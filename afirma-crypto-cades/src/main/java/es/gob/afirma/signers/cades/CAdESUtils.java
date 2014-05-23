@@ -15,8 +15,15 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Properties;
+import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
@@ -29,6 +36,8 @@ import org.bouncycastle.asn1.DERUTCTime;
 import org.bouncycastle.asn1.DERUTF8String;
 import org.bouncycastle.asn1.cms.Attribute;
 import org.bouncycastle.asn1.cms.CMSAttributes;
+import org.bouncycastle.asn1.esf.CommitmentTypeIdentifier;
+import org.bouncycastle.asn1.esf.CommitmentTypeIndication;
 import org.bouncycastle.asn1.ess.ContentHints;
 import org.bouncycastle.asn1.ess.ESSCertID;
 import org.bouncycastle.asn1.ess.ESSCertIDv2;
@@ -54,6 +63,24 @@ import es.gob.afirma.signers.pkcs7.SigUtils;
 /** Utilidades varias relacionadas con firmas electr&oacute;nicas CAdES.
  * Se declara como clase p&uacute;blica para permitir su uso en el m&oacute;dulo de multifirmas CAdES */
 public final class CAdESUtils {
+
+	private static final ASN1ObjectIdentifier COMMITMENT_TYPE_IDENTIFIER_PROOF_OF_ORIGIN = CommitmentTypeIdentifier.proofOfOrigin;
+	private static final ASN1ObjectIdentifier COMMITMENT_TYPE_IDENTIFIER_PROOF_OF_RECEIPT = CommitmentTypeIdentifier.proofOfReceipt;
+	private static final ASN1ObjectIdentifier COMMITMENT_TYPE_IDENTIFIER_PROOF_OF_DELIVERY = CommitmentTypeIdentifier.proofOfDelivery;
+	private static final ASN1ObjectIdentifier COMMITMENT_TYPE_IDENTIFIER_PROOF_OF_SENDER = CommitmentTypeIdentifier.proofOfSender;
+	private static final ASN1ObjectIdentifier COMMITMENT_TYPE_IDENTIFIER_PROOF_OF_APPROVAL = CommitmentTypeIdentifier.proofOfApproval;
+	private static final ASN1ObjectIdentifier COMMITMENT_TYPE_IDENTIFIER_PROOF_OF_CREATION = CommitmentTypeIdentifier.proofOfCreation;
+	private static final Map<String, ASN1ObjectIdentifier> COMMITMENT_TYPE_IDENTIFIERS = new HashMap<String, ASN1ObjectIdentifier>(6);
+	static {
+		COMMITMENT_TYPE_IDENTIFIERS.put("1", COMMITMENT_TYPE_IDENTIFIER_PROOF_OF_ORIGIN); //$NON-NLS-1$
+		COMMITMENT_TYPE_IDENTIFIERS.put("2", COMMITMENT_TYPE_IDENTIFIER_PROOF_OF_RECEIPT); //$NON-NLS-1$
+		COMMITMENT_TYPE_IDENTIFIERS.put("3", COMMITMENT_TYPE_IDENTIFIER_PROOF_OF_DELIVERY); //$NON-NLS-1$
+		COMMITMENT_TYPE_IDENTIFIERS.put("4", COMMITMENT_TYPE_IDENTIFIER_PROOF_OF_SENDER); //$NON-NLS-1$
+		COMMITMENT_TYPE_IDENTIFIERS.put("5", COMMITMENT_TYPE_IDENTIFIER_PROOF_OF_APPROVAL); //$NON-NLS-1$
+		COMMITMENT_TYPE_IDENTIFIERS.put("6", COMMITMENT_TYPE_IDENTIFIER_PROOF_OF_CREATION); //$NON-NLS-1$
+	}
+
+	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma");	//$NON-NLS-1$
 
     private CAdESUtils() {
         // No permitimos la instanciacion
@@ -131,12 +158,15 @@ public final class CAdESUtils {
                 new ESSCertIDv2(digestAlgorithmOID, certHash, isuerSerial)
             };
 
-            /** PolicyInformation ::= SEQUENCE { policyIdentifier CertPolicyId,
-             * policyQualifiers SEQUENCE SIZE (1..MAX) OF PolicyQualifierInfo
-             * OPTIONAL }
-             * CertPolicyId ::= OBJECT IDENTIFIER
-             * PolicyQualifierInfo ::= SEQUENCE { policyQualifierId
-             * PolicyQualifierId, qualifier ANY DEFINED BY policyQualifierId } */
+            /** PolicyInformation ::= SEQUENCE {
+             *    policyIdentifier CertPolicyId,
+             *    policyQualifiers SEQUENCE SIZE (1..MAX) OF PolicyQualifierInfo OPTIONAL
+             *  }
+             *  CertPolicyId ::= OBJECT IDENTIFIER
+             *  PolicyQualifierInfo ::= SEQUENCE {
+             *    policyQualifierId PolicyQualifierId,
+             *    qualifier ANY DEFINED BY policyQualifierId
+             *  } */
 
             final SigningCertificateV2 scv2;
             if(policy.getPolicyIdentifier() != null) {
@@ -189,9 +219,11 @@ public final class CAdESUtils {
             final SigningCertificate scv;
             if (policy.getPolicyIdentifier() != null) {
 
-                /** SigningCertificateV2 ::= SEQUENCE { certs SEQUENCE OF
-                 * ESSCertIDv2, policies SEQUENCE OF PolicyInformation OPTIONAL
-                 * } */
+                /** SigningCertificateV2 ::= SEQUENCE {
+                 *    certs SEQUENCE OF ESSCertIDv2,
+                 *    policies SEQUENCE OF PolicyInformation OPTIONAL
+                 *  } */
+
                 /*
                  * HAY QUE HACER UN SEQUENCE, YA QUE EL CONSTRUCTOR DE BOUNCY
                  * CASTLE NO TIENE DICHO CONSTRUCTOR.
@@ -205,9 +237,9 @@ public final class CAdESUtils {
                 scv = new SigningCertificate(essCertID); // Sin politica
             }
 
-            /** id-aa-signingCertificate OBJECT IDENTIFIER ::= { iso(1)
-             * member-body(2) us(840) rsadsi(113549) pkcs(1) pkcs9(9) smime(16)
-             * id-aa(2) 12 } */
+            /** id-aa-signingCertificate OBJECT IDENTIFIER ::= {
+             *    iso(1) member-body(2) us(840) rsadsi(113549) pkcs(1) pkcs9(9) smime(16) id-aa(2) 12
+             *  } */
             // Secuencia con singningCertificate
             contexExpecific.add(
         		new Attribute(
@@ -227,12 +259,10 @@ public final class CAdESUtils {
         		policy.getPolicyIdentifier().toLowerCase(Locale.US).replace("urn:oid:", "") //$NON-NLS-1$ //$NON-NLS-2$
     		);
 
-            /**
-             *   OtherHashAlgAndValue ::= SEQUENCE {
+            /**  OtherHashAlgAndValue ::= SEQUENCE {
              *     hashAlgorithm    AlgorithmIdentifier,
-             *     hashValue        OCTET STRING }
-             *
-             */
+             *     hashValue        OCTET STRING
+             *   } */
 
             // Algoritmo para el hash
             final AlgorithmIdentifier hashid;
@@ -271,14 +301,11 @@ public final class CAdESUtils {
                 spqInfo = new AOSigPolicyQualifierInfo(policy.getPolicyQualifier().toString());
             }
 
-            /**
-             * SignaturePolicyId ::= SEQUENCE {
-             *  sigPolicyId           SigPolicyId,
-             *  sigPolicyHash         SigPolicyHash,
-             *  sigPolicyQualifiers   SEQUENCE SIZE (1..MAX) OF
-             *                          AOSigPolicyQualifierInfo OPTIONAL}
-             *
-             */
+            /** SignaturePolicyId ::= SEQUENCE {
+             *    sigPolicyId           SigPolicyId,
+             *    sigPolicyHash         SigPolicyHash,
+             *    sigPolicyQualifiers   SEQUENCE SIZE (1..MAX) OF AOSigPolicyQualifierInfo OPTIONAL
+             *  } */
             final ASN1EncodableVector v = new ASN1EncodableVector();
             // sigPolicyId
             v.add(doiSigPolicyId);
@@ -467,6 +494,105 @@ public final class CAdESUtils {
 		);
 
         return contexExpecific;
+    }
+
+    /** Genera la lista de <i>CommitmentTypeIndication</i> a incluir en la firma a partir de los par&aacute;metros
+     * adicionales.
+     * <pre>
+     * CommitmentTypeIndication ::= SEQUENCE {
+     *   commitmentTypeId           CommitmentTypeIdentifier,
+     *   commitmentTypeQualifier    SEQUENCE SIZE (1..MAX) OF CommitmentTypeQualifier OPTIONAL
+     * }
+     *
+     * CommitmentTypeIdentifier ::= OBJECT IDENTIFIER
+     *
+     * CommitmentTypeQualifier ::= SEQUENCE {
+     *   commitmentTypeIdentifier   CommitmentTypeIdentifier,
+     *   qualifier                  ANY DEFINED BY commitmentTypeIdentifier
+     * }
+     * </pre>
+     * @param xParams Par&aacute;metros adicionales con la informaci&oacute;n de los CommitmentTypeIndication a incluir
+     * @return Lista de <i>CommitmentTypeIndication</i> a incluir en la firma CAdES */
+    public static List<CommitmentTypeIndication> generateCommitmentTypeIndications(final Properties xParams) {
+
+    	final List<CommitmentTypeIndication> ret = new ArrayList<CommitmentTypeIndication>();
+
+		if (xParams == null) {
+			return ret;
+		}
+
+		String tmpStr = xParams.getProperty("commitmentTypeIndications"); //$NON-NLS-1$
+		if (tmpStr == null) {
+			return ret;
+		}
+
+		final int nCtis;
+		try {
+			nCtis = Integer.parseInt(tmpStr);
+			if (nCtis < 1) {
+				throw new NumberFormatException();
+			}
+		}
+		catch(final Exception e) {
+			LOGGER.severe(
+				"El parametro adicional 'CommitmentTypeIndications' debe contener un valor numerico entero (el valor actual es " + tmpStr + "), no se anadira el CommitmentTypeIndication: " + e //$NON-NLS-1$ //$NON-NLS-2$
+			);
+			return ret;
+		}
+
+		ASN1ObjectIdentifier identifier;
+		List<ASN1ObjectIdentifier> commitmentTypeQualifiers;
+
+		for(int i=0;i<=nCtis;i++) {
+
+			// Identifier
+			tmpStr = xParams.getProperty("commitmentTypeIndication" + Integer.toString(i) + "Identifier"); //$NON-NLS-1$ //$NON-NLS-2$
+			if (tmpStr == null) {
+				continue;
+			}
+			identifier = COMMITMENT_TYPE_IDENTIFIERS.get(tmpStr);
+			if (identifier == null)  {
+				LOGGER.severe(
+					"El identificador del CommitmentTypeIndication " + i + " no es un tipo soportado (" + tmpStr + "), se omitira y se continuara con el siguiente" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				);
+				continue;
+			}
+
+			// Qualifiers
+			tmpStr = xParams.getProperty("commitmentTypeIndication" + Integer.toString(i) + "CommitmentTypeQualifiers"); //$NON-NLS-1$ //$NON-NLS-2$
+			if (tmpStr == null) {
+				commitmentTypeQualifiers = null;
+			}
+			else {
+				commitmentTypeQualifiers = new ArrayList<ASN1ObjectIdentifier>();
+				final String[] ctqs = tmpStr.split(Pattern.quote("|")); //$NON-NLS-1$
+				for (final String ctq : ctqs) {
+					try {
+						commitmentTypeQualifiers.add(new ASN1ObjectIdentifier(ctq));
+					}
+					catch(final Exception e) {
+						LOGGER.severe(
+							"El calificador '" + ctq + "' del CommitmentTypeIndication " + i + " no es un OID, se omitira y se continuara con el siguiente calificador" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+						);
+					}
+				}
+			}
+			if (commitmentTypeQualifiers == null || commitmentTypeQualifiers.size() < 1) {
+				ret.add(new CommitmentTypeIndication(identifier));
+			}
+			else {
+				ret.add(
+					new CommitmentTypeIndication(
+						identifier,
+						new DERSequence(commitmentTypeQualifiers.toArray(new ASN1ObjectIdentifier[0]))
+					)
+				);
+			}
+
+		}
+
+    	return ret;
+
     }
 
 }
