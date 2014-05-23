@@ -254,7 +254,7 @@ import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
         final ASN1EncodableVector contexExpecific = new ASN1EncodableVector();
 
         // tipo de contenido
-        contexExpecific.add(new Attribute(CMSAttributes.contentType, new DERSet(new DERObjectIdentifier(datatype))));
+        contexExpecific.add(new Attribute(CMSAttributes.contentType, new DERSet(new ASN1ObjectIdentifier(datatype))));
 
         // fecha de firma
         if (timestamp) {
@@ -318,7 +318,7 @@ import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
             // Contenido de Data
             final ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
 
-            final AuthenticatedData auth = new AuthenticatedData((ASN1Sequence) doj.getObject());
+            final AuthenticatedData auth = AuthenticatedData.getInstance(doj.getObject());
 
             final AlgorithmIdentifier digAlg = extractAOIfromAuth((ASN1Sequence) doj.getObject());
 

@@ -25,7 +25,7 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import org.bouncycastle.asn1.ASN1EncodableVector;
-import org.bouncycastle.asn1.DEREnumerated;
+import org.bouncycastle.asn1.ASN1Enumerated;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.DERTaggedObject;
@@ -324,7 +324,7 @@ final class PdfDocumentSecurityStore {
         v2.add(OCSPObjectIdentifiers.id_pkix_ocsp_basic);
         v2.add(new DEROctetString(basicResp));
         final ASN1EncodableVector v3 = new ASN1EncodableVector();
-        v3.add(new DEREnumerated(0));
+        v3.add(new ASN1Enumerated(0));
         v3.add(new DERTaggedObject(true, 0, new DERSequence(v2)));
         return registerOcspResp(new DERSequence(v3).getEncoded());
     }

@@ -257,7 +257,14 @@ final class GenSignedData {
         final ASN1EncodableVector contexExpecific = new ASN1EncodableVector();
 
         // tipo de contenido
-        contexExpecific.add(new Attribute(CMSAttributes.contentType, new DERSet(new DERObjectIdentifier(dataType))));
+        contexExpecific.add(
+    		new Attribute(
+				CMSAttributes.contentType,
+				new DERSet(
+					DERObjectIdentifier.getInstance(dataType)
+				)
+			)
+		);
 
         // fecha de firma
         if (timestamp) {

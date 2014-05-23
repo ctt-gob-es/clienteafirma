@@ -459,7 +459,14 @@ final class Utils {
 
         // tipo de contenido
         if (dataType != null) {
-            contexExpecific.add(new Attribute(CMSAttributes.contentType, new DERSet(new DERObjectIdentifier(dataType))));
+            contexExpecific.add(
+        		new Attribute(
+    				CMSAttributes.contentType,
+    				new DERSet(
+						DERObjectIdentifier.getInstance(dataType)
+					)
+				)
+    		);
         }
 
         // fecha de firma

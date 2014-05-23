@@ -224,7 +224,7 @@ public final class CAdESUtils {
             /**
              * SigPolicyId ::= OBJECT IDENTIFIER Politica de firma.
              */
-            final DERObjectIdentifier doiSigPolicyId = new DERObjectIdentifier(
+            final DERObjectIdentifier doiSigPolicyId = new ASN1ObjectIdentifier(
         		policy.getPolicyIdentifier().toLowerCase(Locale.US).replace("urn:oid:", "") //$NON-NLS-1$ //$NON-NLS-2$
     		);
 
@@ -407,7 +407,7 @@ public final class CAdESUtils {
         if(uri != null){
             v.add(pqid);
             v.add(uri);
-            pqi = new PolicyQualifierInfo(new DERSequence(v));
+            pqi = PolicyQualifierInfo.getInstance(new DERSequence(v));
         }
 
         /**
@@ -449,7 +449,7 @@ public final class CAdESUtils {
 
         // tipo de contenido
         if (dataType != null) {
-            contexExpecific.add(new Attribute(CMSAttributes.contentType, new DERSet(new DERObjectIdentifier(dataType))));
+            contexExpecific.add(new Attribute(CMSAttributes.contentType, new DERSet(new ASN1ObjectIdentifier(dataType))));
         }
 
         // fecha de firma, no se anade en modo PAdES

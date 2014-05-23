@@ -11,6 +11,7 @@
 package es.gob.afirma.signers.pkcs7;
 
 import org.bouncycastle.asn1.ASN1EncodableVector;
+import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1Object;
 import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.ASN1Sequence;
@@ -51,7 +52,7 @@ public final class SignedAndEnvelopedData extends ASN1Object {
                            final ASN1Set crls,
                            final ASN1Set signerInfos) {
 
-        this.version = new DERInteger(1);// Always 1
+        this.version = new ASN1Integer(1);// Always 1
         this.recipientInfos = recipientInfos;
         this.digestAlgorithms = digestAlgorithms;
         this.encryptedContentInfo = encryptedContentInfo;

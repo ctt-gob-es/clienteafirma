@@ -204,7 +204,7 @@ public final class CMSAuthenticatedEnvelopedData {
         final ASN1EncodableVector contexExpecific = new ASN1EncodableVector();
 
         // tipo de contenido
-        contexExpecific.add(new Attribute(CMSAttributes.contentType, new DERSet(new DERObjectIdentifier(datatype))));
+        contexExpecific.add(new Attribute(CMSAttributes.contentType, new DERSet(new ASN1ObjectIdentifier(datatype))));
 
         // fecha de firma
         if (signingTime) {
@@ -260,7 +260,7 @@ public final class CMSAuthenticatedEnvelopedData {
             // Contenido de Data
             final ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
 
-            final AuthEnvelopedData authEnv = new AuthEnvelopedData((ASN1Sequence) doj.getObject());
+            final AuthEnvelopedData authEnv = AuthEnvelopedData.getInstance(doj.getObject());
 
             // Obtenemos los originatorInfo
             OriginatorInfo origInfo = authEnv.getOriginatorInfo();
