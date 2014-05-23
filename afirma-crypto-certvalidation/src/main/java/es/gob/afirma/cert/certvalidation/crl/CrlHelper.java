@@ -29,9 +29,9 @@ import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.x509.CRLDistPoint;
 import org.bouncycastle.asn1.x509.DistributionPoint;
 import org.bouncycastle.asn1.x509.DistributionPointName;
+import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.GeneralName;
 import org.bouncycastle.asn1.x509.GeneralNames;
-import org.bouncycastle.asn1.x509.X509Extension;
 
 import es.gob.afirma.cert.certvalidation.ValidationResult;
 import es.gob.afirma.core.misc.AOUtil;
@@ -172,7 +172,7 @@ final class CrlHelper {
 	}
 
 	private static List<String> getCrlDistributionPoints(final X509Certificate cert) throws IOException {
-		final byte[] crldpExt = cert.getExtensionValue(X509Extension.cRLDistributionPoints.getId());
+		final byte[] crldpExt = cert.getExtensionValue(Extension.cRLDistributionPoints.getId());
 		if (crldpExt == null) {
 			return new ArrayList<String>();
 		}
