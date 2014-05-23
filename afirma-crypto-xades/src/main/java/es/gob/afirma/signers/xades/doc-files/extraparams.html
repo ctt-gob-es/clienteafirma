@@ -122,8 +122,48 @@
    <dd>C&oacute;digo postal en el que se realiza la firma.</dd>
   <dt><b><i>signatureProductionCountry</i></b></dt>
    <dd>Pa&iacute;s en el que se realiza la firma.</dd>
+   
+   
+  <dt><b><i>commitmentTypeIndications</i></b></dt>
+   <dd>
+    N&uacute;mero de <i>CommitmentTypeIndications</i> a a&ntilde;adir a la firma XAdES.<br>
+    En los par&aacute;metros siguientes, los <i>CommitmentTypeIndications</i> se numeran a partir de 0 (cero).
+   </dd>
+  <dt><b><i>commitmentTypeIndication</i>n<i>ObjectReference</i></b></dt>
+   <dd>
+    URI que referencia al objeto principal del <i>CommitmentTypeIndication</i> n&uacute;mero <i>n</i> (atributo obligatorio). 
+   </dd>
+  <dt><b><i>commitmentTypeIndication</i>n<i>Identifier</i></b></dt>  
+    <dd>
+    URI que identifica un&iacute;vocamente el <i>CommitmentTypeIndication</i> n&uacute;mero <i>n</i> (atributo obligatorio). 
+   </dd>
+  <dt><b><i>commitmentTypeIndication</i>n<i>Qualifier</i></b></dt>
+    <dd>
+    OID (o URN de tipo OID) que califica el <i>CommitmentTypeIndication</i> n&uacute;mero <i>n</i> (atributo opcional). 
+   </dd>
+  <dt><b><i>commitmentTypeIndication</i>n<i>Description</i></b></dt>
+   <dd>
+    Descripci&oacute;n textual del <i>CommitmentTypeIndication</i> n&uacute;mero <i>n</i> (atributo opcional). 
+   </dd>
+  <dt><b><i>commitmentTypeIndication</i>n<i>DocumentationReferences</i></b></dt>
+   <dd>
+    Lista de URL separadas por el caracter '<i>|</i>' que se aportan como referencias documentales del 
+    <i>CommitmentTypeIndication</i> n&uacute;mero <i>n</i> (atributo opcional).<br>
+    Las URL de la lista no pueden contener el caracter '<i>|</i>' (ya que este se usa como separador). 
+   </dd>
+  <dt><b><i>commitmentTypeIndication</i>n<i>CommitmentTypeQualifiers</i></b></dt>
+   <dd>
+    Lista de indicadores textuales separados por el caracter '<i>|</i>' que se aportan como calificadores adicionales del 
+    <i>CommitmentTypeIndication</i> n&uacute;mero <i>n</i> (atributo opcional).<br>
+    Los elementos de la lista no pueden contener el caracter '<i>|</i>' (ya que este se usa como separador). 
+   </dd>
+   
+   
   <dt><b><i>xmlTransforms</i></b></dt>
-   <dd>N&uacute;mero de transformaciones a aplicar al XML antes de firmarlo.</dd>
+   <dd>
+    N&uacute;mero de transformaciones a aplicar al XML antes de firmarlo.<br>
+    En los par&aacute;metros siguientes, las transformaciones se numeran a partir de 0 (cero).
+   </dd>
   <dt><b><i>xmlTransform</i>n<i>Type</i></b></dt>
    <dd>Tipo de la transformaci&oacute;n <i>n</i> (debe ser la URL del algoritmo seg&uacute;n define W3C).</dd>
   <dt><b><i>xmlTransform</i>n<i>Subtype</i></b></dt>

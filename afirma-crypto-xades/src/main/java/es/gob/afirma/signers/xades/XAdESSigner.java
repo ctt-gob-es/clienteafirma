@@ -43,6 +43,7 @@ import javax.xml.crypto.dsig.spec.XPathFilterParameterSpec;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.OutputKeys;
 
+import net.java.xades.security.xml.XAdES.CommitmentTypeIndication;
 import net.java.xades.security.xml.XAdES.DataObjectFormat;
 import net.java.xades.security.xml.XAdES.DataObjectFormatImpl;
 import net.java.xades.security.xml.XAdES.ObjectIdentifierImpl;
@@ -1051,6 +1052,12 @@ public final class XAdESSigner {
 		);
 		objectFormats.add(objectFormat);
 		xades.setDataObjectFormats(objectFormats);
+
+		// CommitmentTypeIndications (http://www.w3.org/TR/XAdES/#Syntax_for_XAdES_The_CommitmentTypeIndication_element)
+		final List<CommitmentTypeIndication> ctis = XAdESUtil.parseCommitmentTypeIndications(extraParams);
+		if (ctis != null && ctis.size() > 0) {
+			xades.setCommitmentTypeIndications(XAdESUtil.parseCommitmentTypeIndications(extraParams));
+		}
 
 		final AOXMLAdvancedSignature xmlSignature;
 		try {
