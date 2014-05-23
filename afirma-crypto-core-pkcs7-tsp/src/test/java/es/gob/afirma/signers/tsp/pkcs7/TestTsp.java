@@ -10,7 +10,6 @@ import org.junit.Test;
 public class TestTsp {
 
 	private static final String CATCERT_POLICY = "0.4.0.2023.1.1"; //$NON-NLS-1$
-	private static final String CATCERT_TSP = "http://psis.catcert.net/psis/catcert/tsp"; //$NON-NLS-1$
 	private static final String CATCERT_TSP_SSL = "https://psis.catcert.net/psis/catcert/tsp"; //$NON-NLS-1$
 	private static final boolean CATCERT_REQUIRECERT = true;
 
