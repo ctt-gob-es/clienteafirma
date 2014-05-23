@@ -59,14 +59,14 @@ public final class CAdESUtils {
         // No permitimos la instanciacion
     }
 
-    /** Genera la parte que contiene la informaci&oacute;n del
-     * Usuario. Se generan los atributos que se necesitan para generar la firma.
+    /** Genera la parte que contiene la informaci&oacute;n del Usuario.
+     * Se generan los atributos que se necesitan para generar la firma.
      * @param cert Certificado del firmante
      * @param digestAlgorithmName Nombre del algoritmo de huella digital a usar
      * @param data Datos firmados
      * @param policy Pol&iacute;tica de firma
      * @param signingCertificateV2 {@code true} para utilizar la versi&oacute;n 2 del campo
-     * signingCertificate, {@code false} para utilizar la versi&oacute;n 1.
+     *                             signingCertificate, {@code false} para utilizar la versi&oacute;n 1.
      * @param dataDigest Huella digital de los datos firmados
      * @param signDate Fecha de la firma (debe establecerse externamente para evitar desincronismos en la firma trif&aacute;sica)
      * @param padesMode <code>true</code> para generar una firma CAdES compatible PAdES, <code>false</code> para generar una firma CAdES normal
@@ -75,8 +75,7 @@ public final class CAdESUtils {
      * @return Los datos necesarios para generar la firma referente a los datos del usuario.
      * @throws java.security.NoSuchAlgorithmException Cuando se introduce un algoritmo no v&aacute;lido.
      * @throws java.io.IOException Cuando se produce un error de entrada/salida.
-     * @throws CertificateEncodingException Error de codificaci&oacute;n en el certificado.
-     */
+     * @throws CertificateEncodingException Error de codificaci&oacute;n en el certificado. */
     public static ASN1EncodableVector generateSignerInfo(final X509Certificate cert,
                                                   final String digestAlgorithmName,
                                                   final byte[] data,
@@ -333,8 +332,7 @@ public final class CAdESUtils {
         return contexExpecific;
     }
 
-    /**
-     * Obtiene un PolicyInformation a partir de los datos de la pol&iacute;tica.
+    /** Obtiene un PolicyInformation a partir de los datos de la pol&iacute;tica.
      * Sirve para los datos de SigningCertificate y SigningCertificateV2. Tiene que llevar algunos
      * datos de la pol&iacute;tica.
      * <pre>
@@ -381,8 +379,7 @@ public final class CAdESUtils {
      * </pre>
      *
      * @param policy    Pol&iacute;tica de la firma.
-     * @return          Estructura con la pol&iacute;tica preparada para insertarla en la firma.
-     */
+     * @return          Estructura con la pol&iacute;tica preparada para insertarla en la firma. */
     private static PolicyInformation[] getPolicyInformation(final AdESPolicy policy){
 
         if (policy == null) {
