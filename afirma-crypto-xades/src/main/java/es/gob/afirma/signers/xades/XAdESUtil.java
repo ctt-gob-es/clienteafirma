@@ -3,7 +3,9 @@ package es.gob.afirma.signers.xades;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -26,6 +28,22 @@ import es.gob.afirma.core.AOException;
 final class XAdESUtil {
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma");	//$NON-NLS-1$
+
+	private static final String COMMITMENT_TYPE_IDENTIFIER_PROOF_OF_ORIGIN = "urn:oid:1.2.840.113549.1.9.16.6.1"; //$NON-NLS-1$
+	private static final String COMMITMENT_TYPE_IDENTIFIER_PROOF_OF_RECEIPT = "urn:oid:1.2.840.113549.1.9.16.6.2"; //$NON-NLS-1$
+	private static final String COMMITMENT_TYPE_IDENTIFIER_PROOF_OF_DELIVERY = "urn:oid:1.2.840.113549.1.9.16.6.3"; //$NON-NLS-1$
+	private static final String COMMITMENT_TYPE_IDENTIFIER_PROOF_OF_SENDER = "urn:oid:1.2.840.113549.1.9.16.6.4"; //$NON-NLS-1$
+	private static final String COMMITMENT_TYPE_IDENTIFIER_PROOF_OF_APPROVAL = "urn:oid:1.2.840.113549.1.9.16.6.5"; //$NON-NLS-1$
+	private static final String COMMITMENT_TYPE_IDENTIFIER_PROOF_OF_CREATION = "urn:oid:1.2.840.113549.1.9.16.6.6"; //$NON-NLS-1$
+	private static final Map<String, String> COMMITMENT_TYPE_IDENTIFIERS = new HashMap<String, String>(6);
+	static {
+		COMMITMENT_TYPE_IDENTIFIERS.put("1", COMMITMENT_TYPE_IDENTIFIER_PROOF_OF_ORIGIN); //$NON-NLS-1$
+		COMMITMENT_TYPE_IDENTIFIERS.put("2", COMMITMENT_TYPE_IDENTIFIER_PROOF_OF_RECEIPT); //$NON-NLS-1$
+		COMMITMENT_TYPE_IDENTIFIERS.put("3", COMMITMENT_TYPE_IDENTIFIER_PROOF_OF_DELIVERY); //$NON-NLS-1$
+		COMMITMENT_TYPE_IDENTIFIERS.put("4", COMMITMENT_TYPE_IDENTIFIER_PROOF_OF_SENDER); //$NON-NLS-1$
+		COMMITMENT_TYPE_IDENTIFIERS.put("5", COMMITMENT_TYPE_IDENTIFIER_PROOF_OF_APPROVAL); //$NON-NLS-1$
+		COMMITMENT_TYPE_IDENTIFIERS.put("6", COMMITMENT_TYPE_IDENTIFIER_PROOF_OF_CREATION); //$NON-NLS-1$
+	}
 
 	private XAdESUtil() {
 		// No permitimos la instanciacion
@@ -69,16 +87,18 @@ final class XAdESUtil {
 		final int nCtis;
 		try {
 			nCtis = Integer.parseInt(tmpStr);
+			if (nCtis < 1) {
+				throw new NumberFormatException();
+			}
 		}
 		catch(final Exception e) {
 			LOGGER.severe(
-				"El parametro adicional 'CommitmentTypeIndications' debe contener un valor numerico (el valor actual es " + tmpStr + "), no se anadira el CommitmentTypeIndication: " + e //$NON-NLS-1$ //$NON-NLS-2$
+				"El parametro adicional 'CommitmentTypeIndications' debe contener un valor numerico entero (el valor actual es " + tmpStr + "), no se anadira el CommitmentTypeIndication: " + e //$NON-NLS-1$ //$NON-NLS-2$
 			);
 			return ret;
 		}
 
 		String identifier;
-		String qualifier;
 		String description;
 		ArrayList<String> documentationReferences;
 		String objectReference;
@@ -106,19 +126,13 @@ final class XAdESUtil {
 			if (tmpStr == null) {
 				continue;
 			}
-			try {
-				identifier = new Uri(tmpStr).toString();
-			}
-			catch (final MalformedURLException e) {
+			identifier = COMMITMENT_TYPE_IDENTIFIERS.get(tmpStr);
+			if (identifier == null)  {
 				LOGGER.severe(
-					"El identificador del CommitmentTypeIndication " + i + " no es una URI, se omitira y se continuara con la siguiente: " + e //$NON-NLS-1$ //$NON-NLS-2$
+					"El identificador del CommitmentTypeIndication " + i + " no es un tipo soportado (" + tmpStr + "), se omitira y se continuara con el siguiente" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				);
 				continue;
 			}
-
-			// Qualifier
-			tmpStr = xParams.getProperty("commitmentTypeIndication" + Integer.toString(i) + "Qualifier"); //$NON-NLS-1$ //$NON-NLS-2$
-			qualifier = tmpStr == null ? "" : (tmpStr.startsWith("urn:oid:") ? "" : "urn:oid:") + tmpStr; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 
 			// Description
 			description = xParams.getProperty("commitmentTypeIndication" + Integer.toString(i) + "Description"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -160,8 +174,8 @@ final class XAdESUtil {
 			ret.add(
 				new CommitmentTypeIndicationImpl(
 					new CommitmentTypeIdImpl(
-						qualifier,				// OID como URI u OID como URN (puede ser vacio)
-						identifier,				// Una URI (obligatorio)
+						"OIDAsURN",				// OID como URI u OID como URN //$NON-NLS-1$
+						identifier,				// Un OID
 						description,			// Descripcion textual (opcional)
 						documentationReferences	// Lista de URL (opcional)
 					),

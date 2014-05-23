@@ -122,8 +122,6 @@
    <dd>C&oacute;digo postal en el que se realiza la firma.</dd>
   <dt><b><i>signatureProductionCountry</i></b></dt>
    <dd>Pa&iacute;s en el que se realiza la firma.</dd>
-   
-   
   <dt><b><i>commitmentTypeIndications</i></b></dt>
    <dd>
     N&uacute;mero de <i>CommitmentTypeIndications</i> a a&ntilde;adir a la firma XAdES.<br>
@@ -135,11 +133,15 @@
    </dd>
   <dt><b><i>commitmentTypeIndication</i>n<i>Identifier</i></b></dt>  
     <dd>
-    URI que identifica un&iacute;vocamente el <i>CommitmentTypeIndication</i> n&uacute;mero <i>n</i> (atributo obligatorio). 
-   </dd>
-  <dt><b><i>commitmentTypeIndication</i>n<i>Qualifier</i></b></dt>
-    <dd>
-    OID (o URN de tipo OID) que califica el <i>CommitmentTypeIndication</i> n&uacute;mero <i>n</i> (atributo opcional). 
+    Tipo de <i>CommitmentTypeIndication</i> (atributo obligatorio):
+    <ul>
+     <li><i>1</i> = Prueba de origen</li>
+     <li><i>2</i> = Prueba de recepci&oacute;n</li>
+     <li><i>3</i> = Prueba de entrega</li>
+     <li><i>4</i> = Prueba de env&iacute;o</li>
+     <li><i>5</i> = Prueba de aprobaci&oacute;n</li>
+     <li><i>6</i> = Prueba de creaci&oacute;n</li>
+    </ul> 
    </dd>
   <dt><b><i>commitmentTypeIndication</i>n<i>Description</i></b></dt>
    <dd>
@@ -157,8 +159,6 @@
     <i>CommitmentTypeIndication</i> n&uacute;mero <i>n</i> (atributo opcional).<br>
     Los elementos de la lista no pueden contener el caracter '<i>|</i>' (ya que este se usa como separador). 
    </dd>
-   
-   
   <dt><b><i>xmlTransforms</i></b></dt>
    <dd>
     N&uacute;mero de transformaciones a aplicar al XML antes de firmarlo.<br>
