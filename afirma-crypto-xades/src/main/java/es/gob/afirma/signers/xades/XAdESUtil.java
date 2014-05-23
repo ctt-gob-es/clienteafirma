@@ -21,8 +21,6 @@ import net.java.xades.security.xml.XAdES.CommitmentTypeIndicationImpl;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-import com.sun.jndi.toolkit.url.Uri;
-
 import es.gob.afirma.core.AOException;
 
 final class XAdESUtil {
@@ -73,7 +71,7 @@ final class XAdESUtil {
 		return (Element) nodeList.item(0);
 	}
 
-	static List<CommitmentTypeIndication> parseCommitmentTypeIndications(final Properties xParams) {
+	static List<CommitmentTypeIndication> parseCommitmentTypeIndications(final Properties xParams, final String signedDataId) {
 
 		final List<CommitmentTypeIndication> ret = new ArrayList<CommitmentTypeIndication>();
 
@@ -101,25 +99,9 @@ final class XAdESUtil {
 		String identifier;
 		String description;
 		ArrayList<String> documentationReferences;
-		String objectReference;
 		ArrayList<String> commitmentTypeQualifiers;
 
 		for(int i=0;i<=nCtis;i++) {
-
-			// ObjectReference
-			tmpStr = xParams.getProperty("commitmentTypeIndication" + Integer.toString(i) + "ObjectReference"); //$NON-NLS-1$ //$NON-NLS-2$
-			if (tmpStr == null) {
-				continue;
-			}
-			try {
-				objectReference = new Uri(tmpStr).toString();
-			}
-			catch (final MalformedURLException e) {
-				LOGGER.severe(
-					"La referencia al objeto principal del CommitmentTypeIndication " + i + " no es una URI, se omitira y se continuara con la siguiente: " + e //$NON-NLS-1$ //$NON-NLS-2$
-				);
-				continue;
-			}
 
 			// Identifier
 			tmpStr = xParams.getProperty("commitmentTypeIndication" + Integer.toString(i) + "Identifier"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -179,7 +161,7 @@ final class XAdESUtil {
 						description,			// Descripcion textual (opcional)
 						documentationReferences	// Lista de URL (opcional)
 					),
-					objectReference,			// Una URI
+					"#" + signedDataId,			// Una URI //$NON-NLS-1$
 					commitmentTypeQualifiers	// Lista de elementos textuales (opcional)
 				)
 			);

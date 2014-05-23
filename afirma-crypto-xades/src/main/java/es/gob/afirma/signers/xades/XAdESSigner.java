@@ -1054,9 +1054,9 @@ public final class XAdESSigner {
 		xades.setDataObjectFormats(objectFormats);
 
 		// CommitmentTypeIndications (http://www.w3.org/TR/XAdES/#Syntax_for_XAdES_The_CommitmentTypeIndication_element)
-		final List<CommitmentTypeIndication> ctis = XAdESUtil.parseCommitmentTypeIndications(extraParams);
+		final List<CommitmentTypeIndication> ctis = XAdESUtil.parseCommitmentTypeIndications(extraParams, referenceId);
 		if (ctis != null && ctis.size() > 0) {
-			xades.setCommitmentTypeIndications(XAdESUtil.parseCommitmentTypeIndications(extraParams));
+			xades.setCommitmentTypeIndications(ctis);
 		}
 
 		final AOXMLAdvancedSignature xmlSignature;
