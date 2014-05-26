@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<toc version="1.0"> 
+<!--  categoryclosedimage="FolderClosed" categoryopenimage="FolderOpened" topicimage="ItemIco"-->
+		<!--  
+        <tocitem text="Ejemplo JavaHelp"    target="aplicacion">
+           <tocitem text="Ventana principal"    target="ventana_principal"/>
+           <tocitem text="Ventana secundaria"    target="ventana_secundaria"/>
+        </tocitem>
+        -->
+	<tocitem text="SimpleAfirma" target="SimpleAfirma">
+	<tocitem text="Pantalla de espera" target="PantallaEspera" />
+	<tocitem text="Pantalla de firma" target="PantallaFirma" />
+	<tocitem text="Pantalla de detalle de firma" target="PantallaDetalle" />
+	<tocitem text="Menú Preferencias" target="MenuPreferencias" />
+	<tocitem text="Licencias" target="Licencia" />
+	</tocitem>
+</toc>

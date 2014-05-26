@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?><Facturae xmlns="http://www.facturae.es/Facturae/2007/v3.1/Facturae" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><FileHeader xmlns=""><SchemaVersion>3.1</SchemaVersion><Modality>I</Modality><InvoiceIssuerType>EM</InvoiceIssuerType><Batch><BatchIdentifier>2008/15501</BatchIdentifier><InvoicesCount>1</InvoicesCount><TotalInvoicesAmount><TotalAmount>127.01</TotalAmount></TotalInvoicesAmount><TotalOutstandingAmount><TotalAmount>127.01</TotalAmount></TotalOutstandingAmount><TotalExecutableAmount><TotalAmount>127.01</TotalAmount></TotalExecutableAmount><InvoiceCurrencyCode>EUR</InvoiceCurrencyCode></Batch></FileHeader><Parties xmlns=""><SellerParty><TaxIdentification><PersonTypeCode>J</PersonTypeCode><ResidenceTypeCode>R</ResidenceTypeCode><TaxIdentificationNumber>b99999999</TaxIdentificationNumber></TaxIdentification><LegalEntity><CorporateName>PRUEBAS, sl.</CorporateName><TradeName>PRUEBAS, sl.</TradeName><RegistrationData><Book>Libro</Book><RegisterOfCompaniesLocation>Registro</RegisterOfCompaniesLocation><Sheet>Hoja</Sheet><Folio>Folio</Folio><Section>Seccion</Section><Volume>Tomo</Volume><AdditionalRegistrationData>Otros</AdditionalRegistrationData></RegistrationData><AddressInSpain><Address>c/direccion</Address><PostCode>50320</PostCode><Town>Zaragoza</Town><Province>Zaragoza</Province><CountryCode>ESP</CountryCode></AddressInSpain><ContactDetails/></LegalEntity></SellerParty><BuyerParty><TaxIdentification><PersonTypeCode>J</PersonTypeCode><ResidenceTypeCode>R</ResidenceTypeCode><TaxIdentificationNumber>Q-2222222-I</TaxIdentificationNumber></TaxIdentification><LegalEntity><CorporateName>EMPRESA CLIENTE</CorporateName><TradeName>EMPRESA CLIENTE</TradeName><RegistrationData><Book/><RegisterOfCompaniesLocation/><Sheet/><Folio/><Section/><Volume/><AdditionalRegistrationData/></RegistrationData><AddressInSpain><Address>PASEO DE PRUENAS, 2</Address><PostCode>50009</PostCode><Town>ZARAGOZA</Town><Province>ZARAGOZA</Province><CountryCode>ESP</CountryCode></AddressInSpain><ContactDetails/></LegalEntity></BuyerParty></Parties><Invoices xmlns=""><Invoice><InvoiceHeader><InvoiceNumber>2008/155</InvoiceNumber><InvoiceSeriesCode>01</InvoiceSeriesCode><InvoiceDocumentType>FC</InvoiceDocumentType><InvoiceClass>OO</InvoiceClass></InvoiceHeader><InvoiceIssueData><IssueDate>2008-08-04</IssueDate><PlaceOfIssue><PostCode>50320</PostCode><PlaceOfIssueDescription>Zaragoza</PlaceOfIssueDescription></PlaceOfIssue><InvoiceCurrencyCode>EUR</InvoiceCurrencyCode><TaxCurrencyCode>EUR</TaxCurrencyCode><LanguageName>es</LanguageName></InvoiceIssueData><TaxesOutputs><Tax><TaxTypeCode>01</TaxTypeCode><TaxRate>16.00</TaxRate><TaxableBase><TotalAmount>109.49</TotalAmount></TaxableBase><TaxAmount><TotalAmount>17.52</TotalAmount></TaxAmount></Tax></TaxesOutputs><InvoiceTotals><TotalGrossAmount>109.49</TotalGrossAmount><GeneralDiscounts><Discount><DiscountReason>Descuento a cliente</DiscountReason><DiscountRate>0.0000</DiscountRate><DiscountAmount>0.00</DiscountAmount></Discount></GeneralDiscounts><TotalGrossAmountBeforeTaxes>109.49</TotalGrossAmountBeforeTaxes><TotalTaxOutputs>17.52</TotalTaxOutputs><TotalTaxesWithheld>0.00</TotalTaxesWithheld><InvoiceTotal>127.01</InvoiceTotal><TotalOutstandingAmount>127.01</TotalOutstandingAmount><TotalExecutableAmount>127.01</TotalExecutableAmount></InvoiceTotals><Items><InvoiceLine><IssuerTransactionReference/><ReceiverTransactionReference/><DeliveryNotesReferences><DeliveryNote><DeliveryNoteNumber>-0</DeliveryNoteNumber></DeliveryNote></DeliveryNotesReferences><ItemDescription>FACTURAS Y CERTIFICACIONES</ItemDescription><Quantity>1.00</Quantity><UnitPriceWithoutTax>109.490000</UnitPriceWithoutTax><TotalCost>109.49</TotalCost><DiscountsAndRebates><Discount><DiscountReason>Descuento a cliente</DiscountReason><DiscountRate>0.0000</DiscountRate><DiscountAmount>0.00</DiscountAmount></Discount></DiscountsAndRebates><GrossAmount>109.49</GrossAmount><TaxesOutputs><Tax><TaxTypeCode>01</TaxTypeCode><TaxRate>16.00</TaxRate><TaxableBase><TotalAmount>109.49</TotalAmount></TaxableBase><TaxAmount><TotalAmount>17.52</TotalAmount></TaxAmount></Tax></TaxesOutputs></InvoiceLine></Items><PaymentDetails><Installment><InstallmentDueDate>2008-11-02</InstallmentDueDate><InstallmentAmount>127.01</InstallmentAmount><PaymentMeans>05</PaymentMeans><AccountToBeDebited><IBAN>01234567890123456789</IBAN><BankCode>cajanorte</BankCode><BranchCode>66</BranchCode><BranchInSpainAddress><Address>c/las victorias, 3</Address><PostCode>50003</PostCode><Town>sepúlveda</Town><Province>zaragoza</Province><CountryCode>ESP</CountryCode></BranchInSpainAddress></AccountToBeDebited></Installment></PaymentDetails></Invoice></Invoices><ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:xades="http://uri.etsi.org/01903/v1.3.2#" Id="Signature">
+<ds:SignedInfo Id="Signature-SignedInfo">
+<ds:CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/>
+<ds:SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>
+<ds:Reference Id="SignedPropertiesID" Type="http://uri.etsi.org/01903#SignedProperties" URI="#Signature-SignedProperties">
+<ds:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>
+<ds:DigestValue>Xu7HuBKW6A56qazfVDNXUHFlRNY=</ds:DigestValue>
+</ds:Reference>
+<ds:Reference URI="">
+<ds:Transforms>
+<ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/>
+</ds:Transforms>
+<ds:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>
+<ds:DigestValue>oVlFwjNHHLaHIxLDgtzIDrNDErY=</ds:DigestValue>
+</ds:Reference>
+<ds:Reference URI="#Certificate1">
+<ds:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>
+<ds:DigestValue>LYgP5d+5GRrV5zSBp01mSAcwdZA=</ds:DigestValue>
+</ds:Reference>
+</ds:SignedInfo>
+<ds:SignatureValue Id="SignatureValue">
+odDGxb8PjYKKRS+OLbnTZLNa1jsPK7iTCNKWwFdn2fwQ64OQAf8q5e8aQN5+llHA6VO5lKi7EK7C
+EHODwk0W1KUT8cTuc5TjYQlqsvBBotOM4u6UOqKyjdh2zkc9xbwRrAFXsVq0MHeU76LOkT5T8AfW
+FzLsM3mQJEO12kzWjVgAP1tEJXIOrChALasQSIEd2JSUhvfwmLfJd8AfcJlxCA/ppQXQmZ9ClTdS
+Hueoiu5AzLZFVTGxlQ1+H3IROE6iws1PsVqryjbypfrqvCCNmOKQxIV8VLG5OWDMfGS0RFYHPO7K
+7g22VEff2G92rtG37m7V9k0i7t5ZHEDqLwgCtA==
+</ds:SignatureValue>
+<ds:KeyInfo Id="Certificate1">
+<ds:X509Data>
+<ds:X509Certificate>
+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
+aux7DIPm7Kb9OPeHR02d8UHMUu36
+</ds:X509Certificate>
+</ds:X509Data>
+<ds:KeyValue>
+<ds:RSAKeyValue>
+<ds:Modulus>
+xyZNcyzjarxISadwXoYV/t5nUbaMIrYM6CX3cn8d3OwV8S6uZ7qYngbVgMj+sGnXUyZeXFBf/Eth
+Rq/alLFt4o1+qduJ5eFLtXxMVceLr0KJy3aK9/XZjbe3a9fwVynWm2NaO+UDdparsV76M9wp4TpC
+s0kT05UeXVMvooApFC6k3aYR7g+5Yas3jwm+2qBTZSmtC6eCSkQrazHCcvl0aQOV4YiyCF8Id1ZB
+Om6z+mbj1e6lAY0r0YOevqd093deqEB4mfG889q37kIqsJCEyhtDe3gr8Vrw8EoIoigMR7krIZdB
+xPX7rcjLkITT7WQo2jUG1J3ie2WWGrwgEB0q6Q==
+</ds:Modulus>
+<ds:Exponent>AQAB</ds:Exponent>
+</ds:RSAKeyValue>
+</ds:KeyValue>
+</ds:KeyInfo>
+<ds:Object Id="Signature-Object"><xades:QualifyingProperties Target="#Signature"><xades:SignedProperties Id="Signature-SignedProperties"><xades:SignedSignatureProperties><xades:SigningTime>2010-02-11T17:28:24+01:00</xades:SigningTime><xades:SigningCertificate><xades:Cert><xades:CertDigest><ds:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/><ds:DigestValue>6jWIOEVMTanvoO0o4Jl3x9xkcDU=</ds:DigestValue></xades:CertDigest><xades:IssuerSerial><ds:X509IssuerName>CN=AC DNIE 001,OU=DNIE,O=DIRECCION GENERAL DE LA POLICIA,C=ES</ds:X509IssuerName><ds:X509SerialNumber>77650501059047179808462143355025559049</ds:X509SerialNumber></xades:IssuerSerial></xades:Cert></xades:SigningCertificate><xades:SignaturePolicyIdentifier><xades:SignaturePolicyId><xades:SigPolicyId><xades:Identifier>http://www.facturae.es/politica_de_firma_formato_facturae/politica_de_firma_formato_facturae_v3_1.pdf</xades:Identifier><xades:Description>facturae31</xades:Description></xades:SigPolicyId><xades:SigPolicyHash><ds:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/><ds:DigestValue>Ohixl6upD6av8N7pEvDABhEL6hM=</ds:DigestValue></xades:SigPolicyHash></xades:SignaturePolicyId></xades:SignaturePolicyIdentifier><xades:SignerRole><xades:ClaimedRoles><xades:ClaimedRole>emisor</xades:ClaimedRole></xades:ClaimedRoles></xades:SignerRole></xades:SignedSignatureProperties></xades:SignedProperties></xades:QualifyingProperties></ds:Object></ds:Signature></Facturae>
