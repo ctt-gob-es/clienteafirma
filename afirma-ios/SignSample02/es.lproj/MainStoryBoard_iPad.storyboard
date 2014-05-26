@@ -1,0 +1,1239 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="2.0" toolsVersion="3084" systemVersion="12F45" targetRuntime="iOS.CocoaTouch.iPad" propertyAccessControl="none" initialViewController="oXt-Wl-tio">
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="2083"/>
+    </dependencies>
+    <scenes>
+        <!--Navigation Controller-->
+        <scene sceneID="9zR-zd-mmm">
+            <objects>
+                <navigationController definesPresentationContext="YES" id="oXt-Wl-tio" sceneMemberID="viewController">
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="iwP-rE-YNG">
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <connections>
+                        <segue destination="FiJ-J0-m6p" kind="relationship" relationship="rootViewController" id="mCH-Qh-CjI"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Rpb-tz-mUw" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-2128" y="-122"/>
+        </scene>
+        <!--Pin Drop Box Cloud View Controller-->
+        <scene sceneID="9pj-xP-qKF">
+            <objects>
+                <viewController id="8OC-Jd-4nd" customClass="AOPinDropBoxCloudViewController" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="ZWh-LU-1Gc">
+                        <rect key="frame" x="0.0" y="20" width="768" height="1004"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        <subviews>
+                            <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" minimumFontSize="17" id="6Pq-qT-ArO">
+                                <rect key="frame" x="151" y="181" width="469" height="30"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits" returnKeyType="done" enablesReturnKeyAutomatically="YES" secureTextEntry="YES"/>
+                                <connections>
+                                    <outlet property="delegate" destination="8OC-Jd-4nd" id="njF-wH-kft"/>
+                                </connections>
+                            </textField>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" text="Una vez introducida la contraseña de su almacén de certificados y claves, se copiará en su carpeta personal de iTunes." id="74V-hT-5OR">
+                                <rect key="frame" x="151" y="219" width="469" height="152"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                            </textView>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" text="Por favor, introduzca la contraseña del almacén de claves " id="Bkk-i0-x3I">
+                                <rect key="frame" x="151" y="123" width="469" height="50"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                            </textView>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="ROY-Oq-eO3">
+                                <rect key="frame" x="21" y="892" width="728" height="44"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
+                                <state key="normal" title="Aceptar">
+                                    <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <state key="highlighted">
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="pinButtonPressed:" destination="8OC-Jd-4nd" eventType="touchUpInside" id="9gD-xb-yvZ"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="2aS-He-SVl">
+                                <rect key="frame" x="21" y="941" width="728" height="43"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
+                                <state key="normal" title="Volver" image="flecha.png">
+                                    <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <state key="highlighted">
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <segue destination="iSJ-GX-CyA" kind="custom" identifier="toPreviousScreen" customClass="AOCustomSegue" id="j3p-2w-aox"/>
+                                </connections>
+                            </button>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" image="logo_cliente.png" id="nVr-hj-SGX">
+                                <rect key="frame" x="245" y="19" width="280" height="83"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                            </imageView>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                    </view>
+                    <navigationItem key="navigationItem" id="igk-DQ-DXm"/>
+                    <connections>
+                        <outlet property="buttonCertDropBoxCloud" destination="ROY-Oq-eO3" id="oIJ-Pa-ndv"/>
+                        <outlet property="nameCertDropBoxCloud" destination="Bkk-i0-x3I" id="DFQ-To-FyI"/>
+                        <outlet property="pinCertDropBoxCloud" destination="6Pq-qT-ArO" id="NLr-MS-e3c"/>
+                        <segue destination="FiJ-J0-m6p" kind="push" identifier="toFirstScreen" id="k0B-S6-2Ic"/>
+                        <segue destination="MFF-BY-lPu" kind="custom" identifier="toStoreManager" customClass="AOCustomSegue" id="qII-J2-bWn"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="R75-vf-iUD" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-1010" y="-2980"/>
+        </scene>
+        <!--Drop Box Cloud View Controller-->
+        <scene sceneID="scC-6N-FJW">
+            <objects>
+                <viewController id="iSJ-GX-CyA" customClass="AODropBoxCloudViewController" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="COI-D3-8l2">
+                        <rect key="frame" x="0.0" y="20" width="768" height="1004"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        <subviews>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="none" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" id="ANt-uc-F4X">
+                                <rect key="frame" x="151" y="263" width="469" height="220"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <connections>
+                                    <outlet property="dataSource" destination="iSJ-GX-CyA" id="27D-Ye-Sg7"/>
+                                    <outlet property="delegate" destination="iSJ-GX-CyA" id="gxG-ey-YPs"/>
+                                </connections>
+                            </tableView>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="NQE-r2-8wv">
+                                <rect key="frame" x="245" y="491" width="280" height="44"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
+                                <state key="normal" title="Importar almacén">
+                                    <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <state key="highlighted">
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="saveStorebuttonPressed:" destination="iSJ-GX-CyA" eventType="touchUpInside" id="eUz-67-mng"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="Nxe-JM-g8k">
+                                <rect key="frame" x="21" y="940" width="728" height="44"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
+                                <state key="normal" title="Volver" image="flecha.png">
+                                    <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <state key="highlighted">
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <segue destination="MFF-BY-lPu" kind="custom" identifier="toPreviousScreen" customClass="AOCustomSegue" id="4R2-Oe-dzS"/>
+                                </connections>
+                            </button>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" image="logo_cliente.png" id="Cww-a8-JG8">
+                                <rect key="frame" x="245" y="21" width="280" height="83"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                            </imageView>
+                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="Seleccione el amacén de certificados y claves que desea importar:" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="POg-C6-cch">
+                                <rect key="frame" x="21" y="155" width="727" height="21"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                    </view>
+                    <navigationItem key="navigationItem" id="sYz-D9-PDp"/>
+                    <connections>
+                        <outlet property="dbxTblView" destination="ANt-uc-F4X" id="zb9-uU-eq4"/>
+                        <outlet property="saveStore" destination="NQE-r2-8wv" id="Vjr-Sj-4ZZ"/>
+                        <segue destination="8OC-Jd-4nd" kind="push" identifier="toPinDropBox" id="pHF-KD-NKO"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="aDo-Mp-dkp" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-1010" y="-1558"/>
+        </scene>
+        <!--Manager Store Screen View Controller-->
+        <scene sceneID="Eec-Ob-oD4">
+            <objects>
+                <viewController id="MFF-BY-lPu" customClass="AOManagerStoreScreenViewController" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="axD-Hp-M44">
+                        <rect key="frame" x="0.0" y="20" width="768" height="1004"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        <subviews>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" id="CJb-lz-UbE">
+                                <rect key="frame" x="20" y="109" width="728" height="98"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                <string key="text">Desde esta pantalla puede añadir nuevos almacenes de claves con los que crear sus firmas, o eliminar los almacenes de claves instalados en el dispositivo.</string>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                            </textView>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="XZr-Fq-1T7">
+                                <rect key="frame" x="20" y="877" width="728" height="53"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
+                                <state key="normal" title="   Importar desde Dropbox" image="dropbox-ico.png">
+                                    <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <state key="highlighted">
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="buttonPressed:" destination="MFF-BY-lPu" eventType="touchUpInside" id="p8G-Uw-rcc"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="dgm-t5-yi3">
+                                <rect key="frame" x="20" y="938" width="728" height="46"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
+                                <state key="normal" title="Volver" image="flecha.png">
+                                    <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <state key="highlighted">
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <segue destination="FiJ-J0-m6p" kind="custom" identifier="toFirstScreen" customClass="AOCustomSegue" id="1rl-H1-e1G"/>
+                                </connections>
+                            </button>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" image="logo_cliente.png" id="GcC-e7-o44">
+                                <rect key="frame" x="244" y="21" width="280" height="83"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                            </imageView>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="none" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" id="1fR-bc-6ze">
+                                <rect key="frame" x="151" y="232" width="469" height="220"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <connections>
+                                    <outlet property="dataSource" destination="MFF-BY-lPu" id="pc7-9O-ayk"/>
+                                    <outlet property="delegate" destination="MFF-BY-lPu" id="Wxm-3c-wip"/>
+                                </connections>
+                            </tableView>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="l0B-qj-l6s">
+                                <rect key="frame" x="267" y="460" width="234" height="44"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
+                                <state key="normal" title="Borrar almacén seleccionado">
+                                    <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <state key="highlighted">
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="deleteButtonPressed:" destination="MFF-BY-lPu" eventType="touchUpInside" id="LZ1-EV-m3T"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                    </view>
+                    <navigationItem key="navigationItem" id="Uif-ey-poH"/>
+                    <connections>
+                        <outlet property="deleteButton" destination="l0B-qj-l6s" id="bK2-sI-Kq6"/>
+                        <outlet property="dropBoxButton" destination="XZr-Fq-1T7" id="9WJ-GM-ceC"/>
+                        <outlet property="tblViewManager" destination="1fR-bc-6ze" id="VnT-Or-yeg"/>
+                        <segue destination="iSJ-GX-CyA" kind="push" identifier="toDropBoxCloud" id="pPA-i2-JCc"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="U92-M0-iRI" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="3" y="-1558"/>
+        </scene>
+        <!--About View Controller-->
+        <scene sceneID="v4Q-D1-Ugd">
+            <objects>
+                <viewController id="FiJ-J0-m6p" customClass="AOAboutViewController" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="FUv-99-v4I">
+                        <rect key="frame" x="0.0" y="20" width="768" height="1004"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" scrollEnabled="NO" showsHorizontalScrollIndicator="NO" editable="NO" textAlignment="center" id="8Ub-S5-UfZ">
+                                <rect key="frame" x="148" y="113" width="469" height="820"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                <string key="text">Bienvenido a "Cliente @firma iOS" 1.0 (b41)
+
+Esta aplicación permite realizar firmas electrónicas en las páginas de los proveedores de servicios que lo soporten.
+
+Para funcionar correctamente debe instalar un certificado electrónico y su clave privada en su dispositivo a través de iTunes. Consulte la documentación de su sitema iOS y con su proveedor de servicios de  certificación.
+
+Cliente @firma para Apple iOS 1.0
+© Derechos de copia: Gobierno de España, 2013 (Ministerio de Hacienda y Administraciones Públicas, Secretaría de Estado de Administraciones Públicas).
+
+El Cliente @firma para Apple iOS es software libre y puede ser distribuido y/o modificado bajo los términos de la licencia EUPL (European Software License) versión 1.1.
+
+Puede contactar con el tenedor de los derechos de copia en la siguiente dirección de correo electrónico: soporte.afirma@seap.minhap.es.</string>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                            </textView>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" image="logo_cliente.png" id="HOR-WT-1d4">
+                                <rect key="frame" x="244" y="20" width="280" height="83"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES"/>
+                            </imageView>
+                            <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="KoX-uW-hfd">
+                                <rect key="frame" x="21" y="940" width="73" height="44"/>
+                                <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
+                                <state key="normal" title="Al Inicio">
+                                    <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <state key="highlighted">
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <segue destination="BdW-y5-nVW" kind="push" identifier="toSelectionScreen" id="2EB-G0-Tn7"/>
+                                </connections>
+                            </button>
+                            <tabBar contentMode="scaleToFill" id="mb1-uS-cVi">
+                                <rect key="frame" x="1" y="949" width="768" height="49"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                <items>
+                                    <tabBarItem tag="2" title="Gestión de almacenes" image="cert_menu.png" id="Zea-kl-jLA"/>
+                                    <tabBarItem tag="1" title="Firmar" image="menu_firma.png" id="CBz-bI-vAI"/>
+                                    <tabBarItem title="Ayuda" image="help.png" id="6N7-bl-qO4"/>
+                                </items>
+                                <connections>
+                                    <outlet property="delegate" destination="FiJ-J0-m6p" id="j2r-nF-UaO"/>
+                                </connections>
+                            </tabBar>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                    </view>
+                    <navigationItem key="navigationItem" id="YYJ-23-JhL"/>
+                    <connections>
+                        <outlet property="tabBar" destination="mb1-uS-cVi" id="iAe-Vi-83K"/>
+                        <segue destination="lDR-zU-wtW" kind="push" identifier="toHelpScreen" id="xbb-0e-Qwt"/>
+                        <segue destination="MFF-BY-lPu" kind="push" identifier="toStoreManager" id="eqz-rU-vQo"/>
+                        <segue destination="iSJ-GX-CyA" kind="push" identifier="toDropBoxCloud" id="XWE-4n-Vzb"/>
+                        <segue destination="0dB-ME-8xb" kind="push" identifier="toDropBoxSignScreen" id="ogS-7r-5Dq"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="uXD-aP-FVd" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-1010" y="-122"/>
+        </scene>
+        <!--Sign Dropbox View Controller-->
+        <scene sceneID="llP-Ip-m51">
+            <objects>
+                <viewController id="0dB-ME-8xb" customClass="AOSignDropboxViewController" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="pEH-Jk-Djc">
+                        <rect key="frame" x="0.0" y="20" width="768" height="1004"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        <subviews>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" image="logo_cliente.png" id="tJ3-2p-dx3">
+                                <rect key="frame" x="245" y="18" width="280" height="83"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                            </imageView>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="none" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" id="ecQ-ju-TSp">
+                                <rect key="frame" x="151" y="174" width="469" height="220"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <connections>
+                                    <outlet property="dataSource" destination="0dB-ME-8xb" id="3Gn-ql-EU3"/>
+                                    <outlet property="delegate" destination="0dB-ME-8xb" id="4Ad-Lb-Qd0"/>
+                                </connections>
+                            </tableView>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="b45-W1-UgG">
+                                <rect key="frame" x="20" y="941" width="728" height="44"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
+                                <state key="normal" title="Volver" image="flecha.png">
+                                    <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <state key="highlighted">
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="backButtonPressed:" destination="0dB-ME-8xb" eventType="touchUpInside" id="mU1-QQ-gaA"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="Wde-AW-C5J">
+                                <rect key="frame" x="244" y="402" width="280" height="44"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
+                                <state key="normal" title="Firmar fichero seleccionado">
+                                    <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <state key="highlighted">
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="signButtonPressed:" destination="0dB-ME-8xb" eventType="touchUpInside" id="BpT-We-hGw"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="5ez-iM-B3d">
+                                <rect key="frame" x="20" y="890" width="728" height="44"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
+                                <state key="normal" title="Finalizar sesión">
+                                    <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <state key="highlighted">
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="logOutButtonPressed:" destination="0dB-ME-8xb" eventType="touchUpInside" id="Z7k-mN-txl"/>
+                                </connections>
+                            </button>
+                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="Seleccione el fichero que desea firmar:" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="deN-dd-3gK">
+                                <rect key="frame" x="21" y="124" width="727" height="21"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                    </view>
+                    <navigationItem key="navigationItem" id="F0x-NK-StK"/>
+                    <connections>
+                        <outlet property="backButton" destination="b45-W1-UgG" id="obI-mP-DoD"/>
+                        <outlet property="dbxTblView" destination="ecQ-ju-TSp" id="TmI-NH-aeR"/>
+                        <outlet property="logout" destination="5ez-iM-B3d" id="9wQ-R6-Xoa"/>
+                        <outlet property="signButton" destination="Wde-AW-C5J" id="5Zc-vJ-ui6"/>
+                        <segue destination="FiJ-J0-m6p" kind="custom" identifier="toFirstScreen" customClass="AOCustomSegue" id="xkK-9v-BpQ"/>
+                        <segue destination="BdW-y5-nVW" kind="push" identifier="toSelectionScreen" id="6fP-As-ytB"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="oeD-sg-hIA" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-1010" y="1065"/>
+        </scene>
+        <!--Help Menu View Controller-->
+        <scene sceneID="be6-ra-zG7">
+            <objects>
+                <viewController id="lDR-zU-wtW" customClass="AOHelpMenuViewController" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="yVZ-nu-b9s">
+                        <rect key="frame" x="0.0" y="20" width="768" height="1004"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        <subviews>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" image="logo_cliente.png" id="fkW-Yq-H6E">
+                                <rect key="frame" x="244" y="21" width="280" height="83"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                            </imageView>
+                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="Ayuda" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="eny-S1-djc">
+                                <rect key="frame" x="20" y="112" width="728" height="33"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <color key="backgroundColor" red="0.91620524879999998" green="0.91620524879999998" blue="0.91620524879999998" alpha="0.59999999999999998" colorSpace="calibratedRGB"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="24"/>
+                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" textAlignment="center" id="k51-d7-j4Y">
+                                <rect key="frame" x="195" y="334" width="381" height="156"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                <string key="text">Los contenidos de esta sección son específicos de la versión móvil del servicio. Si desea consultar información general sobre el mismo, puede visitar la web 
+http://administracionelectronica.gob.es/</string>
+                                <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                                <dataDetectorType key="dataDetectorTypes" link="YES"/>
+                            </textView>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" id="F4Y-sM-jtU">
+                                <rect key="frame" x="195" y="152" width="381" height="133"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <prototypes>
+                                    <tableViewCell contentMode="scaleToFill" selectionStyle="blue" accessoryType="disclosureIndicator" indentationWidth="10" reuseIdentifier="1" id="Ku1-xw-soW">
+                                        <rect key="frame" x="0.0" y="22" width="381" height="44"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
+                                            <rect key="frame" x="0.0" y="0.0" width="361" height="43"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                        </view>
+                                        <connections>
+                                            <segue destination="SYG-om-9yd" kind="push" identifier="toAcerca" id="KYK-aM-rZg"/>
+                                        </connections>
+                                    </tableViewCell>
+                                    <tableViewCell contentMode="scaleToFill" selectionStyle="blue" accessoryType="disclosureIndicator" indentationWidth="10" reuseIdentifier="2" id="rJI-Gq-kr1">
+                                        <rect key="frame" x="0.0" y="66" width="381" height="44"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
+                                            <rect key="frame" x="0.0" y="0.0" width="361" height="43"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                        </view>
+                                        <connections>
+                                            <segue destination="M9t-8B-1DM" kind="push" identifier="toInstalar" id="5nQ-cn-h6d"/>
+                                        </connections>
+                                    </tableViewCell>
+                                    <tableViewCell contentMode="scaleToFill" selectionStyle="blue" accessoryType="disclosureIndicator" indentationWidth="10" reuseIdentifier="3" id="WzZ-N5-9l3">
+                                        <rect key="frame" x="0.0" y="110" width="381" height="44"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
+                                            <rect key="frame" x="0.0" y="0.0" width="361" height="43"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                        </view>
+                                        <connections>
+                                            <segue destination="iX5-l6-vvI" kind="push" identifier="toPregFrecuentes" id="8Ao-5H-cX3"/>
+                                        </connections>
+                                    </tableViewCell>
+                                </prototypes>
+                                <connections>
+                                    <outlet property="dataSource" destination="lDR-zU-wtW" id="9ui-lG-gpB"/>
+                                    <outlet property="delegate" destination="lDR-zU-wtW" id="0hT-M8-RdL"/>
+                                </connections>
+                            </tableView>
+                            <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="M3v-wp-qWC">
+                                <rect key="frame" x="0.0" y="960" width="73" height="44"/>
+                                <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
+                                <state key="normal" title="Al Inicio">
+                                    <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <state key="highlighted">
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="aEG-ri-b36">
+                                <rect key="frame" x="20" y="938" width="730" height="46"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
+                                <state key="normal" title="Volver" image="flecha.png">
+                                    <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <state key="highlighted">
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <segue destination="FiJ-J0-m6p" kind="custom" identifier="toFirstScreen" customClass="AOCustomSegue" id="0Bv-sY-VPR"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                    </view>
+                    <navigationItem key="navigationItem" id="HZI-mn-E2d"/>
+                    <connections>
+                        <outlet property="tblViewHelp" destination="F4Y-sM-jtU" id="MPM-2v-CJf"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="any-KO-w10" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1023" y="-1558"/>
+        </scene>
+        <!--Acercade View Controller-->
+        <scene sceneID="wz3-wO-usq">
+            <objects>
+                <viewController id="SYG-om-9yd" customClass="AOAcercadeViewController" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="KN8-Lo-usB">
+                        <rect key="frame" x="0.0" y="20" width="768" height="1004"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        <subviews>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" image="logo_cliente.png" id="qIK-5a-AFw">
+                                <rect key="frame" x="244" y="20" width="280" height="83"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                            </imageView>
+                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="Acerca de..." textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="ChF-s7-uLj">
+                                <rect key="frame" x="20" y="109" width="728" height="33"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <color key="backgroundColor" red="0.91620524879999998" green="0.91620524879999998" blue="0.91620524879999998" alpha="0.59999999999999998" colorSpace="calibratedRGB"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="24"/>
+                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" showsHorizontalScrollIndicator="NO" editable="NO" textAlignment="center" id="q6t-cq-MCe">
+                                <rect key="frame" x="20" y="151" width="728" height="778"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" heightSizable="YES" flexibleMaxY="YES"/>
+                                <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                <string key="text">"Cliente @firma para Apple iOS" v1.0 
+2013 Gobierno de España
+
+El Cliente @firma para Apple iOS es Software Libre; puedes redistribuirlo y/o modificarlo bajo los términos de la siguiente licencia: "European Software License 1.1", cuyo texto completo puede consultarse en la siguiente página Web: http://ec.europa.eu/idabc/eupl.html
+
+El código fuente de este programa, así como del resto de los componentes del proyecto se pueden descargar libremente desde: http://forja-ctt.administracionelectronica.gob.es
+
+El proyecto Cliente @firma es un proyecto colaborativo, si desea participar en él, no dude en unirse a la comunidad, accesible desde la siguiente página Web:
+
+http://forja-ctt.administracionelectronica.gob.es/web/clienteafirma</string>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                                <dataDetectorType key="dataDetectorTypes" link="YES"/>
+                            </textView>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="ND0-Yg-BOW">
+                                <rect key="frame" x="20" y="937" width="728" height="46"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
+                                <state key="normal" title="Volver" image="flecha.png">
+                                    <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <state key="highlighted">
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <segue destination="lDR-zU-wtW" kind="custom" identifier="toMenuScreen" customClass="AOCustomSegue" id="tkT-1h-ijc"/>
+                                </connections>
+                            </button>
+                            <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="EMS-uf-ykI">
+                                <rect key="frame" x="0.0" y="959" width="73" height="44"/>
+                                <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
+                                <state key="normal" title="Al Inicio">
+                                    <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <state key="highlighted">
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <segue destination="FiJ-J0-m6p" kind="push" identifier="toFirstScreen" id="0dn-Yd-aFb"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                    </view>
+                    <navigationItem key="navigationItem" id="VQL-s8-iHo"/>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="21z-7d-X5N" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2079" y="-2629"/>
+        </scene>
+        <!--Certificate Selection View Controller - Solicitud de certificado-->
+        <scene sceneID="HbR-9a-0Y9">
+            <objects>
+                <viewController title="Solicitud de certificado" id="BdW-y5-nVW" customClass="AOCertificateSelectionViewController" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="n9S-c5-sfB">
+                        <rect key="frame" x="0.0" y="20" width="768" height="1004"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        <subviews>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" image="logo_cliente.png" id="IWI-e2-02M">
+                                <rect key="frame" x="246" y="19" width="280" height="83"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                            </imageView>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" showsHorizontalScrollIndicator="NO" editable="NO" textAlignment="center" id="fhk-ie-nSo">
+                                <rect key="frame" x="149" y="123" width="469" height="114"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                <string key="text">Por favor, seleccione el almacén de claves y certificados que desea utilizar para el proceso de firma.
+Si no aparecen almacenes en la lista, podrá importarlos desde las opciones de la aplicación en iTunes.</string>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                            </textView>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="none" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" id="Dd5-HU-hFJ">
+                                <rect key="frame" x="149" y="266" width="469" height="220"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <connections>
+                                    <outlet property="dataSource" destination="BdW-y5-nVW" id="vxG-V8-aa0"/>
+                                    <outlet property="delegate" destination="BdW-y5-nVW" id="4mN-bt-XTr"/>
+                                </connections>
+                            </tableView>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="dqi-Cj-y1X">
+                                <rect key="frame" x="22" y="941" width="728" height="44"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
+                                <state key="normal" title="Seleccionar">
+                                    <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <state key="highlighted">
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <segue destination="GAJ-C9-ffl" kind="push" identifier="toPinScreen" id="qUh-zg-YVY"/>
+                                </connections>
+                            </button>
+                            <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="hJ6-O2-w2o">
+                                <rect key="frame" x="22" y="888" width="73" height="44"/>
+                                <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
+                                <state key="normal" title="Al Inicio">
+                                    <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <state key="highlighted">
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <segue destination="FiJ-J0-m6p" kind="custom" identifier="toFirstScreen" customClass="AOCustomSegue" id="aG4-vU-0Oo"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                    </view>
+                    <navigationItem key="navigationItem" id="VxL-B1-PSv"/>
+                    <connections>
+                        <outlet property="selectionButton" destination="dqi-Cj-y1X" id="asj-Bp-Uo7"/>
+                        <outlet property="tblView" destination="Dd5-HU-hFJ" id="svS-cH-gSo"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="udQ-we-IkE" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1133" y="1116"/>
+        </scene>
+        <!--Pin View Controller - Solicitud de PIN-->
+        <scene sceneID="9jM-Wg-Zub">
+            <objects>
+                <viewController title="Solicitud de PIN" id="GAJ-C9-ffl" customClass="AOPinViewController" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="XML-nt-6if">
+                        <rect key="frame" x="0.0" y="20" width="768" height="1004"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        <subviews>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" image="logo_cliente.png" id="dyX-6s-tTM">
+                                <rect key="frame" x="244" y="17" width="280" height="83"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                            </imageView>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" showsHorizontalScrollIndicator="NO" editable="NO" text="Por favor, introduzca su contraseña del almacén de claves y certificados." textAlignment="center" id="xDL-pz-I3p">
+                                <rect key="frame" x="151" y="123" width="469" height="50"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                            </textView>
+                            <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" minimumFontSize="17" id="CYs-fW-9q5">
+                                <rect key="frame" x="151" y="181" width="469" height="30"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits" secureTextEntry="YES"/>
+                                <connections>
+                                    <action selector="pinButtonPressed:" destination="GAJ-C9-ffl" eventType="editingChanged" id="4gO-Yn-etg"/>
+                                    <outlet property="delegate" destination="GAJ-C9-ffl" id="Est-3D-QDu"/>
+                                </connections>
+                            </textField>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" showsHorizontalScrollIndicator="NO" editable="NO" textAlignment="center" id="xEa-tO-dEN">
+                                <rect key="frame" x="151" y="219" width="469" height="152"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                <string key="text">Una vez introducida la contraseña de su almacén de certificados y claves se le mostrará el certificado con el que se realizará el proceso de firma.
+
+Si ha olvidado la contraseña utilice iTunes para sustituir su almacén PKCS#12.</string>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                            </textView>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="M6j-4b-wrk">
+                                <rect key="frame" x="20" y="940" width="728" height="44"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
+                                <state key="normal" title="Aceptar">
+                                    <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <state key="highlighted">
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <segue destination="zg9-9u-ifb" kind="push" identifier="pinEntered" id="WFs-EB-ElY"/>
+                                </connections>
+                            </button>
+                            <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="RpB-6d-HOh">
+                                <rect key="frame" x="20" y="887" width="73" height="44"/>
+                                <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
+                                <state key="normal" title="Al Inicio">
+                                    <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <state key="highlighted">
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <segue destination="FiJ-J0-m6p" kind="custom" identifier="toFirstScreen" customClass="AOCustomSegue" id="nwd-Gl-Nbi"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                    </view>
+                    <navigationItem key="navigationItem" id="CVX-5L-LnU"/>
+                    <connections>
+                        <outlet property="nombreCert" destination="xDL-pz-I3p" id="4zU-KM-NiP"/>
+                        <outlet property="pinButton" destination="M6j-4b-wrk" id="d15-an-ozG"/>
+                        <outlet property="pinTextField" destination="CYs-fW-9q5" id="Q4d-bG-fqe"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="cyJ-SD-d8X" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2203" y="1121"/>
+        </scene>
+        <!--Sign View Controller - Firma Electrónica-->
+        <scene sceneID="Ior-uI-bhK">
+            <objects>
+                <viewController title="Firma Electrónica" id="zg9-9u-ifb" customClass="AOSignViewController" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="zvO-RC-BJv">
+                        <rect key="frame" x="0.0" y="20" width="768" height="1004"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        <subviews>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" image="logo_cliente.png" id="O5N-UJ-Apf">
+                                <rect key="frame" x="246" y="17" width="280" height="83"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                            </imageView>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" showsHorizontalScrollIndicator="NO" editable="NO" text="Se ha seleccionado el siguiente certificado del almacén:" id="bar-ZC-vY0">
+                                <rect key="frame" x="150" y="111" width="469" height="34"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                            </textView>
+                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="0Dx-m0-MPg">
+                                <rect key="frame" x="149" y="152" width="469" height="21"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" name="Helvetica-BoldOblique" family="Helvetica" pointSize="17"/>
+                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" showsHorizontalScrollIndicator="NO" editable="NO" text="Se va a utilizar este certificado para realizar la firma. Pulse el siguiente botón para iniciar el proceso." id="zdR-IB-SHo">
+                                <rect key="frame" x="149" y="179" width="469" height="61"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                            </textView>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="g7K-e3-dGQ">
+                                <rect key="frame" x="22" y="940" width="728" height="44"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
+                                <state key="normal" title="Firmar">
+                                    <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <state key="highlighted">
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="buttonPressed:" destination="zg9-9u-ifb" eventType="touchUpInside" id="wG3-7C-OJI"/>
+                                </connections>
+                            </button>
+                            <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="he1-LA-Yfj">
+                                <rect key="frame" x="22" y="887" width="73" height="44"/>
+                                <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
+                                <state key="normal" title="Al Inicio">
+                                    <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <state key="highlighted">
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <segue destination="FiJ-J0-m6p" kind="custom" identifier="toFirstScreen" customClass="AOCustomSegue" id="mid-dV-KjV"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                    </view>
+                    <navigationItem key="navigationItem" id="U4D-9Y-YYq"/>
+                    <connections>
+                        <outlet property="nombreCert" destination="0Dx-m0-MPg" id="0tn-ea-JNo"/>
+                        <outlet property="signButton" destination="g7K-e3-dGQ" id="H24-4Y-UXZ"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="bpA-bK-0RN" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="3181" y="1121"/>
+        </scene>
+        <!--Acercade View Controller-->
+        <scene sceneID="rJF-Uj-A3S">
+            <objects>
+                <viewController id="M9t-8B-1DM" customClass="AOAcercadeViewController" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="Ddr-QD-Y7l">
+                        <rect key="frame" x="0.0" y="20" width="768" height="1004"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        <subviews>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" image="logo_cliente.png" id="mDR-YV-F4O">
+                                <rect key="frame" x="247" y="20" width="280" height="83"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                            </imageView>
+                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="Cómo instalar certificados" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="VfZ-Yy-PeU">
+                                <rect key="frame" x="20" y="109" width="730" height="33"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <color key="backgroundColor" red="0.91620524879999998" green="0.91620524879999998" blue="0.91620524879999998" alpha="0.59999999999999998" colorSpace="calibratedRGB"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="24"/>
+                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="dKg-KG-Vbx">
+                                <rect key="frame" x="20" y="937" width="730" height="46"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
+                                <state key="normal" title="Volver" image="flecha.png">
+                                    <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <state key="highlighted">
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <segue destination="lDR-zU-wtW" kind="custom" identifier="toMenuScreen" customClass="AOCustomSegue" id="xJB-GG-ZdQ"/>
+                                </connections>
+                            </button>
+                            <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="QpT-C2-gI4">
+                                <rect key="frame" x="0.0" y="959" width="73" height="44"/>
+                                <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
+                                <state key="normal" title="Al Inicio">
+                                    <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <state key="highlighted">
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <segue destination="FiJ-J0-m6p" kind="push" identifier="toFirstScreen" id="q1e-aa-IBq"/>
+                                </connections>
+                            </button>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" image="certificados.png" id="AB2-S3-Z5H">
+                                <rect key="frame" x="421" y="234" width="58" height="42"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            </imageView>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" image="itunes.png" id="Q9m-XX-pFK">
+                                <rect key="frame" x="74" y="226" width="58" height="58"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            </imageView>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" scrollEnabled="NO" editable="NO" id="T87-X0-lsx">
+                                <rect key="frame" x="140" y="205" width="214" height="102"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                <string key="text">Conecte su dispositivo a iTunes, vaya a la pestaña "Aplicaciones" y escoja "Cliente @firma" en la lista, para arrastrar sus certificados.</string>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                            </textView>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" scrollEnabled="NO" editable="NO" id="mt5-IV-7KA">
+                                <rect key="frame" x="487" y="203" width="214" height="104"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                <string key="text">Extensiones permitidas: .p12 y .pfx. Recuerde que necesita la contraseña de exportación de su certificado, y que éste debe de incluir la clave privada.</string>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                            </textView>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="Alz-x7-F8T">
+                                <rect key="frame" x="284" y="348" width="201" height="43"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
+                                <state key="normal" title="  Más información" image="information_icon.png">
+                                    <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <state key="highlighted">
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="buttonPressed:" destination="M9t-8B-1DM" eventType="touchUpInside" id="1Id-5x-iQf"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                    </view>
+                    <navigationItem key="navigationItem" id="o9g-BM-Puf"/>
+                    <connections>
+                        <outlet property="masInfoButton" destination="Alz-x7-F8T" id="Kfj-CX-hEP"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="aKG-XA-CHD" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2087" y="-1493"/>
+        </scene>
+        <!--Acercade View Controller-->
+        <scene sceneID="Oxg-2J-1Lg">
+            <objects>
+                <viewController id="iX5-l6-vvI" customClass="AOAcercadeViewController" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="xa4-kd-mby">
+                        <rect key="frame" x="0.0" y="20" width="768" height="1004"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        <subviews>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" image="logo_cliente.png" id="RwX-e9-Z5a">
+                                <rect key="frame" x="244" y="20" width="280" height="83"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                            </imageView>
+                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="Preguntas más comunes" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="Rnt-QU-5XV">
+                                <rect key="frame" x="20" y="109" width="728" height="33"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <color key="backgroundColor" red="0.91620524879999998" green="0.91620524879999998" blue="0.91620524879999998" alpha="0.59999999999999998" colorSpace="calibratedRGB"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="24"/>
+                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" showsHorizontalScrollIndicator="NO" editable="NO" usesAttributedText="YES" id="0f3-cD-V1Q">
+                                <rect key="frame" x="20" y="150" width="728" height="771"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" heightSizable="YES" flexibleMaxY="YES"/>
+                                <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                <attributedString key="attributedText">
+                                    <fragment content="¿Cómo puedo realizar firmas electrónicas con este programa?">
+                                        <attributes>
+                                            <font key="NSFont" size="17" name="Helvetica-Bold"/>
+                                            <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="leftToRight" paragraphSpacing="16" defaultTabInterval="36">
+                                                <tabStops/>
+                                            </paragraphStyle>
+                                        </attributes>
+                                    </fragment>
+                                    <fragment>
+                                        <string key="content">  El Cliente @firma iOS permite tanto la firma de ficheros de usuario en la nube como la firma de trámites web.
+ 
+Puede firmar ficheros en la nube a través de la opción "Firmar" de la pantalla principal de la aplicación. La firma generada se almacenará también en la nube, desde la que podrá descargarla a través de los medios proporcionados por la plataforma en cuestión que utilice.
+ 
+Para la firma de trámites web realice los trámites normalmente a través de su navegador. Si el trámite está preparado para la firma con el Cliente @firma móvil, este se ejecutará en el momento de la firma para que el usuario seleccione su certificado y ejecute la operación.
+ 
+</string>
+                                        <attributes>
+                                            <font key="NSFont" size="17" name="Helvetica"/>
+                                            <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="leftToRight" paragraphSpacing="16" defaultTabInterval="36">
+                                                <tabStops/>
+                                            </paragraphStyle>
+                                        </attributes>
+                                    </fragment>
+                                    <fragment content="¿Por qué al acceder a la opción de firma se me piden los datos de mi cuenta de Dropbox?">
+                                        <attributes>
+                                            <font key="NSFont" size="17" name="Helvetica-Bold"/>
+                                            <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="leftToRight" paragraphSpacing="16" defaultTabInterval="36">
+                                                <tabStops/>
+                                            </paragraphStyle>
+                                        </attributes>
+                                    </fragment>
+                                    <fragment>
+                                        <string key="content">
+ 
+El Cliente @firma para Apple iOS firma ficheros localizados en la nube (por defecto, a través de Dropbox), por lo que necesita acceder a su directorio en la nube para el acceso a los ficheros disponibles para firmar. El proceso de autenticación se realiza directamente a través del servicio pertinente de Dropbox, por lo que sus datos de usuario nunca son almacenados ni conocidos por el Cliente @firma para Applet iOS.
+ 
+</string>
+                                        <attributes>
+                                            <font key="NSFont" size="17" name="Helvetica"/>
+                                            <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="leftToRight" paragraphSpacing="16" defaultTabInterval="36">
+                                                <tabStops/>
+                                            </paragraphStyle>
+                                        </attributes>
+                                    </fragment>
+                                    <fragment>
+                                        <string key="content">Ciertas operaciones iniciadas desde páginas Web diseñadas para operar con el Cliente @firma terminan en error, aunque esas mismas operaciones se completan correctamente en otros sistemas (Mac OS X, etc.) ¿Por qué?</string>
+                                        <attributes>
+                                            <font key="NSFont" size="17" name="Helvetica-Bold"/>
+                                            <font key="NSOriginalFont" size="17" name="Helvetica-Bold"/>
+                                            <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="leftToRight" paragraphSpacing="16" defaultTabInterval="36">
+                                                <tabStops/>
+                                            </paragraphStyle>
+                                        </attributes>
+                                    </fragment>
+                                    <fragment>
+                                        <string key="content">
+ 
+El Cliente @firma para Apple iOS carece aún de ciertas funcionalidades que sí están presentes en versiones para otros sistemas operativos. Futuras actualizaciones del producto solventarán estas carencias. Mientras tanto, utilice otro sistema operativo y notifique si lo considera preciso a su proveedor de servicios.
+ 
+</string>
+                                        <attributes>
+                                            <font key="NSFont" size="17" name="Helvetica"/>
+                                            <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="leftToRight" paragraphSpacing="16" defaultTabInterval="36">
+                                                <tabStops/>
+                                            </paragraphStyle>
+                                        </attributes>
+                                    </fragment>
+                                    <fragment content="¿Corren peligro mis certificados si pierdo el dispositivo?">
+                                        <attributes>
+                                            <font key="NSFont" size="17" name="Helvetica-Bold"/>
+                                            <font key="NSOriginalFont" size="17" name="Helvetica-Bold"/>
+                                            <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="leftToRight" paragraphSpacing="16" defaultTabInterval="36">
+                                                <tabStops/>
+                                            </paragraphStyle>
+                                        </attributes>
+                                    </fragment>
+                                    <fragment>
+                                        <string key="content">
+ 
+Los certificados se almacenan en su dispositivo con un potente cifrado protegido con contraseña, pero como cualquier sistema criptográfico, en el momento que este está fuera del control de propietario corre el riesgo de ser comprometido. Si pierde el dispositivo debe contactar lo antes posible con su proveedor de servicios de certificación para revocar de inmediato los certificados que este contenía.
+ 
+</string>
+                                        <attributes>
+                                            <font key="NSFont" size="17" name="Helvetica"/>
+                                            <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="leftToRight" paragraphSpacing="16" defaultTabInterval="36">
+                                                <tabStops/>
+                                            </paragraphStyle>
+                                        </attributes>
+                                    </fragment>
+                                    <fragment>
+                                        <string key="content">He importado los certificados correctamente en el Cliente @firma para Apple iOS, pero aun así no consigo identificarme con ellos en las sedes electrónicas y demás páginas Web que lo requieren ¿Por qué?</string>
+                                        <attributes>
+                                            <font key="NSFont" size="17" name="Helvetica-Bold"/>
+                                            <font key="NSOriginalFont" size="17" name="Helvetica-Bold"/>
+                                            <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="leftToRight" paragraphSpacing="16" defaultTabInterval="36">
+                                                <tabStops/>
+                                            </paragraphStyle>
+                                        </attributes>
+                                    </fragment>
+                                    <fragment>
+                                        <string key="content">
+ 
+Los certificados importados en el Cliente @firma para Apple iOS son de uso exclusivo para firma electrónica en páginas Web diseñadas a tal efecto. Para usar un certificado digital en una autenticación Web segura debe seguir las instrucciones de su navegador Web y de Apple respecto al proceso de instalación de los certificados y sus claves en el sistema operativo iOS y en el propio navegador Web si fuese preciso.
+</string>
+                                        <attributes>
+                                            <font key="NSFont" size="17" name="Helvetica"/>
+                                            <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="leftToRight" paragraphSpacing="16" defaultTabInterval="36">
+                                                <tabStops/>
+                                            </paragraphStyle>
+                                        </attributes>
+                                    </fragment>
+                                </attributedString>
+                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                            </textView>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="L5O-M2-y6Z">
+                                <rect key="frame" x="20" y="939" width="728" height="46"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
+                                <state key="normal" title="Volver" image="flecha.png">
+                                    <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <state key="highlighted">
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <segue destination="lDR-zU-wtW" kind="custom" identifier="toMenuScreen" customClass="AOCustomSegue" id="ebZ-cH-UW7"/>
+                                </connections>
+                            </button>
+                            <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="6Vs-HQ-gkd">
+                                <rect key="frame" x="0.0" y="959" width="73" height="44"/>
+                                <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
+                                <state key="normal" title="Al Inicio">
+                                    <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <state key="highlighted">
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <segue destination="FiJ-J0-m6p" kind="push" identifier="toFirstScreen" id="z9s-o9-MGv"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                    </view>
+                    <navigationItem key="navigationItem" id="gsa-Zv-ClK"/>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="LZh-hD-Im8" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2095" y="-293"/>
+        </scene>
+    </scenes>
+    <resources>
+        <image name="cert_menu.png" width="20" height="17"/>
+        <image name="certificados.png" width="64" height="53"/>
+        <image name="dropbox-ico.png" width="50" height="50"/>
+        <image name="flecha.png" width="20" height="20"/>
+        <image name="help.png" width="20" height="20"/>
+        <image name="information_icon.png" width="30" height="30"/>
+        <image name="itunes.png" width="200" height="200"/>
+        <image name="logo_cliente.png" width="726" height="200"/>
+        <image name="menu_firma.png" width="30" height="11"/>
+    </resources>
+    <classes>
+        <class className="AOAboutViewController" superclassName="GAITrackedViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/AOAboutViewController.h"/>
+            <relationships>
+                <relationship kind="outlet" name="manageStoreButton" candidateClass="UIButton"/>
+                <relationship kind="outlet" name="tabBar" candidateClass="UITabBar"/>
+            </relationships>
+        </class>
+        <class className="AOAcercadeViewController" superclassName="GAITrackedViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/AOAcercadeViewController.h"/>
+            <relationships>
+                <relationship kind="action" name="buttonPressed:"/>
+                <relationship kind="outlet" name="masInfoButton" candidateClass="UIButton"/>
+            </relationships>
+        </class>
+        <class className="AOCertificateSelectionViewController" superclassName="GAITrackedViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/AOCertificateSelectionViewController.h"/>
+            <relationships>
+                <relationship kind="outlet" name="selectionButton" candidateClass="UIButton"/>
+                <relationship kind="outlet" name="tblView" candidateClass="UITableView"/>
+            </relationships>
+        </class>
+        <class className="AODropBoxCloudViewController" superclassName="GAITrackedViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/AODropBoxCloudViewController.h"/>
+            <relationships>
+                <relationship kind="action" name="buttonPressed:"/>
+                <relationship kind="action" name="saveStorebuttonPressed:"/>
+                <relationship kind="outlet" name="LogOffDropbox" candidateClass="UIButton"/>
+                <relationship kind="outlet" name="dbxTblView" candidateClass="UITableView"/>
+                <relationship kind="outlet" name="saveStore" candidateClass="UIButton"/>
+            </relationships>
+        </class>
+        <class className="AOHelpMenuViewController" superclassName="GAITrackedViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/AOHelpMenuViewController.h"/>
+            <relationships>
+                <relationship kind="outlet" name="tblViewHelp" candidateClass="UITableView"/>
+            </relationships>
+        </class>
+        <class className="AOManagerStoreScreenViewController" superclassName="GAITrackedViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/AOManagerStoreScreenViewController.h"/>
+            <relationships>
+                <relationship kind="action" name="buttonPressed:"/>
+                <relationship kind="action" name="deleteButtonPressed:"/>
+                <relationship kind="outlet" name="deleteButton" candidateClass="UIButton"/>
+                <relationship kind="outlet" name="dropBoxButton" candidateClass="UIButton"/>
+                <relationship kind="outlet" name="tblViewManager" candidateClass="UITableView"/>
+            </relationships>
+        </class>
+        <class className="AOPinDropBoxCloudViewController" superclassName="GAITrackedViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/AOPinDropBoxCloudViewController.h"/>
+            <relationships>
+                <relationship kind="action" name="pinButtonPressed:"/>
+                <relationship kind="outlet" name="buttonCertDropBoxCloud" candidateClass="UIButton"/>
+                <relationship kind="outlet" name="nameCertDropBoxCloud" candidateClass="UITextView"/>
+                <relationship kind="outlet" name="pinCertDropBoxCloud" candidateClass="UITextField"/>
+            </relationships>
+        </class>
+        <class className="AOPinViewController" superclassName="GAITrackedViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/AOPinViewController.h"/>
+            <relationships>
+                <relationship kind="action" name="pinButtonPressed:"/>
+                <relationship kind="outlet" name="nombreCert" candidateClass="UITextView"/>
+                <relationship kind="outlet" name="pinButton" candidateClass="UIButton"/>
+                <relationship kind="outlet" name="pinTextField" candidateClass="UITextField"/>
+            </relationships>
+        </class>
+        <class className="AOSignDropboxViewController" superclassName="GAITrackedViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/AOSignDropboxViewController.h"/>
+            <relationships>
+                <relationship kind="action" name="backButtonPressed:"/>
+                <relationship kind="action" name="logOutButtonPressed:"/>
+                <relationship kind="action" name="signButtonPressed:"/>
+                <relationship kind="outlet" name="backButton" candidateClass="UIButton"/>
+                <relationship kind="outlet" name="dbxTblView" candidateClass="UITableView"/>
+                <relationship kind="outlet" name="logout" candidateClass="UIButton"/>
+                <relationship kind="outlet" name="signButton" candidateClass="UIButton"/>
+            </relationships>
+        </class>
+        <class className="AOSignViewController" superclassName="GAITrackedViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/AOSignViewController.h"/>
+            <relationships>
+                <relationship kind="action" name="buttonPressed:"/>
+                <relationship kind="outlet" name="nombreCert" candidateClass="UILabel"/>
+                <relationship kind="outlet" name="signButton" candidateClass="UIButton"/>
+            </relationships>
+        </class>
+        <class className="GAITrackedViewController" superclassName="UIViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/GAITrackedViewController.h"/>
+        </class>
+    </classes>
+    <simulatedMetricsContainer key="defaultSimulatedMetrics">
+        <simulatedStatusBarMetrics key="statusBar" statusBarStyle="blackTranslucent"/>
+        <simulatedOrientationMetrics key="orientation"/>
+        <simulatedScreenMetrics key="destination"/>
+    </simulatedMetricsContainer>
+    <inferredMetricsTieBreakers>
+        <segue reference="2EB-G0-Tn7"/>
+        <segue reference="1rl-H1-e1G"/>
+        <segue reference="eqz-rU-vQo"/>
+        <segue reference="pPA-i2-JCc"/>
+        <segue reference="xbb-0e-Qwt"/>
+    </inferredMetricsTieBreakers>
+</document>
