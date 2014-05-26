@@ -1,0 +1,14 @@
+Manifest-Version: 1.0
+Name: es/gob/afirma
+Specification-Title: Cliente @firma
+Specification-Version: 3.3.1 u4
+Specification-Vendor: Gobierno de Espana
+Implementation-Title: es.gob.afirma
+Implementation-Version: build01
+Implementation-Vendor: Gobierno de Espana
+Application-Name: Cliente @firma
+Permissions: all-permissions
+Codebase: *
+Application-Library-Allowable-Codebase: *
+Caller-Allowable-Codebase: *
+Sealed: true
