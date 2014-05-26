@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app>
+  <display-name>Demo Firma Movil</display-name>
+  <welcome-file-list>
+    <welcome-file>demo.html</welcome-file>
+  </welcome-file-list>
+</web-app>

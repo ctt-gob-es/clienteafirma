@@ -1,0 +1,129 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html> <!-- Ejemplo basico de lanzador de la aplicacion -->
+  <head>
+	<title>Ejemplo de despliegue del MiniApplet @firma</title>
+	<meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
+	<script type="text/javascript" src="js/deployJava.js"></script>
+	<script type="text/javascript" src="js/miniapplet.js"></script>
+	<script type="text/javascript">
+	
+		var showResultCallback = function(b64Signature) {
+			document.getElementById("b64signature").innerHTML = "";
+			document.getElementById("b64signature").innerHTML = b64Signature;
+				
+			showLog("Firma OK");
+		}
+		
+		var errorCallback = function(type, message) {
+			document.getElementById("b64signature").innerHTML = "";
+			showLog(type + " = " + message);
+		}
+	
+		function doSign() {
+			try {
+				MiniApplet.echo();
+
+				var plainText = document.getElementById("plaintext").value;
+				if (plainText == undefined || plainText == null || plainText == "") {
+					plainText = null;
+				}
+				
+				var dataB64 = null;
+				if (plainText != null) {
+					dataB64 = MiniApplet.getBase64FromText(plainText, "UTF-8");
+				}
+				
+				MiniApplet.sign(
+					dataB64,
+					document.getElementById("algorithm").value,
+					document.getElementById("format").value,
+					document.getElementById("params").value.length > 0 ? document.getElementById("params").value : null,
+					showResultCallback,
+					errorCallback);
+				
+			} catch(e) {
+				showLog("Type: " + MiniApplet.getErrorType() + "\nMessage: " + MiniApplet.getErrorMessage());
+			}
+		}
+
+		function doCosign() {
+			try {
+				MiniApplet.echo();
+
+				var signB64 = document.getElementById("plaintext").value;
+				
+				MiniApplet.coSign(
+					signB64,
+					null,
+					document.getElementById("algorithm").value,
+					document.getElementById("format").value,
+					document.getElementById("params").value.length > 0 ? document.getElementById("params").value : null,
+					showResultCallback,
+					errorCallback);
+				
+			} catch(e) {
+				showLog("Type: " + MiniApplet.getErrorType() + "\nMessage: " + MiniApplet.getErrorMessage());
+			}
+		}
+		
+		function addExtraParam(extraParam) {
+			var paramsList = document.getElementById("params");
+			paramsList.value = paramsList.value + extraParam + "\n";
+			document.getElementById('newParam').value = "";
+		}
+		
+		function showLog(newLog) {
+			document.getElementById('console').value = document.getElementById('console').value + "\n" + newLog;
+		}
+	</script>
+  </head>
+  <body>
+		<script type="text/javascript">
+			//MiniApplet.cargarMiniApplet('http://172.24.22.62:8080/afirma-mobile-web');
+			//MiniApplet.setServlets("http://172.24.22.62:8080/SignatureStorageServer/StorageService", "http://172.24.22.62:8080/SignatureRetrieverServer/RetrieveService");
+			MiniApplet.cargarMiniApplet('https://valide.redsara.es/firmaMovil');
+		MiniApplet.setServlets("https://valide.redsara.es/firmaMovil/SignatureStorageServer/StorageService", "https://valide.redsara.es/firmaMovil/SignatureRetrieverServer/RetrieveService");
+		</script>
+		<p>Cargamos el MiniApplet</p>
+		<div>
+		 <label for="plaintext">Texto</label><br />
+		 <textarea id="plaintext" cols="150" rows="10"></textarea>
+		 <!--  PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPGRzOlNpZ25hdHVyZSBJZD0iU2lnbmF0dXJlLWQyNDFmZTM4LWJkOGQtNDM0ZC05NDEzLWRiNTI0ZWRmZjNkZi1TaWduYXR1cmUiIHhtbG5zOmRzPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwLzA5L3htbGRzaWcjIj48ZHM6U2lnbmVkSW5mbz48ZHM6Q2Fub25pY2FsaXphdGlvbk1ldGhvZCBBbGdvcml0aG09Imh0dHA6Ly93d3cudzMub3JnL1RSLzIwMDEvUkVDLXhtbC1jMTRuLTIwMDEwMzE1Ii8+PGRzOlNpZ25hdHVyZU1ldGhvZCBBbGdvcml0aG09Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvMDkveG1sZHNpZyNyc2Etc2hhMSIvPjxkczpSZWZlcmVuY2UgSWQ9IlJlZmVyZW5jZS02Mjk1MjVkYy0zODExLTQ2YTQtOWQ0MC0zMGI4NmJhZTVmOTciIFR5cGU9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvMDkveG1sZHNpZyNPYmplY3QiIFVSST0iI09iamVjdC1mNzAzY2Y5Zi01NjkyLTQxYjctOWQwMC05OWFhZGYxMjFiNTAiPjxkczpUcmFuc2Zvcm1zPjxkczpUcmFuc2Zvcm0gQWxnb3JpdGhtPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwLzA5L3htbGRzaWcjYmFzZTY0Ii8+PC9kczpUcmFuc2Zvcm1zPjxkczpEaWdlc3RNZXRob2QgQWxnb3JpdGhtPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwLzA5L3htbGRzaWcjc2hhMSIvPjxkczpEaWdlc3RWYWx1ZT5pVmx0Q1FIL3RZV2dzK1Mwc3BoTHcrTHlUYmM9PC9kczpEaWdlc3RWYWx1ZT48L2RzOlJlZmVyZW5jZT48ZHM6UmVmZXJlbmNlIFR5cGU9Imh0dHA6Ly91cmkuZXRzaS5vcmcvMDE5MDMjU2lnbmVkUHJvcGVydGllcyIgVVJJPSIjU2lnbmF0dXJlLWQyNDFmZTM4LWJkOGQtNDM0ZC05NDEzLWRiNTI0ZWRmZjNkZi1TaWduZWRQcm9wZXJ0aWVzIj48ZHM6RGlnZXN0TWV0aG9kIEFsZ29yaXRobT0iaHR0cDovL3d3dy53My5vcmcvMjAwMC8wOS94bWxkc2lnI3NoYTEiLz48ZHM6RGlnZXN0VmFsdWU+aEUwVjd0clBQSXZ3UlFXU0I0OGFKNFVqUVhBPTwvZHM6RGlnZXN0VmFsdWU+PC9kczpSZWZlcmVuY2U+PGRzOlJlZmVyZW5jZSBVUkk9IiNTaWduYXR1cmUtZDI0MWZlMzgtYmQ4ZC00MzRkLTk0MTMtZGI1MjRlZGZmM2RmLUtleUluZm8iPjxkczpEaWdlc3RNZXRob2QgQWxnb3JpdGhtPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwLzA5L3htbGRzaWcjc2hhMSIvPjxkczpEaWdlc3RWYWx1ZT5nTk1KOFVrNi9tSVFrYlJsZ1BONmZaK2MxR289PC9kczpEaWdlc3RWYWx1ZT48L2RzOlJlZmVyZW5jZT48L2RzOlNpZ25lZEluZm8+PGRzOlNpZ25hdHVyZVZhbHVlIElkPSJTaWduYXR1cmUtZDI0MWZlMzgtYmQ4ZC00MzRkLTk0MTMtZGI1MjRlZGZmM2RmLVNpZ25hdHVyZVZhbHVlIj5hckc0YnVqRjZGTURiMmlrQ3MwcFFGVS9HZGtwNXlNQ3JmaWtCOGhHSWtKYkpPVG5mbEJ1VGtlUHdFUURDK21IWGdUMW5SYmhaZS9lCk1JREhya3ZHWTU5RUpBcVNHZXZWMURDbUdNU0VjcE81bEJlQXl3WTJzdktLSitLZkFZWDdsNzNkSm1idTVLUkY5dERjc0xQYjFrdGgKamxzcU9EZGFaQVduTXRrVElTVT08L2RzOlNpZ25hdHVyZVZhbHVlPjxkczpLZXlJbmZvIElkPSJTaWduYXR1cmUtZDI0MWZlMzgtYmQ4ZC00MzRkLTk0MTMtZGI1MjRlZGZmM2RmLUtleUluZm8iPjxkczpLZXlWYWx1ZT48ZHM6UlNBS2V5VmFsdWU+PGRzOk1vZHVsdXM+ajJxQWNlT2YwcHlBVEVNMEJ4Qks3K2VHQTBIRVpXRFpwcWRoQ2VWdnNJMUFxaExXUXBXTmc2NVRHWEU4aWp6eEdVL3lTOTRrLzM0ZwpQZ0lrbGErcC9tckRhTnNWWTY5UmNMcDFoV1ljTDYxck0vL0luK2hYbEEzcVVLNmFzOTQyYjU1WXl6TnNiSlNRUENOZ2tpR3VJUVRvCjFYZnNmazRYWkRpK3lOU1JnVU09PC9kczpNb2R1bHVzPjxkczpFeHBvbmVudD5BUUFCPC9kczpFeHBvbmVudD48L2RzOlJTQUtleVZhbHVlPjwvZHM6S2V5VmFsdWU+PGRzOlg1MDlEYXRhPjxkczpYNTA5Q2VydGlmaWNhdGU+TUlJRm5UQ0NCSVdnQXdJQkFnSUNBK293RFFZSktvWklodmNOQVFFRkJRQXdnZG94Q3pBSkJnTlZCQVlUQWtWVE1SSXdFQVlEVlFRSQpFd2xDWVhKalpXeHZibUV4U0RCR0JnTlZCQWNNUDBKaGNtTmxiRzl1WVNBb2MyVmxJR04xY25KbGJuUWdZV1JrY21WemN5QmhkQ0JvCmRIUndjem92TDNkM2R5NWhibVl1WlhNdllXUmtjbVZ6Y3k4Z0tURW5NQ1VHQTFVRUNoTWVRVTVHSUVGMWRHOXlhV1JoWkNCa1pTQkQKWlhKMGFXWnBZMkZqYVc5dU1SY3dGUVlEVlFRTEV3NUJUa1lnUTJ4aGMyVWdNU0JEUVRFVE1CRUdBMVVFQlJNS1J5MDJNekk0TnpVeApNREVXTUJRR0ExVUVBeE1OUVU1R0lGTmxjblpsY2lCRFFUQWVGdzB3TmpFeU16RXlNekF3TURCYUZ3MHhOREV5TXpFeU16QXdNREJhCk1JR21NUnN3R1FZRFZRUURFeEpCVGtZZ1ZYTjFZWEpwYnlCQlkzUnBkbTh4RERBS0JnTlZCQ29UQTBGT1JqRVhNQlVHQTFVRUJCTU8KVlhOMVlYSnBieUJCWTNScGRtOHhFakFRQmdOVkJBVVRDVEV5TXpRMU5qYzRXakVlTUJ3R0NTcUdTSWIzRFFFSkFSWVBkR1Z6ZEVCdwpjblZsWW1FdVkyOXRNUjh3SFFZRFZRUUxFeFpEYkdGelpTQXlJSEJsY25OdmJtRWdabWx6YVdOaE1Rc3dDUVlEVlFRR0V3SkZVekNCCm56QU5CZ2txaGtpRzl3MEJBUUVGQUFPQmpRQXdnWWtDZ1lFQWoycUFjZU9mMHB5QVRFTTBCeEJLNytlR0EwSEVaV0RacHFkaENlVnYKc0kxQXFoTFdRcFdOZzY1VEdYRThpanp4R1UveVM5NGsvMzRnUGdJa2xhK3AvbXJEYU5zVlk2OVJjTHAxaFdZY0w2MXJNLy9JbitoWApsQTNxVUs2YXM5NDJiNTVZeXpOc2JKU1FQQ05na2lHdUlRVG8xWGZzZms0WFpEaSt5TlNSZ1VNQ0F3RUFBYU9DQWlFd2dnSWRNQWtHCkExVWRFd1FDTUFBd0N3WURWUjBQQkFRREFnYkFNQk1HQ2lzR0FRUUJnWThjRkFNRUJRd0RRVTVHTUJjR0Npc0dBUVFCZ1k4Y0ZBUUUKQ1F3SFZYTjFZWEpwYnpBV0Jnb3JCZ0VFQVlHUEhCUUZCQWdNQmtGamRHbDJiekFaQmdvckJnRUVBWUdQSEJRR0JBc01DVEV5TXpRMQpOamM0V2pDQmlBWURWUjBnQklHQU1INHdmQVlLS3dZQkJBR0JqeHdEQkRCdU1EMEdDQ3NHQVFVRkJ3SUNNREVhTDBObGNuUnBabWxqCllXUnZJR1Z0YVhScFpHOGdjR0Z5WVNCeVpXRnNhWHBoWTJuemJpQmtaU0J3Y25WbFltRnpNQzBHQ0NzR0FRVUZCd0lCRmlGb2RIUncKY3pvdkwzZDNkeTVoYm1ZdVpYTXZRVU12Wkc5amRXMWxiblJ2Y3k4d09BWUlLd1lCQlFVSEFRRUVMREFxTUNnR0NDc0dBUVVGQnpBQgpoaHhvZEhSd09pOHZkM2QzTG1GdVppNWxjeTlCUXk5U1F5OXZZM053TURrR0ExVWRId1F5TURBd0xxQXNvQ3FHS0doMGRIQTZMeTkzCmQzY3VZVzVtTG1WekwwRkRMMUpETDBGT1JrRkRRMHhCVTBWQk1TNWpjbXd3RndZS0t3WUJCQUdCanh3VEFRUUpEQWN4TWpNdE16SXgKTURFR0Npc0dBUVFCZ1k4Y0tnWUVJd3doYUhSMGNITTZMeTkzZDNjdVlXNW1MbVZ6TDBGREwwRkRWRUZUTHpVMk56ZzVNQllHQ1NzRwpBUVFCZ1k4Y0V3UUpEQWN6TWpFdE1USXpNQjBHQTFVZERnUVdCQlN4VHhBem5GMnVvT3RNVytmSlVvRE42QitySkRBZkJnTlZIU01FCkdEQVdnQlMrTy9hME1iZHpKRWc1eFZjVGxIV3FuNEUvTERBTkJna3Foa2lHOXcwQkFRVUZBQU9DQVFFQVRRZ1lBT3d4ck1SVFQyTmgKeDdwcWlOc29HVDVkSm1ldW5BditpVTV6eC9Wb0VYQi9teCtWdHlMZk1lYTNWUzlMQzIzNDA0WFM3cHo1b1B3aVZQTHNNUFp0ek9jbQpmYWNWblNkUm41SjcrcU9POE1CK09WbFhxL1FtQVJuKzFYZUJDSGFUUTZBTWMvcGR2ZUVvR2t0YVh3RWpUc2xXeVJEOWRHRHpMcDA0CitGbmRRQWJWY0k1eFJrYjR2VG9SbmhRbWxvVVZkZGhRQU84dXNPQUliMDBHSkZOVHE0bHN5WjFxVDFIcGxRbCtuZ3NTRDFIQnhraHgKMTBQbTNLdXZDdW5BaDR1bTBRblNlZWlxOXFXSVYwVVpyRmxNd05SWHZIOU9WVHFTR0M0UFhqdzJ6T2kyR0xVZmFnczFkZWN1N2djRwpqaWRsRUxSL1dIVS82bHJ6dGZkVmlRPT08L2RzOlg1MDlDZXJ0aWZpY2F0ZT48ZHM6WDUwOUNlcnRpZmljYXRlPk1JSUZ5RENDQkxDZ0F3SUJBZ0lCS1RBTkJna3Foa2lHOXcwQkFRVUZBRENCMmpFTE1Ba0dBMVVFQmhNQ1JWTXhFakFRQmdOVkJBZ1QKQ1VKaGNtTmxiRzl1WVRGSU1FWUdBMVVFQnd3L1FtRnlZMlZzYjI1aElDaHpaV1VnWTNWeWNtVnVkQ0JoWkdSeVpYTnpJR0YwSUdoMApkSEJ6T2k4dmQzZDNMbUZ1Wmk1bGN5OWhaR1J5WlhOekx5QXBNU2N3SlFZRFZRUUtFeDVCVGtZZ1FYVjBiM0pwWkdGa0lHUmxJRU5sCmNuUnBabWxqWVdOcGIyNHhGekFWQmdOVkJBc1REa0ZPUmlCRGJHRnpaU0F4SUVOQk1STXdFUVlEVlFRRkV3cEhMVFl6TWpnM05URXcKTVJZd0ZBWURWUVFERXcxQlRrWWdVMlZ5ZG1WeUlFTkJNQjRYRFRBMU1EUXdOVEUwTWprd05Wb1hEVEUxTURRd016RTBNamt3TlZvdwpnZG94Q3pBSkJnTlZCQVlUQWtWVE1SSXdFQVlEVlFRSUV3bENZWEpqWld4dmJtRXhTREJHQmdOVkJBY01QMEpoY21ObGJHOXVZU0FvCmMyVmxJR04xY25KbGJuUWdZV1JrY21WemN5QmhkQ0JvZEhSd2N6b3ZMM2QzZHk1aGJtWXVaWE12WVdSa2NtVnpjeThnS1RFbk1DVUcKQTFVRUNoTWVRVTVHSUVGMWRHOXlhV1JoWkNCa1pTQkRaWEowYVdacFkyRmphVzl1TVJjd0ZRWURWUVFMRXc1QlRrWWdRMnhoYzJVZwpNU0JEUVRFVE1CRUdBMVVFQlJNS1J5MDJNekk0TnpVeE1ERVdNQlFHQTFVRUF4TU5RVTVHSUZObGNuWmxjaUJEUVRDQ0FTSXdEUVlKCktvWklodmNOQVFFQkJRQURnZ0VQQURDQ0FRb0NnZ0VCQUwvcVNLZWFpRGxyTEVoQUJ3U1RmUGU0TFg2bE4rSmgxaUg4a0RmTGFUNWUKaXpmZlcyODcyTGJEaUVDUTlKME1YQkJTc2JQbFg1RVE1djJvZ0JSZjA0dTlYTDBQSTVJSk4rTnkwbWFVQzF4MGxDOWU4azdZQThhegp6bGFsSE5sNy9VOEhUTlMzMmw4cFRYWHlIMVhQTWlNY1Jna25IVVhzOFl3MGlkNTdGcWREWG9vcjZaUkRIdGMrazIxdmlUMjg3ckhJCnQvL0pmZU5mRFc5M2VQVXFMbzNFaTVpWE1MRkdXZ3RqY05SNHg0YXpmLzhuUXFxZmltNXRvWlRLN0ljQ0hOWlVTLzI4aVp1bVl6aG0KakJhSmlaZkRVT2oyUWdHbmQzMFFHWklENkYxRnlCWEZoeHNOa2ZMR09aeDc4OEFLbWZqdWcyOStRbmNSanNNZkhISXZQUnNDQXdFQQpBYU9DQVpVd2dnR1JNQjBHQTFVZERnUVdCQlMrTy9hME1iZHpKRWc1eFZjVGxIV3FuNEUvTERBTUJnTlZIUk1FQlRBREFRSC9NQTRHCkExVWREd0VCL3dRRUF3SUJCakNCNmdZRFZSMGdCSUhpTUlIZk1JSGNCZ29yQmdFRUFZR1BIQUVJTUlITk1Dd0dDQ3NHQVFVRkJ3SUIKRmlCb2RIUndjem92TDNkM2R5NWhibVl1WlhNdlFVTXZaRzlqZFcxbGJuUnZjekNCbkFZSUt3WUJCUVVIQWdJd2dZOGFnWXhCYm5SbApjeUJrWlNCaFkyVndkR0Z5SUdWemRHVWdZMlZ5ZEdsbWFXTmhaRzhzSUdOdmJYQnlkV1ZpWlRvS0xVTnZibVJwWTJsdmJtVnpMQ0JzCmFXMXBkR0ZqYVc5dVpYTWdlU0IxYzI5eklHRjFkRzl5YVhwaFpHOXpJSE5sWjNWdUlFTlFJR0VnYkdFZ2NYVmxJSE5sSUhOdmJXVjAKWlM0S0xVVnpkR0ZrYnlCa1pTQjJhV2RsYm1OcFlUQVVCZ29yQmdFRUFZR1BIQk1CQkFZYkJEVXRNelF3TGdZS0t3WUJCQUdCanh3cQpCZ1FnR3g1b2RIUndjem92TDNkM2R5NWhibVl1WlhNdlFVTXZRVU5VUVZNdk5ERXdId1lEVlIwakJCZ3dGb0FVdmp2MnRERzNjeVJJCk9jVlhFNVIxcXArQlB5d3dEUVlKS29aSWh2Y05BUUVGQlFBRGdnRUJBSEMxYWtyc2pqMTBCYW5vckRVeGRMZG1RZ2tXeHk3VjFTT3YKbXBNWDhJKzRyZVUzSnhFWEZjNEdhcWpzSllmUjRuWjJNU2ZuZjFwalVIZ0cvWHc3ZjFBaHJBanUvd0JONWFnRFR1SEpWM0NwZG9uMgpaNDJMbURHQ29JNE4ydEkyUWVhRkJ0TDVXTzVqRVR5VEhCTG1US3Z6UzN2NncyQVhudDl3TnViYW9PNDRsamxwekNZRXdVdno4cWtBCkxzY2NoeHlwTVlmREdXL2JYSEw4L056bzdaNzZudzhhc2tEQWswSENpQ25aRkdOc0NSaStPdmdjaGJxU0gyYW1VQ0JKdUhxaXBwSG8KZWhpRWV4akg3Zzd5YzlJM2hLc0ttWXlGTXYzNEYxZ09VMTZvU0N3WGp3WU8wR21SZGxoZitBK0VPRE45ZUltb0pKanR4cXZRUm1qMQp3dEk9PC9kczpYNTA5Q2VydGlmaWNhdGU+PC9kczpYNTA5RGF0YT48L2RzOktleUluZm8+PGRzOk9iamVjdCBFbmNvZGluZz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC8wOS94bWxkc2lnI2Jhc2U2NCIgSWQ9Ik9iamVjdC1mNzAzY2Y5Zi01NjkyLTQxYjctOWQwMC05OWFhZGYxMjFiNTAiIE1pbWVUeXBlPSJ0ZXh0L3BsYWluIj5TRzlzWVNCTmRXNWtieUVoPC9kczpPYmplY3Q+PGRzOk9iamVjdD48eGFkZXM6UXVhbGlmeWluZ1Byb3BlcnRpZXMgSWQ9IlNpZ25hdHVyZS1kMjQxZmUzOC1iZDhkLTQzNGQtOTQxMy1kYjUyNGVkZmYzZGYtUXVhbGlmeWluZ1Byb3BlcnRpZXMiIFRhcmdldD0iI1NpZ25hdHVyZS1kMjQxZmUzOC1iZDhkLTQzNGQtOTQxMy1kYjUyNGVkZmYzZGYtU2lnbmF0dXJlIiB4bWxuczpkcz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC8wOS94bWxkc2lnIyIgeG1sbnM6eGFkZXM9Imh0dHA6Ly91cmkuZXRzaS5vcmcvMDE5MDMvdjEuMy4yIyI+PHhhZGVzOlNpZ25lZFByb3BlcnRpZXMgSWQ9IlNpZ25hdHVyZS1kMjQxZmUzOC1iZDhkLTQzNGQtOTQxMy1kYjUyNGVkZmYzZGYtU2lnbmVkUHJvcGVydGllcyI+PHhhZGVzOlNpZ25lZFNpZ25hdHVyZVByb3BlcnRpZXM+PHhhZGVzOlNpZ25pbmdUaW1lPjIwMTMtMDMtMTJUMTU6NTI6MjErMDE6MDA8L3hhZGVzOlNpZ25pbmdUaW1lPjx4YWRlczpTaWduaW5nQ2VydGlmaWNhdGU+PHhhZGVzOkNlcnQ+PHhhZGVzOkNlcnREaWdlc3Q+PGRzOkRpZ2VzdE1ldGhvZCBBbGdvcml0aG09Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvMDkveG1sZHNpZyNzaGExIi8+PGRzOkRpZ2VzdFZhbHVlPkYweDZlSHRncnFIUVhRYTQ1N2I4SDF4UGFRZz08L2RzOkRpZ2VzdFZhbHVlPjwveGFkZXM6Q2VydERpZ2VzdD48eGFkZXM6SXNzdWVyU2VyaWFsPjxkczpYNTA5SXNzdWVyTmFtZT5DTj1BTkYgU2VydmVyIENBLCBTRVJJQUxOVU1CRVI9Ry02MzI4NzUxMCwgT1U9QU5GIENsYXNlIDEgQ0EsIE89QU5GIEF1dG9yaWRhZCBkZSBDZXJ0aWZpY2FjaW9uLCBMPUJhcmNlbG9uYSAoc2VlIGN1cnJlbnQgYWRkcmVzcyBhdCBodHRwczovL3d3dy5hbmYuZXMvYWRkcmVzcy8gKSwgU1Q9QmFyY2Vsb25hLCBDPUVTPC9kczpYNTA5SXNzdWVyTmFtZT48ZHM6WDUwOVNlcmlhbE51bWJlcj4xMDAyPC9kczpYNTA5U2VyaWFsTnVtYmVyPjwveGFkZXM6SXNzdWVyU2VyaWFsPjwveGFkZXM6Q2VydD48L3hhZGVzOlNpZ25pbmdDZXJ0aWZpY2F0ZT48L3hhZGVzOlNpZ25lZFNpZ25hdHVyZVByb3BlcnRpZXM+PHhhZGVzOlNpZ25lZERhdGFPYmplY3RQcm9wZXJ0aWVzPjx4YWRlczpEYXRhT2JqZWN0Rm9ybWF0IE9iamVjdFJlZmVyZW5jZT0iI1JlZmVyZW5jZS02Mjk1MjVkYy0zODExLTQ2YTQtOWQ0MC0zMGI4NmJhZTVmOTciPjx4YWRlczpEZXNjcmlwdGlvbi8+PHhhZGVzOk1pbWVUeXBlPnRleHQvcGxhaW48L3hhZGVzOk1pbWVUeXBlPjx4YWRlczpFbmNvZGluZz5odHRwOi8vd3d3LnczLm9yZy8yMDAwLzA5L3htbGRzaWcjYmFzZTY0PC94YWRlczpFbmNvZGluZz48L3hhZGVzOkRhdGFPYmplY3RGb3JtYXQ+PC94YWRlczpTaWduZWREYXRhT2JqZWN0UHJvcGVydGllcz48L3hhZGVzOlNpZ25lZFByb3BlcnRpZXM+PC94YWRlczpRdWFsaWZ5aW5nUHJvcGVydGllcz48L2RzOk9iamVjdD48L2RzOlNpZ25hdHVyZT4=   -->
+		</div>
+		
+		<div>
+		 <label for="format">Formato</label>
+		 <select id="format">
+		 <option value="CAdES">CAdES</option>
+		 </select>
+		</div>
+				
+		<div>
+		 <label for="algorithm">Algoritmo</label>
+		 <select id="algorithm">
+		 <option value="SHA1withRSA" selected>SHA1 con RSA</option>
+		 <option value="SHA512withRSA">SHA512 con RSA</option>
+		 </select>
+		</div>
+		
+		<div>
+		 <label for="newParam">ExtraParams</label>
+		 <input id="newParam" type="text"><input type="button" value="Agregar" onclick="addExtraParam(document.getElementById('newParam').value);">
+		 <span>&nbsp;(Insertar las propiedades de una en una)</span>
+		 <br>
+		 <textarea id="params" cols="50" rows="5" readonly></textarea>
+		</div>
+		
+		<input type="button" value="Firmar" onclick="this.disabled = true; doSign();">
+		
+		<div>
+		 <label for="console">Consola</label>
+		 <textarea id="console" cols="150" rows="10"></textarea>
+		</div>
+		
+		<div>
+		 <span>Firma generada</span><br />
+		 <div id="b64signature"></div>
+		</div>
+	</body>
+</html>	

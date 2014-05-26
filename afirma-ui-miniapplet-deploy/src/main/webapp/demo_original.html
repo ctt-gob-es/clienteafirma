@@ -1,0 +1,159 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<title>VALIDe</title>
+	<link rel="stylesheet" type="text/css" href="css/estilos.css" media="screen">
+	<meta http-equiv="Expires" content="0">
+	<meta http-equiv="Last-Modified" content="0">
+	<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+	<meta http-equiv="content-script-type" content="text/javascript"> 
+	<meta http-equiv="Pragma" content="no-cache">
+	<meta http-equiv="Expires" content="0">
+	<meta http-equiv="Cache-Control" content="no-cache,no-store">
+	<meta name="lang" content="es">
+	<meta name="author" content="Dirección General para el impulso de la Administración Electrónica">
+	<meta name="organization" content="Ministerio de Hacienda y Administraciones Públicas">
+	<meta name="locality" content="Madrid, España">
+	<meta name="keywords" content="VALIDe, validacion firmas, validacion certificados, realizar firma, demostrador @firma, @firma, cliente firma, firma electrónica, certificado electrónico, CMS, CAdES, XAdES, XMLDSig">
+	<meta name="description" content="VALIDe. Validación de firmas y certificados online  ">
+	<style>
+		OBJECT   { width:1px; height:1px; position:absolute; top:50%; left:50%; }
+		APPLET   { width:1px; height:1px; position:absolute; top:50%; left:50%; }
+	</style>
+	<script type="text/javascript" src="js/deployJava.js"></script>
+	<script type="text/javascript" src="js/miniapplet.js"></script>
+	<script type="text/javascript" defer="defer">
+	<!--
+		function firmar(){
+			var textoFirmar = document.getElementById('textoFirmar').value;
+			var divMensaje = document.getElementById('divmensaje');
+			divMensaje.innerHTML='';
+			
+			var params = 	"mode=implicit\n" +
+							"serverUrl=https://valide.redsara.es/firmaMovil/TriPhaseSignerServer/SignatureService";
+			
+			try {
+				MiniApplet.sign(Base64.encode(textoFirmar), "SHA1withRSA", "CAdES", params, successCallback, errorCallback);
+			}
+			catch (excep) {
+				//Se puede recuperar el mensaje de error y pintarlo en la pantalla
+				var msg = getErrorMessage();
+				if (msg==undefined || msg==null) msg = excep.message;
+				if (msg==undefined || msg==null) msg = '';
+				divMensaje.innerHTML='<br><div class="iconErrorFirma">Error al firmar</div><br>' + msg + '<br>';
+			}
+		}
+		
+		function successCallback(signatureB64) {
+			var divMensaje = document.getElementById('divmensaje');
+			divMensaje.innerHTML='<br><div class="iconOKFirma">La firma se ha realizado correctamente</div><br>' +
+					'<textarea cols="76" rows="6">' + signatureB64 + '</textarea>' + '<br>';
+		}
+		
+		function errorCallback(errorType, errorMessage) {
+			var divMensaje = document.getElementById('divmensaje');
+			divMensaje.innerHTML='<br><div class="iconErrorFirma">Error al firmar</div><br>' +
+					'<div style="width: 300pt">' + errorMessage + '</div>' + '<br>';
+		}
+		
+		function mostrarPantalla()	{
+			document.getElementById("cargandoApplet").style.display = "none";
+			document.getElementById("pantalla").style.display = "block";
+		}
+	-->  
+</script>
+		
+<body onload="mostrarPantalla()">
+	<!-- CONTENEDOR ** -->
+	<div id="contenedor" style="background-color: rgb(230,230,230)">
+		<div id="cabecera">
+			
+
+<div class="cabecera">
+	<a title="Cliente Afirma" class="floatLeft">
+		<img src="img/logo_cliente.png" alt="Cliente @firma" title="Ciente @firma" style="width: 180px; height: 57px; margin-left: 26px; margin-top: 10px;">
+	</a>
+	<a href="http://www.lamoncloa.gob.es/home.htm" title="Gobierno de España">
+		<img src="img/logoGobEsp.PNG" alt="www.lamoncloa.gob.es" title="Gobierno de España" class="logoGobEsp">
+	</a>
+</div>
+<div class="clear"></div>
+		</div>
+		<div id="contenidoTop"></div>
+		<div id="contenido">
+			<div id="cuerpo" style="background-color: rgb(248,248,248);">
+				<div class="bloqueDerechoInterior">
+					
+
+
+
+<div style="display: none;" id="cargandoApplet" class="error cursiva">
+	<br>
+	Cargando el applet para la extracción de certificados. Tenga paciencia.
+	<br><br>
+	<span>ESPERE POR FAVOR...</span>
+</div>
+<div id="pantalla" style="display: block;">
+<form id="sede">
+	<h2>
+		<img src="img/icon_realizarFirma.png" alt="validar sede" class="VASub VANormalIE7">
+		<span>Realizar Firma Electr&oacute;nica (Firm@Movil)</span>
+	</h2>
+	<p>Una firma electr&oacute;nica es un conjunto de datos asociados a un mensaje que
+ permite asegurar la identidad del firmante y la integridad del mensaje.</p>
+	<div class="separadorSeccion"></div>
+	<fieldset style="background-color: rgb(252,252,252)">
+	<p>Para realizar la firma del texto, <a href="https://play.google.com/store/apps/details?id=es.gob.afirma">descargue el Cliente m&oacute;vil @firma</a> y pulse el boton "Firmar".</p>
+	<div id="divmensaje"></div>
+	<br>
+	<div style="width: 100%" class="botoneraCentro">
+		<input style="width: 100%" id="textoFirmar" value="Texto que desea firmar" type="text"><br>
+	</div>
+	<div class="botoneraCentro">
+		<input class="botonP marginR15" id="botonFirmar" value="Firmar" onclick="javascript:firmar();" type="button"><br>
+	</div>
+	<br>
+	</fieldset>
+</form>
+
+	<div class="nota"><p>
+	Nota: La firma electrónica se realiza mediante una aplicaci&oacute;n firmada por la D.G. para Impulso de 
+la Administración Electrónica por su seguridad.
+	<a href="https://valide.redsara.es/valide/requisitos.html" class="enlace">
+		Pulsa aquí para ver los requisitos de funcionamiento
+	</a>
+	</p></div>
+
+</div>
+				</div>
+				
+<div style="float: left; width: 200px; margin-left: 30px; margin-top: 60px;">
+<a href="https://play.google.com/store/apps/details?id=es.gob.afirma">
+  <img alt="Get it on Google Play"
+       src="img/es_generic_rgb_wo_60.png" />
+</a>
+</div>
+				 <div class="clear"></div>
+			</div><!-- FIN DE CUERPO -->
+		</div><!-- FIN DE CONTENIDO -->
+		<div id="contenidoBottom"></div>
+		<div id="pie">
+			
+<!-- LOGOS PIE ** -->
+<div id="logos">
+	<img src="img/btn_w3c_aa.gif" class="logo_w3c" alt="W3C AA">
+	<img src="img/btn_w3c_css.gif" class="logo_w3c" alt="W3C CSS">
+	<img src="img/btn_w3c_xhtml.gif" class="logo_w3c" alt="W3C HTML">
+</div>
+<!-- FIN DE LOGOS PIE ** -->
+<!-- MENÚ PIE ** -->
+
+		</div>
+	</div> <!-- FIN DE CONTENEDOR -->
+	
+	<script type="text/javascript">
+		MiniApplet.cargarMiniApplet('https://valide.redsara.es/firmaMovil');
+		MiniApplet.setServlets("https://valide.redsara.es/firmaMovil/SignatureStorageServer/StorageService", "https://valide.redsara.es/firmaMovil/SignatureRetrieverServer/RetrieveService");
+	</script>
+	
+</body></html>
