@@ -1,0 +1,7 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+	<item android:id="@+id/update" android:title="@string/update"></item>
+    <item android:id="@+id/see_unresolveds" android:title="@string/see_unresolves" />
+    <item android:id="@+id/see_rejects" android:title="@string/see_rejects" />
+    <item android:id="@+id/filter" android:icon="@drawable/icon_filter" android:title="@string/filter" android:showAsAction="ifRoom"></item>
+    <item android:id="@+id/no_filter" android:icon="@drawable/icon_no_filter" android:title="@string/nofilter" android:showAsAction="ifRoom" android:visible="false"></item>
+</menu>

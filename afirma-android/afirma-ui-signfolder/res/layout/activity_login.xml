@@ -1,0 +1,76 @@
+<FrameLayout  
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+	android:layout_width="match_parent" 
+	android:layout_height="match_parent">
+
+	<ImageView
+		android:layout_width="match_parent" 
+		android:layout_height="match_parent"
+		android:src="@drawable/background" 
+		android:scaleType="fitCenter" 
+		android:contentDescription="@string/app_name"/>
+	
+	<RelativeLayout
+	    android:layout_width="match_parent"
+	    android:layout_height="match_parent"
+	    android:paddingBottom="@dimen/activity_vertical_margin"
+	    android:paddingLeft="@dimen/activity_horizontal_margin"
+	    android:paddingRight="@dimen/activity_horizontal_margin"
+	    android:paddingTop="@dimen/activity_vertical_margin">
+		
+	    <ImageView
+	        android:id="@+id/imageView1"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_alignParentTop="true"
+	        android:layout_centerHorizontal="true"
+	        android:layout_marginTop="5dp"
+	        android:contentDescription="@string/signfolder_logo"
+	        android:src="@drawable/logo_portafirmas_mini" />
+	    
+	    <TextView
+	        android:id="@+id/presentationText"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_below="@+id/imageView1"
+	        android:layout_marginTop="5dp"
+	        android:layout_marginLeft="5dp"
+	        android:layout_marginRight="5dp"
+	        android:text="@string/label_presentation_text_mini"
+			android:textAppearance="?android:attr/textAppearanceSmall"
+	          />
+	
+	        <LinearLayout
+	            android:layout_width="match_parent"
+	            android:layout_height="wrap_content"
+	            android:orientation="horizontal"
+	            android:layout_alignParentBottom="true"
+	            android:layout_marginBottom="5dp"
+	            android:layout_marginTop="5dp" >
+	
+	            <Button
+	                android:id="@+id/button_importar_cert"
+	                android:layout_width="wrap_content"
+	                android:layout_height="wrap_content"
+	                android:minWidth="30dp"
+	                android:onClick="onClick"
+	                android:text="@string/button_import_cert"
+	                android:maxLines="2"
+	                android:layout_weight="0.5"
+	                style="@style/ButtonText" />
+	
+	            <Button
+	                android:id="@+id/button_acceder"
+	                android:layout_width="wrap_content"
+	                android:layout_height="wrap_content"
+	                android:minWidth="30dp"
+	                android:onClick="onClick"
+	                android:text="@string/button_login"
+	                android:maxLines="2"
+	                android:layout_weight="0.5"
+	                style="@style/ButtonText" />
+	        </LinearLayout>
+	    
+	</RelativeLayout>
+</FrameLayout>

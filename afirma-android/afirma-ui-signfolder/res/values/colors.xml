@@ -1,0 +1,8 @@
+<resources>
+        <color name="white">#ffffffff</color>
+        <color name="black">#ff000000</color>
+        <color name="red">#ff95191c</color>
+        <color name="lightGrey">#ffe0e0e0</color>
+        <color name="darkGrey">#ff404040</color>
+        <color name="lightRed">#FBE8E8</color>
+</resources>

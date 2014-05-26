@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/paginationPanel"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_alignParentBottom="true"
+    android:layout_marginTop="2dp"
+    android:background="@color/white"
+    android:clickable="false"
+    android:focusable="false"
+    android:minHeight="80dp" >
+
+    <TextView
+        android:id="@+id/paginationText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerInParent="true"
+        android:layout_centerVertical="true"
+        android:clickable="true"
+        android:gravity="center"
+        android:paddingLeft="30dp"
+        android:paddingRight="30dp"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textColor="@color/black"
+        android:textIsSelectable="false" />
+
+    <View
+        android:id="@+id/separator_bottom"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="1dp"
+        android:background="@android:color/darker_gray"
+        android:clickable="false" />
+
+    <ImageView
+        android:id="@+id/arrowLeft"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="32dp"
+        android:layout_toLeftOf="@id/paginationText"
+        android:clickable="true"
+        android:contentDescription="@string/img_cd_previous_page"
+        android:paddingLeft="5dp"
+        android:paddingRight="5dp"
+        android:src="@drawable/background_arrow_left" />
+
+    <ImageView
+        android:id="@+id/arrowRigth"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_marginRight="32dp"
+        android:layout_toRightOf="@id/paginationText"
+        android:clickable="true"
+        android:contentDescription="@string/img_cd_next_page"
+        android:paddingLeft="5dp"
+        android:paddingRight="5dp"
+        android:src="@drawable/background_arrow_right" />
+
+    <ImageView
+        android:id="@+id/arrowFirst"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_toLeftOf="@id/arrowLeft"
+        android:clickable="true"
+        android:contentDescription="@string/img_cd_first_page"
+        android:paddingLeft="5dp"
+        android:paddingRight="5dp"
+        android:src="@drawable/background_arrow_first" />
+
+    <ImageView
+        android:id="@+id/arrowLast"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_toRightOf="@id/arrowRigth"
+        android:clickable="true"
+        android:contentDescription="@string/img_cd_last_page"
+        android:paddingLeft="5dp"
+        android:paddingRight="5dp"
+        android:src="@drawable/background_arrow_last" />
+    
+</RelativeLayout>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:padding="@dimen/dialog_dimen"
+    >
+   
+    <TextView 
+        android:id="@+id/tvProxyUrl"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/title_url_portafirmas"
+        android:textColor="@color/black"
+        android:textSize="15sp"/>
+    
+    <EditText 
+        android:id="@+id/etProxyUrl"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="textUri"
+	    android:hint="@string/hint_url_portafirmas"
+        />
+
+</LinearLayout>

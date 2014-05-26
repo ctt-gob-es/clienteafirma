@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal"
+    android:minHeight="45dp" >
+    
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingLeft="24dp"
+        android:layout_gravity="center_vertical"
+        android:src="@drawable/icon_signline"
+        android:contentDescription="@string/accesibility_icon_filetype"
+        android:layout_marginTop="6dp" />
+    
+    <TextView
+        android:id="@+id/signer"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:textIsSelectable="false"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Elemento de prueba"
+        style="@style/SignLine_Item"
+        android:layout_marginTop="6dp" />
+
+</LinearLayout>

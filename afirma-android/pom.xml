@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+	<packaging>pom</packaging>
+	<artifactId>afirma-android</artifactId>
+	<name>afirma-android</name>
+
+	<parent>
+		<groupId>es.gob.afirma</groupId>
+		<artifactId>afirma-client-base</artifactId>
+		<version>3.3.2-SNAPSHOT</version>
+		<relativePath>../../../pom.xml</relativePath>
+	</parent>
+
+	<description>Componentes móvil de afirma</description>
+	
+	<modules>
+		<module>afirma-ui-android</module>
+		<!-- <module>afirma-ui-signfolder</module> tiene errores en el codigo. Descomentar al corregir -->
+	</modules>
+</project>

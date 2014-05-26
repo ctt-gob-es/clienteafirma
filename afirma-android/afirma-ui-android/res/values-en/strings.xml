@@ -1,0 +1,14 @@
+<resources>
+
+    <string name="app_name">Cliente @firma M\u00F3vil</string>
+    <string name="title_activity_cert_chooser">Import certificate</string>
+    <string name="presentation_text">Wellcome to the "Cliente @firma Android" 0.1 Beta.\nThis application allows making electronic signatures from compatible service providers Web pages.\nTo use the app, you\'ll need an electronic certificate and its related private key installed on the device. Consult the Android documentation and your service provider\'s documentarion.</string>
+    <string name="import_cert">Import certificate</string>
+    <string name="disclaimer">2013 Gobierno de Espa\u00F1a</string>
+    <string name="ok">OK</string>
+    <string name="title_activity_sign_data">Sign data</string>
+    <string name="error_bad_params">Illegal App invocation, please ask your service provider for a Web page upgrade.</string>
+    <string name="error_server_connect">Network connection error.</string>
+    <string name="error_server_error">Error trying to send back the signature to the Web page.</string>
+
+</resources>
