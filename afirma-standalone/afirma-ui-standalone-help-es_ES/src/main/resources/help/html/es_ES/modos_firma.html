@@ -1,0 +1,104 @@
+<html>
+<head>
+	<title>Modos de firma</title>
+</head>
+<body>
+<h2><a name="_Toc275937489">Modos de firma</a></h2>
+
+<p>El modo de firma hace referencia a la disposici&oacute;n de los datos firmados con respecto a la firma generada. &eacute;l concepto
+"modo de firma" puede no estar contemplado por todos los formatos de firma pero, por simplificar, se distinguen 2 modos de firma que 
+conceptualmente se pueden aplicar de manera informal a cualquier formato:</p>
+
+<ul>
+	<li><b>Modo impl&iacute;cito:</b> Se dice que una firma es impl&iacute;cita cuando el documento de firma generado contiene el documento que 
+	se ha firmado. Las distintas distribuciones contempladas por esta definici&oacute;n son:</li>
+	<ul type="circle">
+		<li>El documento firmado se incorpora dentro de la estructura de firma generada.</li>
+		<li>La estructura de firma generada pasa a formar parte del documento firmado.</li>
+		<li>Se genera una nueva estructura que alberga tanto al objeto de firma como al documento firmado.</li>
+	</ul>
+	<li><b>Modo expl&iacute;cito:</b> Se dice que una firma es expl&iacute;cita cuando genera un documento de firma que 
+	no incorpora el documento que se firm&oacute;.</li>
+</ul>
+
+<p>Existen formatos de firma que admiten los modos de firma impl&iacute;cito y expl&iacute;cito, mientras que otros no contemplan el
+concepto de "modo de firma". Estos &uacute;ltimos generar&iacute;an siempre firmas acorde a uno de estos modos o ser&iacute;an lo suficientemente 
+flexibles como para generar firmas de ambos tipos.</p>
+
+<p>La compatibilidad entre los formatos de firma admitidos por el Cliente @firma y los modos de firma descritos 
+se muestra en la siguiente tabla:</p><br/>
+
+<table  align="center" border="1" cellspacing="0">
+	<tr align="center">
+		<td bgcolor="#778899" width="200"><b>Formato de firma</b></td>
+		<td bgcolor="#778899" colspan="2" width="200"><b>Modo de firma</b></td>
+	</tr>
+	<tr align="center">
+		<td bgcolor="#778899"></td>
+		<td bgcolor="#D3D3D3"><b>Impl&iacute;cito</b></td>
+		<td bgcolor="#D3D3D3"><b>Expl&iacute;cito</b></td>
+	</tr>
+	<tr align="center">
+		<td bgcolor="#D3D3D3"><b>PKCS#7 / CMS</b></td>
+		<td>S&iacute;</td>
+		<td>S&iacute;</td>
+	</tr>
+	<tr align="center">
+		<td bgcolor="#D3D3D3"><b>CAdES</b></td>
+		<td>SI</td>
+		<td>S&iacute;</td>
+	</tr>
+	<tr align="center">
+		<td bgcolor="#D3D3D3"><b>XMLdSig Enveloping</b></td>
+		<td>SI</td>
+		<td>S&iacute;</td>
+	</tr>
+	<tr align="center">
+		<td bgcolor="#D3D3D3"><b>XMLdSig Enveloped</b></td>
+		<td>S&iacute;</td>
+		<td>NO</td>
+	</tr>
+	<tr align="center">
+		<td bgcolor="#D3D3D3"><b>XMLdSig Detached</b></td>
+		<td>S&iacute;</td>
+		<td>S&iacute;</td>
+	</tr>
+	<tr align="center">
+		<td bgcolor="#D3D3D3"><b>XAdES Enveloping</b></td>
+		<td>S&iacute;</td>
+		<td>S&iacute;</td>
+	</tr>
+	<tr align="center">
+		<td bgcolor="#D3D3D3"><b>XAdES Enveloped</b></td>
+		<td>S&iacute;</td>
+		<td>NO</td>
+	</tr>
+	<tr align="center">
+		<td bgcolor="#D3D3D3"><b>XAdES Detached</b></td>
+		<td>S&iacute;</td>
+		<td>S&iacute;</td>
+	</tr>
+	<tr align="center">
+		<td bgcolor="#D3D3D3"><b>PDF</b></td>
+		<td>S&iacute;</td>
+		<td>NO</td>
+	</tr>
+	<tr align="center">
+		<td bgcolor="#D3D3D3"><b>PAdES</b></td>
+		<td>S&iacute;</td>
+		<td>NO</td>
+	</tr>
+	<tr align="center">
+		<td bgcolor="#D3D3D3"><b>ODF</b></td>
+		<td>S&iacute;</td>
+		<td>NO</td>
+	</tr>
+	<tr align="center">
+		<td bgcolor="#D3D3D3"><b>OOXML</b></td>
+		<td>S&iacute;</td>
+		<td>NO</td>
+	</tr>
+</table>
+<br/>
+</body>
+</html>

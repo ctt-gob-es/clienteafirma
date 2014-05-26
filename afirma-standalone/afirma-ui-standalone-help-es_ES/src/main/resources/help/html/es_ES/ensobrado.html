@@ -1,0 +1,170 @@
+<html>
+<head>
+	<title>Ensobrado digital</title>
+</head>
+<body>
+<h2><a name="_Toc275937516">Ensobrado digital</a></h2>
+
+<p>Desde la opci&oacute;n de <i>"Ensobrado"</i> es posible generar sobres digitales para la transferencia de datos segura con 
+otras personas.</p>
+
+<p>Esta opci&oacute;n s&oacute;lo est&aacute; disponible en el modo de vista avanzada.</p>
+
+<p><b>IMPORTANTE:</b> El DNIe y otros dispositivos externos tienen bloqueado el proceso de desenvoltura de sobres, as&iacute; que 
+nunca deben utilizarse para generar sobre digitales.</p>
+
+<p align="center">
+	<img src="images/image070.png" width="650" height="370"/>
+</p>
+
+<p>Las opciones de configuraci&oacute;n disponibles son:</p>
+
+<ul>
+	<li><a name="ensobrado.fichero">Fichero a ensobrar digitalmente:</a></li>
+	<ul type="circle">
+	<li>Permite seleccionar el documento que deseamos introducir en el sobre digital. Es posible pulsar el bot&oacute;n "Examinar" 
+			para buscar un fichero en disco o escribir directamente su ruta en la caja de texto asociada.</li>
+	<li>Tecla de acceso r&aacute;pido: o</li>
+	<li>Tecla de acceso r&aacute;pido al bot&oacute;n Examinar: e</li>
+		<!--  <li>Si se esta generando un sobre digital:</li>
+		<ul type="square">
+			<li>Permite seleccionar el documento que deseamos introducir en el sobre digital. Es posible pulsar el bot&oacute;n "Examinar" 
+			para buscar un fichero en disco o escribir directamente su ruta en la caja de texto asociada.</li>
+		</ul><br/>
+		<li>Si se est&aacute; a&ntilde;adiendo un remitente a un sobre digital:</li>
+		<ul type="square">
+			<li>Permite seleccionar el sobre digital al que queremos a&ntilde;adir un nuevo remitente. Es posible pulsar el bot&oacute;n "Examinar" 
+			para buscar un fichero en disco o escribir directamente su ruta en la caja de texto asociada.</li>
+		</ul>-->
+	</ul><br/>
+	<!--  <li><a name="ensobrado.fichero">A&ntilde;adir nuevos remitentes al sobre:</a></li>
+	<ul type="circle">
+		<li>Permite a&ntilde;adir un nuevo remitente a un sobre digital ya generado.</li>
+	</ul><br/>-->
+	<li><a name="ensobrado.firmarsobre">Tipos de sobre digital:</a></li>
+	<ul type="circle">
+		<li>Indica el tipo de sobre electr&oacute;nico que debe generarse. Los tipos soportados son:</li>
+		<ul type="square">
+			<li>Sobre autenticado: Este es el tipo por defecto y el sobre m&aacute;s seguro. Cifra los datos contenidos en el sobre y agrega 
+			un c&oacute;digo de autenticaci&oacute;n para detectar modificaci&oacute;n en el sobre.</li>
+			<li>Sobre firmado: Cifra los datos contenidos en el sobre y posteriormente lo firma.</li>
+			<li>Sobre simple: Cifra los datos contenidos en el sobre.</li>
+		</ul>
+		<li>Tecla de acceso r&aacute;pido: t</li>
+	</ul>
+</ul>
+
+<p>Al pulsar el icono de ayuda se muestra la ventana de ayuda para el men&uacute; "Ensobrado".</p>
+<ul>
+	<li>Tecla de acceso r&aacute;pido para el bot&oacute;n de Ayuda: h</li>
+</ul>
+
+<p>Al pulsar el bot&oacute;n "Generar" se inicializar&aacute; el asistente para la generaci&oacute;n de sobres electr&oacute;nicos.</p>
+<ul>
+	<li>Tecla de acceso r&aacute;pido para el bot&oacute;n "Generar":</li>
+</ul>
+
+<p align="center">
+	<img src="images/image072.png" width="670" height="585"/>
+</p>
+
+<p>Al pulsar el bot&oacute;n "Siguiente &gt;" pasaremos al primer paso para la generaci&oacute;n del sobre electr&oacute;nico: la selecci&oacute;n
+del los destinatarios del sobre. Desde esta pantalla podr&aacute;n indicarse los distintos destinatarios del sobre por medio de 
+sus certificados.</p>
+
+<p align="center">
+	<img src="images/image074.png" width="670" height="585"/>
+</p>
+
+<p>Las opciones de configuraci&oacute;n disponibles en esta pantalla son:</p>
+<ul>
+	<li><a name="ensobrado.wizard.repositorio.destinatario">A&ntilde;adir un destinatario desde.</a></li>
+	<ul type="circle">
+		<li>Este listado contiene los almacenes disponibles para la extracci&oacute;n de una clave p&uacute;blica para el env&iacute;o de datos. 
+		Es de suponer que no disponemos de los certificados con la clave p&uacute;blica de los destinatarios en nuestro almac&eacute;n personal, 
+		as&iacute; que s&oacute;lo est&aacute;n disponibles los almacenes en fichero y la libreta de direcciones. Los almacenes concretos disponibles son:</li>
+		<ul type="square">
+			<li>PKCS#7 / X.509: Certificado en fichero (.cer) con clave p&uacute;blica.</li>
+			<li>PKCS#12 / PFX: Certificado en almac&eacute;n en fichero (.p12, .pfx).</li>
+			<li>Windows / Internet Explorer (otras personas / libreta de direcciones): Almac&eacute;n de Windows con las claves p&uacute;blicas de 
+			otras personas.</li>
+		</ul>
+		<li>Tecla de acceso r&aacute;pido: d</li>
+	</ul><br/>
+	
+	<li>A&ntilde;adir.</li>
+	<ul type="circle">
+		<li>Abre un di&aacute;logo para la selecci&oacute;n de un certificado del almac&eacute;n seleccionado. Si el almac&eacute;n est&aacute; protegido con contrase&ntilde;a ser&aacute; 
+		necesario introducirla. Al seleccionar un certificado, este se agrega al listado de destinatarios.</li>
+		<li>Tecla de acceso r&aacute;pido: r</li>
+	</ul><br/>
+	<li>Destinatarios.</li>
+	<ul type="circle">
+		<li>Muestra la lista de destinatarios. Permite seleccionar elementos para ser eliminados.</li>
+		<li>Tecla de acceso r&aacute;pido: t</li>
+	</ul>
+	<li>Eliminar destinatario.</li>
+	<ul type="circle">
+		<li>Permite eliminar el destinatario seleccionado de la lista de destinatarios.</li>
+		<li>Tecla de acceso r&aacute;pido: e</li>
+	</ul>
+</ul>
+
+<p>Es obligatorio seleccionar al menos un destinatario para el sobre digital. Al pulsar el bot&oacute;n "Siguiente &gt;" nos aparecer&aacute; la ventana 
+para la selecci&oacute;n del remitente del sobre. En esta pantalla podemos seleccionar nuestro certificado para identificarnos como remitente 
+del sobre. Este paso es opcional en la generaci&oacute;n de Sobres Simples y obligatorio en los Sobres Firmados o Autenticados.</p>
+
+<p><b>En este paso, s&iacute; es posible utilizar el DNIe.</b></p>
+
+<p align="center">
+	<img src="images/image076.png" width="670" height="585"/>
+</p>
+
+<p>Las opciones disponibles en esta pantalla son:</p>
+<ul>
+	<li><a name="ensobrado.wizard.repositorio.remitente">A&ntilde;adir remitente desde el repositorio / almac&eacute;n de certificados.</a></li>
+	<ul type="circle">
+		<li>Este listado contiene los posibles almacenes que pueden contener el certificado del quien genera el sobre digital. Los 
+		almacenes concretos disponibles son:</li>
+		<ul type="square">
+			<li>Windows / Internet Explorer: Para tomar el certificado del almac&eacute;n de Windows o un dispositivo externo (por ejemplo, 
+			el DNIe) instalado en el sistema.</li>
+			<li>PKCS#12 / PFX: Para tomar el certificado de un almac&eacute;n en disco en formato P12 o PFX.</li>
+			<li>PKCS#7 / X.509: Para tomar el certificado de un almac&eacute;n en disco en formato P12 o X.509.</li>
+		</ul>
+		<li>Tecla de acceso r&aacute;pido: d</li>
+	</ul><br/>
+	<li>A&ntilde;adir</li>
+	<ul type="circle">
+		<li>Abre un di&aacute;logo para la selecci&oacute;n de un certificado del almac&eacute;n seleccionado. Si el almac&eacute;n est&aacute; protegido con contrase&ntilde;a 
+		ser&aacute; necesario introducirla. Al seleccionar un certificado, este se agrega como el nuevo remitente del sobre. Actualmente la Interfaz 
+		de Escritorio del Cliente @firma s&oacute;lo soporta la configuraci&oacute;n de un remitente para el sobre electr&oacute;nico.</li>
+		<li>Tecla de acceso r&aacute;pido: r</li>
+	</ul><br/>
+	<li>Remitente</li>
+	<ul type="circle">
+		<li>Muestra la lista de remitentes. Permite seleccionar elementos para ser eliminados.</li>
+		<li>Tecla de acceso r&aacute;pido: t</li>
+	</ul>
+	<li>Eliminar remitente</li>
+	<ul type="circle">
+		<li>Permite eliminar el remitente seleccionado de la lista de remitentes.</li>
+		<li>Tecla de acceso r&aacute;pido: e</li>
+	</ul>
+</ul>
+
+<p>Al pulsar el bot&oacute;n "Siguiente &gt;" se lleva a cabo el proceso de generaci&oacute;n del sobre electr&oacute;nico. Si ocurriese un error durante 
+el proceso, se mostrar&aacute; el mensaje correspondiente, y si finaliza el proceso correctamente se nos mostrar&aacute; un di&aacute;logo para almacenar 
+el sobre electr&oacute;nico generado.</p>
+
+<p>Teclas de acceso r&aacute;pido para los botones: </p>
+<ul>
+	<li>Maximizar ventana: m</li>
+	<li>Anterior: a</li>
+	<li>Siguiente: s</li>
+	<li>Cancelar: c</li>
+	<li>Finalizar: f</li>
+</ul>
+
+</body>
+</html>

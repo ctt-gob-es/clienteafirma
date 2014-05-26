@@ -1,0 +1,3 @@
+Manifest-Version: 1.0
+Main-Class: es.gob.afirma.ui.principal.Main
+SplashScreen-Image: splash.gif

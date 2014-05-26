@@ -1,0 +1,151 @@
+<html>
+<head>
+	<title>Descifrado de datos</title>
+</head>
+<body>
+<h2><a name="_Toc275937513">Descifrado de datos</a></h2>
+
+<p>Desde la ventana de <i>"Descifrado"</i> podemos descifrar un fichero de datos que haya sido previamente cifrado 
+por medio de las funcionalidades de la ventana de <i>"Cifrado"</i>.</p>
+
+<p align="center">
+	<img src="images/image060.png" width="650" height="370"/>
+</p>
+
+<p>Las opciones de configuraci&oacute;n de esta pantalla son:</p>
+
+<ul>
+	<li><a name="descifrado.fichero">Fichero a descifrar digitalmente:</a></li>
+	<ul type="circle">
+		<li>Permite seleccionar el fichero que se desea descifrar. Es posible pulsar el bot&oacute;n "Examinar" para buscar 
+		un fichero en disco o escribir directamente su ruta en la caja de texto asociada.</li>
+		<li>Tecla de acceso r&aacute;pido: e</li>
+		<li>Tecla de acceso r&aacute;pido al bot&oacute;n Examinar: x</li>
+	</ul><br/>
+	<li><a name="descifrado.mecanismo">Mecanismo de cifrado:</a></li>
+	<ul type="circle">
+		<li>Permite establecer si el fichero se cifr&oacute; mediante una contrase&ntilde;a o una clave de cifrado.</li>
+		<li>Tecla de acceso r&aacute;pido: a</li>
+	</ul><br/>
+	<li><a name="descifrado.algoritmo">Algoritmo de cifrado electr&oacute;nico:</a></li>
+	<ul type="circle">
+		<li>Es el algoritmo que se utiliz&oacute; para el cifrado de datos. La lista de algoritmos var&iacute;a seg&uacute;n el mecanismo 
+		de cifrado escogido y la vista activa en la interfaz. Los algoritmos disponibles son:</li>
+		<ul type="square">
+			<li>Para el descifrado con contrase&ntilde;a (pre-establecido en la vista simple):</li>
+			<ul>
+				<li>SHA1 y 3DES (pre-establecido en la vista simple).</li>
+				<li>SHA1 y RC2.</li>
+				<li>MD5 y DES.</li>
+			</ul>
+			<li>Para el descifrado mediante clave:</li>
+			<ul>
+				<li>AES</li>
+				<li>Alleged RC4</li>
+				<li>Blowfish</li>
+				<li>DES</li>
+				<li>3DES</li>
+				<li>RC2</li>
+			</ul>
+		</ul>
+		<li>Tecla de acceso r&aacute;pido: g</li>
+	</ul>
+</ul>
+
+<p>En la vista simple de la interfaz, el mecanismo de cifrado es obligatoriamente "Contrase&ntilde;a de cifrado" y el algoritmo es siempre 
+"Contrase&ntilde;a SHA1 y 3DES".</p>
+
+<p>Recuerde que el mecanismo y el algoritmo de cifrado seleccionado debe coincidir con el utilizado cuando se cifr&oacute; el documento. 
+Para facilitar este aspecto, es recomendable utilizar siempre los mismos valores para estos par&aacute;metros.</p>
+
+<p>Al pulsar el icono de ayuda se muestra la ventana de ayuda para el men&uacute; "Descifrado".</p>
+<ul>
+	<li>Tecla de acceso r&aacute;pido para el bot&oacute;n de Ayuda: h</li>
+</ul>
+
+<p>Al pulsar el bot&oacute;n "Descifrar" se nos abrir&aacute; el asistente para la configuraci&oacute;n del proceso de descifrado.</p>
+<ul>
+	<li>Tecla de acceso r&aacute;pido para el bot&oacute;n "Descifrar": r</li>
+</ul>
+
+<p align="center">
+	<img src="images/image062.png" width="670" height="585"/>
+</p>
+
+<p>Al pulsar el bot&oacute;n "Siguiente &gt;" se nos mostrar&aacute; la pantalla del asistente para la inserci&oacute;n de la contrase&ntilde;a o clave de 
+cifrado. Esta pantalla variar&aacute; seg&uacute;n el mecanismo de cifrado seleccionado.</p>
+
+<h3><a name="_Toc275937514"></a><a name="descifrado.password">Contrase&ntilde;a de cifrado</a></h3>
+
+<p>Si se seleccion&oacute; el mecanismo de cifrado mediante contrase&ntilde;a, el asistente nos mostrar&aacute; una pantalla para la inserci&oacute;n de la 
+contrase&ntilde;a de cifrado. S&oacute;lo ser&aacute; necesario insertar esta para llevar a cabo el proceso.</p>
+
+<p align="center">
+	<img src="images/image064.png" width="670" height="585"/>
+</p>
+
+<p>Las opciones de configuraci&oacute;n disponibles son:</p>
+
+<ul>
+	<li><a name="descifrado.wizard.password">Contrase&ntilde;a de cifrado:</a></li>
+	<ul type="circle">
+		<li>En la caja de texto que aparece deberemos insertar la contrase&ntilde;a que se utiliz&oacute; para el cifrado de los datos. Deben 
+		respetarse las may&uacute;sculas y min&uacute;sculas de la contrase&ntilde;a original.</li>
+		<li>Tecla de acceso r&aacute;pido: o</li>
+	</ul>
+</ul>
+
+<p>En la caja de texto que aparece deberemos insertar la contrase&ntilde;a que se utiliz&oacute; para el cifrado de los datos. Deben respetarse 
+las may&uacute;sculas y min&uacute;sculas de la contrase&ntilde;a original.</p>
+
+<p>Al pulsar el bot&oacute;n "Siguiente &gt;" se llevar&aacute; a cabo el proceso de descifrado. Si ocurriese un error durante el mismo, se 
+informar&iacute;a al usuario con el mensaje correspondiente. Aseg&uacute;rese en este caso de haber seleccionado el mecanismo y el algoritmo de cifrado
+correctos, adem&aacute;s de la contrase&ntilde;a. Si el proceso finaliza correctamente, se mostrar&aacute; un di&aacute;logo para el guardado del documento descifrado.</p>
+
+<h3><a name="_Toc275937515"></a><a name="descifrado.clave">Clave de cifrado</a></h3>
+
+<p>Si se seleccion&oacute; el mecanismo de cifrado mediante clave, el asistente nos mostrar&aacute; una pantalla para la inserci&oacute;n de la clave que se 
+utiliz&oacute; en el proceso de cifrado. S&oacute;lo ser&aacute; necesario insertarla o recuperarla del almac&eacute;n de claves para llevar a cabo el proceso.</p>
+
+<p class="MsoNormal" align="center">
+	<img src="images/image066.png" width="670" height="585"/>
+</p>
+
+<p>Las opciones de configuraci&oacute;n disponibles en esta pantalla son:</p>
+<ul>
+	<li><a name="descifrado.wizard.clave">Clave de descifrado:</a></li>
+	<ul type="circle">
+		<li>En esta caja de texto puede insertar la clave de cifrado en base 64 que utiliz&oacute; para el cifrado de los datos. Tenga en cuenta 
+		que la clave debe disponer de un formato concreto seg&uacute;n el algoritmo de cifrado utilizado.</li>
+		<li>Tecla de acceso r&aacute;pido: l</li>
+	</ul><br/>
+	<li>Extraer del almac&eacute;n:</li>
+	<ul type="circle">
+		<li>Permite acceder al almac&eacute;n de claves (para lo que deberemos conocer su contrase&ntilde;a) y recuperar una de las claves almacenadas. 
+		Si almacen&oacute; la clave en el almac&eacute;n durante el proceso de cifrado, este es el mecanismo recomendado para seleccionarla.</li>
+		<li>Tecla de acceso r&aacute;pido: e</li>
+	</ul>
+</ul>
+
+<p>Al lado de los alias que aparecen en el almac&eacute;n y que designan a claves del mismo, puede verse el algoritmo con la que es compatible
+a clave.</p>
+
+<p align="center">
+	<img src="images/image068.png" width="505" height="210"/>
+</p>
+
+<p>Al pulsar el bot&oacute;n "Siguiente &gt;" se llevar&aacute; a cabo el descifrado de los datos. En caso de producirse un error durante el mismo, se
+mostrar&aacute; el mensaje correspondiente, mientras que, si finaliz&oacute; correctamente, se mostrar&aacute; un di&aacute;logo para selecci&oacute;n donde se desea 
+almacenar el documento descifrado.</p>
+
+<p>Teclas de acceso r&aacute;pido para los botones: </p>
+<ul>
+	<li>Maximizar ventana: m</li>
+	<li>Anterior: a</li>
+	<li>Siguiente: s</li>
+	<li>Cancelar: c</li>
+	<li>Finalizar: f</li>
+</ul>
+
+</body>
+</html>

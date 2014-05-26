@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<toc version="1.0"> 
+<!--  categoryclosedimage="FolderClosed" categoryopenimage="FolderOpened" topicimage="ItemIco"-->
+		<!--  
+        <tocitem text="Ejemplo JavaHelp"    target="aplicacion">
+           <tocitem text="Ventana principal"    target="ventana_principal"/>
+           <tocitem text="Ventana secundaria"    target="ventana_secundaria"/>
+        </tocitem>
+        -->
+	<tocitem text="Introducción" target="introduccion" />
+	<tocitem text="Conceptos básicos" target="conceptos.basicos">
+		<tocitem text="Firma electrónica" target="firma.electronica"/>
+		<tocitem text="Firma electrónica avanzada" target="firma.avanzada" />
+		<tocitem text="Firma electrónica reconocida" target="firma.reconocida" />
+		<tocitem text="Prestador de servicios de certificación" target="prestador.certificacion" />
+		<tocitem text="Certificado electrónico" target="certificado.electronico" />
+		<tocitem text="Certificado reconocido" target="certificado.reconocido" />
+		<tocitem text="Validación de firma" target="validacion.firma"/>
+		<tocitem text="Datos de creación de firma" target="creacion.firma" />
+		<tocitem text="Dispositivo de creación de firma" target="dispositivo.firma" />
+		<tocitem text="Dispositivo seguro de creación de firma" target="dispositivo.seguro.firma" />
+	</tocitem>	
+	<tocitem text="Conceptos criptográficos" target="conceptos.criptograficos">	
+		<tocitem text="Algoritmos de firma" target="algoritmos.firma" />
+		<tocitem text="Formatos de firma" target="formatos.firma">
+			<tocitem text="Firmas XML" target="firma.xml">
+				<tocitem text="XMLdSig" target="xmldsig"/>
+				<tocitem text="XAdES" target="xades"/>
+				<tocitem text="Facturas electrónicas" target="facturas.electronicas" />
+				<tocitem text="ODF" target="odf"/>
+				<tocitem text="OOXML" target="ooxml"/>
+			</tocitem>	
+			<tocitem text="Firma binaria" target="firma.binaria">
+				<tocitem text="PKCS#7 / CMS" target="pkcs7"/>
+				<tocitem text="CAdES" target="cades"/>
+				<tocitem text="PDF" target="pdf"/>
+				<tocitem text="PAdES" target="pades"/>
+			</tocitem>	
+		</tocitem>	
+		<tocitem text="Modos de firma" target="modos.firma" />
+		<tocitem text="Política de firma" target="politica.firma" />
+		<tocitem text="Política de firma de la AGE" target="politica.firma.age" />
+		<tocitem text="Cofirma" target="cofirma" />
+		<tocitem text="Contrafirma" target="contrafirma" />
+		<tocitem text="Almacén de certificados" target="almacen.certificados" />
+		<tocitem text="Cifrado de datos" target="cifrado.datos">
+			<tocitem text="Claves de cifrado" target="claves.cifrado">
+				<tocitem text="Algoritmos PBE" target="algoritmos.pbe"/>
+			</tocitem>
+			<tocitem text="Cifrado simétrico" target="cifrado.simetrico"/>
+			<tocitem text="Cifrado asimétrico" target="cifrado.asimetrico" />
+		</tocitem>		
+		<tocitem text="Sobres digitales" target="sobres.digitales"/>
+	</tocitem>
+	<tocitem text="Interfaz de escritorio" target="interfaz.escritorio">
+		<tocitem text="Requisítos mínimos" target="requisitos.minimos" />
+		<tocitem text="Perfiles de usuario" target="perfiles.usuario" />
+		<tocitem text="Uso de la interfaz" target="uso.interfaz" />		
+		<tocitem text="Opciones de configuración" target="opciones.configuracion" />
+		<tocitem text="Opciones de accesibilidad" target="opciones.accesibilidad" />
+		<tocitem text="Opciones de perfiles de usuario" target="opciones.perfil" />
+		<tocitem text="Firma electrónica" target="firma" />
+		<tocitem text="Multifirma" target="multifirma" >
+			<tocitem text="Cofirma" target="multifirma.cofirma" />
+			<tocitem text="Contrafirma" target="multifirma.contrafirma" />
+		</tocitem>
+		<tocitem text="Multifirma Masiva" target="firma.masiva" />
+		<tocitem text="Validación de firmas" target="validacion" />
+		<tocitem text="Cifrado de datos" target="cifrado" >
+			<tocitem text="Contraseña de cifrado" target="cifrado.password" />
+			<tocitem text="Clave de cifrado" target="cifrado.clave" />
+			<tocitem text="Almacén de claves de cifrado" target="cifrado.almacen" />
+		</tocitem>
+		<tocitem text="Descifrado de datos" target="descifrado" >
+			<tocitem text="Contraseña de cifrado" target="descifrado.password" />
+			<tocitem text="Clave de cifrado" target="descifrado.clave" />
+		</tocitem>
+		<tocitem text="Ensobrado digital" target="ensobrado" >
+			<!-- <tocitem text="Añadir remitentes" target="ensobrado.anadirremitentes" /> -->
+		</tocitem>
+		<tocitem text="Desensobrado digital" target="desensobrado" />		
+	</tocitem>
+    <tocitem text="Siglas" target="siglas" />
+</toc>

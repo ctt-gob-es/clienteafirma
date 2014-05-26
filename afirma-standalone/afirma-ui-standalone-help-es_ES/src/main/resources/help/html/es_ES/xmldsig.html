@@ -1,0 +1,28 @@
+<html>
+<head>
+	<title>XMLdSig</title>
+</head>
+<body>
+<h5>XMLdSig</h5>
+
+<p>Formato de firma XML desarrollado por el W3C. Este formato puede ser aplicado a cualquier tipo de contenido digital y permite 
+la generaci&oacute;n de la firma de uno o m&aacute;s objetos de datos.</p>
+
+<p>El formato define distintos tipos de organizaci&oacute;n para el documento de firma:</p>
+
+<ul>
+	<li><b>Detached</b>: Firma de un documento externo al XML de firma. De este tipo pueden distinguirse los siguientes casos:</li>
+	<ul type="circle">
+		<li>Internally Detached : Cuando el objeto firmado est&aacute; dentro de un mismo contexto XML que los datos firmados. Esto es, 
+		un XML que engloba los elementos de firma y datos manteni&eacute;ndolos como nodos hermanos.</li>
+		<li>Externally Detached: Cuando el elemento XML de firma y el documento firmado no comparten contexto.</li>
+	</ul><br/>
+	<li><b>Enveloping</b>: Firma de un documento interno al XML de firma.</li>
+	<li><b>Enveloped</b>: Firma del documento XML que contiene la firma. S&oacute;lo v&aacute;lido para firmar documentos XML.</li>
+</ul>
+
+<p>La Interfaz de Escritorio del Cliente @firma no permite la generaci&oacute;n de firmas XMLdSig. En su lugar, permite la generaci&oacute;n de 
+su variante de firma avanzada, XAdES.</p>
+
+</body>
+</html>

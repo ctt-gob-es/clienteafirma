@@ -1,0 +1,80 @@
+<?xml version='1.0' encoding='ISO-8859-1'  ?>
+<!DOCTYPE index
+  PUBLIC "-//Sun Microsystems Inc.//DTD JavaHelp Index Version 1.0//EN"
+         "http://java.sun.com/products/javahelp/index_1_0.dtd">
+<index version="1.0">
+	<indexitem text="Introducción" target="introduccion" />
+	<indexitem text="Conceptos básicos" target="conceptos.basicos">
+		<indexitem text="Firma electrónica" target="firma.electronica"/>
+		<indexitem text="Firma electrónica avanzada" target="firma.avanzada" />
+		<indexitem text="Firma electrónica reconocida" target="firma.reconocida" />
+		<indexitem text="Prestador de servicios de certificación" target="prestador.certificacion" />
+		<indexitem text="Certificado electrónico" target="certificado.electronico" />
+		<indexitem text="Certificado reconocido" target="certificado.reconocido" />
+		<indexitem text="Validación de firma" target="validacion.firma"/>
+		<indexitem text="Datos de creación de firma" target="creacion.firma" />
+		<indexitem text="Dispositivo de creación de firma" target="dispositivo.firma" />
+		<indexitem text="Dispositivo seguro de creación de firma" target="dispositivo.seguro.firma" />
+	</indexitem>	
+	<indexitem text="Conceptos criptográficos" target="conceptos.criptograficos">	
+		<indexitem text="Algoritmos de firma" target="algoritmos.firma" />
+		<indexitem text="Formatos de firma" target="formatos.firma">
+			<indexitem text="Firmas XML" target="firma.xml">
+				<indexitem text="XMLdSig" target="xmldsig"/>
+				<indexitem text="XAdES" target="xades"/>
+				<indexitem text="Facturas electrónicas" target="facturas.electronicas" />
+				<indexitem text="ODF" target="odf"/>
+				<indexitem text="OOXML" target="ooxml"/>
+			</indexitem>	
+			<indexitem text="Firma binaria" target="firma.binaria">
+				<indexitem text="PKCS#7 / CMS" target="pkcs7"/>
+				<indexitem text="CAdES" target="cades"/>
+				<indexitem text="PDF" target="pdf"/>
+				<indexitem text="PAdES" target="pades"/>
+			</indexitem>	
+		</indexitem>	
+		<indexitem text="Modos de firma" target="modos.firma" />
+		<indexitem text="Política de firma" target="politica.firma" />
+		<indexitem text="Política de firma de la AGE" target="politica.firma.age" />
+		<indexitem text="Cofirma" target="cofirma" />
+		<indexitem text="Contrafirma" target="contrafirma" />
+		<indexitem text="Almacén de certificados" target="almacen.certificados" />
+		<indexitem text="Cifrado de datos" target="cifrado.datos">
+			<indexitem text="Claves de cifrado" target="claves.cifrado">
+				<indexitem text="Algoritmos PBE" target="algoritmos.pbe" />
+			</indexitem>	
+			<indexitem text="Cifrado simétrico" target="cifrado.simetrico"/>
+			<indexitem text="Cifrado asimétrico" target="cifrado.asimetrico" />
+		</indexitem>
+		<indexitem text="Sobres digitales" target="sobres.digitales" />		
+	</indexitem>
+	<indexitem text="Interfaz de escritorio" target="interfaz.escritorio">
+		<indexitem text="Requisítos mínimos" target="requisitos.minimos" />
+		<indexitem text="Perfiles de usuario" target="perfiles.usuario" />
+		<indexitem text="Uso de la interfaz" target="uso.interfaz" />		
+		<indexitem text="Opciones de configuración" target="opciones.configuracion" />
+		<indexitem text="Opciones de accesibilidad" target="opciones.accesibilidad" />
+		<indexitem text="Opciones de perfiles de usuario" target="opciones.perfil" />
+		<indexitem text="Firma electrónica" target="firma" />
+		<indexitem text="Multifirma" target="multifirma" >
+			<indexitem text="Cofirma" target="multifirma.cofirma" />
+			<indexitem text="Contrafirma" target="multifirma.contrafirma" />
+		</indexitem>
+		<indexitem text="Multifirma Masiva" target="firma.masiva" />
+		<indexitem text="Validación de firmas" target="validacion" />
+		<indexitem text="Cifrado de datos" target="cifrado" >
+			<indexitem text="Contraseña de cifrado" target="cifrado.password" />
+			<indexitem text="Clave de cifrado" target="cifrado.clave" />
+			<indexitem text="Almacén de claves de cifrado" target="cifrado.almacen" />
+		</indexitem>
+		<indexitem text="Descifrado de datos" target="descifrado" >
+			<indexitem text="Contraseña de cifrado" target="descifrado.password" />
+			<indexitem text="Clave de cifrado" target="descifrado.clave" />
+		</indexitem>
+		<indexitem text="Ensobrado digital" target="ensobrado">
+			<!--  <indexitem text="Añadir remitentes" target="ensobrado.anadirremitentes" />-->
+		</indexitem>
+		<indexitem text="Desensobrado digital" target="desensobrado" />		
+	</indexitem>
+    <indexitem text="Siglas" target="siglas" />
+</index>

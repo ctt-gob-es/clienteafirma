@@ -1,0 +1,187 @@
+<html>
+<head>
+	<title>Cifrado de datos</title>
+</head>
+<body>
+<h2><a name="_Toc275937509">Cifrado de datos</a></h2>
+
+<p>Desde la ventana de <i>"Cifrado"</i> podemos acceder a las funcionalidades el cifrado sim&eacute;trico de datos. Mediante estas funciones podemos
+cifrar documentos para uso personal que no queremos que nadie vea o documentos sensibles que debemos enviar a otra persona. S&oacute;lo 
+alguien con la clave/contrase&ntilde;a utilizada para el cifrado podr&aacute; descifrar este documento y acceder a su contenido. La operaci&oacute;n 
+de descifrado de datos se realiza desde la ventana de <i>"Descifrado"</i>.</p>
+
+<p align="center">
+	<img src="images/image048.png" width="650" height="370"/>
+</p>
+
+<p>Las opciones de configuraci&oacute;n de esta pantalla son:</p>
+<ul>
+	<li><a name="cifrado.fichero">Fichero a cifrar digitalmente:</a></li>
+	<ul type="circle">
+		<li>Permite seleccionar el fichero que se desea cifrar. Es posible pulsar el bot&oacute;n "Examinar" para buscar un fichero en disco o escribir 
+		directamente su ruta en la caja de texto asociada.</li>
+		<li>Tecla de acceso r&aacute;pido: t</li>
+		<li>Tecla de acceso r&aacute;pido al bot&oacute;n Examinar: e</li>
+	</ul><br/>
+	<li><a name="cifrado.mecanismo">Mecanismo de cifrado:</a></li>
+	<ul type="circle">
+		<li>Permite establecer si se desea utilizar una contrase&ntilde;a para el cifrado o una clave de cifrado, espec&iacute;fica o autogenerada, para 
+		el algoritmo de cifrado seleccionado.</li>
+		<li>Tecla de acceso r&aacute;pido: a</li>
+	</ul><br/>
+	<li><a name="cifrado.algoritmo">Algoritmo de cifrado electr&oacute;nico:</a></li>
+	<ul type="circle">
+		<li>Es el algoritmo que se utilizar&aacute; para el cifrado de datos. La lista de algoritmos var&iacute;a seg&uacute;n el mecanismo de cifrado escogido y 
+		la vista activa en la interfaz. Los algoritmos disponibles son:</li>
+		<ul type="square">
+			<li>Para el cifrado por contrase&ntilde;a (pre-establecido en la vista simple):</li>
+			<ul>
+				<li>SHA1 y 3DES (pre-establecido en la vista simple).</li>
+				<li>SHA1 y RC2.</li>
+				<li>MD5 y DES</li>
+			</ul>
+			<li>Para el cifrado mediante clave:</li>
+			<ul>
+				<li>AES</li>
+				<li>Alleged RC4</li>
+				<li>Blowfish</li>
+				<li>DES</li>
+				<li>3DES</li>
+				<li>RC2</li>
+			</ul>
+		</ul>
+		<li>Tecla de acceso r&aacute;pido: g</li>
+	</ul>
+</ul>
+
+<p>En la vista simple de la interfaz, el mecanismo de cifrado es obligatoriamente "Contrase&ntilde;a de cifrado" y el algoritmo es siempre 
+"Contrase&ntilde;a SHA1 y 3DES".</p>
+
+<p>Al pulsar el icono de ayuda se muestra la ventana de ayuda para el men&uacute; "Cifrado".</p>
+<ul>
+	<li>Tecla de acceso r&aacute;pido para el bot&oacute;n de Ayuda: h</li>
+</ul>
+
+<p>Al pulsar en el bot&oacute;n "Cifrar" nos aparecer&aacute; un asistente para ayudarnos a configurar el proceso de cifrado.</p>
+<ul>
+	<li>Tecla de acceso r&aacute;pido para el bot&oacute;n "Cifrar": r</li>
+</ul>
+
+<p align="center">
+	<img src="images/image050.png" width="670" height="585"/>
+</p>
+
+<p>Al pulsar el bot&oacute;n "Siguiente &gt;" accederemos a las pantallas de configuraci&oacute;n del asistente, que variar&aacute; seg&uacute;n el mecanismo 
+de cifrado elegido.</p>
+
+<h3><a name="cifrado.password"></a><a name="_Toc275865249"><a name="cifrado.password">Contrase&ntilde;a de cifrado</a></a></h3>
+
+<p>En la primera pantalla del asistente para el cifrado con contrase&ntilde;a se nos pedir&aacute; introducir dos veces la contrase&ntilde;a que 
+deseamos utilizar para el cifrado. Las dos contrase&ntilde;as introducidas deben ser la misma, respetando min&uacute;sculas y may&uacute;sculas, y 
+no deben contener caracteres no ASCII como vocales acentuadas, la letra '&ntilde;' o caracteres extra&ntilde;os.</p>
+
+<p align="center">
+	<img src="images/image052.png" width="670" height="585"/>
+</p>
+
+<p>Las opciones que aparecen en esta pantalla son:</p>
+<ul>
+	<li><a name="cifrado.wizard.password">Introduzca la contrase&ntilde;a:</a></li>
+	<ul type="circle">
+		<li>En esta caja de texto debe introducir la contrase&ntilde;a que desee utilizar para el cifrado de datos, respetando las 
+		condiciones ya explicadas.</li>
+		<li>Tecla de acceso r&aacute;pido: i</li>
+	</ul><br/>
+	<li><a name="cifrado.wizard.repeatpassword">Introduzca de nuevo la contrase&ntilde;a:</a></li>
+	<ul type="circle">
+		<li>En esta caja de texto debe volver a introducir la contrase&ntilde;a de cifrado. Si no coincide con la primera contrase&ntilde;a, 
+		se le informar&aacute; al pulsar el bot&oacute;n "Siguiente &gt;".</li>
+		<li>Tecla de acceso r&aacute;pido: n</li>
+	</ul>
+</ul>
+
+<p>Al pulsar el bot&oacute;n "Siguiente &gt;" se ejecutar&aacute; el proceso de cifrado. En caso de finalizar el proceso correctamente le 
+aparecer&aacute; un di&aacute;logo para el guardado del fichero con los datos cifrado. En caso de error le aparecer&aacute; el mensaje de error
+correspondiente.</p>
+
+<h3><a name="cifrado.clave"></a><a name="_Toc275865250"><a name="cifrado.clave">Clave de cifrado</a></a></h3>
+
+<p>En la primera pantalla del asistente para el cifrado con clave se nos pedir&aacute; la clave que deseamos utilizar para el cifrado. 
+Esta clave debe respetar un formato concreto para cada algoritmo de cifrado y debe introducirse en Base64. La alternativa, 
+mucho m&aacute;s recomendable, a introducir la clave, es generar una clave v&aacute;lida aleatoria.</p>
+
+<p align="center">
+	<img src="images/image054.png" width="670" height="585"/>
+</p>
+
+<p>Las opciones de configuraci&oacute;n que aparecen en esta pantalla son:</p>
+<ul>
+	<li>Clave de cifrado:</li>
+	<ul type="circle">
+		<li>En esta caja de texto podemos introducir la clave en base 64.</li>
+		<li>Tecla de acceso r&aacute;pido: v</li>
+	</ul><br/>
+	<li><a name="cifrado.wizard.autogenerar">Autogenerar:</a></li>
+	<ul type="circle">
+		<li>Mediante este bot&oacute;n generaremos una clave aleatoria v&aacute;lida para el algoritmo de cifrado seleccionado, ahorr&aacute;ndonos 
+		introducir una manualmente.</li>
+		<li>Tecla de acceso r&aacute;pido: u</li>
+	</ul><br/>
+	<li><a name="cifrado.wizard.almacen">Almac&eacute;n:</a></li>
+	<ul type="circle">
+		<li>Permite acceder al almac&eacute;n de claves (para lo que deberemos conocer su contrase&ntilde;a) y recuperar una de las claves almacenadas.</li>
+		<li>Tecla de acceso r&aacute;pido: l</li>
+	</ul><br/>
+		<li><a name="cifrado.wizard.salvar">Guardar en almac&eacute;n de claves de cifrado de @firma.</a></li>
+	<ul type="circle">
+		<li>Si marcamos esta casilla la clave de cifrado introducida, ya se haya introducido manualmente o autogenerado, se almacenar&aacute; 
+		en el almac&eacute;n de claves del Cliente @firma. Para saber m&aacute;s del almac&eacute;n de claves del Cliente @firma consulte el apartado 
+		"Almac&eacute;n de claves de cifrado".</li>
+		<li>Tecla de acceso r&aacute;pido: g</li>
+	</ul>
+</ul>
+
+<p>Al pulsar el bot&oacute;n "Siguiente &gt;" se ejecutar&aacute; el proceso de cifrado. En caso de error, se mostrar&aacute; el mensaje pertinente y, 
+en caso de finalizar la operaci&oacute;n correctamente, se solicitar&aacute; mediante un di&aacute;logo d&oacute;nde desea guardarse el fichero cifrado. Si se 
+marc&oacute; la casilla para almacenar la clave en el almac&eacute;n se almacenar&aacute; una vez finalizado el proceso.</p>
+
+<h3><a name="_Toc275865251"></a><a name="cifrado.almacen">Almac&eacute;n de claves de cifrado</a></h3>
+
+<p>El almac&eacute;n de claves de cifrado del Cliente @firma es compartido por el Cliente y la Interfaz de Escritorio. Las caracter&iacute;sticas 
+del mismo son:</p>
+
+<ul>
+	<li>No es necesario tener instalado el Cliente @firma.</li>
+	<li>Est&aacute; protegido por una contrase&ntilde;a que deber&aacute; establecer el usuario la primera vez que se almacene en &eacute;l una clave.</li>
+</ul>
+
+<p align="center">
+	<img src="images/image056.png" width="505" height="210">
+</p>
+
+<ul>
+	<li>Cada vez que se almacene una clave, se nos pedir&aacute; un alias con el que identificarla.</li>
+</ul>
+
+<p align="center">
+	<img src="images/image058.png" width="505" height="210">
+</p>
+
+<ul>
+	<li>Los alias de las claves se almacenar&aacute;n siempre en min&uacute;sculas.</li>
+	<li>Se almacena en el directorio del usuario con el nombre "ciphkeys.jceks"</li>
+	<li>No se elimina aunque se desinstale el Cliente @firma o la Interfaz de Escritorio.</li>
+</ul>
+<p>Tenga en cuenta que si el usuario elimina este almac&eacute;n manualmente, se perder&aacute;n todas las claves de cifrado que tuviese almacenadas.</p>
+
+<p>Teclas de acceso r&aacute;pido para los botones: </p>
+<ul>
+	<li>Maximizar ventana: m</li>
+	<li>Anterior: a</li>
+	<li>Siguiente: s</li>
+	<li>Cancelar: c</li>
+	<li>Finalizar: f</li>
+</ul>
+
+</body>
+</html>

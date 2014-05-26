@@ -1,0 +1,98 @@
+<html>
+<head>
+	<title>Opciones de configuraci&oacute;n</title>
+</head>
+<body>
+<h2><a name="_Toc275937502">Opciones de configuraci&oacute;n</a></h2>
+
+<p>Es posible acceder a las opciones de configuraci&oacute;n de la Interfaz de Escritorio del Cliente @firma mediante el 
+elemento "Opciones del men&uacute; "Herramientas".</p>
+
+<p align="center">
+	<img src="images/image010.png" alt="Men&uacute; Herramientas - Opciones" width="650" height="105"/>
+</p>
+
+<p>La pantalla de Opciones presenta, en concreto, 4 pesta&ntilde;as con las distintas opciones de configuraci&oacute;n.</p>
+
+<h3>General</h3>
+
+<p align="center">
+	<img src="images/image012.png" alt="Configuraci&oacute;n general" width="525" height="600"/>
+</p>
+
+<p>Los elementos disponibles en esta pantalla son:</p>
+<ul>
+	<li><a name="general">General:</a></li>
+	<ul type="circle">
+		<li><b>Habilitar opciones de configuraci&oacute;n avanzadas:</b> Esta opci&oacute;n habilita la vista avanzada de la Interfaz de Escritorio.</li>
+		<li>Tecla de acceso r&aacute;pido: b</li>
+	</ul><br/>
+	<li><a name="criptografia">Criptograf&iacute;a:</a></li>
+	<ul type="circle">
+		<li><b>Algoritmo de huella digital por defecto:</b> Es el algoritmo que se debe utilizar para ejecutar las firmas electr&oacute;nicas. 
+		Por defecto se utilizar&aacute; SHA-1 (SHA1withRSA). No se recomienda modificar este valor salvo que se est&eacute; seguro que el formato de 
+		firmas y el almac&eacute;n de certificados que se desea utilizar soportan este algoritmo.</li>
+		<ul>
+			<li>Tecla de acceso r&aacute;pido: r</li>
+		</ul>
+		<li><b>Utilizar tambi&eacute;n este algoritmo para las referencias internas XML:</b> Esta opci&oacute;n permite que las referencias internas 
+		de las firmas XML se realicen con el algoritmo seleccionado.</li>
+		<ul>
+			<li>Tecla de acceso r&aacute;pido: u</li>
+		</ul>
+	</ul><br/>
+	<li><a name="firma">Pol&iacute;tica de firma:</a></li>
+	<ul type="circle">
+		<li><b>Configurar pol&iacute;tica de firma:</b> Habilita la generaci&oacute;n de firmas EPES. Cuando se generen firmas en
+		formatos CAdES, XAdES y PAdES se les aplicar&aacute; la pol&iacute;tica de firma definida.</li>
+		<li><b>Identificador de la pol&iacute;tica de firma:</b> Identificador de la pol&iacute;tica. Puede ser un OID o una URL.</li>
+		<li><b>Ruta de la pol&iacute;tica de firma (URL):</b> Ruta de la versi&oacute;n legible de la pol&iacute;tica (Opcional).</li>
+		<li><b>Huella digital SHA1:</b> Huella digital en base 64 con algoritmo SHA1 de la pol&iacute;tica.</li>
+	</ul><br/>
+	<li><b>Valores por defecto:</b> Restablece los valores por defecto para esta pesta&ntilde;a de configuraci&oacute;n.</li>
+</ul>
+
+<p>Puede consultar las propiedades de configuraci&oacute;n de la pol&iacute;tica de firma de la
+AGE en el apartado <a href="politica_firma_AGE.html">Pol&iacute;tica de firma de la AGE</a></p>
+
+<p>Antes de configurar la pol&iacute;tica de firma de facturas electr&oacute;nicas consulte el
+apartado <a href="facturas_electronicas.html">Facturas electr&oacute;nicas</a></p>
+
+<h3>Configuraci&oacute;n de firma</h3>
+
+<p align="center">
+	<img src="images/image013.png" alt="Contexto de firma" width="525" height="600"/>
+</p>
+
+<p>Los elementos disponibles en esta pantalla son:</p>
+<ul>
+	<li><a name="firma">Firmas de documentos PDF:</a></li>
+	<ul type="circle">
+		<li><b>Motivo / raz&oacute;n de la firma electr&oacute;nica:</b> Establece el motivo asociado a las firmas PDF que se generen.</li>
+		<li><b>Lugar donde se realiza la firma electr&oacute;nica:</b> Establece la localizaci&oacute;n asociada a las firmas PDF que se generen.</li>
+		<li><b>Datos de contacto del firmante:</b> Establece la informaci&oacute;n de contacto de quien genera la firma PDF.</li>
+				<li><b>Formato PAdES:</b> Formato b&aacute;sico sobre el que se construyen las firmas PAdES. Permite los valores:
+				<ul type="disc">
+					<li>PAdES B&aacute;sico: Es el formato de firma PAdES generado por Adobe Acrobat y el utilizado por defecto por el Cliente @firma.</li>
+					<li>PAdES-BES: Es el formato que m&aacute;s se ajusta al est&aacute;ndar PAdES, pero Adobe Reader/Acrobat no valida correctamente las multifirmas generadas a partir de &eacute;l.</li>
+				</ul>
+				</li>
+	</ul><br/>
+	<li><b>Valores por defecto:</b> Establece los valores por defecto para esta pesta&ntilde;a de configuraci&oacute;n.</li>
+</ul>
+
+<h3>Accesibilidad</h3>
+
+<p>Consulte la ayuda de esta secci&oacute;n desde el apartado <a href="opciones_accesibilidad.html">Opciones de accesibilidad</a></p>
+
+<h3>Perfiles de usuario</h3>
+
+<p>Consulte la ayuda de esta secci&oacute;n desde el apartado <a href="opciones_perfil.html">Perfiles de usuario</a></p>
+
+<p>Al pulsar el icono de ayuda se muestra la ventana de ayuda para el men&uacute; "Opciones de configuraci&oacute;n".</p>
+<ul>
+<li>Tecla de acceso r&aacute;pido para el bot&oacute;n de Ayuda: h</li>
+</ul>
+
+</body>
+</html>

@@ -1,0 +1,36 @@
+<?xml version='1.0' encoding='ISO-8859-1'?>
+<map version="1.0">
+<!--
+   <mapID target="aplicacion" url="html/en_UK/main.html" />
+   <mapID target="ventana_principal" url="html/en_UK/principal.html" />
+   <mapID target="ventana_secundaria" url="html/en_UK/secundaria.html" />
+   -->
+	<mapID target="firma.fichero" url="html/en_UK/firma_fichero.html" />
+	<mapID target="firma.almacen" url="html/en_UK/firma_almacen.html" />
+	<mapID target="firma.formato" url="html/en_UK/firma_formato.html" />
+	<mapID target="multifirma.almacen" url="html/en_UK/multifirma_almacen.html" />
+	<mapID target="multifirma.tipo" url="html/en_UK/multifirma_tipo.html" />
+	<mapID target="cifrado.fichero" url="html/en_UK/cifrado_fichero.html" />
+	<mapID target="cifrado.mecanismo" url="html/en_UK/cifrado_mecanismo.html" />
+	<mapID target="cifrado.algoritmo" url="html/en_UK/cifrado_algoritmo.html" />
+	<mapID target="descifrado.fichero" url="html/en_UK/descifrado_fichero.html" />
+	<mapID target="descifrado.mecanismo" url="html/en_UK/descifrado_mecanismo.html" />
+	<mapID target="descifrado.algoritmo" url="html/en_UK/descifrado_algoritmo.html" />
+	<mapID target="opciones.general" url="html/en_UK/opciones_general.html" />
+	<mapID target="opciones.algoritmo" url="html/en_UK/opciones_algoritmo.html" />
+	
+	<mapID target="opciones.referenciasInternas" url="html/en_UK/opciones_referenciasInternas.html" />
+	<mapID target="opciones.pdf.motivo" url="html/en_UK/opciones_pdf_motivo.html" />
+	<mapID target="opciones.pdf.lugar" url="html/en_UK/opciones_pdf_lugar.html" />
+	<mapID target="opciones.pdf.datos" url="html/en_UK/opciones_pdf_datos.html" />
+	<mapID target="opciones.pdf.formato" url="html/en_UK/opciones_configuracion.html#firma" />
+	<mapID target="password.almacen" url="html/en_UK/password_almacen.html" />
+	<mapID target="certificados.lista" url="html/en_UK/certificados_lista.html" />
+	<mapID target="password.certificado" url="html/en_UK/password_certificado.html" />
+	<mapID target="multifirma.wizard.ficherodatos" url="html/en_UK/multifirma_wizard_ficherodatos.html" />
+	<mapID target="multifirma.wizard.ficherofirma" url="html/en_UK/multifirma_wizard_ficherofirma.html" />
+	<mapID target="multifirma.wizard.ficherocontrafirma" url="html/en_UK/multifirma_wizard_ficherocontrafirma.html" />
+	<mapID target="cifrado.wizard.password" url="html/en_UK/cifrado_wizard_password.html" />
+	<mapID target="cifrado.wizard.repeatpassword" url="html/en_UK/cifrado_wizard_repeatpassword.html" />
+	<mapID target="descifrado.wizar.password" url="html/en_UK/descifrado_wizar_password.html" />
+</map>

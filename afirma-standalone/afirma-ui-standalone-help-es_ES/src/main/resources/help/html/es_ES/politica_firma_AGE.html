@@ -1,0 +1,54 @@
+<html>
+<head>
+	<title>Pol&iacute;tica de firma de la AGE</title>
+</head>
+<body>
+<h2><a name="_Toc275937502">Pol&iacute;tica de firma de la AGE</a></h2>
+
+<p>La pol&iacute;tica de firma de la AGE define un marco legal de firma electr&oacute;nica concreto
+y com&uacute;n para la administraci&oacute;n p&uacute;blica espa&ntilde;ola. La declaraci&oacute;n de esta pol&iacute;tica de
+firma indica que se han cumplido los requisitos exigidos por la pol&iacute;tica durante el
+proceso de firma electr&oacute;nica.</p>
+
+<p>Actualmente, se encuentra en vigencia la versi&oacute;n 1.8 de la pol&iacute;tica de la AGE.
+Puede descargar y consultar la informaci&ooacute;n relativa a la misma desde el siguiente enlace:</p>
+
+<a href="http://administracionelectronica.gob.es/?_nfpb=true&_pageLabel=PAE_PG_CTT_General&langPae=es&iniciativa=239">
+http://administracionelectronica.gob.es/?_nfpb=true&_pageLabel=PAE_PG_CTT_General&langPae=es&iniciativa=239</a>
+
+<p>Se recomienda igualmente consultar la guía rápida de aplicaci&oacute;n:</p>
+
+<a href="http://administracionelectronica.gob.es/recursos/PAE_13312914564875059.pdf?iniciativa=239">
+http://administracionelectronica.gob.es/recursos/PAE_13312914564875059.pdf?iniciativa=239</a>
+
+<p>En la interfaz de escritorio del Cliente @firma deberá configurar los atributos apropiados desde
+la pantalla de opciones generales de la aplicación. Los valores asignados a las distintas propiedades
+son:</p>
+
+<table border="1px">
+<tr><td><b>Propiedad</b></td><td><b>Valor</b></td></tr>
+<tr><td>Identificador de la pol&iacute;tica de firma</td><td>urn:oid:2.16.724.1.3.1.1.2.1.8</td></tr>
+<tr><td>Cualificador de la pol&iacute;tica de firma</td><td>
+<a href="http://administracionelectronica.gob.es/es/ctt/politicafirma/politica_firma_AGE_v1_8.pdf">
+http://administracionelectronica.gob.es/es/ctt/politicafirma/politica_firma_AGE_v1_8.pdf</a></td></tr>
+<tr><td>Huella digital SHA1 (para firmas CAdES)</td><td>7SxX3erFuH31TvAw9LZ70N7p1vA=</td></tr>
+<tr><td>Huella digital SHA1 (para firmas XAdES)</td><td>V8lVVNGDCPen6VELRD1Ja8HARFk=</td></tr>
+</table>
+
+<p><b>ADVERTENCIA:</b> Debido a que las firmas CAdES y XAdES deben declarar una huella digital
+distinta para la pol&iacute;tica de firma, se debe configurar cuidadosamente esta propiedad seg&uacute;n el
+tipo de formato de firma electr&oacute;nica que desee utilizar. Tenga en cuenta que algunos validadores
+compatibles con la pol&iacute;tica de firma definida (como VALIDe en el caso de la pol&iacute;tica de firma de
+la AGE) pueden validar la huella digital de la pol&iacute;tica y determinar que la firma es incorrecta
+si no define la huella digital correspondiente al formato de firma.</p>
+
+<p>Las firmas XAdES soportadas por la pol&iacute;tica deben ser Detached impl&iacute;cita o Enveloped
+impl&iacute;cita.</p>
+
+<p>Tenga en cuenta que la pol&iacute;tica de firma versi&oacute;n 1.8 de la AGE no soporta las firmas
+PAdES. Estas firmas se soportar&aacute;n en la versi&oacute;n 1.9.</p>
+
+<p>Las firmas ODF y OOXML no definen una pol&iacute;tica de firma.</p>
+
+</body>
+</html>

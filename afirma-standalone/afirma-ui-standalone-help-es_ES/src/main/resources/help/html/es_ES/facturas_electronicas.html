@@ -1,0 +1,37 @@
+<html>
+<head>
+	<title>Facturas electr&oacute;nicas</title>
+</head>
+<body>
+<h2><a name="_Toc275937534">Facturas electr&oacute;nicas</a></h2>
+
+<p>Los esquemas de factura electr&oacute;nica existentes definen las caracter&iacute;sticas
+que debe cumplir una firma de factura electr&oacute;nica acorde al esquema en
+cuesti&oacute;n. El formato utilizado para la firma es XAdES Enveloped, pero esta debe
+cumplir con ciertas propiedades específicas que no pueden configurarse a través del
+Cliente @firma o su interfaz de escritorio.</p>
+
+<p>Para la firma de facturas electr&oacute;nicas, el Cliente @firma y la interfaz de
+escritorio incluyen un formato de firma específico. Este formato se encarga de configurar
+autom&aacute;ticamente todas las propiedades necesarias para que la factura firmada sea
+correctamente validada por los validadores de firma (incluidos la Plataforma @firma, VALIDe
+y el validador de facturas electr&oacute;nicas del Ministerio de Industria, Turismo y Comercio).</p>
+
+<p>Las firmas generadas con el formato de firma de facturas se realizan conforme al esquema
+3.1 de factura electr&oacute;nica. Esto incluye, entre otros atributos, la configuraci&oacute;n
+de la pol&iacute;tica de firma de facturas, por lo que no es necesario que el usuario configure
+la pol&iacute;tica de firma en la pantalla de opciones de la interfaz. Al generar una firma con
+el formato de factura electr&oacute;nica la pol&iacute;tica de firma configurada por el usuario
+se ignorar&aacute;.</p>
+
+<p>El usuario, si lo desea, puede firmar una factura con el formato XAdES Enveloped, el modo
+impl&iacute;cito y configurar la pol&iacute;tica de firma de factura electr&oacute;nica. De
+hacerlo, se generar&aacute; una firma con estas caracter&iacute;sticas que se validar&aacute;
+correctamente en la Plataforma @firma y VALIDe, pero no ser&aacute; aceptada por el validador
+de facturas del Ministerio de Industria, Turismo y Comercio.</p>
+
+<p>Puede consultar el apartado <a href="opciones_configuracion.html">Opciones de configuraci&oacute;n</a>
+para saber c&oacute;mo configurar una pol&iacute;tica de firma.</p>
+
+</body>
+</html>
