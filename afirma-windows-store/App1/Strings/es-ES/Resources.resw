@@ -1,0 +1,352 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Boton_aceptar" xml:space="preserve">
+    <value>Aceptar</value>
+    <comment>Texto de botón aceptar</comment>
+  </data>
+  <data name="Boton_aceptar.Content" xml:space="preserve">
+    <value>Aceptar</value>
+    <comment>Texto de botón aceptar</comment>
+  </data>
+  <data name="Boton_cancelar" xml:space="preserve">
+    <value>Cancelar</value>
+    <comment>Texto del botón cancelar</comment>
+  </data>
+  <data name="Boton_cancelar.Content" xml:space="preserve">
+    <value>Cancelar</value>
+    <comment>Texto del botón cancelar</comment>
+  </data>
+  <data name="Boton_firmar.Content" xml:space="preserve">
+    <value>Firmar</value>
+    <comment>Texto del botón firmar</comment>
+  </data>
+  <data name="Boton_importar_almacen.Content" xml:space="preserve">
+    <value>Importar un nuevo almacén</value>
+    <comment>Etiqueta de botón selección un nuevo almacén</comment>
+  </data>
+  <data name="Error_bad_certificate" xml:space="preserve">
+    <value>Se ha recibido un certificado corrupto</value>
+    <comment>Se ha recibido un certificado corrupto</comment>
+  </data>
+  <data name="Error_bad_xml" xml:space="preserve">
+    <value>Se ha recibido un XML mal formado</value>
+    <comment>Se ha recibido un XML mal formado</comment>
+  </data>
+  <data name="Error_cancelled_opperation" xml:space="preserve">
+    <value>Operación cancelada</value>
+    <comment>Operación cancelada</comment>
+  </data>
+  <data name="Error_carga_almacen" xml:space="preserve">
+    <value>Se ha producido un error al cargar el almacén, es posible que la contraseña proporcionada no sea correcta. Si está seguro de la corrección de la contraseña y el problema persiste, pruebe a reiniciar el equipo y volver a intentarlo.</value>
+    <comment>Etiqueta de error de carga de almacén</comment>
+  </data>
+  <data name="Error_ciphering" xml:space="preserve">
+    <value>Error durante el proceso de cifrado de datos</value>
+    <comment>de cifrado de datos</comment>
+  </data>
+  <data name="Error_coding_base64" xml:space="preserve">
+    <value>Error en la codificación del base 64</value>
+    <comment>del base 64</comment>
+  </data>
+  <data name="Error_communicating_with_web" xml:space="preserve">
+    <value>No se ha podido enviar la firma generada a la web de origen</value>
+    <comment>No se ha podido enviar la firma generada a la web de origen</comment>
+  </data>
+  <data name="Error_configuration_file_problem" xml:space="preserve">
+    <value>Error de configuración de la aplicación</value>
+    <comment>Error de configuración de la aplicación</comment>
+  </data>
+  <data name="Error_invalid_cipher_key" xml:space="preserve">
+    <value>La clave de cifrado proporcionada no es válida</value>
+    <comment>La clave de cifrado proporcionada no es válida</comment>
+  </data>
+  <data name="Error_invalid_data" xml:space="preserve">
+    <value>Los datos solicitados o enviados son invalidos</value>
+    <comment>Los datos solicitados o enviados son invalidos</comment>
+  </data>
+  <data name="Error_invalid_data_id" xml:space="preserve">
+    <value>El identificador para los datos es invalido</value>
+    <comment>El identificador para los datos es invalido</comment>
+  </data>
+  <data name="Error_invalid_servlet" xml:space="preserve">
+    <value>La ruta del servlet es invalida</value>
+    <comment>La ruta del servlet es invalida</comment>
+  </data>
+  <data name="Error_missing_data" xml:space="preserve">
+    <value>No se han proporcionado los datos de la operacion</value>
+    <comment>No se han proporcionado los datos de la operacion</comment>
+  </data>
+  <data name="Error_missing_data_id" xml:space="preserve">
+    <value>No se ha proporcionado un identificador para los datos</value>
+    <comment>No se ha proporcionado un identificador para los datos</comment>
+  </data>
+  <data name="Error_missing_operation_name" xml:space="preserve">
+    <value>No se ha indicado codigo de operacion</value>
+    <comment>No se ha indicado codigo de operacion</comment>
+  </data>
+  <data name="Error_missing_servlet" xml:space="preserve">
+    <value>No se ha proporcionado el sevlet para la comunicacion de los datos</value>
+    <comment>No se ha proporcionado el sevlet para la comunicacion de los datos</comment>
+  </data>
+  <data name="Error_missing_syntax_version" xml:space="preserve">
+    <value>No se ha indicado la versión de la sintaxis de la operación</value>
+    <comment>operación</comment>
+  </data>
+  <data name="Error_not_supported_format" xml:space="preserve">
+    <value>Se ha configurado un formato de firma no soportado</value>
+    <comment>Se ha configurado un formato de firma no soportado</comment>
+  </data>
+  <data name="Error_no_cert_selected" xml:space="preserve">
+    <value>El usuario no seleccionó ningún certificado</value>
+    <comment>ningún certificado</comment>
+  </data>
+  <data name="Error_pass_vacia" xml:space="preserve">
+    <value>La contraseña no puede ser vacía</value>
+    <comment>Etiqueta de error de contraseña vacia</comment>
+  </data>
+  <data name="Error_pke" xml:space="preserve">
+    <value>No se seleccionó certificado de firma</value>
+    <comment>certificado de firma</comment>
+  </data>
+  <data name="Error_signing" xml:space="preserve">
+    <value>Ocurrió un error en la operación de firma</value>
+    <comment>operación de firma</comment>
+  </data>
+  <data name="Error_unsupported_operation_name" xml:space="preserve">
+    <value>Codigo de operacion no soportado</value>
+    <comment>Codigo de operacion no soportado</comment>
+  </data>
+  <data name="Etiqueta_almacen_abrir.Text" xml:space="preserve">
+    <value>Introduzca la contraseña para abrir el almacén.</value>
+    <comment>Etiqueta para la página de peticion de contraseña</comment>
+  </data>
+  <data name="Etiqueta_almacen_importar.Text" xml:space="preserve">
+    <value>Introduzca la contraseña del almacén para ser importado.</value>
+    <comment>Etiqueta para la página de petición de contraseña</comment>
+  </data>
+  <data name="Etiqueta_peticion_pass" xml:space="preserve">
+    <value>Petición de contraseña</value>
+    <comment>Etiqueta de petición de contraseña</comment>
+  </data>
+  <data name="Etiqueta_seleccion_alias" xml:space="preserve">
+    <value>Seleccione un alias</value>
+    <comment>Etiqueta de seleccion de un alias</comment>
+  </data>
+  <data name="Etiqueta_seleccion_alias_p.Text" xml:space="preserve">
+    <value>Seleccione un alias</value>
+    <comment>Etiqueta de seleccion de un alias</comment>
+  </data>
+  <data name="Etiqueta_seleccion_almacen" xml:space="preserve">
+    <value>Seleccione un almacén</value>
+    <comment>Etiqueta selección almacén</comment>
+  </data>
+  <data name="Etiqueta_seleccion_almacen_p.Text" xml:space="preserve">
+    <value>Seleccione un almacén</value>
+    <comment>Etiqueta selección almacén</comment>
+  </data>
+  <data name="Info_almacen_importado" xml:space="preserve">
+    <value>El almacén ha sido importado correctamente como "</value>
+    <comment>Parte 1 del texto de importacion de almacén</comment>
+  </data>
+  <data name="Principal.Text" xml:space="preserve">
+    <value>Firma electrónica</value>
+    <comment>Título de la página inicial</comment>
+  </data>
+  <data name="Etiqueta_presentacion.Text" xml:space="preserve">
+    <value>Bienvenido a la plataforma de firma electrónica para Windows 8. Debe seleccionar un almacén de claves y un alias de un certificado de dicho almacén. Si no dispone de almacenes en la aplicación deberá importarlos usando el botón "Importar un nuevo almacén". Recuerde, cuando termine la operación, deberá volver al navegador desde el cual se inició el proceso de firma.</value>
+    <comment>Bienvenido a la plataforma de firma para Windows 8. Debe seleccionar un alamcén de claves y un alias de dicho almacén. Si no dispone de almacenes en la aplicación deberá importarlos usando el botón "Importar un nuevo almacén". Recuerde, cuando termine la operación, deberá volver al navegador desde el cual se inició el proceso de firma.</comment>
+  </data>
+  <data name="Info_operacion_finalizada" xml:space="preserve">
+    <value>La operación ha finalizado. Vuelva al navegador desde el que inició la operación para ver el resultado</value>
+    <comment>La operación ha finalizado. Vuelva al navegador desde el que inició la operación para ver el resultado</comment>
+  </data>
+  <data name="Info_regreso_navegador" xml:space="preserve">
+    <value>Por favor, regrese al navegador desde donde inició el proceso y configure correctamente la operación.</value>
+    <comment>Por favor, regrese al navegador desde donde inició el proceso y configure correctamente la operación.</comment>
+  </data>
+  <data name="Info_regreso_navegador_ok" xml:space="preserve">
+    <value>¡Felicidades! La firma ha sido generada. Ya puede regresar al navegador desde donde inició la operación.</value>
+    <comment>¡Felicidades! La firma ha sido generada. Ya puede regresar al navegador desde donde inició la operación.</comment>
+  </data>
+  <data name="Iniciar_aplicacion_adecuado" xml:space="preserve">
+    <value>Debe iniciar la aplicación desde el sitio adecuado.</value>
+    <comment>Debe iniciar la aplicación desde el sitio adecuado</comment>
+  </data>
+  <data name="Procesando.Text" xml:space="preserve">
+    <value>Procesando</value>
+    <comment>Procesando</comment>
+  </data>
+  <data name="Preparando.Text" xml:space="preserve">
+    <value>Preparando</value>
+    <comment>Preparando</comment>
+  </data>
+  <data name="Default_file_description" xml:space="preserve">
+    <value>Fichero de tipo </value>
+    <comment>Fichero de tipo</comment>
+  </data>
+  <data name="Error" xml:space="preserve">
+    <value>Error</value>
+    <comment>Error</comment>
+  </data>
+  <data name="Error_extension" xml:space="preserve">
+    <value>Debe proporcionar una extensión para el fichero.</value>
+    <comment>Debe proporcionar una extensión para el fichero.</comment>
+  </data>
+  <data name="Error_filename" xml:space="preserve">
+    <value>Debe proporcionar un nombre de fichero.</value>
+    <comment>Debe proporcionar un nombre de fichero.</comment>
+  </data>
+  <data name="Error_file_saved" xml:space="preserve">
+    <value>No se ha podido guardar el fichero</value>
+    <comment>No se ha podido guardar el fichero</comment>
+  </data>
+  <data name="Descripcion_aplicacion.Text" xml:space="preserve">
+    <value>Bienvenido a la plataforma de firma electrónica para Windows 8. Esta aplicación permite generar firmas electrónicas pero previamente, deberá tener importados a la aplicación almacenes de claves. Si desea importar almacenes a la aplicación puede usar el botón "Importar un nuevo almacén".</value>
+    <comment>Bienvenido a la plataforma de firma electrónica para Windows 8. Esta aplicación permite generar firmas electrónicas pero previamente, deberá tener importados a la aplicación almacenes de claves. Si desea importar almacenes a la aplicación puede usar el botón "Importar un nuevo almacén".</comment>
+  </data>
+  <data name="Principal_acerca_de.Text" xml:space="preserve">
+    <value>Acerca de Firma elenctrónica</value>
+    <comment>Acerca de Firma elenctrónica</comment>
+  </data>
+  <data name="info_operacion_finalizada_desktop" xml:space="preserve">
+    <value>La operación ha finalizado correctamente. Para continuar, vuelva al navegador desde el que inició la operación desde el entorno de  escritorio clásico de Windows.</value>
+    <comment>La operación ha finalizado correctamente. Para continuar, vuelva al navegador desde el que inició la operación desde el entorno de  escritorio clásico de Windows.</comment>
+  </data>
+  <data name="info_operacion_finalizada_metro" xml:space="preserve">
+    <value>La operación ha finalizado correctamente. Para continuar, vuelva al navegador desde el que inició la operación desde la interfaz Modern UI de windows 8.</value>
+    <comment>La operación ha finalizado correctamente. Para continuar, vuelva al navegador desde el que inició la operación desde la interfaz Modern UI de windows 8.</comment>
+  </data>
+  <data name="Error_parametros" xml:space="preserve">
+    <value>La llamada a la aplicación desde la página Web no es correcta y no se puede completar la operación solicitada. Consulte a su proveedor de servicios.</value>
+    <comment>Cualquier parámetro en URL mal formado o inexistente</comment>
+  </data>
+  <data name="No_items_list" xml:space="preserve">
+    <value>Debe importar un almacén</value>
+    <comment>Debe importar un alamcén de claves para poder utilizarlo</comment>
+  </data>
+  <data name="Boton_borrar_almacen.Content" xml:space="preserve">
+    <value>Borrar almacén seleccionado</value>
+    <comment>Borrar almacén seleccionado</comment>
+  </data>
+  <data name="Boton_importar_almacen2.Content" xml:space="preserve">
+    <value>Importar almacén</value>
+    <comment>Importar un nuevo almacén</comment>
+  </data>
+</root>

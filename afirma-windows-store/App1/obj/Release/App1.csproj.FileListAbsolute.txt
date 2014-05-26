@@ -1,0 +1,39 @@
+C:\Users\afirma\Desktop\Metro - bc\App1\bin\Release\Afirma WMetro.exe
+C:\Users\afirma\Desktop\Metro - bc\App1\bin\Release\Afirma WMetro.pdb
+C:\Users\afirma\Desktop\Metro - bc\App1\bin\Release\resources.pri
+C:\Users\afirma\Desktop\Metro - bc\App1\bin\Release\AppxManifest.xml
+C:\Users\afirma\Desktop\Metro - bc\App1\bin\Release\App1.build.appxrecipe
+C:\Users\afirma\Desktop\Metro - bc\App1\obj\Release\App.g.i.cs
+C:\Users\afirma\Desktop\Metro - bc\App1\obj\Release\App.g.cs
+C:\Users\afirma\Desktop\Metro - bc\App1\obj\Release\Common\LightStyles.g.i.cs
+C:\Users\afirma\Desktop\Metro - bc\App1\obj\Release\Common\LightStyles.g.cs
+C:\Users\afirma\Desktop\Metro - bc\App1\obj\Release\Common\StandardStyles.g.i.cs
+C:\Users\afirma\Desktop\Metro - bc\App1\obj\Release\Common\StandardStyles.g.cs
+C:\Users\afirma\Desktop\Metro - bc\App1\obj\Release\CredentialPanel2.g.i.cs
+C:\Users\afirma\Desktop\Metro - bc\App1\obj\Release\CredentialPanel2.g.cs
+C:\Users\afirma\Desktop\Metro - bc\App1\obj\Release\CredentialPanel.g.i.cs
+C:\Users\afirma\Desktop\Metro - bc\App1\obj\Release\CredentialPanel.g.cs
+C:\Users\afirma\Desktop\Metro - bc\App1\obj\Release\MainPage.g.i.cs
+C:\Users\afirma\Desktop\Metro - bc\App1\obj\Release\MainPage.g.cs
+C:\Users\afirma\Desktop\Metro - bc\App1\obj\Release\solucionFirma.g.i.cs
+C:\Users\afirma\Desktop\Metro - bc\App1\obj\Release\solucionFirma.g.cs
+C:\Users\afirma\Desktop\Metro - bc\App1\obj\Release\XamlTypeInfo.g.cs
+C:\Users\afirma\Desktop\Metro - bc\App1\obj\Release\Common\LightStyles.xaml
+C:\Users\afirma\Desktop\Metro - bc\App1\obj\Release\Common\StandardStyles.xaml
+C:\Users\afirma\Desktop\Metro - bc\App1\obj\Release\CredentialPanel2.xaml
+C:\Users\afirma\Desktop\Metro - bc\App1\obj\Release\CredentialPanel.xaml
+C:\Users\afirma\Desktop\Metro - bc\App1\obj\Release\solucionFirma.xaml
+C:\Users\afirma\Desktop\Metro - bc\App1\obj\Release\App.xaml
+C:\Users\afirma\Desktop\Metro - bc\App1\obj\Release\MainPage.xaml
+C:\Users\afirma\Desktop\Metro - bc\App1\obj\Release\Afirma WMetro.exe
+C:\Users\afirma\Desktop\Metro - bc\App1\obj\Release\Afirma WMetro.pdb
+C:\Users\afirma\Desktop\Metro - bc\App1\obj\Release\priconfig.xml.intermediate
+C:\Users\afirma\Desktop\Metro - bc\App1\obj\Release\layout.resfiles.intermediate
+C:\Users\afirma\Desktop\Metro - bc\App1\obj\Release\resources.resfiles.intermediate
+C:\Users\afirma\Desktop\Metro - bc\App1\obj\Release\pri.resfiles.intermediate
+C:\Users\afirma\Desktop\Metro - bc\App1\obj\Release\priconfig.xml
+C:\Users\afirma\Desktop\Metro - bc\App1\obj\Release\layout.resfiles
+C:\Users\afirma\Desktop\Metro - bc\App1\obj\Release\resources.resfiles
+C:\Users\afirma\Desktop\Metro - bc\App1\obj\Release\pri.resfiles
+C:\Users\afirma\Desktop\Metro - bc\App1\obj\Release\LanguageQualifiers.txt
+C:\Users\afirma\Desktop\Metro - bc\App1\obj\Release\ProjectArchitectures.txt

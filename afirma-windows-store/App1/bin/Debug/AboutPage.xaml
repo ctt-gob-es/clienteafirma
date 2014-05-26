@@ -1,0 +1,148 @@
+﻿<Page
+    x:Class="App1.AboutPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:App1"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Page.Resources>
+        <CollectionViewSource x:Name="collectionViewSource" IsSourceGrouped="True"></CollectionViewSource>
+    </Page.Resources>
+    <!--
+        This grid acts as a root panel for the page that defines two rows:
+        * Row 0 contains the back button and page title
+        * Row 1 contains the rest of the page layout
+    -->
+    <Grid x:Name="raiz" Style="{StaticResource LayoutRootStyle}" Margin="0" >
+        <Grid.Background>
+            <ImageBrush ImageSource="Images/fondo.jpg" Stretch="UniformToFill"/>
+        </Grid.Background>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="100"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Back button and page title -->
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            
+            <TextBlock x:Name="pageTitle" 
+                       x:Uid="Principal"
+                       Grid.Column="1" 
+                       Text="" 
+                       Style="{StaticResource PageHeaderTextStyle}"
+                       Margin="150,0,0,0" Foreground="#DE000000"/>
+            
+        </Grid>
+        
+        <!-- Controls added in PART 1. -->
+        <StackPanel x:Name="content" Grid.Row="1" Margin="120,20,-25,10" >
+            <StackPanel Orientation="Vertical" Margin="0,20,0,0">
+                <Image Grid.ColumnSpan="2" Margin="10,10,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Source="Images/logo_recortado.png"  Height="100" Width="Auto"/>
+                <TextBlock x:Name="descripcion" x:Uid="Descripcion_aplicacion" Text="" Margin="10,10,0,0"  Width="400" HorizontalAlignment="Left" Style="{StaticResource BasicTextStyle}" Foreground="#DE000000"/>
+                <GridView x:Name="ItemGridView2" Margin="10,10,0,0" Width="400"  HorizontalAlignment="Left" Height="250" 
+                        Background="Transparent"
+                        ItemsSource="{Binding Source={StaticResource collectionViewSource}, Mode=TwoWay}"
+                        ItemTemplate="{StaticResource StoreFrontTileTemplate}"
+                        ItemContainerStyle="{StaticResource StoreFrontTileStyle}"
+                        ItemsPanel="{StaticResource StoreFrontGridItemsPanelTemplate}"
+                        BorderBrush="LightGray"
+                        BorderThickness="1" VerticalAlignment="Stretch" ScrollViewer.VerticalScrollBarVisibility="Auto"
+                          ScrollViewer.VerticalScrollMode="Enabled"
+                        ScrollViewer.HorizontalScrollBarVisibility="Auto" IsItemClickEnabled="False"
+                         />
+
+                <StackPanel Orientation="Horizontal" Margin="0,10,0,10" Width="415" HorizontalAlignment="Left">
+                    <Button x:ConnectionId='1' x:Uid="Boton_importar_almacen2" x:Name="botonImportar" Content="" Margin="7,10,0,10"                             Background="Transparent" BorderBrush="Black" Foreground="Black" Style="{StaticResource LightButtonStyle}"/>
+                    <Button x:ConnectionId='2' x:Uid="Boton_borrar_almacen" x:Name="botonBorrar" Content=""  Margin="28,10,0,10"                             Background="Transparent" BorderBrush="Black" Foreground="Black" Style="{StaticResource LightButtonStyle}"/>
+                </StackPanel>
+               
+            </StackPanel>
+            
+        </StackPanel>
+        <!-- End -->
+
+        <VisualStateManager.VisualStateGroups>
+            <!-- Visual states reflect the application's view state -->
+            <VisualStateGroup>
+                
+                <VisualState x:Name="Portrait">
+                    <Storyboard>
+
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.Margin)" Storyboard.TargetName="pageTitle">
+                            <DiscreteObjectKeyFrame KeyTime="0" Value="150,0,0,0" />
+                        </ObjectAnimationUsingKeyFrames>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.Style)" Storyboard.TargetName="pageTitle">
+                            <DiscreteObjectKeyFrame KeyTime="0:0:0" Value="{StaticResource PageHeaderTextStyle}" />
+                        </ObjectAnimationUsingKeyFrames>
+
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.Width)" Storyboard.TargetName="descripcion">
+                            <DiscreteObjectKeyFrame KeyTime="0:0:0" Value="400" />
+                        </ObjectAnimationUsingKeyFrames>
+
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.Width)" Storyboard.TargetName="ItemGridView2">
+                            <DiscreteObjectKeyFrame KeyTime="0:0:0" Value="400" />
+                        </ObjectAnimationUsingKeyFrames>
+                        
+
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.Margin)" Storyboard.TargetName="content">
+                            <DiscreteObjectKeyFrame KeyTime="0" Value="120,20,-25,10" />
+                        </ObjectAnimationUsingKeyFrames>
+                    </Storyboard>
+                </VisualState>
+
+                <VisualState x:Name="Snapped">
+                    <Storyboard>
+
+
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.Margin)" Storyboard.TargetName="pageTitle">
+                            <DiscreteObjectKeyFrame KeyTime="0" Value="20,20,20,20" />
+                        </ObjectAnimationUsingKeyFrames>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.Style)" Storyboard.TargetName="pageTitle">
+                            <DiscreteObjectKeyFrame KeyTime="0:0:0" Value="{StaticResource PageHeaderTextStyleSnap}" />                            
+                        </ObjectAnimationUsingKeyFrames>
+
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.Width)" Storyboard.TargetName="descripcion">
+                            <DiscreteObjectKeyFrame KeyTime="0:0:0" Value="270" />
+                        </ObjectAnimationUsingKeyFrames>
+
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.Width)" Storyboard.TargetName="ItemGridView2">
+                            <DiscreteObjectKeyFrame KeyTime="0:0:0" Value="270" />
+                        </ObjectAnimationUsingKeyFrames>
+
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.Margin)" Storyboard.TargetName="content">
+                            <DiscreteObjectKeyFrame KeyTime="0" Value="20,20,20,20" />
+                        </ObjectAnimationUsingKeyFrames>
+                         
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.Content)" Storyboard.TargetName="botonImportar">
+                            <DiscreteObjectKeyFrame KeyTime="0" Value="Importar" />
+                        </ObjectAnimationUsingKeyFrames>
+                        
+                        
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.Content)" Storyboard.TargetName="botonBorrar">
+                            <DiscreteObjectKeyFrame KeyTime="0" Value="Borrar" />
+                        </ObjectAnimationUsingKeyFrames>
+
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.Margin)" Storyboard.TargetName="botonBorrar">
+                            <DiscreteObjectKeyFrame KeyTime="0" Value="105,10,0,10" />
+                        </ObjectAnimationUsingKeyFrames>
+
+
+                    </Storyboard>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
+
+
+    </Grid>
+
+    
+
+</Page>
+

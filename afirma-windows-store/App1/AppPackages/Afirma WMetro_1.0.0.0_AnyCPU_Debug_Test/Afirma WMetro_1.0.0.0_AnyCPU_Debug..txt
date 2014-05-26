@@ -1,0 +1,7 @@
+FILE QUARANTINED
+----------------
+
+The original contents of this file have been replaced with
+this message because of its characteristics.
+File name: "Metro - bc - 2013-04-03.rar->Metro - bc\App1\AppPackages\Afirma WMetro_1.0.0.0_AnyCPU_Debug_Test\Afirma WMetro_1.0.0.0_AnyCPU_Debug.appx"
+Virus name: "CorruptedCompressedFile"

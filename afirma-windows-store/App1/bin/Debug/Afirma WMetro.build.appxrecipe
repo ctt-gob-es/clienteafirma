@@ -1,0 +1,111 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Machine>PROBOOK</Machine>
+    <WindowsUser>Tomas</WindowsUser>
+    <SolutionConfiguration>Debug|AnyCPU</SolutionConfiguration>
+    <PackageArchitecture>neutral</PackageArchitecture>
+  </PropertyGroup>
+  <ItemGroup>
+    <AppXManifest Include="C:\Users\Tomas\Documents\Visual Studio 2012\Projects\Metro - bc\App1\bin\Debug\AppxManifest.xml">
+      <PackagePath>AppxManifest.xml</PackagePath>
+      <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
+    </AppXManifest>
+  </ItemGroup>
+  <ItemGroup>
+    <AppxPackagedFile Include="C:\Users\Tomas\Documents\Visual Studio 2012\Projects\Metro - bc\App1\bin\Debug\Cliente %40firma %28Gobierno de España%29.exe">
+      <PackagePath>Cliente %40firma %28Gobierno de España%29.exe</PackagePath>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Tomas\Documents\Visual Studio 2012\Projects\Metro - bc\App1\bin\Debug\Cliente %40firma %28Gobierno de España%29.pdb">
+      <PackagePath>Cliente %40firma %28Gobierno de España%29.pdb</PackagePath>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Tomas\Documents\Visual Studio 2012\Projects\Metro - bc\App1\Assets\Logo.png">
+      <PackagePath>Assets\Logo.png</PackagePath>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Tomas\Documents\Visual Studio 2012\Projects\Metro - bc\App1\Assets\SmallLogo.png">
+      <PackagePath>Assets\SmallLogo.png</PackagePath>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Tomas\Documents\Visual Studio 2012\Projects\Metro - bc\App1\Assets\SplashScreen.png">
+      <PackagePath>Assets\SplashScreen.png</PackagePath>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Tomas\Documents\Visual Studio 2012\Projects\Metro - bc\App1\Assets\StoreLogo.png">
+      <PackagePath>Assets\StoreLogo.png</PackagePath>
+      <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Tomas\Documents\Visual Studio 2012\Projects\Metro - bc\App1\Images\certificados.png">
+      <PackagePath>Images\certificados.png</PackagePath>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Tomas\Documents\Visual Studio 2012\Projects\Metro - bc\App1\Images\fondo.png">
+      <PackagePath>Images\fondo.png</PackagePath>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Tomas\Documents\Visual Studio 2012\Projects\Metro - bc\App1\Images\logo 150x150.png">
+      <PackagePath>Images\logo 150x150.png</PackagePath>
+      <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Tomas\Documents\Visual Studio 2012\Projects\Metro - bc\App1\Images\logo 30x30.png">
+      <PackagePath>Images\logo 30x30.png</PackagePath>
+      <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Tomas\Documents\Visual Studio 2012\Projects\Metro - bc\App1\Images\logo 310x150.png">
+      <PackagePath>Images\logo 310x150.png</PackagePath>
+      <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Tomas\Documents\Visual Studio 2012\Projects\Metro - bc\App1\Images\logo 620x300.png">
+      <PackagePath>Images\logo 620x300.png</PackagePath>
+      <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Tomas\Documents\Visual Studio 2012\Projects\Metro - bc\App1\Images\logo aplicacion.png">
+      <PackagePath>Images\logo aplicacion.png</PackagePath>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Tomas\Documents\Visual Studio 2012\Projects\Metro - bc\App1\Images\logo_cliente.png">
+      <PackagePath>Images\logo_cliente.png</PackagePath>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Tomas\Documents\Visual Studio 2012\Projects\Metro - bc\App1\Images\logo_de_lado.png">
+      <PackagePath>Images\logo_de_lado.png</PackagePath>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Tomas\Documents\Visual Studio 2012\Projects\Metro - bc\App1\Images\logo_largo.png">
+      <PackagePath>Images\logo_largo.png</PackagePath>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Tomas\Documents\Visual Studio 2012\Projects\Metro - bc\App1\Images\logo_recortado.png">
+      <PackagePath>Images\logo_recortado.png</PackagePath>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Tomas\Documents\Visual Studio 2012\Projects\Metro - bc\App1\Common\ReadMe.txt">
+      <PackagePath>Common\ReadMe.txt</PackagePath>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Tomas\Documents\Visual Studio 2012\Projects\Metro - bc\App1\Images\fondo.jpg">
+      <PackagePath>Images\fondo.jpg</PackagePath>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Tomas\Documents\Visual Studio 2012\Projects\Metro - bc\App1\bin\Debug\App.xaml">
+      <PackagePath>App.xaml</PackagePath>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Tomas\Documents\Visual Studio 2012\Projects\Metro - bc\App1\bin\Debug\Common\LightStyles.xaml">
+      <PackagePath>Common\LightStyles.xaml</PackagePath>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Tomas\Documents\Visual Studio 2012\Projects\Metro - bc\App1\bin\Debug\Common\StandardStyles.xaml">
+      <PackagePath>Common\StandardStyles.xaml</PackagePath>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Tomas\Documents\Visual Studio 2012\Projects\Metro - bc\App1\bin\Debug\AboutPage.xaml">
+      <PackagePath>AboutPage.xaml</PackagePath>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Tomas\Documents\Visual Studio 2012\Projects\Metro - bc\App1\bin\Debug\ErrorDialog.xaml">
+      <PackagePath>ErrorDialog.xaml</PackagePath>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Tomas\Documents\Visual Studio 2012\Projects\Metro - bc\App1\bin\Debug\Preparing.xaml">
+      <PackagePath>Preparing.xaml</PackagePath>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Tomas\Documents\Visual Studio 2012\Projects\Metro - bc\App1\bin\Debug\CredentialPanel2.xaml">
+      <PackagePath>CredentialPanel2.xaml</PackagePath>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Tomas\Documents\Visual Studio 2012\Projects\Metro - bc\App1\bin\Debug\CredentialPanel.xaml">
+      <PackagePath>CredentialPanel.xaml</PackagePath>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Tomas\Documents\Visual Studio 2012\Projects\Metro - bc\App1\bin\Debug\MainPage.xaml">
+      <PackagePath>MainPage.xaml</PackagePath>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Tomas\Documents\Visual Studio 2012\Projects\Metro - bc\App1\bin\Debug\resources.pri">
+      <PackagePath>resources.pri</PackagePath>
+    </AppxPackagedFile>
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+</Project>

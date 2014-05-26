@@ -1,0 +1,22 @@
+﻿<Application
+    x:Class="App1.App"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:App1">
+
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+
+                <!-- 
+                    Estilos que definen aspectos comunes de la apariencia de la aplicación.
+                    Requeridos por las plantillas de elementos y proyecto de Visual Studio.
+               -->
+                <ResourceDictionary Source="Common/StandardStyles.xaml"/>  
+               <ResourceDictionary Source="Common/LightStyles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>
+

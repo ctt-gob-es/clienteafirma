@@ -1,0 +1,706 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{DF6B47FB-AB13-4489-9677-DA2C07733305}</ProjectGuid>
+    <OutputType>AppContainerExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>AfirmaWMetro</RootNamespace>
+    <AssemblyName>Cliente %40firma %28Gobierno de España%29</AssemblyName>
+    <DefaultLanguage>es-ES</DefaultLanguage>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{BC8A1FFA-BEE3-4634-8014-F334798102B3};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <PackageCertificateKeyFile>App1_TemporaryKey.pfx</PackageCertificateKeyFile>
+    <AppxAutoIncrementPackageRevision>True</AppxAutoIncrementPackageRevision>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE;NETFX_CORE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE;NETFX_CORE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|ARM'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\ARM\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE;NETFX_CORE</DefineConstants>
+    <NoWarn>;2008</NoWarn>
+    <DebugType>full</DebugType>
+    <PlatformTarget>ARM</PlatformTarget>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <ErrorReport>prompt</ErrorReport>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|ARM'">
+    <OutputPath>bin\ARM\Release\</OutputPath>
+    <DefineConstants>TRACE;NETFX_CORE</DefineConstants>
+    <Optimize>true</Optimize>
+    <NoWarn>;2008</NoWarn>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>ARM</PlatformTarget>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <ErrorReport>prompt</ErrorReport>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x64\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE;NETFX_CORE</DefineConstants>
+    <NoWarn>;2008</NoWarn>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <ErrorReport>prompt</ErrorReport>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <OutputPath>bin\x64\Release\</OutputPath>
+    <DefineConstants>TRACE;NETFX_CORE</DefineConstants>
+    <Optimize>true</Optimize>
+    <NoWarn>;2008</NoWarn>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <ErrorReport>prompt</ErrorReport>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE;NETFX_CORE</DefineConstants>
+    <NoWarn>;2008</NoWarn>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <ErrorReport>prompt</ErrorReport>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DefineConstants>TRACE;NETFX_CORE</DefineConstants>
+    <Optimize>true</Optimize>
+    <NoWarn>;2008</NoWarn>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <ErrorReport>prompt</ErrorReport>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- A reference to the entire .Net Framework and Windows SDK are automatically included -->
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="App.xaml.cs">
+      <DependentUpon>App.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ConstantsAfirmaMetro.cs" />
+    <Compile Include="Common\BindableBase.cs" />
+    <Compile Include="Common\BooleanNegationConverter.cs" />
+    <Compile Include="Common\BooleanToVisibilityConverter.cs" />
+    <Compile Include="Common\LayoutAwarePage.cs" />
+    <Compile Include="Common\RichTextColumns.cs" />
+    <Compile Include="Common\SuspensionManager.cs" />
+    <Compile Include="AboutPage.xaml.cs">
+      <DependentUpon>AboutPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ErrorDialog.xaml.cs">
+      <DependentUpon>ErrorDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="es\gob\afirma\core\AOCancelledOperationException.cs" />
+    <Compile Include="es\gob\afirma\windows\parameters\UrlParameters.cs" />
+    <Compile Include="Preparing.xaml.cs">
+      <DependentUpon>Preparing.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="CredentialPanel2.xaml.cs">
+      <DependentUpon>CredentialPanel2.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="CredentialPanel.xaml.cs">
+      <DependentUpon>CredentialPanel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="CustomDialog.cs" />
+    <Compile Include="es\gob\afirma\core\csutils\Digester.cs" />
+    <Compile Include="es\gob\afirma\core\csutils\UrlReader.cs" />
+    <Compile Include="es\gob\afirma\core\misc\AOUtil.cs" />
+    <Compile Include="es\gob\afirma\core\signers\AdESPolicy.cs" />
+    <Compile Include="es\gob\afirma\core\signers\AOSignConstants.cs" />
+    <Compile Include="es\gob\afirma\signers\AOPkcs1Signer.cs" />
+    <Compile Include="es\gob\afirma\signers\cades\AOCAdESSigner.cs" />
+    <Compile Include="es\gob\afirma\signers\cades\AOSigPolicyQualifierInfo.cs" />
+    <Compile Include="es\gob\afirma\signers\cades\CAdESTriPhaseSigner.cs" />
+    <Compile Include="es\gob\afirma\signers\cades\CAdESUtils.cs" />
+    <Compile Include="es\gob\afirma\signers\cades\GenCAdESEPESSignedData.cs" />
+    <Compile Include="es\gob\afirma\signers\pkcs7\AOAlgorithmID.cs" />
+    <Compile Include="es\gob\afirma\signers\pkcs7\P7ContentSignerParameters.cs" />
+    <Compile Include="es\gob\afirma\signers\pkcs7\SigUtils.cs" />
+    <Compile Include="MainPage.xaml.cs">
+      <DependentUpon>MainPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Org\BouncyCastle\Asn1\Asn1Encodable.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\Asn1EncodableVector.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\Asn1Exception.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\Asn1InputStream.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\Asn1Null.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\Asn1Object.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\Asn1OctetString.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\ASN1OctetStringParser.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\Asn1OutputStream.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\Asn1ParsingException.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\Asn1Sequence.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\ASN1SequenceParser.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\Asn1Set.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\ASN1SetParser.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\ASN1StreamParser.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\Asn1TaggedObject.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\ASN1TaggedObjectParser.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\Asn1Tags.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\bc\BCObjectIdentifiers.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\BerApplicationSpecific.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\BerApplicationSpecificParser.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\BerOctetString.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\BEROctetStringParser.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\BerOutputStream.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\BerSequence.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\BERSequenceParser.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\BerSet.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\BERSetParser.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\BerTaggedObject.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\BERTaggedObjectParser.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\Cms\Attribute.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\Cms\Attributes.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\Cms\AttributeTable.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\Cms\CMSAttributes.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\Cms\CMSObjectIdentifiers.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\Cms\ContentInfo.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\Cms\IssuerAndSerialNumber.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\Cms\SignedData.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\Cms\SignerIdentifier.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\Cms\SignerInfo.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\Cms\Time.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\ConstructedOctetStream.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\cryptopro\CryptoProObjectIdentifiers.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\cryptopro\ECGOST3410NamedCurves.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\cryptopro\GOST3410NamedParameters.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\cryptopro\GOST3410ParamSetParameters.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\cryptopro\GOST3410PublicKeyAlgParameters.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\DefiniteLengthInputStream.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\DerApplicationSpecific.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\DerBitString.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\DerBMPString.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\DerBoolean.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\DerEnumerated.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\DERExternal.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\DERExternalParser.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\DerGeneralizedTime.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\DerGeneralString.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\DerIA5String.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\DerInteger.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\DerNull.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\DerNumericString.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\DerObjectIdentifier.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\DerOctetString.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\DEROctetStringParser.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\DerOutputStream.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\DerPrintableString.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\DerSequence.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\DERSequenceParser.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\DerSet.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\DERSetParser.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\DerStringBase.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\DerT61String.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\DerTaggedObject.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\DerUniversalString.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\DerUnknownTag.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\DerUTCTime.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\DerUTF8String.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\DerVisibleString.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\Ess\ContentHints.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\Ess\ESSCertID.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\Ess\ESSCertIDv2.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\Ess\SigningCertificate.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\Ess\SigningCertificateV2.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\iana\IANAObjectIdentifiers.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\IAsn1ApplicationSpecificParser.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\IAsn1Choice.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\IAsn1Convertible.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\IAsn1String.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\IndefiniteLengthInputStream.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\kisa\KISAObjectIdentifiers.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\LimitedInputStream.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\misc\CAST5CBCParameters.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\misc\MiscObjectIdentifiers.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\misc\NetscapeCertType.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\misc\NetscapeRevocationURL.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\misc\VerisignCzagExtension.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\nist\NISTNamedCurves.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\nist\NISTObjectIdentifiers.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\ntt\NTTObjectIdentifiers.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\OidTokenizer.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\oiw\ElGamalParameter.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\oiw\OIWObjectIdentifiers.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\Pkcs\AuthenticatedSafe.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\Pkcs\CertBag.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\Pkcs\DHParameter.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\Pkcs\EncryptedData.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\Pkcs\EncryptedPrivateKeyInfo.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\Pkcs\EncryptionScheme.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\Pkcs\KeyDerivationFunc.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\Pkcs\PBEParameter.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\Pkcs\PBES2Parameters.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\Pkcs\PBKDF2Params.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\Pkcs\Pfx.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\Pkcs\PKCS12PBEParams.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\Pkcs\PKCSObjectIdentifiers.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\Pkcs\PrivateKeyInfo.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\Pkcs\RC2CBCParameter.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\Pkcs\RSAPrivateKeyStructure.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\Pkcs\RSASSAPSSparams.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\Pkcs\SafeBag.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\Pkcs\SignedData.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\sec\ECPrivateKeyStructure.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\sec\SECNamedCurves.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\sec\SECObjectIdentifiers.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\teletrust\TeleTrusTNamedCurves.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\teletrust\TeleTrusTObjectIdentifiers.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\util\Asn1Dump.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\util\FilterStream.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\X509\AlgorithmIdentifier.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\X509\AuthorityKeyIdentifier.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\X509\BasicConstraints.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\X509\DigestInfo.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\X509\DSAParameter.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\X509\GeneralName.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\X509\GeneralNames.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\X509\IssuerSerial.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\X509\KeyUsage.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\X509\PolicyInformation.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\X509\PolicyQualifierId.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\X509\PolicyQualifierInfo.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\X509\RSAPublicKeyStructure.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\X509\SubjectKeyIdentifier.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\X509\SubjectPublicKeyInfo.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\X509\TBSCertificateStructure.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\X509\X509CertificateStructure.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\X509\X509DefaultEntryConverter.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\X509\X509Extension.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\X509\X509Extensions.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\X509\X509Name.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\X509\X509NameEntryConverter.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\X509\X509NameTokenizer.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\X509\X509ObjectIdentifiers.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\x9\DHDomainParameters.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\x9\DHPublicKey.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\x9\DHValidationParms.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\x9\X962NamedCurves.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\x9\X962Parameters.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\x9\X9Curve.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\x9\X9ECParameters.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\x9\X9ECParametersHolder.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\x9\X9ECPoint.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\x9\X9FieldElement.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\x9\X9FieldID.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\x9\X9IntegerConverter.cs" />
+    <Compile Include="Org\BouncyCastle\Asn1\x9\X9ObjectIdentifiers.cs" />
+    <Compile Include="Org\BouncyCastle\Cms\CMSProcessable.cs" />
+    <Compile Include="Org\BouncyCastle\Cms\CMSProcessableByteArray.cs" />
+    <Compile Include="Org\BouncyCastle\Cms\CMSReadable.cs" />
+    <Compile Include="Org\BouncyCastle\Collections\CollectionUtilities.cs" />
+    <Compile Include="Org\BouncyCastle\Collections\ISet.cs" />
+    <Compile Include="Org\BouncyCastle\Collections\UnmodifiableDictionary.cs" />
+    <Compile Include="Org\BouncyCastle\Collections\UnmodifiableDictionaryProxy.cs" />
+    <Compile Include="Org\BouncyCastle\Collections\UnmodifiableList.cs" />
+    <Compile Include="Org\BouncyCastle\Collections\UnmodifiableListProxy.cs" />
+    <Compile Include="Org\BouncyCastle\Collections\UnmodifiableSet.cs" />
+    <Compile Include="Org\BouncyCastle\Collections\UnmodifiableSetProxy.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\agreement\DHBasicAgreement.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\agreement\ECDHBasicAgreement.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\agreement\kdf\DHKdfParameters.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\AsymmetricCipherKeyPair.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\AsymmetricKeyParameter.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\BufferedAeadBlockCipher.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\BufferedAsymmetricBlockCipher.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\BufferedBlockCipher.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\BufferedCipherBase.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\BufferedIesCipher.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\BufferedStreamCipher.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\CipherKeyGenerator.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\CryptoException.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\DataLengthException.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\digests\GeneralDigest.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\digests\GOST3411Digest.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\digests\LongDigest.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\digests\MD2Digest.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\digests\MD4Digest.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\digests\MD5Digest.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\digests\NullDigest.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\digests\RipeMD128Digest.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\digests\RipeMD160Digest.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\digests\RipeMD256Digest.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\digests\RipeMD320Digest.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\digests\Sha1Digest.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\digests\Sha224Digest.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\digests\Sha256Digest.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\digests\Sha384Digest.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\digests\Sha512Digest.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\digests\TigerDigest.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\digests\WhirlpoolDigest.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\encodings\ISO9796d1Encoding.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\encodings\OaepEncoding.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\encodings\Pkcs1Encoding.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\engines\AesFastEngine.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\engines\BlowfishEngine.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\engines\CamelliaEngine.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\engines\Cast5Engine.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\engines\Cast6Engine.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\engines\DesEdeEngine.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\engines\DesEngine.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\engines\ElGamalEngine.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\engines\GOST28147Engine.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\engines\HC128Engine.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\engines\HC256Engine.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\engines\IesEngine.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\engines\NoekeonEngine.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\engines\RC2Engine.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\engines\RC4Engine.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\engines\RC532Engine.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\engines\RC564Engine.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\engines\RC6Engine.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\engines\RijndaelEngine.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\engines\RSABlindedEngine.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\engines\RSACoreEngine.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\engines\Salsa20Engine.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\engines\SEEDEngine.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\engines\SerpentEngine.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\engines\SkipjackEngine.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\engines\TEAEngine.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\engines\TwofishEngine.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\engines\VMPCEngine.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\engines\VMPCKSA3Engine.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\engines\XTEAEngine.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\generators\BaseKdfBytesGenerator.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\generators\DesEdeKeyGenerator.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\generators\DesKeyGenerator.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\generators\DHKeyGeneratorHelper.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\generators\DHKeyPairGenerator.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\generators\DsaKeyPairGenerator.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\generators\ECKeyPairGenerator.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\generators\ElGamalKeyPairGenerator.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\generators\GOST3410KeyPairGenerator.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\generators\Kdf2BytesGenerator.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\generators\OpenSSLPBEParametersGenerator.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\generators\Pkcs12ParametersGenerator.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\generators\Pkcs5S1ParametersGenerator.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\generators\Pkcs5S2ParametersGenerator.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\generators\RsaKeyPairGenerator.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\IAsymmetricBlockCipher.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\IAsymmetricCipherKeyPairGenerator.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\IBasicAgreement.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\IBlockCipher.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\IBufferedCipher.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\ICipherParameters.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\IDerivationFunction.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\IDerivationParameters.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\IDigest.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\IDSA.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\IMac.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\InvalidCipherTextException.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\ISigner.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\ISignerWithRecovery.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\IStreamCipher.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\macs\CbcBlockCipherMac.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\macs\CfbBlockCipherMac.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\macs\CMac.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\macs\GOST28147Mac.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\macs\HMac.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\macs\ISO9797Alg3Mac.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\macs\VMPCMac.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\MaxBytesExceededException.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\modes\CbcBlockCipher.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\modes\CcmBlockCipher.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\modes\CfbBlockCipher.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\modes\CtsBlockCipher.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\modes\EAXBlockCipher.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\modes\GCMBlockCipher.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\modes\gcm\GcmUtilities.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\modes\gcm\IGcmMultiplier.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\modes\gcm\Tables8kGcmMultiplier.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\modes\GOFBBlockCipher.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\modes\IAeadBlockCipher.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\modes\OfbBlockCipher.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\modes\OpenPgpCfbBlockCipher.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\modes\SicBlockCipher.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\paddings\BlockCipherPadding.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\paddings\ISO10126d2Padding.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\paddings\ISO7816d4Padding.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\paddings\PaddedBufferedBlockCipher.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\paddings\Pkcs7Padding.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\paddings\TbcPadding.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\paddings\X923Padding.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\paddings\ZeroBytePadding.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\parameters\AEADParameters.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\parameters\DesEdeParameters.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\parameters\DesParameters.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\parameters\DHKeyGenerationParameters.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\parameters\DHKeyParameters.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\parameters\DHParameters.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\parameters\DHPrivateKeyParameters.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\parameters\DHPublicKeyParameters.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\parameters\DHValidationParameters.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\parameters\DsaKeyGenerationParameters.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\parameters\DsaKeyParameters.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\parameters\DsaParameters.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\parameters\DsaPrivateKeyParameters.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\parameters\DsaPublicKeyParameters.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\parameters\DsaValidationParameters.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\parameters\ECDomainParameters.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\parameters\ECKeyGenerationParameters.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\parameters\ECKeyParameters.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\parameters\ECPrivateKeyParameters.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\parameters\ECPublicKeyParameters.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\parameters\ElGamalKeyGenerationParameters.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\parameters\ElGamalKeyParameters.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\parameters\ElGamalParameters.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\parameters\ElGamalPrivateKeyParameters.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\parameters\ElGamalPublicKeyParameters.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\parameters\GOST3410KeyGenerationParameters.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\parameters\GOST3410KeyParameters.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\parameters\GOST3410Parameters.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\parameters\GOST3410PrivateKeyParameters.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\parameters\GOST3410PublicKeyParameters.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\parameters\GOST3410ValidationParameters.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\parameters\IesParameters.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\parameters\IesWithCipherParameters.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\parameters\ISO18033KDFParameters.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\parameters\KdfParameters.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\parameters\KeyGenerationParameters.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\parameters\KeyParameter.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\parameters\ParametersWithIV.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\parameters\ParametersWithRandom.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\parameters\ParametersWithSBox.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\parameters\RC2Parameters.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\parameters\RC5Parameters.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\parameters\RSABlindingParameters.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\parameters\RsaKeyGenerationParameters.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\parameters\RsaKeyParameters.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\parameters\RsaPrivateCrtKeyParameters.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\PbeParametersGenerator.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\prng\DigestRandomGenerator.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\prng\IRandomGenerator.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\prng\ReversedWindowGenerator.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\prng\ThreadedSeedGenerator.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\signers\DsaDigestSigner.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\signers\DsaSigner.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\signers\ECDsaSigner.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\signers\ECGOST3410Signer.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\signers\ECNRSigner.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\signers\GOST3410DigestSigner.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\signers\GOST3410Signer.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\signers\Iso9796d2Signer.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\signers\PssSigner.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\signers\RsaDigestSigner.cs" />
+    <Compile Include="Org\BouncyCastle\crypto\util\Pack.cs" />
+    <Compile Include="Org\BouncyCastle\encoders\Hex.cs" />
+    <Compile Include="Org\BouncyCastle\encoders\HexEncoder.cs" />
+    <Compile Include="Org\BouncyCastle\encoders\IEncoder.cs" />
+    <Compile Include="Org\BouncyCastle\io\BaseInputStream.cs" />
+    <Compile Include="Org\BouncyCastle\io\StreamOverflowException.cs" />
+    <Compile Include="Org\BouncyCastle\math\BigInteger.cs" />
+    <Compile Include="Org\BouncyCastle\math\ec\abc\SimpleBigDecimal.cs" />
+    <Compile Include="Org\BouncyCastle\math\ec\abc\Tnaf.cs" />
+    <Compile Include="Org\BouncyCastle\math\ec\abc\ZTauElement.cs" />
+    <Compile Include="Org\BouncyCastle\math\ec\ECAlgorithms.cs" />
+    <Compile Include="Org\BouncyCastle\math\ec\ECCurve.cs" />
+    <Compile Include="Org\BouncyCastle\math\ec\ECFieldElement.cs" />
+    <Compile Include="Org\BouncyCastle\math\ec\ECPoint.cs" />
+    <Compile Include="Org\BouncyCastle\math\ec\IntArray.cs" />
+    <Compile Include="Org\BouncyCastle\math\ec\multiplier\ECMultiplier.cs" />
+    <Compile Include="Org\BouncyCastle\math\ec\multiplier\FpNafMultiplier.cs" />
+    <Compile Include="Org\BouncyCastle\math\ec\multiplier\PreCompInfo.cs" />
+    <Compile Include="Org\BouncyCastle\math\ec\multiplier\WNafMultiplier.cs" />
+    <Compile Include="Org\BouncyCastle\math\ec\multiplier\WNafPreCompInfo.cs" />
+    <Compile Include="Org\BouncyCastle\math\ec\multiplier\WTauNafMultiplier.cs" />
+    <Compile Include="Org\BouncyCastle\math\ec\multiplier\WTauNafPreCompInfo.cs" />
+    <Compile Include="Org\BouncyCastle\pkcs\AsymmetricKeyEntry.cs" />
+    <Compile Include="Org\BouncyCastle\pkcs\ContentInfo.cs" />
+    <Compile Include="Org\BouncyCastle\pkcs\EncryptedPrivateKeyInfoFactory.cs" />
+    <Compile Include="Org\BouncyCastle\pkcs\MacData.cs" />
+    <Compile Include="Org\BouncyCastle\pkcs\Pkcs12Entry.cs" />
+    <Compile Include="Org\BouncyCastle\pkcs\Pkcs12Store.cs" />
+    <Compile Include="Org\BouncyCastle\pkcs\PrivateKeyInfoFactory.cs" />
+    <Compile Include="Org\BouncyCastle\pkcs\X509CertificateEntry.cs" />
+    <Compile Include="Org\BouncyCastle\security\cert\CertificateException.cs" />
+    <Compile Include="Org\BouncyCastle\security\cert\CertificateExpiredException.cs" />
+    <Compile Include="Org\BouncyCastle\security\cert\CertificateNotYetValidException.cs" />
+    <Compile Include="Org\BouncyCastle\security\cert\CertificateParsingException.cs" />
+    <Compile Include="Org\BouncyCastle\security\CipherUtilities.cs" />
+    <Compile Include="Org\BouncyCastle\security\DigestUtilities.cs" />
+    <Compile Include="Org\BouncyCastle\security\GeneralSecurityException.cs" />
+    <Compile Include="Org\BouncyCastle\security\GeneratorUtilities.cs" />
+    <Compile Include="Org\BouncyCastle\security\InvalidKeyException.cs" />
+    <Compile Include="Org\BouncyCastle\security\InvalidParameterException.cs" />
+    <Compile Include="Org\BouncyCastle\security\KeyException.cs" />
+    <Compile Include="Org\BouncyCastle\security\MacUtilities.cs" />
+    <Compile Include="Org\BouncyCastle\security\ParameterUtilities.cs" />
+    <Compile Include="Org\BouncyCastle\security\PbeUtilities.cs" />
+    <Compile Include="Org\BouncyCastle\security\PrivateKeyFactory.cs" />
+    <Compile Include="Org\BouncyCastle\security\PublicKeyFactory.cs" />
+    <Compile Include="Org\BouncyCastle\security\SecureRandom.cs" />
+    <Compile Include="Org\BouncyCastle\security\SecurityUtilityException.cs" />
+    <Compile Include="Org\BouncyCastle\security\SignatureException.cs" />
+    <Compile Include="Org\BouncyCastle\security\SignerUtilities.cs" />
+    <Compile Include="Org\BouncyCastle\util\Arrays.cs" />
+    <Compile Include="Org\BouncyCastle\util\BigIntegers.cs" />
+    <Compile Include="Org\BouncyCastle\util\collections\EnumerableProxy.cs" />
+    <Compile Include="Org\BouncyCastle\util\collections\HashSet.cs" />
+    <Compile Include="Org\BouncyCastle\util\date\DateTimeUtilities.cs" />
+    <Compile Include="Org\BouncyCastle\util\encoders\Base64.cs" />
+    <Compile Include="Org\BouncyCastle\util\Enums.cs" />
+    <Compile Include="Org\BouncyCastle\util\io\PushbackStream.cs" />
+    <Compile Include="Org\BouncyCastle\util\io\Streams.cs" />
+    <Compile Include="Org\BouncyCastle\util\net\IPAddress.cs" />
+    <Compile Include="Org\BouncyCastle\util\Platform.cs" />
+    <Compile Include="Org\BouncyCastle\util\Strings.cs" />
+    <Compile Include="Org\BouncyCastle\X509\extension\X509ExtensionUtil.cs" />
+    <Compile Include="Org\BouncyCastle\X509\IX509Extension.cs" />
+    <Compile Include="Org\BouncyCastle\X509\PEMParser.cs" />
+    <Compile Include="Org\BouncyCastle\X509\SubjectPublicKeyInfoFactory.cs" />
+    <Compile Include="Org\BouncyCastle\X509\Time.cs" />
+    <Compile Include="Org\BouncyCastle\X509\X509Certificate.cs" />
+    <Compile Include="Org\BouncyCastle\X509\X509CertificateParser.cs" />
+    <Compile Include="Org\BouncyCastle\X509\X509ExtensionBase.cs" />
+    <Compile Include="Org\BouncyCastle\X509\X509SignatureUtil.cs" />
+    <Compile Include="Org\mozilla\Ude\CharsetDetector.cs" />
+    <Compile Include="Org\mozilla\Ude\Core\Big5Prober.cs" />
+    <Compile Include="Org\mozilla\Ude\Core\BitPackage.cs" />
+    <Compile Include="Org\mozilla\Ude\Core\CharDistributionAnalyser.cs" />
+    <Compile Include="Org\mozilla\Ude\Core\CharsetProber.cs" />
+    <Compile Include="Org\mozilla\Ude\Core\Charsets.cs" />
+    <Compile Include="Org\mozilla\Ude\Core\CodingStateMachine.cs" />
+    <Compile Include="Org\mozilla\Ude\Core\EscCharsetProber.cs" />
+    <Compile Include="Org\mozilla\Ude\Core\EscSM.cs" />
+    <Compile Include="Org\mozilla\Ude\Core\EUCJPProber.cs" />
+    <Compile Include="Org\mozilla\Ude\Core\EUCKRProber.cs" />
+    <Compile Include="Org\mozilla\Ude\Core\EUCTWProber.cs" />
+    <Compile Include="Org\mozilla\Ude\Core\GB18030Prober.cs" />
+    <Compile Include="Org\mozilla\Ude\Core\HebrewProber.cs" />
+    <Compile Include="Org\mozilla\Ude\Core\JapaneseContextAnalyser.cs" />
+    <Compile Include="Org\mozilla\Ude\Core\LangBulgarianModel.cs" />
+    <Compile Include="Org\mozilla\Ude\Core\LangCyrillicModel.cs" />
+    <Compile Include="Org\mozilla\Ude\Core\LangGreekModel.cs" />
+    <Compile Include="Org\mozilla\Ude\Core\LangHebrewModel.cs" />
+    <Compile Include="Org\mozilla\Ude\Core\LangHungarianModel.cs" />
+    <Compile Include="Org\mozilla\Ude\Core\LangThaiModel.cs" />
+    <Compile Include="Org\mozilla\Ude\Core\Latin1Prober.cs" />
+    <Compile Include="Org\mozilla\Ude\Core\MBCSGroupProber.cs" />
+    <Compile Include="Org\mozilla\Ude\Core\MBCSSM.cs" />
+    <Compile Include="Org\mozilla\Ude\Core\SBCharsetProber.cs" />
+    <Compile Include="Org\mozilla\Ude\Core\SBCSGroupProber.cs" />
+    <Compile Include="Org\mozilla\Ude\Core\SequenceModel.cs" />
+    <Compile Include="Org\mozilla\Ude\Core\SJISProber.cs" />
+    <Compile Include="Org\mozilla\Ude\Core\SMModel.cs" />
+    <Compile Include="Org\mozilla\Ude\Core\UniversalDetector.cs" />
+    <Compile Include="Org\mozilla\Ude\Core\UTF8Prober.cs" />
+    <Compile Include="Org\mozilla\Ude\DetectionConfidence.cs" />
+    <Compile Include="Org\mozilla\Ude\ICharsetDetector.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="System\Collections\ArrayList.cs" />
+    <Compile Include="System\Collections\Hashtable.cs" />
+    <Compile Include="System\Security\Cryptography\X509Certificate2.cs" />
+    <Compile Include="Utils\AfirmaMetroUtils.cs" />
+    <Compile Include="Utils\AsyncHelpers.cs" />
+    <Compile Include="Utils\Base64Encoder.cs" />
+    <Compile Include="Utils\CriptoManager.cs" />
+    <Compile Include="Utils\FileManager.cs" />
+    <Compile Include="Utils\GroupInfoCollection.cs" />
+    <Compile Include="Utils\StorageManager.cs" />
+    <Compile Include="Utils\UrlDecoder.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <AppxManifest Include="Package.appxmanifest">
+      <SubType>Designer</SubType>
+    </AppxManifest>
+    <None Include="App1_TemporaryKey.pfx" />
+    <PRIResource Include="Strings\es-ES\Resources.resw" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Assets\Logo.png" />
+    <Content Include="Assets\SmallLogo.png" />
+    <Content Include="Assets\SplashScreen.png" />
+    <Content Include="Assets\StoreLogo.png" />
+    <Content Include="Common\ReadMe.txt" />
+    <Content Include="Images\certificados.png" />
+    <Content Include="Images\fondo.jpg" />
+    <Content Include="Images\fondo.png" />
+    <Content Include="Images\logo 150x150.png" />
+    <Content Include="Images\logo 30x30.png" />
+    <Content Include="Images\logo 310x150.png" />
+    <Content Include="Images\logo 620x300.png" />
+    <Content Include="Images\logo aplicacion.png" />
+    <Content Include="Images\logo_cliente.png" />
+    <Content Include="Images\logo_de_lado.png" />
+    <Content Include="Images\logo_largo.png" />
+    <Content Include="Images\logo_recortado.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <ApplicationDefinition Include="App.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </ApplicationDefinition>
+    <Page Include="Common\LightStyles.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Common\StandardStyles.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="AboutPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="ErrorDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Preparing.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="CredentialPanel2.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="CredentialPanel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="MainPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+  </ItemGroup>
+  <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '11.0' ">
+    <VisualStudioVersion>11.0</VisualStudioVersion>
+  </PropertyGroup>
+  <Import Project="$(MSBuildExtensionsPath)\Microsoft\WindowsXaml\v$(VisualStudioVersion)\Microsoft.Windows.UI.Xaml.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

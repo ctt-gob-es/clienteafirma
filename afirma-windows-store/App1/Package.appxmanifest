@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Package xmlns="http://schemas.microsoft.com/appx/2010/manifest">
+  <Identity Name="b29dae0b-b9a1-4656-913e-35b656cd28f1" Publisher="CN=Tomas" Version="1.0.0.0" />
+  <Properties>
+    <DisplayName>App1</DisplayName>
+    <PublisherDisplayName>Tomas</PublisherDisplayName>
+    <Logo>Assets\StoreLogo.png</Logo>
+  </Properties>
+  <Prerequisites>
+    <OSMinVersion>6.2.1</OSMinVersion>
+    <OSMaxVersionTested>6.2.1</OSMaxVersionTested>
+  </Prerequisites>
+  <Resources>
+    <Resource Language="x-generate" />
+  </Resources>
+  <Applications>
+    <Application Id="App" Executable="$targetnametoken$.exe" EntryPoint="App1.App">
+      <VisualElements DisplayName="Cliente @firma (Gobierno de España)" Logo="images\logo 150x150.png" SmallLogo="images\logo 30x30.png" Description="Afirma WMetro" ForegroundText="light" BackgroundColor="#464646">
+        <DefaultTile ShowName="allLogos" WideLogo="images\logo 310x150.png" />
+        <SplashScreen Image="Images\logo 620x300.png" />
+      </VisualElements>
+      <Extensions>
+        <Extension Category="windows.protocol">
+          <Protocol Name="afirma" />
+        </Extension>
+      </Extensions>
+    </Application>
+  </Applications>
+  <Capabilities>
+    <Capability Name="internetClient" />
+  </Capabilities>
+</Package>
