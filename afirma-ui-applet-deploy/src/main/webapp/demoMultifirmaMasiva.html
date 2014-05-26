@@ -1,0 +1,373 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="es">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+		<script type="text/javascript" language="javascript" src="common-js/firma.js"></script>
+		<script type="text/javascript" language="javascript" src="common-js/instalador.js"></script>
+		<script type="text/javascript" language="javascript" src="constantes.js"></script>
+		<script type="text/javascript" language="javascript"><!--
+        	function operacionChanged(op)
+        	{
+			document.getElementById('operacion').value = op;
+        	}
+
+        	function dataChanged(data)
+        	{
+			if(data == "datos" || data == "fichero" || data == "hash"){
+				document.getElementById('tipoDatos').value = data;
+			}
+        	}
+
+        	function configurarOperacion()
+        	{
+			
+				configuraFirma();
+				
+				// Configuramos la configuracion de firma por defecto
+				clienteFirma.setSignatureAlgorithm(document.getElementById("algoritmo").value);
+				clienteFirma.setSignatureFormat(document.getElementById("formato").value);
+				clienteFirma.setSignatureMode(document.getElementById("modoFirma").value);
+				clienteFirma.setOriginalFormat(document.getElementById("ckOriginalFormat").checked);
+				clienteFirma.setMassiveOperation(parseOperation(document.getElementById("operacion").value));
+			}
+
+        	function realizarOperacion()
+        	{
+				// Comprobamos que se haya introducido al menos un fichero
+				var filesList = document.getElementById("rutas").value;
+				if(filesList == undefined || filesList == null || trim(filesList) == "") {
+					alert("No se ha indicado ning\u00FAn fichero sobre el que realizar la operaci\u00F3n.");
+					return;
+				}
+
+				// Limpiamos la configuracion del cliente
+				initialize();
+
+				// Configuramos los datos de la operacion
+				configurarOperacion();
+				
+				// Iniciamos la operacion masiva
+				clienteFirma.initMassiveSignature();
+				
+				// Firmamos cada uno de los ficheros introducidos en la forma indicada (firma de datos, firma de ficheros o hash)
+				var filesWithHeader = trim(document.getElementById("rutas").value).split('\n');
+			
+				// Realizamos la operacion. En un entorno en produccion, estos resultados (obtenidos como cadenas en base64) se
+				// guardarian en variables para despues operar con ellas o almacenarlas en disco. Es posible almacenar las firmas
+				// en disco mediante los metodos del applet:
+				//   -  setElectronicSignature(String): Recibe como parametro la firma en base64 y la guarda internamente.
+				//   -  setOutFilePath(String): Establece un directorio de salida.
+				//   -  saveSignToFile(): Almacena la firma en el directorio de salida indicado.
+				// Tengase en cuenta que, si no se estableciese un directorio de salida, el cliente preguntaria al usuario donde desea
+				// almacenar la firma, lo que llevarÃ­a a establecer la ruta de salida y cada fichero de firma sobreescribirÃ­a al anterior.
+				// La alternativa mas recomendable es el de asignar un nombre de salida para cada fichero pero, en caso de que sea el usuario
+				// quien deba establecerlo, se le puede pasar el parÃ¡metro "null" para obligar al cliente que lo pregunte cada vez.
+
+				for(i=0; i<filesWithHeader.length; i++)
+				{
+					var registry = trim(filesWithHeader[i]);
+					var pos = registry.indexOf(':');
+					var headerElements = registry.substring(0, pos).split(' ');
+
+					// Tomamos el tipo de operacion teniendo en cuenta que puede venir descrito por mas de una palabra.
+					var operation = headerElements[0];
+					for(j=1; j<headerElements.length-2; j++) {
+						operation += " " + headerElements[j];
+					}
+
+					// Tomamos el tipo de elemento (fichero, datos o hash)
+					var typeData = headerElements[headerElements.length-1];
+
+					// Tomamos el nombre de fichero
+					var file = trim(registry.substring(pos+2));
+
+					// Establecemos la operacion concreta
+					clienteFirma.setMassiveOperation(parseOperation(operation));
+
+					var result;
+					if(typeData == "datos") {
+						result = clienteFirma.massiveSignatureData(clienteFirma.getFileBase64Encoded(file, true));
+					}
+					else if(typeData == "fichero") {
+						result = clienteFirma.massiveSignatureFile(file);
+					}
+					else if(typeData == "hash") {
+						clienteFirma.setFileuri(file);
+						result = clienteFirma.massiveSignatureHash(clienteFirma.getFileHashBase64Encoded());
+					}
+
+					// AQUI OPERAREMOS CON LAS FIRMAS GENERADAS. COMUNMENTE ESTAS SE INCORPORARAN A UN FORMULARIO WEB PARA SU ENVIO A
+					// SERVIDOR.
+					
+					
+					// A CONTINUACION SE MUESTRA EL BLOQUE DE CODIGO QUE PERMITIRIA ALMACENAR LAS FIRMAS EN DISCO. TENGA EN CUENTA QUE
+					// ESTO EXIGIRIA LA APROBACION DEL USUARIO POR CADA FIRMA INDIVIDUAL
+					//if(result != undefined && result != null) {
+					//	clienteFirma.setElectronicSignature(result);
+					//	
+					//	/* El nombre de fichero y la extension deberan indicarse en base a la entrada de datos. Algunas opciones
+					//	 * serÃ­an agregar particulas al nombre (".firmado", ".cofirmado"...) segun la operacion o modificar la
+					//	 * extension de los ficheros resultados: firmas CMS/CAdES con extension ".csig", firmas XMLdSig/XAdES
+					//	 * con extension ".xsig" y firmas PDF, ODF y OOXML con la extension de entrada.
+					//	 * Aqui obviamos esta logica para no agregar complejidad al ejemplo. */
+					//	clienteFirma.setOutFilePath(file + ".firmado.sig");	
+					//	clienteFirma.saveSignToFile();
+					//}
+
+				}
+
+				// Finalizamos la operacion masiva
+				clienteFirma.endMassiveSignature();
+
+				// Cargamos el registro de log
+				loadLog(clienteFirma.getMassiveSignatureLog());
+			}
+
+			function trim(cad)
+			{
+				return cad.replace(/^(\s|\t|\r|\n)*|(\s|\t|\r|\n)*$/g,"");
+			}
+
+			function parseOperation(operation)
+			{
+				switch(operation) {
+					case "Firma":
+						return 'FIRMAR';
+					case "Cofirma":
+						return 'COFIRMAR';
+					case "Contrafirma completa":
+						return 'CONTRAFIRMAR_ARBOL';
+					case "Contrafirma de hojas":
+						return 'CONTRAFIRMAR_HOJAS';
+					default:
+						return 'FIRMAR';
+				}
+			}
+
+
+			function getOperationDescription()
+			{
+				return document.getElementById('operacion').value;
+			}
+
+			function getElementDescription()
+			{
+				return document.getElementById("tipoDatos").value;
+			}
+
+			function addFileData(uri)
+			{
+				// Comprobamos que se haya indicado algun fichero
+				if(uri == undefined || uri == null || trim(uri) == "") {
+					alert("No se ha indicado ning\u00FAn fichero sobre el que realizar la operaci\u00F3n.");
+					return;
+				}
+
+				// Comprobamos que no se intente cofirma o contrafirmar un hash (operaciones no validas)
+				if(document.getElementById('tipoDatos').value == "hash" && document.getElementById('operacion').value != "Firma") {
+					alert("La \u00FAnica operaci\u00F3n permitida sobre hash es la firma.");
+					return;
+				}
+
+				// Agregamos el fichero a la lista
+				var header = getOperationDescription() + " de " + getElementDescription() + ": ";
+				var x=document.getElementById("rutas");
+				x.value=x.value+header+uri+"\n";
+			}
+
+			// Muestra un texto en el panel del log
+			function loadLog(logText)
+			{
+				var panel = document.getElementById("logPosition");
+				panel.innerHTML = "<fieldset><legend>Resultado de la operaci&oacute;n:</legend>" +
+					"<textarea id='logger' readonly cols='50' rows='5' wrap='off'" +
+					"></textarea><br>" +
+					"<input type='button' onClick='guardarLog();' value='Guardar'>" +
+					"</fieldset>";
+
+				document.getElementById("logger").value = clienteFirma.getMassiveSignatureLog();
+			}
+
+			// Almacena el log en un fichero que debera designar el usuario
+			function guardarLog()
+			{
+				clienteFirma.setOutFilePath(null); // Eliminamos la configuracion establecida para que se le permita indicarla al usuario
+				clienteFirma.saveMassiveSignatureLog();
+			}
+		--></script>
+		<title>Demo de firma masiva program&aacute;tica</title>
+	</head>
+	<body>
+		<script type="text/javascript">
+			cargarAppletFirma();
+		</script>
+		<form name="prueba" id="prueba" action="">
+			<input type="hidden" value="Firma" id="operacion" >
+			<input type="hidden" value="fichero" id="tipoDatos" >
+
+			<table align="center">
+			<tr>
+				<td>
+					<fieldset><legend>Formato de firma por defecto</legend>
+					<table>
+						<tr>
+							<td><label for="algoritmo">Algoritmo</label></td>
+							<td><label for="formato">Formato</label></td>
+							<td><label for="modoFirma">Modo</label></td>
+						</tr>
+						<tr>
+							<td>
+								<select id="algoritmo">
+									<option value="SHA512withRSA" selected="selected">SHA512 con RSA</option>
+									<option value="SHA1withRSA">SHA1 con RSA</option>
+								</select>
+							</td>
+							<td>
+								<select id="formato">
+									<option value="CAdES" selected="selected">CAdES</option>
+									<option value="CMS/PKCS#7">CMS/PKCS#7</option>
+									<option value="XAdES Detached">XAdES/XAdES Detached</option>
+									<option value="XAdES Enveloped">XAdES Enveloped</option>
+									<option value="XAdES Enveloping" >XAdES Enveloping</option>
+									<option value="XMLDSig Detached">XMLDSig Detached</option>
+									<option value="XMLDSig Enveloped">XMLDSig Enveloped</option>
+									<option value="XMLDSig Enveloping">XMLDSig Enveloping</option>
+									<option value="PDF">Adobe PDF</option>
+									<option value="ODF">ODF (Open Document Format)</option>
+									<option value="OOXML">OOXML (Office Open XML)</option>
+								</select>
+							</td>
+							<td>
+								<select id="modoFirma">
+									<option value="explicit" selected="selected">Expl&iacute;cita</option>
+									<option value="implicit">Impl&iacute;cita</option>
+								</select>
+							</td>
+						</tr>
+						<tr>
+							<td colspan="3">
+								<input id="ckOriginalFormat" type="checkbox" checked="checked">
+								<label for="ckOriginalFormat">Respetar el formato original (S&oacute;lo cofirma y contrafirma)</label>
+							</td>
+						</tr>
+					</table>
+					</fieldset>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<fieldset><legend>Tipo de operaci&oacute;n</legend>
+					<table>
+						<tr>
+							<td>
+								<input id="rbFirmar" type="radio" name="operacion" value="Firma"
+								onchange="operacionChanged(this.value)" onclick="operacionChanged(this.value)" checked="checked" >
+								<label for="rbFirmar">Firmar</label>
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<input id="rbCofirmar" type="radio" name="operacion" value="Cofirma"
+								onchange="operacionChanged(this.value)" onclick="operacionChanged(this.value)" >
+									<label for="rbCofirmar">Co-firmar</label>
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<input id="rbContrafirmarArbol" type="radio" name="operacion" value="Contrafirma completa"
+								onchange="operacionChanged(this.value)" onclick="operacionChanged(this.value)" >
+								<label for="rbContrafirmarArbol">Contra-firmar &aacute;rbol de firma</label>
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<input id="rbContrafirmarHojas" type="radio" name="operacion" value="Contrafirma de hojas"
+								onchange="operacionChanged(this.value)" onclick="operacionChanged(this.value)" >
+								<label for="rbContrafirmarHojas">Contra-firmar nodos hoja</label>
+							</td>
+						</tr>
+					</table>
+					</fieldset>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<fieldset><legend>Tipo de elemento</legend>
+					<table>
+						<tr>
+							<td>
+								<input type="radio" id="rbFichero" name="dataType" value="fichero"
+								onchange="dataChanged(this.value)" onclick="dataChanged(this.value)" checked="checked" >
+									<label for="rbFichero">Fichero</label>
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<input type="radio" id="rbDatos" name="dataType" value="datos"
+								onchange="dataChanged(this.value)" onclick="dataChanged(this.value)" >
+								<label for="rbDatos">Datos<sup>*</sup></label>
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<input type="radio" id="rbHash" name="dataType" value="hash"
+								onchange="dataChanged(this.value)" onclick="dataChanged(this.value)" >
+									<label for="rbHash">Hash<sup>*</sup></label>
+							</td>
+						</tr>
+					</table>
+					</fieldset>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<fieldset><legend>Listado de ficheros</legend>
+					<table id="fileSelector">
+					<tr>
+						<td>
+							<label for="file_1">Ruta de fichero</label><br>
+							<input type="text" id="file_1" size="32">
+							<input type="button" id="addFileDataButton" onClick="addFileData(document.getElementById('file_1').value);" value="A&ntilde;adir fichero">
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<label for="rutas">Datos para operar</label><br>
+							<textarea id="rutas" readonly cols="50" rows="5"></textarea>
+						</td>
+					</tr>
+					</table>
+					</fieldset>
+				</td>
+			</tr>
+			<tr>
+				<td align="center">
+					<br><input name="btnFirma" type="button" title="Ejecutar operaci&oacute;n masiva" value="Firmar" onclick="realizarOperacion();">
+				</td>
+			</tr>
+
+			<!-- Aclaraciones -->
+			<tr>
+				<td>
+					<b>ADVERTENCIA: </b>Las firmas generadas no se almacenar&aacute;n.
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<sup>*</sup>La firma de datos y hash requiere que estos est&eacute;n en memoria. Para este ejemplo, se cargar&aacute;n
+					los ficheros seleccionados en memoria para simular esta situacion, lo que llevar&aacute; a mostrar mensajes de advertencia por
+					cada firma realizada. Consulte el apartado de firma masiva program&aacute;tica del manual del integrador para obtener m&aacute;s
+					informaci&oacute;n.
+				</td>
+			</tr>
+			
+			<!-- Bloque utilizado para mostrar los resultados de la operacion -->
+			<tr>
+				<td align="center" colspan="2" id="logPosition">
+					
+				</td>
+			</tr>
+		</table>
+		</form>
+	</body>
+</html>	

@@ -1,0 +1,80 @@
+
+body{ 
+	color: #395D96; 
+	background-color:#FFFFFF;
+	text-align: center;
+	}
+	
+fieldset 
+	{ 
+	color: #395D96;
+	background-color: #B4CDE6;
+	}
+	
+legend {
+	font-weight:bold;
+	}
+	
+table{
+	color: #395D96;
+	background-color:#B4CDE6;
+	}
+	
+td	{
+	font-weight:bold;
+	}
+
+form#prueba{
+	width: 40em;
+	margin: 0 auto;
+	text-align: left;
+	}
+	
+input#ficheroDatos, input#ficheroFirma, input#filtroCertificados{
+	width: 24em;
+	}
+	
+input#botonCifrar, input#botonDescifrar, input#botonAlgoritmo{
+	display: block;
+	width: 10em;
+	}	
+
+input#claveActual, input#archivoOriginal, input#archivoProcesado{
+	width: 32em;
+}
+
+input#dirFirm, input#exts, input#dirDest{
+	width: 36em;
+}	
+	
+div#dRadios{
+	width: 70%;
+}	
+	
+div#dBotones{
+	position: relative;
+	margin-top: -100px;
+	float: right;
+}	
+
+textarea#textoOriginal, input#archivoOriginal, textarea#textoProcesado, input#archivoProcesado{
+	display: block;
+	}	
+	
+label{
+	width: 100%;
+	float: left;
+	text-align: left;
+	margin-right: 0.5em;
+	display: block;
+	}	
+	
+select#firmantes{
+	font-family: monospace;
+	width: 100%;
+	min-width: 240px;
+	}
+
+.allWidth {
+	width: 100%;	
+}
