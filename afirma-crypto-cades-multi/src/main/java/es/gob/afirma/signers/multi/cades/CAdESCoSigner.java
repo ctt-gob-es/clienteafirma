@@ -57,7 +57,9 @@ import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.signers.AOPkcs1Signer;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AdESPolicy;
+import es.gob.afirma.signers.cades.CAdESSignerMetadata;
 import es.gob.afirma.signers.cades.CAdESUtils;
+import es.gob.afirma.signers.cades.CommitmentTypeIndicationBean;
 import es.gob.afirma.signers.pkcs7.AOAlgorithmID;
 import es.gob.afirma.signers.pkcs7.ContainsNoDataException;
 import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
@@ -140,31 +142,33 @@ final class CAdESCoSigner {
 	 *        atributo <i>Signing Certificate</i> <code>false</code> para
 	 *        usar la versi&oacute;n 1
 	 * @param key Clave privada usada para firmar.
+	 * @param certChain Cadena de certificados del firmante.
 	 * @param messageDigest
 	 *        Hash espec&iacute;fico para una firma.
 	 * @param contentType Tipo de contenido definido por su OID.
 	 * @param contentDescription Descripci&oacute;n textual del tipo de contenido firmado.
+	 * @param ctis Indicaciones sobre los tipos de compromisos adquiridos con la firma.
+	 * @param csm Metadatos sobre el firmante
 	 * @return El archivo de firmas con la nueva firma.
-	 * @throws java.io.IOException
-	 *         Si ocurre alg&uacute;n problema leyendo o escribiendo los
-	 *         datos
-	 * @throws java.security.NoSuchAlgorithmException
-	 *         Si no se soporta alguno de los algoritmos de firma o huella
-	 *         digital
-	 * @throws java.security.cert.CertificateException
-	 *         Si se produce alguna excepci&oacute;n con los certificados de
-	 *         firma.*/
+	 * @throws IOException Si ocurre alg&uacute;n problema leyendo o escribiendo los datos
+	 * @throws NoSuchAlgorithmException Si no se soporta alguno de los algoritmos de firma o huella
+	 *                                  digital
+	 * @throws CertificateException Si se produce alguna excepci&oacute;n con los certificados de
+	 *                              firma.*/
 	byte[] coSigner(final P7ContentSignerParameters parameters,
-			final byte[] signature,
-			final boolean omitContent,
-			final AdESPolicy policy,
-			final boolean signingCertificateV2,
-			final PrivateKey key,
-			final java.security.cert.Certificate[] certChain,
-			final byte[] messageDigest,
-			final String contentType,
-			final String contentDescription) throws IOException, NoSuchAlgorithmException, CertificateException {
-
+			        final byte[] signature,
+			        final boolean omitContent,
+			        final AdESPolicy policy,
+			        final boolean signingCertificateV2,
+			        final PrivateKey key,
+			        final java.security.cert.Certificate[] certChain,
+			        final byte[] messageDigest,
+			        final String contentType,
+			        final String contentDescription,
+			        final List<CommitmentTypeIndicationBean> ctis,
+			        final CAdESSignerMetadata csm) throws IOException,
+			                                              NoSuchAlgorithmException,
+			                                              CertificateException {
 		// LEEMOS EL FICHERO QUE NOS INTRODUCEN
 		final ASN1InputStream is = new ASN1InputStream(signature);
 		final ASN1Sequence dsq = (ASN1Sequence) is.readObject();
@@ -240,36 +244,38 @@ final class CAdESCoSigner {
 
 		ASN1Set signedAttr = null;
 		if (messageDigest == null) {
-			final ASN1EncodableVector contextExpecific =
-					CAdESUtils.generateSignerInfo(
-							(X509Certificate) certChain[0],
-							digestAlgorithm,
-							content2 != null ? content2 : parameters.getContent(),
-									policy,
-									signingCertificateV2,
-									null,
-									new Date(),
-									false,
-									contentType,
-									contentDescription
-							);
+			final ASN1EncodableVector contextExpecific = CAdESUtils.generateSignerInfo(
+				(X509Certificate) certChain[0],
+				digestAlgorithm,
+				content2 != null ? content2 : parameters.getContent(),
+				policy,
+				signingCertificateV2,
+				null,
+				new Date(),
+				false,
+				contentType,
+				contentDescription,
+				ctis,
+				csm
+			);
 			this.signedAttr2 = SigUtils.getAttributeSet(new AttributeTable(contextExpecific));
 			signedAttr = SigUtils.getAttributeSet(new AttributeTable(contextExpecific));
 		}
 		else {
-			final ASN1EncodableVector contextExpecific =
-					CAdESUtils.generateSignerInfo(
-							(X509Certificate) certChain[0],
-							digestAlgorithm,
-							null,
-							policy,
-							signingCertificateV2,
-							messageDigest,
-							new Date(),
-							false,
-							contentType,
-							contentDescription
-							);
+			final ASN1EncodableVector contextExpecific = CAdESUtils.generateSignerInfo(
+				(X509Certificate) certChain[0],
+				digestAlgorithm,
+				null,
+				policy,
+				signingCertificateV2,
+				messageDigest,
+				new Date(),
+				false,
+				contentType,
+				contentDescription,
+				ctis,
+				csm
+			);
 			this.signedAttr2 = SigUtils.getAttributeSet(new AttributeTable(contextExpecific));
 			signedAttr = SigUtils.getAttributeSet(new AttributeTable(contextExpecific));
 		}
@@ -313,8 +319,7 @@ final class CAdESCoSigner {
 	/** Constructor de la clase. Se crea una cofirma a partir de los datos del
 	 * firmante y del archivo que contiene las firmas.
 	 * @param signatureAlgorithm Algoritmo para la firma
-	 * @param signerCertificateChain Cadena de certificados para la construccion de los parametros
-	 *        de firma.
+	 * @param signerCertificateChain Cadena de certificados para la construccion de los parametros de firma.
 	 * @param signature Archivo que contiene las firmas.
 	 * @param policy Pol&iacute;tica de firma
 	 * @param signingCertificateV2
@@ -322,33 +327,33 @@ final class CAdESCoSigner {
 	 *        atributo <i>Signing Certificate</i> <code>false</code> para
 	 *        usar la versi&oacute;n 1
 	 * @param key Clave privada usada para firmar.
-	 * @param md
-	 *        Huella digital espec&iacute;fica para una firma.
+	 * @param certChain Cadena de certificados del firmante.
+	 * @param md Huella digital espec&iacute;fica para una firma.
 	 * @param contentType Tipo de contenido definido por su OID.
 	 * @param contentDescription Descripci&oacute;n textual del tipo de contenido firmado.
+	 * @param ctis Indicaciones sobre los tipos de compromisos adquiridos con la firma.
+	 * @param csm Metadatos sobre el firmante
 	 * @return El archivo de firmas con la nueva firma.
-	 * @throws java.io.IOException
-	 *         Si ocurre alg&uacute;n problema leyendo o escribiendo los
-	 *         datos
-	 * @throws java.security.NoSuchAlgorithmException
-	 *         Si no se soporta alguno de los algoritmos de firma o huella
-	 *         digital
-	 * @throws java.security.cert.CertificateException
-	 *         Si se produce alguna excepci&oacute;n con los certificados de
-	 *         firma.
-	 * @throws ContainsNoDataException Cuando la firma no contiene los datos
-	 * 		   ni fue generada con el mismo algoritmo de firma. */
+	 * @throws java.io.IOException Si ocurre alg&uacute;n problema leyendo o escribiendo los datos
+	 * @throws NoSuchAlgorithmException Si no se soporta alguno de los algoritmos de firma o huella digital
+	 * @throws CertificateException Si se produce alguna excepci&oacute;n con los certificados de firma.
+	 * @throws ContainsNoDataException Cuando la firma no contiene los datos ni fue generada con el mismo
+	 *                                 algoritmo de firma. */
 	byte[] coSigner(final String signatureAlgorithm,
-			final X509Certificate[] signerCertificateChain,
-			final InputStream signature,
-			final AdESPolicy policy,
-			final boolean signingCertificateV2,
-			final PrivateKey key,
-			final java.security.cert.Certificate[] certChain,
-			final byte[] md,
-			final String contentType,
-			final String contentDescription) throws IOException, NoSuchAlgorithmException, CertificateException, ContainsNoDataException {
-
+			        final X509Certificate[] signerCertificateChain,
+			        final InputStream signature,
+			        final AdESPolicy policy,
+			        final boolean signingCertificateV2,
+			        final PrivateKey key,
+			        final java.security.cert.Certificate[] certChain,
+			        final byte[] md,
+			        final String contentType,
+			        final String contentDescription,
+			        final List<CommitmentTypeIndicationBean> ctis,
+                    final CAdESSignerMetadata csm) throws IOException,
+			                                              NoSuchAlgorithmException,
+			                                              CertificateException,
+			                                              ContainsNoDataException {
 		// LEEMOS EL FICHERO QUE NOS INTRODUCEN
 		final ASN1InputStream is = new ASN1InputStream(signature);
 		final ASN1Sequence dsq = (ASN1Sequence) is.readObject();
@@ -441,35 +446,38 @@ final class CAdESCoSigner {
 		ASN1Set signedAttr;
 		// atributos firmados
 		if (contenidoDatos != null) {
-			final ASN1EncodableVector contextExpecific =
-					CAdESUtils.generateSignerInfo(
-							signerCertificateChain[0],
-							digestAlgorithm,
-							contenidoDatos,
-							policy,
-							signingCertificateV2,
-							null, // MessageDigest
-							new Date(),
-							false,
-							contentType,
-							contentDescription
-							);
+			final ASN1EncodableVector contextExpecific = CAdESUtils.generateSignerInfo(
+				signerCertificateChain[0],
+				digestAlgorithm,
+				contenidoDatos,
+				policy,
+				signingCertificateV2,
+				null, // MessageDigest
+				new Date(),
+				false,
+				contentType,
+				contentDescription,
+				ctis,
+				csm
+			);
 			this.signedAttr2 = SigUtils.getAttributeSet(new AttributeTable(contextExpecific));
 			signedAttr = SigUtils.getAttributeSet(new AttributeTable(contextExpecific));
 		}
 		else if (messageDigest != null) {
-			final ASN1EncodableVector contextExpecific =
-					CAdESUtils.generateSignerInfo(signerCertificateChain[0],
-							digestAlgorithm,
-							null,
-							policy,
-							signingCertificateV2,
-							messageDigest,
-							new Date(),
-							false,
-							contentType,
-							contentDescription
-							);
+			final ASN1EncodableVector contextExpecific = CAdESUtils.generateSignerInfo(
+				signerCertificateChain[0],
+				digestAlgorithm,
+				null,
+				policy,
+				signingCertificateV2,
+				messageDigest,
+				new Date(),
+				false,
+				contentType,
+				contentDescription,
+				ctis,
+				csm
+			);
 			this.signedAttr2 = SigUtils.getAttributeSet(new AttributeTable(contextExpecific));
 			signedAttr = SigUtils.getAttributeSet(new AttributeTable(contextExpecific));
 		}
@@ -503,8 +511,9 @@ final class CAdESCoSigner {
 	 * @param signatureAlgorithm
 	 *        Algoritmo para la firma
 	 * @param key Clave para firmar.
+	 * @param certChain Cadena de certificados del firmante.
 	 * @return Firma de los atributos.
-	 * @throws es.map.es.map.afirma.exceptions.AOException */
+	 * @throws AOException Cuando ocurre cualquier tipo de error */
 	private ASN1OctetString firma(final String signatureAlgorithm,
 			                      final PrivateKey key,
 			                      final java.security.cert.Certificate[] certChain) throws AOException {

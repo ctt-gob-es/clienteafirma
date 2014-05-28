@@ -153,6 +153,8 @@ public final class CAdESTriPhaseSigner {
      * @param padesMode <code>true</code> para generar una firma CAdES compatible PAdES, <code>false</code> para generar una firma CAdES normal
      * @param contentType Tipo de contenido definido por su OID.
      * @param contentDescription Descripci&oacute;n textual del tipo de contenido firmado.
+     * @param ctis Indicaciones sobre los tipos de compromisos adquiridos con la firma.
+     * @param csm Metadatos sobre el firmante.
      * @return Atributos CAdES a firmar (prefirma) en formato ASN.1
      * @throws AOException Cuando se produce cualquier error durante el proceso. */
     public static byte[] preSign(final String digestAlgorithmName,
@@ -164,7 +166,9 @@ public final class CAdESTriPhaseSigner {
                           final Date signDate,
                           final boolean padesMode,
                           final String contentType,
-                          final String contentDescription) throws AOException {
+                          final String contentDescription,
+                          final List<CommitmentTypeIndicationBean> ctis,
+                          final CAdESSignerMetadata csm) throws AOException {
 
         if (signerCertificateChain == null || signerCertificateChain.length == 0) {
             throw new IllegalArgumentException("La cadena de certificados debe contener al menos una entrada"); //$NON-NLS-1$
@@ -185,7 +189,9 @@ public final class CAdESTriPhaseSigner {
                      signDate,
                      padesMode,
                      contentType,
-                     contentDescription
+                     contentDescription,
+                     ctis,
+                     csm
                   )
                )
             );

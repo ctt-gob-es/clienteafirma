@@ -31,7 +31,9 @@ import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AdESPolicy;
+import es.gob.afirma.signers.cades.CAdESSignerMetadataHelper;
 import es.gob.afirma.signers.cades.CAdESTriPhaseSigner;
+import es.gob.afirma.signers.cades.CommitmentTypeIndicationsHelper;
 import es.gob.afirma.signers.pkcs7.AOAlgorithmID;
 import es.gob.afirma.signers.tsp.pkcs7.CMSTimestamper;
 import es.gob.afirma.signers.tsp.pkcs7.TsaRequestExtension;
@@ -221,7 +223,9 @@ public final class PAdESTriPhaseSigner {
                 signTime.getTime(), // Fecha de la firma (debe establecerse externamente para evitar desincronismos en la firma trifasica)
                 true, // Modo PAdES
                 PDF_OID,
-                PDF_DESC
+                PDF_DESC,
+                CommitmentTypeIndicationsHelper.getCommitmentTypeIndications(extraParams),
+                CAdESSignerMetadataHelper.getCAdESSignerMetadata(extraParams)
             ),
             signTime,
             extraParams

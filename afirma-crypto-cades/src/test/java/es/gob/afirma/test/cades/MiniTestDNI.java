@@ -76,7 +76,10 @@ public class MiniTestDNI {
         		"SHA-512", //$NON-NLS-1$
         		false,
         		null,
-        		null);
+        		null,
+        		null,
+        		null
+		);
 
         Assert.assertNotNull(firma);
 

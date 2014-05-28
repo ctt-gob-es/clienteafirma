@@ -17,6 +17,7 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Date;
+import java.util.List;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.signers.AOPkcs1Signer;
@@ -81,25 +82,30 @@ public final class GenCAdESEPESSignedData {
      *                                Si <code>dataDigest</code> es nulo el valor de este par&aacute;metro se ignora.
      * @param padesMode <code>true</code> para generar una firma CAdES compatible PAdES, <code>false</code> para generar una firma CAdES normal.
      * @param contentType Tipo de contenido definido por su OID.
-     * @param contentDescription Descripci&oacute;n textual del tipo de contendio.
+     * @param contentDescription Descripci&oacute;n textual del tipo de contenido.
+     * @param ctis Indicaciones sobre los tipos de compromisos adquiridos con la firma.
+     * @param csm Metadatos sobre el firmante.
      * @return La firma generada codificada en ASN.1 binario.
-     * @throws java.security.NoSuchAlgorithmException
-     *         Si no se soporta alguno de los algoritmos de firma o huella digital indicados
+     * @throws NoSuchAlgorithmException Si no se soporta alguno de los algoritmos de firma o huella digital indicados
      * @throws CertificateException En caso de cualquier problema con los certificados de firma.
      * @throws IOException En caso de cualquier problema leyendo o escribiendo los datos
      * @throws AOException Cuando ocurre alg&uacute;n error durante el proceso de codificaci&oacute;n ASN.1 */
     public static byte[] generateSignedData(final P7ContentSignerParameters parameters,
-                                     final boolean omitContent,
-                                     final AdESPolicy policy,
-                                     final boolean signingCertificateV2,
-                                     final PrivateKey key,
-                                     final Certificate[] certChain,
-                                     final byte[] dataDigest,
-                                     final String dataDigestAlgorithmName,
-                                     final boolean padesMode,
-                                     final String contentType,
-                                     final String contentDescription) throws NoSuchAlgorithmException, CertificateException, IOException, AOException {
-
+                                            final boolean omitContent,
+                                            final AdESPolicy policy,
+                                            final boolean signingCertificateV2,
+                                            final PrivateKey key,
+                                            final Certificate[] certChain,
+                                            final byte[] dataDigest,
+                                            final String dataDigestAlgorithmName,
+                                            final boolean padesMode,
+                                            final String contentType,
+                                            final String contentDescription,
+                                            final List<CommitmentTypeIndicationBean> ctis,
+                                            final CAdESSignerMetadata csm) throws NoSuchAlgorithmException,
+                                                                                  CertificateException,
+                                                                                  IOException,
+                                                                                  AOException {
         if (parameters == null) {
             throw new IllegalArgumentException("Los parametros no pueden ser nulos"); //$NON-NLS-1$
         }
@@ -120,7 +126,9 @@ public final class GenCAdESEPESSignedData {
             signDate,
             padesMode,
             contentType,
-            contentDescription
+            contentDescription,
+            ctis,
+            csm
         );
 
         final byte[] signature = new AOPkcs1Signer().sign(preSignature, signatureAlgorithm, key, certChain, null);
@@ -142,7 +150,9 @@ public final class GenCAdESEPESSignedData {
                 signDate,
                 padesMode,
                 contentType,
-                contentDescription
+                contentDescription,
+                ctis,
+                csm
             )
         );
 

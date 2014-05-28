@@ -23,7 +23,9 @@ import es.gob.afirma.core.signers.AOCoSigner;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AdESPolicy;
 import es.gob.afirma.signers.cades.AOCAdESSigner;
+import es.gob.afirma.signers.cades.CAdESSignerMetadataHelper;
 import es.gob.afirma.signers.cades.CAdESValidator;
+import es.gob.afirma.signers.cades.CommitmentTypeIndicationsHelper;
 import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
 
 /** Operaciones de cofirma CAdES. */
@@ -100,7 +102,9 @@ public class AOCAdESCoSigner implements AOCoSigner {
                 			certChain,
                     messageDigest,
                     contentTypeOid,
-                    contentDescription
+                    contentDescription,
+                    CommitmentTypeIndicationsHelper.getCommitmentTypeIndications(extraParams),
+                    CAdESSignerMetadataHelper.getCAdESSignerMetadata(extraParams)
                 );
             }
 
@@ -115,7 +119,9 @@ public class AOCAdESCoSigner implements AOCoSigner {
             			 certChain,
                  messageDigest,
                  contentTypeOid,
-                 contentDescription
+                 contentDescription,
+                 CommitmentTypeIndicationsHelper.getCommitmentTypeIndications(extraParams),
+                 CAdESSignerMetadataHelper.getCAdESSignerMetadata(extraParams)
             );
 
         }
@@ -175,7 +181,9 @@ public class AOCAdESCoSigner implements AOCoSigner {
 				    certChain,
 				    null, // null porque no nos pueden dar un hash en este metodo, tendria que ser en el que incluye datos
 				    contentTypeOid,
-				    contentDescription
+				    contentDescription,
+				    CommitmentTypeIndicationsHelper.getCommitmentTypeIndications(extraParams),
+				    CAdESSignerMetadataHelper.getCAdESSignerMetadata(extraParams)
 				);
 			}
             catch (final Exception e) {
@@ -199,7 +207,9 @@ public class AOCAdESCoSigner implements AOCoSigner {
             			 certChain,
                  null, // null porque no nos pueden dar un hash en este metodo, tendria que ser en el que incluye datos
                  contentTypeOid,
-                 contentDescription
+                 contentDescription,
+                 CommitmentTypeIndicationsHelper.getCommitmentTypeIndications(extraParams),
+                 CAdESSignerMetadataHelper.getCAdESSignerMetadata(extraParams)
             );
         }
         catch (final Exception e) {

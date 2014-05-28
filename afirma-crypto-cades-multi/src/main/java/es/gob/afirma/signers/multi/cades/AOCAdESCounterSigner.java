@@ -22,7 +22,9 @@ import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AdESPolicy;
 import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.signers.cades.AOCAdESSigner;
+import es.gob.afirma.signers.cades.CAdESSignerMetadataHelper;
 import es.gob.afirma.signers.cades.CAdESValidator;
+import es.gob.afirma.signers.cades.CommitmentTypeIndicationsHelper;
 import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
 import es.gob.afirma.signers.pkcs7.ReadNodesTree;
 
@@ -92,7 +94,9 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
 	                       new AdESPolicy(extraParams),
 	                       signingCertificateV2,
 	                       contentTypeOid,
-	                       contentDescription
+	                       contentDescription,
+	                       CommitmentTypeIndicationsHelper.getCommitmentTypeIndications(extraParams),
+	                       CAdESSignerMetadataHelper.getCAdESSignerMetadata(extraParams)
                     );
                 }
                 // CASO DE FIRMA DE HOJAS
@@ -111,7 +115,9 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
                                 new AdESPolicy(extraParams),
 								signingCertificateV2,
                                 contentTypeOid,
-                                contentDescription
+                                contentDescription,
+                                CommitmentTypeIndicationsHelper.getCommitmentTypeIndications(extraParams),
+                                CAdESSignerMetadataHelper.getCAdESSignerMetadata(extraParams)
                     		);
                 }
                 // CASO DE FIRMA DE NODOS
@@ -132,7 +138,9 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
                                 new AdESPolicy(extraParams),
 								signingCertificateV2,
                                 contentTypeOid,
-                                contentDescription
+                                contentDescription,
+                                CommitmentTypeIndicationsHelper.getCommitmentTypeIndications(xParams),
+                                CAdESSignerMetadataHelper.getCAdESSignerMetadata(extraParams)
                             );
                 }
                 // CASO DE FIRMA DE NODOS DE UNO O VARIOS FIRMANTES
@@ -156,7 +164,9 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
                                 new AdESPolicy(extraParams),
                                 signingCertificateV2,
                                 contentTypeOid,
-                                contentDescription
+                                contentDescription,
+                                CommitmentTypeIndicationsHelper.getCommitmentTypeIndications(xParams),
+                                CAdESSignerMetadataHelper.getCAdESSignerMetadata(extraParams)
                     		);
 
                 }
@@ -177,38 +187,40 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
                     0
                 };
 
-                dataSigned =
-                        new CAdESCounterSignerEnveloped().counterSigner(
-                    		csp,
-                            sign,
-                            CounterSignTarget.TREE,
-                            nodes,
-                            key,
-                            certChain,
-                            new AdESPolicy(extraParams),
-                            signingCertificateV2,
-                            contentTypeOid,
-                            contentDescription
-                        );
+                dataSigned = new CAdESCounterSignerEnveloped().counterSigner(
+            		csp,
+                    sign,
+                    CounterSignTarget.TREE,
+                    nodes,
+                    key,
+                    certChain,
+                    new AdESPolicy(extraParams),
+                    signingCertificateV2,
+                    contentTypeOid,
+                    contentDescription,
+                    CommitmentTypeIndicationsHelper.getCommitmentTypeIndications(xParams),
+                    CAdESSignerMetadataHelper.getCAdESSignerMetadata(extraParams)
+                );
             }
             // CASO DE FIRMA DE HOJAS
             else if (targetType == CounterSignTarget.LEAFS) {
                 final int[] nodes = {
                     0
                 };
-                dataSigned =
-                        new CAdESCounterSignerEnveloped().counterSigner(
-                    		csp,
-                            sign,
-                            CounterSignTarget.LEAFS,
-                            nodes,
-                            key,
-                            certChain,
-                            new AdESPolicy(extraParams),
-                            signingCertificateV2,
-                            contentTypeOid,
-                            contentDescription
-                		);
+                dataSigned = new CAdESCounterSignerEnveloped().counterSigner(
+            		csp,
+                    sign,
+                    CounterSignTarget.LEAFS,
+                    nodes,
+                    key,
+                    certChain,
+                    new AdESPolicy(extraParams),
+                    signingCertificateV2,
+                    contentTypeOid,
+                    contentDescription,
+                    CommitmentTypeIndicationsHelper.getCommitmentTypeIndications(xParams),
+                    CAdESSignerMetadataHelper.getCAdESSignerMetadata(extraParams)
+        		);
             }
             // CASO DE FIRMA DE NODOS
             else if (targetType == CounterSignTarget.NODES) {
@@ -227,7 +239,9 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
                     new AdESPolicy(extraParams),
                     signingCertificateV2,
                     contentTypeOid,
-                    contentDescription
+                    contentDescription,
+                    CommitmentTypeIndicationsHelper.getCommitmentTypeIndications(xParams),
+                    CAdESSignerMetadataHelper.getCAdESSignerMetadata(extraParams)
                 );
             }
             // CASO DE FIRMA DE NODOS DE UNO O VARIOS FIRMANTES
@@ -250,7 +264,9 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
                     new AdESPolicy(extraParams),
                     signingCertificateV2,
                     contentTypeOid,
-                    contentDescription
+                    contentDescription,
+                    CommitmentTypeIndicationsHelper.getCommitmentTypeIndications(xParams),
+                    CAdESSignerMetadataHelper.getCAdESSignerMetadata(extraParams)
                 );
             }
 

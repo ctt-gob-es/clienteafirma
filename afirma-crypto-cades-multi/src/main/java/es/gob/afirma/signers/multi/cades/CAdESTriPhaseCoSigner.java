@@ -49,7 +49,9 @@ import org.bouncycastle.cms.CMSProcessableByteArray;
 
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AdESPolicy;
+import es.gob.afirma.signers.cades.CAdESSignerMetadata;
 import es.gob.afirma.signers.cades.CAdESUtils;
+import es.gob.afirma.signers.cades.CommitmentTypeIndicationBean;
 import es.gob.afirma.signers.pkcs7.AOAlgorithmID;
 import es.gob.afirma.signers.pkcs7.SigUtils;
 
@@ -72,60 +74,68 @@ public final class CAdESTriPhaseCoSigner {
 	 * @param contentType Tipo de los datos a firmar
 	 * @param contentDescription Contenido de los datos a firmar
 	 * @param signDate Fecha de la firma
+	 * @param ctis Indicaciones sobre los tipos de compromisos adquiridos con la firma.
+	 * @param csm Metadatos sobre el firmante
 	 * @return Pre-cofirma CAdES (SignedAttributes de CAdES)
 	 * @throws CertificateEncodingException Si alguno de los certificados proporcionados tienen problemas de formatos
 	 * @throws NoSuchAlgorithmException Si no se soporta alg&uacute;n algoritmo necesario
 	 * @throws IOException Cuando ocurren problemas de entrada / salida */
-	public static byte[] preCoSign(
-			final byte[] content,
-			final String signatureAlgorithm,
-			final X509Certificate[] signerCertificateChain,
-			final AdESPolicy policy,
-			final boolean signingCertificateV2,
-			final byte[] messageDigest,
-			final String contentType,
-			final String contentDescription,
-			final Date signDate) throws CertificateEncodingException,
-			NoSuchAlgorithmException,
-			IOException {
-
+	public static byte[] preCoSign(final byte[] content,
+			                       final String signatureAlgorithm,
+			                       final X509Certificate[] signerCertificateChain,
+			                       final AdESPolicy policy,
+			                       final boolean signingCertificateV2,
+			                       final byte[] messageDigest,
+			                       final String contentType,
+			                       final String contentDescription,
+			                       final Date signDate,
+			                       final List<CommitmentTypeIndicationBean> ctis,
+			                       final CAdESSignerMetadata csm) throws CertificateEncodingException,
+			                                                                             NoSuchAlgorithmException,
+			                                                                             IOException {
 		return getSignedAttributes(
-				messageDigest,
-				signerCertificateChain,
-				AOSignConstants.getDigestAlgorithmName(signatureAlgorithm),
-				content,
-				signingCertificateV2,
-				policy,
-				contentType,
-				contentDescription,
-				signDate
-				).getEncoded(ASN1Encoding.DER);
+			messageDigest,
+			signerCertificateChain,
+			AOSignConstants.getDigestAlgorithmName(signatureAlgorithm),
+			content,
+			signingCertificateV2,
+			policy,
+			contentType,
+			contentDescription,
+			signDate,
+			ctis,
+			csm
+		).getEncoded(ASN1Encoding.DER);
 	}
 
 	private static ASN1Set getSignedAttributes(final byte[] messageDigest,
-			final X509Certificate[] signerCertificateChain,
-			final String digestAlgorithm,
-			final byte[] content,
-			final boolean signingCertificateV2,
-			final AdESPolicy policy,
-			final String contentType,
-			final String contentDescription,
-			final Date signDate) throws CertificateEncodingException,
-			NoSuchAlgorithmException,
-			IOException {
+			                                   final X509Certificate[] signerCertificateChain,
+			                                   final String digestAlgorithm,
+			                                   final byte[] content,
+			                                   final boolean signingCertificateV2,
+			                                   final AdESPolicy policy,
+			                                   final String contentType,
+			                                   final String contentDescription,
+			                                   final Date signDate,
+			                                   final List<CommitmentTypeIndicationBean> ctis,
+			                                   final CAdESSignerMetadata csm) throws CertificateEncodingException,
+			                                                                         NoSuchAlgorithmException,
+			                                                                         IOException {
 
-		final ASN1EncodableVector contextExpecific =
-				CAdESUtils.generateSignerInfo(signerCertificateChain[0],
-						digestAlgorithm,
-						content,
-						policy,
-						signingCertificateV2,
-						messageDigest,
-						signDate,
-						false,
-						contentType,
-						contentDescription
-						);
+		final ASN1EncodableVector contextExpecific = CAdESUtils.generateSignerInfo(
+			signerCertificateChain[0],
+			digestAlgorithm,
+			content,
+			policy,
+			signingCertificateV2,
+			messageDigest,
+			signDate,
+			false,
+			contentType,
+			contentDescription,
+			ctis,
+			csm
+		);
 		return SigUtils.getAttributeSet(new AttributeTable(contextExpecific));
 	}
 

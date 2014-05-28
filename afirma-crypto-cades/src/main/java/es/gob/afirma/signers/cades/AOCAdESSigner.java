@@ -172,7 +172,9 @@ public final class AOCAdESSigner implements AOSigner {
                    digestAlgoritmName,
                    Boolean.parseBoolean(extraParams.getProperty("padesMode", "false")), //$NON-NLS-1$ //$NON-NLS-2$
                    contentTypeOid,
-                   contentDescription
+                   contentDescription,
+                   CommitmentTypeIndicationsHelper.getCommitmentTypeIndications(extraParams),
+                   CAdESSignerMetadataHelper.getCAdESSignerMetadata(extraParams)
             );
         }
         catch (final Exception e) {
