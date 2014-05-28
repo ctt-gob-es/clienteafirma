@@ -48,7 +48,6 @@ public final class CustomUriDereferencer implements URIDereferencer {
     	return (URIDereferencer) instanceField.get(null);
 	}
 
-	@SuppressWarnings("restriction")
 	@Override
 	public Data dereference(final URIReference domRef, final XMLCryptoContext context) throws URIReferenceException {
 		try {

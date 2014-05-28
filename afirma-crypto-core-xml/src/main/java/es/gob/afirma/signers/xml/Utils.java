@@ -560,7 +560,6 @@ public final class Utils {
         }
     }
 
-    @SuppressWarnings("restriction")
 	private static void writeXMLwithXALAN(final Writer writer, final Node node, final String xmlEncoding) {
         final LSSerializer serializer = ((DOMImplementationLS) node.getOwnerDocument().getImplementation()).createLSSerializer();
         serializer.getDomConfig().setParameter("namespaces", Boolean.FALSE); //$NON-NLS-1$
