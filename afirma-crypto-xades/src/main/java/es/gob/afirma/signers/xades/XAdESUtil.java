@@ -25,6 +25,8 @@ import es.gob.afirma.core.AOException;
 
 final class XAdESUtil {
 
+	private static final String COMMITMENT_TYPE_INDICATOR_PROPERTY_PREFIX = "commitmentTypeIndication"; //$NON-NLS-1$
+
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma");	//$NON-NLS-1$
 
 	private static final String COMMITMENT_TYPE_IDENTIFIER_PROOF_OF_ORIGIN = "urn:oid:1.2.840.113549.1.9.16.6.1"; //$NON-NLS-1$
@@ -104,7 +106,7 @@ final class XAdESUtil {
 		for(int i=0;i<=nCtis;i++) {
 
 			// Identifier
-			tmpStr = xParams.getProperty("commitmentTypeIndication" + Integer.toString(i) + "Identifier"); //$NON-NLS-1$ //$NON-NLS-2$
+			tmpStr = xParams.getProperty(COMMITMENT_TYPE_INDICATOR_PROPERTY_PREFIX + Integer.toString(i) + "Identifier"); //$NON-NLS-1$
 			if (tmpStr == null) {
 				continue;
 			}
@@ -117,10 +119,10 @@ final class XAdESUtil {
 			}
 
 			// Description
-			description = xParams.getProperty("commitmentTypeIndication" + Integer.toString(i) + "Description"); //$NON-NLS-1$ //$NON-NLS-2$
+			description = xParams.getProperty(COMMITMENT_TYPE_INDICATOR_PROPERTY_PREFIX + Integer.toString(i) + "Description"); //$NON-NLS-1$
 
 			// DocumentationReferences
-			tmpStr = xParams.getProperty("commitmentTypeIndication" + Integer.toString(i) + "DocumentationReferences"); //$NON-NLS-1$ //$NON-NLS-2$
+			tmpStr = xParams.getProperty(COMMITMENT_TYPE_INDICATOR_PROPERTY_PREFIX + Integer.toString(i) + "DocumentationReferences"); //$NON-NLS-1$
 			if (tmpStr == null) {
 				documentationReferences = new ArrayList<String>(0);
 			}
@@ -141,7 +143,7 @@ final class XAdESUtil {
 			}
 
 			// CommitmentTypeQualifiers
-			tmpStr = xParams.getProperty("commitmentTypeIndication" + Integer.toString(i) + "CommitmentTypeQualifiers"); //$NON-NLS-1$ //$NON-NLS-2$
+			tmpStr = xParams.getProperty(COMMITMENT_TYPE_INDICATOR_PROPERTY_PREFIX + Integer.toString(i) + "CommitmentTypeQualifiers"); //$NON-NLS-1$
 			if (tmpStr == null) {
 				commitmentTypeQualifiers = new ArrayList<String>(0);
 			}
