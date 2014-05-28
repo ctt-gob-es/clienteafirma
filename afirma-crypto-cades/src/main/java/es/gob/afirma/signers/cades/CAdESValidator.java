@@ -49,6 +49,7 @@ public final class CAdESValidator {
      * @return <code>true</code> si los datos proporcionados se corresponden con una estructura de tipo <i>Data</i>,
      * <code>false</code> en caso contrario.
      * @throws IOException En caso de problemas leyendo el fichero */
+	@SuppressWarnings("unused")
 	static boolean isCAdESData(final byte[] data) throws IOException {
 
         // LEEMOS EL FICHERO QUE NOS INTRODUCEN
