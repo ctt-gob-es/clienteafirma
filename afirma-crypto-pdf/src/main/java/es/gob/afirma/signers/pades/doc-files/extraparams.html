@@ -9,7 +9,7 @@
  <body>
  <p>Valores aceptados como par&aacute;metros adicionales para las firmas PAdES:</p>
  <dl>
-  <dt><b><i>includeOnlySignningCertificate</i></b></dt>
+  <dt><b><i>includeOnlySignningCertificate</i></b> (propiedad compartida con XAdES y CAdES)</dt>
    <dd>
 	Si se establece a <code>true</code> se incluye en la firma &uacute;nicamente el certificado del firmante (y no la cadena de certificaci&oacute;n completa).
 	Si no se establece o se establece a o <code>false</code> se incluir&aacute; toda la cadena de certificaci&oacute;n.
@@ -268,7 +268,7 @@
    <dd>Nombre de usuario de la TSA.</dd>
   <dt><b><i>tsaPwd</i></b></dt>
    <dd>Contrase&ntilde;a del usuario de la TSA. Se ignora si no se ha establecido adem&aacute;s <code>tsaUsr</code>.</dd>
-  <dt><b><i>signingCertificateV2</i></b></dt>
+  <dt><b><i>signingCertificateV2</i></b> (propiedad compartida con CAdES)</dt>
    <dd>Si se indica a <code>true</code> se utilizar&aacute; SigningCertificateV2, si se indica cualquier otra cosa SigningCertificateV1.
    Si no se indica nada, se utilizar&aacute; V1 para las firmas SHA1 y V2 para el resto.</dd>
  </dl>

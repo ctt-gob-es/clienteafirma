@@ -9,7 +9,7 @@
  <body>
  <p>Valores aceptados como par&aacute;metros adicionales para las firmas CAdES:</p>
  <dl>
-   <dt><b><i>includeOnlySignningCertificate</i></b></dt>
+   <dt><b><i>includeOnlySignningCertificate</i></b> (propiedad compartida con XAdES y PAdES)</dt>
 	<dd>
 	 Si se establece a <code>true</code> se incluye en la firma &uacute;nicamente el certificado del firmante (y no la cadena de certificaci&oacute;n completa).
 	 Si no se establece o se establece a <code>false</code> se incluir&aacute; toda la cadena de certificaci&oacute;n.
@@ -52,7 +52,7 @@
        <code>data</code> son la huella digital de los datos a firmar, y no los datos a firmar en s&iacute;.
       </b>
      </dd>
-    <dt><b><i>signingCertificateV2</i></b></dt>
+    <dt><b><i>signingCertificateV2</i></b> (propiedad compartida con PAdES)</dt>
      <dd>
       Debe establecerse a <code>true</code> si se desea usar la versi&oacute;n 2 del atributo
       <i>Signing Certificate</i> de CAdES. Si no se establece un valor para este par&aacute;metro
