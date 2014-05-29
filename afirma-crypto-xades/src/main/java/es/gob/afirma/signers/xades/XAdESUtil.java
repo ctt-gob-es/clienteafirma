@@ -82,16 +82,12 @@ final class XAdESUtil {
 		SignerRole signerRole = null;
 		try {
 			final String claimedRole = extraParams.getProperty("signerClaimedRoles"); //$NON-NLS-1$
-			final String certifiedRole = extraParams.getProperty("signerCertifiedRole"); //$NON-NLS-1$
 			signerRole = new SignerRoleImpl();
 			if (claimedRole != null) {
 				String[] roles = claimedRole.split(Pattern.quote("|")); //$NON-NLS-1$
 				for (final String role : roles) {
 					signerRole.addClaimedRole(role);
 				}
-			}
-			if (certifiedRole != null) {
-				signerRole.addCertifiedRole(certifiedRole);
 			}
 		}
 		catch (final Exception e) {

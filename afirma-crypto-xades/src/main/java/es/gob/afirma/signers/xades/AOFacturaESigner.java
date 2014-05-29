@@ -41,7 +41,6 @@ public final class AOFacturaESigner implements AOSigner {
 
     private static final Set<String> ALLOWED_PARAMS = new HashSet<String>(5);
     static {
-        ALLOWED_PARAMS.add("signerCertifiedRole"); //$NON-NLS-1$
         ALLOWED_PARAMS.add("signatureProductionCity"); //$NON-NLS-1$
         ALLOWED_PARAMS.add("signatureProductionProvince"); //$NON-NLS-1$
         ALLOWED_PARAMS.add("signatureProductionPostalCode"); //$NON-NLS-1$
@@ -108,8 +107,6 @@ public final class AOFacturaESigner implements AOSigner {
      * @param extraParams Par&aacute;metros adicionales para la firma.
      * <p>Se aceptan los siguientes valores en el par&aacute;metro <code>xParams</code>:</p>
      * <dl>
-     *  <dt><b><i>signerCertifiedRole</i></b></dt>
-     *   <dd>Cargo confirmado para el firmante</dd>
      *  <dt><b><i>signatureProductionCity</i></b></dt>
      *   <dd>Ciudad en la que se realiza la firma</dd>
      *  <dt><b><i>signatureProductionProvince</i></b></dt>
