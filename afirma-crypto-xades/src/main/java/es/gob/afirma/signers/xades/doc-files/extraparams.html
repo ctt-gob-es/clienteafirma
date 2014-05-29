@@ -79,18 +79,18 @@
      </li>
     </ul>
    </dd>
-  <dt><b><i>policyIdentifier</i></b></dt>
+  <dt><b><i>policyIdentifier</i></b> (propiedad compartida con CAdES y PAdES)</dt>
    <dd>Identificador de la pol&iacute;tica de firma (normalmente una URL hacia la pol&iacute;tica en formato XML procesable o una URN de tipo OID).</dd>
-  <dt><b><i>policyIdentifierHash</i></b></dt>
+  <dt><b><i>policyIdentifierHash</i></b> (propiedad compartida con CAdES y PAdES)</dt>
    <dd>
     Huella digital del documento de pol&iacute;tica de firma (normalmente del mismo fichero en formato XML procesable).
     Si no se indica, es obligatorio que el par&aacute;metro <code>policyIdentifier</code> sea una URL accesible universalmente.
    </dd>
-  <dt><b><i>policyIdentifierHashAlgorithm</i></b></dt>
+  <dt><b><i>policyIdentifierHashAlgorithm</i></b> (propiedad compartida con CAdES y PAdES)</dt>
    <dd>Algoritmo usado para el c&aacute;lculo de la huella digital indicada en el par&aacute;metro <code>policyIdentifierHash</code>.
   <dt><b><i>policyDescription</i></b></dt>
    <dd>Descripci&oacute;n textual de la pol&iacute;tica</dd>
-  <dt><b><i>policyQualifier</i></b></dt>
+  <dt><b><i>policyQualifier</i></b> (propiedad compartida con CAdES y PAdES)</dt>
    <dd>URL hacia el documento (legible por personas, normalmente en formato PDF) descriptivo de la pol&iacute;tica de firma.</dd>
   <dt><b><i>includeOnlySignningCertificate</i></b></dt>
    <dd>
@@ -115,20 +115,20 @@
    </dd>
   <dt><b><i>pre-calculatedHashAlgorithm</i></b></dt>
    <dd>Algoritmo de huella digital cuando esta se proporciona precalculada.</dd>
-  <dt><b><i>signatureProductionCity</i></b></dt>
+  <dt><b><i>signatureProductionCity</i></b> (propiedad compartida con PAdES y CAdES)</dt>
    <dd>Ciudad en la que se realiza la firma.</dd>
   <dt><b><i>signatureProductionProvince</i></b></dt>
    <dd>Provincia en la que se realiza la firma.</dd>
-  <dt><b><i>signatureProductionPostalCode</i></b></dt>
+  <dt><b><i>signatureProductionPostalCode</i></b> (propiedad compartida con CAdES)</dt>
    <dd>C&oacute;digo postal en el que se realiza la firma.</dd>
-  <dt><b><i>signatureProductionCountry</i></b></dt>
+  <dt><b><i>signatureProductionCountry</i></b> (propiedad compartida con CAdES)</dt>
    <dd>Pa&iacute;s en el que se realiza la firma.</dd>
-  <dt><b><i>commitmentTypeIndications</i></b></dt>
+  <dt><b><i>commitmentTypeIndications</i></b> (propiedad compartida con CAdES)</dt>
    <dd>
     N&uacute;mero de <i>CommitmentTypeIndications</i> a a&ntilde;adir a la firma XAdES.<br>
     En los par&aacute;metros siguientes, los <i>CommitmentTypeIndications</i> se numeran a partir de 0 (cero).
    </dd>
-  <dt><b><i>commitmentTypeIndication</i>n<i>Identifier</i></b></dt>  
+  <dt><b><i>commitmentTypeIndication</i>n<i>Identifier</i></b> (propiedad compartida con CAdES)</dt>  
     <dd>
     Tipo de <i>CommitmentTypeIndication</i> (atributo obligatorio):
     <ul>

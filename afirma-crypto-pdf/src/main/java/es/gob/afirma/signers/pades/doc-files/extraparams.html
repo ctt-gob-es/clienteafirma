@@ -201,19 +201,19 @@
    </dd>
   <dt><b><i>signReason</i></b></dt>
    <dd>Raz&oacute;n por la que se realiza la firma (este dato se a&ntilde;ade al diccionario PDF, y no a la propia firma).</dd>
-  <dt><b><i>signatureProductionCity</i></b></dt>
+  <dt><b><i>signatureProductionCity</i></b> (propiedad compartida con XAdES y CAdES)</dt>
    <dd>Ciudad en la que se realiza la firma (este dato se a&ntilde;ade al diccionario PDF, y no a la propia firma).</dd>
   <dt><b><i>signerContact</i></b></dt>
    <dd>
     Contacto del firmante, usualmente una direcci&oacute;n de correo electr&oacute;nico
     (este dato se a&ntilde;ade al diccionario PDF, y no a la propia firma).
    </dd>
-  <dt><b><i>policyIdentifier</i></b></dt>
+  <dt><b><i>policyIdentifier</i></b> (propiedad compartida con XAdES y CAdES)</dt>
    <dd>
     Identificador de la pol&iacute;tica de firma. Debe ser un OID (o una URN de tipo OID) que identifique
     un&iacute;vocamente la pol&iacute;tica en formato ASN.1 procesable.
    </dd>
-  <dt><b><i>policyIdentifierHash</i></b></dt>
+  <dt><b><i>policyIdentifierHash</i></b> (propiedad compartida con XAdES y CAdES)</dt>
    <dd>
     Huella digital del documento de pol&iacute;tica de firma (normalmente del mismo fichero en formato ASN.1 procesable).
     Si no se indica una huella digital y el par&aacute;metro <code>policyIdentifier</code> no es una URL accesible
@@ -221,12 +221,12 @@
     <code>policyIdentifier</code> es una URL accesible universalmente, se descargara el fichero apuntado por la URL para calcular la huella
     digital <i>al vuelo</i>.
    </dd>
-  <dt><b><i>policyIdentifierHashAlgorithm</i></b></dt>
+  <dt><b><i>policyIdentifierHashAlgorithm</i></b> (propiedad compartida con XAdES y CAdES)</dt>
    <dd>
     Algoritmo usado para el c&aacute;lculo de la huella digital indicada en el par&aacute;metro <code>policyIdentifierHash</code>.
     Es obligatorio indicarlo cuando se proporciona una huella digital distinta de <code>0</code>.
    </dd>
-  <dt><b><i>policyQualifier</i></b></dt>
+  <dt><b><i>policyQualifier</i></b> (propiedad compartida con XAdES y CAdES)</dt>
    <dd>
     URL que apunta al documento descriptivo de la pol&iacute;tica de firma (normalmente un documento PDF con una descripci&oacute;n textual).
    </dd>
