@@ -22,12 +22,17 @@ public final class CAdESSignerMetadataHelper {
 		if (extraParams == null) {
 			return null;
 		}
-		final String postalAddressOneLine = extraParams.getProperty("signerLocationPostalAddress"); //$NON-NLS-1$
+		// signerLocationPostalAddress
+		final String postalAddressOneLine = extraParams.getProperty("signatureProductionPostalCode"); //$NON-NLS-1$
 		final String[] postalAddress = postalAddressOneLine == null ?
 			null :
 				postalAddressOneLine.split("\n"); //$NON-NLS-1$
-		final String country = extraParams.getProperty("signerLocationCountryName"); //$NON-NLS-1$
-		final String locality = extraParams.getProperty("signerLocationLocalityName"); //$NON-NLS-1$
+		
+		// signerLocationCountryName
+		final String country = extraParams.getProperty("signatureProductionCountry"); //$NON-NLS-1$
+		
+		// signerLocationLocalityName
+		final String locality = extraParams.getProperty("signatureProductionCity"); //$NON-NLS-1$
 		if (postalAddress != null || country != null || locality != null) {
 			return new CAdESSignerMetadata(
 				country,
