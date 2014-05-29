@@ -50,7 +50,6 @@ import net.java.xades.security.xml.XAdES.ObjectIdentifierImpl;
 import net.java.xades.security.xml.XAdES.SignaturePolicyIdentifier;
 import net.java.xades.security.xml.XAdES.SignatureProductionPlace;
 import net.java.xades.security.xml.XAdES.SignerRole;
-import net.java.xades.security.xml.XAdES.SignerRoleImpl;
 import net.java.xades.security.xml.XAdES.XAdES;
 import net.java.xades.security.xml.XAdES.XAdES_EPES;
 
@@ -994,21 +993,7 @@ public final class XAdESSigner {
 		}
 
 		// SignerRole
-		SignerRole signerRole = null;
-		try {
-			final String claimedRole = extraParams.getProperty("signerClaimedRole"); //$NON-NLS-1$
-			final String certifiedRole = extraParams.getProperty("signerCertifiedRole"); //$NON-NLS-1$
-			signerRole = new SignerRoleImpl();
-			if (claimedRole != null) {
-				signerRole.addClaimedRole(claimedRole);
-			}
-			if (certifiedRole != null) {
-				signerRole.addCertifiedRole(certifiedRole);
-			}
-		}
-		catch (final Exception e) {
-			// Se ignoran los errores, el parametro es opcional
-		}
+		SignerRole signerRole = XAdESUtil.parseSignerRole(extraParams);
 		if (signerRole != null) {
 			xades.setSignerRole(signerRole);
 		}

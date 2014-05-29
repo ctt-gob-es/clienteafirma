@@ -30,6 +30,7 @@ public final class TestCommitmentTypeIndications {
 	    p3.setProperty("commitmentTypeIndication0Description", "Prueba"); //$NON-NLS-1$ //$NON-NLS-2$
 	    p3.setProperty("commitmentTypeIndication0DocumentationReferences", "http://es.atos.net/es-es/home.html|http://atos.net/en-us/home.html"); //$NON-NLS-1$ //$NON-NLS-2$
 	    p3.setProperty("commitmentTypeIndication0CommitmentTypeQualifiers", "Q1|Q2|Q3"); //$NON-NLS-1$ //$NON-NLS-2$
+	    p3.setProperty("signerClaimedRole", "Papa de Roma"); //$NON-NLS-1$ //$NON-NLS-2$
     }
 
 	/** Prueba de XAdES Enveloped con inserci&oacute;n de CommitmentTypeIndication.

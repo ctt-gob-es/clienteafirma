@@ -17,6 +17,8 @@ import javax.xml.xpath.XPathFactory;
 import net.java.xades.security.xml.XAdES.CommitmentTypeIdImpl;
 import net.java.xades.security.xml.XAdES.CommitmentTypeIndication;
 import net.java.xades.security.xml.XAdES.CommitmentTypeIndicationImpl;
+import net.java.xades.security.xml.XAdES.SignerRole;
+import net.java.xades.security.xml.XAdES.SignerRoleImpl;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -71,6 +73,31 @@ final class XAdESUtil {
 			);
 		}
 		return (Element) nodeList.item(0);
+	}
+	
+	static SignerRole parseSignerRole(final Properties extraParams) {
+		if (extraParams == null) {
+			return null;
+		}
+		SignerRole signerRole = null;
+		try {
+			final String claimedRole = extraParams.getProperty("signerClaimedRoles"); //$NON-NLS-1$
+			final String certifiedRole = extraParams.getProperty("signerCertifiedRole"); //$NON-NLS-1$
+			signerRole = new SignerRoleImpl();
+			if (claimedRole != null) {
+				String[] roles = claimedRole.split(Pattern.quote("|")); //$NON-NLS-1$
+				for (final String role : roles) {
+					signerRole.addClaimedRole(role);
+				}
+			}
+			if (certifiedRole != null) {
+				signerRole.addCertifiedRole(certifiedRole);
+			}
+		}
+		catch (final Exception e) {
+			// Se ignoran los errores, el parametro es opcional
+		}
+		return signerRole;
 	}
 
 	static List<CommitmentTypeIndication> parseCommitmentTypeIndications(final Properties xParams, final String signedDataId) {

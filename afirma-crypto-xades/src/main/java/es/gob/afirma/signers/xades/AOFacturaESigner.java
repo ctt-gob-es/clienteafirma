@@ -56,7 +56,7 @@ public final class AOFacturaESigner implements AOSigner {
         EXTRA_PARAMS.setProperty("policyIdentifierHash", "Ohixl6upD6av8N7pEvDABhEL6hM=");  //$NON-NLS-1$//$NON-NLS-2$
         EXTRA_PARAMS.setProperty("policyIdentifierHashAlgorithm", DigestMethod.SHA1);         //$NON-NLS-1$
         EXTRA_PARAMS.setProperty("policyDescription", "facturae31"); //$NON-NLS-1$ //$NON-NLS-2$
-        EXTRA_PARAMS.setProperty("signerClaimedRole", "emisor"); //$NON-NLS-1$ //$NON-NLS-2$
+        EXTRA_PARAMS.setProperty("signerClaimedRoles", "emisor"); //$NON-NLS-1$ //$NON-NLS-2$
         EXTRA_PARAMS.setProperty("facturaeSign", "true"); //$NON-NLS-1$ //$NON-NLS-2$:P
     }
 

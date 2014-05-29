@@ -35,14 +35,14 @@
     Indica, mediante <code>true</code> o <code>false</code>, si debe
     incluirse el nodo <code>KeyName</code> dentro de <code>KeyInfo</code> de XAdES.
    </dd>
-  <dt><b><i>avoidXpathExtraTransformsOnEnveloped</i></b></dt>
+  <dt><b><i>avoidXpathExtraTransformsOnEnveloped</i></b> (&uacute;nicamente aplica a firmas <i>enveloped</i>)</dt>
    <dd>
 	Indica si se debe evitar la inclusi&oacute;n de la transformaci&oacute;n
 	XPATH2 que normalmente se a&ntilde;ade para posibilitar las cofirmas y
 	que elimina todas las firmas del documento para dejar &uacute;nicamente
 	el contenido. Por defecto, se encuentra a <code>false</code>.
    </dd>
-  <dt><b><i>nodeToSign</i></b></dt>
+  <dt><b><i>nodeToSign</i></b> (no aplica a contrafirmas)</dt>
    <dd>
 	Indica un nombre de nodo a firmar, para el caso en el que quiera firmarse
 	un nodo concreto en vez de todo el documento. Solo aplica a la firma de
@@ -54,7 +54,7 @@
 	<code>&lt;xs:attribute name="otronombre" type="xs:ID"/&gt;</code>), para evitar
 	conflictos con el esquema de XAdES y XMLDSig.
    </dd>
-  <dt><b><i>uri</i></b></dt>
+  <dt><b><i>uri</i></b> (no aplica a contrafirmas)</dt>
    <dd>URL en la que se encuentra el documento a firmar, necesario en el caso del formato <i>XAdES Externally Detached</i>.</dd>
   <dt><b><i>format</i></b></dt>
    <dd>
@@ -108,8 +108,11 @@
 	transformaci&oacute;n de canonicalizaci&oacute;n de la firma,
 	ni la transformaci&oacute;n XPATH en las firmas Enveloped.
    </dd>
-  <dt><b><i>signerClaimedRole</i></b></dt>
-   <dd>Cargo atribuido para el firmante.</dd>
+  <dt><b><i>signerClaimedRoles</i></b></dt>
+   <dd>
+    Lista de cargos atribuidos al firmante separados por el caracter '<i>|</i>'.<br>
+    Los cargos de la lista no pueden contener el caracter '<i>|</i>' (ya que este se usa como separador).
+   </dd>
   <dt><b><i>signerCertifiedRole</i></b></dt>
    <dd>Cargo confirmado para el firmante.</dd>
   <dt><b><i>pre-calculatedHashAlgorithm</i></b></dt>
@@ -177,7 +180,7 @@
      <li><i>http://www.w3.org/2001/04/xmlenc#ripemd160 (RIPEMD-160)</i></li>
     </ul>
    </dd>
-  <dt><b><i>mimeType</i></b></dt>
+  <dt><b><i>mimeType</i></b> (no aplica a contrafirmas)</dt>
    <dd>
     MIME-Type de los datos a firmar. Si no se indica se realiza una auto-detecci&oacute;n cuyo resultado puede
     ser inexacto.
@@ -186,7 +189,7 @@
    <dd>
     Codificaci&oacute;n de los datos a firmar.
    </dd>
-  <dt><b><i>contentTypeOid</i></b><dt>
+  <dt><b><i>contentTypeOid</i></b> (no aplica a contrafirmas)<dt>
    <dd>OID que identifica el tipo de datos a firmar.</dd>
   <dt><b><i>canonicalizationAlgorithm</i></b></dt>
    <dd>Algoritmo de canonicalizaci&oacute;n.</dd>
@@ -203,12 +206,12 @@
     <code>xadesNamespace</code> para evitar incoherencias en la versi&oacute;n de XAdES.<br>
     Si no se establece se usa el valor por defecto: <a href="http://uri.etsi.org/01903#SignedProperties">http://uri.etsi.org/01903#SignedProperties</a>.
    </dd>
-  <dt><b><i>ignoreStyleSheets</i></b></dt>
+  <dt><b><i>ignoreStyleSheets</i></b> (no aplica a contrafirmas)</dt>
    <dd>
     Ignora las hojas de estilo externas de los XML (no las firma) si se establece a <code>true</code>,
     si se establece a <code>false</code> act&uacute;a normalmente (s&iacute; las firma).
    </dd>
-  <dt><b><i>avoidBase64Transforms</i></b></dt>
+  <dt><b><i>avoidBase64Transforms</i></b> (no aplica a contrafirmas)</dt>
    <dd>
     No declara transformaciones Base64 incluso si son necesarias si se establece a <code>true</code>,
     si se establece a <code>false</code> act&uacute;a normalmente (s&iacute; las declara).

@@ -42,7 +42,6 @@ import net.java.xades.security.xml.XAdES.ObjectIdentifierImpl;
 import net.java.xades.security.xml.XAdES.SignaturePolicyIdentifier;
 import net.java.xades.security.xml.XAdES.SignatureProductionPlace;
 import net.java.xades.security.xml.XAdES.SignerRole;
-import net.java.xades.security.xml.XAdES.SignerRoleImpl;
 import net.java.xades.security.xml.XAdES.XAdES;
 import net.java.xades.security.xml.XAdES.XAdES_EPES;
 
@@ -101,82 +100,11 @@ public final class XAdESCounterSigner {
 	 *            <p>
 	 *            Cada uno de estos tipos se define en
 	 *            {@link es.gob.afirma.core.signers.CounterSignTarget}.
-	 * @param targets
-	 *            Listado de nodos o firmantes que se deben contrafirmar
-	 *            seg&uacute;n el {@code targetType} seleccionado.
+	 * @param targets Listado de nodos o firmantes que se deben contrafirmar 
+	 *                seg&uacute;n el {@code targetType} seleccionado.
 	 * @param key Clave privada a usar para firmar.
-	 * @param certChain
-	 * 			  Cadena de certificados del firmante
-	 * @param xParams
-	 *            Par&aacute;metros adicionales para la firma.
-	 *            <p>
-	 *            Se aceptan los siguientes valores en el par&aacute;metro
-	 *            <code>xParams</code>:
-	 *            </p>
-	 *            <dl>
-	 *            <dt><b><i>encoding</i></b></dt>
-	 *            <dd>Fuerza la codificaci&oacute;n del XML de salida (utf-8,
-	 *            iso-8859-1,...)</dd>
-	 *            <dt><b><i>policyIdentifier</i></b></dt>
-	 *            <dd>Identificador de la pol&iacute;tica de firma (normalmente
-	 *            una URL hacia la pol&iacute;tica en formato XML procesable)</dd>
-	 *            <dt><b><i>policyIdentifierHash</i></b></dt>
-	 *            <dd>
-	 *            Huella digital del documento de pol&iacute;tica de firma
-	 *            (normlamente del mismo fichero en formato XML procesable). Si
-	 *            no se indica, es obligatorio que el par&aacute;metro
-	 *            <code>policyIdentifier</code> sea una URL accesible
-	 *            universalmente</dd>
-	 *            <dt><b><i>policyIdentifierHashAlgorithm</i></b></dt>
-	 *            <dd>Algoritmo usado para el c&aacute;lculo de la huella
-	 *            digital indicada en el par&aacute;metro
-	 *            <code>policyIdentifierHash</code>
-	 *            <dt><b><i>policyDescription</i></b></dt>
-	 *            <dd>Descripci&oacute;n textual de la pol&iacute;tica</dd>
-	 *            <dt><b><i>policyQualifier</i></b></dt>
-	 *            <dd>URL hacia el documento (legible por personas, normalmente
-	 *            en formato PDF) descriptivo de la pol&iacute;tica de firma</dd>
-	 *            <dt><b><i>includeOnlySignningCertificate</i></b></dt>
-	 *            <dd>Indica, mediante un {@code true} o {@code false}, que debe
-	 *            indicarse en la firma &uacute;nicamente el certificado utilizado
-	 *            para firmar y no su cadena de certificaci&oacute;n completa.
-	 *            Por defecto, se incluir&aacute; toda la cadena de certificaci&oacute;n.</dd>
-	 *            <dt><b><i>signerClaimedRole</i></b></dt>
-	 *            <dd>Cargo atribuido para el firmante</dd>
-	 *            <dt><b><i>signerCertifiedRole</i></b></dt>
-	 *            <dd>Cargo confirmado para el firmante</dd>
-	 *            <dt><b><i>signatureProductionCity</i></b></dt>
-	 *            <dd>Ciudad en la que se realiza la firma</dd>
-	 *            <dt><b><i>signatureProductionProvince</i></b></dt>
-	 *            <dd>Provincia en la que se realiza la firma</dd>
-	 *            <dt><b><i>signatureProductionPostalCode</i></b></dt>
-	 *            <dd>C&oacute;digo postal en el que se realiza la firma</dd>
-	 *            <dt><b><i>signatureProductionCountry</i></b></dt>
-	 *            <dd>Pa&iacute;s en el que se realiza la firma</dd>
-	 *            <dt><b><i>applySystemDate</i></b></dt>
-	 *            <dd>
-	 *            Indica si se debe introducir en la firma el atributo
-	 *            <i>signingTime</i> con la fecha actual del sistema. Por
-	 *            defecto, se encuentra a {@code true}.</dd>
-	 *            <dt><b><i>xadesNamespace</i></b></dt>
-	 *            <dd>
-	 *            URL de definici&oacute;n del espacio de nombres de XAdES (y
-	 *            por extensi&oacute;n, versi&oacute;n de XAdES). Si se
-	 *            establece este par&aacute;metro es posible que se necesite
-	 *            establecer tambi&eacute;n el par&aacute;metro
-	 *            <code>signedPropertiesTypeUrl</code> para evitar incoherencias
-	 *            en la versi&oacute;n de XAdES.</dd>
-	 *            <dt><b><i>signedPropertiesTypeUrl</i></b></dt>
-	 *            <dd>
-	 *            URL de definici&oacute;n del tipo de las propiedades firmadas
-	 *            (<i>Signed Properties</i>) de XAdES. Si se establece este
-	 *            par&aacute;metro es posible que se necesite establecer
-	 *            tambi&eacute;n el par&aacute;metro <code>xadesNamespace</code>
-	 *            para evitar incoherencias en la versi&oacute;n de XAdES.<br>
-	 *            Si no se establece se usa el valor por defecto: <a
-	 *            href="http://uri.etsi.org/01903#SignedProperties"
-	 *            >http://uri.etsi.org/01903#SignedProperties</a>.</dd>
-	 *            </dl>
+	 * @param certChain Cadena de certificados del firmante
+	 * @param xParams Par&aacute;metros adicionales para la firma (<a href="doc-files/extraparams.html">detalle</a>)
 	 * @return Contrafirma en formato XAdES.
 	 * @throws AOException
 	 *             Cuando ocurre cualquier problema durante el proceso
@@ -663,20 +591,7 @@ public final class XAdESCounterSigner {
 		}
 
 		// SignerRole
-		SignerRole signerRole = null;
-		try {
-			final String claimedRole = extraParams.getProperty("signerClaimedRole"); //$NON-NLS-1$
-			final String certifiedRole = extraParams.getProperty("signerCertifiedRole"); //$NON-NLS-1$
-			signerRole = new SignerRoleImpl();
-			if (claimedRole != null) {
-				signerRole.addClaimedRole(claimedRole);
-			}
-			if (certifiedRole != null) {
-				signerRole.addCertifiedRole(certifiedRole);
-			}
-		} catch (final Exception e) {
-			// Se ignoran los errores, los parametros son opcionales
-		}
+		SignerRole signerRole = XAdESUtil.parseSignerRole(extraParams);
 		if (signerRole != null) {
 			xades.setSignerRole(signerRole);
 		}
