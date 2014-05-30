@@ -7,14 +7,28 @@ import java.util.List;
 public final class CAdESSignerMetadata {
 
 	private final CAdESSignerLocation signerLocation;
+	private final String[] signerClaimedRoles;
 
 	/** Construye los metadatos del firmante de una firma CAdES.
 	 * @param country Pa&iacute;s donde estaba situado el firmante en el momento de la firma.
 	 * @param locality Localidad donde estaba situado el firmante en el momento de la firma.
 	 * @param address Direcci&oacute;n postal (en m&aacute;ximo 6 l&iacute;neas) donde
-	 *                estaba situado el firmante en el momento de la firma. */
-	public CAdESSignerMetadata(final String country, final String locality, final List<String> address) {
+	 *                estaba situado el firmante en el momento de la firma.
+	 * @param claimedRoles Cargos atribuidos al firmante. */
+	public CAdESSignerMetadata(final String country,
+			                   final String locality,
+			                   final List<String> address,
+			                   final String... claimedRoles) {
 		this.signerLocation = new CAdESSignerLocation(country, locality, address);
+		this.signerClaimedRoles = claimedRoles != null ?
+									claimedRoles :
+										new String[0];
+	}
+
+	/** Obtiene los cargos atribuidos al firmante.
+	 * @return Cargos atribuidos al firmante. */
+	public String[] getClaimedRoles() {
+		return this.signerClaimedRoles;
 	}
 
 	/** Obtiene los metadatos de situaci&oacute;n del firmante en el momento de la firma.

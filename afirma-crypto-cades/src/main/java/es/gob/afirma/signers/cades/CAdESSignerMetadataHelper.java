@@ -27,10 +27,10 @@ public final class CAdESSignerMetadataHelper {
 		final String[] postalAddress = postalAddressOneLine == null ?
 			null :
 				postalAddressOneLine.split("\n"); //$NON-NLS-1$
-		
+
 		// signerLocationCountryName
 		final String country = extraParams.getProperty("signatureProductionCountry"); //$NON-NLS-1$
-		
+
 		// signerLocationLocalityName
 		final String locality = extraParams.getProperty("signatureProductionCity"); //$NON-NLS-1$
 		if (postalAddress != null || country != null || locality != null) {
