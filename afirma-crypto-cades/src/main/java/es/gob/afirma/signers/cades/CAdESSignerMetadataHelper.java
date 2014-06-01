@@ -15,6 +15,10 @@ import org.bouncycastle.asn1.esf.SignerLocation;
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public final class CAdESSignerMetadataHelper {
 
+	private CAdESSignerMetadataHelper() {
+		// No instanciable
+	}
+
 	/** Obtiene los metadatos del firmante a partir de los par&aacute;metros adicionales.
 	 * @param extraParams Par&aacute;metros adicionales que contienen las propiedades de los metadatos.
 	 * @return Metadatos del firmante */
