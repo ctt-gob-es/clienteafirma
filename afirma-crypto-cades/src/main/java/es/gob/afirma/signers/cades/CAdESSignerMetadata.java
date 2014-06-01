@@ -9,6 +9,8 @@ public final class CAdESSignerMetadata {
 	private final CAdESSignerLocation signerLocation;
 	private final String[] signerClaimedRoles;
 
+	private static final int POSTAL_ADDRESS_MAX_LINES = 6;
+
 	/** Construye los metadatos del firmante de una firma CAdES.
 	 * @param country Pa&iacute;s donde estaba situado el firmante en el momento de la firma.
 	 * @param locality Localidad donde estaba situado el firmante en el momento de la firma.
@@ -56,7 +58,7 @@ public final class CAdESSignerMetadata {
 					"Alguno de los datos del firmante debe ser distinto de nulo" //$NON-NLS-1$
 				);
 			}
-			if (address != null && address.size() > 6) {
+			if (address != null && address.size() > POSTAL_ADDRESS_MAX_LINES) {
 				throw new IllegalArgumentException(
 					"La direccion postal debe tener un maximo de seis lineas, y se han proporcionado " + address.size() //$NON-NLS-1$
 				);
@@ -79,6 +81,9 @@ public final class CAdESSignerMetadata {
 		}
 
 		/** Obtiene la direcci&oacute;n postal donde se encuentra el firmante.
+		 * <pre>
+		 *  PostalAddress ::= SEQUENCE SIZE(1..6) OF DirectoryString
+		 * </pre>
 		 * @return Direcci&oacute;n postal donde se encuentra el firmante. */
 		public List<String> getPostalAddress() {
 			return this.postalAddress;
