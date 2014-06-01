@@ -47,7 +47,7 @@ import es.gob.afirma.keystores.misc.JarSignatureCertExtractor;
 /** MiniApplet de firma del proyecto Afirma. */
 public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 
-	private static final String GOOGLE_ANALYTICS_TRACKING_CODE = "UA-77448-3"; //$NON-NLS-1$
+	private static final String GOOGLE_ANALYTICS_TRACKING_CODE = "UA-41615516-2"; //$NON-NLS-1$
 
 	private final StringBuilder dataStore = new StringBuilder();
 
