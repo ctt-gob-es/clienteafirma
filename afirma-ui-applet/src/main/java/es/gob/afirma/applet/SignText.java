@@ -12,7 +12,6 @@ package es.gob.afirma.applet;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.security.KeyStore.PrivateKeyEntry;
-import java.security.cert.CertPathValidatorException;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
@@ -42,8 +41,6 @@ import es.gob.afirma.keystores.KeyStoreUtilities;
 import es.gob.afirma.keystores.callbacks.NullPasswordCallback;
 import es.gob.afirma.keystores.filters.CertificateFilter;
 import es.gob.afirma.keystores.filters.rfc.RFC2254CertificateFilter;
-import es.gob.afirma.util.AOCertVerifier;
-import es.gob.afirma.util.AOCertificateRevokedException;
 
 
 /** Clase para la firma electr&oacute;nica de cadenas de texto simulando el
@@ -358,29 +355,17 @@ final class SignText {
 
                 for (final String al : aliasesByFriendlyName.keySet().toArray(new String[aliasesByFriendlyName.size()])) {
                     if (aliasesByFriendlyName.get(al).equals(certName) && this.kss != null) {
-                        final AOCertVerifier cv = new AOCertVerifier();
                         final X509Certificate tmpCert = this.kss.getCertificate(al);
                         if (tmpCert != null) {
                             String errorMessage = null;
                             try {
-                                cv.checkCertificate(
-                            		new java.security.cert.Certificate[] {
-                        				tmpCert
-                            		},
-                            		false
-                        		);
+                            	tmpCert.checkValidity();
                             }
                             catch (final CertificateExpiredException e) {
                                 errorMessage = AppletMessages.getString("SignText.5"); //$NON-NLS-1$
                             }
                             catch (final CertificateNotYetValidException e) {
                                 errorMessage = AppletMessages.getString("SignText.6"); //$NON-NLS-1$
-                            }
-                            catch (final CertPathValidatorException e) {
-                                errorMessage = AppletMessages.getString("SignText.7"); //$NON-NLS-1$
-                            }
-                            catch (final AOCertificateRevokedException e) {
-                                errorMessage = AppletMessages.getString("SignText.8"); //$NON-NLS-1$
                             }
                             catch (final Exception e) {
                                 errorMessage = AppletMessages.getString("SignText.9"); //$NON-NLS-1$
@@ -389,7 +374,8 @@ final class SignText {
                             if (errorMessage != null) {
                                 Logger.getLogger("es.gob.afirma").warning(errorMessage); //$NON-NLS-1$
                                 if (AOUIFactory.showConfirmDialog(
-                                		this.parent, cv.getErrorMessage() + "\r\n" + AppletMessages.getString("SignText.10"), //$NON-NLS-1$ //$NON-NLS-2$
+                                		this.parent,
+                                		errorMessage,
                                         AppletMessages.getString("SignApplet.658"), //$NON-NLS-1$
                                         AOUIFactory.YES_NO_OPTION,
                                         AOUIFactory.WARNING_MESSAGE

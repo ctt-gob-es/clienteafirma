@@ -104,12 +104,6 @@
 		</dependency>
 
 		<dependency>
-			<groupId>es.gob.afirma</groupId>
-			<artifactId>afirma-util</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		
-		<dependency>
 			<groupId>es.gob</groupId>
 			<artifactId>jmulticard-jse</artifactId>
 			<version>1.4</version>
