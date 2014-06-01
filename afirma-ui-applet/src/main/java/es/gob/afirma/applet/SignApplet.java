@@ -97,7 +97,7 @@ import es.gob.afirma.signers.cms.AOCMSSigner;
  * </ul> */
 public final class SignApplet extends JApplet implements EntryPointsCrypto, EntryPointsUtil {
 
-	private static final String GOOGLE_ANALYTICS_TRACKING_CODE = "UA-77448-3"; //$NON-NLS-1$
+	private static final String GOOGLE_ANALYTICS_TRACKING_CODE = "UA-41615516-3"; //$NON-NLS-1$
 
 	/** Estado del  modo DEBUG. Mantener a {@code false} en la compilaci&oacute;n final. */
 	private static final boolean DEBUG = true;
