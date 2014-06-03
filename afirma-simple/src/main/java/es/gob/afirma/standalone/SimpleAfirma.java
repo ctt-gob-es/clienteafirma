@@ -20,10 +20,13 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.RandomAccessFile;
+import java.net.URL;
 import java.nio.channels.FileLock;
 import java.security.cert.X509Certificate;
 import java.util.Locale;
@@ -40,6 +43,10 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
+
+import com.dmurph.tracking.AnalyticsConfigData;
+import com.dmurph.tracking.JGoogleAnalyticsTracker;
+import com.dmurph.tracking.JGoogleAnalyticsTracker.GoogleAnalyticsVersion;
 
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Platform;
@@ -63,6 +70,9 @@ import es.gob.afirma.standalone.ui.UIUtils;
  * </ul>
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public final class SimpleAfirma extends JApplet implements PropertyChangeListener, WindowListener {
+
+	private static final String GOOGLE_ANALYTICS_TRACKING_CODE = "UA-41615516-4"; //$NON-NLS-1$
+	private static final String IP_DISCOVERY_AUTOMATION = "http://checkip.amazonaws.com"; //$NON-NLS-1$
 
 	private static final String SYSTEM_PROPERTY_DEBUG_FILE = "afirma_debug"; //$NON-NLS-1$
 
@@ -521,6 +531,27 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
      *        Par&aacute;metros en l&iacute;nea de comandos */
     public static void main(final String[] args) {
 
+		// Google Analytics
+    	SwingUtilities.invokeLater(
+			new Runnable() {
+				@Override
+				public void run() {
+			    	try {
+						final AnalyticsConfigData config = new AnalyticsConfigData(GOOGLE_ANALYTICS_TRACKING_CODE);
+						final JGoogleAnalyticsTracker tracker = new JGoogleAnalyticsTracker(config, GoogleAnalyticsVersion.V_4_7_2);
+						tracker.trackPageView(
+							"firmafacil", //$NON-NLS-1$
+							"Firma Facil con @firma", //$NON-NLS-1$
+							getIp()
+						);
+			    	}
+			    	catch(final Exception e) {
+			    		LOGGER.warning("Error registrando datos en Google Analytics: " + e); //$NON-NLS-1$
+			    	}
+				}
+			}
+		);
+
     	// Configuramos el log de la aplicacion
     	configureLog();
 
@@ -632,10 +663,8 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
     	}
 	}
 
-    /**
-     * Configura que el log de la ejecuci&oacute;n se guarde tambien en fichero.
-     * @param Fichero en donde se almacenar&aacute; el log.
-     */
+    /** Configura que el registro de la ejecuci&oacute;n se guarde tambien en fichero.
+     * @param Fichero en donde se almacenar&aacute; el registro. */
     private static void configureFileLogger(final String logPath) {
 
     	try {
@@ -655,5 +684,18 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
     	catch (final Exception e) {
     		LOGGER.warning("No se pudo configurar el log en fichero: " + e); //$NON-NLS-1$
     	}
+    }
+
+    static String getIp() throws IOException {
+        final URL whatismyip = new URL(IP_DISCOVERY_AUTOMATION);
+        BufferedReader in = null;
+        in = new BufferedReader(
+    		new InputStreamReader(
+                whatismyip.openStream()
+            )
+		);
+        final String ip = in.readLine();
+        in.close();
+        return ip;
     }
 }
