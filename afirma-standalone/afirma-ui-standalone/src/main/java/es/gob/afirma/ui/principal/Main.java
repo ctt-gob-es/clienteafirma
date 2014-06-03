@@ -9,12 +9,21 @@
  */
 package es.gob.afirma.ui.principal;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
+
+import com.dmurph.tracking.AnalyticsConfigData;
+import com.dmurph.tracking.JGoogleAnalyticsTracker;
+import com.dmurph.tracking.JGoogleAnalyticsTracker.GoogleAnalyticsVersion;
 
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.ui.utils.Constants;
@@ -36,7 +45,7 @@ public final class Main {
     /** Indica si el SO tiene activado el alto contraste con color negro de fondo */
 	private static boolean isOSHighContrast = false;
 
-	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+	static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
     /** Preferencias generales establecidas para el aplicativo. */
 	private static final Preferences PREFERENCES = Preferences.userRoot().node(Constants.OUR_NODE_NAME);
@@ -44,9 +53,48 @@ public final class Main {
     /** Versi&oacute;n de la interfaz gr&aacute;fica de escritorio. */
     public static final String VERSION = "2.0"; //$NON-NLS-1$
 
+    private static final String GOOGLE_ANALYTICS_TRACKING_CODE = "UA-41615516-5"; //$NON-NLS-1$
+
+    private static final String IP_DISCOVERY_AUTOMATION = "http://checkip.amazonaws.com"; //$NON-NLS-1$
+
+    static String getIp() throws IOException {
+        final URL whatismyip = new URL(IP_DISCOVERY_AUTOMATION);
+        BufferedReader in = null;
+        in = new BufferedReader(
+    		new InputStreamReader(
+                whatismyip.openStream()
+            )
+		);
+        final String ip = in.readLine();
+        in.close();
+        return ip;
+    }
+
     /** Arranca la interfaz de escritorio del Cliente @firma.
      * @param args Par&aacute;metros de entrada. */
     public static void main(final String[] args) {
+
+		// Google Analytics
+    	SwingUtilities.invokeLater(
+			new Runnable() {
+				@Override
+				public void run() {
+			    	try {
+						final AnalyticsConfigData config = new AnalyticsConfigData(GOOGLE_ANALYTICS_TRACKING_CODE);
+						final JGoogleAnalyticsTracker tracker = new JGoogleAnalyticsTracker(config, GoogleAnalyticsVersion.V_4_7_2);
+						tracker.trackPageView(
+							"firmafacil", //$NON-NLS-1$
+							"@firma StandAlone " + VERSION, //$NON-NLS-1$
+							getIp()
+						);
+			    	}
+			    	catch(final Exception e) {
+			    		LOGGER.warning("Error registrando datos en Google Analytics: " + e); //$NON-NLS-1$
+			    	}
+				}
+			}
+		);
+
         if (System.getProperty("java.version").compareTo("1.6.0_18") < 0) { //$NON-NLS-1$ //$NON-NLS-2$
             CustomDialog.showMessageDialog(null, true, Messages.getString("main.requerido") + //$NON-NLS-1$
                                            System.getProperty("java.version") + ".<br>" + //$NON-NLS-1$ //$NON-NLS-2$
