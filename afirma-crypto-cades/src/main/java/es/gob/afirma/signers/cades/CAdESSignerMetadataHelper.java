@@ -57,6 +57,9 @@ public final class CAdESSignerMetadataHelper {
 		if (csl == null) {
 			return null;
 		}
+		if (csl.getCountryName() == null && csl.getLocalityName() == null && csl.getPostalAddress() == null) {
+			return null;
+		}
 		final List<String> postalAddress = csl.getPostalAddress();
 		List<ASN1Encodable> postalAdressAsn1List = null;
 		if (postalAddress != null) {
@@ -66,8 +69,8 @@ public final class CAdESSignerMetadataHelper {
 			}
 		}
 		return new SignerLocation(
-			new DERUTF8String(csl.getCountryName()),
-			new DERUTF8String(csl.getLocalityName()),
+			csl.getCountryName() != null ? new DERUTF8String(csl.getCountryName()) : null,
+			csl.getLocalityName() != null ? new DERUTF8String(csl.getLocalityName()) : null,
 			postalAdressAsn1List != null ?
 				new DERSequence(
 					postalAdressAsn1List.toArray(new ASN1Encodable[0])
