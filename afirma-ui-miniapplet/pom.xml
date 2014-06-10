@@ -6,17 +6,14 @@
 	<groupId>es.gob.afirma</groupId>
 	<artifactId>afirma-ui-miniapplet</artifactId>
 	<name>afirma-ui-miniapplet</name>
-	
-	<parent>
-		<groupId>es.gob.afirma</groupId>
-		<artifactId>afirma-client-base</artifactId>
-		<version>3.3.2-SNAPSHOT</version>
-		<relativePath>../../../../pom.xml</relativePath>
-	</parent>
-	
-	<properties>
-        <afirma.keytool.keystore>${basedir}/afirma.keystore</afirma.keytool.keystore>
-	</properties>
+	<version>3.3.2-SNAPSHOT</version>
+
+  <properties>
+    <project.build.sourceEncoding>utf-8</project.build.sourceEncoding>
+    <afirma.keytool.keystore>${basedir}/afirma.keystore</afirma.keytool.keystore>
+    <afirma.keytool.alias>codesign</afirma.keytool.alias>
+    <afirma.keytool.password>afirma</afirma.keytool.password>
+  </properties>
 
 	<profiles>
 		<profile>
@@ -160,7 +157,14 @@
   					<artifactId>JGoogleAnalyticsTracker</artifactId>
   					<version>1.2.0</version>
 				</dependency>
-				
+
+        <dependency>
+          <groupId>junit</groupId>
+          <artifactId>junit</artifactId>
+          <version>4.8.2</version>
+          <scope>test</scope>
+        </dependency>
+
 			</dependencies>
 		</profile>
 	</profiles>
@@ -211,7 +215,8 @@
 						</filter>
 					</filters>
 				</configuration>
-			</plugin>
+</plugin>
+<!--
 			<plugin>
 				<groupId>com.github.wvengen</groupId>
 				<artifactId>proguard-maven-plugin</artifactId>
@@ -241,7 +246,8 @@
                         <version>4.9</version>
                     </dependency>
                 </dependencies>
-			</plugin>
+      </plugin>
+-->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
