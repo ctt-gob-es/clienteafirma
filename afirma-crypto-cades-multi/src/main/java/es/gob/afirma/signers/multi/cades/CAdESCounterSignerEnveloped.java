@@ -116,8 +116,6 @@ final class CAdESCounterSignerEnveloped {
      *        <code>true</code> si se desea usar la versi&oacute;n 2 del
      *        atributo <i>Signing Certificate</i> <code>false</code> para
      *        usar la versi&oacute;n 1
-     * @param contentType
-     * 		  Tipo de contenido definido por su OID.
      * @param contentDescription Descripci&oacute;n textual del tipo de contenido firmado.
      * @param ctis Indicaciones sobre los tipos de compromisos adquiridos con la firma.
      * @param csm Metadatos sobre el firmante.
@@ -140,7 +138,6 @@ final class CAdESCounterSignerEnveloped {
                          final java.security.cert.Certificate[] certChain,
                          final AdESPolicy policy,
                          final boolean signingCertificateV2,
-                         final String contentType,
                          final String contentDescription,
                          final List<CommitmentTypeIndicationBean> ctis,
                          final CAdESSignerMetadata csm) throws IOException, NoSuchAlgorithmException, CertificateException, AOException {
@@ -201,7 +198,6 @@ final class CAdESCounterSignerEnveloped {
         		parameters,
         		key,
         		certChain,
-                contentType,
                 contentDescription,
                 ctis,
                 csm
@@ -214,7 +210,6 @@ final class CAdESCounterSignerEnveloped {
         		parameters,
         		key,
         		certChain,
-                contentType,
                 contentDescription,
                 ctis,
                 csm
@@ -234,7 +229,6 @@ final class CAdESCounterSignerEnveloped {
             		parameters,
             		key,
             		certChain,
-                    contentType,
                     contentDescription,
                     nodo,
                     ctis,
@@ -272,7 +266,6 @@ final class CAdESCounterSignerEnveloped {
             		parameters,
             		key,
             		certChain,
-                    contentType,
                     contentDescription,
                     nodo,
                     ctis,
@@ -317,7 +310,6 @@ final class CAdESCounterSignerEnveloped {
      *        Par&aacute;metros necesarios para firmar un determinado
      *        SignerInfo
      * @param key Clave privada a usar para firmar
-     * @param contentType Tipo de contenido definido por su OID.
      * @param contentDescription Descripci&oacute;n textual del tipo de contenido firmado.
      * @param ctis Indicaciones sobre los tipos de compromisos adquiridos con la firma.
      * @param csm Metadatos sobre el firmante.
@@ -330,7 +322,6 @@ final class CAdESCounterSignerEnveloped {
                                             final P7ContentSignerParameters parameters,
                                             final PrivateKey key,
                                             final java.security.cert.Certificate[] certChain,
-                                            final String contentType,
                                             final String contentDescription,
                                             final List<CommitmentTypeIndicationBean> ctis,
                                             final CAdESSignerMetadata csm) throws NoSuchAlgorithmException,
@@ -347,7 +338,6 @@ final class CAdESCounterSignerEnveloped {
             		parameters,
             		key,
             		certChain,
-            		contentType,
             		contentDescription,
             		ctis,
             		csm
@@ -368,7 +358,6 @@ final class CAdESCounterSignerEnveloped {
      *        SignerInfo hoja.
      * @param key Clave privada a usar para firmar.
      * @param certChain Cadena de certificados del firmante.
-     * @param contentType Tipo de contenido definido por su OID.
      * @param contentDescription Descripci&oacute;n textual del tipo de contenido firmado.
      * @param ctis Indicaciones sobre los tipos de compromisos adquiridos con la firma.
      * @param csm Metadatos sobre el firmante.
@@ -381,7 +370,6 @@ final class CAdESCounterSignerEnveloped {
                                             final P7ContentSignerParameters parameters,
                                             final PrivateKey key,
                                             final java.security.cert.Certificate[] certChain,
-                                            final String contentType,
                                             final String contentDescription,
                                             final List<CommitmentTypeIndicationBean> ctis,
                                             final CAdESSignerMetadata csm) throws NoSuchAlgorithmException,
@@ -398,7 +386,6 @@ final class CAdESCounterSignerEnveloped {
             		parameters,
             		key,
             		certChain,
-            		contentType,
             		contentDescription,
             		ctis,
             		csm
@@ -416,7 +403,6 @@ final class CAdESCounterSignerEnveloped {
      *        <code>SignerInfo</code> hoja.
      * @param key Clave privada a usar para firmar.
      * @param certChain Cadena de certificados del firmante.
-     * @param contentType Tipo de contenido definido por su OID.
      * @param contentDescription Descripci&oacute;n textual del tipo de contenido firmado.
      * @param nodo Nodo signerInfo a firmar.
      * @param ctis Indicaciones sobre los tipos de compromisos adquiridos con la firma.
@@ -430,7 +416,6 @@ final class CAdESCounterSignerEnveloped {
                                             final P7ContentSignerParameters parameters,
                                             final PrivateKey key,
                                             final java.security.cert.Certificate[] certChain,
-                                            final String contentType,
                                             final String contentDescription,
                                             final int nodo,
                                             final List<CommitmentTypeIndicationBean> ctis,
@@ -456,7 +441,6 @@ final class CAdESCounterSignerEnveloped {
             		parameters,
             		key,
             		certChain,
-            		contentType,
             		contentDescription,
             		ctis,
             		csm
@@ -469,7 +453,6 @@ final class CAdESCounterSignerEnveloped {
                 		parameters,
                 		key,
                 		certChain,
-                        contentType,
                         contentDescription,
                         nodo,
                         ctis,
@@ -495,8 +478,6 @@ final class CAdESCounterSignerEnveloped {
      *        SignerInfo hoja.
      * @param key Clave privada a usar para firmar.
      * @param certChain Cadena de certificados del firmante.
-     * @param contentType
-     * 		  Tipo de contenido definido por su OID.
      * @param contentDescription Descripci&oacute;n textual del tipo de contenido firmado.
      * @param ctis Indicaciones sobre los tipos de compromisos adquiridos con la firma.
      * @param csm Metadatos sobre el firmante.
@@ -510,7 +491,6 @@ final class CAdESCounterSignerEnveloped {
                                             final P7ContentSignerParameters parameters,
                                             final PrivateKey key,
                                             final java.security.cert.Certificate[] certChain,
-                                            final String contentType,
                                             final String contentDescription,
                                             final List<CommitmentTypeIndicationBean> ctis,
                                             final CAdESSignerMetadata csm) throws NoSuchAlgorithmException,
@@ -536,7 +516,6 @@ final class CAdESCounterSignerEnveloped {
                         		parameters,
                         		key,
                         		certChain,
-                                contentType,
                                 contentDescription,
                                 ctis,
                                 csm
@@ -555,7 +534,6 @@ final class CAdESCounterSignerEnveloped {
         		signerInfo,
         		key,
         		certChain,
-                contentType,
                 contentDescription,
                 ctis,
                 csm
@@ -597,7 +575,6 @@ final class CAdESCounterSignerEnveloped {
                         		signerInfo,
                         		key,
                         		certChain,
-                                contentType,
                                 contentDescription,
                                 ctis,
                                 csm
@@ -639,7 +616,6 @@ final class CAdESCounterSignerEnveloped {
             		signerInfo,
             		key,
             		certChain,
-            		contentType,
             		contentDescription,
             		ctis,
             		csm
@@ -669,8 +645,6 @@ final class CAdESCounterSignerEnveloped {
      *        SignerInfo hoja.
      * @param key Clave privada a usar para firmar.
      * @param certChain Cadena de certificados del firmante.
-     * @param contentType
-     * 		  Tipo de contenido definido por su OID.
      * @param contentDescription Descripci&oacute;n textual del tipo de contenido firmado.
      * @param ctis Indicaciones sobre los tipos de compromisos adquiridos con la firma.
      * @param csm Metadatos sobre el firmante.
@@ -684,7 +658,6 @@ final class CAdESCounterSignerEnveloped {
                                                 final P7ContentSignerParameters parameters,
                                                 final PrivateKey key,
                                                 final java.security.cert.Certificate[] certChain,
-                                                final String contentType,
                                                 final String contentDescription,
                                                 final List<CommitmentTypeIndicationBean> ctis,
                                                 final CAdESSignerMetadata csm) throws NoSuchAlgorithmException,
@@ -710,7 +683,6 @@ final class CAdESCounterSignerEnveloped {
                         		parameters,
                         		key,
                         		certChain,
-                        		contentType,
                         		contentDescription,
                         		ctis,
                         		csm
@@ -765,7 +737,6 @@ final class CAdESCounterSignerEnveloped {
             		signerInfo,
             		key,
             		certChain,
-            		contentType,
             		contentDescription,
             		ctis,
             		csm
@@ -796,8 +767,6 @@ final class CAdESCounterSignerEnveloped {
      *        SignerInfo hoja.
      * @param key Clave privada a usar para firmar.
      * @param certChain Cadena de certificados del firmante.
-     * @param contentType
-     * 		  Tipo de contenido definido por su OID.
      * @param contentDescription Descripci&oacute;n textual del tipo de contenido firmado.
      * @param ctis Indicaciones sobre los tipos de compromisos adquiridos con la firma.
      * @param csm Metadatos sobre el firmante.
@@ -810,7 +779,6 @@ final class CAdESCounterSignerEnveloped {
                                                 final P7ContentSignerParameters parameters,
                                                 final PrivateKey key,
                                                 final java.security.cert.Certificate[] certChain,
-                                                final String contentType,
                                                 final String contentDescription,
                                                 final List<CommitmentTypeIndicationBean> ctis,
                                                 final CAdESSignerMetadata csm) throws NoSuchAlgorithmException,
@@ -842,7 +810,6 @@ final class CAdESCounterSignerEnveloped {
 	        		signerInfo,
 	        		key,
 	        		certChain,
-	        		contentType,
 	        		contentDescription,
 	        		ctis,
 	        		csm
@@ -882,7 +849,6 @@ final class CAdESCounterSignerEnveloped {
                         		signerInfo,
                         		key,
                         		certChain,
-                        		contentType,
                         		contentDescription,
                         		ctis,
                         		csm
@@ -923,7 +889,6 @@ final class CAdESCounterSignerEnveloped {
 	        		signerInfo,
 	        		key,
 	        		certChain,
-	        		contentType,
 	        		contentDescription,
 	        		ctis,
 	        		csm
@@ -952,8 +917,6 @@ final class CAdESCounterSignerEnveloped {
      *        SignerInfo hoja.
      * @param key Clave privada a usar para firmar
      * @param certChain Cadena de certificados del firmante.
-     * @param contentType
-     * 		  Tipo de contenido definido por su OID.
      * @param contentDescription
      * 		  Descripci&oacute;n textual del tipo de contenido firmado.
      * @param node Nodo espec&iacute;fico a firmar.
@@ -969,7 +932,6 @@ final class CAdESCounterSignerEnveloped {
                                                 final P7ContentSignerParameters parameters,
                                                 final PrivateKey key,
                                                 final java.security.cert.Certificate[] certChain,
-                                                final String contentType,
                                                 final String contentDescription,
                                                 final int node,
                                                 final List<CommitmentTypeIndicationBean> ctis,
@@ -997,7 +959,6 @@ final class CAdESCounterSignerEnveloped {
                                 		parameters,
                                 		key,
                                 		certChain,
-                                        contentType,
                                         contentDescription,
                                         node,
                                         ctis,
@@ -1016,7 +977,6 @@ final class CAdESCounterSignerEnveloped {
                             		parameters,
                             		key,
                             		certChain,
-                                    contentType,
                                     contentDescription,
                                     ctis,
                                     csm
@@ -1105,7 +1065,6 @@ final class CAdESCounterSignerEnveloped {
      *           realizar la contrafirma espec&iacute;fica.
      * @param key Clave privada a usar para firmar.
      * @param certChain Cadena de certificados del firmante.
-     * @param contentType Tipo de contenido definido por su OID.
      * @param contentDescription Descripci&oacute;n textual del tipo de contenido firmado.
      * @param ctis Indicaciones sobre los tipos de compromisos adquiridos con la firma.
      * @param csm Metadatos sobre el firmante.
@@ -1117,7 +1076,6 @@ final class CAdESCounterSignerEnveloped {
                                           final SignerInfo si,
                                           final PrivateKey key,
                                           final java.security.cert.Certificate[] certChain,
-                                          final String contentType,
                                           final String contentDescription,
                                           final List<CommitmentTypeIndicationBean> ctis,
                                           final CAdESSignerMetadata csm) throws NoSuchAlgorithmException,
@@ -1140,7 +1098,7 @@ final class CAdESCounterSignerEnveloped {
                  null,
                  new Date(),
                  false,
-                 contentType,
+                 null, // En contrafirmas no se pone el ContentType
                  contentDescription,
                  ctis,
                  csm

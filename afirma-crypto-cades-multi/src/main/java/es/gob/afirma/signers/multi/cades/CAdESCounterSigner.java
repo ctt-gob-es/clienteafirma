@@ -88,8 +88,6 @@ final class CAdESCounterSigner {
      *        <code>true</code> si se desea usar la versi&oacute;n 2 del
      *        atributo <i>Signing Certificate</i> <code>false</code> para
      *        usar la versi&oacute;n 1
-     * @param contentType
-     * 		  Tipo de contenido definido por su OID.
      * @param contentDescription Descripci&oacute;n textual del tipo de contenido firmado.
      * @param ctis Indicaciones sobre los tipos de compromisos adquiridos con la firma.
      * @param csm Metadatos sobre el firmante.
@@ -109,7 +107,6 @@ final class CAdESCounterSigner {
                                 final java.security.cert.Certificate[] certChain,
                                 final AdESPolicy policy,
                                 final boolean signingCertificateV2,
-                                final String contentType,
                                 final String contentDescription,
                                 final List<CommitmentTypeIndicationBean> ctis,
                                 final CAdESSignerMetadata csm) throws IOException,
@@ -168,7 +165,6 @@ final class CAdESCounterSigner {
         		parameters,
         		key,
         		certChain,
-                contentType,
                 contentDescription,
                 policy,
                 signingCertificateV2,
@@ -183,7 +179,6 @@ final class CAdESCounterSigner {
         		parameters,
         		key,
         		certChain,
-                contentType,
                 contentDescription,
                 policy,
                 signingCertificateV2,
@@ -205,7 +200,6 @@ final class CAdESCounterSigner {
             		parameters,
             		key,
             		certChain,
-                    contentType,
                     contentDescription,
                     nodo,
                     policy,
@@ -245,7 +239,6 @@ final class CAdESCounterSigner {
             		parameters,
             		key,
             		certChain,
-                    contentType,
                     contentDescription,
                     nodo,
                     policy,
@@ -286,8 +279,6 @@ final class CAdESCounterSigner {
      *        SignerInfo
      * @param key Clave privada a usar para firmar.
      * @param certChain Cadena de certificados del firmante.
-     * @param contentType
-     * 		  Tipo de contenido definido por su OID.
      * @param contentDescription Descripci&oacute;n textual del tipo de contenido firmado.
      * @param policy Pol&iacute;tica de firma.
      * @param ctis Indicaciones sobre los tipos de compromisos adquiridos con la firma.
@@ -301,7 +292,6 @@ final class CAdESCounterSigner {
                                             final P7ContentSignerParameters parameters,
                                             final PrivateKey key,
                                             final java.security.cert.Certificate[] certChain,
-                                            final String contentType,
                                             final String contentDescription,
                                             final AdESPolicy policy,
                                             final boolean signingCertificateV2,
@@ -319,7 +309,6 @@ final class CAdESCounterSigner {
         			parameters,
         			key,
         			certChain,
-                    contentType,
                     contentDescription,
                     policy,
                     signingCertificateV2,
@@ -341,7 +330,6 @@ final class CAdESCounterSigner {
      *        SignerInfo hoja.
      * @param key Clave privada a usar para firmar.
      * @param certChain Cadena de certificados del firmante.
-     * @param contentType Tipo de contenido definido por su OID.
      * @param contentDescription Descripci&oacute;n textual del tipo de contenido firmado.
      * @param policy Pol&iacute;tica de firma.
      * @param ctis Indicaciones sobre los tipos de compromisos adquiridos con la firma.
@@ -355,7 +343,6 @@ final class CAdESCounterSigner {
                                             final P7ContentSignerParameters parameters,
                                             final PrivateKey key,
                                             final java.security.cert.Certificate[] certChain,
-                                            final String contentType,
                                             final String contentDescription,
                                             final AdESPolicy policy,
                                             final boolean signingCertificateV2,
@@ -373,7 +360,6 @@ final class CAdESCounterSigner {
     				parameters,
     				key,
     				certChain,
-    				contentType,
     				contentDescription,
     				policy,
     				signingCertificateV2,
@@ -394,7 +380,6 @@ final class CAdESCounterSigner {
      *        SignerInfo hoja.
      * @param key Clave privada a usar para firmar.
      * @param certChain Cadena de certificados del firmante.
-     * @param contentType Tipo de contenido definido por su OID.
      * @param contentDescription Descripci&oacute;n textual del tipo de contenido firmado.
      * @param nodo Nodo signerInfo a firmar.
      * @param ctis Indicaciones sobre los tipos de compromisos adquiridos con la firma.
@@ -408,7 +393,6 @@ final class CAdESCounterSigner {
                                             final P7ContentSignerParameters parameters,
                                             final PrivateKey key,
                                             final java.security.cert.Certificate[] certChain,
-                                            final String contentType,
                                             final String contentDescription,
                                             final int nodo,
                                             final AdESPolicy policy,
@@ -435,7 +419,6 @@ final class CAdESCounterSigner {
             		parameters,
             		key,
             		certChain,
-                    contentType,
                     contentDescription,
                     policy,
                     signingCertificateV2,
@@ -450,7 +433,6 @@ final class CAdESCounterSigner {
                 		parameters,
                 		key,
                 		certChain,
-                        contentType,
                         contentDescription,
                         nodo,
                         policy,
@@ -477,8 +459,6 @@ final class CAdESCounterSigner {
      *        SignerInfo hoja.
      * @param key Clave privada a usar para firmar.
      * @param certChain Cadena de certificados del firmante.
-     * @param contentType
-     * 		  Tipo de contenido definido por su OID.
      * @param contentDescription Descripci&oacute;n textual del tipo de contenido firmado.
      * @param policy Pol&iacute;tica de firma.
      * @param ctis Indicaciones sobre los tipos de compromisos adquiridos con la firma.
@@ -493,7 +473,6 @@ final class CAdESCounterSigner {
                                             final P7ContentSignerParameters parameters,
                                             final PrivateKey key,
                                             final java.security.cert.Certificate[] certChain,
-                                            final String contentType,
                                             final String contentDescription,
                                             final AdESPolicy policy,
                                             final boolean signingCertificateV2,
@@ -521,7 +500,6 @@ final class CAdESCounterSigner {
                 				parameters,
                 				key,
                 				certChain,
-                				contentType,
                 				contentDescription,
                 				policy,
                 				signingCertificateV2,
@@ -542,7 +520,6 @@ final class CAdESCounterSigner {
         		signerInfo,
         		key,
         		certChain,
-                contentType,
                 contentDescription,
                 policy,
                 signingCertificateV2,
@@ -586,7 +563,6 @@ final class CAdESCounterSigner {
                 				signerInfo,
                 				key,
                 				certChain,
-                				contentType,
                 				contentDescription,
                 				policy,
                 				signingCertificateV2,
@@ -632,7 +608,6 @@ final class CAdESCounterSigner {
             		signerInfo,
             		key,
             		certChain,
-            		contentType,
             		contentDescription,
             		policy,
             		signingCertificateV2,
@@ -664,7 +639,6 @@ final class CAdESCounterSigner {
      *        SignerInfo hoja.
      * @param key Clave privada a usar para firmar
      * @param certChain Cadena de certificados del firmante.
-     * @param contentType Tipo de contenido definido por su OID.
      * @param contentDescription Descripci&oacute;n textual del tipo de contenido firmado.
      * @param policy Pol&iacute;tica de firma.
      * @param ctis Indicaciones sobre los tipos de compromisos adquiridos con la firma.
@@ -679,7 +653,6 @@ final class CAdESCounterSigner {
                                          final P7ContentSignerParameters parameters,
                                          final PrivateKey key,
                                          final java.security.cert.Certificate[] certChain,
-                                         final String contentType,
                                          final String contentDescription,
                                          final AdESPolicy policy,
                                          final boolean signingCertificateV2,
@@ -707,7 +680,6 @@ final class CAdESCounterSigner {
                         		parameters,
                         		key,
                         		certChain,
-                        		contentType,
                         		contentDescription,
                         		policy,
                         		signingCertificateV2,
@@ -757,7 +729,6 @@ final class CAdESCounterSigner {
                 				signerInfo,
                 				key,
                 				certChain,
-                                contentType,
                                 contentDescription,
                                 policy,
                                 signingCertificateV2,
@@ -803,7 +774,6 @@ final class CAdESCounterSigner {
             		signerInfo,
             		key,
             		certChain,
-            		contentType,
             		contentDescription,
             		policy,
             		signingCertificateV2,
@@ -836,7 +806,6 @@ final class CAdESCounterSigner {
      *        SignerInfo hoja.
      * @param key Clave privada a usar para firmar.
      * @param certChain Cadena de certificados del firmante.
-     * @param contentType Tipo de contenido definido por su OID.
      * @param contentDescription Descripci&oacute;n textual del tipo de contenido firmado.
      * @param policy Pol&iacute;tica de firma.
      * @param ctis Indicaciones sobre los tipos de compromisos adquiridos con la firma.
@@ -850,7 +819,6 @@ final class CAdESCounterSigner {
                                                 final P7ContentSignerParameters parameters,
                                                 final PrivateKey key,
                                                 final java.security.cert.Certificate[] certChain,
-                                                final String contentType,
                                                 final String contentDescription,
                                                 final AdESPolicy policy,
                                                 final boolean signingCertificateV2,
@@ -884,7 +852,6 @@ final class CAdESCounterSigner {
             		signerInfo,
             		key,
             		certChain,
-            		contentType,
             		contentDescription,
             		policy,
             		signingCertificateV2,
@@ -927,7 +894,6 @@ final class CAdESCounterSigner {
                         		signerInfo,
                         		key,
                         		certChain,
-                        		contentType,
                         		contentDescription,
                         		policy,
                         		signingCertificateV2,
@@ -971,7 +937,6 @@ final class CAdESCounterSigner {
             		signerInfo,
             		key,
             		certChain,
-            		contentType,
             		contentDescription,
             		policy,
             		signingCertificateV2,
@@ -1003,7 +968,6 @@ final class CAdESCounterSigner {
      * @param key Clave privada a usar para firmar.
      * @param certChain Cadena de certificados del firmante.
      * @param node Nodo espec&iacute;fico a firmar.
-     * @param contentType Tipo de contenido definido por su OID.
      * @param contentDescription Descripci&oacute;n textual del tipo de contenido firmado.
      * @param policy Pol&iacute;tica de firma.
      * @param ctis Indicaciones sobre los tipos de compromisos adquiridos con la firma.
@@ -1017,7 +981,6 @@ final class CAdESCounterSigner {
                                          final P7ContentSignerParameters parameters,
                                          final PrivateKey key,
                                          final java.security.cert.Certificate[] certChain,
-                                         final String contentType,
                                          final String contentDescription,
                                          final int node,
                                          final AdESPolicy policy,
@@ -1047,7 +1010,6 @@ final class CAdESCounterSigner {
                                 		parameters,
                                 		key,
                                 		certChain,
-                                        contentType,
                                         contentDescription,
                                         node,
                                         policy,
@@ -1067,7 +1029,6 @@ final class CAdESCounterSigner {
                         		parameters,
                         		key,
                         		certChain,
-                        		contentType,
                         		contentDescription,
                         		policy,
                         		signingCertificateV2,
@@ -1160,7 +1121,6 @@ final class CAdESCounterSigner {
      *           realizar la contrafirma espec&iacute;fica.
      * @param key Clave privada a usar para firmar.
      * @param certChain Cadena de certificados del firmante.
-     * @param contentType Tipo de contenido definido por su OID.
      * @param contentDescription Descripci&oacute;n textual del tipo de contenido firmado.
      * @param policy Pol&iacute;tica de firma.
      * @param ctis Indicaciones sobre los tipos de compromisos adquiridos con la firma.
@@ -1173,7 +1133,6 @@ final class CAdESCounterSigner {
                                           final SignerInfo si,
                                           final PrivateKey key,
                                           final java.security.cert.Certificate[] certChain,
-                                          final String contentType,
                                           final String contentDescription,
                                           final AdESPolicy policy,
                                           final boolean signingCertificateV2,
@@ -1194,7 +1153,7 @@ final class CAdESCounterSigner {
              null,
              new Date(),
              false,
-             contentType,
+             null, // En contrafirma el ContentType no se pone
              contentDescription,
              ctis,
              csm

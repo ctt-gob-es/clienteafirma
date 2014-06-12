@@ -64,13 +64,11 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
     		algorithm
 		);
 
-        String contentTypeOid = MimeHelper.DEFAULT_CONTENT_OID_DATA;
         String contentDescription = MimeHelper.DEFAULT_CONTENT_DESCRIPTION;
         final byte[] data = new AOCAdESSigner().getData(sign);
         if (data != null) {
         	final MimeHelper mimeHelper = new MimeHelper(data);
 			contentDescription = mimeHelper.getDescription();
-			contentTypeOid = MimeHelper.transformMimeTypeToOid(mimeHelper.getMimeType());
         }
 
         // Datos firmados.
@@ -93,7 +91,6 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
 	                       certChain,
 	                       new AdESPolicy(extraParams),
 	                       signingCertificateV2,
-	                       contentTypeOid,
 	                       contentDescription,
 	                       CommitmentTypeIndicationsHelper.getCommitmentTypeIndications(extraParams),
 	                       CAdESSignerMetadataHelper.getCAdESSignerMetadata(extraParams)
@@ -114,7 +111,6 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
                                 certChain,
                                 new AdESPolicy(extraParams),
 								signingCertificateV2,
-                                contentTypeOid,
                                 contentDescription,
                                 CommitmentTypeIndicationsHelper.getCommitmentTypeIndications(extraParams),
                                 CAdESSignerMetadataHelper.getCAdESSignerMetadata(extraParams)
@@ -137,7 +133,6 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
                                 certChain,
                                 new AdESPolicy(extraParams),
 								signingCertificateV2,
-                                contentTypeOid,
                                 contentDescription,
                                 CommitmentTypeIndicationsHelper.getCommitmentTypeIndications(xParams),
                                 CAdESSignerMetadataHelper.getCAdESSignerMetadata(extraParams)
@@ -163,7 +158,6 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
                                 certChain,
                                 new AdESPolicy(extraParams),
                                 signingCertificateV2,
-                                contentTypeOid,
                                 contentDescription,
                                 CommitmentTypeIndicationsHelper.getCommitmentTypeIndications(xParams),
                                 CAdESSignerMetadataHelper.getCAdESSignerMetadata(extraParams)
@@ -196,7 +190,6 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
                     certChain,
                     new AdESPolicy(extraParams),
                     signingCertificateV2,
-                    contentTypeOid,
                     contentDescription,
                     CommitmentTypeIndicationsHelper.getCommitmentTypeIndications(xParams),
                     CAdESSignerMetadataHelper.getCAdESSignerMetadata(extraParams)
@@ -216,7 +209,6 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
                     certChain,
                     new AdESPolicy(extraParams),
                     signingCertificateV2,
-                    contentTypeOid,
                     contentDescription,
                     CommitmentTypeIndicationsHelper.getCommitmentTypeIndications(xParams),
                     CAdESSignerMetadataHelper.getCAdESSignerMetadata(extraParams)
@@ -238,7 +230,6 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
                     certChain,
                     new AdESPolicy(extraParams),
                     signingCertificateV2,
-                    contentTypeOid,
                     contentDescription,
                     CommitmentTypeIndicationsHelper.getCommitmentTypeIndications(xParams),
                     CAdESSignerMetadataHelper.getCAdESSignerMetadata(extraParams)
@@ -263,7 +254,6 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
                     certChain,
                     new AdESPolicy(extraParams),
                     signingCertificateV2,
-                    contentTypeOid,
                     contentDescription,
                     CommitmentTypeIndicationsHelper.getCommitmentTypeIndications(xParams),
                     CAdESSignerMetadataHelper.getCAdESSignerMetadata(extraParams)
