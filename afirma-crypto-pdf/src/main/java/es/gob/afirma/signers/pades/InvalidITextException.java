@@ -19,28 +19,9 @@ public final class InvalidITextException extends InvalidLibraryException {
 
 	private static final long serialVersionUID = -322997692480101275L;
 
-	private final String exp;
-	private final String fnd;
-
-	/** Crea una instancia de la excepci&oacute;n.
-	 * @param expected Versi&oacute;n esperada de iText
-	 * @param found Versi&oacute;n encontrada (actual) de iText */
-	InvalidITextException(final String expected, final String found) {
-		super("Se necesitaba iText version " + expected + ", pero se encontro la version " + found); //$NON-NLS-1$ //$NON-NLS-2$
-		this.exp = expected;
-		this.fnd = found;
-	}
-
-	/** Obtiene la versi&oacute;n esperada de iText.
-	 * @return Versi&oacute;n esperada de iText */
-	public String getExpectedVersion() {
-		return this.exp;
-	}
-
-	/** Obtiene la versi&oacute;n encontrada (actual) de iText.
-	 * @return Versi&oacute;n encontrada (actual) de iText */
-	public String getFoundVersion() {
-		return this.fnd;
+	/** Crea una instancia de la excepci&oacute;n. */
+	InvalidITextException() {
+		super("El Cliente afirma necesita una version especifica propia de iText"); //$NON-NLS-1$
 	}
 
 }

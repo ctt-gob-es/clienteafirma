@@ -31,7 +31,6 @@ import com.lowagie.text.pdf.PdfReader;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOInvalidFormatException;
 import es.gob.afirma.core.misc.AOUtil;
-import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.signers.AOPkcs1Signer;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSignInfo;
@@ -65,9 +64,6 @@ public final class AOPDFSigner implements AOSigner {
 
     private static final String PDF_FILE_SUFFIX = ".pdf"; //$NON-NLS-1$
     private static final String PDF_FILE_HEADER = "%PDF-"; //$NON-NLS-1$
-
-    /** Versi&oacute;n de iText necesaria para el uso de esta clase (2.1.7). */
-    private static final String ITEXT_VERSION = "2.1.7"; //$NON-NLS-1$
 
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma");  //$NON-NLS-1$
 
@@ -502,10 +498,12 @@ public final class AOPDFSigner implements AOSigner {
 
     @SuppressWarnings("static-method")
 	private void checkIText() {
-        final String itextVersion = Platform.getITextVersion();
-        if (!ITEXT_VERSION.equals(itextVersion)) {
-            throw new InvalidITextException(ITEXT_VERSION, itextVersion);
-        }
+    	try {
+    		PdfReader.isAfirmaModifiedItext();
+    	}
+    	catch(final Exception e) {
+    		throw new InvalidITextException();
+    	}
     }
 
 }

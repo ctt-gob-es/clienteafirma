@@ -11,7 +11,6 @@
 package es.gob.afirma.core.misc;
 
 import java.io.File;
-import java.lang.reflect.Method;
 import java.util.Locale;
 import java.util.logging.Logger;
 
@@ -214,20 +213,6 @@ public final class Platform {
         }
 
         return null;
-    }
-
-    /** Obtiene la versi&oacute;n del iText en uso.
-     * @return Identificador de versi&oacute;n o {@code null} si no se pudo identificar */
-    public static String getITextVersion() {
-        try {
-            final Class<?> documentClass = Class.forName("com.lowagie.text.Document"); //$NON-NLS-1$
-            final Method getReleaseMethod = documentClass.getDeclaredMethod("getRelease"); //$NON-NLS-1$
-
-            return (String) getReleaseMethod.invoke(null);
-        }
-        catch (final Exception e) {
-            return null;
-        }
     }
 
     /** Obtiene el directorio principal del sistema operativo del sistema.
