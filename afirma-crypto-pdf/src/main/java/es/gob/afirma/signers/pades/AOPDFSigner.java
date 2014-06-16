@@ -502,7 +502,7 @@ public final class AOPDFSigner implements AOSigner {
     		PdfReader.isAfirmaModifiedItext();
     	}
     	catch(final Exception e) {
-    		throw new InvalidITextException();
+    		throw new InvalidITextException(e);
     	}
     }
 

@@ -19,9 +19,10 @@ public final class InvalidITextException extends InvalidLibraryException {
 
 	private static final long serialVersionUID = -322997692480101275L;
 
-	/** Crea una instancia de la excepci&oacute;n. */
-	InvalidITextException() {
-		super("El Cliente afirma necesita una version especifica propia de iText"); //$NON-NLS-1$
+	/** Crea una instancia de la excepci&oacute;n.
+	 * @param e Error por el cual se ha identificado qie el iText es inv&aacute;lido */
+	InvalidITextException(final Throwable e) {
+		super("El Cliente afirma necesita una version especifica propia de iText", e); //$NON-NLS-1$
 	}
 
 }
