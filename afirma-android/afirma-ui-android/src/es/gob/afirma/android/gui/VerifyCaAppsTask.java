@@ -37,7 +37,8 @@ public final class VerifyCaAppsTask extends AsyncTask<Void, Void, List<AppProper
 		// Cargamos de un properties el listado de aplicaciones soportadas
 		final Properties caProperties = new Properties();
 		try {
-			final InputStream is = getClass().getClassLoader().getResourceAsStream(CAS_DATA_LIST);
+			
+			final InputStream is = this.context.getAssets().open(CAS_DATA_LIST);
 			caProperties.load(is);
 			is.close();
 		}
