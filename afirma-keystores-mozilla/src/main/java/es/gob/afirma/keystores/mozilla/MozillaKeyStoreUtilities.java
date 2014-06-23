@@ -732,7 +732,7 @@ final class MozillaKeyStoreUtilities {
 			return false;
 		}
 		for (final String libName : DNI_P11_NAMES) {
-			if (driverName.toLowerCase().endsWith(libName)) {
+			if (driverName.toLowerCase().endsWith(libName.toLowerCase())) {
 				return true;
 			}
 		}
