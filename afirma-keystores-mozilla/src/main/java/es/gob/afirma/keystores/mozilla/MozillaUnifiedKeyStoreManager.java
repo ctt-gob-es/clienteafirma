@@ -46,8 +46,7 @@ public final class MozillaUnifiedKeyStoreManager extends AggregatedKeyStoreManag
 
 		final Object parentComponent = params != null && params.length > 0 ? params[0] : null;
 
-		final boolean onlySscd = Boolean.getBoolean(ONLY_PKCS11);
-		if (onlySscd) {
+		if (Boolean.getBoolean(ONLY_PKCS11)) {
 			// Primero anadimos el almacen principal NSS
 			final AOKeyStoreManager ksm = new NssKeyStoreManager(parentComponent);
 			try {
