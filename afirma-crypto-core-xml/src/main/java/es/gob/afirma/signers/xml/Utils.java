@@ -12,6 +12,7 @@ package es.gob.afirma.signers.xml;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
@@ -660,7 +661,14 @@ public final class Utils {
         }
         final X509Certificate cert;
         try {
-            cert = (X509Certificate) CertificateFactory.getInstance("X.509").generateCertificate(new ByteArrayInputStream(Base64.decode(b64Cert))); //$NON-NLS-1$
+            final InputStream isCert = new ByteArrayInputStream(Base64.decode(b64Cert));
+            cert = (X509Certificate) CertificateFactory.getInstance("X.509").generateCertificate(isCert); //$NON-NLS-1$
+            try {
+                isCert.close();
+            }
+            catch (final Exception e) {
+                // Ignoramos los errores en el cierre
+            }
         }
         catch (final Exception e) {
             LOGGER.severe("No se pudo decodificar el certificado en Base64, se devolvera null: " + e); //$NON-NLS-1$
