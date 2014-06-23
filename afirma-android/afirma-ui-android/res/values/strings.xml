@@ -11,8 +11,10 @@
     <string name="appsDialogTitle">Listado de autoridades soportadas</string>
     <string name="appsDialogMessage">Seleccione la autoridad de certificaci\u00F3n a la que desee solicitar su certificado.</string>
     <string name="disclaimer">2013 Gobierno de Espa\u00F1a</string>
-    <string name="content_desc">Logotipo Afirma m\u00F3vil</string>
+    <string name="content_desc">Logotipo @firma m\u00F3vil</string>
     <string name="ok">Aceptar</string>
+    <string name="close">Cerrar</string>
+    <string name="ca_not_found">No hay autoridades de certificaci\u00F3n configuradas.</string>
     <string name="title_activity_sign_data">Firma de datos</string>
     <string name="error_bad_params">No se ha realizado correctamente la invocaci\u00F3n de la aplicaci\u00F3n. Consulte a su proveedor de servicios.</string>
     <string name="error_server_connect">Ocurri\u00F3 un error en la conexi\u00F3n entre la app y la pagina web.</string>
@@ -46,9 +48,8 @@
     <string name="error_dni_blocked_dlg">Lo sentimos, su DNI est\u00E1 bloquedado.</string>
     <string name="error_dni_blocked">Su DNI est\u00E1 bloquedado, deber\u00E1 acudir a los Puntos de Actualización de las Oficinas de Expedición para poder desbloquearlo. </string>
     <string name="error_title_dni_blocked">DNI bloquedado</string>
-    <string name="error_pin_nulo">Error, el pin del DNI es nulo.</string>
-    
-    <string name="error_android_4_1">Android 4.1 y 4.1.1 no permiten que los nombres de certificados contengan caracteres especiales (espacios, guiones...). Modifique el alias de sus certificados al importarlos para evitar este error.</string>
+    <string name="error_pin_nulo">Error, el pin del DNI es nulo.</string>    
+    <string name="error_android_4_1">Android 4.1 y 4.1.1 no permiten que los nombres de certificados contengan caracteres especiales (espacios, guiones, etc.). Modifique el alias de sus certificados al importarlos para evitar este error.</string>
     <string name="data_saved">El fichero se ha guardado con el nombre %s</string>
     <string name="icon_ca">Icono de la autoridad de certificación</string>
     <string name="dialog_msg_loading_data">Cargando datos</string>

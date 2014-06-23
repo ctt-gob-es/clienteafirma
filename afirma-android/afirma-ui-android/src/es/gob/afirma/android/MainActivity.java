@@ -11,6 +11,7 @@ import java.util.List;
 import android.app.AlertDialog;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -36,7 +37,7 @@ import es.gob.afirma.android.gui.VerifyCaAppsTask.CaAppsVerifiedListener;
 
 /** Actividad que se muestra cuando se arranca la aplicaci&oaute;n pulsando su icono.
  * @author Alberto Mart&iacute;nez */
-public final class MainActivity extends FragmentActivity implements CaAppsVerifiedListener {
+public final class MainActivity extends FragmentActivity implements CaAppsVerifiedListener, DialogInterface.OnClickListener {
 
 	@Override
 	  public void onStart() {
@@ -97,18 +98,27 @@ public final class MainActivity extends FragmentActivity implements CaAppsVerifi
 		// Dialogo de solicitud de certificados
 		if (v.getId() == R.id.requestCertButton) {
 
-			final AlertDialog ad = new AlertDialog.Builder(MainActivity.this).create();
-			ad.setTitle(getString(R.string.appsDialogTitle));
-			ad.setMessage(getString(R.string.appsDialogMessage));
+			if (this.apps == null || this.apps.size() < 1) {
+				final AlertDialog ad = new AlertDialog.Builder(MainActivity.this).create();
+				ad.setTitle(getString(R.string.appsDialogTitle));
+				ad.setMessage(getString(R.string.ca_not_found));
+				ad.setButton(DialogInterface.BUTTON_POSITIVE, getString(R.string.close), this);
+				ad.show();
+			}
+			else {
+				final AlertDialog ad = new AlertDialog.Builder(MainActivity.this).create();
+				ad.setTitle(getString(R.string.appsDialogTitle));
+				ad.setMessage(getString(R.string.appsDialogMessage));
 
-			final LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-			final View view = inflater.inflate(R.layout.dialog_list, null);
-			final ListView listView = (ListView) view.findViewById(R.id.listViewListadoApp);
+				final LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+				final View view = inflater.inflate(R.layout.dialog_list, null);
+				final ListView listView = (ListView) view.findViewById(R.id.listViewListadoApp);
 
-			final AppAdapter listaAppAdapter = new AppAdapter(MainActivity.this, ad, R.layout.array_adapter_apps, this.apps);
-			listView.setAdapter(listaAppAdapter);
-			ad.setView(view);
-			ad.show();
+				final AppAdapter listaAppAdapter = new AppAdapter(MainActivity.this, ad, R.layout.array_adapter_apps, this.apps);
+				listView.setAdapter(listaAppAdapter);
+				ad.setView(view);
+				ad.show();
+			}
 		}
 		//Boton firmar fichero local
 		else if(v.getId() == R.id.buttonSign){
@@ -248,5 +258,10 @@ public final class MainActivity extends FragmentActivity implements CaAppsVerifi
 				this.alertDialog.dismiss();
 			}
 		}
+	}
+
+	@Override
+	public void onClick(DialogInterface dialog, int which) {
+		dialog.dismiss();
 	}
 }
