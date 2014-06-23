@@ -808,12 +808,16 @@ DownloadDocumentListener, OperationRequestListener, PrivateKeySelectionListener,
 		
 		dismissProgressDialog();
 		
-		if (operation == OperationRequestListener.REJECT_OPERATION) {
-			setResult(PetitionDetailsActivity.RESULT_REJECT_FAILED);
+		Log.i("es.gob.afirma", "Ha fallado la operacion con la excepcion: " + t);
+		if (t != null) {
+			t.printStackTrace();
 		}
-		else {
-			setResult(PetitionDetailsActivity.RESULT_SIGN_FAILED);
-		}
+		
+		final int resultCode = (operation == OperationRequestListener.REJECT_OPERATION) ?
+				PetitionDetailsActivity.RESULT_REJECT_FAILED :
+				PetitionDetailsActivity.RESULT_SIGN_FAILED;
+
+		setResult(resultCode);
 		closeActivity();
 	}
 	

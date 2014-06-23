@@ -763,7 +763,7 @@ public class PetitionListActivity extends FragmentActivity implements
 					secondaryText.setText(this.request.getSubject());
 				}
 
-				if (this.request.getDate() != null) {
+				if (dateText != null && this.request.getDate() != null) {
 					dateText.setText(this.request.getDate());
 				}
 
@@ -790,14 +790,18 @@ public class PetitionListActivity extends FragmentActivity implements
 				if (SignRequest.VIEW_NEW.equals(this.request.getView())) {
 					v.setBackgroundResource(R.drawable.array_adapter_selector_grey);
 					primaryText.setTextAppearance(this.context, R.style.NewRequestPrimaryText);
-					dateText.setTextAppearance(this.context, R.style.NewRequestPrimaryText);
 					secondaryText.setTextAppearance(this.context, R.style.NewRequestSecondaryText);
+					if (dateText != null) {
+						dateText.setTextAppearance(this.context, R.style.NewRequestPrimaryText);
+					}
 				}
 				else if (SignRequest.VIEW_READED.equals(this.request.getView())) {
 					v.setBackgroundResource(R.drawable.array_adapter_selector_white);
 					primaryText.setTextAppearance(this.context, R.style.ReadedRequestPrimaryText);
-					dateText.setTextAppearance(this.context, R.style.ReadedRequestPrimaryText);
 					secondaryText.setTextAppearance(this.context, R.style.ReadedRequestSecondaryText);
+					if (dateText != null) {
+						dateText.setTextAppearance(this.context, R.style.ReadedRequestPrimaryText);
+					}
 				}
 
 				// Icono diferente dependiendo de si la peticion es de fima o de

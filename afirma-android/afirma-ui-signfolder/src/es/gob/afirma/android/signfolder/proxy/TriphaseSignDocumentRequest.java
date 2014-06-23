@@ -224,8 +224,7 @@ public final class TriphaseSignDocumentRequest {
 				}
 			}
 			
-			Log.i(SFConstants.LOG_TAG, "XML peticion:");
-			Log.i(SFConstants.LOG_TAG, builder.toString());
+			Log.i(SFConstants.LOG_TAG, "XML peticion:\n" + builder.toString());
 			
 			return builder.toString();
 		}

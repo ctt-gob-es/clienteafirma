@@ -41,7 +41,7 @@ public final class TriSigner {
 		// **************************** PREFIRMA ***************************************************************
 		//******************************************************************************************************
 		
-		Log.i(SFConstants.LOG_TAG, "TriSigner - sign: == PREFIRMA ==");
+		Log.i(SFConstants.LOG_TAG, "TriSigner - sign: == PREFIRMA =="); //$NON-NLS-1$
 		
 		// Mandamos a prefirmar y obtenemos los resultados
 		final TriphaseRequest[] signRequest = commMgr.preSignRequests(
@@ -53,14 +53,14 @@ public final class TriSigner {
 		// ******************************* FIRMA ***************************************************************
 		//******************************************************************************************************
 		
-		Log.i(SFConstants.LOG_TAG, "TriSigner - sign: == FIRMA ==");
+		Log.i(SFConstants.LOG_TAG, "TriSigner - sign: == FIRMA =="); //$NON-NLS-1$
 		
 		// Recorremos las peticiones de firma
 		for (int i = 0; i < signRequest.length; i++) {
 
 			// Si fallo una sola firma de la peticion, esta es erronea al completo
 			if (!signRequest[i].isStatusOk()) {
-				Log.w(SFConstants.LOG_TAG, "Se encontro prefirma erronea, se aborta el proceso de firma");
+				Log.w(SFConstants.LOG_TAG, "Se encontro prefirma erronea, se aborta el proceso de firma. La traza de la excepcion es: " + signRequest[i].getException()); //$NON-NLS-1$
 				return new RequestResult(request.getId(), false);
 			}
 
@@ -71,7 +71,7 @@ public final class TriSigner {
 					signPhase2(docRequests, pk, certificateChain);
 				}
 				catch(final Exception e) {
-					Log.w(SFConstants.LOG_TAG, "Error en la fase de FIRMA: " + e);
+					Log.w(SFConstants.LOG_TAG, "Error en la fase de FIRMA: " + e); //$NON-NLS-1$
 					e.printStackTrace();
 					
 					// Si un documento falla en firma toda la peticion se da por fallida
@@ -84,7 +84,7 @@ public final class TriSigner {
 		// **************************** POSTFIRMA **************************************************************
 		//******************************************************************************************************
 		
-		Log.i(SFConstants.LOG_TAG, "TriSigner - sign: == POSTFIRMA ==");
+		Log.i(SFConstants.LOG_TAG, "TriSigner - sign: == POSTFIRMA =="); //$NON-NLS-1$
 		
 		// Mandamos a postfirmar y recogemos el resultado
 		return commMgr.postSignRequests(

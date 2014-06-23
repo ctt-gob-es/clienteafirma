@@ -26,28 +26,32 @@
             android:layout_marginTop="5dp"
             android:singleLine="true"
             android:textAppearance="?android:attr/textAppearanceLarge"
-            android:textIsSelectable="false" />
+            android:textIsSelectable="false"
+            android:text="Primary text text text text" />
 
         <TextView
             android:id="@+id/secondaryText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textIsSelectable="false" />
+            android:textIsSelectable="false"
+            android:text="Secondary text text text text" />
+
     </LinearLayout>
     
 	
 	
 	<TextView
 		android:id="@+id/dateText"
-		android:layout_width="180dp"
+		android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_marginTop="5dp"
-        android:layout_marginLeft="15dp"
+        android:layout_marginLeft="5dp"
         android:layout_marginRight="5dp"
         android:gravity="center_horizontal"
         android:singleLine="true"
         android:textIsSelectable="false"
         android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="22/22/2222" 
        />
     
 	<ImageView

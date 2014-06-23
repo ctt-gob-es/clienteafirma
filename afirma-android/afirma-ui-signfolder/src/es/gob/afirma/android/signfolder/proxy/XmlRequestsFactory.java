@@ -136,7 +136,7 @@ final class XmlRequestsFactory {
 			} else {
 				sb.append("\">"); //$NON-NLS-1$
 				sb.append(XML_PARAMS_OPEN);
-				sb.append(documents[j].getParams());
+				sb.append(documents[j].getParams() != null ? documents[j].getParams() : ""); //$NON-NLS-1$
 				sb.append(XML_PARAMS_CLOSE);
 				sb.append("</doc>"); //$NON-NLS-1$
 			}

@@ -20,13 +20,13 @@
         android:layout_weight="0.90"
         android:orientation="vertical" >
 
-
         <TextView
             android:id="@+id/primaryText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="5dp"
             android:layout_marginTop="5dp"
+            android:background="@color/red"
             android:singleLine="true"
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:textIsSelectable="false" />
@@ -37,6 +37,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="5dp"
             android:textIsSelectable="false" />
+
     </LinearLayout>
 
 	<TextView

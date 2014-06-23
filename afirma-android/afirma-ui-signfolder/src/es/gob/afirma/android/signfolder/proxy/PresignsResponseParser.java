@@ -69,6 +69,7 @@ public class PresignsResponseParser {
 		private static final String REQUEST_NODE = "req"; //$NON-NLS-1$
 		private static final String ID_ATTRIBUTE = "id"; //$NON-NLS-1$
 		private static final String STATUS_ATTRIBUTE = "status"; //$NON-NLS-1$
+		private static final String EXCEPTION_B64_ATTRIBUTE = "exceptionb64"; //$NON-NLS-1$
 
 		static TriphaseRequest parse(final Node presignRequestNode) {
 
@@ -96,9 +97,19 @@ public class PresignsResponseParser {
 			// statusOk = true, salvo que la propiedad status tenga el valor "KO"
 			statusOk = (attributeNode == null || !"KO".equalsIgnoreCase(attributeNode.getNodeValue())); //$NON-NLS-1$
 
+			attributeNode = attributes.getNamedItem(EXCEPTION_B64_ATTRIBUTE);
+			// statusOk = true, salvo que la propiedad status tenga el valor "KO"
+			String exception;
+			try {
+				exception = (attributeNode == null ? null : new String(Base64.decode(attributeNode.getNodeValue())));
+			} catch (IOException e) {
+				Log.w("es.gob.afirma", "No se ha podido descodificar el base 64 de la traza de la excepcion, se usara tal cual");  //$NON-NLS-1$//$NON-NLS-2$
+				exception = attributeNode.getNodeValue();
+			}
+
 			// Si la peticion no se ha procesado correctamente se descarta
 			if (!statusOk) {
-				return new TriphaseRequest(ref, false, null);
+				return new TriphaseRequest(ref, false, exception);
 			}
 
 			// Cargamos el listado de peticiones

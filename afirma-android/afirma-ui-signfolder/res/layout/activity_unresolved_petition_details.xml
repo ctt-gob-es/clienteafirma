@@ -92,14 +92,17 @@
 							        android:layout_marginLeft="10dp"
 							        android:layout_marginRight="10dp"
 			                        />
+
 								<TextView
-			                        android:id="@+id/subjectValue"
-			                        android:layout_width="wrap_content"
-			                        android:layout_height="wrap_content"
-			                        android:textIsSelectable="true"
-			                        android:textAppearance="?android:attr/textAppearanceMedium"
-									android:layout_marginLeft="10dp"
-									android:layout_marginTop="5dp" />
+								    android:id="@+id/subjectValue"
+								    android:layout_width="wrap_content"
+								    android:layout_height="wrap_content"
+								    android:layout_marginLeft="10dp"
+								    android:layout_marginTop="5dp"
+								    android:gravity="center_vertical"
+								    android:textAppearance="?android:attr/textAppearanceMedium"
+								    android:textIsSelectable="true" />
+
 			                </LinearLayout>
 			
 			                <!--  Referencia -->		                
@@ -127,10 +130,12 @@
 			                        android:id="@+id/referenceValue"
 			                        android:layout_width="wrap_content"
 			                        android:layout_height="wrap_content"
-			                        android:textIsSelectable="true"
+			                        android:layout_marginLeft="10dp"
+			                        android:layout_marginTop="5dp"
+			                        android:gravity="center_vertical"
 			                        android:textAppearance="?android:attr/textAppearanceMedium"
-									android:layout_marginLeft="10dp"
-									android:layout_marginTop="5dp"/>
+			                        android:textIsSelectable="true" />
+
 			                </LinearLayout>
 			
 			                <!-- Fecha -->
@@ -161,7 +166,8 @@
 			                        android:textIsSelectable="true"
 			                        android:textAppearance="?android:attr/textAppearanceMedium"
 									android:layout_marginLeft="10dp"
-									android:layout_marginTop="5dp" />
+									android:layout_marginTop="5dp"
+			                        android:gravity="center_vertical" />
 			                </LinearLayout>
 					
 							<!-- Aplicacion -->		                
@@ -192,7 +198,8 @@
 			                        android:textIsSelectable="true"
 			                        android:textAppearance="?android:attr/textAppearanceMedium"
 									android:layout_marginTop="5dp"
-									android:layout_marginLeft="10dp" />
+									android:layout_marginLeft="10dp"
+									android:gravity="center_vertical" />
 			                </LinearLayout>
 				
 			                <!-- Remitente -->		                
@@ -234,9 +241,9 @@
 	                android:layout_width="match_parent"
 	                android:layout_height="match_parent"
 	                android:baselineAligned="false"
-	                android:layout_marginTop="30dp"
-	                android:layout_marginLeft="30dp"
-	                android:layout_marginRight="30dp"
+	                android:layout_marginTop="15dp"
+	                android:layout_marginLeft="15dp"
+	                android:layout_marginRight="15dp"
 	                 >
 	                
 	                <ListView
@@ -254,9 +261,9 @@
 	                android:layout_width="match_parent"
 	                android:layout_height="match_parent"
 	                android:baselineAligned="false"
-	               	android:layout_marginTop="30dp"
-	                android:layout_marginLeft="30dp"
-	                android:layout_marginRight="30dp">
+	               	android:layout_marginTop="15dp"
+	                android:layout_marginLeft="15dp"
+	                android:layout_marginRight="15dp">
 	
 	                <ListView
 	                    android:id="@+id/listDocs"
