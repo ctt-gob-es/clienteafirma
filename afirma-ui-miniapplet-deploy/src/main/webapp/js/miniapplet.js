@@ -965,7 +965,8 @@ var MiniApplet = {
 						intentURL += (i != 0 ? '&' : '') + params[i].key + '=' + params[i].value; 
 					}
 				}
-				return encodeURI(intentURL);
+
+				return intentURL;
 			};
 			
 			this.getProtocol = function () {
