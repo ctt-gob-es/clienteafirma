@@ -155,6 +155,8 @@ public final class ProxyService extends HttpServlet {
 	@Override
 	protected void service(final HttpServletRequest request, final HttpServletResponse response) {
 
+		LOGGER.info("Peticion al proxy Portafirmas"); //$NON-NLS-1$
+		
 		final Responser responser;
 		try {
 			responser = new Responser(response);
@@ -171,6 +173,7 @@ public final class ProxyService extends HttpServlet {
 		
 		final String data = request.getParameter(PARAMETER_NAME_DATA);
 		if (data == null) {
+			LOGGER.severe("No se han proporcionado los datos"); //$NON-NLS-1$
 			responser.print(ErrorManager.genError(ErrorManager.ERROR_MISSING_DATA, null));
 			return;
 		}
@@ -189,40 +192,53 @@ public final class ProxyService extends HttpServlet {
 			}
 		}
 		
+		LOGGER.info("XML de la peticion:\n" + new String(xml)); //$NON-NLS-1$
+		
 		final String ret;
 		
 		try {
 			if (OPERATION_PRESIGN.equals(operation)) {
+				LOGGER.info("Solicitud de prefirma"); //$NON-NLS-1$
 				ret = processPreSigns(xml);
 			}
 			else if (OPERATION_POSTSIGN.equals(operation)) {
+				LOGGER.info("Solicitud de postfirma"); //$NON-NLS-1$
 				ret = processPostSigns(xml);
 			}
 			else if (OPERATION_REQUEST.equals(operation)) {
+				LOGGER.info("Solicitud del listado de peticiones"); //$NON-NLS-1$
 				ret = processRequestsList(xml);
 			}
 			else if (OPERATION_REJECT.equals(operation)) {
+				LOGGER.info("Solicitud de rechazo peticiones"); //$NON-NLS-1$
 				ret = processRejects(xml);
 			}
 			else if (OPERATION_DETAIL.equals(operation)) {
+				LOGGER.info("Solicitud de detalle de una peticion"); //$NON-NLS-1$
 				ret = processRequestDetail(xml);
 			}
 			else if (OPERATION_DOCUMENT_PREVIEW.equals(operation)) {
+				LOGGER.info("Solicitud de previsualizacion de un documento"); //$NON-NLS-1$
 				ret = processDocumentPreview(xml);
 			}
 			else if (OPERATION_CONFIGURING.equals(operation)) {
+				LOGGER.info("Solicitud de la configuracion"); //$NON-NLS-1$
 				ret = processConfigueApp(xml);
 			}
 			else if (OPERATION_APPROVE.equals(operation)) {
+				LOGGER.info("Solicitud de aprobacion de una peticion"); //$NON-NLS-1$
 				ret = processApproveRequest(xml);
 			}
 			else if (OPERATION_SIGN_PREVIEW.equals(operation)) {
+				LOGGER.info("Solicitud de previsualizacion de una firma"); //$NON-NLS-1$
 				ret = processSignPreview(xml);
 			}
 			else if (OPERATION_REPORT_PREVIEW.equals(operation)) {
+				LOGGER.info("Solicitud de previsualizacion de un informe de firma"); //$NON-NLS-1$
 				ret = processSignReportPreview(xml);
 			}
 			else {
+				LOGGER.info("Se ha indicado un codigo de operacion no valido"); //$NON-NLS-1$
 				ret = ErrorManager.genError(ErrorManager.ERROR_UNSUPPORTED_OPERATION_NAME, null);
 			}
 		}
@@ -264,6 +280,8 @@ public final class ProxyService extends HttpServlet {
 			return;
 		}
 		
+		LOGGER.info("XML de respuesta:\n" + ret); //$NON-NLS-1$
+		
 		responser.print(ret);
 		return;
 	}
@@ -304,34 +322,51 @@ public final class ProxyService extends HttpServlet {
 		final MobileService_Service mobileService = new MobileService_Service();
 		final MobileService service = mobileService.getMobileServicePort();
 		
-		// Prefirmamos cada uno de los documentos de cada una de las peticiones. Si falla la prefirma de un documento, se da por erronea
-		// la prefirma de toda la peticion
+		LOGGER.info("Procesamos la peticiones que se van a prefirmar"); //$NON-NLS-1$
+		
+		// Prefirmamos cada uno de los documentos de cada una de las peticiones. Si falla la prefirma de
+		// un documento, se da por erronea la prefirma de toda la peticion
 		for (TriphaseRequest singleRequest : triRequests) {
 			
 			try {
 				MobileDocumentList downloadedDocs = service.getDocumentsToSign(triRequests.getCertificate().getEncoded(), singleRequest.getRef());
-				if (singleRequest.size() != downloadedDocs.getDocument().size()) {
-					throw new Exception("No se han recuperado tantos documentos para la peticion '" + //$NON-NLS-1$
-							singleRequest.getRef() + "'como los indicados en la propia peticion"); //$NON-NLS-1$
-				}
 				
+				LOGGER.info("Recuperamos el documento"); //$NON-NLS-1$
+				
+				if (singleRequest.size() != downloadedDocs.getDocument().size()) {
+					LOGGER.info("No se han recuperado tantos documentos para la peticion " + singleRequest.getRef() + "' como los indicados en la propia peticion"); //$NON-NLS-1$ //$NON-NLS-2$
+					throw new Exception("No se han recuperado tantos documentos para la peticion '" + //$NON-NLS-1$
+							singleRequest.getRef() + "' como los indicados en la propia peticion"); //$NON-NLS-1$
+				}
+
 				// Prefirmamos cada documento de la peticion
 				for (TriphaseSignDocumentRequest docRequest : singleRequest) {
-					
-					LOGGER.info(" == PREFIRMA == ");			
-					
+
+					LOGGER.info(" == PREFIRMA == "); //$NON-NLS-1$
+
 					// Buscamos para la prefirma el documento descargado que corresponde para la peticion
 					// de firma del documento actual
 					for (MobileDocument downloadedDoc : downloadedDocs.getDocument()) {
 						if (downloadedDoc.getIdentifier().equals(docRequest.getId())) {
 
+							LOGGER.info(" Procesamos documento con el id: " + downloadedDoc.getIdentifier()); //$NON-NLS-1$
+
 							docRequest.setCryptoOperation(normalizeOperationType(downloadedDoc.getOperationType()));
 
+							LOGGER.info(" Operacion criptografica: " + docRequest.getCryptoOperation()); //$NON-NLS-1$
+
 							// Del servicio remoto obtener los parametros de configuracion, tal como deben pasarse al MiniApplet
-							// Lo pasamos a base 64 URL_SAFE para que no afecten al envio de datos 
-							docRequest.setParams(Base64.encodeBytes(downloadedDoc.getSignatureParameters().getValue().getBytes(), Base64.URL_SAFE));
-							
-							final Object content = downloadedDoc.getData().getValue().getContent();
+							// Lo pasamos a base 64 URL_SAFE para que no afecten al envio de datos
+							final String extraParams = downloadedDoc.getSignatureParameters() != null ? downloadedDoc.getSignatureParameters().getValue() : null;
+							if (extraParams != null) {
+								docRequest.setParams(Base64.encodeBytes(extraParams.getBytes(), Base64.URL_SAFE));
+							}
+
+							final DataHandler dataHandler = downloadedDoc.getData() != null ? downloadedDoc.getData().getValue() : null;
+							if (dataHandler == null) {
+								throw new IllegalArgumentException("No se han recuperado los datos del documento"); //$NON-NLS-1$
+							}
+							final Object content = dataHandler.getContent();
 							if (content instanceof ByteArrayInputStream) {
 								docRequest.setContent(Base64.encodeBytes(AOUtil.getDataFromInputStream((ByteArrayInputStream) content), Base64.URL_SAFE));
 							}
@@ -354,6 +389,7 @@ public final class ProxyService extends HttpServlet {
 				LOGGER.warning("Error en la prefirma de la peticion " + //$NON-NLS-1$
 						singleRequest.getRef() + ": " + mex); //$NON-NLS-1$
 				singleRequest.setStatusOk(false);
+				singleRequest.setThrowable(mex);
 				mex.printStackTrace();
 			}
 		}
@@ -408,11 +444,13 @@ public final class ProxyService extends HttpServlet {
 		final MobileService_Service mobileService = new MobileService_Service();
 		final MobileService service = mobileService.getMobileServicePort();
 
+		LOGGER.info("Procesamos la peticiones que se van a postfirmar"); //$NON-NLS-1$
+		
 		// Postfirmamos cada uno de los documentos de cada una de las peticiones. Si falla la
 		// postfirma de un solo documento, se da por erronea la postfirma de toda la peticion
 		for (TriphaseRequest triRequest : triRequests) {
 			
-			LOGGER.info(" == POSTFIRMA == ");
+			LOGGER.info(" == POSTFIRMA == "); //$NON-NLS-1$
 			
 			// Sustituir. Algunos formatos de firma no requeriran que se vuelva a descargar el
 			// documento. Solo los descargaremos si es necesario para al menos una de las firmas.
@@ -455,7 +493,7 @@ public final class ProxyService extends HttpServlet {
 						}
 					}
 					
-					LOGGER.info("Parametros en la postfirma:\n" + docRequest.getParams());
+					LOGGER.info("Parametros en la postfirma:\n" + docRequest.getParams()); //$NON-NLS-1$
 					
 					
 					doPostSign(triRequests.getCertificate(), docRequest);
@@ -530,8 +568,12 @@ public final class ProxyService extends HttpServlet {
 		final Document doc = this.documentBuilder.parse(new ByteArrayInputStream(xml));
 		final ListRequest listRequest = ListRequestParser.parse(doc);
 		
+		LOGGER.info("Solicitamos las peticiones de firma al Portafirmas"); //$NON-NLS-1$
+		
 		final PartialSignRequestsList signRequests = getRequestsList(listRequest);
 
+		LOGGER.info("Hemos obtenido las peticiones de firma del Portafirmas"); //$NON-NLS-1$
+		
 		return XmlResponsesFactory.createRequestsListResponse(signRequests);
 	}
 
@@ -625,7 +667,7 @@ public final class ProxyService extends HttpServlet {
 		final RejectRequest request = RejectsRequestParser.parse(doc);
 
 		final RequestResult[] requestResults = doReject(request);
-		
+
 		return XmlResponsesFactory.createRejectsResponse(requestResults);
 	}
 
@@ -637,13 +679,15 @@ public final class ProxyService extends HttpServlet {
 	 */
 	private static RequestResult[] doReject(final RejectRequest rejectRequest) {
 
+		LOGGER.info("Se solicita el rechazo de peticiones: " + Integer.toString(rejectRequest.size())); //$NON-NLS-1$
+		
 		final MobileService service = new MobileService_Service().getMobileServicePort();
 
 		final List<Boolean> rejectionsResults = new ArrayList<Boolean>();
 		for (final String id : rejectRequest) {
 			// Si devuelve cualquier texto es que la operacion ha terminado correctamente. Por defecto,
 			// devuelve el mismo identificador de la peticion, aunque no es obligatorio
-			// Si falla devuelve una excepcion.  
+			// Si falla devuelve una excepcion.
 			try {
 				service.rejectRequest(rejectRequest.getCertEncoded(), id, MOBILE_REJECT_DESCRIPTION);
 				rejectionsResults.add(Boolean.TRUE);
@@ -659,6 +703,8 @@ public final class ProxyService extends HttpServlet {
 			result[i] = new RequestResult(rejectRequest.get(i), rejectionsResults.get(i).booleanValue());
 		}
 
+		LOGGER.info("Se devuelve el resultado del rechazo de peticiones: " + result.length); //$NON-NLS-1$
+		
 		return result;
 	}
 
@@ -666,8 +712,12 @@ public final class ProxyService extends HttpServlet {
 		final Document doc = this.documentBuilder.parse(new ByteArrayInputStream(xml));
 		final DetailRequest request = DetailRequestParser.parse(doc);
 
+		LOGGER.info("Solicitamos el detalle de una peticion al Portafirmas"); //$NON-NLS-1$
+		
 		final Detail requestDetails = getRequestDetail(request);
 
+		LOGGER.info("Hemos obtenido el detalle de la peticion del Portafirmas"); //$NON-NLS-1$
+		
 		return XmlResponsesFactory.createRequestDetailResponse(requestDetails);
 	}
 
@@ -735,21 +785,39 @@ public final class ProxyService extends HttpServlet {
 		final Document doc = this.documentBuilder.parse(new ByteArrayInputStream(xml));
 		final PreviewRequest request = PreviewRequestParser.parse(doc);
 		
-		return XmlResponsesFactory.createPreviewResponse(previewDocument(request));
+		LOGGER.info("Solicitamos la previsualizacion de un documento al Portafirmas"); //$NON-NLS-1$
+		
+		final DocumentData documentData = previewDocument(request);
+		
+		LOGGER.info("Hemos obtenido la previsualizacion de un documento del Portafirmas"); //$NON-NLS-1$
+		
+		return XmlResponsesFactory.createPreviewResponse(documentData);
 	}
 	
 	private String processSignPreview(final byte[] xml) throws SAXException, IOException, MobileException {
 		final Document doc = this.documentBuilder.parse(new ByteArrayInputStream(xml));
 		final PreviewRequest request = PreviewRequestParser.parse(doc);
 
-		return XmlResponsesFactory.createPreviewResponse(previewSign(request));
+		LOGGER.info("Solicitamos la previsualizacion de una firma al Portafirmas"); //$NON-NLS-1$
+		
+		final DocumentData documentData = previewSign(request);
+		
+		LOGGER.info("Hemos obtenido la previsualizacion de una firma del Portafirmas"); //$NON-NLS-1$
+		
+		return XmlResponsesFactory.createPreviewResponse(documentData);
 	}
 
 	private String processSignReportPreview(final byte[] xml) throws SAXException, IOException, MobileException {
 		final Document doc = this.documentBuilder.parse(new ByteArrayInputStream(xml));
 		final PreviewRequest request = PreviewRequestParser.parse(doc);
 
-		return XmlResponsesFactory.createPreviewResponse(previewSignReport(request));
+		LOGGER.info("Solicitamos la previsualizacion de un informe de firma al Portafirmas"); //$NON-NLS-1$
+		
+		final DocumentData documentData = previewSignReport(request);
+		
+		LOGGER.info("Hemos obtenido la previsualizacion de un informe de firma del Portafirmas"); //$NON-NLS-1$
+		
+		return XmlResponsesFactory.createPreviewResponse(documentData);
 	}
 	
 	/**
@@ -821,7 +889,13 @@ public final class ProxyService extends HttpServlet {
 		final Document doc = this.documentBuilder.parse(new ByteArrayInputStream(xml));
 		final GenericRequest request = ConfigurationRequestParser.parse(doc);
 
-		return XmlResponsesFactory.createConfigurationResponse(loadConfiguration(request));
+		LOGGER.info("Solicitamos la configuracion al Portafirmas"); //$NON-NLS-1$
+		
+		final AppConfiguration config = loadConfiguration(request);
+		
+		LOGGER.info("Hemos obtenido la configuracion del Portafirmas"); //$NON-NLS-1$
+		
+		return XmlResponsesFactory.createConfigurationResponse(config);
 	}
 	
 	/**
@@ -855,7 +929,13 @@ public final class ProxyService extends HttpServlet {
 		final Document xmlDoc = this.documentBuilder.parse(new ByteArrayInputStream(xml));
 		final ApproveRequestList appRequests = ApproveRequestParser.parse(xmlDoc);
 
-		return XmlResponsesFactory.createApproveRequestsResponse(approveRequests(appRequests));
+		LOGGER.info("Solicitamos la aprobacion de peticiones al Portafirmas"); //$NON-NLS-1$
+		
+		ApproveRequestList approvedList = approveRequests(appRequests);
+		
+		LOGGER.info("Hemos obtenido la listad de peticiones aprobadas del Portafirmas"); //$NON-NLS-1$
+		
+		return XmlResponsesFactory.createApproveRequestsResponse(approvedList);
 	}
 
 	private static ApproveRequestList approveRequests(final ApproveRequestList appRequests) {

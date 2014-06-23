@@ -17,7 +17,7 @@ import javax.xml.ws.WebServiceFeature;
  * Generated source version: 2.1
  * 
  */
-@WebServiceClient(name = "MobileService", targetNamespace = "urn:juntadeandalucia:cice:pfirma:mobile:v2.0", wsdlLocation = "https://portafirma.mpt.es/portafirma/servicesv2/MobileService?wsdl")
+@WebServiceClient(name = "MobileService", targetNamespace = "urn:juntadeandalucia:cice:pfirma:mobile:v2.0", wsdlLocation = "http://appint.map.es/portafirma/servicesv2/MobileService?wsdl")
 public class MobileService_Service
     extends Service
 {
@@ -30,9 +30,9 @@ public class MobileService_Service
         try {
             URL baseUrl;
             baseUrl = es.gob.afirma.signfolder.client.MobileService_Service.class.getResource(".");
-            url = new URL(baseUrl, "https://portafirma.mpt.es/portafirma/servicesv2/MobileService?wsdl");
+            url = new URL(baseUrl, "http://appint.map.es/portafirma/servicesv2/MobileService?wsdl");
         } catch (MalformedURLException e) {
-            logger.warning("Failed to create URL for the wsdl Location: 'https://portafirma.mpt.es/portafirma/servicesv2/MobileService?wsdl', retrying as a local file");
+            logger.warning("Failed to create URL for the wsdl Location: 'http://appint.map.es/portafirma/servicesv2/MobileService?wsdl', retrying as a local file");
             logger.warning(e.getMessage());
         }
         MOBILESERVICE_WSDL_LOCATION = url;

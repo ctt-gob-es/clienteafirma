@@ -1,6 +1,11 @@
 package es.gob.afirma.signfolder.server.proxy;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Vector;
+
+import es.gob.afirma.core.misc.Base64;
 
 /** Factor&iacute;a para la creaci&oacute;n de respuestas XML hacia el dispositivo cliente de firmas multi-fase.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
@@ -46,7 +51,24 @@ final class XmlResponsesFactory {
 			sb.append("</req>"); //$NON-NLS-1$
 		}
 		else {
-			sb.append("KO\" />"); //$NON-NLS-1$
+			
+			String exceptionb64 = null;
+			final Throwable t = triphaseRequest.getThrowable();
+			if (t != null) {
+				final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+				t.printStackTrace(new PrintWriter(baos));
+				exceptionb64 = Base64.encode(baos.toByteArray());
+				try { baos.close(); } catch (IOException e) { /* No hacemos nada */ }
+			}
+			
+			if (exceptionb64 != null) {
+				sb.append("KO\" exceptionb64=\"") //$NON-NLS-1$
+				.append(exceptionb64)
+				.append("\" />"); //$NON-NLS-1$
+			}
+			else {
+				sb.append("KO\" />"); //$NON-NLS-1$
+			}
 		}
 		return sb.toString();
 	}
@@ -102,7 +124,7 @@ final class XmlResponsesFactory {
 				sb.append("<mmtp>").append(doc.getMimeType()).append("</mmtp>"); //$NON-NLS-1$ //$NON-NLS-2$
 				sb.append("<sigfrmt>").append(doc.getSignFormat()).append("</sigfrmt>"); //$NON-NLS-1$ //$NON-NLS-2$
 				sb.append("<mdalgo>").append(doc.getMessageDigestAlgorithm()).append("</mdalgo>"); //$NON-NLS-1$ //$NON-NLS-2$
-				sb.append("<params>").append(doc.getParams()).append("</params>"); //$NON-NLS-1$ //$NON-NLS-2$
+				sb.append("<params>").append(doc.getParams() != null ? doc.getParams() : "").append("</params>"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				sb.append("</doc>"); //$NON-NLS-1$
 			}
 			sb.append("</docs>"); //$NON-NLS-1$

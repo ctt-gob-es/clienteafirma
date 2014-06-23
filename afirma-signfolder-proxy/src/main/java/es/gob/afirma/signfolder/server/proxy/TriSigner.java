@@ -9,7 +9,7 @@ import java.util.logging.Logger;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.Base64;
-import es.gob.afirma.core.misc.UrlHttpManagerImpl;
+import es.gob.afirma.core.misc.UrlHttpManagerFactory;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.signfolder.server.proxy.TriphaseSignDocumentRequest.TriphaseConfigDataBean;
 
@@ -78,7 +78,7 @@ public class TriSigner {
 				urlBuffer.append(HTTP_AND).append(PARAMETER_NAME_EXTRA_PARAM).append(HTTP_EQUALS).append(docReq.getParams());
 			}
 			
-			docReq.setPartialResult(parseTriphaseResult(UrlHttpManagerImpl.readUrlByPost(urlBuffer.toString())));
+			docReq.setPartialResult(parseTriphaseResult(UrlHttpManagerFactory.getInstalledManager().readUrlByPost(urlBuffer.toString())));
 			urlBuffer.setLength(0);
 		}
 		catch (final CertificateEncodingException e) {
@@ -126,7 +126,7 @@ public class TriSigner {
 				urlBuffer.append(HTTP_AND).append(PARAMETER_NAME_DOCID).append(HTTP_EQUALS).append(docReq.getContent());
 			}
 			
-			triSignFinalResult = UrlHttpManagerImpl.readUrlByPost(urlBuffer.toString());
+			triSignFinalResult = UrlHttpManagerFactory.getInstalledManager().readUrlByPost(urlBuffer.toString());
 			urlBuffer.setLength(0);
 		}
 		catch (final CertificateEncodingException e) {
@@ -161,9 +161,6 @@ public class TriSigner {
 	private static String digestToSignatureAlgorithmName(final String digestAlgorithm) {
 		return digestAlgorithm.replace("-", "").toUpperCase() + "withRSA";  //$NON-NLS-1$ //$NON-NLS-2$//$NON-NLS-3$
 	}
-	
-	/** Formato de firma PDF. */
-	private static final String FORMAT_PDF = "PDF"; //$NON-NLS-1$
 	
 	/**
 	 * Normalizamos el nombre del formato de firma. 

@@ -16,6 +16,9 @@ public class TriphaseRequest extends ArrayList<TriphaseSignDocumentRequest> {
 	/** Resultado de la petici&oacute;n de la petici&oacute;n. */
 	private boolean statusOk = true;
 
+	/** Excepcion detectada durante la peticion, en caso de existir. */
+	private Throwable throwable = null;
+	
 	/**
 	 * Construye un objeto de petici&oacute;n de prefirma o postfirma de documentos.
 	 * @param reference Referencia &uacute;nica de la petici&oacute;n.
@@ -58,5 +61,21 @@ public class TriphaseRequest extends ArrayList<TriphaseSignDocumentRequest> {
 	 * correctamente, {@code false} en caso contrario. */
 	public void setStatusOk(final boolean statusOk) {
 		this.statusOk = statusOk;
+	}
+
+	/**
+	 * Recupera el error detectado durante la operaci&oacute;n en caso de haberse producido.
+	 * @return Excepci&oacute;n/error que hizo fallar la operaci&oacute;n.
+	 */
+	public Throwable getThrowable() {
+		return this.throwable;
+	}
+
+	/**
+	 * Establece el error que se haya producido durante la operaci&oacute;n.
+	 * @param t Excepci&oacute;n/error que hizo fallar la operaci&oacute;n.
+	 */
+	public void setThrowable(Throwable t) {
+		this.throwable = t;
 	}
 }
