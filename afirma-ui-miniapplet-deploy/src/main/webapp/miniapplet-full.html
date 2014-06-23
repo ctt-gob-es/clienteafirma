@@ -3,7 +3,6 @@
   <head>
 	<title>Ejemplo de despliegue del MiniApplet @firma</title>
         <meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
-	<script type="text/javascript" src="js/deployJava.js"></script>
 	<script type="text/javascript" src="js/miniapplet.js"></script>
 	<script type="text/javascript">
 	
@@ -84,7 +83,7 @@
 		 */
 		function browse(title, dataField, textDiv) {
 			try {
-				var filenameDataB64 = MiniApplet.getFileNameContentBase64(title, null, null);
+				var filenameDataB64 = MiniApplet.getFileNameContentBase64(title, null, null, "Salida.txt");
 				if (filenameDataB64 == null) {
 					return;
 				}
@@ -126,7 +125,7 @@
   </head>
 	<body>
 		<script type="text/javascript">
-			MiniApplet.cargarMiniApplet('http://172.24.19.77:8080/afirma-ui-miniapplet-deploy');
+			MiniApplet.cargarMiniApplet('http://localhost:8080/afirma-ui-miniapplet-deploy');
 		</script>
 
 		<fieldset><legend>Entrada de datos (Opcional)</legend>
@@ -174,7 +173,7 @@
 		 <input type="button" value="Limpiar" onclick="cleanExtraParams();">&nbsp;
 		 <span>(Insertar las propiedades de una en una)</span>
 		 <br>
-		 <textarea id="params" cols="50" rows="5" readonly>serverUrl=http://172.24.19.77:8080/afirma-server-triphase-signer/SignatureService
+		 <textarea id="params" cols="50" rows="5" readonly>serverUrl=http://localhost:8080/afirma-server-triphase-signer/SignatureService
 </textarea>
 		</div>
 		</fieldset>

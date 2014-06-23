@@ -131,6 +131,10 @@ var MiniApplet = {
 					|| !!(navigator.userAgent.match(/Trident/) && navigator.userAgent.match(/rv:11/)); /* Internet Explorer 11 o superior */
 		},
 		
+		isFirefoxUAM : function () {
+		    return navigator.userAgent.indexOf("UAM") > 0;
+		},
+		
 		/** Determina con un boolean si nos encontramos en un entorno Windows 8 en modo "Modern UI".
 		 * Este metodo no es infalible dado que el navegador no ofrece forma de saberlo.
 		 * La comprobacion . */
@@ -144,20 +148,6 @@ var MiniApplet = {
 		isChrome : function () {
 			return navigator.userAgent.toUpperCase().indexOf("CHROME") != -1 ||
 				navigator.userAgent.toUpperCase().indexOf("CHROMIUM") != -1;
-		},
-
-		/**
-		 * Determina con un boolean si el navegador es Internet Explorer 7
-		 */
-		isIE7 : function () {
-			return navigator.appVersion.toUpperCase().indexOf("MSIE 7.0") != -1;
-		},
-		
-		/**
-		 * Determina con un boolean si el navegador es Internet Explorer 8
-		 */
-		isIE8 : function () {
-			return navigator.appVersion.toUpperCase().indexOf("MSIE 8.0") != -1;
 		},
 		
 		/**
@@ -237,6 +227,17 @@ var MiniApplet = {
 				 }
 			}
 		},
+
+		/** Establece los parametros de configuracion para la correcta seleccion del almacen
+		 * de claves que se debe cargar. */
+		configureKeyStore : function () {
+			if (MiniApplet.isFirefoxUAM()) {
+				if (MiniApplet.CUSTOM_JAVA_ARGUMENTS == null) {
+					MiniApplet.CUSTOM_JAVA_ARGUMENTS = "";
+				}
+				MiniApplet.CUSTOM_JAVA_ARGUMENTS += " -Des.gob.afirma.keystores.mozilla.UseEnvironmentVariables=true";
+			}
+		},
 		
 		/** Carga el MiniApplet. */
 		cargarMiniApplet : function (base, keystore) {
@@ -261,6 +262,9 @@ var MiniApplet = {
 				return;
 			}
 
+			// Configuramos los argumentos para la seleccion de almacen
+			MiniApplet.configureKeyStore();
+			
 			// Incluso si el navegador informa que hay Java, puede no haberlo (Internet Explorer
 			// siempre dice que hay), asi que cargamos el applet, pero tenemos en cuenta que en
 			// caso de error debemos cargar el cliente JavaScript
@@ -282,7 +286,6 @@ var MiniApplet = {
 			// Los argumentos de java no llegan al propio applet en las pruebas con Java 6 y 7,
 			// asi que (salvo los argumentos de carga) vamos a pasarlos como un parametro mas al
 			// applet para luego establecerlos internamente
-			
 			var parameters = {
 					keystore: keystoreConfig,
 					userAgent: window.navigator.userAgent,
@@ -294,7 +297,7 @@ var MiniApplet = {
 					separate_jvm: true,
 					locale: MiniApplet.selectedLocale
 			};
-			
+
 			this.loadMiniApplet(attributes, parameters);
 
 			MiniApplet.clienteFirma = document.getElementById("miniApplet");
@@ -448,27 +451,37 @@ var MiniApplet = {
 		 **************************************************************/
 		
 		loadMiniApplet : function (attributes, parameters) {
-
 			// Internet Explorer (a excepcion de la version 10) se carga mediante un
 			// elemento <object>. El resto con un <embed>.
-			if (MiniApplet.isInternetExplorer() && !MiniApplet.isIE10()) {
+			if (MiniApplet.isInternetExplorer()) { // && !MiniApplet.isIE10()) {
 				
-				var appletTag = "<object classid='clsid:8AD9C840-044E-11D1-B3E9-00805F499D93' width='1' height='1' id='" + attributes["id"] + "'>";
-					
+				var appletTag = "<object classid='clsid:8AD9C840-044E-11D1-B3E9-00805F499D93' width='" + attributes["width"] + "' height='" + attributes["height"] + "' id='" + attributes["id"] + "'>";
+
 				if (attributes != undefined && attributes != null) {
 					for (var attribute in attributes) {
 						appletTag += "<param name='" + attribute + "' value='" + attributes[attribute] + "' />";
 					}
 				}
-	
+
 				if (parameters != undefined && parameters != null) {
 					for (var parameter in parameters) {
 						appletTag += "<param name='" + parameter + "' value='" + parameters[parameter] + "' />";
 					}
 				}
-	
+
 				appletTag += "</object>";
-				document.write(appletTag);
+
+				// Al agregar con append() estos nodos no se carga automaticamente el applet en IE10 e inferiores, así que
+				// hay que usar document.write() o innerHTML. Para asegurarnos de no pisar HTML previo, crearemos un <div>
+				// en la pagina, lo recogeremos e insertaremos dentro suyo el codigo del applet.
+				var divElem = document.createElement("div");
+				var idAtt = document.createAttribute("id");
+				idAtt.value = 'divAfirmaApplet';
+				divElem.setAttributeNode(idAtt);
+
+				document.body.appendChild(divElem);
+				
+				document.getElementById("divAfirmaApplet").innerHTML = appletTag;
 			}
 			else {
 				var embed = document.createElement("embed");
@@ -477,7 +490,15 @@ var MiniApplet = {
 					for (var attribute in attributes) {
 						var att = document.createAttribute(attribute);
 						att.value = attributes[attribute];
-						embed.setAttributeNode(att);
+						try {
+							embed.setAttributeNode(att);
+						}
+						catch (e) {
+							// Probamos este como alternativa en caso de error.Solo detectado en IE10
+							// sin modo de compabilidad con el Document Mode de IE7. Este intento no
+							// soluciona el error, pero evita que se propague 
+							embed.setAttribute(attribute, attributes[attribute]);
+						}
 					}
 				}
 
@@ -503,7 +524,6 @@ var MiniApplet = {
 			if (MiniApplet.severeTimeDelay) {
 				return;
 			}
-			
 			if (MiniApplet.clientType == null) {
 				if (MiniApplet.clienteFirma == null) {
 					MiniApplet.clienteFirma = document.getElementById("miniApplet");
