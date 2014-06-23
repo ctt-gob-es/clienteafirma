@@ -28,6 +28,8 @@ import es.gob.afirma.keystores.callbacks.UIPasswordCallback;
  *  v&iacute;a NSS en el que se tratan de forma unificada los m&oacute;dulos internos y externos. */
 public final class MozillaUnifiedKeyStoreManager extends AggregatedKeyStoreManager {
 
+    private static final String ONLY_PKCS11 = "es.gob.afirma.keystores.mozilla.LoadSscdOnly"; //$NON-NLS-1$
+
 	/** Inicializa la clase gestora de almacenes de claves.
 	 * @throws AOKeyStoreManagerException
 	 *         Si no puede inicializarse ning&uacute;n almac&eacute;n de
@@ -44,10 +46,20 @@ public final class MozillaUnifiedKeyStoreManager extends AggregatedKeyStoreManag
 
 		final Object parentComponent = params != null && params.length > 0 ? params[0] : null;
 
-		// Primero anadimos el almacen principal NSS
-		final AOKeyStoreManager ksm = new NssKeyStoreManager(parentComponent);
-		ksm.init(type, store, pssCallBack, params, forceReset);
-		addKeyStoreManager(ksm);
+		final boolean onlySscd = Boolean.getBoolean(ONLY_PKCS11);
+		if (onlySscd) {
+			// Primero anadimos el almacen principal NSS
+			final AOKeyStoreManager ksm = new NssKeyStoreManager(parentComponent);
+			try {
+				ksm.init(type, store, pssCallBack, params, forceReset);
+			}
+			catch(final Exception e) {
+				LOGGER.severe(
+					"No se ha podido cargar NSS, se continuara con los almacenes externos: " + e //$NON-NLS-1$
+				);
+			}
+			addKeyStoreManager(ksm);
+		}
 
 		// Vamos ahora con los almacenes externos, que se limpian antes de usarse quitando DNIe (porque se usa
 		// el controlador Java) y anadiendo modulos conocidos si se encuentran en el sistema.
