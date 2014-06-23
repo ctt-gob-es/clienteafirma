@@ -10,6 +10,8 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import es.gob.afirma.core.AOUnsupportedSignFormatException;
 import es.gob.afirma.core.misc.AOUtil;
@@ -81,7 +83,7 @@ final class CommandLineLauncher {
 
 		// Desactivamos el Logger para que no interfiera con la consola
 		//TODO: Descomentar para poner en produccion
-//		Logger.getLogger("es.gob.afirma").setLevel(Level.OFF); //$NON-NLS-1$
+		Logger.getLogger("es.gob.afirma").setLevel(Level.OFF); //$NON-NLS-1$
 
 		final Console console = System.console();
 
