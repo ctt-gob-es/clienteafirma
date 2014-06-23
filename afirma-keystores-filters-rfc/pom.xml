@@ -24,5 +24,12 @@
 			<artifactId>afirma-core-keystores</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		
+		<dependency>
+			<groupId>es.gob.afirma</groupId>
+			<artifactId>afirma-lib-bouncycastle</artifactId>
+			<version>1.49</version>
+		</dependency>
+		
 	</dependencies>
 </project>
