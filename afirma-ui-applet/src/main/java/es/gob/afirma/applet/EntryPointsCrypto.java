@@ -201,7 +201,7 @@ interface EntryPointsCrypto {
     /** Agrega una nueva transformaci&oacute;n XML a la configuraci&oacute;n del
      * cliente. Esta transformaci&oacute;n ser&aacute; tenida en cuenta por
      * aquellos formatos de firma que permitan configurar las transformaciones
-     * XML que deben aplicarse sobre los datos.
+     * XML que deben aplicarse sobre los datos.<br>
      * Este m&eacute;todo puede utilizarse varias veces para establecer un
      * conjunto de transformaciones que se apliquen a las firmas de forma
      * ordenada. Existen varios tipos de transformaciones, dentro de los cuales
@@ -1006,7 +1006,7 @@ interface EntryPointsCrypto {
     /** Devuelve la firma generada en el &uacute;ltimo proceso de firma o
      * establecida por en el cliente como un String (&uacute;til para firmas
      * XAdES, XMLDSign y firma web). Si no se ha generado una firma, se devuelve
-     * cadena vac&iacute;a.
+     * cadena vac&iacute;a.<br>
      * El uso de este m&eacute;todo no esta recomendado ya que el resultado de
      * la que devuelve puede variar seg&uacute;n la codificaci&oacute;n
      * establecida por defecto. Su principal utilidad es mostrar el resultado de
@@ -1065,7 +1065,7 @@ interface EntryPointsCrypto {
     /** Establece los datos contenidos en el fichero indicado (en donde se
      * encontrar&aacute;n codificados en base 64), como los datos de entrada
      * para las operaciones criptogr&aacute;ficas y establece la ruta
-     * introducida como ruta de entrada.
+     * introducida como ruta de entrada.<br>
      * El contenido del fichero se interpretar&aacute; siempre como datos en
      * base 64 no realiz&aacute;ndose la comprobaci&oacute;n de los mismos. <br>
      *  Se muestra un di&aacute;logo al usuario
@@ -1127,7 +1127,7 @@ interface EntryPointsCrypto {
      * cuando no hay un valor asignado. Una vez se establece el valor del
      * fichero de datos este permanece a&uacute;n cuando no se completa la
      * operaci&acute;n de firma. Si no hay un fichero de datos establecido se
-     * devuelve cadena vac&iacute;a.
+     * devuelve cadena vac&iacute;a.<br>
      * La ruta del fichero se devolver&aacute; respetando el <i>URL
      * Encoding</i>, es decir, se realizar&aacute;n cambios tales como sustituir
      * los espacios (' ') por "%20". Esta codificaci&oacute;n impide obtener de
@@ -1259,7 +1259,7 @@ interface EntryPointsCrypto {
     /** Establece el modo de firma, que define si los datos se incrustar&aacute;n
      * o no en una firma generada. Puede ser "Explicit" o "Implicit" (o
      * "Explicita" e "Implicita", respectivamente). Las opciones son insensibles
-     * a may&uacute;sculas y min&uacute;sculas.
+     * a may&uacute;sculas y min&uacute;sculas.<br>
      * Un formato de firma puede definir modos de firma propios. <br>
      * <br>
      * Sets the signature mode defining whether data will be embedded or not in
@@ -1319,8 +1319,8 @@ interface EntryPointsCrypto {
     boolean signDirectory();
 
     /** Establece la operaci&oacute;n masiva a realizar en el proceso generado
-     * por los m&eacute;todos <code>signDirectory()</code>, <code>massiveSignatureData(String)</code> y <code>EntryPointsCrypto.massiveSignatureFile(String)</code>
-     * . <br>
+     * por los m&eacute;todos <code>signDirectory()</code>, <code>massiveSignatureData(String)</code>
+     * y <code>EntryPointsCrypto.massiveSignatureFile(String)</code>.<br>
      * Los tipos de operaci&oacute;n permitidos son:
      * <ul>
      * <li>FIRMAR: Firma de datos.</li>
