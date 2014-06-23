@@ -26,9 +26,16 @@
 		</dependency>
 
 		<dependency>
-			<groupId>es.gob.afirma</groupId>
-			<artifactId>afirma-lib-bouncycastle</artifactId>
-			<version>1.49</version>
+			<groupId>org.bouncycastle</groupId>
+			<artifactId>bcprov-jdk15on</artifactId>
+			<version>1.50</version>
 		</dependency>
+		
+		<dependency>
+			<groupId>org.bouncycastle</groupId>
+			<artifactId>bcpkix-jdk15on</artifactId>
+			<version>1.50</version>
+		</dependency>
+		
 	</dependencies>
 </project>
