@@ -14,7 +14,7 @@ import es.gob.afirma.keystores.filters.CertificateFilter;
 
 /** Filtro de certificados que limita el uso &uacute;nicamente a los certificados generados en
  * un SSCD.
- * Se usa como referencia el atributo QcSSCD, tal y como se indica en el Anexo II del los
+ * Se usa como referencia el atributo QcSSCD, tal y como se indica en el Anexo II de los
  * <i>Perfiles de certificados electr&oacute;nicos</i>, aprobado por el <i>Consejo Superior de
  * Administraci&oacute;n Electr&oacute;nica</i>, en reuni&oacute;n de la Comisi&oacute;n
  * Permanente de 30 de mayo de 2012.
