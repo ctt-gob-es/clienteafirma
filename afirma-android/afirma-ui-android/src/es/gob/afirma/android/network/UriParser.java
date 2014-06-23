@@ -331,14 +331,14 @@ public final class UriParser {
 		if (params.containsKey(PROPERTIES_PARAM)) {
 
 			final String props = URLDecoder.decode(params.get(PROPERTIES_PARAM), DEFAULT_URL_ENCODING);
-
+			
 			Log.d(ES_GOB_AFIRMA, "ExtraParams B64: " + props); //$NON-NLS-1$
 
 			try {
 				ret.setExtraParams(parseB64Properties(props));
 			}
 			catch (final Exception e) {
-				Log.e(ES_GOB_AFIRMA, "Se han indicado ExtraParams incorrecto, se ignoraran: " + e);  //$NON-NLS-1$
+				Log.e(ES_GOB_AFIRMA, "Se ha indicado ExtraParams incorrecto, se ignoraran: " + e);  //$NON-NLS-1$
 				ret.setExtraParams(new Properties());
 			}
 		}
