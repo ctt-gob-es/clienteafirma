@@ -17,7 +17,9 @@ import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AdESPolicy;
 import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.signers.cades.AOCAdESSigner;
+import es.gob.afirma.signers.cades.CAdESSignerMetadataHelper;
 import es.gob.afirma.signers.cades.CAdESTriPhaseSigner;
+import es.gob.afirma.signers.cades.CommitmentTypeIndicationsHelper;
 import es.gob.afirma.signers.multi.cades.CAdESTriPhaseCoSigner;
 import es.gob.afirma.signers.multi.cades.CAdESTriPhaseCounterSigner;
 import es.gob.afirma.signers.multi.cades.CAdESTriPhaseCounterSigner.CAdESPreCounterSignResult;
@@ -118,7 +120,9 @@ final class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 						new Date(),
 						false,           // PAdES Mode
 						contentTypeOid,
-						contentDescription
+						contentDescription,
+						CommitmentTypeIndicationsHelper.getCommitmentTypeIndications(extraParams),
+						CAdESSignerMetadataHelper.getCAdESSignerMetadata(extraParams)
 				);
 
 		LOGGER.info("Se prepara la respuesta de la prefirma CAdES"); //$NON-NLS-1$
@@ -225,7 +229,9 @@ final class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 					messageDigest,
 					contentTypeOid,
 					contentDescription,
-					new Date()
+					new Date(),
+					CommitmentTypeIndicationsHelper.getCommitmentTypeIndications(extraParams),
+					CAdESSignerMetadataHelper.getCAdESSignerMetadata(extraParams)
 					);
 		}
 		catch (final CertificateEncodingException e) {
@@ -342,7 +348,9 @@ final class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 							new AdESPolicy(config),
 							signingCertificateV2,
 							contentTypeOid,
-							contentDescription
+							contentDescription,
+							CommitmentTypeIndicationsHelper.getCommitmentTypeIndications(extraParams),
+							CAdESSignerMetadataHelper.getCAdESSignerMetadata(extraParams)
 					);
 		}
 		catch (final Exception e) {
