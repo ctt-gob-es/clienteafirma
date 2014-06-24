@@ -82,7 +82,7 @@ final class QCStatements extends ASN1Object {
         throw new IllegalArgumentException("Secuencia invalida"); //$NON-NLS-1$
     }
 
-    public List<QCStatement> getQCStatement() {
+    List<QCStatement> getQCStatement() {
         return this.qCStatements;
     }
 
