@@ -328,8 +328,12 @@ public final class UriParser {
 
 		ret.setSignAlgorithm(algo);
 
+		Log.i(ES_GOB_AFIRMA, "Vamos a analizar los ExtraParams: " + params.containsKey(PROPERTIES_PARAM)); //$NON-NLS-1$
+		
 		if (params.containsKey(PROPERTIES_PARAM)) {
 
+			Log.d(ES_GOB_AFIRMA, "ExtraParams B64 sin decodificar: " + params.get(PROPERTIES_PARAM)); //$NON-NLS-1$
+			
 			final String props = URLDecoder.decode(params.get(PROPERTIES_PARAM), DEFAULT_URL_ENCODING);
 			
 			Log.d(ES_GOB_AFIRMA, "ExtraParams B64: " + props); //$NON-NLS-1$
