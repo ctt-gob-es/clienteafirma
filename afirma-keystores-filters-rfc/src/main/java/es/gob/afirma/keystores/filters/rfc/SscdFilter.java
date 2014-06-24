@@ -2,7 +2,7 @@ package es.gob.afirma.keystores.filters.rfc;
 
 import java.io.IOException;
 import java.security.cert.X509Certificate;
-import java.util.Vector;
+import java.util.List;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Primitive;
@@ -46,7 +46,7 @@ public final class SscdFilter extends CertificateFilter {
 			return false;
 		}
 
-		final Vector<QCStatement> qcss = qcs.getQCStatement();
+		final List<QCStatement> qcss = qcs.getQCStatement();
 
 		for (final QCStatement qc : qcss) {
 			if (QC_SSCD_OID.equals(qc.getStatementId())) {

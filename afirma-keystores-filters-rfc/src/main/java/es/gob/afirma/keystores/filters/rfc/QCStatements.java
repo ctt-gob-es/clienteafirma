@@ -31,8 +31,9 @@ DAMAGE.
 
 package es.gob.afirma.keystores.filters.rfc;
 
+import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.Vector;
+import java.util.List;
 
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1Object;
@@ -62,10 +63,10 @@ import org.bouncycastle.asn1.x509.qualified.QCStatement;
    </pre> */
 final class QCStatements extends ASN1Object {
 
-    private final Vector<QCStatement> qCStatements;
+    private final List<QCStatement> qCStatements;
 
     private QCStatements(final ASN1Sequence seq) {
-        this.qCStatements = new Vector<QCStatement>();
+        this.qCStatements = new ArrayList<QCStatement>();
         for(int i =0;i<seq.size();i++){
             this.qCStatements.add(QCStatement.getInstance(seq.getObjectAt(i)));
         }
@@ -81,7 +82,7 @@ final class QCStatements extends ASN1Object {
         throw new IllegalArgumentException("Secuencia invalida"); //$NON-NLS-1$
     }
 
-    public Vector<QCStatement> getQCStatement() {
+    public List<QCStatement> getQCStatement() {
         return this.qCStatements;
     }
 
