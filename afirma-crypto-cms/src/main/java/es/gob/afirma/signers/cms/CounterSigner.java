@@ -108,8 +108,6 @@ final class CounterSigner {
                                 final Map<String, byte[]> atri,
                                 final Map<String, byte[]> uatri) throws IOException, NoSuchAlgorithmException, CertificateException, AOException {
 
-        // Inicializamos el Oid
-        // actualOid= dataType;
         this.atrib2 = atri;
         this.uatrib2 = uatri;
 
@@ -166,7 +164,6 @@ final class CounterSigner {
             SignedData sigDat;
             SignedData aux = sd;
 
-            // int carry = 0;
             int nodo = 0;
             for (int i = targets.length - 1; i >= 0; i--) {
                 nodo = targets[i];
@@ -214,11 +211,16 @@ final class CounterSigner {
         }
 
         // construimos el Signed Data y lo devolvemos
-        return new ContentInfo(PKCSObjectIdentifiers.signedData, new SignedData(sd.getDigestAlgorithms(),
-                                                                                sd.getEncapContentInfo(),
-                                                                                certificates,
-                                                                                certrevlist,
-                                                                                new DERSet(signerInfos))).getEncoded(ASN1Encoding.DER);
+        return new ContentInfo(
+    		PKCSObjectIdentifiers.signedData,
+    		new SignedData(
+				sd.getDigestAlgorithms(),
+				sd.getEncapContentInfo(),
+				certificates,
+				certrevlist,
+				new DERSet(signerInfos)
+			)
+		).getEncoded(ASN1Encoding.DER);
 
     }
 
@@ -461,12 +463,13 @@ final class CounterSigner {
             signerInfosU2.add(unsignedAtributte(parameters, signerInfo, key, certChain));
             final Attribute uAtrib = new Attribute(CMSAttributes.counterSignature, new DERSet(signerInfosU2));
             counterSigner =
-                    new SignerInfo(signerInfo.getSID(),
-                                   signerInfo.getDigestAlgorithm(),
-                                   signerInfo.getAuthenticatedAttributes(),
-                                   signerInfo.getDigestEncryptionAlgorithm(),
-                                   signerInfo.getEncryptedDigest(),
-                                   generateUnsignerInfoFromCounter(uAtrib) // unsignedAttr
+                    new SignerInfo(
+                	   signerInfo.getSID(),
+                       signerInfo.getDigestAlgorithm(),
+                       signerInfo.getAuthenticatedAttributes(),
+                       signerInfo.getDigestEncryptionAlgorithm(),
+                       signerInfo.getEncryptedDigest(),
+                       generateUnsignerInfoFromCounter(uAtrib) // unsignedAttr
                     );
 
         }

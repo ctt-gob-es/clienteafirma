@@ -35,7 +35,7 @@ final class MozillaKeyStoreUtilitiesWindows {
 
 	// Novedades de Firefox 9
 	// IMPORTANTE:
-	// No se puede cargar el entorno de ejecucion de Visual C++ 8 ("msvcr80.dll") porque requiere
+	// No se puede cargar el entorno de ejecucion de Visual C++ 8 (msvcr80.dll) porque requiere
 	// que el EXE de carga tenga empotrado un MANIFEST adecuado
 	private static final String MOZUTILS_DLL = "mozutils.dll"; //$NON-NLS-1$
 

@@ -158,17 +158,11 @@ final class CoSigner {
         }
 
         if (certChain.length != 0) {
-            // descomentar lo siguiente para version del rfc 3852
             final List<ASN1Encodable> ce = new ArrayList<ASN1Encodable>();
             for (final java.security.cert.Certificate element : certChain) {
                 ce.add(Certificate.getInstance(ASN1Primitive.fromByteArray(element.getEncoded())));
             }
             certificates = SigUtils.fillRestCerts(ce, vCertsSig);
-
-            // y comentar esta parte de abajo
-            // vCertsSig.add(X509CertificateStructure.getInstance(ASN1Object.fromByteArray(signerCertificateChain[0].getEncoded())));
-            // certificates = new BERSet(vCertsSig);
-
         }
 
         // buscamos que timo de algoritmo es y lo codificamos con su OID
@@ -304,9 +298,6 @@ final class CoSigner {
         // 4. CERTIFICADOS
         // obtenemos la lista de certificados
         ASN1Set certificates = null;
-        // X509Certificate[] signerCertificateChain =
-        // parameters.getSignerCertificateChain();
-
         final ASN1Set certificatesSigned = sd.getCertificates();
         final ASN1EncodableVector vCertsSig = new ASN1EncodableVector();
         final Enumeration<?> certs = certificatesSigned.getObjects();
@@ -317,17 +308,11 @@ final class CoSigner {
         }
 
         if (signerCertificateChain.length != 0) {
-            // descomentar lo siguiente para version del rfc 3852
             final List<ASN1Encodable> ce = new ArrayList<ASN1Encodable>();
             for (final X509Certificate element : signerCertificateChain) {
                 ce.add(Certificate.getInstance(ASN1Primitive.fromByteArray(element.getEncoded())));
             }
             certificates = SigUtils.fillRestCerts(ce, vCertsSig);
-
-            // y comentar esta parte de abajo
-            // vCertsSig.add(X509CertificateStructure.getInstance(ASN1Object.fromByteArray(signerCertificateChain[0].getEncoded())));
-            // certificates = new BERSet(vCertsSig);
-
         }
 
         // buscamos que tipo de algoritmo es y lo codificamos con su OID
@@ -420,12 +405,16 @@ final class CoSigner {
         ));
 
         // construimos el Signed Data y lo devolvemos
-        return new ContentInfo(PKCSObjectIdentifiers.signedData, new SignedData(sd.getDigestAlgorithms(),
-                                                                                encInfo,
-                                                                                certificates,
-                                                                                null,
-                                                                                new DERSet(signerInfos)// unsignedAttr
-                               )).getEncoded(ASN1Encoding.DER);
+        return new ContentInfo(
+    		PKCSObjectIdentifiers.signedData,
+    		new SignedData(
+				sd.getDigestAlgorithms(),
+                encInfo,
+                certificates,
+                null,
+                new DERSet(signerInfos)// unsignedAttr
+            )
+		).getEncoded(ASN1Encoding.DER);
 
     }
 

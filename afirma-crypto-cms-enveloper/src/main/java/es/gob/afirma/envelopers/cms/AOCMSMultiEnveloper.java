@@ -632,12 +632,10 @@ public byte[] cosign(final byte[] data, final byte[] sign, final String algorith
         if (doi.equals(org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers.data)) {
             LOGGER.warning("La extraccion de datos de los envoltorios CMS Data no esta implementada"); //$NON-NLS-1$
             datos = null;
-            // datos = this.recoverCMSEncryptedData(cmsEnvelop, cipherKey);
         }
         else if (doi.equals(org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers.digestedData)) {
             LOGGER.warning("La extraccion de datos de los envoltorios CMS DigestedData no esta implementada");  //$NON-NLS-1$
             datos = null;
-            // datos = this.recoverCMSEncryptedData(cmsEnvelop, cipherKey);
         }
         else if (doi.equals(org.bouncycastle.asn1.cms.CMSObjectIdentifiers.compressedData)) {
             datos = AOCMSMultiEnveloper.recoverCMSCompressedData(cmsEnvelop);

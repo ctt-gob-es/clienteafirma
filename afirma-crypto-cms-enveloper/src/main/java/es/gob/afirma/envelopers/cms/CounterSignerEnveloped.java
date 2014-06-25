@@ -166,7 +166,6 @@ final class CounterSignerEnveloped {
             SignedAndEnvelopedData sigDat;
             SignedAndEnvelopedData aux = sd;
 
-            // int carry = 0;
             int nodo = 0;
             for (int i = targets.length - 1; i >= 0; i--) {
                 nodo = targets[i];
@@ -613,10 +612,6 @@ final class CounterSignerEnveloped {
                             );
                 }
                 else {
-                    // Esta sentencia se comenta para que no se firme el nodo
-                    // actual cuando no sea hoja
-                    // signerInfosU.add(UnsignedAtributte(parameters, cert,
-                    // signerInfo, keyEntry));
                     final Attribute uAtrib = new Attribute(CMSAttributes.counterSignature, new DERSet(signerInfosU));
                     counterSigner =
                             new SignerInfo(signerInfo.getSID(),
@@ -750,10 +745,6 @@ final class CounterSignerEnveloped {
                             );
                 }
                 else {
-                    // Esta sentencia se comenta para que no se firme el nodo
-                    // actual cuando no sea hoja
-                    // signerInfosU.add(UnsignedAtributte(parameters, cert,
-                    // signerInfo, keyEntry));
                     final Attribute uAtrib = new Attribute(CMSAttributes.counterSignature, new DERSet(signerInfosU));
                     counterSigner =
                             new SignerInfo(signerInfo.getSID(),
