@@ -22,9 +22,9 @@ import javax.swing.JOptionPane;
 import es.gob.afirma.core.keystores.KeyStoreRefresher;
 import es.gob.afirma.core.keystores.NameCertificateBean;
 
-/** Di&aacute;logo de selecci&oacute;n de certificados con est&eacute;tica similar al de
- * Windows 7.
- * @author Carlos Gamuci */
+/** Di&aacute;logo de selecci&oacute;n de certificados con est&eacute;tica similar al de Windows 7.
+ * @author Carlos Gamuci
+ * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public final class CertificateSelectionDialog extends MouseAdapter {
 
 	private final CertificateSelectionPanel csd;
