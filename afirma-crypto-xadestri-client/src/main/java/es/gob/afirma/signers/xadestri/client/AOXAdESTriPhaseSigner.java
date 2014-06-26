@@ -17,8 +17,16 @@ import java.net.URL;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
+
+import javax.xml.parsers.DocumentBuilderFactory;
+
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOInvalidFormatException;
@@ -175,10 +183,53 @@ public final class AOXAdESTriPhaseSigner implements AOSigner {
 		throw new UnsupportedOperationException("No se soporta en firma trifasica"); //$NON-NLS-1$
 	}
 
+	
+	/** URI que define el NameSpace de firma XMLdSig (Compatible XAdES). */
+    public static final String DSIGNNS = "http://www.w3.org/2000/09/xmldsig#"; //$NON-NLS-1$
+    static final String XML_SIGNATURE_PREFIX = "ds"; //$NON-NLS-1$
+    /** Etiqueta de los nodos firma de los XML firmados. */
+    public static final String SIGNATURE_TAG = "Signature"; //$NON-NLS-1$
+    static final String SIGNATURE_NODE_NAME = XML_SIGNATURE_PREFIX + ":Signature"; //$NON-NLS-1$
+    
 	/** {@inheritDoc} */
 	@Override
 	public boolean isSign(final byte[] sign) {
-		throw new UnsupportedOperationException("No se soporta en firma trifasica"); //$NON-NLS-1$
+        if (sign == null) {
+            LOGGER.warning("Se han introducido datos nulos para su comprobacion"); //$NON-NLS-1$
+            return false;
+        }
+
+        try {
+            // Carga el documento a validar
+            final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            dbf.setNamespaceAware(true);
+
+            // JXades no captura un nodo de firma si se pasa este como raiz del
+            // arbol de firmas, asi
+            // que nos vemos obligados a crear un nodo padre, del que colgara
+            // todo el arbol de firmas,
+            // para que lo detecte correctamente
+            final Element rootNode = dbf.newDocumentBuilder().parse(new ByteArrayInputStream(sign)).getDocumentElement();
+
+            final List<Node> signNodes = new ArrayList<Node>();
+            if (rootNode.getNodeName().equals(SIGNATURE_NODE_NAME)) {
+                signNodes.add(rootNode);
+            }
+
+            final NodeList signatures = rootNode.getElementsByTagNameNS(DSIGNNS, SIGNATURE_TAG);
+            for (int i = 0; i < signatures.getLength(); i++) {
+                signNodes.add(signatures.item(i));
+            }
+
+            // Si no se encuentran firmas, no es un documento de firma (obviamos si son XAdES o no)
+            if (signNodes.size() == 0) {
+                return false;
+            }
+        }
+        catch (final Exception e) {
+            return false;
+        }
+        return true;
 	}
 
 	/** {@inheritDoc} */

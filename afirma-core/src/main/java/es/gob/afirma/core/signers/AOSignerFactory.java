@@ -47,7 +47,7 @@ public final class AOSignerFactory {
 		{AOSignConstants.SIGN_FORMAT_FACTURAE, SIGNER_CLASS_FACTURAE, Boolean.TRUE.toString()},
 		{AOSignConstants.SIGN_FORMAT_FACTURAE_ALT1, SIGNER_CLASS_FACTURAE, Boolean.FALSE.toString()},
 		{AOSignConstants.SIGN_FORMAT_XADES, SIGNER_CLASS_XADES, Boolean.TRUE.toString()},
-		{AOSignConstants.SIGN_FORMAT_XADES_TRI, SIGNER_CLASS_XADES_TRI, Boolean.FALSE.toString()},
+		{AOSignConstants.SIGN_FORMAT_XADES_TRI, SIGNER_CLASS_XADES_TRI, Boolean.TRUE.toString()},
 		{AOSignConstants.SIGN_FORMAT_XADES_DETACHED, SIGNER_CLASS_XADES, Boolean.FALSE.toString()},
 		{AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED, SIGNER_CLASS_XADES, Boolean.FALSE.toString()},
 		{AOSignConstants.SIGN_FORMAT_XADES_ENVELOPING, SIGNER_CLASS_XADES, Boolean.FALSE.toString()},
