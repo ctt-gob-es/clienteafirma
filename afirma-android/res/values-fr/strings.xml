@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Client m\u00F3vil @firma</string>
+    <string name="title_activity_cert_chooser">Importer certificat</string>
+    <string name="presentation_text">Bienvenue "Client @firma Android" 0.1 Beta.\nCette application permet rèaliser signatures électroniques sur les sites webs qui possédent des serveurs de certificats.\nPour bien fonctionner, vous devez disposer d’un certificat électronique et votre code privé installés dans votre dispositive. Consultez avec votre serveur de certification et la documentation de votre système Android.</string>
+    <string name="import_cert">Importer cerficat</string>
+    <string name="disclaimer">2013 Gouvernement d\'Espagne</string>
+    <string name="ok">Accepter</string>
+    <string name="title_activity_sign_data">Signature des données</string>
+    <string name="error_bad_params">L\'invocation à l\'application n\'a pas réussi. Consultez avec votre serveur.</string>
+    <string name="error_server_connect">Erreur de conexion entre l\'application et le site web.</string>
+    <string name="error_server_error">Erreur dans l\'envoie du resultat de la signature au site web.</string>
+    <string name="file_chooser_directorio_actual">Répertoire actuel:</string>
+    <string name="file_chooser_directorio">Répertoire</string>
+    <string name="file_chooser_directorio_padre">Répertoire principal</string>
+    <string name="file_chooser_tamano_del_fichero">Taille du fichier:</string>
+    <string name="file_chooser_read_error">Erreur: Il n\'est pas possible la lecture du fichier</string>
+    <string name="bytes">bytes</string>
+</resources>
+
