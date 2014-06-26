@@ -1,4 +1,4 @@
-package es.gob.afirma.keystores.misc;
+package es.gob.afirma.crypto.jarverifier;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;

@@ -41,8 +41,8 @@ import es.gob.afirma.core.LogManager.App;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.signers.AOSigner;
+import es.gob.afirma.crypto.jarverifier.JarSignatureCertExtractor;
 import es.gob.afirma.keystores.AOKeyStore;
-import es.gob.afirma.keystores.misc.JarSignatureCertExtractor;
 
 /** MiniApplet de firma del proyecto Afirma. */
 public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
