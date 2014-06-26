@@ -30,6 +30,11 @@ public final class MozillaUnifiedKeyStoreManager extends AggregatedKeyStoreManag
 
     private static final String ONLY_PKCS11 = "es.gob.afirma.keystores.mozilla.LoadSscdOnly"; //$NON-NLS-1$
 
+	/** Crea un <i>AOKeyStoreManager</i> para acceso a almacenes de claves de Firefox. */
+	public MozillaUnifiedKeyStoreManager() {
+		setKeyStoreType(AOKeyStore.MOZ_UNI);
+	}
+
 	/** Inicializa la clase gestora de almacenes de claves.
 	 * @throws AOKeyStoreManagerException
 	 *         Si no puede inicializarse ning&uacute;n almac&eacute;n de
