@@ -393,6 +393,7 @@ public final class AOKeyStoreManagerFactory {
             ksmUni.init(AOKeyStore.MOZ_UNI, null, pssCallback, new Object[] { parentComponent }, forceReset);
         }
         catch (final AOException e) {
+            e.printStackTrace();
             throw new AOKeystoreAlternativeException(
                 getAlternateKeyStoreType(AOKeyStore.MOZ_UNI),
                 "Error al inicializar el almacen NSS unificado de Mozilla Firefox: " + e, //$NON-NLS-1$

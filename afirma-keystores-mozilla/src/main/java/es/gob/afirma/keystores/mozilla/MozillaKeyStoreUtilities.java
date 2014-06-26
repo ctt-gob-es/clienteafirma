@@ -315,7 +315,6 @@ final class MozillaKeyStoreUtilities {
 		if (Platform.OS.WINDOWS.equals(Platform.getOS()) || Platform.OS.MACOSX.equals(Platform.getOS())) {
 			try {
 				nssLibDir = getNssPathFromCompatibilityFile();
-				LOGGER.info("Directorio de NSS determinado a partir de 'compatibility.ini' de Firefox"); //$NON-NLS-1$
 			}
 			catch(final Exception e) {
 				LOGGER.warning("No se ha podido acceder a 'compatibility.ini' de Mozilla: " + e); //$NON-NLS-1$
@@ -638,7 +637,8 @@ final class MozillaKeyStoreUtilities {
 				"libplds4.dylib", //$NON-NLS-1$
 				"libplc4.dylib", //$NON-NLS-1$
 				"libnssutil3.dylib", //$NON-NLS-1$
-				"libmozsqlite3.dylib" //$NON-NLS-1$
+				"libmozsqlite3.dylib", //$NON-NLS-1$
+				"libnss3.dylib" // Detectado en Firefox 30, quizas se introdujo en versiones anteriores //$NON-NLS-1$
 		};
 
 		// Creamos enlaces simbolicos via AppleScript
