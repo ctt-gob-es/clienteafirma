@@ -1,6 +1,5 @@
 package es.gob.afirma.keystores;
 
-import java.awt.Component;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.security.KeyStore;
@@ -21,7 +20,7 @@ final class AOKeyStoreManagerHelperDnieJava {
 	}
 
     static KeyStore initDnieJava(final PasswordCallback pssCallBack,
-    		                            final Object parentComponent) throws AOKeyStoreManagerException,
+    		                     final Object parentComponent) throws AOKeyStoreManagerException,
     		                                                                 IOException {
     	final Provider p;
     	if (Security.getProvider(AOKeyStore.DNIEJAVA.getProviderName()) == null) {
@@ -39,7 +38,7 @@ final class AOKeyStoreManagerHelperDnieJava {
 
     	try {
     		final Class<?> managerClass = Class.forName("es.gob.jmulticard.ui.passwordcallback.PasswordCallbackManager"); //$NON-NLS-1$
-    		final Method setDialogOwnerFrameMethod = managerClass.getMethod("setDialogOwner", Component.class); //$NON-NLS-1$
+    		final Method setDialogOwnerFrameMethod = managerClass.getMethod("setDialogOwner", Object.class); //$NON-NLS-1$
     		setDialogOwnerFrameMethod.invoke(null, parentComponent);
     	}
     	catch (final Exception e) {
