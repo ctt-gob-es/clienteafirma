@@ -131,7 +131,7 @@ public final class MozillaUnifiedKeyStoreManager extends AggregatedKeyStoreManag
 		}
 
 		if (lacksKeyStores()) {
-			throw new AOKeyStoreManagerException("No se ha podido inicializar ningun almacen, interno o externo, de Firefox"); //$NON-NLS-1$
+			LOGGER.warning("No se ha podido inicializar ningun almacen, interno o externo, de Firefox"); //$NON-NLS-1$
 		}
 
 	}
