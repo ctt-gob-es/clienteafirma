@@ -44,6 +44,12 @@
 
 		<dependency>
 			<groupId>es.gob.afirma</groupId>
+			<artifactId>afirma-ui-core-jse-keystores</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>es.gob.afirma</groupId>
 			<artifactId>afirma-core-keystores</artifactId>
 			<version>${project.version}</version>
 		</dependency>

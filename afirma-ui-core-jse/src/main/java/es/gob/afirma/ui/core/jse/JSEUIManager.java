@@ -18,6 +18,8 @@ import java.awt.Toolkit;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 import java.util.logging.Logger;
 
 import javax.swing.Icon;
@@ -32,10 +34,9 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.PlainDocument;
 
 import es.gob.afirma.core.AOCancelledOperationException;
-import es.gob.afirma.core.keystores.KeyStoreRefresher;
+import es.gob.afirma.core.keystores.KeyStoreManager;
 import es.gob.afirma.core.keystores.NameCertificateBean;
 import es.gob.afirma.core.ui.AOUIManager;
-import es.gob.afirma.ui.core.jse.certificateselection.CertificateSelectionDialog;
 
 /** Gestor de componentes de interfaz gr&aacute;fico (tanto para Applet como para
  * aplicaci&oacute;n de escritorio) de la aplicaci&oacute;n.
@@ -154,12 +155,28 @@ public class JSEUIManager implements AOUIManager {
     @Override
 	public final Object showCertificateSelectionDialog(final Object parentComponent,
     												   final NameCertificateBean[] selectionValues,
-    												   final KeyStoreRefresher ksr) {
+    												   final KeyStoreManager ksm) {
     	Component parent = null;
     	if (parentComponent instanceof Component) {
     		parent = (Component) parentComponent;
     	}
-		return new CertificateSelectionDialog(selectionValues, parent).showDialog(ksr);
+    	
+    	try {
+    		final Class<?> csdClass = Class.forName(
+    				"es.gob.afirma.ui.core.jse.certificateselection.CertificateSelectionDialog" //$NON-NLS-1$
+    		);
+    		final Constructor<?> csdConstructor =
+    				csdClass.getConstructor(
+    						NameCertificateBean[].class,
+    						KeyStoreManager.class,
+    						Component.class);
+    		final Object csd =  csdConstructor.newInstance(selectionValues, ksm, parent);
+    		final Method showDialogMethod = csdClass.getMethod("showDialog"); //$NON-NLS-1$
+    		return showDialogMethod.invoke(csd);
+    	}
+    	catch (final Exception e) {
+    		throw new RuntimeException("No se encuentra disponible el proyecto del interfaz grafico del dialogo de seleccion", e); //$NON-NLS-1$
+    	}
     }
 
     /** Original code: <a href="http://tactika.com/realhome/realhome.html">http://tactika.com/realhome/realhome.html</a>

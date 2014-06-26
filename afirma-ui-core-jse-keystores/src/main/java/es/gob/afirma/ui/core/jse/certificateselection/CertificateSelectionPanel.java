@@ -62,7 +62,7 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 
 	private int selectedIndex;
 
-	private final NameCertificateBean[] certificateBeans;
+	private NameCertificateBean[] certificateBeans;
 
 	CertificateSelectionPanel(final NameCertificateBean[] el) {
 		this.certificateBeans = el == null ? new NameCertificateBean[0] : el.clone();
@@ -154,6 +154,33 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 		this.add(sPane, c);
 	}
 
+	
+	//TODO: COMPLETAR ======================
+	public void refresh(NameCertificateBean[] certs) {
+		
+		this.certificateBeans = certs;
+
+		CertificateLine certLine;
+		final List<CertificateLine> certLines = new ArrayList<CertificateSelectionPanel.CertificateLine>();
+		for (final NameCertificateBean nameCert : this.certificateBeans) {
+		    try {
+		    	certLine = createCertLine(nameCert.getName(), nameCert.getCertificate() );
+		    }
+		    catch(final Exception e) {
+		        continue;
+		    }
+			certLine.setPreferredSize(new Dimension(0, CERT_LIST_ELEMENT_HEIGHT));
+			certLines.add(certLine);
+		}
+
+		this.certList.setListData(certLines.toArray());
+		this.certList.setVisibleRowCount(Math.max(Math.min(4, certLines.size()), 1));
+		if (certLines.size() > 0) {
+			this.certList.setSelectedIndex(0);
+		}
+		
+	}
+	
 	/** Selecciona la lista de certificados. */
     void selectCertificateList() {
 		this.certList.requestFocusInWindow();

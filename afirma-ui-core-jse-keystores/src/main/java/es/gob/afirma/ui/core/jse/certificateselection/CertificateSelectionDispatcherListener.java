@@ -12,20 +12,19 @@ import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 
 import es.gob.afirma.core.AOCancelledOperationException;
-import es.gob.afirma.core.keystores.KeyStoreRefresher;
+import es.gob.afirma.core.keystores.KeyStoreManager;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.ui.core.jse.JSEUIManager;
 
 final class CertificateSelectionDispatcherListener implements KeyEventDispatcher {
 
-	private final KeyStoreRefresher localKeyStoreEnabler;
-
-	private static final String[] EXTS;
-	private static final String EXTS_DESC;
+	private static final String HELP_URI = "http://incidencias-ctt.administracionelectronica.gob.es/wiki/doku.php?id=forja-ctt_wiki:clienteafirma:start"; //$NON-NLS-1$
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
-	private static final String HELP_URI = "http://incidencias-ctt.administracionelectronica.gob.es/wiki/doku.php?id=forja-ctt_wiki:clienteafirma:start"; //$NON-NLS-1$
+	
+	private static final String[] EXTS;
+	private static final String EXTS_DESC;
 	static {
 		if (Platform.OS.MACOSX.equals(Platform.getOS())) {
 			EXTS = new String[] {
@@ -48,11 +47,15 @@ final class CertificateSelectionDispatcherListener implements KeyEventDispatcher
 	}
 
 	private final Component parent;
+	private final KeyStoreManager localKeyStore;
+	private final CertificateSelectionDialog selectionDialog;
 
 	CertificateSelectionDispatcherListener(final Component p,
-			                               final KeyStoreRefresher lke) {
+			                               final KeyStoreManager lks,
+			                               final CertificateSelectionDialog selectionDialog) {
 		this.parent = p;
-		this.localKeyStoreEnabler = lke;
+		this.localKeyStore = lks;
+		this.selectionDialog = selectionDialog;
 	}
 
 	@Override
@@ -76,7 +79,7 @@ final class CertificateSelectionDispatcherListener implements KeyEventDispatcher
 				return false;
 			}
 
-			if (this.localKeyStoreEnabler != null) {
+			if (this.localKeyStore != null) {
 
 				// En OS X el modificador es distinto (la tecla Meta es el "Command" de Mac)
 				if (!Platform.OS.MACOSX.equals(Platform.getOS()) && ke.isControlDown() || ke.isMetaDown()) {
@@ -99,26 +102,29 @@ final class CertificateSelectionDispatcherListener implements KeyEventDispatcher
 					}
 				}
 				else if (KeyEvent.VK_F5 == ke.getKeyCode()) {
+
 					if (this.parent != null) {
 						this.parent.setCursor(new Cursor(Cursor.WAIT_CURSOR));
 					}
 					try {
-						this.localKeyStoreEnabler.refresh();
+						this.localKeyStore.refresh();
 					}
 					catch (final IOException e) {
 						LOGGER.severe("Error al refrescar el almacen actual: " + e); //$NON-NLS-1$
 						new JSEUIManager().showMessageDialog(
-							this.parent,
-							CertificateSelectionDialogMessages.getString("CertificateSelectionDispatcherListener.2"), //$NON-NLS-1$
-							CertificateSelectionDialogMessages.getString("CertificateSelectionDispatcherListener.3"), //$NON-NLS-1$
-							JOptionPane.ERROR_MESSAGE
-						);
+								this.parent,
+								CertificateSelectionDialogMessages.getString("CertificateSelectionDispatcherListener.2"), //$NON-NLS-1$
+								CertificateSelectionDialogMessages.getString("CertificateSelectionDispatcherListener.3"), //$NON-NLS-1$
+								JOptionPane.ERROR_MESSAGE
+								);
 					}
 					finally {
 						if (this.parent != null) {
 							this.parent.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 						}
 					}
+					
+					this.selectionDialog.refresh();
 				}
 			}
 

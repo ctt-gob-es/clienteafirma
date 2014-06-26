@@ -136,6 +136,12 @@
 				
 				<dependency>
 					<groupId>es.gob.afirma</groupId>
+					<artifactId>afirma-ui-core-jse-keystores</artifactId>
+					<version>${project.version}</version>
+				</dependency>
+				
+				<dependency>
+					<groupId>es.gob.afirma</groupId>
 					<artifactId>afirma-crypto-cadestri-client</artifactId>
 					<version>${project.version}</version>
 				</dependency>

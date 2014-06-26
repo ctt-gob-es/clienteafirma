@@ -43,6 +43,7 @@
 		<module>afirma-keystores-mozilla</module>
 		<module>afirma-keystores-single</module>
 		<module>afirma-ui-core-jse</module>
+		<module>afirma-ui-core-jse-keystores</module>
 		<module>afirma-util</module>
 		<module>afirma-crypto-pdf</module>
 		<module>afirma-core-massive</module>

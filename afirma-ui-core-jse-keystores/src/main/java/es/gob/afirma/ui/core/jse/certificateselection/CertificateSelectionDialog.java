@@ -12,6 +12,7 @@ package es.gob.afirma.ui.core.jse.certificateselection;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -19,7 +20,7 @@ import java.awt.event.MouseEvent;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 
-import es.gob.afirma.core.keystores.KeyStoreRefresher;
+import es.gob.afirma.core.keystores.KeyStoreManager;
 import es.gob.afirma.core.keystores.NameCertificateBean;
 
 /** Di&aacute;logo de selecci&oacute;n de certificados con est&eacute;tica similar al de Windows 7.
@@ -30,6 +31,8 @@ public final class CertificateSelectionDialog extends MouseAdapter {
 	private final CertificateSelectionPanel csd;
 
 	private final JOptionPane optionPane;
+	
+	private final KeyStoreManager ksm;
 
 	private final Component parent;
 
@@ -37,12 +40,14 @@ public final class CertificateSelectionDialog extends MouseAdapter {
 	 * sus nombres y los propios certificados.
 	 * @param el Listado de certificados.
 	 * @param parent Componente sobre el que se mostrar&aacute; el di&aacute;logo. */
-	public CertificateSelectionDialog(final NameCertificateBean[] el, final Component parent) {
+	public CertificateSelectionDialog(final NameCertificateBean[] el, final KeyStoreManager ksm, final Component parent) {
 
 	    if (el == null || el.length == 0) {
 	        throw new IllegalArgumentException("El listado de certificados no puede ser nulo ni vacio"); //$NON-NLS-1$
 	    }
 
+	    this.ksm = ksm;
+	    
 		this.csd = new CertificateSelectionPanel(el.clone());
 		this.parent = parent;
 		this.optionPane = el.length > 1 ?
@@ -57,10 +62,9 @@ public final class CertificateSelectionDialog extends MouseAdapter {
 	}
 
 	/** Muestra el di&aacute;logo de selecci&oacute;n de certificados.
-	 * @param ksr Componente para actualizar el almac&eacute;n actual
 	 * @return Nombre del certificado seleccionado o {@code null} si el usuario
 	 * lo cancela o cierra sin seleccionar. */
-	public String showDialog(final KeyStoreRefresher ksr) {
+	public String showDialog() {
 		final JDialog certDialog = this.optionPane.createDialog(
 			this.parent,
 			CertificateSelectionDialogMessages.getString("CertificateSelectionDialog.0") //$NON-NLS-1$
@@ -69,21 +73,24 @@ public final class CertificateSelectionDialog extends MouseAdapter {
 		certDialog.setBackground(Color.WHITE);
 		certDialog.setModal(true);
 
-		KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(
-			new CertificateSelectionDispatcherListener(
+		final KeyEventDispatcher dispatcher = new CertificateSelectionDispatcherListener(
 				this.optionPane,
-				ksr
-			)
-		);
+				this.ksm,
+				this
+				); 
+		
+		KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(dispatcher);
 
 		certDialog.setVisible(true);
 
 		if (this.optionPane.getValue() == null ||
 				((Integer) this.optionPane.getValue()).intValue() != JOptionPane.OK_OPTION) {
+			KeyboardFocusManager.getCurrentKeyboardFocusManager().removeKeyEventDispatcher(dispatcher);
 			certDialog.dispose();
 			return null;
 		}
 		final String selectedAlias = this.csd.getSelectedCertificate();
+		KeyboardFocusManager.getCurrentKeyboardFocusManager().removeKeyEventDispatcher(dispatcher);
 		certDialog.dispose();
 		return selectedAlias;
 	}
@@ -113,4 +120,13 @@ public final class CertificateSelectionDialog extends MouseAdapter {
         }
 	}
 
+	/** Refresca el di&aacute;logo con los certificados del mismo almac&eacute;n. */
+	public void refresh() {
+		
+	}
+	
+	public void changeKeyStore(final KeyStoreManager ksm) {
+		
+		
+	}
 }
