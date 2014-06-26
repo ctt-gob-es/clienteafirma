@@ -1168,14 +1168,7 @@ public final class AOXMLDSigSigner implements AOSigner {
                 if (firstChild.getAttribute(MIMETYPE_STR).equals("text/xml")) { //$NON-NLS-1$
                     elementRes = (Element) firstChild.getFirstChild();
                 }
-                // Si el MimeType es de tipo Hash (tipo creado para el cliente
-                // afirma) asi que la firma no tiene datos
-                // else if
-                // (firstChild.getAttribute(MIMETYPE_STR).startsWith("hash/")) {
-                // elementRes = null;
-                // }
-                // si el documento es binario se deshace la codificacion en
-                // Base64
+                // si el documento es binario se deshace la codificacion en Base64
                 else {
                     return Base64.decode(firstChild.getTextContent());
                 }

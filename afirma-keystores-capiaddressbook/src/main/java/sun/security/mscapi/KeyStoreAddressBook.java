@@ -67,7 +67,7 @@ public abstract class KeyStoreAddressBook extends KeyStoreSpi {
     }
 
     final class KeyEntry {
-        // private Key privateKey;
+
         private final X509Certificate certChain[];
         private String alias;
 
@@ -81,7 +81,6 @@ public abstract class KeyStoreAddressBook extends KeyStoreSpi {
 
         KeyEntry(final String alias, final X509Certificate[] chain) {
 
-            // this.privateKey = key;
             this.certChain = chain.clone();
             /*
              * The default alias for both entry types is derived from a hash

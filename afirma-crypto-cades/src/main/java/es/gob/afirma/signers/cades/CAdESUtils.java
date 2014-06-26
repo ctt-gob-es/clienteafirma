@@ -372,10 +372,6 @@ public final class CAdESUtils {
                 padesMode
         );
 
-        // Serial Number
-        // comentar lo de abajo para version del rfc 3852
-        // contexExpecific.add(new Attribute(RFC4519Style.serialNumber, new DERSet(new DERPrintableString(cert.getSerialNumber().toString()))));
-
         if (signingCertificateV2) {
             contexExpecific.add(
         		getSigningVertificateV2(cert, digestAlgorithmName, policy)

@@ -475,10 +475,6 @@ final class CounterSignerEnveloped {
                             );
                 }
                 else {
-                    // Esta sentencia se comenta para que no se firme el nodo
-                    // actual cuando no sea hoja
-                    // signerInfosU.add(UnsignedAtributte(parameters, cert,
-                    // signerInfo, keyEntry));
                     final Attribute uAtrib = new Attribute(CMSAttributes.counterSignature, new DERSet(signerInfosU));
                     counterSigner =
                             new SignerInfo(signerInfo.getSID(),

@@ -83,7 +83,6 @@ public class AOCAdESCoSigner implements AOCoSigner {
 
         try {
             // Si la firma que nos introducen es SignedData
-            //final boolean signedData = new ValidateCMS().isCMSSignedData(sign);
             final boolean signedData = CAdESValidator.isCAdESSignedData(sign);
             if (signedData) {
 

@@ -370,8 +370,6 @@ public final class CMSTimestamper {
          }
 
          return tsToken.getEncoded();
-
-         // El tamano aproximado del token es tsToken.getEncoded().length + 32;
      }
 
 	 private static final TrustManager[] DUMMY_TRUST_MANAGER = new TrustManager[] {

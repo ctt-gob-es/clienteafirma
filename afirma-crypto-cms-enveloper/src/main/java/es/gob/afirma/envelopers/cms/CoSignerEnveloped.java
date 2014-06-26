@@ -126,17 +126,11 @@ final class CoSignerEnveloped {
         }
 
         if (signerCertificateChain.length != 0) {
-            // descomentar lo siguiente para version del rfc 3852
             final List<ASN1Encodable> ce = new ArrayList<ASN1Encodable>();
             for (final X509Certificate element : signerCertificateChain) {
                 ce.add(Certificate.getInstance(ASN1Primitive.fromByteArray(element.getEncoded())));
             }
             certificates = SigUtils.fillRestCerts(ce, vCertsSig);
-
-            // y comentar esta parte de abajo
-            // vCertsSig.add(X509CertificateStructure.getInstance(ASN1Object.fromByteArray(signerCertificateChain[0].getEncoded())));
-            // certificates = new BERSet(vCertsSig);
-
         }
 
         // buscamos que timo de algoritmo es y lo codificamos con su OID
@@ -196,21 +190,19 @@ final class CoSignerEnveloped {
         ));
 
         // construimos el Signed Data y lo devolvemos
-        return new ContentInfo(PKCSObjectIdentifiers.signedAndEnvelopedData, new SignedAndEnvelopedData(sd.getRecipientInfos(),
-                                                                                                        sd.getDigestAlgorithms(),
-                                                                                                        sd.getEncryptedContentInfo(),
-                                                                                                        certificates,
-                                                                                                        null,
-                                                                                                        new DERSet(signerInfos)// unsignedAttr
-                               )).getEncoded(ASN1Encoding.DER);
+        return new ContentInfo(
+    		PKCSObjectIdentifiers.signedAndEnvelopedData,
+    		new SignedAndEnvelopedData(
+				sd.getRecipientInfos(),
+				sd.getDigestAlgorithms(),
+				sd.getEncryptedContentInfo(),
+				certificates,
+				null,
+				new DERSet(signerInfos)// unsignedAttr
+            )
+		).getEncoded(ASN1Encoding.DER);
 
     }
-
-    /*
-     * sd.getRecipientInfos(), sd.getDigestAlgorithms(),
-     * sd.getEncryptedContentInfo(), certificates, certrevlist, new
-     * DERSet(signerInfos))).getDEREncoded();
-     */
 
     /** Constructor de la clase. Se crea una cofirma a partir de los datos del
      * firmante y el archivo que se firma.
@@ -285,17 +277,11 @@ final class CoSignerEnveloped {
         }
 
         if (signerCertificateChain.length != 0) {
-            // descomentar lo siguiente para version del rfc 3852
             final List<ASN1Encodable> ce = new ArrayList<ASN1Encodable>();
             for (final X509Certificate element : signerCertificateChain) {
                 ce.add(Certificate.getInstance(ASN1Primitive.fromByteArray(element.getEncoded())));
             }
             certificates = SigUtils.fillRestCerts(ce, vCertsSig);
-
-            // y comentar esta parte de abajo
-            // vCertsSig.add(X509CertificateStructure.getInstance(ASN1Object.fromByteArray(signerCertificateChain[0].getEncoded())));
-            // certificates = new BERSet(vCertsSig);
-
         }
 
         // buscamos que tipo de algoritmo es y lo codificamos con su OID
@@ -331,16 +317,12 @@ final class CoSignerEnveloped {
         // introducimos el nuevo SignerInfo del firmante actual.
 
         // Secuencia:
-        // 1.- Si cofirmamos sin datos en el mismo algoritmo de hash que la
-        // firma
-        // original sacamos el messagedigest de la firma previa.
-        // 2.- Si no es el mismo algoritmo, miramos si nos ha llegado un
-        // messagedigest
-        // como parametro del metodo, que quiere decir que se ha calculado
-        // externamente
-        // (en el fondo sera que no se ha sobreescrito el parametro, con lo que
-        // si llego
-        // != null, seguira siendo != null)
+        // 1.- Si cofirmamos sin datos en el mismo algoritmo de hash que la firma
+        //     original sacamos el messagedigest de la firma previa.
+        // 2.- Si no es el mismo algoritmo, miramos si nos ha llegado un messagedigest
+        //     como parametro del metodo, que quiere decir que se ha calculado externamente
+        //     (en el fondo sera que no se ha sobreescrito el parametro, con lo que
+        //     si llego != null, seguira siendo != null)
         // 3.- Si no es ninguno de los dos casos, no podemos firmar
         for (int i = 0; i < signerInfosSd.size(); i++) {
             final SignerInfo si = SignerInfo.getInstance(signerInfosSd.getObjectAt(i));
@@ -383,13 +365,17 @@ final class CoSignerEnveloped {
         ));
 
         // construimos el Signed Data y lo devolvemos
-        return new ContentInfo(PKCSObjectIdentifiers.signedAndEnvelopedData, new SignedAndEnvelopedData(sd.getRecipientInfos(),
-                                                                                                        sd.getDigestAlgorithms(),
-                                                                                                        sd.getEncryptedContentInfo(),
-                                                                                                        certificates,
-                                                                                                        null,
-                                                                                                        new DERSet(signerInfos)// unsignedAttr
-                               )).getEncoded(ASN1Encoding.DER);
+        return new ContentInfo(
+    		PKCSObjectIdentifiers.signedAndEnvelopedData,
+    		new SignedAndEnvelopedData(
+				sd.getRecipientInfos(),
+                sd.getDigestAlgorithms(),
+                sd.getEncryptedContentInfo(),
+                certificates,
+                null,
+                new DERSet(signerInfos)// unsignedAttr
+            )
+		).getEncoded(ASN1Encoding.DER);
 
     }
 
