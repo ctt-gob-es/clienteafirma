@@ -327,7 +327,7 @@ public final class LocalSignResultActivity extends FragmentActivity implements K
 			throw new IllegalArgumentException("La entrada a la clave privada no puede ser nula"); //$NON-NLS-1$
 		}
 
-		this.format = this.fileName.toLowerCase(Locale.US).endsWith(PDF_FILE_SUFFIX) ?
+		this.format = this.fileName.toLowerCase(Locale.ENGLISH).endsWith(PDF_FILE_SUFFIX) ?
 				AOSignConstants.SIGN_FORMAT_PADES : AOSignConstants.SIGN_FORMAT_CADES;
 
 		new SignTask(

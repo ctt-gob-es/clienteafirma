@@ -1,6 +1,8 @@
 package es.gob.afirma.android.crypto;
 
+import java.io.IOException;
 import java.security.KeyStore.PrivateKeyEntry;
+import java.util.Locale;
 import java.util.Properties;
 
 import android.content.ActivityNotFoundException;
@@ -8,6 +10,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 import es.gob.afirma.android.network.UriParser;
 import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.AOUnsupportedSignFormatException;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.AOSignerFactory;
@@ -29,6 +32,8 @@ public class SignTask extends AsyncTask<Void, Void, byte[]>{
 
 	private static final String COUNTERSIGN_TARGET_TREE = "tree"; //$NON-NLS-1$
 
+	private static final String SIGN_FORMAT_AUTO = "AUTO"; //$NON-NLS-1$
+	
 	private final int op;
 	private final byte[] data;
 	private final String format;
@@ -70,8 +75,11 @@ public class SignTask extends AsyncTask<Void, Void, byte[]>{
 	protected byte[] doInBackground(final Void... params) {
 
 		// Obtenemos el manejador de firma apropiado
-		final String supportedFormat = getSupportedCompatibleFormat(this.format);
-		final AOSigner signer = AOSignerFactory.getSigner(supportedFormat);
+		final AOSigner signer = getSupportedCompatibleSigner(this.format, this.op, this.data);
+		if (signer == null) {
+			this.t = new AOUnsupportedSignFormatException("No se ha indicado un formato de firma soportado o el fichero indicado no se reconoce como fichero de firma"); //$NON-NLS-1$
+			return null;
+		}
 
 		// Generacion de la firma
 		byte[] sign = null;
@@ -138,15 +146,30 @@ public class SignTask extends AsyncTask<Void, Void, byte[]>{
 		return sign;
 	}
 
-	private static String getSupportedCompatibleFormat(String format) {
+	private static AOSigner getSupportedCompatibleSigner(final String format, final int operation, final byte[] signature) {
 
-		String supportedFormat = format;
+		
+		AOSigner signer;
 		
 		// La firma XAdES monofasica no esta soportada en Android, asi que pasamos a firma XAdES trifasica
-		if (format.toLowerCase().startsWith(AOSignConstants.SIGN_FORMAT_XADES.toLowerCase())) {
-			supportedFormat = AOSignConstants.SIGN_FORMAT_XADES_TRI;
+		if (format.toLowerCase(Locale.ENGLISH).startsWith(AOSignConstants.SIGN_FORMAT_XADES.toLowerCase(Locale.ENGLISH))) {
+			signer = AOSignerFactory.getSigner(AOSignConstants.SIGN_FORMAT_XADES_TRI);
 		}
-		return supportedFormat;
+		// Si se indica el formato AUTO, intentaremos identificar el formato de la firma
+		else if (format.equalsIgnoreCase(SIGN_FORMAT_AUTO) && (operation == UriParser.OP_COSIGN || operation == UriParser.OP_COUNTERSIGN)) {
+			try {
+				signer = AOSignerFactory.getSigner(signature);
+			} catch (IOException e) {
+				Log.e(ES_GOB_AFIRMA, "No se ha podido identificar el formato de la firma, asi que se devolvera un manejador nulo"); //$NON-NLS-1$
+				signer = null;
+			}
+		}
+		// En cualquier otro caso obtenemos el manejador del formato indicado
+		else {
+			signer = AOSignerFactory.getSigner(format);
+		}
+		
+		return signer;
 	}
 
 	@Override

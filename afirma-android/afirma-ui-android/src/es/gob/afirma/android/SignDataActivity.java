@@ -50,6 +50,7 @@ import es.gob.afirma.android.network.AndroidUrlHttpManager;
 import es.gob.afirma.android.network.UriParser;
 import es.gob.afirma.android.network.UriParser.ParameterException;
 import es.gob.afirma.android.network.UriParser.UrlParametersToSign;
+import es.gob.afirma.core.AOUnsupportedSignFormatException;
 import es.gob.afirma.core.misc.UrlHttpManagerFactory;
 import es.gob.afirma.core.signers.AOSignConstants;
 
@@ -491,6 +492,10 @@ KeystoreManagerListener, PrivateKeySelectionListener, DownloadDataListener, Send
 		if (t instanceof MSCBadPinException) {
 			showErrorMessage(getString(R.string.error_msc_pin));
 			launchError(ErrorManager.ERROR_MSC_PIN, false, false);
+		}
+		else if (t instanceof AOUnsupportedSignFormatException) {
+			showErrorMessage(getString(R.string.error_format_not_supported));
+			launchError(ErrorManager.ERROR_NOT_SUPPORTED_FORMAT, true, true);
 		}
 		else {
 			launchError(ErrorManager.ERROR_SIGNING, true, true);

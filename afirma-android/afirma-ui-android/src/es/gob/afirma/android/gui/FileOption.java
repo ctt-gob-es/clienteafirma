@@ -78,7 +78,7 @@ public final class FileOption implements Comparable<FileOption> {
 	@Override
 	public int compareTo(final FileOption o) {
 		if (this.name != null) {
-			return this.name.toLowerCase(Locale.US).compareTo(o.getName().toLowerCase());
+			return this.name.toLowerCase(Locale.ENGLISH).compareTo(o.getName().toLowerCase());
 		}
 		throw new IllegalArgumentException();
 	}

@@ -65,6 +65,7 @@
 	<string name="signedfile_original_location">La firma "%1$s" se ha almacenado en el mismo directorio que el fichero firmado.</string>
 	<string name="signedfile_downloads_location">La firma "%1$s" se ha almacenado en su directorio de descargas.</string>
 	<string name="error_msc_pin">El PIN del dispositivo criptogr\u00E1fico es incorrecto. Tenga en cuenta que varios intentos fallidos consecutivos podr\u00EDan bloquearlo.</string>
+	<string name="error_format_not_supported">Formato de firma no soportado.</string>
 	<string name="dialog_alias_cert_text">%1$s\nV\u00E1lido: %2$s\nHasta: %3$s\nEmisor: %4$s</string>
 	<string name="accesibility_icon_filetype">Icono del tipo de archivo</string>
 	<string name="accesibility_icon_sign_ko">Error en la firma</string>

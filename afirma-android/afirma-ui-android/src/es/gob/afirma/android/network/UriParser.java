@@ -40,10 +40,12 @@ public final class UriParser {
 	private static final Set<String> SUPPORTED_SIGNATURE_FORMATS = new HashSet<String>();
 	static {
 		SUPPORTED_SIGNATURE_FORMATS.add("cades"); //$NON-NLS-1$
+		SUPPORTED_SIGNATURE_FORMATS.add("xades"); //$NON-NLS-1$
 		SUPPORTED_SIGNATURE_FORMATS.add("pades"); //$NON-NLS-1$
 		SUPPORTED_SIGNATURE_FORMATS.add("cadestri"); //$NON-NLS-1$
 		SUPPORTED_SIGNATURE_FORMATS.add("xadestri"); //$NON-NLS-1$
 		SUPPORTED_SIGNATURE_FORMATS.add("padestri"); //$NON-NLS-1$
+		SUPPORTED_SIGNATURE_FORMATS.add("auto"); //$NON-NLS-1$
 	}
 
 	private static final String DEFAULT_URL_ENCODING = "UTF-8"; //$NON-NLS-1$
@@ -327,17 +329,10 @@ public final class UriParser {
 		}
 
 		ret.setSignAlgorithm(algo);
-
-		Log.i(ES_GOB_AFIRMA, "Vamos a analizar los ExtraParams: " + params.containsKey(PROPERTIES_PARAM)); //$NON-NLS-1$
 		
 		if (params.containsKey(PROPERTIES_PARAM)) {
-
-			Log.d(ES_GOB_AFIRMA, "ExtraParams B64 sin decodificar: " + params.get(PROPERTIES_PARAM)); //$NON-NLS-1$
-			
 			final String props = URLDecoder.decode(params.get(PROPERTIES_PARAM), DEFAULT_URL_ENCODING);
-			
 			Log.d(ES_GOB_AFIRMA, "ExtraParams B64: " + props); //$NON-NLS-1$
-
 			try {
 				ret.setExtraParams(parseB64Properties(props));
 			}

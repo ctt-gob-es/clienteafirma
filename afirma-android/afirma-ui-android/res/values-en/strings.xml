@@ -65,6 +65,7 @@
 	<string name="signedfile_original_location">The signature "%1$s" was saved on the same folder as the signed file.</string>
 	<string name="signedfile_downloads_location">The signature "%1$s" was saved on the donwloads folder.</string>
 	<string name="error_msc_pin">Wrong PIN. Please, beware that invalid PIN entering can lock your smart card.</string>
+	<string name="error_format_not_supported">Unsupported signature format.</string>
 	<string name="dialog_alias_cert_text">%1$s\nValid: %2$s\nUntil: %3$s\nIssuer: %4$s</string>
 	<string name="accesibility_icon_filetype">File type icon</string>
 	<string name="accesibility_icon_sign_ko">Error while signing</string>
