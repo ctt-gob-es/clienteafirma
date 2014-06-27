@@ -16,12 +16,14 @@ import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.Map;
 
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 
 import es.gob.afirma.core.keystores.KeyStoreManager;
 import es.gob.afirma.core.keystores.NameCertificateBean;
+import es.gob.afirma.keystores.KeyStoreUtilities;
 
 /** Di&aacute;logo de selecci&oacute;n de certificados con est&eacute;tica similar al de Windows 7.
  * @author Carlos Gamuci
@@ -40,7 +42,7 @@ public final class CertificateSelectionDialog extends MouseAdapter {
 	 * sus nombres y los propios certificados.
 	 * @param el Listado de certificados.
 	 * @param parent Componente sobre el que se mostrar&aacute; el di&aacute;logo. */
-	public CertificateSelectionDialog(final NameCertificateBean[] el, final KeyStoreManager ksm, final Component parent) {
+	public CertificateSelectionDialog(final Component parent, final NameCertificateBean[] el, final KeyStoreManager ksm) {
 
 	    if (el == null || el.length == 0) {
 	        throw new IllegalArgumentException("El listado de certificados no puede ser nulo ni vacio"); //$NON-NLS-1$
@@ -65,6 +67,7 @@ public final class CertificateSelectionDialog extends MouseAdapter {
 	 * @return Nombre del certificado seleccionado o {@code null} si el usuario
 	 * lo cancela o cierra sin seleccionar. */
 	public String showDialog() {
+
 		final JDialog certDialog = this.optionPane.createDialog(
 			this.parent,
 			CertificateSelectionDialogMessages.getString("CertificateSelectionDialog.0") //$NON-NLS-1$
@@ -122,7 +125,23 @@ public final class CertificateSelectionDialog extends MouseAdapter {
 
 	/** Refresca el di&aacute;logo con los certificados del mismo almac&eacute;n. */
 	public void refresh() {
-		
+
+		try {
+			Map<String, String> aliases = KeyStoreUtilities.getAliasesByFriendlyName(
+					this.ksm.getAliases(),
+					this.ksm,
+					false,
+					true,
+					null);
+
+			this.csd.refresh(KeyStoreUtilities.getNameCertificateBeans(
+					aliases.keySet().toArray(new String[aliases.size()]),
+					this.ksm)
+					);
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public void changeKeyStore(final KeyStoreManager ksm) {

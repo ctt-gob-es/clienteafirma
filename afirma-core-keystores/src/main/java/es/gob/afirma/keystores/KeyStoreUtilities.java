@@ -24,6 +24,7 @@ import java.util.logging.Logger;
 import javax.security.auth.x500.X500Principal;
 
 import es.gob.afirma.core.AOCancelledOperationException;
+import es.gob.afirma.core.keystores.KeyStoreManager;
 import es.gob.afirma.core.keystores.NameCertificateBean;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Platform;
@@ -123,7 +124,7 @@ public final class KeyStoreUtilities {
      *        Filtros a aplicar sobre los certificados.
      * @return Alias seleccionado por el usuario */
     public static Map<String, String> getAliasesByFriendlyName(final String[] aliases,
-                                                               final AOKeyStoreManager ksm,
+                                                               final KeyStoreManager ksm,
                                                                final boolean checkPrivateKeys,
                                                                final boolean showExpiredCertificates,
                                                                final List<CertificateFilter> certFilters) {
@@ -258,9 +259,6 @@ public final class KeyStoreUtilities {
 
     /** Muestra un di&aacute;logo para que el usuario seleccione entre los
      * certificados mostrados.
-     * @param alias
-     *        Alias de los certificados entre los que el usuario debe
-     *        seleccionar uno
      * @param ksm
      *        Gestor de los almac&eacute;nes de certificados a los que pertenecen los alias.
      *        Debe ser {@code null} si se quiere usar el m&eacute;todo para seleccionar
@@ -281,14 +279,13 @@ public final class KeyStoreUtilities {
      *         Si el usuario cancela manualmente la operaci&oacute;n
      * @throws AOCertificatesNotFoundException
      *         Si no hay certificados que mostrar al usuario */
-    public static String showCertSelectionDialog(final String[] alias,
-                                                 final AOKeyStoreManager ksm,
+    public static String showCertSelectionDialog(final AOKeyStoreManager ksm,
                                                  final Object parentComponent,
                                                  final boolean checkPrivateKeys,
                                                  final boolean checkValidity,
                                                  final boolean showExpiredCertificates) throws AOCertificatesNotFoundException {
-        return showCertSelectionDialog(
-               alias,
+    	
+    	return showCertSelectionDialog(
                ksm,
                parentComponent,
                checkPrivateKeys,
@@ -305,9 +302,6 @@ public final class KeyStoreUtilities {
      * cuyo caso se seleccionar&iacute; autom&aacute;ticamente. Si se pidiese
      * que se seleccione autom&aacute;ticamemte un certificado y hubiese
      * m&aacute;s de uno, se devolver&iacute;a una excepci&oacute;n.
-     * @param alias
-     *        Alias de los certificados entre los que el usuario debe
-     *        seleccionar uno
      * @param ksm
      *        Gestor de los almac&eacute;nes de certificados a los que pertenecen los alias.
      *        Debe ser {@code null} si se quiere usar el m&eacute;todo para seleccionar
@@ -331,35 +325,28 @@ public final class KeyStoreUtilities {
      * @return Alias seleccionado por el usuario
      * @throws AOCancelledOperationException
      *         Si el usuario cancela manualmente la operaci&oacute;n
-     * @throws AOCertificatesNotFoundException
-     *         Si no hay certificados que mostrar al usuario */
-    public static String showCertSelectionDialog(final String[] alias,
-    		                                     final AOKeyStoreManager ksm,
+     * @throws NullPointerException
+     *         Si no se indica un AOKeyStoreManager */
+    public static String showCertSelectionDialog(final AOKeyStoreManager ksm,
     		                                     final Object parentComponent,
     		                                     final boolean checkPrivateKeys,
     		                                     final boolean checkValidity,
     		                                     final boolean showExpiredCertificates,
     		                                     final List<CertificateFilter> certFilters,
-    		                                     final boolean mandatoryCertificate) throws AOCertificatesNotFoundException {
-
-    	if (alias == null && ksm == null || alias != null && alias.length == 0) {
-    		throw new AOCertificatesNotFoundException("El almacen no contenia entradas"); //$NON-NLS-1$
+    		                                     final boolean mandatoryCertificate) {
+    	
+    	if (ksm == null) {
+    		throw new NullPointerException("No se ha indicado el almacen de claves"); //$NON-NLS-1$
     	}
-
+    	
     	final Map<String, String> aliassesByFriendlyName =
     		KeyStoreUtilities.getAliasesByFriendlyName(
-				alias != null ? alias : ksm.getAliases(),
+				ksm.getAliases(),
 				ksm,
 				checkPrivateKeys,
 				showExpiredCertificates,
 				certFilters
 			);
-
-    	// Miramos si despues de filtrar las entradas queda alguna o se ha
-    	// quedado la lista vacia
-    	if (aliassesByFriendlyName.size() == 0) {
-    		throw new AOCertificatesNotFoundException("El almacen no contenia entradas validas"); //$NON-NLS-1$
-    	}
 
     	// Si se ha pedido que se seleccione automaticamente un certificado, se
     	// seleccionara
@@ -380,24 +367,7 @@ public final class KeyStoreUtilities {
     				aliassesByFriendlyName.get(certAlias),
     				ksm.getCertificate(certAlias));
     	}
-    	Arrays.sort(orderedFriendlyNames, new Comparator<NameCertificateBean>() {
-    		/** {@inheritDoc} */
-    		@Override
-			public int compare(final NameCertificateBean o1, final NameCertificateBean o2) {
-    			if (o1 == null && o2 == null) {
-    				return 0;
-    			}
-    			else if (o1 == null) {
-    				return 1;
-    			}
-    			else if (o2 == null) {
-    				return -1;
-    			}
-    			else{
-    				return o1.getName().compareToIgnoreCase(o2.getName());
-    			}
-    		}
-    	});
+    	Arrays.sort(orderedFriendlyNames, nameCertificateComparator);
 
     	final String selectedAlias = (String) AOUIFactory.showCertificateSelectionDialog(
 			parentComponent,
@@ -409,7 +379,7 @@ public final class KeyStoreUtilities {
     		throw new AOCancelledOperationException("Operacion de seleccion de certificado cancelada"); //$NON-NLS-1$
     	}
 
-    	if (checkValidity && ksm != null) {
+    	if (checkValidity) {
 
     		String errorMessage = null;
 
@@ -534,4 +504,67 @@ public final class KeyStoreUtilities {
 		}
 		return false;
 	}
+	
+	public static NameCertificateBean[] getNameCertificateBeans(final String[] aliases, final KeyStoreManager ksm) throws AOCertificatesNotFoundException {
+		
+		final Map<String, String> aliassesByFriendlyName =
+	    		KeyStoreUtilities.getAliasesByFriendlyName(
+					aliases != null ? aliases : ksm.getAliases(),
+					ksm,
+					//TODO: Integrar con filtros
+					false,
+					true,
+					null
+				);
+
+	    	// Miramos si despues de filtrar las entradas queda alguna o se ha
+	    	// quedado la lista vacia
+	    	if (aliassesByFriendlyName.size() == 0) {
+	    		throw new AOCertificatesNotFoundException("El almacen no contenia entradas validas"); //$NON-NLS-1$
+	    	}
+
+	    	// Ordenamos el array de alias justo antes de mostrarlo, ignorando entre
+	    	// mayusculas y minusculas
+	    	int i = 0;
+	    	final NameCertificateBean[] orderedNameCertificates =
+	    		new NameCertificateBean[aliassesByFriendlyName.size()];
+	    	for (final String certAlias : aliassesByFriendlyName.keySet().toArray(new String[0])) {
+	    		orderedNameCertificates[i++] = new NameCertificateBean(
+	    				certAlias,
+	    				aliassesByFriendlyName.get(certAlias),
+	    				ksm.getCertificate(certAlias));
+	    	}
+
+	    	//TODO: Integrar con filtros
+	    	// Si se ha pedido que se seleccione automaticamente un certificado, se
+	    	// seleccionara
+	    	// si hay mas de un certificado que se ajuste al filtro, se dara a
+	    	// elegir
+//	    	if (mandatoryCertificate && aliassesByFriendlyName.size() == 1) {
+//	    			return orderedFriendlyNames.[0];
+//	    	}
+
+	    	Arrays.sort(orderedNameCertificates, nameCertificateComparator);
+	    	
+	    	return orderedNameCertificates;
+	}
+	
+	private static final Comparator<NameCertificateBean> nameCertificateComparator = new Comparator<NameCertificateBean>() {
+		/** {@inheritDoc} */
+		@Override
+		public int compare(final NameCertificateBean o1, final NameCertificateBean o2) {
+			if (o1 == null && o2 == null) {
+				return 0;
+			}
+			else if (o1 == null) {
+				return 1;
+			}
+			else if (o2 == null) {
+				return -1;
+			}
+			else{
+				return o1.getName().compareToIgnoreCase(o2.getName());
+			}
+		}
+	};
 }

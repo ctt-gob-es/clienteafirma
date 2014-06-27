@@ -116,7 +116,6 @@ final class SelectPrivateKeyAction implements PrivilegedExceptionAction<PrivateK
 		}
 
 		final String selectedAlias = KeyStoreUtilities.showCertSelectionDialog(
-			ksm.getAliases(),
 			ksm,
 			this,
 			true,

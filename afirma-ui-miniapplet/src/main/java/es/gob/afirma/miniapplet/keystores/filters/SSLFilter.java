@@ -21,8 +21,8 @@ import javax.naming.InvalidNameException;
 import javax.naming.ldap.LdapName;
 import javax.naming.ldap.Rdn;
 
+import es.gob.afirma.core.keystores.KeyStoreManager;
 import es.gob.afirma.core.misc.AOUtil;
-import es.gob.afirma.keystores.AOKeyStoreManager;
 import es.gob.afirma.keystores.filters.CertificateFilter;
 
 /**
@@ -63,7 +63,7 @@ public final class SSLFilter extends CertificateFilter {
 
 	/** {@inheritDoc} */
 	@Override
-	public String[] matches(final String[] aliases, final AOKeyStoreManager ksm) {
+	public String[] matches(final String[] aliases, final KeyStoreManager ksm) {
 
 		final X509Certificate[] certs = new X509Certificate[aliases.length];
 		for (int i = 0; i < aliases.length; i++) {

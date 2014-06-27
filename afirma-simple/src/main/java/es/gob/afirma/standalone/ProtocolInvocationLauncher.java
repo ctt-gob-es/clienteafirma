@@ -150,7 +150,6 @@ public final class ProtocolInvocationLauncher {
 		final String selectedAlias;
 		try {
 			selectedAlias = KeyStoreUtilities.showCertSelectionDialog(
-				null, // Aliases, null porque salen del AOKeyStore
 				ksm,
 				null, // Parent
 				true, // Check private keys

@@ -13,7 +13,7 @@ package es.gob.afirma.core.ui;
 import java.io.File;
 import java.io.IOException;
 
-import es.gob.afirma.core.keystores.KeyStoreRefresher;
+import es.gob.afirma.core.keystores.KeyStoreManager;
 import es.gob.afirma.core.keystores.NameCertificateBean;
 
 /** Gestor de componentes de interfaz gr&aacute;fico
@@ -56,9 +56,9 @@ public interface AOUIManager {
     /** Di&aacute;logo de selecci&oacute;n de certificados.
      * @param parentComponent Componente padre (se descarta si no es del tipo <code>java.awt.Component</code> en la implementaci&oacute;n Swing
      * @param selectionValues Listado de valores seleccionables de tipo Nombre-Certificado.
-     * @param ksr Componente para actualizar el almac&eacute;n de claves actual
+     * @param ksm Almacen con las claves a cargar.
      * @return Valor seleccionado */
-    Object showCertificateSelectionDialog(Object parentComponent, NameCertificateBean[] selectionValues, final KeyStoreRefresher ksr);
+    Object showCertificateSelectionDialog(Object parentComponent, NameCertificateBean[] selectionValues, final KeyStoreManager ksm);
 
     /** JOptionPane.showConfirmDialog().
      * @param parentComponent Componente padre (se descarta si no es del tipo <code>java.awt.Component</code> en la implementaci&oacute;n Swing

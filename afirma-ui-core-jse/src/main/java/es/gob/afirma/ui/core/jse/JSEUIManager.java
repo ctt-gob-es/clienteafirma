@@ -156,6 +156,7 @@ public class JSEUIManager implements AOUIManager {
 	public final Object showCertificateSelectionDialog(final Object parentComponent,
     												   final NameCertificateBean[] selectionValues,
     												   final KeyStoreManager ksm) {
+    	
     	Component parent = null;
     	if (parentComponent instanceof Component) {
     		parent = (Component) parentComponent;
@@ -172,9 +173,11 @@ public class JSEUIManager implements AOUIManager {
     						Component.class);
     		final Object csd =  csdConstructor.newInstance(selectionValues, ksm, parent);
     		final Method showDialogMethod = csdClass.getMethod("showDialog"); //$NON-NLS-1$
+
     		return showDialogMethod.invoke(csd);
     	}
     	catch (final Exception e) {
+    		LOGGER.severe("No se encuentra disponible el proyecto del interfaz grafico del dialogo de seleccion: " + e); //$NON-NLS-1$
     		throw new RuntimeException("No se encuentra disponible el proyecto del interfaz grafico del dialogo de seleccion", e); //$NON-NLS-1$
     	}
     }

@@ -2,7 +2,7 @@ package es.gob.afirma.keystores.filters;
 
 import java.security.cert.X509Certificate;
 
-import es.gob.afirma.keystores.AOKeyStoreManager;
+import es.gob.afirma.core.keystores.KeyStoreManager;
 
 /**
  * Clase que engloba m&uacute;ltiples filtros de certificados, de tal forma que
@@ -36,7 +36,7 @@ public final class MultipleCertificateFilter extends CertificateFilter {
 	}
 
     @Override
-	public String[] matches(final String[] aliases, final AOKeyStoreManager ksm) {
+	public String[] matches(final String[] aliases, final KeyStoreManager ksm) {
     	String[] filteredAliases = aliases.clone();
     	for (final CertificateFilter filter : this.filters) {
     		filteredAliases = filter.matches(filteredAliases, ksm);

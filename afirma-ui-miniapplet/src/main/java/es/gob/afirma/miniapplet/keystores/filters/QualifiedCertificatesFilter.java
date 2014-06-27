@@ -21,8 +21,8 @@ import javax.naming.InvalidNameException;
 import javax.naming.ldap.LdapName;
 import javax.naming.ldap.Rdn;
 
+import es.gob.afirma.core.keystores.KeyStoreManager;
 import es.gob.afirma.core.misc.AOUtil;
-import es.gob.afirma.keystores.AOKeyStoreManager;
 import es.gob.afirma.keystores.filters.CertificateFilter;
 
 /** Filtro que selecciona los certificados con un n&uacute;mero de serie concreto,
@@ -67,7 +67,7 @@ public final class QualifiedCertificatesFilter extends CertificateFilter {
 
 	/** {@inheritDoc} */
 	@Override
-	public String[] matches(final String[] aliases, final AOKeyStoreManager ksm) {
+	public String[] matches(final String[] aliases, final KeyStoreManager ksm) {
 
 		X509Certificate cert;
 		final List<String> filteredCerts = new ArrayList<String>();
@@ -117,7 +117,7 @@ public final class QualifiedCertificatesFilter extends CertificateFilter {
 	 * @param aliases Alias de los certificados candidatos.
 	 * @return Alias del certificado pareja del indicado o {@code null} si no se ha
 	 * localizado una pareja satisfactoria. */
-	private static String searchQualifiedSignatureCertificate(final X509Certificate cert, final AOKeyStoreManager ksm, final String[] aliases) {
+	private static String searchQualifiedSignatureCertificate(final X509Certificate cert, final KeyStoreManager ksm, final String[] aliases) {
 		X509Certificate cert2;
 
 

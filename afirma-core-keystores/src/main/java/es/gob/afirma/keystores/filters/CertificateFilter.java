@@ -14,7 +14,7 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
 
-import es.gob.afirma.keystores.AOKeyStoreManager;
+import es.gob.afirma.core.keystores.KeyStoreManager;
 
 /** Filtro para certificados. Debe autocontener toda la l&oacute;gica que indique si un
  * certificado cumple o no las condiciones del filtro.
@@ -35,7 +35,7 @@ public abstract class CertificateFilter {
      * @param ksm <code>AOKeyStoreManager</code> que contiene los certificados cuyos
      *            alias se indican.
      * @return Alias de certificados que cumplen el criterio. */
-    public String[] matches(final String[] aliases, final AOKeyStoreManager ksm) {
+    public String[] matches(final String[] aliases, final KeyStoreManager ksm) {
         final List<String> filteredAliases = new ArrayList<String>();
         for (final String alias : aliases) {
             if(matches(ksm.getCertificate(alias))) {

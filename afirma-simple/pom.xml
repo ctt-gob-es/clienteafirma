@@ -128,12 +128,6 @@
 		
 		<dependency>
 			<groupId>es.gob.afirma</groupId>
-			<artifactId>afirma-crypto-cadestri-client</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>es.gob.afirma</groupId>
 			<artifactId>afirma-crypto-certvalidation</artifactId>
 			<version>${project.version}</version>
 		</dependency>

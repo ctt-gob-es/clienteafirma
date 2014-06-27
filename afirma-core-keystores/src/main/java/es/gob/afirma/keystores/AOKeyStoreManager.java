@@ -25,12 +25,12 @@ import java.util.logging.Logger;
 
 import javax.security.auth.callback.PasswordCallback;
 
-import es.gob.afirma.core.keystores.KeyStoreRefresher;
+import es.gob.afirma.core.keystores.KeyStoreManager;
 
 /** Clase gestora de claves y certificados. B&aacute;sicamente se encarga de
  * crear KeyStores de distintos tipos, utilizando el proveedor JCA apropiado para cada caso
  * @version 0.4 */
-public class AOKeyStoreManager implements KeyStoreRefresher {
+public class AOKeyStoreManager implements KeyStoreManager {
 
     protected static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
@@ -60,9 +60,6 @@ public class AOKeyStoreManager implements KeyStoreRefresher {
     	return this.ks;
     }
 
-    /** Reinicia el almac&eacute;n de claves, leyendo de nuevo los dispositivos de almac&eacute;n (tarjetas, etc.)
-     * si es preciso.
-     * @throws IOException SI ocurren errores de entrada / salida que no permiten refrescar el almac&eacute;n */
     @Override
 	public void refresh() throws IOException {
     	resetCachedAliases();
@@ -181,23 +178,8 @@ public class AOKeyStoreManager implements KeyStoreRefresher {
 
     }
 
-    /** Obtiene la clave privada de un certificado.
-     * @param alias
-     *        Alias del certificado
-     * @param pssCallback
-     *        <i>CallBback</i> para obtener la contrase&ntilde;a del
-     *        certificado que contiene la clave
-     * @return Clave privada del certificado correspondiente al alias
-     * @throws KeyStoreException
-     * 		   Cuando ocurren errores en el tratamiento del almac&eacute;n de claves
-     * @throws NoSuchAlgorithmException
-     * 		   Cuando no se puede identificar el algoritmo para la recuperaci&oacute;n de la clave.
-     * @throws UnrecoverableEntryException
-     * 		   Si la contrase&ntilde;a proporcionada no es v&aacute;lida para obtener la clave privada
-     * @throws es.gob.afirma.core.AOCancelledOperationException
-     * 		   Cuando el usuario cancela el proceso antes de que finalice
-     */
-    public KeyStore.PrivateKeyEntry getKeyEntry(final String alias,
+    @Override
+	public KeyStore.PrivateKeyEntry getKeyEntry(final String alias,
     		                                    final PasswordCallback pssCallback) throws KeyStoreException,
     		                                                                               NoSuchAlgorithmException,
     		                                                                               UnrecoverableEntryException {
@@ -210,11 +192,8 @@ public class AOKeyStoreManager implements KeyStoreRefresher {
 		return (KeyStore.PrivateKeyEntry) this.ks.getEntry(alias, pssCallback != null ? new KeyStore.PasswordProtection(pssCallback.getPassword()) : null);
     }
 
-    /** Obtiene un certificado del keystore activo a partir de su alias.
-     * @param alias
-     *        Alias del certificado.
-     * @return El certificado o {@code null} si no se pudo recuperar. */
-    public X509Certificate getCertificate(final String alias) {
+    @Override
+	public X509Certificate getCertificate(final String alias) {
         if (alias == null) {
             LOGGER.warning("El alias del certificado es nulo, se devolvera null"); //$NON-NLS-1$
             return null;
@@ -238,10 +217,8 @@ public class AOKeyStoreManager implements KeyStoreRefresher {
     	}
     }
 
-    /** Obtiene la cadena de certificaci&oacute;n de un certificado del keystore activo a partir de su alias.
-     * @param alias Alias del certificado.
-     * @return Certificados de la cadena de certificaci&oacute;n o {@code null} si no se pudo recuperar. */
-     public X509Certificate[] getCertificateChain(final String alias) {
+     @Override
+	public X509Certificate[] getCertificateChain(final String alias) {
          if (alias == null) {
              LOGGER.warning("El alias del certificado es nulo, se devolvera una cadena vacia"); //$NON-NLS-1$
              return new X509Certificate[0];
@@ -278,9 +255,8 @@ public class AOKeyStoreManager implements KeyStoreRefresher {
          return new X509Certificate[0];
     }
 
-    /** Obtiene todos los alias de los certificados del almac&eacute;n actual.
-     * @return Todos los alias encontrados en el almac&eacute;n actual */
-    public String[] getAliases() {
+    @Override
+	public String[] getAliases() {
         if (this.ks == null) {
             throw new IllegalStateException("Se han pedido alias a un almacen no inicializado"); //$NON-NLS-1$
         }

@@ -34,8 +34,8 @@ public class CertificateSelectionDialogTest {
 			elements.add(new NameCertificateBean(alias, alias, (X509Certificate) ks.getCertificate(alias)));
 		}
 
-		final CertificateSelectionDialog dialog = new CertificateSelectionDialog(
-				elements.toArray(new NameCertificateBean[elements.size()]), null, null);
+		final CertificateSelectionDialog dialog = new CertificateSelectionDialog(null, 
+				elements.toArray(new NameCertificateBean[elements.size()]), null);
 
 		final String selectedAlias = dialog.showDialog();
 

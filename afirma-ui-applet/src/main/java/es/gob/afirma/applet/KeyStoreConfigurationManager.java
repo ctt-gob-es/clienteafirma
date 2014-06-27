@@ -227,7 +227,18 @@ final class KeyStoreConfigurationManager {
                             NoSuchAlgorithmException,
                             KeyStoreException {
         if (this.selectedAlias == null) {
-            this.selectedAlias = this.showCertSelectionDialog(this.getKeyStoreManager().getAliases());
+        	// Obtenemos el KeyStoreManager para asegurarnos de que esta inicializado
+        	// el listado de alias
+        	this.getKeyStoreManager();
+            this.selectedAlias = KeyStoreUtilities.showCertSelectionDialog(
+                    this.ksManager, // KeyStoreManager
+                    this.parent, // Panel sobre el que mostrar el dialogo
+                    this.checkPrivateKey, // Comprobar accesibilidad de claves privadas
+                    true, // Advierte si el certificado esta caducado
+                    this.showExpiratedCertificates, // Muestra certificados caducados
+                    this.certFilters, // Filtros para los certificados
+                    this.isMandatoryCert() // Solo se admite un certificado
+);
         }
 
         // En caso de ser todos certificados con clave privada, obtenemos la
@@ -314,30 +325,6 @@ final class KeyStoreConfigurationManager {
      * @return Clave privada del certificado. */
     PrivateKeyEntry getCertificateKeyEntry() {
         return this.ke;
-    }
-
-    /** Muestra el di&aacute;logo de selecci&oacute;n de certificados del
-     * almac&eacute;n seleccionado, aplicando los filtros de certificado de ser
-     * necesario.
-     * @param certAlias
-     *        Alias de los certificados sobre los que hay que aplicar el
-     *        filtro.
-     * @return Alias real (con el que fue dado de alta en el almac&eacute;n de
-     *         claves) del certificado seleccionado.
-     * @throws AOCertificatesNotFoundException
-     *         Cuando no se encuentran certificados que cumplan el filtro.
-     * @throws es.gob.afirma.core.AOCancelledOperationException
-     *         Cuando el usuario cancel&oacute; la operaci&oacute;n. */
-    private String showCertSelectionDialog(final String[] certAlias) throws AOCertificatesNotFoundException {
-        return KeyStoreUtilities.showCertSelectionDialog(certAlias, // Aliases
-                                                   this.ksManager, // KeyStoreManager
-                                                   this.parent, // Panel sobre el que mostrar el dialogo
-                                                   this.checkPrivateKey, // Comprobar accesibilidad de claves privadas
-                                                   true, // Advierte si el certificado esta caducado
-                                                   this.showExpiratedCertificates, // Muestra certificados caducados
-                                                   this.certFilters, // Filtros para los certificados
-                                                   this.isMandatoryCert() // Solo se admite un certificado
-        );
     }
 
     /** Recupera el PasswordCallback apropiado para los certificados del
