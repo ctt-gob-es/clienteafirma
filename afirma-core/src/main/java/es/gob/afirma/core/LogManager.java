@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.logging.FileHandler;
+import java.util.logging.Handler;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.misc.AOUtil;
@@ -51,17 +52,24 @@ public final class LogManager {
 		else {
 			application = app;
 		}
-		Logger.getLogger("es.gob.afirma").addHandler( //$NON-NLS-1$
-			new FileHandler(
+		Logger.getLogger("es.gob.afirma").addHandler(createFileHandler()); //$NON-NLS-1$
+		installed = true;
+	}
+
+	/**
+	 * Crea un manejador para el guardado de log en fichero.
+	 * @return Manejador de log en fichero.
+	 * @throws IOException Cuando ocurren errores al crear o utilizar el fichero.
+	 */
+	private static FileHandler createFileHandler() throws IOException {
+		return new FileHandler(
 				LOG_FILE.replace("%a", application.toString()), //$NON-NLS-1$
 				LOG_MAX_SIZE,
 				1,
 				false
-			)
-		);
-		installed = true;
+			);
 	}
-
+	
 	/** Obtiene, en formato XML, el registro acumulado de la ejecuci&oacute;n actual.
 	 * @return Registro acumulado de la ejecuci&oacute;n actual
 	 * @throws IOException Si no hay registro o este no se puede leer */
@@ -69,6 +77,16 @@ public final class LogManager {
 		if (!installed) {
 			throw new IOException("No esta instalado el manejador de fichero"); //$NON-NLS-1$
 		}
+		
+		Handler[] handlers = Logger.getLogger("es.gob.afirma").getHandlers(); //$NON-NLS-1$
+		for (final Handler h : handlers) {
+			if (h instanceof FileHandler) {
+				h.close();
+				Logger.getLogger("es.gob.afirma").info("Cerrado el manejador de fichero para permitir que sea procesado"); //$NON-NLS-1$ //$NON-NLS-2$
+				Logger.getLogger("es.gob.afirma").removeHandler(h); //$NON-NLS-1$
+			}
+		}
+		
 		final InputStream is = new FileInputStream(
 			new File(
 				LOG_FILE.replace("%h", Platform.getUserHome()).replace("%a", application.toString())  //$NON-NLS-1$//$NON-NLS-2$
@@ -76,6 +94,9 @@ public final class LogManager {
 		);
 		final String log = new String(AOUtil.getDataFromInputStream(is));
 		is.close();
+		
+		Logger.getLogger("es.gob.afirma").addHandler(createFileHandler()); //$NON-NLS-1$
+		
 		return log;
 	}
 

@@ -433,7 +433,17 @@ var MiniApplet = {
 
 		getCurrentLog : function () {
 			this.forceLoad();
-			return MiniApplet.clienteFirma.getCurrentLog();
+			return	" === JAVASCRIPT INFORMATION === " +
+					"\nnavigator.appCodeName: " + navigator.appCodeName +
+					"\nnavigator.appName: " +  navigator.appName +
+					"\nnavigator.appVersion: " + navigator.appVersion +
+					"\nnavigator.platform: " + navigator.platform +
+					"\nnavigator.userAgent: " + navigator.userAgent+
+					"\nnavigator.javaEnabled(): " + navigator.javaEnabled() +
+					"\nscreen.width: " + (window.screen ? screen.width : 0) +
+					"\nscreen.height: " + (window.screen ? screen.height : 0) +
+					"\n\n   === CLIENTE LOG === \n" + 
+					MiniApplet.clienteFirma.getCurrentLog();
 		},
 		
 		setServlets : function (storageServlet,  retrieverServlet) {
@@ -800,6 +810,10 @@ var MiniApplet = {
 				// No hace nada
 			};
 
+			this.getCurrentLog = function () {
+				// No hace nada
+			};
+			
 			/**
 			 * Recupera el mensaje de error asociado al ultimo error capturado.
 			 * Implementada en el applet Java de firma.

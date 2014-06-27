@@ -1089,14 +1089,6 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 
 	@Override
 	public String getCurrentLog() {
-		try {
-			return LogManager.getLogFile();
-		}
-		catch (final Exception e) {
-			LOGGER.severe(
-				"No ha sido posible obtener el registro actual del MiniApplet, se devuelve una cadena vacia: " + e //$NON-NLS-1$
-			);
-		}
-		return ""; //$NON-NLS-1$
+		return AccessController.doPrivileged(new GetCurrentLogAction());
 	}
 }
