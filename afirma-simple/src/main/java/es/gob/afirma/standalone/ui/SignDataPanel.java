@@ -362,7 +362,6 @@ final class SignDataPanel extends JPanel {
         this.add(detailPanel, c);
     }
 
-    @SuppressWarnings("static-method")
 	void openCertificate(final X509Certificate cert) {
         try {
             final File tmp = File.createTempFile("afirma", ".cer");  //$NON-NLS-1$//$NON-NLS-2$

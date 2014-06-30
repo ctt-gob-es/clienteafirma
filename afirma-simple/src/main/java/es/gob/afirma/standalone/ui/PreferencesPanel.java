@@ -197,7 +197,7 @@ final class PreferencesPanel extends JPanel implements KeyListener {
 
 	private static final String PADES_FORMAT_BASIC_TEXT = SimpleAfirmaMessages.getString("PreferencesPanel.71"); //$NON-NLS-1$
 	private static final String PADES_FORMAT_BES_TEXT = SimpleAfirmaMessages.getString("PreferencesPanel.72"); //$NON-NLS-1$
-	
+
 	private static final List<AdESPolicy> CADES_PRELOADED_POLICIES = new ArrayList<AdESPolicy>(1);
 	static {
 		CADES_PRELOADED_POLICIES.add(
@@ -318,7 +318,7 @@ final class PreferencesPanel extends JPanel implements KeyListener {
 	JComboBox getBasicPadesFormat() {
 		return this.padesBasicFormat;
 	}
-	
+
 	private final JCheckBox cadesImplicit = new JCheckBox(
 		SimpleAfirmaMessages.getString("PreferencesPanel.1"), //$NON-NLS-1$
 		Boolean.parseBoolean(PREFERENCES.get(PREFERENCE_CADES_IMPLICIT, "true")) //$NON-NLS-1$
@@ -501,9 +501,9 @@ final class PreferencesPanel extends JPanel implements KeyListener {
 		else {
 			PreferencesPanel.PREFERENCES.put(PREFERENCE_PADES_SIGN_REASON, this.padesSignReason.getText());
 		}
-		
+
 		PreferencesPanel.PREFERENCES.put(PREFERENCE_PADES_FORMAT, ((ValueTextPair) this.padesBasicFormat.getSelectedItem()).getValue());
-		
+
 		if (this.padesPolicies.getSelectedIndex() != POLICY_INDEX_NONE) {
 			PreferencesPanel.PREFERENCES.put(PREFERENCE_PADES_POLICY_IDENTIFIER, this.padesPolicyIdentifier.getText());
 			PreferencesPanel.PREFERENCES.put(PREFERENCE_PADES_POLICY_IDENTIFIER_HASH, this.padesPolicyIdentifierHash.getText());
@@ -830,7 +830,7 @@ final class PreferencesPanel extends JPanel implements KeyListener {
 		this.padesBasicFormat.getAccessibleContext().setAccessibleDescription(SimpleAfirmaMessages.getString("PreferencesPanel.70")); //$NON-NLS-1$
 		this.padesBasicFormat.addItemListener(this.modificationListener);
 		this.padesBasicFormat.addKeyListener(this);
-		
+
 		final DefaultComboBoxModel padesFormatModel = new DefaultComboBoxModel(new ValueTextPair[] {
 				new ValueTextPair(AOSignConstants.PADES_SUBFILTER_BASIC, PADES_FORMAT_BASIC_TEXT),
 				new ValueTextPair(AOSignConstants.PADES_SUBFILTER_BES, PADES_FORMAT_BES_TEXT)
@@ -847,7 +847,7 @@ final class PreferencesPanel extends JPanel implements KeyListener {
 
 		gbc.gridy++;
 		panel.add(padesPreferencesPanel, gbc);
-	    
+
 	    gbc.gridy++;
 	    gbc.weighty = 1.0;
 	    panel.add(new JPanel(), gbc); // Panel de relleno
@@ -1355,25 +1355,21 @@ final class PreferencesPanel extends JPanel implements KeyListener {
 	 * la otra el texto que se debe mostrar.
 	 */
 	private class ValueTextPair {
-		
+
 		private final String value;
 		private final String text;
-		
-		public ValueTextPair(String value, String text) {
+
+		public ValueTextPair(final String value, final String text) {
 			this.value = value;
 			this.text = text;
 		}
-		
+
 		public String getValue() {
 			return this.value;
 		}
-		
-		public String getText() {
-			return this.text;
-		}
-		
+
 		@Override
-		public boolean equals(Object obj) {
+		public boolean equals(final Object obj) {
 			if (obj == null) {
 				return false;
 			}
@@ -1382,7 +1378,7 @@ final class PreferencesPanel extends JPanel implements KeyListener {
 			}
 			return this.value.equals(obj.toString());
 		}
-		
+
 		@Override
 		public String toString() {
 			return this.text;
