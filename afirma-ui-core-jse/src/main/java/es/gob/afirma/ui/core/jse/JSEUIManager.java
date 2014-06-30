@@ -168,10 +168,11 @@ public class JSEUIManager implements AOUIManager {
     		);
     		final Constructor<?> csdConstructor =
     				csdClass.getConstructor(
+    						Component.class,
     						NameCertificateBean[].class,
-    						KeyStoreManager.class,
-    						Component.class);
-    		final Object csd =  csdConstructor.newInstance(selectionValues, ksm, parent);
+    						KeyStoreManager.class
+    						);
+    		final Object csd =  csdConstructor.newInstance(parent, selectionValues, ksm);
     		final Method showDialogMethod = csdClass.getMethod("showDialog"); //$NON-NLS-1$
 
     		return showDialogMethod.invoke(csd);

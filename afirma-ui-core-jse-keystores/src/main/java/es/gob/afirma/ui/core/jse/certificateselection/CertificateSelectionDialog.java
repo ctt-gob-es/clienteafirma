@@ -34,9 +34,10 @@ public final class CertificateSelectionDialog extends MouseAdapter {
 
 	private final JOptionPane optionPane;
 	
-	private final KeyStoreManager ksm;
-
 	private final Component parent;
+	
+	private KeyStoreManager ksm;
+
 
 	/** Construye el di&aacute;logo de selecci&oacute;n de certificados a partir del listado con
 	 * sus nombres y los propios certificados.
@@ -127,7 +128,7 @@ public final class CertificateSelectionDialog extends MouseAdapter {
 	public void refresh() {
 
 		try {
-			Map<String, String> aliases = KeyStoreUtilities.getAliasesByFriendlyName(
+			final Map<String, String> aliases = KeyStoreUtilities.getAliasesByFriendlyName(
 					this.ksm.getAliases(),
 					this.ksm,
 					false,
@@ -146,6 +147,22 @@ public final class CertificateSelectionDialog extends MouseAdapter {
 	
 	public void changeKeyStore(final KeyStoreManager ksm) {
 		
-		
+		this.ksm = ksm;
+		try {
+			final Map<String, String> aliases = KeyStoreUtilities.getAliasesByFriendlyName(
+					this.ksm.getAliases(),
+					this.ksm,
+					false,
+					true,
+					null);
+
+			this.csd.refresh(KeyStoreUtilities.getNameCertificateBeans(
+					aliases.keySet().toArray(new String[aliases.size()]),
+					this.ksm)
+					);
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 }

@@ -5,6 +5,7 @@ import java.awt.Cursor;
 import java.awt.Desktop;
 import java.awt.KeyEventDispatcher;
 import java.awt.event.KeyEvent;
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.util.logging.Logger;
@@ -14,6 +15,9 @@ import javax.swing.JOptionPane;
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.keystores.KeyStoreManager;
 import es.gob.afirma.core.misc.Platform;
+import es.gob.afirma.keystores.AOKeyStore;
+import es.gob.afirma.keystores.AOKeyStoreManager;
+import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
 import es.gob.afirma.ui.core.jse.JSEUIManager;
 
 final class CertificateSelectionDispatcherListener implements KeyEventDispatcher {
@@ -47,8 +51,9 @@ final class CertificateSelectionDispatcherListener implements KeyEventDispatcher
 	}
 
 	private final Component parent;
-	private final KeyStoreManager localKeyStore;
 	private final CertificateSelectionDialog selectionDialog;
+	private KeyStoreManager localKeyStore;
+	
 
 	CertificateSelectionDispatcherListener(final Component p,
 			                               final KeyStoreManager lks,
@@ -84,8 +89,9 @@ final class CertificateSelectionDispatcherListener implements KeyEventDispatcher
 				// En OS X el modificador es distinto (la tecla Meta es el "Command" de Mac)
 				if (!Platform.OS.MACOSX.equals(Platform.getOS()) && ke.isControlDown() || ke.isMetaDown()) {
 					if (KeyEvent.VK_O == ke.getKeyCode()) {
+						final File[] ksFile; 
 						try {
-							new JSEUIManager().getLoadFiles(
+							ksFile = new JSEUIManager().getLoadFiles(
 								CertificateSelectionDialogMessages.getString("CertificateSelectionDispatcherListener.0"), //$NON-NLS-1$
 								null,
 								null,
@@ -98,6 +104,24 @@ final class CertificateSelectionDispatcherListener implements KeyEventDispatcher
 						}
 						catch(final AOCancelledOperationException e) {
 							return false;
+						}
+						
+						if (ksFile != null && ksFile.length > 0) {
+							AOKeyStoreManager ksm;
+							try {
+								ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
+										AOKeyStore.PKCS12,
+										ksFile[0].getAbsolutePath(),
+										null,
+										AOKeyStore.PKCS12.getStorePasswordCallback(this.parent),
+										this.parent);
+							} catch (final Exception e) {
+								LOGGER.warning("No se ha podido cargar el almacen de certificados seleccionado: " + e); //$NON-NLS-1$
+								return false;
+							}
+							
+							this.localKeyStore = ksm;
+							this.selectionDialog.changeKeyStore(ksm);
 						}
 					}
 				}
