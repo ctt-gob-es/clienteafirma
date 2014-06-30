@@ -180,7 +180,7 @@ public final class KeyStoreUtilities {
 
                 if (checkPrivateKeys) {
                     try {
-                    	if (ksm.getKeyEntry(al, new CachePasswordCallback(new char[0])) == null) { //TODO: Solo DNIe
+                    	if (ksm.getKeyEntry(al, new CachePasswordCallback(new char[0])) == null) {
                             aliassesByFriendlyName.remove(al);
                             LOGGER.info(
                               "El certificado '" + al + "' no era tipo trusted pero su clave tampoco era de tipo privada, no se mostrara" //$NON-NLS-1$ //$NON-NLS-2$
@@ -284,7 +284,7 @@ public final class KeyStoreUtilities {
                                                  final boolean checkPrivateKeys,
                                                  final boolean checkValidity,
                                                  final boolean showExpiredCertificates) throws AOCertificatesNotFoundException {
-    	
+
     	return showCertSelectionDialog(
                ksm,
                parentComponent,
@@ -334,11 +334,11 @@ public final class KeyStoreUtilities {
     		                                     final boolean showExpiredCertificates,
     		                                     final List<CertificateFilter> certFilters,
     		                                     final boolean mandatoryCertificate) {
-    	
+
     	if (ksm == null) {
     		throw new NullPointerException("No se ha indicado el almacen de claves"); //$NON-NLS-1$
     	}
-    	
+
     	final Map<String, String> aliassesByFriendlyName =
     		KeyStoreUtilities.getAliasesByFriendlyName(
 				ksm.getAliases(),
@@ -367,7 +367,7 @@ public final class KeyStoreUtilities {
     				aliassesByFriendlyName.get(certAlias),
     				ksm.getCertificate(certAlias));
     	}
-    	Arrays.sort(orderedFriendlyNames, nameCertificateComparator);
+    	Arrays.sort(orderedFriendlyNames, CERT_NAME_COMPARATOR);
 
     	final String selectedAlias = (String) AOUIFactory.showCertificateSelectionDialog(
 			parentComponent,
@@ -504,9 +504,9 @@ public final class KeyStoreUtilities {
 		}
 		return false;
 	}
-	
+
 	public static NameCertificateBean[] getNameCertificateBeans(final String[] aliases, final KeyStoreManager ksm) throws AOCertificatesNotFoundException {
-		
+
 		final Map<String, String> aliassesByFriendlyName =
 	    		KeyStoreUtilities.getAliasesByFriendlyName(
 					aliases != null ? aliases : ksm.getAliases(),
@@ -544,12 +544,12 @@ public final class KeyStoreUtilities {
 //	    			return orderedFriendlyNames.[0];
 //	    	}
 
-	    	Arrays.sort(orderedNameCertificates, nameCertificateComparator);
-	    	
+	    	Arrays.sort(orderedNameCertificates, CERT_NAME_COMPARATOR);
+
 	    	return orderedNameCertificates;
 	}
-	
-	private static final Comparator<NameCertificateBean> nameCertificateComparator = new Comparator<NameCertificateBean>() {
+
+	private static final Comparator<NameCertificateBean> CERT_NAME_COMPARATOR = new Comparator<NameCertificateBean>() {
 		/** {@inheritDoc} */
 		@Override
 		public int compare(final NameCertificateBean o1, final NameCertificateBean o2) {
