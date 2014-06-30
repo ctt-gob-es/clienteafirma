@@ -1,7 +1,6 @@
 package es.gob.afirma.test.simple;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 import es.gob.afirma.core.misc.AOUtil;
@@ -12,7 +11,7 @@ import es.gob.afirma.standalone.DataAnalizerUtil;
  * la cadena "factura" en su nombre
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public final class TestFacturaeHelper {
-    
+
     private static final String[] TEST_FILES = new String[] {
         "ANF_PF_Activo.pfx", //$NON-NLS-1$
         "base64.b64", //$NON-NLS-1$
@@ -29,17 +28,17 @@ public final class TestFacturaeHelper {
         "sample-namespace-encoding-us-ascii.xml", //$NON-NLS-1$
         "TEST_PDF_Certified.pdf" //$NON-NLS-1$
     };
-    
-    /** Pruebas de la detecci&oacute;n de facturas electr&oacute;nicas. 
+
+    /** Pruebas de la detecci&oacute;n de facturas electr&oacute;nicas.
      * @throws Exception */
     @SuppressWarnings("static-method")
 	@Test
     public void testFacturaeHelper() throws Exception {
         for (final String f : TEST_FILES) {
             final byte[] file = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(f));
-            Assert.assertEquals(DataAnalizerUtil.isFacturae(file), f.contains("factura")); //$NON-NLS-1$
+            Assert.assertEquals(Boolean.valueOf(DataAnalizerUtil.isFacturae(file)), Boolean.valueOf(f.contains("factura"))); //$NON-NLS-1$
         }
-        
+
     }
 
 }
