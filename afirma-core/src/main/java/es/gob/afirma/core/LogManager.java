@@ -15,6 +15,8 @@ import es.gob.afirma.core.misc.Platform;
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public final class LogManager {
 
+	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+
 	private LogManager() {
 		// No permito la instanciacion
 	}
@@ -52,7 +54,7 @@ public final class LogManager {
 		else {
 			application = app;
 		}
-		Logger.getLogger("es.gob.afirma").addHandler(createFileHandler()); //$NON-NLS-1$
+		LOGGER.addHandler(createFileHandler());
 		installed = true;
 	}
 
@@ -69,7 +71,7 @@ public final class LogManager {
 				false
 			);
 	}
-	
+
 	/** Obtiene, en formato XML, el registro acumulado de la ejecuci&oacute;n actual.
 	 * @return Registro acumulado de la ejecuci&oacute;n actual
 	 * @throws IOException Si no hay registro o este no se puede leer */
@@ -77,16 +79,16 @@ public final class LogManager {
 		if (!installed) {
 			throw new IOException("No esta instalado el manejador de fichero"); //$NON-NLS-1$
 		}
-		
-		Handler[] handlers = Logger.getLogger("es.gob.afirma").getHandlers(); //$NON-NLS-1$
+
+		final Handler[] handlers = LOGGER.getHandlers();
 		for (final Handler h : handlers) {
 			if (h instanceof FileHandler) {
 				h.close();
-				Logger.getLogger("es.gob.afirma").info("Cerrado el manejador de fichero para permitir que sea procesado"); //$NON-NLS-1$ //$NON-NLS-2$
-				Logger.getLogger("es.gob.afirma").removeHandler(h); //$NON-NLS-1$
+				LOGGER.info("Cerrado el manejador de fichero para permitir que sea procesado"); //$NON-NLS-1$
+				LOGGER.removeHandler(h);
 			}
 		}
-		
+
 		final InputStream is = new FileInputStream(
 			new File(
 				LOG_FILE.replace("%h", Platform.getUserHome()).replace("%a", application.toString())  //$NON-NLS-1$//$NON-NLS-2$
@@ -94,9 +96,9 @@ public final class LogManager {
 		);
 		final String log = new String(AOUtil.getDataFromInputStream(is));
 		is.close();
-		
-		Logger.getLogger("es.gob.afirma").addHandler(createFileHandler()); //$NON-NLS-1$
-		
+
+		LOGGER.addHandler(createFileHandler());
+
 		return log;
 	}
 
