@@ -48,6 +48,8 @@ import com.dmurph.tracking.AnalyticsConfigData;
 import com.dmurph.tracking.JGoogleAnalyticsTracker;
 import com.dmurph.tracking.JGoogleAnalyticsTracker.GoogleAnalyticsVersion;
 
+import es.gob.afirma.core.LogManager;
+import es.gob.afirma.core.LogManager.App;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.keystores.AOKeyStoreManager;
@@ -70,6 +72,15 @@ import es.gob.afirma.standalone.ui.UIUtils;
  * </ul>
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public final class SimpleAfirma extends JApplet implements PropertyChangeListener, WindowListener {
+
+	static {
+		try {
+			LogManager.install(App.SIMPLE);
+		}
+		catch(final Exception e) {
+			Logger.getLogger("es.gob.afirma").severe("No ha sido posible instalar el gestor de registro: " + e); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+	}
 
 	private static final String GOOGLE_ANALYTICS_TRACKING_CODE = "UA-41615516-4"; //$NON-NLS-1$
 	private static final String IP_DISCOVERY_AUTOMATION = "http://checkip.amazonaws.com"; //$NON-NLS-1$
