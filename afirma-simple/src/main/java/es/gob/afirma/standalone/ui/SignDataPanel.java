@@ -11,6 +11,7 @@
 package es.gob.afirma.standalone.ui;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Desktop;
 import java.awt.Dimension;
@@ -208,7 +209,7 @@ final class SignDataPanel extends JPanel {
 	            final EditorFocusManager editorFocusManager = new EditorFocusManager (this.certDescription, new EditorFocusManagerAction() {
                     @Override
                     public void openHyperLink(final HyperlinkEvent he, final int linkIndex) {
-                        openCertificate(cert);
+                        openCertificate(cert, SignDataPanel.this);
                     }
                 });
                 this.certDescription.addFocusListener(editorFocusManager);
@@ -315,7 +316,9 @@ final class SignDataPanel extends JPanel {
         	LOGGER.severe("Error obteniendo los datos de la firma: " + e); //$NON-NLS-1$
             signInfo = null;
         }
-        final JScrollPane detailPanel = new JScrollPane(signInfo == null ? null : this.getSignDataTree(signInfo, extKeyListener));
+        final JScrollPane detailPanel = new JScrollPane(
+    		signInfo == null ? null : SignDataPanel.getSignDataTree(signInfo, extKeyListener, SignDataPanel.this)
+		);
 
         // En Apple siempre hay barras, y es el SO el que las pinta o no depende de si hacen falta
         if (Platform.OS.MACOSX.equals(Platform.getOS())) {
@@ -362,7 +365,7 @@ final class SignDataPanel extends JPanel {
         this.add(detailPanel, c);
     }
 
-	void openCertificate(final X509Certificate cert) {
+	static void openCertificate(final X509Certificate cert, final Component parent) {
         try {
             final File tmp = File.createTempFile("afirma", ".cer");  //$NON-NLS-1$//$NON-NLS-2$
             tmp.deleteOnExit();
@@ -376,7 +379,7 @@ final class SignDataPanel extends JPanel {
         }
         catch(final Exception e) {
             UIUtils.showErrorMessage(
-                    SignDataPanel.this,
+                    parent,
                     SimpleAfirmaMessages.getString("SignDataPanel.23"), //$NON-NLS-1$
                     SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
                     JOptionPane.ERROR_MESSAGE
@@ -418,7 +421,9 @@ final class SignDataPanel extends JPanel {
         return signInfo;
     }
 
-    private JTree getSignDataTree(final CompleteSignInfo signInfo, final KeyListener extKeyListener) {
+    private static JTree getSignDataTree(final CompleteSignInfo signInfo,
+    		                             final KeyListener extKeyListener,
+    		                             final Component parent) {
         final DefaultMutableTreeNode root = new DefaultMutableTreeNode();
 
         // Formato de firma
@@ -460,7 +465,7 @@ final class SignDataPanel extends JPanel {
             @Override
             public void openTreeNode(final Object nodeInfo) {
                 if (nodeInfo instanceof AOSimpleSignInfo) {
-                    openCertificate(((AOSimpleSignInfo) nodeInfo).getCerts()[0]);
+                    openCertificate(((AOSimpleSignInfo) nodeInfo).getCerts()[0], parent);
                 }
                 else if (nodeInfo instanceof ShowFileLinkAction) {
                     ((ShowFileLinkAction) nodeInfo).action();
