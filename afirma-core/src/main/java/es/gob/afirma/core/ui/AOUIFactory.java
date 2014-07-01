@@ -188,11 +188,9 @@ public final class AOUIFactory {
 
     /** Di&aacute;logo de selecci&oacute;n de certificados.
      * @param parentComponent Componente padre (se descarta si no es del tipo <code>java.awt.Component</code> en la implementaci&oacute;n Swing
-     * @param selectionValues Listado de valores seleccionables Nombre-Certificado.
-     * @param ksm Almac&eacute;n actual.
+     * @param dialogManager Gestor del di&aacute;logo
      * @return Alias del certificado seleccionado o {@code null} si no se seleccion&oacute; ninguno. */
-    public static Object showCertificateSelectionDialog(final Object parentComponent,
-    		                                            KeyStoreDialogManager dialogManager) {
+    public static Object showCertificateSelectionDialog(final Object parentComponent, final KeyStoreDialogManager dialogManager) {
         return uiManager.showCertificateSelectionDialog(parentComponent, dialogManager);
     }
 

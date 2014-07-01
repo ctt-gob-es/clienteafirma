@@ -18,34 +18,31 @@ public interface KeyStoreDialogManager {
 	 * @return Listado de certificados con alias.
 	 */
 	NameCertificateBean[] getNameCertificates();
-	
+
 	/**
 	 * Cambia el almacen que gestiona internamente el di&aacute;logo.
 	 * @param ksm Almac&eacute;n de certificados.
 	 */
 	void setKeyStoreManager(KeyStoreManager ksm);
-	
+
 	/**
 	 * Devuelve la clave asociada a un alias.
 	 * @param alias Alias de la clave que se desea recuperar.
-	 * @throws AOException Cuando no se puede extraer la clave del almac&eacute;n. 
+	 * @throws AOException Cuando no se puede extraer la clave del almac&eacute;n.
 	 * @return Clave.
 	 */
 	Object getKeyEntry(String alias) throws AOException;
-	
-	/**
-	 * Muestra el di&aacute;logo de selecci&oacute;n y devuelve la clave seleccionada.
-	 * @return Clave.
-	 * @throws AOCancelledOperationException Cuando no se selecciona ning&uacute;n certificado.
-	 */
+
+	/** Muestra el di&aacute;logo de selecci&oacute;n y devuelve la clave seleccionada.
+	 * @throws AOCancelledOperationException Cuando no se selecciona ning&uacute;n certificado. */
 	void show();
-	
+
 	/**
 	 * Recupera el alias del certificado seleccionado;
 	 * @return Alias de certificado.
 	 */
 	String getSelectedAlias();
-	
+
 	/**
 	 * Recupera el par Clave-Certificado del certificado seleccionado.
 	 * @return Par clave-certificado.
