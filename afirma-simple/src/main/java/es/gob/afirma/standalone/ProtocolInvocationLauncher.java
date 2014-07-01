@@ -1,6 +1,7 @@
 package es.gob.afirma.standalone;
 
 import java.io.IOException;
+import java.security.KeyStore.PrivateKeyEntry;
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.logging.Logger;
@@ -16,11 +17,10 @@ import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.AOSignerFactory;
 import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.ui.AOUIFactory;
-import es.gob.afirma.keystores.AOCertificatesNotFoundException;
 import es.gob.afirma.keystores.AOKeyStore;
+import es.gob.afirma.keystores.AOKeyStoreDialog;
 import es.gob.afirma.keystores.AOKeyStoreManager;
 import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
-import es.gob.afirma.keystores.KeyStoreUtilities;
 import es.gob.afirma.standalone.crypto.CipherDataManager;
 
 /** Gestiona la ejecuci&oacute;n del Cliente Afirma en una invocaci&oacute;n
@@ -147,22 +147,13 @@ public final class ProtocolInvocationLauncher {
 			showError(SAF_08);
 			return;
 		}
-		final String selectedAlias;
+		final PrivateKeyEntry pke;
 		try {
-			selectedAlias = KeyStoreUtilities.showCertSelectionDialog(
-				ksm,
-				null, // Parent
-				true, // Check private keys
-				true, // Check validity
-				false // Show expired
-			);
+			AOKeyStoreDialog dialog = new AOKeyStoreDialog(ksm, null, true, false, true);
+			dialog.show();
+			pke = dialog.getSelectedPrivateKeyEntry();
 		}
 		catch (final AOCancelledOperationException e) {
-			return;
-		}
-		catch (final AOCertificatesNotFoundException e) {
-			LOGGER.warning("No se han encontrado certificados: " + e); //$NON-NLS-1$
-			showError(SAF_10);
 			return;
 		}
 		catch (final Exception e) {
@@ -177,11 +168,8 @@ public final class ProtocolInvocationLauncher {
 					sign = signer.sign(
 						options.getData(),
 						options.getSignatureAlgorithm(),
-						ksm.getKeyEntry(
-							selectedAlias,
-							pwc
-						).getPrivateKey(),
-						ksm.getCertificateChain(selectedAlias),
+						pke.getPrivateKey(),
+						pke.getCertificateChain(),
 						options.getExtraParams()
 					);
 				}
@@ -197,11 +185,8 @@ public final class ProtocolInvocationLauncher {
 					sign = signer.cosign(
 						options.getData(),
 						options.getSignatureAlgorithm(),
-						ksm.getKeyEntry(
-							selectedAlias,
-							pwc
-						).getPrivateKey(),
-						ksm.getCertificateChain(selectedAlias),
+						pke.getPrivateKey(),
+						pke.getCertificateChain(),
 						options.getExtraParams()
 					);
 				}
@@ -218,11 +203,8 @@ public final class ProtocolInvocationLauncher {
 						options.getSignatureAlgorithm(),
 						"tree".equalsIgnoreCase(options.getExtraParams().getProperty("target")) ? CounterSignTarget.TREE : CounterSignTarget.LEAFS, //$NON-NLS-1$ //$NON-NLS-2$
 						null, // Targets
-						ksm.getKeyEntry(
-							selectedAlias,
-							pwc
-						).getPrivateKey(),
-						ksm.getCertificateChain(selectedAlias),
+						pke.getPrivateKey(),
+						pke.getCertificateChain(),
 						options.getExtraParams()
 					);
 				}

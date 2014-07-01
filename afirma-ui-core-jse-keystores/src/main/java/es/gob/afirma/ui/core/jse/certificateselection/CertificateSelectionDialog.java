@@ -16,44 +16,47 @@ import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.Map;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.logging.Logger;
 
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 
+import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.keystores.KeyStoreManager;
 import es.gob.afirma.core.keystores.NameCertificateBean;
-import es.gob.afirma.keystores.KeyStoreUtilities;
+import es.gob.afirma.core.ui.KeyStoreDialogManager;
 
 /** Di&aacute;logo de selecci&oacute;n de certificados con est&eacute;tica similar al de Windows 7.
  * @author Carlos Gamuci
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public final class CertificateSelectionDialog extends MouseAdapter {
 
+	private static final Logger logger = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+	 
 	private final CertificateSelectionPanel csd;
 
 	private final JOptionPane optionPane;
 	
 	private final Component parent;
 	
-	private KeyStoreManager ksm;
+	private final KeyStoreDialogManager ksdm;
 
 
 	/** Construye el di&aacute;logo de selecci&oacute;n de certificados a partir del listado con
 	 * sus nombres y los propios certificados.
-	 * @param el Listado de certificados.
-	 * @param parent Componente sobre el que se mostrar&aacute; el di&aacute;logo. */
-	public CertificateSelectionDialog(final Component parent, final NameCertificateBean[] el, final KeyStoreManager ksm) {
+	 * @param parent Componente sobre el que se mostrar&aacute; el di&aacute;logo.
+	 * @param ksdm Gestor del almacen de claves. */
+	public CertificateSelectionDialog(final Component parent, final KeyStoreDialogManager ksdm) {
 
-	    if (el == null || el.length == 0) {
-	        throw new IllegalArgumentException("El listado de certificados no puede ser nulo ni vacio"); //$NON-NLS-1$
-	    }
+	    this.ksdm = ksdm;
 
-	    this.ksm = ksm;
-	    
-		this.csd = new CertificateSelectionPanel(el.clone());
+	    final NameCertificateBean[] certs = this.ksdm.getNameCertificates();
+	    Arrays.sort(certs, CERT_NAME_COMPARATOR);
+	    this.csd = new CertificateSelectionPanel(certs);
 		this.parent = parent;
-		this.optionPane = el.length > 1 ?
+		this.optionPane = certs.length > 1 ?
 				new CertOptionPane(this.csd) : new JOptionPane();
 
 		this.csd.addCertificateListMouseListener(this);
@@ -67,7 +70,7 @@ public final class CertificateSelectionDialog extends MouseAdapter {
 	/** Muestra el di&aacute;logo de selecci&oacute;n de certificados.
 	 * @return Nombre del certificado seleccionado o {@code null} si el usuario
 	 * lo cancela o cierra sin seleccionar. */
-	public String showDialog() {
+	public Object showDialog() throws AOException {
 
 		final JDialog certDialog = this.optionPane.createDialog(
 			this.parent,
@@ -79,7 +82,6 @@ public final class CertificateSelectionDialog extends MouseAdapter {
 
 		final KeyEventDispatcher dispatcher = new CertificateSelectionDispatcherListener(
 				this.optionPane,
-				this.ksm,
 				this
 				); 
 		
@@ -93,10 +95,14 @@ public final class CertificateSelectionDialog extends MouseAdapter {
 			certDialog.dispose();
 			return null;
 		}
+		
+		
 		final String selectedAlias = this.csd.getSelectedCertificate();
+		
 		KeyboardFocusManager.getCurrentKeyboardFocusManager().removeKeyEventDispatcher(dispatcher);
 		certDialog.dispose();
-		return selectedAlias;
+		
+		return this.ksdm.getKeyEntry(selectedAlias);
 	}
 
 	/** {@inheritDoc} */
@@ -126,43 +132,42 @@ public final class CertificateSelectionDialog extends MouseAdapter {
 
 	/** Refresca el di&aacute;logo con los certificados del mismo almac&eacute;n. */
 	public void refresh() {
-
+		
+		final NameCertificateBean[] certs = this.ksdm.getNameCertificates();
+		Arrays.sort(certs, CERT_NAME_COMPARATOR);
+		
 		try {
-			final Map<String, String> aliases = KeyStoreUtilities.getAliasesByFriendlyName(
-					this.ksm.getAliases(),
-					this.ksm,
-					false,
-					true,
-					null);
-
-			this.csd.refresh(KeyStoreUtilities.getNameCertificateBeans(
-					aliases.keySet().toArray(new String[aliases.size()]),
-					this.ksm)
-					);
+			this.csd.refresh(certs);
 		}
 		catch (Exception e) {
+			logger.warning("No se pudo actualizar el dialogo de seleccion: " + e); //$NON-NLS-1$
 			e.printStackTrace();
 		}
 	}
 	
 	public void changeKeyStore(final KeyStoreManager ksm) {
 		
-		this.ksm = ksm;
-		try {
-			final Map<String, String> aliases = KeyStoreUtilities.getAliasesByFriendlyName(
-					this.ksm.getAliases(),
-					this.ksm,
-					false,
-					true,
-					null);
-
-			this.csd.refresh(KeyStoreUtilities.getNameCertificateBeans(
-					aliases.keySet().toArray(new String[aliases.size()]),
-					this.ksm)
-					);
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-		}
+		this.ksdm.setKeyStoreManager(ksm);
+		
+		refresh();
 	}
+	
+	private static final Comparator<NameCertificateBean> CERT_NAME_COMPARATOR = new Comparator<NameCertificateBean>() {
+		/** {@inheritDoc} */
+		@Override
+		public int compare(final NameCertificateBean o1, final NameCertificateBean o2) {
+			if (o1 == null && o2 == null) {
+				return 0;
+			}
+			else if (o1 == null) {
+				return 1;
+			}
+			else if (o2 == null) {
+				return -1;
+			}
+			else{
+				return o1.getName().compareToIgnoreCase(o2.getName());
+			}
+		}
+	};	
 }

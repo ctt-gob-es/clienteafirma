@@ -75,9 +75,8 @@ import es.gob.afirma.core.signers.AOSignInfo;
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.AOSignerFactory;
 import es.gob.afirma.core.ui.AOUIFactory;
-import es.gob.afirma.keystores.AOCertificatesNotFoundException;
+import es.gob.afirma.keystores.AOKeyStoreDialog;
 import es.gob.afirma.keystores.AOKeyStoreManager;
-import es.gob.afirma.keystores.KeyStoreUtilities;
 import es.gob.afirma.signers.cades.AOCAdESSigner;
 import es.gob.afirma.signers.pades.AOPDFSigner;
 import es.gob.afirma.signers.pades.BadPdfPasswordException;
@@ -101,7 +100,6 @@ public final class SignPanel extends JPanel {
 
     private final JSVGCanvas fileTypeVectorIcon = new JSVGCanvas();
 
-    private static final String DNIE_SIGNATURE_ALIAS = "CertFirmaDigital"; //$NON-NLS-1$
     private static final String FILE_ICON_PDF = "/resources/icon_pdf.svg"; //$NON-NLS-1$
     private static final String FILE_ICON_XML = "/resources/icon_xml.svg"; //$NON-NLS-1$
     private static final String FILE_ICON_BINARY = "/resources/icon_binary.svg"; //$NON-NLS-1$
@@ -774,35 +772,12 @@ public final class SignPanel extends JPanel {
                 return null;
             }
             final AOKeyStoreManager ksm = SignPanel.this.getSimpleAfirma().getAOKeyStoreManager();
-            String alias = null;
 
-            //TODO: Para que esta preseleccion de Alias????
-            try {
-            	final X509Certificate tmpCert = ksm.getCertificate(DNIE_SIGNATURE_ALIAS);
-            	if (tmpCert != null && tmpCert.getIssuerX500Principal().toString().contains("DNIE")) { //$NON-NLS-1$
-            		alias = DNIE_SIGNATURE_ALIAS;
-            	}
-            }
-            catch(final Exception e) { /* Ignoramos los errores */ }
-
-            if (alias == null) {
+            PrivateKeyEntry pke;
                 try {
-                    alias = KeyStoreUtilities.showCertSelectionDialog(
-                		ksm,
-                        SignPanel.this,
-                        true,
-                        true,
-                        false
-                    );
-                }
-                catch (final AOCertificatesNotFoundException e) {
-                    UIUtils.showErrorMessage(
-                            SignPanel.this,
-                            SimpleAfirmaMessages.getString("SignPanel.55"), //$NON-NLS-1$
-                            SimpleAfirmaMessages.getString("SimpleAfirma.48"), //$NON-NLS-1$
-                            JOptionPane.WARNING_MESSAGE
-                    );
-                    return null;
+                	AOKeyStoreDialog dialog = new AOKeyStoreDialog(ksm, SignPanel.this, true, false, true);
+                	dialog.show();
+                	pke = dialog.getSelectedPrivateKeyEntry();
                 }
                 catch (final AOCancelledOperationException e) {
                     return null;
@@ -810,7 +785,6 @@ public final class SignPanel extends JPanel {
                 finally {
                     SignPanel.this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
                 }
-            }
 
             setSignCommandEnabled(false);
 
@@ -854,10 +828,6 @@ public final class SignPanel extends JPanel {
             final byte[] signResult;
 
             try {
-            	final PrivateKeyEntry pke = ksm.getKeyEntry(
-        			alias,
-        			ksm.getType().getCertificatePasswordCallback(SignPanel.this)
-    			);
                 if (SignPanel.this.isCosign()) {
                     signResult = SignPanel.this.getSigner().cosign(
                 		SignPanel.this.getDataToSign(),
@@ -997,7 +967,10 @@ public final class SignPanel extends JPanel {
             SignPanel.this.getSimpleAfirma().setCurrentDir(fd);
             newFileName = fd.getAbsolutePath();
 
-            SignPanel.this.getSimpleAfirma().loadResultsPanel(signResult, newFileName, ksm.getCertificate(alias));
+            SignPanel.this.getSimpleAfirma().loadResultsPanel(
+            		signResult,
+            		newFileName,
+            		(X509Certificate) pke.getCertificate());
 
             return null;
         }

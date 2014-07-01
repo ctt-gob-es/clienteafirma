@@ -14,8 +14,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.logging.Logger;
 
-import es.gob.afirma.core.keystores.KeyStoreManager;
-import es.gob.afirma.core.keystores.NameCertificateBean;
 import es.gob.afirma.core.misc.Platform;
 
 /**
@@ -194,9 +192,8 @@ public final class AOUIFactory {
      * @param ksm Almac&eacute;n actual.
      * @return Alias del certificado seleccionado o {@code null} si no se seleccion&oacute; ninguno. */
     public static Object showCertificateSelectionDialog(final Object parentComponent,
-    		                                            final NameCertificateBean[] selectionValues,
-    		                                            final KeyStoreManager ksm) {
-        return uiManager.showCertificateSelectionDialog(parentComponent, selectionValues, ksm);
+    		                                            KeyStoreDialogManager dialogManager) {
+        return uiManager.showCertificateSelectionDialog(parentComponent, dialogManager);
     }
 
     /** Pide al usuario que seleccione un fichero.

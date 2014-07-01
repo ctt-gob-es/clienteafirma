@@ -49,4 +49,9 @@ public class NameCertificateBean {
 	public X509Certificate getCertificate() {
 		return this.certificate;
 	}
+	
+	@Override
+	public String toString() {
+		return this.name;
+	}
 }

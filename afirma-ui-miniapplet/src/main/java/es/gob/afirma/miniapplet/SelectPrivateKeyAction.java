@@ -24,10 +24,10 @@ import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.Platform.BROWSER;
 import es.gob.afirma.core.misc.Platform.OS;
 import es.gob.afirma.keystores.AOKeyStore;
+import es.gob.afirma.keystores.AOKeyStoreDialog;
 import es.gob.afirma.keystores.AOKeyStoreManager;
 import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
 import es.gob.afirma.keystores.AOKeystoreAlternativeException;
-import es.gob.afirma.keystores.KeyStoreUtilities;
 import es.gob.afirma.keystores.filters.CertificateFilter;
 
 /** Acci&oacute;n privilegiada para la selecci&oacute;n de una clave privada
@@ -115,20 +115,18 @@ final class SelectPrivateKeyAction implements PrivilegedExceptionAction<PrivateK
 			mandatoryCertificate = this.filterManager.isMandatoryCertificate();
 		}
 
-		final String selectedAlias = KeyStoreUtilities.showCertSelectionDialog(
-			ksm,
-			this,
-			true,
-			true,
-			true,
-			filters,
-			mandatoryCertificate
-		);
+		final AOKeyStoreDialog dialog = new AOKeyStoreDialog(
+				ksm,
+				this,
+				true,
+				true,
+				true,
+				filters,
+				mandatoryCertificate
+				);
+		dialog.show();
 
-    	return ksm.getKeyEntry(
-			selectedAlias,
-			this.keyStore.getCertificatePasswordCallback(this.parent)
-		);
+		return dialog.getSelectedPrivateKeyEntry();
 	}
 
 

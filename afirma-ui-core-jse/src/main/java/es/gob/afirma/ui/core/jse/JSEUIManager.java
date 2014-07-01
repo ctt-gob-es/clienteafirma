@@ -34,9 +34,8 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.PlainDocument;
 
 import es.gob.afirma.core.AOCancelledOperationException;
-import es.gob.afirma.core.keystores.KeyStoreManager;
-import es.gob.afirma.core.keystores.NameCertificateBean;
 import es.gob.afirma.core.ui.AOUIManager;
+import es.gob.afirma.core.ui.KeyStoreDialogManager;
 
 /** Gestor de componentes de interfaz gr&aacute;fico (tanto para Applet como para
  * aplicaci&oacute;n de escritorio) de la aplicaci&oacute;n.
@@ -154,8 +153,7 @@ public class JSEUIManager implements AOUIManager {
     /** {@inheritDoc} */
     @Override
 	public final Object showCertificateSelectionDialog(final Object parentComponent,
-    												   final NameCertificateBean[] selectionValues,
-    												   final KeyStoreManager ksm) {
+    												   final KeyStoreDialogManager ksdm) {
     	
     	Component parent = null;
     	if (parentComponent instanceof Component) {
@@ -169,10 +167,9 @@ public class JSEUIManager implements AOUIManager {
     		final Constructor<?> csdConstructor =
     				csdClass.getConstructor(
     						Component.class,
-    						NameCertificateBean[].class,
-    						KeyStoreManager.class
+    						KeyStoreDialogManager.class
     						);
-    		final Object csd =  csdConstructor.newInstance(parent, selectionValues, ksm);
+    		final Object csd =  csdConstructor.newInstance(parent, ksdm);
     		final Method showDialogMethod = csdClass.getMethod("showDialog"); //$NON-NLS-1$
 
     		return showDialogMethod.invoke(csd);
