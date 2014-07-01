@@ -9,8 +9,8 @@ package es.gob.afirma.ui.core.jse;
 public class CertificateSelectionDialogTest {
 
 
-    private static final String CERT_PATH = "multi_almacen.p12"; //$NON-NLS-1$
-    private static final String CERT_PASS = "1111"; //$NON-NLS-1$
+//    private static final String CERT_PATH = "multi_almacen.p12"; //$NON-NLS-1$
+//    private static final String CERT_PASS = "1111"; //$NON-NLS-1$
 
 //	/** Para pruebas sin JUnit
 //	 * @param args
@@ -28,14 +28,14 @@ public class CertificateSelectionDialogTest {
 //			elements.add(new NameCertificateBean(alias, alias, (X509Certificate) ks.getCertificate(alias)));
 //		}
 //
-//		final CertificateSelectionDialog dialog = new CertificateSelectionDialog(null, 
+//		final CertificateSelectionDialog dialog = new CertificateSelectionDialog(null,
 //				elements.toArray(new NameCertificateBean[elements.size()]), null);
 //
 //		final String selectedAlias = dialog.showDialog();
 //
 //		System.out.println("Certificado selecionado: " + selectedAlias); //$NON-NLS-1$
 //	}
-    
+
 //	/** Para pruebas sin JUnit
 //	 * @param args
 //	 * @throws Exception */
@@ -47,13 +47,13 @@ public class CertificateSelectionDialogTest {
 //				null,
 //				AOKeyStore.WINDOWS.getStorePasswordCallback(null),
 //				null);
-//		
+//
 //		List<CertificateFilter> filters = new ArrayList<CertificateFilter>();
 //		filters.add(new RFC2254CertificateFilter("(CN=NOMBRE*)", "(OU=FNMT*)"));
-//		
+//
 //		AOKeyStoreDialog dialog = new AOKeyStoreDialog(ksm, null, false, false, false, filters, true);
-//		
-//		
+//
+//
 //		System.out.println(AOUtil.getCN((X509Certificate) dialog.show().getCertificate()));
 //	}
 }

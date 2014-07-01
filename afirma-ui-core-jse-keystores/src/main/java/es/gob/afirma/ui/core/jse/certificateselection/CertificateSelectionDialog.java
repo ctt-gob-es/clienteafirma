@@ -34,13 +34,13 @@ import es.gob.afirma.core.ui.KeyStoreDialogManager;
 public final class CertificateSelectionDialog extends MouseAdapter {
 
 	private static final Logger logger = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
-	 
+
 	private final CertificateSelectionPanel csd;
 
 	private final JOptionPane optionPane;
-	
+
 	private final Component parent;
-	
+
 	private final KeyStoreDialogManager ksdm;
 
 
@@ -69,7 +69,8 @@ public final class CertificateSelectionDialog extends MouseAdapter {
 
 	/** Muestra el di&aacute;logo de selecci&oacute;n de certificados.
 	 * @return Nombre del certificado seleccionado o {@code null} si el usuario
-	 * lo cancela o cierra sin seleccionar. */
+	 * lo cancela o cierra sin seleccionar.
+	 * @throws AOException Cuando ocurre cualquier error durante el proceso. */
 	public Object showDialog() throws AOException {
 
 		final JDialog certDialog = this.optionPane.createDialog(
@@ -83,8 +84,8 @@ public final class CertificateSelectionDialog extends MouseAdapter {
 		final KeyEventDispatcher dispatcher = new CertificateSelectionDispatcherListener(
 				this.optionPane,
 				this
-				); 
-		
+		);
+
 		KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(dispatcher);
 
 		certDialog.setVisible(true);
@@ -95,13 +96,13 @@ public final class CertificateSelectionDialog extends MouseAdapter {
 			certDialog.dispose();
 			return null;
 		}
-		
-		
+
+
 		final String selectedAlias = this.csd.getSelectedCertificate();
-		
+
 		KeyboardFocusManager.getCurrentKeyboardFocusManager().removeKeyEventDispatcher(dispatcher);
 		certDialog.dispose();
-		
+
 		return this.ksdm.getKeyEntry(selectedAlias);
 	}
 
@@ -132,26 +133,26 @@ public final class CertificateSelectionDialog extends MouseAdapter {
 
 	/** Refresca el di&aacute;logo con los certificados del mismo almac&eacute;n. */
 	public void refresh() {
-		
+
 		final NameCertificateBean[] certs = this.ksdm.getNameCertificates();
 		Arrays.sort(certs, CERT_NAME_COMPARATOR);
-		
+
 		try {
 			this.csd.refresh(certs);
 		}
-		catch (Exception e) {
+		catch (final Exception e) {
 			logger.warning("No se pudo actualizar el dialogo de seleccion: " + e); //$NON-NLS-1$
 			e.printStackTrace();
 		}
 	}
-	
+
+	/** Cambia el almac&eacute;n de claves actual.
+	 * @param ksm Gestor de almacenes de claves. */
 	public void changeKeyStore(final KeyStoreManager ksm) {
-		
 		this.ksdm.setKeyStoreManager(ksm);
-		
 		refresh();
 	}
-	
+
 	private static final Comparator<NameCertificateBean> CERT_NAME_COMPARATOR = new Comparator<NameCertificateBean>() {
 		/** {@inheritDoc} */
 		@Override
@@ -169,5 +170,5 @@ public final class CertificateSelectionDialog extends MouseAdapter {
 				return o1.getName().compareToIgnoreCase(o2.getName());
 			}
 		}
-	};	
+	};
 }
