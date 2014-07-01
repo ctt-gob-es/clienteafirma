@@ -154,12 +154,12 @@ public class JSEUIManager implements AOUIManager {
     @Override
 	public final Object showCertificateSelectionDialog(final Object parentComponent,
     												   final KeyStoreDialogManager ksdm) {
-    	
+
     	Component parent = null;
     	if (parentComponent instanceof Component) {
     		parent = (Component) parentComponent;
     	}
-    	
+
     	try {
     		final Class<?> csdClass = Class.forName(
     				"es.gob.afirma.ui.core.jse.certificateselection.CertificateSelectionDialog" //$NON-NLS-1$
@@ -176,7 +176,9 @@ public class JSEUIManager implements AOUIManager {
     	}
     	catch (final Exception e) {
     		LOGGER.severe("No se encuentra disponible el proyecto del interfaz grafico del dialogo de seleccion: " + e); //$NON-NLS-1$
-    		throw new RuntimeException("No se encuentra disponible el proyecto del interfaz grafico del dialogo de seleccion", e); //$NON-NLS-1$
+    		throw new IllegalStateException(
+				"No se encuentra disponible el proyecto del interfaz grafico del dialogo de seleccion", e //$NON-NLS-1$
+			);
     	}
     }
 

@@ -20,18 +20,18 @@ import es.gob.afirma.keystores.filters.CertificateFilter;
 public class AOKeyStoreDialog implements KeyStoreDialogManager {
 
 	private static final Logger logger = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
-	
-	KeyStoreManager ksm;
-	final Object parentComponent;
-    final boolean checkPrivateKeys;
-    final boolean checkValidity;
-    final boolean showExpiredCertificates;
-    final List<CertificateFilter> certFilters;
-    final boolean mandatoryCertificate;
 
-    PrivateKeyEntry selectedPke = null;
-    String selectedAlias = null;
-    
+	private KeyStoreManager ksm;
+	private final Object parentComponent;
+	private final boolean checkPrivateKeys;
+	private final boolean checkValidity;
+	private final boolean showExpiredCertificates;
+	private final List<CertificateFilter> certFilters;
+	private final boolean mandatoryCertificate;
+
+	private PrivateKeyEntry selectedPke = null;
+	private String selectedAlias = null;
+
     /**
      * Crea un dialogo para la selecci&oacute;n de un certificado.
      * @param ksm
@@ -57,9 +57,9 @@ public class AOKeyStoreDialog implements KeyStoreDialogManager {
     		final boolean checkValidity) {
 
 		if (ksm == null) {
-    		throw new NullPointerException("No se ha indicado el almacen de claves"); //$NON-NLS-1$
+    		throw new IllegalArgumentException("El almacen de claves no puede ser nulo"); //$NON-NLS-1$
     	}
-		
+
 		this.ksm = ksm;
 		this.parentComponent = parentComponent;
 		this.checkPrivateKeys = checkPrivateKeys;
@@ -68,7 +68,7 @@ public class AOKeyStoreDialog implements KeyStoreDialogManager {
 		this.certFilters = null;
 		this.mandatoryCertificate = false;
     }
-    
+
     /**
      * Crea un dialogo para la selecci&oacute;n de un certificado.
      * @param ksm
@@ -99,9 +99,9 @@ public class AOKeyStoreDialog implements KeyStoreDialogManager {
             final boolean mandatoryCertificate) {
 
 		if (ksm == null) {
-    		throw new NullPointerException("No se ha indicado el almacen de claves"); //$NON-NLS-1$
+    		throw new IllegalArgumentException("El almacen de claves no puede ser nulo"); //$NON-NLS-1$
     	}
-		
+
 		this.ksm = ksm;
 		this.parentComponent = parentComponent;
 		this.checkPrivateKeys = checkPrivateKeys;
@@ -122,7 +122,7 @@ public class AOKeyStoreDialog implements KeyStoreDialogManager {
     				this.showExpiredCertificates,
     				this.certFilters
     			);
-    	
+
     	if (this.mandatoryCertificate && aliassesByFriendlyName.size() == 1) {
     		final String alias = aliassesByFriendlyName.keySet().toArray(new String[1])[0];
     		return new NameCertificateBean[] {
@@ -132,7 +132,7 @@ public class AOKeyStoreDialog implements KeyStoreDialogManager {
     						this.ksm.getCertificate(alias))
     		};
     	}
-    	
+
     	int i = 0;
     	final NameCertificateBean[] namedCerts =
     			new NameCertificateBean[aliassesByFriendlyName.size()];
@@ -142,19 +142,19 @@ public class AOKeyStoreDialog implements KeyStoreDialogManager {
     				aliassesByFriendlyName.get(certAlias),
     				this.ksm.getCertificate(certAlias));
     	}
-		
-		
+
+
 		return namedCerts;
 	}
 
 	@Override
-	public void setKeyStoreManager(KeyStoreManager ksm) {
+	public void setKeyStoreManager(final KeyStoreManager ksm) {
 		this.ksm = ksm;
 	}
 
 	@Override
-	public Object getKeyEntry(String alias) throws AOException {
-		
+	public Object getKeyEntry(final String alias) throws AOException {
+
 		try {
 			this.selectedPke = this.ksm.getKeyEntry(
 					alias,
@@ -167,10 +167,10 @@ public class AOKeyStoreDialog implements KeyStoreDialogManager {
 			throw new AOException("No se ha podido extraer la clave del almacen", e); //$NON-NLS-1$
 		}
 		this.selectedAlias = alias;
-		
+
 		return this.selectedPke;
 	}
-	
+
 	@Override
 	public void show() {
 		this.selectedPke = (PrivateKeyEntry) AOUIFactory.showCertificateSelectionDialog(this.parentComponent, this);
@@ -188,6 +188,6 @@ public class AOKeyStoreDialog implements KeyStoreDialogManager {
 	public PrivateKeyEntry getSelectedPrivateKeyEntry() {
 		return this.selectedPke;
 	}
-	
-	
+
+
 }

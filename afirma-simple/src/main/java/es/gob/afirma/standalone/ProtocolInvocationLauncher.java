@@ -97,7 +97,6 @@ public final class ProtocolInvocationLauncher {
 				processSign(ProtocolInvocationUriParser.getParametersToSign(urlString));
 			}
 			catch (final Exception e) {
-				e.printStackTrace();
 				LOGGER.severe("Error en los parametros de firma: " + e); //$NON-NLS-1$
 				showError(SAF_03);
 				return;
@@ -149,7 +148,7 @@ public final class ProtocolInvocationLauncher {
 		}
 		final PrivateKeyEntry pke;
 		try {
-			AOKeyStoreDialog dialog = new AOKeyStoreDialog(ksm, null, true, false, true);
+			final AOKeyStoreDialog dialog = new AOKeyStoreDialog(ksm, null, true, false, true);
 			dialog.show();
 			pke = dialog.getSelectedPrivateKeyEntry();
 		}
@@ -174,7 +173,6 @@ public final class ProtocolInvocationLauncher {
 					);
 				}
 				catch (final Exception e2) {
-					e2.printStackTrace();
 					LOGGER.severe("Error en el proceso de firma: " + e2); //$NON-NLS-1$
 					showError(SAF_09);
 					return;
@@ -271,7 +269,6 @@ public final class ProtocolInvocationLauncher {
 			return;
 		}
 		catch (final Exception e) {
-			e.printStackTrace();
 			LOGGER.severe("Error en el salvado de datos: " + e); //$NON-NLS-1$
 			showError(SAF_05);
 			return;

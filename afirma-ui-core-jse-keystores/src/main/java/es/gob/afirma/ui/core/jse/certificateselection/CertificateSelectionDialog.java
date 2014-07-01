@@ -142,7 +142,6 @@ public final class CertificateSelectionDialog extends MouseAdapter {
 		}
 		catch (final Exception e) {
 			logger.warning("No se pudo actualizar el dialogo de seleccion: " + e); //$NON-NLS-1$
-			e.printStackTrace();
 		}
 	}
 

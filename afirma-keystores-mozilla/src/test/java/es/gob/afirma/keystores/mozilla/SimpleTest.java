@@ -108,7 +108,6 @@ public final class SimpleTest {
 						.newInstance(new ByteArrayInputStream(p11NSSConfigFile.getBytes()));
 			}
 			catch (final Exception e2) {
-				e.printStackTrace();
 				// Un ultimo intento de cargar el proveedor valiendonos de que es posible que
 				// las bibliotecas necesarias se hayan cargado tras el ultimo intento
 				p = (Provider) Class.forName("sun.security.pkcs11.SunPKCS11") //$NON-NLS-1$

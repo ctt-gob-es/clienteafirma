@@ -760,7 +760,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 
 		final ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		final PrintWriter writer = new PrintWriter(baos);
-		e.printStackTrace(writer);
+
 		writer.flush();
 		writer.close();
 

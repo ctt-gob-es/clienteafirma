@@ -154,11 +154,11 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 		this.add(sPane, c);
 	}
 
-	
+
 	//TODO: COMPLETAR ======================
-	public void refresh(NameCertificateBean[] certs) {
-		
-		this.certificateBeans = certs;
+	public void refresh(final NameCertificateBean[] certs) {
+
+		this.certificateBeans = certs.clone();
 
 		CertificateLine certLine;
 		final List<CertificateLine> certLines = new ArrayList<CertificateSelectionPanel.CertificateLine>();
@@ -178,9 +178,9 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 		if (certLines.size() > 0) {
 			this.certList.setSelectedIndex(0);
 		}
-		
+
 	}
-	
+
 	/** Selecciona la lista de certificados. */
     void selectCertificateList() {
 		this.certList.requestFocusInWindow();

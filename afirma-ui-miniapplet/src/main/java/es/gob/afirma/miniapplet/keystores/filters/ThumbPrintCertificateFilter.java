@@ -34,7 +34,7 @@ public final class ThumbPrintCertificateFilter extends CertificateFilter {
 	 * @param thumbprint Huella del certificado, obtenida con el algoritmo indicado */
 	public ThumbPrintCertificateFilter(final String digestAlgorithm, final String thumbprint) {
 		if (digestAlgorithm == null || thumbprint == null) {
-			throw new NullPointerException("Se debe indicar tanto el algoritmo como la huella digital del certificado"); //$NON-NLS-1$
+			throw new IllegalArgumentException("Se debe indicar tanto el algoritmo como la huella digital del certificado"); //$NON-NLS-1$
 		}
 		this.digestAlgorithm = digestAlgorithm;
 		this.thumbprint = thumbprint.replace(" ", ""); //$NON-NLS-1$ //$NON-NLS-2$
