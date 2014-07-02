@@ -57,8 +57,7 @@ import es.gob.afirma.core.util.tree.AOTreeNode;
  *   "ETSI.CAdES.detached". Consulte la documentaci&oacute;n del par&aacute;metro <code>signatureSubFilter</code> para variar este comportamiento.
  * </p>
  * <p>
- *  La clase necesita espec&iacute;ficamente iText 2.1.7 (no se usan versiones m&aacute;s actuales por cuestiones de licencia) y
- *  BouncyCastle 1.49 o superior (Proveedor + TSP + <i>Mail</i>).
+ *  La clase necesita espec&iacute;ficamente la versi&oacute;n de iText 2.1.7 modificada para el Cliente &#64;firma.
  * </p> */
 public final class AOPDFSigner implements AOSigner {
 
