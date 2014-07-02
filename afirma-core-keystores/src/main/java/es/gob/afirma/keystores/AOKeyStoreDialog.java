@@ -1,6 +1,8 @@
 package es.gob.afirma.keystores;
 
 import java.security.KeyStore.PrivateKeyEntry;
+import java.security.cert.CertificateExpiredException;
+import java.security.cert.CertificateNotYetValidException;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -168,6 +170,45 @@ public class AOKeyStoreDialog implements KeyStoreDialogManager {
 		}
 		this.selectedAlias = alias;
 
+		if (this.checkValidity && this.ksm != null) {
+
+    		String errorMessage = null;
+
+			try {
+				this.ksm.getCertificate(this.selectedAlias).checkValidity();
+			}
+			catch (final CertificateExpiredException e) {
+				errorMessage = KeyStoreMessages.getString("AOKeyStoreDialog.2"); //$NON-NLS-1$
+			}
+			catch (final CertificateNotYetValidException e) {
+				errorMessage = KeyStoreMessages.getString("AOKeyStoreDialog.3"); //$NON-NLS-1$
+			}
+			catch (final Exception e) {
+				errorMessage = KeyStoreMessages.getString("AOKeyStoreDialog.4"); //$NON-NLS-1$
+			}
+
+    		boolean rejected = false;
+
+			if (errorMessage != null) {
+				logger.warning("Error durante la validacion: " + errorMessage); //$NON-NLS-1$
+				if (AOUIFactory.showConfirmDialog(
+						this.parentComponent,
+						errorMessage,
+						KeyStoreMessages.getString("AOKeyStoreDialog.5"), //$NON-NLS-1$
+						AOUIFactory.YES_NO_OPTION,
+						AOUIFactory.WARNING_MESSAGE
+				) == AOUIFactory.YES_OPTION) {
+					return this.selectedAlias;
+				}
+				rejected = true;
+			}
+
+			if (rejected) {
+				throw new AOCancelledOperationException("Se ha reusado un certificado probablemente no valido"); //$NON-NLS-1$
+			}
+    	}
+		
+		
 		return this.selectedPke;
 	}
 
