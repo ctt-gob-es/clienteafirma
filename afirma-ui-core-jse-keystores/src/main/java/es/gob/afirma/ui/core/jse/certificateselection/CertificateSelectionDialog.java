@@ -33,7 +33,7 @@ import es.gob.afirma.core.ui.KeyStoreDialogManager;
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public final class CertificateSelectionDialog extends MouseAdapter {
 
-	private static final Logger logger = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	private final CertificateSelectionPanel csd;
 
@@ -141,7 +141,7 @@ public final class CertificateSelectionDialog extends MouseAdapter {
 			this.csd.refresh(certs);
 		}
 		catch (final Exception e) {
-			logger.warning("No se pudo actualizar el dialogo de seleccion: " + e); //$NON-NLS-1$
+			LOGGER.warning("No se pudo actualizar el dialogo de seleccion: " + e); //$NON-NLS-1$
 		}
 	}
 

@@ -21,7 +21,7 @@ import es.gob.afirma.keystores.filters.CertificateFilter;
  */
 public class AOKeyStoreDialog implements KeyStoreDialogManager {
 
-	private static final Logger logger = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	private KeyStoreManager ksm;
 	private final Object parentComponent;
@@ -165,7 +165,7 @@ public class AOKeyStoreDialog implements KeyStoreDialogManager {
 								null);
 		}
 		catch (final Exception e) {
-			logger.severe("No se ha podido extraer la clave del almacen: " + e); //$NON-NLS-1$
+			LOGGER.severe("No se ha podido extraer la clave del almacen: " + e); //$NON-NLS-1$
 			throw new AOException("No se ha podido extraer la clave del almacen", e); //$NON-NLS-1$
 		}
 		this.selectedAlias = alias;
@@ -190,7 +190,7 @@ public class AOKeyStoreDialog implements KeyStoreDialogManager {
     		boolean rejected = false;
 
 			if (errorMessage != null) {
-				logger.warning("Error durante la validacion: " + errorMessage); //$NON-NLS-1$
+				LOGGER.warning("Error durante la validacion: " + errorMessage); //$NON-NLS-1$
 				if (AOUIFactory.showConfirmDialog(
 						this.parentComponent,
 						errorMessage,
