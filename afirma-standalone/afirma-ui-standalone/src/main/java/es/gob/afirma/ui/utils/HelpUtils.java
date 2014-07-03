@@ -84,7 +84,7 @@ public final class HelpUtils {
     /** Variable que almacena el icono original del boton de ayuda. */
     public static final ImageIcon IMAGEICONHELP = new ImageIcon(HelpUtils.class.getResource("/resources/images/help.png")); //$NON-NLS-1$
 
-    /** Devuelve la ayuda. */
+    /** Genera la ayuda. */
     static {
         getHelp();
     }
@@ -179,35 +179,37 @@ public final class HelpUtils {
      * @param id Identificador de la entrada de la ayuda a la que se desea acceder. */
     public static void enableHelpKey(final Component component, final String id) {
 
-        components.put(id, component);
-        getHelp().enableHelpKey(component, id, helpset);
-        if (GeneralConfig.isBigFontSize() && GeneralConfig.isFontBold()) {
-            helpBroker.setFont(new Font(helpBroker.getFont().getName(), helpBroker.getFont().getStyle(), 16));
-            helpBroker.setFont(new Font(helpBroker.getFont().getName(), Font.BOLD, helpBroker.getFont().getSize()));
-        }
-        else if (GeneralConfig.isBigFontSize()) {
-            helpBroker.setFont(new Font(helpBroker.getFont().getName(), Font.PLAIN, 16));
-        }
-        else if (GeneralConfig.isFontBold()) {
-            helpBroker.setFont(new Font(helpBroker.getFont().getName(), Font.BOLD, 11));
-        }
-        else {
-            helpBroker.setFont(new Font(helpBroker.getFont().getName(), Font.PLAIN, 11));
-        }
-        // Alto contraste
-        final WindowPresentation wp = ((DefaultHelpBroker) getHelp()).getWindowPresentation();
-        final Window helpwindow = wp.getHelpWindow();
-        if (Main.isOSHighContrast() || GeneralConfig.isHighContrast()) {
-            checkHelpAccessibility(helpwindow, true);
-        }
-        else {
-            checkHelpAccessibility(helpwindow, false);
+        final HelpBroker hb = getHelpBroker();
+        if (hb != null) {
+            components.put(id, component);
+	        hb.enableHelpKey(component, id, helpset);
+	        if (GeneralConfig.isBigFontSize() && GeneralConfig.isFontBold()) {
+	            helpBroker.setFont(new Font(helpBroker.getFont().getName(), helpBroker.getFont().getStyle(), 16));
+	            helpBroker.setFont(new Font(helpBroker.getFont().getName(), Font.BOLD, helpBroker.getFont().getSize()));
+	        }
+	        else if (GeneralConfig.isBigFontSize()) {
+	            helpBroker.setFont(new Font(helpBroker.getFont().getName(), Font.PLAIN, 16));
+	        }
+	        else if (GeneralConfig.isFontBold()) {
+	            helpBroker.setFont(new Font(helpBroker.getFont().getName(), Font.BOLD, 11));
+	        }
+	        else {
+	            helpBroker.setFont(new Font(helpBroker.getFont().getName(), Font.PLAIN, 11));
+	        }
+	        // Alto contraste
+	        final WindowPresentation wp = ((DefaultHelpBroker) hb).getWindowPresentation();
+	        final Window helpwindow = wp.getHelpWindow();
+	        if (Main.isOSHighContrast() || GeneralConfig.isHighContrast()) {
+	            checkHelpAccessibility(helpwindow, true);
+	        }
+	        else {
+	            checkHelpAccessibility(helpwindow, false);
+	        }
         }
     }
 
-    /** Genera la ayuda
-     * @return Ventana con el panel de ayuda */
-    static HelpBroker getHelp() {
+    /** Genera la ayuda. */
+    static void getHelp() {
 
         if (helpBroker == null) {
             try {
@@ -238,7 +240,6 @@ public final class HelpUtils {
 
         }
 
-        return helpBroker;
     }
 
     /** Genera el bot&oacute;n de ayuda que apuntar&aacute; a la p&aacute;gina dada.
@@ -303,34 +304,39 @@ public final class HelpUtils {
         botonAyuda.addActionListener(new ActionListener() {
             /** Accion para el boton de ayuda. */
             @Override
-            public void actionPerformed(final ActionEvent evt) {
-                getHelp().setDisplayed(true);
-                getHelp().setCurrentID(pagina);
-                if (GeneralConfig.isBigFontSize() && GeneralConfig.isFontBold()) {
-                	getHelpBroker().setFont(new Font(getHelpBroker().getFont().getName(), getHelpBroker().getFont().getStyle(), 16));
-                	getHelpBroker().setFont(new Font(getHelpBroker().getFont().getName(), Font.BOLD, getHelpBroker().getFont().getSize()));
-                }
-                else if (GeneralConfig.isBigFontSize()) {
-                	getHelpBroker().setFont(new Font(getHelpBroker().getFont().getName(), Font.PLAIN, 16));
-                }
-                else if (GeneralConfig.isFontBold()) {
-                	getHelpBroker().setFont(new Font(getHelpBroker().getFont().getName(), Font.BOLD, 11));
-                }
-                else {
-                	getHelpBroker().setFont(new Font(getHelpBroker().getFont().getName(), Font.PLAIN, 11));
-                }
+            public void actionPerformed(
+        		final ActionEvent evt) {
+	            	final HelpBroker hb = getHelpBroker();
+	                if (hb != null) {
+		                hb.setDisplayed(true);
+		                hb.setCurrentID(pagina);
+		                if (GeneralConfig.isBigFontSize() && GeneralConfig.isFontBold()) {
+		                	getHelpBroker().setFont(new Font(getHelpBroker().getFont().getName(), getHelpBroker().getFont().getStyle(), 16));
+		                	getHelpBroker().setFont(new Font(getHelpBroker().getFont().getName(), Font.BOLD, getHelpBroker().getFont().getSize()));
+		                }
+		                else if (GeneralConfig.isBigFontSize()) {
+		                	getHelpBroker().setFont(new Font(getHelpBroker().getFont().getName(), Font.PLAIN, 16));
+		                }
+		                else if (GeneralConfig.isFontBold()) {
+		                	getHelpBroker().setFont(new Font(getHelpBroker().getFont().getName(), Font.BOLD, 11));
+		                }
+		                else {
+		                	getHelpBroker().setFont(new Font(getHelpBroker().getFont().getName(), Font.PLAIN, 11));
+		                }
 
-                // Alto contraste
-                final WindowPresentation wp = ((DefaultHelpBroker) getHelp()).getWindowPresentation();
-                final Window helpwindow = wp.getHelpWindow();
-                if (Main.isOSHighContrast() || GeneralConfig.isHighContrast()) {
-                    checkHelpAccessibility(helpwindow, true);
-                }
-                else {
-                    checkHelpAccessibility(helpwindow, false);
-                }
-            }
-        });
+		                // Alto contraste
+		                final WindowPresentation wp = ((DefaultHelpBroker) hb).getWindowPresentation();
+		                final Window helpwindow = wp.getHelpWindow();
+		                if (Main.isOSHighContrast() || GeneralConfig.isHighContrast()) {
+		                    checkHelpAccessibility(helpwindow, true);
+		                }
+		                else {
+		                    checkHelpAccessibility(helpwindow, false);
+		                }
+	                }
+	            }
+        	}
+        );
         Utils.remarcar(botonAyuda);
 
         return botonAyuda;
@@ -492,50 +498,53 @@ public final class HelpUtils {
      * abrir&aacute;a por la p&aacute;gina principal.
      * @param pagina Identificador de p&aacute;gina. */
     public static void showHelp(final String pagina) {
-        getHelp().setDisplayed(true);
-        if (pagina != null) {
-            try {
-                getHelp().setCurrentID(pagina);
-                if (GeneralConfig.isBigFontSize() && GeneralConfig.isFontBold()) {
-                    helpBroker.setFont(new Font(helpBroker.getFont().getName(), helpBroker.getFont().getStyle(), 16));
-                    helpBroker.setFont(new Font(helpBroker.getFont().getName(), Font.BOLD, helpBroker.getFont().getSize()));
-                }
-                else if (GeneralConfig.isBigFontSize()) {
-                    helpBroker.setFont(new Font(helpBroker.getFont().getName(), Font.PLAIN, 16));
-                }
-                else if (GeneralConfig.isFontBold()) {
-                    helpBroker.setFont(new Font(helpBroker.getFont().getName(), Font.BOLD, 11));
-                }
-                else {
-                    helpBroker.setFont(new Font(helpBroker.getFont().getName(), Font.PLAIN, 11));
-                }
-            }
-            catch (final Exception e) {
-                if (GeneralConfig.isBigFontSize() && GeneralConfig.isFontBold()) {
-                    helpBroker.setFont(new Font(helpBroker.getFont().getName(), helpBroker.getFont().getStyle(), 16));
-                    helpBroker.setFont(new Font(helpBroker.getFont().getName(), Font.BOLD, helpBroker.getFont().getSize()));
-                }
-                else if (GeneralConfig.isBigFontSize()) {
-                    helpBroker.setFont(new Font(helpBroker.getFont().getName(), Font.PLAIN, 16));
-                }
-                else if (GeneralConfig.isFontBold()) {
-                    helpBroker.setFont(new Font(helpBroker.getFont().getName(), Font.BOLD, 11));
-                }
-                else {
-                    helpBroker.setFont(new Font(helpBroker.getFont().getName(), Font.PLAIN, 11));
-                }
-                /* No hacemos nada para que se abra por la pagina principal */
-            }
+    	final HelpBroker hb = getHelpBroker();
+        if (hb != null) {
+	        hb.setDisplayed(true);
+	        if (pagina != null) {
+	            try {
+	                hb.setCurrentID(pagina);
+	                if (GeneralConfig.isBigFontSize() && GeneralConfig.isFontBold()) {
+	                    helpBroker.setFont(new Font(helpBroker.getFont().getName(), helpBroker.getFont().getStyle(), 16));
+	                    helpBroker.setFont(new Font(helpBroker.getFont().getName(), Font.BOLD, helpBroker.getFont().getSize()));
+	                }
+	                else if (GeneralConfig.isBigFontSize()) {
+	                    helpBroker.setFont(new Font(helpBroker.getFont().getName(), Font.PLAIN, 16));
+	                }
+	                else if (GeneralConfig.isFontBold()) {
+	                    helpBroker.setFont(new Font(helpBroker.getFont().getName(), Font.BOLD, 11));
+	                }
+	                else {
+	                    helpBroker.setFont(new Font(helpBroker.getFont().getName(), Font.PLAIN, 11));
+	                }
+	            }
+	            catch (final Exception e) {
+	                if (GeneralConfig.isBigFontSize() && GeneralConfig.isFontBold()) {
+	                    helpBroker.setFont(new Font(helpBroker.getFont().getName(), helpBroker.getFont().getStyle(), 16));
+	                    helpBroker.setFont(new Font(helpBroker.getFont().getName(), Font.BOLD, helpBroker.getFont().getSize()));
+	                }
+	                else if (GeneralConfig.isBigFontSize()) {
+	                    helpBroker.setFont(new Font(helpBroker.getFont().getName(), Font.PLAIN, 16));
+	                }
+	                else if (GeneralConfig.isFontBold()) {
+	                    helpBroker.setFont(new Font(helpBroker.getFont().getName(), Font.BOLD, 11));
+	                }
+	                else {
+	                    helpBroker.setFont(new Font(helpBroker.getFont().getName(), Font.PLAIN, 11));
+	                }
+	                /* No hacemos nada para que se abra por la pagina principal */
+	            }
 
-            // Alto contraste
-            final WindowPresentation wp = ((DefaultHelpBroker) getHelp()).getWindowPresentation();
-            final Window helpwindow = wp.getHelpWindow();
-            if (Main.isOSHighContrast() || GeneralConfig.isHighContrast()) {
-                checkHelpAccessibility(helpwindow, true);
-            }
-            else {
-                checkHelpAccessibility(helpwindow, false);
-            }
+	            // Alto contraste
+	            final WindowPresentation wp = ((DefaultHelpBroker) hb).getWindowPresentation();
+	            final Window helpwindow = wp.getHelpWindow();
+	            if (Main.isOSHighContrast() || GeneralConfig.isHighContrast()) {
+	                checkHelpAccessibility(helpwindow, true);
+	            }
+	            else {
+	                checkHelpAccessibility(helpwindow, false);
+	            }
+	        }
         }
     }
 
@@ -543,60 +552,67 @@ public final class HelpUtils {
      * @param show indica si se mostrara o no */
     public static void visualize(final boolean show) {
 
-        getHelp().setDisplayed(show);
+    	final HelpBroker hb = getHelpBroker();
+        if (hb != null) {
 
-        getHelp().setCurrentID("introduccion"); //$NON-NLS-1$
-        if (GeneralConfig.isBigFontSize() && GeneralConfig.isFontBold()) {
-            helpBroker.setFont(new Font(helpBroker.getFont().getName(), helpBroker.getFont().getStyle(), 16));
-            helpBroker.setFont(new Font(helpBroker.getFont().getName(), Font.BOLD, helpBroker.getFont().getSize()));
-        }
-        else if (GeneralConfig.isBigFontSize()) {
-            helpBroker.setFont(new Font(helpBroker.getFont().getName(), Font.PLAIN, 16));
-        }
-        else if (GeneralConfig.isFontBold()) {
-            helpBroker.setFont(new Font(helpBroker.getFont().getName(), Font.BOLD, 11));
-        }
-        else {
-            helpBroker.setFont(new Font(helpBroker.getFont().getName(), Font.PLAIN, 11));
-        }
+	        hb.setDisplayed(show);
 
-        // Alto contraste
-        final WindowPresentation wp = ((DefaultHelpBroker) getHelp()).getWindowPresentation();
-        final Window helpwindow = wp.getHelpWindow();
-        if (Main.isOSHighContrast() || GeneralConfig.isHighContrast()) {
-            checkHelpAccessibility(helpwindow, true);
-        }
-        else {
-            checkHelpAccessibility(helpwindow, false);
+	        hb.setCurrentID("introduccion"); //$NON-NLS-1$
+	        if (GeneralConfig.isBigFontSize() && GeneralConfig.isFontBold()) {
+	            helpBroker.setFont(new Font(helpBroker.getFont().getName(), helpBroker.getFont().getStyle(), 16));
+	            helpBroker.setFont(new Font(helpBroker.getFont().getName(), Font.BOLD, helpBroker.getFont().getSize()));
+	        }
+	        else if (GeneralConfig.isBigFontSize()) {
+	            helpBroker.setFont(new Font(helpBroker.getFont().getName(), Font.PLAIN, 16));
+	        }
+	        else if (GeneralConfig.isFontBold()) {
+	            helpBroker.setFont(new Font(helpBroker.getFont().getName(), Font.BOLD, 11));
+	        }
+	        else {
+	            helpBroker.setFont(new Font(helpBroker.getFont().getName(), Font.PLAIN, 11));
+	        }
+
+	        // Alto contraste
+	        final WindowPresentation wp = ((DefaultHelpBroker) hb).getWindowPresentation();
+	        final Window helpwindow = wp.getHelpWindow();
+	        if (Main.isOSHighContrast() || GeneralConfig.isHighContrast()) {
+	            checkHelpAccessibility(helpwindow, true);
+	        }
+	        else {
+	            checkHelpAccessibility(helpwindow, false);
+	        }
         }
     }
 
     /** Visualiza la pagina de ayuda indicada.
      * @param pagina id de pagina */
     public static void visualize(final String pagina) {
-        getHelp().setCurrentID(pagina);
-        if (GeneralConfig.isBigFontSize() && GeneralConfig.isFontBold()) {
-            helpBroker.setFont(new Font(helpBroker.getFont().getName(), helpBroker.getFont().getStyle(), 16));
-            helpBroker.setFont(new Font(helpBroker.getFont().getName(), Font.BOLD, helpBroker.getFont().getSize()));
-        }
-        else if (GeneralConfig.isBigFontSize()) {
-            helpBroker.setFont(new Font(helpBroker.getFont().getName(), Font.PLAIN, 16));
-        }
-        else if (GeneralConfig.isFontBold()) {
-            helpBroker.setFont(new Font(helpBroker.getFont().getName(), Font.BOLD, 11));
-        }
-        else {
-            helpBroker.setFont(new Font(helpBroker.getFont().getName(), Font.PLAIN, 11));
-        }
+    	final HelpBroker hb = getHelpBroker();
+        if (hb != null) {
+	        hb.setCurrentID(pagina);
+	        if (GeneralConfig.isBigFontSize() && GeneralConfig.isFontBold()) {
+	            helpBroker.setFont(new Font(helpBroker.getFont().getName(), helpBroker.getFont().getStyle(), 16));
+	            helpBroker.setFont(new Font(helpBroker.getFont().getName(), Font.BOLD, helpBroker.getFont().getSize()));
+	        }
+	        else if (GeneralConfig.isBigFontSize()) {
+	            helpBroker.setFont(new Font(helpBroker.getFont().getName(), Font.PLAIN, 16));
+	        }
+	        else if (GeneralConfig.isFontBold()) {
+	            helpBroker.setFont(new Font(helpBroker.getFont().getName(), Font.BOLD, 11));
+	        }
+	        else {
+	            helpBroker.setFont(new Font(helpBroker.getFont().getName(), Font.PLAIN, 11));
+	        }
 
-        // Alto contraste
-        final WindowPresentation wp = ((DefaultHelpBroker) getHelp()).getWindowPresentation();
-        final Window helpwindow = wp.getHelpWindow();
-        if (Main.isOSHighContrast() || GeneralConfig.isHighContrast()) {
-            checkHelpAccessibility(helpwindow, true);
-        }
-        else {
-            checkHelpAccessibility(helpwindow, false);
+	        // Alto contraste
+	        final WindowPresentation wp = ((DefaultHelpBroker) hb).getWindowPresentation();
+	        final Window helpwindow = wp.getHelpWindow();
+	        if (Main.isOSHighContrast() || GeneralConfig.isHighContrast()) {
+	            checkHelpAccessibility(helpwindow, true);
+	        }
+	        else {
+	            checkHelpAccessibility(helpwindow, false);
+	        }
         }
     }
 
