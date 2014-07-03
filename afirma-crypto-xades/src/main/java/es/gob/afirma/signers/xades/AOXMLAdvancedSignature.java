@@ -10,6 +10,7 @@
 
 package es.gob.afirma.signers.xades;
 
+import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.KeyException;
 import java.security.PrivateKey;
@@ -19,6 +20,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
 
+import javax.naming.InvalidNameException;
+import javax.naming.ldap.LdapName;
+import javax.naming.ldap.Rdn;
 import javax.xml.crypto.MarshalException;
 import javax.xml.crypto.XMLStructure;
 import javax.xml.crypto.dom.DOMStructure;
@@ -95,7 +99,7 @@ final class AOXMLAdvancedSignature extends XMLAdvancedSignature {
     private KeyInfo newKeyInfo(final List<X509Certificate> certificates,
     		                   final String keyInfoId,
     		                   final boolean addKeyValue,
-    		                   final boolean addKeyName) throws KeyException {
+    		                   final boolean addKeyName) throws KeyException, IOException {
         final KeyInfoFactory keyInfoFactory = getXMLSignatureFactory().getKeyInfoFactory();
         final List<X509Certificate> x509DataList = new ArrayList<X509Certificate>();
         if (!XmlWrappedKeyInfo.PUBLIC_KEY.equals(getXmlWrappedKeyInfo())) {
@@ -114,23 +118,7 @@ final class AOXMLAdvancedSignature extends XMLAdvancedSignature {
         if (addKeyName) {
 	        newList.add(
 	    		keyInfoFactory.newKeyName(
-					AOUtil.getCN(certificates.get(0))
-						// Se sustituyen los caracteres UTF-8 comunes para evitar problemas
-						// de codificacion del XML
-						.replace("\u00e1", "a") //$NON-NLS-1$ //$NON-NLS-2$
-						.replace("\u00e9", "e") //$NON-NLS-1$ //$NON-NLS-2$
-						.replace("\u00ed", "i") //$NON-NLS-1$ //$NON-NLS-2$
-						.replace("\u00f3", "o") //$NON-NLS-1$ //$NON-NLS-2$
-						.replace("\u00fa", "u") //$NON-NLS-1$ //$NON-NLS-2$
-						.replace("\u00c1", "A") //$NON-NLS-1$ //$NON-NLS-2$
-						.replace("\u00c9", "E") //$NON-NLS-1$ //$NON-NLS-2$
-						.replace("\u00cd", "I") //$NON-NLS-1$ //$NON-NLS-2$
-						.replace("\u00d3", "O") //$NON-NLS-1$ //$NON-NLS-2$
-						.replace("\u00da", "U") //$NON-NLS-1$ //$NON-NLS-2$
-						.replace("\u00f1", "n") //$NON-NLS-1$ //$NON-NLS-2$
-						.replace("\u00d1", "N") //$NON-NLS-1$ //$NON-NLS-2$
-						.replace("\u00e7", "c") //$NON-NLS-1$ //$NON-NLS-2$
-						.replace("\u00c7", "C") //$NON-NLS-1$ //$NON-NLS-2$
+    				escapeLdapName(AOUtil.getCN(certificates.get(0)))
 				)
 			);
         }
@@ -144,8 +132,9 @@ final class AOXMLAdvancedSignature extends XMLAdvancedSignature {
               final String signatureIdPrefix,
               final boolean addKeyInfoKeyValue,
               final boolean addKeyInfoKeyName) throws MarshalException,
-                                                     GeneralSecurityException,
-                                                     XMLSignatureException {
+                                                      GeneralSecurityException,
+                                                      XMLSignatureException,
+                                                      IOException {
 
         final List<?> referencesIdList = new ArrayList<Object>(refsIdList);
 
@@ -222,4 +211,42 @@ final class AOXMLAdvancedSignature extends XMLAdvancedSignature {
         result.setXadesNamespace(xades.getXadesNamespace());
         return result;
     }
+
+	private static String escapeLdapName(final String in) throws IOException {
+		final LdapName name;
+		try {
+			name = new LdapName(in);
+		}
+		catch (final InvalidNameException e) {
+			throw new IOException(e);
+		}
+		final StringBuilder sb = new StringBuilder();
+		for (final Rdn rdn : name.getRdns()) {
+			sb.append(rdn.getType());
+			sb.append('=');
+			sb.append(escapeCharacters(Rdn.escapeValue(rdn.getValue())));
+			sb.append(", "); //$NON-NLS-1$
+		}
+		sb.append("<EOF>"); //$NON-NLS-1$
+		return sb.toString().replace(", <EOF>", ""); //$NON-NLS-1$ //$NON-NLS-2$
+	}
+
+	private static String escapeCharacters(final String str) {
+		return str
+			.replace("\u00e1", "\\C3\\A1") //$NON-NLS-1$ //$NON-NLS-2$
+			.replace("\u00e9", "\\C3\\A9") //$NON-NLS-1$ //$NON-NLS-2$
+			.replace("\u00ed", "\\C3\\AD") //$NON-NLS-1$ //$NON-NLS-2$
+			.replace("\u00f3", "\\C3\\B3") //$NON-NLS-1$ //$NON-NLS-2$
+			.replace("\u00fa", "\\C3\\BA") //$NON-NLS-1$ //$NON-NLS-2$
+			.replace("\u00c1", "\\C3\\81") //$NON-NLS-1$ //$NON-NLS-2$
+			.replace("\u00c9", "\\C3\\89") //$NON-NLS-1$ //$NON-NLS-2$
+			.replace("\u00cd", "\\C3\\8D") //$NON-NLS-1$ //$NON-NLS-2$
+			.replace("\u00d3", "\\C3\\93") //$NON-NLS-1$ //$NON-NLS-2$
+			.replace("\u00da", "\\C3\\9A") //$NON-NLS-1$ //$NON-NLS-2$
+			.replace("\u00f1", "\\C3\\B1") //$NON-NLS-1$ //$NON-NLS-2$
+			.replace("\u00d1", "\\C3\\91") //$NON-NLS-1$ //$NON-NLS-2$
+			.replace("\u00e7", "\\C3\\A7") //$NON-NLS-1$ //$NON-NLS-2$
+			.replace("\u00c7", "\\C3\\87") //$NON-NLS-1$ //$NON-NLS-2$
+		;
+	}
 }
