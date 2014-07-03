@@ -156,7 +156,7 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 
 
 	//TODO: COMPLETAR ======================
-	public void refresh(final NameCertificateBean[] certs) {
+	void refresh(final NameCertificateBean[] certs) {
 
 		this.certificateBeans = certs.clone();
 
