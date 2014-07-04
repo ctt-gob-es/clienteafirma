@@ -25,6 +25,10 @@ import javax.security.auth.x500.X500Principal;
 
 final class EscapeHelper {
 
+	private EscapeHelper() {
+		// No permitimos instanciar
+	}
+
 	static List<X509Certificate> getEscapedCertificates(final List<X509Certificate> certs) {
 		if (certs == null) {
 			return new ArrayList<X509Certificate>(0);
