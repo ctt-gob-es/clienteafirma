@@ -19,7 +19,7 @@ public final class DesCipher {
 
 	/** Cifra datos con un algoritmo DES (ECB sin relleno). Antes de cifrar los datos se les a&ntilde;ade
 	 * un relleno independiente del cifrado, f&aacute;cilmente eliminable cuando los datos de entrada
-	 * con Base64.
+	 * son Base64.
 	 * @param data Datos que se desean cifrar.
 	 * @param sk Contrase&ntilde;a para generar la clave secreta.
 	 * @return Resultado del proceso de cifrado.
