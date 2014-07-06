@@ -33,7 +33,7 @@ public class SignTask extends AsyncTask<Void, Void, byte[]>{
 	private static final String COUNTERSIGN_TARGET_TREE = "tree"; //$NON-NLS-1$
 
 	private static final String SIGN_FORMAT_AUTO = "AUTO"; //$NON-NLS-1$
-	
+
 	private final int op;
 	private final byte[] data;
 	private final String format;
@@ -52,8 +52,7 @@ public class SignTask extends AsyncTask<Void, Void, byte[]>{
 	 * @param algorithm Algoritmo de firma.
 	 * @param pke Clave privada para la firma.
 	 * @param extraParams Par&aacute;metros adicionales para la configuraci&oacute;n de la firma.
-	 * @param signListener Manejador para el tratamiento del resultado de la firma.
-	 * @param ctx Contexto Android para el uso de Google Analytics */
+	 * @param signListener Manejador para el tratamiento del resultado de la firma. */
 	public SignTask(final int op,
 			        final byte[] data,
 			        final String format,
@@ -148,9 +147,9 @@ public class SignTask extends AsyncTask<Void, Void, byte[]>{
 
 	private static AOSigner getSupportedCompatibleSigner(final String format, final int operation, final byte[] signature) {
 
-		
+
 		AOSigner signer;
-		
+
 		// La firma XAdES monofasica no esta soportada en Android, asi que pasamos a firma XAdES trifasica
 		if (format.toLowerCase(Locale.ENGLISH).startsWith(AOSignConstants.SIGN_FORMAT_XADES.toLowerCase(Locale.ENGLISH))) {
 			signer = AOSignerFactory.getSigner(AOSignConstants.SIGN_FORMAT_XADES_TRI);
@@ -159,7 +158,7 @@ public class SignTask extends AsyncTask<Void, Void, byte[]>{
 		else if (format.equalsIgnoreCase(SIGN_FORMAT_AUTO) && (operation == UriParser.OP_COSIGN || operation == UriParser.OP_COUNTERSIGN)) {
 			try {
 				signer = AOSignerFactory.getSigner(signature);
-			} catch (IOException e) {
+			} catch (final IOException e) {
 				Log.e(ES_GOB_AFIRMA, "No se ha podido identificar el formato de la firma, asi que se devolvera un manejador nulo"); //$NON-NLS-1$
 				signer = null;
 			}
@@ -168,7 +167,7 @@ public class SignTask extends AsyncTask<Void, Void, byte[]>{
 		else {
 			signer = AOSignerFactory.getSigner(format);
 		}
-		
+
 		return signer;
 	}
 

@@ -192,7 +192,6 @@ public final class UriParser {
 	/** Comprueba que est&eacute;n disponibles en un XML todos los parametros disponibles en la
 	 * entrada de datos para la operaci&oacute;n de firma.
 	 * @param xml XML de entrada
-	 * @param uri Url de llamada
 	 * @return Par&aacute;metros
 	 * @throws ParameterException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto
 	 * @throws UnsupportedEncodingException Si no se soporta UTF-8 en URL (no debe ocurrir nunca) */
@@ -202,7 +201,7 @@ public final class UriParser {
 
 	/** Comprueba que est&eacute;n disponibles todos los parametros disponibles en la entrada de
 	 * datos para la operaci&oacute;n de firma.
-	 * @param uri Url de llamada
+	 * @param params Par&aacute;metros obtenidos de la URL de llamada
 	 * @return Par&aacute;metros
 	 * @throws ParameterException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto
 	 * @throws UnsupportedEncodingException Si no se soporta UTF-8 en URL (no debe ocurrir nunca) */
@@ -274,7 +273,7 @@ public final class UriParser {
 		if (!params.containsKey(OPERATION_PARAM)) {
 			throw new ParameterException("No se ha indicado un codigo de operacion"); //$NON-NLS-1$
 		}
-		
+
 		final String op = params.get(OPERATION_PARAM);
 		if (OP_ID_SIGN.equalsIgnoreCase(op)) {
 			ret.setOperation(OP_SIGN);
@@ -329,7 +328,7 @@ public final class UriParser {
 		}
 
 		ret.setSignAlgorithm(algo);
-		
+
 		if (params.containsKey(PROPERTIES_PARAM)) {
 			final String props = URLDecoder.decode(params.get(PROPERTIES_PARAM), DEFAULT_URL_ENCODING);
 			Log.d(ES_GOB_AFIRMA, "ExtraParams B64: " + props); //$NON-NLS-1$
@@ -341,7 +340,7 @@ public final class UriParser {
 				ret.setExtraParams(new Properties());
 			}
 		}
-		
+
 		return ret;
 	}
 
@@ -388,7 +387,7 @@ public final class UriParser {
 		if (params.containsKey(KEY_PARAM)) {
 			ret.setDesKey(verifyCipherKey(params.get(KEY_PARAM)));
 		}
-		
+
 		ret.setData(verifyData(params));
 		ret.setFileId(verifyFileId(params));
 		if (ret.getData() == null && ret.getFileId() != null) {
@@ -458,7 +457,7 @@ public final class UriParser {
 	}
 
 	/** Extrae y verifica la clave de cifrado de los parametros de entrada. Si no se especifica  se devuelve.
-	 *  @param params Par&aacute;metros extra&iacute;dos de la URI.
+	 *  @param key Clave num&eacute;tica en ASCII.
 	 *  @return Clave de cifrado o null si no se declar&oacute; en los par&aacute;metros.
 	 *  @throws ParameterException Cuando la clave de cifrado es err&oacute;nea.
 	 */

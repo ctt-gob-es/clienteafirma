@@ -35,7 +35,7 @@ import es.gob.afirma.android.gui.AppProperties;
 import es.gob.afirma.android.gui.VerifyCaAppsTask;
 import es.gob.afirma.android.gui.VerifyCaAppsTask.CaAppsVerifiedListener;
 
-/** Actividad que se muestra cuando se arranca la aplicaci&oaute;n pulsando su icono.
+/** Actividad que se muestra cuando se arranca la aplicaci&oacute;n pulsando su icono.
  * @author Alberto Mart&iacute;nez */
 public final class MainActivity extends FragmentActivity implements CaAppsVerifiedListener, DialogInterface.OnClickListener {
 
@@ -261,7 +261,7 @@ public final class MainActivity extends FragmentActivity implements CaAppsVerifi
 	}
 
 	@Override
-	public void onClick(DialogInterface dialog, int which) {
+	public void onClick(final DialogInterface dialog, final int which) {
 		dialog.dismiss();
 	}
 }

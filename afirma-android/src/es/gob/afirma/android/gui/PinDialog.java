@@ -59,9 +59,7 @@ public class PinDialog extends DialogFragment {
 	 * @param provider proveedor Proveedor de seguridad para obtener el almac&eacute;n de claves
 	 * @param keyStoreName Nombre del almac&eacute;n de claves
 	 * @param ksml Clase a la que se establece el gestor de almacenes de claves y certificados
-	 * @return pinDialog el di&acute;logo creado
-	 * @throws KeyStoreException Cuando el di&aacute;logo de PIN es invocado desde una
-	 */
+	 * @return pinDialog el di&acute;logo creado */
 	public static PinDialog newInstance(final String provider, final String keyStoreName, final KeystoreManagerListener ksml) {
 
 		final PinDialog pinDialog = new PinDialog();

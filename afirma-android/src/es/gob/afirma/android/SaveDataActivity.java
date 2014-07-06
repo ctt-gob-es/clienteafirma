@@ -38,7 +38,7 @@ import es.gob.afirma.android.network.UriParser.UrlParametersToSave;
 import es.gob.afirma.core.misc.MimeHelper;
 import es.gob.afirma.core.misc.UrlHttpManagerFactory;
 
-/** Actividad Android para la elecci&oacue;n de un fichero en el almacenamiento del dispositivo. */
+/** Actividad Android para la elecci&oacute;n de un fichero en el almacenamiento del dispositivo. */
 public final class SaveDataActivity extends ListActivity implements DownloadDataListener {
 
 	private static final String ES_GOB_AFIRMA = "es.gob.afirma"; //$NON-NLS-1$
@@ -132,7 +132,7 @@ public final class SaveDataActivity extends ListActivity implements DownloadData
 				return;
 			}
 		}
-		
+
 		UrlHttpManagerFactory.install(new AndroidUrlHttpManager());
 	}
 

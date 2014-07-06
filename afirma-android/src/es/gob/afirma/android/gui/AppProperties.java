@@ -58,13 +58,13 @@ public final class AppProperties {
 		return this.nameApp;
 	}
 
-	/** Obtiene el nombre del paquete de la aplicaci&ocute;n.
-	 * @return packageName Nombre del paquete de la aplicaci&ocute;n. */
+	/** Obtiene el nombre del paquete de la aplicaci&oacute;n.
+	 * @return packageName Nombre del paquete de la aplicaci&oacute;n. */
 	public String getPackageName(){
 		return this.packageName;
 	}
 
-	/** Obtiene el icono de la aplicaci&ocute;n.
+	/** Obtiene el icono de la aplicaci&oacute;n.
 	 * @return icon Identificador de <i>drawable</i> del icono. */
 	public Drawable getIcon(){
 		return this.icon;

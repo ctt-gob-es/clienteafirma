@@ -44,7 +44,7 @@ public final class CipherDataManager {
 
 	/** Descifra una cadena de datos. Esta cadena viene precedida por el n&uacute;mero de caracteres de padding que
 	 * se agregaron y separado por un punto (.) de la cadena base 64 con los datos cifrados.
-	 * @param dataB64 Cadena de datos con la forma: PADDING.CIPHERDATAB64.
+	 * @param data Cadena de datos con la forma: PADDING.CIPHERDATAB64.
 	 * @param cipherKey Clave de cifrado.
 	 * @return Datos descifrados.
 	 * @throws InvalidKeyException Cuando la clave no es v&aacute;lida.
@@ -76,7 +76,14 @@ public final class CipherDataManager {
 	 * @throws GeneralSecurityException Cuando falla el proceso de cifrado.
 	 * @throws IOException */
 	public static String cipherData(final byte[] data, final byte[] cipherKey) throws InvalidKeyException, GeneralSecurityException, IOException {
-		return Integer.toString((DesCipher.getPaddingLength() - data.length % DesCipher.getPaddingLength()) % DesCipher.getPaddingLength()) +
-				PADDING_CHAR_SEPARATOR + Base64.encodeBytes(DesCipher.cipher(data, cipherKey), Base64.URL_SAFE);
+		return
+			Integer.toString(
+				(DesCipher.getBlockSize() - data.length % DesCipher.getBlockSize()) % DesCipher.getBlockSize()
+			) +
+			PADDING_CHAR_SEPARATOR +
+			Base64.encodeBytes(
+				DesCipher.cipher(data, cipherKey),
+				Base64.URL_SAFE
+			);
 	}
 }

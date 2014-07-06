@@ -48,9 +48,8 @@ import es.gob.afirma.core.signers.AOSignerFactory;
 
 /** Esta actividad permite firmar un fichero local. La firma se guarda en un fichero .csig.
  * Esta clase tiene mucho c&oacute;fdigo duplicado de la clase LocalSignResultActivity.
- * Hay crear una nueva clase con los m&ecute;todos duplicados.
- * @author Astrid Idoate Gil
- * */
+ * Hay crear una nueva clase con los m&eacute;todos duplicados.
+ * @author Astrid Idoate Gil */
 public final class LocalSignResultActivity extends FragmentActivity implements KeystoreManagerListener,
 		                                                                       PrivateKeySelectionListener,
 		                                                                       SignListener {
@@ -165,7 +164,7 @@ public final class LocalSignResultActivity extends FragmentActivity implements K
 			intent.putExtra("es.gob.afirma.android.excludedDirs", MainActivity.COMMON_EXCLUDED_DIRS); //$NON-NLS-1$
 			startActivityForResult(intent, SELECT_FILE_REQUEST_CODE);
 		}
-		
+
 		UrlHttpManagerFactory.install(new AndroidUrlHttpManager());
 	}
 
@@ -180,7 +179,7 @@ public final class LocalSignResultActivity extends FragmentActivity implements K
 	    super.onStop();
 
 	    dismissProgressDialog();
-	    
+
 	    EasyTracker.getInstance().activityStop(this); // Parada de Google Analytics
 	}
 
@@ -206,7 +205,7 @@ public final class LocalSignResultActivity extends FragmentActivity implements K
 
 			// Aseguramos que se muestra el panel con el mensaje de espera
 			showProgressDialog(getString(R.string.dialog_msg_loading_keystore));
-			
+
 			// Abrirmos el KeyStore y firmamos
 			loadKeyStore();
 		}
@@ -223,13 +222,13 @@ public final class LocalSignResultActivity extends FragmentActivity implements K
 			public void run() {
 				try {
 				setProgressDialog(ProgressDialog.show(LocalSignResultActivity.this, "", message, true)); //$NON-NLS-1$
-				} catch (Exception e) {
+				} catch (final Exception e) {
 					Log.e(ES_GOB_AFIRMA, "No se ha podido mostrar el dialogo de progreso: " + e); //$NON-NLS-1$
 				}
 			}
 		});
 	}
-	
+
 	private void loadKeyStore() {
 
 		// Buscamos si hay dispositivos CCID USB conectados
@@ -261,7 +260,7 @@ public final class LocalSignResultActivity extends FragmentActivity implements K
 	public synchronized void keySelected(final KeySelectedEvent kse) {
 
 		showProgressDialog(getString(R.string.dialog_msg_signning));
-		
+
 		try {
 			this.pke = kse.getPrivateKeyEntry();
 		}
@@ -387,7 +386,7 @@ public final class LocalSignResultActivity extends FragmentActivity implements K
 		}
 
 		showSuccessMessage(finalSignatureFilename, outDirectory, originalDirectory);
-		
+
 		//refresco del media scanner despues de guardar el ficheo porque esta dando problemas en la version 4.3
 		sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED,android.net.Uri.fromFile(new File(outDirectory))));
 	}
@@ -429,9 +428,9 @@ public final class LocalSignResultActivity extends FragmentActivity implements K
 
 		//activo los elementos de la interfaz que corresponden a la firma correcta de un fichero
 		final TextView tv_sf= (TextView) findViewById(R.id.filestorage_path);
-		tv_sf.setText(getString((originalDirectory ?
+		tv_sf.setText(getString(originalDirectory ?
 				R.string.signedfile_original_location :
-					R.string.signedfile_downloads_location), filename));
+					R.string.signedfile_downloads_location, filename));
 
 		final RelativeLayout rl = (RelativeLayout) findViewById(R.id.signedfile_correct);
 		rl.setVisibility(View.VISIBLE);
@@ -454,13 +453,13 @@ public final class LocalSignResultActivity extends FragmentActivity implements K
 			"Operacion='" + UriParser.OP_SIGN + "', formato='" + this.format + "', algoritmo='" + DEFAULT_SIGNATURE_ALGORITHM + "'", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			Long.valueOf(0L)
 		);
-		
+
 		saveData(signature);
 	}
 
 	@Override
 	public void onSignError(final Throwable t) {
-		
+
 		// Notificamos a Google Analytics la operacion realizada
 		EasyTracker.getTracker().sendEvent(
 			"Operacion local", //$NON-NLS-1$
@@ -468,8 +467,8 @@ public final class LocalSignResultActivity extends FragmentActivity implements K
 			"Operacion='" + UriParser.OP_SIGN + "', formato='" + this.format + "', algoritmo='" + DEFAULT_SIGNATURE_ALGORITHM + "'", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			Long.valueOf(0L)
 		);
-		
-		
+
+
 		if (t instanceof MSCBadPinException) {
 			showErrorMessage(getString(R.string.error_msc_pin));
 		}
@@ -481,7 +480,7 @@ public final class LocalSignResultActivity extends FragmentActivity implements K
 
 	/** Comprueba si esta abierto el di&aacute;logo de espera y lo cierra en dicho caso. */
 	private void dismissProgressDialog() {
-		
+
 		if (this.progressDialog != null) {
 			this.progressDialog.dismiss();
 		}
