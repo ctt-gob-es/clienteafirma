@@ -39,7 +39,7 @@ final class DesCipher {
 	 * @return Resultado del proceso de cifrado.
 	 * @throws InvalidKeyException Cuando La clave no es valida para el algoritmo DES.
 	 * @throws GeneralSecurityException Cuando los datos introducidos no son validos o se produce un error en la operaci&oacute;n. */
-	static byte[] cipher(final byte[] data, final byte[] sk) throws InvalidKeyException, GeneralSecurityException {
+	static byte[] cypher(final byte[] data, final byte[] sk) throws InvalidKeyException, GeneralSecurityException {
 		return doDes(padData(data), sk, Cipher.ENCRYPT_MODE);
 	}
 
@@ -49,7 +49,7 @@ final class DesCipher {
 	 * @return Resultado del proceso de descifrado.
 	 * @throws InvalidKeyException Cuando La clave no es valida para el algoritmo DES.
 	 * @throws GeneralSecurityException Cuando los datos introducidos no son validos o se produce un error en la operaci&oacute;n. */
-	static byte[] decipher(final byte[] data, final byte[] sk) throws InvalidKeyException, GeneralSecurityException {
+	static byte[] decypher(final byte[] data, final byte[] sk) throws InvalidKeyException, GeneralSecurityException {
 		return doDes(data, sk, Cipher.DECRYPT_MODE);
 	}
 

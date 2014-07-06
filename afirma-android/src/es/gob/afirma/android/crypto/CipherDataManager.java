@@ -59,7 +59,7 @@ public final class CipherDataManager {
 			padding = Integer.parseInt(data.substring(0, dotPos));
 		}
 
-		final byte[] decipheredData = DesCipher.decipher(
+		final byte[] decipheredData = DesCipher.decypher(
 				Base64.decode(data.substring(dotPos + 1).replace('+', '-').replace('/', '_'), Base64.URL_SAFE),
 				cipherKey);
 
@@ -82,7 +82,7 @@ public final class CipherDataManager {
 			) +
 			PADDING_CHAR_SEPARATOR +
 			Base64.encodeBytes(
-				DesCipher.cipher(data, cipherKey),
+				DesCipher.cypher(data, cipherKey),
 				Base64.URL_SAFE
 			);
 	}
