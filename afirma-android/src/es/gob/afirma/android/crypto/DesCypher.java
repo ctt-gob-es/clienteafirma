@@ -8,9 +8,9 @@ import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 
 /** Cifrador DES. */
-final class DesCipher {
+final class DesCypher {
 
-	private DesCipher() {
+	private DesCypher() {
 		// No permitimos la instanciacion
 	}
 
@@ -67,7 +67,7 @@ final class DesCipher {
 	 * m&uacute;ltiplo la longitud de los datos.
 	 * @return Tama&ntilde;o de bloque requerido para el cifrado. */
 	static int getBlockSize() {
-		return DesCipher.BLOCK_SIZE;
+		return DesCypher.BLOCK_SIZE;
 	}
 
 }

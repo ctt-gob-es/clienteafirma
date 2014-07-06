@@ -59,7 +59,7 @@ public final class CipherDataManager {
 			padding = Integer.parseInt(data.substring(0, dotPos));
 		}
 
-		final byte[] decipheredData = DesCipher.decypher(
+		final byte[] decipheredData = DesCypher.decypher(
 				Base64.decode(data.substring(dotPos + 1).replace('+', '-').replace('/', '_'), Base64.URL_SAFE),
 				cipherKey);
 
@@ -78,11 +78,11 @@ public final class CipherDataManager {
 	public static String cipherData(final byte[] data, final byte[] cipherKey) throws InvalidKeyException, GeneralSecurityException, IOException {
 		return
 			Integer.toString(
-				(DesCipher.getBlockSize() - data.length % DesCipher.getBlockSize()) % DesCipher.getBlockSize()
+				(DesCypher.getBlockSize() - data.length % DesCypher.getBlockSize()) % DesCypher.getBlockSize()
 			) +
 			PADDING_CHAR_SEPARATOR +
 			Base64.encodeBytes(
-				DesCipher.cypher(data, cipherKey),
+				DesCypher.cypher(data, cipherKey),
 				Base64.URL_SAFE
 			);
 	}
