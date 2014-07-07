@@ -18,16 +18,19 @@ final class DesCypher {
 	 * ama&ntilde;o hay que a&ntilde;adir relleno (con 0x00h) hasta que lo sea. */
 	private static final int BLOCK_SIZE = 8;
 
+	private static final String DES_MODE = "DES/ECB/NoPadding"; //$NON-NLS-1$
+	private static final String DES = "DES"; //$NON-NLS-1$
+
 	private static byte[] doDes(final byte[] data, final byte[] sk, final int opMode) throws InvalidKeyException, GeneralSecurityException {
 		final Cipher desCipher;
 		try {
-			desCipher = Cipher.getInstance("DES/ECB/NoPadding"); //$NON-NLS-1$
+			desCipher = Cipher.getInstance(DES_MODE);
 		}
 		catch (final Exception e) {
 			// Este caso no deberia ocurrir nunca
 			throw new GeneralSecurityException("Algoritmo o formato no soportado por la maquina virtual: " + e); //$NON-NLS-1$
 		}
-		desCipher.init(opMode, new SecretKeySpec(sk, "DES")); //$NON-NLS-1$
+		desCipher.init(opMode, new SecretKeySpec(sk, DES));
 		return desCipher.doFinal(data);
 	}
 
