@@ -37,7 +37,7 @@ public final class CipherDataManager {
 			decipheredData = decipherData(recoveredData, cipherKey);
 		}
 		else {
-			decipheredData = Base64.decode(recoveredData, Base64.URL_SAFE);
+			decipheredData = Base64.decode(recoveredData, true);
 		}
 		return decipheredData;
 	}
@@ -60,7 +60,7 @@ public final class CipherDataManager {
 		}
 
 		final byte[] decipheredData = DesCypher.decypher(
-				Base64.decode(data.substring(dotPos + 1).replace('+', '-').replace('/', '_'), Base64.URL_SAFE),
+				Base64.decode(data.substring(dotPos + 1).replace('+', '-').replace('/', '_'), true),
 				cipherKey);
 
 		return padding == 0 ? decipheredData : Arrays.copyOf(decipheredData, decipheredData.length - padding);
@@ -81,9 +81,9 @@ public final class CipherDataManager {
 				(DesCypher.getBlockSize() - data.length % DesCypher.getBlockSize()) % DesCypher.getBlockSize()
 			) +
 			PADDING_CHAR_SEPARATOR +
-			Base64.encodeBytes(
+			Base64.encode(
 				DesCypher.cypher(data, cipherKey),
-				Base64.URL_SAFE
+				true
 			);
 	}
 }

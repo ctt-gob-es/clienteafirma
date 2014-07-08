@@ -37,7 +37,7 @@ public final class CipherDataManager {
 			decipheredData = decipherData(recoveredData, cipherKey);
 		}
 		else {
-			decipheredData = Base64.decode(recoveredData, Base64.URL_SAFE);
+			decipheredData = Base64.decode(recoveredData, true);
 		}
 		return decipheredData;
 	}
@@ -60,7 +60,7 @@ public final class CipherDataManager {
 		}
 
 		final byte[] decipheredData = DesCipher.decipher(
-				Base64.decode(data.substring(dotPos + 1).replace('+', '-').replace('/', '_'), Base64.URL_SAFE),
+				Base64.decode(data.substring(dotPos + 1).replace('+', '-').replace('/', '_'), true),
 				cipherKey);
 
 		return padding == 0 ? decipheredData : Arrays.copyOf(decipheredData, decipheredData.length - padding);
@@ -77,6 +77,6 @@ public final class CipherDataManager {
 	 * @throws IOException */
 	public static String cipherData(final byte[] data, final byte[] cipherKey) throws InvalidKeyException, GeneralSecurityException, IOException {
 		return Integer.toString((DesCipher.getPaddingLength() - data.length % DesCipher.getPaddingLength()) % DesCipher.getPaddingLength()) +
-				PADDING_CHAR_SEPARATOR + Base64.encodeBytes(DesCipher.cipher(data, cipherKey), Base64.URL_SAFE);
+				PADDING_CHAR_SEPARATOR + Base64.encode(DesCipher.cipher(data, cipherKey), true);
 	}
 }

@@ -1,5 +1,7 @@
 package es.gob.afirma.core.misc;
 
+import java.io.IOException;
+
 
 /**
  * <p>Encodes and decodes to and from Base64 notation.</p>
@@ -278,43 +280,32 @@ public final class Base64 {
         }   // end switch
     }   // end encode3to4
 
-    /**
-     * Encodes a byte array into Base64 notation.
-     *
-     * @param source The data to convert
-     * @return The data in Base64-encoded form
-     * @since 1.4
-     */
-    public static String encode( final byte[] source ) {
+    /** Codifica un binario en Base64.
+     * @param source Datos a convertir a Base64
+     * @return Datos codificados como texto Base64
+     * @throws java.io.IOException si se produce cualquier error */
+    public static String encode(final byte[] source) {
         String encoded = null;
         try {
             encoded = encodeBytes(source, 0, source.length, NO_OPTIONS);
         }
         catch (final java.io.IOException ex) {
             assert false : ex.getMessage();
-        }   // end catch
+        }
         assert encoded != null;
         return encoded;
-    }   // end encodeBytes
+    }
 
-
-
-    /**
-     * Encodes a byte array into Base64 notation.
-     * <p>
-     * Example: <code>encodeBytes( myData )</code> or
-     * <p>
-     * Example: <code>encodeBytes( myData, Base64.DO_BREAK_LINES )</code>
-     *
-     * @param source The data to convert
-     * @param options Specified options
-     * @return The Base64-encoded data as a String
-     * @throws java.io.IOException if there is an error
-     * @since 2.0
-     */
-    public static String encodeBytes( final byte[] source, final int options ) throws java.io.IOException {
-        return encodeBytes( source, 0, source.length, options );
-    }   // end encodeBytes
+    /** Codifica un binario en Base64.
+     * @param source Datos a convertir a Base64
+     * @param urlSafe Si se establece a <code>true</code> indica que los datos se codificar&aacute;n con un alfabeto Base64
+     *                susceptible de ser usado en URL, seg&uacute;n se indica en la seccti&oacute;n 4 de la RFC3548,
+     *                si se establece a <code>false</code> los datos se codificar&aacute;n en Base64 normal
+     * @return Datos codificados como texto Base64
+     * @throws java.io.IOException si se produce cualquier error */
+    public static String encode(final byte[] source, final boolean urlSafe) throws java.io.IOException {
+        return encodeBytes( source, 0, source.length, URL_SAFE);
+    }
 
     /**
      * Encodes a byte array into Base64 notation.
@@ -395,7 +386,6 @@ public final class Base64 {
             encLen += encLen / MAX_LINE_LENGTH; // Plus extra newline characters
         }
         final byte[] outBuff = new byte[ encLen ];
-
 
         int d = 0;
         int e = 0;
@@ -553,8 +543,7 @@ public final class Base64 {
      * @throws java.io.IOException If bogus characters exist in source data
      * @since 1.3
      */
-    public static byte[] decode( final byte[] source, final int off, final int len, final int options)
-    throws java.io.IOException {
+    public static byte[] decode( final byte[] source, final int off, final int len, final int options) throws IOException {
 
         // Lots of error checking and exception throwing
         if( source == null ){
@@ -628,46 +617,34 @@ public final class Base64 {
         return out;
     }   // end decode
 
-    /**
-     * Decodes data from Base64 notation.
-     *
-     * @param s the string to decode
-     * @return the decoded data
-     * @throws java.io.IOException If there is a problem
-     * @since 1.4
-     */
-    public static byte[] decode( final String s ) throws java.io.IOException {
-        return decode( s, NO_OPTIONS );
+    /** Descodifica datos en Base64.
+     * @param str Cadena de caracteres en formato Base64
+     * @return Datos descodificados
+     * @throws java.io.IOException si ocurre cualquier error */
+    public static byte[] decode(final String str) throws java.io.IOException {
+        return decode(str, false);
     }
 
-    /**
-     * Decodes data from Base64 notation.
-     *
-     * @param s the string to decode
-     * @param options encode options such as URL_SAFE
-     * @return the decoded data
-     * @throws java.io.IOException if there is an error
-     * @since 1.4
-     */
-    public static byte[] decode( final String s, final int options ) throws java.io.IOException {
-
-        if( s == null ){
+    /** Descodifica datos en Base64.
+     * @param str Cadena de caracteres en formato Base64
+     * @param urlSafe Si se establece a <code>true</code> indica que los datos est&aacute;n con un alfabeto Base64
+     *                susceptible de ser usado en URL, seg&uacute;n se indica en la seccti&oacute;n 4 de la RFC3548,
+     *                si se establece a <code>false</code> los datos deben estar en Base64 normal
+     * @return Datos descodificados
+     * @throws java.io.IOException si ocurre cualquier error */
+    public static byte[] decode(final String str, final boolean urlSafe) throws java.io.IOException {
+        if( str == null ){
             throw new IllegalArgumentException("Input string was null"); //$NON-NLS-1$
-        }   // end if
-
+        }
         byte[] bytes;
         try {
-            bytes = s.getBytes( PREFERRED_ENCODING );
-        }   // end try
-        catch( final java.io.UnsupportedEncodingException uee ) {
-            bytes = s.getBytes();
-        }   // end catch
-		//</change>
-
-        // Decode
-        return decode( bytes, 0, bytes.length, options );
-
-    }   // end decode
+            bytes = str.getBytes(PREFERRED_ENCODING);
+        }
+        catch(final java.io.UnsupportedEncodingException uee ) {
+            bytes = str.getBytes();
+        }
+        return decode( bytes, 0, bytes.length, URL_SAFE);
+    }
 
 
 }   // end class Base64
