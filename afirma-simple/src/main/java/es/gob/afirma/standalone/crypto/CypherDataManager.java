@@ -14,32 +14,25 @@ public final class CypherDataManager {
 	 * cifrados en base64. */
 	private static final char PADDING_CHAR_SEPARATOR = '.';
 
-
 	/** Juego de carateres UTF-8. */
 	private static final String DEFAULT_URL_ENCODING = "UTF-8"; //$NON-NLS-1$
 
 	/** Descifra datos.
-	 * @param cipheredDataB64 Datos cifrados (en Base64)
-	 * @param cipherKey Clave de descifrado
+	 * @param cypheredDataB64 Datos cifrados (en Base64)
+	 * @param cypherKey Clave de descifrado
 	 * @return Datos descifrados
-	 * @throws InvalidKeyException
-	 * @throws IllegalArgumentException
-	 * @throws GeneralSecurityException
-	 * @throws IOException */
-	public static byte[] decipherData(final byte[] cipheredDataB64,
-			                          final byte[] cipherKey) throws InvalidKeyException,
-			                                                         IllegalArgumentException,
+	 * @throws InvalidKeyException Si la clave de descifrado no es v&aacute;lida
+	 * @throws GeneralSecurityException Cuando falla el proceso de cifrado
+	 * @throws IOException Si hay problemas en el tratamiento de datos */
+	public static byte[] decipherData(final byte[] cypheredDataB64,
+			                          final byte[] cypherKey) throws InvalidKeyException,
 			                                                         GeneralSecurityException,
 			                                                         IOException {
-		final String recoveredData = new String(cipheredDataB64, DEFAULT_URL_ENCODING).replace("_", "/").replace("-", "+"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-		byte[] decipheredData;
-		if (cipherKey != null) {
-			decipheredData = decipherData(recoveredData, cipherKey);
+		final String recoveredData = new String(cypheredDataB64, DEFAULT_URL_ENCODING).replace("_", "/").replace("-", "+"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		if (cypherKey != null) {
+			return decipherData(recoveredData, cypherKey);
 		}
-		else {
-			decipheredData = Base64.decode(recoveredData, true);
-		}
-		return decipheredData;
+		return Base64.decode(recoveredData, true);
 	}
 
 	/** Descifra una cadena de datos. Esta cadena viene precedida por el n&uacute;mero de caracteres de padding que
