@@ -33,7 +33,7 @@ import android.widget.Toast;
 import com.google.analytics.tracking.android.EasyTracker;
 
 import es.gob.afirma.R;
-import es.gob.afirma.android.crypto.CipherDataManager;
+import es.gob.afirma.android.crypto.CypherDataManager;
 import es.gob.afirma.android.crypto.LoadKeyStoreManagerTask;
 import es.gob.afirma.android.crypto.LoadKeyStoreManagerTask.KeystoreManagerListener;
 import es.gob.afirma.android.crypto.MSCBadPinException;
@@ -424,7 +424,7 @@ KeystoreManagerListener, PrivateKeySelectionListener, DownloadDataListener, Send
 		// al dialogo de seleccion de certificados para la firma
 		byte[] decipheredData;
 		try {
-			decipheredData = CipherDataManager.decipherData(data, this.parameters.getDesKey());
+			decipheredData = CypherDataManager.decipherData(data, this.parameters.getDesKey());
 		}
 		catch (final IOException e) {
 			Log.e(ES_GOB_AFIRMA, "Los datos proporcionados no est&aacute;n correctamente codificados en base 64: " + e.toString()); //$NON-NLS-1$
@@ -471,7 +471,7 @@ KeystoreManagerListener, PrivateKeySelectionListener, DownloadDataListener, Send
 		// Ciframos si nos dieron clave privada, si no subimos los datos sin cifrar
 		final String data;
 		try {
-			data = CipherDataManager.cipherData(signature, this.parameters.getDesKey());
+			data = CypherDataManager.cipherData(signature, this.parameters.getDesKey());
 		}
 		catch (final IOException e) {
 			Log.e(ES_GOB_AFIRMA, "Error al codificar los datos cifrados: " + e); //$NON-NLS-1$

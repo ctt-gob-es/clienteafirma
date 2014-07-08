@@ -21,7 +21,7 @@ import es.gob.afirma.keystores.AOKeyStore;
 import es.gob.afirma.keystores.AOKeyStoreDialog;
 import es.gob.afirma.keystores.AOKeyStoreManager;
 import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
-import es.gob.afirma.standalone.crypto.CipherDataManager;
+import es.gob.afirma.standalone.crypto.CypherDataManager;
 
 /** Gestiona la ejecuci&oacute;n del Cliente Afirma en una invocaci&oacute;n
  * por protocolo y bajo un entorno compatible <code>Swing</code>.
@@ -220,7 +220,7 @@ public final class ProtocolInvocationLauncher {
 		// Ciframos la firmar resultante
 		final String cipheredDataB64;
 		try {
-			cipheredDataB64 = CipherDataManager.cipherData(sign, options.getDesKey());
+			cipheredDataB64 = CypherDataManager.cipherData(sign, options.getDesKey());
 		}
 		catch (final Exception e) {
 			LOGGER.severe("Error en el cifrado de la firma: " + e); //$NON-NLS-1$

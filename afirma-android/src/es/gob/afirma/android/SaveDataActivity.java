@@ -26,7 +26,7 @@ import android.widget.Toast;
 import com.google.analytics.tracking.android.EasyTracker;
 
 import es.gob.afirma.R;
-import es.gob.afirma.android.crypto.CipherDataManager;
+import es.gob.afirma.android.crypto.CypherDataManager;
 import es.gob.afirma.android.gui.DownloadFileTask;
 import es.gob.afirma.android.gui.DownloadFileTask.DownloadDataListener;
 import es.gob.afirma.android.gui.FileArrayAdapter;
@@ -301,7 +301,7 @@ public final class SaveDataActivity extends ListActivity implements DownloadData
 		// al dialogo de seleccion de certificados para la firma
 		byte[] decipheredData;
 		try {
-			decipheredData = CipherDataManager.decipherData(data, this.parameters.getDesKey());
+			decipheredData = CypherDataManager.decipherData(data, this.parameters.getDesKey());
 		} catch (final IOException e) {
 			Log.e(ES_GOB_AFIRMA, "Los datos proporcionados no estan correctamente codificados en base 64: " + e.toString()); //$NON-NLS-1$
 			showMessage(getString(R.string.error_bad_params));
