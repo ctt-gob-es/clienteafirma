@@ -63,7 +63,7 @@ public final class Base64 {
      * or at the very least should not be called Base64 without also specifying that is
      * was encoded using the URL- and Filename-safe dialect.
      */
-     public static final int URL_SAFE = 16;
+     private static final int URL_SAFE = 16;
 
 
 
