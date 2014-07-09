@@ -75,7 +75,7 @@ public final class AOXAdESTriPhaseSigner implements AOSigner {
 
 	/** Identificador de la operaci&oacute;n criptogr&aacute;fica de contrafirma. */
 	private static final String CRYPTO_OPERATION_COUNTERSIGN = "countersign"; //$NON-NLS-1$
-	
+
 	/** Nombre del par&aacute;metro que identifica la operaci&oacute;n trif&aacute;sica en la URL del servidor de firma. */
 	private static final String PARAMETER_NAME_OPERATION = "op"; //$NON-NLS-1$
 
@@ -106,7 +106,7 @@ public final class AOXAdESTriPhaseSigner implements AOSigner {
 
 	/** Firma PKCS#1. */
 	private static final String PROPERTY_NAME_PKCS1_SIGN_PREFIX = "PK1."; //$NON-NLS-1$
-	
+
 	/** Indica si la postfirma requiere la prefirma. */
 	private static final String PROPERTY_NAME_NEED_PRE = "NEED_PRE"; //$NON-NLS-1$
 
@@ -118,13 +118,13 @@ public final class AOXAdESTriPhaseSigner implements AOSigner {
 
 	/** Clave de la propiedad de configuraci&oacute;n del tipo de contrafirma. */
 	private static final String COUNTERSIGN_TARGET_KEY = "target"; //$NON-NLS-1$
-	
+
 	/** Valor para la configuraci&oacute;n de la contrafirma de nodos hoja. */
 	public static final String COUNTERSIGN_TARGET_LEAFS = "leafs"; //$NON-NLS-1$
-	
+
 	/** Valor para la configuraci&oacute;n de la contrafirma de todos los nodos del &aacute;bol. */
 	public static final String COUNTERSIGN_TARGET_TREE = "tree"; //$NON-NLS-1$
-	
+
 
 	@Override
 	public byte[] sign(final byte[] data,
@@ -169,7 +169,7 @@ public final class AOXAdESTriPhaseSigner implements AOSigner {
 			final PrivateKey key,
 			final Certificate[] certChain,
 			final Properties xParams) throws AOException {
-		
+
 		final Properties params = xParams != null ? xParams : new Properties();
 		if (!params.containsKey(COUNTERSIGN_TARGET_KEY)) {
 			params.setProperty(COUNTERSIGN_TARGET_KEY, COUNTERSIGN_TARGET_LEAFS);
@@ -183,14 +183,14 @@ public final class AOXAdESTriPhaseSigner implements AOSigner {
 		throw new UnsupportedOperationException("No se soporta en firma trifasica"); //$NON-NLS-1$
 	}
 
-	
+
 	/** URI que define el NameSpace de firma XMLdSig (Compatible XAdES). */
     public static final String DSIGNNS = "http://www.w3.org/2000/09/xmldsig#"; //$NON-NLS-1$
     static final String XML_SIGNATURE_PREFIX = "ds"; //$NON-NLS-1$
     /** Etiqueta de los nodos firma de los XML firmados. */
     public static final String SIGNATURE_TAG = "Signature"; //$NON-NLS-1$
     static final String SIGNATURE_NODE_NAME = XML_SIGNATURE_PREFIX + ":Signature"; //$NON-NLS-1$
-    
+
 	/** {@inheritDoc} */
 	@Override
 	public boolean isSign(final byte[] sign) {
@@ -294,13 +294,14 @@ public final class AOXAdESTriPhaseSigner implements AOSigner {
 			throw new IllegalArgumentException("No se ha proporcionado una URL valida para el servidor de firma: " + extraParams.getProperty(PROPERTY_NAME_SIGN_SERVER_URL), e); //$NON-NLS-1$
 		}
 
-		//TODO: Retirar del extraParams la URL del servidor de firma sin mutar el parametros de entrada
+		//TODO: Retirar del extraParams la URL del servidor de firma sin mutar los parametros de entrada
 
 		// Decodificamos el identificador del documento
 		final String documentId;
 		try {
-			documentId = Base64.encodeBytes(data, Base64.URL_SAFE);
-		} catch (final IOException e) {
+			documentId = Base64.encode(data, true);
+		}
+		catch (final IOException e) {
 			throw new IllegalArgumentException("Error al interpretar los datos como identificador del documento que desea firmar", e); //$NON-NLS-1$
 		}
 
@@ -328,7 +329,7 @@ public final class AOXAdESTriPhaseSigner implements AOSigner {
 			append(PARAMETER_NAME_CRYPTO_OPERATION).append(HTTP_EQUALS).append(cryptoOperation).append(HTTP_AND).
 			append(PARAMETER_NAME_FORMAT).append(HTTP_EQUALS).append(XADES_FORMAT).append(HTTP_AND).
 			append(PARAMETER_NAME_ALGORITHM).append(HTTP_EQUALS).append(algorithm).append(HTTP_AND).
-			append(PARAMETER_NAME_CERT).append(HTTP_EQUALS).append(Base64.encodeBytes(certChain[0].getEncoded(), Base64.URL_SAFE)).append(HTTP_AND).
+			append(PARAMETER_NAME_CERT).append(HTTP_EQUALS).append(Base64.encode(certChain[0].getEncoded(), true)).append(HTTP_AND).
 			append(PARAMETER_NAME_DOCID).append(HTTP_EQUALS).append(documentId);
 
 			if (extraParams.size() > 0) {
@@ -397,7 +398,7 @@ public final class AOXAdESTriPhaseSigner implements AOSigner {
 
 			// Configuramos la peticion de postfirma indicando las firmas PKCS#1 generadas
 			preSignProperties.setProperty(PROPERTY_NAME_PKCS1_SIGN_PREFIX + i, Base64.encode(pkcs1sign));
-			
+
 			// Si no es necesaria la prefirma para completar la postfirma, la eliminamos
 			if (!needPre) {
 				preSignProperties.remove(PROPERTY_NAME_PRESIGN_PREFIX + i);
@@ -417,7 +418,7 @@ public final class AOXAdESTriPhaseSigner implements AOSigner {
 			append(PARAMETER_NAME_CRYPTO_OPERATION).append(HTTP_EQUALS).append(cryptoOperation).append(HTTP_AND).
 			append(PARAMETER_NAME_FORMAT).append(HTTP_EQUALS).append(XADES_FORMAT).append(HTTP_AND).
 			append(PARAMETER_NAME_ALGORITHM).append(HTTP_EQUALS).append(algorithm).append(HTTP_AND).
-			append(PARAMETER_NAME_CERT).append(HTTP_EQUALS).append(Base64.encodeBytes(certChain[0].getEncoded(), Base64.URL_SAFE));
+			append(PARAMETER_NAME_CERT).append(HTTP_EQUALS).append(Base64.encode(certChain[0].getEncoded(), true));
 
 			if (extraParams.size() > 0) {
 				urlBuffer.append(HTTP_AND).append(PARAMETER_NAME_EXTRA_PARAM).append(HTTP_EQUALS).
@@ -451,7 +452,7 @@ public final class AOXAdESTriPhaseSigner implements AOSigner {
 
 		// Los datos no se devuelven, se quedan en el servidor
 		try {
-			return Base64.decode(stringTrimmedResult.substring((SUCCESS + " NEWID=").length()), Base64.URL_SAFE); //$NON-NLS-1$
+			return Base64.decode(stringTrimmedResult.substring((SUCCESS + " NEWID=").length()), true); //$NON-NLS-1$
 		}
 		catch (final IOException e) {
 			LOGGER.warning("El resultado de NEWID del servidor no estaba en Base64: " + e); //$NON-NLS-1$
@@ -462,12 +463,12 @@ public final class AOXAdESTriPhaseSigner implements AOSigner {
 	private static String properties2Base64(final Properties p) throws IOException {
 		final ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		p.store(baos, ""); //$NON-NLS-1$
-		return Base64.encodeBytes(baos.toByteArray(), Base64.URL_SAFE);
+		return Base64.encode(baos.toByteArray(), true);
 	}
 
 	private static Properties base642Properties(final String base64) throws IOException {
 		final Properties p = new Properties();
-		p.load(new ByteArrayInputStream(Base64.decode(base64, Base64.URL_SAFE)));
+		p.load(new ByteArrayInputStream(Base64.decode(base64, true)));
 		return p;
 	}
 }
