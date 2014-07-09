@@ -25,8 +25,7 @@ final class ErrorManager {
 	}
 
 	static String getErrorMessage(final int errNo) {
-		final String errDescription = errorMessages.get(Integer.valueOf(errNo));
-		return "ERR-" + Integer.toString(errNo) + ": " + errDescription != null ? errDescription : "Error deconocido"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		return "ERR-" + Integer.toString(errNo) + ": " + errorMessages.get(Integer.valueOf(errNo)); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 }

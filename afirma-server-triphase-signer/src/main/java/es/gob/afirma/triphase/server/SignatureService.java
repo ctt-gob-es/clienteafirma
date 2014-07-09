@@ -36,7 +36,7 @@ public final class SignatureService extends HttpServlet {
 	private static final String CONFIG_FILE = "config.properties"; //$NON-NLS-1$
 
 	private static final String DOCUMENT_MANAGER_CLASS_PARAM = "document.manager"; //$NON-NLS-1$
-	
+
 	static {
 		final InputStream configIs = SignatureService.class.getClassLoader().getResourceAsStream(CONFIG_FILE);
 		if (configIs == null) {
@@ -48,7 +48,7 @@ public final class SignatureService extends HttpServlet {
 			prop.load(configIs);
 			configIs.close();
 		} catch (final Exception e) {
-			try { configIs.close(); } catch (Exception ex) { /* No hacemos nada */ } 
+			try { configIs.close(); } catch (Exception ex) { /* No hacemos nada */ }
 			throw new RuntimeException("Error en la carga del fichero de propiedades", e); //$NON-NLS-1$
 		}
 
@@ -116,25 +116,27 @@ public final class SignatureService extends HttpServlet {
 		final String[] params;
 		try {
 			params = new String(AOUtil.getDataFromInputStream(request.getInputStream())).split("&"); //$NON-NLS-1$
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			LOGGER.severe("No se pudieron leer los parametros de la peticion: " + e); //$NON-NLS-1$
 			return;
 		}
-		
+
 		for (final String param : params) {
 			if (param.indexOf('=') != -1) {
 				try {
 					parameters.put(param.substring(0, param.indexOf('=')), URLDecoder.decode(param.substring(param.indexOf('=') + 1), URL_DEFAULT_CHARSET));
-				} catch (Exception e) {
+				}
+				catch (Exception e) {
 					LOGGER.warning("Error al decodificar un parametro de la peticion: " + e); //$NON-NLS-1$
 				}
 			}
 		}
-		
+
 		response.setHeader("Access-Control-Allow-Origin", "*"); //$NON-NLS-1$ //$NON-NLS-2$
 		response.setContentType("text/plain"); //$NON-NLS-1$
 		response.setCharacterEncoding("utf-8"); //$NON-NLS-1$
-		
+
 		// Obtenemos el codigo de operacion
 		final PrintWriter out;
 		try {
@@ -143,7 +145,7 @@ public final class SignatureService extends HttpServlet {
 			LOGGER.severe("No se pude contestar a la peticion: " + e); //$NON-NLS-1$
 			return;
 		}
-		
+
 		final String operation = parameters.get(PARAMETER_NAME_OPERATION);
 		if (operation == null) {
 			LOGGER.warning("No se ha indicado la operacion trifasica a realizar"); //$NON-NLS-1$
@@ -166,10 +168,10 @@ public final class SignatureService extends HttpServlet {
 		try {
 			if (parameters.containsKey(PARAMETER_NAME_EXTRA_PARAM)) {
 				extraParams.load(
-						new ByteArrayInputStream(
-								Base64.decode(parameters.get(PARAMETER_NAME_EXTRA_PARAM).trim(), Base64.URL_SAFE)
-								)
-						);
+					new ByteArrayInputStream(
+						Base64.decode(parameters.get(PARAMETER_NAME_EXTRA_PARAM).trim(), true)
+					)
+				);
 			}
 		}
 		catch (final Exception e) {
@@ -178,16 +180,16 @@ public final class SignatureService extends HttpServlet {
 			out.close();
 			return;
 		}
-		
+
 		// Obtenemos los parametros adicionales para la firma
 		final Properties sessionData = new Properties();
 		try {
 			if (parameters.containsKey(PARAMETER_NAME_SESSION_DATA)) {
 				sessionData.load(
-						new ByteArrayInputStream(
-								Base64.decode(parameters.get(PARAMETER_NAME_SESSION_DATA).trim(), Base64.URL_SAFE)
-								)
-						);
+					new ByteArrayInputStream(
+						Base64.decode(parameters.get(PARAMETER_NAME_SESSION_DATA).trim(), true)
+					)
+				);
 			}
 		}
 		catch (final Exception e) {
@@ -221,8 +223,8 @@ public final class SignatureService extends HttpServlet {
 		final X509Certificate signerCert;
 		try {
 			signerCert = (X509Certificate) CertificateFactory.getInstance("X.509").generateCertificate( //$NON-NLS-1$
-					new ByteArrayInputStream(Base64.decode(cert, Base64.URL_SAFE))
-					);
+				new ByteArrayInputStream(Base64.decode(cert, true))
+			);
 		}
 		catch(final Exception e) {
 			LOGGER.severe("Error al decodificar el certificado: " + e);  //$NON-NLS-1$
@@ -242,7 +244,7 @@ public final class SignatureService extends HttpServlet {
 				return;
 			}
 		}
-		
+
 		// Obtenemos el algoritmo de firma
 		final String algorithm = parameters.get(PARAMETER_NAME_ALGORITHM);
 		if (algorithm == null) {
@@ -281,9 +283,9 @@ public final class SignatureService extends HttpServlet {
 		}
 
 		if (OPERATION_PRESIGN.equals(operation)) {
-			
+
 			LOGGER.info(" == PREFIRMA en servidor"); //$NON-NLS-1$
-			
+
 			try {
 				final byte[] preRes;
 				if (PARAMETER_VALUE_SUB_OPERATION_SIGN.equals(subOperation)) {
@@ -293,7 +295,7 @@ public final class SignatureService extends HttpServlet {
 					preRes = prep.preProcessPreCoSign(docBytes, algorithm, signerCert, extraParams);
 				}
 				else if (PARAMETER_VALUE_SUB_OPERATION_COUNTERSIGN.equals(subOperation)) {
-			
+
 					CounterSignTarget target = CounterSignTarget.LEAFS;
 					if (extraParams.containsKey(PARAMETER_NAME_TARGET_TYPE)) {
 						final String targetValue = extraParams.getProperty(PARAMETER_NAME_TARGET_TYPE).trim();
@@ -301,22 +303,22 @@ public final class SignatureService extends HttpServlet {
 							target = CounterSignTarget.TREE;
 						}
 					}
-					
+
 					preRes = prep.preProcessPreCounterSign(docBytes, algorithm, signerCert, extraParams, target);
 				}
 				else {
 					throw new AOException("No se reconoce el codigo de sub-operacion: " + subOperation); //$NON-NLS-1$
 				}
-				
+
 				LOGGER.info(" Se calculado el resultado de la prefirma y se devuelve. Numero de bytes: " + preRes.length); //$NON-NLS-1$
-				
+
 				out.print(
-						Base64.encodeBytes(
-								preRes,
-								Base64.URL_SAFE
-								)
-						);
-				
+					Base64.encode(
+						preRes,
+						true
+					)
+				);
+
 				LOGGER.info(" FIN PREFIRMA"); //$NON-NLS-1$
 			}
 			catch (final Exception e) {
@@ -330,7 +332,7 @@ public final class SignatureService extends HttpServlet {
 		else if (OPERATION_POSTSIGN.equals(operation)) {
 
 			LOGGER.info(" == POSTFIRMA en servidor"); //$NON-NLS-1$
-			
+
 			final byte[] signedDoc;
 			try {
 				if (PARAMETER_VALUE_SUB_OPERATION_SIGN.equals(subOperation)) {
@@ -358,7 +360,7 @@ public final class SignatureService extends HttpServlet {
 			extraParams.setProperty(PARAMETER_NAME_FORMAT, format);
 
 			LOGGER.info(" Se ha calculado el resultado de la postfirma y se devuelve. Numero de bytes: " + signedDoc.length); //$NON-NLS-1$
-			
+
 			// Devolvemos al servidor documental el documento firmado
 			final String newDocId;
 			try {

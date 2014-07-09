@@ -18,7 +18,7 @@ final class SelfishDocumentManager implements DocumentManager {
 
 	@Override
 	public String storeDocument(final String id, final X509Certificate cert, final byte[] data, final Properties config) throws IOException {
-		return Base64.encodeBytes(data, Base64.URL_SAFE);
+		return Base64.encode(data, true);
 	}
 
 }

@@ -12,6 +12,8 @@ import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.signers.AOSignConstants;
 
+/** Implementaci&oacute;n de acceso a gestor documental usando simplemente el sistema de ficheros.
+ * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 final public class FileSystemDocumentManager implements DocumentManager {
 
 	private static final String IN_DIR_PARAM = "indir"; //$NON-NLS-1$
@@ -26,6 +28,8 @@ final public class FileSystemDocumentManager implements DocumentManager {
 
 	final static Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$ 
 	
+	/** Construye la clase de acceso a gestor documental usando sistema de ficheros.
+	 * @param config Configuraci&oacute;n del gestor (directorios, etc.) */
 	public FileSystemDocumentManager(final Properties config) {
 
 		this.inDir = config.getProperty(IN_DIR_PARAM);
