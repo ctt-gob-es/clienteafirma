@@ -602,22 +602,16 @@ public final class PAdESTriPhaseSignerServerSide {
 		}
         final PdfSignatureAppearance sap = pts.getSAP();
 
-    	final ByteArrayOutputStream baos = pts.getBAOS();
-	    final String badFileID = pts.getFileID();
-
-	    try {
-	       sap.close(dic2);
-	    }
-	    catch (final Exception e) {
-	    	baos.close();
-	        throw new AOException("Error al cerrar el PDF para finalizar el proceso de firma", e); //$NON-NLS-1$
-	    }
-
-	    final byte[] ret = new String(baos.toByteArray(), "ISO-8859-1").replace(badFileID, fileID).getBytes("ISO-8859-1"); //$NON-NLS-1$ //$NON-NLS-2$
-
-	    baos.close();
-
-	    return ret;
+    	try (final ByteArrayOutputStream baos = pts.getBAOS()) {
+		    final String badFileID = pts.getFileID();
+		    try {
+		       sap.close(dic2);
+		    }
+		    catch (final Exception e) {
+		        throw new AOException("Error al cerrar el PDF para finalizar el proceso de firma: " + e, e); //$NON-NLS-1$
+		    }
+		    return new String(baos.toByteArray(), "ISO-8859-1").replace(badFileID, fileID).getBytes("ISO-8859-1"); //$NON-NLS-1$ //$NON-NLS-2$
+    	}
     }
 
     /** Resultado de una pre-firma (como primera parte de un firma trif&aacute;sica) PAdES. */

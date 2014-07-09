@@ -26,8 +26,8 @@ final public class FileSystemDocumentManager implements DocumentManager {
 	final String outDir;
 	final boolean overwrite;
 
-	final static Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$ 
-	
+	final static Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+
 	/** Construye la clase de acceso a gestor documental usando sistema de ficheros.
 	 * @param config Configuraci&oacute;n del gestor (directorios, etc.) */
 	public FileSystemDocumentManager(final Properties config) {
@@ -35,7 +35,7 @@ final public class FileSystemDocumentManager implements DocumentManager {
 		this.inDir = config.getProperty(IN_DIR_PARAM);
 		this.outDir = config.getProperty(OUT_DIR_PARAM);
 		this.overwrite = Boolean.parseBoolean(config.getProperty(OVERWRITE_PARAM));
-		
+
 		LOGGER.info("Directorio de entrada de ficheros: " + this.inDir); //$NON-NLS-1$
 		LOGGER.info("Directorio de salida de ficheros: " + this.outDir); //$NON-NLS-1$
 	}
@@ -44,21 +44,19 @@ final public class FileSystemDocumentManager implements DocumentManager {
 	public byte[] getDocument(final String id, final X509Certificate cert, final Properties prop) throws IOException {
 
 		LOGGER.info("Recuperamos el documento con identificador: " + id); //$NON-NLS-1$
-		
+
 		final File file = new File(this.inDir, new String(Base64.decode(id)));
-		
+
 		LOGGER.info("Buscamos el fichero: " + file.getAbsolutePath()); //$NON-NLS-1$
-		
-		
+
+
 		if (!file.exists() || !file.isFile() || !file.canRead()) {
 			throw new IOException("No se puede cargar el documento"); //$NON-NLS-1$
 		}
 
-		final FileInputStream fis = new FileInputStream(file);
-		final byte[] data = AOUtil.getDataFromInputStream(fis);
-		fis.close();
-
-		return data;
+		try (final FileInputStream fis = new FileInputStream(file)) {
+			return AOUtil.getDataFromInputStream(fis);
+		}
 	}
 
 	@Override
@@ -85,11 +83,10 @@ final public class FileSystemDocumentManager implements DocumentManager {
 			throw new IOException("Se ha obtenido un nombre de documento existente en el sistema de ficheros."); //$NON-NLS-1$
 		}
 
-		final FileOutputStream fos = new FileOutputStream(file);
-		fos.write(data);
-		fos.close();
+		try (final FileOutputStream fos = new FileOutputStream(file)) {
+			fos.write(data);
+		}
 		LOGGER.info("Escribiendo el fichero: " + file.getAbsolutePath()); //$NON-NLS-1$
-		
 		return Base64.encode(newId.getBytes());
 	}
 
