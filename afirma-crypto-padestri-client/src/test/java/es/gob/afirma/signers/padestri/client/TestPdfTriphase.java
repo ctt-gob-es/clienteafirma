@@ -156,7 +156,7 @@ public class TestPdfTriphase {
 		final byte[] encoded = AOUtil.getDataFromInputStream(is);
 		is.close();
 
-		return Base64.encodeBytes(encoded, Base64.URL_SAFE);
+		return Base64.encode(encoded, true);
 	}
 
 	private static byte[] loadFile(final String filename) throws Exception {
@@ -191,7 +191,7 @@ public class TestPdfTriphase {
 		Assert.assertNotNull("Error durante el proceso de firma, resultado nulo", signature); //$NON-NLS-1$
 		Assert.assertFalse("Se recibio un codigo de error desde el servidor", new String(signature).startsWith("ERR-")); //$NON-NLS-1$ //$NON-NLS-2$
 
-		config.setProperty(PROPERTY_NAME_DOC_ID, Base64.encodeBytes(signature, Base64.URL_SAFE));
+		config.setProperty(PROPERTY_NAME_DOC_ID, Base64.encode(signature, true));
 
 		final byte[] coSignature = signer.cosign(
 				signature,
