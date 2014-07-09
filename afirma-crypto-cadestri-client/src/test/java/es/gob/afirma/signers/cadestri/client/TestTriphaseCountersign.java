@@ -18,7 +18,6 @@ import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.signers.AOCounterSigner;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.CounterSignTarget;
-import es.gob.afirma.signers.cadestri.client.AOCAdESTriPhaseSigner;
 
 /**
  * Prueba de cofirmas CAdES.
@@ -37,13 +36,12 @@ public class TestTriphaseCountersign {
 	private static final String SERVLET_URL = "http://localhost:8080/afirma-server-triphase-signer/SignatureService"; //$NON-NLS-1$
 
 	private static final String PARAM_NAME_SERVER_URL = "serverUrl"; //$NON-NLS-1$
-	
+
 	private static InputStream ksIs;
 	private static KeyStore ks;
 
 	/** Carga el almac&eacute;n de certificados.
 	 * @throws Exception Cuando ocurre algun problema al cargar el almac&eacute;n o los datos. */
-	@SuppressWarnings("static-method")
 	@Before
 	public void cargaAlmacen() throws Exception {
 		ksIs = getClass().getClassLoader().getResourceAsStream(PKCS12_KEYSTORE);
@@ -51,11 +49,8 @@ public class TestTriphaseCountersign {
 		ks.load(ksIs, PASSWORD.toCharArray());
 	}
 
-	/**
-	 * Prueba de contrafirma de todo el &aacute;rbol de firmas de una firma expl&iacute;cita.
-	 * @throws Exception Cuando se produce un error.
-	 */
-	@SuppressWarnings("static-method")
+	/** Prueba de contrafirma de todo el &aacute;rbol de firmas de una firma expl&iacute;cita.
+	 * @throws Exception Cuando se produce un error. */
 	@Test
 	@Ignore
 	public void prueba_contrafirma_de_arbol_de_firma_explicita() throws Exception {
@@ -66,7 +61,7 @@ public class TestTriphaseCountersign {
 
 		final Properties config = new Properties();
 		config.setProperty(PARAM_NAME_SERVER_URL, SERVLET_URL);
-		
+
 		final AOCounterSigner signer = new AOCAdESTriPhaseSigner();
 		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(PASSWORD.toCharArray()));
 		final byte[] countersign = signer.countersign(
@@ -88,11 +83,8 @@ public class TestTriphaseCountersign {
 		fos.close();
 	}
 
-	/**
-	 * Prueba de contrafirma de los nodos hoja de una firma explicita.
-	 * @throws Exception Cuando se produce un error.
-	 */
-	@SuppressWarnings("static-method")
+	/** Prueba de contrafirma de los nodos hoja de una firma explicita.
+	 * @throws Exception Cuando se produce un error. */
 	@Test
 	@Ignore
 	public void prueba_contrafirma_de_firma_explicita_nodos_hoja() throws Exception {
@@ -103,7 +95,7 @@ public class TestTriphaseCountersign {
 
 		final Properties config = new Properties();
 		config.setProperty(PARAM_NAME_SERVER_URL, SERVLET_URL);
-		
+
 		final AOCounterSigner signer = new AOCAdESTriPhaseSigner();
 		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(PASSWORD.toCharArray()));
 		final byte[] countersign = signer.countersign(
@@ -126,11 +118,8 @@ public class TestTriphaseCountersign {
 		fos.close();
 	}
 
-	/**
-	 * Prueba de contrafirma de todo el &aacute;rbol de firmas de una firma impl&iacute;cita.
-	 * @throws Exception Cuando se produce un error.
-	 */
-	@SuppressWarnings("static-method")
+	/** Prueba de contrafirma de todo el &aacute;rbol de firmas de una firma impl&iacute;cita.
+	 * @throws Exception Cuando se produce un error. */
 	@Test
 	@Ignore
 	public void prueba_contrafirma_de_arbol_de_firma_implicita() throws Exception {
@@ -141,7 +130,7 @@ public class TestTriphaseCountersign {
 
 		final Properties config = new Properties();
 		config.setProperty(PARAM_NAME_SERVER_URL, SERVLET_URL);
-		
+
 		final AOCounterSigner signer = new AOCAdESTriPhaseSigner();
 		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(PASSWORD.toCharArray()));
 		final byte[] countersign = signer.countersign(
@@ -164,11 +153,8 @@ public class TestTriphaseCountersign {
 		fos.close();
 	}
 
-	/**
-	 * Prueba de contrafirma de los nodos hoja de una firma implicita.
-	 * @throws Exception Cuando se produce un error.
-	 */
-	@SuppressWarnings("static-method")
+	/** Prueba de contrafirma de los nodos hoja de una firma impl&iacute;cita.
+	 * @throws Exception Cuando se produce un error. */
 	@Test
 	@Ignore
 	public void prueba_contrafirma_de_firma_implicita_nodos_hoja() throws Exception {
@@ -179,7 +165,7 @@ public class TestTriphaseCountersign {
 
 		final Properties config = new Properties();
 		config.setProperty(PARAM_NAME_SERVER_URL, SERVLET_URL);
-		
+
 		final AOCounterSigner signer = new AOCAdESTriPhaseSigner();
 		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(PASSWORD.toCharArray()));
 		final byte[] countersign = signer.countersign(
