@@ -54,7 +54,7 @@ public class TestPAdES {
 
     private static final String TEST_FILE_PWD = "TEST_PDF_Password.pdf"; //$NON-NLS-1$
     private static final String TEST_FILE_PWD_MOD = "TEST_PDF_Password_Modification.pdf"; //$NON-NLS-1$
-    private static final String TEST_FILE_CTF = "TEST_PDF_Certified.pdf"; //$NON-NLS-1$
+    //private static final String TEST_FILE_CTF = "TEST_PDF_Certified.pdf"; //$NON-NLS-1$
     private static final String TEST_FILE_CTF2 = "pruebafirma_certificado.pdf"; //$NON-NLS-1$
 
     static {
