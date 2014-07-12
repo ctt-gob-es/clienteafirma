@@ -55,6 +55,7 @@ public class TestPAdES {
     private static final String TEST_FILE_PWD = "TEST_PDF_Password.pdf"; //$NON-NLS-1$
     private static final String TEST_FILE_PWD_MOD = "TEST_PDF_Password_Modification.pdf"; //$NON-NLS-1$
     private static final String TEST_FILE_CTF = "TEST_PDF_Certified.pdf"; //$NON-NLS-1$
+    private static final String TEST_FILE_CTF2 = "pruebafirma_certificado.pdf"; //$NON-NLS-1$
 
     static {
         final Properties p1 = new Properties();
@@ -173,10 +174,8 @@ public class TestPAdES {
     }
 
 
-    /**
-     * Prueba la firma de un PDF protegido con contrase&ntilde;a.
-     * @throws Exception en cualquier error
-     */
+    /** Prueba la firma de un PDF protegido con contrase&ntilde;a.
+     * @throws Exception en cualquier error */
     @SuppressWarnings("static-method")
 	@Test
     public void testPasswordSignature() throws Exception {
@@ -213,10 +212,8 @@ public class TestPAdES {
 
     }
 
-    /**
-     * Prueba la firma de un PDF protegido con contrase&ntilde;a contra modificaci&oacute;n.
-     * @throws Exception en cualquier error
-     */
+    /** Prueba la firma de un PDF protegido con contrase&ntilde;a contra modificaci&oacute;n.
+     * @throws Exception en cualquier error */
     @SuppressWarnings("static-method")
 	@Test
     public void testModificationPasswordSignature() throws Exception {
@@ -260,11 +257,8 @@ public class TestPAdES {
 
     }
 
-
-    /**
-     * Prueba de firma convencional.
-     * @throws Exception en cualquier error
-     */
+    /** Prueba de firma convencional.
+     * @throws Exception en cualquier error */
     @SuppressWarnings("static-method")
 	@Test
     public void testSignature() throws Exception {
@@ -342,11 +336,8 @@ public class TestPAdES {
         }
     }
 
-
-    /**
-     * Prueba la firma de un PDF certificado.
-     * @throws Exception en cualquier error
-     */
+    /** Prueba la firma de un PDF certificado.
+     * @throws Exception en cualquier error */
     @SuppressWarnings("static-method")
 	@Test
     public void testCertifiedSignature() throws Exception {
@@ -358,13 +349,9 @@ public class TestPAdES {
         pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
 
         final AOSigner signer = new AOPDFSigner();
-
-        final byte[] testPdf = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(TEST_FILE_CTF));
-
+        final byte[] testPdf = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(TEST_FILE_CTF2));
         Assert.assertTrue("No se ha reconocido como un PDF", signer.isValidDataFile(testPdf)); //$NON-NLS-1$
-
         String prueba = "Firma PAdES de PDF certificado en SHA512withRSA indicando allowSigningCertifiedPdfs=true"; //$NON-NLS-1$
-
         System.out.println(prueba);
 
         Properties extraParams = new Properties();
@@ -395,6 +382,12 @@ public class TestPAdES {
         		pke.getCertificateChain(),
         		extraParams
     		);
+            final File file = File.createTempFile("PDF-FALLIDO_", ".pdf"); //$NON-NLS-1$ //$NON-NLS-2$
+            final OutputStream fos = new FileOutputStream(file);
+            fos.write(result);
+            fos.flush();
+            fos.close();
+            System.out.println("PDF Fallido: " + file.getAbsolutePath()); //$NON-NLS-1$
         }
         catch(final Exception e) {
             failed = true;

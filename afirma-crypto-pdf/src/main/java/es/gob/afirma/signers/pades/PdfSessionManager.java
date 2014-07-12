@@ -218,7 +218,8 @@ public final class PdfSessionManager {
 			throw new InvalidPdfException(e);
 		}
 
-		if (pdfReader.getCertificationLevel() == PdfSignatureAppearance.CERTIFIED_NO_CHANGES_ALLOWED && !Boolean.parseBoolean(extraParams.getProperty("allowSigningCertifiedPdfs"))) { //$NON-NLS-1$
+		if (pdfReader.getCertificationLevel() != PdfSignatureAppearance.NOT_CERTIFIED &&
+				!Boolean.parseBoolean(extraParams.getProperty("allowSigningCertifiedPdfs"))) { //$NON-NLS-1$
 			// Si no permitimos dialogos graficos o directamente hemos indicado que no permitimos firmar PDF certificados lanzamos
 			// una excepcion
 			if (Boolean.parseBoolean(extraParams.getProperty("headLess")) || "false".equalsIgnoreCase(extraParams.getProperty("allowSigningCertifiedPdfs"))) {  //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -535,7 +536,6 @@ public final class PdfSessionManager {
 		return new PdfTriPhaseSession(sap, baos, new String(pdfObject.getBytes()));
     }
 
-
     /** Devuelve la posici&oacute;n de la p&aacute;gina en donde debe agregarse
      * la firma. La medida de posicionamiento es el p&iacute;xel y se cuenta en
      * el eje horizontal de izquierda a derecha y en el vertical de abajo a
@@ -546,4 +546,6 @@ public final class PdfSessionManager {
     private static Rectangle getSignaturePositionOnPage(final Properties extraParams) {
     	return PdfPreProcessor.getPositionOnPage(extraParams, "signature"); //$NON-NLS-1$
     }
+
+
 }
