@@ -100,17 +100,16 @@ final class CAdESCounterSignerEnveloped {
     /** Constructor de la clase. Se crea una contrafirma a partir de los datos
      * del firmante, el archivo que se firma y del archivo que contiene las
      * firmas.<br>
-     * @param parameters
-     *        par&aacute;metros necesarios que contienen tanto la firma del
-     *        archivo a firmar como los datos del firmante.
-     * @param data
-     *        Archivo que contiene las firmas.
+     * @param parameters Par&aacute;metros necesarios que contienen tanto la firma del
+     *                   archivo a firmar como los datos del firmante.
+     * @param data Archivo que contiene las firmas.
      * @param targetType
      *        Lo que se quiere firmar. Puede ser el &aacute;rbol completo,
      *        las hojas, un nodo determinado o unos determinados firmantes.
      * @param targets
      *        Nodos objetivos a firmar.
      * @param key Clave privada a usar para firmar.
+     * @param certChain Cadena de certificados del firmante.
      * @param policy Pol&iacute;tica de firma
      * @param signingCertificateV2
      *        <code>true</code> si se desea usar la versi&oacute;n 2 del
@@ -309,14 +308,15 @@ final class CAdESCounterSignerEnveloped {
      * @param parameters
      *        Par&aacute;metros necesarios para firmar un determinado
      *        SignerInfo
-     * @param key Clave privada a usar para firmar
+     * @param key Clave privada a usar para firmar.
+     * @param certChain Cadena de certificados del firmante.
      * @param contentDescription Descripci&oacute;n textual del tipo de contenido firmado.
      * @param ctis Indicaciones sobre los tipos de compromisos adquiridos con la firma.
      * @param csm Metadatos sobre el firmante.
      * @return El SignerInfo ra&iacute;z con todos sus nodos Contrafirmados.
-     * @throws java.security.NoSuchAlgorithmException
+     * @throws NoSuchAlgorithmException Si no se soporta alguno de los algoritmos necesarios.
      * @throws java.io.IOException Cuando hay errores de entrada / salida
-     * @throws java.security.cert.CertificateException
+     * @throws CertificateException Cuando hay problemas con los certificados proporcionados.
      * @throws AOException En caso de cualquier otro tipo de error */
     private ASN1EncodableVector counterTree(final ASN1Set signerInfosRaiz,
                                             final P7ContentSignerParameters parameters,
@@ -362,9 +362,9 @@ final class CAdESCounterSignerEnveloped {
      * @param ctis Indicaciones sobre los tipos de compromisos adquiridos con la firma.
      * @param csm Metadatos sobre el firmante.
      * @return El SignerInfo ra&iacute;z con todos sus nodos Contrafirmados.
-     * @throws java.security.NoSuchAlgorithmException
+     * @throws NoSuchAlgorithmException Si no se soporta alguno de los algoritmos necesarios.
      * @throws java.io.IOException Cuando hay errores de entrada / salida
-     * @throws java.security.cert.CertificateException
+     * @throws CertificateException Cuando hay problemas con los certificados proporcionados.
      * @throws AOException En caso de cualquier otro tipo de error */
     private ASN1EncodableVector counterLeaf(final ASN1Set signerInfosRaiz,
                                             final P7ContentSignerParameters parameters,
@@ -408,9 +408,9 @@ final class CAdESCounterSignerEnveloped {
      * @param ctis Indicaciones sobre los tipos de compromisos adquiridos con la firma.
      * @param csm Metadatos sobre el firmante.
      * @return El SignerInfo ra&iacute;z con todos sus nodos Contrafirmados.
-     * @throws java.security.NoSuchAlgorithmException
+     * @throws NoSuchAlgorithmException Si no se soporta alguno de los algoritmos necesarios.
      * @throws java.io.IOException Cuando hay errores de entrada / salida
-     * @throws java.security.cert.CertificateException
+     * @throws CertificateException Cuando hay problemas con los certificados proporcionados.
      * @throws AOException En caso de cualquier otro tipo de error */
     private ASN1EncodableVector counterNode(final SignedAndEnvelopedData sd,
                                             final P7ContentSignerParameters parameters,
@@ -483,9 +483,9 @@ final class CAdESCounterSignerEnveloped {
      * @param csm Metadatos sobre el firmante.
      * @return El SignerInfo ra&iacute;z parcial con todos sus nodos
      *         Contrafirmados.
-     * @throws NoSuchAlgorithmException
+     * @throws NoSuchAlgorithmException Si no se soporta alguno de los algoritmos necesarios.
      * @throws IOException Cuando hay errores de entrada / salida
-     * @throws CertificateException
+     * @throws CertificateException Cuando hay problemas con los certificados proporcionados.
      * @throws AOException En caso de cualquier otro tipo de error */
     private SignerInfo getCounterSignerInfo(final SignerInfo signerInfo,
                                             final P7ContentSignerParameters parameters,
@@ -650,9 +650,9 @@ final class CAdESCounterSignerEnveloped {
      * @param csm Metadatos sobre el firmante.
      * @return El SignerInfo ra&iacute;z parcial con todos sus nodos
      *         Contrafirmados.
-     * @throws java.security.NoSuchAlgorithmException
+     * @throws NoSuchAlgorithmException Si no se soporta alguno de los algoritmos necesarios.
      * @throws java.io.IOException Cuando hay errores de entrada / salida
-     * @throws java.security.cert.CertificateException
+     * @throws CertificateException Cuando hay problemas con los certificados proporcionados.
      * @throws AOException En caso de cualquier otro tipo de error */
     private SignerInfo getCounterLeafSignerInfo(final SignerInfo signerInfo,
                                                 final P7ContentSignerParameters parameters,
@@ -772,9 +772,9 @@ final class CAdESCounterSignerEnveloped {
      * @param csm Metadatos sobre el firmante.
      * @return El SignerInfo ra&iacute;z parcial con todos sus nodos
      *         Contrafirmados.
-     * @throws java.security.NoSuchAlgorithmException
-     * @throws java.io.IOException
-     * @throws java.security.cert.CertificateException */
+     * @throws NoSuchAlgorithmException Si no se soporta alguno de los algoritmos necesarios.
+     * @throws IOException Cuando hay errores en el tratamiento de los datos.
+     * @throws CertificateException Cuando hay problemas con los certificados proporcionados. */
     private SignerInfo getCounterNodeSignerInfo(final SignerInfo signerInfo,
                                                 final P7ContentSignerParameters parameters,
                                                 final PrivateKey key,
@@ -924,9 +924,9 @@ final class CAdESCounterSignerEnveloped {
      * @param csm Metadatos sobre el firmante.
      * @return El SignerInfo ra&iacute;z parcial con todos sus nodos
      *         Contrafirmados.
-     * @throws java.security.NoSuchAlgorithmException
-     * @throws java.io.IOException
-     * @throws java.security.cert.CertificateException
+     * @throws NoSuchAlgorithmException Si no se soporta alguno de los algoritmos necesarios.
+     * @throws IOException Cuando hay errores en el tratamiento de los datos.
+     * @throws CertificateException Cuando hay problemas con los certificados proporcionados.
      * @throws AOException En caso de cualquier otro tipo de error */
     private SignerInfo getCounterNodeSignerInfo(final SignerInfo signerInfo,
                                                 final P7ContentSignerParameters parameters,
@@ -1069,9 +1069,9 @@ final class CAdESCounterSignerEnveloped {
      * @param ctis Indicaciones sobre los tipos de compromisos adquiridos con la firma.
      * @param csm Metadatos sobre el firmante.
      * @return El signerInfo contrafirmado.
-     * @throws java.security.NoSuchAlgorithmException
-     * @throws java.io.IOException
-     * @throws java.security.cert.CertificateException */
+     * @throws NoSuchAlgorithmException Si no se soporta alguno de los algoritmos necesarios.
+     * @throws IOException Cuando hay errores en el tratamiento de los datos.
+     * @throws CertificateException Cuando hay problemas con los certificados proporcionados. */
     private SignerInfo generateSignerInfo(final P7ContentSignerParameters parameters,
                                           final SignerInfo si,
                                           final PrivateKey key,

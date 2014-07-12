@@ -78,19 +78,15 @@ public final class CAdESTriPhaseCounterSigner {
 			this.sign = s.clone();
 		}
 
-		/**
-		 * Recupera la firma con las contrafirmas que deseamos generada con un certificado fake.
-		 * @return Firma CAdES con contrafirmas.
-		 */
+		/** Recupera la firma con las contrafirmas que deseamos generada con un certificado fake.
+		 * @return Firma CAdES con contrafirmas. */
 		public byte[] getSign() {
 			return this.sign;
 		}
 
-		/**
-		 * Recupera las prefirmas (SignedData) de cada contrafirma realizada listas para
+		/** Recupera las prefirmas (SignedData) de cada contrafirma realizada listas para
 		 * firmarse con el certificado correcto.
-		 * @return Listado de prefirmas.
-		 */
+		 * @return Listado de prefirmas. */
 		public List<byte[]> getPreSigns() {
 			return this.preSigns;
 		}
@@ -105,60 +101,49 @@ public final class CAdESTriPhaseCounterSigner {
 	/** Lista de <i>SignedAttributes</i> de las contrafirmas de la firma ordenados por n&uacute;mero de contrafirma dentro de la firma. */
 	private List<byte[]> signedDatas = new ArrayList<byte[]>();
 
-    /** Crea una contrafirma a partir de los datos
-     * del firmante, el archivo que se firma y del archivo que contiene las
+    /** Crea una contrafirma a partir de los datos del firmante, el archivo que se firma y del archivo que contiene las
      * firmas.<br>
-     * @param parameters
-     *        par&aacute;metros necesarios que contienen tanto la firma del
-     *        archivo a firmar como los datos del firmante.
-     * @param data
-     *        Archivo que contiene las firmas.
-     * @param targetType
-     *        Lo que se quiere firmar. Puede ser el &aacute;rbol completo,
-     *        las hojas, un nodo determinado o unos determinados firmantes.
+     * @param parameters Par&aacute;metros necesarios que contienen tanto la firma del
+     *                   archivo a firmar como los datos del firmante.
+     * @param sign Archivo que contiene las firmas.
+     * @param targetType Lo que se quiere firmar.
+     *                   Puede ser el &aacute;rbol completo, las hojas, un nodo determinado o unos determinados firmantes.
      * @param key Clave privada a usar para firmar.
      * @param certChain Cadena de certificados del firmante
      * @param policy Pol&iacute;tica de firma
-     * @param signingCertificateV2
-     *        <code>true</code> si se desea usar la versi&oacute;n 2 del
-     *        atributo <i>Signing Certificate</i> <code>false</code> para
-     *        usar la versi&oacute;n 1
-     * @param contentType
-     * 		  Tipo de contenido definido por su OID.
+     * @param signingCertificateV2 <code>true</code> si se desea usar la versi&oacute;n 2 del
+     *                             atributo <i>Signing Certificate</i> <code>false</code> para
+     *                             usar la versi&oacute;n 1
      * @param contentDescription Descripci&oacute;n textual del tipo de contenido firmado.
      * @param ctis Indicaciones sobre los tipos de compromisos adquiridos con la firma.
      * @param csm Metadatos sobre el firmante.
      * @return El archivo de firmas con la nueva firma.
      * @throws IOException Cuando se produce algun error con la lectura o escritura de datos.
-     * @throws java.security.NoSuchAlgorithmException
-     *         Excepci&oacute;n cuando no se encuentra el algoritmo de
-     *         firma.
-     * @throws java.security.cert.CertificateException
-     *         Si se produce alguna excepci&oacute;n con los certificados de
-     *         firma.
-     * @throws AOException
-     *         Cuando ocurre alguno error con contemplado por las otras
-     *         excepciones declaradas */
+     * @throws NoSuchAlgorithmException Cuando no se encuentra el algoritmo de
+     *                                  firma.
+     * @throws CertificateException Si se produce alguna excepci&oacute;n con los certificados de
+     *                              firma.
+     * @throws AOException Cuando ocurre alguno error no contemplado por las otras
+     *                     excepciones declaradas */
     public CAdESPreCounterSignResult preCounterSign(final P7ContentSignerParameters parameters,
-                                final byte[] data,
-                                final CounterSignTarget targetType,
-                                final PrivateKey key,
-                                final java.security.cert.Certificate[] certChain,
-                                final AdESPolicy policy,
-                                final boolean signingCertificateV2,
-                                final String contentType,
-                                final String contentDescription,
-                                final List<CommitmentTypeIndicationBean> ctis,
-                                final CAdESSignerMetadata csm) throws IOException,
-                                                                      NoSuchAlgorithmException,
-                                                                      CertificateException,
-                                                                      AOException {
+                                                    final byte[] sign,
+                                                    final CounterSignTarget targetType,
+                                                    final PrivateKey key,
+                                                    final java.security.cert.Certificate[] certChain,
+                                                    final AdESPolicy policy,
+                                                    final boolean signingCertificateV2,
+                                                    final String contentDescription,
+                                                    final List<CommitmentTypeIndicationBean> ctis,
+                                                    final CAdESSignerMetadata csm) throws IOException,
+                                                                                          NoSuchAlgorithmException,
+                                                                                          CertificateException,
+                                                                                          AOException {
     	// Inicializamos el contador global y la lista de SignedDatas
     	this.counterIndex = 0;
     	this.signedDatas = new ArrayList<byte[]>();
 
         // LEEMOS EL FICHERO QUE NOS INTRODUCEN
-    	final ASN1InputStream is = new ASN1InputStream(data);
+    	final ASN1InputStream is = new ASN1InputStream(sign);
         final ASN1Sequence dsq = (ASN1Sequence) is.readObject();
         is.close();
         final Enumeration<?> e = dsq.getObjects();
@@ -208,7 +193,6 @@ public final class CAdESTriPhaseCounterSigner {
         		parameters,
         		key,
         		certChain,
-                contentType,
                 contentDescription,
                 policy,
                 signingCertificateV2,
@@ -223,7 +207,6 @@ public final class CAdESTriPhaseCounterSigner {
         		parameters,
         		key,
         		certChain,
-                contentType,
                 contentDescription,
                 policy,
                 signingCertificateV2,
@@ -259,21 +242,21 @@ public final class CAdESTriPhaseCounterSigner {
      *        SignerInfo
      * @param key Clave privada a usar para firmar.
      * @param certChain Cadena de certificados del firmante.
-     * @param contentType Tipo de contenido definido por su OID.
      * @param contentDescription Descripci&oacute;n textual del tipo de contenido firmado.
      * @param policy Pol&iacute;tica de firma.
+     * @param signingCertificateV2 <code>true</code> si se desea usar <i>SigningCertificateV2</i>, <code>false</code>
+     *        para usar <i>SigningCertificateV1</i>.
      * @param ctis Indicaciones sobre los tipos de compromisos adquiridos con la firma.
      * @param csm Metadatos sobre el firmante.
      * @return El SignerInfo ra&iacute;z con todos sus nodos Contrafirmados.
-     * @throws NoSuchAlgorithmException
-     * @throws IOException
-     * @throws CertificateException
+     * @throws NoSuchAlgorithmException Si no se soporta alguno de los algoritmos necesarios.
+     * @throws IOException Cuando hay errores en el tratamiento de los datos.
+     * @throws CertificateException Cuando hay problemas con los certificados proporcionados.
      * @throws AOException En caso de cualquier otro tipo de error */
     private ASN1EncodableVector counterTree(final ASN1Set signerInfosRaiz,
                                             final P7ContentSignerParameters parameters,
                                             final PrivateKey key,
                                             final java.security.cert.Certificate[] certChain,
-                                            final String contentType,
                                             final String contentDescription,
                                             final AdESPolicy policy,
                                             final boolean signingCertificateV2,
@@ -291,7 +274,6 @@ public final class CAdESTriPhaseCounterSigner {
         			parameters,
         			key,
         			certChain,
-                    contentType,
                     contentDescription,
                     policy,
                     signingCertificateV2,
@@ -305,27 +287,27 @@ public final class CAdESTriPhaseCounterSigner {
 
     /** Contrafirma las hojas del &aacute;rbol completo de forma
      * recursiva, todos los dodos creando un nuevo contraSigner.<br>
-     * @param signerInfosRaiz
-     *        Nodo ra&iacute; que contiene todos los signerInfos que se
-     *        deben firmar.
-     * @param parameters
-     *        Par&aacute;metros necesarios para firmar un determinado
-     *        SignerInfo hoja.
-     * @param key Clave privada a usar para firmar
-     * @param contentType Tipo de contenido definido por su OID.
+     * @param signerInfosRaiz Nodo ra&iacute; que contiene todos los signerInfos que se
+     *                        deben firmar.
+     * @param parameters Par&aacute;metros necesarios para firmar un determinado
+     *                   SignerInfo hoja.
+     * @param key Clave privada a usar para firmar.
+     * @param certChain Cadena de certificados del firmante.
      * @param contentDescription Descripci&oacute;n textual del tipo de contenido firmado.
+     * @param policy Pol&iacute;tica de firma a aplicar, <code>null</code> si no se desea usar ninguna.
+     * @param signingCertificateV2 <code>true</code> si se desea usar <i>SigningCertificateV2</i>, <code>false</code>
+     *        para usar <i>SigningCertificateV1</i>.
      * @param ctis Indicaciones sobre los tipos de compromisos adquiridos con la firma.
      * @param csm Metadatos sobre el firmante.
      * @return El SignerInfo ra&iacute;z con todos sus nodos Contrafirmados.
-     * @throws java.security.NoSuchAlgorithmException
-     * @throws java.io.IOException
-     * @throws java.security.cert.CertificateException
+     * @throws NoSuchAlgorithmException Si no se soporta alguno de los algoritmos necesarios.
+     * @throws IOException Cuando hay errores en el tratamiento de los datos.
+     * @throws CertificateException Cuando hay problemas con los certificados proporcionados.
      * @throws AOException En caso de cualquier otro tipo de error */
     private ASN1EncodableVector counterLeaf(final ASN1Set signerInfosRaiz,
                                             final P7ContentSignerParameters parameters,
                                             final PrivateKey key,
                                             final java.security.cert.Certificate[] certChain,
-                                            final String contentType,
                                             final String contentDescription,
                                             final AdESPolicy policy,
                                             final boolean signingCertificateV2,
@@ -343,7 +325,6 @@ public final class CAdESTriPhaseCounterSigner {
     				parameters,
     				key,
     				certChain,
-    				contentType,
     				contentDescription,
     				policy,
     				signingCertificateV2,
@@ -359,21 +340,23 @@ public final class CAdESTriPhaseCounterSigner {
      * @param signerInfo Nodo ra&iacute; que contiene todos los signerInfos que se deben firmar.
      * @param parameters Par&aacute;metros necesarios para firmar un determinado SignerInfo hoja.
      * @param key Clave privada a usar para firmar.
-     * @param contentType Tipo de contenido definido por su OID.
+     * @param certChain Cadena de certificados del firmante.
      * @param contentDescription Descripci&oacute;n textual del tipo de contenido firmado.
+     * @param policy Pol&iacute;tica de firma.
+     * @param signingCertificateV2 <code>true</code> si se desea usar <i>SigningCertificateV2</i>, <code>false</code>
+     *        para usar <i>SigningCertificateV1</i>.
      * @param ctis Indicaciones sobre los tipos de compromisos adquiridos con la firma.
      * @param csm Metadatos sobre el firmante.
      * @return El SignerInfo ra&iacute;z parcial con todos sus nodos
      *         Contrafirmados.
-     * @throws java.security.NoSuchAlgorithmException
-     * @throws java.io.IOException
-     * @throws java.security.cert.CertificateException
+     * @throws NoSuchAlgorithmException Si no se soporta alguno de los algoritmos necesarios.
+     * @throws IOException Cuando hay errores en el tratamiento de los datos.
+     * @throws CertificateException Cuando hay problemas con los certificados proporcionados.
      * @throws AOException En caso de cualquier otro tipo de error */
     private SignerInfo getCounterSignerInfo(final SignerInfo signerInfo,
                                             final P7ContentSignerParameters parameters,
                                             final PrivateKey key,
                                             final java.security.cert.Certificate[] certChain,
-                                            final String contentType,
                                             final String contentDescription,
                                             final AdESPolicy policy,
                                             final boolean signingCertificateV2,
@@ -401,7 +384,6 @@ public final class CAdESTriPhaseCounterSigner {
                 				parameters,
                 				key,
                 				certChain,
-                				contentType,
                 				contentDescription,
                 				policy,
                 				signingCertificateV2,
@@ -421,7 +403,6 @@ public final class CAdESTriPhaseCounterSigner {
         		parameters.getSignatureAlgorithm(),
         		signerInfo,
         		certChain,
-                contentType,
                 contentDescription,
                 policy,
                 signingCertificateV2,
@@ -464,7 +445,6 @@ public final class CAdESTriPhaseCounterSigner {
                 				parameters.getSignatureAlgorithm(),
                 				signerInfo,
                 				certChain,
-                				contentType,
                 				contentDescription,
                 				policy,
                 				signingCertificateV2,
@@ -509,7 +489,6 @@ public final class CAdESTriPhaseCounterSigner {
             		parameters.getSignatureAlgorithm(),
             		signerInfo,
             		certChain,
-            		contentType,
             		contentDescription,
             		policy,
             		signingCertificateV2,
@@ -535,21 +514,23 @@ public final class CAdESTriPhaseCounterSigner {
      * recursiva.<br>
      * @param signerInfo Nodo ra&iacute; que contiene todos los signerInfos que se deben firmar.
      * @param parameters Par&aacute;metros necesarios para firmar un determinado <i>SignerInfo</i> hoja.
-     * @param key Clave privada a usar para firmar
-     * @param contentType Tipo de contenido definido por su OID.
+     * @param key Clave privada a usar para firmar.
+     * @param certChain Cadena de certificados del firmante.
      * @param contentDescription Descripci&oacute;n textual del tipo de contenido firmado.
+     * @param policy Pol&iacute;tica de firma.
+     * @param signingCertificateV2 <code>true</code> si se desea usar <i>SigningCertificateV2</i>, <code>false</code>
+     *        para usar <i>SigningCertificateV1</i>.
      * @param ctis Indicaciones sobre los tipos de compromisos adquiridos con la firma.
      * @param csm Metadatos sobre el firmante.
      * @return SignerInfo ra&iacute;z parcial con todos sus nodos contrafirmados.
-     * @throws NoSuchAlgorithmException
-     * @throws IOException
-     * @throws CertificateException
+     * @throws NoSuchAlgorithmException Si no se soporta alguno de los algoritmos necesarios.
+     * @throws IOException Cuando hay errores en el tratamiento de los datos.
+     * @throws CertificateException Cuando hay problemas con los certificados proporcionados.
      * @throws AOException En caso de cualquier otro tipo de error */
     private SignerInfo getLeafSignerInfo(final SignerInfo signerInfo,
                                          final P7ContentSignerParameters parameters,
                                          final PrivateKey key,
                                          final java.security.cert.Certificate[] certChain,
-                                         final String contentType,
                                          final String contentDescription,
                                          final AdESPolicy policy,
                                          final boolean signingCertificateV2,
@@ -577,7 +558,6 @@ public final class CAdESTriPhaseCounterSigner {
                         		parameters,
                         		key,
                         		certChain,
-                        		contentType,
                         		contentDescription,
                         		policy,
                         		signingCertificateV2,
@@ -627,7 +607,6 @@ public final class CAdESTriPhaseCounterSigner {
                 				parameters.getSignatureAlgorithm(),
                 				signerInfo,
                 				certChain,
-                                contentType,
                                 contentDescription,
                                 policy,
                                 signingCertificateV2,
@@ -672,7 +651,6 @@ public final class CAdESTriPhaseCounterSigner {
             		parameters.getSignatureAlgorithm(),
             		signerInfo,
             		certChain,
-            		contentType,
             		contentDescription,
             		policy,
             		signingCertificateV2,
@@ -700,20 +678,20 @@ public final class CAdESTriPhaseCounterSigner {
      * @param signatureAlgorithm Algoritmo de firma.
      * @param si SignerInfo del que se debe recoger la informaci&oacute;n para
      *           realizar la contrafirma espec&iacute;fica.
-     * @param certChain Cadena de certificados del firmante
-     * @param contentType Tipo de contenido definido por su OID.
+     * @param certChain Cadena de certificados del firmante.
      * @param contentDescription Descripci&oacute;n textual del tipo de contenido firmado.
-     * @param policy Pol&iacute;tica de firma
+     * @param policy Pol&iacute;tica de firma.
+     * @param signingCertificateV2 <code>true</code> si se desea usar <i>SigningCertificateV2</i>, <code>false</code>
+     *        para usar <i>SigningCertificateV1</i>.
      * @param ctis Indicaciones sobre los tipos de compromisos adquiridos con la firma.
      * @param csm Metadatos sobre el firmante.
      * @return <code>SignerInfo</code> contrafirmado.
-     * @throws java.security.NoSuchAlgorithmException
+     * @throws NoSuchAlgorithmException Si no se soporta alguno de los algoritmos necesarios.
      * @throws java.io.IOException En caso de errores de entrada / salida
-     * @throws java.security.cert.CertificateException */
+     * @throws CertificateException Cuando hay problemas con los certificados proporcionados. */
     private SignerInfo generateSignerInfo(final String signatureAlgorithm,
                                           final SignerInfo si,
                                           final java.security.cert.Certificate[] certChain,
-                                          final String contentType,
                                           final String contentDescription,
                                           final AdESPolicy policy,
                                           final boolean signingCertificateV2,
@@ -734,7 +712,7 @@ public final class CAdESTriPhaseCounterSigner {
              null,
              new Date(),
              false,
-             contentType,
+             null, // ContentType a null siempre en contrafirmas
              contentDescription,
              ctis,
              csm
