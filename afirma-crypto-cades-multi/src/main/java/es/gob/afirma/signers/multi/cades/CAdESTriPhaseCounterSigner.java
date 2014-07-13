@@ -12,6 +12,7 @@ package es.gob.afirma.signers.multi.cades;
 
 
 import java.io.IOException;
+import java.security.KeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -143,7 +144,8 @@ public final class CAdESTriPhaseCounterSigner {
      * @throws CertificateException Si se produce alguna excepci&oacute;n con los certificados de
      *                              firma.
      * @throws AOException Cuando ocurre alguno error no contemplado por las otras
-     *                     excepciones declaradas */
+     *                     excepciones declaradas
+     * @throws KeyException KeyException Si no se soporta el tama&ntilde;o de clave (solo se soporta 1024, 2048 y 4096 bits). */
     public CAdESPreCounterSignResult preCounterSign(final P7ContentSignerParameters parameters,
                                                     final byte[] sign,
                                                     final CounterSignTarget targetType,
@@ -156,7 +158,8 @@ public final class CAdESTriPhaseCounterSigner {
                                                     final CAdESSignerMetadata csm) throws IOException,
                                                                                           NoSuchAlgorithmException,
                                                                                           CertificateException,
-                                                                                          AOException {
+                                                                                          AOException,
+                                                                                          KeyException {
     	// Inicializamos el contador global y la lista de SignedDatas
     	this.counterIndex = 0;
     	this.signedDatas = new ArrayList<byte[]>();
@@ -271,7 +274,8 @@ public final class CAdESTriPhaseCounterSigner {
      * @throws NoSuchAlgorithmException Si no se soporta alguno de los algoritmos necesarios.
      * @throws IOException Cuando hay errores en el tratamiento de los datos.
      * @throws CertificateException Cuando hay problemas con los certificados proporcionados.
-     * @throws AOException En caso de cualquier otro tipo de error */
+     * @throws AOException En caso de cualquier otro tipo de error
+     * @throws KeyException KeyException Si no se soporta el tama&ntilde;o de clave (solo se soporta 1024, 2048 y 4096 bits). */
     private ASN1EncodableVector counterTree(final ASN1Set signerInfosRaiz,
                                             final P7ContentSignerParameters parameters,
                                             final RSAPrivateKey key,
@@ -283,7 +287,8 @@ public final class CAdESTriPhaseCounterSigner {
                                             final CAdESSignerMetadata csm) throws NoSuchAlgorithmException,
                                                                                   IOException,
                                                                                   CertificateException,
-                                                                                  AOException {
+                                                                                  AOException,
+                                                                                  KeyException {
         final ASN1EncodableVector counterSigners = new ASN1EncodableVector();
         for (int i = 0; i < signerInfosRaiz.size(); i++) {
             final SignerInfo si = SignerInfo.getInstance(signerInfosRaiz.getObjectAt(i));
@@ -322,7 +327,8 @@ public final class CAdESTriPhaseCounterSigner {
      * @throws NoSuchAlgorithmException Si no se soporta alguno de los algoritmos necesarios.
      * @throws IOException Cuando hay errores en el tratamiento de los datos.
      * @throws CertificateException Cuando hay problemas con los certificados proporcionados.
-     * @throws AOException En caso de cualquier otro tipo de error */
+     * @throws AOException En caso de cualquier otro tipo de error
+     * @throws KeyException Si no se soporta el tama&ntilde;o de clave (solo se soporta 1024, 2048 y 4096 bits). */
     private ASN1EncodableVector counterLeaf(final ASN1Set signerInfosRaiz,
                                             final P7ContentSignerParameters parameters,
                                             final RSAPrivateKey key,
@@ -334,7 +340,8 @@ public final class CAdESTriPhaseCounterSigner {
                                             final CAdESSignerMetadata csm) throws NoSuchAlgorithmException,
                                                                                   IOException,
                                                                                   CertificateException,
-                                                                                  AOException {
+                                                                                  AOException,
+                                                                                  KeyException {
         final ASN1EncodableVector counterSigners = new ASN1EncodableVector();
         for (int i = 0; i < signerInfosRaiz.size(); i++) {
             final SignerInfo si = SignerInfo.getInstance(signerInfosRaiz.getObjectAt(i));
@@ -371,7 +378,8 @@ public final class CAdESTriPhaseCounterSigner {
      * @throws NoSuchAlgorithmException Si no se soporta alguno de los algoritmos necesarios.
      * @throws IOException Cuando hay errores en el tratamiento de los datos.
      * @throws CertificateException Cuando hay problemas con los certificados proporcionados.
-     * @throws AOException En caso de cualquier otro tipo de error */
+     * @throws AOException En caso de cualquier otro tipo de error
+     * @throws KeyException KeyException Si no se soporta el tama&ntilde;o de clave (solo se soporta 1024, 2048 y 4096 bits). */
     private SignerInfo getCounterSignerInfo(final SignerInfo signerInfo,
                                             final P7ContentSignerParameters parameters,
                                             final RSAPrivateKey key,
@@ -383,7 +391,8 @@ public final class CAdESTriPhaseCounterSigner {
                                             final CAdESSignerMetadata csm) throws NoSuchAlgorithmException,
                                                                                   IOException,
                                                                                   CertificateException,
-                                                                                  AOException {
+                                                                                  AOException,
+                                                                                  KeyException {
         final ASN1EncodableVector signerInfosU = new ASN1EncodableVector();
         final ASN1EncodableVector signerInfosU2 = new ASN1EncodableVector();
         SignerInfo counterSigner = null;
@@ -548,7 +557,8 @@ public final class CAdESTriPhaseCounterSigner {
      * @throws NoSuchAlgorithmException Si no se soporta alguno de los algoritmos necesarios.
      * @throws IOException Cuando hay errores en el tratamiento de los datos.
      * @throws CertificateException Cuando hay problemas con los certificados proporcionados.
-     * @throws AOException En caso de cualquier otro tipo de error */
+     * @throws AOException En caso de cualquier otro tipo de error
+     * @throws KeyException Si no se soporta el tama&ntilde;o de clave (solo se soporta 1024, 2048 y 4096 bits). */
     private SignerInfo getLeafSignerInfo(final SignerInfo signerInfo,
                                          final P7ContentSignerParameters parameters,
                                          final RSAPrivateKey key,
@@ -560,7 +570,8 @@ public final class CAdESTriPhaseCounterSigner {
                                          final CAdESSignerMetadata csm) throws NoSuchAlgorithmException,
                                                                                IOException,
                                                                                CertificateException,
-                                                                               AOException {
+                                                                               AOException,
+                                                                               KeyException {
         final ASN1EncodableVector signerInfosU = new ASN1EncodableVector();
         final ASN1EncodableVector signerInfosU2 = new ASN1EncodableVector();
         SignerInfo counterSigner = null;
@@ -713,7 +724,8 @@ public final class CAdESTriPhaseCounterSigner {
      * @return <code>SignerInfo</code> contrafirmado.
      * @throws NoSuchAlgorithmException Si no se soporta alguno de los algoritmos necesarios.
      * @throws java.io.IOException En caso de errores de entrada / salida
-     * @throws CertificateException Cuando hay problemas con los certificados proporcionados. */
+     * @throws CertificateException Cuando hay problemas con los certificados proporcionados.
+     * @throws KeyException Si no se soporta el tama&ntilde;o de clave (solo se soporta 1024, 2048 y 4096 bits). */
     private SignerInfo generateSignerInfo(final int keySize,
     		                              final String signatureAlgorithm,
                                           final SignerInfo si,
@@ -724,7 +736,8 @@ public final class CAdESTriPhaseCounterSigner {
                                           final List<CommitmentTypeIndicationBean> ctis,
                                           final CAdESSignerMetadata csm) throws NoSuchAlgorithmException,
                                                                                 IOException,
-                                                                                CertificateException {
+                                                                                CertificateException,
+                                                                                KeyException {
         // buscamos que timo de algoritmo es y lo codificamos con su OID
         final String digestAlgorithm = AOSignConstants.getDigestAlgorithmName(signatureAlgorithm);
 
@@ -781,9 +794,14 @@ public final class CAdESTriPhaseCounterSigner {
     }
 
     /** Simula una firma PKCS#1.
-     * @return Array de octetos relleno con el ASCII del n&uacute;mero de contrafirma y de longitud igual a un PKCS#1 equivalente */
-    private byte[] firma(final int keySize) {
-    	final byte[] dummy = new byte[P1_SIZES.get(Integer.valueOf(keySize)).intValue()];
+     * @return Array de octetos relleno con el ASCII del n&uacute;mero de contrafirma y de longitud igual a un PKCS#1 equivalente
+     * @throws KeyException Si no se soporta el tama&ntilde;o de clave (solo se soporta 1024, 2048 y 4096 bits). */
+    private byte[] firma(final int keySize) throws KeyException {
+    	final Integer p1Size = P1_SIZES.get(Integer.valueOf(keySize));
+    	if (p1Size == null) {
+    		throw new KeyException("No se soporta el tamano de clave: " + keySize); //$NON-NLS-1$
+    	}
+    	final byte[] dummy = new byte[p1Size.intValue()];
     	Arrays.fill(dummy, (byte) Integer.toString(this.counterIndex).toCharArray()[0]);
         return dummy;
     }
