@@ -13,14 +13,16 @@ package es.gob.afirma.signers.multi.cades;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.security.interfaces.RSAPrivateKey;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
@@ -92,8 +94,25 @@ public final class CAdESTriPhaseCounterSigner {
 		}
 	}
 
-	/** Tama&ntilde;o de una firma PKCS#1. */
-	public static final int PKCS1_DEFAULT_SIZE = 128;
+	/** Tama&ntilde;o de una firma PKCS#1 con clave RSA de 1024 bits. */
+	private static final Integer PKCS1_DEFAULT_SIZE_1024 = Integer.valueOf(128);
+
+	/** Tama&ntilde;o de una firma PKCS#1 con clave RSA de 2048 bits. */
+	private static final Integer PKCS1_DEFAULT_SIZE_2048 = Integer.valueOf(256);
+
+	/** Tama&ntilde;o de una firma PKCS#1 con clave RSA de 4096 bits. */
+	private static final Integer PKCS1_DEFAULT_SIZE_4096 = Integer.valueOf(512);
+
+	private static final Integer KEY_SIZE_1024 = Integer.valueOf(1024);
+	private static final Integer KEY_SIZE_2048 = Integer.valueOf(2048);
+	private static final Integer KEY_SIZE_4096 = Integer.valueOf(4096);
+
+	private static final Map<Integer, Integer> P1_SIZES = new HashMap<Integer, Integer>(3);
+	static {
+		P1_SIZES.put(KEY_SIZE_1024, PKCS1_DEFAULT_SIZE_1024);
+		P1_SIZES.put(KEY_SIZE_2048, PKCS1_DEFAULT_SIZE_2048);
+		P1_SIZES.put(KEY_SIZE_4096, PKCS1_DEFAULT_SIZE_4096);
+	}
 
     /** N&uacute;mero de contrafirma dentro de la firma actual. */
 	private int counterIndex = 0;
@@ -128,7 +147,7 @@ public final class CAdESTriPhaseCounterSigner {
     public CAdESPreCounterSignResult preCounterSign(final P7ContentSignerParameters parameters,
                                                     final byte[] sign,
                                                     final CounterSignTarget targetType,
-                                                    final PrivateKey key,
+                                                    final RSAPrivateKey key,
                                                     final java.security.cert.Certificate[] certChain,
                                                     final AdESPolicy policy,
                                                     final boolean signingCertificateV2,
@@ -255,7 +274,7 @@ public final class CAdESTriPhaseCounterSigner {
      * @throws AOException En caso de cualquier otro tipo de error */
     private ASN1EncodableVector counterTree(final ASN1Set signerInfosRaiz,
                                             final P7ContentSignerParameters parameters,
-                                            final PrivateKey key,
+                                            final RSAPrivateKey key,
                                             final java.security.cert.Certificate[] certChain,
                                             final String contentDescription,
                                             final AdESPolicy policy,
@@ -306,7 +325,7 @@ public final class CAdESTriPhaseCounterSigner {
      * @throws AOException En caso de cualquier otro tipo de error */
     private ASN1EncodableVector counterLeaf(final ASN1Set signerInfosRaiz,
                                             final P7ContentSignerParameters parameters,
-                                            final PrivateKey key,
+                                            final RSAPrivateKey key,
                                             final java.security.cert.Certificate[] certChain,
                                             final String contentDescription,
                                             final AdESPolicy policy,
@@ -355,7 +374,7 @@ public final class CAdESTriPhaseCounterSigner {
      * @throws AOException En caso de cualquier otro tipo de error */
     private SignerInfo getCounterSignerInfo(final SignerInfo signerInfo,
                                             final P7ContentSignerParameters parameters,
-                                            final PrivateKey key,
+                                            final RSAPrivateKey key,
                                             final java.security.cert.Certificate[] certChain,
                                             final String contentDescription,
                                             final AdESPolicy policy,
@@ -400,6 +419,7 @@ public final class CAdESTriPhaseCounterSigner {
             }
             // FIRMA DEL NODO ACTUAL
             counterSigner = generateSignerInfo(
+        		key.getModulus().bitLength(),
         		parameters.getSignatureAlgorithm(),
         		signerInfo,
         		certChain,
@@ -442,6 +462,7 @@ public final class CAdESTriPhaseCounterSigner {
                         // creamos el de la contrafirma.
                         signerInfosU2.add(
                     		generateSignerInfo(
+                    			key.getModulus().bitLength(),
                 				parameters.getSignatureAlgorithm(),
                 				signerInfo,
                 				certChain,
@@ -486,6 +507,7 @@ public final class CAdESTriPhaseCounterSigner {
         else {
             signerInfosU2.add(
         		generateSignerInfo(
+        			key.getModulus().bitLength(),
             		parameters.getSignatureAlgorithm(),
             		signerInfo,
             		certChain,
@@ -529,7 +551,7 @@ public final class CAdESTriPhaseCounterSigner {
      * @throws AOException En caso de cualquier otro tipo de error */
     private SignerInfo getLeafSignerInfo(final SignerInfo signerInfo,
                                          final P7ContentSignerParameters parameters,
-                                         final PrivateKey key,
+                                         final RSAPrivateKey key,
                                          final java.security.cert.Certificate[] certChain,
                                          final String contentDescription,
                                          final AdESPolicy policy,
@@ -604,6 +626,7 @@ public final class CAdESTriPhaseCounterSigner {
                         // creamos el de la contrafirma.
                         signerInfosU2.add(
                     		generateSignerInfo(
+                    			key.getModulus().bitLength(),
                 				parameters.getSignatureAlgorithm(),
                 				signerInfo,
                 				certChain,
@@ -648,6 +671,7 @@ public final class CAdESTriPhaseCounterSigner {
         else {
             signerInfosU2.add(
         		generateSignerInfo(
+        			key.getModulus().bitLength(),
             		parameters.getSignatureAlgorithm(),
             		signerInfo,
             		certChain,
@@ -675,6 +699,7 @@ public final class CAdESTriPhaseCounterSigner {
     /** Genera un signerInfo espec&iacute;fico utilizando los
      * datos necesarios para crearlo. Se utiliza siempre que no se sabe cual es
      * el signerInfo que se debe firmar.<br>
+     * @param keySize Tama&ntilde;o en bits de la clave privada RSA a usar para la firma.
      * @param signatureAlgorithm Algoritmo de firma.
      * @param si SignerInfo del que se debe recoger la informaci&oacute;n para
      *           realizar la contrafirma espec&iacute;fica.
@@ -689,7 +714,8 @@ public final class CAdESTriPhaseCounterSigner {
      * @throws NoSuchAlgorithmException Si no se soporta alguno de los algoritmos necesarios.
      * @throws java.io.IOException En caso de errores de entrada / salida
      * @throws CertificateException Cuando hay problemas con los certificados proporcionados. */
-    private SignerInfo generateSignerInfo(final String signatureAlgorithm,
+    private SignerInfo generateSignerInfo(final int keySize,
+    		                              final String signatureAlgorithm,
                                           final SignerInfo si,
                                           final java.security.cert.Certificate[] certChain,
                                           final String contentDescription,
@@ -722,8 +748,10 @@ public final class CAdESTriPhaseCounterSigner {
 
         // Anadimos los SignedAttributes a la lista en la posicion adecuada
         this.signedDatas.add(this.counterIndex, signedAttr.getEncoded(ASN1Encoding.DER));
+
         // Obtenemos el sustituto del PKCS#1, relleno con el numero de contrafirma
-        final ASN1OctetString sign2 = new DEROctetString(firma());
+        final ASN1OctetString sign2 = new DEROctetString(firma(keySize));
+
         // Incrementamos el indice de contrafirmas
     	this.counterIndex = this.counterIndex + 1;
 
@@ -754,8 +782,8 @@ public final class CAdESTriPhaseCounterSigner {
 
     /** Simula una firma PKCS#1.
      * @return Array de octetos relleno con el ASCII del n&uacute;mero de contrafirma y de longitud igual a un PKCS#1 equivalente */
-    private byte[] firma() {
-    	final byte[] dummy = new byte[PKCS1_DEFAULT_SIZE];
+    private byte[] firma(final int keySize) {
+    	final byte[] dummy = new byte[P1_SIZES.get(Integer.valueOf(keySize)).intValue()];
     	Arrays.fill(dummy, (byte) Integer.toString(this.counterIndex).toCharArray()[0]);
         return dummy;
     }

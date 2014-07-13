@@ -81,7 +81,7 @@ public final class CAdESUtils {
      * @throws CertificateEncodingException Si el certificado proporcionado no es v&aacute;lido
      * @throws NoSuchAlgorithmException Si no se soporta el algoritmo de huella indicado
      * @throws IOException Si hay errores en el tratamiento de datos */
-    private static Attribute getSigningVertificateV2(final X509Certificate cert,
+    private static Attribute getSigningCertificateV2(final X509Certificate cert,
     		                                         final String digestAlgorithmName,
     		                                         final AdESPolicy policy) throws CertificateEncodingException,
     		                                                                  NoSuchAlgorithmException,
@@ -122,7 +122,7 @@ public final class CAdESUtils {
          *  } */
 
         final SigningCertificateV2 scv2;
-        if(policy.getPolicyIdentifier() != null) {
+        if (policy != null && policy.getPolicyIdentifier() != null) {
 
             /** SigningCertificateV2 ::= SEQUENCE { certs SEQUENCE OF
              * ESSCertIDv2, policies SEQUENCE OF PolicyInformation OPTIONAL
@@ -189,7 +189,7 @@ public final class CAdESUtils {
          * PolicyQualifierId, qualifier ANY DEFINED BY policyQualifierId } */
 
         final SigningCertificate scv;
-        if (policy.getPolicyIdentifier() != null) {
+        if (policy != null && policy.getPolicyIdentifier() != null) {
 
             /** SigningCertificateV2 ::= SEQUENCE {
              *    certs SEQUENCE OF ESSCertIDv2,
@@ -374,7 +374,7 @@ public final class CAdESUtils {
 
         if (signingCertificateV2) {
             contexExpecific.add(
-        		getSigningVertificateV2(cert, digestAlgorithmName, policy)
+        		getSigningCertificateV2(cert, digestAlgorithmName, policy)
     		);
         }
         else {
@@ -385,7 +385,7 @@ public final class CAdESUtils {
 
         // SIGPOLICYID ATTRIBUTE
 
-        if (policy.getPolicyIdentifier() != null) {
+        if (policy != null && policy.getPolicyIdentifier() != null) {
             contexExpecific.add(
         		getSigPolicyId(digestAlgorithmName, policy)
     		);
