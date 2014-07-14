@@ -304,7 +304,7 @@ public final class Base64 {
      * @return Datos codificados como texto Base64
      * @throws java.io.IOException si se produce cualquier error */
     public static String encode(final byte[] source, final boolean urlSafe) throws java.io.IOException {
-        return encodeBytes( source, 0, source.length, URL_SAFE);
+        return encodeBytes( source, 0, source.length, urlSafe ? URL_SAFE : NO_OPTIONS);
     }
 
     /**
@@ -643,7 +643,7 @@ public final class Base64 {
         catch(final java.io.UnsupportedEncodingException uee ) {
             bytes = str.getBytes();
         }
-        return decode( bytes, 0, bytes.length, URL_SAFE);
+        return decode( bytes, 0, bytes.length, urlSafe ? URL_SAFE : NO_OPTIONS);
     }
 
 
