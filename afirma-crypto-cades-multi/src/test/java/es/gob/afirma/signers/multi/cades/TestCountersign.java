@@ -18,18 +18,13 @@ import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.signers.cades.AOCAdESSigner;
 
-/**
- * Prueba de cofirmas CAdES.
- * @author Carlos Gamuci
- */
+/** Prueba de contrafirmas CAdES.
+ * @author Carlos Gamuci */
 public class TestCountersign {
 
 	private static final String PKCS12_KEYSTORE = "ANF_PF_Activo.pfx"; //$NON-NLS-1$
-
 	private static final String PASSWORD = "12341234"; //$NON-NLS-1$
-
 	private static final String IMPLICIT_SHA1_COUNTERSIGN_FILE = "contrafirma_implicita.csig"; //$NON-NLS-1$
-
 	private static final String EXPLICIT_SHA1_COUNTERSIGN_FILE = "contrafirma_explicita.csig"; //$NON-NLS-1$
 
 	private static InputStream ksIs;

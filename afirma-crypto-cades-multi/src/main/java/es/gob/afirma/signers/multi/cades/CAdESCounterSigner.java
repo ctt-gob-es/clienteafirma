@@ -49,6 +49,7 @@ import org.bouncycastle.asn1.x509.TBSCertificateStructure;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.signers.AOPkcs1Signer;
 import es.gob.afirma.core.signers.AOSignConstants;
+import es.gob.afirma.core.signers.AOSimpleSigner;
 import es.gob.afirma.core.signers.AdESPolicy;
 import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.signers.cades.CAdESSignerMetadata;
@@ -65,8 +66,8 @@ import es.gob.afirma.signers.pkcs7.SigUtils;
  * peculiaridad de que es una Contrafirma. */
 final class CAdESCounterSigner {
 
-    /* Propiedades de la clase */
     private int actualIndex = 0;
+    private AOSimpleSigner ss = new AOPkcs1Signer();
 
     /** Crea una contrafirma a partir de los datos
      * del firmante, el archivo que se firma y del archivo que contiene las
@@ -828,7 +829,7 @@ final class CAdESCounterSigner {
      * @throws NoSuchAlgorithmException Si no se soporta alguno de los algoritmos necesarios.
      * @throws java.io.IOException Cuando hay errores de entrada / salida
      * @throws CertificateException  Cuando hay problemas con los certificados proporcionados. */
-    private static SignerInfo getNodeSignerInfo(final SignerInfo signerInfo,
+    private SignerInfo getNodeSignerInfo(final SignerInfo signerInfo,
                                                 final P7ContentSignerParameters parameters,
                                                 final PrivateKey key,
                                                 final java.security.cert.Certificate[] certChain,
@@ -1147,7 +1148,7 @@ final class CAdESCounterSigner {
      * @throws NoSuchAlgorithmException Si no se soporta alguno de los algoritmos necesarios.
      * @throws java.io.IOException Cuando hay errores de entrada / salida
      * @throws CertificateException Cuando hay problemas con los certificados proporcionados. */
-    private static SignerInfo generateSignerInfo(final String signatureAlgorithm,
+    private SignerInfo generateSignerInfo(final String signatureAlgorithm,
                                                  final SignerInfo si,
                                                  final PrivateKey key,
                                                  final java.security.cert.Certificate[] certChain,
@@ -1216,6 +1217,13 @@ final class CAdESCounterSigner {
 
     }
 
+    void setpkcs1Signer(final AOSimpleSigner p1Signer) {
+    	if (p1Signer == null) {
+    		throw new IllegalArgumentException("El firmador PKCS#1 no puede ser nulo"); //$NON-NLS-1$
+    	}
+    	this.ss = p1Signer;
+    }
+
     /** Realiza la firma usando los atributos del firmante.
      * @param data Datos a firmar.
      * @param signatureAlgorithm Algoritmo para la firma
@@ -1223,10 +1231,17 @@ final class CAdESCounterSigner {
      * @param certChain Cadena de certificados del firmante.
      * @return Firma de los atributos.
      * @throws AOException En caso de cualquier otro tipo de error */
-    private static byte[] pkcs1Sign(final byte[] data,
+    private byte[] pkcs1Sign(final byte[] data,
     		                        final String signatureAlgorithm,
     		                        final PrivateKey key,
     		                        final java.security.cert.Certificate[] certChain) throws AOException {
-    	return new AOPkcs1Signer().sign(data, signatureAlgorithm, key, certChain, null);
+    	try {
+			return this.ss.sign(data, signatureAlgorithm, key, certChain, null);
+		}
+    	catch (final IOException e) {
+			throw new AOException(
+				"Error en la firma PKCS#1 de la contrafirma CAdES: " + e, e //$NON-NLS-1$
+			);
+		}
     }
 }

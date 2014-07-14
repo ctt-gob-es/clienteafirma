@@ -19,6 +19,7 @@ import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.MimeHelper;
 import es.gob.afirma.core.signers.AOCounterSigner;
 import es.gob.afirma.core.signers.AOSignConstants;
+import es.gob.afirma.core.signers.AOSimpleSigner;
 import es.gob.afirma.core.signers.AdESPolicy;
 import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.signers.cades.AOCAdESSigner;
@@ -28,8 +29,24 @@ import es.gob.afirma.signers.cades.CommitmentTypeIndicationsHelper;
 import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
 import es.gob.afirma.signers.pkcs7.ReadNodesTree;
 
-/** Operaciones de cofirma CAdES. */
+/** Contrafirmador CAdES. */
 public class AOCAdESCounterSigner implements AOCounterSigner {
+
+	private final AOSimpleSigner ss;
+
+	/** Crea un contrafirmador CAdES con el firmador PKCS#1 por defecto. */
+	public AOCAdESCounterSigner() {
+		this.ss = null;
+	}
+
+	/** Crea un contrafirmador CAdES con un firmador PKCS#1 espec&iacute;fico.
+	 * @param sSigner Firmador PKCS#1 a usar. */
+	public AOCAdESCounterSigner(final AOSimpleSigner sSigner) {
+		if (sSigner == null) {
+			throw new IllegalArgumentException("El firmador PKCS#1 no puede ser mulo"); //$NON-NLS-1$
+		}
+		this.ss = sSigner;
+	}
 
 	/** {@inheritDoc} */
 	@Override
@@ -71,6 +88,14 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
 			contentDescription = mimeHelper.getDescription();
         }
 
+        // Creamos el contrafirmador
+        final CAdESCounterSigner cadesCountersigner = new CAdESCounterSigner();
+
+        // Le asignamos el firmador PKCS#1 a medida si procede
+        if (this.ss != null) {
+        	cadesCountersigner.setpkcs1Signer(this.ss);
+        }
+
         // Datos firmados.
         byte[] dataSigned = null;
         // Si la firma que nos introducen es SignedData
@@ -82,7 +107,7 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
                         0
                     };
 
-                    dataSigned = new CAdESCounterSigner().counterSigner(
+                    dataSigned = cadesCountersigner.counterSigner(
                     	   csp,
 	                       sign,
 	                       CounterSignTarget.TREE,
@@ -102,7 +127,7 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
                         0
                     };
                     dataSigned =
-                            new CAdESCounterSigner().counterSigner(
+                    		cadesCountersigner.counterSigner(
                         		csp,
                                 sign,
                                 CounterSignTarget.LEAFS,
@@ -124,7 +149,7 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
                     }
 					nodesID = ReadNodesTree.simplyArray(nodesID);
                     dataSigned =
-                            new CAdESCounterSigner().counterSigner(
+                    		cadesCountersigner.counterSigner(
                         		csp,
                                 sign,
                                 CounterSignTarget.NODES,
@@ -149,7 +174,7 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
                     }
                     final int[] nodes2 = new ReadNodesTree().readNodesFromSigners(signers, sign);
                     dataSigned =
-                            new CAdESCounterSigner().counterSigner(
+                    		cadesCountersigner.counterSigner(
                         		csp,
                                 sign,
                                 CounterSignTarget.SIGNERS,
@@ -264,7 +289,7 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
 
         }
         catch (final Exception e) {
-            throw new AOException("Error generando la Contrafirma CAdES", e); //$NON-NLS-1$
+            throw new AOException("Error generando la Contrafirma CAdES: " + e, e); //$NON-NLS-1$
         }
     }
 
