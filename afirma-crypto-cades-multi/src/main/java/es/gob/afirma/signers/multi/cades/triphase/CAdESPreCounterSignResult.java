@@ -16,8 +16,14 @@ final class CAdESPreCounterSignResult {
 
 	private byte[] preCountersign = null;
 
-	/** Par de subarray aleatorio que hay que sustituir dentro de la plantilla de firma por el resultado real de la
-	 *  firma PKCS#1 y datos a firmar con PKCS#1. */
+	/** Mapa que contiene:
+	 * <ul>
+	 *  <li>Datos a firmar con PKCS#1 (como clave del mapa).</li>
+	 *  <li>
+	 *   Subarray aleatorio que hay que sustituir dentro de la plantilla de firma por
+	 *   el resultado real de la firma PKCS#1.
+	 *  </li>
+	 * </ul> */
 	private final Map<byte[], byte[]> tbs = new LinkedHashMap<byte[], byte[]>();
 
 	/** A&ntilde;ade una firma a realizar en cliente.
@@ -29,7 +35,7 @@ final class CAdESPreCounterSignResult {
 				"Danto datos a firmar como datos aleatorios a sustituir deben ser nulos" //$NON-NLS-1$
 			);
 		}
-		this.tbs.put(randomDummyData, data);
+		this.tbs.put(data, randomDummyData);
 	}
 
 	/** A&ntilde;ade la plantilla de firma sobre la que insertar las firmas PKCS#11 sustitutendo los datos aleatorios.

@@ -19,6 +19,8 @@ import es.gob.afirma.core.signers.AOSimpleSigner;
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 final class CAdESFakePkcs1Signer implements AOSimpleSigner {
 
+	private static final Random RANDOM = new Random();
+
 	/** Tama&ntilde;o de una firma PKCS#1 con clave RSA de 1024 bits. */
 	private static final Integer PKCS1_DEFAULT_SIZE_1024 = Integer.valueOf(128);
 
@@ -71,7 +73,7 @@ final class CAdESFakePkcs1Signer implements AOSimpleSigner {
 
 		// Creamos el PKCS#1 falso
 		final byte[] randomDummyData = new byte[p1Size.intValue()];
-		new Random().nextBytes(randomDummyData);
+		RANDOM.nextBytes(randomDummyData);
 
 		// Guardamos el par de PKCS#1 falso y datos a firmar
 		this.preResult.addSign(data, randomDummyData);
