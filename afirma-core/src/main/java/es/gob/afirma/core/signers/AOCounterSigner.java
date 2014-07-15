@@ -32,23 +32,16 @@ public interface AOCounterSigner {
      * Los algoritmos disponibles para la contrafirma se
      * declaran en {@link es.gob.afirma.core.signers.AOSignConstants}, mientras que los tipos de objetivo
      * se declaran en {@link es.gob.afirma.core.signers.CounterSignTarget}.
-     * @param sign
-     *        Flujo de lectura de los datos a firmar
-     * @param algorithm
-     *        Algoritmo a usar para la firma (SHA1withRSA, SHA512withRSA,...)
-     * @param targetType
-     *        Tipo de objetivo de la contrafirma
-     * @param targets
-     *        Informaci&oacute;n complementaria seg&uacute;n el tipo de
-     *        objetivo de la contrafirma
-     * @param key Clave privada a usar para firmar
-     * @param certChain Cadena de certificados del firmante
-     * @param extraParams
-     *        Par&aacute;metros adicionales para la contrafirma
+     * @param sign Flujo de lectura de los datos a firmar.
+     * @param algorithm Algoritmo a usar para la firma (SHA1withRSA, SHA512withRSA, etc.).
+     * @param targetType Tipo de objetivo de la contrafirma.
+     * @param targets Informaci&oacute;n complementaria seg&uacute;n el tipo de objetivo de la contrafirma.
+     * @param key Clave privada a usar para firmar.
+     * @param certChain Cadena de certificados del firmante.
+     * @param extraParams Par&aacute;metros adicionales para la contrafirma.
      * @return Contenido firmado
-     * @throws AOException
-     *         Cuando ocurre cualquier problema durante el proceso
-     * @throws IOException Si ocurren problemas relacionados con la lectura de la firma */
+     * @throws AOException Cuando ocurre cualquier problema durante el proceso.
+     * @throws IOException Si ocurren problemas relacionados con la lectura de la firma. */
     byte[] countersign(byte[] sign,
                               String algorithm,
                               CounterSignTarget targetType,

@@ -50,7 +50,7 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
 
 	/** {@inheritDoc} */
 	@Override
-	public byte[] countersign(final byte[] sign,
+	public final byte[] countersign(final byte[] sign,
                               final String algorithm,
                               final CounterSignTarget targetType,
                               final Object[] targets,

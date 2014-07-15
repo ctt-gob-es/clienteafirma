@@ -17,7 +17,7 @@ import es.gob.afirma.core.signers.AOSimpleSigner;
  * guarda estos m&aacute;s los datos que deben ser firmados para en el cliente pueda realizarse
  * la firma y la sustituci&oacute;n de los datos aleatorios por la firma real.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
-public final class CAdESFakePkcs1Signer implements AOSimpleSigner {
+final class CAdESFakePkcs1Signer implements AOSimpleSigner {
 
 	/** Tama&ntilde;o de una firma PKCS#1 con clave RSA de 1024 bits. */
 	private static final Integer PKCS1_DEFAULT_SIZE_1024 = Integer.valueOf(128);
@@ -44,7 +44,7 @@ public final class CAdESFakePkcs1Signer implements AOSimpleSigner {
 	/** Construye el sustituto del firmador PKCS#1 para firmas trif&aacute;sicas.
 	 * @param preCountersignResult Resultado donde ir almacenando los pares de datos a firmar
 	 *                             y datos aleatorios a sustituir. */
-	public CAdESFakePkcs1Signer(final CAdESPreCounterSignResult preCountersignResult) {
+	CAdESFakePkcs1Signer(final CAdESPreCounterSignResult preCountersignResult) {
 		if (preCountersignResult == null) {
 			throw new IllegalArgumentException(
 				"Es necesario un resultado de PreContrafirma para ir almacenando las firmas" //$NON-NLS-1$

@@ -29,7 +29,7 @@ import es.gob.afirma.signers.cades.CommitmentTypeIndicationsHelper;
 import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
 
 /** Operaciones de cofirma CAdES. */
-public class AOCAdESCoSigner implements AOCoSigner {
+public final class AOCAdESCoSigner implements AOCoSigner {
 
 	/** {@inheritDoc} */
 
