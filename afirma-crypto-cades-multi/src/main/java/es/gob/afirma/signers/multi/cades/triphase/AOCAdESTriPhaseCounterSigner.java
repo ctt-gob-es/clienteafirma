@@ -21,6 +21,10 @@ import es.gob.afirma.signers.multi.cades.AOCAdESCounterSigner;
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public final class AOCAdESTriPhaseCounterSigner {
 
+	private AOCAdESTriPhaseCounterSigner() {
+		// No permitimos instanciar
+	}
+
 	/** Realiza la pre-contrafirma trif&aacute;sica.
      * @param sign Flujo de lectura de los datos a firmar.
      * @param algorithm Algoritmo a usar para la firma (SHA1withRSA, SHA512withRSA, etc.).
