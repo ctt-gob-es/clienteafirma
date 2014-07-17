@@ -75,7 +75,7 @@ public class AOKeyStoreManager implements KeyStoreManager {
     	return this.ks == null;
     }
 
-    protected void setKeyStoreType(final AOKeyStore type) {
+    protected final void setKeyStoreType(final AOKeyStore type) {
     	this.ksType = type;
     }
 
