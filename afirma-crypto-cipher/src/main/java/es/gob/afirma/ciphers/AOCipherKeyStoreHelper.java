@@ -22,8 +22,9 @@ import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
+import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.Vector;
+import java.util.List;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.AOException;
@@ -108,7 +109,7 @@ public final class AOCipherKeyStoreHelper {
             LOGGER.severe("Error obteniendo los alias del almacen, se devolvera una lista vacia: " + e); //$NON-NLS-1$
             return new String[0];
         }
-        final Vector<String> tmpRet = new Vector<String>();
+        final List<String> tmpRet = new ArrayList<String>();
         while (aliases.hasMoreElements()) {
             tmpRet.add(aliases.nextElement().toString());
         }

@@ -11,7 +11,8 @@
 package es.gob.afirma.signers.ooxml;
 
 import java.io.InputStream;
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 
@@ -77,7 +78,7 @@ final class RelationshipsParser {
         }
 
         final NodeList relationsList = root.getChildNodes();
-        final Vector<Relationship> relationsVector = new Vector<Relationship>();
+        final List<Relationship> relationsVector = new ArrayList<Relationship>();
         for (int i = 0; i < relationsList.getLength(); i++) {
             relationsVector.add(RelationshipsParser.getRelationship(relationsList.item(i)));
         }
