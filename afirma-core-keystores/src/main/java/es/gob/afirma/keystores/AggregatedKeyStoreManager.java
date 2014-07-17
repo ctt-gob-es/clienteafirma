@@ -15,7 +15,7 @@ import javax.security.auth.callback.PasswordCallback;
 /** Gestor de claves consistente a su vez en un agregado de varios gestores, que se tratan y manejan como
  * si fuese un gestor normal de un &uacute;nico almac&eacute;n.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
-public class AggregatedKeyStoreManager extends AOKeyStoreManager {
+public final class AggregatedKeyStoreManager extends AOKeyStoreManager {
 
 	private final List<AOKeyStoreManager> ksms = new ArrayList<AOKeyStoreManager>();
 
