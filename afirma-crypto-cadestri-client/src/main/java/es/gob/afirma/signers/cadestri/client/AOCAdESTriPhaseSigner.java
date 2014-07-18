@@ -155,13 +155,13 @@ public final class AOCAdESTriPhaseSigner implements AOSigner {
 	/** {@inheritDoc} */
 	@Override
 	public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo) throws AOInvalidFormatException {
-		throw new UnsupportedOperationException("No se soporta en firma trifasica"); //$NON-NLS-1$
+		throw new UnsupportedOperationException("No se soporta la obtencion de estructura de firmas en firma trifasica"); //$NON-NLS-1$
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public boolean isSign(final byte[] sign) {
-		throw new UnsupportedOperationException("No se soporta en firma trifasica"); //$NON-NLS-1$
+		throw new UnsupportedOperationException("No se soporta comprobacion de si es firma en modo trifasico"); //$NON-NLS-1$
 	}
 
 	/** {@inheritDoc} */
@@ -183,13 +183,13 @@ public final class AOCAdESTriPhaseSigner implements AOSigner {
 	/** {@inheritDoc} */
 	@Override
 	public byte[] getData(final byte[] signData) throws AOException, IOException {
-		throw new UnsupportedOperationException("No se soporta en firma trifasica"); //$NON-NLS-1$
+		throw new UnsupportedOperationException("No se soporta ela obtencion de datos n firma trifasica"); //$NON-NLS-1$
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public AOSignInfo getSignInfo(final byte[] sign) throws AOException {
-		throw new UnsupportedOperationException("No se soporta en firma trifasica"); //$NON-NLS-1$
+		throw new UnsupportedOperationException("No se soporta la obtencion de informacion de la firma en modo trifasico"); //$NON-NLS-1$
 	}
 
 	/**
