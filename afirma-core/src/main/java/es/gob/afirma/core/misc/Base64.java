@@ -282,8 +282,7 @@ public final class Base64 {
 
     /** Codifica un binario en Base64.
      * @param source Datos a convertir a Base64
-     * @return Datos codificados como texto Base64
-     * @throws java.io.IOException si se produce cualquier error */
+     * @return Datos codificados como texto Base64 */
     public static String encode(final byte[] source) {
         String encoded = null;
         try {
