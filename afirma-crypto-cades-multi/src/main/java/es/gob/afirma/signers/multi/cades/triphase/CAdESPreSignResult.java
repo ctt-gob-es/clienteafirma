@@ -80,4 +80,8 @@ final class CAdESPreSignResult {
 		return sb.toString();
 	}
 
+	byte[] getRandomDummyData(final byte[] data) {
+		return this.tbs.get(data);
+	}
+
 }

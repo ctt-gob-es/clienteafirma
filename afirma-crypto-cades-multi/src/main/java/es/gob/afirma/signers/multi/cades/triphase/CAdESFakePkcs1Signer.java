@@ -71,12 +71,19 @@ final class CAdESFakePkcs1Signer implements AOSimpleSigner {
 			throw new AOException("Tamano de clave no soportado: " + keySize); //$NON-NLS-1$
 		}
 
-		// Creamos el PKCS#1 falso
-		final byte[] randomDummyData = new byte[p1Size.intValue()];
-		RANDOM.nextBytes(randomDummyData);
+		// Miramos si ya existe una entrada para exactamente los mismos datos a firmar con PKCS#1,
+		// ya que si ya esta no es necesario crear un aleatorio nuevo, y hay que reutilizar el
+		// existente.
+		byte[] randomDummyData = this.preResult.getRandomDummyData(data);
+		if (randomDummyData == null) {
 
-		// Guardamos el par de PKCS#1 falso y datos a firmar
-		this.preResult.addSign(data, randomDummyData);
+			// Creamos el PKCS#1 falso
+			randomDummyData = new byte[p1Size.intValue()];
+			RANDOM.nextBytes(randomDummyData);
+
+			// Guardamos el par de PKCS#1 falso y datos a firmar
+			this.preResult.addSign(data, randomDummyData);
+		}
 
 		return randomDummyData;
 	}
