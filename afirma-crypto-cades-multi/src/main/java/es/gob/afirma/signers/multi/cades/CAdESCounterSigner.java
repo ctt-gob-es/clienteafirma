@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.logging.Logger;
 
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
@@ -68,6 +69,7 @@ final class CAdESCounterSigner {
 
     private int actualIndex = 0;
     private AOSimpleSigner ss = new AOPkcs1Signer();
+    private Date date = null;
 
     /** Crea una contrafirma a partir de los datos
      * del firmante, el archivo que se firma y del archivo que contiene las
@@ -1170,7 +1172,7 @@ final class CAdESCounterSigner {
              policy,
              signingCertificateV2,
              null,
-             new Date(),
+             this.date != null ? this.date : new Date(), // Usamos fecha y hora actual nueva si no se nos ha indicado otra distinta
              false,
              null, // En contrafirma el ContentType no se pone
              contentDescription,
@@ -1217,11 +1219,15 @@ final class CAdESCounterSigner {
 
     }
 
-    void setpkcs1Signer(final AOSimpleSigner p1Signer) {
+    void setpkcs1Signer(final AOSimpleSigner p1Signer, final Date d) {
     	if (p1Signer == null) {
     		throw new IllegalArgumentException("El firmador PKCS#1 no puede ser nulo"); //$NON-NLS-1$
     	}
+    	if (d == null) {
+    		Logger.getLogger("es.gob.afirma").warning("Se ha establecido una fecha nula, se usara la actual"); //$NON-NLS-1$ //$NON-NLS-2$
+    	}
     	this.ss = p1Signer;
+    	this.date = d;
     }
 
     /** Realiza la firma usando los atributos del firmante.

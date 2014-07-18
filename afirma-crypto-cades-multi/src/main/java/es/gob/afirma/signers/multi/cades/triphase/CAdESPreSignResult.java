@@ -1,5 +1,6 @@
 package es.gob.afirma.signers.multi.cades.triphase;
 
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
@@ -12,9 +13,9 @@ import es.gob.afirma.core.misc.Base64;
  * dentro de la plantilla de firma por el resultado real de la firma PKCS#1 de estos datos, m&aacute;s la propia plantilla
  * de firma.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
-final class CAdESPreCounterSignResult {
+final class CAdESPreSignResult {
 
-	private byte[] preCountersign = null;
+	private Date preSignDate = null;
 
 	/** Mapa que contiene:
 	 * <ul>
@@ -38,13 +39,13 @@ final class CAdESPreCounterSignResult {
 		this.tbs.put(data, randomDummyData);
 	}
 
-	/** A&ntilde;ade la plantilla de firma sobre la que insertar las firmas PKCS#11 sustitutendo los datos aleatorios.
-	 * @param pcs Plantilla de firma. */
-	void addSignTemplate(final byte[] pcs) {
+	/** A&ntilde;ade la fecha de firma.
+	 * @param pcs Fecha de firma. */
+	void addSignDate(final Date pcs) {
 		if (pcs == null) {
-			throw new IllegalArgumentException("La platilla de firma no puede ser nula"); //$NON-NLS-1$
+			throw new IllegalArgumentException("La fecha de firma no puede ser nula"); //$NON-NLS-1$
 		}
-		this.preCountersign = pcs.clone();
+		this.preSignDate = pcs;
 	}
 
 	@Override
@@ -53,7 +54,7 @@ final class CAdESPreCounterSignResult {
 		sb.append("<xml>\n"); //$NON-NLS-1$
 		sb.append(" <cs>\n"); //$NON-NLS-1$
 		sb.append("  "); //$NON-NLS-1$
-		sb.append(Base64.encode(this.preCountersign));
+		sb.append(this.preSignDate.getTime());
 		sb.append('\n');
 		sb.append(" </cs>\n"); //$NON-NLS-1$
 		sb.append(" <css>\n"); //$NON-NLS-1$

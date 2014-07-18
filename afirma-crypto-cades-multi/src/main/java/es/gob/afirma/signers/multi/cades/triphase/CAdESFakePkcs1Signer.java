@@ -41,12 +41,12 @@ final class CAdESFakePkcs1Signer implements AOSimpleSigner {
 		P1_SIZES.put(KEY_SIZE_4096, PKCS1_DEFAULT_SIZE_4096);
 	}
 
-	private final CAdESPreCounterSignResult preResult;
+	private final CAdESPreSignResult preResult;
 
 	/** Construye el sustituto del firmador PKCS#1 para firmas trif&aacute;sicas.
 	 * @param preCountersignResult Resultado donde ir almacenando los pares de datos a firmar
 	 *                             y datos aleatorios a sustituir. */
-	CAdESFakePkcs1Signer(final CAdESPreCounterSignResult preCountersignResult) {
+	CAdESFakePkcs1Signer(final CAdESPreSignResult preCountersignResult) {
 		if (preCountersignResult == null) {
 			throw new IllegalArgumentException(
 				"Es necesario un resultado de PreContrafirma para ir almacenando las firmas" //$NON-NLS-1$

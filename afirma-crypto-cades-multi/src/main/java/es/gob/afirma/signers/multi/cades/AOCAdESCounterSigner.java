@@ -13,7 +13,9 @@ package es.gob.afirma.signers.multi.cades;
 import java.io.IOException;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
+import java.util.Date;
 import java.util.Properties;
+import java.util.logging.Logger;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.MimeHelper;
@@ -33,19 +35,26 @@ import es.gob.afirma.signers.pkcs7.ReadNodesTree;
 public class AOCAdESCounterSigner implements AOCounterSigner {
 
 	private final AOSimpleSigner ss;
+	private final Date date;
 
 	/** Crea un contrafirmador CAdES con el firmador PKCS#1 por defecto. */
 	public AOCAdESCounterSigner() {
 		this.ss = null;
+		this.date = null;
 	}
 
-	/** Crea un contrafirmador CAdES con un firmador PKCS#1 espec&iacute;fico.
-	 * @param sSigner Firmador PKCS#1 a usar. */
-	public AOCAdESCounterSigner(final AOSimpleSigner sSigner) {
+	/** Crea un contrafirmador CAdES con un firmador PKCS#1 espec&iacute;fico y una fecha/hora est&aacute;tica.
+	 * @param sSigner Firmador PKCS#1 a usar.
+	 * @param d Fecha y hora prefijada (se usa esta como atributo CAdES en vez de la del momento exacto de la firma). */
+	public AOCAdESCounterSigner(final AOSimpleSigner sSigner, final Date d) {
 		if (sSigner == null) {
-			throw new IllegalArgumentException("El firmador PKCS#1 no puede ser mulo"); //$NON-NLS-1$
+			throw new IllegalArgumentException("El firmador PKCS#1 no puede ser nulo"); //$NON-NLS-1$
 		}
+    	if (d == null) {
+    		Logger.getLogger("es.gob.afirma").warning("Se ha establecido una fecha nula, se usara la actual"); //$NON-NLS-1$ //$NON-NLS-2$
+    	}
 		this.ss = sSigner;
+		this.date = d;
 	}
 
 	/** {@inheritDoc} */
@@ -91,9 +100,9 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
         // Creamos el contrafirmador
         final CAdESCounterSigner cadesCountersigner = new CAdESCounterSigner();
 
-        // Le asignamos el firmador PKCS#1 a medida si procede
+        // Le asignamos el firmador PKCS#1 a medida y la fecha prefijada si procede
         if (this.ss != null) {
-        	cadesCountersigner.setpkcs1Signer(this.ss);
+        	cadesCountersigner.setpkcs1Signer(this.ss, this.date);
         }
 
         // Datos firmados.

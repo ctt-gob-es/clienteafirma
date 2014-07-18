@@ -11,6 +11,7 @@
 package es.gob.afirma.signers.multi.cades.triphase;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.Properties;
 
 import es.gob.afirma.core.AOException;
@@ -43,17 +44,19 @@ public final class AOCAdESTriPhaseCounterSigner {
                                         final Properties xParams) throws AOException,
                                                                          IOException {
 
-		final CAdESPreCounterSignResult cpcs = new CAdESPreCounterSignResult();
-		final AOCAdESCounterSigner countersigner = new AOCAdESCounterSigner(new CAdESFakePkcs1Signer(cpcs));
-		cpcs.addSignTemplate(countersigner.countersign(
+		final Date date = new Date();
+		final CAdESPreSignResult cpcs = new CAdESPreSignResult();
+		final AOCAdESCounterSigner countersigner = new AOCAdESCounterSigner(new CAdESFakePkcs1Signer(cpcs), date);
+		countersigner.countersign(
 			sign,
 			algorithm,
 			targetType,
 			targets,
 			null,
 			cChain,
-			xParams)
+			xParams
 		);
+		cpcs.addSignDate(date);
 
 		return cpcs.toString();
     }
