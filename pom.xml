@@ -23,7 +23,6 @@
 		<module>afirma-crypto-cipher</module>
 		<module>afirma-crypto-core-pkcs7</module>
 		<module>afirma-crypto-cades</module>
-		<module>afirma-crypto-cades-enveloper</module>
 		<module>afirma-crypto-cades-multi</module>
 		<module>afirma-crypto-cms</module>
 		<module>afirma-crypto-cms-enveloper</module>
