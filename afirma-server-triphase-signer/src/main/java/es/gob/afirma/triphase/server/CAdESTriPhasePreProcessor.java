@@ -7,6 +7,7 @@ import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
 
@@ -16,30 +17,32 @@ import es.gob.afirma.core.misc.MimeHelper;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AdESPolicy;
 import es.gob.afirma.core.signers.CounterSignTarget;
-import es.gob.afirma.signers.cades.AOCAdESSigner;
 import es.gob.afirma.signers.cades.CAdESSignerMetadataHelper;
 import es.gob.afirma.signers.cades.CAdESTriPhaseSigner;
 import es.gob.afirma.signers.cades.CommitmentTypeIndicationsHelper;
+import es.gob.afirma.signers.multi.cades.AOCAdESCounterSigner;
 import es.gob.afirma.signers.multi.cades.CAdESTriPhaseCoSigner;
-import es.gob.afirma.signers.multi.cades.CAdESTriPhaseCounterSigner;
-import es.gob.afirma.signers.multi.cades.CAdESTriPhaseCounterSigner.CAdESPreCounterSignResult;
+import es.gob.afirma.signers.multi.cades.triphase.AOCAdESTriPhaseCounterSigner;
+import es.gob.afirma.signers.multi.cades.triphase.CAdESFakePkcs1Signer;
+import es.gob.afirma.signers.multi.cades.triphase.CAdESPreSignResult;
+import es.gob.afirma.signers.multi.cades.triphase.PreSignData;
+import es.gob.afirma.signers.multi.cades.triphase.PreSignData.SinglePreSignData;
 import es.gob.afirma.signers.pkcs7.ObtainContentSignedData;
-import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
 
 final class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 
 	/** Clave de la propiedad de firma. */
 	private static final String PROPERTY_NAME_SIGN = "SIGN"; //$NON-NLS-1$
-	
+
 	/** Nombre de la propiedad que contiene el n&uacute;mero de firmas proporcionadas. */
 	private static final String PROPERTY_NAME_SIGN_COUNT = "SIGN_COUNT"; //$NON-NLS-1$
 
 	/** Indica si la postfirma requiere la prefirma. */
 	private static final String PROPERTY_NAME_NEED_DATA = "NEED_DATA"; //$NON-NLS-1$
-	
+
 	/** Indica si la postfirma requiere la prefirma. */
 	private static final String PROPERTY_NAME_NEED_PRE = "NEED_PRE"; //$NON-NLS-1$
-	
+
 	/** Prefijo para cada prefirma. */
 	private static final String PROPERTY_NAME_PRESIGN_PREFIX = "PRE."; //$NON-NLS-1$
 
@@ -60,7 +63,7 @@ final class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 			final Properties extraParams) throws IOException, AOException {
 
 		LOGGER.info("Prefirma CAdES - Firma - INICIO"); //$NON-NLS-1$
-		
+
 		if (data == null) {
 			throw new IllegalArgumentException("Los datos no pueden ser nulos"); //$NON-NLS-1$
 		}
@@ -90,9 +93,9 @@ final class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 			contentDescription = mimeHelper.getDescription();
 		}
 		catch(final Exception e) {
-			LOGGER.warning("No se ha podido determinar el tipo de los datos: " + e); //$NON-NLS-1$ 
+			LOGGER.warning("No se ha podido determinar el tipo de los datos: " + e); //$NON-NLS-1$
 		}
-		
+
 		final byte[] messageDigest;
 		final String digestAlgorithm;
 		final String precalculatedHashAlgorithm = extraParams.getProperty("precalculatedHashAlgorithm"); //$NON-NLS-1$
@@ -137,7 +140,7 @@ final class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 		}
 
 		LOGGER.info("Prefirma CAdES - Firma - FIN"); //$NON-NLS-1$
-		
+
 		return urlParamBuilder.toString().getBytes();
 	}
 
@@ -149,9 +152,9 @@ final class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 			final Properties sessionData) throws NoSuchAlgorithmException, AOException, IOException {
 
 		LOGGER.info("Postfirma CAdES - Firma - INICIO"); //$NON-NLS-1$
-		
+
 		checkSessionProperties(sessionData, false);
-		
+
 		boolean omitContent = false;
 		if (extraParams.containsKey("mode")) { //$NON-NLS-1$
 			omitContent = "explicit".equalsIgnoreCase(extraParams.getProperty("mode")); //$NON-NLS-1$ //$NON-NLS-2$
@@ -213,7 +216,7 @@ final class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 				contentDescription = mimeHelper.getDescription();
 			}
 			catch(final Exception e) {
-				LOGGER.warning("No se ha podido determinar el tipo de los datos: " + e); //$NON-NLS-1$ 
+				LOGGER.warning("No se ha podido determinar el tipo de los datos: " + e); //$NON-NLS-1$
 			}
 		}
 
@@ -242,10 +245,10 @@ final class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 		}
 
 		LOGGER.info("Se prepara la respuesta de la pre-cofirma CAdES"); //$NON-NLS-1$
-		
+
 		// Ahora pasamos al cliente los datos de la prefirma
-		String presignB64 = Base64.encode(presign).replace("\n", "").replace("\r", ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-		
+		final String presignB64 = Base64.encode(presign).replace("\n", "").replace("\r", ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+
 		final StringBuilder urlParamBuilder = new StringBuilder();
 		urlParamBuilder.append(PROPERTY_NAME_PRESIGN_PREFIX).append("0=").append(presignB64).append("\n"); //$NON-NLS-1$ //$NON-NLS-2$
 		urlParamBuilder.append(PROPERTY_NAME_SESSION_DATA_PREFIX).append("0=").append(presignB64).append("\n"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -265,9 +268,9 @@ final class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 			final Properties sessionData) throws NoSuchAlgorithmException, AOException, IOException {
 
 		LOGGER.info("Postfirma CAdES - Cofirma - INICIO"); //$NON-NLS-1$
-		
+
 		checkSessionProperties(sessionData, false);
-		
+
 		byte[] messageDigest = null;
 		final byte[] data = ObtainContentSignedData.obtainData(sign);
 		if (data == null) {
@@ -279,10 +282,10 @@ final class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 
 		final byte[] pk1 = Base64.decode(sessionData.getProperty(PROPERTY_NAME_PKCS1_SIGN_PREFIX + 0));
 		sessionData.remove(PROPERTY_NAME_PKCS1_SIGN_PREFIX + 0);
-		
+
 		final byte[] presign = Base64.decode(sessionData.getProperty(PROPERTY_NAME_PRESIGN_PREFIX + 0));
 		sessionData.remove(PROPERTY_NAME_PRESIGN_PREFIX + 0);
-		
+
 		LOGGER.info("Se invocan las funciones internas de post-cofirma CAdES"); //$NON-NLS-1$
 		final byte[] signature;
 		try {
@@ -298,118 +301,103 @@ final class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 		catch (final CertificateEncodingException e) {
 			throw new AOException("Error de codificaci\u00F3n de certificado en la post-cofirma CAdES", e); //$NON-NLS-1$
 		}
-		
+
 		LOGGER.info("Postfirma CAdES - Cofirma - FIN"); //$NON-NLS-1$
-		
+
 		return signature;
 	}
 
 	@Override
-	public byte[] preProcessPreCounterSign(final byte[] sign, final String algorithm,
-			final X509Certificate cert, final Properties extraParams, final CounterSignTarget targetType) throws IOException, AOException {
+	public byte[] preProcessPreCounterSign(final byte[] sign,
+			                               final String algorithm,
+			                               final X509Certificate cert,
+			                               final Properties extraParams,
+			                               final CounterSignTarget targetType) throws IOException,
+			                                                                          AOException {
 
 		LOGGER.info("Prefirma CAdES - Contrafirma - INICIO"); //$NON-NLS-1$
 
-		final Properties config = extraParams != null ? extraParams : new Properties();
-
-		boolean signingCertificateV2;
-		if (AOSignConstants.isSHA2SignatureAlgorithm(algorithm)) {
-			signingCertificateV2 = true;
-		}
-		else if (config.containsKey("signingCertificateV2")) { //$NON-NLS-1$
-			signingCertificateV2 = Boolean.parseBoolean(config.getProperty("signingCertificateV2")); //$NON-NLS-1$
-		}
-		else {
-			signingCertificateV2 = !"SHA1".equals(AOSignConstants.getDigestAlgorithmName(algorithm));	 //$NON-NLS-1$
-		}
-
-		String contentTypeOid = MimeHelper.DEFAULT_CONTENT_OID_DATA;
-		String contentDescription = MimeHelper.DEFAULT_CONTENT_DESCRIPTION;
-		final byte[] data = new AOCAdESSigner().getData(sign);
-		if (data != null) {
-			final MimeHelper mimeHelper = new MimeHelper(data);
-			contentDescription = mimeHelper.getDescription();
-			contentTypeOid = MimeHelper.transformMimeTypeToOid(mimeHelper.getMimeType());
-		}
-
 		LOGGER.info("Se invocan las funciones internas de pre-contrafirma CAdES"); //$NON-NLS-1$
 
-		final CAdESPreCounterSignResult preSign;
-		try {
-			preSign = new CAdESTriPhaseCounterSigner().preCounterSign(
-					new P7ContentSignerParameters(
-							sign,
-							algorithm
-							),
-							sign,
-							targetType,
-							null,	// La clave privada no es necesaria para la prefirma
-							new X509Certificate[] { cert },
-							new AdESPolicy(config),
-							signingCertificateV2,
-							contentTypeOid,
-							contentDescription,
-							CommitmentTypeIndicationsHelper.getCommitmentTypeIndications(extraParams),
-							CAdESSignerMetadataHelper.getCAdESSignerMetadata(extraParams)
-					);
-		}
-		catch (final Exception e) {
-			throw new AOException("Error generando la PreContrafirma CAdES: " + e, e); //$NON-NLS-1$
-		}
+		return AOCAdESTriPhaseCounterSigner.preCountersign(
+			sign,
+			algorithm,
+			targetType,
+			null,
+			new X509Certificate[] { cert },
+			extraParams,
+			new Date()
+		).getBytes();
 
-		final StringBuilder urlParamBuilder = new StringBuilder();
-		urlParamBuilder.append(PROPERTY_NAME_SIGN).append("=").append(Base64.encode(preSign.getSign()).replace("\n", "").replace("\r", "")).append("\n"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
-		urlParamBuilder.append(PROPERTY_NAME_SIGN_COUNT).append("=").append(preSign.getPreSigns().size()).append("\n"); //$NON-NLS-1$ //$NON-NLS-2$
-		urlParamBuilder.append(PROPERTY_NAME_NEED_DATA).append("=").append(true).append("\n"); //$NON-NLS-1$ //$NON-NLS-2$
-		for(int i = 0; i < preSign.getPreSigns().size(); i++) {
-			// Datos de prefirma
-			urlParamBuilder.append(PROPERTY_NAME_PRESIGN_PREFIX).append(i).append("="); //$NON-NLS-1$
-			urlParamBuilder.append(Base64.encode(preSign.getPreSigns().get(i)).replace("\n", "").replace("\r", "")).append("\n"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
-		}
-
-		LOGGER.info("Prefirma CAdES - Contrafirma - FIN"); //$NON-NLS-1$
-
-		return urlParamBuilder.toString().getBytes();
 	}
 
 	@Override
-	public byte[] preProcessPostCounterSign(final byte[] sign, final String algorithm,
-			final X509Certificate cert, final Properties extraParams, final Properties sessionData,
-			final CounterSignTarget targets)
-					throws NoSuchAlgorithmException, AOException, IOException {
+	public byte[] preProcessPostCounterSign(final byte[] sign,
+			                                final String algorithm,
+			                                final X509Certificate cert,
+			                                final Properties extraParams,
+			                                final Object session,
+			                                final CounterSignTarget targets) throws NoSuchAlgorithmException,
+			                                                                        AOException,
+			                                                                        IOException {
 
-		LOGGER.info("Postfirma CAdES - Contrafirma - INICIO"); //$NON-NLS-1$
-		
-		checkSessionProperties(sessionData, true);
-
-		LOGGER.info("Se invocan las funciones internas de post-contrafirma CAdES"); //$NON-NLS-1$
-		
-		// Ahora vamos sustitutendo los PKCS#1 en la firma
-		final int p1Count = Integer.parseInt(sessionData.getProperty(PROPERTY_NAME_SIGN_COUNT));
-		byte[] signPlacement = Base64.decode(sessionData.getProperty(PROPERTY_NAME_SIGN));
-		for (int i = 0; i < p1Count; i++) {
-			// El PKCS#1 de verdad
-			final byte[] realP1 = Base64.decode(sessionData.getProperty(PROPERTY_NAME_PKCS1_SIGN_PREFIX + Integer.toString(i)));
-			// El troncho a buscar y sustituir
-			final byte[] hop = new byte[CAdESTriPhaseCounterSigner.PKCS1_DEFAULT_SIZE];
-			Arrays.fill(hop, (byte) Integer.toString(i).toCharArray()[0]);
-			signPlacement = searchAndReplace(signPlacement, hop, realP1);
+		if (session == null) {
+			throw new IllegalArgumentException("Los datos de prefirma no pueden ser nulos"); //$NON-NLS-1$
+		}
+		if (!(session instanceof PreSignData)) {
+			throw new IllegalArgumentException(
+				"Los datos de prefirma deben ser de tipo 'PreSignData', pero son de tipo " + session.getClass().getName() //$NON-NLS-1$
+			);
 		}
 
-		LOGGER.info("Postfirma CAdES - Contrafirma - FIN"); //$NON-NLS-1$
+		final PreSignData psd = (PreSignData) session;
+		final Date date = psd.getSignDate();
 
-		return signPlacement;
+		// Recreamos la firma
+		final CAdESPreSignResult cpcs = new CAdESPreSignResult();
+		final byte[] newSign = new AOCAdESCounterSigner(new CAdESFakePkcs1Signer(cpcs), date).countersign(
+			sign,
+			algorithm,
+			targets,
+			null,
+			null,
+			new X509Certificate[] { cert },
+			extraParams
+		);
+
+		// En esta contrafirma las firmas PKCS#1 son falsas, asi que vamos buscando los
+		// valores reales para insertarlo, teniendo en cuenta que en esta contrafirma y
+		// en la sesion se comparte el valor de los datos que se firman con PKCS#1
+
+		final List<SinglePreSignData> psds = psd.getPreSigns();
+		for (final SinglePreSignData sessionData : psds) {
+
+			// Los datos que se han firmado con PKCS#1
+			final byte[] signedData = sessionData.getData();
+
+			// Los datos que hay que sustituir en la firma recien creada
+			final byte[] dataToReplace = cpcs.getRandomDummyData(signedData);
+
+			// La firma real PKCS#1
+			final byte[] pkcs1Sign = sessionData.getProcessedData();
+
+			// Reemplazamos
+			searchAndReplace(newSign, dataToReplace, pkcs1Sign);
+		}
+
+
+		return newSign;
 	}
 
-	private static byte[] searchAndReplace(final byte[] array, final byte[] search, final byte[] replace) {
+	private static byte[] searchAndReplace(final byte[] source, final byte[] search, final byte[] replace) {
 		if (search.length != replace.length) {
-			return array;
+			return source;
 		}
-		int p = searchFor(array, search);
+		int p = searchFor(source, search);
 		if (p == -1) {
 			throw new IllegalArgumentException("No se ha encontrado la cadena a sustituir"); //$NON-NLS-1$
 		}
-		final byte[] result = Arrays.copyOf(array, array.length);
+		final byte[] result = Arrays.copyOf(source, source.length);
 		for (final byte element : replace) {
 			result[p] = element;
 			p++;
@@ -429,13 +417,11 @@ final class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 		}
 		return p;
 	}
-	
-	/**
-	 * Comprueba que hayan proporcionado todos los datos de sesi&oacute;n necesarios.
+
+	/** Comprueba que hayan proporcionado todos los datos de sesi&oacute;n necesarios.
 	 * @param sessionData Properties con los datos de sesi&oacute;n necesarios para una postfirma.
 	 * @param isCounterSign Indica si los datos de sesi&oacute;n a comprobar son de una contrafirma.
-	 * @throws AOException Cuando se encuentra un error en los dados de sesi&oacute;n.
-	 */
+	 * @throws AOException Cuando se encuentra un error en los dados de sesi&oacute;n. */
 	private static void checkSessionProperties(final Properties sessionData, final boolean isCounterSign) throws AOException {
 
 		if (sessionData == null) {
@@ -453,11 +439,11 @@ final class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 				try {
 					count = Integer.parseInt(sessionData.getProperty(PROPERTY_NAME_SIGN_COUNT));
 				}
-				catch (Exception e) {
+				catch (final Exception e) {
 					throw new AOException("Se ha introducido como un numero de firmas el valor invalido " + sessionData.getProperty(PROPERTY_NAME_SIGN_COUNT), e); //$NON-NLS-1$
 				}
 
-				// TODO: Eliminar la limitacion de 10 contrafirmas 
+				// TODO: Eliminar la limitacion de 10 contrafirmas
 				if (count > 10) {
 					throw new AOException("No se pueden contrafirmar mas de 10 nodos de firma simultaneamente"); //$NON-NLS-1$
 				}
@@ -465,7 +451,7 @@ final class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 				for (int i = 0; i < count; i++) {
 					if (!sessionData.containsKey(PROPERTY_NAME_PKCS1_SIGN_PREFIX + i)) {
 						throw new AOException("Los datos de sesion no contienen la prefirma numero " + i); //$NON-NLS-1$
-					}	
+					}
 				}
 			}
 			else {
@@ -478,7 +464,7 @@ final class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 			}
 		} finally {
 			LOGGER.severe("Datos de sesion contenidos:"); //$NON-NLS-1$
-			for (String key : sessionData.keySet().toArray(new String[sessionData.size()])) {
+			for (final String key : sessionData.keySet().toArray(new String[sessionData.size()])) {
 				LOGGER.severe(key);
 			}
 			LOGGER.severe("---------------------------"); //$NON-NLS-1$

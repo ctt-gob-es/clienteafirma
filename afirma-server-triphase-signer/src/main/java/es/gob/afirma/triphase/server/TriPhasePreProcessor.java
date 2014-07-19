@@ -20,6 +20,6 @@ interface TriPhasePreProcessor {
 
 	// Contrafirma
 	byte[] preProcessPreCounterSign(byte[] sign, String algorithm, X509Certificate cert, Properties extraParams, CounterSignTarget targets) throws IOException, AOException;
-	byte[] preProcessPostCounterSign(byte[] sign, String algorithm, X509Certificate cert, Properties extraParams, Properties session, CounterSignTarget targets) throws NoSuchAlgorithmException, AOException, IOException;
+	byte[] preProcessPostCounterSign(byte[] sign, String algorithm, X509Certificate cert, Properties extraParams, Object session, CounterSignTarget targets) throws NoSuchAlgorithmException, AOException, IOException;
 
 }

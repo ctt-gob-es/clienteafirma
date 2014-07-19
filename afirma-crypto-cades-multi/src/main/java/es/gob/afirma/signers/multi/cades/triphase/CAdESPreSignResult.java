@@ -13,7 +13,7 @@ import es.gob.afirma.core.misc.Base64;
  * dentro de la plantilla de firma por el resultado real de la firma PKCS#1 de estos datos, m&aacute;s la propia plantilla
  * de firma.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
-final class CAdESPreSignResult {
+public final class CAdESPreSignResult {
 
 	private Date preSignDate = null;
 
@@ -80,7 +80,10 @@ final class CAdESPreSignResult {
 		return sb.toString();
 	}
 
-	byte[] getRandomDummyData(final byte[] data) {
+	/** Obtiene los datos que deben sustituirse por una firma PKCS#1 real.
+	 * @param data Datos a firmar con PKCS#1.
+	 * @return Datos que deben sustituirse por una firma PKCS#1 real. */
+	public byte[] getRandomDummyData(final byte[] data) {
 		return this.tbs.get(data);
 	}
 

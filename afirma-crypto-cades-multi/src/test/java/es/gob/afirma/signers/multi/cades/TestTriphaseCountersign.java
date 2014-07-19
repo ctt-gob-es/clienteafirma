@@ -50,7 +50,7 @@ public final class TestTriphaseCountersign {
 		final byte[] sign = AOUtil.getDataFromInputStream(is);
 		is.close();
 
-		final Properties config = new Properties();
+		final Properties extraParams = new Properties();
 
 		final Date signDate = new Date(23723684);
 
@@ -61,7 +61,7 @@ public final class TestTriphaseCountersign {
 			CounterSignTarget.TREE,
 			null,
 			pke.getCertificateChain(),
-			config,
+			extraParams,
 			signDate
 		);
 

@@ -152,10 +152,10 @@ public final class PreSignData {
 			return this.data;
 		}
 
-		/** Obtiene los datos aletorios que deben sustituirse por las firmas finales
-		 *  o la propia firma PKCS#1, seg&uacute;n la fase de firma.
+		/** Obtiene los datos aletorios que deben sustituirse por las firmas finales o las firmas
+		 * PKCS#1 finales, seg&uacute;n la fase de la firma.
 		 * @return Datos aletorios que deben sustituirse por las firmas finales o la propia firma PKCS#1. */
-		public byte[] getDummyData() {
+		public byte[] getProcessedData() {
 			return this.dummyData;
 		}
 	}
