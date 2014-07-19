@@ -33,6 +33,7 @@ public final class AOCAdESTriPhaseCounterSigner {
      * @param targets Informaci&oacute;n complementaria seg&uacute;n el tipo de objetivo de la contrafirma.
      * @param cChain Cadena de certificados del firmante.
      * @param xParams Par&aacute;metros adicionales para la contrafirma.
+	 * @param date Fecha de la contrafirma.
      * @return Prefirma en formato XML.
      * @throws AOException Cuando ocurre cualquier problema durante el proceso.
      * @throws IOException Si ocurren problemas relacionados con la lectura de la firma. */
@@ -41,10 +42,10 @@ public final class AOCAdESTriPhaseCounterSigner {
                                         final CounterSignTarget targetType,
                                         final Object[] targets,
                                         final java.security.cert.Certificate[] cChain,
-                                        final Properties xParams) throws AOException,
-                                                                         IOException {
+                                        final Properties xParams,
+                                        final Date date) throws AOException,
+                                                                IOException {
 
-		final Date date = new Date();
 		final CAdESPreSignResult cpcs = new CAdESPreSignResult();
 		final AOCAdESCounterSigner countersigner = new AOCAdESCounterSigner(new CAdESFakePkcs1Signer(cpcs), date);
 		countersigner.countersign(

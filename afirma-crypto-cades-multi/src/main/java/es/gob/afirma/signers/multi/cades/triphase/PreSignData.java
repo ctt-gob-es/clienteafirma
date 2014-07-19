@@ -39,14 +39,15 @@ public final class PreSignData {
 		return this.original;
 	}
 
-	/** Obtiene las prefirmas, que consisten en los datos a firmar como PKCS#1 o las propias firmas
-	 * PKCS#1 y los datos aleatorios que deben ser sustituidos por las firmas finales.
+	/** Obtiene las prefirmas, que consisten en los datos a firmar como PKCS#1
+	 * y los datos aleatorios que deben ser sustituidos por las firmas finales o la propia firma PKCS#1,
+	 * seg&uacute;n la fase de la firma.
 	 * @return Prefirmas. */
 	public List<SinglePreSignData> getPreSigns() {
 		return this.counterSigns;
 	}
 
-	/** Obtiene la informaci&oacute;n de una operaci&oacute;n de contrafirma trif&aacute;sica
+	/** Obtiene la informaci&oacute;n de una operaci&oacute;n de firma CAdES trif&aacute;sica
 	 * del XML en donde se define.
 	 * @param xml XML con la informaci&oacute;n de la operaci&oacute;n trif&aacute;sica.
 	 * @return Informaci&oacute;n de la operaci&oacute;n.
@@ -132,8 +133,9 @@ public final class PreSignData {
 		return -1;
 	}
 
-	/** Informaci&oacute;n de una prefirma concreta (datos a firmar con PKCS#1 o la propia firma PKCS#1)
-	 * y valores aletorios que hay que sustituir por las firmas finales). */
+	/** Informaci&oacute;n de una prefirma concreta (datos a firmar con PKCS#1
+	 * y valores aletorios que hay que sustituir por las firmas finales o la propia firma PKCS#1,
+	 * dependiendo de la fase de la firma. */
 	public static final class SinglePreSignData {
 
 		private final byte[] data;
@@ -144,14 +146,15 @@ public final class PreSignData {
 			this.dummyData = dd;
 		}
 
-		/** Obtiene los datos que deben firmarse con PKCS#1 o la propia firma PKCS#1.
-		 * @return Datos que deben firmarse con PKCS#1 o la propia firma PKCS#1. */
+		/** Obtiene los datos que deben firmarse con PKCS#1.
+		 * @return Datos que deben firmarse con PKCS#1. */
 		public byte[] getData() {
 			return this.data;
 		}
 
-		/** Obtiene los datos aletorios que deben sustituirse por las firmas finales.
-		 * @return Datos aletorios que deben sustituirse por las firmas finales. */
+		/** Obtiene los datos aletorios que deben sustituirse por las firmas finales
+		 *  o la propia firma PKCS#1, seg&uacute;n la fase de firma.
+		 * @return Datos aletorios que deben sustituirse por las firmas finales o la propia firma PKCS#1. */
 		public byte[] getDummyData() {
 			return this.dummyData;
 		}

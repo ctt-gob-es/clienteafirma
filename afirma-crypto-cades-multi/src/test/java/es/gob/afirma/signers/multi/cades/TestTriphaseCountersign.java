@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.KeyStore;
 import java.security.KeyStore.PrivateKeyEntry;
+import java.util.Date;
 import java.util.Properties;
 
 import junit.framework.Assert;
@@ -51,6 +52,8 @@ public final class TestTriphaseCountersign {
 
 		final Properties config = new Properties();
 
+		final Date signDate = new Date(23723684);
+
 		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(PASSWORD.toCharArray()));
 		final String preCountersign = AOCAdESTriPhaseCounterSigner.preCountersign(
 			sign,
@@ -58,7 +61,8 @@ public final class TestTriphaseCountersign {
 			CounterSignTarget.TREE,
 			null,
 			pke.getCertificateChain(),
-			config
+			config,
+			signDate
 		);
 
 		System.out.println(preCountersign);
