@@ -192,8 +192,7 @@ public final class AOCAdESTriPhaseSigner implements AOSigner {
 		throw new UnsupportedOperationException("No se soporta la obtencion de informacion de la firma en modo trifasico"); //$NON-NLS-1$
 	}
 
-	/**
-	 * Ejecuta una operaci&oacute;n de firma/multifirma en 3 fases.
+	/** Ejecuta una operaci&oacute;n de firma/multifirma en 3 fases.
 	 * @param cryptoOperation Tipo de operaci&oacute.
 	 * @param data Datos o firma sobre la que operar
 	 * @param algorithm Algoritmo de firma
@@ -201,15 +200,13 @@ public final class AOCAdESTriPhaseSigner implements AOSigner {
 	 * @param certChain Cadena de certificaci&oacute;n.
 	 * @param extraParams Par&aacute;metros para la configuraci&oacute;n de la operaci&oacute;n.
 	 * @return Resultado de la operaci&oacute;n de firma.
-	 * @throws AOException Cuando se produce un error durante la operaci&oacute;n.
-	 */
+	 * @throws AOException Cuando se produce un error durante la operaci&oacute;n. */
 	private static byte[] triPhaseOperation(final String cryptoOperation,
-			final byte[] data,
-			final String algorithm,
-			final PrivateKey key,
-			final Certificate[] certChain,
-			final Properties extraParams) throws AOException {
-
+			                                final byte[] data,
+			                                final String algorithm,
+			                                final PrivateKey key,
+			                                final Certificate[] certChain,
+			                                final Properties extraParams) throws AOException {
 		if (extraParams == null) {
 			throw new IllegalArgumentException("Se necesitan parametros adicionales"); //$NON-NLS-1$
 		}

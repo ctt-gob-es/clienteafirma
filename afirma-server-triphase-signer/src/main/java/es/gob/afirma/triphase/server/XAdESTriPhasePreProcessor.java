@@ -30,28 +30,28 @@ final class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 
 	/** Nombre de la propiedad que contiene el n&uacute;mero de firmas proporcionadas. */
 	private static final String PROPERTY_NAME_SIGN_COUNT = "SIGN_COUNT"; //$NON-NLS-1$
-	
+
 	/** Prefijo para cada prefirma. */
 	private static final String PROPERTY_NAME_PRESIGN_PREFIX = "PRE."; //$NON-NLS-1$
-	
+
 	/** Nombre de la propiedad de los sesi&oacute;n necesarios para completar la firma. */
 	private static final String PROPERTY_NAME_SESSION_DATA_PREFIX = "SESSION."; //$NON-NLS-1$
 
 	/** Car&aacute;cter por el que se sustituye a {@code #EQUAL} en los Properties anidados. */
 	private static final String EQUAL_REPLACEMENT = "%%%"; //$NON-NLS-1$
-	
+
 	/** Car&aacute;cter igual. */
 	private static final String EQUAL = "="; //$NON-NLS-1$
-	
+
 	/** Car&aacute;cter por el que se sustituye a {@code #CR} en los Properties anidados. */
 	private static final String CR_REPLACEMENT = "&&&"; //$NON-NLS-1$
-	
+
 	/** Car&aacute;cter de salto de l&iacute;nea usado para los Properties. */
 	private static final String CR = "\n"; //$NON-NLS-1$
 
 	/** Firma PKCS#1. */
 	private static final String PROPERTY_NAME_PKCS1_SIGN_PREFIX = "PK1."; //$NON-NLS-1$
-	
+
 	/** Nombre de la propiedad que guarda la estructura b&aacute;sica con la composici&oacute;n
 	 * de la firma trif&aacute;sica. */
 	private static final String PROPERTY_NAME_SCHEMA_BASE = "BASE"; //$NON-NLS-1$
@@ -68,9 +68,9 @@ final class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 		LOGGER.info("Prefirma XAdES - Firma - INICIO"); //$NON-NLS-1$
 
 		final byte[] presign = preProcessPre(data, algorithm, cert, extraParams, Op.SIGN);
-		
+
 		LOGGER.info("Prefirma XAdES - Firma - FIN"); //$NON-NLS-1$
-		
+
 		return presign;
 	}
 
@@ -83,9 +83,9 @@ final class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 		LOGGER.info("Prefirma XAdES - Cofirma - INICIO"); //$NON-NLS-1$
 
 		final byte[] presign = preProcessPre(data, algorithm, cert, extraParams, Op.COSIGN);
-		
+
 		LOGGER.info("Prefirma XAdES - Cofirma - FIN"); //$NON-NLS-1$
-		
+
 		return presign;
 	}
 
@@ -98,24 +98,24 @@ final class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 		LOGGER.info("Prefirma XAdES - Contrafirma - INICIO"); //$NON-NLS-1$
 
 		final byte[] presign = preProcessPre(sign, algorithm, cert, extraParams, Op.COUNTERSIGN);
-		
+
 		LOGGER.info("Prefirma XAdES - Contrafirma - FIN"); //$NON-NLS-1$
-		
+
 		return presign;
 	}
-	
+
 	private static byte[] preProcessPre(final byte[] data,
 			final String algorithm,
 			final X509Certificate cert,
 			final Properties extraParams,
 			final Op op) throws IOException, AOException {
-		
+
 		final String algoUri = SIGN_ALGOS_URI.get(algorithm);
 		if (algoUri == null) {
 			throw new AOException(
 					"El formato de firma XAdES no soporta el algoritmo de firma '" + algorithm + "'"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
-		
+
 		final XmlPreSignResult preSignature;
 		try {
 			preSignature = XAdESTriPhaseSignerServerSide.preSign(
@@ -149,20 +149,20 @@ final class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 		catch (final XmlPreSignException e) {
 			throw new AOException("Error en la prefirma XAdES", e); //$NON-NLS-1$
 		}
-		
+
 		// Ahora pasamos al cliente los datos de la prefirma
 		final StringBuilder urlParamBuilder = new StringBuilder();
 		urlParamBuilder.append(PROPERTY_NAME_SIGN_COUNT).append(EQUAL).append(preSignature.getSignedInfos().size()).append(CR);
-		
+
 		for (int i = 0; i < preSignature.getSignedInfos().size(); i++) {
 			urlParamBuilder.append(PROPERTY_NAME_PRESIGN_PREFIX).append(i).append(EQUAL).append(Base64.encode(preSignature.getSignedInfos().get(i))).append(CR);
 
 			// Pasamos como datos de sesion el documento base en donde se realizan las sustituciones, pero solo lo
-			// haremos en la primera prefirma ya que todos serian iguales 
+			// haremos en la primera prefirma ya que todos serian iguales
 			if (i == 0) {
 				final StringBuilder sessionBuilder = new StringBuilder();
 				sessionBuilder.append(PROPERTY_NAME_SCHEMA_BASE).append(EQUAL).append(Base64.encode(preSignature.getXmlSign()));
-				
+
 				urlParamBuilder.append(PROPERTY_NAME_SESSION_DATA_PREFIX).append(0).append(EQUAL).
 				append(sessionBuilder.toString().replace(EQUAL, EQUAL_REPLACEMENT).replace(CR, CR_REPLACEMENT)).append(CR);
 			}
@@ -208,9 +208,15 @@ final class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 
 	@Override
 	public byte[] preProcessPostCounterSign(final byte[] sign, final String algorithm,
-			final X509Certificate cert, final Properties extraParams, final Properties sessionData,
+			final X509Certificate cert, final Properties extraParams, final Object session,
 			final CounterSignTarget targets) throws NoSuchAlgorithmException,
 			AOException, IOException {
+
+		if (!(session instanceof Properties)) {
+			throw new IllegalArgumentException("La sesion debe ser no nula y de tipo Properties"); //$NON-NLS-1$
+		}
+
+		final Properties sessionData = (Properties) session;
 
 		LOGGER.info("Postfirma XAdES - Contrafirma - INICIO"); //$NON-NLS-1$
 
@@ -220,33 +226,33 @@ final class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 
 		return signature;
 	}
-	
+
 	private static byte[] preProcessPost(final Properties sessionData) throws IOException, AOException {
 
 		checkSessionProperties(sessionData);
-		
+
 		final int signCount = sessionData.containsKey(PROPERTY_NAME_SIGN_COUNT) ? Integer.parseInt(sessionData.getProperty(PROPERTY_NAME_SIGN_COUNT)) : 1;
-		
+
 		// El XML base se incluye como datos de sesion de la primera firma y solo de la primera
 		final Properties configParams = new Properties();
 		configParams.load(new ByteArrayInputStream(
 				sessionData.getProperty(PROPERTY_NAME_SESSION_DATA_PREFIX + 0)
 				.replace(CR_REPLACEMENT, CR).replace(EQUAL_REPLACEMENT, EQUAL).getBytes()
 				));
-		
+
 		String xmlBase = new String(Base64.decode(configParams.getProperty(PROPERTY_NAME_SCHEMA_BASE)));
-		
+
 		for (int i = 0; i < signCount; i++) {
 			final String pkcs1Base64Sign = sessionData.getProperty(PROPERTY_NAME_PKCS1_SIGN_PREFIX + i);
 			if (pkcs1Base64Sign == null) {
 				throw new IllegalArgumentException("La propiedades adicionales no contienen la firma PKCS#1"); //$NON-NLS-1$
 			}
-			
+
 			xmlBase = xmlBase.replace(
 					XAdESTriPhaseSignerServerSide.REPLACEMENT_STRING.replace(XAdESTriPhaseSignerServerSide.REPLACEMENT_CODE, Integer.toString(i)),
 					pkcs1Base64Sign.trim());
 		}
-		
+
 		return xmlBase.getBytes();
 	}
 
@@ -288,10 +294,10 @@ final class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 
 		}
 	};
-	
+
 	/**
 	 * Comprueba que hayan proporcionado todos los datos de sesi&oacute;n necesarios.
-	 * @param sessionData Properties con los datos de sesi&oacute;n necesarios para una postfirma. 
+	 * @param sessionData Properties con los datos de sesi&oacute;n necesarios para una postfirma.
 	 * @throws AOException Cuando se encuentra un error en los dados de sesi&oacute;n.
 	 */
 	private static void checkSessionProperties(final Properties sessionData) throws AOException {
@@ -302,24 +308,24 @@ final class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 		try {
 			if (!sessionData.containsKey(PROPERTY_NAME_SESSION_DATA_PREFIX + 0)) {
 				throw new AOException("Los datos de sesion no contienen la configuracion global de la firma"); //$NON-NLS-1$
-			}	
+			}
 			if (sessionData.containsKey(PROPERTY_NAME_SIGN_COUNT)) {
 				int count;
 				try {
 					count = Integer.parseInt(sessionData.getProperty(PROPERTY_NAME_SIGN_COUNT));
 				}
-				catch (Exception e) {
+				catch (final Exception e) {
 					throw new AOException("Se ha introducido como un numero de firmas el valor invalido " + sessionData.getProperty(PROPERTY_NAME_SIGN_COUNT), e); //$NON-NLS-1$
 				}
 				for (int i = 0; i < count; i++) {
 					if (!sessionData.containsKey(PROPERTY_NAME_PKCS1_SIGN_PREFIX + i)) {
 						throw new AOException("Los datos de sesion no contienen la contrafirma numero " + i); //$NON-NLS-1$
-					}	
+					}
 				}
 			}
 		} finally {
 			LOGGER.severe("Datos de sesion contenidos:"); //$NON-NLS-1$
-			for (String key : sessionData.keySet().toArray(new String[sessionData.size()])) {
+			for (final String key : sessionData.keySet().toArray(new String[sessionData.size()])) {
 				LOGGER.severe(key);
 			}
 			LOGGER.severe("---------------------------"); //$NON-NLS-1$
