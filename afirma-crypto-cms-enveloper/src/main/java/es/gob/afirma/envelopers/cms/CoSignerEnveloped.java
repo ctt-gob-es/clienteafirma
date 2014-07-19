@@ -77,7 +77,7 @@ final class CoSignerEnveloped {
      * @param sign Archivo que contiene las firmas.
      * @param dataType Identifica el tipo del contenido a firmar.
      * @param keyEntry Clave privada del firmante.
-     * @param atrib Atributos firmados opcionales.
+     * @param atrib Atributos firmados opcion	ales.
      * @param uatrib Atributos no autenticados firmados opcionales.
      * @param messageDigest Huella digital a aplicar en la firma.
      * @return El archivo de firmas con la nueva firma.
@@ -186,8 +186,11 @@ final class CoSignerEnveloped {
         }
 
         // Creamos los signerInfos del signedAndEnvelopedData
-        signerInfos.add(new SignerInfo(identifier, digAlgId, signedAttr, encAlgId, sign2, unSignedAttr// null //unsignedAttr
-        ));
+        signerInfos.add(
+    		new SignerInfo(
+				identifier, digAlgId, signedAttr, encAlgId, sign2, unSignedAttr
+			)
+		);
 
         // construimos el Signed Data y lo devolvemos
         return new ContentInfo(
@@ -264,8 +267,6 @@ final class CoSignerEnveloped {
         // 4. CERTIFICADOS
         // obtenemos la lista de certificados
         ASN1Set certificates = null;
-        // X509Certificate[] signerCertificateChain =
-        // parameters.getSignerCertificateChain();
 
         final ASN1Set certificatesSigned = sd.getCertificates();
         final ASN1EncodableVector vCertsSig = new ASN1EncodableVector();

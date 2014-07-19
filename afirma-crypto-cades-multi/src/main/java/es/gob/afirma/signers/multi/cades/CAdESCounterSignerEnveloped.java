@@ -1125,12 +1125,6 @@ final class CAdESCounterSignerEnveloped {
         // digEncryptionAlgorithm
         final AlgorithmIdentifier encAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID("RSA")); //$NON-NLS-1$
 
-        // Firma del SignerInfo
-        // ByteArrayInputStream signerToDigest = new
-        // ByteArrayInputStream(si.getEncryptedDigest().getOctets());
-        // byte[] signedInfo = signData(signerToDigest, signatureAlgorithm,
-        // keyEntry);
-
         final ASN1OctetString sign2;
         try {
             sign2 = firma(signatureAlgorithm, key, certChain);
