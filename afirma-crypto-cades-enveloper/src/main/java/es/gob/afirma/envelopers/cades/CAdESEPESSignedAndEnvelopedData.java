@@ -291,7 +291,6 @@ final class CAdESEPESSignedAndEnvelopedData {
                                     final X509Certificate[] signerCertificateChain,
                                     final PrivateKeyEntry keyEntry,
                                     final AdESPolicy policy) throws IOException {
-        // boolean isValid = false;
         byte[] retorno = null;
 
         // LEEMOS EL FICHERO QUE NOS INTRODUCEN
