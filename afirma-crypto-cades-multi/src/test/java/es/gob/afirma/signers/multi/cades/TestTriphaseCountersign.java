@@ -7,6 +7,8 @@ import java.security.KeyStore;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.util.Properties;
 
+import junit.framework.Assert;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -15,6 +17,7 @@ import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.signers.multi.cades.triphase.AOCAdESTriPhaseCounterSigner;
+import es.gob.afirma.signers.multi.cades.triphase.PreSignData;
 
 /** Prueba de contrafirmas CAdES.
  * @author Carlos Gamuci */
@@ -59,6 +62,8 @@ public final class TestTriphaseCountersign {
 		);
 
 		System.out.println(preCountersign);
+
+		Assert.assertNotNull(PreSignData.getInstance(preCountersign.getBytes()));
 	}
 
 	/** Cierra el flujo de lectura del almac&eacute;n de certificados.

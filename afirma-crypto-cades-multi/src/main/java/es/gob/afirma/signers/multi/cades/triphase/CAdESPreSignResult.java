@@ -76,7 +76,7 @@ final class CAdESPreSignResult {
 		}
 
 		sb.append(" </css>\n"); //$NON-NLS-1$
-		sb.append("<xml>"); //$NON-NLS-1$
+		sb.append("</xml>"); //$NON-NLS-1$
 		return sb.toString();
 	}
 
