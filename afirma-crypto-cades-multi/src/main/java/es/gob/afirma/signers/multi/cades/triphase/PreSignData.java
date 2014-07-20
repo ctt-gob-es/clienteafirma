@@ -9,7 +9,6 @@ import java.util.List;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -52,11 +51,9 @@ public final class PreSignData {
 	 * @param xml XML con la informaci&oacute;n de la operaci&oacute;n trif&aacute;sica.
 	 * @return Informaci&oacute;n de la operaci&oacute;n.
 	 * @throws IOException Si hay problemas con el tratamiento de datos.
-	 * @throws DOMException Si hay problemas en el tratamiento del XML.
 	 * @throws ParserConfigurationException Si no se puede obtener el XML apropiado.
 	 * @throws SAXException Si hay problemas en el tratamiento del XML. */
-	public static PreSignData getInstance(final byte[] xml) throws DOMException,
-	                                                               IOException,
+	public static PreSignData getInstance(final byte[] xml) throws IOException,
 	                                                               SAXException,
 	                                                               ParserConfigurationException {
 
@@ -93,7 +90,7 @@ public final class PreSignData {
 		return csData;
 	}
 
-	private static SinglePreSignData parseDcs(final Node dcsNode) throws DOMException, IOException {
+	private static SinglePreSignData parseDcs(final Node dcsNode) throws IOException {
 
 		final NodeList childNodes = dcsNode.getChildNodes();
 
@@ -142,21 +139,21 @@ public final class PreSignData {
 		private final byte[] dummyData;
 
 		SinglePreSignData(final byte[] d, final byte[] dd) {
-			this.data = d;
-			this.dummyData = dd;
+			this.data = d.clone();
+			this.dummyData = dd.clone();
 		}
 
 		/** Obtiene los datos que deben firmarse con PKCS#1.
 		 * @return Datos que deben firmarse con PKCS#1. */
 		public byte[] getData() {
-			return this.data;
+			return this.data.clone();
 		}
 
 		/** Obtiene los datos aletorios que deben sustituirse por las firmas finales o las firmas
 		 * PKCS#1 finales, seg&uacute;n la fase de la firma.
 		 * @return Datos aletorios que deben sustituirse por las firmas finales o la propia firma PKCS#1. */
 		public byte[] getProcessedData() {
-			return this.dummyData;
+			return this.dummyData.clone();
 		}
 	}
 
