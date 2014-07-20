@@ -58,7 +58,6 @@ import org.bouncycastle.asn1.ASN1Set;
 import org.bouncycastle.asn1.ASN1TaggedObject;
 import org.bouncycastle.asn1.BERSet;
 import org.bouncycastle.asn1.DERNull;
-import org.bouncycastle.asn1.DERObjectIdentifier;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERPrintableString;
 import org.bouncycastle.asn1.DERSequence;
@@ -463,7 +462,7 @@ final class Utils {
         		new Attribute(
     				CMSAttributes.contentType,
     				new DERSet(
-						DERObjectIdentifier.getInstance(dataType)
+						ASN1ObjectIdentifier.getInstance(dataType)
 					)
 				)
     		);

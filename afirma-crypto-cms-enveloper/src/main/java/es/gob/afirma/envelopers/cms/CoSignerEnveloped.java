@@ -36,7 +36,6 @@ import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1Set;
 import org.bouncycastle.asn1.ASN1TaggedObject;
-import org.bouncycastle.asn1.DERObjectIdentifier;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERPrintableString;
 import org.bouncycastle.asn1.DERSet;
@@ -333,7 +332,7 @@ final class CoSignerEnveloped {
                 final ASN1Set signedAttrib = si.getAuthenticatedAttributes();
                 for (int s = 0; s < signedAttrib.size(); s++) {
                     final ASN1Sequence elemento = (ASN1Sequence) signedAttrib.getObjectAt(s);
-                    final DERObjectIdentifier oids = (DERObjectIdentifier) elemento.getObjectAt(0);
+                    final ASN1ObjectIdentifier oids = (ASN1ObjectIdentifier) elemento.getObjectAt(0);
                     if (CMSAttributes.messageDigest.getId().toString().equals(oids.toString())) {
                         final DERSet derSetHash = (DERSet) elemento.getObjectAt(1);
                         final DEROctetString derHash = (DEROctetString) derSetHash.getObjectAt(0);
@@ -405,7 +404,7 @@ final class CoSignerEnveloped {
     		new Attribute(
 				CMSAttributes.contentType,
 				new DERSet(
-					DERObjectIdentifier.getInstance(dataType)
+					ASN1ObjectIdentifier.getInstance(dataType)
 				)
 			)
 		);
@@ -464,7 +463,7 @@ final class CoSignerEnveloped {
     		new Attribute(
 				CMSAttributes.contentType,
 				new DERSet(
-					DERObjectIdentifier.getInstance(dataType)
+					ASN1ObjectIdentifier.getInstance(dataType)
 				)
 			)
 		);

@@ -40,7 +40,6 @@ import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1Set;
 import org.bouncycastle.asn1.ASN1TaggedObject;
 import org.bouncycastle.asn1.BEROctetString;
-import org.bouncycastle.asn1.DERObjectIdentifier;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERPrintableString;
 import org.bouncycastle.asn1.DERSet;
@@ -313,7 +312,7 @@ import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
         is.close();
         final Enumeration<?> e = dsq.getObjects();
         // Elementos que contienen los elementos OID Data
-        final DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();
+        final ASN1ObjectIdentifier doi = (ASN1ObjectIdentifier) e.nextElement();
         if (doi.equals(PKCSObjectIdentifiers.id_ct_authData)) {
             // Contenido de Data
             final ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();

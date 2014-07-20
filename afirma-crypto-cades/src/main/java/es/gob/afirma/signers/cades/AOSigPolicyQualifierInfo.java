@@ -12,9 +12,9 @@ package es.gob.afirma.signers.cades;
 
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.DERIA5String;
-import org.bouncycastle.asn1.DERObjectIdentifier;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 
@@ -32,7 +32,7 @@ import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
  * Policy qualifiers. */
 final class AOSigPolicyQualifierInfo implements ASN1Encodable {
 
-    private final DERObjectIdentifier sigPolicyQualifierId;
+    private final ASN1ObjectIdentifier sigPolicyQualifierId;
     private final ASN1Encodable sigQualifier;
 
     /** Crea un nuevo <code>AOSigPolicyQualifierInfo</code> con su calificador
@@ -46,7 +46,7 @@ final class AOSigPolicyQualifierInfo implements ASN1Encodable {
 
     /** Devuelve el identificador de la estancia.
      * @return El identificador. */
-    DERObjectIdentifier getSigPolicyQualifierId() {
+    ASN1ObjectIdentifier getSigPolicyQualifierId() {
         return this.sigPolicyQualifierId;
     }
 

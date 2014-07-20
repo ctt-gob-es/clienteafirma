@@ -23,10 +23,10 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import org.bouncycastle.asn1.ASN1InputStream;
+import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1Set;
 import org.bouncycastle.asn1.ASN1TaggedObject;
-import org.bouncycastle.asn1.DERInteger;
 import org.bouncycastle.asn1.DERUTCTime;
 import org.bouncycastle.asn1.cms.Attribute;
 import org.bouncycastle.asn1.cms.CMSAttributes;
@@ -280,7 +280,7 @@ public final class ReadNodesTree {
      * @param serialNumber
      *        N&uacute;mero de serie del certificado a firmar.
      * @return El nombre com&uacute;n. */
-    private static String searchName(final ASN1Set certificates, final DERInteger serialNumber) {
+    private static String searchName(final ASN1Set certificates, final ASN1Integer serialNumber) {
         final Enumeration<?> certSet = certificates.getObjects();
         while (certSet.hasMoreElements()) {
             final X509Certificate c;
@@ -307,7 +307,7 @@ public final class ReadNodesTree {
      *        N&uacute;mero de serie del certificado a firmar.
      * @return El certificado (en la posici&oacute;n 0 y su cadena de confianza
      *         en orden). */
-    private static X509Certificate[] searchCert(final ASN1Set certificates, final DERInteger serialNumber) {
+    private static X509Certificate[] searchCert(final ASN1Set certificates, final ASN1Integer serialNumber) {
         final Enumeration<?> certSet = certificates.getObjects();
         while (certSet.hasMoreElements()) {
             final X509Certificate c;

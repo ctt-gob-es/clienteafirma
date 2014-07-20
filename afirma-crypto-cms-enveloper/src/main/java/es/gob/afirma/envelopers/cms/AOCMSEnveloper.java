@@ -594,7 +594,7 @@ public class AOCMSEnveloper implements AOEnveloper {
     	final Enumeration<?> objects = dsq.getObjects();
 
     	// Elementos que contienen los elementos OID Data
-    	final org.bouncycastle.asn1.DERObjectIdentifier doi = (org.bouncycastle.asn1.DERObjectIdentifier) objects.nextElement();
+    	final org.bouncycastle.asn1.ASN1ObjectIdentifier doi = (org.bouncycastle.asn1.ASN1ObjectIdentifier) objects.nextElement();
 
     	byte[] datos;
     	try {

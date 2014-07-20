@@ -33,7 +33,6 @@ import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1Set;
 import org.bouncycastle.asn1.ASN1TaggedObject;
 import org.bouncycastle.asn1.BEROctetString;
-import org.bouncycastle.asn1.DERObjectIdentifier;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERSet;
 import org.bouncycastle.asn1.cms.AttributeTable;
@@ -429,7 +428,7 @@ final class CAdESCoSigner {
 				final ASN1Set signedAttrib = si.getAuthenticatedAttributes();
 				for (int s = 0; s < signedAttrib.size(); s++) {
 					final ASN1Sequence elemento = (ASN1Sequence) signedAttrib.getObjectAt(s);
-					final DERObjectIdentifier oids = (DERObjectIdentifier) elemento.getObjectAt(0);
+					final ASN1ObjectIdentifier oids = (ASN1ObjectIdentifier) elemento.getObjectAt(0);
 					if (CMSAttributes.messageDigest.getId().equals(oids.toString())) {
 						final DERSet derSetHash = (DERSet) elemento.getObjectAt(1);
 						final DEROctetString derHash = (DEROctetString) derSetHash.getObjectAt(0);

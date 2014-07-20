@@ -22,7 +22,6 @@ import java.util.Locale;
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.DERIA5String;
-import org.bouncycastle.asn1.DERObjectIdentifier;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.DERSet;
@@ -223,7 +222,7 @@ public final class CAdESUtils {
 
         /** SigPolicyId ::= OBJECT IDENTIFIER Politica de firma. */
 
-        final DERObjectIdentifier doiSigPolicyId = new ASN1ObjectIdentifier(
+        final ASN1ObjectIdentifier doiSigPolicyId = new ASN1ObjectIdentifier(
     		policy.getPolicyIdentifier().toLowerCase(Locale.US).replace("urn:oid:", "") //$NON-NLS-1$ //$NON-NLS-2$
 		);
 

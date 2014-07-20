@@ -14,11 +14,11 @@ import java.util.Enumeration;
 import java.util.logging.Logger;
 
 import org.bouncycastle.asn1.ASN1InputStream;
+import org.bouncycastle.asn1.ASN1Integer;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1Set;
 import org.bouncycastle.asn1.ASN1TaggedObject;
-import org.bouncycastle.asn1.DERInteger;
-import org.bouncycastle.asn1.DERObjectIdentifier;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.cms.Attribute;
 import org.bouncycastle.asn1.cms.AuthEnvelopedData;
@@ -68,7 +68,7 @@ final class ValidateCMS {
             is.close();
             final Enumeration<?> e = dsq.getObjects();
             // Elementos que contienen los elementos OID Data
-            final DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();
+            final ASN1ObjectIdentifier doi = (ASN1ObjectIdentifier) e.nextElement();
             if (!doi.equals(PKCSObjectIdentifiers.data)) {
                 isValid = false;
             }
@@ -102,7 +102,7 @@ final class ValidateCMS {
             is.close();
             final Enumeration<?> e = dsq.getObjects();
             // Elementos que contienen los elementos OID Data
-            final DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();
+            final ASN1ObjectIdentifier doi = (ASN1ObjectIdentifier) e.nextElement();
             if (!doi.equals(PKCSObjectIdentifiers.signedData)) {
                 isValid = false;
             }
@@ -161,7 +161,7 @@ final class ValidateCMS {
             is.close();
             final Enumeration<?> e = dsq.getObjects();
             // Elementos que contienen los elementos OID Data
-            final DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();
+            final ASN1ObjectIdentifier doi = (ASN1ObjectIdentifier) e.nextElement();
             if (!doi.equals(PKCSObjectIdentifiers.digestedData)) {
                 isValid = false;
             }
@@ -196,7 +196,7 @@ final class ValidateCMS {
             is.close();
             final Enumeration<?> e = dsq.getObjects();
             // Elementos que contienen los elementos OID Data
-            final DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();
+            final ASN1ObjectIdentifier doi = (ASN1ObjectIdentifier) e.nextElement();
             if (!doi.equals(PKCSObjectIdentifiers.encryptedData)) {
                 isValid = false;
             }
@@ -209,7 +209,7 @@ final class ValidateCMS {
                  * Si no es de tipo EncryptedData se pasa al manejo de la
                  * excepcion
                  */
-                DERInteger.getInstance(asq.getObjectAt(0));
+                ASN1Integer.getInstance(asq.getObjectAt(0));
                 EncryptedContentInfo.getInstance(asq.getObjectAt(1));
             }
         }
@@ -233,7 +233,7 @@ final class ValidateCMS {
             is.close();
             final Enumeration<?> e = dsq.getObjects();
             // Elementos que contienen los elementos OID Data
-            final DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();
+            final ASN1ObjectIdentifier doi = (ASN1ObjectIdentifier) e.nextElement();
             if (!doi.equals(PKCSObjectIdentifiers.envelopedData)) {
                 isValid = false;
             }
@@ -268,7 +268,7 @@ final class ValidateCMS {
             is.close();
             final Enumeration<?> e = dsq.getObjects();
             // Elementos que contienen los elementos OID Data
-            final DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();
+            final ASN1ObjectIdentifier doi = (ASN1ObjectIdentifier) e.nextElement();
             if (!doi.equals(PKCSObjectIdentifiers.signedAndEnvelopedData)) {
                 isValid = false;
             }
@@ -308,7 +308,7 @@ final class ValidateCMS {
             is.close();
             final Enumeration<?> e = dsq.getObjects();
             // Elementos que contienen los elementos OID AuthenticatedData.
-            final DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();
+            final ASN1ObjectIdentifier doi = (ASN1ObjectIdentifier) e.nextElement();
             if (!doi.equals(PKCSObjectIdentifiers.id_ct_authData)) {
                 isValid = false;
             }
@@ -342,7 +342,7 @@ final class ValidateCMS {
             final Enumeration<?> e = dsq.getObjects();
             // Elementos que contienen los elementos OID
             // AuthenticatedEnvelopedData.
-            final DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();
+            final ASN1ObjectIdentifier doi = (ASN1ObjectIdentifier) e.nextElement();
             if (!doi.equals(PKCSObjectIdentifiers.id_ct_authEnvelopedData)) {
                 isValid = false;
             }
@@ -373,7 +373,7 @@ final class ValidateCMS {
             is.close();
             final Enumeration<?> e = dsq.getObjects();
             // Elementos que contienen los elementos OID CompressedData.
-            final DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();
+            final ASN1ObjectIdentifier doi = (ASN1ObjectIdentifier) e.nextElement();
             if (!doi.equals(CMSObjectIdentifiers.compressedData)) {
                 isValid = false;
             }

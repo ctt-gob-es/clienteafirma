@@ -15,12 +15,11 @@ import java.util.Enumeration;
 import java.util.logging.Logger;
 
 import org.bouncycastle.asn1.ASN1InputStream;
+import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1Set;
 import org.bouncycastle.asn1.ASN1TaggedObject;
-import org.bouncycastle.asn1.DERInteger;
-import org.bouncycastle.asn1.DERObjectIdentifier;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.cms.Attribute;
 import org.bouncycastle.asn1.cms.EncryptedContentInfo;
@@ -67,7 +66,7 @@ public final class CAdESValidator {
         }
 
         // Elementos que contienen los elementos OID Data
-        final DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();
+        final ASN1ObjectIdentifier doi = (ASN1ObjectIdentifier) e.nextElement();
         if (!doi.equals(PKCSObjectIdentifiers.data)) {
             return false;
         }
@@ -103,7 +102,7 @@ public final class CAdESValidator {
             final ASN1Sequence dsq = (ASN1Sequence) is.readObject();
             final Enumeration<?> e = dsq.getObjects();
             // Elementos que contienen los elementos OID Data
-            final DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();
+            final ASN1ObjectIdentifier doi = (ASN1ObjectIdentifier) e.nextElement();
             if (doi.equals(PKCSObjectIdentifiers.signedData)) {
                 isValid = true;
             }
@@ -181,7 +180,7 @@ public final class CAdESValidator {
         }
         final Enumeration<?> e = dsq.getObjects();
         // Elementos que contienen los elementos OID Data
-        final DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();
+        final ASN1ObjectIdentifier doi = (ASN1ObjectIdentifier) e.nextElement();
         if (doi.equals(PKCSObjectIdentifiers.digestedData)) {
             isValid = true;
         }
@@ -227,7 +226,7 @@ public final class CAdESValidator {
         final Enumeration<?> e = dsq.getObjects();
 
         // Elementos que contienen los elementos OID Data
-        final DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();
+        final ASN1ObjectIdentifier doi = (ASN1ObjectIdentifier) e.nextElement();
         if (doi.equals(PKCSObjectIdentifiers.encryptedData)) {
             isValid = true;
         }
@@ -242,7 +241,7 @@ public final class CAdESValidator {
              * conversion ha sido correcta. De no ser asi, se pasaria al manejo
              * de la excepcion. */
 
-            DERInteger.getInstance(asq.getObjectAt(0));
+        	ASN1Integer.getInstance(asq.getObjectAt(0));
             EncryptedContentInfo.getInstance(asq.getObjectAt(1));
 
             if (asq.size() == 3) {
@@ -281,7 +280,7 @@ public final class CAdESValidator {
         }
         final Enumeration<?> e = dsq.getObjects();
         // Elementos que contienen los elementos OID Data
-        final DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();
+        final ASN1ObjectIdentifier doi = (ASN1ObjectIdentifier) e.nextElement();
         if (doi.equals(PKCSObjectIdentifiers.envelopedData)) {
             isValid = true;
         }
@@ -327,7 +326,7 @@ public final class CAdESValidator {
         final Enumeration<?> e = dsq.getObjects();
 
         // Elementos que contienen los elementos OID Data
-        final DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();
+        final ASN1ObjectIdentifier doi = (ASN1ObjectIdentifier) e.nextElement();
         if (doi.equals(PKCSObjectIdentifiers.signedData)) {
             isValid = true;
         }

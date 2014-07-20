@@ -19,7 +19,6 @@ import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.BERSequence;
-import org.bouncycastle.asn1.DERInteger;
 import org.bouncycastle.asn1.cms.ContentInfo;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 
@@ -42,7 +41,7 @@ import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
  * para crear un mensaje DigestedData de BouncyCastle: <a
  * href="http://www.bouncycastle.org/">www.bouncycastle.org</a> */
 public final class DigestedData implements ASN1Encodable {
-    private final DERInteger version;
+    private final ASN1Integer version;
     private final AlgorithmIdentifier digestAlgorithm;
     private final ContentInfo contentInfo;
     private final ASN1OctetString digest;
@@ -76,7 +75,7 @@ public final class DigestedData implements ASN1Encodable {
     public DigestedData(final ASN1Sequence seq) {
         final Enumeration<?> e = seq.getObjects();
 
-        this.version = (DERInteger) e.nextElement();
+        this.version = (ASN1Integer) e.nextElement();
         this.digestAlgorithm = AlgorithmIdentifier.getInstance(e.nextElement());
         this.contentInfo = ContentInfo.getInstance(e.nextElement());
         this.digest = (ASN1OctetString) e.nextElement();

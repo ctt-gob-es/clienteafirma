@@ -35,7 +35,6 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1Set;
 import org.bouncycastle.asn1.ASN1TaggedObject;
-import org.bouncycastle.asn1.DERObjectIdentifier;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERPrintableString;
 import org.bouncycastle.asn1.DERSet;
@@ -254,7 +253,7 @@ public final class CMSAuthenticatedEnvelopedData {
 
         final Enumeration<?> e = dsq.getObjects();
         // Elementos que contienen los elementos OID Data
-        final DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();
+        final ASN1ObjectIdentifier doi = (ASN1ObjectIdentifier) e.nextElement();
 
         if (doi.equals(PKCSObjectIdentifiers.id_ct_authEnvelopedData)) {
             // Contenido de Data

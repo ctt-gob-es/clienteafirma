@@ -18,7 +18,6 @@ import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1Set;
 import org.bouncycastle.asn1.ASN1TaggedObject;
 import org.bouncycastle.asn1.BERSequence;
-import org.bouncycastle.asn1.DERInteger;
 import org.bouncycastle.asn1.DERTaggedObject;
 import org.bouncycastle.asn1.cms.EncryptedContentInfo;
 
@@ -29,7 +28,7 @@ import org.bouncycastle.asn1.cms.EncryptedContentInfo;
  * href="http://www.bouncycastle.org/">www.bouncycastle.org</a> */
 public final class SignedAndEnvelopedData extends ASN1Object {
 
-    private final DERInteger version;
+    private final ASN1Integer version;
     private final ASN1Set recipientInfos;
     private final ASN1Set digestAlgorithms;
     private final EncryptedContentInfo encryptedContentInfo;
@@ -66,7 +65,7 @@ public final class SignedAndEnvelopedData extends ASN1Object {
      */
     public SignedAndEnvelopedData(final ASN1Sequence seq) {
         int index = 0;
-        this.version = (DERInteger) seq.getObjectAt(index++);
+        this.version = (ASN1Integer) seq.getObjectAt(index++);
         this.recipientInfos = ASN1Set.getInstance(seq.getObjectAt(index++));
         this.digestAlgorithms = ASN1Set.getInstance(seq.getObjectAt(index++));
         this.encryptedContentInfo = EncryptedContentInfo.getInstance(seq.getObjectAt(index++));
@@ -106,7 +105,7 @@ public final class SignedAndEnvelopedData extends ASN1Object {
 
     /** Obtiene la versi&oacute;n de la especificaci&oacute;n usada.
      * @return La versi&oacute;n es siempre <code>1</code>*/
-    public DERInteger getVersion() {
+    public ASN1Integer getVersion() {
         return this.version;
     }
 

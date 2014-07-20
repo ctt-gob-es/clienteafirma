@@ -15,10 +15,10 @@ import java.util.Enumeration;
 import java.util.logging.Logger;
 
 import org.bouncycastle.asn1.ASN1InputStream;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1Set;
 import org.bouncycastle.asn1.ASN1TaggedObject;
-import org.bouncycastle.asn1.DERObjectIdentifier;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERSet;
 import org.bouncycastle.asn1.cms.CMSAttributes;
@@ -54,7 +54,7 @@ public final class ObtainContentSignedData {
 
 		final Enumeration<?> e = dsq.getObjects();
 		// Elementos que contienen los elementos OID Data
-		final DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();
+		final ASN1ObjectIdentifier doi = (ASN1ObjectIdentifier) e.nextElement();
 		// Contenido a obtener informacion
 		final ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
 
@@ -98,7 +98,7 @@ public final class ObtainContentSignedData {
 		final Enumeration<?> e = dsq.getObjects();
 
 		// Elementos que contienen los elementos OID Data
-		final DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();
+		final ASN1ObjectIdentifier doi = (ASN1ObjectIdentifier) e.nextElement();
 
 		// Comprobamos que sea una firma
 		if (!doi.equals(PKCSObjectIdentifiers.signedData)) {
@@ -120,7 +120,7 @@ public final class ObtainContentSignedData {
 				final ASN1Set signedAttrib = si.getAuthenticatedAttributes();
 				for (int s = 0; s < signedAttrib.size(); s++) {
 					final ASN1Sequence elemento = (ASN1Sequence) signedAttrib.getObjectAt(s);
-					final DERObjectIdentifier oids = (DERObjectIdentifier) elemento.getObjectAt(0);
+					final ASN1ObjectIdentifier oids = (ASN1ObjectIdentifier) elemento.getObjectAt(0);
 					if (CMSAttributes.messageDigest.getId().equals(oids.toString())) {
 						final DERSet derSetHash = (DERSet) elemento.getObjectAt(1);
 						final DEROctetString derHash = (DEROctetString) derSetHash.getObjectAt(0);

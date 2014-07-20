@@ -26,10 +26,10 @@ import javax.crypto.SecretKey;
 
 import org.bouncycastle.asn1.ASN1Encoding;
 import org.bouncycastle.asn1.ASN1InputStream;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1Set;
 import org.bouncycastle.asn1.ASN1TaggedObject;
-import org.bouncycastle.asn1.DERObjectIdentifier;
 import org.bouncycastle.asn1.DERSet;
 import org.bouncycastle.asn1.cms.ContentInfo;
 import org.bouncycastle.asn1.cms.EnvelopedData;
@@ -212,7 +212,7 @@ public final class CMSEnvelopedData {
         is.close();
         final Enumeration<?> e = dsq.getObjects();
         // Elementos que contienen los elementos OID Data
-        final DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();
+        final ASN1ObjectIdentifier doi = (ASN1ObjectIdentifier) e.nextElement();
         if (doi.equals(PKCSObjectIdentifiers.envelopedData)) {
             // Contenido de Data
             final ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();

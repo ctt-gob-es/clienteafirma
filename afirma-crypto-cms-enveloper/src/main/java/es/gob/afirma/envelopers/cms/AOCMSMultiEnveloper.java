@@ -626,7 +626,7 @@ public byte[] cosign(final byte[] data, final byte[] sign, final String algorith
         final Enumeration<?> objects = dsq.getObjects();
 
         // Elementos que contienen los elementos OID Data
-        final org.bouncycastle.asn1.DERObjectIdentifier doi = (org.bouncycastle.asn1.DERObjectIdentifier) objects.nextElement();
+        final org.bouncycastle.asn1.ASN1ObjectIdentifier doi = (org.bouncycastle.asn1.ASN1ObjectIdentifier) objects.nextElement();
 
         byte[] datos;
         if (doi.equals(org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers.data)) {
