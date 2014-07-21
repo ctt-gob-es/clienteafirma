@@ -55,6 +55,12 @@ function cargarAppletFirma()
 	
 	// Se configuran los parametrospara un despliegue tradicional del applet debido a los problema con
 	// JNLP en Mac OS X, Linux con IcedTea y algunos entornos Windows 7/8
+	
+                        // ***************** IMPORTANTE *********
+                        // Por problemas con Java 7u65 se ha comentado "java_arguments" para evitar
+						// errores en el despliegue. Este cambio debería deshacerse una vez se publique
+						// una version de Java que corrija el error.
+                        // ************** FIN IMPORTANTE ********
 	var parameters = {
 			userAgent: window.navigator.userAgent,
 			appName: window.navigator.appName,
@@ -63,7 +69,7 @@ function cargarAppletFirma()
 			code: 'es.gob.afirma.applet.SignApplet',
 			archive: codeBase + "/" + jarArchive,
 			locale: defaultLocale,
-			java_arguments: '-Xms512M -Xmx512M',
+			//java_arguments: '-Xms512M -Xmx512M',
 			custom_java_arguments: CUSTOM_JAVA_ARGUMENTS,
 			codebase_lookup: false,
 			separate_jvm: true
