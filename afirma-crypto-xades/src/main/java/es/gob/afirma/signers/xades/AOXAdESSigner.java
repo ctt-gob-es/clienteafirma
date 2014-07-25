@@ -19,6 +19,7 @@ import java.security.cert.Certificate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.util.UUID;
 import java.util.logging.Logger;
 
 import javax.xml.crypto.dsig.DigestMethod;
@@ -995,8 +996,7 @@ public final class AOXAdESSigner implements AOSigner {
      * documento especificado.
      * @param docu Documento que estar&aacute; contenido en el nuevo documento.
      * @return Documento con ra&iacute;z "AFIRMA".
-     * @throws ParserConfigurationException Cuando se produce un error al analizar el XML.
-     */
+     * @throws ParserConfigurationException Cuando se produce un error al analizar el XML. */
     static Document insertarNodoAfirma(final Document docu) throws ParserConfigurationException {
 
         // Nueva instancia de DocumentBuilderFactory que permita espacio de
@@ -1007,6 +1007,7 @@ public final class AOXAdESSigner implements AOSigner {
         // Crea un nuevo documento con la raiz "AFIRMA"
         final Document docAfirma = dbf.newDocumentBuilder().newDocument();
         final Element rootAfirma = docAfirma.createElement(AFIRMA);
+        rootAfirma.setAttributeNS(null, "Id", "AfirmaRoot-" + UUID.randomUUID().toString());  //$NON-NLS-1$//$NON-NLS-2$
 
         // Inserta el documento pasado por parametro en el nuevo documento
         rootAfirma.appendChild(docAfirma.adoptNode(docu.getDocumentElement()));

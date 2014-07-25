@@ -492,7 +492,9 @@ public final class XAdESSigner {
 				docSignature.appendChild(docSignature.adoptNode(dataElement));
 			}
 			else {
-				docSignature.appendChild(docSignature.createElement(AOXAdESSigner.AFIRMA));
+				final Element afirmaRoot = docSignature.createElement(AOXAdESSigner.AFIRMA);
+				afirmaRoot.setAttributeNS(null, "Id", "AfirmaRoot-" + UUID.randomUUID().toString());  //$NON-NLS-1$//$NON-NLS-2$
+				docSignature.appendChild(afirmaRoot);
 			}
 		}
 		catch (final Exception e) {
@@ -993,7 +995,7 @@ public final class XAdESSigner {
 		}
 
 		// SignerRole
-		SignerRole signerRole = XAdESUtil.parseSignerRole(extraParams);
+		final SignerRole signerRole = XAdESUtil.parseSignerRole(extraParams);
 		if (signerRole != null) {
 			xades.setSignerRole(signerRole);
 		}
