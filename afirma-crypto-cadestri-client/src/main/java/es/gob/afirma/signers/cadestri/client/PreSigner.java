@@ -24,6 +24,10 @@ import es.gob.afirma.core.misc.UrlHttpManager;
 
 final class PreSigner {
 
+	private PreSigner() {
+		// No instanciable
+	}
+
 	static byte[] preSign(final String algorithm,
 			            final Certificate[] certChain,
 			            final String cryptoOperation,
