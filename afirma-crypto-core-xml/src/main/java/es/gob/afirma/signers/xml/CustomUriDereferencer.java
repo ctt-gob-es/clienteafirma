@@ -100,7 +100,7 @@ public final class CustomUriDereferencer implements URIDereferencer {
 	 * @param nodeId Valor del atributo <i>Id</i> del nodo a buscar
 	 * @return Primer nodo de un documento XML que tenga un atributo <i>Id</i> con el
 	 *         valor indicado o <code>null</code> si no se encuentra ninguno */
-	private static Element getElementById(final Document doc, final String nodeId) {
+	public static Element getElementById(final Document doc, final String nodeId) {
 		if (doc == null || nodeId == null) {
 			return null;
 		}

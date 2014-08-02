@@ -62,6 +62,7 @@ import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.MimeHelper;
 import es.gob.afirma.core.signers.AOSignConstants;
+import es.gob.afirma.signers.xml.CustomUriDereferencer;
 import es.gob.afirma.signers.xml.InvalidXMLException;
 import es.gob.afirma.signers.xml.Utils;
 import es.gob.afirma.signers.xml.XMLConstants;
@@ -78,6 +79,8 @@ public final class XAdESSigner {
 
     private static final String HTTP_PROTOCOL_PREFIX = "http://"; //$NON-NLS-1$
     private static final String HTTPS_PROTOCOL_PREFIX = "https://"; //$NON-NLS-1$
+
+    private static final String ID_IDENTIFIER = "Id"; //$NON-NLS-1$
 
 	/** Firma datos en formato XAdES.
 	 * <p>
@@ -218,7 +221,7 @@ public final class XAdESSigner {
 				"useManifest", Boolean.FALSE.toString())); //$NON-NLS-1$
 		final String envelopedNodeXPath = extraParams.getProperty(
 				"insertEnvelopedSignatureOnNodeByXPath"); //$NON-NLS-1$
-		final String nodeToSign = extraParams.getProperty(
+		String nodeToSign = extraParams.getProperty(
 				"nodeToSign"); //$NON-NLS-1$
 		final String format = extraParams.getProperty(
 				"format", AOSignConstants.SIGN_FORMAT_XADES_ENVELOPING); //$NON-NLS-1$
@@ -274,20 +277,27 @@ public final class XAdESSigner {
 		// Propiedades del documento XML original
 		final Map<String, String> originalXMLProperties = new Hashtable<String, String>();
 
-		// carga el documento xml
+		// Factoria XML
 		final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 		dbf.setNamespaceAware(true);
 
 		// Elemento de datos
 		Element dataElement;
 
+		// Documento final de firma
+		Document docSignature = null;
+
 		final String contentId = AOXAdESSigner.DETACHED_CONTENT_ELEMENT_NAME + "-" + UUID.randomUUID().toString(); //$NON-NLS-1$
 		final String styleId = AOXAdESSigner.DETACHED_STYLE_ELEMENT_NAME + "-" + UUID.randomUUID().toString(); //$NON-NLS-1$
 		boolean isBase64 = false;
 		boolean wasEncodedToBase64 = false;
+		boolean avoidDetachedContentInclusion = false;
 
 		// Elemento de estilo
 		XmlStyle xmlStyle = new XmlStyle();
+
+		// Nodo donde insertar la firma
+		Element signatureInsertionNode = null;
 
 		try {
 
@@ -356,22 +366,44 @@ public final class XAdESSigner {
 				}
 			}
 
-			// En Detached se crea un elemento nuevo que contiene los datos
+			// Creamos un elemento raiz nuevo unicamente si es necesario
 			if (format.equals(AOSignConstants.SIGN_FORMAT_XADES_DETACHED)) {
-				dataElement = docum.createElement(AOXAdESSigner.DETACHED_CONTENT_ELEMENT_NAME);
-				dataElement.setAttributeNS(null, "Id", contentId); //$NON-NLS-1$
-				dataElement.setAttributeNS(null, AOXAdESSigner.MIMETYPE_STR, mimeType);
-				if (encoding != null && !"".equals(encoding)) { //$NON-NLS-1$
-					dataElement.setAttributeNS(null, AOXAdESSigner.ENCODING_STR, encoding);
-				}
+				// Si se esta firmando un nodo con un ID concreto, ese nodo es ya el elemento de datos,
+				// por lo que no es necesario crear un elemento nuevo, a menos que sea justo el raiz,
+				// en cuyo caso no podemos usarlo directamente por la imposibilidad de poner la firma
+				// como su hermano, tal y como obliga la normativa
+				if (nodeToSign != null) {
+						dataElement = CustomUriDereferencer.getElementById(docum, nodeToSign);
+						if (!CustomUriDereferencer.getElementById(docum, nodeToSign).isSameNode(docum.getDocumentElement())) {
 
-				dataElement.appendChild(docum.getDocumentElement());
+							// El documento de firma es este mismo
+							docSignature = docum;
+
+							// No debemos anadir el contenido, ya que vamos a firmar sobre el mismo,
+							// por lo que ya esta en el XML
+							avoidDetachedContentInclusion = true;
+
+							// El punto de insercion de la firma debe ser el padre, para que nodo firmado
+							// y firma queden como hermanos
+							signatureInsertionNode = (Element) dataElement.getParentNode();
+						}
+				}
+				// Si no, creamos un nuevo nodo con identificador para insertar el contenido
+				else {
+					dataElement = docum.createElement(AOXAdESSigner.DETACHED_CONTENT_ELEMENT_NAME);
+					dataElement.setAttributeNS(null, ID_IDENTIFIER, contentId);
+					dataElement.setAttributeNS(null, AOXAdESSigner.MIMETYPE_STR, mimeType);
+					if (encoding != null && !"".equals(encoding)) { //$NON-NLS-1$
+						dataElement.setAttributeNS(null, AOXAdESSigner.ENCODING_STR, encoding);
+					}
+					dataElement.appendChild(docum.getDocumentElement());
+				}
 
 				// Tambien el estilo
 				if (xmlStyle.getStyleElement() != null) {
 					try {
 						final Element tmpStyleElement = docum.createElement(AOXAdESSigner.DETACHED_STYLE_ELEMENT_NAME);
-						tmpStyleElement.setAttributeNS(null, "Id", styleId); //$NON-NLS-1$
+						tmpStyleElement.setAttributeNS(null, ID_IDENTIFIER, styleId);
 						if (xmlStyle.getStyleType() != null) {
 							tmpStyleElement.setAttributeNS(null, AOXAdESSigner.MIMETYPE_STR, xmlStyle.getStyleType());
 						}
@@ -419,7 +451,7 @@ public final class XAdESSigner {
 					mimeType = XMLConstants.DEFAULT_MIMETYPE;
 				}
 
-				dataElement.setAttributeNS(null, "Id", contentId); //$NON-NLS-1$
+				dataElement.setAttributeNS(null, ID_IDENTIFIER, contentId);
 
 				// Si es base 64, lo firmamos indicando como contenido el dato pero, ya que puede
 				// poseer un formato particular o caracteres valido pero extranos para el XML,
@@ -482,25 +514,26 @@ public final class XAdESSigner {
 		final String tmpUri = "#" + (nodeToSign != null ? nodeToSign : contentId); //$NON-NLS-1$
 		final String tmpStyleUri = "#" + styleId; //$NON-NLS-1$
 
-		// Crea el nuevo documento de firma
-		Document docSignature = null;
-		try {
-			docSignature = dbf.newDocumentBuilder().newDocument();
-			if (format.equals(AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED)) {
-				// En este caso, dataElement es siempre el XML original a firmar
-				// (o un nodo de este si asi se especifico)
-				docSignature.appendChild(docSignature.adoptNode(dataElement));
+		// Crea el nuevo documento de firma si no lo tenemos ya
+		if (docSignature == null) {
+			try {
+				docSignature = dbf.newDocumentBuilder().newDocument();
+				if (format.equals(AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED)) {
+					// En este caso, dataElement es siempre el XML original a firmar
+					// (o un nodo de este si asi se especifico)
+					docSignature.appendChild(docSignature.adoptNode(dataElement));
+				}
+				else {
+					final Element afirmaRoot = docSignature.createElement(AOXAdESSigner.AFIRMA);
+					afirmaRoot.setAttributeNS(null, ID_IDENTIFIER, "AfirmaRoot-" + UUID.randomUUID().toString());  //$NON-NLS-1$
+					docSignature.appendChild(afirmaRoot);
+				}
 			}
-			else {
-				final Element afirmaRoot = docSignature.createElement(AOXAdESSigner.AFIRMA);
-				afirmaRoot.setAttributeNS(null, "Id", "AfirmaRoot-" + UUID.randomUUID().toString());  //$NON-NLS-1$//$NON-NLS-2$
-				docSignature.appendChild(afirmaRoot);
+			catch (final Exception e) {
+				throw new AOException(
+					"Error al crear la firma en formato " + format + ": " + e, e //$NON-NLS-1$ //$NON-NLS-2$
+				);
 			}
-		}
-		catch (final Exception e) {
-			throw new AOException(
-				"Error al crear la firma en formato " + format + ": " + e, e //$NON-NLS-1$ //$NON-NLS-2$
-			);
 		}
 
 		final List<Reference> referenceList = new ArrayList<Reference>();
@@ -668,14 +701,17 @@ public final class XAdESSigner {
 		}
 
 		// crea una referencia al documento mediante la URI hacia el
-		// identificador del nodo CONTENT
+		// identificador del nodo CONTENT o el de datos si ya tenia Id
 		else if (format.equals(AOSignConstants.SIGN_FORMAT_XADES_DETACHED)) {
 			try {
 				if (dataElement != null) {
 					// Inserta en el nuevo documento de firma el documento a firmar
-					docSignature.getDocumentElement().appendChild(
-						docSignature.adoptNode(dataElement)
-					);
+					// si es nccesario
+					if (!avoidDetachedContentInclusion) {
+						docSignature.getDocumentElement().appendChild(
+							docSignature.adoptNode(dataElement)
+						);
+					}
 					// Crea la referencia a los datos firmados que se encontraran en el mismo
 					// documento
 					referenceList.add(
@@ -885,9 +921,22 @@ public final class XAdESSigner {
 					)
 				);
 
-				// Salvo que sea una factura electronica, se agrega una transformacion XPATH
-				// para eliminar el resto de firmas del documento en las firmas Enveloped
-				if (!facturaeSign) {
+				// Establecemos que es lo que se firma
+				// 1.- Si se especifico un nodo, se firma ese nodo
+				// 2.- Si el raiz tiene Id, se firma ese Id
+				// 3.- Se firma todo el XML con ""
+				if (nodeToSign == null) {
+					// Tiene la raiz un Id?
+					final String ident = docSignature.getDocumentElement().getAttribute(ID_IDENTIFIER);
+					if (ident != null && !"".equals(ident)) { //$NON-NLS-1$
+						nodeToSign = ident;
+					}
+				}
+
+				// Salvo que sea una factura electronica o que el nodo raiz se haya firmado en
+				// base a su Id, se agrega una transformacion XPATH para eliminar el resto de
+				// firmas del documento en las firmas Enveloped
+				if (!facturaeSign && nodeToSign == null) {
 					transformList.add(
 						fac.newTransform(
 							Transform.XPATH,
@@ -949,10 +998,9 @@ public final class XAdESSigner {
 			// *******************************************************
 		}
 
-		// Nodo donde insertar la firma enveloped
-		Element envNode = null;
+		// Nodo donde insertar la firma
 		if (envelopedNodeXPath != null && AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED.equals(format)) {
-			envNode = XAdESUtil.getFirstElmentFromXPath(envelopedNodeXPath, docSignature.getDocumentElement());
+			signatureInsertionNode = XAdESUtil.getFirstElmentFromXPath(envelopedNodeXPath, docSignature.getDocumentElement());
 		}
 
 		// Instancia XADES_EPES
@@ -963,8 +1011,8 @@ public final class XAdESSigner {
 			AOXAdESSigner.XML_SIGNATURE_PREFIX,   // XMLDSig Prefix
 			digestMethodAlgorithm,                // DigestMethod
 			docSignature,                         // Document
-			envNode != null ?                     // Nodo donde se inserta la firma (como hijo), si no se indica se usa la raiz
-				envNode:
+			signatureInsertionNode != null ?                     // Nodo donde se inserta la firma (como hijo), si no se indica se usa la raiz
+				signatureInsertionNode:
 					docSignature.getDocumentElement()
 		);
 

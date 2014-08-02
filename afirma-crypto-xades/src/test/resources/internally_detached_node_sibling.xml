@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<papa Id="ROOT">
+ <hijo>
+  <nieto Id="IDN">
+     CONTENIDO DEL NIETO
+  </nieto>
+ </hijo>
+</papa>
