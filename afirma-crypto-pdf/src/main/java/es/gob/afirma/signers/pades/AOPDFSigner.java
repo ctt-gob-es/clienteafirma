@@ -16,8 +16,8 @@ import java.lang.reflect.Field;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
 import java.util.GregorianCalendar;
+import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
 import java.util.logging.Logger;
@@ -339,7 +339,7 @@ public final class AOPDFSigner implements AOSigner {
     		LOGGER.severe("No se ha podido obtener la informacion de los firmantes del PDF, se devolvera un arbol vacio: " + e); //$NON-NLS-1$
     		return new AOTreeModel(root);
     	}
-    	final ArrayList<?> names = af.getSignatureNames();
+    	final List<String> names = af.getSignatureNames();
     	Object pkcs1Object = null;
     	for (int i = 0; i < names.size(); ++i) {
     		final PdfPKCS7 pcks7 = af.verifySignature(names.get(i).toString());
