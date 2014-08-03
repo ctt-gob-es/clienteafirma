@@ -344,7 +344,11 @@ public final class PAdESTriPhaseSigner {
                 				 )
                              } :
                 			 null
-                     ).addTimestamp(completeCAdESSignature, AOAlgorithmID.getOID(AOSignConstants.getDigestAlgorithmName(tsaHashAlgorithm != null ? tsaHashAlgorithm : "SHA1"))); //$NON-NLS-1$
+                     ).addTimestamp(
+                		 completeCAdESSignature,
+                		 AOAlgorithmID.getOID(AOSignConstants.getDigestAlgorithmName(tsaHashAlgorithm != null ? tsaHashAlgorithm : "SHA1")), //$NON-NLS-1$
+                		 signingTime
+            		 );
                 }
             }
 

@@ -23,6 +23,7 @@ import java.security.KeyStore;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Hashtable;
 import java.util.List;
@@ -117,11 +118,11 @@ public final class CMSTimestamper {
      * @param tsaPwd Contrase&ntilde;a del usuario de la TSA (puede ser <code>null</code> si no se necesita autenticaci&oacute;n)
      * @param extensions Extensiones a a&ntilde;adir a la petici&oacute;n de sello de tiempo */
     public CMSTimestamper(final boolean requireCert,
-                     final String policy,
-                     final URI tsa,
-                     final String tsaUsr,
-                     final String tsaPwd,
-                     final TsaRequestExtension[] extensions) {
+                          final String policy,
+                          final URI tsa,
+                          final String tsaUsr,
+                          final String tsaPwd,
+                          final TsaRequestExtension[] extensions) {
         this.tsqGenerator = new TimeStampRequestGenerator();
         if (extensions != null) {
         	for (final TsaRequestExtension ext : extensions) {
@@ -143,11 +144,12 @@ public final class CMSTimestamper {
     /** A&ntilde;ade un sello de tiempo a las firmas encontradas dentro de una estructura PKCS#7.
      * @param pkcs7 Estructura que contiene las firmas a estampar un sello de tiempo
      * @param hashAlgorithm Algoritmo de huella digital a usar en los sellos de tiempo (si se indica <code>null</code> se usa SHA-1)
+     * @param time Tiempo del sello
      * @return Nueva estructura PKCS#7 con los sellos de tiempo a&ntilde;adidos
      * @throws NoSuchAlgorithmException Si no se soporta el algoritmo de huella digital del sello de tiempo
      * @throws AOException Cuando ocurren errores gen&eacute;ricos
      * @throws IOException Si hay errores de entrada / salida */
-    public byte[] addTimestamp(final byte[] pkcs7, final String hashAlgorithm) throws NoSuchAlgorithmException, AOException, IOException {
+    public byte[] addTimestamp(final byte[] pkcs7, final String hashAlgorithm, final Calendar time) throws NoSuchAlgorithmException, AOException, IOException {
 
         final CMSSignedData signedData;
         try {
@@ -166,7 +168,7 @@ public final class CMSTimestamper {
         for (final Object name : ovSigners) {
 
              final SignerInformation si = (SignerInformation) name;
-             final byte[] tsToken = getTimeStampToken(si.getSignature(), hashAlgorithm);
+             final byte[] tsToken = getTimeStampToken(si.getSignature(), hashAlgorithm, time);
 
              final ASN1InputStream is = new ASN1InputStream(new ByteArrayInputStream(tsToken));
              final ASN1Primitive derObj = is.readObject();
@@ -328,15 +330,16 @@ public final class CMSTimestamper {
     /** Obtiene directamente el <i>token</i> de sello de tiempo seg&uacute;n RFC3161.
      * @param imprint Huella digital de los datos sobre los que se quiere obtener el sello de tiempo
      * @param hashAlgorithm Algoritmo de huella digital usado
+     * @param time Tiempo de solicitud del sello
      * @return <i>Token</i> de sello de tiempo seg&uacute;n RFC3161
      * @throws AOException Si se produce un error en el protocolo TSA o en ASN.1
      * @throws IOException Si hay errores en la comunicaci&oacute;n o en la lectura de datos con la TSA */
-    public byte[] getTimeStampToken(final byte[] imprint, final String hashAlgorithm) throws AOException, IOException {
+    public byte[] getTimeStampToken(final byte[] imprint, final String hashAlgorithm, final Calendar time) throws AOException, IOException {
 
          final TimeStampRequest request = this.tsqGenerator.generate(
                new ASN1ObjectIdentifier(hashAlgorithm != null ? AOAlgorithmID.getOID(hashAlgorithm) : X509ObjectIdentifiers.id_SHA1.getId()),
                imprint,
-               BigInteger.valueOf(System.currentTimeMillis())
+               BigInteger.valueOf(time != null ? time.getTimeInMillis() : System.currentTimeMillis())
           );
 
          final byte[] requestBytes = request.getEncoded();
@@ -347,16 +350,16 @@ public final class CMSTimestamper {
             response = new TimeStampResponse(rawResponse);
          }
          catch (final Exception e) {
-            throw new AOException("Error obteniendo la respuesta de la TSA", e); //$NON-NLS-1$
+            throw new AOException("Error obteniendo la respuesta de la TSA: " + e, e); //$NON-NLS-1$
          }
 
          // Validamos los atributos de la respuesta (RFC 3161 PKIStatus)
          try {
             response.validate(request);
-        }
-        catch (final Exception e) {
-            throw new AOException("Error validando la respuesta de la TSA", e); //$NON-NLS-1$
-        }
+         }
+         catch (final Exception e) {
+            throw new AOException("Error validando la respuesta de la TSA: " + e, e); //$NON-NLS-1$
+         }
          final PKIFailureInfo failure = response.getFailInfo();
          final int value = failure == null ? 0 : failure.intValue();
          if (value != 0) {

@@ -1,5 +1,8 @@
 package es.gob.afirma.signers.tsp.pkcs7;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.net.URI;
 import java.security.MessageDigest;
 
@@ -29,8 +32,13 @@ public class TestTsp {
 		);
 		final byte[] tspToken = cmsTsp.getTimeStampToken(
 			MessageDigest.getInstance("SHA-256").digest("Hola".getBytes()), //$NON-NLS-1$ //$NON-NLS-2$
-			"SHA-256" //$NON-NLS-1$
+			"SHA-256", //$NON-NLS-1$
+			null
 		);
+		final OutputStream fos = new FileOutputStream(File.createTempFile("TSP_", ".asn1")); //$NON-NLS-1$ //$NON-NLS-2$
+		fos.write(tspToken);
+		fos.flush();
+		fos.close();
 		System.out.println(new String(tspToken));
 	}
 
