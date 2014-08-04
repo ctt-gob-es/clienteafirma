@@ -12,6 +12,7 @@ import java.util.logging.Logger;
 import com.lowagie.text.DocumentException;
 import com.lowagie.text.exceptions.BadPasswordException;
 import com.lowagie.text.pdf.PdfDate;
+import com.lowagie.text.pdf.PdfDeveloperExtension;
 import com.lowagie.text.pdf.PdfDictionary;
 import com.lowagie.text.pdf.PdfName;
 import com.lowagie.text.pdf.PdfReader;
@@ -19,6 +20,7 @@ import com.lowagie.text.pdf.PdfSignature;
 import com.lowagie.text.pdf.PdfSignatureAppearance;
 import com.lowagie.text.pdf.PdfStamper;
 import com.lowagie.text.pdf.PdfString;
+import com.lowagie.text.pdf.PdfWriter;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.AOUtil;
@@ -87,15 +89,14 @@ final class PdfTimestamper {
         		final PdfSignatureAppearance sap = stp.getSignatureAppearance();
         		stp.setFullCompression();
 
-        		//TODO:QUITAR???
-//        		// PAdES parte 3 seccion 4.7 - Habilitacion para LTV
-//        		stp.getWriter().addDeveloperExtension(
-//    				new PdfDeveloperExtension(
-//	        			new PdfName("ESIC"), //$NON-NLS-1$
-//	        			PdfWriter.PDF_VERSION_1_7,
-//	        			1
-//					)
-//				);
+        		// PAdES parte 3 seccion 4.7 - Habilitacion para LTV
+        		stp.getWriter().addDeveloperExtension(
+    				new PdfDeveloperExtension(
+	        			new PdfName("ESIC"), //$NON-NLS-1$
+	        			PdfWriter.PDF_VERSION_1_7,
+	        			1
+					)
+				);
 
         		sap.setAcro6Layers(true);
         		sap.setRender(PdfSignatureAppearance.SignatureRenderDescription);

@@ -33,11 +33,8 @@ import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.core.util.tree.AOTreeNode;
 import es.gob.afirma.signers.pades.AOPDFSigner;
 
-/**
- * Pruebas del m&oacute;dulo PAdES de Afirma.
- * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s
- *
- */
+/** Pruebas del m&oacute;dulo PAdES de Afirma.
+ * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public class TestPAdES {
 
 	private static final String CATCERT_POLICY = "0.4.0.2023.1.1"; //$NON-NLS-1$
