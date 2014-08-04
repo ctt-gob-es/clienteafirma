@@ -134,9 +134,12 @@ public class TestPAdES {
         extraParams.put("tsaURL", CATCERT_TSP); //$NON-NLS-1$
         extraParams.put("tsaPolicy", CATCERT_POLICY); //$NON-NLS-1$
         extraParams.put("tsaRequireCert", CATCERT_REQUIRECERT); //$NON-NLS-1$
-        extraParams.put("tsaHashAlgorithm", "SHA1"); //$NON-NLS-1$ //$NON-NLS-2$
+        extraParams.put("tsaHashAlgorithm", "SHA-512"); //$NON-NLS-1$ //$NON-NLS-2$
         //******************************************************************************************
         //********* FIN TSA CATCERT ****************************************************************
+
+        // Certificacion
+        //extraParams.put("certificationLevel", "1"); //$NON-NLS-1$ //$NON-NLS-2$
 
 //        //********** TSA AFIRMA ********************************************************************
 //        //******************************************************************************************

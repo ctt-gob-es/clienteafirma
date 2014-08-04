@@ -53,9 +53,9 @@ public final class PdfSignResult implements Serializable {
      * @param signingTime Momento de firmado
      * @param xParams Opciones adiconales de la firma */
     public PdfSignResult(final String pdfFileId,
-    		         final byte[] signature,
-    		         final GregorianCalendar signingTime,
-    		         final Properties xParams) {
+    		             final byte[] signature,
+    		             final GregorianCalendar signingTime,
+    		             final Properties xParams) {
         if (signingTime == null || pdfFileId == null || signature == null || "".equals(pdfFileId) || signature.length < 1) { //$NON-NLS-1$
             throw new IllegalArgumentException("Es obligatorio proporcionar un MAC, una pre-firma y un momento de firmado"); //$NON-NLS-1$
         }

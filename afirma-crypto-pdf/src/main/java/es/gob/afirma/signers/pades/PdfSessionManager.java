@@ -71,11 +71,11 @@ public final class PdfSessionManager {
      * @throws IOException En caso de errores de entrada / salida
      * @throws DocumentException Si ocurren errores en la estampaci&iacute;n de la firma PDF */
     public static PdfTriPhaseSession getSessionData(final byte[] inPDF,
-                                                     final X509Certificate[] certChain,
-                                                     final Calendar signTime,
-                                                     final Properties extraParams) throws AOException,
-                                                                                          IOException,
-                                                                                          DocumentException {
+                                                    final X509Certificate[] certChain,
+                                                    final Calendar signTime,
+                                                    final Properties extraParams) throws AOException,
+                                                                                         IOException,
+                                                                                         DocumentException {
 
 		// *********************************************************************************************************************
 		// **************** LECTURA PARAMETROS ADICIONALES *********************************************************************
@@ -171,7 +171,7 @@ public final class PdfSessionManager {
 		// *****************************
 
 		// Contrasena del propietario del PDF
-		String ownerPassword = extraParams.getProperty("ownerPassword"); //$NON-NLS-1$
+		final String ownerPassword = extraParams.getProperty("ownerPassword"); //$NON-NLS-1$
 
 		// Contrasena del usuario del PDF
 		final String userPassword =  extraParams.getProperty("userPassword"); //$NON-NLS-1$
@@ -180,43 +180,12 @@ public final class PdfSessionManager {
 		// **************** FIN LECTURA PARAMETROS ADICIONALES *****************************************************************
 		// *********************************************************************************************************************
 
-		PdfReader pdfReader;
-		try {
-			if (ownerPassword != null) {
-				pdfReader = new PdfReader(inPDF, ownerPassword.getBytes());
-			}
-			else if (userPassword != null) {
-				pdfReader = new PdfReader(inPDF, userPassword.getBytes());
-			}
-			else {
-				pdfReader = new PdfReader(inPDF);
-			}
-		}
-		catch (final BadPasswordException e) {
-			// Comprobamos que el signer esta en modo interactivo, y si no lo
-			// esta no pedimos contrasena por dialogo, principalmente para no interrumpir un firmado por lotes
-			// desatendido
-			if (Boolean.TRUE.toString().equalsIgnoreCase(extraParams.getProperty("headLess"))) { //$NON-NLS-1$
-				throw new BadPdfPasswordException(e);
-			}
-			// La contrasena que nos han proporcionada no es buena o no nos
-			// proporcionaron ninguna
-			ownerPassword = new String(
-				AOUIFactory.getPassword(
-					ownerPassword == null ? CommonPdfMessages.getString("AOPDFSigner.0") : CommonPdfMessages.getString("AOPDFSigner.1"), //$NON-NLS-1$ //$NON-NLS-2$
-					null
-				)
-			);
-			try {
-				pdfReader = new PdfReader(inPDF, ownerPassword.getBytes());
-			}
-			catch (final BadPasswordException e2) {
-				throw new BadPdfPasswordException(e2);
-			}
-		}
-		catch (final IOException e) {
-			throw new InvalidPdfException(e);
-		}
+		final PdfReader pdfReader = PdfUtil.getPdfReader(
+			inPDF,
+			ownerPassword,
+			userPassword,
+			Boolean.getBoolean(extraParams.getProperty("headLess")) //$NON-NLS-1$
+		);
 
 		if (pdfReader.getCertificationLevel() != PdfSignatureAppearance.NOT_CERTIFIED &&
 				!Boolean.parseBoolean(extraParams.getProperty("allowSigningCertifiedPdfs"))) { //$NON-NLS-1$

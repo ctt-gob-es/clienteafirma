@@ -27,10 +27,15 @@ import com.lowagie.text.pdf.PdfSignatureAppearance;
 import com.lowagie.text.pdf.PdfString;
 
 import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.AOInvalidFormatException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.signers.AOSignConstants;
+import es.gob.afirma.core.signers.AOSimpleSignInfo;
 import es.gob.afirma.core.signers.AdESPolicy;
+import es.gob.afirma.core.util.tree.AOTreeModel;
+import es.gob.afirma.core.util.tree.AOTreeNode;
+import es.gob.afirma.signers.cades.AOCAdESSigner;
 import es.gob.afirma.signers.cades.CAdESSignerMetadataHelper;
 import es.gob.afirma.signers.cades.CAdESTriPhaseSigner;
 import es.gob.afirma.signers.cades.CommitmentTypeIndicationsHelper;
@@ -201,16 +206,15 @@ public final class PAdESTriPhaseSigner {
         final byte[] original = AOUtil.getDataFromInputStream(ptps.getSAP().getRangeStream());
 
         // Calculamos el MessageDigest
-        final MessageDigest md;
+        final byte[] md;
         try {
-            md = MessageDigest.getInstance(AOSignConstants.getDigestAlgorithmName(digestAlgorithmName));
+            md = MessageDigest.getInstance(AOSignConstants.getDigestAlgorithmName(digestAlgorithmName)).digest(original);
         }
         catch (final NoSuchAlgorithmException e) {
-            throw new AOException("El algoritmo de huella digital no es valido", e); //$NON-NLS-1$
+            throw new AOException("El algoritmo de huella digital no es valido: " + e, e); //$NON-NLS-1$
         }
-        md.update(original);
 
-        // pre-firma CAdES
+        // Pre-firma CAdES
         return new PdfSignResult(
             ptps.getFileID(),
             CAdESTriPhaseSigner.preSign(
@@ -219,7 +223,7 @@ public final class PAdESTriPhaseSigner {
                 signerCertificateChain, // Cadena de certificados del firmante
                 new AdESPolicy(extraParams), // Politica de firma
                 signingCertificateV2, // signingCertificateV2
-                md.digest(), // Valor de la huella digital del contenido
+                md, // Valor de la huella digital del contenido
                 signTime.getTime(), // Fecha de la firma (debe establecerse externamente para evitar desincronismos en la firma trifasica)
                 true, // Modo PAdES
                 PDF_OID,
@@ -243,7 +247,7 @@ public final class PAdESTriPhaseSigner {
      *  <li><i>SHA-384</i></li>
      *  <li><i>SHA-512</i></li>
      * </ul>
-     * @param inPDF PDF a firmar (debe ser el mismo que el usado en la pre-firma).
+     * @param inPdf PDF a firmar (debe ser el mismo que el usado en la pre-firma).
      * @param signerCertificateChain Cadena de certificados del firmante (debe ser la misma que la usado en la pre-firma).
      * @param pkcs1Signature Resultado de la firma PKCS#1 v1.5 de los datos de la pre-firma.
      * @param preSign Resultado de la pre-firma
@@ -254,15 +258,17 @@ public final class PAdESTriPhaseSigner {
      * @throws AOException en caso de cualquier tipo de error
      * @throws IOException Cuando ocurre algun error en la conversi&oacute;n o generaci&oacute;n
      * de estructuras.
-     * @throws NoSuchAlgorithmException Si hay problemas con el algoritmo durante el sello de tiempo */
+     * @throws NoSuchAlgorithmException Si hay problemas con el algoritmo durante el sello de tiempo
+     * @throws DocumentException Si hay problemas en la lectura del PDF. */
     public static byte[] postSign(final String digestAlgorithmName,
-                    final byte[] inPDF,
-                    final X509Certificate[] signerCertificateChain,
-                    final byte[] pkcs1Signature,
-                    final PdfSignResult preSign,
-                    final SignEnhancer enhancer,
-                    final Properties enhancerConfig) throws AOException, IOException, NoSuchAlgorithmException {
-
+                                  final byte[] inPdf,
+                                  final X509Certificate[] signerCertificateChain,
+                                  final byte[] pkcs1Signature,
+                                  final PdfSignResult preSign,
+                                  final SignEnhancer enhancer,
+                                  final Properties enhancerConfig) throws AOException,
+                                                                          IOException,
+                                                                          NoSuchAlgorithmException {
     	// Obtenemos la firma
     	final PdfSignResult completePdfSSignature = generatePdfSignature(
     		digestAlgorithmName,
@@ -277,13 +283,30 @@ public final class PAdESTriPhaseSigner {
 		);
 
         // Insertamos la firma en el PDF
-        return insertSignatureOnPdf(
-    		inPDF,
-    		signerCertificateChain,
-    		completePdfSSignature
+    	return PdfTimestamper.timestampPdf(
+			insertSignatureOnPdf(
+        		inPdf,
+        		signerCertificateChain,
+        		completePdfSSignature
+    		),
+    		preSign.getExtraParams(),
+    		preSign.getSignTime()
 		);
-
     }
+
+    private final static X509Certificate[] getCertChainFromPkcs7(final byte[] pkcs7) throws AOInvalidFormatException, IOException {
+    	return ((AOSimpleSignInfo)(
+			(AOTreeNode) AOTreeModel.getChild(
+					new AOCAdESSigner().getSignersStructure(
+						pkcs7,
+						true
+					).getRoot(),
+					0
+				)
+			).getUserObject()
+		).getCerts();
+    }
+
 
     private static PdfSignResult generatePdfSignature(final String digestAlgorithmName,
                                                final X509Certificate[] signerCertificateChain,
@@ -313,8 +336,8 @@ public final class PAdESTriPhaseSigner {
 
         //***************** SELLO DE TIEMPO ****************
         final String tsa = extraParams.getProperty("tsaURL"); //$NON-NLS-1$
-        URI tsaURL;
         if (tsa != null) {
+            URI tsaURL;
             try {
                 tsaURL = new URI(tsa);
             }
@@ -360,8 +383,10 @@ public final class PAdESTriPhaseSigner {
     }
 
     private static byte[] insertSignatureOnPdf(final byte[] inPdf,
-    		                                   final X509Certificate[] signerCertificateChain,
+    		                                   final X509Certificate[] certChain,
     		                                   final PdfSignResult signature) throws AOException, IOException {
+
+    	final X509Certificate[] signerCertificateChain = certChain != null ? certChain : getCertChainFromPkcs7(signature.getSign());
 
         final byte[] outc = new byte[CSIZE];
 

@@ -124,7 +124,6 @@ public final class ReadNodesTree {
                 this.rama = new AOTreeNode(aossi);
                 this.listaCert.add(nameSigner);
                 getUnsignedAtributesWithCertificates(si.getUnauthenticatedAttributes(), this.rama, certificates);
-
                 raiz.add(this.rama);
             }
         }
