@@ -12,13 +12,11 @@ package es.gob.afirma.signers.pades;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.net.URI;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
 import java.util.GregorianCalendar;
 import java.util.Properties;
-import java.util.logging.Logger;
 
 import com.lowagie.text.DocumentException;
 import com.lowagie.text.pdf.PdfDictionary;
@@ -28,15 +26,11 @@ import com.lowagie.text.pdf.PdfString;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.AOUtil;
-import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AdESPolicy;
 import es.gob.afirma.signers.cades.CAdESSignerMetadataHelper;
 import es.gob.afirma.signers.cades.CAdESTriPhaseSigner;
 import es.gob.afirma.signers.cades.CommitmentTypeIndicationsHelper;
-import es.gob.afirma.signers.pkcs7.AOAlgorithmID;
-import es.gob.afirma.signers.tsp.pkcs7.CMSTimestamper;
-import es.gob.afirma.signers.tsp.pkcs7.TsaRequestExtension;
 
 /** Clase para la firma electr&oacute;nica en tres fases de ficheros Adobe PDF en formato PAdES.
  * <p>No firma PDF cifrados.</p>
@@ -148,8 +142,6 @@ public final class PAdESTriPhaseSigner {
 
     /** Versi&oacute;n de iText necesaria para el uso de esta clase (2.1.7). */
     public static final String ITEXT_VERSION = "2.1.7"; //$NON-NLS-1$
-
-    private static final Logger LOGGER = Logger.getLogger("es.gob.afirma");  //$NON-NLS-1$
 
     private static final int CSIZE = 27000;
 
@@ -286,17 +278,15 @@ public final class PAdESTriPhaseSigner {
     }
 
     private static PdfSignResult generatePdfSignature(final String digestAlgorithmName,
-                                               final X509Certificate[] signerCertificateChain,
-                                               final Properties xParams,
-                                               final byte[] pkcs1Signature,
-                                               final byte[] signedAttributes,
-                                               final String pdfFileId,
-                                               final GregorianCalendar signingTime,
-                                               final SignEnhancer enhancer,
-                                               final Properties enhancerConfig) throws AOException,
-                                                                                       IOException,
-                                                                                       NoSuchAlgorithmException {
-
+                                                      final X509Certificate[] signerCertificateChain,
+                                                      final Properties xParams,
+                                                      final byte[] pkcs1Signature,
+                                                      final byte[] signedAttributes,
+                                                      final String pdfFileId,
+                                                      final GregorianCalendar signingTime,
+                                                      final SignEnhancer enhancer,
+                                                      final Properties enhancerConfig) throws AOException,
+                                                                                              IOException {
         byte[] completeCAdESSignature = CAdESTriPhaseSigner.postSign(
     		AOSignConstants.getDigestAlgorithmName(digestAlgorithmName),
     		null,
@@ -309,54 +299,7 @@ public final class PAdESTriPhaseSigner {
         	completeCAdESSignature = enhancer.enhance(completeCAdESSignature, enhancerConfig);
         }
 
-        final Properties extraParams = xParams != null ? xParams : new Properties();
-
-        //***************** SELLO DE TIEMPO ****************
-        final String tsa = extraParams.getProperty("tsaURL"); //$NON-NLS-1$
-        if (tsa != null) {
-            URI tsaURL;
-            try {
-                tsaURL = new URI(tsa);
-            }
-            catch(final Exception e) {
-                LOGGER.warning("Se ha indicado una URL de TSA invalida (" + tsa + "), no se anadira sello de tiempo: " + e); //$NON-NLS-1$ //$NON-NLS-2$
-                tsaURL = null;
-            }
-            if (tsaURL != null) {
-                final String tsaPolicy = extraParams.getProperty("tsaPolicy"); //$NON-NLS-1$
-                if (tsaPolicy == null) {
-                    LOGGER.warning("Se ha indicado una URL de TSA pero no una politica, no se anadira sello de tiempo"); //$NON-NLS-1$
-                }
-                else {
-                    final String tsaHashAlgorithm = extraParams.getProperty("tsaHashAlgorithm"); //$NON-NLS-1$
-                    completeCAdESSignature = new CMSTimestamper(
-                         !Boolean.FALSE.toString().equalsIgnoreCase(extraParams.getProperty("tsaRequireCert")),  //$NON-NLS-1$
-                         tsaPolicy,
-                         tsaURL,
-                         extraParams.getProperty("tsaUsr"),  //$NON-NLS-1$
-                         extraParams.getProperty("tsaPwd"), //$NON-NLS-1$
-                         extraParams.getProperty("tsaExtensionOid") != null && extraParams.getProperty("tsaExtensionValueBase64") != null ? //$NON-NLS-1$ //$NON-NLS-2$
-                    		 new TsaRequestExtension[] {
-                        		 new TsaRequestExtension(
-                    				 extraParams.getProperty("tsaExtensionOid"), //$NON-NLS-1$
-                    				 Boolean.getBoolean(extraParams.getProperty("tsaExtensionCritical", "false")), //$NON-NLS-1$ //$NON-NLS-2$
-                    				 Base64.decode(extraParams.getProperty("tsaExtensionValueBase64")) //$NON-NLS-1$
-                				 )
-                             } :
-                			 null
-                     ).addTimestamp(
-                		 completeCAdESSignature,
-                		 AOAlgorithmID.getOID(AOSignConstants.getDigestAlgorithmName(tsaHashAlgorithm != null ? tsaHashAlgorithm : "SHA1")), //$NON-NLS-1$
-                		 signingTime
-            		 );
-                }
-            }
-
-        }
-        //************** FIN SELLO DE TIEMPO ****************
-
-        return new PdfSignResult(pdfFileId, completeCAdESSignature, signingTime, xParams);
-
+        return new PdfSignResult(pdfFileId, completeCAdESSignature, signingTime, xParams != null ? xParams : new Properties());
     }
 
     private static byte[] insertSignatureOnPdf(final byte[] inPdf,
