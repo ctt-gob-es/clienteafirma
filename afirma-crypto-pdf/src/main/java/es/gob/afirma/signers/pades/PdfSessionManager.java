@@ -23,7 +23,6 @@ import com.lowagie.text.Image;
 import com.lowagie.text.Rectangle;
 import com.lowagie.text.exceptions.BadPasswordException;
 import com.lowagie.text.pdf.PdfDate;
-import com.lowagie.text.pdf.PdfDeveloperExtension;
 import com.lowagie.text.pdf.PdfName;
 import com.lowagie.text.pdf.PdfObject;
 import com.lowagie.text.pdf.PdfPKCS7;
@@ -31,13 +30,10 @@ import com.lowagie.text.pdf.PdfReader;
 import com.lowagie.text.pdf.PdfSignature;
 import com.lowagie.text.pdf.PdfSignatureAppearance;
 import com.lowagie.text.pdf.PdfStamper;
-import com.lowagie.text.pdf.PdfWriter;
 
-import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.misc.Platform.OS;
-import es.gob.afirma.core.ui.AOUIFactory;
 
 /** Gestor del n&uacute;cleo de firma PDF. Esta clase realiza las operaciones necesarias tanto para
  * la firma monof&aacute;sica PAdES como para las trif&aacute;sicas de una forma unificada, pero
@@ -187,24 +183,7 @@ public final class PdfSessionManager {
 			Boolean.getBoolean(extraParams.getProperty("headLess")) //$NON-NLS-1$
 		);
 
-		if (pdfReader.getCertificationLevel() != PdfSignatureAppearance.NOT_CERTIFIED &&
-				!Boolean.parseBoolean(extraParams.getProperty("allowSigningCertifiedPdfs"))) { //$NON-NLS-1$
-			// Si no permitimos dialogos graficos o directamente hemos indicado que no permitimos firmar PDF certificados lanzamos
-			// una excepcion
-			if (Boolean.parseBoolean(extraParams.getProperty("headLess")) || "false".equalsIgnoreCase(extraParams.getProperty("allowSigningCertifiedPdfs"))) {  //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-				throw new PdfIsCertifiedException();
-			}
-			// En otro caso, perguntamos al usuario
-			if (AOUIFactory.NO_OPTION == AOUIFactory.showConfirmDialog(
-				null,
-				CommonPdfMessages.getString("AOPDFSigner.8"), //$NON-NLS-1$
-				CommonPdfMessages.getString("AOPDFSigner.9"), //$NON-NLS-1$
-				AOUIFactory.YES_NO_OPTION,
-				AOUIFactory.WARNING_MESSAGE)
-			) {
-				throw new AOCancelledOperationException("El usuario no ha permitido la firma de un PDF certificado"); //$NON-NLS-1$
-			}
-		}
+		PdfUtil.checkPdfCertification(pdfReader.getCertificationLevel(), extraParams);
 
 		// Los derechos van firmados por Adobe, y como desde iText se invalidan
 		// es mejor quitarlos
@@ -264,12 +243,7 @@ public final class PdfSessionManager {
 		stp.setFullCompression();
 		sap.setAcro6Layers(true);
 
-		// PAdES parte 3 seccion 4.7 - Habilitacion para LTV
-		stp.getWriter().addDeveloperExtension(new PdfDeveloperExtension(
-			new PdfName("ESIC"), //$NON-NLS-1$
-			PdfWriter.PDF_VERSION_1_7,
-			1
-		));
+		PdfUtil.enableLtv(stp);
 
 		// Adjuntos
 		PdfPreProcessor.attachFile(extraParams, stp);
@@ -289,31 +263,7 @@ public final class PdfSessionManager {
 		sap.setSignDate(signTime);
 
 		// Gestion de los cifrados
-		if (pdfReader.isEncrypted() && (ownerPassword != null || userPassword != null)) {
-			if (Boolean.TRUE.toString().equalsIgnoreCase(extraParams.getProperty("avoidEncryptingSignedPdfs"))) { //$NON-NLS-1$
-				LOGGER.info(
-					"Aunque el PDF original estaba encriptado no se encriptara el PDF firmado (se establecio el indicativo 'avoidEncryptingSignedPdfs')" //$NON-NLS-1$
-				);
-			}
-			else {
-				LOGGER.info(
-					"El PDF original estaba encriptado, se intentara encriptar tambien el PDF firmado" //$NON-NLS-1$
-				);
-				try {
-					stp.setEncryption(
-						ownerPassword != null ? ownerPassword.getBytes() : null,
-						userPassword != null ? userPassword.getBytes() : null,
-						pdfReader.getPermissions(),
-						pdfReader.getCryptoMode()
-					);
-				}
-				catch (final DocumentException de) {
-					LOGGER.warning(
-						"No se ha podido cifrar el PDF destino, se escribira sin contrasena: " + de //$NON-NLS-1$
-					);
-				}
-			}
-		}
+		PdfUtil.managePdfEncryption(stp, pdfReader, ownerPassword, userPassword, extraParams);
 
 		// Pagina en donde se imprime la firma
 		if (page == LAST_PAGE) {

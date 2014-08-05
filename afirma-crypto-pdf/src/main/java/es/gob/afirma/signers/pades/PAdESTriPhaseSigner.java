@@ -278,14 +278,10 @@ public final class PAdESTriPhaseSigner {
 		);
 
         // Insertamos la firma en el PDF
-    	return PdfTimestamper.timestampPdf(
-			insertSignatureOnPdf(
-        		inPdf,
-        		signerCertificateChain,
-        		completePdfSSignature
-    		),
-    		preSign.getExtraParams(),
-    		preSign.getSignTime()
+    	return insertSignatureOnPdf(
+    		inPdf,
+    		signerCertificateChain,
+    		completePdfSSignature
 		);
     }
 

@@ -88,7 +88,7 @@ public final class AOPDFSigner implements AOSigner {
      *  igualmente cifrado y protegido con contrase&ntilde;a. Consulte la documentaci&oacute;n de la opci&oacute;n <code>avoidEncryptingSignedPdfs</code>
      *  para m&aacute;s informaci&oacute;n.
      * </p>
-     * @param data Documento PDF a firmar
+     * @param inPDF Documento PDF a firmar
      * @param algorithm Algoritmo a usar para la firma.
      * <p>Se aceptan los siguientes algoritmos en el par&aacute;metro <code>algorithm</code>:</p>
      * <ul>
@@ -105,7 +105,7 @@ public final class AOPDFSigner implements AOSigner {
      * @return Documento PDF firmado en formato PAdES
      * @throws AOException Cuando ocurre cualquier problema durante el proceso */
     @Override
-	public byte[] sign(final byte[] data,
+	public byte[] sign(final byte[] inPDF,
 			           final String algorithm,
 			           final PrivateKey key,
 			           final java.security.cert.Certificate[] certChain,
@@ -115,18 +115,22 @@ public final class AOPDFSigner implements AOSigner {
 
         checkIText();
 
+        final GregorianCalendar signTime = new GregorianCalendar();
+
+        final byte[] data = PdfTimestamper.timestampPdf(inPDF, extraParams, signTime);
+
         final PdfSignResult pre;
         try {
 			pre = PAdESTriPhaseSigner.preSign(
 				algorithm,
 				data,
 				(X509Certificate[]) certChain,
-				new GregorianCalendar(),
+				signTime,
 				extraParams
 			);
 		}
-        catch (final DocumentException e1) {
-			throw new InvalidPdfException(e1);
+        catch (final DocumentException e) {
+			throw new InvalidPdfException(e);
 		}
 
         try {
@@ -140,8 +144,8 @@ public final class AOPDFSigner implements AOSigner {
 				null
 			);
 		}
-        catch (final NoSuchAlgorithmException e1) {
-			throw new AOException("Error el en algoritmo de firma: " + e1, e1); //$NON-NLS-1$
+        catch (final NoSuchAlgorithmException e) {
+			throw new AOException("Error el en algoritmo de firma: " + e, e); //$NON-NLS-1$
 		}
 
     }

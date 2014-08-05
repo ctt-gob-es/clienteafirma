@@ -136,7 +136,7 @@ public class TestPAdES {
         //********* FIN TSA CATCERT ****************************************************************
 
         // Certificacion
-        //extraParams.put("certificationLevel", "1"); //$NON-NLS-1$ //$NON-NLS-2$
+        extraParams.put("certificationLevel", "1"); //$NON-NLS-1$ //$NON-NLS-2$
 
 //        //********** TSA AFIRMA ********************************************************************
 //        //******************************************************************************************
