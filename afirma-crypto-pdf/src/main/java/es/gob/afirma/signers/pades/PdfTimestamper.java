@@ -69,7 +69,7 @@ final class PdfTimestamper {
         				baos,      // Salida
         				'\0',      // Mantener version
         				null,      // No crear temporal
-        				true,      // Siempre creo revision
+        				Boolean.parseBoolean(extraParams.getProperty("alwaysCreateRevision", "false")) || pdfReader.getAcroFields().getSignatureNames().size() > 0, //$NON-NLS-1$ //$NON-NLS-2$
         				signTime   // Momento de la firma
         			);
         		}
