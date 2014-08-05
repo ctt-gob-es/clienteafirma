@@ -27,15 +27,10 @@ import com.lowagie.text.pdf.PdfSignatureAppearance;
 import com.lowagie.text.pdf.PdfString;
 
 import es.gob.afirma.core.AOException;
-import es.gob.afirma.core.AOInvalidFormatException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.signers.AOSignConstants;
-import es.gob.afirma.core.signers.AOSimpleSignInfo;
 import es.gob.afirma.core.signers.AdESPolicy;
-import es.gob.afirma.core.util.tree.AOTreeModel;
-import es.gob.afirma.core.util.tree.AOTreeNode;
-import es.gob.afirma.signers.cades.AOCAdESSigner;
 import es.gob.afirma.signers.cades.CAdESSignerMetadataHelper;
 import es.gob.afirma.signers.cades.CAdESTriPhaseSigner;
 import es.gob.afirma.signers.cades.CommitmentTypeIndicationsHelper;
@@ -294,20 +289,6 @@ public final class PAdESTriPhaseSigner {
 		);
     }
 
-    private final static X509Certificate[] getCertChainFromPkcs7(final byte[] pkcs7) throws AOInvalidFormatException, IOException {
-    	return ((AOSimpleSignInfo)(
-			(AOTreeNode) AOTreeModel.getChild(
-					new AOCAdESSigner().getSignersStructure(
-						pkcs7,
-						true
-					).getRoot(),
-					0
-				)
-			).getUserObject()
-		).getCerts();
-    }
-
-
     private static PdfSignResult generatePdfSignature(final String digestAlgorithmName,
                                                final X509Certificate[] signerCertificateChain,
                                                final Properties xParams,
@@ -383,11 +364,8 @@ public final class PAdESTriPhaseSigner {
     }
 
     private static byte[] insertSignatureOnPdf(final byte[] inPdf,
-    		                                   final X509Certificate[] certChain,
+    		                                   final X509Certificate[] signerCertificateChain,
     		                                   final PdfSignResult signature) throws AOException, IOException {
-
-    	final X509Certificate[] signerCertificateChain = certChain != null ? certChain : getCertChainFromPkcs7(signature.getSign());
-
         final byte[] outc = new byte[CSIZE];
 
         if (signature.getSign().length > CSIZE) {
