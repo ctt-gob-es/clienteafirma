@@ -18,7 +18,7 @@ import es.gob.afirma.core.ui.AOUIFactory;
 
 final class PdfUtil {
 
-	private static Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	private PdfUtil() {
 		// No instanciable
