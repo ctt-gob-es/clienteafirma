@@ -29,6 +29,7 @@ public final class PdfSignResult implements Serializable {
 
 	private String fileID;
     private byte[] sign;
+    private byte[] timestamp;
     private GregorianCalendar signTime;
     private Properties extraParams;
 
@@ -50,10 +51,12 @@ public final class PdfSignResult implements Serializable {
     /** Construye el resultado de una pre-firma (como primera parte de un firma trif&aacute;sica) o una firma completa PAdES.
      * @param pdfFileId Identificador &uacute;nico del PDF
      * @param signature Firma o pre-firma
+     * @param tsp Sello de tiempo
      * @param signingTime Momento de firmado
      * @param xParams Opciones adiconales de la firma */
     public PdfSignResult(final String pdfFileId,
     		             final byte[] signature,
+    		             final byte[] tsp,
     		             final GregorianCalendar signingTime,
     		             final Properties xParams) {
         if (signingTime == null || pdfFileId == null || signature == null || "".equals(pdfFileId) || signature.length < 1) { //$NON-NLS-1$
@@ -61,6 +64,7 @@ public final class PdfSignResult implements Serializable {
         }
         this.fileID = pdfFileId;
         this.sign = signature.clone();
+        this.timestamp = tsp.clone();
         this.signTime = signingTime;
         this.extraParams = xParams != null ? xParams : new Properties();
     }
@@ -80,7 +84,13 @@ public final class PdfSignResult implements Serializable {
     /** Obtiene los atributos CAdES a firmar.
      * @return Atributos CAdES a firmar (pre-firma) */
     public byte[] getSign() {
-        return this.sign;
+        return this.sign.clone();
+    }
+
+    /** Obtiene el sello de tiempo.
+     * @return Sello de tiempo. */
+    public byte[] getTimestamp() {
+    	return this.timestamp.clone();
     }
 
     /** Obtiene el momento en el que se realiz&oacute; la firma.
@@ -135,6 +145,9 @@ public final class PdfSignResult implements Serializable {
     		.append(" <sign>\n") //$NON-NLS-1$
     		.append(Base64.encode(getSign())).append('\n')
     		.append(" </sign>\n") //$NON-NLS-1$
+    		.append(" <timestamp>\n") //$NON-NLS-1$
+    		.append(this.timestamp != null ? Base64.encode(getTimestamp()) : "").append('\n') //$NON-NLS-1$
+    		.append(" </timestamp>\n") //$NON-NLS-1$
     		.append(" <signTime>\n") //$NON-NLS-1$
     		.append(dataTypeFactory.newXMLGregorianCalendar(getSignTime()).toXMLFormat()).append('\n')
     		.append(" </signTime>\n") //$NON-NLS-1$
@@ -144,7 +157,7 @@ public final class PdfSignResult implements Serializable {
     }
 
 	/** M&eacute;todo necesario para la deserializaci&oacute;n de un objeto.
-	 * @param in Datos de entrada.
+	 * @param in Datos de entrada (en formato XML).
 	 * @throws IOException Cuando no se puede deserializar.
 	 * @throws ClassNotFoundException Cuando no existe la clase. */
 	private void readObject(final ObjectInputStream in) throws IOException, ClassNotFoundException {
@@ -184,6 +197,16 @@ public final class PdfSignResult implements Serializable {
     		throw new IOException("No se encontro el nodo 'sign' del PdfSignResultSerializado"); //$NON-NLS-1$
     	}
     	this.sign = Base64.decode(node.getTextContent().trim());
+
+    	// timestamp
+    	i = getNextElementNode(nodeList, ++i);
+    	node = nodeList.item(i);
+    	if (!"timestamp".equalsIgnoreCase(node.getNodeName())) { //$NON-NLS-1$
+    		throw new IOException(
+				"No se encontro el nodo 'timestamp' del PdfSignResultSerializado, aunque no haya sello de tiempo el nodo debe existir (aunque vacio)" //$NON-NLS-1$
+			);
+    	}
+    	this.timestamp = "".equals(node.getTextContent().trim()) ? null : Base64.decode(node.getTextContent().trim()); //$NON-NLS-1$
 
     	// signTime
     	i = getNextElementNode(nodeList, ++i);

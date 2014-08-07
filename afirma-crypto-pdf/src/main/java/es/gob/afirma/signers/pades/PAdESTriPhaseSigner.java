@@ -218,6 +218,7 @@ public final class PAdESTriPhaseSigner {
                 CommitmentTypeIndicationsHelper.getCommitmentTypeIndications(extraParams),
                 CAdESSignerMetadataHelper.getCAdESSignerMetadata(extraParams)
             ),
+            null, // Sello de tiempo
             signTime,
             extraParams
         );
@@ -264,6 +265,7 @@ public final class PAdESTriPhaseSigner {
     		pkcs1Signature,
     		preSign.getSign(),
     		preSign.getFileID(),
+    		preSign.getTimestamp(),
     		preSign.getSignTime(),
     		enhancer,
     		enhancerConfig
@@ -283,6 +285,7 @@ public final class PAdESTriPhaseSigner {
                                                       final byte[] pkcs1Signature,
                                                       final byte[] signedAttributes,
                                                       final String pdfFileId,
+                                                      final byte[] timestamp,
                                                       final GregorianCalendar signingTime,
                                                       final SignEnhancer enhancer,
                                                       final Properties enhancerConfig) throws AOException,
@@ -299,7 +302,12 @@ public final class PAdESTriPhaseSigner {
         	completeCAdESSignature = enhancer.enhance(completeCAdESSignature, enhancerConfig);
         }
 
-        return new PdfSignResult(pdfFileId, completeCAdESSignature, signingTime, xParams != null ? xParams : new Properties());
+        return new PdfSignResult(
+    		pdfFileId,
+    		completeCAdESSignature,
+    		timestamp, // Sello de tiempo
+    		signingTime,
+    		xParams != null ? xParams : new Properties());
     }
 
     private static byte[] insertSignatureOnPdf(final byte[] inPdf,
