@@ -64,7 +64,7 @@ public final class PdfSignResult implements Serializable {
         }
         this.fileID = pdfFileId;
         this.sign = signature.clone();
-        this.timestamp = tsp.clone();
+        this.timestamp = tsp != null ? tsp.clone() : null;
         this.signTime = signingTime;
         this.extraParams = xParams != null ? xParams : new Properties();
     }
@@ -90,7 +90,7 @@ public final class PdfSignResult implements Serializable {
     /** Obtiene el sello de tiempo.
      * @return Sello de tiempo. */
     public byte[] getTimestamp() {
-    	return this.timestamp.clone();
+    	return this.timestamp != null ? this.timestamp.clone() : null;
     }
 
     /** Obtiene el momento en el que se realiz&oacute; la firma.
