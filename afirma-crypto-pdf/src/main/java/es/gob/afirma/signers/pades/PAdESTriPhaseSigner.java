@@ -178,6 +178,8 @@ public final class PAdESTriPhaseSigner {
 
         final Properties extraParams = xParams != null ? xParams : new Properties();
 
+        // TODO: Obtener, si procede, el sello de tiempo
+
         final PdfTriPhaseSession ptps = PdfSessionManager.getSessionData(inPDF, signerCertificateChain, signTime, extraParams);
 
 	    // La norma PAdES establece que si el algoritmo de huella digital es SHA1 debe usarse SigningCertificateV2, y en cualquier
