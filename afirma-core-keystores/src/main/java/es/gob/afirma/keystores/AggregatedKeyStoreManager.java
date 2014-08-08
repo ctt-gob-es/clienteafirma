@@ -34,7 +34,7 @@ public class AggregatedKeyStoreManager extends AOKeyStoreManager {
 	/** Contruye un gestor de claves consistente a su vez en un agregado de varios gestores,
 	 * a partir de un almac&acute;n principal.
 	 * @param ksm Gestor de claves principal */
-	public void addKeyStoreManager(final AOKeyStoreManager ksm) {
+	public final void addKeyStoreManager(final AOKeyStoreManager ksm) {
 		if (ksm != null) {
 			this.ksms.add(ksm);
 		}
