@@ -20,6 +20,7 @@ import java.net.Socket;
 import java.net.URI;
 import java.net.URLConnection;
 import java.security.KeyStore;
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -58,6 +59,7 @@ import org.bouncycastle.tsp.TimeStampToken;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
+import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.signers.pkcs7.AOAlgorithmID;
 
 /** Generador local de sellos de tiempo para PKCS#7.
@@ -111,13 +113,26 @@ public final class CMSTimestamper {
     }
 
     /** Construye un estampador de sellos de tiempo para estructuras CMS y CAdES.
+     * @param params Par&aacute;metros de configuraci&oacute;n de una Autoridad de Sellado de Tiempo. */
+    public CMSTimestamper(final TsaParams params) {
+    	this(
+			params.doTsaRequireCert(),
+			params.getTsaPolicy(),
+			params.getTsaUrl(),
+			params.getTsaUsr(),
+			params.getTsaPwd(),
+			params.getExtensions()
+		);
+    }
+
+    /** Construye un estampador de sellos de tiempo para estructuras CMS y CAdES.
      * @param requireCert <code>true</code> si la TSA requiere certificado, <code>false</code> en caso contrario
      * @param policy OID de la pol&iacute;tica de sellado de tiempo
      * @param tsa URL de la autoridad de sellado de tiempo
      * @param tsaUsr Nombre de usuario si la TSA requiere autenticaci&oacute;n (puede ser <code>null</code> si no se necesita autenticaci&oacute;n)
      * @param tsaPwd Contrase&ntilde;a del usuario de la TSA (puede ser <code>null</code> si no se necesita autenticaci&oacute;n)
      * @param extensions Extensiones a a&ntilde;adir a la petici&oacute;n de sello de tiempo */
-    public CMSTimestamper(final boolean requireCert,
+    CMSTimestamper(final boolean requireCert,
                           final String policy,
                           final URI tsa,
                           final String tsaUsr,
@@ -151,6 +166,8 @@ public final class CMSTimestamper {
      * @throws IOException Si hay errores de entrada / salida */
     public byte[] addTimestamp(final byte[] pkcs7, final String hashAlgorithm, final Calendar time) throws NoSuchAlgorithmException, AOException, IOException {
 
+    	final String digestAlgorithm = AOSignConstants.getDigestAlgorithmName(hashAlgorithm);
+
         final CMSSignedData signedData;
         try {
             signedData = new CMSSignedData(pkcs7);
@@ -168,7 +185,12 @@ public final class CMSTimestamper {
         for (final Object name : ovSigners) {
 
              final SignerInformation si = (SignerInformation) name;
-             final byte[] tsToken = getTimeStampToken(si.getSignature(), hashAlgorithm, time);
+
+             final byte[] tsToken = getTimeStampToken(
+        		 MessageDigest.getInstance(digestAlgorithm).digest(si.getSignature()),
+        		 digestAlgorithm,
+        		 time
+    		 );
 
              final ASN1InputStream is = new ASN1InputStream(new ByteArrayInputStream(tsToken));
              final ASN1Primitive derObj = is.readObject();
@@ -329,11 +351,11 @@ public final class CMSTimestamper {
 
     /** Obtiene directamente el <i>token</i> de sello de tiempo seg&uacute;n RFC3161.
      * @param imprint Huella digital de los datos sobre los que se quiere obtener el sello de tiempo
-     * @param hashAlgorithm Algoritmo de huella digital usado
-     * @param time Tiempo de solicitud del sello
-     * @return <i>Token</i> de sello de tiempo seg&uacute;n RFC3161
-     * @throws AOException Si se produce un error en el protocolo TSA o en ASN.1
-     * @throws IOException Si hay errores en la comunicaci&oacute;n o en la lectura de datos con la TSA */
+     * @param hashAlgorithm Algoritmo de huella digital usado para calcular la huella indicada en <code>imprint</code>.
+     * @param time Tiempo de solicitud del sello.
+     * @return <i>Token</i> de sello de tiempo seg&uacute;n RFC3161.
+     * @throws AOException Si se produce un error en el protocolo TSA o en ASN.1.
+     * @throws IOException Si hay errores en la comunicaci&oacute;n o en la lectura de datos con la TSA. */
     public byte[] getTimeStampToken(final byte[] imprint, final String hashAlgorithm, final Calendar time) throws AOException, IOException {
 
          final TimeStampRequest request = this.tsqGenerator.generate(
