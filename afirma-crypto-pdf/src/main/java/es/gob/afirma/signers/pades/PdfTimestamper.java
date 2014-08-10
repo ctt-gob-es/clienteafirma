@@ -2,7 +2,6 @@ package es.gob.afirma.signers.pades;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.net.URI;
 import java.security.MessageDigest;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -21,13 +20,11 @@ import com.lowagie.text.pdf.PdfString;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.AOUtil;
-import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.signers.tsp.pkcs7.CMSTimestamper;
-import es.gob.afirma.signers.tsp.pkcs7.TsaRequestExtension;
+import es.gob.afirma.signers.tsp.pkcs7.TsaParams;
 
 final class PdfTimestamper {
 
-	private static final String TIMESTAMP_DIGEST_ALGORITHM = "SHA-512"; //$NON-NLS-1$
 	private static final String TIMESTAMP_SUBFILTER = "ETSI.RFC3161"; //$NON-NLS-1$
 
 	private static final int CSIZE = 27000;
@@ -148,18 +145,18 @@ final class PdfTimestamper {
 	private static byte[] getTspToken(final Properties extraParams, final byte[] original, final Calendar signTime) throws AOException {
 
     	// Obtenemos el sellador de tiempo
-        final String tsaHashAlgorithm = extraParams.getProperty("tsaHashAlgorithm"); //$NON-NLS-1$
-        final CMSTimestamper timestamper = getCmsTimestamper(extraParams);
+		final TsaParams tsaParams = new TsaParams(extraParams);
+        final CMSTimestamper timestamper = new CMSTimestamper(tsaParams);
 
 		// Obtenemos el token TSP
 		try {
     		return timestamper.getTimeStampToken(
 				MessageDigest.getInstance(
-					tsaHashAlgorithm != null ? tsaHashAlgorithm : TIMESTAMP_DIGEST_ALGORITHM
+					tsaParams.getTsaHashAlgorithm()
         		).digest(
     				original
 				),
-				tsaHashAlgorithm != null ? tsaHashAlgorithm : TIMESTAMP_DIGEST_ALGORITHM,
+				tsaParams.getTsaHashAlgorithm(),
 				signTime
 			);
     	}
@@ -167,51 +164,5 @@ final class PdfTimestamper {
     		throw new AOException("Error en la obtencion del sello de tiempo PAdES: " + e, e); //$NON-NLS-1$
     	}
 	}
-
-    private static CMSTimestamper getCmsTimestamper(final Properties extraParams) throws AOException {
-    	final String tsa = extraParams.getProperty("tsaURL"); //$NON-NLS-1$
-        URI tsaURL;
-        try {
-            tsaURL = new URI(tsa);
-        }
-        catch(final Exception e) {
-            throw new AOException(
-        		"Se ha indicado una URL de TSA invalida (" + tsa + "), no se anadira sello de tiempo: " + e, e //$NON-NLS-1$ //$NON-NLS-2$
-    		);
-        }
-        final String tsaPolicy = extraParams.getProperty("tsaPolicy"); //$NON-NLS-1$
-        if (tsaPolicy == null) {
-        	throw new AOException(
-    			"Se ha indicado una URL de TSA pero no una politica" //$NON-NLS-1$
-			);
-        }
-
-        final TsaRequestExtension[] extensions;
-		try {
-			extensions = extraParams.getProperty("tsaExtensionOid") != null && extraParams.getProperty("tsaExtensionValueBase64") != null ? //$NON-NLS-1$ //$NON-NLS-2$
-				new TsaRequestExtension[] {
-					new TsaRequestExtension(
-						extraParams.getProperty("tsaExtensionOid"), //$NON-NLS-1$
-						Boolean.getBoolean(extraParams.getProperty("tsaExtensionCritical", "false")), //$NON-NLS-1$ //$NON-NLS-2$
-						Base64.decode(extraParams.getProperty("tsaExtensionValueBase64")) //$NON-NLS-1$
-					)
-				} :
-			null;
-		}
-		catch (final IOException e) {
-			throw new AOException("Se han indicado extensiones incorrectas en la peticion de sello de tiempo: " + e, e); //$NON-NLS-1$
-		}
-
-        return new CMSTimestamper(
-            !Boolean.FALSE.toString().equalsIgnoreCase(extraParams.getProperty("tsaRequireCert")),  //$NON-NLS-1$
-            tsaPolicy,
-            tsaURL,
-            extraParams.getProperty("tsaUsr"),  //$NON-NLS-1$
-            extraParams.getProperty("tsaPwd"), //$NON-NLS-1$
-            extensions
-        );
-
-    }
-
 
 }

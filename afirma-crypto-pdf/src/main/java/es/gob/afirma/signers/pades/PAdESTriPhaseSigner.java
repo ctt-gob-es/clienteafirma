@@ -1,9 +1,9 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation;
+ *   the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
- *   - or The European Software License; either version 1.1 or (at your option) any later version.
+ *   or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
  * You may contact the copyright holder at: soporte.afirma5@mpt.es
  */
@@ -31,6 +31,8 @@ import es.gob.afirma.core.signers.AdESPolicy;
 import es.gob.afirma.signers.cades.CAdESSignerMetadataHelper;
 import es.gob.afirma.signers.cades.CAdESTriPhaseSigner;
 import es.gob.afirma.signers.cades.CommitmentTypeIndicationsHelper;
+import es.gob.afirma.signers.tsp.pkcs7.CMSTimestamper;
+import es.gob.afirma.signers.tsp.pkcs7.TsaParams;
 
 /** Clase para la firma electr&oacute;nica en tres fases de ficheros Adobe PDF en formato PAdES.
  * <p>No firma PDF cifrados.</p>
@@ -178,8 +180,6 @@ public final class PAdESTriPhaseSigner {
 
         final Properties extraParams = xParams != null ? xParams : new Properties();
 
-        // TODO: Obtener, si procede, el sello de tiempo
-
         final PdfTriPhaseSession ptps = PdfSessionManager.getSessionData(inPDF, signerCertificateChain, signTime, extraParams);
 
 	    // La norma PAdES establece que si el algoritmo de huella digital es SHA1 debe usarse SigningCertificateV2, y en cualquier
@@ -291,7 +291,8 @@ public final class PAdESTriPhaseSigner {
                                                       final GregorianCalendar signingTime,
                                                       final SignEnhancer enhancer,
                                                       final Properties enhancerConfig) throws AOException,
-                                                                                              IOException {
+                                                                                              IOException,
+                                                                                              NoSuchAlgorithmException {
         byte[] completeCAdESSignature = CAdESTriPhaseSigner.postSign(
     		AOSignConstants.getDigestAlgorithmName(digestAlgorithmName),
     		null,
@@ -299,6 +300,26 @@ public final class PAdESTriPhaseSigner {
     		pkcs1Signature,
     		signedAttributes
 		);
+
+        final Properties extraParams = xParams != null ? xParams : new Properties();
+
+        //***************** SELLO DE TIEMPO ****************
+        TsaParams tsaParams;
+        try {
+        	tsaParams = new TsaParams(extraParams);
+        }
+        catch(final Exception e) {
+        	tsaParams = null;
+        	e.printStackTrace();
+        }
+        if (tsaParams != null) {
+        	completeCAdESSignature = new CMSTimestamper(tsaParams).addTimestamp(
+				completeCAdESSignature,
+				tsaParams.getTsaHashAlgorithm(),
+				signingTime
+			);
+        }
+        //************** FIN SELLO DE TIEMPO ****************
 
         if (enhancer != null) {
         	completeCAdESSignature = enhancer.enhance(completeCAdESSignature, enhancerConfig);
