@@ -310,7 +310,6 @@ public final class PAdESTriPhaseSigner {
         }
         catch(final Exception e) {
         	tsaParams = null;
-        	e.printStackTrace();
         }
         if (tsaParams != null) {
         	completeCAdESSignature = new CMSTimestamper(tsaParams).addTimestamp(
