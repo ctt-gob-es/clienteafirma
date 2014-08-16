@@ -64,8 +64,6 @@ NSMutableDictionary *dataLoadedCert = NULL;
     //Rellenamos la tabla de certificados con los facilitados por iTunes y si hay almacenes, habilitamos el botón de seleccion.
     [self listFilesFromDocumentsFolder];
     [[self navigationController] setNavigationBarHidden:YES animated:YES];   
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onGoingToBackGround:) name:UIApplicationDidEnterBackgroundNotification object:nil];
-    
     
     //tabla de certificados
     if(isTableLoaded){
@@ -147,17 +145,6 @@ NSMutableDictionary *dataLoadedCert = NULL;
     }
 }
 
-//cuando se pulsa el botón del centro
-/*
--(void)onGoingToBackGround:(NSNotification*) notification {
-    @try {
-        [self performSegueWithIdentifier:@"toFirstScreen" sender:self];
-    }
-    @catch (NSException *e) {
-        // Se ignora
-    }
-}
-*/
 
 /****************************************/
 /***** GESTION DE LA CARPETA ITUNES *****/

@@ -344,7 +344,6 @@ SecKeyRef privateKey = NULL;
         }
     }
     
-    
     NSLog(@"Operacion: %@", operation);
     NSLog(@"Documento: %@", docId);
     NSLog(@"Servlet: %@", urlServlet);
@@ -463,7 +462,6 @@ SecKeyRef privateKey = NULL;
         [alert show];
         [alert release];
         
-        //[signButton setTitle:@"Cerrar aplicación" forState:UIControlStateNormal];
         self.signButton.userInteractionEnabled = NO;
         return;
     }
@@ -494,7 +492,6 @@ SecKeyRef privateKey = NULL;
         
         [alert show];
         [alert release];
-        //[signButton setTitle:@"Cerrar aplicación" forState:UIControlStateNormal];
         self.signButton.userInteractionEnabled = NO;
         return;
     }
@@ -513,8 +510,7 @@ SecKeyRef privateKey = NULL;
         //Invocamos la firma trifásica
         [self cadesTriPhasic];
     }
-       
-    //[signButton setTitle:@"Cerrar aplicación" forState:UIControlStateNormal];
+    
     self.signButton.userInteractionEnabled = NO;
     self.signButton.enabled = NO;
     
@@ -531,9 +527,6 @@ SecKeyRef privateKey = NULL;
 {
     NSData *contentData = [Base64 decode:datosInUse urlSafe:true];
     
-    //NSString *aux= [CADESSignUtils urlSafeDecode:datosInUse];
-    //NSData *contentData = [NSData dataFromBase64String:aux];
-    //NSData *contentData = [CADESSignUtils base64DecodeString:aux];
     NSLog(@"%@",[NSString stringWithUTF8String:[contentData bytes]]);
     
     NSString *contentDescription = [[NSString alloc]init];
@@ -651,8 +644,7 @@ SecKeyRef privateKey = NULL;
                          precalculatedHash: precalculatedHash];
     
     
-    //[signature writeToFile:@"/Users/tomas/David/pruebas/signature.csig" atomically:TRUE];
-    NSLog(@"%@",signature);
+    //NSLog(@"%@",signature);
     
     
     //iniciamos la barra de progreso.
@@ -733,9 +725,13 @@ SecKeyRef privateKey = NULL;
     // Obtenemos la URL de las preferencias
     NSURL* requestUrl = NULL;
     if(triphasicServerURL!=NULL)
+    {
         requestUrl = [[NSURL alloc] initWithString:triphasicServerURL];
+    }
     else
+    {
         requestUrl = [[NSURL alloc] initWithString:[[NSUserDefaults standardUserDefaults] stringForKey:@"server_url"]];
+    }
     NSMutableURLRequest* request = [NSMutableURLRequest requestWithURL:requestUrl cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30.0];
     [request setHTTPMethod:@"POST"];
     [request setValue:postLength forHTTPHeaderField:@"Content-Length"];
