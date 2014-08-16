@@ -8,9 +8,6 @@
 #include <CommonCrypto/CommonCryptor.h>
 
 @interface DesCypher:NSObject
-+ (NSData*) padData:(NSData*) data;
-+ (NSData*) doDes:(NSData*) data sk:(NSData*) sk opMode:(CCOperation) opMode;
 + (NSString*) cypherData:(NSData*) data sk:(NSData*) sk;
-+ (NSData*) decypher:(NSData*) data sk:(NSData*) sk;
-+ (int) getBlockSize;
++ (NSData*) decypherData:(NSString*) prefixedBase64Data sk:(NSData*) sk;
 @end

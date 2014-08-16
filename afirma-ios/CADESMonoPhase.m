@@ -36,7 +36,7 @@
     
     SecCertificateRef myCertificate = SecCertificateCreateWithData(kCFAllocatorDefault, (CFDataRef)(sCertificate));
     CFStringRef  certSummary = SecCertificateCopySubjectSummary(myCertificate);
-    NSLog(@"%@", certSummary);
+    //NSLog(@"%@", certSummary);
     const unsigned char *certificateDataBytes = (const unsigned char *)[sCertificate bytes];
     X509 *certificateX509 = d2i_X509(NULL, &certificateDataBytes, [sCertificate length]);
     
@@ -114,7 +114,7 @@
     
     NSString *directory = [tmpDir path];
     directory= [directory stringByAppendingString:@"/firmantes.csig"];
-    NSLog(@"Fichero temporal creado en: %@",directory);
+    //NSLog(@"Fichero temporal creado en: %@",directory);
     char *nombre2 = (char*)[directory UTF8String];
     /* Codificamos los atributos firmados y los guardamos en un fichero */
     FILE *fichero2;
@@ -175,7 +175,7 @@
     
     NSString *directorySign = [tmpDir path];
     directorySign= [directorySign stringByAppendingString:@"/sign.csig"];
-    NSLog(@"Fichero temporal creado en: %@",directorySign);
+    //NSLog(@"Fichero temporal creado en: %@",directorySign);
     char *rutaSign = (char*)[directorySign UTF8String];
     
     /* Codificamos la firma y los guardamos en un fichero */

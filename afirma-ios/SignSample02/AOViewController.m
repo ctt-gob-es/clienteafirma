@@ -401,8 +401,10 @@ NSString *receivedString = NULL;
             signButton.userInteractionEnabled = NO;
             return;
         }
-        else{
-            if(cipherKey!=NULL && rtServlet!=NULL){
+        else
+        {
+            if(cipherKey!=NULL && rtServlet!=NULL)
+            {
                 [self loadDataFromRtservlet:fileId rtServlet:rtServlet];
             }
             else{
@@ -952,9 +954,9 @@ NSString *receivedString = NULL;
     [request setValue:@"text/plain,text/html,application/xhtml+xml,application/xml" forHTTPHeaderField:@"Accept"];
     [request setHTTPBody:postData];
     
-    NSLog(@"\n\n");
-    NSLog(@"Realizamos el storage de la firma con los siguientes parámetros: %@", post);
-    NSLog(@"\n\n");
+    //NSLog(@"\n\n");
+    //NSLog(@"Realizamos el storage de la firma con los siguientes parámetros: %@", post);
+    //NSLog(@"\n\n");
     
     
     //realizamos la llamada al servidor.
@@ -982,11 +984,12 @@ NSString *receivedString = NULL;
 }
 
 /**
- Método que notifica de un error en la aplicación al servidor de guardado de firmas "storage" de forma síncrona.
+ Método que obtiene los datos de trabajo desde el servidor intermedio.
  
  parámetros:
  -----------
- dataSign: error producido.
+ fileId: Identificador del fichero de datos.
+ rtServlet: Dirección del servidor intermedio.
  
  */
 -(NSString *) loadDataFromRtservlet:(NSString*) fileId rtServlet:(NSString *)rtServlet
@@ -1040,7 +1043,7 @@ NSString *receivedString = NULL;
             
             decoded = [CADESSignUtils DesDecrypt: cipherKey:encoded];
             
-            //deshacemos el padiing especial
+            //deshacemos el padding especial
             NSData *finalDecoded = [[NSData alloc] init];
             NSRange range = NSMakeRange(0,(decoded.length - 8) - [[responseString substringToIndex:1] intValue]);
             

@@ -416,11 +416,7 @@ NSMutableDictionary *dataLoadedCert = NULL;
 
 
 /**
- Método que notifica de un error en la aplicación al servidor de guardado de firmas "storage" de forma síncrona.
- 
- parámetros:
- -----------
- dataSign: error producido.
+ Método que obtiene los datos de trabajo desde el servidor intermedio.
  
  */
 -(void) loadDataFromRtservlet
@@ -456,9 +452,6 @@ NSMutableDictionary *dataLoadedCert = NULL;
         
     NSLog(@"Se recogen los datos del fichero del rtServlet con los siguientes datos: %@", post);
         
-    //realizamos la llamada al servidor.
-    //NSData* data = [NSURLConnection sendSynchronousRequest:request returningResponse:nil error:nil];
-    
     retrievingDataFromServletCert = true;
     
     NSURLConnection* connection = [[NSURLConnection alloc] initWithRequest:request delegate:self];
@@ -576,17 +569,8 @@ NSString *receivedStringCert = NULL;
         
         @try {
             
-            NSString *base64 = [responseString substringFromIndex:2];
-            
-            NSData *encoded = [Base64 decode:base64 urlSafe:true];
-            
-            NSData *decoded = NULL;
-            
-            decoded = [DesCypher decypher:encoded sk:[cipherKeyCert dataUsingEncoding:NSUTF8StringEncoding]];
-            
-            //deshacemos el pading especial
-            //syNSData *finalDecoded = [NSData dataWithBytes: encoded length:decoded.length - [[responseString substringToIndex:1] intValue] ];
-            
+            NSData *decoded = [DesCypher decypherData:responseString sk:[cipherKeyCert dataUsingEncoding:NSUTF8StringEncoding]];
+                        
             datosInUse = [[NSString alloc] initWithData:decoded encoding:NSASCIIStringEncoding];
             
             AOEntity *entidad = [[AOEntity alloc] init];

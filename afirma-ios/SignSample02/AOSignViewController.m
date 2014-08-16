@@ -121,7 +121,8 @@ SecKeyRef privateKey = NULL;
 /******** METODOS DE LA PROPIA FIRMA Y ENVIO AL SERVIDOR *********/
 /*****************************************************************/
 
--(void) preloadData{
+-(void) preloadData
+{
     
     NSDictionary *urlParameters = self.parameters;
     
@@ -146,10 +147,12 @@ SecKeyRef privateKey = NULL;
     if([urlParameters objectForKey:PARAMETER_NAME_ID])
         docId      = [[NSString alloc] initWithString:[urlParameters objectForKey:PARAMETER_NAME_ID]];
     
-    if (datosInUse == nil) {
-        
-        if(fileId == nil){
-            
+    // Si no tenemos datos es que hay que recojerlos del servidor
+    if (datosInUse == nil)
+    {
+        // Si no hay identificador de datos es un error, porque ni hay datos ni podemos recogerlos del servidor
+        if(fileId == nil)
+        {
             //Notificamos del error al servidor si es posible
             NSString *errorToSend = @"";
             errorToSend = [errorToSend stringByAppendingString:ERROR_MISSING_DATA];
@@ -175,12 +178,14 @@ SecKeyRef privateKey = NULL;
             self.signButton.userInteractionEnabled = NO;
             return;
         }
+        // En este punto buscamos los datos en el servidor intermedio
         else
         {
             if(cipherKey!=NULL && rtServlet!=NULL)
             {
                 [self loadDataFromRtservlet:fileId rtServlet:rtServlet];
             }
+            // Si no teniamos clave de cifrado o dirección del servidor intermedio es un error
             else
             {
                 //Notificamos del error al servidor si es posible
@@ -383,7 +388,8 @@ SecKeyRef privateKey = NULL;
         return;
     }
     
-    if (urlServlet == nil) {
+    if (urlServlet == nil)
+    {
         
         UIAlertView *alert = [[UIAlertView alloc] initWithTitle: NSLocalizedString(@"error",nil) message:  NSLocalizedString(@"error_url_servidor",nil) delegate:self cancelButtonTitle: NSLocalizedString(@"cerrar",nil) otherButtonTitles:nil];
         
@@ -856,17 +862,7 @@ SecKeyRef privateKey = NULL;
         
         @try
         {
-            NSString *base64 = [responseString substringFromIndex:2];
-            
-            NSData *encoded = [Base64 decode:base64 urlSafe:true];
-            
-            NSData *decoded = NULL;
-            
-            decoded = [DesCypher decypher:encoded sk:[cipherKey dataUsingEncoding:NSUTF8StringEncoding]];
-            
-            //deshacemos el pading especial
-            NSData *finalDecoded = [NSData dataWithBytes: encoded length:decoded.length - [[responseString substringToIndex:1] intValue] ];
-            
+            NSData *finalDecoded = [DesCypher decypherData:responseString sk:[cipherKey dataUsingEncoding:NSUTF8StringEncoding]];            
             datosInUse =[[NSString alloc] initWithString:[Base64 encode:finalDecoded urlSafe:true]];
         }
         @catch (NSException *exception)
@@ -1265,9 +1261,9 @@ SecKeyRef privateKey = NULL;
         [request setValue:@"text/plain,text/html,application/xhtml+xml,application/xml" forHTTPHeaderField:@"Accept"];
         [request setHTTPBody:postData];
         
-        NSLog(@"\n\n");
-        NSLog(@"Realizamos el storage de la firma con los siguientes parámetros: %@", post);
-        NSLog(@"\n\n");
+        //NSLog(@"\n\n");
+        //NSLog(@"Realizamos el storage de la firma con los siguientes parámetros: %@", post);
+        //NSLog(@"\n\n");
         
         storingData= true;
         
@@ -1277,11 +1273,12 @@ SecKeyRef privateKey = NULL;
 }
 
 /**
- Método que notifica de un error en la aplicación al servidor de guardado de firmas "storage" de forma síncrona.
+ Obtiene los datos a firmar desde el servidor intermedio.
  
  parámetros:
  -----------
- dataSign: error producido.
+ fileId: Identificador del fichero de datos.
+ rtServlet: Dirección del servidor intermedio.
  
  */
 -(NSString *) loadDataFromRtservlet:(NSString*) fileId rtServlet:(NSString *)rtServlet

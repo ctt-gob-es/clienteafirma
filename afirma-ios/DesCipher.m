@@ -83,4 +83,24 @@ NSString *PADDING_CHAR_SEPARATOR = @".";
     return [[[self getNeededPaddingAsString:data] stringByAppendingString:PADDING_CHAR_SEPARATOR] stringByAppendingString:base64EncodedData];
 }
 
++ (NSData*) decypherData:(NSString*) prefixedBase64Data sk:(NSData*) sk
+{
+    NSString *base64Data;
+    int pad = 0;
+    
+    if ([[prefixedBase64Data substringWithRange:NSMakeRange(1, 1)] isEqualToString:PADDING_CHAR_SEPARATOR])
+    {
+        NSLog(@"Recibidos datos con prefijo de relleno");
+        base64Data = [prefixedBase64Data substringFromIndex:2];
+        pad = [[prefixedBase64Data substringToIndex:1] intValue];
+    }
+    else
+    {
+        NSLog(@"Recibidos datos sin prefijo de relleno");
+        base64Data = prefixedBase64Data;
+    }
+    NSData* rawData = [Base64 decode:base64Data urlSafe:true];
+    return [NSData dataWithBytes:rawData length:rawData.length - pad];
+}
+
 @end
