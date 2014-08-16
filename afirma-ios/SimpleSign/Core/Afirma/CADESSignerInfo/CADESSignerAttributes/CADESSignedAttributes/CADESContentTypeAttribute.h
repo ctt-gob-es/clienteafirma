@@ -1,5 +1,5 @@
 //
-//  ContentTypeAttribute.h
+//  CADESContentTypeAttribute.h
 //  CadesASN1Simplificado
 //
 //

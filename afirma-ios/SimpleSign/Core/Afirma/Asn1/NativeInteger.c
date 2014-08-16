@@ -65,9 +65,6 @@ NativeInteger_decode_ber(asn_codec_ctx_t *opt_codec_ctx,
 		}
 	}
 
-	ASN_DEBUG("Decoding %s as INTEGER (tm=%d)",
-		td->name, tag_mode);
-
 	/*
 	 * Check tags.
 	 */
@@ -75,8 +72,6 @@ NativeInteger_decode_ber(asn_codec_ctx_t *opt_codec_ctx,
 			tag_mode, 0, &length, 0);
 	if(rval.code != RC_OK)
 		return rval;
-
-	ASN_DEBUG("%s length is %d bytes", td->name, (int)length);
 
 	/*
 	 * Make sure we have this length.
@@ -119,9 +114,6 @@ NativeInteger_decode_ber(asn_codec_ctx_t *opt_codec_ctx,
 
 	rval.code = RC_OK;
 	rval.consumed += length;
-
-	ASN_DEBUG("Took %ld/%ld bytes to encode %s (%ld)",
-		(long)rval.consumed, (long)length, td->name, (long)*native);
 
 	return rval;
 }
@@ -243,7 +235,6 @@ NativeInteger_decode_uper(asn_codec_ctx_t *opt_codec_ctx,
 	void *tmpintptr = &tmpint;
 
 	(void)opt_codec_ctx;
-	ASN_DEBUG("Decoding NativeInteger %s (UPER)", td->name);
 
 	if(!native) {
 		native = (long *)(*sptr = CALLOC(1, sizeof(*native)));
@@ -278,8 +269,6 @@ NativeInteger_encode_uper(asn_TYPE_descriptor_t *td,
 	if(!sptr) _ASN_ENCODE_FAILED;
 
 	native = *(long *)sptr;
-
-	ASN_DEBUG("Encoding NativeInteger %s %ld (UPER)", td->name, native);
 
 	memset(&tmpint, 0, sizeof(tmpint));
 	if((specs&&specs->field_unsigned)
@@ -321,9 +310,6 @@ NativeInteger_free(asn_TYPE_descriptor_t *td, void *ptr, int contents_only) {
 
 	if(!td || !ptr)
 		return;
-
-	ASN_DEBUG("Freeing %s as INTEGER (%d, %p, Native)",
-		td->name, contents_only, ptr);
 
 	if(!contents_only) {
 		FREEMEM(ptr);

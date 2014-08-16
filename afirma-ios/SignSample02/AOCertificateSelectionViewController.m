@@ -9,9 +9,10 @@
 #import "AOPinViewController.h"
 #import "CADESSignUtils.h"
 #import "CADESConstants.h"
-#import "NSData+Base64.h"
 #import "AOEntity.h"
 #import "AOXMLReader.h"
+#import "DesCypher.h"
+#import "Base64.h"
 
 @interface AOCertificateSelectionViewController ()
 
@@ -576,17 +577,16 @@ NSString *receivedStringCert = NULL;
         @try {
             
             NSString *base64 = [responseString substringFromIndex:2];
-            base64 = [CADESSignUtils urlSafeDecode:base64];
-            NSData *encoded = [CADESSignUtils base64DecodeString:base64];
+            
+            NSData *encoded = [Base64 decode:base64 urlSafe:true];
+            
             NSData *decoded = NULL;
             
-            decoded = [CADESSignUtils DesDecrypt: cipherKeyCert:encoded];
+            decoded = [DesCypher decypher:encoded sk:[cipherKeyCert dataUsingEncoding:NSUTF8StringEncoding]];
             
             //deshacemos el pading especial
             //syNSData *finalDecoded = [NSData dataWithBytes: encoded length:decoded.length - [[responseString substringToIndex:1] intValue] ];
             
-            
-            //datosInUse = [[NSString alloc] initWithString:[CADESSignUtils urlSafeEncode:[CADESSignUtils encodeBase64:finalDecoded]]];
             datosInUse = [[NSString alloc] initWithData:decoded encoding:NSASCIIStringEncoding];
             
             AOEntity *entidad = [[AOEntity alloc] init];

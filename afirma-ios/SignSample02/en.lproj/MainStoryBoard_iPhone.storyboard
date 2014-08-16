@@ -1,21 +1,24 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="2.0" toolsVersion="3084" systemVersion="12F45" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" initialViewController="E8a-gZ-k6m">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="2.0" toolsVersion="6205" systemVersion="14A314h" targetRuntime="iOS.CocoaTouch" variant="6xAndEarlier" propertyAccessControl="none" useAutolayout="YES" promptedForUpgradeToXcode5="NO" initialViewController="E8a-gZ-k6m">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="2083"/>
+        <deployment defaultVersion="1536" identifier="iOS"/>
+        <development version="4600" identifier="xcode"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6198"/>
     </dependencies>
     <scenes>
-        <!--Pin View Controller - Solicitud de PIN-->
+        <!--Solicitud de PIN-->
         <scene sceneID="Ppb-KD-vaQ">
             <objects>
                 <viewController storyboardIdentifier="pin" title="Solicitud de PIN" wantsFullScreenLayout="YES" id="7tH-yy-d2T" customClass="AOPinViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="R5q-y6-x5V">
-                        <rect key="frame" x="0.0" y="20" width="320" height="548"/>
+                        <rect key="frame" x="0.0" y="20" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="xnT-qm-h5g">
+                                <rect key="frame" x="20" y="505" width="280" height="44"/>
                                 <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
                                 <state key="normal" title="Accept">
-                                    <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="titleColor" red="0.19607843137254902" green="0.30980392156862746" blue="0.52156862745098043" alpha="1" colorSpace="calibratedRGB"/>
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <state key="highlighted">
@@ -26,6 +29,7 @@
                                 </connections>
                             </button>
                             <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="Aqp-Dg-D7H">
+                                <rect key="frame" x="20" y="179" width="280" height="30"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits" returnKeyType="done" enablesReturnKeyAutomatically="YES" secureTextEntry="YES"/>
                                 <connections>
@@ -34,12 +38,13 @@
                                 </connections>
                             </textField>
                             <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="nEX-DI-Shc">
+                                <rect key="frame" x="20" y="505" width="73" height="44"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="73" id="XHs-Yo-2AL"/>
                                 </constraints>
                                 <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
                                 <state key="normal" title="Al Inicio">
-                                    <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="titleColor" red="0.19607843137254902" green="0.30980392156862746" blue="0.52156862745098043" alpha="1" colorSpace="calibratedRGB"/>
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <state key="highlighted">
@@ -50,11 +55,13 @@
                                 </connections>
                             </button>
                             <imageView userInteractionEnabled="NO" contentMode="scaleToFill" image="logo_cliente.png" translatesAutoresizingMaskIntoConstraints="NO" id="jHr-hi-ACV">
+                                <rect key="frame" x="20" y="20" width="280" height="82"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="82" id="xr6-Tb-My4"/>
                                 </constraints>
                             </imageView>
                             <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="xia-7O-acv">
+                                <rect key="frame" x="20" y="217" width="280" height="189"/>
                                 <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="189" id="Fb9-w2-3ET"/>
@@ -66,6 +73,7 @@ If you forgot your password use iTunes to modify your PKCS#12 keychain.</string>
                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                             </textView>
                             <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" text="Please, enter the keychain password: " translatesAutoresizingMaskIntoConstraints="NO" id="vdK-4G-sVF">
+                                <rect key="frame" x="20" y="101" width="280" height="75"/>
                                 <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="75" id="MYY-Z1-wYJ"/>
@@ -106,133 +114,25 @@ If you forgot your password use iTunes to modify your PKCS#12 keychain.</string>
             </objects>
             <point key="canvasLocation" x="1484" y="446"/>
         </scene>
-        <!--Sign Dropbox View Controller-->
-        <scene sceneID="vv1-c1-pgj">
-            <objects>
-                <viewController id="sMC-Cd-Ttf" customClass="AOSignDropboxViewController" sceneMemberID="viewController">
-                    <view key="view" contentMode="scaleToFill" id="ISm-7h-CUr">
-                        <rect key="frame" x="0.0" y="20" width="320" height="548"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                        <subviews>
-                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" image="logo_cliente.png" translatesAutoresizingMaskIntoConstraints="NO" id="xBL-n8-AxW">
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="82" id="gb3-de-O9v"/>
-                                </constraints>
-                            </imageView>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="BYT-z7-C2G">
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="45" id="FF3-WQ-bdh"/>
-                                </constraints>
-                                <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
-                                <state key="normal" title="Back" image="flecha.png">
-                                    <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
-                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                                </state>
-                                <state key="highlighted">
-                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                </state>
-                                <connections>
-                                    <action selector="backButtonPressed:" destination="sMC-Cd-Ttf" eventType="touchUpInside" id="6dX-EG-REV"/>
-                                    <segue destination="VdI-Vu-J89" kind="custom" identifier="toFirstScreen" customClass="AOCustomSegue" id="Ez9-Dh-diO"/>
-                                </connections>
-                            </button>
-                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="none" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" translatesAutoresizingMaskIntoConstraints="NO" id="Cnm-ng-OJX">
-                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="132" id="CfE-do-NOO"/>
-                                </constraints>
-                                <connections>
-                                    <outlet property="dataSource" destination="sMC-Cd-Ttf" id="z8R-Bf-Ehs"/>
-                                    <outlet property="delegate" destination="sMC-Cd-Ttf" id="z3j-lJ-2RM"/>
-                                </connections>
-                            </tableView>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Cbe-iV-sBV">
-                                <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
-                                <state key="normal" title="Sign selected fileseleccionado">
-                                    <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
-                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                                </state>
-                                <state key="highlighted">
-                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                </state>
-                                <connections>
-                                    <action selector="signButtonPressed:" destination="sMC-Cd-Ttf" eventType="touchUpInside" id="AVH-OC-gny"/>
-                                </connections>
-                            </button>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="hu5-ke-ycw">
-                                <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
-                                <state key="normal" title="Logout">
-                                    <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
-                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                                </state>
-                                <state key="highlighted">
-                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                </state>
-                                <connections>
-                                    <action selector="logOutButtonPressed:" destination="sMC-Cd-Ttf" eventType="touchUpInside" id="vqo-XN-LRf"/>
-                                </connections>
-                            </button>
-                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" scrollEnabled="NO" text="Select the file to sign:" translatesAutoresizingMaskIntoConstraints="NO" id="XxV-Yc-BDd">
-                                <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="43" id="rDt-Xa-RhV"/>
-                                </constraints>
-                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
-                            </textView>
-                        </subviews>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
-                        <constraints>
-                            <constraint firstItem="Cnm-ng-OJX" firstAttribute="top" secondItem="XxV-Yc-BDd" secondAttribute="bottom" constant="8" symbolic="YES" type="default" id="5ex-49-XxO"/>
-                            <constraint firstItem="XxV-Yc-BDd" firstAttribute="leading" secondItem="ISm-7h-CUr" secondAttribute="leading" constant="20" symbolic="YES" type="default" id="7N2-Ho-p5Z"/>
-                            <constraint firstItem="Cbe-iV-sBV" firstAttribute="top" secondItem="Cnm-ng-OJX" secondAttribute="bottom" constant="8" symbolic="YES" type="default" id="9cN-Lv-Bv1"/>
-                            <constraint firstItem="hu5-ke-ycw" firstAttribute="leading" secondItem="ISm-7h-CUr" secondAttribute="leading" constant="20" symbolic="YES" type="default" id="KYI-qi-ze5"/>
-                            <constraint firstItem="xBL-n8-AxW" firstAttribute="top" secondItem="ISm-7h-CUr" secondAttribute="top" constant="20" symbolic="YES" type="default" id="NdZ-XW-w8t"/>
-                            <constraint firstAttribute="trailing" secondItem="Cnm-ng-OJX" secondAttribute="trailing" constant="20" symbolic="YES" type="default" id="PZr-MF-M1R"/>
-                            <constraint firstItem="xBL-n8-AxW" firstAttribute="leading" secondItem="ISm-7h-CUr" secondAttribute="leading" constant="20" symbolic="YES" type="default" id="YbL-6b-Ij2"/>
-                            <constraint firstAttribute="trailing" secondItem="BYT-z7-C2G" secondAttribute="trailing" constant="20" symbolic="YES" type="default" id="f0I-qy-ooN"/>
-                            <constraint firstItem="XxV-Yc-BDd" firstAttribute="top" secondItem="xBL-n8-AxW" secondAttribute="bottom" constant="8" symbolic="YES" type="default" id="g7h-Lk-HOe"/>
-                            <constraint firstAttribute="trailing" secondItem="XxV-Yc-BDd" secondAttribute="trailing" constant="20" symbolic="YES" type="default" id="n1W-Uo-Xi1"/>
-                            <constraint firstAttribute="trailing" secondItem="xBL-n8-AxW" secondAttribute="trailing" constant="20" symbolic="YES" type="default" id="pZC-hx-ICx"/>
-                            <constraint firstItem="BYT-z7-C2G" firstAttribute="top" secondItem="hu5-ke-ycw" secondAttribute="bottom" constant="8" symbolic="YES" type="default" id="pgP-Al-qJJ"/>
-                            <constraint firstItem="BYT-z7-C2G" firstAttribute="leading" secondItem="ISm-7h-CUr" secondAttribute="leading" constant="20" symbolic="YES" type="default" id="pq8-on-Vum"/>
-                            <constraint firstAttribute="bottom" secondItem="BYT-z7-C2G" secondAttribute="bottom" constant="20" symbolic="YES" type="default" id="qdD-Oq-dVH"/>
-                            <constraint firstAttribute="trailing" secondItem="hu5-ke-ycw" secondAttribute="trailing" constant="20" symbolic="YES" type="default" id="qqz-9H-eyS"/>
-                            <constraint firstItem="Cnm-ng-OJX" firstAttribute="leading" secondItem="ISm-7h-CUr" secondAttribute="leading" constant="20" symbolic="YES" type="default" id="rQm-xm-LZ5"/>
-                            <constraint firstItem="Cbe-iV-sBV" firstAttribute="leading" secondItem="ISm-7h-CUr" secondAttribute="leading" constant="20" symbolic="YES" type="default" id="uEH-9D-jb7"/>
-                            <constraint firstAttribute="trailing" secondItem="Cbe-iV-sBV" secondAttribute="trailing" constant="20" symbolic="YES" type="default" id="wF4-Tj-aEV"/>
-                        </constraints>
-                    </view>
-                    <navigationItem key="navigationItem" id="euB-68-7US"/>
-                    <connections>
-                        <outlet property="backButton" destination="BYT-z7-C2G" id="XCx-KE-lLO"/>
-                        <outlet property="dbxTblView" destination="Cnm-ng-OJX" id="ZOY-cc-Njr"/>
-                        <outlet property="logout" destination="hu5-ke-ycw" id="LBb-j0-rYm"/>
-                        <outlet property="signButton" destination="Cbe-iV-sBV" id="KYe-Xo-aTa"/>
-                        <segue destination="wka-yG-7pe" kind="push" identifier="toSelectionScreen" id="yEF-pG-sB3"/>
-                    </connections>
-                </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="hvC-yJ-fVe" userLabel="First Responder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="215" y="393"/>
-        </scene>
-        <!--Certificate Selection View Controller - Solicitud de certificado-->
+        <!--Solicitud de certificado-->
         <scene sceneID="bnz-q8-KCz">
             <objects>
                 <viewController title="Solicitud de certificado" wantsFullScreenLayout="YES" id="wka-yG-7pe" customClass="AOCertificateSelectionViewController" sceneMemberID="viewController">
                     <view key="view" clipsSubviews="YES" contentMode="scaleToFill" id="F5C-AC-uwg">
-                        <rect key="frame" x="0.0" y="20" width="320" height="548"/>
+                        <rect key="frame" x="0.0" y="20" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <imageView userInteractionEnabled="NO" contentMode="scaleToFill" image="logo_cliente.png" translatesAutoresizingMaskIntoConstraints="NO" id="pjS-yV-b2D">
+                                <rect key="frame" x="20" y="20" width="280" height="82"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="82" id="Rst-Tl-ziy"/>
                                 </constraints>
                             </imageView>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="LWl-nK-Ouz">
+                                <rect key="frame" x="20" y="505" width="280" height="44"/>
                                 <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
                                 <state key="normal" title="Open selected keychain">
-                                    <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="titleColor" red="0.19607843137254902" green="0.30980392156862746" blue="0.52156862745098043" alpha="1" colorSpace="calibratedRGB"/>
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <state key="highlighted">
@@ -243,12 +143,13 @@ If you forgot your password use iTunes to modify your PKCS#12 keychain.</string>
                                 </connections>
                             </button>
                             <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="0vf-Be-HNG">
+                                <rect key="frame" x="20" y="505" width="73" height="44"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="73" id="Q0z-Ul-dip"/>
                                 </constraints>
                                 <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
                                 <state key="normal" title="Al Inicio">
-                                    <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="titleColor" red="0.19607843137254902" green="0.30980392156862746" blue="0.52156862745098043" alpha="1" colorSpace="calibratedRGB"/>
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <state key="highlighted">
@@ -259,6 +160,7 @@ If you forgot your password use iTunes to modify your PKCS#12 keychain.</string>
                                 </connections>
                             </button>
                             <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="275" translatesAutoresizingMaskIntoConstraints="NO" id="PTw-Q9-0mN">
+                                <rect key="frame" x="20" y="110" width="275" height="122"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="275" id="bk5-5w-ris"/>
                                 </constraints>
@@ -269,6 +171,7 @@ If no keychain are shown in the list, you will be able to import them from the o
                                 <nil key="highlightedColor"/>
                             </label>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="none" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" translatesAutoresizingMaskIntoConstraints="NO" id="bZe-Ao-Wzf">
+                                <rect key="frame" x="20" y="240" width="280" height="132"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="132" id="0FJ-eu-uVg"/>
@@ -306,18 +209,19 @@ If no keychain are shown in the list, you will be able to import them from the o
             </objects>
             <point key="canvasLocation" x="871" y="446"/>
         </scene>
-        <!--Sign View Controller - Firma Electrónica-->
+        <!--Firma Electrónica-->
         <scene sceneID="QTY-tT-Aby">
             <objects>
                 <viewController storyboardIdentifier="firma" title="Firma Electrónica" wantsFullScreenLayout="YES" id="OQu-SY-frv" customClass="AOSignViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="YmP-v8-Z4x">
-                        <rect key="frame" x="0.0" y="20" width="320" height="548"/>
+                        <rect key="frame" x="0.0" y="20" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="pIZ-Xc-LAF">
+                                <rect key="frame" x="20" y="505" width="280" height="44"/>
                                 <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
                                 <state key="normal" title="Sign">
-                                    <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="titleColor" red="0.19607843137254902" green="0.30980392156862746" blue="0.52156862745098043" alpha="1" colorSpace="calibratedRGB"/>
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <state key="highlighted">
@@ -328,12 +232,13 @@ If no keychain are shown in the list, you will be able to import them from the o
                                 </connections>
                             </button>
                             <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Jn6-N1-gq6">
+                                <rect key="frame" x="0.0" y="525" width="73" height="44"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="73" id="COj-VT-6BX"/>
                                 </constraints>
                                 <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
                                 <state key="normal" title="Al Inicio">
-                                    <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="titleColor" red="0.19607843137254902" green="0.30980392156862746" blue="0.52156862745098043" alpha="1" colorSpace="calibratedRGB"/>
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <state key="highlighted">
@@ -344,11 +249,13 @@ If no keychain are shown in the list, you will be able to import them from the o
                                 </connections>
                             </button>
                             <imageView userInteractionEnabled="NO" contentMode="scaleToFill" image="logo_cliente.png" translatesAutoresizingMaskIntoConstraints="NO" id="ke4-gG-wgY">
+                                <rect key="frame" x="20" y="20" width="280" height="83"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="83" id="WfX-hT-YEJ"/>
                                 </constraints>
                             </imageView>
                             <textView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleToFill" scrollEnabled="NO" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" editable="NO" text="The next certificate is selected from the keychain: " translatesAutoresizingMaskIntoConstraints="NO" id="MGT-dC-nYc">
+                                <rect key="frame" x="20" y="111" width="280" height="58"/>
                                 <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="58" id="Kkw-bH-mNN"/>
@@ -357,11 +264,13 @@ If no keychain are shown in the list, you will be able to import them from the o
                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                             </textView>
                             <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="dSj-wa-fYQ">
+                                <rect key="frame" x="20" y="177" width="280" height="20"/>
                                 <fontDescription key="fontDescription" name="Helvetica-BoldOblique" family="Helvetica" pointSize="17"/>
                                 <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <textView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleToFill" scrollEnabled="NO" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" editable="NO" text="This certificate is going to be use in the signing procedure. Please, push the &quot;Sign&quot; button to start the process." translatesAutoresizingMaskIntoConstraints="NO" id="FTY-hG-p4z">
+                                <rect key="frame" x="20" y="205" width="280" height="110"/>
                                 <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="110" id="YMp-bn-630"/>
@@ -429,11 +338,13 @@ If no keychain are shown in the list, you will be able to import them from the o
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <imageView userInteractionEnabled="NO" contentMode="scaleToFill" image="logo_cliente.png" translatesAutoresizingMaskIntoConstraints="NO" id="Ds7-Bm-vBt">
+                                <rect key="frame" x="20" y="20" width="280" height="83"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="83" id="tC7-Ml-ktr"/>
                                 </constraints>
                             </imageView>
                             <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="About... " textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="S7O-QZ-u7o">
+                                <rect key="frame" x="20" y="111" width="280" height="33"/>
                                 <color key="backgroundColor" red="0.91620524879999998" green="0.91620524879999998" blue="0.91620524879999998" alpha="0.59999999999999998" colorSpace="calibratedRGB"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="33" id="INI-AY-y4c"/>
@@ -443,8 +354,9 @@ If no keychain are shown in the list, you will be able to import them from the o
                                 <nil key="highlightedColor"/>
                             </label>
                             <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="qK1-Mk-nwO">
+                                <rect key="frame" x="20" y="152" width="280" height="323"/>
                                 <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
-                                <mutableString key="text">"Cliente @firma for Apple iOS" v1.0 
+                                <string key="text">"Cliente @firma for Apple iOS" v1.0 
 2013 Gobierno de España
 
 Cliente @firma for Apple iOS is open source; is available for redistribution and/or modification using the EUPL license: "European Software License 1.1", the complete text can be found in the next Web: http://ec.europa.eu/idabc/eupl.html
@@ -453,18 +365,19 @@ The source code of this software, as well as all the components used in this pro
 
 The project Cliente @firma is a cooperative project, and if you want to participate on it, you shouldn't doubt about joining the community, available in the next Web:
 
-http://forja-ctt.administracionelectronica.gob.es/web/clienteafirma </mutableString>
+http://forja-ctt.administracionelectronica.gob.es/web/clienteafirma </string>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                                 <dataDetectorType key="dataDetectorTypes" link="YES"/>
                             </textView>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="i9U-Q5-zwh">
+                                <rect key="frame" x="20" y="483" width="280" height="46"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="45" id="2eW-Te-x20"/>
                                 </constraints>
                                 <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
                                 <state key="normal" title="Back" image="flecha.png">
-                                    <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="titleColor" red="0.19607843137254902" green="0.30980392156862746" blue="0.52156862745098043" alpha="1" colorSpace="calibratedRGB"/>
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <state key="highlighted">
@@ -475,12 +388,13 @@ http://forja-ctt.administracionelectronica.gob.es/web/clienteafirma </mutableStr
                                 </connections>
                             </button>
                             <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="4Lo-tP-hKr">
+                                <rect key="frame" x="0.0" y="505" width="73" height="44"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="73" id="yx0-Sf-OWW"/>
                                 </constraints>
                                 <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
                                 <state key="normal" title="Al Inicio">
-                                    <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="titleColor" red="0.19607843137254902" green="0.30980392156862746" blue="0.52156862745098043" alpha="1" colorSpace="calibratedRGB"/>
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <state key="highlighted">
@@ -516,195 +430,6 @@ http://forja-ctt.administracionelectronica.gob.es/web/clienteafirma </mutableStr
             </objects>
             <point key="canvasLocation" x="1159" y="-2049"/>
         </scene>
-        <!--Pin Drop Box Cloud View Controller-->
-        <scene sceneID="QuK-Lr-Sfg">
-            <objects>
-                <viewController id="5Xk-kS-aNh" customClass="AOPinDropBoxCloudViewController" sceneMemberID="viewController">
-                    <view key="view" contentMode="scaleToFill" id="44I-b0-WY6">
-                        <rect key="frame" x="0.0" y="20" width="320" height="548"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                        <subviews>
-                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" image="logo_cliente.png" translatesAutoresizingMaskIntoConstraints="NO" id="ws8-hZ-pUU">
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="83" id="zxK-dH-W8V"/>
-                                </constraints>
-                            </imageView>
-                            <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="N3Q-nR-zfU">
-                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                <textInputTraits key="textInputTraits" returnKeyType="done" enablesReturnKeyAutomatically="YES" secureTextEntry="YES"/>
-                                <connections>
-                                    <outlet property="delegate" destination="5Xk-kS-aNh" id="0Ev-jm-gng"/>
-                                </connections>
-                            </textField>
-                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" text="After entering the keychain password, it will be copied into your personal iTunes folder." translatesAutoresizingMaskIntoConstraints="NO" id="gKD-2T-iIG">
-                                <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="112" id="CfX-tU-X8J"/>
-                                </constraints>
-                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
-                            </textView>
-                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" text="Please, enter the keychain password " translatesAutoresizingMaskIntoConstraints="NO" id="LLF-dL-I9Y">
-                                <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="75" id="3Ix-Xx-Tng"/>
-                                </constraints>
-                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
-                            </textView>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="9jQ-KQ-doD">
-                                <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
-                                <state key="normal" title="Accept">
-                                    <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
-                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                                </state>
-                                <state key="highlighted">
-                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                </state>
-                                <connections>
-                                    <action selector="pinButtonPressed:" destination="5Xk-kS-aNh" eventType="touchUpInside" id="tne-hu-WpM"/>
-                                </connections>
-                            </button>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="42s-Bx-4lO">
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="45" id="boN-1f-urc"/>
-                                </constraints>
-                                <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
-                                <state key="normal" title="Back" image="flecha.png">
-                                    <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
-                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                                </state>
-                                <state key="highlighted">
-                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                </state>
-                                <connections>
-                                    <segue destination="b2e-Pz-hYr" kind="custom" identifier="toPreviousScreen" customClass="AOCustomSegue" id="lR0-Cx-LhU"/>
-                                </connections>
-                            </button>
-                        </subviews>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
-                        <constraints>
-                            <constraint firstAttribute="trailing" secondItem="N3Q-nR-zfU" secondAttribute="trailing" constant="20" symbolic="YES" type="default" id="37a-cO-Ihh"/>
-                            <constraint firstAttribute="bottom" secondItem="42s-Bx-4lO" secondAttribute="bottom" constant="20" symbolic="YES" type="default" id="AjQ-66-Fy9"/>
-                            <constraint firstItem="LLF-dL-I9Y" firstAttribute="leading" secondItem="44I-b0-WY6" secondAttribute="leading" constant="20" symbolic="YES" type="default" id="GQN-0T-G4X"/>
-                            <constraint firstAttribute="trailing" secondItem="gKD-2T-iIG" secondAttribute="trailing" constant="20" symbolic="YES" type="default" id="Jw6-Oc-3Nu"/>
-                            <constraint firstAttribute="trailing" secondItem="ws8-hZ-pUU" secondAttribute="trailing" constant="20" symbolic="YES" type="default" id="KsO-Kr-nDr"/>
-                            <constraint firstItem="gKD-2T-iIG" firstAttribute="leading" secondItem="44I-b0-WY6" secondAttribute="leading" constant="20" symbolic="YES" type="default" id="LvF-3K-ExF"/>
-                            <constraint firstItem="9jQ-KQ-doD" firstAttribute="top" secondItem="gKD-2T-iIG" secondAttribute="bottom" constant="8" symbolic="YES" type="default" id="XEP-yP-9gl"/>
-                            <constraint firstItem="N3Q-nR-zfU" firstAttribute="top" secondItem="44I-b0-WY6" secondAttribute="top" constant="189" id="bd1-aQ-HYc"/>
-                            <constraint firstItem="N3Q-nR-zfU" firstAttribute="leading" secondItem="44I-b0-WY6" secondAttribute="leading" constant="20" symbolic="YES" type="default" id="ej3-0R-icm"/>
-                            <constraint firstItem="9jQ-KQ-doD" firstAttribute="leading" secondItem="44I-b0-WY6" secondAttribute="leading" constant="20" symbolic="YES" type="default" id="gI4-Sw-7Hv"/>
-                            <constraint firstItem="42s-Bx-4lO" firstAttribute="leading" secondItem="44I-b0-WY6" secondAttribute="leading" constant="20" symbolic="YES" type="default" id="gW7-JF-CqI"/>
-                            <constraint firstAttribute="trailing" secondItem="9jQ-KQ-doD" secondAttribute="trailing" constant="20" symbolic="YES" type="default" id="h70-mi-FrI"/>
-                            <constraint firstAttribute="trailing" secondItem="42s-Bx-4lO" secondAttribute="trailing" constant="20" symbolic="YES" type="default" id="hOL-Ew-HdY"/>
-                            <constraint firstItem="gKD-2T-iIG" firstAttribute="top" secondItem="N3Q-nR-zfU" secondAttribute="bottom" constant="8" symbolic="YES" type="default" id="kIy-Pv-PrM"/>
-                            <constraint firstItem="LLF-dL-I9Y" firstAttribute="top" secondItem="ws8-hZ-pUU" secondAttribute="bottom" constant="8" symbolic="YES" type="default" id="r7E-lL-khC"/>
-                            <constraint firstItem="ws8-hZ-pUU" firstAttribute="top" secondItem="44I-b0-WY6" secondAttribute="top" constant="20" symbolic="YES" type="default" id="rbQ-Kf-XIk"/>
-                            <constraint firstAttribute="trailing" secondItem="LLF-dL-I9Y" secondAttribute="trailing" constant="20" symbolic="YES" type="default" id="tLB-rU-ywZ"/>
-                            <constraint firstItem="ws8-hZ-pUU" firstAttribute="leading" secondItem="44I-b0-WY6" secondAttribute="leading" constant="20" symbolic="YES" type="default" id="y0V-3N-8qy"/>
-                        </constraints>
-                    </view>
-                    <navigationItem key="navigationItem" id="6fe-VA-nP0"/>
-                    <connections>
-                        <outlet property="buttonCertDropBoxCloud" destination="9jQ-KQ-doD" id="Egu-rb-qI9"/>
-                        <outlet property="nameCertDropBoxCloud" destination="LLF-dL-I9Y" id="Xtp-s9-1az"/>
-                        <outlet property="pinCertDropBoxCloud" destination="N3Q-nR-zfU" id="jTl-bI-hir"/>
-                        <segue destination="VdI-Vu-J89" kind="custom" identifier="toFirstScreen" customClass="AOCustomSegue" id="a3l-mg-ApP"/>
-                        <segue destination="Xba-9r-3ek" kind="custom" identifier="toStoreManager" customClass="AOCustomSegue" id="TQt-8t-kTg"/>
-                    </connections>
-                </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="ZIy-nZ-134" userLabel="First Responder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="296" y="-2020"/>
-        </scene>
-        <!--Drop Box Cloud View Controller-->
-        <scene sceneID="ZId-mV-TN3">
-            <objects>
-                <viewController id="b2e-Pz-hYr" customClass="AODropBoxCloudViewController" sceneMemberID="viewController">
-                    <view key="view" contentMode="scaleToFill" id="w92-HO-lGQ">
-                        <rect key="frame" x="0.0" y="20" width="320" height="548"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                        <subviews>
-                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" image="logo_cliente.png" translatesAutoresizingMaskIntoConstraints="NO" id="V2B-SP-cjz"/>
-                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="none" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" translatesAutoresizingMaskIntoConstraints="NO" id="r56-yV-N78">
-                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="132" id="VcB-J2-btG"/>
-                                </constraints>
-                                <connections>
-                                    <outlet property="dataSource" destination="b2e-Pz-hYr" id="VmB-hB-e6Y"/>
-                                    <outlet property="delegate" destination="b2e-Pz-hYr" id="hyl-La-dmf"/>
-                                </connections>
-                            </tableView>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="2hr-gC-P1v">
-                                <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
-                                <state key="normal" title="Import keychain">
-                                    <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
-                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                                </state>
-                                <state key="highlighted">
-                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                </state>
-                                <connections>
-                                    <action selector="saveStorebuttonPressed:" destination="b2e-Pz-hYr" eventType="touchUpInside" id="c9G-RQ-14V"/>
-                                </connections>
-                            </button>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="GOi-Qr-DcO">
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="45" id="nFO-BP-NtC"/>
-                                </constraints>
-                                <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
-                                <state key="normal" title="Back" image="flecha.png">
-                                    <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
-                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                                </state>
-                                <state key="highlighted">
-                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                </state>
-                                <connections>
-                                    <segue destination="VdI-Vu-J89" kind="custom" identifier="toFirstScreen" customClass="AOCustomSegue" id="1Rb-2I-sdO"/>
-                                </connections>
-                            </button>
-                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" scrollEnabled="NO" text="Select the keychain that you want import:" translatesAutoresizingMaskIntoConstraints="NO" id="1ld-GG-oz6">
-                                <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="68" id="WpI-Lx-Itw"/>
-                                </constraints>
-                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
-                            </textView>
-                        </subviews>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
-                        <constraints>
-                            <constraint firstItem="2hr-gC-P1v" firstAttribute="top" secondItem="r56-yV-N78" secondAttribute="bottom" constant="8" symbolic="YES" type="default" id="3u6-XO-qLC"/>
-                            <constraint firstAttribute="trailing" secondItem="1ld-GG-oz6" secondAttribute="trailing" constant="20" symbolic="YES" type="default" id="9LX-yZ-Zmm"/>
-                            <constraint firstItem="r56-yV-N78" firstAttribute="top" secondItem="w92-HO-lGQ" secondAttribute="top" constant="187" id="GXm-oL-2cr"/>
-                            <constraint firstItem="2hr-gC-P1v" firstAttribute="leading" secondItem="w92-HO-lGQ" secondAttribute="leading" constant="20" symbolic="YES" type="default" id="ICh-kE-2lY"/>
-                            <constraint firstItem="V2B-SP-cjz" firstAttribute="leading" secondItem="w92-HO-lGQ" secondAttribute="leading" constant="20" symbolic="YES" type="default" id="IMV-YY-8Uw"/>
-                            <constraint firstItem="V2B-SP-cjz" firstAttribute="top" secondItem="w92-HO-lGQ" secondAttribute="top" constant="20" symbolic="YES" type="default" id="QLg-PW-tWQ"/>
-                            <constraint firstItem="r56-yV-N78" firstAttribute="leading" secondItem="w92-HO-lGQ" secondAttribute="leading" constant="20" symbolic="YES" type="default" id="Uiq-AA-cjk"/>
-                            <constraint firstAttribute="trailing" secondItem="V2B-SP-cjz" secondAttribute="trailing" constant="20" symbolic="YES" type="default" id="UoF-MT-N4g"/>
-                            <constraint firstAttribute="trailing" secondItem="r56-yV-N78" secondAttribute="trailing" constant="20" symbolic="YES" type="default" id="aS5-L1-lvb"/>
-                            <constraint firstAttribute="bottom" secondItem="GOi-Qr-DcO" secondAttribute="bottom" constant="20" symbolic="YES" type="default" id="dXE-2D-obg"/>
-                            <constraint firstItem="GOi-Qr-DcO" firstAttribute="leading" secondItem="w92-HO-lGQ" secondAttribute="leading" constant="20" symbolic="YES" type="default" id="fDG-Y7-jEr"/>
-                            <constraint firstItem="1ld-GG-oz6" firstAttribute="leading" secondItem="w92-HO-lGQ" secondAttribute="leading" constant="20" symbolic="YES" type="default" id="iF9-5j-vhZ"/>
-                            <constraint firstItem="r56-yV-N78" firstAttribute="top" secondItem="1ld-GG-oz6" secondAttribute="bottom" constant="8" symbolic="YES" type="default" id="pwV-53-tq9"/>
-                            <constraint firstAttribute="trailing" secondItem="2hr-gC-P1v" secondAttribute="trailing" constant="20" symbolic="YES" type="default" id="qLk-TB-1Rb"/>
-                            <constraint firstItem="1ld-GG-oz6" firstAttribute="top" secondItem="V2B-SP-cjz" secondAttribute="bottom" constant="8" symbolic="YES" type="default" id="wPb-f1-8Ev"/>
-                            <constraint firstAttribute="trailing" secondItem="GOi-Qr-DcO" secondAttribute="trailing" constant="20" symbolic="YES" type="default" id="xRe-RE-xyS"/>
-                        </constraints>
-                    </view>
-                    <navigationItem key="navigationItem" id="NL1-ar-9xG"/>
-                    <connections>
-                        <outlet property="dbxTblView" destination="r56-yV-N78" id="SyV-wj-KP4"/>
-                        <outlet property="saveStore" destination="2hr-gC-P1v" id="g8S-3g-EFJ"/>
-                        <segue destination="5Xk-kS-aNh" kind="push" identifier="toPinDropBox" id="5Pv-al-ZQN"/>
-                    </connections>
-                </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="CS2-QD-LmY" userLabel="First Responder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="280" y="-1255"/>
-        </scene>
         <!--Help Menu View Controller-->
         <scene sceneID="nCE-4s-Zpg">
             <objects>
@@ -713,8 +438,11 @@ http://forja-ctt.administracionelectronica.gob.es/web/clienteafirma </mutableStr
                         <rect key="frame" x="0.0" y="20" width="320" height="548"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
-                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" image="logo_cliente.png" translatesAutoresizingMaskIntoConstraints="NO" id="tel-2I-NJ1"/>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" image="logo_cliente.png" translatesAutoresizingMaskIntoConstraints="NO" id="tel-2I-NJ1">
+                                <rect key="frame" x="20" y="20" width="280" height="83"/>
+                            </imageView>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" translatesAutoresizingMaskIntoConstraints="NO" id="XVU-T4-L14">
+                                <rect key="frame" x="20" y="152" width="280" height="132"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="132" id="yhe-Ok-wxB"/>
@@ -763,6 +491,7 @@ http://forja-ctt.administracionelectronica.gob.es/web/clienteafirma </mutableStr
                                 </connections>
                             </tableView>
                             <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" textAlignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="If7-jq-mK4">
+                                <rect key="frame" x="20" y="381" width="280" height="94"/>
                                 <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="94" id="dPX-lr-gK9"/>
@@ -775,12 +504,13 @@ http://administracionelectronica.gob.es/</string>
                                 <dataDetectorType key="dataDetectorTypes" link="YES"/>
                             </textView>
                             <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="eOS-rh-Dp6">
+                                <rect key="frame" x="0.0" y="505" width="73" height="44"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="73" id="eRV-gX-FKf"/>
                                 </constraints>
                                 <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
                                 <state key="normal" title="Al Inicio">
-                                    <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="titleColor" red="0.19607843137254902" green="0.30980392156862746" blue="0.52156862745098043" alpha="1" colorSpace="calibratedRGB"/>
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <state key="highlighted">
@@ -788,6 +518,7 @@ http://administracionelectronica.gob.es/</string>
                                 </state>
                             </button>
                             <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="Help" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="HV8-Ix-XS3">
+                                <rect key="frame" x="20" y="111" width="280" height="33"/>
                                 <color key="backgroundColor" red="0.91620524879999998" green="0.91620524879999998" blue="0.91620524879999998" alpha="0.59999999999999998" colorSpace="calibratedRGB"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="33" id="EOq-pt-ldx"/>
@@ -797,12 +528,13 @@ http://administracionelectronica.gob.es/</string>
                                 <nil key="highlightedColor"/>
                             </label>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="82u-ru-v39">
+                                <rect key="frame" x="20" y="483" width="280" height="46"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="45" id="CDM-Qr-gtk"/>
                                 </constraints>
                                 <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
                                 <state key="normal" title="Back" image="flecha.png">
-                                    <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="titleColor" red="0.19607843137254902" green="0.30980392156862746" blue="0.52156862745098043" alpha="1" colorSpace="calibratedRGB"/>
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <state key="highlighted">
@@ -853,12 +585,13 @@ http://administracionelectronica.gob.es/</string>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="UuK-le-0aa">
+                                <rect key="frame" x="20" y="485" width="73" height="44"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="73" id="Ofj-TN-99u"/>
                                 </constraints>
                                 <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
                                 <state key="normal" title="Al Inicio">
-                                    <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="titleColor" red="0.19607843137254902" green="0.30980392156862746" blue="0.52156862745098043" alpha="1" colorSpace="calibratedRGB"/>
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <state key="highlighted">
@@ -866,17 +599,19 @@ http://administracionelectronica.gob.es/</string>
                                 </state>
                             </button>
                             <imageView userInteractionEnabled="NO" contentMode="scaleToFill" image="logo_cliente.png" translatesAutoresizingMaskIntoConstraints="NO" id="gae-7s-PDC">
+                                <rect key="frame" x="20" y="20" width="280" height="83"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="83" id="QtE-mI-k4t"/>
                                 </constraints>
                             </imageView>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="DPy-X9-rmm">
+                                <rect key="frame" x="20" y="484" width="280" height="46"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="45" id="65F-tA-tuS"/>
                                 </constraints>
                                 <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
                                 <state key="normal" title="Back" image="flecha.png">
-                                    <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="titleColor" red="0.19607843137254902" green="0.30980392156862746" blue="0.52156862745098043" alpha="1" colorSpace="calibratedRGB"/>
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <state key="highlighted">
@@ -887,8 +622,10 @@ http://administracionelectronica.gob.es/</string>
                                 </connections>
                             </button>
                             <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="eOv-cJ-QU9">
+                                <rect key="frame" x="20" y="111" width="280" height="365"/>
                                 <subviews>
                                     <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" text="This section allows you import new keychains to create your own signs or delete kaychains installed on device." translatesAutoresizingMaskIntoConstraints="NO" id="9TI-rw-EK7">
+                                        <rect key="frame" x="0.0" y="0.0" width="280" height="92"/>
                                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="92" id="afJ-3P-jpo"/>
@@ -897,6 +634,7 @@ http://administracionelectronica.gob.es/</string>
                                         <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                                     </textView>
                                     <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="none" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" translatesAutoresizingMaskIntoConstraints="NO" id="Tca-lt-Uf4">
+                                        <rect key="frame" x="0.0" y="100" width="280" height="132"/>
                                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="132" id="AO1-1C-SW6"/>
@@ -907,9 +645,10 @@ http://administracionelectronica.gob.es/</string>
                                         </connections>
                                     </tableView>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Brt-pG-mjv">
+                                        <rect key="frame" x="0.0" y="240" width="280" height="44"/>
                                         <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
                                         <state key="normal" title="Delete selected keychain">
-                                            <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
+                                            <color key="titleColor" red="0.19607843137254902" green="0.30980392156862746" blue="0.52156862745098043" alpha="1" colorSpace="calibratedRGB"/>
                                             <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                         </state>
                                         <state key="highlighted">
@@ -919,38 +658,19 @@ http://administracionelectronica.gob.es/</string>
                                             <action selector="deleteButtonPressed:" destination="Xba-9r-3ek" eventType="touchUpInside" id="nI1-Lf-ypW"/>
                                         </connections>
                                     </button>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="3Js-ZP-g0g">
-                                        <constraints>
-                                            <constraint firstAttribute="height" constant="52" id="mFs-JW-ubH"/>
-                                        </constraints>
-                                        <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
-                                        <state key="normal" title="   Import from Dropbox" image="dropbox-ico.png">
-                                            <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
-                                            <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                                        </state>
-                                        <state key="highlighted">
-                                            <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                        </state>
-                                        <connections>
-                                            <action selector="buttonPressed:" destination="Xba-9r-3ek" eventType="touchUpInside" id="u4u-fx-MMh"/>
-                                        </connections>
-                                    </button>
                                 </subviews>
                                 <constraints>
-                                    <constraint firstItem="Tca-lt-Uf4" firstAttribute="trailing" secondItem="eOv-cJ-QU9" secondAttribute="trailing" type="default" id="2Ax-XK-Agb"/>
-                                    <constraint firstItem="3Js-ZP-g0g" firstAttribute="trailing" secondItem="eOv-cJ-QU9" secondAttribute="trailing" type="default" id="5YK-Ke-wPp"/>
-                                    <constraint firstItem="3Js-ZP-g0g" firstAttribute="centerX" secondItem="eOv-cJ-QU9" secondAttribute="centerX" type="default" id="GGQ-Lm-2P0"/>
+                                    <constraint firstItem="Tca-lt-Uf4" firstAttribute="trailing" secondItem="Brt-pG-mjv" secondAttribute="trailing" type="default" id="Ee8-c8-oXQ"/>
+                                    <constraint firstItem="Tca-lt-Uf4" firstAttribute="leading" secondItem="Brt-pG-mjv" secondAttribute="leading" type="default" id="FVc-KH-kaY"/>
                                     <constraint firstItem="9TI-rw-EK7" firstAttribute="top" secondItem="eOv-cJ-QU9" secondAttribute="top" type="default" id="Gbs-Ro-gIn"/>
-                                    <constraint firstItem="Tca-lt-Uf4" firstAttribute="leading" secondItem="eOv-cJ-QU9" secondAttribute="leading" type="default" id="NZQ-da-hqP"/>
-                                    <constraint firstItem="3Js-ZP-g0g" firstAttribute="bottom" secondItem="eOv-cJ-QU9" secondAttribute="bottom" type="default" id="NwY-Xm-Nr3"/>
+                                    <constraint firstItem="Tca-lt-Uf4" firstAttribute="trailing" secondItem="9TI-rw-EK7" secondAttribute="trailing" type="default" id="HB8-pj-1FT"/>
                                     <constraint firstItem="Tca-lt-Uf4" firstAttribute="top" secondItem="9TI-rw-EK7" secondAttribute="bottom" constant="8" symbolic="YES" type="default" id="Wgp-yp-bhm"/>
                                     <constraint firstItem="9TI-rw-EK7" firstAttribute="trailing" secondItem="eOv-cJ-QU9" secondAttribute="trailing" type="default" id="ZRU-Rk-gWG"/>
-                                    <constraint firstItem="3Js-ZP-g0g" firstAttribute="top" secondItem="eOv-cJ-QU9" secondAttribute="top" constant="313" id="eSX-3C-f58"/>
-                                    <constraint firstItem="Brt-pG-mjv" firstAttribute="trailing" secondItem="eOv-cJ-QU9" secondAttribute="trailing" type="default" id="gSD-fF-pUt"/>
-                                    <constraint firstItem="Brt-pG-mjv" firstAttribute="leading" secondItem="eOv-cJ-QU9" secondAttribute="leading" type="default" id="iac-MP-NuL"/>
+                                    <constraint firstAttribute="bottom" secondItem="Brt-pG-mjv" secondAttribute="bottom" constant="82" id="a6s-Sx-y6Y"/>
+                                    <constraint firstItem="9TI-rw-EK7" firstAttribute="centerX" secondItem="eOv-cJ-QU9" secondAttribute="centerX" type="default" id="fDJ-76-yxR"/>
                                     <constraint firstItem="Brt-pG-mjv" firstAttribute="top" secondItem="Tca-lt-Uf4" secondAttribute="bottom" constant="8" symbolic="YES" type="default" id="lsN-gN-2dL"/>
                                     <constraint firstItem="9TI-rw-EK7" firstAttribute="leading" secondItem="eOv-cJ-QU9" secondAttribute="leading" type="default" id="nsR-Gb-wGB"/>
-                                    <constraint firstItem="3Js-ZP-g0g" firstAttribute="leading" secondItem="eOv-cJ-QU9" secondAttribute="leading" type="default" id="rsi-Ga-aXw"/>
+                                    <constraint firstItem="Tca-lt-Uf4" firstAttribute="leading" secondItem="9TI-rw-EK7" secondAttribute="leading" type="default" id="wLk-Pb-67T"/>
                                 </constraints>
                             </scrollView>
                         </subviews>
@@ -959,23 +679,21 @@ http://administracionelectronica.gob.es/</string>
                             <constraint firstItem="gae-7s-PDC" firstAttribute="top" secondItem="24B-qk-x9L" secondAttribute="top" constant="20" symbolic="YES" type="default" id="08H-2Q-Ga0"/>
                             <constraint firstItem="gae-7s-PDC" firstAttribute="leading" secondItem="24B-qk-x9L" secondAttribute="leading" constant="20" symbolic="YES" type="default" id="5Pn-Y4-Onz"/>
                             <constraint firstItem="eOv-cJ-QU9" firstAttribute="top" secondItem="gae-7s-PDC" secondAttribute="bottom" constant="8" symbolic="YES" type="default" id="5of-ZX-0LT"/>
-                            <constraint firstItem="eOv-cJ-QU9" firstAttribute="leading" secondItem="24B-qk-x9L" secondAttribute="leading" constant="20" symbolic="YES" type="default" id="6I2-oe-EPQ"/>
-                            <constraint firstAttribute="trailing" secondItem="eOv-cJ-QU9" secondAttribute="trailing" constant="20" symbolic="YES" type="default" id="AZO-3I-fav"/>
+                            <constraint firstItem="eOv-cJ-QU9" firstAttribute="trailing" secondItem="DPy-X9-rmm" secondAttribute="trailing" type="default" id="7NU-Wc-G2x"/>
+                            <constraint firstItem="eOv-cJ-QU9" firstAttribute="leading" secondItem="DPy-X9-rmm" secondAttribute="leading" type="default" id="LYh-G6-USK"/>
+                            <constraint firstItem="eOv-cJ-QU9" firstAttribute="leading" secondItem="UuK-le-0aa" secondAttribute="leading" type="default" id="Mrj-G3-V2U"/>
                             <constraint firstItem="DPy-X9-rmm" firstAttribute="top" secondItem="eOv-cJ-QU9" secondAttribute="bottom" constant="8" symbolic="YES" type="default" id="NRU-3U-h34"/>
-                            <constraint firstItem="DPy-X9-rmm" firstAttribute="leading" secondItem="24B-qk-x9L" secondAttribute="leading" constant="20" symbolic="YES" type="default" id="Ndj-fo-3qP"/>
                             <constraint firstItem="DPy-X9-rmm" firstAttribute="baseline" secondItem="UuK-le-0aa" secondAttribute="baseline" type="default" id="QYI-3q-j0d"/>
-                            <constraint firstAttribute="trailing" secondItem="DPy-X9-rmm" secondAttribute="trailing" constant="20" symbolic="YES" type="default" id="Zhc-iG-tM5"/>
                             <constraint firstAttribute="trailing" secondItem="gae-7s-PDC" secondAttribute="trailing" constant="20" symbolic="YES" type="default" id="hVm-6R-rj7"/>
+                            <constraint firstItem="eOv-cJ-QU9" firstAttribute="trailing" secondItem="gae-7s-PDC" secondAttribute="trailing" type="default" id="jz5-Qq-xK2"/>
+                            <constraint firstItem="eOv-cJ-QU9" firstAttribute="leading" secondItem="gae-7s-PDC" secondAttribute="leading" type="default" id="unp-Wm-7Af"/>
                             <constraint firstAttribute="bottom" secondItem="UuK-le-0aa" secondAttribute="bottom" constant="20" symbolic="YES" type="default" id="ws7-6g-ewW"/>
-                            <constraint firstItem="UuK-le-0aa" firstAttribute="leading" secondItem="24B-qk-x9L" secondAttribute="leading" constant="20" symbolic="YES" type="default" id="xPR-ha-JOf"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="AdC-2s-DHp"/>
                     <connections>
                         <outlet property="deleteButton" destination="Brt-pG-mjv" id="o1n-3Y-92a"/>
-                        <outlet property="dropBoxButton" destination="3Js-ZP-g0g" id="thu-1J-EqU"/>
                         <outlet property="tblViewManager" destination="Tca-lt-Uf4" id="vQp-0p-2dY"/>
-                        <segue destination="b2e-Pz-hYr" kind="push" identifier="toDropBoxCloud" id="kRY-XU-ghR"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="8n2-xu-nPy" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -987,13 +705,14 @@ http://administracionelectronica.gob.es/</string>
             <objects>
                 <viewController wantsFullScreenLayout="YES" id="VdI-Vu-J89" customClass="AOAboutViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="BLw-aA-1Ba">
-                        <rect key="frame" x="0.0" y="20" width="320" height="548"/>
+                        <rect key="frame" x="0.0" y="20" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="WrM-2I-hjk">
+                                <rect key="frame" x="51" y="37" width="72" height="44"/>
                                 <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
                                 <state key="normal" title="Button">
-                                    <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="titleColor" red="0.19607843137254902" green="0.30980392156862746" blue="0.52156862745098043" alpha="1" colorSpace="calibratedRGB"/>
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <state key="highlighted">
@@ -1004,8 +723,9 @@ http://administracionelectronica.gob.es/</string>
                                 </connections>
                             </button>
                             <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" showsHorizontalScrollIndicator="NO" editable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="wiD-pw-MlF">
+                                <rect key="frame" x="20" y="111" width="280" height="408"/>
                                 <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
-                                <mutableString key="text">Welcome to "Cliente @firma iOS" 1.0
+                                <string key="text">Welcome to "Cliente @firma iOS" 1.0
 
 This application allows to sign electronically in the supported websites of services providers.
 
@@ -1016,20 +736,21 @@ Cliente @firma for Apple iOS 1.0
 
 Cliente @firma for Apple iOS is open source that is available for redistribution and/or modification using the EUPL license (European Software License) version 1.1.
 
-You can email the copyright holder to: soporte.afirma@seap.minhap.es.</mutableString>
+You can email the copyright holder to: soporte.afirma@seap.minhap.es.</string>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                             </textView>
                             <imageView userInteractionEnabled="NO" contentMode="scaleToFill" image="logo_cliente.png" translatesAutoresizingMaskIntoConstraints="NO" id="bSd-sJ-dwW">
+                                <rect key="frame" x="20" y="20" width="280" height="83"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="83" id="Sf8-79-K2u"/>
                                 </constraints>
                             </imageView>
                             <tabBar contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="QP4-OJ-ffc">
+                                <rect key="frame" x="0.0" y="519" width="320" height="49"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                 <items>
                                     <tabBarItem tag="2" title="Keystore manager" image="cert_menu.png" id="EkF-EX-9Ue"/>
-                                    <tabBarItem tag="1" title="Sign" image="menu_firma.png" id="TLK-II-ZkV"/>
                                     <tabBarItem title="Help" image="help.png" id="kfK-pp-MFJ"/>
                                 </items>
                                 <connections>
@@ -1057,9 +778,7 @@ You can email the copyright holder to: soporte.afirma@seap.minhap.es.</mutableSt
                     <connections>
                         <outlet property="tabBar" destination="QP4-OJ-ffc" id="eUS-Fs-rie"/>
                         <segue destination="Xba-9r-3ek" kind="push" identifier="toStoreManager" id="hd5-9f-dgL"/>
-                        <segue destination="b2e-Pz-hYr" kind="push" identifier="toDropBoxCloud" id="71T-u5-U8d"/>
                         <segue destination="UWq-gP-qqr" kind="push" identifier="toHelpScreen" id="95b-rT-XO6"/>
-                        <segue destination="sMC-Cd-Ttf" kind="push" identifier="toDropBoxSignScreen" id="UeP-jH-p0T"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="nYy-aZ-74m" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -1075,11 +794,13 @@ You can email the copyright holder to: soporte.afirma@seap.minhap.es.</mutableSt
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <imageView userInteractionEnabled="NO" contentMode="scaleToFill" image="logo_cliente.png" translatesAutoresizingMaskIntoConstraints="NO" id="cba-qE-XD9">
+                                <rect key="frame" x="20" y="20" width="280" height="83"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="83" id="x7k-ME-hza"/>
                                 </constraints>
                             </imageView>
                             <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="Frequently asked questions" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="TeM-Kz-q5J">
+                                <rect key="frame" x="20" y="111" width="280" height="33"/>
                                 <color key="backgroundColor" red="0.91620524878640774" green="0.91620524878640774" blue="0.91620524878640774" alpha="0.59999999999999998" colorSpace="calibratedRGB"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="33" id="BM3-92-RN7"/>
@@ -1089,6 +810,7 @@ You can email the copyright holder to: soporte.afirma@seap.minhap.es.</mutableSt
                                 <nil key="highlightedColor"/>
                             </label>
                             <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" usesAttributedText="YES" translatesAutoresizingMaskIntoConstraints="NO" id="cQ1-o8-KIY">
+                                <rect key="frame" x="20" y="152" width="280" height="323"/>
                                 <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                 <attributedString key="attributedText">
                                     <fragment>
@@ -1217,12 +939,13 @@ Imported certificates to Cliente @firma for Apple iOS are used only in websites 
                                 <dataDetectorType key="dataDetectorTypes" link="YES"/>
                             </textView>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="BA1-VQ-s7p">
+                                <rect key="frame" x="20" y="483" width="280" height="46"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="45" id="440-Pt-h8i"/>
                                 </constraints>
                                 <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
                                 <state key="normal" title="Back" image="flecha.png">
-                                    <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="titleColor" red="0.19607843137254902" green="0.30980392156862746" blue="0.52156862745098043" alpha="1" colorSpace="calibratedRGB"/>
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <state key="highlighted">
@@ -1233,12 +956,13 @@ Imported certificates to Cliente @firma for Apple iOS are used only in websites 
                                 </connections>
                             </button>
                             <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="g7X-Ex-PEI">
+                                <rect key="frame" x="0.0" y="505" width="73" height="44"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="73" id="wzY-Ai-j4T"/>
                                 </constraints>
                                 <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
                                 <state key="normal" title="Al Inicio">
-                                    <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="titleColor" red="0.19607843137254902" green="0.30980392156862746" blue="0.52156862745098043" alpha="1" colorSpace="calibratedRGB"/>
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <state key="highlighted">
@@ -1283,11 +1007,13 @@ Imported certificates to Cliente @firma for Apple iOS are used only in websites 
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <imageView userInteractionEnabled="NO" contentMode="scaleToFill" image="logo_cliente.png" translatesAutoresizingMaskIntoConstraints="NO" id="ZCk-YQ-PIt">
+                                <rect key="frame" x="20" y="20" width="280" height="83"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="83" id="VhS-5y-iAJ"/>
                                 </constraints>
                             </imageView>
                             <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="How to install certificates" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="cDW-CP-g9m">
+                                <rect key="frame" x="20" y="111" width="280" height="33"/>
                                 <color key="backgroundColor" red="0.91620524879999998" green="0.91620524879999998" blue="0.91620524879999998" alpha="0.59999999999999998" colorSpace="calibratedRGB"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="33" id="5J6-S5-uyL"/>
@@ -1297,12 +1023,13 @@ Imported certificates to Cliente @firma for Apple iOS are used only in websites 
                                 <nil key="highlightedColor"/>
                             </label>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="NTn-AP-FBL">
+                                <rect key="frame" x="20" y="483" width="280" height="46"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="45" id="BHy-6C-oor"/>
                                 </constraints>
                                 <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
                                 <state key="normal" title="Back" image="flecha.png">
-                                    <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="titleColor" red="0.19607843137254902" green="0.30980392156862746" blue="0.52156862745098043" alpha="1" colorSpace="calibratedRGB"/>
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <state key="highlighted">
@@ -1313,12 +1040,13 @@ Imported certificates to Cliente @firma for Apple iOS are used only in websites 
                                 </connections>
                             </button>
                             <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="jcT-IC-cFK">
+                                <rect key="frame" x="0.0" y="505" width="73" height="44"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="73" id="nuL-DX-wfW"/>
                                 </constraints>
                                 <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
                                 <state key="normal" title="Al Inicio">
-                                    <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="titleColor" red="0.19607843137254902" green="0.30980392156862746" blue="0.52156862745098043" alpha="1" colorSpace="calibratedRGB"/>
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <state key="highlighted">
@@ -1329,8 +1057,10 @@ Imported certificates to Cliente @firma for Apple iOS are used only in websites 
                                 </connections>
                             </button>
                             <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="1Gb-dZ-oj2">
+                                <rect key="frame" x="20" y="152" width="280" height="300"/>
                                 <subviews>
                                     <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" scrollEnabled="NO" editable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="PvP-Nn-Iiw">
+                                        <rect key="frame" x="72" y="0.0" width="214" height="102"/>
                                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="102" id="w6C-1b-sC7"/>
@@ -1341,12 +1071,14 @@ Imported certificates to Cliente @firma for Apple iOS are used only in websites 
                                         <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                                     </textView>
                                     <imageView userInteractionEnabled="NO" contentMode="scaleToFill" image="itunes.png" translatesAutoresizingMaskIntoConstraints="NO" id="Ye7-k1-MT1">
+                                        <rect key="frame" x="6" y="22" width="58" height="58"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="58" id="C8j-y3-jh9"/>
                                             <constraint firstAttribute="height" constant="58" id="kFy-1W-zIp"/>
                                         </constraints>
                                     </imageView>
                                     <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" scrollEnabled="NO" editable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Hft-Uk-v6U">
+                                        <rect key="frame" x="72" y="110" width="214" height="104"/>
                                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="104" id="3wL-ee-gWI"/>
@@ -1356,18 +1088,20 @@ Imported certificates to Cliente @firma for Apple iOS are used only in websites 
                                         <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                                     </textView>
                                     <imageView userInteractionEnabled="NO" contentMode="scaleToFill" image="certificados.png" translatesAutoresizingMaskIntoConstraints="NO" id="4lF-8S-Zte">
+                                        <rect key="frame" x="6" y="141" width="58" height="42"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="42" id="8dl-R7-seq"/>
                                         </constraints>
                                     </imageView>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="w61-eW-cwu">
+                                        <rect key="frame" x="40" y="222" width="201" height="43"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="42" id="8Vt-QL-w7Y"/>
                                             <constraint firstAttribute="width" constant="201" id="uPj-8Y-Aao"/>
                                         </constraints>
                                         <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
                                         <state key="normal" title="  More information" image="information_icon.png">
-                                            <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
+                                            <color key="titleColor" red="0.19607843137254902" green="0.30980392156862746" blue="0.52156862745098043" alpha="1" colorSpace="calibratedRGB"/>
                                             <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                         </state>
                                         <state key="highlighted">
@@ -1428,117 +1162,22 @@ Imported certificates to Cliente @firma for Apple iOS are used only in websites 
     <resources>
         <image name="cert_menu.png" width="20" height="17"/>
         <image name="certificados.png" width="64" height="53"/>
-        <image name="dropbox-ico.png" width="50" height="50"/>
         <image name="flecha.png" width="20" height="20"/>
         <image name="help.png" width="20" height="20"/>
         <image name="information_icon.png" width="30" height="30"/>
         <image name="itunes.png" width="200" height="200"/>
         <image name="logo_cliente.png" width="726" height="200"/>
-        <image name="menu_firma.png" width="30" height="11"/>
     </resources>
-    <classes>
-        <class className="AOAboutViewController" superclassName="GAITrackedViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/AOAboutViewController.h"/>
-            <relationships>
-                <relationship kind="outlet" name="manageStoreButton" candidateClass="UIButton"/>
-                <relationship kind="outlet" name="tabBar" candidateClass="UITabBar"/>
-            </relationships>
-        </class>
-        <class className="AOAcercadeViewController" superclassName="GAITrackedViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/AOAcercadeViewController.h"/>
-            <relationships>
-                <relationship kind="action" name="buttonPressed:"/>
-                <relationship kind="outlet" name="masInfoButton" candidateClass="UIButton"/>
-            </relationships>
-        </class>
-        <class className="AOCertificateSelectionViewController" superclassName="GAITrackedViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/AOCertificateSelectionViewController.h"/>
-            <relationships>
-                <relationship kind="outlet" name="selectionButton" candidateClass="UIButton"/>
-                <relationship kind="outlet" name="tblView" candidateClass="UITableView"/>
-            </relationships>
-        </class>
-        <class className="AODropBoxCloudViewController" superclassName="GAITrackedViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/AODropBoxCloudViewController.h"/>
-            <relationships>
-                <relationship kind="action" name="buttonPressed:"/>
-                <relationship kind="action" name="saveStorebuttonPressed:"/>
-                <relationship kind="outlet" name="LogOffDropbox" candidateClass="UIButton"/>
-                <relationship kind="outlet" name="dbxTblView" candidateClass="UITableView"/>
-                <relationship kind="outlet" name="saveStore" candidateClass="UIButton"/>
-            </relationships>
-        </class>
-        <class className="AOHelpMenuViewController" superclassName="GAITrackedViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/AOHelpMenuViewController.h"/>
-            <relationships>
-                <relationship kind="outlet" name="tblViewHelp" candidateClass="UITableView"/>
-            </relationships>
-        </class>
-        <class className="AOManagerStoreScreenViewController" superclassName="GAITrackedViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/AOManagerStoreScreenViewController.h"/>
-            <relationships>
-                <relationship kind="action" name="buttonPressed:"/>
-                <relationship kind="action" name="deleteButtonPressed:"/>
-                <relationship kind="outlet" name="deleteButton" candidateClass="UIButton"/>
-                <relationship kind="outlet" name="dropBoxButton" candidateClass="UIButton"/>
-                <relationship kind="outlet" name="tblViewManager" candidateClass="UITableView"/>
-            </relationships>
-        </class>
-        <class className="AOPinDropBoxCloudViewController" superclassName="GAITrackedViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/AOPinDropBoxCloudViewController.h"/>
-            <relationships>
-                <relationship kind="action" name="pinButtonPressed:"/>
-                <relationship kind="outlet" name="buttonCertDropBoxCloud" candidateClass="UIButton"/>
-                <relationship kind="outlet" name="nameCertDropBoxCloud" candidateClass="UITextView"/>
-                <relationship kind="outlet" name="pinCertDropBoxCloud" candidateClass="UITextField"/>
-            </relationships>
-        </class>
-        <class className="AOPinViewController" superclassName="GAITrackedViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/AOPinViewController.h"/>
-            <relationships>
-                <relationship kind="action" name="pinButtonPressed:"/>
-                <relationship kind="outlet" name="nombreCert" candidateClass="UITextView"/>
-                <relationship kind="outlet" name="pinButton" candidateClass="UIButton"/>
-                <relationship kind="outlet" name="pinTextField" candidateClass="UITextField"/>
-            </relationships>
-        </class>
-        <class className="AOSignDropboxViewController" superclassName="GAITrackedViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/AOSignDropboxViewController.h"/>
-            <relationships>
-                <relationship kind="action" name="backButtonPressed:"/>
-                <relationship kind="action" name="logOutButtonPressed:"/>
-                <relationship kind="action" name="signButtonPressed:"/>
-                <relationship kind="outlet" name="backButton" candidateClass="UIButton"/>
-                <relationship kind="outlet" name="dbxTblView" candidateClass="UITableView"/>
-                <relationship kind="outlet" name="logout" candidateClass="UIButton"/>
-                <relationship kind="outlet" name="signButton" candidateClass="UIButton"/>
-            </relationships>
-        </class>
-        <class className="AOSignViewController" superclassName="GAITrackedViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/AOSignViewController.h"/>
-            <relationships>
-                <relationship kind="action" name="buttonPressed:"/>
-                <relationship kind="outlet" name="nombreCert" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="signButton" candidateClass="UIButton"/>
-            </relationships>
-        </class>
-        <class className="GAITrackedViewController" superclassName="UIViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/GAITrackedViewController.h"/>
-        </class>
-        <class className="NSLayoutConstraint" superclassName="NSObject">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/NSLayoutConstraint.h"/>
-        </class>
-    </classes>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">
         <simulatedStatusBarMetrics key="statusBar"/>
         <simulatedOrientationMetrics key="orientation"/>
-        <simulatedScreenMetrics key="destination" type="retina4"/>
+        <simulatedScreenMetrics key="destination" type="retina4">
+            <size key="portraitSize" width="320" height="568"/>
+            <size key="landscapeSize" width="568" height="320"/>
+        </simulatedScreenMetrics>
     </simulatedMetricsContainer>
     <inferredMetricsTieBreakers>
-        <segue reference="yEF-pG-sB3"/>
-        <segue reference="tOZ-kr-G8o"/>
-        <segue reference="kRY-XU-ghR"/>
-        <segue reference="TQt-8t-kTg"/>
-        <segue reference="MHy-pT-cs6"/>
+        <segue reference="XSt-c3-X0e"/>
+        <segue reference="95b-rT-XO6"/>
     </inferredMetricsTieBreakers>
 </document>

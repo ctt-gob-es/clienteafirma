@@ -11,12 +11,6 @@
 // URL_SERVER
 //NSString *const URL_SERVER = @"http://172.24.36.40:8080/SignFolderMobileProxy/SignatureService";
 
-//URLS CONEXION DROPBOX
-NSString *const URL_STORE = @"hig78yqqhwhxyqy";//@"n3qvxtrnqshhs3p";
-NSString *const PASS_STORE = @"58xj0gsp98sfjp7";//@"6c5fvrum0ux6e6d";
-NSString *const URL_SIGN = @"1d7bi6upounwvh2";//@"ps247gi3h4iff2j";
-NSString *const PASS_SIGN = @"ujdccxjrw0jb477";//@"7rcxmkarichbudw";
-
 NSString *const OPERATION_SIGN = @"sign";
 NSString *const OPERATION_COSIGN = @"cosign";
 NSString *const OPERATION_COUNTERSIGN = @"countersign";

@@ -24,7 +24,6 @@ uper_decode_complete(asn_codec_ctx_t *opt_codec_ctx, asn_TYPE_descriptor_t *td, 
 			if(((uint8_t *)buffer)[0] == 0) {
 				rval.consumed = 1;	/* 1 byte */
 			} else {
-				ASN_DEBUG("Expecting single zeroed byte");
 				rval.code = RC_FAIL;
 			}
 		} else {
@@ -81,10 +80,10 @@ uper_decode(asn_codec_ctx_t *opt_codec_ctx, asn_TYPE_descriptor_t *td, void **sp
 		/* Return the number of consumed bits */
 		rval.consumed = ((pd.buffer - (const uint8_t *)buffer) << 3)
 					+ pd.nboff - skip_bits;
-		ASN_DEBUG("PER decoding consumed %d, counted %d",
-			rval.consumed, pd.moved);
 		assert(rval.consumed == pd.moved);
-	} else {
+	}
+    else
+    {
 		/* PER codec is not a restartable */
 		rval.consumed = 0;
 	}

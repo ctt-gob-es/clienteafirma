@@ -45,9 +45,6 @@ INTEGER_encode_der(asn_TYPE_descriptor_t *td, void *sptr,
 	asn_app_consume_bytes_f *cb, void *app_key) {
 	INTEGER_t *st = (INTEGER_t *)sptr;
 
-	ASN_DEBUG("%s %s as INTEGER (tm=%d)",
-		cb?"Encoding":"Estimating", td->name, tag_mode);
-
 	/*
 	 * Canonicalize integer in the buffer.
 	 * (Remove too long sign extension, remove some first 0x00 bytes)
@@ -151,8 +148,6 @@ INTEGER__dump(asn_TYPE_descriptor_t *td, const INTEGER_t *st, asn_app_consume_by
 				ret = snprintf(scr, scrsize,
 					"<%s/>", el->enum_name);
 		} else if(plainOrXER && specs && specs->strict_enumeration) {
-			ASN_DEBUG("ASN.1 forbids dealing with "
-				"unknown value of ENUMERATED type");
 			errno = EPERM;
 			return -1;
 		} else {
@@ -169,8 +164,6 @@ INTEGER__dump(asn_TYPE_descriptor_t *td, const INTEGER_t *st, asn_app_consume_by
 		 * Here and earlier, we cannot encode the ENUMERATED values
 		 * if there is no corresponding identifier.
 		 */
-		ASN_DEBUG("ASN.1 forbids dealing with "
-			"unknown value of ENUMERATED type");
 		errno = EPERM;
 		return -1;
 	}
@@ -424,14 +417,11 @@ INTEGER__xer_body_decode(asn_TYPE_descriptor_t *td, void *sptr, const void *chun
 					(asn_INTEGER_specifics_t *)
 					td->specifics, lstart, lstop);
 				if(el) {
-					ASN_DEBUG("Found \"%s\" => %ld",
-						el->enum_name, el->nat_value);
 					state = ST_DIGITS;
 					value = el->nat_value;
 					lp = lstop - 1;
 					continue;
 				}
-				ASN_DEBUG("Unknown identifier for INTEGER");
 			}
 			return XPBD_BROKEN_ENCODING;
 		case 0x3a:	/* ':' */
@@ -444,14 +434,12 @@ INTEGER__xer_body_decode(asn_TYPE_descriptor_t *td, void *sptr, const void *chun
 				 * decoded the first two hexadecimal
 				 * places as a decimal value.
 				 * Switch decoding mode. */
-				ASN_DEBUG("INTEGER re-evaluate as hex form");
 				if(INTEGER_st_prealloc(st, (chunk_size/3) + 1))
 					return XPBD_SYSTEM_FAILURE;
 				state = ST_SKIPSPHEX;
 				lp = lstart - 1;
 				continue;
 			} else {
-				ASN_DEBUG("state %d at %d", state, lp - lstart);
 				break;
 			}
 		/* [A-Fa-f] */
@@ -473,7 +461,6 @@ INTEGER__xer_body_decode(asn_TYPE_descriptor_t *td, void *sptr, const void *chun
 				state = ST_HEXCOLON;
 				continue;
 			case ST_DIGITS:
-				ASN_DEBUG("INTEGER re-evaluate as hex form");
 				if(INTEGER_st_prealloc(st, (chunk_size/3) + 1))
 					return XPBD_SYSTEM_FAILURE;
 				state = ST_SKIPSPHEX;
@@ -486,8 +473,6 @@ INTEGER__xer_body_decode(asn_TYPE_descriptor_t *td, void *sptr, const void *chun
 		}
 
 		/* Found extra non-numeric stuff */
-		ASN_DEBUG("Found non-numeric 0x%2x at %d",
-			lv, lp - lstart);
 		state = ST_EXTRASTUFF;
 		break;
 	}
@@ -509,8 +494,6 @@ INTEGER__xer_body_decode(asn_TYPE_descriptor_t *td, void *sptr, const void *chun
 				return XPBD_NOT_BODY_IGNORE;
 			break;
 		} else {
-			ASN_DEBUG("INTEGER: No useful digits (state %d)",
-				state);
 			return XPBD_BROKEN_ENCODING;	/* No digits */
 		}
 		break;
@@ -597,7 +580,6 @@ INTEGER_decode_uper(asn_codec_ctx_t *opt_codec_ctx, asn_TYPE_descriptor_t *td,
 	/* X.691, #12.2.2 */
 	if(ct && ct->flags != APC_UNCONSTRAINED) {
 		/* #10.5.6 */
-		ASN_DEBUG("Integer with range %d bits", ct->range_bits);
 		if(ct->range_bits >= 0) {
 			long value;
 			if(ct->range_bits == 32) {
@@ -611,8 +593,6 @@ INTEGER_decode_uper(asn_codec_ctx_t *opt_codec_ctx, asn_TYPE_descriptor_t *td,
 				value = per_get_few_bits(pd, ct->range_bits);
 				if(value < 0) _ASN_DECODE_STARVED;
 			}
-			ASN_DEBUG("Got value %ld + low %ld",
-				value, ct->lower_bound);
 			value += ct->lower_bound;
 			if((specs && specs->field_unsigned)
 				? asn_ulong2INTEGER(st, value)
@@ -692,10 +672,6 @@ INTEGER_encode_uper(asn_TYPE_descriptor_t *td,
 				|| uval > (unsigned long)ct->upper_bound)
 					inext = 1;
 			}
-			ASN_DEBUG("Value %lu (%02x/%d) lb %lu ub %lu %s",
-				uval, st->buf[0], st->size,
-				ct->lower_bound, ct->upper_bound,
-				inext ? "ext" : "fix");
 			value = uval;
 		} else {
 			if(asn_INTEGER2long(st, &value))
@@ -709,10 +685,6 @@ INTEGER_encode_uper(asn_TYPE_descriptor_t *td,
 				|| value > ct->upper_bound)
 					inext = 1;
 			}
-			ASN_DEBUG("Value %ld (%02x/%d) lb %ld ub %ld %s",
-				value, st->buf[0], st->size,
-				ct->lower_bound, ct->upper_bound,
-				inext ? "ext" : "fix");
 		}
 		if(ct->flags & APC_EXTENSIBLE) {
 			if(per_put_few_bits(po, inext, 1))
@@ -727,8 +699,6 @@ INTEGER_encode_uper(asn_TYPE_descriptor_t *td,
 	/* X.691, #12.2.2 */
 	if(ct && ct->range_bits >= 0) {
 		/* #10.5.6 */
-		ASN_DEBUG("Encoding integer with range %d bits",
-			ct->range_bits);
 		if(ct->range_bits == 32) {
 			/* TODO: extend to >32 bits */
 			long v = value - ct->lower_bound;
@@ -744,7 +714,6 @@ INTEGER_encode_uper(asn_TYPE_descriptor_t *td,
 	}
 
 	if(ct && ct->lower_bound) {
-		ASN_DEBUG("Adjust lower bound to %ld", ct->lower_bound);
 		/* TODO: adjust lower bound */
 		_ASN_ENCODE_FAILED;
 	}

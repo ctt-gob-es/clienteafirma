@@ -107,7 +107,6 @@ ber_skip_length(asn_codec_ctx_t *opt_codec_ctx,
 	/*
 	 * Indefinite length!
 	 */
-	ASN_DEBUG("Skipping indefinite length");
 	for(skip = ll, ptr = ((const char *)ptr) + ll, size -= ll;;) {
 		ber_tlv_tag_t tag;
 

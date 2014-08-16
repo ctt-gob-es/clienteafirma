@@ -223,7 +223,6 @@ NSString *receivedString = NULL;
 
 -(void) onReadUrl:(NSNotification*) notification {
     NSString *url = [notification object];
-    //NSLog(@"URL notificada: %@", url);
     startUrl = url;
     signDone = false;
     signButton.userInteractionEnabled = NO;
@@ -490,24 +489,15 @@ NSString *receivedString = NULL;
         UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:@"El Algoritmo no es váLido o no está soportado. Por favor, vuelva de nuevo al navegador donde inició la operación e inténtelo de nuevo más tarde" delegate:self cancelButtonTitle:@"Cerrar" otherButtonTitles:nil];
         [alert show];
         signDone = true;
-        //[signButton setTitle:@"Cerrar aplicación" forState:UIControlStateNormal];
         signButton.userInteractionEnabled = NO;
         return;
     }
-    
-    
-    [[NSNotificationCenter defaultCenter]
-     addObserver:self
-     selector:@selector(eventHandler:)
-     name:@"eventType"
-     object:nil ];
     
     //Invocamos el método de petición al servidor.  
     [self processBackground];
     
     signDone = true;
     
-    //[signButton setTitle:@"Cerrar aplicación" forState:UIControlStateNormal];
     signButton.userInteractionEnabled = NO;
     signButton.enabled=NO;
 }

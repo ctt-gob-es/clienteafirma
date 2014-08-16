@@ -9,6 +9,7 @@
 #include "NULL.h"
 #include "CADESOID.h"
 #include <openssl/x509.h>
+#include "CADESSignerInfo.h"
 
 void getSignedDataStructure(SignedData_t **sig_dat,
                             X509 *certificateX509,

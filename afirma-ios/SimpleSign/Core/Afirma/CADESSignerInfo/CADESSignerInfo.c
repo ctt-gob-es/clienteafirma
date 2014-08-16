@@ -12,6 +12,8 @@
 #include <openssl/x509.h>
 #include "CADESOID.h"
 #include "NULL.h"
+//#include "CADESSignerIdentifier.h"
+//#include "CADESSignedAttributes.h"
 
 void getCADESSignerInfos( struct SignerInfos **at_ext,
                          X509 *certificateX509,

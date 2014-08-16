@@ -15,9 +15,6 @@ asn_enc_rval_t
 der_encode(asn_TYPE_descriptor_t *type_descriptor, void *struct_ptr,
 	asn_app_consume_bytes_f *consume_bytes, void *app_key) {
 
-	ASN_DEBUG("DER encoder invoked for %s",
-		type_descriptor->name);
-
 	/*
 	 * Invoke type-specific encoder.
 	 */
@@ -86,15 +83,6 @@ der_write_tags(asn_TYPE_descriptor_t *sd,
 	ssize_t *lens;
 	int i;
 
-	ASN_DEBUG("Writing tags (%s, tm=%d, tc=%d, tag=%s, mtc=%d)",
-		sd->name, tag_mode, sd->tags_count,
-		ber_tlv_tag_string(tag),
-		tag_mode
-			?(sd->tags_count+1
-				-((tag_mode == -1) && sd->tags_count))
-			:sd->tags_count
-	);
-
 	if(tag_mode) {
 		/*
 		 * Instead of doing shaman dance like we do in ber_check_tags(),
@@ -143,9 +131,6 @@ der_write_tags(asn_TYPE_descriptor_t *sd,
 	}
 
 	if(!cb) return overall_length - struct_length;
-
-	ASN_DEBUG("%s %s TL sequence (%d elements)",
-		cb?"Encoding":"Estimating", sd->name, tags_count);
 
 	/*
 	 * Encode the TL sequence for real.

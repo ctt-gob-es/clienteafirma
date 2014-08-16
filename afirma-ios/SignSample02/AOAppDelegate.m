@@ -4,7 +4,6 @@
 //
 
 #import "AOAppDelegate.h"
-#import <DropboxSDK/DropboxSDK.h>
 #import "GAI.h"
 
 @implementation AOAppDelegate
@@ -13,7 +12,8 @@
 {
     //[self.window makeKeyAndVisible];
     [self registerDefaultsFromSettingsBundle];
-    
+
+    /*
     // Optional: automatically send uncaught exceptions to Google Analytics.
     [GAI sharedInstance].trackUncaughtExceptions = YES;
     
@@ -24,7 +24,8 @@
     [[[GAI sharedInstance] logger] setLogLevel:kGAILogLevelVerbose];
     
     // Initialize tracker.
-    id<GAITracker> tracker = [[GAI sharedInstance] trackerWithTrackingId:@"UA-41615516-1"];
+    [[GAI sharedInstance] trackerWithTrackingId:@"UA-41615516-1"];
+     */
     
     return YES;
 }

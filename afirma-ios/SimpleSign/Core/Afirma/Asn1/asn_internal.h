@@ -116,8 +116,6 @@ _ASN_STACK_OVERFLOW_CHECK(asn_codec_ctx_t *ctx) {
 
 		/* double negative required to avoid int wrap-around */
 		if(usedstack < -(ptrdiff_t)ctx->max_stack_size) {
-			ASN_DEBUG("Stack limit %ld reached",
-				(long)ctx->max_stack_size);
 			return -1;
 		}
 	}

@@ -21,8 +21,6 @@ SEQUENCE_OF_encode_der(asn_TYPE_descriptor_t *td, void *ptr,
 	asn_enc_rval_t erval;
 	int edx;
 
-	ASN_DEBUG("Estimating size of SEQUENCE OF %s", td->name);
-
 	/*
 	 * Gather the length of the underlying members sequence.
 	 */
@@ -54,8 +52,6 @@ SEQUENCE_OF_encode_der(asn_TYPE_descriptor_t *td, void *ptr,
 		erval.encoded = computed_size;
 		_ASN_ENCODED_OK(erval);
 	}
-
-	ASN_DEBUG("Encoding members of SEQUENCE OF %s", td->name);
 
 	/*
 	 * Encode all members.
@@ -154,8 +150,6 @@ SEQUENCE_OF_encode_uper(asn_TYPE_descriptor_t *td,
 
 	er.encoded = 0;
 
-	ASN_DEBUG("Encoding %s as SEQUENCE OF (%d)", td->name, list->count);
-
 	if(constraints) ct = &constraints->size;
 	else if(td->per_constraints) ct = &td->per_constraints->size;
 	else ct = 0;
@@ -164,9 +158,6 @@ SEQUENCE_OF_encode_uper(asn_TYPE_descriptor_t *td,
 	if(ct) {
 		int not_in_root = (list->count < ct->lower_bound
 				|| list->count > ct->upper_bound);
-		ASN_DEBUG("lb %ld ub %ld %s",
-			ct->lower_bound, ct->upper_bound,
-			ct->flags & APC_EXTENSIBLE ? "ext" : "fix");
 		if(ct->flags & APC_EXTENSIBLE) {
 			/* Declare whether size is in extension root */
 			if(per_put_few_bits(po, not_in_root, 1))

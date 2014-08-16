@@ -1,5 +1,5 @@
 //
-//  SignedAttributes.h
+//  CADESSignedAttributes.h
 //  CadesASN1Simplificado
 //
 //

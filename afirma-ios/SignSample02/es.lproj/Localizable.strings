@@ -9,7 +9,6 @@
 */
 "processing" = "Procesando...";
 "atencion" = "¡Atención!";
-"sesion_finalizada" = "La sesión de Dropbox ha finalizado. ¿Desea volver a conectar?";
 "cerrar" = "Cerrar";
 "conectar" = "Conectar";
 "url_forja" = "http://blogs.forja.cenatic.es/clienteafirma/?p=42";
@@ -29,7 +28,7 @@
 "borrar" = "Borrar";
 "seleccion_almacen_borrar" = "Por favor, seleccione el almacen de claves y certificados que desea eliminar";
 "bienvenida" = "¡Bienvenido al Cliente @firma!";
-"bienvenida_msg" = "Para empezar a usar el Cliente @firma debe instalar un almacén de claves y certificados. Puede importar un almacén desde una cuenta de Dropbox o desde la configuración de la aplicación de iTunes.";
+"bienvenida_msg" = "Para empezar a usar el Cliente @firma debe instalar un almacén de claves y certificados. Puede importar un almacén desde una la configuración de la aplicación de iTunes.";
 "error_borrar_almacen" = "No se ha podido borrar el almacén seleccionado.";
 "introducir_contrasenia" = "Por favor, introduzca la contraseña del almacén de claves ";
 "error_contrasenia" = "La contraseña del almacén de claves es incorrecta";

@@ -56,9 +56,6 @@ BOOLEAN_decode_ber(asn_codec_ctx_t *opt_codec_ctx,
 		}
 	}
 
-	ASN_DEBUG("Decoding %s as BOOLEAN (tm=%d)",
-		td->name, tag_mode);
-
 	/*
 	 * Check tags.
 	 */
@@ -66,8 +63,6 @@ BOOLEAN_decode_ber(asn_codec_ctx_t *opt_codec_ctx,
 		tag_mode, 0, &length, 0);
 	if(rval.code != RC_OK)
 		return rval;
-
-	ASN_DEBUG("Boolean length is %d bytes", (int)length);
 
 	buf_ptr = ((const char *)buf_ptr) + rval.consumed;
 	size -= rval.consumed;
@@ -92,10 +87,6 @@ BOOLEAN_decode_ber(asn_codec_ctx_t *opt_codec_ctx,
 
 	rval.code = RC_OK;
 	rval.consumed += length;
-
-	ASN_DEBUG("Took %ld/%ld bytes to encode %s, value=%d",
-		(long)rval.consumed, (long)length,
-		td->name, *st);
 	
 	return rval;
 }
@@ -256,8 +247,6 @@ BOOLEAN_decode_uper(asn_codec_ctx_t *opt_codec_ctx, asn_TYPE_descriptor_t *td,
 	case 0: *st = 0; break;
 	case -1: default: _ASN_DECODE_STARVED;
 	}
-
-	ASN_DEBUG("%s decoded as %s", td->name, *st ? "TRUE" : "FALSE");
 
 	rv.code = RC_OK;
 	rv.consumed = 1;

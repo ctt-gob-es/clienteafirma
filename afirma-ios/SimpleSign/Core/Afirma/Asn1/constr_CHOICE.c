@@ -118,8 +118,6 @@ CHOICE_decode_ber(asn_codec_ctx_t *opt_codec_ctx, asn_TYPE_descriptor_t *td,
 
 	ssize_t consumed_myself = 0;	/* Consumed bytes from ptr */
 
-	ASN_DEBUG("Decoding %s as CHOICE", td->name);
-
 	/*
 	 * Create the target structure if it is not present already.
 	 */
@@ -150,8 +148,6 @@ CHOICE_decode_ber(asn_codec_ctx_t *opt_codec_ctx, asn_TYPE_descriptor_t *td,
 			rval = ber_check_tags(opt_codec_ctx, td, ctx, ptr, size,
 				tag_mode, -1, &ctx->left, 0);
 			if(rval.code != RC_OK) {
-				ASN_DEBUG("%s tagging check failed: %d",
-					td->name, rval.code);
 				return rval;
 			}
 
@@ -166,16 +162,12 @@ CHOICE_decode_ber(asn_codec_ctx_t *opt_codec_ctx, asn_TYPE_descriptor_t *td,
 
 		NEXT_PHASE(ctx);
 
-		ASN_DEBUG("Structure consumes %ld bytes, buffer %ld",
-			(long)ctx->left, (long)size);
-
 		/* Fall through */
 	case 1:
 		/*
 		 * Fetch the T from TLV.
 		 */
 		tag_len = ber_fetch_tag(ptr, LEFT, &tlv_tag);
-		ASN_DEBUG("In %s CHOICE tag length %d", td->name, (int)tag_len);
 		switch(tag_len) {
 		case 0: if(!SIZE_VIOLATION) RETURN(RC_WMORE);
 			/* Fall through */
@@ -198,16 +190,10 @@ CHOICE_decode_ber(asn_codec_ctx_t *opt_codec_ctx, asn_TYPE_descriptor_t *td,
 				ctx->step = t2m->el_no;
 				break;
 			} else if(specs->ext_start == -1) {
-				ASN_DEBUG("Unexpected tag %s "
-					"in non-extensible CHOICE %s",
-					ber_tlv_tag_string(tlv_tag), td->name);
 				RETURN(RC_FAIL);
 			} else {
 				/* Skip this tag */
 				ssize_t skip;
-
-				ASN_DEBUG("Skipping unknown tag %s",
-					ber_tlv_tag_string(tlv_tag));
 
 				skip = ber_skip_length(opt_codec_ctx,
 					BER_TLV_CONSTRUCTED(ptr),
@@ -281,9 +267,6 @@ CHOICE_decode_ber(asn_codec_ctx_t *opt_codec_ctx, asn_TYPE_descriptor_t *td,
 
 		/* Fall through */
 	case 3:
-		ASN_DEBUG("CHOICE %s Leftover: %ld, size = %ld, tm=%d, tc=%d",
-			td->name, (long)ctx->left, (long)size,
-			tag_mode, td->tags_count);
 
 		if(ctx->left > 0) {
 			/*
@@ -336,8 +319,6 @@ CHOICE_decode_ber(asn_codec_ctx_t *opt_codec_ctx, asn_TYPE_descriptor_t *td,
 					continue;
 				}
 			} else {
-				ASN_DEBUG("Unexpected continuation in %s",
-					td->name);
 				RETURN(RC_FAIL);
 			}
 
@@ -365,9 +346,6 @@ CHOICE_encode_der(asn_TYPE_descriptor_t *td, void *sptr,
 	int present;
 
 	if(!sptr) _ASN_ENCODE_FAILED;
-
-	ASN_DEBUG("%s %s as CHOICE",
-		cb?"Encoding":"Estimating", td->name);
 
 	present = _fetch_present_idx(sptr,
 		specs->pres_offset, specs->pres_size);
@@ -435,9 +413,6 @@ CHOICE_encode_der(asn_TYPE_descriptor_t *td, void *sptr,
 		elm->tag_mode, elm->tag, cb, app_key);
 	if(erval.encoded == -1)
 		return erval;
-
-	ASN_DEBUG("Encoded CHOICE member in %ld bytes (+%ld)",
-		(long)erval.encoded, (long)computed_size);
 
 	erval.encoded += computed_size;
 
@@ -617,8 +592,6 @@ CHOICE_decode_xer(asn_codec_ctx_t *opt_codec_ctx, asn_TYPE_descriptor_t *td,
 					elm->type, memb_ptr2, elm->name,
 					buf_ptr, size);
 			XER_ADVANCE(tmprval.consumed);
-			ASN_DEBUG("XER/CHOICE: itdf: [%s] code=%d",
-				elm->type->name, tmprval.code);
 			if(tmprval.code != RC_OK)
 				RETURN(tmprval.code);
 			assert(_fetch_present_idx(st,
@@ -655,17 +628,9 @@ CHOICE_decode_xer(asn_codec_ctx_t *opt_codec_ctx, asn_TYPE_descriptor_t *td,
 		}
 
 		tcv = xer_check_tag(buf_ptr, ch_size, xml_tag);
-		ASN_DEBUG("XER/CHOICE checked [%c%c%c%c] vs [%s], tcv=%d",
-			ch_size>0?((const uint8_t *)buf_ptr)[0]:'?',
-			ch_size>1?((const uint8_t *)buf_ptr)[1]:'?',
-			ch_size>2?((const uint8_t *)buf_ptr)[2]:'?',
-			ch_size>3?((const uint8_t *)buf_ptr)[3]:'?',
-		xml_tag, tcv);
 
 		/* Skip the extensions section */
 		if(ctx->phase == 4) {
-			ASN_DEBUG("skip_unknown(%d, %ld)",
-				tcv, (long)ctx->left);
 			switch(xer_skip_unknown(tcv, &ctx->left)) {
 			case -1:
 				ctx->phase = 5;
@@ -734,7 +699,6 @@ CHOICE_decode_xer(asn_codec_ctx_t *opt_codec_ctx, asn_TYPE_descriptor_t *td,
 
 			/* It is expected extension */
 			if(specs->ext_start != -1) {
-				ASN_DEBUG("Got anticipated extension");
 				/*
 				 * Check for (XCT_BOTH or XCT_UNKNOWN_BO)
 				 * By using a mask. Only record a pure
@@ -756,13 +720,6 @@ CHOICE_decode_xer(asn_codec_ctx_t *opt_codec_ctx, asn_TYPE_descriptor_t *td,
 			break;
 		}
 
-		ASN_DEBUG("Unexpected XML tag [%c%c%c%c] in CHOICE [%s]"
-			" (ph=%d, tag=%s)",
-			ch_size>0?((const uint8_t *)buf_ptr)[0]:'?',
-			ch_size>1?((const uint8_t *)buf_ptr)[1]:'?',
-			ch_size>2?((const uint8_t *)buf_ptr)[2]:'?',
-			ch_size>3?((const uint8_t *)buf_ptr)[3]:'?',
-			td->name, ctx->phase, xml_tag);
 		break;
 	}
 
@@ -860,8 +817,6 @@ CHOICE_decode_uper(asn_codec_ctx_t *opt_codec_ctx, asn_TYPE_descriptor_t *td,
 	if(ct && ct->range_bits >= 0) {
 		value = per_get_few_bits(pd, ct->range_bits);
 		if(value < 0) _ASN_DECODE_STARVED;
-		ASN_DEBUG("CHOICE %s got index %d in range %d",
-			td->name, value, ct->range_bits);
 		if(value > ct->upper_bound)
 			_ASN_DECODE_FAILED;
 	} else {
@@ -889,7 +844,6 @@ CHOICE_decode_uper(asn_codec_ctx_t *opt_codec_ctx, asn_TYPE_descriptor_t *td,
 		memb_ptr = (char *)st + elm->memb_offset;
 		memb_ptr2 = &memb_ptr;
 	}
-	ASN_DEBUG("Discovered CHOICE %s encodes %s", td->name, elm->name);
 
 	if(ct && ct->range_bits >= 0) {
 		rv = elm->type->uper_decoder(opt_codec_ctx, elm->type,
@@ -900,8 +854,6 @@ CHOICE_decode_uper(asn_codec_ctx_t *opt_codec_ctx, asn_TYPE_descriptor_t *td,
 	}
 
 	if(rv.code != RC_OK)
-		ASN_DEBUG("Failed to decode %s in %s (CHOICE) %d",
-			elm->name, td->name, rv.code);
 	return rv;
 }
    
@@ -915,8 +867,6 @@ CHOICE_encode_uper(asn_TYPE_descriptor_t *td,
 	int present;
 
 	if(!sptr) _ASN_ENCODE_FAILED;
-
-	ASN_DEBUG("Encoding %s as CHOICE", td->name);
 
 	if(constraints) ct = &constraints->value;
 	else if(td->per_constraints) ct = &td->per_constraints->value;
@@ -937,8 +887,6 @@ CHOICE_encode_uper(asn_TYPE_descriptor_t *td,
 	/* Adjust if canonical order is different from natural order */
 	if(specs->canonical_order)
 		present = specs->canonical_order[present];
-
-	ASN_DEBUG("Encoding %s CHOICE element %d", td->name, present);
 
 	if(ct && ct->range_bits >= 0) {
 		if(present < ct->lower_bound
@@ -1034,8 +982,6 @@ CHOICE_free(asn_TYPE_descriptor_t *td, void *ptr, int contents_only) {
 
 	if(!td || !ptr)
 		return;
-
-	ASN_DEBUG("Freeing %s as CHOICE", td->name);
 
 	/*
 	 * Figure out which CHOICE element is encoded.

@@ -1,5 +1,5 @@
 //
-//  SigningTime.h
+//  CADESSigningTimeAttribute.h
 //  CadesASN1Simplificado
 //
 //

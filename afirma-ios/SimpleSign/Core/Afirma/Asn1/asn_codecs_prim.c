@@ -26,9 +26,6 @@ ber_decode_primitive(asn_codec_ctx_t *opt_codec_ctx,
 		*sptr = (void *)st;
 	}
 
-	ASN_DEBUG("Decoding %s as plain primitive (tm=%d)",
-		td->name, tag_mode);
-
 	/*
 	 * Check tags and extract value length.
 	 */
@@ -36,8 +33,6 @@ ber_decode_primitive(asn_codec_ctx_t *opt_codec_ctx,
 			tag_mode, 0, &length, 0);
 	if(rval.code != RC_OK)
 		return rval;
-
-	ASN_DEBUG("%s length is %d bytes", td->name, (int)length);
 
 	/*
 	 * Make sure we have this length.
@@ -70,10 +65,6 @@ ber_decode_primitive(asn_codec_ctx_t *opt_codec_ctx,
 	rval.code = RC_OK;
 	rval.consumed += length;
 
-	ASN_DEBUG("Took %ld/%ld bytes to encode %s",
-		(long)rval.consumed,
-		(long)length, td->name);
-
 	return rval;
 }
 
@@ -87,12 +78,9 @@ der_encode_primitive(asn_TYPE_descriptor_t *td, void *sptr,
 	asn_enc_rval_t erval;
 	ASN__PRIMITIVE_TYPE_t *st = (ASN__PRIMITIVE_TYPE_t *)sptr;
 
-	ASN_DEBUG("%s %s as a primitive type (tm=%d)",
-		cb?"Encoding":"Estimating", td->name, tag_mode);
-
 	erval.encoded = der_write_tags(td, st->size, tag_mode, 0, tag,
 		cb, app_key);
-	ASN_DEBUG("%s wrote tags %d", td->name, (int)erval.encoded);
+
 	if(erval.encoded == -1) {
 		erval.failed_type = td;
 		erval.structure_ptr = sptr;
@@ -121,8 +109,6 @@ ASN__PRIMITIVE_TYPE_free(asn_TYPE_descriptor_t *td, void *sptr,
 
 	if(!td || !sptr)
 		return;
-
-	ASN_DEBUG("Freeing %s as a primitive type", td->name);
 
 	if(st->buf)
 		FREEMEM(st->buf);
@@ -258,8 +244,6 @@ xer_decode_primitive(asn_codec_ctx_t *opt_codec_ctx,
 	case RC_OK:
 		if(!s_arg.decoded_something) {
 			char ch;
-			ASN_DEBUG("Primitive body is not recognized, "
-				"supplying empty one");
 			/*
 			 * Decoding opportunity has come and gone.
 			 * Where's the result?

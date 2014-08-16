@@ -7,6 +7,7 @@
 #import "AOPinViewController.h"
 #import "CADESSignUtils.h"
 #import "AOSignViewController.h"
+#import "Base64.h"
 
 @interface AOPinViewController ()
 
@@ -155,6 +156,7 @@ SecKeyRef privateKeyPkcs12 = NULL;
     
     // Cargamos el PKCS#12 desde como un recurso
     NSString *thePath = NULL;
+    
 #if TARGET_IPHONE_SIMULATOR
     
     // Cargamos el PKCS#12 desde como un recurso
@@ -191,8 +193,7 @@ SecKeyRef privateKeyPkcs12 = NULL;
         return status;
     }
     
-    self.base64UrlSafeCertificateData = [CADESSignUtils encodeBase64:(NSData*) CFBridgingRelease(SecCertificateCopyData(myReturnedCertificate))];
-    //NSLog(@"Certificado en Base64: %@", base64UrlSafeCertificateData);
+    self.base64UrlSafeCertificateData = [Base64 encode:CFBridgingRelease(SecCertificateCopyData(myReturnedCertificate))];
     
     status = SecIdentityCopyPrivateKey(myIdentity, &privateKeyPkcs12);
     
@@ -223,7 +224,6 @@ SecKeyRef privateKeyPkcs12 = NULL;
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }
-
 
 - (void)dealloc {
     [_nombreCert release];

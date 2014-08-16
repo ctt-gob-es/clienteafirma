@@ -9,7 +9,6 @@
  */
 "processing" = "Processing...";
 "atencion" = "Warning!";
-"sesion_finalizada" = "Dropbox session has expired. Do you want to connect again?";
 "cerrar" = "Close";
 "conectar" = "Connect";
 "url_forja" = "http://blogs.forja.cenatic.es/clienteafirma/?p=42";
@@ -29,7 +28,7 @@
 "borrar" = "Delete";
 "seleccion_almacen_borrar" = "Please, select the keychain to delete";
 "bienvenida" = "Welcome to Cliente @firma!";
-"bienvenida_msg" = "In order to begin to use Cliente @firma, first you must install a keychain. You are able to import a keychain from your Dropbox account or from the iTunes configuration panel.";
+"bienvenida_msg" = "In order to begin to use Cliente @firma, first you must install a keychain. You are able to import a keychain from the iTunes configuration panel.";
 "error_borrar_almacen" = "Error deleting selected keychain.";
 "introducir_contrasenia" = "Please, enter your keychain password ";
 "error_contrasenia" = "Wrong keychain password";

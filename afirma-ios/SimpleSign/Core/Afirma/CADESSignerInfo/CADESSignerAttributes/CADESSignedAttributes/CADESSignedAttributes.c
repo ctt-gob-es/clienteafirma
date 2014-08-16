@@ -7,6 +7,13 @@
 #include <stdio.h>
 #include "SignedAttributes.h"
 #include <openssl/x509.h>
+//#include "CADESSigningTimeAttribute.h"
+//#include "CADESContentTypeAttribute.h"
+//#include "CADESMessageDigest.h"
+//#include "CADESContentHint.c"
+//#include "CADESSigPolicyId.h"
+//#include "CADESSigningCertificateV1.h"
+//#include "CADESSigningCertificateV2.h"
 
 void getCADESSignedAttributes( struct SignedAttributes_t **at_ext,
                               X509 *certificateX509,

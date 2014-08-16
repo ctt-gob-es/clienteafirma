@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="2.0" toolsVersion="3084" systemVersion="12F45" targetRuntime="iOS.CocoaTouch.iPad" propertyAccessControl="none" initialViewController="oXt-Wl-tio">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="2.0" toolsVersion="6205" systemVersion="14A314h" targetRuntime="iOS.CocoaTouch.iPad" variant="6xAndEarlier" propertyAccessControl="none" promptedForUpgradeToXcode5="NO" initialViewController="oXt-Wl-tio">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="2083"/>
+        <deployment defaultVersion="1536" identifier="iOS"/>
+        <development version="4600" identifier="xcode"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6198"/>
     </dependencies>
     <scenes>
         <!--Navigation Controller-->
@@ -19,159 +21,6 @@
             </objects>
             <point key="canvasLocation" x="-2128" y="-122"/>
         </scene>
-        <!--Pin Drop Box Cloud View Controller-->
-        <scene sceneID="9pj-xP-qKF">
-            <objects>
-                <viewController id="8OC-Jd-4nd" customClass="AOPinDropBoxCloudViewController" sceneMemberID="viewController">
-                    <view key="view" contentMode="scaleToFill" id="ZWh-LU-1Gc">
-                        <rect key="frame" x="0.0" y="20" width="768" height="1004"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                        <subviews>
-                            <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" minimumFontSize="17" id="6Pq-qT-ArO">
-                                <rect key="frame" x="151" y="181" width="469" height="30"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                <textInputTraits key="textInputTraits" returnKeyType="done" enablesReturnKeyAutomatically="YES" secureTextEntry="YES"/>
-                                <connections>
-                                    <outlet property="delegate" destination="8OC-Jd-4nd" id="njF-wH-kft"/>
-                                </connections>
-                            </textField>
-                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" text="After entering the keychain password, it will be copied into your personal iTunes folder." id="74V-hT-5OR">
-                                <rect key="frame" x="151" y="219" width="469" height="152"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
-                            </textView>
-                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" text="Please, enter the keychain password " id="Bkk-i0-x3I">
-                                <rect key="frame" x="151" y="123" width="469" height="50"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
-                            </textView>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="ROY-Oq-eO3">
-                                <rect key="frame" x="21" y="892" width="728" height="44"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
-                                <state key="normal" title="Accept">
-                                    <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
-                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                                </state>
-                                <state key="highlighted">
-                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                </state>
-                                <connections>
-                                    <action selector="pinButtonPressed:" destination="8OC-Jd-4nd" eventType="touchUpInside" id="9gD-xb-yvZ"/>
-                                </connections>
-                            </button>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="2aS-He-SVl">
-                                <rect key="frame" x="21" y="941" width="728" height="43"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
-                                <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
-                                <state key="normal" title="Back" image="flecha.png">
-                                    <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
-                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                                </state>
-                                <state key="highlighted">
-                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                </state>
-                                <connections>
-                                    <segue destination="iSJ-GX-CyA" kind="custom" identifier="toPreviousScreen" customClass="AOCustomSegue" id="j3p-2w-aox"/>
-                                </connections>
-                            </button>
-                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" image="logo_cliente.png" id="nVr-hj-SGX">
-                                <rect key="frame" x="245" y="19" width="280" height="83"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
-                            </imageView>
-                        </subviews>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
-                    </view>
-                    <navigationItem key="navigationItem" id="igk-DQ-DXm"/>
-                    <connections>
-                        <outlet property="buttonCertDropBoxCloud" destination="ROY-Oq-eO3" id="oIJ-Pa-ndv"/>
-                        <outlet property="nameCertDropBoxCloud" destination="Bkk-i0-x3I" id="DFQ-To-FyI"/>
-                        <outlet property="pinCertDropBoxCloud" destination="6Pq-qT-ArO" id="NLr-MS-e3c"/>
-                        <segue destination="FiJ-J0-m6p" kind="push" identifier="toFirstScreen" id="k0B-S6-2Ic"/>
-                        <segue destination="MFF-BY-lPu" kind="custom" identifier="toStoreManager" customClass="AOCustomSegue" id="gvL-x3-JTR"/>
-                    </connections>
-                </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="R75-vf-iUD" userLabel="First Responder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="-1010" y="-2980"/>
-        </scene>
-        <!--Drop Box Cloud View Controller-->
-        <scene sceneID="scC-6N-FJW">
-            <objects>
-                <viewController id="iSJ-GX-CyA" customClass="AODropBoxCloudViewController" sceneMemberID="viewController">
-                    <view key="view" contentMode="scaleToFill" id="COI-D3-8l2">
-                        <rect key="frame" x="0.0" y="20" width="768" height="1004"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                        <subviews>
-                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="none" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" id="ANt-uc-F4X">
-                                <rect key="frame" x="151" y="263" width="469" height="220"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                <connections>
-                                    <outlet property="dataSource" destination="iSJ-GX-CyA" id="27D-Ye-Sg7"/>
-                                    <outlet property="delegate" destination="iSJ-GX-CyA" id="gxG-ey-YPs"/>
-                                </connections>
-                            </tableView>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="NQE-r2-8wv">
-                                <rect key="frame" x="245" y="491" width="280" height="44"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
-                                <state key="normal" title="Import keychain">
-                                    <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
-                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                                </state>
-                                <state key="highlighted">
-                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                </state>
-                                <connections>
-                                    <action selector="saveStorebuttonPressed:" destination="iSJ-GX-CyA" eventType="touchUpInside" id="eUz-67-mng"/>
-                                </connections>
-                            </button>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="Nxe-JM-g8k">
-                                <rect key="frame" x="21" y="940" width="728" height="44"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
-                                <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
-                                <state key="normal" title="Back" image="flecha.png">
-                                    <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
-                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                                </state>
-                                <state key="highlighted">
-                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                </state>
-                                <connections>
-                                    <segue destination="MFF-BY-lPu" kind="custom" identifier="toPreviousScreen" customClass="AOCustomSegue" id="4R2-Oe-dzS"/>
-                                </connections>
-                            </button>
-                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" image="logo_cliente.png" id="Cww-a8-JG8">
-                                <rect key="frame" x="245" y="21" width="280" height="83"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
-                            </imageView>
-                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="Select the keychain that you want import:" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="6Dg-dp-tU5">
-                                <rect key="frame" x="21" y="155" width="727" height="21"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
-                                <nil key="highlightedColor"/>
-                            </label>
-                        </subviews>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
-                    </view>
-                    <navigationItem key="navigationItem" id="sYz-D9-PDp"/>
-                    <connections>
-                        <outlet property="dbxTblView" destination="ANt-uc-F4X" id="zb9-uU-eq4"/>
-                        <outlet property="saveStore" destination="NQE-r2-8wv" id="Vjr-Sj-4ZZ"/>
-                        <segue destination="8OC-Jd-4nd" kind="push" identifier="toPinDropBox" id="pHF-KD-NKO"/>
-                    </connections>
-                </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="aDo-Mp-dkp" userLabel="First Responder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="-1010" y="-1558"/>
-        </scene>
         <!--Manager Store Screen View Controller-->
         <scene sceneID="Eec-Ob-oD4">
             <objects>
@@ -187,27 +36,12 @@
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                             </textView>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="XZr-Fq-1T7">
-                                <rect key="frame" x="20" y="877" width="728" height="53"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
-                                <state key="normal" title="   Import from Dropbox" image="dropbox-ico.png">
-                                    <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
-                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                                </state>
-                                <state key="highlighted">
-                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                </state>
-                                <connections>
-                                    <action selector="buttonPressed:" destination="MFF-BY-lPu" eventType="touchUpInside" id="p8G-Uw-rcc"/>
-                                </connections>
-                            </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="dgm-t5-yi3">
                                 <rect key="frame" x="20" y="938" width="728" height="46"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
                                 <state key="normal" title="Back" image="flecha.png">
-                                    <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="titleColor" red="0.19607843137254902" green="0.30980392156862746" blue="0.52156862745098043" alpha="1" colorSpace="calibratedRGB"/>
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <state key="highlighted">
@@ -235,7 +69,7 @@
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
                                 <state key="normal" title="Delete keychain selected">
-                                    <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="titleColor" red="0.19607843137254902" green="0.30980392156862746" blue="0.52156862745098043" alpha="1" colorSpace="calibratedRGB"/>
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <state key="highlighted">
@@ -251,9 +85,7 @@
                     <navigationItem key="navigationItem" id="Uif-ey-poH"/>
                     <connections>
                         <outlet property="deleteButton" destination="l0B-qj-l6s" id="bK2-sI-Kq6"/>
-                        <outlet property="dropBoxButton" destination="XZr-Fq-1T7" id="9WJ-GM-ceC"/>
                         <outlet property="tblViewManager" destination="1fR-bc-6ze" id="VnT-Or-yeg"/>
-                        <segue destination="iSJ-GX-CyA" kind="push" identifier="toDropBoxCloud" id="pPA-i2-JCc"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="U92-M0-iRI" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -295,7 +127,7 @@ You can email the copyright holder to: soporte.afirma@seap.minhap.es.</string>
                                 <rect key="frame" x="21" y="940" width="73" height="44"/>
                                 <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
                                 <state key="normal" title="Al Inicio">
-                                    <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="titleColor" red="0.19607843137254902" green="0.30980392156862746" blue="0.52156862745098043" alpha="1" colorSpace="calibratedRGB"/>
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <state key="highlighted">
@@ -311,7 +143,6 @@ You can email the copyright holder to: soporte.afirma@seap.minhap.es.</string>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                 <items>
                                     <tabBarItem tag="2" title="Keystore manager" image="cert_menu.png" id="Zea-kl-jLA"/>
-                                    <tabBarItem tag="1" title="Sign" image="menu_firma.png" id="CBz-bI-vAI"/>
                                     <tabBarItem title="Help" image="help.png" id="6N7-bl-qO4"/>
                                 </items>
                                 <connections>
@@ -326,103 +157,11 @@ You can email the copyright holder to: soporte.afirma@seap.minhap.es.</string>
                         <outlet property="tabBar" destination="mb1-uS-cVi" id="iAe-Vi-83K"/>
                         <segue destination="lDR-zU-wtW" kind="push" identifier="toHelpScreen" id="xbb-0e-Qwt"/>
                         <segue destination="MFF-BY-lPu" kind="push" identifier="toStoreManager" id="eqz-rU-vQo"/>
-                        <segue destination="iSJ-GX-CyA" kind="push" identifier="toDropBoxCloud" id="XWE-4n-Vzb"/>
-                        <segue destination="0dB-ME-8xb" kind="push" identifier="toDropBoxSignScreen" id="ogS-7r-5Dq"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="uXD-aP-FVd" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="-1010" y="-122"/>
-        </scene>
-        <!--Sign Dropbox View Controller-->
-        <scene sceneID="llP-Ip-m51">
-            <objects>
-                <viewController id="0dB-ME-8xb" customClass="AOSignDropboxViewController" sceneMemberID="viewController">
-                    <view key="view" contentMode="scaleToFill" id="pEH-Jk-Djc">
-                        <rect key="frame" x="0.0" y="20" width="768" height="1004"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                        <subviews>
-                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" image="logo_cliente.png" id="tJ3-2p-dx3">
-                                <rect key="frame" x="245" y="18" width="280" height="83"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
-                            </imageView>
-                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="none" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" id="ecQ-ju-TSp">
-                                <rect key="frame" x="151" y="174" width="469" height="220"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                <connections>
-                                    <outlet property="dataSource" destination="0dB-ME-8xb" id="3Gn-ql-EU3"/>
-                                    <outlet property="delegate" destination="0dB-ME-8xb" id="4Ad-Lb-Qd0"/>
-                                </connections>
-                            </tableView>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="b45-W1-UgG">
-                                <rect key="frame" x="20" y="941" width="728" height="44"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
-                                <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
-                                <state key="normal" title="Back" image="flecha.png">
-                                    <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
-                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                                </state>
-                                <state key="highlighted">
-                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                </state>
-                                <connections>
-                                    <action selector="backButtonPressed:" destination="0dB-ME-8xb" eventType="touchUpInside" id="mU1-QQ-gaA"/>
-                                </connections>
-                            </button>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="Wde-AW-C5J">
-                                <rect key="frame" x="244" y="402" width="280" height="44"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
-                                <state key="normal" title="Sign selected file">
-                                    <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
-                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                                </state>
-                                <state key="highlighted">
-                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                </state>
-                                <connections>
-                                    <action selector="signButtonPressed:" destination="0dB-ME-8xb" eventType="touchUpInside" id="BpT-We-hGw"/>
-                                </connections>
-                            </button>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="5ez-iM-B3d">
-                                <rect key="frame" x="20" y="890" width="728" height="44"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
-                                <state key="normal" title="Logout">
-                                    <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
-                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                                </state>
-                                <state key="highlighted">
-                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                </state>
-                                <connections>
-                                    <action selector="logOutButtonPressed:" destination="0dB-ME-8xb" eventType="touchUpInside" id="Z7k-mN-txl"/>
-                                </connections>
-                            </button>
-                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="Select the file to sign" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="kGn-56-Bag">
-                                <rect key="frame" x="21" y="124" width="727" height="21"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
-                                <nil key="highlightedColor"/>
-                            </label>
-                        </subviews>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
-                    </view>
-                    <navigationItem key="navigationItem" id="F0x-NK-StK"/>
-                    <connections>
-                        <outlet property="backButton" destination="b45-W1-UgG" id="obI-mP-DoD"/>
-                        <outlet property="dbxTblView" destination="ecQ-ju-TSp" id="TmI-NH-aeR"/>
-                        <outlet property="logout" destination="5ez-iM-B3d" id="9wQ-R6-Xoa"/>
-                        <outlet property="signButton" destination="Wde-AW-C5J" id="5Zc-vJ-ui6"/>
-                        <segue destination="FiJ-J0-m6p" kind="custom" identifier="toFirstScreen" customClass="AOCustomSegue" id="xkK-9v-BpQ"/>
-                        <segue destination="BdW-y5-nVW" kind="push" identifier="toSelectionScreen" id="6fP-As-ytB"/>
-                    </connections>
-                </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="oeD-sg-hIA" userLabel="First Responder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="-1010" y="1065"/>
         </scene>
         <!--Help Menu View Controller-->
         <scene sceneID="be6-ra-zG7">
@@ -506,7 +245,7 @@ http://administracionelectronica.gob.es/</string>
                                 <rect key="frame" x="0.0" y="960" width="73" height="44"/>
                                 <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
                                 <state key="normal" title="Al Inicio">
-                                    <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="titleColor" red="0.19607843137254902" green="0.30980392156862746" blue="0.52156862745098043" alpha="1" colorSpace="calibratedRGB"/>
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <state key="highlighted">
@@ -518,7 +257,7 @@ http://administracionelectronica.gob.es/</string>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
                                 <state key="normal" title="Back" image="flecha.png">
-                                    <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="titleColor" red="0.19607843137254902" green="0.30980392156862746" blue="0.52156862745098043" alpha="1" colorSpace="calibratedRGB"/>
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <state key="highlighted">
@@ -583,7 +322,7 @@ http://forja-ctt.administracionelectronica.gob.es/web/clienteafirma </string>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
                                 <state key="normal" title="Back" image="flecha.png">
-                                    <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="titleColor" red="0.19607843137254902" green="0.30980392156862746" blue="0.52156862745098043" alpha="1" colorSpace="calibratedRGB"/>
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <state key="highlighted">
@@ -597,7 +336,7 @@ http://forja-ctt.administracionelectronica.gob.es/web/clienteafirma </string>
                                 <rect key="frame" x="0.0" y="959" width="73" height="44"/>
                                 <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
                                 <state key="normal" title="Al Inicio">
-                                    <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="titleColor" red="0.19607843137254902" green="0.30980392156862746" blue="0.52156862745098043" alpha="1" colorSpace="calibratedRGB"/>
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <state key="highlighted">
@@ -616,7 +355,7 @@ http://forja-ctt.administracionelectronica.gob.es/web/clienteafirma </string>
             </objects>
             <point key="canvasLocation" x="2079" y="-2629"/>
         </scene>
-        <!--Certificate Selection View Controller - Solicitud de certificado-->
+        <!--Solicitud de certificado-->
         <scene sceneID="HbR-9a-0Y9">
             <objects>
                 <viewController title="Solicitud de certificado" id="BdW-y5-nVW" customClass="AOCertificateSelectionViewController" sceneMemberID="viewController">
@@ -651,7 +390,7 @@ If no keychain are shown in the list, you will be able to import them from the o
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
                                 <state key="normal" title="Open selected keychain">
-                                    <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="titleColor" red="0.19607843137254902" green="0.30980392156862746" blue="0.52156862745098043" alpha="1" colorSpace="calibratedRGB"/>
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <state key="highlighted">
@@ -665,7 +404,7 @@ If no keychain are shown in the list, you will be able to import them from the o
                                 <rect key="frame" x="22" y="888" width="73" height="44"/>
                                 <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
                                 <state key="normal" title="Al Inicio">
-                                    <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="titleColor" red="0.19607843137254902" green="0.30980392156862746" blue="0.52156862745098043" alpha="1" colorSpace="calibratedRGB"/>
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <state key="highlighted">
@@ -688,7 +427,7 @@ If no keychain are shown in the list, you will be able to import them from the o
             </objects>
             <point key="canvasLocation" x="1133" y="1116"/>
         </scene>
-        <!--Pin View Controller - Solicitud de PIN-->
+        <!--Solicitud de PIN-->
         <scene sceneID="9jM-Wg-Zub">
             <objects>
                 <viewController title="Solicitud de PIN" id="GAJ-C9-ffl" customClass="AOPinViewController" sceneMemberID="viewController">
@@ -732,7 +471,7 @@ If you forgot your password use iTunes to modify your PKCS#12 keychain.</string>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
                                 <state key="normal" title="Accept">
-                                    <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="titleColor" red="0.19607843137254902" green="0.30980392156862746" blue="0.52156862745098043" alpha="1" colorSpace="calibratedRGB"/>
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <state key="highlighted">
@@ -746,7 +485,7 @@ If you forgot your password use iTunes to modify your PKCS#12 keychain.</string>
                                 <rect key="frame" x="20" y="887" width="73" height="44"/>
                                 <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
                                 <state key="normal" title="Al Inicio">
-                                    <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="titleColor" red="0.19607843137254902" green="0.30980392156862746" blue="0.52156862745098043" alpha="1" colorSpace="calibratedRGB"/>
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <state key="highlighted">
@@ -770,7 +509,7 @@ If you forgot your password use iTunes to modify your PKCS#12 keychain.</string>
             </objects>
             <point key="canvasLocation" x="2203" y="1121"/>
         </scene>
-        <!--Sign View Controller - Firma Electrónica-->
+        <!--Firma Electrónica-->
         <scene sceneID="Ior-uI-bhK">
             <objects>
                 <viewController title="Firma Electrónica" id="zg9-9u-ifb" customClass="AOSignViewController" sceneMemberID="viewController">
@@ -808,7 +547,7 @@ If you forgot your password use iTunes to modify your PKCS#12 keychain.</string>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
                                 <state key="normal" title="Sign">
-                                    <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="titleColor" red="0.19607843137254902" green="0.30980392156862746" blue="0.52156862745098043" alpha="1" colorSpace="calibratedRGB"/>
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <state key="highlighted">
@@ -822,7 +561,7 @@ If you forgot your password use iTunes to modify your PKCS#12 keychain.</string>
                                 <rect key="frame" x="22" y="887" width="73" height="44"/>
                                 <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
                                 <state key="normal" title="Al Inicio">
-                                    <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="titleColor" red="0.19607843137254902" green="0.30980392156862746" blue="0.52156862745098043" alpha="1" colorSpace="calibratedRGB"/>
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <state key="highlighted">
@@ -870,7 +609,7 @@ If you forgot your password use iTunes to modify your PKCS#12 keychain.</string>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
                                 <state key="normal" title="Back" image="flecha.png">
-                                    <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="titleColor" red="0.19607843137254902" green="0.30980392156862746" blue="0.52156862745098043" alpha="1" colorSpace="calibratedRGB"/>
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <state key="highlighted">
@@ -884,7 +623,7 @@ If you forgot your password use iTunes to modify your PKCS#12 keychain.</string>
                                 <rect key="frame" x="0.0" y="959" width="73" height="44"/>
                                 <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
                                 <state key="normal" title="Al Inicio">
-                                    <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="titleColor" red="0.19607843137254902" green="0.30980392156862746" blue="0.52156862745098043" alpha="1" colorSpace="calibratedRGB"/>
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <state key="highlighted">
@@ -923,7 +662,7 @@ If you forgot your password use iTunes to modify your PKCS#12 keychain.</string>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
                                 <state key="normal" title="  More information" image="information_icon.png">
-                                    <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="titleColor" red="0.19607843137254902" green="0.30980392156862746" blue="0.52156862745098043" alpha="1" colorSpace="calibratedRGB"/>
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <state key="highlighted">
@@ -1090,7 +829,7 @@ Imported certificates to Cliente @firma for Apple iOS are used only in websites 
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES"/>
                                 <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
                                 <state key="normal" title="Back" image="flecha.png">
-                                    <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="titleColor" red="0.19607843137254902" green="0.30980392156862746" blue="0.52156862745098043" alpha="1" colorSpace="calibratedRGB"/>
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <state key="highlighted">
@@ -1104,7 +843,7 @@ Imported certificates to Cliente @firma for Apple iOS are used only in websites 
                                 <rect key="frame" x="0.0" y="959" width="73" height="44"/>
                                 <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
                                 <state key="normal" title="Al Inicio">
-                                    <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="titleColor" red="0.19607843137254902" green="0.30980392156862746" blue="0.52156862745098043" alpha="1" colorSpace="calibratedRGB"/>
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <state key="highlighted">
@@ -1127,114 +866,22 @@ Imported certificates to Cliente @firma for Apple iOS are used only in websites 
     <resources>
         <image name="cert_menu.png" width="20" height="17"/>
         <image name="certificados.png" width="64" height="53"/>
-        <image name="dropbox-ico.png" width="50" height="50"/>
         <image name="flecha.png" width="20" height="20"/>
         <image name="help.png" width="20" height="20"/>
         <image name="information_icon.png" width="30" height="30"/>
         <image name="itunes.png" width="200" height="200"/>
         <image name="logo_cliente.png" width="726" height="200"/>
-        <image name="menu_firma.png" width="30" height="11"/>
     </resources>
-    <classes>
-        <class className="AOAboutViewController" superclassName="GAITrackedViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/AOAboutViewController.h"/>
-            <relationships>
-                <relationship kind="outlet" name="manageStoreButton" candidateClass="UIButton"/>
-                <relationship kind="outlet" name="tabBar" candidateClass="UITabBar"/>
-            </relationships>
-        </class>
-        <class className="AOAcercadeViewController" superclassName="GAITrackedViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/AOAcercadeViewController.h"/>
-            <relationships>
-                <relationship kind="action" name="buttonPressed:"/>
-                <relationship kind="outlet" name="masInfoButton" candidateClass="UIButton"/>
-            </relationships>
-        </class>
-        <class className="AOCertificateSelectionViewController" superclassName="GAITrackedViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/AOCertificateSelectionViewController.h"/>
-            <relationships>
-                <relationship kind="outlet" name="selectionButton" candidateClass="UIButton"/>
-                <relationship kind="outlet" name="tblView" candidateClass="UITableView"/>
-            </relationships>
-        </class>
-        <class className="AODropBoxCloudViewController" superclassName="GAITrackedViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/AODropBoxCloudViewController.h"/>
-            <relationships>
-                <relationship kind="action" name="buttonPressed:"/>
-                <relationship kind="action" name="saveStorebuttonPressed:"/>
-                <relationship kind="outlet" name="LogOffDropbox" candidateClass="UIButton"/>
-                <relationship kind="outlet" name="dbxTblView" candidateClass="UITableView"/>
-                <relationship kind="outlet" name="saveStore" candidateClass="UIButton"/>
-            </relationships>
-        </class>
-        <class className="AOHelpMenuViewController" superclassName="GAITrackedViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/AOHelpMenuViewController.h"/>
-            <relationships>
-                <relationship kind="outlet" name="tblViewHelp" candidateClass="UITableView"/>
-            </relationships>
-        </class>
-        <class className="AOManagerStoreScreenViewController" superclassName="GAITrackedViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/AOManagerStoreScreenViewController.h"/>
-            <relationships>
-                <relationship kind="action" name="buttonPressed:"/>
-                <relationship kind="action" name="deleteButtonPressed:"/>
-                <relationship kind="outlet" name="deleteButton" candidateClass="UIButton"/>
-                <relationship kind="outlet" name="dropBoxButton" candidateClass="UIButton"/>
-                <relationship kind="outlet" name="tblViewManager" candidateClass="UITableView"/>
-            </relationships>
-        </class>
-        <class className="AOPinDropBoxCloudViewController" superclassName="GAITrackedViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/AOPinDropBoxCloudViewController.h"/>
-            <relationships>
-                <relationship kind="action" name="pinButtonPressed:"/>
-                <relationship kind="outlet" name="buttonCertDropBoxCloud" candidateClass="UIButton"/>
-                <relationship kind="outlet" name="nameCertDropBoxCloud" candidateClass="UITextView"/>
-                <relationship kind="outlet" name="pinCertDropBoxCloud" candidateClass="UITextField"/>
-            </relationships>
-        </class>
-        <class className="AOPinViewController" superclassName="GAITrackedViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/AOPinViewController.h"/>
-            <relationships>
-                <relationship kind="action" name="pinButtonPressed:"/>
-                <relationship kind="outlet" name="nombreCert" candidateClass="UITextView"/>
-                <relationship kind="outlet" name="pinButton" candidateClass="UIButton"/>
-                <relationship kind="outlet" name="pinTextField" candidateClass="UITextField"/>
-            </relationships>
-        </class>
-        <class className="AOSignDropboxViewController" superclassName="GAITrackedViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/AOSignDropboxViewController.h"/>
-            <relationships>
-                <relationship kind="action" name="backButtonPressed:"/>
-                <relationship kind="action" name="logOutButtonPressed:"/>
-                <relationship kind="action" name="signButtonPressed:"/>
-                <relationship kind="outlet" name="backButton" candidateClass="UIButton"/>
-                <relationship kind="outlet" name="dbxTblView" candidateClass="UITableView"/>
-                <relationship kind="outlet" name="logout" candidateClass="UIButton"/>
-                <relationship kind="outlet" name="signButton" candidateClass="UIButton"/>
-            </relationships>
-        </class>
-        <class className="AOSignViewController" superclassName="GAITrackedViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/AOSignViewController.h"/>
-            <relationships>
-                <relationship kind="action" name="buttonPressed:"/>
-                <relationship kind="outlet" name="nombreCert" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="signButton" candidateClass="UIButton"/>
-            </relationships>
-        </class>
-        <class className="GAITrackedViewController" superclassName="UIViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/GAITrackedViewController.h"/>
-        </class>
-    </classes>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">
         <simulatedStatusBarMetrics key="statusBar" statusBarStyle="blackTranslucent"/>
         <simulatedOrientationMetrics key="orientation"/>
-        <simulatedScreenMetrics key="destination"/>
+        <simulatedScreenMetrics key="destination">
+            <size key="portraitSize" width="768" height="1024"/>
+            <size key="landscapeSize" width="1024" height="768"/>
+        </simulatedScreenMetrics>
     </simulatedMetricsContainer>
     <inferredMetricsTieBreakers>
-        <segue reference="6fP-As-ytB"/>
-        <segue reference="z9s-o9-MGv"/>
-        <segue reference="ebZ-cH-UW7"/>
-        <segue reference="4R2-Oe-dzS"/>
-        <segue reference="pPA-i2-JCc"/>
+        <segue reference="xbb-0e-Qwt"/>
+        <segue reference="1rl-H1-e1G"/>
     </inferredMetricsTieBreakers>
 </document>

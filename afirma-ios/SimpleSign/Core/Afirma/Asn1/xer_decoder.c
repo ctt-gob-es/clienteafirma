@@ -109,7 +109,6 @@ xer_check_tag(const void *buf_ptr, int size, const char *need_tag) {
 
 	if(size < 2 || buf[0] != LANGLE || buf[size-1] != RANGLE) {
 		if(size >= 2)
-		ASN_DEBUG("Broken XML tag: \"%c...%c\"", buf[0], buf[size - 1]);
 		return XCT_BROKEN;
 	}
 
@@ -307,7 +306,6 @@ xer_decode_general(asn_codec_ctx_t *opt_codec_ctx,
 			break;		/* Unexpected tag */
 		}
 
-		ASN_DEBUG("Unexpected XML tag (expected \"%s\")", xml_tag);
 		break;	/* Dark and mysterious things have just happened */
 	}
 

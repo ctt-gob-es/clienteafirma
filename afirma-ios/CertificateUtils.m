@@ -3,15 +3,12 @@
 //  FirmaDigital
 //
 //  Modified by Carlos Pérez on 25/02/11.
-//  Copyright 2011 __MyCompanyName__. All rights reserved.
 //
 
 #import "CertificateUtils.h"
 #import <Foundation/Foundation.h>
 #import <Security/Security.h>
 #import <UIKit/UIKit.h>
-#import "NSData+Base64.h"
-//#import "Base64.h"
 
 #define SHA1_DIGESTINFO_HEADER_LENGTH 15
 // 15
@@ -75,8 +72,6 @@ static unsigned char  SHA512_DIGESTINFO_HEADER[] =
 }
 
 - (NSData *)getHashBytesSHA512:(NSData *)plainText {
-    // #define CC_SHA512_DIGEST_LENGTH     64          /* digest length in bytes */
-    //#define CC_SHA512_BLOCK_BYTES      128          /* block size in bytes */
     
     CC_SHA512_CTX ctx;
     uint8_t * hashBytes = NULL;
@@ -157,8 +152,6 @@ static unsigned char  SHA512_DIGESTINFO_HEADER[] =
     return hash;
 }
 
-
-
 - (NSData *)getSignatureBytesSHA1:(NSData *)plainText{
 	OSStatus sanityCheck = noErr;
 	NSData * signedHash = nil;
@@ -173,10 +166,7 @@ static unsigned char  SHA512_DIGESTINFO_HEADER[] =
 	memset((void *)signedHashBytes, 0x0, signedHashBytesSize);
 	
     const uint8_t *hashMessage=[[self getHashBytesSHA1:plainText] bytes];
-    // Concatenamos SHA1
-    //SHA1_DIGESTINFO_HEADER+hashMessage
-    
-    
+
     uint8_t * digestInfo = malloc((CC_SHA1_DIGEST_LENGTH + SHA1_DIGESTINFO_HEADER_LENGTH)* sizeof(uint8_t));
     
     memcpy(digestInfo, SHA1_DIGESTINFO_HEADER, SHA1_DIGESTINFO_HEADER_LENGTH);
@@ -223,9 +213,6 @@ static unsigned char  SHA512_DIGESTINFO_HEADER[] =
 	memset((void *)signedHashBytes, 0x0, signedHashBytesSize);
 	
     const uint8_t *hashMessage=[[self getHashBytesSHA256:plainText] bytes];
-    // Concat SHA256 header:
-    // Message=SHA256_DIGESTINFO_HEADER+hashMessage
-    
     
     uint8_t * digestInfo = malloc((CC_SHA256_DIGEST_LENGTH + SHA256_DIGESTINFO_HEADER_LENGTH)* sizeof(uint8_t));
     memcpy(digestInfo, SHA256_DIGESTINFO_HEADER, SHA256_DIGESTINFO_HEADER_LENGTH);
@@ -272,9 +259,6 @@ static unsigned char  SHA512_DIGESTINFO_HEADER[] =
 	memset((void *)signedHashBytes, 0x0, signedHashBytesSize);
 	
     const uint8_t *hashMessage=[[self getHashBytesSHA384:plainText] bytes];
-    // Concat SHA384 header:
-    // Message=SHA384_DIGESTINFO_HEADER+hashMessage
-    
     
     uint8_t * digestInfo = malloc((CC_SHA384_DIGEST_LENGTH + SHA384_DIGESTINFO_HEADER_LENGTH)* sizeof(uint8_t));
     memcpy(digestInfo, SHA384_DIGESTINFO_HEADER, SHA384_DIGESTINFO_HEADER_LENGTH);

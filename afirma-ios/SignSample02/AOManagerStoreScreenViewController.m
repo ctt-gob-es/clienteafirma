@@ -5,11 +5,10 @@
 //
 
 #import "AOManagerStoreScreenViewController.h"
-#import <DropboxSDK/DropboxSDK.h>
 #import "CADESConstants.h"
 #import <QuartzCore/QuartzCore.h>
 
-@interface AOManagerStoreScreenViewController () <DBSessionDelegate, DBNetworkRequestDelegate>
+@interface AOManagerStoreScreenViewController ()
 
 @end
 
@@ -45,14 +44,6 @@ NSString *cellSelectedManager = NULL;
     
     self.screenName = @"IOS AOManagerStoreScreenViewController - Certificate manager window";
 }
-
--(IBAction)buttonPressed:(id)sender {
-    if ([[DBSession sharedSession] isLinked]) {
-        [[DBSession sharedSession] unlinkAll];
-    }
-    [self connectDropbox];
-}
-
 
 -(IBAction)deleteButtonPressed:(id)sender{
     NSLog(@"Borrando almacen %@",cellSelectedManager);
@@ -106,18 +97,6 @@ NSString *cellSelectedManager = NULL;
     return YES;
 }
 
-//cuando se pulsa el botón del centro
-/*
--(void)onGoingToBackGround:(NSNotification*) notification {
-    @try {
-        [self performSegueWithIdentifier:@"toFirstScreen" sender:self];
-    }
-    @catch (NSException *e) {
-        // Se ignora
-    }
-}
- */
-
 - (void)didReceiveMemoryWarning
 {
     [super didReceiveMemoryWarning];
@@ -125,10 +104,8 @@ NSString *cellSelectedManager = NULL;
 }
 
 
-- (void)viewDidUnload {
-   
-    [dropBoxButton release];
-    dropBoxButton = nil;
+- (void)viewDidUnload
+{
     [deleteButton release];
     deleteButton = nil;
     [super viewDidUnload];
@@ -137,98 +114,11 @@ NSString *cellSelectedManager = NULL;
 }
 
 
-- (void)dealloc {
-	
-    [dropBoxButton release];
+- (void)dealloc
+{
     [deleteButton release];
     [super dealloc];
 }
-
-
-
-#pragma mark -
-#pragma mark Application lifecycle
-
-- (BOOL) connectDropbox {
-    
-    NSDictionary *launchOptions=nil;
-    
-	// Set these variables before launching the app
-    NSString* appKey = URL_STORE;
-	NSString* appSecret = PASS_STORE;
-	NSString *root = kDBRootAppFolder; // Should be set to either kDBRootAppFolder or kDBRootDropbox
-	// You can determine if you have App folder access or Full Dropbox along with your consumer key/secret
-	// from https://dropbox.com/developers/apps
-	
-	// Look below where the DBSession is created to understand how to use DBSession in your app
-			
-	DBSession* session =
-    [[DBSession alloc] initWithAppKey:appKey appSecret:appSecret root:root];
-	session.delegate = self; // DBSessionDelegate methods allow you to handle re-authenticating
-	[DBSession setSharedSession:session];
-    [session release];
-	
-	[DBRequest setNetworkRequestDelegate:self];
-    	
-    
-    //rootViewController.photoViewController = [[PhotoViewController new] autorelease];
-    if ([[DBSession sharedSession] isLinked]) {
-        //navigationController.viewControllers = [NSArray arrayWithObjects:rootViewController, rootViewController.photoViewController, nil];
-    }
-    
-    // Add the navigation controller's view to the window and display.
-    //[window addSubview:navigationController.view];
-    //[window makeKeyAndVisible];
-	
-	NSURL *launchURL = [launchOptions objectForKey:UIApplicationLaunchOptionsURLKey];
-	NSInteger majorVersion =
-    [[[[[UIDevice currentDevice] systemVersion] componentsSeparatedByString:@"."] objectAtIndex:0] integerValue];
-	if (launchURL && majorVersion < 4) {
-		// Pre-iOS 4.0 won't call application:handleOpenURL; this code is only needed if you support
-		// iOS versions 3.2 or below
-		//[self application:application handleOpenURL:launchURL];
-		return NO;
-	}
-    
-    if (![[DBSession sharedSession] isLinked]) {
-		[[DBSession sharedSession] linkFromController:self];
-    }
-    //else {
-    //    [[DBSession sharedSession] unlinkAll];
-    //    [[[[UIAlertView alloc]
-    //       initWithTitle:@"Account Unlinked!" message:@"Your dropbox account has been unlinked"
-    //       delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil]
-    //      autorelease]
-    //     show];
-    //}
-    
-    return YES;
-}
-
-#pragma mark -
-#pragma mark DBSessionDelegate methods
-
-- (void)sessionDidReceiveAuthorizationFailure:(DBSession*)session userId:(NSString *)userId {
-	relinkUserId = [userId retain];
-	    
-    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"atencion",nil) message:NSLocalizedString(@"sesion_finalizada",nil) delegate:self cancelButtonTitle:NSLocalizedString(@"cancelar",nil) otherButtonTitles:NSLocalizedString(@"conectar",nil), nil];
-    
-    UIImageView *imageView = [[UIImageView alloc] initWithFrame:CGRectMake(50, 6, 40, 40)];
-    
-    NSString *path = [[NSString alloc] initWithString:[[[NSBundle mainBundle] resourcePath] stringByAppendingPathComponent:@"info_mini.png"]];
-    UIImage *bkgImg = [[UIImage alloc] initWithContentsOfFile:path];
-    [imageView setImage:bkgImg];
-    [bkgImg release];
-    [path release];
-    
-    [alert addSubview:imageView];
-    [imageView release];
-    
-    [alert show];
-    [alert release];
-    
-}
-
 
 #pragma mark -
 #pragma mark UIAlertViewDelegate methods
@@ -247,26 +137,6 @@ NSString *cellSelectedManager = NULL;
 	[relinkUserId release];
 	relinkUserId = nil;
      */
-}
-
-
-#pragma mark -
-#pragma mark DBNetworkRequestDelegate methods
-
-static int outstandingRequests;
-
-- (void)networkRequestStarted {
-	outstandingRequests++;
-	if (outstandingRequests == 1) {
-		[[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
-	}
-}
-
-- (void)networkRequestStopped {
-	outstandingRequests--;
-	if (outstandingRequests == 0) {
-		[[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
-	}
 }
 
 /****************************************/
