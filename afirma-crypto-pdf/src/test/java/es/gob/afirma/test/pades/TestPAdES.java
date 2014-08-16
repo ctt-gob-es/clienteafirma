@@ -138,6 +138,12 @@ public class TestPAdES {
         // Certificacion
         extraParams.put("certificationLevel", "1"); //$NON-NLS-1$ //$NON-NLS-2$
 
+        // Politica
+        extraParams.put("policyIdentifier", "urn:oid:2.16.724.1.3.1.1.2.1.9"); //$NON-NLS-1$ //$NON-NLS-2$
+        extraParams.put("policyQualifier", "https://sede.060.gob.es/politica_de_firma_anexo_1.pdf"); //$NON-NLS-1$ //$NON-NLS-2$
+        extraParams.put("policyIdentifierHashAlgorithm", "http://www.w3.org/2000/09/xmldsig#sha1"); //$NON-NLS-1$ //$NON-NLS-2$
+        extraParams.put("policyIdentifierHash", "G7roucf600+f03r/o0bAOQ6WAs0="); //$NON-NLS-1$ //$NON-NLS-2$
+
 //        //********** TSA AFIRMA ********************************************************************
 //        //******************************************************************************************
 //        extraParams.put("tsaURL", "https://10.253.252.184:10318/tsamap/TspHttpServer"); //$NON-NLS-1$ //$NON-NLS-2$

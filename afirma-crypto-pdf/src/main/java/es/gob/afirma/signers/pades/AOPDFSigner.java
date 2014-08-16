@@ -312,14 +312,14 @@ public final class AOPDFSigner implements AOSigner {
     	catch (final BadPasswordException e) {
     		try {
     			pdfReader = new PdfReader(
-    					sign,
-    					new String(
-    							AOUIFactory.getPassword(
-    									CommonPdfMessages.getString("AOPDFSigner.0"), //$NON-NLS-1$
-    									null
-    									)
-    							).getBytes()
-    					);
+					sign,
+					new String(
+						AOUIFactory.getPassword(
+							CommonPdfMessages.getString("AOPDFSigner.0"), //$NON-NLS-1$
+							null
+						)
+					).getBytes()
+				);
     		}
     		catch (final BadPasswordException e2) {
     			LOGGER.severe("La contrasena del PDF no es valida, se devolvera un arbol vacio: " + e2); //$NON-NLS-1$
@@ -348,22 +348,24 @@ public final class AOPDFSigner implements AOSigner {
     	for (int i = 0; i < names.size(); ++i) {
     		final PdfPKCS7 pcks7 = af.verifySignature(names.get(i).toString());
     		if (asSimpleSignInfo) {
-    			final AOSimpleSignInfo ssi = new AOSimpleSignInfo(new X509Certificate[] {
+    			final AOSimpleSignInfo ssi = new AOSimpleSignInfo(
+					new X509Certificate[] {
     					pcks7.getSigningCertificate()
-    			}, pcks7.getSignDate().getTime());
+					},
+					pcks7.getSignDate().getTime()
+				);
 
     			// Extraemos el PKCS1 de la firma
     			try {
     				// iText antiguo
     				final Field digestField = Class.forName("com.lowagie.text.pdf.PdfPKCS7").getDeclaredField("digest"); //$NON-NLS-1$ //$NON-NLS-2$
-    				// En iText nuevo seria "final Field digestField = Class.forName("com.itextpdf.text.pdf.PdfPKCS7").getDeclaredField("digest");"
     				digestField.setAccessible(true);
     				pkcs1Object = digestField.get(pcks7);
     			}
     			catch (final Exception e) {
     				LOGGER.severe(
-    						"No se ha podido obtener informacion de una de las firmas del PDF, se continuara con la siguiente: " + e //$NON-NLS-1$
-    						);
+						"No se ha podido obtener informacion de una de las firmas del PDF, se continuara con la siguiente: " + e //$NON-NLS-1$
+					);
     				continue;
     			}
     			if (pkcs1Object instanceof byte[]) {
