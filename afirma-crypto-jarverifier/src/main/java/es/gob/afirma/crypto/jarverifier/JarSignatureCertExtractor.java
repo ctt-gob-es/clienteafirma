@@ -38,7 +38,8 @@ public final class JarSignatureCertExtractor {
 	private static final int BUFFER_SIZE = 1024;
 
 	private static final String SIGNATURE_DIR_PATH = "META-INF/"; //$NON-NLS-1$
-	private static final String SIGNATURE_EXT = ".RSA"; //$NON-NLS-1$
+	private static final String SIGNATURE_EXT_RSA = ".RSA"; //$NON-NLS-1$
+	private static final String SIGNATURE_EXT_DSA = ".DSA"; //$NON-NLS-1$
 
 	private static final String USER_HOME = "$USER_HOME"; //$NON-NLS-1$
 
@@ -76,7 +77,7 @@ public final class JarSignatureCertExtractor {
 		final ZipInputStream zip = new ZipInputStream(src.getLocation().openStream());
 		while((e = zip.getNextEntry()) != null) {
 			final String name = e.getName();
-			if (name.startsWith(SIGNATURE_DIR_PATH) && name.endsWith(SIGNATURE_EXT)) {
+			if (name.startsWith(SIGNATURE_DIR_PATH) && (name.endsWith(SIGNATURE_EXT_RSA) || name.endsWith(SIGNATURE_EXT_DSA))) {
 				baos = new ByteArrayOutputStream();
 				while ((n = zip.read(buffer)) > 0) {
 					baos.write(buffer, 0, n);
@@ -84,6 +85,7 @@ public final class JarSignatureCertExtractor {
 				break;
 			}
 		}
+
 		return baos == null ? null : baos.toByteArray();
 	}
 
