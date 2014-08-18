@@ -30,6 +30,7 @@ import es.gob.afirma.core.MissingLibraryException;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.keystores.AOCertificatesNotFoundException;
 import es.gob.afirma.keystores.AOKeyStore;
+import es.gob.afirma.keystores.AOKeyStoreDialog;
 import es.gob.afirma.keystores.AOKeyStoreManager;
 import es.gob.afirma.keystores.AOKeyStoreManagerException;
 import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
@@ -230,15 +231,19 @@ final class KeyStoreConfigurationManager {
         	// Obtenemos el KeyStoreManager para asegurarnos de que esta inicializado
         	// el listado de alias
         	this.getKeyStoreManager();
-            this.selectedAlias = KeyStoreUtilities.showCertSelectionDialog(
-                    this.ksManager, // KeyStoreManager
+        	
+        	final AOKeyStoreDialog dialog = new AOKeyStoreDialog(
+        			this.ksManager, // KeyStoreManager
                     this.parent, // Panel sobre el que mostrar el dialogo
                     this.checkPrivateKey, // Comprobar accesibilidad de claves privadas
                     true, // Advierte si el certificado esta caducado
                     this.showExpiratedCertificates, // Muestra certificados caducados
                     this.certFilters, // Filtros para los certificados
                     this.isMandatoryCert() // Solo se admite un certificado
-);
+    				);
+    		dialog.show();
+
+    		this.selectedAlias = dialog.getSelectedAlias();
         }
 
         // En caso de ser todos certificados con clave privada, obtenemos la

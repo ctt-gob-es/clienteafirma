@@ -24,9 +24,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.KeyStore.PrivateKeyEntry;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.UnrecoverableEntryException;
 import java.util.logging.Logger;
 
 import javax.security.auth.callback.PasswordCallback;
@@ -55,10 +52,10 @@ import es.gob.afirma.keystores.AOKeyStoreManager;
 import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
 import es.gob.afirma.keystores.AOKeystoreAlternativeException;
 import es.gob.afirma.keystores.KeyStoreConfiguration;
-import es.gob.afirma.keystores.KeyStoreUtilities;
 import es.gob.afirma.keystores.callbacks.NullPasswordCallback;
 import es.gob.afirma.ui.listeners.ElementDescriptionFocusListener;
 import es.gob.afirma.ui.listeners.ElementDescriptionMouseListener;
+import es.gob.afirma.ui.utils.CertificateManagerDialog;
 import es.gob.afirma.ui.utils.ConfigureCaret;
 import es.gob.afirma.ui.utils.CustomDialog;
 import es.gob.afirma.ui.utils.ExtFilter;
@@ -150,26 +147,10 @@ final class Desensobrado extends JPanel {
             PrivateKeyEntry privateKeyEntry = null;
             try {
                 final AOKeyStoreManager keyStoreManager = getKeyStoreManager((KeyStoreConfiguration) comboAlmacen.getSelectedItem());
-                privateKeyEntry = getPrivateKeyEntry(keyStoreManager, comboAlmacen);
+                privateKeyEntry = new CertificateManagerDialog().show(SwingUtilities.getRoot(this), keyStoreManager);
             }
             catch (final AOCancelledOperationException e) {
                 LOGGER.info("Operacion cancelada por el usuario"); //$NON-NLS-1$
-                setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-                return;
-            }
-            catch (final UnrecoverableEntryException e) {
-                // Control de la excepcion generada al introducir mal la contrasena para el almacen
-                CustomDialog.showMessageDialog(SwingUtilities.getRoot(this),
-                                               true,
-                                               Messages.getString("Desensobrado.msg.error.contrasenia"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
-                setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-                return;
-            }
-            catch (final AOException e) {
-                LOGGER.severe("Error al abrir el almacen de claves del usuario: " + e); //$NON-NLS-1$
-                CustomDialog.showMessageDialog(SwingUtilities.getRoot(this),
-                                               true,
-                                               Messages.getString("Desensobrado.msg.error.almacen"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
                 setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
                 return;
             }
@@ -262,7 +243,7 @@ final class Desensobrado extends JPanel {
             final MimeHelper mh = new MimeHelper(recoveredData);
             final String ext = mh.getExtension();
             ExtFilter fileFilter = null;
-            if (ext != null && (!name.toLowerCase().endsWith("." + ext) || ext.equals("html") && name.toLowerCase().endsWith(".htm") || ext.equals("jpg") && name.toLowerCase().endsWith(".jpeg"))) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            if (ext != null && (!name.toLowerCase().endsWith("." + ext) || ext.equals("html") && name.toLowerCase().endsWith(".htm") || ext.equals("jpg") && name.toLowerCase().endsWith(".jpeg"))) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
             	name = name + "." + ext; //$NON-NLS-1$
             	fileFilter = new ExtFilter(new String[] { ext }, mh.getDescription());
             }
@@ -336,36 +317,6 @@ final class Desensobrado extends JPanel {
         }
 
         return AOKeyStoreManagerFactory.getAOKeyStoreManager(store, lib, ksConfiguration.toString(), pssCallback, this);
-
-    }
-
-    private PrivateKeyEntry getPrivateKeyEntry(final AOKeyStoreManager keyStoreManager,
-    		                                   final JComboBox comboAlmacen) throws AOException,
-    		                                                                        UnrecoverableEntryException,
-    		                                                                        KeyStoreException,
-    		                                                                        NoSuchAlgorithmException {
-        // Seleccionamos un certificado
-        final String selectedcert = KeyStoreUtilities.showCertSelectionDialog(
-    		keyStoreManager.getAliases(),
-            keyStoreManager,
-            SwingUtilities.getRoot(this),
-            true,
-            true,
-            true,
-            null,
-            false
-        );
-
-        // Comprobamos si se ha cancelado la seleccion
-        if (selectedcert == null) {
-            throw new AOCancelledOperationException("Operacion de firma cancelada por el usuario"); //$NON-NLS-1$
-        }
-
-        // Recuperamos la clave del certificado
-        return keyStoreManager.getKeyEntry(
-    		selectedcert,
-    		((KeyStoreConfiguration) comboAlmacen.getSelectedItem()).getType().getCertificatePasswordCallback(SwingUtilities.getRoot(this))
-        );
 
     }
 

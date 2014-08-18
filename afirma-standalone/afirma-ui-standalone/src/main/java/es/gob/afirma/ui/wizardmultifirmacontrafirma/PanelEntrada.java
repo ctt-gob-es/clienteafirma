@@ -35,6 +35,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.text.Caret;
 
+import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.signers.AOSignConstants;
@@ -319,6 +320,10 @@ final class PanelEntrada extends JAccessibilityDialogWizard {
 			logger.severe("Error al generar la firma electronica: " + e); //$NON-NLS-1$
 			CustomDialog.showMessageDialog(this, true, Messages.getString("Wizard.multifirma.simple.error.generar.firma"),  //$NON-NLS-1$
 					Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
+			return false;
+		}
+		catch (final AOCancelledOperationException e) {
+			logger.info("Operacion cancelada por el usuario: " + e); //$NON-NLS-1$
 			return false;
 		}
 		catch (final Exception e) {

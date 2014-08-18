@@ -98,12 +98,12 @@ public final class CertificateSelectionDialog extends MouseAdapter {
 		}
 
 
-		final String selectedAlias = this.csd.getSelectedCertificate();
+		final String selectedAlias = this.csd.getSelectedCertificateAlias();
 
 		KeyboardFocusManager.getCurrentKeyboardFocusManager().removeKeyEventDispatcher(dispatcher);
 		certDialog.dispose();
 
-		return this.ksdm.getKeyEntry(selectedAlias);
+		return this.ksdm.getKeyEntry(selectedAlias);	
 	}
 
 	/** {@inheritDoc} */

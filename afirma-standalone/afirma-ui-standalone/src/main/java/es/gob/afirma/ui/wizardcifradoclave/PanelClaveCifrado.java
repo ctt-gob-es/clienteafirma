@@ -29,7 +29,6 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.util.List;
-import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -48,8 +47,6 @@ import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.ciphers.AOCipherConfig;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
-import es.gob.afirma.keystores.KeyStoreUtilities;
-import es.gob.afirma.keystores.filters.CertificateFilter;
 import es.gob.afirma.ui.utils.CipherConfig;
 import es.gob.afirma.ui.utils.ConfigureCaret;
 import es.gob.afirma.ui.utils.CustomDialog;
@@ -345,18 +342,17 @@ final class PanelClaveCifrado extends JAccessibilityDialogWizard {
             )
         );
 
-        // Si no se establecio el alias de la clave de cifrado, se la pedimos al usuario
-        final String alias = KeyStoreUtilities.showCertSelectionDialog(
-    		cKs.getAliases(),
-    		null,
-    		this,
-    		true,
-    		true,
-    		true,
-    		new Vector<CertificateFilter>(0),
-    		false
-		);
-
+        // Le pedimos el alias de laclave de cifrado al usuario
+        final String alias = (String) CustomDialog.showInputDialog(
+        		this,
+        		true,
+        		"Seleccione la clave de cifrado.",
+        		KeyEvent.VK_S,
+        		"Selecci\u00F3n de clave",
+        		JOptionPane.NO_OPTION,
+        		cKs.getAliases(),
+        		cKs.getAliases()[0]);
+        
         return Base64.encode(cKs.getKey(alias).getEncoded());
     }
 

@@ -25,7 +25,6 @@ import java.io.FileFilter;
 import java.io.IOException;
 import java.security.KeyException;
 import java.security.KeyStore.PrivateKeyEntry;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
@@ -47,11 +46,10 @@ import es.gob.afirma.keystores.AOKeyStore;
 import es.gob.afirma.keystores.AOKeyStoreManager;
 import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
 import es.gob.afirma.keystores.KeyStoreConfiguration;
-import es.gob.afirma.keystores.KeyStoreUtilities;
 import es.gob.afirma.keystores.callbacks.NullPasswordCallback;
-import es.gob.afirma.keystores.filters.CertificateFilter;
 import es.gob.afirma.massive.MassiveType;
 import es.gob.afirma.ui.principal.Main;
+import es.gob.afirma.ui.utils.CertificateManagerDialog;
 import es.gob.afirma.ui.utils.ConfigureCaret;
 import es.gob.afirma.ui.utils.CustomDialog;
 import es.gob.afirma.ui.utils.DirectorySignatureHelperAdv;
@@ -506,26 +504,9 @@ final class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
             }
             keyStoreManager = AOKeyStoreManagerFactory.getAOKeyStoreManager(store, lib, this.kssc.toString(), pssCallback, this);
 
-            // Seleccionamos un certificado
-            final String selectedcert = KeyStoreUtilities.showCertSelectionDialog(
-        		  keyStoreManager.getAliases(),
-	              keyStoreManager,
-	              this,
-	              true,
-	              true,
-	              true,
-	              new ArrayList<CertificateFilter>(0),
-	              false
-            );
-
-            // Comprobamos si se ha cancelado la seleccion
-            if (selectedcert == null) {
-                throw new AOCancelledOperationException("Operacion de firma cancelada por el usuario"); //$NON-NLS-1$
-            }
-
             // Recuperamos la clave del certificado
             try {
-                privateKeyEntry = keyStoreManager.getKeyEntry(selectedcert, store.getCertificatePasswordCallback(this));
+            	privateKeyEntry = new CertificateManagerDialog().show(this, keyStoreManager);
             }
             catch (final AOCancelledOperationException e) {
                 // Si se ha cancelado la operacion lo informamos en el nivel superior para que se trate.

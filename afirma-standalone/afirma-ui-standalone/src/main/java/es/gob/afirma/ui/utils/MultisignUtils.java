@@ -14,10 +14,6 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
 import java.security.KeyStore.PrivateKeyEntry;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.UnrecoverableEntryException;
-import java.util.Vector;
 
 import javax.security.auth.callback.PasswordCallback;
 
@@ -25,13 +21,10 @@ import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.keystores.AOKeyStore;
 import es.gob.afirma.keystores.AOKeyStoreManager;
-import es.gob.afirma.keystores.AOKeyStoreManagerException;
 import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
 import es.gob.afirma.keystores.AOKeystoreAlternativeException;
 import es.gob.afirma.keystores.KeyStoreConfiguration;
-import es.gob.afirma.keystores.KeyStoreUtilities;
 import es.gob.afirma.keystores.callbacks.NullPasswordCallback;
-import es.gob.afirma.keystores.filters.CertificateFilter;
 import es.gob.afirma.ui.principal.Main;
 
 /** Utilidades para las multifirmas */
@@ -118,47 +111,6 @@ public final class MultisignUtils {
      * @return Entrada que apunta a la clave privada
      * @throws AOException se ha producido un error al intentar obtener la clave privada */
     public static PrivateKeyEntry getPrivateKeyEntry(final KeyStoreConfiguration kssc, final AOKeyStoreManager keyStoreManager, final Component padre) throws AOException {
-        // Recuperamos la clave del certificado
-        PrivateKeyEntry privateKeyEntry = null;
-
-        // Seleccionamos un certificado
-        final String selectedcert = KeyStoreUtilities.showCertSelectionDialog(
-    		  keyStoreManager.getAliases(),
-		      keyStoreManager,
-		      padre,
-		      true,
-		      true,
-		      true,
-		      new Vector<CertificateFilter>(0),
-		      false
-	    );
-
-        // Comprobamos si se ha cancelado la seleccion
-        if (selectedcert == null) {
-            throw new AOCancelledOperationException("Operacion de firma cancelada por el usuario"); //$NON-NLS-1$
-        }
-
-        final AOKeyStore store = kssc.getType();
-        try {
-            privateKeyEntry = keyStoreManager.getKeyEntry(
-        		selectedcert,
-        		store.getCertificatePasswordCallback(padre)
-    		);
-        }
-        catch (final KeyStoreException e) {
-        	throw new AOKeyStoreManagerException("No se ha podido recuperar el certificado seleccionado: " + selectedcert, e); //$NON-NLS-1$
-		}
-        catch (final NoSuchAlgorithmException e) {
-        	throw new AOKeyStoreManagerException(
-    			"No se ha podido recuperar el certificado seleccionado (" + selectedcert + "), el algoritmo es invalido", e //$NON-NLS-1$ //$NON-NLS-2$
-			);
-		}
-        catch (final UnrecoverableEntryException e) {
-        	throw new AOKeyStoreManagerException(
-    			"No se ha podido recuperar el certificado seleccionado (" + selectedcert + "), la clave es invalida", e //$NON-NLS-1$ //$NON-NLS-2$
-			);
-		}
-
-        return privateKeyEntry;
+        return new CertificateManagerDialog().show(padre, keyStoreManager);
     }
 }

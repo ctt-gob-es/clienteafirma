@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.logging.Logger;
 
@@ -174,10 +175,16 @@ public class JSEUIManager implements AOUIManager {
 
     		return showDialogMethod.invoke(csd);
     	}
+    	catch (final InvocationTargetException e) {
+    		LOGGER.severe("Ocurrio un error durante la extraccion de la clave del certificado seleccionado: " + e); //$NON-NLS-1$
+    		throw new RuntimeException(
+				"Ocurrio un error durante la extraccion de la clave del certificado seleccionado", e //$NON-NLS-1$
+			);
+    	}
     	catch (final Exception e) {
     		LOGGER.severe("No se encuentra disponible el proyecto del interfaz grafico del dialogo de seleccion: " + e); //$NON-NLS-1$
     		throw new IllegalStateException(
-				"No se encuentra disponible el proyecto del interfaz grafico del dialogo de seleccion", e //$NON-NLS-1$
+				"No se encuentra disponible el proyecto del interfaz grafico del dialogo de seleccion u ocurrio un error durante su ejecucion", e //$NON-NLS-1$
 			);
     	}
     }

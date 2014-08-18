@@ -188,7 +188,7 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 
 	/** Recupera el alias del certificado seleccionado.
 	 * @return Alias del certificado seleccionado o {@code null} si no se seleccion&oacute; ninguno. */
-	String getSelectedCertificate() {
+	String getSelectedCertificateAlias() {
 		return this.selectedIndex == -1 ? null : this.certificateBeans[this.selectedIndex].getAlias();
 	}
 

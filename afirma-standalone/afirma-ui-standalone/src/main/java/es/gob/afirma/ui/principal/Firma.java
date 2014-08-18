@@ -54,7 +54,6 @@ import es.gob.afirma.keystores.AOKeyStore;
 import es.gob.afirma.keystores.AOKeyStoreManager;
 import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
 import es.gob.afirma.keystores.KeyStoreConfiguration;
-import es.gob.afirma.keystores.KeyStoreUtilities;
 import es.gob.afirma.keystores.callbacks.NullPasswordCallback;
 import es.gob.afirma.signers.pades.BadPdfPasswordException;
 import es.gob.afirma.signers.pades.InvalidPdfException;
@@ -66,6 +65,7 @@ import es.gob.afirma.signers.xml.InvalidXMLException;
 import es.gob.afirma.signers.xmldsig.AOXMLDSigSigner;
 import es.gob.afirma.ui.listeners.ElementDescriptionFocusListener;
 import es.gob.afirma.ui.listeners.ElementDescriptionMouseListener;
+import es.gob.afirma.ui.utils.CertificateManagerDialog;
 import es.gob.afirma.ui.utils.ConfigureCaret;
 import es.gob.afirma.ui.utils.CustomDialog;
 import es.gob.afirma.ui.utils.ExtFilter;
@@ -242,30 +242,11 @@ final class Firma extends JPanel {
                 return;
             }
 
-
             // Recuperamos la clave del certificado
             final PrivateKeyEntry privateKeyEntry;
+            
             try {
-            	// Seleccionamos un certificado
-            	final String selectedcert = KeyStoreUtilities.showCertSelectionDialog(
-        			keyStoreManager.getAliases(),
-    				keyStoreManager,
-    				SwingUtilities.getRoot(this),
-    				true,
-    				true,
-    				true,
-    				null,
-    				false
-				);
-
-            	// Comprobamos si se ha cancelado la seleccion
-            	if (selectedcert == null) {
-            		throw new AOCancelledOperationException("Operacion de firma cancelada por el usuario"); //$NON-NLS-1$
-            	}
-            	privateKeyEntry = keyStoreManager.getKeyEntry(
-        			selectedcert,
-        			store.getCertificatePasswordCallback(SwingUtilities.getRoot(this))
-    			);
+            	privateKeyEntry = new CertificateManagerDialog().show(SwingUtilities.getRoot(this), keyStoreManager);
             }
             catch (final java.security.ProviderException e) {
             	// Comprobacion especifica para el proveedor Java de DNIe
@@ -277,14 +258,6 @@ final class Firma extends JPanel {
             		setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
             		return;
             	}
-                CustomDialog.showMessageDialog(SwingUtilities.getRoot(this),
-                                               true,
-                                               Messages.getString("Firma.msg.error.contrasenia"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
-                setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-                return;
-            }
-            catch (final java.security.UnrecoverableEntryException e) {
-                // Control de la excepcion generada al introducir mal la contrasena para el certificado
                 CustomDialog.showMessageDialog(SwingUtilities.getRoot(this),
                                                true,
                                                Messages.getString("Firma.msg.error.contrasenia"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$

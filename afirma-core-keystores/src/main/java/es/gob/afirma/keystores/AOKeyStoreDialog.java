@@ -1,6 +1,7 @@
 package es.gob.afirma.keystores;
 
 import java.security.KeyStore.PrivateKeyEntry;
+import java.security.cert.Certificate;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
 import java.util.List;
@@ -30,10 +31,11 @@ public class AOKeyStoreDialog implements KeyStoreDialogManager {
 	private final boolean showExpiredCertificates;
 	private final List<CertificateFilter> certFilters;
 	private final boolean mandatoryCertificate;
-
-	private PrivateKeyEntry selectedPke = null;
+	
 	private String selectedAlias = null;
-
+	private PrivateKeyEntry selectedPke = null;
+	private Certificate[] selectedCertChain = null;
+	
     /**
      * Crea un dialogo para la selecci&oacute;n de un certificado.
      * @param ksm
@@ -50,7 +52,7 @@ public class AOKeyStoreDialog implements KeyStoreDialogManager {
      *        certificado al ser seleccionado
      * @param showExpiredCertificates
      *        Indica si se deben o no mostrar los certificados caducados o
-     *        aun no v&aacute;lidos
+     *        a&uacute;n no v&aacute;lidos
      */
     public AOKeyStoreDialog(final AOKeyStoreManager ksm,
     		final Object parentComponent,
@@ -157,17 +159,21 @@ public class AOKeyStoreDialog implements KeyStoreDialogManager {
 	@Override
 	public Object getKeyEntry(final String alias) throws AOException {
 
-		try {
-			this.selectedPke = this.ksm.getKeyEntry(
-					alias,
-					this.ksm instanceof AOKeyStoreManager ?
-							((AOKeyStoreManager) this.ksm).getType().getCertificatePasswordCallback(this.parentComponent) :
-								null);
+		PrivateKeyEntry pke = null;
+		if (this.checkPrivateKeys) {
+			try {
+				pke = this.ksm.getKeyEntry(
+						alias,
+						this.ksm instanceof AOKeyStoreManager ?
+								((AOKeyStoreManager) this.ksm).getType().getCertificatePasswordCallback(this.parentComponent) :
+									null);
+			}
+			catch (final Exception e) {
+				LOGGER.severe("No se ha podido extraer la clave del almacen: " + e); //$NON-NLS-1$
+				throw new AOException("No se ha podido extraer la clave del almacen", e); //$NON-NLS-1$
+			}
 		}
-		catch (final Exception e) {
-			LOGGER.severe("No se ha podido extraer la clave del almacen: " + e); //$NON-NLS-1$
-			throw new AOException("No se ha podido extraer la clave del almacen", e); //$NON-NLS-1$
-		}
+		
 		this.selectedAlias = alias;
 
 		if (this.checkValidity && this.ksm != null) {
@@ -208,14 +214,23 @@ public class AOKeyStoreDialog implements KeyStoreDialogManager {
 			}
     	}
 		
-		
-		return this.selectedPke;
+		return this.checkPrivateKeys ? pke : this.ksm.getCertificateChain(alias);
 	}
 
 	@Override
 	public void show() {
-		this.selectedPke = (PrivateKeyEntry) AOUIFactory.showCertificateSelectionDialog(this.parentComponent, this);
-		if (this.selectedPke == null) {
+		
+		Object selectedElement = AOUIFactory.showCertificateSelectionDialog(this.parentComponent, this);
+		
+		this.selectedCertChain = selectedElement instanceof Certificate[] ? (Certificate[]) selectedElement : null;
+		if (this.selectedCertChain == null) {
+			this.selectedPke = selectedElement instanceof PrivateKeyEntry ? (PrivateKeyEntry) selectedElement : null;
+			if (this.selectedPke != null) {
+				this.selectedCertChain = this.selectedPke.getCertificateChain();
+			}
+		}
+		
+		if (this.selectedCertChain == null) {
 			throw new AOCancelledOperationException("No se ha seleccionado certificado"); //$NON-NLS-1$
 		}
 	}
@@ -230,5 +245,8 @@ public class AOKeyStoreDialog implements KeyStoreDialogManager {
 		return this.selectedPke;
 	}
 
-
+	@Override
+	public Certificate[] getSelectedCertificateChain() {
+		return this.selectedCertChain;
+	}
 }
