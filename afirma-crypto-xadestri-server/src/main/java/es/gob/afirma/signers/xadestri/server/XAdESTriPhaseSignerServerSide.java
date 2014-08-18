@@ -140,7 +140,7 @@ public final class XAdESTriPhaseSignerServerSide {
 
 		// Miramos si la entrada es un XML que ya contenga firmas (almacenando los ID para luego localizar cual es la firma
 		// nueva y no confundirla con las antiguas), y si lo es cual es su codificacion con un Document.getXmlEncoding()
-		final List<String> previousSignaturesIds = new ArrayList<>();
+		final List<String> previousSignaturesIds = new ArrayList<String>();
 		Document xml = null;
 		String xmlEncoding = XML_DEFAULT_ENCODING;
 		try {
@@ -315,7 +315,7 @@ public final class XAdESTriPhaseSignerServerSide {
 		}
 
 		// Recogemos el signedInfo de cada firma cuyo identificador no este en la lista de excluidos (excludedIds)
-		final List<byte[]> signedInfos = new ArrayList<>();
+		final List<byte[]> signedInfos = new ArrayList<byte[]>();
 		for (int i = 0; i < signatureNodeList.getLength(); i++) {
 
 			final Node currentNode = signatureNodeList.item(i);
