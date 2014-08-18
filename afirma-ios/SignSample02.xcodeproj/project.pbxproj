@@ -226,7 +226,6 @@
 		C30C9ACD172EC49C00FE5C6B /* CADESMonoPhase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CADESMonoPhase.h; sourceTree = "<group>"; };
 		C30C9ACE172EC49C00FE5C6B /* CADESMonoPhase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CADESMonoPhase.m; sourceTree = "<group>"; };
 		C3121D741666788700C1C80A /* ANF_PF_Activo.p12 */ = {isa = PBXFileReference; lastKnownFileType = file; path = ANF_PF_Activo.p12; sourceTree = "<group>"; };
-		C31649D3175F2829009F3B67 /* DropboxSDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = DropboxSDK.framework; sourceTree = "<group>"; };
 		C31649D6175F2A3C009F3B67 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		C33B9518163AACB8003D317A /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		C33E9CBA16F714A0006AC003 /* AOPinViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AOPinViewController.h; sourceTree = "<group>"; };
@@ -604,7 +603,6 @@
 				C3AF7F7017FD61CE0084D916 /* CoreData.framework */,
 				C3AF7F6E17FD60C80084D916 /* libGoogleAnalyticsServices.a */,
 				C31649D6175F2A3C009F3B67 /* QuartzCore.framework */,
-				C31649D3175F2829009F3B67 /* DropboxSDK.framework */,
 				C39E591E16F9EB5100248B0A /* libcrypto.a */,
 				C39E591F16F9EB5100248B0A /* libssl.a */,
 				C3BDC4B816CD16D300589B05 /* libresolv.dylib */,
