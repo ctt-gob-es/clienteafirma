@@ -313,7 +313,7 @@ public final class TriphaseSignDocumentRequest {
 			}
 			
 			try {
-				return Base64.encodeBytes(builder.toString().getBytes(), Base64.URL_SAFE);
+				return Base64.encode(builder.toString().getBytes(), true);
 			} catch (Exception e) {
 				// Este caso nunca se dara
 				return null;

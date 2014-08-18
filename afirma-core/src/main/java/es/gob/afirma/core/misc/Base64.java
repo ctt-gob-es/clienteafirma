@@ -50,10 +50,10 @@ public final class Base64 {
 
 
     /** No options specified. Value is zero. */
-    public static final int NO_OPTIONS = 0;
+    private static final int NO_OPTIONS = 0;
 
     /** Do break lines when encoding. Value is 8. */
-    public static final int DO_BREAK_LINES = 8;
+    private static final int DO_BREAK_LINES = 8;
 
     /**
      * Encode using Base64-like encoding that is URL- and Filename-safe as described
@@ -526,24 +526,22 @@ public final class Base64 {
         }
     }   // end decodeToBytes
 
-    /**
-     * Low-level access to decoding ASCII characters in
-     * the form of a byte array. <strong>Ignores GUNZIP option, if
-     * it's set.</strong> This is not generally a recommended method,
-     * although it is used internally as part of the decoding process.
-     * Special case: if len = 0, an empty array is returned. Still,
-     * if you need more speed and reduced memory footprint, consider this method.
-     *
-     * @param source The Base64 encoded data
-     * @param off    The offset of where to begin decoding
-     * @param len    The length of characters to decode
-     * @param options Can specify options such as alphabet type to use
-     * @return decoded data
-     * @throws java.io.IOException If bogus characters exist in source data
-     * @since 1.3
-     */
-    public static byte[] decode( final byte[] source, final int off, final int len, final int options) throws IOException {
+    /** Descodifica datos en Base64.
+     * @param source Datos codificados en Base64.
+     * @param off    El &iacute;ndice inicial por el que empezar a descodificar.
+     * @param len    N&uacute;mero de caracteres que descodificar.
+     * @param urlSafe Si se establece a <code>true</code> indica que los datos est&aacute;n con un alfabeto Base64
+     *                susceptible de ser usado en URL, seg&uacute;n se indica en la seccti&oacute;n 4 de la RFC3548,
+     *                si se establece a <code>false</code> los datos deben estar en Base64 normal
+     * @return Datos descodificados
+     * @throws java.io.IOException si ocurre cualquier error */
+    public static byte[] decode( final byte[] source, final int off, final int len, final boolean urlSafe) throws IOException {
 
+    	int options = NO_OPTIONS;
+    	if (urlSafe) {
+    		options = URL_SAFE;
+    	}
+    	
         // Lots of error checking and exception throwing
         if( source == null ){
             throw new IllegalArgumentException("Cannot decode null source array"); //$NON-NLS-1$
@@ -642,7 +640,7 @@ public final class Base64 {
         catch(final java.io.UnsupportedEncodingException uee ) {
             bytes = str.getBytes();
         }
-        return decode( bytes, 0, bytes.length, urlSafe ? URL_SAFE : NO_OPTIONS);
+        return decode( bytes, 0, bytes.length, urlSafe);
     }
 
 

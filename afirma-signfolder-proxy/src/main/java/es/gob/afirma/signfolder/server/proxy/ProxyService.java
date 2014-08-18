@@ -180,12 +180,12 @@ public final class ProxyService extends HttpServlet {
 		
 		byte[] xml;
 		try {
-			xml = GzipCompressorImpl.gunzip(Base64.decode(data, Base64.URL_SAFE));
+			xml = GzipCompressorImpl.gunzip(Base64.decode(data, true));
 		}
 		catch(final IOException e) {
 			LOGGER.info("Los datos de entrada no estan comprimidos: " + e); //$NON-NLS-1$
 			try {
-				xml = Base64.decode(data, Base64.URL_SAFE);
+				xml = Base64.decode(data, true);
 			} catch (Exception ex) {
 				LOGGER.warning("Los datos de entrada no estan correctamente codificados: " + ex); //$NON-NLS-1$
 				return;
@@ -359,7 +359,7 @@ public final class ProxyService extends HttpServlet {
 							// Lo pasamos a base 64 URL_SAFE para que no afecten al envio de datos
 							final String extraParams = downloadedDoc.getSignatureParameters() != null ? downloadedDoc.getSignatureParameters().getValue() : null;
 							if (extraParams != null) {
-								docRequest.setParams(Base64.encodeBytes(extraParams.getBytes(), Base64.URL_SAFE));
+								docRequest.setParams(Base64.encode(extraParams.getBytes(), true));
 							}
 
 							final DataHandler dataHandler = downloadedDoc.getData() != null ? downloadedDoc.getData().getValue() : null;
@@ -368,7 +368,7 @@ public final class ProxyService extends HttpServlet {
 							}
 							final Object content = dataHandler.getContent();
 							if (content instanceof ByteArrayInputStream) {
-								docRequest.setContent(Base64.encodeBytes(AOUtil.getDataFromInputStream((ByteArrayInputStream) content), Base64.URL_SAFE));
+								docRequest.setContent(Base64.encode(AOUtil.getDataFromInputStream((ByteArrayInputStream) content), true));
 							}
 							else if (content instanceof String) {
 								docRequest.setContent((String) content);

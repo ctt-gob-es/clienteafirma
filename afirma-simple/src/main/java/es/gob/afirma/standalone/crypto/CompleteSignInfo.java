@@ -96,7 +96,7 @@ public final class CompleteSignInfo {
     public void setData(final byte[] data) {
     	if (AOUtil.isBase64(data)) {
     		try {
-    			final byte[] tmpData = Base64.decode(data, 0, data.length, 0);
+    			final byte[] tmpData = Base64.decode(data, 0, data.length, false);
     			final String ext = new MimeHelper(tmpData).getExtension();
 				if (ext != null && !"".equals(ext)) { //$NON-NLS-1$
 					this.data = tmpData;

@@ -72,7 +72,7 @@ public class TriSigner {
 			append(PARAMETER_NAME_CRYPTO_OPERATION).append(HTTP_EQUALS).append(docReq.getCryptoOperation()).append(HTTP_AND).
 			append(PARAMETER_NAME_FORMAT).append(HTTP_EQUALS).append(normalizeSignatureFormat(docReq.getSignatureFormat())).append(HTTP_AND).
 			append(PARAMETER_NAME_ALGORITHM).append(HTTP_EQUALS).append(digestToSignatureAlgorithmName(docReq.getMessageDigestAlgorithm())).append(HTTP_AND).
-			append(PARAMETER_NAME_CERT).append(HTTP_EQUALS).append(Base64.encodeBytes(signerCert.getEncoded(), Base64.URL_SAFE)).append(HTTP_AND).
+			append(PARAMETER_NAME_CERT).append(HTTP_EQUALS).append(Base64.encode(signerCert.getEncoded(), true)).append(HTTP_AND).
 			append(PARAMETER_NAME_DOCID).append(HTTP_EQUALS).append(docReq.getContent());
 			if (docReq.getParams() != null) {
 				urlBuffer.append(HTTP_AND).append(PARAMETER_NAME_EXTRA_PARAM).append(HTTP_EQUALS).append(docReq.getParams());
@@ -109,7 +109,7 @@ public class TriSigner {
 			append(PARAMETER_NAME_CRYPTO_OPERATION).append(HTTP_EQUALS).append(docReq.getCryptoOperation()).append(HTTP_AND).
 			append(PARAMETER_NAME_FORMAT).append(HTTP_EQUALS).append(normalizeSignatureFormat(docReq.getSignatureFormat())).append(HTTP_AND).
 			append(PARAMETER_NAME_ALGORITHM).append(HTTP_EQUALS).append(digestToSignatureAlgorithmName(docReq.getMessageDigestAlgorithm())).append(HTTP_AND).
-			append(PARAMETER_NAME_CERT).append(HTTP_EQUALS).append(Base64.encodeBytes(signerCert.getEncoded(), Base64.URL_SAFE));
+			append(PARAMETER_NAME_CERT).append(HTTP_EQUALS).append(Base64.encode(signerCert.getEncoded(), true));
 
 			if (docReq.getParams() != null && docReq.getParams().length() > 0) {
 				urlBuffer.append(HTTP_AND).append(PARAMETER_NAME_EXTRA_PARAM).append(HTTP_EQUALS).append(docReq.getParams());
@@ -144,7 +144,7 @@ public class TriSigner {
 
 		// Los datos no se devuelven, se quedan en el servidor
 		try {
-			docReq.setResult(Base64.decode(stringTrimmedResult.replace(SUCCESS + " NEWID=", ""), Base64.URL_SAFE)); //$NON-NLS-1$ //$NON-NLS-2$
+			docReq.setResult(Base64.decode(stringTrimmedResult.replace(SUCCESS + " NEWID=", ""), true)); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		catch (final IOException e) {
 			Logger.getLogger("es.gob.afirma").warning("El resultado de NEWID del servidor no estaba en Base64: " + e); //$NON-NLS-1$ //$NON-NLS-2$
@@ -182,7 +182,7 @@ public class TriSigner {
 	private static TriphaseConfigDataBean parseTriphaseResult(byte[] triphaseResult) throws IOException {
 		
 		Properties resultProperties = new Properties();
-		resultProperties.load(new ByteArrayInputStream(Base64.decode(triphaseResult, 0, triphaseResult.length, Base64.URL_SAFE)));
+		resultProperties.load(new ByteArrayInputStream(Base64.decode(triphaseResult, 0, triphaseResult.length, true)));
 
 		TriphaseConfigDataBean triphaseConfig = new TriphaseConfigDataBean();
 		

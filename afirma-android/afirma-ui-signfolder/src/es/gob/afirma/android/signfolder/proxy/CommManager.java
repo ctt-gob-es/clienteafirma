@@ -81,7 +81,7 @@ public final class CommManager {
 		// return
 		// Base64.encodeBytes(AndroidGzipCompressor.gzip(param.getBytes()),
 		// Base64.URL_SAFE);
-		return Base64.encodeBytes(param.getBytes(), Base64.URL_SAFE);
+		return Base64.encode(param.getBytes(), true);
 	}
 
 	private String prepareUrl(final String operation,
