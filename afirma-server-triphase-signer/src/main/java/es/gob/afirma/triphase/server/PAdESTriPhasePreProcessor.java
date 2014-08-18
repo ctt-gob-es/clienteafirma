@@ -137,6 +137,7 @@ final class PAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 		final PdfSignResult signResult = new PdfSignResult(
 				configParams.getProperty(PROPERTY_NAME_PDF_UNIQUE_ID),
 				Base64.decode(sessionData.getProperty(PROPERTY_NAME_PRESIGN_PREFIX + 0)),
+				null,
 				cal,
 				extraParams);
 
