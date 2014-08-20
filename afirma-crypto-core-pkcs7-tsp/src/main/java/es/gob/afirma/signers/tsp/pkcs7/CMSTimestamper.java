@@ -42,7 +42,6 @@ import javax.net.ssl.X509TrustManager;
 import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Primitive;
-import org.bouncycastle.asn1.DERObjectIdentifier;
 import org.bouncycastle.asn1.DERSet;
 import org.bouncycastle.asn1.cmp.PKIFailureInfo;
 import org.bouncycastle.asn1.cms.Attribute;
@@ -199,7 +198,7 @@ public final class CMSTimestamper {
 
              final Attribute unsignAtt = new Attribute(new ASN1ObjectIdentifier(SIGNATURE_TIMESTAMP_TOKEN_OID), derSet);
 
-             final Hashtable<DERObjectIdentifier, Attribute> ht = new Hashtable<DERObjectIdentifier, Attribute>();
+             final Hashtable<ASN1ObjectIdentifier, Attribute> ht = new Hashtable<ASN1ObjectIdentifier, Attribute>();
              ht.put(new ASN1ObjectIdentifier(SIGNATURE_TIMESTAMP_TOKEN_OID), unsignAtt);
 
              final AttributeTable unsignedAtts = new AttributeTable(ht);
