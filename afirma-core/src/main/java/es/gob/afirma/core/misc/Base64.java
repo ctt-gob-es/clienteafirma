@@ -284,13 +284,7 @@ public final class Base64 {
      * @param source Datos a convertir a Base64
      * @return Datos codificados como texto Base64 */
     public static String encode(final byte[] source) {
-        String encoded = null;
-        try {
-            encoded = encodeBytes(source, 0, source.length, NO_OPTIONS);
-        }
-        catch (final java.io.IOException ex) {
-            assert false : ex.getMessage();
-        }
+        String encoded = encodeBytes(source, 0, source.length, NO_OPTIONS);
         assert encoded != null;
         return encoded;
     }
@@ -302,7 +296,7 @@ public final class Base64 {
      *                si se establece a <code>false</code> los datos se codificar&aacute;n en Base64 normal
      * @return Datos codificados como texto Base64
      * @throws java.io.IOException si se produce cualquier error */
-    public static String encode(final byte[] source, final boolean urlSafe) throws java.io.IOException {
+    public static String encode(final byte[] source, final boolean urlSafe) {
         return encodeBytes( source, 0, source.length, urlSafe ? URL_SAFE : NO_OPTIONS);
     }
 
@@ -318,11 +312,10 @@ public final class Base64 {
      * @param len Length of data to convert
      * @param options Specified options
      * @return The Base64-encoded data as a String
-     * @throws java.io.IOException if there is an error
      * @throws IllegalArgumentException if source array, offset, or length are invalid
      * @since 2.0
      */
-    private static String encodeBytes( final byte[] source, final int off, final int len, final int options ) throws java.io.IOException {
+    private static String encodeBytes( final byte[] source, final int off, final int len, final int options ) {
         final byte[] encoded = encodeBytesToBytes( source, off, len, options );
 
         // Return value according to relevant encoding.
@@ -346,11 +339,10 @@ public final class Base64 {
      * @param len Length of data to convert
      * @param options Specified options
      * @return The Base64-encoded data as a String
-     * @throws java.io.IOException if there is an error
      * @throws IllegalArgumentException if source array, offset, or length are invalid
      * @since 2.3.1
      */
-    private static byte[] encodeBytesToBytes(final byte[] source, final int off, final int len, final int options) throws java.io.IOException {
+    private static byte[] encodeBytesToBytes(final byte[] source, final int off, final int len, final int options) {
 
         if( source == null ){
             throw new IllegalArgumentException("Cannot serialize a null array"); //$NON-NLS-1$

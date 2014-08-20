@@ -1,5 +1,6 @@
 package es.gob.afirma.signers.multi.cades.triphase;
 
+import java.security.MessageDigest;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
@@ -7,7 +8,6 @@ import java.security.interfaces.RSAPublicKey;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Random;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.signers.AOSimpleSigner;
@@ -19,8 +19,8 @@ import es.gob.afirma.core.signers.AOSimpleSigner;
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public final class CAdESFakePkcs1Signer implements AOSimpleSigner {
 
-	private static final Random RANDOM = new Random();
-
+	private static final String MD_ALGORITHM = "SHA-512";   //$NON-NLS-1$
+	
 	/** Tama&ntilde;o de una firma PKCS#1 con clave RSA de 1024 bits. */
 	private static final Integer PKCS1_DEFAULT_SIZE_1024 = Integer.valueOf(128);
 
@@ -71,21 +71,23 @@ public final class CAdESFakePkcs1Signer implements AOSimpleSigner {
 			throw new AOException("Tamano de clave no soportado: " + keySize); //$NON-NLS-1$
 		}
 
-		// Miramos si ya existe una entrada para exactamente los mismos datos a firmar con PKCS#1,
-		// ya que si ya esta no es necesario crear un aleatorio nuevo, y hay que reutilizar el
-		// existente.
-		byte[] randomDummyData = this.preResult.getRandomDummyData(data);
-		if (randomDummyData == null) {
-
-			// Creamos el PKCS#1 falso
-			randomDummyData = new byte[p1Size.intValue()];
-			RANDOM.nextBytes(randomDummyData);
-
-			// Guardamos el par de PKCS#1 falso y datos a firmar
-			this.preResult.addSign(data, randomDummyData);
+		// Calculamos un valor que sera siempre el mismo para los mismos datos y de las dimensiones que
+		// corresponden a un PKCS#1 del tamano de clave del certificado utilizado 
+		final byte[] sha512;
+		try {
+			sha512 = MessageDigest.getInstance(MD_ALGORITHM).digest(data);
 		}
+		catch (final Exception e) {
+			throw new AOException("Ocurrio un error al generar el PKCS#1 temporal de los datos", e); //$NON-NLS-1$
+		}
+		final byte[] dummyData = new byte[p1Size.intValue()];
+		for (int i = 0; i < dummyData.length; i += sha512.length) {
+			System.arraycopy(sha512, 0, dummyData, i, sha512.length);
+		}
+		
+		// Guardamos el par de PKCS#1 falso y datos a firmar
+		this.preResult.addSign(data, dummyData);
 
-		return randomDummyData;
+		return dummyData;
 	}
-
 }

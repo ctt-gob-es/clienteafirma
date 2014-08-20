@@ -18,6 +18,7 @@ import java.net.URL;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
+import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
 
@@ -26,10 +27,12 @@ import es.gob.afirma.core.AOInvalidFormatException;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.UrlHttpManager;
 import es.gob.afirma.core.misc.UrlHttpManagerFactory;
+import es.gob.afirma.core.signers.AOPkcs1Signer;
 import es.gob.afirma.core.signers.AOSignInfo;
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.util.tree.AOTreeModel;
+import es.gob.afirma.signers.cadestri.client.CounterSignData.SingleCounterSignData;
 
 /** Firmador CAdES en tres fases.
  * @author Tom&acute;s Garc&iacute;a-Mer&aacute;s */
@@ -105,7 +108,7 @@ public final class AOCAdESTriPhaseSigner implements AOSigner {
 
 		extraParams.setProperty(PROPERTY_NAME_CS_TARGET, targetType.toString());
 
-		return triPhaseOperation(CRYPTO_OPERATION_COUNTERSIGN, sign, algorithm, key, certChain, extraParams);
+		return counterSignOperation(sign, algorithm, key, certChain, extraParams);
 	}
 
 	/** {@inheritDoc} */
@@ -188,14 +191,8 @@ public final class AOCAdESTriPhaseSigner implements AOSigner {
 		//TODO: Retirar del extraParams la URL del servidor de firma sin mutar los parametros de entrada
 
 		// Decodificamos el identificador del documento
-		final String documentId;
-		try {
-			documentId = Base64.encode(data, true);
-		}
-		catch (final IOException e) {
-			throw new IllegalArgumentException("Error al interpretar los datos como identificador del documento que desea firmar", e); //$NON-NLS-1$
-		}
-
+		final String documentId = Base64.encode(data, true);
+		
 		final UrlHttpManager urlManager = UrlHttpManagerFactory.getInstalledManager();
 
 		// ---------
@@ -282,6 +279,124 @@ public final class AOCAdESTriPhaseSigner implements AOSigner {
 			throw new AOException("El resultado devuelto por el servidor no es correcto", e); //$NON-NLS-1$
 		}
 	}
+	
+	private static byte[] counterSignOperation(
+			                                final byte[] data,
+			                                final String algorithm,
+			                                final PrivateKey key,
+			                                final Certificate[] certChain,
+			                                final Properties extraParams) throws AOException {
+		if (extraParams == null) {
+			throw new IllegalArgumentException("Se necesitan parametros adicionales"); //$NON-NLS-1$
+		}
+		if (key == null) {
+			throw new IllegalArgumentException("Es necesario proporcionar la clave privada de firma"); //$NON-NLS-1$
+		}
+		if (certChain == null || certChain.length == 0) {
+			throw new IllegalArgumentException("Es necesario proporcionar el certificado de firma"); //$NON-NLS-1$
+		}
+		if (data == null) {
+			throw new IllegalArgumentException("No se ha proporcionado el identificador de documento a firmar"); //$NON-NLS-1$
+		}
 
+		// Comprobamos la direccion del servidor
+		final URL signServerUrl;
+		try {
+			signServerUrl = new URL(extraParams.getProperty(PROPERTY_NAME_SIGN_SERVER_URL));
+		}
+		catch (final Exception e) {
+			throw new IllegalArgumentException("No se ha proporcionado una URL valida para el servidor de firma: " + extraParams.getProperty(PROPERTY_NAME_SIGN_SERVER_URL), e); //$NON-NLS-1$
+		}
 
+		//TODO: Retirar del extraParams la URL del servidor de firma sin mutar los parametros de entrada
+
+		// Decodificamos el identificador del documento
+		final String documentId = Base64.encode(data, true);
+		
+		final UrlHttpManager urlManager = UrlHttpManagerFactory.getInstalledManager();
+
+		// ---------
+		// PREFIRMA
+		// ---------
+
+		// Empezamos la prefirma
+		final byte[] preSignResult;
+		try {
+			preSignResult = PreSigner.preSign(algorithm, certChain, CRYPTO_OPERATION_COUNTERSIGN, documentId, urlManager, signServerUrl, extraParams);
+		}
+		catch (final CertificateEncodingException e) {
+			throw new AOException("Error decodificando el certificado del firmante: " + e, e); //$NON-NLS-1$
+		}
+		catch (final IOException e) {
+			throw new AOException("Error en la llamada de prefirma al servidor: " + e, e); //$NON-NLS-1$
+		}
+
+		// ----------
+		// FIRMA
+		// ----------
+
+		final CounterSignData csd;
+		try {
+			csd = CounterSignData.parse(Base64.decode(preSignResult, 0, preSignResult.length, true));
+		} catch (Exception e) {
+			throw new AOException("El valor de prefirma para la operacion de contrafirma CAdES no es valido", e); //$NON-NLS-1$
+		}
+
+		List<SingleCounterSignData> scss = csd.getCounterSigns();
+		for (int i = 0; i < scss.size(); i++) {
+			final SingleCounterSignData scs = scss.get(i);
+			final byte[] pkcs1sign = new AOPkcs1Signer().sign(
+					scs.getData(),
+					algorithm,
+					key,
+					certChain,
+					null // No hay parametros en PKCS#1
+				);
+			scs.setData(pkcs1sign);
+		}
+		
+		final String preResultAsBase64 = Base64.encode(csd.toString().getBytes(), true);
+		
+		// ---------
+		// POSTFIRMA
+		// ---------
+
+		final byte[] triSignFinalResult;
+		try {
+			triSignFinalResult = PostSigner.postSign(
+				algorithm,
+				certChain,
+				CRYPTO_OPERATION_COUNTERSIGN,
+				documentId,
+				extraParams,
+				true,
+				urlManager,
+				signServerUrl,
+				preResultAsBase64
+			);
+		}
+		catch (final CertificateEncodingException e1) {
+			throw new AOException(
+				"Error en el tratamiento del certificado del firmante en la postfirma: " + e1, e1 //$NON-NLS-1$
+			);
+		}
+		catch (final IOException e1) {
+			throw new AOException("Error en la postfirma: " + e1, e1); //$NON-NLS-1$
+		}
+
+		// Analizamos la respuesta del servidor
+		final String stringTrimmedResult = new String(triSignFinalResult).trim();
+		if (!stringTrimmedResult.startsWith(SUCCESS)) {
+			throw new AOException("La firma trifasica no ha finalizado correctamente: " + new String(triSignFinalResult)); //$NON-NLS-1$
+		}
+
+		// Los datos no se devuelven, se quedan en el servidor
+		try {
+			return Base64.decode(stringTrimmedResult.substring((SUCCESS + " NEWID=").length()), true); //$NON-NLS-1$
+		}
+		catch (final IOException e) {
+			LOGGER.warning("El resultado de NEWID del servidor no estaba en Base64: " + e); //$NON-NLS-1$
+			throw new AOException("El resultado devuelto por el servidor no es correcto", e); //$NON-NLS-1$
+		}
+	}
 }

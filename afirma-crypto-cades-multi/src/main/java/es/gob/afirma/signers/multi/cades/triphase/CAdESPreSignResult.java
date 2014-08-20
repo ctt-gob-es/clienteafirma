@@ -83,7 +83,7 @@ public final class CAdESPreSignResult {
 	/** Obtiene los datos que deben sustituirse por una firma PKCS#1 real.
 	 * @param data Datos a firmar con PKCS#1.
 	 * @return Datos que deben sustituirse por una firma PKCS#1 real. */
-	public byte[] getRandomDummyData(final byte[] data) {
+	public byte[] getDummyData(final byte[] data) {
 		return this.tbs.get(data);
 	}
 

@@ -86,7 +86,6 @@ public final class SignatureService extends HttpServlet {
 	private static final String PARAMETER_VALUE_SUB_OPERATION_COUNTERSIGN = "countersign"; //$NON-NLS-1$
 
 	// Parametros que necesitamos para la prefirma
-	private static final String PARAMETER_NAME_NEED_DATA = "nd"; //$NON-NLS-1$
 	private static final String PARAMETER_NAME_DOCID = "doc"; //$NON-NLS-1$
 	private static final String PARAMETER_NAME_ALGORITHM = "algo"; //$NON-NLS-1$
 	private static final String PARAMETER_NAME_FORMAT = "format"; //$NON-NLS-1$
@@ -172,32 +171,16 @@ public final class SignatureService extends HttpServlet {
 			}
 
 			// Obtenemos los parametros adicionales para la firma
-			final Properties sessionData = new Properties();
+			byte[] sessionData = null;
 			try {
 				if (parameters.containsKey(PARAMETER_NAME_SESSION_DATA)) {
-					sessionData.load(
-						new ByteArrayInputStream(
-							Base64.decode(parameters.get(PARAMETER_NAME_SESSION_DATA).trim(), true)
-						)
-					);
+					sessionData = Base64.decode(parameters.get(PARAMETER_NAME_SESSION_DATA).trim(), true);
 				}
 			}
 			catch (final Exception e) {
 				LOGGER.severe("El formato de los datos de sesion suministrados es erroneo: "  + e); //$NON-NLS-1$
 				out.print(ErrorManager.getErrorMessage(6) + ": " + e); //$NON-NLS-1$
 				return;
-			}
-
-			// Comprobamos que los datos sean necesarios para la operacion y, en caso afirmativo, que se hayan proporcionado
-			byte[] docBytes = null;
-			final String docId = parameters.get(PARAMETER_NAME_DOCID);
-			final String needData = sessionData.getProperty(PARAMETER_NAME_NEED_DATA);
-			if (needData != null && Boolean.parseBoolean(needData)) {
-				if (docId == null) {
-					LOGGER.warning("No se han indicado datos ni identificador para la obtencion del documento"); //$NON-NLS-1$
-					out.print(ErrorManager.getErrorMessage(2));
-					return;
-				}
 			}
 
 			// Obtenemos el certificado
@@ -219,6 +202,9 @@ public final class SignatureService extends HttpServlet {
 				return;
 			}
 
+			
+			byte[] docBytes = null;
+			final String docId = parameters.get(PARAMETER_NAME_DOCID);
 			if (docId != null) {
 				try {
 					docBytes = DOC_MANAGER.getDocument(docId, signerCert, extraParams);
@@ -323,7 +309,16 @@ public final class SignatureService extends HttpServlet {
 						signedDoc = prep.preProcessPostCoSign(docBytes, algorithm, signerCert, extraParams, sessionData);
 					}
 					else if (PARAMETER_VALUE_SUB_OPERATION_COUNTERSIGN.equals(subOperation)) {
-						signedDoc = prep.preProcessPostCounterSign(docBytes, algorithm, signerCert, extraParams, sessionData, null);
+						
+						CounterSignTarget target = CounterSignTarget.LEAFS;
+						if (extraParams.containsKey(PARAMETER_NAME_TARGET_TYPE)) {
+							final String targetValue = extraParams.getProperty(PARAMETER_NAME_TARGET_TYPE).trim();
+							if (CounterSignTarget.TREE.toString().equalsIgnoreCase(targetValue)) {
+								target = CounterSignTarget.TREE;
+							}
+						}
+						
+						signedDoc = prep.preProcessPostCounterSign(docBytes, algorithm, signerCert, extraParams, sessionData, target);
 					}
 					else {
 						throw new AOException("No se reconoce el codigo de sub-operacion: " + subOperation); //$NON-NLS-1$

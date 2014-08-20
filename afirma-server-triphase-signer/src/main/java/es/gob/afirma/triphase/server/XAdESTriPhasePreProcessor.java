@@ -176,11 +176,20 @@ final class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 			final String algorithm,
 			final X509Certificate cert,
 			final Properties extraParams,
-			final Properties sessionData) throws NoSuchAlgorithmException,
+			final byte[] session) throws NoSuchAlgorithmException,
 			AOException, IOException {
 
 		LOGGER.info("Postfirma XAdES - Firma - INICIO"); //$NON-NLS-1$
 
+		final Properties sessionData = new Properties();
+		try {
+			sessionData.load(new ByteArrayInputStream(session));
+		}
+		catch (final Exception e) {
+			LOGGER.severe("El formato de los datos de sesion suministrados es erroneo: "  + e); //$NON-NLS-1$
+			throw new IllegalArgumentException("El formato de los datos de sesion suministrados es erroneo", e); //$NON-NLS-1$
+		}
+		
 		final byte[] signature = preProcessPost(sessionData);
 
 		LOGGER.info("Postfirma XAdES - Firma - FIN"); //$NON-NLS-1$
@@ -193,11 +202,20 @@ final class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 			final String algorithm,
 			final X509Certificate cert,
 			final Properties extraParams,
-			final Properties sessionData) throws NoSuchAlgorithmException,
+			final byte[] session) throws NoSuchAlgorithmException,
 			AOException, IOException {
 
 		LOGGER.info("Postfirma XAdES - Cofirma - INICIO"); //$NON-NLS-1$
 
+		final Properties sessionData = new Properties();
+		try {
+			sessionData.load(new ByteArrayInputStream(session));
+		}
+		catch (final Exception e) {
+			LOGGER.severe("El formato de los datos de sesion suministrados es erroneo: "  + e); //$NON-NLS-1$
+			throw new IllegalArgumentException("El formato de los datos de sesion suministrados es erroneo", e); //$NON-NLS-1$
+		}
+		
 		final byte[] signature = preProcessPost(sessionData);
 
 		LOGGER.info("Postfirma XAdES - Cofirma - FIN"); //$NON-NLS-1$
@@ -208,15 +226,18 @@ final class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 
 	@Override
 	public byte[] preProcessPostCounterSign(final byte[] sign, final String algorithm,
-			final X509Certificate cert, final Properties extraParams, final Object session,
+			final X509Certificate cert, final Properties extraParams, final byte[] session,
 			final CounterSignTarget targets) throws NoSuchAlgorithmException,
 			AOException, IOException {
 
-		if (!(session instanceof Properties)) {
-			throw new IllegalArgumentException("La sesion debe ser no nula y de tipo Properties"); //$NON-NLS-1$
+		final Properties sessionData = new Properties();
+		try {
+			sessionData.load(new ByteArrayInputStream(session));
 		}
-
-		final Properties sessionData = (Properties) session;
+		catch (final Exception e) {
+			LOGGER.severe("El formato de los datos de sesion suministrados es erroneo: "  + e); //$NON-NLS-1$
+			throw new IllegalArgumentException("El formato de los datos de sesion suministrados es erroneo", e); //$NON-NLS-1$
+		}
 
 		LOGGER.info("Postfirma XAdES - Contrafirma - INICIO"); //$NON-NLS-1$
 
@@ -324,11 +345,11 @@ final class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 				}
 			}
 		} finally {
-			LOGGER.severe("Datos de sesion contenidos:"); //$NON-NLS-1$
+			LOGGER.fine("Datos de sesion contenidos:"); //$NON-NLS-1$
 			for (final String key : sessionData.keySet().toArray(new String[sessionData.size()])) {
-				LOGGER.severe(key);
+				LOGGER.fine(key);
 			}
-			LOGGER.severe("---------------------------"); //$NON-NLS-1$
+			LOGGER.fine("---------------------------"); //$NON-NLS-1$
 		}
 	}
 }

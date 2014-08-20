@@ -297,14 +297,8 @@ public final class AOXAdESTriPhaseSigner implements AOSigner {
 		//TODO: Retirar del extraParams la URL del servidor de firma sin mutar los parametros de entrada
 
 		// Decodificamos el identificador del documento
-		final String documentId;
-		try {
-			documentId = Base64.encode(data, true);
-		}
-		catch (final IOException e) {
-			throw new IllegalArgumentException("Error al interpretar los datos como identificador del documento que desea firmar", e); //$NON-NLS-1$
-		}
-
+		final String documentId = Base64.encode(data, true);
+		
 		final UrlHttpManager urlManager = UrlHttpManagerFactory.getInstalledManager();
 
 		// ---------

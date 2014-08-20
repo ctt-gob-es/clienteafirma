@@ -48,18 +48,20 @@ public final class AOCAdESTriPhaseCounterSigner {
 
 		final CAdESPreSignResult cpcs = new CAdESPreSignResult();
 		final AOCAdESCounterSigner countersigner = new AOCAdESCounterSigner(new CAdESFakePkcs1Signer(cpcs), date);
+
+		// No queremos la contrafirma sino los PKCS#1 generados
 		countersigner.countersign(
 			sign,
-			algorithm,
+			algorithm,	
 			targetType,
 			targets,
 			null,
 			cChain,
 			xParams
 		);
+
 		cpcs.addSignDate(date);
 
 		return cpcs.toString();
     }
-
 }

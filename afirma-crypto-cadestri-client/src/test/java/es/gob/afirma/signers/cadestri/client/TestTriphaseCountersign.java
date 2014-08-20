@@ -121,7 +121,6 @@ public class TestTriphaseCountersign {
 	/** Prueba de contrafirma de todo el &aacute;rbol de firmas de una firma impl&iacute;cita.
 	 * @throws Exception Cuando se produce un error. */
 	@Test
-	@Ignore
 	public void prueba_contrafirma_de_arbol_de_firma_implicita() throws Exception {
 
 		final InputStream is = getClass().getClassLoader().getResourceAsStream(IMPLICIT_SHA1_COUNTERSIGN_FILE);

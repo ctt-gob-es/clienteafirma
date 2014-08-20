@@ -1,5 +1,6 @@
 package es.gob.afirma.triphase.server;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -149,10 +150,19 @@ final class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 			final String algorithm,
 			final X509Certificate cert,
 			final Properties extraParams,
-			final Properties sessionData) throws NoSuchAlgorithmException, AOException, IOException {
+			final byte[] session) throws NoSuchAlgorithmException, AOException, IOException {
 
 		LOGGER.info("Postfirma CAdES - Firma - INICIO"); //$NON-NLS-1$
 
+		final Properties sessionData = new Properties();
+		try {
+			sessionData.load(new ByteArrayInputStream(session));
+		}
+		catch (final Exception e) {
+			LOGGER.severe("El formato de los datos de sesion suministrados es erroneo: "  + e); //$NON-NLS-1$
+			throw new IllegalArgumentException("El formato de los datos de sesion suministrados es erroneo", e); //$NON-NLS-1$
+		}
+		
 		checkSessionProperties(sessionData, false);
 
 		boolean omitContent = false;
@@ -265,10 +275,19 @@ final class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 			final String algorithm,
 			final X509Certificate cert,
 			final Properties extraParams,
-			final Properties sessionData) throws NoSuchAlgorithmException, AOException, IOException {
+			final byte[] session) throws NoSuchAlgorithmException, AOException, IOException {
 
 		LOGGER.info("Postfirma CAdES - Cofirma - INICIO"); //$NON-NLS-1$
 
+		final Properties sessionData = new Properties();
+		try {
+			sessionData.load(new ByteArrayInputStream(session));
+		}
+		catch (final Exception e) {
+			LOGGER.severe("El formato de los datos de sesion suministrados es erroneo: "  + e); //$NON-NLS-1$
+			throw new IllegalArgumentException("El formato de los datos de sesion suministrados es erroneo", e); //$NON-NLS-1$
+		}
+		
 		checkSessionProperties(sessionData, false);
 
 		byte[] messageDigest = null;
@@ -317,18 +336,15 @@ final class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 
 		LOGGER.info("Prefirma CAdES - Contrafirma - INICIO"); //$NON-NLS-1$
 
-		LOGGER.info("Se invocan las funciones internas de pre-contrafirma CAdES"); //$NON-NLS-1$
-
 		return AOCAdESTriPhaseCounterSigner.preCountersign(
-			sign,
-			algorithm,
-			targetType,
-			null,
-			new X509Certificate[] { cert },
-			extraParams,
-			new Date()
-		).getBytes();
-
+				sign,
+				algorithm,
+				targetType,
+				null,
+				new X509Certificate[] { cert },
+				extraParams,
+				new Date()
+			).getBytes();		
 	}
 
 	@Override
@@ -336,26 +352,32 @@ final class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 			                                final String algorithm,
 			                                final X509Certificate cert,
 			                                final Properties extraParams,
-			                                final Object session,
+			                                final byte[] session,
 			                                final CounterSignTarget targets) throws NoSuchAlgorithmException,
 			                                                                        AOException,
 			                                                                        IOException {
 
+		LOGGER.info("Postfirma CAdES - Contrafirma - INICIO"); //$NON-NLS-1$
+
 		if (session == null) {
 			throw new IllegalArgumentException("Los datos de prefirma no pueden ser nulos"); //$NON-NLS-1$
 		}
-		if (!(session instanceof PreSignData)) {
+
+		final PreSignData psd;
+		try {
+			psd = PreSignData.getInstance(session);
+		}
+		catch (final Exception e) {
 			throw new IllegalArgumentException(
-				"Los datos de prefirma deben ser de tipo 'PreSignData', pero son de tipo " + session.getClass().getName() //$NON-NLS-1$
+				"Los datos de sesion no son interpretables como la informacion de prefirma", e //$NON-NLS-1$
 			);
 		}
 
-		final PreSignData psd = (PreSignData) session;
 		final Date date = psd.getSignDate();
 
 		// Recreamos la firma
 		final CAdESPreSignResult cpcs = new CAdESPreSignResult();
-		final byte[] newSign = new AOCAdESCounterSigner(new CAdESFakePkcs1Signer(cpcs), date).countersign(
+		byte[] newSign = new AOCAdESCounterSigner(new CAdESFakePkcs1Signer(cpcs), date).countersign(
 			sign,
 			algorithm,
 			targets,
@@ -369,22 +391,18 @@ final class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 		// valores reales para insertarlo, teniendo en cuenta que en esta contrafirma y
 		// en la sesion se comparte el valor de los datos que se firman con PKCS#1
 
-		final List<SinglePreSignData> psds = psd.getPreSigns();
-		for (final SinglePreSignData sessionData : psds) {
-
-			// Los datos que se han firmado con PKCS#1
-			final byte[] signedData = sessionData.getData();
+		final List<SinglePreSignData> spsds = psd.getPreSigns();
+		for (final SinglePreSignData spsd : spsds) {
 
 			// Los datos que hay que sustituir en la firma recien creada
-			final byte[] dataToReplace = cpcs.getRandomDummyData(signedData);
+			final byte[] dataToReplace = spsd.getDummyData();
 
 			// La firma real PKCS#1
-			final byte[] pkcs1Sign = sessionData.getProcessedData();
+			final byte[] pkcs1Sign = spsd.getData();
 
 			// Reemplazamos
-			searchAndReplace(newSign, dataToReplace, pkcs1Sign);
+			newSign = searchAndReplace(newSign, dataToReplace, pkcs1Sign);
 		}
-
 
 		return newSign;
 	}
@@ -398,10 +416,14 @@ final class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 			throw new IllegalArgumentException("No se ha encontrado la cadena a sustituir"); //$NON-NLS-1$
 		}
 		final byte[] result = Arrays.copyOf(source, source.length);
+		
+		
+		
 		for (final byte element : replace) {
 			result[p] = element;
 			p++;
 		}
+		
 		return result;
 	}
 
@@ -410,9 +432,11 @@ final class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 			return -1;
 		}
 		final int p = new String(array).indexOf(new String(subArray));
-		for (int i = 1; i < subArray.length; i++) {
-			if (array[p + i] != subArray[i]) {
-				return -1;
+		if (p != -1) {
+			for (int i = 1; i < subArray.length; i++) {
+				if (array[p + i] != subArray[i]) {
+					return -1;
+				}
 			}
 		}
 		return p;
@@ -463,11 +487,11 @@ final class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 				}
 			}
 		} finally {
-			LOGGER.severe("Datos de sesion contenidos:"); //$NON-NLS-1$
+			LOGGER.fine("Datos de sesion contenidos:"); //$NON-NLS-1$
 			for (final String key : sessionData.keySet().toArray(new String[sessionData.size()])) {
-				LOGGER.severe(key);
+				LOGGER.fine(key);
 			}
-			LOGGER.severe("---------------------------"); //$NON-NLS-1$
+			LOGGER.fine("---------------------------"); //$NON-NLS-1$
 		}
 	}
 }

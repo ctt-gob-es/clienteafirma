@@ -19,23 +19,23 @@ import es.gob.afirma.core.misc.Base64;
 /** Datos de prefirma trif&aacute;sica CAdES. */
 public final class PreSignData {
 
-	private Date original = null;
+	private Date signDate = null;
 
-	private final List<SinglePreSignData> counterSigns;
+	private final List<SinglePreSignData> preSigns;
 
 	private PreSignData(final long dateMilis) {
-		this.original = new Date(dateMilis);
-		this.counterSigns = new ArrayList<PreSignData.SinglePreSignData>();
+		this.signDate = new Date(dateMilis);
+		this.preSigns = new ArrayList<PreSignData.SinglePreSignData>();
 	}
 
 	private void addCounterSigns(final SinglePreSignData cs) {
-		this.counterSigns.add(cs);
+		this.preSigns.add(cs);
 	}
 
 	/** Obtiene la fecha de la firma.
 	 * @return Fecha de la firma, que es est&aacute;tica y no var&iacute;a en todo el proceso. */
 	public Date getSignDate() {
-		return this.original;
+		return this.signDate;
 	}
 
 	/** Obtiene las prefirmas, que consisten en los datos a firmar como PKCS#1
@@ -43,7 +43,7 @@ public final class PreSignData {
 	 * seg&uacute;n la fase de la firma.
 	 * @return Prefirmas. */
 	public List<SinglePreSignData> getPreSigns() {
-		return this.counterSigns;
+		return this.preSigns;
 	}
 
 	/** Obtiene la informaci&oacute;n de una operaci&oacute;n de firma CAdES trif&aacute;sica
@@ -152,7 +152,7 @@ public final class PreSignData {
 		/** Obtiene los datos aletorios que deben sustituirse por las firmas finales o las firmas
 		 * PKCS#1 finales, seg&uacute;n la fase de la firma.
 		 * @return Datos aletorios que deben sustituirse por las firmas finales o la propia firma PKCS#1. */
-		public byte[] getProcessedData() {
+		public byte[] getDummyData() {
 			return this.dummyData.clone();
 		}
 	}
