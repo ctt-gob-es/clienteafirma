@@ -25,6 +25,7 @@
 	<!--
 		/* Indica si debe firmarse un fichero (true) o el formulario de la pagina (false) */ 
 		var firmarFichero = true;
+		var firmarDatosGenerados = true;
 	
 		function firmar(){
 			var divMensaje = document.getElementById('divmensaje');
@@ -33,19 +34,29 @@
 			divFirma.innerHTML='';
 			
 			var params = 	"mode=explicit\n" +
-							//"serverUrl=https://valide.redsara.es/firmaMovil/TriPhaseSignerServer/SignatureService";
-			"serverUrl=http://192.168.137.204:8080/afirma-server-triphase-signer/SignatureService";
+							"serverUrl=https://valide.redsara.es/firmaMovil/TriPhaseSignerServer/SignatureService";
+							//"serverUrl=http://192.168.176.196:8080/afirma-server-triphase-signer/SignatureService";
 
-			
 			var dataB64 = null;
-			if (!firmarFichero) {
+			
+			if (firmarDatosGenerados) {
+				// Generamos una cadena de mas de 100.000 caracteres
+				var data = "1234567890";
+				for (var i = 0; i < 13; i++) {
+					data += data;
+				}
+				dataB64 = MiniApplet.getBase64FromText(data);
+			}
+			else if (!firmarFichero) {
 				var serializedForm = "fNif=" + encodeURIComponent(document.getElementById("fNif").value) + "&" +
 					"fNombre=" + encodeURIComponent(document.getElementById("fNombre").value);
 				dataB64 = MiniApplet.getBase64FromText(serializedForm);
 			}
-			
+
+			var format = document.getElementById("fFormat").value;
+
 			try {
-				MiniApplet.sign(dataB64, "SHA1withRSA", "CAdES", params, successCallback, errorCallback);
+				MiniApplet.sign(dataB64, "SHA1withRSA", format, params, successCallback, errorCallback);
 			}
 			catch (excep) {
 				//Se puede recuperar el mensaje de error y pintarlo en la pantalla
@@ -62,7 +73,7 @@
 			
 			var divFirma = document.getElementById('divfirma');
 			var content = '<br><textarea id="firmaB64" cols="76" rows="6">' + signatureB64 + '</textarea><br>';
-			if (!MiniApplet.isIOS() && !MiniApplet.isWindows8()) {
+			if (!MiniApplet.isIOS() && !MiniApplet.isWindowsRT() && !MiniApplet.isWindows8ModernUI()) {
 				content += '<br><div class="botoneraCentro">' +
 					'<input class="botonM marginR15" id="botonGuardar" value="Guardar datos" onclick="javascript:guardar();" type="button">' +
 					'</div><br>';
@@ -85,21 +96,35 @@
 			document.getElementById("cargandoApplet").style.display = "none";
 			document.getElementById("pantalla").style.display = "block";
 			
-			if (MiniApplet.isIOS()) {
-				document.getElementById("punto2Label").style.display = "none";
-				document.getElementById("punto2LabelAltIOS").style.display = "block";
+			if (MiniApplet.isIOS() || MiniApplet.isWindowsRT() || MiniApplet.isWindows8ModernUI()) {
+				document.getElementById("punto3Label").style.display = "none";
+				document.getElementById("punto3LabelAltIOS").style.display = "block";
 				document.getElementById("seleccionTarget").style.display = "none";
 				document.getElementById("formulario").style.display = "block";
 				firmarFichero = false;
+			}
+			
+			if (MiniApplet.isIOS()) {
+				document.getElementById("afirmaStoreLink").href="https://itunes.apple.com/es/app/cliente-firma-movil/id627410001?mt=8&uo=4";
+			}
+			
+			if (MiniApplet.isWindowsRT() || MiniApplet.isWindows8ModernUI()) {
+				document.getElementById("afirmaStoreLink").href="http://windows.microsoft.com/es-es/windows-8/apps";
 			}
 		}
 		
 		function mostrarFormulario(form) {
 			if (form == "fileData") {
 				firmarFichero = true;
+				firmarDatosGenerados = false;
+				document.getElementById("formulario").style.display = "none";
+			} else if (form == "generatedData") {
+				firmarFichero = false;
+				firmarDatosGenerados = true;
 				document.getElementById("formulario").style.display = "none";
 			} else {
 				firmarFichero = false;
+				firmarDatosGenerados = false;
 				document.getElementById("formulario").style.display = "block";
 			}
 		}
@@ -150,17 +175,32 @@
 	<p>Para realizar la firma de un formulario o un fichero localizado en su dispositivo m&oacute;vil:</p><br/>
 
 	<div class="lblAnchoMaxMB">
-			<span>1. <a href="https://play.google.com/store/apps/details?id=es.gob.afirma">Descargue el Cliente m&oacute;vil @firma</a></span>
+			<span>1. <a id="afirmaStoreLink" href="https://play.google.com/store/apps/details?id=es.gob.afirma">Descargue el Cliente m&oacute;vil @firma</a></span>
 	</div><br/>
-	<div id="punto2Label" class="lblAnchoMaxMB">
-			<span>2. Seleccione el elemento que desee firmar</span>
+	<div class="lb2AnchoMaxMB">
+			<span>2. Seleccione el formato de firma que desea utilizar</span>
+	</div>
+	<div>
+			<select id="fFormat">
+				<option value="CAdES" selected>CAdES</option>
+				<option value="CAdEStri">CAdEStri</option>
+				<option value="Adobe PDF">PAdES</option>
+				<option value="PAdEStri">PAdEStri</option>
+				<option value="XAdES">XAdES</option>
+				<option value="XAdEStri">XAdEStri</option>
+				<option value="AUTO">AUTO</option>
+			</select>
+	<div><br/>
+	<div id="punto3Label" class="lblAnchoMaxMB">
+			<span>3. Seleccione el elemento que desee firmar</span>
 	</div><br/>
-	<div id="punto2LabelAltIOS" class="lblAnchoMaxMB" style="display: none">
-			<span>2. Rellene el formulario y pulse Firmar</span>
+	<div id="punto3LabelAltIOS" class="lblAnchoMaxMB" style="display: none">
+			<span>3. Rellene el formulario y pulse Firmar</span>
 	</div><br/>
 	<div style="margin-left:20px;">
 		<div id="seleccionTarget" >
 			<input name="formTarget" value="fileData" onclick="javascript:mostrarFormulario(this.value);" type="radio" checked="checked" />Fichero<br>
+			<input name="formTarget" value="generatedData" onclick="javascript:mostrarFormulario(this.value);" type="radio" />Datos generados<br>
 			<input name="formTarget" value="formData" onclick="javascript:mostrarFormulario(this.value);" type="radio" />Formulario<br>
 		</div><br/>
 		<div id="formulario" style="display:none">
@@ -216,8 +256,11 @@ la Administración Electrónica por su seguridad.
 	</div> <!-- FIN DE CONTENEDOR -->
 	
 	<script type="text/javascript">
-		MiniApplet.cargarMiniApplet('http://192.168.137.204:8080/afirma-ui-miniapplet-deploy');
-		MiniApplet.setServlets("http://192.168.137.204:8080/afirma-signature-storage/StorageService", "http://192.168.137.204:8080/afirma-signature-retriever/RetrieveService");
+		MiniApplet.cargarMiniApplet('https://valide.redsara.es/firmaMovil');
+		MiniApplet.setServlets("https://valide.redsara.es/firmaMovil/SignatureStorageServer/StorageService", "https://valide.redsara.es/firmaMovil/SignatureRetrieverServer/RetrieveService");
+		//MiniApplet.cargarMiniApplet('http://192.168.176.196:8080/afirma-ui-miniapplet-deploy');
+		//MiniApplet.setServlets("http://192.168.176.196:8080/afirma-signature-storage/StorageService", "http://192.168.176.196:8080/afirma-signature-retriever/RetrieveService");
+		
 	</script>
 	
 </body></html>
