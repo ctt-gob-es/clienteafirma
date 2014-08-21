@@ -32,6 +32,7 @@ import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.ASN1Set;
 import org.bouncycastle.asn1.BEROctetString;
+import org.bouncycastle.asn1.DERObjectIdentifier;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERPrintableString;
 import org.bouncycastle.asn1.DERSet;
@@ -260,7 +261,7 @@ final class GenSignedData {
     		new Attribute(
 				CMSAttributes.contentType,
 				new DERSet(
-					ASN1ObjectIdentifier.getInstance(dataType)
+						DERObjectIdentifier.getInstance(new ASN1ObjectIdentifier(dataType))
 				)
 			)
 		);

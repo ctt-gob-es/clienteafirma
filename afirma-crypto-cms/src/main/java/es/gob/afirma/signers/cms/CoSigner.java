@@ -37,6 +37,7 @@ import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1Set;
 import org.bouncycastle.asn1.ASN1TaggedObject;
 import org.bouncycastle.asn1.BEROctetString;
+import org.bouncycastle.asn1.DERObjectIdentifier;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERPrintableString;
 import org.bouncycastle.asn1.DERSet;
@@ -442,7 +443,7 @@ final class CoSigner {
     		new Attribute(
 				CMSAttributes.contentType,
 				new DERSet(
-					ASN1ObjectIdentifier.getInstance(dataType)
+					DERObjectIdentifier.getInstance(new ASN1ObjectIdentifier(dataType))
 				)
 			)
 		);
@@ -500,7 +501,7 @@ final class CoSigner {
     		new Attribute(
 				CMSAttributes.contentType,
 				new DERSet(
-					ASN1ObjectIdentifier.getInstance(dataType)
+					DERObjectIdentifier.getInstance(new ASN1ObjectIdentifier(dataType))
 				)
 			)
 		);
