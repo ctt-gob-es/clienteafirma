@@ -602,8 +602,8 @@ final class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
                 Toolkit.getDefaultToolkit().beep();
             }
         }
-        catch (final Exception e) {
-            LOGGER.severe(e.toString());
+        catch (final Throwable e) {
+            LOGGER.severe("Error durante la operacion de firma: " + e.toString()); //$NON-NLS-1$
             resultadoFirma = false;
         }
 

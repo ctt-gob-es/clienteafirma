@@ -428,7 +428,8 @@ final class PanelCofirma extends JAccessibilityDialogWizard {
 		    try {
 		        coSignedData = cosignOperation(signer, data, sign, keyEntry, ficheroDatos);
 		    } catch (final AOException e) {
-		        logger.severe(e.toString());
+		        logger.severe("Error en la cofirma: " + e.toString()); //$NON-NLS-1$
+		        e.printStackTrace();
 		        CustomDialog.showMessageDialog(this, true, Messages.getString("Wizard.multifirma.simple.cofirma.error"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
 		        return false;
 		    }

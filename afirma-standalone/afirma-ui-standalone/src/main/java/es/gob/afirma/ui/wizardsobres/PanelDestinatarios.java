@@ -155,7 +155,7 @@ final class PanelDestinatarios extends JAccessibilityDialogWizard {
             return;
         }
         catch (final IOException e) {
-            // Control de la excepcon generada al introducir mal la contrasena para el almacen
+            // Control de la excepcion generada al introducir mal la contrasena para el almacen
             CustomDialog.showMessageDialog(this,
                                            true,
                                            Messages.getString("Wizard.sobres.error.almacen.contrasenia"), //$NON-NLS-1$
