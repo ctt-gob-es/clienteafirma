@@ -39,13 +39,15 @@ public final class SignatureService extends HttpServlet {
 
 	static {
 		final Properties prop;
-		try (final InputStream configIs = SignatureService.class.getClassLoader().getResourceAsStream(CONFIG_FILE)) {
+		try {
+			final InputStream configIs = SignatureService.class.getClassLoader().getResourceAsStream(CONFIG_FILE);
 			if (configIs == null) {
 				throw new RuntimeException("No se encuentra el fichero de configuracion del servicio: " + CONFIG_FILE); //$NON-NLS-1$
 			}
 
 			prop = new Properties();
 			prop.load(configIs);
+			configIs.close();
 		}
 		catch(final Exception e) {
 			throw new RuntimeException("Error en la carga del fichero de propiedades: " + e, e); //$NON-NLS-1$
@@ -110,7 +112,7 @@ public final class SignatureService extends HttpServlet {
 
 		LOGGER.info("Se realiza una peticion de firma trifasica"); //$NON-NLS-1$
 
-		final Map<String, String> parameters = new HashMap<>();
+		final Map<String, String> parameters = new HashMap<String, String>();
 		final String[] params;
 		try {
 			params = new String(AOUtil.getDataFromInputStream(request.getInputStream())).split("&"); //$NON-NLS-1$
@@ -136,12 +138,14 @@ public final class SignatureService extends HttpServlet {
 		response.setCharacterEncoding("utf-8"); //$NON-NLS-1$
 
 		// Obtenemos el codigo de operacion
-		try (final PrintWriter out = response.getWriter()) {
-
+		PrintWriter out = null;
+		try {
+			out = response.getWriter();
 			final String operation = parameters.get(PARAMETER_NAME_OPERATION);
 			if (operation == null) {
 				LOGGER.warning("No se ha indicado la operacion trifasica a realizar"); //$NON-NLS-1$
 				out.print(ErrorManager.getErrorMessage(1));
+				out.close();
 				return;
 			}
 
@@ -150,6 +154,7 @@ public final class SignatureService extends HttpServlet {
 			String subOperation = parameters.get(PARAMETER_NAME_SUB_OPERATION);
 			if (subOperation == null) {
 				out.print(ErrorManager.getErrorMessage(13));
+				out.close();
 				return;
 			}
 
@@ -167,6 +172,7 @@ public final class SignatureService extends HttpServlet {
 			catch (final Exception e) {
 				LOGGER.severe("El formato de los parametros adicionales suministrado es erroneo: " +  e); //$NON-NLS-1$
 				out.print(ErrorManager.getErrorMessage(6) + ": " + e); //$NON-NLS-1$);
+				out.close();
 				return;
 			}
 
@@ -180,6 +186,7 @@ public final class SignatureService extends HttpServlet {
 			catch (final Exception e) {
 				LOGGER.severe("El formato de los datos de sesion suministrados es erroneo: "  + e); //$NON-NLS-1$
 				out.print(ErrorManager.getErrorMessage(6) + ": " + e); //$NON-NLS-1$
+				out.close();
 				return;
 			}
 
@@ -188,6 +195,7 @@ public final class SignatureService extends HttpServlet {
 			if (cert == null) {
 				LOGGER.warning("No se ha indicado certificado de firma"); //$NON-NLS-1$
 				out.print(ErrorManager.getErrorMessage(5));
+				out.close();
 				return;
 			}
 			final X509Certificate signerCert;
@@ -199,6 +207,7 @@ public final class SignatureService extends HttpServlet {
 			catch(final Exception e) {
 				LOGGER.severe("Error al decodificar el certificado: " + e);  //$NON-NLS-1$
 				out.print(ErrorManager.getErrorMessage(7));
+				out.close();
 				return;
 			}
 
@@ -212,6 +221,7 @@ public final class SignatureService extends HttpServlet {
 					LOGGER.warning("Error al recuperar el documento: " + e); //$NON-NLS-1$
 					out.print(ErrorManager.getErrorMessage(14) + ": " + e); //$NON-NLS-1$
 					e.printStackTrace();
+					out.close();
 					return;
 				}
 			}
@@ -221,6 +231,7 @@ public final class SignatureService extends HttpServlet {
 			if (algorithm == null) {
 				LOGGER.warning("No se ha indicado algoritmo de firma"); //$NON-NLS-1$
 				out.print(ErrorManager.getErrorMessage(3));
+				out.close();
 				return;
 			}
 
@@ -230,6 +241,7 @@ public final class SignatureService extends HttpServlet {
 			if (format == null) {
 				LOGGER.warning("No se ha indicado formato de firma"); //$NON-NLS-1$
 				out.print(ErrorManager.getErrorMessage(4));
+				out.close();
 				return;
 			}
 
@@ -247,6 +259,7 @@ public final class SignatureService extends HttpServlet {
 			else {
 				LOGGER.severe("Formato de firma no soportado: " + format); //$NON-NLS-1$
 				out.print(ErrorManager.getErrorMessage(8));
+				out.close();
 				return;
 			}
 
@@ -275,6 +288,7 @@ public final class SignatureService extends HttpServlet {
 						preRes = prep.preProcessPreCounterSign(docBytes, algorithm, signerCert, extraParams, target);
 					}
 					else {
+						out.close();
 						throw new AOException("No se reconoce el codigo de sub-operacion: " + subOperation); //$NON-NLS-1$
 					}
 
@@ -293,6 +307,7 @@ public final class SignatureService extends HttpServlet {
 					LOGGER.severe("Error en la prefirma: " + e); //$NON-NLS-1$
 					e.printStackTrace();
 					out.print(ErrorManager.getErrorMessage(9) + ": " + e); //$NON-NLS-1$
+					out.close();
 					return;
 				}
 			}
@@ -321,6 +336,7 @@ public final class SignatureService extends HttpServlet {
 						signedDoc = prep.preProcessPostCounterSign(docBytes, algorithm, signerCert, extraParams, sessionData, target);
 					}
 					else {
+						out.close();
 						throw new AOException("No se reconoce el codigo de sub-operacion: " + subOperation); //$NON-NLS-1$
 					}
 				}
@@ -328,6 +344,7 @@ public final class SignatureService extends HttpServlet {
 					LOGGER.severe("Error en la postfirma: " + e); //$NON-NLS-1$
 					out.print(ErrorManager.getErrorMessage(12) + ": " + e); //$NON-NLS-1$
 					e.printStackTrace();
+					out.close();
 					return;
 				}
 
@@ -345,6 +362,7 @@ public final class SignatureService extends HttpServlet {
 					LOGGER.severe("Error al almacenar el documento: " + e); //$NON-NLS-1$
 					out.print(ErrorManager.getErrorMessage(10) + ": " + e); //$NON-NLS-1$
 					e.printStackTrace();
+					out.close();
 					return;
 				}
 
@@ -355,9 +373,14 @@ public final class SignatureService extends HttpServlet {
 			else {
 				out.println(ErrorManager.getErrorMessage(11));
 			}
+			out.close();
 		}
         catch (final Exception e) {
         	LOGGER.severe("No se pude contestar a la peticion: " + e); //$NON-NLS-1$
+        	e.printStackTrace();
+        	if (out != null) {
+        		out.close();
+        	}
         	return;
         }
 

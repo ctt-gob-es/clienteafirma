@@ -54,9 +54,27 @@ final public class FileSystemDocumentManager implements DocumentManager {
 			throw new IOException("No se puede cargar el documento"); //$NON-NLS-1$
 		}
 
-		try (final FileInputStream fis = new FileInputStream(file)) {
-			return AOUtil.getDataFromInputStream(fis);
+		byte[] data;
+		FileInputStream fis = null;
+		try {
+			fis = new FileInputStream(file);
+			data = AOUtil.getDataFromInputStream(fis);
+			fis.close();
 		}
+		catch (final IOException e) {
+			LOGGER.warning("Error en la lectura del fichero '" + file.getAbsolutePath() + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
+			if (fis != null) {
+				try {
+					fis.close();
+				}
+				catch (final IOException e2) {
+					LOGGER.warning("El fichero queda sin cerrar"); //$NON-NLS-1$
+				}
+			}
+			throw e;
+		}
+		
+		return data;
 	}
 
 	@Override
@@ -83,9 +101,25 @@ final public class FileSystemDocumentManager implements DocumentManager {
 			throw new IOException("Se ha obtenido un nombre de documento existente en el sistema de ficheros."); //$NON-NLS-1$
 		}
 
-		try (final FileOutputStream fos = new FileOutputStream(file)) {
+		FileOutputStream fos = null;
+		try {
+			fos = new FileOutputStream(file);
 			fos.write(data);
+			fos.close();
 		}
+		catch (final IOException e) {
+			LOGGER.severe("Error al almacenar los datos en el fichero '" + file.getAbsolutePath() + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
+			if (fos != null) {
+				try {
+					fos.close();
+				}
+				catch (final IOException e2) {
+					LOGGER.warning("El fichero queda sin cerrar"); //$NON-NLS-1$
+				}
+			}
+			throw e;
+		}
+		
 		LOGGER.info("Escribiendo el fichero: " + file.getAbsolutePath()); //$NON-NLS-1$
 		return Base64.encode(newId.getBytes());
 	}

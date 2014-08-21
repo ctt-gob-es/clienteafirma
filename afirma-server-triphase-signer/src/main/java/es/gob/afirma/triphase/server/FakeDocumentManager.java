@@ -25,8 +25,23 @@ final class FakeDocumentManager implements DocumentManager {
 	@Override
 	public String storeDocument(final String id, final X509Certificate cert, final byte[] data, final Properties config) throws IOException {
 		final File tempFile = File.createTempFile("fakeDocumentRetriever-" + id, ".pdf"); //$NON-NLS-1$ //$NON-NLS-2$
-		try (final FileOutputStream fos = new FileOutputStream(tempFile)) {
+		FileOutputStream fos = null;
+		try {
+			fos = new FileOutputStream(tempFile);
 			fos.write(data);
+			fos.close();
+		}
+		catch (final IOException e) {
+			LOGGER.severe("Error al almacenar los datos en el fichero '" + tempFile.getAbsolutePath() + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
+			if (fos != null) {
+				try {
+					fos.close();
+				}
+				catch (final IOException e2) {
+					LOGGER.warning("El fichero queda sin cerrar"); //$NON-NLS-1$
+				}
+			}
+			throw e;
 		}
 		LOGGER.info("Guardamos la firma generada en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
 		return "id-fake-" + id; //$NON-NLS-1$
