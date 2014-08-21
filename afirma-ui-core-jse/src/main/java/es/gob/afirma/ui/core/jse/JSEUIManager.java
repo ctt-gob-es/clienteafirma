@@ -176,9 +176,12 @@ public class JSEUIManager implements AOUIManager {
     		return showDialogMethod.invoke(csd);
     	}
     	catch (final InvocationTargetException e) {
-    		LOGGER.severe("Ocurrio un error durante la extraccion de la clave del certificado seleccionado: " + e); //$NON-NLS-1$
+    		LOGGER.severe("Ocurrio un error al extraer el certificado seleccionado: " + e); //$NON-NLS-1$
+    		if (e.getCause() instanceof RuntimeException) {
+    			throw (RuntimeException) e.getCause();
+    		}
     		throw new RuntimeException(
-				"Ocurrio un error durante la extraccion de la clave del certificado seleccionado", e //$NON-NLS-1$
+				"Ocurrio un error durante al extraer el certificado seleccionado", e.getCause() //$NON-NLS-1$
 			);
     	}
     	catch (final Exception e) {
