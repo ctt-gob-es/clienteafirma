@@ -28,6 +28,7 @@ package sun.security.mscapi;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.Method;
 import java.security.KeyStoreException;
 import java.security.KeyStoreSpi;
 import java.security.NoSuchAlgorithmException;
@@ -175,14 +176,23 @@ public abstract class KeyStoreAddressBook extends KeyStoreSpi {
         if (alias == null) {
             return null;
         }
-
-        for (final KeyEntry entry : this.entries) {
-            if (alias.equals(entry.getAlias())) {
-                final X509Certificate[] certChain = entry.getCertificateChain();
-                return certChain.clone();
-            }
+        
+        // Se usan los KeyEntry por reflexion porque se han detectado casos en los que son del
+        // tipo del almacen de windows en lugar de la libreta de direcciones
+        try {
+        	for (final Object entry : this.entries.toArray()) {
+        		final Method getAliasMethod = entry.getClass().getDeclaredMethod("getAlias"); //$NON-NLS-1$
+        		getAliasMethod.setAccessible(true);
+        		if (alias.equals(getAliasMethod.invoke(entry))) {
+        			final Method getCertificateChainMethod = entry.getClass().getDeclaredMethod("getCertificateChain"); //$NON-NLS-1$
+        			getCertificateChainMethod.setAccessible(true);
+        			return (Certificate[]) getCertificateChainMethod.invoke(entry);
+        		}
+        	}
         }
-
+        catch (final Exception e) {
+        	Logger.getLogger("es.gob.afirma").warning("Error tratando de obtener la cadena de certificacion: " + e); //$NON-NLS-1$ //$NON-NLS-2$
+        }
         return null;
     }
 
