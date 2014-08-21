@@ -203,10 +203,9 @@ public class AOKeyStoreDialog implements KeyStoreDialogManager {
 						KeyStoreMessages.getString("AOKeyStoreDialog.5"), //$NON-NLS-1$
 						AOUIFactory.YES_NO_OPTION,
 						AOUIFactory.WARNING_MESSAGE
-				) == AOUIFactory.YES_OPTION) {
-					return this.selectedAlias;
+				) != AOUIFactory.YES_OPTION) {
+					rejected = true;
 				}
-				rejected = true;
 			}
 
 			if (rejected) {
