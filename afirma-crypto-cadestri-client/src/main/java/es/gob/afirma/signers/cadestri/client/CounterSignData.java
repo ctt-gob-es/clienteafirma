@@ -2,21 +2,25 @@
 package es.gob.afirma.signers.cadestri.client;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
+import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 import es.gob.afirma.core.misc.Base64;
 
 /**
  * Datos de contrafirma trif&aacute;sica.
  */
-public class CounterSignData {
+public final class CounterSignData {
 
 	private String date = null;
 
@@ -75,9 +79,11 @@ public class CounterSignData {
 	 * del XML en donde se define.
 	 * @param xml XML con la informaci&oacute;n de la operaci&oacute;n trif&aacute;sica.
 	 * @return Informaci&oacute;n de la operaci&oacute;n.
-	 * @throws Exception Cuando ocurre un error durante la operaci&oacute;n.
+	 * @throws ParserConfigurationException Cuando no puede crearse el parser para el XML.
+	 * @throws IOException Cuando ocurre alg&uacute;n error en la lectura de los datos.
+	 * @throws SAXException Cuando el XML est&aacute; mal formado.
 	 */
-	public static CounterSignData parse(final byte[] xml) throws Exception {
+	public static CounterSignData parse(final byte[] xml) throws SAXException, IOException, ParserConfigurationException {
 
 		final ByteArrayInputStream bais = new ByteArrayInputStream(xml);
 		final Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(bais);
@@ -108,7 +114,7 @@ public class CounterSignData {
 		return csData;
 	}
 
-	private static SingleCounterSignData parseDcs(final Node dcsNode) throws Exception {
+	private static SingleCounterSignData parseDcs(final Node dcsNode) throws DOMException, IOException {
 
 		int idx;
 		final NodeList childNodes = dcsNode.getChildNodes();
@@ -161,8 +167,8 @@ public class CounterSignData {
 		private final byte[] dummyData;
 
 		public SingleCounterSignData(final byte[] d, final byte[] dd) {
-			this.data = d;
-			this.dummyData = dd;
+			this.data = d.clone();
+			this.dummyData = dd.clone();
 		}
 
 		public byte[] getData() {
@@ -174,7 +180,7 @@ public class CounterSignData {
 		}
 
 		public void setData(byte[] data) {
-			this.data = data;	
+			this.data = data.clone();
 		}
 	}
 }
