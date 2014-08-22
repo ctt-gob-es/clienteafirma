@@ -39,7 +39,7 @@ public final class AOCAdESCoSigner implements AOCoSigner {
                          final String algorithm,
                          final PrivateKey key,
                          final java.security.cert.Certificate[] certChain,
-                         final Properties xParams) throws AOException {
+                         final Properties xParams) throws AOException, IOException {
 
         final Properties extraParams = xParams != null ? xParams : new Properties();
 
@@ -81,32 +81,36 @@ public final class AOCAdESCoSigner implements AOCoSigner {
 			}
 		}
 
-        try {
-            // Si la firma que nos introducen es SignedData
-            final boolean signedData = CAdESValidator.isCAdESSignedData(sign);
-            if (signedData) {
+		// Si la firma que nos introducen es SignedData
+		if (CAdESValidator.isCAdESSignedData(sign)) {
+			try {
+				final String mode = extraParams.getProperty("mode", AOSignConstants.DEFAULT_SIGN_MODE); //$NON-NLS-1$
+				final boolean omitContent = mode.equals(AOSignConstants.SIGN_MODE_EXPLICIT) || precalculatedDigest != null;
 
-                final String mode = extraParams.getProperty("mode", AOSignConstants.DEFAULT_SIGN_MODE); //$NON-NLS-1$
-                final boolean omitContent = mode.equals(AOSignConstants.SIGN_MODE_EXPLICIT) || precalculatedDigest != null;
+				return new CAdESCoSigner().coSigner(
+						csp,
+						sign,
+						omitContent,
+						new AdESPolicy(extraParams),
+						signingCertificateV2,
+						key,
+						onlySigningCertificate ?
+								new X509Certificate[] { (X509Certificate) certChain[0] } :
+									certChain,
+									messageDigest,
+									contentTypeOid,
+									contentDescription,
+									CommitmentTypeIndicationsHelper.getCommitmentTypeIndications(extraParams),
+									CAdESSignerMetadataHelper.getCAdESSignerMetadata(extraParams)
+						);
 
-                return new CAdESCoSigner().coSigner(
-                    csp,
-                    sign,
-                    omitContent,
-                    new AdESPolicy(extraParams),
-                    signingCertificateV2,
-                    key,
-                    onlySigningCertificate ?
-                		new X509Certificate[] { (X509Certificate) certChain[0] } :
-                			certChain,
-                    messageDigest,
-                    contentTypeOid,
-                    contentDescription,
-                    CommitmentTypeIndicationsHelper.getCommitmentTypeIndications(extraParams),
-                    CAdESSignerMetadataHelper.getCAdESSignerMetadata(extraParams)
-                );
-            }
+			}
+			catch (final Exception e) {
+				throw new AOException("Error generando la Cofirma CAdES", e); //$NON-NLS-1$
+			}
+		}
 
+		try {
             return new CAdESCoSignerEnveloped().coSigner(
                  csp,
                  sign,
@@ -125,7 +129,7 @@ public final class AOCAdESCoSigner implements AOCoSigner {
 
         }
         catch (final Exception e) {
-            throw new AOException("Error generando la Cofirma CAdES", e); //$NON-NLS-1$
+            throw new AOException("Error generando la Cofirma CAdES. La firma no es una CAdES corriente.", e); //$NON-NLS-1$
         }
     }
 
@@ -212,9 +216,8 @@ public final class AOCAdESCoSigner implements AOCoSigner {
             );
         }
         catch (final Exception e) {
-            throw new AOException("Error generando la Cofirma CADES", e); //$NON-NLS-1$
+        	throw new AOException("Error generando la Cofirma CAdES. La firma no es una CAdES corriente.", e); //$NON-NLS-1$
         }
 
     }
-
 }
