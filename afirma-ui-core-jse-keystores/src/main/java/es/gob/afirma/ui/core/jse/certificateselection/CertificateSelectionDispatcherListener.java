@@ -11,10 +11,10 @@ import java.util.logging.Logger;
 
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.Platform;
+import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.keystores.AOKeyStore;
 import es.gob.afirma.keystores.AOKeyStoreManager;
 import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
-import es.gob.afirma.ui.core.jse.JSEUIManager;
 
 final class CertificateSelectionDispatcherListener implements KeyEventDispatcher {
 
@@ -82,7 +82,7 @@ final class CertificateSelectionDispatcherListener implements KeyEventDispatcher
 				if (KeyEvent.VK_O == ke.getKeyCode()) {
 					final File[] ksFile; 
 					try {
-						ksFile = new JSEUIManager().getLoadFiles(
+						ksFile = AOUIFactory.getLoadFiles(
 								CertificateSelectionDialogMessages.getString("CertificateSelectionDispatcherListener.0"), //$NON-NLS-1$
 								null,
 								null,
@@ -108,6 +108,11 @@ final class CertificateSelectionDispatcherListener implements KeyEventDispatcher
 									this.parent);
 						} catch (final Exception e) {
 							LOGGER.warning("No se ha podido cargar el almacen de certificados seleccionado: " + e); //$NON-NLS-1$
+							AOUIFactory.showMessageDialog(
+									this.parent,
+									CertificateSelectionDialogMessages.getString("CertificateSelectionDispatcherListener.4"), //$NON-NLS-1$
+									CertificateSelectionDialogMessages.getString("CertificateSelectionDispatcherListener.3"), //$NON-NLS-1$
+									AOUIFactory.ERROR_MESSAGE);
 							return false;
 						}
 
@@ -116,20 +121,17 @@ final class CertificateSelectionDispatcherListener implements KeyEventDispatcher
 				}
 			}
 			else if (KeyEvent.VK_F5 == ke.getKeyCode()) {
-
 				if (this.parent != null) {
 					this.parent.setCursor(new Cursor(Cursor.WAIT_CURSOR));
 				}
 
 				this.selectionDialog.refresh();
-
+				
 				if (this.parent != null) {
 					this.parent.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 				}
 			}
-
 		}
 		return false;
 	}
-
 }

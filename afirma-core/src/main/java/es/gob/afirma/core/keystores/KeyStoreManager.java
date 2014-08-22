@@ -49,7 +49,7 @@ public interface KeyStoreManager {
                                                   NoSuchAlgorithmException,
                                                   UnrecoverableEntryException;
 
-	/** Refresca los certificados del alma&eacute;n actual.
+	/** Refresca los certificados del almac&eacute;n actual.
 	 * @throws IOException En caso de errores de entrada / salida */
 	void refresh() throws IOException;
 

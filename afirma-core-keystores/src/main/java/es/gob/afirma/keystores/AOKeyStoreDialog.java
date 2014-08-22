@@ -1,5 +1,6 @@
 package es.gob.afirma.keystores;
 
+import java.io.IOException;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateExpiredException;
@@ -147,7 +148,6 @@ public class AOKeyStoreDialog implements KeyStoreDialogManager {
     				this.ksm.getCertificate(certAlias));
     	}
 
-
 		return namedCerts;
 	}
 
@@ -247,5 +247,10 @@ public class AOKeyStoreDialog implements KeyStoreDialogManager {
 	@Override
 	public Certificate[] getSelectedCertificateChain() {
 		return this.selectedCertChain;
+	}
+
+	@Override
+	public void refresh() throws IOException {
+		this.ksm.refresh();
 	}
 }

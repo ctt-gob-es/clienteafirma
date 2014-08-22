@@ -13,7 +13,7 @@ package es.gob.afirma.ui.core.jse.certificateselection;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
-/** Clase para la obtenci&oacute;n de los recursos textuales del di&uacute;logo de selecci&oacute;n de certificados. */
+/** Clase para la obtenci&oacute;n de los recursos textuales del di&aacute;logo de selecci&oacute;n de certificados. */
 final class CertificateSelectionDialogMessages {
 
     private static final String BUNDLE_NAME = "certdialogmessages"; //$NON-NLS-1$

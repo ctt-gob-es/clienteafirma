@@ -257,7 +257,8 @@ public class AOKeyStoreManager implements KeyStoreManager {
 
     @Override
 	public String[] getAliases() {
-        if (this.ks == null) {
+
+    	if (this.ks == null) {
             throw new IllegalStateException("Se han pedido alias a un almacen no inicializado"); //$NON-NLS-1$
         }
         if (this.cachedAliases != null) {

@@ -1,5 +1,6 @@
 package es.gob.afirma.core.ui;
 
+import java.io.IOException;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.cert.Certificate;
 
@@ -13,6 +14,13 @@ import es.gob.afirma.core.keystores.NameCertificateBean;
  */
 public interface KeyStoreDialogManager {
 
+	/**
+	 * Manda recargar al almac&eacute;n asociado actualmente al di&aacute;logo de
+	 * selecci&oacute;n.
+	 * @throws IOException En caso de errores de entrada / salida
+	 */
+	void refresh() throws IOException;
+	
 	/**
 	 * Obtiene el listado de certificados con alias que deben mostrarse en el
 	 * di&aacute;logo de selecci&oacute;n.

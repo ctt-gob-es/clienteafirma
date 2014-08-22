@@ -131,9 +131,23 @@ public final class CertificateSelectionDialog extends MouseAdapter {
         }
 	}
 
-	/** Refresca el di&aacute;logo con los certificados del mismo almac&eacute;n. */
+	/** Refresca el almacen de certificados y el di&aacute;logo de selecci&oacute;n. */
 	public void refresh() {
-
+	
+		try {
+			this.ksdm.refresh();
+		}
+		catch (final Exception e) {
+			LOGGER.warning("Error en la orden de actualizacion del almacen: " + e); //$NON-NLS-1$
+			return;
+		}
+	
+		refreshDialog();
+	}
+	
+	/** Refresca el apartado gr&aacute;fico del di&aacute;logo de selecci&oacute;n. */
+	private void refreshDialog() {
+		
 		final NameCertificateBean[] certs = this.ksdm.getNameCertificates();
 		Arrays.sort(certs, CERT_NAME_COMPARATOR);
 
@@ -149,7 +163,7 @@ public final class CertificateSelectionDialog extends MouseAdapter {
 	 * @param ksm Gestor de almacenes de claves. */
 	public void changeKeyStore(final KeyStoreManager ksm) {
 		this.ksdm.setKeyStoreManager(ksm);
-		refresh();
+		refreshDialog();
 	}
 
 	private static final Comparator<NameCertificateBean> CERT_NAME_COMPARATOR = new Comparator<NameCertificateBean>() {
