@@ -11,7 +11,7 @@
 package es.gob.afirma.signers.pades;
 
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Logger;
 
@@ -38,7 +38,7 @@ public final class PdfPreProcessor {
 	/** A&ntilde;ade campos adicionales al diccionario PDF.
 	 * @param moreInfo Campos a a&ntilde;adir al diccionario PDF
 	 * @param stp Estampador de PDF, debe abrirse y cerrarse fuera de este m&eacute;todo */
-	public static void addMoreInfo(final HashMap<String, String> moreInfo, final PdfStamper stp) {
+	public static void addMoreInfo(final Map<String, String> moreInfo, final PdfStamper stp) {
 		if (moreInfo == null || moreInfo.isEmpty()) {
 			return;
 		}

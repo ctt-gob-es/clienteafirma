@@ -9,7 +9,6 @@ import java.util.List;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -17,9 +16,7 @@ import org.xml.sax.SAXException;
 
 import es.gob.afirma.core.misc.Base64;
 
-/**
- * Datos de contrafirma trif&aacute;sica.
- */
+/** Datos de contrafirma trif&aacute;sica. */
 public final class CounterSignData {
 
 	private String date = null;
@@ -35,10 +32,14 @@ public final class CounterSignData {
 		this.counterSigns.add(cs);
 	}
 
+	/** Obtiene el momento de la contrafirma.
+	 * @return Fecha (momento) de la contrafirma. */
 	public String getDate() {
 		return this.date;
 	}
 
+	/** Obtiene los datos de todas las contrafirmas realizadas en la misma operaci&oacute;n.
+	 * @return Datos de todas las contrafirmas realizadas en la misma operaci&oacute;n. */
 	public List<SingleCounterSignData> getCounterSigns() {
 		return this.counterSigns;
 	}
@@ -73,16 +74,14 @@ public final class CounterSignData {
 		.append("</xml>"); //$NON-NLS-1$
 		return sb.toString();
 	}
-	
-	/**
-	 * Obtiene la informaci&oacute;n de una operaci&oacute;n de contrafirma trif&aacute;sica
+
+	/** Obtiene la informaci&oacute;n de una operaci&oacute;n de contrafirma trif&aacute;sica
 	 * del XML en donde se define.
 	 * @param xml XML con la informaci&oacute;n de la operaci&oacute;n trif&aacute;sica.
 	 * @return Informaci&oacute;n de la operaci&oacute;n.
 	 * @throws ParserConfigurationException Cuando no puede crearse el parser para el XML.
 	 * @throws IOException Cuando ocurre alg&uacute;n error en la lectura de los datos.
-	 * @throws SAXException Cuando el XML est&aacute; mal formado.
-	 */
+	 * @throws SAXException Cuando el XML est&aacute; mal formado. */
 	public static CounterSignData parse(final byte[] xml) throws SAXException, IOException, ParserConfigurationException {
 
 		final ByteArrayInputStream bais = new ByteArrayInputStream(xml);
@@ -114,7 +113,7 @@ public final class CounterSignData {
 		return csData;
 	}
 
-	private static SingleCounterSignData parseDcs(final Node dcsNode) throws DOMException, IOException {
+	private static SingleCounterSignData parseDcs(final Node dcsNode) throws IOException {
 
 		int idx;
 		final NodeList childNodes = dcsNode.getChildNodes();
@@ -155,31 +154,37 @@ public final class CounterSignData {
 		}
 		return -1;
 	}
-	
-	/**
-	 * Almacena la informacion de una contrafirma concreta (pkcs#1 de la contrafirma
-	 * y valor dummy que lo sustituye).
-	 */
-	public static class SingleCounterSignData {
+
+	/** Almacena la informacion de una contrafirma concreta (pkcs#1 de la contrafirma
+	 * y valor dummy que lo sustituye). */
+	public static final class SingleCounterSignData {
 
 		private byte[] data;
-
 		private final byte[] dummyData;
 
+		/** Crea los datos de la contrafirma concreta.
+		 * @param d Datos a firmar o firma real de los datos (seg&uacute;n la fase en la que se encuentre el proceso trif&aacute;sico).
+		 * @param dd Datos a sustituir por la firma real de los datos. */
 		public SingleCounterSignData(final byte[] d, final byte[] dd) {
 			this.data = d.clone();
 			this.dummyData = dd.clone();
 		}
 
+		/** Obtiene los datos a firmar o firma real de los datos (seg&uacute;n la fase en la que se encuentre el proceso trif&aacute;sico).
+		 * @return Datos a firmar o firma real de los datos (seg&uacute;n la fase en la que se encuentre el proceso trif&aacute;sico). */
 		public byte[] getData() {
 			return this.data;
 		}
 
+		/** Obtiene los datos a sustituir por la firma real de los datos.
+		 * @return Datos a sustituir por la firma real de los datos. */
 		public byte[] getDummyData() {
 			return this.dummyData;
 		}
 
-		public void setData(byte[] data) {
+		/** Establece los datos a firmar o firma real de los datos (seg&uacute;n la fase en la que se encuentre el proceso trif&aacute;sico).
+		 * @param data Datos a firmar o firma real de los datos (seg&uacute;n la fase en la que se encuentre el proceso trif&aacute;sico). */
+		public void setData(final byte[] data) {
 			this.data = data.clone();
 		}
 	}
