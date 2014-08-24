@@ -13,7 +13,7 @@
 #include "CertificateUtils.h"
 #include "CADESConstants.h"
 #include "Base64.h"
-//#include "CADESSignedAttributes.h"
+#include "CADESSignedAttributes.h"
 
 @implementation CADESMonoPhase
 
@@ -35,8 +35,8 @@
     NSData *sCertificate = [Base64 decode:base64UrlSafeCertificateData urlSafe:true];
     
     SecCertificateRef myCertificate = SecCertificateCreateWithData(kCFAllocatorDefault, (CFDataRef)(sCertificate));
-    CFStringRef  certSummary = SecCertificateCopySubjectSummary(myCertificate);
-    //NSLog(@"%@", certSummary);
+
+    //NSLog(@"%@", SecCertificateCopySubjectSummary(myCertificate));
     const unsigned char *certificateDataBytes = (const unsigned char *)[sCertificate bytes];
     X509 *certificateX509 = d2i_X509(NULL, &certificateDataBytes, [sCertificate length]);
     

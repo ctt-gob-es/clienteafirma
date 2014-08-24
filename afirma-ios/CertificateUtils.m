@@ -187,7 +187,7 @@ static unsigned char  SHA512_DIGESTINFO_HEADER[] =
 								&signedHashBytesSize
 								);
 	
-	NSLog(@"sanityCheck::Return code=%ld",sanityCheck);
+	NSLog(@"sanityCheck::Return code=%d",(int)sanityCheck);
     
 	// Build up signed SHA1 blob.
 	signedHash = [NSData dataWithBytes:(const void *)signedHashBytes length:(NSUInteger)signedHashBytesSize];
@@ -233,7 +233,7 @@ static unsigned char  SHA512_DIGESTINFO_HEADER[] =
 								&signedHashBytesSize
 								);
 	
-	NSLog(@"sanityCheck::Return code=%ld",sanityCheck);
+	NSLog(@"sanityCheck::Return code=%d",(int)sanityCheck);
     
 	// Build up signed SHA256 blob.
 	signedHash = [NSData dataWithBytes:(const void *)signedHashBytes length:(NSUInteger)signedHashBytesSize];
@@ -279,7 +279,7 @@ static unsigned char  SHA512_DIGESTINFO_HEADER[] =
 								&signedHashBytesSize
 								);
 	
-	NSLog(@"sanityCheck::Return code=%ld",sanityCheck);
+	NSLog(@"sanityCheck::Return code=%d",(int)sanityCheck);
     
 	// Build up signed SHA256 blob.
 	signedHash = [NSData dataWithBytes:(const void *)signedHashBytes length:(NSUInteger)signedHashBytesSize];
@@ -331,8 +331,6 @@ static unsigned char  SHA512_DIGESTINFO_HEADER[] =
                                 (uint8_t *)signedHashBytes,
 								&signedHashBytesSize
 								);
-	
-	NSLog(@"sanityCheck::Return code=%ld",sanityCheck);
     
 	// Build up signed SHA1 blob.
 	signedHash = [NSData dataWithBytes:(const void *)signedHashBytes length:(NSUInteger)signedHashBytesSize];

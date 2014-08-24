@@ -13,7 +13,6 @@
     //[self.window makeKeyAndVisible];
     [self registerDefaultsFromSettingsBundle];
 
-    /*
     // Optional: automatically send uncaught exceptions to Google Analytics.
     [GAI sharedInstance].trackUncaughtExceptions = YES;
     
@@ -25,7 +24,6 @@
     
     // Initialize tracker.
     [[GAI sharedInstance] trackerWithTrackingId:@"UA-41615516-1"];
-     */
     
     return YES;
 }
