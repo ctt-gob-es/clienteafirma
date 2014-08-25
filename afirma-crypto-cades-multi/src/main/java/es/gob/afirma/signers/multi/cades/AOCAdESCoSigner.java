@@ -31,8 +31,9 @@ import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
 /** Operaciones de cofirma CAdES. */
 public final class AOCAdESCoSigner implements AOCoSigner {
 
-	/** {@inheritDoc} */
+	private static final String SIGNING_CERTIFICATE_V2 = "signingCertificateV2"; //$NON-NLS-1$
 
+	/** {@inheritDoc} */
 	@Override
 	public byte[] cosign(final byte[] data,
                          final byte[] sign,
@@ -55,8 +56,8 @@ public final class AOCAdESCoSigner implements AOCoSigner {
         if (AOSignConstants.isSHA2SignatureAlgorithm(algorithm)) {
         	signingCertificateV2 = true;
         }
-        else if (extraParams.containsKey("signingCertificateV2")) { //$NON-NLS-1$
-        	signingCertificateV2 = Boolean.parseBoolean(extraParams.getProperty("signingCertificateV2")); //$NON-NLS-1$
+        else if (extraParams.containsKey(SIGNING_CERTIFICATE_V2)) {
+        	signingCertificateV2 = Boolean.parseBoolean(extraParams.getProperty(SIGNING_CERTIFICATE_V2));
         }
         else {
         	signingCertificateV2 = !"SHA1".equals(AOSignConstants.getDigestAlgorithmName(algorithm));	 //$NON-NLS-1$
@@ -149,8 +150,8 @@ public final class AOCAdESCoSigner implements AOCoSigner {
         if (AOSignConstants.isSHA2SignatureAlgorithm(algorithm)) {
         	signingCertificateV2 = true;
         }
-        else if (extraParams.containsKey("signingCertificateV2")) { //$NON-NLS-1$
-        	signingCertificateV2 = Boolean.parseBoolean(extraParams.getProperty("signingCertificateV2")); //$NON-NLS-1$
+        else if (extraParams.containsKey(SIGNING_CERTIFICATE_V2)) {
+        	signingCertificateV2 = Boolean.parseBoolean(extraParams.getProperty(SIGNING_CERTIFICATE_V2));
         }
         else {
         	signingCertificateV2 = !"SHA1".equals(AOSignConstants.getDigestAlgorithmName(algorithm));	 //$NON-NLS-1$
