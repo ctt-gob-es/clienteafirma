@@ -44,6 +44,10 @@ public final class MassiveSignatureHelper {
 
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
+    private static final String MODE = "mode"; //$NON-NLS-1$
+    private static final String FORMAT = "format"; //$NON-NLS-1$
+    private static final String MIME_TYPE = "mimeType"; //$NON-NLS-1$
+
     /** Configuracion de la operaci&oacute;n masiva. */
     private MassiveSignConfiguration massiveConfiguration = null;
 
@@ -354,11 +358,11 @@ public final class MassiveSignatureHelper {
     private byte[] signDataFromData(final AOSigner signer, final byte[] data, final URI uri, final Properties config) throws AOException, IOException {
 
         // Configuramos y ejecutamos la operacion
-    	if (!config.containsKey("mode")) { //$NON-NLS-1$
-    		config.setProperty("mode", this.massiveConfiguration.getMode()); //$NON-NLS-1$
+    	if (!config.containsKey(MODE)) {
+    		config.setProperty(MODE, this.massiveConfiguration.getMode());
     	}
-    	if (!config.containsKey("format")) { //$NON-NLS-1$
-    		config.setProperty("format", this.massiveConfiguration.getSignatureFormat()); //$NON-NLS-1$
+    	if (!config.containsKey(FORMAT)) {
+    		config.setProperty(FORMAT, this.massiveConfiguration.getSignatureFormat());
     	}
         if (uri != null) {
             config.setProperty("uri", uri.toString()); //$NON-NLS-1$
@@ -371,12 +375,12 @@ public final class MassiveSignatureHelper {
         		XMLDSIG_SIGNER.equals(signerClassName)) {
 
         	final String mimeType;
-        	if (config.containsKey("mimeType")) { //$NON-NLS-1$
-        		mimeType = config.getProperty("mimeType"); //$NON-NLS-1$
+        	if (config.containsKey(MIME_TYPE)) {
+        		mimeType = config.getProperty(MIME_TYPE);
         	} else {
         		final MimeHelper mimeHelper = new MimeHelper(data);
         		mimeType = mimeHelper.getMimeType();
-        		config.setProperty("mimeType", mimeType); //$NON-NLS-1$
+        		config.setProperty(MIME_TYPE, mimeType);
         	}
 
         	if (!config.containsKey("contentTypeOid")) { //$NON-NLS-1$
@@ -416,18 +420,18 @@ public final class MassiveSignatureHelper {
     private byte[] signDataFromHash(final AOSigner signer, final byte[] data, final Properties config) throws AOException, IOException {
 
         // Configuramos y ejecutamos la operacion
-    	if (!config.containsKey("mode")) { //$NON-NLS-1$
-    		config.setProperty("mode", this.massiveConfiguration.getMode()); //$NON-NLS-1$
+    	if (!config.containsKey(MODE)) {
+    		config.setProperty(MODE, this.massiveConfiguration.getMode());
     	}
-    	if (!config.containsKey("format")) { //$NON-NLS-1$
-    		config.setProperty("format", this.massiveConfiguration.getSignatureFormat()); //$NON-NLS-1$
+    	if (!config.containsKey(FORMAT)) {
+    		config.setProperty(FORMAT, this.massiveConfiguration.getSignatureFormat());
     	}
         config.setProperty("precalculatedHashAlgorithm", AOSignConstants.getDigestAlgorithmName(this.massiveConfiguration.getAlgorithm())); //$NON-NLS-1$
 
         // Introduccion MIMEType "hash/algo", solo para XAdES y XMLDSig
         if (signer.getClass().getName().equals(XADES_SIGNER) || signer.getClass().getName().equals(XMLDSIG_SIGNER)) {
             final String mimeType = "hash/" + AOSignConstants.getDigestAlgorithmName(this.massiveConfiguration.getAlgorithm()).toLowerCase(); //$NON-NLS-1$
-            config.setProperty("mimeType", mimeType); //$NON-NLS-1$
+            config.setProperty(MIME_TYPE, mimeType);
         }
 
         final byte[] signData = signer.sign(
@@ -461,8 +465,8 @@ public final class MassiveSignatureHelper {
     private byte[] cosign(final AOSigner signer, final byte[] sign, final Properties config) throws AOException, IOException {
 
         // Configuramos y ejecutamos la operacion
-    	if (!config.containsKey("mode")) { //$NON-NLS-1$
-    		config.setProperty("mode", this.massiveConfiguration.getMode()); //$NON-NLS-1$
+    	if (!config.containsKey(MODE)) {
+    		config.setProperty(MODE, this.massiveConfiguration.getMode());
     	}
 
         // Tomamos el signer adecuado para la operacion o el obligatorio si se
