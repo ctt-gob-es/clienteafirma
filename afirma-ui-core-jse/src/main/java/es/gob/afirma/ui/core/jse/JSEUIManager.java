@@ -180,14 +180,14 @@ public class JSEUIManager implements AOUIManager {
     		if (e.getCause() instanceof RuntimeException) {
     			throw (RuntimeException) e.getCause();
     		}
-    		throw new RuntimeException(
-				"Ocurrio un error durante al extraer el certificado seleccionado", e.getCause() //$NON-NLS-1$
+    		throw new IllegalStateException(
+				"Ocurrio un error durante al extraer el certificado seleccionado: " + e, e.getCause() //$NON-NLS-1$
 			);
     	}
     	catch (final Exception e) {
     		LOGGER.severe("No se encuentra disponible el proyecto del interfaz grafico del dialogo de seleccion: " + e); //$NON-NLS-1$
     		throw new IllegalStateException(
-				"No se encuentra disponible el proyecto del interfaz grafico del dialogo de seleccion u ocurrio un error durante su ejecucion", e //$NON-NLS-1$
+				"No se encuentra disponible el proyecto del interfaz grafico del dialogo de seleccion u ocurrio un error durante su ejecucion: " + e, e //$NON-NLS-1$
 			);
     	}
     }
