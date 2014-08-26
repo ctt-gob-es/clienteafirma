@@ -40,6 +40,10 @@ public final class ProtocolInvocationUriParser {
 	static {
 		SUPPORTED_SIGNATURE_FORMATS.add("cades"); //$NON-NLS-1$
 		SUPPORTED_SIGNATURE_FORMATS.add("pades"); //$NON-NLS-1$
+		// En Android no soportamos XAdES
+		if (!Platform.getOS().equals(Platform.OS.ANDROID)) {
+			SUPPORTED_SIGNATURE_FORMATS.add("xades"); //$NON-NLS-1$
+		}
 		SUPPORTED_SIGNATURE_FORMATS.add("cadestri"); //$NON-NLS-1$
 		SUPPORTED_SIGNATURE_FORMATS.add("xadestri"); //$NON-NLS-1$
 		SUPPORTED_SIGNATURE_FORMATS.add("padestri"); //$NON-NLS-1$
