@@ -42,8 +42,8 @@ import com.apple.eawt.QuitResponse;
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.ui.AOUIFactory;
-import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.SimpleAfirma;
+import es.gob.afirma.standalone.SimpleAfirmaMessages;
 
 /** Barra de men&uacute; para toda la aplicaci&oacute;n.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
@@ -363,7 +363,8 @@ public final class MainMenu extends JMenuBar {
         final JDialog preferencesDialog = new JDialog(MainMenu.this.getParentComponent(), true);
         preferencesDialog.setTitle(SimpleAfirmaMessages.getString("MainMenu.24")); //$NON-NLS-1$
         preferencesDialog.add(new PreferencesPanel(preferencesDialog));
-        preferencesDialog.setSize(800,600);
+        preferencesDialog.setSize(800, 610);
+        preferencesDialog.setResizable(false);
         preferencesDialog.setLocationRelativeTo(MainMenu.this.getParentComponent());
         preferencesDialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         preferencesDialog.setVisible(true);
