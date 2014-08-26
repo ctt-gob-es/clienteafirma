@@ -88,25 +88,47 @@ final class PreferencesPanel extends JPanel implements KeyListener {
 
 	private static final Preferences PREFERENCES = Preferences.userRoot();
 
-	private static final AdESPolicy POLICY_XADES_AGE = new AdESPolicy(
-		"urn:oid:2.16.724.1.3.1.1.2.1.8", //$NON-NLS-1$
-		"V8lVVNGDCPen6VELRD1Ja8HARFk=", //$NON-NLS-1$
-		"SHA1", //$NON-NLS-1$
-		"http://administracionelectronica.gob.es/es/ctt/politicafirma/politica_firma_AGE_v1_8.pdf" //$NON-NLS-1$
-	);
+	static final AdESPolicy POLICY_CADES_AGE_1_8 = new AdESPolicy(
+			"2.16.724.1.3.1.1.2.1.8", //$NON-NLS-1$
+			"7SxX3erFuH31TvAw9LZ70N7p1vA=", //$NON-NLS-1$
+			"SHA1", //$NON-NLS-1$
+			"http://administracionelectronica.gob.es/es/ctt/politicafirma/politica_firma_AGE_v1_8.pdf" //$NON-NLS-1$
+			);
 
-	private static final AdESPolicy POLICY_CADES_AGE = new AdESPolicy(
-		"2.16.724.1.3.1.1.2.1.8", //$NON-NLS-1$
-		"7SxX3erFuH31TvAw9LZ70N7p1vA=", //$NON-NLS-1$
-		"SHA1", //$NON-NLS-1$
-		"http://administracionelectronica.gob.es/es/ctt/politicafirma/politica_firma_AGE_v1_8.pdf" //$NON-NLS-1$
-	);
+	private static final int POLICY_INDEX_CADES_AGE_1_8 = 1;
+	
+	static final AdESPolicy POLICY_XADES_AGE_1_8 = new AdESPolicy(
+			"urn:oid:2.16.724.1.3.1.1.2.1.8", //$NON-NLS-1$
+			"V8lVVNGDCPen6VELRD1Ja8HARFk=", //$NON-NLS-1$
+			"SHA1", //$NON-NLS-1$
+			"http://administracionelectronica.gob.es/es/ctt/politicafirma/politica_firma_AGE_v1_8.pdf" //$NON-NLS-1$
+			);
 
-	private static final int POLICY_INDEX_AGE = 1;
+	private static final int POLICY_INDEX_XADES_AGE_1_8 = 1;
+	
+	static final AdESPolicy POLICY_CADES_PADES_AGE_1_9 = new AdESPolicy(
+			"2.16.724.1.3.1.1.2.1.9", //$NON-NLS-1$
+			"G7roucf600+f03r/o0bAOQ6WAs0=", //$NON-NLS-1$
+			"SHA1", //$NON-NLS-1$
+			"https://sede.060.gob.es/politica_de_firma_anexo_1.pdf" //$NON-NLS-1$
+			);
+
+	private static final int POLICY_INDEX_PADES_AGE_1_9 = 1;
+	
+	private static final int POLICY_INDEX_CADES_AGE_1_9 = 2;
+	
+	static final AdESPolicy POLICY_XADES_AGE_1_9 = new AdESPolicy(
+			"urn:oid:2.16.724.1.3.1.1.2.1.9", //$NON-NLS-1$
+			"G7roucf600+f03r/o0bAOQ6WAs0=", //$NON-NLS-1$
+			"SHA1", //$NON-NLS-1$
+			"https://sede.060.gob.es/politica_de_firma_anexo_1.pdf" //$NON-NLS-1$
+			);
+
+	private static final int POLICY_INDEX_XADES_AGE_1_9 = 2;
 
 	private static final int POLICY_INDEX_NONE = 0;
 
-	private static final AdESPolicy POLICY_XADES_CUSTOM;
+	private static AdESPolicy POLICY_XADES_CUSTOM;
 	static {
 		AdESPolicy customPolicy = null;
 		try {
@@ -164,11 +186,15 @@ final class PreferencesPanel extends JPanel implements KeyListener {
 			null
 		);
 		XADES_PRELOADED_POLICIES.add(
-			POLICY_INDEX_AGE, // Por posicion, en el 1 la politica de la AGE
-			POLICY_XADES_AGE
+				POLICY_INDEX_XADES_AGE_1_8, // Por posicion, en el 1 la politica de la AGE 1.8
+				POLICY_XADES_AGE_1_8
 		);
 		XADES_PRELOADED_POLICIES.add(
-			2, // Por posicion, en el ultimo lugar una politica a medida
+			POLICY_INDEX_XADES_AGE_1_9, // Por posicion, en el 2 la politica de la AGE 1.9
+			POLICY_XADES_AGE_1_9
+		);
+		XADES_PRELOADED_POLICIES.add(
+			3, // Por posicion, en el ultimo lugar una politica a medida
 			POLICY_XADES_CUSTOM
 		);
 	}
@@ -183,8 +209,8 @@ final class PreferencesPanel extends JPanel implements KeyListener {
 			null
 		);
 		PADES_PRELOADED_POLICIES.add(
-			POLICY_INDEX_AGE, // Por posicion, en el 1 la politica de la AGE
-			POLICY_CADES_AGE
+			POLICY_INDEX_PADES_AGE_1_9, // Por posicion, en el 1 la politica de la AGE 1_9
+			POLICY_CADES_PADES_AGE_1_9
 		);
 		PADES_PRELOADED_POLICIES.add(
 			2, // Por posicion, en el ultimo lugar una politica a medida
@@ -205,11 +231,15 @@ final class PreferencesPanel extends JPanel implements KeyListener {
 			null
 		);
 		CADES_PRELOADED_POLICIES.add(
-			POLICY_INDEX_AGE, // Por posicion, en el 1 la politica de la AGE
-			POLICY_CADES_AGE
+				POLICY_INDEX_CADES_AGE_1_8, // Por posicion, en el 1 la politica de la AGE 1_8
+				POLICY_CADES_AGE_1_8
 		);
 		CADES_PRELOADED_POLICIES.add(
-			2, // Por posicion, en el ultimo lugar una politica a medida
+			POLICY_INDEX_CADES_AGE_1_9, // Por posicion, en el 2 la politica de la AGE 1_9
+			POLICY_CADES_PADES_AGE_1_9
+		);
+		CADES_PRELOADED_POLICIES.add(
+			3, // Por posicion, en el ultimo lugar una politica a medida
 			POLICY_CADES_CUSTOM
 		);
 	}
@@ -260,7 +290,7 @@ final class PreferencesPanel extends JPanel implements KeyListener {
 	JTextField getXadesPolicyQualifier() {
 		return this.xadesPolicyQualifier;
 	}
-
+	
 	//*********** CAMPOS POLITICA CADES ***************************************************************
 	//*************************************************************************************************
 	private final JTextField cadesPolicyIdentifier = new JTextField();
@@ -279,7 +309,7 @@ final class PreferencesPanel extends JPanel implements KeyListener {
 	JTextField getCadesPolicyQualifier() {
 		return this.cadesPolicyQualifier;
 	}
-
+	
 	//*********** CAMPOS POLITICA PADES ***************************************************************
 	//*************************************************************************************************
 	private final JTextField padesPolicyIdentifier = new JTextField();
@@ -468,16 +498,24 @@ final class PreferencesPanel extends JPanel implements KeyListener {
 		//****************************************************************************
 		PreferencesPanel.PREFERENCES.put(PREFERENCE_CADES_IMPLICIT, Boolean.valueOf(this.cadesImplicit.isSelected()).toString());
 		if (this.cadesPolicies.getSelectedIndex() != POLICY_INDEX_NONE) {
-			PreferencesPanel.PREFERENCES.put(PREFERENCE_CADES_POLICY_IDENTIFIER, this.cadesPolicyIdentifier.getText());
-			PreferencesPanel.PREFERENCES.put(PREFERENCE_CADES_POLICY_IDENTIFIER_HASH, this.cadesPolicyIdentifierHash.getText());
-			PreferencesPanel.PREFERENCES.put(PREFERENCE_CADES_POLICY_IDENTIFIER_HASH_ALGORITHM, this.cadesPolicyIdentifierHashAlgorithm.getSelectedItem().toString());
-			PreferencesPanel.PREFERENCES.put(PREFERENCE_CADES_POLICY_QUALIFIER, this.cadesPolicyQualifier.getText());
+			final AdESPolicy policy = new AdESPolicy(
+					this.cadesPolicyIdentifier.getText(),
+					this.cadesPolicyIdentifierHash.getText(),
+					this.cadesPolicyIdentifierHashAlgorithm.getSelectedItem().toString(),
+					this.cadesPolicyQualifier.getText());
+			
+			PreferencesPanel.PREFERENCES.put(PREFERENCE_CADES_POLICY_IDENTIFIER, policy.getPolicyIdentifier());
+			PreferencesPanel.PREFERENCES.put(PREFERENCE_CADES_POLICY_IDENTIFIER_HASH, policy.getPolicyIdentifierHash());
+			PreferencesPanel.PREFERENCES.put(PREFERENCE_CADES_POLICY_IDENTIFIER_HASH_ALGORITHM, policy.getPolicyIdentifierHashAlgorithm());
+			PreferencesPanel.PREFERENCES.put(PREFERENCE_CADES_POLICY_QUALIFIER, policy.getPolicyQualifier().toString());
+			getCadesPreloadedPolicies().set(getCadesPreloadedPolicies().size() - 1, policy);
 		}
 		else {
 			PreferencesPanel.PREFERENCES.remove(PREFERENCE_CADES_POLICY_IDENTIFIER);
 			PreferencesPanel.PREFERENCES.remove(PREFERENCE_CADES_POLICY_IDENTIFIER_HASH);
 			PreferencesPanel.PREFERENCES.remove(PREFERENCE_CADES_POLICY_IDENTIFIER_HASH_ALGORITHM);
 			PreferencesPanel.PREFERENCES.remove(PREFERENCE_CADES_POLICY_QUALIFIER);
+			getCadesPreloadedPolicies().set(getCadesPreloadedPolicies().size() - 1, null);
 		}
 
 		//****************************************************************************
@@ -505,16 +543,24 @@ final class PreferencesPanel extends JPanel implements KeyListener {
 		PreferencesPanel.PREFERENCES.put(PREFERENCE_PADES_FORMAT, ((ValueTextPair) this.padesBasicFormat.getSelectedItem()).getValue());
 
 		if (this.padesPolicies.getSelectedIndex() != POLICY_INDEX_NONE) {
-			PreferencesPanel.PREFERENCES.put(PREFERENCE_PADES_POLICY_IDENTIFIER, this.padesPolicyIdentifier.getText());
-			PreferencesPanel.PREFERENCES.put(PREFERENCE_PADES_POLICY_IDENTIFIER_HASH, this.padesPolicyIdentifierHash.getText());
-			PreferencesPanel.PREFERENCES.put(PREFERENCE_PADES_POLICY_IDENTIFIER_HASH_ALGORITHM, this.padesPolicyIdentifierHashAlgorithm.getSelectedItem().toString());
-			PreferencesPanel.PREFERENCES.put(PREFERENCE_PADES_POLICY_QUALIFIER, this.padesPolicyQualifier.getText());
+			final AdESPolicy policy = new AdESPolicy(
+					this.padesPolicyIdentifier.getText(),
+					this.padesPolicyIdentifierHash.getText(),
+					this.padesPolicyIdentifierHashAlgorithm.getSelectedItem().toString(),
+					this.padesPolicyQualifier.getText());
+			
+			PreferencesPanel.PREFERENCES.put(PREFERENCE_PADES_POLICY_IDENTIFIER, policy.getPolicyIdentifier());
+			PreferencesPanel.PREFERENCES.put(PREFERENCE_PADES_POLICY_IDENTIFIER_HASH, policy.getPolicyIdentifierHash());
+			PreferencesPanel.PREFERENCES.put(PREFERENCE_PADES_POLICY_IDENTIFIER_HASH_ALGORITHM, policy.getPolicyIdentifierHashAlgorithm());
+			PreferencesPanel.PREFERENCES.put(PREFERENCE_PADES_POLICY_QUALIFIER, policy.getPolicyQualifier().toString());
+			getPadesPreloadedPolicies().set(getPadesPreloadedPolicies().size() - 1, policy);  
 		}
 		else {
 			PreferencesPanel.PREFERENCES.remove(PREFERENCE_PADES_POLICY_IDENTIFIER);
 			PreferencesPanel.PREFERENCES.remove(PREFERENCE_PADES_POLICY_IDENTIFIER_HASH);
 			PreferencesPanel.PREFERENCES.remove(PREFERENCE_PADES_POLICY_IDENTIFIER_HASH_ALGORITHM);
 			PreferencesPanel.PREFERENCES.remove(PREFERENCE_PADES_POLICY_QUALIFIER);
+			getPadesPreloadedPolicies().set(getPadesPreloadedPolicies().size() - 1, null);
 		}
 
 		//****************************************************************************
@@ -565,10 +611,17 @@ final class PreferencesPanel extends JPanel implements KeyListener {
 			Logger.getLogger("es.gob.afirma").severe("Error al guardar las preferencias de firma: " + e); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		if (this.xadesPolicies.getSelectedIndex() != POLICY_INDEX_NONE) {
-			PreferencesPanel.PREFERENCES.put(PREFERENCE_XADES_POLICY_IDENTIFIER, this.xadesPolicyIdentifier.getText());
-			PreferencesPanel.PREFERENCES.put(PREFERENCE_XADES_POLICY_IDENTIFIER_HASH, this.xadesPolicyIdentifierHash.getText());
-			PreferencesPanel.PREFERENCES.put(PREFERENCE_XADES_POLICY_IDENTIFIER_HASH_ALGORITHM, this.xadesPolicyIdentifierHashAlgorithm.getSelectedItem().toString());
-			PreferencesPanel.PREFERENCES.put(PREFERENCE_XADES_POLICY_QUALIFIER, this.xadesPolicyQualifier.getText());
+			final AdESPolicy policy = new AdESPolicy(
+					this.xadesPolicyIdentifier.getText(),
+					this.xadesPolicyIdentifierHash.getText(),
+					this.xadesPolicyIdentifierHashAlgorithm.getSelectedItem().toString(),
+					this.xadesPolicyQualifier.getText());
+			
+			PreferencesPanel.PREFERENCES.put(PREFERENCE_XADES_POLICY_IDENTIFIER, policy.getPolicyIdentifier());
+			PreferencesPanel.PREFERENCES.put(PREFERENCE_XADES_POLICY_IDENTIFIER_HASH, policy.getPolicyIdentifierHash());
+			PreferencesPanel.PREFERENCES.put(PREFERENCE_XADES_POLICY_IDENTIFIER_HASH_ALGORITHM, policy.getPolicyIdentifierHashAlgorithm());
+			PreferencesPanel.PREFERENCES.put(PREFERENCE_XADES_POLICY_QUALIFIER, policy.getPolicyQualifier().toString());
+			getXadesPreloadedPolicies().set(getXadesPreloadedPolicies().size() - 1, policy);  
 		}
 		else {
 			PreferencesPanel.PREFERENCES.remove(PREFERENCE_XADES_POLICY_IDENTIFIER);
@@ -868,7 +921,8 @@ final class PreferencesPanel extends JPanel implements KeyListener {
 		// Los elementos del menu desplegable se identifican por su orden
 		this.xadesPolicies.setModel(new DefaultComboBoxModel(new String[] {
 			SimpleAfirmaMessages.getString("PreferencesPanel.24"),	// Ninguna politica, debe ser el primer elemento //$NON-NLS-1$
-			SimpleAfirmaMessages.getString("PreferencesPanel.25"),	// Politica de la AGE, debe ser el segundo elemento //$NON-NLS-1$
+			SimpleAfirmaMessages.getString("PreferencesPanel.25"),	// Politica de la AGE 1.8, debe ser el segundo elemento //$NON-NLS-1$
+			SimpleAfirmaMessages.getString("PreferencesPanel.73"),	// Politica de la AGE 1.9, debe ser el tercer elemento //$NON-NLS-1$
 			SimpleAfirmaMessages.getString("PreferencesPanel.26")	// Politica a medida, debe ser el ultimo elemento //$NON-NLS-1$
 		}));
 		panel.add(this.xadesPolicies, c);
@@ -881,7 +935,7 @@ final class PreferencesPanel extends JPanel implements KeyListener {
 			public void itemStateChanged(final ItemEvent ie) {
 
 				final boolean enabled = PreferencesPanel.this.getXadesPolicies().getSelectedIndex() != POLICY_INDEX_NONE;
-				final boolean editable = PreferencesPanel.this.getXadesPolicies().getSelectedIndex() != POLICY_INDEX_AGE;
+				final boolean editable = PreferencesPanel.this.getXadesPolicies().getSelectedIndex() == PreferencesPanel.this.getXadesPolicies().getItemCount() - 1;
 
 				PreferencesPanel.this.getXadesPolicyIdentifier().setEnabled(enabled);
 				PreferencesPanel.this.getXadesPolicyIdentifierHash().setEnabled(enabled);
@@ -895,12 +949,18 @@ final class PreferencesPanel extends JPanel implements KeyListener {
 				}
 				PreferencesPanel.this.getXadesPolicyQualifier().setEditable(editable);
 
-				loadXadesPolicy(getXadesPreloadedPolicies().get(PreferencesPanel.this.getXadesPolicies().getSelectedIndex()));
+				AdESPolicy currentPolicy = getXadesPreloadedPolicies().get(PreferencesPanel.this.getXadesPolicies().getSelectedIndex());
+				if (PreferencesPanel.this.getXadesPolicies().getSelectedIndex() == PreferencesPanel.this.getXadesPolicies().getItemCount() - 1) { 
+					if (POLICY_XADES_AGE_1_8.equals(currentPolicy) || POLICY_XADES_AGE_1_9.equals(currentPolicy)) {
+						currentPolicy = null;
+					}
+				}
+				loadXadesPolicy(currentPolicy);
 			}
 		});
 
 		final boolean enableTextFields = this.xadesPolicies.getSelectedIndex() != POLICY_INDEX_NONE;
-		final boolean editableTextFields = this.xadesPolicies.getSelectedIndex() != POLICY_INDEX_AGE;
+		final boolean editableTextFields = this.xadesPolicies.getSelectedIndex() == PreferencesPanel.this.getXadesPolicies().getItemCount() - 1;
 
 		this.xadesPolicyIdentifier.setEnabled(enableTextFields);
 		this.xadesPolicyIdentifier.setEditable(editableTextFields);
@@ -949,11 +1009,14 @@ final class PreferencesPanel extends JPanel implements KeyListener {
 		c.gridy++;
 		panel.add(this.xadesPolicyQualifier, c);
 
-		// Cargamos la politica de las preferencias cambiado el Combo si es preciso
-		final AdESPolicy savedPolicy = XADES_PRELOADED_POLICIES.get(this.xadesPolicies.getItemCount()-1);
+		// Cargamos la politica de las preferencias cambiando el Combo si es preciso
+		final AdESPolicy savedPolicy = getXadesPreferedPolicy();
 		if (savedPolicy != null) {
-			if (POLICY_XADES_AGE.equals(savedPolicy)) {
-				this.xadesPolicies.setSelectedIndex(POLICY_INDEX_AGE);
+			if (POLICY_XADES_AGE_1_9.equals(savedPolicy)) {
+				this.xadesPolicies.setSelectedIndex(POLICY_INDEX_XADES_AGE_1_9);
+			}
+			else if (POLICY_XADES_AGE_1_8.equals(savedPolicy)) {
+				this.xadesPolicies.setSelectedIndex(POLICY_INDEX_XADES_AGE_1_8);
 			}
 			else {
 				this.xadesPolicies.setSelectedIndex(this.xadesPolicies.getItemCount()-1);
@@ -976,7 +1039,7 @@ final class PreferencesPanel extends JPanel implements KeyListener {
 		// Los elementos del menu desplegable se identifican por su orden
 		this.padesPolicies.setModel(new DefaultComboBoxModel(new String[] {
 			SimpleAfirmaMessages.getString("PreferencesPanel.24"),	// Ninguna politica, debe ser el primer elemento //$NON-NLS-1$
-			SimpleAfirmaMessages.getString("PreferencesPanel.25"),	// Politica de la AGE, debe ser el segundo elemento //$NON-NLS-1$
+			SimpleAfirmaMessages.getString("PreferencesPanel.73"),	// Politica de la AGE 1.9, debe ser el segundo elemento //$NON-NLS-1$
 			SimpleAfirmaMessages.getString("PreferencesPanel.26")	// Politica a medida, debe ser el ultimo elemento //$NON-NLS-1$
 		}));
 		panel.add(this.padesPolicies, c);
@@ -989,7 +1052,7 @@ final class PreferencesPanel extends JPanel implements KeyListener {
 			public void itemStateChanged(final ItemEvent ie) {
 
 				final boolean enabled = PreferencesPanel.this.getPadesPolicies().getSelectedIndex() != POLICY_INDEX_NONE;
-				final boolean editable = PreferencesPanel.this.getPadesPolicies().getSelectedIndex() != POLICY_INDEX_AGE;
+				final boolean editable = PreferencesPanel.this.getPadesPolicies().getSelectedIndex() == PreferencesPanel.this.getPadesPolicies().getItemCount() - 1;
 
 				PreferencesPanel.this.getPadesPolicyIdentifier().setEnabled(enabled);
 				PreferencesPanel.this.getPadesPolicyIdentifierHash().setEnabled(enabled);
@@ -1003,12 +1066,18 @@ final class PreferencesPanel extends JPanel implements KeyListener {
 				}
 				PreferencesPanel.this.getPadesPolicyQualifier().setEditable(editable);
 
-				loadPadesPolicy(getPadesPreloadedPolicies().get(PreferencesPanel.this.getPadesPolicies().getSelectedIndex()));
+				AdESPolicy currentPolicy = getPadesPreloadedPolicies().get(PreferencesPanel.this.getPadesPolicies().getSelectedIndex());
+				if (PreferencesPanel.this.getPadesPolicies().getSelectedIndex() == PreferencesPanel.this.getPadesPolicies().getItemCount() - 1) { 
+					if (POLICY_CADES_PADES_AGE_1_9.equals(currentPolicy)) {
+						currentPolicy = null;
+					}
+				}
+				loadPadesPolicy(currentPolicy);
 			}
 		});
 
 		final boolean enableTextFields = this.padesPolicies.getSelectedIndex() != POLICY_INDEX_NONE;
-		final boolean editableTextFields = this.padesPolicies.getSelectedIndex() != POLICY_INDEX_AGE;
+		final boolean editableTextFields = this.padesPolicies.getSelectedIndex() == this.padesPolicies.getItemCount() - 1;
 
 		this.padesPolicyIdentifier.setEnabled(enableTextFields);
 		this.padesPolicyIdentifier.setEditable(editableTextFields);
@@ -1058,10 +1127,10 @@ final class PreferencesPanel extends JPanel implements KeyListener {
 		panel.add(this.padesPolicyQualifier, c);
 
 		// Cargamos la politica de las preferencias cambiado el Combo si es preciso
-		final AdESPolicy savedPolicy = PADES_PRELOADED_POLICIES.get(this.padesPolicies.getItemCount()-1);
+		final AdESPolicy savedPolicy = getPadesPreferedPolicy();
 		if (savedPolicy != null) {
-			if (POLICY_CADES_AGE.equals(savedPolicy)) {
-				this.padesPolicies.setSelectedIndex(POLICY_INDEX_AGE);
+			if (POLICY_CADES_PADES_AGE_1_9.equals(savedPolicy)) {
+				this.padesPolicies.setSelectedIndex(POLICY_INDEX_PADES_AGE_1_9);
 			}
 			else {
 				this.padesPolicies.setSelectedIndex(this.padesPolicies.getItemCount()-1);
@@ -1084,7 +1153,8 @@ final class PreferencesPanel extends JPanel implements KeyListener {
 		// Los elementos del menu desplegable se identifican por su orden
 		this.cadesPolicies.setModel(new DefaultComboBoxModel(new String[] {
 			SimpleAfirmaMessages.getString("PreferencesPanel.24"),	// Ninguna politica, debe ser el primer elemento //$NON-NLS-1$
-			SimpleAfirmaMessages.getString("PreferencesPanel.25"),	// Politica de la AGE, debe ser el segundo elemento //$NON-NLS-1$
+			SimpleAfirmaMessages.getString("PreferencesPanel.25"),	// Politica de la AGE 1.8, debe ser el segundo elemento //$NON-NLS-1$
+			SimpleAfirmaMessages.getString("PreferencesPanel.73"),	// Politica de la AGE 1.9, debe ser el tercer elemento //$NON-NLS-1$
 			SimpleAfirmaMessages.getString("PreferencesPanel.26")	// Politica a medida, debe ser el ultimo elemento //$NON-NLS-1$
 		}));
 		panel.add(this.cadesPolicies, c);
@@ -1097,7 +1167,7 @@ final class PreferencesPanel extends JPanel implements KeyListener {
 			public void itemStateChanged(final ItemEvent ie) {
 
 				final boolean enabled = PreferencesPanel.this.getCadesPolicies().getSelectedIndex() != POLICY_INDEX_NONE;
-				final boolean editable = PreferencesPanel.this.getCadesPolicies().getSelectedIndex() != POLICY_INDEX_AGE;
+				final boolean editable = PreferencesPanel.this.getCadesPolicies().getSelectedIndex() == PreferencesPanel.this.getCadesPolicies().getItemCount() - 1;
 
 				PreferencesPanel.this.getCadesPolicyIdentifier().setEnabled(enabled);
 				PreferencesPanel.this.getCadesPolicyIdentifierHash().setEnabled(enabled);
@@ -1111,12 +1181,18 @@ final class PreferencesPanel extends JPanel implements KeyListener {
 				}
 				PreferencesPanel.this.getCadesPolicyQualifier().setEditable(editable);
 
-				loadCadesPolicy(getCadesPreloadedPolicies().get(PreferencesPanel.this.getCadesPolicies().getSelectedIndex()));
+				AdESPolicy currentPolicy = getCadesPreloadedPolicies().get(PreferencesPanel.this.getCadesPolicies().getSelectedIndex());
+				if (PreferencesPanel.this.getCadesPolicies().getSelectedIndex() == PreferencesPanel.this.getCadesPolicies().getItemCount() - 1) { 
+					if (POLICY_CADES_AGE_1_8.equals(currentPolicy) || POLICY_CADES_PADES_AGE_1_9.equals(currentPolicy)) {
+						currentPolicy = null;
+					}
+				}
+				loadCadesPolicy(currentPolicy);
 			}
 		});
 
 		final boolean enableTextFields = this.cadesPolicies.getSelectedIndex() != POLICY_INDEX_NONE;
-		final boolean editableTextFields = this.cadesPolicies.getSelectedIndex() != POLICY_INDEX_AGE;
+		final boolean editableTextFields = this.cadesPolicies.getSelectedIndex() == this.cadesPolicies.getItemCount() - 1;
 
 		this.cadesPolicyIdentifier.setEnabled(enableTextFields);
 		this.cadesPolicyIdentifier.setEditable(editableTextFields);
@@ -1166,10 +1242,13 @@ final class PreferencesPanel extends JPanel implements KeyListener {
 		panel.add(this.cadesPolicyQualifier, c);
 
 		// Cargamos la politica de las preferencias cambiado el Combo si es preciso
-		final AdESPolicy savedPolicy = CADES_PRELOADED_POLICIES.get(this.cadesPolicies.getItemCount()-1);
+		final AdESPolicy savedPolicy = getCadesPreferedPolicy();
 		if (savedPolicy != null) {
-			if (POLICY_CADES_AGE.equals(savedPolicy)) {
-				this.cadesPolicies.setSelectedIndex(POLICY_INDEX_AGE);
+			if (POLICY_CADES_PADES_AGE_1_9.equals(savedPolicy)) {
+				this.cadesPolicies.setSelectedIndex(POLICY_INDEX_CADES_AGE_1_9);
+			}
+			else if (POLICY_CADES_AGE_1_8.equals(savedPolicy)) {
+				this.cadesPolicies.setSelectedIndex(POLICY_INDEX_CADES_AGE_1_8);
 			}
 			else {
 				this.cadesPolicies.setSelectedIndex(this.cadesPolicies.getItemCount()-1);
@@ -1274,6 +1353,23 @@ final class PreferencesPanel extends JPanel implements KeyListener {
 		}
 	}
 
+	/**
+	 * Obtiene la configuraci&oacute;n de politica de firma XAdES establecida actualmente. 
+	 * @return Pol&iacute;tica de firma configurada.
+	 */
+	AdESPolicy getXadesPreferedPolicy() {
+
+		if (PREFERENCES.get(PREFERENCE_XADES_POLICY_IDENTIFIER, null) == null) {
+			return null;
+		}
+		return new AdESPolicy(
+				PREFERENCES.get(PREFERENCE_XADES_POLICY_IDENTIFIER, this.xadesPolicyIdentifier.getText()),
+				PREFERENCES.get(PREFERENCE_XADES_POLICY_IDENTIFIER_HASH, this.xadesPolicyIdentifierHash.getText()),
+				PREFERENCES.get(PREFERENCE_XADES_POLICY_IDENTIFIER_HASH_ALGORITHM, this.xadesPolicyIdentifierHashAlgorithm.getSelectedItem().toString()),
+				PREFERENCES.get(PREFERENCE_XADES_POLICY_QUALIFIER, this.xadesPolicyQualifier.getText())
+				);
+	}
+
 	void loadPadesPolicy(final AdESPolicy policy) {
 		if (policy != null) {
 			PreferencesPanel.this.getPadesPolicyIdentifier().setText(policy.getPolicyIdentifier());
@@ -1290,6 +1386,23 @@ final class PreferencesPanel extends JPanel implements KeyListener {
 		}
 	}
 
+	/**
+	 * Obtiene la configuraci&oacute;n de politica de firma PAdES establecida actualmente. 
+	 * @return Pol&iacute;tica de firma configurada.
+	 */
+	AdESPolicy getPadesPreferedPolicy() {
+
+		if (PREFERENCES.get(PREFERENCE_PADES_POLICY_IDENTIFIER, null) == null) {
+			return null;
+		}
+		return new AdESPolicy(
+				PREFERENCES.get(PREFERENCE_PADES_POLICY_IDENTIFIER, this.padesPolicyIdentifier.getText()),
+				PREFERENCES.get(PREFERENCE_PADES_POLICY_IDENTIFIER_HASH, this.padesPolicyIdentifierHash.getText()),
+				PREFERENCES.get(PREFERENCE_PADES_POLICY_IDENTIFIER_HASH_ALGORITHM, this.padesPolicyIdentifierHashAlgorithm.getSelectedItem().toString()),
+				PREFERENCES.get(PREFERENCE_PADES_POLICY_QUALIFIER, this.padesPolicyQualifier.getText())
+				);
+	}
+	
 	void loadCadesPolicy(final AdESPolicy policy) {
 		if (policy != null) {
 			PreferencesPanel.this.getCadesPolicyIdentifier().setText(policy.getPolicyIdentifier());
@@ -1306,6 +1419,23 @@ final class PreferencesPanel extends JPanel implements KeyListener {
 		}
 	}
 
+	/**
+	 * Obtiene la configuraci&oacute;n de politica de firma CAdES establecida actualmente. 
+	 * @return Pol&iacute;tica de firma configurada.
+	 */
+	AdESPolicy getCadesPreferedPolicy() {
+
+		if (PREFERENCES.get(PREFERENCE_CADES_POLICY_IDENTIFIER, null) == null) {
+			return null;
+		}
+		return new AdESPolicy(
+				PREFERENCES.get(PREFERENCE_CADES_POLICY_IDENTIFIER, this.cadesPolicyIdentifier.getText()),
+				PREFERENCES.get(PREFERENCE_CADES_POLICY_IDENTIFIER_HASH, this.cadesPolicyIdentifierHash.getText()),
+				PREFERENCES.get(PREFERENCE_CADES_POLICY_IDENTIFIER_HASH_ALGORITHM, this.cadesPolicyIdentifierHashAlgorithm.getSelectedItem().toString()),
+				PREFERENCES.get(PREFERENCE_CADES_POLICY_QUALIFIER, this.cadesPolicyQualifier.getText())
+				);
+	}
+	
 	private static final class ModificationListener extends KeyAdapter implements ItemListener {
 
 	    private final PreferencesPanel prefPanel;
