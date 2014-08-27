@@ -75,8 +75,11 @@ public class VisorFirma extends JApplet implements WindowListener {
         }
         else {
             this.currentPanel = new VisorPanel(this.signFile, null, this, this.standalone);
-            this.container = new MainScreen(this, this.currentPanel, 740, 550);
-
+            
+           	final MainScreen mainScreen = new MainScreen();
+           	mainScreen.showMainScreen(this, this.currentPanel, 780, 500);
+            this.container = mainScreen;
+            
             if (this.window != null) {
                 this.window.dispose();
             }

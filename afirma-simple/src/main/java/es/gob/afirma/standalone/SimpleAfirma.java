@@ -189,21 +189,25 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
 	        	showDNIeScreen = false;
 	        }
         }
-
+        
         if (asApplet) {
             this.container = this;
         }
         else if (showDNIeScreen) {
            	this.currentPanel = new DNIeWaitPanel(this);
-            this.container = new MainScreen(this, this.currentPanel, 780, 500);
-            this.window = (JFrame) this.container;
+           	final MainScreen mainScreen = new MainScreen();
+           	mainScreen.showMainScreen(this, this.currentPanel, 780, 500);
+           	this.window = mainScreen;
             this.window.setTitle(SimpleAfirmaMessages.getString("SimpleAfirma.10")); //$NON-NLS-1$
+            this.container = this.window;
         }
         else {
-        	this.currentPanel = new JPanel();
-        	this.container = new MainScreen(this, this.currentPanel, 780, 500);
-            this.window = (JFrame) this.container;
-
+        	final MainScreen mainScreen = new MainScreen();
+        	this.currentPanel = new SignPanel(mainScreen, this, true);
+           	mainScreen.showMainScreen(this, this.currentPanel, 780, 500);
+        	this.window = mainScreen;
+        	this.container = this.window;
+        	
         	loadDefaultKeyStore();
         	loadMainApp(true);
 
