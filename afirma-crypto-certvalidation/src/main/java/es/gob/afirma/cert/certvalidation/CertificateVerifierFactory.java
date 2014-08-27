@@ -58,7 +58,12 @@ public final class CertificateVerifierFactory {
 
 		final String validationProperties = p.getProperty(crc + ".validation.properties"); //$NON-NLS-1$
 		final String validationMethod     = p.getProperty(crc + ".validation.type"); //$NON-NLS-1$
-		if ("ocsp".equalsIgnoreCase(validationMethod)) { //$NON-NLS-1$
+		if (validationMethod == null) {
+			throw new IllegalStateException(
+					"No se conocen mecanismos de validacion para los certificados de este emisor" //$NON-NLS-1$
+				);
+		}
+		else if ("ocsp".equalsIgnoreCase(validationMethod)) { //$NON-NLS-1$
 			LOGGER.info("Se usara OCSP para la validacion"); //$NON-NLS-1$
 			return new OcspCertificateVerifier(validationProperties);
 		}
