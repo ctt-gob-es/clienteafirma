@@ -2,10 +2,10 @@ Manifest-Version: 1.0
 Main-Class: es.gob.afirma.standalone.SimpleAfirma
 SplashScreen-Image: splash.gif
 Specification-Title: Firma Fácil
-Specification-Version: v1.2
-Specification-Vendor: Gobierno de Espana
+Specification-Version: v1.3
+Specification-Vendor: Gobierno de España
 Implementation-Title: es.gob.afirma
 Implementation-Version: build01
-Implementation-Vendor: Gobierno de Espana
+Implementation-Vendor: Gobierno de España
 Application-Name: Firma Fácil
 
