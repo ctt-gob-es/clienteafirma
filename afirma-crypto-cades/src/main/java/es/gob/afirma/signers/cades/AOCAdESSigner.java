@@ -164,7 +164,7 @@ public final class AOCAdESSigner implements AOSigner {
 			return GenCAdESEPESSignedData.generateSignedData(
                    csp,
                    omitContent,
-                   new AdESPolicy(extraParams),
+                   AdESPolicy.buildAdESPolicy(extraParams),
                    signingCertificateV2,
                    key,
                    Boolean.parseBoolean(extraParams.getProperty("includeOnlySignningCertificate", Boolean.FALSE.toString())) ? new X509Certificate[] { (X509Certificate) certChain[0] } : certChain, //$NON-NLS-1$

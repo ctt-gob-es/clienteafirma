@@ -210,7 +210,7 @@ public final class PAdESTriPhaseSigner {
                 AOSignConstants.getDigestAlgorithmName(digestAlgorithmName), // Algoritmo de huella digital
                 null, // Datos a firmar (null por ser explicita))
                 signerCertificateChain, // Cadena de certificados del firmante
-                new AdESPolicy(extraParams), // Politica de firma
+                AdESPolicy.buildAdESPolicy(extraParams), // Politica de firma
                 signingCertificateV2, // signingCertificateV2
                 md, // Valor de la huella digital del contenido
                 signTime.getTime(), // Fecha de la firma (debe establecerse externamente para evitar desincronismos en la firma trifasica)

@@ -68,7 +68,7 @@ public class MiniTestDNI {
         final byte[] firma = GenCAdESEPESSignedData.generateSignedData(
         		p7ContentSignerParameters,
         		omitContent,
-        		new AdESPolicy(new Properties()),
+        		AdESPolicy.buildAdESPolicy(new Properties()),
         		false,
         		pke.getPrivateKey(),
         		pke.getCertificateChain(),

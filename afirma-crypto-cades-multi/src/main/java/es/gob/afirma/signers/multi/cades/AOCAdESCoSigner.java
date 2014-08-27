@@ -92,7 +92,7 @@ public final class AOCAdESCoSigner implements AOCoSigner {
 						csp,
 						sign,
 						omitContent,
-						new AdESPolicy(extraParams),
+						AdESPolicy.buildAdESPolicy(extraParams),
 						signingCertificateV2,
 						key,
 						onlySigningCertificate ?
@@ -115,7 +115,7 @@ public final class AOCAdESCoSigner implements AOCoSigner {
             return new CAdESCoSignerEnveloped().coSigner(
                  csp,
                  sign,
-                 new AdESPolicy(extraParams),
+                 AdESPolicy.buildAdESPolicy(extraParams),
                  signingCertificateV2,
                  key,
                  onlySigningCertificate ?
@@ -179,7 +179,7 @@ public final class AOCAdESCoSigner implements AOCoSigner {
 						new X509Certificate[] { (X509Certificate) certChain[0] } :
 							(X509Certificate[]) certChain,
 				    new ByteArrayInputStream(sign),
-				    new AdESPolicy(extraParams),
+				    AdESPolicy.buildAdESPolicy(extraParams),
 				    signingCertificateV2,
 				    key,
 				    certChain,
@@ -203,7 +203,7 @@ public final class AOCAdESCoSigner implements AOCoSigner {
          			new X509Certificate[] { (X509Certificate) certChain[0] } :
      				(X509Certificate[]) certChain,
                  new ByteArrayInputStream(sign),
-                 new AdESPolicy(extraParams),
+                 AdESPolicy.buildAdESPolicy(extraParams),
                  signingCertificateV2,
                  key,
                  Boolean.parseBoolean(extraParams.getProperty("includeOnlySignningCertificate", Boolean.FALSE.toString())) ? //$NON-NLS-1$
