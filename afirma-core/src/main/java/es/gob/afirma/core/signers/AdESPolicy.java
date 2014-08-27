@@ -22,7 +22,7 @@ import es.gob.afirma.core.misc.Base64;
 public final class AdESPolicy {
 
 	private static final String DEFAULT_HASH_ALGORITHM = "SHA-512"; //$NON-NLS-1$
-	
+
     private String policyIdentifier = null;
     private String policyIdentifierHash = null;
     private String policyIdentifierHashAlgorithm = null;
@@ -56,12 +56,8 @@ public final class AdESPolicy {
 
         this.policyIdentifier = identifier;
 
-        if (identifierHash != null && !"0".equals(identifierHash) && (identifierHashAlgorithm == null || "".equals(identifierHashAlgorithm))) { //$NON-NLS-1$ //$NON-NLS-2$
-            throw new IllegalArgumentException("Si se indica la huella digital del identificador de politica es obligatorio indicar tambien el algoritmo"); //$NON-NLS-1$
-        }
-
         if (identifierHash == null || "0".equals(identifierHash)) { //$NON-NLS-1$
-        	
+
         	this.policyIdentifierHashAlgorithm = identifierHashAlgorithm == null ?
         			DEFAULT_HASH_ALGORITHM : AOSignConstants.getDigestAlgorithmName(identifierHashAlgorithm);
 
@@ -75,11 +71,17 @@ public final class AdESPolicy {
             }
         }
         else {
+
+        	if (identifierHashAlgorithm == null || "".equals(identifierHashAlgorithm)) { //$NON-NLS-1$
+                throw new IllegalArgumentException("Si se indica la huella digital del identificador de politica es obligatorio indicar tambien el algoritmo"); //$NON-NLS-1$
+            }
+
         	if (!AOUtil.isBase64(identifierHash.getBytes())) {
         		throw new IllegalArgumentException("La huella digital de la politica debe estar en formato Base64"); //$NON-NLS-1$
         	}
-        	
+
         	this.policyIdentifierHash = identifierHash;
+        	this.policyIdentifierHashAlgorithm = AOSignConstants.getDigestAlgorithmName(identifierHashAlgorithm);
         }
 
         if (qualifier != null && !"".equals(qualifier)) { //$NON-NLS-1$
@@ -91,7 +93,7 @@ public final class AdESPolicy {
             }
         }
     }
-    
+
     /** Obtiene el identificador de la pol&iacute;tica de firma.
      * @return Identificador de la pol&iacute;tica de firma
      */
@@ -156,10 +158,11 @@ public final class AdESPolicy {
     			extraParams.getProperty("policyQualifier") //$NON-NLS-1$
     			);
     }
-    
+
     /** {@inheritDoc} */
     @Override
     public boolean equals(final Object o) {
+
     	if (!(o instanceof AdESPolicy)) {
     		return false;
     	}
