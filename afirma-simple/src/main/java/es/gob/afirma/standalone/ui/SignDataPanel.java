@@ -221,7 +221,7 @@ final class SignDataPanel extends JPanel {
 	            	cfv = CertificateVerifierFactory.getCertificateVerifier(cert);
 	            }
 	            catch(final Exception e) {
-	            	LOGGER.severe("No se ha podido cargar el vertificador de certificados: " + e); //$NON-NLS-1$
+	            	LOGGER.warning("No se ha podido cargar el verificador de certificados: " + e); //$NON-NLS-1$
 	            }
 
 	            if (cfv != null) {
