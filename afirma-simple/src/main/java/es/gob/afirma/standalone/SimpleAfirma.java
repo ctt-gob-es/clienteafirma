@@ -123,10 +123,6 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
     private AOKeyStoreManager ksManager;
     private final MainMenu mainMenu;
 
-    MainMenu getMainMenu() {
-    	return this.mainMenu;
-    }
-
     /** Indica si el <code>AOKeyStoreManager</code> ha terminado de inicializarse
      * y est&aacute; listo para su uso.
      * @return <code>true</code> si el <code>AOKeyStoreManager</code> est&aacute; listo para usarse, <code>false</code> en caso
@@ -189,7 +185,7 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
 	        	showDNIeScreen = false;
 	        }
         }
-        
+
         if (asApplet) {
             this.container = this;
         }
@@ -206,16 +202,36 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
         	this.currentPanel = new SignPanel(mainScreen, this, true);
            	mainScreen.showMainScreen(this, this.currentPanel, 780, 500);
         	this.window = mainScreen;
+        	this.window.setTitle(SimpleAfirmaMessages.getString("SimpleAfirma.10")); //$NON-NLS-1$
         	this.container = this.window;
-        	
+
         	loadDefaultKeyStore();
-        	loadMainApp(true);
+        	configureMenuBar(true);
 
         	if (preSelectedFile != null) {
         		loadFileToSign(preSelectedFile);
         	}
         }
     }
+
+	private void configureMenuBar(final boolean firstTime) {
+		if (this.window != null) {
+        	if (Platform.OS.MACOSX.equals(Platform.getOS())) {
+            	this.window.getRootPane().putClientProperty("Window.documentFile", null); //$NON-NLS-1$
+            }
+            this.window.setJMenuBar(this.mainMenu);
+            this.mainMenu.setEnabledOpenCommand(true);
+            if (firstTime) {
+            	MainMenuManager.setMenuManagement(
+        			this.window.getRootPane().getActionMap(),
+        			this.window.getRootPane().getInputMap(
+            			JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
+        			),
+        			this.mainMenu
+    			);
+            }
+        }
+	}
 
     private void loadDefaultKeyStore() {
         this.container.setCursor(new Cursor(Cursor.WAIT_CURSOR));
@@ -273,23 +289,11 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
      * @param firstTime <code>true</code> si se la primera vez que se carga, <code>en caso contrario</code>
      */
     public void loadMainApp(final boolean firstTime) {
-        if (this.window != null) {
-        	this.window.setTitle(SimpleAfirmaMessages.getString("SimpleAfirma.10")); //$NON-NLS-1$
-            if (Platform.OS.MACOSX.equals(Platform.getOS())) {
-            	this.window.getRootPane().putClientProperty("Window.documentFile", null); //$NON-NLS-1$
-            }
-            this.window.setJMenuBar(this.mainMenu);
-            this.mainMenu.setEnabledOpenCommand(true);
-            if (firstTime) {
-            	MainMenuManager.setMenuManagement(
-        			this.window.getRootPane().getActionMap(),
-        			this.window.getRootPane().getInputMap(
-            			JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
-        			),
-        			SimpleAfirma.this.getMainMenu()
-    			);
-            }
-        }
+
+    	this.window.setTitle(SimpleAfirmaMessages.getString("SimpleAfirma.10")); //$NON-NLS-1$
+
+    	configureMenuBar(firstTime);
+
         final JPanel newPanel = new SignPanel(this.window, this, firstTime);
         this.container.add(newPanel, BorderLayout.CENTER);
         if (this.currentPanel != null) {

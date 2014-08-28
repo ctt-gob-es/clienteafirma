@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -43,9 +43,9 @@ public final class MainScreen extends JFrame {
     		public void run() {
     			createUI(wlist, firstPanel, width, height);
     		}
-    	});    	
+    	});
     }
-    
+
     void createUI(final WindowListener wlist, final JPanel firstPanel, final int width, final int height) {
         if (!LookAndFeelManager.HIGH_CONTRAST) {
             this.setBackground(LookAndFeelManager.WINDOW_COLOR);
@@ -59,7 +59,7 @@ public final class MainScreen extends JFrame {
         }
 
         this.add(firstPanel, BorderLayout.CENTER);
-        
+
         try {
             setIconImage(Toolkit.getDefaultToolkit().getImage(this.getClass().getResource("/resources/afirma_ico.png")) //$NON-NLS-1$
             );
@@ -92,7 +92,6 @@ public final class MainScreen extends JFrame {
                 }
             });
         }
-
         this.setVisible(true);
     }
 }

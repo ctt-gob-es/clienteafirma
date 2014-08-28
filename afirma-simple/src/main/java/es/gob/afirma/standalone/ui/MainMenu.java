@@ -182,7 +182,7 @@ public final class MainMenu extends JMenuBar {
 
         this.add(this.menuArchivo);
 
-          final Locale[] locales = SimpleAfirma.getAvailableLocales();
+        final Locale[] locales = SimpleAfirma.getAvailableLocales();
 
         if (!isMac) {
             final JMenu optionsMenu = new JMenu(SimpleAfirmaMessages.getString("MainMenu.18")); //$NON-NLS-1$
