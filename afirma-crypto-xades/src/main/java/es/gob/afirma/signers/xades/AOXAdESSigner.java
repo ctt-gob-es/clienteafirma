@@ -266,6 +266,8 @@ public final class AOXAdESSigner implements AOSigner {
 
     static final Logger LOGGER = Logger.getLogger("es.agob.afirma"); //$NON-NLS-1$
 
+    private static final String ID_IDENTIFIER = "Id"; //$NON-NLS-1$
+
     /** Etiqueta de los nodos firma de los XML firmados. */
     public static final String SIGNATURE_TAG = "Signature"; //$NON-NLS-1$
 
@@ -442,7 +444,7 @@ public final class AOXAdESSigner implements AOSigner {
         	final NodeList mainChildNodes = element.getChildNodes();
         	for (int i = 0; i < mainChildNodes.getLength(); i++) {
         		if (!mainChildNodes.item(i).getNodeName().equals(SIGNATURE_TAG)) {
-        			dataNodeId = ((Element) mainChildNodes.item(i)).getAttribute("Id"); //$NON-NLS-1$
+        			dataNodeId = ((Element) mainChildNodes.item(i)).getAttribute(ID_IDENTIFIER);
         			break;
         		}
         	}
@@ -525,7 +527,7 @@ public final class AOXAdESSigner implements AOSigner {
                 // Base64 si y solo si esta declarada esta transformacion
                 else {
                 	//TODO: Deshacer solo el Base64 si existe la transformacion Base64 (COMPROBAR)
-                	return isBase64TransformationDeclared(rootSig, firstChild.getAttribute("Id")) ? //$NON-NLS-1$
+                	return isBase64TransformationDeclared(rootSig, firstChild.getAttribute(ID_IDENTIFIER)) ?
                 				Base64.decode(firstChild.getTextContent()) :
                 					firstChild.getTextContent().getBytes();
                 }
@@ -552,7 +554,7 @@ public final class AOXAdESSigner implements AOSigner {
                 // Base64 si y solo si esta declarada esta transformacion
                 else {
                 	//TODO: Deshacer solo el Base64 si existe la transformacion Base64 (COMPROBAR)
-                	return isBase64TransformationDeclared(rootSig, object.getAttribute("Id")) ? //$NON-NLS-1$
+                	return isBase64TransformationDeclared(rootSig, object.getAttribute(ID_IDENTIFIER)) ?
                 				Base64.decode(object.getTextContent()) :
                 					object.getTextContent().getBytes();
                 }
@@ -852,7 +854,7 @@ public final class AOXAdESSigner implements AOSigner {
             final Element signature = (Element) signatures.item(i);
 
             // Recogemos el identificador del nodo de firma
-            arrayIds.add(signature.getAttribute("Id")); //$NON-NLS-1$
+            arrayIds.add(signature.getAttribute(ID_IDENTIFIER));
 
             // Recogemos los objetos que identificaran a los nodos de firma
             arrayNodes.add(new AOTreeNode(asSimpleSignInfo ? Utils.getSimpleSignInfoNode(Utils.guessXAdESNamespaceURL(signDoc.getDocumentElement()),
@@ -1007,7 +1009,7 @@ public final class AOXAdESSigner implements AOSigner {
         // Crea un nuevo documento con la raiz "AFIRMA"
         final Document docAfirma = dbf.newDocumentBuilder().newDocument();
         final Element rootAfirma = docAfirma.createElement(AFIRMA);
-        rootAfirma.setAttributeNS(null, "Id", "AfirmaRoot-" + UUID.randomUUID().toString());  //$NON-NLS-1$//$NON-NLS-2$
+        rootAfirma.setAttributeNS(null, ID_IDENTIFIER, "AfirmaRoot-" + UUID.randomUUID().toString());  //$NON-NLS-1$
 
         // Inserta el documento pasado por parametro en el nuevo documento
         rootAfirma.appendChild(docAfirma.adoptNode(docu.getDocumentElement()));

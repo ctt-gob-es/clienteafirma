@@ -71,6 +71,8 @@ import es.gob.afirma.signers.xml.XMLConstants;
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public final class XAdESCoSigner {
 
+    private static final String ID_IDENTIFIER = "Id"; //$NON-NLS-1$
+
 	private XAdESCoSigner() {
 		// No permitimos la instanciacion
 	}
@@ -145,7 +147,7 @@ public final class XAdESCoSigner {
 		// Propiedades del documento XML original
 		final Map<String, String> originalXMLProperties = new Hashtable<String, String>();
 
-		// carga el documento XML de firmas y su raiz
+		// Carga el documento XML de firmas y su raiz
 		Document docSig;
 		Element rootSig;
 		try {
@@ -178,38 +180,30 @@ public final class XAdESCoSigner {
 		XMLObject envelopingObject = null;
 		boolean isEnveloping = false;
 
-		// Localizamos la primera firma (primer nodo "Signature") en profundidad
-		// en el arbol de firma.
-		// Se considera que todos los objetos "Signature" del documento firman
-		// (referencian) los mismos
-		// objetos, por lo que podemos extraerlos de cualquiera de las firmas
-		// actuales.
-		// Buscamos dentro de ese Signature todas las referencias que apunten a
-		// datos para firmarlas
+		// Localizamos la primera firma (primer nodo "Signature") en profundidad en el arbol de firma.
+		// Se considera que todos los objetos "Signature" del documento firman (referencian) los mismos
+		// objetos, por lo que podemos extraerlos de cualquiera de las firmas actuales.
+		// Buscamos dentro de ese Signature todas las referencias que apunten a datos para firmarlas
 		final List<Reference> referenceList = new ArrayList<Reference>();
 		Node currentElement;
 		final NodeList nl = ((Element) docSig.getElementsByTagNameNS(XMLConstants.DSIGNNS, SIGNATURE_TAG).item(0)).getElementsByTagNameNS(XMLConstants.DSIGNNS, "Reference"); //$NON-NLS-1$
 
-		// Se considera que la primera referencia de la firma son los datos que
-		// debemos firmar, ademas
+		// Se considera que la primera referencia de la firma son los datos que debemos firmar, ademas
 		// de varias referencias especiales
 		String referenceId = null;
 		for (int i = 0; i < nl.getLength(); i++) {
 			currentElement = nl.item(i);
 
-			// Firmamos la primera referencia (que seran los datos firmados) y
-			// las hojas de estilo que
-			// tenga asignadas. Las hojas de estilo tendran un identificador que
-			// comience por STYLE_REFERENCE_PREFIX.
+			// Firmamos la primera referencia (que seran los datos firmados) y las hojas de estilo que
+			// tenga asignadas. Las hojas de estilo tendran un identificador que comience por STYLE_REFERENCE_PREFIX.
 			// TODO: Identificar las hojas de estilo de un modo generico.
 			final NamedNodeMap currentNodeAttributes = currentElement.getAttributes();
-			if (i == 0 || currentNodeAttributes.getNamedItem("Id") != null && currentNodeAttributes.getNamedItem("Id")  //$NON-NLS-1$//$NON-NLS-2$
+			if (i == 0 || currentNodeAttributes.getNamedItem(ID_IDENTIFIER) != null && currentNodeAttributes.getNamedItem(ID_IDENTIFIER)
 					.getNodeValue()
 					.startsWith(STYLE_REFERENCE_PREFIX)) {
 
 				// Buscamos las transformaciones declaradas en la Referencia,
-				// para anadirlas
-				// tambien en la nueva
+				// para anadirlas tambien en la nueva
 				final List<Transform> currentTransformList;
 				try {
 					currentTransformList = Utils.getObjectReferenceTransforms(currentElement, XML_SIGNATURE_PREFIX);
@@ -221,12 +215,10 @@ public final class XAdESCoSigner {
 					throw new AOException("Se han especificado parametros erroneos para una transformacion personalizada", e); //$NON-NLS-1$
 				}
 
-				// Creamos un identificador de referencia para el objeto a
-				// firmar y la almacenamos
-				// para mantener un listado con todas. En el caso de las hojas
-				// de estilo lo creamos con un
+				// Creamos un identificador de referencia para el objeto a firmar y la almacenamos
+				// para mantener un listado con todas. En el caso de las hojas de estilo lo creamos con un
 				// identificador descriptivo
-				if (currentNodeAttributes.getNamedItem("Id") != null && currentNodeAttributes.getNamedItem("Id")  //$NON-NLS-1$//$NON-NLS-2$
+				if (currentNodeAttributes.getNamedItem(ID_IDENTIFIER) != null && currentNodeAttributes.getNamedItem(ID_IDENTIFIER)
 						.getNodeValue()
 						.startsWith(STYLE_REFERENCE_PREFIX)) {
 					referenceId = STYLE_REFERENCE_PREFIX + UUID.randomUUID().toString();
@@ -260,7 +252,7 @@ public final class XAdESCoSigner {
 					final Element docElement = docSig.getDocumentElement();
 
 					// Comprobamos si el nodo raiz o sus hijos inmediatos son el nodo de datos
-					Node nodeAttributeId = docElement.getAttributes() != null ? docElement.getAttributes().getNamedItem("Id") : null; //$NON-NLS-1$
+					Node nodeAttributeId = docElement.getAttributes() != null ? docElement.getAttributes().getNamedItem(ID_IDENTIFIER) : null;
 					if (nodeAttributeId != null && dataNodeId.equals(nodeAttributeId.getNodeValue())) {
 						dataObjectElement = docElement;
 					}
@@ -269,7 +261,7 @@ public final class XAdESCoSigner {
 						final NodeList rootChildNodes = docElement.getChildNodes();
 						for (int j = rootChildNodes.getLength() - 1; j >= 0; j--) {
 
-							nodeAttributeId = rootChildNodes.item(j).getAttributes() != null ? rootChildNodes.item(j).getAttributes().getNamedItem("Id") : null; //$NON-NLS-1$
+							nodeAttributeId = rootChildNodes.item(j).getAttributes() != null ? rootChildNodes.item(j).getAttributes().getNamedItem(ID_IDENTIFIER) : null;
 							if (nodeAttributeId != null && dataNodeId.equals(nodeAttributeId.getNodeValue())) {
 								dataObjectElement = (Element) rootChildNodes.item(j);
 								break;
@@ -279,7 +271,7 @@ public final class XAdESCoSigner {
 							if (SIGNATURE_TAG.equals(rootChildNodes.item(j).getLocalName())) {
 								final NodeList subChildsNodes = rootChildNodes.item(j).getChildNodes();
 								for (int k = subChildsNodes.getLength() - 1; k >= 0; k--) {
-									nodeAttributeId = subChildsNodes.item(k).getAttributes() != null ? subChildsNodes.item(k).getAttributes().getNamedItem("Id") : null; //$NON-NLS-1$
+									nodeAttributeId = subChildsNodes.item(k).getAttributes() != null ? subChildsNodes.item(k).getAttributes().getNamedItem(ID_IDENTIFIER) : null;
 									if (nodeAttributeId != null && dataNodeId.equals(nodeAttributeId.getNodeValue())) {
 										dataObjectElement = (Element) subChildsNodes.item(k);
 										break;
@@ -305,7 +297,7 @@ public final class XAdESCoSigner {
 						final Node subNode = signatureChildNodes.item(j);
 						final NamedNodeMap nnm = subNode.getAttributes();
 						if (nnm != null) {
-							final Node idAttrNode = nnm.getNamedItem("Id"); //$NON-NLS-1$
+							final Node idAttrNode = nnm.getNamedItem(ID_IDENTIFIER);
 							if (idAttrNode != null && dataNodeId.equals(idAttrNode.getNodeValue())) {
 								isEnveloping = true;
 							}
@@ -384,7 +376,7 @@ public final class XAdESCoSigner {
 		}
 
 		// SignerRole
-		SignerRole signerRole = XAdESUtil.parseSignerRole(extraParams);
+		final SignerRole signerRole = XAdESUtil.parseSignerRole(extraParams);
 		if (signerRole != null) {
 			xades.setSignerRole(signerRole);
 		}
