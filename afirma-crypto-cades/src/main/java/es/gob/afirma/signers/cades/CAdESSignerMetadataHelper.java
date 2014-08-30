@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
-import java.util.regex.Pattern;
 
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.DERSequence;
@@ -36,26 +35,15 @@ public final class CAdESSignerMetadataHelper {
 		// signerLocationCountryName
 		final String country = extraParams.getProperty("signatureProductionCountry"); //$NON-NLS-1$
 
-		// claimedRoles
-		final String claimedRole = extraParams.getProperty("signerClaimedRoles"); //$NON-NLS-1$
-		final String[] roles;
-		if (claimedRole != null) {
-			roles = claimedRole.split(Pattern.quote("|")); //$NON-NLS-1$
-		}
-		else {
-			roles = null;
-		}
-
 		// signerLocationLocalityName
 		final String locality = extraParams.getProperty("signatureProductionCity"); //$NON-NLS-1$
-		if (postalAddress != null || country != null || locality != null || roles != null) {
+		if (postalAddress != null || country != null || locality != null) {
 			return new CAdESSignerMetadata(
 				country,
 				locality,
 				postalAddress != null ?
 					Arrays.asList(postalAddress) :
-						null,
-				roles
+						null
 			);
 		}
 		return null;

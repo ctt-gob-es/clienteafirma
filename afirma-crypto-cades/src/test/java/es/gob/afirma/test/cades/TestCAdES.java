@@ -256,8 +256,7 @@ public final class TestCAdES {
 		}
 	}
 
-	/**
-	 * Carga la clave privada un certificado de un almac&eacute;n en disco.
+	/** Carga la clave privada un certificado de un almac&eacute;n en disco.
 	 * @param pkcs12File Fichero P12/PFX.
 	 * @param alias Alias del certificado.
 	 * @param password Contrase&ntilde;a.
