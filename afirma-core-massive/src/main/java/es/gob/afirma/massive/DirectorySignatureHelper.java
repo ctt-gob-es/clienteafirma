@@ -401,9 +401,11 @@ public class DirectorySignatureHelper {
         }
 
         // Inicializamos el log de operacion
+        final OutputStream logOs = new FileOutputStream(this.logPath != null ? this.logPath : outDir + File.separator + DEFAULT_LOG_FILE);
         if (this.activeLog && this.logHandler == null) {
             this.logHandler = DirectorySignatureHelper.initDefaultLogHandler(
-            		new FileOutputStream(this.logPath != null ? this.logPath : outDir + File.separator + DEFAULT_LOG_FILE));
+        		logOs
+    		);
         }
 
         // Realizamos la operacion masiva correspondiente
@@ -423,6 +425,8 @@ public class DirectorySignatureHelper {
 
         // Cerramos el log de operacion
         this.closeLogRegistry();
+
+    	logOs.close();
 
         return allOK;
     }

@@ -16,6 +16,7 @@ public abstract class LogHandler {
 	public static final int LEVEL_SEVERE = 1000;
 
 	/** Da por finalizado el registro, a&ntilde;adiendo como pie de este las propiedades indicadas.
+	 * No cierra el flujo de escritura del registro, este cierre debe hacerse externamente.
 	 * @param params Propiedades a a&ntilde;adir en el pie del regitro al cierre de este
 	 * @throws IOException En caso de errores de entrada / salida */
 	public abstract void close(Properties params) throws IOException;
