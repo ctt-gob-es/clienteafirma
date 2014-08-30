@@ -70,6 +70,7 @@ public final class TestCAdESCommitment {
 	    p3.setProperty("signerLocationPostalAddress", "c/ Albarracin 25\n28037\nMadrid"); //$NON-NLS-1$ //$NON-NLS-2$
 		p3.setProperty("signerLocationCountryName", "Spain"); //$NON-NLS-1$ //$NON-NLS-2$
 		p3.setProperty("signerLocationLocalityName", "Madrid"); //$NON-NLS-1$ //$NON-NLS-2$
+		p3.setProperty("signerClaimedRoles", "Papa de Roma|Cardenal emerito de Pamplona"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		CADES_MODES = new Properties[] {
 			p3

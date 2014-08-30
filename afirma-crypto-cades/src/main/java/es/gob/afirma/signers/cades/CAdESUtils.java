@@ -432,8 +432,22 @@ public final class CAdESUtils {
         	}
         }
 
+        // claimed roles
+        if (csm != null && csm.getClaimedRoles() != null && csm.getClaimedRoles().length > 0) {
+        	for (final String role : csm.getClaimedRoles()) {
+        		contexExpecific.add(
+    				new Attribute(
+						PKCSObjectIdentifiers.,
+						new DERSet(
+
+						)
+					)
+    			);
+        	}
+        }
+
         // id-aa-ets-signerLocation
-        if (csm != null && csm.getSignerLocation() != null) {
+        if (csm != null && CAdESSignerMetadataHelper.getSignerLocation(csm.getSignerLocation()) != null) {
     		contexExpecific.add(
 				new Attribute(
 					PKCSObjectIdentifiers.id_aa_ets_signerLocation,

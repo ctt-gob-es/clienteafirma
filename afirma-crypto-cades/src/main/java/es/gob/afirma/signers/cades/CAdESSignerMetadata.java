@@ -53,11 +53,6 @@ public final class CAdESSignerMetadata {
 		 * @param locality Localidad
 		 * @param address Direcci&oacute;n postal (en m&aacute;ximo 6 l&iacute;neas) */
 		CAdESSignerLocation(final String country, final String locality, final List<String> address) {
-			if (country == null && locality == null && (address == null || address.size() < 1)) {
-				throw new IllegalArgumentException(
-					"Alguno de los datos del firmante debe ser distinto de nulo" //$NON-NLS-1$
-				);
-			}
 			if (address != null && address.size() > POSTAL_ADDRESS_MAX_LINES) {
 				throw new IllegalArgumentException(
 					"La direccion postal debe tener un maximo de seis lineas, y se han proporcionado " + address.size() //$NON-NLS-1$
