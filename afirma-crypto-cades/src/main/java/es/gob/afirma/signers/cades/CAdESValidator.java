@@ -70,6 +70,7 @@ public final class CAdESValidator {
         if (!doi.equals(PKCSObjectIdentifiers.data)) {
             return false;
         }
+
         // Contenido de Data
         final ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
 
@@ -81,7 +82,7 @@ public final class CAdESValidator {
 
         }
         catch (final Exception ex) {
-        	LOGGER.info("Lo datos proporcionados no son de tipo CAdESData: " + ex); //$NON-NLS-1$
+        	LOGGER.info("Los datos proporcionados no son de tipo Data: " + ex); //$NON-NLS-1$
             return false;
         }
 
@@ -94,18 +95,22 @@ public final class CAdESValidator {
      * <code>false</code> en caso contrario.
      * @throws IOException Si ocurren problemas leyendo los datos */
     public static boolean isCAdESSignedData(final byte[] data) throws IOException {
-        boolean isValid = false;
-        ASN1InputStream is = null;
         try {
-            is = new ASN1InputStream(data);
+        	final ASN1InputStream is = new ASN1InputStream(data);
             // LEEMOS EL FICHERO QUE NOS INTRODUCEN
             final ASN1Sequence dsq = (ASN1Sequence) is.readObject();
+            is.close();
             final Enumeration<?> e = dsq.getObjects();
+
             // Elementos que contienen los elementos OID Data
             final ASN1ObjectIdentifier doi = (ASN1ObjectIdentifier) e.nextElement();
-            if (doi.equals(PKCSObjectIdentifiers.signedData)) {
-                isValid = true;
+            if (!doi.equals(PKCSObjectIdentifiers.signedData)) {
+            	LOGGER.info(
+    				"Los datos proporcionados no son de tipo SignedData de CAdES (no esta declarado el OID de SignedData)" //$NON-NLS-1$
+				);
+        		return false;
             }
+
             // Contenido de SignedData
             final ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
             final ASN1Sequence datos = (ASN1Sequence) doj.getObject();
@@ -114,21 +119,21 @@ public final class CAdESValidator {
             final ASN1Set signerInfosSd = sd.getSignerInfos();
 
             for (int i = 0; i < signerInfosSd.size(); i++) {
-                final SignerInfo si = SignerInfo.getInstance(signerInfosSd.getObjectAt(i));
-                isValid = verifySignerInfo(si);
+            	if (!verifySignerInfo(SignerInfo.getInstance(signerInfosSd.getObjectAt(i)))) {
+            		LOGGER.info(
+        				"Los datos proporcionados no son de tipo SignedData de CAdES (al menos un SignerInfo no se ha declarado de tipo CAdES)" //$NON-NLS-1$
+    				);
+            		return false;
+            	}
             }
 
         }
         catch (final Exception ex) {
-        	LOGGER.info("Los datos proporcionados no son un SignedData de CAdES: " + ex); //$NON-NLS-1$
+        	LOGGER.info("Los datos proporcionados no son de tipo SignedData de CAdES: " + ex); //$NON-NLS-1$
             return false;
         }
-        finally {
-        	if (is != null) {
-        		is.close();
-        	}
-        }
-        return isValid;
+
+        return true;
     }
 
     /** Verifica que los <code>SignerInfos</code> tengan el par&aacute;metro
@@ -147,7 +152,8 @@ public final class CAdESValidator {
         		(ASN1ObjectIdentifier)seq.getObjectAt(0),
         		(ASN1Set)seq.getObjectAt(1)
     		);
-            // si tiene la pol&iacute;tica es CADES.
+
+            // Si tiene la politica es CADES.
             if (atribute.getAttrType().equals(PKCSObjectIdentifiers.id_aa_signingCertificate) ||
                 atribute.getAttrType().equals(PKCSObjectIdentifiers.id_aa_signingCertificateV2)) {
                 	isSignerValid = true;
@@ -195,7 +201,7 @@ public final class CAdESValidator {
 
         }
         catch (final Exception ex) {
-        	LOGGER.info("Los datos proporcionados no son de tipo CAdESDigestedData: " + ex); //$NON-NLS-1$
+        	LOGGER.info("Los datos proporcionados no son de tipo DigestedData: " + ex); //$NON-NLS-1$
             return false;
         }
 
@@ -250,7 +256,7 @@ public final class CAdESValidator {
 
         }
         catch (final Exception ex) {
-        	LOGGER.info("Lo datos proporcionados no son de tipo CAdESEncryptedData: " + ex); //$NON-NLS-1$
+        	LOGGER.info("Los datos proporcionados no son de tipo EncryptedData: " + ex); //$NON-NLS-1$
             return false;
         }
 
@@ -294,7 +300,7 @@ public final class CAdESValidator {
             EnvelopedData.getInstance(doj.getObject());
         }
         catch (final Exception ex) {
-        	LOGGER.info("Lo datos proporcionados no son de tipo CAdESEnvelopedData: " + ex); //$NON-NLS-1$
+        	LOGGER.info("Los datos proporcionados no son de tipo EnvelopedData: " + ex); //$NON-NLS-1$
             return false;
         }
 
@@ -305,7 +311,7 @@ public final class CAdESValidator {
      * @param data Datos PKCS#7/CMS/CAdES.
      * @return <code>true</code> si los datos proporcionados se corresponden con una estructura de tipo <i>SignedAndEnvelopedData</i>,
      * <code>false</code> en caso contrario.
-     * @throws IOException Si ocurren problemas relacionados con la lectura de los datos */
+     * @throws IOException Si ocurren problemas relacionados con la lectura de los datos. */
     static boolean isCAdESSignedAndEnvelopedData(final byte[] data) throws IOException {
         boolean isValid = false;
 
@@ -333,7 +339,15 @@ public final class CAdESValidator {
         // Contenido de SignedData
         final ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
         final ASN1Sequence datos = (ASN1Sequence) doj.getObject();
-        final SignedAndEnvelopedData sd = new SignedAndEnvelopedData(datos);
+
+        final SignedAndEnvelopedData sd;
+        try {
+        	sd = new SignedAndEnvelopedData(datos);
+        }
+        catch(final Exception ex) {
+        	LOGGER.info("Los datos proporcionados no son de tipo SignedAndEnvelopedData: " + ex); //$NON-NLS-1$
+        	return false;
+        }
 
         final ASN1Set signerInfosSd = sd.getSignerInfos();
 
@@ -404,7 +418,7 @@ public final class CAdESValidator {
      * @param data Datos que se desean comprobar.
      * @return <code>true</code> si los datos proporcionados se corresponden con la estructura CAdES
      *         indicada, <code>false</code> en caso contrario.
-     * @throws IOException SI ocurren problemas en la lectura de los datos */
+     * @throws IOException Si ocurren problemas en la lectura de los datos. */
     public static boolean isCAdESValid(final byte[] data) throws IOException {
         // si se lee en el CMSDATA, el inputstream ya esta leido y en los demas
         // siempre sera nulo
