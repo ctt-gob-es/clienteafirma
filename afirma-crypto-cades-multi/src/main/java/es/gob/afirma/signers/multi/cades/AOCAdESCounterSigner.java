@@ -108,7 +108,7 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
         // Datos firmados.
         byte[] dataSigned = null;
         // Si la firma que nos introducen es SignedData
-        if (CAdESValidator.isCAdESSignedData(sign)) {
+        if (CAdESValidator.isCAdESSignedData(sign, false)) {
             try {
                 // CASO DE FIRMA DE ARBOL
                 if (targetType == CounterSignTarget.TREE) {

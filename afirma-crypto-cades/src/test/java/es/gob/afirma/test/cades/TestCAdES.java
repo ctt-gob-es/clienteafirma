@@ -24,7 +24,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import es.gob.afirma.core.misc.AOUtil;
@@ -167,7 +166,7 @@ public final class TestCAdES {
 
 					Assert.assertNotNull(prueba, result);
 					Assert.assertTrue(signer.isSign(result));
-					Assert.assertTrue(CAdESValidator.isCAdESValid(result, AOSignConstants.CMS_CONTENTTYPE_SIGNEDDATA));
+					Assert.assertTrue(CAdESValidator.isCAdESValid(result, AOSignConstants.CMS_CONTENTTYPE_SIGNEDDATA, true));
 
 					AOTreeModel tree = signer.getSignersStructure(result, false);
 					Assert.assertEquals("Datos", ((AOTreeNode) tree.getRoot()).getUserObject()); //$NON-NLS-1$
@@ -200,7 +199,6 @@ public final class TestCAdES {
 	 */
 	@SuppressWarnings("static-method")
 	@Test
-	@Ignore
 	public void testCoSignature() throws Exception {
 
 		Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$
@@ -296,7 +294,7 @@ public final class TestCAdES {
 	private static void checkSign(final AOSigner signer, final byte[] sign, final PrivateKeyEntry[] pke, final String[] signsAlias, final String prueba) throws Exception {
 		Assert.assertNotNull(prueba, sign);
 		Assert.assertTrue(signer.isSign(sign));
-		Assert.assertTrue(CAdESValidator.isCAdESValid(sign, AOSignConstants.CMS_CONTENTTYPE_SIGNEDDATA));
+		Assert.assertTrue(CAdESValidator.isCAdESValid(sign, AOSignConstants.CMS_CONTENTTYPE_SIGNEDDATA, true));
 
 		// Arbol de alias
 		AOTreeModel tree = signer.getSignersStructure(sign, false);

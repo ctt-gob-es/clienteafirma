@@ -31,7 +31,7 @@ public class TestCadesValidator {
 		final byte[] cades = AOUtil.getDataFromInputStream(is);
 
 		Assert.assertTrue("La firma CAdES no es valida", //$NON-NLS-1$
-					CAdESValidator.isCAdESValid(cades, AOSignConstants.CMS_CONTENTTYPE_SIGNEDDATA));
+					CAdESValidator.isCAdESValid(cades, AOSignConstants.CMS_CONTENTTYPE_SIGNEDDATA, true));
 		is.close();
 
 	}

@@ -83,7 +83,7 @@ public final class AOCAdESCoSigner implements AOCoSigner {
 		}
 
 		// Si la firma que nos introducen es SignedData
-		if (CAdESValidator.isCAdESSignedData(sign)) {
+		if (CAdESValidator.isCAdESSignedData(sign, false)) {
 			try {
 				final String mode = extraParams.getProperty("mode", AOSignConstants.DEFAULT_SIGN_MODE); //$NON-NLS-1$
 				final boolean omitContent = mode.equals(AOSignConstants.SIGN_MODE_EXPLICIT) || precalculatedDigest != null;
@@ -171,7 +171,7 @@ public final class AOCAdESCoSigner implements AOCoSigner {
 
 
         // Si la firma que nos introducen es SignedData
-        if (CAdESValidator.isCAdESSignedData(sign)) {
+        if (CAdESValidator.isCAdESSignedData(sign, false)) {
             try {
 				return new CAdESCoSigner().coSigner(
 				    typeAlgorithm,

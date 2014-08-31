@@ -21,11 +21,11 @@ import java.util.Locale;
 
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.ASN1UTCTime;
 import org.bouncycastle.asn1.DERIA5String;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.DERSet;
-import org.bouncycastle.asn1.DERUTCTime;
 import org.bouncycastle.asn1.DERUTF8String;
 import org.bouncycastle.asn1.cms.Attribute;
 import org.bouncycastle.asn1.cms.CMSAttributes;
@@ -572,7 +572,7 @@ public final class CAdESUtils {
             contexExpecific.add(
         		new Attribute(
     				CMSAttributes.signingTime,
-    				new DERSet(new DERUTCTime(signDate))
+    				new DERSet(new ASN1UTCTime(signDate))
 				)
     		);
         }

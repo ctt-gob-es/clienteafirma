@@ -367,8 +367,8 @@ public final class AOCAdESSigner implements AOSigner {
     @Override
 	public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo) throws AOInvalidFormatException, IOException {
     	new BCChecker().checkBouncyCastle();
-    	if (!CAdESValidator.isCAdESValid(sign)) {
-    		throw new AOInvalidFormatException("Los datos introducidos no se corresponden con un objeto de firma"); //$NON-NLS-1$
+    	if (!CAdESValidator.isCAdESValid(sign, false)) {
+    		throw new AOInvalidFormatException("Los datos introducidos no se corresponden con un objeto de firma CAdES"); //$NON-NLS-1$
     	}
     	try {
             return new ReadNodesTree().readNodesTree(sign, asSimpleSignInfo);
@@ -390,7 +390,7 @@ public final class AOCAdESSigner implements AOSigner {
             return false;
         }
         new BCChecker().checkBouncyCastle();
-		return CAdESValidator.isCAdESSignedData(data);
+		return CAdESValidator.isCAdESSignedData(data, true);
     }
 
     /** Comprueba si unos datos sos susceptibles de ser firmados por esta clase.
@@ -423,7 +423,7 @@ public final class AOCAdESSigner implements AOSigner {
             throw new IllegalArgumentException("Se han introducido datos nulos para su comprobacion"); //$NON-NLS-1$
         }
         new BCChecker().checkBouncyCastle();
-        if (!CAdESValidator.isCAdESValid(signData)) {
+        if (!CAdESValidator.isCAdESValid(signData, false)) {
             throw new AOInvalidFormatException("Los datos introducidos no se corresponden con un objeto de firma"); //$NON-NLS-1$
         }
 		return ObtainContentSignedData.obtainData(signData);

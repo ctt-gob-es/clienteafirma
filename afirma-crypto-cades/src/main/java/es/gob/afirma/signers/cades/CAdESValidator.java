@@ -91,10 +91,13 @@ public final class CAdESValidator {
 
     /** Verifica si los datos proporcionados se corresponden con una estructura de tipo <i>SignedData</i>.
      * @param data Datos PKCS#7/CMS/CAdES.
+     * @param enforceCAdES Si se establece a <code>true</code> se comprueba que los SignerInfos sean expl&iacute;citamente
+     *                     de tipo CAdES, si se establece a <code>false</code> no se comprueba, por lo que se aceptan
+     *                     <code>SignedData</code> de CMS y PKCS#7.
      * @return <code>true</code> si los datos proporcionados se corresponden con una estructura de tipo <i>SignedData</i>,
      * <code>false</code> en caso contrario.
      * @throws IOException Si ocurren problemas leyendo los datos */
-    public static boolean isCAdESSignedData(final byte[] data) throws IOException {
+    public static boolean isCAdESSignedData(final byte[] data, final boolean enforceCAdES) throws IOException {
         try {
         	final ASN1InputStream is = new ASN1InputStream(data);
             // LEEMOS EL FICHERO QUE NOS INTRODUCEN
@@ -118,13 +121,15 @@ public final class CAdESValidator {
 
             final ASN1Set signerInfosSd = sd.getSignerInfos();
 
-            for (int i = 0; i < signerInfosSd.size(); i++) {
-            	if (!verifySignerInfo(SignerInfo.getInstance(signerInfosSd.getObjectAt(i)))) {
-            		LOGGER.info(
-        				"Los datos proporcionados no son de tipo SignedData de CAdES (al menos un SignerInfo no se ha declarado de tipo CAdES)" //$NON-NLS-1$
-    				);
-            		return false;
-            	}
+            if (enforceCAdES) {
+	            for (int i = 0; i < signerInfosSd.size(); i++) {
+	            	if (!verifySignerInfo(SignerInfo.getInstance(signerInfosSd.getObjectAt(i)))) {
+	            		LOGGER.info(
+	        				"Los datos proporcionados no son de tipo SignedData de CAdES (al menos un SignerInfo no se ha declarado de tipo CAdES)" //$NON-NLS-1$
+	    				);
+	            		return false;
+	            	}
+	            }
             }
 
         }
@@ -379,15 +384,19 @@ public final class CAdESValidator {
      *              <li><code>AOSignConstants.CMS_CONTENTTYPE_SIGNEDANDENVELOPEDDATA</code></li>
      *              <li><code>AOSignConstants.CMS_CONTENTTYPE_DIGESTEDDATA</code></li>
      *             </ul>
+     * @param enforceCAdESSignedData Si se establece a <code>true</code> se comprueba que los SignerInfos sean
+     *                               expl&iacute;citamente de tipo CAdES, si se establece a <code>false</code> no
+     *                               se comprueba, por lo que se aceptan <code>SignedData</code> de CMS y PKCS#7.
+     *                               Solo aplica a comprobaciones de <code>SignedData</code>.
      * @return <code>true</code> si los datos proporcionados se corresponden con la estructura CAdES
      *         indicada, <code>false</code> en caso contrario.
      * @throws IOException Si ocurren problemas en la lectura de la firma */
-    public static boolean isCAdESValid(final byte[] signData, final String type) throws IOException {
+    public static boolean isCAdESValid(final byte[] signData, final String type, final boolean enforceCAdESSignedData) throws IOException {
         if (type.equals(AOSignConstants.CMS_CONTENTTYPE_DATA)) {
 			return CAdESValidator.isCAdESData(signData);
         }
         else if (type.equals(AOSignConstants.CMS_CONTENTTYPE_SIGNEDDATA)) {
-			return CAdESValidator.isCAdESSignedData(signData);
+			return CAdESValidator.isCAdESSignedData(signData, enforceCAdESSignedData);
         }
         else if (type.equals(AOSignConstants.CMS_CONTENTTYPE_DIGESTEDDATA)) {
 			return CAdESValidator.isCAdESDigestedData(signData);
@@ -416,10 +425,14 @@ public final class CAdESValidator {
      *  <li>Signed and Enveloped Data</li>
      * </ul>
      * @param data Datos que se desean comprobar.
+     * @param enforceCAdESSignedData Si se establece a <code>true</code> se comprueba que los SignerInfos sean
+     *                               expl&iacute;citamente de tipo CAdES, si se establece a <code>false</code> no
+     *                               se comprueba, por lo que se aceptan <code>SignedData</code> de CMS y PKCS#7.
+     *                               Solo aplica a comprobaciones de <code>SignedData</code>.
      * @return <code>true</code> si los datos proporcionados se corresponden con la estructura CAdES
      *         indicada, <code>false</code> en caso contrario.
      * @throws IOException Si ocurren problemas en la lectura de los datos. */
-    public static boolean isCAdESValid(final byte[] data) throws IOException {
+    public static boolean isCAdESValid(final byte[] data, final boolean enforceCAdESSignedData) throws IOException {
         // si se lee en el CMSDATA, el inputstream ya esta leido y en los demas
         // siempre sera nulo
         if (data == null) {
@@ -431,7 +444,7 @@ public final class CAdESValidator {
         boolean valido = CAdESValidator.isCAdESData(data);
         // Comprobamos si su contenido es de tipo SIGNEDDATA
         if (!valido) {
-			valido = CAdESValidator.isCAdESSignedData(data);
+			valido = CAdESValidator.isCAdESSignedData(data, enforceCAdESSignedData);
         }
         // Comprobamos si su contenido es de tipo DIGESTDATA
         if (!valido) {
