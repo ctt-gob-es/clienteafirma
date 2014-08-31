@@ -10,6 +10,7 @@
 
 package es.gob.afirma.signers.pkcs7;
 
+import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1Object;
@@ -25,12 +26,38 @@ import org.bouncycastle.asn1.cms.EncryptedContentInfo;
  * Data del estandar pkcs#7 basado en la RFC-2315.
  * La implementaci&oacute;n del c&oacute;digo ha seguido los pasos necesarios
  * para crear un SignedAndEnvelopedData desarrollado en BouncyCastle: <a
- * href="http://www.bouncycastle.org/">www.bouncycastle.org</a> */
+ * href="http://www.bouncycastle.org/">www.bouncycastle.org</a>.
+ * <pre>
+ *  SignedAndEnvelopedData ::= SEQUENCE {
+ *     version                 Version,
+ *     recipientInfos          RecipientInfos,
+ *     digestAlgorithms        DigestAlgorithmIdentifiers,
+ *     encryptedContentInfo    EncryptedContentInfo,
+ *     certificates            [0] IMPLICIT Certificates OPTIONAL,
+ *     crls                    [1] IMPLICIT CertificateRevocationLists OPTIONAL,
+ *     signerInfos             SignerInfos }
+ *
+ *  RecipientInfos ::= SET OF RecipientInfo
+ *
+ *  DigestAlgorithmIdentifiers ::= CHOICE {
+ *     daSet SET OF DigestAlgorithmIdentifier,
+ *     daSequence SEQUENCE OF DigestAlgorithmIdentifier }
+ *
+ *  EncryptedContentInfo ::= SEQUENCE {
+ *    contentType ContentType,
+ *    contentEncryptionAlgorithm ContentEncryptionAlgorithmIdentifier,
+ *    encryptedContent [0] IMPLICIT EncryptedContent OPTIONAL }
+ *
+ *  </pre> */
 public final class SignedAndEnvelopedData extends ASN1Object {
 
     private final ASN1Integer version;
     private final ASN1Set recipientInfos;
-    private final ASN1Set digestAlgorithms;
+
+    /** <code>DigestAlgorithmIdentifiers</code>, que puede ser tanto un <code>SET</code> como una <code>SEQUENCE</code>
+     * ASN.1 de estructuras <code>DigestAlgorithmIdentifier</code>. */
+    private ASN1Primitive digestAlgorithms;
+
     private final EncryptedContentInfo encryptedContentInfo;
     private ASN1Set certificates;
     private ASN1Set crls;
@@ -45,13 +72,13 @@ public final class SignedAndEnvelopedData extends ASN1Object {
      * @param signerInfos SignerInfo
      */
     public SignedAndEnvelopedData(final ASN1Set recipientInfos,
-                           final ASN1Set digestAlgorithms,
-                           final EncryptedContentInfo encryptedContentInfo,
-                           final ASN1Set certificates,
-                           final ASN1Set crls,
-                           final ASN1Set signerInfos) {
+                                  final ASN1Primitive digestAlgorithms,
+                                  final EncryptedContentInfo encryptedContentInfo,
+                                  final ASN1Set certificates,
+                                  final ASN1Set crls,
+                                  final ASN1Set signerInfos) {
 
-        this.version = new ASN1Integer(1);// Always 1
+        this.version = new ASN1Integer(1); // Siempre 1
         this.recipientInfos = recipientInfos;
         this.digestAlgorithms = digestAlgorithms;
         this.encryptedContentInfo = encryptedContentInfo;
@@ -67,7 +94,16 @@ public final class SignedAndEnvelopedData extends ASN1Object {
         int index = 0;
         this.version = (ASN1Integer) seq.getObjectAt(index++);
         this.recipientInfos = ASN1Set.getInstance(seq.getObjectAt(index++));
-        this.digestAlgorithms = ASN1Set.getInstance(seq.getObjectAt(index++));
+
+        // Los DigestAlgorithmIdentifiers pueden ser SET o SEQUENCE, probamos ambos
+        final ASN1Encodable dai = seq.getObjectAt(index++);
+        try {
+        	this.digestAlgorithms = ASN1Set.getInstance(dai);
+        }
+        catch(final IllegalArgumentException e) {
+        	this.digestAlgorithms = ASN1Sequence.getInstance(dai);
+        }
+
         this.encryptedContentInfo = EncryptedContentInfo.getInstance(seq.getObjectAt(index++));
 
         if (seq.size() > 5) {
@@ -119,7 +155,7 @@ public final class SignedAndEnvelopedData extends ASN1Object {
     /** Obtiene los algoritmos de huella digital en forma de Set ASN.1.
      * @return Algoritmos de huella digital
      */
-    public ASN1Set getDigestAlgorithms() {
+    public ASN1Primitive getDigestAlgorithms() {
         return this.digestAlgorithms;
     }
 
