@@ -51,7 +51,7 @@ public final class Main {
 	private static final Preferences PREFERENCES = Preferences.userRoot().node(Constants.OUR_NODE_NAME);
 
     /** Versi&oacute;n de la interfaz gr&aacute;fica de escritorio. */
-    public static final String VERSION = "2.0"; //$NON-NLS-1$
+    public static final String VERSION = "2.1"; //$NON-NLS-1$
 
     private static final String GOOGLE_ANALYTICS_TRACKING_CODE = "UA-41615516-5"; //$NON-NLS-1$
 
