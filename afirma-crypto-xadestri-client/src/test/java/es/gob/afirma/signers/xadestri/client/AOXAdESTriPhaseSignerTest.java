@@ -73,6 +73,7 @@ public class AOXAdESTriPhaseSignerTest {
 	 * @throws Exception */
 	@SuppressWarnings("static-method")
 	@Test
+	@Ignore
 	public void pruebaFirmaXAdES() throws Exception {
 
 		final byte[] data = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(DATA_FILENAME));
