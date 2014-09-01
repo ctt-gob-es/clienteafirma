@@ -236,6 +236,11 @@ public final class AOSignConstants {
 	 *        Nombre o variante del nombre del algoritmo de huella digital
 	 * @return Nombre del algoritmo de huella digital */
 	public static String getDigestAlgorithmName(final String pseudoName) {
+		if (pseudoName == null) {
+			throw new IllegalArgumentException(
+				"El nombre del algoritmo de huella digital no puede ser nulo" //$NON-NLS-1$
+			);
+		}
 		final String upperPseudoName = pseudoName.toUpperCase(Locale.US);
 		if (upperPseudoName.equals("SHA")  //$NON-NLS-1$
 				|| upperPseudoName.equals("http://www.w3.org/2000/09/xmldsig#sha1".toUpperCase(Locale.US)) //$NON-NLS-1$
