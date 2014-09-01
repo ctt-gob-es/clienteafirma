@@ -119,7 +119,7 @@ public final class GenCAdESEPESSignedData {
         final byte[] preSignature = CAdESTriPhaseSigner.preSign(
     		AOSignConstants.getDigestAlgorithmName(dataDigestAlgorithmName),
             omitContent ? null : content,
-            (X509Certificate[]) certChain,
+            certChain,
             policy,
             signingCertificateV2,
             dataDigest,
@@ -143,7 +143,7 @@ public final class GenCAdESEPESSignedData {
             CAdESTriPhaseSigner.preSign(
         		AOSignConstants.getDigestAlgorithmName(dataDigestAlgorithmName),
                 omitContent ? null : content,
-                (X509Certificate[]) certChain,
+                certChain,
                 policy,
                 signingCertificateV2,
                 dataDigest,

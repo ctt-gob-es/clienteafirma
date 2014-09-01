@@ -13,6 +13,7 @@ package es.gob.afirma.signers.cades;
 import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.Date;
@@ -346,7 +347,7 @@ public final class CAdESUtils {
      * @throws java.security.NoSuchAlgorithmException Cuando se introduce un algoritmo no v&aacute;lido.
      * @throws java.io.IOException Cuando se produce un error de entrada/salida.
      * @throws CertificateEncodingException Error de codificaci&oacute;n en el certificado. */
-    public static ASN1EncodableVector generateSignerInfo(final X509Certificate cert,
+    public static ASN1EncodableVector generateSignerInfo(final Certificate cert,
                                                          final String digestAlgorithmName,
                                                          final byte[] data,
                                                          final AdESPolicy policy,
@@ -373,12 +374,12 @@ public final class CAdESUtils {
 
         if (signingCertificateV2) {
             contexExpecific.add(
-        		getSigningCertificateV2(cert, digestAlgorithmName, policy)
+        		getSigningCertificateV2((X509Certificate) cert, digestAlgorithmName, policy)
     		);
         }
         else {
             contexExpecific.add(
-        		getSigningCertificateV1(cert, digestAlgorithmName, policy)
+        		getSigningCertificateV1((X509Certificate) cert, digestAlgorithmName, policy)
     		);
         }
 

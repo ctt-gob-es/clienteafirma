@@ -14,6 +14,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.GregorianCalendar;
 import java.util.Properties;
@@ -172,7 +173,7 @@ public final class PAdESTriPhaseSigner {
      * @throws DocumentException En caso de errores en el XML de sesi&oacute;n */
     public static PdfSignResult preSign(final String digestAlgorithmName,
                                            final byte[] inPDF,
-                                           final X509Certificate[] signerCertificateChain,
+                                           final Certificate[] signerCertificateChain,
                                            final GregorianCalendar signTime,
                                            final Properties xParams) throws IOException,
                                                                             AOException,

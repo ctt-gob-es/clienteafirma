@@ -124,7 +124,7 @@ public final class AOPDFSigner implements AOSigner {
 			pre = PAdESTriPhaseSigner.preSign(
 				algorithm,
 				data,
-				(X509Certificate[]) certChain,
+				certChain,
 				signTime,
 				extraParams
 			);

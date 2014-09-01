@@ -159,7 +159,7 @@ public final class CAdESTriPhaseSigner {
      * @throws AOException Cuando se produce cualquier error durante el proceso. */
     public static byte[] preSign(final String digestAlgorithmName,
                           final byte[] content,
-                          final X509Certificate[] signerCertificateChain,
+                          final java.security.cert.Certificate[] signerCertificateChain,
                           final AdESPolicy policy,
                           final boolean signingCertificateV2,
                           final byte[] dataDigest,

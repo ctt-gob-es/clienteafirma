@@ -12,6 +12,7 @@ package es.gob.afirma.signers.pades;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -67,7 +68,7 @@ public final class PdfSessionManager {
      * @throws IOException En caso de errores de entrada / salida
      * @throws DocumentException Si ocurren errores en la estampaci&iacute;n de la firma PDF */
     public static PdfTriPhaseSession getSessionData(final byte[] inPDF,
-                                                    final X509Certificate[] certChain,
+                                                    final Certificate[] certChain,
                                                     final Calendar signTime,
                                                     final Properties extraParams) throws AOException,
                                                                                          IOException,
@@ -420,7 +421,7 @@ public final class PdfSessionManager {
 			dic.setDate(new PdfDate(sap.getSignDate()));
 		}
 
-		dic.setName(PdfPKCS7.getSubjectFields(certChain[0]).getField("CN")); //$NON-NLS-1$
+		dic.setName(PdfPKCS7.getSubjectFields((X509Certificate) certChain[0]).getField("CN")); //$NON-NLS-1$
 
 		if (sap.getReason() != null) {
 			dic.setReason(sap.getReason());
