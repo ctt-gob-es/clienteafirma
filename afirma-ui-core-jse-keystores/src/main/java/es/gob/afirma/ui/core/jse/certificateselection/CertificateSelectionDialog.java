@@ -103,7 +103,7 @@ public final class CertificateSelectionDialog extends MouseAdapter {
 		KeyboardFocusManager.getCurrentKeyboardFocusManager().removeKeyEventDispatcher(dispatcher);
 		certDialog.dispose();
 
-		return this.ksdm.getKeyEntry(selectedAlias);	
+		return this.ksdm.getKeyEntry(selectedAlias);
 	}
 
 	/** {@inheritDoc} */
@@ -133,7 +133,7 @@ public final class CertificateSelectionDialog extends MouseAdapter {
 
 	/** Refresca el almacen de certificados y el di&aacute;logo de selecci&oacute;n. */
 	public void refresh() {
-	
+
 		try {
 			this.ksdm.refresh();
 		}
@@ -141,13 +141,13 @@ public final class CertificateSelectionDialog extends MouseAdapter {
 			LOGGER.warning("Error en la orden de actualizacion del almacen: " + e); //$NON-NLS-1$
 			return;
 		}
-	
+
 		refreshDialog();
 	}
-	
+
 	/** Refresca el apartado gr&aacute;fico del di&aacute;logo de selecci&oacute;n. */
 	private void refreshDialog() {
-		
+
 		final NameCertificateBean[] certs = this.ksdm.getNameCertificates();
 		Arrays.sort(certs, CERT_NAME_COMPARATOR);
 
