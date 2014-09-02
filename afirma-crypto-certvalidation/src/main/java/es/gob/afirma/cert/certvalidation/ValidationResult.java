@@ -43,8 +43,7 @@ public enum ValidationResult {
 		.toString();
 	}
 
-	/** Indica si el resultado corresponde a un certificado X.509v3 v&aacute;lido (Clase 2, expedido por
-	 * FNMT-RCM, dentro de su periodo de validez y no revocado).
+	/** Indica si el resultado corresponde a un certificado X.509v3 v&aacute;lido.
 	 * @return <code>true</code> si corresponde a un certificado X.509v3 v&aacute;lido, <code>false</code>
 	 *         en caso contrario */
 	public boolean isValid() {
