@@ -16,6 +16,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
+import java.util.GregorianCalendar;
 import java.util.Locale;
 import java.util.Properties;
 import java.util.logging.Logger;
@@ -35,6 +36,8 @@ import es.gob.afirma.signers.pkcs7.BCChecker;
 import es.gob.afirma.signers.pkcs7.ObtainContentSignedData;
 import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
 import es.gob.afirma.signers.pkcs7.ReadNodesTree;
+import es.gob.afirma.signers.tsp.pkcs7.CMSTimestamper;
+import es.gob.afirma.signers.tsp.pkcs7.TsaParams;
 
 /** Manejador de firmas binarias CADES.
  * Soporta CAdES-BES, CAdES-EPES y CAdES-T. &Uacute;nicamente expone los m&eacute;todos declarados en el interfaz implementado <code>AOSigner</code>.
@@ -141,6 +144,8 @@ public final class AOCAdESSigner implements AOSigner {
     		algorithm
 		);
 
+        final byte[] CAdESSignedData;
+
         try {
             boolean omitContent = false;
             if (mode.equals(AOSignConstants.SIGN_MODE_EXPLICIT) || precalculatedDigestAlgorithmName != null) {
@@ -161,7 +166,7 @@ public final class AOCAdESSigner implements AOSigner {
 				}
 			}
 
-			return GenCAdESEPESSignedData.generateSignedData(
+			CAdESSignedData = GenCAdESEPESSignedData.generateSignedData(
                    csp,
                    omitContent,
                    AdESPolicy.buildAdESPolicy(extraParams),
@@ -180,6 +185,30 @@ public final class AOCAdESSigner implements AOSigner {
         catch (final Exception e) {
             throw new AOException("Error generando la firma CAdES: " + e, e); //$NON-NLS-1$
         }
+
+        //***************** SELLO DE TIEMPO ****************
+        TsaParams tsaParams;
+        try {
+        	tsaParams = new TsaParams(extraParams);
+        }
+        catch(final Exception e) {
+        	tsaParams = null;
+        }
+        if (tsaParams != null) {
+        	try {
+				return new CMSTimestamper(tsaParams).addTimestamp(
+					CAdESSignedData,
+					tsaParams.getTsaHashAlgorithm(),
+					new GregorianCalendar()
+				);
+			}
+        	catch (final Exception e) {
+        		LOGGER.severe("no se ha podido aplicar el sello de tiempo: " + e); //$NON-NLS-1$
+			}
+        }
+        //************** FIN SELLO DE TIEMPO ****************
+
+        return CAdESSignedData;
     }
 
     /** Cofirma datos en formato CAdES a&ntilde;adiendo la nueva firma a una CAdES o CMS ya existente. Para realizar la

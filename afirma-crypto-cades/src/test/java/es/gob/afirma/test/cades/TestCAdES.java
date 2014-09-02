@@ -62,6 +62,10 @@ public final class TestCAdES {
 		}
 	}
 
+	private static final String CATCERT_POLICY = "0.4.0.2023.1.1"; //$NON-NLS-1$
+	private static final String CATCERT_TSP = "http://psis.catcert.net/psis/catcert/tsp"; //$NON-NLS-1$
+	private static final Boolean CATCERT_REQUIRECERT = Boolean.TRUE;
+
 	private static final Properties[] CADES_MODES;
 
 	static {
@@ -80,6 +84,14 @@ public final class TestCAdES {
 		final Properties p3 = new Properties();
 		p3.setProperty("format", AOSignConstants.SIGN_FORMAT_CADES); //$NON-NLS-1$
 		p3.setProperty("mode", AOSignConstants.SIGN_MODE_EXPLICIT); //$NON-NLS-1$
+
+		final Properties p4 = new Properties();
+		p4.setProperty("format", AOSignConstants.SIGN_FORMAT_CADES); //$NON-NLS-1$
+		p4.setProperty("mode", AOSignConstants.SIGN_MODE_IMPLICIT); //$NON-NLS-1$
+        p4.put("tsaURL", CATCERT_TSP); //$NON-NLS-1$
+        p4.put("tsaPolicy", CATCERT_POLICY); //$NON-NLS-1$
+        p4.put("tsaRequireCert", CATCERT_REQUIRECERT); //$NON-NLS-1$
+        p4.put("tsaHashAlgorithm", "SHA-512"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		CADES_MODES = new Properties[] {
 				p1, p2, p3
