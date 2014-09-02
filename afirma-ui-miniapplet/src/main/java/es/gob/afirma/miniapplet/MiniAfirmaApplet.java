@@ -758,9 +758,10 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 
 		this.errorType = ex.getClass().getCanonicalName();
 
+		// Mostramos la traza de error a traves del log
 		final ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		final PrintWriter writer = new PrintWriter(baos);
-
+		e.printStackTrace(writer);
 		writer.flush();
 		writer.close();
 
