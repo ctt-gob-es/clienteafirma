@@ -150,7 +150,9 @@ final class ExtraParamsProcessor {
 	static void expandPolicyKeys(final Properties p, final byte[] signedData, final String format) {
 		if (p.containsKey(EXPANDIBLE_POLICY_KEY)) {
 
-			if (PolicyPropertiesManager.POLICY_ID_AGE.equals(p.getProperty(EXPANDIBLE_POLICY_KEY))) {
+			// Consideraciones de la politica 1.8 de la AGE y la ultima version de esta misma politica
+			if (PolicyPropertiesManager.POLICY_ID_AGE.equals(p.getProperty(EXPANDIBLE_POLICY_KEY)) ||
+					PolicyPropertiesManager.POLICY_ID_AGE_1_8.equals(p.getProperty(EXPANDIBLE_POLICY_KEY))) {
 
 				String normalizedFormat = null;
 				if (format != null) {
@@ -181,7 +183,7 @@ final class ExtraParamsProcessor {
 					}
 				}
 				try {
-					PolicyPropertiesManager.setProperties(p, PolicyPropertiesManager.POLICY_ID_AGE, normalizedFormat);
+					PolicyPropertiesManager.setProperties(p, p.getProperty(EXPANDIBLE_POLICY_KEY), normalizedFormat);
 				} catch (final IOException e) {
 					Logger.getLogger("es.gob.afirma").warning("No se han encontrado podido cargar el fichero de propiedades: " + e); //$NON-NLS-1$ //$NON-NLS-2$
 				}

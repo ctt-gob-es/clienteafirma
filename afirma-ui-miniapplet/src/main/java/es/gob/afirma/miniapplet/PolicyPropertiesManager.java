@@ -23,8 +23,11 @@ import java.util.ResourceBundle;
  */
 final class PolicyPropertiesManager {
 
-	/** Identificador de la pol&iacute;tica de firma de la AGE. */
+	/** Identificador de la &uacute;ltima versi&oacute;n de la pol&iacute;tica de firma de la AGE. */
 	static final String POLICY_ID_AGE = "FirmaAGE"; //$NON-NLS-1$
+
+	/** Identificador de la pol&iacute;tica de firma de la AGE versi&oacute;n 1.8. */
+	static final String POLICY_ID_AGE_1_8 = "FirmaAGE18"; //$NON-NLS-1$
 
 	static final String PROPERTY_POLICY_IDENTIFIER = "policyIdentifier"; //$NON-NLS-1$
 
