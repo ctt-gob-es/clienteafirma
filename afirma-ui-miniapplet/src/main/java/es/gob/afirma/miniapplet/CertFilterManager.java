@@ -19,6 +19,7 @@ import es.gob.afirma.keystores.filters.CertificateFilter;
 import es.gob.afirma.keystores.filters.MultipleCertificateFilter;
 import es.gob.afirma.keystores.filters.rfc.KeyUsageFilter;
 import es.gob.afirma.keystores.filters.rfc.RFC2254CertificateFilter;
+import es.gob.afirma.keystores.filters.rfc.SscdFilter;
 import es.gob.afirma.miniapplet.keystores.filters.AuthCertificateFilter;
 import es.gob.afirma.miniapplet.keystores.filters.ExpiredCertificateFilter;
 import es.gob.afirma.miniapplet.keystores.filters.QualifiedCertificatesFilter;
@@ -42,13 +43,14 @@ final class CertFilterManager {
 	private static final String FILTERS_PREFIX_KEY = "filters"; //$NON-NLS-1$
 	private static final String FILTERS_ENUM_SEPARATOR = "."; //$NON-NLS-1$
 	private static final String FILTERS_SEPARATOR = ";"; //$NON-NLS-1$
-	
+
 	private static final String FILTER_TYPE_DNIE = "dnie:"; //$NON-NLS-1$
 	private static final String FILTER_TYPE_SSL = "ssl:"; //$NON-NLS-1$
 	private static final String FILTER_TYPE_QUALIFIED = "qualified:"; //$NON-NLS-1$
 	private static final String FILTER_TYPE_SIGNING_CERTIFICATE = "signingcert:"; //$NON-NLS-1$
 	private static final String FILTER_TYPE_AUTHENTICATION_CERTIFICATE = "authcert:"; //$NON-NLS-1$
 	private static final String FILTER_TYPE_NON_EXPIRED = "nonexpired:"; //$NON-NLS-1$
+	private static final String FILTER_TYPE_SSCD = "sscd:"; //$NON-NLS-1$
 	private static final String FILTER_TYPE_SUBJECT_RFC2254 = "subject.rfc2254:"; //$NON-NLS-1$
 	private static final String FILTER_TYPE_SUBJECT_CONTAINS = "subject.contains:"; //$NON-NLS-1$
 	private static final String FILTER_TYPE_ISSUER_RFC2254 = "issuer.rfc2254:"; //$NON-NLS-1$
@@ -64,7 +66,7 @@ final class CertFilterManager {
 	private static final String FILTER_TYPE_KEYUSAGE_ENCIPHER_ONLY = FILTER_PREFIX_KEYUSAGE + "encipheronly:"; //$NON-NLS-1$
 	private static final String FILTER_TYPE_KEYUSAGE_DECIPHER_ONLY = FILTER_PREFIX_KEYUSAGE + "decipheronly:"; //$NON-NLS-1$
 	private static final String FILTER_TYPE_THUMBPRINT = "thumbprint:"; //$NON-NLS-1$
-	
+
 	private boolean mandatoryCertificate = false;
 
 	private final ArrayList<CertificateFilter> filters = new ArrayList<CertificateFilter>();
@@ -91,7 +93,7 @@ final class CertFilterManager {
 			this.filters.add(parseFilter(filterValue));
 		}
 	}
-	
+
 	/**
 	 * Recoge los distintos filtros declarados en el par&aacute;metro de configuraci&oacute;n.
 	 * @param config Configuraci&oacute;n de la operaci&oacute;n.
@@ -108,7 +110,7 @@ final class CertFilterManager {
 		else if (config.containsKey(FILTERS_PREFIX_KEY + FILTERS_ENUM_SEPARATOR + 1)) {
 			int i = 1;
 			while (config.containsKey(FILTERS_PREFIX_KEY + FILTERS_ENUM_SEPARATOR + i)) {
-				filterValues.add(config.getProperty(FILTERS_PREFIX_KEY + FILTERS_ENUM_SEPARATOR + i));	
+				filterValues.add(config.getProperty(FILTERS_PREFIX_KEY + FILTERS_ENUM_SEPARATOR + i));
 				i++;
 			}
 		}
@@ -116,7 +118,7 @@ final class CertFilterManager {
 	}
 
 	private static CertificateFilter parseFilter(final String filterValue) {
-		
+
 		final List<CertificateFilter> filtersList = new ArrayList<CertificateFilter>();
 		final String[] sortedFilterValues = filterValue.split(FILTERS_SEPARATOR);
 		// Se ordena para que los KeyUsage esten consecutivos
@@ -141,9 +143,9 @@ final class CertFilterManager {
 			else if (filter.toLowerCase().startsWith(FILTER_PREFIX_KEYUSAGE)) {
 				final Boolean[] kuPattern = new Boolean[9];
 				do {
-					processKeyUsageFilterDeclaration(filter, kuPattern); 
+					processKeyUsageFilterDeclaration(filter, kuPattern);
 					if (sortedFilterValues.length > (i + 1) && sortedFilterValues[i + 1].startsWith(FILTER_PREFIX_KEYUSAGE)) {
-						filter = sortedFilterValues[++i]; 
+						filter = sortedFilterValues[++i];
 					}
 					else {
 						break;
@@ -153,6 +155,9 @@ final class CertFilterManager {
 			}
 			else if (filter.toLowerCase().startsWith(FILTER_TYPE_NON_EXPIRED)) {
 				filtersList.add(new ExpiredCertificateFilter());
+			}
+			else if (filter.toLowerCase().startsWith(FILTER_TYPE_SSCD)) {
+				filtersList.add(new SscdFilter());
 			}
 			else if (filter.toLowerCase().startsWith(FILTER_TYPE_SUBJECT_RFC2254)) {
 				filtersList.add(new RFC2254CertificateFilter(filter.substring(FILTER_TYPE_SUBJECT_RFC2254.length()), null));
@@ -173,14 +178,14 @@ final class CertFilterManager {
 				}
 			}
 		}
-		
+
 		return filtersList.size() == 1 ?
 				filtersList.get(0) :
 					new MultipleCertificateFilter(filtersList.toArray(new CertificateFilter[filtersList.size()]));
 	}
-	
+
 	private static void processKeyUsageFilterDeclaration (final String filter, final Boolean[] kuPattern) {
-		
+
 		int patternPosition;
 		if (filter.toLowerCase().startsWith(FILTER_TYPE_KEYUSAGE_DIGITAL_SIGNATURE)) {
 			patternPosition = 0;
@@ -215,7 +220,7 @@ final class CertFilterManager {
 		final String value = filter.substring(filter.indexOf(":") + 1); //$NON-NLS-1$
 		kuPattern[patternPosition] = value.equalsIgnoreCase("null") ? null : Boolean.valueOf(value); //$NON-NLS-1$
 	}
-	
+
 	/**
 	 * Devuelve la lista de certificados definidos.
 	 * @return Listado de certificados.

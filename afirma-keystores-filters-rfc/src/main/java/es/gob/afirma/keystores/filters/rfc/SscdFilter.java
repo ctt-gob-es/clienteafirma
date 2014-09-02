@@ -26,12 +26,14 @@ public final class SscdFilter extends CertificateFilter {
 
 	@Override
 	public boolean matches(final X509Certificate cert) {
+
 		if (cert == null) {
 			return false;
 		}
+
 		final byte [] qcStatementsValue = cert.getExtensionValue(QC_STATEMENTS_OID);
 		if (qcStatementsValue == null) {
-			return true;
+			return false;
 		}
 
 		final QCStatements qcs;
@@ -53,6 +55,6 @@ public final class SscdFilter extends CertificateFilter {
 				return true;
 			}
 		}
-		return true;
+		return false;
 	}
 }
