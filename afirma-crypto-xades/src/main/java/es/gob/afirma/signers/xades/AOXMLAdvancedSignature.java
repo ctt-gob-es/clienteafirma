@@ -39,7 +39,6 @@ import net.java.xades.security.xml.XAdES.XMLAdvancedSignature;
 
 import org.w3c.dom.Element;
 
-import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.signers.xml.CustomUriDereferencer;
 import es.gob.afirma.signers.xml.style.XmlStyle;
 
@@ -115,7 +114,7 @@ final class AOXMLAdvancedSignature extends XMLAdvancedSignature {
         if (addKeyName) {
 	        newList.add(
 	    		keyInfoFactory.newKeyName(
-    				AOUtil.getCN(certificates.get(0))
+    				certificates.get(0).getSubjectX500Principal().toString()
 				)
 			);
         }
