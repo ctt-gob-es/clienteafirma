@@ -144,7 +144,7 @@ public final class AOCAdESSigner implements AOSigner {
     		algorithm
 		);
 
-        final byte[] CAdESSignedData;
+        final byte[] cadesSignedData;
 
         try {
             boolean omitContent = false;
@@ -166,7 +166,7 @@ public final class AOCAdESSigner implements AOSigner {
 				}
 			}
 
-			CAdESSignedData = GenCAdESEPESSignedData.generateSignedData(
+			cadesSignedData = GenCAdESEPESSignedData.generateSignedData(
                    csp,
                    omitContent,
                    AdESPolicy.buildAdESPolicy(extraParams),
@@ -197,7 +197,7 @@ public final class AOCAdESSigner implements AOSigner {
         if (tsaParams != null) {
         	try {
 				return new CMSTimestamper(tsaParams).addTimestamp(
-					CAdESSignedData,
+					cadesSignedData,
 					tsaParams.getTsaHashAlgorithm(),
 					new GregorianCalendar()
 				);
@@ -208,7 +208,7 @@ public final class AOCAdESSigner implements AOSigner {
         }
         //************** FIN SELLO DE TIEMPO ****************
 
-        return CAdESSignedData;
+        return cadesSignedData;
     }
 
     /** Cofirma datos en formato CAdES a&ntilde;adiendo la nueva firma a una CAdES o CMS ya existente. Para realizar la
