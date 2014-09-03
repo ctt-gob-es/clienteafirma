@@ -23,7 +23,7 @@ import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.signers.tsp.pkcs7.CMSTimestamper;
 import es.gob.afirma.signers.tsp.pkcs7.TsaParams;
 
-final class PdfTimestamper {
+public final class PdfTimestamper {
 
 	private static final String TIMESTAMP_SUBFILTER = "ETSI.RFC3161"; //$NON-NLS-1$
 
@@ -33,7 +33,7 @@ final class PdfTimestamper {
 		// No instanciable
 	}
 
-	static byte[] timestampPdf(final byte[] inPDF,
+	public static byte[] timestampPdf(final byte[] inPDF,
 			                   final Properties extraParams,
 			                   final Calendar signTime) throws AOException, IOException {
     	// Comprobamos si se ha pedido un sello de tiempo
