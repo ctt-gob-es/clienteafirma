@@ -23,6 +23,8 @@ import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.signers.tsp.pkcs7.CMSTimestamper;
 import es.gob.afirma.signers.tsp.pkcs7.TsaParams;
 
+/** Sellador de tiempo para documentos PDF.
+ * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public final class PdfTimestamper {
 
 	private static final String TIMESTAMP_SUBFILTER = "ETSI.RFC3161"; //$NON-NLS-1$
@@ -33,6 +35,13 @@ public final class PdfTimestamper {
 		// No instanciable
 	}
 
+	/** Aplica un sello de tiempo a un PDF.
+	 * @param inPDF PDF de entrada.
+	 * @param extraParams Par&aacute;metros de la TSA.
+	 * @param signTime Tiempo para el sello.
+	 * @return PDF con el sello de tiempo aplicado.
+	 * @throws AOException Si hay problemas durante el proceso.
+	 * @throws IOException Si hay problemas en el tratamiento de datos. */
 	public static byte[] timestampPdf(final byte[] inPDF,
 			                   final Properties extraParams,
 			                   final Calendar signTime) throws AOException, IOException {
