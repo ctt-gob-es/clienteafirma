@@ -102,7 +102,8 @@ public final class CMSEnvelopedData {
                                                           InvalidAlgorithmParameterException,
                                                           IllegalBlockSizeException,
                                                           BadPaddingException {
-        this.cipherKey = Utils.initEnvelopedData(config, certDest, keySize);
+
+        this.cipherKey = Utils.initEnvelopedData(config, keySize);
 
         // Ya que el contenido puede ser grande, lo recuperamos solo una vez
         final byte[] content2 = parameters.getContent();
@@ -166,8 +167,7 @@ public final class CMSEnvelopedData {
                                                                  IllegalBlockSizeException,
                                                                  BadPaddingException {
 
-        // Comprobamos que el archivo a tratar no sea nulo.
-        this.cipherKey = Utils.initEnvelopedData(config, certDest, keySize);
+        this.cipherKey = Utils.initEnvelopedData(config, keySize);
 
         // Datos previos utiles
         final String digestAlgorithm = AOSignConstants.getDigestAlgorithmName(digestAlg);

@@ -147,7 +147,7 @@ import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
                                                                                 IllegalBlockSizeException,
                                                                                 BadPaddingException {
 
-    	final SecretKey cipherKey = Utils.initEnvelopedData(config, certDest, keySize);
+    	final SecretKey cipherKey = Utils.initEnvelopedData(config, keySize);
 
         // Ya que el contenido puede ser grande, lo recuperamos solo una vez
         final byte[] content2 = parameters.getContent();

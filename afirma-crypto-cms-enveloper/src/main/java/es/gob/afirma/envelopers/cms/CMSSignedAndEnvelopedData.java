@@ -124,7 +124,7 @@ final class CMSSignedAndEnvelopedData {
                                                                    BadPaddingException,
                                                                    SignatureException {
 
-    	final SecretKey cipherKey = Utils.initEnvelopedData(config, certDest, keySize);
+    	final SecretKey cipherKey = Utils.initEnvelopedData(config, keySize);
 
         // 1. VERSION
         // la version se mete en el constructor del signedAndEnvelopedData y es

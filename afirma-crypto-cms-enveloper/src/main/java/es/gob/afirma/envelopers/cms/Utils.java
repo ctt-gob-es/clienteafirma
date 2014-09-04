@@ -76,7 +76,6 @@ import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.Certificate;
-import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.asn1.x509.TBSCertificateStructure;
 
 import es.gob.afirma.core.ciphers.AOCipherConfig;
@@ -129,17 +128,11 @@ final class Utils {
     /** Objeto para mostrar los logs de la clase. */
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
-    /** Comprueba que el archivo a tratar no es nulo e inicializa la clave de
-     * cifrado
+    /** Comprueba que el archivo a tratar no es nulo e inicializa la clave de cifrado.
      * @param config Configuraci&oacute;n de cifrado.
-     * @param certDest Certificado.
      * @param keySize Tama&ntilde;o (en bits) de la clave de cifrado.
      * @return Clave secreta */
-    static SecretKey initEnvelopedData(final AOCipherConfig config, final X509Certificate[] certDest, final Integer keySize) {
-        // Comprobamos que el archivo a tratar no sea nulo.
-        if (certDest == null || certDest.length == 0) {
-            throw new IllegalArgumentException("No se pueden envolver datos sin certificados destino"); //$NON-NLS-1$
-        }
+    static SecretKey initEnvelopedData(final AOCipherConfig config, final Integer keySize) {
 
         // Asignamos la clave de cifrado
         try {
@@ -221,42 +214,31 @@ final class Utils {
         final Info infos = new Info();
 
         final ASN1EncodableVector recipientInfos = new ASN1EncodableVector();
-        X509Certificate cert;
-        TBSCertificateStructure tbs;
-        IssuerAndSerialNumber isse;
-        RecipientIdentifier rid;
-        PublicKey pubKey;
-        AlgorithmIdentifier keyEncAlg;
-        SubjectPublicKeyInfo info;
-        // Cifrado de la clave
-        byte[] encryptedKey = null;
-        // generamos el contenedor de cifrado
-
-        RecipientInfo recipient = null;
 
         for (final X509Certificate element : certDest) {
-            cert = element;
-            tbs = TBSCertificateStructure.getInstance(ASN1Primitive.fromByteArray(cert.getTBSCertificate()));
-            // Obtenemos el Isuer & serial number
-            isse = new IssuerAndSerialNumber(X500Name.getInstance(tbs.getIssuer()), tbs.getSerialNumber().getValue());
-            // Creamos el recipientInfo
-            rid = new RecipientIdentifier(isse);
-            // Obtenemos la clave publica
-            pubKey = cert.getPublicKey();
-            // obtenemos la informacion de la clave publica
-            info = tbs.getSubjectPublicKeyInfo();
-            // obtenemos el algoritmo de cifrado.
-            keyEncAlg = info.getAlgorithm();
 
-            // ciframos la clave
-            encryptedKey = cipherKey(pubKey, cipherKey);
+        	final TBSCertificateStructure tbs = TBSCertificateStructure.getInstance(ASN1Primitive.fromByteArray(element.getTBSCertificate()));
 
             // creamos el recipiente con los datos del destinatario.
-            final KeyTransRecipientInfo keyTransRecipientInfo = new KeyTransRecipientInfo(rid, keyEncAlg, new DEROctetString(encryptedKey));
+            final KeyTransRecipientInfo keyTransRecipientInfo = new KeyTransRecipientInfo(
+        		// Creamos el recipientInfo
+        		new RecipientIdentifier(
+                    // Obtenemos el issuer & serial number
+        			new IssuerAndSerialNumber(X500Name.getInstance(tbs.getIssuer()), tbs.getSerialNumber().getValue())
+    			),
+    			// obtenemos el algoritmo de cifrado (RSA / DSA).
+    			tbs.getSubjectPublicKeyInfo().getAlgorithm(),
+        		new DEROctetString(
+    				cipherKey(
+		        		// Obtenemos la clave publica
+		        		element.getPublicKey(),
+		        		cipherKey
+		    		)
+				)
+    		);
 
-            recipient = new RecipientInfo(keyTransRecipientInfo);
-            // Lo a&ntilde;adimos al recipiente de destinatarios.
-            recipientInfos.add(recipient);
+            // Lo anadimos al recipiente de destinatarios.
+            recipientInfos.add(new RecipientInfo(keyTransRecipientInfo));
         }
 
         // 3. ENCRIPTEDCONTENTINFO
