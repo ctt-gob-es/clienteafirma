@@ -103,12 +103,14 @@
 				}
 				
 				// Guardamos la firma en disco si todo ha salido bien
+				alert("Se han producido errores: " + clienteFirma.isError());
 				if(!clienteFirma.isError()) {
 					clienteFirma.saveSignToFile();
 				}
 
 				/* Solo mostramos el error via JavaScript si se ha configurado que no lo muestre el propio cliente */
-				else if (!showErrors) {
+				//else if (!showErrors) {
+				else {
 					alert(clienteFirma.getErrorMessage());
 				}
 			}
@@ -214,18 +216,15 @@
 							<td>
 								<select id="formato">
 									<option value="CAdES" selected="selected">CAdES</option>
-									<option value="CAdEStri">CAdES trif&aacute;sica</option>
 									<option value="CMS/PKCS#7">CMS/PKCS#7</option>
 									<option value="XAdES Detached">XAdES/XAdES Detached</option>
 									<option value="XAdES Enveloped">XAdES Enveloped</option>
 									<option value="XAdES Enveloping" >XAdES Enveloping</option>
-									<option value="XAdEStri">XAdES trif&aacute;sica</option>
 									<option value="XMLDSig Detached">XMLDSig Detached</option>
 									<option value="XMLDSig Enveloped">XMLDSig Enveloped</option>
 									<option value="XMLDSig Enveloping">XMLDSig Enveloping</option>
 									<option value="FacturaE">FacturaE (Factura electr&oacute;nica)</option>
 									<option value="PDF">Adobe PDF</option>
-									<option value="PAdEStri">PAdES trif&aacute;sica</option>
 									<option value="ODF">ODF (Open Document Format)</option>
 									<option value="OOXML">OOXML (Office Open XML)</option>
 								</select>
@@ -301,8 +300,8 @@
 								<select name="tipoContrafirma" id="tipoContrafirma" onchange="cambioTipoContrafirma(this.value)">
 									<option value="NODOS">Nodos seleccionados</option>
 									<option value="FIRMANTES">Firmantes seleccionados</option>
-									<option value="ARBOL">Ãrbol entero</option>
-									<option value="HOJAS">Hojas del Ã¡rbol</option>
+									<option value="ARBOL">&Aacute;rbol entero</option>
+									<option value="HOJAS">Hojas del &Aacute;rbol</option>
 								</select>
 							</td>
 							<td rowspan="2" style="width: 100%">
