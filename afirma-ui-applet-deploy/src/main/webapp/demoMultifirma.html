@@ -103,7 +103,6 @@
 				}
 				
 				// Guardamos la firma en disco si todo ha salido bien
-				alert("Se han producido errores: " + clienteFirma.isError());
 				if(!clienteFirma.isError()) {
 					clienteFirma.saveSignToFile();
 				}
