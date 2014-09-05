@@ -84,25 +84,7 @@
 			<artifactId>afirma-crypto-xmlsignature</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		
-		<dependency>
-			<groupId>es.gob.afirma</groupId>
-			<artifactId>afirma-crypto-cadestri-client</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>es.gob.afirma</groupId>
-			<artifactId>afirma-crypto-padestri-client</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>es.gob.afirma</groupId>
-			<artifactId>afirma-crypto-xadestri-client</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		
+				
 		<dependency>
 			<groupId>es.gob.afirma</groupId>
 			<artifactId>afirma-keystores-filters-rfc</artifactId>
@@ -196,6 +178,7 @@
 					</filters>
 				</configuration>
 			</plugin>
+
 			<plugin>
 				<groupId>com.github.wvengen</groupId>
 				<artifactId>proguard-maven-plugin</artifactId>
@@ -225,6 +208,7 @@
                     </dependency>
                 </dependencies>
 			</plugin>
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
