@@ -286,18 +286,12 @@ var MiniApplet = {
 			// Los argumentos de java no llegan al propio applet en las pruebas con Java 6 y 7,
 			// asi que (salvo los argumentos de carga) vamos a pasarlos como un parametro mas al
 			// applet para luego establecerlos internamente.
-
-                        // ***************** IMPORTANTE *********
-                        // Por problemas con Java 7u65 se ha comentado "java_arguments" para evitar
-						// errores en el despliegue. Este cambio debería deshacerse una vez se publique
-						// una version de Java que corrija el error.
-                        // ************** FIN IMPORTANTE ********
 			var parameters = {
 					keystore: keystoreConfig,
 					userAgent: window.navigator.userAgent,
 					archive: MiniApplet.codeBase + '/' + MiniApplet.JAR_NAME,
 					code: 'es.gob.afirma.miniapplet.MiniAfirmaApplet',
-					//java_arguments: '-Xms512M -Xmx512M',
+					java_arguments: '-Xms512M -Xmx512M',
 					custom_java_arguments: MiniApplet.CUSTOM_JAVA_ARGUMENTS,
 					codebase_lookup: false,
 					separate_jvm: true,
