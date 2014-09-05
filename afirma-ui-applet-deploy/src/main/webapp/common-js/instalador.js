@@ -29,7 +29,7 @@ function cargarAppletFirma()
 		return;
 	}
 	
-	var jarArchive = "applet_afirma_core.jar";
+	var jarArchive = "applet_afirma_3_4.jar";
 	
 	var codeBase = base;
 	if (codeBase == undefined || codeBase == null) {
@@ -69,7 +69,7 @@ function cargarAppletFirma()
 			code: 'es.gob.afirma.applet.SignApplet',
 			archive: codeBase + "/" + jarArchive,
 			locale: defaultLocale,
-			//java_arguments: '-Xms512M -Xmx512M',
+			java_arguments: '-Xms512M -Xmx512M',
 			custom_java_arguments: CUSTOM_JAVA_ARGUMENTS,
 			codebase_lookup: false,
 			separate_jvm: true
