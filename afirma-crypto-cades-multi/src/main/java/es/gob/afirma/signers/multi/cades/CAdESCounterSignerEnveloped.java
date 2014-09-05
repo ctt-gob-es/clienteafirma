@@ -1090,7 +1090,7 @@ final class CAdESCounterSignerEnveloped {
 
         final ASN1EncodableVector contextExcepcific =
             CAdESUtils.generateSignerInfo(
-        		 (X509Certificate) certChain[0],
+        		 certChain[0],
                  digestAlgorithm,
                  si.getEncryptedDigest().getOctets(),
                  getGlobalPolicy(),

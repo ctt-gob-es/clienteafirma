@@ -244,7 +244,7 @@ final class CAdESCoSigner {
 		ASN1Set signedAttr = null;
 		if (messageDigest == null) {
 			final ASN1EncodableVector contextExpecific = CAdESUtils.generateSignerInfo(
-				(X509Certificate) certChain[0],
+				certChain[0],
 				digestAlgorithm,
 				content2 != null ? content2 : parameters.getContent(),
 				policy,
@@ -262,7 +262,7 @@ final class CAdESCoSigner {
 		}
 		else {
 			final ASN1EncodableVector contextExpecific = CAdESUtils.generateSignerInfo(
-				(X509Certificate) certChain[0],
+				certChain[0],
 				digestAlgorithm,
 				null,
 				policy,
