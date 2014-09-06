@@ -16,7 +16,7 @@ public final class TestClauerCSP {
 	private static final String ALIAS = "CLAUER_PERSONA FISICA DE LA PE\u199A DE PROVES"; //$NON-NLS-1$
 
 	/** Prueba de firma con CSP.
-	 * @throws Exception */
+	 * @throws Exception En cualquier error. */
 	@SuppressWarnings("static-method")
 	@Test
 	@Ignore
@@ -36,8 +36,8 @@ public final class TestClauerCSP {
 	}
 
 	/** M&eacute;todo de entrada.
-	 * @param args
-	 * @throws Exception */
+	 * @param args No se usa.
+	 * @throws Exception En cualquier error. */
 	public static void main(final String args[]) throws Exception {
 		new TestClauerCSP().testCapi();
 	}

@@ -37,15 +37,14 @@ import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
 public class TestAOKeystoreFactory {
 
 	/** Prueba directa.
-	 * @param args
-	 * @throws Exception */
+	 * @param args No se usa.
+	 * @throws Exception En cualquier error. */
 	public static void main(final String args[]) throws Exception {
 		new TestAOKeystoreFactory().testAOKeystoreFactoryCAPI();
 	}
 
     /** Pruebas de AOKeyStoreFactory de los tipos sin dependencias de otros m&oacute;dulos
-     * @throws Exception
-     */
+     * @throws Exception En cualquier error. */
     @SuppressWarnings("static-method")
 	@Test
 	@Ignore
@@ -70,8 +69,7 @@ public class TestAOKeystoreFactory {
     }
 
     /** Pruebas de AOKeyStoreFactory de los tipos sin dependencias de otros m&oacute;dulos
-     * @throws Exception
-     */
+     * @throws Exception En cualquier error. */
     @SuppressWarnings("static-method")
 	@Test
     public void testAOKeystoreFactory() throws Exception {

@@ -26,7 +26,7 @@ public final class TestPkcs11 {
 	private static final char[] PIN = "1111".toCharArray(); //$NON-NLS-1$
 
 	/** Prueba de firma con PKCS#11.
-	 * @throws Exception */
+	 * @throws Exception En cualquier error. */
 	@SuppressWarnings("static-method")
 	@Ignore
 	@Test
@@ -52,7 +52,7 @@ public final class TestPkcs11 {
 	}
 
 	/** Prueba de firma con PKCS#11 usando directamente JRE.
-	 * @throws Exception */
+	 * @throws Exception En cualquier error. */
 	@SuppressWarnings("static-method")
 	@Test
 	@Ignore
@@ -87,8 +87,8 @@ public final class TestPkcs11 {
 	}
 
 	/** M&eacute;todo de entrada.
-	 * @param args
-	 * @throws Exception */
+	 * @param args No se usa.
+	 * @throws Exception En cualquier error. */
 	public static void main(final String args[]) throws Exception {
 		new TestPkcs11().testPkcs11();
 	}

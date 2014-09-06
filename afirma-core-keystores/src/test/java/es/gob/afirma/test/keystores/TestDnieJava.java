@@ -27,7 +27,7 @@ import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
 public class TestDnieJava {
 
     /** Prueba de carga y uso del almac&eacute;n DNIe 100% Java.
-     * @throws Exception */
+     * @throws Exception En cualquier error. */
     @SuppressWarnings("static-method")
 	@Test
 	@Ignore
@@ -58,8 +58,8 @@ public class TestDnieJava {
     }
 
 	/** Main.
-	 * @param args
-	 * @throws Exception */
+	 * @param args No se usa.
+	 * @throws Exception En cualquier error. */
 	public static void main(final String[] args) throws Exception {
 		new TestDnieJava().testDnieJava();
 	}

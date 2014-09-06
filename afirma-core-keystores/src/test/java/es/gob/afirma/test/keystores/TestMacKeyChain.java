@@ -32,8 +32,8 @@ import es.gob.afirma.keystores.callbacks.CachePasswordCallback;
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public class TestMacKeyChain {
 
-    /** Prueba de carga y uso de un <i>KayChain</i> en fichero suelto.
-     * @throws Exception */
+    /** Prueba de carga y uso de un <i>KeyChain</i> en fichero suelto.
+     * @throws Exception En cualquier error. */
     @SuppressWarnings("static-method")
 	@Test
     public void testStandaloneKeyChain() throws Exception {
@@ -76,7 +76,7 @@ public class TestMacKeyChain {
 
     /** Prueba de carga y uso del <i>KayChain</i> del sistema.
      * Requiere importada en el sistema una entrada con alias "anf usuario activo" que tenga clave privada
-     * @throws Exception */
+     * @throws Exception En cualquier error. */
     @SuppressWarnings("static-method")
 	@Test
     public void testSystemKeyChain() throws Exception {
