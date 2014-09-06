@@ -8,7 +8,7 @@ import org.junit.Test;
 public final class TestMIMEDetection {
 
 	/** Prueba la detecci&oacute;n de documentos PDF.
-	 * @throws Exception */
+	 * @throws Exception En cualquier error. */
 	@SuppressWarnings("static-method")
 	@Test
 	public void testPdfDetection() throws Exception {
@@ -18,7 +18,7 @@ public final class TestMIMEDetection {
 	}
 
 	/** Prueba la detecci&oacute;n de documentos TXT.
-	 * @throws Exception */
+	 * @throws Exception En cualquier error. */
 	@SuppressWarnings("static-method")
 	@Test
 	public void testTxtDetection() throws Exception {
@@ -28,7 +28,7 @@ public final class TestMIMEDetection {
 	}
 
 	/** Prueba la detecci&oacute;n de documentos XML.
-	 * @throws Exception */
+	 * @throws Exception En cualquier error. */
 	@SuppressWarnings("static-method")
 	@Test
 	public void testXmlDetection() throws Exception {
@@ -38,7 +38,7 @@ public final class TestMIMEDetection {
 	}
 
 	/** Prueba la detecci&oacute;n de archivos RAR.
-	 * @throws Exception */
+	 * @throws Exception En cualquier error. */
 	@SuppressWarnings("static-method")
 	@Test
 	public void testRarDetection() throws Exception {

@@ -8,7 +8,7 @@ import org.junit.Test;
 public final class TestOfficeMIMEDetection {
 
 	/** Prueba la detecci&oacute;n de documentos Excel.
-	 * @throws Exception */
+	 * @throws Exception En cualquier error. */
 	@SuppressWarnings("static-method")
 	@Test
 	public void testExcelDetection() throws Exception {
@@ -18,7 +18,7 @@ public final class TestOfficeMIMEDetection {
 	}
 
 	/** Prueba la detecci&oacute;n de documentos Word.
-	 * @throws Exception */
+	 * @throws Exception En cualquier error. */
 	@SuppressWarnings("static-method")
 	@Test
 	public void testWordDetection() throws Exception {
@@ -28,7 +28,7 @@ public final class TestOfficeMIMEDetection {
 	}
 
 	/** Prueba la detecci&oacute;n de documentos PowerPoint.
-	 * @throws Exception */
+	 * @throws Exception En cualquier error. */
 	@SuppressWarnings("static-method")
 	@Test
 	public void testPowerPointDetection() throws Exception {
@@ -38,7 +38,7 @@ public final class TestOfficeMIMEDetection {
 	}
 
 	/** Prueba la detecci&oacute;n de documentos Project.
-	 * @throws Exception */
+	 * @throws Exception En cualquier error. */
 	@SuppressWarnings("static-method")
 	@Test
 	public void testProjectDetection() throws Exception {
@@ -48,7 +48,7 @@ public final class TestOfficeMIMEDetection {
 	}
 
 	/** Prueba la detecci&oacute;n de documentos Visio.
-	 * @throws Exception */
+	 * @throws Exception En cualquier error. */
 	@SuppressWarnings("static-method")
 	@Test
 	public void testVisioDetection() throws Exception {

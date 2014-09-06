@@ -284,7 +284,7 @@ public final class Base64 {
      * @param source Datos a convertir a Base64
      * @return Datos codificados como texto Base64 */
     public static String encode(final byte[] source) {
-        String encoded = encodeBytes(source, 0, source.length, NO_OPTIONS);
+        final String encoded = encodeBytes(source, 0, source.length, NO_OPTIONS);
         assert encoded != null;
         return encoded;
     }
@@ -294,8 +294,7 @@ public final class Base64 {
      * @param urlSafe Si se establece a <code>true</code> indica que los datos se codificar&aacute;n con un alfabeto Base64
      *                susceptible de ser usado en URL, seg&uacute;n se indica en la seccti&oacute;n 4 de la RFC3548,
      *                si se establece a <code>false</code> los datos se codificar&aacute;n en Base64 normal
-     * @return Datos codificados como texto Base64
-     * @throws java.io.IOException si se produce cualquier error */
+     * @return Datos codificados como texto Base64. */
     public static String encode(final byte[] source, final boolean urlSafe) {
         return encodeBytes( source, 0, source.length, urlSafe ? URL_SAFE : NO_OPTIONS);
     }
@@ -533,7 +532,7 @@ public final class Base64 {
     	if (urlSafe) {
     		options = URL_SAFE;
     	}
-    	
+
         // Lots of error checking and exception throwing
         if( source == null ){
             throw new IllegalArgumentException("Cannot decode null source array"); //$NON-NLS-1$

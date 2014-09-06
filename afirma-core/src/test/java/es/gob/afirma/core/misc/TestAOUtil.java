@@ -11,7 +11,6 @@
 package es.gob.afirma.core.misc;
 
 import org.junit.Assert;
-
 import org.junit.Test;
 
 /** M&eacute;todos generales de utilidad para toda la aplicaci&oacute;n.
@@ -27,7 +26,7 @@ public final class TestAOUtil {
 	}
 
     /** Prueba para el getCN(), reconstruido para prescindir de javax.naming.
-     * @throws Exception */
+     * @throws Exception En cualquier error. */
     @SuppressWarnings("static-method")
 	@Test
     public void testGetCN() throws Exception {
