@@ -104,7 +104,6 @@ final class AOXMLAdvancedSignature extends XMLAdvancedSignature {
             }
         }
         final List<XMLStructure> newList = new ArrayList<XMLStructure>();
-        newList.add(keyInfoFactory.newKeyValue(certificates.get(0).getPublicKey()));
         newList.add(keyInfoFactory.newX509Data(x509DataList));
         if (addKeyValue) {
 	        newList.add(keyInfoFactory.newKeyValue(
