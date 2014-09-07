@@ -86,14 +86,14 @@ public final class CMSTimestamper {
     private String sslP12KeyStorePassword = null;
 
     /** Construye un estampador de sellos de tiempo para estructuras CMS y CAdES.
-     * @param requireCert <code>true</code> si la TSA requiere certificado, <code>false</code> en caso contrario
-     * @param policy OID de la pol&iacute;tica de sellado de tiempo
-     * @param tsa URL de la autoridad de sellado de tiempo
-     * @param tsaUsr Nombre de usuario si la TSA requiere autenticaci&oacute;n (puede ser <code>null</code> si no se necesita autenticaci&oacute;n)
-     * @param tsaPwd Contrase&ntilde;a del usuario de la TSA (puede ser <code>null</code> si no se necesita autenticaci&oacute;n)
-     * @param extensions Extensiones a a&ntilde;adir a la petici&oacute;n de sello de tiempo
-     * @param p12KeyStoreFile Fichero PKCS#12 / PFX de almac&eacute;n (formato PKCS#12) del certificado cliente a usar en conexiones SSL
-     * @param p12KeyStoreFilePassword Contrase&ntilde;a del ichero PKCS#12 / PFX de almac&eacute;n (formato PKCS#12) del certificado
+     * @param requireCert <code>true</code> si la TSA requiere certificado, <code>false</code> en caso contrario.
+     * @param policy OID de la pol&iacute;tica de sellado de tiempo.
+     * @param tsa URL de la autoridad de sellado de tiempo.
+     * @param tsaUsr Nombre de usuario si la TSA requiere autenticaci&oacute;n (puede ser <code>null</code> si no se necesita autenticaci&oacute;n).
+     * @param tsaPwd Contrase&ntilde;a del usuario de la TSA (puede ser <code>null</code> si no se necesita autenticaci&oacute;n).
+     * @param extensions Extensiones a a&ntilde;adir a la petici&oacute;n de sello de tiempo.
+     * @param p12KeyStoreFile Fichero PKCS#12 / PFX de almac&eacute;n (formato PKCS#12) del certificado cliente a usar en conexiones SSL.
+     * @param p12KeyStoreFilePassword Contrase&ntilde;a del ichero PKCS#12 / PFX de almac&eacute;n (formato PKCS#12) del certificado.
      *                                cliente a usar en conexiones SSL */
     public CMSTimestamper(final boolean requireCert,
                      final String policy,
@@ -103,40 +103,6 @@ public final class CMSTimestamper {
                      final TsaRequestExtension[] extensions,
                      final byte[] p12KeyStoreFile,
                      final String p12KeyStoreFilePassword) {
-    	this(requireCert, policy, tsa, tsaUsr, tsaPwd, extensions);
-    	if (p12KeyStoreFile == null || p12KeyStoreFilePassword == null) {
-    		throw new IllegalArgumentException("El almacen PKCS#12 y su contrasena no pueden ser nulos"); //$NON-NLS-1$
-    	}
-    	this.sslP12KeyStoreFile = p12KeyStoreFile.clone();
-    	this.sslP12KeyStorePassword = p12KeyStoreFilePassword;
-    }
-
-    /** Construye un estampador de sellos de tiempo para estructuras CMS y CAdES.
-     * @param params Par&aacute;metros de configuraci&oacute;n de una Autoridad de Sellado de Tiempo. */
-    public CMSTimestamper(final TsaParams params) {
-    	this(
-			params.doTsaRequireCert(),
-			params.getTsaPolicy(),
-			params.getTsaUrl(),
-			params.getTsaUsr(),
-			params.getTsaPwd(),
-			params.getExtensions()
-		);
-    }
-
-    /** Construye un estampador de sellos de tiempo para estructuras CMS y CAdES.
-     * @param requireCert <code>true</code> si la TSA requiere certificado, <code>false</code> en caso contrario
-     * @param policy OID de la pol&iacute;tica de sellado de tiempo
-     * @param tsa URL de la autoridad de sellado de tiempo
-     * @param tsaUsr Nombre de usuario si la TSA requiere autenticaci&oacute;n (puede ser <code>null</code> si no se necesita autenticaci&oacute;n)
-     * @param tsaPwd Contrase&ntilde;a del usuario de la TSA (puede ser <code>null</code> si no se necesita autenticaci&oacute;n)
-     * @param extensions Extensiones a a&ntilde;adir a la petici&oacute;n de sello de tiempo */
-    CMSTimestamper(final boolean requireCert,
-                          final String policy,
-                          final URI tsa,
-                          final String tsaUsr,
-                          final String tsaPwd,
-                          final TsaRequestExtension[] extensions) {
         this.tsqGenerator = new TimeStampRequestGenerator();
         if (extensions != null) {
         	for (final TsaRequestExtension ext : extensions) {
@@ -153,6 +119,23 @@ public final class CMSTimestamper {
         this.tsaURL = tsa;
         this.tsaPassword = tsaPwd;
         this.tsaUsername = tsaUsr;
+		this.sslP12KeyStoreFile = p12KeyStoreFile.clone();
+		this.sslP12KeyStorePassword = p12KeyStoreFilePassword;
+    }
+
+    /** Construye un estampador de sellos de tiempo para estructuras CMS y CAdES.
+     * @param params Par&aacute;metros de configuraci&oacute;n de una Autoridad de Sellado de Tiempo. */
+    public CMSTimestamper(final TsaParams params) {
+    	this(
+			params.doTsaRequireCert(),
+			params.getTsaPolicy(),
+			params.getTsaUrl(),
+			params.getTsaUsr(),
+			params.getTsaPwd(),
+			params.getExtensions(),
+			params.getSslPkcs12File(),
+			params.getSslPkcs12FilePassword()
+		);
     }
 
     /** A&ntilde;ade un sello de tiempo a las firmas encontradas dentro de una estructura PKCS#7.

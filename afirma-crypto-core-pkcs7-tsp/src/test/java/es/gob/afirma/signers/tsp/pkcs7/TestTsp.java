@@ -28,6 +28,8 @@ public class TestTsp {
 			new URI(CATCERT_TSP_SSL),
 			null,
 			null,
+			null,
+			null,
 			null
 		);
 		final byte[] tspToken = cmsTsp.getTimeStampToken(

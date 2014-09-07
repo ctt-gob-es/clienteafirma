@@ -86,6 +86,27 @@
      <dd>
       Lista de OID separados por el caracter '<i>|</i>' que se aportan como calificadores adicionales del 
       <i>CommitmentTypeIndication</i> n&uacute;mero <i>n</i> (atributo opcional). 
+     </dd>     
+    <dt><b><i>tsaURL</i></b></dt>
+     <dd>URL de la autoridad de sello de tiempo (si no se indica no se a&ntilde;ade sello de tiempo).</dd>
+    <dt><b><i>tsaPolicy</i></b></dt>
+     <dd>Pol&iacute;tica de sellado de tiempo (obligatoria si se indica <code>tsaURL</code>).</dd>
+    <dt><b><i>tsaHashAlgorithm</i></b></dt>
+     <dd>Algoritmo de huella digital a usar para el sello de tiempo (si no se establece se usa SHA-1).</dd>
+    <dt><b><i>tsaRequireCert</i></b></dt>
+     <dd><code>true</code> si se requiere el certificado de la TSA, false en caso contrario (si no se establece se asume <code>true</code>).</dd>
+    <dt><b><i>tsaUsr</i></b></dt>
+     <dd>Nombre de usuario de la TSA.</dd>
+    <dt><b><i>tsaPwd</i></b></dt>
+     <dd>Contrase&ntilde;a del usuario de la TSA. Se ignora si no se ha establecido adem&aacute;s <code>tsaUsr</code>.</dd>
+    <dt><b><i>sslPkcs12File</i></b></dt>
+     <dd>
+      Nombre del fichero PKCS#12 que contiene el certificado SSL cliente que pedir&aacute; la TSA al establecer la 
+      coneci&oacute;s HTTPS.
+     </dd>
+    <dt><b><i>sslPkcs12FilePassword</i></b></dt>
+     <dd>
+      Contrase&ntilde;a del fichero PKCS#12 que contiene el certificado SSL cliente para las conexiones HTTPS.
      </dd>
   </dl>
  </body>

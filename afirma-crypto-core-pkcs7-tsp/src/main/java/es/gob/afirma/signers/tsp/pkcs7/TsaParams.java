@@ -1,9 +1,13 @@
 package es.gob.afirma.signers.tsp.pkcs7;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.util.Properties;
 
+import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.signers.AOSignConstants;
 
@@ -20,6 +24,8 @@ public final class TsaParams {
 	private final String tsaPwd;
 	private final TsaRequestExtension[] extensions;
 	private final String tsaHashAlgorithm;
+	private final byte[] sslPkcs12File;
+	private final String sslPkcs12FilePassword;
 
 	/** Construye los par&aacute;metros de configuraci&oacute;n de una Autoridad de Sellado de Tiempo.
 	 * En caso de ausencia o error en las propiedades de entrada lanza una <code>IllegalArgumentException</code>.
@@ -44,11 +50,39 @@ public final class TsaParams {
 				"Se ha indicado una URL de TSA invalida (" + tsa + "): " + e, e //$NON-NLS-1$ //$NON-NLS-2$
 			);
     	}
-        this.tsaPolicy = extraParams.getProperty("tsaPolicy") != null ? extraParams.getProperty("tsaPolicy") : POLICY; //$NON-NLS-1$ //$NON-NLS-2$
-        this.tsaHashAlgorithm = AOSignConstants.getDigestAlgorithmName(extraParams.getProperty("tsaHashAlgorithm")); //$NON-NLS-1$
+        this.tsaPolicy = extraParams.getProperty("tsaPolicy") != null ? //$NON-NLS-1$
+    		extraParams.getProperty("tsaPolicy") : //$NON-NLS-1$
+    			POLICY;
+        this.tsaHashAlgorithm = extraParams.getProperty("tsaHashAlgorithm") != null ? //$NON-NLS-1$
+        		AOSignConstants.getDigestAlgorithmName(extraParams.getProperty("tsaHashAlgorithm")) : //$NON-NLS-1$
+        			"SHA-512"; //$NON-NLS-1$
         this.tsaRequireCert = !Boolean.FALSE.toString().equalsIgnoreCase(extraParams.getProperty("tsaRequireCert")); //$NON-NLS-1$
         this.tsaUsr = extraParams.getProperty("tsaUsr"); //$NON-NLS-1$
         this.tsaPwd = extraParams.getProperty("tsaPwd"); //$NON-NLS-1$
+
+        // PKCS#12 / PFX para el SSL cliente
+        final String p12FileName = extraParams.getProperty("sslPkcs12File"); //$NON-NLS-1$
+        if (p12FileName != null) {
+        	final File p12File = new File(p12FileName);
+        	if (!p12File.exists()) {
+        		throw new IllegalArgumentException("El fichero PKCS#12 para el SSL de la TSA no existe: " + p12File); //$NON-NLS-1$
+        	}
+			try {
+				final InputStream is = new FileInputStream(p12File);
+				this.sslPkcs12File = AOUtil.getDataFromInputStream(is);
+				is.close();
+			}
+			catch(final Exception e) {
+				throw new IllegalArgumentException(
+					"El fichero PKCS#12 (" + p12File + ") para el SSL de la TSA no ha podido leerse: " + e, e  //$NON-NLS-1$//$NON-NLS-2$
+				);
+			}
+        }
+        else {
+        	this.sslPkcs12File = null;
+        }
+        this.sslPkcs12FilePassword = extraParams.getProperty("sslPkcs12FilePassword", ""); //$NON-NLS-1$ //$NON-NLS-2$
+
         try {
 	        this.extensions = extraParams.getProperty("tsaExtensionOid") != null && extraParams.getProperty("tsaExtensionValueBase64") != null ? //$NON-NLS-1$ //$NON-NLS-2$
 				new TsaRequestExtension[] {
@@ -92,5 +126,20 @@ public final class TsaParams {
 	 * @return Algoritmo de huella digital a usar en el sellado de tiempo. */
 	public String getTsaHashAlgorithm() {
 		return this.tsaHashAlgorithm;
+	}
+
+	/** Obtiene el fichero PKCS#12 que contiene el certificado SSL cliente que pedir&aacute; la TSA al
+	 * establecer la coneci&oacute;s HTTPS.
+	 * @return Fichero PKCS#12 que contiene el certificado SSL cliente para las conexiones HTTPS, o
+	 *         <code>null</code> si no se ha establecido ninguno. */
+	public byte[] getSslPkcs12File() {
+		return this.sslPkcs12File;
+	}
+
+	/** Obtiene la contrase&ntilde;a del fichero PKCS#12 que contiene el certificado SSL cliente para las conexiones HTTPS.
+	 * @return Contrase&ntilde;a del fichero PKCS#12 que contiene el certificado SSL cliente para las conexiones HTTPS o
+	 *         cadena vac&iacute;a si no se ha establecido ninguna. */
+	public String getSslPkcs12FilePassword() {
+		return this.sslPkcs12FilePassword;
 	}
 }
