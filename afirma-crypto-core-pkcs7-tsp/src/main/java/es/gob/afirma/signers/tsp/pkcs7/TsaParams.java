@@ -61,7 +61,7 @@ public final class TsaParams {
         this.tsaPwd = extraParams.getProperty("tsaPwd"); //$NON-NLS-1$
 
         // PKCS#12 / PFX para el SSL cliente
-        final String p12FileName = extraParams.getProperty("sslPkcs12File"); //$NON-NLS-1$
+        final String p12FileName = extraParams.getProperty("tsaSslPkcs12File"); //$NON-NLS-1$
         if (p12FileName != null) {
         	final File p12File = new File(p12FileName);
         	if (!p12File.exists()) {
@@ -81,7 +81,7 @@ public final class TsaParams {
         else {
         	this.sslPkcs12File = null;
         }
-        this.sslPkcs12FilePassword = extraParams.getProperty("sslPkcs12FilePassword", ""); //$NON-NLS-1$ //$NON-NLS-2$
+        this.sslPkcs12FilePassword = extraParams.getProperty("tsaSslPkcs12FilePassword", ""); //$NON-NLS-1$ //$NON-NLS-2$
 
         try {
 	        this.extensions = extraParams.getProperty("tsaExtensionOid") != null && extraParams.getProperty("tsaExtensionValueBase64") != null ? //$NON-NLS-1$ //$NON-NLS-2$
