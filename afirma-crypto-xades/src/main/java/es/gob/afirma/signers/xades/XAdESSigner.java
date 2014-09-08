@@ -452,6 +452,7 @@ public final class XAdESSigner {
 				}
 
 				dataElement.setAttributeNS(null, ID_IDENTIFIER, contentId);
+				dataElement.setAttributeNS(null, AOXAdESSigner.MIMETYPE_STR, mimeType);
 
 				// Si es base 64, lo firmamos indicando como contenido el dato pero, ya que puede
 				// poseer un formato particular o caracteres valido pero extranos para el XML,
