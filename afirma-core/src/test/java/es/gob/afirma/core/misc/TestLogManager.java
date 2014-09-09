@@ -16,7 +16,7 @@ public final class TestLogManager {
 	@SuppressWarnings("static-method")
 	@Test
 	public void testLogRetrieve() throws Exception {
-		LogManager.install(App.OTHER);
+		LogManager.install(App.OTHER, null);
 		final Logger logger = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 		logger.info("Info"); //$NON-NLS-1$
 		logger.warning("Warning"); //$NON-NLS-1$
