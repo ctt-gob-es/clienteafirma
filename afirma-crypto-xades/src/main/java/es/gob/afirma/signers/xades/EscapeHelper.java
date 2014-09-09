@@ -54,7 +54,7 @@ final class EscapeHelper {
 		 * <a href="http://www.ietf.org/rfc/rfc4514.txt">RFC 4514</a>.
 		 * En particular, la RFC 4514 detalla la <i>String Representation of Distinguished Names</i> de la siguiente forma:
 		 * <ol>
-		 *  <li>El algoritmo descrito en el apartado 2 es <b>recomendado</b>, y que se pueden dar por válidos otros algoritmos.</li>
+		 *  <li>El algoritmo descrito en el apartado 2 es <b>recomendado</b>, y que se pueden dar por v&aacute;lidos otros algoritmos.</li>
 		 *  <li>Cualquier algoritmo <b>deber&aacute;</b> cumplir lo descrito en el apartado 3.</li>
 		 * </ol>
 		 * <p>Y siguiendo los puntos, el apartado 3 (<i>Parsing a String Back to a Distinguished Name</i>) define:</p>
