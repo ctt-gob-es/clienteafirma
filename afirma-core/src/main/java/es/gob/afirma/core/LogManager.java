@@ -33,6 +33,8 @@ public final class LogManager {
 		STANDALONE,
 		/** Cliente para Android. */
 		ANDROID,
+		/** Firma manuscrita digitalizada biom&eacute;trica. */
+		HANDWRITTEN,
 		/** Otra. */
 		OTHER
 	}
@@ -41,31 +43,55 @@ public final class LogManager {
 	private static final int LOG_MAX_SIZE = 1024 * 1024 * 2;
 
 	private static boolean installed = false;
+	private static String logFile = null;
 	private static App application = App.OTHER;
 
-	/** Instala los manejadores de registro adicionales.
-	 * @param app Aplicaci&oacute;n que va a registrar
-	 * @throws java.lang.SecurityException Si no hay permisos para instalar el gestor de registro
-	 * @throws IOException En caso de errores de entrada / salida */
+	/** Instala los manejadores de registro adicionales creando el fichero de registro en el directorio
+	 * predeterminado.
+	 * @param app Aplicaci&oacute;n que va a registrar.
+	 * @throws java.lang.SecurityException Si no hay permisos para instalar el gestor de registro.
+	 * @throws IOException En caso de errores de entrada / salida. */
 	public static void install(final App app) throws IOException {
+		install(app, null);
+	}
+
+	/** Instala los manejadores de registro adicionales.
+	 * @param app Aplicaci&oacute;n que va a registrar.
+	 * @param logFilePath Ruta de directorios donde guardar el fichero de registro.
+	 *                    Los directorios deben separarse con "/", no debe indicarse solo la ruta
+	 *                    de directorios, nunca el nombre del fichero de registro (este lo asigna el
+	 *                    gestor) y pueden usarse los comodines de <i>Java Logging API</i> para indicar
+	 *                    directorios especiales.
+	 * @throws java.lang.SecurityException Si no hay permisos para instalar el gestor de registro.
+	 * @throws IOException En caso de errores de entrada / salida. */
+	public static void install(final App app, final String logFilePath) throws IOException {
 		if (app == null) {
 			application = App.OTHER;
 		}
 		else {
 			application = app;
 		}
-		LOGGER.addHandler(createFileHandler());
+
+		if (logFilePath == null) {
+			logFile = LOG_FILE.replace("%a", application.toString()); //$NON-NLS-1$
+		}
+		else {
+			logFile = logFilePath.replace("\\", "/") + (logFilePath.endsWith("/") ? "" : "/") + application + ".afirma.log.xml"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
+		}
+		LOGGER.addHandler(createFileHandler(logFile));
 		installed = true;
 	}
 
 	/**
 	 * Crea un manejador para el guardado de log en fichero.
+	 * @param logFileString Fichero de registro (con ruta) a usar, seg&uacute;n la norma de codificaci&oacute;n
+	 *                      de <i>Java Logging API</i> para los c&oacute;digos de directorios.
 	 * @return Manejador de log en fichero.
 	 * @throws IOException Cuando ocurren errores al crear o utilizar el fichero.
 	 */
-	private static FileHandler createFileHandler() throws IOException {
+	private static FileHandler createFileHandler(final String logFileString) throws IOException {
 		return new FileHandler(
-				LOG_FILE.replace("%a", application.toString()), //$NON-NLS-1$
+				logFileString,
 				LOG_MAX_SIZE,
 				1,
 				false
@@ -76,7 +102,7 @@ public final class LogManager {
 	 * @return Registro acumulado de la ejecuci&oacute;n actual
 	 * @throws IOException Si no hay registro o este no se puede leer */
 	public static String getLogFile() throws IOException {
-		if (!installed) {
+		if (!installed || logFile == null) {
 			throw new IOException("No esta instalado el manejador de fichero"); //$NON-NLS-1$
 		}
 
@@ -91,13 +117,13 @@ public final class LogManager {
 
 		final InputStream is = new FileInputStream(
 			new File(
-				LOG_FILE.replace("%h", Platform.getUserHome()).replace("%a", application.toString())  //$NON-NLS-1$//$NON-NLS-2$
+				logFile.replace("%h", Platform.getUserHome())  //$NON-NLS-1$
 			)
 		);
 		final String log = new String(AOUtil.getDataFromInputStream(is));
 		is.close();
 
-		LOGGER.addHandler(createFileHandler());
+		LOGGER.addHandler(createFileHandler(logFile));
 
 		return log;
 	}
