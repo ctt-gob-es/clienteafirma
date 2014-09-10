@@ -41,27 +41,13 @@ final class AppletMessages {
         }
     }
 
-    /** Recupera el texto identificado con la clave proporcionada y sustituye la
-     * subcadenas "%0" por el texto proporcionado.
-     * @param key Clave del texto.
-     * @param text Texto que se desea insertar.
-     * @return Recuerso textual con la subcadena sustituida. */
-    static String getString(final String key, final String text) {
-        try {
-            return resourceBundle.getString(key).replace("%0", text != null ? text : "null"); //$NON-NLS-1$ //$NON-NLS-2$
-        }
-        catch (final Exception e) {
-            return '!' + key + '!';
-        }
-    }
-
     /** Recupera el texto identificado con la clave proporcionada y sustituye las
      * subcadenas de tipo "%i" por el texto en la posici&oacute;n 'i' del array
      * proporcionado.
      * @param key Clave del texto.
      * @param params Par&aacute;metros que se desean insertar.
      * @return Recuerso textual con las subcadenas sustituidas. */
-    static String getString(final String key, final String[] params) {
+    static String getString(final String key, final String... params) {
         String text;
         try {
             text = resourceBundle.getString(key);
