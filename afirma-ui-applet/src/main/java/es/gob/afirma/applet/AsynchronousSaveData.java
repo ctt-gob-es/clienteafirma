@@ -19,11 +19,14 @@ import java.util.logging.Logger;
 
 import javax.swing.JOptionPane;
 
+import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.ui.AOUIFactory;
 
 /** Invocar preferentemente de la siguiente manera:<br>
  * <code>SwingUtilities.invokeLater(new AsynchronousSaveData(data, file, desc, exts, parent, true));</code> */
 final class AsynchronousSaveData implements Runnable {
+
+	static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	private final byte[] dataToSave;
 
@@ -120,17 +123,21 @@ final class AsynchronousSaveData implements Runnable {
                     			AsynchronousSaveData.this.getParent()
             			);
                     	if (outputFile == null) {
-                    		Logger.getLogger("es.gob.afirma").severe("Operacion cancelada por el usuario"); //$NON-NLS-1$ //$NON-NLS-2$
+                    		LOGGER.severe("Operacion cancelada por el usuario"); //$NON-NLS-1$
                             return null;
                     	}
                     	AsynchronousSaveData.this.setSavingTarget(outputFile.getAbsolutePath());
                     }
+                    catch (final AOCancelledOperationException e) {
+                    	LOGGER.warning("El usuario cancelo la operacion de guardado: " + e); //$NON-NLS-1$
+                        return null;
+                    }
                     catch (final Exception e) {
-                        Logger.getLogger("es.gob.afirma").severe("El nombre de fichero para guardar los datos no es valido: " + e); //$NON-NLS-1$ //$NON-NLS-2$
+                        LOGGER.severe("El nombre de fichero para guardar los datos no es valido: " + e); //$NON-NLS-1$
                         return null;
                     }
                     if (AsynchronousSaveData.this.getSavingTarget() == null) {
-                        Logger.getLogger("es.gob.afirma").severe("No se establecio un nombre de fichero de salida"); //$NON-NLS-1$ //$NON-NLS-2$
+                    	LOGGER.severe("No se establecio un nombre de fichero de salida"); //$NON-NLS-1$
                         return null;
                     }
                 }
@@ -143,7 +150,7 @@ final class AsynchronousSaveData implements Runnable {
                     fos.close();
                 }
                 catch (final Exception e) {
-                    Logger.getLogger("es.gob.afirma").severe("No se pudieron almacenar los datos en disco: " + e);  //$NON-NLS-1$//$NON-NLS-2$
+                	LOGGER.severe("No se pudieron almacenar los datos en disco: " + e);  //$NON-NLS-1$
                     if (AsynchronousSaveData.this.getShowDialogIfError()) {
                         JOptionPane.showMessageDialog(AsynchronousSaveData.this.getParent(),
                                                       AppletMessages.getString("AsynchronousSaveData.1"), //$NON-NLS-1$
