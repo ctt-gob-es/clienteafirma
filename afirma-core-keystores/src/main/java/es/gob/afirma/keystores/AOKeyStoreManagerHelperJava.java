@@ -46,6 +46,7 @@ final class AOKeyStoreManagerHelperJava {
 			if (e.getCause() instanceof UnrecoverableKeyException || e.getCause() instanceof BadPaddingException) {
 				throw new IOException("Contrasena invalida: " + e, e); //$NON-NLS-1$
 			}
+			throw e;
 		}
 		catch (final CertificateException e) {
 			throw new AOKeyStoreManagerException(

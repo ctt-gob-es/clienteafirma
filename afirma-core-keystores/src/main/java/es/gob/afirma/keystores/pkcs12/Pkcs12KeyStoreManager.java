@@ -82,6 +82,7 @@ public final class Pkcs12KeyStoreManager extends AOKeyStoreManager {
                 e.getCause() instanceof ArithmeticException) { // Caso probable de contrasena nula
                 	throw new IOException("Contrasena invalida: " + e, e); //$NON-NLS-1$
             }
+            throw e;
         }
         catch (final CertificateException e) {
             throw new AOKeyStoreManagerException("No se han podido cargar los certificados del almacen PKCS#12 / PFX solicitado.", e); //$NON-NLS-1$
@@ -123,14 +124,14 @@ public final class Pkcs12KeyStoreManager extends AOKeyStoreManager {
             throw new IllegalStateException("Se han pedido claves a un almacen no inicializado"); //$NON-NLS-1$
         }
 
-        // Primero probamos si la contrasena de la clave es la misma que la del certificado
+        // Primero probamos si la contrasena de la clave es la misma que la del almacen
         try {
         	return super.getKeyEntry(
     			alias, this.cachePasswordCallback
 			);
         }
         catch(final Exception e) {
-        	// Se ignora
+        	LOGGER.warning("La contrasena del certificado no coincide con la del almacen"); //$NON-NLS-1$
         }
 
         // Luego probamos con null
@@ -140,7 +141,7 @@ public final class Pkcs12KeyStoreManager extends AOKeyStoreManager {
 			);
         }
         catch(final Exception e) {
-        	// Se ignora
+        	LOGGER.warning("La contrasena del certificado no es nula"); //$NON-NLS-1$
         }
 
         // Finalmente pedimos la contrasena
