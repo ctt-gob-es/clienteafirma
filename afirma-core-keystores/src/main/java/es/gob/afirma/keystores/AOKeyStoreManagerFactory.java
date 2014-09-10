@@ -83,8 +83,7 @@ public final class AOKeyStoreManagerFactory {
 
 
     	// Fichero P7, X509 o Java JKS, en cualquier sistema operativo
-        if (AOKeyStore.PKCS12.equals(store) ||
-    		AOKeyStore.JAVA.equals(store)   ||
+        if (AOKeyStore.JAVA.equals(store)   ||
     		AOKeyStore.SINGLE.equals(store) ||
     		AOKeyStore.JAVACE.equals(store) ||
     		AOKeyStore.JCEKS.equals(store)) {
@@ -119,6 +118,7 @@ public final class AOKeyStoreManagerFactory {
         	return getMacOSXKeyStoreManager(store, lib, pssCallback, forceReset, parentComponent);
         }
 
+        // Driver Java para DNIe
         else if (AOKeyStore.DNIEJAVA.equals(store)) {
         	return new AggregatedKeyStoreManager(getDnieJavaKeyStoreManager(pssCallback, forceReset, parentComponent));
         }
@@ -138,6 +138,7 @@ public final class AOKeyStoreManagerFactory {
     		                                                  final boolean forceReset,
     		                                                  final Object parentComponent) throws IOException,
     		                                                  						               AOKeystoreAlternativeException {
+
     	final AOKeyStoreManager ksm = new Pkcs12KeyStoreManager();
         String storeFilename = null;
         if (lib != null && !"".equals(lib) && new File(lib).exists()) { //$NON-NLS-1$
@@ -214,28 +215,22 @@ public final class AOKeyStoreManagerFactory {
         if (lib != null && !"".equals(lib) && new File(lib).exists()) { //$NON-NLS-1$
             storeFilename = lib;
         }
-        if (storeFilename == null) {
+        else {
             String desc = null;
             String[] exts = null;
-            if (store == AOKeyStore.PKCS12) {
-                exts = new String[] {
-                        "pfx", "p12" //$NON-NLS-1$ //$NON-NLS-2$
-                };
-                desc = KeyStoreMessages.getString("AOKeyStoreManagerFactory.0"); //$NON-NLS-1$
-            }
             if (store == AOKeyStore.JAVA) {
                 exts = new String[] {
                     "jks" //$NON-NLS-1$
                 };
                 desc = KeyStoreMessages.getString("AOKeyStoreManagerFactory.1"); //$NON-NLS-1$
             }
-            if (store == AOKeyStore.SINGLE) {
+            else if (store == AOKeyStore.SINGLE) {
                 exts = new String[] {
                         "cer", "p7b" //$NON-NLS-1$ //$NON-NLS-2$
                 };
                 desc = KeyStoreMessages.getString("AOKeyStoreManagerFactory.2"); //$NON-NLS-1$
             }
-            if (store == AOKeyStore.JCEKS) {
+            else if (store == AOKeyStore.JCEKS) {
                 exts = new String[] {
                         "jceks", "jks" //$NON-NLS-1$ //$NON-NLS-2$
                 };
