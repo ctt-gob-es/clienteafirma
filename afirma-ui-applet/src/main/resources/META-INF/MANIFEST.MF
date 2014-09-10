@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Name: es/gob/afirma
 Specification-Title: Cliente @firma
-Specification-Version: 3.3.1 u4
+Specification-Version: 3.4
 Specification-Vendor: Gobierno de Espana
 Implementation-Title: es.gob.afirma
 Implementation-Version: build01
