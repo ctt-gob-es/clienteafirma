@@ -25,11 +25,17 @@ final class PdfUtil {
 	}
 
 	static PdfReader getPdfReader(final byte[] inPDF,
-			                      final String ownerPassword,
-			                      final String userPassword,
+			                      final Properties extraParams,
 			                      final boolean headLess) throws BadPdfPasswordException,
 			                                                     InvalidPdfException,
 			                                                     IOException {
+
+		// Contrasena del propietario del PDF
+		final String ownerPassword = extraParams.getProperty("ownerPassword"); //$NON-NLS-1$
+
+		// Contrasena del usuario del PDF
+		final String userPassword =  extraParams.getProperty("userPassword"); //$NON-NLS-1$
+
 		PdfReader pdfReader;
 		try {
 			if (ownerPassword != null) {
@@ -63,6 +69,7 @@ final class PdfUtil {
 			catch (final BadPasswordException e2) {
 				throw new BadPdfPasswordException(e2);
 			}
+			extraParams.put("ownerPassword", ownerPwd); //$NON-NLS-1$
 		}
 		catch (final IOException e) {
 			throw new InvalidPdfException(e);
@@ -105,9 +112,14 @@ final class PdfUtil {
 
 	static void managePdfEncryption(final PdfStamper stp,
 			                        final PdfReader pdfReader,
-			                        final String ownerPassword,
-			                        final String userPassword,
 			                        final Properties extraParams) {
+
+		// Contrasena del propietario del PDF
+		final String ownerPassword = extraParams.getProperty("ownerPassword"); //$NON-NLS-1$
+
+		// Contrasena del usuario del PDF
+		final String userPassword =  extraParams.getProperty("userPassword"); //$NON-NLS-1$
+
 		if (pdfReader.isEncrypted() && (ownerPassword != null || userPassword != null)) {
 			if (Boolean.TRUE.toString().equalsIgnoreCase(extraParams.getProperty("avoidEncryptingSignedPdfs"))) { //$NON-NLS-1$
 				LOGGER.info(

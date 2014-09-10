@@ -50,17 +50,10 @@ public final class PdfTimestamper {
     		final String tsa = extraParams.getProperty("tsaURL"); //$NON-NLS-1$
             if (tsa != null) {
 
-        		// Contrasena del propietario del PDF
-        		final String ownerPassword = extraParams.getProperty("ownerPassword"); //$NON-NLS-1$
-
-        		// Contrasena del usuario del PDF
-        		final String userPassword =  extraParams.getProperty("userPassword"); //$NON-NLS-1$
-
                 // Y procesamos normalmente el PDF
                 final PdfReader pdfReader = PdfUtil.getPdfReader(
             		inPDF,
-            		ownerPassword,
-            		userPassword,
+            		extraParams,
             		Boolean.getBoolean(extraParams.getProperty("headLess")) //$NON-NLS-1$
         		);
 
@@ -97,7 +90,7 @@ public final class PdfTimestamper {
         		sap.setSignDate(signTime);
 
         		// Gestion de los cifrados
-        		PdfUtil.managePdfEncryption(stp, pdfReader, ownerPassword, userPassword, extraParams);
+        		PdfUtil.managePdfEncryption(stp, pdfReader, extraParams);
 
         		final PdfSignature pdfSignature = new PdfSignature(
     				PdfName.ADOBE_PPKLITE,

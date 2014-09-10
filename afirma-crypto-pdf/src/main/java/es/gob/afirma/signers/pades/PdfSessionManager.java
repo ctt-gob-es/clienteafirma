@@ -167,20 +167,13 @@ public final class PdfSessionManager {
 		// ** Fin texto firma visible **
 		// *****************************
 
-		// Contrasena del propietario del PDF
-		final String ownerPassword = extraParams.getProperty("ownerPassword"); //$NON-NLS-1$
-
-		// Contrasena del usuario del PDF
-		final String userPassword =  extraParams.getProperty("userPassword"); //$NON-NLS-1$
-
 		// *********************************************************************************************************************
 		// **************** FIN LECTURA PARAMETROS ADICIONALES *****************************************************************
 		// *********************************************************************************************************************
 
 		final PdfReader pdfReader = PdfUtil.getPdfReader(
 			inPDF,
-			ownerPassword,
-			userPassword,
+			extraParams,
 			Boolean.getBoolean(extraParams.getProperty("headLess")) //$NON-NLS-1$
 		);
 
@@ -264,7 +257,7 @@ public final class PdfSessionManager {
 		sap.setSignDate(signTime);
 
 		// Gestion de los cifrados
-		PdfUtil.managePdfEncryption(stp, pdfReader, ownerPassword, userPassword, extraParams);
+		PdfUtil.managePdfEncryption(stp, pdfReader, extraParams);
 
 		// Pagina en donde se imprime la firma
 		if (page == LAST_PAGE) {
