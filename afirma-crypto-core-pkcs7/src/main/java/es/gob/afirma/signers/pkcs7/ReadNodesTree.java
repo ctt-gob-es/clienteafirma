@@ -22,12 +22,12 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.logging.Logger;
 
+import org.bouncycastle.asn1.ASN1GeneralizedTime;
 import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1Set;
 import org.bouncycastle.asn1.ASN1TaggedObject;
-import org.bouncycastle.asn1.ASN1UTCTime;
 import org.bouncycastle.asn1.cms.Attribute;
 import org.bouncycastle.asn1.cms.CMSAttributes;
 import org.bouncycastle.asn1.cms.IssuerAndSerialNumber;
@@ -334,7 +334,7 @@ public final class ReadNodesTree {
                 final Attribute data = Attribute.getInstance(eAtributes.nextElement());
                 if (data.getAttrType().equals(CMSAttributes.signingTime)) {
                     final ASN1Set time = data.getAttrValues();
-                    final ASN1UTCTime d = (ASN1UTCTime) time.getObjectAt(0);
+                    final ASN1GeneralizedTime d = (ASN1GeneralizedTime) time.getObjectAt(0);
                     try {
                         returnDate = d.getDate();
                     }
