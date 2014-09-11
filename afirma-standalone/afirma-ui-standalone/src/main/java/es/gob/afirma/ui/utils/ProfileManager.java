@@ -381,7 +381,7 @@ public final class ProfileManager {
     	final Properties config = new Properties();
     	final Properties defaultConfig = getDefaultConfiguration();
 
-    	saveDefaultModifiedValue(config, MainOptionsPane.MAIN_ADVANCED_VIEW, defaultConfig, "false"); //$NON-NLS-1$
+    	saveDefaultModifiedValue(config, MainOptionsPane.MAIN_ADVANCED_VIEW, defaultConfig, "true"); //$NON-NLS-1$
     	saveDefaultModifiedValue(config, MainOptionsPane.MAIN_DEFAULT_ALGORITHM, defaultConfig, AOSignConstants.DEFAULT_SIGN_ALGO);
     	saveDefaultModifiedValue(config, MainOptionsPane.MAIN_ALGORITHM_XML, defaultConfig, "false"); //$NON-NLS-1$
     	saveDefaultModifiedValue(config, MainOptionsPane.MAIN_POLICY_ESTABLISHED, defaultConfig, "false"); //$NON-NLS-1$
@@ -470,8 +470,7 @@ public final class ProfileManager {
      */
     public static void savePreferencesOnDefaultProfile(final Properties config) {
 
-    	savePreferenceOnDefaultProfile(config, MainOptionsPane.MAIN_ADVANCED_VIEW, "false"); //$NON-NLS-1$
-    	savePreferenceOnDefaultProfile(config, MainOptionsPane.MAIN_ADVANCED_VIEW, "false"); //$NON-NLS-1$
+    	savePreferenceOnDefaultProfile(config, MainOptionsPane.MAIN_ADVANCED_VIEW, "true"); //$NON-NLS-1$
     	savePreferenceOnDefaultProfile(config, MainOptionsPane.MAIN_DEFAULT_ALGORITHM, AOSignConstants.DEFAULT_SIGN_ALGO);
     	savePreferenceOnDefaultProfile(config, MainOptionsPane.MAIN_ALGORITHM_XML, "false"); //$NON-NLS-1$
     	savePreferenceOnDefaultProfile(config, MainOptionsPane.MAIN_POLICY_ESTABLISHED, "false"); //$NON-NLS-1$
