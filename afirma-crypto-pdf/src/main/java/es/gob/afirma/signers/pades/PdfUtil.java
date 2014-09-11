@@ -64,7 +64,9 @@ final class PdfUtil {
 				)
 			);
 			if ("".equals(ownerPwd)) { //$NON-NLS-1$
-			    throw new BadPdfPasswordException(e);
+                throw new AOCancelledOperationException(
+                    "Entrada de contrasena de PDF cancelada por el usuario", e //$NON-NLS-1$
+                );
 			}
 			try {
 				pdfReader = new PdfReader(inPDF, ownerPwd.getBytes());

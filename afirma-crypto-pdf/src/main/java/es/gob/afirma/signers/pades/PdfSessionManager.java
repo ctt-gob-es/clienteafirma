@@ -32,6 +32,7 @@ import com.lowagie.text.pdf.PdfSignature;
 import com.lowagie.text.pdf.PdfSignatureAppearance;
 import com.lowagie.text.pdf.PdfStamper;
 
+import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.misc.Platform.OS;
@@ -245,7 +246,9 @@ public final class PdfSessionManager {
                 )
             );
             if ("".equals(userPwd)) { //$NON-NLS-1$
-                throw new BadPdfPasswordException(e);
+                throw new AOCancelledOperationException(
+                    "Entrada de contrasena de PDF cancelada por el usuario", e //$NON-NLS-1$
+                );
             }
             extraParams.put("userPassword", userPwd); //$NON-NLS-1$
             return getSessionData(inPDF, certChain, signTime, extraParams);
