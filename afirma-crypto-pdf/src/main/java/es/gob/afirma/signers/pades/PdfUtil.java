@@ -63,6 +63,9 @@ final class PdfUtil {
 					null
 				)
 			);
+			if ("".equals(ownerPwd)) { //$NON-NLS-1$
+			    throw new BadPdfPasswordException(e);
+			}
 			try {
 				pdfReader = new PdfReader(inPDF, ownerPwd.getBytes());
 			}

@@ -35,6 +35,7 @@ import com.lowagie.text.pdf.PdfStamper;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.misc.Platform.OS;
+import es.gob.afirma.core.ui.AOUIFactory;
 
 /** Gestor del n&uacute;cleo de firma PDF. Esta clase realiza las operaciones necesarias tanto para
  * la firma monof&aacute;sica PAdES como para las trif&aacute;sicas de una forma unificada, pero
@@ -229,7 +230,25 @@ public final class PdfSessionManager {
 			);
 		}
 		catch(final BadPasswordException e) {
-			throw new PdfIsPasswordProtectedException(e);
+	        // Comprobamos que el signer esta en modo interactivo, y si no lo
+            // esta no pedimos contrasena por dialogo, principalmente para no interrumpir un firmado por lotes
+            // desatendido
+            if (Boolean.getBoolean(extraParams.getProperty("headLess"))) { //$NON-NLS-1$
+                throw new BadPdfPasswordException(e);
+            }
+            // La contrasena que nos han proporcionada no es buena o no nos
+            // proporcionaron ninguna
+            final String userPwd = new String(
+                AOUIFactory.getPassword(
+                    extraParams.getProperty("userPassword") == null ? CommonPdfMessages.getString("AOPDFSigner.0") : CommonPdfMessages.getString("AOPDFSigner.1"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                    null
+                )
+            );
+            if ("".equals(userPwd)) { //$NON-NLS-1$
+                throw new BadPdfPasswordException(e);
+            }
+            extraParams.put("userPassword", userPwd); //$NON-NLS-1$
+            return getSessionData(inPDF, certChain, signTime, extraParams);
 		}
 
 		// Aplicamos todos los atributos de firma
