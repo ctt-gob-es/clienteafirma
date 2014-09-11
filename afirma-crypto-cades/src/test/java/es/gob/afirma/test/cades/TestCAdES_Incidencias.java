@@ -24,13 +24,13 @@ import es.gob.afirma.signers.cades.AOCAdESSigner;
 
 
 /**
- * Pruebas del m&oacute;dulo CAdES de Afirma.
- * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
+ * Pruebas asociadas a incidencias detectadas en el nucleo  */
 public final class TestCAdES_Incidencias {
 
 	/**
-	 * Prueba de firma convencional.
-	 * @throws Exception en cualquier error
+	 * Prueba de analisis de las firmas del gobierno canario. Originalmente, ocurria un error
+	 * de tipo:
+	 * java.lang.ClassCastException: org.bouncycastle.asn1.ASN1GeneralizedTime cannot be cast to org.bouncycastle.asn1.ASN1UTCTime
 	 */
 	@SuppressWarnings("static-method")
 	@Test
@@ -38,13 +38,11 @@ public final class TestCAdES_Incidencias {
 
 		Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$
 
-
-		InputStream is = TestCAdES_Incidencias.class.getResourceAsStream("/firma_inc71506.csig"); //$NON-NLS-1$
-		byte[] signature = AOUtil.getDataFromInputStream(is);
+		final InputStream is = TestCAdES_Incidencias.class.getResourceAsStream("/firma_inc71506.csig"); //$NON-NLS-1$
+		final byte[] signature = AOUtil.getDataFromInputStream(is);
 		is.close();
 
 		final AOSigner signer = new AOCAdESSigner();
 		Assert.assertNotNull("El arbol de firmas no puede ser nulo", signer.getSignersStructure(signature, true)); //$NON-NLS-1$
 	}
-
 }
