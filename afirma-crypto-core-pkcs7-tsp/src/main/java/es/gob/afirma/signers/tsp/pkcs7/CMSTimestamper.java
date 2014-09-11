@@ -119,7 +119,7 @@ public final class CMSTimestamper {
         this.tsaURL = tsa;
         this.tsaPassword = tsaPwd;
         this.tsaUsername = tsaUsr;
-		this.sslP12KeyStoreFile = p12KeyStoreFile.clone();
+		this.sslP12KeyStoreFile = p12KeyStoreFile != null ? p12KeyStoreFile.clone() : null;
 		this.sslP12KeyStorePassword = p12KeyStoreFilePassword;
     }
 
