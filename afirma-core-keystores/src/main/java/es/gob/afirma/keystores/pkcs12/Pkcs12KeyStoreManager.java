@@ -51,7 +51,7 @@ public final class Pkcs12KeyStoreManager extends AOKeyStoreManager {
 	 * @param store Flujo de datos hacia el propio almac&eacute;n (fichero)
 	 * @param pssCallBack <i>PasswordCallback</i> para la obtenci&oacute;n de la contrase&ntilde;a del almac&eacute;n
 	 *                    y los propios certificados (las contrase&ntilde;as pueden ser distintas)
-	 * @return Lista con un &uacute;nico <code>KeyStore</code> correspondiente al PKCS#12
+	 * @return Almac&eacute;n PKCS#12
 	 * @throws AOKeyStoreManagerException Si hay errores en el tratamiento del almac&eacute;n
 	 * @throws IOException Si hay errores en la lectura del almac&eacute;n */
 	private KeyStore init(final InputStream store,
@@ -109,7 +109,7 @@ public final class Pkcs12KeyStoreManager extends AOKeyStoreManager {
     /** Obtiene la clave privada de un certificado en un almac&eacute;n PKCS#12.
      * @param alias Alias del certificado
      * @param pssCallback <i>CallBback</i> para obtener la contrase&ntilde;a del certificado que contiene la clave,
-     *                    se utilizar&aacute; en caso de que sea distinta a la del propio lmac&eacute;n
+     *                    se utilizar&aacute; en caso de que sea distinta a la del propio almac&eacute;n
      * @return Clave privada del certificado correspondiente al alias
      * @throws KeyStoreException Cuando ocurren errores en el tratamiento del almac&eacute;n de claves
      * @throws NoSuchAlgorithmException Cuando no se puede identificar el algoritmo para la recuperaci&oacute;n de la clave.
