@@ -22,12 +22,15 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.logging.Logger;
 
+import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1GeneralizedTime;
 import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1Set;
 import org.bouncycastle.asn1.ASN1TaggedObject;
+import org.bouncycastle.asn1.DERGeneralizedTime;
+import org.bouncycastle.asn1.DERUTCTime;
 import org.bouncycastle.asn1.cms.Attribute;
 import org.bouncycastle.asn1.cms.CMSAttributes;
 import org.bouncycastle.asn1.cms.IssuerAndSerialNumber;
@@ -334,6 +337,29 @@ public final class ReadNodesTree {
                 final Attribute data = Attribute.getInstance(eAtributes.nextElement());
                 if (data.getAttrType().equals(CMSAttributes.signingTime)) {
                     final ASN1Set time = data.getAttrValues();
+                    final ASN1Encodable timeObject = time.getObjectAt(0);
+                    if (timeObject == null) {
+                    	LOGGER.severe("El objeto no contiene una fecha"); //$NON-NLS-1$
+                    }
+                    else if (timeObject instanceof DERGeneralizedTime) {
+                    	try {
+                    		returnDate = ((DERGeneralizedTime)timeObject).getDate();
+                    	}
+                        catch (final ParseException ex) {
+                            LOGGER.severe("No es posible convertir la fecha: " + ex); //$NON-NLS-1$
+                        }
+                    }
+                    else if (timeObject instanceof DERUTCTime) {
+                    	try {
+                    		returnDate = ((DERUTCTime)timeObject).getDate();
+                    	}
+                        catch (final ParseException ex) {
+                            LOGGER.severe("No es posible convertir la fecha: " + ex); //$NON-NLS-1$
+                        }
+                    }
+                    else {
+                    	LOGGER.severe("Formato de fecha deconocido: " + timeObject.getClass().getName()); //$NON-NLS-1$
+                    }
                     final ASN1GeneralizedTime d = (ASN1GeneralizedTime) time.getObjectAt(0);
                     try {
                         returnDate = d.getDate();
