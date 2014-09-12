@@ -126,7 +126,7 @@ public final class XAdESCoSigner {
 		final String signedPropertiesTypeUrl = extraParams.getProperty(
 				"signedPropertiesTypeUrl", XADES_SIGNED_PROPERTIES_TYPE); //$NON-NLS-1$
 		final boolean addKeyInfoKeyValue = Boolean.parseBoolean(extraParams.getProperty(
-				"addKeyInfoKeyValue", Boolean.FALSE.toString())); //$NON-NLS-1$
+				"addKeyInfoKeyValue", Boolean.TRUE.toString())); //$NON-NLS-1$
 		final boolean addKeyInfoKeyName = Boolean.parseBoolean(extraParams.getProperty(
 				"addKeyInfoKeyName", Boolean.FALSE.toString())); //$NON-NLS-1$
 

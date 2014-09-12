@@ -100,7 +100,7 @@ public final class XAdESCounterSigner {
 	 *            <p>
 	 *            Cada uno de estos tipos se define en
 	 *            {@link es.gob.afirma.core.signers.CounterSignTarget}.
-	 * @param targets Listado de nodos o firmantes que se deben contrafirmar 
+	 * @param targets Listado de nodos o firmantes que se deben contrafirmar
 	 *                seg&uacute;n el {@code targetType} seleccionado.
 	 * @param key Clave privada a usar para firmar.
 	 * @param certChain Cadena de certificados del firmante
@@ -651,7 +651,7 @@ public final class XAdESCounterSigner {
 					XMLConstants.SIGN_ALGOS_URI.get(algorithm),
 					referenceList,
 					"Signature-" + UUID.randomUUID().toString(), //$NON-NLS-1$
-					Boolean.parseBoolean(extraParams.getProperty("addKeyInfoKeyValue", Boolean.FALSE.toString())), //$NON-NLS-1$
+					Boolean.parseBoolean(extraParams.getProperty("addKeyInfoKeyValue", Boolean.TRUE.toString())), //$NON-NLS-1$
 					Boolean.parseBoolean(extraParams.getProperty("addKeyInfoKeyName", Boolean.FALSE.toString())) //$NON-NLS-1$
 				);
 			}

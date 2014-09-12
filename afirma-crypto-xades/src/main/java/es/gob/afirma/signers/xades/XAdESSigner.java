@@ -240,7 +240,7 @@ public final class XAdESSigner {
 		final boolean headLess = Boolean.parseBoolean(extraParams.getProperty(
 				"headLess", Boolean.TRUE.toString())); //$NON-NLS-1$
 		final boolean addKeyInfoKeyValue = Boolean.parseBoolean(extraParams.getProperty(
-				"addKeyInfoKeyValue", Boolean.FALSE.toString())); //$NON-NLS-1$
+				"addKeyInfoKeyValue", Boolean.TRUE.toString())); //$NON-NLS-1$
 		final boolean addKeyInfoKeyName = Boolean.parseBoolean(extraParams.getProperty(
 				"addKeyInfoKeyName", Boolean.FALSE.toString())); //$NON-NLS-1$
 		final String precalculatedHashAlgorithm = extraParams.getProperty(
