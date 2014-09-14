@@ -20,7 +20,6 @@ public class BundleResourceTest {
 
 	private final static String[] OTHER_LANGUAGES_FILES = {
 		"appletmessages_de.properties", //$NON-NLS-1$
-		"appletmessages_el.properties", //$NON-NLS-1$
 		"appletmessages_en.properties", //$NON-NLS-1$
 		"appletmessages_fr.properties", //$NON-NLS-1$
 		"appletmessages_it.properties", //$NON-NLS-1$
