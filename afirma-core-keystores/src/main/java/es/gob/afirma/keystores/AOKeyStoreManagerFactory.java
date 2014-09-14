@@ -23,6 +23,7 @@ import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.keystores.callbacks.NullPasswordCallback;
+import es.gob.afirma.keystores.java.JavaKeyStoreManager;
 import es.gob.afirma.keystores.pkcs12.Pkcs12KeyStoreManager;
 
 /** Obtiene clases de tipo AOKeyStoreManager seg&uacute;n se necesiten,
@@ -77,14 +78,18 @@ public final class AOKeyStoreManagerFactory {
 			);
     	}
 
+    	// Almacen PKCS#12, en cualquier sistema operativo
     	if (AOKeyStore.PKCS12.equals(store)) {
     		return new AggregatedKeyStoreManager(getPkcs12KeyStoreManager(lib, pssCallback, forceReset, parentComponent));
     	}
 
+    	// Almacen JKS, en cualquier sistema operativo
+    	else if (AOKeyStore.JAVA.equals(store)) {
+    		return new AggregatedKeyStoreManager(getJavaKeyStoreManager(lib, pssCallback, forceReset, parentComponent));
+        }
 
-    	// Fichero P7, X509 o Java JKS, en cualquier sistema operativo
-        if (AOKeyStore.JAVA.equals(store)   ||
-    		AOKeyStore.SINGLE.equals(store) ||
+    	// Fichero P7, X509, JCEKS o CaseExactKS en cualquier sistema operativo
+        else if (AOKeyStore.SINGLE.equals(store) ||
     		AOKeyStore.JAVACE.equals(store) ||
     		AOKeyStore.JCEKS.equals(store)) {
         		return new AggregatedKeyStoreManager(getFileKeyStoreManager(store, lib, pssCallback, forceReset, parentComponent));
@@ -185,6 +190,57 @@ public final class AOKeyStoreManagerFactory {
         return ksm;
 	}
 
+    private static AOKeyStoreManager getJavaKeyStoreManager(final String lib,
+    														final PasswordCallback pssCallback,
+    														final boolean forceReset,
+    														final Object parentComponent) throws IOException,
+    															AOKeystoreAlternativeException {
+
+    	final AOKeyStoreManager ksm = new JavaKeyStoreManager();
+    	String storeFilename = null;
+    	if (lib != null && !"".equals(lib) && new File(lib).exists()) { //$NON-NLS-1$
+    		storeFilename = lib;
+    	}
+    	if (storeFilename == null) {
+    		String desc = null;
+    		final String[] exts = new String[] {
+    				"jks" //$NON-NLS-1$
+    		};
+    		desc = KeyStoreMessages.getString("AOKeyStoreManagerFactory.1"); //$NON-NLS-1$
+    		storeFilename = AOUIFactory.getLoadFiles(
+    				KeyStoreMessages.getString("AOKeyStoreManagerFactory.4") + " " + "JKS", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+    				null,
+    				null,
+    				exts,
+    				desc,
+    				false,
+    				false,
+    				parentComponent
+    				)[0].getAbsolutePath();
+    		if (storeFilename == null) {
+    			throw new AOCancelledOperationException("No se ha seleccionado el almacen de certificados"); //$NON-NLS-1$
+    		}
+    	}
+
+    	InputStream is = null;
+    	try {
+    		is = new FileInputStream(storeFilename);
+    		ksm.init(null, is, pssCallback, null, forceReset);
+    	}
+    	catch (final AOException e) {
+    		throw new AOKeystoreAlternativeException(AOKeyStore.JAVA,
+    				"No se ha podido abrir el almacen de tipo JKS para el fichero " + lib, //$NON-NLS-1$
+    				e
+    				);
+    	}
+    	finally {
+    		if (is != null) {
+    			is.close();
+    		}
+    	}
+    	return ksm;
+    }
+
 	private static AOKeyStoreManager getDnieJavaKeyStoreManager(final PasswordCallback pssCallback,
 																final boolean forceReset,
     	                                                        final Object parentComponent) throws AOKeystoreAlternativeException,
@@ -218,13 +274,7 @@ public final class AOKeyStoreManagerFactory {
         else {
             String desc = null;
             String[] exts = null;
-            if (store == AOKeyStore.JAVA) {
-                exts = new String[] {
-                    "jks" //$NON-NLS-1$
-                };
-                desc = KeyStoreMessages.getString("AOKeyStoreManagerFactory.1"); //$NON-NLS-1$
-            }
-            else if (store == AOKeyStore.SINGLE) {
+            if (store == AOKeyStore.SINGLE) {
                 exts = new String[] {
                         "cer", "p7b" //$NON-NLS-1$ //$NON-NLS-2$
                 };

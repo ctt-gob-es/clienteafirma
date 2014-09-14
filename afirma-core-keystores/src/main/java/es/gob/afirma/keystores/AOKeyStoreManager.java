@@ -141,7 +141,6 @@ public class AOKeyStoreManager implements KeyStoreManager {
         			pssCallBack, params != null && params.length > 0 ? params[0] : null
     			);
             	break;
-        	case JAVA:
         	case JAVACE:
         	case JCEKS:
         		this.ks = AOKeyStoreManagerHelperJava.initJava(store, pssCallBack, this.ksType);
