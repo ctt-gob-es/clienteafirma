@@ -6,7 +6,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 
-import com.stepover.opensignatureapi.helpers.Base64;
+import es.gob.afirma.core.misc.Base64;
 
 final class DataConnection extends URLConnection {
 
