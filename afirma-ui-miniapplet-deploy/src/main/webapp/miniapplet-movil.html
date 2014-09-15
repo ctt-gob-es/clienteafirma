@@ -74,7 +74,8 @@
 				MiniApplet.counterSign(
 					signB64,
 					document.getElementById("algorithm").value,
-					document.getElementById("format").value,
+					"AUTO",
+					//document.getElementById("format").value,
 					document.getElementById("params").value.length > 0 ? document.getElementById("params").value : null,
 					showResultCallback,
 					errorCallback);
@@ -99,8 +100,8 @@
 		<script type="text/javascript">
 		/* MiniApplet.cargarMiniApplet('https://valide.redsara.es/firmaMovil');
 		MiniApplet.setServlets("https://valide.redsara.es/firmaMovil/SignatureStorageServer/StorageService", "https://valide.redsara.es/firmaMovil/SignatureRetrieverServer/RetrieveService"); */
-		MiniApplet.cargarMiniApplet('http://172.24.19.224:8080/afirma-ui-miniapplet');
-		MiniApplet.setServlets("http://172.24.19.224:8080/afirma-signature-storage/StorageService", "http://172.24.19.224:8080/afirma-signature-retriever/RetrieveService");
+		MiniApplet.cargarMiniApplet('http://192.168.178.179:8080/afirma-ui-miniapplet');
+		MiniApplet.setServlets("http://192.168.178.179:8080/afirma-signature-storage/StorageService", "http://192.168.178.179:8080/afirma-signature-retriever/RetrieveService");
 		</script>
 		<p>Cargamos el MiniApplet</p>
 		<div>
@@ -119,7 +120,7 @@
  		 <option value="XAdEStri">XAdEStri</option>
 		 </select>
 		</div>
-				
+
 		<div>
 		 <label for="algorithm">Algoritmo</label>
 		 <select id="algorithm">
@@ -134,7 +135,7 @@
 		 <span>&nbsp;(Insertar las propiedades de una en una)</span>
 		 <br>
 		 <!-- <textarea id="params" cols="50" rows="5" readonly>serverUrl=https://valide.redsara.es/firmaMovil/TriPhaseSignerServer/SignatureService -->
-		 <textarea id="params" cols="50" rows="5" readonly>serverUrl=http://172.24.19.224:8080/afirma-server-triphase-signer/SignatureService
+		 <textarea id="params" cols="50" rows="5" readonly>serverUrl=http://192.168.178.179:8080/afirma-server-triphase-signer/SignatureService
 		 </textarea>
 		</div>
 		
@@ -152,7 +153,7 @@
 		
 		<div>
 		 <span>Firma generada</span><br />
-		 <div id="b64signature"></div>
+		 <textarea id="b64signature" cols="150" rows="10"></textarea>
 		</div>
 	</body>
 </html>	

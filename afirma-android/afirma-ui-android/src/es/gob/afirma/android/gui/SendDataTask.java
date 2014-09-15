@@ -2,15 +2,14 @@ package es.gob.afirma.android.gui;
 
 import java.io.IOException;
 
-import android.os.AsyncTask;
 import android.util.Log;
-import es.gob.afirma.core.misc.UrlHttpManagerFactory;
+import es.gob.afirma.core.AOCancelledOperationException;
 
 /** Tarea para el env&iacute;o de datos al servidor de intercambio. Si la entrega de estos datos es
  * cr&iacute;tica para la correcta ejecuc&iacute;n del procedimiento, la tarea tratar&aacute; de
  * finalizar la actividad.
  * @author Carlos Gamuci */
-public final class SendDataTask extends AsyncTask<Void, Void, byte[]> {
+public final class SendDataTask extends BasicHttpTransferDataTask {
 
 	private static final String METHOD_OP_PUT = "put"; //$NON-NLS-1$
 
@@ -69,10 +68,15 @@ public final class SendDataTask extends AsyncTask<Void, Void, byte[]> {
 			url.append("&dat=").append(this.dataB64); //$NON-NLS-1$
 
 			// Llamamos al servicio para guardar los datos
-			result = UrlHttpManagerFactory.getInstalledManager().readUrlByPost(url.toString());
+			result = readUrlByPost(url.toString());
 		}
 		catch (final IOException e) {
 			Log.e(ES_GOB_AFIRMA, "No se pudo conectar con el servidor intermedio para el envio de datos: " + e); //$NON-NLS-1$
+			this.error = e;
+			return null;
+		}
+		catch (final AOCancelledOperationException e) {
+			Log.e(ES_GOB_AFIRMA, "Se cancelo el envio de datos: " + e); //$NON-NLS-1$
 			this.error = e;
 			return null;
 		}

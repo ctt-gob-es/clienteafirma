@@ -3,13 +3,11 @@ package es.gob.afirma.android.gui;
 import java.io.IOException;
 import java.net.URL;
 
-import android.os.AsyncTask;
 import android.util.Log;
 import es.gob.afirma.core.AOCancelledOperationException;
-import es.gob.afirma.core.misc.UrlHttpManagerFactory;
 
 /** Tarea para la descarga de un fichero del servidor intermedio. */
-public final class DownloadFileTask extends AsyncTask<Void, Void, byte[]> {
+public final class DownloadFileTask extends BasicHttpTransferDataTask {
 
 	private static final String ES_GOB_AFIRMA = "es.gob.afirma"; //$NON-NLS-1$
 
@@ -54,8 +52,10 @@ public final class DownloadFileTask extends AsyncTask<Void, Void, byte[]> {
 			Log.i(ES_GOB_AFIRMA, "URL: " + url); //$NON-NLS-1$
 
 			// Llamamos al servicio para guardar los datos
-			data = UrlHttpManagerFactory.getInstalledManager().readUrlByPost(url.toString());
+			data = this.readUrlByPost(url.toString());
 
+			Log.i(ES_GOB_AFIRMA, "Descarga de datos finalizada"); //$NON-NLS-1$
+			
 			if (ERROR_PREFIX.equalsIgnoreCase(new String(data, 0, 4, DEFAULT_URL_ENCODING))) {
 				this.errorMessage = "El servidor devolvio el siguiente error al descargar los datos: " + new String(data, DEFAULT_URL_ENCODING); //$NON-NLS-1$
 				this.errorThowable = new IOException(this.errorMessage);
@@ -67,17 +67,25 @@ public final class DownloadFileTask extends AsyncTask<Void, Void, byte[]> {
 			this.errorThowable = e;
 			return null;
 		}
+		catch (final AOCancelledOperationException e) {
+			this.errorMessage = "Se cancelo la descarga de los datos"; //$NON-NLS-1$
+			this.errorThowable = e;
+			return null;
+		}
+		catch (final Throwable e) {
+			this.errorMessage = "Error desconocido durante la descarga de datos: " + e; //$NON-NLS-1$
+			this.errorThowable = e;
+			return null;
+		}
 
 		// Comprobamos que la tarea no se haya cancelado
 		if (isCancelled()) {
-			Log.i("es.gob.afirma", "Se ha cancelado la tarea de descarga"); //$NON-NLS-1$ //$NON-NLS-2$
 			this.errorMessage = "Se ha cancelado la tarea de descarga"; //$NON-NLS-1$
 			this.errorThowable = new AOCancelledOperationException(this.errorMessage);
 			return null;
 		}
 
 		return data;
-
 	}
 
 	@Override
@@ -89,6 +97,9 @@ public final class DownloadFileTask extends AsyncTask<Void, Void, byte[]> {
 		}
 		else if (this.errorMessage != null) {
 			this.ddListener.onErrorDownloadingData(this.errorMessage, this.errorThowable);
+		}
+		else {
+			Log.e(ES_GOB_AFIRMA, "La actividad de descarga ha finalizado sin obtener resultados"); //$NON-NLS-1$
 		}
 	}
 

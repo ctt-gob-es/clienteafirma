@@ -27,15 +27,15 @@
 		var firmarFichero = true;
 		var firmarDatosGenerados = true;
 	
-		function firmar(){
+		function firmar() {
 			var divMensaje = document.getElementById('divmensaje');
 			divMensaje.innerHTML='';
 			var divFirma = document.getElementById('divfirma');
 			divFirma.innerHTML='';
 			
 			var params = 	"mode=explicit\n" +
-							"serverUrl=https://valide.redsara.es/firmaMovil/TriPhaseSignerServer/SignatureService";
-							//"serverUrl=http://192.168.176.196:8080/afirma-server-triphase-signer/SignatureService";
+							//"serverUrl=https://valide.redsara.es/firmaMovil/TriPhaseSignerServer/SignatureService";
+							"serverUrl=http://192.168.177.20:8080/afirma-server-triphase-signer/SignatureService";
 
 			var dataB64 = null;
 			
@@ -184,7 +184,7 @@
 			<select id="fFormat">
 				<option value="CAdES" selected>CAdES</option>
 				<option value="CAdEStri">CAdEStri</option>
-				<option value="Adobe PDF">PAdES</option>
+				<option value="PAdES">PAdES</option>
 				<option value="PAdEStri">PAdEStri</option>
 				<option value="XAdES">XAdES</option>
 				<option value="XAdEStri">XAdEStri</option>
@@ -256,10 +256,10 @@ la Administración Electrónica por su seguridad.
 	</div> <!-- FIN DE CONTENEDOR -->
 	
 	<script type="text/javascript">
-		MiniApplet.cargarMiniApplet('https://valide.redsara.es/firmaMovil');
-		MiniApplet.setServlets("https://valide.redsara.es/firmaMovil/SignatureStorageServer/StorageService", "https://valide.redsara.es/firmaMovil/SignatureRetrieverServer/RetrieveService");
-		//MiniApplet.cargarMiniApplet('http://192.168.176.196:8080/afirma-ui-miniapplet-deploy');
-		//MiniApplet.setServlets("http://192.168.176.196:8080/afirma-signature-storage/StorageService", "http://192.168.176.196:8080/afirma-signature-retriever/RetrieveService");
+		//MiniApplet.cargarMiniApplet('https://valide.redsara.es/firmaMovil');
+		//MiniApplet.setServlets("https://valide.redsara.es/firmaMovil/SignatureStorageServer/StorageService", "https://valide.redsara.es/firmaMovil/SignatureRetrieverServer/RetrieveService");
+		MiniApplet.cargarMiniApplet('http://192.168.177.20:8080/afirma-ui-miniapplet-deploy');
+		MiniApplet.setServlets("http://192.168.177.20:8080/afirma-signature-storage/StorageService", "http://192.168.177.20:8080/afirma-signature-retriever/RetrieveService");
 		
 	</script>
 	

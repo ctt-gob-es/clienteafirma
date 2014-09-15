@@ -37,9 +37,9 @@ import es.gob.afirma.core.misc.UrlHttpManager;
  * @author Carlos Gamuci */
 public final class AndroidUrlHttpManager implements UrlHttpManager {
 
-	private static final int DEFAULT_TIMEOUT = -1;
+	public static final int DEFAULT_TIMEOUT = -1;
 
-	private static final String HTTPS = "https"; //$NON-NLS-1$
+	public static final String HTTPS = "https"; //$NON-NLS-1$
 
 	private static final HostnameVerifier DEFAULT_HOSTNAME_VERIFIER = HttpsURLConnection.getDefaultHostnameVerifier();
 	private static final SSLSocketFactory DEFAULT_SSL_SOCKET_FACTORY = HttpsURLConnection.getDefaultSSLSocketFactory();
@@ -128,7 +128,7 @@ public final class AndroidUrlHttpManager implements UrlHttpManager {
 
 		return data;
 	}
-	
+
 	/** Lee una URL HTTP o HTTPS por GET. En HTTPS no se hacen comprobaciones del certificado servidor.
 	 * @param url URL a leer
 	 * @return Contenido de la URL
@@ -149,18 +149,18 @@ public final class AndroidUrlHttpManager implements UrlHttpManager {
 		final InputStream is = uri.openStream();
 		final byte[] data = AOUtil.getDataFromInputStream(is);
 		is.close();
-		if (uri.getProtocol().equals("https")) { //$NON-NLS-1$
+		if (uri.getProtocol().equals(HTTPS)) {
 			enableSslChecks();
 		}
 		return data;
 	}
 
-	private static void enableSslChecks() {
+	public static void enableSslChecks() {
 		HttpsURLConnection.setDefaultSSLSocketFactory(DEFAULT_SSL_SOCKET_FACTORY);
 		HttpsURLConnection.setDefaultHostnameVerifier(DEFAULT_HOSTNAME_VERIFIER);
 	}
 
-	private static void disableSslChecks() throws KeyManagementException, NoSuchAlgorithmException {
+	public static void disableSslChecks() throws KeyManagementException, NoSuchAlgorithmException {
 		final SSLContext sc = SSLContext.getInstance("SSL"); //$NON-NLS-1$
 		sc.init(null, DUMMY_TRUST_MANAGER, new java.security.SecureRandom());
 		HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
@@ -171,6 +171,4 @@ public final class AndroidUrlHttpManager implements UrlHttpManager {
 			}
 		});
 	}
-
-
 }

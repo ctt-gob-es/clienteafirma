@@ -1,6 +1,7 @@
 package es.gob.afirma.android.crypto;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.security.GeneralSecurityException;
 import java.security.InvalidKeyException;
 import java.util.Arrays;
@@ -8,6 +9,7 @@ import java.util.Arrays;
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 
+import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 
 /** Gestor para el cifrado sim&eacute;trico de datos (para el servidor intermedio). */
@@ -113,7 +115,7 @@ public final class CipherDataManager {
         }
         catch (final Exception e) {
             // Este caso no deberia ocurrir nunca
-            throw new GeneralSecurityException("Algoritmo o formato no soportado por la maquina virtual: " + e); //$NON-NLS-1$
+            throw new GeneralSecurityException("Algoritmo o formato no soportado por la maquina virtual: " + e, e); //$NON-NLS-1$
         }
         desCipher.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(sk, "DES")); //$NON-NLS-1$
         return desCipher.doFinal(padData(data, 8));
@@ -132,7 +134,7 @@ public final class CipherDataManager {
         }
         catch (final Exception e) {
             // Este caso no deberia ocurrir nunca
-            throw new GeneralSecurityException("Algoritmo o formato no soportado por la maquina virtual: " + e); //$NON-NLS-1$
+            throw new GeneralSecurityException("Algoritmo o formato no soportado por la maquina virtual: " + e, e); //$NON-NLS-1$
         }
         desCipher.init(Cipher.DECRYPT_MODE, new SecretKeySpec(sk, "DES")); //$NON-NLS-1$
         return desCipher.doFinal(data);
@@ -156,4 +158,38 @@ public final class CipherDataManager {
         return PADDING_LENGTH;
     }
 
+	public static void main(String[] args) throws InvalidKeyException, GeneralSecurityException, IOException {
+
+		final Charset CHARSET = Charset.forName("utf-8");
+
+		String plainText = new String("Hola Mundo!".getBytes(CHARSET));
+		String key = new String("10186587".getBytes(CHARSET));
+
+		System.out.println("Texto plano:");
+		System.out.println(plainText);
+		System.out.println("Clave:");
+		System.out.println(key);
+
+		byte[] data = plainText.getBytes(CHARSET);
+		byte[] cipherKey = key.getBytes(CHARSET);
+
+		System.out.println("Texto en binario:");
+		System.out.println(AOUtil.hexify(data, true));
+
+		String cipheredText = CipherDataManager.cipherData(data, cipherKey);
+
+		System.out.println("Datos cifrados:");
+		System.out.println(cipheredText);
+
+		//byte[] cipheredData = Base64.encode(cipheredText.getBytes(CHARSET)).getBytes(CHARSET);
+				byte[] cipheredData = cipheredText.getBytes(CHARSET);
+
+				byte[] plainData = CipherDataManager.decipherData(cipheredData, cipherKey);//byte[] cipheredData = Base64.encode(cipheredText.getBytes(CHARSET)).getBytes(CHARSET);
+
+		System.out.println("Texto descifrado en binario:");
+		System.out.println(AOUtil.hexify(plainData, true));
+
+		System.out.println("Texto plano descifrado:");
+		System.out.println(new String(plainData, CHARSET));
+	}
 }

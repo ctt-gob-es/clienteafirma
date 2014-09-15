@@ -1,6 +1,5 @@
 package es.gob.afirma.android;
 
-
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -77,11 +76,12 @@ KeystoreManagerListener, PrivateKeySelectionListener, DownloadDataListener, Send
 
 	private UrlParametersToSign parameters;
 
+	private DownloadFileTask downloadFileTask = null;
+	
 	private MessageDialog messageDialog;
 	MessageDialog getMessageDialog() {
 		return this.messageDialog;
 	}
-
 
 	private ProgressDialog progressDialog = null;
 	ProgressDialog getProgressDialog() {
@@ -193,20 +193,21 @@ KeystoreManagerListener, PrivateKeySelectionListener, DownloadDataListener, Send
 			}
 			// Si no se han indicado datos y si el identificador de un fichero remoto, lo recuperamos para firmarlos
 			else if (this.parameters.getData() == null && this.parameters.getFileId() != null) {
-				Log.i(ES_GOB_AFIRMA, "Se van a descargar los datos del servidor"); //$NON-NLS-1$
-				new DownloadFileTask(
+				Log.i(ES_GOB_AFIRMA, "Se van a descargar los datos desde servidor con el identificador: " + this.parameters.getFileId()); //$NON-NLS-1$
+				this.downloadFileTask = new DownloadFileTask(
 						this.parameters.getFileId(),
 						this.parameters.getRetrieveServletUrl(),
-						this).execute();
+						this);
+				this.downloadFileTask.execute();
 			}
 			// Si tenemos los datos, cargamos un certificado para firmarlos
 			else {
-				Log.i(ES_GOB_AFIRMA, "Se van a firmar los datos recibidos por parametro"); //$NON-NLS-1$
+				Log.i(ES_GOB_AFIRMA, "Se inicia la firma de los datos obtenidos por parametro"); //$NON-NLS-1$
 				loadKeyStore();
 			}
 		}
 	}
-
+	
 	private void loadKeyStore() {
 
 		// Si ya tenemos los datos para la firma (no antes), buscamos si hay dispositivos CCID USB conectados
@@ -278,8 +279,8 @@ KeystoreManagerListener, PrivateKeySelectionListener, DownloadDataListener, Send
 	 */
 	private void sendData(final String data, final boolean critical, final boolean needCloseApp) {
 
-		Log.i(ES_GOB_AFIRMA, "Invocando sendData"); //$NON-NLS-1$
-
+		Log.i(ES_GOB_AFIRMA, "Se almacena el resultado en el servidor con el Id: " + this.parameters.getId()); //$NON-NLS-1$
+		
 		new SendDataTask(
 			this.parameters.getId(),
 			this.parameters.getStorageServletUrl().toExternalForm(),
@@ -303,6 +304,11 @@ KeystoreManagerListener, PrivateKeySelectionListener, DownloadDataListener, Send
 			// No puede darse, el soporte de UTF-8 es obligatorio
 			Log.e(ES_GOB_AFIRMA,
 				"No se ha podido enviar la respuesta al servidor por error en la codificacion " + DEFAULT_URL_ENCODING + ": " + e //$NON-NLS-1$ //$NON-NLS-2$
+			);
+		}
+		catch (final Throwable e) {
+			Log.e(ES_GOB_AFIRMA,
+				"Error desconocido al enviar el error obtenido al servidor: " + e //$NON-NLS-1$
 			);
 		}
 	}
@@ -409,8 +415,8 @@ KeystoreManagerListener, PrivateKeySelectionListener, DownloadDataListener, Send
 			@Override
 			public void run() {
 				try {
-				setProgressDialog(ProgressDialog.show(SignDataActivity.this, "", message, true)); //$NON-NLS-1$
-				} catch (Exception e) {
+					setProgressDialog(ProgressDialog.show(SignDataActivity.this, "", message, true)); //$NON-NLS-1$
+				} catch (Throwable e) {
 					Log.e(ES_GOB_AFIRMA, "No se ha podido mostrar el dialogo de progreso: " + e); //$NON-NLS-1$
 				}
 			}
@@ -420,6 +426,8 @@ KeystoreManagerListener, PrivateKeySelectionListener, DownloadDataListener, Send
 	@Override
 	public synchronized void processData(final byte[] data) {
 
+		Log.i(ES_GOB_AFIRMA, "Se ha descargado correctamente la configuracion de firma almacenada en servidor"); //$NON-NLS-1$
+		
 		// Si hemos tenido que descargar los datos desde el servidor, los desciframos y llamamos
 		// al dialogo de seleccion de certificados para la firma
 		byte[] decipheredData;
@@ -441,7 +449,14 @@ KeystoreManagerListener, PrivateKeySelectionListener, DownloadDataListener, Send
 			showErrorMessage(getString(R.string.error_bad_params));
 			return;
 		}
+		catch (final Throwable e) {
+			Log.e(ES_GOB_AFIRMA, "Error desconocido durante el descifrado de los datos: " + e.toString()); //$NON-NLS-1$
+			showErrorMessage(getString(R.string.error_bad_params));
+			return;
+		}
 
+		Log.i(ES_GOB_AFIRMA, "Se han descifrado los datos y se inicia su analisis"); //$NON-NLS-1$
+		
 		try {
 			this.parameters = UriParser.getParametersToSign(decipheredData);
 		}
@@ -455,13 +470,19 @@ KeystoreManagerListener, PrivateKeySelectionListener, DownloadDataListener, Send
 			showErrorMessage(getString(R.string.error_bad_params));
 			return;
 		}
+		catch (final Throwable e) {
+			Log.e(ES_GOB_AFIRMA, "Error desconocido al analizar los datos descargados desde el servidor: " + e.toString()); //$NON-NLS-1$
+			showErrorMessage(getString(R.string.error_bad_params));
+			return;
+		}		
 
+		Log.i(ES_GOB_AFIRMA, "Se inicia la firma de los datos descargados desde el servidor"); //$NON-NLS-1$
 		loadKeyStore();
 	}
 
 	@Override
 	public synchronized void onErrorDownloadingData(final String msg, final Throwable t) {
-		Log.e(ES_GOB_AFIRMA, msg + (t != null ? ": " + t.toString() : "")); //$NON-NLS-1$ //$NON-NLS-2$
+		Log.e(ES_GOB_AFIRMA, "Error durante la descarga de la configuracion de firma guardada en servidor:" + msg + (t != null ? ": " + t.toString() : "")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		showErrorMessage(getString(R.string.error_server_connect));
 	}
 
@@ -480,6 +501,11 @@ KeystoreManagerListener, PrivateKeySelectionListener, DownloadDataListener, Send
 		}
 		catch (final GeneralSecurityException e) {
 			Log.e(ES_GOB_AFIRMA, "Error en el cifrado de la firma: " + e); //$NON-NLS-1$
+			launchError(ErrorManager.ERROR_CIPHERING, true, true);
+			return;
+		}
+		catch (final Throwable e) {
+			Log.e(ES_GOB_AFIRMA, "Error desconocido al cifrar el resultado de la firma: " + e); //$NON-NLS-1$
 			launchError(ErrorManager.ERROR_CIPHERING, true, true);
 			return;
 		}
@@ -576,14 +602,20 @@ KeystoreManagerListener, PrivateKeySelectionListener, DownloadDataListener, Send
 						baos.write(buffer, 0, n);
 					}
 					is.close();
-				} catch (final IOException e) {
+				}
+				catch (final IOException e) {
 					Log.e(ES_GOB_AFIRMA, "Error al cargar el fichero, se dara al usuario la posibilidad de reintentar: " + e.toString()); //$NON-NLS-1$
 					showErrorMessageOnToast(getString(R.string.error_loading_selected_file, filename));
-					e.printStackTrace();
 					openSelectFileActivity();
 					return;
 				}
-
+				catch (final Throwable e) {
+						Log.e(ES_GOB_AFIRMA, "Error desconocido al cargar el fichero: " + e.toString()); //$NON-NLS-1$
+						showErrorMessageOnToast(getString(R.string.error_loading_selected_file, filename));
+						e.printStackTrace();
+						return;
+					}
+				
 				this.parameters.setData(baos.toByteArray());
 
 				// Tras esto vuelve a ejecutarse el onStart() de la actividad pero ya con datos para firmar
@@ -642,7 +674,16 @@ KeystoreManagerListener, PrivateKeySelectionListener, DownloadDataListener, Send
 	protected void onStop() {
 		dismissProgressDialog();
 		dismissMessageDialog();
-		super.onStop();
 		EasyTracker.getInstance().activityStop(this);
+		super.onStop();
+	}
+	
+	@Override
+	protected void onDestroy() {
+		if (this.downloadFileTask != null) {
+			Log.d(ES_GOB_AFIRMA, "SignDataActivity onDestroy: Cancelamos la descarga");	
+			this.downloadFileTask.cancel(true);
+		}
+		super.onDestroy();
 	}
 }

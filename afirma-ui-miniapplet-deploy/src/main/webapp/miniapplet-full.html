@@ -75,6 +75,14 @@
 			}
 		}
 		
+		function showAppletLog() {
+			try {
+				showLog(MiniApplet.getCurrentLog());
+			} catch(e) {
+				showLog("Type: " + MiniApplet.getErrorType() + "\nMessage: " + MiniApplet.getErrorMessage());
+			}
+		}
+		
 		/**
 		 * Funcion para la carga de un fichero. Almacena el contenido del fichero en un campo oculto y muestra su nombre.
 		 * LA CARGA INDEPENDIENTE DE FICHEROS DEBE EVITARSE EN LA MEDIDA DE LO POSIBLE. Si deseas firmar, cofirmar o contrafirmar
@@ -182,6 +190,7 @@
 		<input type="button" value="Firmar" onclick="doSign();">&nbsp;
 		<input type="button" value="Cofirmar" onclick="doCoSign();">&nbsp;
 		<input type="button" value="Contrafirmar" onclick="doCounterSign();">
+		<input type="button" value="Mostrar Log" onclick="showAppletLog();">
 		<br/>
 		<br/>
 		

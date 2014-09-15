@@ -297,6 +297,8 @@ public final class SaveDataActivity extends ListActivity implements DownloadData
 	@Override
 	public void processData(final byte[] data) {
 
+		Log.i(ES_GOB_AFIRMA, "Datos descargados correctamente"); //$NON-NLS-1$
+
 		// Si hemos tenido que descargar los datos desde el servidor, los desciframos y llamamos
 		// al dialogo de seleccion de certificados para la firma
 		byte[] decipheredData;
