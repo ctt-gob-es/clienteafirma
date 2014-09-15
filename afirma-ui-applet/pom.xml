@@ -178,7 +178,6 @@
 					</filters>
 				</configuration>
 			</plugin>
-<!-- 
 			<plugin>
 				<groupId>com.github.wvengen</groupId>
 				<artifactId>proguard-maven-plugin</artifactId>
@@ -208,8 +207,7 @@
                     </dependency>
                 </dependencies>
 			</plugin>
- -->
-			<plugin>
+ 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
 				<version>2.4</version>
