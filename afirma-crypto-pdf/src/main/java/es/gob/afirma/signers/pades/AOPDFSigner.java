@@ -256,7 +256,7 @@ public final class AOPDFSigner implements AOSigner {
                               final Object[] targets,
                               final PrivateKey key,
                               final java.security.cert.Certificate[] certChain,
-                              final Properties extraParams) throws AOException {
+                              final Properties extraParams) {
         throw new UnsupportedOperationException("No es posible realizar contrafirmas de ficheros PDF"); //$NON-NLS-1$
     }
 

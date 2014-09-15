@@ -1,6 +1,5 @@
 package es.gob.afirma.crypto.handwritten.data;
 
-import java.io.IOException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLStreamHandler;
@@ -8,7 +7,7 @@ import java.net.URLStreamHandler;
 public final class Handler extends URLStreamHandler {
 
     @Override
-    protected URLConnection openConnection(final URL u) throws IOException {
+    protected URLConnection openConnection(final URL u) {
     	System.out.println("OPEN_CONNECTION DATA");
         return new DataConnection(u);
     }

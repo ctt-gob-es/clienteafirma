@@ -20,7 +20,6 @@ public final class PdfXmpHelper {
 	 * @param surname1 Primer apellido del firmante.
 	 * @param surname2 Segundo apellido del firmante.
 	 * @param id NIF del firmante.
-	 * @return PDF con los metadatos a&ntilde;adidos.
 	 * @throws IOException En caso de errores en el tratamiento de datos. */
 	public static void addBioXmpDataToPdf(final PdfStamper pdfStamper,
 			                                final byte[] xmpData) throws IOException {

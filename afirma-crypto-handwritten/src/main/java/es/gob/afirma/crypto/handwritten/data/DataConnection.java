@@ -15,7 +15,7 @@ final class DataConnection extends URLConnection {
     }
 
     @Override
-    public void connect() throws IOException {
+    public void connect() {
         this.connected = true;
     }
 
