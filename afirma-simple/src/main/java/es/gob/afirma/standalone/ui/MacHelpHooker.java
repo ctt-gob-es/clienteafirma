@@ -10,14 +10,19 @@
 
 package es.gob.afirma.standalone.ui;
 
+import java.io.IOException;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.misc.Platform;
+import es.gob.afirma.standalone.HelpResourceManager;
+import es.gob.afirma.standalone.SimpleAfirma;
 
 /** Clase de enlace con la ayuda nativa de Mac OS X.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s
  */
 public final class MacHelpHooker {
+
+    static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	private MacHelpHooker() {
 		// No permitimos la instanciacion
@@ -27,16 +32,25 @@ public final class MacHelpHooker {
 
     static {
         if (Platform.OS.MACOSX.equals(Platform.getOS())) {
+        	try {
+				HelpResourceManager.createOsxHelpResources();
+			}
+        	catch (final IOException e) {
+                LOGGER.warning("La ayuda de Apple OS X no se ha podido copiar: " + e); //$NON-NLS-1$
+			}
             try {
-                System.loadLibrary("JavaHelpHook"); //$NON-NLS-1$
+                System.load(SimpleAfirma.APPLICATION_HOME + "/libJavaHelpHook.jnilib"); //$NON-NLS-1$
                 loaded = true;
             }
             catch(final UnsatisfiedLinkError e) {
-                Logger.getLogger("es.gob.afirma").warning("No se encuentra la biblioteca nativa de apertura de Apple Help: " + e);  //$NON-NLS-1$//$NON-NLS-2$
+            	LOGGER.warning("No se encuentra la biblioteca nativa de apertura de Apple Help: " + e);  //$NON-NLS-1$
             }
             catch(final Exception e) {
-                Logger.getLogger("es.gob.afirma").warning("No ha sido posible cargar la biblioteca nativa de apertura de Apple Help: " + e);  //$NON-NLS-1$//$NON-NLS-2$
+            	LOGGER.warning("No ha sido posible cargar la biblioteca nativa de apertura de Apple Help: " + e);  //$NON-NLS-1$
             }
+        }
+        else {
+        	LOGGER.warning("Se ha pedido cargar una ayuda Apple OS X en un sistema " + Platform.getOS()); //$NON-NLS-1$
         }
     }
 
@@ -45,9 +59,8 @@ public final class MacHelpHooker {
     public static native void showHelp();
 
     /** Indica si es posible mostrar la ayuda nativa Apple Help.
-     * @return <code>true</code> si se detecta Mac OS X y la biblioteca nativa de enlace (<code>JavaHelpHook.jnilib</code>)
-     *         est&aacute; disponible, <code>false</code> en caso contrario
-     */
+     * @return <code>true</code> si se detecta Apple OS X y la biblioteca nativa de enlace (<code>JavaHelpHook.jnilib</code>)
+     *         est&aacute; disponible, <code>false</code> en caso contrario. */
     public static boolean isMacHelpAvailable() {
         return loaded;
     }

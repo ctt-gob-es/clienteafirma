@@ -180,7 +180,7 @@ public final class Platform {
     }
 
     /** Recupera la ruta del directorio personal del usuario del sistema
-     * operativo.
+     * operativo (no incluye nunca una barra final).
      * @return Ruta del directorio del usuario. */
     public static String getUserHome() {
         if (userHome == null) {

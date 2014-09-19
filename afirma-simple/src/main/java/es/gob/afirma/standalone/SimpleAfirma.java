@@ -22,7 +22,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.RandomAccessFile;
@@ -50,7 +49,6 @@ import com.dmurph.tracking.JGoogleAnalyticsTracker.GoogleAnalyticsVersion;
 
 import es.gob.afirma.core.LogManager;
 import es.gob.afirma.core.LogManager.App;
-import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.keystores.AOKeyStoreManager;
 import es.gob.afirma.signature.SignValidity;
@@ -67,13 +65,14 @@ import es.gob.afirma.standalone.ui.UIUtils;
 /** Aplicaci&oacute;n gr&aacute;fica de firma electr&oacute;nica f&aacute;cil
  * basada en @firma. C&oacute;digos de salida de la aplicaci&oacute;n:
  * <ul>
- * <li>-1 - Error en el subsistema de tarjetas e imposibilidad de abrir el almac&eacute;n local por defecto</li>
- * <li>-2 - Imposibilidad de abrir el almac&eacute;n local por defecto</li>
+ *  <li>-1 - Error en el subsistema de tarjetas e imposibilidad de abrir el almac&eacute;n local por defecto</li>
+ *  <li>-2 - Imposibilidad de abrir el almac&eacute;n local por defecto</li>
  * </ul>
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public final class SimpleAfirma extends JApplet implements PropertyChangeListener, WindowListener {
 
 	static {
+		// Instalamos el registro a disco
 		try {
 			LogManager.install(App.SIMPLE);
 		}
@@ -89,7 +88,8 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
 
 	private static final String SYSTEM_PROPERTY_DEBUG_LEVEL = "afirma_debug_level"; //$NON-NLS-1$
 
-	private static final String APPLICATION_HOME = Platform.getUserHome() + File.separator + ".afirma" + File.separator + "firmafacil"; //$NON-NLS-1$ //$NON-NLS-2$
+	/** Directorio de datos de la aplicaci&oacute;n. */
+	public static final String APPLICATION_HOME = Platform.getUserHome() + File.separator + ".afirma" + File.separator + "firmafacil"; //$NON-NLS-1$ //$NON-NLS-2$
 
     /** Clave de la preferencia para el guardado del idioma por defecto. */
     public static final String PREFERENCES_LOCALE = "default.locale"; //$NON-NLS-1$
@@ -113,15 +113,15 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
 
     private File currentDir;
 
+    private AOKeyStoreManager ksManager;
+    private final MainMenu mainMenu;
+
     /** Construye la aplicaci&oacute;n principal y establece el
      * <i>Look&Field</i>. */
     public SimpleAfirma() {
        LookAndFeelManager. applyLookAndFeel();
        this.mainMenu = new MainMenu(this.window, this);
     }
-
-    private AOKeyStoreManager ksManager;
-    private final MainMenu mainMenu;
 
     /** Indica si el <code>AOKeyStoreManager</code> ha terminado de inicializarse
      * y est&aacute; listo para su uso.
@@ -318,9 +318,8 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
     @Override public void windowDeactivated(final WindowEvent we) { /* No implementado */ }
 
     /** Cierra la aplicaci&oacute;n.
-     * @param exitCode
-     *        C&oacute;digo de cierre de la aplicaci&oacute;n (negativo
-     *        indica error y cero indica salida normal */
+     * @param exitCode C&oacute;digo de cierre de la aplicaci&oacute;n (negativo
+     *                 indica error y cero indica salida normal. */
     public void closeApplication(final int exitCode) {
         if (this.window != null) {
             this.window.dispose();
@@ -456,33 +455,30 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
     public static void showHelp() {
         if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
             final File helpFile = new File(APPLICATION_HOME + "\\FirmaFacil.chm"); //$NON-NLS-1$
+            // Si el fichero no existe lo creamos
+            if (!helpFile.exists()) {
+	            try {
+	            	HelpResourceManager.createWindowsHelpResources(helpFile);
+	            }
+	            catch(final Exception e) {
+	                LOGGER.warning("La ayuda Windows Help no se ha podido copiar: " + e); //$NON-NLS-1$
+	            }
+            }
+            // Cargamos el fichero
             try {
-            	final byte[] helpDocument = AOUtil.getDataFromInputStream(
-            			ClassLoader.getSystemResourceAsStream("help/WinHelp/FirmaFacil.chm")); //$NON-NLS-1$
-            	if (helpDocument == null || helpDocument.length == 0) {
-            		throw new IOException("No se ha encontrado el fichero de ayuda de Windows"); //$NON-NLS-1$
-            	}
-
-                if (!helpFile.getParentFile().exists()) {
-                	helpFile.getParentFile().mkdirs();
-                }
-                final FileOutputStream fos = new FileOutputStream(helpFile);
-                fos.write(helpDocument);
-                fos.flush();
-                fos.close();
-                Desktop.getDesktop().open(helpFile);
-                return;
-            }
-            catch(final Exception e) {
-                LOGGER.warning("La ayuda Windows Help no se ha podido cargar, se mostrara JavaHelp: " + e); //$NON-NLS-1$
-            }
+				Desktop.getDesktop().open(helpFile);
+			}
+            catch (final IOException e) {
+				LOGGER.warning("La ayuda Windows Help no se ha podido cargar, se mostrara JavaHelp: " + e); //$NON-NLS-1$
+			}
+            return;
         }
         else if (MacHelpHooker.isMacHelpAvailable()) {
             MacHelpHooker.showHelp();
             return;
         }
 
-        // Ultimo recurso, si no es Windows, es Mac OS X pero no disponemos de Apple Help, o es otro
+        // Ultimo recurso, si no es Windows, es Apple OS X pero no disponemos de Apple Help, o es otro
         // sistema operativo (Linux, Solaris), cargamos JavaHelp
         JavaHelp.showHelp();
     }
