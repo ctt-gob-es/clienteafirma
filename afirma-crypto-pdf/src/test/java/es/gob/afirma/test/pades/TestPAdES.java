@@ -84,7 +84,7 @@ public class TestPAdES {
     };
 
     /** Prueba de identificaci&oacute;n de un PDF sin ninguna firma.
-     * @throws Exception */
+     * @throws Exception En cualquier error. */
     @SuppressWarnings("static-method")
 	@Test
     public void testIsSign() throws Exception {
@@ -105,7 +105,7 @@ public class TestPAdES {
     }
 
     /** Prueba de PDF con sello de tiempo contra la TSA de CATCert.
-     * @throws Exception */
+     * @throws Exception En cualquier error. */
     @SuppressWarnings("static-method")
 	@Test
     public void testTimestampedSignature() throws Exception {

@@ -54,7 +54,7 @@ public class TestAttachments {
     }
 
     /** Prueba de la firma con adjuntos (incompleta).
-     * @throws Exception */
+     * @throws Exception En cualquier error. */
     @SuppressWarnings("static-method")
 	@Test
 	@Ignore

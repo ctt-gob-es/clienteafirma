@@ -29,7 +29,7 @@ public class TestSignField {
 	private final static String CERT_ALIAS = "anf usuario activo"; //$NON-NLS-1$
 
 	/** Prueba de firma de PDF insertando imagen.
-	 * @throws Exception */
+	 * @throws Exception En cualquier error. */
 	@SuppressWarnings("static-method")
 	@Test
 	public void testImageOnPdf() throws Exception {
@@ -79,7 +79,7 @@ public class TestSignField {
 	//TODO: Averiguar porque en MAVEN no encuentra la fuente Helvetica
 
 	/** Prueba de firma PDF visible sin r&uacute;brica.
-	 * @throws Exception */
+	 * @throws Exception En cualquier error. */
 	@SuppressWarnings("static-method")
 	@Test
 	@Ignore
@@ -124,7 +124,7 @@ public class TestSignField {
 	}
 
 	/** Prueba de firma PDF visible con r&uacute;brica.
-	 * @throws Exception */
+	 * @throws Exception En cualquier error. */
 	@SuppressWarnings("static-method")
 	@Test
 	@Ignore
@@ -174,7 +174,7 @@ public class TestSignField {
 	}
 
 	/** Prueba de firma PDF visible con un texto.
-	 * @throws Exception */
+	 * @throws Exception En cualquier error. */
 	@SuppressWarnings("static-method")
 	@Test
 	@Ignore
@@ -225,7 +225,7 @@ public class TestSignField {
 	}
 
 	/** Prueba de firma PDF visible con r&uacute;brica y texto.
-	 * @throws Exception */
+	 * @throws Exception En cualquier error. */
 	@SuppressWarnings("static-method")
 	@Test
 	public void testCampoDeFirmaConPosicionesRubricaYTexto() throws Exception {
@@ -279,8 +279,8 @@ public class TestSignField {
 	}
 
 	/** Entrada para pruebas manuales.
-	 * @param args
-	 * @throws Exception */
+	 * @param args No se usa.
+	 * @throws Exception En cualquier error. */
 	public static void main(final String[] args) throws Exception {
 		final TestSignField test = new TestSignField();
 		test.testCampoDeFirmaConPosicionesRubricaYTexto();

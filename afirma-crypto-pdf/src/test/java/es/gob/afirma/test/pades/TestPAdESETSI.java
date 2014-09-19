@@ -101,7 +101,7 @@ public final class TestPAdESETSI {
     };
 
     /** Pruebas de firma con los ficheros de prueba y certificado de la ETSI.
-     * @throws Exception */
+     * @throws Exception En cualquier error. */
     @SuppressWarnings("static-method")
 	@Test
     public void testSignature() throws Exception {

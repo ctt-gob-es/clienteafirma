@@ -24,7 +24,7 @@ public class TestCosignature {
 	private final static String CERT_ALIAS = "anf usuario activo"; //$NON-NLS-1$
 
 	/** Prueba de cofirma de PDF.
-	 * @throws Exception */
+	 * @throws Exception En cualquier error. */
 	@SuppressWarnings("static-method")
 	@Test
 	public void testCosignPdf() throws Exception {

@@ -19,8 +19,8 @@ import es.gob.afirma.core.misc.Base64;
 public class TestAddingXmp {
 
 	/** Main.
-	 * @param args
-	 * @throws Exception */
+	 * @param args No se usa.
+	 * @throws Exception En cualquier error. */
 	public static void main(final String[] args) throws Exception {
 
 		// PDF de ejemplo

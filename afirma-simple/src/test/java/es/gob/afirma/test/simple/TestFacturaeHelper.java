@@ -30,7 +30,7 @@ public final class TestFacturaeHelper {
     };
 
     /** Pruebas de la detecci&oacute;n de facturas electr&oacute;nicas.
-     * @throws Exception */
+     * @throws Exception En cualquier error. */
     @SuppressWarnings("static-method")
 	@Test
     public void testFacturaeHelper() throws Exception {
