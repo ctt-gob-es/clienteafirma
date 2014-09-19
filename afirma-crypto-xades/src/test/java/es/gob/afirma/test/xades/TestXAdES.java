@@ -137,7 +137,7 @@ public final class TestXAdES {
     };
 
     /** Prueba de firma de nodo indicado expl&iacute;citamente.
-     * @throws Exception */
+     * @throws Exception En cualquier error. */
     @SuppressWarnings("static-method")
 	@Test
     public void testNodeTbs() throws Exception {

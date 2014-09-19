@@ -32,7 +32,7 @@ public final class TestEnvelopedOnCusomNode {
     }
 
 	/** Prueba de XAdES Enveloped con inserci&oacute;n de firma en nodo espec&iacute;fico.
-	 * @throws Exception */
+	 * @throws Exception En cualquier error. */
 	@SuppressWarnings("static-method")
 	@Test
 	public void TestInsertSignatureOnCustomNode() throws Exception {
