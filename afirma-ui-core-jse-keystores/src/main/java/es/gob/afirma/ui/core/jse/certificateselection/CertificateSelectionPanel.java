@@ -43,6 +43,7 @@ import javax.swing.event.ListSelectionListener;
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.keystores.NameCertificateBean;
 import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.core.misc.Platform;
 
 /** Di&aacute;logo de selecci&oacute;n de certificados con est&eacute;tica Windows 7. */
 final class CertificateSelectionPanel extends JPanel implements ListSelectionListener {
@@ -95,6 +96,7 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 			c.gridy++;
 
 			final JTextPane textMessage = new JTextPane();
+			textMessage.setOpaque(false);
 			textMessage.setText(
 				CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.1") //$NON-NLS-1$
 			);
@@ -359,8 +361,12 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
         		CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.5") + //$NON-NLS-1$
 		        "</u></html>" //$NON-NLS-1$
 	        );
-			this.propertiesLink.setFont(DETAILS_FONT);
-			add(this.propertiesLink, c);
+			// Omitimos la muestra de detalles de certificados en OS X porque el SO en vez de mostrar los detalles
+			// inicia su importacion
+			if (!Platform.OS.MACOSX.equals(Platform.getOS())) {
+				this.propertiesLink.setFont(DETAILS_FONT);
+				add(this.propertiesLink, c);
+			}
 		}
 
 		/** Devuelve la fecha con formato.
