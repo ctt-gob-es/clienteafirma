@@ -295,4 +295,9 @@ public class AOKeyStoreManager implements KeyStoreManager {
         }
         return ret.toString();
     }
+
+	@Override
+	public boolean isKeyEntry(final String alias) throws KeyStoreException {
+		return getKeyStore().isKeyEntry(alias);
+	}
 }

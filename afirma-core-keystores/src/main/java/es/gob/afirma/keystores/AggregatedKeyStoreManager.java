@@ -103,4 +103,15 @@ public class AggregatedKeyStoreManager extends AOKeyStoreManager {
 		return this.ksms.isEmpty();
 	}
 
+	@Override
+	public boolean isKeyEntry(final String alias) throws KeyStoreException {
+		for (final AOKeyStoreManager ksm : this.ksms) {
+			if (Arrays.asList(ksm.getAliases()).contains(alias)) {
+				return ksm.isKeyEntry(alias);
+			}
+		}
+		throw new KeyStoreException(
+			"Se ha pedido comprobar la clave privada de un certificado no contenido en este gestor" //$NON-NLS-1$
+		);
+	}
 }

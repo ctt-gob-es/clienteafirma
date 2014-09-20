@@ -22,7 +22,6 @@ import javax.security.auth.x500.X500Principal;
 import es.gob.afirma.core.keystores.KeyStoreManager;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Platform;
-import es.gob.afirma.keystores.callbacks.CachePasswordCallback;
 import es.gob.afirma.keystores.filters.CertificateFilter;
 
 /** Utilidades para le manejo de almacenes de claves y certificados. */
@@ -173,23 +172,18 @@ public final class KeyStoreUtilities {
 
                 if (checkPrivateKeys) {
                     try {
-                    	if (ksm.getKeyEntry(al, new CachePasswordCallback(new char[0])) == null) {
-                            aliassesByFriendlyName.remove(al);
+                    	if (!ksm.isKeyEntry(al)) {
+                    		aliassesByFriendlyName.remove(al);
                             LOGGER.info(
-                              "El certificado '" + al + "' no era tipo trusted pero su clave tampoco era de tipo privada, no se mostrara" //$NON-NLS-1$ //$NON-NLS-2$
+                              "Se ha ocultado un certificado por no soportar operaciones de clave privada" //$NON-NLS-1$
                             );
-                            continue;
-                        }
-                    }
-                    catch (final UnsupportedOperationException e) {
-                        aliassesByFriendlyName.remove(al);
-                        LOGGER.info(
-                          "Se ha ocultado un certificado por no soportar operaciones de clave privada: " + e //$NON-NLS-1$
-                        );
+                    	}
                     }
                     catch (final Exception e) {
-                    	// Se ignora, cuando no tienen clave privada dan un UnsupportedOPerationException, si salta otro tipo de excepcion
-                    	// es porque la contrasena es incorrecta o por otra razon, pero si tiene clave privada
+                    	aliassesByFriendlyName.remove(al);
+                    	LOGGER.info(
+                            "Se ha ocultado un certificado por no poderse comprobar su clave privada: "  + e //$NON-NLS-1$
+            			);
                     }
                 }
             }
@@ -247,7 +241,6 @@ public final class KeyStoreUtilities {
         }
 
         return aliassesByFriendlyName;
-
     }
 
     static String getPKCS11DNIeLib() throws AOKeyStoreManagerException {

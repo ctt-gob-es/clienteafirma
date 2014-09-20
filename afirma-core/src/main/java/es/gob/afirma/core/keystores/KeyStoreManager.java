@@ -13,6 +13,13 @@ import javax.security.auth.callback.PasswordCallback;
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public interface KeyStoreManager {
 
+	/** Indica si el certificado contiene clave privada.
+	 * @param alias Alias del certificado.
+	 * @return <code>true</code> si el certificado contiene clave privada, <code>false</code> en caso contrario.
+	 * @throws KeyStoreException Si no se puede comprobar la presencia de clave privada o no existe el certificado
+	 *                           con el alias indicado. */
+	boolean isKeyEntry(String alias) throws KeyStoreException;
+
 	/** Obtiene todos los alias de los certificados del almac&eacute;n actual.
      * @return Todos los alias encontrados en el almac&eacute;n actual */
 	String[] getAliases();
