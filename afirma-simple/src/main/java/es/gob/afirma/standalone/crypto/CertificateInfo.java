@@ -38,17 +38,31 @@ public final class CertificateInfo {
      * @param i Icono para el certificado
      * @param iTooltip <i>Tooltip</i> para el icono del certificado */
     CertificateInfo(final X509Certificate cert, final String description, final Icon i, final String iTooltip) {
-
+		final boolean isMac = Platform.OS.MACOSX.equals(Platform.getOS());
     	if (description == null || "".equals(description)) {  //$NON-NLS-1$
         	if (cert == null) {
         		this.descriptionText = SimpleAfirmaMessages.getString("CertificateInfo.0"); //$NON-NLS-1$
         	}
         	else {
-        		this.descriptionText = "<html>" + (Platform.OS.MACOSX.equals(Platform.getOS()) ? "<br>" : "") + SimpleAfirmaMessages.getString("CertificateInfo.1") + ": <a href=\"#\">" + AOUtil.getCN(cert) + "</a>. " + SimpleAfirmaMessages.getString("CertificateInfo.2") + ": <a href=\"#\">" + AOUtil.getCN(cert.getIssuerX500Principal().toString()) + "</a>" + "</html>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$ //$NON-NLS-10$
+        		this.descriptionText =
+    				"<html>" + //$NON-NLS-1$
+					(isMac ? "<br>" : "") + //$NON-NLS-1$ //$NON-NLS-2$
+					SimpleAfirmaMessages.getString("CertificateInfo.1") + //$NON-NLS-1$
+					": " + //$NON-NLS-1$
+					(isMac ? "<b>" : "<a href=\"#\">") + //$NON-NLS-1$ //$NON-NLS-2$
+					AOUtil.getCN(cert) +
+					(isMac ? "</b>" : "</a>") +  //$NON-NLS-1$//$NON-NLS-2$
+					". " + //$NON-NLS-1$
+					SimpleAfirmaMessages.getString("CertificateInfo.2") + //$NON-NLS-1$
+					": " + //$NON-NLS-1$
+					(isMac ? "<b>" : "<a href=\"#\">") + //$NON-NLS-1$ //$NON-NLS-2$
+					AOUtil.getCN(cert.getIssuerX500Principal().toString()) +
+					(isMac ? "</b>" : "</a>") + //$NON-NLS-1$ //$NON-NLS-2$
+					"</html>"; //$NON-NLS-1$
         	}
         }
         else {
-            this.descriptionText = "<html>" + (Platform.OS.MACOSX.equals(Platform.getOS()) ? "<br>" : "") + "<a href=\"#\">" + description + "</a>" + "</html>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
+            this.descriptionText = "<html>" + (isMac ? "<br>" : "") + "<a href=\"#\">" + description + "</a>" + "</html>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
         }
 
         if (i == null) {
