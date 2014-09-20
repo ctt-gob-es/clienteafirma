@@ -775,12 +775,25 @@ public final class SignPanel extends JPanel {
 
             PrivateKeyEntry pke;
                 try {
-                	AOKeyStoreDialog dialog = new AOKeyStoreDialog(ksm, SignPanel.this, true, false, true);
+                	final AOKeyStoreDialog dialog = new AOKeyStoreDialog(ksm, SignPanel.this, true, false, true);
                 	dialog.show();
                 	pke = dialog.getSelectedPrivateKeyEntry();
                 }
-                catch (final AOCancelledOperationException e) {
+                catch(final AOCancelledOperationException e) {
                     return null;
+                }
+                catch(final Exception e) {
+                	// EL dialogo hay que mostrarlo desde aqui por ser la operacion asincrona
+                    UIUtils.showErrorMessage(
+                        SignPanel.this,
+                        SimpleAfirmaMessages.getString("SignPanel.19"), //$NON-NLS-1$
+                        SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
+                        JOptionPane.ERROR_MESSAGE
+                    );
+                    LOGGER.severe(
+                		"Error intentando mostrar el dialogo de seleccion de certificados: " + e //$NON-NLS-1$
+            		);
+                	return null;
                 }
                 finally {
                     SignPanel.this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
