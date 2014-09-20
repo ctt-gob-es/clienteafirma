@@ -23,15 +23,15 @@ import es.gob.afirma.keystores.KeyStoreUtilities;
 public final class SimpleTest {
 
     /** Inicio de las pruebas desde consola sin JUnit.
-     * @param args
-     * @throws Exception */
+     * @param args No se usa.
+     * @throws Exception En cualquier error. */
     public static void main(final String[] args) throws Exception {
     	System.out.println(MozillaKeyStoreUtilities.getMozillaUserProfileDirectory());
 		SimpleTest.testDirectNssUsage();
     }
 
     /** Prueba de la obtenci&oacute;n de almac&eacute;n y alias con Mozilla NSS.
-     * @throws Exception */
+     * @throws Exception En cualquier error. */
     @SuppressWarnings("static-method")
     @Test
     public void testKeyStoreManagerCreation() throws Exception {
