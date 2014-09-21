@@ -49,9 +49,6 @@ public final class MacHelpHooker {
             	LOGGER.warning("No ha sido posible cargar la biblioteca nativa de apertura de Apple Help: " + e);  //$NON-NLS-1$
             }
         }
-        else {
-        	LOGGER.warning("Se ha pedido cargar una ayuda Apple OS X en un sistema " + Platform.getOS()); //$NON-NLS-1$
-        }
     }
 
     /** Muestra la ayuda de la aplicaci&oacute;n en Mac OS X con formato Apple Help (que debe estar declara en el
