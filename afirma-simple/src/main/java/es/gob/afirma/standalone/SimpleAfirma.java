@@ -50,7 +50,10 @@ import com.dmurph.tracking.JGoogleAnalyticsTracker.GoogleAnalyticsVersion;
 import es.gob.afirma.core.LogManager;
 import es.gob.afirma.core.LogManager.App;
 import es.gob.afirma.core.misc.Platform;
+import es.gob.afirma.core.misc.Platform.OS;
+import es.gob.afirma.keystores.AOKeyStore;
 import es.gob.afirma.keystores.AOKeyStoreManager;
+import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
 import es.gob.afirma.signature.SignValidity;
 import es.gob.afirma.signature.SignValidity.SIGN_DETAIL_TYPE;
 import es.gob.afirma.standalone.ui.ClosePanel;
@@ -197,14 +200,14 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
             this.window.setTitle(SimpleAfirmaMessages.getString("SimpleAfirma.10")); //$NON-NLS-1$
             this.container = this.window;
         }
-        else {
+        else {	    	
         	final MainScreen mainScreen = new MainScreen();
         	this.currentPanel = new SignPanel(mainScreen, this, true);
            	mainScreen.showMainScreen(this, this.currentPanel, 780, 500);
         	this.window = mainScreen;
         	this.window.setTitle(SimpleAfirmaMessages.getString("SimpleAfirma.10")); //$NON-NLS-1$
         	this.container = this.window;
-
+        	
         	loadDefaultKeyStore();
         	configureMenuBar(true);
 
@@ -234,6 +237,12 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
 	}
 
     private void loadDefaultKeyStore() {
+    	if (this.ksManager != null) {
+    		LOGGER.info(
+    			"Se omite la carga concurrente de almacen por haberse hecho una precarga previa" //$NON-NLS-1$
+    		);
+    		return;
+    	}
         this.container.setCursor(new Cursor(Cursor.WAIT_CURSOR));
         try {
             new SimpleKeyStoreManagerWorker(this, null, false).execute();
@@ -545,7 +554,7 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
      * @param args
      *        Par&aacute;metros en l&iacute;nea de comandos */
     public static void main(final String[] args) {
-
+    	
 		// Google Analytics
     	SwingUtilities.invokeLater(
 			new Runnable() {
@@ -574,15 +583,43 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
     		if (args == null || args.length == 0) {
 
     			if (!isSimpleAfirmaAlreadyRunning()) {
-    				new SimpleAfirma().initialize(false, null);
+    				
+    				final SimpleAfirma saf = new SimpleAfirma();
+    				
+    				final OS os = Platform.getOS();
+    				if (OS.WINDOWS != os && OS.MACOSX != os) {
+    					LOGGER.info(
+							"Se intenta una precarga temprana de NSS" //$NON-NLS-1$
+						);
+	    				// Hay un error raro en Java / NSS / SunPKCS11Provider que impide la inicializacion
+	    				// de NSS en puntos posteriores de la ejecucion del programa, donde devuelve siempre
+	    				// un CKR_DEVICE_ERROR (directamente desde NSS). 
+	    		    	try {
+	    					final AOKeyStoreManager ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
+							    AOKeyStore.MOZ_UNI, // Store
+							    null, // Lib
+								"AFIRMA-NSS-KEYSTORE", // Description //$NON-NLS-1$
+								null, // PasswordCallback
+								null // Parent
+	    					);
+	    					saf.setKeyStoreManager(ksm);
+	    				} 
+	    		    	catch (final Exception e1) {
+	    					LOGGER.severe(
+    							"Ha fallado la precarga temprana de NSS, se intentara la carga concurrente normal: " + e1 //$NON-NLS-1$
+							);
+	    				}
+    				}
+
+    				saf.initialize(false, null);
     			}
     			else {
     				JOptionPane.showMessageDialog(
-    						null,
-    						SimpleAfirmaMessages.getString("SimpleAfirma.3"), //$NON-NLS-1$
-    						SimpleAfirmaMessages.getString("SimpleAfirma.48"), //$NON-NLS-1$
-    						JOptionPane.WARNING_MESSAGE
-    						);
+						null,
+						SimpleAfirmaMessages.getString("SimpleAfirma.3"), //$NON-NLS-1$
+						SimpleAfirmaMessages.getString("SimpleAfirma.48"), //$NON-NLS-1$
+						JOptionPane.WARNING_MESSAGE
+					);
     			}
     		}
     		else if (args[0].toLowerCase().startsWith(PROTOCOL_URL_START_LOWER_CASE)) {
@@ -687,8 +724,8 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
 				@Override
 				public String format(final LogRecord record) {
 					return new StringBuffer(Long.toString(record.getMillis())).append(": "). //$NON-NLS-1$
-							append(record.getLevel().toString()).append(": "). //$NON-NLS-1$
-							append(record.getMessage()).append("\n").toString(); //$NON-NLS-1$
+						append(record.getLevel().toString()).append(": "). //$NON-NLS-1$
+						append(record.getMessage()).append("\n").toString(); //$NON-NLS-1$
 				}
 			};
 
