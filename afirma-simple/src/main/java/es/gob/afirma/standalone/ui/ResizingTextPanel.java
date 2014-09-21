@@ -10,11 +10,15 @@
 
 package es.gob.afirma.standalone.ui;
 
+import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 
+import javax.swing.BorderFactory;
 import javax.swing.JPanel;
+
+import es.gob.afirma.core.misc.Platform;
 
 final class ResizingTextPanel extends JPanel {
 
@@ -47,6 +51,10 @@ final class ResizingTextPanel extends JPanel {
         super(true);
         this.text = txt;
         this.font = this.getFont();
+        // En Linux ponemos un borde al panel
+        if (Platform.OS.LINUX.equals(Platform.getOS())) {
+        	this.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+        }
     }
 
     /** {@inheritDoc} */
