@@ -442,7 +442,7 @@ final class CoSigner {
     		new Attribute(
 				CMSAttributes.contentType,
 				new DERSet(
-					ASN1ObjectIdentifier.getInstance(new ASN1ObjectIdentifier(dataType))
+					new ASN1ObjectIdentifier(dataType)
 				)
 			)
 		);
@@ -500,7 +500,7 @@ final class CoSigner {
     		new Attribute(
 				CMSAttributes.contentType,
 				new DERSet(
-					ASN1ObjectIdentifier.getInstance(new ASN1ObjectIdentifier(dataType))
+					new ASN1ObjectIdentifier(dataType)
 				)
 			)
 		);

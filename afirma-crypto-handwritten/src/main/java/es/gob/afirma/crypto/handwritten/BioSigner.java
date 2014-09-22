@@ -6,20 +6,28 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URL;
+import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
-import java.security.interfaces.RSAPublicKey;
 import java.util.Properties;
 import java.util.logging.Logger;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 import javax.swing.JOptionPane;
 
+import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.ciphers.AOCipherConfig;
+import es.gob.afirma.core.ciphers.CipherConstants.AOCipherAlgorithm;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.crypto.handwritten.pdf.PdfSignerManager;
 import es.gob.afirma.crypto.handwritten.pdf.PdfXmpHelper;
 import es.gob.afirma.crypto.handwritten.wacom.WacomSignatureWindow;
+import es.gob.afirma.envelopers.cms.AOCMSEnveloper;
 
 /** Firmador de documentos PDF con firma manuscrita digitalizada biom&eacute;trica.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
@@ -319,7 +327,7 @@ public final class BioSigner implements SignaturePadListener {
 
 		byte[] bioDataCiphered;
 		try {
-			bioDataCiphered = cipherData(bioData, (RSAPublicKey) cypherCert.getPublicKey());
+			bioDataCiphered = cipherData(bioData, cypherCert);
 		}
 		catch (final Exception e) {
 			throw new CipherException(e);
@@ -331,22 +339,31 @@ public final class BioSigner implements SignaturePadListener {
 		);
 	}
 
-	/**
-	 * Cifra los datos con una clave p&uacute;blica.
+	/** Cifra (sobre PKCS#7) los datos con una clave p&uacute;blica.
 	 * @param data Datos a cifrar.
-	 * @param pk Clave p&uacute;blica.
+	 * @param cert Certificado del destinatario del cifrado.
 	 * @return Datos cifrados.
-	 */
-	private static byte[] cipherData(final byte[] data, final RSAPublicKey pk) {
-
-		//TODO:Implementar el cifrado
-
-//		final AOCMSEnveloper enveloper = new AOCMSEnveloper();
-//        final AOCipherConfig cipherConfig = new AOCipherConfig(AOCipherAlgorithm.AES, null, null);
-//
-//        enveloper.createCMSEnvelopedData(data, null, cipherConfig, recipientsCerts, null);
-
-		return data;
+	 * @throws AOException Si hay problemas generales en la creaci&oacute;n del sobre.
+	 * @throws IOException Si hay problemas en el tratamiento de datos.
+	 * @throws BadPaddingException Si hay problemas en el relleno criptogr&aacute;fico.
+	 * @throws IllegalBlockSizeException Si no se soporta del modo de bloques del cifrado.
+	 * @throws InvalidAlgorithmParameterException Si los par&aacute;metros del cifrado son incorectos.
+	 * @throws NoSuchPaddingException Si no se soporta un modo de relleno criptogr&aacute;fico necesario.
+	 * @throws NoSuchAlgorithmException Si no se soporta un algoritmo necesario.
+	 * @throws InvalidKeyException Si la clave privada del certificado es incorrecta.
+	 * @throws CertificateEncodingException Si el certificado proporcionado no es v&aacute;lido. */
+	private static byte[] cipherData(final byte[] data, final X509Certificate cert) throws CertificateEncodingException, InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException, IOException, AOException {
+        return new AOCMSEnveloper().createCMSEnvelopedData(
+    		data,
+    		null,
+    		new AOCipherConfig(
+	    		AOCipherAlgorithm.AES,
+	    		null, // BlockMode (sin uso)
+	    		null  // Padding (sin uso)
+			),
+    		new X509Certificate[] { cert },
+    		null
+		);
 	}
 
 	/**

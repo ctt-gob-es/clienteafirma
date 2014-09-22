@@ -16,5 +16,7 @@
 	<classpathentry kind="lib" path="lib/bcpkix-jdk15on-151b18.jar"/>
 	<classpathentry kind="lib" path="lib/bcprov-jdk15on-151b18.jar"/>
 	<classpathentry kind="lib" path="lib/wgssSTU.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/afirma-crypto-cms"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/afirma-crypto-cms-enveloper"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

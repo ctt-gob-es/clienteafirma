@@ -404,7 +404,7 @@ final class CoSignerEnveloped {
     		new Attribute(
 				CMSAttributes.contentType,
 				new DERSet(
-					ASN1ObjectIdentifier.getInstance(dataType)
+					new ASN1ObjectIdentifier(dataType)
 				)
 			)
 		);
@@ -463,7 +463,7 @@ final class CoSignerEnveloped {
     		new Attribute(
 				CMSAttributes.contentType,
 				new DERSet(
-					ASN1ObjectIdentifier.getInstance(dataType)
+					new ASN1ObjectIdentifier(dataType)
 				)
 			)
 		);

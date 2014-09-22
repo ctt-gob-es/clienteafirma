@@ -444,7 +444,7 @@ final class Utils {
         		new Attribute(
     				CMSAttributes.contentType,
     				new DERSet(
-						ASN1ObjectIdentifier.getInstance(dataType)
+						new ASN1ObjectIdentifier(dataType)
 					)
 				)
     		);

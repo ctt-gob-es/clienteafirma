@@ -260,7 +260,7 @@ final class GenSignedData {
     		new Attribute(
 				CMSAttributes.contentType,
 				new DERSet(
-					ASN1ObjectIdentifier.getInstance(new ASN1ObjectIdentifier(dataType))
+					new ASN1ObjectIdentifier(dataType)
 				)
 			)
 		);

@@ -22,7 +22,7 @@ import es.gob.afirma.crypto.handwritten.SignerInfoBean;
 import es.gob.afirma.signers.pades.PdfPreProcessor;
 import es.gob.afirma.signers.pades.PdfTimestamper;
 
-/** gestor de firmas manuscritas digitalizadas en documentos PDF. */
+/** Gestor de firmas manuscritas digitalizadas en documentos PDF. */
 public class PdfSignerManager {
 
 	/** Logger para la impresi&oacute;n de trazas. */
