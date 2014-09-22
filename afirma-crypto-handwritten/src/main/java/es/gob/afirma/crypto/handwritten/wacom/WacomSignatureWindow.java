@@ -10,6 +10,7 @@ import es.gob.afirma.crypto.handwritten.JseUtil;
 import es.gob.afirma.crypto.handwritten.Rectangle;
 import es.gob.afirma.crypto.handwritten.SignaturePadException;
 import es.gob.afirma.crypto.handwritten.SignaturePadListener;
+import es.gob.afirma.crypto.handwritten.SignerInfoBean;
 
 /** Panel con el aspecto de una tableta Wacom sobre el que se replica la superficie de firma. */
 public class WacomSignatureWindow extends JFrame {
@@ -26,18 +27,26 @@ public class WacomSignatureWindow extends JFrame {
 	 *                     la tableta de captura.
 	 * @param signAreaRect Coordenadas del rect&aacute;ngulo de firma en la pantalla de la
 	 *                     r&eacute;plica de la tableta.
+	 * @param signer Informaci&oacute;n del firmante que va a usar la tableta.
 	 * @throws IOException Cuando ocurre un error en la codificaci&oacute;n de la plantilla de la tableta
 	 * @throws SignaturePadException Cuando no se ha podido inicializar el dispositivo de creacion de firmas. */
-	public WacomSignatureWindow(final Object parent, final String htmlTemplate, final Rectangle signAreaRect) throws IOException, SignaturePadException {
+	public WacomSignatureWindow(final Object parent,
+			                    final String htmlTemplate,
+			                    final Rectangle signAreaRect,
+			                    final SignerInfoBean signer) throws IOException, SignaturePadException {
 		this.signatureDialog = new WacomSignaturePad(
-				parent instanceof Frame ? (Frame) parent : null);
+			parent instanceof Frame ? (Frame) parent : null,
+			signer
+		);
 
 		this.signatureDialog.init(
-				JseUtil.html2Image(
-						htmlTemplate,
-						this.signatureDialog.getAvailableWidth(),
-						this.signatureDialog.getAvailableHeight()),
-				signAreaRect);
+			JseUtil.html2Image(
+				htmlTemplate,
+				this.signatureDialog.getAvailableWidth(),
+				this.signatureDialog.getAvailableHeight()
+			),
+			signAreaRect
+		);
 	}
 
 	/** Crea el panel con el aspecto de una tableta Wacom sobre el que se replica la superficie de firma.
@@ -46,14 +55,20 @@ public class WacomSignatureWindow extends JFrame {
 	 *                      la tableta de captura.
 	 * @param signAreaRect Coordenadas del rect&aacute;ngulo de firma en la pantalla de la
 	 *                     r&eacute;plica de la tableta.
+	 * @param signer Informaci&oacute;n del firmante que va a usar la tableta.
 	 * @throws IOException Cuando ocurre un error en la codificaci&oacute;n de la imagen de
 	 *                     fondo de la r&eacute;plica de la tableta.
 	 * @throws SignaturePadException Cuando no se ha podido inicializar la r&eacute;plica
 	 *                               del dispositivo de creacion de firmas. */
-	public WacomSignatureWindow(final Object parent, final byte[] imageTemplate, final Rectangle signAreaRect) throws SignaturePadException, IOException {
+	public WacomSignatureWindow(final Object parent,
+			                    final byte[] imageTemplate,
+			                    final Rectangle signAreaRect,
+			                    final SignerInfoBean signer) throws SignaturePadException, IOException {
 
 		this.signatureDialog = new WacomSignaturePad(
-				parent instanceof Frame ? (Frame) parent : null);
+			parent instanceof Frame ? (Frame) parent : null,
+			signer
+		);
 
 		this.signatureDialog.init(imageTemplate, signAreaRect);
 	}

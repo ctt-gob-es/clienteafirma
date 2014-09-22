@@ -30,6 +30,7 @@ import com.WacomGSS.STU.Protocol.Capability;
 import com.WacomGSS.STU.Protocol.DevicePublicKey;
 import com.WacomGSS.STU.Protocol.EncodingMode;
 import com.WacomGSS.STU.Protocol.EncryptionStatus;
+import com.WacomGSS.STU.Protocol.Information;
 import com.WacomGSS.STU.Protocol.InkingMode;
 import com.WacomGSS.STU.Protocol.PenData;
 import com.WacomGSS.STU.Protocol.PenDataEncrypted;
@@ -43,8 +44,10 @@ import es.gob.afirma.crypto.handwritten.JseUtil;
 import es.gob.afirma.crypto.handwritten.Rectangle;
 import es.gob.afirma.crypto.handwritten.SignaturePad;
 import es.gob.afirma.crypto.handwritten.SignaturePadException;
+import es.gob.afirma.crypto.handwritten.SignaturePadInfoBean;
 import es.gob.afirma.crypto.handwritten.SignaturePadListener;
 import es.gob.afirma.crypto.handwritten.SignatureResult;
+import es.gob.afirma.crypto.handwritten.SignerInfoBean;
 import es.gob.afirma.crypto.handwritten.wacom.UiUtils.ButtonsOnScreen;
 
 /** Tableta de firma Wacom USB.
@@ -66,16 +69,14 @@ public final class WacomSignaturePad extends SignaturePad implements ITabletHand
 	 * para mejorar la velocidad de transmisi&oacute;n. */
 	private static final boolean USE_ZLIB_COMPRESSION = true;
 
+	private final Capability capability;
+	private final SignerInfoBean signerInfo;
+	private final JPanel panel;
+
 	private static final String BACKGROUND_IMAGE_PATH = "/wacom/Wacom_STU430.png"; //$NON-NLS-1$
 
 	private Tablet tablet;
-
-	private final Capability capability;
-
 	private java.awt.Rectangle sigArea = null;
-
-	private final JPanel panel;
-
 	private boolean useColor = false;
 
 	/** Imagen que se muestra en la pantalla replicada. */
@@ -170,12 +171,31 @@ public final class WacomSignaturePad extends SignaturePad implements ITabletHand
 	public synchronized void pressOkButton() {
 		this.setVisible(false);
 		for (final SignaturePadListener sl : this.signatureListeners) {
+			Information in;
+			try {
+				in = this.tablet.getInformation();
+			}
+			catch (final STUException e1) {
+				LOGGER.warning("Error obteniendo la informacion de la tableta de captura: " + e1); //$NON-NLS-1$
+				in = null;
+			}
 			try {
 				sl.signatureFinished(
 					new SignatureResult(
 						PadUtils.penDataArrayToIso19794(getPenData()),
 						null,
-						JseUtil.bufferedImage2Jpeg(getCurrentCroppedImage())
+						JseUtil.bufferedImage2Jpeg(getCurrentCroppedImage()),
+						this.signerInfo,
+						new SignaturePadInfoBean(
+							"Wacom", //$NON-NLS-1$
+							in != null ? in.getModelName() : "Desconocido", //$NON-NLS-1$
+							in != null ? in.getFirmwareMajorVersion() + "." + in.getFirmwareMinorVersion() : "Desconocido", //$NON-NLS-1$ //$NON-NLS-2$
+							this.capability.getMaxReportRate(),
+							this.capability.getScreenWidth(),
+							this.capability.getScreenHeight(),
+							this.capability.getTabletMaxPressure() + 1,
+							this.capability.getResolution()
+						)
 					)
 				);
 			}
@@ -244,10 +264,13 @@ public final class WacomSignaturePad extends SignaturePad implements ITabletHand
 
 	/** Crea una tableta de firma Wacom USB.
 	 * @param frame Componente padre para la modalidad.
+	 * @param signer Informaci&oacute;n del firmante que va a usar la tableta.
 	 * @throws SignaturePadException Si hay problemas durante la creaci&oacute;n de la tableta. */
-	public WacomSignaturePad(final Frame frame) throws SignaturePadException {
+	public WacomSignaturePad(final Frame frame, final SignerInfoBean signer) throws SignaturePadException {
 
 		super(frame, true);
+
+		this.signerInfo = signer;
 
 		setTitle(Messages.getString("SignatureDialog.3")); //$NON-NLS-1$
 		try {
@@ -325,8 +348,7 @@ public final class WacomSignaturePad extends SignaturePad implements ITabletHand
 	 * @param imageTemplate Imagen a mostrar como fondo en la pantalla de la tableta de captura.
 	 * @param signatureArea Area de firma dentro de la pantalla de la tableta.
 	 * @throws SignaturePadException Si hay problemas con la tarbeta de firma.
-	 * @throws IOException Cuando hay problemas en el tratamiento de datos.
-	 */
+	 * @throws IOException Cuando hay problemas en el tratamiento de datos. */
 	public void init(final byte[] imageTemplate, final Rectangle signatureArea) throws SignaturePadException, IOException {
 		init(JseUtil.jpeg2BufferedImage(imageTemplate, this.useColor), signatureArea);
 	}
@@ -552,6 +574,5 @@ public final class WacomSignaturePad extends SignaturePad implements ITabletHand
 	public void onDevicePublicKey(final DevicePublicKey devicePublicKey) {
 		// Vacio
 	}
-
 
 }

@@ -7,14 +7,20 @@ public final class SignatureResult {
 	private final byte[] signatureIsoData;
 	private final byte[] signatureRawData;
 	private final byte[] signatureJpegImage;
+	private final SignerInfoBean signer;
+	private final SignaturePadInfoBean pad;
 
 	/** Crea el resultado de una firma biom&eacute;trica.
 	 * @param data Datos biom&eacute;tricos de la firma en formato ISO 19794-7.
 	 * @param rawData Datos biom&eacute;tricos de la firma en formato nativo de la tableta.
-	 * @param jpegImage Imagen (en formato JPEG) de la r&uacute;brica de la firma. */
+	 * @param jpegImage Imagen (en formato JPEG) de la r&uacute;brica de la firma.
+	 * @param signerInfo Metadatos del firmante.
+	 * @param padInfo informaci&oacute;n de la tableta de captura de firmas usada. */
 	public SignatureResult(final byte[] data,
 			               final byte[] rawData,
-			               final byte[] jpegImage) {
+			               final byte[] jpegImage,
+			               final SignerInfoBean signerInfo,
+			               final SignaturePadInfoBean padInfo) {
 		if (jpegImage == null || data == null) {
 			throw new IllegalArgumentException(
 				"Es obligatorio proporcionar tanto imagen como datos de la firma" //$NON-NLS-1$
@@ -23,6 +29,20 @@ public final class SignatureResult {
 		this.signatureIsoData = data.clone();
 		this.signatureJpegImage = jpegImage.clone();
 		this.signatureRawData = rawData != null ? rawData.clone() : null;
+		this.signer = signerInfo;
+		this.pad = padInfo;
+	}
+
+	/** Obtiene los metadatos de la tableta de captura usada para la firma.
+	 * @return Metadatos de la tableta de captura usada para la firma. */
+	public SignaturePadInfoBean getSignaturePadInfo() {
+		return this.pad;
+	}
+
+	/** Obtiene los metadatos del firmante.
+	 * @return Metadatos del firmante. */
+	public SignerInfoBean getSignerInfo() {
+		return this.signer;
 	}
 
 	/** Obtiene los datos biom&eacute;tricos de la firma en formato ISO 19794-7.
@@ -41,10 +61,6 @@ public final class SignatureResult {
 	 * @return Datos biom&eacute;tricos de la firma en formato nativo de la tableta. */
 	public byte[] getSignatureRawData() {
 		return this.signatureRawData != null ? this.signatureRawData.clone() : null;
-	}
-
-	public static class SignaturePadInfo {
-		//TODO: Rellenar y usar
 	}
 
 }

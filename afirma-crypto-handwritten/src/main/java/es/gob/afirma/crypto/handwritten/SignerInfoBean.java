@@ -45,4 +45,9 @@ public final class SignerInfoBean {
 		return this.id;
 	}
 
+	@Override
+	public String toString() {
+		return this.name + " " + this.surname1 + " " + this.surname2 + " (NIF: " + this.id + ")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+	}
+
 }

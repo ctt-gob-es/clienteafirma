@@ -16,8 +16,8 @@ public final class PdfXmpHelper {
 	 * @param pdfStamper <code>PDFStamper</code>.
 	 * @param xmpData Datos XMP a a&ntilde;adir.
 	 * @throws IOException En caso de errores en el tratamiento de datos. */
-	public static void addBioXmpDataToPdf(final PdfStamper pdfStamper,
-			                              final byte[] xmpData) throws IOException {
+	static void addBioXmpDataToPdf(final PdfStamper pdfStamper,
+			                       final byte[] xmpData) throws IOException {
 		if (pdfStamper == null) {
 			throw new IllegalArgumentException(
 				"El PDF de entrada no puede ser nulo" //$NON-NLS-1$
@@ -32,10 +32,9 @@ public final class PdfXmpHelper {
 	 * @param signerInfo Informaci&oacute;n del firmante.
 	 * @return Estructura XMP.
 	 * @throws IOException Cuando ocurre un error al construir la estructura. */
-	public static byte[] buildXmp(
-			final byte[] bioSignData,
-			final String pkDn,
-			final SignerInfoBean signerInfo) throws IOException {
+	public static byte[] buildXmp(final byte[] bioSignData,
+			               final String pkDn,
+			               final SignerInfoBean signerInfo) throws IOException {
 
 		// Datos a insertar como XMP
 		final BioMetadataSchema schema = new BioMetadataSchema();

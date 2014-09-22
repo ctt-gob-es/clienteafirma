@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.security.NoSuchAlgorithmException;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Properties;
@@ -17,6 +18,8 @@ import com.lowagie.text.pdf.PdfStamper;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.crypto.handwritten.Rectangle;
+import es.gob.afirma.crypto.handwritten.SignaturePadInfoBean;
+import es.gob.afirma.crypto.handwritten.SignerInfoBean;
 import es.gob.afirma.signers.pades.PdfPreProcessor;
 import es.gob.afirma.signers.pades.PdfTimestamper;
 
@@ -30,11 +33,21 @@ public class PdfSignerManager {
 	 * @param pdfDoc Documento PDF.
 	 * @param bioMetadata Informaci&oacute;n biom&eacute;trica.
 	 * @param jpgImage Imagen de la r&uacute;brica de la firma.
+	 * @param signer Informaci&oacute;n del firmante.
+	 * @param pad Informaci&oacute;n de la tableta de captura.
 	 * @param extraParams Par&aacute;metros adicionales de la inserci&oacute;n.
 	 * @return PDF con todos los datos insertados.
-	 * @throws IOException Si hay problemas en el tratamiento de datos.
-	 * @throws AOException Cuando ocurre un error al insertar el sello de tiempo. */
-	public static byte[] addPdfInfo(final byte[] pdfDoc, final byte[] bioMetadata, final byte[] jpgImage, final Properties extraParams) throws IOException, AOException {
+	 * @throws IOException Si hay problemas en el tratamiento de datos o en el
+	 *                     acceso al servidor de sello de tiempo.
+	 * @throws AOException Cuando ocurre un error al insertar el sello de tiempo.
+	 * @throws NoSuchAlgorithmException Si no se soporta el algoritmo de huella digital
+	 *                                  indicado para el sello de tiempo. */
+	public static byte[] addPdfInfo(final byte[] pdfDoc,
+			                        final byte[] bioMetadata,
+			                        final byte[] jpgImage,
+			                        final SignerInfoBean signer,
+			                        final SignaturePadInfoBean pad,
+			                        final Properties extraParams) throws IOException, AOException, NoSuchAlgorithmException {
 
 		// Creamos un temporal en donde se gestionaran los cambios del PDF
 		final File outputPdfFile = File.createTempFile("temp", ".pdf"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -51,6 +64,9 @@ public class PdfSignerManager {
 			fos.close();
 			throw new IOException("Error creando el PDFStamper: " + e, e); //$NON-NLS-1$
 		}
+
+		System.out.println(pad.toString());
+		System.out.println(signer.toString());
 
 		// Insertamos los datos biometricos
 		insertBioData(pdfStamper, bioMetadata);
@@ -101,14 +117,10 @@ public class PdfSignerManager {
 				pdfStamper);
 	}
 
-	/**
-	 * Obtiene el rect&aacute;ngulo en el que estampar la r&uacute;brica de la firma en el PDF.
+	/** Obtiene el rect&aacute;ngulo en el que estampar la r&uacute;brica de la firma en el PDF.
 	 * @param extraParams Par&aacute;metros de configuraci&oacute;n de la firma.
-	 * @return Rect&aacute;ngulo para la r&uacute;brica.
-	 */
+	 * @return Rect&aacute;ngulo para la r&uacute;brica. */
 	private static Rectangle calculateRectangle(final Properties extraParams) {
-
-
 
 		if (extraParams == null) {
     		LOGGER.severe("No se ha proporcionado la configuracion de firma"); //$NON-NLS-1$
@@ -167,8 +179,11 @@ public class PdfSignerManager {
 	 * en los {@code extraParams}.
 	 * @throws AOException Cuando ocurri&oacute; un error al insertar el sello de tiempo.
 	 * @throws IOException Cuando ocurri&oacute; un error de lectura del documento o de acceso a la TSA.
-	 */
-	private static byte[] addTimeStamp(final byte[] inPdf, final Properties extraParams) throws AOException, IOException {
+	 * @throws NoSuchAlgorithmException Si no se soporta el algoritmo de huella digital indicado. */
+	private static byte[] addTimeStamp(final byte[] inPdf,
+			                           final Properties extraParams) throws AOException,
+			                                                                IOException,
+			                                                                NoSuchAlgorithmException {
 		return PdfTimestamper.timestampPdf(inPdf, extraParams, new GregorianCalendar());
 	}
 

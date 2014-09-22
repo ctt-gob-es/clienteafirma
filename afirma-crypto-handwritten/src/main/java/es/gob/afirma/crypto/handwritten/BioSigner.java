@@ -101,7 +101,12 @@ public final class BioSigner implements SignaturePadListener {
 
 		LOGGER.info("Se ha terminado la descarga del documento. Bytes: " + this.pdfDoc.length); //$NON-NLS-1$
 
-		this.signatureWindow = new WacomSignatureWindow(parent, template, this.signatureAreaOnPad);
+		this.signatureWindow = new WacomSignatureWindow(
+			parent,
+			template,
+			this.signatureAreaOnPad,
+			signerData
+		);
 		this.signatureWindow.addSignatureListener(this);
 		this.signatureWindow.captureSign();
 	}
@@ -158,7 +163,12 @@ public final class BioSigner implements SignaturePadListener {
 
 		this.pdfDoc = downloadDocument(retrieveUrl);
 
-		this.signatureWindow = new WacomSignatureWindow(parent, jpegImage, this.signatureAreaOnPad);
+		this.signatureWindow = new WacomSignatureWindow(
+			parent,
+			jpegImage,
+			this.signatureAreaOnPad,
+			signerData
+		);
 		this.signatureWindow.addSignatureListener(this);
 		this.signatureWindow.captureSign();
 	}
@@ -204,7 +214,14 @@ public final class BioSigner implements SignaturePadListener {
 		LOGGER.info("Agregamos al PDF la informacion de firma"); //$NON-NLS-1$
 		final byte[] signedPdf;
 		try {
-			signedPdf = PdfSignerManager.addPdfInfo(this.pdfDoc, metadata, sr.getSignatureJpegImage(), this.extraParams);
+			signedPdf = PdfSignerManager.addPdfInfo(
+				this.pdfDoc,
+				metadata,
+				sr.getSignatureJpegImage(),
+				sr.getSignerInfo(),
+				sr.getSignaturePadInfo(),
+				this.extraParams
+			);
 		}
 		catch(final Exception e) {
 			e.printStackTrace();
@@ -342,10 +359,12 @@ public final class BioSigner implements SignaturePadListener {
 	private static void sendPdf(final URL storeUrl, final byte[] signedPdf, final String dataUrlParam) throws IOException {
 
 		System.out.println("Almacenamos el PDF en disco para depuracion");
-		final OutputStream fos = new FileOutputStream(File.createTempFile("BIO_", "-pdf"));
+		final File tmpFile = File.createTempFile("BIO_", ".pdf");
+		final OutputStream fos = new FileOutputStream(tmpFile);
 		fos.write(signedPdf);
 		fos.flush();
 		fos.close();
+		System.out.println(tmpFile.getAbsolutePath());
 
 //		final Map<String, String> params = new HashMap<String, String>();
 //		params.put(dataUrlParam, Base64.encode(signedPdf, true));
@@ -358,30 +377,27 @@ public final class BioSigner implements SignaturePadListener {
 //		}
 	}
 
-	/**
-	 * Obtiene el nombre de par&aacute;metro configurado para el env&iacute;o de los datos.
+	/** Obtiene el nombre de par&aacute;metro configurado para el env&iacute;o de los datos.
 	 * @param extraParams Par&aacute;metros de configuraci&oacute;n.
-	 * @return Nombre del par&aacute;metro configurado o el nombre por defecto si no se indic&oacute; ninguno.
-	 */
+	 * @return Nombre del par&aacute;metro configurado o el nombre por defecto si no se indic&oacute; ninguno. */
 	private static String getDataUrlParam(final Properties extraParams) {
 		return extraParams != null ?
-				extraParams.containsKey(DATA_URL_PARAM_NAME) ?
-						extraParams.getProperty(DATA_URL_PARAM_NAME) : DEFAULT_URL_PARAM_TO_UPLOAD_DATA :
+			extraParams.containsKey(DATA_URL_PARAM_NAME) ?
+				extraParams.getProperty(DATA_URL_PARAM_NAME) : DEFAULT_URL_PARAM_TO_UPLOAD_DATA :
 					DEFAULT_URL_PARAM_TO_UPLOAD_DATA;
 	}
 
-	/**
-	 * Muestra un mensaje de error al usuario.
+	/** Muestra un mensaje de error al usuario.
 	 * @param parent Componente padre sobre el que mostrar el mensaje.
-	 * @param message Mensaje a mostrar.
-	 */
+	 * @param message Mensaje a mostrar. */
 	private static void showErrorMessage(final Object parent, final String message) {
+		LOGGER.severe(message);
 		JOptionPane.showMessageDialog(
-				parent instanceof Component ? (Component) parent : null,
-						message,
-						HandWrittenMessages.getString("BioSigner.7"), //$NON-NLS-1$
-						JOptionPane.ERROR_MESSAGE
-				);
+			parent instanceof Component ? (Component) parent : null,
+			message,
+			HandWrittenMessages.getString("BioSigner.7"), //$NON-NLS-1$
+			JOptionPane.ERROR_MESSAGE
+		);
 	}
 
 	/** Excepci&oacute;n que identifica un error en el cifrado de datos. */
