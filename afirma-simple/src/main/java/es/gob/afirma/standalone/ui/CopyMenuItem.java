@@ -38,7 +38,10 @@ final class CopyMenuItem extends JPopupMenu implements ClipboardOwner {
 			public void actionPerformed(final ActionEvent ae) {
 				if (CopyMenuItem.this.getTextComponent() != null) {
 					Toolkit.getDefaultToolkit().getSystemClipboard().setContents(
-						new StringSelection((CopyMenuItem.this.getTextComponent().getSelectedText() != null) ? CopyMenuItem.this.getTextComponent().getSelectedText() : CopyMenuItem.this.getTextComponent().getText()), CopyMenuItem.this
+						new StringSelection(
+							CopyMenuItem.this.getTextComponent().getText()
+						),
+						CopyMenuItem.this
 					);
 				}
 			}
