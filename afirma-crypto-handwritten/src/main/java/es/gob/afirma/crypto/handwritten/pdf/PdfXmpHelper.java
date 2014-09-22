@@ -13,33 +13,25 @@ import es.gob.afirma.crypto.handwritten.SignerInfoBean;
 public final class PdfXmpHelper {
 
 	/** A&ntilde;ade los datos de una firma biom&eacute;trica a un PDF en forma de XMP.
-	 * @param pdf PDF de entrada.
-	 * @param isoBioData Datos biom&acute;tricos en formato ISO 19794-7.
-	 * @param rawBioData Datos biom&acute;tricos en el formato nativo de la tableta de captura.
-	 * @param name Nombre del firmante.
-	 * @param surname1 Primer apellido del firmante.
-	 * @param surname2 Segundo apellido del firmante.
-	 * @param id NIF del firmante.
+	 * @param pdfStamper <code>PDFStamper</code>.
+	 * @param xmpData Datos XMP a a&ntilde;adir.
 	 * @throws IOException En caso de errores en el tratamiento de datos. */
 	public static void addBioXmpDataToPdf(final PdfStamper pdfStamper,
-			                                final byte[] xmpData) throws IOException {
+			                              final byte[] xmpData) throws IOException {
 		if (pdfStamper == null) {
 			throw new IllegalArgumentException(
 				"El PDF de entrada no puede ser nulo" //$NON-NLS-1$
 			);
 		}
-
 		pdfStamper.setXmpMetadata(xmpData);
 	}
 
-	/**
-	 * Construye una estructura XMP de metadatos para su posterior inserci&oacute;n en un PDF.
+	/** Construye una estructura XMP de metadatos para su posterior inserci&oacute;n en un PDF.
 	 * @param bioSignData Datos biom&eacute;tricos de firma.
 	 * @param pkDn DN de la clave de firma.
 	 * @param signerInfo Informaci&oacute;n del firmante.
 	 * @return Estructura XMP.
-	 * @throws IOException Cuando ocurre un error al construir la estructura.
-	 */
+	 * @throws IOException Cuando ocurre un error al construir la estructura. */
 	public static byte[] buildXmp(
 			final byte[] bioSignData,
 			final String pkDn,

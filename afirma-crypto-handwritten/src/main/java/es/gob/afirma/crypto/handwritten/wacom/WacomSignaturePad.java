@@ -42,7 +42,6 @@ import com.WacomGSS.STU.Protocol.ProtocolHelper;
 import es.gob.afirma.crypto.handwritten.JseUtil;
 import es.gob.afirma.crypto.handwritten.Rectangle;
 import es.gob.afirma.crypto.handwritten.SignaturePad;
-import es.gob.afirma.crypto.handwritten.SignaturePadConnectionException;
 import es.gob.afirma.crypto.handwritten.SignaturePadException;
 import es.gob.afirma.crypto.handwritten.SignaturePadListener;
 import es.gob.afirma.crypto.handwritten.SignatureResult;
@@ -244,10 +243,8 @@ public final class WacomSignaturePad extends SignaturePad implements ITabletHand
 	}
 
 	/** Crea una tableta de firma Wacom USB.
-	 * @param frame Componente padre (para la modalidad)
-	 * @param bgSurfaceImage Imagen a mostrar de fondo en la pantalla de la tableta.
-	 * @param signatureArea Area de firma dentro de la pantalla de la tableta.
-	 * @throws SignaturePadConnectionException */
+	 * @param frame Componente padre para la modalidad.
+	 * @throws SignaturePadException Si hay problemas durante la creaci&oacute;n de la tableta. */
 	public WacomSignaturePad(final Frame frame) throws SignaturePadException {
 
 		super(frame, true);
@@ -324,16 +321,20 @@ public final class WacomSignaturePad extends SignaturePad implements ITabletHand
 		this.tablet.addTabletHandler(this);
 	}
 
+	/** Inicializa la tableta para una firma.
+	 * @param imageTemplate Imagen a mostrar como fondo en la pantalla de la tableta de captura.
+	 * @param signatureArea Area de firma dentro de la pantalla de la tableta.
+	 * @throws SignaturePadException Si hay problemas con la tarbeta de firma.
+	 * @throws IOException Cuando hay problemas en el tratamiento de datos.
+	 */
 	public void init(final byte[] imageTemplate, final Rectangle signatureArea) throws SignaturePadException, IOException {
 		init(JseUtil.jpeg2BufferedImage(imageTemplate, this.useColor), signatureArea);
 	}
 
-	/**
-	 *
-	 * @param bgSurfaceImage
-	 * @param signatureArea
-	 * @throws SignaturePadException Cuando ocurre cualquier problema durante el proceso.
-	 */
+	/** Inicializa la tableta para una firma.
+	 * @param bgSurfaceImage Imagen a mostrar de fondo en la pantalla de la tableta.
+	 * @param signatureArea Area de firma dentro de la pantalla de la tableta.
+	 * @throws SignaturePadException Cuando ocurre cualquier problema durante el proceso. */
 	public void init(final Image bgSurfaceImage, final Rectangle signatureArea) throws SignaturePadException {
 
 		// Establecemos el area de firma

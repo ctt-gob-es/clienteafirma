@@ -4,7 +4,6 @@ import java.awt.Component;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
 import java.security.InvalidKeyException;
@@ -12,15 +11,12 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.RSAPublicKey;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Logger;
 
 import javax.swing.JOptionPane;
 
 import es.gob.afirma.core.misc.AOUtil;
-import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.crypto.handwritten.pdf.PdfSignerManager;
 import es.gob.afirma.crypto.handwritten.pdf.PdfXmpHelper;
 import es.gob.afirma.crypto.handwritten.wacom.WacomSignatureWindow;
@@ -55,7 +51,7 @@ public final class BioSigner implements SignaturePadListener {
 	 * Se sigue el siguiente proceso:
 	 * <ol>
 	 *  <li>Se descarga el documento a firmar de <i>retrieveUrl</i>.</li>
-	 *  <li>Se obtiene la huella digital del documento a firmar.</i>
+	 *  <li>Se obtiene la huella digital del documento a firmar.</li>
 	 *  <li>Se obtiene la firma biom&eacute;trica (muestras e imagen).</li>
 	 *  <li>
 	 *    Se cifran las muestras de la firma biom&eacute;trica junto a la huella
@@ -74,17 +70,15 @@ public final class BioSigner implements SignaturePadListener {
 	 * @param storeUrl URL para el almac&eacute;n del documento una vez firmado (HTTP POST,
 	 *                 en un par&aacute;metro que se debe llamar <i>data</i>).
 	 * @param template  Plantilla en formato HTML a mostrar en la tableta de firma.
-	 * @param signatureArea  Area en la que el usuario pueden firmar dentro de la pantalla
-	 *                       de la tableta de firma.
-	 * @param cypherCert Certificado de donde obtener la clave publica para el cifrado de los 
+	 * @param signatureArea Area en la que el usuario pueden firmar dentro de la pantalla
+	 *                      de la tableta de firma.
+	 * @param cypherCert Certificado de donde obtener la clave publica para el cifrado de los
 	 *                   datos.
 	 * @param signerData Informaci&oacute;n del firmante.
-	 * @param params 
-	 * @param extraParams Par&aacute;metros adicionales de configuraci&oacute;n de firma.
+	 * @param params Par&aacute;metros adicionales de configuraci&oacute;n de firma.
 	 * @throws IOException Cuando ocurre un error en la descarga de los datos o la codificacion
 	 * de la plantilla a mostrar en la tableta de firma.
-	 * @throws SignaturePadException Cuando no se ha podido inicializar la tableta de firma.
-	 */
+	 * @throws SignaturePadException Cuando no se ha podido inicializar la tableta de firma. */
 	public void sign(final Object parent,
 					 final URL retrieveUrl,
 					 final URL storeUrl,
@@ -116,7 +110,7 @@ public final class BioSigner implements SignaturePadListener {
 	 * Se sigue el siguiente proceso:
 	 * <ol>
 	 *  <li>Se descarga el documento a firmar de <i>retrieveUrl</i>.</li>
-	 *  <li>Se obtiene la huella digital del documento a firmar.</i>
+	 *  <li>Se obtiene la huella digital del documento a firmar.</li>
 	 *  <li>Se obtiene la firma biom&eacute;trica (muestras e imagen).</li>
 	 *  <li>
 	 *    Se cifran las muestras de la firma biom&eacute;trica junto a la huella
@@ -134,15 +128,18 @@ public final class BioSigner implements SignaturePadListener {
 	 * @param retrieveUrl URL para la recuperac&oacute;n (GET HTTP) del PDF a firmar.
 	 * @param storeUrl URL para el almac&eacute;n del documento una vez firmado (HTTP POST,
 	 *                 en un par&aacute;metro que se debe llamar <i>data</i>).
-	 * @param htmlTemplate Plantilla en formato HTML a mostrar en la tableta de firma.
-	 * @param signatureAreaOnPad Area en la que el usuario pueden firmar dentro de la pantalla
-	 *                           de la tableta de firma.
+	 * @param jpegImage Imagen a mostrar en la tableta de firma.
+	 * @param signatureArea Area en la que el usuario pueden firmar dentro de la pantalla
+	 *                      de la tableta de firma.
+	 * @param cypherCert Certificado de donde obtener la clave publica para el cifrado de los
+	 *                   datos.
+	 * @param signatureArea Area en la que el usuario pueden firmar dentro de la pantalla
+	 *                      de la tableta de firma.
 	 * @param signerData Informaci&oacute;n del firmante.
-	 * @param extraParams Par&aacute;metros adicionales de configuraci&oacute;n de firma.
+	 * @param params Par&aacute;metros adicionales de configuraci&oacute;n de firma.
 	 * @throws IOException Cuando ocurre un error en la descarga de los datos o la codificacion
 	 * de la plantilla a mostrar en la tableta de firma.
-	 * @throws SignaturePadException Cuando no se ha podido inicializar la tableta de firma.
-	 */
+	 * @throws SignaturePadException Cuando no se ha podido inicializar la tableta de firma. */
 	public void sign(final Object parent,
 					 final URL retrieveUrl,
 					 final URL storeUrl,
@@ -180,10 +177,10 @@ public final class BioSigner implements SignaturePadListener {
 		final byte[] metadata;
 		try {
 			metadata = buildXmpMetadata(
-				sr.getSignatureData(), 
-				sr.getSignatureRawData(), 
+				sr.getSignatureData(),
+				sr.getSignatureRawData(),
 				mdDoc,
-				this.pK, 
+				this.pK,
 				this.signerInfo
 			);
 		}
@@ -253,8 +250,8 @@ public final class BioSigner implements SignaturePadListener {
 	 * @throws IOException Cuando no es posible acceder al recurso remoto o descargarlo.
 	 */
 	private static byte[] downloadDocument(final URL retrieverUrl) throws IOException {
-		
-		System.out.println("Usamos doc en disco para depuracion");
+
+		System.out.println("Usamos documento en disco para depuracion");
 		return AOUtil.getDataFromInputStream(
 			BioSigner.class.getResourceAsStream("/AppCampus_Tomas_Garcia-Meras.pdf")
 		);
@@ -276,44 +273,43 @@ public final class BioSigner implements SignaturePadListener {
 		try {
 			return MessageDigest.getInstance(algorithm).digest(data);
 		}
-		catch (NoSuchAlgorithmException e) {
+		catch (final NoSuchAlgorithmException e) {
 			// Nunca se deberia llegar a este punto
 			LOGGER.severe("Se ha configurado un algoritmo interno de huella digital no valido: " + e); //$NON-NLS-1$
 			throw new RuntimeException(e);
 		}
 	}
 
-
 	/** Crea el XMP con los metadatos para el PDF.
 	 * @param isoBioData Datos biom&eacute;tricos de firma seg&uacute;n la ISO.
 	 * @param rawBioData Datos biom&eacute;tricos de firma en bruto.
 	 * @param md Huella digital de los datos.
+	 * @param cypherCert Certificado para el cifrado de datos.
 	 * @param signerInfo Informaci&oacute;n del firmante.
 	 * @return Metadatos del PDF.
 	 * @throws IOException Cuando
 	 * @throws InvalidKeyException Cuando la clave p&uacute;blica no es v&aacute;lida.
-	 * @throws CipherException Cuando no se pueden cifrar los documetos.
-	 */
-	private static byte[] buildXmpMetadata(final byte[] isoBioData, 
-			                               final byte[] rawBioData, 
+	 * @throws CipherException Cuando no se pueden cifrar los documetos. */
+	private static byte[] buildXmpMetadata(final byte[] isoBioData,
+			                               final byte[] rawBioData,
 			                               final byte[] md,
-			                               final X509Certificate pk, 
-			                               final SignerInfoBean signerInfo) throws IOException, 
-			                                                                       InvalidKeyException, 
+			                               final X509Certificate cypherCert,
+			                               final SignerInfoBean signerInfo) throws IOException,
+			                                                                       InvalidKeyException,
 			                                                                       CipherException {
 
-		byte[] bioData = new BioDataStructure(isoBioData, rawBioData, md, DIGEST_ALGO).getEncoded();
+		final byte[] bioData = new BioDataStructure(isoBioData, rawBioData, md, DIGEST_ALGO).getEncoded();
 
 		byte[] bioDataCiphered;
 		try {
-			bioDataCiphered = cipherData(bioData, (RSAPublicKey) pk.getPublicKey());
+			bioDataCiphered = cipherData(bioData, (RSAPublicKey) cypherCert.getPublicKey());
 		}
-		catch (Exception e) {
+		catch (final Exception e) {
 			throw new CipherException(e);
 		}
 		return PdfXmpHelper.buildXmp(
-			bioDataCiphered, 
-			pk.getIssuerX500Principal().toString(), 
+			bioDataCiphered,
+			cypherCert.getIssuerX500Principal().toString(),
 			signerInfo
 		);
 	}
@@ -324,7 +320,7 @@ public final class BioSigner implements SignaturePadListener {
 	 * @param pk Clave p&uacute;blica.
 	 * @return Datos cifrados.
 	 */
-	private static byte[] cipherData(final byte[] data, RSAPublicKey pk) {
+	private static byte[] cipherData(final byte[] data, final RSAPublicKey pk) {
 
 		//TODO:Implementar el cifrado
 
@@ -346,11 +342,11 @@ public final class BioSigner implements SignaturePadListener {
 	private static void sendPdf(final URL storeUrl, final byte[] signedPdf, final String dataUrlParam) throws IOException {
 
 		System.out.println("Almacenamos el PDF en disco para depuracion");
-		OutputStream fos = new FileOutputStream(File.createTempFile("BIO_", "-pdf"));
+		final OutputStream fos = new FileOutputStream(File.createTempFile("BIO_", "-pdf"));
 		fos.write(signedPdf);
 		fos.flush();
 		fos.close();
-		
+
 //		final Map<String, String> params = new HashMap<String, String>();
 //		params.put(dataUrlParam, Base64.encode(signedPdf, true));
 //
@@ -369,8 +365,8 @@ public final class BioSigner implements SignaturePadListener {
 	 */
 	private static String getDataUrlParam(final Properties extraParams) {
 		return extraParams != null ?
-				(extraParams.containsKey(DATA_URL_PARAM_NAME) ?
-						extraParams.getProperty(DATA_URL_PARAM_NAME) : DEFAULT_URL_PARAM_TO_UPLOAD_DATA) :
+				extraParams.containsKey(DATA_URL_PARAM_NAME) ?
+						extraParams.getProperty(DATA_URL_PARAM_NAME) : DEFAULT_URL_PARAM_TO_UPLOAD_DATA :
 					DEFAULT_URL_PARAM_TO_UPLOAD_DATA;
 	}
 
@@ -395,7 +391,7 @@ public final class BioSigner implements SignaturePadListener {
 
 		/** Construye una excepci&oacute;n que identifica un error en el cifrado de datos..
 		 * @param cause Causa de la excepci&oacute;n. */
-		public CipherException(Throwable cause) {
+		public CipherException(final Throwable cause) {
 			super(cause);
 		}
 	}

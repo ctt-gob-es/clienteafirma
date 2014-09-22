@@ -20,32 +20,37 @@ import es.gob.afirma.crypto.handwritten.Rectangle;
 import es.gob.afirma.signers.pades.PdfPreProcessor;
 import es.gob.afirma.signers.pades.PdfTimestamper;
 
+/** gestor de firmas manuscritas digitalizadas en documentos PDF. */
 public class PdfSignerManager {
 
 	/** Logger para la impresi&oacute;n de trazas. */
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma");  //$NON-NLS-1$
 
-	/**
-	 *
-	 * @param pdfDoc
-	 * @param bioMetadata
-	 * @param jpgImage
-	 * @param extraParams
-	 * @return
-	 * @throws IOException
-	 * @throws DocumentException Cuando hay algun error en la estructura del PDF.
-	 * @throws AOException Cuando ocurre un error al insertar el sello de tiempo.
-	 */
-	public static byte[] addPdfInfo(final byte[] pdfDoc, final byte[] bioMetadata, final byte[] jpgImage, final Properties extraParams) throws IOException, DocumentException, AOException {
+	/** Inserta todos los datos de una firma biom&eacute;trica en un PDF.
+	 * @param pdfDoc Documento PDF.
+	 * @param bioMetadata Informaci&oacute;n biom&eacute;trica.
+	 * @param jpgImage Imagen de la r&uacute;brica de la firma.
+	 * @param extraParams Par&aacute;metros adicionales de la inserci&oacute;n.
+	 * @return PDF con todos los datos insertados.
+	 * @throws IOException Si hay problemas en el tratamiento de datos.
+	 * @throws AOException Cuando ocurre un error al insertar el sello de tiempo. */
+	public static byte[] addPdfInfo(final byte[] pdfDoc, final byte[] bioMetadata, final byte[] jpgImage, final Properties extraParams) throws IOException, AOException {
 
 		// Creamos un temporal en donde se gestionaran los cambios del PDF
 		final File outputPdfFile = File.createTempFile("temp", ".pdf"); //$NON-NLS-1$ //$NON-NLS-2$
-		FileOutputStream fos = new FileOutputStream(outputPdfFile);
+		final FileOutputStream fos = new FileOutputStream(outputPdfFile);
 
 		// Creamos los objetos necesarios para la lectura y gestion del PDF
 		final PdfReader pdfReader = new PdfReader(pdfDoc);
 		final Calendar globalCalendar = new GregorianCalendar();
-		final PdfStamper pdfStamper = new PdfStamper(pdfReader, fos, globalCalendar);
+		final PdfStamper pdfStamper;
+		try {
+			pdfStamper = new PdfStamper(pdfReader, fos, globalCalendar);
+		}
+		catch (final DocumentException e) {
+			fos.close();
+			throw new IOException("Error creando el PDFStamper: " + e, e); //$NON-NLS-1$
+		}
 
 		// Insertamos los datos biometricos
 		insertBioData(pdfStamper, bioMetadata);
@@ -54,7 +59,13 @@ public class PdfSignerManager {
 		insertImage(pdfStamper, jpgImage, extraParams);
 
 		// Cerramos el PDF
-		pdfStamper.close(globalCalendar);
+		try {
+			pdfStamper.close(globalCalendar);
+		}
+		catch (final DocumentException e) {
+			fos.close();
+			throw new IOException("Error cerrando el PDFStamper: " + e, e); //$NON-NLS-1$
+		}
 		fos.close();
 		pdfReader.close();
 
@@ -73,7 +84,6 @@ public class PdfSignerManager {
 	private static void insertBioData(final PdfStamper pdfStamper, final byte[] bioData) throws IOException {
 		PdfXmpHelper.addBioXmpDataToPdf(pdfStamper, bioData);
 	}
-
 
 	private static void insertImage(final PdfStamper pdfStamper, final byte[] signatureJpegImage, final Properties extraParams) throws IOException {
 
@@ -143,7 +153,7 @@ public class PdfSignerManager {
 		try {
 			numPage = Integer.parseInt(imagePage);
 		}
-		catch (NumberFormatException e) {
+		catch (final NumberFormatException e) {
 			throw new IllegalArgumentException("No se ha introducido un valor valido como numero de pagina", e); //$NON-NLS-1$
 		}
 		return numPage;
@@ -169,7 +179,7 @@ public class PdfSignerManager {
 	private static void deleteFile(final File file) {
 		try {
 			Files.delete(file.toPath());
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			LOGGER.warning("No se ha podido borrar el fichero: " + e); //$NON-NLS-1$
 		}
 	}

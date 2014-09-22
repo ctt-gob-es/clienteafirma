@@ -42,7 +42,7 @@ public final class JseUtil {
 	/** Convierte una <code>BufferedImage</code> de AWT en una imagen JPEG.
 	 * @param img <code>BufferedImage</code> de origen
 	 * @return Imagen JPEG
-	 * @throws IOException */
+	 * @throws IOException Si hay problemas en el tratamiento de la imagen. */
 	public static byte[] bufferedImage2Jpeg(final BufferedImage img) throws IOException {
 		final IIORegistry registry = IIORegistry.getDefaultInstance();
 		final Iterator<ImageWriterSpi> services = registry.getServiceProviders(
@@ -93,7 +93,7 @@ public final class JseUtil {
 	 * @param width Ancho de la imagen deseada.
 	 * @param height Alto de la imagen deseada.
 	 * @return Imagen de las dimensiones indicadas con la representaci&oacute;n gr&aacute;fica del HTML.
-	 * @throws IOException */
+	 * @throws IOException Si hay problemas en el tratamiento de la imagen. */
 	public static Image html2Image(final String html,
 			                           final int width,
 			                           final int height) throws IOException {
@@ -113,10 +113,10 @@ public final class JseUtil {
 	}
 
     /** Convierte una imagen JPEG en una <code>BufferedImage</code> de AWT.
-	 * @param jpegImage Imagen JPEG de origen
-	 * @param bw Si se debe o no convertir la imagen a blanco y negro
-	 * @return <code>BufferedImage</code>
-	 * @throws IOException */
+	 * @param jpegImage Imagen JPEG de origen.
+	 * @param bw Si se debe o no convertir la imagen a blanco y negro.
+	 * @return <code>BufferedImage</code>.
+	 * @throws IOException Si hay problemas en el tratamiento de la imagen. */
 	public static BufferedImage jpeg2BufferedImage(final byte[] jpegImage, final boolean bw) throws IOException {
 		final BufferedImage original = ImageIO.read(new ByteArrayInputStream(jpegImage));
 		if (!bw) {

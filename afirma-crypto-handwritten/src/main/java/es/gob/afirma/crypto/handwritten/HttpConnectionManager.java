@@ -23,7 +23,7 @@ import javax.net.ssl.X509TrustManager;
 
 import es.gob.afirma.core.misc.AOUtil;
 
-public class HttpConnectionManager {
+class HttpConnectionManager {
 
 	/** Protocolo de transporte seguro. */
 	private static final String HTTPS = "https"; //$NON-NLS-1$
@@ -46,13 +46,11 @@ public class HttpConnectionManager {
 		}
 	};
 
-	/**
-	 * EnvIacute;a datos como par&aacute;metros por POST a una URL.
+	/** Env&iacute;a datos como par&aacute;metros por POST a una URL.
 	 * @param storeUrl URL a la que enviar los datos.
 	 * @param params Par&aacute;metros que hay que enviar.
-	 * @throws Cuando ocurre alg&uacute;n error durante el env&iacute;o.
-	 */
-	public static void sendDataByPost(final URL storeUrl, final Map<String, String> params) throws IOException {
+	 * @throws IOException Cuando ocurre alg&uacute;n error durante el env&iacute;o. */
+	static void sendDataByPost(final URL storeUrl, final Map<String, String> params) throws IOException {
 
 		if (storeUrl.getProtocol().equals(HTTPS)) {
 			try {
@@ -78,7 +76,7 @@ public class HttpConnectionManager {
 
 		final OutputStreamWriter writer = new OutputStreamWriter(conn.getOutputStream());
 
-		Iterator<String> it = params.keySet().iterator();
+		final Iterator<String> it = params.keySet().iterator();
 		while (it.hasNext()) {
 			final String param = it.next();
 			writer.write(param);

@@ -20,14 +20,14 @@ public class WacomSignatureWindow extends JFrame {
 
 	BufferedImage signatureImage;
 
-	/**
-	 *
-	 * @param parent
-	 * @param htmlTemplate
-	 * @param signAreaRect
+	/** Crea el panel con el aspecto de una tableta Wacom sobre el que se replica la superficie de firma.
+	 * @param parent Componente padre para la modalidad.
+	 * @param htmlTemplate Plantilla HTML a mostrar como fondo en la pantalla de la r&eacute;plica de
+	 *                     la tableta de captura.
+	 * @param signAreaRect Coordenadas del rect&aacute;ngulo de firma en la pantalla de la
+	 *                     r&eacute;plica de la tableta.
 	 * @throws IOException Cuando ocurre un error en la codificaci&oacute;n de la plantilla de la tableta
-	 * @throws SignaturePadException Cuando no se ha podido inicializar el dispositivo de creacion de firmas.
-	 */
+	 * @throws SignaturePadException Cuando no se ha podido inicializar el dispositivo de creacion de firmas. */
 	public WacomSignatureWindow(final Object parent, final String htmlTemplate, final Rectangle signAreaRect) throws IOException, SignaturePadException {
 		this.signatureDialog = new WacomSignaturePad(
 				parent instanceof Frame ? (Frame) parent : null);
@@ -40,14 +40,16 @@ public class WacomSignatureWindow extends JFrame {
 				signAreaRect);
 	}
 
-	/**
-	 *
-	 * @param parent
-	 * @param imageTemplate
-	 * @param signAreaRect
-	 * @throws IOException Cuando ocurre un error en la codificaci&oacute;n de la plantilla de la tableta.
-	 * @throws SignaturePadException Cuando no se ha podido inicializar el dispositivo de creacion de firmas.
-	 */
+	/** Crea el panel con el aspecto de una tableta Wacom sobre el que se replica la superficie de firma.
+	 * @param parent Componente padre para la modalidad.
+	 * @param imageTemplate Imagen a mostrar como fondo en la pantalla de la r&eacute;plica de
+	 *                      la tableta de captura.
+	 * @param signAreaRect Coordenadas del rect&aacute;ngulo de firma en la pantalla de la
+	 *                     r&eacute;plica de la tableta.
+	 * @throws IOException Cuando ocurre un error en la codificaci&oacute;n de la imagen de
+	 *                     fondo de la r&eacute;plica de la tableta.
+	 * @throws SignaturePadException Cuando no se ha podido inicializar la r&eacute;plica
+	 *                               del dispositivo de creacion de firmas. */
 	public WacomSignatureWindow(final Object parent, final byte[] imageTemplate, final Rectangle signAreaRect) throws SignaturePadException, IOException {
 
 		this.signatureDialog = new WacomSignaturePad(
@@ -56,15 +58,22 @@ public class WacomSignatureWindow extends JFrame {
 		this.signatureDialog.init(imageTemplate, signAreaRect);
 	}
 
+	/** Indica una clase a la que notificar los eventos que se produzcan en la r&eacute;plica de la
+	 * tableta de captura (sus botones son comletamente funcionales).
+	 * @param listener Instancia a la que notificar los eventos que se produzcan en la r&eacute;plica de la
+	 *                 tableta de captura. */
 	public void addSignatureListener(final SignaturePadListener listener) {
-		this.signatureDialog.addSignatureListener(listener);
+		if (listener != null) {
+			this.signatureDialog.addSignatureListener(listener);
+		}
 	}
 
+	/** Inicia el proceso de firma en la r&eacute;plica de la tableta de captura. */
 	public void captureSign() {
-
 		this.signatureDialog.setVisible(true);
 	}
 
+	/** Borra la pantalla de la r&eacute;plica de la tableta. */
 	public void clearScreen() {
 		this.signatureDialog.dispose();
 	}
