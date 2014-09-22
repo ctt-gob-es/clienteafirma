@@ -1,4 +1,4 @@
-package es.gob.afirma.crypto.handwritten;
+package es.gob.afirma.crypto.handwritten.applet;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -18,6 +18,9 @@ import javax.swing.JApplet;
 
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
+import es.gob.afirma.crypto.handwritten.BioSigner;
+import es.gob.afirma.crypto.handwritten.Rectangle;
+import es.gob.afirma.crypto.handwritten.SignerInfoBean;
 
 public class SignatureApplet extends JApplet {
 

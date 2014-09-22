@@ -1,4 +1,4 @@
-package es.gob.afirma.crypto.handwritten;
+package es.gob.afirma.crypto.handwritten.applet;
 
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
