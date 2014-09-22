@@ -3,6 +3,7 @@ package es.gob.afirma.signers.pades;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Properties;
@@ -41,10 +42,11 @@ public final class PdfTimestamper {
 	 * @param signTime Tiempo para el sello.
 	 * @return PDF con el sello de tiempo aplicado.
 	 * @throws AOException Si hay problemas durante el proceso.
-	 * @throws IOException Si hay problemas en el tratamiento de datos. */
+	 * @throws IOException Si hay problemas en el tratamiento de datos.
+	 * @throws NoSuchAlgorithmException Si no se soporta el algoritmo de huella digital indicado. */
 	public static byte[] timestampPdf(final byte[] inPDF,
 			                   final Properties extraParams,
-			                   final Calendar signTime) throws AOException, IOException {
+			                   final Calendar signTime) throws AOException, IOException, NoSuchAlgorithmException {
     	// Comprobamos si se ha pedido un sello de tiempo
     	if (extraParams != null) {
     		final String tsa = extraParams.getProperty("tsaURL"); //$NON-NLS-1$
@@ -144,27 +146,22 @@ public final class PdfTimestamper {
 		return inPDF;
 	}
 
-	private static byte[] getTspToken(final Properties extraParams, final byte[] original, final Calendar signTime) throws AOException {
+	private static byte[] getTspToken(final Properties extraParams, final byte[] original, final Calendar signTime) throws AOException, NoSuchAlgorithmException, IOException {
 
     	// Obtenemos el sellador de tiempo
 		final TsaParams tsaParams = new TsaParams(extraParams);
         final CMSTimestamper timestamper = new CMSTimestamper(tsaParams);
 
 		// Obtenemos el token TSP
-		try {
-    		return timestamper.getTimeStampToken(
-				MessageDigest.getInstance(
-					tsaParams.getTsaHashAlgorithm()
-        		).digest(
-    				original
-				),
-				tsaParams.getTsaHashAlgorithm(),
-				signTime
-			);
-    	}
-    	catch(final Exception e) {
-    		throw new AOException("Error en la obtencion del sello de tiempo PAdES: " + e, e); //$NON-NLS-1$
-    	}
+		return timestamper.getTimeStampToken(
+			MessageDigest.getInstance(
+				tsaParams.getTsaHashAlgorithm()
+    		).digest(
+				original
+			),
+			tsaParams.getTsaHashAlgorithm(),
+			signTime
+		);
 	}
 
 }

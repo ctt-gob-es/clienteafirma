@@ -117,7 +117,15 @@ public final class AOPDFSigner implements AOSigner {
 
         final GregorianCalendar signTime = new GregorianCalendar();
 
-        final byte[] data = PdfTimestamper.timestampPdf(inPDF, extraParams, signTime);
+        byte[] data;
+		try {
+			data = PdfTimestamper.timestampPdf(inPDF, extraParams, signTime);
+		}
+		catch (final NoSuchAlgorithmException e1) {
+			throw new IOException(
+				"No se soporta el algoritmo indicado para la huella digital del sello de tiempo: " + e1, e1 //$NON-NLS-1$
+			);
+		}
 
         final PdfSignResult pre;
         try {
