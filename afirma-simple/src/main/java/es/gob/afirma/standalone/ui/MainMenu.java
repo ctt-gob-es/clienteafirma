@@ -340,7 +340,6 @@ public final class MainMenu extends JMenuBar {
         if (this.abrirMenuItem != null) {
             this.abrirMenuItem.setEnabled(en);
         }
-        setEnabledFileMenu(en);
     }
 
     /** Habilita o deshabilita el elemento de men&uacute; de firma de fichero.
@@ -348,14 +347,6 @@ public final class MainMenu extends JMenuBar {
     public void setEnabledSignCommand(final boolean en) {
         if (this.firmarMenuItem != null) {
             this.firmarMenuItem.setEnabled(en);
-        }
-    }
-
-    /** Habilita o deshabilita el men&uacute; de fichero.
-     * @param en <code>true</code> para habilitar el men&uacute; de fichero, <code>false</code> para deshabilitarlo */
-    public void setEnabledFileMenu(final boolean en) {
-    	if (this.menuArchivo != null) {
-            this.menuArchivo.setEnabled(en);
         }
     }
 

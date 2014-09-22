@@ -200,14 +200,14 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
             this.window.setTitle(SimpleAfirmaMessages.getString("SimpleAfirma.10")); //$NON-NLS-1$
             this.container = this.window;
         }
-        else {	    	
+        else {
         	final MainScreen mainScreen = new MainScreen();
         	this.currentPanel = new SignPanel(mainScreen, this, true);
            	mainScreen.showMainScreen(this, this.currentPanel, 780, 500);
         	this.window = mainScreen;
         	this.window.setTitle(SimpleAfirmaMessages.getString("SimpleAfirma.10")); //$NON-NLS-1$
         	this.container = this.window;
-        	
+
         	loadDefaultKeyStore();
         	configureMenuBar(true);
 
@@ -354,9 +354,7 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
     public void loadResultsPanel(final byte[] sign, final String fileName, final X509Certificate signingCert) {
     	this.mainMenu.setEnabledSignCommand(false);
     	this.mainMenu.setEnabledOpenCommand(false);
-    	if (Platform.OS.MACOSX.equals(Platform.getOS())) {
-    		this.mainMenu.setEnabledFileMenu(false);
-    	}
+
         final JPanel newPanel = new SignDetailPanel(this, sign, fileName, signingCert, new SignValidity(SIGN_DETAIL_TYPE.GENERATED, null), null);
         this.container.add(newPanel, BorderLayout.CENTER);
         if (this.window != null && fileName != null) {
@@ -554,7 +552,7 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
      * @param args
      *        Par&aacute;metros en l&iacute;nea de comandos */
     public static void main(final String[] args) {
-    	
+
 		// Google Analytics
     	SwingUtilities.invokeLater(
 			new Runnable() {
@@ -583,9 +581,9 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
     		if (args == null || args.length == 0) {
 
     			if (!isSimpleAfirmaAlreadyRunning()) {
-    				
+
     				final SimpleAfirma saf = new SimpleAfirma();
-    				
+
     				final OS os = Platform.getOS();
     				if (OS.WINDOWS != os && OS.MACOSX != os) {
     					LOGGER.info(
@@ -593,7 +591,7 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
 						);
 	    				// Hay un error raro en Java / NSS / SunPKCS11Provider que impide la inicializacion
 	    				// de NSS en puntos posteriores de la ejecucion del programa, donde devuelve siempre
-	    				// un CKR_DEVICE_ERROR (directamente desde NSS). 
+	    				// un CKR_DEVICE_ERROR (directamente desde NSS).
 	    		    	try {
 	    					final AOKeyStoreManager ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
 							    AOKeyStore.MOZ_UNI, // Store
@@ -603,7 +601,7 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
 								null // Parent
 	    					);
 	    					saf.setKeyStoreManager(ksm);
-	    				} 
+	    				}
 	    		    	catch (final Exception e1) {
 	    					LOGGER.severe(
     							"Ha fallado la precarga temprana de NSS, se intentara la carga concurrente normal: " + e1 //$NON-NLS-1$
