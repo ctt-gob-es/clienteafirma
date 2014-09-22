@@ -12,7 +12,7 @@ public class NameCertificateBean {
 
 	private final String name;
 
-	private final X509Certificate certificate;
+	private final X509Certificate[] certificateChain;
 
 	/**
 	 * Construye la tupla Nombre-Certificado.
@@ -20,10 +20,10 @@ public class NameCertificateBean {
 	 * @param name Nombre identificador del certificado.
 	 * @param cert Certificado.
 	 */
-	public NameCertificateBean(final String alias, final String name, final X509Certificate cert) {
+	public NameCertificateBean(final String alias, final String name, final X509Certificate[] certChain) {
 		this.alias = alias;
 		this.name = name;
-		this.certificate = cert;
+		this.certificateChain = certChain;
 	}
 
 	/**
@@ -47,9 +47,17 @@ public class NameCertificateBean {
 	 * @return Certificado.
 	 */
 	public X509Certificate getCertificate() {
-		return this.certificate;
+		return this.certificateChain[0];
 	}
-	
+
+	/**
+	 * Devuelve la cadena de certificaci&oacute;n del certificado.
+	 * @return Cadena de certificaci&oacute;n.
+	 */
+	public X509Certificate[] getCertificateChain() {
+		return this.certificateChain;
+	}
+
 	@Override
 	public String toString() {
 		return this.name;

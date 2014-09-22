@@ -190,7 +190,7 @@ public final class AOUIFactory {
      * @param parentComponent Componente padre (se descarta si no es del tipo <code>java.awt.Component</code> en la implementaci&oacute;n Swing
      * @param dialogManager Gestor del di&aacute;logo
      * @return Alias del certificado seleccionado o {@code null} si no se seleccion&oacute; ninguno. */
-    public static Object showCertificateSelectionDialog(final Object parentComponent, final KeyStoreDialogManager dialogManager) {
+    public static String showCertificateSelectionDialog(final Object parentComponent, final KeyStoreDialogManager dialogManager) {
         return uiManager.showCertificateSelectionDialog(parentComponent, dialogManager);
     }
 

@@ -2,7 +2,6 @@ package es.gob.afirma.keystores;
 
 import java.io.IOException;
 import java.security.KeyStore.PrivateKeyEntry;
-import java.security.cert.Certificate;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
 import java.util.List;
@@ -32,11 +31,9 @@ public class AOKeyStoreDialog implements KeyStoreDialogManager {
 	private final boolean showExpiredCertificates;
 	private final List<CertificateFilter> certFilters;
 	private final boolean mandatoryCertificate;
-	
+
 	private String selectedAlias = null;
-	private PrivateKeyEntry selectedPke = null;
-	private Certificate[] selectedCertChain = null;
-	
+
     /**
      * Crea un dialogo para la selecci&oacute;n de un certificado.
      * @param ksm
@@ -128,16 +125,6 @@ public class AOKeyStoreDialog implements KeyStoreDialogManager {
     				this.certFilters
     			);
 
-    	if (this.mandatoryCertificate && aliassesByFriendlyName.size() == 1) {
-    		final String alias = aliassesByFriendlyName.keySet().toArray(new String[1])[0];
-    		return new NameCertificateBean[] {
-    				new NameCertificateBean(
-    						alias,
-    						aliassesByFriendlyName.get(alias),
-    						this.ksm.getCertificate(alias))
-    		};
-    	}
-
     	int i = 0;
     	final NameCertificateBean[] namedCerts =
     			new NameCertificateBean[aliassesByFriendlyName.size()];
@@ -145,7 +132,7 @@ public class AOKeyStoreDialog implements KeyStoreDialogManager {
     		namedCerts[i++] = new NameCertificateBean(
     				certAlias,
     				aliassesByFriendlyName.get(certAlias),
-    				this.ksm.getCertificate(certAlias));
+    				this.ksm.getCertificateChain(certAlias));
     	}
 
 		return namedCerts;
@@ -173,7 +160,7 @@ public class AOKeyStoreDialog implements KeyStoreDialogManager {
 				throw new AOException("No se ha podido extraer la clave del almacen", e); //$NON-NLS-1$
 			}
 		}
-		
+
 		this.selectedAlias = alias;
 
 		if (this.checkValidity && this.ksm != null) {
@@ -212,41 +199,34 @@ public class AOKeyStoreDialog implements KeyStoreDialogManager {
 				throw new AOCancelledOperationException("Se ha reusado un certificado probablemente no valido"); //$NON-NLS-1$
 			}
     	}
-		
+
 		return this.checkPrivateKeys ? pke : this.ksm.getCertificateChain(alias);
 	}
 
 	@Override
-	public void show() {
-		
-		Object selectedElement = AOUIFactory.showCertificateSelectionDialog(this.parentComponent, this);
-		
-		this.selectedCertChain = selectedElement instanceof Certificate[] ? (Certificate[]) selectedElement : null;
-		if (this.selectedCertChain == null) {
-			this.selectedPke = selectedElement instanceof PrivateKeyEntry ? (PrivateKeyEntry) selectedElement : null;
-			if (this.selectedPke != null) {
-				this.selectedCertChain = this.selectedPke.getCertificateChain();
+	public String show() {
+
+		// Si se ha indicado que, en caso de haber solo un certificado disponible, se autoseleccione;
+		// no mostramos el dialogo de seleccion
+		if (this.mandatoryCertificate) {
+			final NameCertificateBean[] namedCertificates = this.getNameCertificates();
+			if (namedCertificates != null && namedCertificates.length == 1) {
+				return namedCertificates[0].getAlias();
 			}
 		}
-		
-		if (this.selectedCertChain == null) {
+
+		this.selectedAlias = AOUIFactory.showCertificateSelectionDialog(this.parentComponent, this);
+
+		if (this.selectedAlias == null) {
 			throw new AOCancelledOperationException("No se ha seleccionado certificado"); //$NON-NLS-1$
 		}
+
+		return this.selectedAlias;
 	}
 
 	@Override
 	public String getSelectedAlias() {
 		return this.selectedAlias;
-	}
-
-	@Override
-	public PrivateKeyEntry getSelectedPrivateKeyEntry() {
-		return this.selectedPke;
-	}
-
-	@Override
-	public Certificate[] getSelectedCertificateChain() {
-		return this.selectedCertChain;
 	}
 
 	@Override

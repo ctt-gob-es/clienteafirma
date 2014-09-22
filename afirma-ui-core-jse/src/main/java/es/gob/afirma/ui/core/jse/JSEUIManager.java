@@ -153,7 +153,7 @@ public class JSEUIManager implements AOUIManager {
 
     /** {@inheritDoc} */
     @Override
-	public final Object showCertificateSelectionDialog(final Object parentComponent,
+	public final String showCertificateSelectionDialog(final Object parentComponent,
     												   final KeyStoreDialogManager ksdm) {
 
     	Component parent = null;
@@ -173,7 +173,9 @@ public class JSEUIManager implements AOUIManager {
     		final Object csd =  csdConstructor.newInstance(parent, ksdm);
     		final Method showDialogMethod = csdClass.getMethod("showDialog"); //$NON-NLS-1$
 
-    		return showDialogMethod.invoke(csd);
+    		final Object result = showDialogMethod.invoke(csd);
+
+    		return result instanceof String ? (String) result : null;
     	}
     	catch (final InvocationTargetException e) {
     		LOGGER.severe("Ocurrio un error al extraer el certificado seleccionado: " + e); //$NON-NLS-1$

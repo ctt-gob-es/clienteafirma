@@ -14,6 +14,9 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
 import java.security.KeyStore.PrivateKeyEntry;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableEntryException;
 
 import javax.security.auth.callback.PasswordCallback;
 
@@ -109,8 +112,11 @@ public final class MultisignUtils {
      * @param keyStoreManager Manager del almac&eacute;n o repositorio de certificados
      * @param padre Componente padre
      * @return Entrada que apunta a la clave privada
-     * @throws AOException se ha producido un error al intentar obtener la clave privada */
-    public static PrivateKeyEntry getPrivateKeyEntry(final KeyStoreConfiguration kssc, final AOKeyStoreManager keyStoreManager, final Component padre) throws AOException {
+     * @throws AOException se ha producido un error al intentar obtener la clave privada
+     * @throws KeyStoreException Cuando ocurren errores en el tratamiento del almac&eacute;n de claves
+	 * @throws NoSuchAlgorithmException Cuando no se puede identificar el algoritmo para la recuperaci&oacute;n de la clave
+	 * @throws UnrecoverableEntryException Si la contrase&ntilde;a proporcionada no es v&aacute;lida para obtener la clave privada */
+    public static PrivateKeyEntry getPrivateKeyEntry(final KeyStoreConfiguration kssc, final AOKeyStoreManager keyStoreManager, final Component padre) throws AOException, KeyStoreException, NoSuchAlgorithmException, UnrecoverableEntryException {
         return new CertificateManagerDialog().show(padre, keyStoreManager);
     }
 }

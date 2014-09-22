@@ -2,6 +2,9 @@ package es.gob.afirma.ui.utils;
 
 import java.awt.Component;
 import java.security.KeyStore.PrivateKeyEntry;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableEntryException;
 import java.security.cert.Certificate;
 import java.util.List;
 
@@ -16,15 +19,18 @@ import es.gob.afirma.keystores.filters.CertificateFilter;
 public class CertificateManagerDialog {
 
 	private String selectedAlias = null;
-	
+
 	/**
 	 * Muestra el dialogo de selecci&oacute;n.
 	 * @param parentComponent Componente padre sobre el que mostrarse.
 	 * @param ksm Almacen de certificados que debe mostrar.
 	 * @return Entrada con la clave y el certificado seleccionado.
+	 * @throws KeyStoreException Cuando ocurren errores en el tratamiento del almac&eacute;n de claves
+	 * @throws NoSuchAlgorithmException Cuando no se puede identificar el algoritmo para la recuperaci&oacute;n de la clave
+	 * @throws UnrecoverableEntryException Si la contrase&ntilde;a proporcionada no es v&aacute;lida para obtener la clave privada
 	 * @throws AOCancelledOperationException Cuando no se selecciona ning&uacute;n certificado.
 	 */
-	public PrivateKeyEntry show(final Component parentComponent, final AOKeyStoreManager ksm) {
+	public PrivateKeyEntry show(final Component parentComponent, final AOKeyStoreManager ksm) throws KeyStoreException, NoSuchAlgorithmException, UnrecoverableEntryException {
 		return show(parentComponent, ksm, null, false);
 	}
 
@@ -36,10 +42,13 @@ public class CertificateManagerDialog {
 	 * @param mandatoryCertificate Indica si debe seleccionarse autom&aacute;ticamente el
 	 * certificado cuando solo haya uno disponible que cumpla con los requisitos especificados.
 	 * @return Entrada con la clave y el certificado seleccionado.
+	 * @throws KeyStoreException Cuando ocurren errores en el tratamiento del almac&eacute;n de claves
+	 * @throws NoSuchAlgorithmException Cuando no se puede identificar el algoritmo para la recuperaci&oacute;n de la clave
+	 * @throws UnrecoverableEntryException Si la contrase&ntilde;a proporcionada no es v&aacute;lida para obtener la clave privada
 	 * @throws AOCancelledOperationException Cuando no se selecciona ning&uacute;n certificado.
 	 */
-	public PrivateKeyEntry show(final Component parentComponent, final AOKeyStoreManager ksm, List<CertificateFilter> filters, final boolean mandatoryCertificate) {
-		
+	public PrivateKeyEntry show(final Component parentComponent, final AOKeyStoreManager ksm, List<CertificateFilter> filters, final boolean mandatoryCertificate) throws KeyStoreException, NoSuchAlgorithmException, UnrecoverableEntryException {
+
 		final AOKeyStoreDialog dialog = new AOKeyStoreDialog(
 				ksm,
 				parentComponent,
@@ -52,10 +61,10 @@ public class CertificateManagerDialog {
 		dialog.show();
 
 		this.selectedAlias = dialog.getSelectedAlias();
-		
-		return dialog.getSelectedPrivateKeyEntry();
+
+		return ksm.getKeyEntry(this.selectedAlias, ksm.getType().getCertificatePasswordCallback(parentComponent));
 	}
-	
+
 	/**
 	 * Muestra el dialogo de selecci&oacute;n.
 	 * @param parentComponent Componente padre sobre el que mostrarse.
@@ -71,7 +80,7 @@ public class CertificateManagerDialog {
 	 */
 	public Certificate[] showCerts(final Component parentComponent, final AOKeyStoreManager ksm,
 			final boolean checkPrivateKeys, final boolean showExpiredCertificates) {
-		
+
 		final AOKeyStoreDialog dialog = new AOKeyStoreDialog(
 				ksm,
 				parentComponent,
@@ -81,10 +90,10 @@ public class CertificateManagerDialog {
 		dialog.show();
 
 		this.selectedAlias = dialog.getSelectedAlias();
-		
-		return dialog.getSelectedCertificateChain();
+
+		return ksm.getCertificateChain(this.selectedAlias);
 	}
-	
+
 	/**
 	 * Recupera el alias del certificado seleccionado.
 	 * @return Alias del certificado seleccionado.

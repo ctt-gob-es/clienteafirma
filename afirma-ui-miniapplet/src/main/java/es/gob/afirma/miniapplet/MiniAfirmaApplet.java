@@ -12,6 +12,8 @@ package es.gob.afirma.miniapplet;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
@@ -20,6 +22,8 @@ import java.security.AccessController;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
 import java.util.logging.Logger;
@@ -38,11 +42,21 @@ import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOFormatFileException;
 import es.gob.afirma.core.LogManager;
 import es.gob.afirma.core.LogManager.App;
+import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.Platform;
+import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSigner;
+import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.crypto.jarverifier.JarSignatureCertExtractor;
 import es.gob.afirma.keystores.AOKeyStore;
+import es.gob.afirma.keystores.AOKeyStoreDialog;
+import es.gob.afirma.keystores.AOKeyStoreManager;
+import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
+import es.gob.afirma.keystores.AOKeystoreAlternativeException;
+import es.gob.afirma.keystores.filters.CertificateFilter;
+import es.gob.afirma.miniapplet.keystores.filters.SSLFilter;
+import es.gob.afirma.signers.cadestri.client.AOCAdESTriPhaseSigner;
 
 /** MiniApplet de firma del proyecto Afirma. */
 public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
@@ -1091,5 +1105,61 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 	@Override
 	public String getCurrentLog() {
 		return AccessController.doPrivileged(new GetCurrentLogAction());
+	}
+
+	public static void main(String[] args) throws AOKeystoreAlternativeException, IOException, AOException {
+
+		final String SERVLET_URL = "http://localhost:8080/afirma-server-triphase-signer/SignatureService"; //$NON-NLS-1$
+		final String PARAM_NAME_SERVER_URL = "serverUrl"; //$NON-NLS-1$
+		final String IMPLICIT_SHA1_COUNTERSIGN_FILE = "contrafirma_implicita.csig"; //$NON-NLS-1$
+
+
+		final InputStream is = MiniAfirmaApplet.class.getClassLoader().getResourceAsStream(IMPLICIT_SHA1_COUNTERSIGN_FILE);
+		final byte[] sign = AOUtil.getDataFromInputStream(is);
+		is.close();
+
+		final Properties config = new Properties();
+		config.setProperty(PARAM_NAME_SERVER_URL, SERVLET_URL);
+
+		final AOSigner signer = new AOCAdESTriPhaseSigner();
+		//final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(PASSWORD.toCharArray()));
+
+		List<CertificateFilter> filters = new ArrayList<CertificateFilter>();
+		filters.add(new SSLFilter("3D09442E"));
+
+		AOKeyStoreManager ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(AOKeyStore.WINDOWS, null, null, AOKeyStore.WINDOWS.getStorePasswordCallback(null), null);
+		AOKeyStoreDialog ksdm = new AOKeyStoreDialog(ksm, null, true, false, false, filters, false);
+		String selectedAlias = ksdm.show();
+
+		System.out.println("Alias seleccionado: " + selectedAlias);
+
+		PrivateKeyEntry pke;
+		try {
+			pke = ksm.getKeyEntry(selectedAlias, AOKeyStore.WINDOWS.getCertificatePasswordCallback(null));
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return;
+		}
+
+//		System.out.println("SerialNumber: " + AOUtil.hexify(((X509Certificate) pke.getCertificate()).getSerialNumber().toByteArray(), false));
+
+		final byte[] countersign = signer.countersign(
+				sign,
+				AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA,
+				CounterSignTarget.TREE,
+				null,
+				pke.getPrivateKey(),
+				pke.getCertificateChain(),
+				config);
+
+		final File tempFile = File.createTempFile("CountersignCades", ".csig"); //$NON-NLS-1$ //$NON-NLS-2$
+
+		System.out.println("Prueba de contrafirma de arbol sobre firma explicita."); //$NON-NLS-1$
+		System.out.println("El resultado se almacena en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
+
+		final FileOutputStream fos = new FileOutputStream(tempFile);
+		fos.write(countersign);
+		fos.close();
 	}
 }

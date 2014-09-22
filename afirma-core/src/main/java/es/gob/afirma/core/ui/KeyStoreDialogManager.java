@@ -1,8 +1,6 @@
 package es.gob.afirma.core.ui;
 
 import java.io.IOException;
-import java.security.KeyStore.PrivateKeyEntry;
-import java.security.cert.Certificate;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.keystores.KeyStoreManager;
@@ -41,30 +39,16 @@ public interface KeyStoreDialogManager {
 	 */
 	Object getKeyEntry(String alias) throws AOException;
 
-	/** Muestra el di&aacute;logo de selecci&oacute;n y establece cual es la pareja clave-certificado seleccionado.
-	 * Este m&eacute;todo no puede utilizarse cuando el di&aacute;logo se utilice para mostrar certificados sin
-	 * clave privada.
+	/** Muestra el di&aacute;logo con el listado de certificados que se ajusta a los criterios establecidos
+	 * para que el usuario seleccione uno de ellos.
+	 * @return Alias del certifciado seleccionado.
 	 * @throws es.gob.afirma.core.AOCancelledOperationException Cuando no se selecciona ning&uacute;n certificado.
 	 * @throws RuntimeException Cuando se produce un error en la extracci&oacute;n de la clave del almac&eacute;n. */
-	void show();
+	String show();
 
 	/**
 	 * Recupera el alias del certificado seleccionado;
 	 * @return Alias de certificado.
 	 */
 	String getSelectedAlias();
-
-	/**
-	 * Recupera el par Clave-Certificado del certificado seleccionado. Antes debe haberse invocado al m&eacute;todo
-	 * {@link KeyStoreDialogManager#show()}.
-	 * @return Par clave-certificado.
-	 */
-	PrivateKeyEntry getSelectedPrivateKeyEntry();
-
-	/**
-	 * Recupera la cadena de certificaci&oacute;n del certificado seleccionado. Antes debe haberse invocado al
-	 * m&eacute;todo {@link KeyStoreDialogManager#show()}.
-	 * @return Par certificado.
-	 */
-	Certificate[] getSelectedCertificateChain();
 }

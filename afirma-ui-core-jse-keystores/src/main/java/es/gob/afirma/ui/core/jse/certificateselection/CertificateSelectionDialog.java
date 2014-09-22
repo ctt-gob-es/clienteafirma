@@ -50,12 +50,13 @@ public final class CertificateSelectionDialog extends MouseAdapter {
 	 * @param ksdm Gestor del almacen de claves. */
 	public CertificateSelectionDialog(final Component parent, final KeyStoreDialogManager ksdm) {
 
+		this.parent = parent;
 	    this.ksdm = ksdm;
 
 	    final NameCertificateBean[] certs = this.ksdm.getNameCertificates();
+
 	    Arrays.sort(certs, CERT_NAME_COMPARATOR);
 	    this.csd = new CertificateSelectionPanel(certs);
-		this.parent = parent;
 		this.optionPane = certs.length > 1 ?
 				new CertOptionPane(this.csd) : new JOptionPane();
 
@@ -68,10 +69,10 @@ public final class CertificateSelectionDialog extends MouseAdapter {
 	}
 
 	/** Muestra el di&aacute;logo de selecci&oacute;n de certificados.
-	 * @return Nombre del certificado seleccionado o {@code null} si el usuario
-	 * lo cancela o cierra sin seleccionar.
+	 * @return Alias del certificado seleccionado o {@code null} si el usuario
+	 * cancela el di&aacute;logo o cierra sin seleccionar.
 	 * @throws AOException Cuando ocurre cualquier error durante el proceso. */
-	public Object showDialog() throws AOException {
+	public String showDialog() throws AOException {
 
 		final JDialog certDialog = this.optionPane.createDialog(
 			this.parent,
@@ -103,7 +104,7 @@ public final class CertificateSelectionDialog extends MouseAdapter {
 		KeyboardFocusManager.getCurrentKeyboardFocusManager().removeKeyEventDispatcher(dispatcher);
 		certDialog.dispose();
 
-		return this.ksdm.getKeyEntry(selectedAlias);
+		return selectedAlias;
 	}
 
 	/** {@inheritDoc} */

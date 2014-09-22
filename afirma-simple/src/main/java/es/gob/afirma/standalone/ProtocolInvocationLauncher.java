@@ -150,7 +150,7 @@ public final class ProtocolInvocationLauncher {
 		try {
 			final AOKeyStoreDialog dialog = new AOKeyStoreDialog(ksm, null, true, false, true);
 			dialog.show();
-			pke = dialog.getSelectedPrivateKeyEntry();
+			pke = ksm.getKeyEntry(dialog.getSelectedAlias(), ksm.getType().getCertificatePasswordCallback(null));
 		}
 		catch (final AOCancelledOperationException e) {
 			return;
