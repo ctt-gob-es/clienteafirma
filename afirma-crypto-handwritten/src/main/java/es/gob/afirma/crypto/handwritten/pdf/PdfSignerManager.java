@@ -1,13 +1,12 @@
 package es.gob.afirma.crypto.handwritten.pdf;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.security.NoSuchAlgorithmException;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Logger;
 
@@ -16,7 +15,7 @@ import com.lowagie.text.pdf.PdfReader;
 import com.lowagie.text.pdf.PdfStamper;
 
 import es.gob.afirma.core.AOException;
-import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.crypto.handwritten.Rectangle;
 import es.gob.afirma.crypto.handwritten.SignaturePadInfoBean;
 import es.gob.afirma.crypto.handwritten.SignerInfoBean;
@@ -49,9 +48,7 @@ public class PdfSignerManager {
 			                        final SignaturePadInfoBean pad,
 			                        final Properties extraParams) throws IOException, AOException, NoSuchAlgorithmException {
 
-		// Creamos un temporal en donde se gestionaran los cambios del PDF
-		final File outputPdfFile = File.createTempFile("temp", ".pdf"); //$NON-NLS-1$ //$NON-NLS-2$
-		final FileOutputStream fos = new FileOutputStream(outputPdfFile);
+		final ByteArrayOutputStream fos = new ByteArrayOutputStream();
 
 		// Creamos los objetos necesarios para la lectura y gestion del PDF
 		final PdfReader pdfReader = new PdfReader(pdfDoc);
@@ -61,12 +58,15 @@ public class PdfSignerManager {
 			pdfStamper = new PdfStamper(pdfReader, fos, globalCalendar);
 		}
 		catch (final DocumentException e) {
-			fos.close();
 			throw new IOException("Error creando el PDFStamper: " + e, e); //$NON-NLS-1$
 		}
 
-		System.out.println(pad.toString());
-		System.out.println(signer.toString());
+		// Insertamos el diccionario MoreInfo
+		final Map<String, String> moreInfo = new HashMap<String, String>(3);
+		moreInfo.put("Firmante", signer.toString()); //$NON-NLS-1$
+		moreInfo.put("Tableta de captura", pad.toString()); //$NON-NLS-1$
+		moreInfo.put("Datos biométricos", Base64.encode(bioMetadata)); //$NON-NLS-1$
+		PdfPreProcessor.addMoreInfo(moreInfo, pdfStamper);
 
 		// Insertamos los datos biometricos
 		insertBioData(pdfStamper, bioMetadata);
@@ -79,22 +79,12 @@ public class PdfSignerManager {
 			pdfStamper.close(globalCalendar);
 		}
 		catch (final DocumentException e) {
-			fos.close();
 			throw new IOException("Error cerrando el PDFStamper: " + e, e); //$NON-NLS-1$
 		}
-		fos.close();
 		pdfReader.close();
 
-		// Leemos el resultado de fichero y los borramos
-		final FileInputStream fis = new FileInputStream(outputPdfFile);
-		final byte[] pdf = AOUtil.getDataFromInputStream(fis);
-		fis.close();
-
-		// Eliminamos los temporales
-		deleteFile(outputPdfFile);
-
 		// Insertamos el sello de tiempo
-		return addTimeStamp(pdf, extraParams);
+		return addTimeStamp(fos.toByteArray(), extraParams);
 	}
 
 	private static void insertBioData(final PdfStamper pdfStamper, final byte[] bioData) throws IOException {
@@ -137,10 +127,10 @@ public class PdfSignerManager {
 
     	try {
     		return new Rectangle(Integer.parseInt(extraParams.getProperty("PositionOnPageLowerLeftX")), //$NON-NLS-1$
-    				Integer.parseInt(extraParams.getProperty("PositionOnPageLowerLeftY")), //$NON-NLS-1$
-    				Integer.parseInt(extraParams.getProperty("PositionOnPageUpperRightX")), //$NON-NLS-1$
-    				Integer.parseInt(extraParams.getProperty("PositionOnPageUpperRightY")) //$NON-NLS-1$
-    				);
+				Integer.parseInt(extraParams.getProperty("PositionOnPageLowerLeftY")), //$NON-NLS-1$
+				Integer.parseInt(extraParams.getProperty("PositionOnPageUpperRightX")), //$NON-NLS-1$
+				Integer.parseInt(extraParams.getProperty("PositionOnPageUpperRightY")) //$NON-NLS-1$
+			);
     	}
     	catch (final Exception e) {
     		LOGGER.severe("Se han proporcionado valores no validos como posicion de firma: " + e); //$NON-NLS-1$
@@ -149,12 +139,10 @@ public class PdfSignerManager {
 
 	}
 
-	/**
-	 * Obtiene el n&uacute;mero de p&aacute;gina en el que se tiene que insertar la
+	/** Obtiene el n&uacute;mero de p&aacute;gina en el que se tiene que insertar la
 	 * r&uacute;brica de un documento.
 	 * @param extraParams Par&aacute;metros de configuraci&oacute;n de la firma.
-	 * @return N&uacute;mero de p&aacute;gina.
-	 */
+	 * @return N&uacute;mero de p&aacute;gina. */
 	private static int getPageImage(final Properties extraParams) {
 		final String imagePage = extraParams.getProperty("imagePage"); //$NON-NLS-1$
 		if (imagePage == null) {
@@ -171,8 +159,7 @@ public class PdfSignerManager {
 		return numPage;
 	}
 
-	/**
-	 * Agrega un sello de tiempo a un PDF.
+	/** Agrega un sello de tiempo a un PDF.
 	 * @param inPdf Documento PDF.
 	 * @param extraParams Par&aacute;metros de configuraci&oacute;n para la operaci&oacute;n de firma.
 	 * @return Documento PDF con el sello de tiempo o la misma entrada si no se configuro la operaci&oacute;n
@@ -187,15 +174,4 @@ public class PdfSignerManager {
 		return PdfTimestamper.timestampPdf(inPdf, extraParams, new GregorianCalendar());
 	}
 
-	/**
-	 * Borra un fichero.
-	 * @param file Fichero a borrar.
-	 */
-	private static void deleteFile(final File file) {
-		try {
-			Files.delete(file.toPath());
-		} catch (final IOException e) {
-			LOGGER.warning("No se ha podido borrar el fichero: " + e); //$NON-NLS-1$
-		}
-	}
 }
