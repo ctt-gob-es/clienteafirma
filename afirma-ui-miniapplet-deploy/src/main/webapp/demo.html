@@ -97,11 +97,10 @@
 			document.getElementById("pantalla").style.display = "block";
 			
 			if (MiniApplet.isIOS() || MiniApplet.isWindowsRT() || MiniApplet.isWindows8ModernUI()) {
-				document.getElementById("punto3Label").style.display = "none";
-				document.getElementById("punto3LabelAltIOS").style.display = "block";
-				document.getElementById("seleccionTarget").style.display = "none";
-				document.getElementById("formulario").style.display = "block";
+				document.getElementById("targetFile").style.display = "none";
+				document.getElementById("targetGeneratedData").checked = "checked";
 				firmarFichero = false;
+				firmarDatosGenerados = true;
 			}
 			
 			if (MiniApplet.isIOS()) {
@@ -190,17 +189,15 @@
 				<option value="XAdEStri">XAdEStri</option>
 				<option value="AUTO">AUTO</option>
 			</select>
-	<div><br/>
-	<div id="punto3Label" class="lblAnchoMaxMB">
+	</div><br/>
+	<div class="lblAnchoMaxMB">
 			<span>3. Seleccione el elemento que desee firmar</span>
 	</div><br/>
-	<div id="punto3LabelAltIOS" class="lblAnchoMaxMB" style="display: none">
-			<span>3. Rellene el formulario y pulse Firmar</span>
-	</div><br/>
+	<br/>
 	<div style="margin-left:20px;">
 		<div id="seleccionTarget" >
-			<input name="formTarget" value="fileData" onclick="javascript:mostrarFormulario(this.value);" type="radio" checked="checked" />Fichero<br>
-			<input name="formTarget" value="generatedData" onclick="javascript:mostrarFormulario(this.value);" type="radio" />Datos generados<br>
+			<input name="formTarget" value="fileData" id="targetFile" onclick="javascript:mostrarFormulario(this.value);" type="radio" checked="checked" />Fichero<br>
+			<input name="formTarget" value="generatedData" id="targetGeneratedData" onclick="javascript:mostrarFormulario(this.value);" type="radio" />Datos generados<br>
 			<input name="formTarget" value="formData" onclick="javascript:mostrarFormulario(this.value);" type="radio" />Formulario<br>
 		</div><br/>
 		<div id="formulario" style="display:none">
