@@ -26,10 +26,6 @@ import com.WacomGSS.STU.Protocol.PenData;
 
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
-import es.gob.afirma.crypto.handwritten.JseUtil;
-import es.gob.afirma.crypto.handwritten.Rectangle;
-import es.gob.afirma.crypto.handwritten.SignaturePadListener;
-import es.gob.afirma.crypto.handwritten.SignatureResult;
 import es.gob.afirma.crypto.handwritten.wacom.WacomSignaturePad;
 
 /** Ejemplo de invocaci&oacute;n. */
@@ -41,7 +37,10 @@ public class DemoButtons extends JFrame {
 
 	void startButtonPress() throws Throwable {
 		try {
-				final WacomSignaturePad signatureDialog = new WacomSignaturePad(this);
+				final WacomSignaturePad signatureDialog = new WacomSignaturePad(
+					this,
+					new SignerInfoBean("Tomas", "Garcia-Meras", "Capote", "12345678Z") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+				);
 				signatureDialog.init(
 					JseUtil.html2Image(
 						"<html><body><p>Texto a mostrar en la pantalla</p><img src=\"data:image/png;base64," + Base64.encode(AOUtil.getDataFromInputStream(JseUtil.class.getResourceAsStream("/logo_aeat.gif"))) + "\"></body></html>", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
