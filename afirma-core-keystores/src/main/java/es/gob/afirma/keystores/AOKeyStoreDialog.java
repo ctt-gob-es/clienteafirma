@@ -206,8 +206,8 @@ public class AOKeyStoreDialog implements KeyStoreDialogManager {
 	@Override
 	public String show() {
 
-		// Si se ha indicado que, en caso de haber solo un certificado disponible, se autoseleccione;
-		// no mostramos el dialogo de seleccion
+		// No mostramos el dialogo de seleccion si se ha indicado que se autoseleccione
+		// un certificado en caso de ser el unico
 		if (this.mandatoryCertificate) {
 			final NameCertificateBean[] namedCertificates = this.getNameCertificates();
 			if (namedCertificates != null && namedCertificates.length == 1) {
