@@ -23,7 +23,7 @@ public class NameCertificateBean {
 	public NameCertificateBean(final String alias, final String name, final X509Certificate[] certChain) {
 		this.alias = alias;
 		this.name = name;
-		this.certificateChain = certChain;
+		this.certificateChain = certChain == null ? null : certChain.clone();
 	}
 
 	/**
