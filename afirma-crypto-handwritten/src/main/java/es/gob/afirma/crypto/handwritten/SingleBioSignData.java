@@ -1,28 +1,41 @@
 package es.gob.afirma.crypto.handwritten;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.UUID;
+
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /** Informaci&oacute;n necesaria para realizar una &uacute;nica firma biom&eacute;trica.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
+@XmlRootElement(name = "singleBioSignData")
 final class SingleBioSignData {
 
+	@XmlElement(name = "id")
+	private String id;
+
 	/** Datos del firmante. */
-	private final SignerInfoBean signerData;
+	private SignerInfoBean signerData;
 
 	/** Plantilla HTML a mostrar en la tableta al firmar el firmante. */
-	final String htmlTemplate;
+	private String htmlTemplate;
 
 	/** Imagen JPEG a mostrar en la tableta al firmar el firmante. */
-	final byte[] jpegTemplate;
+	private byte[] jpegTemplate;
 
 	/** Rectangulo de firma en la tableta de captura. */
-	final Rectangle signatureArea;
+	private Rectangle signatureArea;
 
-	private SingleBioSignData(final SignerInfoBean signer,
+	private Rectangle signatureRubricPositionOnPdf;
+
+	public SingleBioSignData() {
+		// Vacio para JAXB
+	}
+
+	SingleBioSignData(final SignerInfoBean signer,
 			                  final String template,
 			                  final byte[] bgJpegImage,
-			                  final Rectangle signatureRectOnPad) {
+			                  final Rectangle signatureRectOnPad,
+			                  final Rectangle signaturePositionOnPdf) {
 		if (signer == null) {
 			throw new IllegalArgumentException(
 				"Los datos del firmante no pueden ser nulos" //$NON-NLS-1$
@@ -30,32 +43,16 @@ final class SingleBioSignData {
 		}
 		this.signerData = signer;
 		this.htmlTemplate = template;
-		this.jpegTemplate = bgJpegImage.clone();
+		this.jpegTemplate = bgJpegImage != null ? bgJpegImage.clone() : null;
 		this.signatureArea = signatureRectOnPad;
-	}
-
-	static List<SingleBioSignData> getSignaturesData() {
-		final List<SingleBioSignData> ret = new ArrayList<SingleBioSignData>(1);
-		ret.add(
-			new SingleBioSignData(
-				new SignerInfoBean(
-					"Tomas", //$NON-NLS-1$
-					"Garcia-Meras", //$NON-NLS-1$
-					"Capote", //$NON-NLS-1$
-					"123454678Z" //$NON-NLS-1$
-				),
-				"<html><head></head><body><h1>HOLA</h1></body></html>", //$NON-NLS-1$
-				null,
-				new Rectangle(10, 10, 400, 200)
-			)
-		);
-
-		return ret;
-
+		this.signatureRubricPositionOnPdf = signaturePositionOnPdf;
+		this.id = UUID.randomUUID().toString();
 	}
 
 	SignerInfoBean getSignerData() {
 		return this.signerData;
 	}
+
+	//TODO:Completar getters y setters
 
 }
