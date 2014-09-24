@@ -298,8 +298,8 @@ var MiniApplet = {
 					locale: MiniApplet.selectedLocale
 			};
 
-			this.loadMiniApplet(attributes, parameters);
-
+			MiniApplet.loadMiniApplet(attributes, parameters);
+			
 			MiniApplet.clienteFirma = document.getElementById("miniApplet");
 			
 			// Si no esta definido el cliente es porque se ha intentado cargar el applet
@@ -308,7 +308,7 @@ var MiniApplet = {
 				MiniApplet.cargarAppAfirma(MiniApplet.codeBase);
 			}
 		},
-		
+				
 		sign : function (dataB64, algorithm, format, params, successCallback, errorCallback) {
 			
 			this.forceLoad();
@@ -504,9 +504,10 @@ var MiniApplet = {
 							embed.setAttributeNode(att);
 						}
 						catch (e) {
-							// Probamos este como alternativa en caso de error.Solo detectado en IE10
-							// sin modo de compabilidad con el Document Mode de IE7. Este intento no
-							// soluciona el error, pero evita que se propague 
+							// Probamos este como alternativa en caso de error. Caso detectado en:
+							// - IE10 sin modo de compabilidad con el Document Mode de IE7.
+							// - Firefox en Mac OS X
+							// Este intento no soluciona el error, pero evita que se propague 
 							embed.setAttribute(attribute, attributes[attribute]);
 						}
 					}
@@ -535,9 +536,7 @@ var MiniApplet = {
 				return;
 			}
 			if (MiniApplet.clientType == null) {
-				if (MiniApplet.clienteFirma == null) {
-					MiniApplet.clienteFirma = document.getElementById("miniApplet");
-				}
+				MiniApplet.clienteFirma = document.getElementById("miniApplet");
 				try {
 					MiniApplet.clienteFirma.echo();
 					MiniApplet.clientType = MiniApplet.TYPE_APPLET;
