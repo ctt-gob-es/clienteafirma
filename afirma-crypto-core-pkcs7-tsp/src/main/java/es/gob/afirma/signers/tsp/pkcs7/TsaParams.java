@@ -27,6 +27,19 @@ public final class TsaParams {
 	private final byte[] sslPkcs12File;
 	private final String sslPkcs12FilePassword;
 
+	/** Construye los par&aacute;metros de configuraci&oacute;n de una Autoridad de Sellado de Tiempo.
+	 * @param requireCert Indicar <code>true</code>Si es necesario incluir el certificado de la TSA,
+	 *                    <code>false</code> en caso contrario.
+	 * @param policy OID de la pol6iacute;tica de sellado de tiempo.
+	 * @param url URL de la TSA.
+	 * @param usr Nombre de usuario para la TSA.
+	 * @param pwd Contrase&ntilde;a para el usuario de la TSA.
+	 * @param exts Extensiones de la petici&oacute;n a la TSA.
+	 * @param hashAlgorithm Algoritmo de huella digital a usar.
+	 * @param sslPkcs12 Fichero PKCS#12 que contiene el certificado SSL cliente que pedir&aacute; la TSA al
+	 *                  establecer la coneci&oacute;s HTTPS.
+	 * @param sslPkcs12Password Contrase&ntilde;a del fichero PKCS#12 que contiene el certificado SSL
+	 *                          cliente para las conexiones HTTPS. */
 	public TsaParams(final boolean requireCert,
 			         final String policy,
 			         final URI url,
