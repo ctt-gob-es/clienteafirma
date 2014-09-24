@@ -27,6 +27,32 @@ public final class TsaParams {
 	private final byte[] sslPkcs12File;
 	private final String sslPkcs12FilePassword;
 
+	public TsaParams(final boolean requireCert,
+			         final String policy,
+			         final URI url,
+			         final String usr,
+			         final String pwd,
+			         final TsaRequestExtension[] exts,
+			         final String hashAlgorithm,
+			         final byte[] sslPkcs12,
+			         final String sslPkcs12Password) {
+        if (url == null) {
+        	throw new IllegalArgumentException(
+				"La URL del servidor de sello de tiempo no puede ser nula" //$NON-NLS-1$
+			);
+        }
+        this.tsaURL = url;
+        this.tsaPolicy = policy != null ? policy : POLICY;
+        this.tsaUsr = usr;
+        this.tsaPwd = pwd;
+        this.extensions = exts != null ? exts.clone() : null;
+        this.tsaHashAlgorithm = hashAlgorithm != null ? hashAlgorithm : "SHA-512"; //$NON-NLS-1$
+        this.sslPkcs12File = sslPkcs12 != null ? sslPkcs12.clone() : null;
+        this.sslPkcs12FilePassword = sslPkcs12Password;
+        this.tsaRequireCert = requireCert;
+
+	}
+
 	/** Construye los par&aacute;metros de configuraci&oacute;n de una Autoridad de Sellado de Tiempo.
 	 * En caso de ausencia o error en las propiedades de entrada lanza una <code>IllegalArgumentException</code>.
 	 * @param extraParams Propiedades que contienen los par&aacute;metros de configuraci&oacute;n necesarios. */
