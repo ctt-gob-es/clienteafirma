@@ -9,6 +9,10 @@ import org.junit.Test;
 /** Prueba de BioSigner. */
 public final class TestBioSigner {
 
+	 /* @param retrieveUrl URL para la recuperac&oacute;n (GET HTTP) del PDF a firmar.
+	 * @param storeUrl URL para el almac&eacute;n del documento una vez firmado (HTTP POST,
+	 *                 en un par&aacute;metro que se debe llamar <i>data</i>).*/
+
 	/** Prueba de BioSigner.
 	 * @throws Exception EN cualquier error. */
 	@SuppressWarnings("static-method")

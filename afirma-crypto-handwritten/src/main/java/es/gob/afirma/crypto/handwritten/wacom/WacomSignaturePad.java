@@ -47,7 +47,6 @@ import es.gob.afirma.crypto.handwritten.SignaturePadException;
 import es.gob.afirma.crypto.handwritten.SignaturePadInfoBean;
 import es.gob.afirma.crypto.handwritten.SignaturePadListener;
 import es.gob.afirma.crypto.handwritten.SignatureResult;
-import es.gob.afirma.crypto.handwritten.SignerInfoBean;
 import es.gob.afirma.crypto.handwritten.wacom.UiUtils.ButtonsOnScreen;
 
 /** Tableta de firma Wacom USB.
@@ -70,7 +69,6 @@ public final class WacomSignaturePad extends SignaturePad implements ITabletHand
 	private static final boolean USE_ZLIB_COMPRESSION = true;
 
 	private final Capability capability;
-	private final SignerInfoBean signerInfo;
 	private final JPanel panel;
 
 	private static final String BACKGROUND_IMAGE_PATH = "/wacom/Wacom_STU430.png"; //$NON-NLS-1$
@@ -185,7 +183,6 @@ public final class WacomSignaturePad extends SignaturePad implements ITabletHand
 						PadUtils.penDataArrayToIso19794(getPenData()),
 						null,
 						JseUtil.bufferedImage2Jpeg(getCurrentCroppedImage()),
-						this.signerInfo,
 						new SignaturePadInfoBean(
 							"Wacom", //$NON-NLS-1$
 							in != null ? in.getModelName() : "Desconocido", //$NON-NLS-1$
@@ -264,13 +261,10 @@ public final class WacomSignaturePad extends SignaturePad implements ITabletHand
 
 	/** Crea una tableta de firma Wacom USB.
 	 * @param frame Componente padre para la modalidad.
-	 * @param signer Informaci&oacute;n del firmante que va a usar la tableta.
 	 * @throws SignaturePadException Si hay problemas durante la creaci&oacute;n de la tableta. */
-	public WacomSignaturePad(final Frame frame, final SignerInfoBean signer) throws SignaturePadException {
+	public WacomSignaturePad(final Frame frame) throws SignaturePadException {
 
 		super(frame, true);
-
-		this.signerInfo = signer;
 
 		setTitle(Messages.getString("SignatureDialog.3")); //$NON-NLS-1$
 		try {

@@ -33,8 +33,8 @@ public final class PdfXmpHelper {
 	 * @return Estructura XMP.
 	 * @throws IOException Cuando ocurre un error al construir la estructura. */
 	public static byte[] buildXmp(final byte[] bioSignData,
-			               final String pkDn,
-			               final SignerInfoBean signerInfo) throws IOException {
+			                      final String pkDn,
+			                      final SignerInfoBean signerInfo) throws IOException {
 
 		// Datos a insertar como XMP
 		final BioMetadataSchema schema = new BioMetadataSchema();
