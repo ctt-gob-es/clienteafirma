@@ -212,12 +212,11 @@ public class AOKeyStoreDialog implements KeyStoreDialogManager {
 			final NameCertificateBean[] namedCertificates = this.getNameCertificates();
 			if (namedCertificates != null && namedCertificates.length == 1) {
 				this.selectedAlias = namedCertificates[0].getAlias();
-				return namedCertificates[0].getAlias();
+				return this.selectedAlias;
 			}
 		}
 
 		this.selectedAlias = AOUIFactory.showCertificateSelectionDialog(this.parentComponent, this);
-
 		if (this.selectedAlias == null) {
 			throw new AOCancelledOperationException("No se ha seleccionado certificado"); //$NON-NLS-1$
 		}
