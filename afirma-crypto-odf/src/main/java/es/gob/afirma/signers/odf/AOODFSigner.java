@@ -106,6 +106,8 @@ public final class AOODFSigner implements AOSigner {
     /** Algoritmo de huella digital por defecto para las referencias XML. */
     private static final String DIGEST_METHOD = DigestMethod.SHA1;
 
+    private static final String DIGEST_METHOD_ALGORITHM_NAME = "SHA1"; //$NON-NLS-1$
+
     static {
         SUPPORTED_FORMATS = new HashSet<String>();
         SUPPORTED_FORMATS.add("application/vnd.oasis.opendocument.text"); //$NON-NLS-1$
@@ -183,7 +185,16 @@ public final class AOODFSigner implements AOSigner {
             //
 
             // MessageDigest
-            final MessageDigest md = MessageDigest.getInstance("SHA1"); //$NON-NLS-1$
+            final MessageDigest md;
+            try {
+	            md = MessageDigest.getInstance(DIGEST_METHOD_ALGORITHM_NAME);
+            }
+            catch (final Exception e) {
+            	zf.close();
+            	throw new AOException(
+        			"No se ha podido obtener un generador de huellas digitales con el algoritmo " + DIGEST_METHOD_ALGORITHM_NAME + ": " + e, e //$NON-NLS-1$ //$NON-NLS-2$
+    			);
+            }
 
             // XMLSignatureFactory
             final XMLSignatureFactory fac = XMLSignatureFactory.getInstance("DOM"); //$NON-NLS-1$
