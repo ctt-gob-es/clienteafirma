@@ -211,6 +211,7 @@ public class AOKeyStoreDialog implements KeyStoreDialogManager {
 		if (this.mandatoryCertificate) {
 			final NameCertificateBean[] namedCertificates = this.getNameCertificates();
 			if (namedCertificates != null && namedCertificates.length == 1) {
+				this.selectedAlias = namedCertificates[0].getAlias();
 				return namedCertificates[0].getAlias();
 			}
 		}
