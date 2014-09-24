@@ -183,7 +183,17 @@ public final class AOODFSigner implements AOSigner {
             //
 
             // MessageDigest
-            final MessageDigest md = MessageDigest.getInstance("SHA1"); //$NON-NLS-1$
+            final MessageDigest md;
+            
+            try {
+                md = MessageDigest.getInstance("SHA1"); //$NON-NLS-1$
+            }
+            catch (final NoSuchProviderException e) {
+                throw new AOException(
+                      "No se ha podido obtener un generador de huellas digitales con el algoritmo: SHA1", e //$NON-NLS-1$
+                );
+            }
+            
 
             // XMLSignatureFactory
             final XMLSignatureFactory fac = XMLSignatureFactory.getInstance("DOM"); //$NON-NLS-1$
