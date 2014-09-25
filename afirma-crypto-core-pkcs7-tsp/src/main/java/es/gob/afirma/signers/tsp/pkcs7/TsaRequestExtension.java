@@ -19,14 +19,6 @@ public final class TsaRequestExtension {
 		return "Extension [OID: " + this.oid + ", citical: " + this.critical + ", value: " + new String(this.value) + "]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 	}
 
-	/** Constructor de uso restringido a la serializaci&oacute;n JAXB. */
-	@SuppressWarnings("unused")
-	private TsaRequestExtension() {
-		this.oid = null;
-		this.critical = false;
-		this.value = null;
-	}
-
 	/** Crea una extensi&oacute;n para una solicitud de TSA seg&uacute;n RFC 2161.
 	 * @param oid OID de la extensi&oacute;n
 	 * @param isCritical <code>true</code> si la extensi&oacute;n es cr&iacute;tica, <code>false</code> en caso contrario
