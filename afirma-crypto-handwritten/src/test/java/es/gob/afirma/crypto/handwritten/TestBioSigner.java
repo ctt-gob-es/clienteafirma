@@ -1,34 +1,31 @@
 package es.gob.afirma.crypto.handwritten;
 
-import java.security.cert.CertificateFactory;
-import java.security.cert.X509Certificate;
 import java.util.Properties;
 
 import org.junit.Test;
 
 /** Prueba de BioSigner. */
-public final class TestBioSigner {
+public final class TestBioSigner implements SignaturePadListener {
 
 	 /* @param retrieveUrl URL para la recuperac&oacute;n (GET HTTP) del PDF a firmar.
 	 * @param storeUrl URL para el almac&eacute;n del documento una vez firmado (HTTP POST,
 	 *                 en un par&aacute;metro que se debe llamar <i>data</i>).*/
 
 	/** Prueba de BioSigner.
-	 * @throws Exception EN cualquier error. */
-	@SuppressWarnings("static-method")
+	 * @throws Exception En cualquier error. */
 	@Test
 	public void testBioSigner() throws Exception {
 
-		final X509Certificate cert = (X509Certificate) CertificateFactory.getInstance("X.509").generateCertificate( //$NON-NLS-1$
-			TestBioSigner.class.getResourceAsStream("/democert.cer") //$NON-NLS-1$
-		);
-
-		final SignerInfoBean signerData = new SignerInfoBean(
-			"Tomas", //$NON-NLS-1$
-			"Garcia-Meras", //$NON-NLS-1$
-			"Capote", //$NON-NLS-1$
-			"12345678Z" //$NON-NLS-1$
-		);
+//		final X509Certificate cert = (X509Certificate) CertificateFactory.getInstance("X.509").generateCertificate( //$NON-NLS-1$
+//			TestBioSigner.class.getResourceAsStream("/democert.cer") //$NON-NLS-1$
+//		);
+//
+//		final SignerInfoBean signerData = new SignerInfoBean(
+//			"Tomas", //$NON-NLS-1$
+//			"Garcia-Meras", //$NON-NLS-1$
+//			"Capote", //$NON-NLS-1$
+//			"12345678Z" //$NON-NLS-1$
+//		);
 
 		final Properties p = new Properties();
 		p.put("tsaURL", "http://psis.catcert.net/psis/catcert/tsp"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -44,14 +41,31 @@ public final class TestBioSigner {
 
 		new BioSigner().sign(
 			null, // Padre
-			null, // retrieveUrl
-			null, // storeUrl
+			this, // SignaturePadListener
 			"HOLA", // Plantilla HTML //$NON-NLS-1$
 			new Rectangle(10, 10, 400, 200),
-			cert,
-			signerData,
 			p
 		);
+	}
+
+	@Override
+	public void signatureFinished(final SignatureResult sr) {
+		System.out.println("Firma terminada"); //$NON-NLS-1$
+	}
+
+	@Override
+	public void signatureCancelled() {
+		System.out.println("Firma cancelada"); //$NON-NLS-1$
+
+	}
+
+	@Override
+	public void signatureAborted(final Throwable e) {
+		System.out.println("Firma abortada"); //$NON-NLS-1$
+		if (e != null) {
+			e.printStackTrace();
+		}
+
 	}
 
 }

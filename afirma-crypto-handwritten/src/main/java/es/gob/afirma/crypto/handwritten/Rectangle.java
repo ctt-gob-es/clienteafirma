@@ -29,4 +29,9 @@ public final class Rectangle {
 		this.width = w;
 	}
 
+	@Override
+	public String toString() {
+		return "X=" + Integer.toString(this.x) + ", Y=" + Integer.toString(this.y) + ", ancho=" + Integer.toString(this.width) + ", alto=" + this.height; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+	}
+
 }

@@ -11,24 +11,43 @@ import javax.xml.bind.annotation.XmlRootElement;
 final class SingleBioSignData {
 
 	@XmlElement(name = "id")
-	private String id;
+	private final String id;
 
 	/** Datos del firmante. */
-	private SignerInfoBean signerData;
+	@XmlElement(name = "signerData")
+	private final SignerInfoBean signerData;
 
 	/** Plantilla HTML a mostrar en la tableta al firmar el firmante. */
-	private String htmlTemplate;
+	@XmlElement(name = "htmlTemplate")
+	private final String htmlTemplate;
 
 	/** Imagen JPEG a mostrar en la tableta al firmar el firmante. */
-	private byte[] jpegTemplate;
+	@XmlElement(name = "jpegTemplate")
+	private final byte[] jpegTemplate;
 
 	/** Rectangulo de firma en la tableta de captura. */
-	private Rectangle signatureArea;
+	@XmlElement(name = "signatureArea")
+	private final Rectangle signatureArea;
 
-	private Rectangle signatureRubricPositionOnPdf;
+	@XmlElement(name = "signatureRubricPositionOnPdf")
+	private final Rectangle signatureRubricPositionOnPdf;
 
-	public SingleBioSignData() {
-		// Vacio para JAXB
+	@Override
+	public String toString() {
+		return "Firma biometrica [id=" + this.id + "; signerData=" + this.signerData + "; htmlTemplate=" + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			(this.htmlTemplate == null ? "No" : "Si") + "; jpegTemplate=" + (this.htmlTemplate == null && this.jpegTemplate != null ? "Si" : "No") + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+			"; signatureArea=[" + this.signatureArea + "]; signatureRubricPositionOnPdf=[" + this.signatureRubricPositionOnPdf + "]]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+	}
+
+	/** Constructor de uso restringido a la serializaci&oacute;n JAXB. */
+	@SuppressWarnings("unused")
+	private SingleBioSignData() {
+		this.signerData = null;
+		this.htmlTemplate = null;
+		this.jpegTemplate = null;
+		this.signatureArea = null;
+		this.signatureRubricPositionOnPdf = null;
+		this.id = UUID.randomUUID().toString();
 	}
 
 	SingleBioSignData(final SignerInfoBean signer,
@@ -53,6 +72,21 @@ final class SingleBioSignData {
 		return this.signerData;
 	}
 
-	//TODO:Completar getters y setters
+	String getHtmlTemplate() {
+		return this.htmlTemplate;
+	}
+
+	byte[] getJpegTemplate() {
+		return this.jpegTemplate;
+	}
+
+	Rectangle getSignatureArea() {
+		return this.signatureArea;
+	}
+
+	Rectangle getSignatureRubricPositionOnPdf() {
+		return this.signatureRubricPositionOnPdf;
+	}
+
 
 }
