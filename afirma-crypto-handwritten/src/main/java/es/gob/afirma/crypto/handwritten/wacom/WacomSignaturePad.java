@@ -70,6 +70,7 @@ public final class WacomSignaturePad extends SignaturePad implements ITabletHand
 
 	private final Capability capability;
 	private final JPanel panel;
+	private final String signatureId;
 
 	private static final String BACKGROUND_IMAGE_PATH = "/wacom/Wacom_STU430.png"; //$NON-NLS-1$
 
@@ -180,6 +181,7 @@ public final class WacomSignaturePad extends SignaturePad implements ITabletHand
 			try {
 				sl.signatureFinished(
 					new SignatureResult(
+						this.signatureId,
 						PadUtils.penDataArrayToIso19794(getPenData()),
 						null,
 						JseUtil.bufferedImage2Jpeg(getCurrentCroppedImage()),
@@ -225,7 +227,7 @@ public final class WacomSignaturePad extends SignaturePad implements ITabletHand
 		dispose();
 
 		for (final SignaturePadListener sl : this.signatureListeners) {
-			sl.signatureCancelled();
+			sl.signatureCancelled(this.signatureId);
 		}
 
 		// Eliminamos los listeners
@@ -261,10 +263,13 @@ public final class WacomSignaturePad extends SignaturePad implements ITabletHand
 
 	/** Crea una tableta de firma Wacom USB.
 	 * @param frame Componente padre para la modalidad.
+	 * @param signId Identificador de la firma que sera capturada con esta tableta.
 	 * @throws SignaturePadException Si hay problemas durante la creaci&oacute;n de la tableta. */
-	public WacomSignaturePad(final Frame frame) throws SignaturePadException {
+	public WacomSignaturePad(final Frame frame, final String signId) throws SignaturePadException {
 
 		super(frame, true);
+
+		this.signatureId = signId;
 
 		setTitle(Messages.getString("SignatureDialog.3")); //$NON-NLS-1$
 		try {
@@ -427,7 +432,7 @@ public final class WacomSignaturePad extends SignaturePad implements ITabletHand
 		this.penData.clear();
 		this.setVisible(false);
 		for (final SignaturePadListener sl : this.signatureListeners) {
-			sl.signatureAborted(e);
+			sl.signatureAborted(e, this.signatureId);
 		}
 	}
 

@@ -18,6 +18,7 @@ public final class BioSigner {
 
 	/** Obtiene una firma biom&eacute;trica.
 	 * @param parent Componente padre sobre el que mostrar los elementos visuales.
+	 * @param signatureId Identificador de la firma a obtener.
 	 * @param spl Componente al que notificar el resultado de la firma.
 	 * @param template  Plantilla en formato HTML a mostrar en la tableta de firma.
 	 * @param signatureArea Area en la que el usuario pueden firmar dentro de la pantalla
@@ -27,6 +28,7 @@ public final class BioSigner {
 	 *                     de la plantilla a mostrar en la tableta de firma.
 	 * @throws SignaturePadException Cuando no se ha podido inicializar la tableta de firma. */
 	public void sign(final Object parent,
+			         final String signatureId,
 					 final SignaturePadListener spl,
 					 final String template,
 					 final Rectangle signatureArea,
@@ -35,6 +37,7 @@ public final class BioSigner {
 		this.signatureAreaOnPad = signatureArea;
 		this.signatureWindow = new WacomSignatureWindow(
 			parent,
+			signatureId,
 			template,
 			this.signatureAreaOnPad
 		);
@@ -44,6 +47,7 @@ public final class BioSigner {
 
 	/** Obtiene una firma biom&eacute;trica.
 	 * @param parent Componente padre sobre el que mostrar los elementos visuales.
+	 * @param signatureId Identificador de la firma a obtener.
 	 * @param spl Componente al que notificar el resultado de la firma.
 	 * @param jpegImage Imagen a mostrar en la tableta de firma.
 	 * @param signatureArea Area en la que el usuario pueden firmar dentro de la pantalla
@@ -55,6 +59,7 @@ public final class BioSigner {
 	 * de la plantilla a mostrar en la tableta de firma.
 	 * @throws SignaturePadException Cuando no se ha podido inicializar la tableta de firma. */
 	public void sign(final Object parent,
+					 final String signatureId,
 					 final SignaturePadListener spl,
 					 final byte[] jpegImage,
 					 final Rectangle signatureArea,
@@ -82,6 +87,7 @@ public final class BioSigner {
 		this.signatureAreaOnPad = signatureArea;
 		this.signatureWindow = new WacomSignatureWindow(
 			parent,
+			signatureId,
 			jpegImage,
 			this.signatureAreaOnPad
 		);

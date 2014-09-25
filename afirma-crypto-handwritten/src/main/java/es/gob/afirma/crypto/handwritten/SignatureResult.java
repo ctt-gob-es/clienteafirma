@@ -4,17 +4,20 @@ package es.gob.afirma.crypto.handwritten;
  * @author Tom&oacute;s Garc&iacute;a-Mer&aacute;s */
 public final class SignatureResult {
 
+	private final String signatureId;
 	private final byte[] signatureIsoData;
 	private final byte[] signatureRawData;
 	private final byte[] signatureJpegImage;
 	private final SignaturePadInfoBean pad;
 
 	/** Crea el resultado de una firma biom&eacute;trica.
+	 * @param id Identificador &uacute;nico de la firma.
 	 * @param data Datos biom&eacute;tricos de la firma en formato ISO 19794-7.
 	 * @param rawData Datos biom&eacute;tricos de la firma en formato nativo de la tableta.
 	 * @param jpegImage Imagen (en formato JPEG) de la r&uacute;brica de la firma.
 	 * @param padInfo informaci&oacute;n de la tableta de captura de firmas usada. */
-	public SignatureResult(final byte[] data,
+	public SignatureResult(final String id,
+			               final byte[] data,
 			               final byte[] rawData,
 			               final byte[] jpegImage,
 			               final SignaturePadInfoBean padInfo) {
@@ -27,6 +30,7 @@ public final class SignatureResult {
 		this.signatureJpegImage = jpegImage.clone();
 		this.signatureRawData = rawData != null ? rawData.clone() : null;
 		this.pad = padInfo;
+		this.signatureId = id;
 	}
 
 	/** Obtiene los metadatos de la tableta de captura usada para la firma.
@@ -51,6 +55,12 @@ public final class SignatureResult {
 	 * @return Datos biom&eacute;tricos de la firma en formato nativo de la tableta. */
 	public byte[] getSignatureRawData() {
 		return this.signatureRawData != null ? this.signatureRawData.clone() : null;
+	}
+
+	/** Obtiene el identificador &uacute;nico de la firma.
+	 * @return Identificador &uacute;nico de la firma. */
+	public String getSignatureId() {
+		return this.signatureId;
 	}
 
 }

@@ -207,17 +207,17 @@ public final class BioSignerRunner implements SignaturePadListener {
 	}
 
 	@Override
-	public void signatureCancelled() {
+	public void signatureCancelled(final String id) {
 
-		LOGGER.info("Firma cancelada"); //$NON-NLS-1$
+		LOGGER.info("Firma cancelada: " + id); //$NON-NLS-1$
 
 		//showErrorMessage(this.parentComponent, HandWrittenMessages.getString("BioSigner.5")); //$NON-NLS-1$
 	}
 
 	@Override
-	public void signatureAborted(final Throwable e) {
+	public void signatureAborted(final Throwable e, final String id) {
 
-		LOGGER.info("Ocurrio un error durante la firma y fue abortada: " + e); //$NON-NLS-1$
+		LOGGER.info("Ocurrio un error durante la firma (" + id + ") y fue abortada: " + e); //$NON-NLS-1$ //$NON-NLS-2$
 
 		e.printStackTrace();
 		//showErrorMessage(this.parentComponent, HandWrittenMessages.getString("BioSigner.6") + e); //$NON-NLS-1$
@@ -229,9 +229,9 @@ public final class BioSignerRunner implements SignaturePadListener {
 	 * @throws IOException Cuando no es posible acceder al recurso remoto o descargarlo. */
 	private static byte[] downloadDocument(final URL retrieverUrl) throws IOException {
 
-		System.out.println("Usamos documento en disco para depuracion");
+		System.out.println("Usamos documento en disco para depuracion"); //$NON-NLS-1$
 		return AOUtil.getDataFromInputStream(
-			BioSigner.class.getResourceAsStream("/AppCampus_Tomas_Garcia-Meras.pdf")
+			BioSigner.class.getResourceAsStream("/AppCampus_Tomas_Garcia-Meras.pdf") //$NON-NLS-1$
 		);
 
 //		final InputStream is = retrieverUrl.openStream();
@@ -247,8 +247,8 @@ public final class BioSignerRunner implements SignaturePadListener {
 	 * @throws IOException Cuando ocurre alg&uacute;n error durante el env&iacute;o. */
 	private static void sendPdf(final URL storeUrl, final byte[] signedPdf) throws IOException {
 
-		System.out.println("Almacenamos el PDF en disco para depuracion");
-		final File tmpFile = File.createTempFile("BIO_", ".pdf");
+		System.out.println("Almacenamos el PDF en disco para depuracion"); //$NON-NLS-1$
+		final File tmpFile = File.createTempFile("BIO_", ".pdf"); //$NON-NLS-1$ //$NON-NLS-2$
 		final OutputStream fos = new FileOutputStream(tmpFile);
 		fos.write(signedPdf);
 		fos.flush();

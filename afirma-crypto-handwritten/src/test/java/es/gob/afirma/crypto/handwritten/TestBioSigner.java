@@ -41,6 +41,7 @@ public final class TestBioSigner implements SignaturePadListener {
 
 		new BioSigner().sign(
 			null, // Padre
+			"ID001", // Id //$NON-NLS-1$
 			this, // SignaturePadListener
 			"HOLA", // Plantilla HTML //$NON-NLS-1$
 			new Rectangle(10, 10, 400, 200),
@@ -50,18 +51,18 @@ public final class TestBioSigner implements SignaturePadListener {
 
 	@Override
 	public void signatureFinished(final SignatureResult sr) {
-		System.out.println("Firma terminada"); //$NON-NLS-1$
+		System.out.println("Firma terminada: " + sr.getSignatureId()); //$NON-NLS-1$
 	}
 
 	@Override
-	public void signatureCancelled() {
-		System.out.println("Firma cancelada"); //$NON-NLS-1$
+	public void signatureCancelled(final String id) {
+		System.out.println("Firma cancelada: " + id); //$NON-NLS-1$
 
 	}
 
 	@Override
-	public void signatureAborted(final Throwable e) {
-		System.out.println("Firma abortada"); //$NON-NLS-1$
+	public void signatureAborted(final Throwable e, final String id) {
+		System.out.println("Firma abortada: " + id); //$NON-NLS-1$
 		if (e != null) {
 			e.printStackTrace();
 		}

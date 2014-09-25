@@ -10,11 +10,13 @@ public interface SignaturePadListener extends EventListener {
 	 * @param sr resultado de la firma. */
 	void signatureFinished(SignatureResult sr);
 
-	/** Cancelaci&oacute;n de una firma. */
-	void signatureCancelled();
+	/** Cancelaci&oacute;n de una firma.
+	 * @param signatureId Identificador de la firma cancelada. */
+	void signatureCancelled(String signatureId);
 
 	/**Finalizaci&oacute;n con errores de una firma.
-	 * @param e Errores que causaron el aborto de la firma. */
-	void signatureAborted(Throwable e);
+	 * @param e Errores que causaron el aborto de la firma.
+	 * @param signatureId Identificador de la firma abortada. */
+	void signatureAborted(Throwable e, String signatureId);
 
 }
