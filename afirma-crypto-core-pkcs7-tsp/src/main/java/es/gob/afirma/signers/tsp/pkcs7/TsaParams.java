@@ -7,6 +7,9 @@ import java.io.InputStream;
 import java.net.URI;
 import java.util.Properties;
 
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
+
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.signers.AOSignConstants;
@@ -15,17 +18,51 @@ import es.gob.afirma.core.signers.AOSignConstants;
  * @author Tomas Garc&iacute;a-Mer&aacute;s. */
 public final class TsaParams {
 
+	private static final String DEFAULT_DIGEST_ALGO = "SHA-512"; //$NON-NLS-1$
 	private static final String POLICY = "0.4.0.2023.1.1"; //$NON-NLS-1$
 
+	@XmlElement(name = "tsaRequireCert")
 	private final boolean tsaRequireCert;
+
+	@XmlElement(name = "tsaPolicy")
 	private final String tsaPolicy;
+
+	@XmlElement(name = "tsaURL")
 	private final URI tsaURL;
+
+	@XmlElement(name = "tsaUsr")
 	private final String tsaUsr;
+
+	@XmlElement(name = "tsaPwd")
 	private final String tsaPwd;
+
+	@XmlElementWrapper(name = "extensions")
+	@XmlElement(name = "extension")
 	private final TsaRequestExtension[] extensions;
+
+	@XmlElement(name = "tsaHashAlgorithm")
 	private final String tsaHashAlgorithm;
+
+	@XmlElement(name = "sslPkcs12File")
 	private final byte[] sslPkcs12File;
+
+	@XmlElement(name = "sslPkcs12FilePassword")
 	private final String sslPkcs12FilePassword;
+
+	/** Constructor de uso restringido a la serializaci&oacute;n JAXB. */
+	@SuppressWarnings("unused")
+	private TsaParams() {
+		// Para la serializacion JAXB
+        this.tsaURL = null;
+        this.tsaPolicy = POLICY;
+        this.tsaUsr = null;
+        this.tsaPwd = null;
+        this.extensions = null;
+        this.tsaHashAlgorithm = DEFAULT_DIGEST_ALGO;
+        this.sslPkcs12File = null;
+        this.sslPkcs12FilePassword = null;
+        this.tsaRequireCert = true;
+	}
 
 	/** Construye los par&aacute;metros de configuraci&oacute;n de una Autoridad de Sellado de Tiempo.
 	 * @param requireCert Indicar <code>true</code>Si es necesario incluir el certificado de la TSA,
@@ -59,7 +96,7 @@ public final class TsaParams {
         this.tsaUsr = usr;
         this.tsaPwd = pwd;
         this.extensions = exts != null ? exts.clone() : null;
-        this.tsaHashAlgorithm = hashAlgorithm != null ? hashAlgorithm : "SHA-512"; //$NON-NLS-1$
+        this.tsaHashAlgorithm = hashAlgorithm != null ? hashAlgorithm : DEFAULT_DIGEST_ALGO;
         this.sslPkcs12File = sslPkcs12 != null ? sslPkcs12.clone() : null;
         this.sslPkcs12FilePassword = sslPkcs12Password;
         this.tsaRequireCert = requireCert;
@@ -94,7 +131,7 @@ public final class TsaParams {
     			POLICY;
         this.tsaHashAlgorithm = extraParams.getProperty("tsaHashAlgorithm") != null ? //$NON-NLS-1$
         		AOSignConstants.getDigestAlgorithmName(extraParams.getProperty("tsaHashAlgorithm")) : //$NON-NLS-1$
-        			"SHA-512"; //$NON-NLS-1$
+        			DEFAULT_DIGEST_ALGO;
         this.tsaRequireCert = !Boolean.FALSE.toString().equalsIgnoreCase(extraParams.getProperty("tsaRequireCert")); //$NON-NLS-1$
         this.tsaUsr = extraParams.getProperty("tsaUsr"); //$NON-NLS-1$
         this.tsaPwd = extraParams.getProperty("tsaPwd"); //$NON-NLS-1$
