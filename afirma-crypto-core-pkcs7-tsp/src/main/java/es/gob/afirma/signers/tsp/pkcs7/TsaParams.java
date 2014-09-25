@@ -49,6 +49,33 @@ public final class TsaParams {
 	@XmlElement(name = "sslPkcs12FilePassword")
 	private final String sslPkcs12FilePassword;
 
+	@Override
+	public String toString() {
+
+		// Extensiones
+		final StringBuilder exts = new StringBuilder("["); //$NON-NLS-1$
+		if (this.extensions != null) {
+			for(final TsaRequestExtension ex : this.extensions) {
+				exts.append(ex);
+				exts.append("; "); //$NON-NLS-1$
+			}
+		}
+		exts.append("]"); //$NON-NLS-1$
+
+		final String ret = "Parametros TSA [" + //$NON-NLS-1$
+					"URL=" + getTsaUrl() + "; " + //$NON-NLS-1$ //$NON-NLS-2$
+					"User=" + getTsaUsr() + ": " + //$NON-NLS-1$ //$NON-NLS-2$
+					"Policy=" + getTsaPolicy() + "; " + //$NON-NLS-1$ //$NON-NLS-2$
+					"Extensions" + exts.toString() + "; " + //$NON-NLS-1$ //$NON-NLS-2$
+					"Digest=" + getTsaHashAlgorithm() + "; " + //$NON-NLS-1$ //$NON-NLS-2$
+					"SSLP12=" + (getSslPkcs12File() != null ? "Yes" : "No") + "; " + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+					"SSLP12Pwd=" + getSslPkcs12FilePassword() + //$NON-NLS-1$
+			"]"; //$NON-NLS-1$
+
+		// Quitamos el punto y coma de la ultima extension
+		return ret.replace("]; ]", "]]"); //$NON-NLS-1$ //$NON-NLS-2$
+	}
+
 	/** Construye los par&aacute;metros de configuraci&oacute;n de una Autoridad de Sellado de Tiempo.
 	 * @param requireCert Indicar <code>true</code>Si es necesario incluir el certificado de la TSA,
 	 *                    <code>false</code> en caso contrario.
