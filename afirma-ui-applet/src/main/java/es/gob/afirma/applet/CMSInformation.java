@@ -199,7 +199,7 @@ final class CMSInformation {
 	private static String getFromCompressedData(final ASN1TaggedObject doj) {
 		String detalle = ""; //$NON-NLS-1$
 		detalle = detalle + "Tipo:" + SP + COMPRESSED_DATA + CR; //$NON-NLS-1$
-		final CompressedData ed = new CompressedData((ASN1Sequence)doj.getObject());
+		final CompressedData ed = CompressedData.getInstance(doj.getObject());
 
 		//obtenemos la version
 		detalle = detalle + AppletMessages.getString("CMSInformation.1") + SP + ed.getVersion() + CR; //$NON-NLS-1$
@@ -246,14 +246,14 @@ final class CMSInformation {
 
 		switch (envelopeType) {
 		case TYPE_ENVELOPED_DATA:
-			final EnvelopedData enveloped = new EnvelopedData((ASN1Sequence)doj.getObject());
+			final EnvelopedData enveloped = EnvelopedData.getInstance(doj.getObject());
 			version = enveloped.getVersion();
 			rins = enveloped.getRecipientInfos();
 			encryptedContentInfo = enveloped.getEncryptedContentInfo();
 			unprotectedAttrs = enveloped.getUnprotectedAttrs();
 			break;
 		case TYPE_AUTHENTICATED_DATA:
-			final AuthenticatedData authenticated = new AuthenticatedData((ASN1Sequence)doj.getObject());
+			final AuthenticatedData authenticated = AuthenticatedData.getInstance(doj.getObject());
 			version = authenticated.getVersion();
 			rins = authenticated.getRecipientInfos();
 			aid = authenticated.getMacAlgorithm();
@@ -262,7 +262,7 @@ final class CMSInformation {
 			unprotectedAttrs = authenticated.getUnauthAttrs();
 			break;
 		case TYPE_AUTHENTICATED_ENVELOPED_DATA:
-			final AuthEnvelopedData authEnveloped = new AuthEnvelopedData((ASN1Sequence)doj.getObject());
+			final AuthEnvelopedData authEnveloped = AuthEnvelopedData.getInstance(doj.getObject());
 			version = authEnveloped.getVersion();
 			rins = authEnveloped.getRecipientInfos();
 			encryptedContentInfo = authEnveloped.getAuthEncryptedContentInfo();
@@ -291,6 +291,8 @@ final class CMSInformation {
 				unprotectedAttrs = (ASN1Set) encrypted.getObjectAt(2);
 			}
 			break;
+		default:
+			throw new IllegalArgumentException("Tipo de sobre no soportado: " + envelopeType); //$NON-NLS-1$
 		}
 
 		//obtenemos la version
@@ -392,7 +394,7 @@ final class CMSInformation {
 				detalle = detalle + AppletMessages.getString("CMSInformation.30") + CR; //$NON-NLS-1$
 			}
 			for(int i =0; i< signerInfosSd.size(); i++){
-				final SignerInfo si = new SignerInfo((ASN1Sequence)signerInfosSd.getObjectAt(i));
+				final SignerInfo si = SignerInfo.getInstance(signerInfosSd.getObjectAt(i));
 
 				detalle = detalle + AppletMessages.getString("CMSInformation.31") + SP + (i+1) + ":" + CR;  //$NON-NLS-1$//$NON-NLS-2$
 				// version
