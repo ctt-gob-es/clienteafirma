@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Properties;
 import java.util.logging.Logger;
 import java.util.zip.Deflater;
 
@@ -72,11 +73,15 @@ public final class WacomSignaturePad extends SignaturePad implements ITabletHand
 	private final JPanel panel;
 	private final String signatureId;
 
-	private static final String BACKGROUND_IMAGE_PATH = "/wacom/Wacom_STU430.png"; //$NON-NLS-1$
+	private static final String WACOM_RESOUCE_PATH = "/wacom/"; //$NON-NLS-1$
+	private static final String PROPERTIES_EXTENSION = ".properties"; //$NON-NLS-1$
 
 	private Tablet tablet;
 	private java.awt.Rectangle sigArea = null;
 	private boolean useColor = false;
+
+	/** Modelo de la tableta*/
+	private String model;
 
 	/** Imagen que se muestra en la pantalla replicada. */
 	private BufferedImage bitmap = null;
@@ -319,19 +324,62 @@ public final class WacomSignaturePad extends SignaturePad implements ITabletHand
 			this.getToolkit().getScreenResolution()
 		);
 
+		try {
+			// Obtenemos el modelo de la tableta. Dependiendo del modelo de la tableta seleccionaremos el fichero properties correspondiente al modelo.
+			this.model = this.tablet.getInformation().getModelName().replace(" ", "_"); //$NON-NLS-1$ //$NON-NLS-2$
+
+		} catch (STUException e) {
+			e.printStackTrace();
+		}
+
+		//Obtenemos el fichero properties correspondiente al modelo de tableta detectada
+		Properties properties = new Properties();
+
+		try {
+			if(this.model != null ) {
+				// Cargamos el fichero de propiedades
+				properties.load(
+						WacomSignaturePad.class.getResourceAsStream(
+								WACOM_RESOUCE_PATH +
+								this.model +
+								PROPERTIES_EXTENSION
+							)
+						);
+			}
+		} catch (IOException ex) {
+			ex.printStackTrace();
+		}
+
 		// La situamos acorde a la imagen de fondo
 		this.panel.setLocation(
-			153,
-			211
+			Integer.parseInt(properties.getProperty("location.x")), //$NON-NLS-1$
+			Integer.parseInt(properties.getProperty("location.y")) //$NON-NLS-1$
+		);
+
+		this.panel.setSize(
+			Integer.parseInt(properties.getProperty("size.w")), //$NON-NLS-1$
+			Integer.parseInt(properties.getProperty("size.h")) //$NON-NLS-1$
 		);
 
 		this.setLayout(null);
-		this.setBounds(10, 10, 718, 653);
+		this.setBounds(
+			10, 10,
+			Integer.parseInt(properties.getProperty("bound.w")),  //$NON-NLS-1$
+			Integer.parseInt(properties.getProperty("bound.h")) //$NON-NLS-1$
+		);
 		this.setResizable(false);
 
 		// Pintamos la imagen de fondo (imagen de la tableta fisica, por estetica)
-		final JLabel bgImage = new JLabel(new ImageIcon(WacomSignaturePad.class.getResource(BACKGROUND_IMAGE_PATH)));
-		bgImage.setBounds(0, 0, 718, 653);
+		final JLabel bgImage = new JLabel(new ImageIcon(
+												WacomSignaturePad.class.getResource(
+														 properties.getProperty("backgroundImagePath") //$NON-NLS-1$
+												)
+										));
+		bgImage.setBounds(
+			0, 0,
+			Integer.parseInt(properties.getProperty("bound.w")),  //$NON-NLS-1$
+			Integer.parseInt(properties.getProperty("bound.h")) //$NON-NLS-1$
+		);
 
 		this.add(this.panel);
 		this.add(bgImage);
