@@ -14,7 +14,6 @@ import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Cursor;
 import java.awt.Desktop;
-import java.awt.Dimension;
 import java.awt.HeadlessException;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
@@ -36,7 +35,6 @@ import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 
-import javax.swing.JApplet;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -72,7 +70,7 @@ import es.gob.afirma.standalone.ui.UIUtils;
  *  <li>-2 - Imposibilidad de abrir el almac&eacute;n local por defecto</li>
  * </ul>
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
-public final class SimpleAfirma extends JApplet implements PropertyChangeListener, WindowListener {
+public final class SimpleAfirma implements PropertyChangeListener, WindowListener {
 
 	static {
 		// Instalamos el registro a disco
@@ -102,8 +100,6 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
 
     /** Modo de depuraci&oacute;n para toda la aplicaci&oacute;n. */
     public static final boolean DEBUG = false;
-
-    private static final long serialVersionUID = 9146759318663175997L;
 
     static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
@@ -151,10 +147,10 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
 				}
         		catch (final ClassNotFoundException e) {
                     UIUtils.showErrorMessage(
-                            this.container,
-                            SimpleAfirmaMessages.getString("SimpleAfirma.5"), //$NON-NLS-1$
-                            SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
-                            JOptionPane.ERROR_MESSAGE
+                        this.container,
+                        SimpleAfirmaMessages.getString("SimpleAfirma.5"), //$NON-NLS-1$
+                        SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
+                        JOptionPane.ERROR_MESSAGE
                     );
                     closeApplication(-3);
 				}
@@ -169,7 +165,7 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
         }
     }
 
-	void initialize(final boolean asApplet, final File preSelectedFile) {
+	void initialize(final File preSelectedFile) {
 
         // Cargamos las preferencias establecidas
         this.preferences = Preferences.userNodeForPackage(SimpleAfirma.class);
@@ -189,10 +185,7 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
 	        }
         }
 
-        if (asApplet) {
-            this.container = this;
-        }
-        else if (showDNIeScreen) {
+        if (showDNIeScreen) {
            	this.currentPanel = new DNIeWaitPanel(this);
            	final MainScreen mainScreen = new MainScreen();
            	mainScreen.showMainScreen(this, this.currentPanel, 780, 500);
@@ -252,10 +245,10 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
         		"No se pudo abrir el almacen por defecto del entorno operativo: " + e //$NON-NLS-1$
             );
             UIUtils.showErrorMessage(
-                    this.container,
-                    SimpleAfirmaMessages.getString("SimpleAfirma.42"), //$NON-NLS-1$
-                    SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
-                    JOptionPane.ERROR_MESSAGE
+                this.container,
+                SimpleAfirmaMessages.getString("SimpleAfirma.42"), //$NON-NLS-1$
+                SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
+                JOptionPane.ERROR_MESSAGE
             );
             closeApplication(-2);
         }
@@ -295,8 +288,7 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
     }
 
     /** Carga el panel de firma en el interfaz.
-     * @param firstTime <code>true</code> si se la primera vez que se carga, <code>en caso contrario</code>
-     */
+     * @param firstTime <code>true</code> si se la primera vez que se carga, <code>en caso contrario</code>. */
     public void loadMainApp(final boolean firstTime) {
 
     	this.window.setTitle(SimpleAfirmaMessages.getString("SimpleAfirma.10")); //$NON-NLS-1$
@@ -408,29 +400,24 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
     }
 
     /** Recupera una de las preferencias establecidas para la aplicaci&oacute;n.
-     * @param key
-     *        Clave de la preferencia.
-     * @param defaultValue
-     *        Valor por defecto.
+     * @param key Clave de la preferencia.
+     * @param defaultValue Valor por defecto.
      * @return Devuelve el valor de la preferencia indicada o {@code defaultValue} si no est&aacute;a establecida. */
     public String getPreference(final String key, final String defaultValue) {
         return this.preferences.get(key, defaultValue);
     }
 
     /** Establece una preferencia para la aplicaci&oacute;n.
-     * @param key
-     *        Clave de la preferencia.
-     * @param value
-     *        Valor asignado. */
+     * @param key Clave de la preferencia.
+     * @param value Valor asignado. */
     public void setPreference(final String key, final String value) {
         this.preferences.put(key, value);
     }
 
     /** Habilita o desabilita el men&uacute; <i>Archivo</i> de la barra de
      * men&uacute;.
-     * @param e
-     *        <code>true</code> para habilitar el men&uacute;
-     *        <i>Archivo</i>, <code>false</code> para deshabilitarlo */
+     * @param e <code>true</code> para habilitar el men&uacute;
+     *          <i>Archivo</i>, <code>false</code> para deshabilitarlo */
     public void setSignMenuCommandEnabled(final boolean e) {
         if (this.mainMenu != null) {
             this.mainMenu.setEnabledSignCommand(e);
@@ -438,8 +425,7 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
     }
 
     /** Establece el directorio actual para la lectura y guardado de ficheros.
-     * @param dir
-     *        Directorio actual, incluyendo su ruta completa */
+     * @param dir Directorio actual, incluyendo su ruta completa */
     public void setCurrentDir(final File dir) {
         this.currentDir = dir;
     }
@@ -509,48 +495,20 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
         }
     }
 
-    // ***********************************************
-    // ***** APLICACION COMO APPLET ******************
-    // ***********************************************
-
-    void createUI() {
-        if (!LookAndFeelManager.HIGH_CONTRAST) {
-            this.setBackground(LookAndFeelManager.WINDOW_COLOR);
-        }
-        this.setSize(new Dimension(780, 500));
-        this.setLayout(new BorderLayout());
-        this.currentPanel = new DNIeWaitPanel(this);
-        this.add(this.currentPanel, BorderLayout.CENTER);
-        this.setVisible(true);
-    }
-
-    @Override
-    public void init() {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                createUI();
-            }
-        });
-        initialize(true, null);
-    }
-
-    // ***********************************************
-    // ***** FIN APLICACION COMO APPLET **************
-    // ***********************************************
-
-
     /** Punto de entrada de la aplicaci&oacute;n. La ejecuci&oacute;n se realizar&aacute;
      * acorde a la siguiente secuencia:<br/>
      * <ol>
-     * <li>Si no se pasan par&aacute;metros se iniciar&aacute; normalmente.</li>
-     * <li>Si se pasan par&aacute;metros, se iniciar&aacute; el modo de
-     * invocaci&oacute;n por protocolo</li>
-     * <li>Si falla la invocaci&oacute;n por protocolo debido a que no se cuenta con entorno
-     * gr&aacute;fico, se iniciar&aacute; el modo consola.</li>
+     *   <li>Si no se pasan par&aacute;metros se iniciar&aacute; normalmente.</li>
+     *   <li>
+     *     Si se pasan par&aacute;metros, se iniciar&aacute; el modo de
+     *     invocaci&oacute;n por protocolo
+     *   </li>
+     *   <li>
+     *     Si falla la invocaci&oacute;n por protocolo debido a que no se cuenta con entorno
+     *     gr&aacute;fico, se iniciar&aacute; el modo consola.
+     *   </li>
      * </ol>
-     * @param args
-     *        Par&aacute;metros en l&iacute;nea de comandos */
+     * @param args Par&aacute;metros en l&iacute;nea de comandos */
     public static void main(final String[] args) {
 
 		// Google Analytics
@@ -609,7 +567,7 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
 	    				}
     				}
 
-    				saf.initialize(false, null);
+    				saf.initialize(null);
     			}
     			else {
     				JOptionPane.showMessageDialog(
@@ -686,9 +644,7 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
         return false;
     }
 
-    /**
-     * Configura el log de la aplicaci&oacute;n.
-     */
+    /** Configura el registro (<i>log</i>) de la aplicaci&oacute;n. */
     private static void configureLog() {
     	// Configuramos, si procede, el log en fichero
     	try {

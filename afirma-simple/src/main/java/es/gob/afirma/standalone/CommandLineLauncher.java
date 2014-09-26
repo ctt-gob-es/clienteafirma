@@ -222,7 +222,7 @@ final class CommandLineLauncher {
 				if (COMMAND_SIGN.equals(command)) {
 
 					final SimpleAfirma simpleAfirma = new SimpleAfirma();
-					simpleAfirma.initialize(false, inputFile);
+					simpleAfirma.initialize(inputFile);
 					simpleAfirma.loadFileToSign(inputFile);
 				}
 				else if (COMMAND_VERIFY.equals(command)) {
