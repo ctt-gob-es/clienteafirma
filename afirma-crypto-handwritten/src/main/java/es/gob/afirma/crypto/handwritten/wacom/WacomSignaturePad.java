@@ -356,11 +356,6 @@ public final class WacomSignaturePad extends SignaturePad implements ITabletHand
 			Integer.parseInt(properties.getProperty("location.y")) //$NON-NLS-1$
 		);
 
-		this.panel.setSize(
-			Integer.parseInt(properties.getProperty("size.w")), //$NON-NLS-1$
-			Integer.parseInt(properties.getProperty("size.h")) //$NON-NLS-1$
-		);
-
 		this.setLayout(null);
 		this.setBounds(
 			10, 10,
