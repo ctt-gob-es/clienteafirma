@@ -16,17 +16,14 @@ import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
-import java.util.Locale;
 
 import javax.swing.Box;
-import javax.swing.ButtonGroup;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
-import javax.swing.JRadioButtonMenuItem;
 import javax.swing.KeyStroke;
 import javax.swing.WindowConstants;
 
@@ -68,7 +65,6 @@ public final class MainMenu extends JMenuBar {
     	return this.saf;
     }
 
-
     /** Indica si hay alg&uacute; men&uacute; de primer nivel seleccionado.
      * @return <code>true</code> si hay alg&uacute; men&uacute; de primer nivel seleccionado,
      *         <code>false</code> en caso contrario */
@@ -77,6 +73,27 @@ public final class MainMenu extends JMenuBar {
     }
 
     /** Construye la barra de men&uacute; de la aplicaci&oacute;n.
+     * En MS-Windows y Linux se crean los siguientes atajos de teclado:
+     * <ul>
+     *  <li>Alt+A = Menu archivo</li>
+     *  <ul>
+     *   <li>Alt+B = Abrir archivo</li>
+     *   <li>Alt+I = Firmar archivo</li>
+     *   <li>Alt+F4 = Salir del programa</li>
+     *  </ul>
+     *  <li>Alt+Y = Menu Ayuda</li>
+     *  <ul>
+     *   <li>Alt+U = Ayuda</li>
+     *   <li>Alt+R = Acerca de...</li>
+     *  </ul>
+     *  <li>Alt+S = Seleccionar fichero</li>
+     *  <li>Alt+F = Firmar fichero</li>
+     *  <li>Ctrl+A = Seleccionar fichero</li>
+     *  <li>Ctrl+F = Firmar fichero</li>
+     *  <li>Alt+F4 = Salir del programa</li>
+     *  <li>F1 = Ayuda</li>
+     *  <li>Ctrl+R = Acerca de...</li>
+     * </ul>
      * @param p Componente padre para la modalidad
      * @param s Aplicaci&oacute;n padre, para determinar el n&uacute;mero de
      *        locales e invocar a ciertos comandos de men&uacute; */
@@ -86,24 +103,6 @@ public final class MainMenu extends JMenuBar {
         // Importante: No cargar en un invokeLater, da guerra en Mac OS X
         createUI();
     }
-
-    /*
-     * Mnemonicos y atajos de menu:
-     *  Alt+A = Menu archivo
-     *  	Alt+B = Abrir archivo
-     * 		Alt+I = Firmar archivo
-     *  	Alt+F4 = Salir de @firma
-     *  Alt+Y = Menu Ayuda
-     *  	Alt+U = Ayuda
-     *  	Alt+R = Acerca de...
-     *  Alt+S = Seleccionar fichero
-     *  Alt+F = Firmar fichero
-     *  Ctrl+A = Seleccionar fichero
-     *  Ctrl+F = Firmar fichero
-     *  Alt+F4 = Salir de @firma
-     *  F1 = Ayuda
-     *  Ctrl+R = Acerca de...
-     */
 
     private void createUI() {
 
@@ -118,31 +117,34 @@ public final class MainMenu extends JMenuBar {
 
         this.abrirMenuItem.setText(SimpleAfirmaMessages.getString("MainMenu.2")); //$NON-NLS-1$
         this.abrirMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-        this.abrirMenuItem.getAccessibleContext().setAccessibleDescription(SimpleAfirmaMessages.getString("MainMenu.3") //$NON-NLS-1$
-                     );
-        this.abrirMenuItem.addActionListener(new ActionListener() {
-        	/** {@inheritDoc} */
-            @Override
-            public void actionPerformed(final ActionEvent ae) {
-            	final File fileToLoad;
-            	try {
-            		fileToLoad = AOUIFactory.getLoadFiles(
-            			SimpleAfirmaMessages.getString("MainMenu.4"), //$NON-NLS-1$
-            			MainMenu.this.getSimpleAfirma().getCurrentDir() != null ? MainMenu.this.getSimpleAfirma().getCurrentDir().getAbsolutePath() : null,
-            			null,
-            			null,
-            			null,
-            			false,
-            			false,
-            			MainMenu.this
-        			)[0];
-            	}
-            	catch(final AOCancelledOperationException e) {
-            		return;
-            	}
-            	MainMenu.this.getSimpleAfirma().loadFileToSign(fileToLoad);
-            }
-        });
+        this.abrirMenuItem.getAccessibleContext().setAccessibleDescription(
+    		SimpleAfirmaMessages.getString("MainMenu.3") //$NON-NLS-1$
+		);
+        this.abrirMenuItem.addActionListener(
+    		new ActionListener() {
+	        	/** {@inheritDoc} */
+	            @Override
+	            public void actionPerformed(final ActionEvent ae) {
+	            	final File fileToLoad;
+	            	try {
+	            		fileToLoad = AOUIFactory.getLoadFiles(
+	            			SimpleAfirmaMessages.getString("MainMenu.4"), //$NON-NLS-1$
+	            			MainMenu.this.getSimpleAfirma().getCurrentDir() != null ? MainMenu.this.getSimpleAfirma().getCurrentDir().getAbsolutePath() : null,
+	            			null,
+	            			null,
+	            			null,
+	            			false,
+	            			false,
+	            			MainMenu.this
+	        			)[0];
+	            	}
+	            	catch(final AOCancelledOperationException e) {
+	            		return;
+	            	}
+	            	MainMenu.this.getSimpleAfirma().loadFileToSign(fileToLoad);
+	            }
+	        }
+		);
         this.menuArchivo.add(this.abrirMenuItem);
 
         this.firmarMenuItem.setText(SimpleAfirmaMessages.getString("MainMenu.5")); //$NON-NLS-1$
@@ -153,13 +155,15 @@ public final class MainMenu extends JMenuBar {
     		SimpleAfirmaMessages.getString("MainMenu.6") //$NON-NLS-1$
         );
         this.firmarMenuItem.setEnabled(false);
-        this.firmarMenuItem.addActionListener(new ActionListener() {
-        	/** {@inheritDoc} */
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                MainMenu.this.getSimpleAfirma().signLoadedFile();
-            }
-        });
+        this.firmarMenuItem.addActionListener(
+    		new ActionListener() {
+	        	/** {@inheritDoc} */
+	            @Override
+	            public void actionPerformed(final ActionEvent e) {
+	                MainMenu.this.getSimpleAfirma().signLoadedFile();
+	            }
+	        }
+		);
         this.menuArchivo.add(this.firmarMenuItem);
 
         // En Mac OS X el salir lo gestiona el propio OS
@@ -167,22 +171,23 @@ public final class MainMenu extends JMenuBar {
             this.menuArchivo.addSeparator();
             final JMenuItem salirMenuItem = new JMenuItem(SimpleAfirmaMessages.getString("MainMenu.7")); //$NON-NLS-1$
             salirMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F4, ActionEvent.ALT_MASK));
-            salirMenuItem.getAccessibleContext().setAccessibleDescription(SimpleAfirmaMessages.getString("MainMenu.8") //$NON-NLS-1$
-                         );
-            salirMenuItem.addActionListener(new ActionListener() {
-            	/** {@inheritDoc} */
-                @Override
-                public void actionPerformed(final ActionEvent ae) {
-                    exitApplication();
-                }
-            });
+            salirMenuItem.getAccessibleContext().setAccessibleDescription(
+        		SimpleAfirmaMessages.getString("MainMenu.8") //$NON-NLS-1$
+             );
+            salirMenuItem.addActionListener(
+        		new ActionListener() {
+	            	/** {@inheritDoc} */
+	                @Override
+	                public void actionPerformed(final ActionEvent ae) {
+	                    exitApplication();
+	                }
+	            }
+    		);
             salirMenuItem.setMnemonic(KeyEvent.VK_L);
             this.menuArchivo.add(salirMenuItem);
         }
 
         this.add(this.menuArchivo);
-
-        final Locale[] locales = SimpleAfirma.getAvailableLocales();
 
         if (!isMac) {
             final JMenu optionsMenu = new JMenu(SimpleAfirmaMessages.getString("MainMenu.18")); //$NON-NLS-1$
@@ -190,13 +195,6 @@ public final class MainMenu extends JMenuBar {
             optionsMenu.getAccessibleContext().setAccessibleDescription(
         		SimpleAfirmaMessages.getString("MainMenu.19") //$NON-NLS-1$
             );
-
-            final JMenu languajesMenu = new JMenu(SimpleAfirmaMessages.getString("MainMenu.20")); //$NON-NLS-1$
-            languajesMenu.setMnemonic(KeyEvent.VK_I);
-            languajesMenu.getAccessibleContext().setAccessibleDescription(
-        		SimpleAfirmaMessages.getString("MainMenu.21") //$NON-NLS-1$
-            );
-            optionsMenu.add(languajesMenu);
 
             final JMenuItem preferencesMenuItem = new JMenuItem(SimpleAfirmaMessages.getString("MainMenu.12")); //$NON-NLS-1$
             preferencesMenuItem.setAccelerator(
@@ -206,57 +204,30 @@ public final class MainMenu extends JMenuBar {
             preferencesMenuItem.getAccessibleContext().setAccessibleDescription(
         		SimpleAfirmaMessages.getString("MainMenu.16") //$NON-NLS-1$
     		);
-            preferencesMenuItem.addActionListener(new ActionListener() {
-            	/** {@inheritDoc} */
-				@Override
-				public void actionPerformed(final ActionEvent ae) {
-				    showPreferences();
-				}});
+            preferencesMenuItem.addActionListener(
+        		new ActionListener() {
+	            	/** {@inheritDoc} */
+					@Override
+					public void actionPerformed(final ActionEvent ae) {
+					    showPreferences();
+					}
+				}
+    		);
             optionsMenu.add(preferencesMenuItem);
 
-            final ButtonGroup group = new ButtonGroup();
-            JMenuItem item;
-            for (final Locale locale : locales) {
-                final String localeText = locale.getDisplayName(locale);
-                item = new JRadioButtonMenuItem(localeText.substring(0, 1).toUpperCase() + localeText.substring(1));
-                item.setSelected(locale.equals(Locale.getDefault()));
-                item.addActionListener(new ActionListener() {
-                	/** {@inheritDoc} */
-                    @Override
-                    public void actionPerformed(final ActionEvent ae) {
-                        MainMenu.this.getSimpleAfirma().setDefaultLocale(locale);
-                    }
-                });
-                group.add(item);
-                languajesMenu.add(item);
-            }
             this.add(optionsMenu);
         }
         // En Mac OS X el menu es "Preferencias" dentro de la opcion principal
         else {
-            Application.getApplication().setPreferencesHandler(new PreferencesHandler() {
-            	/** {@inheritDoc} */
-                @Override
-                public void handlePreferences(final PreferencesEvent pe) {
-//                    final String[] localesDescs = new String[locales.length];
-//                    for (int i = 0; i < locales.length; i++) {
-//                        final String localeText = locales[i].getDisplayName(locales[i]);
-//                        localesDescs[i] = localeText.substring(0, 1).toUpperCase() + localeText.substring(1);
-//                    }
-//                    final Object o = JOptionPane.showInputDialog(MainMenu.this.getParentComponent(), Messages.getString("MainMenu.22"), //$NON-NLS-1$
-//                                                                 Messages.getString("MainMenu.23"), //$NON-NLS-1$
-//                                                                 JOptionPane.PLAIN_MESSAGE,
-//                                                                 null,
-//                                                                 localesDescs,
-//                                                                 null);
-//                    for (int i = 0; i < locales.length; i++) {
-//                        if (localesDescs[i].equals(o)) {
-//                            MainMenu.this.getSimpleAfirma().setDefaultLocale(locales[i]);
-//                        }
-//                    }
-                    showPreferences();
-                }
-            });
+            Application.getApplication().setPreferencesHandler(
+        		new PreferencesHandler() {
+	            	/** {@inheritDoc} */
+	                @Override
+	                public void handlePreferences(final PreferencesEvent pe) {
+	                    showPreferences();
+	                }
+	            }
+    		);
         }
 
         // Separador para que la ayuda quede a la derecha, se ignora en Mac OS X
@@ -271,7 +242,9 @@ public final class MainMenu extends JMenuBar {
 
         this.ayudaMenuItem.setText(SimpleAfirmaMessages.getString("MainMenu.11")); //$NON-NLS-1$
         if (isMac) {
-            this.ayudaMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_SLASH, InputEvent.SHIFT_MASK | Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+            this.ayudaMenuItem.setAccelerator(
+        		KeyStroke.getKeyStroke(KeyEvent.VK_SLASH, InputEvent.SHIFT_MASK | Toolkit.getDefaultToolkit().getMenuShortcutKeyMask())
+    		);
         }
         else {
             this.ayudaMenuItem.setAccelerator(KeyStroke.getKeyStroke("F1")); //$NON-NLS-1$
@@ -279,12 +252,14 @@ public final class MainMenu extends JMenuBar {
         this.ayudaMenuItem.getAccessibleContext().setAccessibleDescription(
               SimpleAfirmaMessages.getString("MainMenu.13") //$NON-NLS-1$
         );
-        this.ayudaMenuItem.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                SimpleAfirma.showHelp();
-            }
-        });
+        this.ayudaMenuItem.addActionListener(
+    		new ActionListener() {
+	            @Override
+	            public void actionPerformed(final ActionEvent e) {
+	                SimpleAfirma.showHelp();
+	            }
+	        }
+		);
         this.menuAyuda.add(this.ayudaMenuItem);
 
         // En Mac OS X el Acerca de lo gestiona el propio OS
@@ -316,20 +291,24 @@ public final class MainMenu extends JMenuBar {
         }
         // Acciones especificas de Mac OS X
         else {
-            Application.getApplication().setAboutHandler(new AboutHandler() {
-                @Override
-                public void handleAbout(final AboutEvent ae) {
-                    showAbout();
-                }
-            });
-            Application.getApplication().setQuitHandler(new QuitHandler() {
-                @Override
-                public void handleQuitRequestWith(final QuitEvent qe, final QuitResponse qr) {
-                    if (!exitApplication()) {
-                        qr.cancelQuit();
-                    }
-                }
-            });
+            Application.getApplication().setAboutHandler(
+        		new AboutHandler() {
+	                @Override
+	                public void handleAbout(final AboutEvent ae) {
+	                    showAbout();
+	                }
+	            }
+    		);
+            Application.getApplication().setQuitHandler(
+        		new QuitHandler() {
+	                @Override
+	                public void handleQuitRequestWith(final QuitEvent qe, final QuitResponse qr) {
+	                    if (!exitApplication()) {
+	                        qr.cancelQuit();
+	                    }
+	                }
+        		}
+    		);
         }
 
     }
@@ -362,10 +341,12 @@ public final class MainMenu extends JMenuBar {
     }
 
     void showAbout() {
-        JOptionPane.showMessageDialog(this.parent == null ? MainMenu.this : this.parent,
-        							  SimpleAfirmaMessages.getString("MainMenu.14"), //$NON-NLS-1$,
-                                      SimpleAfirmaMessages.getString("MainMenu.15"), //$NON-NLS-1$
-                                      JOptionPane.INFORMATION_MESSAGE);
+        JOptionPane.showMessageDialog(
+    		this.parent == null ? MainMenu.this : this.parent,
+			SimpleAfirmaMessages.getString("MainMenu.14"), //$NON-NLS-1$,
+            SimpleAfirmaMessages.getString("MainMenu.15"), //$NON-NLS-1$
+            JOptionPane.INFORMATION_MESSAGE
+        );
     }
 
     boolean exitApplication() {
