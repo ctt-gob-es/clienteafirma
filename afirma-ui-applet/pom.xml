@@ -57,6 +57,12 @@
 		
 		<dependency>
 			<groupId>es.gob.afirma</groupId>
+			<artifactId>afirma-crypto-cms-enveloper</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>es.gob.afirma</groupId>
 			<artifactId>afirma-crypto-core-pkcs7</artifactId>
 			<version>${project.version}</version>
 		</dependency>
@@ -84,7 +90,13 @@
 			<artifactId>afirma-crypto-xmlsignature</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-				
+
+		<dependency>
+			<groupId>es.gob.afirma</groupId>
+			<artifactId>afirma-crypto-cipher</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
 		<dependency>
 			<groupId>es.gob.afirma</groupId>
 			<artifactId>afirma-keystores-filters-rfc</artifactId>

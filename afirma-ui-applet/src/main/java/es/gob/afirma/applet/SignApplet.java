@@ -23,6 +23,7 @@ import java.net.URISyntaxException;
 import java.net.URLDecoder;
 import java.nio.charset.Charset;
 import java.security.AccessController;
+import java.security.KeyException;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -54,6 +55,8 @@ import com.dmurph.tracking.JGoogleAnalyticsTracker.GoogleAnalyticsVersion;
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOFormatFileException;
+import es.gob.afirma.core.AOInvalidFormatException;
+import es.gob.afirma.core.ciphers.CipherConstants.AOCipherAlgorithm;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.MimeHelper;
@@ -64,6 +67,7 @@ import es.gob.afirma.core.signers.AOSignerFactory;
 import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.crypto.jarverifier.JarSignatureCertExtractor;
+import es.gob.afirma.envelopers.cms.AOInvalidRecipientException;
 import es.gob.afirma.keystores.AOCertificatesNotFoundException;
 import es.gob.afirma.keystores.AOKeyStore;
 import es.gob.afirma.keystores.AOKeyStoreManager;
@@ -83,10 +87,14 @@ import es.gob.afirma.signers.cms.AOCMSSigner;
 /** Reimplementaci&oacute;n del Applet original de firma del cliente AFirma.
  * Por seguridad los siguientes m&eacute;todos piden confirmaci&oacute;n directamente al usuario:
  * <ul>
+ * <li><code>cipherFile(final String filename)</code></li>
+ * <li><code>decipherFile(final String filename)</code></li>
  * <li><code>getFileBase64Encoded(final String filename, final boolean showProgress)</code></li>
  * <li><code>getTextFileContent(final String filename)</code></li>
  * <li><code>massiveSignatureFile(final String filename)</code></li>
+ * <li><code>saveCipherDataToFile(final String filename)</code></li>
  * <li><code>saveDataToFile(final String filename)</code></li>
+ * <li><code>savePlainDataToFile(final String filename)</code></li>
  * <li><code>setElectronicSignatureFile(final String filename)</code></li>
  * <li><code>setFileuri(final String uri)</code></li>
  * <li><code>setFileuriBase64(final String uri)</code></li>
@@ -94,8 +102,11 @@ import es.gob.afirma.signers.cms.AOCMSSigner;
  * <li><code>setKeyStore(final String filename, final String password, final String type)</code></li>
  * <li><code>setOutFilePath(final String filename)</code></li>
  * <li><code>setOutputDirectoryToSign(final String directory)</code></li>
+ * <li><code>signAndPackFile(final String filename)</code></li>
  * </ul> */
 public final class SignApplet extends JApplet implements EntryPointsCrypto, EntryPointsUtil {
+
+	private static final long serialVersionUID = 5692094082535848369L;
 
 	private static final String GOOGLE_ANALYTICS_TRACKING_CODE = "UA-41615516-3"; //$NON-NLS-1$
 
@@ -107,6 +118,9 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 	/** Separador utilizado para separar varios valores consecutivos en una
 	 * cadena devuelta por el Applet. */
 	public static final String STRING_SEPARATOR = "\u0024%\u0024"; //$NON-NLS-1$
+
+	/** N&uacute;meto de puerto por defecto para la conexi&oacute;n LDAP. */
+	private static final int DEFAULT_LDAP_PORT = 389;
 
 	private static final String EXTRAPARAM_KEY_MIMETYPE = "mimeType"; //$NON-NLS-1$
 
@@ -346,12 +360,43 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 		return this.showMozillaSmartCardWarning;
 	}
 
-	private static final long serialVersionUID = 5692094082535848369L;
+	/** Manejador de las funcionalidades de cifrado del Cliente. */
+	private CipherManager cipherManager = null;
+
+	CipherManager getCipherManager() {
+		return this.cipherManager;
+	}
+
+	/** Manejador de las funcionalidades de ensobrado del Cliente. */
+	private EnveloperManager enveloperManager = null;
+
+	/** URL del servidor LDAP. */
+	private String ldapServerUrl = null;
+
+	String getLdapServerUrl() {
+		return this.ldapServerUrl;
+	}
+
+	/** Puerto del servidor LDAP. Por defecto, 389. */
+	private int ldapServerPort = DEFAULT_LDAP_PORT;
+
+	int getLdapServerPort() {
+		return this.ldapServerPort;
+	}
+
+	/** Principal del certificado que se desea recuperar del servidor LDAP. */
+	private String ldapCertificatePrincipal = null;
+
+	String getLdapCertificatePrincipal() {
+		return this.ldapCertificatePrincipal;
+	}
 
 	/** Construye la clase asegurandose de que se inicializan todas las
 	 * propiedades necesarias. */
 	public SignApplet() {
 		this.ksConfigManager = new KeyStoreConfigurationManager(AOKeyStore.PKCS12, this);
+		this.cipherManager = new CipherManager(this);
+		this.enveloperManager = new EnveloperManager(this);
 	}
 
 	/** {@inheritDoc} */
@@ -410,6 +455,12 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 		this.defaultShowExpiratedCertificates = paramValue == null || !paramValue.trim().equalsIgnoreCase("false"); //$NON-NLS-1$
 		this.ksConfigManager.setShowExpiratedCertificates(this.defaultShowExpiratedCertificates);
 
+		// Creamos el manejador para el cifrado de datos
+		this.cipherManager = new CipherManager(this);
+
+		// Creamos el manejador para el ensobrado de datos
+		this.enveloperManager = new EnveloperManager(this);
+
 		// Indicamos que el cliente ya se ha inicializado
 		this.initializedApplet = true;
 	}
@@ -462,6 +513,8 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 		this.xmlTransforms = null;
 		this.ksConfigManager.initialize();
 		this.ksConfigManager.setShowExpiratedCertificates(this.defaultShowExpiratedCertificates);
+		this.cipherManager.initialize();
+		this.enveloperManager.initialize();
 	}
 
 	/** {@inheritDoc} */
@@ -2806,6 +2859,12 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 
 	/** {@inheritDoc} */
 	@Override
+	public String getTextFromBase64(final String b64) {
+		return getTextFromBase64(b64, null);
+	}
+
+	/** {@inheritDoc} */
+	@Override
 	public String getTextFromBase64(final String b64, final String charsetName) {
 		LOGGER.info("Invocando getTextFromBase64"); //$NON-NLS-1$
 		Charset charset = null;
@@ -2824,6 +2883,12 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 			this.setError(AppletMessages.getString("SignApplet.492")); //$NON-NLS-1$
 			return null;
 		}
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public String getBase64FromText(final String plainText) {
+		return getBase64FromText(plainText, null);
 	}
 
 	/** {@inheritDoc} */
@@ -3026,6 +3091,22 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 		}
 		try {
 			return Base64.encode(this.data);
+		} catch (final OutOfMemoryError e) {
+			LOGGER.severe("Error de falta de memoria al recuperar los datos: " + e); //$NON-NLS-1$
+			SignApplet.this.setError(AppletMessages.getString("SignApplet.493")); //$NON-NLS-1$
+			return ""; //$NON-NLS-1$
+		}
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public String getData() {
+		LOGGER.info("Invocando getData"); //$NON-NLS-1$
+		if (this.data == null) {
+			LOGGER.warning("No se dispone de datos de salida, se devolvera cadena vacia"); //$NON-NLS-1$
+		}
+		try {
+			return this.data == null ? "" : new String(this.data); //$NON-NLS-1$
 		} catch (final OutOfMemoryError e) {
 			LOGGER.severe("Error de falta de memoria al recuperar los datos: " + e); //$NON-NLS-1$
 			SignApplet.this.setError(AppletMessages.getString("SignApplet.493")); //$NON-NLS-1$
@@ -3924,5 +4005,786 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 		else if (localeComponents.length > 2) {
 			Locale.setDefault(new Locale(localeComponents[0], localeComponents[1], localeComponents[2]));
 		}
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public void setCipherData(final String data) {
+		LOGGER.info("Invocando setCipherData"); //$NON-NLS-1$
+		try {
+			this.cipherManager.setCipheredData(data == null ? null : Base64.decode(data));
+		} catch (final Exception e) {
+			LOGGER.warning("Los datos insertados no estan en Base64: " + e); //$NON-NLS-1$
+
+		} catch (final OutOfMemoryError e) {
+			LOGGER.severe("Error de falta de memoria al establecer los datos cifrados: " + e); //$NON-NLS-1$
+			SignApplet.this.setError(AppletMessages.getString("SignApplet.493")); //$NON-NLS-1$
+		}
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public void setPlainData(final String data) {
+		LOGGER.info("Invocando setPlainData"); //$NON-NLS-1$
+		try {
+			this.cipherManager.setPlainData(data == null ? null : Base64.decode(data));
+		} catch (final Exception e) {
+			LOGGER.warning("Los datos insertados no estan en Base64: " + e); //$NON-NLS-1$
+			this.data = null;
+		} catch (final OutOfMemoryError e) {
+			LOGGER.severe("Error de falta de memoria al establecer los datos en claro: " + e); //$NON-NLS-1$
+			SignApplet.this.setError(AppletMessages.getString("SignApplet.493")); //$NON-NLS-1$
+		}
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public String getCipherData() {
+		LOGGER.info("Invocando getCipherData"); //$NON-NLS-1$
+		try {
+			return Base64.encode(this.cipherManager.getCipheredData());
+		} catch (final OutOfMemoryError e) {
+			LOGGER.severe("Error de falta de memoria al recuperar los datos cifrados: " + e); //$NON-NLS-1$
+			SignApplet.this.setError(AppletMessages.getString("SignApplet.493")); //$NON-NLS-1$
+			return ""; //$NON-NLS-1$
+		}
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public String getPlainData() {
+		LOGGER.info("Invocando getPlainData"); //$NON-NLS-1$
+		try {
+			return this.cipherManager.getPlainData() == null ?
+					null : Base64.encode(this.cipherManager.getPlainData());
+		} catch (final OutOfMemoryError e) {
+			LOGGER.severe("Error de falta de memoria al establecer los datos cifrados: " + e); //$NON-NLS-1$
+			SignApplet.this.setError(AppletMessages.getString("SignApplet.493")); //$NON-NLS-1$
+			return ""; //$NON-NLS-1$
+		}
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public String getKey() {
+		LOGGER.info("Invocando getKey"); //$NON-NLS-1$
+		if (this.cipherManager.getCipherKey() != null) {
+			return Base64.encode(this.cipherManager.getCipherKey());
+		}
+		return null;
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public void setKey(final String newKey) {
+		LOGGER.info("Invocando setKey"); //$NON-NLS-1$
+		try {
+			this.cipherManager.setCipherKey(newKey == null ? null : Base64.decode(newKey));
+		} catch (final Exception e) {
+			LOGGER.warning("La clave insertada no esta en Base64: " + e); //$NON-NLS-1$
+			this.data = null;
+		}
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public String getPassword() {
+		LOGGER.info("Invocando getPassword"); //$NON-NLS-1$
+		return this.cipherManager.getCipherPassword() == null ? null : String.valueOf(this.cipherManager.getCipherPassword());
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public boolean setPassword(final String password) {
+		LOGGER.info("Invocando setPassword"); //$NON-NLS-1$
+		if (!CipherManager.isValidPassword(password)) {
+			LOGGER.warning("La contrasena introducida no es una cadena ASCII"); //$NON-NLS-1$
+			return false;
+		}
+		this.cipherManager.setCipherPassword(password.toCharArray());
+		return true;
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public void setCipherAlgorithm(final String algorithm) {
+		LOGGER.info("Invocando setCipherAlgorithm: " + algorithm); //$NON-NLS-1$
+
+		final AOCipherAlgorithm algo = AOCipherAlgorithm.getValueOf(algorithm);
+		if (algo == null) {
+			LOGGER.warning("Algoritmo de cifrado no reconocido, se establecera el por defecto: " + //$NON-NLS-1$
+					AOCipherAlgorithm.getDefault().getName());
+		}
+		this.cipherManager.setCipherAlgorithm(algo);
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public String getCipherAlgorithm() {
+		LOGGER.info("Invocando getCipherAlgorithm"); //$NON-NLS-1$
+		return this.cipherManager.getCipherAlgorithm().getName();
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public void setKeyMode(final String keyMode) {
+		LOGGER.info("Invocando setKeyMode: " + keyMode); //$NON-NLS-1$
+		this.cipherManager.setKeyMode(keyMode);
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public String getKeyMode() {
+		LOGGER.info("Invocando getKeyMode"); //$NON-NLS-1$
+		return this.cipherManager.getKeyMode();
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public void setUseCipherKeyStore(final boolean useKeyStore) {
+		LOGGER.info("Invocando setUseCipherKeyStore con el valor: " + useKeyStore); //$NON-NLS-1$
+		this.cipherManager.setUseCipherKeyStore(useKeyStore);
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public boolean cipherFile(final String filename) {
+		LOGGER.info("Invocando cipherFile: " + filename); //$NON-NLS-1$
+
+		setError(null);
+
+		if (filename == null || filename.trim().length() < 1) {
+			setError(AppletMessages.getString("SignApplet.78")); //$NON-NLS-1$
+			return false;
+		}
+
+		if (!checkUserPermision(AppletMessages.getString("SignApplet.79") + CR + filename + //$NON-NLS-1$
+				CR + AppletMessages.getString("SignApplet.12"))) { //$NON-NLS-1$
+			setError(AppletMessages.getString("SignApplet.494", filename)); //$NON-NLS-1$
+			return false;
+		}
+
+		this.setPlainData(null);
+
+		final byte[] dat = FileUtils.loadFile(filename);
+		if (dat == null) {
+			setError(AppletMessages.getString("SignApplet.401")); //$NON-NLS-1$
+			return false;
+		}
+
+		return cipherData(dat);
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public boolean cipherData() {
+		LOGGER.info("Invocando cipherData"); //$NON-NLS-1$
+		return cipherData(null);
+	}
+
+	/** Cifra los datos introducido o los configurados en la instancia actual de
+	 * cipherManager.
+	 * @param dat
+	 *        Datos que deseamos cifrar.
+	 * @return Devuelve {@code true} si la operaci&oacute; finaliz&oacute;
+	 *         correctamente.
+	 */
+	private boolean cipherData(final byte[] dat) {
+
+		// Establecemos el fichero seleccionado (si es que lo hay) para que se procese
+		// si no se indicaron los datos en claro para cifrar
+
+		if (getInternalFileUri() != null) {
+			try {
+				this.cipherManager.setFileUri(AOUtil.createURI(getInternalFileUri()), false);
+			}
+			catch (final URISyntaxException e) {
+				setError(AppletMessages.getString("SignApplet.15") + getInternalFileUri()); //$NON-NLS-1$
+				LOGGER.severe("Error: " + e.toString()); //$NON-NLS-1$
+				return false;
+			}
+		}
+
+		// El resultado queda almacenado en el objeto CipherManager
+		try {
+			AccessController.doPrivileged(new CipherAction(this.cipherManager, dat));
+		} catch (final PrivilegedActionException e) {
+			if (e.getCause() instanceof AOCancelledOperationException) {
+				LOGGER.severe("Error: " + e.toString()); //$NON-NLS-1$
+				setError(AppletMessages.getString("SignApplet.68")); //$NON-NLS-1$
+				return false;
+			}
+			LOGGER.severe("Error: " + e.toString()); //$NON-NLS-1$
+			setError(AppletMessages.getString("SignApplet.93")); //$NON-NLS-1$
+			return false;
+		}
+		catch (final OutOfMemoryError e) {
+			LOGGER.severe("Error de falta de memoria durante el cifrado: " + e); //$NON-NLS-1$
+			SignApplet.this.setError(AppletMessages.getString("SignApplet.493")); //$NON-NLS-1$
+			return false;
+		}
+		return true;
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public boolean decipherFile(final String filename) {
+		LOGGER.info("Invocando decipherFile: " + filename); //$NON-NLS-1$
+
+		setError(null);
+
+		if (filename == null || filename.trim().length() < 1) {
+			setError(AppletMessages.getString("SignApplet.87")); //$NON-NLS-1$
+			return false;
+		}
+
+		if (!checkUserPermision(AppletMessages.getString("SignApplet.88") + CR + filename + //$NON-NLS-1$
+				CR + AppletMessages.getString("SignApplet.12"))) { //$NON-NLS-1$
+			setError(AppletMessages.getString("SignApplet.494", filename)); //$NON-NLS-1$
+			return false;
+		}
+
+		this.setCipherData(null);
+
+		final byte[] cipheredData = FileUtils.loadFile(filename);
+		if (cipheredData == null) {
+			setError(AppletMessages.getString("SignApplet.402")); //$NON-NLS-1$
+			return false;
+		}
+
+		return decipherData(cipheredData);
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public boolean decipherData() {
+		LOGGER.info("Invocando decipherData"); //$NON-NLS-1$
+		return decipherData(null);
+	}
+
+	/** Descifra los datos introducido o los configurados en la instancia actual
+	 * de cipherManager.
+	 * @param dat
+	 *        Datos que deseamos descifrar.
+	 * @return Devuelve {@code true} si la operaci&oacute; finaliz&oacute;
+	 *         correctamente.
+	 */
+	private boolean decipherData(final byte[] dat) {
+
+		// Establecemos el fichero seleccionado (si es que lo hay) para que se procese
+		// si no se indicaron los datos en claro para descifrar
+		if (getInternalFileUri() != null) {
+			try {
+				this.cipherManager.setFileUri(AOUtil.createURI(getInternalFileUri()), false);
+			}
+			catch (final URISyntaxException e) {
+				setError(AppletMessages.getString("SignApplet.15") + getInternalFileUri()); //$NON-NLS-1$
+				LOGGER.severe("Error: " + e.toString()); //$NON-NLS-1$
+				return false;
+			}
+		}
+
+		// El resultado quedara almacenado en el objeto CipherManager
+		try {
+			AccessController.doPrivileged(new DecipherAction(this.cipherManager, dat));
+		} catch (final PrivilegedActionException e) {
+			if (e.getCause() instanceof AOCancelledOperationException) {
+				setError(AppletMessages.getString("SignApplet.68")); //$NON-NLS-1$
+				return false;
+			} else if (e.getCause() instanceof KeyException) {
+				setError(AppletMessages.getString("SignApplet.111")); //$NON-NLS-1$
+				return false;
+			} else {
+				setError(AppletMessages.getString("SignApplet.92")); //$NON-NLS-1$
+				return false;
+			}
+		}
+		catch (final OutOfMemoryError e) {
+			getLogger().severe("Error de falta de memoria durante el descifrado: " + e); //$NON-NLS-1$
+			SignApplet.this.setError(AppletMessages.getString("SignApplet.493")); //$NON-NLS-1$
+			return false;
+		}
+		return true;
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public boolean savePlainDataToFile(final String filename) {
+		LOGGER.info("Invocando savePlainDataToFile: " + filename); //$NON-NLS-1$
+
+		setError(null);
+
+		if (this.cipherManager.getPlainData() == null) {
+			LOGGER.severe("No hay datos en claro que guardar"); //$NON-NLS-1$
+			setError(AppletMessages.getString("SignApplet.394")); //$NON-NLS-1$
+			return false;
+		}
+		if (filename == null || filename.trim().length() < 1) {
+			LOGGER.severe("El fichero de salida para los datos no puede ser nulo"); //$NON-NLS-1$
+			setError(AppletMessages.getString("SignApplet.396")); //$NON-NLS-1$
+			return false;
+		}
+
+		if (!checkUserPermision(AppletMessages.getString("SignApplet.66") + CR + filename + //$NON-NLS-1$
+				CR + AppletMessages.getString("SignApplet.12"))) { //$NON-NLS-1$
+			setError(AppletMessages.getString("SignApplet.496", filename)); //$NON-NLS-1$
+			return false;
+		}
+
+		return AccessController.doPrivileged(new java.security.PrivilegedAction<Boolean>() {
+			/** {@inheritDoc} */
+			@Override
+			public Boolean run() {
+				try {
+					SignApplet.saveDataToStorage(SignApplet.this.getCipherManager().getPlainData(), filename);
+				}
+				catch (final Exception e) {
+					getLogger().severe("No se pudo almacenar el texto plano (establecido o cifrado) en " + filename + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$
+					SignApplet.this.setError(AppletMessages.getString("SignApplet.392") + filename); //$NON-NLS-1$
+					return Boolean.FALSE;
+				}
+				return Boolean.TRUE;
+			}
+		}).booleanValue();
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public boolean saveCipherDataToFile(final String filename) {
+		LOGGER.info("Invocando saveCipherDataToFile: " + filename); //$NON-NLS-1$
+
+		setError(null);
+
+		if (this.cipherManager.getCipheredData() == null) {
+			LOGGER.severe("No hay datos cifrados que guardar"); //$NON-NLS-1$
+			setError(AppletMessages.getString("SignApplet.395")); //$NON-NLS-1$
+			return false;
+		}
+
+		if (filename == null || filename.trim().length() < 1) {
+			LOGGER.severe("El fichero de salida para los datos no puede ser nulo"); //$NON-NLS-1$
+			setError(AppletMessages.getString("SignApplet.396")); //$NON-NLS-1$
+			return false;
+		}
+
+		if (!checkUserPermision(AppletMessages.getString("SignApplet.71") + CR + filename + //$NON-NLS-1$
+				CR + AppletMessages.getString("SignApplet.12"))) { //$NON-NLS-1$
+			setError(AppletMessages.getString("SignApplet.496", filename)); //$NON-NLS-1$
+			return false;
+		}
+
+		return AccessController.doPrivileged(new java.security.PrivilegedAction<Boolean>() {
+			/** {@inheritDoc} */
+			@Override
+			public Boolean run() {
+				try {
+					SignApplet.saveDataToStorage(SignApplet.this.getCipherManager().getCipheredData(), filename);
+				}
+				catch (final Exception e) {
+					getLogger().severe("No se pudo almacenar el texto cifrado en" + filename + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$
+					SignApplet.this.setError(AppletMessages.getString("SignApplet.397") + filename); //$NON-NLS-1$
+					return Boolean.FALSE;
+				}
+				return Boolean.TRUE;
+			}
+		}).booleanValue();
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public void setRecipientsToCMS(final String s) {
+		LOGGER.info("Invocando setRecipientsToCMS: " + s); //$NON-NLS-1$
+		this.setError(null);
+
+		if (s == null || s.equals("")) { //$NON-NLS-1$
+			this.enveloperManager.removeAllRecipients();
+			LOGGER.info("Se han eliminado los destinatarios configurados para el sobre electronico"); //$NON-NLS-1$
+			return;
+		}
+
+		for (final String recipientsCertFile : s.split(CR)) {
+
+			final byte[] recipientsCert = FileUtils.loadFile(recipientsCertFile);
+			if (recipientsCert == null) {
+				this.setError(AppletMessages.getString("SignApplet.468", recipientsCertFile)); //$NON-NLS-1$
+				continue;
+			}
+			this.addRecipientToCMS(recipientsCert);
+		}
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public void addRecipientToCMS(final String certB64) {
+		LOGGER.info("Invocando addRecipientToCMS"); //$NON-NLS-1$
+		if (certB64 == null || certB64.length() == 0) {
+			LOGGER.warning("No se han introducido destinatarios"); //$NON-NLS-1$
+		}
+		try {
+			addRecipientToCMS(Base64.decode(certB64));
+		} catch (final Exception e) {
+			LOGGER.warning("El certificado no esta en Base64: " + e); //$NON-NLS-1$
+		}
+	}
+
+	/** Configura un nuevo destinatario para el sobre electr&oacute;nico por
+	 * medio de su certificado.
+	 * @param cert
+	 *        Certificado del destinatario. */
+	private void addRecipientToCMS(final byte[] cert) {
+		try {
+			this.enveloperManager.addRecipient(cert);
+		}
+		catch (final CertificateException e) {
+			LOGGER.severe("Error al decodificar el certificado de destinatario, asegurese de que es un certificado valido: " + e); //$NON-NLS-1$
+			this.setError(AppletMessages.getString("SignApplet.10")); //$NON-NLS-1$
+		}
+		catch (final Exception e) {
+			LOGGER.severe("Error al cargar el certificado de destinatario: " + e); //$NON-NLS-1$
+			this.setError(AppletMessages.getString("SignApplet.572")); //$NON-NLS-1$
+		}
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public void removeRecipientToCMS(final String certB64) {
+
+		if (certB64 == null || certB64.length() == 0) {
+			throw new IllegalArgumentException("No se ha introducido el certificado que se desea eliminar"); //$NON-NLS-1$
+		}
+
+		try {
+			this.enveloperManager.removeRecipient(Base64.decode(certB64));
+		}
+		catch (final CertificateException e) {
+			LOGGER.severe("Error al decodificar el certificado de destinatario, asegurese de que es un certificado valido: " + e); //$NON-NLS-1$
+			this.setError(AppletMessages.getString("SignApplet.10")); //$NON-NLS-1$
+		}
+		catch (final Exception e) {
+			LOGGER.severe("Error al eliminar el certificado de la lista de destinatarios: " + e); //$NON-NLS-1$
+			SignApplet.this.setError(AppletMessages.getString("SignApplet.572")); //$NON-NLS-1$
+		}
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public void setCMSContentType(final String contentType) {
+		LOGGER.info("Invocando setCMSContentType: " + contentType); //$NON-NLS-1$
+		this.enveloperManager.setCmsContentType(contentType);
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public boolean buildCMSEncrypted() {
+		LOGGER.info("Invocando buildCMSEncrypted"); //$NON-NLS-1$
+		return this.doEnvelopOperation(null, AOSignConstants.CMS_CONTENTTYPE_ENCRYPTEDDATA);
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public boolean buildCMSEnveloped() {
+		LOGGER.info("Invocando buildCMSEnveloped"); //$NON-NLS-1$
+		return this.doEnvelopOperation(null, AOSignConstants.CMS_CONTENTTYPE_ENVELOPEDDATA);
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public boolean buildCMSAuthenticated() {
+		LOGGER.info("Invocando buildCMSAuthenticated"); //$NON-NLS-1$
+		return this.doEnvelopOperation(null, AOSignConstants.CMS_CONTENTTYPE_AUTHENVELOPEDDATA);
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public boolean buildCMSStructure() {
+		LOGGER.info("Invocando buildCMSStructure"); //$NON-NLS-1$
+		return this.doEnvelopOperation(null, null);
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public boolean signAndPackData() {
+		LOGGER.info("Invocando signAndPackData"); //$NON-NLS-1$
+		return this.doEnvelopOperation(null, AOSignConstants.CMS_CONTENTTYPE_SIGNEDANDENVELOPEDDATA);
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public boolean signAndPackFile(final String filename) {
+		LOGGER.info("Invocando signAndPackFile: " + filename); //$NON-NLS-1$
+
+		setError(null);
+
+		if (filename == null || filename.trim().length() < 1) {
+			setError(AppletMessages.getString("SignApplet.91")); //$NON-NLS-1$
+			return false;
+		}
+
+		if (!checkUserPermision(AppletMessages.getString("SignApplet.94") + CR + filename + //$NON-NLS-1$
+				CR + AppletMessages.getString("SignApplet.12"))) { //$NON-NLS-1$
+			setError(AppletMessages.getString("SignApplet.494", filename)); //$NON-NLS-1$
+			return false;
+		}
+
+		final byte[] plainData = FileUtils.loadFile(filename);
+		if (plainData == null) {
+			setError(AppletMessages.getString("SignApplet.403")); //$NON-NLS-1$
+			return false;
+		}
+
+		return doEnvelopOperation(plainData, AOSignConstants.CMS_CONTENTTYPE_SIGNEDANDENVELOPEDDATA);
+	}
+
+	/** Genera un sobre electr&oacute;nico.
+	 * @param dat
+	 *        Datos que se desean ensobrar. Si no se indica, se
+	 *        tomar&acute;n los configurados actualmente en el manejador de
+	 *        ensobrado.
+	 * @param contentType
+	 *        Tipo de sobre que se desea generar. Si no se indica, se
+	 *        tomar&acute; el tipo configurado actualmente en el manejador
+	 *        de ensobrado.
+	 * @return Devuelve {@code true} si el sobre se genera correctamente. */
+	private boolean doEnvelopOperation(final byte[] dat, final String contentType) {
+
+		setError(null);
+
+		final byte[] contentData;
+		try {
+			contentData = dat != null ? dat : getInData();
+		}
+		catch (final AOException e) {
+			// El metodo getInData() establece el mensaje en caso de error (Incluido el OutOfMemoryError)
+			return false;
+		}
+
+		if (contentType != null) {
+			this.enveloperManager.setCmsContentType(contentType);
+		}
+		if (this.enveloperManager.getCmsContentType() == null) {
+			this.enveloperManager.setCmsContentType(AOSignConstants.CMS_CONTENTTYPE_ENVELOPEDDATA);
+		}
+
+		// Le pasamos la configuracion de almacenes y cifrado establecidas
+		this.enveloperManager.setKsConfigManager(this.ksConfigManager);
+		this.enveloperManager.setCipherManager(this.cipherManager);
+
+		try {
+			this.data = AccessController.doPrivileged(new WrapAction(this.enveloperManager, contentData));
+		} catch (final PrivilegedActionException e) {
+			if (e.getCause() instanceof AOCancelledOperationException) {
+				LOGGER.severe(e.toString());
+				setError(AppletMessages.getString("SignApplet.68")); //$NON-NLS-1$
+				return false;
+			}
+			LOGGER.severe(e.toString());
+			setError(AppletMessages.getString("SignApplet.65")); //$NON-NLS-1$
+			return false;
+		}
+		catch (final OutOfMemoryError e) {
+			LOGGER.severe("Error de falta de memoria durante el ensobrado: " + e); //$NON-NLS-1$
+			setError(AppletMessages.getString("SignApplet.493")); //$NON-NLS-1$
+			return false;
+		}
+		return true;
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public boolean coEnvelop() {
+		LOGGER.info("Invocando coEnvelop"); //$NON-NLS-1$
+
+		// Reiniciamos el mensaje de error
+		this.setError(null);
+
+		// Leemos los datos
+		final byte[] envelop;
+		try {
+			envelop = SignApplet.this.getInData();
+		}
+		catch (final AOException e) {
+			// El metodo getInDataStream ya se habra encargado de establecer el
+			// mensaje en caso de error
+			return false;
+		}
+
+		this.enveloperManager.setKsConfigManager(this.ksConfigManager);
+		this.enveloperManager.setCipherManager(this.cipherManager);
+
+		try {
+			this.data = AccessController.doPrivileged(new CoEnvelopAction(this.enveloperManager, envelop));
+		} catch (final PrivilegedActionException e) {
+			if (e.getCause() instanceof AOCancelledOperationException) {
+				setError(AppletMessages.getString("SignApplet.68")); //$NON-NLS-1$
+				LOGGER.severe(e.toString());
+				return false;
+			}
+			setError(AppletMessages.getString("SignApplet.0")); //$NON-NLS-1$
+			LOGGER.severe(e.toString());
+			return false;
+		}
+		return true;
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public boolean recoverCMS() {
+		LOGGER.info("Invocando recoverCMS"); //$NON-NLS-1$
+
+		// Reiniciamos el mensaje de error
+		this.setError(null);
+
+		final byte[] contentData;
+		try {
+			contentData = this.data != null ? this.data : getInData();
+		}
+		catch (final AOException e) {
+			return false; // getInData() establece el mensaje en caso de error
+		}
+
+		this.enveloperManager.setKsConfigManager(this.ksConfigManager);
+		this.enveloperManager.setCipherManager(this.cipherManager);
+
+		try {
+			this.data = AccessController.doPrivileged(new UnwrapAction(this.enveloperManager, contentData));
+		} catch (final PrivilegedActionException e) {
+			if (e.getCause() instanceof AOCancelledOperationException) {
+				LOGGER.severe(e.toString());
+				setError(AppletMessages.getString("SignApplet.68")); //$NON-NLS-1$
+				return false;
+			} else if (e.getCause() instanceof AOInvalidRecipientException) {
+				LOGGER.severe(e.toString());
+				setError(AppletMessages.getString("SignApplet.112")); //$NON-NLS-1$
+				return false;
+			} else if (e.getCause() instanceof AOInvalidFormatException) {
+				LOGGER.severe(e.toString());
+				setError(AppletMessages.getString("SignApplet.75")); //$NON-NLS-1$
+				return false;
+			} else {
+				LOGGER.severe(e.toString());
+				setError(AppletMessages.getString("SignApplet.77")); //$NON-NLS-1$
+				return false;
+			}
+		}
+		catch (final OutOfMemoryError e) {
+			LOGGER.severe("Error de falta de memoria al recuperar desensobrar: " + e); //$NON-NLS-1$
+			setError(AppletMessages.getString("SignApplet.493")); //$NON-NLS-1$
+			return false;
+		}
+		return true;
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public String formatEncryptedCMS(final String b64) {
+		LOGGER.info("Invocando formatEncryptedCMS"); //$NON-NLS-1$
+		return SignApplet.getCMSInfo(b64);
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public String formatEnvelopedCMS(final String b64) {
+		LOGGER.info("Invocando formatEnvelopedCMS"); //$NON-NLS-1$
+		return SignApplet.getCMSInfo(b64);
+	}
+
+	/** Recupera la informaci&oacute;n de un objeto CMS reconocido. Si ocurre un
+	 * error durante el proceso, se devuelve cadena vac&iacute;a.
+	 * @param b64
+	 *        Objeto CMS en base 64.
+	 * @return Informaci&oacute;n del objeto CMS introducido. */
+	private static String getCMSInfo(final String b64) {
+		try {
+			return EnveloperManager.getCMSInfo(Base64.decode(b64));
+		} catch (final Exception e) {
+			LOGGER.warning("Los datos insertados no estan en Base64: " + e); //$NON-NLS-1$
+			return null;
+		}
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public void setLdapConfiguration(final String address, final String port, final String root) {
+		LOGGER.info("Invocando setLdapConfiguration"); //$NON-NLS-1$
+		if (address == null) {
+			throw new IllegalArgumentException("No se ha indicado la URL del directorio LDAP"); //$NON-NLS-1$
+		}
+
+		// Si no se indica el puerto se toma el por defecto
+		if (port == null) {
+			LOGGER.warning("No se ha indicado el puerto para la configuracion del LDAP, se utilizara el puerto " + DEFAULT_LDAP_PORT); //$NON-NLS-1$
+			this.ldapServerPort = DEFAULT_LDAP_PORT;
+		}
+		else {
+			try {
+				this.ldapServerPort = Integer.parseInt(port);
+				if (this.ldapServerPort < 1 || this.ldapServerPort > 65535) {
+					throw new IllegalArgumentException("Numero de puerto no valido, el numero de puerto debe estar entre 1 y 65535"); //$NON-NLS-1$
+				}
+			}
+			catch (final Exception e) {
+				LOGGER.warning("No se ha insertado un numero de puerto valido para el LDAP, se usara el puerto " + DEFAULT_LDAP_PORT + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$
+				this.ldapServerPort = DEFAULT_LDAP_PORT;
+			}
+		}
+
+		this.ldapServerUrl = ""; //$NON-NLS-1$
+		this.ldapServerUrl += address;
+		// ldapRootPath = (root == null || root.trim().length() == 0) ? null :
+		// root;
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public void setLdapCertificatePrincipal(final String ldapCertificatePrincipal) {
+		LOGGER.info("Invocando setLdapCertificatePrincipal con el parametro: " + ldapCertificatePrincipal); //$NON-NLS-1$
+		this.ldapCertificatePrincipal = ldapCertificatePrincipal != null && ldapCertificatePrincipal.length() > 0 ? ldapCertificatePrincipal : null;
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public String getLdapCertificate() {
+		LOGGER.info("Invocando getLdapCertificate()"); //$NON-NLS-1$
+		return AccessController.doPrivileged(new java.security.PrivilegedAction<String>() {
+			/** {@inheritDoc} */
+			@Override
+			public String run() {
+
+				final X509Certificate cert;
+
+				// Si se ha establecido la direccion LDAP del
+				// certificado, se descarga; si no
+				// se muestra un navegador LDAP para seleccionarlo y
+				// descargarlo
+				if (SignApplet.this.getLdapCertificatePrincipal() != null) {
+					try {
+						cert =
+							LdapUtils.getCertificate(SignApplet.this.getLdapServerUrl(),
+									SignApplet.this.getLdapServerPort(),
+									SignApplet.this.getLdapCertificatePrincipal());
+					}
+					catch (final Exception e) {
+						getLogger().severe("Error al recuperar el certificado '" + SignApplet.this.getLdapCertificatePrincipal() + "' del directorio LDAP: " + e); //$NON-NLS-1$ //$NON-NLS-2$
+						setError(AppletMessages.getString("SignApplet.74") + SignApplet.this.getLdapCertificatePrincipal()); //$NON-NLS-1$
+						return null;
+					}
+				}
+
+				else {
+					getLogger().severe("No se especifico el Principal del certificado que se desea seleccionar"); //$NON-NLS-1$
+					return null;
+				}
+
+				// Devolvemos el certificado codificado en Base64
+				try {
+					return Base64.encode(cert.getEncoded());
+				}
+				catch (final Exception e) {
+					getLogger().severe("Error al codificar el certificado recuperado del directorio LDAP : " + e); //$NON-NLS-1$
+					setError(AppletMessages.getString("SignApplet.83")); //$NON-NLS-1$
+					return null;
+				}
+			}
+		});
 	}
 }

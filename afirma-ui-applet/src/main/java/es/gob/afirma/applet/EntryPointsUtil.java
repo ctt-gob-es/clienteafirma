@@ -166,12 +166,40 @@ interface EntryPointsUtil {
      * @param b64
      *        Texto en base 64. <br>
      *        Text in base 64.
+     * @return Texto decodificado. <br>
+     *         Decoded text.
+     * @deprecated Utilizar <code>getTextFromBase64(String b64, String charsetName)</code>*/
+    @Deprecated
+	String getTextFromBase64(String b64);
+
+    /** Decodifica un texto en base 64. Si se produce alg&uacute;n error se
+     * devuelve <code>null</code>. <br>
+     * <br>
+     * Decodes a text in base 64. If an error occurs, <code>null</code> is
+     * returned.
+     * @param b64
+     *        Texto en base 64. <br>
+     *        Text in base 64.
      * @param charsetName
      *        Juego de caracteres. <br>
      *        Charset.
      * @return Texto decodificado. <br>
      *         Decoded text.*/
     String getTextFromBase64(String b64, String charsetName);
+
+    /** Codifica un texto plano a base 64. Si se produce alg&uacute;n error se
+     * devuelve <code>null</code>. <br>
+     * <br>
+     * Encodes plain text to base 64. If an error occurs, <code>null</code> is
+     * returned.
+     * @param plainText
+     *        Texto plano. <br>
+     *        Plain Text.
+     * @return Texto codificado. <br>
+     *         Encoded Text.
+     * @deprecated Utilizar <code>getBase64FromText(String plainText, String charsetName)</code>*/
+    @Deprecated
+    String getBase64FromText(String plainText);
 
     /** Codifica un texto plano a base 64. Si se produce alg&uacute;n error se
      * devuelve <code>null</code>. <br>

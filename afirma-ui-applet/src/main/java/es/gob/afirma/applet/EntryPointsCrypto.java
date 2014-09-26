@@ -1093,16 +1093,6 @@ interface EntryPointsCrypto {
      *        Hash en base 64 que se desea firmar. */
     void setHash(final String hash);
 
-    /** Devuelve los datos establecidos como entrada para la operaci&oacute;n de
-     * firma. En caso de no haberse establecido ning&uacute;n dato, se devuelve
-     * cadena vac&iacute;a. <br>
-     * <br>
-     * Returns the input Base64 data. If no data is established, empty string is
-     * returned.
-     * @return Cadena en Base 64. <br>
-     *         String in base 64. */
-    String getB64Data();
-
     /** Ruta al fichero en el que se ha guardado la firma. Esta direcci&oacute;n
      * puede hacerse establecido program&aacute;ticamente mediante <code>setOutFilePath(String)</code>
      * o mediante la interfaz que aparece cuando no hay un valor asignado. Una vez se establece el valor
@@ -1581,6 +1571,10 @@ interface EntryPointsCrypto {
      * <li><b>P12</b>: Repositorios en disco en formato P12 o PFX.</li>
      * <li><b>JKS</b>: Repositorios en disco en formato JKS.</li>
      * <li><b>JAVACE</b>: Repositorios en disco en formato Java Case Exact.</li>
+     * <li><b>WINADDRESSBOOK</b>: Repositorio "Otras Personas" de Windows.</li>
+     * <li><b>SINGLE</b>: Certificado suelto en disco.</li>
+     * <li><b>WINDOWS-CA</b>: Repositorio de Autoridades Intermedias de Certificaci&oacute;n de Windows.</li>
+     * <li><b>WINDOWS-ROOT</b>: Repositorio de Certificados Raiz de Windows.</li>
      * </ul>
      * Se recomienda utilizar {@code initialize()} antes de usar este
      * m&eacute;todo. <br>
@@ -1599,6 +1593,10 @@ interface EntryPointsCrypto {
      * <li><b>P12</b>: Repositories on disk, under P12 or PFX formats.</li>
      * <li><b>JKS</b>: Repositories on disk, under JKS format.</li>
      * <li><b>JAVACE</b>: Repositories on disk, under Java Case Exact format.</li>
+     * <li><b>WINADDRESSBOOK</b>: "Other People" Windows repository.</li>
+     * <li><b>SINGLE</b>: Loose certificate on disk.</li>
+     * <li><b>WINDOWS-CA</b>: Windows Intermediate Certification Authorities Repository.</li>
+     * <li><b>WINDOWS-ROOT</b>: Windows Root Certificates Repository.</li>
      * </ul>
      * It's recommended use {@code initialize()} previously.<br>
      * @param path
@@ -1842,4 +1840,750 @@ interface EntryPointsCrypto {
      *         the keystore) */
     String showCertSelectionDialog();
 
+    // ------------------- FUNCIONES DE CIFRADO SIMETRICO --------------
+
+ // *******************************************************************/
+    // ***************** FUNCIONALIDADES DE CIFRADO **********************/
+    // ***************** ENCRYPTION FUNCTIONALITIES **********************/
+    // *******************************************************************/
+
+    /** Cifra los datos indicados mediante el m&eacute;todo setPlainData(String).
+     * Si no se le indica algoritmo de cifrado, modo de bloque y el padding, se
+     * usar&aacute; la configuracion por defecto. Puede establecerse el modo de
+     * clave con <code>setKeyMode(String)</code> para seg&uacute;n deseemos clave
+     * autogenerada, clave manual o contrase&ntilde;a. Los datos se pueden
+     * recuperar con <code>getCipherData()</code> y almacenar en disco con
+     * <code>saveCipherDataToFile(String)</code>.<br>
+     * <br>
+     * Encrypts indicated data by setPlainData(String) method. If no encryption
+     * algorithm, block mode and padding is indicated, default configuration
+     * will be used. Key mode can be set with <code>setKeyMode(String)</code>, if
+     * either self-generated, manual, or password key is desired. Data can be
+     * retrieved with <code>getCipherData()</code> and stored to disk with
+     * <code>saveCipherDataToFile(String)</code>.
+     * @return true si la operaci&oacute;n se realiz&oacute; con &eacute;xito,
+     *         false en caso contrario. <br>
+     *         true if operation successful. Else, false. */
+    boolean cipherData();
+
+    /** Cifra el fichero especificado. El resultado de esta operaci&oacute;n es
+     * el mismo que el de ejecutar el m&eacute;todo <code>cipherData()</code> tras
+     * haber indicado un fichero con <code>setFileuri(String)</code>. No puede
+     * recuperarse la ruta de fichero mediante getFileUsedPath(). <br>
+     * Se muestra un di&aacute;logo al usuario para que consienta la operaci&oacute;n.
+     * Si no lo hace, se aborta la operaci&oacute;n y se establece un error.<br>
+     * <br>
+     * Encrypts the specified file. This operation's result is equivalent to
+     * executing <code>cipherData()</code> method, after indicating a file with <code>setFileuri(String)</code>. The files path cant recovered using
+     * getFileUsedPath() method.
+     * @param fileUri
+     *        Fichero de datos a cifrar <br>
+     *        Data file to encrypt.
+     * @return true si la operaci&oacute;n se efectu&oacute; con &eacute;xito <br>
+     *         true if operation successful. */
+    boolean cipherFile(String fileUri);
+
+    /** Realiza una operaci&oacute;n de descifrado de datos. Los datos a
+     * descifrar pueden establecerse en base 64 mediante el m&eacute;todo <code>setCipherData(String)</code> o, de tratarse de un fichero, a
+     * trav&eacute;s de <code>setFileuri(String)</code>. La configuraci&oacute;n de
+     * cifrado que se utiliz&oacute; para los datos debe indicarse por medio del
+     * m&eacute;todo <code>setCipherAlgorithm(String)</code> que puede contener el
+     * algoritmo de cifrado &uacute;nicamente o la configuraci&oacute;n completa
+     * de algoritmo de cifrado, modo de bloque y padding, con los datos
+     * separados por una barra ('/'). Por ejemplo:
+     * <ul>
+     * <li>AES</li>
+     * <li>AES/ECB/PKCS5PADDING</li>
+     * </ul>
+     * Seg&uacute;n el algoritmo de cifrado deberemos indicar mediante el
+     * m&eacute;todo <code>setKeyMode(String)</code> y es necesaria una clave de
+     * cifrado, introducida en base 64 mediante <code>setKey(String)</code>, o una
+     * contrase&ntilde;a que el propio usuario deber&aacute; establecer a
+     * trav&eacute;s de un di&aacute;logo modal que se le
+     * presentar&aacute;.<br/> El resultado de la operaci&oacute;n puede
+     * recuperarse con <code>getPlainData()</code> o salvarse directamente a disco
+     * con <code>savePlainDataToFile(String)</code>. <br>
+     * <br>
+     * Performs a decryption operation. Data to decrypt may be set in base 64
+     * with the <code>setCipherData(String)</code> method or, if a file, with <code>setFileuri(String)</code>. Encryption configuration used for the data
+     * must be indicated with <code>setCipherAlgorithm(String)</code> method which
+     * may contain the encryption algorithm only, or the complete encryption
+     * algorithm configuration, block mode, and padding, with data separated by
+     * a slash ('/'). E.g.:
+     * <ul>
+     * <li>AES</li>
+     * <li>AES/ECB/PKCS5PADDING</li>
+     * </ul>
+     * According to the encryption algorithm, the <code>setKeyMode(String)</code> must be used, and a mandatory encryption key in base 64 must be
+     * introduced with <code>setKey(String)</code>, or a password set by user with a
+     * modal dialog that will be displayed.<br/> Operation's result may be
+     * retrieved with <code>getPlainData()</code> or be directly saved to disk with <code>savePlainDataToFile(String)</code>.
+     * @return true si la operaci&oacute;n finaliz&oacute; con &eacute;xito,
+     *         false en caso contrario. <br>
+     *         true if operation successful. Else, false. */
+    boolean decipherData();
+
+    /** Desencripta el fichero indicado. La configuraci&oacute;n de cifrado que
+     * se utiliz&oacute; para los datos debe indicarse por medio del
+     * m&eacute;todo <code>setCipherAlgorithm(String)</code> que puede contener el
+     * algoritmo de cifrado &uacute;nicamente o la configuraci&oacute;n completa
+     * de algoritmo de cifrado, modo de bloque y padding, con los datos
+     * separados por una barra ('/'). Por ejemplo:
+     * <ul>
+     * <li>AES</li>
+     * <li>AES/ECB/PKCS5PADDING</li>
+     * </ul>
+     * Seg&uacute;n el algoritmo de cifrado deberemos indicar mediante el
+     * m&eacute;todo <code>setKeyMode(String)</code> y es necesaria una clave de
+     * cifrado, introducida en base 64 mediante <code>setKey(String)</code>, o una
+     * contrase&ntilde;a que el propio usuario deber&aacute; establecer a
+     * trav&eacute;s de un di&aacute;logo modal que se le
+     * presentar&aacute;.<br/> El resultado de la operaci&oacute;n puede
+     * recuperarse con <code>getPlainData()</code> o salvarse directamente a disco
+     * con <code>savePlainDataToFile(String)</code>. <br>
+     * Se muestra un di&aacute;logo al usuario para que consienta la operaci&oacute;n.
+     * Si no lo hace, se aborta la operaci&oacute;n y se establece un error.<br/>
+     * <br>
+     * Decrypts indicated file. Encryption configuration used for data must be
+     * indicated with <code>setCipherAlgorithm(String)</code> method, which may
+     * include the encryption algorithm only, or the complete encryption
+     * algorithm configuration, block mode and padding, with data separated by a
+     * slash ('/'). Example:
+     * <ul>
+     * <li>AES</li>
+     * <li>AES/ECB/PKCS5PADDING</li>
+     * </ul>
+     * According to the encryption algorithm, the <code>setKeyMode(String)</code> method must be used, and a mandatory encryption key in base 64 must be
+     * introduced with <code>setKey(String)</code>, or a password set by user with a
+     * modal dialog that will be displayed.<br/> Operation's result may be
+     * retrieved with <code>getPlainData()</code> or be directly saved to disk with <code>savePlainDataToFile(String)</code>.
+     * @param fileUri
+     *        Archivo de datos a descifrar <br>
+     *        Data file to decrypt.
+     * @return true si la operaci&oacute;n finaliz&oacute; con &eacute;xito,
+     *         false en caso contrario. <br>
+     *         true if operation successful. Else, false. */
+    boolean decipherFile(String fileUri);
+
+    /** Devuelve la clave de cifrado actualmente en uso en Base64. Si se acaba de
+     * realizar alguna acci&oacute;n se devolver&aacute; la clave utilizada para
+     * esta accion. En caso contrario, se devolver&aacute; la clave de entrada
+     * (para el caso de clave manual) o null. <br>
+     * <br>
+     * Returns the current encryption key in Base64. Si an action has just been
+     * executed, the key for this action will be returned. Else, the input key
+     * (in case of manual key) or null will be returned.
+     * @return Clave en Base64. <br>
+     *         Key in Base64 */
+    String getKey();
+
+    /** Define una nueva clave sim&eacute;trica para para el cifrado cuando el
+     * modo de cifrado es mediante clave introducida por el usuario. Debe ser
+     * especificada en base64, igual que ser&aacute; obtenida mediante <code>getKey()</code>.
+     * @param newKey
+     *        Clave en base64. */
+    void setKey(String newKey);
+
+    /** Establece la cadena de texto usada como contrase&ntilde;a para el cifrado
+     * de datos. Este m&eacute;todo debe usarse estableciendo el modo de clave
+     * para el uso de contrase&ntilde;as y acompa&ntilde;ado de un algoritmo de
+     * cifrado preparado para su uso con contrase&ntilde;as. La
+     * contrase&ntilde;a debe ser una cadena ASCII v&aacute;lida. <br>
+     * <br>
+     * Sets the text string used as password for data encryption. The use of
+     * this method requires setting the key mode for password use, and an
+     * encryption algorithm suitable for use with passwords. Password must be a
+     * valid ASCII string.
+     * @param password
+     *        Cadena de texto usada como contrase&ntilde;a. <br>
+     *        Text string used as password.
+     * @return Devuelve <code>true</code> si la contrase&ntilde;a es
+     *         v&aacute;lida, <code>false</code> en caso contrario. <br>
+     *         Returns <code>true</code> if password is valid. Else, <code>false</code>. */
+    boolean setPassword(String password);
+
+    /** Devuelve la cadena de texto usada como password en la &uacute;ltima
+     * operaci&oacute;n de cifrado. <br>
+     * <br>
+     * Returns the text string used as a password in the last encryption
+     * operation.
+     * @return String Password o, si no se ha establecido una, nulo. <br>
+     *         String password or, if none, null. */
+    String getPassword();
+
+    /** Especifica el algoritmo a utilizar para la
+     * encriptaci&oacute;n/desencriptaci&oacute;n sim&eacute;trica.<br/>
+     * Se utiliza tanto en la encriptaci&oacute;n simple como en la
+     * generaci&oacute;n de sobres digitales.<br/>
+     * En caso de requerir el algoritmo algun tipo de configuraci&oacute;n de
+     * modo de clave y padding se podr&aacute; pasar junto a su nombre separados
+     * por '/' con el formato:
+     *
+     * <pre>
+     * <code>Algoritmo/Modo/Padding</code>
+     * </pre>
+     *
+     * Por ejemplo:
+     *
+     * <pre>
+     * <code>AES/ECB/PKCS5PADDING</code>
+     * </pre>
+     *
+     * <br/>
+     * Los algoritmos de cifrados aceptados son:<br/>
+     * Para los modos de cifrado con clave:
+     * <ul>
+     * <li>AES</li>
+     * <li>ARCFOUR</li>
+     * <li>Blowfish</li>
+     * <li>DESede</li>
+     * <li>DES</li>
+     * <li>RC2</li>
+     * </ul>
+     * Para los modos de cifrado con contrase&ntilde;a:
+     * <ul>
+     * <li>PBEWithSHA1AndDESede</li>
+     * <li>PBEWithSHA1AndRC2_40</li>
+     * <li>PBEWithMD5AndDES</li>
+     * </ul>
+     * <br>
+     * <br>
+     * Specifies the algorithm to be used for symmetric encryption/decryption.<br/>
+     * It may be used in both simple encryptions as in the generation of digital
+     * envelopes.<br/>
+     * If key mode and padding configuration are required by the algorithm, they
+     * may be provided next to its name, separated by '/' with the format:
+     *
+     * <pre>
+     * <code>Algorithm/Mode/Padding</code>
+     * </pre>
+     *
+     * Example:
+     *
+     * <pre>
+     * <code>AES/ECB/PKCS5PADDING</code>
+     * </pre>
+     *
+     * <br/>
+     * Accepted encryption algorithms are:<br/>
+     * To the cipher modes using keys:
+     * <ul>
+     * <li>AES</li>
+     * <li>ARCFOUR</li>
+     * <li>Blowfish</li>
+     * <li>DESede</li>
+     * <li>DES</li>
+     * <li>RC2</li>
+     * </ul>
+     * To the cipher modes using passphrases:
+     * <ul>
+     * <li>PBEWithSHA1AndDESede</li>
+     * <li>PBEWithSHA1AndRC2_40</li>
+     * <li>PBEWithMD5AndDES</li>
+     * </ul>
+     * @param algorithm
+     *        Algoritmo de encriptaci&oacute;n sim&eacute;trica <br>
+     *        Symmetric encryption algorithm */
+    void setCipherAlgorithm(String algorithm);
+
+    /** Devuelve el algoritmo sim&eacute;trico actualmente en uso.<br>
+     * Los algoritmos de cifrados aceptados son:<br/>
+     * Para los modos de cifrado con clave:
+     * <ul>
+     * <li>AES</li>
+     * <li>ARCFOUR</li>
+     * <li>Blowfish</li>
+     * <li>DESede</li>
+     * <li>DES</li>
+     * <li>RC2</li>
+     * </ul>
+     * Para los modos de cifrado con contrase&ntilde;a:
+     * <ul>
+     * <li>PBEWithSHA1AndDESede</li>
+     * <li>PBEWithSHA1AndRC2_40</li>
+     * <li>PBEWithMD5AndDES</li>
+     * </ul>
+     * <br>
+     * <br>
+     * Returns the symmetric algorithm currently in use.<br>
+     * Accepted encryption algorithms are:<br/>
+     * To the cipher modes using keys:
+     * <ul>
+     * <li>AES</li>
+     * <li>ARCFOUR</li>
+     * <li>Blowfish</li>
+     * <li>DESede</li>
+     * <li>DES</li>
+     * <li>RC2</li>
+     * </ul>
+     * To the cipher modes using passphrases:
+     * <ul>
+     * <li>PBEWithSHA1AndDESede</li>
+     * <li>PBEWithSHA1AndRC2_40</li>
+     * <li>PBEWithMD5AndDES</li>
+     * </ul>
+     * <br>
+     * <br>
+     * @return Algoritmo de cifrado. <br>
+     *         Encryption algorithm. */
+    String getCipherAlgorithm();
+    
+    /** Establece los los datos cifrados en base 64 que se van a descifrar
+     * mediante una pr&oacute;xima llamada a <code>decipherData()</code>. Si los datos son
+     * demasiado grandes, se obtendr&aacute; un error.<br>
+     * <br>
+     * Sets the encrypted data in base 64 to be decrypted by a call to <code>decipherData()</code>.
+     * If data is too large, a error will setting.
+     * @param data
+     *        Datos cifrados en base 64. <br>
+     *        Encrypted data in base 64. */
+    void setCipherData(String data);
+
+    /** Define los datos planos que se van a cifrar mediante una pr&oacute;xima
+     * llamada a <code>cipherData()</code>. <br>
+     * <br>
+     * Defines plain data to be encrypted by a call to <code>cipherData()</code>.
+     * @param data
+     *        Datos planos a cifrar. <br>
+     *        Plain data to be encrypted. */
+    void setPlainData(String data);
+
+    /** Devuelve los datos cifrados. Si se produce un error o no se han establecido datos cifrados, se
+     * devolver&aacute; <code>null</code> <br>
+     * <br>
+     * Returns the encrypted data. If the operation doesn't end succesfully or no encrypted data have
+     * been set, <code>null</code> will be returned.
+     * @return String en Base64 con el texto cifrado. <br>
+     *         Base64 string, with the encrypted text. */
+    String getCipherData();
+
+    /** Devuelve los datos planos que se han introducido para cifrar o el texto
+     * resultado de un descifrado (lo &uacute;ltimo que haya ocurrido). En caso
+     * de ocurrir un error durante la operaci&oacute;n o no haber ocurrido ninguna
+     * de estas condiciones, se devolver&aacute; <code>null</code>. <br>
+     * <br>
+     * Returns the plain data that has been introduced to encrypt, or the text
+     * resulting from a decryption (whichever comes last). If the operation doesn't end succesfully or
+     * none of this conditions are met, <code>null</code> is returned.
+     * @return String Texto plano de la operaci&oacute;n de cifrado /
+     *         descifrado. <br>
+     *         Plain text string of the encryption/decryption operation. */
+    String getPlainData();
+
+    /** Devuelve el modo actual de generaci&oacute;n de clave. <br>
+     * <br>
+     * Returns the current key generation mode.
+     * @return Modo de generaci&oacute;n. <br>
+     *         Generation Mode. */
+    String getKeyMode();
+
+    /** Define el modo de obtenci&oacute;n de clave para cifrado / descifrado
+     * sim&eacute;trico. Los modos de obtenci&oacute;n de clave son:
+     * <ul>
+     * <li><b>GENERATEKEY:</b> El Cliente genera una clave de cifrado aleatoria.</li>
+     * <li><b>USERINPUT:</b> El usuario introduce una clave.</li>
+     * <li><b>PASSWORD:</b> El usuario introduce una contrase&tilde;a.</li>
+     * </ul>
+     * <br>
+     * <br>
+     * Defines the mode of acquiring a symmetric encryption/decryption key. Key
+     * acquiring modes are:
+     * <ul>
+     * <li><b>GENERATEKEY:</b> The Client generate a random cipher key.</li>
+     * <li><b>USERINPUT:</b> The user insert a cipher key.</li>
+     * <li><b>PASSWORD:</b> The user insert a password.</li>
+     * </ul>
+     * @param keyMode
+     *        Modo de obtenci&oacute;n de clave. <br>
+     *        Key acquiring mode. */
+    void setKeyMode(String keyMode);
+
+    /** Graba los datos cifrados en un fichero.  Se muestra un di&aacute;logo al usuario
+     * para que consienta la operaci&oacute;n. Si no lo hace, se aborta la operaci&oacute;n
+     * y se establece un error.<br>
+     * <br>
+     * Saves the encrypted data to a file.
+     * @param fileUri
+     *        Direcci&oacute;n del fichero en donde se desean guardar los
+     *        datos. <br>
+     *        Route to the storage file.
+     * @return Devuelve <code>true</code> si se ha realizado con &eacute;xito. <br>
+     *         Returns <code>true</code> if successful. */
+    boolean saveCipherDataToFile(String fileUri);
+
+    /** Guarda los datos descrifrados en una anterior operaci&oacute;n de
+     * desencriptado o el texto plano introducido anteriormente, seg&uacute;n
+     * sea lo &uacute;ltimo que ocurra, en un fichero especificado. <br>
+     * Se muestra un di&aacute;logo al usuario para que consienta la operaci&oacute;n.
+     * Si no lo hace, se aborta la operaci&oacute;n y se establece un error.<br>
+     * <br>
+     * Saves the data decrypted during a previous decryption operation or a
+     * previously entered plain text (whichever comes last) in a specified file.
+     * @param fileUri
+     *        Ruta del fichero donde guardar la informaci&oacute;n en plano. <br>
+     *        Route to the file where information is to be stored, in plain
+     *        text.
+     * @return true si los datos se guardaron correctamente. <br>
+     *         true if data was saved successfully. */
+    boolean savePlainDataToFile(String fileUri);
+
+    // ***************** USO DEL ALMACEN DE CLAVES DE CIFRADO *****************
+    // ************************ USE OF KEYSTORE *******************************
+    /** Establece si debe permitirse al usuario almacenar sus claves de cifrado
+     * en su almac&eacute;n asociado.
+     * Sets whether or not user may store encrption keys in the associated
+     * keystore.
+     * @param useKeyStore
+     *        Indica si se debe usar el almacen de claves. <br>
+     *        Indicates whether or not the keystore mut be used. */
+    void setUseCipherKeyStore(boolean useKeyStore);
+
+    // ------------------- FUNCIONES DE SOBRE ELECTRONICO --------------
+
+    /** Define la ubicaci&oacute;n de los certificados que se utilizar&aacute;n
+     * como receptores de un sobre digital. <br>
+     * <br>
+     * Defines the location of certificates that will be used as digital
+     * envelope's recipients.
+     * @param recipientsCertPath
+     *        Cadena de rutas a los ficheros, separados por 'retornos de
+     *        l&iacute;nea' ('\n'). <br>
+     *        String of routes to the files, separated by 'returns' ('\n'). */
+    void setRecipientsToCMS(String recipientsCertPath);
+
+    /** Agrega un nuevo destinatario, por medio de su certificado, a la lista de
+     * destinatarios a los que se enviar&aacute; un sobre digital. Este
+     * destinario se agrega a los que se hayan especificado por medio del
+     * m&eacute;todo <code>setRecipientsToCMS(String)</code> de tal forma que usar
+     * este m&eacute;todo no afectar&aacute; a los certificados introducidos
+     * mediante aquella funci&oacute;n y viceversa. Para eliminar un certificado
+     * de la lista agregado mediante este m&eacute;todo deber&aacute; usarse <code>removeRecipientToCMS(String)</code>. <br>
+     * <br>
+     * Adds a new recipient to list of recipients that will be sent a digital
+     * envelope, using the former's certificate. This recipient is added to
+     * those specified with <code>setRecipientsToCMS(String)</code>. Thus, the use
+     * of this method does not affect certificates introduced using that
+     * function, and viceversa. To eliminate a certificate added to the list
+     * with this method, <code>removeRecipientToCMS(String)</code> must be used.
+     * @param certB64
+     *        Certificado en base 64. <br>
+     *        Certificate in base 64. */
+    void addRecipientToCMS(String certB64);
+
+    /** Eliminar un destinatario de la lista de destinatarios a los que se
+     * enviar&aacute; un sobre digital siempre y cuando este se haya
+     * especificado mediante el m&eacute;todo <code>addRecipientToCMS(String)</code> . <br>
+     * <br>
+     * Eliminates a recipient from the list of recipients that will be sent a
+     * digital envelope, as long as it was specified with <code>addRecipientToCMS(String)</code>.
+     * @param certB64
+     *        Certificado en base 64 del destinatario que deseamos eliminar. <br>
+     *        Certificate in base 64, for the recipient desired for
+     *        ellimination. */
+    void removeRecipientToCMS(String certB64);
+
+    /** Crea un objeto CMS encriptado (sin informaci&oacute;n de clave, emisor o
+     * receptor) con los datos establecidos mediante <code>setData(String)</code> o <code>setFileuri(String)</code>. La configuraci&oacute;n del cifrado se
+     * establece con <code>setKeyMode(String)</code> para seleccionar el tipo de
+     * cifrado (por clave o por password) y, en caso de establecerse el uso de
+     * claves (valor por defecto) ser&aacute; obligatorio establecer una clave
+     * mediante <code>setKey(String)</code>. En cambio, la contrase&ntilde;a se
+     * pedir&aacute; siempre mediante una interfaz propia del cliente, sin
+     * posibilidad de introducirla program&aacute;ticamente. <br/>
+     * El algoritmo de cifrado se establecer&aacute; con <code>setCipherAlgorithm(String)</code>, el modo de bloque y el relleno
+     * siempre ser&aacute;n "CBC" y "PKCS#5 Padding" respectivamente. <br/>
+     * El resultado se puede recuperar mediante <code>getData()</code> en formato
+     * binario o mediante <code>getB64Data()</code> en base 64 y puede ser
+     * almacenado en un fichero mediante <code>saveCipherDataToFile(String)</code>. <br>
+     * <br>
+     * Creates an encrypted CMS object (w/o key, sender or recipient
+     * information) with the data set with <code>setData(String)</code> or <code>setFileuri(String)</code>. Encryption configuration is set with
+     * <code>setKeyMode(String)</code> to select the kind of encryption (key or
+     * password) and - if the default option of key is used - it will be
+     * mandatory that a key be set with <code>setKey(String)</code>. In contrast,
+     * passwords will always be requested via a client's propietary interface.
+     * No programmatic introduction is possible. <br/>
+     * The encryption algorith is set with <code>setCipherAlgorithm(String)</code>,
+     * block mode and fill will always be "CBC" y "PKCS#5 Padding",
+     * respectively. <br/>
+     * Results may be retrieved with <code>getB64Data()</code> in binary or with <code>getB64Data()</code> in base 64 and they may be stored in a file with
+     * <code>saveCipherDataToFile(String)</code>.
+     * @return <code>true</code> si la operaci&oacute;n se ha realizado con
+     *         &eacute;xito. <br>
+     *         <code>true</code>, if successul.
+     * @deprecated Sustituir por la configuraci&oacute;n del tipo de contenido
+     *             con <code>setCMSContentType(String)</code> y la generaci&oacute;n
+     *             de la estrutura mediante <code>buildCMSStructure()</code>.<br>
+     * <br>
+     *             Replace with the content type's configuration with <code>getCMSContentType(String)</code> and the structure
+     *             generation with <code>buildCMSStructure()</code>. */
+    @Deprecated
+    boolean buildCMSEncrypted();
+
+    /** Crea un objeto CMS AuthenticatedData con los datos establecidos mediante <code>setData(String)</code> o <code>setFileuri(String)</code>. <br>
+     * <br>
+     * Creates a CMS AuthenticatedData object with the data set with <code>setData(String)</code> or <code>setFileuri(String)</code>.
+     * @return <code>true</code> si la operaci&oacute;n se ha realizado con
+     *         &eacute;xito, <code>false</code> en caso contrario. <br>
+     *         <code>true</code> if successful. Else, <code>false</code>.
+     * @deprecated Sustituir por la configuraci&oacute;n del tipo de contenido
+     *             con <code>setCMSContentType(String)</code> y la generaci&oacute;n
+     *             de la estrutura mediante <code>buildCMSStructure()</code>.<br>
+     * <br>
+     *             Replace with the content type's configuration with <code>setCMSContentType(String)</code> and the structure
+     *             generation with <code>buildCMSStructure()</code>. */
+    @Deprecated
+    boolean buildCMSAuthenticated();
+
+    /** Crea un objeto CMS envuelto utilizando los datos introducidos con <code>setData(String)</code> o <code>setFileuri(String)</code> y los certificados
+     * indicados mediante <code>setRecipientsToCMS(String)</code> como receptores.
+     * Es obligatorio introducir al menos un receptor. Los datos del emisor se
+     * introducir&aacute; en el envoltorio si se ha establecido el certificado
+     * del emisor mediante <code>setSelectedCertificateAlias(String)</code>, en caso
+     * contrario no se incluir&aacute;. <br/>
+     * El resultado se podr&aacute; recuperar en base64 mediante <code>getB64Data()</code> y puede ser almacenado en un fichero mediante
+     * <code>saveDataToFile()</code>. <br>
+     * <br>
+     * Creates an enveloped CMS object, using the data set with <code>setData(String)</code> or <code>setFileuri(String)</code> and the
+     * certificates indicated with <code>setRecipientsToCMS(String)</code> as
+     * recipients. It is mandatory to set at least one recipient. Sender data
+     * will be set in the envelope if the sender certificate has been set with <code>setSelectedCertificateAlias(String)</code>. Else, it will not be
+     * included. <br/>
+     * Results may be retrieved in base 64 with <code>getB64Data()</code> and may be
+     * stored in a file with <code>saveDataToFile()</code>.
+     * @return Devuelve <code>true</code> si la operaci&oacute;n se ha realizado
+     *         con &eacute;xito. <br>
+     *         Returns <code>true</code> if successful.
+     * @deprecated Sustituir por la configuraci&oacute;n del tipo de contenido
+     *             con <code>setCMSContentType(String)</code> y la generaci&oacute;n
+     *             de la estrutura mediante <code>buildCMSStructure()</code> <br>
+     * <br>
+     *             Replace with the content type's configuration with <code>setCMSContentType(String)</code> and the structure
+     *             generation with <code>buildCMSStructure()</code> */
+    @Deprecated
+    boolean buildCMSEnveloped();
+
+    /** Crea la estructura CMS del tipo indicado con <code>setCMSContentType(String)</code>, por defecto "EnvelopedData".<br/>
+     * La estructura de datos se generar&aacute; a partir de los datons
+     * indicados mediante <code>setData(String)</code> o <code>setFileuri(String)</code> . Adicionalmente, cada estructura requiere la configuraci&oacute;n de
+     * los
+     * siguientes par&aacute;metros:<br/>
+     * <ul>
+     * <li><b>EncryptedData:</b> Estructura de datos cifrados simetricamente. Requiere establecer una configuraci&oacute;n de cifrado.</li>
+     * <li><b>EnvelopedData:</b> Estructura de datos envuelta (Sobre digital). Requiere que se le indiquen los destinatarios del mensaje y,
+     * opcionalmente, el remitente.</li>
+     * <li><b>SignedAndEnvelopedData:</b> Estructura de datos envuelta y firmada (Sobre digital firmado). Requiere que se le indiquen los
+     * destinatarios del mensaje y el remitente.</li>
+     * <li><b>AuthEnvelopedData:</b> Estructura de datos autenticada y envuelta (Sobre digital autenticado). Requiere que se le indiquen los
+     * destinatarios del mensaje y el remitente.</li>
+     * </ul>
+     * Los destinatarios se deber&aacute;n indicar mediante <code>setRecipientsToCMS(String)</code> y/o <code>addRecipientToCMS(String)</code> y
+     * <code>removeRecipientToCMS(String)</code>. El emisor puede indicarse mediante <code>setSelectedCertificateAlias(String)</code>. De no hacerlo y ser
+     * obligatorio, se presentar&aacute; un di&aacute;logo al usuario para su
+     * selecci&oacute;n. <br/>
+     * El resultado se podr&aacute; recuperar en base64 mediante <code>getB64Data()</code> y puede ser almacenado en un fichero mediante
+     * <code>saveDataToFile()</code>. <br>
+     * <br>
+     * Creates a CMS structure of the type indicated with <code>setCMSContentType(String)</code>. Default content type is
+     * "EnvelopedData".<br/>
+     * Data structure will be generated from the data set with <code>setData(String)</code> or <code>setFileuri(String)</code>. Moreover, each
+     * structure requires the configuration of the following parameters:<br/>
+     * <ul>
+     * <li><b>EncryptedData:</b> Symmetrically encrypted data structure. Requires setting an encryption configuration.</li>
+     * <li><b>EnvelopedData:</b> Enveloped data structure (Digital envelope). Requires message recipients and (optionally) the sender to be set.</li>
+     * <li><b>SignedAndEnvelopedData:</b> Enveloped and signed data structure (Signed digital envelope). Requires message's sender and recipients to
+     * be set.</li>
+     * <li><b>AuthEnvelopedData:</b> Authenticated and enveloped data structure (Authenticated digital envelope). Requires messages's recipients and
+     * sender to be set.</li>
+     * </ul>
+     * Recipients must be indicated with <code>setRecipientsToCMS(String)</code> and/or <code>addRecipientToCMS(String)</code> and
+     * <code>removeRecipientToCMS(String)</code>. Sender may be indicated with <code>setSelectedCertificateAlias(String)</code>. If no sender is indicated
+     * in mandatory cases, a dialog will be displayed, promting the user to
+     * select it. <br/>
+     * Results may me retrieved in base64 with <code>getB64Data()</code> and can be
+     * saved to a file with <code>saveDataToFile(String)</code>.
+     * @return Devuelve <code>true</code> si la operaci&oacute;n finaliz&oacute;
+     *         con &eacute;xito. <br>
+     *         Returns <code>true</code> if operation ended successfully. */
+    boolean buildCMSStructure();
+
+    /** Establece un tipo de contenido para la generaci&oacute;n de una
+     * estructura CMS. Los tipos de contenido soportados son:
+     * <ul>
+     * <li><b>EncryptedData:</b> Estructura de datos cifrados sim&eacute;tricamente.</li>
+     * <li><b>EnvelopedData:</b> Estructura de datos envuelta (Sobre digital).</li>
+     * <li><b>SignedAndEnvelopedData:</b> Estructura de datos envuelta y firmada (Sobre digital firmado).</li>
+     * <li><b>AuthEnvelopedData:</b> Estructura de datos autenticada y envuelta (Sobre digital autenticado)</li>
+     * </ul>
+     * <br>
+     * <br>
+     * Sets a type of contents for the generation of a CMS structure. Supported
+     * content types are:
+     * <ul>
+     * <li><b>EncryptedData:</b> Simmetrycally encrypted data structure.</li>
+     * <li><b>EnvelopedData:</b> Enveloped data structure (Digital envelope).</li>
+     * <li><b>SignedAndEnvelopedData:</b> Enveloped and Signed Data Structure (Signed digital envelope).</li>
+     * <li><b>AuthEnvelopedData:</b> Authenticated and enveloped data structure (Authenticated digital envelope)</li>
+     * </ul>
+     * @param contentType
+     *        Tipo de contenido. <br>
+     *        Type of contents. */
+    void setCMSContentType(String contentType);
+
+    /** Devuelve los datos generados en la &uacute;ltima operaci&oacute;n de
+     * envoltorio CMS codificados en Base 64. En caso de no haberse realizado
+     * ninguna operaci&oacute;n de este tipo se devuelve cadena vac&iacute;a. <br>
+     * <br>
+     * Returns data generated during the last base 64-encrypted enveloping
+     * operation. If no such operation has been executed, an empty string is
+     * returned.
+     * @return String en Base 64. <br>
+     *         String in base 64. */
+    String getB64Data();
+
+    /** Recupera el contenido de un sobre digital. El sobre se indicar&aacute;
+     * mediante una cadena en Base 64 con <code>setData</code> o mediante un
+     * fichero con <code>setFileuri</code>. <br/>
+     * En el caso de los sobre <code>EncryptedData</code>, puede indicarse si se
+     * cifr&oacute; con contrase&ntilde; o clave mediante el m&eacute;todo <code>setKeyMode(String)</code>, y esta con <code>setPassword(String)</code> o
+     * <code>etKey(String)</code>, respectivamente. <br/>
+     * En el caso de los sobres <code>EnvelopedData</code> y <code>SignedAndEnvelopedData</code> se puede indicar el certificado para
+     * descifrar mediante el m&eacute;todo <code>setSelectedCertificateAlias(String)</code>. <br/>
+     * El resultado se podr&aacute; recuperar en base64 mediante <code>getB64Data()</code> y puede ser almacenado en un fichero mediante
+     * <code>saveDataToFile()</code>.<br>
+     * <br>
+     * Recovers a digital envelope's contents. Envelope will be indicated with a
+     * base 64 string with <code>setData</code> or w<code>setFileuri</code>. <br/>
+     * In the case of <code>EncryptedData</code> envelopes, it may be indicated
+     * whether password or key was used for encryption with <code>setKeyMode(String)</code> method. In turn, these may be set with
+     * <code>setPassword(String)</code> or <code>setKey(String)</code>, respectively. <br/>
+     * In case of <code>EnvelopedData</code> and <code>SignedAndEnvelopedData</code> envelopes certificate for decryption
+     * may be set with <code>setSelectedCertificateAlias(String)</code>. <br/>
+     * Results can be retrieved in base 64 with <code>getB64Data()</code> and can be
+     * saved to a file with <code>saveDataToFile()</code>.
+     * @return true si la operaci&oacute;n fue correcta. <br>
+     *         true if successful. */
+    boolean recoverCMS();
+
+    /** Formatea el objeto DER en Base64 especificado en la llamada y devuelve
+     * una cadena con los objetos CMS contenidos. Si el datos no est&aacute;
+     * codificado en base 64 o no es un dato CMS se devuelve cadena
+     * vac&iacute;a. <br>
+     * <br>
+     * Formats the DER object specified in the call in Base 64 and returns a
+     * string with the included CMS objects. If data is not encrypted in base 64
+     * or is not CMS data, an emppty string is returned.
+     * @param b64
+     *        Objeto DER en Base64. <br>
+     *        DER object in base 64.
+     * @return Cadena correspondiente al objeto CMS. <br>
+     *         String for the CMS object. */
+    String formatEnvelopedCMS(String b64);
+
+    /** Formatea el objeto DER en Base64 especificado en la llamada y devuelve
+     * una cadena con los objetos CMS contenidos. Si el datos no est&aacute;
+     * codificado en base 64 o no es un dato CMS se devuelve cadena
+     * vac&iacute;a. <br>
+     * <br>
+     * Formats the Base 64 DER object specified in the call, and returns a
+     * string with the included CMS objects. If data is not encrypted in base 64
+     * or is not CMS data, an empty string is returned.
+     * @param b64
+     *        Objeto DER en Base64. <br>
+     *        DER object, in base 64.
+     * @return Cadena correspondiente al objeto CMS. <br>
+     *         String for the CMS object. */
+    String formatEncryptedCMS(String b64);
+
+    /** Firma y empaqueta en un sobre digital los datos especificados por <code>setData(String)</code> o <code>setFileuri(String)</code>. El resultado puede
+     * ser recuperado mediante <code>getB64Data()</code> <br>
+     * <br>
+     * Signs and packs in a digital envelope the digital data specified by <code>setData(String)</code>. Results can be retrieved with
+     * <code>getB64Data()</code> or <code>setFileuri(String)</code>.
+     * @return true si la operaci&oacute;n se ha efectuado correctamente <br>
+     *         true if successful. */
+    boolean signAndPackData();
+
+    /** Firma y empaqueta en un sobre digital el fichero especificado por uri. El
+     * resultado puede ser recuperado mediante <code>getB64Data()</code>.
+     * Se muestra un di&aacute;logo al usuario para que consienta la operaci&oacute;n.
+     * Si no lo hace, se aborta la operaci&oacute;n y se establece un error.<br>
+     * <br>
+     * Signs and packs in a digital envelope the file specified by uri. Results
+     * can be retrieved with <code>getB64Data()</code>.
+     * @param uri
+     *        Localizaci&oacute;n en formato URI de los datos a firmar y
+     *        empaquetar <br>
+     *        Location in URI format of data to sign and pack.
+     * @return true si la operaci&oacute;n se ha efectuado correctamente <br>
+     *         true if successful. */
+    boolean signAndPackFile(String uri);
+
+    /** Agrega un nuevo remitente a un sobre electr&oacute;nico especificado
+     * mediante <code>setData(String)</code> o <code>setFileuri(String)</code>. El
+     * resultado puede ser recuperado mediante <code>getB64Data()</code>. <br>
+     * <br>
+     * Add a new sender in a digital envelope specified with <code>setData(String)</code> or <code>setFileuri(String)</code>. Results can be
+     * retrieved with <code>getB64Data()</code>.
+     * @return true si la operaci&oacute;n se ha efectuado correctamente. <br>
+     *         true if successful. */
+    boolean coEnvelop();
+
+    // ************* SELECCION DE DESTINATARIO DESDE LDAP *******************/
+    // ************* RECIPIENT'S SELECTION FROM LDAP *******************/
+
+    /** Establece la configuraci&oacute;n necesaria para que el cliente conecte
+     * con un servidor LDAP. Si no se indica el puerto o se indica un
+     * par&aacute;metro err&oacute;neo, se usar&aacute; el puerto por defecto de
+     * LDAP. La direcci&oacute;n del LDAP es obligatoria. <br>
+     * <br>
+     * Sets the necessary configuration for the client to connect with an LDAP
+     * server. If no port is indicated, or a wrong parameter is given, LDAP
+     * default port will be used. LDAP address is mandatory.
+     * @param address
+     *        Direcci&oacute;n URL del LDAP (Actualmente, sin uso). <br>
+     *        LDAP URL address (currently not in use)
+     * @param port
+     *        Puerto a trav&eacute;s del que se realiza la conexi&oacute;n. <br>
+     *        Connection port.
+     * @param root
+     *        Direcci&oacute;n ra&iacute;z del LDAP. <br>
+     *        LDAP root address. */
+    void setLdapConfiguration(String address, String port, String root);
+
+    /** Establece el nombre "principal" del certificado que se desea recuperar. <br>
+     * <br>
+     * Sets the "principal" name of the certificate to retrieve.
+     * @param ldapCertificatePrincipal
+     *        Nombre "principal". <br>
+     *        "Main" name. */
+    void setLdapCertificatePrincipal(String ldapCertificatePrincipal);
+
+    /** Obtiene un certificado en base 64 de un servidor LDAP.<br/>
+     * Es necesario haber establecido previamente la configuraci&oacute;n del
+     * LDAP y los requisitos para identificar al certificado en cuesti&oacute;n. <br>
+     * <br>
+     * Retrieves a base 64 certificate from an LDAP server. It is necessary to
+     * previously establish LDAP configuration and the conditions to identify
+     * this certificate.
+     * @return Certificado descargado en base 64. <br>
+     *         Downloaded certificate in base 64. */
+    String getLdapCertificate();
+
+ // *******************************************************************//
+
+    /** Devuelve los datos generados en la &uacute;ltima operaci&oacute;n sin
+     * codificar. En caso de no haberse realizado ninguna operaci&oacute;n de
+     * este tipo se devuelve cadena vac&iacute;a. <br>
+     * <br>
+     * Returns unencrypted data generated in the last operation. If no such
+     * operation was executed, an empty string is returned.
+     * @return String de los datos de salida <br>
+     *         Output data string.
+     * @deprecated Operaci&oacute;n no recomendada ya que el resultado puede
+     *             variar seg&uacute;n la codificaci&oacute;n del sistema. <br>
+     *             This operation is discouraged, since results may vary
+     *             depending on system's coding. */
+    @Deprecated
+    String getData();
 }
