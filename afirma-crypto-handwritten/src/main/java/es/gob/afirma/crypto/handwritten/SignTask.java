@@ -1,10 +1,7 @@
 package es.gob.afirma.crypto.handwritten;
 
 import java.io.ByteArrayInputStream;
-import java.net.URI;
 import java.net.URL;
-import java.security.cert.CertificateFactory;
-import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -13,7 +10,6 @@ import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
@@ -21,7 +17,6 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.signers.tsp.pkcs7.TsaParams;
-import es.gob.afirma.signers.tsp.pkcs7.TsaRequestExtension;
 
 /** Tarea completa de firma manuscrita.
  * @author Astrid Idoate. */
@@ -200,7 +195,7 @@ public final class SignTask {
 		}
 		byte[] rawXml;
 		try {
-			rawXml = Base64.decode(xml);
+			rawXml = new String(Base64.decode(xml), "UTF-8").trim().getBytes(); //$NON-NLS-1$
 		}
 		catch(final Exception e) {
 			Logger.getLogger("es.gob.afirma").info("Los datos de entrada no estaban en Base64: " + e); //$NON-NLS-1$ //$NON-NLS-2$
@@ -208,58 +203,6 @@ public final class SignTask {
 		rawXml = xml.getBytes();
 		final Unmarshaller um = JAXBContext.newInstance(SignTask.class).createUnmarshaller();
 		return (SignTask) um.unmarshal(new ByteArrayInputStream(rawXml));
-	}
-
-	public static void main(final String[] args) throws Exception {
-
-		final TsaParams tsaParams = new TsaParams(
-			true,
-			"4.3.2.1", //$NON-NLS-1$
-			new URI("http://kaka.ka"), //$NON-NLS-1$
-			"user", //$NON-NLS-1$
-			"password", //$NON-NLS-1$
-			new TsaRequestExtension[] { new TsaRequestExtension("1.2.3.4", false, new byte[] { (byte) 0xff, (byte) 0xfa }) }, //$NON-NLS-1$
-			"SHA-512", //$NON-NLS-1$
-			new byte[] { 0x00, 0x01, 0x02, 0x03 },
-			"p12password" //$NON-NLS-1$
-		);
-
-		final SingleBioSignData sbd = new SingleBioSignData(
-			new SignerInfoBean("Astrid", "Idoate", "Gil", "12345678Z"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-			"<html><body><h1>HOLA</h1></body></html>", //$NON-NLS-1$
-			null,
-			new Rectangle(10, 10, 100, 100),
-			new Rectangle(50, 30, 200, 75),
-			1
-		);
-		final List<SingleBioSignData> signs = new ArrayList<SingleBioSignData>(1);
-		signs.add(sbd);
-
-		final Map<String, String> p = new ConcurrentHashMap<String, String>();
-		p.put("clave", "valor"); //$NON-NLS-1$ //$NON-NLS-2$
-
-		final SignTask st = new SignTask(
-			tsaParams,
-			new URL("http://www.google.com/"), //$NON-NLS-1$
-			new URL("http://www.ibm.es"), //$NON-NLS-1$
-			"data", //$NON-NLS-1$
-			Base64.encode(
-				((X509Certificate) CertificateFactory.getInstance("X.509").generateCertificate( //$NON-NLS-1$
-					TestBioSigner.class.getResourceAsStream("/democert.cer") //$NON-NLS-1$
-				)).getEncoded()
-			),
-			signs,
-			true,
-			p
-		);
-
-		final Marshaller m = JAXBContext.newInstance(SignTask.class).createMarshaller();
-	    m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-	    m.marshal(st, System.out);
-
-	    System.out.println();
-	    System.out.println(st.toString());
-
 	}
 
 }
