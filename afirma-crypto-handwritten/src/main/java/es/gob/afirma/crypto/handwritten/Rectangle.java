@@ -17,6 +17,15 @@ public final class Rectangle {
 	/** Alto del rect&aacute;ngulo. */
 	public final int height;
 
+	/** Constructor de uso restringido a la serializaci&oacute;n JAXB. */
+	@SuppressWarnings("unused")
+	private Rectangle() {
+		this.x = 0;
+		this.y = 0;
+		this.width = 0;
+		this.height = 0;
+	}
+
 	/** Crea un rect&aacute;ngulo.
 	 * @param x Coordenada horizontal de a esquina superior izquierda del rect&aacute;ngulo
 	 * @param y Coordenada vertical de a esquina superior izquierda del rect&aacute;ngulo

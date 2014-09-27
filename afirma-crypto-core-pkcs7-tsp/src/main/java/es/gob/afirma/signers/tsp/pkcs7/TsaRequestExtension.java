@@ -46,4 +46,12 @@ public final class TsaRequestExtension {
 	byte[] getValue() {
 		return this.value.clone();
 	}
+
+	/** Constructor de uso restringido a la serializaci&oacute;n JAXB. */
+	@SuppressWarnings("unused")
+	private TsaRequestExtension() {
+		this.oid = null;
+		this.critical = false;
+		this.value = null;
+	}
 }

@@ -230,4 +230,20 @@ public final class TsaParams {
 	public String getSslPkcs12FilePassword() {
 		return this.sslPkcs12FilePassword;
 	}
+
+	/** Constructor de uso restringido a la serializaci&oacute;n JAXB. */
+	@SuppressWarnings("unused")
+	private TsaParams() {
+		// Para la serializacion JAXB
+        this.tsaURL = null;
+        this.tsaPolicy = POLICY;
+        this.tsaUsr = null;
+        this.tsaPwd = null;
+        this.extensions = null;
+        this.tsaHashAlgorithm = DEFAULT_DIGEST_ALGO;
+        this.sslPkcs12File = null;
+        this.sslPkcs12FilePassword = null;
+        this.tsaRequireCert = true;
+	}
+
 }

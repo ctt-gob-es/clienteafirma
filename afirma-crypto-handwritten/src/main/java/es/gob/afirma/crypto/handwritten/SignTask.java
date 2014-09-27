@@ -229,7 +229,8 @@ public final class SignTask {
 			"<html><body><h1>HOLA</h1></body></html>", //$NON-NLS-1$
 			null,
 			new Rectangle(10, 10, 100, 100),
-			new Rectangle(50, 30, 200, 75)
+			new Rectangle(50, 30, 200, 75),
+			1
 		);
 		final List<SingleBioSignData> signs = new ArrayList<SingleBioSignData>(1);
 		signs.add(sbd);

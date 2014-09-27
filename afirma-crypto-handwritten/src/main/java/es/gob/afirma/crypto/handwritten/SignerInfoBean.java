@@ -23,6 +23,15 @@ public final class SignerInfoBean {
 		return this.name + " " + this.surname1 + " " + (this.surname2 != null ? this.surname2 : "") + " (NIF: " + this.id + ")";  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 	}
 
+	/** Constructor de uso restringido a la serializaci&oacute;n JAXB. */
+	@SuppressWarnings("unused")
+	private SignerInfoBean() {
+		this.name = null;
+		this.surname1 = null;
+		this.surname2 = null;
+		this.id = null;
+	}
+
 	/** Crea los datos del firmante.
 	 * @param n Nombre.
 	 * @param s1 Primer apellido.

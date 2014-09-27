@@ -32,6 +32,9 @@ final class SingleBioSignData {
 	@XmlElement(name = "signatureRubricPositionOnPdf")
 	private final Rectangle signatureRubricPositionOnPdf;
 
+	@XmlElement(name = "signatureRubricPageOnPdf")
+	private final int signatureRubricPageOnPdf;
+
 	@Override
 	public String toString() {
 		return "Firma biometrica [id=" + this.id + "; signerData=" + this.signerData + "; htmlTemplate=" + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -47,6 +50,7 @@ final class SingleBioSignData {
 		this.jpegTemplate = null;
 		this.signatureArea = null;
 		this.signatureRubricPositionOnPdf = null;
+		this.signatureRubricPageOnPdf = 1;
 		this.id = UUID.randomUUID().toString();
 	}
 
@@ -54,7 +58,8 @@ final class SingleBioSignData {
 			                  final String template,
 			                  final byte[] bgJpegImage,
 			                  final Rectangle signatureRectOnPad,
-			                  final Rectangle signaturePositionOnPdf) {
+			                  final Rectangle signaturePositionOnPdf,
+			                  final int signaturePageOnPdf) {
 		if (signer == null) {
 			throw new IllegalArgumentException(
 				"Los datos del firmante no pueden ser nulos" //$NON-NLS-1$
@@ -66,6 +71,7 @@ final class SingleBioSignData {
 		this.signatureArea = signatureRectOnPad;
 		this.signatureRubricPositionOnPdf = signaturePositionOnPdf;
 		this.id = UUID.randomUUID().toString();
+		this.signatureRubricPageOnPdf = signaturePageOnPdf;
 	}
 
 	SignerInfoBean getSignerData() {
