@@ -73,7 +73,7 @@ import es.gob.afirma.standalone.ui.PolicyPanel.PolicyItem;
 
 final class PreferencesPanel extends JPanel implements KeyListener {
 
-    	private static final long serialVersionUID = -3168095095548385291L;
+	private static final long serialVersionUID = -3168095095548385291L;
 
 	private static final Preferences PREFERENCES = Preferences.userRoot();
 
@@ -170,11 +170,13 @@ final class PreferencesPanel extends JPanel implements KeyListener {
 	private final JTextField xadesSignerCertifiedRole = new JTextField(
 		PREFERENCES.get(PREFERENCE_XADES_SIGNER_CERTIFIED_ROLE, "") //$NON-NLS-1$
 	);
-	private final JComboBox xadesSignFormat = new JComboBox(new String[] {
-	  AOSignConstants.SIGN_FORMAT_XADES_ENVELOPING,
-      AOSignConstants.SIGN_FORMAT_XADES_DETACHED,
-      AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED
-	});
+	private final JComboBox xadesSignFormat = new JComboBox(
+		new String[] {
+	      AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED,
+		  AOSignConstants.SIGN_FORMAT_XADES_ENVELOPING,
+	      AOSignConstants.SIGN_FORMAT_XADES_DETACHED
+		}
+	);
 
 	private final JTabbedPane tabbedPane = new JTabbedPane();
 
@@ -432,14 +434,25 @@ final class PreferencesPanel extends JPanel implements KeyListener {
         gbc.gridy = 0;
 
         final List<PolicyPanel.PolicyItem> xadesPolicies = new ArrayList<PolicyPanel.PolicyItem>();
-        xadesPolicies.add(new PolicyPanel.PolicyItem(
+        xadesPolicies.add(
+    		new PolicyPanel.PolicyItem(
         		SimpleAfirmaMessages.getString("PreferencesPanel.25"), //$NON-NLS-1$
-        		POLICY_XADES_AGE_1_8));
-        xadesPolicies.add(new PolicyItem(
+        		POLICY_XADES_AGE_1_8
+    		)
+		);
+        xadesPolicies.add(
+    		new PolicyItem(
         		SimpleAfirmaMessages.getString("PreferencesPanel.73"), //$NON-NLS-1$
-        		POLICY_XADES_AGE_1_9));
+        		POLICY_XADES_AGE_1_9
+    		)
+		);
 
-        this.xadesPolicyPanel = new PolicyPanel(SIGN_FORMAT_XADES, xadesPolicies, getXadesPreferedPolicy(), null);
+        this.xadesPolicyPanel = new PolicyPanel(
+    		SIGN_FORMAT_XADES,
+    		xadesPolicies,
+    		getXadesPreferedPolicy(),
+    		this.xadesSignFormat
+		);
         this.xadesPolicyPanel.setModificationListener(this.modificationListener);
         this.xadesPolicyPanel.setKeyListener(this);
         panel.add(this.xadesPolicyPanel, gbc);
@@ -566,12 +579,16 @@ final class PreferencesPanel extends JPanel implements KeyListener {
 		this.signarureAlgorithms.getAccessibleContext().setAccessibleDescription(SimpleAfirmaMessages.getString("PreferencesPanel.46")); //$NON-NLS-1$
 		this.signarureAlgorithms.addItemListener(this.modificationListener);
 		this.signarureAlgorithms.addKeyListener(this);
-		this.signarureAlgorithms.setModel(new DefaultComboBoxModel(new String[] {
-			"SHA1withRSA", //$NON-NLS-1$
-			"SHA512withRSA", //$NON-NLS-1$
-			"SHA384withRSA", //$NON-NLS-1$
-			"SHA256withRSA" //$NON-NLS-1$
-		}));
+		this.signarureAlgorithms.setModel(
+			new DefaultComboBoxModel(
+				new String[] {
+					"SHA1withRSA", //$NON-NLS-1$
+					"SHA512withRSA", //$NON-NLS-1$
+					"SHA384withRSA", //$NON-NLS-1$
+					"SHA256withRSA" //$NON-NLS-1$
+				}
+			)
+		);
 		this.signarureAlgorithms.setSelectedItem(PreferencesPanel.PREFERENCES.get(PREFERENCE_SIGNATURE_ALGORITHM, "SHA1withRSA")); //$NON-NLS-1$
 		signatureAgorithmPanel.add(this.signarureAlgorithms);
 
@@ -681,19 +698,29 @@ final class PreferencesPanel extends JPanel implements KeyListener {
 
 		final FlowLayout fLayout = new FlowLayout(FlowLayout.LEADING);
 		final JPanel padesPreferencesPanel = new JPanel(fLayout);
-		padesPreferencesPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(), SimpleAfirmaMessages.getString("PreferencesPanel.69"))); //$NON-NLS-1$
-		this.padesBasicFormat.getAccessibleContext().setAccessibleDescription(SimpleAfirmaMessages.getString("PreferencesPanel.70")); //$NON-NLS-1$
+		padesPreferencesPanel.setBorder(
+			BorderFactory.createTitledBorder(
+				BorderFactory.createEmptyBorder(),
+				SimpleAfirmaMessages.getString("PreferencesPanel.69") //$NON-NLS-1$
+			)
+		);
+		this.padesBasicFormat.getAccessibleContext().setAccessibleDescription(
+			SimpleAfirmaMessages.getString("PreferencesPanel.70") //$NON-NLS-1$
+		);
 		this.padesBasicFormat.addItemListener(this.modificationListener);
 		this.padesBasicFormat.addKeyListener(this);
 
 		final DefaultComboBoxModel padesFormatModel = new DefaultComboBoxModel(
 			new ValueTextPair[] {
-				new ValueTextPair(AOSignConstants.PADES_SUBFILTER_BASIC, PADES_FORMAT_BASIC_TEXT),
-				new ValueTextPair(AOSignConstants.PADES_SUBFILTER_BES, PADES_FORMAT_BES_TEXT)
+				new ValueTextPair(AOSignConstants.PADES_SUBFILTER_BES, PADES_FORMAT_BES_TEXT),
+				new ValueTextPair(AOSignConstants.PADES_SUBFILTER_BASIC, PADES_FORMAT_BASIC_TEXT)
 			}
 		);
 		this.padesBasicFormat.setModel(padesFormatModel);
-		final String selectedValue = PreferencesPanel.PREFERENCES.get(PREFERENCE_PADES_FORMAT, AOSignConstants.PADES_SUBFILTER_BASIC);
+		final String selectedValue = PreferencesPanel.PREFERENCES.get(
+			PREFERENCE_PADES_FORMAT,
+			AOSignConstants.PADES_SUBFILTER_BASIC
+		);
 		for (int i = 0; i < padesFormatModel.getSize(); i++) {
 			if (padesFormatModel.getElementAt(i).equals(selectedValue)) {
 				this.padesBasicFormat.setSelectedIndex(i);
@@ -723,13 +750,15 @@ final class PreferencesPanel extends JPanel implements KeyListener {
 			SimpleAfirmaMessages.getString("PreferencesPanel.32") //$NON-NLS-1$
 		);
 		cancelButton.addKeyListener(this);
-		cancelButton.addActionListener(new ActionListener() {
-		    /** {@inheritDoc} */
-            @Override
-            public void actionPerformed(final ActionEvent ae) {
-                PreferencesPanel.this.getParentWindow().dispose();
-            }
-        });
+		cancelButton.addActionListener(
+			new ActionListener() {
+			    /** {@inheritDoc} */
+	            @Override
+	            public void actionPerformed(final ActionEvent ae) {
+	                PreferencesPanel.this.getParentWindow().dispose();
+	            }
+	        }
+		);
 
 		final JButton acceptButton = new JButton(SimpleAfirmaMessages.getString("PreferencesPanel.33")); //$NON-NLS-1$
 		acceptButton.setMnemonic('A');

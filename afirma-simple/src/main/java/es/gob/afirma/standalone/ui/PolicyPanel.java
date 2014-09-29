@@ -15,6 +15,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AdESPolicy;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 
@@ -40,10 +41,19 @@ final class PolicyPanel extends JPanel implements ItemListener {
 	private JComboBox hashAlgorithmField;
 	private JTextField qualifierField;
 
-	/** Men&uacute; desplegable con la selecci&oacute;n de PAdES-BES - PAdES-B&aacute;sico.
-	 * Si hay una pol&iacute;tica establecida, sea la que sea, es necesario modificarlo para
-	 * que refleje PAdES-BES y que no se pueda cambiar. */
-	private final JComboBox padesBesCombo;
+	/** Men&uacute; desplegable con la selecci&oacute;n de sub-formato de firma.
+	 * <p>
+	 *  En el caso de PAdES, si hay una pol&iacute;tica establecida, sea la que sea,
+	 *  es necesario modificarlo para que refleje PAdES-BES y que no se pueda cambiar
+	 *  a PAdES-B&aacute;sico.
+	 * </p>
+	 * <p>
+	 *  En el caso de XAdES, si la pol&iacute;tica de firma es la de la AGE, hay que
+	 *  restringir al tipo <i>Enveloped</i>.
+	 * </p> */
+	private final JComboBox subFormatCombo;
+
+	private final String signatureFormat;
 
 	private AdESPolicy currentPolicy;
 
@@ -53,17 +63,25 @@ final class PolicyPanel extends JPanel implements ItemListener {
 	 * @param signFormat Formato de firma.
 	 * @param policies Listado de pol&iacute;ticas prefijadas.
 	 * @param currentPolicy Pol&iacute;tica actualmente configurada.
-	 * @param padesBasicFormat Men&uacute; desplegable con la selecci&oacute;n
-	 *                         de PAdES-BES - PAdES-B&aacute;sico.
-	 *                         Si hay una pol&iacute;tica establecida, sea la que sea,
-	 *                         es necesario modificarlo para que refleje PAdES-BES y
-	 *                         que no se pueda cambiar. */
+	 * @param adesSubFormat Men&uacute; desplegable con la selecci&oacute;n de
+	 *                         sub-formato de firma.
+	 * <p>
+	 *  En el caso de PAdES, si hay una pol&iacute;tica establecida, sea la que sea,
+	 *  es necesario modificarlo para que refleje PAdES-BES y que no se pueda cambiar
+	 *  a PAdES-B&aacute;sico.
+	 * </p>
+	 * <p>
+	 *  En el caso de XAdES, si la pol&iacute;tica de firma es la de la AGE, hay que
+	 *  restringir al tipo <i>Enveloped</i>, dej&aacute;ndolo libre en caso de pol&iacute;tica
+	 *  a medida o sin pol&iacute;tica.
+	 * </p> */
 	PolicyPanel(final String signFormat,
 			    final List<PolicyItem> policies,
 			    final AdESPolicy currentPolicy,
-			    final JComboBox padesBasicFormat) {
+			    final JComboBox adesSubFormat) {
 
-		this.padesBesCombo = padesBasicFormat;
+		this.subFormatCombo = adesSubFormat;
+		this.signatureFormat = signFormat;
 
 		// La politica actual sera la personalizada siempre que no sea una de las prefijadas
 		AdESPolicy customPolicy = currentPolicy;
@@ -256,12 +274,19 @@ final class PolicyPanel extends JPanel implements ItemListener {
 		loadPolicy(((PolicyItem) this.policiesCombo.getSelectedItem()).getPolicy());
 
 		// Si es PAdES hay que seleccionar PAdES-BES si hay politica, tanto si es AGE como
-		// si es a medida
-		if (this.padesBesCombo != null) {
-			if (enabled) {
-				this.padesBesCombo.setSelectedIndex(1);
+		// si es a medida.
+		// Si es XAdES y la politica es AGE, hay que seleccionar Enveloped.
+		if (this.subFormatCombo != null) {
+			if (enabled && (
+				AOSignConstants.SIGN_FORMAT_PADES.equalsIgnoreCase(this.signatureFormat) ||
+				AOSignConstants.SIGN_FORMAT_XADES.equalsIgnoreCase(this.signatureFormat) && !editable
+			 )) {
+				this.subFormatCombo.setSelectedIndex(0);
+				this.subFormatCombo.setEnabled(false);
 			}
-			this.padesBesCombo.setEnabled(!enabled);
+			else {
+				this.subFormatCombo.setEnabled(true);
+			}
 		}
 
 	}
@@ -273,9 +298,11 @@ final class PolicyPanel extends JPanel implements ItemListener {
 			this.identifierField.setText(policy.getPolicyIdentifier());
 			this.hashField.setText(policy.getPolicyIdentifierHash());
 			this.hashAlgorithmField.setSelectedItem(policy.getPolicyIdentifierHashAlgorithm());
-			this.qualifierField.setText(policy.getPolicyQualifier() != null ?
-				policy.getPolicyQualifier().toString() :
-					""); //$NON-NLS-1$
+			this.qualifierField.setText(
+				policy.getPolicyQualifier() != null ?
+					policy.getPolicyQualifier().toString() :
+						"" //$NON-NLS-1$
+			);
 		}
 		else {
 			this.identifierField.setText(""); //$NON-NLS-1$
