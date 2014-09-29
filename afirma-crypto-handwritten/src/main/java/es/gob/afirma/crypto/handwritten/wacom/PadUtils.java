@@ -15,6 +15,7 @@ import com.WacomGSS.STU.Tablet;
 import com.WacomGSS.STU.UsbDevice;
 import com.WacomGSS.STU.Protocol.Capability;
 import com.WacomGSS.STU.Protocol.EncodingMode;
+import com.WacomGSS.STU.Protocol.InkingMode;
 import com.WacomGSS.STU.Protocol.PenData;
 import com.WacomGSS.STU.Protocol.ProtocolHelper;
 
@@ -31,6 +32,8 @@ final class PadUtils {
 
 	/** N&uacute;mero m&aacute;ximo re reintentos de reconexi&oacute;n USB. */
 	private static final int RECONNECT_MAX_ATTEMPS = 3;
+
+	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	static {
 		setLibraryPath();
@@ -149,6 +152,29 @@ final class PadUtils {
 			throw new SignaturePadException(
 				"Error obteniendo las capacidades de la tableta de captura: " + e, e //$NON-NLS-1$
 			);
+		}
+	}
+
+	static void disposeTablet(final Tablet tablet, final boolean encrypted) {
+		if (tablet != null) {
+			try {
+				tablet.setInkingMode(InkingMode.Off);
+				if (encrypted) {
+					tablet.endCapture();
+				}
+				tablet.setClearScreen();
+			}
+			catch (final STUException t) {
+				LOGGER.warning("Error cerrando el dipositivo de captura de firmas: " + t); //$NON-NLS-1$
+			}
+			try {
+				tablet.reset();
+			}
+			catch(final Exception e) {
+				LOGGER.warning("Error reiniciando la tableta: " + e); //$NON-NLS-1$
+			}
+			tablet.disconnect();
+			LOGGER.info("Tableta desconectada y lista para la proxima captura"); //$NON-NLS-1$
 		}
 	}
 

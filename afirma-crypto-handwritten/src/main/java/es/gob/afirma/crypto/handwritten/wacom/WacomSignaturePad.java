@@ -249,18 +249,8 @@ public final class WacomSignaturePad extends SignaturePad implements ITabletHand
 	@Override
 	public void dispose() {
 		if (this.tablet != null) {
-			try {
-				this.tablet.setInkingMode(InkingMode.Off);
-				if (this.encrypted) {
-					this.tablet.endCapture();
-					this.encrypted = false;
-				}
-				this.tablet.setClearScreen();
-			}
-			catch (final STUException t) {
-				LOGGER.warning("Error cerrando el dipositivo de captura de firmas: " + t); //$NON-NLS-1$
-			}
-			this.tablet.disconnect();
+			PadUtils.disposeTablet(this.tablet, this.encrypted);
+			this.encrypted = false;
 			this.tablet = null;
 		}
 		super.dispose();
