@@ -366,7 +366,7 @@ final class PreferencesPanel extends JPanel implements KeyListener {
 			this.xadesPolicyPanel.getCurrentPolicy();
 		}
 		catch(final Exception e) {
-			AOUIFactory.showMessageDialog(
+			AOUIFactory.showErrorMessage(
 				this,
 				"<html><p>" + SimpleAfirmaMessages.getString("PreferencesPanel.6") + ":<br>" + e.getLocalizedMessage() + "</p></html>", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 				SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
@@ -389,7 +389,7 @@ final class PreferencesPanel extends JPanel implements KeyListener {
 			}
 		}
 		catch(final Exception e) {
-			AOUIFactory.showMessageDialog(
+			AOUIFactory.showErrorMessage(
 				this,
 				"<html><p>" + SimpleAfirmaMessages.getString("PreferencesPanel.7") + ":<br>" + e.getLocalizedMessage() + "</p></html>", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 				SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
@@ -412,7 +412,7 @@ final class PreferencesPanel extends JPanel implements KeyListener {
 			}
 		}
 		catch(final Exception e) {
-			AOUIFactory.showMessageDialog(
+			AOUIFactory.showErrorMessage(
 				this,
 				"<html><p>" + SimpleAfirmaMessages.getString("PreferencesPanel.38") + ":<br>" + e.getLocalizedMessage() + "</p></html>", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 				SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$

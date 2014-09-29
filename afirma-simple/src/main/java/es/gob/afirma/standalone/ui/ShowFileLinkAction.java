@@ -84,7 +84,7 @@ final class ShowFileLinkAction {
 			}
             catch (final IOException e) {
 				Logger.getLogger("es.gob.afirma").severe("No se ha podido guardar el fichero: " + e); //$NON-NLS-1$ //$NON-NLS-2$
-				AOUIFactory.showMessageDialog(
+				AOUIFactory.showErrorMessage(
 					null,
 					"No se ha podido guardar el fichero",
 					"Error",

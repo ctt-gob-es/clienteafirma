@@ -573,7 +573,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
     				saf.initialize(null);
     			}
     			else {
-    				AOUIFactory.showMessageDialog(
+    				AOUIFactory.showErrorMessage(
 						null,
 						SimpleAfirmaMessages.getString("SimpleAfirma.3"), //$NON-NLS-1$
 						SimpleAfirmaMessages.getString("SimpleAfirma.48"), //$NON-NLS-1$

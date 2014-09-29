@@ -278,7 +278,7 @@ public final class ProtocolInvocationLauncher {
 	private static void showError(final String code) {
 		final String desc = ProtocolMessages.getString("ProtocolLauncher.28") + "\n(" + code + ": " + ERRORS.get(code) + ")";  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		if (!HEADLESS) {
-			AOUIFactory.showMessageDialog(
+			AOUIFactory.showErrorMessage(
 				null,
 				desc,
 				ProtocolMessages.getString("ProtocolLauncher.29"), //$NON-NLS-1$

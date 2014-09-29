@@ -67,11 +67,21 @@ final class SimpleKeyStoreManager {
         			return getKeyStore(true, parent);
             	}
             	else if ("es.gob.jmulticard.card.dnie.BurnedDnieCardException".equals(e.getClass().getName())) { //$NON-NLS-1$
-            		AOUIFactory.showMessageDialog(parent, SimpleAfirmaMessages.getString("SimpleKeyStoreManager.5"), SimpleAfirmaMessages.getString("SimpleKeyStoreManager.6"), JOptionPane.WARNING_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
+            		AOUIFactory.showErrorMessage(
+        				parent,
+        				SimpleAfirmaMessages.getString("SimpleKeyStoreManager.5"), //$NON-NLS-1$
+        				SimpleAfirmaMessages.getString("SimpleKeyStoreManager.6"), //$NON-NLS-1$
+        				JOptionPane.WARNING_MESSAGE
+    				);
             	}
             	else {
             		Logger.getLogger("es.gob.afirma").severe("No se ha podido inicializar el controlador 100% Java del DNIe: " + e); //$NON-NLS-1$ //$NON-NLS-2$
-            		AOUIFactory.showMessageDialog(parent, SimpleAfirmaMessages.getString("SimpleKeyStoreManager.7"), SimpleAfirmaMessages.getString("SimpleKeyStoreManager.8"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
+            		AOUIFactory.showMessageDialog(
+        				parent,
+        				SimpleAfirmaMessages.getString("SimpleKeyStoreManager.7"), //$NON-NLS-1$
+        				SimpleAfirmaMessages.getString("SimpleKeyStoreManager.8"), //$NON-NLS-1$
+        				JOptionPane.ERROR_MESSAGE
+    				);
             	}
             }
         }

@@ -80,18 +80,18 @@ final class CertificateSelectionDispatcherListener implements KeyEventDispatcher
 			// En OS X el modificador es distinto (la tecla Meta es el "Command" de Mac)
 			if (!Platform.OS.MACOSX.equals(Platform.getOS()) && ke.isControlDown() || ke.isMetaDown()) {
 				if (KeyEvent.VK_O == ke.getKeyCode()) {
-					final File[] ksFile; 
+					final File[] ksFile;
 					try {
 						ksFile = AOUIFactory.getLoadFiles(
-								CertificateSelectionDialogMessages.getString("CertificateSelectionDispatcherListener.0"), //$NON-NLS-1$
-								null,
-								null,
-								EXTS,
-								CertificateSelectionDialogMessages.getString("CertificateSelectionDispatcherListener.1") + EXTS_DESC, //$NON-NLS-1$
-								false,
-								false,
-								this.parent
-								);
+							CertificateSelectionDialogMessages.getString("CertificateSelectionDispatcherListener.0"), //$NON-NLS-1$
+							null,
+							null,
+							EXTS,
+							CertificateSelectionDialogMessages.getString("CertificateSelectionDispatcherListener.1") + EXTS_DESC, //$NON-NLS-1$
+							false,
+							false,
+							this.parent
+						);
 					}
 					catch(final AOCancelledOperationException e) {
 						return false;
@@ -106,13 +106,15 @@ final class CertificateSelectionDispatcherListener implements KeyEventDispatcher
 									null,
 									AOKeyStore.PKCS12.getStorePasswordCallback(this.parent),
 									this.parent);
-						} catch (final Exception e) {
+						}
+						catch (final Exception e) {
 							LOGGER.warning("No se ha podido cargar el almacen de certificados seleccionado: " + e); //$NON-NLS-1$
-							AOUIFactory.showMessageDialog(
-									this.parent,
-									CertificateSelectionDialogMessages.getString("CertificateSelectionDispatcherListener.4"), //$NON-NLS-1$
-									CertificateSelectionDialogMessages.getString("CertificateSelectionDispatcherListener.3"), //$NON-NLS-1$
-									AOUIFactory.ERROR_MESSAGE);
+							AOUIFactory.showErrorMessage(
+								this.parent,
+								CertificateSelectionDialogMessages.getString("CertificateSelectionDispatcherListener.4"), //$NON-NLS-1$
+								CertificateSelectionDialogMessages.getString("CertificateSelectionDispatcherListener.3"), //$NON-NLS-1$
+								AOUIFactory.ERROR_MESSAGE
+							);
 							return false;
 						}
 
@@ -126,7 +128,7 @@ final class CertificateSelectionDispatcherListener implements KeyEventDispatcher
 				}
 
 				this.selectionDialog.refresh();
-				
+
 				if (this.parent != null) {
 					this.parent.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 				}
