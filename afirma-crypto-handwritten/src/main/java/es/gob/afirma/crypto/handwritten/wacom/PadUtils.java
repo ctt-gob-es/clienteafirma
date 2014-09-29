@@ -1,5 +1,6 @@
 package es.gob.afirma.crypto.handwritten.wacom;
 
+import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -19,6 +20,7 @@ import com.WacomGSS.STU.Protocol.ProtocolHelper;
 
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Platform;
+import es.gob.afirma.crypto.handwritten.Rectangle;
 import es.gob.afirma.crypto.handwritten.SignaturePadConnectionException;
 import es.gob.afirma.crypto.handwritten.SignaturePadException;
 
@@ -36,6 +38,16 @@ final class PadUtils {
 
 	private PadUtils() {
 		// No instanciable
+	}
+
+	static boolean fitsInto(final Rectangle sigArea, final Dimension availableScreenSize) {
+		if (sigArea == null || availableScreenSize == null) {
+			return false;
+		}
+		if (sigArea.x + sigArea.width < availableScreenSize.width && sigArea.y + sigArea.height < availableScreenSize.height) {
+			return true;
+		}
+		return false;
 	}
 
 	static byte[] penDataArrayToIso19794(final PenData[] penDataArray) {
@@ -141,7 +153,7 @@ final class PadUtils {
 	}
 
 	static void setTabletSignatureArea(final Tablet tablet,
-			                           final java.awt.Rectangle sigArea) throws SignaturePadException {
+			                           final Rectangle sigArea) throws SignaturePadException {
 		if (sigArea != null) {
 			try {
 				tablet.setHandwritingDisplayArea(

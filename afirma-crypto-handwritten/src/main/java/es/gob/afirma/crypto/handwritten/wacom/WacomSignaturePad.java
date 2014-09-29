@@ -77,7 +77,7 @@ public final class WacomSignaturePad extends SignaturePad implements ITabletHand
 	private static final String PROPERTIES_EXTENSION = ".properties"; //$NON-NLS-1$
 
 	private Tablet tablet;
-	private java.awt.Rectangle sigArea = null;
+	private Rectangle sigArea = null;
 	private boolean useColor = false;
 
 	/** Modelo de la tableta*/
@@ -312,6 +312,9 @@ public final class WacomSignaturePad extends SignaturePad implements ITabletHand
 
 		// Los botones determinan el espacio util para captura de la pantalla de la tableta
 		this.availableScreenSize = bos.getAvailableScreenSize();
+		LOGGER.info(
+			"Superficie util en la tableta de firma: " + this.availableScreenSize.width + "x" + this.availableScreenSize.height  //$NON-NLS-1$//$NON-NLS-2$
+		);
 
 		this.btns = bos.getButtons();
 
@@ -328,12 +331,12 @@ public final class WacomSignaturePad extends SignaturePad implements ITabletHand
 			// Obtenemos el modelo de la tableta. Dependiendo del modelo de la tableta seleccionaremos el fichero properties correspondiente al modelo.
 			this.model = this.tablet.getInformation().getModelName().replace(" ", "_"); //$NON-NLS-1$ //$NON-NLS-2$
 
-		} catch (STUException e) {
+		} catch (final STUException e) {
 			e.printStackTrace();
 		}
 
 		//Obtenemos el fichero properties correspondiente al modelo de tableta detectada
-		Properties properties = new Properties();
+		final Properties properties = new Properties();
 
 		try {
 			if(this.model != null ) {
@@ -346,7 +349,7 @@ public final class WacomSignaturePad extends SignaturePad implements ITabletHand
 							)
 						);
 			}
-		} catch (IOException ex) {
+		} catch (final IOException ex) {
 			ex.printStackTrace();
 		}
 
@@ -402,8 +405,8 @@ public final class WacomSignaturePad extends SignaturePad implements ITabletHand
 	public void init(final Image bgSurfaceImage, final Rectangle signatureArea) throws SignaturePadException {
 
 		// Establecemos el area de firma
-		if (signatureArea != null) {
-			this.sigArea = new java.awt.Rectangle(
+		if (PadUtils.fitsInto(signatureArea, this.availableScreenSize)) {
+			this.sigArea = new Rectangle(
 				signatureArea.x,
 				signatureArea.y,
 				signatureArea.width,
@@ -411,13 +414,18 @@ public final class WacomSignaturePad extends SignaturePad implements ITabletHand
 			);
 		}
 		else {
-			this.sigArea = new java.awt.Rectangle(
+			LOGGER.info(
+				"No se ha especificado area de firma en la tableta o el area especificada es invalida, " + //$NON-NLS-1$
+				"se usara toda la superficie de la tableta de captura" //$NON-NLS-1$
+			);
+			this.sigArea = new Rectangle(
 				0,
 				0,
-				this.availableScreenSize.width,
-				this.availableScreenSize.height
+				this.availableScreenSize.width -1,
+				this.availableScreenSize.height -1
 			);
 		}
+		LOGGER.info("Establecida area de firma en tableta: " + this.sigArea); //$NON-NLS-1$
 		PadUtils.setTabletSignatureArea(this.tablet, this.sigArea);
 
 		// Dimensionamos el mapa de bits de la pantalla y pintamos los botones.
@@ -427,7 +435,7 @@ public final class WacomSignaturePad extends SignaturePad implements ITabletHand
 			this.capability.getScreenHeight(),
 			this.btns,
 			bgSurfaceImage,
-			signatureArea
+			this.sigArea
 		);
 
 		// Convertimos la imagen a formato Wacom nativo.

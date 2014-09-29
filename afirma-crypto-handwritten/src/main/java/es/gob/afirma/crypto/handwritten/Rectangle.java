@@ -1,5 +1,7 @@
 package es.gob.afirma.crypto.handwritten;
 
+import java.awt.geom.Point2D.Float;
+
 /** Rect&aacute;ngulo.
  * No se reutilizan las clases de AWT para compatibilidad con Android.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
@@ -41,6 +43,14 @@ public final class Rectangle {
 	@Override
 	public String toString() {
 		return "X=" + Integer.toString(this.x) + ", Y=" + Integer.toString(this.y) + ", ancho=" + Integer.toString(this.width) + ", alto=" + this.height; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+	}
+
+	/** Indica si este rect&aacute;ngulo contiene el punto indicado.
+	 * @param point Punto a comprobar.
+	 * @return <code>true</code> si este rect&aacute;ngulo contiene el punto indicado,
+	 *         <code>false</code> en caso contrario. */
+	public boolean contains(final Float point) {
+		return new java.awt.Rectangle(this.x, this.y, this.width, this.height).contains(point);
 	}
 
 }
