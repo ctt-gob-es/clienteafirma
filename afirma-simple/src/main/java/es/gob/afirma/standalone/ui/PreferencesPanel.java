@@ -68,6 +68,7 @@ import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AdESPolicy;
+import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.ui.PolicyPanel.PolicyItem;
 
@@ -365,7 +366,7 @@ final class PreferencesPanel extends JPanel implements KeyListener {
 			this.xadesPolicyPanel.getCurrentPolicy();
 		}
 		catch(final Exception e) {
-			JOptionPane.showMessageDialog(
+			AOUIFactory.showMessageDialog(
 				this,
 				"<html><p>" + SimpleAfirmaMessages.getString("PreferencesPanel.6") + ":<br>" + e.getLocalizedMessage() + "</p></html>", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 				SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
@@ -388,7 +389,7 @@ final class PreferencesPanel extends JPanel implements KeyListener {
 			}
 		}
 		catch(final Exception e) {
-			JOptionPane.showMessageDialog(
+			AOUIFactory.showMessageDialog(
 				this,
 				"<html><p>" + SimpleAfirmaMessages.getString("PreferencesPanel.7") + ":<br>" + e.getLocalizedMessage() + "</p></html>", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 				SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
@@ -411,7 +412,7 @@ final class PreferencesPanel extends JPanel implements KeyListener {
 			}
 		}
 		catch(final Exception e) {
-			JOptionPane.showMessageDialog(
+			AOUIFactory.showMessageDialog(
 				this,
 				"<html><p>" + SimpleAfirmaMessages.getString("PreferencesPanel.38") + ":<br>" + e.getLocalizedMessage() + "</p></html>", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 				SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$

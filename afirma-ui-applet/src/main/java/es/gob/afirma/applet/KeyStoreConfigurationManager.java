@@ -28,6 +28,7 @@ import javax.swing.JOptionPane;
 
 import es.gob.afirma.core.MissingLibraryException;
 import es.gob.afirma.core.misc.Platform;
+import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.keystores.AOCertificatesNotFoundException;
 import es.gob.afirma.keystores.AOKeyStore;
 import es.gob.afirma.keystores.AOKeyStoreDialog;
@@ -163,10 +164,12 @@ final class KeyStoreConfigurationManager {
     private void initKeyStore() throws AOKeystoreAlternativeException, IOException {
 
         if (this.showLoadingWarning) {
-            JOptionPane.showMessageDialog(this.parent,
-                    AppletMessages.getString("KeyStoreConfigurationManager.0"), //$NON-NLS-1$
-                    AppletMessages.getString("SignApplet.658"), //$NON-NLS-1$
-                    JOptionPane.WARNING_MESSAGE);
+        	AOUIFactory.showMessageDialog(
+    			this.parent,
+                AppletMessages.getString("KeyStoreConfigurationManager.0"), //$NON-NLS-1$
+                AppletMessages.getString("SignApplet.658"), //$NON-NLS-1$
+                JOptionPane.WARNING_MESSAGE
+            );
         }
         this.ksManager = AOKeyStoreManagerFactory.getAOKeyStoreManager(this.ks, this.ksPath, null, this.getKeystorePasswordCallback(), this.parent);
     }
@@ -231,7 +234,7 @@ final class KeyStoreConfigurationManager {
         	// Obtenemos el KeyStoreManager para asegurarnos de que esta inicializado
         	// el listado de alias
         	this.getKeyStoreManager();
-        	
+
         	final AOKeyStoreDialog dialog = new AOKeyStoreDialog(
         			this.ksManager, // KeyStoreManager
                     this.parent, // Panel sobre el que mostrar el dialogo

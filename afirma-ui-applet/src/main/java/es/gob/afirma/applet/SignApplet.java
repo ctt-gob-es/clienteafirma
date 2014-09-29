@@ -2793,7 +2793,12 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 
 		// Mostramos, si procede, el mensaje de error que corresponda
 		if (this.error && (forceToShow || this.showErrors)) {
-			JOptionPane.showMessageDialog(this, this.errorMsg, AppletMessages.getString("SignApplet.156"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
+			AOUIFactory.showMessageDialog(
+				this,
+				this.errorMsg,
+				AppletMessages.getString("SignApplet.156"), //$NON-NLS-1$
+				JOptionPane.ERROR_MESSAGE
+			);
 		}
 	}
 

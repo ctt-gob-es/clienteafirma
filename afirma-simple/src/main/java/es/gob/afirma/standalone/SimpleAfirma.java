@@ -573,7 +573,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
     				saf.initialize(null);
     			}
     			else {
-    				JOptionPane.showMessageDialog(
+    				AOUIFactory.showMessageDialog(
 						null,
 						SimpleAfirmaMessages.getString("SimpleAfirma.3"), //$NON-NLS-1$
 						SimpleAfirmaMessages.getString("SimpleAfirma.48"), //$NON-NLS-1$
@@ -634,7 +634,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
     		closeApplication(0);
             return true;
     	}
-        if (JOptionPane.showConfirmDialog(
+        if (AOUIFactory.showConfirmDialog(
     		this.container,
     		new ClosePanel(),
             SimpleAfirmaMessages.getString("SimpleAfirma.48"), //$NON-NLS-1$

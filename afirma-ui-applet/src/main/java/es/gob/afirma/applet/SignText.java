@@ -397,7 +397,12 @@ final class SignText {
             }
             catch (final Exception t) {
                 Logger.getLogger("es.gob.afirma").severe("Error durante el proceso de firma de texto: " + t); //$NON-NLS-1$ //$NON-NLS-2$
-                JOptionPane.showMessageDialog(this.parent, AppletMessages.getString("SignApplet.101"), AppletMessages.getString("SignApplet.156"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
+                AOUIFactory.showMessageDialog(
+            		this.parent,
+            		AppletMessages.getString("SignApplet.101"), //$NON-NLS-1$
+            		AppletMessages.getString("SignApplet.156"), //$NON-NLS-1$
+            		JOptionPane.ERROR_MESSAGE
+        		);
             }
         }
     }

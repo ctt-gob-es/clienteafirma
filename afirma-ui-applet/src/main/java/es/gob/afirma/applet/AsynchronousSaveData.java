@@ -152,10 +152,12 @@ final class AsynchronousSaveData implements Runnable {
                 catch (final Exception e) {
                 	LOGGER.severe("No se pudieron almacenar los datos en disco: " + e);  //$NON-NLS-1$
                     if (AsynchronousSaveData.this.getShowDialogIfError()) {
-                        JOptionPane.showMessageDialog(AsynchronousSaveData.this.getParent(),
-                                                      AppletMessages.getString("AsynchronousSaveData.1"), //$NON-NLS-1$
-                                                      AppletMessages.getString("SignApplet.156"), //$NON-NLS-1$
-                                                      JOptionPane.ERROR_MESSAGE);
+                    	AOUIFactory.showMessageDialog(
+                			AsynchronousSaveData.this.getParent(),
+                            AppletMessages.getString("AsynchronousSaveData.1"), //$NON-NLS-1$
+                            AppletMessages.getString("SignApplet.156"), //$NON-NLS-1$
+                            JOptionPane.ERROR_MESSAGE
+                        );
                     }
                 }
                 return null;

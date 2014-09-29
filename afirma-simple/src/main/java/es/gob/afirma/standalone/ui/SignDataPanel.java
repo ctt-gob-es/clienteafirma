@@ -272,7 +272,7 @@ final class SignDataPanel extends JPanel {
 								default:
 									validationMessage = SimpleAfirmaMessages.getString("SignDataPanel.11");  //$NON-NLS-1$
 							}
-							JOptionPane.showMessageDialog(
+							AOUIFactory.showMessageDialog(
 								SignDataPanel.this,
 								SimpleAfirmaMessages.getString("SignDataPanel.19"),  //$NON-NLS-1$
 								validationMessage,

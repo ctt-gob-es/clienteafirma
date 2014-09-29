@@ -475,9 +475,12 @@ final class CipherManager {
                     saveCipherKey(config, cipherKey);
                 }
                 catch (final AOMaxAttemptsExceededException e) {
-                    JOptionPane.showMessageDialog(this.parent, AppletMessages.getString("SignApplet.43"), //$NON-NLS-1$
-                                                  AppletMessages.getString("SignApplet.156"), //$NON-NLS-1$
-                                                  JOptionPane.ERROR_MESSAGE);
+                	AOUIFactory.showMessageDialog(
+            			this.parent,
+            			AppletMessages.getString("SignApplet.43"), //$NON-NLS-1$
+                        AppletMessages.getString("SignApplet.156"), //$NON-NLS-1$
+                        JOptionPane.ERROR_MESSAGE
+                    );
                 }
             }
         }

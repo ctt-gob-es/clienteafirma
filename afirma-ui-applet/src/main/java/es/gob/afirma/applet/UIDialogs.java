@@ -111,8 +111,12 @@ final class UIDialogs {
             }
 
             if (jList.getSelectedIndices() == null || jList.getSelectedIndices().length < 1) {
-                JOptionPane.showMessageDialog(parentComponent,
-                		AppletMessages.getString("UIDialogs.3"), AppletMessages.getString("SignApplet.658"), JOptionPane.WARNING_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
+            	AOUIFactory.showMessageDialog(
+        			parentComponent,
+            		AppletMessages.getString("UIDialogs.3"), //$NON-NLS-1$
+            		AppletMessages.getString("SignApplet.658"), //$NON-NLS-1$
+            		JOptionPane.WARNING_MESSAGE
+        		);
             }
 
         } while (jList.getSelectedIndices() == null || jList.getSelectedIndices().length < 1);
@@ -201,8 +205,12 @@ final class UIDialogs {
             }
 
             if (arbolNodos.getSelectionRows() == null || arbolNodos.getSelectionRows().length < 1) {
-                JOptionPane.showMessageDialog(parentComponent,
-                		AppletMessages.getString("UIDialogs.6"), AppletMessages.getString("SignApplet.658"), JOptionPane.WARNING_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
+            	AOUIFactory.showMessageDialog(
+        			parentComponent,
+            		AppletMessages.getString("UIDialogs.6"), //$NON-NLS-1$
+            		AppletMessages.getString("SignApplet.658"), //$NON-NLS-1$
+            		JOptionPane.WARNING_MESSAGE
+        		);
             }
 
         } while (arbolNodos.getSelectionRows() == null || arbolNodos.getSelectionRows().length < 1);
