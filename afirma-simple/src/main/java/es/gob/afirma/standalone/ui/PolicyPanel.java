@@ -18,10 +18,8 @@ import javax.swing.JTextField;
 import es.gob.afirma.core.signers.AdESPolicy;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 
-/**
- * Panel con los componentes para la configuracion de una politica de firma.
- */
-public class PolicyPanel extends JPanel implements ItemListener {
+/** Panel con los componentes para la configuracion de una pol&iacute;tica de firma. */
+final class PolicyPanel extends JPanel implements ItemListener {
 
 	/** Serial Id. */
 	private static final long serialVersionUID = 4804298622744399269L;
@@ -37,26 +35,35 @@ public class PolicyPanel extends JPanel implements ItemListener {
 	};
 
 	private JComboBox policiesCombo;
-
 	private JTextField identifierField;
-
 	private JTextField hashField;
-
 	private JComboBox hashAlgorithmField;
-
 	private JTextField qualifierField;
 
-	private final List<PolicyItem> policies;
+	/** Men&uacute; desplegable con la selecci&oacute;n de PAdES-BES - PAdES-B&aacute;sico.
+	 * Si hay una pol&iacute;tica establecida, sea la que sea, es necesario modificarlo para
+	 * que refleje PAdES-BES y que no se pueda cambiar. */
+	private final JComboBox padesBesCombo;
 
 	private AdESPolicy currentPolicy;
 
-	/**
-	 * Crea el panel de configuracion de pol&iacute;ticas de firma.
+	private final List<PolicyItem> policies;
+
+	/** Crea el panel de configuracion de pol&iacute;ticas de firma.
 	 * @param signFormat Formato de firma.
 	 * @param policies Listado de pol&iacute;ticas prefijadas.
 	 * @param currentPolicy Pol&iacute;tica actualmente configurada.
-	 */
-	public PolicyPanel(final String signFormat, final List<PolicyItem> policies, final AdESPolicy currentPolicy) {
+	 * @param padesBasicFormat Men&uacute; desplegable con la selecci&oacute;n
+	 *                         de PAdES-BES - PAdES-B&aacute;sico.
+	 *                         Si hay una pol&iacute;tica establecida, sea la que sea,
+	 *                         es necesario modificarlo para que refleje PAdES-BES y
+	 *                         que no se pueda cambiar. */
+	PolicyPanel(final String signFormat,
+			    final List<PolicyItem> policies,
+			    final AdESPolicy currentPolicy,
+			    final JComboBox padesBasicFormat) {
+
+		this.padesBesCombo = padesBasicFormat;
 
 		// La politica actual sera la personalizada siempre que no sea una de las prefijadas
 		AdESPolicy customPolicy = currentPolicy;
@@ -73,11 +80,21 @@ public class PolicyPanel extends JPanel implements ItemListener {
 		// De 1 a N: Politicas prefijadas
 		// Ultima: Politica personalizada
 		this.policies = new ArrayList<PolicyPanel.PolicyItem>();
-		this.policies.add(new PolicyItem(SimpleAfirmaMessages.getString("PreferencesPanel.24"), null)); //$NON-NLS-1$
+		this.policies.add(
+			new PolicyItem(
+				SimpleAfirmaMessages.getString("PreferencesPanel.24"), //$NON-NLS-1$
+				null
+			)
+		);
 		for (final PolicyItem item : policies) {
 			this.policies.add(item);
 		}
-		this.policies.add(new PolicyItem(SimpleAfirmaMessages.getString("PreferencesPanel.26"), customPolicy)); //$NON-NLS-1$
+		this.policies.add(
+			new PolicyItem(
+				SimpleAfirmaMessages.getString("PreferencesPanel.26"), //$NON-NLS-1$
+				customPolicy
+			)
+		);
 		this.currentPolicy = currentPolicy;
 
 		createUI(signFormat);
@@ -86,7 +103,11 @@ public class PolicyPanel extends JPanel implements ItemListener {
 	/** Crea la interfaz gr&aacute;fica del panel.
 	 * @param signFormat Formato de firma. */
 	private void createUI(final String signFormat) {
-		setBorder(BorderFactory.createTitledBorder(SimpleAfirmaMessages.getString("PreferencesPanel.23"))); //$NON-NLS-1$
+		setBorder(
+			BorderFactory.createTitledBorder(
+				SimpleAfirmaMessages.getString("PreferencesPanel.23") //$NON-NLS-1$
+			)
+		);
 		setLayout(new GridBagLayout());
 
 		final GridBagConstraints c = new GridBagConstraints();
@@ -103,7 +124,9 @@ public class PolicyPanel extends JPanel implements ItemListener {
 		);
 
 		add(this.policiesCombo, c);
-		this.policiesCombo.getAccessibleContext().setAccessibleDescription(SimpleAfirmaMessages.getString("PreferencesPanel.47")); //$NON-NLS-1$
+		this.policiesCombo.getAccessibleContext().setAccessibleDescription(
+			SimpleAfirmaMessages.getString("PreferencesPanel.47") //$NON-NLS-1$
+		);
 		this.policiesCombo.addItemListener(this);
 
 		final boolean enableTextFields = this.policiesCombo.getSelectedIndex() > POLICY_INDEX_NONE;
@@ -112,8 +135,12 @@ public class PolicyPanel extends JPanel implements ItemListener {
 		this.identifierField = new JTextField();
 		this.identifierField.setEnabled(enableTextFields);
 		this.identifierField.setEditable(editableTextFields);
-		this.identifierField.getAccessibleContext().setAccessibleDescription(SimpleAfirmaMessages.getString("PreferencesPanel.54")); //$NON-NLS-1$
-		final JLabel policyIdentifierLabel = new JLabel(SimpleAfirmaMessages.getString("PreferencesPanel." + signFormat + ".27")); //$NON-NLS-1$ //$NON-NLS-2$
+		this.identifierField.getAccessibleContext().setAccessibleDescription(
+			SimpleAfirmaMessages.getString("PreferencesPanel.54") //$NON-NLS-1$
+		);
+		final JLabel policyIdentifierLabel = new JLabel(
+			SimpleAfirmaMessages.getString("PreferencesPanel." + signFormat + ".27") //$NON-NLS-1$ //$NON-NLS-2$
+		);
 		policyIdentifierLabel.setLabelFor(this.identifierField);
 		c.gridy++;
 		add(policyIdentifierLabel, c);
@@ -123,8 +150,12 @@ public class PolicyPanel extends JPanel implements ItemListener {
 		this.hashField = new JTextField();
 		this.hashField.setEnabled(enableTextFields);
 		this.hashField.setEditable(editableTextFields);
-		this.hashField.getAccessibleContext().setAccessibleDescription(SimpleAfirmaMessages.getString("PreferencesPanel.55")); //$NON-NLS-1$
-		final JLabel policyIdentifierHashLabel = new JLabel(SimpleAfirmaMessages.getString("PreferencesPanel.28")); //$NON-NLS-1$
+		this.hashField.getAccessibleContext().setAccessibleDescription(
+			SimpleAfirmaMessages.getString("PreferencesPanel.55") //$NON-NLS-1$
+		);
+		final JLabel policyIdentifierHashLabel = new JLabel(
+			SimpleAfirmaMessages.getString("PreferencesPanel.28") //$NON-NLS-1$
+		);
 		policyIdentifierHashLabel.setLabelFor(this.hashField);
 		c.gridy++;
 		add(policyIdentifierHashLabel, c);
@@ -133,8 +164,12 @@ public class PolicyPanel extends JPanel implements ItemListener {
 
 		this.hashAlgorithmField = new JComboBox(POLICY_HASH_ALGORITHMS);
 		this.hashAlgorithmField.setEnabled(enableTextFields);
-		this.hashAlgorithmField.getAccessibleContext().setAccessibleDescription(SimpleAfirmaMessages.getString("PreferencesPanel.50")); //$NON-NLS-1$
-		final JLabel policyIdentifierHashAlgorithmLabel = new JLabel(SimpleAfirmaMessages.getString("PreferencesPanel.29")); //$NON-NLS-1$
+		this.hashAlgorithmField.getAccessibleContext().setAccessibleDescription(
+			SimpleAfirmaMessages.getString("PreferencesPanel.50") //$NON-NLS-1$
+		);
+		final JLabel policyIdentifierHashAlgorithmLabel = new JLabel(
+			SimpleAfirmaMessages.getString("PreferencesPanel.29") //$NON-NLS-1$
+		);
 		policyIdentifierHashAlgorithmLabel.setLabelFor(this.hashAlgorithmField);
 		c.gridy++;
 		add(policyIdentifierHashAlgorithmLabel, c);
@@ -144,8 +179,12 @@ public class PolicyPanel extends JPanel implements ItemListener {
 		this.qualifierField = new JTextField();
 		this.qualifierField.setEnabled(enableTextFields);
 		this.qualifierField.setEditable(editableTextFields);
-		this.qualifierField.getAccessibleContext().setAccessibleDescription(SimpleAfirmaMessages.getString("PreferencesPanel.56")); //$NON-NLS-1$
-		final JLabel policyQualifierLabel = new JLabel(SimpleAfirmaMessages.getString("PreferencesPanel.30")); //$NON-NLS-1$
+		this.qualifierField.getAccessibleContext().setAccessibleDescription(
+			SimpleAfirmaMessages.getString("PreferencesPanel.56") //$NON-NLS-1$
+		);
+		final JLabel policyQualifierLabel = new JLabel(
+			SimpleAfirmaMessages.getString("PreferencesPanel.30") //$NON-NLS-1$
+		);
 		policyQualifierLabel.setLabelFor(this.qualifierField);
 		c.gridy++;
 		add(policyQualifierLabel, c);
@@ -162,21 +201,16 @@ public class PolicyPanel extends JPanel implements ItemListener {
 		}
 	}
 
-	/**
-	 * Obtiene el &iacute;ndice de la politica personalizada en el listado de pol&iacute;ticas.
-	 * @return &Iacute;ndice.
-	 */
+	/** Obtiene el &iacute;ndice de la pol&iacute;tica personalizada en el listado de pol&iacute;ticas.
+	 * @return &Iacute;ndice. */
 	private int getCustomPolicyIndex() {
 		return this.policiesCombo.getItemCount() - 1;
 	}
 
-	/**
-	 * Establece el listener que atiende a los cambios realizados en el panel de
+	/** Establece el listener que atiende a los cambios realizados en el panel de
 	 * configuraci&oacute;n de pol&iacute;ticas.
-	 * @param modListener Listener al que se notifican los eventos de cambio.
-	 */
-	public void setModificationListener(final ModificationListener modListener) {
-
+	 * @param modListener Listener al que se notifican los eventos de cambio. */
+	void setModificationListener(final ModificationListener modListener) {
 		this.policiesCombo.addItemListener(modListener);
 		this.identifierField.addKeyListener(modListener);
 		this.hashField.addKeyListener(modListener);
@@ -187,7 +221,7 @@ public class PolicyPanel extends JPanel implements ItemListener {
 	/** Establece el listener que atiende a los cambios realizados en el panel de
 	 * configuraci&oacute;n de pol&iacute;ticas.
 	 * @param keyListener Listener al que se notifican los eventos de cambio. */
-	public void setKeyListener(final KeyListener keyListener) {
+	void setKeyListener(final KeyListener keyListener) {
 
 		this.identifierField.addKeyListener(keyListener);
 		this.hashField.addKeyListener(keyListener);
@@ -220,18 +254,28 @@ public class PolicyPanel extends JPanel implements ItemListener {
 
 		// Mostramos la configuracion de politica que corresponde
 		loadPolicy(((PolicyItem) this.policiesCombo.getSelectedItem()).getPolicy());
+
+		// Si es PAdES hay que seleccionar PAdES-BES si hay politica, tanto si es AGE como
+		// si es a medida
+		if (this.padesBesCombo != null) {
+			if (enabled) {
+				this.padesBesCombo.setSelectedIndex(1);
+			}
+			this.padesBesCombo.setEnabled(!enabled);
+		}
+
 	}
 
-	/**
-	 * Carga los datos de una politica en el panel.
-	 * @param policy Politica a cargar.
-	 */
+	/** Carga los datos de una pol&iacute;tica en el panel.
+	 * @param policy Pol&iacute;tica a cargar. */
 	private void loadPolicy(final AdESPolicy policy) {
 		if (policy != null) {
 			this.identifierField.setText(policy.getPolicyIdentifier());
 			this.hashField.setText(policy.getPolicyIdentifierHash());
 			this.hashAlgorithmField.setSelectedItem(policy.getPolicyIdentifierHashAlgorithm());
-			this.qualifierField.setText(policy.getPolicyQualifier() != null ? policy.getPolicyQualifier().toString() : ""); //$NON-NLS-1$
+			this.qualifierField.setText(policy.getPolicyQualifier() != null ?
+				policy.getPolicyQualifier().toString() :
+					""); //$NON-NLS-1$
 		}
 		else {
 			this.identifierField.setText(""); //$NON-NLS-1$
@@ -240,38 +284,30 @@ public class PolicyPanel extends JPanel implements ItemListener {
 		}
 	}
 
-	/**
-	 * Politica de firma definida por los valores que deben establecerse para la misma y un nombre
-	 * que la define de cara al usuario.
-	 */
-	public static class PolicyItem {
+	/** Pol&iacute;tica de firma definida por los valores que deben establecerse para la misma y un nombre
+	 * que la define de cara al usuario. */
+	static final class PolicyItem {
 
 		private final String name;
 		private AdESPolicy policy;
 
-		/**
-		 * Construye el elemento con nombre y configuraci&oacute;n de pol&iacute;tica.
+		/** Construye el elemento con nombre y configuraci&oacute;n de pol&iacute;tica.
 		 * @param name Nombre de la configuraci&oacute;n.
-		 * @param policy Configuraci&oacute;n.
-		 */
-		public PolicyItem(final String name, final AdESPolicy policy) {
+		 * @param policy Configuraci&oacute;n. */
+		PolicyItem(final String name, final AdESPolicy policy) {
 			this.name = name;
 			this.policy = policy;
 		}
 
-		/**
-		 * Recupera la configuraci&oacute;n de pol&iacute;tica.
-		 * @return Configuraci&oacute;n.
-		 */
-		public AdESPolicy getPolicy() {
+		/** Recupera la configuraci&oacute;n de pol&iacute;tica.
+		 * @return Configuraci&oacute;n. */
+		AdESPolicy getPolicy() {
 			return this.policy;
 		}
 
-		/**
-		 * Establece la configuraci&oacute;n de pol&iacute;tica.
-		 * @param policy Configuraci&oacute;n.
-		 */
-		public void setPolicy(final AdESPolicy policy) {
+		/** Establece la configuraci&oacute;n de pol&iacute;tica.
+		 * @param policy Configuraci&oacute;n. */
+		void setPolicy(final AdESPolicy policy) {
 			this.policy = policy;
 		}
 
@@ -301,11 +337,9 @@ public class PolicyPanel extends JPanel implements ItemListener {
 		}
 	}
 
-	/**
-	 * Guarda la configuraci&oacute;n actual dentro el contexto. NO GUARDA EN LAS PREFERENCIAS.
-	 */
-	public void saveCurrentPolicy() {
-
+	/** Guarda la configuraci&oacute;n actual dentro el contexto.
+	 * <b>No guarda en las preferencias</b>. */
+	void saveCurrentPolicy() {
 		final AdESPolicy policy = getCurrentPolicy();
 		if (this.policiesCombo.getSelectedIndex() == getCustomPolicyIndex()) {
 			((PolicyItem) this.policiesCombo.getSelectedItem()).setPolicy(policy);
@@ -316,23 +350,20 @@ public class PolicyPanel extends JPanel implements ItemListener {
 		this.currentPolicy = policy;
 	}
 
-	/**
-	 * Crea un objeto de configuracion con los valores actuales.
+	/** Crea un objeto de configuracion con los valores actuales.
 	 * @return Configuraci&oacute;n de pol&iacute;tica actualmente establecida o
 	 * {@code null} en caso de no especificarse ninguna.
 	 * @throws IllegalArgumentException Cuando la configuraci&oacute;n actual no
-	 * es v&aacute;lida para una pol&iacute;tica.
-	 */
-	public AdESPolicy getCurrentPolicy() {
-
+	 * es v&aacute;lida para una pol&iacute;tica. */
+	AdESPolicy getCurrentPolicy() {
 		if (this.policiesCombo.getSelectedIndex() <= POLICY_INDEX_NONE) {
 			return null;
 		}
-
 		return new AdESPolicy(
-				this.identifierField.getText(),
-				this.hashField.getText(),
-				this.hashAlgorithmField.getSelectedItem().toString(),
-				this.qualifierField.getText());
+			this.identifierField.getText(),
+			this.hashField.getText(),
+			this.hashAlgorithmField.getSelectedItem().toString(),
+			this.qualifierField.getText()
+		);
 	}
 }

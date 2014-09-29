@@ -82,32 +82,32 @@ final class PreferencesPanel extends JPanel implements KeyListener {
 	private static final String SIGN_FORMAT_PADES = "PAdES"; //$NON-NLS-1$
 
 	private static final AdESPolicy POLICY_CADES_AGE_1_8 = new AdESPolicy(
-			"2.16.724.1.3.1.1.2.1.8", //$NON-NLS-1$
-			"7SxX3erFuH31TvAw9LZ70N7p1vA=", //$NON-NLS-1$
-			"SHA1", //$NON-NLS-1$
-			"http://administracionelectronica.gob.es/es/ctt/politicafirma/politica_firma_AGE_v1_8.pdf" //$NON-NLS-1$
-			);
+		"2.16.724.1.3.1.1.2.1.8", //$NON-NLS-1$
+		"7SxX3erFuH31TvAw9LZ70N7p1vA=", //$NON-NLS-1$
+		"SHA1", //$NON-NLS-1$
+		"http://administracionelectronica.gob.es/es/ctt/politicafirma/politica_firma_AGE_v1_8.pdf" //$NON-NLS-1$
+	);
 
 	private static final AdESPolicy POLICY_XADES_AGE_1_8 = new AdESPolicy(
-			"urn:oid:2.16.724.1.3.1.1.2.1.8", //$NON-NLS-1$
-			"V8lVVNGDCPen6VELRD1Ja8HARFk=", //$NON-NLS-1$
-			"SHA1", //$NON-NLS-1$
-			"http://administracionelectronica.gob.es/es/ctt/politicafirma/politica_firma_AGE_v1_8.pdf" //$NON-NLS-1$
-			);
+		"urn:oid:2.16.724.1.3.1.1.2.1.8", //$NON-NLS-1$
+		"V8lVVNGDCPen6VELRD1Ja8HARFk=", //$NON-NLS-1$
+		"SHA1", //$NON-NLS-1$
+		"http://administracionelectronica.gob.es/es/ctt/politicafirma/politica_firma_AGE_v1_8.pdf" //$NON-NLS-1$
+	);
 
 	private static final AdESPolicy POLICY_CADES_PADES_AGE_1_9 = new AdESPolicy(
-			"2.16.724.1.3.1.1.2.1.9", //$NON-NLS-1$
-			"G7roucf600+f03r/o0bAOQ6WAs0=", //$NON-NLS-1$
-			"SHA1", //$NON-NLS-1$
-			"https://sede.060.gob.es/politica_de_firma_anexo_1.pdf" //$NON-NLS-1$
-			);
+		"2.16.724.1.3.1.1.2.1.9", //$NON-NLS-1$
+		"G7roucf600+f03r/o0bAOQ6WAs0=", //$NON-NLS-1$
+		"SHA1", //$NON-NLS-1$
+		"https://sede.060.gob.es/politica_de_firma_anexo_1.pdf" //$NON-NLS-1$
+	);
 
 	private static final AdESPolicy POLICY_XADES_AGE_1_9 = new AdESPolicy(
-			"urn:oid:2.16.724.1.3.1.1.2.1.9", //$NON-NLS-1$
-			"G7roucf600+f03r/o0bAOQ6WAs0=", //$NON-NLS-1$
-			"SHA1", //$NON-NLS-1$
-			"https://sede.060.gob.es/politica_de_firma_anexo_1.pdf" //$NON-NLS-1$
-			);
+		"urn:oid:2.16.724.1.3.1.1.2.1.9", //$NON-NLS-1$
+		"G7roucf600+f03r/o0bAOQ6WAs0=", //$NON-NLS-1$
+		"SHA1", //$NON-NLS-1$
+		"https://sede.060.gob.es/politica_de_firma_anexo_1.pdf" //$NON-NLS-1$
+	);
 
 	private static final String PADES_FORMAT_BASIC_TEXT = SimpleAfirmaMessages.getString("PreferencesPanel.71"); //$NON-NLS-1$
 	private static final String PADES_FORMAT_BES_TEXT = SimpleAfirmaMessages.getString("PreferencesPanel.72"); //$NON-NLS-1$
@@ -264,7 +264,6 @@ final class PreferencesPanel extends JPanel implements KeyListener {
 
 		final AdESPolicy padesPolicy = this.padesPolicyPanel.getCurrentPolicy();
 		if (padesPolicy != null) {
-
 			PreferencesPanel.PREFERENCES.put(PREFERENCE_PADES_POLICY_IDENTIFIER, padesPolicy.getPolicyIdentifier());
 			PreferencesPanel.PREFERENCES.put(PREFERENCE_PADES_POLICY_IDENTIFIER_HASH, padesPolicy.getPolicyIdentifierHash());
 			PreferencesPanel.PREFERENCES.put(PREFERENCE_PADES_POLICY_IDENTIFIER_HASH_ALGORITHM, padesPolicy.getPolicyIdentifierHashAlgorithm());
@@ -342,14 +341,12 @@ final class PreferencesPanel extends JPanel implements KeyListener {
 			else {
 				PreferencesPanel.PREFERENCES.remove(PREFERENCE_XADES_POLICY_QUALIFIER);
 			}
-//			getXadesPreloadedPolicies().set(getXadesPreloadedPolicies().size() - 1, xadesPolicy);
 		}
 		else {
 			PreferencesPanel.PREFERENCES.remove(PREFERENCE_XADES_POLICY_IDENTIFIER);
 			PreferencesPanel.PREFERENCES.remove(PREFERENCE_XADES_POLICY_IDENTIFIER_HASH);
 			PreferencesPanel.PREFERENCES.remove(PREFERENCE_XADES_POLICY_IDENTIFIER_HASH_ALGORITHM);
 			PreferencesPanel.PREFERENCES.remove(PREFERENCE_XADES_POLICY_QUALIFIER);
-//			getXadesPreloadedPolicies().set(getXadesPreloadedPolicies().size() - 1, null);
 		}
 		this.xadesPolicyPanel.saveCurrentPolicy();
 
@@ -357,11 +354,9 @@ final class PreferencesPanel extends JPanel implements KeyListener {
 
 	}
 
-	/**
-	 * Comprueba que los datos configurados sean v&aacute;lidos.
+	/** Comprueba que los datos configurados sean v&aacute;lidos.
 	 * @return {@code true} cuando los datos son v&aacute;lidos, {@code false} en caso
-	 * contrario.
-	 */
+	 * contrario. */
 	@SuppressWarnings("unused")
 	private boolean checkPreferences() {
 		try {
@@ -369,11 +364,11 @@ final class PreferencesPanel extends JPanel implements KeyListener {
 		}
 		catch(final Exception e) {
 			JOptionPane.showMessageDialog(
-					this,
-					"<html><p>" + SimpleAfirmaMessages.getString("PreferencesPanel.6") + ":<br>" + e.getLocalizedMessage() + "</p></html>", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-					SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
-					JOptionPane.ERROR_MESSAGE
-					);
+				this,
+				"<html><p>" + SimpleAfirmaMessages.getString("PreferencesPanel.6") + ":<br>" + e.getLocalizedMessage() + "</p></html>", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+				SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
+				JOptionPane.ERROR_MESSAGE
+			);
 			this.tabbedPane.setSelectedIndex(3);
 			return false;
 		}
@@ -444,7 +439,7 @@ final class PreferencesPanel extends JPanel implements KeyListener {
         		SimpleAfirmaMessages.getString("PreferencesPanel.73"), //$NON-NLS-1$
         		POLICY_XADES_AGE_1_9));
 
-        this.xadesPolicyPanel = new PolicyPanel(SIGN_FORMAT_XADES, xadesPolicies, getXadesPreferedPolicy());
+        this.xadesPolicyPanel = new PolicyPanel(SIGN_FORMAT_XADES, xadesPolicies, getXadesPreferedPolicy(), null);
         this.xadesPolicyPanel.setModificationListener(this.modificationListener);
         this.xadesPolicyPanel.setKeyListener(this);
         panel.add(this.xadesPolicyPanel, gbc);
@@ -458,7 +453,9 @@ final class PreferencesPanel extends JPanel implements KeyListener {
         c.weightx = 1.0;
         c.gridy = 0;
 
-        final JLabel xadesSignatureProductionCityLabel = new JLabel(SimpleAfirmaMessages.getString("PreferencesPanel.11")); //$NON-NLS-1$
+        final JLabel xadesSignatureProductionCityLabel = new JLabel(
+    		SimpleAfirmaMessages.getString("PreferencesPanel.11") //$NON-NLS-1$
+		);
         xadesSignatureProductionCityLabel.setLabelFor(this.xadesSignatureProductionCity);
         c.gridy++;
         metadata.add(xadesSignatureProductionCityLabel, c);
@@ -529,7 +526,7 @@ final class PreferencesPanel extends JPanel implements KeyListener {
         		SimpleAfirmaMessages.getString("PreferencesPanel.73"), //$NON-NLS-1$
         		POLICY_CADES_PADES_AGE_1_9));
 
-        this.cadesPolicyPanel = new PolicyPanel(SIGN_FORMAT_CADES, cadesPolicies, getCadesPreferedPolicy());
+        this.cadesPolicyPanel = new PolicyPanel(SIGN_FORMAT_CADES, cadesPolicies, getCadesPreferedPolicy(), null);
         this.cadesPolicyPanel.setModificationListener(this.modificationListener);
         this.cadesPolicyPanel.setKeyListener(this);
         panel.add(this.cadesPolicyPanel, c);
@@ -609,17 +606,27 @@ final class PreferencesPanel extends JPanel implements KeyListener {
         gbc.gridy = 0;
 
         final List<PolicyPanel.PolicyItem> padesPolicies = new ArrayList<PolicyPanel.PolicyItem>();
-        padesPolicies.add(new PolicyItem(
+        padesPolicies.add(
+    		new PolicyItem(
         		SimpleAfirmaMessages.getString("PreferencesPanel.73"), //$NON-NLS-1$
-        		POLICY_CADES_PADES_AGE_1_9));
+        		POLICY_CADES_PADES_AGE_1_9
+    		)
+		);
 
-        this.padesPolicyPanel = new PolicyPanel(SIGN_FORMAT_PADES, padesPolicies, getPadesPreferedPolicy());
+        this.padesPolicyPanel = new PolicyPanel(
+    		SIGN_FORMAT_PADES,
+    		padesPolicies,
+    		getPadesPreferedPolicy(),
+    		this.padesBasicFormat
+		);
         this.padesPolicyPanel.setModificationListener(this.modificationListener);
         this.padesPolicyPanel.setKeyListener(this);
         panel.add(this.padesPolicyPanel, gbc);
 
 	    final JPanel metadataPanel = new JPanel();
-        metadataPanel.setBorder(BorderFactory.createTitledBorder(SimpleAfirmaMessages.getString("PreferencesPanel.19"))); //$NON-NLS-1$
+        metadataPanel.setBorder(BorderFactory.createTitledBorder(
+    		SimpleAfirmaMessages.getString("PreferencesPanel.19")) //$NON-NLS-1$
+		);
         metadataPanel.setLayout(new GridBagLayout());
 
         final GridBagConstraints c = new GridBagConstraints();
@@ -679,10 +686,12 @@ final class PreferencesPanel extends JPanel implements KeyListener {
 		this.padesBasicFormat.addItemListener(this.modificationListener);
 		this.padesBasicFormat.addKeyListener(this);
 
-		final DefaultComboBoxModel padesFormatModel = new DefaultComboBoxModel(new ValueTextPair[] {
+		final DefaultComboBoxModel padesFormatModel = new DefaultComboBoxModel(
+			new ValueTextPair[] {
 				new ValueTextPair(AOSignConstants.PADES_SUBFILTER_BASIC, PADES_FORMAT_BASIC_TEXT),
 				new ValueTextPair(AOSignConstants.PADES_SUBFILTER_BES, PADES_FORMAT_BES_TEXT)
-		});
+			}
+		);
 		this.padesBasicFormat.setModel(padesFormatModel);
 		final String selectedValue = PreferencesPanel.PREFERENCES.get(PREFERENCE_PADES_FORMAT, AOSignConstants.PADES_SUBFILTER_BASIC);
 		for (int i = 0; i < padesFormatModel.getSize(); i++) {
