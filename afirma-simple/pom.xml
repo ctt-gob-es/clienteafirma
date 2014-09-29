@@ -128,6 +128,12 @@
 		
 		<dependency>
 			<groupId>es.gob.afirma</groupId>
+			<artifactId>afirma-lib-jmimemagic</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>es.gob.afirma</groupId>
 			<artifactId>afirma-crypto-certvalidation</artifactId>
 			<version>${project.version}</version>
 		</dependency>
