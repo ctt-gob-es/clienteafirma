@@ -34,10 +34,13 @@ public final class CertificateInfo {
     /** Construye el objeto con la informaci&oacute;n del certificado.
      * @param cert Certificado al cual se refierre la informaci&oacute;n
      * @param description Texto descriptivo del certificado.
-     * @param ocsp Configuraci&oacute;n de OCSP para la validaci&oacute;n del certificado
      * @param i Icono para el certificado
      * @param iTooltip <i>Tooltip</i> para el icono del certificado */
-    CertificateInfo(final X509Certificate cert, final String description, final Icon i, final String iTooltip) {
+    CertificateInfo(final X509Certificate cert,
+    		        final String description,
+    		        final Icon i,
+    		        final String iTooltip) {
+
 		final boolean isMac = Platform.OS.MACOSX.equals(Platform.getOS());
     	if (description == null || "".equals(description)) {  //$NON-NLS-1$
         	if (cert == null) {

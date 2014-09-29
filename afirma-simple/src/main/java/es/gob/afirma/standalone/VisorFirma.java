@@ -46,12 +46,9 @@ public class VisorFirma extends JApplet implements WindowListener {
     /** Fichero de firma. */
     private File signFile;
 
-    /**
-     * Crea la pantalla para la visualizaci&oacute;n de la informaci&oacute;n de la firma indicada.
-     * @param signFile Fichero de firma.
+    /** Crea la pantalla para la visualizaci&oacute;n de la informaci&oacute;n de la firma indicada.
      * @param standalone <code>true</code> si el visor se ha arrancado como aplicaci&oacute;n independiente,
-     *                   <code>false</code> si se ha arrancado desde otra aplicaci&oacute;n Java
-     */
+     *                   <code>false</code> si se ha arrancado desde otra aplicaci&oacute;n Java. */
     public VisorFirma(final boolean standalone) {
         this.standalone = standalone;
         LookAndFeelManager.applyLookAndFeel();
@@ -75,11 +72,11 @@ public class VisorFirma extends JApplet implements WindowListener {
         }
         else {
             this.currentPanel = new VisorPanel(this.signFile, null, this, this.standalone);
-            
+
            	final MainScreen mainScreen = new MainScreen();
            	mainScreen.showMainScreen(this, this.currentPanel, 780, 500);
             this.container = mainScreen;
-            
+
             if (this.window != null) {
                 this.window.dispose();
             }

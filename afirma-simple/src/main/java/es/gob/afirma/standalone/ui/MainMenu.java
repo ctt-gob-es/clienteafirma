@@ -76,16 +76,20 @@ public final class MainMenu extends JMenuBar {
      * En MS-Windows y Linux se crean los siguientes atajos de teclado:
      * <ul>
      *  <li>Alt+A = Menu archivo</li>
-     *  <ul>
-     *   <li>Alt+B = Abrir archivo</li>
-     *   <li>Alt+I = Firmar archivo</li>
-     *   <li>Alt+F4 = Salir del programa</li>
-     *  </ul>
+     *  <li>
+     *   <ul>
+     *    <li>Alt+B = Abrir archivo</li>
+     *    <li>Alt+I = Firmar archivo</li>
+     *    <li>Alt+F4 = Salir del programa</li>
+     *   </ul>
+     *  </li>
      *  <li>Alt+Y = Menu Ayuda</li>
-     *  <ul>
-     *   <li>Alt+U = Ayuda</li>
-     *   <li>Alt+R = Acerca de...</li>
-     *  </ul>
+     *  <li>
+     *   <ul>
+     *    <li>Alt+U = Ayuda</li>
+     *    <li>Alt+R = Acerca de...</li>
+     *   </ul>
+     *  </li>
      *  <li>Alt+S = Seleccionar fichero</li>
      *  <li>Alt+F = Firmar fichero</li>
      *  <li>Ctrl+A = Seleccionar fichero</li>

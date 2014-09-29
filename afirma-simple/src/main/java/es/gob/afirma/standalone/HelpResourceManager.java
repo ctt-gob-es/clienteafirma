@@ -34,8 +34,8 @@ public final class HelpResourceManager {
 	 * de ayuda de OS X. Esta biblioteca, llamada <code>libJavaHelpHook.jnilib</code> se crea a partir del
 	 * siguiente c&oacute;digo fuente Objective-C (<code>JavaHelpHook.m</code>):
 	 * <pre>
-	 * #import <JavaVM/jni.h>
-     * #import <Cocoa/Cocoa.h>
+	 * #import &lt;JavaVM/jni.h&gt;
+     * #import &lt;Cocoa/Cocoa.h&gt;
      *
      * JNIEXPORT void JNICALL Java_es_gob_afirma_standalone_ui_MacHelpHooker_showHelp(JNIEnv *env, jclass clazz)
      * {

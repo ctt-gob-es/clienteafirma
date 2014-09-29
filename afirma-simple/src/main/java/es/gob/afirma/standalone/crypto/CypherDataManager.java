@@ -37,15 +37,18 @@ public final class CypherDataManager {
 
 	/** Descifra una cadena de datos. Esta cadena viene precedida por el n&uacute;mero de caracteres de padding que
 	 * se agregaron y separado por un punto (.) de la cadena base 64 con los datos cifrados.
-	 * @param dataB64 Cadena de datos con la forma: PADDING.CIPHERDATAB64.
+	 * @param data Cadena de datos con la forma: PADDING.CIPHERDATAB64.
 	 * @param cipherKey Clave de cifrado.
 	 * @return Datos descifrados.
 	 * @throws InvalidKeyException Cuando la clave no es v&aacute;lida.
 	 * @throws GeneralSecurityException Cuando falla el proceso de cifrado.
 	 * @throws IllegalArgumentException Si los datos no se corresponden con un Base64 v&aacute;lido.
 	 * @throws IOException Cuando ocurre un error en la decodificaci&oacute;n de los datos. */
-	private static byte[] decipherData(final String data, final byte[] cipherKey) throws InvalidKeyException, GeneralSecurityException, IllegalArgumentException, IOException {
-
+	private static byte[] decipherData(final String data,
+			                           final byte[] cipherKey) throws InvalidKeyException,
+			                                                          GeneralSecurityException,
+			                                                          IllegalArgumentException,
+			                                                          IOException {
 		int padding = 0;
 		final int dotPos = data.indexOf(PADDING_CHAR_SEPARATOR);
 		if (dotPos != -1) {

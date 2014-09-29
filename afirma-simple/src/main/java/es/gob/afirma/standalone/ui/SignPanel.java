@@ -337,13 +337,15 @@ public final class SignPanel extends JPanel {
         this.signButton.requestFocusInWindow();
     }
 
-    private void createUI(final ActionListener al, final boolean firstTime) {
+    private void createUI(final boolean firstTime) {
+
         if (!LookAndFeelManager.HIGH_CONTRAST) {
             this.setBackground(LookAndFeelManager.WINDOW_COLOR);
         }
+
         this.setLayout(new GridLayout(2, 1));
-        this.add(new UpperPanel(al, firstTime));
-        this.lowerPanel = new LowerPanel(al);
+        this.add(new UpperPanel(firstTime));
+        this.lowerPanel = new LowerPanel();
         this.add(this.lowerPanel);
         this.dropTarget = new DropTarget(this.filePanel, DnDConstants.ACTION_COPY, new DropTargetListener() {
 
@@ -454,31 +456,30 @@ public final class SignPanel extends JPanel {
         super(true);
         this.window = win;
         this.saf = sa;
-        createUI(null, firstTime);
+        createUI(firstTime);
     }
 
     private final class UpperPanel extends JPanel {
 
         private static final long serialVersionUID = 533243192995645135L;
 
-        UpperPanel(final ActionListener al, final boolean firstTime) {
+        UpperPanel(final boolean firstTime) {
             super(true);
-            createUI(al, firstTime);
+            createUI(firstTime);
         }
 
-        private void createUI(final ActionListener al, final boolean firstTime) {
+        private void createUI(final boolean firstTime) {
             this.setLayout(new BorderLayout(5, 5));
             this.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 
             SignPanel.this.getSelectButton().setText(SimpleAfirmaMessages.getString("SignPanel.32")); //$NON-NLS-1$
-            if (al != null) {
-                SignPanel.this.getSelectButton().addActionListener(al);
-            }
             SignPanel.this.getSelectButton().setMnemonic('S');
-            SignPanel.this.getSelectButton().getAccessibleContext().setAccessibleDescription(SimpleAfirmaMessages.getString("SignPanel.33") //$NON-NLS-1$
-                                       );
-            SignPanel.this.getSelectButton().getAccessibleContext().setAccessibleName(SimpleAfirmaMessages.getString("SignPanel.34") //$NON-NLS-1$
-                                       );
+            SignPanel.this.getSelectButton().getAccessibleContext().setAccessibleDescription(
+        		SimpleAfirmaMessages.getString("SignPanel.33") //$NON-NLS-1$
+            );
+            SignPanel.this.getSelectButton().getAccessibleContext().setAccessibleName(
+        		SimpleAfirmaMessages.getString("SignPanel.34") //$NON-NLS-1$
+            );
             SignPanel.this.getSelectButton().requestFocusInWindow();
             SignPanel.this.getSelectButton().addActionListener(new ActionListener() {
                 @Override
@@ -564,17 +565,17 @@ public final class SignPanel extends JPanel {
 
         private static final long serialVersionUID = 533243192995645135L;
 
-        LowerPanel(final ActionListener al) {
+        LowerPanel() {
             super(true);
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
-                    createUI(al);
+                    createUI();
                 }
             });
         }
 
-        void createUI(final ActionListener al) {
+        void createUI() {
             this.setLayout(new BorderLayout(5, 5));
             this.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 
@@ -596,9 +597,6 @@ public final class SignPanel extends JPanel {
                 SignPanel.this.getSignButton().setText(SimpleAfirmaMessages.getString("SignPanel.16")); //$NON-NLS-1$
             }
             SignPanel.this.getSignButton().setMnemonic('F');
-            if (al != null) {
-                SignPanel.this.getSignButton().addActionListener(al);
-            }
             SignPanel.this.getSignButton().setEnabled(false);
             buttonPanel.add(SignPanel.this.getSignButton());
             SignPanel.this.getSignButton().addActionListener(new ActionListener() {
@@ -775,14 +773,14 @@ public final class SignPanel extends JPanel {
 
             PrivateKeyEntry pke;
                 try {
-                	AOKeyStoreDialog dialog = new AOKeyStoreDialog(ksm, SignPanel.this, true, false, true);
+                	final AOKeyStoreDialog dialog = new AOKeyStoreDialog(ksm, SignPanel.this, true, false, true);
                 	dialog.show();
                 	pke = ksm.getKeyEntry(dialog.getSelectedAlias(), ksm.getType().getCertificatePasswordCallback(SignPanel.this));
                 }
                 catch (final AOCancelledOperationException e) {
                     return null;
                 }
-                catch (Exception e) {
+                catch (final Exception e) {
                 	LOGGER.severe("Ocurrio un error al extraer la clave privada del certificiado seleccionado: " + e); //$NON-NLS-1$
                 	UIUtils.showErrorMessage(
                             SignPanel.this,

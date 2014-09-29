@@ -116,7 +116,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
     private final MainMenu mainMenu;
 
     /** Construye la aplicaci&oacute;n principal y establece el
-     * <i>Look&Field</i>. */
+     * <i>Look&amp;Feel</i>. */
     public SimpleAfirma() {
        LookAndFeelManager. applyLookAndFeel();
        this.mainMenu = new MainMenu(this.window, this);
@@ -496,7 +496,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
     }
 
     /** Punto de entrada de la aplicaci&oacute;n. La ejecuci&oacute;n se realizar&aacute;
-     * acorde a la siguiente secuencia:<br/>
+     * acorde a la siguiente secuencia:<br>
      * <ol>
      *   <li>Si no se pasan par&aacute;metros se iniciar&aacute; normalmente.</li>
      *   <li>
@@ -670,7 +670,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 	}
 
     /** Configura que el registro de la ejecuci&oacute;n se guarde tambien en fichero.
-     * @param Fichero en donde se almacenar&aacute; el registro. */
+     * @param logPath Fichero en donde se almacenar&aacute; el registro. */
     private static void configureFileLogger(final String logPath) {
 
     	try {

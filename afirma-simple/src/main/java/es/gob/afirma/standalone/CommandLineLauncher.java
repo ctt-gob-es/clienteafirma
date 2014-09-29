@@ -616,12 +616,12 @@ final class CommandLineLauncher {
 	 * Procesa de error de la operaci&oacute;n. Si se indica que debe presentarse como
 	 * XML se devolver&aacute; un XML con la forma:
 	 * <pre>
-	 * <afirma>
-	 *   <result>ko</result>
-	 *   <response>
-	 *       <description>DESCRIPCION_ERROR</description>
-	 *   </response>
-	 * </afirma>
+	 * &lt;afirma&gt;
+	 *   &lt;result&gt;ko&lt;/result&gt;
+	 *   &lt;response&gt;
+	 *       &lt;description&gt;DESCRIPCION_ERROR&lt;/description&gt;
+	 *   &lt;/response&gt;
+	 * &lt;/afirma&gt;
 	 * </pre>
 	 * Si el resultado no debe ser un XML se lanzar&aacute; una excepci&oacute;n de tipo
 	 * @param message Mensaje de error.
@@ -652,7 +652,7 @@ final class CommandLineLauncher {
 
 	/**
 	 * Construye el resultado para una firma/multifirma realizada correctamente. Si el resultado debe
-	 * devolverse en XML se devolver&aacute; un XML con la forma:<br/>
+	 * devolverse en XML se devolver&aacute; un XML con la forma:<br>
 	 * {@code
 	 * <afirma>
 	 *   <result>ok</result>

@@ -28,9 +28,15 @@ public final class FileUIManager {
 
     /** Muestra un di&aacute;logo para el guardado de datos y los almacena en el
      * fichero seleccionado.
+     * @param parent Componente padre para la modalidad.
      * @param data Datos que se desean guardar.
+     * @param currentDir Directorio actual.
+     * @param filename Nombre por defecto para el fichero a guardar.
      * @param exts Posibles extensiones que asignar al fichero.
-     * @param currentDir Directorio actual. */
+     * @param description descripci&oacute;n del tipo de fichero a guardar.
+     * @param title T&iacute;tulo del di&aacute;logo de guardado.
+     * @return fichero guardado.
+     * @throws IOException Si hay problemas guardando los datos. */
     static File saveFile(final Frame parent,
     		             final byte[] data,
     		             final File currentDir,

@@ -83,9 +83,8 @@ public class PolicyPanel extends JPanel implements ItemListener {
 		createUI(signFormat);
 	}
 
-	/**
-	 * Crea la interfaz gr&aacute;fica del panel.
-	 */
+	/** Crea la interfaz gr&aacute;fica del panel.
+	 * @param signFormat Formato de firma. */
 	private void createUI(final String signFormat) {
 		setBorder(BorderFactory.createTitledBorder(SimpleAfirmaMessages.getString("PreferencesPanel.23"))); //$NON-NLS-1$
 		setLayout(new GridBagLayout());
@@ -97,9 +96,11 @@ public class PolicyPanel extends JPanel implements ItemListener {
 
 		// Los elementos del menu desplegable se identifican por su orden
 		this.policiesCombo = new JComboBox();
-		this.policiesCombo.setModel(new DefaultComboBoxModel(
+		this.policiesCombo.setModel(
+			new DefaultComboBoxModel(
 				this.policies.toArray(new PolicyItem[this.policies.size()])
-				));
+			)
+		);
 
 		add(this.policiesCombo, c);
 		this.policiesCombo.getAccessibleContext().setAccessibleDescription(SimpleAfirmaMessages.getString("PreferencesPanel.47")); //$NON-NLS-1$
@@ -283,7 +284,7 @@ public class PolicyPanel extends JPanel implements ItemListener {
 			else if (obj instanceof PolicyItem) {
 				final PolicyItem item = (PolicyItem) obj;
 				return this.name.equals(item.name) &&
-						((this.policy == null && item.getPolicy() == null) ||
+						(this.policy == null && item.getPolicy() == null ||
 								this.policy.equals(item.getPolicy()));
 			}
 			return false;

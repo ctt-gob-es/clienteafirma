@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -32,8 +32,8 @@ import javax.swing.JPanel;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.signature.SignValidity;
 import es.gob.afirma.standalone.LookAndFeelManager;
-import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.SimpleAfirma;
+import es.gob.afirma.standalone.SimpleAfirmaMessages;
 
 /** Panel con detalles de una firma electr&oacute;nica. */
 public final class SignDetailPanel extends JPanel {
@@ -41,7 +41,7 @@ public final class SignDetailPanel extends JPanel {
     /** Serial ID */
     private static final long serialVersionUID = 7567869419737753210L;
 
-    /** Referencia a la aplicaci&ocute;n de firma. */
+    /** Referencia a la aplicaci&oacute;n de firma. */
     private final SimpleAfirma saf;
 
     /** Bot&oacute;n para volver a la pantalla anterior. */
@@ -66,15 +66,20 @@ public final class SignDetailPanel extends JPanel {
         createUI(sig, sigPath, signingCert, signValidity, fileTypeIcon);
     }
 
-    /** Agrega el contenido gr&aacute;fico al panel. */
+    /** Agrega el contenido gr&aacute;fico al panel.
+     * @param signature Firma creada.
+     * @param sigPath Ruta del fichero firmado.
+     * @param signingCert Certificado usado para firmar.
+     * @param signValidity Validez de la firma.
+     * @param fileTypeIcon Icono del fichero firmado (dependiente de su tipo). */
     private void createUI(final byte[] signature,
                           final String sigPath,
                           final X509Certificate signingCert,
                           final SignValidity signValidity,
                           final JComponent fileTypeIcon) {
 
-        byte[] sig = (signature != null) ? signature.clone() : null;
-        
+        byte[] sig = signature != null ? signature.clone() : null;
+
         // Cargamos los datos de firma si no nos los proporcionaron en el constructor
         if (sig == null && sigPath != null) {
             final File signFile = new File(sigPath);
@@ -134,7 +139,7 @@ public final class SignDetailPanel extends JPanel {
             this.setBackground(LookAndFeelManager.WINDOW_COLOR);
             returnPanel.setBackground(LookAndFeelManager.WINDOW_COLOR);
         }
-        
+
         setLayout(new GridBagLayout());
 
         final GridBagConstraints c = new GridBagConstraints();
