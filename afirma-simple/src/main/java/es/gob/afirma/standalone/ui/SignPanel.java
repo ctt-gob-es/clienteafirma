@@ -943,14 +943,17 @@ public final class SignPanel extends JPanel {
 
             final File fd;
             try {
-            	fd = FileUIManager.saveFile(
-            			SignPanel.this.getWindow(),
-            			signResult,
-            			SignPanel.this.getSimpleAfirma().getCurrentDir(),
-            			newFileName,
-            			fExtensions,
-            			fDescription,
-            			SimpleAfirmaMessages.getString("SignPanel.81")); //$NON-NLS-1$
+    	    	fd = AOUIFactory.getSaveDataToFile(
+        			signResult,
+        			SimpleAfirmaMessages.getString("SignPanel.81"), //$NON-NLS-1$
+        			SignPanel.this.getSimpleAfirma().getCurrentDir() != null ?
+    					SignPanel.this.getSimpleAfirma().getCurrentDir().getAbsolutePath() :
+    						null,
+        			newFileName,
+        			fExtensions,
+        			fDescription,
+					SignPanel.this.getWindow()
+    			);
             }
             catch(final IOException e) {
                 LOGGER.severe(

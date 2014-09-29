@@ -72,14 +72,14 @@ final class ShowFileLinkAction {
         }
         else {
             try {
-				FileUIManager.saveFile(
-				        null,
-				        this.data,
-				        null,
-				        null,
-				        null,
-				        null,
-				        SimpleAfirmaMessages.getString("ShowFileLinkAction.1") //$NON-NLS-1$
+            	AOUIFactory.getSaveDataToFile(
+        			this.data,
+			        SimpleAfirmaMessages.getString("ShowFileLinkAction.1"), //$NON-NLS-1$
+			        null,
+			        null,
+			        null,
+			        null,
+			        null
 				);
 			}
             catch (final IOException e) {

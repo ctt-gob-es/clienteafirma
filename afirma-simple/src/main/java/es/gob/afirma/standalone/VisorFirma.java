@@ -21,7 +21,8 @@ import javax.swing.JApplet;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-import es.gob.afirma.standalone.ui.FileUIManager;
+import es.gob.afirma.core.AOCancelledOperationException;
+import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.standalone.ui.MainScreen;
 import es.gob.afirma.standalone.ui.VisorPanel;
 
@@ -167,10 +168,24 @@ public class VisorFirma extends JApplet implements WindowListener {
         }
     }
 
-
     /** Carga una nueva firma en el Visor, preguntando al usuario por el fichero de firma. */
     public void loadNewSign() {
-        final File sgFile = FileUIManager.openFile(VisorFirma.this.window, null, null, SimpleAfirmaMessages.getString("VisorFirma.1")); //$NON-NLS-1$
+    	final File sgFile;
+       	try {
+       		sgFile = AOUIFactory.getLoadFiles(
+       			SimpleAfirmaMessages.getString("VisorFirma.1"), //$NON-NLS-1$
+				null,
+				null,
+				null,
+				null,
+				false,
+				false,
+				VisorFirma.this.window
+			)[0];
+    	}
+    	catch(final AOCancelledOperationException e) {
+    		return;
+    	}
         if (sgFile == null) {
             return;
         }
