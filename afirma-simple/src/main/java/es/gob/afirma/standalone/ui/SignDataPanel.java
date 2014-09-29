@@ -58,6 +58,7 @@ import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.AOSignerFactory;
 import es.gob.afirma.core.signers.AOSimpleSignInfo;
+import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.signers.pades.AOPDFSigner;
 import es.gob.afirma.standalone.DataAnalizerUtil;
 import es.gob.afirma.standalone.LookAndFeelManager;
@@ -164,11 +165,11 @@ final class SignDataPanel extends JPanel {
                         Desktop.getDesktop().open(signFile);
                     }
                     catch (final Exception e) {
-                        UIUtils.showErrorMessage(
-                                SignDataPanel.this,
-                                SimpleAfirmaMessages.getString("SignDataPanel.7"), //$NON-NLS-1$
-                                SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
-                                JOptionPane.ERROR_MESSAGE
+                    	AOUIFactory.showErrorMessage(
+                            SignDataPanel.this,
+                            SimpleAfirmaMessages.getString("SignDataPanel.7"), //$NON-NLS-1$
+                            SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
+                            JOptionPane.ERROR_MESSAGE
                         );
                     }
                 }
@@ -378,11 +379,11 @@ final class SignDataPanel extends JPanel {
             Desktop.getDesktop().open(tmp);
         }
         catch(final Exception e) {
-            UIUtils.showErrorMessage(
-                    parent,
-                    SimpleAfirmaMessages.getString("SignDataPanel.23"), //$NON-NLS-1$
-                    SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
-                    JOptionPane.ERROR_MESSAGE
+        	AOUIFactory.showErrorMessage(
+                parent,
+                SimpleAfirmaMessages.getString("SignDataPanel.23"), //$NON-NLS-1$
+                SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
+                JOptionPane.ERROR_MESSAGE
             );
         }
     }

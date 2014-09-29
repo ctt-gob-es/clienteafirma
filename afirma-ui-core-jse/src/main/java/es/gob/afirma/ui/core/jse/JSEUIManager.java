@@ -603,4 +603,21 @@ public class JSEUIManager implements AOUIManager {
         }
 
     }
+
+	@Override
+    public void showErrorMessage(final Object parent, final Object message, final String title, final int messageType) {
+        final String buttonTxt = JSEUIMessages.getString("JSEUIManager.1"); //$NON-NLS-1$
+        JOptionPane.showOptionDialog(
+                parent instanceof Component ? (Component) parent : null,
+                message,
+                title,
+                JOptionPane.OK_OPTION,
+                messageType,
+                null,
+                new String[] {
+            		buttonTxt
+                },
+                buttonTxt
+        );
+    }
 }

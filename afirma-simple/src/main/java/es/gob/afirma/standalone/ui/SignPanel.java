@@ -200,11 +200,11 @@ public final class SignPanel extends JPanel {
             errorMessage = SimpleAfirmaMessages.getString("SignPanel.5"); //$NON-NLS-1$
         }
         if (errorMessage != null) {
-            UIUtils.showErrorMessage(
-                    SignPanel.this,
-                    errorMessage,
-                    SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
-                    JOptionPane.ERROR_MESSAGE
+        	AOUIFactory.showErrorMessage(
+                SignPanel.this,
+                errorMessage,
+                SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
+                JOptionPane.ERROR_MESSAGE
             );
             this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
             return;
@@ -217,7 +217,7 @@ public final class SignPanel extends JPanel {
             data = AOUtil.getDataFromInputStream(fis);
         }
         catch(final OutOfMemoryError e) {
-            UIUtils.showErrorMessage(
+        	AOUIFactory.showErrorMessage(
                  SignPanel.this,
                  SimpleAfirmaMessages.getString("SignPanel.26"), //$NON-NLS-1$
                  SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
@@ -249,10 +249,11 @@ public final class SignPanel extends JPanel {
         // Comprobamos si es una factura electronica
         else if (DataAnalizerUtil.isFacturae(data)) {
         	if (new AOFacturaESigner().isSign(data)) {
-        		UIUtils.showErrorMessage(this,
-        				SimpleAfirmaMessages.getString("SignPanel.22"), //$NON-NLS-1$
-        				SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
-        				JOptionPane.WARNING_MESSAGE);
+        		AOUIFactory.showErrorMessage(this,
+    				SimpleAfirmaMessages.getString("SignPanel.22"), //$NON-NLS-1$
+    				SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
+    				JOptionPane.WARNING_MESSAGE
+				);
         		this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
         		return;
         	}
@@ -383,7 +384,7 @@ public final class SignPanel extends JPanel {
                             return;
                         }
                         if (fileList.size() > 1) {
-                            UIUtils.showErrorMessage(
+                        	AOUIFactory.showErrorMessage(
                                     SignPanel.this,
                                     SimpleAfirmaMessages.getString("SignPanel.18"), //$NON-NLS-1$
                                     SimpleAfirmaMessages.getString("SimpleAfirma.48"), //$NON-NLS-1$
@@ -396,7 +397,7 @@ public final class SignPanel extends JPanel {
                         	filename.startsWith("https://") || //$NON-NLS-1$
                         	filename.startsWith("ftp://") //$NON-NLS-1$
                         ) {
-                            UIUtils.showErrorMessage(
+                        	AOUIFactory.showErrorMessage(
                                     SignPanel.this,
                                     SimpleAfirmaMessages.getString("SignPanel.24"), //$NON-NLS-1$
                                     SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
@@ -506,11 +507,11 @@ public final class SignPanel extends JPanel {
                     }
                     catch (final Exception e) {
                     	LOGGER.severe("Error en la carga de fichero " + file.getAbsolutePath() + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$
-                        UIUtils.showErrorMessage(
-                                UpperPanel.this,
-                                SimpleAfirmaMessages.getString("SignPanel.36"), //$NON-NLS-1$
-                                SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
-                                JOptionPane.ERROR_MESSAGE
+                    	AOUIFactory.showErrorMessage(
+                            UpperPanel.this,
+                            SimpleAfirmaMessages.getString("SignPanel.36"), //$NON-NLS-1$
+                            SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
+                            JOptionPane.ERROR_MESSAGE
                         );
                         // La carga habra dejado el cursor en reloj de arena
                         SignPanel.this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
@@ -709,7 +710,7 @@ public final class SignPanel extends JPanel {
                             Desktop.getDesktop().open(file);
                         }
                         catch (final IOException e) {
-                            UIUtils.showErrorMessage(
+                        	AOUIFactory.showErrorMessage(
                                 FilePanel.this,
                                 SimpleAfirmaMessages.getString("SignPanel.53"), //$NON-NLS-1$
                                 SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
@@ -782,7 +783,7 @@ public final class SignPanel extends JPanel {
             }
             catch (final Exception e) {
             	LOGGER.severe("Ocurrio un error al extraer la clave privada del certificiado seleccionado: " + e); //$NON-NLS-1$
-            	UIUtils.showErrorMessage(
+            	AOUIFactory.showErrorMessage(
                     SignPanel.this,
                     SimpleAfirmaMessages.getString("SignPanel.56"), //$NON-NLS-1$
                     SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
@@ -861,40 +862,40 @@ public final class SignPanel extends JPanel {
             }
             catch(final PdfIsCertifiedException e) {
             	LOGGER.warning("PDF no firmado por estar certificado: " + e); //$NON-NLS-1$
-                UIUtils.showErrorMessage(
-                        SignPanel.this,
-                        SimpleAfirmaMessages.getString("SignPanel.27"), //$NON-NLS-1$
-                        SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
-                        JOptionPane.ERROR_MESSAGE
+            	AOUIFactory.showErrorMessage(
+                    SignPanel.this,
+                    SimpleAfirmaMessages.getString("SignPanel.27"), //$NON-NLS-1$
+                    SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
+                    JOptionPane.ERROR_MESSAGE
                 );
                 setSignCommandEnabled(true);
                 return null;
             }
             catch(final BadPdfPasswordException e) {
             	LOGGER.warning("PDF protegido con contrasena mal proporcionada: " + e); //$NON-NLS-1$
-                UIUtils.showErrorMessage(
-                        SignPanel.this,
-                        SimpleAfirmaMessages.getString("SignPanel.23"), //$NON-NLS-1$
-                        SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
-                        JOptionPane.ERROR_MESSAGE
+            	AOUIFactory.showErrorMessage(
+                    SignPanel.this,
+                    SimpleAfirmaMessages.getString("SignPanel.23"), //$NON-NLS-1$
+                    SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
+                    JOptionPane.ERROR_MESSAGE
                 );
                 setSignCommandEnabled(true);
                 return null;
             }
             catch(final Exception e) {
                 LOGGER.severe("Error durante el proceso de firma: " + e); //$NON-NLS-1$
-                UIUtils.showErrorMessage(
-                        SignPanel.this,
-                        SimpleAfirmaMessages.getString("SignPanel.65"), //$NON-NLS-1$
-                        SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
-                        JOptionPane.ERROR_MESSAGE
+                AOUIFactory.showErrorMessage(
+                    SignPanel.this,
+                    SimpleAfirmaMessages.getString("SignPanel.65"), //$NON-NLS-1$
+                    SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
+                    JOptionPane.ERROR_MESSAGE
                 );
                 setSignCommandEnabled(true);
                 return null;
             }
             catch(final OutOfMemoryError ooe) {
                 LOGGER.severe("Falta de memoria en el proceso de firma: " + ooe); //$NON-NLS-1$
-                UIUtils.showErrorMessage(
+                AOUIFactory.showErrorMessage(
                     SignPanel.this,
                     SimpleAfirmaMessages.getString("SignPanel.1"), //$NON-NLS-1$
                     SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
@@ -955,11 +956,11 @@ public final class SignPanel extends JPanel {
                 LOGGER.severe(
                     "No se ha podido guardar el resultado de la firma: " + e //$NON-NLS-1$
                   );
-                  UIUtils.showErrorMessage(
-                          SignPanel.this,
-                          SimpleAfirmaMessages.getString("SignPanel.88"), //$NON-NLS-1$
-                          SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
-                          JOptionPane.ERROR_MESSAGE
+                AOUIFactory.showErrorMessage(
+                      SignPanel.this,
+                      SimpleAfirmaMessages.getString("SignPanel.88"), //$NON-NLS-1$
+                      SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
+                      JOptionPane.ERROR_MESSAGE
                   );
                   setSignCommandEnabled(true);
                   return null;

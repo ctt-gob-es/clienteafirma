@@ -49,6 +49,7 @@ import es.gob.afirma.core.LogManager;
 import es.gob.afirma.core.LogManager.App;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.misc.Platform.OS;
+import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.keystores.AOKeyStore;
 import es.gob.afirma.keystores.AOKeyStoreManager;
 import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
@@ -61,7 +62,6 @@ import es.gob.afirma.standalone.ui.MainMenu;
 import es.gob.afirma.standalone.ui.MainScreen;
 import es.gob.afirma.standalone.ui.SignDetailPanel;
 import es.gob.afirma.standalone.ui.SignPanel;
-import es.gob.afirma.standalone.ui.UIUtils;
 
 /** Aplicaci&oacute;n gr&aacute;fica de firma electr&oacute;nica f&aacute;cil
  * basada en @firma. C&oacute;digos de salida de la aplicaci&oacute;n:
@@ -149,7 +149,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 					Class.forName("sun.security.mscapi.SunMSCAPI"); //$NON-NLS-1$
 				}
         		catch (final ClassNotFoundException e) {
-                    UIUtils.showErrorMessage(
+        			AOUIFactory.showErrorMessage(
                         this.container,
                         SimpleAfirmaMessages.getString("SimpleAfirma.5"), //$NON-NLS-1$
                         SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
@@ -158,7 +158,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
                     closeApplication(-3);
 				}
         	}
-            UIUtils.showErrorMessage(
+        	AOUIFactory.showErrorMessage(
                 this.container,
                 SimpleAfirmaMessages.getString("SimpleAfirma.6"), //$NON-NLS-1$
                 SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
@@ -247,7 +247,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
             LOGGER.severe(
         		"No se pudo abrir el almacen por defecto del entorno operativo: " + e //$NON-NLS-1$
             );
-            UIUtils.showErrorMessage(
+            AOUIFactory.showErrorMessage(
                 this.container,
                 SimpleAfirmaMessages.getString("SimpleAfirma.42"), //$NON-NLS-1$
                 SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
@@ -488,11 +488,11 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
                 ((SignPanel) this.currentPanel).loadFile(file);
             }
             catch (final Exception e) {
-                UIUtils.showErrorMessage(
-                        this.currentPanel,
-                        SimpleAfirmaMessages.getString("SimpleAfirma.0"), //$NON-NLS-1$
-                        SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
-                        JOptionPane.ERROR_MESSAGE
+            	AOUIFactory.showErrorMessage(
+                    this.currentPanel,
+                    SimpleAfirmaMessages.getString("SimpleAfirma.0"), //$NON-NLS-1$
+                    SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
+                    JOptionPane.ERROR_MESSAGE
                 );
             }
         }

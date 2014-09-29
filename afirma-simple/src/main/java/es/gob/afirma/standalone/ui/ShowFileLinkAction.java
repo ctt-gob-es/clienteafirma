@@ -22,6 +22,7 @@ import javax.swing.JOptionPane;
 
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.MimeHelper;
+import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 
 /**
@@ -61,11 +62,11 @@ final class ShowFileLinkAction {
                 Desktop.getDesktop().open(tmp);
             }
             catch(final Exception e) {
-                UIUtils.showErrorMessage(
-                        null,
-                        SimpleAfirmaMessages.getString("ShowFileLinkAction.2") + " '" + ext + "'",  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
-                        SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
-                        JOptionPane.ERROR_MESSAGE
+            	AOUIFactory.showErrorMessage(
+                    null,
+                    SimpleAfirmaMessages.getString("ShowFileLinkAction.2") + " '" + ext + "'",  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
+                    SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
+                    JOptionPane.ERROR_MESSAGE
                 );
             }
         }

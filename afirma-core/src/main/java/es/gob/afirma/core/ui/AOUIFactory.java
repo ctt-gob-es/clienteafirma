@@ -16,10 +16,8 @@ import java.util.logging.Logger;
 
 import es.gob.afirma.core.misc.Platform;
 
-/**
- * Factor&iacute;a de elementos de interfaz gr&aacute;fica.
- * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s
- */
+/** Factor&iacute;a de elementos de interfaz gr&aacute;fica.
+ * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public final class AOUIFactory {
 
     private AOUIFactory() {
@@ -169,6 +167,21 @@ public final class AOUIFactory {
     		                            final String title,
     		                            final int messageType) {
         uiManager.showMessageDialog(parentComponent, message, title, messageType);
+    }
+
+    /** Muestra un di&aacute;logo de error de forma modal. Difiere del normal mostrado con <code>JOptionPane</code>
+     * en que, siguiendo la gu&iacute;a de estilo de interfaces de Microsoft, el bot&oacute;n no es "OK", sino
+     * "Cerrar". El comportamiento por lo dem&aacute;s es igual, incluyendo los par&aacute;metros, a
+     * <code>JOptionPane</code>.
+     * @param parent Componente padre para la modalidad.
+     * @param message Mensaje de error.
+     * @param title Titulo de la ventana de error.
+     * @param messageType Tipo de mensaje. */
+    public static void showErrorMessage(final Object parent,
+    		                            final Object message,
+    		                            final String title,
+    		                            final int messageType) {
+    	uiManager.showErrorMessage(parent, message, title, messageType);
     }
 
     /**

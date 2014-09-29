@@ -31,6 +31,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.batik.swing.JSVGCanvas;
 
+import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.signature.SignValidity;
 import es.gob.afirma.standalone.LookAndFeelManager;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
@@ -43,12 +44,14 @@ final class SignResultPanel extends JPanel {
     private final JLabel resultTextLabel = new JLabel();
 
     SignResultPanel(final SignValidity validity, final KeyListener extKeyListener) {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                createUI(validity, extKeyListener);
-            }
-        });
+        SwingUtilities.invokeLater(
+    		new Runnable() {
+	            @Override
+	            public void run() {
+	                createUI(validity, extKeyListener);
+	            }
+	        }
+		);
     }
 
     void createUI(final SignValidity validity, final KeyListener extKeyListener) {
@@ -151,7 +154,7 @@ final class SignResultPanel extends JPanel {
                     }
                 }
                 catch (final Exception e) {
-                    UIUtils.showErrorMessage(
+                	AOUIFactory.showErrorMessage(
                         SignResultPanel.this,
                         SimpleAfirmaMessages.getString("SignResultPanel.0") + he.getURL(), //$NON-NLS-1$
                         SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
