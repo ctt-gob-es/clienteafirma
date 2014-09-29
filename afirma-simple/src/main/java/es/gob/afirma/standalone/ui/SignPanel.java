@@ -771,28 +771,28 @@ public final class SignPanel extends JPanel {
             }
             final AOKeyStoreManager ksm = SignPanel.this.getSimpleAfirma().getAOKeyStoreManager();
 
-            PrivateKeyEntry pke;
-                try {
-                	final AOKeyStoreDialog dialog = new AOKeyStoreDialog(ksm, SignPanel.this, true, false, true);
-                	dialog.show();
-                	pke = ksm.getKeyEntry(dialog.getSelectedAlias(), ksm.getType().getCertificatePasswordCallback(SignPanel.this));
-                }
-                catch (final AOCancelledOperationException e) {
-                    return null;
-                }
-                catch (final Exception e) {
-                	LOGGER.severe("Ocurrio un error al extraer la clave privada del certificiado seleccionado: " + e); //$NON-NLS-1$
-                	UIUtils.showErrorMessage(
-                            SignPanel.this,
-                            SimpleAfirmaMessages.getString("SignPanel.56"), //$NON-NLS-1$
-                            SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
-                            JOptionPane.ERROR_MESSAGE
-                        );
-                	return null;
-            	}
-                finally {
-                    SignPanel.this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-                }
+            final PrivateKeyEntry pke;
+            try {
+            	final AOKeyStoreDialog dialog = new AOKeyStoreDialog(ksm, SignPanel.this, true, false, true);
+            	dialog.show();
+            	pke = ksm.getKeyEntry(dialog.getSelectedAlias(), ksm.getType().getCertificatePasswordCallback(SignPanel.this));
+            }
+            catch (final AOCancelledOperationException e) {
+                return null;
+            }
+            catch (final Exception e) {
+            	LOGGER.severe("Ocurrio un error al extraer la clave privada del certificiado seleccionado: " + e); //$NON-NLS-1$
+            	UIUtils.showErrorMessage(
+                    SignPanel.this,
+                    SimpleAfirmaMessages.getString("SignPanel.56"), //$NON-NLS-1$
+                    SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
+                    JOptionPane.ERROR_MESSAGE
+                );
+            	return null;
+        	}
+            finally {
+                SignPanel.this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+            }
 
             setSignCommandEnabled(false);
 
@@ -833,8 +833,8 @@ public final class SignPanel extends JPanel {
             final Properties p = ExtraParamsHelper.preferencesToExtraParams(preferences, SignPanel.this.getSigner());
 
             final String signatureAlgorithm = preferences.get(PreferencesNames.PREFERENCE_SIGNATURE_ALGORITHM, "SHA512withRSA"); //$NON-NLS-1$
-            final byte[] signResult;
 
+            final byte[] signResult;
             try {
                 if (SignPanel.this.isCosign()) {
                     signResult = SignPanel.this.getSigner().cosign(
