@@ -82,6 +82,9 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 		}
 	}
 
+	private static final int DEFAULT_WINDOW_WIDTH = 780;
+	private static final int DEFAULT_WINDOW_HEIGHT = 550;
+
 	private static final String GOOGLE_ANALYTICS_TRACKING_CODE = "UA-41615516-4"; //$NON-NLS-1$
 	private static final String IP_DISCOVERY_AUTOMATION = "http://checkip.amazonaws.com"; //$NON-NLS-1$
 
@@ -188,7 +191,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
         if (showDNIeScreen) {
            	this.currentPanel = new DNIeWaitPanel(this);
            	final MainScreen mainScreen = new MainScreen();
-           	mainScreen.showMainScreen(this, this.currentPanel, 780, 500);
+           	mainScreen.showMainScreen(this, this.currentPanel, DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT);
            	this.window = mainScreen;
             this.window.setTitle(SimpleAfirmaMessages.getString("SimpleAfirma.10")); //$NON-NLS-1$
             this.container = this.window;
@@ -196,7 +199,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
         else {
         	final MainScreen mainScreen = new MainScreen();
         	this.currentPanel = new SignPanel(mainScreen, this, true);
-           	mainScreen.showMainScreen(this, this.currentPanel, 780, 500);
+           	mainScreen.showMainScreen(this, this.currentPanel, DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT);
         	this.window = mainScreen;
         	this.window.setTitle(SimpleAfirmaMessages.getString("SimpleAfirma.10")); //$NON-NLS-1$
         	this.container = this.window;
