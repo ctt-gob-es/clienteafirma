@@ -86,8 +86,8 @@ final class ShowFileLinkAction {
 				Logger.getLogger("es.gob.afirma").severe("No se ha podido guardar el fichero: " + e); //$NON-NLS-1$ //$NON-NLS-2$
 				AOUIFactory.showErrorMessage(
 					null,
-					"No se ha podido guardar el fichero",
-					"Error",
+					SimpleAfirmaMessages.getString("ShowFileLinkAction.3"), //$NON-NLS-1$
+					SimpleAfirmaMessages.getString("ShowFileLinkAction.4"), //$NON-NLS-1$
 					JOptionPane.ERROR_MESSAGE
 				);
 			}
