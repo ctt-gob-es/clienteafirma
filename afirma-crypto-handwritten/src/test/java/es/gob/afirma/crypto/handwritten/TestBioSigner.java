@@ -44,7 +44,7 @@ public final class TestBioSigner implements SignaturePadListener {
 			"ID001", // Id //$NON-NLS-1$
 			this, // SignaturePadListener
 			"HOLA", // Plantilla HTML //$NON-NLS-1$
-			new Rectangle(10, 10, 400, 200),
+			new Rectangle(10, 10, 1100, 1100),
 			p
 		);
 	}
