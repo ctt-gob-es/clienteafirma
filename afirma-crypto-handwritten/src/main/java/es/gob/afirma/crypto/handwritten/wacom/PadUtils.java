@@ -27,13 +27,13 @@ import es.gob.afirma.crypto.handwritten.SignaturePadException;
 
 final class PadUtils {
 
+	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+
 	/** Tiempo a esperar para reintentar la reconexi&oacute;n USB si esta falla. */
 	private static final int RECONNECT_WAIT_TIME_MILIS = 500;
 
 	/** N&uacute;mero m&aacute;ximo re reintentos de reconexi&oacute;n USB. */
 	private static final int RECONNECT_MAX_ATTEMPS = 3;
-
-	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	static {
 		setLibraryPath();
@@ -264,5 +264,21 @@ final class PadUtils {
 			bitmap.getHeight(),
 			useColor
 		);
+	}
+
+	// Devuelve el nombre del modelo de la tableta sin espacios en blanco
+	static String getTabletModel(final Tablet tablet) {
+
+		// Modelo de la tableta
+		String model;
+		try {
+			model = tablet.getInformation().getModelName().replace(" ", "_");  //$NON-NLS-1$//$NON-NLS-2$
+		}
+		catch(final Exception e) {
+			LOGGER.warning("Error en la obtecion del modelo de la tableta."); //$NON-NLS-1$
+			return "UNKNOWN"; //$NON-NLS-1$
+		}
+
+		return model;
 	}
 }

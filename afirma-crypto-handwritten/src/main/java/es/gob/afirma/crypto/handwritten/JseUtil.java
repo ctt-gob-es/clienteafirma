@@ -1,6 +1,8 @@
 package es.gob.afirma.crypto.handwritten;
 
 import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics2D;
 import java.awt.GraphicsEnvironment;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
@@ -8,6 +10,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.Properties;
 
 import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
@@ -31,6 +34,8 @@ import es.gob.afirma.crypto.handwritten.data.Handler;
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public final class JseUtil {
 
+	private static final String FOOTER_PROP_FILE = "/footerText.properties"; //$NON-NLS-1$
+
 	private JseUtil() {
 		// No instanciable
 	}
@@ -38,6 +43,63 @@ public final class JseUtil {
 	static {
 		Handler.install();
 	}
+
+	/** A&ntilde;ade un pie de texto a una imagen JPEG.
+	 * @param jpegImage Imagen JPEG de entrada
+	 * @param footerTxt Texto a a&ntilde;adir como pie.
+	 * @return Imagen JPEG con el pie a&ntilde;adido.
+	 * @throws IOException Si hay errores durante el proceso. */
+	public static byte[] addFooter(final byte[] jpegImage, final String footerTxt) throws IOException {
+
+		Properties properties = new Properties();
+		// Cargamos el fichero de propiedades del estilo de pie de firma
+		properties.load(
+			JseUtil.class.getResourceAsStream(
+				FOOTER_PROP_FILE
+			)
+		);
+
+		BufferedImage bi = jpeg2BufferedImage(jpegImage, true);
+
+		// Se crea una nueva imagen formada por la firma en jpg y el footer
+		BufferedImage biWithFooter = new BufferedImage(
+											bi.getWidth(),
+											bi.getHeight() + Integer.parseInt(properties.getProperty("font.size")),  //$NON-NLS-1$
+											BufferedImage.TYPE_BYTE_BINARY
+										);
+
+		// Definimos un grafico para insertar la imagen y el pie de firma dentro de la nueva imagen creada
+		Graphics2D g = biWithFooter.createGraphics();
+
+		// Definimos el fondo blanco de la imagen
+		g.setBackground(Color.WHITE);
+		g.clearRect(0, 0, biWithFooter.getWidth(), biWithFooter.getHeight());
+
+		// Dibujamos la firma
+		g.drawImage(bi, null, 0,  0);
+
+		// Definimos la fuente del pie de firma
+		g.setFont(
+			new Font(
+				properties.getProperty("font.name"), //$NON-NLS-1$
+				Font.PLAIN,
+				Integer.parseInt(properties.getProperty("font.size")) //$NON-NLS-1$
+			)
+		);
+
+		// El texto en color negro
+		g.setColor(Color.BLACK);
+
+		// Insertamos el pie de firma
+		g.drawString(
+			footerTxt,
+			Integer.parseInt(properties.getProperty("margin.left")), //$NON-NLS-1$
+			biWithFooter.getHeight() - g.getFont().getSize() / 4 + 2
+		);
+
+		return bufferedImage2Jpeg(biWithFooter);
+	}
+
 
 	/** Convierte una <code>BufferedImage</code> de AWT en una imagen JPEG.
 	 * @param img <code>BufferedImage</code> de origen
@@ -168,7 +230,7 @@ public final class JseUtil {
 	     }
     }
 
-    private static class CustomHTMLEditorKit extends HTMLEditorKit {
+    private static final class CustomHTMLEditorKit extends HTMLEditorKit {
 
     	private static final long serialVersionUID = -916670986056265502L;
 

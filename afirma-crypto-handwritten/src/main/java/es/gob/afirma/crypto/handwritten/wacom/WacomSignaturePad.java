@@ -80,9 +80,6 @@ public final class WacomSignaturePad extends SignaturePad implements ITabletHand
 	private Rectangle sigArea = null;
 	private boolean useColor = false;
 
-	/** Modelo de la tableta*/
-	private String model;
-
 	/** Imagen que se muestra en la pantalla replicada. */
 	private BufferedImage bitmap = null;
 
@@ -167,7 +164,7 @@ public final class WacomSignaturePad extends SignaturePad implements ITabletHand
 			this.sigArea.x * this.panel.getWidth() / this.bitmap.getWidth() + 1 ,
 			this.sigArea.y * this.panel.getHeight() / this.bitmap.getHeight() + 2,
 			this.sigArea.width * this.panel.getWidth() / this.bitmap.getWidth() -1,
-			this.sigArea.height * this.panel.getHeight() / this.bitmap.getHeight() -1
+			this.sigArea.height * this.panel.getHeight() / this.bitmap.getHeight() -2
 		);
 	}
 
@@ -317,66 +314,85 @@ public final class WacomSignaturePad extends SignaturePad implements ITabletHand
 			this.getToolkit().getScreenResolution()
 		);
 
-		try {
-			// Obtenemos el modelo de la tableta. Dependiendo del modelo de la tableta seleccionaremos el fichero properties correspondiente al modelo.
-			this.model = this.tablet.getInformation().getModelName().replace(" ", "_"); //$NON-NLS-1$ //$NON-NLS-2$
-
-		} catch (final STUException e) {
-			e.printStackTrace();
-		}
-
-		//Obtenemos el fichero properties correspondiente al modelo de tableta detectada
-		final Properties properties = new Properties();
-
-		try {
-			if(this.model != null ) {
-				// Cargamos el fichero de propiedades
-				properties.load(
-						WacomSignaturePad.class.getResourceAsStream(
-								WACOM_RESOUCE_PATH +
-								this.model +
-								PROPERTIES_EXTENSION
-							)
-						);
-			}
-		} catch (final IOException ex) {
-			ex.printStackTrace();
-		}
-
-		// La situamos acorde a la imagen de fondo
-		this.panel.setLocation(
-			Integer.parseInt(properties.getProperty("location.x")), //$NON-NLS-1$
-			Integer.parseInt(properties.getProperty("location.y")) //$NON-NLS-1$
-		);
-
-		this.setLayout(null);
-		this.setBounds(
-			10, 10,
-			Integer.parseInt(properties.getProperty("bound.w")),  //$NON-NLS-1$
-			Integer.parseInt(properties.getProperty("bound.h")) //$NON-NLS-1$
-		);
 		this.setResizable(false);
 
-		// Pintamos la imagen de fondo (imagen de la tableta fisica, por estetica)
-		final JLabel bgImage = new JLabel(new ImageIcon(
-												WacomSignaturePad.class.getResource(
-														 properties.getProperty("backgroundImagePath") //$NON-NLS-1$
-												)
-										));
-		bgImage.setBounds(
-			0, 0,
-			Integer.parseInt(properties.getProperty("bound.w")),  //$NON-NLS-1$
-			Integer.parseInt(properties.getProperty("bound.h")) //$NON-NLS-1$
-		);
+        String model = PadUtils.getTabletModel(this.tablet);
 
-		this.add(this.panel);
-		this.add(bgImage);
+		try {
+
+			// Obtenemos el fichero properties correspondiente al modelo de tableta detectada
+			final Properties properties = new Properties();
+			// Cargamos el fichero de propiedades
+			properties.load(
+				WacomSignaturePad.class.getResourceAsStream(
+					WACOM_RESOUCE_PATH +
+					model +
+					PROPERTIES_EXTENSION
+				)
+			);
+
+			// Establecemos la situacion del area de captura respecto a la ventana y el fondo
+			this.panel.setLocation(
+				Integer.parseInt(properties.getProperty("location.x")), //$NON-NLS-1$
+				Integer.parseInt(properties.getProperty("location.y")) //$NON-NLS-1$
+			);
+
+			this.setBounds(
+				10, 10,
+				Integer.parseInt(properties.getProperty("bound.w")),  //$NON-NLS-1$
+				Integer.parseInt(properties.getProperty("bound.h")) //$NON-NLS-1$
+			);
+
+			// Pintamos la imagen de fondo (imagen de la tableta fisica, por estetica)
+			final JLabel bgImage = new JLabel(
+				new ImageIcon(
+					WacomSignaturePad.class.getResource(
+						properties.getProperty("backgroundImagePath") //$NON-NLS-1$
+					)
+				)
+			);
+
+			bgImage.setBounds(
+				0, 0,
+				Integer.parseInt(properties.getProperty("bound.w")),  //$NON-NLS-1$
+				Integer.parseInt(properties.getProperty("bound.h")) //$NON-NLS-1$
+			);
+
+			this.setLayout(null);
+			this.add(this.panel);
+			this.add(bgImage);
+
+		}
+		catch (NullPointerException ex) {
+			LOGGER.warning("Modelo de tableta de captura no reconocido (" + model + "): " + ex); //$NON-NLS-1$ //$NON-NLS-2$
+			setMirrorDefaultSize();
+		}
+		catch(NumberFormatException ex) {
+			LOGGER.warning("Error en el formato del fichero de propiedades para el modelo (" + model + "): " + ex); //$NON-NLS-1$ //$NON-NLS-2$
+			setMirrorDefaultSize();
+		}
+		catch (IOException ex) {
+			LOGGER.warning("Error leyendo el fichero de propiedades para el modelo (" + model + "): " + ex); //$NON-NLS-1$ //$NON-NLS-2$
+			setMirrorDefaultSize();
+		}
 
 		// Calculamos el modo de codificacion para la imagen a enviar a la tableta
 		this.encodingMode = PadUtils.getTabletEncodingMode(this.useColor, this.tablet);
 
 		// Anadimos el manejador que recibe los datos de la firma.
 		this.tablet.addTabletHandler(this);
+
+	}
+
+	private void setMirrorDefaultSize() {
+		//this.setLayout(new BorderLayout());
+		this.add(this.panel);
+		this.setBounds(
+			10,
+			10,
+			this.panel.getWidth(),
+			this.panel.getHeight()
+		);
 	}
 
 	/** Inicializa la tableta para una firma.
