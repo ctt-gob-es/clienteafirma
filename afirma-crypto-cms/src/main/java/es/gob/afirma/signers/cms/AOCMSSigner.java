@@ -292,7 +292,7 @@ public final class AOCMSSigner implements AOSigner {
 
     /** {@inheritDoc} */
     @Override
-	public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo) throws AOInvalidFormatException {
+	public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo) {
     	new BCChecker().checkBouncyCastle();
         final ReadNodesTree rn = new ReadNodesTree();
         try {
