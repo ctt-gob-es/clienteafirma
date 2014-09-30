@@ -2,11 +2,10 @@ package es.gob.afirma.crypto.handwritten.pdf;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.List;
 
 import com.lowagie.text.pdf.PdfStamper;
 import com.lowagie.text.xml.xmp.XmpWriter;
-
-import es.gob.afirma.crypto.handwritten.SignerInfoBean;
 
 /** Funciones de XMP para PDF.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
@@ -27,34 +26,13 @@ public final class PdfXmpHelper {
 	}
 
 	/** Construye una estructura XMP de metadatos para su posterior inserci&oacute;n en un PDF.
-	 * @param bioSignData Datos biom&eacute;tricos de firma.
-	 * @param pkDn DN de la clave de firma.
-	 * @param signerInfo Informaci&oacute;n del firmante.
+	 * @param signs Firmas biom&eacute;tricas.
 	 * @return Estructura XMP.
 	 * @throws IOException Cuando ocurre un error al construir la estructura. */
-	public static byte[] buildXmp(final byte[] bioSignData,
-			                      final String pkDn,
-			                      final SignerInfoBean signerInfo) throws IOException {
+	public static byte[] buildXmp(final List<XmpSignStructure> signs) throws IOException {
 
 		// Datos a insertar como XMP
-		final BioMetadataSchema schema = new BioMetadataSchema();
-		if (bioSignData != null) {
-			schema.addBioSignData(bioSignData);
-		}
-
-		// DN de la clave de firma
-		if (pkDn != null) {
-			schema.addKeyDn(pkDn);
-		}
-
-		// Datos del firmante
-		if (signerInfo != null &&
-				(signerInfo.getName() != null ||
-				signerInfo.getSurname1() != null ||
-				signerInfo.getSurname2() != null ||
-				signerInfo.getId() != null)) {
-			schema.addSignerData(signerInfo.getName(), signerInfo.getSurname1(), signerInfo.getSurname2(), signerInfo.getId());
-		}
+		final BioMetadataSchema schema = new BioMetadataSchema(signs);
 
 		// Insertamos los datos en el XMP
 		final ByteArrayOutputStream os = new ByteArrayOutputStream();
