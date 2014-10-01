@@ -119,56 +119,9 @@ public final class QualifiedCertificatesFilter extends CertificateFilter {
 	 * localizado una pareja satisfactoria. */
 	private static String searchQualifiedSignatureCertificate(final X509Certificate cert, final KeyStoreManager ksm, final String[] aliases) {
 		X509Certificate cert2;
-
-
-		//Logger.getLogger("es.gob.afirma").info(
-		final StringBuilder buffer = new StringBuilder();
-		buffer.append("El certificado al que corresponde el numero de serie no es un certificado "). //$NON-NLS-1$
-				append("de firma, se mostrara su informacion ademas de la del resto de certificados "). //$NON-NLS-1$
-				append("del almacen:\n"). //$NON-NLS-1$
-				append("Certificado original:\n"). //$NON-NLS-1$
-				append("\t- Numero de serie: ").append(cert.getSerialNumber()).append('\n'). //$NON-NLS-1$
-				append("\t- Issuer: ").append(cert.getIssuerDN()).append('\n'). //$NON-NLS-1$
-				append("\t- Fecha de caducidad: ").append(getExpiredDate(cert)).append('\n'); //$NON-NLS-1$
-				if (cert.getKeyUsage() != null) {
-					buffer.append("\t- KeyUsages:\n"). //$NON-NLS-1$
-					append("\t\t+ digitalSignature: ").append(cert.getKeyUsage()[0]).append('\n'). //$NON-NLS-1$
-					append("\t\t+ nonRepudiation: ").append(cert.getKeyUsage()[1]).append('\n'). //$NON-NLS-1$
-					append("\t\t+ keyEncipherment: ").append(cert.getKeyUsage()[2]).append('\n'). //$NON-NLS-1$
-					append("\t\t+ dataEncipherment: ").append(cert.getKeyUsage()[3]).append('\n'). //$NON-NLS-1$
-					append("\t\t+ keyAgreement: ").append(cert.getKeyUsage()[4]).append('\n'). //$NON-NLS-1$
-					append("\t\t+ keyCertSign: ").append(cert.getKeyUsage()[5]).append('\n'). //$NON-NLS-1$
-					append("\t\t+ cRLSign: ").append(cert.getKeyUsage()[6]).append('\n'). //$NON-NLS-1$
-					append("\t\t+ encipherOnly: ").append(cert.getKeyUsage()[7]).append('\n'). //$NON-NLS-1$
-					append("\t\t+ decipherOnly: ").append(cert.getKeyUsage()[8]).append('\n'); //$NON-NLS-1$
-				}
-				else {
-					buffer.append("\t- El certificado no tiene definidos KeyUsages\n"); //$NON-NLS-1$
-				}
-				buffer.append(" -----\n"); //$NON-NLS-1$
-
 		for (final String aliase : aliases) {
 			cert2 = ksm.getCertificate(aliase);
 			if (!cert.getSerialNumber().equals(cert2.getSerialNumber())) {
-				buffer.append("Certificado:\n"). //$NON-NLS-1$
-				append("\t- Numero de serie: ").append(cert2.getSerialNumber()).append('\n'). //$NON-NLS-1$
-				append("\t- Issuer: ").append(cert2.getIssuerDN()).append('\n'). //$NON-NLS-1$
-				append("\t- Fecha de caducidad: ").append(getExpiredDate(cert2)).append('\n'); //$NON-NLS-1$
-				if (cert2.getKeyUsage() != null) {
-					buffer.append("\t- KeyUsages:\n"). //$NON-NLS-1$
-					append("\t\t+ digitalSignature: ").append(cert2.getKeyUsage()[0]).append('\n'). //$NON-NLS-1$
-					append("\t\t+ nonRepudiation: ").append(cert2.getKeyUsage()[1]).append('\n'). //$NON-NLS-1$
-					append("\t\t+ keyEncipherment: ").append(cert2.getKeyUsage()[2]).append('\n'). //$NON-NLS-1$
-					append("\t\t+ dataEncipherment: ").append(cert2.getKeyUsage()[3]).append('\n'). //$NON-NLS-1$
-					append("\t\t+ keyAgreement: ").append(cert2.getKeyUsage()[4]).append('\n'). //$NON-NLS-1$
-					append("\t\t+ keyCertSign: ").append(cert2.getKeyUsage()[5]).append('\n'). //$NON-NLS-1$
-					append("\t\t+ cRLSign: ").append(cert2.getKeyUsage()[6]).append('\n'). //$NON-NLS-1$
-					append("\t\t+ encipherOnly: ").append(cert2.getKeyUsage()[7]).append('\n'). //$NON-NLS-1$
-					append("\t\t+ decipherOnly: ").append(cert2.getKeyUsage()[8]).append('\n'); //$NON-NLS-1$
-				} else {
-					buffer.append("\t- El certificado no tiene definidos KeyUsages\n"); //$NON-NLS-1$
-				}
-				buffer.append(" -----\n"); //$NON-NLS-1$
 				final boolean sameIssuer = cert.getIssuerDN() == null ?
 						cert2.getIssuerDN() == null : cert.getIssuerDN().equals(cert2.getIssuerDN());
 				final boolean sameSubjectSN = getSubjectSN(cert) == null ?
@@ -176,14 +129,12 @@ public final class QualifiedCertificatesFilter extends CertificateFilter {
 				final boolean sameExpiredData = getExpiredDate(cert) == null ?
 						getExpiredDate(cert2) == null : getExpiredDate(cert).equals(getExpiredDate(cert2));
 				if (QualifiedCertificatesFilter.isSignatureCert(cert2) && sameIssuer && sameSubjectSN && sameExpiredData) {
-					buffer.append("Se ha elegido el certificado recien mostrado como pareja del original"); //$NON-NLS-1$
-					Logger.getLogger("es.gob.afirma").info(buffer.toString()); //$NON-NLS-1$
+					Logger.getLogger("es.gob.afirma").info( //$NON-NLS-1$
+							"Se selecciona un certificado pareja de firma del certificado del numero de serie indicado"); //$NON-NLS-1$
 					return aliase;
 				}
 			}
 		}
-		buffer.append("NO se ha elegido ningun certificado como pareja del original"); //$NON-NLS-1$
-		Logger.getLogger("es.gob.afirma").info(buffer.toString()); //$NON-NLS-1$
 		return null;
 	}
 
