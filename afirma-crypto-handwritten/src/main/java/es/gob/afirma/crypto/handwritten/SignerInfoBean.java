@@ -68,4 +68,10 @@ public final class SignerInfoBean {
 		return this.id;
 	}
 
+	/** Obtiene el nombre completo.
+	 * @return Nombre completo del firmante: nombre apellido1 apellido2. */
+	public String getSignerName() {
+		return this.name + " " + this.surname1 + (this.surname2 != null ? " " + this.surname2 : "");  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
+	}
+
 }

@@ -1,282 +1,544 @@
 package es.gob.afirma.crypto.handwritten;
 
-import java.io.File;
-import java.io.FileOutputStream;
+import java.awt.Dimension;
+import java.awt.Frame;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.net.URL;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.cert.X509Certificate;
-import java.util.Properties;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
-import es.gob.afirma.core.misc.AOUtil;
-import es.gob.afirma.crypto.handwritten.pdf.PdfSignerManager;
-import es.gob.afirma.crypto.handwritten.pdf.PdfXmpHelper;
+import javax.imageio.ImageIO;
+import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
+
+import es.gob.afirma.core.ui.AOUIFactory;
 
 /** Ejecutor de procesos de firma biom&eacute;trica
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public final class BioSignerRunner implements SignaturePadListener {
 
-	/** Logger para la impresi&oacute;n de trazas. */
-	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma");  //$NON-NLS-1$
+	private static final String ERROR_ICON = "/error.png"; //$NON-NLS-1$
+	private static final String CHECK_ICON = "/check.png"; //$NON-NLS-1$
+	private static final String SIGN_ICON = "/sign.png"; //$NON-NLS-1$
+	private static final String LOCK_ICON = "/lock.png"; //$NON-NLS-1$
 
-	/** Algoritmo de huella digital interno. */
-	private static final String DIGEST_ALGO = "SHA-512"; //$NON-NLS-1$
+	// Opciones para el dialogo de cancelacion
+	private static int REPEAT_SIGN = 0;
+	private static int REPEAT_ALL_PROCESS = 1;
+	private static int CANCEL_ALL_PROCESS = 2;
 
-	/** Nombre del par&aacute;metro a utilizar para la subida de datos. */
-	private static final String DEFAULT_URL_PARAM_TO_UPLOAD_DATA = "data"; //$NON-NLS-1$
+	private static final int BUTTON_BOX_GAP = 10;
+	private static final int BUTTON_PANEL_BORDER = 10;
+	private static final int BUTTON_HEIGHT = 75;
+	private static final int BUTTON_WIDTH = 500;
 
-	// *********************************************************************
-	// ************* Atributos comunes para todas las firmas ***************
 
-	/** Componente padre para la modalidad. */
-	private final Object parentComponent;
+	private static final int MIN_WIDTH = 300;
+	private static final int MIN_HEIGHT_CONSTANT = 90;
 
-	/** Certificado para el cifrado. */
-	private final X509Certificate cert;
+	private final SignTask signTask;
+	SignTask getSignTask() {
+		return this.signTask;
+	}
 
-	/** Documento a firmar. */
-	private final byte[] pdfDoc;
+	private int signCount;
+	int decreaseSignCount() {
+		this.signCount = this.signCount -1;
+		return this.signCount;
+	}
 
-	/** Par&aacute;metro del POST donde indicar el PDF al servicio Web de env&iacute;o de PDF firmado. */
-	private final String postDataParamName;
+	private JButton opSignButton;
+	void enableOpSignButton() {
+		if (this.opSignButton != null) {
+			this.opSignButton.setEnabled(true);
+		}
+	}
+	void setOpSignButton(final JButton b) {
+		this.opSignButton = b;
+	}
 
-	/** URL del POST del servicio Web de env&iacute;o de PDF firmado. */
-	private final URL targetUrl;
+	/** Asociaci&oacute;n de los identificadores de firma con su posici&oacute;n en la
+	 * lista de firmas. */
+	private final Map<String, Integer> signIdAssociation = new ConcurrentHashMap<String, Integer>();
+	Map<String, Integer> getAssociationMap () {
+		return this.signIdAssociation;
+	}
 
-	// *********************************************************************
-	// *********************************************************************
+	/** Resultados de las firmas que se van haciendo. */
+	private final Map<String, SignatureResult> sigResults = new ConcurrentHashMap<String, SignatureResult>();
 
-	private final SignerInfoBean signerInfo = null;
-	private final Properties extraParams = null;
+	private final List<String> signIdList = new ArrayList<String>();
+
+	static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+
+	private final JFrame frame = new JFrame();
+	Frame getMainFrame() {
+		return this.frame;
+	}
+
+	private final List<JButton> buttonList = new ArrayList<JButton>();
+	List<JButton> getButtonList() {
+		return this.buttonList;
+	}
 
 	/** Crea el ejecutor de procesos de firma biom&eacute;trica.
-	 * @param parent Componente padre sobre el que mostrar los elementos visuales.
-	 * @param retrieveUrl URL para la recuperac&oacute;n (GET HTTP) del PDF a firmar.
-	 * @param postDataParam Par&aacute;metro del POST donde indicar el PDF al servicio Web de
-	 *                      env&iacute;o de PDF firmado.
-	 * @param sendUrl URL del POST del servicio Web de env&iacute;o de PDF firmado.
-	 * @param cypherCert Certificado de donde obtener la clave publica para el cifrado de los
-	 *                   datos.
-	 * @throws IOException Si hay problemas descargando el PDF a firmar.
-	 */
-	public BioSignerRunner(final Object parent,
-			               final URL retrieveUrl,
-			               final URL sendUrl,
-			               final String postDataParam,
-			               final X509Certificate cypherCert) throws IOException {
+	 * @param xml Contiene los datos de la tarea de firma.
+	 * @throws IOException */
+	public BioSignerRunner(final String xml) throws IOException {
 
-		if (retrieveUrl == null) {
+		if (xml == null) {
+			throw new IllegalArgumentException("El XML de entrada no puede ser nulo"); //$NON-NLS-1$
+		}
+		try {
+			this.signTask = SignTask.getInstance(xml);
+		}
+		catch (final Exception e) {
 			throw new IllegalArgumentException(
-				"Es necesario indicar un origen del documento a firmar" //$NON-NLS-1$
+				"El XML no se ha podido tratar, es probable que no sea correcto: " + e, //$NON-NLS-1$
+				e
 			);
 		}
-		if (sendUrl == null) {
-			throw new IllegalArgumentException(
-				"Es necesario indicar un destino para el documento firmado" //$NON-NLS-1$
-			);
-		}
-		if (cypherCert == null) {
-			LOGGER.warning(
-				"No se ha proporcionado un certificado de cifrado, el resultado no se cifrara" //$NON-NLS-1$
-			);
-		}
-		if (postDataParam == null) {
-			LOGGER.info(
-				"No se ha indicado el nombre del parametro del POST donde indicar el PDF al servicio Web " + //$NON-NLS-1$
-				"de env&iacute;o de PDF firmado, se usara '" + DEFAULT_URL_PARAM_TO_UPLOAD_DATA + "'" //$NON-NLS-1$ //$NON-NLS-2$
-			);
-			this.postDataParamName = DEFAULT_URL_PARAM_TO_UPLOAD_DATA;
+		this.signCount = getSignTask().getBioSigns().size();
+
+		SwingUtilities.invokeLater(
+			new Runnable() {
+				@Override
+				public void run() {
+					createUI(getSignTask());
+				}
+			}
+		);
+	}
+
+	private JButton createButton(final int ordinal, final String img) {
+
+		JButton btn = new JButton();
+		this.buttonList.add(btn);
+
+		final String signerData;
+
+
+		if(getSignTask().getBioSigns().size() < ordinal) {
+			signerData = HandwrittenMessages.getString("BioSignerRunner.20"); //$NON-NLS-1$
+			btn.setEnabled(false);
+			setOpSignButton(btn);
 		}
 		else {
-			this.postDataParamName = postDataParam;
+			signerData = getSignTask().getBioSigns().get(ordinal-1).getSignerData().toString();
 		}
 
-		LOGGER.info("Se inicia la descarga del documento a firmar"); //$NON-NLS-1$
-		this.pdfDoc = downloadDocument(retrieveUrl);
-		LOGGER.info("Se ha terminado la descarga del documento a firma. Bytes recibidos: " + this.pdfDoc.length); //$NON-NLS-1$
+		btn.setText(buttonTxt(signerData, ordinal, img));
 
-		this.parentComponent = parent;
-		this.cert = cypherCert;
-		this.targetUrl = sendUrl;
+		btn.getAccessibleContext().setAccessibleDescription(
+			HandwrittenMessages.getString("BioSignerRunner.0") + signerData//$NON-NLS-1$
+		);
+		btn.setPreferredSize(new Dimension(BUTTON_WIDTH, BUTTON_HEIGHT));
 
+		btn.setMnemonic(Integer.toString(ordinal).toCharArray()[0]);
+		btn.setHorizontalAlignment(SwingConstants.LEFT);
+
+		btn.addActionListener(
+			new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent ae) {
+					JButton b = (JButton) ae.getSource();
+					b.setEnabled(false);
+					try {
+						launchSign(ordinal-1);
+					}
+					catch(Exception e) {
+						b.setText(buttonTxt(signerData, ordinal, ERROR_ICON));
+						//TODO: Mostrar dialog de error
+						return;
+					}
+				}
+			}
+		);
+
+		return btn;
+	}
+
+
+	static String buttonTxt(final String signerData, final int ordinal, final String img) {
+		return 	"<html>" + //$NON-NLS-1$
+				"<table style=\"width:100%\">" + //$NON-NLS-1$
+				"<tr>" + //$NON-NLS-1$
+					"<td>" + //$NON-NLS-1$
+						"<img src=" + //$NON-NLS-1$
+							new ImageIcon(BioSignerRunner.class.getResource(img)) +
+						">" + //$NON-NLS-1$
+					"</td>" + //$NON-NLS-1$
+					"<td>" + //$NON-NLS-1$
+					"<b style=\"text-align: left\">" + //$NON-NLS-1$
+						"<u>" + //$NON-NLS-1$
+							Integer.toString(ordinal) +
+						"</u>" + //$NON-NLS-1$
+						". " + signerData + //$NON-NLS-1$
+					"</b>" + //$NON-NLS-1$
+				"</td>" + //$NON-NLS-1$
+				"</tr>" + //$NON-NLS-1$
+			"</table>"; //$NON-NLS-1$
+	}
+
+
+	void launchSign(final int ordinal) {
+
+		SingleBioSignData sign = null;
+
+		// Asociamos el identificador de firma al ordinal
+		if(ordinal >= getSignTask().getBioSigns().size()) {
+			//Firma del funcionario
+			// TODO: firmar con el cliente
+			LOGGER.info("Firma del funcionario");
+			manageSignatures();
+		}
+		else {
+			sign = getSignTask().getBioSigns().get(ordinal);
+			this.signIdAssociation.put(
+				sign.getId(),
+				Integer.valueOf(ordinal)
+			);
+		}
+
+		// Captura desde tableta
+		if (sign != null) {
+
+			// Abrimos la pantalla de firma en la tableta
+			try{
+				LOGGER.info("Abrimos la pantalla de firma"); //$NON-NLS-1$
+				BioSigner bs = new BioSigner();
+				// Si hay plantilla HTML
+				if (sign.getHtmlTemplate() != null) {
+					bs.sign(
+						getMainFrame(),
+						sign.getId(),
+						BioSignerRunner.this,
+						sign.getHtmlTemplate(),
+						sign.getSignatureArea()
+					);
+				}
+				// Si no es imagen o null
+				else {
+					bs.sign(
+						getMainFrame(),
+						sign.getId(),
+						BioSignerRunner.this,
+						sign.getJpegTemplate(),
+						sign.getSignatureArea()
+					);
+				}
+
+			}
+			catch (Exception ex) {
+				abortTask(null, ex);
+			}
+			//TODO: Guardar resultado de la firma
+		}
+		else {
+			// Firma del funcionario
+		}
+
+	}
+
+	// Crea el panel de botones de firma
+	void createUI(final SignTask st) {
+
+		this.frame.setTitle(HandwrittenMessages.getString("BioSignerRunner.19")); //$NON-NLS-1$
+		this.frame.getAccessibleContext().setAccessibleDescription(
+			HandwrittenMessages.getString("BioSignerRunner.1") //$NON-NLS-1$
+		);
+
+		try {
+			this.frame.setIconImage(ImageIO.read(BioSignerRunner.class.getResource("/logo_cliente_96x96.png")));
+		}
+		catch (final IOException e) {
+			LOGGER.warning(
+					"No ha sido posible establecer el icono del dialogo: " + e //$NON-NLS-1$
+				);
+		}
+		this.frame.setLayout(new GridLayout());
+
+		// Creamos el panel donde incluiremos los botones
+		JPanel buttonPanel = new JPanel();
+		buttonPanel.getAccessibleContext().setAccessibleDescription(
+			HandwrittenMessages.getString("BioSignerRunner.2") //$NON-NLS-1$
+		);
+		// Creamos el layout donde colocar los botones
+		buttonPanel.setLayout(new GridLayout(0, 1, BUTTON_BOX_GAP, BUTTON_BOX_GAP));
+
+		buttonPanel.setBorder(BorderFactory
+			.createEmptyBorder(
+				BUTTON_PANEL_BORDER,
+				BUTTON_PANEL_BORDER,
+				BUTTON_PANEL_BORDER,
+				BUTTON_PANEL_BORDER
+			)
+		);
+
+		// Anadimos los botones
+		List<SingleBioSignData> signs = st.getBioSigns();
+		for (int i=1; i<=signs.size(); i++) {
+			buttonPanel.add(createButton(i, SIGN_ICON));
+		}
+
+		if(st.isCompleteWithCriptoSign()) {
+			// Se necesita firma del funcionario
+			// Anadimos boton de firma del funcionario
+			buttonPanel.add(createButton(signs.size() + 1, LOCK_ICON));
+		}
+
+		this.frame.setMinimumSize(new Dimension(MIN_WIDTH, MIN_HEIGHT_CONSTANT * signs.size()));
+		buttonPanel.setMaximumSize(new Dimension(800, 120 * signs.size()));
+
+		this.frame.add(buttonPanel);
+		this.frame.pack();
+		this.frame.setLocationRelativeTo(null);
+
+
+	}
+
+	/** Muestra la ventana con las tareas de firma. */
+	public void show() {
+		this.frame.setVisible(true);
+	}
+
+	private void abortTask(final String signatureId, final Throwable t) {
+
+		LOGGER.warning("El proceso de firma ha sido abortado: " + t.getMessage());
+
+		final String errorMsg;
+		if (signatureId == null) {
+			errorMsg = "Error general";
+		}
+		else {
+			SignerInfoBean signer = getSignTask().getBioSigns().get(
+				getAssociationMap().get(signatureId).intValue()
+			).getSignerData();
+
+			String signerName = signer.getSignerName();
+			errorMsg = "Error durante la firma de " + signerName;
+		}
+
+		AOUIFactory.showErrorMessage(
+			getMainFrame(),
+			errorMsg,
+			"Error en el proceso de captura de firma",
+			JOptionPane.ERROR_MESSAGE
+		);
+
+		closeApp();
+	}
+
+	private void cancelTask(final String signatureId) {
+
+		int signerPosition = getAssociationMap().get(signatureId).intValue();
+		String signerName = null;
+
+		String errorMsg = null;
+		if (signatureId == null) {
+			abortTask(null, null);
+		}
+		else {
+
+			SignerInfoBean signer = getSignTask().getBioSigns().get(
+				signerPosition
+			).getSignerData();
+
+			signerName = signer.getSignerName();
+
+			errorMsg = "El usuario \"" + signerName + "\" ha cancelado la firma. ¿Qué desea hacer?"; //$NON-NLS-1$ //$NON-NLS-2$
+		}
+
+		// Variable para indicar si se muestra el dialogo con las tres opciones
+		boolean showOpDlg = true;
+
+		while(showOpDlg){
+
+			int n = JOptionPane.showOptionDialog(
+				this.frame,
+			    errorMsg,
+			    "Firma cancelada",
+			    JOptionPane.CANCEL_OPTION,
+			    JOptionPane.WARNING_MESSAGE,
+			    null,
+			    new Object[] {
+					"Repetir sólo esta firma",
+		            "Repetir todo el proceso",
+		            "Cancelar todo el proceso"
+				},
+			    null
+		    );
+
+			if(n == REPEAT_SIGN) {
+				LOGGER.info("Repetir la firma"); //$NON-NLS-1$
+				JButton b = getButtonList().get(signerPosition);
+				b.setEnabled(true);
+				b.setText( buttonTxt(signerName, signerPosition + 1,SIGN_ICON));
+				showOpDlg = false;
+			}
+			else if(n == REPEAT_ALL_PROCESS) {
+				LOGGER.info("Repetir todo el proceso"); //$NON-NLS-1$
+
+				// Borrar todas las firmas ya realizadas
+				this.sigResults.clear();
+
+				// Volver a activar los botones.
+				List<SingleBioSignData> signersList = getSignTask().getBioSigns();
+				for(int i = 0; i < signersList.size(); i++) {
+					getButtonList().get(i).setEnabled(true);
+					getButtonList().get(i).setText(
+						buttonTxt(
+							signersList.get(i).getSignerData().toString(),
+							i + 1,
+							SIGN_ICON
+						)
+					);
+				}
+
+				// El boton del operador debe aparecer desactivado
+				if(getSignTask().isCompleteWithCriptoSign()) {
+					getButtonList().get(getButtonList().size() - 1).setEnabled(false);
+				}
+
+				showOpDlg = false;
+			}
+			else if (n == CANCEL_ALL_PROCESS){
+				LOGGER.info("Cancelar todo el proceso");
+
+				if (JOptionPane.YES_OPTION == AOUIFactory
+					.showConfirmDialog(
+						getMainFrame(),
+						"¿Estas seguro de cancelar todo el proceso?",
+						"Cancelar todo el proceso",
+						JOptionPane.YES_NO_OPTION,
+						JOptionPane.QUESTION_MESSAGE
+				)) {
+					//TODO: canelar todo el proceso
+					AOUIFactory.showMessageDialog(
+						getMainFrame(),
+						"Proceso cancelado.",
+						"Cancelado",
+						JOptionPane.OK_CANCEL_OPTION
+					);
+					closeApp();
+					showOpDlg = false;
+				}
+			}
+		}
+	}
+
+	private void closeApp() {
+		// Borrar todas las firmas ya realizadas
+		this.sigResults.clear();
+		// TODO: Cerrar aplicacion
+		getMainFrame().setVisible(false);
+	}
+
+	@Override
+	public void signatureCancelled(final String signatureId) {
+		LOGGER.info("Firma cancelada"); //$NON-NLS-1$
+		cancelTask(signatureId);
+	}
+
+	@Override
+	public void signatureAborted(final Throwable e, final String signatureId) {
+		LOGGER.info("Firma abort"); //$NON-NLS-1$
+		abortTask(signatureId, e);
 	}
 
 	@Override
 	public void signatureFinished(final SignatureResult sr) {
 
-		LOGGER.info("La firma se realizo correctamente"); //$NON-NLS-1$
+		LOGGER.info("Firma realizada con exito. " + " ID: " + sr.getSignatureId()); //$NON-NLS-1$
 
-		// Obtenemos la huella digital de los datos
-		byte[] mdDoc;
-		try {
-			mdDoc = SimpleCryptoHelper.messageDigest(this.pdfDoc, DIGEST_ALGO);
-		} catch (final NoSuchAlgorithmException e1) {
-			e1.printStackTrace();
-			throw new RuntimeException();
-		}
+		// Guardamos la firma
+		this.sigResults.put(sr.getSignatureId(), sr);
 
-		// Obtenemos los metadatos
-		LOGGER.info("Obtenemos los metadatos de la firma"); //$NON-NLS-1$
-		final byte[] metadata;
-		try {
-			metadata = buildXmpMetadata(
-				sr.getSignatureData(),
-				sr.getSignatureRawData(),
-				mdDoc,
-				this.cert,
-				this.signerInfo
+		this.signIdList.add(sr.getSignatureId());
+
+		int signerPosition = getAssociationMap().get(sr.getSignatureId()).intValue();
+
+		SignerInfoBean signer = getSignTask().getBioSigns().get(
+				signerPosition
+			).getSignerData();
+
+		getButtonList().get(signerPosition).setText(
+			buttonTxt(
+				signer.getSignerName(),
+				signerPosition + 1,
+				CHECK_ICON)
 			);
+
+		int count = decreaseSignCount();
+		// Si el contador es meno que cero quiere decir que la firma es del funcionario
+		if(count < 0) {
+			//TODO: Tramite realizado por el funcionario
+			LOGGER.info("Firma del funcionario"); //$NON-NLS-1$
+			//TODO: empezar a gestionar las firmas recibidas
+			manageSignatures();
+			//return;
 		}
-		catch(final InvalidKeyException e) {
-			e.printStackTrace();
+		// Comprobamos si hay firma de funcionario, y si la hay miramos
+		// si todos los botones estan deshabilitados, para habilitarlo.
+		// Si no hay firma de funcionario y todos los botones estan deshabilitados es que
+		// hemos terminado.
+
+		if(getSignTask().isCompleteWithCriptoSign()) {
+			if(count == 0) {
+				enableOpSignButton();
+			}
+		}
+		else {
+			// Fin de tramite
+			manageSignatures();
 			return;
 		}
-		catch(final CipherException e) {
-			e.printStackTrace();
-			return;
-		}
-		catch(final Exception e) {
-			e.printStackTrace();
-			return;
-		}
-
-		// Insertamos todo en el PDF
-		LOGGER.info("Agregamos al PDF la informacion de firma"); //$NON-NLS-1$
-		final byte[] signedPdf;
-		try {
-			signedPdf = PdfSignerManager.addPdfInfo(
-				this.pdfDoc,
-				metadata,
-				sr.getSignatureJpegImage(),
-				this.signerInfo,
-				sr.getSignaturePadInfo(),
-				this.extraParams
-			);
-		}
-		catch(final Exception e) {
-			e.printStackTrace();
-			return;
-		}
-
-		// Enviamos el PDF
-		LOGGER.info("Se envia el PDF"); //$NON-NLS-1$
-		try {
-			sendPdf(this.targetUrl, signedPdf);
-		}
-		catch(final IOException e) {
-			e.printStackTrace();
-			//showErrorMessage(this.parentComponent, HandWrittenMessages.getString("BioSigner.4")); //$NON-NLS-1$
-		}
 	}
 
-	/** Crea el XMP con los metadatos para el PDF.
-	 * @param isoBioData Datos biom&eacute;tricos de firma seg&uacute;n la ISO.
-	 * @param rawBioData Datos biom&eacute;tricos de firma en bruto.
-	 * @param md Huella digital de los datos.
-	 * @param cypherCert Certificado para el cifrado de datos.
-	 * @param signerInfo Informaci&oacute;n del firmante.
-	 * @return Metadatos del PDF.
-	 * @throws IOException Cuando
-	 * @throws InvalidKeyException Cuando la clave p&uacute;blica no es v&aacute;lida.
-	 * @throws CipherException Cuando no se pueden cifrar los documetos. */
-	private static byte[] buildXmpMetadata(final byte[] isoBioData,
-			                               final byte[] rawBioData,
-			                               final byte[] md,
-			                               final X509Certificate cypherCert,
-			                               final SignerInfoBean signerInfo) throws IOException,
-			                                                                       InvalidKeyException,
-			                                                                       CipherException {
+	private void manageSignatures() {
 
-		final byte[] bioData = new BioDataStructure(isoBioData, rawBioData, md, DIGEST_ALGO).getEncoded();
+		Map<String, SignatureResult> signatures = this.sigResults;
+		LOGGER.info("Numero de firmas: "  + this.signIdList.size() );
 
-		byte[] bioDataCiphered;
-		try {
-			bioDataCiphered = SimpleCryptoHelper.cipherData(bioData, cypherCert);
+		// Ponemos pie de firma a las firmas
+		for(int i = 0; i < this.signIdList.size(); i ++) {
+
+			LOGGER.info("Id lista: "  + this.signIdList.get(i) + "  " +signatures.get(this.signIdList.get(i)).getSignatureId()); //$NON-NLS-1$
+			SignatureResult sr = signatures.get(this.signIdList.get(i));
+
+			byte[] jpg = sr.getSignatureJpegImage();
+
+			LOGGER.info("Tenemos la imagen");
+
+			try {
+				byte[] signFooter = JseUtil.addFooter(jpg, "Astrid Idoate");
+			} catch (IOException e) {
+				LOGGER.warning("No se ha podido añadir el pie de firma al usuario: " + " " + e.getMessage());
+			}
+			//TODO: Borrar estas lineas, solo sirven para comprobar si la opcion de añadir footer funciona bien
+			//os = new FileOutputStream(File.createTempFile("MODDD", ".jpg"));
+			// Anadimos el pie de firma a la firma
+			//os.write(JseUtil.addFooter(jpg, "Astrid Idoate"));
+			//os.flush();
+			//os.close();
 		}
-		catch (final Exception e) {
-			throw new CipherException(e);
-		}
-		return PdfXmpHelper.buildXmp(
-			bioDataCiphered,
-			cypherCert.getIssuerX500Principal().toString(),
-			signerInfo
-		);
+		// Insertamos las firmas en el pdf
+
+		// Añadimos MoreInfo
+
+		// Añadimos XMP
+
+		// Firmamos el fichero con el Cliente
 	}
-
-	@Override
-	public void signatureCancelled(final String id) {
-
-		LOGGER.info("Firma cancelada: " + id); //$NON-NLS-1$
-
-		//showErrorMessage(this.parentComponent, HandWrittenMessages.getString("BioSigner.5")); //$NON-NLS-1$
-	}
-
-	@Override
-	public void signatureAborted(final Throwable e, final String id) {
-
-		LOGGER.info("Ocurrio un error durante la firma (" + id + ") y fue abortada: " + e); //$NON-NLS-1$ //$NON-NLS-2$
-
-		e.printStackTrace();
-		//showErrorMessage(this.parentComponent, HandWrittenMessages.getString("BioSigner.6") + e); //$NON-NLS-1$
-	}
-
-	/** Descarga el contenido de una URL.
-	 * @param retrieverUrl URL de descarga.
-	 * @return Contenido accesible a partir de la URL.
-	 * @throws IOException Cuando no es posible acceder al recurso remoto o descargarlo. */
-	private static byte[] downloadDocument(final URL retrieverUrl) throws IOException {
-
-		System.out.println("Usamos documento en disco para depuracion"); //$NON-NLS-1$
-		return AOUtil.getDataFromInputStream(
-			BioSigner.class.getResourceAsStream("/AppCampus_Tomas_Garcia-Meras.pdf") //$NON-NLS-1$
-		);
-
-//		final InputStream is = retrieverUrl.openStream();
-//		byte[] data = AOUtil.getDataFromInputStream(is);
-//		is.close();
-//
-//		return data;
-	}
-
-	/** Env&iacute;a los datos indicados mediante POST a la URL proporcionada.
-	 * @param storeUrl URL a la que enviar los datos.
-	 * @param signedPdf Datos a enviar.
-	 * @throws IOException Cuando ocurre alg&uacute;n error durante el env&iacute;o. */
-	private static void sendPdf(final URL storeUrl, final byte[] signedPdf) throws IOException {
-
-		System.out.println("Almacenamos el PDF en disco para depuracion"); //$NON-NLS-1$
-		final File tmpFile = File.createTempFile("BIO_", ".pdf"); //$NON-NLS-1$ //$NON-NLS-2$
-		final OutputStream fos = new FileOutputStream(tmpFile);
-		fos.write(signedPdf);
-		fos.flush();
-		fos.close();
-		System.out.println(tmpFile.getAbsolutePath());
-
-//		final Map<String, String> params = new HashMap<String, String>();
-//		params.put(dataUrlParam, Base64.encode(signedPdf, true));
-//
-//		try {
-//			HttpConnectionManager.sendDataByPost(storeUrl, params);
-//		} catch (IOException e) {
-//			LOGGER.severe("Ocurrio un error durante el envio del PDF firmado al servidor remoto: " + e); //$NON-NLS-1$
-//			throw e;
-//		}
-	}
-
-
-	/** Excepci&oacute;n que identifica un error en el cifrado de datos. */
-	private static final class CipherException extends Exception {
-
-		private static final long serialVersionUID = -4712179728841694716L;
-
-		/** Construye una excepci&oacute;n que identifica un error en el cifrado de datos..
-		 * @param cause Causa de la excepci&oacute;n. */
-		public CipherException(final Throwable cause) {
-			super(cause);
-		}
-	}
-
 }

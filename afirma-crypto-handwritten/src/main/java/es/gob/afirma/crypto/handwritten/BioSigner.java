@@ -1,7 +1,6 @@
 package es.gob.afirma.crypto.handwritten;
 
 import java.io.IOException;
-import java.util.Properties;
 import java.util.logging.Logger;
 
 import es.gob.afirma.crypto.handwritten.wacom.WacomSignatureWindow;
@@ -23,7 +22,6 @@ public final class BioSigner {
 	 * @param template  Plantilla en formato HTML a mostrar en la tableta de firma.
 	 * @param signatureArea Area en la que el usuario pueden firmar dentro de la pantalla
 	 *                      de la tableta de firma.
-	 * @param params Par&aacute;metros adicionales de configuraci&oacute;n de firma.
 	 * @throws IOException Cuando ocurre un error en la descarga de los datos o la codificacion
 	 *                     de la plantilla a mostrar en la tableta de firma.
 	 * @throws SignaturePadException Cuando no se ha podido inicializar la tableta de firma. */
@@ -31,8 +29,7 @@ public final class BioSigner {
 			         final String signatureId,
 					 final SignaturePadListener spl,
 					 final String template,
-					 final Rectangle signatureArea,
-					 final Properties params) throws IOException, SignaturePadException {
+					 final Rectangle signatureArea) throws IOException, SignaturePadException {
 
 		this.signatureAreaOnPad = signatureArea;
 		this.signatureWindow = new WacomSignatureWindow(
@@ -54,7 +51,6 @@ public final class BioSigner {
 	 *                      de la tableta de firma.
 	 * @param signatureArea Area en la que el usuario pueden firmar dentro de la pantalla
 	 *                      de la tableta de firma.
-	 * @param params Par&aacute;metros adicionales de configuraci&oacute;n de firma.
 	 * @throws IOException Cuando ocurre un error en la descarga de los datos o la codificacion
 	 * de la plantilla a mostrar en la tableta de firma.
 	 * @throws SignaturePadException Cuando no se ha podido inicializar la tableta de firma. */
@@ -62,8 +58,7 @@ public final class BioSigner {
 					 final String signatureId,
 					 final SignaturePadListener spl,
 					 final byte[] jpegImage,
-					 final Rectangle signatureArea,
-					 final Properties params) throws IOException, SignaturePadException {
+					 final Rectangle signatureArea) throws IOException, SignaturePadException {
 
 		if (spl == null) {
 			throw new IllegalArgumentException(
@@ -76,11 +71,6 @@ public final class BioSigner {
 		if (signatureArea == null) {
 			LOGGER.info(
 				"No se ha indicado un recuadro de firma en la tableta de captura, se usara toda la pantalla para firmar" //$NON-NLS-1$
-			);
-		}
-		if (params == null) {
-			LOGGER.warning(
-				"No se han proporcionado los parametros adicionales" //$NON-NLS-1$
 			);
 		}
 

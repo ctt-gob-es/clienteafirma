@@ -45,6 +45,29 @@
             </signatureRubricPositionOnPdf>
             <signatureRubricPageOnPdf>1</signatureRubricPageOnPdf>
         </bioSign>
+        <bioSign>
+            <id>f7b4b8ed-7632-472d-8dce-85915f57d237</id>
+            <signerData>
+                <signerName>Tomas</signerName>
+                <signerSurname1>Garcia-Merás</signerSurname1>
+                <signerSurname2>Capote</signerSurname2>
+                <signerId>12345678Z</signerId>
+            </signerData>
+            <htmlTemplate>&lt;html&gt;&lt;body&gt;&lt;h1&gt;HOLA&lt;/h1&gt;&lt;/body&gt;&lt;/html&gt;</htmlTemplate>
+            <signatureArea>
+                <x>10</x>
+                <y>10</y>
+                <width>100</width>
+                <height>100</height>
+            </signatureArea>
+            <signatureRubricPositionOnPdf>
+                <x>50</x>
+                <y>30</y>
+                <width>200</width>
+                <height>75</height>
+            </signatureRubricPositionOnPdf>
+            <signatureRubricPageOnPdf>1</signatureRubricPageOnPdf>
+        </bioSign>
     </bioSigns>
     <completeWithCriptoSign>true</completeWithCriptoSign>
     <completeCriptoSignExtraParams>

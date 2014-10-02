@@ -18,5 +18,6 @@
 	<classpathentry kind="lib" path="lib/wgssSTU.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/afirma-crypto-cms"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/afirma-crypto-cms-enveloper"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/afirma-ui-core-jse"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

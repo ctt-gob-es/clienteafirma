@@ -94,5 +94,9 @@ final class SingleBioSignData {
 		return this.signatureRubricPositionOnPdf;
 	}
 
+	String getId() {
+		return this.id;
+	}
+
 
 }

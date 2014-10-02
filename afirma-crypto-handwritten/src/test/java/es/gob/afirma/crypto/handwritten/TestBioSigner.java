@@ -1,5 +1,8 @@
 package es.gob.afirma.crypto.handwritten;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.util.Properties;
 
 import org.junit.Test;
@@ -44,14 +47,23 @@ public final class TestBioSigner implements SignaturePadListener {
 			"ID001", // Id //$NON-NLS-1$
 			this, // SignaturePadListener
 			"HOLA", // Plantilla HTML //$NON-NLS-1$
-			new Rectangle(10, 10, 1100, 1100),
-			p
+			new Rectangle(10, 10, 400, 200)/*,
+			p*/
 		);
 	}
 
 	@Override
 	public void signatureFinished(final SignatureResult sr) {
 		System.out.println("Firma terminada: " + sr.getSignatureId()); //$NON-NLS-1$
+		byte[] image = sr.getSignatureJpegImage();
+		try {
+			OutputStream os = new FileOutputStream(File.createTempFile("IMG_", ".jpg")); //$NON-NLS-1$ //$NON-NLS-2$
+			os.write(image);
+			os.flush();
+			os.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override
