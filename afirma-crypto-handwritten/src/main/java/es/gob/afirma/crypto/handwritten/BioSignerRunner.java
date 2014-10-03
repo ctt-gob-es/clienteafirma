@@ -509,17 +509,15 @@ public final class BioSignerRunner implements SignaturePadListener {
 	private void manageSignatures() {
 
 		Map<String, SignatureResult> signatures = this.sigResults;
-		LOGGER.info("Numero de firmas: "  + this.signIdList.size() );
+
+		LOGGER.info("Numero de firmas: "  + this.signIdList.size() + "num. firmas " + signatures.size());
 
 		// Ponemos pie de firma a las firmas
 		for(int i = 0; i < this.signIdList.size(); i ++) {
 
-			LOGGER.info("Id lista: "  + this.signIdList.get(i) + "  " +signatures.get(this.signIdList.get(i)).getSignatureId()); //$NON-NLS-1$
 			SignatureResult sr = signatures.get(this.signIdList.get(i));
 
 			byte[] jpg = sr.getSignatureJpegImage();
-
-			LOGGER.info("Tenemos la imagen");
 
 			try {
 				byte[] signFooter = JseUtil.addFooter(jpg, "Astrid Idoate");
