@@ -23,7 +23,8 @@
    </dd>
   <dt><b><i>image</i></b></dt>
    <dd>
-    Imagen que se desea insertar en el PDF antes de que este sea firmado. La imagen debe proporcionarse en formato JPEG codificado en Base64.
+    Imagen que se desea insertar en el PDF antes de que este sea firmado. La imagen debe proporcionarse en formato JPEG codificado en Base64.<br>
+    SI el documento ya contiene firmas es posible que se invaliden, por lo que conviene usarlo &uacute;nicamente en documentos sin firmas previas.
    </dd>
   <dt><b><i>imagePage</i></b></dt>
    <dd>
@@ -84,10 +85,70 @@
      <li><i>3</i> = Firma certificada. Se permite &uacute;nicamente el relleno posterior de los campos del formulario o el a&ntilde;adido de firmas de aprobaci&oacute;n</li>
     </ul>
    </dd>
+  <dt><b><i>signatureSubFilter</i></b></dt>
+   <dd>
+    Nombre del sub-filtro en el diccionario PDF para indicar el tipo de la firma. Si no se indica este par&aacute;metro por defecto se
+    usa <code>adbe.pkcs7.detached</code> (firma PAdES b&aacute;sica).
+    Es posible indicar <code>ETSI.CAdES.detached</code> para generar una firma PAdES-BES, si bien el hacerlo puede causar que al a&ntilde;adir firmas adicionales
+    al PDF se invaliden las ya existentes.
+   </dd>
+  <dt><b><i>signatureField</i></b></dt>
+   <dd>
+    Nombre del campo en donde insertar la firma.
+    Si el documento PDF tiene ya un campo de firma pre-creado es posible utilizarlo para insertar la firma generada, referenci&aacute;ndolo
+    por su nombre.<br>
+    Si se indica un nombre de campo de firma que no exista en el documento PDF proporcionado, se generar&aacute; una excepci&oacute;n.
+   </dd>
+  <dt><b><i>signaturePage</i></b></dt>
+   <dd>
+    P&aacute;gina del documento PDF donde insertar la firma. Puede usarse la constante <code>LAST_PAGE</code>
+    para referirse a la &uacute;ltima p&aacute;gina del documento PDF si se desconoce el n&uacute;mero total de
+    p&aacute;ginas de este.<br>
+    Este par&aacute;metro se ignora si se ha establecido valor al par&aacute;metro <code>signatureField</code>, y necesita que se
+    establezcan valores v&aacute;lidos a los par&aacute;metros <code>signaturePositionOnPageLowerLeftX</code>, <code>signaturePositionOnPageLowerLeftY</code>,
+    <code>signaturePositionOnPageUpperRightX</code> y <code>signaturePositionOnPageUpperRightY</code>.
+   </dd>
+  <dt><b><i>signaturePositionOnPageLowerLeftX</i></b></dt>
+   <dd>
+    Coordenada horizontal inferior izquierda de la posici&oacute;n del recuadro visible de la firma dentro de la p&aacute;gina.<br>
+    Es necesario indicar el resto de coordenadas del recuadro mediante los par&aacute;metros <code>signaturePositionOnPageLowerLeftY</code>,
+    <code>signaturePositionOnPageUpperRightX</code> y <code>signaturePositionOnPageUpperRightY</code>.<br>
+    Si no se indica una p&aacute;gina en el par&aacute;metro <code>signaturePage</code> la firma se inserta en la &uacute;ltima p&aacute;gina
+    del documento.
+   </dd>
+  <dt><b><i>signaturePositionOnPageLowerLeftY</i></b></dt>
+   <dd>
+    Coordenada vertical inferior izquierda de la posici&oacute;n del recuadro visible de la firma dentro de la p&aacute;gina.<br>
+    Es necesario indicar el resto de coordenadas del recuadro mediante los par&aacute;metros <code>signaturePositionOnPageLowerLeftX</code>,
+    <code>signaturePositionOnPageUpperRightX</code> y <code>signaturePositionOnPageUpperRightY</code>.<br>
+    Si no se indica una p&aacute;gina en el par&aacute;metro <code>signaturePage</code> la firma se inserta en la &uacute;ltima p&aacute;gina
+    del documento.
+   </dd>
+  <dt><b><i>signaturePositionOnPageUpperRightX</i></b></dt>
+   <dd>
+    Coordenada horizontal superior derecha de la posici&oacute;n del recuadro visible de la firma dentro de la p&aacute;gina.<br>
+    Es necesario indicar el resto de coordenadas del recuadro mediante los par&aacute;metros <code>signaturePositionOnPageLowerLeftX</code>,
+    <code>signaturePositionOnPageLowerLeftY</code> y <code>signaturePositionOnPageUpperRightY</code>.<br>
+    Si no se indica una p&aacute;gina en el par&aacute;metro <code>signaturePage</code> la firma se inserta en la &uacute;ltima p&aacute;gina
+    del documento.
+   </dd>
+  <dt><b><i>signaturePositionOnPageUpperRightY</i></b></dt>
+   <dd>
+    Coordenada vertical superior derecha de la posici&oacute;n del recuadro visible de la firma dentro de la p&aacute;gina.<br>
+    Es necesario indicar el resto de coordenadas del recuadro mediante los par&aacute;metros <code>signaturePositionOnPageLowerLeftX</code>,
+    <code>signaturePositionOnPageLowerLeftY</code> y <code>signaturePositionOnPageUpperRightX</code>.<br>
+    Si no se indica una p&aacute;gina en el par&aacute;metro <code>signaturePage</code> la firma se inserta en la &uacute;ltima p&aacute;gina
+    del documento.
+   </dd>
+  <dt><b><i>signatureRubricImage</i></b></dt>
+   <dd>Imagen JPEG codificada en Base64 de la r&uacute;brica de la firma manuscrita que se desea aparezca como firma visible en el PDF.</dd>
   <dt><b><i>layer2Text</i></b></dt>
    <dd>
-    Texto a escribir dentro de la "capa 2" de la firma visible. Este texto se escribe &uacute;nicamente si no se ha especificado una
-    imagen de r&uacute;brica.
+    Texto a escribir dentro de la "capa 2" de la firma visible.<br>
+    Este texto se escribe &uacute;nicamente si no se ha especificado una
+    imagen de r&uacute;brica, y necesita que se indique la p&aacute;gina y la situaci&oacute;n d&oacute;nde mostrar el recuadro de firma
+    mediante los par&aacute;metros <code>signaturePositionOnPageLowerLeftX</code>, <code>signaturePositionOnPageLowerLeftY</code>,
+    <code>signaturePositionOnPageUpperRightX</code>, <code>signaturePositionOnPageUpperRightY</code> y <code>signaturePage</code>.
    </dd>
   <dt><b><i>layer2FontFamily</i></b></dt>
    <dd>
@@ -142,63 +203,6 @@
     imagen de r&uacute;brica.
    </dd>
   -->
-  <dt><b><i>signatureSubFilter</i></b></dt>
-   <dd>
-    Nombre del sub-filtro en el diccionario PDF para indicar el tipo de la firma. Si no se indica este par&aacute;metro por defecto se
-    usa <code>adbe.pkcs7.detached</code> (firma PAdES b&aacute;sica).
-    Es posible indicar <code>ETSI.CAdES.detached</code> para generar una firma PAdES-BES, si bien el hacerlo puede causar que al a&ntilde;adir firmas adicionales
-    al PDF se invaliden las ya existentes.
-   </dd>
-  <dt><b><i>signatureField</i></b></dt>
-   <dd>
-    Nombre del campo en donde insertar la firma.
-    Si el documento PDF tiene ya un campo de firma pre-creado es posible utilizarlo para insertar la firma generada, referenci&aacute;ndolo
-    por su nombre.<br>
-    Si se indica un nombre de campo de firma que no exista en el documento PDF proporcionado, se generar&aacute; una excepci&oacute;n.
-   </dd>
-  <dt><b><i>signatureRubricImage</i></b></dt>
-   <dd>Imagen JPEG codificada en Base64 de la r&uacute;brica de la firma manuscrita que se desea aparezca como firma visible en el PDF.</dd>
-  <dt><b><i>signaturePage</i></b></dt>
-   <dd>
-    P&aacute;gina del documento PDF donde insertar la firma. Puede usarse la constante <code>LAST_PAGE</code>
-    para referirse a la &uacute;ltima p&aacute;gina del documento PDF si se desconoce el n&uacute;mero total de
-    p&aacute;ginas de este.<br>
-    Este par&aacute;metro se ignora si se ha establecido valor al par&aacute;metro <code>signatureField</code>, y necesita que se
-    establezcan valores v&aacute;lidos a los par&aacute;metros <code>signaturePositionOnPageLowerLeftX</code>, <code>signaturePositionOnPageLowerLeftY</code>,
-    <code>signaturePositionOnPageUpperRightX</code> y <code>signaturePositionOnPageUpperRightY</code>.
-   </dd>
-  <dt><b><i>signaturePositionOnPageLowerLeftX</i></b></dt>
-   <dd>
-    Coordenada horizontal inferior izquierda de la posici&oacute;n del recuadro visible de la firma dentro de la p&aacute;gina.<br>
-    Es necesario indicar el resto de coordenadas del recuadro mediante los par&aacute;metros <code>signaturePositionOnPageLowerLeftY</code>,
-    <code>signaturePositionOnPageUpperRightX</code> y <code>signaturePositionOnPageUpperRightY</code>.<br>
-    Si no se indica una p&aacute;gina en el par&aacute;metro <code>signaturePage</code> la firma se inserta en la &uacute;ltima p&aacute;gina
-    del documento.
-   </dd>
-  <dt><b><i>signaturePositionOnPageLowerLeftY</i></b></dt>
-   <dd>
-    Coordenada vertical inferior izquierda de la posici&oacute;n del recuadro visible de la firma dentro de la p&aacute;gina.<br>
-    Es necesario indicar el resto de coordenadas del recuadro mediante los par&aacute;metros <code>signaturePositionOnPageLowerLeftX</code>,
-    <code>signaturePositionOnPageUpperRightX</code> y <code>signaturePositionOnPageUpperRightY</code>.<br>
-    Si no se indica una p&aacute;gina en el par&aacute;metro <code>signaturePage</code> la firma se inserta en la &uacute;ltima p&aacute;gina
-    del documento.
-   </dd>
-  <dt><b><i>signaturePositionOnPageUpperRightX</i></b></dt>
-   <dd>
-    Coordenada horizontal superior derecha de la posici&oacute;n del recuadro visible de la firma dentro de la p&aacute;gina.<br>
-    Es necesario indicar el resto de coordenadas del recuadro mediante los par&aacute;metros <code>signaturePositionOnPageLowerLeftX</code>,
-    <code>signaturePositionOnPageLowerLeftY</code> y <code>signaturePositionOnPageUpperRightY</code>.<br>
-    Si no se indica una p&aacute;gina en el par&aacute;metro <code>signaturePage</code> la firma se inserta en la &uacute;ltima p&aacute;gina
-    del documento.
-   </dd>
-  <dt><b><i>signaturePositionOnPageUpperRightY</i></b></dt>
-   <dd>
-    Coordenada vertical superior derecha de la posici&oacute;n del recuadro visible de la firma dentro de la p&aacute;gina.<br>
-    Es necesario indicar el resto de coordenadas del recuadro mediante los par&aacute;metros <code>signaturePositionOnPageLowerLeftX</code>,
-    <code>signaturePositionOnPageLowerLeftY</code> y <code>signaturePositionOnPageUpperRightX</code>.<br>
-    Si no se indica una p&aacute;gina en el par&aacute;metro <code>signaturePage</code> la firma se inserta en la &uacute;ltima p&aacute;gina
-    del documento.
-   </dd>
   <dt><b><i>signReason</i></b></dt>
    <dd>Raz&oacute;n por la que se realiza la firma (este dato se a&ntilde;ade al diccionario PDF, y no a la propia firma).</dd>
   <dt><b><i>signatureProductionCity</i></b> (propiedad compartida con XAdES y CAdES)</dt>

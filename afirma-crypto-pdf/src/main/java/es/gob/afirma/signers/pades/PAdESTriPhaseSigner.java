@@ -248,9 +248,8 @@ public final class PAdESTriPhaseSigner {
      * @return PDF firmado
      * @throws AOException en caso de cualquier tipo de error
      * @throws IOException Cuando ocurre algun error en la conversi&oacute;n o generaci&oacute;n
-     * de estructuras.
-     * @throws NoSuchAlgorithmException Si hay problemas con el algoritmo durante el sello de tiempo
-     * @throws DocumentException Si hay problemas en la lectura del PDF. */
+     *                     de estructuras.
+     * @throws NoSuchAlgorithmException Si hay problemas con el algoritmo durante el sello de tiempo. */
     public static byte[] postSign(final String digestAlgorithmName,
                                   final byte[] inPdf,
                                   final X509Certificate[] signerCertificateChain,
