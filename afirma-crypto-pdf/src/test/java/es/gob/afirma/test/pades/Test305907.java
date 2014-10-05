@@ -4,8 +4,7 @@ import java.security.KeyStore;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.util.Properties;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 import es.gob.afirma.core.misc.AOUtil;
@@ -25,6 +24,8 @@ public final class Test305907 {
 	private final static String CERT_PASS = "12341234"; //$NON-NLS-1$
 	private final static String CERT_ALIAS = "anf usuario activo"; //$NON-NLS-1$
 
+	/** Prueba de detecci&oacute;n de firmas no registradas.
+	 * @throws Exception EN cualquier error. */
 	@SuppressWarnings("static-method")
 	@Test
 	public void testReadRaw() throws Exception {
