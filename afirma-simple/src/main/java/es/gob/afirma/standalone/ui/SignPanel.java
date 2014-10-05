@@ -80,6 +80,7 @@ import es.gob.afirma.keystores.AOKeyStoreManager;
 import es.gob.afirma.signers.cades.AOCAdESSigner;
 import es.gob.afirma.signers.pades.AOPDFSigner;
 import es.gob.afirma.signers.pades.BadPdfPasswordException;
+import es.gob.afirma.signers.pades.PdfHasUnregisteredSignaturesException;
 import es.gob.afirma.signers.pades.PdfIsCertifiedException;
 import es.gob.afirma.signers.xades.AOFacturaESigner;
 import es.gob.afirma.signers.xades.AOXAdESSigner;
@@ -876,6 +877,17 @@ public final class SignPanel extends JPanel {
             	AOUIFactory.showErrorMessage(
                     SignPanel.this,
                     SimpleAfirmaMessages.getString("SignPanel.23"), //$NON-NLS-1$
+                    SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
+                    JOptionPane.ERROR_MESSAGE
+                );
+                setSignCommandEnabled(true);
+                return null;
+            }
+            catch(final PdfHasUnregisteredSignaturesException e) {
+            	LOGGER.warning("PDF con firmas no registradas: " + e); //$NON-NLS-1$
+            	AOUIFactory.showErrorMessage(
+                    SignPanel.this,
+                    SimpleAfirmaMessages.getString("SignPanel.28"), //$NON-NLS-1$
                     SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
                     JOptionPane.ERROR_MESSAGE
                 );
