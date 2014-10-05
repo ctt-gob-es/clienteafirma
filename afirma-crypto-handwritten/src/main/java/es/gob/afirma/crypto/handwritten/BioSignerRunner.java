@@ -123,7 +123,7 @@ public final class BioSignerRunner implements SignaturePadListener {
 
 	private JButton createButton(final int ordinal, final String img) {
 
-		JButton btn = new JButton();
+		final JButton btn = new JButton();
 		this.buttonList.add(btn);
 
 		final String signerData;
@@ -152,12 +152,12 @@ public final class BioSignerRunner implements SignaturePadListener {
 			new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent ae) {
-					JButton b = (JButton) ae.getSource();
+					final JButton b = (JButton) ae.getSource();
 					b.setEnabled(false);
 					try {
 						launchSign(ordinal-1);
 					}
-					catch(Exception e) {
+					catch(final Exception e) {
 						b.setText(buttonTxt(signerData, ordinal, ERROR_ICON));
 						//TODO: Mostrar dialog de error
 						return;
@@ -200,7 +200,7 @@ public final class BioSignerRunner implements SignaturePadListener {
 		if(ordinal >= getSignTask().getBioSigns().size()) {
 			//Firma del funcionario
 			// TODO: firmar con el cliente
-			LOGGER.info("Firma del funcionario");
+			LOGGER.info("Firma del funcionario"); //$NON-NLS-1$
 			manageSignatures();
 		}
 		else {
@@ -217,7 +217,7 @@ public final class BioSignerRunner implements SignaturePadListener {
 			// Abrimos la pantalla de firma en la tableta
 			try{
 				LOGGER.info("Abrimos la pantalla de firma"); //$NON-NLS-1$
-				BioSigner bs = new BioSigner();
+				final BioSigner bs = new BioSigner();
 				// Si hay plantilla HTML
 				if (sign.getHtmlTemplate() != null) {
 					bs.sign(
@@ -240,7 +240,7 @@ public final class BioSignerRunner implements SignaturePadListener {
 				}
 
 			}
-			catch (Exception ex) {
+			catch (final Exception ex) {
 				abortTask(null, ex);
 			}
 			//TODO: Guardar resultado de la firma
@@ -260,25 +260,25 @@ public final class BioSignerRunner implements SignaturePadListener {
 		);
 
 		try {
-			this.frame.setIconImage(ImageIO.read(BioSignerRunner.class.getResource("/logo_cliente_96x96.png")));
+			this.frame.setIconImage(ImageIO.read(BioSignerRunner.class.getResource("/logo_cliente_96x96.png"))); //$NON-NLS-1$
 		}
 		catch (final IOException e) {
 			LOGGER.warning(
-					"No ha sido posible establecer el icono del dialogo: " + e //$NON-NLS-1$
-				);
+				"No ha sido posible establecer el icono del dialogo: " + e //$NON-NLS-1$
+			);
 		}
 		this.frame.setLayout(new GridLayout());
 
 		// Creamos el panel donde incluiremos los botones
-		JPanel buttonPanel = new JPanel();
+		final JPanel buttonPanel = new JPanel();
 		buttonPanel.getAccessibleContext().setAccessibleDescription(
 			HandwrittenMessages.getString("BioSignerRunner.2") //$NON-NLS-1$
 		);
-		// Creamos el layout donde colocar los botones
+		// Establecemos el layout para colocar los botones
 		buttonPanel.setLayout(new GridLayout(0, 1, BUTTON_BOX_GAP, BUTTON_BOX_GAP));
 
-		buttonPanel.setBorder(BorderFactory
-			.createEmptyBorder(
+		buttonPanel.setBorder(
+			BorderFactory.createEmptyBorder(
 				BUTTON_PANEL_BORDER,
 				BUTTON_PANEL_BORDER,
 				BUTTON_PANEL_BORDER,
@@ -287,7 +287,7 @@ public final class BioSignerRunner implements SignaturePadListener {
 		);
 
 		// Anadimos los botones
-		List<SingleBioSignData> signs = st.getBioSigns();
+		final List<SingleBioSignData> signs = st.getBioSigns();
 		for (int i=1; i<=signs.size(); i++) {
 			buttonPanel.add(createButton(i, SIGN_ICON));
 		}
@@ -304,8 +304,6 @@ public final class BioSignerRunner implements SignaturePadListener {
 		this.frame.add(buttonPanel);
 		this.frame.pack();
 		this.frame.setLocationRelativeTo(null);
-
-
 	}
 
 	/** Muestra la ventana con las tareas de firma. */
@@ -315,25 +313,25 @@ public final class BioSignerRunner implements SignaturePadListener {
 
 	private void abortTask(final String signatureId, final Throwable t) {
 
-		LOGGER.warning("El proceso de firma ha sido abortado: " + t.getMessage());
+		LOGGER.warning("El proceso de firma ha sido abortado: " + t); //$NON-NLS-1$
 
 		final String errorMsg;
 		if (signatureId == null) {
-			errorMsg = "Error general";
+			errorMsg = HandwrittenMessages.getString("BioSignerRunner.11"); //$NON-NLS-1$
 		}
 		else {
-			SignerInfoBean signer = getSignTask().getBioSigns().get(
+			final SignerInfoBean signer = getSignTask().getBioSigns().get(
 				getAssociationMap().get(signatureId).intValue()
 			).getSignerData();
 
-			String signerName = signer.getSignerName();
-			errorMsg = "Error durante la firma de " + signerName;
+			final String signerName = signer.getSignerName();
+			errorMsg = HandwrittenMessages.getString("BioSignerRunner.21", signerName); //$NON-NLS-1$
 		}
 
 		AOUIFactory.showErrorMessage(
 			getMainFrame(),
 			errorMsg,
-			"Error en el proceso de captura de firma",
+			HandwrittenMessages.getString("BioSignerRunner.12"), //$NON-NLS-1$
 			JOptionPane.ERROR_MESSAGE
 		);
 
@@ -342,22 +340,21 @@ public final class BioSignerRunner implements SignaturePadListener {
 
 	private void cancelTask(final String signatureId) {
 
-		int signerPosition = getAssociationMap().get(signatureId).intValue();
+		final int signerPosition = getAssociationMap().get(signatureId).intValue();
 		String signerName = null;
-
 		String errorMsg = null;
+
 		if (signatureId == null) {
 			abortTask(null, null);
+			return;
 		}
 		else {
 
-			SignerInfoBean signer = getSignTask().getBioSigns().get(
+			signerName = getSignTask().getBioSigns().get(
 				signerPosition
-			).getSignerData();
+			).getSignerData().getSignerName();
 
-			signerName = signer.getSignerName();
-
-			errorMsg = "El usuario \"" + signerName + "\" ha cancelado la firma. ¿Qué desea hacer?"; //$NON-NLS-1$ //$NON-NLS-2$
+			errorMsg = HandwrittenMessages.getString("BioSignerRunner.13", signerName); //$NON-NLS-1$
 		}
 
 		// Variable para indicar si se muestra el dialogo con las tres opciones
@@ -365,36 +362,37 @@ public final class BioSignerRunner implements SignaturePadListener {
 
 		while(showOpDlg){
 
-			int n = JOptionPane.showOptionDialog(
+			final int n = JOptionPane.showOptionDialog(
 				this.frame,
 			    errorMsg,
-			    "Firma cancelada",
+			    HandwrittenMessages.getString("BioSignerRunner.4"), //$NON-NLS-1$
 			    JOptionPane.CANCEL_OPTION,
 			    JOptionPane.WARNING_MESSAGE,
 			    null,
 			    new Object[] {
-					"Repetir sólo esta firma",
-		            "Repetir todo el proceso",
-		            "Cancelar todo el proceso"
+					HandwrittenMessages.getString("BioSignerRunner.5"), //$NON-NLS-1$
+		            HandwrittenMessages.getString("BioSignerRunner.6"), //$NON-NLS-1$
+		            HandwrittenMessages.getString("BioSignerRunner.7") //$NON-NLS-1$
 				},
 			    null
 		    );
 
-			if(n == REPEAT_SIGN) {
+			if (n == REPEAT_SIGN) {
 				LOGGER.info("Repetir la firma"); //$NON-NLS-1$
-				JButton b = getButtonList().get(signerPosition);
+				final JButton b = getButtonList().get(signerPosition);
 				b.setEnabled(true);
 				b.setText( buttonTxt(signerName, signerPosition + 1,SIGN_ICON));
 				showOpDlg = false;
 			}
-			else if(n == REPEAT_ALL_PROCESS) {
-				LOGGER.info("Repetir todo el proceso"); //$NON-NLS-1$
+			else if (n == REPEAT_ALL_PROCESS) {
+
+				LOGGER.info("Se ha solicitado repetir todo el proceso tras una cancelacion de una firma"); //$NON-NLS-1$
 
 				// Borrar todas las firmas ya realizadas
 				this.sigResults.clear();
 
 				// Volver a activar los botones.
-				List<SingleBioSignData> signersList = getSignTask().getBioSigns();
+				final List<SingleBioSignData> signersList = getSignTask().getBioSigns();
 				for(int i = 0; i < signersList.size(); i++) {
 					getButtonList().get(i).setEnabled(true);
 					getButtonList().get(i).setText(
@@ -414,21 +412,21 @@ public final class BioSignerRunner implements SignaturePadListener {
 				showOpDlg = false;
 			}
 			else if (n == CANCEL_ALL_PROCESS){
-				LOGGER.info("Cancelar todo el proceso");
+				LOGGER.info("Se ha solicitado cancelar todo el proceso tras una cancelacion de una firma"); //$NON-NLS-1$
 
 				if (JOptionPane.YES_OPTION == AOUIFactory
 					.showConfirmDialog(
 						getMainFrame(),
-						"¿Estas seguro de cancelar todo el proceso?",
-						"Cancelar todo el proceso",
+						HandwrittenMessages.getString("BioSignerRunner.8"), //$NON-NLS-1$
+						HandwrittenMessages.getString("BioSignerRunner.9"), //$NON-NLS-1$
 						JOptionPane.YES_NO_OPTION,
 						JOptionPane.QUESTION_MESSAGE
 				)) {
 					//TODO: canelar todo el proceso
 					AOUIFactory.showMessageDialog(
 						getMainFrame(),
-						"Proceso cancelado.",
-						"Cancelado",
+						HandwrittenMessages.getString("BioSignerRunner.10"), //$NON-NLS-1$
+						HandwrittenMessages.getString("BioSignerRunner.14"), //$NON-NLS-1$
 						JOptionPane.OK_CANCEL_OPTION
 					);
 					closeApp();
@@ -443,6 +441,7 @@ public final class BioSignerRunner implements SignaturePadListener {
 		this.sigResults.clear();
 		// TODO: Cerrar aplicacion
 		getMainFrame().setVisible(false);
+		getMainFrame().dispose();
 	}
 
 	@Override
@@ -453,25 +452,25 @@ public final class BioSignerRunner implements SignaturePadListener {
 
 	@Override
 	public void signatureAborted(final Throwable e, final String signatureId) {
-		LOGGER.info("Firma abort"); //$NON-NLS-1$
+		LOGGER.info("Firma abortada"); //$NON-NLS-1$
 		abortTask(signatureId, e);
 	}
 
 	@Override
 	public void signatureFinished(final SignatureResult sr) {
 
-		LOGGER.info("Firma realizada con exito. " + " ID: " + sr.getSignatureId()); //$NON-NLS-1$
+		LOGGER.info("Firma realizada con exito con identificador: " + sr.getSignatureId()); //$NON-NLS-1$
 
 		// Guardamos la firma
 		this.sigResults.put(sr.getSignatureId(), sr);
 
 		this.signIdList.add(sr.getSignatureId());
 
-		int signerPosition = getAssociationMap().get(sr.getSignatureId()).intValue();
+		final int signerPosition = getAssociationMap().get(sr.getSignatureId()).intValue();
 
-		SignerInfoBean signer = getSignTask().getBioSigns().get(
-				signerPosition
-			).getSignerData();
+		final SignerInfoBean signer = getSignTask().getBioSigns().get(
+			signerPosition
+		).getSignerData();
 
 		getButtonList().get(signerPosition).setText(
 			buttonTxt(
@@ -480,7 +479,7 @@ public final class BioSignerRunner implements SignaturePadListener {
 				CHECK_ICON)
 			);
 
-		int count = decreaseSignCount();
+		final int count = decreaseSignCount();
 		// Si el contador es meno que cero quiere decir que la firma es del funcionario
 		if(count < 0) {
 			//TODO: Tramite realizado por el funcionario
@@ -489,6 +488,7 @@ public final class BioSignerRunner implements SignaturePadListener {
 			manageSignatures();
 			//return;
 		}
+
 		// Comprobamos si hay firma de funcionario, y si la hay miramos
 		// si todos los botones estan deshabilitados, para habilitarlo.
 		// Si no hay firma de funcionario y todos los botones estan deshabilitados es que
@@ -508,21 +508,21 @@ public final class BioSignerRunner implements SignaturePadListener {
 
 	private void manageSignatures() {
 
-		Map<String, SignatureResult> signatures = this.sigResults;
+		final Map<String, SignatureResult> signatures = this.sigResults;
 
-		LOGGER.info("Numero de firmas: "  + this.signIdList.size() + "num. firmas " + signatures.size());
+		LOGGER.info("Numero de firmas: "  + this.signIdList.size() + "num. firmas " + signatures.size()); //$NON-NLS-1$ //$NON-NLS-2$
 
 		// Ponemos pie de firma a las firmas
 		for(int i = 0; i < this.signIdList.size(); i ++) {
 
-			SignatureResult sr = signatures.get(this.signIdList.get(i));
+			final SignatureResult sr = signatures.get(this.signIdList.get(i));
 
-			byte[] jpg = sr.getSignatureJpegImage();
+			final byte[] jpg = sr.getSignatureJpegImage();
 
 			try {
-				byte[] signFooter = JseUtil.addFooter(jpg, "Astrid Idoate");
-			} catch (IOException e) {
-				LOGGER.warning("No se ha podido añadir el pie de firma al usuario: " + " " + e.getMessage());
+				final byte[] signFooter = JseUtil.addFooter(jpg, "Astrid Idoate"); //$NON-NLS-1$
+			} catch (final IOException e) {
+				LOGGER.warning("No se ha podido añadir el pie de firma al usuario: " + e); //$NON-NLS-1$
 			}
 			//TODO: Borrar estas lineas, solo sirven para comprobar si la opcion de añadir footer funciona bien
 			//os = new FileOutputStream(File.createTempFile("MODDD", ".jpg"));

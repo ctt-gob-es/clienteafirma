@@ -10,7 +10,6 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "singleBioSignData")
 final class SingleBioSignData {
 
-	@XmlElement(name = "id")
 	private final String id;
 
 	/** Datos del firmante. */
