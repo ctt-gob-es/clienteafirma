@@ -1003,6 +1003,9 @@ public final class XAdESSigner {
 		if (envelopedNodeXPath != null && AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED.equals(format)) {
 			signatureInsertionNode = XAdESUtil.getFirstElmentFromXPath(envelopedNodeXPath, docSignature.getDocumentElement());
 		}
+		else if (nodeToSign != null) {
+			signatureInsertionNode = CustomUriDereferencer.getElementById(docSignature, nodeToSign);
+		}
 
 		// Instancia XADES_EPES
 		final XAdES_EPES xades = (XAdES_EPES) XAdES.newInstance(

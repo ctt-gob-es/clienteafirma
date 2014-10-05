@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bookstore>
-<book category="COOKING">
+<book category="COOKING" Id="1">
   <title lang="en">Everyday Italian</title>
   <author>Giada De Laurentiis</author>
   <year>2005</year>
   <price>30.00</price>
 </book>
-<book category="CHILDREN">
+<book category="CHILDREN" Id="2">
   <title lang="en">Harry Potter</title>
   <author>J K. Rowling</author>
   <year>2005</year>
