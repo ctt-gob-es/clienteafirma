@@ -11,7 +11,6 @@
 package es.gob.afirma.signers.pades;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Logger;
@@ -43,7 +42,7 @@ public final class PdfPreProcessor {
 		if (moreInfo == null || moreInfo.isEmpty()) {
 			return;
 		}
-		stp.setMoreInfo((HashMap<String, String>) moreInfo);
+		stp.setMoreInfo(moreInfo);
 	}
 
 	static void attachFile(final Properties extraParams, final PdfStamper stp) throws IOException {

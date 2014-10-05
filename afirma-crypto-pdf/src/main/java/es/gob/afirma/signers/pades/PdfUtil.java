@@ -1,16 +1,23 @@
 package es.gob.afirma.signers.pades;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
 import java.util.Properties;
 import java.util.logging.Logger;
 
 import com.lowagie.text.DocumentException;
 import com.lowagie.text.exceptions.BadPasswordException;
+import com.lowagie.text.pdf.PdfArray;
 import com.lowagie.text.pdf.PdfDeveloperExtension;
+import com.lowagie.text.pdf.PdfDictionary;
 import com.lowagie.text.pdf.PdfName;
+import com.lowagie.text.pdf.PdfObject;
 import com.lowagie.text.pdf.PdfReader;
 import com.lowagie.text.pdf.PdfSignatureAppearance;
 import com.lowagie.text.pdf.PdfStamper;
+import com.lowagie.text.pdf.PdfString;
 import com.lowagie.text.pdf.PdfWriter;
 
 import es.gob.afirma.core.AOCancelledOperationException;
@@ -150,5 +157,38 @@ final class PdfUtil {
 				}
 			}
 		}
+	}
+
+	static void checkUnregisteredSignatures(final PdfReader pdfReader, final Properties extraParams) throws PdfHasUnregisteredSignaturesException {
+
+		boolean ret = false;
+    	for (int i = 0; i < pdfReader.getXrefSize(); i++) {
+    		final PdfObject pdfobj = pdfReader.getPdfObject(i);
+    		if (pdfobj != null && pdfobj.isDictionary()) {
+    			final PdfDictionary d = (PdfDictionary) pdfobj;
+    			if (PdfName.SIG.equals(d.get(PdfName.TYPE))) {
+    				ret = true;
+    				try {
+						final X509Certificate cert = (X509Certificate) CertificateFactory.getInstance("X.509").generateCertificate( //$NON-NLS-1$
+							new ByteArrayInputStream(
+								((PdfString) ((PdfArray) d.get(PdfName.CERT)).getArrayList().get(0)).getOriginalBytes()
+							)
+						);
+						LOGGER.info(
+							"Encontrada firma no registrada, hecha con certificado emitido por: " + cert.getIssuerX500Principal().toString() //$NON-NLS-1$
+						);
+					}
+    				catch (final Exception e) {
+						LOGGER.warning("No se ha podido comprobar la identidad de una firma no registrada: " + e); //$NON-NLS-1$
+					}
+    			}
+    		}
+    	}
+    	if (Boolean.TRUE.toString().equalsIgnoreCase(extraParams.getProperty("allowCosigningUnregisteredSignatures"))) { //$NON-NLS-1$
+    		return;
+		}
+    	if (ret) {
+    	   throw new PdfHasUnregisteredSignaturesException();
+    	}
 	}
 }

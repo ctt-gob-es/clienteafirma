@@ -180,6 +180,7 @@ public final class PdfSessionManager {
 		);
 
 		PdfUtil.checkPdfCertification(pdfReader.getCertificationLevel(), extraParams);
+		PdfUtil.checkUnregisteredSignatures(pdfReader, extraParams);
 
 		// Los derechos van firmados por Adobe, y como desde iText se invalidan
 		// es mejor quitarlos

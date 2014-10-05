@@ -351,10 +351,22 @@ public final class AOPDFSigner implements AOSigner {
     		LOGGER.severe("No se ha podido obtener la informacion de los firmantes del PDF, se devolvera un arbol vacio: " + e); //$NON-NLS-1$
     		return new AOTreeModel(root);
     	}
+
     	final List<String> names = af.getSignatureNames();
     	Object pkcs1Object = null;
     	for (int i = 0; i < names.size(); ++i) {
-    		final PdfPKCS7 pcks7 = af.verifySignature(names.get(i).toString());
+    		final PdfPKCS7 pcks7;
+    		try {
+    			pcks7 = af.verifySignature(names.get(i).toString());
+    		}
+    		catch(final Exception e) {
+    			LOGGER.severe(
+					"El PDF contiene una firma corrupta o con un formato desconocido (" + //$NON-NLS-1$
+						names.get(i).toString() +
+						"), se continua con las siguientes si las hubiese: " + e //$NON-NLS-1$
+				);
+    			continue;
+    		}
     		if (asSimpleSignInfo) {
     			final AOSimpleSignInfo ssi = new AOSimpleSignInfo(
 					new X509Certificate[] {

@@ -9,6 +9,14 @@
  <body>
  <p>Valores aceptados como par&aacute;metros adicionales para las firmas PAdES:</p>
  <dl>
+  <dt><b><i>allowCosigningUnregisteredSignatures</i></b></dt>
+  <dd>
+   Si se establece a <code>true</code> se permite firmar un PDF incluso si este contiene firmas previas no
+   registradas dentro de campos Acrobat (<i>AcroFields</i>), condici&oacute;n obligatoria sin la cual es muy
+   probable que se corrompan las firmas previas.<br>
+   Si no se establece o se establece a o <code>false</code>, al intentar firmar un PDF cque contenga firmas
+   no registradas se lanza una excepci&oacute;n de tipo <code>PdfHasUnregisteredSignaturesException</code>.
+  </dd>
   <dt><b><i>includeOnlySignningCertificate</i></b> (propiedad compartida con XAdES y CAdES)</dt>
    <dd>
 	Si se establece a <code>true</code> se incluye en la firma &uacute;nicamente el certificado del firmante (y no la cadena de certificaci&oacute;n completa).
