@@ -267,9 +267,8 @@ public final class PdfSessionManager {
 		// Imagenes
 		PdfPreProcessor.addImage(extraParams, stp);
 
-		// iText antiguo
+		// Establecemos el render segun iText antiguo, varia en versiones modernas
 		sap.setRender(PdfSignatureAppearance.SignatureRenderDescription);
-		// En iText nuevo seria "sap.setRenderingMode(PdfSignatureAppearance.RenderingMode.NAME_AND_DESCRIPTION);"
 
 		// Razon de firma
 		if (reason != null) {
