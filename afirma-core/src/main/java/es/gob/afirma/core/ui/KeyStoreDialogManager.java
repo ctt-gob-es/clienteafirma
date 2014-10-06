@@ -43,8 +43,9 @@ public interface KeyStoreDialogManager {
 	 * para que el usuario seleccione uno de ellos.
 	 * @return Alias del certifciado seleccionado.
 	 * @throws es.gob.afirma.core.AOCancelledOperationException Cuando no se selecciona ning&uacute;n certificado.
-	 * @throws RuntimeException Cuando se produce un error en la extracci&oacute;n de la clave del almac&eacute;n. */
-	String show();
+	 * @throws RuntimeException Cuando se produce un error en la extracci&oacute;n de la clave del almac&eacute;n.
+	 * @throws AOException Cuando no hay certificados en el almac&eacute;n acordes a los criterios establecidos. */
+	String show() throws AOException;
 
 	/**
 	 * Recupera el alias del certificado seleccionado;

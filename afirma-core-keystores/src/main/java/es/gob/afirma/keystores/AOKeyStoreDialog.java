@@ -204,16 +204,24 @@ public class AOKeyStoreDialog implements KeyStoreDialogManager {
 	}
 
 	@Override
-	public String show() {
+	public String show() throws AOCertificatesNotFoundException {
+
+		final NameCertificateBean[] namedCertificates = this.getNameCertificates();
 
 		// No mostramos el dialogo de seleccion si se ha indicado que se autoseleccione
 		// un certificado en caso de ser el unico
 		if (this.mandatoryCertificate) {
-			final NameCertificateBean[] namedCertificates = this.getNameCertificates();
 			if (namedCertificates != null && namedCertificates.length == 1) {
 				this.selectedAlias = namedCertificates[0].getAlias();
 				return this.selectedAlias;
 			}
+		}
+
+		//TODO: Esto es temporal. La siguiente version del dialogo permitira que no haya
+		// certificados y mostrara el boton de actualizar por si el usuario quiere cargar
+		// certificados en tarjeta
+		if (namedCertificates == null || namedCertificates.length < 1) {
+			throw new AOCertificatesNotFoundException("No se han encontrado certificados en el almacen acordes a los filtros establecidos"); //$NON-NLS-1$
 		}
 
 		this.selectedAlias = AOUIFactory.showCertificateSelectionDialog(this.parentComponent, this);
