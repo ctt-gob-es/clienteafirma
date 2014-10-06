@@ -20,7 +20,9 @@ public @interface XmlElement {
 
     String defaultValue() default "\u0000";
 
-    Class type() default DEFAULT.class;
+    Class<?> type() default DEFAULT.class;
 
-    static final class DEFAULT {}
+    static final class DEFAULT {
+    	// No hace nada
+    }
 }
