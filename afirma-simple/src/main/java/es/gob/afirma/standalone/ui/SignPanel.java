@@ -798,6 +798,9 @@ public final class SignPanel extends JPanel {
 
             setSignCommandEnabled(false);
 
+
+            // ********************************************************************************************
+            // ***************** PREPARACION DIALOGO PROGRESO ********************************************
             SignPanel.this.setCursor(new Cursor(Cursor.WAIT_CURSOR));
 
             SignPanel.this.getProgressMonitor().setProgress(999);
@@ -826,11 +829,17 @@ public final class SignPanel extends JPanel {
             }
             catch (final Exception e) {
                 LOGGER.warning(
-                        "No se ha podido mostrar la barra de progreso indeterminado: " + e); //$NON-NLS-1$
+                    "No se ha podido mostrar la barra de progreso indeterminado: " + e //$NON-NLS-1$
+                );
             }
 
             try { Thread.sleep(1000); } catch(final Exception e) { /* Ignoramos los errores */ }
+            // ***************** FIN PREPARACION DIALOGO PROGRESO *****************************************
+            // ********************************************************************************************
 
+
+            // ************************************************************************************
+            // ****************** PROCESO DE FIRMA ************************************************
             final Preferences preferences = Preferences.userRoot();
             final Properties p = ExtraParamsHelper.preferencesToExtraParams(preferences, SignPanel.this.getSigner());
 
@@ -918,8 +927,12 @@ public final class SignPanel extends JPanel {
             }
             finally {
                 SignPanel.this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+
+                // Cuando la barra llega a 1000 se quita el dialogo
                 SignPanel.this.getProgressMonitor().setProgress(1000);
             }
+            // ****************** FIN PROCESO DE FIRMA ********************************************
+            // ************************************************************************************
 
             String newFileName = SignPanel.this.getCurrentFile().getName();
             String[] filterExtensions;
