@@ -5,10 +5,13 @@ import java.awt.Frame;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
@@ -23,6 +26,7 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 
 import es.gob.afirma.core.ui.AOUIFactory;
+import es.gob.afirma.crypto.handwritten.pdf.PdfBuilder;
 
 /** Ejecutor de procesos de firma biom&eacute;trica
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
@@ -201,7 +205,7 @@ public final class BioSignerRunner implements SignaturePadListener {
 			//Firma del funcionario
 			// TODO: firmar con el cliente
 			LOGGER.info("Firma del funcionario"); //$NON-NLS-1$
-			manageSignatures();
+			//manageSignatures();
 		}
 		else {
 			sign = getSignTask().getBioSigns().get(ordinal);
@@ -340,22 +344,19 @@ public final class BioSignerRunner implements SignaturePadListener {
 
 	private void cancelTask(final String signatureId) {
 
-		final int signerPosition = getAssociationMap().get(signatureId).intValue();
-		String signerName = null;
-		String errorMsg = null;
-
 		if (signatureId == null) {
+			LOGGER.warning("Firma cancelada"); //$NON-NLS-1$
 			abortTask(null, null);
 			return;
 		}
-		else {
 
-			signerName = getSignTask().getBioSigns().get(
-				signerPosition
-			).getSignerData().getSignerName();
+		final int signerPosition = getAssociationMap().get(signatureId).intValue();
 
-			errorMsg = HandwrittenMessages.getString("BioSignerRunner.13", signerName); //$NON-NLS-1$
-		}
+		final String signerName = getSignTask().getBioSigns().get(
+			signerPosition
+		).getSignerData().getSignerName();
+
+		final String errorMsg = HandwrittenMessages.getString("BioSignerRunner.13", signerName); //$NON-NLS-1$
 
 		// Variable para indicar si se muestra el dialogo con las tres opciones
 		boolean showOpDlg = true;
@@ -463,80 +464,83 @@ public final class BioSignerRunner implements SignaturePadListener {
 
 		// Guardamos la firma
 		this.sigResults.put(sr.getSignatureId(), sr);
-
 		this.signIdList.add(sr.getSignatureId());
 
+		// Deshabilitamos el boton y lo marcamos como correcto
 		final int signerPosition = getAssociationMap().get(sr.getSignatureId()).intValue();
-
 		final SignerInfoBean signer = getSignTask().getBioSigns().get(
 			signerPosition
 		).getSignerData();
+
+
 
 		getButtonList().get(signerPosition).setText(
 			buttonTxt(
 				signer.getSignerName(),
 				signerPosition + 1,
-				CHECK_ICON)
-			);
+				CHECK_ICON
+			)
+		);
 
 		final int count = decreaseSignCount();
-		// Si el contador es meno que cero quiere decir que la firma es del funcionario
-		if(count < 0) {
-			//TODO: Tramite realizado por el funcionario
-			LOGGER.info("Firma del funcionario"); //$NON-NLS-1$
-			//TODO: empezar a gestionar las firmas recibidas
-			manageSignatures();
-			//return;
-		}
 
-		// Comprobamos si hay firma de funcionario, y si la hay miramos
-		// si todos los botones estan deshabilitados, para habilitarlo.
-		// Si no hay firma de funcionario y todos los botones estan deshabilitados es que
-		// hemos terminado.
+		// Si se han terminado todas las firmas biometricas...
+		if (count == 0) {
+			System.out.println("CONSTRUIMOS EL PDF");
+			try {
+				generatePdf();
+			}
+			catch (final Exception e) {
+				// TODO: Tratar el error abortando todo el proceso
+				e.printStackTrace();
+				return;
+			}
 
-		if(getSignTask().isCompleteWithCriptoSign()) {
-			if(count == 0) {
+			if(getSignTask().isCompleteWithCriptoSign()) {
 				enableOpSignButton();
 			}
 		}
-		else {
-			// Fin de tramite
-			manageSignatures();
-			return;
+
+		// Si el contador es menor que cero quiere decir que la firma es del funcionario
+		else if(count < 0) {
+			//TODO: Tramite realizado por el funcionario
+			LOGGER.info("Firma del funcionario"); //$NON-NLS-1$
+			//TODO: empezar a gestionar las firmas recibidas
+			//manageSignatures();
+			//return;
 		}
+
 	}
 
-	private void manageSignatures() {
+	private Map<SignerInfoBean, SignatureResult> buildSrList() {
 
-		final Map<String, SignatureResult> signatures = this.sigResults;
+		Map<SignerInfoBean, SignatureResult> srList = new ConcurrentHashMap<SignerInfoBean, SignatureResult>(this.sigResults.size());
 
-		LOGGER.info("Numero de firmas: "  + this.signIdList.size() + "num. firmas " + signatures.size()); //$NON-NLS-1$ //$NON-NLS-2$
+		Set<String> signResultKey = this.sigResults.keySet();
 
-		// Ponemos pie de firma a las firmas
-		for(int i = 0; i < this.signIdList.size(); i ++) {
-
-			final SignatureResult sr = signatures.get(this.signIdList.get(i));
-
-			final byte[] jpg = sr.getSignatureJpegImage();
-
-			try {
-				final byte[] signFooter = JseUtil.addFooter(jpg, "Astrid Idoate"); //$NON-NLS-1$
-			} catch (final IOException e) {
-				LOGGER.warning("No se ha podido añadir el pie de firma al usuario: " + e); //$NON-NLS-1$
-			}
-			//TODO: Borrar estas lineas, solo sirven para comprobar si la opcion de añadir footer funciona bien
-			//os = new FileOutputStream(File.createTempFile("MODDD", ".jpg"));
-			// Anadimos el pie de firma a la firma
-			//os.write(JseUtil.addFooter(jpg, "Astrid Idoate"));
-			//os.flush();
-			//os.close();
+		for(final String signString : signResultKey) {
+			final SignatureResult sr = this.sigResults.get(signString);
+			// Posicion en la que se encuentra la informacion del firmante
+			final int signerPosition = getAssociationMap().get(sr.getSignatureId()).intValue();
+			srList.put(
+				getSignTask().getBioSigns().get(
+					signerPosition
+				).getSignerData(),
+				sr
+			);
 		}
-		// Insertamos las firmas en el pdf
 
-		// Añadimos MoreInfo
-
-		// Añadimos XMP
-
-		// Firmamos el fichero con el Cliente
+		return srList;
 	}
+
+	private byte[] generatePdf() throws IOException {
+		byte[] pdf = new ProgressUrlHttpManagerImpl(getMainFrame()).readUrlByGet(getSignTask().getRetrieveUrl().toString());
+		pdf = PdfBuilder.buildPdf(buildSrList(), pdf);
+		java.io.OutputStream fos = new FileOutputStream(File.createTempFile("KAKA", ".pdf")); //$NON-NLS-1$ //$NON-NLS-2$
+		fos.write(pdf);
+		fos.flush();
+		fos.close();
+		return pdf;
+	}
+
 }
