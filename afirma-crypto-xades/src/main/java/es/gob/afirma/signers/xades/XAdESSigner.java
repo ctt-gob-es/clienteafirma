@@ -1000,11 +1000,13 @@ public final class XAdESSigner {
 		}
 
 		// Nodo donde insertar la firma
-		if (envelopedNodeXPath != null && AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED.equals(format)) {
-			signatureInsertionNode = XAdESUtil.getFirstElmentFromXPath(envelopedNodeXPath, docSignature.getDocumentElement());
-		}
-		else if (nodeToSign != null) {
-			signatureInsertionNode = CustomUriDereferencer.getElementById(docSignature, nodeToSign);
+		if (AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED.equals(format)) {
+			if (envelopedNodeXPath != null) {
+				signatureInsertionNode = XAdESUtil.getFirstElmentFromXPath(envelopedNodeXPath, docSignature.getDocumentElement());
+			}
+			else if (nodeToSign != null) {
+				signatureInsertionNode = CustomUriDereferencer.getElementById(docSignature, nodeToSign);
+			}
 		}
 
 		// Instancia XADES_EPES
