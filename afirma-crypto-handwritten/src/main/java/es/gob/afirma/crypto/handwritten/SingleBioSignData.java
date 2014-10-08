@@ -8,7 +8,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 /** Informaci&oacute;n necesaria para realizar una &uacute;nica firma biom&eacute;trica.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 @XmlRootElement(name = "singleBioSignData")
-final class SingleBioSignData {
+public final class SingleBioSignData {
 
 	private final String id;
 
@@ -73,7 +73,9 @@ final class SingleBioSignData {
 		this.signatureRubricPageOnPdf = signaturePageOnPdf;
 	}
 
-	SignerInfoBean getSignerData() {
+	/** M&eactue;todo para obtener los datos personales de un firmante.
+	 * @return datos personales del firmante. */
+	public SignerInfoBean getSignerData() {
 		return this.signerData;
 	}
 
@@ -89,10 +91,16 @@ final class SingleBioSignData {
 		return this.signatureArea;
 	}
 
-	Rectangle getSignatureRubricPositionOnPdf() {
+	/** M&eacute;todo para obtener las coordenadas donde se coloca una firma dentro de un PDF.
+	 * @return las coordenadas de la posici&oacute;n de una firma. */
+	public Rectangle getSignatureRubricPositionOnPdf() {
 		return this.signatureRubricPositionOnPdf;
 	}
-
+	/** M&eacute;todo para obtener la p&aactue;gina donde se debe colocar la firma dentro del documetno PDF.
+	 * @return n&uacute;mero de p&aacute;gina del documento.*/
+	public int getSignatureRubricPageOnPdf() {
+		return this.signatureRubricPageOnPdf;
+	}
 	String getId() {
 		return this.id;
 	}

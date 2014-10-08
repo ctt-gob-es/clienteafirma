@@ -49,7 +49,7 @@
                 <signerName>Tomas</signerName>
                 <signerSurname1>Garcia-Merás</signerSurname1>
                 <signerSurname2>Capote</signerSurname2>
-                <signerId>12345678Z</signerId>
+                <signerId>11111111d</signerId>
             </signerData>
             <htmlTemplate>&lt;html&gt;&lt;body&gt;&lt;h1&gt;HOLA&lt;/h1&gt;&lt;/body&gt;&lt;/html&gt;</htmlTemplate>
             <signatureArea>
@@ -64,7 +64,7 @@
                 <width>200</width>
                 <height>75</height>
             </signatureRubricPositionOnPdf>
-            <signatureRubricPageOnPdf>1</signatureRubricPageOnPdf>
+            <signatureRubricPageOnPdf>2</signatureRubricPageOnPdf>
         </bioSign>
     </bioSigns>
     <completeWithCriptoSign>false</completeWithCriptoSign>

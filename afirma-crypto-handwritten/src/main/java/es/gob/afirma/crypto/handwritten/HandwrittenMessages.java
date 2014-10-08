@@ -2,7 +2,11 @@ package es.gob.afirma.crypto.handwritten;
 
 import java.util.ResourceBundle;
 
-final class HandwrittenMessages {
+/** Clase para obtener las cadenas de texto utilizadas en la aplicaci&oacute;n.
+ * 	Estas cadenas est&aacute;n almacenadas en el fichero 'handwrittenmessages.properties'.
+ *  @author Astrid Idoate
+ **/
+public final class HandwrittenMessages {
 
 	private static final String BUNDLE_NAME = "handwrittenmessages"; //$NON-NLS-1$
 
@@ -25,7 +29,7 @@ final class HandwrittenMessages {
      * @param key Clave del mensaje.
      * @param params Part&iacute;culas de texto que se agregan al mensaje.
      * @return Mensaje correspondiente a la clave. */
-    static String getString(final String key, final String... params) {
+    public static String getString(final String key, final String... params) {
 
     	String text;
         try {

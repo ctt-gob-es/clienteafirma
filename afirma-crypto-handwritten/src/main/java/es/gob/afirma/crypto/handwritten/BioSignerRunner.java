@@ -486,13 +486,11 @@ public final class BioSignerRunner implements SignaturePadListener {
 
 		// Si se han terminado todas las firmas biometricas...
 		if (count == 0) {
-			System.out.println("CONSTRUIMOS EL PDF");
 			try {
 				generatePdf();
 			}
 			catch (final Exception e) {
-				// TODO: Tratar el error abortando todo el proceso
-				e.printStackTrace();
+				LOGGER.warning("Error generando el documento PDF firmado. " + e); //$NON-NLS-1$
 				return;
 			}
 
@@ -503,11 +501,11 @@ public final class BioSignerRunner implements SignaturePadListener {
 
 		// Si el contador es menor que cero quiere decir que la firma es del funcionario
 		else if(count < 0) {
+			// Si el fichero necesita ser firmado por un funcionario, activamos el boton de firma y abrimos el cliente @firma
+
 			//TODO: Tramite realizado por el funcionario
 			LOGGER.info("Firma del funcionario"); //$NON-NLS-1$
-			//TODO: empezar a gestionar las firmas recibidas
-			//manageSignatures();
-			//return;
+
 		}
 
 	}
@@ -534,8 +532,11 @@ public final class BioSignerRunner implements SignaturePadListener {
 	}
 
 	private byte[] generatePdf() throws IOException {
+
 		byte[] pdf = new ProgressUrlHttpManagerImpl(getMainFrame()).readUrlByGet(getSignTask().getRetrieveUrl().toString());
-		pdf = PdfBuilder.buildPdf(buildSrList(), pdf);
+
+		pdf = PdfBuilder.buildPdf(buildSrList(), pdf, getSignTask().getBioSigns());
+
 		java.io.OutputStream fos = new FileOutputStream(File.createTempFile("KAKA", ".pdf")); //$NON-NLS-1$ //$NON-NLS-2$
 		fos.write(pdf);
 		fos.flush();

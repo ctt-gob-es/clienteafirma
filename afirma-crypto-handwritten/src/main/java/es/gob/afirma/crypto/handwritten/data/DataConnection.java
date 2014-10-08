@@ -22,7 +22,6 @@ final class DataConnection extends URLConnection {
     @Override
     public InputStream getInputStream() throws IOException {
 
-    	System.out.println("DECODIFICAMOS EL PROTOCOLO DATA");
     	final byte[] image = Base64.decode(
 			this.url.toString().replaceFirst("^.*;base64,", "")  //$NON-NLS-1$//$NON-NLS-2$
 		);

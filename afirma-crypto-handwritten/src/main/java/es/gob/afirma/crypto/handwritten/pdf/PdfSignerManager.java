@@ -110,7 +110,7 @@ public class PdfSignerManager {
 	/** Obtiene el rect&aacute;ngulo en el que estampar la r&uacute;brica de la firma en el PDF.
 	 * @param extraParams Par&aacute;metros de configuraci&oacute;n de la firma.
 	 * @return Rect&aacute;ngulo para la r&uacute;brica. */
-	private static Rectangle calculateRectangle(final Properties extraParams) {
+	public static Rectangle calculateRectangle(final Properties extraParams) {
 
 		if (extraParams == null) {
     		LOGGER.severe("No se ha proporcionado la configuracion de firma"); //$NON-NLS-1$
