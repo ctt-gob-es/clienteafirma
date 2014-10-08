@@ -210,11 +210,9 @@ public class AOKeyStoreDialog implements KeyStoreDialogManager {
 
 		// No mostramos el dialogo de seleccion si se ha indicado que se autoseleccione
 		// un certificado en caso de ser el unico
-		if (this.mandatoryCertificate) {
-			if (namedCertificates != null && namedCertificates.length == 1) {
-				this.selectedAlias = namedCertificates[0].getAlias();
-				return this.selectedAlias;
-			}
+		if (this.mandatoryCertificate && namedCertificates != null && namedCertificates.length == 1) {
+			this.selectedAlias = namedCertificates[0].getAlias();
+			return this.selectedAlias;
 		}
 
 		//TODO: Esto es temporal. La siguiente version del dialogo permitira que no haya
