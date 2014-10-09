@@ -166,7 +166,7 @@ final class PdfUtil {
     		final PdfObject pdfobj = pdfReader.getPdfObject(i);
     		if (pdfobj != null && pdfobj.isDictionary()) {
     			final PdfDictionary d = (PdfDictionary) pdfobj;
-    			if (PdfName.SIG.equals(d.get(PdfName.TYPE))) {
+    			if (PdfName.SIG.equals(d.get(PdfName.TYPE)) && !"/ETSI.RFC3161".equalsIgnoreCase(d.get(PdfName.SUBFILTER).toString())) { //$NON-NLS-1$
     				ret = true;
     				try {
 						final X509Certificate cert = (X509Certificate) CertificateFactory.getInstance("X.509").generateCertificate( //$NON-NLS-1$
