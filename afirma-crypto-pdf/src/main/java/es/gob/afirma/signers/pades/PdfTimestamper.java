@@ -50,7 +50,16 @@ public final class PdfTimestamper {
     	// Comprobamos si se ha pedido un sello de tiempo
     	if (extraParams != null) {
     		final String tsa = extraParams.getProperty("tsaURL"); //$NON-NLS-1$
-            if (tsa != null) {
+    		final String tsType = extraParams.getProperty("tsType"); //$NON-NLS-1$
+
+    		// Solo hacemos este tipo de sello en esta situacion:
+    		// Han establecido URL de TSA y nos piden sello de tipo 2 (a nivel de documento) o de tipo 3
+    		// (a nivel de documento y tambien a nivel de firma). Si el tipo del sello solicitado es null
+    		// no se aplica este sello (pero si se hace el sello a nivel de firma).
+    		// 1.- Solo sello firma.
+    		// 2.- Solo sello de documento.
+    		// 3.- Ambos sellos, documento y firma.
+            if (tsa != null && (TsaParams.TS_DOC.equals(tsType) || TsaParams.TS_SIGN_DOC.equals(tsType))) {
 
                 // Y procesamos normalmente el PDF
                 final PdfReader pdfReader = PdfUtil.getPdfReader(

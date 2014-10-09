@@ -49,6 +49,24 @@ public final class TsaParams {
 	@XmlElement(name = "sslPkcs12FilePassword")
 	private final String sslPkcs12FilePassword;
 
+	/** Sello de tiempo a nivel de firma. */
+	public static final String TS_SIGN = "1";  //$NON-NLS-1$
+
+	/** Sello de tiempo a nivel de documento. */
+	public static final String TS_DOC = "2";  //$NON-NLS-1$
+
+	/** Sello de tiempo doble, a nivel de firma y a nivel de documento. */
+	public static final String TS_SIGN_DOC = "3";  //$NON-NLS-1$
+
+	/** Tipo de sello a aplicar:
+	 * <ol>
+	 *  <li>Solo sello a nivel de firma.</li>
+	 *  <li>Solo sello a nivel de documento.</li>
+	 *  <li>Dos sellos, uno a nivel de firma y otro a nivel de documento.</li>
+	 * </ol> */
+	@XmlElement(name="tsType")
+	private final String tsType = TS_SIGN;
+
 	@Override
 	public String toString() {
 

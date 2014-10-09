@@ -303,22 +303,29 @@ public final class PAdESTriPhaseSigner {
 
         final Properties extraParams = xParams != null ? xParams : new Properties();
 
+        //**************************************************
         //***************** SELLO DE TIEMPO ****************
-        TsaParams tsaParams;
-        try {
-        	tsaParams = new TsaParams(extraParams);
+
+        // El sello a nivel de firma nunca se aplica si han pedido solo sello a nivel de documento
+        if (!TsaParams.TS_DOC.equals(extraParams.getProperty("tsType"))) { //$NON-NLS-1$
+	        TsaParams tsaParams;
+	        try {
+	        	tsaParams = new TsaParams(extraParams);
+	        }
+	        catch(final Exception e) {
+	        	tsaParams = null;
+	        }
+	        if (tsaParams != null) {
+	        	completeCAdESSignature = new CMSTimestamper(tsaParams).addTimestamp(
+					completeCAdESSignature,
+					tsaParams.getTsaHashAlgorithm(),
+					signingTime
+				);
+	        }
         }
-        catch(final Exception e) {
-        	tsaParams = null;
-        }
-        if (tsaParams != null) {
-        	completeCAdESSignature = new CMSTimestamper(tsaParams).addTimestamp(
-				completeCAdESSignature,
-				tsaParams.getTsaHashAlgorithm(),
-				signingTime
-			);
-        }
+
         //************** FIN SELLO DE TIEMPO ****************
+        //***************************************************
 
         if (enhancer != null) {
         	completeCAdESSignature = enhancer.enhance(completeCAdESSignature, enhancerConfig);
