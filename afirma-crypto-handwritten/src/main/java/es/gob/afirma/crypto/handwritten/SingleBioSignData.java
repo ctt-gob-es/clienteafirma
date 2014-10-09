@@ -73,7 +73,7 @@ public final class SingleBioSignData {
 		this.signatureRubricPageOnPdf = signaturePageOnPdf;
 	}
 
-	/** M&eactue;todo para obtener los datos personales de un firmante.
+	/** Obtiene los datos personales de un firmante.
 	 * @return datos personales del firmante. */
 	public SignerInfoBean getSignerData() {
 		return this.signerData;

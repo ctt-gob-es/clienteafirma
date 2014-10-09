@@ -48,10 +48,7 @@ public final class ProgressUrlHttpManagerImpl extends UrlHttpManagerImpl {
 
 	private final Border borderPanel = BorderFactory.createEmptyBorder(BORDER, BORDER, BORDER, BORDER);
 
-	/** M&eacute;todo para descargar un documento a trav&eactues de una URL.
-	 * @param url URL para la descarga del documento
-	 * @return devuelve el documento descargado.
-	 * @throws IOException tramiento de excepciones.*/
+	/** {@inheritDoc} */
 	@Override
 	public byte[] readUrlByGet(final String url) throws IOException {
 
@@ -61,13 +58,13 @@ public final class ProgressUrlHttpManagerImpl extends UrlHttpManagerImpl {
 		final JDialog dlg = new JDialog(this.parent, HandwrittenMessages.getString("ProgressUrlHttpManagerImpl.1"), true); //$NON-NLS-1$
 		dlg.setCursor(new Cursor(Cursor.WAIT_CURSOR));
 
-		JProgressBar dpb = new JProgressBar(MIN_PG, MAX_PG);
+		final JProgressBar dpb = new JProgressBar(MIN_PG, MAX_PG);
 
 		dpb.setIndeterminate(true);
 		dpb.setBorder(this.borderPanel);
 		dpb.setPreferredSize(new Dimension(WIDTH_DPB, HEIGHT_DPB));
 
-		JLabel jlText = new JLabel(HandwrittenMessages.getString("ProgressUrlHttpManagerImpl.2", url)); //$NON-NLS-1$
+		final JLabel jlText = new JLabel(HandwrittenMessages.getString("ProgressUrlHttpManagerImpl.2", url)); //$NON-NLS-1$
 		jlText.setBorder(this.borderPanel);
 
 		dlg.add(BorderLayout.CENTER, dpb);

@@ -44,7 +44,6 @@ public final class PdfBuilder {
 	 * @param srList Mapa de firmantes y resultados de sus firmas.
 	 * @param inPdf PDF de entrada.
 	 * @param bioSignDataList Lista de datos de la tarea de firma de cada firmante.
-	 * @param xml Contiene los datos de la tarea de firma.
 	 * @return PDF con la informaci&oacute; a&ntilde;adida.
 	 * @throws IOException Si hay problemas en el tratamiento de datos. */
 	public static byte[] buildPdf(final Map<SignerInfoBean, SignatureResult> srList,
@@ -66,20 +65,20 @@ public final class PdfBuilder {
 			throw new IOException("Error creando el PDFStamper: " + e, e); //$NON-NLS-1$
 		}
 
-		Set<SignerInfoBean> keys = srList.keySet();
+		final Set<SignerInfoBean> keys = srList.keySet();
 
 		// Insertamos el pie de pagina a la rubrica
 		int count = 0;
 		for (final SignerInfoBean signer : keys) {
 
 			// Obtenemos la imagen de firma
-			byte[] jpg = srList.get(signer).getSignatureJpegImage();
+			final byte[] jpg = srList.get(signer).getSignatureJpegImage();
 			// Añadimos el pie de firma
-			byte[] signature = JseUtil.addFooter(jpg, signer.getSignerName());
+			final byte[] signature = JseUtil.addFooter(jpg, signer.getSignerName());
 			// Datos de la tarea de firma para el firmante
-			SingleBioSignData singleSing = getSingleBioSignData(bioSignDataList, signer.getId());
+			final SingleBioSignData singleSing = getSingleBioSignData(bioSignDataList, signer.getId());
 			// Area en la que se posiciona la firma en el pdf
-			Rectangle signatureRubricPositionOnPdf = singleSing.getSignatureRubricPositionOnPdf();
+			final Rectangle signatureRubricPositionOnPdf = singleSing.getSignatureRubricPositionOnPdf();
 
 			// Insertamos la imagen en el pdf
 			PdfPreProcessor.addImage(
@@ -97,7 +96,7 @@ public final class PdfBuilder {
 
 
 		// Insertamos la informacion biometrica como MoreInfo
-		Map<String, String> moreInfo = new HashMap<String, String>(srList.size());
+		final Map<String, String> moreInfo = new HashMap<String, String>(srList.size());
 		count = 0;
 		for (final SignerInfoBean signer : keys) {
 			moreInfo.put(
@@ -147,7 +146,7 @@ public final class PdfBuilder {
 
 	// Metodo para obtener los datos de firma para un identificador especifico.
 	private static SingleBioSignData getSingleBioSignData( final List<SingleBioSignData> signDataList, final String id) {
-		for(SingleBioSignData sign : signDataList) {
+		for(final SingleBioSignData sign : signDataList) {
 
 			if(sign.getSignerData().getId().equals(id) ) {
 				return sign;

@@ -98,7 +98,7 @@ public final class BioSignerRunner implements SignaturePadListener {
 
 	/** Crea el ejecutor de procesos de firma biom&eacute;trica.
 	 * @param xml Contiene los datos de la tarea de firma.
-	 * @throws IOException */
+	 * @throws IOException Si hay errores en el tratamiento de datos. */
 	public BioSignerRunner(final String xml) throws IOException {
 
 		if (xml == null) {
@@ -512,9 +512,9 @@ public final class BioSignerRunner implements SignaturePadListener {
 
 	private Map<SignerInfoBean, SignatureResult> buildSrList() {
 
-		Map<SignerInfoBean, SignatureResult> srList = new ConcurrentHashMap<SignerInfoBean, SignatureResult>(this.sigResults.size());
+		final Map<SignerInfoBean, SignatureResult> srList = new ConcurrentHashMap<SignerInfoBean, SignatureResult>(this.sigResults.size());
 
-		Set<String> signResultKey = this.sigResults.keySet();
+		final Set<String> signResultKey = this.sigResults.keySet();
 
 		for(final String signString : signResultKey) {
 			final SignatureResult sr = this.sigResults.get(signString);
@@ -537,7 +537,7 @@ public final class BioSignerRunner implements SignaturePadListener {
 
 		pdf = PdfBuilder.buildPdf(buildSrList(), pdf, getSignTask().getBioSigns());
 
-		java.io.OutputStream fos = new FileOutputStream(File.createTempFile("KAKA", ".pdf")); //$NON-NLS-1$ //$NON-NLS-2$
+		final java.io.OutputStream fos = new FileOutputStream(File.createTempFile("KAKA", ".pdf")); //$NON-NLS-1$ //$NON-NLS-2$
 		fos.write(pdf);
 		fos.flush();
 		fos.close();
