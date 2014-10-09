@@ -42,6 +42,7 @@ import javax.swing.text.Caret;
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.signers.AOSignConstants;
+import es.gob.afirma.keystores.AOCertificatesNotFoundException;
 import es.gob.afirma.keystores.AOKeyStore;
 import es.gob.afirma.keystores.AOKeyStoreManager;
 import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
@@ -512,6 +513,10 @@ final class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
                 // Si se ha cancelado la operacion lo informamos en el nivel superior para que se trate.
                 // Este relanzamiento se realiza para evitar la siguiente captura generica de excepciones
                 // que las relanza en forma de AOException
+                throw e;
+            }
+            catch (final AOCertificatesNotFoundException e) {
+                LOGGER.severe("No se han encontrado certificados validos en el almacen: " + e); //$NON-NLS-1$
                 throw e;
             }
             catch (final Exception e) {

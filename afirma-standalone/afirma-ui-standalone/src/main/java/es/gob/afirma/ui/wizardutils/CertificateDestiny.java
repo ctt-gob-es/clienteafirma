@@ -15,6 +15,7 @@ import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 
 import es.gob.afirma.core.AOCancelledOperationException;
+import es.gob.afirma.keystores.AOCertificatesNotFoundException;
 import es.gob.afirma.keystores.AOKeyStoreManager;
 import es.gob.afirma.ui.utils.CertificateManagerDialog;
 import es.gob.afirma.ui.utils.CustomDialog;
@@ -42,7 +43,7 @@ public class CertificateDestiny {
         			certDialog.showCerts(dialogo, keyStoreManager, false, true);
         	this.cert = selectedCertChain[0];
             this.alias = certDialog.getSelectedAlias();
-            
+
         }
         catch (final AOCancelledOperationException e) {
             logger.severe("Operacion cancelada por el usuario"); //$NON-NLS-1$
@@ -59,6 +60,11 @@ public class CertificateDestiny {
                                            true,
                                            Messages.getString("Firma.msg.error.contrasenia"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
             return;
+        }
+        catch (final AOCertificatesNotFoundException e) {
+            logger.severe("No se han encontrado certificados validos en el almacen: " + e); //$NON-NLS-1$
+            CustomDialog.showMessageDialog(dialogo, true, Messages.getString("No.certificates"), //$NON-NLS-1$
+                                           Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
         }
         catch (final Exception e) {
             logger.severe("No se ha podido recuperar el certificado seleccionado: " + e); //$NON-NLS-1$

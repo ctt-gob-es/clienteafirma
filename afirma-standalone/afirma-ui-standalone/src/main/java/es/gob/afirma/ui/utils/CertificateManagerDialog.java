@@ -9,6 +9,7 @@ import java.security.cert.Certificate;
 import java.util.List;
 
 import es.gob.afirma.core.AOCancelledOperationException;
+import es.gob.afirma.keystores.AOCertificatesNotFoundException;
 import es.gob.afirma.keystores.AOKeyStoreDialog;
 import es.gob.afirma.keystores.AOKeyStoreManager;
 import es.gob.afirma.keystores.filters.CertificateFilter;
@@ -28,9 +29,10 @@ public class CertificateManagerDialog {
 	 * @throws KeyStoreException Cuando ocurren errores en el tratamiento del almac&eacute;n de claves
 	 * @throws NoSuchAlgorithmException Cuando no se puede identificar el algoritmo para la recuperaci&oacute;n de la clave
 	 * @throws UnrecoverableEntryException Si la contrase&ntilde;a proporcionada no es v&aacute;lida para obtener la clave privada
+	 * @throws AOCertificatesNotFoundException
 	 * @throws AOCancelledOperationException Cuando no se selecciona ning&uacute;n certificado.
 	 */
-	public PrivateKeyEntry show(final Component parentComponent, final AOKeyStoreManager ksm) throws KeyStoreException, NoSuchAlgorithmException, UnrecoverableEntryException {
+	public PrivateKeyEntry show(final Component parentComponent, final AOKeyStoreManager ksm) throws KeyStoreException, NoSuchAlgorithmException, UnrecoverableEntryException, AOCertificatesNotFoundException {
 		return show(parentComponent, ksm, null, false);
 	}
 
@@ -45,9 +47,10 @@ public class CertificateManagerDialog {
 	 * @throws KeyStoreException Cuando ocurren errores en el tratamiento del almac&eacute;n de claves
 	 * @throws NoSuchAlgorithmException Cuando no se puede identificar el algoritmo para la recuperaci&oacute;n de la clave
 	 * @throws UnrecoverableEntryException Si la contrase&ntilde;a proporcionada no es v&aacute;lida para obtener la clave privada
+	 * @throws AOCertificatesNotFoundException
 	 * @throws AOCancelledOperationException Cuando no se selecciona ning&uacute;n certificado.
 	 */
-	public PrivateKeyEntry show(final Component parentComponent, final AOKeyStoreManager ksm, List<CertificateFilter> filters, final boolean mandatoryCertificate) throws KeyStoreException, NoSuchAlgorithmException, UnrecoverableEntryException {
+	public PrivateKeyEntry show(final Component parentComponent, final AOKeyStoreManager ksm, List<CertificateFilter> filters, final boolean mandatoryCertificate) throws KeyStoreException, NoSuchAlgorithmException, UnrecoverableEntryException, AOCertificatesNotFoundException {
 
 		final AOKeyStoreDialog dialog = new AOKeyStoreDialog(
 				ksm,
@@ -76,10 +79,11 @@ public class CertificateManagerDialog {
      *        Indica si se deben o no mostrar los certificados caducados o
      *        a&uacute;n no v&aacute;lidos
 	 * @return Entrada con la clave y el certificado seleccionado.
+	 * @throws AOCertificatesNotFoundException
 	 * @throws AOCancelledOperationException Cuando no se selecciona ning&uacute;n certificado.
 	 */
 	public Certificate[] showCerts(final Component parentComponent, final AOKeyStoreManager ksm,
-			final boolean checkPrivateKeys, final boolean showExpiredCertificates) {
+			final boolean checkPrivateKeys, final boolean showExpiredCertificates) throws AOCertificatesNotFoundException {
 
 		final AOKeyStoreDialog dialog = new AOKeyStoreDialog(
 				ksm,

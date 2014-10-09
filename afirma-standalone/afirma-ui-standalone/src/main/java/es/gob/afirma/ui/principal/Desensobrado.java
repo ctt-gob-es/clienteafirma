@@ -47,6 +47,7 @@ import es.gob.afirma.envelopers.cms.AOCMSEnveloper;
 import es.gob.afirma.envelopers.cms.CMSDecipherAuthenticatedEnvelopedData;
 import es.gob.afirma.envelopers.cms.CMSDecipherEnvelopData;
 import es.gob.afirma.envelopers.cms.CMSDecipherSignedAndEnvelopedData;
+import es.gob.afirma.keystores.AOCertificatesNotFoundException;
 import es.gob.afirma.keystores.AOKeyStore;
 import es.gob.afirma.keystores.AOKeyStoreManager;
 import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
@@ -153,6 +154,11 @@ final class Desensobrado extends JPanel {
                 LOGGER.info("Operacion cancelada por el usuario"); //$NON-NLS-1$
                 setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
                 return;
+            }
+            catch (final AOCertificatesNotFoundException e) {
+                LOGGER.severe("No se han encontrado certificados validos en el almacen: " + e); //$NON-NLS-1$
+                CustomDialog.showMessageDialog(SwingUtilities.getRoot(this), true, Messages.getString("No.certificates"), //$NON-NLS-1$
+                                               Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
             }
             catch (final Exception e) {
                 LOGGER.severe("Error al recuperar el certificado del usuario: " + e); //$NON-NLS-1$

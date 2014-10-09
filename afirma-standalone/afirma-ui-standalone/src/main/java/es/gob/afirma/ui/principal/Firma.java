@@ -244,7 +244,7 @@ final class Firma extends JPanel {
 
             // Recuperamos la clave del certificado
             final PrivateKeyEntry privateKeyEntry;
-            
+
             try {
             	privateKeyEntry = new CertificateManagerDialog().show(SwingUtilities.getRoot(this), keyStoreManager);
             }
