@@ -32,7 +32,7 @@ import javax.net.ssl.X509TrustManager;
 
 /** Clase para la lectura y env&iacute;o de datos a URL remotas.
  * @author Carlos Gamuci */
-public final class UrlHttpManagerImpl implements UrlHttpManager {
+public class UrlHttpManagerImpl implements UrlHttpManager {
 
 	private static final int DEFAULT_TIMEOUT = -1;
 
@@ -41,8 +41,8 @@ public final class UrlHttpManagerImpl implements UrlHttpManager {
 	private static final HostnameVerifier DEFAULT_HOSTNAME_VERIFIER = HttpsURLConnection.getDefaultHostnameVerifier();
 	private static final SSLSocketFactory DEFAULT_SSL_SOCKET_FACTORY = HttpsURLConnection.getDefaultSSLSocketFactory();
 
-	UrlHttpManagerImpl() {
-		// Instanciacion "default"
+	protected UrlHttpManagerImpl() {
+		// Instanciacion "protected"
 	}
 
 	private static final TrustManager[] DUMMY_TRUST_MANAGER = new TrustManager[] {
@@ -119,7 +119,7 @@ public final class UrlHttpManagerImpl implements UrlHttpManager {
 		}
 
 		conn.setDoOutput(true);
-		
+
 		final OutputStreamWriter writer = new OutputStreamWriter(conn.getOutputStream());
 
 		writer.write(urlParameters);
@@ -163,12 +163,12 @@ public final class UrlHttpManagerImpl implements UrlHttpManager {
 		return data;
 	}
 
-	private static void enableSslChecks() {
+	protected static void enableSslChecks() {
 		HttpsURLConnection.setDefaultSSLSocketFactory(DEFAULT_SSL_SOCKET_FACTORY);
 		HttpsURLConnection.setDefaultHostnameVerifier(DEFAULT_HOSTNAME_VERIFIER);
 	}
 
-	private static void disableSslChecks() throws KeyManagementException, NoSuchAlgorithmException {
+	protected static void disableSslChecks() throws KeyManagementException, NoSuchAlgorithmException {
 		final SSLContext sc = SSLContext.getInstance("SSL"); //$NON-NLS-1$
 		sc.init(null, DUMMY_TRUST_MANAGER, new java.security.SecureRandom());
 		HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
