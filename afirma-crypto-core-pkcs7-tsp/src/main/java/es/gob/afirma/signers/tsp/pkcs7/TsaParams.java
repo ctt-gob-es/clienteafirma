@@ -58,15 +58,6 @@ public final class TsaParams {
 	/** Sello de tiempo doble, a nivel de firma y a nivel de documento. */
 	public static final String TS_SIGN_DOC = "3";  //$NON-NLS-1$
 
-	/** Tipo de sello a aplicar:
-	 * <ol>
-	 *  <li>Solo sello a nivel de firma.</li>
-	 *  <li>Solo sello a nivel de documento.</li>
-	 *  <li>Dos sellos, uno a nivel de firma y otro a nivel de documento.</li>
-	 * </ol> */
-	@XmlElement(name="tsType")
-	private final String tsType = TS_SIGN;
-
 	@Override
 	public String toString() {
 
