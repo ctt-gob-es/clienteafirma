@@ -266,7 +266,7 @@ public final class PdfSessionManager {
 		PdfPreProcessor.attachFile(extraParams, stp);
 
 		// Imagenes
-		PdfPreProcessor.addImage(extraParams, stp);
+		PdfPreProcessor.addImage(extraParams, stp, pdfReader);
 
 		// Establecemos el render segun iText antiguo, varia en versiones modernas
 		sap.setRender(PdfSignatureAppearance.SignatureRenderDescription);

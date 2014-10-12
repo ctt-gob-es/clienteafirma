@@ -19,6 +19,7 @@ import es.gob.afirma.signers.pades.AOPDFSigner;
 public class TestSignField {
 
 	private final static String TEST_FILE = "TEST_PDF.pdf"; //$NON-NLS-1$
+	private final static String TEST_FILE_MP = "multipage.pdf"; //$NON-NLS-1$
 
 	private final static String RUBRIC_IMAGE = "rubric.jpg"; //$NON-NLS-1$
 
@@ -53,10 +54,10 @@ public class TestSignField {
 
 		extraParams.put("imagePage", "1"); //$NON-NLS-1$ //$NON-NLS-2$
 
-		final byte[] testPdf = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(TEST_FILE));
+		final byte[] testPdf = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(TEST_FILE_MP));
 
 		final AOPDFSigner signer = new AOPDFSigner();
-		final byte[] signedPdf = signer.sign(
+		byte[] signedPdf = signer.sign(
 			testPdf,
 			DEFAULT_SIGNATURE_ALGORITHM,
 			pke.getPrivateKey(),
@@ -64,15 +65,56 @@ public class TestSignField {
 			extraParams
 		);
 
-		final File tempFile = File.createTempFile("afirmaPDF", ".pdf"); //$NON-NLS-1$ //$NON-NLS-2$
+		File tempFile = File.createTempFile("afirmaPDF-IMAGEN-1_", ".pdf"); //$NON-NLS-1$ //$NON-NLS-2$
 
-		final FileOutputStream fos = new FileOutputStream(tempFile);
+		FileOutputStream fos = new FileOutputStream(tempFile);
 		fos.write(signedPdf);
 		fos.close();
 
 		Logger.getLogger("es.gob.afirma").info( //$NON-NLS-1$
-				"Fichero temporal para la comprobacion manual del resultado: " + //$NON-NLS-1$
-				tempFile.getAbsolutePath());
+			"Fichero temporal para la comprobacion manual del resultado: " + //$NON-NLS-1$
+				tempFile.getAbsolutePath()
+		);
+
+
+		// Ahora con imagen en ultima pagina
+		extraParams.put("imagePage", "-1"); //$NON-NLS-1$ //$NON-NLS-2$
+		signedPdf = signer.sign(
+			testPdf,
+			DEFAULT_SIGNATURE_ALGORITHM,
+			pke.getPrivateKey(),
+			pke.getCertificateChain(),
+			extraParams
+		);
+		tempFile = File.createTempFile("afirmaPDF-IMAGEN-LAST_", ".pdf"); //$NON-NLS-1$ //$NON-NLS-2$
+		fos = new FileOutputStream(tempFile);
+		fos.write(signedPdf);
+		fos.close();
+
+		Logger.getLogger("es.gob.afirma").info( //$NON-NLS-1$
+			"Fichero temporal para la comprobacion manual del resultado: " + //$NON-NLS-1$
+				tempFile.getAbsolutePath()
+		);
+
+		// Y por ultimo imagen en todas las paginas
+		extraParams.put("imagePage", "0"); //$NON-NLS-1$ //$NON-NLS-2$
+		signedPdf = signer.sign(
+			testPdf,
+			DEFAULT_SIGNATURE_ALGORITHM,
+			pke.getPrivateKey(),
+			pke.getCertificateChain(),
+			extraParams
+		);
+		tempFile = File.createTempFile("afirmaPDF-IMAGEN-TODAS_", ".pdf"); //$NON-NLS-1$ //$NON-NLS-2$
+		fos = new FileOutputStream(tempFile);
+		fos.write(signedPdf);
+		fos.close();
+
+		Logger.getLogger("es.gob.afirma").info( //$NON-NLS-1$
+			"Fichero temporal para la comprobacion manual del resultado: " + //$NON-NLS-1$
+				tempFile.getAbsolutePath()
+		);
+
 	}
 
 

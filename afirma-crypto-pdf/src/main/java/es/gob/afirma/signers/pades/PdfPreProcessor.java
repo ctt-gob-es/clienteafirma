@@ -21,6 +21,7 @@ import com.lowagie.text.Image;
 import com.lowagie.text.Jpeg;
 import com.lowagie.text.Rectangle;
 import com.lowagie.text.pdf.PdfContentByte;
+import com.lowagie.text.pdf.PdfReader;
 import com.lowagie.text.pdf.PdfStamper;
 
 import es.gob.afirma.core.misc.Base64;
@@ -118,10 +119,11 @@ public final class PdfPreProcessor {
 	}
 
 	/** Sobreimpone una imagen en un documento PDF.
-	 * @param extraParams Datos de la imagen a a&ntilde;adir como <a href="doc-files/extraparams.html">par&aacute;metros adicionales</a>
-	 * @param stp Estampador de PDF, debe abrirse y cerrarse fuera de este m&eacute;todo
-	 * @throws IOException Cuando ocurren errores de entrada / salida */
-	static void addImage(final Properties extraParams, final PdfStamper stp) throws IOException {
+	 * @param extraParams Datos de la imagen a a&ntilde;adir como <a href="doc-files/extraparams.html">par&aacute;metros adicionales</a>.
+	 * @param stp Estampador de PDF, debe abrirse y cerrarse fuera de este m&eacute;todo.
+	 * @param pdfReader Lector PDF, para obtener el n&uacute;mero de p&aacute;ginas del documento.
+	 * @throws IOException Cuando ocurren errores de entrada / salida. */
+	static void addImage(final Properties extraParams, final PdfStamper stp, final PdfReader pdfReader) throws IOException {
 
 		if (extraParams == null || stp == null) {
 			return;
@@ -144,7 +146,7 @@ public final class PdfPreProcessor {
 			return;
 		}
 
-		final int pageNum;
+		int pageNum;
 		try {
 			pageNum = Integer.parseInt(imagePage);
 		}
@@ -152,16 +154,30 @@ public final class PdfPreProcessor {
 			throw new IOException("Se ha indicado un numero de pagina con formato invalido para insertar la imagen (" + imagePage + "): " + e, e); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
-		addImage(
-			image,
-			(int) rect.getWidth(),
-			(int) rect.getHeight(),
-			(int) rect.getLeft(),
-			(int) rect.getBottom(),
-			pageNum,
-			null,
-			stp
-		);
+		if (pageNum == -1) {
+			pageNum = pdfReader.getNumberOfPages();
+		}
+		final int pageLimit;
+		if (pageNum == 0) {
+			pageNum = 1;
+			pageLimit = pdfReader.getNumberOfPages();
+		}
+		else {
+			pageLimit = pageNum;
+		}
+
+		for (int i= pageNum; i<=pageLimit; i++) {
+			addImage(
+				image,
+				(int) rect.getWidth(),
+				(int) rect.getHeight(),
+				(int) rect.getLeft(),
+				(int) rect.getBottom(),
+				i,
+				null,
+				stp
+			);
+		}
 
 		LOGGER.info("Anadida imagen al PDF antes de la firma"); //$NON-NLS-1$
 	}
