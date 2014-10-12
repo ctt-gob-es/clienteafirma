@@ -15,6 +15,7 @@ import java.awt.Container;
 import java.awt.Cursor;
 import java.awt.Desktop;
 import java.awt.HeadlessException;
+import java.awt.Toolkit;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.beans.PropertyChangeEvent;
@@ -568,6 +569,19 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
     							"Ha fallado la precarga temprana de NSS, se intentara la carga concurrente normal: " + e1 //$NON-NLS-1$
 							);
 	    				}
+    				}
+    				// En Linux, para evitar los problemas con los iconos hay que cambiar a bajo nivel el nombre de la ventana:
+    				// http://bugs.java.com/bugdatabase/view_bug.do?bug_id=6528430
+    				if (OS.LINUX.equals(os)) {
+    					try {
+    						final Toolkit xToolkit = Toolkit.getDefaultToolkit();
+    						final java.lang.reflect.Field awtAppClassNameField = xToolkit.getClass().getDeclaredField("awtAppClassName"); //$NON-NLS-1$
+    						awtAppClassNameField.setAccessible(true);
+    						awtAppClassNameField.set(xToolkit, "simpleafirma"); //$NON-NLS-1$
+    					}
+    					catch(final Exception e) {
+    						LOGGER.warning("No ha sido posible renombrar la ventana AWT para X11: " + e); //$NON-NLS-1$
+    					}
     				}
 
     				saf.initialize(null);
