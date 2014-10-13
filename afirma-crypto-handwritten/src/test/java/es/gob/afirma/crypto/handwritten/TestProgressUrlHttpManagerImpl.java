@@ -4,6 +4,8 @@ import java.awt.Frame;
 
 import org.junit.Test;
 
+import es.gob.afirma.crypto.handwritten.net.ProgressUrlHttpManagerImpl;
+
 /** Clase para probar la descarga de documentos PDF.
  * @author Astrid Idoate **/
 public class TestProgressUrlHttpManagerImpl {

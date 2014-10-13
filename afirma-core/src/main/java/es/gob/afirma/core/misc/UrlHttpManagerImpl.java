@@ -42,7 +42,7 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 	private static final SSLSocketFactory DEFAULT_SSL_SOCKET_FACTORY = HttpsURLConnection.getDefaultSSLSocketFactory();
 
 	protected UrlHttpManagerImpl() {
-		// Instanciacion "protected"
+		// Instanciacion "default"
 	}
 
 	private static final TrustManager[] DUMMY_TRUST_MANAGER = new TrustManager[] {
@@ -163,12 +163,12 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 		return data;
 	}
 
-	protected static void enableSslChecks() {
+	public static void enableSslChecks() {
 		HttpsURLConnection.setDefaultSSLSocketFactory(DEFAULT_SSL_SOCKET_FACTORY);
 		HttpsURLConnection.setDefaultHostnameVerifier(DEFAULT_HOSTNAME_VERIFIER);
 	}
 
-	protected static void disableSslChecks() throws KeyManagementException, NoSuchAlgorithmException {
+	public static void disableSslChecks() throws KeyManagementException, NoSuchAlgorithmException {
 		final SSLContext sc = SSLContext.getInstance("SSL"); //$NON-NLS-1$
 		sc.init(null, DUMMY_TRUST_MANAGER, new java.security.SecureRandom());
 		HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
