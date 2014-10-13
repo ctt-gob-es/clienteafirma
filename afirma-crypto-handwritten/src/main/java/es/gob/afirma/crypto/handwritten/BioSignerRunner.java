@@ -26,6 +26,8 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 
 import es.gob.afirma.core.ui.AOUIFactory;
+import es.gob.afirma.crypto.handwritten.net.DownloadListener;
+import es.gob.afirma.crypto.handwritten.net.Downloader;
 import es.gob.afirma.crypto.handwritten.pdf.PdfBuilder;
 
 /** Ejecutor de procesos de firma biom&eacute;trica
@@ -487,10 +489,12 @@ public final class BioSignerRunner implements SignaturePadListener {
 		// Si se han terminado todas las firmas biometricas...
 		if (count == 0) {
 			try {
-				generatePdf();
+				generatePdf(sr.getSignatureId());
 			}
+
 			catch (final Exception e) {
 				LOGGER.warning("Error generando el documento PDF firmado. " + e); //$NON-NLS-1$
+				signatureAborted(e, sr.getSignatureId());
 				return;
 			}
 
@@ -510,7 +514,7 @@ public final class BioSignerRunner implements SignaturePadListener {
 
 	}
 
-	private Map<SignerInfoBean, SignatureResult> buildSrList() {
+	Map<SignerInfoBean, SignatureResult> buildSrList() {
 
 		final Map<SignerInfoBean, SignatureResult> srList = new ConcurrentHashMap<SignerInfoBean, SignatureResult>(this.sigResults.size());
 
@@ -531,17 +535,37 @@ public final class BioSignerRunner implements SignaturePadListener {
 		return srList;
 	}
 
-	private byte[] generatePdf() throws IOException {
+	private void generatePdf(final String signId) throws IOException {
 
-		byte[] pdf = new ProgressUrlHttpManagerImpl(getMainFrame()).readUrlByGet(getSignTask().getRetrieveUrl().toString());
+		Downloader dwn = new Downloader(getMainFrame(), new DownloadListener() {
 
-		pdf = PdfBuilder.buildPdf(buildSrList(), pdf, getSignTask().getBioSigns());
+			@Override
+			public void downloadError(final Throwable t) {
+				System.out.println("Error"); //$NON-NLS-1$
+				signatureAborted(t,signId);
+			}
 
-		final java.io.OutputStream fos = new FileOutputStream(File.createTempFile("KAKA", ".pdf")); //$NON-NLS-1$ //$NON-NLS-2$
-		fos.write(pdf);
-		fos.flush();
-		fos.close();
-		return pdf;
+			@Override
+			public void downloadComplete(final byte[] data) {
+
+				try {
+					byte[] pdf = PdfBuilder.buildPdf(buildSrList(), data, getSignTask().getBioSigns());
+
+					final java.io.OutputStream fos = new FileOutputStream(File.createTempFile("KAKA", ".pdf")); //$NON-NLS-1$ //$NON-NLS-2$
+					fos.write(pdf);
+					fos.flush();
+					fos.close();
+					//return pdf;
+				}
+				catch(final Exception e) {
+					signatureAborted(e, signId);
+				}
+
+			}
+		});
+		dwn.downloadFile(getSignTask().getRetrieveUrl().toString());
+
+
 	}
 
 }
