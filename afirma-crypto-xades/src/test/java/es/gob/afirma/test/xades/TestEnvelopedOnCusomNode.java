@@ -40,6 +40,13 @@ public final class TestEnvelopedOnCusomNode {
 	    p2.setProperty("useManifest", "true"); //$NON-NLS-1$ //$NON-NLS-2$
     }
 
+    private static final Properties p1 = new Properties();
+    static {
+	    p1.setProperty("format", AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED); //$NON-NLS-1$
+	    p1.setProperty("mode", AOSignConstants.SIGN_MODE_IMPLICIT); //$NON-NLS-1$
+	    p1.setProperty("avoidXpathExtraTransformsOnEnveloped", "true"); //$NON-NLS-1$ //$NON-NLS-2$
+    }
+
 	/** Prueba de XAdES Enveloped con inserci&oacute;n de firma en el mismo nodo espec&iacute;fico
 	 * que se firma.
 	 * @throws Exception En cualquier error. */
@@ -101,6 +108,36 @@ public final class TestEnvelopedOnCusomNode {
         fos.flush(); fos.close();
         System.out.println("Temporal para comprobacion manual: " + f.getAbsolutePath()); //$NON-NLS-1$
 
+	}
+
+	/** Prueba de XAdES Enveloped sin transformaci&oacute;n XPath extra.
+	 * @throws Exception EN cualquier error. */
+	@SuppressWarnings("static-method")
+	@Test
+	public void testAvoidXpathExtraTransformsOnEnveloped() throws Exception {
+        Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$
+        final PrivateKeyEntry pke;
+        final KeyStore ks = KeyStore.getInstance("JKS"); //$NON-NLS-1$
+
+        ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH), CERT_PASS.toCharArray());
+        pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
+        final AOSigner signer = new AOXAdESSigner();
+
+        final byte[] data = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream("xpathnodenveloped.xml")); //$NON-NLS-1$
+
+        final byte[] result = signer.sign(
+    		data,
+    		"SHA512withRSA", //$NON-NLS-1$
+    		pke.getPrivateKey(),
+    		pke.getCertificateChain(),
+    		p1
+		);
+
+        final File f = File.createTempFile("xpathnodenveloped-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$
+        final java.io.FileOutputStream fos = new java.io.FileOutputStream(f);
+        fos.write(result);
+        fos.flush(); fos.close();
+        System.out.println("Temporal para comprobacion manual: " + f.getAbsolutePath()); //$NON-NLS-1$
 	}
 
 }

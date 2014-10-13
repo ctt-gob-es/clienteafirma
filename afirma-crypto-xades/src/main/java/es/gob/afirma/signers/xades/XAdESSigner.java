@@ -215,6 +215,8 @@ public final class XAdESSigner {
 
 		final Properties extraParams = xParams != null ? xParams : new Properties();
 
+		final boolean avoidXpathExtraTransformsOnEnveloped = Boolean.parseBoolean(extraParams.getProperty(
+				"avoidXpathExtraTransformsOnEnveloped", Boolean.FALSE.toString())); //$NON-NLS-1$
 		final boolean onlySignningCert = Boolean.parseBoolean(extraParams.getProperty(
 				"includeOnlySignningCertificate", Boolean.FALSE.toString())); //$NON-NLS-1$
 		final boolean useManifest = Boolean.parseBoolean(extraParams.getProperty(
@@ -934,10 +936,10 @@ public final class XAdESSigner {
 					}
 				}
 
-				// Salvo que sea una factura electronica o que el nodo raiz se haya firmado en
-				// base a su Id, se agrega una transformacion XPATH para eliminar el resto de
+				// Salvo que sea una factura electronica o que se indique lo contrario
+				// se agrega una transformacion XPATH para eliminar el resto de
 				// firmas del documento en las firmas Enveloped
-				if (!facturaeSign && nodeToSign == null) {
+				if (!facturaeSign && !avoidXpathExtraTransformsOnEnveloped) {
 					transformList.add(
 						fac.newTransform(
 							Transform.XPATH,
