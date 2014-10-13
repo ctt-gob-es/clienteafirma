@@ -1,0 +1,147 @@
+<!--
+ Este fichero forma parte del Cliente @firma. 
+ El Cliente @firma es una aplicacion de libre distribucion cuyo codigo fuente puede ser consultado
+ y descargado desde http://forja-ctt.administracionelectronica.gob.es/
+ Copyright 2009,2010 Ministerio de la Presidencia, Gobierno de Espana
+ Este fichero se distribuye bajo licencia GPL version 2  segun las
+ condiciones que figuran en el fichero 'licence' que se acompana.  Si se   distribuyera este 
+ fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
+-->
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html> <!-- Ejemplo basico de las funcionalidades para el acceso a LDAP del cliente @firma -->
+	<head>
+		<title>Demo LDAP</title>
+		<script type="text/javascript" src="common-js/instalador.js"></script>
+		<script type="text/javascript" src="constantes.js"></script>
+		<script language="javascript" type="text/javascript">
+        	
+			function realizarOperacion() {
+
+				clienteFirma.initialize();
+
+				/* Configuramos el cliente. */
+				clienteFirma.setLdapConfiguration(
+						document.getElementById('ldapAddress').value,
+						document.getElementById('ldapPort').value,
+						document.getElementById('ldapRoot').value);
+				clienteFirma.setLdapCertificatePrincipal(document.getElementById('ldapPrincipal').value);
+
+				/* Obtenemos el certificado. */
+				var certB64 = clienteFirma.getLdapCertificate();
+
+				/* Mostramos el resultado. */
+				if(clienteFirma.isError()) {
+					document.getElementById('certificadoB64').value = clienteFirma.getErrorMessage();
+				} else {
+					document.getElementById('certificadoB64').value = certB64;
+				}
+
+
+				/*
+				   Para utilizar el certificado como destinatario de un sobre digital,
+				   lo hariamos de la siguiente manera.
+				*/
+				/* 
+					clienteFirma.addRecipientToCMS(certB64);
+				*/
+
+				/*
+				   Para eliminarlo como destinatario de un sobre digital hariamos:
+				*/
+				/* 
+					clienteFirma.removeRecipientToCMS(certB64);
+				*/
+
+				/*
+					Se podria guardar el certificado a disco mediante los siguientes comandos
+					ya sea para mantenerlo en disco o para usarlo como destinatario de un sobre
+					digital mediante el metodo setRecipientsToCMS().
+				*/
+				/*
+				   clienteFirma.setData(certB64);
+				   clienteFirma.saveDataToFile("C:/certificado.cer");
+				*/
+
+			}
+
+			/*
+			 * Guarda en disco el certificado recuperado.
+			 */
+			function guardarCertificado() {
+				
+				clienteFirma.setData(document.getElementById('certificadoB64').value);
+				clienteFirma.saveDataToFile();
+			}
+
+		</script>
+		<meta http-equiv="content-type" content="text/html;charset=utf-8">
+	</head>
+	<body>
+		<script type="text/javascript">
+			cargarAppletFirma();
+		</script>
+		<p style="font-weight:bold;font-size:16pt;" align="center">Demostraci&oacute;n de acceso a certificados de un LDAP</p>
+		<form name="prueba" id="prueba">
+			<table align="center">
+			<tr>
+				<td>
+					<fieldset><legend>Configuraci&oacute;n del LDAP</legend>
+					<table class="allWidth">
+						<tr>
+							<td>Direcci&oacute;n:</td>
+							<td>Puerto:</td>
+							<td>Directorio ra&iacute;z:</td>
+						</tr>
+						<tr>
+							<td id="ldapCell">
+								<input id="ldapAddress" type="text" value="">
+							</td>
+							<td id="ldapCell">
+								<input id="ldapPort" type="text" value="389">
+							</td>
+							<td id="ldapCell">
+								<input id="ldapRoot" type="text">
+							</td>
+						</tr>
+						<tr>
+							<td colspan="3"><i>Principal</i> del certificado:</td>
+						</tr>
+						<tr>
+							<td colspan="3">
+								<input id="ldapPrincipal" type="text" class="allWidth"  value="">
+							</td>
+						</tr>
+						<tr>
+							<td colspan="3" align="center">
+								<input type="button" onclick="realizarOperacion();return false;" value="Obtener">
+							</td>
+						</tr>
+					</table>
+					</fieldset>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<fieldset><legend>Datos del certificado:</legend>
+					<table>
+						<tr>
+							<td>Certificado:</td>
+						</tr>
+						<tr>
+							<td>
+								<textarea id="certificadoB64" name="certificadoB64" cols="80" rows="10"></textarea>
+							</td>
+						</tr>
+						<tr>
+							<td align="center">
+								<input type="button" onclick="guardarCertificado();return false;" value="Guardar" >
+							</td>
+						</tr>
+					</table>
+					</fieldset>
+				</td>
+			</tr>
+		</table>
+		</form>
+	</body>
+</html>	
