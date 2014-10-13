@@ -4198,8 +4198,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 
 		// Establecemos el fichero seleccionado (si es que lo hay) para que se procese
 		// si no se indicaron los datos en claro para cifrar
-
-		if (getInternalFileUri() != null) {
+		if (dat == null && getInternalFileUri() != null) {
 			try {
 				this.cipherManager.setFileUri(AOUtil.createURI(getInternalFileUri()), false);
 			}
@@ -4214,13 +4213,18 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 		try {
 			AccessController.doPrivileged(new CipherAction(this.cipherManager, dat));
 		} catch (final PrivilegedActionException e) {
-			if (e.getCause() instanceof AOCancelledOperationException) {
-				LOGGER.severe("Error: " + e.toString()); //$NON-NLS-1$
-				setError(AppletMessages.getString("SignApplet.68")); //$NON-NLS-1$
+			if (e.getCause() instanceof KeyException) {
+				LOGGER.info("Ocurrio un error al decodificar la clave de cifrado: " + e.getCause()); //$NON-NLS-1$
+				setError(AppletMessages.getString("SignApplet.113")); //$NON-NLS-1$
 				return false;
 			}
 			LOGGER.severe("Error: " + e.toString()); //$NON-NLS-1$
 			setError(AppletMessages.getString("SignApplet.93")); //$NON-NLS-1$
+			return false;
+		}
+		catch (final AOCancelledOperationException e) {
+			LOGGER.severe("Operacion cancelada por el usuario"); //$NON-NLS-1$
+			setError(AppletMessages.getString("SignApplet.68")); //$NON-NLS-1$
 			return false;
 		}
 		catch (final OutOfMemoryError e) {
@@ -4293,16 +4297,19 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 		try {
 			AccessController.doPrivileged(new DecipherAction(this.cipherManager, dat));
 		} catch (final PrivilegedActionException e) {
-			if (e.getCause() instanceof AOCancelledOperationException) {
-				setError(AppletMessages.getString("SignApplet.68")); //$NON-NLS-1$
-				return false;
-			} else if (e.getCause() instanceof KeyException) {
+			if (e.getCause() instanceof KeyException) {
+				LOGGER.info("Ocurrio un error al decodificar la clave de cifrado: " + e.getCause()); //$NON-NLS-1$
 				setError(AppletMessages.getString("SignApplet.111")); //$NON-NLS-1$
 				return false;
-			} else {
-				setError(AppletMessages.getString("SignApplet.92")); //$NON-NLS-1$
-				return false;
 			}
+			LOGGER.info("Ocurrio un error en la operacion de descifrado: " + e.getCause()); //$NON-NLS-1$
+			setError(AppletMessages.getString("SignApplet.92")); //$NON-NLS-1$
+			return false;
+		}
+		catch (AOCancelledOperationException e) {
+			LOGGER.info("Operacion cancelada por el usuario"); //$NON-NLS-1$
+			setError(AppletMessages.getString("SignApplet.68")); //$NON-NLS-1$
+			return false;
 		}
 		catch (final OutOfMemoryError e) {
 			getLogger().severe("Error de falta de memoria durante el descifrado: " + e); //$NON-NLS-1$
@@ -4556,10 +4563,21 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 
 		final byte[] contentData;
 		try {
-			contentData = dat != null ? dat : getInData();
+			contentData = dat != null ? dat :
+				(byte[]) AccessController.doPrivileged(new PrivilegedExceptionAction<Object>() {
+					@Override
+					public Object run() throws Exception {
+						return getInData();
+					}
+				});
 		}
-		catch (final AOException e) {
+		catch (final PrivilegedActionException e) {
 			// El metodo getInData() establece el mensaje en caso de error (Incluido el OutOfMemoryError)
+			return false;
+		}
+		catch (final AOCancelledOperationException e) {
+			getLogger().severe("Operacion cancelada por el usuario: " + e); //$NON-NLS-1$
+			SignApplet.this.setError(AppletMessages.getString("SignApplet.68")); //$NON-NLS-1$
 			return false;
 		}
 
@@ -4591,6 +4609,12 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 			setError(AppletMessages.getString("SignApplet.493")); //$NON-NLS-1$
 			return false;
 		}
+		catch (final Throwable e) {
+			LOGGER.severe("Error durante el proceso de ensobrado electronico: " + e); //$NON-NLS-1$
+			setError(AppletMessages.getString("SignApplet.67")); //$NON-NLS-1$
+			return false;
+		}
+
 		return true;
 	}
 
@@ -4605,11 +4629,16 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 		// Leemos los datos
 		final byte[] envelop;
 		try {
-			envelop = SignApplet.this.getInData();
+			envelop =
+				(byte[]) AccessController.doPrivileged(new PrivilegedExceptionAction<Object>() {
+					@Override
+					public Object run() throws Exception {
+						return getInData();
+					}
+				});
 		}
-		catch (final AOException e) {
-			// El metodo getInDataStream ya se habra encargado de establecer el
-			// mensaje en caso de error
+		catch (final PrivilegedActionException e) {
+			// El metodo getInData() establece el mensaje en caso de error (Incluido el OutOfMemoryError)
 			return false;
 		}
 
@@ -4677,34 +4706,6 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 			return false;
 		}
 		return true;
-	}
-
-	/** {@inheritDoc} */
-	@Override
-	public String formatEncryptedCMS(final String b64) {
-		LOGGER.info("Invocando formatEncryptedCMS"); //$NON-NLS-1$
-		return SignApplet.getCMSInfo(b64);
-	}
-
-	/** {@inheritDoc} */
-	@Override
-	public String formatEnvelopedCMS(final String b64) {
-		LOGGER.info("Invocando formatEnvelopedCMS"); //$NON-NLS-1$
-		return SignApplet.getCMSInfo(b64);
-	}
-
-	/** Recupera la informaci&oacute;n de un objeto CMS reconocido. Si ocurre un
-	 * error durante el proceso, se devuelve cadena vac&iacute;a.
-	 * @param b64
-	 *        Objeto CMS en base 64.
-	 * @return Informaci&oacute;n del objeto CMS introducido. */
-	private static String getCMSInfo(final String b64) {
-		try {
-			return EnveloperManager.getCMSInfo(Base64.decode(b64));
-		} catch (final Exception e) {
-			LOGGER.warning("Los datos insertados no estan en Base64: " + e); //$NON-NLS-1$
-			return null;
-		}
 	}
 
 	/** {@inheritDoc} */

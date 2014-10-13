@@ -2127,7 +2127,7 @@ interface EntryPointsCrypto {
      * @return Algoritmo de cifrado. <br>
      *         Encryption algorithm. */
     String getCipherAlgorithm();
-    
+
     /** Establece los los datos cifrados en base 64 que se van a descifrar
      * mediante una pr&oacute;xima llamada a <code>decipherData()</code>. Si los datos son
      * demasiado grandes, se obtendr&aacute; un error.<br>
@@ -2464,36 +2464,6 @@ interface EntryPointsCrypto {
      * @return true si la operaci&oacute;n fue correcta. <br>
      *         true if successful. */
     boolean recoverCMS();
-
-    /** Formatea el objeto DER en Base64 especificado en la llamada y devuelve
-     * una cadena con los objetos CMS contenidos. Si el datos no est&aacute;
-     * codificado en base 64 o no es un dato CMS se devuelve cadena
-     * vac&iacute;a. <br>
-     * <br>
-     * Formats the DER object specified in the call in Base 64 and returns a
-     * string with the included CMS objects. If data is not encrypted in base 64
-     * or is not CMS data, an emppty string is returned.
-     * @param b64
-     *        Objeto DER en Base64. <br>
-     *        DER object in base 64.
-     * @return Cadena correspondiente al objeto CMS. <br>
-     *         String for the CMS object. */
-    String formatEnvelopedCMS(String b64);
-
-    /** Formatea el objeto DER en Base64 especificado en la llamada y devuelve
-     * una cadena con los objetos CMS contenidos. Si el datos no est&aacute;
-     * codificado en base 64 o no es un dato CMS se devuelve cadena
-     * vac&iacute;a. <br>
-     * <br>
-     * Formats the Base 64 DER object specified in the call, and returns a
-     * string with the included CMS objects. If data is not encrypted in base 64
-     * or is not CMS data, an empty string is returned.
-     * @param b64
-     *        Objeto DER en Base64. <br>
-     *        DER object, in base 64.
-     * @return Cadena correspondiente al objeto CMS. <br>
-     *         String for the CMS object. */
-    String formatEncryptedCMS(String b64);
 
     /** Firma y empaqueta en un sobre digital los datos especificados por <code>setData(String)</code> o <code>setFileuri(String)</code>. El resultado puede
      * ser recuperado mediante <code>getB64Data()</code> <br>

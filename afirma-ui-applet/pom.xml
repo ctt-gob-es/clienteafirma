@@ -202,6 +202,7 @@
 					</filters>
 				</configuration>
 			</plugin>
+ 
 			<plugin>
 				<groupId>com.github.wvengen</groupId>
 				<artifactId>proguard-maven-plugin</artifactId>
@@ -231,6 +232,7 @@
                     </dependency>
                 </dependencies>
 			</plugin>
+
  			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
@@ -246,7 +248,7 @@
 					<keystore>${afirma.keytool.keystore}</keystore>
 					<alias>${afirma.keytool.alias}</alias>
 					<storepass>${afirma.keytool.password}</storepass>
-					<signedjar>${project.build.directory}/${project.build.finalName}-signed.jar</signedjar>
+ 					<signedjar>${project.build.directory}/${project.build.finalName}-signed.jar</signedjar>
 					<verify>true</verify>
 					<archive>
 						<manifestFile>src/main/resources/META-INF/MANIFEST.MF</manifestFile>

@@ -715,6 +715,7 @@ final class EnveloperManager {
             return ""; //$NON-NLS-1$
         }
         catch (final Exception e) {
+        	e.printStackTrace();
             LOGGER.severe("Error al obtener la informacion del objeto CMS: " + e); //$NON-NLS-1$
             return ""; //$NON-NLS-1$
         }
