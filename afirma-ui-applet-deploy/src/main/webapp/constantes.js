@@ -35,6 +35,14 @@ var signatureAlgorithm = 'SHA512withRSA'; // Valor por defecto
 var signatureFormat = 'CAdES'; // Valor por defecto
 
 /*******************************************************************************
+ * Formato de firma. Puede ser 'AES', 'ARCFOUR' 'Blowfish', 'DES', 'DESese', 'RC2',
+ * 'PBEWITHSHA1ANDDESEDE', 'PBEWithSHA1AndRC2_40' o 'PBEWITHMD5ANDDES'. *
+ * Se estable al llamar a configuraCifrador en crypto.js      				 *
+ * Por defecto: AES.														 *
+ ******************************************************************************/
+var cipherAlgorithm = 'AES'; // Valor por defecto
+
+/*******************************************************************************
  * Mostrar los errores al usuario. Puede ser 'true' o 'false'.                 *
  * Se estable al llamar a configuraFirma en firma.js                           *
  * Por defecto: false.										 *
