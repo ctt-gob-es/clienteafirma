@@ -4,7 +4,10 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.util.HashSet;
+import java.util.Locale;
 import java.util.Properties;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import com.lowagie.text.DocumentException;
@@ -26,6 +29,15 @@ import es.gob.afirma.core.ui.AOUIFactory;
 final class PdfUtil {
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+
+	private static final Set<String> supportedSubFilters;
+	static {
+		supportedSubFilters = new HashSet<String>();
+		supportedSubFilters.add("/ETSI.RFC3161".toLowerCase(Locale.US)); //$NON-NLS-1$
+		supportedSubFilters.add("/adbe.pkcs7.detached".toLowerCase(Locale.US)); //$NON-NLS-1$
+		supportedSubFilters.add("/ETSI.CAdES.detached".toLowerCase(Locale.US)); //$NON-NLS-1$
+		supportedSubFilters.add("/adbe.pkcs7.sha1".toLowerCase(Locale.US)); //$NON-NLS-1$
+	}
 
 	private PdfUtil() {
 		// No instanciable
@@ -168,13 +180,12 @@ final class PdfUtil {
     			final PdfDictionary d = (PdfDictionary) pdfobj;
     			if (PdfName.SIG.equals(d.get(PdfName.TYPE))) {
 
-    				final String subFilter = d.get(PdfName.SUBFILTER) != null ? d.get(PdfName.SUBFILTER).toString() : null;
+    				final String subFilter = d.get(PdfName.SUBFILTER) != null ?
+    						d.get(PdfName.SUBFILTER).toString().toLowerCase(Locale.US) : null;
 
-    				if (!"/ETSI.RFC3161".equalsIgnoreCase(subFilter) && //$NON-NLS-1$
-    					!"/adbe.pkcs7.detached".equalsIgnoreCase(subFilter) && //$NON-NLS-1$
-    					!"/ETSI.CAdES.detached".equalsIgnoreCase(subFilter)) { //$NON-NLS-1$
+    				if (subFilter == null || !supportedSubFilters.contains(subFilter)) {
 
-	    				ret = true;
+    					ret = true;
 	    				try {
 							final X509Certificate cert = (X509Certificate) CertificateFactory.getInstance("X.509").generateCertificate( //$NON-NLS-1$
 								new ByteArrayInputStream(
@@ -186,7 +197,7 @@ final class PdfUtil {
 							);
 						}
 	    				catch (final Exception e) {
-							LOGGER.warning("No se ha podido comprobar la identidad de una firma no registrada: " + e); //$NON-NLS-1$
+							LOGGER.warning("No se ha podido comprobar la identidad de una firma no registrada con el subfiltro: " + subFilter + ", " + e); //$NON-NLS-1$ //$NON-NLS-2$
 						}
     				}
     			}

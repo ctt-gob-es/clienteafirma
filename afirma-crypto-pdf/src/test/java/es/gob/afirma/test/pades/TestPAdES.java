@@ -205,8 +205,8 @@ public class TestPAdES {
         System.out.println(prueba);
 
         final Properties extraParams = new Properties();
-//        extraParams.put("headLess", "true"); //$NON-NLS-1$ //$NON-NLS-2$
-//        extraParams.put("ownerPassword", "password"); //$NON-NLS-1$ //$NON-NLS-2$
+        extraParams.put("headLess", "true"); //$NON-NLS-1$ //$NON-NLS-2$
+        extraParams.put("ownerPassword", "password"); //$NON-NLS-1$ //$NON-NLS-2$
 
         final byte[] result = signer.sign(
     		testPdf,
