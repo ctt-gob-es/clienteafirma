@@ -163,11 +163,17 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 		return data;
 	}
 
+	/** Habilita las comprobaciones de certificados en conexiones SSL dej&aacute;ndolas con su
+	 * comportamiento por defecto. */
 	public static void enableSslChecks() {
 		HttpsURLConnection.setDefaultSSLSocketFactory(DEFAULT_SSL_SOCKET_FACTORY);
 		HttpsURLConnection.setDefaultHostnameVerifier(DEFAULT_HOSTNAME_VERIFIER);
 	}
 
+	/** Deshabilita las comprobaciones de certificados en conexiones SSL, acept&aacute;dose entonces
+	 * cualquier certificado.
+	 * @throws KeyManagementException Si hay problemas en la gesti&oacute;n de claves SSL.
+	 * @throws NoSuchAlgorithmException Si el JRE no soporta alg&uacute;n algoritmo necesario. */
 	public static void disableSslChecks() throws KeyManagementException, NoSuchAlgorithmException {
 		final SSLContext sc = SSLContext.getInstance("SSL"); //$NON-NLS-1$
 		sc.init(null, DUMMY_TRUST_MANAGER, new java.security.SecureRandom());
