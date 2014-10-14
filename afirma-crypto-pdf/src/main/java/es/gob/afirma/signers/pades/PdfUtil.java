@@ -166,21 +166,29 @@ final class PdfUtil {
     		final PdfObject pdfobj = pdfReader.getPdfObject(i);
     		if (pdfobj != null && pdfobj.isDictionary()) {
     			final PdfDictionary d = (PdfDictionary) pdfobj;
-    			if (PdfName.SIG.equals(d.get(PdfName.TYPE)) && !"/ETSI.RFC3161".equalsIgnoreCase(d.get(PdfName.SUBFILTER).toString())) { //$NON-NLS-1$
-    				ret = true;
-    				try {
-						final X509Certificate cert = (X509Certificate) CertificateFactory.getInstance("X.509").generateCertificate( //$NON-NLS-1$
-							new ByteArrayInputStream(
-								((PdfString) ((PdfArray) d.get(PdfName.CERT)).getArrayList().get(0)).getOriginalBytes()
-							)
-						);
-						LOGGER.info(
-							"Encontrada firma no registrada, hecha con certificado emitido por: " + cert.getIssuerX500Principal().toString() //$NON-NLS-1$
-						);
-					}
-    				catch (final Exception e) {
-						LOGGER.warning("No se ha podido comprobar la identidad de una firma no registrada: " + e); //$NON-NLS-1$
-					}
+    			if (PdfName.SIG.equals(d.get(PdfName.TYPE))) {
+
+    				final String subFilter = d.get(PdfName.SUBFILTER) != null ? d.get(PdfName.SUBFILTER).toString() : null;
+
+    				if (!"/ETSI.RFC3161".equalsIgnoreCase(subFilter) && //$NON-NLS-1$
+    					!"/adbe.pkcs7.detached".equalsIgnoreCase(subFilter) && //$NON-NLS-1$
+    					!"/ETSI.CAdES.detached".equalsIgnoreCase(subFilter)) { //$NON-NLS-1$
+
+	    				ret = true;
+	    				try {
+							final X509Certificate cert = (X509Certificate) CertificateFactory.getInstance("X.509").generateCertificate( //$NON-NLS-1$
+								new ByteArrayInputStream(
+									((PdfString) ((PdfArray) d.get(PdfName.CERT)).getArrayList().get(0)).getOriginalBytes()
+								)
+							);
+							LOGGER.info(
+								"Encontrada firma no registrada, hecha con certificado emitido por: " + cert.getIssuerX500Principal().toString() //$NON-NLS-1$
+							);
+						}
+	    				catch (final Exception e) {
+							LOGGER.warning("No se ha podido comprobar la identidad de una firma no registrada: " + e); //$NON-NLS-1$
+						}
+    				}
     			}
     		}
     	}
