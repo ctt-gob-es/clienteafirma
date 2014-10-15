@@ -13,6 +13,8 @@ if (document.all && !window.setTimeout.isPolyfill) {
 var MiniApplet = {
 
 		JAR_NAME : 'miniapplet-full_1_2.jar',
+
+		JAVA_ARGUMENTS : '-Xms512M -Xmx512M',
 		
 		CUSTOM_JAVA_ARGUMENTS : null,
 		
@@ -276,26 +278,27 @@ var MiniApplet = {
 			}
 			
 			var attributes = {
-					id: 'miniApplet',
-					name: 'MiniApplet @firma (Gobierno de Espa\u00F1a)',
-					type: 'application/x-java-applet',
-					width: 1,
-					height: 1
+					'id': 'miniApplet',
+					'name': 'MiniApplet @firma (Gobierno de Espa\u00F1a)',
+					'type': 'application/x-java-applet',
+					'width': 1,
+					'height': 1
 			};
 			
 			// Los argumentos de java no llegan al propio applet en las pruebas con Java 6 y 7,
 			// asi que (salvo los argumentos de carga) vamos a pasarlos como un parametro mas al
 			// applet para luego establecerlos internamente.
 			var parameters = {
-					keystore: keystoreConfig,
-					userAgent: window.navigator.userAgent,
-					archive: MiniApplet.codeBase + '/' + MiniApplet.JAR_NAME,
-					code: 'es.gob.afirma.miniapplet.MiniAfirmaApplet',
-					java_arguments: '-Xms512M -Xmx512M',
-					custom_java_arguments: MiniApplet.CUSTOM_JAVA_ARGUMENTS,
-					codebase_lookup: false,
-					separate_jvm: true,
-					locale: MiniApplet.selectedLocale
+					'keystore': keystoreConfig,
+					'userAgent': window.navigator.userAgent,
+					'archive': MiniApplet.codeBase + '/' + MiniApplet.JAR_NAME,
+					'code': 'es.gob.afirma.miniapplet.MiniAfirmaApplet',
+					'java-vm-args': MiniApplet.JAVA_ARGUMENTS,
+					'java_arguments': MiniApplet.JAVA_ARGUMENTS,
+					'custom_java_arguments': MiniApplet.CUSTOM_JAVA_ARGUMENTS,
+					'codebase_lookup': false,
+					'separate_jvm': true,
+					'locale': MiniApplet.selectedLocale
 			};
 
 			MiniApplet.loadMiniApplet(attributes, parameters);
