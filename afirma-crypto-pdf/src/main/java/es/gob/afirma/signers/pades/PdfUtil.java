@@ -30,13 +30,13 @@ final class PdfUtil {
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
-	private static final Set<String> supportedSubFilters;
+	private static final Set<String> SUPPORTED_SUBFILTERS;
 	static {
-		supportedSubFilters = new HashSet<String>();
-		supportedSubFilters.add("/ETSI.RFC3161".toLowerCase(Locale.US)); //$NON-NLS-1$
-		supportedSubFilters.add("/adbe.pkcs7.detached".toLowerCase(Locale.US)); //$NON-NLS-1$
-		supportedSubFilters.add("/ETSI.CAdES.detached".toLowerCase(Locale.US)); //$NON-NLS-1$
-		supportedSubFilters.add("/adbe.pkcs7.sha1".toLowerCase(Locale.US)); //$NON-NLS-1$
+		SUPPORTED_SUBFILTERS = new HashSet<String>();
+		SUPPORTED_SUBFILTERS.add("/ETSI.RFC3161".toLowerCase(Locale.US)); //$NON-NLS-1$
+		SUPPORTED_SUBFILTERS.add("/adbe.pkcs7.detached".toLowerCase(Locale.US)); //$NON-NLS-1$
+		SUPPORTED_SUBFILTERS.add("/ETSI.CAdES.detached".toLowerCase(Locale.US)); //$NON-NLS-1$
+		SUPPORTED_SUBFILTERS.add("/adbe.pkcs7.sha1".toLowerCase(Locale.US)); //$NON-NLS-1$
 	}
 
 	private PdfUtil() {
@@ -183,7 +183,7 @@ final class PdfUtil {
     				final String subFilter = d.get(PdfName.SUBFILTER) != null ?
     						d.get(PdfName.SUBFILTER).toString().toLowerCase(Locale.US) : null;
 
-    				if (subFilter == null || !supportedSubFilters.contains(subFilter)) {
+    				if (subFilter == null || !SUPPORTED_SUBFILTERS.contains(subFilter)) {
 
     					ret = true;
 	    				try {
