@@ -83,7 +83,7 @@ public final class Base64 {
     /** Preferred encoding. */
     private static final String PREFERRED_ENCODING = "US-ASCII"; //$NON-NLS-1$
 
-    private static final byte WHITE_SPACE_ENC = -5; // Indicates white space in encoding
+    private static final byte WHITE_SPACE_ENC = -9; // Indicates white space in encoding
     private static final byte EQUALS_SIGN_ENC = -1; // Indicates equals sign in encoding
 
 
