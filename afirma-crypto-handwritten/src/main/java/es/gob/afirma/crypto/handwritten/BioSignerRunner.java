@@ -321,8 +321,11 @@ public final class BioSignerRunner implements SignaturePadListener {
 
 		LOGGER.warning("El proceso de firma ha sido abortado: " + t); //$NON-NLS-1$
 
-		final String errorMsg;
-		if (signatureId == null) {
+		String errorMsg;
+		if(t instanceof SignaturePadConnectionException) {
+			errorMsg = HandwrittenMessages.getString("BioSignerRunner.3"); //$NON-NLS-1$
+		}
+		else if (signatureId == null) {
 			errorMsg = HandwrittenMessages.getString("BioSignerRunner.11"); //$NON-NLS-1$
 		}
 		else {
@@ -549,7 +552,13 @@ public final class BioSignerRunner implements SignaturePadListener {
 			public void downloadComplete(final byte[] data) {
 
 				try {
-					byte[] pdf = PdfBuilder.buildPdf(buildSrList(), data, getSignTask().getBioSigns());
+
+					byte[] pdf = PdfBuilder.buildPdf(
+						buildSrList(),
+						data,
+						getSignTask().getBioSigns(),
+						getSignTask().getCert()
+					);
 
 					final java.io.OutputStream fos = new FileOutputStream(File.createTempFile("KAKA", ".pdf")); //$NON-NLS-1$ //$NON-NLS-2$
 					fos.write(pdf);

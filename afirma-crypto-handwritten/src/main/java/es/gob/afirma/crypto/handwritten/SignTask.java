@@ -193,6 +193,7 @@ public final class SignTask {
 		if (xml == null) {
 			throw new IllegalArgumentException("El XML de entrada no puede ser nulo"); //$NON-NLS-1$
 		}
+
 		byte[] rawXml;
 		try {
 			rawXml = new String(Base64.decode(xml), "UTF-8").trim().getBytes(); //$NON-NLS-1$

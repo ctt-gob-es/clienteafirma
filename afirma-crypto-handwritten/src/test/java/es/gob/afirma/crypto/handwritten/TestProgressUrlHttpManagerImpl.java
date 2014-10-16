@@ -1,7 +1,5 @@
 package es.gob.afirma.crypto.handwritten;
 
-import java.awt.Frame;
-
 import org.junit.Test;
 
 import es.gob.afirma.crypto.handwritten.net.ProgressUrlHttpManagerImpl;
@@ -15,7 +13,7 @@ public class TestProgressUrlHttpManagerImpl {
 	@Test
 	public void testSimpleProgressUrlHttpManager () {
 		try {
-			ProgressUrlHttpManagerImpl puhmi = new ProgressUrlHttpManagerImpl(new Frame());
+			ProgressUrlHttpManagerImpl puhmi = new ProgressUrlHttpManagerImpl();
 			puhmi.readUrlByGet(
 				"http://technology.nasa.gov/NASA_Software_Catalog_2014.pdf"//$NON-NLS-1$
 			);

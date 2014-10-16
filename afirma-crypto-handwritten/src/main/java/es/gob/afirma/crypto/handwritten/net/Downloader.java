@@ -4,8 +4,6 @@ import java.awt.BorderLayout;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Frame;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
@@ -39,7 +37,6 @@ public final class Downloader implements DownloadListener {
 
 	private final JDialog dlg;
 	private final DownloadListener dl;
-	private final Frame p;
 
 	/** Construye una clase de auda para descarga de ficheros.
 	 * @param parent Padre para la modalidad gr&aacute;fica.
@@ -52,7 +49,6 @@ public final class Downloader implements DownloadListener {
 		}
 		this.dlg = new JDialog(parent, HandwrittenMessages.getString("ProgressUrlHttpManagerImpl.1"), true); //$NON-NLS-1$
 		this.dl = dlistener;
-		this.p = parent;
 	}
 
 	/** Descarga un fichero por HTTP/HTTPS GET.
@@ -86,7 +82,7 @@ public final class Downloader implements DownloadListener {
 
 		this.dlg.pack();
 
-		new ProgressUrlHttpManagerImpl(this.p).readUrlByGetAsync(url, this);
+		ProgressUrlHttpManagerImpl.readUrlByGetAsync(url, this);
 
 		this.dlg.setVisible(true);
 
@@ -109,35 +105,6 @@ public final class Downloader implements DownloadListener {
 		this.dlg.setVisible(false);
 		this.dlg.dispose();
 		this.dlg.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-	}
-
-	public static void main(final String[] args) throws Exception {
-		new Downloader(
-			null,
-			new DownloadListener() {
-
-				@Override
-				public void downloadError(final Throwable t) {
-					System.out.println("Error"); //$NON-NLS-1$
-
-				}
-
-				@Override
-				public void downloadComplete(final byte[] data) {
-					System.out.println("Terminado"); //$NON-NLS-1$
-					try {
-						final java.io.OutputStream fos = new FileOutputStream(File.createTempFile("KAKA", ".pdf")); //$NON-NLS-1$ //$NON-NLS-2$
-						fos.write(data);
-						fos.flush();
-						fos.close();
-					}
-					catch(final Exception e) {
-						e.printStackTrace();
-					}
-
-				}
-			}
-		).downloadFile("http://www.nasa.gov/pdf/703154main_earth_art-ebook.pdf"); //$NON-NLS-1$
 	}
 
 }

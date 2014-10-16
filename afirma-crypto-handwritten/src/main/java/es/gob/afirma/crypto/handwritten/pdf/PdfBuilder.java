@@ -2,6 +2,7 @@ package es.gob.afirma.crypto.handwritten.pdf;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
@@ -44,11 +45,13 @@ public final class PdfBuilder {
 	 * @param srList Mapa de firmantes y resultados de sus firmas.
 	 * @param inPdf PDF de entrada.
 	 * @param bioSignDataList Lista de datos de la tarea de firma de cada firmante.
+	 * @param cert Certificado X500DN
 	 * @return PDF con la informaci&oacute; a&ntilde;adida.
 	 * @throws IOException Si hay problemas en el tratamiento de datos. */
 	public static byte[] buildPdf(final Map<SignerInfoBean, SignatureResult> srList,
 			                      final byte[] inPdf,
-			                      final List<SingleBioSignData> bioSignDataList) throws IOException {
+			                      final List<SingleBioSignData> bioSignDataList,
+			                      final String cert) throws IOException {
 
 		LOGGER.info("Numero de firmas: "  + srList.size()); //$NON-NLS-1$
 
@@ -126,10 +129,20 @@ public final class PdfBuilder {
 
 		// Insertamos la informacion biometrica como XMP
 		count = 0;
+		List<XmpSignStructure> xmpList = new ArrayList<XmpSignStructure>();
 		for (final SignerInfoBean signer : keys) {
-			PdfXmpHelper.addBioXmpDataToPdf(pdfStamper, srList.get(signer).getSignatureData());
+
+			xmpList.add(
+				new XmpSignStructure (
+					signer,
+					srList.get(signer).getSignatureData(),
+					cert
+				)
+			);
 			count ++;
 		}
+
+		PdfXmpHelper.addBioXmpDataToPdf(pdfStamper, PdfXmpHelper.buildXmp(xmpList));
 
 		// Cerramos el PDF
 		try {

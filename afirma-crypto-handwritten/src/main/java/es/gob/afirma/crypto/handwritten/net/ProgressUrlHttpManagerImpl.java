@@ -1,6 +1,5 @@
 package es.gob.afirma.crypto.handwritten.net;
 
-import java.awt.Frame;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -15,23 +14,12 @@ public final class ProgressUrlHttpManagerImpl extends UrlHttpManagerImpl {
 
 	static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
-	private final Frame parent;
-
-
-
-
-	public ProgressUrlHttpManagerImpl(final Frame p) {
-		super();
-		this.parent = p;
-	}
-	byte[] data;
-
 	/** Descarga el contenido de una URL de forma as&iacute;ncrona mediante HTTP/HTTPS GET.
 	 * @param url URL a descargar.
 	 * @param dl Clase a la que notificar el resultado de la descarga.
 	 * @throws IOException Si hay problemas preparando la descarga, los errores durante la
 	 *                     descarga en si se notifican al <i>listener</i>. */
-	public void readUrlByGetAsync(final String url, final DownloadListener dl) throws IOException {
+	public static void readUrlByGetAsync(final String url, final DownloadListener dl) throws IOException {
 
 		if (url == null) {
 			throw new IllegalArgumentException("La URL de descarga no puede ser nula"); //$NON-NLS-1$

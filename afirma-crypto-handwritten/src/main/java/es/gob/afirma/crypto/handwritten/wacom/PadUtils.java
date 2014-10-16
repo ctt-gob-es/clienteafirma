@@ -6,8 +6,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Field;
-import java.util.Random;
 import java.util.logging.Logger;
+import java.util.zip.Deflater;
 
 import com.WacomGSS.STU.NotConnectedException;
 import com.WacomGSS.STU.STUException;
@@ -57,9 +57,28 @@ final class PadUtils {
 		if (penDataArray == null) {
 			throw new IllegalArgumentException("El array de muestras no puede ser nulo"); //$NON-NLS-1$
 		}
-		final byte[] ret = new byte[2048];
-		new Random().nextBytes(ret);
-		return ret;
+
+		return compress(Iso197947Helper.createIsoXml(penDataArray).getBytes());
+	}
+
+	private static byte[] compress(final byte[] in) {
+		try {
+		     byte[] output = new byte[in.length];
+		     Deflater compresser = new Deflater(Deflater.BEST_COMPRESSION);
+		     compresser.setInput(in);
+		     compresser.finish();
+		     final int compressedDataLength = compresser.deflate(output);
+		     compresser.end();
+		     final byte[] ret = new byte[compressedDataLength];
+		     for (int i=0; i<compressedDataLength;i++) {
+		    	 ret[i] = output[i];
+		     }
+		     return ret;
+		}
+		catch(Exception e) {
+			LOGGER.warning("No se ha podido comprimir el penData, se introducira sin comprimir: " + e); //$NON-NLS-1$
+		}
+		return in;
 	}
 
 	static void setLibraryPath() {
