@@ -337,7 +337,7 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 
 			final JLabel issuer = new JLabel(
 				CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.2") + " " + AOUtil.getCN(this.cert.getIssuerDN().toString()) + //$NON-NLS-1$ //$NON-NLS-2$
-					", " + CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.6") + " " + new KeyUsage(this.cert).toString() //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+					". " + CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.6") + " " + new KeyUsage(this.cert).toString() //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			);
 			issuer.setFont(DETAILS_FONT);
 			add(issuer, c);
