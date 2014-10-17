@@ -16,11 +16,9 @@ import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.core.ui.KeyStoreDialogManager;
 import es.gob.afirma.keystores.filters.CertificateFilter;
 
-/**
- * Di&aacute;logo para la selecci&oacute;n de certificados.
- * @author Carlos Gamuci
- */
-public class AOKeyStoreDialog implements KeyStoreDialogManager {
+/** Di&aacute;logo para la selecci&oacute;n de certificados.
+ * @author Carlos Gamuci. */
+public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
@@ -34,14 +32,13 @@ public class AOKeyStoreDialog implements KeyStoreDialogManager {
 
 	private String selectedAlias = null;
 
-    /**
-     * Crea un dialogo para la selecci&oacute;n de un certificado.
+    /** Crea un di&aacute;logo para la selecci&oacute;n de un certificado.
      * @param ksm
      *        Gestor de los almac&eacute;nes de certificados a los que pertenecen los alias.
      *        Debe ser {@code null} si se quiere usar el m&eacute;todo para seleccionar
      *        otra cosa que no sean certificados X.509 (como claves de cifrado)
      * @param parentComponent
-     *        Componente grafico sobre el que mostrar los di&aacute;logos.
+     *        Componente gr&aacute;fico sobre el que mostrar los di&aacute;logos.
      * @param checkPrivateKeys
      *        Indica si se debe comprobar que el certificado tiene clave
      *        privada o no, para no mostrar aquellos que carezcan de ella
@@ -72,11 +69,11 @@ public class AOKeyStoreDialog implements KeyStoreDialogManager {
     }
 
     /**
-     * Crea un dialogo para la selecci&oacute;n de un certificado.
+     * Crea un di&aacute;logo para la selecci&oacute;n de un certificado.
      * @param ksm
      *        Gestor de los almac&eacute;nes de certificados entre los que se selecciona.
      * @param parentComponent
-     *        Componente grafico sobre el que mostrar los di&aacute;logos.
+     *        Componente gr&aacute;fico sobre el que mostrar los di&aacute;logos.
      * @param checkPrivateKeys
      *        Indica si se debe comprobar que el certificado tiene clave
      *        privada o no, para no mostrar aquellos que carezcan de ella
