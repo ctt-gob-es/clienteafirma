@@ -41,6 +41,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import es.gob.afirma.core.AOCancelledOperationException;
+import es.gob.afirma.core.keystores.KeyUsage;
 import es.gob.afirma.core.keystores.NameCertificateBean;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Platform;
@@ -335,7 +336,8 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 			c.insets = new Insets(0, 0, 0, 5);
 
 			final JLabel issuer = new JLabel(
-				CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.2") + AOUtil.getCN(this.cert.getIssuerDN().toString()) //$NON-NLS-1$
+				CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.2") + " " + AOUtil.getCN(this.cert.getIssuerDN().toString()) + //$NON-NLS-1$ //$NON-NLS-2$
+					", " + CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.6") + " " + new KeyUsage(this.cert).toString() //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			);
 			issuer.setFont(DETAILS_FONT);
 			add(issuer, c);

@@ -54,7 +54,7 @@ public final class KeyUsage {
 		}
 	);
 
-	/** Uso para autenticaci&oacute;n. */
+	/** Uso para cifrado. */
 	public static final KeyUsage CYPH = new KeyUsage(
 		new Boolean[] {
 			null, // digitalSignature
@@ -177,6 +177,12 @@ public final class KeyUsage {
 	public String toString() {
 		if (includes(SIGN) && includes(AUTH) && includes(CYPH)) {
 			return "Firma, autenticaci\u00F3n y cifrado"; //$NON-NLS-1$
+		}
+		if (includes(AUTH) && includes(CYPH)) {
+			return "Autenticaci\u00F3n y cifrado"; //$NON-NLS-1$
+		}
+		if (includes(SIGN) && includes(AUTH) && includes(CYPH)) {
+			return "Firma y cifrado"; //$NON-NLS-1$
 		}
 		if (includes(SIGN) && includes(AUTH)) {
 			return "Firma y autenticaci\u00F3n"; //$NON-NLS-1$
