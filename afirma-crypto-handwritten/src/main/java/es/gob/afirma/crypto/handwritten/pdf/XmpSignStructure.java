@@ -1,5 +1,7 @@
 package es.gob.afirma.crypto.handwritten.pdf;
 
+import java.util.GregorianCalendar;
+
 import es.gob.afirma.crypto.handwritten.SignerInfoBean;
 
 /** Bean con los datos de una firma biom&eacute;trica que se insertan como XMP.
@@ -9,6 +11,7 @@ public final class XmpSignStructure {
 	private final SignerInfoBean signer;
 	private final byte[] bioData;
 	private final String keyDn;
+	private final GregorianCalendar signTime;
 
 	/** Crea una estructura con los datos de una firma biom&eacute;trica que se insertan como XMP.
 	 * @param signerInfo Datos del firmante.
@@ -31,6 +34,7 @@ public final class XmpSignStructure {
 		this.signer = signerInfo;
 		this.bioData = bioSignData.clone();
 		this.keyDn = decipherKeyDn;
+		this.signTime = new GregorianCalendar();
 	}
 
 	SignerInfoBean getSigner() {
@@ -43,6 +47,10 @@ public final class XmpSignStructure {
 
 	String getKeyDn() {
 		return this.keyDn;
+	}
+
+	String getSignTime() {
+		return Long.toString(this.signTime.getTimeInMillis());
 	}
 
 }

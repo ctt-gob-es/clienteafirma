@@ -34,6 +34,7 @@ final class BioMetadataSchema extends XmpSchema {
 		a.add(sign.getSigner().getId());
 		a.add(Base64.encode(sign.getBioData()));
 		a.add(sign.getKeyDn() != null ? sign.getKeyDn() : ""); //$NON-NLS-1$
+		a.add(sign.getSignTime());
 		return a;
 	}
 

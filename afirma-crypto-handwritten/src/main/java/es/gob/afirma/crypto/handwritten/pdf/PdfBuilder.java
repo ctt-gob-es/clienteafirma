@@ -45,13 +45,14 @@ public final class PdfBuilder {
 	 * @param srList Mapa de firmantes y resultados de sus firmas.
 	 * @param inPdf PDF de entrada.
 	 * @param bioSignDataList Lista de datos de la tarea de firma de cada firmante.
-	 * @param cert Certificado X500DN
+	 * @param certSubjectDn DN del titular del certificado X.509 cuya clave se ha usado
+	 *                      para el cifrado.
 	 * @return PDF con la informaci&oacute; a&ntilde;adida.
 	 * @throws IOException Si hay problemas en el tratamiento de datos. */
 	public static byte[] buildPdf(final Map<SignerInfoBean, SignatureResult> srList,
 			                      final byte[] inPdf,
 			                      final List<SingleBioSignData> bioSignDataList,
-			                      final String cert) throws IOException {
+			                      final String certSubjectDn) throws IOException {
 
 		LOGGER.info("Numero de firmas: "  + srList.size()); //$NON-NLS-1$
 
@@ -136,7 +137,7 @@ public final class PdfBuilder {
 				new XmpSignStructure (
 					signer,
 					srList.get(signer).getSignatureData(),
-					cert
+					certSubjectDn
 				)
 			);
 			count ++;
