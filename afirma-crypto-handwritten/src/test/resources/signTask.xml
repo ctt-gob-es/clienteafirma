@@ -29,11 +29,31 @@
                 <signerSurname2>Gil</signerSurname2>
                 <signerId>12345678Z</signerId>
             </signerData>
-            <htmlTemplate>&lt;html&gt;&lt;body&gt;&lt;h1&gt;HOLA&lt;/h1&gt;&lt;/body&gt;&lt;/html&gt;</htmlTemplate>
+            <htmlTemplate>
+            	&lt;div style="margin-left:15px;" &gt;
+            		&lt;table&gt;
+            			&lt;tr&gt;
+            				&lt;th&gt;
+            					&lt;img alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAbCAIAAADkn6hGAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAYdEVYdFNvZnR3YXJlAHBhaW50Lm5ldCA0LjAuM4zml1AAAAE1SURBVEhLtZThlUUwEEYVohCF0Ad9aIQ+KEQjdpgbEjLz8nbP3j/MzM13SJ5X7f/GHV19Ypom1DKSpybDBq+M76IF1AKeKgE2eAU81WVZyLBBNajrWm8yHgE2wzCg5hBhnufjRusHGuGA96Lrukv4ZfT11g8YO9ECig1eCjM/+no1B9QA3dDPjO8j/kT8fcrR0c1GMwmzdV2pbdQUqOMO1/QZaaXNLG3bPjRdKHAX76x2LuiWwZoTCiavXKHkPBUWBI6aSS5XYeyCGlEUHZ++BWrEHa21hToOTdOgBo6/Ep3RsFHNAS9Qbdsm3b7vadjoeh/UEzZE/qa1zlKy10r8ff51i9+wMhtt/ZD1iShs9Ps8TL0ITHKM44h0QtcGTS9CdkOZpTBzOTS1FXnl+Bwc1HTY9/0HxhUBnaas+zAAAAAASUVORK5CYII="&gt;
+            				&lt;/th&gt;
+            				&lt;th&gt;
+            					&lt;div style="margin-left:147px; margin-top=20px;" &gt;
+	            					&lt;img alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACUAAAAUCAIAAACF2mNcAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAYdEVYdFNvZnR3YXJlAHBhaW50Lm5ldCA0LjAuM4zml1AAAANASURBVEhL5ZRLKKxhGMe/4YxhXMal3BZSmJRbKbkkC0tlQRShWEimWcjGhsSCmqassBULlyRKLIhkJRIiFiOUDSl1XHL/zm/meY0ZR6ezsjjnv/h67v/3e57nfTX9e/Ff8f30h7J6cHd3h+X+/l7pf4fb21uybm5ulP6JLyIi4ocPnp6elEPXi4qKsNTV1Sn9j3h7e1tZWWloaLBYLGSZzWbkkZER7H58CQkJmg+Oj4+VQ9fz8/Ox1NTUKP0dlOAPrq+vn5+flUnXSZQKICAgQAS73f6ZjxyDwWAymaKjo4mor6/HuLOzk5eXFxoaiiUqKgoZQPDy8tLR0bG+vh4TE4MrIyOjq6tLWieHy83NXVtbI310dBS1p6cHlx/f4uIijszMzPLycgRYX19fNzY24uLijEYjlqCgIGRweXlZUFCAZWtriy/goHzb29tJ4VjIg4ODyJTd3d2l5vDwMLIfX1ZWFnEOh2Nubs5dQ9OoKy45cmVlpahysvT09JmZGYSysrK+vj53gqZtbm4KX0hIyNLSksR78cFH6eDgYOLoKiNh1MhtbW3iFb7a2lpflfXx8vErLS0tyFVVVdPT0wiArjCI5ubms7MzSfzgGx8fpyesjKilpaUkxMbGypZ+4pMBHx4esodkgYeHh4ODAzeJprEX/f39KSkpogLKTk1N+e1LTk6OcvogMDBwf38f75d8V1dXj4+PSUlJyCUlJUdHR+4c7aOmy+Xy3XmOrnwXFxeyZr+ju7ubgC/5BgYGkOfn5z2BWlpaGt/k5GSJEdDnsbExCYBF8S0vL6OHh4fzgnjBUmFkiZio8FGRa0B8Z2cnKneL3cPCitFSLGBycnJ2dvb09JQloIE8TKurq+KiH24+rAwZfWhoyMOuwHZJHLfN6XQi0N7GxsbW1tb4+HhxhYWF8Qg0NTXhQrVarTSNvUPl/nGDi4uLJbKwsJB/dfNxn+R0BPFbQgZ4iiSUNTs5OSFMVBAZGcn14o4r3YPs7GyGzSkTExOV6R2pqanb29tqXxYWFuiAQNolUCYPODXDZ2AVFRW9vb17e3sEsJMTExPV1dXcS2JonSSen5+j2mw2gukcsvdpVPP7NvzbfLr+C6sz1kySVyDzAAAAAElFTkSuQmCC"&gt;
+	            				&lt;/div&gt;
+            				&lt;/th&gt;
+            			&lt;/tr&gt;
+            		&lt;/table&gt;
+         		&lt;/div&gt;
+         		&lt;div style="margin-left:20px; margin-top:58px;" &gt;
+ 					&lt;p style="font-weight: bold; font-size:10px;"&gt;        		
+            			Fdo. Astrid Idoate Gil
+            		&lt;/p&gt;
+         		&lt;/div&gt;
+            </htmlTemplate>
             <signatureArea>
-                <x>10</x>
-                <y>10</y>
-                <width>100</width>
+                <x>20</x>
+                <y>50</y>
+                <width>275</width>
                 <height>100</height>
             </signatureArea>
             <signatureRubricPositionOnPdf>
@@ -51,11 +71,31 @@
                 <signerSurname2>Capote</signerSurname2>
                 <signerId>11111111d</signerId>
             </signerData>
-            <htmlTemplate>&lt;html&gt;&lt;body&gt;&lt;h1&gt;HOLA&lt;/h1&gt;&lt;/body&gt;&lt;/html&gt;</htmlTemplate>
+           	<htmlTemplate>
+            	&lt;div style="margin-left:15px;" &gt;
+            		&lt;table&gt;
+            			&lt;tr&gt;
+            				&lt;th&gt;
+            					&lt;img alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAbCAIAAADkn6hGAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAYdEVYdFNvZnR3YXJlAHBhaW50Lm5ldCA0LjAuM4zml1AAAAE1SURBVEhLtZThlUUwEEYVohCF0Ad9aIQ+KEQjdpgbEjLz8nbP3j/MzM13SJ5X7f/GHV19Ypom1DKSpybDBq+M76IF1AKeKgE2eAU81WVZyLBBNajrWm8yHgE2wzCg5hBhnufjRusHGuGA96Lrukv4ZfT11g8YO9ECig1eCjM/+no1B9QA3dDPjO8j/kT8fcrR0c1GMwmzdV2pbdQUqOMO1/QZaaXNLG3bPjRdKHAX76x2LuiWwZoTCiavXKHkPBUWBI6aSS5XYeyCGlEUHZ++BWrEHa21hToOTdOgBo6/Ep3RsFHNAS9Qbdsm3b7vadjoeh/UEzZE/qa1zlKy10r8ff51i9+wMhtt/ZD1iShs9Ps8TL0ITHKM44h0QtcGTS9CdkOZpTBzOTS1FXnl+Bwc1HTY9/0HxhUBnaas+zAAAAAASUVORK5CYII="&gt;
+            				&lt;/th&gt;
+            				&lt;th&gt;
+            					&lt;div style="margin-left:147px; margin-top=20px;" &gt;
+	            					&lt;img alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACUAAAAUCAIAAACF2mNcAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAYdEVYdFNvZnR3YXJlAHBhaW50Lm5ldCA0LjAuM4zml1AAAANASURBVEhL5ZRLKKxhGMe/4YxhXMal3BZSmJRbKbkkC0tlQRShWEimWcjGhsSCmqassBULlyRKLIhkJRIiFiOUDSl1XHL/zm/meY0ZR6ezsjjnv/h67v/3e57nfTX9e/Ff8f30h7J6cHd3h+X+/l7pf4fb21uybm5ulP6JLyIi4ocPnp6elEPXi4qKsNTV1Sn9j3h7e1tZWWloaLBYLGSZzWbkkZER7H58CQkJmg+Oj4+VQ9fz8/Ox1NTUKP0dlOAPrq+vn5+flUnXSZQKICAgQAS73f6ZjxyDwWAymaKjo4mor6/HuLOzk5eXFxoaiiUqKgoZQPDy8tLR0bG+vh4TE4MrIyOjq6tLWieHy83NXVtbI310dBS1p6cHlx/f4uIijszMzPLycgRYX19fNzY24uLijEYjlqCgIGRweXlZUFCAZWtriy/goHzb29tJ4VjIg4ODyJTd3d2l5vDwMLIfX1ZWFnEOh2Nubs5dQ9OoKy45cmVlpahysvT09JmZGYSysrK+vj53gqZtbm4KX0hIyNLSksR78cFH6eDgYOLoKiNh1MhtbW3iFb7a2lpflfXx8vErLS0tyFVVVdPT0wiArjCI5ubms7MzSfzgGx8fpyesjKilpaUkxMbGypZ+4pMBHx4esodkgYeHh4ODAzeJprEX/f39KSkpogLKTk1N+e1LTk6OcvogMDBwf38f75d8V1dXj4+PSUlJyCUlJUdHR+4c7aOmy+Xy3XmOrnwXFxeyZr+ju7ubgC/5BgYGkOfn5z2BWlpaGt/k5GSJEdDnsbExCYBF8S0vL6OHh4fzgnjBUmFkiZio8FGRa0B8Z2cnKneL3cPCitFSLGBycnJ2dvb09JQloIE8TKurq+KiH24+rAwZfWhoyMOuwHZJHLfN6XQi0N7GxsbW1tb4+HhxhYWF8Qg0NTXhQrVarTSNvUPl/nGDi4uLJbKwsJB/dfNxn+R0BPFbQgZ4iiSUNTs5OSFMVBAZGcn14o4r3YPs7GyGzSkTExOV6R2pqanb29tqXxYWFuiAQNolUCYPODXDZ2AVFRW9vb17e3sEsJMTExPV1dXcS2JonSSen5+j2mw2gukcsvdpVPP7NvzbfLr+C6sz1kySVyDzAAAAAElFTkSuQmCC"&gt;
+	            				&lt;/div&gt;
+            				&lt;/th&gt;
+            			&lt;/tr&gt;
+            		&lt;/table&gt;
+         		&lt;/div&gt;
+         		&lt;div style="margin-left:20px; margin-top:58px;" &gt;
+ 					&lt;p style="font-weight: bold; font-size:10px;"&gt;        		
+            			Fdo. Tomás García-Merás Capote
+            		&lt;/p&gt;
+         		&lt;/div&gt;
+            </htmlTemplate>
             <signatureArea>
-                <x>10</x>
-                <y>10</y>
-                <width>100</width>
+                <x>20</x>
+                <y>50</y>
+                <width>275</width>
                 <height>100</height>
             </signatureArea>
             <signatureRubricPositionOnPdf>
@@ -64,7 +104,7 @@
                 <width>200</width>
                 <height>75</height>
             </signatureRubricPositionOnPdf>
-            <signatureRubricPageOnPdf>2</signatureRubricPageOnPdf>
+            <signatureRubricPageOnPdf>1</signatureRubricPageOnPdf>
         </bioSign>
     </bioSigns>
     <completeWithCriptoSign>false</completeWithCriptoSign>

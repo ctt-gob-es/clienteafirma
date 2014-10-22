@@ -32,6 +32,8 @@ public class TestBioSignerRunner {
 	/** Main.
 	 * @param args No se usa. */
 	public static void main(final String[] args) {
+
+
 		String xml;
 		try {
 			xml = new String(AOUtil.getDataFromInputStream(TestSignTask.class.getResourceAsStream("/signTask.xml"))); //$NON-NLS-1$
@@ -40,5 +42,8 @@ public class TestBioSignerRunner {
 		catch (Exception e) {
 			e.printStackTrace();
 		}
+
+
+
 	}
 }

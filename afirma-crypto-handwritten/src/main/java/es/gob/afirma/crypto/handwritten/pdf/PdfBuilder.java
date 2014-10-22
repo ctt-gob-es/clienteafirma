@@ -2,8 +2,10 @@ package es.gob.afirma.crypto.handwritten.pdf;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
@@ -77,8 +79,8 @@ public final class PdfBuilder {
 
 			// Obtenemos la imagen de firma
 			final byte[] jpg = srList.get(signer).getSignatureJpegImage();
-			// Añadimos el pie de firma
-			final byte[] signature = JseUtil.addFooter(jpg, signer.getSignerName());
+			// Anadimos el pie de firma
+			final byte[] signature = JseUtil.addFooter(jpg, new SimpleDateFormat("dd/mm/yyyy hh:mm").format(new Date()));
 			// Datos de la tarea de firma para el firmante
 			final SingleBioSignData singleSing = getSingleBioSignData(bioSignDataList, signer.getId());
 			// Area en la que se posiciona la firma en el pdf
