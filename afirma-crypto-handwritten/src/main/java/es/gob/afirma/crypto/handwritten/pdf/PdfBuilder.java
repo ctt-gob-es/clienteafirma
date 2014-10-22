@@ -2,6 +2,8 @@ package es.gob.afirma.crypto.handwritten.pdf;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.X509Certificate;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -11,6 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
 import com.lowagie.text.DocumentException;
@@ -18,25 +21,27 @@ import com.lowagie.text.pdf.PdfReader;
 import com.lowagie.text.pdf.PdfStamper;
 
 import es.gob.afirma.core.misc.Base64;
+import es.gob.afirma.crypto.handwritten.BioDataStructure;
 import es.gob.afirma.crypto.handwritten.HandwrittenMessages;
 import es.gob.afirma.crypto.handwritten.JseUtil;
 import es.gob.afirma.crypto.handwritten.Rectangle;
 import es.gob.afirma.crypto.handwritten.SignatureResult;
 import es.gob.afirma.crypto.handwritten.SignerInfoBean;
+import es.gob.afirma.crypto.handwritten.SimpleCryptoHelper;
 import es.gob.afirma.crypto.handwritten.SingleBioSignData;
 import es.gob.afirma.signers.pades.PdfPreProcessor;
 
-/**
+/** Genera el PDF final con toda la informaci&oacute;n de las firmas.
  * @author Astrid Idoate */
 public final class PdfBuilder {
 
-	static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+
+	private static final String DIGEST_ALGORITHM = "SHA-512"; //$NON-NLS-1$
 
 	private PdfBuilder() {
 		// No instanciable
 	}
-
-
 
 	/** En un PDF de entrada, y por cada una de las firmas proporcionadas a&ntilde;ade:
 	 * <ul>
@@ -47,14 +52,15 @@ public final class PdfBuilder {
 	 * @param srList Mapa de firmantes y resultados de sus firmas.
 	 * @param inPdf PDF de entrada.
 	 * @param bioSignDataList Lista de datos de la tarea de firma de cada firmante.
-	 * @param certSubjectDn DN del titular del certificado X.509 cuya clave se ha usado
-	 *                      para el cifrado.
+	 * @param cert Certificado X.509 cuya clave se usar&aacute; para cifrar la informaci&oacute;n biom&eacute;trica.
 	 * @return PDF con la informaci&oacute; a&ntilde;adida.
-	 * @throws IOException Si hay problemas en el tratamiento de datos. */
+	 * @throws IOException Si hay problemas en el tratamiento de datos.
+	 * @throws NoSuchAlgorithmException Si no se encuentra alg&uacute;n algoritmo necesario
+	 *                                  para la huella o para el cifrado. */
 	public static byte[] buildPdf(final Map<SignerInfoBean, SignatureResult> srList,
 			                      final byte[] inPdf,
 			                      final List<SingleBioSignData> bioSignDataList,
-			                      final String certSubjectDn) throws IOException {
+			                      final X509Certificate cert) throws IOException, NoSuchAlgorithmException {
 
 		LOGGER.info("Numero de firmas: "  + srList.size()); //$NON-NLS-1$
 
@@ -79,10 +85,13 @@ public final class PdfBuilder {
 
 			// Obtenemos la imagen de firma
 			final byte[] jpg = srList.get(signer).getSignatureJpegImage();
+
 			// Anadimos el pie de firma
-			final byte[] signature = JseUtil.addFooter(jpg, new SimpleDateFormat("dd/mm/yyyy hh:mm").format(new Date()));
+			final byte[] signature = JseUtil.addFooter(jpg, new SimpleDateFormat("dd/mm/yyyy hh:mm").format(new Date())); //$NON-NLS-1$
+
 			// Datos de la tarea de firma para el firmante
 			final SingleBioSignData singleSing = getSingleBioSignData(bioSignDataList, signer.getId());
+
 			// Area en la que se posiciona la firma en el pdf
 			final Rectangle signatureRubricPositionOnPdf = singleSing.getSignatureRubricPositionOnPdf();
 
@@ -98,6 +107,46 @@ public final class PdfBuilder {
 				pdfStamper
 			);
 			count++;
+		}
+
+		// *******************************************************************************
+		// ***** Generamos los sobres digitales con los BioDataStructure cifrados ********
+
+		// Calculamos la huella del PDF de entrada
+		final byte[] inPdfDigest = SimpleCryptoHelper.messageDigest(inPdf, DIGEST_ALGORITHM);
+
+		// Creamos una lista para ir amacenando las estructuras creadas
+		final Map<SignerInfoBean, byte[]> cypheredBioStructures = new ConcurrentHashMap<SignerInfoBean, byte[]>(keys.size());
+
+		// Iteramos las firmas creando las estructuras
+		for (final SignerInfoBean signer : keys) {
+
+			// Creamos al estructura
+			final BioDataStructure bds = new BioDataStructure(
+				srList.get(signer).getSignatureData(),
+				srList.get(signer).getSignatureRawData(),
+				inPdfDigest,
+				DIGEST_ALGORITHM
+			);
+
+			if (cert != null) {
+				// La ciframos
+				final byte[] cipheredBds;
+				try {
+					cipheredBds = SimpleCryptoHelper.cipherData(bds.getEncoded(), cert);
+				}
+				catch (final Exception e) {
+					fos.close();
+					throw new IOException("Error cifrando los datos biometricos de '" + signer + "': " + e, e); //$NON-NLS-1$ //$NON-NLS-2$
+				}
+
+				// Y la metemos en la lista
+				cypheredBioStructures.put(signer, cipheredBds);
+			}
+			else {
+				cypheredBioStructures.put(signer, bds.getEncoded());
+			}
+
 		}
 
 
@@ -116,30 +165,23 @@ public final class PdfBuilder {
 			if (srList.get(signer).getSignatureData() != null) {
 				moreInfo.put(
 					HandwrittenMessages.getString("PdfBuilder.3", Integer.toString(count)), //$NON-NLS-1$
-					Base64.encode(srList.get(signer).getSignatureData())
-				);
-			}
-			if (srList.get(signer).getSignatureRawData() != null) {
-				moreInfo.put(
-					HandwrittenMessages.getString("PdfBuilder.4", Integer.toString(count)), //$NON-NLS-1$
-					Base64.encode(srList.get(signer).getSignatureRawData())
+					Base64.encode(cypheredBioStructures.get(signer))
 				);
 			}
 			count++;
 		}
 		PdfPreProcessor.addMoreInfo(moreInfo, pdfStamper);
 
-
 		// Insertamos la informacion biometrica como XMP
 		count = 0;
-		List<XmpSignStructure> xmpList = new ArrayList<XmpSignStructure>();
+		final List<XmpSignStructure> xmpList = new ArrayList<XmpSignStructure>();
 		for (final SignerInfoBean signer : keys) {
 
 			xmpList.add(
 				new XmpSignStructure (
 					signer,
-					srList.get(signer).getSignatureData(),
-					certSubjectDn
+					cypheredBioStructures.get(signer),
+					cert != null ? cert.getSubjectX500Principal().toString() : "" //$NON-NLS-1$
 				)
 			);
 			count ++;
@@ -162,8 +204,7 @@ public final class PdfBuilder {
 
 	// Metodo para obtener los datos de firma para un identificador especifico.
 	private static SingleBioSignData getSingleBioSignData( final List<SingleBioSignData> signDataList, final String id) {
-		for(final SingleBioSignData sign : signDataList) {
-
+		for (final SingleBioSignData sign : signDataList) {
 			if(sign.getSignerData().getId().equals(id) ) {
 				return sign;
 			}

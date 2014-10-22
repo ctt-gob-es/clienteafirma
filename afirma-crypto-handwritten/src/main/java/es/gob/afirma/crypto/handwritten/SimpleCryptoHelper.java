@@ -17,7 +17,9 @@ import es.gob.afirma.core.ciphers.AOCipherConfig;
 import es.gob.afirma.core.ciphers.CipherConstants.AOCipherAlgorithm;
 import es.gob.afirma.envelopers.cms.AOCMSEnveloper;
 
-final class SimpleCryptoHelper {
+/** Funciones criptogr&aacute;ficas b&aacute;sicas de utilidad.
+ * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
+public final class SimpleCryptoHelper {
 
 	private SimpleCryptoHelper() {
 		// No instanciable
@@ -28,7 +30,7 @@ final class SimpleCryptoHelper {
 	 * @param algorithm Algoritmo de huella digital.
 	 * @return Huella digital de los datos.
 	 * @throws NoSuchAlgorithmException Si el algoritmo de huella no es v&aacute;lido. */
-	static byte[] messageDigest(final byte[] data, final String algorithm) throws NoSuchAlgorithmException {
+	public static byte[] messageDigest(final byte[] data, final String algorithm) throws NoSuchAlgorithmException {
 		return MessageDigest.getInstance(algorithm).digest(data);
 	}
 
@@ -45,7 +47,7 @@ final class SimpleCryptoHelper {
 	 * @throws NoSuchAlgorithmException Si no se soporta un algoritmo necesario.
 	 * @throws InvalidKeyException Si la clave privada del certificado es incorrecta.
 	 * @throws CertificateEncodingException Si el certificado proporcionado no es v&aacute;lido. */
-	static byte[] cipherData(final byte[] data, final X509Certificate cert) throws CertificateEncodingException,
+	public static byte[] cipherData(final byte[] data, final X509Certificate cert) throws CertificateEncodingException,
 	                                                                               InvalidKeyException,
 	                                                                               NoSuchAlgorithmException,
 	                                                                               NoSuchPaddingException,

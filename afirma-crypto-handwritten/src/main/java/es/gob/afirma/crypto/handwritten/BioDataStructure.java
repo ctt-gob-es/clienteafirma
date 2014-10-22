@@ -21,9 +21,15 @@ import es.gob.afirma.core.signers.AOSignConstants;
  *  }
  * </pre>
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
-final class BioDataStructure extends DERSequence {
+public final class BioDataStructure extends DERSequence {
 
-	BioDataStructure(final byte[] isoBioData,
+	/** Crea una estructura ASN.1 que combina datos biom&eacute;tricos con huella digital
+	 * del documento firmado.
+	 * @param isoBioData Datos biom&eacute;tricos en formato ISO 19794-7.
+	 * @param rawBioData Datos biom&eacute;tricos en el formato nativo de la tableta.
+	 * @param docDigest Huellla digital original del documento firmado.
+	 * @param digestAlgorithmName Algoritmo usado para la huella digital. */
+	public BioDataStructure(final byte[] isoBioData,
 			                final byte[] rawBioData,
 			                final byte[] docDigest,
 			                final String digestAlgorithmName) {

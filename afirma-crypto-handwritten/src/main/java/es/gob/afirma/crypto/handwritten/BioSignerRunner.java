@@ -545,7 +545,7 @@ public final class BioSignerRunner implements SignaturePadListener {
 
 	private void generatePdf(final String signId) throws IOException {
 
-		Downloader dwn = new Downloader(getMainFrame(), new DownloadListener() {
+		final Downloader dwn = new Downloader(getMainFrame(), new DownloadListener() {
 
 			@Override
 			public void downloadError(final Throwable t) {
@@ -564,22 +564,22 @@ public final class BioSignerRunner implements SignaturePadListener {
 					cert = (X509Certificate) cf.generateCertificate(
 						new ByteArrayInputStream(Base64.decode(getSignTask().getCert()))
 					);
-				} catch (CertificateException e) {
+				} catch (final CertificateException e) {
 					LOGGER.warning("Error generando certificado X.509 : " + e); //$NON-NLS-1$
 					downloadError(e);
 					return;
-				} catch (IOException e) {
+				} catch (final IOException e) {
 					LOGGER.warning("Error decodificando certificado X.509 : " + e); //$NON-NLS-1$
 					downloadError(e);
 					return;
 				}
 
 				try {
-					byte[] pdf = PdfBuilder.buildPdf(
+					final byte[] pdf = PdfBuilder.buildPdf(
 						buildSrList(),
 						data,
 						getSignTask().getBioSigns(),
-						cert.getSubjectX500Principal().toString()
+						cert
 					);
 
 					final java.io.OutputStream fos = new FileOutputStream(File.createTempFile("KAKA", ".pdf")); //$NON-NLS-1$ //$NON-NLS-2$
