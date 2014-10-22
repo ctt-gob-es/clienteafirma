@@ -564,11 +564,13 @@ public final class BioSignerRunner implements SignaturePadListener {
 					cert = (X509Certificate) cf.generateCertificate(
 						new ByteArrayInputStream(Base64.decode(getSignTask().getCert()))
 					);
-				} catch (final CertificateException e) {
+				}
+				catch (final CertificateException e) {
 					LOGGER.warning("Error generando certificado X.509 : " + e); //$NON-NLS-1$
 					downloadError(e);
 					return;
-				} catch (final IOException e) {
+				}
+				catch (final IOException e) {
 					LOGGER.warning("Error decodificando certificado X.509 : " + e); //$NON-NLS-1$
 					downloadError(e);
 					return;
@@ -586,7 +588,6 @@ public final class BioSignerRunner implements SignaturePadListener {
 					fos.write(pdf);
 					fos.flush();
 					fos.close();
-					//return pdf;
 				}
 				catch(final Exception e) {
 					signatureAborted(e, signId);
