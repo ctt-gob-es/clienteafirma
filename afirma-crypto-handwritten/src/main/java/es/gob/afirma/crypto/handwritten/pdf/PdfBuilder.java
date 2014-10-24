@@ -121,7 +121,7 @@ public final class PdfBuilder {
 		// Iteramos las firmas creando las estructuras
 		for (final SignerInfoBean signer : keys) {
 
-			// Creamos al estructura
+			// Creamos la estructura
 			final BioDataStructure bds = new BioDataStructure(
 				srList.get(signer).getSignatureData(),
 				srList.get(signer).getSignatureRawData(),

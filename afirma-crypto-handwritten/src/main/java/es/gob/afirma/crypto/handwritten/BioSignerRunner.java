@@ -196,7 +196,7 @@ public final class BioSignerRunner implements SignaturePadListener {
 							HandwrittenMessages.getString("BioSignerRunner.24"), //$NON-NLS-1$
 							JOptionPane.ERROR_MESSAGE
 						);
-
+						closeApp();
 						return;
 					}
 				}
@@ -286,13 +286,6 @@ public final class BioSignerRunner implements SignaturePadListener {
 	private void signEmployeeProcess() {
 		// Inicio del proceso de firma del funcionario
 		LOGGER.info("Inicio del proceso de firma del funcionario"); //$NON-NLS-1$
-
-		// Generamos el PDF
-		try {
-			generatePdf();
-		} catch (IOException e) {
-			abortTask(null, e);
-		}
 
 		// Obtenemos el gestor del almac&eacute;n de claves (KeyStoreManager)
 		final AOKeyStoreManager ksm;
@@ -588,12 +581,13 @@ public final class BioSignerRunner implements SignaturePadListener {
 		}
 	}
 
-	private void closeApp() {
+	void closeApp() {
 		// Borrar todas las firmas ya realizadas
 		this.sigResults.clear();
 		// TODO: Cerrar aplicacion
 		getMainFrame().setVisible(false);
 		getMainFrame().dispose();
+
 	}
 
 	@Override
@@ -635,20 +629,14 @@ public final class BioSignerRunner implements SignaturePadListener {
 
 		// Si se han terminado todas las firmas biometricas...
 		if (count == 0) {
-			// Si no necesitamos la firma del funcionario generamos el PDF y terminamos
-			if(getSignTask().isCompleteWithCriptoSign()) {
-				enableOpSignButton();
-			} else {
-				try {
-					generatePdf();
-				}
+			try {
+				generatePdf();
+			}
 
-				catch (final Exception e) {
-					LOGGER.warning("Error generando el documento PDF firmado. " + e); //$NON-NLS-1$
-					signatureAborted(e, sr.getSignatureId());
-					return;
-				}
-
+			catch (final Exception e) {
+				LOGGER.warning("Error generando el documento PDF firmado. " + e); //$NON-NLS-1$
+				signatureAborted(e, sr.getSignatureId());
+				return;
 			}
 		}
 	}
@@ -716,9 +704,11 @@ public final class BioSignerRunner implements SignaturePadListener {
 					);
 
 					// Si necesitamos la firma del funcionario, guardamos la estructura del pdf para
-					// insertar la firma del funcionario y posteriormente guardarla a disco.
+					// insertar la firma del funcionario y posteriormente guardarla a disco y
+					// habilitamos el boton de firmado al funcionario
 					if(getSignTask().isCompleteWithCriptoSign()) {
 						BioSignerRunner.this.pdfSignedByBioSigns = pdf;
+						enableOpSignButton();
 					}
 					else {
 						// Guardamos el PDF a disco.
@@ -728,6 +718,7 @@ public final class BioSignerRunner implements SignaturePadListener {
 				}
 				catch(final Exception e) {
 					signatureAborted(e, null);
+					return;
 				}
 
 			}
@@ -757,6 +748,7 @@ public final class BioSignerRunner implements SignaturePadListener {
 			fos.write(data);
 			fos.flush();
 			fos.close();
+
 		} catch (Exception e) {
 			LOGGER.warning("Error cerrando el PDF. El archivo no se ha podido guardar a disco. " + e); //$NON-NLS-1$
 			AOUIFactory
