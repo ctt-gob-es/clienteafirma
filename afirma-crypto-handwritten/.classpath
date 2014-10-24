@@ -19,5 +19,7 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/afirma-crypto-cms"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/afirma-crypto-cms-enveloper"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/afirma-ui-core-jse"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/afirma-core-keystores"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/afirma-ui-core-jse-keystores"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

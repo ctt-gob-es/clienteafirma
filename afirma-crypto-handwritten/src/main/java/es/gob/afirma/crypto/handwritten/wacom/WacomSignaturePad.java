@@ -161,9 +161,9 @@ public final class WacomSignaturePad extends SignaturePad implements ITabletHand
 		);
 		this.panel.paint(im.getGraphics());
 		return im.getSubimage(
-			this.sigArea.x * this.panel.getWidth() / this.bitmap.getWidth() + 1 ,
+			this.sigArea.x * this.panel.getWidth() / this.bitmap.getWidth() + 2 ,
 			this.sigArea.y * this.panel.getHeight() / this.bitmap.getHeight() + 2,
-			this.sigArea.width * this.panel.getWidth() / this.bitmap.getWidth() -1,
+			this.sigArea.width * this.panel.getWidth() / this.bitmap.getWidth() -3,
 			this.sigArea.height * this.panel.getHeight() / this.bitmap.getHeight() -2
 		);
 	}
@@ -185,7 +185,7 @@ public final class WacomSignaturePad extends SignaturePad implements ITabletHand
 					new SignatureResult(
 						this.signatureId,
 						PadUtils.penDataArrayToIso19794(getPenData()),
-						null,
+						PadUtils.penDataArrayToRaw(getPenData()),
 						JseUtil.bufferedImage2Jpeg(getCurrentCroppedImage()),
 						new SignaturePadInfoBean(
 							"Wacom", //$NON-NLS-1$

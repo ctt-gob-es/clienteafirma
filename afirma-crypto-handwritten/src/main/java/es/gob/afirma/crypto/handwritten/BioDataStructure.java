@@ -15,8 +15,8 @@ import es.gob.afirma.core.signers.AOSignConstants;
 /** Estructura ASN.1 que combina datos biom&eacute;tricos con huella digital del documento firmado.
  * <pre>
  *  BioDataStructure ::= SEQUENCE {
- *    isoBioData	OctetctStream,
- *    rawBioData	OctectStream	OPTIONAL,
+ *    isoBioData	OctectString,
+ *    rawBioData	OctectString	OPTIONAL,
  *    digestInfo	DigestInfo
  *  }
  * </pre>

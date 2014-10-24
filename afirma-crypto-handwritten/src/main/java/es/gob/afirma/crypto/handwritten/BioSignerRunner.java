@@ -9,10 +9,14 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.ConnectException;
+import java.security.KeyStore.PrivateKeyEntry;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -30,10 +34,19 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 
 import es.gob.afirma.core.misc.Base64;
+import es.gob.afirma.core.misc.Platform;
+import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.crypto.handwritten.net.DownloadListener;
 import es.gob.afirma.crypto.handwritten.net.Downloader;
 import es.gob.afirma.crypto.handwritten.pdf.PdfBuilder;
+import es.gob.afirma.keystores.AOCertificatesNotFoundException;
+import es.gob.afirma.keystores.AOKeyStore;
+import es.gob.afirma.keystores.AOKeyStoreDialog;
+import es.gob.afirma.keystores.AOKeyStoreManager;
+import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
+import es.gob.afirma.keystores.callbacks.NullPasswordCallback;
+import es.gob.afirma.signers.pades.AOPDFSigner;
 
 /** Ejecutor de procesos de firma biom&eacute;trica
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
@@ -103,6 +116,12 @@ public final class BioSignerRunner implements SignaturePadListener {
 		return this.buttonList;
 	}
 
+	byte[] pdfSignedByBioSigns = null;
+	byte[] getPdfSignedByBioSigns() {
+		return this.pdfSignedByBioSigns;
+	}
+
+
 	/** Crea el ejecutor de procesos de firma biom&eacute;trica.
 	 * @param xml Contiene los datos de la tarea de firma.
 	 * @throws IOException Si hay errores en el tratamiento de datos. */
@@ -170,7 +189,14 @@ public final class BioSignerRunner implements SignaturePadListener {
 					}
 					catch(final Exception e) {
 						b.setText(buttonTxt(signerData, ordinal, ERROR_ICON));
-						//TODO: Mostrar dialog de error
+						LOGGER.warning("Error en el proceso de firma."); //$NON-NLS-1$
+						AOUIFactory.showErrorMessage(
+							getMainFrame(),
+							HandwrittenMessages.getString("BioSignerRunner.23"), //$NON-NLS-1$
+							HandwrittenMessages.getString("BioSignerRunner.24"), //$NON-NLS-1$
+							JOptionPane.ERROR_MESSAGE
+						);
+
 						return;
 					}
 				}
@@ -202,17 +228,16 @@ public final class BioSignerRunner implements SignaturePadListener {
 			"</table>"; //$NON-NLS-1$
 	}
 
-
+	/**
+	 * Inicio del proceso firma.
+	 * @param ordinal posici&oacute;n que ocupa en la lista el usuario seleccionado.*/
 	void launchSign(final int ordinal) {
 
 		SingleBioSignData sign = null;
 
 		// Asociamos el identificador de firma al ordinal
 		if(ordinal >= getSignTask().getBioSigns().size()) {
-			//Firma del funcionario
-			// TODO: firmar con el cliente
-			LOGGER.info("Firma del funcionario"); //$NON-NLS-1$
-			//manageSignatures();
+			signEmployeeProcess();
 		}
 		else {
 			sign = getSignTask().getBioSigns().get(ordinal);
@@ -224,11 +249,11 @@ public final class BioSignerRunner implements SignaturePadListener {
 
 		// Captura desde tableta
 		if (sign != null) {
-
 			// Abrimos la pantalla de firma en la tableta
 			try{
 				LOGGER.info("Abrimos la pantalla de firma"); //$NON-NLS-1$
 				final BioSigner bs = new BioSigner();
+
 				// Si hay plantilla HTML
 				if (sign.getHtmlTemplate() != null) {
 					bs.sign(
@@ -249,16 +274,129 @@ public final class BioSignerRunner implements SignaturePadListener {
 						sign.getSignatureArea()
 					);
 				}
-
 			}
 			catch (final Exception ex) {
 				abortTask(null, ex);
+				return;
 			}
-			//TODO: Guardar resultado de la firma
 		}
-		else {
-			// Firma del funcionario
+
+	}
+
+	private void signEmployeeProcess() {
+		// Inicio del proceso de firma del funcionario
+		LOGGER.info("Inicio del proceso de firma del funcionario"); //$NON-NLS-1$
+
+		// Generamos el PDF
+		try {
+			generatePdf();
+		} catch (IOException e) {
+			abortTask(null, e);
 		}
+
+		// Obtenemos el gestor del almac&eacute;n de claves (KeyStoreManager)
+		final AOKeyStoreManager ksm;
+		try {
+			if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
+				ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
+					AOKeyStore.WINDOWS,
+					null,
+					"Windows", //$NON-NLS-1$
+					AOKeyStore.WINDOWS.getStorePasswordCallback(getMainFrame()),
+					getMainFrame()
+				);
+			}
+			else if (Platform.OS.MACOSX.equals(Platform.getOS())) {
+				ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
+						AOKeyStore.APPLE,
+						null,
+						"Apple", //$NON-NLS-1$
+						AOKeyStore.APPLE.getStorePasswordCallback(getMainFrame()),
+						getMainFrame()
+					);
+			}
+			else {
+				ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
+						AOKeyStore.MOZ_UNI,
+						null,
+						"NSS", //$NON-NLS-1$
+						AOKeyStore.MOZ_UNI.getStorePasswordCallback(getMainFrame()),
+						getMainFrame()
+					);
+			}
+		}
+		catch(final Exception e) {
+			AOUIFactory.showErrorMessage(
+					getMainFrame(),
+					HandwrittenMessages.getString("BioSignerRunner.25"), //$NON-NLS-1$
+					HandwrittenMessages.getString("BioSignerRunner.24"), //$NON-NLS-1$
+					JOptionPane.ERROR_MESSAGE
+				);
+			return;
+		}
+
+		final AOKeyStoreDialog dialog = new AOKeyStoreDialog(ksm, null, true, true, false);
+		String alias;
+		try {
+			alias = dialog.show();
+		}
+		catch (AOCertificatesNotFoundException e) {
+			LOGGER.warning("Error, no hay certificados para firmar. " + e); //$NON-NLS-1$
+			AOUIFactory
+				.showErrorMessage(
+					getMainFrame(),
+					HandwrittenMessages.getString("BioSignerRunner.26"), //$NON-NLS-1$
+					HandwrittenMessages.getString("BioSignerRunner.24"), //$NON-NLS-1$
+					JOptionPane.ERROR_MESSAGE
+				);
+			closeApp();
+			return;
+		}
+
+		// Obtenemos la entrada de la clave privada
+		final PrivateKeyEntry signKey;
+		try {
+			signKey = ksm.getKeyEntry(alias, NullPasswordCallback.getInstance());
+		}
+		catch (Exception e) {
+			LOGGER.warning("Error accediendo a la clave de firma. " + e); //$NON-NLS-1$
+			AOUIFactory
+				.showErrorMessage(
+					getMainFrame(),
+					HandwrittenMessages.getString("BioSignerRunner.27"), //$NON-NLS-1$
+					HandwrittenMessages.getString("BioSignerRunner.24"), //$NON-NLS-1$
+					JOptionPane.ERROR_MESSAGE
+				);
+			closeApp();
+			return;
+		}
+
+		// PDF final
+		final byte[] finalPDFToSave;
+		try {
+			finalPDFToSave = new AOPDFSigner().sign(
+				getPdfSignedByBioSigns(),
+				AOSignConstants.SIGN_ALGORITHM_SHA512WITHRSA,
+				signKey.getPrivateKey(),
+				signKey.getCertificateChain(),
+				null
+			);
+		}
+		catch (Exception e) {
+			LOGGER.warning("Error en la firma del funcionario. " + e); //$NON-NLS-1$
+			AOUIFactory
+				.showErrorMessage(
+					getMainFrame(),
+					HandwrittenMessages.getString("BioSignerRunner.28"), //$NON-NLS-1$
+					HandwrittenMessages.getString("BioSignerRunner.24"), //$NON-NLS-1$
+					JOptionPane.ERROR_MESSAGE
+				);
+			closeApp();
+			return;
+		}
+
+		// Guardamos el PDF a disco(importante en este caso no haber guardado el intermedio)
+		closePDF(finalPDFToSave, getMainFrame());
 
 	}
 
@@ -329,6 +467,9 @@ public final class BioSignerRunner implements SignaturePadListener {
 		String errorMsg;
 		if(t instanceof SignaturePadConnectionException) {
 			errorMsg = HandwrittenMessages.getString("BioSignerRunner.3"); //$NON-NLS-1$
+		}
+		else if(t instanceof ConnectException) {
+			errorMsg = HandwrittenMessages.getString("BioSignerRunner.22"); //$NON-NLS-1$
 		}
 		else if (signatureId == null) {
 			errorMsg = HandwrittenMessages.getString("BioSignerRunner.11"); //$NON-NLS-1$
@@ -482,8 +623,6 @@ public final class BioSignerRunner implements SignaturePadListener {
 			signerPosition
 		).getSignerData();
 
-
-
 		getButtonList().get(signerPosition).setText(
 			buttonTxt(
 				signer.getSignerName(),
@@ -496,30 +635,22 @@ public final class BioSignerRunner implements SignaturePadListener {
 
 		// Si se han terminado todas las firmas biometricas...
 		if (count == 0) {
-			try {
-				generatePdf(sr.getSignatureId());
-			}
-
-			catch (final Exception e) {
-				LOGGER.warning("Error generando el documento PDF firmado. " + e); //$NON-NLS-1$
-				signatureAborted(e, sr.getSignatureId());
-				return;
-			}
-
+			// Si no necesitamos la firma del funcionario generamos el PDF y terminamos
 			if(getSignTask().isCompleteWithCriptoSign()) {
 				enableOpSignButton();
+			} else {
+				try {
+					generatePdf();
+				}
+
+				catch (final Exception e) {
+					LOGGER.warning("Error generando el documento PDF firmado. " + e); //$NON-NLS-1$
+					signatureAborted(e, sr.getSignatureId());
+					return;
+				}
+
 			}
 		}
-
-		// Si el contador es menor que cero quiere decir que la firma es del funcionario
-		else if(count < 0) {
-			// Si el fichero necesita ser firmado por un funcionario, activamos el boton de firma y abrimos el cliente @firma
-
-			//TODO: Tramite realizado por el funcionario
-			LOGGER.info("Firma del funcionario"); //$NON-NLS-1$
-
-		}
-
 	}
 
 	Map<SignerInfoBean, SignatureResult> buildSrList() {
@@ -543,14 +674,14 @@ public final class BioSignerRunner implements SignaturePadListener {
 		return srList;
 	}
 
-	private void generatePdf(final String signId) throws IOException {
+	private void generatePdf() throws IOException {
 
 		final Downloader dwn = new Downloader(getMainFrame(), new DownloadListener() {
 
 			@Override
 			public void downloadError(final Throwable t) {
 				System.out.println("Error"); //$NON-NLS-1$
-				signatureAborted(t,signId);
+				signatureAborted(t,null);
 			}
 
 			@Override
@@ -584,20 +715,71 @@ public final class BioSignerRunner implements SignaturePadListener {
 						cert
 					);
 
-					final java.io.OutputStream fos = new FileOutputStream(File.createTempFile("KAKA", ".pdf")); //$NON-NLS-1$ //$NON-NLS-2$
-					fos.write(pdf);
-					fos.flush();
-					fos.close();
+					// Si necesitamos la firma del funcionario, guardamos la estructura del pdf para
+					// insertar la firma del funcionario y posteriormente guardarla a disco.
+					if(getSignTask().isCompleteWithCriptoSign()) {
+						BioSignerRunner.this.pdfSignedByBioSigns = pdf;
+					}
+					else {
+						// Guardamos el PDF a disco.
+						closePDF(pdf, getMainFrame());
+					}
+
 				}
 				catch(final Exception e) {
-					signatureAborted(e, signId);
+					signatureAborted(e, null);
 				}
 
 			}
 		});
+
 		dwn.downloadFile(getSignTask().getRetrieveUrl().toString());
 
 
 	}
 
-}
+	/**
+	 * M&eacute;do para cerrar un PDF: crear el fichero y guardarlo a disco.
+	 * @param data datos del PDF.
+	 * */
+	static void closePDF(final byte[] data, final Frame parent) {
+
+		try {
+			final java.io.OutputStream fos = new FileOutputStream(
+					File
+						.createTempFile(
+									"AEAT_" + new SimpleDateFormat("dd_mm_yyyy").format(new Date()), //$NON-NLS-2$
+									".pdf" //$NON-NLS-1$
+
+						)
+				);
+
+			fos.write(data);
+			fos.flush();
+			fos.close();
+		} catch (Exception e) {
+			LOGGER.warning("Error cerrando el PDF. El archivo no se ha podido guardar a disco. " + e); //$NON-NLS-1$
+			AOUIFactory
+				.showErrorMessage(
+					parent,
+					HandwrittenMessages.getString("BioSignerRunner.31"), //$NON-NLS-1$
+					HandwrittenMessages.getString("BioSignerRunner.24"), //$NON-NLS-1$
+					JOptionPane.ERROR_MESSAGE
+				);
+			return;
+		}
+
+		AOUIFactory
+			.showMessageDialog(
+				parent,
+				HandwrittenMessages.getString("BioSignerRunner.29"), //$NON-NLS-1$
+				HandwrittenMessages.getString("BioSignerRunner.30"), //$NON-NLS-1$
+				JOptionPane.INFORMATION_MESSAGE
+			);
+
+		// Cerramos la aplicacion
+		parent.setVisible(false);
+		parent.dispose();
+	}
+
+	}

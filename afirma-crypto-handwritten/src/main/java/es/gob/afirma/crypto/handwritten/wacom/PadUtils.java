@@ -61,6 +61,25 @@ final class PadUtils {
 		return compress(Iso197947Helper.createIsoXml(penDataArray).getBytes());
 	}
 
+	static byte[] penDataArrayToRaw(final PenData[] penDataArray) {
+		if (penDataArray == null) {
+			throw new IllegalArgumentException("El array de muestras no puede ser nulo"); //$NON-NLS-1$
+		}
+		StringBuilder sb = new StringBuilder();
+		sb.append('[');
+		for (final PenData pd : penDataArray) {
+			sb.append('[');
+			sb.append(Integer.toString(pd.getX()));
+			sb.append(',');
+			sb.append(pd.getY());
+			sb.append(',');
+			sb.append(pd.getPressure());
+			sb.append(']');
+		}
+		sb.append(']');
+		return compress(sb.toString().getBytes());
+	}
+
 	private static byte[] compress(final byte[] in) {
 		try {
 		     byte[] output = new byte[in.length];
