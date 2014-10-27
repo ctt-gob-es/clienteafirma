@@ -208,7 +208,7 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 		return certLine;
 	}
 
-	private static class CertificateLine extends JPanel {
+	private static final class CertificateLine extends JPanel {
 
 		/** Serial Version */
 		private static final long serialVersionUID = 5012625058876812352L;
