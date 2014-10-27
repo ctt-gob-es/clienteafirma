@@ -57,16 +57,28 @@ final class UiUtils {
 		}
 	}
 
+
+	/** M&eactute;todo para crear los botones de la interfaz de firma.
+	 * @param tablet Tableta de firma.
+	 * @param useColor True si la tableta presenta interfaz gráfico con color, false en caso contrario.
+	 * @param screenWidth Ancho de pantalla.
+	 * @param screenHeight Alto de los botones.
+	 * @param pbl Listener con los m&ecute;todos para utilizar cuando se pulsa los botones de la interfaz.
+	 * @param count array de tres posiciones con la que se evita realizar m&acute;s de una llamada a la funciones correspondiente al listener del bot&oacute;n pulsado.
+	 * @return devuelve la interfaz de botones para la tableta de firma
+	 * */
 	static ButtonsOnScreen createButtons(final Tablet tablet,
 			                      final boolean useColor,
 			                      final int screenWidth,
 			                      final int screenHeight,
-			                      final PadButtonsListener pbl) throws SignaturePadConnectionException {
+			                      final PadButtonsListener pbl,
+			                      final int[] count) throws SignaturePadConnectionException {
 
 		final Button[] btns = new Button[3];
 		btns[0] = new Button(Messages.getString("SignatureDialog.0"), useColor); //$NON-NLS-1$
 		btns[1] = new Button(Messages.getString("SignatureDialog.1"), useColor); //$NON-NLS-1$
 		btns[2] = new Button(Messages.getString("SignatureDialog.2"), useColor); //$NON-NLS-1$
+
 
 		final short productId;
 		try {
@@ -116,11 +128,18 @@ final class UiUtils {
 			d = new Dimension(screenWidth - w, screenHeight);
 		}
 
+		// Actualmente ocurren decenas clicks, realizando decenas de llamadas al evento presionado.
+		// Con el contador solo permitiremos realizar un unico click
+
 		btns[0].addActionListener(
 			new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent evt) {
-					pbl.pressOkButton();
+					//  Sentencia if para que se ejecute una unica vez el metodo
+					if(count[0] == 0) {
+						count[0]++;
+						pbl.pressOkButton();
+					}
 				}
 			}
 		);
@@ -143,7 +162,10 @@ final class UiUtils {
 			new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent evt) {
-					pbl.pressCancelButton();
+					if(count[1] == 0) {
+						count[1]++;
+						pbl.pressCancelButton();
+					}
 				}
 			}
 		);

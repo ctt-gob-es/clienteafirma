@@ -294,7 +294,8 @@ public final class WacomSignaturePad extends SignaturePad implements ITabletHand
 			this.useColor,
 			screenWidth,
 			screenHeight,
-			this
+			this,
+			new int[]{0,0}
 		);
 
 		// Los botones determinan el espacio util para captura de la pantalla de la tableta
