@@ -12,6 +12,7 @@ package es.gob.afirma.signers.cades;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Date;
@@ -37,7 +38,6 @@ import org.bouncycastle.asn1.cms.SignerInfo;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
-import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.TBSCertificateStructure;
 import org.bouncycastle.cms.CMSProcessable;
 import org.bouncycastle.cms.CMSProcessableByteArray;
@@ -159,7 +159,7 @@ public final class CAdESTriPhaseSigner {
      * @throws AOException Cuando se produce cualquier error durante el proceso. */
     public static byte[] preSign(final String digestAlgorithmName,
                           final byte[] content,
-                          final java.security.cert.Certificate[] signerCertificateChain,
+                          final Certificate[] signerCertificateChain,
                           final AdESPolicy policy,
                           final boolean signingCertificateV2,
                           final byte[] dataDigest,
@@ -220,7 +220,7 @@ public final class CAdESTriPhaseSigner {
      */
     public static byte[] postSign(final String digestAlgorithmName,
                            final byte[] content,
-                           final X509Certificate[] signerCertificateChain,
+                           final Certificate[] signerCertificateChain,
                            final byte[] signature,
                            final byte[] signedAttributes
                ) throws AOException {
@@ -233,7 +233,7 @@ public final class CAdESTriPhaseSigner {
         try {
             tbsCertificateStructure = TBSCertificateStructure.getInstance(
         		ASN1Primitive.fromByteArray(
-    				signerCertificateChain[0].getTBSCertificate()
+    				((X509Certificate) signerCertificateChain[0]).getTBSCertificate()
 				)
     		);
         }
@@ -310,12 +310,12 @@ public final class CAdESTriPhaseSigner {
 
         // Certificados
         final List<ASN1Encodable> ce = new ArrayList<ASN1Encodable>();
-        for (final X509Certificate cert : signerCertificateChain) {
+        for (final Certificate cert : signerCertificateChain) {
             try {
-                ce.add(Certificate.getInstance(ASN1Primitive.fromByteArray(cert.getEncoded())));
+                ce.add(org.bouncycastle.asn1.x509.Certificate.getInstance(ASN1Primitive.fromByteArray(cert.getEncoded())));
             }
             catch(final Exception e) {
-                Logger.getLogger("es.gob.afirma").severe("Error insertando el certificado '" + AOUtil.getCN(cert) + "' en la cadena de confianza"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                Logger.getLogger("es.gob.afirma").severe("Error insertando el certificado '" + AOUtil.getCN((X509Certificate) cert) + "' en la cadena de confianza"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             }
         }
         final ASN1Set certificates = SigUtils.createBerSetFromList(ce);
