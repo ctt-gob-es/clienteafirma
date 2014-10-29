@@ -13,6 +13,7 @@ package es.gob.afirma.signers.xades;
 import java.security.GeneralSecurityException;
 import java.security.KeyException;
 import java.security.PrivateKey;
+import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -91,15 +92,15 @@ final class AOXMLAdvancedSignature extends XMLAdvancedSignature {
         }
     }
 
-    private KeyInfo newKeyInfo(final List<X509Certificate> certs,
+    private KeyInfo newKeyInfo(final List<Certificate> certs,
     		                   final String keyInfoId,
     		                   final boolean addKeyValue,
     		                   final boolean addKeyName) throws KeyException {
-    	final List<X509Certificate> certificates = EscapeHelper.getEscapedCertificates(certs);
+    	final List<Certificate> certificates = EscapeHelper.getEscapedCertificates(certs);
         final KeyInfoFactory keyInfoFactory = getXMLSignatureFactory().getKeyInfoFactory();
-        final List<X509Certificate> x509DataList = new ArrayList<X509Certificate>();
+        final List<Certificate> x509DataList = new ArrayList<Certificate>();
         if (!XmlWrappedKeyInfo.PUBLIC_KEY.equals(getXmlWrappedKeyInfo())) {
-            for (final X509Certificate cert : certificates) {
+            for (final Certificate cert : certificates) {
                 x509DataList.add(cert);
             }
         }
@@ -113,14 +114,14 @@ final class AOXMLAdvancedSignature extends XMLAdvancedSignature {
         if (addKeyName) {
 	        newList.add(
 	    		keyInfoFactory.newKeyName(
-    				certificates.get(0).getSubjectX500Principal().toString()
+    				((X509Certificate) certificates.get(0)).getSubjectX500Principal().toString()
 				)
 			);
         }
         return keyInfoFactory.newKeyInfo(newList, keyInfoId);
     }
 
-    void sign(final List<X509Certificate> certificates,
+    void sign(final List<Certificate> certificates,
               final PrivateKey privateKey,
               final String signatureMethod,
               final List<?> refsIdList,
@@ -133,7 +134,7 @@ final class AOXMLAdvancedSignature extends XMLAdvancedSignature {
         final List<?> referencesIdList = new ArrayList<Object>(refsIdList);
 
         if (WrappedKeyStorePlace.SIGNING_CERTIFICATE_PROPERTY.equals(getWrappedKeyStorePlace()) && certificates != null && certificates.size() > 0) {
-            this.xades.setSigningCertificate(certificates.get(0));
+            this.xades.setSigningCertificate((X509Certificate) certificates.get(0));
         }
 
         addXMLObject(

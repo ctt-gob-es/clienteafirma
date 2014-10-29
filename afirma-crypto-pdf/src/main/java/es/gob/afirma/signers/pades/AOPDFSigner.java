@@ -145,7 +145,7 @@ public final class AOPDFSigner implements AOSigner {
 			return PAdESTriPhaseSigner.postSign(
 				algorithm,
 				data,
-				(X509Certificate[]) certChain,
+				certChain,
 				new AOPkcs1Signer().sign(pre.getSign(), algorithm, key, certChain, extraParams),
 				pre,
 				null,

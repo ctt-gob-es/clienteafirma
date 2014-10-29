@@ -646,7 +646,7 @@ public final class XAdESCounterSigner {
 			}
 			else {
 				xmlSignature.sign(
-					Arrays.asList((X509Certificate[]) certChain),
+					Arrays.asList(certChain),
 					key,
 					XMLConstants.SIGN_ALGOS_URI.get(algorithm),
 					referenceList,

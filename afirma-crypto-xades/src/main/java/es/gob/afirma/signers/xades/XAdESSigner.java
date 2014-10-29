@@ -1202,8 +1202,8 @@ public final class XAdESSigner {
 
 			xmlSignature.sign(
 				onlySignningCert ?
-					Arrays.asList((X509Certificate) certChain[0]) :
-						Arrays.asList((X509Certificate[]) certChain),
+					Arrays.asList(certChain[0]) :
+						Arrays.asList(certChain),
 				pk,
 				algoUri,
 				referenceList,

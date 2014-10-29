@@ -439,7 +439,7 @@ public final class XAdESCoSigner {
 			}
 			else {
 				xmlSignature.sign(
-					Arrays.asList((X509Certificate[]) certChain),
+					Arrays.asList(certChain),
 					pk,
 					algoUri,
 					referenceList,

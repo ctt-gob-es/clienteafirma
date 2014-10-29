@@ -15,7 +15,6 @@ import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.Certificate;
-import java.security.cert.X509Certificate;
 import java.util.GregorianCalendar;
 import java.util.Properties;
 
@@ -252,7 +251,7 @@ public final class PAdESTriPhaseSigner {
      * @throws NoSuchAlgorithmException Si hay problemas con el algoritmo durante el sello de tiempo. */
     public static byte[] postSign(final String digestAlgorithmName,
                                   final byte[] inPdf,
-                                  final X509Certificate[] signerCertificateChain,
+                                  final Certificate[] signerCertificateChain,
                                   final byte[] pkcs1Signature,
                                   final PdfSignResult preSign,
                                   final SignEnhancer enhancer,
@@ -282,7 +281,7 @@ public final class PAdESTriPhaseSigner {
     }
 
     private static PdfSignResult generatePdfSignature(final String digestAlgorithmName,
-                                                      final X509Certificate[] signerCertificateChain,
+                                                      final Certificate[] signerCertificateChain,
                                                       final Properties xParams,
                                                       final byte[] pkcs1Signature,
                                                       final byte[] signedAttributes,
@@ -340,7 +339,7 @@ public final class PAdESTriPhaseSigner {
     }
 
     private static byte[] insertSignatureOnPdf(final byte[] inPdf,
-    		                                   final X509Certificate[] signerCertificateChain,
+    		                                   final Certificate[] signerCertificateChain,
     		                                   final PdfSignResult signature) throws AOException, IOException {
         final byte[] outc = new byte[CSIZE];
 

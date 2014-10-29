@@ -7,6 +7,7 @@ import java.security.NoSuchProviderException;
 import java.security.Principal;
 import java.security.PublicKey;
 import java.security.SignatureException;
+import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateExpiredException;
@@ -29,13 +30,13 @@ final class EscapeHelper {
 		// No permitimos instanciar
 	}
 
-	static List<X509Certificate> getEscapedCertificates(final List<X509Certificate> certs) {
+	static List<Certificate> getEscapedCertificates(final List<Certificate> certs) {
 		if (certs == null) {
-			return new ArrayList<X509Certificate>(0);
+			return new ArrayList<Certificate>(0);
 		}
-		final List<X509Certificate> ret = new ArrayList<X509Certificate>(certs.size());
+		final List<Certificate> ret = new ArrayList<Certificate>(certs.size());
 		for (int i=0; i<certs.size(); i++) {
-			ret.add(i, new EscapedCertificate(certs.get(i)));
+			ret.add(i, new EscapedCertificate((X509Certificate) certs.get(i)));
 		}
 		return ret;
 	}
