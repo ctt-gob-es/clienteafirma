@@ -175,14 +175,14 @@ public final class KeyStoreUtilities {
                     	if (!ksm.isKeyEntry(al)) {
                     		aliassesByFriendlyName.remove(al);
                             LOGGER.info(
-                              "Se ha ocultado un certificado por no soportar operaciones de clave privada" //$NON-NLS-1$
+                              "Se ha ocultado un certificado (emitido por '" + AOUtil.getCN(tmpCert.getIssuerX500Principal().toString()) + "') por no soportar operaciones de clave privada" //$NON-NLS-1$ //$NON-NLS-2$
                             );
                     	}
                     }
                     catch (final Exception e) {
                     	aliassesByFriendlyName.remove(al);
                     	LOGGER.info(
-                            "Se ha ocultado un certificado por no poderse comprobar su clave privada: "  + e //$NON-NLS-1$
+                            "Se ha ocultado un certificado (emitido por '" + AOUtil.getCN(tmpCert.getIssuerX500Principal().toString()) + "') por no poderse comprobar su clave privada: "  + e //$NON-NLS-1$ //$NON-NLS-2$
             			);
                     }
                 }
