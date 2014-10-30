@@ -186,7 +186,6 @@ public final class PdfBuilder {
 			);
 			count ++;
 		}
-
 		PdfXmpHelper.addBioXmpDataToPdf(pdfStamper, PdfXmpHelper.buildXmp(xmpList));
 
 		// Cerramos el PDF

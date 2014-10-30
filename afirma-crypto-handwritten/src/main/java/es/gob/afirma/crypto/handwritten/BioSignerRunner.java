@@ -67,6 +67,8 @@ public final class BioSignerRunner implements SignaturePadListener {
 	private static final int BUTTON_HEIGHT = 75;
 	private static final int BUTTON_WIDTH = 500;
 
+	private static final String ERROR_DWN_PDF = "ERROR_DWN_PDF";
+
 
 	private static final int MIN_WIDTH = 300;
 	private static final int MIN_HEIGHT_CONSTANT = 90;
@@ -457,6 +459,7 @@ public final class BioSignerRunner implements SignaturePadListener {
 
 		LOGGER.warning("El proceso de firma ha sido abortado: " + t); //$NON-NLS-1$
 
+
 		String errorMsg;
 		if(t instanceof SignaturePadConnectionException) {
 			errorMsg = HandwrittenMessages.getString("BioSignerRunner.3"); //$NON-NLS-1$
@@ -567,7 +570,7 @@ public final class BioSignerRunner implements SignaturePadListener {
 						JOptionPane.YES_NO_OPTION,
 						JOptionPane.QUESTION_MESSAGE
 				)) {
-					//TODO: canelar todo el proceso
+
 					AOUIFactory.showMessageDialog(
 						getMainFrame(),
 						HandwrittenMessages.getString("BioSignerRunner.10"), //$NON-NLS-1$
@@ -584,7 +587,6 @@ public final class BioSignerRunner implements SignaturePadListener {
 	void closeApp() {
 		// Borrar todas las firmas ya realizadas
 		this.sigResults.clear();
-		// TODO: Cerrar aplicacion
 		getMainFrame().setVisible(false);
 		getMainFrame().dispose();
 
@@ -668,7 +670,6 @@ public final class BioSignerRunner implements SignaturePadListener {
 
 			@Override
 			public void downloadError(final Throwable t) {
-				System.out.println("Error"); //$NON-NLS-1$
 				signatureAborted(t,null);
 			}
 
@@ -739,7 +740,7 @@ public final class BioSignerRunner implements SignaturePadListener {
 			final java.io.OutputStream fos = new FileOutputStream(
 					File
 						.createTempFile(
-									"AEAT_" + new SimpleDateFormat("dd_mm_yyyy").format(new Date()), //$NON-NLS-2$
+									"AEAT_" + new SimpleDateFormat("dd_MM_yyyy").format(new Date()), //$NON-NLS-2$
 									".pdf" //$NON-NLS-1$
 
 						)

@@ -28,9 +28,9 @@ final class BioMetadataSchema extends XmpSchema {
 
 	private static XmpArray<String> createBioSignsArray(final XmpSignStructure sign) {
 		final XmpArray<String> a = new XmpArray<String>(XmpArray.ORDERED);
-		a.add(sign.getSigner().getName());
-		a.add(sign.getSigner().getSurname1());
-		a.add(sign.getSigner().getSurname2() != null ? sign.getSigner().getSurname2() : ""); //$NON-NLS-1$
+		a.add(replaceAccents(sign.getSigner().getName()));
+		a.add(replaceAccents(sign.getSigner().getSurname1()));
+		a.add(sign.getSigner().getSurname2() != null ? replaceAccents(sign.getSigner().getSurname2()) : ""); //$NON-NLS-1$
 		a.add(sign.getSigner().getId());
 		a.add(Base64.encode(sign.getBioData()));
 		a.add(sign.getKeyDn() != null ? sign.getKeyDn() : ""); //$NON-NLS-1$
@@ -38,4 +38,21 @@ final class BioMetadataSchema extends XmpSchema {
 		return a;
 	}
 
+	/**M&eacute;todo que remplaza los acentos y caracteres especiales.
+	 * @param data cadena de caracteres con los datos iniciales.
+	 * @return cadena de caracteres con los datos reemplazados.*/
+	private static String replaceAccents(final String data) {
+		return data.replaceAll("á","&aacute;") //$NON-NLS-1$ //$NON-NLS-2$
+					.replaceAll("é","&eacute;") //$NON-NLS-1$ //$NON-NLS-2$
+					.replaceAll("í","&iacute;") //$NON-NLS-1$ //$NON-NLS-2$
+					.replaceAll("ó","&oacute;") //$NON-NLS-1$ //$NON-NLS-2$
+					.replaceAll("ú","&uacute;") //$NON-NLS-1$ //$NON-NLS-2$
+					.replaceAll("ñ","&ntilde;") //$NON-NLS-1$ //$NON-NLS-2$
+					.replaceAll("Á","&Aacute;") //$NON-NLS-1$ //$NON-NLS-2$
+					.replaceAll("É","&Eacute;") //$NON-NLS-1$ //$NON-NLS-2$
+					.replaceAll("Í","&Iacute;") //$NON-NLS-1$ //$NON-NLS-2$
+					.replaceAll("Ó","&Oacute;") //$NON-NLS-1$ //$NON-NLS-2$
+					.replaceAll("Ú","&Uacute;") //$NON-NLS-1$ //$NON-NLS-2$
+					.replaceAll("Ñ","&Ntilde;"); //$NON-NLS-1$ //$NON-NLS-2$
+	}
 }
