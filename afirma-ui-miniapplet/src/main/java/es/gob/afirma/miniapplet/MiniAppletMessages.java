@@ -63,7 +63,7 @@ final class MiniAppletMessages {
      *        Clave del texto.
      * @param params
      *        Par&aacute;metros que se desean insertar.
-     * @return Recuerso textual con las subcadenas sustituidas. */
+     * @return Recurso textual con las subcadenas sustituidas. */
     static String getString(final String key, final String... params) {
 
         String text;
