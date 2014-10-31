@@ -347,7 +347,7 @@ public final class MainMenu extends JMenuBar {
     void showAbout() {
         AOUIFactory.showMessageDialog(
     		this.parent == null ? MainMenu.this : this.parent,
-			SimpleAfirmaMessages.getString("MainMenu.14"), //$NON-NLS-1$,
+			SimpleAfirmaMessages.getString("MainMenu.14", System.getProperty("java.version")), //$NON-NLS-1$ //$NON-NLS-2$,
             SimpleAfirmaMessages.getString("MainMenu.15"), //$NON-NLS-1$
             JOptionPane.INFORMATION_MESSAGE
         );
