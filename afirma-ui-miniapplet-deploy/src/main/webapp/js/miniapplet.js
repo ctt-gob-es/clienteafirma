@@ -215,7 +215,7 @@ var MiniApplet = {
 			}
 
 			var delay =  Math.abs(clientDate.getTime() - serverDate.getTime());
-			if(delay > maxMillis){
+			if (delay > maxMillis) {
 				 if (checkType == MiniApplet.CHECKTIME_RECOMMENDED) {
 					 alert("Se ha detectado un desfase horario entre su sistema y el servidor. Se recomienda que se corrija antes de pulsar Aceptar para continuar." +
 							 "\nHora de su sistema: " + clientDate.toLocaleString() +
@@ -1009,7 +1009,7 @@ var MiniApplet = {
 				// Identificador del fichero (equivalente a un id de sesion) del que deben recuperarse los datos
 				var fileId = generateNewIdSession(); 
 
-				var httpRequest = ajaxRequest();
+				var httpRequest = getHttpRequest();
 				if (!httpRequest) {
 					this.throwException("java.lang.Exception", "Su navegador no permite preprocesar los datos que desea tratar");
 				}
@@ -1159,7 +1159,7 @@ var MiniApplet = {
 
 			this.getStoredFileFromServlet = function (idDocument, servletAddress, cipherKey, successCallback, errorCallback) {
 
-				var httpRequest = ajaxRequest();
+				var httpRequest = getHttpRequest();
 				if (!httpRequest) {
 					this.throwException("java.lang.Exception", "Su navegador no permite obtener el resulado de la operaci\u00F3n");
 				}
@@ -1209,8 +1209,8 @@ var MiniApplet = {
 				setTimeout(retrieveRequest, 4000, httpRequest, url, params.replace("&it=" + (iterations-1), "&it=" + iterations), cipherKey, successCallback, errorCallback);
 			}
 
-			// ajaxRequest     Uso:  new ajaxRequest()
-			function ajaxRequest() {
+			// getHttpRequest
+			function getHttpRequest() {
 				var activexmodes=["Msxml2.XMLHTTP", "Microsoft.XMLHTTP"]; //activeX versions to check for in IE
 				if (window.ActiveXObject){ //Test for support for ActiveXObject in IE first (as XMLHttpRequest in IE7 is broken)
 					for (var i=0; i<activexmodes.length; i++) {
