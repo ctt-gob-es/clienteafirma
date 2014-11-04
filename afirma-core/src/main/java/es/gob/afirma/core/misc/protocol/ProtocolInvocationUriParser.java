@@ -526,12 +526,10 @@ public final class ProtocolInvocationUriParser {
 		return key.getBytes();
 	}
 
-	/**
-	 * Valida una URL para asegurar que cumple con los requisitos m&iacute;nimos de seguridad.
+	/** Valida una URL para asegurar que cumple con los requisitos m&iacute;nimos de seguridad.
 	 * @param url URL que se desea validar.
 	 * @return URL formada y validada.
-	 * @throws ParameterException Cuando ocurre alg&uacute;n problema al validar la URL.
-	 */
+	 * @throws ParameterException Cuando ocurre alg&uacute;n problema al validar la URL. */
 	private static URL validateURL(final String url) throws ParameterException {
 
 		// Comprobamos que la URL sea valida
@@ -548,7 +546,7 @@ public final class ProtocolInvocationUriParser {
 		}
 		// Comprobamos que la URL sea una llamada al servlet y que no sea local
 		if ("localhost".equals(servletUrl.getHost()) || "127.0.0.1".equals(servletUrl.getHost())) { //$NON-NLS-1$ //$NON-NLS-2$
-			throw new ParameterException("El host de la URL proporcionada para el Servlet es local"); //$NON-NLS-1$
+			throw new ParameterLocalAccessRequestedException("El host de la URL proporcionada para el Servlet es local"); //$NON-NLS-1$
 		}
 		if (!(servletUrl.toString().endsWith(SERVLET_NAME_STORAGE) || servletUrl.toString().endsWith(SERVLET_NAME_RETRIEVE))) {
 			throw new ParameterException("El protocolo de la URL proporcionada para el servlet no apunta a un servlet declarado"); //$NON-NLS-1$
