@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="2.0" toolsVersion="6205" systemVersion="14A314h" targetRuntime="iOS.CocoaTouch" variant="6xAndEarlier" propertyAccessControl="none" useAutolayout="YES" promptedForUpgradeToXcode5="NO" initialViewController="E8a-gZ-k6m">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="2.0" toolsVersion="6245" systemVersion="13F34" targetRuntime="iOS.CocoaTouch" variant="6xAndEarlier" propertyAccessControl="none" useAutolayout="YES" initialViewController="E8a-gZ-k6m">
     <dependencies>
         <development version="4600" identifier="xcode"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6198"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6238"/>
     </dependencies>
     <scenes>
         <!--Solicitud de PIN-->
         <scene sceneID="Ppb-KD-vaQ">
             <objects>
-                <viewController storyboardIdentifier="pin" title="Solicitud de PIN" wantsFullScreenLayout="YES" id="7tH-yy-d2T" customClass="AOPinViewController" sceneMemberID="viewController">
+                <viewController title="Solicitud de PIN" wantsFullScreenLayout="YES" id="7tH-yy-d2T" customClass="AOPinViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="R5q-y6-x5V">
-                        <rect key="frame" x="0.0" y="20" width="320" height="568"/>
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="xnT-qm-h5g">
@@ -50,7 +50,7 @@
                                     <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <connections>
-                                    <segue destination="VdI-Vu-J89" kind="push" identifier="toFirstScreen" id="Au9-Gn-8dC"/>
+                                    <segue destination="VdI-Vu-J89" kind="custom" identifier="toFirstScreen" customClass="AOCustomSegue" id="Au9-Gn-8dC"/>
                                 </connections>
                             </button>
                             <imageView userInteractionEnabled="NO" contentMode="scaleToFill" image="logo_cliente.png" translatesAutoresizingMaskIntoConstraints="NO" id="jHr-hi-ACV">
@@ -117,7 +117,7 @@ Si ha olvidado la contraseña utilice iTunes para sustituir su almacén PKCS#12.
             <objects>
                 <viewController title="Solicitud de certificado" wantsFullScreenLayout="YES" id="wka-yG-7pe" customClass="AOCertificateSelectionViewController" sceneMemberID="viewController">
                     <view key="view" clipsSubviews="YES" contentMode="scaleToFill" id="F5C-AC-uwg">
-                        <rect key="frame" x="0.0" y="20" width="320" height="568"/>
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <imageView userInteractionEnabled="NO" contentMode="scaleToFill" image="logo_cliente.png" translatesAutoresizingMaskIntoConstraints="NO" id="pjS-yV-b2D">
@@ -154,7 +154,7 @@ Si ha olvidado la contraseña utilice iTunes para sustituir su almacén PKCS#12.
                                     <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <connections>
-                                    <segue destination="VdI-Vu-J89" kind="push" identifier="toFirstScreen" id="XHD-5K-P5E"/>
+                                    <segue destination="VdI-Vu-J89" kind="custom" identifier="toFirstScreen" customClass="AOCustomSegue" id="XHD-5K-P5E"/>
                                 </connections>
                             </button>
                             <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="275" translatesAutoresizingMaskIntoConstraints="NO" id="PTw-Q9-0mN">
@@ -207,9 +207,9 @@ Si no aparecen almacenes en la lista, podrá importarlos desde las opciones de l
         <!--Firma Electrónica-->
         <scene sceneID="QTY-tT-Aby">
             <objects>
-                <viewController storyboardIdentifier="firma" title="Firma Electrónica" wantsFullScreenLayout="YES" id="OQu-SY-frv" customClass="AOSignViewController" sceneMemberID="viewController">
+                <viewController title="Firma Electrónica" wantsFullScreenLayout="YES" id="OQu-SY-frv" customClass="AOSignViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="YmP-v8-Z4x">
-                        <rect key="frame" x="0.0" y="20" width="320" height="568"/>
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="pIZ-Xc-LAF">
@@ -240,7 +240,7 @@ Si no aparecen almacenes en la lista, podrá importarlos desde las opciones de l
                                     <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <connections>
-                                    <segue destination="VdI-Vu-J89" kind="push" identifier="toFirstScreen" id="tOZ-kr-G8o"/>
+                                    <segue destination="VdI-Vu-J89" kind="custom" identifier="toFirstScreen" customClass="AOCustomSegue" id="tOZ-kr-G8o"/>
                                 </connections>
                             </button>
                             <imageView userInteractionEnabled="NO" contentMode="scaleToFill" image="logo_cliente.png" translatesAutoresizingMaskIntoConstraints="NO" id="ke4-gG-wgY">
@@ -258,7 +258,7 @@ Si no aparecen almacenes en la lista, podrá importarlos desde las opciones de l
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                             </textView>
-                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="dSj-wa-fYQ">
+                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" useAutomaticPreferredMaxLayoutWidth="YES" translatesAutoresizingMaskIntoConstraints="NO" id="dSj-wa-fYQ">
                                 <rect key="frame" x="20" y="177" width="280" height="20"/>
                                 <fontDescription key="fontDescription" name="Helvetica-BoldOblique" family="Helvetica" pointSize="17"/>
                                 <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
@@ -338,7 +338,7 @@ Si no aparecen almacenes en la lista, podrá importarlos desde las opciones de l
                                     <constraint firstAttribute="height" constant="83" id="tC7-Ml-ktr"/>
                                 </constraints>
                             </imageView>
-                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="Acerca de..." textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="S7O-QZ-u7o">
+                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="Acerca de..." textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" useAutomaticPreferredMaxLayoutWidth="YES" translatesAutoresizingMaskIntoConstraints="NO" id="S7O-QZ-u7o">
                                 <rect key="frame" x="20" y="111" width="280" height="33"/>
                                 <color key="backgroundColor" red="0.91620524879999998" green="0.91620524879999998" blue="0.91620524879999998" alpha="0.59999999999999998" colorSpace="calibratedRGB"/>
                                 <constraints>
@@ -511,7 +511,7 @@ http://administracionelectronica.gob.es/</string>
                                     <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                             </button>
-                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="Ayuda" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="HV8-Ix-XS3">
+                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="Ayuda" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" useAutomaticPreferredMaxLayoutWidth="YES" translatesAutoresizingMaskIntoConstraints="NO" id="HV8-Ix-XS3">
                                 <rect key="frame" x="20" y="111" width="280" height="33"/>
                                 <color key="backgroundColor" red="0.91620524879999998" green="0.91620524879999998" blue="0.91620524879999998" alpha="0.59999999999999998" colorSpace="calibratedRGB"/>
                                 <constraints>
@@ -535,7 +535,7 @@ http://administracionelectronica.gob.es/</string>
                                     <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <connections>
-                                    <segue destination="VdI-Vu-J89" kind="custom" identifier="toFirstScreen" customClass="AOCustomSegue" id="Coe-re-dJF"/>
+                                    <action selector="goBackHome:" destination="UWq-gP-qqr" eventType="touchUpInside" id="eHx-fy-G7e"/>
                                 </connections>
                             </button>
                         </subviews>
@@ -612,7 +612,7 @@ http://administracionelectronica.gob.es/</string>
                                     <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <connections>
-                                    <segue destination="VdI-Vu-J89" kind="custom" identifier="toFirstScreen" customClass="AOCustomSegue" id="XSt-c3-X0e"/>
+                                    <action selector="goBackHome:" destination="Xba-9r-3ek" eventType="touchUpInside" id="AqV-7Q-dn1"/>
                                 </connections>
                             </button>
                             <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="eOv-cJ-QU9">
@@ -700,7 +700,7 @@ http://administracionelectronica.gob.es/</string>
             <objects>
                 <viewController wantsFullScreenLayout="YES" id="VdI-Vu-J89" customClass="AOAboutViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="BLw-aA-1Ba">
-                        <rect key="frame" x="0.0" y="20" width="320" height="568"/>
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="WrM-2I-hjk">
@@ -794,7 +794,7 @@ Puede contactar con el tenedor de los derechos de copia en la siguiente direcci�
                                     <constraint firstAttribute="height" constant="83" id="x7k-ME-hza"/>
                                 </constraints>
                             </imageView>
-                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="Preguntas más comunes" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="TeM-Kz-q5J">
+                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="Preguntas más comunes" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" useAutomaticPreferredMaxLayoutWidth="YES" translatesAutoresizingMaskIntoConstraints="NO" id="TeM-Kz-q5J">
                                 <rect key="frame" x="20" y="111" width="280" height="33"/>
                                 <color key="backgroundColor" red="0.91620524878640774" green="0.91620524878640774" blue="0.91620524878640774" alpha="0.59999999999999998" colorSpace="calibratedRGB"/>
                                 <constraints>
@@ -822,29 +822,6 @@ Puede contactar con el tenedor de los derechos de copia en la siguiente direcci�
 Puede firmar ficheros en la nube a través de la opción "Firmar" de la pantalla principal de la aplicación. La firma generada se almacenará también en la nube, desde la que podrá descargarla a través de los medios proporcionados por la plataforma en cuestión que utilice.
  
 Para la firma de trámites web realice los trámites normalmente a través de su navegador. Si el trámite está preparado para la firma con el Cliente @firma móvil, este se ejecutará en el momento de la firma para que el usuario seleccione su certificado y ejecute la operación.
- 
-</string>
-                                        <attributes>
-                                            <font key="NSFont" size="14" name="Helvetica"/>
-                                            <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="leftToRight" paragraphSpacing="16" defaultTabInterval="36">
-                                                <tabStops/>
-                                            </paragraphStyle>
-                                        </attributes>
-                                    </fragment>
-                                    <fragment>
-                                        <string key="content">¿Por qué al acceder a la opción de firma se me piden los datos de mi cuenta de Dropbox?
-</string>
-                                        <attributes>
-                                            <font key="NSFont" size="14" name="Helvetica-Bold"/>
-                                            <font key="NSOriginalFont" size="14" name="Helvetica-Bold"/>
-                                            <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="leftToRight" paragraphSpacing="16" defaultTabInterval="36">
-                                                <tabStops/>
-                                            </paragraphStyle>
-                                        </attributes>
-                                    </fragment>
-                                    <fragment>
-                                        <string key="content"> 
-El Cliente @firma para Apple iOS firma ficheros localizados en la nube (por defecto, a través de Dropbox), por lo que necesita acceder a su directorio en la nube para el acceso a los ficheros disponibles para firmar. El proceso de autenticación se realiza directamente a través del servicio pertinente de Dropbox, por lo que sus datos de usuario nunca son almacenados ni conocidos por el Cliente @firma para Applet iOS.
  
 </string>
                                         <attributes>
@@ -999,7 +976,7 @@ Los certificados importados en el Cliente @firma para Apple iOS son de uso exclu
                                     <constraint firstAttribute="height" constant="83" id="VhS-5y-iAJ"/>
                                 </constraints>
                             </imageView>
-                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="Cómo instalar certificados" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="cDW-CP-g9m">
+                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="Cómo instalar certificados" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" useAutomaticPreferredMaxLayoutWidth="YES" translatesAutoresizingMaskIntoConstraints="NO" id="cDW-CP-g9m">
                                 <rect key="frame" x="20" y="111" width="280" height="33"/>
                                 <color key="backgroundColor" red="0.91620524879999998" green="0.91620524879999998" blue="0.91620524879999998" alpha="0.59999999999999998" colorSpace="calibratedRGB"/>
                                 <constraints>
@@ -1158,13 +1135,10 @@ Los certificados importados en el Cliente @firma para Apple iOS son de uso exclu
     <simulatedMetricsContainer key="defaultSimulatedMetrics">
         <simulatedStatusBarMetrics key="statusBar"/>
         <simulatedOrientationMetrics key="orientation"/>
-        <simulatedScreenMetrics key="destination" type="retina4">
-            <size key="portraitSize" width="320" height="568"/>
-            <size key="landscapeSize" width="568" height="320"/>
-        </simulatedScreenMetrics>
+        <simulatedScreenMetrics key="destination" type="retina4"/>
     </simulatedMetricsContainer>
     <inferredMetricsTieBreakers>
         <segue reference="95b-rT-XO6"/>
-        <segue reference="XSt-c3-X0e"/>
+        <segue reference="tOZ-kr-G8o"/>
     </inferredMetricsTieBreakers>
 </document>

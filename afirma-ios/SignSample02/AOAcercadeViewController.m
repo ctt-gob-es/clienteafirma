@@ -40,6 +40,7 @@
 //cuando se pulsa el botón del centro
 -(void)onGoingToBackGround:(NSNotification*) notification {
     @try {
+        
         [self performSegueWithIdentifier:@"toFirstScreen" sender:self];
     }
     @catch (NSException *e) {

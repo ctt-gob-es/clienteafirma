@@ -14,6 +14,8 @@
 #import "GAIDictionaryBuilder.h"
 #import "DesCypher.h"
 #import "Base64.h"
+#import "AOAboutViewController.h"
+#import "AOCounterSignXMLParser.h"
 
 @interface AOSignViewController ()
 
@@ -80,7 +82,8 @@ SecKeyRef privateKey = NULL;
     self.screenName = @"IOS AOSignViewController - Start signature process window";
 }
 
--(IBAction)buttonPressed:(id)sender {
+-(IBAction)buttonPressed:(id)sender
+{
     [self startSignatureProcess];
     
     id<GAITracker> tracker= [[GAI sharedInstance] defaultTracker];
@@ -108,10 +111,12 @@ SecKeyRef privateKey = NULL;
 //cuando se pulsa el botón del centro del teléfono
 -(void)onGoingToBackGround:(NSNotification*) notification
 {
-    @try {
+    @try
+    {
         [self performSegueWithIdentifier:@"toFirstScreen" sender:self];
     }
-    @catch (NSException *e) {
+    @catch (NSException *e)
+    {
         // Se ignora
     }
 }
@@ -126,13 +131,29 @@ SecKeyRef privateKey = NULL;
     
     NSDictionary *urlParameters = self.parameters;
     
+    /*
+    NSLog(@" ------- Parametros en AOSignViewController --------");
+    for(NSString *aKey in urlParameters) {
+        NSLog(@"%@", aKey);
+    }
+    NSLog(@" ---------------------------------------------------");
+    */
+    
     //parámetro donde se recogen los datos originales. El documento llega dentro del parámetro "dat"
     if([urlParameters objectForKey:PARAMETER_NAME_DAT] !=NULL)
     {
+        
+        NSLog(@"SI han llegado los datos a firmar a AOSignViewController");
+        
         NSString *data =[urlParameters objectForKey:PARAMETER_NAME_DAT];
         data = [data stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
         datosInUse = [[NSString alloc] initWithString:data];
     }
+    else
+    {
+        NSLog(@"NO han llegado los datos a firmar a AOSignViewController");
+    }
+        
     
     if([urlParameters objectForKey:PARAMETER_NAME_FILE_ID]!=NULL)
         fileId = [[NSString alloc] initWithString:[urlParameters objectForKey:PARAMETER_NAME_FILE_ID]];
@@ -181,8 +202,9 @@ SecKeyRef privateKey = NULL;
         // En este punto buscamos los datos en el servidor intermedio
         else
         {
-            if(cipherKey!=NULL && rtServlet!=NULL)
+            if(cipherKey != NULL && rtServlet != NULL)
             {
+                NSLog(@"No hay datos en URL pero hay direccion de recuperación y clave de cifrado, se descargarán los datos a firmar");
                 [self loadDataFromRtservlet:fileId rtServlet:rtServlet];
             }
             // Si no teniamos clave de cifrado o dirección del servidor intermedio es un error
@@ -255,7 +277,7 @@ SecKeyRef privateKey = NULL;
 -(void) startSignatureProcess
 {
     NSDictionary *urlParameters = self.parameters;
-    //NSLog(@"URL analizada: %@", url);
+    NSLog(@"URL analizada: %@", urlParameters);
     
     //parámetro de operacion "op"
     if([urlParameters objectForKey:PARAMETER_NAME_OPERATION]!=NULL)
@@ -277,26 +299,29 @@ SecKeyRef privateKey = NULL;
     if([urlParameters objectForKey:PARAMETER_NAME_PROPERTIES] != NULL)
     {
         extraParams = [urlParameters objectForKey:PARAMETER_NAME_PROPERTIES];
-        if(extraParams!=NULL)
-        {
-            //URL DECODE
-            NSData *dataReceibed = [Base64 decode:extraParams urlSafe:true];
+        
+        //URL DECODE
+        NSData *dataReceibed = [Base64 decode:extraParams urlSafe:true];
 
-            NSString* stringDataReceibed = [NSString stringWithUTF8String:[dataReceibed bytes]];
-            
-            //Los datos recibidos son un properties de java y se convierten por tanto a un NSDictionary
-            NSDictionary *dict = [CADESSignUtils javaProperties2Dictionary:stringDataReceibed];
-            dictExtraParams = dict;
-            
-            //Se recoge la prefirma y se vuelve a decodificar, ya que esta viene a su vez codificada en base64.
-            triphasicServerURL  = [dict objectForKey:PARAMETER_NAME_TRIPHASIC_SERVER_URL];
-        }
+        NSLog(@"A - stringWithUTF8String de los datos: %@", dataReceibed);        
+        
+        //Si la variable NSData no esta terminada en null debemos hacer la conversion a NSString de esta manera y no de esta: NSString* stringDataReceibed = [NSString stringWithUTF8String:[dataReceibed bytes]];
+        NSString* stringDataReceibed = [[NSString alloc] initWithData:dataReceibed encoding:NSUTF8StringEncoding];
+        
+        //Los datos recibidos son un properties de java y se convierten por tanto a un NSDictionary
+        NSDictionary *dict = [CADESSignUtils javaProperties2Dictionary:stringDataReceibed];
+        dictExtraParams = dict;
+        
+        //Se recoge la prefirma y se vuelve a decodificar, ya que esta viene a su vez codificada en base64.
+        triphasicServerURL  = [dict objectForKey:PARAMETER_NAME_TRIPHASIC_SERVER_URL];
     }
     
-    if([urlParameters objectForKey:PARAMETER_NAME_TARGET] != NULL){
+    if([urlParameters objectForKey:PARAMETER_NAME_TARGET] != NULL)
+    {
         NSString *extraParams2 = [urlParameters objectForKey:PARAMETER_NAME_TARGET];
         
-        if(extraParams2!=NULL){
+        if(extraParams2!=NULL)
+        {
             
             extraParams2 = [[NSString alloc] initWithData:[Base64 decode:extraParams2 urlSafe:true] encoding:NSUTF8StringEncoding];
             
@@ -333,7 +358,8 @@ SecKeyRef privateKey = NULL;
             }
             else
             {
-                if(aux == NULL){
+                if(aux == NULL)
+                {
                     aux = [[NSMutableDictionary alloc] init];
                 }
                 [aux setObject:extraParams2 forKey:PARAMETER_NAME_TARGET];
@@ -347,7 +373,7 @@ SecKeyRef privateKey = NULL;
     NSLog(@"Operacion: %@", operation);
     NSLog(@"Documento: %@", docId);
     NSLog(@"Servlet: %@", urlServlet);
-    NSLog(@"Datos: %@", datosInUse);
+    //NSLog(@"Datos: %@", datosInUse);
     NSLog(@"Formato: %@", signFormat);
     NSLog(@"Algoritmo: %@", signAlgoInUse);
     NSLog(@"Clave de cifrado: %@", cipherKey);
@@ -356,8 +382,8 @@ SecKeyRef privateKey = NULL;
     
     if (!([operation isEqualToString:OPERATION_SIGN]
           || [operation isEqualToString:OPERATION_COSIGN]
-          || [operation isEqualToString:OPERATION_COUNTERSIGN])) {
-        
+          || [operation isEqualToString:OPERATION_COUNTERSIGN]))
+    {
         //Notificamos del error al servidor si es posible
         NSString *errorToSend = @"";
         errorToSend = [errorToSend stringByAppendingString:ERROR_UNSUPPORTED_OPERATION_NAME];
@@ -496,10 +522,15 @@ SecKeyRef privateKey = NULL;
         return;
     }
     
-    if([signFormat isEqualToString:CADES_FORMAT]){
-        
-        //Invocamos la firma monofasica
-        [self cadesMonoPhasic];
+    if([signFormat isEqualToString:CADES_FORMAT])
+    {
+        if ([operation isEqualToString:OPERATION_SIGN]) {
+            //Invocamos la firma monofasica
+            [self cadesMonoPhasic];
+        }else{
+            NSLog(@"Se realiza la cofirma CADES de forma trifasica.");
+            [self cadesTriPhasic];
+        }
     }
     else if ([signFormat isEqualToString:CADES_TRI_FORMAT] ||
              [signFormat isEqualToString:PADES_FORMAT] ||
@@ -527,6 +558,9 @@ SecKeyRef privateKey = NULL;
 {
     NSData *contentData = [Base64 decode:datosInUse urlSafe:true];
     
+    NSLog(@"B - stringWithUTF8String de los datos: %@", contentData);
+    
+    
     NSLog(@"%@",[NSString stringWithUTF8String:[contentData bytes]]);
     
     NSString *contentDescription = [[NSString alloc]init];
@@ -546,13 +580,15 @@ SecKeyRef privateKey = NULL;
     {
         
         //Parámetro de modo: explícito o implícito
-        if([dictExtraParams objectForKey:PROPERTIES_PARAMETER_MODE]!=NULL){
+        if([dictExtraParams objectForKey:PROPERTIES_PARAMETER_MODE]!=NULL)
+        {
             if([[dictExtraParams objectForKey:PROPERTIES_PARAMETER_MODE] isEqualToString:PROPERTIES_PARAMETER_MODE_EXPLICIT])
                 mode = PROPERTIES_PARAMETER_MODE_EXPLICIT;
         }
         
         //parámetro de algoritmo precalculado
-        if([dictExtraParams objectForKey:PROPERTIES_PARAMETER_PRECALCULATEDHASHALGORITHM]!=NULL){
+        if([dictExtraParams objectForKey:PROPERTIES_PARAMETER_PRECALCULATEDHASHALGORITHM]!=NULL)
+        {
             
             //tenemos que deshacer el formato "http://www.w3.org/2000/09/xmldsig#sha256"
             NSString *auxPreCalculatedHashAlg = [dictExtraParams objectForKey:PROPERTIES_PARAMETER_PRECALCULATEDHASHALGORITHM];
@@ -576,18 +612,14 @@ SecKeyRef privateKey = NULL;
         if([dictExtraParams objectForKey:PROPERTIES_PARAMETER_POLICYIDENTIFIER]!=NULL
            && [dictExtraParams objectForKey:PROPERTIES_PARAMETER_POLICYIDENTIFIERHASH]!=NULL
            && [dictExtraParams objectForKey:PROPERTIES_PARAMETER_POLICYIDENTIFIERHASHALGORITHM]!=NULL
-           && [dictExtraParams objectForKey:PROPERTIES_PARAMETER_POLICYQUALIFIER]!=NULL){
+           && [dictExtraParams objectForKey:PROPERTIES_PARAMETER_POLICYQUALIFIER]!=NULL)
+        {
             
             policyOID = [dictExtraParams objectForKey:PROPERTIES_PARAMETER_POLICYIDENTIFIER];
             
             //quitamos el "urn:oid:" en caso de que lo tuviera
             policyOID = [policyOID stringByReplacingOccurrencesOfString:@"urn:oid:" withString:@""];
             
-            //decodificamos el hash que viene codificado en b64?¿?¿¿?¿?¿
-            /*
-             NSData *auxPolicyHash = [NSData dataFromBase64String:[dictExtraParams objectForKey:PROPERTIES_PARAMETER_POLICYIDENTIFIERHASH]];
-             policyHash = [NSString stringWithUTF8String:[auxPolicyHash bytes]];
-             */
             policyHash = [dictExtraParams objectForKey:PROPERTIES_PARAMETER_POLICYIDENTIFIERHASH];
             
             //obtenemos el algoritmo de la política
@@ -607,14 +639,17 @@ SecKeyRef privateKey = NULL;
         }
         
         //Parámetro de SigningCertificateV2
-        if([dictExtraParams objectForKey:PROPERTIES_PARAMETER_SIGNINGCERTIFICATEV2]!=NULL){
+        if([dictExtraParams objectForKey:PROPERTIES_PARAMETER_SIGNINGCERTIFICATEV2]!=NULL)
+        {
             bool v2 = [[dictExtraParams objectForKey:PROPERTIES_PARAMETER_SIGNINGCERTIFICATEV2] boolValue];
             if (v2){
                 signingCertificateV2 = 1;
             }
         }
-        else{
-            if(strcmp([CADESSignUtils getAlgorithmOID:signAlgoInUse],SHA1_OID)!=0){
+        else
+        {
+            if(strcmp([CADESSignUtils getAlgorithmOID:signAlgoInUse],SHA1_OID)!=0)
+            {
                 signingCertificateV2 = 1; // Usamos SigningCertificateV2
             }
         }
@@ -688,6 +723,8 @@ SecKeyRef privateKey = NULL;
     post = [post stringByAppendingString:datosInUse];
     post = [post stringByAppendingString:HTTP_AND];
     
+    
+    
     //FORMAT: FORMATO DE FIRMA
     post = [post stringByAppendingString:PARAMETER_NAME_FORMAT];
     post = [post stringByAppendingString:HTTP_EQUALS];
@@ -708,29 +745,38 @@ SecKeyRef privateKey = NULL;
     
     //la siguiente línea quita el ultimo caracter que debe ser de nueva línea "\n" esto estaba
     //fastidiando los demás parámetros.
-    certificate = [certificate substringToIndex:[certificate length] - 1];
+    NSLog(@"certificado: %@",certificate);
+    //certificate = [certificate substringToIndex:[certificate length] - 1];
+    //certificate = [certificate stringByReplacingOccurrencesOfString:@"\n" withString:@""];
+    
     post = [post stringByAppendingString:certificate];
     
     //PARAMETERS: PARAMETROS EXTRA
-    if(extraParams !=NULL){
+    if(extraParams !=NULL)
+    {
         post = [post stringByAppendingString:HTTP_AND];
         post = [post stringByAppendingString:PARAMETER_NAME_EXTRA_PARAM];
         post = [post stringByAppendingString:HTTP_EQUALS];
         post = [post stringByAppendingString:extraParams];
     }
-    
-    NSData *postData = [post dataUsingEncoding:NSASCIIStringEncoding allowLossyConversion:YES];
-    NSString *postLength = [NSString stringWithFormat:@"%d", [postData length]];
+    //Changed NSData *postData = [post dataUsingEncoding:NSASCIIStringEncoding allowLossyConversion:YES];
+    NSData *postData = [post dataUsingEncoding:NSUTF8StringEncoding allowLossyConversion:YES];
+    NSString *postLength = [NSString stringWithFormat:@"%d", (int)[postData length]];
     
     // Obtenemos la URL de las preferencias
     NSURL* requestUrl = NULL;
     if(triphasicServerURL!=NULL)
     {
+        
+        NSLog(@"A - Usamos la ruta de servidor trifasico configurado: %@", triphasicServerURL);
+        
         requestUrl = [[NSURL alloc] initWithString:triphasicServerURL];
     }
     else
     {
         requestUrl = [[NSURL alloc] initWithString:[[NSUserDefaults standardUserDefaults] stringForKey:@"server_url"]];
+        
+        NSLog(@"A - Usamos la ruta de servidor trifasico preestablecido: %@", [[NSUserDefaults standardUserDefaults] stringForKey:@"server_url"]);
     }
     NSMutableURLRequest* request = [NSMutableURLRequest requestWithURL:requestUrl cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30.0];
     [request setHTTPMethod:@"POST"];
@@ -740,9 +786,9 @@ SecKeyRef privateKey = NULL;
     [request setValue:@"text/plain,text/html,application/xhtml+xml,application/xml" forHTTPHeaderField:@"Accept"];
     [request setHTTPBody:postData];
     
-    NSLog(@"\n\n");
-    NSLog(@"Inicio de la llamada a PRE con la siguiente URL: %@", post);
-    NSLog(@"\n\n");
+    //NSLog(@"\n\n");
+    //NSLog(@"Inicio de la llamada a PRE con la siguiente URL: %@", post);
+    //NSLog(@"\n\n");
     
     NSURLConnection* connection = [[NSURLConnection alloc] initWithRequest:request delegate:self];
     [connection start];
@@ -783,17 +829,20 @@ SecKeyRef privateKey = NULL;
 -(void)connectionDidFinishLoading:(NSURLConnection *)connection
 {
     // Connection succeeded in downloading the request.
-    NSLog( @"Final de la recepción! se han recibido %d bytes", [receivedData length] );
+    NSLog( @"AOSignViewController: Final de la recepción! se han recibido %d bytes", (int)[receivedData length]);
     
     // Convert received data into string.
-    receivedString = [[NSString alloc] initWithData:receivedData
-                                           encoding:NSASCIIStringEncoding];
-    NSLog( @"invocación desde connectionDidFinishLoading: %@", receivedString );
+    
+    //Changed receivedString = [[NSString alloc] initWithData:receivedData encoding:NSASCIIStringEncoding];
+    
+    receivedString = [[NSString alloc] initWithData:receivedData encoding:NSUTF8StringEncoding];
+    NSLog( @"AOSignViewController: Descarga finalizada");
     
     //se procesa la respuesta del servidor.
     
     //Se recoge el resultado de la petición de almacenamiento
-    if(storingData){
+    if(storingData)
+    {
         storingData= false;
         
         //Obtenemos la respuesta del servidor.
@@ -854,11 +903,12 @@ SecKeyRef privateKey = NULL;
         //Obtenemos la respuesta del servidor.
         NSString* responseString = [[NSString alloc] initWithData:receivedData encoding:NSUTF8StringEncoding];
         
-        NSLog(@"Respuesta del rtserver: %@", responseString);
+        //NSLog(@"Respuesta del rtserver: %@", responseString);
         
         @try
         {
-            NSData *finalDecoded = [DesCypher decypherData:responseString sk:[cipherKey dataUsingEncoding:NSUTF8StringEncoding]];            
+            NSData *finalDecoded = [DesCypher decypherData:responseString sk:[cipherKey dataUsingEncoding:NSUTF8StringEncoding]];
+            
             datosInUse =[[NSString alloc] initWithString:[Base64 encode:finalDecoded urlSafe:true]];
         }
         @catch (NSException *exception)
@@ -952,12 +1002,14 @@ SecKeyRef privateKey = NULL;
 
 //para las protecciones ssl
 
-- (BOOL)connection:(NSURLConnection *)connection canAuthenticateAgainstProtectionSpace:(NSURLProtectionSpace *)protectionSpace {
+- (BOOL)connection:(NSURLConnection *)connection canAuthenticateAgainstProtectionSpace:(NSURLProtectionSpace *)protectionSpace
+{
     return [protectionSpace.authenticationMethod isEqualToString:NSURLAuthenticationMethodServerTrust];
 }
 
 //Acepta todas las conexiones ssl
--(void)connection:(NSURLConnection *)connection willSendRequestForAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge{
+-(void)connection:(NSURLConnection *)connection willSendRequestForAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge
+{
     [challenge.sender useCredential:[NSURLCredential credentialForTrust:challenge.protectionSpace.serverTrust] forAuthenticationChallenge:challenge];
 }
 
@@ -1024,65 +1076,33 @@ SecKeyRef privateKey = NULL;
 {
     //Se reciben los datos en base64 y se decodifican
     NSData *dataReceibed = [Base64 decode:dataReceibedb64 urlSafe:true];
-    NSString* stringDataReceibed = [NSString stringWithUTF8String:[dataReceibed bytes]];
+    NSLog(@"C - stringWithUTF8String de los datos: %@", dataReceibed);
     
+    
+    NSString* stringDataReceibed = [[NSString alloc] initWithData:dataReceibed encoding:NSUTF8StringEncoding];
+    
+    //NSString* stringDataReceibed = [NSString stringWithUTF8String:[dataReceibed bytes]];
     NSLog(@"Datos recibidos en respuesta a la prefirma (properties): %@", stringDataReceibed);
     
-    //Los datos recibidos son un properties de java y se convierten por tanto a un NSDictionary
-    NSDictionary *dict = [ CADESSignUtils javaProperties2Dictionary:stringDataReceibed];
+    // Usado para almacenar las properties que se reciben en la URL (no se usa en el proceso de contrafirma).
+    NSDictionary *dict = [[NSDictionary alloc] init];
     
-     //Contamos los datos del tipo PRE.X
-    int count = 0;
-    NSInteger count2 = [dict count];
-    id objects[count2];
-    id keys[count2];
-    [dict getObjects:objects andKeys:keys];
+    // XML enviado al servidor con la fecha en la que se elaboro el pkcs7 y las parejas de datos firmados y "dummy data".
+    NSData *newXMLData = [[NSData alloc] init];
     
-    for (int i = 0; i < count2; i++)
-    {
-        if ([keys[i] rangeOfString:@"PRE."].location != NSNotFound)
+    // Cadena con las properties que seran enviadas al servidor.
+    NSString *paramsEncoded = [[NSString alloc] init];
+    
+    if([operation isEqualToString:OPERATION_COUNTERSIGN]&&([signFormat isEqualToString:CADES_TRI_FORMAT]||[signFormat isEqualToString:CADES_FORMAT])){
+        //Los datos recibidos son un xml, lo parseamos y creamos una estructura de datos para acceder a los datos.
+        AOCounterSignXMLParser *parser = [[AOCounterSignXMLParser alloc] init];
+        AOCounterSignPreItems *preItems = [parser parseXML:dataReceibed];
+        
+        if([preItems.elements count] == 0)
         {
-            count++;
-        } 
-    }
-   
-    
-    if(count==0)
-    {
-        NSLog(@"El servidor no ha informado del numero de firmas que envía.");
-        //mostramos un mensaje con el error producido.
-        
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle: NSLocalizedString(@"error",nil) message: NSLocalizedString(@"error_proceso_firma",nil) delegate:self cancelButtonTitle: NSLocalizedString(@"cerrar",nil) otherButtonTitles:nil];
-        
-        UIImageView *imageView = [[UIImageView alloc] initWithFrame:CGRectMake(75, 6, 40, 40)];
-        
-        NSString *path = [[NSString alloc] initWithString:[[[NSBundle mainBundle] resourcePath] stringByAppendingPathComponent:@"warning_mini.png"]];
-        UIImage *bkgImg = [[UIImage alloc] initWithContentsOfFile:path];
-        [imageView setImage:bkgImg];
-        [bkgImg release];
-        [path release];
-        
-        [alert addSubview:imageView];
-        [imageView release];
-        
-        [alert show];
-        [alert release];
-        
-        return;
-    }
-    
-    NSMutableDictionary *dataProcessed = [NSMutableDictionary dictionaryWithDictionary:dict];
-    
-    for (int i = 0; i< count; i++){
-        
-        //Obtenemos la prefirma PRE.X
-        NSString *element = PROPERTY_NAME_PRESIGN_PREFIX;
-        element = [ element stringByAppendingString:[NSString stringWithFormat:@"%d",i]];
-        
-        NSString *elementx = [dict objectForKey:element];
-        if(elementx== NULL){
-            NSLog(@"El servidor no ha devuelto la prefirma %d : %@", i, stringDataReceibed);
-                        
+            NSLog(@"El servidor no ha informado del numero de firmas que envía.");
+            //mostramos un mensaje con el error producido.
+            
             UIAlertView *alert = [[UIAlertView alloc] initWithTitle: NSLocalizedString(@"error",nil) message: NSLocalizedString(@"error_proceso_firma",nil) delegate:self cancelButtonTitle: NSLocalizedString(@"cerrar",nil) otherButtonTitles:nil];
             
             UIImageView *imageView = [[UIImageView alloc] initWithFrame:CGRectMake(75, 6, 40, 40)];
@@ -1101,31 +1121,160 @@ SecKeyRef privateKey = NULL;
             
             return;
         }
-
-        NSData *data = [Base64 decode:elementx urlSafe:true];
-                        
-        if(data.length>0)
-        {
-            NSLog(@"Se pasa a realizar la firma PKCS1 de la prefirma %d",i);
+        
+        // Aqui almacenaremos las parejas de prefirmas firmadas y "dummy data" que sera lo que se envie, junto con la fecha al servidor.
+        NSMutableDictionary *auxDictSignedValues = [[NSMutableDictionary alloc] init];
+        
+        // Recorremos las prefirmas
+        for (NSString* key in preItems.elements) {
+            NSString *value = [preItems.elements objectForKey:key];
             
-            //Con los datos de la prefirma decodificados, se procede a realizar la firma pkcs1.
-            NSData *dataSigned = [CADESSignUtils signPkcs1:signAlgoInUse privateKey:&privateKey data:data];
-            NSString *elementp = [PROPERTY_NAME_PKCS1_SIGN_PREFIX stringByAppendingString:[NSString stringWithFormat:@"%d",i]];
-
-            [dataProcessed setObject:[Base64 encode:dataSigned] forKey:elementp];
-                       
-        }
-        NSString *needPre = [dict objectForKey:PROPERTY_NAME_NEED_PRE];
-        if([needPre isEqualToString:@"false"]){
-            [dataProcessed removeObjectForKey:element];
+            if(value == NULL){
+                NSLog(@"El servidor no ha devuelto la prefirma correctamente: %@", stringDataReceibed);
+                
+                UIAlertView *alert = [[UIAlertView alloc] initWithTitle: NSLocalizedString(@"error",nil) message: NSLocalizedString(@"error_proceso_firma",nil) delegate:self cancelButtonTitle: NSLocalizedString(@"cerrar",nil) otherButtonTitles:nil];
+                
+                UIImageView *imageView = [[UIImageView alloc] initWithFrame:CGRectMake(75, 6, 40, 40)];
+                
+                NSString *path = [[NSString alloc] initWithString:[[[NSBundle mainBundle] resourcePath] stringByAppendingPathComponent:@"warning_mini.png"]];
+                UIImage *bkgImg = [[UIImage alloc] initWithContentsOfFile:path];
+                [imageView setImage:bkgImg];
+                [bkgImg release];
+                [path release];
+                
+                [alert addSubview:imageView];
+                [imageView release];
+                
+                [alert show];
+                [alert release];
+                
+                return;
+            }
+            
+            NSData *data = [Base64 decode:value urlSafe:true];
+            
+            if(data.length>0)
+            {
+                NSLog(@"Se pasa a realizar la firma PKCS1 de la prefirma cuya PKCS1 fake es: %@",key);
+                
+                //Con los datos de la prefirma decodificados, se procede a realizar la firma pkcs1.
+                NSData *dataSigned = [CADESSignUtils signPkcs1:signAlgoInUse privateKey:&privateKey data:data];
+                
+                [auxDictSignedValues setObject:[Base64 encode:dataSigned] forKey:key];
+            }
         }
         
+        // Hacemos el cambio del nuevo diccionario con las prefirmas firmadas.
+        preItems.elements = auxDictSignedValues;
+        
+        // Generamos el XML.
+        NSString *newXML = [[NSString alloc] init];
+        newXML = [preItems generateXML];
+        newXML = [newXML stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+        newXMLData = [newXML dataUsingEncoding:NSUTF8StringEncoding];
+        
+        
+    }else{
+        //Los datos recibidos son un properties de java y se convierten por tanto a un NSDictionary
+        dict = [ CADESSignUtils javaProperties2Dictionary:stringDataReceibed];
+        //Contamos los datos del tipo PRE.X
+        int count = 0;
+        NSInteger count2 = [dict count];
+        id objects[count2];
+        id keys[count2];
+        [dict getObjects:objects andKeys:keys];
+        
+        for (int i = 0; i < count2; i++)
+        {
+            if ([keys[i] rangeOfString:@"PRE."].location != NSNotFound)
+            {
+                count++;
+            }
+        }
+        
+        
+        if(count==0)
+        {
+            NSLog(@"El servidor no ha informado del numero de firmas que envía.");
+            //mostramos un mensaje con el error producido.
+            
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle: NSLocalizedString(@"error",nil) message: NSLocalizedString(@"error_proceso_firma",nil) delegate:self cancelButtonTitle: NSLocalizedString(@"cerrar",nil) otherButtonTitles:nil];
+            
+            UIImageView *imageView = [[UIImageView alloc] initWithFrame:CGRectMake(75, 6, 40, 40)];
+            
+            NSString *path = [[NSString alloc] initWithString:[[[NSBundle mainBundle] resourcePath] stringByAppendingPathComponent:@"warning_mini.png"]];
+            UIImage *bkgImg = [[UIImage alloc] initWithContentsOfFile:path];
+            [imageView setImage:bkgImg];
+            [bkgImg release];
+            [path release];
+            
+            [alert addSubview:imageView];
+            [imageView release];
+            
+            [alert show];
+            [alert release];
+            
+            return;
+        }
+        
+        // Usado para almacenar las properties que se enviaran al servidor, tras haber hecho la firma.
+        NSMutableDictionary *dataProcessed = [[NSMutableDictionary alloc] init];
+        
+        for (int i = 0; i< count; i++){
+            
+            //Obtenemos la prefirma PRE.X
+            NSString *element = PROPERTY_NAME_PRESIGN_PREFIX;
+            element = [ element stringByAppendingString:[NSString stringWithFormat:@"%d",i]];
+            
+            NSString *elementx = [dict objectForKey:element];
+            if(elementx== NULL){
+                NSLog(@"El servidor no ha devuelto la prefirma %d : %@", i, stringDataReceibed);
+                
+                UIAlertView *alert = [[UIAlertView alloc] initWithTitle: NSLocalizedString(@"error",nil) message: NSLocalizedString(@"error_proceso_firma",nil) delegate:self cancelButtonTitle: NSLocalizedString(@"cerrar",nil) otherButtonTitles:nil];
+                
+                UIImageView *imageView = [[UIImageView alloc] initWithFrame:CGRectMake(75, 6, 40, 40)];
+                
+                NSString *path = [[NSString alloc] initWithString:[[[NSBundle mainBundle] resourcePath] stringByAppendingPathComponent:@"warning_mini.png"]];
+                UIImage *bkgImg = [[UIImage alloc] initWithContentsOfFile:path];
+                [imageView setImage:bkgImg];
+                [bkgImg release];
+                [path release];
+                
+                [alert addSubview:imageView];
+                [imageView release];
+                
+                [alert show];
+                [alert release];
+                
+                return;
+            }
+            
+            NSData *data = [Base64 decode:elementx urlSafe:true];
+            
+            dataProcessed = [NSMutableDictionary dictionaryWithDictionary:dict];
+            
+            if(data.length>0)
+            {
+                NSLog(@"Se pasa a realizar la firma PKCS1 de la prefirma %d",i);
+                
+                //Con los datos de la prefirma decodificados, se procede a realizar la firma pkcs1.
+                NSData *dataSigned = [CADESSignUtils signPkcs1:signAlgoInUse privateKey:&privateKey data:data];
+                NSString *elementp = [PROPERTY_NAME_PKCS1_SIGN_PREFIX stringByAppendingString:[NSString stringWithFormat:@"%d",i]];
+                
+                [dataProcessed setObject:[Base64 encode:dataSigned] forKey:elementp];
+                
+            }
+            NSString *needPre = [dict objectForKey:PROPERTY_NAME_NEED_PRE];
+            if([needPre isEqualToString:@"false"]){
+                [dataProcessed removeObjectForKey:element];
+            }
+            
+        }
+        paramsEncoded = [CADESSignUtils dictionary2JavaProperties:dataProcessed];
+        paramsEncoded = [paramsEncoded stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
     }
     
     
-    
-    NSString *paramsEncoded = [CADESSignUtils dictionary2JavaProperties:dataProcessed];
-    paramsEncoded = [paramsEncoded stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
     
     //Creamos la cadena de envío al servidor POST
     NSString *post =[[NSMutableString alloc] init];
@@ -1141,7 +1290,7 @@ SecKeyRef privateKey = NULL;
     
     //Se pasa a formato properties codificado en b64
     NSString *needData = [dict objectForKey:PROPERTY_NAME_NEED_DATA];
-    if([needData isEqualToString:@"true"]){        
+    if(![needData isEqualToString:@"false"]){
         post = [post stringByAppendingString:PARAMETER_NAME_DOCID];
         post = [post stringByAppendingString:HTTP_EQUALS];
         post = [post stringByAppendingString:datosInUse];
@@ -1160,11 +1309,8 @@ SecKeyRef privateKey = NULL;
     
     post = [post stringByAppendingString:PARAMETER_NAME_CERT];
     post = [post stringByAppendingString:HTTP_EQUALS];
-    post = [post stringByAppendingString:[Base64 urlSafeEncode: self.base64UrlSafeCertificateData]];
     
-    //la siguiente línea quita el ultimo caracter que debe ser de nueva línea "\n" esto estaba
-    //fastidiando los demás parámetros.
-    post = [post substringToIndex:[post length] - 1];
+    post = [post stringByAppendingString:[Base64 urlSafeEncode: self.base64UrlSafeCertificateData]];
     
     //PARAMETERS: PARAMETROS EXTRA
     if(extraParams !=NULL){
@@ -1177,18 +1323,36 @@ SecKeyRef privateKey = NULL;
     post = [post stringByAppendingString:HTTP_AND];
     post = [post stringByAppendingString:PROPERTY_NAME_SESSION_DATA_PREFIX];
     post = [post stringByAppendingString:HTTP_EQUALS];
-    post = [post stringByAppendingString:paramsEncoded];
+    
+    // Si se trata de una contrafirma CAdES introducimos el XML, sino, las properties.
+    if ([operation isEqualToString:OPERATION_COUNTERSIGN]&&([signFormat isEqualToString:CADES_TRI_FORMAT]||[signFormat isEqualToString:CADES_FORMAT])) {
+        post = [post stringByAppendingString:[Base64 encode:newXMLData urlSafe:true]];
+    }else{
+        post = [post stringByAppendingString:paramsEncoded];
+    }
+    
         
     //Codificamos la url de post
-    NSData *postData = [post dataUsingEncoding:NSASCIIStringEncoding allowLossyConversion:YES];
-    NSString *postLength = [NSString stringWithFormat:@"%d", [postData length]];
+    //Changed NSData *postData = [post dataUsingEncoding:NSASCIIStringEncoding allowLossyConversion:YES];
+    NSData *postData = [post dataUsingEncoding:NSUTF8StringEncoding allowLossyConversion:YES];
+    NSString *postLength = [NSString stringWithFormat:@"%d", (int)[postData length]];
     
     // Obtenemos la URL del servidor de la pantalla de preferencias
     NSURL* requestUrl = NULL;
     if(triphasicServerURL!=NULL)
+    {
         requestUrl = [[NSURL alloc] initWithString:triphasicServerURL];
+        
+        
+        NSLog(@"B - Usamos la ruta de servidor trifasico configurado: %@", triphasicServerURL);
+        
+    }
     else
+    {
         requestUrl = [[NSURL alloc] initWithString:[[NSUserDefaults standardUserDefaults] stringForKey:@"server_url"]];
+        
+        NSLog(@"B - Usamos la ruta de servidor trifasico preestablecido: %@", [[NSUserDefaults standardUserDefaults] stringForKey:@"server_url"]);
+    }
     NSMutableURLRequest* request = [NSMutableURLRequest requestWithURL:requestUrl cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30.0];
     [request setHTTPMethod:@"POST"];
     [request setValue:postLength forHTTPHeaderField:@"Content-Length"];
@@ -1244,8 +1408,9 @@ SecKeyRef privateKey = NULL;
         post = [post stringByAppendingString:encryptedDataB64];
         
         //Codificamos la url de post
-        NSData *postData = [post dataUsingEncoding:NSASCIIStringEncoding allowLossyConversion:YES];
-        NSString *postLength = [NSString stringWithFormat:@"%d", [postData length]];
+        //Changed NSData *postData = [post dataUsingEncoding:NSASCIIStringEncoding allowLossyConversion:YES];
+        NSData *postData = [post dataUsingEncoding:NSUTF8StringEncoding allowLossyConversion:YES];
+        NSString *postLength = [NSString stringWithFormat:@"%d", (int)[postData length]];
         
         // Obtenemos la URL del servidor de la pantalla de preferencias
         NSURL* requestUrl = [[NSURL alloc] initWithString:urlServlet];
@@ -1277,12 +1442,12 @@ SecKeyRef privateKey = NULL;
  rtServlet: Dirección del servidor intermedio.
  
  */
--(NSString *) loadDataFromRtservlet:(NSString*) fileId rtServlet:(NSString *)rtServlet
+-(NSString *) loadDataFromRtservlet:(NSString*) fileId rtServlet:(NSString *) rtServlet
 {
     
     NSString* responseString = NULL;
     
-    if(rtServlet!=NULL && docId != NULL){
+    if(rtServlet != NULL && fileId != NULL){
         //Creamos la cadena de envío al servidor POST
         NSString *post =@"";
         post = [post stringByAppendingString:PARAMETER_NAME_OPERATION];
@@ -1298,8 +1463,9 @@ SecKeyRef privateKey = NULL;
         post = [post stringByAppendingString:fileId];
         
         //Codificamos la url de post
-        NSData *postData = [post dataUsingEncoding:NSASCIIStringEncoding allowLossyConversion:YES];
-        NSString *postLength = [NSString stringWithFormat:@"%d", [postData length]];
+        //Changed NSData *postData = [post dataUsingEncoding:NSASCIIStringEncoding allowLossyConversion:YES];
+        NSData *postData = [post dataUsingEncoding:NSUTF8StringEncoding allowLossyConversion:YES];
+        NSString *postLength = [NSString stringWithFormat:@"%d", (int)[postData length]];
         
         // Obtenemos la URL del servidor de la pantalla de preferencias
         NSURL* requestUrl = [[NSURL alloc] initWithString:rtServlet];
@@ -1311,7 +1477,7 @@ SecKeyRef privateKey = NULL;
         [request setValue:@"text/plain,text/html,application/xhtml+xml,application/xml" forHTTPHeaderField:@"Accept"];
         [request setHTTPBody:postData];
         
-        NSLog(@"Se recogen los datos del fichero del rtServlet con los siguientes datos: %@", post);
+        NSLog(@"AOSignViewController: Se recogen los datos del fichero del rtServlet con los siguientes datos: %@", post);
         
         retrievingDataFromServlet = true;
         
@@ -1357,8 +1523,9 @@ SecKeyRef privateKey = NULL;
         post = [post stringByAppendingString:error];
         
         //Codificamos la url de post
-        NSData *postData = [post dataUsingEncoding:NSASCIIStringEncoding allowLossyConversion:YES];
-        NSString *postLength = [NSString stringWithFormat:@"%d", [postData length]];
+        //Changed NSData *postData = [post dataUsingEncoding:NSASCIIStringEncoding allowLossyConversion:YES];
+        NSData *postData = [post dataUsingEncoding:NSUTF8StringEncoding allowLossyConversion:YES];
+        NSString *postLength = [NSString stringWithFormat:@"%d", (int)[postData length]];
         
         // Obtenemos la URL del servidor de la pantalla de preferencias
         NSURL* requestUrl = [[NSURL alloc] initWithString:urlServlet];
@@ -1379,10 +1546,13 @@ SecKeyRef privateKey = NULL;
     }
 }
 
+
 #pragma mark AlertView Delegate
 -(void) alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
 {
-    [self performSegueWithIdentifier:@"toFirstScreen" sender:self];
+    [self.navigationController popToRootViewControllerAnimated:NO];
+    
+    //[self performSegueWithIdentifier:@"toFirstScreen" sender:self];
     
 }
 

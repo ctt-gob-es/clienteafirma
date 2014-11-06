@@ -33,10 +33,11 @@
            precalculatedHash:(NSData*)precalculatedHash {
     
     NSData *sCertificate = [Base64 decode:base64UrlSafeCertificateData urlSafe:true];
-    
-    SecCertificateRef myCertificate = SecCertificateCreateWithData(kCFAllocatorDefault, (CFDataRef)(sCertificate));
 
-    //NSLog(@"%@", SecCertificateCopySubjectSummary(myCertificate));
+    NSLog(@"certificado sin trip: %@", sCertificate);
+    
+    //NSLog(@"%@", SecCertificateCopySubjectSummary(SecCertificateCreateWithData(kCFAllocatorDefault, (CFDataRef)(sCertificate))));
+    
     const unsigned char *certificateDataBytes = (const unsigned char *)[sCertificate bytes];
     X509 *certificateX509 = d2i_X509(NULL, &certificateDataBytes, [sCertificate length]);
     
@@ -80,14 +81,14 @@
     getCADESSignedAttributes(&CADESSignedAttributes,
                              certificateX509,
                              [dataHash bytes],
-                             [dataHash length],
+                             (int)[dataHash length],
                              [contentDescription UTF8String],
                              [policyOID UTF8String],
                              [policyHash UTF8String],
                              policyHashAlg,
                              [policyUri UTF8String],
                              [certHash bytes],
-                             [certHash length],
+                             (int)[certHash length],
                              hashAlgorithm,
                              signingCertificateV2,
                              local);
@@ -147,25 +148,28 @@
     
     NSString *contentDataString = NULL;
     if([mode isEqualToString:PROPERTIES_PARAMETER_MODE_IMPLICIT])
+    {
+        NSLog(@"F - stringWithUTF8String de los datos: %@", contentData);
+        
         contentDataString = [NSString stringWithUTF8String:[contentData bytes]];
-    
+    }
     /*** GENERAMOS LA ESTRUCTURA CADES ****/
     getSignedDataStructure(&signedData,
                            certificateX509,
                            [contentDataString UTF8String],
                            [sCertificate bytes],
-                           [sCertificate length],
+                           (int)[sCertificate length],
                            [dataSigned bytes],
-                           [dataSigned length],
+                           (int)[dataSigned length],
                            [dataHash bytes],
-                           [dataHash length],
+                           (int)[dataHash length],
                            [contentDescription UTF8String],
                            [policyOID UTF8String],
                            [policyHash UTF8String],
                            policyHashAlg,
                            [policyUri UTF8String],
                            [certHash bytes],
-                           [certHash length],
+                           (int)[certHash length],
                            hashAlgorithm,
                            signingCertificateV2,
                            signAlgorithm,

@@ -12,8 +12,41 @@
 #include <openssl/x509.h>
 #include "CADESOID.h"
 #include "NULL.h"
-//#include "CADESSignerIdentifier.h"
-//#include "CADESSignedAttributes.h"
+#include "CertificateUtil.h"
+#include "CADESSignedAttributes.h"
+
+void getCADESSigerIdentifier(SignerIdentifier_t **at_ext, X509 *certificateX509)
+{
+    
+    //ASN_DEBUG("Creamos el Signer Identifier");
+    SignerIdentifier_t *atSignerIdentifier;
+    atSignerIdentifier = calloc(1, sizeof(*atSignerIdentifier));
+    
+    IssuerAndSerialNumber_t *atIssuerAndSerialNumber;
+    atIssuerAndSerialNumber = calloc(1, sizeof(*atIssuerAndSerialNumber));
+    
+    //CREAMOS EL ISSUER
+    //ASN_DEBUG("Creamos el issuer");
+    Name_t *atIssuer;
+    atIssuer = calloc(1, sizeof(*atIssuer));
+    atIssuer = getCertificateIssuerName(certificateX509);
+    //xer_fprint(stdout, &asn_DEF_Name, atIssuer);
+    
+    //CREAMOS EL SERIAL NUMBER
+    //ASN_DEBUG("Creamos el serial number");
+    CertificateSerialNumber_t *atSerialNumber;
+    atSerialNumber = calloc(1,sizeof(*atSerialNumber));
+    atSerialNumber = getCertificateSerialNumber(certificateX509);
+    
+    //ASIGNAMOS EL ISSUER Y EL SERIAL
+    atIssuerAndSerialNumber->issuer = *atIssuer;
+    atIssuerAndSerialNumber->serialNumber = atSerialNumber;
+    atSignerIdentifier = atIssuerAndSerialNumber;
+    
+    //ASN_DEBUG("Asignamos el Signer Identifier");
+    *at_ext = atSignerIdentifier;
+    
+}
 
 void getCADESSignerInfos( struct SignerInfos **at_ext,
                          X509 *certificateX509,

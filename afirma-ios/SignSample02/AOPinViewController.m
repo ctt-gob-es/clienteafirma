@@ -72,6 +72,14 @@ SecKeyRef privateKeyPkcs12 = NULL;
         // Get destination view
         AOSignViewController *vc = [segue destinationViewController];        
         
+        /*
+        NSLog(@" ------ Parametros pasados desde AOPinViewController ------ ");
+        for (NSString *key in self.parameters) {
+            NSLog(@"%@", key);
+        }
+        NSLog(@" ---------------------------------------------------------- ");
+        */
+        
         // Set the selected button in the new view
         [vc setParameters:self.parameters];
         [vc setCertificateName:self.certificateName];
@@ -154,12 +162,11 @@ SecKeyRef privateKeyPkcs12 = NULL;
 
 -(OSStatus) openPkcs12Store:(NSString*)pin {
     
-    // Cargamos el PKCS#12 desde como un recurso
     NSString *thePath = NULL;
     
 #if TARGET_IPHONE_SIMULATOR
     
-    // Cargamos el PKCS#12 desde como un recurso
+    // Cargamos el PKCS#12 como un recurso
     thePath = [[NSBundle mainBundle] pathForResource:@"ANF_PF_Activo" ofType:@"p12"];
     
 #else
@@ -226,7 +233,6 @@ SecKeyRef privateKeyPkcs12 = NULL;
 }
 
 - (void)dealloc {
-    [_nombreCert release];
     [_nombreCert release];
     [_pinTextField release];
     [_pinButton release];

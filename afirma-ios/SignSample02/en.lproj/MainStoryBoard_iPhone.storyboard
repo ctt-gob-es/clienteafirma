@@ -1,27 +1,25 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="2.0" toolsVersion="6205" systemVersion="14A314h" targetRuntime="iOS.CocoaTouch" variant="6xAndEarlier" propertyAccessControl="none" useAutolayout="YES" promptedForUpgradeToXcode5="NO" initialViewController="E8a-gZ-k6m">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="6245" systemVersion="13F34" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" initialViewController="E8a-gZ-k6m">
     <dependencies>
-        <development version="4600" identifier="xcode"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6198"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6238"/>
     </dependencies>
     <scenes>
         <!--Solicitud de PIN-->
         <scene sceneID="Ppb-KD-vaQ">
             <objects>
-                <viewController storyboardIdentifier="pin" title="Solicitud de PIN" wantsFullScreenLayout="YES" id="7tH-yy-d2T" customClass="AOPinViewController" sceneMemberID="viewController">
+                <viewController title="Solicitud de PIN" wantsFullScreenLayout="YES" id="7tH-yy-d2T" customClass="AOPinViewController" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="ehJ-ZW-wBI"/>
+                        <viewControllerLayoutGuide type="bottom" id="4yf-hs-fiH"/>
+                    </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="R5q-y6-x5V">
-                        <rect key="frame" x="0.0" y="20" width="320" height="568"/>
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="xnT-qm-h5g">
-                                <rect key="frame" x="20" y="505" width="280" height="44"/>
-                                <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
+                                <rect key="frame" x="20" y="518" width="280" height="30"/>
                                 <state key="normal" title="Accept">
-                                    <color key="titleColor" red="0.19607843137254902" green="0.30980392156862746" blue="0.52156862745098043" alpha="1" colorSpace="calibratedRGB"/>
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                                </state>
-                                <state key="highlighted">
-                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <connections>
                                     <segue destination="OQu-SY-frv" kind="push" identifier="pinEntered" id="tsh-KB-s13"/>
@@ -37,20 +35,15 @@
                                 </connections>
                             </textField>
                             <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="nEX-DI-Shc">
-                                <rect key="frame" x="20" y="505" width="73" height="44"/>
+                                <rect key="frame" x="20" y="518" width="73" height="30"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="73" id="XHs-Yo-2AL"/>
                                 </constraints>
-                                <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
                                 <state key="normal" title="Al Inicio">
-                                    <color key="titleColor" red="0.19607843137254902" green="0.30980392156862746" blue="0.52156862745098043" alpha="1" colorSpace="calibratedRGB"/>
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
-                                <state key="highlighted">
-                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                </state>
                                 <connections>
-                                    <segue destination="VdI-Vu-J89" kind="push" identifier="toFirstScreen" id="Au9-Gn-8dC"/>
+                                    <segue destination="VdI-Vu-J89" kind="custom" identifier="toFirstScreen" customClass="AOCustomSegue" id="Au9-Gn-8dC"/>
                                 </connections>
                             </button>
                             <imageView userInteractionEnabled="NO" contentMode="scaleToFill" image="logo_cliente.png" translatesAutoresizingMaskIntoConstraints="NO" id="jHr-hi-ACV">
@@ -83,23 +76,23 @@ If you forgot your password use iTunes to modify your PKCS#12 keychain.</string>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <constraints>
-                            <constraint firstAttribute="bottom" secondItem="nEX-DI-Shc" secondAttribute="bottom" constant="20" symbolic="YES" type="default" id="2Gd-kB-Or5"/>
-                            <constraint firstAttribute="trailing" secondItem="xnT-qm-h5g" secondAttribute="trailing" constant="20" symbolic="YES" type="default" id="2oi-ob-Uep"/>
+                            <constraint firstAttribute="bottom" secondItem="nEX-DI-Shc" secondAttribute="bottom" constant="20" symbolic="YES" id="2Gd-kB-Or5"/>
+                            <constraint firstAttribute="trailing" secondItem="xnT-qm-h5g" secondAttribute="trailing" constant="20" symbolic="YES" id="2oi-ob-Uep"/>
                             <constraint firstItem="vdK-4G-sVF" firstAttribute="top" secondItem="R5q-y6-x5V" secondAttribute="top" constant="101" id="3OQ-Xd-O6D"/>
                             <constraint firstItem="Aqp-Dg-D7H" firstAttribute="top" secondItem="R5q-y6-x5V" secondAttribute="top" constant="179" id="FbL-O0-yTC"/>
-                            <constraint firstItem="xia-7O-acv" firstAttribute="top" secondItem="Aqp-Dg-D7H" secondAttribute="bottom" constant="8" symbolic="YES" type="default" id="GqT-Cw-He5"/>
-                            <constraint firstAttribute="trailing" secondItem="xia-7O-acv" secondAttribute="trailing" constant="20" symbolic="YES" type="default" id="Lcd-1q-Dxd"/>
-                            <constraint firstItem="xnT-qm-h5g" firstAttribute="leading" secondItem="R5q-y6-x5V" secondAttribute="leading" constant="20" symbolic="YES" type="default" id="RLS-2k-IxQ"/>
-                            <constraint firstAttribute="trailing" secondItem="vdK-4G-sVF" secondAttribute="trailing" constant="20" symbolic="YES" type="default" id="Xqu-3X-jxw"/>
-                            <constraint firstItem="nEX-DI-Shc" firstAttribute="leading" secondItem="R5q-y6-x5V" secondAttribute="leading" constant="20" symbolic="YES" type="default" id="hRK-hS-VfU"/>
-                            <constraint firstItem="vdK-4G-sVF" firstAttribute="leading" secondItem="R5q-y6-x5V" secondAttribute="leading" constant="20" symbolic="YES" type="default" id="kcY-5t-YF0"/>
-                            <constraint firstAttribute="trailing" secondItem="Aqp-Dg-D7H" secondAttribute="trailing" constant="20" symbolic="YES" type="default" id="liG-5s-Xas"/>
-                            <constraint firstItem="jHr-hi-ACV" firstAttribute="leading" secondItem="R5q-y6-x5V" secondAttribute="leading" constant="20" symbolic="YES" type="default" id="ljx-lC-3Lg"/>
-                            <constraint firstItem="xia-7O-acv" firstAttribute="leading" secondItem="R5q-y6-x5V" secondAttribute="leading" constant="20" symbolic="YES" type="default" id="mIr-tl-uqN"/>
-                            <constraint firstItem="jHr-hi-ACV" firstAttribute="top" secondItem="R5q-y6-x5V" secondAttribute="top" constant="20" symbolic="YES" type="default" id="mm2-Xm-qPD"/>
-                            <constraint firstAttribute="trailing" secondItem="jHr-hi-ACV" secondAttribute="trailing" constant="20" symbolic="YES" type="default" id="o42-J2-IHD"/>
-                            <constraint firstItem="Aqp-Dg-D7H" firstAttribute="leading" secondItem="R5q-y6-x5V" secondAttribute="leading" constant="20" symbolic="YES" type="default" id="p9k-vL-Yp8"/>
-                            <constraint firstAttribute="bottom" secondItem="xnT-qm-h5g" secondAttribute="bottom" constant="20" symbolic="YES" type="default" id="zFR-X8-2nh"/>
+                            <constraint firstItem="xia-7O-acv" firstAttribute="top" secondItem="Aqp-Dg-D7H" secondAttribute="bottom" constant="8" symbolic="YES" id="GqT-Cw-He5"/>
+                            <constraint firstAttribute="trailing" secondItem="xia-7O-acv" secondAttribute="trailing" constant="20" symbolic="YES" id="Lcd-1q-Dxd"/>
+                            <constraint firstItem="xnT-qm-h5g" firstAttribute="leading" secondItem="R5q-y6-x5V" secondAttribute="leading" constant="20" symbolic="YES" id="RLS-2k-IxQ"/>
+                            <constraint firstAttribute="trailing" secondItem="vdK-4G-sVF" secondAttribute="trailing" constant="20" symbolic="YES" id="Xqu-3X-jxw"/>
+                            <constraint firstItem="nEX-DI-Shc" firstAttribute="leading" secondItem="R5q-y6-x5V" secondAttribute="leading" constant="20" symbolic="YES" id="hRK-hS-VfU"/>
+                            <constraint firstItem="vdK-4G-sVF" firstAttribute="leading" secondItem="R5q-y6-x5V" secondAttribute="leading" constant="20" symbolic="YES" id="kcY-5t-YF0"/>
+                            <constraint firstAttribute="trailing" secondItem="Aqp-Dg-D7H" secondAttribute="trailing" constant="20" symbolic="YES" id="liG-5s-Xas"/>
+                            <constraint firstItem="jHr-hi-ACV" firstAttribute="leading" secondItem="R5q-y6-x5V" secondAttribute="leading" constant="20" symbolic="YES" id="ljx-lC-3Lg"/>
+                            <constraint firstItem="xia-7O-acv" firstAttribute="leading" secondItem="R5q-y6-x5V" secondAttribute="leading" constant="20" symbolic="YES" id="mIr-tl-uqN"/>
+                            <constraint firstItem="jHr-hi-ACV" firstAttribute="top" secondItem="R5q-y6-x5V" secondAttribute="top" constant="20" symbolic="YES" id="mm2-Xm-qPD"/>
+                            <constraint firstAttribute="trailing" secondItem="jHr-hi-ACV" secondAttribute="trailing" constant="20" symbolic="YES" id="o42-J2-IHD"/>
+                            <constraint firstItem="Aqp-Dg-D7H" firstAttribute="leading" secondItem="R5q-y6-x5V" secondAttribute="leading" constant="20" symbolic="YES" id="p9k-vL-Yp8"/>
+                            <constraint firstAttribute="bottom" secondItem="xnT-qm-h5g" secondAttribute="bottom" constant="20" symbolic="YES" id="zFR-X8-2nh"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="1KR-d8-SSY"/>
@@ -117,8 +110,12 @@ If you forgot your password use iTunes to modify your PKCS#12 keychain.</string>
         <scene sceneID="bnz-q8-KCz">
             <objects>
                 <viewController title="Solicitud de certificado" wantsFullScreenLayout="YES" id="wka-yG-7pe" customClass="AOCertificateSelectionViewController" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="vtx-Hz-n8H"/>
+                        <viewControllerLayoutGuide type="bottom" id="Olf-gn-8Gl"/>
+                    </layoutGuides>
                     <view key="view" clipsSubviews="YES" contentMode="scaleToFill" id="F5C-AC-uwg">
-                        <rect key="frame" x="0.0" y="20" width="320" height="568"/>
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <imageView userInteractionEnabled="NO" contentMode="scaleToFill" image="logo_cliente.png" translatesAutoresizingMaskIntoConstraints="NO" id="pjS-yV-b2D">
@@ -128,34 +125,24 @@ If you forgot your password use iTunes to modify your PKCS#12 keychain.</string>
                                 </constraints>
                             </imageView>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="LWl-nK-Ouz">
-                                <rect key="frame" x="20" y="505" width="280" height="44"/>
-                                <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
+                                <rect key="frame" x="20" y="518" width="280" height="30"/>
                                 <state key="normal" title="Open selected keychain">
-                                    <color key="titleColor" red="0.19607843137254902" green="0.30980392156862746" blue="0.52156862745098043" alpha="1" colorSpace="calibratedRGB"/>
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                                </state>
-                                <state key="highlighted">
-                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <connections>
                                     <segue destination="7tH-yy-d2T" kind="push" identifier="toPinScreen" id="cXv-gu-Lmf"/>
                                 </connections>
                             </button>
                             <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="0vf-Be-HNG">
-                                <rect key="frame" x="20" y="505" width="73" height="44"/>
+                                <rect key="frame" x="20" y="518" width="73" height="30"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="73" id="Q0z-Ul-dip"/>
                                 </constraints>
-                                <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
                                 <state key="normal" title="Al Inicio">
-                                    <color key="titleColor" red="0.19607843137254902" green="0.30980392156862746" blue="0.52156862745098043" alpha="1" colorSpace="calibratedRGB"/>
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
-                                <state key="highlighted">
-                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                </state>
                                 <connections>
-                                    <segue destination="VdI-Vu-J89" kind="push" identifier="toFirstScreen" id="XHD-5K-P5E"/>
+                                    <segue destination="VdI-Vu-J89" kind="custom" identifier="toFirstScreen" customClass="AOCustomSegue" id="XHD-5K-P5E"/>
                                 </connections>
                             </button>
                             <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="275" translatesAutoresizingMaskIntoConstraints="NO" id="PTw-Q9-0mN">
@@ -183,19 +170,19 @@ If no keychain are shown in the list, you will be able to import them from the o
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <constraints>
-                            <constraint firstAttribute="trailing" secondItem="bZe-Ao-Wzf" secondAttribute="trailing" constant="20" symbolic="YES" type="default" id="6cP-z3-Z2b"/>
-                            <constraint firstItem="0vf-Be-HNG" firstAttribute="leading" secondItem="F5C-AC-uwg" secondAttribute="leading" constant="20" symbolic="YES" type="default" id="AIQ-lr-OoT"/>
-                            <constraint firstItem="bZe-Ao-Wzf" firstAttribute="leading" secondItem="F5C-AC-uwg" secondAttribute="leading" constant="20" symbolic="YES" type="default" id="DmQ-dv-pIj"/>
-                            <constraint firstItem="bZe-Ao-Wzf" firstAttribute="top" secondItem="PTw-Q9-0mN" secondAttribute="bottom" constant="8" symbolic="YES" type="default" id="E78-XY-EpK"/>
-                            <constraint firstAttribute="bottom" secondItem="0vf-Be-HNG" secondAttribute="bottom" constant="20" symbolic="YES" type="default" id="SM8-oB-U0j"/>
-                            <constraint firstItem="PTw-Q9-0mN" firstAttribute="leading" secondItem="F5C-AC-uwg" secondAttribute="leading" constant="20" symbolic="YES" type="default" id="Spk-fM-isx"/>
-                            <constraint firstAttribute="trailing" secondItem="pjS-yV-b2D" secondAttribute="trailing" constant="20" symbolic="YES" type="default" id="W2F-Vo-9c7"/>
-                            <constraint firstItem="PTw-Q9-0mN" firstAttribute="top" secondItem="pjS-yV-b2D" secondAttribute="bottom" constant="8" symbolic="YES" type="default" id="Zbd-Hu-fnG"/>
-                            <constraint firstAttribute="trailing" secondItem="LWl-nK-Ouz" secondAttribute="trailing" constant="20" symbolic="YES" type="default" id="bCq-ei-XXC"/>
-                            <constraint firstItem="LWl-nK-Ouz" firstAttribute="leading" secondItem="F5C-AC-uwg" secondAttribute="leading" constant="20" symbolic="YES" type="default" id="dfc-1P-Abe"/>
-                            <constraint firstItem="pjS-yV-b2D" firstAttribute="leading" secondItem="F5C-AC-uwg" secondAttribute="leading" constant="20" symbolic="YES" type="default" id="fNA-UI-53V"/>
-                            <constraint firstItem="pjS-yV-b2D" firstAttribute="top" secondItem="F5C-AC-uwg" secondAttribute="top" constant="20" symbolic="YES" type="default" id="kYJ-yX-oJE"/>
-                            <constraint firstAttribute="bottom" secondItem="LWl-nK-Ouz" secondAttribute="bottom" constant="20" symbolic="YES" type="default" id="ojI-3s-F4u"/>
+                            <constraint firstAttribute="trailing" secondItem="bZe-Ao-Wzf" secondAttribute="trailing" constant="20" symbolic="YES" id="6cP-z3-Z2b"/>
+                            <constraint firstItem="0vf-Be-HNG" firstAttribute="leading" secondItem="F5C-AC-uwg" secondAttribute="leading" constant="20" symbolic="YES" id="AIQ-lr-OoT"/>
+                            <constraint firstItem="bZe-Ao-Wzf" firstAttribute="leading" secondItem="F5C-AC-uwg" secondAttribute="leading" constant="20" symbolic="YES" id="DmQ-dv-pIj"/>
+                            <constraint firstItem="bZe-Ao-Wzf" firstAttribute="top" secondItem="PTw-Q9-0mN" secondAttribute="bottom" constant="8" symbolic="YES" id="E78-XY-EpK"/>
+                            <constraint firstAttribute="bottom" secondItem="0vf-Be-HNG" secondAttribute="bottom" constant="20" symbolic="YES" id="SM8-oB-U0j"/>
+                            <constraint firstItem="PTw-Q9-0mN" firstAttribute="leading" secondItem="F5C-AC-uwg" secondAttribute="leading" constant="20" symbolic="YES" id="Spk-fM-isx"/>
+                            <constraint firstAttribute="trailing" secondItem="pjS-yV-b2D" secondAttribute="trailing" constant="20" symbolic="YES" id="W2F-Vo-9c7"/>
+                            <constraint firstItem="PTw-Q9-0mN" firstAttribute="top" secondItem="pjS-yV-b2D" secondAttribute="bottom" constant="8" symbolic="YES" id="Zbd-Hu-fnG"/>
+                            <constraint firstAttribute="trailing" secondItem="LWl-nK-Ouz" secondAttribute="trailing" constant="20" symbolic="YES" id="bCq-ei-XXC"/>
+                            <constraint firstItem="LWl-nK-Ouz" firstAttribute="leading" secondItem="F5C-AC-uwg" secondAttribute="leading" constant="20" symbolic="YES" id="dfc-1P-Abe"/>
+                            <constraint firstItem="pjS-yV-b2D" firstAttribute="leading" secondItem="F5C-AC-uwg" secondAttribute="leading" constant="20" symbolic="YES" id="fNA-UI-53V"/>
+                            <constraint firstItem="pjS-yV-b2D" firstAttribute="top" secondItem="F5C-AC-uwg" secondAttribute="top" constant="20" symbolic="YES" id="kYJ-yX-oJE"/>
+                            <constraint firstAttribute="bottom" secondItem="LWl-nK-Ouz" secondAttribute="bottom" constant="20" symbolic="YES" id="ojI-3s-F4u"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="7ON-UG-s12"/>
@@ -211,40 +198,34 @@ If no keychain are shown in the list, you will be able to import them from the o
         <!--Firma Electrónica-->
         <scene sceneID="QTY-tT-Aby">
             <objects>
-                <viewController storyboardIdentifier="firma" title="Firma Electrónica" wantsFullScreenLayout="YES" id="OQu-SY-frv" customClass="AOSignViewController" sceneMemberID="viewController">
+                <viewController title="Firma Electrónica" wantsFullScreenLayout="YES" id="OQu-SY-frv" customClass="AOSignViewController" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="NbN-38-MYZ"/>
+                        <viewControllerLayoutGuide type="bottom" id="VaF-NW-xhS"/>
+                    </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="YmP-v8-Z4x">
-                        <rect key="frame" x="0.0" y="20" width="320" height="568"/>
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="pIZ-Xc-LAF">
-                                <rect key="frame" x="20" y="505" width="280" height="44"/>
-                                <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
+                                <rect key="frame" x="20" y="518" width="280" height="30"/>
                                 <state key="normal" title="Sign">
-                                    <color key="titleColor" red="0.19607843137254902" green="0.30980392156862746" blue="0.52156862745098043" alpha="1" colorSpace="calibratedRGB"/>
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                                </state>
-                                <state key="highlighted">
-                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <connections>
                                     <action selector="buttonPressed:" destination="OQu-SY-frv" eventType="touchUpInside" id="QNc-CE-zPF"/>
                                 </connections>
                             </button>
                             <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Jn6-N1-gq6">
-                                <rect key="frame" x="0.0" y="525" width="73" height="44"/>
+                                <rect key="frame" x="0.0" y="538" width="73" height="30"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="73" id="COj-VT-6BX"/>
                                 </constraints>
-                                <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
                                 <state key="normal" title="Al Inicio">
-                                    <color key="titleColor" red="0.19607843137254902" green="0.30980392156862746" blue="0.52156862745098043" alpha="1" colorSpace="calibratedRGB"/>
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
-                                <state key="highlighted">
-                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                </state>
                                 <connections>
-                                    <segue destination="VdI-Vu-J89" kind="push" identifier="toFirstScreen" id="tOZ-kr-G8o"/>
+                                    <segue destination="VdI-Vu-J89" kind="custom" identifier="toFirstScreen" customClass="AOCustomSegue" id="tOZ-kr-G8o"/>
                                 </connections>
                             </button>
                             <imageView userInteractionEnabled="NO" contentMode="scaleToFill" image="logo_cliente.png" translatesAutoresizingMaskIntoConstraints="NO" id="ke4-gG-wgY">
@@ -280,23 +261,23 @@ If no keychain are shown in the list, you will be able to import them from the o
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <constraints>
-                            <constraint firstItem="dSj-wa-fYQ" firstAttribute="top" secondItem="MGT-dC-nYc" secondAttribute="bottom" constant="8" symbolic="YES" type="default" id="0cp-Lp-RRJ"/>
-                            <constraint firstItem="ke4-gG-wgY" firstAttribute="top" secondItem="YmP-v8-Z4x" secondAttribute="top" constant="20" symbolic="YES" type="default" id="6mc-DK-e7n"/>
-                            <constraint firstItem="pIZ-Xc-LAF" firstAttribute="leading" secondItem="YmP-v8-Z4x" secondAttribute="leading" constant="20" symbolic="YES" type="default" id="6uM-Nl-HKS"/>
-                            <constraint firstItem="MGT-dC-nYc" firstAttribute="leading" secondItem="YmP-v8-Z4x" secondAttribute="leading" constant="20" symbolic="YES" type="default" id="A3n-Vy-C3Q"/>
-                            <constraint firstItem="ke4-gG-wgY" firstAttribute="leading" secondItem="YmP-v8-Z4x" secondAttribute="leading" constant="20" symbolic="YES" type="default" id="Bkg-yT-nfD"/>
-                            <constraint firstItem="Jn6-N1-gq6" firstAttribute="bottom" secondItem="YmP-v8-Z4x" secondAttribute="bottom" type="default" id="C0b-yt-mi4"/>
-                            <constraint firstAttribute="trailing" secondItem="dSj-wa-fYQ" secondAttribute="trailing" constant="20" symbolic="YES" type="default" id="LI1-tP-D2a"/>
-                            <constraint firstItem="Jn6-N1-gq6" firstAttribute="leading" secondItem="YmP-v8-Z4x" secondAttribute="leading" type="default" id="LIp-u1-jNl"/>
-                            <constraint firstItem="MGT-dC-nYc" firstAttribute="top" secondItem="ke4-gG-wgY" secondAttribute="bottom" constant="8" symbolic="YES" type="default" id="Pvc-Nc-K89"/>
-                            <constraint firstAttribute="trailing" secondItem="FTY-hG-p4z" secondAttribute="trailing" constant="20" symbolic="YES" type="default" id="Q0d-FD-Wty"/>
-                            <constraint firstItem="FTY-hG-p4z" firstAttribute="top" secondItem="dSj-wa-fYQ" secondAttribute="bottom" constant="8" symbolic="YES" type="default" id="Z47-6i-dIT"/>
-                            <constraint firstAttribute="trailing" secondItem="MGT-dC-nYc" secondAttribute="trailing" constant="20" symbolic="YES" type="default" id="ad6-KG-CwP"/>
-                            <constraint firstAttribute="trailing" secondItem="ke4-gG-wgY" secondAttribute="trailing" constant="20" symbolic="YES" type="default" id="fUZ-LD-bBN"/>
-                            <constraint firstItem="dSj-wa-fYQ" firstAttribute="leading" secondItem="YmP-v8-Z4x" secondAttribute="leading" constant="20" symbolic="YES" type="default" id="feb-dQ-OsD"/>
-                            <constraint firstItem="FTY-hG-p4z" firstAttribute="leading" secondItem="YmP-v8-Z4x" secondAttribute="leading" constant="20" symbolic="YES" type="default" id="oLd-YM-37o"/>
-                            <constraint firstAttribute="trailing" secondItem="pIZ-Xc-LAF" secondAttribute="trailing" constant="20" symbolic="YES" type="default" id="tBq-eu-Jgp"/>
-                            <constraint firstAttribute="bottom" secondItem="pIZ-Xc-LAF" secondAttribute="bottom" constant="20" symbolic="YES" type="default" id="v48-Wq-0o5"/>
+                            <constraint firstItem="dSj-wa-fYQ" firstAttribute="top" secondItem="MGT-dC-nYc" secondAttribute="bottom" constant="8" symbolic="YES" id="0cp-Lp-RRJ"/>
+                            <constraint firstItem="ke4-gG-wgY" firstAttribute="top" secondItem="YmP-v8-Z4x" secondAttribute="top" constant="20" symbolic="YES" id="6mc-DK-e7n"/>
+                            <constraint firstItem="pIZ-Xc-LAF" firstAttribute="leading" secondItem="YmP-v8-Z4x" secondAttribute="leading" constant="20" symbolic="YES" id="6uM-Nl-HKS"/>
+                            <constraint firstItem="MGT-dC-nYc" firstAttribute="leading" secondItem="YmP-v8-Z4x" secondAttribute="leading" constant="20" symbolic="YES" id="A3n-Vy-C3Q"/>
+                            <constraint firstItem="ke4-gG-wgY" firstAttribute="leading" secondItem="YmP-v8-Z4x" secondAttribute="leading" constant="20" symbolic="YES" id="Bkg-yT-nfD"/>
+                            <constraint firstItem="Jn6-N1-gq6" firstAttribute="bottom" secondItem="YmP-v8-Z4x" secondAttribute="bottom" id="C0b-yt-mi4"/>
+                            <constraint firstAttribute="trailing" secondItem="dSj-wa-fYQ" secondAttribute="trailing" constant="20" symbolic="YES" id="LI1-tP-D2a"/>
+                            <constraint firstItem="Jn6-N1-gq6" firstAttribute="leading" secondItem="YmP-v8-Z4x" secondAttribute="leading" id="LIp-u1-jNl"/>
+                            <constraint firstItem="MGT-dC-nYc" firstAttribute="top" secondItem="ke4-gG-wgY" secondAttribute="bottom" constant="8" symbolic="YES" id="Pvc-Nc-K89"/>
+                            <constraint firstAttribute="trailing" secondItem="FTY-hG-p4z" secondAttribute="trailing" constant="20" symbolic="YES" id="Q0d-FD-Wty"/>
+                            <constraint firstItem="FTY-hG-p4z" firstAttribute="top" secondItem="dSj-wa-fYQ" secondAttribute="bottom" constant="8" symbolic="YES" id="Z47-6i-dIT"/>
+                            <constraint firstAttribute="trailing" secondItem="MGT-dC-nYc" secondAttribute="trailing" constant="20" symbolic="YES" id="ad6-KG-CwP"/>
+                            <constraint firstAttribute="trailing" secondItem="ke4-gG-wgY" secondAttribute="trailing" constant="20" symbolic="YES" id="fUZ-LD-bBN"/>
+                            <constraint firstItem="dSj-wa-fYQ" firstAttribute="leading" secondItem="YmP-v8-Z4x" secondAttribute="leading" constant="20" symbolic="YES" id="feb-dQ-OsD"/>
+                            <constraint firstItem="FTY-hG-p4z" firstAttribute="leading" secondItem="YmP-v8-Z4x" secondAttribute="leading" constant="20" symbolic="YES" id="oLd-YM-37o"/>
+                            <constraint firstAttribute="trailing" secondItem="pIZ-Xc-LAF" secondAttribute="trailing" constant="20" symbolic="YES" id="tBq-eu-Jgp"/>
+                            <constraint firstAttribute="bottom" secondItem="pIZ-Xc-LAF" secondAttribute="bottom" constant="20" symbolic="YES" id="v48-Wq-0o5"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="PyY-lu-c43"/>
@@ -332,8 +313,12 @@ If no keychain are shown in the list, you will be able to import them from the o
         <scene sceneID="YdO-uN-aYo">
             <objects>
                 <viewController id="AAs-zw-nDr" customClass="AOAcercadeViewController" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="Imi-Qg-E8J"/>
+                        <viewControllerLayoutGuide type="bottom" id="u4r-7c-J8b"/>
+                    </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="0Lv-0f-Jtw">
-                        <rect key="frame" x="0.0" y="20" width="320" height="548"/>
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <imageView userInteractionEnabled="NO" contentMode="scaleToFill" image="logo_cliente.png" translatesAutoresizingMaskIntoConstraints="NO" id="Ds7-Bm-vBt">
@@ -353,7 +338,7 @@ If no keychain are shown in the list, you will be able to import them from the o
                                 <nil key="highlightedColor"/>
                             </label>
                             <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="qK1-Mk-nwO">
-                                <rect key="frame" x="20" y="152" width="280" height="323"/>
+                                <rect key="frame" x="20" y="152" width="280" height="343"/>
                                 <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                 <string key="text">"Cliente @firma for Apple iOS" v1.0 
 2013 Gobierno de España
@@ -370,34 +355,24 @@ http://forja-ctt.administracionelectronica.gob.es/web/clienteafirma </string>
                                 <dataDetectorType key="dataDetectorTypes" link="YES"/>
                             </textView>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="i9U-Q5-zwh">
-                                <rect key="frame" x="20" y="483" width="280" height="46"/>
+                                <rect key="frame" x="20" y="503" width="280" height="45"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="45" id="2eW-Te-x20"/>
                                 </constraints>
-                                <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
                                 <state key="normal" title="Back" image="flecha.png">
-                                    <color key="titleColor" red="0.19607843137254902" green="0.30980392156862746" blue="0.52156862745098043" alpha="1" colorSpace="calibratedRGB"/>
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                                </state>
-                                <state key="highlighted">
-                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <connections>
                                     <segue destination="UWq-gP-qqr" kind="custom" identifier="toMenuScreen" customClass="AOCustomSegue" id="MHy-pT-cs6"/>
                                 </connections>
                             </button>
                             <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="4Lo-tP-hKr">
-                                <rect key="frame" x="0.0" y="505" width="73" height="44"/>
+                                <rect key="frame" x="0.0" y="538" width="73" height="30"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="73" id="yx0-Sf-OWW"/>
                                 </constraints>
-                                <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
                                 <state key="normal" title="Al Inicio">
-                                    <color key="titleColor" red="0.19607843137254902" green="0.30980392156862746" blue="0.52156862745098043" alpha="1" colorSpace="calibratedRGB"/>
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                                </state>
-                                <state key="highlighted">
-                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <connections>
                                     <segue destination="VdI-Vu-J89" kind="push" identifier="toFirstScreen" id="a6s-oX-KM5"/>
@@ -406,21 +381,21 @@ http://forja-ctt.administracionelectronica.gob.es/web/clienteafirma </string>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <constraints>
-                            <constraint firstItem="qK1-Mk-nwO" firstAttribute="leading" secondItem="0Lv-0f-Jtw" secondAttribute="leading" constant="20" symbolic="YES" type="default" id="74T-aD-HTA"/>
-                            <constraint firstItem="Ds7-Bm-vBt" firstAttribute="top" secondItem="0Lv-0f-Jtw" secondAttribute="top" constant="20" symbolic="YES" type="default" id="BnA-cH-fHu"/>
-                            <constraint firstAttribute="trailing" secondItem="i9U-Q5-zwh" secondAttribute="trailing" constant="20" symbolic="YES" type="default" id="LHy-Jr-aeV"/>
-                            <constraint firstItem="qK1-Mk-nwO" firstAttribute="top" secondItem="S7O-QZ-u7o" secondAttribute="bottom" constant="8" symbolic="YES" type="default" id="T8f-fj-pEM"/>
-                            <constraint firstAttribute="trailing" secondItem="S7O-QZ-u7o" secondAttribute="trailing" constant="20" symbolic="YES" type="default" id="VjR-Fb-IBB"/>
-                            <constraint firstItem="4Lo-tP-hKr" firstAttribute="bottom" secondItem="0Lv-0f-Jtw" secondAttribute="bottom" type="default" id="dAd-vl-oIz"/>
-                            <constraint firstItem="Ds7-Bm-vBt" firstAttribute="leading" secondItem="0Lv-0f-Jtw" secondAttribute="leading" constant="20" symbolic="YES" type="default" id="f7o-r2-6hh"/>
-                            <constraint firstAttribute="trailing" secondItem="qK1-Mk-nwO" secondAttribute="trailing" constant="20" symbolic="YES" type="default" id="iWw-Yt-rmC"/>
-                            <constraint firstItem="4Lo-tP-hKr" firstAttribute="leading" secondItem="0Lv-0f-Jtw" secondAttribute="leading" type="default" id="igQ-YN-DtC"/>
-                            <constraint firstAttribute="trailing" secondItem="Ds7-Bm-vBt" secondAttribute="trailing" constant="20" symbolic="YES" type="default" id="kPw-Pd-2hg"/>
-                            <constraint firstItem="i9U-Q5-zwh" firstAttribute="leading" secondItem="0Lv-0f-Jtw" secondAttribute="leading" constant="20" symbolic="YES" type="default" id="l21-wg-9rC"/>
-                            <constraint firstItem="S7O-QZ-u7o" firstAttribute="leading" secondItem="0Lv-0f-Jtw" secondAttribute="leading" constant="20" symbolic="YES" type="default" id="taI-N4-eeu"/>
-                            <constraint firstItem="i9U-Q5-zwh" firstAttribute="top" secondItem="qK1-Mk-nwO" secondAttribute="bottom" constant="8" symbolic="YES" type="default" id="ube-tY-UPq"/>
-                            <constraint firstItem="S7O-QZ-u7o" firstAttribute="top" secondItem="Ds7-Bm-vBt" secondAttribute="bottom" constant="8" symbolic="YES" type="default" id="vde-3h-iRM"/>
-                            <constraint firstAttribute="bottom" secondItem="i9U-Q5-zwh" secondAttribute="bottom" constant="20" symbolic="YES" type="default" id="zOJ-75-CB7"/>
+                            <constraint firstItem="qK1-Mk-nwO" firstAttribute="leading" secondItem="0Lv-0f-Jtw" secondAttribute="leading" constant="20" symbolic="YES" id="74T-aD-HTA"/>
+                            <constraint firstItem="Ds7-Bm-vBt" firstAttribute="top" secondItem="0Lv-0f-Jtw" secondAttribute="top" constant="20" symbolic="YES" id="BnA-cH-fHu"/>
+                            <constraint firstAttribute="trailing" secondItem="i9U-Q5-zwh" secondAttribute="trailing" constant="20" symbolic="YES" id="LHy-Jr-aeV"/>
+                            <constraint firstItem="qK1-Mk-nwO" firstAttribute="top" secondItem="S7O-QZ-u7o" secondAttribute="bottom" constant="8" symbolic="YES" id="T8f-fj-pEM"/>
+                            <constraint firstAttribute="trailing" secondItem="S7O-QZ-u7o" secondAttribute="trailing" constant="20" symbolic="YES" id="VjR-Fb-IBB"/>
+                            <constraint firstItem="4Lo-tP-hKr" firstAttribute="bottom" secondItem="0Lv-0f-Jtw" secondAttribute="bottom" id="dAd-vl-oIz"/>
+                            <constraint firstItem="Ds7-Bm-vBt" firstAttribute="leading" secondItem="0Lv-0f-Jtw" secondAttribute="leading" constant="20" symbolic="YES" id="f7o-r2-6hh"/>
+                            <constraint firstAttribute="trailing" secondItem="qK1-Mk-nwO" secondAttribute="trailing" constant="20" symbolic="YES" id="iWw-Yt-rmC"/>
+                            <constraint firstItem="4Lo-tP-hKr" firstAttribute="leading" secondItem="0Lv-0f-Jtw" secondAttribute="leading" id="igQ-YN-DtC"/>
+                            <constraint firstAttribute="trailing" secondItem="Ds7-Bm-vBt" secondAttribute="trailing" constant="20" symbolic="YES" id="kPw-Pd-2hg"/>
+                            <constraint firstItem="i9U-Q5-zwh" firstAttribute="leading" secondItem="0Lv-0f-Jtw" secondAttribute="leading" constant="20" symbolic="YES" id="l21-wg-9rC"/>
+                            <constraint firstItem="S7O-QZ-u7o" firstAttribute="leading" secondItem="0Lv-0f-Jtw" secondAttribute="leading" constant="20" symbolic="YES" id="taI-N4-eeu"/>
+                            <constraint firstItem="i9U-Q5-zwh" firstAttribute="top" secondItem="qK1-Mk-nwO" secondAttribute="bottom" constant="8" symbolic="YES" id="ube-tY-UPq"/>
+                            <constraint firstItem="S7O-QZ-u7o" firstAttribute="top" secondItem="Ds7-Bm-vBt" secondAttribute="bottom" constant="8" symbolic="YES" id="vde-3h-iRM"/>
+                            <constraint firstAttribute="bottom" secondItem="i9U-Q5-zwh" secondAttribute="bottom" constant="20" symbolic="YES" id="zOJ-75-CB7"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="j1w-cy-gOR"/>
@@ -433,14 +408,18 @@ http://forja-ctt.administracionelectronica.gob.es/web/clienteafirma </string>
         <scene sceneID="nCE-4s-Zpg">
             <objects>
                 <viewController id="UWq-gP-qqr" customClass="AOHelpMenuViewController" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="qK5-en-Mfk"/>
+                        <viewControllerLayoutGuide type="bottom" id="ufY-OJ-I6E"/>
+                    </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="tDG-4O-c57">
-                        <rect key="frame" x="0.0" y="20" width="320" height="548"/>
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <imageView userInteractionEnabled="NO" contentMode="scaleToFill" image="logo_cliente.png" translatesAutoresizingMaskIntoConstraints="NO" id="tel-2I-NJ1">
                                 <rect key="frame" x="20" y="20" width="280" height="83"/>
                             </imageView>
-                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" translatesAutoresizingMaskIntoConstraints="NO" id="XVU-T4-L14">
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" translatesAutoresizingMaskIntoConstraints="NO" id="XVU-T4-L14">
                                 <rect key="frame" x="20" y="152" width="280" height="132"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <constraints>
@@ -450,11 +429,10 @@ http://forja-ctt.administracionelectronica.gob.es/web/clienteafirma </string>
                                     <tableViewCell contentMode="scaleToFill" selectionStyle="blue" accessoryType="disclosureIndicator" indentationWidth="10" reuseIdentifier="1" id="53S-5z-oms">
                                         <rect key="frame" x="0.0" y="22" width="280" height="44"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                        <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
-                                            <rect key="frame" x="0.0" y="0.0" width="260" height="43"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="53S-5z-oms" id="dy3-tr-85W">
+                                            <rect key="frame" x="0.0" y="0.0" width="247" height="43"/>
                                             <autoresizingMask key="autoresizingMask"/>
-                                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
-                                        </view>
+                                        </tableViewCellContentView>
                                         <connections>
                                             <segue destination="AAs-zw-nDr" kind="push" identifier="toAcerca" id="KVN-vy-kRn"/>
                                         </connections>
@@ -462,11 +440,10 @@ http://forja-ctt.administracionelectronica.gob.es/web/clienteafirma </string>
                                     <tableViewCell contentMode="scaleToFill" selectionStyle="blue" accessoryType="disclosureIndicator" indentationWidth="10" reuseIdentifier="2" id="7Uf-gt-mnh">
                                         <rect key="frame" x="0.0" y="66" width="280" height="44"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                        <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
-                                            <rect key="frame" x="0.0" y="0.0" width="260" height="43"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="7Uf-gt-mnh" id="aTj-bB-iOw">
+                                            <rect key="frame" x="0.0" y="0.0" width="247" height="43"/>
                                             <autoresizingMask key="autoresizingMask"/>
-                                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
-                                        </view>
+                                        </tableViewCellContentView>
                                         <connections>
                                             <segue destination="rBH-2e-2uT" kind="push" identifier="toPregFrecuentes" id="tFn-gK-5tR"/>
                                         </connections>
@@ -474,11 +451,10 @@ http://forja-ctt.administracionelectronica.gob.es/web/clienteafirma </string>
                                     <tableViewCell contentMode="scaleToFill" selectionStyle="blue" accessoryType="disclosureIndicator" indentationWidth="10" reuseIdentifier="3" id="5n6-ib-Vcx">
                                         <rect key="frame" x="0.0" y="110" width="280" height="44"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                        <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
-                                            <rect key="frame" x="0.0" y="0.0" width="260" height="43"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="5n6-ib-Vcx" id="b0j-NT-yNg">
+                                            <rect key="frame" x="0.0" y="0.0" width="247" height="43"/>
                                             <autoresizingMask key="autoresizingMask"/>
-                                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
-                                        </view>
+                                        </tableViewCellContentView>
                                         <connections>
                                             <segue destination="Ash-QT-aqD" kind="push" identifier="toInstalar" id="RiP-0Y-8e7"/>
                                         </connections>
@@ -490,7 +466,7 @@ http://forja-ctt.administracionelectronica.gob.es/web/clienteafirma </string>
                                 </connections>
                             </tableView>
                             <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" textAlignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="If7-jq-mK4">
-                                <rect key="frame" x="20" y="381" width="280" height="94"/>
+                                <rect key="frame" x="20" y="401" width="280" height="94"/>
                                 <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="94" id="dPX-lr-gK9"/>
@@ -503,17 +479,12 @@ http://administracionelectronica.gob.es/</string>
                                 <dataDetectorType key="dataDetectorTypes" link="YES"/>
                             </textView>
                             <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="eOS-rh-Dp6">
-                                <rect key="frame" x="0.0" y="505" width="73" height="44"/>
+                                <rect key="frame" x="0.0" y="538" width="73" height="30"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="73" id="eRV-gX-FKf"/>
                                 </constraints>
-                                <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
                                 <state key="normal" title="Al Inicio">
-                                    <color key="titleColor" red="0.19607843137254902" green="0.30980392156862746" blue="0.52156862745098043" alpha="1" colorSpace="calibratedRGB"/>
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                                </state>
-                                <state key="highlighted">
-                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                             </button>
                             <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="Help" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="HV8-Ix-XS3">
@@ -527,43 +498,38 @@ http://administracionelectronica.gob.es/</string>
                                 <nil key="highlightedColor"/>
                             </label>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="82u-ru-v39">
-                                <rect key="frame" x="20" y="483" width="280" height="46"/>
+                                <rect key="frame" x="20" y="503" width="280" height="45"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="45" id="CDM-Qr-gtk"/>
                                 </constraints>
-                                <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
                                 <state key="normal" title="Back" image="flecha.png">
-                                    <color key="titleColor" red="0.19607843137254902" green="0.30980392156862746" blue="0.52156862745098043" alpha="1" colorSpace="calibratedRGB"/>
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
-                                <state key="highlighted">
-                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                </state>
                                 <connections>
-                                    <segue destination="VdI-Vu-J89" kind="custom" identifier="toFirstScreen" customClass="AOCustomSegue" id="Coe-re-dJF"/>
+                                    <action selector="goBackHome:" destination="UWq-gP-qqr" eventType="touchUpInside" id="6LV-RC-hcX"/>
                                 </connections>
                             </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <constraints>
-                            <constraint firstItem="82u-ru-v39" firstAttribute="leading" secondItem="tDG-4O-c57" secondAttribute="leading" constant="20" symbolic="YES" type="default" id="5p8-e9-xEl"/>
-                            <constraint firstAttribute="bottom" secondItem="82u-ru-v39" secondAttribute="bottom" constant="20" symbolic="YES" type="default" id="CG6-lh-5Nr"/>
-                            <constraint firstItem="If7-jq-mK4" firstAttribute="leading" secondItem="tDG-4O-c57" secondAttribute="leading" constant="20" symbolic="YES" type="default" id="EaA-rC-8HC"/>
-                            <constraint firstItem="tel-2I-NJ1" firstAttribute="leading" secondItem="tDG-4O-c57" secondAttribute="leading" constant="20" symbolic="YES" type="default" id="FKJ-3o-3dx"/>
-                            <constraint firstItem="XVU-T4-L14" firstAttribute="top" secondItem="HV8-Ix-XS3" secondAttribute="bottom" constant="8" symbolic="YES" type="default" id="J8a-Xi-JS2"/>
-                            <constraint firstAttribute="trailing" secondItem="82u-ru-v39" secondAttribute="trailing" constant="20" symbolic="YES" type="default" id="NmF-G9-Pho"/>
-                            <constraint firstItem="XVU-T4-L14" firstAttribute="leading" secondItem="tDG-4O-c57" secondAttribute="leading" constant="20" symbolic="YES" type="default" id="PQC-kw-rrN"/>
-                            <constraint firstAttribute="trailing" secondItem="HV8-Ix-XS3" secondAttribute="trailing" constant="20" symbolic="YES" type="default" id="Pbh-eg-3JS"/>
-                            <constraint firstItem="eOS-rh-Dp6" firstAttribute="bottom" secondItem="tDG-4O-c57" secondAttribute="bottom" type="default" id="VPO-gI-8BX"/>
+                            <constraint firstItem="82u-ru-v39" firstAttribute="leading" secondItem="tDG-4O-c57" secondAttribute="leading" constant="20" symbolic="YES" id="5p8-e9-xEl"/>
+                            <constraint firstAttribute="bottom" secondItem="82u-ru-v39" secondAttribute="bottom" constant="20" symbolic="YES" id="CG6-lh-5Nr"/>
+                            <constraint firstItem="If7-jq-mK4" firstAttribute="leading" secondItem="tDG-4O-c57" secondAttribute="leading" constant="20" symbolic="YES" id="EaA-rC-8HC"/>
+                            <constraint firstItem="tel-2I-NJ1" firstAttribute="leading" secondItem="tDG-4O-c57" secondAttribute="leading" constant="20" symbolic="YES" id="FKJ-3o-3dx"/>
+                            <constraint firstItem="XVU-T4-L14" firstAttribute="top" secondItem="HV8-Ix-XS3" secondAttribute="bottom" constant="8" symbolic="YES" id="J8a-Xi-JS2"/>
+                            <constraint firstAttribute="trailing" secondItem="82u-ru-v39" secondAttribute="trailing" constant="20" symbolic="YES" id="NmF-G9-Pho"/>
+                            <constraint firstItem="XVU-T4-L14" firstAttribute="leading" secondItem="tDG-4O-c57" secondAttribute="leading" constant="20" symbolic="YES" id="PQC-kw-rrN"/>
+                            <constraint firstAttribute="trailing" secondItem="HV8-Ix-XS3" secondAttribute="trailing" constant="20" symbolic="YES" id="Pbh-eg-3JS"/>
+                            <constraint firstItem="eOS-rh-Dp6" firstAttribute="bottom" secondItem="tDG-4O-c57" secondAttribute="bottom" id="VPO-gI-8BX"/>
                             <constraint firstItem="XVU-T4-L14" firstAttribute="top" secondItem="tDG-4O-c57" secondAttribute="top" constant="152" id="WdU-sZ-BLa"/>
-                            <constraint firstItem="eOS-rh-Dp6" firstAttribute="leading" secondItem="tDG-4O-c57" secondAttribute="leading" type="default" id="XuZ-ox-Nw0"/>
-                            <constraint firstAttribute="trailing" secondItem="XVU-T4-L14" secondAttribute="trailing" constant="20" symbolic="YES" type="default" id="Y5K-OH-w96"/>
-                            <constraint firstItem="82u-ru-v39" firstAttribute="top" secondItem="If7-jq-mK4" secondAttribute="bottom" constant="8" symbolic="YES" type="default" id="ahl-0N-rQh"/>
-                            <constraint firstAttribute="trailing" secondItem="tel-2I-NJ1" secondAttribute="trailing" constant="20" symbolic="YES" type="default" id="cUk-yq-APO"/>
-                            <constraint firstItem="HV8-Ix-XS3" firstAttribute="leading" secondItem="tDG-4O-c57" secondAttribute="leading" constant="20" symbolic="YES" type="default" id="j5d-NE-aRJ"/>
-                            <constraint firstItem="tel-2I-NJ1" firstAttribute="top" secondItem="tDG-4O-c57" secondAttribute="top" constant="20" symbolic="YES" type="default" id="nud-Ng-YCQ"/>
-                            <constraint firstItem="HV8-Ix-XS3" firstAttribute="top" secondItem="tel-2I-NJ1" secondAttribute="bottom" constant="8" symbolic="YES" type="default" id="p6P-Uo-T2X"/>
-                            <constraint firstAttribute="trailing" secondItem="If7-jq-mK4" secondAttribute="trailing" constant="20" symbolic="YES" type="default" id="qr6-Jz-0ua"/>
+                            <constraint firstItem="eOS-rh-Dp6" firstAttribute="leading" secondItem="tDG-4O-c57" secondAttribute="leading" id="XuZ-ox-Nw0"/>
+                            <constraint firstAttribute="trailing" secondItem="XVU-T4-L14" secondAttribute="trailing" constant="20" symbolic="YES" id="Y5K-OH-w96"/>
+                            <constraint firstItem="82u-ru-v39" firstAttribute="top" secondItem="If7-jq-mK4" secondAttribute="bottom" constant="8" symbolic="YES" id="ahl-0N-rQh"/>
+                            <constraint firstAttribute="trailing" secondItem="tel-2I-NJ1" secondAttribute="trailing" constant="20" symbolic="YES" id="cUk-yq-APO"/>
+                            <constraint firstItem="HV8-Ix-XS3" firstAttribute="leading" secondItem="tDG-4O-c57" secondAttribute="leading" constant="20" symbolic="YES" id="j5d-NE-aRJ"/>
+                            <constraint firstItem="tel-2I-NJ1" firstAttribute="top" secondItem="tDG-4O-c57" secondAttribute="top" constant="20" symbolic="YES" id="nud-Ng-YCQ"/>
+                            <constraint firstItem="HV8-Ix-XS3" firstAttribute="top" secondItem="tel-2I-NJ1" secondAttribute="bottom" constant="8" symbolic="YES" id="p6P-Uo-T2X"/>
+                            <constraint firstAttribute="trailing" secondItem="If7-jq-mK4" secondAttribute="trailing" constant="20" symbolic="YES" id="qr6-Jz-0ua"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="P3x-BA-kUb"/>
@@ -579,22 +545,21 @@ http://administracionelectronica.gob.es/</string>
         <scene sceneID="fDf-pX-0bg">
             <objects>
                 <viewController id="Xba-9r-3ek" customClass="AOManagerStoreScreenViewController" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="HoB-GI-EZx"/>
+                        <viewControllerLayoutGuide type="bottom" id="Y4r-3U-AW9"/>
+                    </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="24B-qk-x9L">
-                        <rect key="frame" x="0.0" y="20" width="320" height="548"/>
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="UuK-le-0aa">
-                                <rect key="frame" x="20" y="485" width="73" height="44"/>
+                                <rect key="frame" x="20" y="518" width="73" height="30"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="73" id="Ofj-TN-99u"/>
                                 </constraints>
-                                <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
                                 <state key="normal" title="Al Inicio">
-                                    <color key="titleColor" red="0.19607843137254902" green="0.30980392156862746" blue="0.52156862745098043" alpha="1" colorSpace="calibratedRGB"/>
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                                </state>
-                                <state key="highlighted">
-                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                             </button>
                             <imageView userInteractionEnabled="NO" contentMode="scaleToFill" image="logo_cliente.png" translatesAutoresizingMaskIntoConstraints="NO" id="gae-7s-PDC">
@@ -603,28 +568,23 @@ http://administracionelectronica.gob.es/</string>
                                     <constraint firstAttribute="height" constant="83" id="QtE-mI-k4t"/>
                                 </constraints>
                             </imageView>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="DPy-X9-rmm">
-                                <rect key="frame" x="20" y="484" width="280" height="46"/>
+                            <button opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="DPy-X9-rmm">
+                                <rect key="frame" x="20" y="510" width="280" height="45"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="45" id="65F-tA-tuS"/>
                                 </constraints>
-                                <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
                                 <state key="normal" title="Back" image="flecha.png">
-                                    <color key="titleColor" red="0.19607843137254902" green="0.30980392156862746" blue="0.52156862745098043" alpha="1" colorSpace="calibratedRGB"/>
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
-                                <state key="highlighted">
-                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                </state>
                                 <connections>
-                                    <segue destination="VdI-Vu-J89" kind="custom" identifier="toFirstScreen" customClass="AOCustomSegue" id="XSt-c3-X0e"/>
+                                    <action selector="goBackHome:" destination="Xba-9r-3ek" eventType="touchUpInside" id="cfj-w9-dc5"/>
                                 </connections>
                             </button>
-                            <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="eOv-cJ-QU9">
-                                <rect key="frame" x="20" y="111" width="280" height="365"/>
+                            <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="eOv-cJ-QU9">
+                                <rect key="frame" x="20" y="111" width="280" height="391"/>
                                 <subviews>
                                     <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" text="This section allows you import new keychains to create your own signs or delete kaychains installed on device." translatesAutoresizingMaskIntoConstraints="NO" id="9TI-rw-EK7">
-                                        <rect key="frame" x="0.0" y="0.0" width="280" height="92"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="281" height="92"/>
                                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="92" id="afJ-3P-jpo"/>
@@ -633,7 +593,7 @@ http://administracionelectronica.gob.es/</string>
                                         <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                                     </textView>
                                     <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="none" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" translatesAutoresizingMaskIntoConstraints="NO" id="Tca-lt-Uf4">
-                                        <rect key="frame" x="0.0" y="100" width="280" height="132"/>
+                                        <rect key="frame" x="0.0" y="100" width="281" height="132"/>
                                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="132" id="AO1-1C-SW6"/>
@@ -644,14 +604,9 @@ http://administracionelectronica.gob.es/</string>
                                         </connections>
                                     </tableView>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Brt-pG-mjv">
-                                        <rect key="frame" x="0.0" y="240" width="280" height="44"/>
-                                        <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
+                                        <rect key="frame" x="0.0" y="240" width="281" height="30"/>
                                         <state key="normal" title="Delete selected keychain">
-                                            <color key="titleColor" red="0.19607843137254902" green="0.30980392156862746" blue="0.52156862745098043" alpha="1" colorSpace="calibratedRGB"/>
                                             <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                                        </state>
-                                        <state key="highlighted">
-                                            <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                         </state>
                                         <connections>
                                             <action selector="deleteButtonPressed:" destination="Xba-9r-3ek" eventType="touchUpInside" id="nI1-Lf-ypW"/>
@@ -659,34 +614,34 @@ http://administracionelectronica.gob.es/</string>
                                     </button>
                                 </subviews>
                                 <constraints>
-                                    <constraint firstItem="Tca-lt-Uf4" firstAttribute="trailing" secondItem="Brt-pG-mjv" secondAttribute="trailing" type="default" id="Ee8-c8-oXQ"/>
-                                    <constraint firstItem="Tca-lt-Uf4" firstAttribute="leading" secondItem="Brt-pG-mjv" secondAttribute="leading" type="default" id="FVc-KH-kaY"/>
-                                    <constraint firstItem="9TI-rw-EK7" firstAttribute="top" secondItem="eOv-cJ-QU9" secondAttribute="top" type="default" id="Gbs-Ro-gIn"/>
-                                    <constraint firstItem="Tca-lt-Uf4" firstAttribute="trailing" secondItem="9TI-rw-EK7" secondAttribute="trailing" type="default" id="HB8-pj-1FT"/>
-                                    <constraint firstItem="Tca-lt-Uf4" firstAttribute="top" secondItem="9TI-rw-EK7" secondAttribute="bottom" constant="8" symbolic="YES" type="default" id="Wgp-yp-bhm"/>
-                                    <constraint firstItem="9TI-rw-EK7" firstAttribute="trailing" secondItem="eOv-cJ-QU9" secondAttribute="trailing" type="default" id="ZRU-Rk-gWG"/>
+                                    <constraint firstItem="Tca-lt-Uf4" firstAttribute="trailing" secondItem="Brt-pG-mjv" secondAttribute="trailing" id="Ee8-c8-oXQ"/>
+                                    <constraint firstItem="Tca-lt-Uf4" firstAttribute="leading" secondItem="Brt-pG-mjv" secondAttribute="leading" id="FVc-KH-kaY"/>
+                                    <constraint firstItem="9TI-rw-EK7" firstAttribute="top" secondItem="eOv-cJ-QU9" secondAttribute="top" id="Gbs-Ro-gIn"/>
+                                    <constraint firstItem="Tca-lt-Uf4" firstAttribute="trailing" secondItem="9TI-rw-EK7" secondAttribute="trailing" id="HB8-pj-1FT"/>
+                                    <constraint firstItem="Tca-lt-Uf4" firstAttribute="top" secondItem="9TI-rw-EK7" secondAttribute="bottom" constant="8" symbolic="YES" id="Wgp-yp-bhm"/>
+                                    <constraint firstItem="9TI-rw-EK7" firstAttribute="trailing" secondItem="eOv-cJ-QU9" secondAttribute="trailing" id="ZRU-Rk-gWG"/>
                                     <constraint firstAttribute="bottom" secondItem="Brt-pG-mjv" secondAttribute="bottom" constant="82" id="a6s-Sx-y6Y"/>
-                                    <constraint firstItem="9TI-rw-EK7" firstAttribute="centerX" secondItem="eOv-cJ-QU9" secondAttribute="centerX" type="default" id="fDJ-76-yxR"/>
-                                    <constraint firstItem="Brt-pG-mjv" firstAttribute="top" secondItem="Tca-lt-Uf4" secondAttribute="bottom" constant="8" symbolic="YES" type="default" id="lsN-gN-2dL"/>
-                                    <constraint firstItem="9TI-rw-EK7" firstAttribute="leading" secondItem="eOv-cJ-QU9" secondAttribute="leading" type="default" id="nsR-Gb-wGB"/>
-                                    <constraint firstItem="Tca-lt-Uf4" firstAttribute="leading" secondItem="9TI-rw-EK7" secondAttribute="leading" type="default" id="wLk-Pb-67T"/>
+                                    <constraint firstItem="9TI-rw-EK7" firstAttribute="centerX" secondItem="eOv-cJ-QU9" secondAttribute="centerX" id="fDJ-76-yxR"/>
+                                    <constraint firstItem="Brt-pG-mjv" firstAttribute="top" secondItem="Tca-lt-Uf4" secondAttribute="bottom" constant="8" symbolic="YES" id="lsN-gN-2dL"/>
+                                    <constraint firstItem="9TI-rw-EK7" firstAttribute="leading" secondItem="eOv-cJ-QU9" secondAttribute="leading" id="nsR-Gb-wGB"/>
+                                    <constraint firstItem="Tca-lt-Uf4" firstAttribute="leading" secondItem="9TI-rw-EK7" secondAttribute="leading" id="wLk-Pb-67T"/>
                                 </constraints>
                             </scrollView>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <constraints>
-                            <constraint firstItem="gae-7s-PDC" firstAttribute="top" secondItem="24B-qk-x9L" secondAttribute="top" constant="20" symbolic="YES" type="default" id="08H-2Q-Ga0"/>
-                            <constraint firstItem="gae-7s-PDC" firstAttribute="leading" secondItem="24B-qk-x9L" secondAttribute="leading" constant="20" symbolic="YES" type="default" id="5Pn-Y4-Onz"/>
-                            <constraint firstItem="eOv-cJ-QU9" firstAttribute="top" secondItem="gae-7s-PDC" secondAttribute="bottom" constant="8" symbolic="YES" type="default" id="5of-ZX-0LT"/>
-                            <constraint firstItem="eOv-cJ-QU9" firstAttribute="trailing" secondItem="DPy-X9-rmm" secondAttribute="trailing" type="default" id="7NU-Wc-G2x"/>
-                            <constraint firstItem="eOv-cJ-QU9" firstAttribute="leading" secondItem="DPy-X9-rmm" secondAttribute="leading" type="default" id="LYh-G6-USK"/>
-                            <constraint firstItem="eOv-cJ-QU9" firstAttribute="leading" secondItem="UuK-le-0aa" secondAttribute="leading" type="default" id="Mrj-G3-V2U"/>
-                            <constraint firstItem="DPy-X9-rmm" firstAttribute="top" secondItem="eOv-cJ-QU9" secondAttribute="bottom" constant="8" symbolic="YES" type="default" id="NRU-3U-h34"/>
-                            <constraint firstItem="DPy-X9-rmm" firstAttribute="baseline" secondItem="UuK-le-0aa" secondAttribute="baseline" type="default" id="QYI-3q-j0d"/>
-                            <constraint firstAttribute="trailing" secondItem="gae-7s-PDC" secondAttribute="trailing" constant="20" symbolic="YES" type="default" id="hVm-6R-rj7"/>
-                            <constraint firstItem="eOv-cJ-QU9" firstAttribute="trailing" secondItem="gae-7s-PDC" secondAttribute="trailing" type="default" id="jz5-Qq-xK2"/>
-                            <constraint firstItem="eOv-cJ-QU9" firstAttribute="leading" secondItem="gae-7s-PDC" secondAttribute="leading" type="default" id="unp-Wm-7Af"/>
-                            <constraint firstAttribute="bottom" secondItem="UuK-le-0aa" secondAttribute="bottom" constant="20" symbolic="YES" type="default" id="ws7-6g-ewW"/>
+                            <constraint firstItem="gae-7s-PDC" firstAttribute="top" secondItem="24B-qk-x9L" secondAttribute="top" constant="20" symbolic="YES" id="08H-2Q-Ga0"/>
+                            <constraint firstItem="gae-7s-PDC" firstAttribute="leading" secondItem="24B-qk-x9L" secondAttribute="leading" constant="20" symbolic="YES" id="5Pn-Y4-Onz"/>
+                            <constraint firstItem="eOv-cJ-QU9" firstAttribute="top" secondItem="gae-7s-PDC" secondAttribute="bottom" constant="8" symbolic="YES" id="5of-ZX-0LT"/>
+                            <constraint firstItem="eOv-cJ-QU9" firstAttribute="trailing" secondItem="DPy-X9-rmm" secondAttribute="trailing" id="7NU-Wc-G2x"/>
+                            <constraint firstItem="eOv-cJ-QU9" firstAttribute="leading" secondItem="DPy-X9-rmm" secondAttribute="leading" id="LYh-G6-USK"/>
+                            <constraint firstItem="eOv-cJ-QU9" firstAttribute="leading" secondItem="UuK-le-0aa" secondAttribute="leading" id="Mrj-G3-V2U"/>
+                            <constraint firstItem="DPy-X9-rmm" firstAttribute="top" secondItem="eOv-cJ-QU9" secondAttribute="bottom" constant="8" symbolic="YES" id="NRU-3U-h34"/>
+                            <constraint firstItem="DPy-X9-rmm" firstAttribute="baseline" secondItem="UuK-le-0aa" secondAttribute="baseline" id="QYI-3q-j0d"/>
+                            <constraint firstAttribute="trailing" secondItem="gae-7s-PDC" secondAttribute="trailing" constant="20" symbolic="YES" id="hVm-6R-rj7"/>
+                            <constraint firstItem="eOv-cJ-QU9" firstAttribute="trailing" secondItem="gae-7s-PDC" secondAttribute="trailing" id="jz5-Qq-xK2"/>
+                            <constraint firstItem="eOv-cJ-QU9" firstAttribute="leading" secondItem="gae-7s-PDC" secondAttribute="leading" id="unp-Wm-7Af"/>
+                            <constraint firstAttribute="bottom" secondItem="UuK-le-0aa" secondAttribute="bottom" constant="20" symbolic="YES" id="ws7-6g-ewW"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="AdC-2s-DHp"/>
@@ -703,19 +658,18 @@ http://administracionelectronica.gob.es/</string>
         <scene sceneID="5Ye-sY-E6n">
             <objects>
                 <viewController wantsFullScreenLayout="YES" id="VdI-Vu-J89" customClass="AOAboutViewController" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="v4s-mc-G7v"/>
+                        <viewControllerLayoutGuide type="bottom" id="hBa-0A-pOv"/>
+                    </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="BLw-aA-1Ba">
-                        <rect key="frame" x="0.0" y="20" width="320" height="568"/>
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="WrM-2I-hjk">
-                                <rect key="frame" x="51" y="37" width="72" height="44"/>
-                                <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
+                                <rect key="frame" x="51" y="37" width="46" height="30"/>
                                 <state key="normal" title="Button">
-                                    <color key="titleColor" red="0.19607843137254902" green="0.30980392156862746" blue="0.52156862745098043" alpha="1" colorSpace="calibratedRGB"/>
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                                </state>
-                                <state key="highlighted">
-                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <connections>
                                     <segue destination="wka-yG-7pe" kind="push" identifier="toSelectionScreen" id="ikw-GK-xXo"/>
@@ -759,18 +713,18 @@ You can email the copyright holder to: soporte.afirma@seap.minhap.es.</string>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <constraints>
-                            <constraint firstItem="QP4-OJ-ffc" firstAttribute="top" secondItem="wiD-pw-MlF" secondAttribute="bottom" type="default" id="6cS-7M-k8g"/>
-                            <constraint firstItem="QP4-OJ-ffc" firstAttribute="leading" secondItem="BLw-aA-1Ba" secondAttribute="leading" type="default" id="Cvl-3k-rri"/>
-                            <constraint firstItem="bSd-sJ-dwW" firstAttribute="top" secondItem="BLw-aA-1Ba" secondAttribute="top" constant="20" symbolic="YES" type="default" id="HfV-4R-QBk"/>
-                            <constraint firstItem="wiD-pw-MlF" firstAttribute="leading" secondItem="BLw-aA-1Ba" secondAttribute="leading" constant="20" symbolic="YES" type="default" id="NhC-fe-1Ia"/>
-                            <constraint firstItem="bSd-sJ-dwW" firstAttribute="leading" secondItem="BLw-aA-1Ba" secondAttribute="leading" constant="20" symbolic="YES" type="default" id="QHN-Fo-ciE"/>
+                            <constraint firstItem="QP4-OJ-ffc" firstAttribute="top" secondItem="wiD-pw-MlF" secondAttribute="bottom" id="6cS-7M-k8g"/>
+                            <constraint firstItem="QP4-OJ-ffc" firstAttribute="leading" secondItem="BLw-aA-1Ba" secondAttribute="leading" id="Cvl-3k-rri"/>
+                            <constraint firstItem="bSd-sJ-dwW" firstAttribute="top" secondItem="BLw-aA-1Ba" secondAttribute="top" constant="20" symbolic="YES" id="HfV-4R-QBk"/>
+                            <constraint firstItem="wiD-pw-MlF" firstAttribute="leading" secondItem="BLw-aA-1Ba" secondAttribute="leading" constant="20" symbolic="YES" id="NhC-fe-1Ia"/>
+                            <constraint firstItem="bSd-sJ-dwW" firstAttribute="leading" secondItem="BLw-aA-1Ba" secondAttribute="leading" constant="20" symbolic="YES" id="QHN-Fo-ciE"/>
                             <constraint firstItem="WrM-2I-hjk" firstAttribute="top" secondItem="BLw-aA-1Ba" secondAttribute="top" constant="37" id="Ray-yY-I1Z"/>
-                            <constraint firstItem="wiD-pw-MlF" firstAttribute="top" secondItem="bSd-sJ-dwW" secondAttribute="bottom" constant="8" symbolic="YES" type="default" id="X9S-mz-AV4"/>
-                            <constraint firstAttribute="trailing" secondItem="wiD-pw-MlF" secondAttribute="trailing" constant="20" symbolic="YES" type="default" id="fMa-wf-SkD"/>
-                            <constraint firstAttribute="trailing" secondItem="bSd-sJ-dwW" secondAttribute="trailing" constant="20" symbolic="YES" type="default" id="hEr-J0-m78"/>
-                            <constraint firstItem="QP4-OJ-ffc" firstAttribute="trailing" secondItem="BLw-aA-1Ba" secondAttribute="trailing" type="default" id="hgQ-t8-sMw"/>
+                            <constraint firstItem="wiD-pw-MlF" firstAttribute="top" secondItem="bSd-sJ-dwW" secondAttribute="bottom" constant="8" symbolic="YES" id="X9S-mz-AV4"/>
+                            <constraint firstAttribute="trailing" secondItem="wiD-pw-MlF" secondAttribute="trailing" constant="20" symbolic="YES" id="fMa-wf-SkD"/>
+                            <constraint firstAttribute="trailing" secondItem="bSd-sJ-dwW" secondAttribute="trailing" constant="20" symbolic="YES" id="hEr-J0-m78"/>
+                            <constraint firstItem="QP4-OJ-ffc" firstAttribute="trailing" secondItem="BLw-aA-1Ba" secondAttribute="trailing" id="hgQ-t8-sMw"/>
                             <constraint firstItem="WrM-2I-hjk" firstAttribute="leading" secondItem="BLw-aA-1Ba" secondAttribute="leading" constant="51" id="iWT-RI-1mA"/>
-                            <constraint firstItem="QP4-OJ-ffc" firstAttribute="bottom" secondItem="BLw-aA-1Ba" secondAttribute="bottom" type="default" id="q1v-O0-30A"/>
+                            <constraint firstItem="QP4-OJ-ffc" firstAttribute="bottom" secondItem="BLw-aA-1Ba" secondAttribute="bottom" id="q1v-O0-30A"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="kAf-zR-xcA"/>
@@ -788,8 +742,12 @@ You can email the copyright holder to: soporte.afirma@seap.minhap.es.</string>
         <scene sceneID="3cz-T4-rqF">
             <objects>
                 <viewController id="rBH-2e-2uT" customClass="AOAcercadeViewController" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="rAB-ry-KIR"/>
+                        <viewControllerLayoutGuide type="bottom" id="PZe-5h-2B3"/>
+                    </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="Mrj-BF-UW4">
-                        <rect key="frame" x="0.0" y="20" width="320" height="548"/>
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <imageView userInteractionEnabled="NO" contentMode="scaleToFill" image="logo_cliente.png" translatesAutoresizingMaskIntoConstraints="NO" id="cba-qE-XD9">
@@ -809,7 +767,7 @@ You can email the copyright holder to: soporte.afirma@seap.minhap.es.</string>
                                 <nil key="highlightedColor"/>
                             </label>
                             <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" usesAttributedText="YES" translatesAutoresizingMaskIntoConstraints="NO" id="cQ1-o8-KIY">
-                                <rect key="frame" x="20" y="152" width="280" height="323"/>
+                                <rect key="frame" x="20" y="152" width="280" height="343"/>
                                 <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                 <attributedString key="attributedText">
                                     <fragment>
@@ -830,31 +788,7 @@ In order to sign files hosted in the cloud you can use the option "Sign" in the 
 
 In order to sign web procedures, the procedure has to support signing electronically with "mobile Cliente @firma". In the affirmative case, once the procedure is finished in your browser, the application will be launched allowing the user to select the certificate and complete the signing operation.
 
- 
-</string>
-                                        <attributes>
-                                            <font key="NSFont" size="14" name="Helvetica"/>
-                                            <font key="NSOriginalFont" size="14" name="Helvetica"/>
-                                            <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="leftToRight" paragraphSpacing="16" defaultTabInterval="36">
-                                                <tabStops/>
-                                            </paragraphStyle>
-                                        </attributes>
-                                    </fragment>
-                                    <fragment content="Why do I have to enter my Dropbox credentials? ">
-                                        <attributes>
-                                            <font key="NSFont" size="14" name="Helvetica-Bold"/>
-                                            <font key="NSOriginalFont" size="14" name="Helvetica-Bold"/>
-                                            <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="leftToRight" paragraphSpacing="16" defaultTabInterval="36">
-                                                <tabStops/>
-                                            </paragraphStyle>
-                                        </attributes>
-                                    </fragment>
-                                    <fragment>
-                                        <string key="content">
-  
-Cliente @firma for Apple iOS signs files hosted in the cloud (Dropbox by default), hence it needs to access your personal files from your cloud folder. The authentication procedure uses Dropbox services, therefore your username or password will never be used directly nor stored by Cliente @firma for Applet iOS.
-
-</string>
+ </string>
                                         <attributes>
                                             <font key="NSFont" size="14" name="Helvetica"/>
                                             <font key="NSOriginalFont" size="14" name="Helvetica"/>
@@ -938,34 +872,24 @@ Imported certificates to Cliente @firma for Apple iOS are used only in websites 
                                 <dataDetectorType key="dataDetectorTypes" link="YES"/>
                             </textView>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="BA1-VQ-s7p">
-                                <rect key="frame" x="20" y="483" width="280" height="46"/>
+                                <rect key="frame" x="20" y="503" width="280" height="45"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="45" id="440-Pt-h8i"/>
                                 </constraints>
-                                <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
                                 <state key="normal" title="Back" image="flecha.png">
-                                    <color key="titleColor" red="0.19607843137254902" green="0.30980392156862746" blue="0.52156862745098043" alpha="1" colorSpace="calibratedRGB"/>
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                                </state>
-                                <state key="highlighted">
-                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <connections>
                                     <segue destination="UWq-gP-qqr" kind="custom" identifier="toMenuScreen" customClass="AOCustomSegue" id="8S0-rp-m6f"/>
                                 </connections>
                             </button>
                             <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="g7X-Ex-PEI">
-                                <rect key="frame" x="0.0" y="505" width="73" height="44"/>
+                                <rect key="frame" x="0.0" y="538" width="73" height="30"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="73" id="wzY-Ai-j4T"/>
                                 </constraints>
-                                <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
                                 <state key="normal" title="Al Inicio">
-                                    <color key="titleColor" red="0.19607843137254902" green="0.30980392156862746" blue="0.52156862745098043" alpha="1" colorSpace="calibratedRGB"/>
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                                </state>
-                                <state key="highlighted">
-                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <connections>
                                     <segue destination="VdI-Vu-J89" kind="push" identifier="toFirstScreen" id="OaG-Hs-EQ1"/>
@@ -974,21 +898,21 @@ Imported certificates to Cliente @firma for Apple iOS are used only in websites 
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <constraints>
-                            <constraint firstAttribute="trailing" secondItem="cba-qE-XD9" secondAttribute="trailing" constant="20" symbolic="YES" type="default" id="3y4-vU-C3z"/>
-                            <constraint firstAttribute="trailing" secondItem="cQ1-o8-KIY" secondAttribute="trailing" constant="20" symbolic="YES" type="default" id="HzW-6R-CdK"/>
-                            <constraint firstItem="cQ1-o8-KIY" firstAttribute="leading" secondItem="Mrj-BF-UW4" secondAttribute="leading" constant="20" symbolic="YES" type="default" id="KfU-Sh-gkn"/>
-                            <constraint firstItem="cba-qE-XD9" firstAttribute="leading" secondItem="Mrj-BF-UW4" secondAttribute="leading" constant="20" symbolic="YES" type="default" id="Onk-uj-xvP"/>
-                            <constraint firstItem="BA1-VQ-s7p" firstAttribute="top" secondItem="cQ1-o8-KIY" secondAttribute="bottom" constant="8" symbolic="YES" type="default" id="Tc8-ed-hnc"/>
-                            <constraint firstItem="cba-qE-XD9" firstAttribute="top" secondItem="Mrj-BF-UW4" secondAttribute="top" constant="20" symbolic="YES" type="default" id="Xww-pf-3Wb"/>
-                            <constraint firstItem="cQ1-o8-KIY" firstAttribute="top" secondItem="TeM-Kz-q5J" secondAttribute="bottom" constant="8" symbolic="YES" type="default" id="ZI6-Ql-rGO"/>
-                            <constraint firstAttribute="bottom" secondItem="BA1-VQ-s7p" secondAttribute="bottom" constant="20" symbolic="YES" type="default" id="arh-xt-5C4"/>
-                            <constraint firstItem="BA1-VQ-s7p" firstAttribute="leading" secondItem="Mrj-BF-UW4" secondAttribute="leading" constant="20" symbolic="YES" type="default" id="jaW-RO-BEq"/>
-                            <constraint firstItem="g7X-Ex-PEI" firstAttribute="bottom" secondItem="Mrj-BF-UW4" secondAttribute="bottom" type="default" id="oY2-F5-E0P"/>
-                            <constraint firstItem="TeM-Kz-q5J" firstAttribute="top" secondItem="cba-qE-XD9" secondAttribute="bottom" constant="8" symbolic="YES" type="default" id="rKT-rM-i7b"/>
-                            <constraint firstItem="TeM-Kz-q5J" firstAttribute="leading" secondItem="Mrj-BF-UW4" secondAttribute="leading" constant="20" symbolic="YES" type="default" id="slk-nK-ZV4"/>
-                            <constraint firstAttribute="trailing" secondItem="BA1-VQ-s7p" secondAttribute="trailing" constant="20" symbolic="YES" type="default" id="wcc-h6-uZi"/>
-                            <constraint firstItem="g7X-Ex-PEI" firstAttribute="leading" secondItem="Mrj-BF-UW4" secondAttribute="leading" type="default" id="y0G-lI-cXL"/>
-                            <constraint firstAttribute="trailing" secondItem="TeM-Kz-q5J" secondAttribute="trailing" constant="20" symbolic="YES" type="default" id="yNP-Xr-kbS"/>
+                            <constraint firstAttribute="trailing" secondItem="cba-qE-XD9" secondAttribute="trailing" constant="20" symbolic="YES" id="3y4-vU-C3z"/>
+                            <constraint firstAttribute="trailing" secondItem="cQ1-o8-KIY" secondAttribute="trailing" constant="20" symbolic="YES" id="HzW-6R-CdK"/>
+                            <constraint firstItem="cQ1-o8-KIY" firstAttribute="leading" secondItem="Mrj-BF-UW4" secondAttribute="leading" constant="20" symbolic="YES" id="KfU-Sh-gkn"/>
+                            <constraint firstItem="cba-qE-XD9" firstAttribute="leading" secondItem="Mrj-BF-UW4" secondAttribute="leading" constant="20" symbolic="YES" id="Onk-uj-xvP"/>
+                            <constraint firstItem="BA1-VQ-s7p" firstAttribute="top" secondItem="cQ1-o8-KIY" secondAttribute="bottom" constant="8" symbolic="YES" id="Tc8-ed-hnc"/>
+                            <constraint firstItem="cba-qE-XD9" firstAttribute="top" secondItem="Mrj-BF-UW4" secondAttribute="top" constant="20" symbolic="YES" id="Xww-pf-3Wb"/>
+                            <constraint firstItem="cQ1-o8-KIY" firstAttribute="top" secondItem="TeM-Kz-q5J" secondAttribute="bottom" constant="8" symbolic="YES" id="ZI6-Ql-rGO"/>
+                            <constraint firstAttribute="bottom" secondItem="BA1-VQ-s7p" secondAttribute="bottom" constant="20" symbolic="YES" id="arh-xt-5C4"/>
+                            <constraint firstItem="BA1-VQ-s7p" firstAttribute="leading" secondItem="Mrj-BF-UW4" secondAttribute="leading" constant="20" symbolic="YES" id="jaW-RO-BEq"/>
+                            <constraint firstItem="g7X-Ex-PEI" firstAttribute="bottom" secondItem="Mrj-BF-UW4" secondAttribute="bottom" id="oY2-F5-E0P"/>
+                            <constraint firstItem="TeM-Kz-q5J" firstAttribute="top" secondItem="cba-qE-XD9" secondAttribute="bottom" constant="8" symbolic="YES" id="rKT-rM-i7b"/>
+                            <constraint firstItem="TeM-Kz-q5J" firstAttribute="leading" secondItem="Mrj-BF-UW4" secondAttribute="leading" constant="20" symbolic="YES" id="slk-nK-ZV4"/>
+                            <constraint firstAttribute="trailing" secondItem="BA1-VQ-s7p" secondAttribute="trailing" constant="20" symbolic="YES" id="wcc-h6-uZi"/>
+                            <constraint firstItem="g7X-Ex-PEI" firstAttribute="leading" secondItem="Mrj-BF-UW4" secondAttribute="leading" id="y0G-lI-cXL"/>
+                            <constraint firstAttribute="trailing" secondItem="TeM-Kz-q5J" secondAttribute="trailing" constant="20" symbolic="YES" id="yNP-Xr-kbS"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="oHq-JL-aC4"/>
@@ -1001,8 +925,12 @@ Imported certificates to Cliente @firma for Apple iOS are used only in websites 
         <scene sceneID="exg-cD-9GT">
             <objects>
                 <viewController id="Ash-QT-aqD" customClass="AOAcercadeViewController" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="ZFc-kU-3QT"/>
+                        <viewControllerLayoutGuide type="bottom" id="3ss-EX-9cp"/>
+                    </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="tzm-wj-1kk">
-                        <rect key="frame" x="0.0" y="20" width="320" height="548"/>
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <imageView userInteractionEnabled="NO" contentMode="scaleToFill" image="logo_cliente.png" translatesAutoresizingMaskIntoConstraints="NO" id="ZCk-YQ-PIt">
@@ -1022,41 +950,31 @@ Imported certificates to Cliente @firma for Apple iOS are used only in websites 
                                 <nil key="highlightedColor"/>
                             </label>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="NTn-AP-FBL">
-                                <rect key="frame" x="20" y="483" width="280" height="46"/>
+                                <rect key="frame" x="20" y="503" width="280" height="45"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="45" id="BHy-6C-oor"/>
                                 </constraints>
-                                <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
                                 <state key="normal" title="Back" image="flecha.png">
-                                    <color key="titleColor" red="0.19607843137254902" green="0.30980392156862746" blue="0.52156862745098043" alpha="1" colorSpace="calibratedRGB"/>
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                                </state>
-                                <state key="highlighted">
-                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <connections>
                                     <segue destination="UWq-gP-qqr" kind="custom" identifier="toMenuScreen" customClass="AOCustomSegue" id="ora-yP-wgy"/>
                                 </connections>
                             </button>
                             <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="jcT-IC-cFK">
-                                <rect key="frame" x="0.0" y="505" width="73" height="44"/>
+                                <rect key="frame" x="0.0" y="538" width="73" height="30"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="73" id="nuL-DX-wfW"/>
                                 </constraints>
-                                <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
                                 <state key="normal" title="Al Inicio">
-                                    <color key="titleColor" red="0.19607843137254902" green="0.30980392156862746" blue="0.52156862745098043" alpha="1" colorSpace="calibratedRGB"/>
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                                </state>
-                                <state key="highlighted">
-                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <connections>
                                     <segue destination="VdI-Vu-J89" kind="push" id="Gmh-n5-WMS"/>
                                 </connections>
                             </button>
                             <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="1Gb-dZ-oj2">
-                                <rect key="frame" x="20" y="152" width="280" height="300"/>
+                                <rect key="frame" x="20" y="152" width="280" height="320"/>
                                 <subviews>
                                     <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" scrollEnabled="NO" editable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="PvP-Nn-Iiw">
                                         <rect key="frame" x="72" y="0.0" width="214" height="102"/>
@@ -1093,18 +1011,13 @@ Imported certificates to Cliente @firma for Apple iOS are used only in websites 
                                         </constraints>
                                     </imageView>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="w61-eW-cwu">
-                                        <rect key="frame" x="40" y="222" width="201" height="43"/>
+                                        <rect key="frame" x="40" y="222" width="201" height="42"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="42" id="8Vt-QL-w7Y"/>
                                             <constraint firstAttribute="width" constant="201" id="uPj-8Y-Aao"/>
                                         </constraints>
-                                        <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
                                         <state key="normal" title="  More information" image="information_icon.png">
-                                            <color key="titleColor" red="0.19607843137254902" green="0.30980392156862746" blue="0.52156862745098043" alpha="1" colorSpace="calibratedRGB"/>
                                             <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                                        </state>
-                                        <state key="highlighted">
-                                            <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                         </state>
                                         <connections>
                                             <action selector="buttonPressed:" destination="Ash-QT-aqD" eventType="touchUpInside" id="AhY-I8-YMC"/>
@@ -1112,40 +1025,40 @@ Imported certificates to Cliente @firma for Apple iOS are used only in websites 
                                     </button>
                                 </subviews>
                                 <constraints>
-                                    <constraint firstItem="w61-eW-cwu" firstAttribute="centerX" secondItem="1Gb-dZ-oj2" secondAttribute="centerX" type="default" id="7pc-w1-VaT"/>
+                                    <constraint firstItem="w61-eW-cwu" firstAttribute="centerX" secondItem="1Gb-dZ-oj2" secondAttribute="centerX" id="7pc-w1-VaT"/>
                                     <constraint firstItem="Ye7-k1-MT1" firstAttribute="leading" secondItem="1Gb-dZ-oj2" secondAttribute="leading" constant="6" id="ElN-Id-4nr"/>
-                                    <constraint firstItem="Hft-Uk-v6U" firstAttribute="leading" secondItem="4lF-8S-Zte" secondAttribute="trailing" constant="8" symbolic="YES" type="default" id="KLr-Bb-IOh"/>
-                                    <constraint firstItem="4lF-8S-Zte" firstAttribute="leading" secondItem="Ye7-k1-MT1" secondAttribute="leading" type="default" id="P2X-1b-GxW"/>
-                                    <constraint firstItem="4lF-8S-Zte" firstAttribute="centerY" secondItem="Hft-Uk-v6U" secondAttribute="centerY" type="default" id="PFH-Nt-3f7"/>
+                                    <constraint firstItem="Hft-Uk-v6U" firstAttribute="leading" secondItem="4lF-8S-Zte" secondAttribute="trailing" constant="8" symbolic="YES" id="KLr-Bb-IOh"/>
+                                    <constraint firstItem="4lF-8S-Zte" firstAttribute="leading" secondItem="Ye7-k1-MT1" secondAttribute="leading" id="P2X-1b-GxW"/>
+                                    <constraint firstItem="4lF-8S-Zte" firstAttribute="centerY" secondItem="Hft-Uk-v6U" secondAttribute="centerY" id="PFH-Nt-3f7"/>
                                     <constraint firstAttribute="bottom" secondItem="w61-eW-cwu" secondAttribute="bottom" constant="36" id="Q8h-Gu-Slh"/>
-                                    <constraint firstItem="Hft-Uk-v6U" firstAttribute="top" secondItem="PvP-Nn-Iiw" secondAttribute="bottom" constant="8" symbolic="YES" type="default" id="QzI-F0-1ZT"/>
-                                    <constraint firstItem="PvP-Nn-Iiw" firstAttribute="top" secondItem="1Gb-dZ-oj2" secondAttribute="top" type="default" id="UuD-0q-cDu"/>
-                                    <constraint firstItem="w61-eW-cwu" firstAttribute="top" secondItem="Hft-Uk-v6U" secondAttribute="bottom" constant="8" symbolic="YES" type="default" id="V46-Zh-qbl"/>
-                                    <constraint firstItem="Hft-Uk-v6U" firstAttribute="trailing" secondItem="PvP-Nn-Iiw" secondAttribute="trailing" type="default" id="Wma-5f-s7h"/>
-                                    <constraint firstItem="PvP-Nn-Iiw" firstAttribute="centerY" secondItem="Ye7-k1-MT1" secondAttribute="centerY" type="default" id="ibC-PW-t0b"/>
-                                    <constraint firstItem="Hft-Uk-v6U" firstAttribute="leading" secondItem="PvP-Nn-Iiw" secondAttribute="leading" type="default" id="lvW-d1-UqC"/>
-                                    <constraint firstItem="PvP-Nn-Iiw" firstAttribute="leading" secondItem="Ye7-k1-MT1" secondAttribute="trailing" constant="8" symbolic="YES" type="default" id="tSi-o8-odb"/>
+                                    <constraint firstItem="Hft-Uk-v6U" firstAttribute="top" secondItem="PvP-Nn-Iiw" secondAttribute="bottom" constant="8" symbolic="YES" id="QzI-F0-1ZT"/>
+                                    <constraint firstItem="PvP-Nn-Iiw" firstAttribute="top" secondItem="1Gb-dZ-oj2" secondAttribute="top" id="UuD-0q-cDu"/>
+                                    <constraint firstItem="w61-eW-cwu" firstAttribute="top" secondItem="Hft-Uk-v6U" secondAttribute="bottom" constant="8" symbolic="YES" id="V46-Zh-qbl"/>
+                                    <constraint firstItem="Hft-Uk-v6U" firstAttribute="trailing" secondItem="PvP-Nn-Iiw" secondAttribute="trailing" id="Wma-5f-s7h"/>
+                                    <constraint firstItem="PvP-Nn-Iiw" firstAttribute="centerY" secondItem="Ye7-k1-MT1" secondAttribute="centerY" id="ibC-PW-t0b"/>
+                                    <constraint firstItem="Hft-Uk-v6U" firstAttribute="leading" secondItem="PvP-Nn-Iiw" secondAttribute="leading" id="lvW-d1-UqC"/>
+                                    <constraint firstItem="PvP-Nn-Iiw" firstAttribute="leading" secondItem="Ye7-k1-MT1" secondAttribute="trailing" constant="8" symbolic="YES" id="tSi-o8-odb"/>
                                     <constraint firstAttribute="trailing" secondItem="PvP-Nn-Iiw" secondAttribute="trailing" constant="-6" id="zjG-G8-bRB"/>
                                 </constraints>
                             </scrollView>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <constraints>
-                            <constraint firstItem="ZCk-YQ-PIt" firstAttribute="top" secondItem="tzm-wj-1kk" secondAttribute="top" constant="20" symbolic="YES" type="default" id="5Ee-62-TP6"/>
-                            <constraint firstItem="NTn-AP-FBL" firstAttribute="leading" secondItem="tzm-wj-1kk" secondAttribute="leading" constant="20" symbolic="YES" type="default" id="7TI-KV-H9l"/>
-                            <constraint firstItem="ZCk-YQ-PIt" firstAttribute="leading" secondItem="tzm-wj-1kk" secondAttribute="leading" constant="20" symbolic="YES" type="default" id="9Ke-eI-pxC"/>
+                            <constraint firstItem="ZCk-YQ-PIt" firstAttribute="top" secondItem="tzm-wj-1kk" secondAttribute="top" constant="20" symbolic="YES" id="5Ee-62-TP6"/>
+                            <constraint firstItem="NTn-AP-FBL" firstAttribute="leading" secondItem="tzm-wj-1kk" secondAttribute="leading" constant="20" symbolic="YES" id="7TI-KV-H9l"/>
+                            <constraint firstItem="ZCk-YQ-PIt" firstAttribute="leading" secondItem="tzm-wj-1kk" secondAttribute="leading" constant="20" symbolic="YES" id="9Ke-eI-pxC"/>
                             <constraint firstAttribute="bottom" secondItem="1Gb-dZ-oj2" secondAttribute="bottom" constant="96" id="DTQ-d0-jBv"/>
-                            <constraint firstAttribute="trailing" secondItem="1Gb-dZ-oj2" secondAttribute="trailing" constant="20" symbolic="YES" type="default" id="HOD-Ty-38a"/>
-                            <constraint firstItem="cDW-CP-g9m" firstAttribute="top" secondItem="ZCk-YQ-PIt" secondAttribute="bottom" constant="8" symbolic="YES" type="default" id="NKU-lg-Xc5"/>
-                            <constraint firstItem="1Gb-dZ-oj2" firstAttribute="top" secondItem="cDW-CP-g9m" secondAttribute="bottom" constant="8" symbolic="YES" type="default" id="R3c-hz-eYU"/>
-                            <constraint firstItem="jcT-IC-cFK" firstAttribute="leading" secondItem="tzm-wj-1kk" secondAttribute="leading" type="default" id="SGJ-Io-VOv"/>
-                            <constraint firstAttribute="trailing" secondItem="NTn-AP-FBL" secondAttribute="trailing" constant="20" symbolic="YES" type="default" id="UNI-Xm-yby"/>
-                            <constraint firstAttribute="trailing" secondItem="cDW-CP-g9m" secondAttribute="trailing" constant="20" symbolic="YES" type="default" id="Wfp-Zp-ugX"/>
-                            <constraint firstAttribute="bottom" secondItem="NTn-AP-FBL" secondAttribute="bottom" constant="20" symbolic="YES" type="default" id="Z8x-Tz-526"/>
-                            <constraint firstItem="1Gb-dZ-oj2" firstAttribute="leading" secondItem="tzm-wj-1kk" secondAttribute="leading" constant="20" symbolic="YES" type="default" id="gTu-lT-zQo"/>
-                            <constraint firstAttribute="trailing" secondItem="ZCk-YQ-PIt" secondAttribute="trailing" constant="20" symbolic="YES" type="default" id="upd-04-dVq"/>
-                            <constraint firstItem="cDW-CP-g9m" firstAttribute="leading" secondItem="tzm-wj-1kk" secondAttribute="leading" constant="20" symbolic="YES" type="default" id="wXf-KM-yWT"/>
-                            <constraint firstItem="jcT-IC-cFK" firstAttribute="bottom" secondItem="tzm-wj-1kk" secondAttribute="bottom" type="default" id="wdo-W7-wQM"/>
+                            <constraint firstAttribute="trailing" secondItem="1Gb-dZ-oj2" secondAttribute="trailing" constant="20" symbolic="YES" id="HOD-Ty-38a"/>
+                            <constraint firstItem="cDW-CP-g9m" firstAttribute="top" secondItem="ZCk-YQ-PIt" secondAttribute="bottom" constant="8" symbolic="YES" id="NKU-lg-Xc5"/>
+                            <constraint firstItem="1Gb-dZ-oj2" firstAttribute="top" secondItem="cDW-CP-g9m" secondAttribute="bottom" constant="8" symbolic="YES" id="R3c-hz-eYU"/>
+                            <constraint firstItem="jcT-IC-cFK" firstAttribute="leading" secondItem="tzm-wj-1kk" secondAttribute="leading" id="SGJ-Io-VOv"/>
+                            <constraint firstAttribute="trailing" secondItem="NTn-AP-FBL" secondAttribute="trailing" constant="20" symbolic="YES" id="UNI-Xm-yby"/>
+                            <constraint firstAttribute="trailing" secondItem="cDW-CP-g9m" secondAttribute="trailing" constant="20" symbolic="YES" id="Wfp-Zp-ugX"/>
+                            <constraint firstAttribute="bottom" secondItem="NTn-AP-FBL" secondAttribute="bottom" constant="20" symbolic="YES" id="Z8x-Tz-526"/>
+                            <constraint firstItem="1Gb-dZ-oj2" firstAttribute="leading" secondItem="tzm-wj-1kk" secondAttribute="leading" constant="20" symbolic="YES" id="gTu-lT-zQo"/>
+                            <constraint firstAttribute="trailing" secondItem="ZCk-YQ-PIt" secondAttribute="trailing" constant="20" symbolic="YES" id="upd-04-dVq"/>
+                            <constraint firstItem="cDW-CP-g9m" firstAttribute="leading" secondItem="tzm-wj-1kk" secondAttribute="leading" constant="20" symbolic="YES" id="wXf-KM-yWT"/>
+                            <constraint firstItem="jcT-IC-cFK" firstAttribute="bottom" secondItem="tzm-wj-1kk" secondAttribute="bottom" id="wdo-W7-wQM"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="ab0-94-Zr4"/>
@@ -1170,13 +1083,10 @@ Imported certificates to Cliente @firma for Apple iOS are used only in websites 
     <simulatedMetricsContainer key="defaultSimulatedMetrics">
         <simulatedStatusBarMetrics key="statusBar"/>
         <simulatedOrientationMetrics key="orientation"/>
-        <simulatedScreenMetrics key="destination" type="retina4">
-            <size key="portraitSize" width="320" height="568"/>
-            <size key="landscapeSize" width="568" height="320"/>
-        </simulatedScreenMetrics>
+        <simulatedScreenMetrics key="destination" type="retina4"/>
     </simulatedMetricsContainer>
     <inferredMetricsTieBreakers>
-        <segue reference="XSt-c3-X0e"/>
+        <segue reference="tOZ-kr-G8o"/>
         <segue reference="95b-rT-XO6"/>
     </inferredMetricsTieBreakers>
 </document>

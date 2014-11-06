@@ -39,32 +39,13 @@ NSMutableArray *tableData = NULL;
     self.tblViewHelp.layer.cornerRadius = 6.0f;
     self.tblViewHelp.scrollEnabled=NO;
     
-    /*
-    //definimos la seleccion de la tabla
-    if([tableData count]>0){
-        //ponemos el primer elemento seleccionado
-        NSIndexPath *indexPath=[NSIndexPath indexPathForRow:0 inSection:0];
-        [tblViewHelp selectRowAtIndexPath:indexPath animated:YES  scrollPosition:UITableViewScrollPositionBottom];
-    }
-    */
-    
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onGoingToBackGround:) name:UIApplicationDidEnterBackgroundNotification object:nil];
-    
-     self.screenName = @"IOS AOHelpMenuViewController - Help menu";
+    self.screenName = @"IOS AOHelpMenuViewController - Help menu";
 
 }
-
-//cuando se pulsa el botón del centro
-/*
--(void)onGoingToBackGround:(NSNotification*) notification {
-    @try {
-        [self performSegueWithIdentifier:@"toFirstScreen" sender:self];
-    }
-    @catch (NSException *e) {
-        // Se ignora
-    }
+- (IBAction)goBackHome:(id)sender {
+    [self.navigationController popToRootViewControllerAnimated:YES];
 }
-*/
+
 - (void)didReceiveMemoryWarning
 {
     [super didReceiveMemoryWarning];
@@ -137,7 +118,7 @@ NSMutableArray *tableData = NULL;
 //Nos devuelve la fila seleccionada.
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    int fila = indexPath.row;
+    int fila = (int)indexPath.row;
     @try {
         if(fila==0)
             [self performSegueWithIdentifier:@"toAcerca" sender:self];

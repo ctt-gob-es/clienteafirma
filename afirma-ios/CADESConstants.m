@@ -8,9 +8,6 @@
 
 @implementation CADESConstants
 
-// URL_SERVER
-//NSString *const URL_SERVER = @"http://172.24.36.40:8080/SignFolderMobileProxy/SignatureService";
-
 NSString *const OPERATION_SIGN = @"sign";
 NSString *const OPERATION_COSIGN = @"cosign";
 NSString *const OPERATION_COUNTERSIGN = @"countersign";

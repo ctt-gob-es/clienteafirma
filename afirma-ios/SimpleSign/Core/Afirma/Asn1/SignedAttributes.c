@@ -20,14 +20,17 @@ static asn_TYPE_member_t asn_MBR_SignedAttributes_1[] = {
 		""
 		},
 };
+
 static ber_tlv_tag_t asn_DEF_SignedAttributes_tags_1[] = {
 	(ASN_TAG_CLASS_UNIVERSAL | (17 << 2))
 };
+
 static asn_SET_OF_specifics_t asn_SPC_SignedAttributes_specs_1 = {
 	sizeof(struct SignedAttributes),
 	offsetof(struct SignedAttributes, _asn_ctx),
 	0,	/* XER encoding is XMLDelimitedItemList */
 };
+
 asn_TYPE_descriptor_t asn_DEF_SignedAttributes = {
 	"SignedAttributes",
 	"SignedAttributes",

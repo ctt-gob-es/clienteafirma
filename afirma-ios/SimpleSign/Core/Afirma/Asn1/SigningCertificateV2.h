@@ -15,6 +15,7 @@
 #include "asn_SEQUENCE_OF.h"
 #include "constr_SEQUENCE_OF.h"
 #include "constr_SEQUENCE.h"
+#include "SigningCertificateCommonTypes.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -26,18 +27,8 @@ struct PolicyInformation;
 
 /* SigningCertificateV2 */
 typedef struct SigningCertificateV2 {
-	struct certs {
-		A_SEQUENCE_OF(struct ESSCertIDv2) list;
-		
-		/* Context for parsing across buffer boundaries */
-		asn_struct_ctx_t _asn_ctx;
-	} certs;
-	struct policies {
-		A_SEQUENCE_OF(struct PolicyInformation) list;
-		
-		/* Context for parsing across buffer boundaries */
-		asn_struct_ctx_t _asn_ctx;
-	} *policies;
+	struct certs certs;
+	struct policies *policies;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;

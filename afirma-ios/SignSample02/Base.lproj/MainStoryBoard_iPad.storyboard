@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="2.0" toolsVersion="6205" systemVersion="14A314h" targetRuntime="iOS.CocoaTouch.iPad" variant="6xAndEarlier" propertyAccessControl="none" promptedForUpgradeToXcode5="NO" initialViewController="oXt-Wl-tio">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="6245" systemVersion="13F34" targetRuntime="iOS.CocoaTouch.iPad" propertyAccessControl="none" initialViewController="oXt-Wl-tio">
     <dependencies>
-        <deployment defaultVersion="1536" identifier="iOS"/>
-        <development version="4600" identifier="xcode"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6198"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6238"/>
     </dependencies>
     <scenes>
         <!--Navigation Controller-->
@@ -26,7 +24,7 @@
             <objects>
                 <viewController id="MFF-BY-lPu" customClass="AOManagerStoreScreenViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="axD-Hp-M44">
-                        <rect key="frame" x="0.0" y="20" width="768" height="1004"/>
+                        <rect key="frame" x="0.0" y="0.0" width="768" height="1024"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" id="CJb-lz-UbE">
@@ -38,18 +36,13 @@
                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                             </textView>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="dgm-t5-yi3">
-                                <rect key="frame" x="20" y="938" width="728" height="46"/>
+                                <rect key="frame" x="20" y="957" width="728" height="46"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
-                                <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
                                 <state key="normal" title="Volver" image="flecha.png">
-                                    <color key="titleColor" red="0.19607843137254902" green="0.30980392156862746" blue="0.52156862745098043" alpha="1" colorSpace="calibratedRGB"/>
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
-                                <state key="highlighted">
-                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                </state>
                                 <connections>
-                                    <segue destination="FiJ-J0-m6p" kind="custom" identifier="toFirstScreen" customClass="AOCustomSegue" id="1rl-H1-e1G"/>
+                                    <action selector="goBackHome:" destination="MFF-BY-lPu" eventType="touchUpInside" id="cgj-bN-eQq"/>
                                 </connections>
                             </button>
                             <imageView userInteractionEnabled="NO" contentMode="scaleToFill" image="logo_cliente.png" id="GcC-e7-o44">
@@ -68,13 +61,8 @@
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="l0B-qj-l6s">
                                 <rect key="frame" x="267" y="460" width="234" height="44"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
                                 <state key="normal" title="Borrar almacén seleccionado">
-                                    <color key="titleColor" red="0.19607843137254902" green="0.30980392156862746" blue="0.52156862745098043" alpha="1" colorSpace="calibratedRGB"/>
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                                </state>
-                                <state key="highlighted">
-                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <connections>
                                     <action selector="deleteButtonPressed:" destination="MFF-BY-lPu" eventType="touchUpInside" id="LZ1-EV-m3T"/>
@@ -98,11 +86,11 @@
             <objects>
                 <viewController id="FiJ-J0-m6p" customClass="AOAboutViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="FUv-99-v4I">
-                        <rect key="frame" x="0.0" y="20" width="768" height="1004"/>
+                        <rect key="frame" x="0.0" y="0.0" width="768" height="1024"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" scrollEnabled="NO" showsHorizontalScrollIndicator="NO" editable="NO" textAlignment="center" id="8Ub-S5-UfZ">
-                                <rect key="frame" x="148" y="113" width="469" height="819"/>
+                                <rect key="frame" x="148" y="113" width="469" height="839"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                 <string key="text">Bienvenido a "Cliente @firma iOS" 1.0 (b41)
@@ -125,21 +113,16 @@ Puede contactar con el tenedor de los derechos de copia en la siguiente direcci�
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES"/>
                             </imageView>
                             <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="KoX-uW-hfd">
-                                <rect key="frame" x="21" y="940" width="73" height="44"/>
-                                <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
+                                <rect key="frame" x="21" y="959" width="73" height="44"/>
                                 <state key="normal" title="Al Inicio">
-                                    <color key="titleColor" red="0.19607843137254902" green="0.30980392156862746" blue="0.52156862745098043" alpha="1" colorSpace="calibratedRGB"/>
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                                </state>
-                                <state key="highlighted">
-                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <connections>
                                     <segue destination="BdW-y5-nVW" kind="push" identifier="toSelectionScreen" id="2EB-G0-Tn7"/>
                                 </connections>
                             </button>
                             <tabBar contentMode="scaleToFill" id="mb1-uS-cVi">
-                                <rect key="frame" x="1" y="950" width="768" height="49"/>
+                                <rect key="frame" x="1" y="969" width="768" height="49"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                 <items>
@@ -169,7 +152,7 @@ Puede contactar con el tenedor de los derechos de copia en la siguiente direcci�
             <objects>
                 <viewController id="lDR-zU-wtW" customClass="AOHelpMenuViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="yVZ-nu-b9s">
-                        <rect key="frame" x="0.0" y="20" width="768" height="1004"/>
+                        <rect key="frame" x="0.0" y="0.0" width="768" height="1024"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <imageView userInteractionEnabled="NO" contentMode="scaleToFill" image="logo_cliente.png" id="fkW-Yq-H6E">
@@ -194,7 +177,7 @@ http://administracionelectronica.gob.es/</string>
                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                                 <dataDetectorType key="dataDetectorTypes" link="YES"/>
                             </textView>
-                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" id="F4Y-sM-jtU">
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" id="F4Y-sM-jtU">
                                 <rect key="frame" x="195" y="152" width="381" height="133"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -202,11 +185,10 @@ http://administracionelectronica.gob.es/</string>
                                     <tableViewCell contentMode="scaleToFill" selectionStyle="blue" accessoryType="disclosureIndicator" indentationWidth="10" reuseIdentifier="1" id="Ku1-xw-soW">
                                         <rect key="frame" x="0.0" y="22" width="381" height="44"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                        <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
-                                            <rect key="frame" x="0.0" y="0.0" width="361" height="43"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="Ku1-xw-soW" id="J0m-Jp-eh1">
+                                            <rect key="frame" x="0.0" y="0.0" width="348" height="43"/>
                                             <autoresizingMask key="autoresizingMask"/>
-                                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
-                                        </view>
+                                        </tableViewCellContentView>
                                         <connections>
                                             <segue destination="SYG-om-9yd" kind="push" identifier="toAcerca" id="KYK-aM-rZg"/>
                                         </connections>
@@ -214,11 +196,10 @@ http://administracionelectronica.gob.es/</string>
                                     <tableViewCell contentMode="scaleToFill" selectionStyle="blue" accessoryType="disclosureIndicator" indentationWidth="10" reuseIdentifier="2" id="rJI-Gq-kr1">
                                         <rect key="frame" x="0.0" y="66" width="381" height="44"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                        <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
-                                            <rect key="frame" x="0.0" y="0.0" width="361" height="43"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="rJI-Gq-kr1" id="Tjh-o2-Gi4">
+                                            <rect key="frame" x="0.0" y="0.0" width="348" height="43"/>
                                             <autoresizingMask key="autoresizingMask"/>
-                                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
-                                        </view>
+                                        </tableViewCellContentView>
                                         <connections>
                                             <segue destination="M9t-8B-1DM" kind="push" identifier="toInstalar" id="5nQ-cn-h6d"/>
                                         </connections>
@@ -226,11 +207,10 @@ http://administracionelectronica.gob.es/</string>
                                     <tableViewCell contentMode="scaleToFill" selectionStyle="blue" accessoryType="disclosureIndicator" indentationWidth="10" reuseIdentifier="3" id="WzZ-N5-9l3">
                                         <rect key="frame" x="0.0" y="110" width="381" height="44"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                        <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
-                                            <rect key="frame" x="0.0" y="0.0" width="361" height="43"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="WzZ-N5-9l3" id="x14-ob-Av3">
+                                            <rect key="frame" x="0.0" y="0.0" width="348" height="43"/>
                                             <autoresizingMask key="autoresizingMask"/>
-                                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
-                                        </view>
+                                        </tableViewCellContentView>
                                         <connections>
                                             <segue destination="iX5-l6-vvI" kind="push" identifier="toPregFrecuentes" id="8Ao-5H-cX3"/>
                                         </connections>
@@ -242,29 +222,19 @@ http://administracionelectronica.gob.es/</string>
                                 </connections>
                             </tableView>
                             <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="M3v-wp-qWC">
-                                <rect key="frame" x="0.0" y="960" width="73" height="44"/>
-                                <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
+                                <rect key="frame" x="0.0" y="980" width="73" height="44"/>
                                 <state key="normal" title="Al Inicio">
-                                    <color key="titleColor" red="0.19607843137254902" green="0.30980392156862746" blue="0.52156862745098043" alpha="1" colorSpace="calibratedRGB"/>
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                                </state>
-                                <state key="highlighted">
-                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="aEG-ri-b36">
-                                <rect key="frame" x="20" y="938" width="730" height="46"/>
+                                <rect key="frame" x="20" y="957" width="730" height="46"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
-                                <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
                                 <state key="normal" title="Volver" image="flecha.png">
-                                    <color key="titleColor" red="0.19607843137254902" green="0.30980392156862746" blue="0.52156862745098043" alpha="1" colorSpace="calibratedRGB"/>
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
-                                <state key="highlighted">
-                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                </state>
                                 <connections>
-                                    <segue destination="FiJ-J0-m6p" kind="custom" identifier="toFirstScreen" customClass="AOCustomSegue" id="0Bv-sY-VPR"/>
+                                    <action selector="goBackHome:" destination="lDR-zU-wtW" eventType="touchUpInside" id="MYr-2O-E6A"/>
                                 </connections>
                             </button>
                         </subviews>
@@ -284,7 +254,7 @@ http://administracionelectronica.gob.es/</string>
             <objects>
                 <viewController id="SYG-om-9yd" customClass="AOAcercadeViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="KN8-Lo-usB">
-                        <rect key="frame" x="0.0" y="20" width="768" height="1004"/>
+                        <rect key="frame" x="0.0" y="0.0" width="768" height="1024"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <imageView userInteractionEnabled="NO" contentMode="scaleToFill" image="logo_cliente.png" id="qIK-5a-AFw">
@@ -300,7 +270,7 @@ http://administracionelectronica.gob.es/</string>
                                 <nil key="highlightedColor"/>
                             </label>
                             <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" showsHorizontalScrollIndicator="NO" editable="NO" textAlignment="center" id="q6t-cq-MCe">
-                                <rect key="frame" x="20" y="151" width="728" height="779"/>
+                                <rect key="frame" x="20" y="151" width="728" height="797"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" heightSizable="YES" flexibleMaxY="YES"/>
                                 <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                 <string key="text">"Cliente @firma para Apple iOS" v1.0 
@@ -318,29 +288,19 @@ http://forja-ctt.administracionelectronica.gob.es/web/clienteafirma</string>
                                 <dataDetectorType key="dataDetectorTypes" link="YES"/>
                             </textView>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="ND0-Yg-BOW">
-                                <rect key="frame" x="20" y="937" width="728" height="46"/>
+                                <rect key="frame" x="20" y="956" width="728" height="46"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
-                                <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
                                 <state key="normal" title="Volver" image="flecha.png">
-                                    <color key="titleColor" red="0.19607843137254902" green="0.30980392156862746" blue="0.52156862745098043" alpha="1" colorSpace="calibratedRGB"/>
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                                </state>
-                                <state key="highlighted">
-                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <connections>
                                     <segue destination="lDR-zU-wtW" kind="custom" identifier="toMenuScreen" customClass="AOCustomSegue" id="tkT-1h-ijc"/>
                                 </connections>
                             </button>
                             <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="EMS-uf-ykI">
-                                <rect key="frame" x="0.0" y="959" width="73" height="44"/>
-                                <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
+                                <rect key="frame" x="0.0" y="978" width="73" height="44"/>
                                 <state key="normal" title="Al Inicio">
-                                    <color key="titleColor" red="0.19607843137254902" green="0.30980392156862746" blue="0.52156862745098043" alpha="1" colorSpace="calibratedRGB"/>
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                                </state>
-                                <state key="highlighted">
-                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <connections>
                                     <segue destination="FiJ-J0-m6p" kind="push" identifier="toFirstScreen" id="0dn-Yd-aFb"/>
@@ -360,7 +320,7 @@ http://forja-ctt.administracionelectronica.gob.es/web/clienteafirma</string>
             <objects>
                 <viewController title="Solicitud de certificado" id="BdW-y5-nVW" customClass="AOCertificateSelectionViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="n9S-c5-sfB">
-                        <rect key="frame" x="0.0" y="20" width="768" height="1004"/>
+                        <rect key="frame" x="0.0" y="0.0" width="768" height="1024"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <imageView userInteractionEnabled="NO" contentMode="scaleToFill" image="logo_cliente.png" id="IWI-e2-02M">
@@ -386,29 +346,19 @@ Si no aparecen almacenes en la lista, podrá importarlos desde las opciones de l
                                 </connections>
                             </tableView>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="dqi-Cj-y1X">
-                                <rect key="frame" x="22" y="941" width="728" height="44"/>
+                                <rect key="frame" x="22" y="960" width="728" height="44"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
-                                <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
                                 <state key="normal" title="Seleccionar">
-                                    <color key="titleColor" red="0.19607843137254902" green="0.30980392156862746" blue="0.52156862745098043" alpha="1" colorSpace="calibratedRGB"/>
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                                </state>
-                                <state key="highlighted">
-                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <connections>
                                     <segue destination="GAJ-C9-ffl" kind="push" identifier="toPinScreen" id="qUh-zg-YVY"/>
                                 </connections>
                             </button>
                             <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="hJ6-O2-w2o">
-                                <rect key="frame" x="22" y="888" width="73" height="44"/>
-                                <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
+                                <rect key="frame" x="22" y="906" width="73" height="44"/>
                                 <state key="normal" title="Al Inicio">
-                                    <color key="titleColor" red="0.19607843137254902" green="0.30980392156862746" blue="0.52156862745098043" alpha="1" colorSpace="calibratedRGB"/>
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                                </state>
-                                <state key="highlighted">
-                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <connections>
                                     <segue destination="FiJ-J0-m6p" kind="custom" identifier="toFirstScreen" customClass="AOCustomSegue" id="aG4-vU-0Oo"/>
@@ -432,7 +382,7 @@ Si no aparecen almacenes en la lista, podrá importarlos desde las opciones de l
             <objects>
                 <viewController title="Solicitud de PIN" id="GAJ-C9-ffl" customClass="AOPinViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="XML-nt-6if">
-                        <rect key="frame" x="0.0" y="20" width="768" height="1004"/>
+                        <rect key="frame" x="0.0" y="0.0" width="768" height="1024"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <imageView userInteractionEnabled="NO" contentMode="scaleToFill" image="logo_cliente.png" id="dyX-6s-tTM">
@@ -467,29 +417,19 @@ Si ha olvidado la contraseña utilice iTunes para sustituir su almacén PKCS#12.
                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                             </textView>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="M6j-4b-wrk">
-                                <rect key="frame" x="20" y="940" width="728" height="44"/>
+                                <rect key="frame" x="20" y="959" width="728" height="44"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
-                                <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
                                 <state key="normal" title="Aceptar">
-                                    <color key="titleColor" red="0.19607843137254902" green="0.30980392156862746" blue="0.52156862745098043" alpha="1" colorSpace="calibratedRGB"/>
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                                </state>
-                                <state key="highlighted">
-                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <connections>
                                     <segue destination="zg9-9u-ifb" kind="push" identifier="pinEntered" id="WFs-EB-ElY"/>
                                 </connections>
                             </button>
                             <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="RpB-6d-HOh">
-                                <rect key="frame" x="20" y="887" width="73" height="44"/>
-                                <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
+                                <rect key="frame" x="20" y="905" width="73" height="44"/>
                                 <state key="normal" title="Al Inicio">
-                                    <color key="titleColor" red="0.19607843137254902" green="0.30980392156862746" blue="0.52156862745098043" alpha="1" colorSpace="calibratedRGB"/>
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                                </state>
-                                <state key="highlighted">
-                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <connections>
                                     <segue destination="FiJ-J0-m6p" kind="custom" identifier="toFirstScreen" customClass="AOCustomSegue" id="nwd-Gl-Nbi"/>
@@ -514,7 +454,7 @@ Si ha olvidado la contraseña utilice iTunes para sustituir su almacén PKCS#12.
             <objects>
                 <viewController title="Firma Electrónica" id="zg9-9u-ifb" customClass="AOSignViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="zvO-RC-BJv">
-                        <rect key="frame" x="0.0" y="20" width="768" height="1004"/>
+                        <rect key="frame" x="0.0" y="0.0" width="768" height="1024"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <imageView userInteractionEnabled="NO" contentMode="scaleToFill" image="logo_cliente.png" id="O5N-UJ-Apf">
@@ -543,29 +483,19 @@ Si ha olvidado la contraseña utilice iTunes para sustituir su almacén PKCS#12.
                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                             </textView>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="g7K-e3-dGQ">
-                                <rect key="frame" x="22" y="940" width="728" height="44"/>
+                                <rect key="frame" x="22" y="959" width="728" height="44"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
-                                <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
                                 <state key="normal" title="Firmar">
-                                    <color key="titleColor" red="0.19607843137254902" green="0.30980392156862746" blue="0.52156862745098043" alpha="1" colorSpace="calibratedRGB"/>
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                                </state>
-                                <state key="highlighted">
-                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <connections>
                                     <action selector="buttonPressed:" destination="zg9-9u-ifb" eventType="touchUpInside" id="wG3-7C-OJI"/>
                                 </connections>
                             </button>
                             <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="he1-LA-Yfj">
-                                <rect key="frame" x="22" y="887" width="73" height="44"/>
-                                <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
+                                <rect key="frame" x="22" y="905" width="73" height="44"/>
                                 <state key="normal" title="Al Inicio">
-                                    <color key="titleColor" red="0.19607843137254902" green="0.30980392156862746" blue="0.52156862745098043" alpha="1" colorSpace="calibratedRGB"/>
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                                </state>
-                                <state key="highlighted">
-                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <connections>
                                     <segue destination="FiJ-J0-m6p" kind="custom" identifier="toFirstScreen" customClass="AOCustomSegue" id="mid-dV-KjV"/>
@@ -589,7 +519,7 @@ Si ha olvidado la contraseña utilice iTunes para sustituir su almacén PKCS#12.
             <objects>
                 <viewController id="M9t-8B-1DM" customClass="AOAcercadeViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="Ddr-QD-Y7l">
-                        <rect key="frame" x="0.0" y="20" width="768" height="1004"/>
+                        <rect key="frame" x="0.0" y="0.0" width="768" height="1024"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <imageView userInteractionEnabled="NO" contentMode="scaleToFill" image="logo_cliente.png" id="mDR-YV-F4O">
@@ -605,29 +535,19 @@ Si ha olvidado la contraseña utilice iTunes para sustituir su almacén PKCS#12.
                                 <nil key="highlightedColor"/>
                             </label>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="dKg-KG-Vbx">
-                                <rect key="frame" x="20" y="937" width="730" height="46"/>
+                                <rect key="frame" x="20" y="956" width="730" height="46"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
-                                <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
                                 <state key="normal" title="Volver" image="flecha.png">
-                                    <color key="titleColor" red="0.19607843137254902" green="0.30980392156862746" blue="0.52156862745098043" alpha="1" colorSpace="calibratedRGB"/>
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                                </state>
-                                <state key="highlighted">
-                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <connections>
                                     <segue destination="lDR-zU-wtW" kind="custom" identifier="toMenuScreen" customClass="AOCustomSegue" id="xJB-GG-ZdQ"/>
                                 </connections>
                             </button>
                             <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="QpT-C2-gI4">
-                                <rect key="frame" x="0.0" y="959" width="73" height="44"/>
-                                <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
+                                <rect key="frame" x="0.0" y="978" width="73" height="44"/>
                                 <state key="normal" title="Al Inicio">
-                                    <color key="titleColor" red="0.19607843137254902" green="0.30980392156862746" blue="0.52156862745098043" alpha="1" colorSpace="calibratedRGB"/>
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                                </state>
-                                <state key="highlighted">
-                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <connections>
                                     <segue destination="FiJ-J0-m6p" kind="push" identifier="toFirstScreen" id="q1e-aa-IBq"/>
@@ -660,13 +580,8 @@ Si ha olvidado la contraseña utilice iTunes para sustituir su almacén PKCS#12.
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="Alz-x7-F8T">
                                 <rect key="frame" x="284" y="348" width="201" height="43"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
                                 <state key="normal" title="  Más información" image="information_icon.png">
-                                    <color key="titleColor" red="0.19607843137254902" green="0.30980392156862746" blue="0.52156862745098043" alpha="1" colorSpace="calibratedRGB"/>
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                                </state>
-                                <state key="highlighted">
-                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <connections>
                                     <action selector="buttonPressed:" destination="M9t-8B-1DM" eventType="touchUpInside" id="1Id-5x-iQf"/>
@@ -689,7 +604,7 @@ Si ha olvidado la contraseña utilice iTunes para sustituir su almacén PKCS#12.
             <objects>
                 <viewController id="iX5-l6-vvI" customClass="AOAcercadeViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="xa4-kd-mby">
-                        <rect key="frame" x="0.0" y="20" width="768" height="1004"/>
+                        <rect key="frame" x="0.0" y="0.0" width="768" height="1024"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <imageView userInteractionEnabled="NO" contentMode="scaleToFill" image="logo_cliente.png" id="RwX-e9-Z5a">
@@ -697,15 +612,15 @@ Si ha olvidado la contraseña utilice iTunes para sustituir su almacén PKCS#12.
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                             </imageView>
                             <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="Preguntas más comunes" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="Rnt-QU-5XV">
-                                <rect key="frame" x="20" y="109" width="728" height="33"/>
+                                <rect key="frame" x="20" y="111" width="728" height="33"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                 <color key="backgroundColor" red="0.91620524879999998" green="0.91620524879999998" blue="0.91620524879999998" alpha="0.59999999999999998" colorSpace="calibratedRGB"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="24"/>
                                 <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" showsHorizontalScrollIndicator="NO" editable="NO" usesAttributedText="YES" id="0f3-cD-V1Q">
-                                <rect key="frame" x="20" y="150" width="728" height="779"/>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" showsHorizontalScrollIndicator="NO" editable="NO" usesAttributedText="YES" selectable="NO" id="0f3-cD-V1Q">
+                                <rect key="frame" x="20" y="152" width="728" height="785"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" heightSizable="YES" flexibleMaxY="YES"/>
                                 <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                 <attributedString key="attributedText">
@@ -723,27 +638,6 @@ Si ha olvidado la contraseña utilice iTunes para sustituir su almacén PKCS#12.
 Puede firmar ficheros en la nube a través de la opción "Firmar" de la pantalla principal de la aplicación. La firma generada se almacenará también en la nube, desde la que podrá descargarla a través de los medios proporcionados por la plataforma en cuestión que utilice.
  
 Para la firma de trámites web realice los trámites normalmente a través de su navegador. Si el trámite está preparado para la firma con el Cliente @firma móvil, este se ejecutará en el momento de la firma para que el usuario seleccione su certificado y ejecute la operación.
- 
-</string>
-                                        <attributes>
-                                            <font key="NSFont" size="17" name="Helvetica"/>
-                                            <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="leftToRight" paragraphSpacing="16" defaultTabInterval="36">
-                                                <tabStops/>
-                                            </paragraphStyle>
-                                        </attributes>
-                                    </fragment>
-                                    <fragment content="¿Por qué al acceder a la opción de firma se me piden los datos de mi cuenta de Dropbox?">
-                                        <attributes>
-                                            <font key="NSFont" size="17" name="Helvetica-Bold"/>
-                                            <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="leftToRight" paragraphSpacing="16" defaultTabInterval="36">
-                                                <tabStops/>
-                                            </paragraphStyle>
-                                        </attributes>
-                                    </fragment>
-                                    <fragment>
-                                        <string key="content">
- 
-El Cliente @firma para Apple iOS firma ficheros localizados en la nube (por defecto, a través de Dropbox), por lo que necesita acceder a su directorio en la nube para el acceso a los ficheros disponibles para firmar. El proceso de autenticación se realiza directamente a través del servicio pertinente de Dropbox, por lo que sus datos de usuario nunca son almacenados ni conocidos por el Cliente @firma para Applet iOS.
  
 </string>
                                         <attributes>
@@ -824,29 +718,19 @@ Los certificados importados en el Cliente @firma para Apple iOS son de uso exclu
                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                             </textView>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="L5O-M2-y6Z">
-                                <rect key="frame" x="20" y="937" width="728" height="46"/>
+                                <rect key="frame" x="20" y="957" width="728" height="46"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
                                 <state key="normal" title="Volver" image="flecha.png">
-                                    <color key="titleColor" red="0.19607843137254902" green="0.30980392156862746" blue="0.52156862745098043" alpha="1" colorSpace="calibratedRGB"/>
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                                </state>
-                                <state key="highlighted">
-                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <connections>
                                     <segue destination="lDR-zU-wtW" kind="custom" identifier="toMenuScreen" customClass="AOCustomSegue" id="ebZ-cH-UW7"/>
                                 </connections>
                             </button>
                             <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="6Vs-HQ-gkd">
-                                <rect key="frame" x="0.0" y="959" width="73" height="44"/>
-                                <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
+                                <rect key="frame" x="0.0" y="978" width="73" height="44"/>
                                 <state key="normal" title="Al Inicio">
-                                    <color key="titleColor" red="0.19607843137254902" green="0.30980392156862746" blue="0.52156862745098043" alpha="1" colorSpace="calibratedRGB"/>
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                                </state>
-                                <state key="highlighted">
-                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <connections>
                                     <segue destination="FiJ-J0-m6p" kind="push" identifier="toFirstScreen" id="z9s-o9-MGv"/>
@@ -872,15 +756,12 @@ Los certificados importados en el Cliente @firma para Apple iOS son de uso exclu
         <image name="logo_cliente.png" width="726" height="200"/>
     </resources>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">
-        <simulatedStatusBarMetrics key="statusBar" statusBarStyle="blackTranslucent"/>
+        <simulatedStatusBarMetrics key="statusBar"/>
         <simulatedOrientationMetrics key="orientation"/>
-        <simulatedScreenMetrics key="destination">
-            <size key="portraitSize" width="768" height="1024"/>
-            <size key="landscapeSize" width="1024" height="768"/>
-        </simulatedScreenMetrics>
+        <simulatedScreenMetrics key="destination"/>
     </simulatedMetricsContainer>
     <inferredMetricsTieBreakers>
         <segue reference="xbb-0e-Qwt"/>
-        <segue reference="1rl-H1-e1G"/>
+        <segue reference="mid-dV-KjV"/>
     </inferredMetricsTieBreakers>
 </document>

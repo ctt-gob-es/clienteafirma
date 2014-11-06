@@ -44,9 +44,9 @@ NSString *startUrlIncoming= NULL;
 -(void) onReadUrl:(NSNotification*) notification {
 
     NSString *url = [notification object];
-
+    
     //pasar al segue
-    startUrlIncoming = url;
+    startUrlIncoming = url;    
     
     //Nos desplazamos a la pantalla de seleccion de pkcs12.
     @try {

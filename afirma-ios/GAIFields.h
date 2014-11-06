@@ -33,10 +33,12 @@ extern NSString *const kGAIPage;
 extern NSString *const kGAIDescription;  // synonym for kGAIScreenName
 extern NSString *const kGAIScreenName;   // synonym for kGAIDescription
 extern NSString *const kGAITitle;
+extern NSString *const kGAIAdMobHitId;
 extern NSString *const kGAIAppName;
 extern NSString *const kGAIAppVersion;
 extern NSString *const kGAIAppId;
 extern NSString *const kGAIAppInstallerId;
+extern NSString *const kGAIUserId;
 
 extern NSString *const kGAIEventCategory;
 extern NSString *const kGAIEventAction;
@@ -77,8 +79,12 @@ extern NSString *const kGAIExFatal;
 
 extern NSString *const kGAISampleRate;
 
+extern NSString *const kGAIIdfa;
+extern NSString *const kGAIAdTargetingEnabled;
+
 // hit types
-extern NSString *const kGAIAppView;
+extern NSString *const kGAIAppView;  // deprecated, use kGAIScreenView instead
+extern NSString *const kGAIScreenView;
 extern NSString *const kGAIEvent;
 extern NSString *const kGAISocial;
 extern NSString *const kGAITransaction;

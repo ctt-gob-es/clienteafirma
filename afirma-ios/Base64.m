@@ -20,9 +20,13 @@
 
 +(NSData*) decode:(NSString*) str
 {
-    // Para hacer la decodificación a prueba de errores se deshace un posible "URL Encoding" entes de decodificar
-    // el Base64
+    // Para hacer la decodificación a prueba de errores se deshace un posible "URL Encoding" antes de decodificar el Base64
+    if(str!=NULL){
     return [[NSData alloc] initWithBase64EncodedString:[str stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding] options:NSDataBase64DecodingIgnoreUnknownCharacters];
+    }
+    else{
+        return NULL;
+    }
 }
 
 +(NSString*) encode:(NSData*) source urlSafe:(Boolean) urlSafe;
@@ -39,11 +43,11 @@
     return [[source base64EncodedStringWithOptions:0] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
 }
 
-+ (NSString*) urlSafeEncode: (NSString*) string {
++(NSString*) urlSafeEncode: (NSString*) string {
     return [[string stringByReplacingOccurrencesOfString:@"+" withString:@"-"] stringByReplacingOccurrencesOfString:@"/" withString:@"_"];
 }
 
-+ (NSString*) urlSafeDecode: (NSString*) string {
++(NSString*) urlSafeDecode: (NSString*) string {
     return [[string stringByReplacingOccurrencesOfString:@"-" withString:@"+"] stringByReplacingOccurrencesOfString:@"_" withString:@"/"];
 }
 

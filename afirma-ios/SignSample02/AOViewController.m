@@ -145,11 +145,11 @@ NSString *receivedString = NULL;
 
 -(OSStatus) openPkcs12Store:(NSString*)pin {
     
-    // Cargamos el PKCS#12 desde como un recurso
     NSString *thePath = NULL;
+    
 #if TARGET_IPHONE_SIMULATOR
 
-    // Cargamos el PKCS#12 desde como un recurso
+    // Cargamos el PKCS#12 como un recurso
     thePath = [[NSBundle mainBundle] pathForResource:@"ANF_PF_Activo" ofType:@"p12"];
     
 #else
@@ -338,6 +338,9 @@ NSString *receivedString = NULL;
             extraParams = [extraParams stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
             extraParams = [CADESSignUtils urlSafeDecode:extraParams];
             NSData *dataReceibed = [CADESSignUtils base64DecodeString: extraParams];
+            
+            NSLog(@"D - stringWithUTF8String de los datos: %@", dataReceibed);
+            
             NSString* stringDataReceibed = [NSString stringWithUTF8String:[dataReceibed bytes]];
             
             //Los datos recibidos son un properties de java y se convierten por tanto a un NSDictionary
@@ -358,7 +361,7 @@ NSString *receivedString = NULL;
     NSLog(@"Operacion: %@", operation);
     NSLog(@"Documento: %@", docId);
     NSLog(@"Servlet: %@", urlServlet);
-    NSLog(@"Datos: %@", datosInUse);
+    //NSLog(@"Datos: %@", datosInUse);
     NSLog(@"Formato: %@", signFormat);
     NSLog(@"Algoritmo: %@", signAlgoInUse);
     NSLog(@"Clave de cifrado: %@", cipherKey);
@@ -556,15 +559,24 @@ NSString *receivedString = NULL;
         post = [post stringByAppendingString:extraParams];
     }
     
-    NSData *postData = [post dataUsingEncoding:NSASCIIStringEncoding allowLossyConversion:YES];
+    //Changed NSData *postData = [post dataUsingEncoding:NSASCIIStringEncoding allowLossyConversion:YES];
+    NSData *postData = [post dataUsingEncoding:NSUTF8StringEncoding allowLossyConversion:YES];
     NSString *postLength = [NSString stringWithFormat:@"%d", [postData length]];
     
     // Obtenemos la URL de las preferencias    
     NSURL* requestUrl = NULL;
     if(triphasicServerURL!=NULL)
+    {
         requestUrl = [[NSURL alloc] initWithString:triphasicServerURL];
+        
+        NSLog(@"C - Usamos la ruta de servidor trifasico configurado: %@", triphasicServerURL);
+    }
     else
+    {
         requestUrl = [[NSURL alloc] initWithString:[[NSUserDefaults standardUserDefaults] stringForKey:@"server_url"]];
+        
+        NSLog(@"C - Usamos la ruta de servidor trifasico preestablecido: %@", [[NSUserDefaults standardUserDefaults] stringForKey:@"server_url"]);
+    }
     NSMutableURLRequest* request = [NSMutableURLRequest requestWithURL:requestUrl cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30.0];
     [request setHTTPMethod:@"POST"];
     [request setValue:postLength forHTTPHeaderField:@"Content-Length"];
@@ -573,9 +585,9 @@ NSString *receivedString = NULL;
     [request setValue:@"text/plain,text/html,application/xhtml+xml,application/xml" forHTTPHeaderField:@"Accept"];
     [request setHTTPBody:postData];
     
-    NSLog(@"\n\n");
-    NSLog(@"Inicio de la llamada a PRE con la siguiente URL: %@", post);
-    NSLog(@"\n\n");
+    //NSLog(@"\n\n");
+    //NSLog(@"Inicio de la llamada a PRE con la siguiente URL: %@", post);
+    //NSLog(@"\n\n");
     
     NSURLConnection* connection = [[NSURLConnection alloc] initWithRequest:request delegate:self];
     [connection start];
@@ -616,12 +628,12 @@ NSString *receivedString = NULL;
 -(void)connectionDidFinishLoading:(NSURLConnection *)connection
 {
     // Connection succeeded in downloading the request.
-    NSLog( @"Final de la recepción! se han recibido %d bytes", [receivedData length] );
+    NSLog( @"AOViewController: Final de la recepción! se han recibido %d bytes", (int) [receivedData length] );
     
     // Convert received data into string.
-    receivedString = [[NSString alloc] initWithData:receivedData
-                                           encoding:NSASCIIStringEncoding];
-    NSLog( @"invocación desde connectionDidFinishLoading: %@", receivedString );
+    //Changed receivedString = [[NSString alloc] initWithData:receivedData encoding:NSASCIIStringEncoding];
+    receivedString = [[NSString alloc] initWithData:receivedData encoding:NSUTF8StringEncoding];
+    NSLog( @"AOViewController: Descarga finalizada");
 
     NSString *dataReceibedb64 = [CADESSignUtils urlSafeDecode:receivedString];
     [self preSign:dataReceibedb64];
@@ -687,6 +699,9 @@ NSString *receivedString = NULL;
    
     //Se reciben los datos en base64 y se decodifican
     NSData *dataReceibed = [CADESSignUtils base64DecodeString: dataReceibedb64];
+    
+    NSLog(@"E - stringWithUTF8String de los datos: %@", dataReceibed);
+    
     NSString* stringDataReceibed = [NSString stringWithUTF8String:[dataReceibed bytes]];
         
     //NSLog(@"Datos recibidos en respuesta a la prefirma (properties): %@", stringDataReceibed);
@@ -829,15 +844,24 @@ NSString *receivedString = NULL;
     post = [post stringByAppendingString:paramsEncoded];
     
     //Codificamos la url de post
-    NSData *postData = [post dataUsingEncoding:NSASCIIStringEncoding allowLossyConversion:YES];
+    //Changed NSData *postData = [post dataUsingEncoding:NSASCIIStringEncoding allowLossyConversion:YES];
+    NSData *postData = [post dataUsingEncoding:NSUTF8StringEncoding allowLossyConversion:YES];
     NSString *postLength = [NSString stringWithFormat:@"%d", [postData length]];
     
     // Obtenemos la URL del servidor de la pantalla de preferencias
     NSURL* requestUrl = NULL;
     if(triphasicServerURL!=NULL)
+    {
         requestUrl = [[NSURL alloc] initWithString:triphasicServerURL];
+    
+        NSLog(@"D - Usamos la ruta de servidor trifasico configurado: %@", triphasicServerURL);
+    }
     else
+    {
         requestUrl = [[NSURL alloc] initWithString:[[NSUserDefaults standardUserDefaults] stringForKey:@"server_url"]];
+    
+        NSLog(@"D - Usamos la ruta de servidor trifasico preestablecido: %@", [[NSUserDefaults standardUserDefaults] stringForKey:@"server_url"]);
+    }
     NSMutableURLRequest* request = [NSMutableURLRequest requestWithURL:requestUrl cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30.0];
     [request setHTTPMethod:@"POST"];
     [request setValue:postLength forHTTPHeaderField:@"Content-Length"];
@@ -941,7 +965,8 @@ NSString *receivedString = NULL;
     post = [post stringByAppendingString:dataSign];
     
     //Codificamos la url de post
-    NSData *postData = [post dataUsingEncoding:NSASCIIStringEncoding allowLossyConversion:YES];
+    //Changed NSData *postData = [post dataUsingEncoding:NSASCIIStringEncoding allowLossyConversion:YES];
+    NSData *postData = [post dataUsingEncoding:NSUTF8StringEncoding allowLossyConversion:YES];
     NSString *postLength = [NSString stringWithFormat:@"%d", [postData length]];
     
     // Obtenemos la URL del servidor de la pantalla de preferencias
@@ -1013,7 +1038,8 @@ NSString *receivedString = NULL;
         post = [post stringByAppendingString:fileId];
         
         //Codificamos la url de post
-        NSData *postData = [post dataUsingEncoding:NSASCIIStringEncoding allowLossyConversion:YES];
+        //Changed NSData *postData = [post dataUsingEncoding:NSASCIIStringEncoding allowLossyConversion:YES];
+        NSData *postData = [post dataUsingEncoding:NSUTF8StringEncoding allowLossyConversion:YES];
         NSString *postLength = [NSString stringWithFormat:@"%d", [postData length]];
         
         // Obtenemos la URL del servidor de la pantalla de preferencias
@@ -1026,15 +1052,17 @@ NSString *receivedString = NULL;
         [request setValue:@"text/plain,text/html,application/xhtml+xml,application/xml" forHTTPHeaderField:@"Accept"];
         [request setHTTPBody:postData];
         
-        NSLog(@"Se recogen los datos del fichero del rtServlet con los siguientes datos: %@", post);
+        NSLog(@"AOViewController: Se recogen los datos del fichero del rtServlet con los siguientes datos: %@", post);
         
         //realizamos la llamada al servidor.
         NSData* data = [NSURLConnection sendSynchronousRequest:request returningResponse:nil error:nil];
         
+        NSLog(@"AOViewController: Respuesta del rtserver: %d", (int) [data length]);
+        
         //Obtenemos la respuesta del servidor.
         NSString* responseString = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
         
-        NSLog(@"Respuesta del rtserver: %@", responseString);
+        //NSLog(@"Respuesta del rtserver: %@", responseString);
 
         @try {
             NSString *base64 = [responseString substringToIndex:3];
@@ -1098,7 +1126,8 @@ NSString *receivedString = NULL;
         post = [post stringByAppendingString:error];
         
         //Codificamos la url de post
-        NSData *postData = [post dataUsingEncoding:NSASCIIStringEncoding allowLossyConversion:YES];
+        //Changed NSData *postData = [post dataUsingEncoding:NSASCIIStringEncoding allowLossyConversion:YES];
+        NSData *postData = [post dataUsingEncoding:NSUTF8StringEncoding allowLossyConversion:YES];
         NSString *postLength = [NSString stringWithFormat:@"%d", [postData length]];
         
         // Obtenemos la URL del servidor de la pantalla de preferencias
@@ -1159,7 +1188,8 @@ NSString *receivedString = NULL;
         post = [post stringByAppendingString:error];
         
         //Codificamos la url de post
-        NSData *postData = [post dataUsingEncoding:NSASCIIStringEncoding allowLossyConversion:YES];
+        //Changed NSData *postData = [post dataUsingEncoding:NSASCIIStringEncoding allowLossyConversion:YES];
+        NSData *postData = [post dataUsingEncoding:NSUTF8StringEncoding allowLossyConversion:YES];
         NSString *postLength = [NSString stringWithFormat:@"%d", [postData length]];
         
         // Obtenemos la URL del servidor de la pantalla de preferencias

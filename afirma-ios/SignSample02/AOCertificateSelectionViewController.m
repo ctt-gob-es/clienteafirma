@@ -39,7 +39,7 @@ NSString *idDocCert = NULL;
 NSString *rtServletCert = NULL;
 NSString *cipherKeyCert = NULL;
 NSString *fileIdCert = NULL;
-NSMutableDictionary *dataLoadedCert = NULL;
+NSMutableDictionary *opParameters = NULL;
 
 // URL de entrada a la aplicacion
 
@@ -56,10 +56,6 @@ NSMutableDictionary *dataLoadedCert = NULL;
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    
-    //Parseamos los parámetros.
-     NSLog(@"Parámetro url : %@", self.startUrl);
-   
     
     //Rellenamos la tabla de certificados con los facilitados por iTunes y si hay almacenes, habilitamos el botón de seleccion.
     [self listFilesFromDocumentsFolder];
@@ -139,8 +135,18 @@ NSMutableDictionary *dataLoadedCert = NULL;
         
         // Set the selected button in the new view
         [pvc setNombreCertInUse:cellSelected2];
-        //asignamos para obtener todos los datos de la conexion asíncrona. Si aqui no llegan todos los dato, habría que poner un flag entre el viewDidLoad y el fin de la conexión.
-        self.parameters = dataLoadedCert;
+        //asignamos para obtener todos los datos de la conexion asíncrona. Si aqui no llegan todos los datos, habría que poner un flag entre el viewDidLoad y el fin de la conexión.
+        
+        /*
+        NSLog(@" ------ Parametros pasados desde AOCertificateSelectionViewController ------ ");
+        for (NSString *key in opParameters) {
+            NSLog(@"%@", key);
+        }
+        NSLog(@" ---------------------------------------------------------- ");
+        */
+        
+        self.parameters = opParameters;
+        
         [pvc setParameters:self.parameters];
     }
 }
@@ -161,11 +167,6 @@ NSMutableDictionary *dataLoadedCert = NULL;
 
 //Carga en la lista de almacenes los almacenes encontrados en Itunes.
 -(void)listFilesFromDocumentsFolder {
-    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-    NSString *documentsDirectory = [paths objectAtIndex:0];
-    
-    NSFileManager *manager = [NSFileManager defaultManager];
-    NSArray *fileList = [manager contentsOfDirectoryAtPath:documentsDirectory error:nil];
     
 #if TARGET_IPHONE_SIMULATOR
     //habilitamos el boton de seleccion de certificado.
@@ -175,6 +176,13 @@ NSMutableDictionary *dataLoadedCert = NULL;
     [tableData2 addObject:@"ANF USUARIO ACTIVO"];
     
 #else
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *documentsDirectory = [paths objectAtIndex:0];
+    
+    NSFileManager *manager = [NSFileManager defaultManager];
+    
+    NSArray *fileList = [manager contentsOfDirectoryAtPath:documentsDirectory error:nil];
+    
     if([fileList count]>0){
         //habilitamos el boton de seleccion de certificado.
         isTableLoaded = YES;
@@ -291,35 +299,35 @@ NSMutableDictionary *dataLoadedCert = NULL;
 -(NSDictionary*) parseUrl:(NSString*) urlString {
     
     NSDictionary *urlParameters = [CADESSignUtils parseUrl:urlString];
-    dataLoadedCert = [urlParameters mutableCopy];    
+    opParameters = [urlParameters mutableCopy];    
     NSString *datosInUseCert      = NULL;
     //NSString *idDoc           = NULL;
     //NSString *stServlet       = NULL;
     
     /***** PRUEBAS 
-    [dataLoadedCert removeObjectForKey:PARAMETER_NAME_DAT];
-    [dataLoadedCert setObject:@"http://172.24.36.241:8080/SignatureStorageServer/RetrieveXML" forKey:PARAMETER_NAME_RTSERVLET];
-    [dataLoadedCert setObject:@"12345678" forKey:PARAMETER_NAME_CIPHER_KEY];
-    [dataLoadedCert setObject:@"12345678" forKey:PARAMETER_NAME_FILE_ID];
+    [opParameters removeObjectForKey:PARAMETER_NAME_DAT];
+    [opParameters setObject:@"http://172.24.36.241:8080/SignatureStorageServer/RetrieveXML" forKey:PARAMETER_NAME_RTSERVLET];
+    [opParameters setObject:@"12345678" forKey:PARAMETER_NAME_CIPHER_KEY];
+    [opParameters setObject:@"12345678" forKey:PARAMETER_NAME_FILE_ID];
         
     FIN PRUEBAS *****/
             
     //Leemos si existen datos en la url
-    if([dataLoadedCert objectForKey:PARAMETER_NAME_DAT] !=NULL)
-        datosInUseCert = [[NSString alloc] initWithString:[dataLoadedCert objectForKey:PARAMETER_NAME_DAT]];
+    if([opParameters objectForKey:PARAMETER_NAME_DAT] !=NULL)
+        datosInUseCert = [[NSString alloc] initWithString:[opParameters objectForKey:PARAMETER_NAME_DAT]];
     
     //leemos la url del servlet de almacenamiento
-    if([dataLoadedCert objectForKey:PARAMETER_NAME_STSERVLET] !=NULL)
-        stServletCert = [[NSString alloc] initWithString:[dataLoadedCert objectForKey:PARAMETER_NAME_STSERVLET]];
+    if([opParameters objectForKey:PARAMETER_NAME_STSERVLET] !=NULL)
+        stServletCert = [[NSString alloc] initWithString:[opParameters objectForKey:PARAMETER_NAME_STSERVLET]];
     
     //leemos el identificador del usuario
-    if([dataLoadedCert objectForKey:PARAMETER_NAME_ID] !=NULL)
-        idDocCert = [[NSString alloc] initWithString:[dataLoadedCert objectForKey:PARAMETER_NAME_ID]];
+    if([opParameters objectForKey:PARAMETER_NAME_ID] !=NULL)
+        idDocCert = [[NSString alloc] initWithString:[opParameters objectForKey:PARAMETER_NAME_ID]];
     
     if (datosInUseCert == nil) {
         
-        if([dataLoadedCert objectForKey:PARAMETER_NAME_FILE_ID]!=NULL)
-            fileIdCert = [[NSString alloc] initWithString:[dataLoadedCert objectForKey:PARAMETER_NAME_FILE_ID]];
+        if([opParameters objectForKey:PARAMETER_NAME_FILE_ID]!=NULL)
+            fileIdCert = [[NSString alloc] initWithString:[opParameters objectForKey:PARAMETER_NAME_FILE_ID]];
         
         if(fileIdCert == nil){
             //Notificamos del error al servidor si es posible
@@ -354,12 +362,13 @@ NSMutableDictionary *dataLoadedCert = NULL;
         else{
             
             
-            if([dataLoadedCert objectForKey:PARAMETER_NAME_RTSERVLET]!=NULL)
-                rtServletCert = [[NSString alloc] initWithString:[dataLoadedCert objectForKey:PARAMETER_NAME_RTSERVLET]];
+            if([opParameters objectForKey:PARAMETER_NAME_RTSERVLET]!=NULL)
+                rtServletCert = [[NSString alloc] initWithString:[opParameters objectForKey:PARAMETER_NAME_RTSERVLET]];
             
-            if([dataLoadedCert objectForKey:PARAMETER_NAME_CIPHER_KEY]!=NULL)
-                cipherKeyCert  = [[NSString alloc] initWithString:[dataLoadedCert objectForKey:PARAMETER_NAME_CIPHER_KEY]];
+            if([opParameters objectForKey:PARAMETER_NAME_CIPHER_KEY]!=NULL)
+                cipherKeyCert  = [[NSString alloc] initWithString:[opParameters objectForKey:PARAMETER_NAME_CIPHER_KEY]];
             
+            NSLog(@"Clave de cifrado: %@", cipherKeyCert);
             
             if(cipherKeyCert!=NULL && rtServletCert!=NULL){
                 
@@ -398,7 +407,7 @@ NSMutableDictionary *dataLoadedCert = NULL;
         }
     }
         
-    return dataLoadedCert;
+    return opParameters;
 }
 
 
@@ -424,8 +433,10 @@ NSMutableDictionary *dataLoadedCert = NULL;
     post = [post stringByAppendingString:fileIdCert];
     
     //Codificamos la url de post
-    NSData *postData = [post dataUsingEncoding:NSASCIIStringEncoding allowLossyConversion:YES];
-    NSString *postLength = [NSString stringWithFormat:@"%d", [postData length]];
+    //CHANGED NSData *postData = [post dataUsingEncoding:NSASCIIStringEncoding allowLossyConversion:YES];
+
+    NSData *postData = [post dataUsingEncoding:NSUTF8StringEncoding allowLossyConversion:YES];
+    NSString *postLength = [NSString stringWithFormat:@"%d", (int) [postData length]];
     
     // Obtenemos la URL del servidor de la pantalla de preferencias
     NSURL* requestUrl = [[NSURL alloc] initWithString:rtServletCert];
@@ -437,7 +448,7 @@ NSMutableDictionary *dataLoadedCert = NULL;
     [request setValue:@"text/plain,text/html,application/xhtml+xml,application/xml" forHTTPHeaderField:@"Accept"];
     [request setHTTPBody:postData];
         
-    NSLog(@"Se recogen los datos del fichero del rtServlet con los siguientes datos: %@", post);
+    NSLog(@"AOCertificateSelectionViewController: Se recogen los datos del fichero del rtServlet con los siguientes datos: %@", post);
         
     retrievingDataFromServletCert = true;
     
@@ -477,8 +488,9 @@ NSMutableDictionary *dataLoadedCert = NULL;
         post = [post stringByAppendingString:error];
         
         //Codificamos la url de post
-        NSData *postData = [post dataUsingEncoding:NSASCIIStringEncoding allowLossyConversion:YES];
-        NSString *postLength = [NSString stringWithFormat:@"%d", [postData length]];
+        //Changed NSData *postData = [post dataUsingEncoding:NSASCIIStringEncoding allowLossyConversion:YES];
+        NSData *postData = [post dataUsingEncoding:NSUTF8StringEncoding allowLossyConversion:YES];
+        NSString *postLength = [NSString stringWithFormat:@"%d", (int) [postData length]];
         
         // Obtenemos la URL del servidor de la pantalla de preferencias
         NSURL* requestUrl = [[NSURL alloc] initWithString:stServletCert];
@@ -537,12 +549,14 @@ NSString *receivedStringCert = NULL;
 -(void)connectionDidFinishLoading:(NSURLConnection *)connection
 {
     // Connection succeeded in downloading the request.
-    NSLog( @"Final de la recepción! se han recibido %d bytes", [receivedDataCert length] );
+    NSLog( @"AOCertificateSelectionViewController: Final de la recepción! se han recibido %d bytes", (int) [receivedDataCert length]);
     
     // Convert received data into string.
+    //Changed receivedStringCert = [[NSString alloc] initWithData:receivedDataCert encoding:NSASCIIStringEncoding];
     receivedStringCert = [[NSString alloc] initWithData:receivedDataCert
-                                           encoding:NSASCIIStringEncoding];
-    NSLog( @"invocación desde connectionDidFinishLoading: %@", receivedStringCert );
+                                           encoding:NSUTF8StringEncoding];
+    
+    NSLog( @"AOCertificateSelectionViewController: Descarga finalizada");
     
     if (retrievingDataFromServletCert){
         
@@ -552,35 +566,44 @@ NSString *receivedStringCert = NULL;
         //Obtenemos la respuesta del servidor.
         NSString* responseString = [[NSString alloc] initWithData:receivedDataCert encoding:NSUTF8StringEncoding];
         
-        NSLog(@"Respuesta del rtserver: %@", responseString);
+        NSLog(@"AOCertificateSelectionViewController: Hemos obtenido los datos del rtserver");
         
         @try {
             
+            //NSLog(@"XML Cifrado: %@", responseString);
+            
+            
+            
             NSData *decoded = [DesCypher decypherData:responseString sk:[cipherKeyCert dataUsingEncoding:NSUTF8StringEncoding]];
-                        
-            datosInUse = [[NSString alloc] initWithData:decoded encoding:NSASCIIStringEncoding];
+            
+            //Changed datosInUse = [[NSString alloc] initWithData:decoded encoding:NSASCIIStringEncoding];
+            datosInUse = [[NSString alloc] initWithData:decoded encoding:NSUTF8StringEncoding];
+            
+            //NSLog(@"XML Descifrado: %@", decoded);
             
             AOEntity *entidad = [[AOEntity alloc] init];
             AOXMLReader *xmlReader = [[AOXMLReader alloc] init];
             entidad = [xmlReader loadXMLByString:datosInUse ];
             
+            //NSLog(@"Campo de datos: %@", entidad.datField);
+            
             if(entidad.datField!=NULL)
-                [dataLoadedCert setObject:entidad.datField forKey:PARAMETER_NAME_DAT];
+                [opParameters setObject:entidad.datField forKey:PARAMETER_NAME_DAT];
             
             if(entidad.formatField!=NULL)
-                [dataLoadedCert setObject:entidad.formatField forKey:PARAMETER_NAME_FORMAT];
+                [opParameters setObject:entidad.formatField forKey:PARAMETER_NAME_FORMAT];
             
             if(entidad.algorithmField!=NULL)
-                [dataLoadedCert setObject:entidad.algorithmField forKey:PARAMETER_NAME_ALGORITHM2];
+                [opParameters setObject:entidad.algorithmField forKey:PARAMETER_NAME_ALGORITHM2];
             
             if(entidad.propertiesField!=NULL)
-                [dataLoadedCert setObject:entidad.propertiesField forKey:PARAMETER_NAME_PROPERTIES];
+                [opParameters setObject:entidad.propertiesField forKey:PARAMETER_NAME_PROPERTIES];
             
             if(entidad.idField!=NULL)
-                [dataLoadedCert setObject:entidad.idField forKey:PARAMETER_NAME_ID];
+                [opParameters setObject:entidad.idField forKey:PARAMETER_NAME_ID];
             
             if(entidad.stServletField!=NULL)
-                [dataLoadedCert setObject:entidad.stServletField forKey:PARAMETER_NAME_STSERVLET];
+                [opParameters setObject:entidad.stServletField forKey:PARAMETER_NAME_STSERVLET];
         }
         @catch (NSException *exception) {
             NSLog(@"Se ha producido un error al obtener el fichero: %@", exception.description );
@@ -591,7 +614,7 @@ NSString *receivedStringCert = NULL;
     else if(reportErrorCert){
         reportErrorCert = false;
         //responseString = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-        NSLog(@"Respuesta del servidor: %@",[[NSString alloc] initWithData:receivedDataCert encoding:NSUTF8StringEncoding]);
+        NSLog(@"AOCertificateSelectionViewController: Respuesta del servidor: %@",[[NSString alloc] initWithData:receivedDataCert encoding:NSUTF8StringEncoding]);
     }
     
     // release the connection, and the data object
@@ -648,6 +671,10 @@ NSString *receivedStringCert = NULL;
     
     return;
 }
+- (void)dealloc {
+    self.tblView.delegate = nil;
+    self.tblView.dataSource = nil;
+    [super dealloc];
+}
 
- 
 @end

@@ -32,8 +32,6 @@ NSString *cellSelectedManager = NULL;
 			
     cellSelectedManager = NULL;
     
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onGoingToBackGround:) name:UIApplicationDidEnterBackgroundNotification object:nil];
-    
     //Rellenamos la tabla de certificados con los facilitados por iTunes y si hay almacenes, habilitamos el botón de seleccion.
     [self listFilesFromDocumentsFolder];
     
@@ -43,6 +41,10 @@ NSString *cellSelectedManager = NULL;
     self.tblViewManager.layer.cornerRadius = 6.0f;
     
     self.screenName = @"IOS AOManagerStoreScreenViewController - Certificate manager window";
+}
+- (IBAction)goBackHome:(id)sender {
+        [self.navigationController popToRootViewControllerAnimated:YES];
+    
 }
 
 -(IBAction)deleteButtonPressed:(id)sender{
@@ -154,19 +156,18 @@ NSString *cellSelectedManager = NULL;
 
 //Carga en la lista de almacenes los almacenes encontrados en Itunes.
 -(void)listFilesFromDocumentsFolder {
+    
+#if TARGET_IPHONE_SIMULATOR
+    tableDataManager = [[NSMutableArray alloc] init];
+    [tableDataManager addObject:@"ANF USUARIO ACTIVO"];
+#else
+    
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
     NSString *documentsDirectory = [paths objectAtIndex:0];
     
     NSFileManager *manager = [NSFileManager defaultManager];
     NSArray *fileList = [manager contentsOfDirectoryAtPath:documentsDirectory error:nil];
-    
-#if TARGET_IPHONE_SIMULATOR
-    //habilitamos el boton de seleccion de certificado.
-    tableDataManager = [[NSMutableArray alloc] init];
-    
-    [tableDataManager addObject:@"ANF USUARIO ACTIVO"];
-    
-#else
+
     if([fileList count]>0){
         //habilitamos el boton de seleccion de certificado.
         

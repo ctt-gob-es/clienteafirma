@@ -9,18 +9,9 @@
 	<key>CFBundleExecutable</key>
 	<string>${EXECUTABLE_NAME}</string>
 	<key>CFBundleIcons</key>
-	<dict>
-		<key>CFBundlePrimaryIcon</key>
-		<dict>
-			<key>CFBundleIconFiles</key>
-			<array>
-				<string>afirma_logo_57x57.png</string>
-				<string>afirma_logo_72x72.png</string>
-				<string>afirma_logo_114x114.png</string>
-				<string>afirma_logo_144x144.png</string>
-			</array>
-		</dict>
-	</dict>
+	<dict/>
+	<key>CFBundleIcons~ipad</key>
+	<dict/>
 	<key>CFBundleIdentifier</key>
 	<string>es.gob.afirma.${PRODUCT_NAME:rfc1034identifier}</string>
 	<key>CFBundleInfoDictionaryVersion</key>
@@ -42,8 +33,6 @@
 			<string>es.gob.afirma.iosclient</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>db-hig78yqqhwhxyqy</string>
-				<string>db-1d7bi6upounwvh2</string>
 				<string>afirma</string>
 			</array>
 		</dict>
