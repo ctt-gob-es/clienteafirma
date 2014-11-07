@@ -9,12 +9,9 @@ import org.w3c.dom.NodeList;
 
 import es.gob.afirma.android.signfolder.proxy.SignRequest.RequestType;
 
-/**
- * Analizador de XML de respuesta del detalle de una petici&oacute;n de firma.
- *
- * @author Carlos Gamuci
- */
-public class RequestDetailResponseParser {
+/** Analizador de XML de respuesta del detalle de una petici&oacute;n de firma.
+ * @author Carlos Gamuci */
+final class RequestDetailResponseParser {
 
 	private static final String DETAIL_RESPONSE_NODE = "dtl"; //$NON-NLS-1$
 	private static final String ID_ATTRIBUTE = "id"; //$NON-NLS-1$
@@ -40,10 +37,10 @@ public class RequestDetailResponseParser {
 
 	/** Valor usado por el Portafirmas para indicar que una petici&oacute;n es de firma. */
 	private static final String REQUEST_TYPE_SIGN = "FIRMA"; //$NON-NLS-1$
-	
+
 	/** Valor usado por el Portafirmas para indicar que una petici&oacute;n es de visto bueno. */
 	private static final String REQUEST_TYPE_APPROVE = "VISTOBUENO"; //$NON-NLS-1$
-	
+
 	private RequestDetailResponseParser() {
 		// No instanciable
 	}
@@ -68,12 +65,12 @@ public class RequestDetailResponseParser {
 		}
 
 		final NamedNodeMap attributes = doc.getDocumentElement().getAttributes();
-		Node attNode = attributes.getNamedItem(ID_ATTRIBUTE);
+		final Node attNode = attributes.getNamedItem(ID_ATTRIBUTE);
 		if (attNode == null || attNode.getNodeValue() == null || attNode.getNodeValue().trim().length() == 0) {
 			throw new IllegalArgumentException("El detalle de la peticion carece del atributo '" + //$NON-NLS-1$
 					ID_ATTRIBUTE + "' con el identificador de la peticion"); //$NON-NLS-1$
 		}
-		
+
 		final RequestDetail reqDetail = new RequestDetail(attNode.getNodeValue());
 
 		// Establecemos los atributos opcionales de la peticion
@@ -188,7 +185,7 @@ public class RequestDetailResponseParser {
 		else {
 			reqDetail.setForward(DEFAULT_REQUEST_FORWARD_VALUE);
 		}
-		
+
 		// Establecemos el tipo de peticion
 		attNode = attributes.getNamedItem(TYPE_ATTRIBUTE);
 		if (attNode != null && attNode.getNodeValue() != null) {

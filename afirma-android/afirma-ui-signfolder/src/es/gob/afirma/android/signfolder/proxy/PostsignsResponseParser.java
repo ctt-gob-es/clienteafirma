@@ -8,13 +8,10 @@ import org.w3c.dom.NodeList;
 import android.util.Log;
 import es.gob.afirma.android.signfolder.SFConstants;
 
-/**
- * Analizador de XML para la generaci&oacute;n de un listado de objetos
+/** Analizador de XML para la generaci&oacute;n de un listado de objetos
  * de tipo {@link es.gob.afirma.android.signfolder.proxy.TriphaseRequest} a partir
  * de un XML de respuesta de postfirma.
- *
- * @author Carlos Gamuci
- */
+ * @author Carlos Gamuci */
 public class PostsignsResponseParser {
 
 	private static final String POSTSIGN_RESPONSE_NODE = "posts"; //$NON-NLS-1$
@@ -77,10 +74,10 @@ public class PostsignsResponseParser {
 
 			attributeNode = attributes.getNamedItem(STATUS_ATTRIBUTE);
 			// statusOk = true, salvo que la propiedad status tenga el valor "KO"
-			statusOk = (attributeNode == null || !"KO".equalsIgnoreCase(attributeNode.getNodeValue())); //$NON-NLS-1$
+			statusOk = attributeNode == null || !"KO".equalsIgnoreCase(attributeNode.getNodeValue()); //$NON-NLS-1$
 
-			Log.i(SFConstants.LOG_TAG, "Ref="+ref+"; status=" + statusOk);
-			
+			Log.i(SFConstants.LOG_TAG, "Ref=" + ref + "; status=" + statusOk); //$NON-NLS-1$ //$NON-NLS-2$
+
 			return new RequestResult(ref, statusOk);
 		}
 	}

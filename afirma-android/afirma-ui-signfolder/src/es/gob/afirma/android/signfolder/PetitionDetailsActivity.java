@@ -48,49 +48,51 @@ import es.gob.afirma.android.signfolder.proxy.SignRequestDocument;
 import es.gob.afirma.core.signers.AOSignConstants;
 
 /** @author Carlos Gamuci */
-public class PetitionDetailsActivity extends FragmentActivity implements LoadSignRequestDetailsListener,
-DownloadDocumentListener, OperationRequestListener, PrivateKeySelectionListener, DialogFragmentListener {
+public final class PetitionDetailsActivity extends FragmentActivity implements LoadSignRequestDetailsListener,
+                                                                         DownloadDocumentListener,
+                                                                         OperationRequestListener,
+                                                                         PrivateKeySelectionListener,
+                                                                         DialogFragmentListener {
 
-	/** Clave para el paso del identificador de la solicitud de la que se desea mostrar el detalle. */
-	public static final String EXTRA_RESOURCE_CERT_B64 = "es.gob.afirma.signfolder.cert"; //$NON-NLS-1$
-	public static final String EXTRA_RESOURCE_CERT_ALIAS = "es.gob.afirma.signfolder.alias"; //$NON-NLS-1$    
-	public static final String EXTRA_RESOURCE_REQUEST_ID = "es.gob.afirma.signfolder.requestId"; //$NON-NLS-1$
-	public static final String EXTRA_RESOURCE_REQUEST_STATE = "es.gob.afirma.signfolder.requestState"; //$NON-NLS-1$
-    
-	public static final int RESULT_SIGN_OK = 1;
-	public static final int RESULT_REJECT_OK = 2;
-	public static final int RESULT_SIGN_FAILED = 3;
-	public static final int RESULT_REJECT_FAILED = 4;
+	static final String EXTRA_RESOURCE_CERT_B64 = "es.gob.afirma.signfolder.cert"; //$NON-NLS-1$
+	static final String EXTRA_RESOURCE_CERT_ALIAS = "es.gob.afirma.signfolder.alias"; //$NON-NLS-1$
+	static final String EXTRA_RESOURCE_REQUEST_ID = "es.gob.afirma.signfolder.requestId"; //$NON-NLS-1$
+	static final String EXTRA_RESOURCE_REQUEST_STATE = "es.gob.afirma.signfolder.requestState"; //$NON-NLS-1$
+
+	static final int RESULT_SIGN_OK = 1;
+	static final int RESULT_REJECT_OK = 2;
+	static final int RESULT_SIGN_FAILED = 3;
+	static final int RESULT_REJECT_FAILED = 4;
 
 	private static final String PDF_FILE_EXTENSION = ".pdf"; //$NON-NLS-1$
 	private static final String DOC_FILE_EXTENSION = ".doc"; //$NON-NLS-1$
 	private static final String DOCX_FILE_EXTENSION = ".docx"; //$NON-NLS-1$
 	private static final String TXT_FILE_EXTENSION = ".txt"; //$NON-NLS-1$
 	private static final String XML_FILE_EXTENSION = ".xml"; //$NON-NLS-1$
-	
-	public static final int REQUEST_CODE = 3;
-	
+
+	static final int REQUEST_CODE = 3;
+
 	/** Di&aacute;logo para confirmar la firma de peticiones. */
 	private final static int DIALOG_CONFIRM_OPERATION = 15;
-	
+
 	/** Di&aacute;logo para informar de un error. */
 	private final static int DIALOG_MSG_ERROR = 16;
-	
+
 	/** Di&aacute;logo para confirmar el rechazo de peticiones. */
 	private final static int DIALOG_CONFIRM_REJECT = 13;
-	
+
 	/** Tag para la presentaci&oacute;n de di&aacute;logos */
 	private final static String DIALOG_TAG = "dialog"; //$NON-NLS-1$
-		
+
 	private String certB64 = null;
 	private String certAlias = null;
-	
+
 	private RequestDetail reqDetails = null;
-	
+
 	private String requestState = null;
-	
+
 	private List<File> tempDocuments = null;
-    
+
 	private ProgressDialog progressDialog = null;
 	ProgressDialog getProgressDialog() {
 		return this.progressDialog;
@@ -98,23 +100,23 @@ DownloadDocumentListener, OperationRequestListener, PrivateKeySelectionListener,
 	void setProgressDialog(final ProgressDialog pd) {
 		this.progressDialog = pd;
 	}
-	
+
 	private TabHost th;
-	void setTabHost(TabHost th){
+	void setTabHost(final TabHost th){
 		this.th = th;
 	}
 	TabHost getTabHost(){
 		return this.th;
 	}
-	
+
 	private CustomAlertDialog dialog;
-	private void setCustomAlertDialog(CustomAlertDialog dialog){
+	private void setCustomAlertDialog(final CustomAlertDialog dialog){
 		this.dialog = dialog;
 	}
 	CustomAlertDialog getCustomAlertDialog(){
 		return this.dialog;
 	}
-	
+
 	@Override
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -123,48 +125,50 @@ DownloadDocumentListener, OperationRequestListener, PrivateKeySelectionListener,
         		SignRequest.STATE_UNRESOLVED.equals(getIntent().getStringExtra(EXTRA_RESOURCE_REQUEST_STATE)) ?
         				R.layout.activity_unresolved_petition_details :
         					R.layout.activity_resolved_petition_details);
-        
+
         setTabHost((TabHost) findViewById(android.R.id.tabhost));
-        getTabHost().setup();      
+        getTabHost().setup();
         getTabHost().getTabWidget().setDividerDrawable(R.drawable.tab_divider);
 
         setupTab(this.getResources().getString(R.string.details),1);
 		setupTab(this.getResources().getString(R.string.sign_lines),2);
 		setupTab(this.getResources().getString(R.string.docs),3);
      	getTabHost().setCurrentTab(0);
-     	
-     	
-     	
+
+
+
 	}
-	
+
 	/**
 	 * M&eacute;todo para cargar el contenido de cada pesta&ntilde;a del panel de detalle.
-	 * @param view 
+	 * @param view
 	 * @param tag
 	 * @param order
 	 */
-	private void setupTab(final String tag, int order) {
-		View tabview = createTabView( getTabHost().getContext(), tag);
+	private void setupTab(final String tag, final int order) {
+		final View tabview = createTabView( getTabHost().getContext(), tag);
 		if (order == 1) {
-			getTabHost().addTab( getTabHost().newTabSpec(String.valueOf(R.id.tab1)).setIndicator(tabview).setContent(R.id.tab1));	       
-		} else if(order == 2) {
+			getTabHost().addTab( getTabHost().newTabSpec(String.valueOf(R.id.tab1)).setIndicator(tabview).setContent(R.id.tab1));
+		}
+		else if(order == 2) {
 			getTabHost().addTab( getTabHost().newTabSpec(String.valueOf(R.id.tab2)).setIndicator(tabview).setContent(R.id.tab2));
-		} else if (order == 3) {
+		}
+		else if (order == 3) {
 			getTabHost().addTab( getTabHost().newTabSpec(String.valueOf(R.id.tab3)).setIndicator(tabview).setContent(R.id.tab3));
 		}
 	}
 
 	//metodo para crear la pestaña del tab customizada
 	private static View createTabView(final Context context, final String text) {
-		View view = LayoutInflater.from(context).inflate(R.layout.tabs_bg, null);
-		TextView tv = (TextView) view.findViewById(R.id.tabsText);
+		final View view = LayoutInflater.from(context).inflate(R.layout.tabs_bg, null);
+		final TextView tv = (TextView) view.findViewById(R.id.tabsText);
 		tv.setText(text);
 		return view;
 	}
 	@Override
 	protected void onStart() {
 		super.onStart();
-		
+
 		this.requestState = getIntent().getStringExtra(EXTRA_RESOURCE_REQUEST_STATE);
 		if (getIntent() != null && getIntent().getStringExtra(EXTRA_RESOURCE_REQUEST_ID) != null &&
 				getIntent().getStringExtra(EXTRA_RESOURCE_CERT_B64) != null &&
@@ -176,7 +180,7 @@ DownloadDocumentListener, OperationRequestListener, PrivateKeySelectionListener,
 				showRequestDetails(this.reqDetails);
 			}
 			else {
-				LoadPetitionDetailsTask lpdt = new LoadPetitionDetailsTask(
+				final LoadPetitionDetailsTask lpdt = new LoadPetitionDetailsTask(
 						getIntent().getStringExtra(EXTRA_RESOURCE_REQUEST_ID),
 						this.certB64,
 						CommManager.getInstance(),
@@ -194,7 +198,7 @@ DownloadDocumentListener, OperationRequestListener, PrivateKeySelectionListener,
 	String getCertB64() {
 		return this.certB64;
 	}
-	
+
     /**
      * Carga en las pesta&ntilde;as de los paneles de detalle de la solicitud la informaci&oacute;n
      * de la solicitud introducida.
@@ -204,12 +208,12 @@ DownloadDocumentListener, OperationRequestListener, PrivateKeySelectionListener,
     public void loadedSignRequestDetails(final RequestDetail details) {
 
     	dismissProgressDialog();
-    	
+
     	this.reqDetails = details;
-    	
+
     	showRequestDetails(details);
     }
-    
+
     private void showRequestDetails(final RequestDetail details) {
     	// Pestana de detalle
     	((TextView) findViewById(R.id.subjectValue)).setText(details.getSubject());
@@ -226,7 +230,7 @@ DownloadDocumentListener, OperationRequestListener, PrivateKeySelectionListener,
 	     		typeButton.setText(R.string.vb);
 	     	}
     	}
-    	
+
     	// Listado de remitentes en la pestana de detalle
     	final ListView sendersList = (ListView) findViewById(R.id.listSenders);
     	sendersList.setEnabled(false);
@@ -237,24 +241,24 @@ DownloadDocumentListener, OperationRequestListener, PrivateKeySelectionListener,
     	final ListView docsList = (ListView) findViewById(R.id.listDocs);
         docsList.setEnabled(false);
         docsList.setAdapter(new SignLineArrayAdapter(this, prepareDocsItems(documentsList)));
-    	
-        
+
+
     	// Listado de lineas de firma en la pestana de lineas de firma
     	final ListView signLinesList = (ListView) findViewById(R.id.listSignLines);
     	signLinesList.setEnabled(false);
-    	signLinesList.setAdapter(new SignLineArrayAdapter(this, prepareSignLineItems(details.getSignLines())));    	
+    	signLinesList.setAdapter(new SignLineArrayAdapter(this, prepareSignLineItems(details.getSignLines())));
     }
-   
+
     private List<RequestDetailAdapterItem> prepareDocsItems(final List<SignRequestDocument> documentsList){
-    	List<RequestDetailAdapterItem> list = new ArrayList<PetitionDetailsActivity.RequestDetailAdapterItem>();
+    	final List<RequestDetailAdapterItem> list = new ArrayList<PetitionDetailsActivity.RequestDetailAdapterItem>();
 		list.add(new SignLineHeader(getString(R.string.docs)));
 		for (int i = 0; i < documentsList.size(); i++) {
 			list.add(new DocItem(documentsList.get(i).getName(), documentsList.get(i).getSize(),
 					documentsList.get(i).getId(), DownloadFileTask.DOCUMENT_TYPE_DATA));
 		}
-		
+
 		if (SignRequest.STATE_SIGNED.equals(this.requestState) && this.reqDetails.getType() == RequestType.SIGNATURE) {
-			
+
 			// Firmas
 			list.add(new SignLineHeader(getString(R.string.signs)));
 			for (int i = 0; i<documentsList.size(); i++) {
@@ -263,7 +267,7 @@ DownloadDocumentListener, OperationRequestListener, PrivateKeySelectionListener,
 								getSignatureExtension(documentsList.get(i).getSignFormat())),
 								documentsList.get(i).getId(), DownloadFileTask.DOCUMENT_TYPE_SIGN));
 			}
-			
+
 			// Informes de firma
 			list.add(new SignLineHeader(getString(R.string.sign_reports)));
 			for (int i = 0; i<documentsList.size(); i++) {
@@ -274,16 +278,16 @@ DownloadDocumentListener, OperationRequestListener, PrivateKeySelectionListener,
     	}
     	return list;
     }
-    
+
     private final static String PADES_EXTENSION = "pdf";  //$NON-NLS-1$
     private final static String CADES_EXTENSION = "cades";  //$NON-NLS-1$
     private final static String XADES_EXTENSION = "xades";  //$NON-NLS-1$
-    
+
     /**
      * Devuelve la extensi&oacute;n correspondiente a una firma a partir del formato de firma utilizado.
      * @param signFormat Formato de firma.
      */
-    private static String getSignatureExtension(String signFormat) {
+    private static String getSignatureExtension(final String signFormat) {
     	String ext;
     	if (AOSignConstants.SIGN_FORMAT_PADES.equalsIgnoreCase(signFormat)) {
     		ext = PADES_EXTENSION;
@@ -296,18 +300,18 @@ DownloadDocumentListener, OperationRequestListener, PrivateKeySelectionListener,
     	}
     	return ext;
     }
-    
+
     private List<RequestDetailAdapterItem> prepareSignLineItems(final Vector<String>[] signLines) {
 
-    	List<RequestDetailAdapterItem> list = new ArrayList<PetitionDetailsActivity.RequestDetailAdapterItem>();
+    	final List<RequestDetailAdapterItem> list = new ArrayList<PetitionDetailsActivity.RequestDetailAdapterItem>();
     	for (int i = 0; i < signLines.length; i++) {
-    		Vector<String> signLine = signLines[i];
+    		final Vector<String> signLine = signLines[i];
     		list.add(new SignLineHeader(getString(R.string.signline_header, Integer.valueOf(i + 1))));
-    		for (String signer : signLine) {
+    		for (final String signer : signLine) {
     			list.add(new SignLineItem(signer));
     		}
     	}
-    	
+
 		return list;
 	}
 
@@ -318,27 +322,27 @@ DownloadDocumentListener, OperationRequestListener, PrivateKeySelectionListener,
     	// Ha ocurrido un error al cargar el detalle de la aplicacion, cerramos la actividad
     	closeActivity();
     }
-    
+
 	/**
 	 * Muestra un mensaje solicitando confirmacion al usuario para descargar y previsualizar
 	 * el fichero seleccionado.
 	 * @param docId Identificador del documento seleccionado.
 	 */
 	void showConfirmPreviewDialog(final String docId, final String filename, final int docType) {
-		
+
 		final OnClickListener listener = new OnClickListener() {
 			@Override
-			public void onClick(DialogInterface dialog, int which) {
+			public void onClick(final DialogInterface dlg, final int which) {
 				final DownloadFileTask dlfTask =
 						new DownloadFileTask(docId, docType,
 								filename,
 								docType == DownloadFileTask.DOCUMENT_TYPE_SIGN,
-								getCertB64(), CommManager.getInstance(), PetitionDetailsActivity.this, PetitionDetailsActivity.this);		
+								getCertB64(), CommManager.getInstance(), PetitionDetailsActivity.this, PetitionDetailsActivity.this);
 				dlfTask.execute();
 				showProgressDialogDownloadFile(getString(R.string.loading_doc), dlfTask);
 			}
 		};
-		
+
 		String dialogTitle;
 		String dialogMessage;
 		if (docType == DownloadFileTask.DOCUMENT_TYPE_SIGN) {
@@ -348,7 +352,7 @@ DownloadDocumentListener, OperationRequestListener, PrivateKeySelectionListener,
 			dialogMessage = getString(R.string.dialog_msg_confirm_preview);
 			dialogTitle = getString(R.string.dialog_msg_confirm_preview_title);
 		}
-		
+
 		final MessageDialog confirmPreviewDialog = new MessageDialog(dialogMessage,
 				dialogTitle, listener, null, this);
 
@@ -359,7 +363,7 @@ DownloadDocumentListener, OperationRequestListener, PrivateKeySelectionListener,
 			}
 		});
 	}
-    
+
     /**
      * Interfaz que implementan los tipos de elemento que componen las l&iacute;neas de firma.
      */
@@ -367,19 +371,19 @@ DownloadDocumentListener, OperationRequestListener, PrivateKeySelectionListener,
     	public int getViewType();
     	public View getView(LayoutInflater inflater, View convertView);
     }
-    
+
     /**
      * Tipo de elemento de la lista de lineas de firma (cabeceras y firmantes).
      */
     private enum SignLineItemType {
 		SIGNLINE_ITEM, HEADER_ITEM, DOC_ITEM
 	}
-    
+
     class SignLineHeader implements RequestDetailAdapterItem {
-    	
+
     	private final String name;
 
-        public SignLineHeader(String name) {
+        public SignLineHeader(final String name) {
             this.name = name;
         }
 
@@ -389,24 +393,24 @@ DownloadDocumentListener, OperationRequestListener, PrivateKeySelectionListener,
         }
 
         @Override
-        public View getView(LayoutInflater inflater, View convertView) {
+        public View getView(final LayoutInflater inflater, final View convertView) {
             View view;
             if (convertView == null) {
                 view = inflater.inflate(R.layout.array_adapter_header, null);
             } else {
                 view = convertView;
             }
-            TextView text = (TextView) view.findViewById(R.id.header);
+            final TextView text = (TextView) view.findViewById(R.id.header);
             text.setText(this.name);
 
             return view;
         }
     }
-    
-    public class SignLineItem implements RequestDetailAdapterItem {
+
+    final class SignLineItem implements RequestDetailAdapterItem {
         private final String signer;
-        
-        public SignLineItem(String signer) {
+
+        SignLineItem(final String signer) {
             this.signer = signer;
         }
 
@@ -416,7 +420,7 @@ DownloadDocumentListener, OperationRequestListener, PrivateKeySelectionListener,
         }
 
         @Override
-        public View getView(LayoutInflater inflater, View convertView) {
+        public View getView(final LayoutInflater inflater, final View convertView) {
             View view;
             if (convertView == null) {
                 view = inflater.inflate(R.layout.array_adapter_signline_item, null);
@@ -426,25 +430,25 @@ DownloadDocumentListener, OperationRequestListener, PrivateKeySelectionListener,
             }
 
             ((TextView) view.findViewById(R.id.signer)).setText(this.signer);
-            
+
             return view;
         }
     }
-    
-    public class DocItem implements RequestDetailAdapterItem, View.OnClickListener {
+
+    final class DocItem implements RequestDetailAdapterItem, View.OnClickListener {
     	private final String docId;
     	private final String name;
         private final int size;
         private final int docType;
-        
-        public DocItem(final String name, final int size, final String docId, final int docType) {
+
+        DocItem(final String name, final int size, final String docId, final int docType) {
             this.name = name;
             this.size = size;
             this.docId = docId;
             this.docType = docType;
         }
 
-        public DocItem(final String name, final String docId, final int docType) {
+        DocItem(final String name, final String docId, final int docType) {
             this.name = name;
             this.size = -1;
             this.docId = docId;
@@ -457,14 +461,15 @@ DownloadDocumentListener, OperationRequestListener, PrivateKeySelectionListener,
         }
 
         @Override
-        public View getView(LayoutInflater inflater, View convertView) {
+        public View getView(final LayoutInflater inflater, final View convertView) {
             View view;
             if (convertView == null) {
                 view = inflater.inflate(R.layout.array_adapter_file_chooser, null);
-            } else {
+            }
+            else {
                 view = convertView;
             }
-            
+
             view.setBackgroundResource(R.drawable.array_adapter_selector_white);
             final ImageView icon = (ImageView) view.findViewById(R.id.fileIcon);
     		final TextView t1 = (TextView) view.findViewById(R.id.TextView01);
@@ -481,31 +486,29 @@ DownloadDocumentListener, OperationRequestListener, PrivateKeySelectionListener,
     		} else {
     			icon.setImageResource(R.drawable.icon_file);
     		}
-    		
+
     		t1.setText(this.name);
     		if (this.size != -1) {
     			t2.setText(getString(R.string.file_chooser_tamano_del_fichero, formatFileSize(this.size)));
     		}
     		view.setOnClickListener(this);
-    		
+
             return view;
         }
-        
-        /**
-         * Devuelve una cadena con el tama&ntilde;o indicado  en bytes formateada.
-         * @param size Tama&ntilde;o que se quiere representar.
-         * @return Cadena que representa el tama&ntilde;o.
-         */
-    	private String formatFileSize(final long size) {
 
-    		if (size < 1024) {
-    			return addDotMiles(size) + " " + getString(R.string.bytes);  //$NON-NLS-1$
+        /** Devuelve una cadena con el tama&ntilde;o indicado  en bytes formateada.
+         * @param fileSize Tama&ntilde;o que se quiere representar.
+         * @return Cadena que representa el tama&ntilde;o. */
+    	private String formatFileSize(final long fileSize) {
+
+    		if (fileSize < 1024) {
+    			return addDotMiles(fileSize) + " " + getString(R.string.bytes);  //$NON-NLS-1$
     		}
-    		else if (size/1024 < 1024) {
-    			return addDotMiles(size/1024) + " " + getString(R.string.kilobytes);  //$NON-NLS-1$
+    		else if (fileSize/1024 < 1024) {
+    			return addDotMiles(fileSize/1024) + " " + getString(R.string.kilobytes);  //$NON-NLS-1$
     		}
     		else {
-    			final long kbs = size/1024;
+    			final long kbs = fileSize/1024;
     			String fraction = Long.toString(kbs % 1024);
     			if (fraction.length() > 2) {
     				fraction = fraction.substring(0, 2);
@@ -513,7 +516,7 @@ DownloadDocumentListener, OperationRequestListener, PrivateKeySelectionListener,
     			return addDotMiles(kbs/1024) + "," + fraction + " " + getString(R.string.megabytes);  //$NON-NLS-1$ //$NON-NLS-2$
     		}
     	}
-        
+
     	/**
     	 * Devuelve un n&uacute;mero en formato texto con los puntos de miles.
     	 * @param number N&uacute;mero que se quiere representar.
@@ -541,9 +544,9 @@ DownloadDocumentListener, OperationRequestListener, PrivateKeySelectionListener,
     		}
     		return buffer.toString();
     	}
-    	
+
         @Override
-		public void onClick(View v) {
+		public void onClick(final View v) {
 			showConfirmPreviewDialog(this.docId, this.name, this.docType);
 		}
     }
@@ -553,24 +556,24 @@ DownloadDocumentListener, OperationRequestListener, PrivateKeySelectionListener,
     class SignLineArrayAdapter extends ArrayAdapter<RequestDetailAdapterItem> {
 
     	private final LayoutInflater mInflater;
-    	
+
     	public SignLineArrayAdapter(final Context context, final List<RequestDetailAdapterItem> objects) {
     		super(context, 0, objects);
     		this.mInflater = LayoutInflater.from(context);
 		}
-    	
+
     	@Override
     	public int getViewTypeCount() {
     		return SignLineItemType.values().length;
     	}
-    	
+
     	@Override
-    	public int getItemViewType(int position) {
+    	public int getItemViewType(final int position) {
     		return getItem(position).getViewType();
     	}
-    	
+
     	@Override
-    	public View getView(int position, View convertView, ViewGroup parent) {
+    	public View getView(final int position, final View convertView, final ViewGroup parent) {
     		return getItem(position).getView(this.mInflater, convertView);
     	}
     }
@@ -595,18 +598,18 @@ DownloadDocumentListener, OperationRequestListener, PrivateKeySelectionListener,
 						Toast.makeText(PetitionDetailsActivity.this, R.string.toast_msg_download_ok, Toast.LENGTH_SHORT).show();
 					}
 				});
-			} catch (Exception e) {
+			} catch (final Exception e) {
 				Log.w(SFConstants.LOG_TAG, "No se pudo informar de que la firma se guardo correctamente: " + e); //$NON-NLS-1$
 				e.printStackTrace();
 			}
 		}
 	}
-	
+
 	@Override
 	public void downloadDocumentError() {
 		dismissProgressDialog();
 
-		final CustomAlertDialog dialog = CustomAlertDialog.newInstance(
+		final CustomAlertDialog dlg = CustomAlertDialog.newInstance(
 				DIALOG_MSG_ERROR,
 				getString(R.string.error),
 				getString(R.string.toast_error_previewing),
@@ -618,11 +621,11 @@ DownloadDocumentListener, OperationRequestListener, PrivateKeySelectionListener,
 		runOnUiThread(new Runnable() {
 			@Override
 			public void run() {
-				dialog.show(getSupportFragmentManager(), DIALOG_TAG);
+				dlg.show(getSupportFragmentManager(), DIALOG_TAG);
 			}
 		});
 	}
-	
+
 	/**
 	 * Abre y elimina un fichero
 	 * @param documentFile Documento que se debe abrir.
@@ -630,16 +633,16 @@ DownloadDocumentListener, OperationRequestListener, PrivateKeySelectionListener,
 	 * @param context Contento desde el que se abre el documento.
 	 */
 	private void openFile(final File documentFile, final String mimetype) {
-		
+
 		final Intent intent = new Intent(Intent.ACTION_VIEW);
 		intent.setDataAndType(Uri.fromFile(documentFile), mimetype);
 		try {
 			this.startActivity(intent);
-		} catch (ActivityNotFoundException e) {
-			
+		} catch (final ActivityNotFoundException e) {
+
 			Log.w(SFConstants.LOG_TAG, "No se pudo abrir el fichero guardado: " + e); //$NON-NLS-1$
 			e.printStackTrace();
-			
+
 			final MessageDialog md = new MessageDialog(
 					getString(R.string.error_file_not_support), null, this);
 			md.setTitle(getString(R.string.error_title_openning_file));
@@ -651,27 +654,27 @@ DownloadDocumentListener, OperationRequestListener, PrivateKeySelectionListener,
 			});
 		}
 	}
-		
+
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-		
+
 		if (this.tempDocuments != null) {
-			for (File doc : this.tempDocuments) {
+			for (final File doc : this.tempDocuments) {
 				Log.i(SFConstants.LOG_TAG, "Se intenta borrar el fichero: " + doc.getAbsolutePath()); //$NON-NLS-1$
 				doc.delete();
 			}
 		}
 	}
-    
+
     /** Metodo que define la accion a realizar al pulsar en el boton Sign
      * @param v Vista desde la que se invoco el metodo */
     public void onClickSign(final View v) {
     	if (this.reqDetails == null) {
     		return;
     	}
-    	
-    	final CustomAlertDialog dialog = CustomAlertDialog.newInstance(
+
+    	final CustomAlertDialog dlg = CustomAlertDialog.newInstance(
     			DIALOG_CONFIRM_OPERATION,
     			getString(R.string.aviso),
     			getConfirmDialogMessage(this.reqDetails.getType()),
@@ -679,24 +682,24 @@ DownloadDocumentListener, OperationRequestListener, PrivateKeySelectionListener,
     			getString(R.string.cancel),
     			this
     			);
-    	
+
     	runOnUiThread(new Runnable() {
 			@Override
 			public void run() {
-				dialog.show(getSupportFragmentManager(), DIALOG_TAG);
+				dlg.show(getSupportFragmentManager(), DIALOG_TAG);
 			}
 		});
     }
-    
-    
+
+
     //Metodo que devuelve un string indicando el tipo de operacion a realizar: firmar, vb
-    private String getConfirmDialogMessage(RequestType type){
+    private String getConfirmDialogMessage(final RequestType type){
     	if(type == RequestType.APPROVE) {
     		return getString(R.string.dialog_msg_confirm_approve);
     	}
     	return getString(R.string.dialog_msg_confirm_sign);
     }
-    
+
     /** Metodo que define la accion a realizar al pulsar en el boton Reject
      * @param v Vista desde la que se invoco el metodo */
     public void onClickReject(final View v) {
@@ -713,7 +716,7 @@ DownloadDocumentListener, OperationRequestListener, PrivateKeySelectionListener,
     			getString(android.R.string.cancel),
     			this)
     	);
-    	
+
     	runOnUiThread(new Runnable() {
 			@Override
 			public void run() {
@@ -723,7 +726,7 @@ DownloadDocumentListener, OperationRequestListener, PrivateKeySelectionListener,
     }
 
     private void processRequest(final RequestType type) {
-    	
+
     	if (type == RequestType.SIGNATURE) {
     		showProgressDialog(getString(R.string.dialog_msg_signing_1),null);
     		new LoadSelectedPrivateKeyTask(this.certAlias, this, this).execute();
@@ -732,7 +735,7 @@ DownloadDocumentListener, OperationRequestListener, PrivateKeySelectionListener,
     		approveRequest();
     	}
     }
-    
+
     @Override
 	public synchronized void keySelected(final KeySelectedEvent kse) {
 
@@ -763,35 +766,35 @@ DownloadDocumentListener, OperationRequestListener, PrivateKeySelectionListener,
 			showToastMessage(ErrorManager.getErrorMessage(ErrorManager.ERROR_PKE));
 			return;
 		}
-	
+
 		doSign(pke.getPrivateKey(), (X509Certificate[]) pke.getCertificateChain());
 	}
-	
+
 	private void doSign(final PrivateKey pk, final X509Certificate[] certChain) {
 		new SignRequestTask(this.reqDetails, pk, certChain, CommManager.getInstance(), this).execute();
 	}
-    
+
     private void rejectRequest() {
-    	
+
     	showProgressDialog(getString(R.string.dialog_msg_rejecting_1),null);
-    	
+
     	new RejectRequestsTask(
     			this.reqDetails.getId(), this.certB64, CommManager.getInstance(), this).execute();
     }
 
     private void approveRequest() {
-    	
+
     	showProgressDialog(getString(R.string.dialog_msg_approving_1),null);
-    	
+
     	new ApproveRequestsTask(
     			this.reqDetails.getId(), this.certB64, CommManager.getInstance(), this).execute();
     }
-    
+
 	@Override
 	public void requestOperationFinished(final int operation, final RequestResult requestResult) {
-		
+
 		dismissProgressDialog();
-		
+
 		if (operation == OperationRequestListener.REJECT_OPERATION) {
 			setResult(requestResult.isStatusOk() ?
 					PetitionDetailsActivity.RESULT_REJECT_OK : PetitionDetailsActivity.RESULT_REJECT_FAILED);
@@ -805,29 +808,29 @@ DownloadDocumentListener, OperationRequestListener, PrivateKeySelectionListener,
 
 	@Override
 	public void requestOperationFailed(final int operation, final RequestResult requests, final Throwable t) {
-		
+
 		dismissProgressDialog();
-		
-		Log.i("es.gob.afirma", "Ha fallado la operacion con la excepcion: " + t);
+
+		Log.i("es.gob.afirma", "Ha fallado la operacion con la excepcion: " + t); //$NON-NLS-1$ //$NON-NLS-2$
 		if (t != null) {
 			t.printStackTrace();
 		}
-		
-		final int resultCode = (operation == OperationRequestListener.REJECT_OPERATION) ?
+
+		final int resultCode = operation == OperationRequestListener.REJECT_OPERATION ?
 				PetitionDetailsActivity.RESULT_REJECT_FAILED :
 				PetitionDetailsActivity.RESULT_SIGN_FAILED;
 
 		setResult(resultCode);
 		closeActivity();
 	}
-	
+
 	/**
 	 * Muestra un mensaje en un toast.
 	 * @param message
 	 */
 	@SuppressLint("ShowToast")
-	void showToastMessage(String message) {
-		
+	void showToastMessage(final String message) {
+
 		final Toast toast = Toast.makeText(this, message, Toast.LENGTH_LONG);
 		runOnUiThread(new Runnable() {
 			@Override
@@ -836,20 +839,20 @@ DownloadDocumentListener, OperationRequestListener, PrivateKeySelectionListener,
 			}
 		});
 	}
-	
+
 	/** Cierra el activity liberando recursos. */
 	void closeActivity() {
 		this.reqDetails = null;
 		finish();
 	}
-	
+
 	/** Cierra el di&aacute;logo de espera en caso de estar abierto. */
 	void dismissProgressDialog() {
 		if (getProgressDialog() != null) {
 			runOnUiThread(new Runnable() {
 				@Override
 				public void run() {
-					getProgressDialog().dismiss();	
+					getProgressDialog().dismiss();
 				}
 			});
 		}
@@ -860,11 +863,11 @@ DownloadDocumentListener, OperationRequestListener, PrivateKeySelectionListener,
 			@Override
 			public void run() {
 				try {
-					setProgressDialog(ProgressDialog.show(PetitionDetailsActivity.this, null, message, true)); 
+					setProgressDialog(ProgressDialog.show(PetitionDetailsActivity.this, null, message, true));
 					if(lpdt != null){
 						getProgressDialog().setOnKeyListener(new OnKeyListener() {
 							@Override
-							public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
+							public boolean onKey(final DialogInterface dlg, final int keyCode, final KeyEvent event) {
 								if (keyCode == KeyEvent.KEYCODE_BACK) {
 									lpdt.cancel(true);
 									dismissProgressDialog();
@@ -875,24 +878,24 @@ DownloadDocumentListener, OperationRequestListener, PrivateKeySelectionListener,
 							}
 						});
 					}
-				} catch (Exception e) {
+				} catch (final Exception e) {
 					Log.e(SFConstants.LOG_TAG, "No se ha podido mostrar el dialogo de progreso: " + e); //$NON-NLS-1$
 				}
 			}
 		});
 	}
-	
+
 	/** Muestra un di&aacute;logo de espera con un mensaje. */
 	void showProgressDialogDownloadFile(final String message, final DownloadFileTask dlfTask) {
 		runOnUiThread(new Runnable() {
 			@Override
 			public void run() {
 				try {
-					setProgressDialog(ProgressDialog.show(PetitionDetailsActivity.this, null, message, true)); 
+					setProgressDialog(ProgressDialog.show(PetitionDetailsActivity.this, null, message, true));
 					getProgressDialog().setOnKeyListener(new OnKeyListener() {
-		
+
 						@Override
-						public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
+						public boolean onKey(final DialogInterface dlg, final int keyCode, final KeyEvent event) {
 							if (keyCode == KeyEvent.KEYCODE_BACK) {
 								//Stop task, al presionar el boton volver del dialogo paramos la descarga del fichero
 								dlfTask.cancel(true);
@@ -902,15 +905,15 @@ DownloadDocumentListener, OperationRequestListener, PrivateKeySelectionListener,
 							return false;
 						}
 					});
-				} catch (Exception e) {
+				} catch (final Exception e) {
 					Log.e(SFConstants.LOG_TAG, "No se ha podido mostrar el dialogo de progreso: " + e); //$NON-NLS-1$
 				}
 			}
 		});
 	}
-	
+
 	@Override
-	public void onDialogPositiveClick(int dialogId) {
+	public void onDialogPositiveClick(final int dialogId) {
 		if(dialogId == DIALOG_CONFIRM_OPERATION) {
 			processRequest(this.reqDetails.getType());
 		}
@@ -920,10 +923,10 @@ DownloadDocumentListener, OperationRequestListener, PrivateKeySelectionListener,
 			rejectRequest();
 		}
 	}
-	
+
 	@Override
-	public void onDialogNegativeClick(int dialogId) {
+	public void onDialogNegativeClick(final int dialogId) {
 		// No hacemos nada
 	}
-	
+
 }

@@ -6,10 +6,8 @@ import android.util.Log;
 import es.gob.afirma.android.signfolder.proxy.CommManager;
 import es.gob.afirma.android.signfolder.proxy.RequestAppConfiguration;
 
-/**
- * Carga los datos remotos necesarios para la configuraci&oacute;n de la aplicaci&oacute;n
- */
-public class LoadConfigurationDataTask extends AsyncTask<Void, Void, RequestAppConfiguration> {
+/** Carga los datos remotos necesarios para la configuraci&oacute;n de la aplicaci&oacute;n. */
+final class LoadConfigurationDataTask extends AsyncTask<Void, Void, RequestAppConfiguration> {
 
 	private final String certB64;
 	private final String certAlias;
@@ -26,7 +24,7 @@ public class LoadConfigurationDataTask extends AsyncTask<Void, Void, RequestAppC
 	 * @param context Contexto de la aplicaci&oacute;n.
 	 * @param listener Manejador del resultado de la operaci&oacute;n.
 	 */
-	public LoadConfigurationDataTask(final String certB64, final String certAlias,
+	LoadConfigurationDataTask(final String certB64, final String certAlias,
 			final CommManager commManager, final Context context, final LoadConfigurationListener listener) {
 		this.certB64 = certB64;
 		this.certAlias = certAlias;
@@ -48,7 +46,7 @@ public class LoadConfigurationDataTask extends AsyncTask<Void, Void, RequestAppC
     	}
 
     	// Agregamos la configuracion necesaria
-		// Como primer elemento aparecera el elemento que desactiva el filtro 
+		// Como primer elemento aparecera el elemento que desactiva el filtro
     	if (config != null) {
     		config.getAppIdsList().add(0, ""); //$NON-NLS-1$
     		config.getAppNamesList().add(0, this.context.getString(R.string.filter_app_all_request));
@@ -66,15 +64,13 @@ public class LoadConfigurationDataTask extends AsyncTask<Void, Void, RequestAppC
 			this.listener.configurationLoadError(this.t);
 		}
 	}
-	
-	/**
-	 * Interfaz con los metodos para gestionar los resultados de la carga de la
-	 * configuraci&oacute;n de la aplicaci&oacute;n.
-	 */
+
+	/** Interfaz con los metodos para gestionar los resultados de la carga de la
+	 * configuraci&oacute;n de la aplicaci&oacute;n. */
 	interface LoadConfigurationListener {
-		
-		public void configurationLoadSuccess(RequestAppConfiguration appConfig, String certB64, String certAlias);
-		
-		public void configurationLoadError(Throwable t);
+
+		void configurationLoadSuccess(RequestAppConfiguration appConfig, String certB64, String certAlias);
+
+		void configurationLoadError(Throwable t);
 	}
 }

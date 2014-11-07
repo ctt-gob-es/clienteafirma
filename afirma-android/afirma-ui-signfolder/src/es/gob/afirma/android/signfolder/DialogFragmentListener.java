@@ -1,8 +1,8 @@
 package es.gob.afirma.android.signfolder;
 
-public interface DialogFragmentListener {
+interface DialogFragmentListener {
 
-	public void onDialogPositiveClick(int dialogId);
-	
-	public void onDialogNegativeClick(int dialogId);
+	void onDialogPositiveClick(int dialogId);
+
+	void onDialogNegativeClick(int dialogId);
 }

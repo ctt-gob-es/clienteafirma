@@ -11,7 +11,7 @@ import android.support.v4.app.DialogFragment;
 /** Di&aacute;logo modal con el que mostrar al usuario un mensaje y un bot&oacute;n para ocultar el
  * di&aacute;logo y, opcionalmente, realizar una acci&oacute;n. */
 @SuppressLint("ValidFragment")
-class MessageDialog extends DialogFragment {
+final class MessageDialog extends DialogFragment {
 
 	private String title = null;
 	private String message = null;
@@ -21,8 +21,8 @@ class MessageDialog extends DialogFragment {
 
 	private final AlertDialog.Builder dialogBuilder;
 
-	private final boolean needShowNegativeButton; 
-	
+	private final boolean needShowNegativeButton;
+
 	/**
 	 * Construye el di&aacute;logo.
 	 * @param message Mensaje que mostrar al usuario.
@@ -48,14 +48,14 @@ class MessageDialog extends DialogFragment {
 		this.positiveListener = positiveListener;
 		this.negativeListener = negativeListener;
 		this.needShowNegativeButton = true;
-		
+
 		if (activity == null) {
 			this.dialogBuilder = new AlertDialog.Builder(getActivity());
 		}
 		else {
 			this.dialogBuilder = new AlertDialog.Builder(activity);
 		}
-	}	
+	}
 
 	void setMessage(final String message) {
 		this.message = message;
@@ -72,7 +72,7 @@ class MessageDialog extends DialogFragment {
 		}
 		this.dialogBuilder.setMessage(this.message);
 		this.dialogBuilder.setPositiveButton(android.R.string.ok, this.positiveListener);
-		
+
 		if (this.needShowNegativeButton) {
 			this.dialogBuilder.setNegativeButton(android.R.string.cancel, this.negativeListener);
 		}

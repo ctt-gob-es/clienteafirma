@@ -2,24 +2,24 @@ package es.gob.afirma.android.signfolder.proxy;
 
 /** Informaci&oacute;n de un documento de una solicitud de firma.
  * @author Carlos Gamuci */
-public class SignRequestDocument {
+public final class SignRequestDocument {
 
-	public static final String CRYPTO_OPERATION_SIGN = "sign"; //$NON-NLS-1$
-	public static final String CRYPTO_OPERATION_COSIGN = "cosign"; //$NON-NLS-1$
-	public static final String CRYPTO_OPERATION_COUNTERSIGN = "countersign"; //$NON-NLS-1$
-	
+	static final String CRYPTO_OPERATION_SIGN = "sign"; //$NON-NLS-1$
+	static final String CRYPTO_OPERATION_COSIGN = "cosign"; //$NON-NLS-1$
+	static final String CRYPTO_OPERATION_COUNTERSIGN = "countersign"; //$NON-NLS-1$
+
 	/** Identificador del documento */
 	private final String id;
 
 	/** Operaci&oacute;n que se debe realizar sobre el documento (sign, cosign o countersign). */
 	private final String cryptoOperation;
-	
+
 	/** Nombre del documento */
 	private final String name;
 
 	/** Tama&ntilde;o del documento */
 	private final int size;
-	
+
 	/** MimeType del documento */
 	private final String mimeType;
 
@@ -28,7 +28,7 @@ public class SignRequestDocument {
 
 	/** Formato de firma a aplicar */
 	private final String messageDigestAlgorithm;
-	
+
 	/** Par&aacute;metros de firma conforme a las especificaciones de los extraParams de @firma. */
 	private final String params;
 
@@ -44,7 +44,7 @@ public class SignRequestDocument {
 	public SignRequestDocument(final String id, final String name, final int size, final String mimeType, final String signFormat, final String messageDigestAlgorithm, final String params) {
 		this(id, name, size, mimeType, signFormat, messageDigestAlgorithm, params, CRYPTO_OPERATION_SIGN);
 	}
-	
+
 	/** Crea un documento englobado en una petici&oacute;n de firma/multifirma.
 	 * @param id Identificador del documento.
 	 * @param name Nombre.
@@ -55,7 +55,7 @@ public class SignRequestDocument {
 	 * @param params Par&aacute;metros de configuraci&oacute;n de la firma.
 	 * @param operationId Identificador de la operaci&oacute;n que se debe realizar sobre le documento.
 	 */
-	private SignRequestDocument(final String id, final String name, final int size, final String mimeType, final String signFormat, final String messageDigestAlgorithm, final String params, String cryptoOperation) {
+	private SignRequestDocument(final String id, final String name, final int size, final String mimeType, final String signFormat, final String messageDigestAlgorithm, final String params, final String cryptoOperation) {
 		this.id = id;
 		this.name = name;
 		this.size = size;
@@ -77,7 +77,7 @@ public class SignRequestDocument {
 	public String getCryptoOperation() {
 		return this.cryptoOperation;
 	}
-	
+
 	/** Recupera el nombre del documento.
 	 * @return Nombre del documento. */
 	public String getName() {
@@ -89,7 +89,7 @@ public class SignRequestDocument {
 	public int getSize() {
 		return this.size;
 	}
-	
+
 	/** Recupera el mimetype del documento.
 	 * @return Mimetype del documento. */
 	public String getMimeType() {
@@ -114,7 +114,7 @@ public class SignRequestDocument {
 	public String getParams() {
 		return this.params;
 	}
-	
+
 	@Override
 	public String toString() {
 		return getName();

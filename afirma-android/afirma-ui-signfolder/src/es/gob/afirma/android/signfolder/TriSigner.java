@@ -20,10 +20,9 @@ import es.gob.afirma.core.signers.AOPkcs1Signer;
 
 /** Firmador trif&aacute;sico.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
-public final class TriSigner {
+final class TriSigner {
 
-	/**
-	 * Firma de forma trif&aacute;sica una petici&oacute;n de firma.
+	/** Firma de forma trif&aacute;sica una petici&oacute;n de firma.
 	 * @param request Petici&oacute;n de firma.
 	 * @param pk Clave privada para al firma.
 	 * @param certificateChain Cadena de certificaci&oacute;n del certificado de firma.
@@ -31,30 +30,29 @@ public final class TriSigner {
 	 * @return Resultado de la operaci&oacute;n.
 	 * @throws CertificateEncodingException Cuando hay un error en la codificaci&oacute;n del certificado.
 	 * @throws IOException Cuando hay un error de lectura/escritura de datos.
-	 * @throws SAXException Cuando el XML est&aacute; mal formado.
-	 */
-	public static RequestResult sign(SignRequest request, PrivateKey pk,
-			X509Certificate[] certificateChain, CommManager commMgr)
+	 * @throws SAXException Cuando el XML est&aacute; mal formado. */
+	static RequestResult sign(final SignRequest request, final PrivateKey pk,
+			final X509Certificate[] certificateChain, final CommManager commMgr)
 					throws CertificateEncodingException, IOException, SAXException {
 
 		// *****************************************************************************************************
 		// **************************** PREFIRMA ***************************************************************
 		//******************************************************************************************************
-		
+
 		Log.i(SFConstants.LOG_TAG, "TriSigner - sign: == PREFIRMA =="); //$NON-NLS-1$
-		
+
 		// Mandamos a prefirmar y obtenemos los resultados
 		final TriphaseRequest[] signRequest = commMgr.preSignRequests(
 				request,
 				certificateChain[0] // Solo el primero, no toda la cadena
 				);
-		
+
 		// *****************************************************************************************************
 		// ******************************* FIRMA ***************************************************************
 		//******************************************************************************************************
-		
+
 		Log.i(SFConstants.LOG_TAG, "TriSigner - sign: == FIRMA =="); //$NON-NLS-1$
-		
+
 		// Recorremos las peticiones de firma
 		for (int i = 0; i < signRequest.length; i++) {
 
@@ -65,7 +63,7 @@ public final class TriSigner {
 			}
 
 			// Recorremos cada uno de los documentos de cada peticion de firma
-			for(TriphaseSignDocumentRequest docRequests : signRequest[i].getDocumentsRequests()) {
+			for(final TriphaseSignDocumentRequest docRequests : signRequest[i].getDocumentsRequests()) {
 				// Firmamos las prefirmas y actualizamos los parciales de cada documento de cada peticion
 				try {
 					signPhase2(docRequests, pk, certificateChain);
@@ -73,19 +71,19 @@ public final class TriSigner {
 				catch(final Exception e) {
 					Log.w(SFConstants.LOG_TAG, "Error en la fase de FIRMA: " + e); //$NON-NLS-1$
 					e.printStackTrace();
-					
+
 					// Si un documento falla en firma toda la peticion se da por fallida
 					return new RequestResult(request.getId(), false);
 				}
 			} // Documentos de peticion
 		} // Peticiones
-		
+
 		// *****************************************************************************************************
 		// **************************** POSTFIRMA **************************************************************
 		//******************************************************************************************************
-		
+
 		Log.i(SFConstants.LOG_TAG, "TriSigner - sign: == POSTFIRMA =="); //$NON-NLS-1$
-		
+
 		// Mandamos a postfirmar y recogemos el resultado
 		return commMgr.postSignRequests(
 				signRequest,
@@ -98,13 +96,13 @@ public final class TriSigner {
 	 * @param signFormat Formato de firma.
 	 * @return Formato de firma trif&aacute;sico.
 	 */
-	private static String getSignatureAlgorithm(String mdAlgorithm) {
+	private static String getSignatureAlgorithm(final String mdAlgorithm) {
 		return mdAlgorithm.replace("-", "") + "withRSA"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
-	
+
 	/**
 	 * Genera la firma PKCS#1 (segunda fase del proceso de firma trif&aacute;sica) y muta el objeto
-	 * de petici&oacute;n de firma de un documento para almacenar el mismo el resultado. 
+	 * de petici&oacute;n de firma de un documento para almacenar el mismo el resultado.
 	 * @param docRequest Petici&oacute;n de firma de un documento.
 	 * @param key Clave privada de firma.
 	 * @param certChain Cadena de certificaci&oacute;n del certificado de firma.
@@ -114,9 +112,9 @@ public final class TriSigner {
 	private static void signPhase2(final TriphaseSignDocumentRequest docRequest, final PrivateKey key, final Certificate[] certChain) throws AOException {
 
 		final String signatureAlgorithm = getSignatureAlgorithm(docRequest.getMessageDigestAlgorithm());
-		
+
 		final TriphaseConfigData config = docRequest.getPartialResult();
-		
+
 		// Es posible que se ejecute mas de una firma como resultado de haber proporcionado varios
 		// identificadores de datos o en una operacion de contrafirma.
 
@@ -124,7 +122,7 @@ public final class TriSigner {
 		if (config.getSignCount() != null) {
 			signCount = config.getSignCount().intValue();
 		}
-		
+
 		for (int i = 0; i < signCount; i++) {
 			final byte[] preSign = config.getPreSign(i);
 			if (preSign == null) {
@@ -141,7 +139,7 @@ public final class TriSigner {
 
 			// Configuramos la peticion de postfirma indicando las firmas PKCS#1 generadas
 			config.addPk1(pkcs1sign);
-			
+
 			if (config.isNeedPreSign() == null || !config.isNeedPreSign().booleanValue()) {
 				config.setPreSign(i, null);
 			}

@@ -16,18 +16,16 @@ import es.gob.afirma.android.signfolder.proxy.RequestResult;
 import es.gob.afirma.android.signfolder.proxy.SignRequest;
 import es.gob.afirma.core.AOException;
 
-/**
- * Clase para la firma de peticiones. El resultado del proceso, se gestiona, a nivel individual para
+/** Clase para la firma de peticiones. El resultado del proceso, se gestiona, a nivel individual para
  * cada petici&oacute;n desde un listener.
- * @author Carlos Gamuci Mill&aacute;n
- */
-public class RequestSigner implements PrivateKeySelectionListener {
+ * @author Carlos Gamuci Mill&aacute;n */
+final class RequestSigner implements PrivateKeySelectionListener {
 
 	private final String certAlias;
 	private SignRequest[] requests;
 	private final OperationRequestListener opListener;
 	private final Context c;
-	
+
 	/**
 	 * Construye un objeto con la configuraci&oacute;n necesaria para firmar.
 	 * @param certAlias Alias del certificado de firma.
@@ -36,22 +34,22 @@ public class RequestSigner implements PrivateKeySelectionListener {
 	 */
 	public RequestSigner(final String certAlias, final OperationRequestListener operationListener, final Context context) {
 		this.certAlias = certAlias;
-		
+
 		this.opListener = operationListener;
 		this.c = context;
 	}
-	
+
 	/**
 	 * Firma un listado de peticiones.
 	 * @param signRequests Peticiones a firmar.
 	 */
 	public void sign(final SignRequest[] signRequests) {
-		
+
 		this.requests = signRequests;
-		
+
 		new LoadSelectedPrivateKeyTask(this.certAlias, this, this.c).execute();
 	}
-	
+
 	@SuppressWarnings("null")
 	@Override
 	public synchronized void keySelected(final KeySelectedEvent kse) {
@@ -83,9 +81,9 @@ public class RequestSigner implements PrivateKeySelectionListener {
 			Log.e(SFConstants.LOG_TAG, "Error desconocido en la seleccion del certificado: " + e.toString()); //$NON-NLS-1$
 			t = new AOException(ErrorManager.getErrorMessage(ErrorManager.ERROR_PKE), e);
 		}
-		
+
 		if (t != null) {
-			for (SignRequest req : this.requests) {
+			for (final SignRequest req : this.requests) {
 				this.opListener.requestOperationFailed(OperationRequestListener.SIGN_OPERATION,
 						new RequestResult(req.getId(), false), t);
 			}
@@ -94,9 +92,9 @@ public class RequestSigner implements PrivateKeySelectionListener {
 
 		doSign(this.requests, pke.getPrivateKey(), (X509Certificate[]) pke.getCertificateChain());
 	}
-	
-	private void doSign(final SignRequest[] requests, final PrivateKey pk, final X509Certificate[] certChain) {
-		for (SignRequest req : requests) {
+
+	private void doSign(final SignRequest[] reqs, final PrivateKey pk, final X509Certificate[] certChain) {
+		for (final SignRequest req : reqs) {
 			new SignRequestTask(req, pk, certChain, CommManager.getInstance(), this.opListener).execute();
 		}
 	}

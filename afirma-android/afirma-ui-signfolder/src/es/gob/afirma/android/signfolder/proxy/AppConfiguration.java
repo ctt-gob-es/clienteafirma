@@ -3,16 +3,14 @@ package es.gob.afirma.android.signfolder.proxy;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Configuracion de la aplicaci&oacute;n.
- * @author Carlos Gamuci
- */
+/** Configuracion de la aplicaci&oacute;n.
+ * @author Carlos Gamuci. */
 public class AppConfiguration {
 
 	private List<String> appIdsList;
 	private List<String> appNamesList;
-	
-	public AppConfiguration() {
+
+	AppConfiguration() {
 		this.appIdsList = new ArrayList<String>();
 		this.appNamesList = new ArrayList<String>();
 	}
@@ -21,7 +19,7 @@ public class AppConfiguration {
 		return this.appIdsList;
 	}
 
-	public void setAppIdsList(List<String> appIdsList) {
+	void setAppIdsList(final List<String> appIdsList) {
 		this.appIdsList = appIdsList;
 	}
 
@@ -29,7 +27,7 @@ public class AppConfiguration {
 		return this.appNamesList;
 	}
 
-	public void setAppNamesList(List<String> appNamesList) {
+	void setAppNamesList(final List<String> appNamesList) {
 		this.appNamesList = appNamesList;
 	}
 }

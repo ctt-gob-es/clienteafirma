@@ -19,7 +19,7 @@ import es.gob.afirma.core.misc.Base64;
 
 /**
  * Gestor de comunicaciones con el servidor de portafirmas m&oacute;vil.
- * 
+ *
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s
  */
 public final class CommManager {
@@ -40,7 +40,7 @@ public final class CommManager {
 	private static final String OPERATION_PREVIEW_SIGN = "8"; //$NON-NLS-1$
 	private static final String OPERATION_PREVIEW_REPORT = "9"; //$NON-NLS-1$
 
-	/** Tiempo maximo que se va a esperar por una respuesta del proxy. */
+	/** Tiempo m&aacute;ximo que se va a esperar por una respuesta del proxy. */
 	private static final int DEFAULT_CONNECTION_READ_TIMEOUT = 14000;
 
 	private DocumentBuilder db;
@@ -51,6 +51,8 @@ public final class CommManager {
 
 	private static CommManager instance = null;
 
+	/** Obtiene una instancia de la clase.
+	 * @return Gestor de comunicaciones con el Proxy. */
 	public static CommManager getInstance() {
 		if (instance == null) {
 			instance = new CommManager(AppPreferences.getUrlProxy());
@@ -59,12 +61,12 @@ public final class CommManager {
 		return instance;
 	}
 
-	private CommManager(String proxyUrl) {
+	private CommManager(final String proxyUrl) {
 		this.signFolderProxyUrl = proxyUrl;
 
 		try {
 			this.db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-		} catch (ParserConfigurationException e) {
+		} catch (final ParserConfigurationException e) {
 			Log.e(LOGGER_TAG,
 					"No se ha podido cargar un manejador de XML: " + e.toString()); //$NON-NLS-1$
 			e.printStackTrace();
@@ -72,15 +74,12 @@ public final class CommManager {
 		}
 	}
 
+	/** Reinicia la confifuraci&oacute;n del gestor. */
 	public static void resetConfig() {
 		instance = null;
 	}
 
-	/** Extraer bytes -> Comprimir -> Convertir a Base64 URL_SAFE. */
-	private static String prepareParam(final String param) throws IOException {
-		// return
-		// Base64.encodeBytes(AndroidGzipCompressor.gzip(param.getBytes()),
-		// Base64.URL_SAFE);
+	private static String prepareParam(final String param) {
 		return Base64.encode(param.getBytes(), true);
 	}
 
@@ -109,12 +108,10 @@ public final class CommManager {
 	 * <li>Que las solicitudes cumplan con los filtros establecidos. Estos
 	 * filtros tendran la forma: key=value</li>
 	 * </ul>
-	 * 
-	 * @param signRequestState
-	 *            Estado de las peticiones que se desean obtener.
-	 * @param signFormats
-	 *            Listado de formatos de firmas soportados (para que solo se
-	 *            env&iacuteM;n.
+	 * @param certEncodedB64 Certificado codificado en Base64.
+	 * @param signRequestState Estado de las peticiones que se desean obtener.
+	 * @param signFormats Listado de formatos de firmas soportados (para que solo se
+	 *                    env&iacuteM;n.
 	 * @param filters
 	 *            Listado de filtros que deben cumplir las peticiones
 	 *            recuperadas. Los filtros soportados son:
@@ -136,6 +133,8 @@ public final class CommManager {
 	 *            una aplicaci&oacute;n. Filtra las peticiones en base a la
 	 *            aplicaci&oacute;n, ej: "SANCIONES"</li>
 	 *            </ul>
+	 * @param numPage
+	 * @param pageSize
 	 * @return Lista de peticiones de firma
 	 * @throws SAXException
 	 *             Si el XML obtenido del servidor no puede analizarse
@@ -156,26 +155,21 @@ public final class CommManager {
 				OPERATION_REQUEST, dataB64UrlSafe)));
 	}
 
-	/**
-	 * Inicia la pre-firma remota de las peticiones.
-	 * 
-	 * @param requests
-	 *            Peticiones a pre-firmar
-	 * @param cert
-	 *            Certificado del firmante
-	 * @return Prefirmas de las peticiones enviadas
-	 * @throws IOException
-	 *             Si ocurre algun error durante el proceso
-	 * @throws CertificateEncodingException
-	 *             Si no se puede obtener la codificaci&oacute;n del certificado
-	 * @throws SAXException
-	 *             Si ocurren errores analizando el XML de respuesta
-	 */
+	/** Inicia la pre-firma remota de las peticiones.
+	 * @param request Petici&oacute;n de firma.
+	 * @param requests Peticiones a pre-firmar.
+	 * @param cert Certificado del firmante.
+	 * @return Prefirmas de las peticiones enviadas.
+	 * @throws IOException Si ocurre algun error durante el tratamiento de datos.
+	 * @throws CertificateEncodingException Si no se puede obtener la codificaci&oacute;n del certificado.
+	 * @throws SAXException Si ocurren errores analizando el XML de respuesta. */
 	public TriphaseRequest[] preSignRequests(final SignRequest request,
-			final X509Certificate cert) throws IOException,
-			CertificateEncodingException, SAXException {
-		final String dataB64UrlSafe = prepareParam(XmlRequestsFactory
-				.createPresignRequest(request, Base64.encode(cert.getEncoded())));
+			                                 final X509Certificate cert) throws IOException,
+			                                                                    CertificateEncodingException,
+			                                                                    SAXException {
+		final String dataB64UrlSafe = prepareParam(
+			XmlRequestsFactory.createPresignRequest(request, Base64.encode(cert.getEncoded()))
+		);
 
 		return PresignsResponseParser.parse(getRemoteDocument(prepareUrl(
 				OPERATION_PRESIGN, dataB64UrlSafe)));
@@ -183,7 +177,7 @@ public final class CommManager {
 
 	/**
 	 * Inicia la post-firma remota de las peticiones.
-	 * 
+	 *
 	 * @param requests
 	 *            Peticiones a post-firmar
 	 * @param cert
@@ -210,7 +204,7 @@ public final class CommManager {
 
 	/**
 	 * Obtiene los datos de un documento.
-	 * 
+	 *
 	 * @param requestId
 	 *            Identificador de la petici&oacute;n.
 	 * @param certB64
@@ -236,7 +230,7 @@ public final class CommManager {
 
 	/**
 	 * Obtiene el listado de aplicaciones para las que hay peticiones de firma.
-	 * 
+	 *
 	 * @param certB64
 	 *            Certificado codificado en base64.
 	 * @return Configuracion de aplicaci&oacute;n.
@@ -261,7 +255,7 @@ public final class CommManager {
 
 	/**
 	 * Rechaza las peticiones de firma indicadas.
-	 * 
+	 *
 	 * @param requestIds
 	 *            Identificadores de las peticiones de firma que se quieren
 	 *            rechazar.
@@ -288,7 +282,7 @@ public final class CommManager {
 
 	/**
 	 * Obtiene la previsualizaci&oacute;n de un documento.
-	 * 
+	 *
 	 * @param documentId
 	 *            Identificador del documento.
 	 * @param certB64
@@ -310,7 +304,7 @@ public final class CommManager {
 
 	/**
 	 * Obtiene la previsualizaci&oacute;n de una firma.
-	 * 
+	 *
 	 * @param documentId
 	 *            Identificador del documento.
 	 * @param certB64
@@ -332,7 +326,7 @@ public final class CommManager {
 
 	/**
 	 * Obtiene la previsualizaci&oacute;n de un informe de firma.
-	 * 
+	 *
 	 * @param documentId
 	 *            Identificador del documento.
 	 * @param certB64
@@ -354,7 +348,7 @@ public final class CommManager {
 
 	/**
 	 * Obtiene la previsualizaci&oacute;n de un documento.
-	 * 
+	 *
 	 * @param operation
 	 *            Identificador del tipo de documento (datos, firma o informe).
 	 * @param documentId
@@ -383,7 +377,7 @@ public final class CommManager {
 
 	/**
 	 * Aprueba peticiones de firma (les da el visto bueno).
-	 * 
+	 *
 	 * @param requestIds
 	 *            Identificador de las peticiones.
 	 * @param certB64
@@ -409,7 +403,7 @@ public final class CommManager {
 
 	/**
 	 * Descarga un XML remoto de una URL dada.
-	 * 
+	 *
 	 * @param url
 	 *            URL de donde descargar el XML.
 	 * @return &Aacute;rbol XML descargado.
@@ -418,7 +412,7 @@ public final class CommManager {
 	 * @throws SAXException
 	 *             Error al parsear el XML.
 	 */
-	private Document getRemoteDocument(String url) throws SAXException,
+	private Document getRemoteDocument(final String url) throws SAXException,
 			IOException {
 
 		final byte[] docBytes = AndroidUrlHttpManager.readUrlByPost(url,
@@ -430,21 +424,19 @@ public final class CommManager {
 		return this.db.parse(new ByteArrayInputStream(docBytes));
 	}
 
-	/**
-	 * Verifica si la URL de proxy configurada es correcta.
-	 * 
-	 * @return
-	 */
+	/** Verifica si la URL de proxy configurada es correcta.
+	 * @return <code>true</code> si es correcta, <code>false</code> si no lo es. */
 	public boolean verifyProxyUrl() {
 
 		boolean correctUrl = true;
-		if (this.signFolderProxyUrl == null
-				|| this.signFolderProxyUrl.trim().length() == 0) {
+		if (this.signFolderProxyUrl == null || this.signFolderProxyUrl.trim().length() == 0) {
 			correctUrl = false;
-		} else {
+		}
+		else {
 			try {
-				new URL(this.signFolderProxyUrl);
-			} catch (Exception e) {
+				new URL(this.signFolderProxyUrl).toString();
+			}
+			catch (final Exception e) {
 				correctUrl = false;
 			}
 		}

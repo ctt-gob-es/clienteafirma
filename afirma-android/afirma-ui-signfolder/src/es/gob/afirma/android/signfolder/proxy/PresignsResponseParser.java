@@ -14,14 +14,11 @@ import es.gob.afirma.android.signfolder.SFConstants;
 import es.gob.afirma.android.signfolder.proxy.TriphaseSignDocumentRequest.TriphaseConfigData;
 import es.gob.afirma.core.misc.Base64;
 
-/**
- * Analizador de XML para la generaci&oacute;n de un listado de objetos
+/** Analizador de XML para la generaci&oacute;n de un listado de objetos
  * de tipo {@link es.gob.afirma.android.signfolder.proxy.TriphaseRequest} a partir
  * de un XML de respuesta de prefirma.
- *
- * @author Carlos Gamuci
- */
-public class PresignsResponseParser {
+ * @author Carlos Gamuci */
+public final class PresignsResponseParser {
 
 	private static final String PRESIGN_RESPONSE_NODE = "pres"; //$NON-NLS-1$
 
@@ -95,14 +92,14 @@ public class PresignsResponseParser {
 
 			attributeNode = attributes.getNamedItem(STATUS_ATTRIBUTE);
 			// statusOk = true, salvo que la propiedad status tenga el valor "KO"
-			statusOk = (attributeNode == null || !"KO".equalsIgnoreCase(attributeNode.getNodeValue())); //$NON-NLS-1$
+			statusOk = attributeNode == null || !"KO".equalsIgnoreCase(attributeNode.getNodeValue()); //$NON-NLS-1$
 
 			attributeNode = attributes.getNamedItem(EXCEPTION_B64_ATTRIBUTE);
 			// statusOk = true, salvo que la propiedad status tenga el valor "KO"
 			String exception;
 			try {
-				exception = (attributeNode == null ? null : new String(Base64.decode(attributeNode.getNodeValue())));
-			} catch (IOException e) {
+				exception = attributeNode == null ? null : new String(Base64.decode(attributeNode.getNodeValue()));
+			} catch (final IOException e) {
 				Log.w("es.gob.afirma", "No se ha podido descodificar el base 64 de la traza de la excepcion, se usara tal cual");  //$NON-NLS-1$//$NON-NLS-2$
 				exception = attributeNode.getNodeValue();
 			}
@@ -143,9 +140,9 @@ public class PresignsResponseParser {
 		private static final String CRYPTO_OPERATION_SIGN = "sign"; //$NON-NLS-1$
 		private static final String CRYPTO_OPERATION_COSIGN = "cosign"; //$NON-NLS-1$
 		private static final String CRYPTO_OPERATION_COUNTERSIGN = "countersign"; //$NON-NLS-1$
-		
+
 		private static final String DEFAULT_CRYPTO_OPERATION = CRYPTO_OPERATION_SIGN;
-		
+
 		static TriphaseSignDocumentRequest parse(final Node presignDocumentRequestNode) {
 
 			if (!DOCUMENT_REQUEST_NODE.equalsIgnoreCase(presignDocumentRequestNode.getNodeName())) {
@@ -172,8 +169,8 @@ public class PresignsResponseParser {
 			docId = attributeNode.getNodeValue();
 
 			attributeNode = attributes.getNamedItem(CRYPTO_OPERATION_ATTRIBUTE);
-			cryptoOperation = (attributeNode != null ? normalizeCriptoOperationName(attributeNode.getNodeValue()) : DEFAULT_CRYPTO_OPERATION);
-			
+			cryptoOperation = attributeNode != null ? normalizeCriptoOperationName(attributeNode.getNodeValue()) : DEFAULT_CRYPTO_OPERATION;
+
 			attributeNode = attributes.getNamedItem(SIGNATURE_FORMAT_ATTRIBUTE);
 			if (attributeNode == null) {
 				throw new IllegalArgumentException("No se ha encontrado el atributo obligatorio '" + //$NON-NLS-1$
@@ -182,7 +179,7 @@ public class PresignsResponseParser {
 			signatureFormat = attributeNode.getNodeValue();
 
 			attributeNode = attributes.getNamedItem(MESSAGE_DIGEST_ALGORITHM_ATTRIBUTE);
-			messageDigestAlgorithm = (attributeNode != null ? attributeNode.getNodeValue() : null);
+			messageDigestAlgorithm = attributeNode != null ? attributeNode.getNodeValue() : null;
 
 			// Cargamos la respuesta de la prefirma
 			final NodeList presignConfigNodes = presignDocumentRequestNode.getChildNodes();
@@ -205,15 +202,15 @@ public class PresignsResponseParser {
 					docId, cryptoOperation, signatureFormat, messageDigestAlgorithm, params,
 					TriphaseConfigDataParser.parse(presignConfigNodes.item(numIndex).getChildNodes()));
 		}
-		
+
 		/**
 		 * Normaliza varios nombres alternativos para las oepraciones criptogr&aacute;ficas, dejando uno solo
-		 * para cada uno de ellos. 
+		 * para cada uno de ellos.
 		 * @param criptoOperation Operaci&oacute;n criptogr&aacute;fica.
 		 * @return Nombre normalizado de la operaci&oacute;n o el mismo si no se reconoce.
 		 */
 		private static String normalizeCriptoOperationName(final String criptoOperation) {
-			String normalizedName = criptoOperation; 
+			String normalizedName = criptoOperation;
 			if ("firma".equalsIgnoreCase(criptoOperation)) { //$NON-NLS-1$
 				normalizedName = CRYPTO_OPERATION_SIGN;
 			} else if ("cofirma".equalsIgnoreCase(criptoOperation)) { //$NON-NLS-1$
@@ -221,13 +218,13 @@ public class PresignsResponseParser {
 			} else if ("contrafirma".equalsIgnoreCase(criptoOperation)) { //$NON-NLS-1$
 				normalizedName = CRYPTO_OPERATION_COUNTERSIGN;
 			}
-			
+
 			return normalizedName;
 		}
 	}
-	
+
 	private static class TriphaseConfigDataParser {
-		
+
 		private static final String ATTRIBUTE_KEY = "k"; //$NON-NLS-1$
 		private static final String VALUE_SIGN_COUNT = "sc"; //$NON-NLS-1$
 		private static final String VALUE_NEED_PRE = "np"; //$NON-NLS-1$
@@ -235,39 +232,44 @@ public class PresignsResponseParser {
 		private static final String VALUE_SESSION_PREFIX = "ss."; //$NON-NLS-1$
 		private static final String VALUE_PK1_PREFIX = "pk1."; //$NON-NLS-1$
 		private static final String VALUE_PRE_PREFIX = "pre."; //$NON-NLS-1$
-		
+
 		static TriphaseConfigData parse (final NodeList params) {
 
 			final TriphaseConfigData config = new TriphaseConfigData();
 			try {
-				
+
 				int numIndex = 0;
 				while ((numIndex = XmlUtils.nextNodeElementIndex(params, numIndex)) > -1) {
 					final Element param = (Element) params.item(numIndex);
-					String key = param.getAttribute(ATTRIBUTE_KEY);
+					final String key = param.getAttribute(ATTRIBUTE_KEY);
 					if (key == null) {
 						throw new IllegalArgumentException("Se ha indicado un parametro de firma trifasica sin clave"); //$NON-NLS-1$
 					}
-					
-					Log.i(SFConstants.LOG_TAG, "Clave: " + key);
-					Log.i(SFConstants.LOG_TAG, "Valor: " + param.getTextContent());
-					
+
+					Log.i(SFConstants.LOG_TAG, "Clave: " + key); //$NON-NLS-1$
+					Log.i(SFConstants.LOG_TAG, "Valor: " + param.getTextContent()); //$NON-NLS-1$
+
 					if (VALUE_SIGN_COUNT.equalsIgnoreCase(key)) {
-						config.setSignCount(new Integer(param.getTextContent().trim()));
-					} else if (VALUE_NEED_PRE.equalsIgnoreCase(key)) {
-						config.setNeedPreSign(new Boolean(param.getTextContent().trim()));
-					} else if (VALUE_NEED_DATA.equalsIgnoreCase(key)) {
-						config.setNeedData(new Boolean(param.getTextContent().trim()));
-					} else if (key.startsWith(VALUE_SESSION_PREFIX)) {
+						config.setSignCount(Integer.valueOf(param.getTextContent().trim()));
+					}
+					else if (VALUE_NEED_PRE.equalsIgnoreCase(key)) {
+						config.setNeedPreSign(Boolean.valueOf(param.getTextContent().trim()));
+					}
+					else if (VALUE_NEED_DATA.equalsIgnoreCase(key)) {
+						config.setNeedData(Boolean.valueOf(param.getTextContent().trim()));
+					}
+					else if (key.startsWith(VALUE_SESSION_PREFIX)) {
 						config.addSession(param.getTextContent().trim());
-					} else if (key.startsWith(VALUE_PK1_PREFIX)) {
+					}
+					else if (key.startsWith(VALUE_PK1_PREFIX)) {
 						config.addPk1(Base64.decode(param.getTextContent().trim()));
-					} else if (key.startsWith(VALUE_PRE_PREFIX)) {
-						Log.i(SFConstants.LOG_TAG, "Elemento " + Integer.parseInt(key.substring(VALUE_PRE_PREFIX.length())));
-						Log.i(SFConstants.LOG_TAG, "Contenido " + param.getTextContent().trim());
+					}
+					else if (key.startsWith(VALUE_PRE_PREFIX)) {
+						Log.i(SFConstants.LOG_TAG, "Elemento " + Integer.parseInt(key.substring(VALUE_PRE_PREFIX.length()))); //$NON-NLS-1$
+						Log.i(SFConstants.LOG_TAG, "Contenido " + param.getTextContent().trim()); //$NON-NLS-1$
 						config.addPreSign(Base64.decode(param.getTextContent().trim()));
 					}
-					
+
 					numIndex++;
 				}
 			} catch (final IOException e) {

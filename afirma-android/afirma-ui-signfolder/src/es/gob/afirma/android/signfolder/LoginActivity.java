@@ -35,8 +35,10 @@ import es.gob.afirma.android.signfolder.proxy.CommManager;
 import es.gob.afirma.android.signfolder.proxy.RequestAppConfiguration;
 import es.gob.afirma.core.misc.Base64;
 
-public class LoginActivity extends FragmentActivity implements KeystoreManagerListener,
-PrivateKeySelectionListener, LoadConfigurationListener, LoginOptionsListener {
+public final class LoginActivity extends FragmentActivity implements KeystoreManagerListener,
+                                                                     PrivateKeySelectionListener,
+                                                                     LoadConfigurationListener,
+                                                                     LoginOptionsListener {
 
 	private final static String EXTRA_RESOURCE_TITLE = "es.gob.afirma.signfolder.title"; //$NON-NLS-1$
 	private final static String EXTRA_RESOURCE_EXT = "es.gob.afirma.signfolder.exts"; //$NON-NLS-1$
@@ -44,14 +46,14 @@ PrivateKeySelectionListener, LoadConfigurationListener, LoginOptionsListener {
 	private final static String CERTIFICATE_EXTS = ".p12,.pfx"; //$NON-NLS-1$
 
 	private final static int SELECT_CERT_REQUEST_CODE = 1;
-		
+
 	/** Dialogo para mostrar mensajes al usuario */
 	private MessageDialog messageDialog = null;
-	
+
 	MessageDialog getMessageDialog() {
 		return this.messageDialog;
 	}
-	
+
 	private ProgressDialog progressDialog = null;
 	ProgressDialog getProgressDialog() {
 		return this.progressDialog;
@@ -59,28 +61,28 @@ PrivateKeySelectionListener, LoadConfigurationListener, LoginOptionsListener {
 	void setProgressDialog(final ProgressDialog pd) {
 		this.progressDialog = pd;
 	}
-	
+
 	@Override
-	protected void onCreate(Bundle savedInstanceState) {
+	protected void onCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_login);
-		
+
 		//Comprobamos si la conectividad a la red es correcta
-		ConnectivityManager conMgr = (ConnectivityManager) getSystemService (Context.CONNECTIVITY_SERVICE);
-		if (conMgr.getActiveNetworkInfo() == null || 
+		final ConnectivityManager conMgr = (ConnectivityManager) getSystemService (Context.CONNECTIVITY_SERVICE);
+		if (conMgr.getActiveNetworkInfo() == null ||
 				!conMgr.getActiveNetworkInfo().isAvailable() ||
 				!conMgr.getActiveNetworkInfo().isConnected()) {
 			//Error en la conexion
 			showErrorDialog(getString(R.string.error_msg_check_connection));
 		}
-		
+
 		// Cargamos la configuracion general de la aplicacion
 		AppPreferences.init(this);
 	}
-	
+
 	/** @param v Vista sobre la que se hace clic. */
 	public void onClick(final View v) {
-		
+
 		//Boton Acceder
 		if(v.getId() == R.id.button_acceder){
 			CommManager.resetConfig();
@@ -88,7 +90,7 @@ PrivateKeySelectionListener, LoadConfigurationListener, LoginOptionsListener {
 				showErrorDialog(getString(R.string.error_msg_proxy_no_config));
 				return;
 			}
-			
+
 			loadKeyStore();
 		}
 		// Boton importar certificados
@@ -99,12 +101,12 @@ PrivateKeySelectionListener, LoadConfigurationListener, LoginOptionsListener {
 
 	/** Carga el almacen de certificados del sistema. Se configura desde el layout para su ejecucion. */
 	public void loadKeyStore() {
-		
-		LoadKeyStoreManagerTask lksmt = new LoadKeyStoreManagerTask(this, this);
+
+		final LoadKeyStoreManagerTask lksmt = new LoadKeyStoreManagerTask(this, this);
 		showProgressDialog(getString(R.string.dialog_msg_accessing_keystore),lksmt,null);
-		lksmt.execute();	
+		lksmt.execute();
 		}
-	
+
 	/** Abre un activity para la seleccion de un fichero PKCS#12 local. */
 	public void browseKeyStore() {
 		final Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
@@ -113,10 +115,10 @@ PrivateKeySelectionListener, LoadConfigurationListener, LoginOptionsListener {
 		intent.putExtra(EXTRA_RESOURCE_EXT, CERTIFICATE_EXTS);
 		startActivityForResult(intent, SELECT_CERT_REQUEST_CODE);
 	}
-	
+
 	@Override
-	public void setKeyStoreManager(MobileKeyStoreManager msm) {
-		
+	public void setKeyStoreManager(final MobileKeyStoreManager msm) {
+
 		dismissProgressDialog();
 
 		if (msm == null){
@@ -126,12 +128,12 @@ PrivateKeySelectionListener, LoadConfigurationListener, LoginOptionsListener {
 			msm.getPrivateKeyEntryAsynchronously(this);
 		}
 	}
-	
+
 	@Override
-	public void onErrorLoadingKeystore(String msg, Throwable t) {
+	public void onErrorLoadingKeystore(final String msg, final Throwable t) {
 		showErrorDialog(ErrorManager.getErrorMessage(ErrorManager.ERROR_ESTABLISHING_KEYSTORE));
 	}
-	
+
 	@Override
 	public synchronized void keySelected(final KeySelectedEvent kse) {
 
@@ -170,14 +172,14 @@ PrivateKeySelectionListener, LoadConfigurationListener, LoginOptionsListener {
 			showErrorDialog(ErrorManager.getErrorMessage(ErrorManager.ERROR_PKE));
 			return;
 		}
-		
+
 		dismissProgressDialog();
-		
-		LoadConfigurationDataTask lcdt = new LoadConfigurationDataTask(Base64.encode(certEncoded), alias,
+
+		final LoadConfigurationDataTask lcdt = new LoadConfigurationDataTask(Base64.encode(certEncoded), alias,
 				CommManager.getInstance(), this, this);
 		showProgressDialog(getString(R.string.dialog_msg_configurating),null,lcdt);
 		lcdt.execute();
-		
+
 	}
 
 	// Definimos el menu de opciones de la aplicacion, cuyas opciones estan definidas
@@ -192,14 +194,14 @@ PrivateKeySelectionListener, LoadConfigurationListener, LoginOptionsListener {
     @Override
     public boolean onOptionsItemSelected(final MenuItem item) {
     	if (item.getItemId() == R.id.configuration) {
-    		
-    		LoginOptionsDialogBuilder dialogBuilder = new LoginOptionsDialogBuilder(this, this);
+
+    		final LoginOptionsDialogBuilder dialogBuilder = new LoginOptionsDialogBuilder(this, this);
     		dialogBuilder.show();
     	}
-    	
+
     	return true;
     }
-    
+
 	/**
 	 * Muestra un mensaje de advertencia al usuario.
 	 * @param message Mensaje que se desea mostrar.
@@ -220,14 +222,14 @@ PrivateKeySelectionListener, LoadConfigurationListener, LoginOptionsListener {
 					getMessageDialog().show(getSupportFragmentManager(), "ErrorDialog"); //$NON-NLS-1$;
 				}
 			});
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			Log.e(SFConstants.LOG_TAG, "No se ha podido mostrar el mensaje de error: " + e); //$NON-NLS-1$
 			e.printStackTrace();
 		}
 	}
-	
-	
-	
+
+
+
 	/** Muestra un di&aacute;logo de espera con un mensaje. */
 	private void showProgressDialog(final String message, final LoadKeyStoreManagerTask lksmt,
 								final LoadConfigurationDataTask lcdt) {
@@ -240,7 +242,7 @@ PrivateKeySelectionListener, LoadConfigurationListener, LoginOptionsListener {
 					setProgressDialog(ProgressDialog.show(LoginActivity.this, null, message, true));
 					getProgressDialog().setOnKeyListener(new OnKeyListener() {
 						@Override
-						public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
+						public boolean onKey(final DialogInterface dialog, final int keyCode, final KeyEvent event) {
 							if (keyCode == KeyEvent.KEYCODE_BACK) {
 								if(lksmt!=null){
 									lksmt.cancel(true);
@@ -252,28 +254,28 @@ PrivateKeySelectionListener, LoadConfigurationListener, LoginOptionsListener {
 							}
 							return false;
 						}
-					});					
-						
-				}catch (Exception e) {
+					});
+
+				}catch (final Exception e) {
 					Log.e(SFConstants.LOG_TAG, "No se ha podido mostrar el dialogo de progreso: " + e); //$NON-NLS-1$
 				}
 			}
 		});
 	}
-	
-	
+
+
 	/** Cierra el di&aacute;logo de espera en caso de estar abierto. */
 	void dismissProgressDialog() {
 		if (getProgressDialog() != null) {
 			runOnUiThread(new Runnable() {
 				@Override
 				public void run() {
-					getProgressDialog().dismiss();	
+					getProgressDialog().dismiss();
 				}
 			});
 		}
 	}
-	
+
 	@Override
 	protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
@@ -309,21 +311,21 @@ PrivateKeySelectionListener, LoadConfigurationListener, LoginOptionsListener {
 		access(certEncoded, certAlias, appConfig);
 	}
 	@Override
-	public void configurationLoadError(Throwable t) {
+	public void configurationLoadError(final Throwable t) {
 
 		dismissProgressDialog();
-		
+
 		showErrorDialog(getString(R.string.error_loading_app_configuration));
 	}
-	
+
 	/**
 	 * Valida la identidad del usuario y da acceso al portafirmas.
 	 * @param certEncodedB64 Certificado de autenticaci&oacute;n codificado en Base64 .
 	 */
 	private void access(final String certEncodedB64, final String alias, final RequestAppConfiguration appConfig) {
-		
+
 		dismissProgressDialog();
-		
+
 		final Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
 		intent.setClass(this, PetitionListActivity.class);
 		intent.putExtra(PetitionListActivity.EXTRA_RESOURCE_CERT_B64, certEncodedB64);
@@ -335,15 +337,15 @@ PrivateKeySelectionListener, LoadConfigurationListener, LoginOptionsListener {
 
 	//metodo vacio para evitar bugs en versiones superiores al api11
 	@Override
-	protected void onSaveInstanceState(Bundle outState) {
+	protected void onSaveInstanceState(final Bundle outState) {
 	    //No call for super(). Bug on API Level > 11.
 	}
 
 	@Override
-	public void onErrorLoginOptions(String url) {
+	public void onErrorLoginOptions(final String url) {
 		try {
 			Toast.makeText(this, getString(R.string.invalid_url), Toast.LENGTH_LONG).show();
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			Log.e(SFConstants.LOG_TAG, "No se ha podido mostrar el mensaje de error por configuracion incorrecta: " + e); //$NON-NLS-1$
 			e.printStackTrace();
 		}

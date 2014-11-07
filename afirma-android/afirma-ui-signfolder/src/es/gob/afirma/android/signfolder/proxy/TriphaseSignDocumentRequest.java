@@ -11,20 +11,20 @@ import es.gob.afirma.core.misc.Base64;
  * @author Carlos Gamuci Mill&aacute;n */
 public final class TriphaseSignDocumentRequest {
 
-	public static final String CRYPTO_OPERATION_SIGN = "sign"; //$NON-NLS-1$
-	public static final String CRYPTO_OPERATION_COSIGN = "cosign"; //$NON-NLS-1$
-	public static final String CRYPTO_OPERATION_COUNTERSIGN = "countersign"; //$NON-NLS-1$
+	static final String CRYPTO_OPERATION_SIGN = "sign"; //$NON-NLS-1$
+	static final String CRYPTO_OPERATION_COSIGN = "cosign"; //$NON-NLS-1$
+	static final String CRYPTO_OPERATION_COUNTERSIGN = "countersign"; //$NON-NLS-1$
 
 	private static final String DEFAULT_ALGORITHM = "SHA-512"; //$NON-NLS-1$
 
 	private static final String DEFAULT_CRYPTO_OPERATION = "sign"; //$NON-NLS-1$
-	
+
 	/** Identificador del documento. */
 	private final String id;
 
 	/** Operaci&oacute;n que se debe realizar sobre el documento (sign, cosign o countersign). */
 	private final String cryptoOperation;
-	
+
 	/** Formato de firma electr&oacute;nica que se desea utilizar. */
 	private final String signatureFormat;
 
@@ -65,7 +65,7 @@ public final class TriphaseSignDocumentRequest {
 		this.signatureFormat = signatureFormat;
 		this.params = params;
 		this.partialResult = partialResult;
-		this.algorithm = (messageDigestAlgorithm != null) ? messageDigestAlgorithm : DEFAULT_ALGORITHM;
+		this.algorithm = messageDigestAlgorithm != null ? messageDigestAlgorithm : DEFAULT_ALGORITHM;
 	}
 
 	/** Recupera el identificador del documento.
@@ -79,7 +79,7 @@ public final class TriphaseSignDocumentRequest {
 	public String getCryptoOperation() {
 		return this.cryptoOperation;
 	}
-	
+
 	/** Recupera el formato de firma.
 	 * @return Formato de firma. */
 	public String getSignatureFormat() {
@@ -112,23 +112,21 @@ public final class TriphaseSignDocumentRequest {
 		this.partialResult = result;
 	}
 
-	/**
-	 * Clase que almacena los resultados parciales de la firma trif&aacute;sica. 
-	 */
-	public static class TriphaseConfigData {
-		
+	/** Clase que almacena los resultados parciales de la firma trif&aacute;sica. */
+	public static final class TriphaseConfigData {
+
 		private static final String NODE_PART_1 = "<p k='"; //$NON-NLS-1$
 		private static final String NODE_PART_2 = "'>"; //$NON-NLS-1$
 		private static final String NODE_PART_3 = "</p>"; //$NON-NLS-1$
-		
+
 		private final List<byte[]> preSign;
 		private Boolean needPreSign;
 		private Boolean needData;
 		private Integer signCount;
 		private final List<String> session;
 		private final List<byte[]> pk1;
-		
-		public TriphaseConfigData() {
+
+		TriphaseConfigData() {
 			this.preSign = new ArrayList<byte[]>();
 			this.needPreSign = null;
 			this.needData = null;
@@ -136,72 +134,82 @@ public final class TriphaseSignDocumentRequest {
 			this.session = new ArrayList<String>();
 			this.pk1 = new ArrayList<byte[]>();
 		}
-		
-		public byte[] getPreSign(int index) {
+
+		/** Obtiene la prefirma indicada.
+		 * @param index &Iacute;dice de la prefirma a obtener.
+		 * @return Prefirma. */
+		public byte[] getPreSign(final int index) {
 			return this.preSign.get(index);
 		}
 
-		public void addPreSign(byte[] preSign) {
-			this.preSign.add(preSign);
+		void addPreSign(final byte[] preSignature) {
+			this.preSign.add(preSignature);
 		}
 
-		public void setPreSign(int index, byte[] preSign) {
+		/** Establece una prefirma.
+		 * @param index I&iacute;dice de la prefirma a establecer.
+		 * @param preSign Prefirma a establecer. */
+		public void setPreSign(final int index, final byte[] preSign) {
 			this.preSign.set(index, preSign);
 		}
-		
+
 		public Boolean isNeedPreSign() {
 			return this.needPreSign;
 		}
 
-		public void setNeedPreSign(Boolean needPreSign) {
+		void setNeedPreSign(final Boolean needPreSign) {
 			this.needPreSign = needPreSign;
 		}
 
-		public Boolean isNeedData() {
+		Boolean isNeedData() {
 			return this.needData;
 		}
 
-		public void setNeedData(Boolean needData) {
+		void setNeedData(final Boolean needData) {
 			this.needData = needData;
 		}
-		
+
 		public Integer getSignCount() {
 			return this.signCount;
 		}
 
-		public void setSignCount(Integer signCount) {
+		void setSignCount(final Integer signCount) {
 			this.signCount = signCount;
 		}
 
-		public String getSession(int index) {
+		public String getSession(final int index) {
 			return this.session.get(index);
 		}
 
-		/**
-		 * Se almacenan los datos de sesi&oacute;n codificados en base64.
-		 * @param session Datos de sesi&oacute;n.
-		 */
-		public void addSession(String session) {
-			this.session.add(session);
+		/** Almacena los datos de sesi&oacute;n codificados en base64.
+		 * @param ses Datos de sesi&oacute;n. */
+		public void addSession(final String ses) {
+			this.session.add(ses);
 		}
 
-		public byte[] getPk1(int index) {
+		/** Obtiene la firma PKCS#1 de la firma indicada.
+		 * @param index &Iacute;ndice de la firma de la cual se quiere obtener el PKCS#1.
+		 * @return Firma PKCS#1. */
+		public byte[] getPk1(final int index) {
 			return this.pk1.get(index);
 		}
 
-		public void addPk1(byte[] pk1) {
-			this.pk1.add(pk1);
+		/** Almacena la firma PKCS#1.
+		 * @param pkcs1 Firma PKCS#1. */
+		public void addPk1(final byte[] pkcs1) {
+			this.pk1.add(pkcs1);
 		}
 
-		public String toXMLConfig() {
+		String toXMLConfig() {
 			final StringBuilder builder = new StringBuilder();
-			if (this.signCount != null)
-			builder.append(NODE_PART_1).append("sc").append(NODE_PART_2).append(this.signCount.intValue()).append(NODE_PART_3); //$NON-NLS-1$
-			
+			if (this.signCount != null) {
+				builder.append(NODE_PART_1).append("sc").append(NODE_PART_2).append(this.signCount.intValue()).append(NODE_PART_3); //$NON-NLS-1$
+			}
+
 			if (this.needPreSign != null) {
 				builder.append(NODE_PART_1).append("nd").append(NODE_PART_2).append(this.needData.booleanValue()).append(NODE_PART_3); //$NON-NLS-1$
 			}
-			
+
 			if (this.needPreSign != null) {
 				if (this.needPreSign.booleanValue() && this.preSign != null) {
 					builder.append(NODE_PART_1).append("np").append(NODE_PART_2).append(this.needPreSign.booleanValue()).append(NODE_PART_3); //$NON-NLS-1$
@@ -223,9 +231,9 @@ public final class TriphaseSignDocumentRequest {
 					builder.append(NODE_PART_1).append("pk1.").append(i).append(NODE_PART_2).append(Base64.encode(this.pk1.get(i))).append(NODE_PART_3); //$NON-NLS-1$
 				}
 			}
-			
-			Log.i(SFConstants.LOG_TAG, "XML peticion:\n" + builder.toString());
-			
+
+			Log.i(SFConstants.LOG_TAG, "XML peticion:\n" + builder.toString()); //$NON-NLS-1$
+
 			return builder.toString();
 		}
 	}

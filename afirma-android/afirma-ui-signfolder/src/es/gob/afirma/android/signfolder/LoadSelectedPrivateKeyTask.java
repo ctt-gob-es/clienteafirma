@@ -10,47 +10,47 @@ import android.security.KeyChain;
 import es.gob.afirma.android.crypto.MobileKeyStoreManager.KeySelectedEvent;
 import es.gob.afirma.android.crypto.MobileKeyStoreManager.PrivateKeySelectionListener;
 
-public class LoadSelectedPrivateKeyTask extends AsyncTask<Void, Void, PrivateKey> {
+final class LoadSelectedPrivateKeyTask extends AsyncTask<Void, Void, PrivateKey> {
 
 	private final String selectedAlias;
 	private final Context context;
 	private final PrivateKeySelectionListener listener;
 	private X509Certificate[] certChain;
 	private Throwable t;
-	
-	public LoadSelectedPrivateKeyTask(final String certAlias, final PrivateKeySelectionListener listener, final Context context) {
+
+	LoadSelectedPrivateKeyTask(final String certAlias, final PrivateKeySelectionListener listener, final Context context) {
 		this.selectedAlias = certAlias;
 		this.listener = listener;
 		this.context = context;
 	}
-	
+
 	@Override
-	protected PrivateKey doInBackground(Void... params) {
-		
+	protected PrivateKey doInBackground(final Void... params) {
+
 		final PrivateKey pk;
 		try {
 			pk = KeyChain.getPrivateKey(this.context, this.selectedAlias);
 			this.certChain = KeyChain.getCertificateChain(this.context, this.selectedAlias);
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			e.printStackTrace();
 			this.t = e;
 			return null;
 		}
-		
+
 		return pk;
 	}
-	
+
 	@Override
-	protected void onPostExecute(PrivateKey privateKey) {
-		
+	protected void onPostExecute(final PrivateKey privateKey) {
+
 		final KeySelectedEvent ksEvent;
 		if (privateKey != null) {
-			ksEvent = new KeySelectedEvent(new PrivateKeyEntry(privateKey, this.certChain), this.selectedAlias);	
+			ksEvent = new KeySelectedEvent(new PrivateKeyEntry(privateKey, this.certChain), this.selectedAlias);
 		}
 		else {
 			ksEvent = new KeySelectedEvent(this.t);
 		}
-		
+
 		this.listener.keySelected(ksEvent);
 	}
 }

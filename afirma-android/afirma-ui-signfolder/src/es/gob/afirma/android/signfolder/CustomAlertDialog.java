@@ -12,26 +12,26 @@ import android.view.View;
 /** Di&aacute;logo modal con el que mostrar al usuario un mensaje y un bot&oacute;n para ocultar el
  * di&aacute;logo y, opcionalmente, realizar una acci&oacute;n. */
 @SuppressLint("ValidFragment")
-class CustomAlertDialog extends DialogFragment {
+final class CustomAlertDialog extends DialogFragment {
 
 	private static final String BUNDLE_ID_DIALOG = "dialog"; //$NON-NLS-1$
 	private static final String BUNDLE_ID_TITLE = "title"; //$NON-NLS-1$
 	private static final String BUNDLE_ID_MESSAGE = "message"; //$NON-NLS-1$
 	private static final String BUNDLE_ID_POSITIVE_BUTTON = "pb"; //$NON-NLS-1$
 	private static final String BUNDLE_ID_NEGATIVE_BUTTON = "nb"; //$NON-NLS-1$
-	
+
 	private static View vista = null;
 	static DialogFragmentListener fragmentListener = null;
 
-	public static CustomAlertDialog newInstance(int dialogId, String title, String message,
-			String positiveButton, String negativeButton, DialogFragmentListener dFragmentListener) {
-		
+	static CustomAlertDialog newInstance(final int dialogId, final String title, final String message,
+			final String positiveButton, final String negativeButton, final DialogFragmentListener dFragmentListener) {
+
         if (dFragmentListener != null) {
         	fragmentListener = dFragmentListener;
         }
-		
-		CustomAlertDialog frag = new CustomAlertDialog();
-        Bundle args = new Bundle();
+
+		final CustomAlertDialog frag = new CustomAlertDialog();
+        final Bundle args = new Bundle();
         args.putInt(BUNDLE_ID_DIALOG, dialogId);
         if (title != null) {
         	args.putString(BUNDLE_ID_TITLE, title);
@@ -50,15 +50,15 @@ class CustomAlertDialog extends DialogFragment {
         return frag;
     }
 
-    public static CustomAlertDialog newInstance(int dialogId, String title, View message,
-    		String positiveButton, String negativeButton, DialogFragmentListener dFragmentListener) {
-		
+    static CustomAlertDialog newInstance(final int dialogId, final String title, final View message,
+    		final String positiveButton, final String negativeButton, final DialogFragmentListener dFragmentListener) {
+
         if (dFragmentListener != null) {
         	fragmentListener = dFragmentListener;
         }
-    	
-		CustomAlertDialog frag = new CustomAlertDialog();
-        Bundle args = new Bundle();
+
+		final CustomAlertDialog frag = new CustomAlertDialog();
+        final Bundle args = new Bundle();
         args.putInt(BUNDLE_ID_DIALOG, dialogId);
         if (title != null) {
         	args.putString(BUNDLE_ID_TITLE, title);
@@ -78,40 +78,40 @@ class CustomAlertDialog extends DialogFragment {
     }
 
 	@Override
-    public Dialog onCreateDialog(Bundle savedInstanceState) {
-		
+    public Dialog onCreateDialog(final Bundle savedInstanceState) {
+
     	final int dialogId = getArguments().getInt(BUNDLE_ID_DIALOG);
-        Builder dialogBuilder = new AlertDialog.Builder(getActivity());
-        
+        final Builder dialogBuilder = new AlertDialog.Builder(getActivity());
+
         final String title = getArguments().getString(BUNDLE_ID_TITLE);
         if (title != null) {
         	dialogBuilder.setTitle(title);
         }
-        
+
 	    if (getArguments().getString(BUNDLE_ID_MESSAGE) != null) {
         	dialogBuilder.setMessage(getArguments().getString(BUNDLE_ID_MESSAGE));
         } else if (vista !=null){
         	dialogBuilder.setView(vista);
         }
-        
+
         final String positiveButton = getArguments().getString(BUNDLE_ID_POSITIVE_BUTTON);
         if (positiveButton != null) {
         	dialogBuilder.setPositiveButton(positiveButton,
                     new DialogInterface.OnClickListener() {
                         @Override
-						public void onClick(DialogInterface dialog, int whichButton) {
+						public void onClick(final DialogInterface dialog, final int whichButton) {
                         	fragmentListener.onDialogPositiveClick(dialogId);
                         }
                     }
                 );
         }
-        
+
         final String negativeButton = getArguments().getString(BUNDLE_ID_NEGATIVE_BUTTON);
         if (negativeButton != null) {
         	dialogBuilder.setNegativeButton(negativeButton,
                     new DialogInterface.OnClickListener() {
                         @Override
-						public void onClick(DialogInterface dialog, int whichButton) {
+						public void onClick(final DialogInterface dialog, final int whichButton) {
                         	fragmentListener.onDialogNegativeClick(dialogId);
                         }
                     }

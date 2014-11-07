@@ -19,7 +19,7 @@ public class SignRequest {
 
 	/** Identificador correspondiente a las peticiones ya vistas. */
 	public static final String VIEW_READED = "LEIDO"; //$NON-NLS-1$
-	
+
 	/** Referencia &uacute;nica de la petici&oacute;n. */
 	private final String id;
 
@@ -34,7 +34,7 @@ public class SignRequest {
 
 	/** Para listados que admitan selecci&oacute;n, si la petici&oacute;n est&aacute; seleccionada o no. */
 	private boolean selected;
-	
+
 	/** Fecha de la petici&oacute;n. */
 	private String date;
 
@@ -49,23 +49,24 @@ public class SignRequest {
 
 	/** Tipo de la petici&oacute;n. */
 	private RequestType type;
-	
-	/**
-	 * Tipos de petici&oacute;n
-	 */
+
+	/** Tipos de petici&oacute;n */
 	public enum RequestType {
-		SIGNATURE, APPROVE
+		/** Firma. */
+		SIGNATURE,
+		/** Visto bueno. */
+		APPROVE
 	}
-	
+
 	/** Listado de documentos de la petici&oacute;n. */
 	private SignRequestDocument[] docs;
-	
+
 	/** Construye la petici&oacute;n de firma.
 	 * @param id Identificador &uacute;nico. */
 	public SignRequest(final String id) {
 		this.id = id;
 	}
-	
+
 	/** Construye la petici&oacute;n de firma.
 	 * @param id Identificador &uacute;nico.
 	 * @param subject Asunto.
@@ -75,6 +76,7 @@ public class SignRequest {
 	 * @param priority Prioridad.
 	 * @param workflow Si pertenece a un flujo de trabajo.
 	 * @param forward Si se ha reenviado esta petici&oacute;n.
+	 * @param type Tipo de petici&oacute;n.
 	 * @param docs Documentos de la petici&oacute;n. */
 	public SignRequest(final String id,
 			           final String subject,
@@ -135,7 +137,7 @@ public class SignRequest {
 	public String[] getSenders() {
 		return this.senders;
 	}
-	
+
 	/** Recupera la prioridad de la petici&oacute;n: 1(Normal), 2 (Alta), 3 (Muy alta) o 4 (Urgente).
 	 * @return Peticionario de la petici&oacute;n. */
 	public int getPriority() {
@@ -160,7 +162,7 @@ public class SignRequest {
 	public RequestType getType() {
 		return this.type;
 	}
-	
+
 	/** Recupera el listado de documentos de la petici&oacute;n de firma.
 	 * @return Listado de documentos. */
 	public SignRequestDocument[] getDocs() {
@@ -173,9 +175,9 @@ public class SignRequest {
 	public boolean isSelected() {
 		return this.selected;
 	}
-	
+
 	/**
-	 * Establece si el elemento del listado debe mostrarse seleccionado o no. 
+	 * Establece si el elemento del listado debe mostrarse seleccionado o no.
 	 * @param selected {@code true} si se debe mostrar seleccionado, {@code false} en caso contrario.
 	 */
 	public void setSelected(final boolean selected) {
@@ -183,7 +185,7 @@ public class SignRequest {
 	}
 
 	/**
-	 * Invierte el estado de selecci&oacute;n de la petici&oacute;n. 
+	 * Invierte el estado de selecci&oacute;n de la petici&oacute;n.
 	 */
 	public void check() {
 		this.selected = !this.selected;
@@ -192,7 +194,7 @@ public class SignRequest {
 	public void setViewed(final boolean viewed) {
 		this.view = viewed ? VIEW_READED : VIEW_NEW;
 	}
-	
+
 	/**
 	 * Establece el objeto de la petici&oacute;n.
 	 * @param subject Motivo de la petici&oacute;n.
@@ -200,7 +202,7 @@ public class SignRequest {
 	public void setSubject(final String subject) {
 		this.subject = subject;
 	}
-	
+
 	/**
 	 * Establece quienes enviaron la petici&oacute;n.
 	 * @param senders Solicitantes de la petici&oacute;n.
@@ -208,7 +210,7 @@ public class SignRequest {
 	public void setSenders(final String[] senders) {
 		this.senders = senders;
 	}
-	
+
 	/**
 	 * Establece la fecha.
 	 * @param date Fecha.
@@ -216,7 +218,7 @@ public class SignRequest {
 	public void setDate(final String date) {
 		this.date = date;
 	}
-	
+
 	/**
 	 * Estable el listado de documentos que hay que firmar.
 	 * @param docs Listado de documentos.
@@ -224,7 +226,7 @@ public class SignRequest {
 	public void setDocs(final SignRequestDocument[] docs) {
 		this.docs = docs;
 	}
-	
+
 	/**
 	 * Establece la prioridad de la petici&oacute;n.
 	 * @param priority Prioridad: 1 (menor) - 4 (mayor)
@@ -232,7 +234,7 @@ public class SignRequest {
 	public void setPriority(final int priority) {
 		this.priority = priority;
 	}
-	
+
 	/**
 	 * Establece si el proceso de firma forma parte de un flujo de trabajo.
 	 * @param workflow {@code true} cuando procede de un flujo de trabajo, {@code false} en caso contrario.
@@ -240,7 +242,7 @@ public class SignRequest {
 	public void setWorkflow(final boolean workflow) {
 		this.workflow = workflow;
 	}
-	
+
 	/**
 	 * Establece si a petici&oacute;n se reenvi&oacute;n.
 	 * @param forward {@code true} si se reenvi&oacute;, {@code false} en caso contrario.
@@ -248,7 +250,7 @@ public class SignRequest {
 	public void setForward(final boolean forward) {
 		this.forward = forward;
 	}
-	
+
 	/**
 	 * Establece el tipo de petici&oacute;n.
 	 * @param type Tipo de petici&oacute;n.
@@ -256,7 +258,7 @@ public class SignRequest {
 	public void setType(final RequestType type) {
 		this.type = type;
 	}
-	
+
 	@Override
 	public String toString() {
 		return this.subject + " (" + this.id + ")"; //$NON-NLS-1$ //$NON-NLS-2$

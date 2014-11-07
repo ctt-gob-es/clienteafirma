@@ -42,15 +42,15 @@ import es.gob.afirma.android.signfolder.proxy.SignRequest.RequestType;
  * rechazados. Al pulsar prolongadamente sobre un elemento se muestra un menu
  * contextual donde se puede ver los detalles del documento, firmar
  * individualmente o rechazar.
- * 
+ * <p>
  * La visibilidad de la lista y la etiqueta de "No hay elementos" se delega en
  * el Layout por medio del uso de los elementos "list" y "empty" reconocidos por
  * el ListActivity.
- * 
+ *
  * @author Carlos Gamuci
  */
 @TargetApi(14)
-public class PetitionListActivity extends FragmentActivity implements
+public final class PetitionListActivity extends FragmentActivity implements
 		OperationRequestListener, LoadSignRequestListener, OnItemClickListener,
 		DialogFragmentListener {
 
@@ -72,10 +72,10 @@ public class PetitionListActivity extends FragmentActivity implements
 	 */
 	private static final String SIGN_REQUEST_STATE_KEY = "SignRequestState"; //$NON-NLS-1$
 
-	public final static String EXTRA_RESOURCE_CERT_B64 = "es.gob.afirma.signfolder.cert"; //$NON-NLS-1$
-	public final static String EXTRA_RESOURCE_CERT_ALIAS = "es.gob.afirma.signfolder.alias"; //$NON-NLS-1$
-	public final static String EXTRA_RESOURCE_APP_IDS = "es.gob.afirma.signfolder.apps.ids"; //$NON-NLS-1$
-	public final static String EXTRA_RESOURCE_APP_NAMES = "es.gob.afirma.signfolder.apps.names"; //$NON-NLS-1$
+	final static String EXTRA_RESOURCE_CERT_B64 = "es.gob.afirma.signfolder.cert"; //$NON-NLS-1$
+	final static String EXTRA_RESOURCE_CERT_ALIAS = "es.gob.afirma.signfolder.alias"; //$NON-NLS-1$
+	final static String EXTRA_RESOURCE_APP_IDS = "es.gob.afirma.signfolder.apps.ids"; //$NON-NLS-1$
+	final static String EXTRA_RESOURCE_APP_NAMES = "es.gob.afirma.signfolder.apps.names"; //$NON-NLS-1$
 
 	private final static int PAGE_SIZE = 50;
 
@@ -96,7 +96,7 @@ public class PetitionListActivity extends FragmentActivity implements
 
 	/** Di&aacute;logo para mostrar el resultado devuelto por la pantalla de detalle. */
 	private final static int DIALOG_RESULT_SIMPLE_REQUEST = 16;
-	
+
 	/**
 	 * Di&aacute;logo de notificaci&oacute;n de error al procesar las
 	 * peticiones.
@@ -141,7 +141,7 @@ public class PetitionListActivity extends FragmentActivity implements
 
 	private FilterConfig filterConfig = null;
 
-	void setFilterConfig(FilterConfig filterConfig) {
+	void setFilterConfig(final FilterConfig filterConfig) {
 		this.filterConfig = filterConfig;
 	}
 
@@ -209,7 +209,7 @@ public class PetitionListActivity extends FragmentActivity implements
 				.loadFilter(savedInstanceState));
 	}
 
-	private void loadIntentExtra(Intent intent) {
+	private void loadIntentExtra(final Intent intent) {
 
 		this.certAlias = intent.getStringExtra(EXTRA_RESOURCE_CERT_ALIAS);
 		this.certB64 = intent.getStringExtra(EXTRA_RESOURCE_CERT_B64);
@@ -228,7 +228,7 @@ public class PetitionListActivity extends FragmentActivity implements
 
 	/**
 	 * Metodo que define la accion a realizar al pulsar en el boton Reject
-	 * 
+	 *
 	 * @param v
 	 *            Vista desde la que se invoco el metodo
 	 */
@@ -274,7 +274,7 @@ public class PetitionListActivity extends FragmentActivity implements
 					dialog.show(getSupportFragmentManager(), DIALOG_TAG);
 				}
 			});
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			Log.w(SFConstants.LOG_TAG,
 					"No se ha podido mostrar el dialogo informando de que no hay peticiones seleccionadas: " + e); //$NON-NLS-1$
 		}
@@ -292,7 +292,7 @@ public class PetitionListActivity extends FragmentActivity implements
 					dialog.show(PetitionListActivity.this.getSupportFragmentManager(), DIALOG_TAG);
 				}
 			});
-		} catch (Throwable e) {
+		} catch (final Throwable e) {
 			Log.w(SFConstants.LOG_TAG,
 					"No se ha podido mostrar el dialogo de error con el mensaje: " + message + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$
 			e.printStackTrace();
@@ -301,7 +301,7 @@ public class PetitionListActivity extends FragmentActivity implements
 
 	/**
 	 * Metodo que define la accion a realizar al pulsar en el boton Sign
-	 * 
+	 *
 	 * @param v
 	 *            Vista desde la que se invoco el metodo
 	 */
@@ -336,22 +336,22 @@ public class PetitionListActivity extends FragmentActivity implements
 	 * Devuelve la vista con el contenido del di&aacute;logo de
 	 * confirmaci&oacute;n de rechazo, firma o visto bueno de las peticiones
 	 * seleccionadas
-	 * 
+	 *
 	 * @param requests
 	 *            Peticiones seleccionadas.
 	 * @return Vista del di&aacute;logo de confirmaci&oacute;n.
 	 */
-	private View getViewContentDialogRejectSign(SignRequest[] requests) {
-		LayoutInflater li = LayoutInflater.from(PetitionListActivity.this);
-		View view = li.inflate(R.layout.dialog_view_reject_sign_vb, null);
+	private View getViewContentDialogRejectSign(final SignRequest[] requests) {
+		final LayoutInflater li = LayoutInflater.from(PetitionListActivity.this);
+		final View view = li.inflate(R.layout.dialog_view_reject_sign_vb, null);
 		int countApproved = 0;
-		for (int i = 0; i < requests.length; i++) {
-			if (requests[i].getType() == RequestType.APPROVE) {
+		for (final SignRequest request : requests) {
+			if (request.getType() == RequestType.APPROVE) {
 				countApproved++;
 			}
 		}
-		TextView tvSign = (TextView) view.findViewById(R.id.tvSign);
-		TextView tvApprove = (TextView) view.findViewById(R.id.tvApprove);
+		final TextView tvSign = (TextView) view.findViewById(R.id.tvSign);
+		final TextView tvApprove = (TextView) view.findViewById(R.id.tvApprove);
 
 		// Peticiones de firma
 		if (requests.length - countApproved > 0) {
@@ -383,7 +383,7 @@ public class PetitionListActivity extends FragmentActivity implements
 
 	/**
 	 * Recupera el componente lista de la pantalla.
-	 * 
+	 *
 	 * @return Lista.
 	 */
 	private ListView getListView() {
@@ -392,7 +392,7 @@ public class PetitionListActivity extends FragmentActivity implements
 
 	/**
 	 * Recupera el componente lista de la pantalla.
-	 * 
+	 *
 	 * @return Lista.
 	 */
 	private ListAdapter getListAdapter() {
@@ -401,7 +401,7 @@ public class PetitionListActivity extends FragmentActivity implements
 
 	/**
 	 * Recupera el listado de solicitudes seleccionadas.
-	 * 
+	 *
 	 * @return LIstado de solicitudes.
 	 */
 	private SignRequest[] getSelectedRequests() {
@@ -415,7 +415,7 @@ public class PetitionListActivity extends FragmentActivity implements
 		final List<SignRequest> requests = new ArrayList<SignRequest>();
 
 		for (int i = 0; i < adapter.getCount(); i++) {
-			PetitionListAdapterItem item = adapter.getItem(i);
+			final PetitionListAdapterItem item = adapter.getItem(i);
 			if (item instanceof PetitionElement) {
 				final SignRequest request = ((PetitionElement) item)
 						.getSignRequest();
@@ -428,8 +428,8 @@ public class PetitionListActivity extends FragmentActivity implements
 		return requests.toArray(new SignRequest[requests.size()]);
 	}
 
-	protected RejectRequestsTask rejectRequests(SignRequest... signRequests) {
-		RejectRequestsTask rrt = new RejectRequestsTask(signRequests,
+	protected RejectRequestsTask rejectRequests(final SignRequest... signRequests) {
+		final RejectRequestsTask rrt = new RejectRequestsTask(signRequests,
 				this.certB64, CommManager.getInstance(), this);
 		rrt.execute();
 		return rrt;
@@ -524,11 +524,11 @@ public class PetitionListActivity extends FragmentActivity implements
 	/**
 	 * Cambia el listado de peticiones actual por el listado con las peticiones
 	 * con el estado indicado.
-	 * 
+	 *
 	 * @param stateSigned
 	 *            Estado de las peticiones que deben mostrarse.
 	 */
-	private void changeCurrentRequestList(String stateSigned) {
+	private void changeCurrentRequestList(final String stateSigned) {
 		if (this.loadingRequests && this.loadingTask != null) {
 			setVisibilityLoadingMessage(false, null, null);
 			this.loadingTask.cancel(true);
@@ -544,7 +544,7 @@ public class PetitionListActivity extends FragmentActivity implements
 
 	/**
 	 * Selecciona o deselecciona todo el listado de peticiones en pantalla.
-	 * 
+	 *
 	 * @param selected
 	 *            {@code true} para seleccionar todas las peticiones,
 	 *            {@code false} para deseleccionarlas todas.
@@ -651,7 +651,7 @@ public class PetitionListActivity extends FragmentActivity implements
 	}
 
 	@Override
-	public void loadedSignRequest(final List<SignRequest> signRequests, final int pageNumber, final int numPages) {
+	public void loadedSignRequest(final List<SignRequest> signRequests, final int pageNumber, final int numOfPages) {
 
 		// Se termina la carga
 		setVisibilityLoadingMessage(false, null, null);
@@ -660,27 +660,27 @@ public class PetitionListActivity extends FragmentActivity implements
 		// corresponda
 		final TextView emptyTextView = (TextView) findViewById(R.id.empty);
 		emptyTextView.setText(getString(R.string.no_request_avaible));
-		emptyTextView.setVisibility((signRequests == null || signRequests
-				.size() == 0) ? View.VISIBLE : View.INVISIBLE);
+		emptyTextView.setVisibility(signRequests == null || signRequests
+				.size() == 0 ? View.VISIBLE : View.INVISIBLE);
 
 		// Ya no tenemos que recargar el listado
 		this.needReload = false;
 
 		// Guardamos el numero de paginas del listado
-		this.numPages = numPages;
+		this.numPages = numOfPages;
 
 		// Mostramos el listado de peticiones
 		((ListView) findViewById(R.id.list)).setAdapter(preparePetitionList(signRequests,
-				this.currentState, numPages > 1));
+				this.currentState, numOfPages > 1));
 	}
 
 	private PetitionListArrayAdapter preparePetitionList(
-			List<SignRequest> signRequests, String state, boolean needPagination) {
+			final List<SignRequest> signRequests, final String state, final boolean needPagination) {
 
-		List<PetitionListAdapterItem> plAdapterItem = new ArrayList<PetitionListActivity.PetitionListAdapterItem>();
+		final List<PetitionListAdapterItem> plAdapterItem = new ArrayList<PetitionListActivity.PetitionListAdapterItem>();
 
 		// Rellenamos la lista y configuramos el layout
-		for (SignRequest request : signRequests) {
+		for (final SignRequest request : signRequests) {
 			plAdapterItem
 					.add(new PetitionElement(
 							request,
@@ -721,7 +721,7 @@ public class PetitionListActivity extends FragmentActivity implements
 		private final int layoutId;
 		private final Context context;
 
-		public PetitionElement(SignRequest signRequest, int layoutResId, Context context) {
+		public PetitionElement(final SignRequest signRequest, final int layoutResId, final Context context) {
 			this.request = signRequest;
 			this.layoutId = layoutResId;
 			this.context = context;
@@ -733,8 +733,8 @@ public class PetitionListActivity extends FragmentActivity implements
 		}
 
 		@Override
-		public View getView(LayoutInflater inflater, View convertView,
-				int position) {
+		public View getView(final LayoutInflater inflater, final View convertView,
+				final int position) {
 
 			View v = convertView;
 
@@ -818,8 +818,8 @@ public class PetitionListActivity extends FragmentActivity implements
 					// elemento
 					check.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 						@Override
-						public void onCheckedChanged(CompoundButton arg0,
-								boolean checked) {
+						public void onCheckedChanged(final CompoundButton arg0,
+								final boolean checked) {
 							PetitionElement.this.request.setSelected(checked);
 						}
 					});
@@ -854,12 +854,12 @@ public class PetitionListActivity extends FragmentActivity implements
 		}
 
 		@Override
-		public int getItemViewType(int position) {
+		public int getItemViewType(final int position) {
 			return getItem(position).getViewType();
 		}
 
 		@Override
-		public View getView(int position, View convertView, ViewGroup parent) {
+		public View getView(final int position, final View convertView, final ViewGroup parent) {
 			return getItem(position).getView(this.mInflater, convertView, position);
 		}
 	}
@@ -870,7 +870,7 @@ public class PetitionListActivity extends FragmentActivity implements
 		final int page;
 		final Context context;
 
-		public PanelPaginationElement(int numPages, int currentPage, Context context) {
+		public PanelPaginationElement(final int numPages, final int currentPage, final Context context) {
 			this.nPages = numPages;
 			this.page = currentPage;
 			this.context = context;
@@ -882,8 +882,8 @@ public class PetitionListActivity extends FragmentActivity implements
 		}
 
 		@Override
-		public View getView(LayoutInflater inflater, View convertView, int position) {
-			
+		public View getView(final LayoutInflater inflater, final View convertView, final int position) {
+
 			View paginationView = convertView;
 			if (paginationView == null) {
 				paginationView = ((LayoutInflater) this.context
@@ -896,7 +896,7 @@ public class PetitionListActivity extends FragmentActivity implements
 			pagButton.setOnClickListener(
 					new OnClickListener() {
 						@Override
-						public void onClick(View v) {
+						public void onClick(final View v) {
 							v.setSelected(true);
 							updateCurrentList(1);
 						}
@@ -907,7 +907,7 @@ public class PetitionListActivity extends FragmentActivity implements
 			pagButton.setOnClickListener(
 					new OnClickListener() {
 						@Override
-						public void onClick(View v) {
+						public void onClick(final View v) {
 							v.setSelected(true);
 							updateCurrentList(PanelPaginationElement.this.page - 1);
 						}
@@ -918,23 +918,23 @@ public class PetitionListActivity extends FragmentActivity implements
 			pagButton.setOnClickListener(
 					new OnClickListener() {
 						@Override
-						public void onClick(View v) {
+						public void onClick(final View v) {
 							v.setSelected(true);
 							updateCurrentList(PanelPaginationElement.this.page + 1);
 						}
 					});
-			
+
 			pagButton = paginationView.findViewById(R.id.arrowLast);
 			pagButton.setVisibility(this.page == this.nPages ? View.INVISIBLE : View.VISIBLE);
 			pagButton.setOnClickListener(
 					new OnClickListener() {
 						@Override
-						public void onClick(View v) {
+						public void onClick(final View v) {
 							v.setSelected(true);
 							updateCurrentList(PanelPaginationElement.this.nPages);
 						}
 					});
-			
+
 			((TextView) paginationView.findViewById(R.id.paginationText)).setText(
 					getString(R.string.pagination_separator, Integer.valueOf(this.page), Integer.valueOf(this.nPages)));
 
@@ -943,7 +943,7 @@ public class PetitionListActivity extends FragmentActivity implements
 	}
 
 	@Override
-	public void onItemClick(AdapterView<?> adapter, View view, int position, long id) {
+	public void onItemClick(final AdapterView<?> adapter, final View view, final int position, final long id) {
 
 		// Solo procesamos los click sobre los elementos de peticion, no sobre
 		// la barra de paginacion
@@ -958,24 +958,24 @@ public class PetitionListActivity extends FragmentActivity implements
 
 	/**
 	 * Abre un activity en donde muestra el detalle de la petici&oacute;n.
-	 * 
+	 *
 	 * @param requestId
 	 *            Identificador de la petici&oacute;n de la que se quiere ver el
 	 *            detalle.
 	 */
-	private void showRequestDetails(String requestId) {
+	private void showRequestDetails(final String requestId) {
 
 		final Intent changeActivityIntent = new Intent(this, PetitionDetailsActivity.class);
 		changeActivityIntent.putExtra( PetitionDetailsActivity.EXTRA_RESOURCE_REQUEST_STATE, getCurrentState());
-		changeActivityIntent.putExtra( PetitionDetailsActivity.EXTRA_RESOURCE_REQUEST_ID, (requestId));
+		changeActivityIntent.putExtra( PetitionDetailsActivity.EXTRA_RESOURCE_REQUEST_ID, requestId);
 		changeActivityIntent.putExtra( PetitionDetailsActivity.EXTRA_RESOURCE_CERT_B64, this.certB64);
 		changeActivityIntent.putExtra( PetitionDetailsActivity.EXTRA_RESOURCE_CERT_ALIAS, this.certAlias);
-		
+
 		startActivityForResult(changeActivityIntent, PetitionDetailsActivity.REQUEST_CODE);
 	}
 
 	@Override
-	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+	protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
 
 		if (requestCode == PetitionDetailsActivity.REQUEST_CODE) {
@@ -986,7 +986,7 @@ public class PetitionListActivity extends FragmentActivity implements
 			}
 			// Si se trato de firmar la peticion y fallo, se muestra el error
 			else if (resultCode == PetitionDetailsActivity.RESULT_SIGN_FAILED) {
-				Log.i(SFConstants.LOG_TAG, "Mostramos el error del fallo al firmar desde el detalle");
+				Log.i(SFConstants.LOG_TAG, "Mostramos el error del fallo al firmar desde el detalle"); //$NON-NLS-1$
 				showErrorDialog(DIALOG_RESULT_SIMPLE_REQUEST, getString(R.string.error_msg_procesing_request));
 			}
 			// Si se trato de rechazar la peticion y fallo, se muestra el error
@@ -997,7 +997,7 @@ public class PetitionListActivity extends FragmentActivity implements
 	}
 
 	@Override
-	public boolean onPrepareOptionsMenu(Menu menu) {
+	public boolean onPrepareOptionsMenu(final Menu menu) {
 
 		if (this.filterConfig != null) {
 			menu.findItem(R.id.no_filter).setVisible(
@@ -1031,12 +1031,12 @@ public class PetitionListActivity extends FragmentActivity implements
 
 	/**
 	 * Establece la visibilidad de un mensaje/s&iacute;mbolo de carga.
-	 * 
+	 *
 	 * @param visible
 	 *            Establece si el mensage sera visible o no.
 	 */
-	void setVisibilityLoadingMessage(boolean visible, RejectRequestsTask rrt,
-			LoadSignRequestsTask lsrt) {
+	void setVisibilityLoadingMessage(final boolean visible, final RejectRequestsTask rrt,
+			final LoadSignRequestsTask lsrt) {
 		if (visible) {
 			if (rrt != null) {
 				showProgressDialog(
@@ -1058,11 +1058,11 @@ public class PetitionListActivity extends FragmentActivity implements
 
 	/**
 	 * Establece la visibilidad de un mensaje/s&iacute;mbolo de carga.
-	 * 
+	 *
 	 * @param visible
 	 *            Establece si el mensage sera visible o no.
 	 */
-	void setVisibilityProgressMessage(boolean visible) {
+	void setVisibilityProgressMessage(final boolean visible) {
 		if (visible) {
 			showProgressDialog(
 					getString(R.string.dialog_msg_processing_requests), null,
@@ -1073,7 +1073,7 @@ public class PetitionListActivity extends FragmentActivity implements
 	}
 
 	@Override
-	protected void onSaveInstanceState(Bundle outState) {
+	protected void onSaveInstanceState(final Bundle outState) {
 		super.onSaveInstanceState(outState);
 
 		outState.putBoolean(KEY_SAVEINSTANCE_NEED_RELOAD, this.needReload);
@@ -1095,9 +1095,8 @@ public class PetitionListActivity extends FragmentActivity implements
 		this.filterDialogBuilder.setPositiveButton(R.string.ok,
 				new DialogInterface.OnClickListener() {
 					@Override
-					public void onClick(DialogInterface dialog, int id) {
-						setFilterConfig(getFilterDialogBuilder()
-								.getFilterConfig());
+					public void onClick(final DialogInterface dialog, final int identifier) {
+						setFilterConfig(getFilterDialogBuilder().getFilterConfig());
 						invalidateOptionsMenu();
 						updateCurrentList(1);
 					}
@@ -1108,7 +1107,7 @@ public class PetitionListActivity extends FragmentActivity implements
 	}
 
 	@Override
-	public void onDialogPositiveClick(int dialogId) {
+	public void onDialogPositiveClick(final int dialogId) {
 		// Dialogo de confirmacion de cierre de sesion
 		if (dialogId == DIALOG_CONFIRM_EXIT) {
 			CryptoConfiguration.setCertificateAlias(null);
@@ -1146,7 +1145,7 @@ public class PetitionListActivity extends FragmentActivity implements
 			// Separamos entre peticiones de firma y de visto bueno
 			final List<SignRequest> requestToSign = new ArrayList<SignRequest>();
 			final List<SignRequest> requestToApprove = new ArrayList<SignRequest>();
-			for (SignRequest req : requests) {
+			for (final SignRequest req : requests) {
 				if (req.getType() == RequestType.SIGNATURE) {
 					requestToSign.add(req);
 				} else {
@@ -1156,15 +1155,15 @@ public class PetitionListActivity extends FragmentActivity implements
 			// Mandamos a aprobar las peticiones de visto bueno
 			this.numRequestToApprovePending = requestToApprove.size();
 			if (this.numRequestToApprovePending > 0) {
-				Log.i(SFConstants.LOG_TAG, "Peticiones para aprobar: " + this.numRequestToApprovePending);				
+				Log.i(SFConstants.LOG_TAG, "Peticiones para aprobar: " + this.numRequestToApprovePending); //$NON-NLS-1$
 				approveRequests(
 						requestToApprove.toArray(new SignRequest[requestToApprove.size()]));
 			}
-			
+
 			// Mandamos a firmar las peticiones de firma
 			this.numRequestToSignPending = requestToSign.size();
 			if (this.numRequestToSignPending > 0) {
-				Log.i(SFConstants.LOG_TAG, "Peticiones para firmar: " + this.numRequestToSignPending);
+				Log.i(SFConstants.LOG_TAG, "Peticiones para firmar: " + this.numRequestToSignPending); //$NON-NLS-1$
 				signRequets(
 						this.certAlias,
 						requestToSign.toArray(new SignRequest[requestToSign.size()]));
@@ -1181,7 +1180,7 @@ public class PetitionListActivity extends FragmentActivity implements
 	 * Manda a aprobar el listado de peticiones indicado. Llama a la
 	 * operaci&oacute;n de &eacute;xito o fallo del listener una vez por cada
 	 * petici&oacute;n.
-	 * 
+	 *
 	 * @param requests
 	 *            Listado de peticiones de visto bueno.
 	 */
@@ -1190,23 +1189,19 @@ public class PetitionListActivity extends FragmentActivity implements
 				CommManager.getInstance(), this).execute();
 	}
 
-	/**
-	 * Manda a firmar (a traves de una tarea as&iacute;ncrona) el listado de
+	/** Manda a firmar (a traves de una tarea as&iacute;ncrona) el listado de
 	 * peticiones de firma indicado. Llamar&aacute; a la operaci&oacute;n de
 	 * &eacute;xito o fallo del listener, una vez por cada petici&oacute;n
 	 * procesada.
-	 * 
-	 * @param certAlias
-	 *            Alias del certificado de firma que se debe usar.
-	 * @param requests
-	 *            Listado de peticiones de firma.
-	 */
-	private void signRequets(final String certAlias, final SignRequest[] requests) {
-		new RequestSigner(certAlias, this, this).sign(requests);
+	 *
+	 * @param alias Alias del certificado de firma que se debe usar.
+	 * @param requests Listado de peticiones de firma. */
+	private void signRequets(final String alias, final SignRequest[] requests) {
+		new RequestSigner(alias, this, this).sign(requests);
 	}
 
 	@Override
-	public void onDialogNegativeClick(int dialogId) {
+	public void onDialogNegativeClick(final int dialogId) {
 		// No se implementa comportamiento
 	}
 
@@ -1236,8 +1231,8 @@ public class PetitionListActivity extends FragmentActivity implements
 							PetitionListActivity.this, null, message, true));
 					getProgressDialog().setOnKeyListener(new OnKeyListener() {
 						@Override
-						public boolean onKey(DialogInterface dialog,
-								int keyCode, KeyEvent event) {
+						public boolean onKey(final DialogInterface dialog,
+								final int keyCode, final KeyEvent event) {
 							if (keyCode == KeyEvent.KEYCODE_BACK) {
 								// comprobamos si se esta ejecutando alguna
 								// tarea para cancelarla
@@ -1252,7 +1247,7 @@ public class PetitionListActivity extends FragmentActivity implements
 							return false;
 						}
 					});
-				} catch (Exception e) {
+				} catch (final Exception e) {
 					Log.e(SFConstants.LOG_TAG,
 							"No se ha podido mostrar el dialogo de progreso: " + e); //$NON-NLS-1$
 				}

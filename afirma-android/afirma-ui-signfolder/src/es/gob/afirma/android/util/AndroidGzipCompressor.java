@@ -6,17 +6,15 @@ import java.io.IOException;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
-/**
- * Implementaci&oacute;n de un compresor de datos.
- * @author Carlos Gamuci
- */
-public class AndroidGzipCompressor {
+/** Implementaci&oacute;n de un compresor de datos.
+ * @author Carlos Gamuci */
+public final class AndroidGzipCompressor {
 
 	private static final int BUFFER_SIZE = 1024;
 
 	/** Comprime datos en formato GZIP.
 	 * @param data Datos sin comprimir
-	 * @return Datos comprimidos 
+	 * @return Datos comprimidos
 	 * @throws IOException Cuando ocurre alg&uacute;n problema durante la compresi&oacute;n */
 	public static byte[] gzip(final byte[] data) throws IOException {
 
@@ -35,7 +33,7 @@ public class AndroidGzipCompressor {
 
 	/** Descomprime datos en formato GZIP.
 	 * @param compressedData Datos comprimidos
-	 * @return Datos sin comprimir 
+	 * @return Datos sin comprimir
 	 * @throws IOException Cuando ocurre alg&uacute;n problema durante la descompresi&oacute;n */
 	public static byte[] gunzip(final byte[] compressedData) throws IOException {
 
@@ -49,7 +47,8 @@ public class AndroidGzipCompressor {
 		}
 		try {
 			gzipIs.close();
-		} catch (final Exception e) {
+		}
+		catch (final Exception e) {
 			// No tratamos el error
 		}
 		final byte[] data = baos.toByteArray();

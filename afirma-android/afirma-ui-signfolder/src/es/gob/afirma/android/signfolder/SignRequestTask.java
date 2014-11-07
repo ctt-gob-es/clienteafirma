@@ -15,15 +15,14 @@ import es.gob.afirma.android.signfolder.proxy.RequestResult;
 import es.gob.afirma.android.signfolder.proxy.SignRequest;
 import es.gob.afirma.core.AOException;
 
-/**
- * Tarea que ejecuta una firma electr&oacute;nica a trav&eacute;s de un AOSigner.
+/** Tarea que ejecuta una firma electr&oacute;nica a trav&eacute;s de un AOSigner.
  * La operaci&oacute;n puede ser firma simple, cofirma o contrafirma (de nodos hoja
  * o todo el &aacute;rbol) seg&uacute;n se indique.
  * La firma es una operaci&oacute;n que necesariamente debe ejecutarse en segundo
  * plano ya que las firmas trif&aacute;sicas hacen conexiones de red.
  * @author Carlos Gamuci
  */
-public class SignRequestTask extends AsyncTask<Void, Void, RequestResult>{
+final class SignRequestTask extends AsyncTask<Void, Void, RequestResult>{
 
 	private final SignRequest signRequest;
 	private final CommManager comm;
@@ -37,7 +36,7 @@ public class SignRequestTask extends AsyncTask<Void, Void, RequestResult>{
 	 * @param pk Clave privada para la firma.
 	 * @param certificateChain Cadena de certificaci&oacute;n.
 	 * @param operationListener Manejador para el tratamiento del resultado de la operaci&oacute;n. */
-	public SignRequestTask(final SignRequest signRequest,
+	SignRequestTask(final SignRequest signRequest,
 			final PrivateKey pk,
 			final X509Certificate[] certificateChain,
 			final CommManager comm,
@@ -51,19 +50,19 @@ public class SignRequestTask extends AsyncTask<Void, Void, RequestResult>{
 	}
 
 	@Override
-	protected RequestResult doInBackground(Void...params) {
+	protected RequestResult doInBackground(final Void...params) {
 
 		this.t = null;
 		RequestResult result = null;
 		try {
-			result = TriSigner.sign(this.signRequest, this.pk, this.certificateChain, this.comm);	
+			result = TriSigner.sign(this.signRequest, this.pk, this.certificateChain, this.comm);
 		}
-		catch (CertificateEncodingException e) {
+		catch (final CertificateEncodingException e) {
 			Log.e(SFConstants.LOG_TAG, "Error al codificar el certificado de firma: " + e); //$NON-NLS-1$
 			this.t = e;
 			e.printStackTrace();
 		}
-		catch (IOException e) {
+		catch (final IOException e) {
 			Log.e(SFConstants.LOG_TAG, "Error en la comunicacion con el servidor: " + e); //$NON-NLS-1$
 			this.t = e;
 			e.printStackTrace();
@@ -74,9 +73,9 @@ public class SignRequestTask extends AsyncTask<Void, Void, RequestResult>{
 			e.printStackTrace();
 		}
 		catch (final Exception e) {
-			
+
 			e.printStackTrace();
-			
+
 			// Solo se dara este error (hasta la fecha) cuando se intente cargar el dialogo de PIN de
 			// una tarjeta criptografica
 			if (e.getCause() != null && e.getCause() instanceof AOException && e.getCause().getCause() instanceof ActivityNotFoundException) {
@@ -91,10 +90,10 @@ public class SignRequestTask extends AsyncTask<Void, Void, RequestResult>{
 		catch (final Throwable e) {
 			Log.e(SFConstants.LOG_TAG, "Error durante la operacion de firma: " + e); //$NON-NLS-1$
 			this.t = e;
-			
+
 			e.printStackTrace();
 		}
-		
+
 		return result;
 	}
 
