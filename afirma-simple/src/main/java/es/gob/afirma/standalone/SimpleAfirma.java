@@ -63,6 +63,7 @@ import es.gob.afirma.standalone.ui.MainMenu;
 import es.gob.afirma.standalone.ui.MainScreen;
 import es.gob.afirma.standalone.ui.SignDetailPanel;
 import es.gob.afirma.standalone.ui.SignPanel;
+import es.gob.afirma.standalone.updater.Updater;
 
 /** Aplicaci&oacute;n gr&aacute;fica de firma electr&oacute;nica f&aacute;cil
  * basada en @firma. C&oacute;digos de salida de la aplicaci&oacute;n:
@@ -538,6 +539,9 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 
     	// Configuramos el log de la aplicacion
     	configureLog();
+
+    	// Comprobamos actualizaciones
+    	Updater.checkForUpdates(null);
 
     	try {
     		if (args == null || args.length == 0) {
