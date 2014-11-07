@@ -27,7 +27,8 @@ public interface MobileKeyStoreManager {
         private final Throwable e;
 
         /** Construye un evento de selecci&oacute;n de una entrada que apunta a una clave privada.
-         * @param p Entrada que apunta a una clave privada seleccionada */
+         * @param p Entrada que apunta a una clave privada seleccionada
+         * @param alias Alias del certificado */
         public KeySelectedEvent(final PrivateKeyEntry p, final String alias) {
             this.pke = p;
             this.alias = alias;
@@ -51,20 +52,20 @@ public interface MobileKeyStoreManager {
             }
             return this.pke;
         }
-        
+
         /** Obtiene el certificado seleccionado codificado.
          * @return Certificado.
-         * @throws Throwable Cuando ocurre un error en la selecci&oacute;n o la codificaci&oacute;n del certificado. */ 
+         * @throws Throwable Cuando ocurre un error en la selecci&oacute;n o la codificaci&oacute;n del certificado. */
         public byte[] getCertificateEncoded() throws Throwable {
             if (this.e != null) {
                 throw this.e;
             }
             return this.pke.getCertificate().getEncoded();
         }
-        
+
         /** Obtiene el alias del certificado seleccionado.
          * @return Alias del certificado o {@code null} si no tiene.
-         * @throws Throwable Cuando ocurre un error en la selecci&oacute;n del certificado. */ 
+         * @throws Throwable Cuando ocurre un error en la selecci&oacute;n del certificado. */
         public String getCertificateAlias() throws Throwable {
             if (this.e != null) {
                 throw this.e;
