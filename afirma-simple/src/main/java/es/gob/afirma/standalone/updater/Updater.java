@@ -19,31 +19,55 @@ public final class Updater {
 	private static String version = null;
 	private static String currentVersion = null;
 	private static String updateSite = "https://github.com/ctt-gob-es/clienteafirma/"; //$NON-NLS-1$
+
+	private static Properties updaterProperties = null;
+
 	static String getUpdateSite() {
 		return updateSite;
 	}
 
 	static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
-	/** Obtiene la &uacute;ltima versi&oacute;n disponible del programa.
-	 * @return &Uacute;ltima versi&oacute;n disponible del programa o <code>null</code> si no
-	 *         se ha podido obtener. */
-	private static String getLatestVersion() {
-		final Properties p = new Properties();
+	private static void loadProperties() {
+		if (updaterProperties != null) {
+			return;
+		}
+		updaterProperties = new Properties();
 		try {
-			p.load(Updater.class.getResourceAsStream("/properties/updater.properties")); //$NON-NLS-1$
+			updaterProperties.load(Updater.class.getResourceAsStream("/properties/updater.properties")); //$NON-NLS-1$
 		}
 		catch (final Exception e) {
 			LOGGER.severe(
 				"No se ha podido cargar el archivo de recursos del actualizador: " + e //$NON-NLS-1$
 			);
+			updaterProperties = null;
+		}
+	}
+
+	/** Obtiene la versi&oacute;n actual del aplicativo.
+	 * @return Versi&oacute;n actual del aplicativo. */
+	private static String getCurrentVersion() {
+		loadProperties();
+		if (currentVersion == null) {
+			currentVersion = updaterProperties.getProperty("currentVersion"); //$NON-NLS-1$
+		}
+		return currentVersion;
+	}
+
+	/** Obtiene la &uacute;ltima versi&oacute;n disponible del programa.
+	 * @return &Uacute;ltima versi&oacute;n disponible del programa o <code>null</code> si no
+	 *         se ha podido obtener. */
+	private static String getLatestVersion() {
+
+		loadProperties();
+
+		if (updaterProperties == null) {
 			return null;
 		}
-		final String url = p.getProperty("url"); //$NON-NLS-1$
 
-		// Leemos aqui el resto de propiedades
-		currentVersion = p.getProperty("currentVersion"); //$NON-NLS-1$
-		updateSite = p.getProperty("updateSite"); //$NON-NLS-1$
+		final String url = updaterProperties.getProperty("url"); //$NON-NLS-1$
+
+		updateSite = updaterProperties.getProperty("updateSite"); //$NON-NLS-1$
 
 		if (url == null) {
 			LOGGER.severe(
@@ -70,12 +94,12 @@ public final class Updater {
 			LOGGER.severe("No se puede comprobar si hay versiones nuevas del aplicativo"); //$NON-NLS-1$
 			return false;
 		}
-		if (currentVersion == null) {
+		if (getCurrentVersion() == null) {
 			LOGGER.severe("No ha podido comprobar la version actual del aplicativo"); //$NON-NLS-1$
 			return false;
 		}
 		try {
-			return Integer.parseInt(newVersion) > Integer.parseInt(currentVersion);
+			return Integer.parseInt(newVersion) > Integer.parseInt(getCurrentVersion());
 		}
 		catch(final Exception e) {
 			LOGGER.severe(
@@ -83,6 +107,22 @@ public final class Updater {
 			);
 			return false;
 		}
+	}
+
+	/** Indica la versi&oacute;n actual del aplicativo es menor que la requerida.
+	 * @param neededVersion Versi&oacute;n requerida.
+	 * @return <code>true</code> si la versi&oacute;n actual del aplicativo es menor que la requerida,
+	 *         <code>false</code> en caso contrario. */
+	public static boolean isOldVersion(final String neededVersion) {
+		try {
+			if (Integer.parseInt(neededVersion) > Integer.parseInt(getCurrentVersion())) {
+				return true;
+			}
+		}
+		catch(final Exception e) {
+			LOGGER.severe("No se ha podido comprobar si la version actual es menor que la requerida: " + e); //$NON-NLS-1$
+		}
+		return false;
 	}
 
 	/** Comprueba si hay actualizaciones del aplicativo, y en caso afirmativo lo notifica al usuario.

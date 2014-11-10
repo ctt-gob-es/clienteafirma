@@ -27,6 +27,13 @@ public final class UrlParametersToSign {
 	private URL retrieveServer;
 	private Properties extraParams;
 	private String defaultKeyStore;
+	private String minimumVerstion;
+
+	/** Obtiene la versi&oacute;n m&iacute;nima requerida del aplicativo.
+	 * @return Versi&oacute;n m&iacute;nima requerida del aplicativo. */
+	public String getMinimumVersion() {
+		return this.minimumVerstion;
+	}
 
 	/** Obtiene el nombre del almac&eacute;n de claves a usar por defecto.
 	 * @return Nombre del almac&eacute;n de claves a usar por defecto */
@@ -140,6 +147,10 @@ public final class UrlParametersToSign {
 
 	void setExtraParams(final Properties properties) {
 		this.extraParams = properties != null ? properties : new Properties();
+	}
+
+	void setMinimumVersion(final String minVer) {
+		this.minimumVerstion = minVer;
 	}
 
 	/** Establece el nombre del almac&eacute;n de claves a usar por defecto.

@@ -11,6 +11,7 @@ import javax.security.auth.callback.PasswordCallback;
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.UrlHttpManagerFactory;
 import es.gob.afirma.core.misc.protocol.ParameterLocalAccessRequestedException;
+import es.gob.afirma.core.misc.protocol.ParameterNeedsUpdatedVersionException;
 import es.gob.afirma.core.misc.protocol.ProtocolInvocationUriParser;
 import es.gob.afirma.core.misc.protocol.UrlParametersToSave;
 import es.gob.afirma.core.misc.protocol.UrlParametersToSign;
@@ -48,6 +49,7 @@ public final class ProtocolInvocationLauncher {
 	private static final String SAF_11 = "SAF_11"; //$NON-NLS-1$
 	private static final String SAF_12 = "SAF_12"; //$NON-NLS-1$
 	private static final String SAF_13 = "SAF_13"; //$NON-NLS-1$
+	private static final String SAF_14 = "SAF_14"; //$NON-NLS-1$
 
 	private static final Dictionary<String, String> ERRORS = new Hashtable<String, String>();
 	static {
@@ -64,6 +66,7 @@ public final class ProtocolInvocationLauncher {
 		ERRORS.put(SAF_11, ProtocolMessages.getString("ProtocolLauncher.11")); //$NON-NLS-1$
 		ERRORS.put(SAF_12, ProtocolMessages.getString("ProtocolLauncher.12")); //$NON-NLS-1$
 		ERRORS.put(SAF_13, ProtocolMessages.getString("ProtocolLauncher.13")); //$NON-NLS-1$
+		ERRORS.put(SAF_14, ProtocolMessages.getString("ProtocolLauncher.14")); //$NON-NLS-1$
 	}
 
 	private static final String METHOD_OP_PUT = "put"; //$NON-NLS-1$
@@ -85,6 +88,11 @@ public final class ProtocolInvocationLauncher {
 		if (urlString.startsWith("afirma://save?") || urlString.startsWith("afirma://save/?")) { //$NON-NLS-1$ //$NON-NLS-2$
 			try {
 				processSave(ProtocolInvocationUriParser.getParametersToSave(urlString));
+			}
+			catch(final ParameterNeedsUpdatedVersionException e) {
+				LOGGER.severe("Se necesita una version mas moderna de Firma Facil para procesar la peticion: " + e); //$NON-NLS-1$
+				showError(SAF_14);
+				return;
 			}
 			catch(final ParameterLocalAccessRequestedException e) {
 				LOGGER.severe("Se ha pedido un acceso a una direccion local (localhost o 127.0.0.1): " + e); //$NON-NLS-1$

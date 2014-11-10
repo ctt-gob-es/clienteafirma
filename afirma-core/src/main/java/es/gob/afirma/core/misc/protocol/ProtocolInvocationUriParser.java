@@ -87,6 +87,9 @@ public final class ProtocolInvocationUriParser {
 	/** Par&aacute;metro de entrada con el identificador del documento. */
 	private static final String ID_PARAM = "id"; //$NON-NLS-1$
 
+	/** Par&aacute;metro de entrada con la m&iacute;nima versi&oacute;n requerida del aplicativo a usar en la invocaci&oacute;n por protocolo. */
+	private static final String VER_PARAM = "ver"; //$NON-NLS-1$
+
 	/** Par&aacute;metro de entrada con la clave para el cifrado del documento. */
 	private static final String KEY_PARAM = "key"; //$NON-NLS-1$
 
@@ -231,6 +234,15 @@ public final class ProtocolInvocationUriParser {
 				throw new ParameterException("El identificador de la firma debe ser alfanumerico."); //$NON-NLS-1$
 			}
 		}
+
+		// Version minima requerida del aplicativo
+		if (params.containsKey(VER_PARAM)) {
+			ret.setMinimumVersion(params.get(VER_PARAM));
+		}
+		else {
+			ret.setMinimumVersion("0"); //$NON-NLS-1$
+		}
+
 
 		ret.setSessionId(signatureSessionId);
 
