@@ -112,6 +112,11 @@ public final class ProtocolInvocationLauncher {
 			try {
 				processSign(ProtocolInvocationUriParser.getParametersToSign(urlString));
 			}
+			catch(final ParameterNeedsUpdatedVersionException e) {
+				LOGGER.severe("Se necesita una version mas moderna de Firma Facil para procesar la peticion: " + e); //$NON-NLS-1$
+				showError(SAF_14);
+				return;
+			}
 			catch(final ParameterLocalAccessRequestedException e) {
 				LOGGER.severe("Se ha pedido un acceso a una direccion local (localhost o 127.0.0.1): " + e); //$NON-NLS-1$
 				showError(SAF_13);
