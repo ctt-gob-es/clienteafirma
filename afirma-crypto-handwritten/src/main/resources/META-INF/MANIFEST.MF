@@ -2,10 +2,10 @@ Manifest-Version: 1.0
 Name: es/gob/afirma
 Specification-Title: Firma2E
 Specification-Version: v1.0
-Specification-Vendor: Atos SAE
-Implementation-Title: es.gob.afirma
+Specification-Vendor: AEAT
+Implementation-Title: es.gob.afirma.handwritten
 Implementation-Version: build01
-Implementation-Vendor: Atos SAE
+Implementation-Vendor: AEAT
 Application-Name: Firma2E
 Permissions: all-permissions
 Codebase: *
