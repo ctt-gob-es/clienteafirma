@@ -7,9 +7,6 @@ import java.io.InputStream;
 import java.net.URI;
 import java.util.Properties;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
-
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.signers.AOSignConstants;
@@ -21,32 +18,14 @@ public final class TsaParams {
 	private static final String DEFAULT_DIGEST_ALGO = "SHA-512"; //$NON-NLS-1$
 	private static final String POLICY = "0.4.0.2023.1.1"; //$NON-NLS-1$
 
-	@XmlElement(name = "tsaRequireCert")
 	private final boolean tsaRequireCert;
-
-	@XmlElement(name = "tsaPolicy")
 	private final String tsaPolicy;
-
-	@XmlElement(name = "tsaURL")
 	private final URI tsaURL;
-
-	@XmlElement(name = "tsaUsr")
 	private final String tsaUsr;
-
-	@XmlElement(name = "tsaPwd")
 	private final String tsaPwd;
-
-	@XmlElementWrapper(name = "extensions")
-	@XmlElement(name = "extension")
 	private final TsaRequestExtension[] extensions;
-
-	@XmlElement(name = "tsaHashAlgorithm")
 	private final String tsaHashAlgorithm;
-
-	@XmlElement(name = "sslPkcs12File")
 	private final byte[] sslPkcs12File;
-
-	@XmlElement(name = "sslPkcs12FilePassword")
 	private final String sslPkcs12FilePassword;
 
 	/** Sello de tiempo a nivel de firma. */
@@ -121,7 +100,6 @@ public final class TsaParams {
         this.sslPkcs12File = sslPkcs12 != null ? sslPkcs12.clone() : null;
         this.sslPkcs12FilePassword = sslPkcs12Password;
         this.tsaRequireCert = requireCert;
-
 	}
 
 	/** Construye los par&aacute;metros de configuraci&oacute;n de una Autoridad de Sellado de Tiempo.
@@ -238,21 +216,6 @@ public final class TsaParams {
 	 *         cadena vac&iacute;a si no se ha establecido ninguna. */
 	public String getSslPkcs12FilePassword() {
 		return this.sslPkcs12FilePassword;
-	}
-
-	/** Constructor de uso restringido a la serializaci&oacute;n JAXB. */
-	@SuppressWarnings("unused")
-	private TsaParams() {
-		// Para la serializacion JAXB
-        this.tsaURL = null;
-        this.tsaPolicy = POLICY;
-        this.tsaUsr = null;
-        this.tsaPwd = null;
-        this.extensions = null;
-        this.tsaHashAlgorithm = DEFAULT_DIGEST_ALGO;
-        this.sslPkcs12File = null;
-        this.sslPkcs12FilePassword = null;
-        this.tsaRequireCert = true;
 	}
 
 }

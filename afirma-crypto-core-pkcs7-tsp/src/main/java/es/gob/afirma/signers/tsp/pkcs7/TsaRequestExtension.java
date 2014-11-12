@@ -1,17 +1,11 @@
 package es.gob.afirma.signers.tsp.pkcs7;
 
-import javax.xml.bind.annotation.XmlElement;
 
 /** Extensi&oacute;n para una solicitud de TSA seg&uacute;n RFC 2161. */
 public final class TsaRequestExtension {
 
-	@XmlElement(name = "oid")
 	private final String oid;
-
-	@XmlElement(name = "critical")
 	private final boolean critical;
-
-	@XmlElement(name = "value")
 	private final byte[] value;
 
 	@Override

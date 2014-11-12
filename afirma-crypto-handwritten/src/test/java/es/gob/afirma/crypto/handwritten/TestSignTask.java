@@ -16,8 +16,7 @@ import org.junit.Test;
 
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
-import es.gob.afirma.signers.tsp.pkcs7.TsaParams;
-import es.gob.afirma.signers.tsp.pkcs7.TsaRequestExtension;
+import es.gob.afirma.crypto.handwritten.SerializableTsaParams.SerializableTsaRequestExtension;
 
 /** Pruebas de tareas de firma.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
@@ -52,13 +51,13 @@ public class TestSignTask {
 	@SuppressWarnings("static-method")
 	@Test
 	public void testSerial() throws Exception {
-		final TsaParams tsaParams = new TsaParams(
+		final SerializableTsaParams tsaParams = new SerializableTsaParams(
 				true,
 				"4.3.2.1", //$NON-NLS-1$
 				new URI("http://kaka.ka"), //$NON-NLS-1$
 				"user", //$NON-NLS-1$
 				"password", //$NON-NLS-1$
-				new TsaRequestExtension[] { new TsaRequestExtension("1.2.3.4", false, new byte[] { (byte) 0xff, (byte) 0xfa }) }, //$NON-NLS-1$
+				new SerializableTsaRequestExtension[] { new SerializableTsaRequestExtension("1.2.3.4", false, new byte[] { (byte) 0xff, (byte) 0xfa }) }, //$NON-NLS-1$
 				"SHA-512", //$NON-NLS-1$
 				new byte[] { 0x00, 0x01, 0x02, 0x03 },
 				"p12password" //$NON-NLS-1$

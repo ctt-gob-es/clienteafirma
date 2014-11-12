@@ -24,7 +24,7 @@ import es.gob.afirma.signers.tsp.pkcs7.TsaParams;
 public final class SignTask {
 
 	@XmlElement(name = "tsaParams")
-	private TsaParams tsaParams;
+	private SerializableTsaParams tsaParams;
 
 	@XmlElement(name = "retrieveUrl")
 	private URL retrieveUrl;
@@ -113,7 +113,7 @@ public final class SignTask {
 	 *                 contrario.
 	 * @param completeSignExtraParams par&aacute;metros adicionales de la firma final
 	 *                                con certificado. */
-	public SignTask(final TsaParams tsa,
+	public SignTask(final SerializableTsaParams tsa,
 					final URL retrieveUrlPdf,
 					final URL saveUrlPdf,
 					final String saveUrlPostParam,
@@ -138,7 +138,7 @@ public final class SignTask {
 	/** Obtiene los datos para el sellado de tiempo.
 	 * @return Datos para el sellado de tiempo. */
 	public TsaParams getTsaParams() {
-		return this.tsaParams;
+		return this.tsaParams.getTsaParams();
 	}
 
 	/** Obtiene la URL para recuperar el PDF.
