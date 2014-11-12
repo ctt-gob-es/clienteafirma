@@ -1,6 +1,10 @@
 package es.gob.afirma.crypto.handwritten;
 
+import java.util.logging.Logger;
+
 import org.junit.Test;
+
+import com.sun.org.apache.xml.internal.security.utils.Base64;
 
 import es.gob.afirma.core.misc.AOUtil;
 
@@ -8,6 +12,7 @@ import es.gob.afirma.core.misc.AOUtil;
  * @author Astrid Idoate. */
 public class TestBioSignerRunner {
 
+	static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	/** Prueba para realizar varias firmas
 	 * @throws Exception En cualquier error. */
@@ -18,6 +23,7 @@ public class TestBioSignerRunner {
 			String xml;
 			try {
 				xml = new String(AOUtil.getDataFromInputStream(TestSignTask.class.getResourceAsStream("/signTask.xml"))); //$NON-NLS-1$
+
 				new BioSignerRunner(xml).show();
 			}
 			catch (Exception e) {
@@ -37,6 +43,7 @@ public class TestBioSignerRunner {
 		String xml;
 		try {
 			xml = new String(AOUtil.getDataFromInputStream(TestSignTask.class.getResourceAsStream("/signTask.xml"))); //$NON-NLS-1$
+			LOGGER.info("XML en base64" + Base64.encode(xml.getBytes()));
 			new BioSignerRunner(xml).show();
 		}
 		catch (Exception e) {

@@ -67,9 +67,6 @@ public final class BioSignerRunner implements SignaturePadListener {
 	private static final int BUTTON_HEIGHT = 75;
 	private static final int BUTTON_WIDTH = 500;
 
-	private static final String ERROR_DWN_PDF = "ERROR_DWN_PDF";
-
-
 	private static final int MIN_WIDTH = 300;
 	private static final int MIN_HEIGHT_CONSTANT = 90;
 
@@ -129,6 +126,8 @@ public final class BioSignerRunner implements SignaturePadListener {
 	 * @throws IOException Si hay errores en el tratamiento de datos. */
 	public BioSignerRunner(final String xml) throws IOException {
 
+		LOGGER.info("Contenido de la cadena XML : " + xml);
+
 		if (xml == null) {
 			throw new IllegalArgumentException("El XML de entrada no puede ser nulo"); //$NON-NLS-1$
 		}
@@ -147,6 +146,7 @@ public final class BioSignerRunner implements SignaturePadListener {
 			new Runnable() {
 				@Override
 				public void run() {
+					LOGGER.info("Inicio de la creacion de la interfaz de firma...");
 					createUI(getSignTask());
 				}
 			}
