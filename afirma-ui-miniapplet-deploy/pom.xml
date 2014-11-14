@@ -12,4 +12,33 @@
 		<artifactId>afirma-client</artifactId>
 		<version>3.3.2-SNAPSHOT</version>
 	</parent>
+
+  <build>
+    <finalName>afirma</finalName>
+
+    <plugins>
+
+      <!-- Servidor de aplicaciones Jetty -->
+
+      <plugin>
+        <groupId>org.eclipse.jetty</groupId>
+        <artifactId>jetty-maven-plugin</artifactId>
+        <version>9.1.2.v20140210</version>
+        <configuration>
+          <stopKey>ujiapps</stopKey>
+          <stopPort>9905</stopPort>
+          <systemProperties>
+            <systemProperty>
+              <name>jetty.port</name>
+              <value>9006</value>
+            </systemProperty>
+          </systemProperties>
+          <webApp>
+            <contextPath>/afirma</contextPath>
+            <descriptor>target/web.xml</descriptor>
+          </webApp>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>
