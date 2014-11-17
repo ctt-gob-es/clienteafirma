@@ -77,7 +77,7 @@ KeystoreManagerListener, PrivateKeySelectionListener, DownloadDataListener, Send
 	private UrlParametersToSign parameters;
 
 	private DownloadFileTask downloadFileTask = null;
-	
+
 	private MessageDialog messageDialog;
 	MessageDialog getMessageDialog() {
 		return this.messageDialog;
@@ -152,23 +152,23 @@ KeystoreManagerListener, PrivateKeySelectionListener, DownloadDataListener, Send
 		// Aseguramos que se muestra el panel con el mensaje de espera
 		this.progressDialog = ProgressDialog.show(this, "", //$NON-NLS-1$
 				getString(R.string.dialog_msg_loading_data), true);
-		
+
 		try {
 			this.parameters = UriParser.getParametersToSign(getIntent().getDataString());
 		}
 		catch (final ParameterException e) {
-			Log.e(ES_GOB_AFIRMA, "Error en los parametros de firma: " + e.toString()); //$NON-NLS-1$
+			Log.e(ES_GOB_AFIRMA, "Error en los parametros de firma: " + e.toString(), e); //$NON-NLS-1$
 			showErrorMessage(getString(R.string.error_bad_params));
 		}
 		catch (final UnsupportedEncodingException e) {
-			Log.e(ES_GOB_AFIRMA, "Error de codificacion: " + e.toString()); //$NON-NLS-1$
+			Log.e(ES_GOB_AFIRMA, "Error de codificacion", e); //$NON-NLS-1$
 			showErrorMessage(getString(R.string.error_bad_params));
 		} catch (final Throwable e) {
-			Log.e(ES_GOB_AFIRMA, "Error grave en el onCreate de SignDataActivity: " + e.toString()); //$NON-NLS-1$
+			Log.e(ES_GOB_AFIRMA, "Error grave en el onCreate de SignDataActivity: " + e.toString(), e); //$NON-NLS-1$
 			e.printStackTrace();
 			showErrorMessage(getString(R.string.error_bad_params));
 		}
-		
+
 		UrlHttpManagerFactory.install(new AndroidUrlHttpManager());
 	}
 
@@ -207,7 +207,7 @@ KeystoreManagerListener, PrivateKeySelectionListener, DownloadDataListener, Send
 			}
 		}
 	}
-	
+
 	private void loadKeyStore() {
 
 		// Si ya tenemos los datos para la firma (no antes), buscamos si hay dispositivos CCID USB conectados
@@ -280,7 +280,7 @@ KeystoreManagerListener, PrivateKeySelectionListener, DownloadDataListener, Send
 	private void sendData(final String data, final boolean critical, final boolean needCloseApp) {
 
 		Log.i(ES_GOB_AFIRMA, "Se almacena el resultado en el servidor con el Id: " + this.parameters.getId()); //$NON-NLS-1$
-		
+
 		new SendDataTask(
 			this.parameters.getId(),
 			this.parameters.getStorageServletUrl().toExternalForm(),
@@ -303,12 +303,12 @@ KeystoreManagerListener, PrivateKeySelectionListener, DownloadDataListener, Send
 		catch (final UnsupportedEncodingException e) {
 			// No puede darse, el soporte de UTF-8 es obligatorio
 			Log.e(ES_GOB_AFIRMA,
-				"No se ha podido enviar la respuesta al servidor por error en la codificacion " + DEFAULT_URL_ENCODING + ": " + e //$NON-NLS-1$ //$NON-NLS-2$
+				"No se ha podido enviar la respuesta al servidor por error en la codificacion " + DEFAULT_URL_ENCODING, e //$NON-NLS-1$
 			);
 		}
 		catch (final Throwable e) {
 			Log.e(ES_GOB_AFIRMA,
-				"Error desconocido al enviar el error obtenido al servidor: " + e //$NON-NLS-1$
+				"Error desconocido al enviar el error obtenido al servidor: " + e, e //$NON-NLS-1$
 			);
 		}
 	}
@@ -379,7 +379,7 @@ KeystoreManagerListener, PrivateKeySelectionListener, DownloadDataListener, Send
 			pke = kse.getPrivateKeyEntry();
 		}
 		catch (final KeyChainException e) {
-			Log.e(ES_GOB_AFIRMA, e.toString());
+			Log.e(ES_GOB_AFIRMA, "Error en la recuperacion de la clave del almacen", e); //$NON-NLS-1$
 			if ("4.1.1".equals(Build.VERSION.RELEASE) || "4.1.0".equals(Build.VERSION.RELEASE) || "4.1".equals(Build.VERSION.RELEASE)) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				launchError(ErrorManager.ERROR_PKE_ANDROID_4_1, true, true);
 			}
@@ -389,12 +389,12 @@ KeystoreManagerListener, PrivateKeySelectionListener, DownloadDataListener, Send
 			return;
 		}
 		catch (final KeyStoreException e) {
-			Log.e(ES_GOB_AFIRMA, "El usuario no selecciono un certificado: " + e); //$NON-NLS-1$
+			Log.e(ES_GOB_AFIRMA, "El usuario no selecciono un certificado", e); //$NON-NLS-1$
 			launchError(ErrorManager.ERROR_CANCELLED_OPERATION, false, true);
 			return;
 		}
 		catch (final Exception e) {
-			Log.e(ES_GOB_AFIRMA, "Error al recuperar la clave del certificado de firma: " + e); //$NON-NLS-1$
+			Log.e(ES_GOB_AFIRMA, "Error al recuperar la clave del certificado de firma", e); //$NON-NLS-1$
 			e.printStackTrace();
 			launchError(ErrorManager.ERROR_PKE, true, true);
 			return;
@@ -402,7 +402,7 @@ KeystoreManagerListener, PrivateKeySelectionListener, DownloadDataListener, Send
 		// Cuando se instala el certificado desde el dialogo de seleccion, Android da a elegir certificado
 		// en 2 ocasiones y en la segunda se produce un "java.lang.AssertionError". Se ignorara este error.
 		catch (final Throwable e) {
-			Log.e(ES_GOB_AFIRMA, "Error al importar la clave. Si es un AssertionError puede tratarse de un problema de Android: " + e.toString()); //$NON-NLS-1$
+			Log.e(ES_GOB_AFIRMA, "Error al importar la clave. Si es un AssertionError puede tratarse de un problema de Android", e); //$NON-NLS-1$
 			e.printStackTrace();
 			return;
 		}
@@ -417,17 +417,17 @@ KeystoreManagerListener, PrivateKeySelectionListener, DownloadDataListener, Send
 				try {
 					setProgressDialog(ProgressDialog.show(SignDataActivity.this, "", message, true)); //$NON-NLS-1$
 				} catch (Throwable e) {
-					Log.e(ES_GOB_AFIRMA, "No se ha podido mostrar el dialogo de progreso: " + e); //$NON-NLS-1$
+					Log.e(ES_GOB_AFIRMA, "No se ha podido mostrar el dialogo de progreso", e); //$NON-NLS-1$
 				}
 			}
 		});
 	}
-	
+
 	@Override
 	public synchronized void processData(final byte[] data) {
 
 		Log.i(ES_GOB_AFIRMA, "Se ha descargado correctamente la configuracion de firma almacenada en servidor"); //$NON-NLS-1$
-		
+
 		// Si hemos tenido que descargar los datos desde el servidor, los desciframos y llamamos
 		// al dialogo de seleccion de certificados para la firma
 		byte[] decipheredData;
@@ -435,46 +435,46 @@ KeystoreManagerListener, PrivateKeySelectionListener, DownloadDataListener, Send
 			decipheredData = CipherDataManager.decipherData(data, this.parameters.getDesKey());
 		}
 		catch (final IOException e) {
-			Log.e(ES_GOB_AFIRMA, "Los datos proporcionados no est&aacute;n correctamente codificados en base 64: " + e.toString()); //$NON-NLS-1$
+			Log.e(ES_GOB_AFIRMA, "Los datos proporcionados no est&aacute;n correctamente codificados en base 64", e); //$NON-NLS-1$
 			showErrorMessage(getString(R.string.error_bad_params));
 			return;
 		}
 		catch (final GeneralSecurityException e) {
-			Log.e(ES_GOB_AFIRMA, "Error al descifrar los datos recuperados del servidor para la firma: " + e.toString()); //$NON-NLS-1$
+			Log.e(ES_GOB_AFIRMA, "Error al descifrar los datos recuperados del servidor para la firma", e); //$NON-NLS-1$
 			showErrorMessage(getString(R.string.error_bad_params));
 			return;
 		}
 		catch (final IllegalArgumentException e) {
-			Log.e(ES_GOB_AFIRMA, "Los datos recuperados no son un base64 valido: " + e.toString()); //$NON-NLS-1$
+			Log.e(ES_GOB_AFIRMA, "Los datos recuperados no son un base64 valido", e); //$NON-NLS-1$
 			showErrorMessage(getString(R.string.error_bad_params));
 			return;
 		}
 		catch (final Throwable e) {
-			Log.e(ES_GOB_AFIRMA, "Error desconocido durante el descifrado de los datos: " + e.toString()); //$NON-NLS-1$
+			Log.e(ES_GOB_AFIRMA, "Error desconocido durante el descifrado de los datos", e); //$NON-NLS-1$
 			showErrorMessage(getString(R.string.error_bad_params));
 			return;
 		}
 
 		Log.i(ES_GOB_AFIRMA, "Se han descifrado los datos y se inicia su analisis"); //$NON-NLS-1$
-		
+
 		try {
 			this.parameters = UriParser.getParametersToSign(decipheredData);
 		}
 		catch (final ParameterException e) {
-			Log.e(ES_GOB_AFIRMA, "Error en los parametros XML de configuracion de firma: " + e.toString()); //$NON-NLS-1$
+			Log.e(ES_GOB_AFIRMA, "Error en los parametros XML de configuracion de firma: " + e.toString(), e); //$NON-NLS-1$
 			showErrorMessage(getString(R.string.error_bad_params));
 			return;
 		}
 		catch (final UnsupportedEncodingException e) {
-			Log.e(ES_GOB_AFIRMA, "Error de codificacion en el XML de configuracion de firma: " + e.toString()); //$NON-NLS-1$
+			Log.e(ES_GOB_AFIRMA, "Error de codificacion en el XML de configuracion de firma", e); //$NON-NLS-1$
 			showErrorMessage(getString(R.string.error_bad_params));
 			return;
 		}
 		catch (final Throwable e) {
-			Log.e(ES_GOB_AFIRMA, "Error desconocido al analizar los datos descargados desde el servidor: " + e.toString()); //$NON-NLS-1$
+			Log.e(ES_GOB_AFIRMA, "Error desconocido al analizar los datos descargados desde el servidor", e); //$NON-NLS-1$
 			showErrorMessage(getString(R.string.error_bad_params));
 			return;
-		}		
+		}
 
 		Log.i(ES_GOB_AFIRMA, "Se inicia la firma de los datos descargados desde el servidor"); //$NON-NLS-1$
 		loadKeyStore();
@@ -482,7 +482,7 @@ KeystoreManagerListener, PrivateKeySelectionListener, DownloadDataListener, Send
 
 	@Override
 	public synchronized void onErrorDownloadingData(final String msg, final Throwable t) {
-		Log.e(ES_GOB_AFIRMA, "Error durante la descarga de la configuracion de firma guardada en servidor:" + msg + (t != null ? ": " + t.toString() : "")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		Log.e(ES_GOB_AFIRMA, "Error durante la descarga de la configuracion de firma guardada en servidor:" + msg + (t != null ? ": " + t.toString() : ""), t); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		showErrorMessage(getString(R.string.error_server_connect));
 	}
 
@@ -495,17 +495,17 @@ KeystoreManagerListener, PrivateKeySelectionListener, DownloadDataListener, Send
 			data = CipherDataManager.cipherData(signature, this.parameters.getDesKey());
 		}
 		catch (final IOException e) {
-			Log.e(ES_GOB_AFIRMA, "Error al codificar los datos cifrados: " + e); //$NON-NLS-1$
+			Log.e(ES_GOB_AFIRMA, "Error al codificar los datos cifrados", e); //$NON-NLS-1$
 			launchError(ErrorManager.ERROR_CODING_BASE64, true, true);
 			return;
 		}
 		catch (final GeneralSecurityException e) {
-			Log.e(ES_GOB_AFIRMA, "Error en el cifrado de la firma: " + e); //$NON-NLS-1$
+			Log.e(ES_GOB_AFIRMA, "Error en el cifrado de la firma", e); //$NON-NLS-1$
 			launchError(ErrorManager.ERROR_CIPHERING, true, true);
 			return;
 		}
 		catch (final Throwable e) {
-			Log.e(ES_GOB_AFIRMA, "Error desconocido al cifrar el resultado de la firma: " + e); //$NON-NLS-1$
+			Log.e(ES_GOB_AFIRMA, "Error desconocido al cifrar el resultado de la firma", e); //$NON-NLS-1$
 			launchError(ErrorManager.ERROR_CIPHERING, true, true);
 			return;
 		}
@@ -549,7 +549,7 @@ KeystoreManagerListener, PrivateKeySelectionListener, DownloadDataListener, Send
 	@Override
 	public void onErrorSendingData(final Throwable error, final boolean critical, final boolean needCloseApp) {
 
-		Log.e(ES_GOB_AFIRMA, error.toString());
+		Log.e(ES_GOB_AFIRMA, "Se ejecuta la funcion de error en el envio de datos", error); //$NON-NLS-1$
 		error.printStackTrace();
 
 		if (critical) {
@@ -604,18 +604,18 @@ KeystoreManagerListener, PrivateKeySelectionListener, DownloadDataListener, Send
 					is.close();
 				}
 				catch (final IOException e) {
-					Log.e(ES_GOB_AFIRMA, "Error al cargar el fichero, se dara al usuario la posibilidad de reintentar: " + e.toString()); //$NON-NLS-1$
+					Log.e(ES_GOB_AFIRMA, "Error al cargar el fichero, se dara al usuario la posibilidad de reintentar", e); //$NON-NLS-1$
 					showErrorMessageOnToast(getString(R.string.error_loading_selected_file, filename));
 					openSelectFileActivity();
 					return;
 				}
 				catch (final Throwable e) {
-						Log.e(ES_GOB_AFIRMA, "Error desconocido al cargar el fichero: " + e.toString()); //$NON-NLS-1$
+						Log.e(ES_GOB_AFIRMA, "Error desconocido al cargar el fichero", e); //$NON-NLS-1$
 						showErrorMessageOnToast(getString(R.string.error_loading_selected_file, filename));
 						e.printStackTrace();
 						return;
 					}
-				
+
 				this.parameters.setData(baos.toByteArray());
 
 				// Tras esto vuelve a ejecutarse el onStart() de la actividad pero ya con datos para firmar
@@ -677,12 +677,17 @@ KeystoreManagerListener, PrivateKeySelectionListener, DownloadDataListener, Send
 		EasyTracker.getInstance().activityStop(this);
 		super.onStop();
 	}
-	
+
 	@Override
 	protected void onDestroy() {
 		if (this.downloadFileTask != null) {
-			Log.d(ES_GOB_AFIRMA, "SignDataActivity onDestroy: Cancelamos la descarga");	
-			this.downloadFileTask.cancel(true);
+			Log.d(ES_GOB_AFIRMA, "SignDataActivity onDestroy: Cancelamos la descarga"); //$NON-NLS-1$
+			try {
+				this.downloadFileTask.cancel(true);
+			}
+			catch(final Exception e) {
+				Log.e(ES_GOB_AFIRMA, "No se ha podido cancelar el procedimiento de descarga de los datos", e); //$NON-NLS-1$
+			}
 		}
 		super.onDestroy();
 	}
