@@ -192,7 +192,7 @@ public final class AOCAdESTriPhaseSigner implements AOSigner {
 
 		// Decodificamos el identificador del documento
 		final String documentId = Base64.encode(data, true);
-		
+
 		final UrlHttpManager urlManager = UrlHttpManagerFactory.getInstalledManager();
 
 		// ---------
@@ -279,7 +279,7 @@ public final class AOCAdESTriPhaseSigner implements AOSigner {
 			throw new AOException("El resultado devuelto por el servidor no es correcto", e); //$NON-NLS-1$
 		}
 	}
-	
+
 	private static byte[] counterSignOperation(
 			                                final byte[] data,
 			                                final String algorithm,
@@ -312,7 +312,7 @@ public final class AOCAdESTriPhaseSigner implements AOSigner {
 
 		// Decodificamos el identificador del documento
 		final String documentId = Base64.encode(data, true);
-		
+
 		final UrlHttpManager urlManager = UrlHttpManagerFactory.getInstalledManager();
 
 		// ---------
@@ -354,9 +354,9 @@ public final class AOCAdESTriPhaseSigner implements AOSigner {
 				);
 			scs.setData(pkcs1sign);
 		}
-		
+
 		final String preResultAsBase64 = Base64.encode(csd.toString().getBytes(), true);
-		
+
 		// ---------
 		// POSTFIRMA
 		// ---------
