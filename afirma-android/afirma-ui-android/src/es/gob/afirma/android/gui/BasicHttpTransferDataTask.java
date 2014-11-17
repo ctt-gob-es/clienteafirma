@@ -11,11 +11,10 @@ import java.util.StringTokenizer;
 import java.util.logging.Logger;
 
 import android.os.AsyncTask;
-import android.util.Log;
 import es.gob.afirma.android.network.AndroidUrlHttpManager;
 import es.gob.afirma.core.AOCancelledOperationException;
 
-public abstract class BasicHttpTransferDataTask extends AsyncTask<Void, Void, byte[]> {
+abstract class BasicHttpTransferDataTask extends AsyncTask<Void, Void, byte[]> {
 
 	@Override
 	protected abstract byte[] doInBackground(Void... params);
@@ -38,18 +37,15 @@ public abstract class BasicHttpTransferDataTask extends AsyncTask<Void, Void, by
 	 * @return Contenido de la URL
 	 * @throws IOException Si no se puede leer la URL */
 	protected byte[] readUrlByPost(final String url, final int timeout) throws IOException {
+
 		if (url == null) {
 			throw new IllegalArgumentException("La URL a leer no puede ser nula"); //$NON-NLS-1$
 		}
-
-		Log.i("es.gob.afirma", "1");
 
 		// Si la URL no tiene parametros la leemos por GET
 		if (!url.contains("?")) { //$NON-NLS-1$
 			return readUrlByGet(url);
 		}
-
-		Log.i("es.gob.afirma", "2");
 
 		final StringTokenizer st = new StringTokenizer(url, "?"); //$NON-NLS-1$
 		final String request = st.nextToken();
@@ -57,24 +53,18 @@ public abstract class BasicHttpTransferDataTask extends AsyncTask<Void, Void, by
 
 		final URL uri = new URL(request);
 
-		Log.i("es.gob.afirma", "3");
-
 		if (uri.getProtocol().equals(AndroidUrlHttpManager.HTTPS)) {
 			try {
 				AndroidUrlHttpManager.disableSslChecks();
 			}
 			catch(final Exception e) {
 				Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
-						"No se ha podido ajustar la confianza SSL, es posible que no se pueda completar la conexion: " + e //$NON-NLS-1$
-						);
+					"No se ha podido ajustar la confianza SSL, es posible que no se pueda completar la conexion: " + e //$NON-NLS-1$
+				);
 			}
 		}
 
-		Log.i("es.gob.afirma", "4");
-
 		final URLConnection conn = uri.openConnection(Proxy.NO_PROXY);
-
-		Log.i("es.gob.afirma", "5");
 
 		//conn.setRequestMethod("POST"); //$NON-NLS-1$
 		conn.setDoOutput(true);
@@ -83,33 +73,21 @@ public abstract class BasicHttpTransferDataTask extends AsyncTask<Void, Void, by
 			conn.setReadTimeout(timeout);
 		}
 
-		Log.i("es.gob.afirma", "6");
-
 		final OutputStreamWriter writer = new OutputStreamWriter(conn.getOutputStream());
 
 		writer.write(urlParameters);
 		writer.flush();
 		writer.close();
 
-		Log.i("es.gob.afirma", "7");
-
 		final InputStream is = conn.getInputStream();
-
-		Log.i("es.gob.afirma", "7a");
 
 		final byte[] data = readDataFromInputStream(is);
 
-		Log.i("es.gob.afirma", "7b");
-
 		is.close();
-
-		Log.i("es.gob.afirma", "8");
 
 		if (uri.getProtocol().equals(AndroidUrlHttpManager.HTTPS)) {
 			AndroidUrlHttpManager.enableSslChecks();
 		}
-
-		Log.i("es.gob.afirma", "9");
 
 		return data;
 	}
@@ -126,8 +104,8 @@ public abstract class BasicHttpTransferDataTask extends AsyncTask<Void, Void, by
 			}
 			catch(final Exception e) {
 				Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
-						"No se ha podido ajustar la confianza SSL, es posible que no se pueda completar la conexion: " + e //$NON-NLS-1$
-						);
+					"No se ha podido ajustar la confianza SSL, es posible que no se pueda completar la conexion: " + e //$NON-NLS-1$
+				);
 			}
 		}
 		final InputStream is = uri.openStream();
@@ -139,37 +117,29 @@ public abstract class BasicHttpTransferDataTask extends AsyncTask<Void, Void, by
 		return data;
 	}
 
-	/**
-	 * Lee el contenido de un InputStream, abortando la operaci&oacute;n si en alg&uacute;n momento se
+	/** Lee el contenido de un InputStream, abortando la operaci&oacute;n si en alg&uacute;n momento se
 	 * detiene la tarea.
 	 * @param is Flujo de datos de entrada.
 	 * @return Datos le&iacute;dos del flujo.
 	 * @throws IOException Cuando ocurre un error durante la lectura.
-	 * @throws AOCancelledOperationException Cuando se cancela la tarea.
-	 */
+	 * @throws AOCancelledOperationException Cuando se cancela la tarea. */
 	public byte[] readDataFromInputStream(final InputStream is) throws IOException {
 
 		int n = 0;
-		byte[] buffer = new byte[1024];
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		final byte[] buffer = new byte[1024];
+		final ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		while ((n = is.read(buffer)) > 0) {
-			Log.i("es.gob.afirma", "Lectura");
 			baos.write(buffer, 0, n);
 			if (isCancelled()) {
 				throw new AOCancelledOperationException("Se ha cancelado el acceso a informacion remota"); //$NON-NLS-1$
 			}
 		}
 
-		byte[] result = baos.toByteArray();
-
-		Log.i("es.gob.afirma", "Lectura total: " + result.length);
-
-		return result;
+		return baos.toByteArray();
 	}
 
 	@Override
-	protected void onCancelled(byte[] result) {
-		Log.d("es.gob.afirma", "Se cancela la tarea");
+	protected void onCancelled(final byte[] result) {
 		super.onCancelled(result);
 	}
 }

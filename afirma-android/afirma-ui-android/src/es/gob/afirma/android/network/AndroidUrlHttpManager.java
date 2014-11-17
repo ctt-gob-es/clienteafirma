@@ -37,8 +37,10 @@ import es.gob.afirma.core.misc.UrlHttpManager;
  * @author Carlos Gamuci */
 public final class AndroidUrlHttpManager implements UrlHttpManager {
 
+	/** Tiempo de espera por defecto antes de descartar una conexi&oacute;n. */
 	public static final int DEFAULT_TIMEOUT = -1;
 
+	/** Esquema del protocolo HTTPS. */
 	public static final String HTTPS = "https"; //$NON-NLS-1$
 
 	private static final HostnameVerifier DEFAULT_HOSTNAME_VERIFIER = HttpsURLConnection.getDefaultHostnameVerifier();
@@ -104,7 +106,7 @@ public final class AndroidUrlHttpManager implements UrlHttpManager {
 		}
 
 		final URLConnection conn = uri.openConnection(Proxy.NO_PROXY);
-		
+
 		//conn.setRequestMethod("POST"); //$NON-NLS-1$
 		conn.setDoOutput(true);
 		if (timeout != DEFAULT_TIMEOUT) {
@@ -117,7 +119,7 @@ public final class AndroidUrlHttpManager implements UrlHttpManager {
 		writer.write(urlParameters);
 		writer.flush();
 		writer.close();
-		
+
 		final InputStream is = conn.getInputStream();
 		final byte[] data = AOUtil.getDataFromInputStream(is);
 		is.close();
@@ -142,8 +144,8 @@ public final class AndroidUrlHttpManager implements UrlHttpManager {
 			}
 			catch(final Exception e) {
 				Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
-						"No se ha podido ajustar la confianza SSL, es posible que no se pueda completar la conexion: " + e //$NON-NLS-1$
-						);
+					"No se ha podido ajustar la confianza SSL, es posible que no se pueda completar la conexion: " + e //$NON-NLS-1$
+				);
 			}
 		}
 		final InputStream is = uri.openStream();
@@ -155,11 +157,15 @@ public final class AndroidUrlHttpManager implements UrlHttpManager {
 		return data;
 	}
 
+	/** Hablita las comprobaciones de seguridad SSL con sus valores por defecto. */
 	public static void enableSslChecks() {
 		HttpsURLConnection.setDefaultSSLSocketFactory(DEFAULT_SSL_SOCKET_FACTORY);
 		HttpsURLConnection.setDefaultHostnameVerifier(DEFAULT_HOSTNAME_VERIFIER);
 	}
 
+	/** Deshablita las comprobaciones de seguridad SSL.
+	 * @throws KeyManagementException Si hay problemas en la gesti&oacute;n de claves.
+	 * @throws NoSuchAlgorithmException Si no se soporta alg&uacute;n algoritmo necesario. */
 	public static void disableSslChecks() throws KeyManagementException, NoSuchAlgorithmException {
 		final SSLContext sc = SSLContext.getInstance("SSL"); //$NON-NLS-1$
 		sc.init(null, DUMMY_TRUST_MANAGER, new java.security.SecureRandom());
