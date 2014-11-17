@@ -33,7 +33,6 @@ import es.gob.afirma.signers.cades.CAdESTriPhaseSigner;
 import es.gob.afirma.signers.cades.CommitmentTypeIndicationsHelper;
 import es.gob.afirma.signers.tsp.pkcs7.CMSTimestamper;
 import es.gob.afirma.signers.tsp.pkcs7.TsaParams;
-
 /** Clase para la firma electr&oacute;nica en tres fases de ficheros Adobe PDF en formato PAdES.
  * <p>No firma PDF cifrados.</p>
  * <p>Necesita iText 2.1.7 con modificaciones espec&iacute;ficas.</p>
@@ -313,7 +312,7 @@ public final class PAdESTriPhaseSigner {
 	        }
 	        catch(final Exception e) {
 	        	tsaParams = null;
-	        }
+        }
 	        if (tsaParams != null) {
 	        	completeCAdESSignature = new CMSTimestamper(tsaParams).addTimestamp(
 					completeCAdESSignature,
