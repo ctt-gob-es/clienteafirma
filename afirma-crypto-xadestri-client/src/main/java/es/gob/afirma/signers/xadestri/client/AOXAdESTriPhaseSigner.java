@@ -298,7 +298,7 @@ public final class AOXAdESTriPhaseSigner implements AOSigner {
 
 		// Decodificamos el identificador del documento
 		final String documentId = Base64.encode(data, true);
-		
+
 		final UrlHttpManager urlManager = UrlHttpManagerFactory.getInstalledManager();
 
 		// ---------
@@ -331,7 +331,11 @@ public final class AOXAdESTriPhaseSigner implements AOSigner {
 				append(properties2Base64(extraParams));
 			}
 
-			preSignResult = urlManager.readUrlByPost(urlBuffer.toString());
+			final String postUrl = urlBuffer.toString();
+
+			LOGGER.info("Se llamara por POST a la siguiente URL:\n" + postUrl);  //$NON-NLS-1$
+
+			preSignResult = urlManager.readUrlByPost(postUrl);
 			urlBuffer.setLength(0);
 		}
 		catch (final CertificateEncodingException e) {
