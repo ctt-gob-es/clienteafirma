@@ -315,14 +315,4 @@ public final class ProtocolInvocationLauncher {
 		System.exit(Integer.parseInt("-" + code.replace("SAF_", ""))); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
-
-	/** Main para pruebas
-	 * @param args No se usa. */
-	public static void main(final String[] args) {
-		ProtocolInvocationLauncher.launch(
-			"afirma://sign?dat=AAAA&algorithm=SHA512withRSA&format=CAdES&key=21289893&id=001215677026&rtservlet=http://192.168.178.33:8080/SignatureRetrieverServer/RetrieveService&stservlet=http://192.168.178.33:8080/SignatureStorageServer/StorageService" //$NON-NLS-1$
-			//"afirma://save?dat=AAAA&exts=txt,doc&desc=Ficheros%20de%20texto&title=Guardar%20firma%20electr�nica" //$NON-NLS-1$
-		);
-	}
-
 }
