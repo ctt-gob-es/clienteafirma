@@ -10,7 +10,7 @@
     <string name="request_cert">Request new certificate</string>
     <string name="appsDialogTitle">Supported certification authorities</string>
     <string name="appsDialogMessage">Please select the certification authority for requesting your new certificate.</string>
-    <string name="disclaimer">2013 Gobierno de Espa\u00F1a</string>
+    <string name="disclaimer">2014 Gobierno de Espa\u00F1a</string>
     <string name="content_desc">Ciente @firma logo</string>
     <string name="ok">OK</string>
     <string name="close">Close</string>
