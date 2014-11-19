@@ -164,6 +164,7 @@ public final class ProtocolInvocationLauncher {
 			return;
 		}
 
+		// Si no hay datos a firmar se los pedimos al usuario
 		if (options.getData() == null) {
 			final File selectedDataFile;
 			try {
