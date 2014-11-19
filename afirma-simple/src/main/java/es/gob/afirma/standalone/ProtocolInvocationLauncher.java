@@ -1,14 +1,20 @@
 package es.gob.afirma.standalone;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.logging.Logger;
 
 import javax.security.auth.callback.PasswordCallback;
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 
 import es.gob.afirma.core.AOCancelledOperationException;
+import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.UrlHttpManagerFactory;
 import es.gob.afirma.core.misc.protocol.ParameterLocalAccessRequestedException;
 import es.gob.afirma.core.misc.protocol.ParameterNeedsUpdatedVersionException;
@@ -150,12 +156,53 @@ public final class ProtocolInvocationLauncher {
 			showError(SAF_06);
 			return;
 		}
+
 		final AOKeyStore aoks = AOKeyStore.getKeyStore(options.getDefaultKeyStore());
 		if (aoks == null) {
 			LOGGER.severe("No hay un KeyStore con el nombre: " + options.getDefaultKeyStore()); //$NON-NLS-1$
 			showError(SAF_07);
 			return;
 		}
+
+		if (options.getData() == null) {
+			final File selectedDataFile;
+			try {
+				selectedDataFile = AOUIFactory.getLoadFiles(
+					ProtocolMessages.getString("ProtocolLauncher.15"), //$NON-NLS-1$
+					new JFileChooser().getFileSystemView().getDefaultDirectory().toString(),
+					null,
+					null,
+					ProtocolMessages.getString("ProtocolLauncher.16"), //$NON-NLS-1$
+					false,
+					false,
+					null
+				)[0];
+			}
+			catch(final AOCancelledOperationException e) {
+				LOGGER.info("carga de datos de firma cancelada por el usuario: " + e); //$NON-NLS-1$
+				return;
+			}
+			try {
+				final InputStream fis = new FileInputStream(selectedDataFile);
+				final byte[] data = AOUtil.getDataFromInputStream(fis);
+				fis.close();
+				if (data == null) {
+					throw new IOException("La lectura de datos para firmar ha devuleto un nulo"); //$NON-NLS-1$
+				}
+				options.setData(data);
+			}
+			catch(final Exception e) {
+				AOUIFactory.showErrorMessage(
+					null,
+					ProtocolMessages.getString("ProtocolLauncher.17"), //$NON-NLS-1$
+					ProtocolMessages.getString("ProtocolLauncher.29"), //$NON-NLS-1$
+					JOptionPane.ERROR_MESSAGE
+				);
+				LOGGER.severe("Error en la lectura de los datos a firmar: " + e); //$NON-NLS-1$
+				return;
+			}
+		}
+
 		final PasswordCallback pwc = aoks.getStorePasswordCallback(null);
 		final AOKeyStoreManager ksm;
 		try {
