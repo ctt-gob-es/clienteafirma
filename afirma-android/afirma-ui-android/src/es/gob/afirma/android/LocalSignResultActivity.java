@@ -1,9 +1,7 @@
 package es.gob.afirma.android;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.KeyStoreException;
 import java.util.HashMap;
@@ -31,6 +29,7 @@ import android.widget.TextView;
 import com.google.analytics.tracking.android.EasyTracker;
 
 import es.gob.afirma.R;
+import es.gob.afirma.android.ReadLocalFileTask.ReadLocalFileListener;
 import es.gob.afirma.android.crypto.LoadKeyStoreManagerTask;
 import es.gob.afirma.android.crypto.LoadKeyStoreManagerTask.KeystoreManagerListener;
 import es.gob.afirma.android.crypto.MSCBadPinException;
@@ -41,7 +40,6 @@ import es.gob.afirma.android.crypto.SignTask;
 import es.gob.afirma.android.crypto.SignTask.SignListener;
 import es.gob.afirma.android.network.AndroidUrlHttpManager;
 import es.gob.afirma.android.network.UriParser;
-import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.UrlHttpManagerFactory;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSignerFactory;
@@ -71,7 +69,7 @@ public final class LocalSignResultActivity extends FragmentActivity implements K
 	private final static String SAVE_INSTANCE_KEY_OK_TEXT = "okMessage"; //$NON-NLS-1$
 	private final static String SAVE_INSTANCE_KEY_ERROR_TEXT = "errorMessage"; //$NON-NLS-1$
 
-	private String fileName; //Nombre del fichero seleccionado
+	String fileName; //Nombre del fichero seleccionado
 
 	private byte[] dataToSign;
 	private PrivateKeyEntry pke;
@@ -138,7 +136,6 @@ public final class LocalSignResultActivity extends FragmentActivity implements K
 		this.usbManager.requestPermission(this.usbDevice, mPermissionIntent);
 	}
 
-
 	@Override
 	public void onCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -165,7 +162,7 @@ public final class LocalSignResultActivity extends FragmentActivity implements K
 			intent.putExtra("es.gob.afirma.android.excludedDirs", MainActivity.COMMON_EXCLUDED_DIRS); //$NON-NLS-1$
 			startActivityForResult(intent, SELECT_FILE_REQUEST_CODE);
 		}
-		
+
 		UrlHttpManagerFactory.install(new AndroidUrlHttpManager());
 	}
 
@@ -180,8 +177,19 @@ public final class LocalSignResultActivity extends FragmentActivity implements K
 	    super.onStop();
 
 	    dismissProgressDialog();
-	    
+
 	    EasyTracker.getInstance().activityStop(this); // Parada de Google Analytics
+	}
+
+	void finishLocalSign(final byte[] data) {
+		if (data == null) {
+			showErrorMessage(getString(R.string.error_loading_selected_file, this.fileName));
+			return;
+		}
+		this.dataToSign = data;
+
+		// Abrirmos el KeyStore y firmamos
+		loadKeyStore();
 	}
 
 	@Override
@@ -190,25 +198,30 @@ public final class LocalSignResultActivity extends FragmentActivity implements K
 
 		if (requestCode == SELECT_FILE_REQUEST_CODE && resultCode == RESULT_OK) {
 			this.fileName = data.getStringExtra(FileChooserActivity.RESULT_DATA_STRING_FILENAME);
-			try {
-				final FileInputStream fis = new FileInputStream(this.fileName);
-				this.dataToSign = AOUtil.getDataFromInputStream(fis);
-				fis.close();
-
-				if (this.dataToSign == null) {
-					throw new IOException("No se han encontrado datos en el fichero para la firma"); //$NON-NLS-1$
-				}
-			}
-			catch (final Exception e) {
-				showErrorMessage(getString(R.string.error_loading_selected_file, this.fileName));
-				return;
-			}
 
 			// Aseguramos que se muestra el panel con el mensaje de espera
-			showProgressDialog(getString(R.string.dialog_msg_loading_keystore));
-			
-			// Abrirmos el KeyStore y firmamos
-			loadKeyStore();
+			showProgressDialog(getString(R.string.dialog_msg_loading_data));
+
+			new ReadLocalFileTask(
+				new ReadLocalFileListener() {
+					@Override
+					public void setData(final Object readedData) {
+						if (readedData instanceof OutOfMemoryError) {
+							showErrorMessage(
+								getString(R.string.file_read_out_of_memory)
+							);
+						}
+						else if (readedData instanceof Exception) {
+							showErrorMessage(
+								getString(R.string.error_loading_selected_file, LocalSignResultActivity.this.fileName)
+							);
+						}
+						else {
+							finishLocalSign((byte[]) readedData);
+						}
+					}
+				}
+			).execute(this.fileName);
 		}
 		else {
 			// Se ha cancelado la seleccion del fichero a firmar
@@ -218,18 +231,21 @@ public final class LocalSignResultActivity extends FragmentActivity implements K
 	}
 
 	private void showProgressDialog(final String message) {
-		runOnUiThread(new Runnable() {
-			@Override
-			public void run() {
-				try {
-				setProgressDialog(ProgressDialog.show(LocalSignResultActivity.this, "", message, true)); //$NON-NLS-1$
-				} catch (Exception e) {
-					Log.e(ES_GOB_AFIRMA, "No se ha podido mostrar el dialogo de progreso: " + e); //$NON-NLS-1$
+		runOnUiThread(
+			new Runnable() {
+				@Override
+				public void run() {
+					try {
+						setProgressDialog(ProgressDialog.show(LocalSignResultActivity.this, "", message, true)); //$NON-NLS-1$
+					}
+					catch (final Exception e) {
+						Log.e(ES_GOB_AFIRMA, "No se ha podido mostrar el dialogo de progreso: " + e); //$NON-NLS-1$
+					}
 				}
 			}
-		});
+		);
 	}
-	
+
 	private void loadKeyStore() {
 
 		// Buscamos si hay dispositivos CCID USB conectados
@@ -261,7 +277,7 @@ public final class LocalSignResultActivity extends FragmentActivity implements K
 	public synchronized void keySelected(final KeySelectedEvent kse) {
 
 		showProgressDialog(getString(R.string.dialog_msg_signning));
-		
+
 		try {
 			this.pke = kse.getPrivateKeyEntry();
 		}
@@ -387,7 +403,7 @@ public final class LocalSignResultActivity extends FragmentActivity implements K
 		}
 
 		showSuccessMessage(finalSignatureFilename, outDirectory, originalDirectory);
-		
+
 		//refresco del media scanner despues de guardar el ficheo porque esta dando problemas en la version 4.3
 		sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED,android.net.Uri.fromFile(new File(outDirectory))));
 	}
@@ -397,7 +413,7 @@ public final class LocalSignResultActivity extends FragmentActivity implements K
 	 * firma.
 	 * @param message Mensaje que describe el error producido.
 	 */
-	private void showErrorMessage(final String message) {
+	void showErrorMessage(final String message) {
 
 		dismissProgressDialog();
 
@@ -429,9 +445,9 @@ public final class LocalSignResultActivity extends FragmentActivity implements K
 
 		//activo los elementos de la interfaz que corresponden a la firma correcta de un fichero
 		final TextView tv_sf= (TextView) findViewById(R.id.filestorage_path);
-		tv_sf.setText(getString((originalDirectory ?
+		tv_sf.setText(getString(originalDirectory ?
 				R.string.signedfile_original_location :
-					R.string.signedfile_downloads_location), filename));
+					R.string.signedfile_downloads_location, filename));
 
 		final RelativeLayout rl = (RelativeLayout) findViewById(R.id.signedfile_correct);
 		rl.setVisibility(View.VISIBLE);
@@ -454,13 +470,13 @@ public final class LocalSignResultActivity extends FragmentActivity implements K
 			"Operacion='" + UriParser.OP_SIGN + "', formato='" + this.format + "', algoritmo='" + DEFAULT_SIGNATURE_ALGORITHM + "'", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			Long.valueOf(0L)
 		);
-		
+
 		saveData(signature);
 	}
 
 	@Override
 	public void onSignError(final Throwable t) {
-		
+
 		// Notificamos a Google Analytics la operacion realizada
 		EasyTracker.getTracker().sendEvent(
 			"Operacion local", //$NON-NLS-1$
@@ -468,8 +484,8 @@ public final class LocalSignResultActivity extends FragmentActivity implements K
 			"Operacion='" + UriParser.OP_SIGN + "', formato='" + this.format + "', algoritmo='" + DEFAULT_SIGNATURE_ALGORITHM + "'", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			Long.valueOf(0L)
 		);
-		
-		
+
+
 		if (t instanceof MSCBadPinException) {
 			showErrorMessage(getString(R.string.error_msc_pin));
 		}
@@ -481,7 +497,7 @@ public final class LocalSignResultActivity extends FragmentActivity implements K
 
 	/** Comprueba si esta abierto el di&aacute;logo de espera y lo cierra en dicho caso. */
 	private void dismissProgressDialog() {
-		
+
 		if (this.progressDialog != null) {
 			this.progressDialog.dismiss();
 		}

@@ -70,5 +70,5 @@
 	<string name="accesibility_icon_filetype">File type icon</string>
 	<string name="accesibility_icon_sign_ko">Error while signing</string>
 	<string name="accesibility_icon_sign_ok">Success signature</string>
-
+    <string name="file_read_out_of_memory">The selected file is too large and there is no enough memory to load it</string>
 </resources>

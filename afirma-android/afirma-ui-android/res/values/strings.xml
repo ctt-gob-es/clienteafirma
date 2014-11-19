@@ -17,7 +17,7 @@
     <string name="ca_not_found">No hay autoridades de certificaci\u00F3n configuradas.</string>
     <string name="title_activity_sign_data">Firma de datos</string>
     <string name="error_bad_params">No se ha realizado correctamente la invocaci\u00F3n de la aplicaci\u00F3n. Consulte a su proveedor de servicios.</string>
-    <string name="error_server_connect">Ocurri\u00F3 un error en la conexi\u00F3n entre la app y la pagina web.</string>
+    <string name="error_server_connect">Ocurri\u00F3 un error en la conexi\u00F3n entre la aplicaci\00F3n y la p\u00E1gina web.</string>
     <string name="error_server_error">No se ha podido devolver el resultado de firma a la p\u00E1gina web</string>
     <string name="file_chooser_directorio_actual">Directorio actual:</string>
     <string name="file_chooser_directorio">Directorio</string>
@@ -28,7 +28,7 @@
     <string name="kilobytes">KB</string>
     <string name="megabytes">MB</string>
     <string name="error_loading_selected_file">Ocurri\u00F3 un error cargando el fichero \"%s\"</string>
-    <string name="error_no_valid_p12">El fichero \"%s\" no es un PKCS#12 valido. Seleccione un nuevo almac\u00E9n para importar.</string>
+    <string name="error_no_valid_p12">El fichero \"%s\" no es un PKCS#12 v\u00E1lido. Seleccione un nuevo almac\u00E9n para importar.</string>
     <string name="error">Error</string>
     <string name="title_activity_save_data">Guardar datos</string>
     <string name="saveData">Guardar</string>
@@ -39,19 +39,19 @@
     <string name="error_sending_data">No se pudo transmitir la firma de los datos al navegador web</string>
     <string name="error_signing">Error durante la operacion de firma</string>
     <string name="error_signing_no_key">No se pudo recuperar la clave del certificado de firma</string>
-    <string name="error_signing_config">Error durante la configuracion de la firma electronica</string>
+    <string name="error_signing_config">Error durante la configuraci\u00F3n de la firma electr\u00F3nica</string>
     <string name="error_loading_keystore">Error al cargar el almacen de claves</string>
-    <string name="error_loading_certificate_alias">Error extrayendo los alias de los certificados del almacen</string>
+    <string name="error_loading_certificate_alias">Error extrayendo los alias de los certificados del almac\u00E9n</string>
     <string name="error_no_device_to_store">No se ha encontrado un directorio para guardar la firma</string>
     <string name="error_no_certs">No se han encontrado certificados instalados en su dispositivo.</string>
     <string name="error_title_keystore_empty">Almac\u00E9n vac\u00EDo</string>
     <string name="error_dni_blocked_dlg">Lo sentimos, su DNI est\u00E1 bloquedado.</string>
     <string name="error_dni_blocked">Su DNI est\u00E1 bloquedado, deber\u00E1 acudir a los Puntos de Actualización de las Oficinas de Expedición para poder desbloquearlo. </string>
     <string name="error_title_dni_blocked">DNI bloquedado</string>
-    <string name="error_pin_nulo">Error, el pin del DNI es nulo.</string>    
+    <string name="error_pin_nulo">Error, el PIN del DNI es nulo.</string>    
     <string name="error_android_4_1">Android 4.1 y 4.1.1 no permiten que los nombres de certificados contengan caracteres especiales (espacios, guiones, etc.). Modifique el alias de sus certificados al importarlos para evitar este error.</string>
     <string name="data_saved">El fichero se ha guardado con el nombre %s</string>
-    <string name="icon_ca">Icono de la autoridad de certificación</string>
+    <string name="icon_ca">Icono de la autoridad de certificaci\u00F3n</string>
     <string name="dialog_msg_loading_data">Cargando datos</string>
     <string name="dialog_msg_loading_keystore">Cargando almac\u00E9n</string>
     <string name="dialog_msg_signning">Firmando</string>
@@ -70,4 +70,5 @@
 	<string name="accesibility_icon_filetype">Icono del tipo de archivo</string>
 	<string name="accesibility_icon_sign_ko">Error en la firma</string>
 	<string name="accesibility_icon_sign_ok">Firma correcta</string>
+	<string name="file_read_out_of_memory">El fichero seleccionado es demasiado grande y no hay memoria suficiente para completar la operaci\u00F3n de lectura</string>
 </resources>
