@@ -36,7 +36,7 @@
     <string name="allow">Allow</string>
     <string name="error_saving_data">Error while saving data</string>
     <string name="error_saving_signature">Error trying to save the signature</string>
-    <string name="error_sending_data">There was an error trying tosend back the data to the Web browser</string>
+    <string name="error_sending_data">There was an error trying to send back the data to the Web browser</string>
     <string name="error_signing">Error singning the data</string>
     <string name="error_signing_no_key">The signing certificate cannot be readed</string>
     <string name="error_signing_config">Error while configuring the signature</string>
