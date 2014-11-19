@@ -3,8 +3,11 @@
     <tsaParams>
         <tsaRequireCert>true</tsaRequireCert>
         <tsaPolicy>4.3.2.1</tsaPolicy>
+        <!-- URL desde la cual el documento para firmar se descarga -->
         <tsaURL>http://aeat.aeat</tsaURL>
+        <!-- Nombre de usuario -->
         <tsaUsr>user</tsaUsr>
+        <!-- Contrsenia -->
         <tsaPwd>password</tsaPwd>
         <extensions>
             <extension>
@@ -13,22 +16,36 @@
                 <value>//o=</value>
             </extension>
         </extensions>
+        <!-- Algoritmo de firma -->
         <tsaHashAlgorithm>SHA-512</tsaHashAlgorithm>
         <sslPkcs12File>AAECAw==</sslPkcs12File>
         <sslPkcs12FilePassword>p12password</sslPkcs12FilePassword>
     </tsaParams>
+    <!-- Directorio en la que guardar el documento firmado  -->
     <retrieveUrl>http://localhost:8080/formulario1.pdf</retrieveUrl>
     <saveUrl>http://www.ibm.es</saveUrl>
     <saveUrlPostParam>data</saveUrlPostParam>
+    <!-- Certifciado en base64 -->
     <cert>MIIFnTCCBIWgAwIBAgICA+owDQYJKoZIhvcNAQEFBQAwgdoxCzAJBgNVBAYTAkVTMRIwEAYDVQQIEwlCYXJjZWxvbmExSDBGBgNVBAcMP0JhcmNlbG9uYSAoc2VlIGN1cnJlbnQgYWRkcmVzcyBhdCBodHRwczovL3d3dy5hbmYuZXMvYWRkcmVzcy8gKTEnMCUGA1UEChMeQU5GIEF1dG9yaWRhZCBkZSBDZXJ0aWZpY2FjaW9uMRcwFQYDVQQLEw5BTkYgQ2xhc2UgMSBDQTETMBEGA1UEBRMKRy02MzI4NzUxMDEWMBQGA1UEAxMNQU5GIFNlcnZlciBDQTAeFw0wNjEyMzEyMzAwMDBaFw0xNDEyMzEyMzAwMDBaMIGmMRswGQYDVQQDExJBTkYgVXN1YXJpbyBBY3Rpdm8xDDAKBgNVBCoTA0FORjEXMBUGA1UEBBMOVXN1YXJpbyBBY3Rpdm8xEjAQBgNVBAUTCTEyMzQ1Njc4WjEeMBwGCSqGSIb3DQEJARYPdGVzdEBwcnVlYmEuY29tMR8wHQYDVQQLExZDbGFzZSAyIHBlcnNvbmEgZmlzaWNhMQswCQYDVQQGEwJFUzCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEAj2qAceOf0pyATEM0BxBK7+eGA0HEZWDZpqdhCeVvsI1AqhLWQpWNg65TGXE8ijzxGU/yS94k/34gPgIkla+p/mrDaNsVY69RcLp1hWYcL61rM//In+hXlA3qUK6as942b55YyzNsbJSQPCNgkiGuIQTo1Xfsfk4XZDi+yNSRgUMCAwEAAaOCAiEwggIdMAkGA1UdEwQCMAAwCwYDVR0PBAQDAgbAMBMGCisGAQQBgY8cFAMEBQwDQU5GMBcGCisGAQQBgY8cFAQECQwHVXN1YXJpbzAWBgorBgEEAYGPHBQFBAgMBkFjdGl2bzAZBgorBgEEAYGPHBQGBAsMCTEyMzQ1Njc4WjCBiAYDVR0gBIGAMH4wfAYKKwYBBAGBjxwDBDBuMD0GCCsGAQUFBwICMDEaL0NlcnRpZmljYWRvIGVtaXRpZG8gcGFyYSByZWFsaXphY2nzbiBkZSBwcnVlYmFzMC0GCCsGAQUFBwIBFiFodHRwczovL3d3dy5hbmYuZXMvQUMvZG9jdW1lbnRvcy8wOAYIKwYBBQUHAQEELDAqMCgGCCsGAQUFBzABhhxodHRwOi8vd3d3LmFuZi5lcy9BQy9SQy9vY3NwMDkGA1UdHwQyMDAwLqAsoCqGKGh0dHA6Ly93d3cuYW5mLmVzL0FDL1JDL0FORkFDQ0xBU0VBMS5jcmwwFwYKKwYBBAGBjxwTAQQJDAcxMjMtMzIxMDEGCisGAQQBgY8cKgYEIwwhaHR0cHM6Ly93d3cuYW5mLmVzL0FDL0FDVEFTLzU2Nzg5MBYGCSsGAQQBgY8cEwQJDAczMjEtMTIzMB0GA1UdDgQWBBSxTxAznF2uoOtMW+fJUoDN6B+rJDAfBgNVHSMEGDAWgBS+O/a0MbdzJEg5xVcTlHWqn4E/LDANBgkqhkiG9w0BAQUFAAOCAQEATQgYAOwxrMRTT2Nhx7pqiNsoGT5dJmeunAv+iU5zx/VoEXB/mx+VtyLfMea3VS9LC23404XS7pz5oPwiVPLsMPZtzOcmfacVnSdRn5J7+qOO8MB+OVlXq/QmARn+1XeBCHaTQ6AMc/pdveEoGktaXwEjTslWyRD9dGDzLp04+FndQAbVcI5xRkb4vToRnhQmloUVddhQAO8usOAIb00GJFNTq4lsyZ1qT1HplQl+ngsSD1HBxkhx10Pm3KuvCunAh4um0QnSeeiq9qWIV0UZrFlMwNRXvH9OVTqSGC4PXjw2zOi2GLUfags1decu7gcGjidlELR/WHU/6lrztfdViQ==</cert>
+    <!-- DATOS DE LOS FIRMANTES -->
     <bioSigns>
+        <!-- Firmante 1 -->
         <bioSign>
+            <!-- Datos personales del firmnte 1 -->
             <signerData>
+                <!-- Nombre -->
                 <signerName>María Jesús</signerName>
+                <!-- Apellido 1 -->
                 <signerSurname1>García</signerSurname1>
+                <!-- Apellido 2 -->
                 <signerSurname2>López</signerSurname2>
+                <!-- NIE/NIF -->
                 <signerId>12345678Z</signerId>
             </signerData>
+            <!-- Interfaz de firma que se muestra en la tableta de firma
+            	En este caso solo es necesario modicifar la linea de firma indicando el nombre del firmante.
+            	Ejemplo: Fdo. Nombre Apellido1 Apellido2
+             -->
             <htmlTemplate>
             	&lt;div style="margin-left:15px;" &gt;
             		&lt;table&gt;
@@ -50,27 +67,44 @@
             		&lt;/p&gt;
          		&lt;/div&gt;
             </htmlTemplate>
+            <!-- Area de firma en la tableta. -->
             <signatureArea>
+                <!-- Puntos [x,y] donde se situa la esquina superior izquierda del recuadro de firma. -->
                 <x>20</x>
                 <y>50</y>
+                <!-- Anchura y altura (width/height) del cuadro de firma. -->
                 <width>275</width>
                 <height>100</height>
             </signatureArea>
+            <!-- Area de firma del documento, lugar donde se va a situar la firma dentro del documento a firmar. -->
             <signatureRubricPositionOnPdf>
+                <!-- Coordenadas [x,y] donde se situa la esquina inferior derecha de la firma.  -->
                 <x>50</x>
                 <y>30</y>
+                <!-- Anchura y altura (width/height) de la firma dentro del documento. -->
                 <width>200</width>
                 <height>75</height>
             </signatureRubricPositionOnPdf>
+            <!-- Pagina en la que se pinta la firma. -->
             <signatureRubricPageOnPdf>1</signatureRubricPageOnPdf>
         </bioSign>
+        <!-- Firmante 2 -->
         <bioSign>
+            <!-- Datos personales del firmnte 2 -->
             <signerData>
+                <!--  Nombre completo -->
                 <signerName>Pedro</signerName>
+                <!--  Primer apellido -->
                 <signerSurname1>Rodriguez</signerSurname1>
+                <!--  Segundo apellido -->
                 <signerSurname2>Alvarez</signerSurname2>
+                <!--  NIE/NIF -->
                 <signerId>11111122Y</signerId>
             </signerData>
+            <!-- Interfaz de firma que se muestra en la tableta de firma
+            	En este caso solo es necesario modicifar la linea de firma indicando el nombre del firmante.
+            	Ejemplo: Fdo. Nombre Apellido1 Apellido2
+             -->
            	<htmlTemplate>
             	&lt;div style="margin-left:15px;" &gt;
             		&lt;table&gt;
@@ -92,22 +126,31 @@
             		&lt;/p&gt;
          		&lt;/div&gt;
             </htmlTemplate>
+            <!-- Area de firma en la tableta. -->
             <signatureArea>
+                <!-- Puntos [x,y] donde se situa la esquina superior izquierda del recuadro de firma. -->
                 <x>20</x>
                 <y>50</y>
+                <!-- Anchura y altura (width/height) del cuadro de firma. -->
                 <width>275</width>
                 <height>100</height>
             </signatureArea>
+            <!-- Area de firma del documento, lugar donde se va a situar la firma dentro del documento a firmar. -->
             <signatureRubricPositionOnPdf>
+               <!-- Coordenadas [x,y] donde se situa la esquina inferior derecha de la firma.  -->
                 <x>250</x>
                 <y>30</y>
+               	<!-- Anchura y altura (width/height) de la firma dentro del documento. -->
                 <width>200</width>
                 <height>75</height>
             </signatureRubricPositionOnPdf>
+            <!-- Pagina en la que se pinta la firma. -->
             <signatureRubricPageOnPdf>1</signatureRubricPageOnPdf>
         </bioSign>
     </bioSigns>
+    <!-- true si es necesaria la firma adicional del funcionario, false en caso contrario. -->
     <completeWithCriptoSign>true</completeWithCriptoSign>
+    <!-- Parametros extra de la firma del funcionario -->
     <completeCriptoSignExtraParams>
         <entry>
             <key>clave</key>
