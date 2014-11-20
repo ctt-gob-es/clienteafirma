@@ -5,8 +5,7 @@ import java.util.zip.CRC32;
 import org.junit.Assert;
 import org.junit.Test;
 
-/** Pruebas de codificaci&oacute;n en Base64.
- */
+/** Pruebas de codificaci&oacute;n en Base64. */
 public final class TestBase64 {
 
 	private static String[] TEST_FILES = new String[] {
@@ -21,22 +20,24 @@ public final class TestBase64 {
 
 	};
 
+	/** Prueba simple de codificaci&oacute;n / decodificaci&oacute;n Base64.
+	 * @throws Exception En cualquier error. */
 	@SuppressWarnings("static-method")
 	@Test
 	public void testBase64Encoding() throws Exception {
-		for (String f : TEST_FILES) {
-			byte[] data = AOUtil.getDataFromInputStream(TestBase64.class.getResourceAsStream(f));
+		for (final String f : TEST_FILES) {
+			final byte[] data = AOUtil.getDataFromInputStream(TestBase64.class.getResourceAsStream(f));
 
 			// Calculamos el CRC
-			CRC32 crc = new CRC32();
+			final CRC32 crc = new CRC32();
 			crc.update(data);
 			final long crcl = crc.getValue();
 
 			// Lo pasamos a Base64
-			String tmpB64Bin = Base64.encode(data);
+			final String tmpB64Bin = Base64.encode(data);
 
 			// Lo pasamos de nuevo a binario
-			byte[] newBin = Base64.decode(tmpB64Bin);
+			final byte[] newBin = Base64.decode(tmpB64Bin);
 
 			// Volvemos a calcular el CRC y vemos si coincide con el original
 			crc.reset();
