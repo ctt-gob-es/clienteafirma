@@ -1,6 +1,5 @@
 package es.gob.afirma.crypto.handwritten;
 
-import java.io.IOException;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.logging.Logger;
@@ -21,13 +20,28 @@ public final class HandBioApplet extends JApplet {
 
 	@Override
 	public void init() {
-
-
+		final String xmlTask =  this.getParameter("xmltask"); //$NON-NLS-1$
+		if (xmlTask == null || "".equals(xmlTask)) { //$NON-NLS-1$
+			AOUIFactory.showErrorMessage(
+				this,
+				HandwrittenMessages.getString("HandBioApplet.5"), //$NON-NLS-1$
+				HandwrittenMessages.getString("HandBioApplet.2"), //$NON-NLS-1$
+				JOptionPane.ERROR_MESSAGE
+			);
+			LOGGER.severe("No se ha indicado una tarea de firma en la carga del Applet"); //$NON-NLS-1$
+			return;
+		}
 		try {
-			this.base64XmlTask = new String(Base64.decode(this.getParameter("xmltask"))); //$NON-NLS-1$
-		} catch (IOException e) {
-			LOGGER.severe("Error decodifciando el parametro XML"); //$NON-NLS-1$
-			AOUIFactory.showErrorMessage(this, HandwrittenMessages.getString("HandBioApplet.1"), HandwrittenMessages.getString("HandBioApplet.2"),JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
+			this.base64XmlTask = new String(Base64.decode(xmlTask));
+		}
+		catch (final Exception e) {
+			LOGGER.severe("Error decodifciando el parametro XML: " + e); //$NON-NLS-1$
+			AOUIFactory.showErrorMessage(
+				this,
+				HandwrittenMessages.getString("HandBioApplet.1"), //$NON-NLS-1$
+				HandwrittenMessages.getString("HandBioApplet.2"), //$NON-NLS-1$
+				JOptionPane.ERROR_MESSAGE
+			);
 			return;
 		}
 
@@ -40,21 +54,21 @@ public final class HandBioApplet extends JApplet {
 			return;
 		}
 
-		LOGGER.severe("Inicio BioSignerRunner"); //$NON-NLS-1$
+		LOGGER.info("Inicio BioSignerRunner"); //$NON-NLS-1$
 		AccessController.doPrivileged(
 	     new PrivilegedAction<Void>() {
 		    @Override
 			public Void run() {
-		    	LOGGER.severe("Running...");
 		    	initProcess();
 		    	return null;
             }
-		  });
+		  }
+		);
 
 	}
 
 	void initProcess() {
-		LOGGER.info("Instanciando aplicacion..."); //$NON-NLS-1$
+		LOGGER.info("Iniciando aplicacion..."); //$NON-NLS-1$
 		try {
 			new BioSignerRunner(this.base64XmlTask).show();
 		}
@@ -62,7 +76,7 @@ public final class HandBioApplet extends JApplet {
 			LOGGER.severe("La tarea de firma no es correcta: " + e); //$NON-NLS-1$
 			AOUIFactory.showErrorMessage(this, HandwrittenMessages.getString("HandBioApplet.4"), HandwrittenMessages.getString("HandBioApplet.2"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
 		}
-    	catch(Exception e) {
+    	catch(final Exception e) {
 			LOGGER.severe("Error al lanzar la aplicacion de firma en tableta. " + e); //$NON-NLS-1$
 			AOUIFactory.showErrorMessage(this, HandwrittenMessages.getString("HandBioApplet.3"), HandwrittenMessages.getString("HandBioApplet.2"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
 		}
