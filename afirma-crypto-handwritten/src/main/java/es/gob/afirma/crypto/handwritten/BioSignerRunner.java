@@ -6,17 +6,13 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.ConnectException;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -35,6 +31,7 @@ import javax.swing.SwingUtilities;
 
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.Platform;
+import es.gob.afirma.core.misc.UrlHttpManagerFactory;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.crypto.handwritten.net.DownloadListener;
@@ -126,7 +123,7 @@ public final class BioSignerRunner implements SignaturePadListener {
 	 * @throws IOException Si hay errores en el tratamiento de datos. */
 	public BioSignerRunner(final String xml) throws IOException {
 
-		LOGGER.info("Contenido de la cadena XML : " + xml);
+		LOGGER.info("Contenido de la cadena XML : " + xml); //$NON-NLS-1$
 
 		if (xml == null) {
 			throw new IllegalArgumentException("El XML de entrada no puede ser nulo"); //$NON-NLS-1$
@@ -146,7 +143,7 @@ public final class BioSignerRunner implements SignaturePadListener {
 			new Runnable() {
 				@Override
 				public void run() {
-					LOGGER.info("Inicio de la creacion de la interfaz de firma...");
+					LOGGER.info("Inicio de la creacion de la interfaz de firma..."); //$NON-NLS-1$
 					createUI(getSignTask());
 				}
 			}
@@ -730,28 +727,25 @@ public final class BioSignerRunner implements SignaturePadListener {
 
 	}
 
-	/**
-	 * M&eacute;do para cerrar un PDF: crear el fichero y guardarlo a disco.
-	 * @param data datos del PDF.
-	 * */
-	static void closePDF(final byte[] data, final Frame parent) {
+	/** M&eacute;do para cerrar un PDF: crear el fichero y guardarlo a disco.
+	 * @param data datos del PDF. */
+	void closePDF(final byte[] data, final Frame parent) {
 
+		final String url = this.signTask.getSaveUrl() +"?id=001&" + this.signTask.getSaveUrlPostParam() + "=" + Base64.encode(data, true); //$NON-NLS-1$ //$NON-NLS-2$
+		LOGGER.info("Se enviara el PDF a la direccion:\n" + url);   //$NON-NLS-1$
 		try {
-			final java.io.OutputStream fos = new FileOutputStream(
-					File
-						.createTempFile(
-									"AEAT_" + new SimpleDateFormat("dd_MM_yyyy").format(new Date()), //$NON-NLS-2$
-									".pdf" //$NON-NLS-1$
-
-						)
-				);
-
-			fos.write(data);
-			fos.flush();
-			fos.close();
-
-		} catch (Exception e) {
-			LOGGER.warning("Error cerrando el PDF. El archivo no se ha podido guardar a disco. " + e); //$NON-NLS-1$
+			final byte[] resbytes = UrlHttpManagerFactory.getInstalledManager().readUrlByPost(url);
+			if (resbytes == null) {
+				throw new IOException("La respuesta del servidor es nula"); //$NON-NLS-1$
+			}
+			final String response = new String(resbytes);
+			LOGGER.info("Respuesta del servidor tras el envio del PDF firmado: " + response); //$NON-NLS-1$
+			if (!"OK".equals(response.trim())) { //$NON-NLS-1$
+				throw new IOException("La respuesta del servidor no es OK: " + response); //$NON-NLS-1$
+			}
+		}
+		catch (Exception e) {
+			LOGGER.warning("Error enviando el PDF al servidor: " + e); //$NON-NLS-1$
 			AOUIFactory
 				.showErrorMessage(
 					parent,

@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" path="src/main/java"/>
 	<classpathentry kind="src" path="src/main/resources"/>
+	<classpathentry kind="src" path="src/main/java"/>
 	<classpathentry kind="src" path="src/test/resources"/>
 	<classpathentry kind="src" path="src/test/java"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/afirma-core"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/afirma-crypto-cades"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/afirma-crypto-core-pkcs7"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/afirma-crypto-core-pkcs7-tsp"/>
@@ -21,5 +20,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/afirma-ui-core-jse"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/afirma-core-keystores"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/afirma-ui-core-jse-keystores"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/afirma-core"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

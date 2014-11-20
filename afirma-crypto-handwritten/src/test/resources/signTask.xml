@@ -3,7 +3,7 @@
     <tsaParams>
         <tsaRequireCert>true</tsaRequireCert>
         <tsaPolicy>4.3.2.1</tsaPolicy>
-        <!-- URL desde la cual el documento para firmar se descarga -->
+        <!-- URL del organismo -->
         <tsaURL>http://aeat.aeat</tsaURL>
         <!-- Nombre de usuario -->
         <tsaUsr>user</tsaUsr>
@@ -16,13 +16,13 @@
                 <value>//o=</value>
             </extension>
         </extensions>
-        <!-- Algoritmo de firma -->
+        <!-- Algoritmo -->
         <tsaHashAlgorithm>SHA-512</tsaHashAlgorithm>
         <sslPkcs12File>AAECAw==</sslPkcs12File>
         <sslPkcs12FilePassword>p12password</sslPkcs12FilePassword>
     </tsaParams>
     <!-- Directorio en la que guardar el documento firmado  -->
-    <retrieveUrl>http://localhost:8080/formulario1.pdf</retrieveUrl>
+    <retrieveUrl>http://localhost:8080/afirma-crypto-handwritten-server/formulario1.pdf</retrieveUrl>
     <saveUrl>http://www.ibm.es</saveUrl>
     <saveUrlPostParam>data</saveUrlPostParam>
     <!-- Certifciado en base64 -->
@@ -51,7 +51,8 @@
             		&lt;table&gt;
             			&lt;tr&gt;
             				&lt;th&gt;
-            					&lt;img alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAbCAIAAADkn6hGAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAYdEVYdFNvZnR3YXJlAHBhaW50Lm5ldCA0LjAuM4zml1AAAAE1SURBVEhLtZThlUUwEEYVohCF0Ad9aIQ+KEQjdpgbEjLz8nbP3j/MzM13SJ5X7f/GHV19Ypom1DKSpybDBq+M76IF1AKeKgE2eAU81WVZyLBBNajrWm8yHgE2wzCg5hBhnufjRusHGuGA96Lrukv4ZfT11g8YO9ECig1eCjM/+no1B9QA3dDPjO8j/kT8fcrR0c1GMwmzdV2pbdQUqOMO1/QZaaXNLG3bPjRdKHAX76x2LuiWwZoTCiavXKHkPBUWBI6aSS5XYeyCGlEUHZ++BWrEHa21hToOTdOgBo6/Ep3RsFHNAS9Qbdsm3b7vadjoeh/UEzZE/qa1zlKy10r8ff51i9+wMhtt/ZD1iShs9Ps8TL0ITHKM44h0QtcGTS9CdkOZpTBzOTS1FXnl+Bwc1HTY9/0HxhUBnaas+zAAAAAASUVORK5CYII="&gt;
+            				
+            					&lt;img alt="" src="logo_aeat_1bit.png"&gt;
             				&lt;/th&gt;
             				&lt;th&gt;
             					&lt;div style="margin-left:147px; margin-top=20px;" &gt;
@@ -110,7 +111,7 @@
             		&lt;table&gt;
             			&lt;tr&gt;
             				&lt;th&gt;
-            					&lt;img alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAbCAIAAADkn6hGAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAYdEVYdFNvZnR3YXJlAHBhaW50Lm5ldCA0LjAuM4zml1AAAAE1SURBVEhLtZThlUUwEEYVohCF0Ad9aIQ+KEQjdpgbEjLz8nbP3j/MzM13SJ5X7f/GHV19Ypom1DKSpybDBq+M76IF1AKeKgE2eAU81WVZyLBBNajrWm8yHgE2wzCg5hBhnufjRusHGuGA96Lrukv4ZfT11g8YO9ECig1eCjM/+no1B9QA3dDPjO8j/kT8fcrR0c1GMwmzdV2pbdQUqOMO1/QZaaXNLG3bPjRdKHAX76x2LuiWwZoTCiavXKHkPBUWBI6aSS5XYeyCGlEUHZ++BWrEHa21hToOTdOgBo6/Ep3RsFHNAS9Qbdsm3b7vadjoeh/UEzZE/qa1zlKy10r8ff51i9+wMhtt/ZD1iShs9Ps8TL0ITHKM44h0QtcGTS9CdkOZpTBzOTS1FXnl+Bwc1HTY9/0HxhUBnaas+zAAAAAASUVORK5CYII="&gt;
+            					&lt;img alt="" src="logo_aeat_1bit.png"&gt;
             				&lt;/th&gt;
             				&lt;th&gt;
             					&lt;div style="margin-left:147px; margin-top=20px;" &gt;
