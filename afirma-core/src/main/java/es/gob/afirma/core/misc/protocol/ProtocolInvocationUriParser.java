@@ -61,7 +61,7 @@ public final class ProtocolInvocationUriParser {
 	private static final int CIPHER_KEY_LENGTH = 8;
 
 	/** Par&aacute;metro que identifica el <i>User Agent</i> del navegador Web usado. */
-	private static final String BROWSER_USER_AGENT ="agent"; //$NON-NLS-1$
+	private static final String KEYSTORE ="keystore"; //$NON-NLS-1$
 
 	/** Par&aacute;metro que identifica la operaci&oacute;n a realizar. */
 	private static final String OPERATION_PARAM = "op"; //$NON-NLS-1$
@@ -358,9 +358,8 @@ public final class ProtocolInvocationUriParser {
 	}
 
 	private static String verifyDefaultKeyStoreName(final Map<String, String> params) throws UnsupportedEncodingException {
-		// Analizamos el User Agent para determinar el almacen
-		if (params.containsKey(BROWSER_USER_AGENT) && URLDecoder.decode(params.get(BROWSER_USER_AGENT), DEFAULT_URL_ENCODING).contains("Firefox")) { //$NON-NLS-1$
-			return "Mozilla / Firefox (unificado)"; //$NON-NLS-1$
+		if (params.containsKey(KEYSTORE)) {
+			return URLDecoder.decode(params.get(KEYSTORE), DEFAULT_URL_ENCODING);
 		}
 		if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
 			return "Windows / Internet Explorer"; //$NON-NLS-1$
