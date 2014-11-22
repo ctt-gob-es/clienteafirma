@@ -53,12 +53,21 @@ public class TestMacKeyChain {
         os.flush();
         os.close();
 
-        final AOKeyStoreManager ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(AOKeyStore.APPLE, kc.getAbsolutePath(), "Mac-Afirma", null, null); //$NON-NLS-1$
+        final AOKeyStoreManager ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
+    		AOKeyStore.APPLE,
+    		kc.getAbsolutePath(),
+    		"Mac-Afirma", //$NON-NLS-1$
+    		AOKeyStore.APPLE.getStorePasswordCallback(null),
+    		null
+		);
         Assert.assertNotNull(ksm);
         final String[] aliases = ksm.getAliases();
         Assert.assertNotNull(aliases);
 
-        final PrivateKeyEntry pke = ksm.getKeyEntry("anf usuario activo", new CachePasswordCallback("dummy".toCharArray())); //$NON-NLS-1$ //$NON-NLS-2$
+        final PrivateKeyEntry pke = ksm.getKeyEntry(
+    		"anf usuario activo", //$NON-NLS-1$
+    		AOKeyStore.APPLE.getCertificatePasswordCallback(null)
+		);
         Assert.assertNotNull(pke);
 
         final X509Certificate cert = (X509Certificate) pke.getCertificate();
