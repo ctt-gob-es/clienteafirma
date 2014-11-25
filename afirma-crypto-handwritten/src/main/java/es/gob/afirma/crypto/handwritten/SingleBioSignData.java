@@ -16,6 +16,12 @@ public final class SingleBioSignData {
 	@XmlElement(name = "signerData")
 	private final SignerInfoBean signerData;
 
+	@XmlElement(name = "signHeader")
+	private final String signHeader;
+
+	@XmlElement(name = "signFooter")
+	private final String signFooter;
+
 	/** Plantilla HTML a mostrar en la tableta al firmar el firmante. */
 	@XmlElement(name = "htmlTemplate")
 	private final String htmlTemplate;
@@ -51,6 +57,8 @@ public final class SingleBioSignData {
 		this.signatureRubricPositionOnPdf = null;
 		this.signatureRubricPageOnPdf = 1;
 		this.id = UUID.randomUUID().toString();
+		this.signHeader = null;
+		this.signFooter = null;
 	}
 
 	SingleBioSignData(final SignerInfoBean signer,
@@ -58,7 +66,9 @@ public final class SingleBioSignData {
 			                  final byte[] bgJpegImage,
 			                  final Rectangle signatureRectOnPad,
 			                  final Rectangle signaturePositionOnPdf,
-			                  final int signaturePageOnPdf) {
+			                  final int signaturePageOnPdf,
+			                  final String header,
+			                  final String footer) {
 		if (signer == null) {
 			throw new IllegalArgumentException(
 				"Los datos del firmante no pueden ser nulos" //$NON-NLS-1$
@@ -71,6 +81,8 @@ public final class SingleBioSignData {
 		this.signatureRubricPositionOnPdf = signaturePositionOnPdf;
 		this.id = UUID.randomUUID().toString();
 		this.signatureRubricPageOnPdf = signaturePageOnPdf;
+		this.signHeader = header;
+		this.signFooter = footer;
 	}
 
 	/** Obtiene los datos personales de un firmante.
