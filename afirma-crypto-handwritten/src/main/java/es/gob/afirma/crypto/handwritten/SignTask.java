@@ -5,7 +5,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBContext;
@@ -23,6 +22,9 @@ import es.gob.afirma.signers.tsp.pkcs7.TsaParams;
 @XmlRootElement(namespace = "es.gob.afirma.crypto.handwritten")
 public final class SignTask {
 
+	@XmlElement(name = "writableDirectory")
+	private String writableDirectory;
+
 	@XmlElement(name = "tsaParams")
 	private SerializableTsaParams tsaParams;
 
@@ -33,20 +35,35 @@ public final class SignTask {
 	private URL saveUrl;
 
 	@XmlElement(name = "saveUrlPostParam")
-	private String saveUrlPostParam;
+	private final String saveUrlPostParam = "data"; //$NON-NLS-1$
+
+	@XmlElement(name = "saveId")
+	private String saveId;
+
+	@XmlElement(name = "saveIdPostParam")
+	private final String saveIdPostParam = "id"; //$NON-NLS-1$
 
 	@XmlElement(name = "cert")
 	private String base64Cert;
 
 	@XmlElementWrapper(name = "bioSigns")
 	@XmlElement(name = "bioSign")
-	private List<SingleBioSignData> bioSigns = new ArrayList<SingleBioSignData>(0);
+	private final List<SingleBioSignData> bioSigns = new ArrayList<SingleBioSignData>(0);
 
 	@XmlElement(name = "completeWithCriptoSign")
 	private boolean completeWithCriptoSign;
 
 	@XmlElement(name = "completeCriptoSignExtraParams")
 	private Map<String, String> completeCriptoSignExtraParams;
+
+	@XmlElement(name = "completeCriptoSignpkcs12")
+	private Map<String, String> completeCriptoSignPkcs12;
+
+	@XmlElement(name = "completeCriptoSignpkcs12Password")
+	private Map<String, String> completeCriptoSignPkcs12Password;
+
+	@XmlElement(name = "completeCriptoSignpkcs12Alias")
+	private Map<String, String> completeCriptoSignPkcs12Alias;
 
 	/** Construye una tarea de firma vac&iacute;a. */
 	public SignTask() {
@@ -66,13 +83,21 @@ public final class SignTask {
 		sb.append(this.retrieveUrl);
 		sb.append('\n');
 
-		sb.append("  URL de guardado de PDF: "); //$NON-NLS-1$
-		sb.append(this.saveUrl);
-		sb.append('\n');
+		if (this.saveUrl != null) {
+			sb.append("  URL de guardado de PDF: "); //$NON-NLS-1$
+			sb.append(this.saveUrl);
+			sb.append('\n');
 
-		if (this.saveUrlPostParam != null) {
-			sb.append("  Parametro para el POST de la URL de guardado de PDF: "); //$NON-NLS-1$
+			sb.append("  Parametro para el POST de la URL de guardado del PDF: "); //$NON-NLS-1$
 			sb.append(this.saveUrlPostParam);
+			sb.append('\n');
+		}
+
+		if (this.saveId != null) {
+			sb.append("  ID del fichero guardado: "); //$NON-NLS-1$
+			sb.append(this.saveId);
+			sb.append("  Parametro para el POST de la URL de identificador del PDF firmado: "); //$NON-NLS-1$
+			sb.append(this.saveIdPostParam);
 			sb.append('\n');
 		}
 
@@ -98,41 +123,6 @@ public final class SignTask {
 		}
 
 		return sb.toString();
-	}
-
-	/** Construye una tarea de firma.
-	 * @param tsa Datos para el sellado de tiempo.
-	 * @param retrieveUrlPdf URL para recuperar el PDF.
-	 * @param saveUrlPdf URL para guardar el PDF (POST de un servicio Web).
-	 * @param saveUrlPostParam Nombre del par&aacute;metro del POST del servicio Web
-	 *                         de guarado del PDF donde hay que pasar este.
-	 * @param certificate Certificado X.509 para el cifrado de la firma.
-	 * @param bioSignsList Lista de firmas biom&eacute;tricas a hacer.
-	 * @param complete <code>true</code> si el proceso debe finalizar con una firma
-	 *                 criptogr&aacute;fica del operador, <code>false</code> en caso
-	 *                 contrario.
-	 * @param completeSignExtraParams par&aacute;metros adicionales de la firma final
-	 *                                con certificado. */
-	public SignTask(final SerializableTsaParams tsa,
-					final URL retrieveUrlPdf,
-					final URL saveUrlPdf,
-					final String saveUrlPostParam,
-					final String certificate,
-					final List<SingleBioSignData> bioSignsList,
-					final boolean complete,
-					final Map<String, String> completeSignExtraParams) {
-
-		this.tsaParams = tsa;
-		this.retrieveUrl = retrieveUrlPdf;
-		this.saveUrl = saveUrlPdf;
-		this.saveUrlPostParam = saveUrlPostParam;
-		this.base64Cert = certificate;
-		this.bioSigns = bioSignsList;
-		this.completeWithCriptoSign = complete;
-		this.completeCriptoSignExtraParams = completeSignExtraParams != null ?
-			completeSignExtraParams :
-				new ConcurrentHashMap<String, String>();
-
 	}
 
 	/** Obtiene los datos para el sellado de tiempo.
