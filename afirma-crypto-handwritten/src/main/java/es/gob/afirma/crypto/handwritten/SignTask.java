@@ -28,14 +28,27 @@ public final class SignTask {
 	@XmlElement(name = "tsaParams")
 	private SerializableTsaParams tsaParams;
 
+	/** URL de recuperaci&oacute;n del PDF, puede ser por red con http:// o https:// o
+	 * local con file:// */
 	@XmlElement(name = "retrieveUrl")
 	private URL retrieveUrl;
 
 	@XmlElement(name = "saveUrl")
 	private URL saveUrl;
 
+	/** Directorio para guardar el PDF generado.
+	 * Es independiente de <i>saveUrl</i>, si est&aacute;n ambos par&aacute;metros se
+	 * salva tanto en directorio como en red. */
+	@XmlElement(name = "saveDirectoy")
+	private String saveDirectoy;
+
 	@XmlElement(name = "saveUrlPostParam")
 	private final String saveUrlPostParam = "data"; //$NON-NLS-1$
+
+	/** M&eacute;todo JavaScript al que hay que llamar (mediante <code>JSObject</code>)
+	 * para indicar la respuesta del servidor al anv&iacute;o del PDF firmado. */
+	@XmlElement(name = "responseJSMethod")
+	private String responseJSMethod;
 
 	@XmlElement(name = "saveId")
 	private String saveId;
