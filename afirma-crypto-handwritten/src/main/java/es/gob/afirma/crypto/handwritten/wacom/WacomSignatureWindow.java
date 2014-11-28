@@ -37,6 +37,7 @@ public class WacomSignatureWindow extends JFrame {
 			parent instanceof Frame ? (Frame) parent : null,
 			signatureId
 		);
+
 		this.signatureDialog.init(
 			JseUtil.html2Image(
 				htmlTemplate,

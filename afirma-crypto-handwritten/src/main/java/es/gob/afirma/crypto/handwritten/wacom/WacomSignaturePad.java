@@ -306,13 +306,15 @@ public final class WacomSignaturePad extends SignaturePad implements ITabletHand
 
 		this.btns = bos.getButtons();
 
+		LOGGER.info("Resolucion actual de la pantalla: " + this.getToolkit().getScreenResolution());
+
 		// Creamos la replica de la pantalla de captura
 		// El tamano se establece atendiendo a la resolucion de la pantalla
 		this.panel = UiUtils.getPadMirrorPanel(
 			this,
 			this.capability.getTabletMaxX(),
 			this.capability.getTabletMaxY(),
-			this.getToolkit().getScreenResolution()
+			96//this.getToolkit().getScreenResolution()
 		);
 
 		this.setResizable(false);

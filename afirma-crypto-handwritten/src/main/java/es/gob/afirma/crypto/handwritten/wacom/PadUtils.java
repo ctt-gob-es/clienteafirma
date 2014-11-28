@@ -25,7 +25,7 @@ import es.gob.afirma.crypto.handwritten.Rectangle;
 import es.gob.afirma.crypto.handwritten.SignaturePadConnectionException;
 import es.gob.afirma.crypto.handwritten.SignaturePadException;
 
-final class PadUtils {
+public class PadUtils {
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
@@ -166,7 +166,7 @@ final class PadUtils {
 		}
 	}
 
-	static Tablet getTablet() throws SignaturePadException {
+	public static Tablet getTablet() throws SignaturePadException {
 		// Buscamos la primera tableta conectada al sistema y la inicializamos
 		final com.WacomGSS.STU.UsbDevice[] usbDevices = UsbDevice.getUsbDevices();
 		final UsbDevice usbDevice;
@@ -305,7 +305,7 @@ final class PadUtils {
 	}
 
 	// Devuelve el nombre del modelo de la tableta sin espacios en blanco
-	static String getTabletModel(final Tablet tablet) {
+	public static String getTabletModel(final Tablet tablet) {
 
 		// Modelo de la tableta
 		String model;

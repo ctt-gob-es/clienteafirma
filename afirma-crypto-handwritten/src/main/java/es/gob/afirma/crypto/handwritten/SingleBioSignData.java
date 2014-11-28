@@ -1,5 +1,7 @@
 package es.gob.afirma.crypto.handwritten;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import javax.xml.bind.annotation.XmlElement;
@@ -22,13 +24,10 @@ public final class SingleBioSignData {
 	@XmlElement(name = "signFooter")
 	private final String signFooter;
 
-	/** Plantilla HTML a mostrar en la tableta al firmar el firmante. */
-	@XmlElement(name = "htmlTemplate")
-	private final String htmlTemplate;
-
-	/** Imagen JPEG a mostrar en la tableta al firmar el firmante. */
-	@XmlElement(name = "jpegTemplate")
-	private final byte[] jpegTemplate;
+	/** Lista de plantillas definidas para distintos tipos de tabletas.
+	 * Dependiendo del tipo de tableta.*/
+	@XmlElement(name = "tablet")
+	private List<TabletTemplateData> tabletTemplates = new ArrayList<TabletTemplateData>(0);
 
 	/** Rectangulo de firma en la tableta de captura. */
 	@XmlElement(name = "signatureArea")
@@ -42,17 +41,25 @@ public final class SingleBioSignData {
 
 	@Override
 	public String toString() {
-		return "Firma biometrica [id=" + this.id + "; signerData=" + this.signerData + "; htmlTemplate=" + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-			(this.htmlTemplate == null ? "No" : "Si") + "; jpegTemplate=" + (this.htmlTemplate == null && this.jpegTemplate != null ? "Si" : "No") + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
-			"; signatureArea=[" + this.signatureArea + "]; signatureRubricPositionOnPdf=[" + this.signatureRubricPositionOnPdf + "]]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		StringBuilder sb = new StringBuilder("Información de una firma biométrica: "); //$NON-NLS-1$
+		sb.append("Plantillas definidas para distintos tipos de tabletas: "); //$NON-NLS-1$
+		for (final TabletTemplateData ttd : this.tabletTemplates) {
+			sb.append("    "); //$NON-NLS-1$
+			sb.append(ttd.toString());
+			sb.append('\n');
+		}
+
+		sb.append("Firma biometrica [id=" + this.id + "; signerData=" + this.signerData + "; htmlTemplate=" + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				//(this.htmlTemplate == null ? "No" : "Si") + "; jpegTemplate=" + (this.htmlTemplate == null && this.jpegTemplate != null ? "Si" : "No") + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+				"; signatureArea=[" + this.signatureArea + "]; signatureRubricPositionOnPdf=[" + this.signatureRubricPositionOnPdf + "]]"+ //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				""); //$NON-NLS-1$
+		return sb.toString();
 	}
 
 	/** Constructor de uso restringido a la serializaci&oacute;n JAXB. */
 	@SuppressWarnings("unused")
 	private SingleBioSignData() {
 		this.signerData = null;
-		this.htmlTemplate = null;
-		this.jpegTemplate = null;
 		this.signatureArea = null;
 		this.signatureRubricPositionOnPdf = null;
 		this.signatureRubricPageOnPdf = 1;
@@ -62,8 +69,7 @@ public final class SingleBioSignData {
 	}
 
 	SingleBioSignData(final SignerInfoBean signer,
-			                  final String template,
-			                  final byte[] bgJpegImage,
+			                  final List<TabletTemplateData> ttdList,
 			                  final Rectangle signatureRectOnPad,
 			                  final Rectangle signaturePositionOnPdf,
 			                  final int signaturePageOnPdf,
@@ -75,8 +81,7 @@ public final class SingleBioSignData {
 			);
 		}
 		this.signerData = signer;
-		this.htmlTemplate = template;
-		this.jpegTemplate = bgJpegImage != null ? bgJpegImage.clone() : null;
+		this.tabletTemplates = ttdList;
 		this.signatureArea = signatureRectOnPad;
 		this.signatureRubricPositionOnPdf = signaturePositionOnPdf;
 		this.id = UUID.randomUUID().toString();
@@ -91,12 +96,10 @@ public final class SingleBioSignData {
 		return this.signerData;
 	}
 
-	String getHtmlTemplate() {
-		return this.htmlTemplate;
-	}
-
-	byte[] getJpegTemplate() {
-		return this.jpegTemplate;
+	/** Obtiene la lista de plantillas que corresponden a cada tableta de firma definida.
+	 * @return lista de plantillas que corresponden a cada tableta de firma definida. */
+	public List<TabletTemplateData> getTabletTemplates() {
+		return this.tabletTemplates;
 	}
 
 	Rectangle getSignatureArea() {

@@ -3,7 +3,7 @@
     <tsaParams>
         <tsaRequireCert>true</tsaRequireCert>
         <tsaPolicy>4.3.2.1</tsaPolicy>
-        <!-- URL del organismo -->
+        <!-- URL desde la cual el documento para firmar se descarga -->
         <tsaURL>http://aeat.aeat</tsaURL>
         <!-- Nombre de usuario -->
         <tsaUsr>user</tsaUsr>
@@ -16,15 +16,19 @@
                 <value>//o=</value>
             </extension>
         </extensions>
-        <!-- Algoritmo -->
+        <!-- Algoritmo de firma -->
         <tsaHashAlgorithm>SHA-512</tsaHashAlgorithm>
         <sslPkcs12File>AAECAw==</sslPkcs12File>
         <sslPkcs12FilePassword>p12password</sslPkcs12FilePassword>
     </tsaParams>
     <!-- Directorio en la que guardar el documento firmado  -->
     <retrieveUrl>http://localhost:8080/afirma-crypto-handwritten-server/formulario1.pdf</retrieveUrl>
-    <saveUrl>http://www.ibm.es</saveUrl>
-    <saveUrlPostParam>data</saveUrlPostParam>
+    <saveUrl>http://localhost:8080/afirma-crypto-handwritten-server/SaveDataServlet</saveUrl>
+    <saveUrlPostParam>pdf</saveUrlPostParam>
+    <saveId>004</saveId>
+    <saveIdPostParam>idd</saveIdPostParam>
+    <saveDirectory>C:\Users\astrid\Desktop\firma\</saveDirectory>
+    <signedFileName>PDF firmado</signedFileName>
     <!-- Certifciado en base64 -->
     <cert>MIIFnTCCBIWgAwIBAgICA+owDQYJKoZIhvcNAQEFBQAwgdoxCzAJBgNVBAYTAkVTMRIwEAYDVQQIEwlCYXJjZWxvbmExSDBGBgNVBAcMP0JhcmNlbG9uYSAoc2VlIGN1cnJlbnQgYWRkcmVzcyBhdCBodHRwczovL3d3dy5hbmYuZXMvYWRkcmVzcy8gKTEnMCUGA1UEChMeQU5GIEF1dG9yaWRhZCBkZSBDZXJ0aWZpY2FjaW9uMRcwFQYDVQQLEw5BTkYgQ2xhc2UgMSBDQTETMBEGA1UEBRMKRy02MzI4NzUxMDEWMBQGA1UEAxMNQU5GIFNlcnZlciBDQTAeFw0wNjEyMzEyMzAwMDBaFw0xNDEyMzEyMzAwMDBaMIGmMRswGQYDVQQDExJBTkYgVXN1YXJpbyBBY3Rpdm8xDDAKBgNVBCoTA0FORjEXMBUGA1UEBBMOVXN1YXJpbyBBY3Rpdm8xEjAQBgNVBAUTCTEyMzQ1Njc4WjEeMBwGCSqGSIb3DQEJARYPdGVzdEBwcnVlYmEuY29tMR8wHQYDVQQLExZDbGFzZSAyIHBlcnNvbmEgZmlzaWNhMQswCQYDVQQGEwJFUzCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEAj2qAceOf0pyATEM0BxBK7+eGA0HEZWDZpqdhCeVvsI1AqhLWQpWNg65TGXE8ijzxGU/yS94k/34gPgIkla+p/mrDaNsVY69RcLp1hWYcL61rM//In+hXlA3qUK6as942b55YyzNsbJSQPCNgkiGuIQTo1Xfsfk4XZDi+yNSRgUMCAwEAAaOCAiEwggIdMAkGA1UdEwQCMAAwCwYDVR0PBAQDAgbAMBMGCisGAQQBgY8cFAMEBQwDQU5GMBcGCisGAQQBgY8cFAQECQwHVXN1YXJpbzAWBgorBgEEAYGPHBQFBAgMBkFjdGl2bzAZBgorBgEEAYGPHBQGBAsMCTEyMzQ1Njc4WjCBiAYDVR0gBIGAMH4wfAYKKwYBBAGBjxwDBDBuMD0GCCsGAQUFBwICMDEaL0NlcnRpZmljYWRvIGVtaXRpZG8gcGFyYSByZWFsaXphY2nzbiBkZSBwcnVlYmFzMC0GCCsGAQUFBwIBFiFodHRwczovL3d3dy5hbmYuZXMvQUMvZG9jdW1lbnRvcy8wOAYIKwYBBQUHAQEELDAqMCgGCCsGAQUFBzABhhxodHRwOi8vd3d3LmFuZi5lcy9BQy9SQy9vY3NwMDkGA1UdHwQyMDAwLqAsoCqGKGh0dHA6Ly93d3cuYW5mLmVzL0FDL1JDL0FORkFDQ0xBU0VBMS5jcmwwFwYKKwYBBAGBjxwTAQQJDAcxMjMtMzIxMDEGCisGAQQBgY8cKgYEIwwhaHR0cHM6Ly93d3cuYW5mLmVzL0FDL0FDVEFTLzU2Nzg5MBYGCSsGAQQBgY8cEwQJDAczMjEtMTIzMB0GA1UdDgQWBBSxTxAznF2uoOtMW+fJUoDN6B+rJDAfBgNVHSMEGDAWgBS+O/a0MbdzJEg5xVcTlHWqn4E/LDANBgkqhkiG9w0BAQUFAAOCAQEATQgYAOwxrMRTT2Nhx7pqiNsoGT5dJmeunAv+iU5zx/VoEXB/mx+VtyLfMea3VS9LC23404XS7pz5oPwiVPLsMPZtzOcmfacVnSdRn5J7+qOO8MB+OVlXq/QmARn+1XeBCHaTQ6AMc/pdveEoGktaXwEjTslWyRD9dGDzLp04+FndQAbVcI5xRkb4vToRnhQmloUVddhQAO8usOAIb00GJFNTq4lsyZ1qT1HplQl+ngsSD1HBxkhx10Pm3KuvCunAh4um0QnSeeiq9qWIV0UZrFlMwNRXvH9OVTqSGC4PXjw2zOi2GLUfags1decu7gcGjidlELR/WHU/6lrztfdViQ==</cert>
     <!-- DATOS DE LOS FIRMANTES -->
@@ -46,28 +50,32 @@
             	En este caso solo es necesario modicifar la linea de firma indicando el nombre del firmante.
             	Ejemplo: Fdo. Nombre Apellido1 Apellido2
              -->
-            <htmlTemplate>
-            	&lt;div style="margin-left:15px;" &gt;
-            		&lt;table&gt;
-            			&lt;tr&gt;
-            				&lt;th&gt;
-            				
-            					&lt;img alt="" src="logo_aeat_1bit.png"&gt;
-            				&lt;/th&gt;
-            				&lt;th&gt;
-            					&lt;div style="margin-left:147px; margin-top=20px;" &gt;
-	            					&lt;img alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACUAAAAUCAIAAACF2mNcAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAYdEVYdFNvZnR3YXJlAHBhaW50Lm5ldCA0LjAuM4zml1AAAANASURBVEhL5ZRLKKxhGMe/4YxhXMal3BZSmJRbKbkkC0tlQRShWEimWcjGhsSCmqassBULlyRKLIhkJRIiFiOUDSl1XHL/zm/meY0ZR6ezsjjnv/h67v/3e57nfTX9e/Ff8f30h7J6cHd3h+X+/l7pf4fb21uybm5ulP6JLyIi4ocPnp6elEPXi4qKsNTV1Sn9j3h7e1tZWWloaLBYLGSZzWbkkZER7H58CQkJmg+Oj4+VQ9fz8/Ox1NTUKP0dlOAPrq+vn5+flUnXSZQKICAgQAS73f6ZjxyDwWAymaKjo4mor6/HuLOzk5eXFxoaiiUqKgoZQPDy8tLR0bG+vh4TE4MrIyOjq6tLWieHy83NXVtbI310dBS1p6cHlx/f4uIijszMzPLycgRYX19fNzY24uLijEYjlqCgIGRweXlZUFCAZWtriy/goHzb29tJ4VjIg4ODyJTd3d2l5vDwMLIfX1ZWFnEOh2Nubs5dQ9OoKy45cmVlpahysvT09JmZGYSysrK+vj53gqZtbm4KX0hIyNLSksR78cFH6eDgYOLoKiNh1MhtbW3iFb7a2lpflfXx8vErLS0tyFVVVdPT0wiArjCI5ubms7MzSfzgGx8fpyesjKilpaUkxMbGypZ+4pMBHx4esodkgYeHh4ODAzeJprEX/f39KSkpogLKTk1N+e1LTk6OcvogMDBwf38f75d8V1dXj4+PSUlJyCUlJUdHR+4c7aOmy+Xy3XmOrnwXFxeyZr+ju7ubgC/5BgYGkOfn5z2BWlpaGt/k5GSJEdDnsbExCYBF8S0vL6OHh4fzgnjBUmFkiZio8FGRa0B8Z2cnKneL3cPCitFSLGBycnJ2dvb09JQloIE8TKurq+KiH24+rAwZfWhoyMOuwHZJHLfN6XQi0N7GxsbW1tb4+HhxhYWF8Qg0NTXhQrVarTSNvUPl/nGDi4uLJbKwsJB/dfNxn+R0BPFbQgZ4iiSUNTs5OSFMVBAZGcn14o4r3YPs7GyGzSkTExOV6R2pqanb29tqXxYWFuiAQNolUCYPODXDZ2AVFRW9vb17e3sEsJMTExPV1dXcS2JonSSen5+j2mw2gukcsvdpVPP7NvzbfLr+C6sz1kySVyDzAAAAAElFTkSuQmCC"&gt;
-	            				&lt;/div&gt;
-            				&lt;/th&gt;
-            			&lt;/tr&gt;
-            		&lt;/table&gt;
-         		&lt;/div&gt;
-         		&lt;div style="margin-left:20px; margin-top:58px;" &gt;
- 					&lt;p style="font-weight: bold; font-size:12px;"&gt;        		
-            			Fdo. María Jesús García López
-            		&lt;/p&gt;
-         		&lt;/div&gt;
-            </htmlTemplate>
+             <tablet>
+            	<tabletType>STU-430</tabletType>
+            	<htmlTemplate>
+					&lt;p style="font-weight: bold; font-size:12px; margin-left:20px;"&gt;        		
+						Firme en el recuadro y pulse aceptar: 
+	            	&lt;/p&gt;
+	            	&lt;div style="margin-left:20px; margin-top:58px;" &gt;
+	 					&lt;p style="font-weight: bold; font-size:12px;"&gt;        		
+	            			Fdo. María Jesús García López
+	            		&lt;/p&gt;
+	         		&lt;/div&gt;
+	            </htmlTemplate>
+	        </tablet>
+	        <tablet>
+            	<tabletType>STU-530</tabletType>
+            	<htmlTemplate>
+					&lt;p style="font-weight: bold; font-size:12px; margin-left:20px;"&gt;        		
+						Firme en el recuadro y pulse aceptar: 
+	            	&lt;/p&gt;
+	            	&lt;div style="margin-left:20px; margin-top:58px;" &gt;
+	 					&lt;p style="font-weight: bold; font-size:12px;"&gt;        		
+	            			Fdo. María Jesús García López
+	            		&lt;/p&gt;
+	         		&lt;/div&gt;
+	            </htmlTemplate>
+	        </tablet>
             <!-- Area de firma en la tableta. -->
             <signatureArea>
                 <!-- Puntos [x,y] donde se situa la esquina superior izquierda del recuadro de firma. -->
@@ -80,11 +88,11 @@
             <!-- Area de firma del documento, lugar donde se va a situar la firma dentro del documento a firmar. -->
             <signatureRubricPositionOnPdf>
                 <!-- Coordenadas [x,y] donde se situa la esquina inferior derecha de la firma.  -->
-                <x>50</x>
-                <y>30</y>
+                <x>75</x>
+                <y>220</y>
                 <!-- Anchura y altura (width/height) de la firma dentro del documento. -->
-                <width>200</width>
-                <height>75</height>
+                <width>150</width>
+                <height>50</height>
             </signatureRubricPositionOnPdf>
             <!-- Pagina en la que se pinta la firma. -->
             <signatureRubricPageOnPdf>1</signatureRubricPageOnPdf>
@@ -106,27 +114,19 @@
             	En este caso solo es necesario modicifar la linea de firma indicando el nombre del firmante.
             	Ejemplo: Fdo. Nombre Apellido1 Apellido2
              -->
-           	<htmlTemplate>
-            	&lt;div style="margin-left:15px;" &gt;
-            		&lt;table&gt;
-            			&lt;tr&gt;
-            				&lt;th&gt;
-            					&lt;img alt="" src="logo_aeat_1bit.png"&gt;
-            				&lt;/th&gt;
-            				&lt;th&gt;
-            					&lt;div style="margin-left:147px; margin-top=20px;" &gt;
-	            					&lt;img alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACUAAAAUCAIAAACF2mNcAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAYdEVYdFNvZnR3YXJlAHBhaW50Lm5ldCA0LjAuM4zml1AAAANASURBVEhL5ZRLKKxhGMe/4YxhXMal3BZSmJRbKbkkC0tlQRShWEimWcjGhsSCmqassBULlyRKLIhkJRIiFiOUDSl1XHL/zm/meY0ZR6ezsjjnv/h67v/3e57nfTX9e/Ff8f30h7J6cHd3h+X+/l7pf4fb21uybm5ulP6JLyIi4ocPnp6elEPXi4qKsNTV1Sn9j3h7e1tZWWloaLBYLGSZzWbkkZER7H58CQkJmg+Oj4+VQ9fz8/Ox1NTUKP0dlOAPrq+vn5+flUnXSZQKICAgQAS73f6ZjxyDwWAymaKjo4mor6/HuLOzk5eXFxoaiiUqKgoZQPDy8tLR0bG+vh4TE4MrIyOjq6tLWieHy83NXVtbI310dBS1p6cHlx/f4uIijszMzPLycgRYX19fNzY24uLijEYjlqCgIGRweXlZUFCAZWtriy/goHzb29tJ4VjIg4ODyJTd3d2l5vDwMLIfX1ZWFnEOh2Nubs5dQ9OoKy45cmVlpahysvT09JmZGYSysrK+vj53gqZtbm4KX0hIyNLSksR78cFH6eDgYOLoKiNh1MhtbW3iFb7a2lpflfXx8vErLS0tyFVVVdPT0wiArjCI5ubms7MzSfzgGx8fpyesjKilpaUkxMbGypZ+4pMBHx4esodkgYeHh4ODAzeJprEX/f39KSkpogLKTk1N+e1LTk6OcvogMDBwf38f75d8V1dXj4+PSUlJyCUlJUdHR+4c7aOmy+Xy3XmOrnwXFxeyZr+ju7ubgC/5BgYGkOfn5z2BWlpaGt/k5GSJEdDnsbExCYBF8S0vL6OHh4fzgnjBUmFkiZio8FGRa0B8Z2cnKneL3cPCitFSLGBycnJ2dvb09JQloIE8TKurq+KiH24+rAwZfWhoyMOuwHZJHLfN6XQi0N7GxsbW1tb4+HhxhYWF8Qg0NTXhQrVarTSNvUPl/nGDi4uLJbKwsJB/dfNxn+R0BPFbQgZ4iiSUNTs5OSFMVBAZGcn14o4r3YPs7GyGzSkTExOV6R2pqanb29tqXxYWFuiAQNolUCYPODXDZ2AVFRW9vb17e3sEsJMTExPV1dXcS2JonSSen5+j2mw2gukcsvdpVPP7NvzbfLr+C6sz1kySVyDzAAAAAElFTkSuQmCC"&gt;
-	            				&lt;/div&gt;
-            				&lt;/th&gt;
-            			&lt;/tr&gt;
-            		&lt;/table&gt;
-         		&lt;/div&gt;
-         		&lt;div style="margin-left:20px; margin-top:58px;" &gt;
- 					&lt;p style="font-weight: bold; font-size:12px;"&gt;        		
-            			Fdo. Pedro Rodriguez Alvarez
-            		&lt;/p&gt;
-         		&lt;/div&gt;
-            </htmlTemplate>
+             <tablet>
+            	<tabletType>STU-430</tabletType>
+            	<htmlTemplate>
+					&lt;p style="font-weight: bold; font-size:12px; margin-left:20px;"&gt;        		
+						Firme en el recuadro y pulse aceptar: 
+	            	&lt;/p&gt;
+	            	&lt;div style="margin-left:20px; margin-top:58px;" &gt;
+	 					&lt;p style="font-weight: bold; font-size:12px;"&gt;        		
+	            			Fdo. Pedro Rodriguez Alvarez
+	            		&lt;/p&gt;
+	         		&lt;/div&gt;
+	            </htmlTemplate>
+	        </tablet>
             <!-- Area de firma en la tableta. -->
             <signatureArea>
                 <!-- Puntos [x,y] donde se situa la esquina superior izquierda del recuadro de firma. -->
@@ -140,10 +140,10 @@
             <signatureRubricPositionOnPdf>
                <!-- Coordenadas [x,y] donde se situa la esquina inferior derecha de la firma.  -->
                 <x>250</x>
-                <y>30</y>
+                <y>220</y>
                	<!-- Anchura y altura (width/height) de la firma dentro del documento. -->
-                <width>200</width>
-                <height>75</height>
+                <width>150</width>
+                <height>50</height>
             </signatureRubricPositionOnPdf>
             <!-- Pagina en la que se pinta la firma. -->
             <signatureRubricPageOnPdf>1</signatureRubricPageOnPdf>
