@@ -48,6 +48,7 @@ public final class PdfBuilder {
 	 *  <li>La imagen de la r&uacute;brica, poniendo antes un pie.</li>
 	 *  <li>La informaci&oacute;n biom&eacute;trica en el diccionario <i>MoreInfo</i></li>
 	 *  <li>La informaci&oacute;n biom&eacute;trica como XMP</li>
+	 *  <li> (opcional) El CSV en la posici&oacute;n indicada en el XML de entrada.</li>
 	 * </ul>
 	 * @param srList Mapa de firmantes y resultados de sus firmas.
 	 * @param inPdf PDF de entrada.
@@ -60,7 +61,8 @@ public final class PdfBuilder {
 	public static byte[] buildPdf(final Map<SignerInfoBean, SignatureResult> srList,
 			                      final byte[] inPdf,
 			                      final List<SingleBioSignData> bioSignDataList,
-			                      final X509Certificate cert) throws IOException, NoSuchAlgorithmException {
+			                      final X509Certificate cert,
+			                      final Csv csv) throws IOException, NoSuchAlgorithmException {
 
 		LOGGER.info("Numero de firmas: "  + srList.size()); //$NON-NLS-1$
 
@@ -79,19 +81,30 @@ public final class PdfBuilder {
 
 		final Set<SignerInfoBean> keys = srList.keySet();
 
-		// Insertamos el pie de pagina a la rubrica
+		// Insertamos la cabecera y el pie de pagina a la rubrica
+		LOGGER.info("Insertamos la cabecera y el pie de pagina a la rubrica..."); //$NON-NLS-1$
 		int count = 0;
 		for (final SignerInfoBean signer : keys) {
-
-			// Obtenemos la imagen de firma
-			final byte[] jpg = srList.get(signer).getSignatureJpegImage();
-
-			// Anadimos el pie de firma
-			final byte[] signature = JseUtil.addFooter(jpg, new SimpleDateFormat("dd/mm/yyyy hh:mm").format(new Date())); //$NON-NLS-1$
 
 			// Datos de la tarea de firma para el firmante
 			final SingleBioSignData singleSing = getSingleBioSignData(bioSignDataList, signer.getId());
 
+			// Obtenemos la imagen de firma inicial (unicamente el grafo)
+			byte[] signature = srList.get(signer).getSignatureJpegImage();
+
+			if(singleSing.getHeader() != null) {
+				// Ponemos una cabecera de firma
+				signature = JseUtil.addHeader(signature, singleSing.getHeader());
+			}
+
+			if(singleSing.getFooter() != null) {
+				// Anadimos el pie de firma
+				signature = JseUtil.addFooter(signature, singleSing.getFooter());
+
+			} else {
+				// Anadimos la fecha al pie de firma
+				signature = JseUtil.addFooter(signature, new SimpleDateFormat("dd/MM/yyyy hh:mm").format(new Date())); //$NON-NLS-1$
+			}
 			// Area en la que se posiciona la firma en el pdf
 			final Rectangle signatureRubricPositionOnPdf = singleSing.getSignatureRubricPositionOnPdf();
 
@@ -106,6 +119,8 @@ public final class PdfBuilder {
 				null,
 				pdfStamper
 			);
+
+
 			count++;
 		}
 
@@ -187,6 +202,9 @@ public final class PdfBuilder {
 			count ++;
 		}
 		PdfXmpHelper.addBioXmpDataToPdf(pdfStamper, PdfXmpHelper.buildXmp(xmpList));
+
+		// Insertamos el csv
+		csv.applyCsv(pdfStamper);
 
 		// Cerramos el PDF
 		try {

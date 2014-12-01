@@ -18,9 +18,13 @@ public final class SignerInfoBean {
 	@XmlElement(name = "signerId")
 	private final String id;
 
+	/** Cargo (puesto de trabajo) que ocupa el firmante.*/
+	@XmlElement(name = "signerPost")
+	private String signerPost;
+
 	@Override
 	public String toString() {
-		return this.name + " " + this.surname1 + " " + (this.surname2 != null ? this.surname2 : "") + " (NIF: " + this.id + ")";  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+		return this.name + " " + this.surname1 + " " + (this.surname2 != null ? this.surname2 : "") + " (NIF: " + this.id + ")" + " Puesto de trabajo: " + this.signerPost;  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
 	}
 
 	/** Constructor de uso restringido a la serializaci&oacute;n JAXB. */
@@ -74,4 +78,10 @@ public final class SignerInfoBean {
 		return this.name + " " + this.surname1 + (this.surname2 != null ? " " + this.surname2 : "");  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
 	}
 
+	/** Obtiene el cargo (puesto de trabajo) que ocupa el firmante.
+	 * @return Cargo (puesto de trabajo) que ocupa el firmante.*/
+	public String getSignerPost() {
+		return this.signerPost;
+	}
 }
+

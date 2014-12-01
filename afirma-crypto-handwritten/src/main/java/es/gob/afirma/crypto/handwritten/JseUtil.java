@@ -35,6 +35,8 @@ import es.gob.afirma.crypto.handwritten.data.Handler;
 public final class JseUtil {
 
 	private static final String FOOTER_PROP_FILE = "/footerText.properties"; //$NON-NLS-1$
+	private static final String HEADER_PROP_FILE = "/headerText.properties"; //$NON-NLS-1$
+
 
 	private JseUtil() {
 		// No instanciable
@@ -64,7 +66,7 @@ public final class JseUtil {
 		// Se crea una nueva imagen formada por la firma en jpg y el footer
 		BufferedImage biWithFooter = new BufferedImage(
 											bi.getWidth(),
-											bi.getHeight() + Integer.parseInt(properties.getProperty("font.size")),  //$NON-NLS-1$
+											bi.getHeight() + Integer.parseInt(properties.getProperty("font.size")) * 2 + 2,  //$NON-NLS-1$
 											BufferedImage.TYPE_BYTE_BINARY
 										);
 
@@ -94,12 +96,71 @@ public final class JseUtil {
 		g.drawString(
 			footerTxt,
 			Integer.parseInt(properties.getProperty("margin.left")), //$NON-NLS-1$
-			biWithFooter.getHeight() - g.getFont().getSize() / 4 + 2
+			biWithFooter.getHeight() - g.getFont().getSize()
 		);
 
 		return bufferedImage2Jpeg(biWithFooter);
 	}
 
+	/** A&ntilde;ade una cabecera texto a una imagen JPEG.
+	* @param jpegImage Imagen JPEG de entrada
+	 * @param headerTxt Texto a a&ntilde;adir como cabecera.
+	 * @return Imagen JPEG con la cabecera a&ntilde;adido.
+	 * @throws IOException Si hay errores durante el proceso. */
+	public static byte[] addHeader(final byte[] jpegImage, final String headerTxt) throws IOException {
+
+		Properties properties = new Properties();
+		// Cargamos el fichero de propiedades del estilo de la cabecera de firma
+		properties.load(
+			JseUtil.class.getResourceAsStream(
+				HEADER_PROP_FILE
+			)
+		);
+
+		BufferedImage bi = jpeg2BufferedImage(jpegImage, true);
+
+		// Se crea una nueva imagen formada por la firma en jpg y el header
+		BufferedImage biWithHeader = new BufferedImage(
+											bi.getWidth(),
+											bi.getHeight() + Integer.parseInt(properties.getProperty("font.size")) * 2 + 2,  //$NON-NLS-1$
+											BufferedImage.TYPE_BYTE_BINARY
+										);
+
+		// Definimos un grafico para insertar la cabecera y la imagen de firma dentro de la nueva imagen creada
+		Graphics2D g = biWithHeader.createGraphics();
+
+		// Definimos el fondo blanco de la imagen
+		g.setBackground(Color.WHITE);
+		g.clearRect(0, 0, biWithHeader.getWidth(), biWithHeader.getHeight());
+
+		// Definimos la fuente del pie de firma
+		g.setFont(
+			new Font(
+				properties.getProperty("font.name"), //$NON-NLS-1$
+				Font.PLAIN,
+				Integer.parseInt(properties.getProperty("font.size")) //$NON-NLS-1$
+			)
+		);
+
+		// El texto en color negro
+		g.setColor(Color.BLACK);
+
+		// Insertamos el pie de firma
+		g.drawString(
+			headerTxt,
+			Integer.parseInt(properties.getProperty("margin.left")), //$NON-NLS-1$
+			g.getFont().getSize() + 2
+		);
+
+
+		// Dibujamos la firma
+		g.drawImage(bi, null, 0,  g.getFont().getSize() * 2);
+
+
+
+		return bufferedImage2Jpeg(biWithHeader);
+
+	}
 
 	/** Convierte una <code>BufferedImage</code> de AWT en una imagen JPEG.
 	 * @param img <code>BufferedImage</code> de origen

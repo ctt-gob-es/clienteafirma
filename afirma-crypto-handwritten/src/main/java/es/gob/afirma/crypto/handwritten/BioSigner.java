@@ -22,6 +22,7 @@ public final class BioSigner {
 	 * @param template  Plantilla en formato HTML a mostrar en la tableta de firma.
 	 * @param signatureArea Area en la que el usuario pueden firmar dentro de la pantalla
 	 *                      de la tableta de firma.
+	 * @param paintTabletBtns <code>true</code> si se pinta en la tableta la botonera de acciones de firma (aceptar, repetir, borrar), <code>false</code> en caso contrario.
 	 * @throws IOException Cuando ocurre un error en la descarga de los datos o la codificacion
 	 *                     de la plantilla a mostrar en la tableta de firma.
 	 * @throws SignaturePadException Cuando no se ha podido inicializar la tableta de firma. */
@@ -29,14 +30,16 @@ public final class BioSigner {
 			         final String signatureId,
 					 final SignaturePadListener spl,
 					 final String template,
-					 final Rectangle signatureArea) throws IOException, SignaturePadException {
+					 final Rectangle signatureArea,
+					 final boolean paintTabletBtns) throws IOException, SignaturePadException {
 
 		this.signatureAreaOnPad = signatureArea;
 		this.signatureWindow = new WacomSignatureWindow(
 			parent,
 			signatureId,
 			template,
-			this.signatureAreaOnPad
+			this.signatureAreaOnPad,
+			paintTabletBtns
 		);
 		this.signatureWindow.addSignatureListener(spl);
 		this.signatureWindow.captureSign();
@@ -51,6 +54,7 @@ public final class BioSigner {
 	 *                      de la tableta de firma.
 	 * @param signatureArea Area en la que el usuario pueden firmar dentro de la pantalla
 	 *                      de la tableta de firma.
+	 * @param paintTabletBtns <code>true</code> si se pinta en la tableta la botonera de acciones de firma (aceptar, repetir, borrar), <code>false</code> en caso contrario.
 	 * @throws IOException Cuando ocurre un error en la descarga de los datos o la codificacion
 	 * de la plantilla a mostrar en la tableta de firma.
 	 * @throws SignaturePadException Cuando no se ha podido inicializar la tableta de firma. */
@@ -58,7 +62,8 @@ public final class BioSigner {
 					 final String signatureId,
 					 final SignaturePadListener spl,
 					 final byte[] jpegImage,
-					 final Rectangle signatureArea) throws IOException, SignaturePadException {
+					 final Rectangle signatureArea,
+					 final boolean paintTabletBtns) throws IOException, SignaturePadException {
 
 		if (spl == null) {
 			throw new IllegalArgumentException(
@@ -79,7 +84,8 @@ public final class BioSigner {
 			parent,
 			signatureId,
 			jpegImage,
-			this.signatureAreaOnPad
+			this.signatureAreaOnPad,
+			paintTabletBtns
 		);
 		this.signatureWindow.addSignatureListener(spl);
 		this.signatureWindow.captureSign();

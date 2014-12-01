@@ -281,7 +281,8 @@ public final class BioSignerRunner implements SignaturePadListener {
 						sign.getId(),
 						BioSignerRunner.this,
 						htmlTemplate,
-						sign.getSignatureArea()
+						sign.getSignatureArea(),
+						this.signTask.showTabletButtons()
 					);
 				}
 
@@ -292,7 +293,8 @@ public final class BioSignerRunner implements SignaturePadListener {
 						sign.getId(),
 						BioSignerRunner.this,
 						jpegTemplate,
-						sign.getSignatureArea()
+						sign.getSignatureArea(),
+						this.signTask.showTabletButtons()
 					);
 				}
 				else {
@@ -300,8 +302,8 @@ public final class BioSignerRunner implements SignaturePadListener {
 					AOUIFactory
 					.showErrorMessage(
 						getMainFrame(),
-						"No se ha definido una plantilla para la tableta conectada. Modelo de la tableta conectada: " + model,
-						"Error",
+						HandwrittenMessages.getString("BioSignerRunner.34") + model, //$NON-NLS-1$
+						HandwrittenMessages.getString("BioSignerRunner.24"), //$NON-NLS-1$
 						JOptionPane.ERROR_MESSAGE
 					);
 
@@ -743,7 +745,8 @@ public final class BioSignerRunner implements SignaturePadListener {
 						buildSrList(),
 						data,
 						getSignTask().getBioSigns(),
-						cert
+						cert,
+						getSignTask().getCSV()
 					);
 
 					// Si necesitamos la firma del funcionario, guardamos la estructura del pdf para

@@ -116,9 +116,21 @@ public final class SingleBioSignData {
 	public int getSignatureRubricPageOnPdf() {
 		return this.signatureRubricPageOnPdf;
 	}
+
 	String getId() {
 		return this.id;
 	}
 
+	/** Obtiene la cabecera de la firma del firmante.
+	 * @return Cabecera de la firma del firmante.*/
+	public String getHeader() {
+		return this.signHeader;
+	}
 
+
+	/** Obtiene el pie de firma de la firma del firmante.
+	 * @return el pie de firma de la firma del firmante.*/
+	public String getFooter() {
+		return this.signFooter;
+	}
 }

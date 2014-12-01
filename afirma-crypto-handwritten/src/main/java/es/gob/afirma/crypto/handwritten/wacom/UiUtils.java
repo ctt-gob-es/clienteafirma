@@ -72,7 +72,8 @@ final class UiUtils {
 			                      final int screenWidth,
 			                      final int screenHeight,
 			                      final PadButtonsListener pbl,
-			                      final int[] count) throws SignaturePadConnectionException {
+			                      final int[] count,
+			                      final boolean activateBtns) throws SignaturePadConnectionException {
 
 		final Button[] btns = new Button[3];
 		btns[0] = new Button(Messages.getString("SignatureDialog.0"), useColor); //$NON-NLS-1$
@@ -130,45 +131,47 @@ final class UiUtils {
 
 		// Actualmente ocurren decenas clicks, realizando decenas de llamadas al evento presionado.
 		// Con el contador solo permitiremos realizar un unico click
+		if(activateBtns) {
+			btns[0].addActionListener(
+					new ActionListener() {
+						@Override
+						public void actionPerformed(final ActionEvent evt) {
+							//  Sentencia if para que se ejecute una unica vez el metodo
+							if(count[0] == 0) {
+								count[0]++;
+								pbl.pressOkButton();
+							}
+						}
+					}
+				);
 
-		btns[0].addActionListener(
-			new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent evt) {
-					//  Sentencia if para que se ejecute una unica vez el metodo
-					if(count[0] == 0) {
-						count[0]++;
-						pbl.pressOkButton();
+				btns[1].addActionListener(
+					new ActionListener() {
+						@Override
+						public void actionPerformed(final ActionEvent evt) {
+							try {
+								pbl.pressClearButton();
+							}
+							catch (final STUException e1) {
+								Logger.getLogger("es.gob.afirma").warning("Error en el evento de pulsar el boton repetir: " + e1); //$NON-NLS-1$ //$NON-NLS-2$
+							}
+						}
 					}
-				}
-			}
-		);
+				);
 
-		btns[1].addActionListener(
-			new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent evt) {
-					try {
-						pbl.pressClearButton();
+				btns[2].addActionListener(
+					new ActionListener() {
+						@Override
+						public void actionPerformed(final ActionEvent evt) {
+							if(count[1] == 0) {
+								count[1]++;
+								pbl.pressCancelButton();
+							}
+						}
 					}
-					catch (final STUException e1) {
-						Logger.getLogger("es.gob.afirma").warning("Error en el evento de pulsar el boton repetir: " + e1); //$NON-NLS-1$ //$NON-NLS-2$
-					}
-				}
-			}
-		);
+				);
 
-		btns[2].addActionListener(
-			new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent evt) {
-					if(count[1] == 0) {
-						count[1]++;
-						pbl.pressCancelButton();
-					}
-				}
-			}
-		);
+		}
 
 
 		return new ButtonsOnScreen(btns, d);
@@ -179,7 +182,8 @@ final class UiUtils {
 			                                  final int screenHeight,
 			                                  final Button[] btns,
 			                                  final Image bgSurfaceImage,
-			                                  final Rectangle signatureArea) {
+			                                  final Rectangle signatureArea,
+			                                  final boolean paintTabletBtns) {
 		final BufferedImage bitmap = new BufferedImage(
 			screenWidth,
 			screenHeight,
@@ -205,10 +209,11 @@ final class UiUtils {
 		}
 
 		// Pintamos los botones
-		for (final Button btn : btns) {
-			btn.paint(gfx);
+		if(paintTabletBtns) {
+			for (final Button btn : btns) {
+				btn.paint(gfx);
+			}
 		}
-
 		gfx.dispose();
 
 		return bitmap;

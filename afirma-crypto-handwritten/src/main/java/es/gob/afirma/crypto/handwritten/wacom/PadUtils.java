@@ -25,6 +25,7 @@ import es.gob.afirma.crypto.handwritten.Rectangle;
 import es.gob.afirma.crypto.handwritten.SignaturePadConnectionException;
 import es.gob.afirma.crypto.handwritten.SignaturePadException;
 
+/** Utilidades para la implementaci&oacute;n de la interfaz de firma en tableta.*/
 public class PadUtils {
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
@@ -166,6 +167,9 @@ public class PadUtils {
 		}
 	}
 
+	/** Obtiene la tableta conectada con la que se va a proceder a firmar.
+	 * @return Tableta conectada con la que se va a proceder a firmar.
+	 * @throws SignaturePadException Excepción genérica de un dispositivo de captura de firmas. */
 	public static Tablet getTablet() throws SignaturePadException {
 		// Buscamos la primera tableta conectada al sistema y la inicializamos
 		final com.WacomGSS.STU.UsbDevice[] usbDevices = UsbDevice.getUsbDevices();
@@ -304,9 +308,10 @@ public class PadUtils {
 		);
 	}
 
-	// Devuelve el nombre del modelo de la tableta sin espacios en blanco
+	/** Obtiene el nombre del modelo de la tableta sin espacios en blanco.
+	 * @param tablet Tableta conectada.
+	 * @return Nombre del modelo de la tableta sin espacios en blanco. */
 	public static String getTabletModel(final Tablet tablet) {
-
 		// Modelo de la tableta
 		String model;
 		try {

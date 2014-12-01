@@ -17,6 +17,7 @@ import org.junit.Test;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.crypto.handwritten.SerializableTsaParams.SerializableTsaRequestExtension;
+import es.gob.afirma.crypto.handwritten.pdf.Csv;
 
 /** Pruebas de tareas de firma.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
@@ -93,6 +94,7 @@ public class TestSignTask {
 
 			final SignTask st = new SignTask(
 				null,
+				new Csv(),
 				tsaParams,
 				new URL("http://www.google.com/"), //$NON-NLS-1$
 				new URL("http://www.ibm.es"), //$NON-NLS-1$
@@ -106,6 +108,7 @@ public class TestSignTask {
 						TestBioSigner.class.getResourceAsStream("/democert.cer") //$NON-NLS-1$
 					)).getEncoded()
 				),
+				true,
 				signs,
 				true,
 				p,

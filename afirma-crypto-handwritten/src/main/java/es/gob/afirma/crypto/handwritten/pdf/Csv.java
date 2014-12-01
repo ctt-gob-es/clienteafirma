@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import javax.xml.bind.annotation.XmlElement;
 
+import com.lowagie.text.Rectangle;
 import com.lowagie.text.pdf.PdfStamper;
 import com.lowagie.text.pdf.TextField;
 
@@ -54,7 +55,7 @@ public final class Csv {
 		this.fontSize = 25;
 	}
 
-	/** Crea un CSV para inrsertarlo en un PDF.
+	/** Crea un CSV para insertarlo en un PDF.
 	 * @param pg P&aacute;gina de inserci&oacute;n.
 	 * @param txt Texto del CSV.
 	 * @param fontSz Tama&ntilde;o del texto del CSV.
@@ -84,7 +85,7 @@ public final class Csv {
 	void applyCsv(final PdfStamper stamper) throws IOException {
 		final TextField tf = new TextField(
 			stamper.getWriter(),
-			new com.lowagie.text.Rectangle(
+			new Rectangle(
 				this.positionOnPageLowerLeftX,
 				this.positionOnPageLowerLeftY,
 				this.positionOnPageUpperRightX,

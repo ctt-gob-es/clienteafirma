@@ -8,6 +8,8 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.RenderingHints;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
@@ -21,6 +23,7 @@ import java.util.zip.Deflater;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
@@ -256,8 +259,9 @@ public final class WacomSignaturePad extends SignaturePad implements ITabletHand
 	/** Crea una tableta de firma Wacom USB.
 	 * @param frame Componente padre para la modalidad.
 	 * @param signId Identificador de la firma que sera capturada con esta tableta.
+	 * @param activateBtns <code>true</code> si se pinta en la tableta la botonera de acciones de firma (aceptar, repetir, borrar), <code>false</code> en caso contrario.
 	 * @throws SignaturePadException Si hay problemas durante la creaci&oacute;n de la tableta. */
-	public WacomSignaturePad(final Frame frame, final String signId) throws SignaturePadException {
+	public WacomSignaturePad(final Frame frame, final String signId, final boolean activateBtns) throws SignaturePadException {
 
 		super(frame, true);
 
@@ -295,7 +299,8 @@ public final class WacomSignaturePad extends SignaturePad implements ITabletHand
 			screenWidth,
 			screenHeight,
 			this,
-			new int[]{0,0}
+			new int[]{0,0},
+			activateBtns
 		);
 
 		// Los botones determinan el espacio util para captura de la pantalla de la tableta
@@ -306,7 +311,7 @@ public final class WacomSignaturePad extends SignaturePad implements ITabletHand
 
 		this.btns = bos.getButtons();
 
-		LOGGER.info("Resolucion actual de la pantalla: " + this.getToolkit().getScreenResolution());
+		LOGGER.info("Resolucion actual de la pantalla: " + this.getToolkit().getScreenResolution()); //$NON-NLS-1$
 
 		// Creamos la replica de la pantalla de captura
 		// El tamano se establece atendiendo a la resolucion de la pantalla
@@ -355,6 +360,7 @@ public final class WacomSignaturePad extends SignaturePad implements ITabletHand
 				)
 			);
 
+
 			bgImage.setBounds(
 				0, 0,
 				Integer.parseInt(properties.getProperty("bound.w")),  //$NON-NLS-1$
@@ -362,9 +368,69 @@ public final class WacomSignaturePad extends SignaturePad implements ITabletHand
 			);
 
 			this.setLayout(null);
+
+			// Si no se va a mostrar en la tableta de firma la botonera de acciones de firma(Aceptar, repetir,borrar),
+			// mostramos una botonera sobre el panel de la interfaz que aparece en la pantalla del funcionario.
+			if(!activateBtns) {
+				JButton b1 = new JButton(Messages.getString("WacomSignaturePad.1")); //$NON-NLS-1$
+				b1.setBounds(
+					100, Integer.parseInt(properties.getProperty("bound.h")) - 90, //$NON-NLS-1$
+					130, 50
+				);
+
+				b1.addActionListener(
+					new ActionListener() {
+						@Override
+						public void actionPerformed(final ActionEvent evt) {
+								pressOkButton();
+						}
+					}
+				);
+
+
+				JButton b2 = new JButton(Messages.getString("WacomSignaturePad.2")); //$NON-NLS-1$
+				b2.setBounds(
+					250, Integer.parseInt(properties.getProperty("bound.h")) - 90, //$NON-NLS-1$
+					130, 50
+				);
+
+				b2.addActionListener(
+					new ActionListener() {
+						@Override
+						public void actionPerformed(final ActionEvent evt) {
+							try {
+								pressClearButton();
+							}
+							catch (final STUException e1) {
+								Logger.getLogger("es.gob.afirma").warning("Error en el evento de pulsar el boton repetir: " + e1); //$NON-NLS-1$ //$NON-NLS-2$
+							}
+						}
+					}
+				);
+
+				JButton b3 = new JButton(Messages.getString("WacomSignaturePad.3")); //$NON-NLS-1$
+				b3.setBounds(
+					400, Integer.parseInt(properties.getProperty("bound.h")) - 90, //$NON-NLS-1$
+					130, 50
+				);
+
+				b3.addActionListener(
+					new ActionListener() {
+						@Override
+						public void actionPerformed(final ActionEvent evt) {
+							pressCancelButton();
+						}
+					}
+				);
+
+				this.add(b1);
+				this.add(b2);
+				this.add(b3);
+			}
+
+
 			this.add(this.panel);
 			this.add(bgImage);
-
 		}
 		catch (NullPointerException ex) {
 			LOGGER.warning("Modelo de tableta de captura no reconocido (" + model + "): " + ex); //$NON-NLS-1$ //$NON-NLS-2$
@@ -401,17 +467,19 @@ public final class WacomSignaturePad extends SignaturePad implements ITabletHand
 	/** Inicializa la tableta para una firma.
 	 * @param imageTemplate Imagen a mostrar como fondo en la pantalla de la tableta de captura.
 	 * @param signatureArea Area de firma dentro de la pantalla de la tableta.
+	 * @param paintTabletBtns <code>true</code> si se pinta en la tableta la botonera de acciones de firma (aceptar, repetir, borrar), <code>false</code> en caso contrario.
 	 * @throws SignaturePadException Si hay problemas con la tarbeta de firma.
 	 * @throws IOException Cuando hay problemas en el tratamiento de datos. */
-	public void init(final byte[] imageTemplate, final Rectangle signatureArea) throws SignaturePadException, IOException {
-		init(JseUtil.jpeg2BufferedImage(imageTemplate, this.useColor), signatureArea);
+	public void init(final byte[] imageTemplate, final Rectangle signatureArea,  final boolean paintTabletBtns) throws SignaturePadException, IOException {
+		init(JseUtil.jpeg2BufferedImage(imageTemplate, this.useColor), signatureArea, paintTabletBtns);
 	}
 
 	/** Inicializa la tableta para una firma.
 	 * @param bgSurfaceImage Imagen a mostrar de fondo en la pantalla de la tableta.
 	 * @param signatureArea Area de firma dentro de la pantalla de la tableta.
+	 * @param paintTabletBtns <code>true</code> si se pinta en la tableta la botonera de acciones de firma (aceptar, repetir, borrar), <code>false</code> en caso contrario.
 	 * @throws SignaturePadException Cuando ocurre cualquier problema durante el proceso. */
-	public void init(final Image bgSurfaceImage, final Rectangle signatureArea) throws SignaturePadException {
+	public void init(final Image bgSurfaceImage, final Rectangle signatureArea,  final boolean paintTabletBtns) throws SignaturePadException {
 
 		// Establecemos el area de firma
 		if (PadUtils.fitsInto(signatureArea, this.availableScreenSize)) {
@@ -444,7 +512,8 @@ public final class WacomSignaturePad extends SignaturePad implements ITabletHand
 			this.capability.getScreenHeight(),
 			this.btns,
 			bgSurfaceImage,
-			this.sigArea
+			this.sigArea,
+			paintTabletBtns
 		);
 
 		// Convertimos la imagen a formato Wacom nativo.

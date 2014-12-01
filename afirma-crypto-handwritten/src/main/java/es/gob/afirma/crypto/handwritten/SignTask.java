@@ -70,6 +70,9 @@ public final class SignTask {
 	@XmlElement(name = "cert")
 	private String base64Cert;
 
+	@XmlElement(name = "showTabletButtons")
+	private boolean showTabletButtons;
+
 	@XmlElementWrapper(name = "bioSigns")
 	@XmlElement(name = "bioSign")
 	private List<SingleBioSignData> bioSigns = new ArrayList<SingleBioSignData>(0);
@@ -97,6 +100,10 @@ public final class SignTask {
 	@Override
 	public String toString() {
 		final StringBuilder sb = new StringBuilder("Tarea de firmas biometricas:\n"); //$NON-NLS-1$
+
+		sb.append("CSV : " + this.csv); //$NON-NLS-1$
+		sb.append('\n');
+
 		if (this.tsaParams != null) {
 			sb.append("  Parametros de sello de tiempo: "); //$NON-NLS-1$
 			sb.append(this.tsaParams.toString());
@@ -143,6 +150,10 @@ public final class SignTask {
 		sb.append(this.base64Cert == null ? "No" : "Si"); //$NON-NLS-1$ //$NON-NLS-2$
 		sb.append('\n');
 
+		sb.append(" Mostrar lo botones de Aceptar//Repetir//Cancelar en la tableta de firma: "); //$NON-NLS-1$
+		sb.append(this.showTabletButtons);
+		sb.append('\n');
+
 		sb.append("  Firmas biometricas a realizar:\n"); //$NON-NLS-1$
 
 		for (final SingleBioSignData sbsd : this.bioSigns) {
@@ -169,6 +180,12 @@ public final class SignTask {
 		sb.append("Constraseña del PKCS12: " ); //$NON-NLS-1$
 		sb.append(this.completeCriptoSignPkcs12Password);
 		return sb.toString();
+	}
+
+	/** Obtiene el CSV asociado al documento que se desea firmar.
+	 * @return CSV asociado al documento que se desea firmar. */
+	public Csv getCSV() {
+		return this.csv;
 	}
 
 	/** Obtiene el directorio para escritura de recursos
@@ -232,6 +249,14 @@ public final class SignTask {
 	 * @return certificado X.509 (en Base64) para el cifrado de la firma. */
 	public String getCert() {
 		return this.base64Cert;
+	}
+
+	/** Obtiene <code>true</code> si se debe mostrar la botonera con las opciones Aceptar/Repetir/Cancelar
+	 * en la tableta de firma y <code>false</code> en caso contrario. No obstante, se mostrar&aacute;n siempre
+	 * estas opciones en la interfaz del funcionario, en la pantalla del ordenador.
+	 * @return <code>true</code> si se debe mostrar la botonera la tableta de firma.*/
+	public boolean showTabletButtons() {
+		return this.showTabletButtons;
 	}
 
 	/** Obtiene la lista de firmas biom&eacute;tricas a hacer.
@@ -298,6 +323,7 @@ public final class SignTask {
 
 	/** Construye una tarea de firma.
 	 * @param wrtDir Directorio para escritura de recursos.
+	 * @param csvId CSV asociado al documento que se desea firmar.
 	 * @param tsa Datos para el sellado de tiempo.
 	 * @param retrieveUrlPdf URL para recuperar el PDF.
 	 * @param saveUrlPdf URL para guardar el PDF (POST de un servicio Web).
@@ -308,6 +334,8 @@ public final class SignTask {
 	 * @param saveIdStoredDocument Identificador del fichero almacenado.
 	 * @param saveIdPostParamStoredDocument Par&aacute;metro del POST del servicio Web de identificaci&oacute;n del fichero almacenado.
 	 * @param certificate Certificado X.509 para el cifrado de la firma.
+	 * @param tabletButtons Indica si se debe mostrar la botonera con las opciones Aceptar/Repetir/Cancelar en la tableta de firma.
+	 * 						No obstante, se mostrar&aacute;n siempre estas opciones en la interfaz del funcionario, en la pantalla del ordenador.
 	 * @param bioSignsList Lista de firmas biom&eacute;tricas a hacer.
 	 * @param complete <code>true</code> si el proceso debe finalizar con una firma
 	 *                 criptogr&aacute;fica del operador, <code>false</code> en caso
@@ -318,6 +346,7 @@ public final class SignTask {
 	 * @param completePkcs12Password  Contraseña del PKCS12 de firma.
 	 * @param completePkcs12Alias Alias del PKCS12 de firma.*/
 	public SignTask(final String wrtDir,
+					final Csv csvId,
 			        final SerializableTsaParams tsa,
 					final URL retrieveUrlPdf,
 					final URL saveUrlPdf,
@@ -327,6 +356,7 @@ public final class SignTask {
 					final String saveIdStoredDocument,
 					final String saveIdPostParamStoredDocument,
 					final String certificate,
+					final boolean tabletButtons,
 					final List<SingleBioSignData> bioSignsList,
 					final boolean complete,
 					final Map<String, String> completeSignExtraParams,
@@ -335,6 +365,7 @@ public final class SignTask {
 					final String completePkcs12Alias) {
 
 		this.writableDirectory = wrtDir;
+		this.csv = csvId;
 		this.tsaParams = tsa;
 		this.retrieveUrl = retrieveUrlPdf;
 		this.saveUrl = saveUrlPdf;
@@ -344,6 +375,7 @@ public final class SignTask {
 		this.saveId = saveIdStoredDocument;
 		this.saveIdPostParam = saveIdPostParamStoredDocument;
 		this.base64Cert = certificate;
+		this.showTabletButtons = tabletButtons;
 		this.bioSigns = bioSignsList;
 		this.completeWithCriptoSign = complete;
 		this.completeCriptoSignExtraParams = completeSignExtraParams != null ?

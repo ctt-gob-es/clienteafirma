@@ -1,5 +1,15 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <ns2:signTask xmlns:ns2="es.gob.afirma.crypto.handwritten">
+    <CSV>
+        <page>1</page>
+        <text>CSV12351345980898659945934825348342</text>
+        <rotation>90</rotation>
+        <positionOnPageLowerLeftX>12</positionOnPageLowerLeftX>
+        <positionOnPageLowerLeftY>12</positionOnPageLowerLeftY>
+		<positionOnPageUpperRightX>50</positionOnPageUpperRightX>
+		<positionOnPageUpperRightY>50</positionOnPageUpperRightY>
+		<fontSize>12</fontSize>
+    </CSV>
     <tsaParams>
         <tsaRequireCert>true</tsaRequireCert>
         <tsaPolicy>4.3.2.1</tsaPolicy>
@@ -31,6 +41,8 @@
     <signedFileName>PDF firmado</signedFileName>
     <!-- Certifciado en base64 -->
     <cert>MIIFnTCCBIWgAwIBAgICA+owDQYJKoZIhvcNAQEFBQAwgdoxCzAJBgNVBAYTAkVTMRIwEAYDVQQIEwlCYXJjZWxvbmExSDBGBgNVBAcMP0JhcmNlbG9uYSAoc2VlIGN1cnJlbnQgYWRkcmVzcyBhdCBodHRwczovL3d3dy5hbmYuZXMvYWRkcmVzcy8gKTEnMCUGA1UEChMeQU5GIEF1dG9yaWRhZCBkZSBDZXJ0aWZpY2FjaW9uMRcwFQYDVQQLEw5BTkYgQ2xhc2UgMSBDQTETMBEGA1UEBRMKRy02MzI4NzUxMDEWMBQGA1UEAxMNQU5GIFNlcnZlciBDQTAeFw0wNjEyMzEyMzAwMDBaFw0xNDEyMzEyMzAwMDBaMIGmMRswGQYDVQQDExJBTkYgVXN1YXJpbyBBY3Rpdm8xDDAKBgNVBCoTA0FORjEXMBUGA1UEBBMOVXN1YXJpbyBBY3Rpdm8xEjAQBgNVBAUTCTEyMzQ1Njc4WjEeMBwGCSqGSIb3DQEJARYPdGVzdEBwcnVlYmEuY29tMR8wHQYDVQQLExZDbGFzZSAyIHBlcnNvbmEgZmlzaWNhMQswCQYDVQQGEwJFUzCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEAj2qAceOf0pyATEM0BxBK7+eGA0HEZWDZpqdhCeVvsI1AqhLWQpWNg65TGXE8ijzxGU/yS94k/34gPgIkla+p/mrDaNsVY69RcLp1hWYcL61rM//In+hXlA3qUK6as942b55YyzNsbJSQPCNgkiGuIQTo1Xfsfk4XZDi+yNSRgUMCAwEAAaOCAiEwggIdMAkGA1UdEwQCMAAwCwYDVR0PBAQDAgbAMBMGCisGAQQBgY8cFAMEBQwDQU5GMBcGCisGAQQBgY8cFAQECQwHVXN1YXJpbzAWBgorBgEEAYGPHBQFBAgMBkFjdGl2bzAZBgorBgEEAYGPHBQGBAsMCTEyMzQ1Njc4WjCBiAYDVR0gBIGAMH4wfAYKKwYBBAGBjxwDBDBuMD0GCCsGAQUFBwICMDEaL0NlcnRpZmljYWRvIGVtaXRpZG8gcGFyYSByZWFsaXphY2nzbiBkZSBwcnVlYmFzMC0GCCsGAQUFBwIBFiFodHRwczovL3d3dy5hbmYuZXMvQUMvZG9jdW1lbnRvcy8wOAYIKwYBBQUHAQEELDAqMCgGCCsGAQUFBzABhhxodHRwOi8vd3d3LmFuZi5lcy9BQy9SQy9vY3NwMDkGA1UdHwQyMDAwLqAsoCqGKGh0dHA6Ly93d3cuYW5mLmVzL0FDL1JDL0FORkFDQ0xBU0VBMS5jcmwwFwYKKwYBBAGBjxwTAQQJDAcxMjMtMzIxMDEGCisGAQQBgY8cKgYEIwwhaHR0cHM6Ly93d3cuYW5mLmVzL0FDL0FDVEFTLzU2Nzg5MBYGCSsGAQQBgY8cEwQJDAczMjEtMTIzMB0GA1UdDgQWBBSxTxAznF2uoOtMW+fJUoDN6B+rJDAfBgNVHSMEGDAWgBS+O/a0MbdzJEg5xVcTlHWqn4E/LDANBgkqhkiG9w0BAQUFAAOCAQEATQgYAOwxrMRTT2Nhx7pqiNsoGT5dJmeunAv+iU5zx/VoEXB/mx+VtyLfMea3VS9LC23404XS7pz5oPwiVPLsMPZtzOcmfacVnSdRn5J7+qOO8MB+OVlXq/QmARn+1XeBCHaTQ6AMc/pdveEoGktaXwEjTslWyRD9dGDzLp04+FndQAbVcI5xRkb4vToRnhQmloUVddhQAO8usOAIb00GJFNTq4lsyZ1qT1HplQl+ngsSD1HBxkhx10Pm3KuvCunAh4um0QnSeeiq9qWIV0UZrFlMwNRXvH9OVTqSGC4PXjw2zOi2GLUfags1decu7gcGjidlELR/WHU/6lrztfdViQ==</cert>
+    <!-- Mostrar en la tableta de firma los botones de Aceptar/Repetir/Cancelar - (true-false)-->
+    <showTabletButtons>false</showTabletButtons>
     <!-- DATOS DE LOS FIRMANTES -->
     <bioSigns>
         <!-- Firmante 1 -->
@@ -45,7 +57,12 @@
                 <signerSurname2>López</signerSurname2>
                 <!-- NIE/NIF -->
                 <signerId>12345678Z</signerId>
+                <signerPost></signerPost>
             </signerData>
+            <!-- Cabecera y pie de firma
+            <signHeader>La cabecera</signHeader>
+            <signFooter>El pie de firma</signFooter>
+             -->
             <!-- Interfaz de firma que se muestra en la tableta de firma
             	En este caso solo es necesario modicifar la linea de firma indicando el nombre del firmante.
             	Ejemplo: Fdo. Nombre Apellido1 Apellido2
@@ -92,7 +109,7 @@
                 <y>220</y>
                 <!-- Anchura y altura (width/height) de la firma dentro del documento. -->
                 <width>150</width>
-                <height>50</height>
+                <height>55</height>
             </signatureRubricPositionOnPdf>
             <!-- Pagina en la que se pinta la firma. -->
             <signatureRubricPageOnPdf>1</signatureRubricPageOnPdf>
@@ -109,6 +126,7 @@
                 <signerSurname2>Alvarez</signerSurname2>
                 <!--  NIE/NIF -->
                 <signerId>11111122Y</signerId>
+                <signerPost>Responsable alto</signerPost>
             </signerData>
             <!-- Interfaz de firma que se muestra en la tableta de firma
             	En este caso solo es necesario modicifar la linea de firma indicando el nombre del firmante.
@@ -143,7 +161,7 @@
                 <y>220</y>
                	<!-- Anchura y altura (width/height) de la firma dentro del documento. -->
                 <width>150</width>
-                <height>50</height>
+                <height>55</height>
             </signatureRubricPositionOnPdf>
             <!-- Pagina en la que se pinta la firma. -->
             <signatureRubricPageOnPdf>1</signatureRubricPageOnPdf>
