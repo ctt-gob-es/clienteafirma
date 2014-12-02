@@ -1,0 +1,139 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html> <!-- Ejemplo basico de lanzador de la aplicacion -->
+  <head>
+	<title>Ejemplo de despliegue del MiniApplet @firma</title>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
+	
+	<script type="text/javascript" src="js/miniapplet.js"></script>
+	<script type="text/javascript" src="js_test/deployJava.js"></script>
+	<script type="text/javascript" src="js_test/miniappletTests.js"></script>
+	<script type="text/javascript">
+	<!--
+		var data = null;
+		var partialResult = null;
+		
+		function initTests() {
+			testLoadApplet();
+			testSign();
+		}
+		
+		function testLoadApplet() {
+			MiniApplet.cargarMiniApplet('http://localhost:8080/afirma-ui-miniapplet-deploy');
+			
+			if ("Cliente JavaScript" == MiniApplet.echo()) {
+				document.getElementById("testCard").innerText = "KO";
+				notifyResultTest("CARGA", false);
+				throw new Exception();
+			}
+			// Actualizamos la version de Java a partir de la respuesta del applet que es mas fiable
+			TestEnvironment.updateJavaInfoFromApplet(MiniApplet.echo());
+			
+			document.getElementById("testCarga").innerText = "OK";
+			
+			notifyResultTest("CARGA", true);
+			
+			data = MiniApplet.getBase64FromText("Hola Mundo!!")
+			
+			MiniApplet.setStickySignatory(true);
+		}
+		
+		function testSign() {		
+				MiniApplet.sign(
+					data,
+					"SHA1withRSA",
+					"CAdES",
+					"headless=true",
+					notifySignSuccess,
+					notifySignError);
+		}
+		
+		function testCoSign() {
+			MiniApplet.coSign(
+				partialResult,
+				data,
+				"SHA1withRSA",
+				"CAdES",
+				"headless=true",
+				notifyCoSignSuccess,
+				notifyCoSignError);
+		}
+		
+		function testCounterSign() {
+			MiniApplet.counterSign(
+				partialResult,
+				"SHA1withRSA",
+				"CAdES",
+				"headless=true",
+				notifyCounterSignSuccess,
+				notifyCounterSignError);
+		}
+		
+		function notifySignSuccess(signatureB64) {
+			document.getElementById("testFirma").innerText = "OK";
+			notifyResultTest("FIRMA", true);
+			
+			partialResult = signatureB64;
+			testCoSign();
+		}
+		
+		function notifyCoSignSuccess(signatureB64) {
+			document.getElementById("testCofirma").innerText = "OK";
+			notifyResultTest("COFIRMA", true);
+			
+			partialResult = signatureB64;
+			testCounterSign();
+		}
+		
+		function notifyCounterSignSuccess(signatureB64) {
+			document.getElementById("testContrafirma").innerText = "OK";
+			notifyResultTest("CONTRAFIRMA", true);
+		}
+		
+		function notifySignError(errorType, msg) {
+			document.getElementById("testFirma").innerText = "KO";
+			
+			alert(errorType + ": " + msg);
+			notifyResultTest("FIRMA", false, errorType + ": " + msg);
+		}
+		
+		function notifyCoSignError(errorType, msg) {
+			document.getElementById("testCofirma").innerText = "KO";
+			notifyResultTest("COFIRMA", false, errorType + ": " + msg);
+		}
+		
+		function notifyCounterSignError(errorType, msg) {
+			document.getElementById("testContrafirma").innerText = "KO";
+			notifyResultTest("CONTRAFIRMA", false, errorType + ": " + msg);
+		}
+		
+		function notifyResultTest(operation, result, msg) {
+			MiniAppletTests.notifyResultTest(operation, result, msg);
+		}
+	-->
+	</script>
+  </head>
+	<body>
+		<div>
+			<span>Test Carga: </span><span id="testCarga"></span><br />
+			<span>Test Firma: </span><span id="testFirma"></span><br />
+			<span>Test Cofirma: </span><span id="testCofirma"></span><br />
+			<span>Test Contrafirma: </span><span id="testContrafirma"></span><br />
+		</div>
+		<script type="text/javascript">
+		
+			TestEnvironment.identify(this);
+			initTests();
+			
+
+			/* alert(
+			    'OS: ' + jscd.os +' '+ jscd.osVersion + '\n'+
+			    'Browser: ' + jscd.browser +' '+ jscd.browserVersion + '\n' + 
+			    'Mobile: ' + jscd.mobile + '\n' +
+			    'Flash: ' + jscd.flashVersion + '\n' +
+			    'Cookies: ' + jscd.cookies + '\n' +
+			    'Screen Size: ' + jscd.screen
+			); */
+ 
+		</script>
+	</body>
+</html>	

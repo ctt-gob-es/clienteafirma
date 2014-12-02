@@ -5,7 +5,7 @@
         <meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
 	<script type="text/javascript" src="js/miniapplet.js"></script>
 	<script type="text/javascript">
-	
+
 		function saveSignatureCallback(signatureB64) {
 			MiniApplet.saveDataToFile(
 					signatureB64,
@@ -133,7 +133,7 @@
   </head>
 	<body>
 		<script type="text/javascript">
-			MiniApplet.cargarMiniApplet('http://localhost:8080/afirma-ui-miniapplet-deploy');
+			MiniApplet.cargarMiniApplet('http://172.24.30.55:8080/afirma-ui-miniapplet-deploy');
 		</script>
 
 		<fieldset><legend>Entrada de datos (Opcional)</legend>
@@ -181,7 +181,7 @@
 		 <input type="button" value="Limpiar" onclick="cleanExtraParams();">&nbsp;
 		 <span>(Insertar las propiedades de una en una)</span>
 		 <br>
-		 <textarea id="params" cols="50" rows="5" readonly>serverUrl=http://localhost:8080/afirma-server-triphase-signer/SignatureService
+		 <textarea id="params" cols="50" rows="5" readonly>serverUrl=http://172.24.30.55:8080/afirma-server-triphase-signer/SignatureService
 </textarea>
 		</div>
 		</fieldset>

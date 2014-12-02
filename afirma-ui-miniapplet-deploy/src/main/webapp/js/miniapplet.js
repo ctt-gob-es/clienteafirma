@@ -12,7 +12,9 @@ if (document.all && !window.setTimeout.isPolyfill) {
 
 var MiniApplet = {
 
-		JAR_NAME : 'miniapplet-full_1_2.jar',
+		VERSION : "1.3",
+		
+		JAR_NAME : 'miniapplet-full_1_3.jar',
 
 		JAVA_ARGUMENTS : '-Xms512M -Xmx512M',
 		
@@ -785,7 +787,7 @@ var MiniApplet = {
 			 * Implementada en el applet Java de firma.
 			 */
 			this.getFileNameContentBase64 = function(title, extensions, description) {
-				throwException(UnsupportedOperationException, "La operacion de carga de ficheros no esta soportada");
+				this.throwException(UnsupportedOperationException, "La operacion de carga de ficheros no esta soportada");
 			};
 
 			/**
@@ -793,7 +795,7 @@ var MiniApplet = {
 			 * Implementada en el applet Java de firma.
 			 */
 			this.getMultiFileNameContentBase64 = function(title, extensions, description) {
-				throwException(UnsupportedOperationException, "La operacion de carga de multiples ficheros no esta soportada");
+				this.throwException(UnsupportedOperationException, "La operacion de carga de multiples ficheros no esta soportada");
 			};
 
 			/** 
