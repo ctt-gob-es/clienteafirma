@@ -544,8 +544,10 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
     	Updater.checkForUpdates(null);
 
     	try {
+    		// Invocacion normal modo grafico
     		if (args == null || args.length == 0) {
 
+    			// Solo compruebo en invocacion normal de modo grafico
     			if (!isSimpleAfirmaAlreadyRunning()) {
 
     				final SimpleAfirma saf = new SimpleAfirma();

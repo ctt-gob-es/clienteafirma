@@ -91,7 +91,10 @@ public final class ProtocolInvocationLauncher {
 			showError(SAF_02);
 			return;
 		}
-		if (urlString.startsWith("afirma://save?") || urlString.startsWith("afirma://save/?")) { //$NON-NLS-1$ //$NON-NLS-2$
+		if (urlString.startsWith("afirma://service?") || urlString.startsWith("afirma://service/?")) { //$NON-NLS-1$ //$NON-NLS-2$
+			ServiceInvocationManager.startService(urlString);
+		}
+		else if (urlString.startsWith("afirma://save?") || urlString.startsWith("afirma://save/?")) { //$NON-NLS-1$ //$NON-NLS-2$
 			try {
 				processSave(ProtocolInvocationUriParser.getParametersToSave(urlString));
 			}
