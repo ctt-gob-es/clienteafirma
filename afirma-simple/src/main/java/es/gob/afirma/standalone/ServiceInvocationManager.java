@@ -48,8 +48,17 @@ final class ServiceInvocationManager {
 
 			LOGGER.info("Comando URI recibido por HTTP: " + commandUri); //$NON-NLS-1$
 
+			if (commandUri.startsWith("afirma://service?") || commandUri.startsWith("afirma://service/?")) { //$NON-NLS-1$ //$NON-NLS-2$
+				//TODO: No permitir acceso recursivo
+			}
+
+			final String operationResult = ProtocolInvocationLauncher.launch(commandUri);
+
 			// Gestion de la respuesta
-			final byte[] response = createHttpResponse(true, "RESULTADO");
+			final byte[] response = createHttpResponse(
+				operationResult != null && !operationResult.startsWith("SAF_"), //$NON-NLS-1$
+				operationResult != null ? operationResult : "NULL" //$NON-NLS-1$
+			);
 
 			final ByteBuffer bb = ByteBuffer.allocate(response.length);
 			bb.clear();

@@ -11,10 +11,10 @@ import java.util.logging.Logger;
 
 import javax.security.auth.callback.PasswordCallback;
 import javax.swing.JFileChooser;
-import javax.swing.JOptionPane;
 
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.UrlHttpManagerFactory;
 import es.gob.afirma.core.misc.protocol.ParameterLocalAccessRequestedException;
 import es.gob.afirma.core.misc.protocol.ParameterNeedsUpdatedVersionException;
@@ -42,6 +42,7 @@ public final class ProtocolInvocationLauncher {
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
+	private static final String SAF_00 = "SAF_00"; //$NON-NLS-1$
 	private static final String SAF_01 = "SAF_01"; //$NON-NLS-1$
 	private static final String SAF_02 = "SAF_02"; //$NON-NLS-1$
 	private static final String SAF_03 = "SAF_03"; //$NON-NLS-1$
@@ -59,6 +60,7 @@ public final class ProtocolInvocationLauncher {
 
 	private static final Dictionary<String, String> ERRORS = new Hashtable<String, String>();
 	static {
+		ERRORS.put(SAF_00, ProtocolMessages.getString("ProtocolLauncher.0")); //$NON-NLS-1$
 		ERRORS.put(SAF_01, ProtocolMessages.getString("ProtocolLauncher.1")); //$NON-NLS-1$
 		ERRORS.put(SAF_02, ProtocolMessages.getString("ProtocolLauncher.2")); //$NON-NLS-1$
 		ERRORS.put(SAF_03, ProtocolMessages.getString("ProtocolLauncher.3")); //$NON-NLS-1$
@@ -79,39 +81,44 @@ public final class ProtocolInvocationLauncher {
 
 	private static final String SYNTAX_VERSION = "1_0"; //$NON-NLS-1$
 
+	private static final String RESULT_OK = "OK"; //$NON-NLS-1$
+	private static final String RESULT_CANCEL = "CANCEL"; //$NON-NLS-1$
+
 	/** Lanza la aplicaci&oacute;n y realiza las acciones indicadas en la URL.
-	 * @param urlString URL de invocaci&oacute;n por protocolo */
-	public static void launch(final String urlString)  {
+	 * @param urlString URL de invocaci&oacute;n por protocolo.
+	 * @return Resultado de la operaci&oacute;n. */
+	public static String launch(final String urlString)  {
 
 		if (urlString == null) {
 			showError(SAF_01);
-			return;
+			return null;
 		}
 		if (!urlString.startsWith("afirma://")) { //$NON-NLS-1$
 			showError(SAF_02);
-			return;
+			return SAF_02;
 		}
 		if (urlString.startsWith("afirma://service?") || urlString.startsWith("afirma://service/?")) { //$NON-NLS-1$ //$NON-NLS-2$
 			ServiceInvocationManager.startService(urlString);
+			return RESULT_OK;
 		}
 		else if (urlString.startsWith("afirma://save?") || urlString.startsWith("afirma://save/?")) { //$NON-NLS-1$ //$NON-NLS-2$
 			try {
-				processSave(ProtocolInvocationUriParser.getParametersToSave(urlString));
+				return processSave(ProtocolInvocationUriParser.getParametersToSave(urlString));
 			}
 			catch(final ParameterNeedsUpdatedVersionException e) {
 				LOGGER.severe("Se necesita una version mas moderna de Firma Facil para procesar la peticion: " + e); //$NON-NLS-1$
 				showError(SAF_14);
-				return;
+				return SAF_14;
 			}
 			catch(final ParameterLocalAccessRequestedException e) {
 				LOGGER.severe("Se ha pedido un acceso a una direccion local (localhost o 127.0.0.1): " + e); //$NON-NLS-1$
 				showError(SAF_13);
-				return;
+				return SAF_13;
 			}
 			catch (final Exception e) {
 				LOGGER.severe("Error en los parametros de guardado: " + e); //$NON-NLS-1$
 				showError(SAF_03);
-				return;
+				return SAF_03;
 			}
 		}
 		else if (urlString.startsWith("afirma://sign?")   || urlString.startsWith("afirma://sign/?") || //$NON-NLS-1$ //$NON-NLS-2$
@@ -119,52 +126,51 @@ public final class ProtocolInvocationLauncher {
 				 urlString.startsWith("afirma://countersign?") || urlString.startsWith("afirma://countersign/?") //$NON-NLS-1$ //$NON-NLS-2$
 		) {
 			try {
-				processSign(ProtocolInvocationUriParser.getParametersToSign(urlString));
+				return processSign(ProtocolInvocationUriParser.getParametersToSign(urlString));
 			}
 			catch(final ParameterNeedsUpdatedVersionException e) {
 				LOGGER.severe("Se necesita una version mas moderna de Firma Facil para procesar la peticion: " + e); //$NON-NLS-1$
 				showError(SAF_14);
-				return;
+				return SAF_14;
 			}
 			catch(final ParameterLocalAccessRequestedException e) {
 				LOGGER.severe("Se ha pedido un acceso a una direccion local (localhost o 127.0.0.1): " + e); //$NON-NLS-1$
 				showError(SAF_13);
-				return;
+				return SAF_13;
 			}
 			catch (final Exception e) {
 				LOGGER.severe("Error en los parametros de firma: " + e); //$NON-NLS-1$
 				showError(SAF_03);
-				return;
+				return SAF_03;
 			}
 		}
 		else {
 			showError(SAF_04);
-			return;
+			return SAF_04;
 		}
 
-		System.exit(0);
 	}
 
-	private static void processSign(final UrlParametersToSign options) {
+	private static String processSign(final UrlParametersToSign options) {
 
 		if (options == null) {
 			LOGGER.severe("Las opciones de firma son nulas"); //$NON-NLS-1$
 			showError(SAF_01);
-			return;
+			return SAF_01;
 		}
 
 		final AOSigner signer = AOSignerFactory.getSigner(options.getSignatureFormat());
 		if (signer == null) {
 			LOGGER.severe("No hay un firmador configurado para el formato: " + options.getSignatureFormat()); //$NON-NLS-1$
 			showError(SAF_06);
-			return;
+			return SAF_06;
 		}
 
 		final AOKeyStore aoks = AOKeyStore.getKeyStore(options.getDefaultKeyStore());
 		if (aoks == null) {
 			LOGGER.severe("No hay un KeyStore con el nombre: " + options.getDefaultKeyStore()); //$NON-NLS-1$
 			showError(SAF_07);
-			return;
+			return SAF_07;
 		}
 
 		// Si no hay datos a firmar se los pedimos al usuario
@@ -184,26 +190,21 @@ public final class ProtocolInvocationLauncher {
 			}
 			catch(final AOCancelledOperationException e) {
 				LOGGER.info("carga de datos de firma cancelada por el usuario: " + e); //$NON-NLS-1$
-				return;
+				return RESULT_CANCEL;
 			}
 			try {
 				final InputStream fis = new FileInputStream(selectedDataFile);
 				final byte[] data = AOUtil.getDataFromInputStream(fis);
 				fis.close();
 				if (data == null) {
-					throw new IOException("La lectura de datos para firmar ha devuleto un nulo"); //$NON-NLS-1$
+					throw new IOException("La lectura de datos para firmar ha devuelto un nulo"); //$NON-NLS-1$
 				}
 				options.setData(data);
 			}
 			catch(final Exception e) {
-				AOUIFactory.showErrorMessage(
-					null,
-					ProtocolMessages.getString("ProtocolLauncher.17"), //$NON-NLS-1$
-					ProtocolMessages.getString("ProtocolLauncher.29"), //$NON-NLS-1$
-					JOptionPane.ERROR_MESSAGE
-				);
 				LOGGER.severe("Error en la lectura de los datos a firmar: " + e); //$NON-NLS-1$
-				return;
+				showError(SAF_00);
+				return SAF_00;
 			}
 		}
 
@@ -221,7 +222,7 @@ public final class ProtocolInvocationLauncher {
 		catch (final Exception e3) {
 			LOGGER.severe("Error obteniendo el AOKeyStoreManager: " + e3); //$NON-NLS-1$
 			showError(SAF_08);
-			return;
+			return SAF_08;
 		}
 		final PrivateKeyEntry pke;
 		try {
@@ -230,12 +231,12 @@ public final class ProtocolInvocationLauncher {
 			pke = ksm.getKeyEntry(dialog.getSelectedAlias(), ksm.getType().getCertificatePasswordCallback(null));
 		}
 		catch (final AOCancelledOperationException e) {
-			return;
+			return RESULT_CANCEL;
 		}
 		catch (final Exception e) {
 			LOGGER.severe("Error al mostrar el dialogo de seleccion de certificados: " + e); //$NON-NLS-1$
 			showError(SAF_08);
-			return;
+			return SAF_08;
 		}
 		final byte[] sign;
 		switch(options.getOperation()) {
@@ -252,7 +253,7 @@ public final class ProtocolInvocationLauncher {
 				catch (final Exception e2) {
 					LOGGER.severe("Error en el proceso de firma: " + e2); //$NON-NLS-1$
 					showError(SAF_09);
-					return;
+					return SAF_09;
 				}
 				break;
 			case UrlParametersToSign.OP_COSIGN:
@@ -268,7 +269,7 @@ public final class ProtocolInvocationLauncher {
 				catch (final Exception e1) {
 					LOGGER.severe("Error en el proceso de cofirma: " + e1); //$NON-NLS-1$
 					showError(SAF_09);
-					return;
+					return SAF_09;
 				}
 				break;
 			case UrlParametersToSign.OP_COUNTERSIGN:
@@ -286,34 +287,52 @@ public final class ProtocolInvocationLauncher {
 				catch (final Exception e) {
 					LOGGER.severe("Error en el proceso de contrafirma: " + e); //$NON-NLS-1$
 					showError(SAF_09);
-					return;
+					return SAF_09;
 				}
 				break;
 			default:
 				showError(SAF_04);
-				return;
+				return SAF_04;
 		}
 
 		// Ciframos la firmar resultante
 		final String cipheredDataB64;
-		try {
-			cipheredDataB64 = CypherDataManager.cipherData(sign, options.getDesKey());
+		if (options.getDesKey() != null) {
+			try {
+				cipheredDataB64 = CypherDataManager.cipherData(sign, options.getDesKey());
+			}
+			catch (final Exception e) {
+				LOGGER.severe("Error en el cifrado de la firma: " + e); //$NON-NLS-1$
+				showError(SAF_12);
+				return SAF_12;
+			}
 		}
-		catch (final Exception e) {
-			LOGGER.severe("Error en el cifrado de la firma: " + e); //$NON-NLS-1$
-			showError(SAF_12);
-			return;
+		else {
+			LOGGER.warning(
+				"Se omite el cifrado de los datos resultantes por no haberse proporcionado una clave de cifrado" //$NON-NLS-1$
+			);
+			cipheredDataB64 = Base64.encode(sign);
 		}
 
-		// Enviamos la firma cifrada al servicio remoto de intercambio
-		try {
-			sendData(cipheredDataB64, options);
+		if (options.getStorageServletUrl() != null) {
+			// Enviamos la firma cifrada al servicio remoto de intercambio
+			try {
+				sendData(cipheredDataB64, options);
+			}
+			catch (final Exception e) {
+				LOGGER.severe("Error al enviar los datos al servidor: " + e); //$NON-NLS-1$
+				showError(SAF_11);
+				return SAF_11;
+			}
 		}
-		catch (final Exception e) {
-			LOGGER.severe("Error al enviar los datos al servidor: " + e); //$NON-NLS-1$
-			showError(SAF_11);
-			return;
+		else {
+			LOGGER.info(
+				"Se omite el envio por red de los datos resultantes por no haberse proporcionado una URL de destino" //$NON-NLS-1$
+			);
 		}
+
+		return cipheredDataB64;
+
 	}
 
 	private static void sendData(final String dataB64, final UrlParametersToSign options) throws IOException {
@@ -330,26 +349,27 @@ public final class ProtocolInvocationLauncher {
 		LOGGER.info("Resultado: " + new String(result)); //$NON-NLS-1$
 	}
 
-	private static void processSave(final UrlParametersToSave  options) {
+	private static String processSave(final UrlParametersToSave  options) {
 		try {
 			AOUIFactory.getSaveDataToFile(
 				options.getData(),
 				options.getTitle(),
 				System.getProperty("user.dir"), //$NON-NLS-1$
-				options.getTitle(),
+				options.getFileName(),
 				options.getExtensions() != null ? options.getExtensions().split(",") : null, //$NON-NLS-1$
 				options.getFileTypeDescription(),
 				null
 			);
 		}
 		catch(final AOCancelledOperationException e) {
-			return;
+			return RESULT_CANCEL;
 		}
 		catch (final Exception e) {
 			LOGGER.severe("Error en el salvado de datos: " + e); //$NON-NLS-1$
 			showError(SAF_05);
-			return;
+			return SAF_05;
 		}
+		return RESULT_OK;
 	}
 
 	private static void showError(final String code) {

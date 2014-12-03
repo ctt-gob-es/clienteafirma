@@ -604,6 +604,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
     		else if (args[0].toLowerCase().startsWith(PROTOCOL_URL_START_LOWER_CASE)) {
     			LOGGER.info("Invocacion por protocolo con URL:\n" + args[0]); //$NON-NLS-1$
     			ProtocolInvocationLauncher.launch(args[0]);
+    			System.exit(0);
     		}
     		else {
     			CommandLineLauncher.main(args);
