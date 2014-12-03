@@ -96,7 +96,7 @@ public final class SimpleTest {
 			// Cargamos las dependencias necesarias para la correcta carga
 			// del almacen (en Mac se crean enlaces simbolicos)
 			if (Platform.OS.MACOSX.equals(Platform.getOS())) {
-				MozillaKeyStoreUtilities.configureMacNSS(nssDirectory);
+				MozillaKeyStoreUtilitiesOsX.configureMacNSS(nssDirectory);
 			}
 			else {
 				MozillaKeyStoreUtilities.loadNSSDependencies(nssDirectory);
