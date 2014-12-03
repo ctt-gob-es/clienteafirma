@@ -21,17 +21,12 @@ import java.io.InputStreamReader;
 import java.lang.reflect.InvocationTargetException;
 import java.security.Provider;
 import java.security.Security;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
-
-import javax.script.ScriptEngineManager;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.Platform;
@@ -149,108 +144,6 @@ final class MozillaKeyStoreUtilities {
 
 	}
 
-	private static String getSystemNSSLibDirMacOsX() throws FileNotFoundException {
-
-		final String[] paths =
-			new String[] {
-				"/Applications/Firefox.app/Contents/MacOS", //$NON-NLS-1$
-				"/lib", //$NON-NLS-1$
-				"/usr/lib", //$NON-NLS-1$
-				"/usr/lib/nss", //$NON-NLS-1$
-				"/Applications/Minefield.app/Contents/MacOS" //$NON-NLS-1$
-		};
-
-		for (final String path : paths) {
-			if (new File(path + "/libsoftokn3.dylib").exists()) { //$NON-NLS-1$
-				nssLibDir = path;
-			}
-		}
-
-		if (nssLibDir == null) {
-			throw new FileNotFoundException("No se ha podido determinar la localizacion de NSS en Mac OS X"); //$NON-NLS-1$
-		}
-
-		return nssLibDir;
-	}
-
-	private static String getSystemNSSLibDirUnix() throws FileNotFoundException {
-
-		if (nssLibDir != null && !"".equals(nssLibDir)) { //$NON-NLS-1$
-			return nssLibDir;
-		}
-
-		// *********************************************************************
-		// *********************************************************************
-		// Compobamos antes el caso especifico de NSS partido entre /usr/lib y
-		// /lib, que se da en Fedora
-		if (new File("/usr/lib/" + SOFTOKN3_SO).exists() && new File(LIB_NSPR4_SO).exists()) { //$NON-NLS-1$
-			try {
-				System.load(LIB_NSPR4_SO);
-				nssLibDir = "/usr/lib"; //$NON-NLS-1$
-			}
-			catch (final Exception e) {
-				nssLibDir = null;
-				LOGGER.warning(
-						"Descartamos el NSS situado entre /lib y /usr/lib porque no puede cargarse adecuadamente: " + e //$NON-NLS-1$
-				);
-			}
-			if (nssLibDir != null) {
-				return nssLibDir;
-			}
-		}
-		// *********************************************************************
-		// *********************************************************************
-
-		final String[] paths =
-			new String[] {
-				"/usr/lib/firefox", //$NON-NLS-1$
-				"/usr/lib/firefox-" + searchLastFirefoxVersion("/usr/lib/"), //$NON-NLS-1$ //$NON-NLS-2$
-				"/opt/firefox", //$NON-NLS-1$
-				"/opt/firefox-" + searchLastFirefoxVersion("/opt/"), //$NON-NLS-1$ //$NON-NLS-2$
-				"/lib", //$NON-NLS-1$
-				"/usr/lib", //$NON-NLS-1$
-				"/usr/lib/nss", //$NON-NLS-1$
-				"/usr/lib/i386-linux-gnu/nss", /* En algunos Ubuntu */ //$NON-NLS-1$
-				"/opt/fedora-ds/clients/lib", //$NON-NLS-1$
-				"/opt/google/chrome", /* NSS de Chrome cuando no hay NSS de Mozilla de la misma arquietctura */ //$NON-NLS-1$
-				"/usr/lib/thunderbird", /* Si hay Thunderbird pero no Firefox */ //$NON-NLS-1$
-				"/usr/lib64" /* NSS cuando solo hay Firefox de 64 en el sistema */ //$NON-NLS-1$
-		};
-
-		for (final String path : paths) {
-			String tailingLib = "/libnspr4.so"; //$NON-NLS-1$
-			if (new File(path + "/mozsqlite3.so").exists()) { //$NON-NLS-1$
-				tailingLib = "/mozsqlite3.so"; //$NON-NLS-1$
-			}
-			else if (new File(path + "/libmozsqlite3.so").exists()) { //$NON-NLS-1$
-				tailingLib = "/libmozsqlite3.so"; //$NON-NLS-1$
-			}
-			if (new File(path + "/" + SOFTOKN3_SO).exists() && new File(path + tailingLib).exists()) { //$NON-NLS-1$
-				try {
-					System.load(path + tailingLib);
-					nssLibDir = path;
-				}
-				catch (final Exception e) {
-					nssLibDir = null;
-					LOGGER.warning(
-							"Descartamos el NSS situado en '" + path //$NON-NLS-1$
-							+ "' porque no puede cargarse adecuadamente: " //$NON-NLS-1$
-							+ e
-					);
-				}
-				if (nssLibDir != null) {
-					return nssLibDir;
-				}
-			}
-		}
-
-		if (nssLibDir == null) {
-			throw new FileNotFoundException("No se ha podido determinar la localizacion de NSS en UNIX"); //$NON-NLS-1$
-		}
-
-		return nssLibDir;
-	}
-
 	static String getNssPathFromCompatibilityFile() throws IOException {
 		final File compatibility = new File(getMozillaUserProfileDirectory(), "compatibility.ini");  //$NON-NLS-1$
 		if (compatibility.exists() && compatibility.canRead()) {
@@ -298,21 +191,23 @@ final class MozillaKeyStoreUtilities {
 				final File nssDir = new File(nssLibDir);
 				if (nssDir.isDirectory() && nssDir.canRead()) {
 					LOGGER.info("Directorio de NSS determinado a partir de la variable de entorno '" + AFIRMA_NSS_HOME + "'"); //$NON-NLS-1$ //$NON-NLS-2$
-					return nssLibDir;
 				}
-				LOGGER.warning(
-					"La variable de entorno '" + AFIRMA_NSS_HOME + "' apunta a un directorio que no existe o sobre el que no se tienen permisos de lectura, se ignorara" //$NON-NLS-1$ //$NON-NLS-2$
-				);
+				else {
+					LOGGER.warning(
+						"La variable de entorno '" + AFIRMA_NSS_HOME + "' apunta a un directorio que no existe o sobre el que no se tienen permisos de lectura, se ignorara" //$NON-NLS-1$ //$NON-NLS-2$
+					);
+					nssLibDir = null;
+				}
 			}
 		}
 
 		if (Platform.getOS().equals(Platform.OS.WINDOWS)) {
-			return MozillaKeyStoreUtilitiesWindows.getSystemNSSLibDirWindows();
+			nssLibDir = MozillaKeyStoreUtilitiesWindows.getSystemNSSLibDirWindows();
 		}
 
 		// Probamos con "compatibility.ini" de Firefox solo en Mac, ya que la comprobacion anterior de Windows tambien lo hace
 		// pero comprueba caracteres extranos, cosa que no hay que hacer en Mac
-		if (Platform.OS.WINDOWS.equals(Platform.getOS()) || Platform.OS.MACOSX.equals(Platform.getOS())) {
+		else if (Platform.OS.WINDOWS.equals(Platform.getOS()) || Platform.OS.MACOSX.equals(Platform.getOS())) {
 			try {
 				nssLibDir = getNssPathFromCompatibilityFile();
 			}
@@ -323,64 +218,31 @@ final class MozillaKeyStoreUtilities {
 				final File nssDir = new File(nssLibDir);
 				if (nssDir.isDirectory() && nssDir.canRead()) {
 					LOGGER.info("Directorio de NSS determinado a partir de 'compatibility.ini' de Mozilla"); //$NON-NLS-1$
-					return nssLibDir;
 				}
-				LOGGER.warning(
-					"'compatibility.ini' de Mozilla apunta a un directorio que no existe o sobre el que no se tienen permisos de lectura, se ignorara" //$NON-NLS-1$
-				);
+				else {
+					LOGGER.warning(
+						"'compatibility.ini' de Mozilla apunta a un directorio que no existe o sobre el que no se tienen permisos de lectura, se ignorara" //$NON-NLS-1$
+					);
+					nssLibDir = null;
+				}
 			}
 		}
 
-		if (Platform.getOS().equals(Platform.OS.LINUX) || Platform.getOS().equals(Platform.OS.SOLARIS)) {
-			return getSystemNSSLibDirUnix();
+		else if (Platform.getOS().equals(Platform.OS.LINUX) || Platform.getOS().equals(Platform.OS.SOLARIS)) {
+			nssLibDir = MozillaKeyStoreUtilitiesUnix.getSystemNSSLibDirUnix();
 		}
-		if (Platform.getOS().equals(Platform.OS.MACOSX)) {
-			return getSystemNSSLibDirMacOsX();
+
+		else if (Platform.getOS().equals(Platform.OS.MACOSX)) {
+			nssLibDir = MozillaKeyStoreUtilitiesOsX.getSystemNSSLibDirMacOsX();
+		}
+
+		if (nssLibDir != null) {
+			return nssLibDir;
 		}
 
 		throw new FileNotFoundException(
 				"No se han encontrado bibliotecas NSS instaladas en su sistema operativo" //$NON-NLS-1$
 		);
-	}
-
-	/** Busca la &uacute;ltima versi&oacute;n de Firefox instalada en un sistema
-	 * Linux o Solaris
-	 * @param startDir Directorio de inicio para la b&uacute;squeda
-	 * @return &Uacute;ltima versi&oacute;n instalada en el sistema */
-	private static String searchLastFirefoxVersion(final String startDir) {
-		final File directoryLib = new File(startDir);
-		if (directoryLib.isDirectory()) {
-			final String filenames[] = directoryLib.list();
-			final List<String> firefoxDirectories = new ArrayList<String>();
-			for (final String filename : filenames) {
-				if (filename.startsWith("firefox-")) { //$NON-NLS-1$
-					firefoxDirectories.add(filename.replace("firefox-", "")); //$NON-NLS-1$ //$NON-NLS-2$
-				}
-			}
-			if (firefoxDirectories.isEmpty()) {
-				return ""; //$NON-NLS-1$
-			}
-			for (int i = 0; i < firefoxDirectories.size(); i++) {
-				try {
-					Integer.getInteger(firefoxDirectories.get(i));
-				}
-				catch (final Exception e) {
-					firefoxDirectories.remove(i);
-				}
-			}
-			if (firefoxDirectories.size() == 1) {
-				return firefoxDirectories.get(0);
-			}
-			Collections.sort(firefoxDirectories, new Comparator<String>() {
-				/** {@inheritDoc} */
-				@Override
-				public int compare(final String o1, final String o2) {
-					return o1.compareTo(o2);
-				}
-			});
-			return firefoxDirectories.get(0);
-		}
-		return ""; //$NON-NLS-1$
 	}
 
 	/** Obtiene las rutas completas hacia las bibliotecas (.dll o .so) de los
@@ -605,73 +467,6 @@ final class MozillaKeyStoreUtilities {
 		return dir;
 	}
 
-	static void configureMacNSS(final String binDir) throws AOException {
-
-		if (!Platform.OS.MACOSX.equals(Platform.getOS())) {
-			return;
-		}
-
-		if (binDir == null) {
-			LOGGER.severe("El directorio de NSS para configurar proporcionado es nulo, no se realizara ninguna accion"); //$NON-NLS-1$
-			return;
-		}
-
-		final String nssBinDir = binDir.endsWith("/") ? binDir : binDir + "/"; //$NON-NLS-1$ //$NON-NLS-2$
-
-		// Intentamos la carga, para ver si es necesaria la reconfiguracion
-		try {
-			System.load(nssBinDir + "libsoftokn3.dylib"); //$NON-NLS-1$
-			return; // Si funciona salimos sin hacer nada
-		}
-		catch (final Exception e) {
-			// Se ignora el error
-		}
-		catch(final UnsatisfiedLinkError e) {
-			// Se ignora el error
-		}
-
-		final String[] libs = new String[] {
-				"libmozglue.dylib", // Firefox 11 y superiores //$NON-NLS-1$
-				"libmozutils.dylib", // Firefox 9 y 10 //$NON-NLS-1$
-				"libnspr4.dylib", //$NON-NLS-1$
-				"libplds4.dylib", //$NON-NLS-1$
-				"libplc4.dylib", //$NON-NLS-1$
-				"libnssutil3.dylib", //$NON-NLS-1$
-				"libmozsqlite3.dylib", //$NON-NLS-1$
-				"libnss3.dylib" // Detectado en Firefox 30, quizas se introdujo en versiones anteriores //$NON-NLS-1$
-		};
-
-		// Creamos enlaces simbolicos via AppleScript
-		final StringBuilder sb = new StringBuilder();
-		for (final String lib : libs) {
-			if (new File(nssBinDir + lib).exists()) {
-				sb.append("ln -s "); //$NON-NLS-1$
-				sb.append(nssBinDir);
-				sb.append(lib);
-				sb.append(" /usr/lib/"); //$NON-NLS-1$
-				sb.append(lib);
-				sb.append("; "); //$NON-NLS-1$
-			}
-		}
-		try {
-			new ScriptEngineManager().getEngineByName("AppleScript").eval("do shell script \"" + sb.toString() + "\" with administrator privileges"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		}
-		catch(final Exception e) {
-			LOGGER.severe("No se ha podido crear los enlaces simbolicos para NSS: " + e); //$NON-NLS-1$
-		}
-
-		// Y reintentamos la carga, para ver si ha surtido efecto
-		try {
-			System.load(nssBinDir + "libsoftokn3.dylib"); //$NON-NLS-1$
-		}
-		catch (final Exception e) {
-			throw new AOException("La configuracion de NSS para Mac OS X ha fallado por motivos de seguridad: " + e); //$NON-NLS-1$
-		}
-		catch(final UnsatisfiedLinkError e) {
-			throw new AOException("La configuracion de NSS para Mac OS X ha fallado: " + e); //$NON-NLS-1$
-		}
-	}
-
 	static Provider loadNSS() throws IOException,
 	                                 AOException,
 	                                 InstantiationException,
@@ -700,7 +495,7 @@ final class MozillaKeyStoreUtilities {
 			// Cargamos las dependencias necesarias para la correcta carga
 			// del almacen (en Mac se crean enlaces simbolicos)
 			if (Platform.OS.MACOSX.equals(Platform.getOS())) {
-				MozillaKeyStoreUtilities.configureMacNSS(nssDirectory);
+				MozillaKeyStoreUtilitiesOsX.configureMacNSS(nssDirectory);
 			}
 			else {
 				MozillaKeyStoreUtilities.loadNSSDependencies(nssDirectory);
