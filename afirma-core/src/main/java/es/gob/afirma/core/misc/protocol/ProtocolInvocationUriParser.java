@@ -430,7 +430,7 @@ public final class ProtocolInvocationUriParser {
 	}
 
 	private static String verifyFileTypeDescription(final Map<String, String> params) throws UnsupportedEncodingException {
-		String desc = null;
+		String desc = ProtocoloMessages.getString("ProtocolInvocationUriParser.0") + " (*.*)";  //$NON-NLS-1$//$NON-NLS-2$
 		if (params.containsKey(FILETYPE_DESCRIPTION)) {
 			desc = URLDecoder.decode(params.get(FILETYPE_DESCRIPTION), DEFAULT_URL_ENCODING);
 			// Anadimos las extensiones si fuese preciso
@@ -462,7 +462,7 @@ public final class ProtocolInvocationUriParser {
 	}
 
 	private static String verifyExtensions(final Map<String, String> params) throws UnsupportedEncodingException, ParameterException {
-		String extensions = null;
+		String extensions = "*"; //$NON-NLS-1$
 		if (params.containsKey(FILENAME_EXTS)) {
 			extensions = URLDecoder.decode(params.get(FILENAME_EXTS), DEFAULT_URL_ENCODING);
 			// Determinamos si el nombre tiene algun caracter que no consideremos valido para un nombre de fichero
@@ -479,7 +479,7 @@ public final class ProtocolInvocationUriParser {
 		if (params.containsKey(TITLE_PARAM)) {
 			return URLDecoder.decode(params.get(TITLE_PARAM), DEFAULT_URL_ENCODING);
 		}
-		return null;
+		return ProtocoloMessages.getString("ProtocolInvocationUriParser.1"); //$NON-NLS-1$
 	}
 
 	private static URL verifyRetrieveServletUrl(final Map<String, String> params) throws ParameterException {
@@ -520,8 +520,7 @@ public final class ProtocolInvocationUriParser {
 	/** Extrae y verifica la clave de cifrado de los parametros de entrada. Si no se especifica  se devuelve.
 	 *  @param params Par&aacute;metros extra&iacute;dos de la URI.
 	 *  @return Clave de cifrado o null si no se declar&oacute; en los par&aacute;metros.
-	 *  @throws ParameterException Cuando la clave de cifrado es err&oacute;nea.
-	 */
+	 *  @throws ParameterException Cuando la clave de cifrado es err&oacute;nea. */
 	private static byte[] verifyCipherKey(final Map<String, String> params) throws ParameterException {
 
 		// Comprobamos que se ha especificado la clave de cifrado
