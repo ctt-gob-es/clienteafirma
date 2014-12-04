@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.logging.Logger;
 
+import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 
 import es.gob.afirma.core.AOException;
@@ -66,7 +67,22 @@ final class MozillaKeyStoreUtilitiesOsX {
 			}
 		}
 		try {
-			new ScriptEngineManager().getEngineByName("AppleScript").eval("do shell script \"" + sb.toString() + "\" with administrator privileges"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			// Probamos las dos formas de instanciar el motor AppleScript
+
+			// Nuevo nombre desde OS X Yosemite: AppleScriptEngine
+			ScriptEngine se = new ScriptEngineManager().getEngineByName("AppleScriptEngine"); //$NON-NLS-1$
+			if (se == null) {
+				// Nombre en versiones antiguas de OS X
+				se = new ScriptEngineManager().getEngineByName("AppleScript"); //$NON-NLS-1$
+			}
+			if (se != null) {
+				new ScriptEngineManager().getEngineByName("AppleScript").eval("do shell script \"" + sb.toString() + "\" with administrator privileges"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			}
+			else {
+				LOGGER.severe(
+					"No se ha podido instanciar el motor AppleCript para crear los enlaces simbolicos para NSS" //$NON-NLS-1$
+				);
+			}
 		}
 		catch(final Exception e) {
 			LOGGER.severe("No se ha podido crear los enlaces simbolicos para NSS: " + e); //$NON-NLS-1$

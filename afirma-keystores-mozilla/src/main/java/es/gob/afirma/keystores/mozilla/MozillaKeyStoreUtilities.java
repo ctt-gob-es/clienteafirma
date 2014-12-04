@@ -201,31 +201,8 @@ final class MozillaKeyStoreUtilities {
 			}
 		}
 
-		if (Platform.getOS().equals(Platform.OS.WINDOWS)) {
+		if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
 			nssLibDir = MozillaKeyStoreUtilitiesWindows.getSystemNSSLibDirWindows();
-		}
-
-		// Probamos con "compatibility.ini" de Firefox solo en Mac, ya que la comprobacion anterior de Windows tambien lo hace
-		// pero comprueba caracteres extranos, cosa que no hay que hacer en Mac
-		else if (Platform.OS.WINDOWS.equals(Platform.getOS()) || Platform.OS.MACOSX.equals(Platform.getOS())) {
-			try {
-				nssLibDir = getNssPathFromCompatibilityFile();
-			}
-			catch(final Exception e) {
-				LOGGER.warning("No se ha podido acceder a 'compatibility.ini' de Mozilla: " + e); //$NON-NLS-1$
-			}
-			if (nssLibDir != null) {
-				final File nssDir = new File(nssLibDir);
-				if (nssDir.isDirectory() && nssDir.canRead()) {
-					LOGGER.info("Directorio de NSS determinado a partir de 'compatibility.ini' de Mozilla"); //$NON-NLS-1$
-				}
-				else {
-					LOGGER.warning(
-						"'compatibility.ini' de Mozilla apunta a un directorio que no existe o sobre el que no se tienen permisos de lectura, se ignorara" //$NON-NLS-1$
-					);
-					nssLibDir = null;
-				}
-			}
 		}
 
 		else if (Platform.getOS().equals(Platform.OS.LINUX) || Platform.getOS().equals(Platform.OS.SOLARIS)) {
