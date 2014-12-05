@@ -1,11 +1,15 @@
 package es.gob.afirma.crypto.handwritten;
 
+import java.awt.Component;
 import java.awt.Container;
+import java.io.ByteArrayInputStream;
+import java.security.KeyStore;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.util.logging.Logger;
 
 import javax.swing.JOptionPane;
 
+import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.keystores.AOCertificatesNotFoundException;
@@ -21,14 +25,31 @@ final class BioSignerRunnerKeyHelper {
 
 	static PrivateKeyEntry getKeyFromPkcs12(final String p12File,
 			                                final String p12password,
-			                                final String p12alias) {
-		System.out.println("P12: " + p12File + ", " + p12password + ", " + p12alias); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			                                final String p12alias,
+			                                final Component parent) {
+		try {
+			final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
+			ks.load(
+				new ByteArrayInputStream(Base64.decode(p12File)),
+				p12password.toCharArray()
+			);
+			return (PrivateKeyEntry) ks.getEntry(p12alias, new KeyStore.PasswordProtection(p12password.toCharArray()));
+		}
+		catch(final Exception e) {
+			AOUIFactory.showErrorMessage(
+				parent,
+				HandwrittenMessages.getString("BioSignerRunner.25"), //$NON-NLS-1$
+				HandwrittenMessages.getString("BioSignerRunner.24"), //$NON-NLS-1$
+				JOptionPane.ERROR_MESSAGE
+			);
+		}
+
 		return null;
 
 	}
 
 	static PrivateKeyEntry getKey(final Container parent) {
-		// Obtenemos el gestor del almac&eacute;n de claves (KeyStoreManager)
+		// Obtenemos el gestor del almacen de claves (KeyStoreManager)
 		final AOKeyStoreManager ksm;
 		try {
 			if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
@@ -60,12 +81,13 @@ final class BioSignerRunnerKeyHelper {
 			}
 		}
 		catch(final Exception e) {
+			LOGGER.severe("Error accediendo al gestor de claves: " + e); //$NON-NLS-1$
 			AOUIFactory.showErrorMessage(
-					parent,
-					HandwrittenMessages.getString("BioSignerRunner.25"), //$NON-NLS-1$
-					HandwrittenMessages.getString("BioSignerRunner.24"), //$NON-NLS-1$
-					JOptionPane.ERROR_MESSAGE
-				);
+				parent,
+				HandwrittenMessages.getString("BioSignerRunner.25"), //$NON-NLS-1$
+				HandwrittenMessages.getString("BioSignerRunner.24"), //$NON-NLS-1$
+				JOptionPane.ERROR_MESSAGE
+			);
 			return null;
 		}
 
@@ -74,15 +96,14 @@ final class BioSignerRunnerKeyHelper {
 		try {
 			alias = dialog.show();
 		}
-		catch (AOCertificatesNotFoundException e) {
+		catch (final AOCertificatesNotFoundException e) {
 			LOGGER.warning("Error, no hay certificados para firmar. " + e); //$NON-NLS-1$
-			AOUIFactory
-				.showErrorMessage(
-					parent,
-					HandwrittenMessages.getString("BioSignerRunner.26"), //$NON-NLS-1$
-					HandwrittenMessages.getString("BioSignerRunner.24"), //$NON-NLS-1$
-					JOptionPane.ERROR_MESSAGE
-				);
+			AOUIFactory.showErrorMessage(
+				parent,
+				HandwrittenMessages.getString("BioSignerRunner.26"), //$NON-NLS-1$
+				HandwrittenMessages.getString("BioSignerRunner.24"), //$NON-NLS-1$
+				JOptionPane.ERROR_MESSAGE
+			);
 			return null;
 		}
 
@@ -91,7 +112,7 @@ final class BioSignerRunnerKeyHelper {
 		try {
 			signKey = ksm.getKeyEntry(alias, NullPasswordCallback.getInstance());
 		}
-		catch (Exception e) {
+		catch (final Exception e) {
 			LOGGER.warning("Error accediendo a la clave de firma. " + e); //$NON-NLS-1$
 			AOUIFactory
 				.showErrorMessage(

@@ -272,16 +272,16 @@ public final class BioSignerRunner implements SignaturePadListener {
 				final BioSigner bs = new BioSigner();
 
 				// Obtenemos el modelo de la tableta conectada
-				Tablet tablet = PadUtils.getTablet();
-				String model = PadUtils.getTabletModel(tablet);
+				final Tablet tablet = PadUtils.getTablet();
+				final String model = PadUtils.getTabletModel(tablet);
 				tablet.disconnect();
 
 				LOGGER.info("Modelo de la tableta conectada: " + model); //$NON-NLS-1$
 
 				// Obtenemos la plantilla HTML correspondiente a la tableta conectada
-				String htmlTemplate = TabletTemplateData.getTemplateHtml(sign.getTabletTemplates(), model);
+				final String htmlTemplate = TabletTemplateData.getTemplateHtml(sign.getTabletTemplates(), model);
 				// Obtenemos la plantilla JPEG correspondiente a la tableta conectada
-				byte[] jpegTemplate = TabletTemplateData.getTemplateJPEG(sign.getTabletTemplates(), model);
+				final byte[] jpegTemplate = TabletTemplateData.getTemplateJPEG(sign.getTabletTemplates(), model);
 
 				// Si hay plantilla HTML
 				if (htmlTemplate != null) {
@@ -340,7 +340,9 @@ public final class BioSignerRunner implements SignaturePadListener {
 				.getKeyFromPkcs12(
 					this.signTask.getCompleteCriptoSignPkcs12(),
 					this.signTask.getCompleteCriptoSignPkcs12Password(),
-					this.signTask.getCompleteCriptoSignPkcs12Password());
+					this.signTask.getCompleteCriptoSignPkcs12Password(),
+					this.panel
+			);
 		}
 		else{
 			signKey = BioSignerRunnerKeyHelper.getKey(this.panel);
@@ -362,7 +364,7 @@ public final class BioSignerRunner implements SignaturePadListener {
 				extraParams
 			);
 		}
-		catch (Exception e) {
+		catch (final Exception e) {
 			LOGGER.warning("Error en la firma del funcionario. " + e); //$NON-NLS-1$
 			AOUIFactory
 				.showErrorMessage(
@@ -432,7 +434,7 @@ public final class BioSignerRunner implements SignaturePadListener {
 	/** Muestra la ventana con las tareas de firma. */
 	public void show() {
 
-		JOptionPane j = new JOptionPane(
+		final JOptionPane j = new JOptionPane(
 			this.panel,
 			JOptionPane.DEFAULT_OPTION
 		);
@@ -786,7 +788,7 @@ public final class BioSignerRunner implements SignaturePadListener {
 					throw new IOException("La respuesta del servidor es nula"); //$NON-NLS-1$
 				}
 				if(res != null) {
-					res = res + "\n" + new String(resbytes);
+					res = res + "\n" + new String(resbytes); //$NON-NLS-1$
 				}
 				else {
 					res = new String(resbytes);
@@ -796,7 +798,7 @@ public final class BioSignerRunner implements SignaturePadListener {
 				LOGGER.info("Respuesta del servidor tras el envio del PDF firmado: " + res); //$NON-NLS-1$
 
 			}
-			catch (Exception e) {
+			catch (final Exception e) {
 				LOGGER.warning("Error enviando el PDF al servidor: " + e); //$NON-NLS-1$
 				AOUIFactory
 					.showErrorMessage(
