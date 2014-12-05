@@ -133,4 +133,6 @@ public final class SingleBioSignData {
 	public String getFooter() {
 		return this.signFooter;
 	}
+
+
 }

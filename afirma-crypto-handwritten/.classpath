@@ -9,7 +9,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/afirma-crypto-core-pkcs7"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/afirma-crypto-core-pkcs7-tsp"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/afirma-crypto-pdf"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/afirma-lib-itext"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="lib" path="lib/bcmail-jdk15on-151b18.jar"/>
 	<classpathentry kind="lib" path="lib/bcpkix-jdk15on-151b18.jar"/>
@@ -21,5 +20,7 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/afirma-core-keystores"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/afirma-ui-core-jse-keystores"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/afirma-core"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/afirma-lib-itext"/>
+	<classpathentry kind="lib" path="C:/Java/jdk1.7.0_67/jre/lib/plugin.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

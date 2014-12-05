@@ -24,7 +24,7 @@ public class TestBioSignerRunner {
 			try {
 				xml = new String(AOUtil.getDataFromInputStream(TestSignTask.class.getResourceAsStream("/signTask.xml"))); //$NON-NLS-1$
 
-				new BioSignerRunner(xml).show();
+				new BioSignerRunner(xml, null).show();
 			}
 			catch (Exception e) {
 				e.printStackTrace();
@@ -44,7 +44,7 @@ public class TestBioSignerRunner {
 		try {
 			xml = new String(AOUtil.getDataFromInputStream(TestSignTask.class.getResourceAsStream("/signTask.xml"))); //$NON-NLS-1$
 			LOGGER.info("XML en base64" + Base64.encode(xml.getBytes()));
-			new BioSignerRunner(xml).show();
+			new BioSignerRunner(xml, null).show();
 		}
 		catch (Exception e) {
 			e.printStackTrace();

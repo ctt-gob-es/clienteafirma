@@ -7,12 +7,13 @@ import java.util.logging.Logger;
 import javax.swing.JApplet;
 import javax.swing.JOptionPane;
 
+import netscape.javascript.JSObject;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.ui.AOUIFactory;
 
 /** Applet para abrir la aplicaci&oacute;n de firma en tableta.
  * @author Astrid Idoate */
-public final class HandBioApplet extends JApplet {
+public final class HandBioApplet extends JApplet{
 
 	private static final long serialVersionUID = 4423801785743703642L;
 	String base64XmlTask = null;
@@ -20,6 +21,11 @@ public final class HandBioApplet extends JApplet {
 
 	@Override
 	public void init() {
+
+		setFocusable(false);
+
+		final JSObject window = JSObject.getWindow(this);
+
 		final String xmlTask =  this.getParameter("xmltask"); //$NON-NLS-1$
 		if (xmlTask == null || "".equals(xmlTask)) { //$NON-NLS-1$
 			AOUIFactory.showErrorMessage(
@@ -59,18 +65,23 @@ public final class HandBioApplet extends JApplet {
 	     new PrivilegedAction<Void>() {
 		    @Override
 			public Void run() {
-		    	initProcess();
+		    	initProcess(
+		    		window
+		    	);
 		    	return null;
             }
 		  }
 		);
-
 	}
 
-	void initProcess() {
+	void initProcess(
+			final JSObject windowsRequest
+			) {
+
 		LOGGER.info("Iniciando aplicacion..."); //$NON-NLS-1$
+
 		try {
-			new BioSignerRunner(this.base64XmlTask).show();
+			new BioSignerRunner(this.base64XmlTask, windowsRequest).show();
 		}
 		catch (final IllegalArgumentException e) {
 			LOGGER.severe("La tarea de firma no es correcta: " + e); //$NON-NLS-1$
@@ -80,6 +91,6 @@ public final class HandBioApplet extends JApplet {
 			LOGGER.severe("Error al lanzar la aplicacion de firma en tableta. " + e); //$NON-NLS-1$
 			AOUIFactory.showErrorMessage(this, HandwrittenMessages.getString("HandBioApplet.3"), HandwrittenMessages.getString("HandBioApplet.2"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
 		}
-	}
 
+	}
 }

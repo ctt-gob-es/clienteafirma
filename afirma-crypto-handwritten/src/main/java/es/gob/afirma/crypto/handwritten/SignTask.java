@@ -1,10 +1,12 @@
 package es.gob.afirma.crypto.handwritten;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
@@ -191,6 +193,12 @@ public final class SignTask {
 	/** Obtiene el directorio para escritura de recursos
 	 * @return directorio para escritura de recursos. */
 	public String getWrtDirectory() {
+		if (this.writableDirectory == null ) {
+			return null;
+		}
+		if(!this.writableDirectory.endsWith(File.separator)) {
+			this.writableDirectory = this.writableDirectory + File.separator;
+		}
 		return this.writableDirectory;
 	}
 
@@ -217,6 +225,12 @@ public final class SignTask {
 	 * salva tanto en directorio como en red.
 	 * @return directorio para guardar el PDF generado.*/
 	public String getSaveDirectory() {
+		if(this.saveDirectory == null) {
+			return null;
+		}
+		if(!this.saveDirectory.endsWith(File.separator)) {
+			this.saveDirectory = this.saveDirectory + File.separator;
+		}
 		return this.saveDirectory;
 	}
 
@@ -274,14 +288,28 @@ public final class SignTask {
 
 	/** Obtiene los par&aacute;metros adicionales de la firma final con certificado.
 	 * @return Par&aacute;metros adicionales de la firma final con certificado. */
-	public Map<String, String> getCompleteCriptoSignExtraParams() {
-		return this.completeCriptoSignExtraParams;
+	public Properties getCompleteCriptoSignExtraParams() {
+		Properties p = new Properties();
+		p.putAll(this.completeCriptoSignExtraParams);
+		return p;
 	}
 
 	/**Obtiene el PKCS12 de firma.
 	 * @return PKCS12 de firma. */
 	public String getCompleteCriptoSignPkcs12() {
 		return this.completeCriptoSignPkcs12;
+	}
+
+	/** Indica si se han definido los par&aacute;metros de firma PKCS12 (Pkcas12, Alias y Password).
+	 * 	@return <code>true </code> si se han definido los par&aacute;metros de firma PKCS12 (Pkcas12, Alias y Password),
+	 * 			<code>false</code> en caso contrario. */
+	public boolean hasCompleteCriptoSignPkcs12Params() {
+		if(this.completeCriptoSignPkcs12 != null
+				&& this.completeCriptoSignPkcs12Alias != null
+				&& this.completeCriptoSignPkcs12Password != null) {
+			return true;
+		}
+		return false;
 	}
 
 	/** Obtiene la contraseña de firma del PKCS12.

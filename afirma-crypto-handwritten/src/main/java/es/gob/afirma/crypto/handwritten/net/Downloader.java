@@ -1,6 +1,7 @@
 package es.gob.afirma.crypto.handwritten.net;
 
 import java.awt.BorderLayout;
+import java.awt.Container;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Frame;
@@ -41,13 +42,13 @@ public final class Downloader implements DownloadListener {
 	/** Construye una clase de auda para descarga de ficheros.
 	 * @param parent Padre para la modalidad gr&aacute;fica.
 	 * @param dlistener Clase a la que notificar el resultado de la descarga. */
-	public Downloader(final Frame parent, final DownloadListener dlistener) {
+	public Downloader(final Container parent, final DownloadListener dlistener) {
 		if (dlistener == null) {
 			throw new IllegalArgumentException(
 				"Es obligatorio indicar una clase a la que notificar el resulatdo de la descarga" //$NON-NLS-1$
 			);
 		}
-		this.dlg = new JDialog(parent, HandwrittenMessages.getString("ProgressUrlHttpManagerImpl.1"), true); //$NON-NLS-1$
+		this.dlg = new JDialog(new Frame(), HandwrittenMessages.getString("ProgressUrlHttpManagerImpl.1"), true); //$NON-NLS-1$
 		this.dl = dlistener;
 	}
 

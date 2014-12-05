@@ -4,6 +4,7 @@ import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.Field;
 import java.util.logging.Logger;
@@ -19,6 +20,8 @@ import com.WacomGSS.STU.Protocol.InkingMode;
 import com.WacomGSS.STU.Protocol.PenData;
 import com.WacomGSS.STU.Protocol.ProtocolHelper;
 
+import es.gob.afirma.core.LogManager;
+import es.gob.afirma.core.LogManager.App;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.crypto.handwritten.Rectangle;
@@ -35,10 +38,6 @@ public class PadUtils {
 
 	/** N&uacute;mero m&aacute;ximo re reintentos de reconexi&oacute;n USB. */
 	private static final int RECONNECT_MAX_ATTEMPS = 3;
-
-	static {
-		setLibraryPath();
-	}
 
 	private PadUtils() {
 		// No instanciable
@@ -101,8 +100,42 @@ public class PadUtils {
 		return in;
 	}
 
-	static void setLibraryPath() {
-		final String dir = Platform.getUserHome() + File.separator + ".afirma" + File.separator +  "handwritten" + File.separator + "wacom" + File.separator + "lib" + File.separator + Platform.getOS() + File.separator + Platform.getJavaArch(); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+	/** Definimos el directorio donde se almacenan los logs de la aplicaci&oacute;n.
+	 * @param lPath Directorio donde se almacenan los logs de la aplicaci&oacute;n.
+	 * @throws IOException Excepci&oacute;n. */
+	public static void setLogPath(final String lPath) throws IOException {
+		String logPath = null;
+		if(lPath == null) {
+			logPath = Platform.getUserHome() + File.separator;
+		}
+		else {
+			if(!lPath.endsWith(File.pathSeparator)) {
+				logPath = lPath + File.separator;
+			}
+			else {
+				logPath = lPath;
+			}
+		}
+		LOGGER.info("Log directory: " + logPath); //$NON-NLS-1$
+		LogManager.install(App.HANDWRITTEN, logPath);
+	}
+
+	/** M&eacute;todo para referenciar el directorio en el que se guardan las dlls de WACOM.
+	 * @param basePath	Directorio en el que se guardan las dlls de WACOM.*/
+	public static void setLibraryPath(final String basePath) {
+		final String path;
+		if (basePath == null) {
+			path = Platform.getUserHome() + File.separator;
+		}
+		else {
+			if (basePath.endsWith(File.separator)) {
+				path = basePath;
+			}
+			else {
+				path = basePath + File.separator;
+			}
+		}
+		final String dir = path + ".afirma" + File.separator +  "handwritten" + File.separator + "wacom" + File.separator + "lib" + File.separator + Platform.getOS() + File.separator + Platform.getJavaArch(); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		File f = new File(dir);
 		if (!f.exists()) {
 			f.mkdirs();

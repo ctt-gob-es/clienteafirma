@@ -27,6 +27,12 @@ public final class SignerInfoBean {
 		return this.name + " " + this.surname1 + " " + (this.surname2 != null ? this.surname2 : "") + " (NIF: " + this.id + ")" + " Puesto de trabajo: " + this.signerPost;  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
 	}
 
+	/** Obtiene una cadena de texto espec&iacute;fica para mostrar en los botones de firma.
+	 * @return cadena de texto espec&iacute;fica para mostrar en los botones de firma.*/
+	public String dataToBtn() {
+		return  this.name + " " + this.surname1 + " " + (this.surname2 != null ? this.surname2 : "") + " (NIF: " + this.id + ")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+	}
+
 	/** Constructor de uso restringido a la serializaci&oacute;n JAXB. */
 	@SuppressWarnings("unused")
 	private SignerInfoBean() {
