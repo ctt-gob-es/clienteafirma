@@ -98,47 +98,24 @@ final class MozillaKeyStoreUtilities {
 		// Java 1.5 tenia un metodo indocumentado para acceder a NSS,
 		// http://docs.sun.com/app/docs/doc/819-3671/gcsoc?a=view
 
-		// if (System.getProperty("java.version").startsWith("1.5")) {
 		buffer.append("library=") //$NON-NLS-1$
-		.append(libDir)
-		.append(java.io.File.separator)
-		.append(softoknLib)
-		.append("\n") //$NON-NLS-1$
-		.append("attributes=compatibility\n") //$NON-NLS-1$
-		.append("slot=2\n") //$NON-NLS-1$
-		.append("showInfo=false\n") //$NON-NLS-1$
-		.append("allowSingleThreadedModules=true\n") //$NON-NLS-1$
-		.append("nssArgs=\"") //$NON-NLS-1$
-		.append("configdir='") //$NON-NLS-1$
-		.append(userProfileDirectory)
-		.append("' ") //$NON-NLS-1$
-		.append("certPrefix='' ") //$NON-NLS-1$
-		.append("keyPrefix='' ") //$NON-NLS-1$
-		.append("secmod='secmod.db' ") //$NON-NLS-1$
-		.append("flags='readOnly'") //$NON-NLS-1$
-		.append("\""); //$NON-NLS-1$
-		// //.append("omitInitialize=true");
-		// }
-		// else {
-		// Inicializacion segun Java 6
-		// buffer
-		// .append("nssLibraryDirectory=").append(libDir).append("\r\n")
-		// .append("nssSecmodDirectory=\"").append(userProfileDirectory).append("\"\r\n")
-		// //.append("nssUseSecmod=true\r\n") // No es necesario, con usar
-		// nssLibraryDirectory o nssSecModDirectory ya se activa el modo NSS
-		// .append("nssDbMode=readOnly\r\n")
-		// .append("attributes=compatibility\r\n")
-		// .append("nssModule=keystore\r\n")
-		// //.append("allowSingleThreadedModules=true\r\n");
-		// //.append("nssNetscapeDbWorkaround=true\r\n") // Solo si necesitamos
-		// crear claves privadas
-		// //.append("showInfo=true\r\n")
-		//
-		// ;
-		// }
-
-		// LOGGER.info("Configuracion SunPKCS11 para NSS:\n"
-		// + buffer.toString());
+			.append(libDir)
+			.append(java.io.File.separator)
+			.append(softoknLib)
+			.append("\n") //$NON-NLS-1$
+			.append("attributes=compatibility\n") //$NON-NLS-1$
+			.append("slot=2\n") //$NON-NLS-1$
+			.append("showInfo=false\n") //$NON-NLS-1$
+			.append("allowSingleThreadedModules=true\n") //$NON-NLS-1$
+			.append("nssArgs=\"") //$NON-NLS-1$
+			.append("configdir='") //$NON-NLS-1$
+			.append(userProfileDirectory)
+			.append("' ") //$NON-NLS-1$
+			.append("certPrefix='' ") //$NON-NLS-1$
+			.append("keyPrefix='' ") //$NON-NLS-1$
+			.append("secmod='secmod.db' ") //$NON-NLS-1$
+			.append("flags='readOnly'") //$NON-NLS-1$
+			.append("\""); //$NON-NLS-1$
 
 		return buffer.toString();
 
@@ -171,8 +148,7 @@ final class MozillaKeyStoreUtilities {
 	 * @return Directorio de las bibliotecas NSS del sistema
 	 * @throws FileNotFoundException
 	 *         Si no se puede encontrar NSS en el sistema
-     * @throws IOException En caso de errores de lectura/escritura
-	 *         */
+     * @throws IOException En caso de errores de lectura/escritura */
 	private static String getSystemNSSLibDir() throws IOException {
 
 		if (nssLibDir != null) {
@@ -218,7 +194,7 @@ final class MozillaKeyStoreUtilities {
 		}
 
 		throw new FileNotFoundException(
-				"No se han encontrado bibliotecas NSS instaladas en su sistema operativo" //$NON-NLS-1$
+			"No se han encontrado bibliotecas NSS instaladas en su sistema operativo" //$NON-NLS-1$
 		);
 	}
 
@@ -313,19 +289,19 @@ final class MozillaKeyStoreUtilities {
 		// /lib, que se da en Fedora
 		if (Platform.OS.LINUX.equals(Platform.getOS()) && new File("/usr/lib/" + SOFTOKN3_SO).exists() && new File(LIB_NSPR4_SO).exists()) { //$NON-NLS-1$
 			dependList = new String[] {
-					"/lib/libmozglue.so", //$NON-NLS-1$
-					"/usr/lib/libmozglue.so", //$NON-NLS-1$
-					LIB_NSPR4_SO,
-					"/lib/libplds4.so", //$NON-NLS-1$
-					"/usr/lib/libplds4.so", //$NON-NLS-1$
-					"/lib/libplc4.so", //$NON-NLS-1$
-					"/usr/lib/libplc4.so", //$NON-NLS-1$
-					"/lib/libnssutil3.so", //$NON-NLS-1$
-					"/usr/lib/libnssutil3.so", //$NON-NLS-1$
-					"/lib/libsqlite3.so", //$NON-NLS-1$
-					"/usr/lib/libsqlite3.so", //$NON-NLS-1$
-					"/lib/libmozsqlite3.so", //$NON-NLS-1$
-					"/usr/lib/libmozsqlite3.so" //$NON-NLS-1$
+				"/lib/libmozglue.so", //$NON-NLS-1$
+				"/usr/lib/libmozglue.so", //$NON-NLS-1$
+				LIB_NSPR4_SO,
+				"/lib/libplds4.so", //$NON-NLS-1$
+				"/usr/lib/libplds4.so", //$NON-NLS-1$
+				"/lib/libplc4.so", //$NON-NLS-1$
+				"/usr/lib/libplc4.so", //$NON-NLS-1$
+				"/lib/libnssutil3.so", //$NON-NLS-1$
+				"/usr/lib/libnssutil3.so", //$NON-NLS-1$
+				"/lib/libsqlite3.so", //$NON-NLS-1$
+				"/usr/lib/libsqlite3.so", //$NON-NLS-1$
+				"/lib/libmozsqlite3.so", //$NON-NLS-1$
+				"/usr/lib/libmozsqlite3.so" //$NON-NLS-1$
 			};
 		}
 		else {
@@ -373,12 +349,12 @@ final class MozillaKeyStoreUtilities {
 		}
 		else if (Platform.getOS().equals(Platform.OS.LINUX) || Platform.getOS().equals(Platform.OS.SOLARIS)) {
 			return new String[] {
-					nssPath + "libnspr4.so",     // Firefox 2 y superior //$NON-NLS-1$
-					nssPath + "libplds4.so",     // Firefox 2 y superior //$NON-NLS-1$
-					nssPath + "libplc4.so",      // Firefox 2 y superior //$NON-NLS-1$
-					nssPath + "libnssutil3.so",  // Firefox 2 y superior //$NON-NLS-1$
-					nssPath + "libsqlite3.so",   // Firefox 2            //$NON-NLS-1$
-					nssPath + "libmozsqlite3.so" // Firefox 3 y superior //$NON-NLS-1$
+				nssPath + "libnspr4.so",     // Firefox 2 y superior //$NON-NLS-1$
+				nssPath + "libplds4.so",     // Firefox 2 y superior //$NON-NLS-1$
+				nssPath + "libplc4.so",      // Firefox 2 y superior //$NON-NLS-1$
+				nssPath + "libnssutil3.so",  // Firefox 2 y superior //$NON-NLS-1$
+				nssPath + "libsqlite3.so",   // Firefox 2            //$NON-NLS-1$
+				nssPath + "libmozsqlite3.so" // Firefox 3 y superior //$NON-NLS-1$
 			};
 		}
 
