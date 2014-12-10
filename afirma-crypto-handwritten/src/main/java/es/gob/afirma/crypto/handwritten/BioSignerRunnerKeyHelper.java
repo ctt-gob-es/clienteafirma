@@ -36,6 +36,7 @@ final class BioSignerRunnerKeyHelper {
 			return (PrivateKeyEntry) ks.getEntry(p12alias, new KeyStore.PasswordProtection(p12password.toCharArray()));
 		}
 		catch(final Exception e) {
+			LOGGER.severe("Error en la carga del PKCS12: " + e); //$NON-NLS-1$
 			AOUIFactory.showErrorMessage(
 				parent,
 				HandwrittenMessages.getString("BioSignerRunner.25"), //$NON-NLS-1$

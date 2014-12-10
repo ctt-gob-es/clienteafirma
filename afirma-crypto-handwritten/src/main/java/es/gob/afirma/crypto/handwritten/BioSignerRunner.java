@@ -340,7 +340,7 @@ public final class BioSignerRunner implements SignaturePadListener {
 				.getKeyFromPkcs12(
 					this.signTask.getCompleteCriptoSignPkcs12(),
 					this.signTask.getCompleteCriptoSignPkcs12Password(),
-					this.signTask.getCompleteCriptoSignPkcs12Password(),
+					this.signTask.getCompleteCriptoSignPkcs12Alias(),
 					this.panel
 			);
 		}
@@ -436,11 +436,10 @@ public final class BioSignerRunner implements SignaturePadListener {
 
 		final JOptionPane j = new JOptionPane(
 			this.panel,
-			JOptionPane.DEFAULT_OPTION
-		);
-
-		this.dialog = j.createDialog(j, HandwrittenMessages.getString("BioSignerRunner.19")); //$NON-NLS-1$
-
+			 JOptionPane.PLAIN_MESSAGE, JOptionPane.PLAIN_MESSAGE
+			);
+		j.setOptions(new Object[]{});
+		this.dialog = j.createDialog(null, HandwrittenMessages.getString("BioSignerRunner.19")); //$NON-NLS-1$
 		this.dialog.setSize(new Dimension(450, 100 * (this.signTask.getBioSigns().size() + 1)));
 		this.dialog.setVisible(true);
 
@@ -584,7 +583,12 @@ public final class BioSignerRunner implements SignaturePadListener {
 
 		// Devolvemos un resultado al javascript
 		LOGGER.info("Fin del proceso"); //$NON-NLS-1$
-		this.response.call("response", new Object[] {res}); //$NON-NLS-1$
+		if(this.response != null) {
+			this.response.call("response", new Object[] {res}); //$NON-NLS-1$
+		}
+		else {
+			LOGGER.severe("No existe un JSObject. " + res);
+		}
 	}
 
 	@Override

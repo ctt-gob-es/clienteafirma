@@ -85,13 +85,13 @@ public final class SignTask {
 	@XmlElement(name = "completeCriptoSignExtraParams")
 	private Map<String, String> completeCriptoSignExtraParams;
 
-	@XmlElement(name = "completeCriptoSignpkcs12")
+	@XmlElement(name = "completeCriptoSignPkcs12")
 	private String completeCriptoSignPkcs12;
 
-	@XmlElement(name = "completeCriptoSignpkcs12Password")
+	@XmlElement(name = "completeCriptoSignPkcs12Password")
 	private String completeCriptoSignPkcs12Password;
 
-	@XmlElement(name = "completeCriptoSignpkcs12Alias")
+	@XmlElement(name = "completeCriptoSignPkcs12Alias")
 	private String completeCriptoSignPkcs12Alias;
 
 	/** Construye una tarea de firma vac&iacute;a. */
