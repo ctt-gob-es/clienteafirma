@@ -205,7 +205,7 @@ public final class PdfBuilder {
 
 		// Insertamos el csv
 		// TODO: Descomentar la linea de abajo
-		//csv.applyCsv(pdfStamper);
+		csv.applyCsv(pdfStamper);
 
 		// Cerramos el PDF
 		try {

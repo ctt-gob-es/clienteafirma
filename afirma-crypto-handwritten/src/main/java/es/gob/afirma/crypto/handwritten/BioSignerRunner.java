@@ -587,7 +587,7 @@ public final class BioSignerRunner implements SignaturePadListener {
 			this.response.call("response", new Object[] {res}); //$NON-NLS-1$
 		}
 		else {
-			LOGGER.severe("No existe un JSObject. " + res);
+			LOGGER.severe("No existe un JSObject. " + res); //$NON-NLS-1$
 		}
 	}
 
@@ -635,6 +635,7 @@ public final class BioSignerRunner implements SignaturePadListener {
 			}
 
 			catch (final Exception e) {
+				e.printStackTrace();
 				LOGGER.warning("Error generando el documento PDF firmado. " + e); //$NON-NLS-1$
 				signatureAborted(e, sr.getSignatureId());
 				return;
@@ -663,7 +664,7 @@ public final class BioSignerRunner implements SignaturePadListener {
 		return srList;
 	}
 
-	private void generatePdf() throws IOException {
+	private void generatePdf() {
 
 		final Downloader dwn = new Downloader(this.panel, new DownloadListener() {
 
@@ -724,8 +725,19 @@ public final class BioSignerRunner implements SignaturePadListener {
 
 			}
 		});
-
-		dwn.downloadFile(getSignTask().getRetrieveUrl().toString());
+		if(getSignTask().getRetrieveUrl() == null) {
+			LOGGER.severe("No se ha indicado la url del documento a firmar. "); //$NON-NLS-1$
+			signatureAborted(new IllegalStateException("No se ha indicado la url del documento a firmar. "), null); //$NON-NLS-1$
+			return;
+		}
+		try {
+			dwn.downloadFile(getSignTask().getRetrieveUrl().toString());
+		}
+		catch(final Exception e) {
+			LOGGER.severe("Error en la descarga del documento a firmar: " + e); //$NON-NLS-1$
+			signatureAborted(e, null);
+			return;
+		}
 
 
 	}

@@ -5,7 +5,10 @@ import java.awt.Container;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Frame;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
@@ -15,6 +18,7 @@ import javax.swing.JProgressBar;
 import javax.swing.WindowConstants;
 import javax.swing.border.Border;
 
+import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.crypto.handwritten.HandwrittenMessages;
 
 /** Clase de auda para descarga de ficheros. */
@@ -39,6 +43,8 @@ public final class Downloader implements DownloadListener {
 	private final JDialog dlg;
 	private final DownloadListener dl;
 
+	static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+
 	/** Construye una clase de auda para descarga de ficheros.
 	 * @param parent Padre para la modalidad gr&aacute;fica.
 	 * @param dlistener Clase a la que notificar el resultado de la descarga. */
@@ -57,6 +63,19 @@ public final class Downloader implements DownloadListener {
 	 * @throws IOException Si hay problemas preparando la descarga, los errores durante la
 	 *                     descarga en si se notifican al <i>listener</i>. */
 	public void downloadFile(final String url) throws IOException {
+
+		if (url == null) {
+			throw new IllegalArgumentException("La URL de descarga no puede ser nula"); //$NON-NLS-1$
+		}
+
+		if (url.startsWith("file://")) { //$NON-NLS-1$
+			LOGGER.info("Se ha solicitado apertura de documento local: " + url); //$NON-NLS-1$
+			final InputStream fis = new FileInputStream(url.replace("file://", "")); //$NON-NLS-1$ //$NON-NLS-2$
+			final byte[] data = AOUtil.getDataFromInputStream(fis);
+			fis.close();
+			downloadComplete(data);
+			return;
+		}
 
 		// Mostramos dialogo de espera indeterminado y cambiamos el cursor a reloj de arena
 		this.dlg.setCursor(new Cursor(Cursor.WAIT_CURSOR));
