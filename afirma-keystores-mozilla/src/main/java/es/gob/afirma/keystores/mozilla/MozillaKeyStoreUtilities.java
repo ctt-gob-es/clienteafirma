@@ -56,6 +56,7 @@ final class MozillaKeyStoreUtilities {
 		"dnie_p11_priv.dll", //$NON-NLS-1$
 		"dnie_p11_pub.dll", //$NON-NLS-1$
 		"opensc-pkcs11.dll", //$NON-NLS-1$
+		"libpkcs11-fnmtdnie.so" //$NON-NLS-1$
 	};
 
 	private static final String[][] KNOWN_MODULES = new String[][] {
