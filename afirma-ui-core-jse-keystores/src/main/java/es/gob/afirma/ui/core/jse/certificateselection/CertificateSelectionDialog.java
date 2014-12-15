@@ -56,7 +56,7 @@ public final class CertificateSelectionDialog extends MouseAdapter {
 	    final NameCertificateBean[] certs = this.ksdm.getNameCertificates();
 
 	    Arrays.sort(certs, CERT_NAME_COMPARATOR);
-	    this.csd = new CertificateSelectionPanel(certs);
+	    this.csd = new CertificateSelectionPanel(certs, this);
 		this.optionPane = certs.length > 1 ?
 				new CertOptionPane(this.csd) : new JOptionPane();
 
@@ -97,7 +97,6 @@ public final class CertificateSelectionDialog extends MouseAdapter {
 			certDialog.dispose();
 			return null;
 		}
-
 
 		final String selectedAlias = this.csd.getSelectedCertificateAlias();
 

@@ -66,12 +66,12 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 
 	private NameCertificateBean[] certificateBeans;
 
-	CertificateSelectionPanel(final NameCertificateBean[] el) {
+	CertificateSelectionPanel(final NameCertificateBean[] el, final CertificateSelectionDialog selectionDialog) {
 		this.certificateBeans = el == null ? new NameCertificateBean[0] : el.clone();
-		this.createUI();
+		this.createUI(selectionDialog);
 	}
 
-	private void createUI() {
+	private void createUI(final CertificateSelectionDialog selectionDialog) {
 
 		this.setLayout(new GridBagLayout());
 
@@ -84,6 +84,8 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 		c.weightx = 1.0;
 		c.weighty = 0.0;
 		c.gridy = 0;
+
+		this.add(new UtilToolBar(selectionDialog, this));
 
 		final JLabel mainMessage = new JLabel(
 			CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.0") //$NON-NLS-1$
