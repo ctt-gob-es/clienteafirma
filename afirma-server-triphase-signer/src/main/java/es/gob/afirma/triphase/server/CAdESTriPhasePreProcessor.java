@@ -162,7 +162,7 @@ final class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 			LOGGER.severe("El formato de los datos de sesion suministrados es erroneo: "  + e); //$NON-NLS-1$
 			throw new IllegalArgumentException("El formato de los datos de sesion suministrados es erroneo", e); //$NON-NLS-1$
 		}
-		
+
 		checkSessionProperties(sessionData, false);
 
 		boolean omitContent = false;
@@ -287,7 +287,7 @@ final class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 			LOGGER.severe("El formato de los datos de sesion suministrados es erroneo: "  + e); //$NON-NLS-1$
 			throw new IllegalArgumentException("El formato de los datos de sesion suministrados es erroneo", e); //$NON-NLS-1$
 		}
-		
+
 		checkSessionProperties(sessionData, false);
 
 		byte[] messageDigest = null;
@@ -344,7 +344,7 @@ final class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 				new X509Certificate[] { cert },
 				extraParams,
 				new Date()
-			).getBytes();		
+			).getBytes();
 	}
 
 	@Override
@@ -416,14 +416,14 @@ final class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 			throw new IllegalArgumentException("No se ha encontrado la cadena a sustituir"); //$NON-NLS-1$
 		}
 		final byte[] result = Arrays.copyOf(source, source.length);
-		
-		
-		
+
+
+
 		for (final byte element : replace) {
 			result[p] = element;
 			p++;
 		}
-		
+
 		return result;
 	}
 
@@ -431,16 +431,22 @@ final class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 		if (subArray.length > array.length) {
 			return -1;
 		}
-		final int p = new String(array).indexOf(new String(subArray));
-		if (p != -1) {
-			for (int i = 1; i < subArray.length; i++) {
-				if (array[p + i] != subArray[i]) {
-					return -1;
+		for (int i = 0; i <= (array.length - subArray.length); i++) {
+			if (array[i] == subArray[0]) {
+				int j;
+				for (j = 1; j < subArray.length; j++) {
+					if (array[i + j] != subArray[j]) {
+						break;
+					}
+				}
+				if (j == subArray.length) {
+					return i;
 				}
 			}
 		}
-		return p;
+		return -1;
 	}
+
 
 	/** Comprueba que hayan proporcionado todos los datos de sesi&oacute;n necesarios.
 	 * @param sessionData Properties con los datos de sesi&oacute;n necesarios para una postfirma.
