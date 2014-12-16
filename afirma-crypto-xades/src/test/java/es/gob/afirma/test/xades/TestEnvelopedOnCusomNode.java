@@ -111,7 +111,7 @@ public final class TestEnvelopedOnCusomNode {
 	}
 
 	/** Prueba de XAdES Enveloped sin transformaci&oacute;n XPath extra.
-	 * @throws Exception EN cualquier error. */
+	 * @throws Exception En cualquier error. */
 	@SuppressWarnings("static-method")
 	@Test
 	public void testAvoidXpathExtraTransformsOnEnveloped() throws Exception {
