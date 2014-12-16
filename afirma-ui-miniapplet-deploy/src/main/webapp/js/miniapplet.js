@@ -814,10 +814,6 @@ var MiniApplet = {
 			this.setStickySignatory = function(sticky) {
 				// No hace nada
 			};
-
-			this.getCurrentLog = function () {
-				// No hace nada
-			};
 			
 			/**
 			 * Recupera el mensaje de error asociado al ultimo error capturado.
@@ -840,7 +836,7 @@ var MiniApplet = {
 			 * disponible en el applet, no en las aplicacion moviles.
 			 */
 			this.getCurrentLog = function() {
-				return "El log solo esta disponible en el MiniApplet";
+				return "Applet no cargado";
 			};
 
 			/**
