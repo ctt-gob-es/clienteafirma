@@ -114,7 +114,7 @@ final class AOXMLAdvancedSignature extends XMLAdvancedSignature {
         if (addKeyName) {
 	        newList.add(
 	    		keyInfoFactory.newKeyName(
-    				((X509Certificate) certificates.get(0)).getSubjectX500Principal().toString()
+    				EscapeHelper.escapeLdapName(((X509Certificate) certificates.get(0)).getSubjectX500Principal().toString())
 				)
 			);
         }

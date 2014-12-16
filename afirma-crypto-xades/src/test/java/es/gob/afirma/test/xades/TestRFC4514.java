@@ -16,11 +16,12 @@ import es.gob.afirma.signers.xades.AOXAdESSigner;
 
 /** Pruebas de XAdES Enveloped con inserci&oacute;n de CommitmentTypeIndications.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
-public final class TestCommitmentTypeIndications {
+public final class TestRFC4514 {
 
-    private static final String CERT_PATH = "ANF_con cadena_certificacion.jks"; //$NON-NLS-1$
-    private static final String CERT_PASS = "12341234"; //$NON-NLS-1$
-    private static final String CERT_ALIAS = "anf usuario activo"; //$NON-NLS-1$
+    private static final String CERT_PATH = "Carac_raros.p12"; //$NON-NLS-1$
+    private static final String CERT_PASS = "cacertica08"; //$NON-NLS-1$
+    private static final String CERT_ALIAS = "1"; //$NON-NLS-1$
+    private static final String KEYSTORE_TYPE = "PKCS12"; //$NON-NLS-1$
 
     private static final Properties p3 = new Properties();
     static {
@@ -39,11 +40,11 @@ public final class TestCommitmentTypeIndications {
 	 * @throws Exception En cualquier error. */
 	@SuppressWarnings("static-method")
 	@Test
-	public void testCommitmentTypeIndication() throws Exception {
+	public void testRfc4514() throws Exception {
 
         Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$
         final PrivateKeyEntry pke;
-        final KeyStore ks = KeyStore.getInstance("JKS"); //$NON-NLS-1$
+        final KeyStore ks = KeyStore.getInstance(KEYSTORE_TYPE);
 
         ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH), CERT_PASS.toCharArray());
         pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
