@@ -204,7 +204,7 @@ public final class BioSignerRunner implements SignaturePadListener {
 					}
 					catch(final Exception e) {
 						b.setText(buttonTxt(signerData, ordinal, ERROR_ICON));
-						LOGGER.warning("Error en el proceso de firma."); //$NON-NLS-1$
+						LOGGER.severe("Error en el proceso de firma: " + e); //$NON-NLS-1$
 						getMainFrame().setSize(new Dimension(100,100));
 						AOUIFactory.showErrorMessage(
 							getMainFrame(),
@@ -433,16 +433,14 @@ public final class BioSignerRunner implements SignaturePadListener {
 
 	/** Muestra la ventana con las tareas de firma. */
 	public void show() {
-
 		final JOptionPane j = new JOptionPane(
 			this.panel,
-			 JOptionPane.PLAIN_MESSAGE, JOptionPane.PLAIN_MESSAGE
-			);
+			JOptionPane.PLAIN_MESSAGE, JOptionPane.PLAIN_MESSAGE
+		);
 		j.setOptions(new Object[]{});
 		this.dialog = j.createDialog(null, HandwrittenMessages.getString("BioSignerRunner.19")); //$NON-NLS-1$
 		this.dialog.setSize(new Dimension(450, 100 * (this.signTask.getBioSigns().size() + 1)));
 		this.dialog.setVisible(true);
-
 	}
 
 	private void abortTask(final String signatureId, final Throwable t) {
@@ -731,7 +729,7 @@ public final class BioSignerRunner implements SignaturePadListener {
 			return;
 		}
 		try {
-			dwn.downloadFile(getSignTask().getRetrieveUrl().toString());
+			dwn.downloadFile(getSignTask().getRetrieveUrl());
 		}
 		catch(final Exception e) {
 			LOGGER.severe("Error en la descarga del documento a firmar: " + e); //$NON-NLS-1$
@@ -792,6 +790,7 @@ public final class BioSignerRunner implements SignaturePadListener {
 
 		// URL en la que almacenar el PDF.
 		if(this.signTask.getSaveUrl() != null) {
+			LOGGER.info("URL de guardado de documento: " + this.signTask.getSaveUrl().toString()); //$NON-NLS-1$
 			final String url =
 					this.signTask.getSaveUrl() +
 					"?" + this.signTask.getSaveIdPostParam() + "=" + this.signTask.getSaveId() +  //$NON-NLS-1$//$NON-NLS-2$

@@ -33,9 +33,9 @@
     </tsaParams>
 	<writableDirectory>C:\Temp</writableDirectory>
     <!-- Directorio en la que guardar el documento firmado  -->
-    <retrieveUrl>file://C:/Temp/formulario1.pdf</retrieveUrl>
-    <saveUrl>C:\Temp\SaveDataServlet</saveUrl>
-    <saveUrlPostParam>pdf</saveUrlPostParam>
+    <retrieveUrl>file://C:\Temp\formulario1.pdf</retrieveUrl>
+    <saveUrl></saveUrl>
+    <saveUrlPostParam></saveUrlPostParam>
     <saveId>004</saveId>
     <saveIdPostParam>idd</saveIdPostParam>
     <saveDirectory>C:\Temp\</saveDirectory>

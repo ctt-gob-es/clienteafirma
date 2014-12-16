@@ -96,7 +96,7 @@ public class TestSignTask {
 				null,
 				new Csv(),
 				tsaParams,
-				new URL("http://www.google.com/"), //$NON-NLS-1$
+				"http://www.google.com/", //$NON-NLS-1$
 				new URL("http://www.ibm.es"), //$NON-NLS-1$
 				"C:\\Users\\astrid\\Desktop\\firma\\", //$NON-NLS-1$
 				"PDF firmado test", //$NON-NLS-1$

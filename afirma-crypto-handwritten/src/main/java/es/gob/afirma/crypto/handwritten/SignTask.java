@@ -40,7 +40,7 @@ public final class SignTask {
 	/** URL de recuperaci&oacute;n del PDF, puede ser por red con http:// o https:// o
 	 * local con file:// */
 	@XmlElement(name = "retrieveUrl")
-	private URL retrieveUrl;
+	private String retrieveUrl;
 
 	@XmlElement(name = "saveUrl")
 	private URL saveUrl;
@@ -210,7 +210,7 @@ public final class SignTask {
 
 	/** Obtiene la URL para recuperar el PDF.
 	 * @return URL para recuperar el PDF. */
-	public URL getRetrieveUrl() {
+	public String getRetrieveUrl() {
 		return this.retrieveUrl;
 	}
 
@@ -289,7 +289,7 @@ public final class SignTask {
 	/** Obtiene los par&aacute;metros adicionales de la firma final con certificado.
 	 * @return Par&aacute;metros adicionales de la firma final con certificado. */
 	public Properties getCompleteCriptoSignExtraParams() {
-		Properties p = new Properties();
+		final Properties p = new Properties();
 		p.putAll(this.completeCriptoSignExtraParams);
 		return p;
 	}
@@ -376,7 +376,7 @@ public final class SignTask {
 	public SignTask(final String wrtDir,
 					final Csv csvId,
 			        final SerializableTsaParams tsa,
-					final URL retrieveUrlPdf,
+					final String retrieveUrlPdf,
 					final URL saveUrlPdf,
 					final String saveDir,
 					final String fileName,

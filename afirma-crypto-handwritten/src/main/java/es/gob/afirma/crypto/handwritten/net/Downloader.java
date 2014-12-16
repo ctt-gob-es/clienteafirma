@@ -64,6 +64,8 @@ public final class Downloader implements DownloadListener {
 	 *                     descarga en si se notifican al <i>listener</i>. */
 	public void downloadFile(final String url) throws IOException {
 
+		LOGGER.info("URL de obtencion de documento a firmar: " + url); //$NON-NLS-1$
+
 		if (url == null) {
 			throw new IllegalArgumentException("La URL de descarga no puede ser nula"); //$NON-NLS-1$
 		}
