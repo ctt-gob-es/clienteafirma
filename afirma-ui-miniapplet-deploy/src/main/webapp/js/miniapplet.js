@@ -746,6 +746,7 @@ var MiniApplet = {
 				
 				var i = 0;
 				var params = new Array();
+				params[i++] = {key:"op", value:"save"};
 				if (idSession != null && idSession != undefined) {		params[i++] = {key:"id", value:encodeURIComponent(idSession)}; }
 				if (cipherKey != null && cipherKey != undefined) {		params[i++] = {key:"key", value:encodeURIComponent(cipherKey)}; }
 				if (this.storageServletAddress != null && this.storageServletAddress != undefined) {	params[i++] = {key:"stservlet", value:this.storageServletAddress}; }
