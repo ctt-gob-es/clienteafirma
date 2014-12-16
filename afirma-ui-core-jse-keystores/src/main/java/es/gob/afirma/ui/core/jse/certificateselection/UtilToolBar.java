@@ -1,5 +1,6 @@
 package es.gob.afirma.ui.core.jse.certificateselection;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -15,6 +16,12 @@ final class UtilToolBar extends JToolBar {
 	public UtilToolBar(final CertificateSelectionDialog selectionDialog, final Component parent) {
 
 		setName(CertificateSelectionDialogMessages.getString("UtilToolBar.0")); //$NON-NLS-1$
+		setFloatable(false);
+		setBackground(Color.WHITE);
+
+		getAccessibleContext().setAccessibleDescription(
+			CertificateSelectionDialogMessages.getString("UtilToolBar.0") //$NON-NLS-1$
+		);
 
 		final JButton refresh = new JButton(
 			new ImageIcon(
@@ -34,6 +41,7 @@ final class UtilToolBar extends JToolBar {
 				}
 			}
 		);
+		refresh.setBackground(Color.WHITE);
 		add(refresh);
 
 		final JButton open = new JButton(
@@ -54,6 +62,7 @@ final class UtilToolBar extends JToolBar {
 				}
 			}
 		);
+		open.setBackground(Color.WHITE);
 		add(open);
 
 		final JButton help = new JButton(
@@ -74,6 +83,7 @@ final class UtilToolBar extends JToolBar {
 				}
 			}
 		);
+		help.setBackground(Color.WHITE);
 		add(help);
 
 	}
