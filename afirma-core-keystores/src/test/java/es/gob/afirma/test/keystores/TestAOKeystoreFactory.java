@@ -47,7 +47,7 @@ public class TestAOKeystoreFactory {
      * @throws Exception En cualquier error. */
     @SuppressWarnings("static-method")
 	@Test
-	@Ignore
+	@Ignore // Solo para Windows
     public void testAOKeystoreFactoryCAPI() throws Exception {
     	Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$
     	final AOKeyStoreManager ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(

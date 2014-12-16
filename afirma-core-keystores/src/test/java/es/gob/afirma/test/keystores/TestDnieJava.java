@@ -30,7 +30,7 @@ public class TestDnieJava {
      * @throws Exception En cualquier error. */
     @SuppressWarnings("static-method")
 	@Test
-	@Ignore
+	@Ignore // Necesita un DNIe
     public void testDnieJava() throws Exception {
         Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$
 

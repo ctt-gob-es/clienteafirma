@@ -19,7 +19,7 @@ public final class TestClauerCSP {
 	 * @throws Exception En cualquier error. */
 	@SuppressWarnings("static-method")
 	@Test
-	@Ignore
+	@Ignore // Necesita un CLAUER en Windows
 	public void testCapi() throws Exception {
 
 		final KeyStore ks = KeyStore.getInstance("WINDOWS-MY"); //$NON-NLS-1$

@@ -24,7 +24,7 @@ import es.gob.afirma.keystores.pkcs12.Pkcs12KeyStoreManager;
 public class TestP12MultiPassword {
 
 	/** Prueba un almac&eacute;n PKCS#12 con distintas conttrase&ntilde;as.
-	 * @throws Exception SI ocurrel cualquier problema */
+	 * @throws Exception Si ocurre cualquier problema */
 	@SuppressWarnings("static-method")
 	@Test
 	public void testPkcs12StoreWithMultiplePasswords() throws Exception {
