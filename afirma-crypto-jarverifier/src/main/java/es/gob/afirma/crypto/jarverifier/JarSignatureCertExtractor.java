@@ -225,7 +225,9 @@ public final class JarSignatureCertExtractor {
 				return;
 			}
 			catch (final Exception e) {
-				LOGGER.warning("Error en la validacion de los certificados contra el almacen de Java"); //$NON-NLS-1$
+				LOGGER.warning(
+					"Error en la validacion de los certificados contra el almacen de Java: " + e //$NON-NLS-1$
+				);
 				// Si falla continuamos con el almacen de confianza del usuario
 			}
 		}
