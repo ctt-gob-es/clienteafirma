@@ -10,7 +10,6 @@ import java.security.Security;
 import java.security.Signature;
 import java.util.Enumeration;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import es.gob.afirma.keystores.AOKeyStore;
@@ -22,13 +21,14 @@ import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
 public final class TestPkcs11 {
 
 	//private static final String LIB_NAME = "C:\\WINDOWS\\System32\\DNIe_P11_priv.dll"; //$NON-NLS-1$
-	private static final String LIB_NAME = "C:\\WINDOWS\\SysWOW64\\siecap11.dll"; //$NON-NLS-1$
-	private static final char[] PIN = "1111".toCharArray(); //$NON-NLS-1$
+	//private static final String LIB_NAME = "C:\\WINDOWS\\SysWOW64\\siecap11.dll"; //$NON-NLS-1$
+	//private static final String LIB_NAME = "C:\\Users\\tomas\\workspace_32\\afirma-core-keystores\\src\\test\\resources\\CardOS\\cardos11.dll"; //$NON-NLS-1$
+	private static final String LIB_NAME = "C:\\WINDOWS\\SysWOW64\\cardos11.dll"; //$NON-NLS-1$
+	private static final char[] PIN = "rock2048".toCharArray(); //$NON-NLS-1$
 
 	/** Prueba de firma con PKCS#11.
 	 * @throws Exception En cualquier error. */
 	@SuppressWarnings("static-method")
-	@Ignore
 	@Test
 	public void testPkcs11() throws Exception {
 		final AOKeyStoreManager ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
@@ -55,7 +55,6 @@ public final class TestPkcs11 {
 	 * @throws Exception En cualquier error. */
 	@SuppressWarnings("static-method")
 	@Test
-	@Ignore
 	public void testRawPkcs11() throws Exception {
 
 		final Constructor<?> sunPKCS11Contructor = Class.forName("sun.security.pkcs11.SunPKCS11").getConstructor(InputStream.class); //$NON-NLS-1$
