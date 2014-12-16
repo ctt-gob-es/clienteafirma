@@ -18,6 +18,8 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -29,6 +31,7 @@ import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -83,9 +86,8 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 		c.insets = new Insets(13, 15, 8, 15);
 		c.weightx = 1.0;
 		c.weighty = 0.0;
+		c.gridx = 0;
 		c.gridy = 0;
-
-		this.add(new UtilToolBar(selectionDialog, this));
 
 		final JLabel mainMessage = new JLabel(
 			CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.0") //$NON-NLS-1$
@@ -93,6 +95,112 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 		mainMessage.setFont(TITLE_FONT);
 		mainMessage.setForeground(Color.decode("0x0033BC")); //$NON-NLS-1$
 		this.add(mainMessage, c);
+
+
+
+
+
+
+
+
+
+		c.insets = new Insets(13, 0, 8, 5);
+		c.weightx = 0.0;
+		c.gridx++;
+
+
+		final JButton refresh = new JButton(
+				new ImageIcon(
+					UtilToolBar.class.getResource("/resources/toolbar/ic_autorenew_black_18dp.png"), //$NON-NLS-1$
+					CertificateSelectionDialogMessages.getString("UtilToolBar.1") //$NON-NLS-1$
+				)
+			);
+			refresh.setBorder(BorderFactory.createEmptyBorder());
+			refresh.getAccessibleContext().setAccessibleDescription(
+				CertificateSelectionDialogMessages.getString("UtilToolBar.1") //$NON-NLS-1$
+			);
+			refresh.setToolTipText(CertificateSelectionDialogMessages.getString("UtilToolBar.1")); //$NON-NLS-1$
+			refresh.addActionListener(
+				new ActionListener() {
+					@Override
+					public void actionPerformed(final ActionEvent e) {
+						UtilActions.doRefresh(selectionDialog, CertificateSelectionPanel.this);
+					}
+				}
+			);
+			refresh.setBackground(Color.WHITE);
+			this.add(refresh, c);
+
+			c.gridx++;
+
+			final JButton open = new JButton(
+				new ImageIcon(
+					UtilToolBar.class.getResource("/resources/toolbar/ic_open_in_browser_black_18dp.png"), //$NON-NLS-1$
+					CertificateSelectionDialogMessages.getString("UtilToolBar.2") //$NON-NLS-1$
+				)
+			);
+			open.setBorder(BorderFactory.createEmptyBorder());
+			open.getAccessibleContext().setAccessibleDescription(
+				CertificateSelectionDialogMessages.getString("UtilToolBar.2") //$NON-NLS-1$
+			);
+			open.setToolTipText(CertificateSelectionDialogMessages.getString("UtilToolBar.2")); //$NON-NLS-1$
+			open.addActionListener(
+				new ActionListener() {
+					@Override
+					public void actionPerformed(final ActionEvent e) {
+						UtilActions.doOpen(selectionDialog, CertificateSelectionPanel.this);
+					}
+				}
+			);
+			open.setBackground(Color.WHITE);
+			this.add(open, c);
+
+
+			c.insets = new Insets(13, 0, 8, 15);
+			c.gridx++;
+
+
+			final JButton help = new JButton(
+				new ImageIcon(
+					UtilToolBar.class.getResource("/resources/toolbar/ic_help_black_18dp.png"), //$NON-NLS-1$
+					CertificateSelectionDialogMessages.getString("UtilToolBar.3") //$NON-NLS-1$
+				)
+			);
+			help.setBorder(BorderFactory.createEmptyBorder());
+			help.getAccessibleContext().setAccessibleDescription(
+				CertificateSelectionDialogMessages.getString("UtilToolBar.3") //$NON-NLS-1$
+			);
+			help.setToolTipText(CertificateSelectionDialogMessages.getString("UtilToolBar.3")); //$NON-NLS-1$
+			help.addActionListener(
+				new ActionListener() {
+					@Override
+					public void actionPerformed(final ActionEvent e) {
+						UtilActions.doHelp();
+					}
+				}
+			);
+			help.setBackground(Color.WHITE);
+			this.add(help, c);
+
+
+
+			c.gridwidth = 4;
+			c.gridx = 0;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 		if (this.certificateBeans.length == 1) {
 			c.insets = new Insets(0, 15, 4, 15);
