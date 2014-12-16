@@ -102,6 +102,7 @@ final class UtilActions {
 				CertificateSelectionDialogMessages.getString("CertificateSelectionDispatcherListener.1") + EXTS_DESC, //$NON-NLS-1$
 				false,
 				false,
+				null,
 				parent
 			);
 		}

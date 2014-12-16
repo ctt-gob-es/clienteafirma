@@ -185,6 +185,7 @@ public final class ProtocolInvocationLauncher {
 					ProtocolMessages.getString("ProtocolLauncher.16"), //$NON-NLS-1$
 					false,
 					false,
+					null,
 					null
 				)[0];
 			}

@@ -31,13 +31,11 @@ final class GetFileContentAction implements PrivilegedExceptionAction<byte[]>{
     private final String desc;
     private final Component parent;
 
-    /**
-     * Crea la acci&oacute;n para la carga de ficheros.
+    /** Crea la acci&oacute;n para la carga de ficheros.
      * @param title T&iacute;tulo del di&aacute;logo.
      * @param exts Extensiones de fichero aceptadas por defecto.
      * @param description Descripci&oacute;n del tipo de fichero aceptado por defecto.
-     * @param parent Componente padre sobre el que se mostrar&aacute; el di&aacute;logo.
-     */
+     * @param parent Componente padre sobre el que se mostrar&aacute; el di&aacute;logo. */
     GetFileContentAction(final String title, final String[] exts, final String description,
     		 final Component parent) {
         this.title = title;
@@ -46,13 +44,11 @@ final class GetFileContentAction implements PrivilegedExceptionAction<byte[]>{
         this.parent = parent;
     }
 
-    /**
-     * Muestra al usuario un di&aacute;logo modal para la selecci&oacute;n de un fichero y devuelve
+    /** Muestra al usuario un di&aacute;logo modal para la selecci&oacute;n de un fichero y devuelve
      * su contenido.
      * @return El contenido del fichero.
      * @throws es.gob.afirma.core.AOCancelledOperationException Cuando se cancela la operacion de selecci&oacute;n.
-     * @throws IOException Cuando se produce un error al leer el fichero.
-     */
+     * @throws IOException Cuando se produce un error al leer el fichero. */
 	@Override
 	public byte[] run() throws IOException {
 		final InputStream is = new FileInputStream(AOUIFactory.getLoadFiles(
@@ -63,6 +59,7 @@ final class GetFileContentAction implements PrivilegedExceptionAction<byte[]>{
 			this.desc,
 			false,
 			false,
+			null,
 			this.parent
 		)[0]);
     	final byte[] data = AOUtil.getDataFromInputStream(is);

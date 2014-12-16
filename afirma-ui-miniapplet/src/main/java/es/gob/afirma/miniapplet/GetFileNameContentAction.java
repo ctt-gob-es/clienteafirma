@@ -84,6 +84,7 @@ final class GetFileNameContentAction implements PrivilegedExceptionAction<String
 			this.desc,
 			false,	//Seleccionar directorios
 			this.multiSel,
+			null,
 			this.parent
 		);
 

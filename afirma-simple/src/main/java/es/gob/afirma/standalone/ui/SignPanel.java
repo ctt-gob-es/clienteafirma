@@ -496,6 +496,7 @@ public final class SignPanel extends JPanel {
 	                		null,
 	                		false,
 	                		false,
+	                		null,
 	                		UpperPanel.this
 	            		)[0];
                 	}

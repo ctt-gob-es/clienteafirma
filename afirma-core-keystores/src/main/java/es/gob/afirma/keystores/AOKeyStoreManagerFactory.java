@@ -163,6 +163,7 @@ public final class AOKeyStoreManagerFactory {
         		desc,
         		false,
         		false,
+        		null,
         		parentComponent
     		)[0].getAbsolutePath();
             if (storeFilename == null) {
@@ -215,6 +216,7 @@ public final class AOKeyStoreManagerFactory {
     				desc,
     				false,
     				false,
+    				null,
     				parentComponent
     				)[0].getAbsolutePath();
     		if (storeFilename == null) {
@@ -294,6 +296,7 @@ public final class AOKeyStoreManagerFactory {
         		desc,
         		false,
         		false,
+        		null,
         		parentComponent
     		)[0].getAbsolutePath();
             if (storeFilename == null) {
@@ -359,6 +362,7 @@ public final class AOKeyStoreManagerFactory {
 	             extsDesc,
 	             false,
 	             false,
+	             null,
 	             parentComponent
             )[0].getAbsolutePath();
         }

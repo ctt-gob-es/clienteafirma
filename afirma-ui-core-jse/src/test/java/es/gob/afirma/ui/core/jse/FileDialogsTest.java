@@ -13,10 +13,10 @@ public final class FileDialogsTest {
 	 * @param args Argumentos.
 	 * @throws IOException Cuando ocurre un error al leer los datos. */
 	public static void main(final String[] args) throws IOException {
-		for (final File f : AOUIFactory.getLoadFiles("Seleccion multiple de ficheros", null, null, new String[] {"txt"}, "Ficheros de texto (*.txt)", false, true, null)) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		for (final File f : AOUIFactory.getLoadFiles("Seleccion multiple de ficheros", null, null, new String[] { "txt", "log" }, "Ficheros de texto (*.txt, *.log)", false, true, null, null)) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			System.out.println(f.getAbsolutePath());
 		}
-		for (final File f : AOUIFactory.getLoadFiles("Seleccion de fichero", null, null, new String[] {"txt"}, "Fichero de texto (*.txt)", false, false, null)) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		for (final File f : AOUIFactory.getLoadFiles("Seleccion de fichero", null, null, new String[] { "txt", "log" }, "Ficheros de texto (*.txt, *.log)", false, false, null, null)) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			System.out.println(f.getAbsolutePath());
 		}
 		System.out.println(AOUIFactory.getSaveDataToFile(

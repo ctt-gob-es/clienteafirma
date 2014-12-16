@@ -180,6 +180,7 @@ public class VisorFirma extends JApplet implements WindowListener {
 				null,
 				false,
 				false,
+				null,
 				VisorFirma.this.window
 			)[0];
     	}

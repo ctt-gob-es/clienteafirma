@@ -10,6 +10,7 @@
 
 package es.gob.afirma.core.ui;
 
+import java.awt.Image;
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.Logger;
@@ -218,6 +219,9 @@ public final class AOUIFactory {
      * 					  {@code multiselect} se ignorar&aacute;.
      * @param multiSelect {@code true} para permitir selecci&oacute;n m&uacute;ltiple, {@code false}
      *                    para selecci&oacute;n de un &uacute;nico fichero
+     * @param icon Icono del di&aacute;logo de selecci&oacute;n.
+     *             Si se especifica <code>null</code> y se indica un <code>Frame</code> como padre se
+     *             hereda el icono de este.
      * @param parentComponent Componente padre (para la modalidad)
      * @return Nombre de fichero (con ruta) seleccionado por el usuario */
     public static File[] getLoadFiles(final String dialogTitle,
@@ -227,8 +231,9 @@ public final class AOUIFactory {
     		                               final String description,
     		                               final boolean selectDirectory,
     		                               final boolean multiSelect,
+    		                               final Image icon,
     		                               final Object parentComponent) {
-        return uiManager.getLoadFiles(dialogTitle, currentDir, filename, extensions, description, selectDirectory, multiSelect, parentComponent);
+        return uiManager.getLoadFiles(dialogTitle, currentDir, filename, extensions, description, selectDirectory, multiSelect, icon, parentComponent);
     }
 
     /** Pregunta al usuario por la localizaci&oacute;n en la que se desean guardar

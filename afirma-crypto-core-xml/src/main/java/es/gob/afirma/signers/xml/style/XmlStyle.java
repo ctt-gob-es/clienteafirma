@@ -217,14 +217,15 @@ public final class XmlStyle {
             		final File xmlStyleFile;
             		try {
 	            		xmlStyleFile = AOUIFactory.getLoadFiles(
-	            				XmlStyleMessages.getString("XmlStyle.7"), //$NON-NLS-1$
-	            				null,
-	            				fileName,
-	            				null,
-	            				XmlStyleMessages.getString("XmlStyle.8", fileName), //$NON-NLS-1$
-	            				false,
-	            				false,
-	            				null
+            				XmlStyleMessages.getString("XmlStyle.7"), //$NON-NLS-1$
+            				null,
+            				fileName,
+            				null,
+            				XmlStyleMessages.getString("XmlStyle.8", fileName), //$NON-NLS-1$
+            				false,
+            				false,
+            				null,
+            				null
 	            		)[0];
             		}
             		catch(final AOCancelledOperationException ex) {

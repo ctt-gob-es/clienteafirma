@@ -10,6 +10,7 @@
 
 package es.gob.afirma.core.ui;
 
+import java.awt.Image;
 import java.io.File;
 import java.io.IOException;
 
@@ -134,10 +135,21 @@ public interface AOUIManager {
      * 					  {@code multiselect} se ignorar&aacute;.
      * @param multiSelect {@code true} para permitir selecci&oacute;n m&uacute;ltiple, {@code false}
      *                    para selecci&oacute;n de un &uacute;nico fichero
+     * @param icon Icono del di&aacute;logo de selecci&oacute;n.
+     *             Si se especifica <code>null</code> y se indica un <code>Frame</code> como padre se
+     *             hereda el icono de este.
      * @param parentComponent
      *        Componente padre (para la modalidad)
      * @return Nombre de fichero (con ruta) seleccionado por el usuario */
-    File[] getLoadFiles(String dialogTitle, String currentDir, String filename, String[] extensions, String description, boolean selectDirectory, boolean multiSelect, Object parentComponent);
+    File[] getLoadFiles(String dialogTitle,
+    		            String currentDir,
+    		            String filename,
+    		            String[] extensions,
+    		            String description,
+    		            boolean selectDirectory,
+    		            boolean multiSelect,
+    		            Image icon,
+    		            Object parentComponent);
 
     /** Muestra un di&aacute;logo de guardado para almacenar los datos indicados.
      * Los datos ser&aacute;n almacenados en el directorio y con el nombre que

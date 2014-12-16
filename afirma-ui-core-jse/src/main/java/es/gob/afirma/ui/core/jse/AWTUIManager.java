@@ -12,6 +12,7 @@ package es.gob.afirma.ui.core.jse;
 
 import java.awt.FileDialog;
 import java.awt.Frame;
+import java.awt.Image;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
@@ -99,6 +100,7 @@ public final class AWTUIManager extends JSEUIManager {
 			                  final String description,
 			                  final boolean selectDirectory,
 			                  final boolean multiSelect,
+			                  final Image icon,
 			                  final Object parent) {
         final FileDialog fd = new FileDialog(parent instanceof Frame ? (Frame) parent : null, dialogTitle);
         fd.setMode(FileDialog.LOAD);
@@ -116,7 +118,7 @@ public final class AWTUIManager extends JSEUIManager {
         		setMultipleModeMethod.invoke(fd, Boolean.valueOf(multiSelect));
         	} catch (final Exception e) {
         		LOGGER.warning("No es posible utilizar la seleccion multiple de ficheros con los dialogos del sistema con versiones anteriores de Java 7, se utilizara Swing"); //$NON-NLS-1$
-        		return super.getLoadFiles(dialogTitle, currentDir, filename, extensions, description, selectDirectory, multiSelect, parent);
+        		return super.getLoadFiles(dialogTitle, currentDir, filename, extensions, description, selectDirectory, multiSelect, icon, parent);
         	}
         }
         if (filename != null) {

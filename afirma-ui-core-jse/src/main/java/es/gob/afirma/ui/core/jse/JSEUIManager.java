@@ -14,6 +14,8 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.HeadlessException;
+import java.awt.Image;
 import java.awt.Toolkit;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -24,6 +26,7 @@ import java.lang.reflect.Method;
 import java.util.logging.Logger;
 
 import javax.swing.Icon;
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -356,16 +359,7 @@ public class JSEUIManager implements AOUIManager {
         return JOptionPane.QUESTION_MESSAGE;
     }
 
-    /** Permite al usuario seleccionar ficheros o directorios.
-     * @param dialogTitle T&iacute;tulo de la ventana de di&aacute;logo.
-     * @param extensions Extensiones predeterminadas para el fichero
-     * @param description Descripci&oacute;n del tipo de fichero correspondiente con las extensiones
-     * @param parent Componente padre (para la modalidad)
-     * @param selectDirectory Selecci&oacute;n de directorios.
-     * @param multiSelect <code>true</code> para permitir selecci&oacute;n m&uacute;ltiple, <code>false</code>
-     *                    para selecci&oacute;n de un &uacute;nico fichero
-     * @return Nombre de fichero (con ruta) seleccionado por el usuario
-     * @throws AOCancelledOperationException Si el usuario cancela la operaci&oacute;n. */
+    /** {@inheritDoc} */
     @Override
 	public File[] getLoadFiles(final String dialogTitle,
 								    final String currentDir,
@@ -374,13 +368,28 @@ public class JSEUIManager implements AOUIManager {
                                     final String description,
                                     final boolean selectDirectory,
                                     final boolean multiSelect,
+                                    final Image icon,
                                     final Object parent) {
         Component parentComponent = null;
         if (parent instanceof Component) {
             parentComponent = (Component) parent;
         }
 
-        final JFileChooser jfc = new JFileChooser();
+        final JFileChooser jfc;
+        if (icon != null) {
+        	jfc = new JFileChooser() {
+			private static final long serialVersionUID = 5631612687512882773L;
+			   @Override
+			    protected JDialog createDialog(final Component p) throws HeadlessException {
+			        final JDialog dialog = super.createDialog(p);
+			        dialog.setIconImage(icon);
+			        return dialog;
+			    }
+        	};
+        }
+        else {
+        	jfc = new JFileChooser();
+        }
         if (selectDirectory) {
         	jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         }
@@ -417,20 +426,7 @@ public class JSEUIManager implements AOUIManager {
         throw new AOCancelledOperationException();
     }
 
-    /** Muestra un di&aacute;logo de guardado para almacenar los datos indicados.
-     * Los datos ser&aacute;n almacenados en el directorio y con el nombre que
-     * indique el usuario. Si el fichero ya existe se le preguntar&aacute; al
-     * usuario si desea sobreescribirlo. Si la operaci&oacute;n finaliza correctamente se
-     * devolver&aacute; el path completo del fichero.
-     * @param data Datos que se desean almacenar.
-     * @param selectedFile Nombre de fichero por defecto.
-     * @param exts Extensiones de fichero aceptadas.
-     * @param description Descripci&oacute;n del tipo de fichero a guardar.
-     * @param parent Componente padre sobre el que se mostrar&aacute; el
-     *        di&aacute;logo de guardado.
-     * @return Fichero guardado.
-     * @throws IOException Si no se puede guardar el fichero
-     * @throws AOCancelledOperationException Si el usuario cancela la operaci&oacute;n. */
+    /** {@inheritDoc} */
     @Override
 	public File saveDataToFile(final byte[] data,
 							   final String dialogTitle,

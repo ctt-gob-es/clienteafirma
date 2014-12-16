@@ -139,6 +139,7 @@ public final class MainMenu extends JMenuBar {
 	            			null,
 	            			false,
 	            			false,
+	            			null,
 	            			MainMenu.this
 	        			)[0];
 	            	}
