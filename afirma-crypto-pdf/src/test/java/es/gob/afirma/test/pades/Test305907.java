@@ -25,7 +25,7 @@ public final class Test305907 {
 	private final static String CERT_ALIAS = "anf usuario activo"; //$NON-NLS-1$
 
 	/** Prueba de detecci&oacute;n de firmas no registradas.
-	 * @throws Exception EN cualquier error. */
+	 * @throws Exception En cualquier error. */
 	@SuppressWarnings("static-method")
 	@Test
 	public void testReadRaw() throws Exception {
