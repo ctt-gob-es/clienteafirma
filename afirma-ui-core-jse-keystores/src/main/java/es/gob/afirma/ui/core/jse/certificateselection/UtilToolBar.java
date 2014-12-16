@@ -13,7 +13,7 @@ final class UtilToolBar extends JToolBar {
 
 	private static final long serialVersionUID = 4971993407723910690L;
 
-	public UtilToolBar(final CertificateSelectionDialog selectionDialog, final Component parent) {
+	UtilToolBar(final CertificateSelectionDialog selectionDialog, final Component parent) {
 
 		setName(CertificateSelectionDialogMessages.getString("UtilToolBar.0")); //$NON-NLS-1$
 		setFloatable(false);
