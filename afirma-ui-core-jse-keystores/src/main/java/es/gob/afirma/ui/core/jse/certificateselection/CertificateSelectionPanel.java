@@ -116,6 +116,7 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 				)
 			);
 			refresh.setBorder(BorderFactory.createEmptyBorder());
+			refresh.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 			refresh.getAccessibleContext().setAccessibleDescription(
 				CertificateSelectionDialogMessages.getString("UtilToolBar.1") //$NON-NLS-1$
 			);
@@ -140,6 +141,7 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 				)
 			);
 			open.setBorder(BorderFactory.createEmptyBorder());
+			open.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 			open.getAccessibleContext().setAccessibleDescription(
 				CertificateSelectionDialogMessages.getString("UtilToolBar.2") //$NON-NLS-1$
 			);
@@ -167,6 +169,7 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 				)
 			);
 			help.setBorder(BorderFactory.createEmptyBorder());
+			help.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 			help.getAccessibleContext().setAccessibleDescription(
 				CertificateSelectionDialogMessages.getString("UtilToolBar.3") //$NON-NLS-1$
 			);
