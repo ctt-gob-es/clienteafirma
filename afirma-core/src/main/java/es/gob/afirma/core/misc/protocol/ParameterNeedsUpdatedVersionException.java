@@ -1,6 +1,6 @@
 package es.gob.afirma.core.misc.protocol;
 
-/** Error que indica que se necesita una versi&oacte;n m&aacute;s actualizada del aplicativo.
+/** Error que indica que se necesita una versi&oacute;n m&aacute;s actualizada del aplicativo.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public final class ParameterNeedsUpdatedVersionException extends ParameterException {
 
