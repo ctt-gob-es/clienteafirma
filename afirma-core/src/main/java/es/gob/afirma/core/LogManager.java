@@ -39,7 +39,9 @@ public final class LogManager {
 		OTHER
 	}
 
-	private static final String LOG_FILE = "%h/.afirma/%a.afirma.log.xml"; //$NON-NLS-1$
+	private static final String LOG_FILE_NAME = "%a.afirma.log.xml"; //$NON-NLS-1$
+	private static final String LOG_FILE_PATH = "%h/.afirma"; //$NON-NLS-1$
+
 	private static final int LOG_MAX_SIZE = 1024 * 1024 * 2;
 
 	private static boolean installed = false;
@@ -65,6 +67,8 @@ public final class LogManager {
 	 * @throws java.lang.SecurityException Si no hay permisos para instalar el gestor de registro.
 	 * @throws IOException En caso de errores de entrada / salida. */
 	public static void install(final App app, final String logFilePath) throws IOException {
+
+		// Aplicacion del log
 		if (app == null) {
 			application = App.OTHER;
 		}
@@ -72,30 +76,41 @@ public final class LogManager {
 			application = app;
 		}
 
+		// Ruta del fichero
 		if (logFilePath == null) {
-			logFile = LOG_FILE.replace("%a", application.toString()); //$NON-NLS-1$
+			logFile = LOG_FILE_PATH.replace("%h", Platform.getUserHome()) + //$NON-NLS-1$
+				"/" + //$NON-NLS-1$
+					LOG_FILE_NAME.replace("%a", application.toString()); //$NON-NLS-1$
 		}
 		else {
-			logFile = logFilePath.replace("\\", "/") + (logFilePath.endsWith("/") ? "" : "/") + application + ".afirma.log.xml"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
+			logFile = (logFilePath.replace("\\", "/") + //$NON-NLS-1$ //$NON-NLS-2$
+				(logFilePath.endsWith("/") ? "" : "/") + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+					application + ".afirma.log.xml") //$NON-NLS-1$
+						.replace("%h", Platform.getUserHome()); //$NON-NLS-1$
+		}
+		final File path = new File(new File(logFile).getParent());
+		if (!path.exists()) {
+			LOGGER.info("La ruta para el fichero de registro ('" + path + "') no existe, se creara");  //$NON-NLS-1$//$NON-NLS-2$
+			if (!path.mkdirs()) {
+				LOGGER.severe("No se ha podido crear la ruta para el fichero de registro ('" + path + "')"); //$NON-NLS-1$ //$NON-NLS-2$
+			}
 		}
 		LOGGER.addHandler(createFileHandler(logFile));
 		installed = true;
 	}
 
-	/**
-	 * Crea un manejador para el guardado de log en fichero.
+	/** Crea un manejador para el guardado de log en fichero.
 	 * @param logFileString Fichero de registro (con ruta) a usar, seg&uacute;n la norma de codificaci&oacute;n
 	 *                      de <i>Java Logging API</i> para los c&oacute;digos de directorios.
 	 * @return Manejador de log en fichero.
-	 * @throws IOException Cuando ocurren errores al crear o utilizar el fichero.
-	 */
+	 * @throws IOException Cuando ocurren errores al crear o utilizar el fichero. */
 	private static FileHandler createFileHandler(final String logFileString) throws IOException {
 		return new FileHandler(
-				logFileString,
-				LOG_MAX_SIZE,
-				1,
-				false
-			);
+			logFileString,
+			LOG_MAX_SIZE,
+			1,
+			false
+		);
 	}
 
 	/** Obtiene, en formato XML, el registro acumulado de la ejecuci&oacute;n actual.
