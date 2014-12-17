@@ -25,7 +25,7 @@ public class CertificateSelectionDialogTest {
 
 		final AOKeyStoreManager ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
 				AOKeyStore.PKCS12,
-				ClassLoader.getSystemResource(CERT_PATH).toString().replace("file:/", ""),
+				ClassLoader.getSystemResource(CERT_PATH).toString().replace("file:/", ""), //$NON-NLS-1$ //$NON-NLS-2$
 				null,
 				new CachePasswordCallback(CERT_PASS.toCharArray()),
 				null);
@@ -33,7 +33,7 @@ public class CertificateSelectionDialogTest {
 		final AOKeyStoreDialog dialog = new AOKeyStoreDialog(ksm, null, true, true, false);
 		final String alias = dialog.show();
 
-		System.out.println("Certificado:\n" + ksm.getCertificate(alias));
+		System.out.println("Certificado:\n" + ksm.getCertificate(alias)); //$NON-NLS-1$
 	}
 
 //	/** Para pruebas sin JUnit
