@@ -10,27 +10,20 @@
 
 package es.gob.afirma.miniapplet;
 
-import java.io.IOException;
 import java.security.PrivilegedAction;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.LogManager;
 
-/**
- * Acci&oacute;n para recuperar el log generado por la aplicaci&oacute;n.
- * @author Carlos Gamuci Mill&aacute;n
- */
+/** Acci&oacute;n para recuperar el log generado por la aplicaci&oacute;n.
+ * @author Carlos Gamuci Mill&aacute;n. */
 final class GetCurrentLogAction implements PrivilegedAction<String> {
 
-    /**
-     * Obtiene el registro generado por la aplicaci&oacute;n desde su inicio o desde
+    /** Obtiene el registro generado por la aplicaci&oacute;n desde su inicio o desde
      * que se recuper&oacute; por &uacute;ltima vez.
-     * @return Registro generado por la aplicaci&oacute;n.
-     * @throws IOException Cuando se produce un error al obtener el registro.
-     */
+     * @return Registro generado por la aplicaci&oacute;n. */
 	@Override
 	public String run() {
-		
 		try {
 			return LogManager.getLogFile();
 		}
