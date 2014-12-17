@@ -7,7 +7,6 @@ import java.security.KeyStore.PrivateKeyEntry;
 import java.util.Properties;
 import java.util.logging.Logger;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import es.gob.afirma.core.misc.AOUtil;
@@ -124,7 +123,6 @@ public class TestSignField {
 	 * @throws Exception En cualquier error. */
 	@SuppressWarnings("static-method")
 	@Test
-	@Ignore
 	public void testCampoDeFirmaSoloConPosiciones() throws Exception {
 
 		Logger.getLogger("es.gob.afirma").info( //$NON-NLS-1$
@@ -169,7 +167,6 @@ public class TestSignField {
 	 * @throws Exception En cualquier error. */
 	@SuppressWarnings("static-method")
 	@Test
-	@Ignore
 	public void testCampoDeFirmaConPosicionesYRubrica() throws Exception {
 
 		Logger.getLogger("es.gob.afirma").info( //$NON-NLS-1$
@@ -219,7 +216,6 @@ public class TestSignField {
 	 * @throws Exception En cualquier error. */
 	@SuppressWarnings("static-method")
 	@Test
-	@Ignore
 	public void testCampoDeFirmaConPosicionesYTexto() throws Exception {
 
 		Logger.getLogger("es.gob.afirma").info( //$NON-NLS-1$
