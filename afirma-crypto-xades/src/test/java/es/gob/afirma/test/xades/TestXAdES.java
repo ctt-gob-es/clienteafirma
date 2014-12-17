@@ -303,14 +303,12 @@ public final class TestXAdES {
 
     }
 
-    /**
-     * Prueba con hoja de estilo externa.
+    /** Prueba con hoja de estilo externa.
      * <b>Necesita GUI</b>
-     * @throws Exception Cuando ocurre un error
-     */
+     * @throws Exception Cuando ocurre un error. */
     @SuppressWarnings("static-method")
 	@Test
-    @Ignore
+    @Ignore // Necesita GUI
     public void testSignExternalStyle() throws Exception {
 
         Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$

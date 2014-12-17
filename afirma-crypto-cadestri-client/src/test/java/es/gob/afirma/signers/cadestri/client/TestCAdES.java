@@ -101,7 +101,7 @@ public final class TestCAdES {
 	 */
 	@SuppressWarnings("static-method")
 	@Test
-	@Ignore
+	@Ignore // Necesita el servidor
 	public void testSignature() throws Exception {
 
 		Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$
@@ -150,7 +150,7 @@ public final class TestCAdES {
 	 */
 	@SuppressWarnings("static-method")
 	@Test
-	@Ignore
+	@Ignore // Necesita el servidor
 	public void testCoSignature() throws Exception {
 
 		Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$

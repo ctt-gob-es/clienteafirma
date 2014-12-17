@@ -40,7 +40,7 @@ public final class TestCadesTriphase {
 	 * @throws AOException
 	 * @throws IOException */
 	@Test
-	@Ignore
+	@Ignore // Necesita el servidor
 	public void firma() throws AOException, IOException {
 		final AOSigner signer = new AOCAdESTriPhaseSigner();
 

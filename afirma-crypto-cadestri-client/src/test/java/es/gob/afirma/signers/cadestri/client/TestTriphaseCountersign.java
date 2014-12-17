@@ -52,7 +52,7 @@ public class TestTriphaseCountersign {
 	/** Prueba de contrafirma de todo el &aacute;rbol de firmas de una firma expl&iacute;cita.
 	 * @throws Exception Cuando se produce un error. */
 	@Test
-	@Ignore
+	@Ignore // Necesita el servidor
 	public void prueba_contrafirma_de_arbol_de_firma_explicita() throws Exception {
 
 		final InputStream is = getClass().getClassLoader().getResourceAsStream(EXPLICIT_SHA1_COUNTERSIGN_FILE);
@@ -86,7 +86,7 @@ public class TestTriphaseCountersign {
 	/** Prueba de contrafirma de los nodos hoja de una firma explicita.
 	 * @throws Exception Cuando se produce un error. */
 	@Test
-	@Ignore
+	@Ignore // Necesita el servidor
 	public void prueba_contrafirma_de_firma_explicita_nodos_hoja() throws Exception {
 
 		final InputStream is = getClass().getClassLoader().getResourceAsStream(EXPLICIT_SHA1_COUNTERSIGN_FILE);
@@ -121,7 +121,7 @@ public class TestTriphaseCountersign {
 	/** Prueba de contrafirma de todo el &aacute;rbol de firmas de una firma impl&iacute;cita.
 	 * @throws Exception Cuando se produce un error. */
 	@Test
-	@Ignore
+	@Ignore // Necesita el servidor
 	public void prueba_contrafirma_de_arbol_de_firma_implicita() throws Exception {
 
 		final InputStream is = getClass().getClassLoader().getResourceAsStream(IMPLICIT_SHA1_COUNTERSIGN_FILE);
@@ -156,7 +156,7 @@ public class TestTriphaseCountersign {
 	/** Prueba de contrafirma de los nodos hoja de una firma impl&iacute;cita.
 	 * @throws Exception Cuando se produce un error. */
 	@Test
-	@Ignore
+	@Ignore // Necesita el servidor
 	public void prueba_contrafirma_de_firma_implicita_nodos_hoja() throws Exception {
 
 		final InputStream is = getClass().getClassLoader().getResourceAsStream(IMPLICIT_SHA1_COUNTERSIGN_FILE);
