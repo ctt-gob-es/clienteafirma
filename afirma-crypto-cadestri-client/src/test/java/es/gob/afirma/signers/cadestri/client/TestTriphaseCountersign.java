@@ -29,9 +29,7 @@ public class TestTriphaseCountersign {
 
 	private static final String PASSWORD = "12341234"; //$NON-NLS-1$
 
-	private static final String IMPLICIT_SHA1_COUNTERSIGN_FILE = "contrafirma_implicita.csig"; //$NON-NLS-1$
-
-	private static final String EXPLICIT_SHA1_COUNTERSIGN_FILE = "contrafirma_explicita.csig"; //$NON-NLS-1$
+	private static final String SHA1_COUNTERSIGN_FILE = "contrafirma_implicita.csig"; //$NON-NLS-1$
 
 	private static final String SERVLET_URL = "http://localhost:8080/afirma-server-triphase-signer/SignatureService"; //$NON-NLS-1$
 
@@ -49,82 +47,13 @@ public class TestTriphaseCountersign {
 		ks.load(ksIs, PASSWORD.toCharArray());
 	}
 
-	/** Prueba de contrafirma de todo el &aacute;rbol de firmas de una firma expl&iacute;cita.
-	 * @throws Exception Cuando se produce un error. */
-	@Test
-	@Ignore // Necesita el servidor
-	public void prueba_contrafirma_de_arbol_de_firma_explicita() throws Exception {
-
-		final InputStream is = getClass().getClassLoader().getResourceAsStream(EXPLICIT_SHA1_COUNTERSIGN_FILE);
-		final byte[] sign = AOUtil.getDataFromInputStream(is);
-		is.close();
-
-		final Properties config = new Properties();
-		config.setProperty(PARAM_NAME_SERVER_URL, SERVLET_URL);
-
-		final AOCounterSigner signer = new AOCAdESTriPhaseSigner();
-		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(PASSWORD.toCharArray()));
-		final byte[] countersign = signer.countersign(
-				sign,
-				AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA,
-				CounterSignTarget.TREE,
-				null,
-				pke.getPrivateKey(),
-				pke.getCertificateChain(),
-				config);
-
-		final File tempFile = File.createTempFile("CountersignCades", ".csig"); //$NON-NLS-1$ //$NON-NLS-2$
-
-		System.out.println("Prueba de contrafirma de arbol sobre firma explicita."); //$NON-NLS-1$
-		System.out.println("El resultado se almacena en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
-
-		final FileOutputStream fos = new FileOutputStream(tempFile);
-		fos.write(countersign);
-		fos.close();
-	}
-
-	/** Prueba de contrafirma de los nodos hoja de una firma explicita.
-	 * @throws Exception Cuando se produce un error. */
-	@Test
-	@Ignore // Necesita el servidor
-	public void prueba_contrafirma_de_firma_explicita_nodos_hoja() throws Exception {
-
-		final InputStream is = getClass().getClassLoader().getResourceAsStream(EXPLICIT_SHA1_COUNTERSIGN_FILE);
-		final byte[] sign = AOUtil.getDataFromInputStream(is);
-		is.close();
-
-		final Properties config = new Properties();
-		config.setProperty(PARAM_NAME_SERVER_URL, SERVLET_URL);
-
-		final AOCounterSigner signer = new AOCAdESTriPhaseSigner();
-		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(PASSWORD.toCharArray()));
-		final byte[] countersign = signer.countersign(
-			sign,
-			AOSignConstants.SIGN_ALGORITHM_SHA512WITHRSA,
-			CounterSignTarget.LEAFS,
-			null,
-			pke.getPrivateKey(),
-			pke.getCertificateChain(),
-			config
-		);
-
-		final File tempFile = File.createTempFile("CountersignCades", ".csig"); //$NON-NLS-1$ //$NON-NLS-2$
-
-		System.out.println("Prueba de contrafirma de nodos hoja sobre firma explicita."); //$NON-NLS-1$
-		System.out.println("El resultado se almacena en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
-
-		final FileOutputStream fos = new FileOutputStream(tempFile);
-		fos.write(countersign);
-		fos.close();
-	}
-
 	/** Prueba de contrafirma de todo el &aacute;rbol de firmas de una firma impl&iacute;cita.
 	 * @throws Exception Cuando se produce un error. */
 	@Test
 	@Ignore // Necesita el servidor
 	public void prueba_contrafirma_de_arbol_de_firma_implicita() throws Exception {
 
-		final InputStream is = getClass().getClassLoader().getResourceAsStream(IMPLICIT_SHA1_COUNTERSIGN_FILE);
+		final InputStream is = getClass().getClassLoader().getResourceAsStream(SHA1_COUNTERSIGN_FILE);
 		final byte[] sign = AOUtil.getDataFromInputStream(is);
 		is.close();
 
@@ -159,7 +88,7 @@ public class TestTriphaseCountersign {
 	@Ignore // Necesita el servidor
 	public void prueba_contrafirma_de_firma_implicita_nodos_hoja() throws Exception {
 
-		final InputStream is = getClass().getClassLoader().getResourceAsStream(IMPLICIT_SHA1_COUNTERSIGN_FILE);
+		final InputStream is = getClass().getClassLoader().getResourceAsStream(SHA1_COUNTERSIGN_FILE);
 		final byte[] sign = AOUtil.getDataFromInputStream(is);
 		is.close();
 
