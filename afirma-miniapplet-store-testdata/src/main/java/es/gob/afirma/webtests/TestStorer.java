@@ -37,7 +37,7 @@ public class TestStorer extends HttpServlet {
 	protected void doPost(final HttpServletRequest request, final HttpServletResponse response) throws IOException {
 		LOGGER.info(request.getParameter("json")); //$NON-NLS-1$
 		JSONObject obj;
-		List<StoreBean> sbList = new ArrayList<>();
+		List<StoreBean> sbList = new ArrayList<StoreBean>();
 
 		try {
 			JSONArray jsonarray = new JSONArray(request.getParameter("json")); //$NON-NLS-1$
