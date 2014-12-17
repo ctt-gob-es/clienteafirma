@@ -204,7 +204,6 @@ public final class PdfBuilder {
 		PdfXmpHelper.addBioXmpDataToPdf(pdfStamper, PdfXmpHelper.buildXmp(xmpList));
 
 		// Insertamos el csv
-		// TODO: Descomentar la linea de abajo
 		csv.applyCsv(pdfStamper);
 
 		// Cerramos el PDF

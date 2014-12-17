@@ -2,13 +2,13 @@
 <ns2:signTask xmlns:ns2="es.gob.afirma.crypto.handwritten">
     <CSV>
         <page>1</page>
-        <text>CSV-123120892834592458342</text>
-        <rotation>90</rotation>
-        <positionOnPageLowerLeftX>10</positionOnPageLowerLeftX>
-        <positionOnPageLowerLeftY>10</positionOnPageLowerLeftY>
-		<positionOnPageUpperRightX>100</positionOnPageUpperRightX>
-		<positionOnPageUpperRightY>100</positionOnPageUpperRightY>
-		<fontSize>25</fontSize>
+        <text>CSV-1231208</text>
+        <rotation>0</rotation>
+        <positionOnPageLowerLeftX>100</positionOnPageLowerLeftX>
+        <positionOnPageLowerLeftY>100</positionOnPageLowerLeftY>
+		<positionOnPageUpperRightX>200</positionOnPageUpperRightX>
+		<positionOnPageUpperRightY>200</positionOnPageUpperRightY>
+		<fontSize>15</fontSize>
     </CSV>
     <tsaParams>
         <tsaRequireCert>true</tsaRequireCert>
