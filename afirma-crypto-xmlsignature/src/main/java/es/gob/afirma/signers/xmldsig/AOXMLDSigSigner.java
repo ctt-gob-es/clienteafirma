@@ -1442,6 +1442,16 @@ public final class AOXMLDSigSigner implements AOSigner {
 
             final DOMSignContext signContext = new DOMSignContext(key, rootSig);
             signContext.putNamespacePrefix(XMLConstants.DSIGNNS, xmlSignaturePrefix);
+            try {
+            	// Obtenemos el dereferenciador por defecto por reflexion
+            	// e instalamos uno nuevo que solo actua cuando falla el por defecto
+            	signContext.setURIDereferencer(
+        			new CustomUriDereferencer(CustomUriDereferencer.getDefaultDereferencer())
+    			);
+            }
+            catch (final Exception e) {
+            	LOGGER.warning("No se ha podido instalar un dereferenciador a medida, es posible que fallen las firmas de nodos concretos: " + e); //$NON-NLS-1$
+            }
 
             fac.newXMLSignature(fac.newSignedInfo(cm, sm, referenceList), // SignedInfo
                                 kif.newKeyInfo(content, keyInfoId), // KeyInfo
@@ -2031,7 +2041,19 @@ public final class AOXMLDSigSigner implements AOSigner {
         		key,
         		signature.getOwnerDocument().getDocumentElement()
     		);
+
             signContext.putNamespacePrefix(XMLConstants.DSIGNNS, xmlSignaturePrefix);
+
+            try {
+            	// Obtenemos el dereferenciador por defecto por reflexion
+            	// e instalamos uno nuevo que solo actua cuando falla el por defecto
+            	signContext.setURIDereferencer(
+        			new CustomUriDereferencer(CustomUriDereferencer.getDefaultDereferencer())
+    			);
+            }
+            catch (final Exception e) {
+            	LOGGER.warning("No se ha podido instalar un dereferenciador a medida, es posible que fallen las firmas de nodos concretos: " + e); //$NON-NLS-1$
+            }
 
             sign.sign(signContext);
         }
