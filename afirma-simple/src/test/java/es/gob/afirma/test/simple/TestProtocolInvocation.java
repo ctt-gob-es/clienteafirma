@@ -1,5 +1,6 @@
 package es.gob.afirma.test.simple;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import es.gob.afirma.core.misc.Base64;
@@ -21,6 +22,7 @@ public class TestProtocolInvocation {
 	/** Prueba de protocolo sin indicar datos. */
 	@SuppressWarnings("static-method")
 	@Test
+	@Ignore // Necesita UI
 	public void testWithoutData() {
 		SimpleAfirma.main(new String[] { LINE_NODATA });
 	}
@@ -28,6 +30,7 @@ public class TestProtocolInvocation {
 	/** Prueba de protocolo con almac&eacute;n de claves establecido manualmente. */
 	@SuppressWarnings("static-method")
 	@Test
+	@Ignore // Necesita NSS
 	public void testCustomStore() {
 		SimpleAfirma.main(new String[] { LINE_CUSTOM_STORE });
 	}
@@ -36,6 +39,7 @@ public class TestProtocolInvocation {
 	 * @throws Exception En cualquier error */
 	@SuppressWarnings("static-method")
 	@Test
+	@Ignore // Necesita UI
 	public void testService() throws Exception {
 		new Thread(
 			new Runnable() {
