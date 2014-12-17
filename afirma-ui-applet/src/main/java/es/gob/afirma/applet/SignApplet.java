@@ -2066,7 +2066,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 					try {
 						inputDir = AOUIFactory.getLoadFiles(
 								AppletMessages.getString("SignApplet.187"), null, null, null, //$NON-NLS-1$
-								null, true, false, SignApplet.this)[0].getAbsolutePath();
+								null, true, false, null, SignApplet.this)[0].getAbsolutePath();
 					}
 					catch(final AOCancelledOperationException e) {
 						getLogger().info("Operacion cancelada por el usuario"); //$NON-NLS-1$
@@ -2218,6 +2218,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 						null,
 						false,
 						false,
+						null, // Icono
 						this
 					)[0].getAbsolutePath();
 					if (fileName == null) {
@@ -3447,6 +3448,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 						description,
 						false,
 						false,
+						null, // Icono
 						SignApplet.this
 					)[0].getAbsolutePath();
 				}
@@ -3487,7 +3489,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 				public String run() {
 					return AOUIFactory.getLoadFiles(
 							AppletMessages.getString("SignApplet.104"), null, null, null,  //$NON-NLS-1$
-							null, true, false, SignApplet.this)[0].getAbsolutePath();
+							null, true, false, null, SignApplet.this)[0].getAbsolutePath();
 				}
 			});
 		}
@@ -4306,7 +4308,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 			setError(AppletMessages.getString("SignApplet.92")); //$NON-NLS-1$
 			return false;
 		}
-		catch (AOCancelledOperationException e) {
+		catch (final AOCancelledOperationException e) {
 			LOGGER.info("Operacion cancelada por el usuario"); //$NON-NLS-1$
 			setError(AppletMessages.getString("SignApplet.68")); //$NON-NLS-1$
 			return false;

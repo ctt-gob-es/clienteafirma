@@ -174,6 +174,7 @@ class GetSignatureAction implements PrivilegedExceptionAction<byte[]> {
             desc,
             false,
             false,
+            null,
             parent
         )[0].getAbsolutePath();
     }

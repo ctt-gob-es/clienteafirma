@@ -71,7 +71,7 @@ final class GetFileAction implements PrivilegedExceptionAction<FileBean[]> {
 	public FileBean[] run() throws IOException {
 
 		if (this.files == null) {
-			this.files = AOUIFactory.getLoadFiles(this.title, null, null, this.exts, this.desc, false, this.multiSel, this.parent);
+			this.files = AOUIFactory.getLoadFiles(this.title, null, null, this.exts, this.desc, false, this.multiSel, null, this.parent);
 		}
 
 		byte[] contentFic;
