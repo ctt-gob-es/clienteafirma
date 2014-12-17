@@ -14,7 +14,6 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.HeadlessException;
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.io.File;
@@ -380,7 +379,7 @@ public class JSEUIManager implements AOUIManager {
         	jfc = new JFileChooser() {
 			private static final long serialVersionUID = 5631612687512882773L;
 			   @Override
-			    protected JDialog createDialog(final Component p) throws HeadlessException {
+			    protected JDialog createDialog(final Component p) {
 			        final JDialog dialog = super.createDialog(p);
 			        dialog.setIconImage(icon);
 			        return dialog;
