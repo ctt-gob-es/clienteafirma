@@ -44,7 +44,7 @@ import es.gob.afirma.core.util.tree.AOTreeModel;
  * Manejador de firma XAdES trif&aacute;sicas. Mediante este manejador un usuario puede firmar un documento remoto
  * indicando el identificador del documento. Este manejador requiere de un servicio remoto que genere la estructura
  * de firma en servidor. La operaci&oacute;n criptogr&aacute;fica de firma se realiza en el PC o dispositivo del usuario,
- * por lo que la clave privada de su certificado nunca sale de este.<br/>
+ * por lo que la clave privada de su certificado nunca sale de este.<br>
  * El resultado de las operaciones criptogr&aacute;ficas no es el resultado generado sino el identificador con el que
  * el resultado se ha guardado en el servidor remoto (gestor documental, sistema de ficheros,...).
  * La l&oacute;gica de resoluci&oacute;n del identificador de entrada, recuperaci&oacute;n de los datos y el guardado
@@ -254,17 +254,15 @@ public final class AOXAdESTriPhaseSigner implements AOSigner {
 		throw new UnsupportedOperationException("No se soporta en firma trifasica"); //$NON-NLS-1$
 	}
 
-	/**
-	 * Ejecuta una operaci&oacute;n de firma/multifirma en 3 fases.
-	 * @param cryptoOperation Tipo de operaci&oacute.
+	/** Ejecuta una operaci&oacute;n de firma/multifirma en 3 fases.
+	 * @param cryptoOperation Tipo de operaci&oacute;n.
 	 * @param data Datos o firma sobre la que operar
 	 * @param algorithm Algoritmo de firma
 	 * @param key Clave privada del certificado de firma.
 	 * @param certChain Cadena de certificaci&oacute;n.
 	 * @param extraParams Par&aacute;metros para la configuraci&oacute;n de la operaci&oacute;n.
 	 * @return Resultado de la operaci&oacute;n de firma.
-	 * @throws AOException Cuando se produce un error durante la operaci&oacute;n.
-	 */
+	 * @throws AOException Cuando se produce un error durante la operaci&oacute;n. */
 	private static byte[] triPhaseOperation(final String cryptoOperation,
 			final byte[] data,
 			final String algorithm,
