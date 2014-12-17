@@ -4,7 +4,6 @@ import java.io.File;
 
 import junit.framework.Assert;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import es.gob.afirma.core.signers.AOSignConstants;
@@ -23,7 +22,6 @@ public class Ticket194001Test {
     /** Genera una firma acorde al est&aacute;ndar XAdES 1.2.2. */
     @SuppressWarnings("static-method")
 	@Test
-	@Ignore
 	public void signTest() {
 
     	try {
@@ -57,7 +55,6 @@ public class Ticket194001Test {
     /** Genera una cofirma acorde al est&aacute;ndar XAdES 1.2.2. */
     @SuppressWarnings("static-method")
 	@Test
-	@Ignore
 	public void cosignTest() {
 
     	try {
@@ -114,7 +111,6 @@ public class Ticket194001Test {
     /** Genera una cofirma acorde al est&aacute;ndar XAdES 1.2.2. */
     @SuppressWarnings("static-method")
 	@Test
-	@Ignore
 	public void countersignTest() {
 
     	try {

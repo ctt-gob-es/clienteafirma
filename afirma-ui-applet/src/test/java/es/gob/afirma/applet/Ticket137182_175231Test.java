@@ -7,7 +7,6 @@ import javax.xml.crypto.dsig.DigestMethod;
 
 import junit.framework.Assert;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import es.gob.afirma.core.misc.Base64;
@@ -54,7 +53,6 @@ public class Ticket137182_175231Test {
      */
     @SuppressWarnings("static-method")
 	@Test
-	@Ignore
 	public void configuraPoliticaConIdentifierOID() {
 		try {
 			CONFIG.setProperty("policyIdentifier", INPUT_DATA_OID); //$NON-NLS-1$
@@ -76,7 +74,6 @@ public class Ticket137182_175231Test {
      */
     @SuppressWarnings("static-method")
 	@Test
-	@Ignore
 	public void configuraPoliticaConIdentifierURN() {
 		try {
 			CONFIG.setProperty("policyIdentifier", INPUT_DATA_URN); //$NON-NLS-1$
@@ -98,7 +95,6 @@ public class Ticket137182_175231Test {
      */
     @SuppressWarnings("static-method")
 	@Test
-	@Ignore
 	public void configuraPoliticaConIdentifierURL() {
 		try {
 			CONFIG.setProperty("policyIdentifier", INPUT_DATA_URL); //$NON-NLS-1$
@@ -120,7 +116,6 @@ public class Ticket137182_175231Test {
      */
 	@SuppressWarnings("static-method")
 	@Test
-	@Ignore
 	public void configuraPoliticaConIdentifierErroneo() {
 		try {
 			CONFIG.setProperty("policyIdentifier", INPUT_DATA_ERROR); //$NON-NLS-1$

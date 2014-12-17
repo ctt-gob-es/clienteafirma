@@ -16,7 +16,6 @@ import java.util.logging.Logger;
 
 import junit.framework.Assert;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import es.gob.afirma.core.signers.AOSignConstants;
@@ -111,7 +110,6 @@ public class GenerateAllSigns {
      */
     @SuppressWarnings("static-method")
 	@Test
-	@Ignore
 	public void generateSigns() {
 
     	String path = null;
@@ -127,7 +125,7 @@ public class GenerateAllSigns {
     	applet.setKeyStore(ksPath, CERT_PASS, "PKCS12"); //$NON-NLS-1$
     	applet.setSelectedCertificateAlias(CERT_ALIAS);
 
-    	final String[] algos = (applyAlgos ? ALGOS : new String[] {DEFAULT_ALGO});
+    	final String[] algos = applyAlgos ? ALGOS : new String[] {DEFAULT_ALGO};
 		for (final String[] format : FORMATS) {
 			applet.setSignatureFormat(format[0]);
 			for (final String[] mode : FORMATS_MODES) {
@@ -160,7 +158,6 @@ public class GenerateAllSigns {
      */
     @SuppressWarnings("static-method")
 	@Test
-	@Ignore
 	public void generateCosigns() {
 
     	final String path = new File("").getAbsolutePath(); //$NON-NLS-1$
@@ -171,7 +168,7 @@ public class GenerateAllSigns {
     	applet.setKeyStore(ksPath, CERT_PASS2, "PKCS12"); //$NON-NLS-1$
     	applet.setSelectedCertificateAlias(CERT_ALIAS2);
 
-    	final String[] algos = (applyAlgos ? ALGOS : new String[] {DEFAULT_ALGO});
+    	final String[] algos = applyAlgos ? ALGOS : new String[] {DEFAULT_ALGO};
 		for (final String[] format : FORMATS) {
 			applet.setSignatureFormat(format[0]);
 			for (final String[] mode : FORMATS_MODES) {
@@ -209,7 +206,6 @@ public class GenerateAllSigns {
      */
     @SuppressWarnings("static-method")
 	@Test
-	@Ignore
 	public void generateCounterSigns() {
 
     	final String path = new File("").getAbsolutePath(); //$NON-NLS-1$
@@ -220,7 +216,7 @@ public class GenerateAllSigns {
     	applet.setKeyStore(ksPath, CERT_PASS3, "PKCS12"); //$NON-NLS-1$
     	applet.setSelectedCertificateAlias(CERT_ALIAS3);
 
-    	final String[] algos = (applyAlgos ? ALGOS : new String[] {DEFAULT_ALGO});
+    	final String[] algos = applyAlgos ? ALGOS : new String[] {DEFAULT_ALGO};
 		for (final String[] format : FORMATS) {
 
 			// Si no se soporta la contrafirma para este formato

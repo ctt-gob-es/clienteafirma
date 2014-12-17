@@ -6,7 +6,6 @@ import java.io.IOException;
 
 import junit.framework.Assert;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import es.gob.afirma.core.misc.AOUtil;
@@ -34,7 +33,6 @@ public class Ticket173586Test {
 	 */
 	@SuppressWarnings("static-method")
 	@Test
-	@Ignore
 	public void pruebaComprobacionPasoBase64() throws Exception {
 
 		final byte[] data = getResource(DATA_FILE);
@@ -50,7 +48,6 @@ public class Ticket173586Test {
 	 */
 	@SuppressWarnings("static-method")
 	@Test
-	@Ignore
 	public void pruebaFirmaMasivaDeFicheroMayorDe7Megas() throws Exception {
     	final String ksPath = getResourcePath(CERT_PATH);
 

@@ -5,7 +5,6 @@ import java.io.FileOutputStream;
 
 import junit.framework.Assert;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import es.gob.afirma.core.signers.AOSignConstants;
@@ -30,7 +29,6 @@ public class Ticket173308Test {
 	 */
 	@SuppressWarnings("static-method")
 	@Test
-	@Ignore
 	public void saveSignToFileTest() {
 
 		try {
@@ -55,7 +53,6 @@ public class Ticket173308Test {
 	 */
 	@SuppressWarnings("static-method")
 	@Test
-	@Ignore
 	public void getSignatureBase64EncodedTest() {
 
 		try {
@@ -80,7 +77,6 @@ public class Ticket173308Test {
 	 */
 	@SuppressWarnings("static-method")
 	@Test
-	@Ignore
 	public void getTextFromBase64Test() {
 
 		try {
@@ -112,7 +108,6 @@ public class Ticket173308Test {
 	 */
 	@SuppressWarnings({ "static-method" })
 	@Test
-	@Ignore
 	public void getSignatureTextTest() {
 
 		try {
@@ -143,7 +138,6 @@ public class Ticket173308Test {
 	 */
 	@SuppressWarnings({ "static-method" })
 	@Test
-	@Ignore
 	public void getBase64FromTextTest() {
 
 		try {

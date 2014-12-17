@@ -17,7 +17,6 @@ import java.security.NoSuchAlgorithmException;
 
 import junit.framework.Assert;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import es.gob.afirma.core.misc.AOUtil;
@@ -76,7 +75,6 @@ public class DataManagerTest {
 	 */
 	@SuppressWarnings({ "static-method" })
 	@Test
-	@Ignore
 	public void recoverData() {
 
 		try {
