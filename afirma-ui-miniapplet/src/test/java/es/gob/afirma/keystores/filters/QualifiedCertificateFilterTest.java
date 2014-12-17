@@ -14,7 +14,6 @@ import java.io.File;
 
 import junit.framework.Assert;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import es.gob.afirma.keystores.AOKeyStore;
@@ -45,7 +44,6 @@ public class QualifiedCertificateFilterTest {
 	 * @throws Exception Cuando ocurre alg&uacute;n error. */
 	@SuppressWarnings("static-method")
 	@Test
-	@Ignore
 	public void filtraCertificadosCualificados() throws Exception {
 
 		final QualifiedCertificatesFilter filter = new QualifiedCertificatesFilter(CERT_SN);

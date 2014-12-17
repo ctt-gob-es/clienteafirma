@@ -29,7 +29,7 @@ public final class MiniAfirmaAppletTest {
 	/** Prueba de firma simple con DNIe. */
 	@SuppressWarnings("static-method")
 	@Test
-	@Ignore
+	@Ignore // Necesita DNIe
 	public void signWithDNIe() {
 		final MiniAfirmaApplet applet = new MiniAfirmaApplet();
 		try {
@@ -51,7 +51,7 @@ public final class MiniAfirmaAppletTest {
 	 * @throws Exception Cuando ocurre alg&uacute;n error. */
 	@SuppressWarnings("static-method")
 	@Test
-	@Ignore
+	@Ignore // Necesita un almacen por defecto
 	public void signWithDefault() throws Exception {
 		final MiniAfirmaApplet applet = new MiniAfirmaApplet();
 
@@ -70,7 +70,7 @@ public final class MiniAfirmaAppletTest {
 	 * @throws Exception */
 	@SuppressWarnings("static-method")
 	@Test
-	@Ignore
+	@Ignore // Necesita GUI y almacen por defecto
 	public void testLargeFileChunkedSupport() throws Exception {
 
 		final String sourcePdfAsBase64 = Base64.encode(AOUtil.getDataFromInputStream(MiniAfirmaAppletTest.class.getResourceAsStream("/PDF_LARGER_THAN_2MB.pdf"))); //$NON-NLS-1$
