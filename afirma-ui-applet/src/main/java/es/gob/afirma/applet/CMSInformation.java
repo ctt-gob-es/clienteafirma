@@ -169,10 +169,9 @@ final class CMSInformation {
 		return datos;
 	}
 
-	/**
-	 * Obtiene la informaci&oacute;n de un tipo Digested Data.
-	 * @return  Representaci&oacute;n de los datos.
-	 */
+	/** Obtiene la informaci&oacute;n de un tipo DigestedData.
+	 * @param doj <i>DigestedData</i> de PKCS#7 ASN.1.
+	 * @return  Representaci&oacute;n de los datos. */
 	private static String getFromDigestedData(final ASN1TaggedObject doj) {
 		String detalle = ""; //$NON-NLS-1$
 		detalle = detalle + AppletMessages.getString("CMSInformation.0") + SP + DIGESTED_DATA + CR; //$NON-NLS-1$
@@ -192,10 +191,9 @@ final class CMSInformation {
 		return detalle;
 	}
 
-	/**
-	 * Obtiene la informaci&oacute;n de un tipo Compressed Data.
-	 * @return  Representaci&oacute;n de los datos.
-	 */
+	/** Obtiene la informaci&oacute;n de un tipo Compressed Data.
+	 * @param doj <i>CompressedData</i> de PKCS#7 ASN.1.
+	 * @return  Representaci&oacute;n de los datos. */
 	private static String getFromCompressedData(final ASN1TaggedObject doj) {
 		String detalle = ""; //$NON-NLS-1$
 		detalle = detalle + "Tipo:" + SP + COMPRESSED_DATA + CR; //$NON-NLS-1$
@@ -219,12 +217,14 @@ final class CMSInformation {
 	 * Obtiene la informaci&oacute;n de diferentes tipos de formatos.
 	 * @param doj Etiqueta ASN.1 de la que se obtienen los datos.
 	 * @param envelopeType	Tipo de formato:
-	 * <li>0: EnvelopedData</li>
-	 * <li>1: AuthenticatedData</li>
-	 * <li>2: AuthEnvelopedData</li>
-	 * <li>3: SignedAndEnvelopedData</li>
-	 * <li>4: SignedData</li>
-	 * <li>5: Encrypted</li>
+	 * <ul>
+	 *  <li>0: EnvelopedData</li>
+	 *  <li>1: AuthenticatedData</li>
+	 *  <li>2: AuthEnvelopedData</li>
+	 *  <li>3: SignedAndEnvelopedData</li>
+	 *  <li>4: SignedData</li>
+	 *  <li>5: Encrypted</li>
+	 * </ul>
 	 * @param tipoDetalle	Tipo de datos (literal)
 	 * @param signBinaryType Tipo de firmado binario (CADES o CMS)
 	 * @return  Representaci&oacute;n de los datos.
@@ -422,13 +422,6 @@ final class CMSInformation {
 		return detalle;
 	}
 
-	/**
-	 * Obtiene los atributos obligatorios
-	 * @param signBinaryType	Tipo de firma binaria (CADES o CMS)
-	 * @param detalle
-	 * @param authAttrs
-	 * @return
-	 */
 	private static String getObligatorieAtrib(final int signBinaryType,
 			                                  final String detalle,
 			                                  final ASN1Set authAttrs) {
@@ -446,12 +439,10 @@ final class CMSInformation {
 		return det;
 	}
 
-	/**
-	 * Obtiene los atributos obligatorios de una firma.
-	 *
-	 * @param attributes    Grupo de atributos opcionales
-	 * @param binarySignType	Identifica el tipo de firma binaria (CMS o CADES)
-	 * @return              lista de atributos concatenados.
+	/** Obtiene los atributos obligatorios de una firma.
+	 * @param attributes Grupo de atributos opcionales
+	 * @param binarySignType Identifica el tipo de firma binaria (CMS o CADES)
+	 * @return Lista de atributos concatenados.
 	 */
 	private static String getsignedAttributes(final ASN1Set attributes, final int binarySignType){
 		String attributos = ""; //$NON-NLS-1$
@@ -498,14 +489,11 @@ final class CMSInformation {
 		return attributos;
 	}
 
-	/**
-	 * Obtiene los atributos opcionales de una firma cualquiera.
-	 * En caso de ser EncryptedData, usar el otro metodo, ya que por construccion
+	/** Obtiene los atributos opcionales de una firma cualquiera.
+	 * En caso de ser EncryptedData, usar el otro metodo, ya que por construcci&oacute;n
 	 * no es posible utilizar este.
-	 *
-	 * @param attributes    Grupo de atributos opcionales
-	 * @return              lista de atributos concatenados.
-	 */
+	 * @param e Grupo de atributos opcionales.
+	 * @return Lista de atributos concatenados. */
 	private static String getUnSignedAttributes(final Enumeration<?> e){
 		String attributos = ""; //$NON-NLS-1$
 

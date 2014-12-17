@@ -55,11 +55,11 @@ final class WrapAction implements PrivilegedExceptionAction<byte[]> {
     }
 
     /** {@inheritDoc}
-     * @throws SignatureException
-     * @throws BadPaddingException
-     * @throws IllegalBlockSizeException
-     * @throws InvalidAlgorithmParameterException
-     * @throws NoSuchPaddingException */
+     * @throws SignatureException Si hay problemas con la firma PKCS#1.
+     * @throws BadPaddingException Si hay problemas con los rellenos criptogr&aacute;ficos.
+     * @throws IllegalBlockSizeException Si hay tama&ntilde;os de bloque no v&aacute;lidos.
+     * @throws InvalidAlgorithmParameterException Si hay problemas de configuraci&oacute;n de los algoritmos.
+     * @throws NoSuchPaddingException Si hay problemas con los rellenos criptogr&aacute;ficos. */
     @Override
 	public byte[] run() throws NoSuchAlgorithmException,
                                IOException,

@@ -245,12 +245,10 @@ final class EnveloperManager {
     }
 
     /** Obtiene un certificado a partir de su codificaci&oacute;n.
-     * @param cert
-     *        Certificado codificado.
+     * @param cert Certificado codificado.
      * @return Certificado decodificado.
-     * @throws AOCertificateException
-     *         Cuando ocurre un error en la decodificaci&oacute;n del
-     *         certificado. */
+     * @throws CertificateException Cuando ocurre un error en la decodificaci&oacute;n del
+     *                              certificado. */
     private static X509Certificate encodeCertificate(final byte[] cert) throws CertificateException {
         try {
             return (X509Certificate) CertificateFactory.getInstance("X.509") //$NON-NLS-1$
@@ -262,20 +260,19 @@ final class EnveloperManager {
     }
 
     /** Genera un sobre electr&oacute;nico.
-     * @throws IOException
-     *         Cuando ocurre un error en la lectura de los datos.
+     * @throws IOException Cuando ocurre un error en la lectura de los datos.
      * @throws NoSuchAlgorithmException
-     *         Cuando el algoritmo de firma no est&aacuta; soportado.
+     *         Cuando el algoritmo de firma no est&aacute; soportado.
      * @throws CertificateEncodingException
      *         Cuando el certificado del remitente no es v&aacute;lido.
      * @throws AOException
      *         Cuando ocurre algun error al envolver los datos.
-     * @throws BadPaddingException
-     * @throws IllegalBlockSizeException
-     * @throws InvalidAlgorithmParameterException
-     * @throws NoSuchPaddingException
-     * @throws InvalidKeyException
-     * @throws SignatureException
+     * @throws BadPaddingException Si hay problemas con los rellenos criptogr&aacute;ficos.
+     * @throws IllegalBlockSizeException Si hay tama&ntilde;os de bloque no v&aacute;lidos.
+     * @throws InvalidAlgorithmParameterException Si hay problemas de configuraci&oacute;n de los algoritmos.
+     * @throws NoSuchPaddingException Si hay problemas con los rellenos criptogr&aacute;ficos.
+     * @throws InvalidKeyException Si hay problemas con las claves de firma o cifrado.
+     * @throws SignatureException Si hay problemas con la firma PKCS#1.
      * @throws IllegalArgumentException
      *         Cuando no se ha indicado un par&aacute;metro o se
      *         configur&oacute; uno err&oacute;neo.
@@ -291,18 +288,17 @@ final class EnveloperManager {
      *        Contenido que se desea ensobrar.
      * @throws IOException
      *         Cuando ocurre un error en la lectura de los datos.
-     * @throws NoSuchAlgorithmException
-     *         Cuando el algoritmo de firma no est&aacuta; soportado.
+     * @throws NoSuchAlgorithmException Cuando el algoritmo de firma no est&aacute; soportado.
      * @throws CertificateEncodingException
      *         Cuando el certificado del remitente no es v&aacute;lido.
      * @throws AOException
      *         Cuando ocurre algun error al envolver los datos.
-     * @throws BadPaddingException
-     * @throws IllegalBlockSizeException
-     * @throws InvalidAlgorithmParameterException
-     * @throws NoSuchPaddingException
-     * @throws InvalidKeyException
-     * @throws SignatureException
+     * @throws BadPaddingException Si hay problemas con los rellenos criptogr&aacute;ficos.
+     * @throws IllegalBlockSizeException Si hay tama&ntilde;os de bloque no v&aacute;lidos.
+     * @throws InvalidAlgorithmParameterException Si hay problemas de configuraci&oacute;n de los algoritmos.
+     * @throws NoSuchPaddingException Si hay problemas con los rellenos criptogr&aacute;ficos.
+     * @throws InvalidKeyException Si hay problemas con las claves de firma o cifrado.
+     * @throws SignatureException Si hay problemas con la firma PKCS#1.
      * @throws NullPointerException
      *         Cuando se ha indicado el tipo de contenido o los
      *         destinatarios del mismo.
@@ -524,10 +520,7 @@ final class EnveloperManager {
     }
 
     /** Genera un sobre de tipo EnvelopedData.
-     * @param content
-     *        Datos que queremos ensobrar.
-     * @param originatorKe
-     *        Clave del remitente del sobre.
+     * @param content Datos que queremos ensobrar.
      * @return Sobre electr&oacute;nico.
      * @throws IOException
      *         Cuando ocurre un error de lectura de datos.
@@ -535,12 +528,12 @@ final class EnveloperManager {
      *         El certificado de firma no es v&aacute;lido.
      * @throws NoSuchAlgorithmException
      *         Algoritmo no soportado.
-     * @throws AOException
-     * @throws BadPaddingException
-     * @throws IllegalBlockSizeException
-     * @throws InvalidAlgorithmParameterException
-     * @throws NoSuchPaddingException
-     * @throws InvalidKeyException */
+     * @throws AOException En caso de cualquier otro error.
+     * @throws BadPaddingException Si hay problemas con los rellenos criptogr&aacute;ficos.
+     * @throws IllegalBlockSizeException Si hay tama&ntilde;os de bloque no v&aacute;lidos.
+     * @throws InvalidAlgorithmParameterException Si hay problemas de configuraci&oacute;n de los algoritmos.
+     * @throws NoSuchPaddingException Si hay problemas con los rellenos criptogr&aacute;ficos.
+     * @throws InvalidKeyException Si hay problemas con las claves de firma o cifrado. */
     private byte[] createCMSEnvelopData(final byte[] content) throws IOException, CertificateEncodingException, NoSuchAlgorithmException, AOException, InvalidKeyException, NoSuchPaddingException, InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException {
 			return this.enveloper.createCMSEnvelopedData(content,
 													this.ksConfigManager.getCertificateKeyEntry(),
@@ -550,26 +543,20 @@ final class EnveloperManager {
     }
 
     /** Genera un sobre de tipo SignedAndEnvelopedData.
-     * @param content
-     *        Datos que queremos ensobrar.
-     * @param originatorKe
-     *        Clave del remitente del sobre.
+     * @param content Datos que queremos ensobrar.
      * @return Sobre electr&oacute;nico.
-     * @throws AOException
-     *         Cuando ocurre un error durante la operaci&oacute;n.
-     * @throws IOException
-     *         Cuanto hay algun problema en la lectura de datos.
-     * @throws NoSuchAlgorithmException
-     * @throws CertificateEncodingException
-     * @throws SignatureException
-     * @throws BadPaddingException
-     * @throws IllegalBlockSizeException
-     * @throws InvalidAlgorithmParameterException
-     * @throws NoSuchPaddingException
-     * @throws InvalidKeyException
-     * @throws IllegalArgumentException
-     *         Cuando no se ha introducido alg&uacute;n par&aacute;metro
-     *         requerido por el tipo de sobre */
+     * @throws AOException Cuando ocurre un error durante la operaci&oacute;n.
+     * @throws IOException Cuanto hay algun problema en la lectura de datos.
+     * @throws NoSuchAlgorithmException Si no se soporta alg&uacute;n algoritmo necesario.
+     * @throws CertificateEncodingException Si hay problemas en el tratamiento de los certificados.
+     * @throws SignatureException Si hay problemas con la firma PKCS#1.
+     * @throws BadPaddingException Si hay problemas con los rellenos criptogr&aacute;ficos.
+     * @throws IllegalBlockSizeException Si hay tama&ntilde;os de bloque no v&aacute;lidos.
+     * @throws InvalidAlgorithmParameterException Si hay problemas de configuraci&oacute;n de los algoritmos.
+     * @throws NoSuchPaddingException Si hay problemas con los rellenos criptogr&aacute;ficos.
+     * @throws InvalidKeyException Si hay problemas con las claves de firma o cifrado.
+     * @throws IllegalArgumentException Cuando no se ha introducido alg&uacute;n par&aacute;metro
+     *                                  requerido por el tipo de sobre */
     private byte[] createCMSSignedEnvelopData(final byte[] content) throws AOException,
                                                                    CertificateEncodingException,
                                                                    NoSuchAlgorithmException,
@@ -595,14 +582,14 @@ final class EnveloperManager {
      * @return Sobre electr&oacute;nico.
      * @throws AOException
      *         Cuando ocurre un error durante la operaci&oacute;n.
-     * @throws IOException
-     * @throws NoSuchAlgorithmException
-     * @throws CertificateEncodingException
-     * @throws BadPaddingException
-     * @throws IllegalBlockSizeException
-     * @throws InvalidAlgorithmParameterException
-     * @throws NoSuchPaddingException
-     * @throws InvalidKeyException
+     * @throws IOException Si hay problemas en el tratamiento de datos.
+     * @throws NoSuchAlgorithmException Si no se soporta alg&uacute;n algoritmo necesario.
+     * @throws CertificateEncodingException Si hay problemas en el tratamiento de los certificados.
+     * @throws BadPaddingException Si hay problemas con los rellenos criptogr&aacute;ficos.
+     * @throws IllegalBlockSizeException Si hay tama&ntilde;os de bloque no v&aacute;lidos.
+     * @throws InvalidAlgorithmParameterException Si hay problemas de configuraci&oacute;n de los algoritmos.
+     * @throws NoSuchPaddingException Si hay problemas con los rellenos criptogr&aacute;ficos.
+     * @throws InvalidKeyException Si hay problemas con las claves de firma o cifrado.
      * @throws IllegalArgumentException
      *         Cuando no se ha introducido alg&uacute;n par&aacute;metro
      *         requerido por el tipo de sobre */
@@ -637,10 +624,6 @@ final class EnveloperManager {
      * @throws CertificateEncodingException Si hay alg&uacute;n certificado inv&aacute;lido
      * @throws es.gob.afirma.core.AOCancelledOperationException
      *         Cuando el usuario cancela la operaci&oacute;n.
-     * @throws es.gob.afirma.keystores.main.common.AOCertificatesNotFoundException
-     *         Cuando no hay certificados en el almac&eacute;n seleccionado.
-     * @throws es.gob.afirma.keystores.main.common.AOKeyStoreManagerException
-     *         Cuando no se puede acceder al almac&eacute;n de certificados.
      * @throws es.gob.afirma.core.AOInvalidFormatException
      *         Tipo de envoltorio no soportado. */
     byte[] coEnvelop(final byte[] envelop) throws AOException, IOException, CertificateEncodingException {

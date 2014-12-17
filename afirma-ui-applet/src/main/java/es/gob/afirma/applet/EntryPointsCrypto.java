@@ -1900,7 +1900,7 @@ interface EntryPointsCrypto {
      * cifrado, introducida en base 64 mediante <code>setKey(String)</code>, o una
      * contrase&ntilde;a que el propio usuario deber&aacute; establecer a
      * trav&eacute;s de un di&aacute;logo modal que se le
-     * presentar&aacute;.<br/> El resultado de la operaci&oacute;n puede
+     * presentar&aacute;.<br> El resultado de la operaci&oacute;n puede
      * recuperarse con <code>getPlainData()</code> o salvarse directamente a disco
      * con <code>savePlainDataToFile(String)</code>. <br>
      * <br>
@@ -1916,7 +1916,7 @@ interface EntryPointsCrypto {
      * </ul>
      * According to the encryption algorithm, the <code>setKeyMode(String)</code> must be used, and a mandatory encryption key in base 64 must be
      * introduced with <code>setKey(String)</code>, or a password set by user with a
-     * modal dialog that will be displayed.<br/> Operation's result may be
+     * modal dialog that will be displayed.<br> Operation's result may be
      * retrieved with <code>getPlainData()</code> or be directly saved to disk with <code>savePlainDataToFile(String)</code>.
      * @return true si la operaci&oacute;n finaliz&oacute; con &eacute;xito,
      *         false en caso contrario. <br>
@@ -1930,19 +1930,19 @@ interface EntryPointsCrypto {
      * de algoritmo de cifrado, modo de bloque y padding, con los datos
      * separados por una barra ('/'). Por ejemplo:
      * <ul>
-     * <li>AES</li>
-     * <li>AES/ECB/PKCS5PADDING</li>
+     *  <li>AES</li>
+     *  <li>AES/ECB/PKCS5PADDING</li>
      * </ul>
      * Seg&uacute;n el algoritmo de cifrado deberemos indicar mediante el
      * m&eacute;todo <code>setKeyMode(String)</code> y es necesaria una clave de
      * cifrado, introducida en base 64 mediante <code>setKey(String)</code>, o una
      * contrase&ntilde;a que el propio usuario deber&aacute; establecer a
      * trav&eacute;s de un di&aacute;logo modal que se le
-     * presentar&aacute;.<br/> El resultado de la operaci&oacute;n puede
+     * presentar&aacute;.<br> El resultado de la operaci&oacute;n puede
      * recuperarse con <code>getPlainData()</code> o salvarse directamente a disco
      * con <code>savePlainDataToFile(String)</code>. <br>
      * Se muestra un di&aacute;logo al usuario para que consienta la operaci&oacute;n.
-     * Si no lo hace, se aborta la operaci&oacute;n y se establece un error.<br/>
+     * Si no lo hace, se aborta la operaci&oacute;n y se establece un error.<br>
      * <br>
      * Decrypts indicated file. Encryption configuration used for data must be
      * indicated with <code>setCipherAlgorithm(String)</code> method, which may
@@ -1955,7 +1955,7 @@ interface EntryPointsCrypto {
      * </ul>
      * According to the encryption algorithm, the <code>setKeyMode(String)</code> method must be used, and a mandatory encryption key in base 64 must be
      * introduced with <code>setKey(String)</code>, or a password set by user with a
-     * modal dialog that will be displayed.<br/> Operation's result may be
+     * modal dialog that will be displayed.<br> Operation's result may be
      * retrieved with <code>getPlainData()</code> or be directly saved to disk with <code>savePlainDataToFile(String)</code>.
      * @param fileUri
      *        Archivo de datos a descifrar <br>
@@ -2012,9 +2012,9 @@ interface EntryPointsCrypto {
     String getPassword();
 
     /** Especifica el algoritmo a utilizar para la
-     * encriptaci&oacute;n/desencriptaci&oacute;n sim&eacute;trica.<br/>
+     * encriptaci&oacute;n/desencriptaci&oacute;n sim&eacute;trica.<br>
      * Se utiliza tanto en la encriptaci&oacute;n simple como en la
-     * generaci&oacute;n de sobres digitales.<br/>
+     * generaci&oacute;n de sobres digitales.<br>
      * En caso de requerir el algoritmo algun tipo de configuraci&oacute;n de
      * modo de clave y padding se podr&aacute; pasar junto a su nombre separados
      * por '/' con el formato:
@@ -2029,8 +2029,8 @@ interface EntryPointsCrypto {
      * <code>AES/ECB/PKCS5PADDING</code>
      * </pre>
      *
-     * <br/>
-     * Los algoritmos de cifrados aceptados son:<br/>
+     * <br>
+     * Los algoritmos de cifrados aceptados son:<br>
      * Para los modos de cifrado con clave:
      * <ul>
      * <li>AES</li>
@@ -2048,9 +2048,9 @@ interface EntryPointsCrypto {
      * </ul>
      * <br>
      * <br>
-     * Specifies the algorithm to be used for symmetric encryption/decryption.<br/>
+     * Specifies the algorithm to be used for symmetric encryption/decryption.<br>
      * It may be used in both simple encryptions as in the generation of digital
-     * envelopes.<br/>
+     * envelopes.<br>
      * If key mode and padding configuration are required by the algorithm, they
      * may be provided next to its name, separated by '/' with the format:
      *
@@ -2064,8 +2064,8 @@ interface EntryPointsCrypto {
      * <code>AES/ECB/PKCS5PADDING</code>
      * </pre>
      *
-     * <br/>
-     * Accepted encryption algorithms are:<br/>
+     * <br>
+     * Accepted encryption algorithms are:<br>
      * To the cipher modes using keys:
      * <ul>
      * <li>AES</li>
@@ -2087,7 +2087,7 @@ interface EntryPointsCrypto {
     void setCipherAlgorithm(String algorithm);
 
     /** Devuelve el algoritmo sim&eacute;trico actualmente en uso.<br>
-     * Los algoritmos de cifrados aceptados son:<br/>
+     * Los algoritmos de cifrados aceptados son:<br>
      * Para los modos de cifrado con clave:
      * <ul>
      * <li>AES</li>
@@ -2106,7 +2106,7 @@ interface EntryPointsCrypto {
      * <br>
      * <br>
      * Returns the symmetric algorithm currently in use.<br>
-     * Accepted encryption algorithms are:<br/>
+     * Accepted encryption algorithms are:<br>
      * To the cipher modes using keys:
      * <ul>
      * <li>AES</li>
@@ -2289,9 +2289,9 @@ interface EntryPointsCrypto {
      * claves (valor por defecto) ser&aacute; obligatorio establecer una clave
      * mediante <code>setKey(String)</code>. En cambio, la contrase&ntilde;a se
      * pedir&aacute; siempre mediante una interfaz propia del cliente, sin
-     * posibilidad de introducirla program&aacute;ticamente. <br/>
+     * posibilidad de introducirla program&aacute;ticamente. <br>
      * El algoritmo de cifrado se establecer&aacute; con <code>setCipherAlgorithm(String)</code>, el modo de bloque y el relleno
-     * siempre ser&aacute;n "CBC" y "PKCS#5 Padding" respectivamente. <br/>
+     * siempre ser&aacute;n "CBC" y "PKCS#5 Padding" respectivamente. <br>
      * El resultado se puede recuperar mediante <code>getData()</code> en formato
      * binario o mediante <code>getB64Data()</code> en base 64 y puede ser
      * almacenado en un fichero mediante <code>saveCipherDataToFile(String)</code>. <br>
@@ -2302,10 +2302,10 @@ interface EntryPointsCrypto {
      * password) and - if the default option of key is used - it will be
      * mandatory that a key be set with <code>setKey(String)</code>. In contrast,
      * passwords will always be requested via a client's propietary interface.
-     * No programmatic introduction is possible. <br/>
+     * No programmatic introduction is possible. <br>
      * The encryption algorith is set with <code>setCipherAlgorithm(String)</code>,
      * block mode and fill will always be "CBC" y "PKCS#5 Padding",
-     * respectively. <br/>
+     * respectively. <br>
      * Results may be retrieved with <code>getB64Data()</code> in binary or with <code>getB64Data()</code> in base 64 and they may be stored in a file with
      * <code>saveCipherDataToFile(String)</code>.
      * @return <code>true</code> si la operaci&oacute;n se ha realizado con
@@ -2340,7 +2340,7 @@ interface EntryPointsCrypto {
      * Es obligatorio introducir al menos un receptor. Los datos del emisor se
      * introducir&aacute; en el envoltorio si se ha establecido el certificado
      * del emisor mediante <code>setSelectedCertificateAlias(String)</code>, en caso
-     * contrario no se incluir&aacute;. <br/>
+     * contrario no se incluir&aacute;. <br>
      * El resultado se podr&aacute; recuperar en base64 mediante <code>getB64Data()</code> y puede ser almacenado en un fichero mediante
      * <code>saveDataToFile()</code>. <br>
      * <br>
@@ -2348,7 +2348,7 @@ interface EntryPointsCrypto {
      * certificates indicated with <code>setRecipientsToCMS(String)</code> as
      * recipients. It is mandatory to set at least one recipient. Sender data
      * will be set in the envelope if the sender certificate has been set with <code>setSelectedCertificateAlias(String)</code>. Else, it will not be
-     * included. <br/>
+     * included. <br>
      * Results may be retrieved in base 64 with <code>getB64Data()</code> and may be
      * stored in a file with <code>saveDataToFile()</code>.
      * @return Devuelve <code>true</code> si la operaci&oacute;n se ha realizado
@@ -2363,11 +2363,11 @@ interface EntryPointsCrypto {
     @Deprecated
     boolean buildCMSEnveloped();
 
-    /** Crea la estructura CMS del tipo indicado con <code>setCMSContentType(String)</code>, por defecto "EnvelopedData".<br/>
+    /** Crea la estructura CMS del tipo indicado con <code>setCMSContentType(String)</code>, por defecto "EnvelopedData".<br>
      * La estructura de datos se generar&aacute; a partir de los datons
      * indicados mediante <code>setData(String)</code> o <code>setFileuri(String)</code> . Adicionalmente, cada estructura requiere la configuraci&oacute;n de
      * los
-     * siguientes par&aacute;metros:<br/>
+     * siguientes par&aacute;metros:<br>
      * <ul>
      * <li><b>EncryptedData:</b> Estructura de datos cifrados simetricamente. Requiere establecer una configuraci&oacute;n de cifrado.</li>
      * <li><b>EnvelopedData:</b> Estructura de datos envuelta (Sobre digital). Requiere que se le indiquen los destinatarios del mensaje y,
@@ -2380,14 +2380,14 @@ interface EntryPointsCrypto {
      * Los destinatarios se deber&aacute;n indicar mediante <code>setRecipientsToCMS(String)</code> y/o <code>addRecipientToCMS(String)</code> y
      * <code>removeRecipientToCMS(String)</code>. El emisor puede indicarse mediante <code>setSelectedCertificateAlias(String)</code>. De no hacerlo y ser
      * obligatorio, se presentar&aacute; un di&aacute;logo al usuario para su
-     * selecci&oacute;n. <br/>
+     * selecci&oacute;n. <br>
      * El resultado se podr&aacute; recuperar en base64 mediante <code>getB64Data()</code> y puede ser almacenado en un fichero mediante
      * <code>saveDataToFile()</code>. <br>
      * <br>
      * Creates a CMS structure of the type indicated with <code>setCMSContentType(String)</code>. Default content type is
-     * "EnvelopedData".<br/>
+     * "EnvelopedData".<br>
      * Data structure will be generated from the data set with <code>setData(String)</code> or <code>setFileuri(String)</code>. Moreover, each
-     * structure requires the configuration of the following parameters:<br/>
+     * structure requires the configuration of the following parameters:<br>
      * <ul>
      * <li><b>EncryptedData:</b> Symmetrically encrypted data structure. Requires setting an encryption configuration.</li>
      * <li><b>EnvelopedData:</b> Enveloped data structure (Digital envelope). Requires message recipients and (optionally) the sender to be set.</li>
@@ -2399,7 +2399,7 @@ interface EntryPointsCrypto {
      * Recipients must be indicated with <code>setRecipientsToCMS(String)</code> and/or <code>addRecipientToCMS(String)</code> and
      * <code>removeRecipientToCMS(String)</code>. Sender may be indicated with <code>setSelectedCertificateAlias(String)</code>. If no sender is indicated
      * in mandatory cases, a dialog will be displayed, promting the user to
-     * select it. <br/>
+     * select it. <br>
      * Results may me retrieved in base64 with <code>getB64Data()</code> and can be
      * saved to a file with <code>saveDataToFile(String)</code>.
      * @return Devuelve <code>true</code> si la operaci&oacute;n finaliz&oacute;
@@ -2443,22 +2443,22 @@ interface EntryPointsCrypto {
 
     /** Recupera el contenido de un sobre digital. El sobre se indicar&aacute;
      * mediante una cadena en Base 64 con <code>setData</code> o mediante un
-     * fichero con <code>setFileuri</code>. <br/>
+     * fichero con <code>setFileuri</code>. <br>
      * En el caso de los sobre <code>EncryptedData</code>, puede indicarse si se
      * cifr&oacute; con contrase&ntilde; o clave mediante el m&eacute;todo <code>setKeyMode(String)</code>, y esta con <code>setPassword(String)</code> o
-     * <code>etKey(String)</code>, respectivamente. <br/>
+     * <code>etKey(String)</code>, respectivamente. <br>
      * En el caso de los sobres <code>EnvelopedData</code> y <code>SignedAndEnvelopedData</code> se puede indicar el certificado para
-     * descifrar mediante el m&eacute;todo <code>setSelectedCertificateAlias(String)</code>. <br/>
+     * descifrar mediante el m&eacute;todo <code>setSelectedCertificateAlias(String)</code>. <br>
      * El resultado se podr&aacute; recuperar en base64 mediante <code>getB64Data()</code> y puede ser almacenado en un fichero mediante
      * <code>saveDataToFile()</code>.<br>
      * <br>
      * Recovers a digital envelope's contents. Envelope will be indicated with a
-     * base 64 string with <code>setData</code> or w<code>setFileuri</code>. <br/>
+     * base 64 string with <code>setData</code> or w<code>setFileuri</code>. <br>
      * In the case of <code>EncryptedData</code> envelopes, it may be indicated
      * whether password or key was used for encryption with <code>setKeyMode(String)</code> method. In turn, these may be set with
-     * <code>setPassword(String)</code> or <code>setKey(String)</code>, respectively. <br/>
+     * <code>setPassword(String)</code> or <code>setKey(String)</code>, respectively. <br>
      * In case of <code>EnvelopedData</code> and <code>SignedAndEnvelopedData</code> envelopes certificate for decryption
-     * may be set with <code>setSelectedCertificateAlias(String)</code>. <br/>
+     * may be set with <code>setSelectedCertificateAlias(String)</code>. <br>
      * Results can be retrieved in base 64 with <code>getB64Data()</code> and can be
      * saved to a file with <code>saveDataToFile()</code>.
      * @return true si la operaci&oacute;n fue correcta. <br>
@@ -2529,7 +2529,7 @@ interface EntryPointsCrypto {
      *        "Main" name. */
     void setLdapCertificatePrincipal(String ldapCertificatePrincipal);
 
-    /** Obtiene un certificado en base 64 de un servidor LDAP.<br/>
+    /** Obtiene un certificado en base 64 de un servidor LDAP.<br>
      * Es necesario haber establecido previamente la configuraci&oacute;n del
      * LDAP y los requisitos para identificar al certificado en cuesti&oacute;n. <br>
      * <br>

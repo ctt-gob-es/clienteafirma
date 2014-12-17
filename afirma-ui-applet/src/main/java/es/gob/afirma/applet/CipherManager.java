@@ -144,22 +144,18 @@ final class CipherManager {
     }
 
     /** Establece la configuraci&oacute;n de cifrado a partir de una cadena que
-     * siga uno de los siguientes patrones: <list>
+     * siga uno de los siguientes patrones:
      * <ul>
-     * Algoritmo/ModoBloque/Padding
+     *  <li>Algoritmo/ModoBloque/Padding</li>
+     *  <li>Algoritmo</li>
      * </ul>
-     * <ul>
-     * Algoritmo
-     * </ul>
-     * </list> Si se introduce un nulo, se configurar&aacute; el algoritmo de
-     * cifrado por defecto.<br/>
+     * Si se introduce un nulo, se configurar&aacute; el algoritmo de
+     * cifrado por defecto.<br>
      * Si s&oacute;lo se especifica el algoritmo de cifrado, se tomar&aacute; el
      * modo y el padding configurados por defecto para ese algoritmo.
-     * @param config
-     *        Configuraci&oacute;n de cifrado.
-     * @throws NoSuchAlgorithmException
-     *         Cuando el algoritmo de la configuraci&oacute;n no est&aacute;
-     *         soportado. */
+     * @param config Configuraci&oacute;n de cifrado.
+     * @throws NoSuchAlgorithmException Cuando el algoritmo de la configuraci&oacute;n no est&aacute;
+     *                                  soportado. */
     void setCipherConfig(final String config) throws NoSuchAlgorithmException {
         // Si se introduce null o cadena vacia, eliminamos la configuracion
         // actual
@@ -172,9 +168,8 @@ final class CipherManager {
     }
 
     /** Establece la configuraci&oacute;n de cifrado. Si se introduce un nulo, se
-     * configurar&aacute; el algoritmo de cifrado por defecto.<br/>
-     * @param config
-     *        Configuraci&oacute;n de cifrado. */
+     * configurar&aacute; el algoritmo de cifrado por defecto.
+     * @param config Configuraci&oacute;n de cifrado. */
     void setCipherConfig(final AOCipherConfig config) {
 
         if (config == null) {
@@ -209,15 +204,14 @@ final class CipherManager {
 
     /** Recupera la contrase&ntilde;a configurada para el almac&eacute;n de
      * claves.
-     * @return Contrase&ntilda;a configurada. */
+     * @return Contrase&ntilde;a configurada. */
     char[] getCipherKeystorePass() {
         return this.cipherKeystorePass == null ? null : this.cipherKeystorePass.clone();
     }
 
     /** Establece la contrase&ntilde;a para la apertura del almac&eacute;n de
      * claves.
-     * @param cipherKeystorePass
-     *        Contrase&nmtilde;a del almac&eacute;n. */
+     * @param cipherKeystorePass Contrase&ntilde;a del almac&eacute;n. */
     void setCipherKeystorePass(final char[] cipherKeystorePass) {
         this.cipherKeystorePass = cipherKeystorePass == null ? null : cipherKeystorePass.clone();
     }
@@ -446,10 +440,9 @@ final class CipherManager {
      * @throws AOException
      *         Ocurri&oacute; un error al obtener la clave.
      * @throws KeyException Cuando se produce un error al generar la clave.
-     * @throws IOException
-     * @throws KeyStoreException
-     * @throws CertificateException
-     */
+     * @throws IOException Si hay problemas en el tratamiento de datos.
+     * @throws KeyStoreException Si hay problemas con el almac&eacute;n de claves.
+     * @throws CertificateException Si hay problemas en el tratamiento de los certificados. */
     private Key getConfiguredKey(final AOCipher cipher, final AOCipherConfig config) throws NoSuchAlgorithmException,
                                                                                             AOException,
                                                                                             KeyException,
@@ -632,11 +625,16 @@ final class CipherManager {
      * y/o no se ha seleccionado un alias, se solicita al usuario mediante una
      * ventana modal.
      * @return Clave de cifrado/descifrado.
-     * @throws IOException
-     * @throws KeyStoreException
-     * @throws CertificateException
-     * @throws NoSuchAlgorithmException */
-    private Key getKeyFromCipherKeyStore() throws AOException, NoSuchAlgorithmException, CertificateException, KeyStoreException, IOException {
+     * @throws IOException Si hay problemas en el tratamiento de datos.
+     * @throws KeyStoreException Si hay problemas con el almac&eacute;n de claves.
+     * @throws CertificateException Si hay problemas en el tratamiento de los certificados.
+     * @throws NoSuchAlgorithmException Si no se soporta alg&uacute;n algoritmo necesario.
+     * @throws AOException En caso de cualquier otro error. */
+    private Key getKeyFromCipherKeyStore() throws AOException,
+                                                  NoSuchAlgorithmException,
+                                                  CertificateException,
+                                                  KeyStoreException,
+                                                  IOException {
         // Si el almacen no existe devolvemos un error
         if (!AOCipherKeyStoreHelper.storeExists()) {
             throw new AOException("No existe un almacen de claves de cifrado asociado al usuario"); //$NON-NLS-1$
