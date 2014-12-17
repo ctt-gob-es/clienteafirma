@@ -55,9 +55,9 @@ import org.bouncycastle.asn1.x509.qualified.QCStatement;
       QCStatements ::= SEQUENCE OF QCStatement
 
       QCStatement ::= SEQUENCE {
-          statementId   QC-STATEMENT.&Id({SupportedStatements}),
-          statementInfo QC-STATEMENT.&Type
-          ({SupportedStatements}{@statementId}) OPTIONAL }
+          statementId   QC-STATEMENT.&amp;Id({SupportedStatements}),
+          statementInfo QC-STATEMENT.&amp;Type
+          ({SupportedStatements}{&#64;statementId}) OPTIONAL }
 
       SupportedStatements QC-STATEMENT ::= { qcStatement-1,...}
    </pre> */
