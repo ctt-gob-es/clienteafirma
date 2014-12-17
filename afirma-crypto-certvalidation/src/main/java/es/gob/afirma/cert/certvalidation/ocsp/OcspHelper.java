@@ -80,15 +80,15 @@ final class OcspHelper {
 	}
 
 	/** Obtiene una entrada a una clave privada de un almac&eacute;n en formato PKCS#12 / PFX.
-	 * @param pfxFile Archivo PKCS#12 / PFX
-	 * @param pfxPassword Contrase&ntilde;a del archivo PKCS#12 / PFX
-	 * @param alias Alias del certificado a usar
-	 * @return Entrada a una clave privada
-	 * @throws KeyStoreException
-	 * @throws NoSuchAlgorithmException
-	 * @throws CertificateException
-	 * @throws IOException
-	 * @throws UnrecoverableEntryException */
+	 * @param pfxFile Archivo PKCS#12 / PFX.
+	 * @param pfxPassword Contrase&ntilde;a del archivo PKCS#12 / PFX.
+	 * @param alias Alias del certificado a usar.
+	 * @return Entrada a una clave privada.
+	 * @throws KeyStoreException Si hay problemas en el tratamiento del almac&eacute;n de claves.
+	 * @throws NoSuchAlgorithmException Si no se soporta alg&uacute;n algoritmo necesario.
+	 * @throws CertificateException Si hay problemas tratando los certificados.
+	 * @throws IOException Si hay problemas en el tratamiento de datos.
+	 * @throws UnrecoverableEntryException Si una entrada del almac&eacute;n de claves es inaccesible. */
 	static PrivateKeyEntry getSignData(final String pfxFile,
 			                    final String pfxPassword,
 			                    final String alias) throws KeyStoreException,
@@ -118,10 +118,10 @@ final class OcspHelper {
 	}
 
 	/** Env&iacute;a una solicitud OSCP al <i>responder</i>.
-	 * @param responderUrl URL del servidor OCSP
-	 * @param ocspRequest Solicitud OCSP a enviar
-	 * @return Respuesta del servidor OCSP
-	 * @throws IOException */
+	 * @param responderUrl URL del servidor OCSP.
+	 * @param ocspRequest Solicitud OCSP a enviar.
+	 * @return Respuesta del servidor OCSP.
+	 * @throws IOException Si hay problemas en el tratamiento de datos. */
 	static byte[] sendOcspRequest(final URL responderUrl, final byte[] ocspRequest) throws IOException {
 		if (responderUrl == null) {
 			throw new IllegalArgumentException("La URL del servicio OCSP no puede ser nula"); //$NON-NLS-1$
@@ -151,13 +151,13 @@ final class OcspHelper {
 	}
 
 	/** Crea una solicitud OCSP.
-	 * @param certToValidate Certificado a validar
-	 * @param issuerCert Certificado del emisor del certificado
-	 * @return Solicitud en ASN.1 binario
-	 * @throws OCSPException
-	 * @throws NoSuchAlgorithmException
-	 * @throws CertificateEncodingException
-	 * @throws IOException */
+	 * @param certToValidate Certificado a validar.
+	 * @param issuerCert Certificado del emisor del certificado.
+	 * @return Solicitud en ASN.1 binario.
+	 * @throws OCSPException Si hay problemas accediendo al servicio OCSP.
+	 * @throws NoSuchAlgorithmException Si no se soporta alg&uacute;n algoritmo necesario.
+	 * @throws CertificateEncodingException Si hay problemas en el tratamiento de los certificados.
+	 * @throws IOException Si hay problemas en el tratamiento de datos. */
 	static byte[] createOcspRequest(final X509Certificate certToValidate,
                                            final X509Certificate issuerCert) throws CertificateEncodingException,
                                                                                     NoSuchAlgorithmException,
@@ -174,15 +174,15 @@ final class OcspHelper {
 	}
 
 	/** Crea una solicitud OCSP firmada.
-	 * @param certToValidate Certificado a validar
-	 * @param issuerCert Certificado del emisor del certificado
-	 * @param requestSignKey Entrada a la clave privada para la firma de la solicitud
-	 * @return Solicitud en ASN.1 binario
-	 * @throws CertificateEncodingException
-	 * @throws NoSuchAlgorithmException
-	 * @throws OCSPException
-	 * @throws OperatorCreationException
-	 * @throws IOException */
+	 * @param certToValidate Certificado a validar.
+	 * @param issuerCert Certificado del emisor del certificado.
+	 * @param requestSignKey Entrada a la clave privada para la firma de la solicitud.
+	 * @return Solicitud en ASN.1 binario.
+	 * @throws CertificateEncodingException Si hay problemas en el tratamiento de los certificados.
+	 * @throws NoSuchAlgorithmException Si no se soporta alg&uacute;n algoritmo necesario.
+	 * @throws OCSPException Si hay problemas accediendo al servicio OCSP.
+	 * @throws OperatorCreationException Si hay problemas creando los comandos OCSP.
+	 * @throws IOException Si hay problemas en el tratamiento de datos. */
 	static byte[] createSignedOcspRequest(final X509Certificate certToValidate,
 			                              final X509Certificate issuerCert,
 			                              final PrivateKeyEntry requestSignKey) throws CertificateEncodingException,
@@ -214,10 +214,10 @@ final class OcspHelper {
 	}
 
 	/** Analiza una respuesta OCSP.
-	 * @param resp Respuesta OCSP
-	 * @return Resultado de la validaci&oacute;n seg&uacute;n la respuesta OCSP
-	 * @throws OCSPException
-	 * @throws IOException */
+	 * @param resp Respuesta OCSP.
+	 * @return Resultado de la validaci&oacute;n seg&uacute;n la respuesta OCSP.
+	 * @throws IOException Si hay problemas en el tratamiento de datos.
+	 * @throws OCSPException Si hay problemas accediendo al servicio OCSP. */
 	static ValidationResult analyzeOcspResponse(final byte[] resp) throws OCSPException, IOException {
 		if (resp == null) {
 			throw new IOException("La respuesta OCSP es nula"); //$NON-NLS-1$
