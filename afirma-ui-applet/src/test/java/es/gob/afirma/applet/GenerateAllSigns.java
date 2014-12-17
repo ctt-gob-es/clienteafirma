@@ -208,8 +208,6 @@ public class GenerateAllSigns {
 	@Test
 	public void generateCounterSigns() {
 
-    	final String path = new File("").getAbsolutePath(); //$NON-NLS-1$
-
     	final SignApplet applet = new SignApplet();
     	applet.initialize();
     	final String ksPath = GenerateAllSigns.getResourcePath(CERT_PATH3);
@@ -233,46 +231,31 @@ public class GenerateAllSigns {
 							for(final String algo : algos) {
 								applet.setSignatureAlgorithm(algo);
 
+								// Cada operacion de firma deja establecida internamente cual es la firma resultado, de tal forma que, al no indicar otra,
+								// las subsiguientes operaciones tomaran esa firma como entrada
+
 								applet.setFileuri(GenerateAllSigns.getResourcePath(file[1]));
 								applet.sign();
 								Assert.assertFalse("Error al firmar en formato " + format[1] + " y modo " + mode[1] + ": " + applet.getErrorMessage(), applet.isError()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-								applet.setOutFilePath(path + "/" + "Firma_" + format[1] + "_" + mode[1] + "_" + file[1] + "_" + algo + "." + format[2]); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
-								applet.saveSignToFile();
 
 								applet.setFileuri(GenerateAllSigns.getResourcePath(file[1]));
-								applet.setElectronicSignatureFile(path + "/" + "Firma_" + format[1] + "_" + mode[1] + "_" + file[1] + "_" + algo + "." + format[2]); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
 								applet.coSign();
 								Assert.assertFalse("Error al cofirmar en formato " + format[1] + " y modo " + mode[1] + ": " + applet.getErrorMessage(), applet.isError()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-								applet.setOutFilePath(path + "/" + "Cofirma_" + format[1] + "_" + mode[1] + "_" + file[1] + "_" + algo + "." + format[2]); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
-								applet.saveSignToFile();
 
-								applet.setElectronicSignatureFile(path + "/" + "Cofirma_" + format[1] + "_" + mode[1] + "_" + file[1] + "_" + algo + "." + format[2]); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
 								applet.counterSignTree();
 								Assert.assertFalse("Error al contrafirmar el arbol en formato " + format[1] + " y modo " + mode[1] + ": " + applet.getErrorMessage(), applet.isError()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-								applet.setOutFilePath(path + "/" + "Contrafirma_arbol_" + format[1] + "_" + mode[1] + "_" + file[1] + "_" + algo + "." + format[2]); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
-								applet.saveSignToFile();
 
-								applet.setElectronicSignatureFile(path + "/" + "Cofirma_" + format[1] + "_" + mode[1] + "_" + file[1] + "_" + algo + "." + format[2]); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
 								applet.counterSignLeafs();
 								Assert.assertFalse("Error al contrafirmar las hojas en formato " + format[1] + " y modo " + mode[1] + ": " + applet.getErrorMessage(), applet.isError()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-								applet.setOutFilePath(path + "/" + "Contrafirma_hojas_" + format[1] + "_" + mode[1] + "_" + file[1] + "_" + algo + "." + format[2]); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
-								applet.saveSignToFile();
 
-								applet.setElectronicSignatureFile(path + "/" + "Contrafirma_hojas_" + format[1] + "_" + mode[1] + "_" + file[1] + "_" + algo + "." + format[2]); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
 								applet.setSignersToCounterSign("0\n2"); //$NON-NLS-1$
-								Assert.assertFalse("Error al contrafirmar nodos en formato " + format[1] + " y modo " + mode[1] + ": " + applet.getErrorMessage(), applet.isError()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 								applet.counterSignIndexes();
-								applet.setOutFilePath(path + "/" + "Contrafirma_nodos_" + format[1] + "_" + mode[1] + "_" + file[1] + "_" + algo + "." + format[2]); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
-								applet.saveSignToFile();
+								Assert.assertFalse("Error al contrafirmar nodos en formato " + format[1] + " y modo " + mode[1] + ": " + applet.getErrorMessage(), applet.isError()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
-								applet.setElectronicSignatureFile(path + "/" + "Contrafirma_hojas_" + format[1] + "_" + mode[1] + "_" + file[1] + "_" + algo + "." + format[2]); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
 								final String signers = applet.getSignersStructure().replace("\t", "").replace("\r", "").trim(); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-								//applet.setSignersToCounterSign(signers.substring(0, signers.indexOf('\n', signers.indexOf('\n') + 1)));
 								applet.setSignersToCounterSign(signers.substring(0, signers.indexOf('\n')));
 								applet.counterSignSigners();
 								Assert.assertFalse("Error al contrafirmar firmantes en formato " + format[1] + " y modo " + mode[1] + ": " + applet.getErrorMessage(), applet.isError()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-								applet.setOutFilePath(path + "/" + "Contrafirma_signer_" + format[1] + "_" + mode[1] + "_" + file[1] + "_" + algo + "." + format[2]); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
-								applet.saveSignToFile();
 							}
 						}
 					}
