@@ -1,0 +1,189 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html> 
+  	<head>
+		<title>Pruebas - Despliege del MiniApplet @firma</title>
+	    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
+		
+		<link rel="stylesheet" href="qunit/qunit-1.15.0.css">
+		<script src="qunit/qunit-1.15.0.js"></script>
+		
+		<script type="text/javascript" src="js/miniapplet.js"></script>
+		<script type="text/javascript" src="js_test/deployJava.js"></script>
+		<script type="text/javascript" src="js_test/miniappletTests.js"></script>
+		<script type="text/javascript" src="qunit/qunit-miniapplet-test.js"></script>
+  	</head>
+	<body>
+		
+		<div id="qunit"></div>
+		<div id="qunit-fixture"></div>
+		<script type="text/javascript">
+		
+			
+			// Variable para rellenar los campos de un test
+			var testCargaApplet = {
+				// Identificador del test
+				id: 0,
+				// Nombre del test
+				testName: "Prueba para cargar el MiniApplet",
+				// Resultado (true/false)
+				result: "",
+				// Datos adicionales recibidos como resultado del test
+				data: "",
+				// UserAgent
+				userAgent: "",
+				miniapplet_version: "",
+				browser: "",
+				browser_version: "",
+				os: "",
+				os_version: "",
+				java_version: "",
+				java_arch: ""
+			};
+			var testFirma = {
+					id: 1,
+					testName: "Prueba de firma",
+					result: "",
+					data: "",
+					userAgent: "",
+					miniapplet_version: "",
+					browser: "",
+					browser_version: "",
+					os: "",
+					os_version: "",
+					java_version: "",
+					java_arch: ""
+				};
+
+			var testCofirma = {
+					id: 2,
+					testName: "Prueba de cofirma",
+					result: "",
+					data: "",
+					userAgent: "",
+					miniapplet_version: "",
+					browser: "",
+					browser_version: "",
+					os: "",
+					os_version: "",
+					java_version: "",
+					java_arch: ""
+				};
+			var testContrafirma = {
+					id: 3,
+					testName: "Prueba de contrafirma",
+					result: "",
+					data: "",
+					userAgent: "",
+					miniapplet_version: "",
+					browser: "",
+					browser_version: "",
+					os: "",
+					os_version: "",
+					java_version: "",
+					java_arch: ""
+				};
+			
+			// Array para almacenar todos los test
+			var arrayTest = [];	
+
+			QUnit.test( " qunit-miniapplet-full-test", function( assert ) {
+				  	
+				// Prueba carga del miniApplet
+				loadApplet(testCargaApplet );
+				extractExtraInfo(testCargaApplet);
+				testCargaApplet.data = MiniApplet.getCurrentLog();
+				// guardamos el resultado del testFirma
+				arrayTest.push(testCargaApplet);
+					
+				// Prueba de firma.
+				extractExtraInfo(testFirma);
+				testSign(correctTestFirma, failTestFirma);
+					   
+			  	assert.ok( testCargaApplet.result == true, "Test de carga");
+				assert.ok( testFirma.result == true, "Test de firma");
+				assert.ok( testCofirma.result == true, "Test de cofirma");
+				assert.ok( testContrafirma.result == true, "Test de contrafirma");
+			});
+				
+			// Todos los test han finalizado, enviamos la informacion al servidor. La informacion es un JSON
+			QUnit.done(function() {
+				var json = JSON.stringify(arrayTest);
+				document.getElementsByName("json")[0].value = json;
+				document.getElementById("formResult").submit();
+			});
+			
+			//-- Test Firma --//
+			function correctTestFirma(signatureB64) {
+				testFirma.result = true;
+				resultadoTestFirma();
+				
+			}
+			function failTestFirma(errorType, errorMsg) {
+				testFirma.result = false;
+				resultadoTestFirma();
+			}	
+			
+			function resultadoTestFirma() {
+				testFirma.data = MiniApplet.getCurrentLog();
+				
+				// guardamos el resultado del testFirma
+				arrayTest.push(testFirma);
+				
+				// Cofirma
+				extractExtraInfo(testCofirma);
+				testCoSign(correctTestCofirma, failTestCofirma);
+			}
+			
+			//-- Test Cofirma --//
+			function correctTestCofirma(signatureB64) {
+				testCofirma.result = true;
+				resultadoTestCofirma();
+				
+			}
+			function failTestCofirma(errorType, errorMsg) {
+				testCofirma.result = false;
+				resultadoTestCofirma();
+			}	
+			
+			function resultadoTestCofirma() {
+				testCofirma.data = MiniApplet.getCurrentLog();
+				// guardamos el resultado del testFirma
+				arrayTest.push(testCofirma);
+
+				// Contrafirma
+				extractExtraInfo(testContrafirma);
+				testCounterSign(correctTestContrafirma, failTestContrafirma);
+			}
+			
+			//-- Test Contrafirma --//
+			function correctTestContrafirma(signatureB64) {
+				testContrafirma.result = true;
+				testContrafirma.data = MiniApplet.getCurrentLog();
+				// guardamos el resultado del testFirma
+				arrayTest.push(testContrafirma);
+				
+			}
+			function failTestContrafirma(errorType, errorMsg) {
+				testContrafirma.result = false;
+				testContrafirma.data = MiniApplet.getCurrentLog();
+				// guardamos el resultado del testFirma
+				arrayTest.push(testContrafirma);
+			}
+			
+			function extractExtraInfo(test) {
+				test.userAgent = navigator.userAgent;
+				test.miniapplet_version =  MiniApplet.VERSION;
+				test.browser = MiniAppletTests.getBrowser();
+				test.browser_version = MiniAppletTests.getBrowserVersion();
+				test.os = MiniAppletTests.getOs();
+				test.os_version = MiniAppletTests.getOsVersion();
+				test.java_version = MiniAppletTests.getJavaVersion();
+				test.java_arch = MiniAppletTests.getJavaArch();
+			}
+		</script>
+		
+		<form id="formResult" action="http://172.24.30.87:8080/afirma-miniapplet-store-testdata/TestStorer" method="post">
+			<input type="hidden" name="json"/>
+		</form>
+	</body>
+</html>	
