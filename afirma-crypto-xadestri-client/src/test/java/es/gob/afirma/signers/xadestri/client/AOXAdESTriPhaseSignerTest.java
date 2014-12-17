@@ -73,7 +73,7 @@ public class AOXAdESTriPhaseSignerTest {
 	 * @throws Exception */
 	@SuppressWarnings("static-method")
 	@Test
-	@Ignore
+	@Ignore // Necesita un servidor trifasico
 	public void pruebaFirmaXAdES() throws Exception {
 
 		final byte[] data = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(DATA_FILENAME));
@@ -103,7 +103,7 @@ public class AOXAdESTriPhaseSignerTest {
 	 * @throws Exception */
 	@SuppressWarnings("static-method")
 	@Test
-	@Ignore
+	@Ignore // Necesita un servidor trifasico
 	public void pruebaCofirmaXAdES() throws Exception {
 
 		final byte[] sign = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(SIGNATURE_FILENAME));
@@ -126,7 +126,7 @@ public class AOXAdESTriPhaseSignerTest {
 	 * @throws Exception */
 	@SuppressWarnings("static-method")
 	@Test
-	@Ignore
+	@Ignore // Necesita un servidor trifasico
 	public void pruebaContrafirmaXAdES() throws Exception {
 
 		final byte[] sign = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(COSIGNATURE_FILENAME));
