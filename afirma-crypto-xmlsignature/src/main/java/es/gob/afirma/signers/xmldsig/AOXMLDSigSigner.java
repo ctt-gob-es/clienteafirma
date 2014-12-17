@@ -1699,7 +1699,7 @@ public final class AOXMLDSigSigner implements AOSigner {
 
         }
         catch (final Exception e) {
-            throw new AOException("No se ha podido realizar la contrafirma", e); //$NON-NLS-1$
+            throw new AOException("No se ha podido realizar la contrafirma: " + e, e); //$NON-NLS-1$
         }
 
         // convierte el xml resultante para devolverlo como byte[]
@@ -1739,7 +1739,7 @@ public final class AOXMLDSigSigner implements AOSigner {
             }
         }
         catch (final Exception e) {
-            throw new AOException("No se ha podido realizar la contrafirma", e); //$NON-NLS-1$
+            throw new AOException("No se ha podido realizar la contrafirma: " + e, e); //$NON-NLS-1$
         }
     }
 
@@ -1974,7 +1974,9 @@ public final class AOXMLDSigSigner implements AOSigner {
             digestMethod = fac.newDigestMethod(refsDigestMethod, null);
         }
         catch (final Exception e) {
-            throw new AOException("No se ha podido obtener un generador de huellas digitales para el algoritmo '" + refsDigestMethod + "'", e); //$NON-NLS-1$ //$NON-NLS-2$
+            throw new AOException(
+        		"No se ha podido obtener un generador de huellas digitales para el algoritmo '" + refsDigestMethod + "': " + e, e //$NON-NLS-1$ //$NON-NLS-2$
+    		);
         }
         final String referenceId = "Reference-" + UUID.randomUUID().toString(); //$NON-NLS-1$
 
@@ -1985,7 +1987,7 @@ public final class AOXMLDSigSigner implements AOSigner {
             referenceList.add(fac.newReference("#" + signatureValue.getAttribute("Id"), digestMethod, transformList, CSURI, referenceId)); //$NON-NLS-1$ //$NON-NLS-2$
         }
         catch (final Exception e) {
-            throw new AOException("No se ha podido realizar la contrafirma", e); //$NON-NLS-1$
+            throw new AOException("No se ha podido realizar la contrafirma: " + e, e); //$NON-NLS-1$
         }
 
         // definicion de identificadores
@@ -2034,10 +2036,10 @@ public final class AOXMLDSigSigner implements AOSigner {
             sign.sign(signContext);
         }
         catch (final NoSuchAlgorithmException e) {
-            throw new UnsupportedOperationException("Los formatos de firma XML no soportan el algoritmo de firma '" + this.algo + "'", e); //$NON-NLS-1$ //$NON-NLS-2$
+            throw new UnsupportedOperationException("Los formatos de firma XML no soportan el algoritmo de firma '" + this.algo + "': " + e, e); //$NON-NLS-1$ //$NON-NLS-2$
         }
         catch (final Exception e) {
-            throw new AOException("No se ha podido realizar la contrafirma", e); //$NON-NLS-1$
+            throw new AOException("No se ha podido realizar la contrafirma: " + e, e); //$NON-NLS-1$
         }
     }
 
@@ -2068,7 +2070,7 @@ public final class AOXMLDSigSigner implements AOSigner {
             }
         }
         catch (final Exception e) {
-            LOGGER.warning("Se ha producido un error al obtener la estructura de firmas. " + e); //$NON-NLS-1$
+            LOGGER.warning("Se ha producido un error al obtener la estructura de firmas: " + e); //$NON-NLS-1$
             return null;
         }
 
@@ -2155,8 +2157,8 @@ public final class AOXMLDSigSigner implements AOSigner {
             final Element rootNode = signDoc.getDocumentElement();
 
             final String xmlSignatureName = XML_SIGNATURE_PREFIX == null || "".equals(XML_SIGNATURE_PREFIX) ? //$NON-NLS-1$
-            		SIGNATURE_STR :
-            			XML_SIGNATURE_PREFIX + ":" + SIGNATURE_STR; //$NON-NLS-1$
+        		SIGNATURE_STR :
+        			XML_SIGNATURE_PREFIX + ":" + SIGNATURE_STR; //$NON-NLS-1$
 
             final ArrayList<Node> signNodes = new ArrayList<Node>();
             if (rootNode.getNodeName().equals(xmlSignatureName)) {
