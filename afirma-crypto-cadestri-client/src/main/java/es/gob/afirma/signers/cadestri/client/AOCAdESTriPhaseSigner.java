@@ -152,7 +152,7 @@ public final class AOCAdESTriPhaseSigner implements AOSigner {
 	}
 
 	/** Ejecuta una operaci&oacute;n de firma/multifirma en 3 fases.
-	 * @param cryptoOperation Tipo de operaci&oacute.
+	 * @param cryptoOperation Tipo de operaci&oacute;n.
 	 * @param data Datos o firma sobre la que operar
 	 * @param algorithm Algoritmo de firma
 	 * @param key Clave privada del certificado de firma.
@@ -338,11 +338,11 @@ public final class AOCAdESTriPhaseSigner implements AOSigner {
 		final CounterSignData csd;
 		try {
 			csd = CounterSignData.parse(Base64.decode(preSignResult, 0, preSignResult.length, true));
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			throw new AOException("El valor de prefirma para la operacion de contrafirma CAdES no es valido", e); //$NON-NLS-1$
 		}
 
-		List<SingleCounterSignData> scss = csd.getCounterSigns();
+		final List<SingleCounterSignData> scss = csd.getCounterSigns();
 		for (int i = 0; i < scss.size(); i++) {
 			final SingleCounterSignData scs = scss.get(i);
 			final byte[] pkcs1sign = new AOPkcs1Signer().sign(
