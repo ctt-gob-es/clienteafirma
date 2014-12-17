@@ -20,6 +20,7 @@ import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.charset.Charset;
 import java.security.AccessController;
@@ -1061,7 +1062,15 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 		// y este en un host distinto del que se ha descargado el applet, incluso si es el equipo
 		// local, se pide confirmacion al usuario.
 		if (!normalizePath(filename).equals(this.userSelectedPath)) {
-			if (!getCodeBase().getHost().equals(uri.getHost()) &&
+			URL codeBase;
+			try {
+				codeBase = getCodeBase();
+			}
+			catch(final Exception e) {
+				codeBase = null;
+				LOGGER.warning("No se ha podido obtener el CodeBase del Applet: " + e); //$NON-NLS-1$
+			}
+			if (codeBase == null || !codeBase.getHost().equals(uri.getHost()) &&
 					!checkUserPermision(AppletMessages.getString("SignApplet.33") + CR + filename + //$NON-NLS-1$
 							CR + AppletMessages.getString("SignApplet.12"))) { //$NON-NLS-1$
 				setError(AppletMessages.getString("SignApplet.494", filename)); //$NON-NLS-1$
