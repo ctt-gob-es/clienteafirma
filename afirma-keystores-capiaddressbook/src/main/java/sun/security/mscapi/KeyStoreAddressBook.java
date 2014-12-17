@@ -95,12 +95,14 @@ public abstract class KeyStoreAddressBook extends KeyStoreSpi {
             }
         }
 
-        /** Gets the alias for the keystore entry. */
+        /** Gets the alias for the keystore entry.
+         * @return Alias para la entrada de almac&eacute;n. */
         String getAlias() {
             return this.alias;
         }
 
-        /** Gets the certificate chain for the keystore entry. */
+        /** Gets the certificate chain for the keystore entry.
+         * @return cadena de certificados para la entrada de almac&eacute;n. */
         X509Certificate[] getCertificateChain() {
             return this.certChain;
         }
@@ -176,7 +178,7 @@ public abstract class KeyStoreAddressBook extends KeyStoreSpi {
         if (alias == null) {
             return null;
         }
-        
+
         // Se usan los KeyEntry por reflexion porque se han detectado casos en los que son del
         // tipo del almacen de windows en lugar de la libreta de direcciones
         try {
@@ -490,16 +492,16 @@ public abstract class KeyStoreAddressBook extends KeyStoreSpi {
         }
     }
 
-    /** Returns the name of the keystore. */
+    /** Devuelve el nombre del almac&eacute;n.
+     * @return Nombre del almac&eacute;n. */
     private String getName() {
         return this.storeName;
     }
 
     /** Load keys and/or certificates from keystore into Collection.
-     * @param name
-     *        Name of keystore.
-     * @param entries
-     *        Collection of key/certificate. */
+     * @param name Name of keystore.
+     * @param ntries Collection of key/certificate.
+     * @throws KeyStoreException Si hay problemas tratando el almac&eacute;n. */
     private void loadKeysOrCertificateChains(final String name, final Collection<KeyEntry> ntries) throws KeyStoreException {
         try {
             this.loadKeysOrCertificateChains.invoke(this.nativeWrapper, name, ntries);

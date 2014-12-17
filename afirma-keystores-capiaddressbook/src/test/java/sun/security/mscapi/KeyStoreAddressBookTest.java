@@ -6,23 +6,21 @@ import java.security.Security;
 import java.util.Enumeration;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import es.gob.afirma.keystores.capiaddressbook.MSCAPIAddressBook;
 
-/**
- * Clase de pruebas de acceso a la libreta de direcciones.
- * @author Carlos Gamuci
- */
+/** Clase de pruebas de acceso a la libreta de direcciones.
+ * @author Carlos Gamuci. */
 public class KeyStoreAddressBookTest {
 
-	/**
-	 * Prueba de acceso a la libreta a traves del proveedor MSCAPIAddressBook.
+	/** Prueba de acceso a la libreta a traves del proveedor MSCAPIAddressBook.
 	 * @throws Exception Cuando no se localiza el proveedor, ocurren un problema
-	 * en su carga o al listar los certificados.
-	 */
+	 * en su carga o al listar los certificados. */
 	@SuppressWarnings("static-method")
 	@Test
+	@Ignore // Necesita CAPI
 	public void pruebaProveedorDeAccesoLibretaDirecciones() throws Exception {
 
 		if (System.getProperty("os.name").contains("indows")) { //$NON-NLS-1$ //$NON-NLS-2$
