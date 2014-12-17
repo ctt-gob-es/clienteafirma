@@ -27,12 +27,9 @@ import es.gob.afirma.core.signers.AdESPolicy;
 import es.gob.afirma.signers.cades.GenCAdESEPESSignedData;
 import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
 
-/**
- * Pruebas espec&iacute;ficas de CAdES para DNIe.
- * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s
- *
- */
-public class MiniTestDNI {
+/** Pruebas espec&iacute;ficas de CAdES para DNIe.
+ * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
+public final class MiniTestDNI {
 
     private static final String DNIE_DRIVER_PATH = "name=testdni\r\nlibrary=c:/windows/system32/UsrPkcs11.dll\r\nshowInfo=false"; //$NON-NLS-1$
 
@@ -42,12 +39,10 @@ public class MiniTestDNI {
 
     private static final String TEXTO_FIRMAR = "Tom\u00F3"; //$NON-NLS-1$
 
-    /**
-     * Mini-prueba CAdES especifica para DNIe.
-     * @throws Exception en caso de cualquier tipo de problema
-     */
+    /** Mini-prueba CAdES especifica para DNIe.
+     * @throws Exception en caso de cualquier tipo de problema. */
     @SuppressWarnings({ "static-method" })
-    @Ignore
+    @Ignore // Necesita un DNIe
 	@Test
     public void testCAdESDNIe() throws Exception {
 
