@@ -26,7 +26,7 @@ public final class TestCommitmentTypeIndications {
     static {
 	    p3.setProperty("format", AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED); //$NON-NLS-1$
 	    p3.setProperty("commitmentTypeIndications", "1"); //$NON-NLS-1$ //$NON-NLS-2$
-	    p3.setProperty("commitmentTypeIndication0Identifier", "1.2.840.113549.1.9.16.6.1"); //$NON-NLS-1$ //$NON-NLS-2$
+	    p3.setProperty("commitmentTypeIndication0Identifier", "2"); //$NON-NLS-1$ //$NON-NLS-2$
 	    p3.setProperty("commitmentTypeIndication0Description", "Prueba"); //$NON-NLS-1$ //$NON-NLS-2$
 	    p3.setProperty("commitmentTypeIndication0DocumentationReferences", "http://es.atos.net/es-es/home.html|http://atos.net/en-us/home.html"); //$NON-NLS-1$ //$NON-NLS-2$
 	    p3.setProperty("commitmentTypeIndication0CommitmentTypeQualifiers", "Q1|Q2|Q3"); //$NON-NLS-1$ //$NON-NLS-2$
