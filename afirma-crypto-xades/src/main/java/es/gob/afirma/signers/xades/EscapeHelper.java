@@ -204,20 +204,42 @@ final class EscapeHelper {
 
 	private static String escapeCharacters(final String str) {
 		return str
-			.replace("\u00e1", "\\C3\\A1") //$NON-NLS-1$ //$NON-NLS-2$
-			.replace("\u00e9", "\\C3\\A9") //$NON-NLS-1$ //$NON-NLS-2$
-			.replace("\u00ed", "\\C3\\AD") //$NON-NLS-1$ //$NON-NLS-2$
-			.replace("\u00f3", "\\C3\\B3") //$NON-NLS-1$ //$NON-NLS-2$
-			.replace("\u00fa", "\\C3\\BA") //$NON-NLS-1$ //$NON-NLS-2$
-			.replace("\u00c1", "\\C3\\81") //$NON-NLS-1$ //$NON-NLS-2$
-			.replace("\u00c9", "\\C3\\89") //$NON-NLS-1$ //$NON-NLS-2$
-			.replace("\u00cd", "\\C3\\8D") //$NON-NLS-1$ //$NON-NLS-2$
-			.replace("\u00d3", "\\C3\\93") //$NON-NLS-1$ //$NON-NLS-2$
-			.replace("\u00da", "\\C3\\9A") //$NON-NLS-1$ //$NON-NLS-2$
-			.replace("\u00f1", "\\C3\\B1") //$NON-NLS-1$ //$NON-NLS-2$
-			.replace("\u00d1", "\\C3\\91") //$NON-NLS-1$ //$NON-NLS-2$
-			.replace("\u00e7", "\\C3\\A7") //$NON-NLS-1$ //$NON-NLS-2$
-			.replace("\u00c7", "\\C3\\87") //$NON-NLS-1$ //$NON-NLS-2$
+			.replace("\u00e1", "\\C3\\A1") // a minuscula con tilde aguda //$NON-NLS-1$ //$NON-NLS-2$
+			.replace("\u00e9", "\\C3\\A9") // e minuscula con tilde aguda //$NON-NLS-1$ //$NON-NLS-2$
+			.replace("\u00ed", "\\C3\\AD") // i minuscula con tilde aguda //$NON-NLS-1$ //$NON-NLS-2$
+			.replace("\u00f3", "\\C3\\B3") // o minuscula con tilde aguda //$NON-NLS-1$ //$NON-NLS-2$
+			.replace("\u00fa", "\\C3\\BA") // u minuscula con tilde aguda //$NON-NLS-1$ //$NON-NLS-2$
+			.replace("\u00c1", "\\C3\\81") // A mayuscula con tilde aguda //$NON-NLS-1$ //$NON-NLS-2$
+			.replace("\u00c9", "\\C3\\89") // E mayuscula con tilde aguda //$NON-NLS-1$ //$NON-NLS-2$
+			.replace("\u00cd", "\\C3\\8D") // I mayuscula con tilde aguda //$NON-NLS-1$ //$NON-NLS-2$
+			.replace("\u00d3", "\\C3\\93") // O mayuscula con tilde aguda //$NON-NLS-1$ //$NON-NLS-2$
+			.replace("\u00da", "\\C3\\9A") // U mayuscula con tilde aguda //$NON-NLS-1$ //$NON-NLS-2$
+
+			.replace("\u00f1", "\\C3\\B1") // n minuscula con virgulilla //$NON-NLS-1$ //$NON-NLS-2$
+			.replace("\u00d1", "\\C3\\91") // N mayuscula con virgulilla //$NON-NLS-1$ //$NON-NLS-2$
+
+			.replace("\u00e7", "\\C3\\A7") // c minuscula con cedilla //$NON-NLS-1$ //$NON-NLS-2$
+			.replace("\u00c7", "\\C3\\87") // C mayuscula con cedilla //$NON-NLS-1$ //$NON-NLS-2$
+
+			.replace("\u00e0", "\\C3\\A0") // a minuscula con tilde grave //$NON-NLS-1$ //$NON-NLS-2$
+			.replace("\u00e8", "\\C3\\A8") // e minuscula con tilde grave //$NON-NLS-1$ //$NON-NLS-2$
+			.replace("\u00ec", "\\C3\\AC") // i minuscula con tilde grave //$NON-NLS-1$ //$NON-NLS-2$
+			.replace("\u00f2", "\\C3\\B2") // o minuscula con tilde grave //$NON-NLS-1$ //$NON-NLS-2$
+			.replace("\u00f9", "\\C3\\B9") // u minuscula con tilde grave //$NON-NLS-1$ //$NON-NLS-2$
+			.replace("\u00c0", "\\C3\\80") // A mayuscula con tilde grave //$NON-NLS-1$ //$NON-NLS-2$
+			.replace("\u00c8", "\\C3\\88") // E mayuscula con tilde grave //$NON-NLS-1$ //$NON-NLS-2$
+			.replace("\u00cc", "\\C3\\8C") // I mayuscula con tilde grave //$NON-NLS-1$ //$NON-NLS-2$
+			.replace("\u00d2", "\\C3\\92") // O mayuscula con tilde grave //$NON-NLS-1$ //$NON-NLS-2$
+			.replace("\u00d9", "\\C3\\99") // U mayuscula con tilde grave //$NON-NLS-1$ //$NON-NLS-2$
+
+			.replace("\u00fc", "\\C3\\BC") // u minuscula con dieresis //$NON-NLS-1$ //$NON-NLS-2$
+			.replace("\u00dc", "\\C3\\9C") // U mayuscula con dieresis //$NON-NLS-1$ //$NON-NLS-2$
+
+			.replace("\u00bf", "\\C2\\BF") // Apertura de interrogacion //$NON-NLS-1$ //$NON-NLS-2$
+			.replace("\u00a1", "\\C2\\A1") // Apertura de exclamacion //$NON-NLS-1$ //$NON-NLS-2$
+
+			.replace("\u00b5", "\\C2\\B5") // Simbolo de "micro" //$NON-NLS-1$ //$NON-NLS-2$
+			.replace("\u00ba", "\\C2\\BA") // Simbolo de ordinal masculino //$NON-NLS-1$ //$NON-NLS-2$
 		;
 	}
 
@@ -226,7 +248,6 @@ final class EscapeHelper {
 		private final X509Certificate cert;
 
 		private static X500Principal escapePrincipal(final Principal p) {
-			//TODO: Heredar X500Principal para que en el getName() y en el toString() devuelvan la cadena "escapada"
 			return new X500Principal(escapeLdapName(p.toString()));
 		}
 
