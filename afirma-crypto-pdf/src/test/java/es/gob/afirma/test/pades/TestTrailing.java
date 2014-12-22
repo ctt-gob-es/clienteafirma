@@ -4,8 +4,7 @@ import java.security.KeyStore;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.util.Properties;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 import es.gob.afirma.core.misc.AOUtil;
