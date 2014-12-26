@@ -25,7 +25,7 @@ import es.gob.afirma.keystores.callbacks.NullPasswordCallback;
 import es.gob.afirma.keystores.callbacks.UIPasswordCallback;
 
 /** Gestor simple de <code>KeyStores</code>. Obtiene o un <code>KeyStore</code> de DNIe
- * v&iacute;a PKCS#11 o el <code>KeyStore</code> por defecto del sistema operativo
+ * v&iacute;a controlador 100% Java o el <code>KeyStore</code> por defecto del sistema operativo
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 final class SimpleKeyStoreManager {
 
