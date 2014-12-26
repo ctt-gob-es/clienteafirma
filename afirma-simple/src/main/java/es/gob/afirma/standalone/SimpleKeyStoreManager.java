@@ -34,7 +34,7 @@ final class SimpleKeyStoreManager {
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
     /** Obtiene un <code>KeyStore</code>.
-     * @param dnie <code>true</code> si desea obtenerse un <code>KeyStore</code> para DNIe v&iacute;a PKCS#11, <code>false</code> si desea obtenerse
+     * @param dnie <code>true</code> si desea obtenerse un <code>KeyStore</code> para DNIe, <code>false</code> si desea obtenerse
      *        el <code>KeyStore</code> por defecto del sistema operativo
      * @param parent Componente padre para la modalidad
      * @return <code>KeyStore</code> apropiado
