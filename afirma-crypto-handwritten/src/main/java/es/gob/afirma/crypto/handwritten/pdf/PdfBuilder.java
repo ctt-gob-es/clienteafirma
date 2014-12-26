@@ -54,6 +54,8 @@ public final class PdfBuilder {
 	 * @param inPdf PDF de entrada.
 	 * @param bioSignDataList Lista de datos de la tarea de firma de cada firmante.
 	 * @param cert Certificado X.509 cuya clave se usar&aacute; para cifrar la informaci&oacute;n biom&eacute;trica.
+	 * @param csv C&oacute;digo seguro de verificaci&oacute;n a a&ntilde;adir al documento, o <code>null</code>
+	 *            si no se desea a&ntilde;adir ninguno.
 	 * @return PDF con la informaci&oacute; a&ntilde;adida.
 	 * @throws IOException Si hay problemas en el tratamiento de datos.
 	 * @throws NoSuchAlgorithmException Si no se encuentra alg&uacute;n algoritmo necesario
