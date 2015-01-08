@@ -39,7 +39,7 @@ public final class SelectionDialog {
 	public static File showFileOpenDialog(final Component parent, final String title, final String defaultDir) {
 		if (Platform.OS.MACOSX.equals(Platform.getOS())) {
 			try {
-				return AOUIFactory.getLoadFiles(title, null, null, null, null, false, false, parent)[0];
+				return AOUIFactory.getLoadFiles(title, null, null, null, null, false, false, null, parent)[0];
 			}
 			catch(final AOCancelledOperationException e) {
 				return null;
@@ -66,6 +66,7 @@ public final class SelectionDialog {
 					filter != null ? filter.getDescription() : null,
 					false,
 					false,
+					null,
 					parent
 				)[0];
 			}
@@ -84,7 +85,7 @@ public final class SelectionDialog {
 	public static File showDirOpenDialog(final Component parent, final String title, final String defaultDir) {
 		if (Platform.OS.MACOSX.equals(Platform.getOS())) {
 			try {
-				return AOUIFactory.getLoadFiles(title, defaultDir, null, null, null, true, false, parent)[0];
+				return AOUIFactory.getLoadFiles(title, defaultDir, null, null, null, true, false, null, parent)[0];
 			}
 			catch(final AOCancelledOperationException e) {
 				return null;
@@ -116,6 +117,7 @@ public final class SelectionDialog {
 						filter != null ? filter.getDescription() : null,
 						false,
 						false,
+						null,
 						parent
 					)[0];
 			}
