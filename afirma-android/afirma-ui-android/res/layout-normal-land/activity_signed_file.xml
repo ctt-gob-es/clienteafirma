@@ -85,16 +85,15 @@
     	        android:textAppearance="?android:attr/textAppearanceMedium"
     	    />
     	    
-    	    <TextView 
+    	    <TextView
     	        android:id="@+id/filestorage_path"
-    	        android:layout_below="@id/signedfile_ok_icon"
     	        android:layout_width="fill_parent"
     	        android:layout_height="wrap_content"
-    	        android:background="#E0E0E0"
-    	        android:padding="10sp"
+    	        android:layout_below="@id/signedfile_ok_icon"
     	        android:layout_marginTop="10sp"
-    	        android:textIsSelectable="false"
-    	        />
+    	        android:padding="10sp"
+    	        android:textIsSelectable="false" />
+
     	</RelativeLayout>
 
 </RelativeLayout>
