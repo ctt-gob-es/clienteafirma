@@ -10,7 +10,6 @@
 
 package es.gob.afirma.core.ui;
 
-import java.awt.Image;
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.Logger;
@@ -231,7 +230,7 @@ public final class AOUIFactory {
     		                               final String description,
     		                               final boolean selectDirectory,
     		                               final boolean multiSelect,
-    		                               final Image icon,
+    		                               final Object icon,
     		                               final Object parentComponent) {
         return uiManager.getLoadFiles(dialogTitle, currentDir, filename, extensions, description, selectDirectory, multiSelect, icon, parentComponent);
     }

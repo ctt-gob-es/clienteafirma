@@ -367,7 +367,7 @@ public class JSEUIManager implements AOUIManager {
                                     final String description,
                                     final boolean selectDirectory,
                                     final boolean multiSelect,
-                                    final Image icon,
+                                    final Object icon,
                                     final Object parent) {
         Component parentComponent = null;
         if (parent instanceof Component) {
@@ -375,13 +375,13 @@ public class JSEUIManager implements AOUIManager {
         }
 
         final JFileChooser jfc;
-        if (icon != null) {
+        if (icon != null && icon instanceof Image) {
         	jfc = new JFileChooser() {
 			private static final long serialVersionUID = 5631612687512882773L;
 			   @Override
 			    protected JDialog createDialog(final Component p) {
 			        final JDialog dialog = super.createDialog(p);
-			        dialog.setIconImage(icon);
+			        dialog.setIconImage((Image) icon);
 			        return dialog;
 			    }
         	};

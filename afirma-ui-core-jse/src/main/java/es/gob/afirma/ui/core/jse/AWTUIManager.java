@@ -12,7 +12,6 @@ package es.gob.afirma.ui.core.jse;
 
 import java.awt.FileDialog;
 import java.awt.Frame;
-import java.awt.Image;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
@@ -100,7 +99,7 @@ public final class AWTUIManager extends JSEUIManager {
 			                  final String description,
 			                  final boolean selectDirectory,
 			                  final boolean multiSelect,
-			                  final Image icon,
+			                  final Object icon,
 			                  final Object parent) {
         final FileDialog fd = new FileDialog(parent instanceof Frame ? (Frame) parent : null, dialogTitle);
         fd.setMode(FileDialog.LOAD);

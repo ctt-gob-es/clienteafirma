@@ -10,7 +10,6 @@
 
 package es.gob.afirma.core.ui;
 
-import java.awt.Image;
 import java.io.File;
 import java.io.IOException;
 
@@ -148,7 +147,7 @@ public interface AOUIManager {
     		            String description,
     		            boolean selectDirectory,
     		            boolean multiSelect,
-    		            Image icon,
+    		            Object icon,
     		            Object parentComponent);
 
     /** Muestra un di&aacute;logo de guardado para almacenar los datos indicados.
