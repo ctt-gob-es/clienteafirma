@@ -41,10 +41,9 @@
         </activity>
         <activity
             android:name=".android.SignDataActivity"
-            android:finishOnCloseSystemDialogs="true"
-            android:finishOnTaskLaunch="true"
             android:label="@string/title_activity_sign_data"
-            android:theme="@style/Theme.Transparent" >
+            android:theme="@style/Theme.Transparent"
+            >
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 

@@ -55,7 +55,7 @@ public final class DownloadFileTask extends BasicHttpTransferDataTask {
 			data = this.readUrlByPost(url.toString());
 
 			Log.i(ES_GOB_AFIRMA, "Descarga de datos finalizada"); //$NON-NLS-1$
-			
+
 			if (ERROR_PREFIX.equalsIgnoreCase(new String(data, 0, 4, DEFAULT_URL_ENCODING))) {
 				this.errorMessage = "El servidor devolvio el siguiente error al descargar los datos: " + new String(data, DEFAULT_URL_ENCODING); //$NON-NLS-1$
 				this.errorThowable = new IOException(this.errorMessage);
@@ -90,7 +90,6 @@ public final class DownloadFileTask extends BasicHttpTransferDataTask {
 
 	@Override
 	protected void onPostExecute(final byte[] result) {
-		super.onPostExecute(result);
 
 		if (result != null) {
 			this.ddListener.processData(result);

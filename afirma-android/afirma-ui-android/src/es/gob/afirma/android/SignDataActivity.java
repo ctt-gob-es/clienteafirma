@@ -72,7 +72,7 @@ KeystoreManagerListener, PrivateKeySelectionListener, DownloadDataListener, Send
 	/** Codigo de petici\u00F3n usado para invocar a la actividad que selecciona el fichero para firmar. */
 	private static final int SELECT_FILE_REQUEST_CODE = 1;
 
-	private boolean fileChooserOpenned = false;
+	private boolean fileChooserOpenned;
 
 	private UrlParametersToSign parameters;
 
@@ -427,6 +427,7 @@ KeystoreManagerListener, PrivateKeySelectionListener, DownloadDataListener, Send
 	public synchronized void processData(final byte[] data) {
 
 		Log.i(ES_GOB_AFIRMA, "Se ha descargado correctamente la configuracion de firma almacenada en servidor"); //$NON-NLS-1$
+		Log.i(ES_GOB_AFIRMA, "Cantidad de datos descargada: " + (data == null ? -1 : data.length)); //$NON-NLS-1$
 
 		// Si hemos tenido que descargar los datos desde el servidor, los desciframos y llamamos
 		// al dialogo de seleccion de certificados para la firma
@@ -651,8 +652,10 @@ KeystoreManagerListener, PrivateKeySelectionListener, DownloadDataListener, Send
 		}
 	}
 
-	void closeActivity() {
-		finish();
+	static void closeActivity() {
+//		finish();
+		// Cerramos a la fuerza para, en siguientes ejecuciones, no se vuelvan a cargar los mismos datos
+		System.exit(0);
 	}
 
 	@Override

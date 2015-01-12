@@ -14,11 +14,7 @@ import android.os.AsyncTask;
 import es.gob.afirma.android.network.AndroidUrlHttpManager;
 import es.gob.afirma.core.AOCancelledOperationException;
 
-abstract class BasicHttpTransferDataTask extends AsyncTask<Void, Void, byte[]> {
-
-	@Override
-	protected abstract byte[] doInBackground(Void... params);
-
+public abstract class BasicHttpTransferDataTask extends AsyncTask<Void, Void, byte[]> {
 
 	/** Lee una URL HTTP o HTTPS por POST si se indican par&aacute;metros en la URL y por GET en caso contrario.
 	 * En HTTPS no se hacen comprobaciones del certificado servidor.

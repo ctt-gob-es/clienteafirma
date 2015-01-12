@@ -274,7 +274,7 @@ public final class UriParser {
 		if (!params.containsKey(OPERATION_PARAM)) {
 			throw new ParameterException("No se ha indicado un codigo de operacion"); //$NON-NLS-1$
 		}
-		
+
 		final String op = params.get(OPERATION_PARAM);
 		if (OP_ID_SIGN.equalsIgnoreCase(op)) {
 			ret.setOperation(OP_SIGN);
@@ -329,7 +329,7 @@ public final class UriParser {
 		}
 
 		ret.setSignAlgorithm(algo);
-		
+
 		if (params.containsKey(PROPERTIES_PARAM)) {
 			final String props = URLDecoder.decode(params.get(PROPERTIES_PARAM), DEFAULT_URL_ENCODING);
 			Log.d(ES_GOB_AFIRMA, "ExtraParams B64: " + props); //$NON-NLS-1$
@@ -341,7 +341,7 @@ public final class UriParser {
 				ret.setExtraParams(new Properties());
 			}
 		}
-		
+
 		return ret;
 	}
 
@@ -388,7 +388,7 @@ public final class UriParser {
 		if (params.containsKey(KEY_PARAM)) {
 			ret.setDesKey(verifyCipherKey(params.get(KEY_PARAM)));
 		}
-		
+
 		ret.setData(verifyData(params));
 		ret.setFileId(verifyFileId(params));
 		if (ret.getData() == null && ret.getFileId() != null) {
@@ -482,7 +482,7 @@ public final class UriParser {
 		// Comprobamos que la URL sea valida
 		final URL servletUrl;
 		try {
-			servletUrl = new URL(url);
+			servletUrl = new URL(URLDecoder.decode(url));
 		}
 		catch (final MalformedURLException e) {
 			throw new ParameterException("La URL proporcionada para el servlet no es valida: " + e); //$NON-NLS-1$
