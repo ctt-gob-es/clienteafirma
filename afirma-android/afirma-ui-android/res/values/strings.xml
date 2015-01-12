@@ -10,7 +10,7 @@
     <string name="request_cert">Solicitar certificado</string>
     <string name="appsDialogTitle">Listado de autoridades soportadas</string>
     <string name="appsDialogMessage">Seleccione la autoridad de certificaci\u00F3n a la que desee solicitar su certificado.</string>
-    <string name="disclaimer">2014 Gobierno de Espa\u00F1a</string>
+    <string name="disclaimer">2015 Gobierno de Espa\u00F1a</string>
     <string name="content_desc">Logotipo @firma m\u00F3vil</string>
     <string name="ok">Aceptar</string>
     <string name="close">Cerrar</string>

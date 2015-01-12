@@ -3,9 +3,9 @@
 
     <string name="app_name">Client m\u00F3vil @firma</string>
     <string name="title_activity_cert_chooser">Importer certificat</string>
-    <string name="presentation_text">Bienvenue "Client @firma Android" 0.1 Beta.\nCette application permet rèaliser signatures électroniques sur les sites webs qui possédent des serveurs de certificats.\nPour bien fonctionner, vous devez disposer d’un certificat électronique et votre code privé installés dans votre dispositive. Consultez avec votre serveur de certification et la documentation de votre système Android.</string>
+    <string name="presentation_text">Bienvenue "Client @firma Android".\nCette application permet rèaliser signatures électroniques sur les sites webs qui possédent des serveurs de certificats.\nPour bien fonctionner, vous devez disposer d’un certificat électronique et votre code privé installés dans votre dispositive. Consultez avec votre serveur de certification et la documentation de votre système Android.</string>
     <string name="import_cert">Importer cerficat</string>
-    <string name="disclaimer">2014 Gouvernement d\'Espagne</string>
+    <string name="disclaimer">2015 Gouvernement d\'Espagne</string>
     <string name="ok">Accepter</string>
     <string name="title_activity_sign_data">Signature des données</string>
     <string name="error_bad_params">L\'invocation à l\'application n\'a pas réussi. Consultez avec votre serveur.</string>
