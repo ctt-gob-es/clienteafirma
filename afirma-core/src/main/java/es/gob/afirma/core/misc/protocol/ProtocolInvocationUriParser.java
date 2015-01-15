@@ -283,7 +283,7 @@ public final class ProtocolInvocationUriParser {
 
 		// Tomamos el tipo de operacion
 		final String op = params.get(OPERATION_PARAM);
-		if (!OP_ID_SIGN.equalsIgnoreCase(op) && OP_ID_COSIGN.equalsIgnoreCase(op) && OP_ID_COUNTERSIGN.equalsIgnoreCase(op)) {
+		if (!OP_ID_SIGN.equalsIgnoreCase(op) && !OP_ID_COSIGN.equalsIgnoreCase(op) && !OP_ID_COUNTERSIGN.equalsIgnoreCase(op)) {
 			throw new ParameterException("Se ha indicado un codigo de operacion incorrecto"); //$NON-NLS-1$
 		}
 		if (OP_ID_SIGN.equalsIgnoreCase(op)) {
@@ -302,20 +302,19 @@ public final class ProtocolInvocationUriParser {
 			return ret;
 		}
 
-		// Comprobamos que se ha especificado el servlet
-		if (!params.containsKey(STORAGE_SERVLET_PARAM)) {
-			throw new ParameterException("No se ha recibido la direccion del servlet para el envio de la firma"); //$NON-NLS-1$
-		}
+		// Comprobamos que la validez de la URL del servlet de guardado en caso de indicarse
+		if (params.containsKey(STORAGE_SERVLET_PARAM)) {
 
-		// Comprobamos que la URL sea valida
-		URL storageServletUrl;
-		try {
-			storageServletUrl = validateURL(params.get(STORAGE_SERVLET_PARAM));
+			// Comprobamos que la URL sea valida
+			URL storageServletUrl;
+			try {
+				storageServletUrl = validateURL(params.get(STORAGE_SERVLET_PARAM));
+			}
+			catch (final ParameterException e) {
+				throw new ParameterException("Error al validar la URL del servlet de guardado: " + e, e); //$NON-NLS-1$
+			}
+			ret.setStorageServletUrl(storageServletUrl);
 		}
-		catch (final ParameterException e) {
-			throw new ParameterException("Error al validar la URL del servlet de guardado: " + e, e); //$NON-NLS-1$
-		}
-		ret.setStorageServletUrl(storageServletUrl);
 
 		// Comprobamos que se ha especificado el formato
 		if (!params.containsKey(FORMAT_PARAM)) {
