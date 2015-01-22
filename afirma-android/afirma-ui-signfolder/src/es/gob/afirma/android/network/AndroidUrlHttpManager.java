@@ -20,7 +20,6 @@ import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
 import java.util.StringTokenizer;
-import java.util.logging.Logger;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
@@ -30,19 +29,15 @@ import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
-import es.gob.afirma.core.misc.AOUtil;
-
 /** Implementacion de ua clase para la lectura del contenido de una URL.
  * @author Carlos Gamuci */
 public final class AndroidUrlHttpManager {
 
 	private static final int DEFAULT_TIMEOUT = -1;
-	
+
 	private AndroidUrlHttpManager() {
 		// No permitimos la instanciacion
 	}
-
-	private static final String HTTPS = "https"; //$NON-NLS-1$
 
 	private static final HostnameVerifier DEFAULT_HOSTNAME_VERIFIER = HttpsURLConnection.getDefaultHostnameVerifier();
 	private static final SSLSocketFactory DEFAULT_SSL_SOCKET_FACTORY = HttpsURLConnection.getDefaultSSLSocketFactory();
@@ -61,14 +56,58 @@ public final class AndroidUrlHttpManager {
 		}
 	};
 
-	/** Lee una URL HTTP o HTTPS por POST si se indican par&aacute;metros en la URL y por GET en caso contrario.
-	 * En HTTPS no se hacen comprobaciones del certificado servidor.
-	 * @param url URL a leer
-	 * @return Contenido de la URL
-	 * @throws IOException Si no se puede leer la URL */
-	public static byte[] readUrlByPost(final String url) throws IOException {
-		return readUrlByPost(url, DEFAULT_TIMEOUT);
-	}
+//	/** Lee una URL HTTP o HTTPS por POST si se indican par&aacute;metros en la URL y por GET en caso contrario.
+//	 * En HTTPS no se hacen comprobaciones del certificado servidor.
+//	 * @param url URL a leer
+//	 * @return Contenido de la URL
+//	 * @throws IOException Si no se puede leer la URL */
+//	public static byte[] readUrlByPost(final String url) throws IOException {
+//		return readUrlByPost(url, DEFAULT_TIMEOUT);
+//	}
+//
+//	/** Lee una URL HTTP o HTTPS por POST si se indican par&aacute;metros en la URL y por GET en caso contrario.
+//	 * En HTTPS no se hacen comprobaciones del certificado servidor.
+//	 * @param url URL a leer
+//	 * @param timeout Tiempo m&aacute;ximo en milisegundos que se debe esperar por la respuesta. Un timeout de 0
+//	 * se interpreta como un timeout infinito. Si se indica -1, se usar&aacute; el por defecto de Java.
+//	 * @return Contenido de la URL
+//	 * @throws IOException Si no se puede leer la URL */
+//	public static byte[] readUrlByPost(final String url, final int timeout) throws IOException {
+//		if (url == null) {
+//			throw new IllegalArgumentException("La URL a leer no puede ser nula"); //$NON-NLS-1$
+//		}
+//
+//		// Si la URL no tiene parametros la leemos por GET
+//		if (!url.contains("?")) { //$NON-NLS-1$
+//			return readUrlByGet(url);
+//		}
+//
+//		final StringTokenizer st = new StringTokenizer(url, "?"); //$NON-NLS-1$
+//		final String request = st.nextToken();
+//		final String urlParameters = st.nextToken();
+//
+//		final URL uri = new URL(request);
+//		final HttpURLConnection conn = (HttpURLConnection) uri.openConnection(Proxy.NO_PROXY);
+//		conn.setRequestMethod("POST"); //$NON-NLS-1$
+////		if (timeout != DEFAULT_TIMEOUT) {
+////			conn.setConnectTimeout(timeout);
+//////			conn.setReadTimeout(timeout);
+////		}
+//
+//		conn.setDoOutput(true);
+//
+//		final OutputStreamWriter writer = new OutputStreamWriter(conn.getOutputStream());
+//
+//		writer.write(urlParameters);
+//		writer.flush();
+//
+//		final byte[] data;
+//		final InputStream is = conn.getInputStream();
+//		data = AOUtil.getDataFromInputStream(is);
+//		is.close();
+//
+//		return data;
+//	}
 
 	/** Lee una URL HTTP o HTTPS por POST si se indican par&aacute;metros en la URL y por GET en caso contrario.
 	 * En HTTPS no se hacen comprobaciones del certificado servidor.
@@ -77,14 +116,14 @@ public final class AndroidUrlHttpManager {
 	 * se interpreta como un timeout infinito. Si se indica -1, se usar&aacute; el por defecto de Java.
 	 * @return Contenido de la URL
 	 * @throws IOException Si no se puede leer la URL */
-	public static byte[] readUrlByPost(final String url, final int timeout) throws IOException {
+	public static InputStream getRemoteDataByPost(final String url, final int timeout) throws IOException {
 		if (url == null) {
 			throw new IllegalArgumentException("La URL a leer no puede ser nula"); //$NON-NLS-1$
 		}
 
 		// Si la URL no tiene parametros la leemos por GET
 		if (!url.contains("?")) { //$NON-NLS-1$
-			return readUrlByGet(url);
+			return getRemoteDataByGet(url);
 		}
 
 		final StringTokenizer st = new StringTokenizer(url, "?"); //$NON-NLS-1$
@@ -92,23 +131,11 @@ public final class AndroidUrlHttpManager {
 		final String urlParameters = st.nextToken();
 
 		final URL uri = new URL(request);
-
-		if (uri.getProtocol().equals(HTTPS)) {
-			try {
-				disableSslChecks();
-			}
-			catch(final Exception e) {
-				Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
-						"No se ha podido ajustar la confianza SSL, es posible que no se pueda completar la conexion: " + e //$NON-NLS-1$
-						);
-			}
-		}
-
 		final HttpURLConnection conn = (HttpURLConnection) uri.openConnection(Proxy.NO_PROXY);
 		conn.setRequestMethod("POST"); //$NON-NLS-1$
 //		if (timeout != DEFAULT_TIMEOUT) {
 //			conn.setConnectTimeout(timeout);
-////			conn.setReadTimeout(timeout);
+//			conn.setReadTimeout(timeout);
 //		}
 
 		conn.setDoOutput(true);
@@ -118,49 +145,42 @@ public final class AndroidUrlHttpManager {
 		writer.write(urlParameters);
 		writer.flush();
 
-		final byte[] data;
-		final InputStream is = conn.getInputStream();
-		data = AOUtil.getDataFromInputStream(is);
-		is.close();
-				
-		if (uri.getProtocol().equals(HTTPS)) {
-			enableSslChecks();
-		}
-
-		return data;
+		return conn.getInputStream();
 	}
-	
+
+//	/** Lee una URL HTTP o HTTPS por GET. En HTTPS no se hacen comprobaciones del certificado servidor.
+//	 * @param url URL a leer
+//	 * @return Contenido de la URL
+//	 * @throws IOException Si no se puede leer la URL */
+//	public static byte[] readUrlByGet(final String url) throws IOException {
+//		final URL uri = new URL(url);
+//		final InputStream is = uri.openStream();
+//		final byte[] data = AOUtil.getDataFromInputStream(is);
+//		is.close();
+//
+//		return data;
+//	}
+
 	/** Lee una URL HTTP o HTTPS por GET. En HTTPS no se hacen comprobaciones del certificado servidor.
 	 * @param url URL a leer
 	 * @return Contenido de la URL
 	 * @throws IOException Si no se puede leer la URL */
-	public static byte[] readUrlByGet(final String url) throws IOException {
-		final URL uri = new URL(url);
-		if (uri.getProtocol().equals("https")) { //$NON-NLS-1$
-			try {
-				disableSslChecks();
-			}
-			catch(final Exception e) {
-				Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
-						"No se ha podido ajustar la confianza SSL, es posible que no se pueda completar la conexion: " + e //$NON-NLS-1$
-						);
-			}
-		}
-		final InputStream is = uri.openStream();
-		final byte[] data = AOUtil.getDataFromInputStream(is);
-		is.close();
-		if (uri.getProtocol().equals("https")) { //$NON-NLS-1$
-			enableSslChecks();
-		}
-		return data;
+	public static InputStream getRemoteDataByGet(final String url) throws IOException {
+		return new URL(url).openStream();
 	}
 
-	private static void enableSslChecks() {
+	/**
+	 * Habilita las comprobaciones por defecto de las conexiones SSL.
+	 */
+	public static void enableSslChecks() {
 		HttpsURLConnection.setDefaultSSLSocketFactory(DEFAULT_SSL_SOCKET_FACTORY);
 		HttpsURLConnection.setDefaultHostnameVerifier(DEFAULT_HOSTNAME_VERIFIER);
 	}
 
-	private static void disableSslChecks() throws KeyManagementException, NoSuchAlgorithmException {
+	/**
+	 * Deshabilita las comprobaciones por defecto de las conexiones SSL.
+	 */
+	public static void disableSslChecks() throws KeyManagementException, NoSuchAlgorithmException {
 		final SSLContext sc = SSLContext.getInstance("SSL"); //$NON-NLS-1$
 		sc.init(null, DUMMY_TRUST_MANAGER, new java.security.SecureRandom());
 		HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());

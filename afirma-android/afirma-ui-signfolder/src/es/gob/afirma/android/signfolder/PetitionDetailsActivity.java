@@ -252,9 +252,10 @@ public final class PetitionDetailsActivity extends FragmentActivity implements L
     private List<RequestDetailAdapterItem> prepareDocsItems(final List<SignRequestDocument> documentsList){
     	final List<RequestDetailAdapterItem> list = new ArrayList<PetitionDetailsActivity.RequestDetailAdapterItem>();
 		list.add(new SignLineHeader(getString(R.string.docs)));
-		for (int i = 0; i < documentsList.size(); i++) {
-			list.add(new DocItem(documentsList.get(i).getName(), documentsList.get(i).getSize(),
-					documentsList.get(i).getId(), DownloadFileTask.DOCUMENT_TYPE_DATA));
+		//for (int i = 0; i < documentsList.size(); i++) {
+		for (SignRequestDocument doc : documentsList) {
+			list.add(new DocItem(doc.getName(), doc.getSize(), doc.getMimeType(),
+					doc.getId(), DownloadFileTask.DOCUMENT_TYPE_DATA));
 		}
 
 		if (SignRequest.STATE_SIGNED.equals(this.requestState) && this.reqDetails.getType() == RequestType.SIGNATURE) {
@@ -328,7 +329,7 @@ public final class PetitionDetailsActivity extends FragmentActivity implements L
 	 * el fichero seleccionado.
 	 * @param docId Identificador del documento seleccionado.
 	 */
-	void showConfirmPreviewDialog(final String docId, final String filename, final int docType) {
+	void showConfirmPreviewDialog(final String docId, final String filename, final String mimetype, final int docType) {
 
 		final OnClickListener listener = new OnClickListener() {
 			@Override
@@ -336,6 +337,7 @@ public final class PetitionDetailsActivity extends FragmentActivity implements L
 				final DownloadFileTask dlfTask =
 						new DownloadFileTask(docId, docType,
 								filename,
+								mimetype,
 								docType == DownloadFileTask.DOCUMENT_TYPE_SIGN,
 								getCertB64(), CommManager.getInstance(), PetitionDetailsActivity.this, PetitionDetailsActivity.this);
 				dlfTask.execute();
@@ -438,12 +440,14 @@ public final class PetitionDetailsActivity extends FragmentActivity implements L
     final class DocItem implements RequestDetailAdapterItem, View.OnClickListener {
     	private final String docId;
     	private final String name;
+    	private final String mimetype;
         private final int size;
         private final int docType;
 
-        DocItem(final String name, final int size, final String docId, final int docType) {
+        DocItem(final String name, final int size, final String mimetype, final String docId, final int docType) {
             this.name = name;
             this.size = size;
+            this.mimetype = mimetype;
             this.docId = docId;
             this.docType = docType;
         }
@@ -451,6 +455,7 @@ public final class PetitionDetailsActivity extends FragmentActivity implements L
         DocItem(final String name, final String docId, final int docType) {
             this.name = name;
             this.size = -1;
+            this.mimetype = null;
             this.docId = docId;
             this.docType = docType;
         }
@@ -547,7 +552,7 @@ public final class PetitionDetailsActivity extends FragmentActivity implements L
 
         @Override
 		public void onClick(final View v) {
-			showConfirmPreviewDialog(this.docId, this.name, this.docType);
+			showConfirmPreviewDialog(this.docId, this.name, this.mimetype, this.docType);
 		}
     }
     /**

@@ -88,7 +88,7 @@ final class SignRequestTask extends AsyncTask<Void, Void, RequestResult>{
 			}
 		}
 		catch (final Throwable e) {
-			Log.e(SFConstants.LOG_TAG, "Error durante la operacion de firma: " + e); //$NON-NLS-1$
+			Log.e(SFConstants.LOG_TAG, "Error grave durante la operacion de firma: " + e); //$NON-NLS-1$
 			this.t = e;
 
 			e.printStackTrace();

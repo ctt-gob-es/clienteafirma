@@ -1,28 +1,26 @@
 package es.gob.afirma.android.signfolder;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 
 import android.app.Activity;
-import android.content.Context;
 import android.os.AsyncTask;
-import android.os.Environment;
 import android.util.Log;
-import android.widget.Toast;
+import es.gob.afirma.android.signfolder.SaveFileTask.SaveFileListener;
 import es.gob.afirma.android.signfolder.proxy.CommManager;
 import es.gob.afirma.android.signfolder.proxy.DocumentData;
-import es.gob.afirma.core.misc.Base64;
 
 /** Tarea as&iacute;ncrona para la previsualizaci&oacute;n de documentos. */
-final class DownloadFileTask extends AsyncTask<Void, Void, DocumentData> {
+final class DownloadFileTask extends AsyncTask<Void, Void, DocumentData> implements SaveFileListener {
 
 	private static final String DEFAULT_TEMP_DOCUMENT_PREFIX = "temp";  //$NON-NLS-1$
+
+	private static final String PDF_MIMETYPE = "application/pdf"; //$NON-NLS-1$
 
 	private final String documentId;
 	private final int type;
 	private final boolean extDir;
 	private final String proposedName;
+	private final String mimetype;
 	private final String certB64;
 	private final CommManager commManager;
 	private final DownloadDocumentListener listener;
@@ -68,10 +66,11 @@ final class DownloadFileTask extends AsyncTask<Void, Void, DocumentData> {
 	 * @param listener Listener que procesa las notificaciones con el resultado de la operaci&oacute;n.
 	 * @param activity Actividad sobre la que mostrar las notificaciones.
 	 */
-	DownloadFileTask(final String documentId, final int type, final String proposedName, final boolean extDir, final String certB64, final CommManager commManager, final DownloadDocumentListener listener, final Activity activity) {
+	DownloadFileTask(final String documentId, final int type, final String proposedName, final String mimetype, final boolean extDir, final String certB64, final CommManager commManager, final DownloadDocumentListener listener, final Activity activity) {
 		this.documentId = documentId;
 		this.type = type;
 		this.proposedName = proposedName;
+		this.mimetype = mimetype;
 		this.extDir = extDir;
 		this.certB64 = certB64;
 		this.commManager = commManager;
@@ -90,13 +89,16 @@ final class DownloadFileTask extends AsyncTask<Void, Void, DocumentData> {
 		try {
 			switch (this.type) {
 			case DOCUMENT_TYPE_SIGN:
-				documentData = this.commManager.getPreviewSign(this.documentId, this.certB64);
+				documentData = this.commManager.getPreviewSign(this.documentId,
+						this.proposedName, null, this.certB64);
 				break;
 			case DOCUMENT_TYPE_REPORT:
-				documentData = this.commManager.getPreviewReport(this.documentId, this.certB64);
+				documentData = this.commManager.getPreviewReport(this.documentId,
+						this.proposedName, PDF_MIMETYPE, this.certB64);
 				break;
 			default:
-				documentData = this.commManager.getPreviewDocument(this.documentId, this.certB64);
+				documentData = this.commManager.getPreviewDocument(this.documentId,
+						this.proposedName, this.mimetype, this.certB64);
 			}
 
 		} catch (final Exception e) {
@@ -119,82 +121,32 @@ final class DownloadFileTask extends AsyncTask<Void, Void, DocumentData> {
 			return;
 		}
 
-		// Una vez tenemos la respuesta del servicio, guardamos el fichero y lo abrirmos
+		// Una vez tenemos la respuesta del servicio, guardamos el fichero
 		String suffix = null;
 		if (documentData.getFilename() != null && documentData.getFilename().indexOf('.') != -1) {
 			suffix = documentData.getFilename().substring(documentData.getFilename().lastIndexOf('.'));
 		}
 
-		File documentFile;
-		try {
-			documentFile = saveFile(documentData, suffix);
-		} catch (final Exception e) {
-			documentFile = null;
-			Toast.makeText(this.activity, R.string.toast_error_previewing, Toast.LENGTH_SHORT).show();
-			Log.i(SFConstants.LOG_TAG, "Error durante el guardado del fichero: " + e); //$NON-NLS-1$
-			e.printStackTrace();
+		String filename = this.proposedName;
+		if (filename == null) {
+			filename = DEFAULT_TEMP_DOCUMENT_PREFIX;
+			if (suffix != null) {
+				filename += suffix;
+			}
 		}
 
-		if (documentFile != null) {
-			this.listener.downloadDocumentSuccess(documentFile, documentData.getFilename(), documentData.getMimetype(), this.type);
-		}
+		new SaveFileTask(
+				documentData.getDataIs(), filename, this.extDir, this, this.activity
+				).execute();
 	}
 
-	/**
-	 * Guarda un documento en el espacio de cache de la aplicaci&oacute;n.
-	 * @param documentData Documento que se desea guardar.
-	 * @param suffix Sufijo para el final del nombre del documento (com&uacute;nmente la extensi&oacute;n).
-	 * @return Fichero generado.
-	 * @throws IOException Cuando ocurre un error al guardar el fichero.
-	 */
-	private File saveFile(final DocumentData documentData, final String suffix) throws IOException {
-
-		String filename = DEFAULT_TEMP_DOCUMENT_PREFIX;
-		if (suffix != null) {
-			filename += suffix;
-		}
-
-		File outFile;
-		if (this.extDir) {
-			int i = 0;
-			do {
-				outFile = new File(
-						Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
-						generateFileName(this.proposedName, i++));
-			} while (outFile.exists());
-
-			final FileOutputStream fos = new FileOutputStream(outFile);
-			fos.write(Base64.decode(documentData.getDataB64()));
-			fos.close();
-
-		}
-		else {
-			final FileOutputStream fos = this.activity.openFileOutput(filename, Context.MODE_WORLD_READABLE);
-			fos.write(Base64.decode(documentData.getDataB64()));
-			fos.close();
-			outFile = new File(this.activity.getFilesDir(), filename);
-		}
-
-		return outFile;
+	@Override
+	public void saveFileSuccess(File outputFile) {
+		this.listener.downloadDocumentSuccess(outputFile, outputFile.getName(), this.mimetype, this.type);
 	}
 
-	/**
-	 * Genera un nombre de fichero agregando un indice al final del nombre propuesto. Si el
-	 * &iacute;ndice es menor o igual a 0, se devuelve el nombre indicado.
-	 * @param docName Nombre inicial del fichero.
-	 * @param index &Iacute;ndice que agregar.
-	 * @return Nombre generado.
-	 */
-	private static String generateFileName(final String docName, final int index) {
-		if (index <= 0) {
-			return docName;
-		}
-
-		final int lastDocPos = docName.lastIndexOf('.');
-		if (lastDocPos == -1) {
-			return docName + '(' + index + ')';
-		}
-
-		return docName.substring(0, lastDocPos) + '(' + index + ')' + docName.substring(lastDocPos);
+	@Override
+	public void saveFileError(String filename) {
+		this.listener.downloadDocumentError();
 	}
 }

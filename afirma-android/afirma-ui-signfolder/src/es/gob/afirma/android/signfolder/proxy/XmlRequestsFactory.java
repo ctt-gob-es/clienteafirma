@@ -22,7 +22,7 @@ final class XmlRequestsFactory {
 
 	private static final String XML_APPROVE_OPEN = "<apprv>"; //$NON-NLS-1$
 	private static final String XML_APPROVE_CLOSE = "</apprv>"; //$NON-NLS-1$
-	
+
 	private static final String XML_PARAMS_OPEN = "<params>"; //$NON-NLS-1$
 	private static final String XML_PARAMS_CLOSE = "</params>"; //$NON-NLS-1$
 
@@ -35,7 +35,7 @@ final class XmlRequestsFactory {
 	}
 
 	/**
-	 * Crea un XML para la solicitud al proxy de un listado de peticiones. 
+	 * Crea un XML para la solicitud al proxy de un listado de peticiones.
 	 * @param certEncoded Certificado codificado en Base64 con el que validar la petici&oacute;n.
 	 * @param state Estado de la petici&oacute;n.
 	 * @param signFormats Listado de formatos de firma soportados.
@@ -52,11 +52,11 @@ final class XmlRequestsFactory {
 		sb.append("\" sz=\""); //$NON-NLS-1$
 		sb.append(pageSize);
 		sb.append("\">"); //$NON-NLS-1$
-		
+
 		sb.append(XML_CERT_OPEN);
 		sb.append(certEncoded);
 		sb.append(XML_CERT_CLOSE);
-		
+
 		if (signFormats != null && signFormats.length > 0) {
 			sb.append("<fmts>"); //$NON-NLS-1$
 			for (int i = 0; i < signFormats.length; i++) {
@@ -144,7 +144,7 @@ final class XmlRequestsFactory {
 		sb.append("</req>"); //$NON-NLS-1$
 
 		sb.append(XML_REQUESTS_CLOSE); // Cierre del listado de peticiones
-		
+
 		sb.append(XML_TRISIGN_CLOSE); // Cierre del XML
 
 		return sb.toString();
@@ -229,11 +229,11 @@ final class XmlRequestsFactory {
 	    }
 	    sb.append("</rjcts>"); //$NON-NLS-1$
 	    sb.append(XML_REJECTS_CLOSE);
-	    
+
 	    return sb.toString();
 	}
 
-	
+
 	static String createAppListRequest(final String certEncodedB64) {
 
 		final StringBuffer sb = new StringBuffer(XML_HEADER);
@@ -245,7 +245,7 @@ final class XmlRequestsFactory {
 
 	    return sb.toString();
 	}
-	
+
 	static String createDetailRequest(final String certEncodedB64, final String requestId) {
 		if (requestId == null || requestId.trim().length() == 0) {
 			throw new IllegalArgumentException("El identificador de la solicitud de firma no puede ser nulo"); //$NON-NLS-1$
@@ -299,7 +299,7 @@ final class XmlRequestsFactory {
 	    }
 	    sb.append("</reqs>"); //$NON-NLS-1$
 	    sb.append(XML_APPROVE_CLOSE);
-	    
+
 	    return sb.toString();
 	}
 }

@@ -950,7 +950,8 @@ public final class PetitionListActivity extends FragmentActivity implements
 		if (((PetitionListAdapterItem) adapter.getItemAtPosition(position)).getViewType() ==
 				PetitionListItemType.PETITION_ITEM.ordinal()) {
 
-			final SignRequest signRequest = ((PetitionElement) adapter.getItemAtPosition(position)).getSignRequest();
+			final SignRequest signRequest = ((PetitionElement) adapter.getItemAtPosition(position))
+					.getSignRequest();
 			signRequest.setViewed(true);
 			showRequestDetails(signRequest.getId());
 		}

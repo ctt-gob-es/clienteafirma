@@ -1,7 +1,7 @@
 package es.gob.afirma.android.signfolder.proxy;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
@@ -26,6 +26,8 @@ public final class CommManager {
 
 	private static final String LOGGER_TAG = "es.gob.afirma.android.signfolder"; //$NON-NLS-1$
 
+	private static final String HTTPS = "https"; //$NON-NLS-1$
+
 	private static final String PARAMETER_NAME_OPERATION = "op"; //$NON-NLS-1$
 	private static final String PARAMETER_NAME_DATA = "dat"; //$NON-NLS-1$
 
@@ -41,7 +43,7 @@ public final class CommManager {
 	private static final String OPERATION_PREVIEW_REPORT = "9"; //$NON-NLS-1$
 
 	/** Tiempo m&aacute;ximo que se va a esperar por una respuesta del proxy. */
-	private static final int DEFAULT_CONNECTION_READ_TIMEOUT = 14000;
+	private static final int DEFAULT_CONNECTION_READ_TIMEOUT = 30000;	//TODO: Configurar
 
 	private DocumentBuilder db;
 
@@ -245,12 +247,11 @@ public final class CommManager {
 	public RequestAppConfiguration getApplicationList(final String certB64)
 			throws SAXException, IOException {
 
-		final String dataB64UrlSafe = prepareParam(XmlRequestsFactory
-				.createAppListRequest(certB64));
+		final String dataB64UrlSafe = prepareParam(
+				XmlRequestsFactory.createAppListRequest(certB64));
 
-		return ApplicationListResponseParser
-				.parse(getRemoteDocument(prepareUrl(OPERATION_APP_LIST,
-						dataB64UrlSafe)));
+		return ApplicationListResponseParser.parse(
+				getRemoteDocument(prepareUrl(OPERATION_APP_LIST, dataB64UrlSafe)));
 	}
 
 	/**
@@ -297,9 +298,10 @@ public final class CommManager {
 	 *             Si no se puede obtener la codificaci&oacute;n del certificado
 	 */
 	public DocumentData getPreviewDocument(final String documentId,
+			final String filename, final String mimetype,
 			final String certB64) throws SAXException, IOException {
 
-		return getPreview(OPERATION_PREVIEW_DOCUMENT, documentId, certB64);
+		return getPreview(OPERATION_PREVIEW_DOCUMENT, documentId, filename, mimetype, certB64);
 	}
 
 	/**
@@ -319,9 +321,11 @@ public final class CommManager {
 	 *             Si no se puede obtener la codificaci&oacute;n del certificado
 	 */
 	public DocumentData getPreviewSign(final String documentId,
+			final String filename, final String mimetype,
 			final String certB64) throws SAXException, IOException {
 
-		return getPreview(OPERATION_PREVIEW_SIGN, documentId, certB64);
+		return getPreview(OPERATION_PREVIEW_SIGN, documentId,
+				filename, mimetype, certB64);
 	}
 
 	/**
@@ -341,9 +345,11 @@ public final class CommManager {
 	 *             Si no se puede obtener la codificaci&oacute;n del certificado
 	 */
 	public DocumentData getPreviewReport(final String documentId,
+			final String filename, final String mimetype,
 			final String certB64) throws SAXException, IOException {
 
-		return getPreview(OPERATION_PREVIEW_REPORT, documentId, certB64);
+		return getPreview(OPERATION_PREVIEW_REPORT, documentId,
+				filename, mimetype, certB64);
 	}
 
 	/**
@@ -365,14 +371,16 @@ public final class CommManager {
 	 *             Si no se puede obtener la codificaci&oacute;n del certificado
 	 */
 	public DocumentData getPreview(final String operation,
-			final String documentId, final String certB64) throws SAXException,
-			IOException {
+			final String documentId, final String filename,
+			final String mimetype, final String certB64) throws IOException {
 
 		final String dataB64UrlSafe = prepareParam(XmlRequestsFactory
 				.createPreviewRequest(documentId, certB64));
 
-		return PreviewDocumentResponseParser
-				.parse(getRemoteDocument(prepareUrl(operation, dataB64UrlSafe)));
+		final DocumentData docData = new DocumentData(documentId, filename, mimetype);
+		docData.setDataIs(getRemoteDocumentIs(prepareUrl(operation, dataB64UrlSafe)));
+
+		return docData;
 	}
 
 	/**
@@ -412,16 +420,59 @@ public final class CommManager {
 	 * @throws SAXException
 	 *             Error al parsear el XML.
 	 */
-	private Document getRemoteDocument(final String url) throws SAXException,
-			IOException {
+	private Document getRemoteDocument(final String url) throws SAXException, IOException {
 
-		final byte[] docBytes = AndroidUrlHttpManager.readUrlByPost(url,
-				this.timeout);
-		if (docBytes == null || docBytes.length == 0) {
-			throw new IOException(
-					"No se han podido descargar los datos asociados a la URL indicada"); //$NON-NLS-1$
+		if (url.startsWith(HTTPS)) {
+			try {
+				AndroidUrlHttpManager.disableSslChecks();
+			}
+			catch(final Exception e) {
+				Log.w(LOGGER_TAG,
+						"No se ha podido ajustar la confianza SSL, es posible que no se pueda completar la conexion: " + e //$NON-NLS-1$
+						);
+			}
 		}
-		return this.db.parse(new ByteArrayInputStream(docBytes));
+
+		InputStream is = AndroidUrlHttpManager.getRemoteDataByPost(url, this.timeout);
+		Document doc = this.db.parse(is);
+		is.close();
+
+		if (url.startsWith(HTTPS)) {
+			AndroidUrlHttpManager.enableSslChecks();
+		}
+		return doc;
+	}
+
+
+	/**
+	 * Obtiene el flujo de entrada de los datos a descargar.
+	 * @param url URL de donde descargar los datos.
+	 * @return Flujo de datos para la descarga.
+	 * @throws IOException
+	 *             Error en la lectura del documento.
+	 */
+	private InputStream getRemoteDocumentIs(final String url) throws IOException {
+
+		if (url.startsWith(HTTPS)) {
+			try {
+				AndroidUrlHttpManager.disableSslChecks();
+			}
+			catch(final Exception e) {
+				Log.w(LOGGER_TAG,
+						"No se ha podido ajustar la confianza SSL, es posible que no se pueda completar la conexion: " + e //$NON-NLS-1$
+						);
+			}
+		}
+
+		final InputStream is = AndroidUrlHttpManager.getRemoteDataByPost(url, this.timeout);
+
+		if (url.startsWith(HTTPS)) {
+			AndroidUrlHttpManager.enableSslChecks();
+		}
+
+		Log.d(LOGGER_TAG, "Se ha obtenido el flujo de entrada de los datos"); //$NON-NLS-1$
+
+		return is;
 	}
 
 	/** Verifica si la URL de proxy configurada es correcta.

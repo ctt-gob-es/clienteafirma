@@ -63,6 +63,7 @@ public class PreviewDocumentResponseParser {
 		}
 		dataB64 =  XmlUtils.getTextContent(paramsNodes.item(index));
 
-		return new DocumentData(docid, filename, mimetype, dataB64);
+		//return new DocumentData(docid, filename, mimetype, dataB64);
+		return new DocumentData(docid, filename, mimetype, null);
 	}
 }

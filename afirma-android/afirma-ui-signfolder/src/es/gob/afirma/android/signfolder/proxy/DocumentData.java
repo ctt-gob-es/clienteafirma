@@ -1,5 +1,7 @@
 package es.gob.afirma.android.signfolder.proxy;
 
+import java.io.InputStream;
+
 /**
  * Datos identificados de un fichero para su descarga o previsualizaci&oacute;n.
  */
@@ -11,20 +13,59 @@ public class DocumentData {
 
 	private final String mimetype;
 
-	private final String dataB64;
+	private InputStream dataIs;
+
+	private String algorithm;
+
+	private String format;
 
 	/**
 	 * Datos de un documento.
 	 * @param id Identificador del documento.
 	 * @param filename Nombre de fichero.
 	 * @param mimetype MimeType de los datos.
-	 * @param dataB64 Contenido del fichero en base 64.
 	 */
-	public DocumentData(final String id, final String filename, final String mimetype, final String dataB64) {
+	public DocumentData(final String id, final String filename, final String mimetype) {
 		this.docId = id;
 		this.filename = filename;
 		this.mimetype = mimetype;
-		this.dataB64 = dataB64;
+		this.dataIs = null;
+		this.algorithm = null;
+		this.format = null;
+	}
+
+	/**
+	 * Datos de un documento.
+	 * @param id Identificador del documento.
+	 * @param filename Nombre de fichero.
+	 * @param mimetype MimeType de los datos.
+	 * @param dataIs Flujo de entrada de los datos.
+	 */
+	public DocumentData(final String id, final String filename, final String mimetype, final InputStream dataIs) {
+		this.docId = id;
+		this.filename = filename;
+		this.mimetype = mimetype;
+		this.dataIs = dataIs;
+		this.algorithm = null;
+		this.format = null;
+	}
+
+	/**
+	 * Datos de un documento.
+	 * @param id Identificador del documento.
+	 * @param filename Nombre de fichero.
+	 * @param mimetype MimeType de los datos.
+	 * @param dataIs Flujo de entrada de los datos.
+	 * @param algorithm Algoritmo que se debe usar para firmarlo.
+	 * @param format Formato que se debe usar para firmarlo.
+	 */
+	public DocumentData(final String id, final String filename, final String mimetype, final InputStream dataIs, final String algorithm, final String format) {
+		this.docId = id;
+		this.filename = filename;
+		this.mimetype = mimetype;
+		this.dataIs = dataIs;
+		this.algorithm = algorithm;
+		this.format = format;
 	}
 
 	/**
@@ -52,10 +93,50 @@ public class DocumentData {
 	}
 
 	/**
-	 * Recupera el contenido del fichero en base 64.
-	 * @return Contenido del fichero en base 64.
+	 * Recupera el flujo de entrada de los datos.
+	 * @return Flujo de entrada de los datos.
 	 */
-	public String getDataB64() {
-		return this.dataB64;
+	public InputStream getDataIs() {
+		return this.dataIs;
+	}
+
+	/**
+	 * Recupera el algoritmo de firma.
+	 * @return Algoritmo de firma.
+	 */
+	public String getAlgorithm() {
+		return this.algorithm;
+	}
+
+	/**
+	 * Recupera el formato de firma.
+	 * @return Formato de firma.
+	 */
+	public String getFormat() {
+		return this.format;
+	}
+
+	/**
+	 * Establece el flujo entrada de los datos.
+	 * @param dataIs Flujo de entrada de los datos.
+	 */
+	public void setDataIs(InputStream dataIs) {
+		this.dataIs = dataIs;
+	}
+
+	/**
+	 * Establece el algoritmo de firma.
+	 * @param algorithm Algoritmo de firma.
+	 */
+	public void setAlgorithm(String algorithm) {
+		this.algorithm = algorithm;
+	}
+
+	/**
+	 * Establece el formato de firma.
+	 * @param format Formato de firma.
+	 */
+	public void setFormat(String format) {
+		this.format = format;
 	}
 }
