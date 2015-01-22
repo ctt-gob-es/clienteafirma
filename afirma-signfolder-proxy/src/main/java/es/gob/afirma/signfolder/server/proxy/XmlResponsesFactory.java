@@ -51,7 +51,7 @@ final class XmlResponsesFactory {
 			sb.append("</req>"); //$NON-NLS-1$
 		}
 		else {
-			
+
 			String exceptionb64 = null;
 			final Throwable t = triphaseRequest.getThrowable();
 			if (t != null) {
@@ -60,7 +60,7 @@ final class XmlResponsesFactory {
 				exceptionb64 = Base64.encode(baos.toByteArray());
 				try { baos.close(); } catch (IOException e) { /* No hacemos nada */ }
 			}
-			
+
 			if (exceptionb64 != null) {
 				sb.append("KO\" exceptionb64=\"") //$NON-NLS-1$
 				.append(exceptionb64)
@@ -210,24 +210,24 @@ final class XmlResponsesFactory {
 		return sb.toString();
 	}
 
-	/**
-	 * Crea un XML con la informaci&oacute;n necesaria para la previsualizaci&oacute;n de un documento.
-	 * @param docData Datos del documento.
-	 * @return XML con la informaci&oacute;n del documento.
-	 */
-	static String createPreviewResponse(final DocumentData docData) {
-
-		final StringBuilder sb = new StringBuilder();
-		sb.append(XML_HEADER);
-
-		sb.append("<prw docid=\"").append(docData.getDocId()).append("\">"); //$NON-NLS-1$ //$NON-NLS-2$
-		sb.append("<name>").append(docData.getFilename()).append("</name>"); //$NON-NLS-1$ //$NON-NLS-2$
-		sb.append("<mmtp>").append(docData.getMimetype()).append("</mmtp>"); //$NON-NLS-1$ //$NON-NLS-2$
-		sb.append("<data>").append(docData.getDataB64()).append("</data>"); //$NON-NLS-1$ //$NON-NLS-2$
-		sb.append("</prw>"); //$NON-NLS-1$
-
-		return sb.toString();
-	}
+//	/**
+//	 * Crea un XML con la informaci&oacute;n necesaria para la previsualizaci&oacute;n de un documento.
+//	 * @param docData Datos del documento.
+//	 * @return XML con la informaci&oacute;n del documento.
+//	 */
+//	static String createPreviewResponse(final DocumentData docData) {
+//
+//		final StringBuilder sb = new StringBuilder();
+//		sb.append(XML_HEADER);
+//
+//		sb.append("<prw docid=\"").append(docData.getDocId()).append("\">"); //$NON-NLS-1$ //$NON-NLS-2$
+//		sb.append("<name>").append(docData.getFilename()).append("</name>"); //$NON-NLS-1$ //$NON-NLS-2$
+//		sb.append("<mmtp>").append(docData.getMimetype()).append("</mmtp>"); //$NON-NLS-1$ //$NON-NLS-2$
+//		sb.append("<data>").append(docData.getDataB64()).append("</data>"); //$NON-NLS-1$ //$NON-NLS-2$
+//		sb.append("</prw>"); //$NON-NLS-1$
+//
+//		return sb.toString();
+//	}
 
 	/**
 	 * Crea un XML con la informaci&oacute;n para configurar la aplicaci&oacute;n.
@@ -239,11 +239,11 @@ final class XmlResponsesFactory {
 		final StringBuilder sb = new StringBuilder();
 		sb.append(XML_HEADER);
 
-		sb.append("<appConf>"); //$NON-NLS-1$ 
+		sb.append("<appConf>"); //$NON-NLS-1$
 		for (int i = 0; i < appConfig.getAppIdsList().size(); i++) {
 			sb.append("<app id=\"").append(appConfig.getAppIdsList().get(i)).append("\">");  //$NON-NLS-1$//$NON-NLS-2$
 			sb.append(appConfig.getAppNamesList().get(i));
-			sb.append("</app>"); //$NON-NLS-1$ 
+			sb.append("</app>"); //$NON-NLS-1$
 		}
 		sb.append("</appConf>"); //$NON-NLS-1$
 
@@ -254,7 +254,7 @@ final class XmlResponsesFactory {
 		final StringBuilder sb = new StringBuilder();
 		sb.append(XML_HEADER);
 
-		sb.append("<apprq>"); //$NON-NLS-1$ 
+		sb.append("<apprq>"); //$NON-NLS-1$
 		for (ApproveRequest req :  approveRequests) {
 			sb.append("<r id=\"").append(req.getRequestId()) //$NON-NLS-1$
 			.append("\" ok=\"").append(req.isOk() ? "OK" : "KO").append("\"/>");  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
