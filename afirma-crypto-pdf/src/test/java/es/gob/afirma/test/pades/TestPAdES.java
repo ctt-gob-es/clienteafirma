@@ -21,6 +21,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.lowagie.text.pdf.PdfReader;
@@ -28,6 +29,7 @@ import com.lowagie.text.pdf.PdfReader;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSigner;
+import es.gob.afirma.core.signers.AOSignerFactory;
 import es.gob.afirma.core.signers.AOSimpleSignInfo;
 import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.core.util.tree.AOTreeNode;
@@ -489,5 +491,18 @@ public class TestPAdES {
 	@Test
     public void testItextVersion() {
     	PdfReader.isAfirmaModifiedItext();
+    }
+
+    /** Prueba de la verificaci&oacute;n de la versi&oacute:n de iText. */
+    @SuppressWarnings("static-method")
+	@Test
+	@Ignore
+    public void testIdentyFormat() throws Exception {
+
+    	final byte[] testPdf = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream("pades_basic.pdf")); //$NON-NLS-1$
+    	AOSigner signer = AOSignerFactory.getSigner(testPdf);
+    	Assert.assertNotNull("No se ha identificado correctamente el formato PAdES", signer); //$NON-NLS-1$
+
+    	Assert.assertTrue("El formato no se ha identificado correctamente", signer instanceof AOPDFSigner); //$NON-NLS-1$
     }
 }
