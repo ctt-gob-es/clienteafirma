@@ -1,4 +1,4 @@
-package es.gob.afirma.signers.multi.cades.triphase;
+package es.gob.afirma.triphase.server.cades;
 
 import java.security.MessageDigest;
 import java.security.PrivateKey;
@@ -10,7 +10,9 @@ import java.util.Map;
 import java.util.Properties;
 
 import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.signers.AOSimpleSigner;
+import es.gob.afirma.core.signers.TriphaseData;
 
 /** Sustituto del firmador PKCS#1 para firmas trif&aacute;sicas.
  * No firma realmente, sino que devuelve unos datos aleatorios del tama&ntilde;o adecuado y
@@ -20,7 +22,7 @@ import es.gob.afirma.core.signers.AOSimpleSigner;
 public final class CAdESFakePkcs1Signer implements AOSimpleSigner {
 
 	private static final String MD_ALGORITHM = "SHA-512";   //$NON-NLS-1$
-	
+
 	/** Tama&ntilde;o de una firma PKCS#1 con clave RSA de 1024 bits. */
 	private static final Integer PKCS1_DEFAULT_SIZE_1024 = Integer.valueOf(128);
 
@@ -41,18 +43,27 @@ public final class CAdESFakePkcs1Signer implements AOSimpleSigner {
 		P1_SIZES.put(KEY_SIZE_4096, PKCS1_DEFAULT_SIZE_4096);
 	}
 
-	private final CAdESPreSignResult preResult;
+	private static final String PARAM_PRE = "PRE";   //$NON-NLS-1$
+
+	private static final String PARAM_DUMMY_PK1 = "DPK1";   //$NON-NLS-1$
+
+	private final TriphaseData triphaseData;
+
+	private final boolean registry;
 
 	/** Construye el sustituto del firmador PKCS#1 para firmas trif&aacute;sicas.
-	 * @param preCountersignResult Resultado donde ir almacenando los pares de datos a firmar
-	 *                             y datos aleatorios a sustituir. */
-	public CAdESFakePkcs1Signer(final CAdESPreSignResult preCountersignResult) {
-		if (preCountersignResult == null) {
+	 * @param triphaseData Resultado donde ir almacenando los pares de datos a firmar
+	 *                             y datos aleatorios a sustituir.
+	 * @param registry Indica si las firmas realizadas deben quedar registrada internamente.
+	 * 						Esto es de utilidad en la prefirma, no en la postfirma.*/
+	public CAdESFakePkcs1Signer(final TriphaseData triphaseData, final boolean registry) {
+		if (triphaseData == null) {
 			throw new IllegalArgumentException(
 				"Es necesario un resultado de PreContrafirma para ir almacenando las firmas" //$NON-NLS-1$
 			);
 		}
-		this.preResult = preCountersignResult;
+		this.triphaseData = triphaseData;
+		this.registry = registry;
 	}
 
 	@Override
@@ -72,7 +83,7 @@ public final class CAdESFakePkcs1Signer implements AOSimpleSigner {
 		}
 
 		// Calculamos un valor que sera siempre el mismo para los mismos datos y de las dimensiones que
-		// corresponden a un PKCS#1 del tamano de clave del certificado utilizado 
+		// corresponden a un PKCS#1 del tamano de clave del certificado utilizado
 		final byte[] sha512;
 		try {
 			sha512 = MessageDigest.getInstance(MD_ALGORITHM).digest(data);
@@ -84,10 +95,14 @@ public final class CAdESFakePkcs1Signer implements AOSimpleSigner {
 		for (int i = 0; i < dummyData.length; i += sha512.length) {
 			System.arraycopy(sha512, 0, dummyData, i, sha512.length);
 		}
-		
-		// Guardamos el par de PKCS#1 falso y datos a firmar
-		this.preResult.addSign(data, dummyData);
 
+		// Si no existe ya, guardamos el par de PKCS#1 falso y datos a firmar
+		if (this.registry) {
+			final Map<String, String> signConfig = new HashMap<String, String>();
+			signConfig.put(PARAM_PRE, Base64.encode(data));
+			signConfig.put(PARAM_DUMMY_PK1, Base64.encode(dummyData));
+			this.triphaseData.addSignOperation(signConfig);
+		}
 		return dummyData;
 	}
 }

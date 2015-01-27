@@ -8,19 +8,23 @@
  * You may contact the copyright holder at: soporte.afirma5@mpt.es
  */
 
-package es.gob.afirma.signers.multi.cades.triphase;
+package es.gob.afirma.triphase.server.cades;
 
 import java.io.IOException;
 import java.util.Date;
 import java.util.Properties;
 
 import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.CounterSignTarget;
+import es.gob.afirma.core.signers.TriphaseData;
 import es.gob.afirma.signers.multi.cades.AOCAdESCounterSigner;
 
 /** Contrafirmador CAdES trif&aacute;sico.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public final class AOCAdESTriPhaseCounterSigner {
+
+	private static final String PARAM_DATE = "DATE"; //$NON-NLS-1$
 
 	private AOCAdESTriPhaseCounterSigner() {
 		// No permitimos instanciar
@@ -37,7 +41,7 @@ public final class AOCAdESTriPhaseCounterSigner {
      * @return Prefirma en formato XML.
      * @throws AOException Cuando ocurre cualquier problema durante el proceso.
      * @throws IOException Si ocurren problemas relacionados con la lectura de la firma. */
-	public static String preCountersign(final byte[] sign,
+	public static byte[] preCountersign(final byte[] sign,
                                         final String algorithm,
                                         final CounterSignTarget targetType,
                                         final Object[] targets,
@@ -46,13 +50,22 @@ public final class AOCAdESTriPhaseCounterSigner {
                                         final Date date) throws AOException,
                                                                 IOException {
 
-		final CAdESPreSignResult cpcs = new CAdESPreSignResult();
-		final AOCAdESCounterSigner countersigner = new AOCAdESCounterSigner(new CAdESFakePkcs1Signer(cpcs), date);
+		final String operation = targetType == CounterSignTarget.LEAFS ?
+				AOSignConstants.MASSIVE_OPERATION_COUNTERSIGN_LEAFS :
+					AOSignConstants.MASSIVE_OPERATION_COUNTERSIGN_TREE;
 
-		// No queremos la contrafirma sino los PKCS#1 generados
+		final TriphaseData triphaseData = new TriphaseData(
+				AOSignConstants.SIGN_FORMAT_CADES, operation);
+
+
+		//final CAdESPreSignResult cpcs = new CAdESPreSignResult();
+		final AOCAdESCounterSigner countersigner = new AOCAdESCounterSigner(new CAdESFakePkcs1Signer(triphaseData, true), date);
+
+		// No queremos la contrafirma sino los PKCS#1 generados y almacenados internamente en
+		// la siguiente operacion
 		countersigner.countersign(
 			sign,
-			algorithm,	
+			algorithm,
 			targetType,
 			targets,
 			null,
@@ -60,8 +73,10 @@ public final class AOCAdESTriPhaseCounterSigner {
 			xParams
 		);
 
-		cpcs.addSignDate(date);
+		for (int i = 0; i < triphaseData.getSignsCount(); i++) {
+			triphaseData.getSign(i).put(PARAM_DATE, Long.toString(date.getTime()));
+		}
 
-		return cpcs.toString();
+		return triphaseData.toString().getBytes();
     }
 }
