@@ -160,7 +160,7 @@ final class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 		LOGGER.info("Postfirma CAdES - Firma - INICIO"); //$NON-NLS-1$
 
 		// Generamos el mensaje para la configuracion de la operacion
-		final TriphaseData sessionData = TriphaseData.parser(session);
+		final TriphaseData triphaseData = TriphaseData.parser(session);
 
 		boolean omitContent = false;
 		if (extraParams.containsKey("mode")) { //$NON-NLS-1$
@@ -168,12 +168,12 @@ final class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 		}
 
 		// Cargamos la configuracion de la operacion
-		if (sessionData.getSignsCount() < 1) {
+		if (triphaseData.getSignsCount() < 1) {
 			LOGGER.severe("No se ha encontrado la informacion de firma en la peticion"); //$NON-NLS-1$
 			throw new AOException("No se ha encontrado la informacion de firma en la peticion"); //$NON-NLS-1$
 		}
 
-		Map<String, String> config = sessionData.getSign(0);
+		Map<String, String> config = triphaseData.getSign(0);
 
 		LOGGER.info("Se invocan las funciones internas de postfirma CAdES"); //$NON-NLS-1$
 		final byte[] signature = CAdESTriPhaseSigner.postSign(
@@ -288,7 +288,7 @@ final class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 
 		LOGGER.info("Postfirma CAdES - Cofirma - INICIO"); //$NON-NLS-1$
 
-		final TriphaseData sessionData = TriphaseData.parser(session);
+		final TriphaseData triphaseData = TriphaseData.parser(session);
 
 		byte[] messageDigest = null;
 		final byte[] data = ObtainContentSignedData.obtainData(sign);
@@ -300,12 +300,12 @@ final class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 		}
 
 		// Cargamos la configuracion de la operacion
-		if (sessionData.getSignsCount() < 1) {
+		if (triphaseData.getSignsCount() < 1) {
 			LOGGER.severe("No se ha encontrado la informacion de firma en la peticion"); //$NON-NLS-1$
 			throw new AOException("No se ha encontrado la informacion de firma en la peticion"); //$NON-NLS-1$
 		}
 
-		Map<String, String> config = sessionData.getSign(0);
+		Map<String, String> config = triphaseData.getSign(0);
 
 		final byte[] pk1 = Base64.decode(config.get(PROPERTY_NAME_PKCS1_SIGN));
 		config.remove(PROPERTY_NAME_PKCS1_SIGN);
