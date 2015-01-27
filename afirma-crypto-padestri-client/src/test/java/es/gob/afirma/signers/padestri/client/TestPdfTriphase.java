@@ -95,7 +95,7 @@ public class TestPdfTriphase {
 	/** Prueba de firma trif&aacute;sica normal.
 	 * @throws Exception */
 	@Test
-	@Ignore
+	//@Ignore
 	public void firma() throws Exception {
 		final AOSigner signer = new AOPDFTriPhaseSigner();
 
@@ -170,7 +170,7 @@ public class TestPdfTriphase {
 	/** Prueba de firma trif&aacute;sica normal.
 	 * @throws Exception */
 	@Test
-	@Ignore
+//	@Ignore
 	public void cofirma() throws Exception {
 		final AOSigner signer = new AOPDFTriPhaseSigner();
 
