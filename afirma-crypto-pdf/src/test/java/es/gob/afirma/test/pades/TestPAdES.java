@@ -21,7 +21,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import com.lowagie.text.pdf.PdfReader;
@@ -493,14 +492,14 @@ public class TestPAdES {
     	PdfReader.isAfirmaModifiedItext();
     }
 
-    /** Prueba de la verificaci&oacute;n de la versi&oacute:n de iText. */
+    /** Prueba de la verificaci&oacute;n de la versi&oacute:n de iText.
+     * @throws Exception En cualquier error. */
     @SuppressWarnings("static-method")
 	@Test
-	@Ignore
     public void testIdentyFormat() throws Exception {
 
     	final byte[] testPdf = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream("pades_basic.pdf")); //$NON-NLS-1$
-    	AOSigner signer = AOSignerFactory.getSigner(testPdf);
+    	final AOSigner signer = AOSignerFactory.getSigner(testPdf);
     	Assert.assertNotNull("No se ha identificado correctamente el formato PAdES", signer); //$NON-NLS-1$
 
     	Assert.assertTrue("El formato no se ha identificado correctamente", signer instanceof AOPDFSigner); //$NON-NLS-1$
