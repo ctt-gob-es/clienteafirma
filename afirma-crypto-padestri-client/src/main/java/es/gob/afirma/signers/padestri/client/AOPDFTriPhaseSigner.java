@@ -170,14 +170,6 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
 		// FIRMA
 		// ----------
 
-		System.out.println("  ------------- Prefirma: " + new String(preSignResult));
-		try {
-			System.out.println("  ------------- XML Prefirma: " + new String(Base64.decode(preSignResult, 0, preSignResult.length, true)));
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-
 		// Convertimos la respuesta del servidor en un Properties
 		final TriphaseData triphaseData;
 		try {
