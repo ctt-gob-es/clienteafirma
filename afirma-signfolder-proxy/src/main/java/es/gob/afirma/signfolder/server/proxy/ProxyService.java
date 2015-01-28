@@ -283,6 +283,7 @@ public final class ProxyService extends HttpServlet {
 		}
 
 		if (ret instanceof InputStream) {
+			LOGGER.info("La respuesta es un flujo de datos de salida"); //$NON-NLS-1$
 			responser.write((InputStream) ret);
 			try {
 				((InputStream) ret).close();
@@ -343,9 +344,7 @@ public final class ProxyService extends HttpServlet {
 
 			try {
 				MobileDocumentList downloadedDocs = service.getDocumentsToSign(triRequests.getCertificate().getEncoded(), singleRequest.getRef());
-
 				LOGGER.info("Recuperamos el documento"); //$NON-NLS-1$
-
 				if (singleRequest.size() != downloadedDocs.getDocument().size()) {
 					LOGGER.info("No se han recuperado tantos documentos para la peticion " + singleRequest.getRef() + "' como los indicados en la propia peticion"); //$NON-NLS-1$ //$NON-NLS-2$
 					throw new Exception("No se han recuperado tantos documentos para la peticion '" + //$NON-NLS-1$
@@ -380,11 +379,11 @@ public final class ProxyService extends HttpServlet {
 								throw new IllegalArgumentException("No se han recuperado los datos del documento"); //$NON-NLS-1$
 							}
 							final Object content = dataHandler.getContent();
-							if (content instanceof ByteArrayInputStream) {
-								docRequest.setContent(Base64.encode(AOUtil.getDataFromInputStream((ByteArrayInputStream) content), true));
+							if (content instanceof InputStream) {
+								docRequest.setContent(Base64.encode(AOUtil.getDataFromInputStream((InputStream) content), true));
 							}
 							else if (content instanceof String) {
-								docRequest.setContent((String) content);
+								docRequest.setContent(((String) content).replace('+', '-').replace('/', '_'));
 							}
 							else {
 								throw new IOException("No se puede manejar el tipo de objeto devuelto por el servicio de prefirma de documentos: " + content); //$NON-NLS-1$
@@ -1020,5 +1019,19 @@ public final class ProxyService extends HttpServlet {
 				LOGGER.info("Error al devolver el resultado al cliente a traves del metodo write: " + e); //$NON-NLS-1$
 			}
 		}
+	}
+
+	private static MobileDocumentList buildMobileDocumentListTests() {
+
+		MobileDocument doc = new MobileDocument();
+		doc.setMime("application/pdf");
+		doc.setName("1.pdf");
+		doc.setIdentifier("0wrolUzuqN");
+		doc.setOperationType("firmar");
+
+		MobileDocumentList docList = new MobileDocumentList();
+		docList.getDocument().add(doc);
+
+		return docList;
 	}
 }

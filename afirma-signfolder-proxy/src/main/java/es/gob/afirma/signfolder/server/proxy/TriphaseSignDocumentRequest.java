@@ -24,7 +24,7 @@ public final class TriphaseSignDocumentRequest {
 
 	/** Operaci&oacute;n que se debe realizar sobre el documento (sign, cosign o countersign). */
 	private String cryptoOperation;
-	
+
 	/** Formato de firma electr&oacute;nica que se desea utilizar. */
 	private final String signatureFormat;
 
@@ -42,7 +42,7 @@ public final class TriphaseSignDocumentRequest {
 
 	/** Resultado de la firma del documento. */
 	private byte[] result;
-	
+
 	/** Construye un objeto petici&oacute;n de prefirma de un documento.
 	 * @param docId Identificador del documento.
 	 * @param signatureFormat Formato de firma electr&oacute;nica.
@@ -62,7 +62,7 @@ public final class TriphaseSignDocumentRequest {
 	 * @param contentB64 Contenido del documento en base 64 URL SAFE.
 	 * @param partialResult Resultado parcial de la firma trifasica. */
 	TriphaseSignDocumentRequest(final String docId,
-								final String cryptoOperation,                    
+								final String cryptoOperation,
 								final String signatureFormat,
 			                    final String messageDigestAlgorithm,
 			                    final String params,
@@ -88,7 +88,7 @@ public final class TriphaseSignDocumentRequest {
 	public String getCryptoOperation() {
 		return this.cryptoOperation;
 	}
-	
+
 	/**
 	 * Establece el tipo de operaci&oacute;n criptogr&aacute;fica que debe realizarse sobre
 	 * el documento.
@@ -97,7 +97,7 @@ public final class TriphaseSignDocumentRequest {
 	public void setCryptoOperation(final String cryptoOperation) {
 		this.cryptoOperation = cryptoOperation;
 	}
-	
+
 	/** Recupera el formato de firma.
 	 * @return Formato de firma. */
 	public String getSignatureFormat() {
@@ -122,20 +122,20 @@ public final class TriphaseSignDocumentRequest {
 	public void setParams(final String params) {
 		this.params = params;
 	}
-	
+
 	/** Recupera el contenido del documento en Base64 URL SAFE.
 	 * @return Contenido del documento codificado en base64 URL SAFE o {@code null} si
 	 * no se ha establecido. */
 	public String getContent() {
 		return this.content;
 	}
-	
+
 	/** Establece el contenido del documento en Base64 URL SAFE.
 	 * @param content Contenido del documento codificado en base64 URL SAFE. */
 	public void setContent(String content) {
 		this.content = content;
 	}
-	
+
 	/** Recupera la configuraci&oacute;n del resultado parcial obtenido en la fase actual de la firma.
 	 * @return Datos actuales de la firma (que dependen de la fase en la que est&eacute;)
 	 * o {@code null} si aun no se ha iniciado el proceso y por lo tanto todav&iacute;a no hay ning&uacute;n resultado. */
@@ -154,7 +154,7 @@ public final class TriphaseSignDocumentRequest {
 	public byte[] getResult() {
 		return this.result;
 	}
-	
+
 	/** Establece el resultado final de la firma.
 	 * @param result Firma del documento. */
 	public void setResult(final byte[] result) {
@@ -162,21 +162,21 @@ public final class TriphaseSignDocumentRequest {
 	}
 
 	/**
-	 * Clase que almacena los resultados parciales de la firma trif&aacute;sica. 
+	 * Clase que almacena los resultados parciales de la firma trif&aacute;sica.
 	 */
 	public static class TriphaseConfigDataBean {
-		
+
 		private static final String NODE_PART_1 = "<p k='"; //$NON-NLS-1$
 		private static final String NODE_PART_2 = "'>"; //$NON-NLS-1$
 		private static final String NODE_PART_3 = "</p>"; //$NON-NLS-1$
-		
+
 		private final List<String> preSign;
 		private Boolean needPreSign;
 		private Boolean needData;
 		private Integer signCount;
 		private final List<String> session;
 		private final List<String> pk1;
-		
+
 		public TriphaseConfigDataBean() {
 			this.preSign = new ArrayList<String>();
 			this.needPreSign = null;
@@ -185,7 +185,7 @@ public final class TriphaseSignDocumentRequest {
 			this.session = new ArrayList<String>();
 			this.pk1 = new ArrayList<String>();
 		}
-		
+
 		public String getPreSign(int index) {
 			return this.preSign.get(index);
 		}
@@ -209,7 +209,7 @@ public final class TriphaseSignDocumentRequest {
 		public void setNeedData(Boolean needData) {
 			this.needData = needData;
 		}
-		
+
 		public Integer getSignCount() {
 			return this.signCount;
 		}
@@ -242,11 +242,11 @@ public final class TriphaseSignDocumentRequest {
 			final StringBuilder builder = new StringBuilder();
 			if (this.signCount != null)
 			builder.append(NODE_PART_1).append("sc").append(NODE_PART_2).append(this.signCount.intValue()).append(NODE_PART_3); //$NON-NLS-1$
-			
+
 			if (this.needData != null) {
 				builder.append(NODE_PART_1).append("nd").append(NODE_PART_2).append(this.needData.booleanValue()).append(NODE_PART_3); //$NON-NLS-1$
 			}
-			
+
 			if (this.needPreSign != null) {
 				builder.append(NODE_PART_1).append("np").append(NODE_PART_2).append(this.needPreSign.booleanValue()).append(NODE_PART_3); //$NON-NLS-1$
 			}
@@ -256,7 +256,7 @@ public final class TriphaseSignDocumentRequest {
 					builder.append(NODE_PART_1).append("pre.").append(i).append(NODE_PART_2).append(this.preSign.get(i)).append(NODE_PART_3); //$NON-NLS-1$
 				}
 			}
-			
+
 			if (this.session != null) {
 				for (int i = 0; i < this.session.size(); i++) {
 					if (this.session.get(i) != null) {
@@ -264,16 +264,16 @@ public final class TriphaseSignDocumentRequest {
 					}
 				}
 			}
-			
+
 			if (this.pk1 != null) {
 				for (int i = 0; i < this.pk1.size(); i++) {
 					builder.append(NODE_PART_1).append("pk1.").append(i).append(NODE_PART_2).append(this.pk1.get(i)).append(NODE_PART_3); //$NON-NLS-1$
 				}
 			}
-			
+
 			return builder.toString();
 		}
-		
+
 		/**
 		 * Devuelve la cadena Base 64 URL SAFE resultado de codificar la cadena que representa los datos
 		 * de la configuraci&oacute;n del objeto representados como un Properties.
@@ -288,7 +288,7 @@ public final class TriphaseSignDocumentRequest {
 			if (this.needPreSign != null) {
 				builder.append("NEED_DATA=").append(this.needData.booleanValue()).append("\n"); //$NON-NLS-1$ //$NON-NLS-2$
 			}
-			
+
 			if (this.needPreSign != null) {
 				if (this.needPreSign.booleanValue() && this.preSign != null) {
 					builder.append("NEED_PRE=").append(this.needPreSign.booleanValue()).append("\n"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -311,14 +311,14 @@ public final class TriphaseSignDocumentRequest {
 					builder.append("PK1.").append(i).append("=").append(this.pk1.get(i)).append("\n"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				}
 			}
-			
+
 			try {
 				return Base64.encode(builder.toString().getBytes(), true);
 			} catch (Exception e) {
 				// Este caso nunca se dara
 				return null;
 			}
-			
+
 		}
 	}
 }
