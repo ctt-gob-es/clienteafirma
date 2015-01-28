@@ -43,9 +43,9 @@ public class TestPAdES {
 	private static final String CATCERT_TSP = "http://psis.catcert.net/psis/catcert/tsp"; //$NON-NLS-1$
 	private static final Boolean CATCERT_REQUIRECERT = Boolean.TRUE;
 
-    private static final String CERT_PATH = "ANF_PF_Activo.pfx"; //$NON-NLS-1$
+    private static final String CERT_PATH = "PFActivoFirSHA256.pfx"; //$NON-NLS-1$
     private static final String CERT_PASS = "12341234"; //$NON-NLS-1$
-    private static final String CERT_ALIAS = "anf usuario activo"; //$NON-NLS-1$
+    private static final String CERT_ALIAS = "fisico activo prueba"; //$NON-NLS-1$
 
     private static final Properties[] PADES_MODES;
 
