@@ -19,6 +19,7 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Logger;
 
@@ -37,6 +38,7 @@ import es.gob.afirma.core.signers.AOPkcs1Signer;
 import es.gob.afirma.core.signers.AOSignInfo;
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.CounterSignTarget;
+import es.gob.afirma.core.signers.TriphaseData;
 import es.gob.afirma.core.util.tree.AOTreeModel;
 
 
@@ -99,19 +101,10 @@ public final class AOXAdESTriPhaseSigner implements AOSigner {
 	// Nombres de las propiedades intercambiadas con el servidor como Properties
 
 	/** Prefijo para las propiedades que almacenan prefirmas. */
-	private static final String PROPERTY_NAME_PRESIGN_PREFIX = "PRE."; //$NON-NLS-1$
-
-	/** Nombre de la propiedad que contiene el n&uacute;mero de firmas proporcionadas. */
-	private static final String PROPERTY_NAME_SIGN_COUNT = "SIGN_COUNT"; //$NON-NLS-1$
+	private static final String PROPERTY_NAME_PRESIGN = "PRE"; //$NON-NLS-1$
 
 	/** Firma PKCS#1. */
-	private static final String PROPERTY_NAME_PKCS1_SIGN_PREFIX = "PK1."; //$NON-NLS-1$
-
-	/** Indica si la postfirma requiere la prefirma. */
-	private static final String PROPERTY_NAME_NEED_PRE = "NEED_PRE"; //$NON-NLS-1$
-
-	/** Indica si la postfirma requiere el identificador o contenido del documento. */
-	private static final String PROPERTY_NAME_NEED_DATA = "NEED_DATA"; //$NON-NLS-1$
+	private static final String PROPERTY_NAME_PKCS1_SIGN = "PK1"; //$NON-NLS-1$
 
 	/** Indicador de finalizaci&oacute;n correcta de proceso. */
 	private static final String SUCCESS = "OK"; //$NON-NLS-1$
@@ -343,35 +336,36 @@ public final class AOXAdESTriPhaseSigner implements AOSigner {
 			throw new AOException("Error en la llamada de prefirma al servidor: " + e, e); //$NON-NLS-1$
 		}
 
-		// Convertimos la respuesta del servidor en un Properties
-		final Properties preSignProperties;
-		try {
-			preSignProperties = base642Properties(new String(preSignResult));
-		}
-		catch (final IOException e) {
-			throw new AOException("La respuesta del servidor no es valida: " + new String(preSignResult), e); //$NON-NLS-1$
-		}
-
-		final String needDataProperty = preSignProperties.getProperty(PROPERTY_NAME_NEED_DATA);
-		final boolean needData = needDataProperty != null && "true".equalsIgnoreCase(needDataProperty); //$NON-NLS-1$
-
-		final String needPreProperty = preSignProperties.getProperty(PROPERTY_NAME_NEED_PRE);
-		final boolean needPre = needPreProperty != null && "true".equalsIgnoreCase(needPreProperty); //$NON-NLS-1$
-
-
 		// ----------
 		// FIRMA
 		// ----------
 
-		// Es posible que se ejecute mas de una firma como resultado de haber proporcionado varios
-		// identificadores de datos o en una operacion de contrafirma.
-		int signCount = 1;
-		if (preSignProperties.containsKey(PROPERTY_NAME_SIGN_COUNT)) {
-			signCount = Integer.parseInt(preSignProperties.getProperty(PROPERTY_NAME_SIGN_COUNT));
+		// Convertimos la respuesta del servidor en un Properties
+		final TriphaseData triphaseData;
+		try {
+			triphaseData = TriphaseData.parser(Base64.decode(preSignResult, 0, preSignResult.length, true));
+		}
+		catch (Exception e) {
+			LOGGER.severe("Error al analizar la prefirma enviada por el servidor: " + e); //$NON-NLS-1$
+			throw new AOException("Error al analizar la prefirma enviada por el servidor", e); //$NON-NLS-1$
 		}
 
-		for (int i = 0; i < signCount; i++) {
-			final String base64PreSign = preSignProperties.getProperty(PROPERTY_NAME_PRESIGN_PREFIX + i);
+		if (triphaseData.getSignsCount() < 1) {
+			throw new AOException("No se han recibido prefirmas que firmar");  //$NON-NLS-1$
+		}
+
+//		final String needDataProperty = preSignProperties.getProperty(PROPERTY_NAME_NEED_DATA);
+//		final boolean needData = needDataProperty != null && Boolean.parseBoolean(needDataProperty);
+//
+//		final String needPreProperty = preSignProperties.getProperty(PROPERTY_NAME_NEED_PRE);
+//		final boolean needPre = needPreProperty != null && "true".equalsIgnoreCase(needPreProperty); //$NON-NLS-1$
+
+
+		// Es posible que se ejecute mas de una firma como resultado de haber proporcionado varios
+		// identificadores de datos o en una operacion de contrafirma.
+		for (int i = 0; i < triphaseData.getSignsCount(); i++) {
+			final Map<String, String> signConfig = triphaseData.getSign(i);
+			final String base64PreSign = signConfig.get(PROPERTY_NAME_PRESIGN);
 			if (base64PreSign == null) {
 				throw new AOException("El servidor no ha devuelto la prefirma numero " + i + ": " + new String(preSignResult)); //$NON-NLS-1$ //$NON-NLS-2$
 			}
@@ -393,14 +387,13 @@ public final class AOXAdESTriPhaseSigner implements AOSigner {
 					);
 
 			// Configuramos la peticion de postfirma indicando las firmas PKCS#1 generadas
-			preSignProperties.setProperty(PROPERTY_NAME_PKCS1_SIGN_PREFIX + i, Base64.encode(pkcs1sign));
+			signConfig.put(PROPERTY_NAME_PKCS1_SIGN, Base64.encode(pkcs1sign));
 
-			// Si no es necesaria la prefirma para completar la postfirma, la eliminamos
-			if (!needPre) {
-				preSignProperties.remove(PROPERTY_NAME_PRESIGN_PREFIX + i);
-			}
+			// Borramos la prefirma, que no sera necesaria en la postfirma
+			signConfig.remove(PROPERTY_NAME_PRESIGN);	//TODO: Homogenizar usando variable indicada desde servidor
 		}
 
+		final String preResultAsBase64 = Base64.encode(triphaseData.toString().getBytes(), true);
 
 		// ---------
 		// POSTFIRMA
@@ -414,24 +407,18 @@ public final class AOXAdESTriPhaseSigner implements AOSigner {
 			append(PARAMETER_NAME_CRYPTO_OPERATION).append(HTTP_EQUALS).append(cryptoOperation).append(HTTP_AND).
 			append(PARAMETER_NAME_FORMAT).append(HTTP_EQUALS).append(XADES_FORMAT).append(HTTP_AND).
 			append(PARAMETER_NAME_ALGORITHM).append(HTTP_EQUALS).append(algorithm).append(HTTP_AND).
-			append(PARAMETER_NAME_CERT).append(HTTP_EQUALS).append(Base64.encode(certChain[0].getEncoded(), true));
+			append(PARAMETER_NAME_CERT).append(HTTP_EQUALS).append(Base64.encode(certChain[0].getEncoded(), true)).append(HTTP_AND).
+			append(PARAMETER_NAME_SESSION_DATA).append(HTTP_EQUALS).append(preResultAsBase64);
 
 			if (extraParams.size() > 0) {
 				urlBuffer.append(HTTP_AND).append(PARAMETER_NAME_EXTRA_PARAM).append(HTTP_EQUALS).
 				append(properties2Base64(extraParams));
 			}
 
-			if (preSignProperties.size() > 0) {
-				urlBuffer.append(HTTP_AND).append(PARAMETER_NAME_SESSION_DATA).append(HTTP_EQUALS).
-				append(properties2Base64(preSignProperties));
-			}
-
-			if (needData) {
-				urlBuffer.append(HTTP_AND).append(PARAMETER_NAME_DOCID).append(HTTP_EQUALS).append(documentId);
-			}
+			// No indicamos los datos (documentId) porque no son necesarios en la postfirma //TODO: Homogenizar indicandolo desde servidor
 
 			triSignFinalResult = urlManager.readUrlByPost(urlBuffer.toString());
-			urlBuffer.setLength(0);
+
 		}
 		catch (final CertificateEncodingException e) {
 			throw new AOException("Error decodificando el certificado del firmante: " + e, e); //$NON-NLS-1$
@@ -460,11 +447,5 @@ public final class AOXAdESTriPhaseSigner implements AOSigner {
 		final ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		p.store(baos, ""); //$NON-NLS-1$
 		return Base64.encode(baos.toByteArray(), true);
-	}
-
-	private static Properties base642Properties(final String base64) throws IOException {
-		final Properties p = new Properties();
-		p.load(new ByteArrayInputStream(Base64.decode(base64, true)));
-		return p;
 	}
 }

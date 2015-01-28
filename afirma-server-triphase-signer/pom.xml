@@ -34,16 +34,16 @@
 
 		<dependency>
 			<groupId>es.gob.afirma</groupId>
-			<artifactId>afirma-crypto-pdf</artifactId>
+			<artifactId>afirma-crypto-xades</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>es.gob.afirma</groupId>
-			<artifactId>afirma-crypto-xadestri-server</artifactId>
+			<artifactId>afirma-crypto-pdf</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-
+		
 		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>javax.servlet-api</artifactId>

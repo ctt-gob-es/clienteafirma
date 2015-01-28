@@ -18,7 +18,6 @@ import java.util.Properties;
 
 import javax.xml.crypto.dsig.DigestMethod;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import es.gob.afirma.core.misc.AOUtil;
@@ -28,11 +27,11 @@ import es.gob.afirma.core.signers.CounterSignTarget;
 /** Pruebas XAdES trif&aacute;sico. */
 public class AOXAdESTriPhaseSignerTest {
 
-	private static final String CERT_PATH = "ANF_PF_Activo.pfx"; //$NON-NLS-1$
+	private static final String CERT_PATH = "PFActivoFirSHA1.pfx"; //$NON-NLS-1$
 	private static final String CERT_PASS = "12341234"; //$NON-NLS-1$
-	private static final String CERT_ALIAS = "anf usuario activo"; //$NON-NLS-1$
+	private static final String CERT_ALIAS = "fisico activo prueba"; //$NON-NLS-1$
 
-	private static final String DATA_FILENAME = "ANF_PF_Activo.pfx"; //$NON-NLS-1$
+	private static final String DATA_FILENAME = "PFActivoFirSHA1.pfx"; //$NON-NLS-1$
 	private static final String SIGNATURE_FILENAME = "firma.xml"; //$NON-NLS-1$
 	private static final String COSIGNATURE_FILENAME = "cofirma.xml"; //$NON-NLS-1$
 
@@ -73,7 +72,7 @@ public class AOXAdESTriPhaseSignerTest {
 	 * @throws Exception */
 	@SuppressWarnings("static-method")
 	@Test
-	@Ignore // Necesita un servidor trifasico
+//	@Ignore // Necesita un servidor trifasico
 	public void pruebaFirmaXAdES() throws Exception {
 
 		final byte[] data = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(DATA_FILENAME));
@@ -103,7 +102,7 @@ public class AOXAdESTriPhaseSignerTest {
 	 * @throws Exception */
 	@SuppressWarnings("static-method")
 	@Test
-	@Ignore // Necesita un servidor trifasico
+//	@Ignore // Necesita un servidor trifasico
 	public void pruebaCofirmaXAdES() throws Exception {
 
 		final byte[] sign = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(SIGNATURE_FILENAME));
@@ -119,14 +118,21 @@ public class AOXAdESTriPhaseSignerTest {
 
 		final byte[] result = signer.cosign(sign, AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA, pke.getPrivateKey(), pke.getCertificateChain(), config);
 
-		System.out.println("Resultado:\n" + new String(result)); //$NON-NLS-1$
+//		System.out.println("Resultado:\n" + new String(result)); //$NON-NLS-1$
+
+		final File tempFile = File.createTempFile("xades-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$
+		final FileOutputStream fos = new FileOutputStream(tempFile);
+		fos.write(result);
+		fos.close();
+
+		System.out.println("El resultado de la cofirma se ha guardado en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
 	}
 
 	/** Prueba de contrafirma.
 	 * @throws Exception */
 	@SuppressWarnings("static-method")
 	@Test
-	@Ignore // Necesita un servidor trifasico
+//	@Ignore // Necesita un servidor trifasico
 	public void pruebaContrafirmaXAdES() throws Exception {
 
 		final byte[] sign = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(COSIGNATURE_FILENAME));
@@ -143,6 +149,13 @@ public class AOXAdESTriPhaseSignerTest {
 
 		final byte[] result = signer.countersign(sign, AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA, CounterSignTarget.LEAFS, null, pke.getPrivateKey(), pke.getCertificateChain(), config);
 
-		System.out.println("Resultado:\n" + new String(result)); //$NON-NLS-1$
+//		System.out.println("Resultado:\n" + new String(result)); //$NON-NLS-1$
+
+		final File tempFile = File.createTempFile("xades-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$
+		final FileOutputStream fos = new FileOutputStream(tempFile);
+		fos.write(result);
+		fos.close();
+
+		System.out.println("El resultado de la contrafirma se ha guardado en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
 	}
 }
