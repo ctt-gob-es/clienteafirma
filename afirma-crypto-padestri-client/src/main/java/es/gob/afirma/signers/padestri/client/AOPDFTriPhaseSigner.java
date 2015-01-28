@@ -180,6 +180,11 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
 			throw new AOException("Error al analizar la prefirma enviada por el servidor", e); //$NON-NLS-1$
 		}
 
+		// Comprobamos que se incluyan las prefirmas en los datos recibidos
+		if (triphaseData.getSignsCount() < 1) {
+			throw new AOException("No se han recibido prefirmas que firmar");  //$NON-NLS-1$
+		}
+
 		// Es posible que se ejecute mas de una firma como resultado de haber proporcionado varios
 		// identificadores de datos o en una operacion de contrafirma.
 		for (int i = 0; i < triphaseData.getSignsCount(); i++) {

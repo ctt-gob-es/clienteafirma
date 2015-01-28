@@ -228,6 +228,11 @@ public final class AOCAdESTriPhaseSigner implements AOSigner {
 			throw new AOException("Error al analizar la prefirma enviada por el servidor", e); //$NON-NLS-1$
 		}
 
+		// Comprobamos que se incluyan las prefirmas en los datos recibidos
+		if (triphaseData.getSignsCount() < 1) {
+			throw new AOException("No se han recibido prefirmas que firmar");  //$NON-NLS-1$
+		}
+
 		try {
 			for (int i = 0; i < triphaseData.getSignsCount(); i++) {
 				final Map<String, String> signConfig = triphaseData.getSign(i);
