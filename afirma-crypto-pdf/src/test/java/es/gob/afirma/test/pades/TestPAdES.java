@@ -49,7 +49,7 @@ public class TestPAdES {
 
     private static final Properties[] PADES_MODES;
 
-    private static final String[] TEST_FILES = { "TEST_PDF.pdf", "TEST_PDF_Signed.pdf", "pades_basic.pdf" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+    private static final String[] TEST_FILES = { "TEST_PDF.pdf", "TEST_PDF_Signed.pdf", "pades_basic.pdf", "firma_CM.pdf" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
     private static final String TEST_FILE_PWD = "TEST_PDF_Password.pdf"; //$NON-NLS-1$
     private static final String TEST_FILE_PWD_MOD = "TEST_PDF_Password_Modification.pdf"; //$NON-NLS-1$
@@ -90,20 +90,36 @@ public class TestPAdES {
     @SuppressWarnings("static-method")
 	@Test
     public void testIsSign() throws Exception {
-    	Assert.assertFalse(
+    	Assert.assertFalse("El fichero " + TEST_FILES[0] + " se identifica como firma y no lo es", //$NON-NLS-1$ //$NON-NLS-2$
 			new AOPDFSigner().isSign(
 				AOUtil.getDataFromInputStream(
 					ClassLoader.getSystemResourceAsStream(TEST_FILES[0])
 				)
 			)
 		);
-    	Assert.assertTrue(
+    	Assert.assertTrue("El fichero " + TEST_FILES[1] + " no se identifica como firma", //$NON-NLS-1$ //$NON-NLS-2$
 			new AOPDFSigner().isSign(
 				AOUtil.getDataFromInputStream(
 					ClassLoader.getSystemResourceAsStream(TEST_FILES[1])
 				)
 			)
 		);
+
+    	Assert.assertTrue("El fichero " + TEST_FILES[2] + " no se identifica como firma", //$NON-NLS-1$ //$NON-NLS-2$
+    			new AOPDFSigner().isSign(
+    				AOUtil.getDataFromInputStream(
+    					ClassLoader.getSystemResourceAsStream(TEST_FILES[2])
+    				)
+    			)
+    		);
+
+    	Assert.assertTrue("El fichero " + TEST_FILES[3] + " no se identifica como firma", //$NON-NLS-1$ //$NON-NLS-2$
+    			new AOPDFSigner().isSign(
+    				AOUtil.getDataFromInputStream(
+    					ClassLoader.getSystemResourceAsStream(TEST_FILES[3])
+    				)
+    			)
+    		);
     }
 
     /** Prueba de PDF con sello de tiempo contra la TSA de CATCert.
