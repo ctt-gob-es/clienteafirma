@@ -56,11 +56,11 @@ final class MozillaKeyStoreUtilities {
 		"dnie_p11_priv.dll", //$NON-NLS-1$
 		"dnie_p11_pub.dll", //$NON-NLS-1$
 		"opensc-pkcs11.dll", //$NON-NLS-1$
-		"libpkcs11-fnmtdnie.so" //$NON-NLS-1$
+		"libpkcs11-fnmtdnie.so", //$NON-NLS-1$
+		"FNMT_P11.dll"//$NON-NLS-1$
 	};
 
 	private static final String[][] KNOWN_MODULES = new String[][] {
-		new String[] { "FNMT-RCM CERES (preinstalado)", "FNMT_P11.dll" }, //$NON-NLS-1$ //$NON-NLS-2$
 		new String[] { "Atos CardOS (preinstalado)", "siecap11.dll"    }  //$NON-NLS-1$ //$NON-NLS-2$
 	};
 
