@@ -25,7 +25,7 @@
 	<!--
 		/* Indica si debe firmarse un fichero (true) o el formulario de la pagina (false) */ 
 		var firmarFichero = true;
-		var firmarDatosGenerados = true;
+		var firmarDatosGenerados = false;
 	
 		function firmar() {
 			var divMensaje = document.getElementById('divmensaje');
@@ -33,9 +33,11 @@
 			var divFirma = document.getElementById('divfirma');
 			divFirma.innerHTML='';
 			
+			mostrarDialogoEspera();
+			
 			var params = 	"mode=explicit\n" +
-							//"serverUrl=https://valide.redsara.es/firmaMovil/TriPhaseSignerServer/SignatureService";
-							"serverUrl=http://192.168.177.20:8080/afirma-server-triphase-signer/SignatureService";
+							"serverUrl=https://valide.redsara.es/firmaMovil/TriPhaseSignerServer/SignatureService";
+							//"serverUrl=http://192.168.178.237:8080/afirma-server-triphase-signer/SignatureService";
 
 			var dataB64 = null;
 			
@@ -68,6 +70,9 @@
 		}
 		
 		function successCallback(signatureB64) {
+			
+			ocultarDialogoEspera();
+			
 			var divMensaje = document.getElementById('divmensaje');
 			divMensaje.innerHTML='<br><div class="iconOKFirma">La firma se ha realizado correctamente</div>';
 			
@@ -83,6 +88,9 @@
 		}
 		
 		function errorCallback(errorType, errorMessage) {
+			
+			ocultarDialogoEspera();
+			
 			var divMensaje = document.getElementById('divmensaje');
 			divMensaje.innerHTML='<br><div class="iconErrorFirma">Error al firmar</div><br>' +
 					'<div style="width: 300pt">' + errorMessage + '</div>' + '<br>';
@@ -127,6 +135,14 @@
 				document.getElementById("formulario").style.display = "block";
 			}
 		}
+		
+		function mostrarDialogoEspera() {
+			document.getElementById("dialogoEspera").style.display = "block";
+		}
+		
+		function ocultarDialogoEspera() {
+			document.getElementById("dialogoEspera").style.display = "none";
+		}
 	-->  
 </script>
 		
@@ -153,7 +169,11 @@
 					
 
 
-
+<div id="dialogoEspera" style="display: none;background-color: rgba(50,50,50,0.3); width: 100%; height: 100%; z-index: 9990; position: absolute; left: 0; top: 0; ">
+	<div style="background-color: white; position: fixed; top: 30%; left: 35%; width: 30%; padding: 20px; border: 2px solid black; border-radius: 15px;">
+		<span style="text-align: center; font-weight: bold; font-size: 20pt;">Cargando datos...</span>
+	</div>
+</div>
 <div style="display: none;" id="cargandoApplet" class="error cursiva">
 	<br>
 	Cargando el applet para la extracción de certificados. Tenga paciencia.
@@ -253,10 +273,10 @@ la Administración Electrónica por su seguridad.
 	</div> <!-- FIN DE CONTENEDOR -->
 	
 	<script type="text/javascript">
-		//MiniApplet.cargarMiniApplet('https://valide.redsara.es/firmaMovil');
-		//MiniApplet.setServlets("https://valide.redsara.es/firmaMovil/SignatureStorageServer/StorageService", "https://valide.redsara.es/firmaMovil/SignatureRetrieverServer/RetrieveService");
-		MiniApplet.cargarMiniApplet('http://192.168.177.20:8080/afirma-ui-miniapplet-deploy');
-		MiniApplet.setServlets("http://192.168.177.20:8080/afirma-signature-storage/StorageService", "http://192.168.177.20:8080/afirma-signature-retriever/RetrieveService");
+		MiniApplet.cargarMiniApplet('https://valide.redsara.es/firmaMovil');
+		MiniApplet.setServlets("https://valide.redsara.es/firmaMovil/SignatureStorageServer/StorageService", "https://valide.redsara.es/firmaMovil/SignatureRetrieverServer/RetrieveService");
+		//MiniApplet.cargarMiniApplet('http://192.168.178.237:8080/afirma-ui-miniapplet-deploy');
+		//MiniApplet.setServlets("http://192.168.178.237:8080/afirma-signature-storage/StorageService", "http://192.168.178.237:8080/afirma-signature-retriever/RetrieveService");
 		
 	</script>
 	
