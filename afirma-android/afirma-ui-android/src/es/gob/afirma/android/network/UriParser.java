@@ -3,7 +3,6 @@ package es.gob.afirma.android.network;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.util.HashMap;
@@ -482,9 +481,9 @@ public final class UriParser {
 		// Comprobamos que la URL sea valida
 		final URL servletUrl;
 		try {
-			servletUrl = new URL(URLDecoder.decode(url));
+			servletUrl = new URL(URLDecoder.decode(url, "UTF-8")); //$NON-NLS-1$
 		}
-		catch (final MalformedURLException e) {
+		catch (final Exception e) {
 			throw new ParameterException("La URL proporcionada para el servlet no es valida: " + e); //$NON-NLS-1$
 		}
 		// Comprobamos que el protocolo este soportado
