@@ -8,14 +8,14 @@ import java.security.Provider;
 import java.security.Security;
 import java.util.Properties;
 
-import es.gob.afirma.android.crypto.LoadKeyStoreManagerTask.KeystoreManagerListener;
-import es.gob.afirma.android.gui.PinDialog;
-
 import android.app.Activity;
 import android.content.Context;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbManager;
 import android.util.Log;
+import es.gob.afirma.android.crypto.LoadKeyStoreManagerTask.KeystoreManagerListener;
+import es.gob.afirma.android.gui.PinDialog;
+import es.gob.afirma.android.signfolder.SFConstants;
 
 /** Facrtor&iacute;a de gestores de contrase&ntuilde;as y claves para Android. */
 public final class KeyStoreManagerFactory {
@@ -64,16 +64,16 @@ public final class KeyStoreManagerFactory {
 				return;
 			}
 			catch (final ClassNotFoundException e) {
-				Log.w("es.gob.afirma", "No se encuentran las bibliotecas de acceso al DNIe: " + e.toString()); //$NON-NLS-1$ //$NON-NLS-2$
+				Log.w(ES_GOB_AFIRMA, "No se encuentran las bibliotecas de acceso al DNIe: " + e.toString()); //$NON-NLS-1$
 			}
 			catch (final NoSuchMethodException e) {
-				Log.w("es.gob.afirma", "No se encuentran las bibliotecas de acceso al DNIe: " + e.toString()); //$NON-NLS-1$ //$NON-NLS-2$
+				Log.w(ES_GOB_AFIRMA, "No se encuentran las bibliotecas de acceso al DNIe: " + e.toString()); //$NON-NLS-1$
 			}
 			catch (final KeyStoreException e) {
-				Log.w("es.gob.afirma", "Se ha encontrado un CCID USB, pero no un DNIe en el: " + e); //$NON-NLS-1$ //$NON-NLS-2$
+				Log.w(ES_GOB_AFIRMA, "Se ha encontrado un CCID USB, pero no un DNIe en el: " + e); //$NON-NLS-1$
 			}
 			catch (final Exception e) {
-				Log.w("es.gob.afirma", "No se ha podido instanciar el controlador del DNIe: " + e); //$NON-NLS-1$ //$NON-NLS-2$
+				Log.w(ES_GOB_AFIRMA, "No se ha podido instanciar el controlador del DNIe: " + e); //$NON-NLS-1$
 			}
 		}
 
@@ -118,7 +118,7 @@ public final class KeyStoreManagerFactory {
 			);
 
 			Security.addProvider(provider);
-			Log.i(ES_GOB_AFIRMA, "Anadido el proveedor AET: " + provider.getName());  //$NON-NLS-1$
+			Log.i(SFConstants.LOG_TAG, "Anadido el proveedor AET: " + provider.getName());  //$NON-NLS-1$
 
 			// Obtenemos el almacen unicamente para ver si falla
 			KeyStore.getInstance(AET_PKCS11_STORE, provider);

@@ -4,6 +4,7 @@ import java.security.KeyStore;
 import java.security.KeyStore.PrivateKeyEntry;
 
 import android.util.Log;
+import es.gob.afirma.android.signfolder.SFConstants;
 
 /** Gestor simple de claves y certificados para dispositivos Android 2 y 3.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
@@ -26,7 +27,7 @@ public final class AndroidJcaKeyStoreManager implements MobileKeyStoreManager {
 			throw new IllegalArgumentException("El alias seleccionado es nulo"); //$NON-NLS-1$
 		}
 
-		Log.i("es.go.afirma.android", "Alias seleccionado: " + alias); //$NON-NLS-1$ //$NON-NLS-2$
+		Log.i(SFConstants.LOG_TAG, "Alias seleccionado: " + alias); //$NON-NLS-1$
 
 		try {
 			this.pke = (PrivateKeyEntry) ks.getEntry(alias, new KeyStore.PasswordProtection(pin));

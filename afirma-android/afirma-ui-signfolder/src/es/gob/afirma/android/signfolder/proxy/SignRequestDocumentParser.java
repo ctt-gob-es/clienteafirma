@@ -63,7 +63,7 @@ public class SignRequestDocumentParser {
 			}
 			elementIndex = XmlUtils.nextNodeElementIndex(childNodes, ++elementIndex);
 		}
-		
+
 		if (elementIndex == -1 || !MIMETYPE_NODE.equalsIgnoreCase(childNodes.item(elementIndex).getNodeName())) {
 			throw new IllegalArgumentException(
 					"Existe un documento sin el elemento '" + MIMETYPE_NODE + "'"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -87,8 +87,11 @@ public class SignRequestDocumentParser {
 		elementIndex = XmlUtils.nextNodeElementIndex(childNodes, ++elementIndex);
 		if (elementIndex != -1 || PARAMS_NODE.equalsIgnoreCase(childNodes.item(elementIndex).getNodeName())) {
 			params = XmlUtils.getTextContent(childNodes.item(elementIndex));
+			if (params != null && (params.trim().length() == 0 || params.trim().equals("null"))) { //$NON-NLS-1$
+				params = null;
+			}
 		}
-		
+
 		return new SignRequestDocument(docId, name, size, mimeType, signatureFormat, messageDigestAlgorithm, params);
 	}
 }

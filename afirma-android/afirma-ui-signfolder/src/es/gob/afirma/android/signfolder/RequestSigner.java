@@ -78,7 +78,7 @@ final class RequestSigner implements PrivateKeySelectionListener {
 		// Cuando se instala el certificado desde el dialogo de seleccion, Android da a elegir certificado
 		// en 2 ocasiones y en la segunda se produce un "java.lang.AssertionError". Se ignorara este error.
 		catch (final Throwable e) {
-			Log.e(SFConstants.LOG_TAG, "Error desconocido en la seleccion del certificado: " + e.toString()); //$NON-NLS-1$
+			Log.e(SFConstants.LOG_TAG, "Error desconocido en la seleccion del certificado: " + e); //$NON-NLS-1$
 			t = new AOException(ErrorManager.getErrorMessage(ErrorManager.ERROR_PKE), e);
 		}
 

@@ -749,7 +749,7 @@ public final class PetitionDetailsActivity extends FragmentActivity implements L
 			pke = kse.getPrivateKeyEntry();
 		}
 		catch (final KeyChainException e) {
-			Log.e(SFConstants.LOG_TAG, e.toString());
+			Log.e(SFConstants.LOG_TAG, "Error al recuperar la clave privada seleccionada: " + e); //$NON-NLS-1$
 			if ("4.1.1".equals(Build.VERSION.RELEASE) || "4.1.0".equals(Build.VERSION.RELEASE) || "4.1".equals(Build.VERSION.RELEASE)) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				showToastMessage(ErrorManager.getErrorMessage(ErrorManager.ERROR_PKE_ANDROID_4_1));
 				closeActivity();
@@ -800,15 +800,20 @@ public final class PetitionDetailsActivity extends FragmentActivity implements L
 
 		dismissProgressDialog();
 
-		if (operation == OperationRequestListener.REJECT_OPERATION) {
-			setResult(requestResult.isStatusOk() ?
-					PetitionDetailsActivity.RESULT_REJECT_OK : PetitionDetailsActivity.RESULT_REJECT_FAILED);
+		if (requestResult.isStatusOk()) {
+			setResult(operation == OperationRequestListener.REJECT_OPERATION ?
+					PetitionDetailsActivity.RESULT_REJECT_OK:
+						PetitionDetailsActivity.RESULT_SIGN_OK);
+			closeActivity();
 		}
 		else {
-			setResult(requestResult.isStatusOk() ?
-					PetitionDetailsActivity.RESULT_SIGN_OK : PetitionDetailsActivity.RESULT_SIGN_FAILED);
+			Log.e(SFConstants.LOG_TAG, "Ha fallado la operacion"); //$NON-NLS-1$
+
+			final int msgId = (operation == OperationRequestListener.REJECT_OPERATION) ?
+					R.string.error_msg_rejecting_request :
+						R.string.error_msg_procesing_request;
+			showToastMessage(getString(msgId));
 		}
-		closeActivity();
 	}
 
 	@Override
@@ -816,17 +821,15 @@ public final class PetitionDetailsActivity extends FragmentActivity implements L
 
 		dismissProgressDialog();
 
-		Log.i("es.gob.afirma", "Ha fallado la operacion con la excepcion: " + t); //$NON-NLS-1$ //$NON-NLS-2$
+		Log.e(SFConstants.LOG_TAG, "Ha fallado la operacion con la excepcion: " + t); //$NON-NLS-1$
 		if (t != null) {
 			t.printStackTrace();
 		}
 
-		final int resultCode = operation == OperationRequestListener.REJECT_OPERATION ?
-				PetitionDetailsActivity.RESULT_REJECT_FAILED :
-				PetitionDetailsActivity.RESULT_SIGN_FAILED;
-
-		setResult(resultCode);
-		closeActivity();
+		final int msgId = (operation == OperationRequestListener.REJECT_OPERATION) ?
+				R.string.error_msg_rejecting_request :
+					R.string.error_msg_procesing_request;
+		showToastMessage(getString(msgId));
 	}
 
 	/**

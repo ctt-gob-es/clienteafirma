@@ -15,6 +15,7 @@ import org.xml.sax.SAXException;
 
 import android.util.Log;
 import es.gob.afirma.android.network.AndroidUrlHttpManager;
+import es.gob.afirma.android.signfolder.SFConstants;
 import es.gob.afirma.core.misc.Base64;
 
 /**
@@ -23,8 +24,6 @@ import es.gob.afirma.core.misc.Base64;
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s
  */
 public final class CommManager {
-
-	private static final String LOGGER_TAG = "es.gob.afirma.android.signfolder"; //$NON-NLS-1$
 
 	private static final String HTTPS = "https"; //$NON-NLS-1$
 
@@ -69,7 +68,7 @@ public final class CommManager {
 		try {
 			this.db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 		} catch (final ParserConfigurationException e) {
-			Log.e(LOGGER_TAG,
+			Log.e(SFConstants.LOG_TAG,
 					"No se ha podido cargar un manejador de XML: " + e.toString()); //$NON-NLS-1$
 			e.printStackTrace();
 			this.db = null;
@@ -85,8 +84,16 @@ public final class CommManager {
 		return Base64.encode(param.getBytes(), true);
 	}
 
-	private String prepareUrl(final String operation,
-			final String dataB64UrlSafe) {
+	private String prepareUrl(final String operation, final String dataB64UrlSafe) {
+
+		//TODO: Eliminar
+//		try {
+//			Log.i(SFConstants.LOG_TAG, "XML para operacion " + operation + ":\n" +
+//					new String(Base64.decode(dataB64UrlSafe, true)));
+//		}
+//		catch (Exception e) {
+//			e.printStackTrace();
+//		}
 
 		final StringBuffer sb = new StringBuffer(this.signFolderProxyUrl);
 		sb.append("?"); //$NON-NLS-1$
@@ -97,6 +104,7 @@ public final class CommManager {
 		sb.append(PARAMETER_NAME_DATA);
 		sb.append("="); //$NON-NLS-1$
 		sb.append(dataB64UrlSafe);
+
 		return sb.toString();
 	}
 
@@ -427,14 +435,20 @@ public final class CommManager {
 				AndroidUrlHttpManager.disableSslChecks();
 			}
 			catch(final Exception e) {
-				Log.w(LOGGER_TAG,
+				Log.w(SFConstants.LOG_TAG,
 						"No se ha podido ajustar la confianza SSL, es posible que no se pueda completar la conexion: " + e //$NON-NLS-1$
 						);
 			}
 		}
 
 		InputStream is = AndroidUrlHttpManager.getRemoteDataByPost(url, this.timeout);
-		Document doc = this.db.parse(is);
+
+//TODO: Borrar
+//		byte[] data = AOUtil.getDataFromInputStream(is);
+//		Log.i(SFConstants.LOG_TAG, "XML respuesta:\n" + new String(data));
+//		final Document doc = this.db.parse(new ByteArrayInputStream(data));
+
+		final Document doc = this.db.parse(is);
 		is.close();
 
 		if (url.startsWith(HTTPS)) {
@@ -458,7 +472,7 @@ public final class CommManager {
 				AndroidUrlHttpManager.disableSslChecks();
 			}
 			catch(final Exception e) {
-				Log.w(LOGGER_TAG,
+				Log.w(SFConstants.LOG_TAG,
 						"No se ha podido ajustar la confianza SSL, es posible que no se pueda completar la conexion: " + e //$NON-NLS-1$
 						);
 			}
@@ -470,7 +484,7 @@ public final class CommManager {
 			AndroidUrlHttpManager.enableSslChecks();
 		}
 
-		Log.d(LOGGER_TAG, "Se ha obtenido el flujo de entrada de los datos"); //$NON-NLS-1$
+		Log.d(SFConstants.LOG_TAG, "Se ha obtenido el flujo de entrada de los datos"); //$NON-NLS-1$
 
 		return is;
 	}

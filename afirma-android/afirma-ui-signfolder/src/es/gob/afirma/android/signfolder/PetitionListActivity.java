@@ -281,6 +281,7 @@ public final class PetitionListActivity extends FragmentActivity implements
 	}
 
 	private void showErrorDialog(final int dialogId, final String message) {
+
 		final CustomAlertDialog dialog = CustomAlertDialog.newInstance(
 				dialogId, getString(R.string.aviso), message,
 				getString(android.R.string.ok), null, this);
@@ -616,8 +617,10 @@ public final class PetitionListActivity extends FragmentActivity implements
 
 				setVisibilityLoadingMessage(false, null, null);
 
-				showErrorDialog(DIALOG_ERROR_PROCESSING, getString(operation == REJECT_OPERATION ? R.string.error_msg_rejecting_requests
-						: R.string.error_msg_procesing_requests));
+				String errorMsg = getString(operation == REJECT_OPERATION ? R.string.error_msg_rejecting_requests
+						: R.string.error_msg_procesing_requests);
+				Log.w(SFConstants.LOG_TAG, "Error: " + errorMsg); //$NON-NLS-1$
+				showErrorDialog(DIALOG_ERROR_PROCESSING, errorMsg);
 			}
 		}
 	}
@@ -981,17 +984,17 @@ public final class PetitionListActivity extends FragmentActivity implements
 
 		if (requestCode == PetitionDetailsActivity.REQUEST_CODE) {
 			// Si se proceso le peticion correctamente actualizamos el listado
-			if (resultCode == PetitionDetailsActivity.RESULT_SIGN_OK
-					|| resultCode == PetitionDetailsActivity.RESULT_REJECT_OK) {
+			if (resultCode == PetitionDetailsActivity.RESULT_SIGN_OK || resultCode == PetitionDetailsActivity.RESULT_REJECT_OK) {
 				updateCurrentList(1);
 			}
 			// Si se trato de firmar la peticion y fallo, se muestra el error
 			else if (resultCode == PetitionDetailsActivity.RESULT_SIGN_FAILED) {
-				Log.i(SFConstants.LOG_TAG, "Mostramos el error del fallo al firmar desde el detalle"); //$NON-NLS-1$
+				Log.e(SFConstants.LOG_TAG, "Error al firmar la peticion desde la actividad de detalle"); //$NON-NLS-1$
 				showErrorDialog(DIALOG_RESULT_SIMPLE_REQUEST, getString(R.string.error_msg_procesing_request));
 			}
 			// Si se trato de rechazar la peticion y fallo, se muestra el error
 			else if (resultCode == PetitionDetailsActivity.RESULT_REJECT_FAILED) {
+				Log.e(SFConstants.LOG_TAG, "Error al rechazar la peticion desde la actividad de detalle"); //$NON-NLS-1$
 				showErrorDialog(DIALOG_RESULT_SIMPLE_REQUEST, getString(R.string.error_msg_rejecting_request));
 			}
 		}

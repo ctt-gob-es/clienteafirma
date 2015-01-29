@@ -100,7 +100,7 @@ public final class PresignsResponseParser {
 			try {
 				exception = attributeNode == null ? null : new String(Base64.decode(attributeNode.getNodeValue()));
 			} catch (final IOException e) {
-				Log.w("es.gob.afirma", "No se ha podido descodificar el base 64 de la traza de la excepcion, se usara tal cual");  //$NON-NLS-1$//$NON-NLS-2$
+				Log.w(SFConstants.LOG_TAG, "No se ha podido descodificar el base 64 de la traza de la excepcion, se usara tal cual");  //$NON-NLS-1$
 				exception = attributeNode.getNodeValue();
 			}
 

@@ -14,8 +14,6 @@ import android.util.Log;
 
 public class SaveFileTask extends AsyncTask<Void, Void, File> {
 
-	private static final String LOGGER_TAG = "es.gob.afirma.android.signfolder"; //$NON-NLS-1$
-
 	private final InputStream dataIs;
 	private final String filename;
 	private final boolean extDir;
@@ -43,7 +41,7 @@ public class SaveFileTask extends AsyncTask<Void, Void, File> {
 						generateFileName(this.filename, i++));
 			} while (outFile.exists());
 
-			Log.i(LOGGER_TAG, "Se intenta guardar en el directorio externo el fichero: " + outFile.getAbsolutePath()); //$NON-NLS-1$
+			Log.i(SFConstants.LOG_TAG, "Se intenta guardar en el directorio externo el fichero: " + outFile.getAbsolutePath()); //$NON-NLS-1$
 			try {
 				final FileOutputStream fos = new FileOutputStream(outFile);
 				writeData(this.dataIs, fos);
@@ -51,14 +49,14 @@ public class SaveFileTask extends AsyncTask<Void, Void, File> {
 				this.dataIs.close();
 			}
 			catch (Exception e) {
-				Log.e(LOGGER_TAG, "Error al guardar el fichero en un directorio externo: " + e); //$NON-NLS-1$
+				Log.e(SFConstants.LOG_TAG, "Error al guardar el fichero en un directorio externo: " + e); //$NON-NLS-1$
 				return null;
 			}
 		}
 		else {
 			try {
 
-				Log.i(LOGGER_TAG, "Se intenta guardar en el directorio interno el fichero: " + new File(this.activity.getFilesDir(), this.filename).getAbsolutePath()); //$NON-NLS-1$
+				Log.i(SFConstants.LOG_TAG, "Se intenta guardar en el directorio interno el fichero: " + new File(this.activity.getFilesDir(), this.filename).getAbsolutePath()); //$NON-NLS-1$
 				final FileOutputStream fos = this.activity.openFileOutput(this.filename, Context.MODE_WORLD_READABLE);
 				writeData(this.dataIs, fos);
 				fos.close();
@@ -66,7 +64,7 @@ public class SaveFileTask extends AsyncTask<Void, Void, File> {
 				outFile = new File(this.activity.getFilesDir(), this.filename);
 			}
 			catch (Exception e) {
-				Log.e(LOGGER_TAG, "Error al guardar el fichero en un directorio interno: " + e); //$NON-NLS-1$
+				Log.e(SFConstants.LOG_TAG, "Error al guardar el fichero en un directorio interno: " + e); //$NON-NLS-1$
 				return null;
 			}
 		}
