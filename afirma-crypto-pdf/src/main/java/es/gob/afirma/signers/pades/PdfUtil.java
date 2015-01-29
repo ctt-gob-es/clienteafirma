@@ -171,7 +171,17 @@ final class PdfUtil {
 		}
 	}
 
-	static void checkUnregisteredSignatures(final PdfReader pdfReader, final Properties extraParams) throws PdfHasUnregisteredSignaturesException {
+	static boolean pdfHasUnregisteredSignatures(final byte[] pdf, final Properties xParams) throws InvalidPdfException, BadPdfPasswordException, IOException {
+		final Properties extraParams = xParams != null ? xParams : new Properties();
+		final PdfReader pdfReader = PdfUtil.getPdfReader(
+			pdf,
+			extraParams,
+			Boolean.getBoolean(extraParams.getProperty("headLess")) //$NON-NLS-1$
+		);
+		return pdfHasUnregisteredSignatures(pdfReader);
+	}
+
+	static boolean pdfHasUnregisteredSignatures(final PdfReader pdfReader) {
 
 		boolean ret = false;
     	for (int i = 0; i < pdfReader.getXrefSize(); i++) {
@@ -184,12 +194,20 @@ final class PdfUtil {
     						d.get(PdfName.SUBFILTER).toString().toLowerCase(Locale.US) : null;
 
     				if (subFilter == null || !SUPPORTED_SUBFILTERS.contains(subFilter)) {
-
     					ret = true;
 	    				try {
+	    					final PdfObject o = d.get(PdfName.CERT);
+	    					final byte[] data;
+	    					if (o instanceof PdfString) {
+	    						data = ((PdfString)o).getOriginalBytes();
+	    					}
+	    					else {
+	    						data = ((PdfString) ((PdfArray) d.get(PdfName.CERT)).getArrayList().get(0)).getOriginalBytes();
+	    					}
+
 							final X509Certificate cert = (X509Certificate) CertificateFactory.getInstance("X.509").generateCertificate( //$NON-NLS-1$
 								new ByteArrayInputStream(
-									((PdfString) ((PdfArray) d.get(PdfName.CERT)).getArrayList().get(0)).getOriginalBytes()
+									data
 								)
 							);
 							LOGGER.info(
@@ -197,17 +215,12 @@ final class PdfUtil {
 							);
 						}
 	    				catch (final Exception e) {
-							LOGGER.warning("No se ha podido comprobar la identidad de una firma no registrada con el subfiltro: " + subFilter + ", " + e); //$NON-NLS-1$ //$NON-NLS-2$
+							LOGGER.warning("No se ha podido comprobar la identidad de una firma no registrada con el subfiltro: " + subFilter + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$
 						}
     				}
     			}
     		}
     	}
-    	if (Boolean.TRUE.toString().equalsIgnoreCase(extraParams.getProperty("allowCosigningUnregisteredSignatures"))) { //$NON-NLS-1$
-    		return;
-		}
-    	if (ret) {
-    	   throw new PdfHasUnregisteredSignaturesException();
-    	}
+    	return ret;
 	}
 }

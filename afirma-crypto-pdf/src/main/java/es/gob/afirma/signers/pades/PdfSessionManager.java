@@ -180,7 +180,10 @@ public final class PdfSessionManager {
 		);
 
 		PdfUtil.checkPdfCertification(pdfReader.getCertificationLevel(), extraParams);
-		PdfUtil.checkUnregisteredSignatures(pdfReader, extraParams);
+
+		if (PdfUtil.pdfHasUnregisteredSignatures(pdfReader) && !Boolean.TRUE.toString().equalsIgnoreCase(extraParams.getProperty("allowCosigningUnregisteredSignatures"))) { //$NON-NLS-1$
+			throw new PdfHasUnregisteredSignaturesException();
+		}
 
 		// Los derechos van firmados por Adobe, y como desde iText se invalidan
 		// es mejor quitarlos

@@ -363,7 +363,7 @@ public final class AOPDFSigner implements AOSigner {
     			LOGGER.severe(
 					"El PDF contiene una firma corrupta o con un formato desconocido (" + //$NON-NLS-1$
 						names.get(i).toString() +
-						"), se continua con las siguientes si las hubiese: " + e //$NON-NLS-1$
+							"), se continua con las siguientes si las hubiese: " + e //$NON-NLS-1$
 				);
     			continue;
     		}
@@ -415,7 +415,23 @@ public final class AOPDFSigner implements AOSigner {
         }
         final Object root = getSignersStructure(data, false).getRoot();
         if (root instanceof AOTreeNode) {
-        	return AOTreeModel.getChildCount(root) > 0;
+        	// Si el arbol contiene firmas...
+        	if (AOTreeModel.getChildCount(root) > 0) {
+        		return true;
+        	}
+        	// Si no las contiene aun puede haber firmas no registradas
+
+        	// Como el metodo no recibe "extraParams" buscamos en las propiedades de sistema
+        	final Properties extraParams = System.getProperties();
+        	try {
+				if (PdfUtil.pdfHasUnregisteredSignatures(data, extraParams) &&
+						Boolean.TRUE.toString().equalsIgnoreCase(extraParams.getProperty("allowCosigningUnregisteredSignatures"))) { //$NON-NLS-1$
+					return true;
+				}
+			}
+        	catch (final Exception e) {
+				LOGGER.severe("No se han podido comprobar las firmas no registradas del PDF: " + e); //$NON-NLS-1$
+			}
         }
         return false;
     }
