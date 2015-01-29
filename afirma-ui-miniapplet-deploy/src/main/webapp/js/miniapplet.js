@@ -932,8 +932,8 @@ var MiniApplet = {
 			 * Por ejemplo, que XAdEStri sea igual a XAdES.
 			 **/
 			function compareFormats(format, supportedFormat) {
-				format = format.toUpperCase()
-				supportedFormat = supportedFormat.toUpperCase()
+				format = format.toUpperCase();
+				supportedFormat = supportedFormat.toUpperCase();
 				return format == supportedFormat ||
 						(format.length > supportedFormat.length &&
 								format.substr(0, supportedFormat.length) == supportedFormat);
@@ -1039,7 +1039,7 @@ var MiniApplet = {
 			 * @returns XML.
 			 */
 			function buildXML (op, params) {
-				op = (op == null ? "op" : op)
+				op = (op == null ? "op" : op);
 				var xml = '<' + op +'>';
 				for (var i = 0; i < params.length; i++) {
 					xml += '<e k="' + params[i].key + '" v="' + params[i].value + '"/>';
