@@ -8,7 +8,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore.PrivateKeyEntry;
-import java.security.KeyStoreException;
 import java.util.HashMap;
 
 import android.app.PendingIntent;
@@ -49,14 +48,18 @@ import es.gob.afirma.android.network.AndroidUrlHttpManager;
 import es.gob.afirma.android.network.UriParser;
 import es.gob.afirma.android.network.UriParser.ParameterException;
 import es.gob.afirma.android.network.UriParser.UrlParametersToSign;
+import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOUnsupportedSignFormatException;
 import es.gob.afirma.core.misc.UrlHttpManagerFactory;
 import es.gob.afirma.core.signers.AOSignConstants;
 
 /** Actividad dedicada a la firma de los datos recibidos en la entrada mediante un certificado
  * del almac&eacute;n central seleccionado por el usuario. */
-public final class SignDataActivity extends FragmentActivity implements
-KeystoreManagerListener, PrivateKeySelectionListener, DownloadDataListener, SendDataListener, SignListener {
+public final class SignDataActivity extends FragmentActivity implements KeystoreManagerListener,
+                                                                        PrivateKeySelectionListener,
+                                                                        DownloadDataListener,
+                                                                        SendDataListener,
+                                                                        SignListener {
 
 	private static final String ES_GOB_AFIRMA = "es.gob.afirma"; //$NON-NLS-1$
 
@@ -126,11 +129,11 @@ KeystoreManagerListener, PrivateKeySelectionListener, DownloadDataListener, Send
 					}
 					// Ya sea con dispositivo con sin el, se continua la ejecucion cargando el almacen
 					new LoadKeyStoreManagerTask(
-							SignDataActivity.this,
-							SignDataActivity.this,
-							SignDataActivity.this.getUsbDevice(),
-							SignDataActivity.this.getUsbManager()
-							).execute();
+						SignDataActivity.this,
+						SignDataActivity.this,
+						SignDataActivity.this.getUsbDevice(),
+						SignDataActivity.this.getUsbManager()
+					).execute();
 				}
 			}
 		}
@@ -141,7 +144,7 @@ KeystoreManagerListener, PrivateKeySelectionListener, DownloadDataListener, Send
 		super.onCreate(savedInstanceState);
 
 		if (getIntent() == null || getIntent().getData() == null) {
-			Log.w("es.gob.afirma", "No se han indicado parametros de entrada para la actividad");  //$NON-NLS-1$//$NON-NLS-2$
+			Log.w(ES_GOB_AFIRMA, "No se han indicado parametros de entrada para la actividad");  //$NON-NLS-1$
 			closeActivity();
 			return;
 		}
@@ -150,8 +153,11 @@ KeystoreManagerListener, PrivateKeySelectionListener, DownloadDataListener, Send
 		setContentView(R.layout.activity_sign_data);
 
 		// Aseguramos que se muestra el panel con el mensaje de espera
-		this.progressDialog = ProgressDialog.show(this, "", //$NON-NLS-1$
-				getString(R.string.dialog_msg_loading_data), true);
+		this.progressDialog = ProgressDialog.show(
+			this, "", getString(R.string.dialog_msg_loading_data), true //$NON-NLS-1$
+		);
+
+		Log.d(ES_GOB_AFIRMA, "URI de invocacion: " + getIntent().getDataString()); //$NON-NLS-1$
 
 		try {
 			this.parameters = UriParser.getParametersToSign(getIntent().getDataString());
@@ -163,7 +169,8 @@ KeystoreManagerListener, PrivateKeySelectionListener, DownloadDataListener, Send
 		catch (final UnsupportedEncodingException e) {
 			Log.e(ES_GOB_AFIRMA, "Error de codificacion", e); //$NON-NLS-1$
 			showErrorMessage(getString(R.string.error_bad_params));
-		} catch (final Throwable e) {
+		}
+		catch (final Throwable e) {
 			Log.e(ES_GOB_AFIRMA, "Error grave en el onCreate de SignDataActivity: " + e.toString(), e); //$NON-NLS-1$
 			e.printStackTrace();
 			showErrorMessage(getString(R.string.error_bad_params));
@@ -187,7 +194,8 @@ KeystoreManagerListener, PrivateKeySelectionListener, DownloadDataListener, Send
 				// de cancelacion de la seleccion de fichero, en cuyo caso no deseamos que se vuelva a abrir
 				if (!this.fileChooserOpenned) {
 					openSelectFileActivity();
-				} else {
+				}
+				else {
 					this.fileChooserOpenned = false;
 				}
 			}
@@ -195,9 +203,10 @@ KeystoreManagerListener, PrivateKeySelectionListener, DownloadDataListener, Send
 			else if (this.parameters.getData() == null && this.parameters.getFileId() != null) {
 				Log.i(ES_GOB_AFIRMA, "Se van a descargar los datos desde servidor con el identificador: " + this.parameters.getFileId()); //$NON-NLS-1$
 				this.downloadFileTask = new DownloadFileTask(
-						this.parameters.getFileId(),
-						this.parameters.getRetrieveServletUrl(),
-						this);
+					this.parameters.getFileId(),
+					this.parameters.getRetrieveServletUrl(),
+					this
+				);
 				this.downloadFileTask.execute();
 			}
 			// Si tenemos los datos, cargamos un certificado para firmarlos
@@ -243,11 +252,9 @@ KeystoreManagerListener, PrivateKeySelectionListener, DownloadDataListener, Send
 		this.usbManager.requestPermission(this.usbDevice, mPermissionIntent);
 	}
 
-	/**
-	 * Identifica las extensiones de los ficheros que se pueden firmar con un formato de firma.
+	/** Identifica las extensiones de los ficheros que se pueden firmar con un formato de firma.
 	 * @param signatureFormat Formato de firma.
-	 * @return Extensiones.
-	 */
+	 * @return Extensiones. */
 	private static String identifyExts(final String signatureFormat) {
 
 		if (AOSignConstants.SIGN_FORMAT_PADES.equals(signatureFormat) ||
@@ -273,10 +280,8 @@ KeystoreManagerListener, PrivateKeySelectionListener, DownloadDataListener, Send
 		).execute();
 	}
 
-	/**
-	 * Envia los datos indicado a un servlet. En caso de error, cierra la app.
-	 * @param data Datos que se desean enviar.
-	 */
+	/** Env&iacute;a los datos indicado a un servlet. En caso de error, cierra la aplicaci&oacute;n.
+	 * @param data Datos que se desean enviar. */
 	private void sendData(final String data, final boolean critical, final boolean needCloseApp) {
 
 		Log.i(ES_GOB_AFIRMA, "Se almacena el resultado en el servidor con el Id: " + this.parameters.getId()); //$NON-NLS-1$
@@ -291,11 +296,9 @@ KeystoreManagerListener, PrivateKeySelectionListener, DownloadDataListener, Send
 		).execute();
 	}
 
-	/**
-	 * Muestra un mensaje de error y lo env&iacute;a al servidor para que la p&aacute;gina Web
+	/** Muestra un mensaje de error y lo env&iacute;a al servidor para que la p&aacute;gina Web
 	 * tenga constancia de &eacute;l.
-	 * @param errorId Identificador del error.
-	 */
+	 * @param errorId Identificador del error. */
 	private void launchError(final String errorId, final boolean critical, final boolean needCloseApp) {
 		try {
 			sendData(URLEncoder.encode(ErrorManager.genError(errorId, null), DEFAULT_URL_ENCODING), critical, needCloseApp);
@@ -313,10 +316,8 @@ KeystoreManagerListener, PrivateKeySelectionListener, DownloadDataListener, Send
 		}
 	}
 
-	/**
-	 * Muestra un mensaje de advertencia al usuario.
-	 * @param message Mensaje que se desea mostrar.
-	 */
+	/** Muestra un mensaje de advertencia al usuario.
+	 * @param message Mensaje que se desea mostrar. */
 	private void showErrorMessage(final String message) {
 
 		dismissProgressDialog();
@@ -334,21 +335,21 @@ KeystoreManagerListener, PrivateKeySelectionListener, DownloadDataListener, Send
 		});
 	}
 
-	/**
-	 * Muestra un mensaje de advertencia al usuario.
-	 * @param message Mensaje que se desea mostrar.
-	 */
+	/** Muestra un mensaje de advertencia al usuario.
+	 * @param message Mensaje que se desea mostrar. */
 	private void showErrorMessageOnToast(final String message) {
 
 		dismissProgressDialog();
 		dismissMessageDialog();
 
-		runOnUiThread(new Runnable() {
-			@Override
-			public void run() {
-				Toast.makeText(SignDataActivity.this, message, Toast.LENGTH_LONG).show();
+		runOnUiThread(
+			new Runnable() {
+				@Override
+				public void run() {
+					Toast.makeText(SignDataActivity.this, message, Toast.LENGTH_LONG).show();
+				}
 			}
-		});
+		);
 	}
 
 	@Override
@@ -359,7 +360,8 @@ KeystoreManagerListener, PrivateKeySelectionListener, DownloadDataListener, Send
 		if(msm == null){
 			Log.w(ES_GOB_AFIRMA,"Error al establecer el almacen de certificados. Es posible que el usuario cancelase la operacion."); //$NON-NLS-1$
 			launchError(ErrorManager.ERROR_ESTABLISHING_KEYSTORE, true, true);
-		} else {
+		}
+		else {
 			msm.getPrivateKeyEntryAsynchronously(this);
 		}
 	}
@@ -379,7 +381,7 @@ KeystoreManagerListener, PrivateKeySelectionListener, DownloadDataListener, Send
 			pke = kse.getPrivateKeyEntry();
 		}
 		catch (final KeyChainException e) {
-			Log.e(ES_GOB_AFIRMA, "Error en la recuperacion de la clave del almacen", e); //$NON-NLS-1$
+			Log.e(ES_GOB_AFIRMA, "Error en la recuperacion de la clave del almacen: " + e, e); //$NON-NLS-1$
 			if ("4.1.1".equals(Build.VERSION.RELEASE) || "4.1.0".equals(Build.VERSION.RELEASE) || "4.1".equals(Build.VERSION.RELEASE)) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				launchError(ErrorManager.ERROR_PKE_ANDROID_4_1, true, true);
 			}
@@ -388,7 +390,7 @@ KeystoreManagerListener, PrivateKeySelectionListener, DownloadDataListener, Send
 			}
 			return;
 		}
-		catch (final KeyStoreException e) {
+		catch (final AOCancelledOperationException e) {
 			Log.e(ES_GOB_AFIRMA, "El usuario no selecciono un certificado", e); //$NON-NLS-1$
 			launchError(ErrorManager.ERROR_CANCELLED_OPERATION, false, true);
 			return;
@@ -411,16 +413,19 @@ KeystoreManagerListener, PrivateKeySelectionListener, DownloadDataListener, Send
 	}
 
 	private void showProgressDialog(final String message) {
-		runOnUiThread(new Runnable() {
-			@Override
-			public void run() {
-				try {
-					setProgressDialog(ProgressDialog.show(SignDataActivity.this, "", message, true)); //$NON-NLS-1$
-				} catch (Throwable e) {
-					Log.e(ES_GOB_AFIRMA, "No se ha podido mostrar el dialogo de progreso", e); //$NON-NLS-1$
+		runOnUiThread(
+			new Runnable() {
+				@Override
+				public void run() {
+					try {
+						setProgressDialog(ProgressDialog.show(SignDataActivity.this, "", message, true)); //$NON-NLS-1$
+					}
+					catch (final Throwable e) {
+						Log.e(ES_GOB_AFIRMA, "No se ha podido mostrar el dialogo de progreso", e); //$NON-NLS-1$
+					}
 				}
 			}
-		});
+		);
 	}
 
 	@Override

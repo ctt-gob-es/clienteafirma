@@ -1,12 +1,12 @@
 package es.gob.afirma.android.crypto;
 
 import java.security.KeyStore.PrivateKeyEntry;
-import java.security.KeyStoreException;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.security.KeyChain;
 import android.security.KeyChainAliasCallback;
+import es.gob.afirma.core.AOCancelledOperationException;
 
 /** Gestor simple de claves y certificados para dispositivos Android 4.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
@@ -63,7 +63,7 @@ public final class Android4KeyStoreManager implements MobileKeyStoreManager {
 			            }
 		        	}
 		        	else {
-		        		pksl.keySelected(new KeySelectedEvent(new KeyStoreException("El usuario no selecciono un certificado"))); //$NON-NLS-1$
+		        		pksl.keySelected(new KeySelectedEvent(new AOCancelledOperationException("El usuario no selecciono un certificado"))); //$NON-NLS-1$
 		        	}
 		        }
     		},

@@ -196,7 +196,7 @@ public final class UriParser {
 	 * @throws ParameterException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto
 	 * @throws UnsupportedEncodingException Si no se soporta UTF-8 en URL (no debe ocurrir nunca) */
 	public static UrlParametersToSign getParametersToSign(final byte[] xml) throws ParameterException, UnsupportedEncodingException {
-		return  getParametersToSign(parseXml(xml));
+		return getParametersToSign(parseXml(xml));
 	}
 
 	/** Comprueba que est&eacute;n disponibles todos los parametros disponibles en la entrada de
@@ -331,7 +331,7 @@ public final class UriParser {
 
 		if (params.containsKey(PROPERTIES_PARAM)) {
 			final String props = URLDecoder.decode(params.get(PROPERTIES_PARAM), DEFAULT_URL_ENCODING);
-			Log.d(ES_GOB_AFIRMA, "ExtraParams B64: " + props); //$NON-NLS-1$
+			Log.d(ES_GOB_AFIRMA, "ExtraParams en Base64: " + props); //$NON-NLS-1$
 			try {
 				ret.setExtraParams(parseB64Properties(props));
 			}
@@ -640,14 +640,16 @@ public final class UriParser {
 		}
 	}
 
-	/** Convierte una cadena en Base 64 de propiedades en un Properties.
-	 * @param prop Listado de propiedades en base 64.
+	/** Convierte una cadena en Base 64 de propiedades en un <code>Properties</code>.
+	 * @param prop Listado de propiedades en Base 64.
 	 * @return Objeto de propiedades.
 	 * @throws IOException Cuando ocurre alg&uacute;n error en la lectura de la cadena. */
 	private static Properties parseB64Properties(final String prop) throws IOException {
 		final Properties properties = new Properties();
+		final byte[] rawProps = Base64.decode(prop);
+		Log.d(ES_GOB_AFIRMA, "ExtraParams como propiedades:\n" + new String(rawProps)); //$NON-NLS-1$
 		if (prop != null) {
-			properties.load(new ByteArrayInputStream(Base64.decode(prop)));
+			properties.load(new ByteArrayInputStream(rawProps));
 		}
 		return properties;
 	}

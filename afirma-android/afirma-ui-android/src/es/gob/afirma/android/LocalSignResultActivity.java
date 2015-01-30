@@ -3,7 +3,6 @@ package es.gob.afirma.android;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.security.KeyStore.PrivateKeyEntry;
-import java.security.KeyStoreException;
 import java.util.HashMap;
 import java.util.Locale;
 
@@ -40,6 +39,7 @@ import es.gob.afirma.android.crypto.SignTask;
 import es.gob.afirma.android.crypto.SignTask.SignListener;
 import es.gob.afirma.android.network.AndroidUrlHttpManager;
 import es.gob.afirma.android.network.UriParser;
+import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.UrlHttpManagerFactory;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSignerFactory;
@@ -47,8 +47,7 @@ import es.gob.afirma.core.signers.AOSignerFactory;
 /** Esta actividad permite firmar un fichero local. La firma se guarda en un fichero .csig.
  * Esta clase tiene mucho c&oacute;fdigo duplicado de la clase LocalSignResultActivity.
  * Hay crear una nueva clase con los m&ecute;todos duplicados.
- * @author Astrid Idoate Gil
- * */
+ * @author Astrid Idoate Gil. */
 public final class LocalSignResultActivity extends FragmentActivity implements KeystoreManagerListener,
 		                                                                       PrivateKeySelectionListener,
 		                                                                       SignListener {
@@ -292,7 +291,7 @@ public final class LocalSignResultActivity extends FragmentActivity implements K
 			}
 			return;
 		}
-		catch (final KeyStoreException e) {
+		catch (final AOCancelledOperationException e) {
 			Log.e(ES_GOB_AFIRMA, "El usuario no selecciono un certificado: " + e); //$NON-NLS-1$
 			closeActivity();
 			return;
@@ -316,7 +315,6 @@ public final class LocalSignResultActivity extends FragmentActivity implements K
 			showErrorMessage(getString(R.string.error_signing_config));
 		}
 	}
-
 
 	@Override
 	public synchronized void setKeyStoreManager(final MobileKeyStoreManager msm) {
@@ -368,11 +366,13 @@ public final class LocalSignResultActivity extends FragmentActivity implements K
 			Log.d(ES_GOB_AFIRMA, "La firma se guardara en el directorio del fichero de entrada"); //$NON-NLS-1$
 			outDirectory = new File(this.fileName).getParent();
 			originalDirectory = true;
-		} else if (Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).exists() && Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).canWrite()) {
+		}
+		else if (Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).exists() && Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).canWrite()) {
 			Log.d(ES_GOB_AFIRMA, "La firma se guardara en el directorio de descargas"); //$NON-NLS-1$
 			outDirectory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath();
 			originalDirectory = false;
-		} else {
+		}
+		else {
 			Log.w(ES_GOB_AFIRMA, "No se ha encontrado donde guardar la firma generada"); //$NON-NLS-1$
 			showErrorMessage(getString(R.string.error_no_device_to_store));
 			return;
@@ -408,11 +408,9 @@ public final class LocalSignResultActivity extends FragmentActivity implements K
 		sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED,android.net.Uri.fromFile(new File(outDirectory))));
 	}
 
-	/**
-	 * Muestra los elementos de pantalla informando de un error ocurrido durante la operacion de
+	/** Muestra los elementos de pantalla informando de un error ocurrido durante la operaci&oacute;n de
 	 * firma.
-	 * @param message Mensaje que describe el error producido.
-	 */
+	 * @param message Mensaje que describe el error producido. */
 	void showErrorMessage(final String message) {
 
 		dismissProgressDialog();
@@ -429,12 +427,10 @@ public final class LocalSignResultActivity extends FragmentActivity implements K
 		rl.setVisibility(View.VISIBLE);
 	}
 
-	/**
-	 * Muestra los elementos de pantalla informando de que la firma se ha generado correctamente y
+	/** Muestra los elementos de pantalla informando de que la firma se ha generado correctamente y
 	 * donde se ha almacenado.
 	 * @param filename Nombre del fichero almacenado.
-	 * @param directory Directorio en el que se ha almacenado la firma.
-	 */
+	 * @param directory Directorio en el que se ha almacenado la firma. */
 	private void showSuccessMessage(final String filename, final String directory, final boolean originalDirectory) {
 
 		dismissProgressDialog();
@@ -453,9 +449,7 @@ public final class LocalSignResultActivity extends FragmentActivity implements K
 		rl.setVisibility(View.VISIBLE);
 	}
 
-	/**
-	 * Cierra la actividad.
-	 */
+	/** Cierra la actividad. */
 	void closeActivity() {
 		finish();
 	}
@@ -503,13 +497,11 @@ public final class LocalSignResultActivity extends FragmentActivity implements K
 		}
 	}
 
-	/**
-	 * Construye un nombre apropiado para un fichero de firma en base a un nombre base
+	/** Construye un nombre apropiado para un fichero de firma en base a un nombre base
 	 * y un &iacute;ndice.
 	 * @param originalName Nombre base del fichero.
 	 * @param index &Iacute;ndice.
-	 * @return Nombre apropiado para el fichero de firma.
-	 */
+	 * @return Nombre apropiado para el fichero de firma. */
 	private static String buildName(final String originalName, final int index) {
 
 		String indexSuffix = ""; //$NON-NLS-1$
