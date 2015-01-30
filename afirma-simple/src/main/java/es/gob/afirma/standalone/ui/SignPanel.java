@@ -842,7 +842,13 @@ public final class SignPanel extends JPanel {
             // ************************************************************************************
             // ****************** PROCESO DE FIRMA ************************************************
             final Preferences preferences = Preferences.userRoot();
-            final Properties p = ExtraParamsHelper.preferencesToExtraParams(preferences, SignPanel.this.getSigner());
+            final Properties prefProps = ExtraParamsHelper.preferencesToExtraParams(preferences, SignPanel.this.getSigner());
+
+            // Anadimos las propiedades del sistema, habilitando asi que se puedan indicar opciones de uso con -D en linea
+            // de comandos
+            final Properties p = new Properties();
+            p.putAll(prefProps);
+            p.putAll(System.getProperties());
 
             final String signatureAlgorithm = preferences.get(PreferencesNames.PREFERENCE_SIGNATURE_ALGORITHM, "SHA512withRSA"); //$NON-NLS-1$
 
