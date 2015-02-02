@@ -75,6 +75,112 @@ public final class CAPIKeyStoreManager extends AOKeyStoreManager {
 		}
 	}
 
+	/** Inicializa el almac&eacute;n CAPI a trav&eacute;s del proveedor <code>SunMSCAPI</code>.
+	 * La inicializaci&acute;n se realiza proporcionando <code>null</code> como contrase&ntilde;a, lo que, por deficiencias del
+	 * proveedor con ciertos CSP que necesitan que el PIN se establezca con la funci&oacute;n de CAPI
+	 * <a href="msdn.microsoft.com/en-us/library/aa379858%28v=VS.85%29.aspx">CSPSetProvParam</a>, puede no funcionar adecuadamente.
+	 * Un m&eacute;todo alternativo de inicializaci&oacute;n podr&iacute;a ser este:
+	 * <pre>
+	 *  if (!Platform.getOS().equals(Platform.OS.WINDOWS)) {
+	 *      throw new InvalidOSException("Microsoft Windows"); //$NON-NLS-1$
+	 *  }
+     *
+	 *  // Si no se ha agregado el proveedor CAPI de Sun, lo anadimos
+	 *  // En java 6 viene instalado de serie, pero no pasa nada por reinstalarlo
+	 *  Provider provider = Security.getProvider("SunMSCAPI"); //$NON-NLS-1$
+	 *  if (provider == null) {
+	 *      try {
+	 *          provider = (Provider) Class.forName("sun.security.mscapi.SunMSCAPI").newInstance(); //$NON-NLS-1$
+	 *              Security.addProvider(provider);
+	 *      }
+	 *      catch(final Exception e) {
+	 *          LOGGER.severe("No se ha podido instanciar 'sun.security.mscapi.SunMSCAPI': " + e); //$NON-NLS-1$
+	 *              throw new MissingSunMSCAPIException(e);
+	 *      }
+	 *  }
+     *
+	 *  // Inicializamos
+	 * 	final KeyStore.Builder keystoreBuilder = KeyStore.Builder.newInstance(
+     *      AOKeyStore.WINDOWS.getProviderName(),
+     *      provider,
+     *      new KeyStore.CallbackHandlerProtection(
+     *          new CallbackHandler() {
+	 *              @Override
+	 *              public void handle(final Callback[] callbacks) throws IOException, UnsupportedCallbackException {
+	 *                  for (final Callback callback2 : callbacks) {
+	 *                      if (callback2 instanceof TextOutputCallback) {
+	 *                          final TextOutputCallback toc = (TextOutputCallback)callback2;
+	 *                          switch (toc.getMessageType()) {
+	 *                              case TextOutputCallback.INFORMATION:
+	 *                                  AOUIFactory.showMessageDialog(
+	 *                                      null, // Padre
+	 *                                      toc.getMessage(),
+	 *                                      "Informacion del almacen externo",
+	 *                                      JOptionPane.INFORMATION_MESSAGE
+	 *                                  );
+	 *                                  break;
+	 *                              case TextOutputCallback.ERROR:
+	 *                                  AOUIFactory.showErrorMessage(
+	 *                                      null,
+	 *                                      toc.getMessage(),
+	 *                                      "Error del almacen externo",
+	 *                                      JOptionPane.ERROR_MESSAGE
+	 *                                  );
+	 *                                  break;
+	 *                              case TextOutputCallback.WARNING:
+	 *                                  AOUIFactory.showMessageDialog(
+	 *                                      null, // Padre
+	 *                                      toc.getMessage(),
+	 *                                      "Advertencia del almacen externo",
+	 *                                      JOptionPane.WARNING_MESSAGE
+	 *                                  );
+	 *                                  break;
+	 *                              default:
+	 *                                  throw new IOException(
+	 *                                      "Tipo de mensaje no soportado indicado en la callback: " + toc.getMessageType() //$NON-NLS-1$
+	 *                                  );
+	 *                          }
+	 *                      }
+	 *                      else if (callback2 instanceof NameCallback) {
+	 *                          // Preguntamos al usuario por un nombre de usuario
+	 *                          ((NameCallback)callback2).setName(
+	 *                              (String)AOUIFactory.showInputDialog(
+	 *                                  null,
+	 *                                  "Introduzca el nombre de usuario del almacen externo",
+	 *                                  "Nombre de usuario",
+	 *                                  JOptionPane.QUESTION_MESSAGE,
+	 *                                  null,
+	 *                                  null,
+	 *                                  null
+	 *                              )
+	 *                          );
+	 *                      }
+	 *                      else if (callback2 instanceof PasswordCallback) {
+	 *                          // Preguntamos al usuario la contrasena
+	 *                          ((PasswordCallback)callback2).setPassword(
+	 *                              new UIPasswordCallback("Contrasena del almacen externo").getPassword()
+	 *                          );
+	 *                      }
+	 *                      else {
+	 *                          throw new UnsupportedCallbackException(
+	 *                              callback2, "Tipo de callback no soportada: " + callback2 != null ? callback2.getClass().getName() : "NULA" //$NON-NLS-1$ //$NON-NLS-2$
+	 *                          );
+	 *                      }
+	 *                  }
+	 *              }
+	 *          }
+	 *      )
+	 *  );
+	 *  try {
+	 *      capiKsMy = keystoreBuilder.getKeyStore();
+	 *  }
+	 *  catch (final Exception e) {
+	 *      throw new AOKeyStoreManagerException("No se ha podido obtener el almacen Windows.MY: " + e, e); //$NON-NLS-1$
+	 *  }
+	 * </pre>
+	 * @return Almac&eacute; inicializado.
+	 * @throws AOKeyStoreManagerException Si hay problemas durante la creaci&oacute;n o inicializaci&oacute;n del almac&eacute;n.
+	 * @throws IOException Si hay problemas de tratamiento de datos. */
     private static KeyStore initCapi() throws AOKeyStoreManagerException, IOException {
 
     	if (capiKsMy == null) {
