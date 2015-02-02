@@ -253,7 +253,7 @@ public final class PetitionDetailsActivity extends FragmentActivity implements L
     	final List<RequestDetailAdapterItem> list = new ArrayList<PetitionDetailsActivity.RequestDetailAdapterItem>();
 		list.add(new SignLineHeader(getString(R.string.docs)));
 		//for (int i = 0; i < documentsList.size(); i++) {
-		for (SignRequestDocument doc : documentsList) {
+		for (final SignRequestDocument doc : documentsList) {
 			list.add(new DocItem(doc.getName(), doc.getSize(), doc.getMimeType(),
 					doc.getId(), DownloadFileTask.DOCUMENT_TYPE_DATA));
 		}
@@ -809,7 +809,7 @@ public final class PetitionDetailsActivity extends FragmentActivity implements L
 		else {
 			Log.e(SFConstants.LOG_TAG, "Ha fallado la operacion"); //$NON-NLS-1$
 
-			final int msgId = (operation == OperationRequestListener.REJECT_OPERATION) ?
+			final int msgId = operation == OperationRequestListener.REJECT_OPERATION ?
 					R.string.error_msg_rejecting_request :
 						R.string.error_msg_procesing_request;
 			showToastMessage(getString(msgId));
@@ -826,7 +826,7 @@ public final class PetitionDetailsActivity extends FragmentActivity implements L
 			t.printStackTrace();
 		}
 
-		final int msgId = (operation == OperationRequestListener.REJECT_OPERATION) ?
+		final int msgId = operation == OperationRequestListener.REJECT_OPERATION ?
 				R.string.error_msg_rejecting_request :
 					R.string.error_msg_procesing_request;
 		showToastMessage(getString(msgId));

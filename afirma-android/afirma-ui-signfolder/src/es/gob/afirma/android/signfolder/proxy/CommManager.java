@@ -289,22 +289,16 @@ public final class CommManager {
 				OPERATION_REJECT, dataB64UrlSafe)));
 	}
 
-	/**
-	 * Obtiene la previsualizaci&oacute;n de un documento.
-	 *
-	 * @param documentId
-	 *            Identificador del documento.
-	 * @param certB64
-	 *            Certificado codificado en base64.
+	/** Obtiene la previsualizaci&oacute;n de un documento.
+	 * @param documentId Identificador del documento.
+	 * @param filename Nombre del fichero.
+	 * @param mimetype MIME-Type del documento.
+	 * @param certB64 Certificado codificado en base64.
 	 * @return Datos del documento.
-	 * @throws SAXException
-	 *             Cuando se encuentra un XML mal formado.
-	 * @throws IOException
-	 *             Cuando existe alg&uacute;n problema en la lectura/escritura
-	 *             de XML o al recuperar la respuesta del servidor.
-	 * @throws CertificateEncodingException
-	 *             Si no se puede obtener la codificaci&oacute;n del certificado
-	 */
+	 * @throws SAXException Cuando se encuentra un XML mal formado.
+	 * @throws IOException Cuando existe alg&uacute;n problema en la lectura/escritura
+	 *                     de XML o al recuperar la respuesta del servidor.
+	 * @throws CertificateEncodingException Si no se puede obtener la codificaci&oacute;n del certificado. */
 	public DocumentData getPreviewDocument(final String documentId,
 			final String filename, final String mimetype,
 			final String certB64) throws SAXException, IOException {
@@ -312,22 +306,16 @@ public final class CommManager {
 		return getPreview(OPERATION_PREVIEW_DOCUMENT, documentId, filename, mimetype, certB64);
 	}
 
-	/**
-	 * Obtiene la previsualizaci&oacute;n de una firma.
-	 *
-	 * @param documentId
-	 *            Identificador del documento.
-	 * @param certB64
-	 *            Certificado codificado en base64.
+	/** Obtiene la previsualizaci&oacute;n de una firma.
+	 * @param documentId Identificador del documento.
+	 * @param filename Nombre del fichero.
+	 * @param mimetype MIME-Type del documento.
+	 * @param certB64 Certificado codificado en base64.
 	 * @return Datos del documento.
-	 * @throws SAXException
-	 *             Cuando se encuentra un XML mal formado.
-	 * @throws IOException
-	 *             Cuando existe alg&uacute;n problema en la lectura/escritura
-	 *             de XML o al recuperar la respuesta del servidor.
-	 * @throws CertificateEncodingException
-	 *             Si no se puede obtener la codificaci&oacute;n del certificado
-	 */
+	 * @throws SAXException Cuando se encuentra un XML mal formado.
+	 * @throws IOException Cuando existe alg&uacute;n problema en la lectura/escritura
+	 *                     de XML o al recuperar la respuesta del servidor.
+	 * @throws CertificateEncodingException Si no se puede obtener la codificaci&oacute;n del certificado. */
 	public DocumentData getPreviewSign(final String documentId,
 			final String filename, final String mimetype,
 			final String certB64) throws SAXException, IOException {
@@ -336,22 +324,16 @@ public final class CommManager {
 				filename, mimetype, certB64);
 	}
 
-	/**
-	 * Obtiene la previsualizaci&oacute;n de un informe de firma.
-	 *
-	 * @param documentId
-	 *            Identificador del documento.
-	 * @param certB64
-	 *            Certificado codificado en base64.
+	/** Obtiene la previsualizaci&oacute;n de un informe de firma.
+	 * @param documentId Identificador del documento.
+	 * @param filename Nombre del fichero.
+	 * @param mimetype MIME-Type del documento.
+	 * @param certB64 Certificado codificado en base64.
 	 * @return Datos del documento.
-	 * @throws SAXException
-	 *             Cuando se encuentra un XML mal formado.
-	 * @throws IOException
-	 *             Cuando existe alg&uacute;n problema en la lectura/escritura
-	 *             de XML o al recuperar la respuesta del servidor.
-	 * @throws CertificateEncodingException
-	 *             Si no se puede obtener la codificaci&oacute;n del certificado
-	 */
+	 * @throws SAXException Cuando se encuentra un XML mal formado.
+	 * @throws IOException Cuando existe alg&uacute;n problema en la lectura/escritura
+	 *                     de XML o al recuperar la respuesta del servidor.
+	 * @throws CertificateEncodingException Si no se puede obtener la codificaci&oacute;n del certificado. */
 	public DocumentData getPreviewReport(final String documentId,
 			final String filename, final String mimetype,
 			final String certB64) throws SAXException, IOException {
@@ -360,24 +342,17 @@ public final class CommManager {
 				filename, mimetype, certB64);
 	}
 
-	/**
-	 * Obtiene la previsualizaci&oacute;n de un documento.
-	 *
-	 * @param operation
-	 *            Identificador del tipo de documento (datos, firma o informe).
-	 * @param documentId
-	 *            Identificador del documento.
-	 * @param certB64
-	 *            Certificado codificado en base64.
+	/** Obtiene la previsualizaci&oacute;n de un documento.
+	 * @param operation Identificador del tipo de documento (datos, firma o informe).
+	 * @param documentId Identificador del documento.
+	 * @param filename Nombre del fichero.
+	 * @param mimetype MIME-Type del documento.
+	 * @param certB64 Certificado codificado en base64.
 	 * @return Datos del documento.
-	 * @throws SAXException
-	 *             Cuando se encuentra un XML mal formado.
-	 * @throws IOException
-	 *             Cuando existe alg&uacute;n problema en la lectura/escritura
-	 *             de XML o al recuperar la respuesta del servidor.
-	 * @throws CertificateEncodingException
-	 *             Si no se puede obtener la codificaci&oacute;n del certificado
-	 */
+	 * @throws SAXException Cuando se encuentra un XML mal formado.
+	 * @throws IOException Cuando existe alg&uacute;n problema en la lectura/escritura
+	 *                     de XML o al recuperar la respuesta del servidor.
+	 * @throws CertificateEncodingException Si no se puede obtener la codificaci&oacute;n del certificado. */
 	public DocumentData getPreview(final String operation,
 			final String documentId, final String filename,
 			final String mimetype, final String certB64) throws IOException {
@@ -441,7 +416,7 @@ public final class CommManager {
 			}
 		}
 
-		InputStream is = AndroidUrlHttpManager.getRemoteDataByPost(url, this.timeout);
+		final InputStream is = AndroidUrlHttpManager.getRemoteDataByPost(url, this.timeout);
 
 //TODO: Borrar
 //		byte[] data = AOUtil.getDataFromInputStream(is);

@@ -153,6 +153,9 @@ public final class TriphaseSignDocumentRequest {
 			this.preSign.set(index, preSign);
 		}
 
+		/** Indica si el proceso necesita realizar la prefirma.
+		 * @return <code>true</code> si el proceso necesita realizar la prefirma,
+		 *         <code>false</code> en caso contrario. */
 		public Boolean isNeedPreSign() {
 			return this.needPreSign;
 		}

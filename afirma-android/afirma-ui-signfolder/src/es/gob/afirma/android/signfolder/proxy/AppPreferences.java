@@ -10,7 +10,7 @@ import es.gob.afirma.android.signfolder.SFConstants;
 
 public final class AppPreferences {
 
-private static final String CONFIG_PROPERTIES = "config.properties"; //$NON-NLS-1$
+	private static final String CONFIG_PROPERTIES = "config.properties"; //$NON-NLS-1$
 
 	/** Tiempo maximo que se va a esperar por una respuesta del proxy. */
 	private static final int DEFAULT_CONNECTION_READ_TIMEOUT = 14000;
