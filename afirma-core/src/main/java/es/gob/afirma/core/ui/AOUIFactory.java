@@ -184,17 +184,15 @@ public final class AOUIFactory {
     	uiManager.showErrorMessage(parent, message, title, messageType);
     }
 
-    /**
-     * JOptionPane.showInputDialog().
+    /** Di&aacute;logo de solicitud de un valor entre una lista de opciones (equivalente a <code>JOptionPane.showInputDialog()</code>).
      * @param parentComponent Componente padre (se descarta si no es del tipo <code>java.awt.Component</code> en la implementaci&oacute;n Swing
      * @param message Mensaje
-     * @param title Titulo del cuadro de di&aacute;logo
+     * @param title T&iacute;tulo del cuadro de di&aacute;logo
      * @param messageType Tipo de mensaje
      * @param icon Icono a mostrar en el di&aacute;logo
      * @param selectionValues Valores posibles para seleccionar
      * @param initialSelectionValue Valor seleccionado por defecto
-     * @return Valor seleccionado
-     */
+     * @return Valor seleccionado */
     public static Object showInputDialog(final Object parentComponent, final Object message, final String title, final int messageType, final Object icon, final Object[] selectionValues, final Object initialSelectionValue) {
         return uiManager.showInputDialog(parentComponent, message, title, messageType, icon, selectionValues, initialSelectionValue);
     }
