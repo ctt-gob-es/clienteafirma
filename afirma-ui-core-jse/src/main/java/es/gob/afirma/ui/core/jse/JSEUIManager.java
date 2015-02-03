@@ -375,7 +375,7 @@ public class JSEUIManager implements AOUIManager {
         }
 
         final JFileChooser jfc;
-        if (icon != null && icon instanceof Image) {
+        if (icon instanceof Image) {
         	jfc = new JFileChooser() {
 			private static final long serialVersionUID = 5631612687512882773L;
 			   @Override
