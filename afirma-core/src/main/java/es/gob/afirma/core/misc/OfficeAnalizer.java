@@ -265,13 +265,28 @@ public final class OfficeAnalizer {
      *        Fichero zip que deseamos comprobar.
      * @return Devuelve <code>true</code> si el fichero era un ODF soportado, <code>false</code> en caso contrario. */
     private static boolean isODFFile(final ZipFile zipFile) {
-
         // Comprobamos si estan todos los ficheros principales del documento
-        return zipFile.getEntry("mimetype") != null && zipFile.getEntry("content.xml") != null //$NON-NLS-1$ //$NON-NLS-2$
-               && zipFile.getEntry("meta.xml") != null //$NON-NLS-1$
-               && zipFile.getEntry("settings.xml") != null //$NON-NLS-1$
-               && zipFile.getEntry("styles.xml") != null //$NON-NLS-1$
-               && zipFile.getEntry("META-INF/manifest.xml") != null; //$NON-NLS-1$
+    	// Se separan las comprobaciones en varios if para no tener una sola
+    	// sentencia condicional muy larga
+    	if (zipFile.getEntry("mimetype") == null) { //$NON-NLS-1$
+    		return false;
+    	}
+    	if (zipFile.getEntry("content.xml") == null) { //$NON-NLS-1$
+    		return false;
+    	}
+    	if (zipFile.getEntry("meta.xml") == null) { //$NON-NLS-1$
+    		return false;
+    	}
+    	if (zipFile.getEntry("settings.xml") == null) { //$NON-NLS-1$
+    		return false;
+    	}
+    	if (zipFile.getEntry("styles.xml") == null) { //$NON-NLS-1$
+    		return false;
+    	}
+    	if (zipFile.getEntry("META-INF/manifest.xml") == null) { //$NON-NLS-1$
+    		return false;
+    	}
+    	return true;
     }
 
     /** Recupera la extensi&oacute;n apropiada para un documento ODF. Si el
