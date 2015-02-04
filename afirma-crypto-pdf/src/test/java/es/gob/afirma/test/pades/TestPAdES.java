@@ -127,7 +127,7 @@ public class TestPAdES {
      * @throws Exception En cualquier error. */
     @SuppressWarnings("static-method")
 	@Test
-    public void testTimestampedSignature() throws Exception {
+    public void testTimestampedSignatureAndDocument() throws Exception {
 
         Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$
 
@@ -139,7 +139,7 @@ public class TestPAdES {
 
         final byte[] testPdf = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(TEST_FILES[0]));
 
-        final String prueba = "Firma PAdES de PDF con sello de tiempo en SHA512withRSA"; //$NON-NLS-1$
+        final String prueba = "Firma PAdES de PDF con sello de tiempo sobre la firma y el documento"; //$NON-NLS-1$
 
         System.out.println(prueba);
 
@@ -196,6 +196,56 @@ public class TestPAdES {
         Assert.assertNotNull(prueba, result);
         Assert.assertTrue(signer.isSign(result));
 
+    }
+
+    /** Prueba de PDF con sello de tiempo contra la TSA de CATCert.
+     * @throws Exception En cualquier error. */
+    @SuppressWarnings("static-method")
+	@Test
+    public void testTimestampedSignature() throws Exception {
+
+        Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$
+
+        final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
+        ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH), CERT_PASS.toCharArray());
+        final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
+
+        final AOSigner signer = new AOPDFSigner();
+
+        final byte[] testPdf = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(TEST_FILES[0]));
+
+        final String prueba = "Firma PAdES de PDF con sello de tiempo sobre la firma"; //$NON-NLS-1$
+
+        System.out.println(prueba);
+
+        final Properties extraParams = new Properties();
+        //********* TSA CATCERT ********************************************************************
+        //******************************************************************************************
+        extraParams.put("tsaURL", CATCERT_TSP); //$NON-NLS-1$
+        extraParams.put("tsaPolicy", CATCERT_POLICY); //$NON-NLS-1$
+        extraParams.put("tsaRequireCert", CATCERT_REQUIRECERT); //$NON-NLS-1$
+        extraParams.put("tsaHashAlgorithm", "SHA-512"); //$NON-NLS-1$ //$NON-NLS-2$
+        extraParams.put("tsType", TsaParams.TS_SIGN); //$NON-NLS-1$
+        //******************************************************************************************
+        //********* FIN TSA CATCERT ****************************************************************
+
+        final byte[] result = signer.sign(
+    		testPdf,
+    		"SHA512withRSA", //$NON-NLS-1$
+    		pke.getPrivateKey(),
+    		pke.getCertificateChain(),
+    		extraParams
+		);
+
+        final File saveFile = File.createTempFile("TSA-", ".pdf"); //$NON-NLS-1$ //$NON-NLS-2$
+        final OutputStream os = new FileOutputStream(saveFile);
+        os.write(result);
+        os.flush();
+        os.close();
+        System.out.println("Temporal para comprobacion manual: " + saveFile.getAbsolutePath()); //$NON-NLS-1$
+
+        Assert.assertNotNull(prueba, result);
+        Assert.assertTrue(signer.isSign(result));
     }
 
 
