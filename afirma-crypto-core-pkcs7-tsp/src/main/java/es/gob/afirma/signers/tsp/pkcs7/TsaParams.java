@@ -25,8 +25,14 @@ public final class TsaParams {
 	private final String tsaPwd;
 	private final TsaRequestExtension[] extensions;
 	private final String tsaHashAlgorithm;
-	private final byte[] sslPkcs12File;
-	private final String sslPkcs12FilePassword;
+	private final byte[] sslKeyStoreFile;
+	private final String sslKeyStorePassword;
+	private final String sslKeyStoreType;
+	private final byte[] sslTrustStoreFile;
+	private final String sslTrustStorePassword;
+	private final String sslTrustStoreType;
+	private final boolean verifyHostname;
+
 
 	/** Sello de tiempo a nivel de firma. */
 	public static final String TS_SIGN = "1";  //$NON-NLS-1$
@@ -56,8 +62,13 @@ public final class TsaParams {
 					"Policy=" + getTsaPolicy() + "; " + //$NON-NLS-1$ //$NON-NLS-2$
 					"Extensions" + exts.toString() + "; " + //$NON-NLS-1$ //$NON-NLS-2$
 					"Digest=" + getTsaHashAlgorithm() + "; " + //$NON-NLS-1$ //$NON-NLS-2$
-					"SSLP12=" + (getSslPkcs12File() != null ? "Yes" : "No") + "; " + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-					"SSLP12Pwd=" + getSslPkcs12FilePassword() + //$NON-NLS-1$
+					"SSLKeyStore=" + (getSslKeyStoreFile() != null ? "Yes" : "No") + "; " + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+					"SSLKeyStorePwd=" + getSslKeyStorePassword() + //$NON-NLS-1$
+					"SSLKeyStoreType=" + getSslKeyStoreType() + //$NON-NLS-1$
+					"SSLTrustStore=" + (getSslTrustStoreFile() != null ? "Yes" : "No") + "; " + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+					"SSLTrustStorePwd=" + getSslTrustStorePassword() + //$NON-NLS-1$
+					"SSLTrustStoreType=" + getSslTrustStoreType() + //$NON-NLS-1$
+					"VerifyHostname=" + isVerifyHostname() + //$NON-NLS-1$
 			"]"; //$NON-NLS-1$
 
 		// Quitamos el punto y coma de la ultima extension
@@ -73,10 +84,18 @@ public final class TsaParams {
 	 * @param pwd Contrase&ntilde;a para el usuario de la TSA.
 	 * @param exts Extensiones de la petici&oacute;n a la TSA.
 	 * @param hashAlgorithm Algoritmo de huella digital a usar.
-	 * @param sslPkcs12 Fichero PKCS#12 que contiene el certificado SSL cliente que pedir&aacute; la TSA al
+	 * @param sslKeyStoreFile Almac&eacute;n que contiene el certificado SSL cliente que pedir&aacute; la TSA al
 	 *                  establecer la coneci&oacute;s HTTPS.
-	 * @param sslPkcs12Password Contrase&ntilde;a del fichero PKCS#12 que contiene el certificado SSL
-	 *                          cliente para las conexiones HTTPS. */
+	 * @param sslKeyStorePassword Contrase&ntilde;a del almac&eacute;n que contiene el certificado SSL
+	 *                          cliente para las conexiones HTTPS.
+	 * @param sslKeyStoreType Tipo de almac&eacute;n que contiene el certificado SSL cliente.
+	 * @param sslTrustStoreFile Almac&eacute;n que contiene el certificado SSL cliente que pedir&aacute; la TSA al
+	 *                  establecer la coneci&oacute;s HTTPS.
+	 * @param sslTrustStorePassword Contrase&ntilde;a del almac&eacute;n que contiene el certificado SSL
+	 *                          cliente para las conexiones HTTPS.
+	 * @param sslTrustStoreType Tipo de almac&eacute;n que contiene los certificado de CA reconocidas.
+	 * @param verifyHostname Verifica el nombre de dominio contra los certificados SSL.
+	 *                          */
 	public TsaParams(final boolean requireCert,
 			         final String policy,
 			         final URI url,
@@ -84,8 +103,13 @@ public final class TsaParams {
 			         final String pwd,
 			         final TsaRequestExtension[] exts,
 			         final String hashAlgorithm,
-			         final byte[] sslPkcs12,
-			         final String sslPkcs12Password) {
+			         final byte[] sslKeyStoreFile,
+			         final String sslKeyStorePassword,
+			         final String sslKeyStoreType,
+			         final byte[] sslTrustStore,
+			         final String sslTrustStorePassword,
+			         final String sslTrustStoreType,
+			         final boolean verifyHostname) {
         if (url == null) {
         	throw new IllegalArgumentException(
 				"La URL del servidor de sello de tiempo no puede ser nula" //$NON-NLS-1$
@@ -97,9 +121,14 @@ public final class TsaParams {
         this.tsaPwd = pwd;
         this.extensions = exts != null ? exts.clone() : null;
         this.tsaHashAlgorithm = hashAlgorithm != null ? hashAlgorithm : DEFAULT_DIGEST_ALGO;
-        this.sslPkcs12File = sslPkcs12 != null ? sslPkcs12.clone() : null;
-        this.sslPkcs12FilePassword = sslPkcs12Password;
+        this.sslKeyStoreFile = sslKeyStoreFile != null ? sslKeyStoreFile.clone() : null;
+        this.sslKeyStorePassword = sslKeyStorePassword;
+        this.sslKeyStoreType = sslKeyStoreType;
+        this.sslTrustStoreFile = sslTrustStore != null ? sslTrustStore.clone() : null;
+        this.sslTrustStorePassword = sslTrustStorePassword;
+        this.sslTrustStoreType = sslTrustStoreType;
         this.tsaRequireCert = requireCert;
+        this.verifyHostname = verifyHostname;
 	}
 
 	/** Construye los par&aacute;metros de configuraci&oacute;n de una Autoridad de Sellado de Tiempo.
@@ -135,28 +164,53 @@ public final class TsaParams {
         this.tsaUsr = extraParams.getProperty("tsaUsr"); //$NON-NLS-1$
         this.tsaPwd = extraParams.getProperty("tsaPwd"); //$NON-NLS-1$
 
-        // PKCS#12 / PFX para el SSL cliente
-        final String p12FileName = extraParams.getProperty("tsaSslPkcs12File"); //$NON-NLS-1$
-        if (p12FileName != null) {
-        	final File p12File = new File(p12FileName);
-        	if (!p12File.exists()) {
-        		throw new IllegalArgumentException("El fichero PKCS#12 para el SSL de la TSA no existe: " + p12File); //$NON-NLS-1$
+        // Almacen para el SSL cliente
+        final String keyStoreFileName = extraParams.getProperty("tsaSslKeyStoreFile"); //$NON-NLS-1$
+        if (keyStoreFileName != null) {
+        	final File keyStoreFile = new File(keyStoreFileName);
+        	if (!keyStoreFile.exists()) {
+        		throw new IllegalArgumentException("El fichero PKCS#12 para el SSL de la TSA no existe: " + keyStoreFile); //$NON-NLS-1$
         	}
 			try {
-				final InputStream is = new FileInputStream(p12File);
-				this.sslPkcs12File = AOUtil.getDataFromInputStream(is);
+				final InputStream is = new FileInputStream(keyStoreFile);
+				this.sslKeyStoreFile = AOUtil.getDataFromInputStream(is);
 				is.close();
 			}
 			catch(final Exception e) {
 				throw new IllegalArgumentException(
-					"El fichero PKCS#12 (" + p12File + ") para el SSL de la TSA no ha podido leerse: " + e, e  //$NON-NLS-1$//$NON-NLS-2$
+					"El almacen (" + keyStoreFile + ") con el certificado SSL cliente para la conexión con la TSA no ha podido leerse: " + e, e  //$NON-NLS-1$//$NON-NLS-2$
 				);
 			}
         }
         else {
-        	this.sslPkcs12File = null;
+        	this.sslKeyStoreFile = null;
         }
-        this.sslPkcs12FilePassword = extraParams.getProperty("tsaSslPkcs12FilePassword", ""); //$NON-NLS-1$ //$NON-NLS-2$
+        this.sslKeyStorePassword = extraParams.getProperty("tsaSslKeyStorePassword", ""); //$NON-NLS-1$ //$NON-NLS-2$
+        this.sslKeyStoreType = extraParams.getProperty("tsaSslKeyStoreType", null); //$NON-NLS-1$
+
+        // TrustStore con los certificados de confianza para el SSL
+        final String trustStoreFileName = extraParams.getProperty("tsaSslTrustStoreFile"); //$NON-NLS-1$
+        if (trustStoreFileName != null) {
+        	final File trustStoreFile = new File(trustStoreFileName);
+        	if (!trustStoreFile.exists()) {
+        		throw new IllegalArgumentException("El TrustStore para el SSL de la TSA no existe: " + trustStoreFile); //$NON-NLS-1$
+        	}
+			try {
+				final InputStream is = new FileInputStream(trustStoreFile);
+				this.sslTrustStoreFile = AOUtil.getDataFromInputStream(is);
+				is.close();
+			}
+			catch(final Exception e) {
+				throw new IllegalArgumentException(
+					"El TrustStore (" + trustStoreFile + ") para el SSL de la TSA no ha podido leerse: " + e, e  //$NON-NLS-1$//$NON-NLS-2$
+				);
+			}
+        }
+        else {
+        	this.sslTrustStoreFile = null;
+        }
+        this.sslTrustStorePassword = extraParams.getProperty("tsaSslTrustStorePassword", ""); //$NON-NLS-1$ //$NON-NLS-2$
+        this.sslTrustStoreType = extraParams.getProperty("tsaSslTrustStoreType", null); //$NON-NLS-1$
 
         try {
 	        this.extensions = extraParams.getProperty("tsaExtensionOid") != null && extraParams.getProperty("tsaExtensionValueBase64") != null ? //$NON-NLS-1$ //$NON-NLS-2$
@@ -171,6 +225,8 @@ public final class TsaParams {
         catch(final IOException e) {
         	throw new IllegalArgumentException("Las extensiones del sello de tiempo no estan adecuadamente codificadas: " + e, e); //$NON-NLS-1$
         }
+
+        this.verifyHostname = Boolean.parseBoolean(extraParams.getProperty("verifyHostname", Boolean.TRUE.toString())); //$NON-NLS-1$
 	}
 
 	boolean doTsaRequireCert() {
@@ -207,15 +263,44 @@ public final class TsaParams {
 	 * establecer la coneci&oacute;s HTTPS.
 	 * @return Fichero PKCS#12 que contiene el certificado SSL cliente para las conexiones HTTPS, o
 	 *         <code>null</code> si no se ha establecido ninguno. */
-	public byte[] getSslPkcs12File() {
-		return this.sslPkcs12File;
+	public byte[] getSslKeyStoreFile() {
+		return this.sslKeyStoreFile;
 	}
 
 	/** Obtiene la contrase&ntilde;a del fichero PKCS#12 que contiene el certificado SSL cliente para las conexiones HTTPS.
 	 * @return Contrase&ntilde;a del fichero PKCS#12 que contiene el certificado SSL cliente para las conexiones HTTPS o
 	 *         cadena vac&iacute;a si no se ha establecido ninguna. */
-	public String getSslPkcs12FilePassword() {
-		return this.sslPkcs12FilePassword;
+	public String getSslKeyStorePassword() {
+		return this.sslKeyStorePassword;
 	}
 
+	/** Obtiene el tipo de almac&eacute;n que contiene el certificado SSL cliente para las conexiones HTTPS.
+	 * @return Tipo de almac&eacute;n (JKS o PKCS12). Si no se indica ninguno, se establecer&aacute; JKS. */
+	public String getSslKeyStoreType() {
+		return this.sslKeyStoreType;
+	}
+
+	/** Obtiene el TrustStore que contiene los certificados de CA que se permiten para la generacion del certificado SSL
+	 * de la TSA a trav&eacute;s de los que se puede establecer la coneci&oacute;s HTTPS.
+	 * @return Almac&eacute;n que contiene los certificados de CA para las conexiones HTTPS, o
+	 *         <code>null</code> si no se ha establecido ninguno. */
+	public byte[] getSslTrustStoreFile() {
+		return this.sslTrustStoreFile;
+	}
+
+	/** Obtiene la contrase&ntilde;a del almac&eacute;n que contiene el certificado con las CA de confianza para las conexiones HTTPS.
+	 * @return Contrase&ntilde;a del almac&eacute;n o cadena vac&iacute;a si no se ha establecido ninguna. */
+	public String getSslTrustStorePassword() {
+		return this.sslTrustStorePassword;
+	}
+
+	/** Obtiene el tipo de almac&eacute;n que contiene los certificados de CA de confianza para las conexiones HTTPS.
+	 * @return Tipo de almac&eacute;n (JKS o PKCS12). Si no se indica ninguno, se establecer&aacute; JKS. */
+	public String getSslTrustStoreType() {
+		return this.sslTrustStoreType;
+	}
+
+	public boolean isVerifyHostname() {
+		return this.verifyHostname;
+	}
 }
