@@ -59,8 +59,14 @@ public final class PdfSignResult implements Serializable {
     		             final byte[] tsp,
     		             final GregorianCalendar signingTime,
     		             final Properties xParams) {
-        if (signingTime == null || pdfFileId == null || signature == null || "".equals(pdfFileId) || signature.length < 1) { //$NON-NLS-1$
-            throw new IllegalArgumentException("Es obligatorio proporcionar un MAC, una pre-firma y un momento de firmado"); //$NON-NLS-1$
+    	if (signingTime == null) {
+    		throw new IllegalArgumentException("Es obligatorio proporcionar un momento de firmado"); //$NON-NLS-1$
+    	}
+    	if (pdfFileId == null || "".equals(pdfFileId)) { //$NON-NLS-1$
+    		throw new IllegalArgumentException("Es obligatorio proporcionar un MAC de PDF"); //$NON-NLS-1$
+    	}
+        if (signature == null || signature.length < 1) {
+            throw new IllegalArgumentException("Es obligatorio una pre-firma"); //$NON-NLS-1$
         }
         this.fileID = pdfFileId;
         this.sign = signature.clone();
