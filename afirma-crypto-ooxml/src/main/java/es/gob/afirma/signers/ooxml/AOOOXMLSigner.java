@@ -80,11 +80,25 @@ public final class AOOOXMLSigner implements AOSigner {
      * @throws IOException Cuando hay problemas en el tratamiento de los datos. */
     private static boolean isOOXMLFile(final byte[] data) throws IOException {
         final ZipFile zipFile = AOFileUtils.createTempZipFile(data);
-        final boolean ret = zipFile.getEntry("[Content_Types].xml") != null && (zipFile.getEntry("_rels/.rels") != null || zipFile.getEntry("_rels\\.rels") != null) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-                && (zipFile.getEntry("docProps/app.xml") != null || zipFile.getEntry("docProps\\app.xml") != null) //$NON-NLS-1$ //$NON-NLS-2$
-                && (zipFile.getEntry("docProps/core.xml") != null || zipFile.getEntry("docProps\\core.xml") != null); //$NON-NLS-1$ //$NON-NLS-2$
+        // Se separa en varios "if" para simplificar la condicional
+        if (zipFile.getEntry("[Content_Types].xml") == null) { //$NON-NLS-1$
+        	zipFile.close();
+        	return false;
+        }
+        if (zipFile.getEntry("_rels/.rels") == null && zipFile.getEntry("_rels\\.rels") == null) { //$NON-NLS-1$ //$NON-NLS-2$
+        	zipFile.close();
+        	return false;
+        }
+        if (zipFile.getEntry("docProps/app.xml") == null && zipFile.getEntry("docProps\\app.xml") == null) { //$NON-NLS-1$ //$NON-NLS-2$
+        	zipFile.close();
+        	return false;
+        }
+        if (zipFile.getEntry("docProps/core.xml") == null && zipFile.getEntry("docProps\\core.xml") == null) { //$NON-NLS-1$ //$NON-NLS-2$
+        	zipFile.close();
+        	return false;
+        }
         zipFile.close();
-        return ret;
+        return true;
     }
 
     /** { {@inheritDoc} */
@@ -98,8 +112,7 @@ public final class AOOOXMLSigner implements AOSigner {
             throw new AOFormatFileException("Los datos introducidos no se corresponden con documento OOXML"); //$NON-NLS-1$
         }
 
-        // Aqui vendria el analisis de la firma buscando alguno de los otros
-        // datos de relevancia
+        // Aqui vendria el analisis de la firma buscando alguno de los otros datos de relevancia
         // que se almacenan en el objeto AOSignInfo
 
         return new AOSignInfo(AOSignConstants.SIGN_FORMAT_OOXML);
