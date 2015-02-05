@@ -89,6 +89,7 @@ public final class TsaParams {
 	 * @param sslKeyStorePassword Contrase&ntilde;a del almac&eacute;n que contiene el certificado SSL
 	 *                          cliente para las conexiones HTTPS.
 	 * @param sslKeyStoreType Tipo de almac&eacute;n que contiene el certificado SSL cliente.
+	 * @param sslTrustStore Almac&eacute;n para los certificados SSL.
 	 * @param sslTrustStoreFile Almac&eacute;n que contiene el certificado SSL cliente que pedir&aacute; la TSA al
 	 *                  establecer la coneci&oacute;s HTTPS.
 	 * @param sslTrustStorePassword Contrase&ntilde;a del almac&eacute;n que contiene el certificado SSL
@@ -178,7 +179,7 @@ public final class TsaParams {
 			}
 			catch(final Exception e) {
 				throw new IllegalArgumentException(
-					"El almacen (" + keyStoreFile + ") con el certificado SSL cliente para la conexión con la TSA no ha podido leerse: " + e, e  //$NON-NLS-1$//$NON-NLS-2$
+					"El almacen (" + keyStoreFile + ") con el certificado SSL cliente para la conexion con la TSA no ha podido leerse: " + e, e  //$NON-NLS-1$//$NON-NLS-2$
 				);
 			}
         }
@@ -300,6 +301,9 @@ public final class TsaParams {
 		return this.sslTrustStoreType;
 	}
 
+	/** Indica si se verifica o no el nombre de <i>host</i> en el SSL.
+	 * @return <code>true</code> si se verifica el nombre de <i>host</i> en el SSL,
+	 *         <code>false</code> en caso contrario. */
 	public boolean isVerifyHostname() {
 		return this.verifyHostname;
 	}
