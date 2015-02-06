@@ -7,8 +7,10 @@ import java.security.InvalidAlgorithmParameterException;
 import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -49,6 +51,16 @@ final class OOXMLPackageObjectHelper {
     	"powerpoint" //$NON-NLS-1$
     };
 
+    private static final Set<String> EXCLUDED_RELATIONSHIPS = new HashSet<String>(6);
+    static {
+    	EXCLUDED_RELATIONSHIPS.add("http://schemas.openxmlformats.org/officeDocument/2006/relationships/extended-properties"); //$NON-NLS-1$
+    	EXCLUDED_RELATIONSHIPS.add("http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties"); //$NON-NLS-1$
+    	EXCLUDED_RELATIONSHIPS.add("http://schemas.openxmlformats.org/package/2006/relationships/digital-signature/origin"); //$NON-NLS-1$
+    	EXCLUDED_RELATIONSHIPS.add("http://schemas.openxmlformats.org/package/2006/relationships/metadata/thumbnail"); //$NON-NLS-1$
+    	EXCLUDED_RELATIONSHIPS.add("http://schemas.openxmlformats.org/officeDocument/2006/relationships/presProps"); //$NON-NLS-1$
+    	EXCLUDED_RELATIONSHIPS.add("http://schemas.openxmlformats.org/officeDocument/2006/relationships/viewProps"); //$NON-NLS-1$
+    }
+
     private OOXMLPackageObjectHelper() {
     	// No permitimos la instanciacion
     }
@@ -69,7 +81,7 @@ final class OOXMLPackageObjectHelper {
 
 		return fac.newXMLObject(objectContent, nodeId, null, null);
 	}
-	
+
 	private static boolean startsWithAnyOfThose(final String in, final String[] prefixes) {
 		for (final String prefix : prefixes) {
 			if (in.startsWith(prefix)) {
@@ -144,12 +156,7 @@ final class OOXMLPackageObjectHelper {
     		final Element element = (Element) node;
     		final String relationshipType = element.getAttribute("Type"); //$NON-NLS-1$
     		// Obviamos ciertos tipos de relacion
-    		if ("http://schemas.openxmlformats.org/officeDocument/2006/relationships/extended-properties".equals(relationshipType) || //$NON-NLS-1$
-    		    "http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties".equals(relationshipType)   || //$NON-NLS-1$
-    		    "http://schemas.openxmlformats.org/package/2006/relationships/digital-signature/origin".equals(relationshipType)   || //$NON-NLS-1$
-    		    "http://schemas.openxmlformats.org/package/2006/relationships/metadata/thumbnail".equals(relationshipType)         || //$NON-NLS-1$
-    		    "http://schemas.openxmlformats.org/officeDocument/2006/relationships/presProps".equals(relationshipType)           || //$NON-NLS-1$
-    		    "http://schemas.openxmlformats.org/officeDocument/2006/relationships/viewProps".equals(relationshipType)) {           //$NON-NLS-1$
+    		if (EXCLUDED_RELATIONSHIPS.contains(relationshipType)) {
     			continue;
     		}
     		final String relationshipId = element.getAttribute("Id"); //$NON-NLS-1$
