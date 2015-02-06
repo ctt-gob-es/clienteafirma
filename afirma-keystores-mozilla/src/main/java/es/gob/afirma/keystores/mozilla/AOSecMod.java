@@ -62,14 +62,12 @@ final class AOSecMod {
         len = getShort(secmoddb, namesRunningOffset);
         final String libName = new String(secmoddb, namesRunningOffset + 2, len);
 
-        if (
-        		Platform.OS.WINDOWS.equals(Platform.getOS()) && (libName.endsWith(".DLL") || libName.endsWith(".dll")) || //$NON-NLS-1$ //$NON-NLS-2$
-        		!Platform.OS.WINDOWS.equals(Platform.getOS()) && (libName.endsWith(".so") || libName.contains(".so.") || libName.endsWith(".dylib")) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		) {
-            final String trueLibName = searchPathForFile(new String[] {
-                libName
-            });
-
+        if (isWindowsLib(libName) || isUnixLib(libName)) {
+            final String trueLibName = searchPathForFile(
+        		new String[] {
+    				libName
+        		}
+    		);
             if (trueLibName != null) {
                 return new ModuleName(trueLibName, commonName);
             }
@@ -77,6 +75,20 @@ final class AOSecMod {
 
         throw new UnsupportedOperationException("Intento fallido: " + libName); //$NON-NLS-1$
 
+    }
+
+    private static boolean isUnixLib(final String libName) {
+    	if (libName == null) {
+    		return false;
+    	}
+    	return !Platform.OS.WINDOWS.equals(Platform.getOS()) && (libName.endsWith(".so") || libName.contains(".so.") || libName.endsWith(".dylib")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+    }
+
+    private static boolean isWindowsLib(final String libName) {
+    	if (libName == null) {
+    		return false;
+    	}
+    	return Platform.OS.WINDOWS.equals(Platform.getOS()) && (libName.endsWith(".DLL") || libName.endsWith(".dll"));  //$NON-NLS-1$//$NON-NLS-2$
     }
 
     /** Obtiene los m&oacute;dulos de seguridad PKCS#11 instalados en la base de
