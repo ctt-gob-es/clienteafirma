@@ -35,6 +35,7 @@ import java.util.logging.Logger;
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
@@ -77,7 +78,7 @@ public final class CMSTimestamper {
 
 	private static final String STORE_TYPE_PKCS12 = "PKCS12"; //$NON-NLS-1$
 
-	static final Logger logger = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+	static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
     private final TimeStampRequestGenerator tsqGenerator;
     private final URI tsaURL;
@@ -110,9 +111,9 @@ public final class CMSTimestamper {
                      final String tsaUsr,
                      final String tsaPwd,
                      final TsaRequestExtension[] extensions,
-                     final byte[] keyStoreFile,
-                     final String keyStorePassword) {
-        this(requireCert, policy, tsa, tsaUsr, tsaPwd, extensions, keyStoreFile, keyStorePassword, STORE_TYPE_PKCS12, null, null, null, false);
+                     final byte[] p12KeyStoreFile,
+                     final String p12KeyStoreFilePassword) {
+        this(requireCert, policy, tsa, tsaUsr, tsaPwd, extensions, p12KeyStoreFile, p12KeyStoreFilePassword, STORE_TYPE_PKCS12, null, null, null, false);
     }
 
     /** Construye un estampador de sellos de tiempo para estructuras CMS y CAdES.
@@ -122,9 +123,14 @@ public final class CMSTimestamper {
      * @param tsaUsr Nombre de usuario si la TSA requiere autenticaci&oacute;n (puede ser <code>null</code> si no se necesita autenticaci&oacute;n).
      * @param tsaPwd Contrase&ntilde;a del usuario de la TSA (puede ser <code>null</code> si no se necesita autenticaci&oacute;n).
      * @param extensions Extensiones a a&ntilde;adir a la petici&oacute;n de sello de tiempo.
-     * @param p12KeyStoreFile Fichero PKCS#12 / PFX de almac&eacute;n (formato PKCS#12) del certificado cliente a usar en conexiones SSL.
-     * @param p12KeyStoreFilePassword Contrase&ntilde;a del ichero PKCS#12 / PFX de almac&eacute;n (formato PKCS#12) del certificado.
-     *                                cliente a usar en conexiones SSL */
+     * @param keyStoreFile Fichero de almac&eacute;n del certificado cliente a usar en conexiones SSL.
+     * @param keyStorePassword Contrase&ntilde;a del almac&eacute;n del certificado cliente a usar en conexiones SSL.
+     * @param keyStoreType Tipo de almac&eacute;n del certificado cliente a usar en conexiones SSL (tal y como se especifica en <code>KeyStore.getInstance()</code>).
+     * @param trustStoreFile Fichero de almac&eacute;n para certificados de confianza en conexiones SSL.
+     * @param trustStorePassword Contrase&ntilde;a del almac&eacute;n para certificados de confianza en conexiones SSL.
+     * @param trustStoreType Tipo de almac&eacute;n para certificados de confianza en conexiones SSL (tal y como se especifica en <code>KeyStore.getInstance()</code>).
+     * @param verifyHostname Si se especifica <code>true</code>, se verifica el nombre de <i>host</i> en las comprobaciones SSL, si por el contrario
+     *                       se especifica <code>false</code> se omite esta comprobaci&oacute;n. */
     public CMSTimestamper(final boolean requireCert,
                      final String policy,
                      final URI tsa,
@@ -146,7 +152,7 @@ public final class CMSTimestamper {
     				ext.isCritical(),
     				ext.getValue()
 				);
-        		logger.info("Anadida extension a la solicitud de sello de tiempo: " + ext); //$NON-NLS-1$
+        		LOGGER.info("Anadida extension a la solicitud de sello de tiempo: " + ext); //$NON-NLS-1$
         	}
         }
         this.tsqGenerator.setCertReq(requireCert);
@@ -355,23 +361,47 @@ public final class CMSTimestamper {
         return tsaConnection;
     }
 
-    /**
-     * Configura la conexi&oacute;n con los datos necesarios para realizarse sobre HTTPS.
-     * @param conn Conexi&oacute;n.
-     * @throws IOException Cuando el entorno no permite la configuraci&oacute;n.
-     */
-    private void configureHttpsConnection(final URLConnection conn) throws IOException {
+    /** Configura la conexi&oacute;n con los datos necesarios para realizarse sobre HTTPS.
+     * @param conn Conexi&oacute;n SSL.
+     * @throws IOException Cuando el entorno no permite la configuraci&oacute;n. */
+    @SuppressWarnings("deprecation")
+	private void configureHttpsConnection(final URLConnection conn) throws IOException {
 
-    	//TODO: Esto varia segun la implementacion del URLConnection (javax.ssl.net.HttpsURLConnection
-    	// o com.sun.ssl.net.HttpsURLConnection)
-//    	if (!this.verifyHostname) {
-//    		httpsConn.setHostnameVerifier(new HostnameVerifier() {
-//    			@Override
-//    			public boolean verify(final String hostname, final SSLSession session) {
-//    				return true;
-//    			}
-//    		});
-//    	}
+    	if (conn == null) {
+    		throw new IllegalArgumentException("La conexion no puede ser nula"); //$NON-NLS-1$
+    	}
+
+    	if (!this.verifyHostname) {
+	    	if (conn instanceof javax.net.ssl.HttpsURLConnection) {
+	    		((javax.net.ssl.HttpsURLConnection)conn).setHostnameVerifier(
+					new javax.net.ssl.HostnameVerifier() {
+		    			@Override
+		    			public boolean verify(final String hostname, final SSLSession session) {
+		    				return true;
+		    			}
+		    		}
+				);
+	    	}
+	    	else if (conn instanceof com.sun.net.ssl.HttpsURLConnection) {
+	    		// Este caso es problematico porque se deshabilita globalmente (metodo estatico) la comprobacion de
+	    		// nombre de host, y no solo para la conexion en curso.
+	    		// No obstante, la JVM no deberia darnos nunca este tipo de conexiones, porque estan ya deprecadas
+	    		// y obsoletas.
+	    		com.sun.net.ssl.HttpsURLConnection.setDefaultHostnameVerifier(
+					new  com.sun.net.ssl.HostnameVerifier() {
+						@Override
+						public boolean verify(final String arg0, final String arg1) {
+							return true;
+						}
+					}
+				);
+	    	}
+	    	else {
+	    		LOGGER.warning(
+    				"No se ha podido deshabilitar la comprobacion de nombre de host, tipo desconocido de conexion: " + conn.getClass().getName() //$NON-NLS-1$
+				);
+	    	}
+    	}
 
     	final SSLContext sc;
     	try {
@@ -434,7 +464,7 @@ public final class CMSTimestamper {
     		sc.init(
 				keyManagers,
 				trustManagers,
-				new java.security.SecureRandom()
+				null // Dejamos que use el generador de aleatorios por defecto
 			);
     	}
     	catch(final Exception e) {
@@ -446,7 +476,7 @@ public final class CMSTimestamper {
     		setSSLSocketFactoryMethod.invoke(conn, sc.getSocketFactory());
     	}
     	catch (final Exception e) {
-    		logger.severe("Error en la configuracion del acceso a la URL sobre SSL"); //$NON-NLS-1$
+    		LOGGER.severe("Error en la configuracion del acceso a la URL sobre SSL"); //$NON-NLS-1$
     		throw new IOException("Error en la configuracion del acceso a la URL sobre SSL", e); //$NON-NLS-1$
     	}
     }
