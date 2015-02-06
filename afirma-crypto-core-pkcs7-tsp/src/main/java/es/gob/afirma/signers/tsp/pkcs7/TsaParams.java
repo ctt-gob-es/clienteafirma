@@ -170,7 +170,9 @@ public final class TsaParams {
         if (keyStoreFileName != null) {
         	final File keyStoreFile = new File(keyStoreFileName);
         	if (!keyStoreFile.exists()) {
-        		throw new IllegalArgumentException("El fichero PKCS#12 para el SSL de la TSA no existe: " + keyStoreFile); //$NON-NLS-1$
+        		throw new IllegalArgumentException(
+        			"El almacen  (" + keyStoreFile + ") con el certificado SSL cliente para la conexion con la TSA no existe" //$NON-NLS-1$ //$NON-NLS-2$
+        		);
         	}
 			try {
 				final InputStream is = new FileInputStream(keyStoreFile);
@@ -194,7 +196,7 @@ public final class TsaParams {
         if (trustStoreFileName != null) {
         	final File trustStoreFile = new File(trustStoreFileName);
         	if (!trustStoreFile.exists()) {
-        		throw new IllegalArgumentException("El TrustStore para el SSL de la TSA no existe: " + trustStoreFile); //$NON-NLS-1$
+        		throw new IllegalArgumentException("El trustStore (" + trustStoreFile + ") para el SSL de la TSA no existe"); //$NON-NLS-1$ //$NON-NLS-2$
         	}
 			try {
 				final InputStream is = new FileInputStream(trustStoreFile);
@@ -203,7 +205,7 @@ public final class TsaParams {
 			}
 			catch(final Exception e) {
 				throw new IllegalArgumentException(
-					"El TrustStore (" + trustStoreFile + ") para el SSL de la TSA no ha podido leerse: " + e, e  //$NON-NLS-1$//$NON-NLS-2$
+					"El trustStore (" + trustStoreFile + ") para el SSL de la TSA no ha podido leerse: " + e, e  //$NON-NLS-1$//$NON-NLS-2$
 				);
 			}
         }
