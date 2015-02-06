@@ -326,6 +326,14 @@ public final class CMSTimestamper {
          return respBytes;
      }
 
+    /**
+     * Crea una conexi&oacute;n contra la TSA. Esta se realizar&aacute; sobre HTTPS o HTTP
+     * seg&uacute;n se indique en el par&aacute;metro {@code secureConnection}.
+     * @param secureConnection {@code true} para que la conexi&oacute;n se realice sobre HTTPS,
+     * {@code false} para HTTP.
+     * @return Conex&iacute;n contra la TSA.
+     * @throws IOException Cuando ocurre un error al abrir la conexi&oacute;n o si la URL no es v&aacute;lida.
+     */
     private URLConnection prepareConnection(final boolean secureConnection) throws IOException {
 
     	final URLConnection tsaConnection = this.tsaURL.toURL().openConnection();
