@@ -43,11 +43,8 @@ final class ServiceInvocationManager {
 			LOGGER.info("Aceptada conexion desde: " + socketChannel); //$NON-NLS-1$
 			socketChannel.configureBlocking(false);
 
-
 			final String commandUri = getCommandUri(read(socketChannel));
-
 			LOGGER.info("Comando URI recibido por HTTP: " + commandUri); //$NON-NLS-1$
-
 			if (commandUri.startsWith("afirma://service?") || commandUri.startsWith("afirma://service/?")) { //$NON-NLS-1$ //$NON-NLS-2$
 				//TODO: No permitir acceso recursivo
 			}
@@ -71,7 +68,9 @@ final class ServiceInvocationManager {
 
 		}
 		catch (final IOException e) {
-			// TODO Auto-generated catch block
+			// No hacemos nada ya que no tenemos forma de transmitir el error de vuelta y no
+			// debemos mostrar dialogos graficos
+			LOGGER.severe("Ocurrio un error en la comunicacion a traves del socket: " + e); //$NON-NLS-1$
 			e.printStackTrace();
 		}
 
@@ -87,14 +86,19 @@ final class ServiceInvocationManager {
 		}
 		sb.append("Connection: close\n"); //$NON-NLS-1$
 		sb.append("Server: Cliente @firma\n"); //$NON-NLS-1$
+		sb.append("Access-Control-Allow-Origin: *\n"); //$NON-NLS-1$
 		sb.append('\n');
 		if (response != null) {
 			sb.append(Base64.encode(response.getBytes(), true));
 		}
-
 		return sb.toString().getBytes();
 	}
 
+	/**
+	 * Obtiene los puertos que se deben probar para la conexi&oacute;n externa.
+	 * @param url URL de la que extraer los puertos.
+	 * @return Listados de puertos.
+	 */
 	private static int[] getPorts(final String url) {
 		if (url == null) {
 			throw new IllegalArgumentException("La URI de invocacion no puede ser nula"); //$NON-NLS-1$
@@ -152,7 +156,7 @@ final class ServiceInvocationManager {
 				return;
 			}
 			catch (final BindException e) {
-				LOGGER.info(
+				LOGGER.warning(
 					"El puerto " + port + " parece estar en uso, se continua con el siguiente: " + e //$NON-NLS-1$ //$NON-NLS-2$
 				);
 			}
@@ -207,9 +211,10 @@ final class ServiceInvocationManager {
 				"Los datos recibidos por HTTP no contienen un parametro 'cmd'" //$NON-NLS-1$
 			);
 		}
+
 		final String cmdUri;
 		try {
-			cmdUri = new String(Base64.decode(httpResponse.split("cmd=")[1])); //$NON-NLS-1$
+			cmdUri = new String(Base64.decode(httpResponse.split("cmd=")[1].trim(), true)); //$NON-NLS-1$
 		}
 		catch(final Exception e) {
 			throw new IllegalArgumentException(
@@ -223,5 +228,4 @@ final class ServiceInvocationManager {
 		}
 		return cmdUri;
 	}
-
 }

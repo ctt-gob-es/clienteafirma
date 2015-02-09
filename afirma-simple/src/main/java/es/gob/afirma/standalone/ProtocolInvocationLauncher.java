@@ -152,7 +152,6 @@ public final class ProtocolInvocationLauncher {
 	}
 
 	private static String processSign(final UrlParametersToSign options) {
-
 		if (options == null) {
 			LOGGER.severe("Las opciones de firma son nulas"); //$NON-NLS-1$
 			showError(SAF_01);
@@ -193,6 +192,7 @@ public final class ProtocolInvocationLauncher {
 				LOGGER.info("carga de datos de firma cancelada por el usuario: " + e); //$NON-NLS-1$
 				return RESULT_CANCEL;
 			}
+
 			try {
 				final InputStream fis = new FileInputStream(selectedDataFile);
 				final byte[] data = AOUtil.getDataFromInputStream(fis);
