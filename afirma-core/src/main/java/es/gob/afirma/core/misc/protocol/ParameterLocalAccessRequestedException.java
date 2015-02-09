@@ -10,4 +10,7 @@ public final class ParameterLocalAccessRequestedException extends ParameterExcep
 		super(msg);
 	}
 
+	ParameterLocalAccessRequestedException(final String msg, final Throwable cause) {
+		super(msg, cause);
+	}
 }

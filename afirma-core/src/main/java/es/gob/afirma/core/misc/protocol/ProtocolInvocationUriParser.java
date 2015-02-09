@@ -262,6 +262,9 @@ public final class ProtocolInvocationUriParser {
 				try {
 					retrieveServletUrl = validateURL(params.get(RETRIEVE_SERVLET_PARAM));
 				}
+				catch (final ParameterLocalAccessRequestedException e) {
+					throw new ParameterLocalAccessRequestedException("La URL del servicio de recuperacion de datos no puede ser local", e); //$NON-NLS-1$
+				}
 				catch (final ParameterException e) {
 					throw new ParameterException("Error al validar la URL del servlet de recuperacion: " + e, e); //$NON-NLS-1$
 				}
@@ -310,8 +313,11 @@ public final class ProtocolInvocationUriParser {
 			try {
 				storageServletUrl = validateURL(params.get(STORAGE_SERVLET_PARAM));
 			}
+			catch (final ParameterLocalAccessRequestedException e) {
+				throw new ParameterLocalAccessRequestedException("La URL del servicio de guardado no puede ser local", e); //$NON-NLS-1$
+			}
 			catch (final ParameterException e) {
-				throw new ParameterException("Error al validar la URL del servlet de guardado: " + e, e); //$NON-NLS-1$
+				throw new ParameterException("Error al validar la URL del servicio de guardado: " + e, e); //$NON-NLS-1$
 			}
 			ret.setStorageServletUrl(storageServletUrl);
 		}
