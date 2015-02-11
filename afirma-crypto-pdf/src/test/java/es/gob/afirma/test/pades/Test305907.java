@@ -20,9 +20,9 @@ public final class Test305907 {
 
 	private final static String DEFAULT_SIGNATURE_ALGORITHM = "SHA512withRSA"; //$NON-NLS-1$
 
-	private final static String CERT_PATH = "ANF_PF_Activo.pfx"; //$NON-NLS-1$
+	private final static String CERT_PATH = "PFActivoFirSHA256.pfx"; //$NON-NLS-1$
 	private final static String CERT_PASS = "12341234"; //$NON-NLS-1$
-	private final static String CERT_ALIAS = "anf usuario activo"; //$NON-NLS-1$
+	private final static String CERT_ALIAS = "fisico activo prueba"; //$NON-NLS-1$
 
 	/** Prueba de detecci&oacute;n de firmas no registradas.
 	 * @throws Exception En cualquier error. */
@@ -36,6 +36,7 @@ public final class Test305907 {
 		Assert.assertTrue(signer.isSign(testPdf));
 
 		testPdf = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(TEST_FILE));
+		System.setProperty("allowCosigningUnregisteredSignatures", "false"); //$NON-NLS-1$ //$NON-NLS-2$
 		Assert.assertFalse(signer.isSign(testPdf));
 
         final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
@@ -58,6 +59,7 @@ public final class Test305907 {
         Assert.assertTrue(raises);
 
         final Properties p = new Properties();
+        System.setProperty("allowCosigningUnregisteredSignatures", "true"); //$NON-NLS-1$ //$NON-NLS-2$
         p.put("allowCosigningUnregisteredSignatures", "true"); //$NON-NLS-1$ //$NON-NLS-2$
 
         raises = false;
@@ -73,6 +75,7 @@ public final class Test305907 {
         catch (final PdfHasUnregisteredSignaturesException e) {
         	raises = true;
         }
+        System.setProperty("allowCosigningUnregisteredSignatures", "false"); //$NON-NLS-1$ //$NON-NLS-2$
         Assert.assertFalse(raises);
 
 	}
