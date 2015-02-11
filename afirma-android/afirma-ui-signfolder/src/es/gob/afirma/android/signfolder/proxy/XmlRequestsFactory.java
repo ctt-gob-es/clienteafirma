@@ -280,7 +280,7 @@ final class XmlRequestsFactory {
 	    return sb.toString();
 	}
 
-	public static String createApproveRequest(final String[] requestIds, final String certB64) {
+	static String createApproveRequest(final String[] requestIds, final String certB64) {
 		if (requestIds == null || requestIds.length == 0) {
 			throw new IllegalArgumentException("La lista de peticiones no puede ser nula"); //$NON-NLS-1$
 		}
