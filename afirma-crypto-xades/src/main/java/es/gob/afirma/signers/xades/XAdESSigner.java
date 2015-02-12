@@ -693,7 +693,7 @@ public final class XAdESSigner {
 				}
 				catch (final Exception e) {
 					XAdESSigner.LOGGER.severe(
-						"No ha sido posible anadir la referencia a la hoja de estilo del XML, esta no se firmara: " + e //$NON-NLS-1$
+						"No ha sido posible anadir la referencia a la hoja de estilo del XML para Enveloping en modo Externally Detached, esta no se firmara: " + e //$NON-NLS-1$
 					);
 				}
 			}
@@ -778,7 +778,7 @@ public final class XAdESSigner {
 				}
 				catch (final Exception e) {
 					XAdESSigner.LOGGER.severe(
-						"No ha sido posible anadir la referencia a la hoja de estilo del XML, esta no se firmara: " + e //$NON-NLS-1$
+						"No ha sido posible anadir la referencia a la hoja remota de estilo del XML para firma Detached, esta no se firmara: " + e //$NON-NLS-1$
 					);
 				}
 			}
@@ -894,7 +894,7 @@ public final class XAdESSigner {
 					}
 					catch (final Exception e) {
 						XAdESSigner.LOGGER.severe(
-							"No ha sido posible anadir la referencia a la hoja de estilo del XML, esta no se firmara: " + e //$NON-NLS-1$
+							"No ha sido posible anadir la referencia a la hoja de estilo remota del XML para firma Externally Detached, esta no se firmara: " + e //$NON-NLS-1$
 						);
 					}
 				}
@@ -992,7 +992,7 @@ public final class XAdESSigner {
 				}
 				catch (final Exception e) {
 					XAdESSigner.LOGGER.severe(
-						"No ha sido posible anadir la referencia a la hoja de estilo del XML, esta no se firmara: " + e //$NON-NLS-1$
+						"No ha sido posible anadir la referencia a la hoja de estilo remota del XML para firma Enveloped, esta no se firmara: " + e //$NON-NLS-1$
 					);
 				}
 			}
