@@ -110,7 +110,7 @@ public final class AWTUIManager extends JSEUIManager {
 
         // Habilitamos si corresponde el modo de seleccion multiple. Ya que solo esta disponible
         // en Java 7, lo hacemos por reflexion para evitar problemas de compilacion. Esto equivale
-        // a la sentencia: fd.setMultipleMode(multiSelect);
+        // a la sentencia: "fd.setMultipleMode(multiSelect)"
         if (multiSelect) {
         	try {
         		final Method setMultipleModeMethod = FileDialog.class.getMethod("setMultipleMode", Boolean.TYPE); //$NON-NLS-1$
