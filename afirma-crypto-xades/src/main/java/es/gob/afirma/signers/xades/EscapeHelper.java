@@ -240,6 +240,7 @@ final class EscapeHelper {
 
 			.replace("\u00b5", "\\C2\\B5") // Simbolo de "micro" //$NON-NLS-1$ //$NON-NLS-2$
 			.replace("\u00ba", "\\C2\\BA") // Simbolo de ordinal masculino //$NON-NLS-1$ //$NON-NLS-2$
+			.replace("\u00aa", "\\C2\\AA") //  //$NON-NLS-1$ //$NON-NLS-2$
 		;
 	}
 
