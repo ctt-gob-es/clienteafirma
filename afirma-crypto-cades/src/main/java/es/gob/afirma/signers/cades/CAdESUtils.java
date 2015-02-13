@@ -72,6 +72,38 @@ public final class CAdESUtils {
      *      certs        SEQUENCE OF ESSCertIDv2,
      *      policies     SEQUENCE OF PolicyInformation OPTIONAL
      * }
+     *
+     * ESSCertIDv2 ::= SEQUENCE {
+     *   hashAlgorithm AlgorithmIdentifier
+     *   DEFAULT {
+     *     algorithm id-sha256
+     *   },
+     *   certHash Hash,
+     *   issuerSerial IssuerSerial OPTIONAL
+     * }
+     * Hash ::= OCTET STRING+
+     *
+     * IssuerSerial ::= SEQUENCE {
+     *   issuer GeneralNames,
+     *   serialNumber CertificateSerialNumber
+     *   issuerUID UniqueIdentifier OPTIONAL
+     * }
+     *
+     * PolicyInformation ::= SEQUENCE {
+     *    policyIdentifier CertPolicyId,
+     *    policyQualifiers SEQUENCE SIZE (1..MAX) OF PolicyQualifierInfo OPTIONAL
+     * }
+     *
+     * CertPolicyId ::= OBJECT IDENTIFIER
+     * PolicyQualifierInfo ::= SEQUENCE {
+     *   policyQualifierId PolicyQualifierId,
+     *   qualifier ANY DEFINED BY policyQualifierId
+     * }
+     *
+     * SigningCertificateV2 ::= SEQUENCE {
+     *   certs SEQUENCE OF ESSCertIDv2,
+     *   policies SEQUENCE OF PolicyInformation OPTIONAL
+     * }
      * </pre>
      *
      * @param cert Certificado del firmante
@@ -92,41 +124,19 @@ public final class CAdESUtils {
 
         // INICIO SINGING CERTIFICATE-V2
 
-        /** IssuerSerial ::= SEQUENCE { issuer GeneralNames, serialNumber
-         * CertificateSerialNumber */
-
         final GeneralNames gns = new GeneralNames(
     		new GeneralName(X500Name.getInstance(cert.getIssuerX500Principal().getEncoded()))
 		);
 
         final IssuerSerial isuerSerial = new IssuerSerial(gns, cert.getSerialNumber());
 
-        /** ESSCertIDv2 ::= SEQUENCE { hashAlgorithm AlgorithmIdentifier
-         * DEFAULT {algorithm id-sha256}, certHash Hash, issuerSerial
-         * IssuerSerial OPTIONAL }
-         * Hash ::= OCTET STRING */
-
         final byte[] certHash = MessageDigest.getInstance(digestAlgorithmName).digest(cert.getEncoded());
         final ESSCertIDv2[] essCertIDv2 = {
             new ESSCertIDv2(digestAlgorithmOID, certHash, isuerSerial)
         };
 
-        /** PolicyInformation ::= SEQUENCE {
-         *    policyIdentifier CertPolicyId,
-         *    policyQualifiers SEQUENCE SIZE (1..MAX) OF PolicyQualifierInfo OPTIONAL
-         *  }
-         *  CertPolicyId ::= OBJECT IDENTIFIER
-         *  PolicyQualifierInfo ::= SEQUENCE {
-         *    policyQualifierId PolicyQualifierId,
-         *    qualifier ANY DEFINED BY policyQualifierId
-         *  } */
-
         final SigningCertificateV2 scv2;
         if (policy != null && policy.getPolicyIdentifier() != null) {
-
-            /** SigningCertificateV2 ::= SEQUENCE { certs SEQUENCE OF
-             * ESSCertIDv2, policies SEQUENCE OF PolicyInformation OPTIONAL
-             * } */
             scv2 = new SigningCertificateV2(essCertIDv2, getPolicyInformation(policy)); // con politica
         }
         else {
@@ -152,6 +162,11 @@ public final class CAdESUtils {
      *      certs        SEQUENCE OF ESSCertID,
      *      policies     SEQUENCE OF PolicyInformation OPTIONAL
      * }
+     *
+     * IssuerSerial ::= SEQUENCE {
+     *   issuer GeneralNames,
+     *   serialNumber CertificateSerialNumber
+     * }
      * </pre>
      *
      * @param cert Certificado del firmante
@@ -166,9 +181,6 @@ public final class CAdESUtils {
                                                                                      NoSuchAlgorithmException {
 
         // INICIO SINGNING CERTIFICATE
-
-        /** IssuerSerial ::= SEQUENCE { issuer GeneralNames, serialNumber
-         * CertificateSerialNumber } */
 
         final GeneralName gn = new GeneralName(X500Name.getInstance(cert.getIssuerX500Principal().getEncoded()));
         final GeneralNames gns = new GeneralNames(gn);
