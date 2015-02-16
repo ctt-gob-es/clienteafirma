@@ -144,8 +144,8 @@ final class MozillaKeyStoreUtilitiesWindows {
 	 * @return Listado con los nombres de las bibliotecas. */
 	static String[] getSoftkn3DependenciesWindows(final String nssPath) {
 		return new String[] {
-			nssPath + MSVCR100_DLL,	  // Ciertas versiones, Visual C++ 10.0
-			nssPath + MSVCP100_DLL,	  // Ciertas versiones, Visual C++ 10.0
+			nssPath + MSVCR100_DLL,	  // Ciertas versiones
+			nssPath + MSVCP100_DLL,	  // Ciertas versiones
 			nssPath + MOZGLUE_DLL,    // Firefox 11
 			nssPath + NSS3_DLL,       // Firefox 24
 			nssPath + MOZUTILS_DLL,   // Firefox 9 y 10
