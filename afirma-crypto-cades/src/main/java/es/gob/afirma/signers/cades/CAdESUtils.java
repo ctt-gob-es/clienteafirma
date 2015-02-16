@@ -53,7 +53,114 @@ import es.gob.afirma.signers.pkcs7.AOAlgorithmID;
 import es.gob.afirma.signers.pkcs7.SigUtils;
 
 /** Utilidades varias relacionadas con firmas electr&oacute;nicas CAdES.
- * Se declara como clase p&uacute;blica para permitir su uso en el m&oacute;dulo de multifirmas CAdES */
+ * Se declara como clase p&uacute;blica para permitir su uso en el m&oacute;dulo de multifirmas CAdES.
+ * Las principales estructuras ASN.1 implementadas son:
+ * <pre>
+ * id-aa-signingCertificateV2 OBJECT IDENTIFIER ::= { iso(1)
+ *      member-body(2) us(840) rsadsi(113549) pkcs(1) pkcs9(9)
+ *      smime(16) id-aa(2) 47
+ * }
+ *
+ * SigningCertificateV2 ::=  SEQUENCE {
+ *      certs        SEQUENCE OF ESSCertIDv2,
+ *      policies     SEQUENCE OF PolicyInformation OPTIONAL
+ * }
+ *
+ * ESSCertIDv2 ::= SEQUENCE {
+ *   hashAlgorithm AlgorithmIdentifier
+ *   DEFAULT {
+ *     algorithm id-sha256
+ *   },
+ *   certHash Hash,
+ *   issuerSerial IssuerSerial OPTIONAL
+ * }
+ * Hash ::= OCTET STRING+
+ *
+ * IssuerSerial ::= SEQUENCE {
+ *   issuer GeneralNames,
+ *   serialNumber CertificateSerialNumber
+ *   issuerUID UniqueIdentifier OPTIONAL
+ * }
+ *
+ * PolicyInformation ::= SEQUENCE {
+ *    policyIdentifier CertPolicyId,
+ *    policyQualifiers SEQUENCE SIZE (1..MAX) OF PolicyQualifierInfo OPTIONAL
+ * }
+ *
+ * CertPolicyId ::= OBJECT IDENTIFIER
+ * PolicyQualifierInfo ::= SEQUENCE {
+ *   policyQualifierId PolicyQualifierId,
+ *   qualifier ANY DEFINED BY policyQualifierId
+ * }
+ *
+ * SigningCertificateV2 ::= SEQUENCE {
+ *   certs SEQUENCE OF ESSCertIDv2,
+ *   policies SEQUENCE OF PolicyInformation OPTIONAL
+ * }
+ *
+ * id-aa-signingCertificate OBJECT IDENTIFIER ::= { iso(1)
+ *      member-body(2) us(840) rsadsi(113549) pkcs(1) pkcs9(9)
+ *      smime(16) id-aa(2) 12
+ * }
+ *
+ * SigningCertificate ::=  SEQUENCE {
+ *      certs        SEQUENCE OF ESSCertID,
+ *      policies     SEQUENCE OF PolicyInformation OPTIONAL
+ * }
+ *
+ * IssuerSerial ::= SEQUENCE {
+ *   issuer GeneralNames,
+ *   serialNumber CertificateSerialNumber
+ * }
+ *
+ * ESSCertID ::= SEQUENCE {
+ *   certHash Hash,
+ *   issuerSerial IssuerSerial OPTIONAL
+ * }
+ * Hash ::= OCTET STRING -- SHA1 hash of entire certificate
+ *
+ * PolicyInformation ::= SEQUENCE {
+ *   policyIdentifier CertPolicyId,
+ *   policyQualifiers SEQUENCE SIZE (1..MAX) OF PolicyQualifierInfo OPTIONAL
+ * }
+ *
+ * CertPolicyId ::= OBJECT IDENTIFIER
+ *
+ * PolicyQualifierInfo ::= SEQUENCE {
+ *   policyQualifierId PolicyQualifierId,
+ *   qualifier ANY DEFINED BY policyQualifierId
+ * }
+ *
+ * SigningCertificateV2 ::= SEQUENCE {
+ *    certs SEQUENCE OF ESSCertIDv2,
+ *    policies SEQUENCE OF PolicyInformation OPTIONAL
+ * }
+ *
+ * id-aa-signingCertificate OBJECT IDENTIFIER ::= {
+ *    iso(1) member-body(2) us(840) rsadsi(113549) pkcs(1) pkcs9(9) smime(16) id-aa(2) 12
+ * }
+ *
+ * SigPolicyId ::= OBJECT IDENTIFIER (Politica de firma)
+ *
+ * OtherHashAlgAndValue ::= SEQUENCE {
+ *     hashAlgorithm    AlgorithmIdentifier,
+ *     hashValue        OCTET STRING
+ * }
+ *
+ * AOSigPolicyQualifierInfo ::= SEQUENCE {
+ *       SigPolicyQualifierId  SigPolicyQualifierId,
+ *       SigQualifier          ANY DEFINED BY policyQualifierId
+ * }
+ *
+ * SignaturePolicyId ::= SEQUENCE {
+ *    sigPolicyId           SigPolicyId,
+ *    sigPolicyHash         SigPolicyHash,
+ *    sigPolicyQualifiers   SEQUENCE SIZE (1..MAX) OF AOSigPolicyQualifierInfo OPTIONAL
+ * }
+ *
+ * </pre>
+ *
+ *  */
 public final class CAdESUtils {
 
     private CAdESUtils() {
@@ -61,51 +168,6 @@ public final class CAdESUtils {
     }
 
     /** Genera una estructura <i>SigningCertificateV2</i> seg&uacute;n RFC 5035:
-     *
-     * <pre>
-     * id-aa-signingCertificateV2 OBJECT IDENTIFIER ::= { iso(1)
-     *      member-body(2) us(840) rsadsi(113549) pkcs(1) pkcs9(9)
-     *      smime(16) id-aa(2) 47
-     * }
-     *
-     * SigningCertificateV2 ::=  SEQUENCE {
-     *      certs        SEQUENCE OF ESSCertIDv2,
-     *      policies     SEQUENCE OF PolicyInformation OPTIONAL
-     * }
-     *
-     * ESSCertIDv2 ::= SEQUENCE {
-     *   hashAlgorithm AlgorithmIdentifier
-     *   DEFAULT {
-     *     algorithm id-sha256
-     *   },
-     *   certHash Hash,
-     *   issuerSerial IssuerSerial OPTIONAL
-     * }
-     * Hash ::= OCTET STRING+
-     *
-     * IssuerSerial ::= SEQUENCE {
-     *   issuer GeneralNames,
-     *   serialNumber CertificateSerialNumber
-     *   issuerUID UniqueIdentifier OPTIONAL
-     * }
-     *
-     * PolicyInformation ::= SEQUENCE {
-     *    policyIdentifier CertPolicyId,
-     *    policyQualifiers SEQUENCE SIZE (1..MAX) OF PolicyQualifierInfo OPTIONAL
-     * }
-     *
-     * CertPolicyId ::= OBJECT IDENTIFIER
-     * PolicyQualifierInfo ::= SEQUENCE {
-     *   policyQualifierId PolicyQualifierId,
-     *   qualifier ANY DEFINED BY policyQualifierId
-     * }
-     *
-     * SigningCertificateV2 ::= SEQUENCE {
-     *   certs SEQUENCE OF ESSCertIDv2,
-     *   policies SEQUENCE OF PolicyInformation OPTIONAL
-     * }
-     * </pre>
-     *
      * @param cert Certificado del firmante
      * @param digestAlgorithmName Nombre del algoritmo de huella digital a usar
      * @param policy Pol&iacute;tica de firma
@@ -150,25 +212,7 @@ public final class CAdESUtils {
 
     }
 
-    /** Genera una estructura <i>SigningCertificateV2</i> seg&uacute;n RFC 5035:
-     *
-     * <pre>
-     * id-aa-signingCertificate OBJECT IDENTIFIER ::= { iso(1)
-     *      member-body(2) us(840) rsadsi(113549) pkcs(1) pkcs9(9)
-     *      smime(16) id-aa(2) 12
-     * }
-     *
-     * SigningCertificate ::=  SEQUENCE {
-     *      certs        SEQUENCE OF ESSCertID,
-     *      policies     SEQUENCE OF PolicyInformation OPTIONAL
-     * }
-     *
-     * IssuerSerial ::= SEQUENCE {
-     *   issuer GeneralNames,
-     *   serialNumber CertificateSerialNumber
-     * }
-     * </pre>
-     *
+    /** Genera una estructura <i>SigningCertificateV2</i> seg&uacute;n RFC 5035.
      * @param cert Certificado del firmante
      * @param digestAlgorithmName Nombre del algoritmo de huella digital a usar
      * @param policy Pol&iacute;tica de firma
@@ -187,31 +231,15 @@ public final class CAdESUtils {
 
         final IssuerSerial isuerSerial = new IssuerSerial(gns, cert.getSerialNumber());
 
-        /** ESSCertID ::= SEQUENCE { certHash Hash, issuerSerial IssuerSerial
-         * OPTIONAL }
-         * Hash ::= OCTET STRING -- SHA1 hash of entire certificate */
         final byte[] certHash = MessageDigest.getInstance(digestAlgorithmName).digest(cert.getEncoded());
         final ESSCertID essCertID = new ESSCertID(certHash, isuerSerial);
-
-        /** PolicyInformation ::= SEQUENCE { policyIdentifier CertPolicyId,
-         * policyQualifiers SEQUENCE SIZE (1..MAX) OF PolicyQualifierInfo
-         * OPTIONAL }
-         * CertPolicyId ::= OBJECT IDENTIFIER
-         * PolicyQualifierInfo ::= SEQUENCE { policyQualifierId
-         * PolicyQualifierId, qualifier ANY DEFINED BY policyQualifierId } */
 
         final SigningCertificate scv;
         if (policy != null && policy.getPolicyIdentifier() != null) {
 
-            /** SigningCertificateV2 ::= SEQUENCE {
-             *    certs SEQUENCE OF ESSCertIDv2,
-             *    policies SEQUENCE OF PolicyInformation OPTIONAL
-             *  } */
+             // HAY QUE HACER UN SEQUENCE, YA QUE EL CONSTRUCTOR DE BOUNCY
+             // CASTLE NO TIENE DICHO CONSTRUCTOR.
 
-            /*
-             * HAY QUE HACER UN SEQUENCE, YA QUE EL CONSTRUCTOR DE BOUNCY
-             * CASTLE NO TIENE DICHO CONSTRUCTOR.
-             */
             final ASN1EncodableVector v = new ASN1EncodableVector();
             v.add(new DERSequence(essCertID));
             v.add(new DERSequence(getPolicyInformation(policy)));
@@ -221,10 +249,6 @@ public final class CAdESUtils {
             scv = new SigningCertificate(essCertID); // Sin politica
         }
 
-        /** id-aa-signingCertificate OBJECT IDENTIFIER ::= {
-         *    iso(1) member-body(2) us(840) rsadsi(113549) pkcs(1) pkcs9(9) smime(16) id-aa(2) 12
-         *  } */
-
         return new Attribute(
 			PKCSObjectIdentifiers.id_aa_signingCertificate,
 			new DERSet(scv)
@@ -233,16 +257,9 @@ public final class CAdESUtils {
 
     private static Attribute getSigPolicyId(final String digestAlgorithmName, final AdESPolicy policy) throws IOException {
 
-        /** SigPolicyId ::= OBJECT IDENTIFIER Politica de firma. */
-
         final ASN1ObjectIdentifier doiSigPolicyId = new ASN1ObjectIdentifier(
     		policy.getPolicyIdentifier().toLowerCase(Locale.US).replace("urn:oid:", "") //$NON-NLS-1$ //$NON-NLS-2$
 		);
-
-        /**  OtherHashAlgAndValue ::= SEQUENCE {
-         *     hashAlgorithm    AlgorithmIdentifier,
-         *     hashValue        OCTET STRING
-         *   } */
 
         // Algoritmo para el hash
         final AlgorithmIdentifier hashid;
@@ -272,21 +289,10 @@ public final class CAdESUtils {
 
         final DigestInfo otherHashAlgAndValue = new DigestInfo(hashid, hashed);
 
-        /** AOSigPolicyQualifierInfo ::= SEQUENCE {
-         *       SigPolicyQualifierId  SigPolicyQualifierId,
-         *       SigQualifier          ANY DEFINED BY policyQualifierId
-         *  } */
-
         AOSigPolicyQualifierInfo spqInfo = null;
         if(policy.getPolicyQualifier() != null) {
             spqInfo = new AOSigPolicyQualifierInfo(policy.getPolicyQualifier().toString());
         }
-
-        /** SignaturePolicyId ::= SEQUENCE {
-         *    sigPolicyId           SigPolicyId,
-         *    sigPolicyHash         SigPolicyHash,
-         *    sigPolicyQualifiers   SEQUENCE SIZE (1..MAX) OF AOSigPolicyQualifierInfo OPTIONAL
-         *  } */
 
         final ASN1EncodableVector v = new ASN1EncodableVector();
         // sigPolicyId
@@ -340,6 +346,12 @@ public final class CAdESUtils {
      * AttributeValue ::= ANY
      *
      * SignatureValue ::= OCTET STRING
+     *
+     * ContentHints ::= SEQUENCE {  (esta secuencia con el tipo de contenido firmado. No se agrega en firmas PAdES)
+     *	  contentDescription UTF8String (SIZE (1..MAX)) OPTIONAL,
+     *	  contentType ContentType
+     * }
+     *
      * </pre>
      *
      * @param cert Certificado del firmante
@@ -402,13 +414,6 @@ public final class CAdESUtils {
         		getSigPolicyId(digestAlgorithmName, policy)
     		);
         }
-
-        /** Secuencia con el tipo de contenido firmado. No se agrega en firmas PAdES.
-         *
-         * ContentHints ::= SEQUENCE {
-         *	  contentDescription UTF8String (SIZE (1..MAX)) OPTIONAL,
-         *	  contentType ContentType
-         * } */
 
         if (contentType != null && !padesMode) {
         	final ContentHints contentHints;
@@ -508,20 +513,25 @@ public final class CAdESUtils {
      *      bmpString        BMPString      (SIZE (1..200)),
      *      utf8String       UTF8String     (SIZE (1..200))
      * }
-     * </pre>
      *
-     * @param policy    Pol&iacute;tica de la firma.
-     * @return          Estructura con la pol&iacute;tica preparada para insertarla en la firma. */
+     * PolicyQualifierInfo ::= SEQUENCE {
+     *          policyQualifierId  PolicyQualifierId,
+     *          qualifier          ANY DEFINED BY policyQualifierId
+     * }
+     *
+     * PolicyInformation ::= SEQUENCE {
+     *     policyIdentifier   CertPolicyId,
+     *     policyQualifiers   SEQUENCE SIZE (1..MAX) OF PolicyQualifierInfo OPTIONAL
+     * }
+     *
+     * </pre>
+     * @param policy Pol&iacute;tica de la firma.
+     * @return Estructura con la pol&iacute;tica preparada para insertarla en la firma. */
     private static PolicyInformation[] getPolicyInformation(final AdESPolicy policy){
 
         if (policy == null) {
             throw new IllegalArgumentException("La politica de firma no puede ser nula en este punto"); //$NON-NLS-1$
         }
-
-        /** PolicyQualifierInfo ::= SEQUENCE {
-         *          policyQualifierId  PolicyQualifierId,
-         *          qualifier          ANY DEFINED BY policyQualifierId
-         *  } */
 
         final PolicyQualifierId pqid = PolicyQualifierId.id_qt_cps;
         DERIA5String uri = null;
@@ -537,11 +547,6 @@ public final class CAdESUtils {
             v.add(uri);
             pqi = PolicyQualifierInfo.getInstance(new DERSequence(v));
         }
-
-        /** PolicyInformation ::= SEQUENCE {
-         *     policyIdentifier   CertPolicyId,
-         *     policyQualifiers   SEQUENCE SIZE (1..MAX) OF PolicyQualifierInfo OPTIONAL
-         *  } */
 
         if (policy.getPolicyQualifier()==null || pqi == null) {
             return new PolicyInformation[] {
