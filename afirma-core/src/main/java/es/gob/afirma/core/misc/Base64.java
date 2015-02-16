@@ -237,13 +237,6 @@ public final class Base64 {
 
 	final byte[] alphabet = getAlphabet( options );
 
-        //           1         2         3
-        // 01234567890123456789012345678901 Bit position
-        // --------000000001111111122222222 Array position from threeBytes
-        // --------|    ||    ||    ||    | Six bit groups to index ALPHABET
-        //          >>18  >>12  >> 6  >> 0  Right shift necessary
-        //                0x3f  0x3f  0x3f  Additional AND
-
         // Create buffer with zero-padding if there are only one or two
         // significant bytes passed in the array.
         // We have to shift left 24 in order to flush out the 1's that appear
