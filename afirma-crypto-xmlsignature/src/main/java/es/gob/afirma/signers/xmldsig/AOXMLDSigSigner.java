@@ -584,7 +584,7 @@ public final class AOXMLDSigSigner implements AOSigner {
                     digestValue = MessageDigest.getInstance("SHA1").digest(data); //$NON-NLS-1$
                 }
                 catch (final Exception e) {
-                    throw new AOException("No se ha podido obtener el SHA1 de los datos proporcionados", e); //$NON-NLS-1$
+                    throw new AOException("No se ha podido obtener el SHA1 de los datos proporcionados: " + e, e); //$NON-NLS-1$
                 }
             }
 
@@ -597,7 +597,7 @@ public final class AOXMLDSigSigner implements AOSigner {
                 docFile = dbf.newDocumentBuilder().newDocument();
             }
             catch (final Exception e) {
-                throw new AOException("No se ha podido crear el documento XML contenedor", e); //$NON-NLS-1$
+                throw new AOException("No se ha podido crear el documento XML contenedor: " + e, e); //$NON-NLS-1$
             }
             dataElement = docFile.createElement(DETACHED_CONTENT_ELEMENT_NAME);
 
@@ -1318,10 +1318,10 @@ public final class AOXMLDSigSigner implements AOSigner {
             }
         }
         catch (final ParserConfigurationException pcex) {
-            throw new AOException("Formato de documento de firmas incorrecto", pcex); //$NON-NLS-1$
+            throw new AOException("Error en el amalizador XML: " + pcex, pcex); //$NON-NLS-1$
         }
         catch (final SAXException saxex) {
-            throw new AOException("Formato de documento de firmas incorrecto", saxex); //$NON-NLS-1$
+            throw new AOException("Formato de documento de firmas (XML firmado de entrada) incorrecto: " + saxex, saxex); //$NON-NLS-1$
         }
         catch (final IOException ioex) {
             throw new AOException("Error al leer el documento de firmas", ioex); //$NON-NLS-1$
@@ -1569,16 +1569,16 @@ public final class AOXMLDSigSigner implements AOSigner {
             docData.appendChild(rootData);
         }
         catch (final ParserConfigurationException pcex) {
-            throw new AOException("Formato de documento de firmas incorrecto", pcex); //$NON-NLS-1$
+            throw new AOException("Error en el analizador XML: " + pcex, pcex); //$NON-NLS-1$
         }
         catch (final SAXException saxex) {
-            throw new AOException("Formato de documento de firmas incorrecto", saxex); //$NON-NLS-1$
+            throw new AOException("Formato de documento de firmas (XML firmado de entrada) incorrecto: " + saxex, saxex); //$NON-NLS-1$
         }
         catch (final IOException ioex) {
-            throw new AOException("Error al leer el documento de firmas", ioex); //$NON-NLS-1$
+            throw new AOException("Error al leer el documento de firmas: " + ioex, ioex); //$NON-NLS-1$
         }
         catch (final IllegalArgumentException iaex) {
-            throw new AOException("Parametro de entrada incorrecto", iaex); //$NON-NLS-1$
+            throw new AOException("Parametro de entrada incorrecto: " + iaex, iaex); //$NON-NLS-1$
         }
 
         // convierte el documento de firmas en un InputStream
