@@ -17,6 +17,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.Signature;
 import java.security.SignatureException;
+import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -74,6 +75,39 @@ final class CounterSignerEnveloped {
     private Map<String, byte[]> atrib2 = new HashMap<String, byte[]>();
     private Map<String, byte[]> uatrib2 = new HashMap<String, byte[]>();
 
+    private static ASN1Set getCertificates(final SignedAndEnvelopedData sd, final X509Certificate[] signerCertificateChain) throws CertificateEncodingException, IOException {
+        ASN1Set certificates = null;
+
+        final ASN1Set certificatesSigned = sd.getCertificates();
+        final ASN1EncodableVector vCertsSig = new ASN1EncodableVector();
+        final Enumeration<?> certs = certificatesSigned.getObjects();
+
+        // COGEMOS LOS CERTIFICADOS EXISTENTES EN EL FICHERO
+        while (certs.hasMoreElements()) {
+            vCertsSig.add((ASN1Encodable) certs.nextElement());
+        }
+        if (signerCertificateChain.length != 0) {
+            vCertsSig.add(Certificate.getInstance(ASN1Primitive.fromByteArray(signerCertificateChain[0].getEncoded())));
+            certificates = new BERSet(vCertsSig);
+        }
+
+        return certificates;
+    }
+
+    private static SignedAndEnvelopedData readData(final byte[] data) throws IOException {
+    	final ASN1InputStream is = new ASN1InputStream(data);
+        final Enumeration<?> e = ((ASN1Sequence) is.readObject()).getObjects();
+        is.close();
+
+        // Elementos que contienen los elementos OID signedAndEnvelopedData
+        e.nextElement();
+
+        // Contenido de signedAndEnvelopedData
+        final ASN1Sequence contentSignedData = (ASN1Sequence) ((ASN1TaggedObject) e.nextElement()).getObject();
+
+        return new SignedAndEnvelopedData(contentSignedData);
+    }
+
     /** Constructor de la clase. Se crea una contrafirma a partir de los datos
      * del firmante, el archivo que se firma y del archivo que contiene las
      * firmas.<br>
@@ -110,42 +144,18 @@ final class CounterSignerEnveloped {
                                                                                  CertificateException,
                                                                                  InvalidKeyException,
                                                                                  SignatureException {
-
         // Inicializamos el Oid
         this.atrib2 = atri;
         this.uatrib2 = uatri;
 
-        final ASN1InputStream is = new ASN1InputStream(data);
-
-        // LEEMOS EL FICHERO QUE NOS INTRODUCEN
-        final Enumeration<?> e = ((ASN1Sequence) is.readObject()).getObjects();
-        is.close();
-        // Elementos que contienen los elementos OID signedAndEnvelopedData
-        e.nextElement();
-        // Contenido de signedAndEnvelopedData
-        final ASN1Sequence contentSignedData = (ASN1Sequence) ((ASN1TaggedObject) e.nextElement()).getObject();
-
-        final SignedAndEnvelopedData sd = new SignedAndEnvelopedData(contentSignedData);
+        final SignedAndEnvelopedData sd = readData(data);
 
         // Obtenemos los signerInfos del signedAndEnvelopedData
         final ASN1Set signerInfosSd = sd.getSignerInfos();
 
         // 4. CERTIFICADOS
         // obtenemos la lista de certificados
-        ASN1Set certificates = null;
-
-        final ASN1Set certificatesSigned = sd.getCertificates();
-        final ASN1EncodableVector vCertsSig = new ASN1EncodableVector();
-        final Enumeration<?> certs = certificatesSigned.getObjects();
-
-        // COGEMOS LOS CERTIFICADOS EXISTENTES EN EL FICHERO
-        while (certs.hasMoreElements()) {
-            vCertsSig.add((ASN1Encodable) certs.nextElement());
-        }
-        if (signerCertificateChain.length != 0) {
-            vCertsSig.add(Certificate.getInstance(ASN1Primitive.fromByteArray(signerCertificateChain[0].getEncoded())));
-            certificates = new BERSet(vCertsSig);
-        }
+        final ASN1Set certificates = getCertificates(sd, signerCertificateChain);
 
         // CRLS no usado
         final ASN1Set certrevlist = null;
@@ -170,17 +180,18 @@ final class CounterSignerEnveloped {
             for (int i = targets.length - 1; i >= 0; i--) {
                 nodo = targets[i];
                 signerInfos = counterNode(aux, parameters, signerCertificateChain[0], keyEntry, nodo);
-                sigDat =
-                        new SignedAndEnvelopedData(sd.getRecipientInfos(),
-                                                   sd.getDigestAlgorithms(),
-                                                   sd.getEncryptedContentInfo(),
-                                                   certificates,
-                                                   certrevlist,
-                                                   new DERSet(signerInfos));
+                sigDat = new SignedAndEnvelopedData(
+            		sd.getRecipientInfos(),
+                    sd.getDigestAlgorithms(),
+                    sd.getEncryptedContentInfo(),
+                    certificates,
+                    certrevlist,
+                    new DERSet(signerInfos)
+        		);
 
                 // Esto se realiza asi por problemas con los casting.
                 final ASN1InputStream asnIs = new ASN1InputStream(sigDat.getEncoded(ASN1Encoding.DER));
-                final ASN1Sequence contentSignedData2 = (ASN1Sequence) is.readObject(); // contenido del signedAndEnvelopedData
+                final ASN1Sequence contentSignedData2 = (ASN1Sequence) asnIs.readObject(); // contenido del signedAndEnvelopedData
                 asnIs.close();
                 aux = new SignedAndEnvelopedData(contentSignedData2);
             }
@@ -197,13 +208,14 @@ final class CounterSignerEnveloped {
             for (int i = targets.length - 1; i >= 0; i--) {
                 nodo = targets[i];
                 signerInfos = counterNode(aux, parameters, signerCertificateChain[0], keyEntry, nodo);
-                sigDat =
-                        new SignedAndEnvelopedData(sd.getRecipientInfos(),
-                                                   sd.getDigestAlgorithms(),
-                                                   sd.getEncryptedContentInfo(),
-                                                   certificates,
-                                                   certrevlist,
-                                                   new DERSet(signerInfos));
+                sigDat = new SignedAndEnvelopedData(
+            		sd.getRecipientInfos(),
+                    sd.getDigestAlgorithms(),
+                    sd.getEncryptedContentInfo(),
+                    certificates,
+                    certrevlist,
+                    new DERSet(signerInfos)
+        		);
 
                 // Esto se realiza as&iacute; por problemas con los casting.
                 final ASN1InputStream sd2 = new ASN1InputStream(sigDat.getEncoded(ASN1Encoding.DER));
@@ -218,33 +230,28 @@ final class CounterSignerEnveloped {
         }
 
         // construimos el Signed Data y lo devolvemos
-        return new ContentInfo(PKCSObjectIdentifiers.signedAndEnvelopedData, new SignedAndEnvelopedData(sd.getRecipientInfos(),
-                                                                                                        sd.getDigestAlgorithms(),
-                                                                                                        sd.getEncryptedContentInfo(),
-                                                                                                        certificates,
-                                                                                                        certrevlist,
-                                                                                                        new DERSet(signerInfos))).getEncoded(ASN1Encoding.DER);
+        return new ContentInfo(
+    		PKCSObjectIdentifiers.signedAndEnvelopedData,
+    		new SignedAndEnvelopedData(
+    			sd.getRecipientInfos(),
+    			sd.getDigestAlgorithms(),
+    			sd.getEncryptedContentInfo(),
+                certificates,
+                certrevlist,
+                new DERSet(signerInfos)
+    		)
+    	).getEncoded(ASN1Encoding.DER);
 
     }
 
-    /*
-     * new SignedAndEnvelopedData( new DERSet(recipientInfos), new
-     * DERSet(digestAlgs), encInfo, certificates, certrevlist, new
-     * DERSet(signerInfos) )
-     */
-
     /** M&eacute;todo que contrafirma el arbol completo de forma recursiva, todos
      * los dodos creando un nuevo contraSigner.<br>
-     * @param signerInfosRaiz
-     *        Nodo ra&iacute; que contiene todos los signerInfos que se
-     *        deben firmar.
-     * @param parameters
-     *        Par&aacute;metros necesarios para firmar un determinado
-     *        SignerInfo
-     * @param cert
-     *        Certificado de firma.
-     * @param keyEntry
-     *        Clave privada a usar para firmar
+     * @param signerInfosRaiz Nodo ra&iacute; que contiene todos los signerInfos que se
+     *                        deben firmar.
+     * @param parameters Par&aacute;metros necesarios para firmar un determinado
+     *                   SignerInfo
+     * @param cert Certificado de firma.
+     * @param keyEntry Clave privada a usar para firmar
      * @return El SignerInfo ra&iacute;z con todos sus nodos Contrafirmados.
      * @throws java.security.NoSuchAlgorithmException
      *         Si no se soporta alguno de los algoritmos de firma o huella
