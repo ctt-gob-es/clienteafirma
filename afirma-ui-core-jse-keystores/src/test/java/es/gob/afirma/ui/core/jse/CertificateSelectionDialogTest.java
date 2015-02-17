@@ -19,8 +19,8 @@ public class CertificateSelectionDialogTest {
     private static final String CERT_PASS = "1111"; //$NON-NLS-1$
 
 	/** Para pruebas sin JUnit
-	 * @param args
-	 * @throws Exception */
+	 * @param args No se usa.
+	 * @throws Exception En cualquier error. */
 	public static void main(final String[] args) throws Exception {
 
 		final AOKeyStoreManager ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
