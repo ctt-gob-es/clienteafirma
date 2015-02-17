@@ -113,14 +113,7 @@ class ClientHandler extends BasicHandler {
 			} else {
 				secMsg = msgContext.getMessage();
 			}
-			/* SOLO PARA DEBUG */
-/*			String textRequest = "";
-			final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			secMsg.writeTo(baos);
-			textRequest = new String(baos.toByteArray());
-			logger.severe(textRequest);
-*/
-			/* FIN */
+
 			if (!this.securityOption.equals(NONEOPTION.toUpperCase())) {
 				//Modificacion de la peticion SOAP
 				((SOAPPart) msgContext.getRequestMessage().getSOAPPart()).setCurrentMessage(secMsg.getSOAPPart().getEnvelope(), SOAPPart.FORM_SOAPENVELOPE);
@@ -132,7 +125,7 @@ class ClientHandler extends BasicHandler {
 		catch (final Error e) {
 			logger.severe("Error al invocar al servicio de mejora de la firma: " + e); //$NON-NLS-1$
 			// Encapsulamos para permitir su uso con makeFault(Exception)
-			AxisFault.makeFault(new RuntimeException(e));
+			AxisFault.makeFault(new IOException(e));
 		}
 	}
 
@@ -224,7 +217,6 @@ class ClientHandler extends BasicHandler {
 		crypto = CryptoFactory.getInstance("org.apache.ws.security.components.crypto.Merlin", this.initializateCryptoProperties()); //$NON-NLS-1$
 		//Indicacion para que inserte el tag BinarySecurityToken
 		wsSecSignature.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
-		// wsSecSignature.setUserInfo(this.usernameTokenName, this.usernameTokenPassword);
 		wsSecSignature.setUserInfo(this.keystoreCertAlias, this.keystoreCertPassword);
 		wsSecHeader.insertSecurityHeader(soapEnvelopeRequest);
 		wsSecSignature.prepare(soapEnvelopeRequest, crypto, wsSecHeader);
