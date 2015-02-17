@@ -69,7 +69,6 @@ public final class AOCAdESTriPhaseSigner implements AOSigner {
 			final PrivateKey key,
 			final Certificate[] certChain,
 			final Properties extraParams) throws AOException, IOException {
-		//return triPhaseOperation(CRYPTO_OPERATION_SIGN, data, algorithm, key, certChain, extraParams);
 		return triPhaseOperation(CRYPTO_OPERATION_SIGN, data, algorithm, key, certChain, extraParams);
 	}
 
