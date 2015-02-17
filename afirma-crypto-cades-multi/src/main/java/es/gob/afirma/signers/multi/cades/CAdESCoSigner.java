@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
+import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -123,27 +124,59 @@ import es.gob.afirma.signers.pkcs7.SigUtils;
  * </pre> */
 final class CAdESCoSigner {
 
+	private static SignedData readData(final byte[] signature) throws IOException {
+		// LEEMOS EL FICHERO QUE NOS INTRODUCEN
+		final ASN1InputStream is = new ASN1InputStream(signature);
+		final ASN1Sequence dsq = (ASN1Sequence) is.readObject();
+		is.close();
+		final Enumeration<?> e = dsq.getObjects();
+		// Elementos que contienen los elementos OID SignedData
+		e.nextElement();
+		// Contenido de SignedData
+		final ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
+		final ASN1Sequence contentSignedData = (ASN1Sequence) doj.getObject(); // contenido del SignedData
+
+		return SignedData.getInstance(contentSignedData);
+	}
+
+	private static ASN1Set getCertificates(final SignedData sd, final java.security.cert.Certificate[] certChain) throws CertificateEncodingException, IOException {
+		ASN1Set certificates = null;
+
+		final ASN1Set certificatesSigned = sd.getCertificates();
+		final ASN1EncodableVector vCertsSig = new ASN1EncodableVector();
+		final Enumeration<?> certs = certificatesSigned.getObjects();
+
+		// COGEMOS LOS CERTIFICADOS EXISTENTES EN EL FICHERO
+		while (certs.hasMoreElements()) {
+			vCertsSig.add((ASN1Encodable) certs.nextElement());
+		}
+
+		if (certChain.length != 0) {
+			final List<ASN1Encodable> ce = new ArrayList<ASN1Encodable>();
+			for (final java.security.cert.Certificate element : certChain) {
+				ce.add(Certificate.getInstance(ASN1Primitive.fromByteArray(element.getEncoded())));
+			}
+			certificates = SigUtils.fillRestCerts(ce, vCertsSig);
+		}
+		return certificates;
+	}
+
 	private ASN1Set signedAttr2;
 
 	/** Se crea una cofirma a partir de los datos del firmante, el archivo
 	 * que se firma y el archivo que contiene las firmas.
-	 * @param parameters
-	 *        Par&aacute;metros necesarios que contienen tanto la firma del
-	 *        archivo a firmar como los datos del firmante.
-	 * @param signature
-	 *        Archivo que contiene las firmas.
-	 * @param omitContent
-	 *        Si se omite el contenido o no, es decir,si se hace de forma
-	 *        Expl&iacute;cita o Impl&iacute;cita.
+	 * @param parameters Par&aacute;metros necesarios que contienen tanto la firma del
+	 *                   archivo a firmar como los datos del firmante.
+	 * @param signature Archivo que contiene las firmas.
+	 * @param omitContent Si se omite el contenido o no, es decir,si se hace de forma
+	 *                    Expl&iacute;cita o Impl&iacute;cita.
 	 * @param policy Pol&iacute;tica de firma
-	 * @param signingCertificateV2
-	 *        <code>true</code> si se desea usar la versi&oacute;n 2 del
-	 *        atributo <i>Signing Certificate</i> <code>false</code> para
-	 *        usar la versi&oacute;n 1
+	 * @param signingCertificateV2 <code>true</code> si se desea usar la versi&oacute;n 2 del
+	 *                             atributo <i>Signing Certificate</i> <code>false</code> para
+	 *                             usar la versi&oacute;n 1
 	 * @param key Clave privada usada para firmar.
 	 * @param certChain Cadena de certificados del firmante.
-	 * @param messageDigest
-	 *        Hash espec&iacute;fico para una firma.
+	 * @param messageDigest Hash espec&iacute;fico para una firma.
 	 * @param contentType Tipo de contenido definido por su OID.
 	 * @param contentDescription Descripci&oacute;n textual del tipo de contenido firmado.
 	 * @param ctis Indicaciones sobre los tipos de compromisos adquiridos con la firma.
@@ -168,18 +201,7 @@ final class CAdESCoSigner {
 			        final CAdESSignerMetadata csm) throws IOException,
 			                                              NoSuchAlgorithmException,
 			                                              CertificateException {
-		// LEEMOS EL FICHERO QUE NOS INTRODUCEN
-		final ASN1InputStream is = new ASN1InputStream(signature);
-		final ASN1Sequence dsq = (ASN1Sequence) is.readObject();
-		is.close();
-		final Enumeration<?> e = dsq.getObjects();
-		// Elementos que contienen los elementos OID SignedData
-		e.nextElement();
-		// Contenido de SignedData
-		final ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
-		final ASN1Sequence contentSignedData = (ASN1Sequence) doj.getObject(); // contenido del SignedData
-
-		final SignedData sd = SignedData.getInstance(contentSignedData);
+		final SignedData sd = readData(signature);
 
 		// 3. CONTENTINFO
 		// si se introduce el contenido o no
@@ -208,24 +230,7 @@ final class CAdESCoSigner {
 
 		// 4. CERTIFICADOS
 		// obtenemos la lista de certificados
-		ASN1Set certificates = null;
-
-		final ASN1Set certificatesSigned = sd.getCertificates();
-		final ASN1EncodableVector vCertsSig = new ASN1EncodableVector();
-		final Enumeration<?> certs = certificatesSigned.getObjects();
-
-		// COGEMOS LOS CERTIFICADOS EXISTENTES EN EL FICHERO
-		while (certs.hasMoreElements()) {
-			vCertsSig.add((ASN1Encodable) certs.nextElement());
-		}
-
-		if (certChain.length != 0) {
-			final List<ASN1Encodable> ce = new ArrayList<ASN1Encodable>();
-			for (final java.security.cert.Certificate element : certChain) {
-				ce.add(Certificate.getInstance(ASN1Primitive.fromByteArray(element.getEncoded())));
-			}
-			certificates = SigUtils.fillRestCerts(ce, vCertsSig);
-		}
+		final ASN1Set certificates = getCertificates(sd, certChain);
 
 		// buscamos que tipo de algoritmo es y lo codificamos con su OID
 		final String signatureAlgorithm = parameters.getSignatureAlgorithm();
@@ -241,7 +246,7 @@ final class CAdESCoSigner {
 
 		// // ATRIBUTOS
 
-		ASN1Set signedAttr = null;
+		final ASN1Set signedAttr;
 		if (messageDigest == null) {
 			final ASN1EncodableVector contextExpecific = CAdESUtils.generateSignerInfo(
 				certChain[0],
@@ -307,12 +312,16 @@ final class CAdESCoSigner {
 		signerInfos.add(new SignerInfo(identifier, digAlgId, signedAttr, encAlgId, sign2, null));
 
 		// construimos el Signed Data y lo devolvemos
-		return new ContentInfo(PKCSObjectIdentifiers.signedData, new SignedData(sd.getDigestAlgorithms(),
+		return new ContentInfo(
+			PKCSObjectIdentifiers.signedData,
+			new SignedData(
+				sd.getDigestAlgorithms(),
 				encInfo,
 				certificates,
 				null,	// CRLS no usado
 				new DERSet(signerInfos)// unsignedAttr
-				)).getEncoded(ASN1Encoding.DER);
+			)
+		).getEncoded(ASN1Encoding.DER);
 	}
 
 	/** Constructor de la clase. Se crea una cofirma a partir de los datos del
@@ -358,14 +367,15 @@ final class CAdESCoSigner {
 		final ASN1Sequence dsq = (ASN1Sequence) is.readObject();
 		is.close();
 		final Enumeration<?> e = dsq.getObjects();
+
 		// Elementos que contienen los elementos OID SignedData
 		e.nextElement();
+
 		// Contenido de SignedData
 		final ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
 		final ASN1Sequence contentSignedData = (ASN1Sequence) doj.getObject();// contenido
-		// del
-		// SignedData
 
+		// El SignedData
 		final SignedData sd = SignedData.getInstance(contentSignedData);
 
 		// 3. CONTENTINFO
@@ -436,13 +446,12 @@ final class CAdESCoSigner {
 					}
 				}
 			}
-
 			signerInfos.add(si);
 		}
 
 		// // ATRIBUTOS
 
-		ASN1Set signedAttr;
+		final ASN1Set signedAttr;
 		// atributos firmados
 		if (contenidoDatos != null) {
 			final ASN1EncodableVector contextExpecific = CAdESUtils.generateSignerInfo(
@@ -497,12 +506,16 @@ final class CAdESCoSigner {
 				));
 
 		// construimos el Signed Data y lo devolvemos
-		return new ContentInfo(PKCSObjectIdentifiers.signedData, new SignedData(sd.getDigestAlgorithms(),
+		return new ContentInfo(
+			PKCSObjectIdentifiers.signedData,
+			new SignedData(
+				sd.getDigestAlgorithms(),
 				encInfo,
 				certificates,
 				null,	// CRLS no usado
 				new DERSet(signerInfos)// unsignedAttr
-				)).getEncoded(ASN1Encoding.DER);
+			)
+		).getEncoded(ASN1Encoding.DER);
 
 	}
 
