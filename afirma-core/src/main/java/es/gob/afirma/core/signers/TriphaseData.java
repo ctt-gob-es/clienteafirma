@@ -52,7 +52,7 @@ public class TriphaseData {
 	 * Agrega la configuracion para una nueva operaci&oacute;n trif&aacute;sica.
 	 * @param config Configuraci&oacute;n de la operaci&oacute;n trif&aacute;sica.
 	 */
-	public void addSignOperation(Map<String, String> config) {
+	public void addSignOperation(final Map<String, String> config) {
 		this.signs.add(config);
 	}
 
@@ -77,7 +77,7 @@ public class TriphaseData {
 	 * @param idx Posici&oacute;n de los datos de firma a recuperar.
 	 * @return Datos de firma.
 	 */
-	public Map<String, String> getSign(int idx) {
+	public Map<String, String> getSign(final int idx) {
 		// Devolvemos la referencia real porque queremos permitir que se modifique
 		return this.signs.get(idx);
 	}
@@ -90,11 +90,10 @@ public class TriphaseData {
 		return this.signs.size();
 	}
 
-	/**
-	 * Obtiene un mensaje de firma trif&aacute;sica a partir de un XML que lo describe.
+	/** Obtiene un mensaje de firma trif&aacute;sica a partir de un XML que lo describe.
 	 * @param xml Texto XML con la informaci&oacute;n del mensaje.
 	 * @return Mensaje de datos.
-	 * @throws IOException
+	 * @throws IOException Cuando hay problemas en el tratamiento de datos.
 	 * @throws Exception Cuando el XML no describa un mensaje o no se pueda analizar.
 	 */
 	public static TriphaseData parser(final byte[] xml) throws IOException {
@@ -103,7 +102,8 @@ public class TriphaseData {
 		Document doc;
 		try {
 			doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(is);
-		} catch (Exception e) {
+		}
+		catch (final Exception e) {
 			throw new IOException("Error al cargar el fichero XML", e); //$NON-NLS-1$
 		}
 		is.close();
@@ -121,7 +121,7 @@ public class TriphaseData {
 
 		final NodeList childNodes = rootElement.getChildNodes();
 
-		int idx = nextNodeElementIndex(childNodes, 0);
+		final int idx = nextNodeElementIndex(childNodes, 0);
 		if (idx == -1 || !"firmas".equalsIgnoreCase(childNodes.item(idx).getNodeName())) { //$NON-NLS-1$
 			throw new IllegalArgumentException("No se encontro el nodo 'firmas' en el XML proporcionado"); //$NON-NLS-1$
 		}
@@ -140,7 +140,7 @@ public class TriphaseData {
 
 		final NodeList childNodes = signsNode.getChildNodes();
 
-		List<Map<String, String>> signs = new ArrayList<Map<String, String>>();
+		final List<Map<String, String>> signs = new ArrayList<Map<String, String>>();
 		int idx = nextNodeElementIndex(childNodes, 0);
 		while (idx != -1) {
 			signs.add(parseParamsListNode(childNodes.item(idx)));
@@ -160,12 +160,12 @@ public class TriphaseData {
 
 		final NodeList childNodes = paramsNode.getChildNodes();
 
-		Map<String, String> params = new HashMap<String, String>();
+		final Map<String, String> params = new HashMap<String, String>();
 		int idx = nextNodeElementIndex(childNodes, 0);
 		while (idx != -1) {
 			final Node paramNode = childNodes.item(idx);
-			String key = paramNode.getAttributes().getNamedItem("n").getNodeValue(); //$NON-NLS-1$
-			String value = paramNode.getTextContent().trim();
+			final String key = paramNode.getAttributes().getNamedItem("n").getNodeValue(); //$NON-NLS-1$
+			final String value = paramNode.getTextContent().trim();
 			params.put(key, value);
 
 			idx = nextNodeElementIndex(childNodes, idx + 1);
