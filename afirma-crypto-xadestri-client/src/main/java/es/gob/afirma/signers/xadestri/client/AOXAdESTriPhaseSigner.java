@@ -60,6 +60,14 @@ public final class AOXAdESTriPhaseSigner implements AOSigner {
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
+	/** URI que define el NameSpace de firma XMLdSig (Compatible XAdES). */
+    public static final String DSIGNNS = "http://www.w3.org/2000/09/xmldsig#"; //$NON-NLS-1$
+    static final String XML_SIGNATURE_PREFIX = "ds"; //$NON-NLS-1$
+    /** Etiqueta de los nodos firma de los XML firmados. */
+    public static final String SIGNATURE_TAG = "Signature"; //$NON-NLS-1$
+    static final String SIGNATURE_NODE_NAME = XML_SIGNATURE_PREFIX + ":Signature"; //$NON-NLS-1$
+
+
 	/** Nombre de la propiedad de URL del servidor de firma trif&aacute;sica. */
 	private static final String PROPERTY_NAME_SIGN_SERVER_URL = "serverUrl"; //$NON-NLS-1$
 
@@ -141,7 +149,6 @@ public final class AOXAdESTriPhaseSigner implements AOSigner {
 			final PrivateKey key,
 			final Certificate[] certChain,
 			final Properties xParams) throws AOException {
-
 		return triPhaseOperation(CRYPTO_OPERATION_COSIGN, sign, algorithm, key, certChain, xParams);
 	}
 
@@ -175,14 +182,6 @@ public final class AOXAdESTriPhaseSigner implements AOSigner {
 	public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo) throws AOInvalidFormatException {
 		throw new UnsupportedOperationException("No se soporta en firma trifasica"); //$NON-NLS-1$
 	}
-
-
-	/** URI que define el NameSpace de firma XMLdSig (Compatible XAdES). */
-    public static final String DSIGNNS = "http://www.w3.org/2000/09/xmldsig#"; //$NON-NLS-1$
-    static final String XML_SIGNATURE_PREFIX = "ds"; //$NON-NLS-1$
-    /** Etiqueta de los nodos firma de los XML firmados. */
-    public static final String SIGNATURE_TAG = "Signature"; //$NON-NLS-1$
-    static final String SIGNATURE_NODE_NAME = XML_SIGNATURE_PREFIX + ":Signature"; //$NON-NLS-1$
 
 	/** {@inheritDoc} */
 	@Override
@@ -247,7 +246,13 @@ public final class AOXAdESTriPhaseSigner implements AOSigner {
 		throw new UnsupportedOperationException("No se soporta en firma trifasica"); //$NON-NLS-1$
 	}
 
-	/** Ejecuta una operaci&oacute;n de firma/multifirma en 3 fases.
+	/** Ejecuta una operaci&oacute;n de firma/multifirma en 3 fases.<br>
+	 * <b>TODO (Para desarrolladores):</b> Hay que optimizar la transferencia de datos entre servidor
+	 * y cliente, detectando despu&eacute;s de la prefirma las propiedades {@code nd} y {@code np}
+	 * enviadas por el servidor trif&aacute;sico. Si se env&iacute;a {@code nd} y es {@code true} se
+	 * tienen que volver a remitir los datos en la postfirma y si se env&iacute;a {@code np} y es
+	 * {@code true} se tiene que reenviar la prefirma en la petici&oacute;n de postfirma. Si no, se
+	 * puede omitir esta informaci&oacute;n reduciendo la cantidad de datos que se env&iacute;a.
 	 * @param cryptoOperation Tipo de operaci&oacute;n.
 	 * @param data Datos o firma sobre la que operar
 	 * @param algorithm Algoritmo de firma
@@ -354,13 +359,6 @@ public final class AOXAdESTriPhaseSigner implements AOSigner {
 			throw new AOException("No se han recibido prefirmas que firmar");  //$NON-NLS-1$
 		}
 
-//		final String needDataProperty = preSignProperties.getProperty(PROPERTY_NAME_NEED_DATA);
-//		final boolean needData = needDataProperty != null && Boolean.parseBoolean(needDataProperty);
-//
-//		final String needPreProperty = preSignProperties.getProperty(PROPERTY_NAME_NEED_PRE);
-//		final boolean needPre = needPreProperty != null && "true".equalsIgnoreCase(needPreProperty); //$NON-NLS-1$
-
-
 		// Es posible que se ejecute mas de una firma como resultado de haber proporcionado varios
 		// identificadores de datos o en una operacion de contrafirma.
 		for (int i = 0; i < triphaseData.getSignsCount(); i++) {
@@ -416,7 +414,6 @@ public final class AOXAdESTriPhaseSigner implements AOSigner {
 			}
 
 			// No indicamos los datos (documentId) porque no son necesarios en la postfirma //TODO: Homogenizar indicandolo desde servidor
-
 			triSignFinalResult = urlManager.readUrlByPost(urlBuffer.toString());
 
 		}
