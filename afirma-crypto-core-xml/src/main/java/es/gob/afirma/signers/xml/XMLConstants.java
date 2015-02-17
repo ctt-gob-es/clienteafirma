@@ -36,69 +36,66 @@ public final class XMLConstants {
     private static final String URL_SHA512      = "http://www.w3.org/2001/04/xmlenc#sha512"; //$NON-NLS-1$
 
     /** URIs de los algoritmos de firma */
-    public static final Map<String, String> SIGN_ALGOS_URI = new HashMap<String, String>() {
-        private static final long serialVersionUID = 1897588397257599853L;
-        {
-            put(AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA, URL_SHA1_RSA);
-            // Introducimos variantes para hacerlo mas robusto
-            put("RSA", URL_SHA1_RSA); //$NON-NLS-1$
-            put("SHA-1withRSA", URL_SHA1_RSA); //$NON-NLS-1$
-            put("SHA1withRSAEncryption", URL_SHA1_RSA); //$NON-NLS-1$
-            put("SHA-1withRSAEncryption", URL_SHA1_RSA); //$NON-NLS-1$
-            put("SHAwithRSAEncryption", URL_SHA1_RSA); //$NON-NLS-1$
-            put("SHAwithRSA", URL_SHA1_RSA); //$NON-NLS-1$
+    public static final Map<String, String> SIGN_ALGOS_URI;
+    static {
+    	SIGN_ALGOS_URI = new HashMap<String, String>();
 
-            put(AOSignConstants.SIGN_ALGORITHM_SHA256WITHRSA, URL_SHA256_RSA);
-            // Introducimos variantes para hacerlo mas robusto
-            put("SHA-256withRSA", URL_SHA256_RSA); //$NON-NLS-1$
-            put("SHA256withRSAEncryption", URL_SHA256_RSA); //$NON-NLS-1$
-            put("SHA-256withRSAEncryption", URL_SHA256_RSA); //$NON-NLS-1$
+    	SIGN_ALGOS_URI.put(AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA, URL_SHA1_RSA);
+    	// Introducimos variantes para hacerlo mas robusto
+    	SIGN_ALGOS_URI.put("RSA", URL_SHA1_RSA); //$NON-NLS-1$
+    	SIGN_ALGOS_URI.put("SHA-1withRSA", URL_SHA1_RSA); //$NON-NLS-1$
+    	SIGN_ALGOS_URI.put("SHA1withRSAEncryption", URL_SHA1_RSA); //$NON-NLS-1$
+    	SIGN_ALGOS_URI.put("SHA-1withRSAEncryption", URL_SHA1_RSA); //$NON-NLS-1$
+    	SIGN_ALGOS_URI.put("SHAwithRSAEncryption", URL_SHA1_RSA); //$NON-NLS-1$
+    	SIGN_ALGOS_URI.put("SHAwithRSA", URL_SHA1_RSA); //$NON-NLS-1$
 
-            put(AOSignConstants.SIGN_ALGORITHM_SHA384WITHRSA, URL_SHA384_RSA);
-            // Introducimos variantes para hacerlo mas robusto
-            put("SHA-384withRSA", URL_SHA384_RSA); //$NON-NLS-1$
-            put("SHA384withRSAEncryption", URL_SHA384_RSA); //$NON-NLS-1$
-            put("SHA-384withRSAEncryption", URL_SHA384_RSA); //$NON-NLS-1$
+    	SIGN_ALGOS_URI.put(AOSignConstants.SIGN_ALGORITHM_SHA256WITHRSA, URL_SHA256_RSA);
+    	// Introducimos variantes para hacerlo mas robusto
+    	SIGN_ALGOS_URI.put("SHA-256withRSA", URL_SHA256_RSA); //$NON-NLS-1$
+    	SIGN_ALGOS_URI.put("SHA256withRSAEncryption", URL_SHA256_RSA); //$NON-NLS-1$
+    	SIGN_ALGOS_URI.put("SHA-256withRSAEncryption", URL_SHA256_RSA); //$NON-NLS-1$
 
-            put(AOSignConstants.SIGN_ALGORITHM_SHA512WITHRSA, URL_SHA512_RSA);
-            // Introducimos variantes para hacerlo mas robusto
-            put("SHA-512withRSA", URL_SHA512_RSA); //$NON-NLS-1$
-            put("SHA512withRSAEncryption", URL_SHA512_RSA); //$NON-NLS-1$
-            put("SHA-512withRSAEncryption", URL_SHA512_RSA); //$NON-NLS-1$
+    	SIGN_ALGOS_URI.put(AOSignConstants.SIGN_ALGORITHM_SHA384WITHRSA, URL_SHA384_RSA);
+    	// Introducimos variantes para hacerlo mas robusto
+    	SIGN_ALGOS_URI.put("SHA-384withRSA", URL_SHA384_RSA); //$NON-NLS-1$
+    	SIGN_ALGOS_URI.put("SHA384withRSAEncryption", URL_SHA384_RSA); //$NON-NLS-1$
+    	SIGN_ALGOS_URI.put("SHA-384withRSAEncryption", URL_SHA384_RSA); //$NON-NLS-1$
 
-        }
-    };
+    	SIGN_ALGOS_URI.put(AOSignConstants.SIGN_ALGORITHM_SHA512WITHRSA, URL_SHA512_RSA);
+    	// Introducimos variantes para hacerlo mas robusto
+    	SIGN_ALGOS_URI.put("SHA-512withRSA", URL_SHA512_RSA); //$NON-NLS-1$
+    	SIGN_ALGOS_URI.put("SHA512withRSAEncryption", URL_SHA512_RSA); //$NON-NLS-1$
+    	SIGN_ALGOS_URI.put("SHA-512withRSAEncryption", URL_SHA512_RSA); //$NON-NLS-1$
+    }
 
     /** Codificaci&oacute;n Base64 para firmas XMLDSig y XAdES. */
     public static final String BASE64_ENCODING = "http://www.w3.org/2000/09/xmldsig#base64"; //$NON-NLS-1$
 
     /** URIs de los algoritmos de hash. Las claves se encuentran en
      * min&uacute;sculas. */
-    public static final Map<String, String> MESSAGEDIGEST_ALGOS_URI = new HashMap<String, String>() {
-        private static final long serialVersionUID = 7994196143222514908L;
-        {
-            // Introducimos variantes para hacerlo mas robusto
+    public static final Map<String, String> MESSAGEDIGEST_ALGOS_URI;
+    static {
+    	MESSAGEDIGEST_ALGOS_URI = new HashMap<String, String>();
 
-            // SHA1
-            put("sha1", URL_SHA1); //$NON-NLS-1$
-            put("sha-1", URL_SHA1); //$NON-NLS-1$
+    	// Introducimos variantes para hacerlo mas robusto
 
-            // SHA256
-            put("sha256", URL_SHA256); //$NON-NLS-1$
-            put("sha-256", URL_SHA256); //$NON-NLS-1$
+    	// SHA1
+    	MESSAGEDIGEST_ALGOS_URI.put("sha1", URL_SHA1); //$NON-NLS-1$
+    	MESSAGEDIGEST_ALGOS_URI.put("sha-1", URL_SHA1); //$NON-NLS-1$
 
-            // SHA384
-            put("sha384", URL_SHA384); //$NON-NLS-1$
-            put("sha-384", URL_SHA384); //$NON-NLS-1$
+    	// SHA256
+    	MESSAGEDIGEST_ALGOS_URI.put("sha256", URL_SHA256); //$NON-NLS-1$
+    	MESSAGEDIGEST_ALGOS_URI.put("sha-256", URL_SHA256); //$NON-NLS-1$
 
-            // SHA512
-            put("sha512", URL_SHA512); //$NON-NLS-1$
-            put("sha-512", URL_SHA512); //$NON-NLS-1$
-        }
-    };
+    	// SHA384
+    	MESSAGEDIGEST_ALGOS_URI.put("sha384", URL_SHA384); //$NON-NLS-1$
+    	MESSAGEDIGEST_ALGOS_URI.put("sha-384", URL_SHA384); //$NON-NLS-1$
+
+    	// SHA512
+    	MESSAGEDIGEST_ALGOS_URI.put("sha512", URL_SHA512); //$NON-NLS-1$
+    	MESSAGEDIGEST_ALGOS_URI.put("sha-512", URL_SHA512); //$NON-NLS-1$
+    }
 
     /** MimeType por defecto para los datos firmados. */
     public static final String DEFAULT_MIMETYPE = "application/octet-stream"; //$NON-NLS-1$
-
-
 }
