@@ -48,6 +48,8 @@ public final class MassiveSignatureHelper {
     private static final String FORMAT = "format"; //$NON-NLS-1$
     private static final String MIME_TYPE = "mimeType"; //$NON-NLS-1$
 
+    private static final AOException SIGN_DATA_NOT_GENERATED = new AOException("No se generaron datos de firma"); //$NON-NLS-1$
+
     /** Configuracion de la operaci&oacute;n masiva. */
     private MassiveSignConfiguration massiveConfiguration = null;
 
@@ -240,7 +242,7 @@ public final class MassiveSignatureHelper {
             }
         }
         catch (final Exception e) {
-            LOGGER.severe("Error al operar sobre el hash indicado, '" + operation + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
+            LOGGER.severe("Error al operar sobre el hash indicado (" + operation + "): " + e); //$NON-NLS-1$ //$NON-NLS-2$
             this.addLog(MassiveSignMessages.getString("MassiveSignatureHelper.5") + REG_FIELD_SEPARATOR + operation + REG_FIELD_SEPARATOR + e.getMessage()); //$NON-NLS-1$
             return null;
         }
@@ -400,7 +402,7 @@ public final class MassiveSignatureHelper {
         );
 
         if (signData == null) {
-            throw new AOException("No se generaron datos de firma"); //$NON-NLS-1$
+            throw SIGN_DATA_NOT_GENERATED;
         }
         return signData;
     }
@@ -442,7 +444,7 @@ public final class MassiveSignatureHelper {
     		config
 		);
         if (signData == null) {
-            throw new AOException("No se generaron datos de firma"); //$NON-NLS-1$
+            throw SIGN_DATA_NOT_GENERATED;
         }
         return signData;
     }
@@ -483,7 +485,7 @@ public final class MassiveSignatureHelper {
 		);
 
         if (signData == null) {
-            throw new AOException("No se generaron datos de firma"); //$NON-NLS-1$
+            throw SIGN_DATA_NOT_GENERATED;
         }
         return signData;
     }
@@ -562,7 +564,7 @@ public final class MassiveSignatureHelper {
     		config
 		);
         if (signData == null) {
-            throw new AOException("No se generaron datos de firma"); //$NON-NLS-1$
+            throw SIGN_DATA_NOT_GENERATED;
         }
         return signData;
     }
