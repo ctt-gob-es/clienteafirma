@@ -107,7 +107,7 @@ public final class AOCAdESSigner implements AOSigner {
         final String precalculatedDigestAlgorithmName = extraParams.getProperty("precalculatedHashAlgorithm"); //$NON-NLS-1$
 
         // Forzado del SigningCertificateV2
-        boolean signingCertificateV2;
+        final boolean signingCertificateV2;
         if (AOSignConstants.isSHA2SignatureAlgorithm(algorithm)) {
         	signingCertificateV2 = true;
         }
@@ -139,11 +139,6 @@ public final class AOCAdESSigner implements AOSigner {
 			}
         }
 
-        final P7ContentSignerParameters csp = new P7ContentSignerParameters(
-    		data,
-    		algorithm
-		);
-
         final byte[] cadesSignedData;
 
         try {
@@ -162,12 +157,16 @@ public final class AOCAdESSigner implements AOSigner {
 				}
 				catch (final Exception e) {
 					Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
-							"No se han podido cargar las librerias para identificar el tipo de dato firmado: " + e); //$NON-NLS-1$
+						"No se han podido cargar las librerias para identificar el tipo de dato firmado: " + e //$NON-NLS-1$
+					);
 				}
 			}
 
 			cadesSignedData = GenCAdESEPESSignedData.generateSignedData(
-                   csp,
+				   new P7ContentSignerParameters(
+			    		data,
+			    		algorithm
+				   ),
                    omitContent,
                    AdESPolicy.buildAdESPolicy(extraParams),
                    signingCertificateV2,
