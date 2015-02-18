@@ -531,7 +531,6 @@ public final class AOODFSigner implements AOSigner {
             final File zipFile = File.createTempFile("sign", ".zip"); //$NON-NLS-1$ //$NON-NLS-2$
             final FileOutputStream fos = new FileOutputStream(zipFile);
             fos.write(sign);
-            fos.flush();
             fos.close();
 
             // carga el fichero zip
@@ -559,7 +558,7 @@ public final class AOODFSigner implements AOSigner {
                 final String sigId = signature.getAttribute("Id"); //$NON-NLS-1$
 
                 final String strCert = signature.getElementsByTagNameNS(XMLDSIG_NAMESPACE, "X509Certificate").item(0).getTextContent(); //$NON-NLS-1$
-                AOTreeNode node;
+                final AOTreeNode node;
 
                 if (asSimpleSignInfo) {
                     node = new AOTreeNode(Utils.getSimpleSignInfoNode(null, signature));
