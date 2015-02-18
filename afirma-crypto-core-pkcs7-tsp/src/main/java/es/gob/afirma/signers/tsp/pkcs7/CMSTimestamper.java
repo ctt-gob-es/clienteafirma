@@ -372,6 +372,9 @@ public final class CMSTimestamper {
     	}
 
     	if (!this.verifyHostname) {
+
+    		// Podrian encontrarse varios tipos de conexion HTTPS
+
 	    	if (conn instanceof javax.net.ssl.HttpsURLConnection) {
 	    		((javax.net.ssl.HttpsURLConnection)conn).setHostnameVerifier(
 					new javax.net.ssl.HostnameVerifier() {
@@ -382,24 +385,42 @@ public final class CMSTimestamper {
 		    		}
 				);
 	    	}
-	    	else if (conn instanceof com.sun.net.ssl.HttpsURLConnection) {
-	    		// Este caso es problematico porque se deshabilita globalmente (metodo estatico) la comprobacion de
-	    		// nombre de host, y no solo para la conexion en curso.
-	    		// No obstante, la JVM no deberia darnos nunca este tipo de conexiones, porque estan ya deprecadas
-	    		// y obsoletas.
-	    		com.sun.net.ssl.HttpsURLConnection.setDefaultHostnameVerifier(
-					new  com.sun.net.ssl.HostnameVerifier() {
-						@Override
-						public boolean verify(final String arg0, final String arg1) {
-							return true;
-						}
-					}
-				);
-	    	}
 	    	else {
-	    		LOGGER.warning(
-    				"No se ha podido deshabilitar la comprobacion de nombre de host, tipo desconocido de conexion: " + conn.getClass().getName() //$NON-NLS-1$
-				);
+	    		Class<?> sunHttpsURLConnectionClass;
+	    		try {
+	    			sunHttpsURLConnectionClass = Class.forName("com.sun.net.ssl.HttpsURLConnection"); //$NON-NLS-1$
+	    		} catch (Exception e) {
+	    			sunHttpsURLConnectionClass = null;
+	    		}
+
+	    		if (sunHttpsURLConnectionClass != null && sunHttpsURLConnectionClass.isInstance(conn)) {
+
+	    			try {
+	    				// Este caso es problematico porque se deshabilita globalmente (metodo estatico) la comprobacion de
+	    				// nombre de host, y no solo para la conexion en curso.
+	    				// No obstante, la JVM no deberia darnos nunca este tipo de conexiones, porque estan ya deprecadas
+	    				// y obsoletas.
+	    				final Method setDefaultHostnameVerifierMethod = sunHttpsURLConnectionClass.getDeclaredMethod("setDefaultHostnameVerifier"); //$NON-NLS-1$
+	    				setDefaultHostnameVerifierMethod.invoke(
+	    						null,
+	    						new  com.sun.net.ssl.HostnameVerifier() {
+	    							@Override
+	    							public boolean verify(final String arg0, final String arg1) {
+	    								return true;
+	    							}
+	    						});
+	    			}
+	    			catch (Exception e) {
+	    				LOGGER.warning(
+	    						"Ocurrio un error al intentar instanciar una conexion de tipo 'com.sun.net.ssl.HttpsURLConnection' para sobreescribir la conexion el host, se continuara la operacion" //$NON-NLS-1$
+	    						);
+	    			}
+	    		}
+	    		else {
+	    			LOGGER.warning(
+	    					"No se ha podido deshabilitar la comprobacion de nombre de host, tipo desconocido de conexion: " + conn.getClass().getName() //$NON-NLS-1$
+	    					);
+	    		}
 	    	}
     	}
 
