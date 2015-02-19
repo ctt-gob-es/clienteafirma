@@ -2,6 +2,7 @@ package com.sun.net.ssl;
 
 /** Esqueleto de la clase original de Sun, solo para habilitar la compilaci&oacute;n en Android.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
+@Deprecated
 public interface HostnameVerifier {
 
 	/** Implementaci&oacute;n vac&iacute;a solo para habilitar la compilaci&oacute;n en Android.
