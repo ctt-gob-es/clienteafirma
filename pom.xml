@@ -33,7 +33,6 @@
 		<module>afirma-crypto-pdf-enhancer</module>
 		<module>afirma-crypto-xades</module>
 		<module>afirma-crypto-xadestri-client</module>
-		<module>afirma-crypto-xadestri-server</module>
 		<module>afirma-crypto-xmlsignature</module>
 		<module>afirma-crypto-ooxml</module>
 		<module>afirma-crypto-jarverifier</module>
@@ -43,7 +42,6 @@
 		<module>afirma-keystores-single</module>
 		<module>afirma-ui-core-jse</module>
 		<module>afirma-ui-core-jse-keystores</module>
-		<module>afirma-util</module>
 		<module>afirma-crypto-pdf</module>
 		<module>afirma-core-massive</module>
 	</modules>
