@@ -515,7 +515,7 @@ public class DirectorySignatureHelper {
         for (final String filename : filenames) {
             tempFile = new File(filename);
             if (!tempFile.exists()) {
-                LOGGER.severe("El fichero '" + filename + "' no existe");  //$NON-NLS-1$//$NON-NLS-2$
+                LOGGER.severe("El fichero no existe: " + filename);  //$NON-NLS-1$
                 this.addLogRegistry(Level.SEVERE, MassiveSignMessages.getString("DirectorySignatureHelper.0"), filename, null); //$NON-NLS-1$
                 continue;
             }
@@ -557,8 +557,9 @@ public class DirectorySignatureHelper {
             // configuracion de firma actual
             try {
                 if (!DirectorySignatureHelper.isValidDataFile(signer, file)) {
-                	LOGGER.warning("El fichero '" + file.getPath() + //$NON-NLS-1$
-                		"' no puede ser firmado con la configuracion de firma actual"); //$NON-NLS-1$
+                	LOGGER.warning(
+            			"El fichero no puede ser firmado con la configuracion de firma actual: " + file.getPath() //$NON-NLS-1$
+        			);
                     this.addLogRegistry(Level.WARNING, MassiveSignMessages.getString("DirectorySignatureHelper.4"), file.getPath(), null); //$NON-NLS-1$
                     allOK = false;
                     continue;
@@ -656,7 +657,7 @@ public class DirectorySignatureHelper {
                 allOK = false;
                 continue;
             }
-            LOGGER.info("El fichero '" + file.getPath() + "' se ha firmado correctamente");  //$NON-NLS-1$//$NON-NLS-2$
+            LOGGER.info("El fichero se ha firmado correctamente: " + file.getPath());  //$NON-NLS-1$
             this.addLogRegistry(Level.INFO, MassiveSignMessages.getString("DirectorySignatureHelper.3"), file.getPath(), signFilePath); //$NON-NLS-1$
         }
         return allOK;
@@ -944,10 +945,12 @@ public class DirectorySignatureHelper {
     			}
             }
             else {
-                LOGGER.severe("El fichero '" + file //$NON-NLS-1$
-                                                         + "' no es un fichero de firma en formato '" //$NON-NLS-1$
-                                                         + signConfig.getProperty(FORMAT_KEY)
-                                                         + "'"); //$NON-NLS-1$
+                LOGGER.severe(
+            		"El fichero '" + file //$NON-NLS-1$
+                         + "' no es un fichero de firma en formato '" //$NON-NLS-1$
+                             + signConfig.getProperty(FORMAT_KEY)
+                                 + "'" //$NON-NLS-1$
+        		);
                 this.addLogRegistry(Level.SEVERE,
                     MassiveSignMessages.getString("DirectorySignatureHelper.16"), file.getPath(), null //$NON-NLS-1$
                 );
@@ -961,7 +964,7 @@ public class DirectorySignatureHelper {
                 allOK = false;
                 continue;
             }
-            LOGGER.info("El fichero '" + file.getPath() + "' se ha contrafirmado correctamente"); //$NON-NLS-1$ //$NON-NLS-2$
+            LOGGER.info("El fichero se ha contrafirmado correctamente: " + file.getPath()); //$NON-NLS-1$
             this.addLogRegistry(Level.INFO, MassiveSignMessages.getString("DirectorySignatureHelper.20"), file.getPath(), signFilePath); //$NON-NLS-1$
         }
         return allOK;
