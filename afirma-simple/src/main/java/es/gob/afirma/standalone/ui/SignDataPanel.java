@@ -274,8 +274,8 @@ final class SignDataPanel extends JPanel {
 							}
 							AOUIFactory.showMessageDialog(
 								SignDataPanel.this,
-								SimpleAfirmaMessages.getString("SignDataPanel.19"),  //$NON-NLS-1$
 								validationMessage,
+								SimpleAfirmaMessages.getString("SignDataPanel.39"),  //$NON-NLS-1$
 								validationMessageType
 							);
 
