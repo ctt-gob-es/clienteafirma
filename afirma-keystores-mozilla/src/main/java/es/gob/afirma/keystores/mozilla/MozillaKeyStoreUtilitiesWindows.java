@@ -23,6 +23,8 @@ final class MozillaKeyStoreUtilitiesWindows {
 
 	private static final String MSVCR100_DLL = "msvcr100.dll"; //$NON-NLS-1$
 	private static final String MSVCP100_DLL = "msvcp100.dll"; //$NON-NLS-1$
+	private static final String MSVCR120_DLL = "msvcr120.dll"; //$NON-NLS-1$
+	private static final String MSVCP120_DLL = "msvcp120.dll"; //$NON-NLS-1$
 	private static final String PLC4_DLL = "plc4.dll"; //$NON-NLS-1$
 	private static final String PLDS4_DLL = "plds4.dll"; //$NON-NLS-1$
 	private static final String NSPR4_DLL = "nspr4.dll"; //$NON-NLS-1$
@@ -146,6 +148,8 @@ final class MozillaKeyStoreUtilitiesWindows {
 		return new String[] {
 			nssPath + MSVCR100_DLL,	  // Ciertas versiones
 			nssPath + MSVCP100_DLL,	  // Ciertas versiones
+			nssPath + MSVCR120_DLL,	  // Ciertas versiones, Visual C++ 12.0
+			nssPath + MSVCP120_DLL,	  // Ciertas versiones, Visual C++ 12.0
 			nssPath + MOZGLUE_DLL,    // Firefox 11
 			nssPath + NSS3_DLL,       // Firefox 24
 			nssPath + MOZUTILS_DLL,   // Firefox 9 y 10
