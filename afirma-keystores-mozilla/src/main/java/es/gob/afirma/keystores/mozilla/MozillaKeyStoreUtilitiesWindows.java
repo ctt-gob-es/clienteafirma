@@ -105,21 +105,10 @@ final class MozillaKeyStoreUtilitiesWindows {
 					throw new AOException("No se ha creado el directorio temporal"); //$NON-NLS-1$
 				}
 
-				copyFile(new String[] {
-					SOFTOKN3_DLL,   // "softokn3" es comun para todos los Firefox a partir del 2
-					MOZSQLITE3_DLL, // En Firefox 4 sqlite3.dll pasa a llamarse mozsqlite3.dll
-					SQLITE3_DLL,
-					NSS3_DLL,
-					PLDS4_DLL,
-					NSPR4_DLL,
-					PLC4_DLL,
-					MOZCRT19_DLL,
-					NSSUTIL3_DLL,
-					FREEBL3_DLL,
-					NSSDBM3_DLL,
-					MOZUTILS_DLL,
-					MOZGLUE_DLL     // A partir de Firefox 11
-				}, dir, tmp.getCanonicalPath());
+				// Copiamos la biblioteca de acceso y luego sus dependencias. Las dependencias las
+				// recuperamos indicando cadena vacia para que nos las devuelva sin path
+				copyFile(new String[] { SOFTOKN3_DLL }, dir, tmp.getCanonicalPath());
+				copyFile(getSoftkn3DependenciesWindows(""), dir, tmp.getCanonicalPath()); //$NON-NLS-1$
 
 				dir = tmp.getCanonicalPath();
 
@@ -146,10 +135,10 @@ final class MozillaKeyStoreUtilitiesWindows {
 	 * @return Listado con los nombres de las bibliotecas. */
 	static String[] getSoftkn3DependenciesWindows(final String nssPath) {
 		return new String[] {
-			nssPath + MSVCR100_DLL,	  // Ciertas versiones
-			nssPath + MSVCP100_DLL,	  // Ciertas versiones
-			nssPath + MSVCR120_DLL,	  // Ciertas versiones, Visual C++ 12.0
-			nssPath + MSVCP120_DLL,	  // Ciertas versiones, Visual C++ 12.0
+			nssPath + MSVCR100_DLL,	  // Ciertas versiones, Visual C 10
+			nssPath + MSVCP100_DLL,	  // Ciertas versiones, Visual C 10
+			nssPath + MSVCR120_DLL,	  // Ciertas versiones, Visual C 12
+			nssPath + MSVCP120_DLL,	  // Ciertas versiones, Visual C 12
 			nssPath + MOZGLUE_DLL,    // Firefox 11
 			nssPath + NSS3_DLL,       // Firefox 24
 			nssPath + MOZUTILS_DLL,   // Firefox 9 y 10
