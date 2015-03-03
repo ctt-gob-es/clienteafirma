@@ -12,8 +12,6 @@ package es.gob.afirma.signers.ooxml;
 
 import java.io.IOException;
 import java.security.PrivateKey;
-import java.security.Provider;
-import java.security.Security;
 import java.security.cert.X509Certificate;
 import java.util.Properties;
 import java.util.logging.Logger;
@@ -30,7 +28,7 @@ import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.core.util.tree.AOTreeNode;
-import es.gob.afirma.signers.ooxml.relprovider.OOXMLProvider;
+import es.gob.afirma.signers.xml.Utils;
 import es.gob.afirma.signers.xmldsig.AOXMLDSigSigner;
 
 /** Manejador de firmas electr&oacute;nicas XML de documentos OOXML de Microsoft Office. */
@@ -45,15 +43,7 @@ public final class AOOOXMLSigner implements AOSigner {
     private static final String EXTENSION_OOXML = ".ooxml"; //$NON-NLS-1$
 
     static {
-        OOXMLProvider.install();
-        if (Security.getProvider("XMLDSig") == null) { //$NON-NLS-1$
-            try {
-                Security.addProvider((Provider) Class.forName("org.jcp.xml.dsig.internal.dom.XMLDSigRI").newInstance()); //$NON-NLS-1$
-            }
-            catch (final Exception e) {
-                LOGGER.warning("No se ha podido agregar el proveedor de firma XMLDSig necesario para firmas XML: " + e); //$NON-NLS-1$
-            }
-        }
+        Utils.installXmlDSigProvider();
     }
 
     /** Si la entrada es un documento OOXML, devuelve el mismo documento sin ninguna modificaci&oacute;n.

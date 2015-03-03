@@ -115,6 +115,10 @@ public final class AOODFSigner implements AOSigner {
         SUPPORTED_FORMATS.add("application/vnd.oasis.opendocument.presentation"); //$NON-NLS-1$
     }
 
+    static {
+        Utils.installXmlDSigProvider();
+    }
+
     /** A&ntilde;ade una firma electr&oacute;nica a un documento ODF.
      * @param data Documento ODF a firmar
      * @param algorithm Se ignora el valor de este par&aacute;metro, se utiliza siempre el algoritmo SHA1withRSA

@@ -697,6 +697,7 @@ public final class Utils {
 		return fac;
     }
 
+    /** Instala el proveedor de firmas XMLDSig para el entorno de ejecuci&oacute;n de Java en uso. */
     public static void installXmlDSigProvider() {
     	if (Security.getProvider("XMLDSig") == null) { //$NON-NLS-1$
         	LOGGER.info("Instalamos el proveedor de firma XML de Apache"); //$NON-NLS-1$
@@ -704,7 +705,7 @@ public final class Utils {
         		Security.addProvider((Provider) Class.forName("org.apache.jcp.xml.dsig.internal.dom.XMLDSigRI").newInstance()); //$NON-NLS-1$
         	}
         	catch (final Exception e) {
-        		LOGGER.info("No se encontro el proveedor de firma XML de Apache, se instalara el de Sun"); //$NON-NLS-1$
+        		LOGGER.info("No se encontro el proveedor de firma XML de Apache, se instalara el de Sun: " + e); //$NON-NLS-1$
         		try {
         			Security.addProvider((Provider)
         					Class.forName("org.jcp.xml.dsig.internal.dom.XMLDSigRI").newInstance()); //$NON-NLS-1$

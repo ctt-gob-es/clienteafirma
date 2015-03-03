@@ -53,7 +53,7 @@ public final class CustomUriDereferencer implements URIDereferencer {
 	    	instanceField.setAccessible(true);
 	    	return (URIDereferencer) instanceField.get(null);
 		}
-		catch (Exception e) {
+		catch (final Exception e) {
 			final Field instanceField = Class.forName(DEFAULT_SUN_URI_DEREFERENCER_CLASSNAME).getDeclaredField("INSTANCE"); //$NON-NLS-1$
 			instanceField.setAccessible(true);
 			return (URIDereferencer) instanceField.get(null);
@@ -104,7 +104,7 @@ public final class CustomUriDereferencer implements URIDereferencer {
             	}
             	return new org.jcp.xml.dsig.internal.dom.ApacheNodeSetData(in);
             }
-            catch (Exception e2) {
+            catch (final Exception e2) {
 
             	// Nuevo intento con otras clases de apache
             	try {
@@ -130,7 +130,7 @@ public final class CustomUriDereferencer implements URIDereferencer {
 
             		return (Data) apacheNodeSetDataConstructor.newInstance(in);
             	}
-            	catch (Exception e3) {
+            	catch (final Exception e3) {
             		throw new URIReferenceException("Error al derreferenciar la URL en todos los intentos:" + //$NON-NLS-1$
             				"\nIntento 1: " + e + //$NON-NLS-1$
             				"\nIntento 2: " + e2 + //$NON-NLS-1$
