@@ -179,10 +179,10 @@ public final class CMSTimestamper {
 			params.getTsaUsr(),
 			params.getTsaPwd(),
 			params.getExtensions(),
-			params.getSslKeyStoreFile(),
+			params.getSslKeyStore(),
 			params.getSslKeyStorePassword(),
 			params.getSslKeyStoreType(),
-			params.getSslTrustStoreFile(),
+			params.getSslTrustStore(),
 			params.getSslTrustStorePassword(),
 			params.getSslTrustStoreType(),
 			params.isVerifyHostname()
