@@ -13,8 +13,6 @@ package es.gob.afirma.signers.xades;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.security.PrivateKey;
-import java.security.Provider;
-import java.security.Security;
 import java.security.cert.Certificate;
 import java.util.ArrayList;
 import java.util.List;
@@ -296,16 +294,7 @@ public final class AOXAdESSigner implements AOSigner {
     static final String ENCODING_STR = "Encoding"; //$NON-NLS-1$
 
     static {
-        if (Security.getProvider("XMLDSig") == null) { //$NON-NLS-1$
-            try {
-                Security.addProvider((Provider) Class.forName("org.jcp.xml.dsig.internal.dom.XMLDSigRI").newInstance()); //$NON-NLS-1$
-            }
-            catch (final Exception e) {
-                LOGGER.warning(
-            		"No se ha podido agregar el proveedor de firma XMLDSig necesario para firmas XML: " + e //$NON-NLS-1$
-        		);
-            }
-        }
+        Utils.installXmlDSigProvider();
     }
 
     /** Firma datos en formato XAdES.

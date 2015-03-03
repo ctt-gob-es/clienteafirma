@@ -22,8 +22,6 @@ import java.security.InvalidAlgorithmParameterException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
-import java.security.Provider;
-import java.security.Security;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -124,15 +122,7 @@ public final class AOXMLDSigSigner implements AOSigner {
     private Document doc;
 
     static {
-        if (Security.getProvider("XMLDSig") == null) { //$NON-NLS-1$
-            try {
-                Security.addProvider((Provider)
-                		Class.forName("org.jcp.xml.dsig.internal.dom.XMLDSigRI").newInstance()); //$NON-NLS-1$
-            }
-            catch (final Exception e) {
-                LOGGER.warning("No se ha podido agregar el proveedor de firma XMLDSig necesario para firmas XML: " + e); //$NON-NLS-1$
-            }
-        }
+    	Utils.installXmlDSigProvider();
     }
 
     /** Firma datos en formato XMLDSig 1.0 (XML Digital Signature).

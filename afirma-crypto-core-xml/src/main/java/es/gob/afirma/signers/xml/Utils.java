@@ -20,6 +20,7 @@ import java.net.URI;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.NoSuchAlgorithmException;
 import java.security.Provider;
+import java.security.Security;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.text.SimpleDateFormat;
@@ -694,5 +695,24 @@ public final class Utils {
 			return XMLSignatureFactory.getInstance("DOM"); //$NON-NLS-1$
 		}
 		return fac;
+    }
+
+    public static void installXmlDSigProvider() {
+    	if (Security.getProvider("XMLDSig") == null) { //$NON-NLS-1$
+        	LOGGER.info("Instalamos el proveedor de firma XML de Apache"); //$NON-NLS-1$
+        	try {
+        		Security.addProvider((Provider) Class.forName("org.apache.jcp.xml.dsig.internal.dom.XMLDSigRI").newInstance()); //$NON-NLS-1$
+        	}
+        	catch (final Exception e) {
+        		LOGGER.info("No se encontro el proveedor de firma XML de Apache, se instalara el de Sun"); //$NON-NLS-1$
+        		try {
+        			Security.addProvider((Provider)
+        					Class.forName("org.jcp.xml.dsig.internal.dom.XMLDSigRI").newInstance()); //$NON-NLS-1$
+        		}
+        		catch (final Exception e2) {
+        			LOGGER.warning("No se ha podido agregar el proveedor de firma XMLDSig de Sun para firmas XML: " + e2); //$NON-NLS-1$
+        		}
+        	}
+        }
     }
 }
