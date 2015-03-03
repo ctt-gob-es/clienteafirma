@@ -157,15 +157,11 @@ public class AOKeyStoreManager implements KeyStoreManager {
                 // [2] -slot: Numero de lector de tarjeta (Sistema Operativo) [OPCIONAL]
 
         		// Hacemos una copia por la mutabilidad
-        		final Object[] newParams;
+        		Object[] newParams = null;
         		if (params != null) {
         			newParams = new Object[params.length];
         			System.arraycopy(params, 0, newParams, 0, params.length);
         		}
-        		else {
-        			newParams = null;
-        		}
-
                 this.ks = AOKeyStoreManagerHelperPkcs11.initPKCS11(pssCallBack, newParams);
                 break;
         	case APPLE:
