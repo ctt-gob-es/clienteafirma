@@ -45,13 +45,11 @@ public final class ValidateXMLSignature {
 		// No permitimos la instanciacion
 	}
 
-    /**
-     * Valida una firma XML.
+    /** Valida una firma XML.
      * @param sign Firma a validar
-     * @return <code>true</code> si la firma es v&aacute;lida, <code>false</code> en caso contrario
-     */
+     * @return Validez de la firma. */
     public static SignValidity validate(final byte[] sign) {
-        // Instantiate the document to be validated
+
         final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(true);
         final Document doc;
@@ -62,7 +60,7 @@ public final class ValidateXMLSignature {
             return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.CORRUPTED_SIGN);
         }
 
-        // Find Signature element
+        // Obtenemos el elemento Signature
         final NodeList nl = doc.getElementsByTagNameNS(XMLSignature.XMLNS, "Signature"); //$NON-NLS-1$
         if (nl.getLength() == 0) {
             return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.NO_SIGN);
@@ -136,7 +134,6 @@ public final class ValidateXMLSignature {
             throw new KeySelectorException("No se ha encontrado el elemento KeyValue"); //$NON-NLS-1$
         }
 
-        //@@@FIXME: this should also work for key types other than DSA/RSA
         static boolean algEquals(final String algURI, final String algName) {
             if (algName.equalsIgnoreCase("DSA") && //$NON-NLS-1$
                     algURI.equalsIgnoreCase(SignatureMethod.DSA_SHA1)) {
