@@ -23,8 +23,18 @@ public final class CustomUriDereferencer implements URIDereferencer {
 
 	private static final String ID = "Id"; //$NON-NLS-1$
 
-	private static final String DEFAULT_SUN_URI_DEREFERENCER_CLASSNAME = "org.jcp.xml.dsig.internal.dom.DOMURIDereferencer"; //$NON-NLS-1$
+	private static final String DEFAULT_SUN_URI_DEREFERENCER_CLASSNAME =           "org.jcp.xml.dsig.internal.dom.DOMURIDereferencer"; //$NON-NLS-1$
 	private static final String DEFAULT_APACHE_URI_DEREFERENCER_CLASSNAME = "org.apache.jcp.xml.dsig.internal.dom.DOMURIDereferencer"; //$NON-NLS-1$
+
+	private static final String DEFAULT_SUN_XML_SIGNATURE_INPUT_CLASSNAME = "com.sun.org.apache.xml.internal.security.signature.XMLSignatureInput"; //$NON-NLS-1$
+	private static final String DEFAULT_APACHE_XML_SIGNATURE_INPUT_CLASSNAME =               "org.apache.xml.security.signature.XMLSignatureInput"; //$NON-NLS-1$
+
+	private static final String DEFAULT_SUN_OCTET_STREAM_DATA =           "org.jcp.xml.dsig.internal.dom.ApacheOctetStreamData"; //$NON-NLS-1$
+	private static final String DEFAULT_APACHE_OCTET_STREAM_DATA = "org.apache.jcp.xml.dsig.internal.dom.ApacheOctetStreamData"; //$NON-NLS-1$
+
+	private static final String DEFAULT_SUN_NODESET_DATA =           "org.jcp.xml.dsig.internal.dom.ApacheNodeSetData"; //$NON-NLS-1$
+	private static final String DEFAULT_APACHE_NODESET_DATA = "org.apache.jcp.xml.dsig.internal.dom.ApacheNodeSetData"; //$NON-NLS-1$
+
 
 
 	private final URIDereferencer defaultUriDereferencer;
@@ -33,6 +43,46 @@ public final class CustomUriDereferencer implements URIDereferencer {
 	 * @param defaultDereferencer Dereferenciador por defecto */
 	public CustomUriDereferencer(final URIDereferencer defaultDereferencer) {
 		this.defaultUriDereferencer = defaultDereferencer;
+	}
+
+	private static Class<?> getNodesetDataClass() throws ClassNotFoundException {
+		try {
+			return Class.forName(DEFAULT_APACHE_NODESET_DATA);
+		}
+		catch (final Exception e) {
+			return Class.forName(DEFAULT_SUN_NODESET_DATA);
+		}
+	}
+
+	private static Class<?> getOctetStreamDataClass() throws ClassNotFoundException {
+		try {
+			return Class.forName(DEFAULT_APACHE_OCTET_STREAM_DATA);
+		}
+		catch (final Exception e) {
+			return Class.forName(DEFAULT_SUN_OCTET_STREAM_DATA);
+		}
+	}
+
+	private static Class<?> getXmlSignatureInputClass() throws ClassNotFoundException {
+		try {
+			return Class.forName(DEFAULT_APACHE_XML_SIGNATURE_INPUT_CLASSNAME);
+		}
+		catch (final Exception e) {
+			return Class.forName(DEFAULT_SUN_XML_SIGNATURE_INPUT_CLASSNAME);
+		}
+	}
+
+	/** Obtiene el dereferenciador XML por defecto del JRE.
+	 *	Este sera el de Apache o el de Sun.
+	 * @return Dereferenciador XML por defecto del JRE.
+	 * @throws ClassNotFoundException Si no se encuentra ni el dereferenciador de Sun ni el de Apache. */
+	private static Class<?> getDereferencerClass() throws ClassNotFoundException {
+		try {
+			return Class.forName(DEFAULT_APACHE_URI_DEREFERENCER_CLASSNAME);
+		}
+		catch (final Exception e) {
+			return Class.forName(DEFAULT_SUN_URI_DEREFERENCER_CLASSNAME);
+		}
 	}
 
 	/** Obtiene el dereferenciador a medida por defecto de Java.
@@ -46,18 +96,9 @@ public final class CustomUriDereferencer implements URIDereferencer {
 	public static URIDereferencer getDefaultDereferencer() throws NoSuchFieldException,
 	                                                              ClassNotFoundException,
 	                                                              IllegalAccessException {
-    	// Obtenemos el dereferenciador por defecto por reflexion.
-		// Este sera el de Apache si esta instalado o el de Sun si no lo esta
-		try {
-			final Field instanceField = Class.forName(DEFAULT_APACHE_URI_DEREFERENCER_CLASSNAME).getDeclaredField("INSTANCE"); //$NON-NLS-1$
-	    	instanceField.setAccessible(true);
-	    	return (URIDereferencer) instanceField.get(null);
-		}
-		catch (final Exception e) {
-			final Field instanceField = Class.forName(DEFAULT_SUN_URI_DEREFERENCER_CLASSNAME).getDeclaredField("INSTANCE"); //$NON-NLS-1$
-			instanceField.setAccessible(true);
-			return (URIDereferencer) instanceField.get(null);
-		}
+		final Field instanceField = getDereferencerClass().getDeclaredField("INSTANCE"); //$NON-NLS-1$
+    	instanceField.setAccessible(true);
+    	return (URIDereferencer) instanceField.get(null);
 	}
 
 	@Override
@@ -93,49 +134,32 @@ public final class CustomUriDereferencer implements URIDereferencer {
             }
 
             try {
-            	final com.sun.org.apache.xml.internal.security.signature.XMLSignatureInput in = new com.sun.org.apache.xml.internal.security.signature.XMLSignatureInput(targetNode);
-            	if (in.isOctetStream()) {
-            		try {
-            			return new org.jcp.xml.dsig.internal.dom.ApacheOctetStreamData(in);
-            		}
-            		catch (final Exception ioe) {
-            			throw new URIReferenceException(e);
-            		}
-            	}
-            	return new org.jcp.xml.dsig.internal.dom.ApacheNodeSetData(in);
+        		final Class<?> xmlSignatureInputClass = getXmlSignatureInputClass();
+        		final Constructor<?> xmlSignatureInputConstructor = xmlSignatureInputClass.getConstructor(Node.class);
+        		final Object in = xmlSignatureInputConstructor.newInstance(targetNode);
+
+        		final Method isOctetStreamMethod = xmlSignatureInputClass.getMethod("isOctetStream"); //$NON-NLS-1$
+        		if (((Boolean) isOctetStreamMethod.invoke(in)).booleanValue()) {
+        			try {
+        				final Class<?> octetStreamDataClass = getOctetStreamDataClass();
+        				final Constructor<?> octetStreamDataConstructor = octetStreamDataClass.getConstructor(in.getClass());
+
+        				return (Data) octetStreamDataConstructor.newInstance(in);
+        			}
+        			catch (final Exception ioe) {
+        				throw new URIReferenceException(e);
+        			}
+        		}
+
+        		final Constructor<?> nodeSetDataConstructor = getNodesetDataClass().getConstructor(in.getClass());
+        		return (Data) nodeSetDataConstructor.newInstance(in);
             }
             catch (final Exception e2) {
-
-            	// Nuevo intento con otras clases de apache
-            	try {
-            		final Class<?> xmlSignatureInputClass = Class.forName("org.apache.xml.security.signature.XMLSignatureInput"); //$NON-NLS-1$
-            		final Constructor<?> xmlSignatureInputConstructor = xmlSignatureInputClass.getConstructor(Node.class);
-            		final Object in = xmlSignatureInputConstructor.newInstance(targetNode);
-
-            		final Method isOctetStreamMethod = xmlSignatureInputClass.getMethod("isOctetStream"); //$NON-NLS-1$
-            		if (((Boolean) isOctetStreamMethod.invoke(in)).booleanValue()) {
-            			try {
-            				final Class<?> apacheOctetStreamDataClass = Class.forName("org.apache.jcp.xml.dsig.internal.dom.ApacheOctetStreamData"); //$NON-NLS-1$
-            				final Constructor<?> apacheOctetStreamDataConstructor = apacheOctetStreamDataClass.getConstructor(in.getClass());
-
-            				return (Data) apacheOctetStreamDataConstructor.newInstance(in);
-            			}
-            			catch (final Exception ioe) {
-            				throw new URIReferenceException(e);
-            			}
-            		}
-
-            		final Class<?> apacheNodeSetDataClass = Class.forName("org.apache.jcp.xml.dsig.internal.dom.ApacheNodeSetData"); //$NON-NLS-1$
-            		final Constructor<?> apacheNodeSetDataConstructor = apacheNodeSetDataClass.getConstructor(in.getClass());
-
-            		return (Data) apacheNodeSetDataConstructor.newInstance(in);
-            	}
-            	catch (final Exception e3) {
-            		throw new URIReferenceException("Error al derreferenciar la URL en todos los intentos:" + //$NON-NLS-1$
-            				"\nIntento 1: " + e + //$NON-NLS-1$
-            				"\nIntento 2: " + e2 + //$NON-NLS-1$
-            				"\nIntento 3: " + e3, e3); //$NON-NLS-1$
-            	}
+        		throw new URIReferenceException(
+    				"Error al derreferenciar la URL en todos los intentos:" + //$NON-NLS-1$
+        				"\nIntento 1: " + e + //$NON-NLS-1$
+        				"\nIntento 2: " + e2, e2 //$NON-NLS-1$
+				);
             }
 
 		}
