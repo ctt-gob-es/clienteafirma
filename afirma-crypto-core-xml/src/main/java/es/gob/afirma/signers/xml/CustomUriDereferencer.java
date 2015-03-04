@@ -134,20 +134,10 @@ public final class CustomUriDereferencer implements URIDereferencer {
             		throw new URIReferenceException("Error al derreferenciar la URL en todos los intentos:" + //$NON-NLS-1$
             				"\nIntento 1: " + e + //$NON-NLS-1$
             				"\nIntento 2: " + e2 + //$NON-NLS-1$
-            				"\nIntento 3: " + e3); //$NON-NLS-1$
+            				"\nIntento 3: " + e3, e3); //$NON-NLS-1$
             	}
             }
 
-//            final org.apache.xml.security.signature.XMLSignatureInput in = new org.apache.xml.security.signature.XMLSignatureInput(targetNode);
-//            if (in.isOctetStream()) {
-//            	try {
-//            		return new org.apache.jcp.xml.dsig.internal.dom.ApacheOctetStreamData(in);
-//            	}
-//            	catch (final Exception ioe) {
-//            		throw new URIReferenceException(e);
-//            	}
-//            }
-//            return new org.apache.jcp.xml.dsig.internal.dom.ApacheNodeSetData(in);
 		}
 	}
 
