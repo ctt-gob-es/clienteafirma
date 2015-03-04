@@ -168,12 +168,11 @@ public final class CustomUriDereferencer implements URIDereferencer {
         	}
         	final Node targetNode = getElementById(doc, id);
 
-            if (targetNode != null) {
-            	return getStreamData(targetNode);
+            if (targetNode == null) {
+            	throw new URIReferenceException(e);
             }
 
-        	throw new URIReferenceException(e);
-
+            return getStreamData(targetNode);
 		}
 	}
 
