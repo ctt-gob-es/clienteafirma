@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -15,6 +15,41 @@ package es.gob.afirma.signature;
  * @author Carlos Gamuci
  */
 public final class SignValidity {
+
+	@Override
+	public String toString() {
+		if (this.validity.equals(SIGN_DETAIL_TYPE.OK)) {
+			return "Firma valida"; //$NON-NLS-1$
+		}
+		if (this.validity.equals(SIGN_DETAIL_TYPE.UNKNOWN)) {
+			return "Validez de la firma desconocida"; //$NON-NLS-1$
+		}
+		final String ret = "Firma no valida"; //$NON-NLS-1$
+		switch (this.error) {
+			case NO_DATA:
+				return ret + ": no se puede comprobar la validez por no tener los datos firmados"; //$NON-NLS-1$
+			case CORRUPTED_SIGN:
+				return ret + ": la informacion contenida en la firma no es consistente (certificados corruptos, etc.)"; //$NON-NLS-1$
+			case NO_MATCH_DATA:
+				return ret + ": la firma no se corresponda con los datos firmados"; //$NON-NLS-1$
+			case NO_SIGN:
+				return ret + ": no se encuentra la firma dentro del documento"; //$NON-NLS-1$
+			case CERTIFICATE_PROBLEM:
+				return ret + ": no se puede extraer un certificado o este no es valido"; //$NON-NLS-1$
+			case CERTIFICATE_EXPIRED:
+				return ret + ": existe un certificado de firma caducado"; //$NON-NLS-1$
+			case CERTIFICATE_NOT_VALID_YET:
+				return ret + ": existe un certificado de firma que aun no es valido"; //$NON-NLS-1$
+			case ALGORITHM_NOT_SUPPORTED:
+				return ret + ": la firma contiene un algoritmo no reconocido o no soportado"; //$NON-NLS-1$
+			case CRL_PROBLEM:
+				return ret + ": existe algun problema con las CRLs incrustadas en la firma"; //$NON-NLS-1$
+			case UNKOWN_VALIDITY_PDF:
+				return ret + ": no se puede comprobar la validez del PDF"; //$NON-NLS-1$
+			default:
+				return ret;
+		}
+	}
 
     /** Tipo del resultado de la firma. */
     public enum SIGN_DETAIL_TYPE {
@@ -32,7 +67,7 @@ public final class SignValidity {
     public enum VALIDITY_ERROR {
         /** Cuando no se puede comprobar la validez por no tener los datos firmados. */
         NO_DATA,
-        /** Cuando la informacion contenida en la firma no sea consistente (certificados corruptos,...). */
+        /** Cuando la informacion contenida en la firma no sea consistente (certificados corruptos, etc.). */
         CORRUPTED_SIGN,
         /** Cuando la firma no se corresponda con los datos firmados. */
         NO_MATCH_DATA,
