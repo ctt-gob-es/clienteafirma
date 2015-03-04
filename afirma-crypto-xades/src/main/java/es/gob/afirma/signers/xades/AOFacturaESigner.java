@@ -45,6 +45,8 @@ public final class AOFacturaESigner implements AOSigner {
         ALLOWED_PARAMS.add("signatureProductionProvince"); //$NON-NLS-1$
         ALLOWED_PARAMS.add("signatureProductionPostalCode"); //$NON-NLS-1$
         ALLOWED_PARAMS.add("signatureProductionCountry"); //$NON-NLS-1$
+		ALLOWED_PARAMS.add("xadesNamespace"); //$NON-NLS-1$
+		ALLOWED_PARAMS.add("signedPropertiesTypeUrl"); //$NON-NLS-1$
     }
 
     private static final Properties EXTRA_PARAMS = new Properties();
