@@ -110,10 +110,10 @@ public final class TestXAdES {
 
     /** Algoritmos de firma a probar. */
     private final static String[] ALGOS = new String[] {
-//            AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA,
-//            AOSignConstants.SIGN_ALGORITHM_SHA512WITHRSA,
+            AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA,
+            AOSignConstants.SIGN_ALGORITHM_SHA512WITHRSA,
 //            AOSignConstants.SIGN_ALGORITHM_SHA256WITHRSA,
-            AOSignConstants.SIGN_ALGORITHM_SHA384WITHRSA
+//            AOSignConstants.SIGN_ALGORITHM_SHA384WITHRSA
     };
 
     // IMPORTANTE: Poner extension ".xml" a los ficheros de prueba con contenido XML
@@ -126,6 +126,8 @@ public final class TestXAdES {
 //            "sample-encoding-UTF-8.xml", //$NON-NLS-1$
 //            "sample-internal-dtd.xml", //$NON-NLS-1$
 //            "sample-namespace-encoding-us-ascii.xml" //$NON-NLS-1$
+//            	"xmlwithremotestyle.xml" //$NON-NLS-1$
+
     };
 
     private static final String[] TEST_FILES_MULTISIGN = new String[] {

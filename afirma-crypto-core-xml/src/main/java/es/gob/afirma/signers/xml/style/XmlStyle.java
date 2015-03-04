@@ -11,8 +11,6 @@ import java.util.logging.Logger;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.stream.StreamSource;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -58,7 +56,6 @@ public final class XmlStyle {
 	                                                                  CannotDereferenceException,
 	                                                                  IsInnerlException,
 	                                                                  ReferenceIsNotXmlException {
-
 		final Properties p = getStyleSheetHeader(new String(data));
 		this.type = p.getProperty("type"); //$NON-NLS-1$
 		this.href = p.getProperty("href"); //$NON-NLS-1$
@@ -72,14 +69,7 @@ public final class XmlStyle {
 			);
 
 			final Document tmpDoc = dereferenceStyleSheet(
-				TransformerFactory.newInstance().getAssociatedStylesheet(
-					new StreamSource(
-						new ByteArrayInputStream(data)
-					),
-					null,
-					null,
-					null
-				).getSystemId(),
+				this.href,
 				headLess
 			);
 
@@ -160,20 +150,14 @@ public final class XmlStyle {
     }
 
     /** Dereferencia una hoja de estilo en forma de Documento DOM.
-     * @param id
-     *        Identificador de la hoja de estilo
-     * @param headLess
-     *        <code>true</code> si <b>no</b> se desea que se pregunte al
-     *        usuario para dereferenciar las hojas de estilo enlazadas con
-     *        rutas locales
+     * @param id Identificador de la hoja de estilo
+     * @param headLess <code>true</code> si <b>no</b> se desea que se pregunte al
+     *                 usuario para dereferenciar las hojas de estilo enlazadas con rutas locales
      * @return Documento DOM con la hoja de estilo
-     * @throws CannotDereferenceException
-     *         Si no se puede dereferenciar
-     * @throws IsInnerlException
-     *         Si no se puede dereferenciar por ser una referencia local
-     * @throws ReferenceIsNotXmlException
-     *         Si el objeto dereferenciado no puede transformarse en un
-     *         Documento DOM */
+     * @throws CannotDereferenceException Si no se puede dereferenciar
+     * @throws IsInnerlException Si no se puede dereferenciar por ser una referencia local
+     * @throws ReferenceIsNotXmlException Si el objeto dereferenciado no puede transformarse en un
+     *                                    Documento DOM */
     private static Document dereferenceStyleSheet(final String id, final boolean headLess) throws CannotDereferenceException,
                                                                                                  IsInnerlException,
                                                                                                  ReferenceIsNotXmlException {
@@ -194,10 +178,8 @@ public final class XmlStyle {
         }
         catch (final Exception e) {
 
-            // Si no dereferencia puede ser por tres cosas, porque es una
-            // referencia interna,
-            // porque es una referencia local
-            // o porque directamente no se puede dereferenciar
+            // Si no dereferencia puede ser por tres cosas, porque es una referencia interna,
+            // porque es una referencia local o porque directamente no se puede dereferenciar
 
             // Miramos si la referencia es local
             final String[] idParts = id.replace(File.separator, "/").split("/"); //$NON-NLS-1$ //$NON-NLS-2$

@@ -1,8 +1,11 @@
 package es.gob.afirma.signers.xml;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.logging.Logger;
 
 import javax.xml.crypto.Data;
 import javax.xml.crypto.URIDereferencer;
@@ -10,6 +13,8 @@ import javax.xml.crypto.URIReference;
 import javax.xml.crypto.URIReferenceException;
 import javax.xml.crypto.XMLCryptoContext;
 import javax.xml.crypto.dom.DOMURIReference;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
@@ -17,6 +22,9 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
+
+import es.gob.afirma.core.misc.UrlHttpManagerFactory;
 
 /** Dereferenciador a medida de referencias XML DOM. */
 public final class CustomUriDereferencer implements URIDereferencer {
@@ -109,59 +117,83 @@ public final class CustomUriDereferencer implements URIDereferencer {
 		catch(final Exception e) {
 
 			// Aqui ha fallado el dereferenciador por defecto, probamos a dereferenciar nosotros
+
+			// Si la referencia es http o https salimos, esta clase es para referencias dentro del mismo contexto XML
+			final String uri = domRef.getURI();
+			if (uri.startsWith("http://") || uri.startsWith("https://")) { //$NON-NLS-1$ //$NON-NLS-2$
+				Logger.getLogger("es.gob.afirma").info("Se ha pedido dereferenciar una URI externa: " + uri);  //$NON-NLS-1$//$NON-NLS-2$
+				final byte[] externalContent;
+				try {
+					externalContent = UrlHttpManagerFactory.getInstalledManager().readUrlByGet(uri);
+				}
+				catch (final Exception e1) {
+					throw new URIReferenceException(
+						"No se ha podido descargar manualmente el contenido externo: " + e1, e1 //$NON-NLS-1$
+					);
+				}
+				try {
+					return getStreamData(DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new ByteArrayInputStream(externalContent)));
+				}
+				catch (final ParserConfigurationException e1) {
+					throw new URIReferenceException(
+						"No se ha podido crear un XML a partir del contenido externo dereferenciado por error del analizador: " + e1, e1 //$NON-NLS-1$
+					);
+				}
+				catch (final SAXException e1) {
+					throw new URIReferenceException(
+						"No se ha podido crear un XML a partir del contenido externo dereferenciado por error SAX: " + e1, e1 //$NON-NLS-1$
+					);
+				}
+				catch (final IOException e1) {
+					throw new URIReferenceException(
+						"No se ha podido crear un XML a partir del contenido externo dereferenciado: " + e1, e1 //$NON-NLS-1$
+					);
+				}
+			}
+
 			final Attr uriAttr = (Attr) ((DOMURIReference)domRef).getHere();
 
 			final Document doc = uriAttr.getOwnerDocument();
             final String uriValue = uriAttr.getNodeValue();
-            Node targetNode = null;
 
             // Derreferenciacion de todo el XML en firmas enveloped
             if ("".equals(uriValue)) { //$NON-NLS-1$
-            	targetNode = doc;
+            	return getStreamData(doc);
             }
 
             // Buscamos el nodo en todo el XML
-            if (targetNode == null) {
-            	String id = uriValue;
-            	if (uriValue.length() > 0 && uriValue.charAt(0) == '#') {
-            		id = uriValue.substring(1);
-            	}
-            	targetNode = getElementById(doc, id);
+        	String id = uriValue;
+        	if (uriValue.length() > 0 && uriValue.charAt(0) == '#') {
+        		id = uriValue.substring(1);
+        	}
+        	final Node targetNode = getElementById(doc, id);
+
+            if (targetNode != null) {
+            	return getStreamData(targetNode);
             }
 
-            if (targetNode == null) {
-            	throw new URIReferenceException(e);
-            }
+        	throw new URIReferenceException(e);
 
-            try {
-        		final Class<?> xmlSignatureInputClass = getXmlSignatureInputClass();
-        		final Constructor<?> xmlSignatureInputConstructor = xmlSignatureInputClass.getConstructor(Node.class);
-        		final Object in = xmlSignatureInputConstructor.newInstance(targetNode);
+		}
+	}
 
-        		final Method isOctetStreamMethod = xmlSignatureInputClass.getMethod("isOctetStream"); //$NON-NLS-1$
-        		if (((Boolean) isOctetStreamMethod.invoke(in)).booleanValue()) {
-        			try {
-        				final Class<?> octetStreamDataClass = getOctetStreamDataClass();
-        				final Constructor<?> octetStreamDataConstructor = octetStreamDataClass.getConstructor(in.getClass());
+	private static Data getStreamData(final Node targetNode) throws URIReferenceException {
+		try {
+			final Class<?> xmlSignatureInputClass = getXmlSignatureInputClass();
+			final Constructor<?> xmlSignatureInputConstructor = xmlSignatureInputClass.getConstructor(Node.class);
+			final Object in = xmlSignatureInputConstructor.newInstance(targetNode);
 
-        				return (Data) octetStreamDataConstructor.newInstance(in);
-        			}
-        			catch (final Exception ioe) {
-        				throw new URIReferenceException(e);
-        			}
-        		}
-
-        		final Constructor<?> nodeSetDataConstructor = getNodesetDataClass().getConstructor(in.getClass());
-        		return (Data) nodeSetDataConstructor.newInstance(in);
-            }
-            catch (final Exception e2) {
-        		throw new URIReferenceException(
-    				"Error al derreferenciar la URL en todos los intentos:" + //$NON-NLS-1$
-        				"\nIntento 1: " + e + //$NON-NLS-1$
-        				"\nIntento 2: " + e2, e2 //$NON-NLS-1$
-				);
-            }
-
+			final Method isOctetStreamMethod = xmlSignatureInputClass.getMethod("isOctetStream"); //$NON-NLS-1$
+			if (((Boolean) isOctetStreamMethod.invoke(in)).booleanValue()) {
+				final Class<?> octetStreamDataClass = getOctetStreamDataClass();
+				final Constructor<?> octetStreamDataConstructor = octetStreamDataClass.getConstructor(in.getClass());
+				return (Data) octetStreamDataConstructor.newInstance(in);
+			}
+			final Constructor<?> nodeSetDataConstructor = getNodesetDataClass().getConstructor(in.getClass());
+			return (Data) nodeSetDataConstructor.newInstance(in);
+		}
+		catch (final Exception ioe) {
+			throw new URIReferenceException(ioe);
 		}
 	}
 

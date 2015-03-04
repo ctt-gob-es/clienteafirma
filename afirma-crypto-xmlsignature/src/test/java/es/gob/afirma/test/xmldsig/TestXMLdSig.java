@@ -91,6 +91,7 @@ public final class TestXMLdSig {
             "ANF_PF_Activo.pfx", //$NON-NLS-1$
             "base64.b64", //$NON-NLS-1$
             "sample-class-attributes.xml", //$NON-NLS-1$
+//            "xmlwithremotestyle.xml" //$NON-NLS-1$
     };
 
 

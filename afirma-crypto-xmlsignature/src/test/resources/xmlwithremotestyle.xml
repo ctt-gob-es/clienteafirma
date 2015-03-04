@@ -1,0 +1,3 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="https://raw.githubusercontent.com/robotnic/khtmlib/master/testcases/basics/style.xslt"?>
+<hello-world>   <greeter>An XSLT Programmer</greeter>   <greeting>Hello, World!</greeting></hello-world>
