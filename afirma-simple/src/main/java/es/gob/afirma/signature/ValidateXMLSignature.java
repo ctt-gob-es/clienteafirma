@@ -14,7 +14,9 @@ import java.io.ByteArrayInputStream;
 import java.security.Key;
 import java.security.KeyException;
 import java.security.PublicKey;
+import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.xml.crypto.AlgorithmMethod;
 import javax.xml.crypto.KeySelector;
@@ -22,6 +24,7 @@ import javax.xml.crypto.KeySelectorException;
 import javax.xml.crypto.KeySelectorResult;
 import javax.xml.crypto.XMLCryptoContext;
 import javax.xml.crypto.XMLStructure;
+import javax.xml.crypto.dsig.Reference;
 import javax.xml.crypto.dsig.SignatureMethod;
 import javax.xml.crypto.dsig.XMLSignature;
 import javax.xml.crypto.dsig.dom.DOMValidateContext;
@@ -36,14 +39,16 @@ import es.gob.afirma.signature.SignValidity.SIGN_DETAIL_TYPE;
 import es.gob.afirma.signature.SignValidity.VALIDITY_ERROR;
 import es.gob.afirma.signers.xml.Utils;
 
-/**
- * Validador de firmas XML. Basado en la documentaci&oacute;n y los ejemplo de la JSR 105.
- */
+/** Validador de firmas XML. Basado en la documentaci&oacute;n y los ejemplo de la JSR 105. */
 public final class ValidateXMLSignature {
+
+	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	private ValidateXMLSignature() {
 		// No permitimos la instanciacion
 	}
+
+	private static final SignValidity KO = new SignValidity(SIGN_DETAIL_TYPE.KO, null);
 
     /** Valida una firma XML.
      * @param sign Firma a validar
@@ -70,46 +75,38 @@ public final class ValidateXMLSignature {
 
         	final DOMValidateContext valContext = new DOMValidateContext(new KeyValueKeySelector(), nl.item(0));
 
-            // Primero validamos el PKCS#1 XMLSignature
-            return Utils.getDOMFactory().unmarshalXMLSignature(valContext).validate(valContext) ?
-                    new SignValidity(SIGN_DETAIL_TYPE.OK, null) :
-                    new SignValidity(SIGN_DETAIL_TYPE.KO, null);
+        	final XMLSignature signature = Utils.getDOMFactory().unmarshalXMLSignature(valContext);
+            if (!signature.validate(valContext)) {
+            	LOGGER.info("La firma es invalida"); //$NON-NLS-1$
+            	return KO;
+            }
+            if (!signature.getSignatureValue().validate(valContext)) {
+            	LOGGER.info("El valor de la firma es invalido"); //$NON-NLS-1$
+            	return KO;
+            }
 
             // Ahora miramos las referencias una a una
-            		// Check core validation status
-//            		if (coreValidity == false) {
-//            		    System.err.println("Signature failed core validation"); //$NON-NLS-1$
-//            		    final boolean sv = signature.getSignatureValue().validate(valContext);
-//            		    System.out.println("signature validation status: " + sv); //$NON-NLS-1$
-//            		    // check the validation status of each Reference
-//            		    final Iterator<?> i = signature.getSignedInfo().getReferences().iterator();
-//            		    for (int j=0; i.hasNext(); j++) {
-//            			final boolean refValid = ((Reference) i.next()).validate(valContext);
-//            			System.out.println("ref["+j+"] validity status: " + refValid); //$NON-NLS-1$ //$NON-NLS-2$
-//            		    }
-//            		}
-//            		else {
-//            		    System.out.println("Signature passed core validation"); //$NON-NLS-1$
-//            		}
+		    final Iterator<?> i = signature.getSignedInfo().getReferences().iterator();
+		    for (int j=0; i.hasNext(); j++) {
+		    	if (!((Reference) i.next()).validate(valContext)) {
+		    		LOGGER.info("La referencia " + j + " de la firma es invalida"); //$NON-NLS-1$ //$NON-NLS-2$
+		    		return KO;
+		    	}
+		    }
+
+    		return new SignValidity(SIGN_DETAIL_TYPE.OK, null);
         }
         catch (final Exception e) {
             return new SignValidity(SIGN_DETAIL_TYPE.UNKNOWN, null);
         }
     }
 
-    /**
-     * KeySelector which retrieves the public key out of the
-     * KeyValue element and returns it.
-     * NOTE: If the key algorithm doesn't match signature algorithm,
-     * then the public key will be ignored.
-     */
     static final class KeyValueKeySelector extends KeySelector {
         @Override
 		public KeySelectorResult select(final KeyInfo keyInfo,
-                final KeySelector.Purpose purpose,
-                final AlgorithmMethod method,
-                final XMLCryptoContext context)
-        throws KeySelectorException {
+                                        final KeySelector.Purpose purpose,
+                                        final AlgorithmMethod method,
+                                        final XMLCryptoContext context) throws KeySelectorException {
             if (keyInfo == null) {
                 throw new KeySelectorException("Objeto KeyInfo nulo"); //$NON-NLS-1$
             }
