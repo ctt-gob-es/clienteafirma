@@ -1,0 +1,354 @@
+<?xml version="1.0" encoding="UTF-8"?><CATALOG>
+  <PLANT>
+    <COMMON>Bloodroot</COMMON>
+    <BOTANICAL>Sanguinaria canadensis</BOTANICAL>
+    <ZONE>4</ZONE>
+    <LIGHT>Mostly Shady</LIGHT>
+    <PRICE>$2.44</PRICE>
+    <AVAILABILITY>031599</AVAILABILITY>
+  </PLANT>
+  
+  <PLANT>
+    <COMMON>Columbine</COMMON>
+    <BOTANICAL>Aquilegia canadensis</BOTANICAL>
+    <ZONE>3</ZONE>
+    <LIGHT>Mostly Shady</LIGHT>
+    <PRICE>$9.37</PRICE>
+    <AVAILABILITY>030699</AVAILABILITY>
+  </PLANT>
+  
+  <PLANT>
+    <COMMON>Marsh Marigold</COMMON>
+    <BOTANICAL>Caltha palustris</BOTANICAL>
+    <ZONE>4</ZONE>
+    <LIGHT>Mostly Sunny</LIGHT>
+    <PRICE>$6.81</PRICE>
+    <AVAILABILITY>051799</AVAILABILITY>
+  </PLANT>
+  
+  <PLANT>
+    <COMMON>Cowslip</COMMON>
+    <BOTANICAL>Caltha palustris</BOTANICAL>
+    <ZONE>4</ZONE>
+    <LIGHT>Mostly Shady</LIGHT>
+    <PRICE>$9.90</PRICE>
+    <AVAILABILITY>030699</AVAILABILITY>
+  </PLANT>
+  
+  <PLANT>
+    <COMMON>Dutchman's-Breeches</COMMON>
+    <BOTANICAL>Diecentra cucullaria</BOTANICAL>
+    <ZONE>3</ZONE>
+    <LIGHT>Mostly Shady</LIGHT>
+    <PRICE>$6.44</PRICE>
+    <AVAILABILITY>012099</AVAILABILITY>
+  </PLANT>
+  
+  <PLANT>
+    <COMMON>Ginger, Wild</COMMON>
+    <BOTANICAL>Asarum canadense</BOTANICAL>
+    <ZONE>3</ZONE>
+    <LIGHT>Mostly Shady</LIGHT>
+    <PRICE>$9.03</PRICE>
+    <AVAILABILITY>041899</AVAILABILITY>
+  </PLANT>
+  
+  <PLANT>
+    <COMMON>Hepatica</COMMON>
+    <BOTANICAL>Hepatica americana</BOTANICAL>
+    <ZONE>4</ZONE>
+    <LIGHT>Mostly Shady</LIGHT>
+    <PRICE>$4.45</PRICE>
+    <AVAILABILITY>012699</AVAILABILITY>
+  </PLANT>
+  
+  <PLANT>
+    <COMMON>Liverleaf</COMMON>
+    <BOTANICAL>Hepatica americana</BOTANICAL>
+    <ZONE>4</ZONE>
+    <LIGHT>Mostly Shady</LIGHT>
+    <PRICE>$3.99</PRICE>
+    <AVAILABILITY>010299</AVAILABILITY>
+  </PLANT>
+  
+  <PLANT>
+    <COMMON>Jack-In-The-Pulpit</COMMON>
+    <BOTANICAL>Arisaema triphyllum</BOTANICAL>
+    <ZONE>4</ZONE>
+    <LIGHT>Mostly Shady</LIGHT>
+    <PRICE>$3.23</PRICE>
+    <AVAILABILITY>020199</AVAILABILITY>
+  </PLANT>
+  
+  <PLANT>
+    <COMMON>Mayapple</COMMON>
+    <BOTANICAL>Podophyllum peltatum</BOTANICAL>
+    <ZONE>3</ZONE>
+    <LIGHT>Mostly Shady</LIGHT>
+    <PRICE>$2.98</PRICE>
+    <AVAILABILITY>060599</AVAILABILITY>
+  </PLANT>
+  
+  <PLANT>
+    <COMMON>Phlox, Woodland</COMMON>
+    <BOTANICAL>Phlox divaricata</BOTANICAL>
+    <ZONE>3</ZONE>
+    <LIGHT>Sun or Shade</LIGHT>
+    <PRICE>$2.80</PRICE>
+    <AVAILABILITY>012299</AVAILABILITY>
+  </PLANT>
+  
+  <PLANT>
+    <COMMON>Phlox, Blue</COMMON>
+    <BOTANICAL>Phlox divaricata</BOTANICAL>
+    <ZONE>3</ZONE>
+    <LIGHT>Sun or Shade</LIGHT>
+    <PRICE>$5.59</PRICE>
+    <AVAILABILITY>021699</AVAILABILITY>
+  </PLANT>
+  
+  <PLANT>
+    <COMMON>Spring-Beauty</COMMON>
+    <BOTANICAL>Claytonia Virginica</BOTANICAL>
+    <ZONE>7</ZONE>
+    <LIGHT>Mostly Shady</LIGHT>
+    <PRICE>$6.59</PRICE>
+    <AVAILABILITY>020199</AVAILABILITY>
+  </PLANT>
+  
+  <PLANT>
+    <COMMON>Trillium</COMMON>
+    <BOTANICAL>Trillium grandiflorum</BOTANICAL>
+    <ZONE>5</ZONE>
+    <LIGHT>Sun or Shade</LIGHT>
+    <PRICE>$3.90</PRICE>
+    <AVAILABILITY>042999</AVAILABILITY>
+  </PLANT>
+  
+  <PLANT>
+    <COMMON>Wake Robin</COMMON>
+    <BOTANICAL>Trillium grandiflorum</BOTANICAL>
+    <ZONE>5</ZONE>
+    <LIGHT>Sun or Shade</LIGHT>
+    <PRICE>$3.20</PRICE>
+    <AVAILABILITY>022199</AVAILABILITY>
+  </PLANT>
+  
+  <PLANT>
+    <COMMON>Violet, Dog-Tooth</COMMON>
+    <BOTANICAL>Erythronium americanum</BOTANICAL>
+    <ZONE>4</ZONE>
+    <LIGHT>Shade</LIGHT>
+    <PRICE>$9.04</PRICE>
+    <AVAILABILITY>020199</AVAILABILITY>
+  </PLANT>
+  
+  <PLANT>
+    <COMMON>Trout Lily</COMMON>
+    <BOTANICAL>Erythronium americanum</BOTANICAL>
+    <ZONE>4</ZONE>
+    <LIGHT>Shade</LIGHT>
+    <PRICE>$6.94</PRICE>
+    <AVAILABILITY>032499</AVAILABILITY>
+  </PLANT>
+  
+  <PLANT>
+    <COMMON>Adder's-Tongue</COMMON>
+    <BOTANICAL>Erythronium americanum</BOTANICAL>
+    <ZONE>4</ZONE>
+    <LIGHT>Shade</LIGHT>
+    <PRICE>$9.58</PRICE>
+    <AVAILABILITY>041399</AVAILABILITY>
+  </PLANT>
+  
+  <PLANT>
+    <COMMON>Anemone</COMMON>
+    <BOTANICAL>Anemone blanda</BOTANICAL>
+    <ZONE>6</ZONE>
+    <LIGHT>Mostly Shady</LIGHT>
+    <PRICE>$8.86</PRICE>
+    <AVAILABILITY>122698</AVAILABILITY>
+  </PLANT>
+  
+  <PLANT>
+    <COMMON>Grecian Windflower</COMMON>
+    <BOTANICAL>Anemone blanda</BOTANICAL>
+    <ZONE>6</ZONE>
+    <LIGHT>Mostly Shady</LIGHT>
+    <PRICE>$9.16</PRICE>
+    <AVAILABILITY>071099</AVAILABILITY>
+  </PLANT>
+  
+  <PLANT>
+    <COMMON>Bee Balm</COMMON>
+    <BOTANICAL>Monarda didyma</BOTANICAL>
+    <ZONE>4</ZONE>
+    <LIGHT>Shade</LIGHT>
+    <PRICE>$4.59</PRICE>
+    <AVAILABILITY>050399</AVAILABILITY>
+  </PLANT>
+  
+  <PLANT>
+    <COMMON>Bergamont</COMMON>
+    <BOTANICAL>Monarda didyma</BOTANICAL>
+    <ZONE>4</ZONE>
+    <LIGHT>Shade</LIGHT>
+    <PRICE>$7.16</PRICE>
+    <AVAILABILITY>042799</AVAILABILITY>
+  </PLANT>
+  
+  <PLANT>
+    <COMMON>Black-Eyed Susan</COMMON>
+    <BOTANICAL>Rudbeckia hirta</BOTANICAL>
+    <ZONE>Annual</ZONE>
+    <LIGHT>Sunny</LIGHT>
+    <PRICE>$9.80</PRICE>
+    <AVAILABILITY>061899</AVAILABILITY>
+  </PLANT>
+  
+  <PLANT>
+    <COMMON>Buttercup</COMMON>
+    <BOTANICAL>Ranunculus</BOTANICAL>
+    <ZONE>4</ZONE>
+    <LIGHT>Shade</LIGHT>
+    <PRICE>$2.57</PRICE>
+    <AVAILABILITY>061099</AVAILABILITY>
+  </PLANT>
+  
+  <PLANT>
+    <COMMON>Crowfoot</COMMON>
+    <BOTANICAL>Ranunculus</BOTANICAL>
+    <ZONE>4</ZONE>
+    <LIGHT>Shade</LIGHT>
+    <PRICE>$9.34</PRICE>
+    <AVAILABILITY>040399</AVAILABILITY>
+  </PLANT>
+  
+  <PLANT>
+    <COMMON>Butterfly Weed</COMMON>
+    <BOTANICAL>Asclepias tuberosa</BOTANICAL>
+    <ZONE>Annual</ZONE>
+    <LIGHT>Sunny</LIGHT>
+    <PRICE>$2.78</PRICE>
+    <AVAILABILITY>063099</AVAILABILITY>
+  </PLANT>
+  
+  <PLANT>
+    <COMMON>Cinquefoil</COMMON>
+    <BOTANICAL>Potentilla</BOTANICAL>
+    <ZONE>Annual</ZONE>
+    <LIGHT>Shade</LIGHT>
+    <PRICE>$7.06</PRICE>
+    <AVAILABILITY>052599</AVAILABILITY>
+  </PLANT>
+  
+  <PLANT>
+    <COMMON>Primrose</COMMON>
+    <BOTANICAL>Oenothera</BOTANICAL>
+    <ZONE>3 - 5</ZONE>
+    <LIGHT>Sunny</LIGHT>
+    <PRICE>$6.56</PRICE>
+    <AVAILABILITY>013099</AVAILABILITY>
+  </PLANT>
+  
+  <PLANT>
+    <COMMON>Gentian</COMMON>
+    <BOTANICAL>Gentiana</BOTANICAL>
+    <ZONE>4</ZONE>
+    <LIGHT>Sun or Shade</LIGHT>
+    <PRICE>$7.81</PRICE>
+    <AVAILABILITY>051899</AVAILABILITY>
+  </PLANT>
+  
+  <PLANT>
+    <COMMON>Blue Gentian</COMMON>
+    <BOTANICAL>Gentiana</BOTANICAL>
+    <ZONE>4</ZONE>
+    <LIGHT>Sun or Shade</LIGHT>
+    <PRICE>$8.56</PRICE>
+    <AVAILABILITY>050299</AVAILABILITY>
+  </PLANT>
+  
+  <PLANT>
+    <COMMON>Jacob's Ladder</COMMON>
+    <BOTANICAL>Polemonium caeruleum</BOTANICAL>
+    <ZONE>Annual</ZONE>
+    <LIGHT>Shade</LIGHT>
+    <PRICE>$9.26</PRICE>
+    <AVAILABILITY>022199</AVAILABILITY>
+  </PLANT>
+  
+  <PLANT>
+    <COMMON>Greek Valerian</COMMON>
+    <BOTANICAL>Polemonium caeruleum</BOTANICAL>
+    <ZONE>Annual</ZONE>
+    <LIGHT>Shade</LIGHT>
+    <PRICE>$4.36</PRICE>
+    <AVAILABILITY>071499</AVAILABILITY>
+  </PLANT>
+  
+  <PLANT>
+    <COMMON>California Poppy</COMMON>
+    <BOTANICAL>Eschscholzia californica</BOTANICAL>
+    <ZONE>Annual</ZONE>
+    <LIGHT>Sun</LIGHT>
+    <PRICE>$7.89</PRICE>
+    <AVAILABILITY>032799</AVAILABILITY>
+  </PLANT>
+  
+  <PLANT>
+    <COMMON>Shooting Star</COMMON>
+    <BOTANICAL>Dodecatheon</BOTANICAL>
+    <ZONE>Annual</ZONE>
+    <LIGHT>Mostly Shady</LIGHT>
+    <PRICE>$8.60</PRICE>
+    <AVAILABILITY>051399</AVAILABILITY>
+  </PLANT>
+  
+  <PLANT>
+    <COMMON>Snakeroot</COMMON>
+    <BOTANICAL>Cimicifuga</BOTANICAL>
+    <ZONE>Annual</ZONE>
+    <LIGHT>Shade</LIGHT>
+    <PRICE>$5.63</PRICE>
+    <AVAILABILITY>071199</AVAILABILITY>
+  </PLANT>
+  
+  <PLANT>
+    <COMMON>Cardinal Flower</COMMON>
+    <BOTANICAL>Lobelia cardinalis</BOTANICAL>
+    <ZONE>2</ZONE>
+    <LIGHT>Shade</LIGHT>
+    <PRICE>$3.02</PRICE>
+    <AVAILABILITY>022299</AVAILABILITY>
+  </PLANT>
+<ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#" Id="Signature-a3a054ef-58fd-4056-b98d-8efbb72d4a64"><ds:SignedInfo><ds:CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/><ds:SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/><ds:Reference Id="Reference-55a4204f-57df-4758-a7ab-85dc84a6238d" URI=""><ds:Transforms><ds:Transform Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/><ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/><ds:Transform Algorithm="http://www.w3.org/TR/1999/REC-xpath-19991116"><ds:XPath xmlns:ds="http://www.w3.org/2000/09/xmldsig#">not(ancestor-or-self::ds:Signature)</ds:XPath></ds:Transform></ds:Transforms><ds:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/><ds:DigestValue>+E7NBragik5ZmwJnFCg6+GE1gOA=</ds:DigestValue></ds:Reference><ds:Reference URI="#KeyInfo-a3a054ef-58fd-4056-b98d-8efbb72d4a64"><ds:Transforms><ds:Transform Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/><ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/><ds:Transform Algorithm="http://www.w3.org/TR/1999/REC-xpath-19991116"><ds:XPath xmlns:ds="http://www.w3.org/2000/09/xmldsig#">not(ancestor-or-self::ds:Signature)</ds:XPath></ds:Transform></ds:Transforms><ds:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/><ds:DigestValue>Sut4Mr/GopmmX5acPNJU0lh892A=</ds:DigestValue></ds:Reference></ds:SignedInfo><ds:SignatureValue Id="SignatureValue-a3a054ef-58fd-4056-b98d-8efbb72d4a64">CsT1xRGykncW60Jzs06lkTNYXI3wz/aqVxaoMIxshc4h3csPpRi9da5Optz0TnsSZuZf/j7/mPmN
+QPJn+qQzEXHbXCI9B3B2tOXc72wnZYEKWRocvTGbNH6ONnYHAHICwnDg/lJayv3QmhNFtTcaTtSD
+3xI3S5T38xVcv+JrgBM=</ds:SignatureValue><ds:KeyInfo Id="KeyInfo-a3a054ef-58fd-4056-b98d-8efbb72d4a64"><ds:KeyValue><ds:RSAKeyValue><ds:Modulus>j2qAceOf0pyATEM0BxBK7+eGA0HEZWDZpqdhCeVvsI1AqhLWQpWNg65TGXE8ijzxGU/yS94k/34g
+PgIkla+p/mrDaNsVY69RcLp1hWYcL61rM//In+hXlA3qUK6as942b55YyzNsbJSQPCNgkiGuIQTo
+1Xfsfk4XZDi+yNSRgUM=</ds:Modulus><ds:Exponent>AQAB</ds:Exponent></ds:RSAKeyValue></ds:KeyValue><ds:X509Data><ds:X509Certificate>MIIFnTCCBIWgAwIBAgICA+owDQYJKoZIhvcNAQEFBQAwgdoxCzAJBgNVBAYTAkVTMRIwEAYDVQQI
+EwlCYXJjZWxvbmExSDBGBgNVBAcMP0JhcmNlbG9uYSAoc2VlIGN1cnJlbnQgYWRkcmVzcyBhdCBo
+dHRwczovL3d3dy5hbmYuZXMvYWRkcmVzcy8gKTEnMCUGA1UEChMeQU5GIEF1dG9yaWRhZCBkZSBD
+ZXJ0aWZpY2FjaW9uMRcwFQYDVQQLEw5BTkYgQ2xhc2UgMSBDQTETMBEGA1UEBRMKRy02MzI4NzUx
+MDEWMBQGA1UEAxMNQU5GIFNlcnZlciBDQTAeFw0wNjEyMzEyMzAwMDBaFw0xNDEyMzEyMzAwMDBa
+MIGmMRswGQYDVQQDExJBTkYgVXN1YXJpbyBBY3Rpdm8xDDAKBgNVBCoTA0FORjEXMBUGA1UEBBMO
+VXN1YXJpbyBBY3Rpdm8xEjAQBgNVBAUTCTEyMzQ1Njc4WjEeMBwGCSqGSIb3DQEJARYPdGVzdEBw
+cnVlYmEuY29tMR8wHQYDVQQLExZDbGFzZSAyIHBlcnNvbmEgZmlzaWNhMQswCQYDVQQGEwJFUzCB
+nzANBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEAj2qAceOf0pyATEM0BxBK7+eGA0HEZWDZpqdhCeVv
+sI1AqhLWQpWNg65TGXE8ijzxGU/yS94k/34gPgIkla+p/mrDaNsVY69RcLp1hWYcL61rM//In+hX
+lA3qUK6as942b55YyzNsbJSQPCNgkiGuIQTo1Xfsfk4XZDi+yNSRgUMCAwEAAaOCAiEwggIdMAkG
+A1UdEwQCMAAwCwYDVR0PBAQDAgbAMBMGCisGAQQBgY8cFAMEBQwDQU5GMBcGCisGAQQBgY8cFAQE
+CQwHVXN1YXJpbzAWBgorBgEEAYGPHBQFBAgMBkFjdGl2bzAZBgorBgEEAYGPHBQGBAsMCTEyMzQ1
+Njc4WjCBiAYDVR0gBIGAMH4wfAYKKwYBBAGBjxwDBDBuMD0GCCsGAQUFBwICMDEaL0NlcnRpZmlj
+YWRvIGVtaXRpZG8gcGFyYSByZWFsaXphY2nzbiBkZSBwcnVlYmFzMC0GCCsGAQUFBwIBFiFodHRw
+czovL3d3dy5hbmYuZXMvQUMvZG9jdW1lbnRvcy8wOAYIKwYBBQUHAQEELDAqMCgGCCsGAQUFBzAB
+hhxodHRwOi8vd3d3LmFuZi5lcy9BQy9SQy9vY3NwMDkGA1UdHwQyMDAwLqAsoCqGKGh0dHA6Ly93
+d3cuYW5mLmVzL0FDL1JDL0FORkFDQ0xBU0VBMS5jcmwwFwYKKwYBBAGBjxwTAQQJDAcxMjMtMzIx
+MDEGCisGAQQBgY8cKgYEIwwhaHR0cHM6Ly93d3cuYW5mLmVzL0FDL0FDVEFTLzU2Nzg5MBYGCSsG
+AQQBgY8cEwQJDAczMjEtMTIzMB0GA1UdDgQWBBSxTxAznF2uoOtMW+fJUoDN6B+rJDAfBgNVHSME
+GDAWgBS+O/a0MbdzJEg5xVcTlHWqn4E/LDANBgkqhkiG9w0BAQUFAAOCAQEATQgYAOwxrMRTT2Nh
+x7pqiNsoGT5dJmeunAv+iU5zx/VoEXB/mx+VtyLfMea3VS9LC23404XS7pz5oPwiVPLsMPZtzOcm
+facVnSdRn5J7+qOO8MB+OVlXq/QmARn+1XeBCHaTQ6AMc/pdveEoGktaXwEjTslWyRD9dGDzLp04
++FndQAbVcI5xRkb4vToRnhQmloUVddhQAO8usOAIb00GJFNTq4lsyZ1qT1HplQl+ngsSD1HBxkhx
+10Pm3KuvCunAh4um0QnSeeiq9qWIV0UZrFlMwNRXvH9OVTqSGC4PXjw2zOi2GLUfags1decu7gcG
+jidlELR/WHU/6lrztfdViQ==</ds:X509Certificate></ds:X509Data></ds:KeyInfo></ds:Signature></CATALOG>
