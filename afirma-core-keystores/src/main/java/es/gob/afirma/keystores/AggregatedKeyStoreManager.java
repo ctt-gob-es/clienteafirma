@@ -114,4 +114,11 @@ public class AggregatedKeyStoreManager extends AOKeyStoreManager {
 			"Se ha pedido comprobar la clave privada de un certificado no contenido en este gestor" //$NON-NLS-1$
 		);
 	}
+	
+	/**
+	 * Elimina todos los almacenes del de claves del almac&eacute;n agregado.
+	 */
+	public void removeAll() {
+		this.ksms.clear();
+	}
 }

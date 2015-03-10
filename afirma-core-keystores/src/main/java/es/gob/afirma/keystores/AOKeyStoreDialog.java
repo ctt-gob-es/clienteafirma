@@ -137,6 +137,11 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 
 	@Override
 	public void setKeyStoreManager(final KeyStoreManager ksm) {
+		if (this.ksm instanceof AggregatedKeyStoreManager && ksm instanceof AOKeyStoreManager) {
+			((AggregatedKeyStoreManager) this.ksm).removeAll();
+			((AggregatedKeyStoreManager) this.ksm).addKeyStoreManager((AOKeyStoreManager) ksm);
+		}
+		
 		this.ksm = ksm;
 	}
 
