@@ -10,12 +10,12 @@
 
 package es.gob.afirma.standalone.ui;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.standalone.HelpResourceManager;
-import es.gob.afirma.standalone.SimpleAfirma;
 
 /** Clase de enlace con la ayuda nativa de Mac OS X.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s
@@ -39,7 +39,7 @@ public final class MacHelpHooker {
                 LOGGER.warning("La ayuda de Apple OS X no se ha podido copiar: " + e); //$NON-NLS-1$
 			}
             try {
-                System.load(SimpleAfirma.APPLICATION_HOME + "/libJavaHelpHook.jnilib"); //$NON-NLS-1$
+                System.load(new File(MacHelpHooker.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()).getAbsolutePath() + "/libJavaHelpHook.jnilib"); //$NON-NLS-1$
                 loaded = true;
             }
             catch(final UnsatisfiedLinkError e) {
