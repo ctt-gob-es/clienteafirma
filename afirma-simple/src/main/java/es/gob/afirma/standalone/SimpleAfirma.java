@@ -58,7 +58,6 @@ import es.gob.afirma.signature.SignValidity;
 import es.gob.afirma.signature.SignValidity.SIGN_DETAIL_TYPE;
 import es.gob.afirma.standalone.ui.ClosePanel;
 import es.gob.afirma.standalone.ui.DNIeWaitPanel;
-import es.gob.afirma.standalone.ui.MacHelpHooker;
 import es.gob.afirma.standalone.ui.MainMenu;
 import es.gob.afirma.standalone.ui.MainScreen;
 import es.gob.afirma.standalone.ui.SignDetailPanel;
@@ -471,14 +470,11 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 			}
             return;
         }
-        else if (MacHelpHooker.isMacHelpAvailable()) {
-            MacHelpHooker.showHelp();
-            return;
+        else if (!Platform.OS.MACOSX.equals(Platform.getOS())) {
+            // Ultimo recurso, si no es Windows, es Apple OS X pero no disponemos de Apple Help, o es otro
+            // sistema operativo (Linux, Solaris), cargamos JavaHelp
+            JavaHelp.showHelp();
         }
-
-        // Ultimo recurso, si no es Windows, es Apple OS X pero no disponemos de Apple Help, o es otro
-        // sistema operativo (Linux, Solaris), cargamos JavaHelp
-        JavaHelp.showHelp();
     }
 
     /** Carga el fichero a firmar. Este m&eacute;todo se situa aqu&iacute; para

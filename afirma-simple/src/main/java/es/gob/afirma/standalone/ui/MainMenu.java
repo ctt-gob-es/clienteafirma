@@ -14,7 +14,6 @@ import java.awt.Component;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
 
@@ -54,7 +53,7 @@ public final class MainMenu extends JMenuBar {
     private final JMenuItem abrirMenuItem = new JMenuItem();
     private final JMenuItem ayudaMenuItem = new JMenuItem();
 
-    private final JMenu menuAyuda = new JMenu(MacHelpHooker.isMacHelpAvailable() ? "Help" : SimpleAfirmaMessages.getString("MainMenu.9"));  //$NON-NLS-1$//$NON-NLS-2$
+    private final JMenu menuAyuda = new JMenu(SimpleAfirmaMessages.getString("MainMenu.9"));  //$NON-NLS-1$
 
     private final JFrame parent;
     JFrame getParentComponent() {
@@ -239,22 +238,13 @@ public final class MainMenu extends JMenuBar {
         // Separador para que la ayuda quede a la derecha, se ignora en Mac OS X
         this.add(Box.createHorizontalGlue());
 
-        // En Mac OS X el menu de ayuda tiene que llamarse "Help" para que el sistema operativo lo
-        // detecte como tal
         this.menuAyuda.setMnemonic(KeyEvent.VK_Y);
         this.menuAyuda.getAccessibleContext().setAccessibleDescription(
           SimpleAfirmaMessages.getString("MainMenu.10") //$NON-NLS-1$
         );
 
         this.ayudaMenuItem.setText(SimpleAfirmaMessages.getString("MainMenu.11")); //$NON-NLS-1$
-        if (isMac) {
-            this.ayudaMenuItem.setAccelerator(
-        		KeyStroke.getKeyStroke(KeyEvent.VK_SLASH, InputEvent.SHIFT_MASK | Toolkit.getDefaultToolkit().getMenuShortcutKeyMask())
-    		);
-        }
-        else {
-            this.ayudaMenuItem.setAccelerator(KeyStroke.getKeyStroke("F1")); //$NON-NLS-1$
-        }
+        this.ayudaMenuItem.setAccelerator(KeyStroke.getKeyStroke("F1")); //$NON-NLS-1$
         this.ayudaMenuItem.getAccessibleContext().setAccessibleDescription(
               SimpleAfirmaMessages.getString("MainMenu.13") //$NON-NLS-1$
         );
@@ -284,9 +274,8 @@ public final class MainMenu extends JMenuBar {
             });
             acercaMenuItem.setMnemonic(KeyEvent.VK_R);
             this.menuAyuda.add(acercaMenuItem);
+            this.add(this.menuAyuda);
         }
-
-        this.add(this.menuAyuda);
 
         // Los mnemonicos en elementos de menu violan las normas de interfaz de Apple,
         // asi que prescindimos de ellos en Mac OS X
