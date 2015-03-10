@@ -12,9 +12,14 @@ import java.util.logging.Logger;
 import javax.security.auth.callback.PasswordCallback;
 import javax.swing.JFileChooser;
 
+import com.apple.eawt.AboutHandler;
+import com.apple.eawt.AppEvent.AboutEvent;
+import com.apple.eawt.Application;
+
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
+import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.misc.UrlHttpManagerFactory;
 import es.gob.afirma.core.misc.protocol.ParameterLocalAccessRequestedException;
 import es.gob.afirma.core.misc.protocol.ParameterNeedsUpdatedVersionException;
@@ -30,6 +35,7 @@ import es.gob.afirma.keystores.AOKeyStoreDialog;
 import es.gob.afirma.keystores.AOKeyStoreManager;
 import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
 import es.gob.afirma.standalone.crypto.CypherDataManager;
+import es.gob.afirma.standalone.ui.MainMenu;
 
 /** Gestiona la ejecuci&oacute;n del Cliente Afirma en una invocaci&oacute;n
  * por protocolo y bajo un entorno compatible <code>Swing</code>.
@@ -88,6 +94,19 @@ public final class ProtocolInvocationLauncher {
 	 * @param urlString URL de invocaci&oacute;n por protocolo.
 	 * @return Resultado de la operaci&oacute;n. */
 	public static String launch(final String urlString)  {
+
+	    // En OS X sobrecargamos el "Acerca de..." del sistema operativo, que tambien
+	    // aparece en la invocacion por protocolo
+	    if (Platform.OS.MACOSX.equals(Platform.getOS())) {
+	        Application.getApplication().setAboutHandler(
+                 new AboutHandler() {
+                     @Override
+                     public void handleAbout(final AboutEvent ae) {
+                         MainMenu.showAbout(null);
+                     }
+                 }
+            );
+	    }
 
 		if (urlString == null) {
 			showError(SAF_01);

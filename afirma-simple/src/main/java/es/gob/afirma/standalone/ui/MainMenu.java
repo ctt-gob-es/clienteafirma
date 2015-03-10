@@ -10,6 +10,7 @@
 
 package es.gob.afirma.standalone.ui;
 
+import java.awt.Component;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -278,7 +279,7 @@ public final class MainMenu extends JMenuBar {
             acercaMenuItem.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(final ActionEvent ae) {
-                    showAbout();
+                    showAbout(MainMenu.this.getParentComponent() == null ? MainMenu.this : MainMenu.this.getParentComponent());
                 }
             });
             acercaMenuItem.setMnemonic(KeyEvent.VK_R);
@@ -300,7 +301,7 @@ public final class MainMenu extends JMenuBar {
         		new AboutHandler() {
 	                @Override
 	                public void handleAbout(final AboutEvent ae) {
-	                    showAbout();
+	                    showAbout(MainMenu.this.getParentComponent() == null ? MainMenu.this : MainMenu.this.getParentComponent());
 	                }
 	            }
     		);
@@ -345,9 +346,11 @@ public final class MainMenu extends JMenuBar {
         preferencesDialog.setVisible(true);
     }
 
-    void showAbout() {
+    /** Muestra en OS X el men&uacute; "Acerca de...".
+     * @param parentComponent Componente padre para la modalidad. */
+    public static void showAbout(final Component parentComponent) {
         AOUIFactory.showMessageDialog(
-    		this.parent == null ? MainMenu.this : this.parent,
+    		parentComponent,
 			SimpleAfirmaMessages.getString("MainMenu.14", System.getProperty("java.version")), //$NON-NLS-1$ //$NON-NLS-2$,
             SimpleAfirmaMessages.getString("MainMenu.15"), //$NON-NLS-1$
             JOptionPane.INFORMATION_MESSAGE
