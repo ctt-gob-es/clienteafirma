@@ -2,6 +2,8 @@ package es.gob.afirma.android.signfolder.proxy;
 
 import java.io.IOException;
 
+import android.util.Log;
+
 /** Factor&iacute;a para la creaci&oacute;n de solitidudes XML hacia el servidor de firmas multi-fase.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 final class XmlRequestsFactory {
@@ -123,6 +125,9 @@ final class XmlRequestsFactory {
 		sb.append("\">"); //$NON-NLS-1$
 		documents = request.getDocs();
 		for (int j = 0; j<documents.length; j++) {
+
+			Log.i("es.gob.afirma", "Parametros que se agregan:\n" + documents[j].getParams());
+
 			sb.append("<doc docid=\""); //$NON-NLS-1$
 			sb.append(documents[j].getId());
 			sb.append("\" cop=\""); //$NON-NLS-1$
@@ -183,6 +188,9 @@ final class XmlRequestsFactory {
 	    	if (requests[i].isStatusOk()) {
 		    	documents = requests[i].getDocumentsRequests();
 		    	for (int j = 0; j < documents.length; j++) {
+
+		    		Log.i("es.gob.afirma", "Parametros que se agregan:\n" + documents[j].getParams());
+
 		    		sb.append("<doc docid=\"") //$NON-NLS-1$
 		    		.append(documents[j].getId())
 		    		.append("\" cop=\"") //$NON-NLS-1$
@@ -207,7 +215,20 @@ final class XmlRequestsFactory {
 
 		sb.append(XML_TRISIGN_CLOSE);
 
-		return sb.toString();
+		Log.i("es.gob.afirma", "Peticion postfirma:");
+
+		int i = 0;
+		int l = 1024;
+		String xml = sb.toString();
+		while (xml.length() >= l * (i + 1)) {
+			Log.i("es.gob.afirma", i + " " + xml.substring(l * i, l * (i + 1)));
+			i++;
+		}
+		Log.i("es.gob.afirma", i + " " + xml.substring(l * i));
+
+		throw new IllegalArgumentException();
+
+//		return sb.toString();
 	}
 
 	static String createRejectRequest(final String[] requestIds, final String certB64) {

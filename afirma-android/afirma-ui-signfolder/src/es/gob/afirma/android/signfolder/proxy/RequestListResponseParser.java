@@ -15,15 +15,19 @@ import es.gob.afirma.android.signfolder.proxy.SignRequest.RequestType;
 final class RequestListResponseParser {
 
 	private static final String LIST_NODE = "list"; //$NON-NLS-1$
-	
+
+	private static final String ERROR_NODE = "err"; //$NON-NLS-1$
+
 	private static final String NUM_REQUESTS_ATTRIBUTE = "n"; //$NON-NLS-1$
+
+	private static final String CD_ATTRIBUTE = "cd"; //$NON-NLS-1$
 
 	/** Valor usado por el Portafirmas para indicar que una petici&oacute;n es de firma. */
 	private static final String REQUEST_TYPE_SIGN = "FIRMA"; //$NON-NLS-1$
-	
+
 	/** Valor usado por el Portafirmas para indicar que una petici&oacute;n es de visto bueno. */
 	private static final String REQUEST_TYPE_APPROVE = "VISTOBUENO"; //$NON-NLS-1$
-	
+
 	/** Analiza un documento XML y, en caso de tener el formato correcto, obtiene una lista de peticiones de firma.
 	 * @param doc Documento XML.
 	 * @return Objeto con los datos del XML.
@@ -36,7 +40,12 @@ final class RequestListResponseParser {
 		}
 
 		final Element docElement = doc.getDocumentElement();
-		
+
+		if (ERROR_NODE.equalsIgnoreCase(docElement.getNodeName())) {
+			final String errorType = docElement.getAttribute(CD_ATTRIBUTE);
+			throw new ServerException("El servicio proxy notifico un error (" + errorType + "): " + docElement.getTextContent()); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+
 		if (!LIST_NODE.equalsIgnoreCase(docElement.getNodeName())) {
 			throw new IllegalArgumentException("El elemento raiz del XML debe ser '" + LIST_NODE + //$NON-NLS-1$
 					"' y aparece: " + doc.getDocumentElement().getNodeName()); //$NON-NLS-1$
@@ -49,7 +58,7 @@ final class RequestListResponseParser {
 		} catch (Exception e) {
 			numRequests = 0;
 		}
-		
+
 		final Vector<SignRequest> listSignRequest = new Vector<SignRequest>();
 		final NodeList requestNodes = docElement.getChildNodes();
 		for (int i = 0; i < requestNodes.getLength(); i++) {
@@ -150,7 +159,7 @@ final class RequestListResponseParser {
 					type = null;
 				}
 			}
-			
+
 			// Cargamos los elementos
 			int elementIndex = 0;
 			final NodeList childNodes = signRequestNode.getChildNodes();
