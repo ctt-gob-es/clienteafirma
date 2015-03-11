@@ -112,8 +112,10 @@ public final class KeyUsage {
 	@Override
 	public int hashCode() {
 		int ret = 0;
-		for (final Boolean b : this.usage) {
-			ret = ret + b.hashCode();
+		if (this.usage != null) {
+			for (final Boolean b : this.usage) {
+				ret = ret + b.hashCode();
+			}
 		}
 		return ret;
 	}
@@ -158,10 +160,14 @@ public final class KeyUsage {
 			);
 		}
 		final boolean[] ke = cert.getKeyUsage();
+		if (ke == null) {
+			this.usage = null;
+			return;
+		}
 		if (ke.length != KEYUSAGE_NBITS) {
 			throw new IllegalArgumentException(
-				"El certificado de origen tiene un KeyUsage con un numero de posiciones no soportado: " + ke.length //$NON-NLS-1$
-			);
+					"El certificado de origen tiene un KeyUsage con un numero de posiciones no soportado: " + ke.length //$NON-NLS-1$
+					);
 		}
 		this.usage = new Boolean[KEYUSAGE_NBITS];
 		for (int i=0; i<KEYUSAGE_NBITS; i++) {
@@ -170,11 +176,14 @@ public final class KeyUsage {
 	}
 
 	Boolean[] getUsage() {
-		return this.usage.clone();
+		return this.usage == null ? null : this.usage.clone();
 	}
 
 	@Override
 	public String toString() {
+		if (this.usage == null) {
+			return "Desconocido"; //$NON-NLS-1$
+		}
 		if (includes(SIGN) && includes(AUTH) && includes(CYPH)) {
 			return "Firma, autenticaci\u00F3n y cifrado"; //$NON-NLS-1$
 		}
@@ -196,20 +205,7 @@ public final class KeyUsage {
 		if (includes(CYPH)) {
 			return "Cifrado"; //$NON-NLS-1$
 		}
-		final StringBuilder sb = new StringBuilder("{"); //$NON-NLS-1$
-		for (final Boolean b : this.usage) {
-			if (b == null) {
-				sb.append("-,"); //$NON-NLS-1$
-			}
-			else if (b.booleanValue()) {
-				sb.append("1,"); //$NON-NLS-1$
-			}
-			else {
-				sb.append("0,"); //$NON-NLS-1$
-			}
-		}
-		sb.append("}"); //$NON-NLS-1$
-		return sb.toString().replace(",}", "}"); //$NON-NLS-1$ //$NON-NLS-2$
+		return "Otros"; //$NON-NLS-1$
 	}
 
 }
