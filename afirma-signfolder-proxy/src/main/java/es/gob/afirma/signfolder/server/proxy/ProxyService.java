@@ -19,7 +19,6 @@ import java.util.Vector;
 import java.util.logging.Logger;
 
 import javax.activation.DataHandler;
-import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -304,18 +303,6 @@ public final class ProxyService extends HttpServlet {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		t.printStackTrace(new PrintWriter(baos));
 		return new String(baos.toByteArray());
-	}
-
-	@Override
-	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-			throws ServletException, IOException {
-		super.doGet(req, resp);
-	}
-
-	@Override
-	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
-			throws ServletException, IOException {
-		super.doPost(req, resp);
 	}
 
 	/**
