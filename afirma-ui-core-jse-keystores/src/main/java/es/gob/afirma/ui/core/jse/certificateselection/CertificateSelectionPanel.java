@@ -96,14 +96,6 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 		mainMessage.setForeground(Color.decode("0x0033BC")); //$NON-NLS-1$
 		this.add(mainMessage, c);
 
-
-
-
-
-
-
-
-
 		c.insets = new Insets(13, 0, 8, 5);
 		c.weightx = 0.0;
 		c.gridx++;
@@ -111,98 +103,82 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 
 		final JButton refresh = new JButton(
 				new ImageIcon(
-					UtilToolBar.class.getResource("/resources/toolbar/ic_autorenew_black_18dp.png"), //$NON-NLS-1$
-					CertificateSelectionDialogMessages.getString("UtilToolBar.1") //$NON-NLS-1$
-				)
-			);
-			refresh.setBorder(BorderFactory.createEmptyBorder());
-			refresh.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-			refresh.getAccessibleContext().setAccessibleDescription(
+						UtilToolBar.class.getResource("/resources/toolbar/ic_autorenew_black_18dp.png"), //$NON-NLS-1$
+						CertificateSelectionDialogMessages.getString("UtilToolBar.1") //$NON-NLS-1$
+						)
+				);
+		refresh.setBorder(BorderFactory.createEmptyBorder());
+		refresh.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+		refresh.getAccessibleContext().setAccessibleDescription(
 				CertificateSelectionDialogMessages.getString("UtilToolBar.1") //$NON-NLS-1$
-			);
-			refresh.setToolTipText(CertificateSelectionDialogMessages.getString("UtilToolBar.1")); //$NON-NLS-1$
-			refresh.addActionListener(
+				);
+		refresh.setToolTipText(CertificateSelectionDialogMessages.getString("UtilToolBar.1")); //$NON-NLS-1$
+		refresh.addActionListener(
 				new ActionListener() {
 					@Override
 					public void actionPerformed(final ActionEvent e) {
 						UtilActions.doRefresh(selectionDialog, CertificateSelectionPanel.this);
 					}
 				}
-			);
-			refresh.setBackground(Color.WHITE);
-			this.add(refresh, c);
+				);
+		refresh.setBackground(Color.WHITE);
+		this.add(refresh, c);
 
-			c.gridx++;
+		c.gridx++;
 
-			final JButton open = new JButton(
+		final JButton open = new JButton(
 				new ImageIcon(
-					UtilToolBar.class.getResource("/resources/toolbar/ic_open_in_browser_black_18dp.png"), //$NON-NLS-1$
-					CertificateSelectionDialogMessages.getString("UtilToolBar.2") //$NON-NLS-1$
-				)
-			);
-			open.setBorder(BorderFactory.createEmptyBorder());
-			open.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-			open.getAccessibleContext().setAccessibleDescription(
+						UtilToolBar.class.getResource("/resources/toolbar/ic_open_in_browser_black_18dp.png"), //$NON-NLS-1$
+						CertificateSelectionDialogMessages.getString("UtilToolBar.2") //$NON-NLS-1$
+						)
+				);
+		open.setBorder(BorderFactory.createEmptyBorder());
+		open.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+		open.getAccessibleContext().setAccessibleDescription(
 				CertificateSelectionDialogMessages.getString("UtilToolBar.2") //$NON-NLS-1$
-			);
-			open.setToolTipText(CertificateSelectionDialogMessages.getString("UtilToolBar.2")); //$NON-NLS-1$
-			open.addActionListener(
+				);
+		open.setToolTipText(CertificateSelectionDialogMessages.getString("UtilToolBar.2")); //$NON-NLS-1$
+		open.addActionListener(
 				new ActionListener() {
 					@Override
 					public void actionPerformed(final ActionEvent e) {
 						UtilActions.doOpen(selectionDialog, CertificateSelectionPanel.this);
 					}
 				}
-			);
-			open.setBackground(Color.WHITE);
-			this.add(open, c);
+				);
+		open.setBackground(Color.WHITE);
+		this.add(open, c);
 
 
-			c.insets = new Insets(13, 0, 8, 15);
-			c.gridx++;
+		c.insets = new Insets(13, 0, 8, 15);
+		c.gridx++;
 
 
-			final JButton help = new JButton(
+		final JButton help = new JButton(
 				new ImageIcon(
-					UtilToolBar.class.getResource("/resources/toolbar/ic_help_black_18dp.png"), //$NON-NLS-1$
-					CertificateSelectionDialogMessages.getString("UtilToolBar.3") //$NON-NLS-1$
-				)
-			);
-			help.setBorder(BorderFactory.createEmptyBorder());
-			help.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-			help.getAccessibleContext().setAccessibleDescription(
+						UtilToolBar.class.getResource("/resources/toolbar/ic_help_black_18dp.png"), //$NON-NLS-1$
+						CertificateSelectionDialogMessages.getString("UtilToolBar.3") //$NON-NLS-1$
+						)
+				);
+		help.setBorder(BorderFactory.createEmptyBorder());
+		help.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+		help.getAccessibleContext().setAccessibleDescription(
 				CertificateSelectionDialogMessages.getString("UtilToolBar.3") //$NON-NLS-1$
-			);
-			help.setToolTipText(CertificateSelectionDialogMessages.getString("UtilToolBar.3")); //$NON-NLS-1$
-			help.addActionListener(
+				);
+		help.setToolTipText(CertificateSelectionDialogMessages.getString("UtilToolBar.3")); //$NON-NLS-1$
+		help.addActionListener(
 				new ActionListener() {
 					@Override
 					public void actionPerformed(final ActionEvent e) {
 						UtilActions.doHelp();
 					}
 				}
-			);
-			help.setBackground(Color.WHITE);
-			this.add(help, c);
+				);
+		help.setBackground(Color.WHITE);
+		this.add(help, c);
 
-
-
-			c.gridwidth = 4;
-			c.gridx = 0;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+		c.gridwidth = 4;
+		c.gridx = 0;
 
 
 		if (this.certificateBeans.length == 1) {
@@ -232,12 +208,7 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 		CertificateLine certLine;
 		final List<CertificateLine> certLines = new ArrayList<CertificateSelectionPanel.CertificateLine>();
 		for (final NameCertificateBean nameCert : this.certificateBeans) {
-		    try {
-		    	certLine = createCertLine(nameCert.getName(), nameCert.getCertificate() );
-		    }
-		    catch(final Exception e) {
-		        continue;
-		    }
+	    	certLine = createCertLine(nameCert.getName(), nameCert.getCertificate() );
 			certLine.setPreferredSize(new Dimension(0, CERT_LIST_ELEMENT_HEIGHT));
 			certLines.add(certLine);
 		}
@@ -270,8 +241,10 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 		this.add(sPane, c);
 	}
 
-
-	//TODO: COMPLETAR ======================
+	/**
+	 * Recarga el di&aacute;logo para mostrar un grupo distinto de certificados.
+	 * @param certs Conjunto de datos de los certificados a mostrar.
+	 */
 	void refresh(final NameCertificateBean[] certs) {
 
 		this.certificateBeans = certs.clone();
@@ -294,7 +267,6 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 		if (certLines.size() > 0) {
 			this.certList.setSelectedIndex(0);
 		}
-
 	}
 
 	/** Selecciona la lista de certificados. */
