@@ -133,7 +133,12 @@
   </head>
 	<body>
 		<script type="text/javascript">
-			MiniApplet.cargarMiniApplet('http://localhost:8080/afirma-ui-miniapplet-deploy');
+			// IMPORTANTE: PARA PRUEBAS, USAR SIEMPRE UNA IP O NOMBRE DE DOMINIO, NUNCA 'LOCALHOST' O '127.0.0.1'
+			// SI NO SE HACE ASI, FIRMAFACIL BLOQUEARA LA FIRMA POR SEGURIDAD
+			var HOST = "XX.XX.XX.XX:8080";
+			
+			MiniApplet.cargarMiniApplet('http://' + HOST + '/afirma-ui-miniapplet-deploy');
+			MiniApplet.setServlets("http://" + HOST + "/afirma-signature-storage/StorageService", "http://" + HOST + "/afirma-signature-retriever/RetrieveService");
 		</script>
 
 		<fieldset><legend>Entrada de datos (Opcional)</legend>
@@ -181,8 +186,9 @@
 		 <input type="button" value="Limpiar" onclick="cleanExtraParams();">&nbsp;
 		 <span>(Insertar las propiedades de una en una)</span>
 		 <br>
-		 <textarea id="params" cols="50" rows="5" readonly>serverUrl=http://localhost:8080/afirma-server-triphase-signer/SignatureService
+		 <textarea id="params" cols="50" rows="5" readonly>serverUrl=http://XX.XX.XX.XX:8080/afirma-server-triphase-signer/SignatureService
 </textarea>
+
 		</div>
 		</fieldset>
 		<br/>

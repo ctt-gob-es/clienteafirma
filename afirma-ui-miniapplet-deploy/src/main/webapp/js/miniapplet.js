@@ -187,6 +187,45 @@ var MiniApplet = {
 			return navigator.javaEnabled();
 		},
 
+		/** Comprueba si una cadena de texto es una URL (http/https). La alternativa implicaria ser un Base64. */ 
+		isValidUrl : function (data) { 
+			return data != null && data.length > "https://".length &&
+				("http:" == data.substr(0, 5) || "https:" == data.substr(0, 6));
+		},
+		
+		downloadRemoteData : function (url) {
+			var req = MiniApplet.getHttpRequest();
+			req.open("GET", url, false);
+			req.overrideMimeType('text\/plain; charset=x-user-defined');
+			req.send(null);
+			
+			if (req.readyState != 4 || req.status != 200) {
+				throw new Exception();
+		    }
+			return Base64.encode(req.responseText);
+		},
+
+		// getHttpRequest
+		getHttpRequest : function () {
+			var activexmodes=["Msxml2.XMLHTTP", "Microsoft.XMLHTTP"]; //activeX versions to check for in IE
+			if (window.ActiveXObject){ //Test for support for ActiveXObject in IE first (as XMLHttpRequest in IE7 is broken)
+				for (var i=0; i<activexmodes.length; i++) {
+					try {
+						return new ActiveXObject(activexmodes[i]);
+					}
+					catch(e) {
+						//suppress error
+					}
+				}
+			}
+			else if (window.XMLHttpRequest) { // if Mozilla, Safari etc
+				return new XMLHttpRequest();
+			}
+			else {
+				return false;
+			}
+		},
+		
 		/** Permite habilitar la comprobacion de la hora local contra la hora del servidor y
 		 * establecer un tiempo maximo permitido y el comportamiento si se supera.
 		 * Parametros:
@@ -202,7 +241,7 @@ var MiniApplet = {
 			}
 			
 			// Hacemos una llamada al servidor para conocer su hora
-			var xhr = new XMLHttpRequest(); 
+			var xhr = MiniApplet.getHttpRequest(); 
 			xhr.open('GET', document.URL + '/' + Math.random(), false); 
 			xhr.send(); 
 
@@ -317,6 +356,20 @@ var MiniApplet = {
 		sign : function (dataB64, algorithm, format, params, successCallback, errorCallback) {
 			
 			this.forceLoad();
+			
+			// Si el parametro es una URL (HTTP/HTTPS), descargamos los datos
+			if (MiniApplet.isValidUrl(dataB64)) {
+				try {
+					dataB64 = MiniApplet.downloadRemoteData(dataB64);
+				} catch(e) {
+					if (errorCallback == undefined || errorCallback == null) {
+						throw e;
+					}
+					errorCallback("java.io.IOException", "Error al descargar los datos remotos");
+					return;
+				}
+			}
+			
 			if (MiniApplet.clientType == MiniApplet.TYPE_APPLET) {
 				try {
 					this.setData(dataB64);
@@ -339,6 +392,33 @@ var MiniApplet = {
 		coSign : function (signB64, dataB64, algorithm, format, params, successCallback, errorCallback) {
 			
 			this.forceLoad();
+			
+			// Si el parametro es una URL (HTTP/HTTPS), descargamos los datos
+			if (MiniApplet.isValidUrl(signB64)) {
+				try {
+					signB64 = MiniApplet.downloadRemoteData(signB64);
+				} catch(e) {
+					if (errorCallback == undefined || errorCallback == null) {
+						throw e;
+					}
+					errorCallback("java.io.IOException", "Error al descargar la firma remota");
+					return;
+				}
+			}
+			
+			// Si el parametro es una URL (HTTP/HTTPS), descargamos los datos
+			if (MiniApplet.isValidUrl(dataB64)) {
+				try {
+					dataB64 = MiniApplet.downloadRemoteData(dataB64);
+				} catch(e) {
+					if (errorCallback == undefined || errorCallback == null) {
+						throw e;
+					}
+					errorCallback("java.io.IOException", "Error al descargar los datos remotos");
+					return;
+				}
+			}
+						
 			if (MiniApplet.clientType == MiniApplet.TYPE_APPLET) {
 				try {
 					this.setData(signB64);
@@ -361,6 +441,20 @@ var MiniApplet = {
 		counterSign : function (signB64, algorithm, format, params, successCallback, errorCallback) {
 			
 			this.forceLoad();
+			
+			// Si el parametro es una URL (HTTP/HTTPS), descargamos los datos
+			if (MiniApplet.isValidUrl(signB64)) {
+				try {
+					signB64 = MiniApplet.downloadRemoteData(signB64);
+				} catch(e) {
+					if (errorCallback == undefined || errorCallback == null) {
+						throw e;
+					}
+					errorCallback("java.io.IOException", "Error al descargar la firma remota");
+					return;
+				}
+			}
+			
 			if (MiniApplet.clientType == MiniApplet.TYPE_APPLET) {
 				try {
 					this.setData(signB64);
@@ -460,7 +554,7 @@ var MiniApplet = {
 				MiniApplet.clienteFirma.setServlets(storageServlet,  retrieverServlet);
 			}
 		},
-
+		
 		/*************************************************************
 		 *  FUNCIONES PARA EL DESPLIEGUE DEL APPLET					 *
 		 **************************************************************/
@@ -913,13 +1007,13 @@ var MiniApplet = {
 					"policyIdentifierHashAlgorithm=http://www.w3.org/2000/09/xmldsig#sha1\n" +
 					"policyIdentifierHash=V8lVVNGDCPen6VELRD1Ja8HARFk=";
 				}
-//				else if (compareFormats(format, "PAdES") || compareFormats(format, "PDF")) {
-//					// NO DISPONIBLE HASTA LA VERSION 1.9 DE LA POLITICA
-//				expandedPolicy = "policyIdentifier=urn:oid:2.16.724.1.3.1.1.2.1.8\n" +
-//				"policyQualifier=http://administracionelectronica.gob.es/es/ctt/politicafirma/politica_firma_AGE_v1_8.pdf\n" +
-//				"policyIdentifierHashAlgorithm=http://www.w3.org/2000/09/xmldsig#sha1\n" +
-//				"policyIdentifierHash=7SxX3erFuH31TvAw9LZ70N7p1vA=";
-//				}
+				else if (compareFormats(format, "PAdES") || compareFormats(format, "PDF")) {
+					// NO DISPONIBLE HASTA LA VERSION 1.9 DE LA POLITICA
+				expandedPolicy = "policyIdentifier=urn:oid:2.16.724.1.3.1.1.2.1.8\n" +
+				"policyQualifier=http://administracionelectronica.gob.es/es/ctt/politicafirma/politica_firma_AGE_v1_8.pdf\n" +
+				"policyIdentifierHashAlgorithm=http://www.w3.org/2000/09/xmldsig#sha1\n" +
+				"policyIdentifierHash=7SxX3erFuH31TvAw9LZ70N7p1vA=";
+				}
 
 				if (expandedPolicy != "") {
 					config = config.replace(EXPAND_POLICIY_KEY_AND_VALUE, expandedPolicy);
@@ -1206,27 +1300,6 @@ var MiniApplet = {
 				}
 
 				setTimeout(retrieveRequest, 4000, httpRequest, url, params.replace("&it=" + (iterations-1), "&it=" + iterations), cipherKey, successCallback, errorCallback);
-			}
-
-			// getHttpRequest
-			function getHttpRequest() {
-				var activexmodes=["Msxml2.XMLHTTP", "Microsoft.XMLHTTP"]; //activeX versions to check for in IE
-				if (window.ActiveXObject){ //Test for support for ActiveXObject in IE first (as XMLHttpRequest in IE7 is broken)
-					for (var i=0; i<activexmodes.length; i++) {
-						try {
-							return new ActiveXObject(activexmodes[i]);
-						}
-						catch(e) {
-							//suppress error
-						}
-					}
-				}
-				else if (window.XMLHttpRequest) { // if Mozilla, Safari etc
-					return new XMLHttpRequest();
-				}
-				else {
-					return false;
-				}
 			}
 
 			/**
