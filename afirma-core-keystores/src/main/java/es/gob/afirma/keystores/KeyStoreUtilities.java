@@ -96,9 +96,9 @@ public final class KeyStoreUtilities {
     private static final int ALIAS_MAX_LENGTH = 120;
 
     /** Obtiene una mapa con las descripciones usuales de los alias de
-     * certificados (como claves de estas &uacute;ltimas). Se aplicar&acute;n los
-     * filtros de certificados sobre todos ellos y se devolver&acute;n aquellos
-     * certificados que cumplan con alguno de los filtros definidos.
+     * certificados (como claves de estas &uacute;ltimas). Se aplicar&aacute;n los
+     * filtros de certificados sobre todos ellos y se devolver&aacute;n aquellos
+     * certificados que cumplan con los filtros definidos.
      * @param aliases
      *        Alias de los certificados entre los que el usuario debe
      *        seleccionar uno
@@ -111,10 +111,11 @@ public final class KeyStoreUtilities {
      *        privada o no, para no mostrar aquellos que carezcan de ella
      * @param showExpiredCertificates
      *        Indica si se deben o no mostrar los certificados caducados o
-     *        aun no v&aacute;lidos
+     *        a&uacute;n no v&aacute;lidos
      * @param certFilters
      *        Filtros a aplicar sobre los certificados.
-     * @return Alias seleccionado por el usuario */
+     * @return Mapa que asocia los alias reales de los certificados que han pasados los
+     * filtros con un nombre mas amistoso. */
     public static Map<String, String> getAliasesByFriendlyName(final String[] aliases,
                                                                final KeyStoreManager ksm,
                                                                final boolean checkPrivateKeys,
