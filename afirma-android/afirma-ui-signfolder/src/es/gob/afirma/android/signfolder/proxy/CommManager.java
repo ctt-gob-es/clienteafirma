@@ -105,7 +105,7 @@ public final class CommManager {
 		sb.append("="); //$NON-NLS-1$
 		sb.append(dataB64UrlSafe);
 
-		Log.i("es.gob.afirma", "URL de peticion:\n" + sb.toString());
+		Log.i("es.gob.afirma", "URL de peticion:\n" + sb.toString()); //$NON-NLS-1$
 
 		return sb.toString();
 	}
@@ -209,16 +209,6 @@ public final class CommManager {
 		final String dataB64UrlSafe = prepareParam(XmlRequestsFactory
 				.createPostsignRequest(requests,
 						Base64.encode(cert.getEncoded())));
-
-		Log.i("es.gob.afirma", "Parametro postfirma:");
-
-		int i = 0;
-		while (dataB64UrlSafe.length() >= 512 * (i + 1)) {
-			Log.i("es.gob.afirma", i + " " + dataB64UrlSafe.substring(512 * i, 512 * (i + 1)));
-			i++;
-		}
-		Log.i("es.gob.afirma", i + " " + dataB64UrlSafe.substring(512 * i));
-
 
 		return PostsignsResponseParser.parse(getRemoteDocument(prepareUrl(
 				OPERATION_POSTSIGN, dataB64UrlSafe)));

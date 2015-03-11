@@ -205,24 +205,19 @@ public final class TriphaseSignDocumentRequest {
 
 		String toXMLConfig() {
 
-			Log.i("es.gob.afirma", "Parametros del <result>:");
 			final StringBuilder builder = new StringBuilder();
 			if (this.signCount != null) {
-				Log.i("es.gob.afirma", "Agregamos: sc");
 				builder.append(NODE_PART_1).append("sc").append(NODE_PART_2).append(this.signCount.intValue()).append(NODE_PART_3); //$NON-NLS-1$
 			}
 
 			if (this.needData != null) {
-				Log.i("es.gob.afirma", "Agregamos: nd");
 				builder.append(NODE_PART_1).append("nd").append(NODE_PART_2).append(this.needData.booleanValue()).append(NODE_PART_3); //$NON-NLS-1$
 			}
 
 			if (this.needPreSign != null) {
 				if (this.needPreSign.booleanValue() && this.preSign != null) {
-					Log.i("es.gob.afirma", "Agregamos: np");
 					builder.append(NODE_PART_1).append("np").append(NODE_PART_2).append(this.needPreSign.booleanValue()).append(NODE_PART_3); //$NON-NLS-1$
 					for (int i = 0; i < this.preSign.size(); i++) {
-						Log.i("es.gob.afirma", "Agregamos: pre." + i);
 						builder.append(NODE_PART_1).append("pre.").append(i).append(NODE_PART_2).append(Base64.encode(this.preSign.get(i))).append(NODE_PART_3); //$NON-NLS-1$
 					}
 				}
@@ -230,14 +225,12 @@ public final class TriphaseSignDocumentRequest {
 			if (this.session != null) {
 				for (int i = 0; i < this.session.size(); i++) {
 					if (this.session.get(i) != null) {
-						Log.i("es.gob.afirma", "Agregamos: ss." + i + ": " + this.session.get(i));
 						builder.append(NODE_PART_1).append("ss.").append(i).append(NODE_PART_2).append(this.session.get(i)).append(NODE_PART_3); //$NON-NLS-1$
 					}
 				}
 			}
 			if (this.pk1 != null) {
 				for (int i = 0; i < this.pk1.size(); i++) {
-					Log.i("es.gob.afirma", "Agregamos: pk1." + i);
 					builder.append(NODE_PART_1).append("pk1.").append(i).append(NODE_PART_2).append(Base64.encode(this.pk1.get(i))).append(NODE_PART_3); //$NON-NLS-1$
 				}
 			}
