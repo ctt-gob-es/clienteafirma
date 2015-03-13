@@ -80,8 +80,8 @@ public final class TestXMLdSig {
 
     /** Algoritmos de firma a probar. */
     private final static String[] ALGOS = new String[] {
-            AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA,
-//            AOSignConstants.SIGN_ALGORITHM_SHA512WITHRSA,
+//            AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA,
+            AOSignConstants.SIGN_ALGORITHM_SHA512WITHRSA,
 //            AOSignConstants.SIGN_ALGORITHM_SHA256WITHRSA,
 //            AOSignConstants.SIGN_ALGORITHM_SHA384WITHRSA
     };
