@@ -1,5 +1,6 @@
 package es.gob.afirma.signers.cadestri.client;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -9,6 +10,7 @@ import java.util.Properties;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import es.gob.afirma.core.AOException;
@@ -47,7 +49,7 @@ public final class TestCadesTriphase {
 	 * @throws AOException
 	 * @throws IOException */
 	@Test
-//	@Ignore // Necesita el servidor
+	@Ignore // Necesita el servidor
 	public void firma() throws AOException, IOException {
 		final AOSigner signer = new AOCAdESTriPhaseSigner();
 
@@ -56,15 +58,15 @@ public final class TestCadesTriphase {
 			config.setProperty(key, this.serverConfig.getProperty(key));
 		}
 
-		final byte[] result = signer.sign("Hola Mundo".getBytes(), "SHA512withRSA", this.pke.getPrivateKey(), this.pke.getCertificateChain(), config); //$NON-NLS-1$
+		final byte[] result = signer.sign("Hola Mundo".getBytes(), "SHA512withRSA", this.pke.getPrivateKey(), this.pke.getCertificateChain(), config); //$NON-NLS-1$ //$NON-NLS-2$
 
 		Assert.assertNotNull("Error durante el proceso de firma, resultado nulo", result); //$NON-NLS-1$
 
-		FileOutputStream os = new FileOutputStream("C:/users/A122466/Desktop/firma_tri.csig");
+		final FileOutputStream os = new FileOutputStream(File.createTempFile("firma_tri_", ".csig")); //$NON-NLS-1$ //$NON-NLS-2$
 		os.write(result);
 		os.close();
 
-		System.out.println("OK");
+//		System.out.println("OK");
 //		Logger.getLogger("es.gob.afirma").info("El resultado de la firma es: " + new String(result)); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
@@ -72,7 +74,7 @@ public final class TestCadesTriphase {
 	 * @throws AOException
 	 * @throws IOException */
 	@Test
-	//@Ignore // Necesita el servidor
+	@Ignore // Necesita el servidor
 	public void cofirma() throws AOException, IOException {
 		final AOSigner signer = new AOCAdESTriPhaseSigner();
 
@@ -81,8 +83,8 @@ public final class TestCadesTriphase {
 			config.setProperty(key, this.serverConfig.getProperty(key));
 		}
 
-		InputStream is = ClassLoader.getSystemResourceAsStream("firma_tri.csig"); //$NON-NLS-1$
-		byte[] signature = AOUtil.getDataFromInputStream(is);
+		final InputStream is = ClassLoader.getSystemResourceAsStream("firma_tri.csig"); //$NON-NLS-1$
+		final byte[] signature = AOUtil.getDataFromInputStream(is);
 		is.close();
 
 		final byte[] result = signer.cosign(
@@ -94,11 +96,11 @@ public final class TestCadesTriphase {
 
 		Assert.assertNotNull("Error durante el proceso de firma, resultado nulo", result); //$NON-NLS-1$
 
-		FileOutputStream os = new FileOutputStream("C:/users/A122466/Desktop/cofirma_tri.csig");
+		final FileOutputStream os = new FileOutputStream(File.createTempFile("cofirma_tri_", ".csig")); //$NON-NLS-1$ //$NON-NLS-2$
 		os.write(result);
 		os.close();
 
-		System.out.println("OK");
+//		System.out.println("OK");
 //		Logger.getLogger("es.gob.afirma").info("El resultado de la firma es: " + new String(result)); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
@@ -106,7 +108,7 @@ public final class TestCadesTriphase {
 	 * @throws AOException
 	 * @throws IOException */
 	@Test
-	//@Ignore // Necesita el servidor
+	@Ignore // Necesita el servidor
 	public void contrafirma() throws AOException, IOException {
 		final AOSigner signer = new AOCAdESTriPhaseSigner();
 
@@ -115,8 +117,8 @@ public final class TestCadesTriphase {
 			config.setProperty(key, this.serverConfig.getProperty(key));
 		}
 
-		InputStream is = ClassLoader.getSystemResourceAsStream("cofirma_tri.csig"); //$NON-NLS-1$
-		byte[] signature = AOUtil.getDataFromInputStream(is);
+		final InputStream is = ClassLoader.getSystemResourceAsStream("cofirma_tri.csig"); //$NON-NLS-1$
+		final byte[] signature = AOUtil.getDataFromInputStream(is);
 		is.close();
 
 		final byte[] result = signer.countersign(
@@ -130,11 +132,11 @@ public final class TestCadesTriphase {
 
 		Assert.assertNotNull("Error durante el proceso de firma, resultado nulo", result); //$NON-NLS-1$
 
-		FileOutputStream os = new FileOutputStream("C:/users/A122466/Desktop/contrafirma_tri.csig");
+		final FileOutputStream os = new FileOutputStream(File.createTempFile("contrafirma_tri_", ".csig")); //$NON-NLS-1$ //$NON-NLS-2$
 		os.write(result);
 		os.close();
 
-		System.out.println("OK");
+//		System.out.println("OK");
 //		Logger.getLogger("es.gob.afirma").info("El resultado de la firma es: " + new String(result)); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
