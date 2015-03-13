@@ -10,7 +10,6 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import com.lowagie.text.DocumentException;
 import com.lowagie.text.exceptions.BadPasswordException;
 import com.lowagie.text.pdf.PdfArray;
 import com.lowagie.text.pdf.PdfDeveloperExtension;
@@ -48,7 +47,6 @@ final class PdfUtil {
 			                      final boolean headLess) throws BadPdfPasswordException,
 			                                                     InvalidPdfException,
 			                                                     IOException {
-
 		// Contrasena del propietario del PDF
 		final String ownerPassword = extraParams.getProperty("ownerPassword"); //$NON-NLS-1$
 
@@ -134,41 +132,11 @@ final class PdfUtil {
 		);
 	}
 
-	static void managePdfEncryption(final PdfStamper stp,
-			                        final PdfReader pdfReader,
-			                        final Properties extraParams) {
-
-		// Contrasena del propietario del PDF
-		final String ownerPassword = extraParams.getProperty("ownerPassword"); //$NON-NLS-1$
-
-		// Contrasena del usuario del PDF
-		final String userPassword =  extraParams.getProperty("userPassword"); //$NON-NLS-1$
-
-		if (pdfReader.isEncrypted() && (ownerPassword != null || userPassword != null)) {
-			if (Boolean.TRUE.toString().equalsIgnoreCase(extraParams.getProperty("avoidEncryptingSignedPdfs"))) { //$NON-NLS-1$
-				LOGGER.info(
-					"Aunque el PDF original estaba encriptado no se encriptara el PDF firmado (se establecio el indicativo 'avoidEncryptingSignedPdfs')" //$NON-NLS-1$
-				);
-			}
-			else {
-				LOGGER.info(
-					"El PDF original estaba encriptado, se intentara encriptar tambien el PDF firmado" //$NON-NLS-1$
-				);
-				try {
-					stp.setEncryption(
-						ownerPassword != null ? ownerPassword.getBytes() : null,
-						userPassword != null ? userPassword.getBytes() : null,
-						pdfReader.getPermissions(),
-						pdfReader.getCryptoMode()
-					);
-				}
-				catch (final DocumentException de) {
-					LOGGER.warning(
-						"No se ha podido cifrar el PDF destino, se escribira sin contrasena: " + de //$NON-NLS-1$
-					);
-				}
-			}
+	static boolean getAppendMode(final Properties extraParams, final PdfReader pdfReader) {
+		if (extraParams.getProperty("ownerPassword") != null || extraParams.getProperty("userPassword") != null) { //$NON-NLS-1$ //$NON-NLS-2$
+			return true;
 		}
+		return Boolean.parseBoolean(extraParams.getProperty("alwaysCreateRevision")) || pdfReader.getAcroFields().getSignatureNames().size() > 0; //$NON-NLS-1$
 	}
 
 	static boolean pdfHasUnregisteredSignatures(final byte[] pdf, final Properties xParams) throws InvalidPdfException, BadPdfPasswordException, IOException {

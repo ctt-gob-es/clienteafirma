@@ -79,7 +79,7 @@ public final class PdfTimestamper {
         				baos,      // Salida
         				'\0',      // Mantener version
         				null,      // No crear temporal
-        				Boolean.parseBoolean(extraParams.getProperty("alwaysCreateRevision", "false")) || pdfReader.getAcroFields().getSignatureNames().size() > 0, //$NON-NLS-1$ //$NON-NLS-2$
+        				PdfUtil.getAppendMode(extraParams, pdfReader), // Append Mode
         				signTime   // Momento de la firma
         			);
         		}
@@ -99,9 +99,6 @@ public final class PdfTimestamper {
         		sap.setAcro6Layers(true);
         		sap.setRender(PdfSignatureAppearance.SignatureRenderDescription);
         		sap.setSignDate(signTime);
-
-        		// Gestion de los cifrados
-        		PdfUtil.managePdfEncryption(stp, pdfReader, extraParams);
 
         		final PdfSignature pdfSignature = new PdfSignature(
     				PdfName.ADOBE_PPKLITE,

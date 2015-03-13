@@ -80,9 +80,6 @@ public final class PdfSessionManager {
 		// **************** LECTURA PARAMETROS ADICIONALES *********************************************************************
 		// *********************************************************************************************************************
 
-    	// Forzar la creacion de revisiones incluso en PDF no firmados
-    	final boolean alwaysCreateRevision = Boolean.parseBoolean(extraParams.getProperty("alwaysCreateRevision", "false")); //$NON-NLS-1$ //$NON-NLS-2$
-
     	// Imagen de la rubrica
 		final Image rubric = PdfPreProcessor.getImage(extraParams.getProperty("signatureRubricImage")); //$NON-NLS-1$
 
@@ -228,8 +225,8 @@ public final class PdfSessionManager {
 				'\0',
 				// No crear temporal
 				null,
-				// Si hay mas firmas o asi me lo indican, creo una revision
-				alwaysCreateRevision || pdfReader.getAcroFields().getSignatureNames().size() > 0,
+				// Append Mode
+				PdfUtil.getAppendMode(extraParams, pdfReader),
 				// Momento de la firma
 				signTime
 			);
@@ -280,9 +277,6 @@ public final class PdfSessionManager {
 		}
 
 		sap.setSignDate(signTime);
-
-		// Gestion de los cifrados
-		PdfUtil.managePdfEncryption(stp, pdfReader, extraParams);
 
 		// Pagina en donde se imprime la firma
 		if (page == LAST_PAGE) {
