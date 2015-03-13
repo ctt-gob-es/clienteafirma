@@ -35,14 +35,14 @@
   <dt><b><i>image</i></b></dt>
    <dd>
     Imagen que se desea insertar en el PDF antes de que este sea firmado. La imagen debe proporcionarse en formato JPEG codificado en Base64.<br>
-    SI el documento ya contiene firmas es posible que se invaliden, por lo que conviene usarlo &uacute;nicamente en documentos sin firmas previas.
+    Si el documento ya contiene firmas es posible que se invaliden, por lo que conviene usarlo &uacute;nicamente en documentos sin firmas previas.
    </dd>
   <dt><b><i>imagePage</i></b></dt>
    <dd>
     P&aacute;gina donde desea insertarse la imagen indicada mediante el par&aacute;metro <code>image</code>. La numeraci&oacute;n de las p&aacute;ginas
     comienza en uno.<br>
-    Si se indica -1 como n&uacute;mero de p&aacute;gina se inserta la imagen en la &uacute;ltima p&aacute;gina del documento.
-    Si se indica 0 como n&uacute;mero de p&aacute;gina se inserta la imagen en todas las p&aacute;ginas del documento.
+    Si se indica <i>-1</i> como n&uacute;mero de p&aacute;gina se inserta la imagen en la &uacute;ltima p&aacute;gina del documento.
+    Si se indica <i>0</i> como n&uacute;mero de p&aacute;gina se inserta la imagen en todas las p&aacute;ginas del documento.
     Este par&aacute;metro es obligatorio, si no se indica una p&aacute;gina v&aacute;lida no se insertar&aacute; la imagen.
    </dd> 
   <dt><b><i>imagePositionOnPageLowerLeftX</i></b></dt>
@@ -295,8 +295,8 @@
    <dd>Contrase&ntilde;a del usuario de la TSA. Se ignora si no se ha establecido adem&aacute;s <code>tsaUsr</code>.</dd>
   <dt><b><i>tsaSslKeyStore</i></b></dt>
    <dd>
-    Almac&eacute;n de claves en base64 que contiene el certificado SSL cliente que pedir&aacute; la TSA al establecer la 
-    coneci&oacute;s HTTPS.
+    Almac&eacute;n de claves codificado en Base64 que contiene el certificado SSL cliente que pedir&aacute; la TSA al establecer la 
+    conexi&oacute;n HTTPS.
    </dd>
   <dt><b><i>tsaSslKeyStorePassword</i></b></dt>
    <dd>
@@ -304,7 +304,8 @@
    </dd>
    <dt><b><i>tsaSslKeyStoreType</i></b></dt>
    <dd>
-    Tipo del almac&eacute;n de claves que contiene el certificado SSL cliente para las conexiones HTTPS. Puede ser "PKCS12" o "JKS".
+    Tipo del almac&eacute;n de claves que contiene el certificado SSL cliente para las conexiones HTTPS.<br>
+    El formato <code>JKS</code> puede no funcionar adecuadamente en Android.
    </dd>
    <dt><b><i>tsaSslTrustStore</i></b></dt>
    <dd>
@@ -316,7 +317,8 @@
    </dd>
    <dt><b><i>tsaSslTrustStoreType</i></b></dt>
    <dd>
-    Tipo del almac&eacute;n de confianza que contiene los certificados emisores del certificado SSL de la TSA.
+    Tipo del almac&eacute;n de confianza que contiene los certificados emisores del certificado SSL de la TSA.<br>
+    El formato <code>JKS</code> puede no funcionar adecuadamente en Android.
    </dd>
    <dt><b><i>signingCertificateV2</i></b> (propiedad compartida con CAdES)</dt>
    <dd>Si se indica a <code>true</code> se utilizar&aacute; SigningCertificateV2, si se indica cualquier otra cosa SigningCertificateV1.
