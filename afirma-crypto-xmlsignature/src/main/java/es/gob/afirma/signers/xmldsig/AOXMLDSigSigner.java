@@ -1434,8 +1434,11 @@ public final class AOXMLDSigSigner implements AOSigner {
             // recuperar la cadena nos devuelva null
             Certificate[] certs = null;
             final boolean onlySignningCert = Boolean.parseBoolean(
-            		extraParams.getProperty(
-            				"includeOnlySignningCertificate", Boolean.FALSE.toString())); //$NON-NLS-1$
+        		extraParams.getProperty(
+    				"includeOnlySignningCertificate", //$NON-NLS-1$
+    				Boolean.FALSE.toString()
+				)
+    		);
 			if (!onlySignningCert) {
 				certs = certChain;
 			}
@@ -1472,7 +1475,7 @@ public final class AOXMLDSigSigner implements AOSigner {
     		);
         }
         catch (final Exception e) {
-            throw new AOException("Error al generar la cofirma XMLdSig", e); //$NON-NLS-1$
+            throw new AOException("Error al generar la cofirma XMLdSig: " + e, e); //$NON-NLS-1$
         }
 
         return Utils.writeXML(rootSig, originalXMLProperties, null, null);
@@ -1820,7 +1823,7 @@ public final class AOXMLDSigSigner implements AOSigner {
             }
         }
         catch (final Exception e) {
-            throw new AOException("No se ha podido realizar la contrafirma", e); //$NON-NLS-1$
+            throw new AOException("No se ha podido realizar la contrafirma: " + e, e); //$NON-NLS-1$
         }
     }
 
