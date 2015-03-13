@@ -153,7 +153,11 @@ public final class Utils {
                     continue;
                 }
                 try {
-                    transformParam = new XPathFilter2ParameterSpec(Collections.singletonList(new XPathType(transformBody, xPath2TransformFilter)));
+                    transformParam = new XPathFilter2ParameterSpec(
+                		Collections.singletonList(
+            				new XPathType(transformBody, xPath2TransformFilter)
+        				)
+            		);
                 }
                 catch (final Exception e) {
                     LOGGER.warning(
@@ -164,11 +168,15 @@ public final class Utils {
             }
             else if (Transform.XSLT.equals(transformType) && transformBody != null) {
                 try {
-                    transformParam =
-                            new XSLTTransformParameterSpec(new DOMStructure(DocumentBuilderFactory.newInstance()
-                                                                                                  .newDocumentBuilder()
-                                                                                                  .parse(new ByteArrayInputStream(transformBody.getBytes()))
-                                                                                                  .getDocumentElement()));
+                    transformParam = new XSLTTransformParameterSpec(
+                		new DOMStructure(
+            				DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(
+        						new ByteArrayInputStream(
+    								transformBody.getBytes()
+								)
+    						).getDocumentElement()
+						)
+            		);
                 }
                 catch (final Exception e) {
                     LOGGER.warning(
@@ -202,23 +210,18 @@ public final class Utils {
         }
     }
 
-    /** Obtiene de un nodo de referencia de tipo Object la lista de
+    /** Obtiene de un nodo de referencia de tipo <i>Object</i> la lista de
      * transformaciones definidas. Si no tiene transfgormaciones definidas,
      * devuelve {@code null}.
-     * @param referenceNode
-     *        Nodo de tipo referencia.
-     * @param namespacePrefix
-     *        Prefijo del namespace de la firma (opcional).
+     * @param referenceNode Nodo de tipo referencia.
+     * @param namespacePrefix Prefijo del espacio de nombres de la firma (opcional).
      * @return Listado de transformaciones.
-     * @throws InvalidAlgorithmParameterException
-     *         Cuando se encuentre un par&aacute;metro inv&aacute;lido para
-     *         el algoritmo de transformaci&oacute;n.
-     * @throws NoSuchAlgorithmException
-     *         Cuando se encuentre un algoritmo de transformaci&oacute;n no
-     *         soportado. */
-    public static List<Transform> getObjectReferenceTransforms(final Node referenceNode, final String namespacePrefix) throws NoSuchAlgorithmException,
-                                                                                                                        InvalidAlgorithmParameterException {
-
+     * @throws InvalidAlgorithmParameterException Cuando se encuentre un par&aacute;metro inv&aacute;lido para
+     *                                            el algoritmo de transformaci&oacute;n.
+     * @throws NoSuchAlgorithmException Cuando se encuentre un algoritmo de transformaci&oacute;n no soportado. */
+    public static List<Transform> getObjectReferenceTransforms(final Node referenceNode,
+    		                                                   final String namespacePrefix) throws NoSuchAlgorithmException,
+                                                                                                    InvalidAlgorithmParameterException {
         final ArrayList<Transform> transformList = new ArrayList<Transform>();
 
         // El nodo de referencia puede contener un nodo "Transforms" que a su
@@ -300,9 +303,13 @@ public final class Utils {
                             params = new XPathFilterParameterSpec(xpathTransformNode.getTextContent());
                         }
                         else {
-                            params =
-                                    new XPathFilterParameterSpec(xpathTransformNode.getTextContent(), Collections.singletonMap(namespacePrefix,
-                                                                                                                               XMLSignature.XMLNS));
+                            params = new XPathFilterParameterSpec(
+                        		xpathTransformNode.getTextContent(),
+                        		Collections.singletonMap(
+                    				namespacePrefix,
+                                    XMLSignature.XMLNS
+                                )
+                            );
                         }
 
                         break;
@@ -546,7 +553,9 @@ public final class Utils {
             DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
         }
         catch (final Exception e) {
-            LOGGER.severe("No se ha podido recargar el XML para insertar los atributos de la cabecera, quizas la codificacion se vea afectada: " + e); //$NON-NLS-1$
+            LOGGER.severe(
+        		"No se ha podido recargar el XML para insertar los atributos de la cabecera, quizas la codificacion se vea afectada: " + e //$NON-NLS-1$
+    		);
             return baos.toByteArray();
         }
 
@@ -573,11 +582,9 @@ public final class Utils {
     }
 
     /** Genera un objeto descriptor de firma.
-     * @param namespace
-     *        Espacio de nombres utilizado para la recuperaci&oacute;n de
-     *        atributos XAdES.
-     * @param signature
-     *        Nodo de firma.
+     * @param namespace Espacio de nombres utilizado para la recuperaci&oacute;n de
+     *                  atributos XAdES.
+     * @param signature Nodo de firma.
      * @return Objeto descriptor de firma. */
     public static AOSimpleSignInfo getSimpleSignInfoNode(final String namespace, final Element signature) {
 
