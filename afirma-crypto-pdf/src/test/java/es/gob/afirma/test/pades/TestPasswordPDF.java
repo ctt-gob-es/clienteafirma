@@ -1,3 +1,5 @@
+package es.gob.afirma.test.pades;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
