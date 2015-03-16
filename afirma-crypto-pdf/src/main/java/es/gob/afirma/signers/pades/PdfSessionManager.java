@@ -55,6 +55,9 @@ public final class PdfSessionManager {
 
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma");  //$NON-NLS-1$
 
+    private static final int PDF_MAX_VERSION = 7;
+    private static final int PDF_MIN_VERSION = 2;
+
     private PdfSessionManager() {
     	// No permitimos la instanciacion
     }
@@ -112,10 +115,25 @@ public final class PdfSessionManager {
 		try {
 			certificationLevel = extraParams.getProperty("certificationLevel") != null ? //$NON-NLS-1$
 				Integer.parseInt(extraParams.getProperty("certificationLevel")) : //$NON-NLS-1$
-					-1;
+					UNDEFINED;
 		}
 		catch(final Exception e) {
 			certificationLevel = UNDEFINED;
+		}
+
+		// Establecimiento de version PDF
+		int pdfVersion;
+		try {
+			pdfVersion = extraParams.getProperty("pdfVersion") != null ? //$NON-NLS-1$
+				Integer.parseInt(extraParams.getProperty("pdfVersion")) : //$NON-NLS-1$
+					UNDEFINED;
+		}
+		catch(final Exception e) {
+			pdfVersion = UNDEFINED;
+		}
+		if (pdfVersion == UNDEFINED || pdfVersion < PDF_MIN_VERSION || pdfVersion > PDF_MAX_VERSION) {
+			LOGGER.warning("Se ha establecido un valor invalido para version, se ignorara: " + pdfVersion); //$NON-NLS-1$
+			pdfVersion = UNDEFINED;
 		}
 
 		// *****************************
@@ -217,18 +235,12 @@ public final class PdfSessionManager {
 		final PdfStamper stp;
 		try {
 			stp = PdfStamper.createSignature(
-				// PDF de entrada
-				pdfReader,
-				// Salida
-				baos,
-				// Mantener version
-				'\0',
-				// No crear temporal
-				null,
-				// Append Mode
-				PdfUtil.getAppendMode(extraParams, pdfReader),
-				// Momento de la firma
-				signTime
+				pdfReader, // PDF de entrada
+				baos,      // Salida
+				pdfVersion == UNDEFINED ? '\0' /* Mantener version */ : Integer.toString(pdfVersion).toCharArray()[0] /* Version a medida */,
+				null,      // No crear temporal
+				PdfUtil.getAppendMode(extraParams, pdfReader), // Append Mode
+				signTime   // Momento de la firma
 			);
 		}
 		catch(final BadPasswordException e) {
@@ -257,7 +269,9 @@ public final class PdfSessionManager {
 
 		// Aplicamos todos los atributos de firma
 		final PdfSignatureAppearance sap = stp.getSignatureAppearance();
-		stp.setFullCompression();
+		if (pdfVersion > 4) {
+			stp.setFullCompression();
+		}
 		sap.setAcro6Layers(true);
 
 		PdfUtil.enableLtv(stp);
@@ -453,8 +467,13 @@ public final class PdfSessionManager {
 
 		// Certificacion del PDF (NOT_CERTIFIED = 0, CERTIFIED_NO_CHANGES_ALLOWED = 1,
 		// CERTIFIED_FORM_FILLING = 2, CERTIFIED_FORM_FILLING_AND_ANNOTATIONS = 3)
-		if (certificationLevel != -1) {
+		if (certificationLevel != UNDEFINED) {
 			sap.setCertificationLevel(certificationLevel);
+		}
+
+		// Version del PDF
+		if (pdfVersion != UNDEFINED) {
+			stp.getWriter().setPdfVersion(Integer.toString(pdfVersion).toCharArray()[0]);
 		}
 
 		// Reservamos el espacio necesario en el PDF para insertar la firma
