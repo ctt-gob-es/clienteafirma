@@ -1232,6 +1232,9 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 				// Establecemos el mimetype de los datos
 				configureDataTypeExtraParams(SignApplet.this.getGenericConfig());
 
+				// Configuramos la politica
+				SignApplet.this.configurePolicy();
+				
 				// Obtenemos los parametros necesarios segun tipo de
 				// contrafirma. Esto son los firmantes
 				// para la contrafirma de firmantes, los nodos para la
@@ -1526,6 +1529,9 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 			final String description,
 			final String qualifier,
 			final String hashB64) {
+		
+		LOGGER.info("Invocando setPolicy con el identificador: " + identifier); //$NON-NLS-1$
+		
 		// El identificador puede ser un OID o una URI (incluyendo una URN de tipo OID)
 		if (identifier != null) {
 			// Probamos primero si es un OID
@@ -1991,7 +1997,10 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 				// para los signers a los que aplique
 				SignApplet.this.addAttributes(signer);
 
-				// Finalmente, configuramos y operamos
+				// Configuramos la politica
+				SignApplet.this.configurePolicy();
+				
+				// Finalmente, configuramos el modo, la URI y operamos
 				SignApplet.this.getGenericConfig().setProperty("mode", mode); //$NON-NLS-1$
 				if (SignApplet.this.getInternalFileUri() != null) {
 					SignApplet.this.getGenericConfig().setProperty("uri", SignApplet.this.getInternalFileUri()); //$NON-NLS-1$
