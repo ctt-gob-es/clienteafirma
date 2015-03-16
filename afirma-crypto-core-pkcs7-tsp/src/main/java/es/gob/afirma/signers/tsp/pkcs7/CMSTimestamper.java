@@ -389,7 +389,8 @@ public final class CMSTimestamper {
 	    		Class<?> sunHttpsURLConnectionClass;
 	    		try {
 	    			sunHttpsURLConnectionClass = Class.forName("com.sun.net.ssl.HttpsURLConnection"); //$NON-NLS-1$
-	    		} catch (Exception e) {
+	    		}
+	    		catch (final Exception e) {
 	    			sunHttpsURLConnectionClass = null;
 	    		}
 
@@ -403,14 +404,15 @@ public final class CMSTimestamper {
 	    				final Method setDefaultHostnameVerifierMethod = sunHttpsURLConnectionClass.getDeclaredMethod("setDefaultHostnameVerifier"); //$NON-NLS-1$
 	    				setDefaultHostnameVerifierMethod.invoke(
 	    						null,
-	    						new  com.sun.net.ssl.HostnameVerifier() {
+	    						new com.sun.net.ssl.HostnameVerifier() {
 	    							@Override
 	    							public boolean verify(final String arg0, final String arg1) {
 	    								return true;
 	    							}
-	    						});
+	    						}
+						);
 	    			}
-	    			catch (Exception e) {
+	    			catch (final Exception e) {
 	    				LOGGER.warning(
 	    						"Ocurrio un error al intentar instanciar una conexion de tipo 'com.sun.net.ssl.HttpsURLConnection' para sobreescribir la conexion el host, se continuara la operacion" //$NON-NLS-1$
 	    						);
@@ -418,8 +420,8 @@ public final class CMSTimestamper {
 	    		}
 	    		else {
 	    			LOGGER.warning(
-	    					"No se ha podido deshabilitar la comprobacion de nombre de host, tipo desconocido de conexion: " + conn.getClass().getName() //$NON-NLS-1$
-	    					);
+	    				"No se ha podido deshabilitar la comprobacion de nombre de host, tipo desconocido de conexion: " + conn.getClass().getName() //$NON-NLS-1$
+	    			);
 	    		}
 	    	}
     	}
