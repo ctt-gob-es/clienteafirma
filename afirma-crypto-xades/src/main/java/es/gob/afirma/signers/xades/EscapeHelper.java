@@ -62,7 +62,7 @@ final class EscapeHelper {
      *  ; ESC, one of &lt;escaped&gt;, leading SHARP or SPACE, trailing SPACE, and NULL.
      *  string =   [ ( leadchar / pair ) [ *( stringchar / pair ) ( trailchar / pair ) ] ]
      * </pre>
-     * E indica el juego de carcateres soportados:
+     * E indica el juego de caracteres soportados:
      * <pre>
      *  leadchar = LUTF1 / UTFMB
      *  LUTF1 = %x01-1F / %x21 / %x24-2A / %x2D-3A / %x3D / %x3F-5B / %x5D-7F
@@ -90,7 +90,7 @@ final class EscapeHelper {
      *  hexpair = HEX HEX
      * </pre>
      * Lo cual deja la posibilidad abierta de hacer el tratamiento RFC4515-3 de forma manual.<br>
-     * No obstante, es posible una aproximaci&oacute;n m&aacute;s sencilla antendiendo al punto 2.4 (<i>Converting an AttributeValue
+     * No obstante, es posible una aproximaci&oacute;n m&aacute;s sencilla atendiendo al punto 2.4 (<i>Converting an AttributeValue
      * from ASN.1 to a String</i>), donde podemos leer:
      * <pre>
      *  [...] the value is converted first to a UTF-8-encoded Unicode string [...]
@@ -109,7 +109,7 @@ final class EscapeHelper {
      *  <li>Otros caracteres se protegen con '&#92;xx'.</li>
      * </ul>
      * <p>
-     *  Al incoporar Java un codificador Java acorde a la <a href="https://www.ietf.org/rfc/rfc2253.txt">RFC-2253</a> (una versi&oacute;n
+     *  Al incorporar Java un codificador Java acorde a la <a href="https://www.ietf.org/rfc/rfc2253.txt">RFC-2253</a> (una versi&oacute;n
      *  obsoleta de la RFC 4514), es posible considerar que este simple tratamiento podr&iacute;a ser aceptable sin m&aacute;s.
      *  Conviene no obstante notar que esta codificaci&oacute;n podr&iacute;a ser insuficiente en ciertos casos, ya que la RFC 4514, en
      *  su punto 2.4 (<i>Converting an AttributeValue from ASN.1 to a String</i>) indica:
@@ -157,10 +157,10 @@ final class EscapeHelper {
      *  characters appearing in the AttributeValue's string representation
      *  (as demonstrated in the final example of Section 4).
      * </pre>
-     * Con lo que es posible concluir que ser&iacute; necesario usar <i>#hex</i> para codificar el
+     * Con lo que es posible concluir que ser&iacute;a necesario usar <i>#hex</i> para codificar el
      * <code>KeyName</code> de XAdES cuando contenga un DN X.500, cosa que <u>no</u> se est&aacute; haciendo.
      * <p>
-     *  Por &uacute;tilmo, faltar&iacute;a tambi&eacute;n eliminar los espacios entre los RDN X.500 atendiendo a
+     *  Por &uacute;ltimo, faltar&iacute;a tambi&eacute;n eliminar los espacios entre los RDN X.500 atendiendo a
      *  lo recogido en el Ap&eacute;ndice A:
      * </p>
      * <pre>
