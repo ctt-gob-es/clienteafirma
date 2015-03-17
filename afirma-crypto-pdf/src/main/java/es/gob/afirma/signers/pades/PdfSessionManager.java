@@ -269,7 +269,8 @@ public final class PdfSessionManager {
 
 		// Aplicamos todos los atributos de firma
 		final PdfSignatureAppearance sap = stp.getSignatureAppearance();
-		if (pdfVersion > 4) {
+		// La compresion solo para versiones superiores a la 4
+		if (pdfVersion > PDF_MIN_VERSION) {
 			stp.setFullCompression();
 		}
 		sap.setAcro6Layers(true);

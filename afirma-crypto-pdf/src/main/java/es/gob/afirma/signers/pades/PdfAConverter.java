@@ -21,12 +21,19 @@ import com.lowagie.text.pdf.PdfWriter;
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public final class PdfAConverter {
 
+	private static final int PDF_MAX_VERSION = 7;
+	private static final int PDF_MIN_VERSION = 4;
+
+	private PdfAConverter() {
+		// No instanciable
+	}
+
 	/** Convierte un PDF en PDF/A1B.
 	 * @param originalPdf PDF original.
 	 * @return PDF original convertido a PDF/A1B.
 	 * @throws IOException Si ocurre cualquier problema en la conversi&oacute;n. */
 	public static byte[] convertToPdfA(final byte[] originalPdf) throws IOException {
-		return convertToPdfA(originalPdf, 7);
+		return convertToPdfA(originalPdf, PDF_MAX_VERSION);
 	}
 
 	/** Convierte un PDF en PDF/A1B.
@@ -40,7 +47,7 @@ public final class PdfAConverter {
 			throw new IllegalArgumentException("El PDF de entrada no puede ser nulo"); //$NON-NLS-1$
 		}
 
-		if (outputPdfVersion < 4 || outputPdfVersion > 7) {
+		if (outputPdfVersion < PDF_MIN_VERSION || outputPdfVersion > PDF_MAX_VERSION) {
 			throw new IllegalArgumentException(
 				"La version del PDF de salida debe estar comprendida entre 4 y 7: " + outputPdfVersion //$NON-NLS-1$
 			);
