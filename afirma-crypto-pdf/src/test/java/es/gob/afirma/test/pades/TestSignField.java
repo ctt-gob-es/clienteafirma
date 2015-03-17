@@ -24,9 +24,9 @@ public class TestSignField {
 
 	private final static String DEFAULT_SIGNATURE_ALGORITHM = "SHA512withRSA"; //$NON-NLS-1$
 
-	private final static String CERT_PATH = "ANF_PF_Activo.pfx"; //$NON-NLS-1$
-	private final static String CERT_PASS = "12341234"; //$NON-NLS-1$
-	private final static String CERT_ALIAS = "anf usuario activo"; //$NON-NLS-1$
+    private static final String CERT_PATH = "PFActivoFirSHA256.pfx"; //$NON-NLS-1$
+    private static final String CERT_PASS = "12341234"; //$NON-NLS-1$
+    private static final String CERT_ALIAS = "fisico activo prueba"; //$NON-NLS-1$
 
 	/** Prueba de firma de PDF insertando imagen.
 	 * @throws Exception En cualquier error. */
