@@ -33,7 +33,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Logger;
 
-import javax.xml.crypto.dom.DOMStructure;
 import javax.xml.crypto.dsig.Transform;
 import javax.xml.crypto.dsig.XMLSignature;
 import javax.xml.crypto.dsig.XMLSignatureFactory;
@@ -42,7 +41,6 @@ import javax.xml.crypto.dsig.spec.XPathFilter2ParameterSpec;
 import javax.xml.crypto.dsig.spec.XPathFilterParameterSpec;
 import javax.xml.crypto.dsig.spec.XPathType;
 import javax.xml.crypto.dsig.spec.XPathType.Filter;
-import javax.xml.crypto.dsig.spec.XSLTTransformParameterSpec;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.OutputKeys;
 
@@ -162,25 +160,6 @@ public final class Utils {
                 catch (final Exception e) {
                     LOGGER.warning(
                        "No se han podido crear los parametros para una transformacion XPATH2, se omitira: " + e //$NON-NLS-1$
-                    );
-                    continue;
-                }
-            }
-            else if (Transform.XSLT.equals(transformType) && transformBody != null) {
-                try {
-                    transformParam = new XSLTTransformParameterSpec(
-                		new DOMStructure(
-            				DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(
-        						new ByteArrayInputStream(
-    								transformBody.getBytes()
-								)
-    						).getDocumentElement()
-						)
-            		);
-                }
-                catch (final Exception e) {
-                    LOGGER.warning(
-                       "No se han podido crear los parametros para una transformacion XSLT, se omitira: " + e //$NON-NLS-1$
                     );
                     continue;
                 }
