@@ -45,7 +45,7 @@ import es.gob.afirma.core.ui.AOUIFactory;
 public final class PdfSessionManager {
 
     /** Referencia a la &uacute;ltima p&aacute;gina del documento PDF. */
-    static final int LAST_PAGE = -666;
+    static final int LAST_PAGE = -1;
 
     private static final int UNDEFINED = -1;
     private static final int DEFAULT_LAYER_2_FONT_SIZE = 12;
@@ -498,6 +498,5 @@ public final class PdfSessionManager {
     private static Rectangle getSignaturePositionOnPage(final Properties extraParams) {
     	return PdfPreProcessor.getPositionOnPage(extraParams, "signature"); //$NON-NLS-1$
     }
-
 
 }

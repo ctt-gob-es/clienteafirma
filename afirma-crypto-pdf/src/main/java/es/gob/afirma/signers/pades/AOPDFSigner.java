@@ -66,9 +66,6 @@ public final class AOPDFSigner implements AOSigner {
 
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma");  //$NON-NLS-1$
 
-    /** Referencia a la &uacute;ltima p&aacute;gina del documento PDF. */
-    public static final int LAST_PAGE = -666;
-
     /** Firma un documento PDF en formato PAdES.
      * <p>
      *  Notas sobre documentos <i>certificados</i>:<br>

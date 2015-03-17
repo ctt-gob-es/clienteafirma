@@ -32,6 +32,10 @@ public final class PdfPreProcessor {
 
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma");  //$NON-NLS-1$
 
+    private static final int LAST_PAGE = -1;
+    private static final int ALL_PAGES = 0;
+    private static final int FIRST_PAGE = 1;
+
 	private PdfPreProcessor() {
 		// No permitimos la instancacion
 	}
@@ -154,12 +158,12 @@ public final class PdfPreProcessor {
 			throw new IOException("Se ha indicado un numero de pagina con formato invalido para insertar la imagen (" + imagePage + "): " + e, e); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
-		if (pageNum == -1) {
+		if (pageNum == LAST_PAGE) {
 			pageNum = pdfReader.getNumberOfPages();
 		}
 		final int pageLimit;
-		if (pageNum == 0) {
-			pageNum = 1;
+		if (pageNum == ALL_PAGES) {
+			pageNum = FIRST_PAGE;
 			pageLimit = pdfReader.getNumberOfPages();
 		}
 		else {
