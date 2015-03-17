@@ -179,7 +179,11 @@
   <dt><b><i>xmlTransform</i>n<i>Subtype</i></b></dt>
    <dd>Subtipo de la transformaci&oacute;n <i>n</i> (por ejemplo, "intersect", "subtract" o "union" para XPATH2).</dd>
   <dt><b><i>xmlTransform</i>n<i>Body</i></b></dt>
-   <dd>Cuerpo de la transformaci&oacute;n <i>n</i>.</dd>
+   <dd>
+    Cuerpo de la transformaci&oacute;n <i>n</i>.
+    Los valores aceptados y sus funcionalidades dependen de los valores indicados en <code>xmlTransform<i>n</i>Type</code>
+    y en <code>xmlTransform<i>n</i>Subtype</code>.
+   </dd>
   <dt><b><i>referencesDigestMethod</i></b></dt>
    <dd>
     Algoritmo de huella digital a usar en las referencias XML (referencesDigestMethod). Debe indicarse como una URL,
@@ -257,11 +261,10 @@
   &nbsp;&nbsp;&nbsp;&nbsp;<b><i>intersect</i></b>: Intersecci&oacute;n<br>
   &nbsp;&nbsp;&nbsp;&nbsp;<b><i>union</i></b>: Uni&oacute;n<br>
   &nbsp;&nbsp;-<b>Cuerpo</b>: Especificado mediante sentencias de tipo XPATH2.<br>
-  <br>Transformaci&oacute;n <b>XSLT</b><br>
-  &nbsp;&nbsp;-<b>Tipo</b>: <code>http://www.w3.org/TR/1999/REC-xslt-19991116</code><br>
-  &nbsp;&nbsp;-<b>Subtipos</b>: No tiene subtipos.<br>
-  &nbsp;&nbsp;-<b>Cuerpo</b>: Especificado mediante sentencias de tipo XSLT.<br>
-  <br>Transformaci&oacute;n <b>BASE64</b><br>
+  <br>Transformaci&oacute;n <b>BASE64</b>. 
+  La transformación es inversa, es decir, los datos se descodifican desde Base64 antes de firmarse, 
+  por lo que estos deben estar previamente codificados en Base64 e indicarse mediante el par&aacute;metro
+  adicional <code>encodign=base64</code><br>
   &nbsp;&nbsp;-<b>Tipo</b>: <code>http://www.w3.org/2000/09/xmldsig#base64</code><br>
   &nbsp;&nbsp;-<b>Subtipos</b>: No tiene subtipos.<br>
   &nbsp;&nbsp;-<b>Cuerpo</b>: No tiene cuerpo.
