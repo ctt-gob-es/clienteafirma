@@ -73,7 +73,7 @@ final class EscapeHelper {
      *  stringchar = SUTF1 / UTFMB
      *  SUTF1 = %x01-21 / %x23-2A / %x2D-3A / %x3D / %x3F-5B / %x5D-7F
 	 * </pre>
-	 * Y tal y como re recoge en <a href="http://tools.ietf.org/html/rfc4512">http://tools.ietf.org/html/rfc4512</a> se puede observar:
+	 * Y tal y como se recoge en <a href="http://tools.ietf.org/html/rfc4512">http://tools.ietf.org/html/rfc4512</a> se puede observar:
 	 * <pre>
 	 *  UTFMB   = UTF2 / UTF3 / UTF4
      *  UTF2    = %xC2-DF UTF0
