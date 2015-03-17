@@ -21,6 +21,24 @@ import com.lowagie.text.pdf.PdfWriter;
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public final class PdfAConverter {
 
+	/** Tipos de PDF/X. */
+	public enum PDFX {
+		/** PDF normal. */
+		PDF,
+		/** PDF/A (ISO 19005). */
+		PDFA,
+		/** PDF/A-1 (ISO 19005-1). */
+		PDFA1,
+		/** PDF/A-1a (ISO 19005-1 Level A). */
+		PDFA1A,
+		/** PDF/A-1b (ISO 19005-1 Level B). */
+		PDFA1B,
+		/** PDF/A-2 (ISO 19005 parte 2). */
+		PDFA2,
+		/** PDF/A-3 (ISO 19005-3:2012 Parte 3). */
+		PDFA3
+	}
+
 	private static final int PDF_MAX_VERSION = 7;
 	private static final int PDF_MIN_VERSION = 4;
 
@@ -105,6 +123,31 @@ public final class PdfAConverter {
 
         return baos.toByteArray();
 
+	}
+
+	/** Indica el nivel de adherencia a las especificaciones PDF/A del PDF indicado.
+	 * @param pdfIn PDF de entrada.
+	 * @return Nivel de adherencia a las especificaciones PDF/A.
+	 * @throws IOException Si hay problemas en el tratamiento de datos. */
+	public static PDFX getPdfXConformance(final byte[] pdfIn) throws IOException {
+		final PdfReader reader = new PdfReader(pdfIn);
+		final String meta = new String(reader.getMetadata());
+		if (meta.contains("<pdfaid:part>1</pdfaid:part>")) { //$NON-NLS-1$
+			if (meta.contains("<pdfaid:conformance>A</pdfaid:conformance>")) { //$NON-NLS-1$
+				return PDFX.PDFA1A;
+			}
+			else if (meta.contains("<pdfaid:conformance>B</pdfaid:conformance>")) { //$NON-NLS-1$
+				return PDFX.PDFA1B;
+			}
+			return PDFX.PDFA1;
+		}
+		if (meta.contains("<pdfaid:part>2</pdfaid:part>")) { //$NON-NLS-1$
+			return PDFX.PDFA2;
+		}
+		if (meta.contains("<pdfaid:part>3</pdfaid:part>")) { //$NON-NLS-1$
+			return PDFX.PDFA3;
+		}
+		return PDFX.PDF;
 	}
 
 }

@@ -8,6 +8,7 @@ import org.junit.Test;
 
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.signers.pades.PdfAConverter;
+import es.gob.afirma.signers.pades.PdfAConverter.PDFX;
 
 /** Pruebas de conversi&oacute;n a PDF/X.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
@@ -31,4 +32,16 @@ public final class TestPdfAConverter {
         os.close();
         System.out.println("Temporal para comprobacion manual: " + saveFile.getAbsolutePath()); //$NON-NLS-1$
 	}
+
+	/** Prueba de detecci&oacute;n de PDF/X.
+	 * @throws Exception En cualquier error. */
+	@SuppressWarnings("static-method")
+	@Test
+	public void testPdfXDetection() throws Exception {
+		final byte[] testPdf = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(TEST_FILE));
+        final byte[] result = PdfAConverter.convertToPdfA(testPdf);
+        final PDFX conf = PdfAConverter.getPdfXConformance(result);
+        System.out.println(conf);
+	}
+
 }
