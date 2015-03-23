@@ -58,14 +58,17 @@ var MiniApplet = {
 		/* Constantes para la operacion interna del Cliente */
 		/* ------------------------------------------------ */
 		
-		/* Longitud maximo de una URL en Android para la invocacion de una aplicacion nativa. */
+		/* Longitud maxima de una URL en Android para la invocacion de una aplicacion nativa. */
 		MAX_LONG_ANDROID_URL : 2000,
 		
-		/* Longitud maximo de una URL en iOS para la invocacion de una aplicacion nativa. */
+		/* Longitud maxima de una URL en iOS para la invocacion de una aplicacion nativa. */
 		MAX_LONG_IOS_URL : 80000,
 		
-		/* Longitud maximo de una URL en Windows 8 para la invocacion de una aplicacion nativa. */
+		/* Longitud maxima de una URL en Windows 8 para la invocacion de una aplicacion nativa. */
 		MAX_LONG_WINDOWS8_URL : 2000,
+		
+		/* Longitud maxima que generalmente se permite a una URL. */
+		MAX_LONG_GENERAL_URL : 2000,
 
 		/* Tamano del buffer con el que se pasa informacion al applet */
 		BUFFER_SIZE : 1024 * 1024,
@@ -153,20 +156,6 @@ var MiniApplet = {
 			return navigator.userAgent.toUpperCase().indexOf("CHROME") != -1 ||
 				navigator.userAgent.toUpperCase().indexOf("CHROMIUM") != -1;
 		},
-		
-		/**
-		 * Determina con un boolean si el navegador es Internet Explorer 10
-		 */
-		isIE10 : function () {
-			return navigator.userAgent.toUpperCase().indexOf("MSIE 10.0") != -1;
-		},
-		
-		/**
-		 * Determina con un boolean si el navegador es Internet Explorer 11
-		 */
-		isIE11 : function () {
-			return !!navigator.userAgent.match(/Trident.*rv 11\./);
-		},
 
 		isURLTooLong : function (url) {
 			if (MiniApplet.isAndroid()) {
@@ -178,7 +167,7 @@ var MiniApplet = {
 			else if (MiniApplet.isWindows8()) {
 				return url.length > MiniApplet.MAX_LONG_WINDOWS8_URL;
 			}
-			return false;
+			return url.length > MiniApplet.MAX_LONG_GENERAL_URL;
 		},
 		
 		/** Indica si el navegador detecta Java. Este valor no es completamente fiable, ya que
@@ -192,7 +181,7 @@ var MiniApplet = {
 			return data != null && data.length > "https://".length &&
 				("http:" == data.substr(0, 5) || "https:" == data.substr(0, 6));
 		},
-		
+
 		downloadRemoteData : function (url) {
 			var req = MiniApplet.getHttpRequest();
 			req.open("GET", url, false);
@@ -560,9 +549,9 @@ var MiniApplet = {
 		 **************************************************************/
 		
 		loadMiniApplet : function (attributes, parameters) {
-			// Internet Explorer (a excepcion de la version 10) se carga mediante un
+			// Internet Explorer se carga mediante un
 			// elemento <object>. El resto con un <embed>.
-			if (MiniApplet.isInternetExplorer()) { // && !MiniApplet.isIE10()) {
+			if (MiniApplet.isInternetExplorer()) {
 				
 				var appletTag = "<object classid='clsid:8AD9C840-044E-11D1-B3E9-00805F499D93' width='" + attributes["width"] + "' height='" + attributes["height"] + "' id='" + attributes["id"] + "'>";
 
@@ -580,7 +569,7 @@ var MiniApplet = {
 
 				appletTag += "</object>";
 
-				// Al agregar con append() estos nodos no se carga automaticamente el applet en IE10 e inferiores, así que
+				// Al agregar con append() estos nodos no se carga automaticamente el applet en IE10 e inferiores, asï¿½ que
 				// hay que usar document.write() o innerHTML. Para asegurarnos de no pisar HTML previo, crearemos un <div>
 				// en la pagina, lo recogeremos e insertaremos dentro suyo el codigo del applet.
 				var divElem = document.createElement("div");
@@ -771,7 +760,7 @@ var MiniApplet = {
 				
 				var idSession = generateNewIdSession();
 				var cipherKey = generateCipherKey();
-				
+
 				var i = 0;
 				var params = new Array();
 				if (signId != null && signId != undefined) {			params[i++] = {key:"op", value:encodeURIComponent(signId)}; }
@@ -1102,7 +1091,7 @@ var MiniApplet = {
 				// Identificador del fichero (equivalente a un id de sesion) del que deben recuperarse los datos
 				var fileId = generateNewIdSession(); 
 
-				var httpRequest = getHttpRequest();
+				var httpRequest = MiniApplet.getHttpRequest();
 				if (!httpRequest) {
 					this.throwException("java.lang.Exception", "Su navegador no permite preprocesar los datos que desea tratar");
 				}
@@ -1177,25 +1166,34 @@ var MiniApplet = {
 					document.location = url;
 				}
 				else {
-					var iframeElem = document.createElement("iframe");
-					
-					var srcAttr = document.createAttribute("src");
-					srcAttr.value = url;
-					iframeElem.setAttributeNode(srcAttr);
-					
-					var heightAttr = document.createAttribute("height");
-					heightAttr.value = 1;
-					iframeElem.setAttributeNode(heightAttr);
-					
-					var widthAttr = document.createAttribute("width");
-					widthAttr.value = 1;
-					iframeElem.setAttributeNode(widthAttr);
-					
-					var seamlessAttr = document.createAttribute("seamless");
-					seamlessAttr.value = "seamless";
-					iframeElem.setAttributeNode(seamlessAttr);
-					
-					document.body.appendChild(iframeElem);
+					if (document.getElementById("iframeAfirma") != null) {
+						document.getElementById("iframeAfirma").src = url;
+					}
+					else {
+						var iframeElem = document.createElement("iframe");
+
+						var idAttr = document.createAttribute("id");
+						idAttr.value = "iframeAfirma";
+						iframeElem.setAttributeNode(idAttr);
+
+						var srcAttr = document.createAttribute("src");
+						srcAttr.value = url;
+						iframeElem.setAttributeNode(srcAttr);
+
+						var heightAttr = document.createAttribute("height");
+						heightAttr.value = 1;
+						iframeElem.setAttributeNode(heightAttr);
+
+						var widthAttr = document.createAttribute("width");
+						widthAttr.value = 1;
+						iframeElem.setAttributeNode(widthAttr);
+
+						var seamlessAttr = document.createAttribute("seamless");
+						seamlessAttr.value = "seamless";
+						iframeElem.setAttributeNode(seamlessAttr);
+
+						document.body.appendChild(iframeElem);
+					}
 				}
 			};
 
@@ -1249,10 +1247,9 @@ var MiniApplet = {
 				errorCallback(this.errorType, this.errorMessage);
 			};
 
-
 			this.getStoredFileFromServlet = function (idDocument, servletAddress, cipherKey, successCallback, errorCallback) {
 
-				var httpRequest = getHttpRequest();
+				var httpRequest = MiniApplet.getHttpRequest();
 				if (!httpRequest) {
 					this.throwException("java.lang.Exception", "Su navegador no permite obtener el resulado de la operaci\u00F3n");
 				}
