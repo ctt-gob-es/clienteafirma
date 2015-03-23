@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.KeyStore.PrivateKeyEntry;
+import java.util.Arrays;
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.logging.Logger;
@@ -63,6 +64,8 @@ public final class ProtocolInvocationLauncher {
 	private static final String SAF_12 = "SAF_12"; //$NON-NLS-1$
 	private static final String SAF_13 = "SAF_13"; //$NON-NLS-1$
 	private static final String SAF_14 = "SAF_14"; //$NON-NLS-1$
+	private static final String SAF_15 = "SAF_15"; //$NON-NLS-1$
+	private static final String SAF_16 = "SAF_16"; //$NON-NLS-1$
 
 	private static final Dictionary<String, String> ERRORS = new Hashtable<String, String>();
 	static {
@@ -81,6 +84,8 @@ public final class ProtocolInvocationLauncher {
 		ERRORS.put(SAF_12, ProtocolMessages.getString("ProtocolLauncher.12")); //$NON-NLS-1$
 		ERRORS.put(SAF_13, ProtocolMessages.getString("ProtocolLauncher.13")); //$NON-NLS-1$
 		ERRORS.put(SAF_14, ProtocolMessages.getString("ProtocolLauncher.14")); //$NON-NLS-1$
+		ERRORS.put(SAF_15, ProtocolMessages.getString("ProtocolLauncher.15")); //$NON-NLS-1$
+		ERRORS.put(SAF_16, ProtocolMessages.getString("ProtocolLauncher.16")); //$NON-NLS-1$
 	}
 
 	private static final String METHOD_OP_PUT = "put"; //$NON-NLS-1$
@@ -109,20 +114,56 @@ public final class ProtocolInvocationLauncher {
 	    }
 
 		if (urlString == null) {
+			LOGGER.severe("No se ha proporcionado una URL para la invocacion");
 			showError(SAF_01);
 			return null;
 		}
 		if (!urlString.startsWith("afirma://")) { //$NON-NLS-1$
+			LOGGER.severe("La URL de invocacion no comienza por 'afirma://'");
 			showError(SAF_02);
 			return SAF_02;
 		}
 		if (urlString.startsWith("afirma://service?") || urlString.startsWith("afirma://service/?")) { //$NON-NLS-1$ //$NON-NLS-2$
+			LOGGER.info("Se inicia la invocacion por servicio");
 			ServiceInvocationManager.startService(urlString);
 			return RESULT_OK;
 		}
 		else if (urlString.startsWith("afirma://save?") || urlString.startsWith("afirma://save/?")) { //$NON-NLS-1$ //$NON-NLS-2$
+			LOGGER.info("Se invoca a la aplicacion para el guardado de datos");
+			
 			try {
-				return processSave(ProtocolInvocationUriParser.getParametersToSave(urlString));
+				UrlParametersToSave params = ProtocolInvocationUriParser.getParametersToSave(urlString);
+				
+				// Si se indica un identificador de fichero, es que la configuracion se tiene que
+				// descargar desde el servidor intermedio
+				if (params.getFileId() != null) {
+					
+					StringBuilder dataUrl = new StringBuilder(params.getRetrieveServletUrl().toString()).
+							append("?").append("op=get&v=1_0&id=").append(params.getFileId());
+					byte[] recoveredData = 
+							UrlHttpManagerFactory.getInstalledManager().readUrlByPost(dataUrl.toString());
+					
+					// Si los datos recibidos representan un error, detenemos la ejecucion
+					if (recoveredData.length > 8 && new String(Arrays.copyOf(recoveredData, 8)).toLowerCase().startsWith("err-")) {
+						LOGGER.severe("Error al recuperar los datos del servidor intermedio: " + new String(recoveredData)); //$NON-NLS-1$
+						showError(SAF_16);
+						return SAF_16;
+					}
+					
+					// Si no ha ocurrido un error, debemos haber recibido los datos cifrados
+					byte[] xmlData;
+					try {
+						xmlData = CypherDataManager.decipherData(recoveredData, params.getDesKey());
+					}
+					catch (final Exception e) {
+						LOGGER.severe("Error en el descifrado de los datos: " + e); //$NON-NLS-1$
+						showError(SAF_15);
+						return SAF_15;
+					}
+					
+					params = ProtocolInvocationUriParser.getParametersToSave(xmlData);
+				}
+				return processSave(params);
 			}
 			catch(final ParameterNeedsUpdatedVersionException e) {
 				LOGGER.severe("Se necesita una version mas moderna de Firma Facil para procesar la peticion: " + e); //$NON-NLS-1$
@@ -144,8 +185,42 @@ public final class ProtocolInvocationLauncher {
 				 urlString.startsWith("afirma://cosign?") || urlString.startsWith("afirma://cosign/?") || //$NON-NLS-1$ //$NON-NLS-2$
 				 urlString.startsWith("afirma://countersign?") || urlString.startsWith("afirma://countersign/?") //$NON-NLS-1$ //$NON-NLS-2$
 		) {
+			LOGGER.info("Se invoca a la aplicacion para realizar una operacion de firma/multifirma");
+			
 			try {
-				return processSign(ProtocolInvocationUriParser.getParametersToSign(urlString));
+				UrlParametersToSign params = ProtocolInvocationUriParser.getParametersToSign(urlString);
+				
+				// Si se indica un identificador de fichero, es que la configuracion se tiene que
+				// descargar desde el servidor intermedio
+				if (params.getFileId() != null) {
+					
+					StringBuilder dataUrl = new StringBuilder(params.getRetrieveServletUrl().toString()).
+							append("?").append("op=get&v=1_0&id=").append(params.getFileId());
+					byte[] recoveredData = 
+							UrlHttpManagerFactory.getInstalledManager().readUrlByPost(dataUrl.toString());
+					
+					// Si los datos recibidos representan un error, detenemos la ejecucion
+					if (recoveredData.length > 8 && new String(Arrays.copyOf(recoveredData, 8)).toLowerCase().startsWith("err-")) {
+						LOGGER.severe("Error al recuperar los datos del servidor intermedio: " + new String(recoveredData)); //$NON-NLS-1$
+						showError(SAF_16);
+						return SAF_16;
+					}
+					
+					// Si no ha ocurrido un error, debemos haber recibido los datos cifrados
+					byte[] xmlData;
+					try {
+						xmlData = CypherDataManager.decipherData(recoveredData, params.getDesKey());
+					}
+					catch (final Exception e) {
+						LOGGER.severe("Error en el descifrado de los datos: " + e); //$NON-NLS-1$
+						showError(SAF_15);
+						return SAF_15;
+					}
+					
+					params = ProtocolInvocationUriParser.getParametersToSign(xmlData);
+				}
+				
+				return processSign(params);
 			}
 			catch(final ParameterNeedsUpdatedVersionException e) {
 				LOGGER.severe("Se necesita una version mas moderna de Firma Facil para procesar la peticion: " + e); //$NON-NLS-1$
@@ -164,6 +239,7 @@ public final class ProtocolInvocationLauncher {
 			}
 		}
 		else {
+			LOGGER.severe("No se ha identificado el motivo de la invocacion de la aplicacion");
 			showError(SAF_04);
 			return SAF_04;
 		}
@@ -196,11 +272,11 @@ public final class ProtocolInvocationLauncher {
 			final File selectedDataFile;
 			try {
 				selectedDataFile = AOUIFactory.getLoadFiles(
-					ProtocolMessages.getString("ProtocolLauncher.15"), //$NON-NLS-1$
+					ProtocolMessages.getString("ProtocolLauncher.17"), //$NON-NLS-1$
 					new JFileChooser().getFileSystemView().getDefaultDirectory().toString(),
 					null,
 					null,
-					ProtocolMessages.getString("ProtocolLauncher.16"), //$NON-NLS-1$
+					ProtocolMessages.getString("ProtocolLauncher.18"), //$NON-NLS-1$
 					false,
 					false,
 					null,
@@ -385,7 +461,7 @@ public final class ProtocolInvocationLauncher {
 			return RESULT_CANCEL;
 		}
 		catch (final Exception e) {
-			LOGGER.severe("Error en el salvado de datos: " + e); //$NON-NLS-1$
+			LOGGER.severe("Error en el guardado de datos: " + e); //$NON-NLS-1$
 			showError(SAF_05);
 			return SAF_05;
 		}
