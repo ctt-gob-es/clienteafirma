@@ -31,13 +31,13 @@ import es.gob.afirma.signers.ooxml.AOOOXMLSigner;
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public final class TestOOXML {
 
-    private static final String CERT_PATH = "ANF_PF_Activo.pfx"; //$NON-NLS-1$
+    private static final String CERT_PATH = "PFActivoFirSHA1.pfx"; //$NON-NLS-1$
     private static final String CERT_PASS = "12341234"; //$NON-NLS-1$
-    private static final String CERT_ALIAS = "anf usuario activo"; //$NON-NLS-1$
+    private static final String CERT_ALIAS = "fisico activo prueba"; //$NON-NLS-1$
 
-    private static final String CERT_PATH2 = "ANF_PJ_Activo.pfx"; //$NON-NLS-1$
+    private static final String CERT_PATH2 = "PJActivoFirSHA1.pfx"; //$NON-NLS-1$
     private static final String CERT_PASS2 = "12341234"; //$NON-NLS-1$
-    private static final String CERT_ALIAS2 = "anf usuario activo"; //$NON-NLS-1$
+    private static final String CERT_ALIAS2 = "juridico activo prueba-b12345678"; //$NON-NLS-1$
 
     private static final String CERT_PATH3 = "CAMERFIRMA_PF_SW_Clave_usuario_Activo.p12"; //$NON-NLS-1$
     private static final String CERT_PASS3 = "1111"; //$NON-NLS-1$
