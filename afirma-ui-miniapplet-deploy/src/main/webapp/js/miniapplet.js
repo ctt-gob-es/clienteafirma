@@ -1057,7 +1057,7 @@ var MiniApplet = {
 			this.buildUrl = function(op, params) {
 
 				// Operacion seleccionada
-				var intentURL = this.getProtocol() + '://' + op + '?';
+				var intentURL = 'afirma://' + op + '?';
 				if (params != null && params != undefined) {
 					for (var i = 0; i < params.length; i++) {
 						intentURL += (i != 0 ? '&' : '') + params[i].key + '=' + params[i].value; 
@@ -1065,15 +1065,6 @@ var MiniApplet = {
 				}
 
 				return intentURL;
-			};
-			
-			this.getProtocol = function () {
-				// En Windows 8, siempre usaremos el modo "afirmametro", ya que por ahora
-				// la aplicacion con el protocolo "afirma" no hay otro disponible
-				if (MiniApplet.isWindows8()) {
-					return "afirmametro";
-				}
-				return "afirma";
 			};
 			
 			/**
