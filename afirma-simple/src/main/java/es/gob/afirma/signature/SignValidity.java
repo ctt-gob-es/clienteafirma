@@ -25,6 +25,10 @@ public final class SignValidity {
 			return "Validez de la firma desconocida"; //$NON-NLS-1$
 		}
 		final String ret = "Firma no valida"; //$NON-NLS-1$
+		if (this.error == null) {
+			return ret;
+		}
+		
 		switch (this.error) {
 			case NO_DATA:
 				return ret + ": no se puede comprobar la validez por no tener los datos firmados"; //$NON-NLS-1$
