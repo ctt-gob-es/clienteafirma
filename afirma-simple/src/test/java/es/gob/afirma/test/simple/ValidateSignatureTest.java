@@ -17,11 +17,6 @@ public class ValidateSignatureTest {
 
 	private static final String XMLDSIG_ENVELOPED = "xmldsig_enveloped_SHA1.xml"; //$NON-NLS-1$
 	private static final String CADES_EXPLICIT = "cades_explicit.csig"; //$NON-NLS-1$
-
-	private static final String[] SIGNATURES = new String[] {
-		XMLDSIG_ENVELOPED,
-		CADES_EXPLICIT
-	};
 	
 	/** Prueba de validaci&oacute;n de firmas.
 	 * @throws IOException */
@@ -46,7 +41,7 @@ public class ValidateSignatureTest {
 	public void testValidateBinarySign() throws IOException {
 
 			String signaturePath = CADES_EXPLICIT;
-		
+
 			InputStream is = ClassLoader.getSystemResourceAsStream(signaturePath);
 			final byte[] signature = AOUtil.getDataFromInputStream(is);
 			is.close();
