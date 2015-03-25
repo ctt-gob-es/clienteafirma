@@ -278,6 +278,9 @@ public final class AOXAdESSigner implements AOSigner {
     /** URI que define una referencia de tipo OBJECT. */
     static final String OBJURI = "http://www.w3.org/2000/09/xmldsig#Object"; //$NON-NLS-1$
 
+    /** URI que define una referencia de tipo MANIFEST. */
+    static final String MANIFESTURI = "http://www.w3.org/2000/09/xmldsig#Manifest"; //$NON-NLS-1$
+
     static final String AFIRMA = "AFIRMA"; //$NON-NLS-1$
     static final String XML_SIGNATURE_PREFIX = "ds"; //$NON-NLS-1$
     static final String XADES_SIGNATURE_PREFIX = "xades"; //$NON-NLS-1$

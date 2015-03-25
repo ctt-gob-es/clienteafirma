@@ -1175,10 +1175,12 @@ public final class XAdESSigner {
 
 			// Creamos un nodo padre donde insertar el Manifest
 			final List<XMLStructure> objectContent = new LinkedList<XMLStructure>();
-			objectContent.add(fac.newManifest(new ArrayList<Reference>(referenceList)));
 
 			final String manifestId = "Manifest-" + UUID.randomUUID().toString(); //$NON-NLS-1$
-			xmlSignature.addXMLObject(fac.newXMLObject(objectContent, manifestId, null, null));
+			objectContent.add(fac.newManifest(new ArrayList<Reference>(referenceList), manifestId));
+
+			final String manifestObjectId = "ManifestObject-" + UUID.randomUUID().toString(); //$NON-NLS-1$
+			xmlSignature.addXMLObject(fac.newXMLObject(objectContent, manifestObjectId, null, null));
 
 			// Si usamos un manifest las referencias no van en la firma, sino en el Manifest, y se
 			// usa entonces en la firma una unica referencia a este Manifest
@@ -1188,7 +1190,7 @@ public final class XAdESSigner {
 					"#" + manifestId, //$NON-NLS-1$
 					digestMethod,
 					Collections.singletonList(canonicalizationTransform),
-					AOXAdESSigner.OBJURI,
+					AOXAdESSigner.MANIFESTURI,
 					referenceId
 				)
 			);
