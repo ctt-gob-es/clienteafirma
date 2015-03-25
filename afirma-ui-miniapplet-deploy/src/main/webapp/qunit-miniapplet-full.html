@@ -1,8 +1,9 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE html>
 <html> 
   	<head>
 		<title>Pruebas - Despliege del MiniApplet @firma</title>
-	    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
+	   	<meta charset="UTF-8">
+	    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 		
 		<link rel="stylesheet" href="qunit/qunit-1.15.0.css">
 		<script src="qunit/qunit-1.15.0.js"></script>
@@ -86,24 +87,29 @@
 			// Array para almacenar todos los test
 			var arrayTest = [];	
 
+			var globalAssert;
+			
 			QUnit.test( " qunit-miniapplet-full-test", function( assert ) {
 				  	
+				globalAssert = assert;
+				
 				// Prueba carga del miniApplet
 				loadApplet(testCargaApplet );
+				
 				extractExtraInfo(testCargaApplet);
+				
 				testCargaApplet.data = MiniApplet.getCurrentLog();
+				
 				// guardamos el resultado del testFirma
 				arrayTest.push(testCargaApplet);
-					
-				// Prueba de firma.
+				
+				globalAssert.ok( testCargaApplet.result == true, "Test de carga");
+				
+				// Prueba de firma (agregamos un retraso para dar tiempo a la inicializacion del almacen)
 				extractExtraInfo(testFirma);
+				
 				testSign(correctTestFirma, failTestFirma);
-					   
-			  	assert.ok( testCargaApplet.result == true, "Test de carga");
-				assert.ok( testFirma.result == true, "Test de firma");
-				assert.ok( testCofirma.result == true, "Test de cofirma");
-				assert.ok( testContrafirma.result == true, "Test de contrafirma");
-			});
+			 });
 				
 			// Todos los test han finalizado, enviamos la informacion al servidor. La informacion es un JSON
 			QUnit.done(function() {
@@ -161,6 +167,7 @@
 				testContrafirma.data = MiniApplet.getCurrentLog();
 				// guardamos el resultado del testFirma
 				arrayTest.push(testContrafirma);
+				resultados();
 				
 			}
 			function failTestContrafirma(errorType, errorMsg) {
@@ -168,6 +175,7 @@
 				testContrafirma.data = MiniApplet.getCurrentLog();
 				// guardamos el resultado del testFirma
 				arrayTest.push(testContrafirma);
+				resultados();
 			}
 			
 			function extractExtraInfo(test) {
@@ -180,10 +188,19 @@
 				test.java_version = MiniAppletTests.getJavaVersion();
 				test.java_arch = MiniAppletTests.getJavaArch();
 			}
+			
+			function resultados() {
+				
+				globalAssert.ok( testFirma.result == true, "Test de firma");
+				globalAssert.ok( testCofirma.result == true, "Test de cofirma");
+				globalAssert.ok( testContrafirma.result == true, "Test de contrafirma");
+
+			}
 		</script>
 		
-		<form id="formResult" action="http://172.24.30.87:8080/afirma-miniapplet-store-testdata/TestStorer" method="post">
+		<form id="formResult" action="http://servidorcentral:8080/afirma-miniapplet-store-testdata/TestStorer" method="post">
 			<input type="hidden" name="json"/>
 		</form>
+	
 	</body>
 </html>	

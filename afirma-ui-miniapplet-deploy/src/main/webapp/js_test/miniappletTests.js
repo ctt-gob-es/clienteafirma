@@ -279,7 +279,7 @@
 	        cookies: cookieEnabled,
 	        flashVersion: flashVersion,
 	        javaVersion: javaVersion,
-	        javaArch: null,
+	        javaArch: null
 	    };
 	},
  
@@ -346,5 +346,5 @@
 			return v2;
 		}
 		return parseInt(v1.substr(v1.indexOf('_') + 1)) > parseInt(v2.substr(v2.indexOf('_') + 1)) ? v1 : v2;
-	},
+	}
  };
