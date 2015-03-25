@@ -17,9 +17,9 @@ import javax.swing.ImageIcon;
 
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Platform;
+import es.gob.afirma.signature.AOCertVerifier;
 import es.gob.afirma.ui.utils.Constants;
 import es.gob.afirma.ui.utils.Messages;
-import es.gob.afirma.util.AOCertVerifier;
 
 /** Informaci&oacute;n para la visualizaci&oacute;n y validaci&oacute;n del certificado.
  * @author Carlos gamuci Mill&aacute;n */
