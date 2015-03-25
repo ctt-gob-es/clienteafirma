@@ -89,7 +89,7 @@ public class TestStorer extends HttpServlet {
 			LOGGER.info("Datos almacenados correctamente"); //$NON-NLS-1$
 		}
 		else {
-			LOGGER.info("Error guardando los datos en la BD."); //$NON-NLS-1$
+			LOGGER.severe("Error guardando los datos en la BD."); //$NON-NLS-1$
 		}
 	}
 

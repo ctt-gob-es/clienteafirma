@@ -11,7 +11,7 @@ public class SaveDataDB {
 
 	// JDBC driver name and database URL
 	static final String JDBC_DRIVER = "com.mysql.jdbc.Driver"; //$NON-NLS-1$
-	static final String DB_URL = "jdbc:mysql://172.24.30.87:3306/miniapplet_db"; //$NON-NLS-1$
+	static final String DB_URL = "jdbc:mysql://servidorcentral:3306/miniapplet_db?relaxAutoCommit=true"; //$NON-NLS-1$
 	static final String DB_NAME = "stored_data"; //$NON-NLS-1$
 
 	//  Database credentials
@@ -46,7 +46,11 @@ public class SaveDataDB {
 		    LOGGER.info("Estructura creada."); //$NON-NLS-1$
 
 		    for(int i = 0; i < storedDataList.size(); i++ ) {
+
 		    	StoreBean sb = storedDataList.get(i);
+
+		    	LOGGER.info("Registrando resultado del navegador: " + sb.getBrowser()); //$NON-NLS-1$
+
 		    	String query =
 		    		"INSERT INTO " + DB_NAME + //$NON-NLS-1$
 		    		" VALUES (" + //$NON-NLS-1$
@@ -54,7 +58,7 @@ public class SaveDataDB {
 		    			"'" + sb.getDate() + "'," + //$NON-NLS-1$ //$NON-NLS-2$
 		    			"'" + sb.getTest() + "'," + //$NON-NLS-1$ //$NON-NLS-2$
 		   				sb.getResult() + "," + //$NON-NLS-1$
-		   				"'" + sb.getData() +"'," + //$NON-NLS-1$ //$NON-NLS-2$
+		   				"'" + sb.getData().replace("'", "") +"'," + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		   				"'" + sb.getUserAgent() + "'," + //$NON-NLS-1$ //$NON-NLS-2$
 		   				"'" + sb.getMiniappletVersion() + "'," + //$NON-NLS-1$ //$NON-NLS-2$
 		   				"'" + sb.getBrowser() + "'," + //$NON-NLS-1$ //$NON-NLS-2$
@@ -64,7 +68,7 @@ public class SaveDataDB {
 		   				"'" + sb.getJavaVersion() + "'," + //$NON-NLS-1$ //$NON-NLS-2$
 		   				"'" + sb.getJavaArch() + "'" + //$NON-NLS-1$ //$NON-NLS-2$
 	    			")"; //$NON-NLS-1$
-		    		LOGGER.info("Consulta: \n" + query); //$NON-NLS-1$
+		    		LOGGER.fine("Consulta: \n" + query); //$NON-NLS-1$
 				    int res = stmt.executeUpdate(query);
 
 				LOGGER.info("Datos insertados en la BD. Response: " + res); //$NON-NLS-1$
@@ -72,6 +76,9 @@ public class SaveDataDB {
 		    }
 
 		    stmt.close();
+
+		    conn.commit();
+
 			conn.close();
 			LOGGER.info("Conexion con la BD cerrada."); //$NON-NLS-1$
 
@@ -81,10 +88,8 @@ public class SaveDataDB {
 				stmt.close();
 				conn.close();
 			} catch (SQLException e1) {
-				LOGGER.severe("Error cerrando la BD: " + e); //$NON-NLS-1$
+				LOGGER.severe("Error cerrando la BD: " + e1); //$NON-NLS-1$
 			}
-
-			LOGGER.info("Conexion con la BD cerrada."); //$NON-NLS-1$
 			return false;
 		}
 		return true;
