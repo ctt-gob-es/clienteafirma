@@ -38,7 +38,6 @@
 package es.gob.afirma.signers.ooxml.relprovider;
 
 import java.security.Provider;
-import java.security.Security;
 
 
 /** Proveedor de seguridad para las transformadas de relaci&oacute;n de OOXML.
@@ -47,19 +46,14 @@ public final class OOXMLProvider extends Provider {
 
     private static final long serialVersionUID = 1L;
 
-    private static final String NAME = "OOXMLProvider"; //$NON-NLS-1$
+    /** Nombre del proveedor de transformadas de relaci&oacute;n OOXML. */
+    public static final String RELATIONSHIP_TRANSFORM_PROVIDER_NAME = "OOXMLProvider"; //$NON-NLS-1$
 
-    private OOXMLProvider() {
-        super(NAME, 1.0, "OOXML Security Provider"); //$NON-NLS-1$
+    /** Crea el proveedor de transformadas de relaci&oacute;n OOXML. */
+    public OOXMLProvider() {
+        super(RELATIONSHIP_TRANSFORM_PROVIDER_NAME, 1.0, "OOXML Security Provider"); //$NON-NLS-1$
         put("TransformService." + RelationshipTransformService.TRANSFORM_URI, RelationshipTransformService.class.getName()); //$NON-NLS-1$
         put("TransformService." + RelationshipTransformService.TRANSFORM_URI + " MechanismType", "DOM"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
     }
 
-    /** Instala el proveedor. */
-    public static void install() {
-        final Provider provider = Security.getProvider(NAME);
-        if (null == provider) {
-            Security.addProvider(new OOXMLProvider());
-        }
-    }
 }
