@@ -17,36 +17,36 @@ public class ValidateSignatureTest {
 
 	private static final String XMLDSIG_ENVELOPED = "xmldsig_enveloped_SHA1.xml"; //$NON-NLS-1$
 	private static final String CADES_EXPLICIT = "cades_explicit.csig"; //$NON-NLS-1$
-	
+
 	/** Prueba de validaci&oacute;n de firmas.
 	 * @throws IOException */
 	@SuppressWarnings("static-method")
 	@Test
 	public void testValidateXMLSign() throws IOException {
 
-			String signaturePath = XMLDSIG_ENVELOPED;
-		
-			InputStream is = ClassLoader.getSystemResourceAsStream(signaturePath);
+			final String signaturePath = XMLDSIG_ENVELOPED;
+
+			final InputStream is = ClassLoader.getSystemResourceAsStream(signaturePath);
 			final byte[] signature = AOUtil.getDataFromInputStream(is);
 			is.close();
-			SignValidity validity = ValidateXMLSignature.validate(signature);
-			System.out.println(signaturePath + ":\n\t" + validity + "\n====================");
-			Assert.assertEquals("No es valida la firma " + signaturePath, SIGN_DETAIL_TYPE.OK, validity.getValidity());
+			final SignValidity validity = ValidateXMLSignature.validate(signature);
+			System.out.println(signaturePath + ":\n\t" + validity + "\n====================");  //$NON-NLS-1$//$NON-NLS-2$
+			Assert.assertEquals("No es valida la firma " + signaturePath, SIGN_DETAIL_TYPE.OK, validity.getValidity()); //$NON-NLS-1$
 	}
-	
+
 	/** Prueba de validaci&oacute;n de firmas.
 	 * @throws IOException */
 	@SuppressWarnings("static-method")
 	@Test
 	public void testValidateBinarySign() throws IOException {
 
-			String signaturePath = CADES_EXPLICIT;
+			final String signaturePath = CADES_EXPLICIT;
 
-			InputStream is = ClassLoader.getSystemResourceAsStream(signaturePath);
+			final InputStream is = ClassLoader.getSystemResourceAsStream(signaturePath);
 			final byte[] signature = AOUtil.getDataFromInputStream(is);
 			is.close();
-			SignValidity validity = ValidateBinarySignature.validate(signature, null);
-			System.out.println(signaturePath + ":\n\t" + validity + "\n====================");
-			Assert.assertEquals("No es valida la firma " + signaturePath, SIGN_DETAIL_TYPE.UNKNOWN, validity.getValidity());
+			final SignValidity validity = ValidateBinarySignature.validate(signature, null);
+			System.out.println(signaturePath + ":\n\t" + validity + "\n===================="); //$NON-NLS-1$ //$NON-NLS-2$
+			Assert.assertEquals("No es valida la firma " + signaturePath, SIGN_DETAIL_TYPE.UNKNOWN, validity.getValidity()); //$NON-NLS-1$
 	}
 }

@@ -22,6 +22,7 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
 import java.util.Iterator;
+import java.util.logging.Logger;
 
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cms.CMSException;
@@ -39,6 +40,7 @@ import org.bouncycastle.operator.jcajce.JcaContentVerifierProviderBuilder;
 import org.bouncycastle.util.Selector;
 import org.bouncycastle.util.Store;
 
+import es.gob.afirma.core.AOInvalidFormatException;
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.signature.SignValidity.SIGN_DETAIL_TYPE;
 import es.gob.afirma.signature.SignValidity.VALIDITY_ERROR;
@@ -64,9 +66,25 @@ public final class ValidateBinarySignature {
      * @return <code>true</code> si la firma es v&aacute;lida, <code>false</code> en caso contrario
      * @throws IOException Si ocurren problemas relacionados con la lectura de la firma o los datos */
     public static SignValidity validate(final byte[] sign, final byte[] data) throws IOException {
+
     	if (sign == null) {
     		throw new IllegalArgumentException("La firma a validar no puede ser nula"); //$NON-NLS-1$
     	}
+
+    	try {
+			if (data == null && new AOCAdESSigner().getData(sign) == null) {
+				Logger.getLogger("es.gob.afirma").info( //$NON-NLS-1$
+					"Se ha pedido validar una firma explicita sin proporcionar los datos firmados" //$NON-NLS-1$
+				);
+				return new SignValidity(SIGN_DETAIL_TYPE.UNKNOWN, VALIDITY_ERROR.NO_DATA);
+			}
+		}
+    	catch (final AOInvalidFormatException e1) {
+    		Logger.getLogger("es.gob.afirma").info( //$NON-NLS-1$
+				"Se ha pedido validar una firma como CAdES, pero no es CAdES: " + e1  //$NON-NLS-1$
+			);
+    		return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.NO_SIGN);
+		}
 
     	AOSigner signer = new AOCAdESSigner();
     	if (!signer.isSign(sign)) {
@@ -77,7 +95,7 @@ public final class ValidateBinarySignature {
     	}
 
     	try {
-    		verifySignatures(sign, data);
+    		verifySignatures(sign, data != null ? data : new AOCAdESSigner().getData(sign));
 	    }
     	catch (final CertStoreException e) {
     	    // Error al recuperar los certificados o estos no son validos

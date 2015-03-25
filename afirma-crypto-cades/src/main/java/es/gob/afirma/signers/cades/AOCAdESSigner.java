@@ -439,10 +439,9 @@ public final class AOCAdESSigner implements AOSigner {
     /** Recupera los datos originalmente firmados de la firma proporcionada.
      * En caso de no contener la firma los datos firmados, se devuelve <code>null</code>.
      * @param signData Firma CAdES o CMS.
-     * @return Datos originalmente firmados.
-     * @throws AOInvalidFormatException
-     *         Si no se ha introducido un fichero de firma v&aacute;lido o no
-     *         ha podido leerse la firma.
+     * @return Datos originalmente firmados o null si la firma no contiene estos datos.
+     * @throws AOInvalidFormatException Si no se ha introducido un fichero de firma v&aacute;lido o no
+     *                                  ha podido leerse la firma.
      * @throws IOException Si ocurren problemas relacionados con la lectura de la firma.
      * @throws IllegalArgumentException Si la firma introducida es nula. */
     @Override
