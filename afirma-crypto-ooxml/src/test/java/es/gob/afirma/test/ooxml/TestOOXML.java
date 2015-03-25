@@ -43,7 +43,7 @@ public final class TestOOXML {
     private static final String CERT_PASS3 = "1111"; //$NON-NLS-1$
     private static final String CERT_ALIAS3 = "1"; //$NON-NLS-1$
 
-    private static final String[] DATA_PATHS = new String[] { "entrada_w2013.docx", "entrada_w2013.docx" };  //$NON-NLS-1$ //$NON-NLS-2$
+    private static final String[] DATA_PATHS = new String[] { "entrada_w2013.docx", "Entrada.docx" };  //$NON-NLS-1$ //$NON-NLS-2$
     private static byte[][] DATAS = new byte[2][];
 
     private static final Properties[] OOXML_MODES;
