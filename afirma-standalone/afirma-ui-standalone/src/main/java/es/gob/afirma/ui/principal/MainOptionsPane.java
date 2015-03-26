@@ -88,6 +88,9 @@ public class MainOptionsPane {
 
     /** Etiqueta del identificador de la pol&iacute;tica (puede ser una URN, OID,...). */
     private final JLabel policyIdentifierLabel;
+    JLabel getPolicyIdentifierLabel() {
+    	return this.policyIdentifierLabel;
+    }
 
     /** Identificador de la pol&iacute;tica (puede ser una URN, OID,...). */
     private final JTextField textPolicyIdentifier;
@@ -359,8 +362,8 @@ public class MainOptionsPane {
         	/** {@inheritDoc} */
             @Override
 			public void itemStateChanged(final ItemEvent e) {
-                final boolean state = (e.getStateChange() == ItemEvent.SELECTED);
-                MainOptionsPane.this.policyIdentifierLabel.setEnabled(state);
+                final boolean state = e.getStateChange() == ItemEvent.SELECTED;
+                MainOptionsPane.this.getPolicyIdentifierLabel().setEnabled(state);
                 MainOptionsPane.this.policyQualifierLabel.setEnabled(state);
                 MainOptionsPane.this.policyHashLabel.setEnabled(state);
                 MainOptionsPane.this.textPolicyIdentifier.setEnabled(state);
@@ -368,9 +371,9 @@ public class MainOptionsPane {
                 MainOptionsPane.this.textPolicyHash.setEnabled(state);
                 // Asignacion de mnemonicos segun el estado
                 if (state) {
-                    MainOptionsPane.this.policyIdentifierLabel.setDisplayedMnemonic(KeyEvent.VK_I);
-                    MainOptionsPane.this.policyIdentifierLabel.getAccessibleContext().setAccessibleName(MainOptionsPane.this.policyIdentifierLabel.getText() + "ALT + I.");
-                    MainOptionsPane.this.policyIdentifierLabel.setFocusable(false);
+                    MainOptionsPane.this.getPolicyIdentifierLabel().setDisplayedMnemonic(KeyEvent.VK_I);
+                    MainOptionsPane.this.getPolicyIdentifierLabel().getAccessibleContext().setAccessibleName(MainOptionsPane.this.policyIdentifierLabel.getText() + "ALT + I.");
+                    MainOptionsPane.this.getPolicyIdentifierLabel().setFocusable(false);
                     MainOptionsPane.this.policyQualifierLabel.setDisplayedMnemonic(KeyEvent.VK_T);
                     MainOptionsPane.this.policyQualifierLabel.getAccessibleContext().setAccessibleName(MainOptionsPane.this.policyQualifierLabel.getText() + "ALT + T.");
                     MainOptionsPane.this.policyQualifierLabel.setFocusable(false);
@@ -381,10 +384,10 @@ public class MainOptionsPane {
                 }
                 else {
                     // Se eliminan los atajos porque los cuadros de texto estan deshabilitados
-                    MainOptionsPane.this.policyIdentifierLabel.setDisplayedMnemonic(0);
-                    MainOptionsPane.this.policyIdentifierLabel.getAccessibleContext()
-                    .setAccessibleName(MainOptionsPane.this.policyIdentifierLabel.getText() + ". " + "Este cuadro de texto esta deshabilitado por defecto.");
-                    MainOptionsPane.this.policyIdentifierLabel.setFocusable(true);
+                    MainOptionsPane.this.getPolicyIdentifierLabel().setDisplayedMnemonic(0);
+                    MainOptionsPane.this.getPolicyIdentifierLabel().getAccessibleContext()
+                    .setAccessibleName(MainOptionsPane.this.getPolicyIdentifierLabel().getText() + ". " + "Este cuadro de texto esta deshabilitado por defecto.");
+                    MainOptionsPane.this.getPolicyIdentifierLabel().setFocusable(true);
                     MainOptionsPane.this.policyQualifierLabel.setDisplayedMnemonic(0);
                     MainOptionsPane.this.policyQualifierLabel.getAccessibleContext()
                     .setAccessibleName(MainOptionsPane.this.policyQualifierLabel.getText() + ". " + "Este cuadro de texto esta deshabilitado por defecto.");
