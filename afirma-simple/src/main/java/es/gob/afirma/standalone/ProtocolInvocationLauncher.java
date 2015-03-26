@@ -21,7 +21,7 @@ import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.Platform;
-import es.gob.afirma.core.misc.http.UrlHttpManagerFactory;
+import es.gob.afirma.core.misc.UrlHttpManagerFactory;
 import es.gob.afirma.core.misc.protocol.ParameterLocalAccessRequestedException;
 import es.gob.afirma.core.misc.protocol.ParameterNeedsUpdatedVersionException;
 import es.gob.afirma.core.misc.protocol.ProtocolInvocationUriParser;
