@@ -4,7 +4,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import es.gob.afirma.core.misc.Base64;
-import es.gob.afirma.core.misc.UrlHttpManagerFactory;
+import es.gob.afirma.core.misc.http.UrlHttpManagerFactory;
 import es.gob.afirma.standalone.SimpleAfirma;
 
 /** Pruebas de invocaci&oacute;n por protocolo.

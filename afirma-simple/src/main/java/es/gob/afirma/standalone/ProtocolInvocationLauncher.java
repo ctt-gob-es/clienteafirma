@@ -13,15 +13,11 @@ import java.util.logging.Logger;
 import javax.security.auth.callback.PasswordCallback;
 import javax.swing.JFileChooser;
 
-import com.apple.eawt.AboutHandler;
-import com.apple.eawt.AppEvent.AboutEvent;
-import com.apple.eawt.Application;
-
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.Platform;
-import es.gob.afirma.core.misc.UrlHttpManagerFactory;
+import es.gob.afirma.core.misc.http.UrlHttpManagerFactory;
 import es.gob.afirma.core.misc.protocol.ParameterLocalAccessRequestedException;
 import es.gob.afirma.core.misc.protocol.ParameterNeedsUpdatedVersionException;
 import es.gob.afirma.core.misc.protocol.ProtocolInvocationUriParser;
@@ -103,10 +99,10 @@ public final class ProtocolInvocationLauncher {
 	    // En OS X sobrecargamos el "Acerca de..." del sistema operativo, que tambien
 	    // aparece en la invocacion por protocolo
 	    if (Platform.OS.MACOSX.equals(Platform.getOS())) {
-	        Application.getApplication().setAboutHandler(
-                 new AboutHandler() {
+	    	com.apple.eawt.Application.getApplication().setAboutHandler(
+                 new com.apple.eawt.AboutHandler() {
                      @Override
-                     public void handleAbout(final AboutEvent ae) {
+                     public void handleAbout(final com.apple.eawt.AppEvent.AboutEvent ae) {
                          MainMenu.showAbout(null);
                      }
                  }

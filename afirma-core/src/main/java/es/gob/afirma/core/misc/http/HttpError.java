@@ -13,7 +13,7 @@ public final class HttpError extends IOException {
 	/** Crea una excepci&oacute;n de error de conexi&oacute;n HTTP.
 	 * @param resCode C&oacute;digo HTTP de respuesta. */
 	HttpError(final int resCode) {
-		super("Error en conexion HTTP con codigo de respuesta " + resCode);
+		super("Error en conexion HTTP con codigo de respuesta " + resCode); //$NON-NLS-1$
 		this.responseCode = resCode;
 	}
 

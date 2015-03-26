@@ -19,7 +19,7 @@ public class ValidateSignatureTest {
 	private static final String CADES_EXPLICIT = "cades_explicit.csig"; //$NON-NLS-1$
 
 	/** Prueba de validaci&oacute;n de firmas.
-	 * @throws IOException */
+	 * @throws IOException En errores de tratamiento de datos. */
 	@SuppressWarnings("static-method")
 	@Test
 	public void testValidateXMLSign() throws IOException {
@@ -35,7 +35,7 @@ public class ValidateSignatureTest {
 	}
 
 	/** Prueba de validaci&oacute;n de firmas.
-	 * @throws IOException */
+	 * @throws IOException En errores de tratamiento de datos. */
 	@SuppressWarnings("static-method")
 	@Test
 	public void testValidateBinarySign() throws IOException {

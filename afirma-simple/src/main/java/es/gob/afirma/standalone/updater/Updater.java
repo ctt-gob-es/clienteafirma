@@ -9,7 +9,7 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
 import es.gob.afirma.core.misc.Platform;
-import es.gob.afirma.core.misc.UrlHttpManagerFactory;
+import es.gob.afirma.core.misc.http.UrlHttpManagerFactory;
 import es.gob.afirma.core.ui.AOUIFactory;
 
 /** Utilidad para la gesti&oacute;n de actualizaciones de la aplicaci&oacute;n.
