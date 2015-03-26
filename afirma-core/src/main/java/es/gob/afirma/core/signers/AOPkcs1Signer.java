@@ -23,13 +23,12 @@ public final class AOPkcs1Signer implements AOSimpleSigner {
 	 *  <li><i>SHA384withRSA</i></li>
 	 *  <li><i>SHA512withRSA</i></li>
 	 * </ul>
-	 * @param key Clave privada a usar para la firma
-	 * @param certChain Cadena de certificados del firmante
-	 * @param data Datos a firmar
-	 * @param extraParams Se ignora, esta clase no acepta par&aacute;metros adicionales
-	 * @return Firma PKCS#1 en binario puro no tratado
-	 * @throws AOException en caso de cualquier problema durante la firma
-	 */
+	 * @param key Clave privada a usar para la firma.
+	 * @param certChain Se ignora, esta clase no necesita la cadena de certificados.
+	 * @param data Datos a firmar.
+	 * @param extraParams Se ignora, esta clase no acepta par&aacute;metros adicionales.
+	 * @return Firma PKCS#1 en binario puro no tratado.
+	 * @throws AOException en caso de cualquier problema durante la firma. */
 	@Override
 	public byte[] sign(final byte[] data, final String algorithm, final PrivateKey key, final Certificate[] certChain, final Properties extraParams) throws AOException {
 		final Signature sig;

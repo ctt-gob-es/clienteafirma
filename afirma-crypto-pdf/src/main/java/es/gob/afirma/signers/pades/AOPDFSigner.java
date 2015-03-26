@@ -114,6 +114,7 @@ public final class AOPDFSigner implements AOSigner {
 
         final GregorianCalendar signTime = new GregorianCalendar();
 
+        // Sello de stiempo
         byte[] data;
 		try {
 			data = PdfTimestamper.timestampPdf(inPDF, extraParams, signTime);
@@ -124,6 +125,7 @@ public final class AOPDFSigner implements AOSigner {
 			);
 		}
 
+		// Prefirma
         final PdfSignResult pre;
         try {
 			pre = PAdESTriPhaseSigner.preSign(
@@ -138,12 +140,22 @@ public final class AOPDFSigner implements AOSigner {
 			throw new InvalidPdfException(e);
 		}
 
+        // Firma PKCS#1
+        final byte[] interSign = new AOPkcs1Signer().sign(
+    		pre.getSign(),
+    		algorithm,
+    		key,
+    		certChain,
+    		extraParams
+		);
+
+        // Postfirma
         try {
 			return PAdESTriPhaseSigner.postSign(
 				algorithm,
 				data,
 				certChain,
-				new AOPkcs1Signer().sign(pre.getSign(), algorithm, key, certChain, extraParams),
+				interSign,
 				pre,
 				null,
 				null
