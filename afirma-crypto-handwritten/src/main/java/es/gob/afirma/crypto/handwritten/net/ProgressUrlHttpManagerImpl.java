@@ -6,7 +6,7 @@ import java.net.URL;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.misc.AOUtil;
-import es.gob.afirma.core.misc.UrlHttpManagerImpl;
+import es.gob.afirma.core.misc.http.UrlHttpManagerImpl;
 
 /** Clase utilizada para descarga de documentos.
  * @author Astrid Idoate **/

@@ -40,7 +40,7 @@ import es.gob.afirma.android.crypto.SignTask.SignListener;
 import es.gob.afirma.android.network.AndroidUrlHttpManager;
 import es.gob.afirma.android.network.UriParser;
 import es.gob.afirma.core.AOCancelledOperationException;
-import es.gob.afirma.core.misc.UrlHttpManagerFactory;
+import es.gob.afirma.core.misc.http.UrlHttpManagerFactory;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSignerFactory;
 

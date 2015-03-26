@@ -1,4 +1,4 @@
-package es.gob.afirma.core.misc;
+package es.gob.afirma.core.misc.http;
 
 
 /** Factor&iacute;a para la obtenci&oacute;n de un manejador para la lectura y env&iacute;o de datos a URL remotas.

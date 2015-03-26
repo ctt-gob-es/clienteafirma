@@ -21,7 +21,7 @@ import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.Platform;
-import es.gob.afirma.core.misc.UrlHttpManagerFactory;
+import es.gob.afirma.core.misc.http.UrlHttpManagerFactory;
 import es.gob.afirma.core.misc.protocol.ParameterLocalAccessRequestedException;
 import es.gob.afirma.core.misc.protocol.ParameterNeedsUpdatedVersionException;
 import es.gob.afirma.core.misc.protocol.ProtocolInvocationUriParser;
@@ -114,42 +114,42 @@ public final class ProtocolInvocationLauncher {
 	    }
 
 		if (urlString == null) {
-			LOGGER.severe("No se ha proporcionado una URL para la invocacion");
+			LOGGER.severe("No se ha proporcionado una URL para la invocacion"); //$NON-NLS-1$
 			showError(SAF_01);
 			return null;
 		}
 		if (!urlString.startsWith("afirma://")) { //$NON-NLS-1$
-			LOGGER.severe("La URL de invocacion no comienza por 'afirma://'");
+			LOGGER.severe("La URL de invocacion no comienza por 'afirma://'"); //$NON-NLS-1$
 			showError(SAF_02);
 			return SAF_02;
 		}
 		if (urlString.startsWith("afirma://service?") || urlString.startsWith("afirma://service/?")) { //$NON-NLS-1$ //$NON-NLS-2$
-			LOGGER.info("Se inicia la invocacion por servicio");
+			LOGGER.info("Se inicia la invocacion por servicio"); //$NON-NLS-1$
 			ServiceInvocationManager.startService(urlString);
 			return RESULT_OK;
 		}
 		else if (urlString.startsWith("afirma://save?") || urlString.startsWith("afirma://save/?")) { //$NON-NLS-1$ //$NON-NLS-2$
-			LOGGER.info("Se invoca a la aplicacion para el guardado de datos");
-			
+			LOGGER.info("Se invoca a la aplicacion para el guardado de datos"); //$NON-NLS-1$
+
 			try {
 				UrlParametersToSave params = ProtocolInvocationUriParser.getParametersToSave(urlString);
-				
+
 				// Si se indica un identificador de fichero, es que la configuracion se tiene que
 				// descargar desde el servidor intermedio
 				if (params.getFileId() != null) {
-					
-					StringBuilder dataUrl = new StringBuilder(params.getRetrieveServletUrl().toString()).
-							append("?").append("op=get&v=1_0&id=").append(params.getFileId());
-					byte[] recoveredData = 
+
+					final StringBuilder dataUrl = new StringBuilder(params.getRetrieveServletUrl().toString()).
+							append("?").append("op=get&v=1_0&id=").append(params.getFileId()); //$NON-NLS-1$ //$NON-NLS-2$
+					final byte[] recoveredData =
 							UrlHttpManagerFactory.getInstalledManager().readUrlByPost(dataUrl.toString());
-					
+
 					// Si los datos recibidos representan un error, detenemos la ejecucion
-					if (recoveredData.length > 8 && new String(Arrays.copyOf(recoveredData, 8)).toLowerCase().startsWith("err-")) {
+					if (recoveredData.length > 8 && new String(Arrays.copyOf(recoveredData, 8)).toLowerCase().startsWith("err-")) { //$NON-NLS-1$
 						LOGGER.severe("Error al recuperar los datos del servidor intermedio: " + new String(recoveredData)); //$NON-NLS-1$
 						showError(SAF_16);
 						return SAF_16;
 					}
-					
+
 					// Si no ha ocurrido un error, debemos haber recibido los datos cifrados
 					byte[] xmlData;
 					try {
@@ -160,7 +160,7 @@ public final class ProtocolInvocationLauncher {
 						showError(SAF_15);
 						return SAF_15;
 					}
-					
+
 					params = ProtocolInvocationUriParser.getParametersToSave(xmlData);
 				}
 				return processSave(params);
@@ -185,27 +185,27 @@ public final class ProtocolInvocationLauncher {
 				 urlString.startsWith("afirma://cosign?") || urlString.startsWith("afirma://cosign/?") || //$NON-NLS-1$ //$NON-NLS-2$
 				 urlString.startsWith("afirma://countersign?") || urlString.startsWith("afirma://countersign/?") //$NON-NLS-1$ //$NON-NLS-2$
 		) {
-			LOGGER.info("Se invoca a la aplicacion para realizar una operacion de firma/multifirma");
-			
+			LOGGER.info("Se invoca a la aplicacion para realizar una operacion de firma/multifirma"); //$NON-NLS-1$
+
 			try {
 				UrlParametersToSign params = ProtocolInvocationUriParser.getParametersToSign(urlString);
-				
+
 				// Si se indica un identificador de fichero, es que la configuracion se tiene que
 				// descargar desde el servidor intermedio
 				if (params.getFileId() != null) {
-					
-					StringBuilder dataUrl = new StringBuilder(params.getRetrieveServletUrl().toString()).
-							append("?").append("op=get&v=1_0&id=").append(params.getFileId());
-					byte[] recoveredData = 
+
+					final StringBuilder dataUrl = new StringBuilder(params.getRetrieveServletUrl().toString()).
+							append("?").append("op=get&v=1_0&id=").append(params.getFileId()); //$NON-NLS-1$ //$NON-NLS-2$
+					final byte[] recoveredData =
 							UrlHttpManagerFactory.getInstalledManager().readUrlByPost(dataUrl.toString());
-					
+
 					// Si los datos recibidos representan un error, detenemos la ejecucion
-					if (recoveredData.length > 8 && new String(Arrays.copyOf(recoveredData, 8)).toLowerCase().startsWith("err-")) {
+					if (recoveredData.length > 8 && new String(Arrays.copyOf(recoveredData, 8)).toLowerCase().startsWith("err-")) { //$NON-NLS-1$
 						LOGGER.severe("Error al recuperar los datos del servidor intermedio: " + new String(recoveredData)); //$NON-NLS-1$
 						showError(SAF_16);
 						return SAF_16;
 					}
-					
+
 					// Si no ha ocurrido un error, debemos haber recibido los datos cifrados
 					byte[] xmlData;
 					try {
@@ -216,10 +216,10 @@ public final class ProtocolInvocationLauncher {
 						showError(SAF_15);
 						return SAF_15;
 					}
-					
+
 					params = ProtocolInvocationUriParser.getParametersToSign(xmlData);
 				}
-				
+
 				return processSign(params);
 			}
 			catch(final ParameterNeedsUpdatedVersionException e) {
@@ -239,7 +239,7 @@ public final class ProtocolInvocationLauncher {
 			}
 		}
 		else {
-			LOGGER.severe("No se ha identificado el motivo de la invocacion de la aplicacion");
+			LOGGER.severe("No se ha identificado el motivo de la invocacion de la aplicacion"); //$NON-NLS-1$
 			showError(SAF_04);
 			return SAF_04;
 		}

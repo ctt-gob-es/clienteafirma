@@ -36,7 +36,7 @@ import netscape.javascript.JSObject;
 import com.WacomGSS.STU.Tablet;
 
 import es.gob.afirma.core.misc.Base64;
-import es.gob.afirma.core.misc.UrlHttpManagerFactory;
+import es.gob.afirma.core.misc.http.UrlHttpManagerFactory;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.crypto.handwritten.net.DownloadListener;

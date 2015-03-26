@@ -20,7 +20,7 @@ import java.security.cert.CertificateEncodingException;
 import java.util.Properties;
 
 import es.gob.afirma.core.misc.Base64;
-import es.gob.afirma.core.misc.UrlHttpManager;
+import es.gob.afirma.core.misc.http.UrlHttpManager;
 
 final class PostSigner {
 

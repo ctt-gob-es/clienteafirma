@@ -50,7 +50,7 @@ import es.gob.afirma.android.network.UriParser.ParameterException;
 import es.gob.afirma.android.network.UriParser.UrlParametersToSign;
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOUnsupportedSignFormatException;
-import es.gob.afirma.core.misc.UrlHttpManagerFactory;
+import es.gob.afirma.core.misc.http.UrlHttpManagerFactory;
 import es.gob.afirma.core.signers.AOSignConstants;
 
 /** Actividad dedicada a la firma de los datos recibidos en la entrada mediante un certificado

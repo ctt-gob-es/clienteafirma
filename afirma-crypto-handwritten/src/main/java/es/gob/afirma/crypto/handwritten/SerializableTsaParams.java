@@ -93,7 +93,12 @@ final class SerializableTsaParams {
 			convertExtensions(this.extensions),
 			this.tsaHashAlgorithm,
 			this.sslPkcs12File,
-			this.sslPkcs12FilePassword
+			this.sslPkcs12FilePassword,
+			"PKCS12", //$NON-NLS-1$
+			null,
+			null,
+			null,
+			false
 		);
 	}
 

@@ -31,7 +31,7 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
 import es.gob.afirma.core.misc.AOUtil;
-import es.gob.afirma.core.misc.UrlHttpManager;
+import es.gob.afirma.core.misc.http.UrlHttpManager;
 
 /** Implementacion de ua clase para la lectura del contenido de una URL.
  * @author Carlos Gamuci */
@@ -67,18 +67,20 @@ public final class AndroidUrlHttpManager implements UrlHttpManager {
 	 * @throws IOException Si no se puede leer la URL */
 	@Override
 	public byte[] readUrlByPost(final String url) throws IOException {
-		return readUrlByPost(url, DEFAULT_TIMEOUT);
+		return readUrlByPost(url, DEFAULT_TIMEOUT, "application/x-www-form-urlencoded"); //$NON-NLS-1$
 	}
 
 	/** Lee una URL HTTP o HTTPS por POST si se indican par&aacute;metros en la URL y por GET en caso contrario.
 	 * En HTTPS no se hacen comprobaciones del certificado servidor.
 	 * @param url URL a leer
-	 * @param timeout Tiempo m&aacute;ximo en milisegundos que se debe esperar por la respuesta. Un timeout de 0
-	 * se interpreta como un timeout infinito. Si se indica -1, se usar&aacute; el por defecto de Java.
+	 * @param timeout Tiempo m&aacute;ximo en milisegundos que se debe esperar por la respuesta.
+	 *                Un timeout de 0 se interpreta como un timeout infinito.
+	 *                Si se indica -1, se usar&aacute; el por defecto de Java.
+	 * @param contentType Se ignora este par&aacute;metro.
 	 * @return Contenido de la URL
 	 * @throws IOException Si no se puede leer la URL */
 	@Override
-	public byte[] readUrlByPost(final String url, final int timeout) throws IOException {
+	public byte[] readUrlByPost(final String url, final int timeout, final String contentType) throws IOException {
 		if (url == null) {
 			throw new IllegalArgumentException("La URL a leer no puede ser nula"); //$NON-NLS-1$
 		}
@@ -107,7 +109,6 @@ public final class AndroidUrlHttpManager implements UrlHttpManager {
 
 		final URLConnection conn = uri.openConnection(Proxy.NO_PROXY);
 
-		//conn.setRequestMethod("POST"); //$NON-NLS-1$
 		conn.setDoOutput(true);
 		if (timeout != DEFAULT_TIMEOUT) {
 			conn.setConnectTimeout(timeout);

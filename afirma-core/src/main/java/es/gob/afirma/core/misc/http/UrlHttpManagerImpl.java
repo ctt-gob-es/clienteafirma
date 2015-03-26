@@ -8,7 +8,7 @@
  * You may contact the copyright holder at: soporte.afirma5@mpt.es
  */
 
-package es.gob.afirma.core.misc;
+package es.gob.afirma.core.misc.http;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,11 +30,14 @@ import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
+import es.gob.afirma.core.misc.AOUtil;
+
 /** Clase para la lectura y env&iacute;o de datos a URL remotas.
  * @author Carlos Gamuci */
 public class UrlHttpManagerImpl implements UrlHttpManager {
 
-	private static final int DEFAULT_TIMEOUT = -1;
+	/** Tiempo de espera por defecto para descartar una conexi&oacute;n HTTP. */
+	public static final int DEFAULT_TIMEOUT = -1;
 
 	private static final String HTTPS = "https"; //$NON-NLS-1$
 
@@ -66,7 +69,7 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 	 * @throws IOException Si no se puede leer la URL */
 	@Override
 	public byte[] readUrlByPost(final String url) throws IOException {
-		return readUrlByPost(url, DEFAULT_TIMEOUT);
+		return readUrlByPost(url, DEFAULT_TIMEOUT, "application/x-www-form-urlencoded"); //$NON-NLS-1$
 	}
 
 	/** Lee una URL HTTP o HTTPS por POST si se indican par&aacute;metros en la URL y por GET en caso contrario.
@@ -77,13 +80,16 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 	 * @return Contenido de la URL
 	 * @throws IOException Si no se puede leer la URL */
 	@Override
-	public byte[] readUrlByPost(final String url, final int timeout) throws IOException {
+	public byte[] readUrlByPost(final String url, final int timeout, final String contentType) throws IOException {
 		if (url == null) {
 			throw new IllegalArgumentException("La URL a leer no puede ser nula"); //$NON-NLS-1$
 		}
 
 		// Si la URL no tiene parametros la leemos por GET
 		if (!url.contains("?")) { //$NON-NLS-1$
+			Logger.getLogger("es.gob.afirma").warning(
+				"Se ha pedido una peticion POST sin parametros, pero se realizara por GET"
+			);
 			return readUrlByGet(url);
 		}
 
@@ -99,8 +105,8 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 			}
 			catch(final Exception e) {
 				Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
-						"No se ha podido ajustar la confianza SSL, es posible que no se pueda completar la conexion: " + e //$NON-NLS-1$
-						);
+					"No se ha podido ajustar la confianza SSL, es posible que no se pueda completar la conexion: " + e //$NON-NLS-1$
+				);
 			}
 		}
 
@@ -109,7 +115,9 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 
 		conn.addRequestProperty("Accept", "*/*"); //$NON-NLS-1$ //$NON-NLS-2$
 		conn.addRequestProperty("Connection", "keep-alive"); //$NON-NLS-1$ //$NON-NLS-2$
-		conn.addRequestProperty("Content-type", "application/x-www-form-urlencoded"); //$NON-NLS-1$ //$NON-NLS-2$
+		if (contentType != null) {
+			conn.addRequestProperty("Content-type", contentType); //$NON-NLS-1$
+		}
 		conn.addRequestProperty("Host", uri.getHost()); //$NON-NLS-1$
 		conn.addRequestProperty("Origin", uri.getProtocol() +  "://" + uri.getHost()); //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -125,6 +133,16 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 		writer.write(urlParameters);
 		writer.flush();
 		writer.close();
+
+		conn.connect();
+		final int resCode = conn.getResponseCode();
+		final String statusCode = Integer.toString(resCode);
+		if (statusCode.startsWith("4") || statusCode.startsWith("5")) {
+			if (uri.getProtocol().equals(HTTPS)) {
+				enableSslChecks();
+			}
+			throw new HttpError(resCode);
+		}
 
 		final InputStream is = conn.getInputStream();
 		final byte[] data = AOUtil.getDataFromInputStream(is);
@@ -150,8 +168,8 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 			}
 			catch(final Exception e) {
 				Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
-						"No se ha podido ajustar la confianza SSL, es posible que no se pueda completar la conexion: " + e //$NON-NLS-1$
-						);
+					"No se ha podido ajustar la confianza SSL, es posible que no se pueda completar la conexion: " + e //$NON-NLS-1$
+				);
 			}
 		}
 		final InputStream is = uri.openStream();
@@ -178,13 +196,14 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 		final SSLContext sc = SSLContext.getInstance("SSL"); //$NON-NLS-1$
 		sc.init(null, DUMMY_TRUST_MANAGER, new java.security.SecureRandom());
 		HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
-		HttpsURLConnection.setDefaultHostnameVerifier(new HostnameVerifier() {
-			@Override
-			public boolean verify(final String hostname, final SSLSession session) {
-				return true;
+		HttpsURLConnection.setDefaultHostnameVerifier(
+			new HostnameVerifier() {
+				@Override
+				public boolean verify(final String hostname, final SSLSession session) {
+					return true;
+				}
 			}
-		});
+		);
 	}
-
 
 }

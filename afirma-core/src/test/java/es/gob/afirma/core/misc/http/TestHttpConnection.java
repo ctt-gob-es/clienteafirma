@@ -1,4 +1,4 @@
-package es.gob.afirma.core.misc;
+package es.gob.afirma.core.misc.http;
 
 import java.io.IOException;
 
@@ -13,6 +13,6 @@ public final class TestHttpConnection {
 	@SuppressWarnings("static-method")
 	@Test
 	public void testHttpsConnection() throws IOException {
-		Assert.assertNotNull(new es.gob.afirma.core.misc.UrlHttpManagerImpl().readUrlByPost("https://valide.redsara.es/valide/")); //$NON-NLS-1$
+		Assert.assertNotNull(new es.gob.afirma.core.misc.http.UrlHttpManagerImpl().readUrlByPost("https://valide.redsara.es/valide/")); //$NON-NLS-1$
 	}
 }

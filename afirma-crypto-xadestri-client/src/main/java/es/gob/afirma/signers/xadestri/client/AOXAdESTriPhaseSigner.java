@@ -32,8 +32,8 @@ import org.w3c.dom.NodeList;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOInvalidFormatException;
 import es.gob.afirma.core.misc.Base64;
-import es.gob.afirma.core.misc.UrlHttpManager;
-import es.gob.afirma.core.misc.UrlHttpManagerFactory;
+import es.gob.afirma.core.misc.http.UrlHttpManager;
+import es.gob.afirma.core.misc.http.UrlHttpManagerFactory;
 import es.gob.afirma.core.signers.AOPkcs1Signer;
 import es.gob.afirma.core.signers.AOSignInfo;
 import es.gob.afirma.core.signers.AOSigner;
@@ -350,7 +350,7 @@ public final class AOXAdESTriPhaseSigner implements AOSigner {
 		try {
 			triphaseData = TriphaseData.parser(Base64.decode(preSignResult, 0, preSignResult.length, true));
 		}
-		catch (Exception e) {
+		catch (final Exception e) {
 			LOGGER.severe("Error al analizar la prefirma enviada por el servidor: " + e); //$NON-NLS-1$
 			throw new AOException("Error al analizar la prefirma enviada por el servidor", e); //$NON-NLS-1$
 		}

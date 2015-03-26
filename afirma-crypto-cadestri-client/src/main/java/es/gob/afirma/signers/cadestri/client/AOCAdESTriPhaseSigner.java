@@ -24,8 +24,8 @@ import java.util.logging.Logger;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOInvalidFormatException;
 import es.gob.afirma.core.misc.Base64;
-import es.gob.afirma.core.misc.UrlHttpManager;
-import es.gob.afirma.core.misc.UrlHttpManagerFactory;
+import es.gob.afirma.core.misc.http.UrlHttpManager;
+import es.gob.afirma.core.misc.http.UrlHttpManagerFactory;
 import es.gob.afirma.core.signers.AOPkcs1Signer;
 import es.gob.afirma.core.signers.AOSignInfo;
 import es.gob.afirma.core.signers.AOSigner;
@@ -222,7 +222,7 @@ public final class AOCAdESTriPhaseSigner implements AOSigner {
 		try {
 			triphaseData = TriphaseData.parser(Base64.decode(preSignResult, 0, preSignResult.length, true));
 		}
-		catch (Exception e) {
+		catch (final Exception e) {
 			LOGGER.severe("Error al analizar la prefirma enviada por el servidor: " + e); //$NON-NLS-1$
 			throw new AOException("Error al analizar la prefirma enviada por el servidor", e); //$NON-NLS-1$
 		}
@@ -235,7 +235,7 @@ public final class AOCAdESTriPhaseSigner implements AOSigner {
 		try {
 			for (int i = 0; i < triphaseData.getSignsCount(); i++) {
 				final Map<String, String> signConfig = triphaseData.getSign(i);
-				byte[] pkcs1sign = new AOPkcs1Signer().sign(
+				final byte[] pkcs1sign = new AOPkcs1Signer().sign(
 						Base64.decode(signConfig.get(PROPERTY_NAME_PRESIGN)),
 						algorithm,
 						key,
@@ -244,7 +244,7 @@ public final class AOCAdESTriPhaseSigner implements AOSigner {
 						);
 				signConfig.put(PROPERTY_NAME_PKCS1_SIGN, Base64.encode(pkcs1sign));
 			}
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			LOGGER.severe("Ocurrio un error en la decodificacion de una prefirma: " + e); //$NON-NLS-1$
 			throw new AOException("Ocurrio un error en la decodificacion de una prefirma", e); //$NON-NLS-1$
 		}

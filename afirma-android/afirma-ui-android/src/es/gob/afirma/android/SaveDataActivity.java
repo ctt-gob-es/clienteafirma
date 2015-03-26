@@ -36,7 +36,7 @@ import es.gob.afirma.android.network.UriParser;
 import es.gob.afirma.android.network.UriParser.ParameterException;
 import es.gob.afirma.android.network.UriParser.UrlParametersToSave;
 import es.gob.afirma.core.misc.MimeHelper;
-import es.gob.afirma.core.misc.UrlHttpManagerFactory;
+import es.gob.afirma.core.misc.http.UrlHttpManagerFactory;
 
 /** Actividad Android para la elecci&oacue;n de un fichero en el almacenamiento del dispositivo. */
 public final class SaveDataActivity extends ListActivity implements DownloadDataListener {
@@ -132,7 +132,7 @@ public final class SaveDataActivity extends ListActivity implements DownloadData
 				return;
 			}
 		}
-		
+
 		UrlHttpManagerFactory.install(new AndroidUrlHttpManager());
 	}
 
