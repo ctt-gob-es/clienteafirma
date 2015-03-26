@@ -87,8 +87,8 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 
 		// Si la URL no tiene parametros la leemos por GET
 		if (!url.contains("?")) { //$NON-NLS-1$
-			Logger.getLogger("es.gob.afirma").warning(
-				"Se ha pedido una peticion POST sin parametros, pero se realizara por GET"
+			Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
+				"Se ha pedido una peticion POST sin parametros, pero se realizara por GET" //$NON-NLS-1$
 			);
 			return readUrlByGet(url);
 		}
@@ -137,7 +137,7 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 		conn.connect();
 		final int resCode = conn.getResponseCode();
 		final String statusCode = Integer.toString(resCode);
-		if (statusCode.startsWith("4") || statusCode.startsWith("5")) {
+		if (statusCode.startsWith("4") || statusCode.startsWith("5")) { //$NON-NLS-1$ //$NON-NLS-2$
 			if (uri.getProtocol().equals(HTTPS)) {
 				enableSslChecks();
 			}
