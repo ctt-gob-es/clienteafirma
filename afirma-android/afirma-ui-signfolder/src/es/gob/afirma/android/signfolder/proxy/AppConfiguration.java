@@ -15,6 +15,8 @@ public class AppConfiguration {
 		this.appNamesList = new ArrayList<String>();
 	}
 
+	/** Obtiene la lista de identificadores de la aplicaci&oacute;n.
+	 * @return Lista de identificadores de la aplicaci&oacute;n. */
 	public List<String> getAppIdsList() {
 		return this.appIdsList;
 	}
@@ -23,6 +25,8 @@ public class AppConfiguration {
 		this.appIdsList = appIdsList;
 	}
 
+	/** Obtiene la lista de nombres de la aplicaci&oacute;n.
+	 * @return Lista de nombres de la aplicaci&oacute;n. */
 	public List<String> getAppNamesList() {
 		return this.appNamesList;
 	}

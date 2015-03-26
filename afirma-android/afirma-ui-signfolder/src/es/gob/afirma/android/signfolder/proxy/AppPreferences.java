@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.util.Log;
 import es.gob.afirma.android.signfolder.SFConstants;
 
+/** Preferencias de la aplicaci&oacute;n. */
 public final class AppPreferences {
 
 	private static final String CONFIG_PROPERTIES = "config.properties"; //$NON-NLS-1$
@@ -27,6 +28,8 @@ public final class AppPreferences {
 
 	private static SharedPreferences sharedPref;
 
+	/** Inicializa las preferencias a partir de su fichero de propiedades.
+	 * @param activity Actividad padre. */
 	public static void init(final Activity activity) {
 
 		config = new Properties();

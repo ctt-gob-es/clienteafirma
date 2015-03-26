@@ -61,9 +61,9 @@ final class XmlRequestsFactory {
 
 		if (signFormats != null && signFormats.length > 0) {
 			sb.append("<fmts>"); //$NON-NLS-1$
-			for (int i = 0; i < signFormats.length; i++) {
+			for (final String signFormat : signFormats) {
 				sb.append("<fmt>"); //$NON-NLS-1$
-				sb.append(signFormats[i]);
+				sb.append(signFormat);
 				sb.append("</fmt>"); //$NON-NLS-1$
 			}
 			sb.append("</fmts>"); //$NON-NLS-1$
@@ -71,17 +71,17 @@ final class XmlRequestsFactory {
 
 		if (filters != null && filters.length > 0) {
 			sb.append("<fltrs>"); //$NON-NLS-1$
-			for (int i = 0; i < filters.length; i++) {
+			for (final String filter : filters) {
 				sb.append("<fltr>"); //$NON-NLS-1$
-				final int equalPos = (filters[i].indexOf('=') != -1 ? filters[i].indexOf('=') : filters[i].length());
+				final int equalPos = filter.indexOf('=') != -1 ? filter.indexOf('=') : filter.length();
 				sb.append("<key>"); //$NON-NLS-1$
 				if (equalPos > 0) {
-					sb.append(filters[i].substring(0, equalPos));
+					sb.append(filter.substring(0, equalPos));
 				}
 				sb.append("</key>"); //$NON-NLS-1$
 				sb.append("<value>"); //$NON-NLS-1$
-				if (equalPos < filters[i].length() - 1) {
-					sb.append(filters[i].substring(equalPos + 1));
+				if (equalPos < filter.length() - 1) {
+					sb.append(filter.substring(equalPos + 1));
 				}
 				sb.append("</value>"); //$NON-NLS-1$
 				sb.append("</fltr>"); //$NON-NLS-1$
@@ -124,24 +124,24 @@ final class XmlRequestsFactory {
 		sb.append(request.getId());
 		sb.append("\">"); //$NON-NLS-1$
 		documents = request.getDocs();
-		for (int j = 0; j<documents.length; j++) {
+		for (final SignRequestDocument document : documents) {
 
-			Log.i("es.gob.afirma", "Parametros que se agregan:\n" + documents[j].getParams());
+			Log.i("es.gob.afirma", "Parametros que se agregan:\n" + document.getParams()); //$NON-NLS-1$ //$NON-NLS-2$
 
 			sb.append("<doc docid=\""); //$NON-NLS-1$
-			sb.append(documents[j].getId());
+			sb.append(document.getId());
 			sb.append("\" cop=\""); //$NON-NLS-1$
-			sb.append(documents[j].getCryptoOperation());
+			sb.append(document.getCryptoOperation());
 			sb.append("\" sigfrmt=\""); //$NON-NLS-1$
-			sb.append(documents[j].getSignFormat());
+			sb.append(document.getSignFormat());
 			sb.append("\" mdalgo=\""); //$NON-NLS-1$
-			sb.append(documents[j].getMessageDigestAlgorithm());
-			if (documents[j].getParams() == null) {
+			sb.append(document.getMessageDigestAlgorithm());
+			if (document.getParams() == null) {
 				sb.append("\"/>"); //$NON-NLS-1$
 			} else {
 				sb.append("\">"); //$NON-NLS-1$
 				sb.append(XML_PARAMS_OPEN);
-				sb.append(documents[j].getParams() != null ? documents[j].getParams() : ""); //$NON-NLS-1$
+				sb.append(document.getParams() != null ? document.getParams() : ""); //$NON-NLS-1$
 				sb.append(XML_PARAMS_CLOSE);
 				sb.append("</doc>"); //$NON-NLS-1$
 			}
@@ -178,33 +178,33 @@ final class XmlRequestsFactory {
 		// Peticiones
 		sb.append(XML_REQUESTS_OPEN);
 	    TriphaseSignDocumentRequest[] documents;
-	    for (int i = 0; i < requests.length; i++) {
+	    for (final TriphaseRequest request : requests) {
 	    	sb.append("<req id=\""); //$NON-NLS-1$
-	    	sb.append(requests[i].getRef());
+	    	sb.append(request.getRef());
 	    	sb.append("\" status=\""); //$NON-NLS-1$
-	    	sb.append((requests[i].isStatusOk()) ? "OK" : "KO"); //$NON-NLS-1$ //$NON-NLS-2$
+	    	sb.append(request.isStatusOk() ? "OK" : "KO"); //$NON-NLS-1$ //$NON-NLS-2$
 	    	sb.append("\">"); //$NON-NLS-1$
 	    	// Solo procesamos los documentos si la peticion es buena
-	    	if (requests[i].isStatusOk()) {
-		    	documents = requests[i].getDocumentsRequests();
-		    	for (int j = 0; j < documents.length; j++) {
+	    	if (request.isStatusOk()) {
+		    	documents = request.getDocumentsRequests();
+		    	for (final TriphaseSignDocumentRequest document : documents) {
 
-		    		Log.i("es.gob.afirma", "Parametros que se agregan:\n" + documents[j].getParams());
+		    		Log.i("es.gob.afirma", "Parametros que se agregan:\n" + document.getParams()); //$NON-NLS-1$ //$NON-NLS-2$
 
 		    		sb.append("<doc docid=\"") //$NON-NLS-1$
-		    		.append(documents[j].getId())
+		    		.append(document.getId())
 		    		.append("\" cop=\"") //$NON-NLS-1$
-		    		.append(documents[j].getCryptoOperation())
+		    		.append(document.getCryptoOperation())
 		    		.append("\" sigfrmt=\"") //$NON-NLS-1$
-		    		.append(documents[j].getSignatureFormat())
+		    		.append(document.getSignatureFormat())
 		    		.append("\" mdalgo=\"") //$NON-NLS-1$
-		    		.append(documents[j].getMessageDigestAlgorithm())
+		    		.append(document.getMessageDigestAlgorithm())
 		    		.append("\">") //$NON-NLS-1$
 		    		.append(XML_PARAMS_OPEN)
-		    		.append(documents[j].getParams())
+		    		.append(document.getParams())
 		    		.append(XML_PARAMS_CLOSE)
 		    		.append(XML_RESULT_OPEN)
-		    		.append(documents[j].getPartialResult().toXMLConfig())
+		    		.append(document.getPartialResult().toXMLConfig())
 		    		.append(XML_RESULT_CLOSE)
 		    		.append("</doc>"); //$NON-NLS-1$
 		    	}
@@ -215,16 +215,16 @@ final class XmlRequestsFactory {
 
 		sb.append(XML_TRISIGN_CLOSE);
 
-		Log.i("es.gob.afirma", "Peticion postfirma:");
+		Log.i("es.gob.afirma", "Peticion postfirma:"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		int i = 0;
-		int l = 1024;
-		String xml = sb.toString();
+		final int l = 1024;
+		final String xml = sb.toString();
 		while (xml.length() >= l * (i + 1)) {
-			Log.i("es.gob.afirma", i + " " + xml.substring(l * i, l * (i + 1)));
+			Log.i("es.gob.afirma", i + " " + xml.substring(l * i, l * (i + 1))); //$NON-NLS-1$ //$NON-NLS-2$
 			i++;
 		}
-		Log.i("es.gob.afirma", i + " " + xml.substring(l * i));
+		Log.i("es.gob.afirma", i + " " + xml.substring(l * i)); //$NON-NLS-1$ //$NON-NLS-2$
 
 		throw new IllegalArgumentException();
 
@@ -243,9 +243,9 @@ final class XmlRequestsFactory {
 		sb.append(XML_CERT_CLOSE);
 		sb.append("<rjcts>"); //$NON-NLS-1$
 		// Peticiones que se rechazan
-	    for (int i=0;i<requestIds.length;i++) {
+	    for (final String requestId : requestIds) {
 	    	sb.append("<rjct id=\""); //$NON-NLS-1$
-	    	sb.append(requestIds[i]);
+	    	sb.append(requestId);
 	    	sb.append("\"/>"); //$NON-NLS-1$
 	    }
 	    sb.append("</rjcts>"); //$NON-NLS-1$
@@ -313,9 +313,9 @@ final class XmlRequestsFactory {
 		sb.append(XML_CERT_CLOSE);
 		sb.append("<reqs>"); //$NON-NLS-1$
 		// Peticiones que se rechazan
-	    for (int i=0;i<requestIds.length;i++) {
+	    for (final String requestId : requestIds) {
 	    	sb.append("<r id=\""); //$NON-NLS-1$
-	    	sb.append(requestIds[i]);
+	    	sb.append(requestId);
 	    	sb.append("\"/>"); //$NON-NLS-1$
 	    }
 	    sb.append("</reqs>"); //$NON-NLS-1$

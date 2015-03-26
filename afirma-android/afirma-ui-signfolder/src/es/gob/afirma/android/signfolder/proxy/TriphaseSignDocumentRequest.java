@@ -172,6 +172,8 @@ public final class TriphaseSignDocumentRequest {
 			this.needData = needData;
 		}
 
+		/** Obtiene el n&uacute;mero de firmas.
+		 * @return N&uacute;mero de firmas. */
 		public Integer getSignCount() {
 			return this.signCount;
 		}
@@ -180,6 +182,9 @@ public final class TriphaseSignDocumentRequest {
 			this.signCount = signCount;
 		}
 
+		/** Obtiene la sesi&oacute;n de operaci&oacute;n trif&aacute;sica de firma de la firma indicada.
+		 * @param index N&uacute;mero de firma.
+		 * @return Sesi&oacute;n de operaci&oacute;n trif&aacute;sica de firma de la firma indicada. */
 		public String getSession(final int index) {
 			return this.session.get(index);
 		}

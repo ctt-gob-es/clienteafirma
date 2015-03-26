@@ -191,6 +191,9 @@ public class SignRequest {
 		this.selected = !this.selected;
 	}
 
+	/** Establece si la petici&oacute;n ha sido ya vista o no.
+	 * @param viewed <code>true</code> si la petici&oacute;n ha sido ya vista,
+	 *               <code>false</code> en caso contrario. */
 	public void setViewed(final boolean viewed) {
 		this.view = viewed ? VIEW_READED : VIEW_NEW;
 	}

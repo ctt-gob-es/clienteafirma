@@ -18,11 +18,8 @@ import es.gob.afirma.android.network.AndroidUrlHttpManager;
 import es.gob.afirma.android.signfolder.SFConstants;
 import es.gob.afirma.core.misc.Base64;
 
-/**
- * Gestor de comunicaciones con el servidor de portafirmas m&oacute;vil.
- *
- * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s
- */
+/** Gestor de comunicaciones con el servidor de portafirmas m&oacute;vil.
+ * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
 public final class CommManager {
 
 	private static final String HTTPS = "https"; //$NON-NLS-1$
@@ -86,15 +83,6 @@ public final class CommManager {
 
 	private String prepareUrl(final String operation, final String dataB64UrlSafe) {
 
-		//TODO: Eliminar
-//		try {
-//			Log.i(SFConstants.LOG_TAG, "XML para operacion " + operation + ":\n" +
-//					new String(Base64.decode(dataB64UrlSafe, true)));
-//		}
-//		catch (Exception e) {
-//			e.printStackTrace();
-//		}
-
 		final StringBuffer sb = new StringBuffer(this.signFolderProxyUrl);
 		sb.append("?"); //$NON-NLS-1$
 		sb.append(PARAMETER_NAME_OPERATION);
@@ -105,7 +93,7 @@ public final class CommManager {
 		sb.append("="); //$NON-NLS-1$
 		sb.append(dataB64UrlSafe);
 
-		Log.i("es.gob.afirma", "URL de peticion:\n" + sb.toString()); //$NON-NLS-1$
+		Log.i("es.gob.afirma", "URL de peticion:\n" + sb.toString()); //$NON-NLS-1$ //$NON-NLS-2$
 
 		return sb.toString();
 	}
