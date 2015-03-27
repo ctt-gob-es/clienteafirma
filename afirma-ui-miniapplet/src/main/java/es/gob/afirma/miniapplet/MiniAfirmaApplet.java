@@ -47,35 +47,14 @@ import es.gob.afirma.keystores.AOKeyStore;
 /** MiniApplet de firma del proyecto Afirma. */
 public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 
-	private static final String GOOGLE_ANALYTICS_TRACKING_CODE = "UA-41615516-2"; //$NON-NLS-1$
+	private static final long serialVersionUID = -4364574240099120486L;
 
-	private final StringBuilder dataStore = new StringBuilder();
+	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+
+	private static final String GOOGLE_ANALYTICS_TRACKING_CODE = "UA-41615516-2"; //$NON-NLS-1$
 
 	private static final String EOF = "%%EOF%%"; //$NON-NLS-1$
 	private static final String DEFAULT_CHUNK_ENCODING = "ISO-8859-1";  //$NON-NLS-1$
-
-	/** N&uacute;mero m&aacute;ximo de caracteres que se devuelven en cualquiera de los
-	 * m&eacute;todos del Applet. */
-	private static final int BUFFER_SIZE = 1024 * 1024;	// 1 Mb
-
-	private InputStream chunkedReturnStream;
-
-	/** Clave privada fijada para reutilizarse en operaciones sucesivas. */
-	private PrivateKeyEntry stickyKeyEntry = null;
-
-	private boolean stickySignatory = false;
-
-	private static final long serialVersionUID = -4364574240099120486L;
-
-	static {
-		try {
-			LogManager.install(App.MINIAPPLET);
-		}
-		catch(final Exception e) {
-			Logger.getLogger("es.gob.afirma").severe("No ha sido posible instalar el gestor de registro: " + e); //$NON-NLS-1$ //$NON-NLS-2$
-		}
-	}
-	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	private static final String APPLET_PARAM_USER_AGENT = "userAgent"; //$NON-NLS-1$
 
@@ -86,6 +65,20 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 	private static final String APPLET_PARAM_USER_KEYSTORE = "keystore"; //$NON-NLS-1$
 
 	private static final String SIGNATURE_FORMAT_AUTO = "AUTO"; //$NON-NLS-1$
+	
+	/** N&uacute;mero m&aacute;ximo de caracteres que se devuelven en cualquiera de los
+	 * m&eacute;todos del Applet. */
+	private static final int BUFFER_SIZE = 1024 * 1024;	// 1 Mb
+
+	private final StringBuilder dataStore = new StringBuilder();
+
+	/** Flujo de datos utilizado para la lectura de datos en fragmentos. */
+	private InputStream chunkedReturnStream;
+
+	/** Clave privada fijada para reutilizarse en operaciones sucesivas. */
+	private PrivateKeyEntry stickyKeyEntry = null;
+
+	private boolean stickySignatory = false;
 
 	/** Identificador del navegador Web que carga el applet. */
 	private String userAgent = null;
@@ -102,6 +95,15 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 	/** Tipoe del &uacute;ltimo error producido. */
 	private String errorType = null;
 
+	static {
+		try {
+			LogManager.install(App.MINIAPPLET);
+		}
+		catch(final Exception e) {
+			Logger.getLogger("es.gob.afirma").severe("No ha sido posible instalar el gestor de registro: " + e); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+	}
+	
 	/** {@inheritDoc} */
 	@Override
 	public void setStickySignatory(final boolean sticky) {
