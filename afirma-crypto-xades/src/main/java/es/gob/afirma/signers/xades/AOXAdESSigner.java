@@ -275,9 +275,6 @@ public final class AOXAdESSigner implements AOSigner {
     /** URI que define el tipo de propiedades firmadas de XAdES (1.4.x). */
     static final String XADES_SIGNED_PROPERTIES_TYPE = "http://uri.etsi.org/01903#SignedProperties"; //$NON-NLS-1$
 
-    /** URI que define una referencia de tipo OBJECT. */
-    static final String OBJURI = "http://www.w3.org/2000/09/xmldsig#Object"; //$NON-NLS-1$
-
     /** URI que define una referencia de tipo MANIFEST. */
     static final String MANIFESTURI = "http://www.w3.org/2000/09/xmldsig#Manifest"; //$NON-NLS-1$
 

@@ -20,7 +20,7 @@ import es.gob.afirma.keystores.AOKeyStore;
 import es.gob.afirma.keystores.AOKeyStoreManager;
 import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
 import es.gob.afirma.keystores.callbacks.CachePasswordCallback;
-import es.gob.afirma.miniapplet.keystores.filters.QualifiedCertificatesFilter;
+import es.gob.afirma.keystores.filters.QualifiedCertificatesFilter;
 
 
 /* NOTA: No funciona este test porque ninguno de los certificados del almacen tiene

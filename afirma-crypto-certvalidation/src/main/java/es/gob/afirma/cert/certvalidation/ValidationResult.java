@@ -1,5 +1,10 @@
 package es.gob.afirma.cert.certvalidation;
 
+import java.security.cert.CertificateEncodingException;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateExpiredException;
+import java.security.cert.CertificateNotYetValidException;
+
 /** Resultado de la validaci&oacute;n de un certificado X.509.
  * Clase cedida por <a href="http://www.yohago.com/">YoHago</a>.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
@@ -30,7 +35,7 @@ public enum ValidationResult {
 	private static final int CODE_REVOKED = 5;
 	private static final int CODE_UNKNOWN = 6;
 	private static final int CODE_SERVER_ERROR = 7;
-
+	
 	private final int resultCode;
 	private ValidationResult(final int code) {
 		if (code < CODE_VALID || code > CODE_SERVER_ERROR) {
@@ -78,6 +83,33 @@ public enum ValidationResult {
 				return "Desconocido"; //$NON-NLS-1$
 			case CODE_SERVER_ERROR:
 				return "Error interno o del servidor"; //$NON-NLS-1$
+			default:
+				throw new IllegalStateException(
+					"El codigo de resultado debe estar comprendido entre 0 y 7: " + this.resultCode //$NON-NLS-1$
+				);
+		}
+	}
+
+	/** Lanza las excepciones apropiadas en caso de que el certificado no sea v&aacute;lido.
+	 * @throws CertificateException Cuando el certificado no es v&aacute;lido. */
+	public void check() throws CertificateException {
+		switch(this.resultCode) {
+			case CODE_VALID:
+				return;
+			case CODE_CORRUPT:
+				throw new CertificateEncodingException();
+			case CODE_CA_NOT_SUPPORTED:
+				throw new CertificateException("El certificado no es de una CA soportada"); //$NON-NLS-1$
+			case CODE_NOT_YET_VALID:
+				throw new CertificateNotYetValidException();
+			case CODE_EXPIRED:
+				throw new CertificateExpiredException();
+			case CODE_REVOKED:
+				throw new CertificateException("Certificado revocado"); //$NON-NLS-1$
+			case CODE_UNKNOWN:
+				throw new CertificateException("Validez del certificado desconocida"); //$NON-NLS-1$
+			case CODE_SERVER_ERROR:
+				throw new CertificateException("Error interno o del servidor al validar el certificado"); //$NON-NLS-1$
 			default:
 				throw new IllegalStateException(
 					"El codigo de resultado debe estar comprendido entre 0 y 7: " + this.resultCode //$NON-NLS-1$

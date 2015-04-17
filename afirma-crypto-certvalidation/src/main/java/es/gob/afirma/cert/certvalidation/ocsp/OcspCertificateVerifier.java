@@ -20,8 +20,9 @@ public final class OcspCertificateVerifier extends CertificateVerifier {
 	private final Properties conf = new Properties();
 
 	/** Construye un validador de certificados por OCSP.
-	 * @param confFile Fichero de propiedades con las opciones de configuraci&oacute;n */
-	public OcspCertificateVerifier(final String confFile) {
+	 * @param confFile Fichero de propiedades con las opciones de configuraci&oacute;n
+	 * @param cert Certificado inicialmente a validar. */
+	public OcspCertificateVerifier(final String confFile, final X509Certificate cert) {
 		try {
 			this.conf.load(OcspCertificateVerifier.class.getResourceAsStream(confFile));
 		}
@@ -43,6 +44,7 @@ public final class OcspCertificateVerifier extends CertificateVerifier {
 				"No se ha podido cargar el certificado raiz del emisor (" + issuerCertFile + "): " + e, e //$NON-NLS-1$ //$NON-NLS-2$
 			);
 		}
+		setSubjectCert(cert);
 	}
 
 	@Override

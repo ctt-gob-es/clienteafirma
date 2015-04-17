@@ -93,13 +93,12 @@ public final class AOXMLDSigSigner implements AOSigner {
     /** URI que define la versi&oacute;n por defecto de XAdES. */
     private static final String XADESNS = "http://uri.etsi.org/01903#"; //$NON-NLS-1$
 
-    /** URI que define una referencia de tipo OBJECT. */
-    private static final String OBJURI = "http://www.w3.org/2000/09/xmldsig#Object"; //$NON-NLS-1$
-
     private static final String SIGNATURE_STR = "Signature"; //$NON-NLS-1$
     private static final String MIMETYPE_STR = "MimeType"; //$NON-NLS-1$
     private static final String ENCODING_STR = "Encoding"; //$NON-NLS-1$
     private static final String REFERENCE_STR = "Reference"; //$NON-NLS-1$
+
+    private static final String ID_IDENTIFIER = "Id"; //$NON-NLS-1$
 
     private static final String HTTP_PROTOCOL_PREFIX = "http://"; //$NON-NLS-1$
     private static final String HTTPS_PROTOCOL_PREFIX = "https://"; //$NON-NLS-1$
@@ -117,6 +116,8 @@ public final class AOXMLDSigSigner implements AOSigner {
     private static final String DIGEST_METHOD = DigestMethod.SHA1;
 
     private static final String SIGNATURE_VALUE = "SignatureValue"; //$NON-NLS-1$
+
+    private static final String URI_STR = "URI"; //$NON-NLS-1$
 
     private String algo;
     private Document doc;
@@ -441,7 +442,7 @@ public final class AOXMLDSigSigner implements AOSigner {
 
                 if (format.equals(AOSignConstants.SIGN_FORMAT_XMLDSIG_DETACHED)) {
                     dataElement = docum.createElement(DETACHED_CONTENT_ELEMENT_NAME);
-                    dataElement.setAttributeNS(null, "Id", contentId); //$NON-NLS-1$
+                    dataElement.setAttributeNS(null, ID_IDENTIFIER, contentId);
                     dataElement.setAttributeNS(null, MIMETYPE_STR, mimeType);
                     dataElement.setAttributeNS(null, ENCODING_STR, encoding);
                     dataElement.appendChild(docum.getDocumentElement());
@@ -450,7 +451,7 @@ public final class AOXMLDSigSigner implements AOSigner {
                     if (xmlStyle.getStyleElement() != null) {
                         try {
                             final Element tmpStyleElement = docum.createElement(DETACHED_STYLE_ELEMENT_NAME);
-                            tmpStyleElement.setAttributeNS(null, "Id", styleId); //$NON-NLS-1$
+                            tmpStyleElement.setAttributeNS(null, ID_IDENTIFIER, styleId);
                             if (xmlStyle.getStyleType() != null) {
                                 tmpStyleElement.setAttributeNS(null, MIMETYPE_STR, xmlStyle.getStyleType());
                             }
@@ -490,7 +491,7 @@ public final class AOXMLDSigSigner implements AOSigner {
                         mimeType = XMLConstants.DEFAULT_MIMETYPE;
                     }
 
-                    dataElement.setAttributeNS(null, "Id", contentId); //$NON-NLS-1$
+                    dataElement.setAttributeNS(null, ID_IDENTIFIER, contentId);
 
                     // Si es base 64, lo firmamos indicando como contenido el
                     // dato pero, ya que puede
@@ -600,22 +601,16 @@ public final class AOXMLDSigSigner implements AOSigner {
             // utilizado, el Hash de las firmas
             // explicitas de datos siempre sera SHA1, salvo que el hash se haya
             // establecido desde fuera.
-            String hashAlgoUri;
             if (precalculatedHashAlgorithm != null) {
                 mimeType = "hash/" + precalculatedHashAlgorithm.toLowerCase(); //$NON-NLS-1$
-                hashAlgoUri = XMLConstants.MESSAGEDIGEST_ALGOS_URI.get(precalculatedHashAlgorithm.toLowerCase());
             }
             else {
                 mimeType = "hash/sha1"; //$NON-NLS-1$
-                hashAlgoUri = XMLConstants.MESSAGEDIGEST_ALGOS_URI.get("sha1"); //$NON-NLS-1$
             }
 
-            dataElement.setAttributeNS(null, "Id", contentId); //$NON-NLS-1$
+            dataElement.setAttributeNS(null, ID_IDENTIFIER, contentId);
             dataElement.setAttributeNS(null, MIMETYPE_STR, mimeType);
             dataElement.setAttributeNS(null, ENCODING_STR, encoding);
-            if (hashAlgoUri != null) {
-                dataElement.setAttributeNS(null, "hashAlgorithm", hashAlgoUri); //$NON-NLS-1$ // TODO: Aqui se agrega el atributo a la Detached Explicita
-            }
 
             dataElement.setTextContent(Base64.encode(digestValue));
             isBase64 = true;
@@ -707,7 +702,15 @@ public final class AOXMLDSigSigner implements AOSigner {
                 envelopingObject = fac.newXMLObject(structures, objectId, mimeType, encoding);
 
                 // crea la referencia al nuevo elemento Object
-                referenceList.add(fac.newReference("#" + objectId, digestMethod, transformList, OBJURI, referenceId)); //$NON-NLS-1$
+                referenceList.add(
+            		fac.newReference(
+        				"#" + objectId, //$NON-NLS-1$
+        				digestMethod,
+        				transformList,
+        				XMLConstants.OBJURI,
+        				referenceId
+    				)
+				);
 
                 // Vamos con la hoja de estilo
                 if (xmlStyle.getStyleElement() != null) {
@@ -718,12 +721,20 @@ public final class AOXMLDSigSigner implements AOSigner {
                 		xmlStyle.getStyleType(),
                 		xmlStyle.getStyleEncoding()
             		);
-                    referenceList.add(fac.newReference("#" + objectStyleId, //$NON-NLS-1$
-                                                       digestMethod,
-                                                       Collections.singletonList(fac.newTransform(canonicalizationAlgorithm,
-                                                                                                  (TransformParameterSpec) null)),
-                                                       OBJURI,
-                                                       referenceStyleId));
+                    referenceList.add(
+                		fac.newReference(
+            				"#" + objectStyleId, //$NON-NLS-1$
+                            digestMethod,
+                            Collections.singletonList(
+                        		fac.newTransform(
+                    				canonicalizationAlgorithm,
+                    				(TransformParameterSpec) null
+                				)
+            				),
+            				XMLConstants.OBJURI,
+                            referenceStyleId
+                        )
+                    );
 
                 }
             }
@@ -742,7 +753,7 @@ public final class AOXMLDSigSigner implements AOSigner {
             				xmlStyle.getStyleHref(),
                             digestMethod,
                             Collections.singletonList(fac.newTransform(canonicalizationAlgorithm, (TransformParameterSpec) null)),
-                            null,
+                            XMLConstants.OBJURI,
                             referenceStyleId
                         )
                     );
@@ -766,19 +777,35 @@ public final class AOXMLDSigSigner implements AOSigner {
                     docSignature.getDocumentElement().appendChild(docSignature.adoptNode(dataElement));
                     // crea la referencia a los datos firmados que se
                     // encontraran en el mismo documento
-                    referenceList.add(fac.newReference(tmpUri, digestMethod, transformList, null, referenceId));
+                    referenceList.add(
+                		fac.newReference(
+            				tmpUri,
+            				digestMethod,
+            				transformList,
+            				XMLConstants.OBJURI,
+            				referenceId
+        				)
+    				);
                 }
                 if (xmlStyle.getStyleElement() != null) {
                     // inserta en el nuevo documento de firma la hoja de estilo
                     docSignature.getDocumentElement().appendChild(docSignature.adoptNode(xmlStyle.getStyleElement()));
                     // crea la referencia a los datos firmados que se
                     // encontraran en el mismo documento
-                    referenceList.add(fac.newReference(tmpStyleUri,
-                                                       digestMethod,
-                                                       Collections.singletonList(fac.newTransform(canonicalizationAlgorithm,
-                                                                                                  (TransformParameterSpec) null)),
-                                                       null,
-                                                       referenceStyleId));
+                    referenceList.add(
+                		fac.newReference(
+            				tmpStyleUri,
+                            digestMethod,
+                            Collections.singletonList(
+                        		fac.newTransform(
+                    				canonicalizationAlgorithm,
+                                    (TransformParameterSpec) null
+                                )
+                            ),
+                            XMLConstants.OBJURI,
+                            referenceStyleId
+                        )
+                    );
                 }
 
             }
@@ -795,7 +822,7 @@ public final class AOXMLDSigSigner implements AOSigner {
             				xmlStyle.getStyleHref(),
                             digestMethod,
                             Collections.singletonList(fac.newTransform(canonicalizationAlgorithm, (TransformParameterSpec) null)),
-                            null,
+                            XMLConstants.OBJURI,
                             referenceStyleId
                         )
                     );
@@ -818,7 +845,7 @@ public final class AOXMLDSigSigner implements AOSigner {
             if (precalculatedHashAlgorithm != null && (uri == null || uri.getScheme().equals("") || uri.getScheme().equals("file"))) { //$NON-NLS-1$ //$NON-NLS-2$
                 DigestMethod dm = null;
                 try {
-                    // Convertimos el algo del Message Digest externo a la
+                    // Convertimos el algoritmo del Message Digest externo a la
                     // nomenclatura XML
                     if (AOSignConstants.getDigestAlgorithmName(precalculatedHashAlgorithm).equalsIgnoreCase("SHA1")) { //$NON-NLS-1$
                         dm = fac.newDigestMethod(DigestMethod.SHA1, null);
@@ -839,7 +866,14 @@ public final class AOXMLDSigSigner implements AOSigner {
                 if (dm == null) {
                     throw new AOException("Metodo de Message Digest para la referencia Externally Detached no soportado: " + precalculatedHashAlgorithm); //$NON-NLS-1$
                 }
-                ref = fac.newReference("", dm, null, null, referenceId, data); //$NON-NLS-1$
+                ref = fac.newReference(
+            		"", //$NON-NLS-1$
+            		dm,
+            		null,
+            		XMLConstants.OBJURI, // Es un nodo a firmar
+            		referenceId,
+            		data
+        		);
             }
             // Tenemos URI y no nos han establecido algoritmo de message digest,
             // por lo que es una referencia externa accesible
@@ -849,14 +883,16 @@ public final class AOXMLDSigSigner implements AOSigner {
                 // el message digest
                 if (uri != null && uri.getScheme().equals("file")) { //$NON-NLS-1$
                     try {
-                        ref =
-                                fac.newReference("", //$NON-NLS-1$
-                                                 digestMethod,
-                                                 null,
-                                                 null,
-                                                 referenceId,
-                                                 MessageDigest.getInstance(AOSignConstants.getDigestAlgorithmName(digestMethodAlgorithm))
-                                                              .digest(AOUtil.getDataFromInputStream(AOUtil.loadFile(uri))));
+                        ref = fac.newReference(
+                    		"", //$NON-NLS-1$
+                            digestMethod,
+                            null,
+                            XMLConstants.OBJURI,
+                            referenceId,
+                            MessageDigest.getInstance(
+                        		AOSignConstants.getDigestAlgorithmName(digestMethodAlgorithm)
+                    		).digest(AOUtil.getDataFromInputStream(AOUtil.loadFile(uri)))
+                		);
                     }
                     catch (final Exception e) {
                         throw new AOException("No se ha podido crear la referencia XML a partir de la URI local (" + uri.toASCIIString() + ")", e); //$NON-NLS-1$ //$NON-NLS-2$
@@ -870,8 +906,10 @@ public final class AOXMLDSigSigner implements AOSigner {
                         ref = fac.newReference(uri.toASCIIString(), digestMethod);
                     }
                     catch (final Exception e) {
-                        throw new AOException("No se ha podido crear la referencia Externally Detached, probablemente por no obtenerse el metodo de digest", //$NON-NLS-1$
-                                              e);
+                        throw new AOException(
+                    		"No se ha podido crear la referencia Externally Detached, probablemente por no obtenerse el metodo de digest", //$NON-NLS-1$
+                            e
+                        );
                     }
                 }
             }
@@ -890,7 +928,7 @@ public final class AOXMLDSigSigner implements AOSigner {
                 				xmlStyle.getStyleHref(),
                                 digestMethod,
                                 Collections.singletonList(fac.newTransform(canonicalizationAlgorithm, (TransformParameterSpec) null)),
-                                null,
+                                XMLConstants.OBJURI,
                                 referenceStyleId
                             )
                         );
@@ -929,7 +967,14 @@ public final class AOXMLDSigSigner implements AOSigner {
                 );
 
                 // crea la referencia
-                referenceList.add(fac.newReference("", digestMethod, transformList, null, referenceId)); //$NON-NLS-1$
+                referenceList.add(
+            		fac.newReference(
+        				"", //$NON-NLS-1$
+        				digestMethod,
+        				transformList,
+        				XMLConstants.OBJURI, // Aunque sea Enveloped, es un nodo a firmar
+        				referenceId)
+    				);
             }
             catch (final Exception e) {
                 throw new AOException("Error al generar la firma en formato enveloped", e); //$NON-NLS-1$
@@ -944,7 +989,7 @@ public final class AOXMLDSigSigner implements AOSigner {
             				xmlStyle.getStyleHref(),
             				digestMethod,
             				Collections.singletonList(fac.newTransform(canonicalizationAlgorithm, (TransformParameterSpec) null)),
-            				null,
+            				XMLConstants.OBJURI,
             				referenceStyleId
         				)
             		);
@@ -1019,7 +1064,7 @@ public final class AOXMLDSigSigner implements AOSigner {
             				tmpStyleUri,
                             digestMethod,
                             Collections.singletonList(fac.newTransform(canonicalizationAlgorithm, (TransformParameterSpec) null)),
-                            null,
+                            XMLConstants.OBJURI,
                             referenceStyleId
                         )
                     );
@@ -1137,13 +1182,9 @@ public final class AOXMLDSigSigner implements AOSigner {
         if (element == null) {
             return false;
         }
-        if (element.getLocalName().equals(SIGNATURE_STR) || element.getLocalName().equals(AFIRMA) && element.getFirstChild()
-                                                                                                           .getLocalName()
-                                                                                                           .equals(SIGNATURE_STR)) {
-            return true;
-        }
-
-        return false;
+        return element.getLocalName() != null && element.getLocalName().equals(SIGNATURE_STR) ||
+        		element.getNodeName().equals(AFIRMA) &&
+        		element.getFirstChild().getLocalName() != null && element.getFirstChild().getLocalName().equals(SIGNATURE_STR);
     }
 
     /** {@inheritDoc} */
@@ -1342,31 +1383,31 @@ public final class AOXMLDSigSigner implements AOSigner {
         // Buscamos dentro de ese Signature todas las referencias que apunten a
         // datos para firmarlas
         final ArrayList<String> referencesIds = new ArrayList<String>();
-        Node currentElement;
+        Node currentReference;
         final NodeList nl = ((Element) docSig.getElementsByTagNameNS(XMLConstants.DSIGNNS, SIGNATURE_STR).item(0)).getElementsByTagNameNS(XMLConstants.DSIGNNS, REFERENCE_STR);
 
         // Se considera que la primera referencia de la firma son los datos que
         // debemos firmar, ademas
         // de varias referencias especiales
+        XMLObject envelopingObject = null;
         for (int i = 0; i < nl.getLength(); i++) {
-            currentElement = nl.item(i);
+            currentReference = nl.item(i);
 
             // Firmamos la primera referencia (que seran los datos firmados) y
             // las hojas de estilo que
             // tenga asignadas. Las hojas de estilo tendran un identificador que
             // comience por STYLE_REFERENCE_PREFIX.
             // TODO: Identificar las hojas de estilo de un modo generico.
-            final NamedNodeMap currentNodeAttributes = currentElement.getAttributes();
-            if (i == 0 || currentNodeAttributes.getNamedItem("Id") != null && currentNodeAttributes.getNamedItem("Id") //$NON-NLS-1$ //$NON-NLS-2$
-                                                                                                    .getNodeValue()
-                                                                                                    .startsWith(STYLE_REFERENCE_PREFIX)) {
+            final NamedNodeMap currentNodeAttributes = currentReference.getAttributes();
+            if (i == 0 || currentNodeAttributes.getNamedItem(ID_IDENTIFIER) != null &&
+            		currentNodeAttributes.getNamedItem(ID_IDENTIFIER).getNodeValue().startsWith(STYLE_REFERENCE_PREFIX)) {
 
                 // Buscamos las transformaciones declaradas en la Referencia,
                 // para anadirlas
                 // tambien en la nueva
                 List<Transform> currentTransformList;
                 try {
-                    currentTransformList = Utils.getObjectReferenceTransforms(currentElement, xmlSignaturePrefix);
+                    currentTransformList = Utils.getObjectReferenceTransforms(currentReference, xmlSignaturePrefix);
                 }
                 catch (final NoSuchAlgorithmException e) {
                     Logger.getLogger("Se ha declarado una transformacion personalizada de un tipo no soportado: " + e); //$NON-NLS-1$
@@ -1383,9 +1424,8 @@ public final class AOXMLDSigSigner implements AOSigner {
                 // de estilo lo creamos con un
                 // identificador descriptivo
                 String referenceId = null;
-                if (currentNodeAttributes.getNamedItem("Id") != null && currentNodeAttributes.getNamedItem("Id") //$NON-NLS-1$ //$NON-NLS-2$
-                                                                                              .getNodeValue()
-                                                                                              .startsWith(STYLE_REFERENCE_PREFIX)) {
+                if (currentNodeAttributes.getNamedItem(ID_IDENTIFIER) != null &&
+                		currentNodeAttributes.getNamedItem(ID_IDENTIFIER).getNodeValue().startsWith(STYLE_REFERENCE_PREFIX)) {
                     referenceId = STYLE_REFERENCE_PREFIX + UUID.randomUUID().toString();
                 }
                 else {
@@ -1393,12 +1433,49 @@ public final class AOXMLDSigSigner implements AOSigner {
                 }
                 referencesIds.add(referenceId);
 
-                // Creamos la propia referencia con las transformaciones de la
-                // original
-                referenceList.add(fac.newReference(((Element) currentElement).getAttribute("URI"), digestMethod, currentTransformList, // Lista de //$NON-NLS-1$
-                                                                                                                                       // transformaciones
-                                                   null,
-                                                   referenceId));
+                // Creamos la propia referencia con las transformaciones de la original
+                // TODO: Copiar el nodo para enveloping
+                final String referenceUri = ((Element) currentReference).getAttribute(URI_STR);
+                if (isEnveloping(rootSig) && referenceUri != null) {
+
+                	final Node dataNode = searchDataElement(referenceUri, rootSig);
+                	if (dataNode == null) {
+                		LOGGER.severe("No se ha identificado el nodo de datos a firmar"); //$NON-NLS-1$
+                		throw new AOException("No se ha identificado el nodo de datos a firmar"); //$NON-NLS-1$
+                	}
+
+                	// crea el nuevo elemento Object que con el documento afirmar
+					final List<XMLStructure> structures = new ArrayList<XMLStructure>(1);
+					structures.add(new DOMStructure(dataNode.getFirstChild().cloneNode(true)));
+
+					final String mimeType = ((Element) dataNode).getAttribute(MIMETYPE_STR);
+					final String encoding = ((Element) dataNode).getAttribute(ENCODING_STR);
+
+					final String newObjectId = "Object-" + UUID.randomUUID().toString(); //$NON-NLS-1$
+					envelopingObject = fac.newXMLObject(structures, newObjectId, mimeType, encoding);
+
+					// Agregamos la referencia al nuevo objeto de datos
+					referenceList.add(
+						fac.newReference(
+							"#" + newObjectId, //$NON-NLS-1$
+							digestMethod,
+							currentTransformList,
+							XMLConstants.OBJURI,
+							referenceId
+						)
+					);
+                }
+                else {
+                	referenceList.add(
+            			fac.newReference(
+                			((Element) currentReference).getAttribute(URI_STR),
+                			digestMethod,
+                			currentTransformList, // Lista de transformaciones
+                			XMLConstants.OBJURI,
+                			referenceId
+            			)
+        			);
+                }
             }
         }
 
@@ -1462,9 +1539,16 @@ public final class AOXMLDSigSigner implements AOSigner {
             	LOGGER.warning("No se ha podido instalar un dereferenciador a medida, es posible que fallen las firmas de nodos concretos: " + e); //$NON-NLS-1$
             }
 
+            // en el caso de formato enveloping se inserta el elemento Object
+            // con el documento a firmar
+            final List<Object> objectList = new ArrayList<Object>();
+            if (isEnveloping(rootSig) && envelopingObject != null) {
+                objectList.add(envelopingObject);
+            }
+
             fac.newXMLSignature(fac.newSignedInfo(cm, sm, referenceList), // SignedInfo
                                 kif.newKeyInfo(content, keyInfoId), // KeyInfo
-                                new ArrayList<Object>(),
+                                objectList,
                                 signatureId,
                                 signatureValueId).sign(signContext);
 
@@ -1793,7 +1877,7 @@ public final class AOXMLDSigSigner implements AOSigner {
         for (int i = 0; i < signatures.getLength(); i++) {
         	signatureValueID[i] = ((Element) signatures.item(i)).
         		getElementsByTagNameNS(XMLConstants.DSIGNNS, SIGNATURE_VALUE).item(0).
-        		getAttributes().getNamedItem("Id").getNodeValue(); //$NON-NLS-1$
+        		getAttributes().getNamedItem(ID_IDENTIFIER).getNodeValue();
         }
 
         // hojas seran aquellas firmas cuyo SignatureValue no haya sido referenciado
@@ -1803,7 +1887,7 @@ public final class AOXMLDSigSigner implements AOSigner {
 
                 boolean isLeaf = true;
                 for (int j = 0; j < references.getLength(); j++) {
-                    if (((Element) references.item(j)).getAttribute("URI").equals(refURI)) { //$NON-NLS-1$
+                    if (((Element) references.item(j)).getAttribute(URI_STR).equals(refURI)) {
                         isLeaf = false;
                     }
                 }
@@ -1860,7 +1944,7 @@ public final class AOXMLDSigSigner implements AOSigner {
         for (int i = 0; i < signatures.getLength(); i++) {
         	signatureValuesID[i] = ((Element) signatures.item(i)).
         		getElementsByTagNameNS(XMLConstants.DSIGNNS, SIGNATURE_VALUE).item(0).
-        		getAttributes().getNamedItem("Id").getNodeValue(); //$NON-NLS-1$
+        		getAttributes().getNamedItem(ID_IDENTIFIER).getNodeValue();
         }
 
         // ordenamos los nodos de firma en preorden segun el arbol de firmas
@@ -1912,7 +1996,7 @@ public final class AOXMLDSigSigner implements AOSigner {
     				XMLConstants.DSIGNNS, REFERENCE_STR);
 
     		for (int j = 0; j < references.getLength(); j++) {
-    			if (("#" + signatureValueID).equals(((Element)references.item(j)).getAttribute("URI"))) { //$NON-NLS-1$ //$NON-NLS-2$
+    			if (("#" + signatureValueID).equals(((Element)references.item(j)).getAttribute(URI_STR))) { //$NON-NLS-1$
     				// Si una firma contiene una referencia a si misma,
     				// rompemos el ciclo para evitar un bucle infinito
     				if (signatureValuesID[i].equals(signatureValueID)) {
@@ -2007,7 +2091,15 @@ public final class AOXMLDSigSigner implements AOSigner {
             // Transformada para la canonicalizacion inclusiva con comentarios
             final List<Transform> transformList = new ArrayList<Transform>();
             transformList.add(fac.newTransform(canonicalizationAlgorithm, (TransformParameterSpec) null));
-            referenceList.add(fac.newReference("#" + signatureValue.getAttribute("Id"), digestMethod, transformList, CSURI, referenceId)); //$NON-NLS-1$ //$NON-NLS-2$
+            referenceList.add(
+        		fac.newReference(
+            		"#" + signatureValue.getAttribute(ID_IDENTIFIER), //$NON-NLS-1$
+            		digestMethod,
+            		transformList,
+            		CSURI,
+            		referenceId
+        		)
+    		);
         }
         catch (final Exception e) {
             throw new AOException("No se ha podido anadir la transformacion de canonizacion en la contrafirma: " + e, e); //$NON-NLS-1$
@@ -2126,7 +2218,7 @@ public final class AOXMLDSigSigner implements AOSigner {
 
             final Element signature = (Element) signatures.item(i);
 
-            arrayIds[i] = signature.getAttribute("Id"); //$NON-NLS-1$
+            arrayIds[i] = signature.getAttribute(ID_IDENTIFIER);
 
             arrayNodes[i] = new AOTreeNode(asSimpleSignInfo ? Utils.getSimpleSignInfoNode(XADESNS, signature) : Utils.getStringInfoNode(signature));
 
@@ -2319,4 +2411,49 @@ public final class AOXMLDSigSigner implements AOSigner {
         serializer.write(node, output);
     }
 
+    /**
+     * Busca en un elemento XML el nodo de datos con un ID concreto.
+     * @param dataElementIdReference Referencia al elemento que se busca.
+     * @param rootElement Elemento XML a partir del cual buscar.
+     * @return Elemento XML con los datos o {@code null} si no se encuentra.
+     */
+    private static Element searchDataElement(final String dataElementIdReference, final Element rootElement) {
+
+    	final String dataElementId = dataElementIdReference.substring(dataElementIdReference.startsWith("#") ? 1 : 0); //$NON-NLS-1$
+		Element dataObjectElement = null;
+
+		// Comprobamos si el nodo raiz o sus hijos inmediatos son el nodo de datos
+		Node nodeAttributeId = rootElement.getAttributes() != null ? rootElement.getAttributes().getNamedItem(ID_IDENTIFIER) : null;
+		if (nodeAttributeId != null && dataElementId.equals(nodeAttributeId.getNodeValue())) {
+			dataObjectElement = rootElement;
+		}
+		else {
+			// Recorremos los hijos al reves para acceder antes a los datos y las firmas
+			final NodeList rootChildNodes = rootElement.getChildNodes();
+			for (int j = rootChildNodes.getLength() - 1; j >= 0; j--) {
+
+				nodeAttributeId = rootChildNodes.item(j).getAttributes() != null ? rootChildNodes.item(j).getAttributes().getNamedItem(ID_IDENTIFIER) : null;
+				if (nodeAttributeId != null && dataElementId.equals(nodeAttributeId.getNodeValue())) {
+					dataObjectElement = (Element) rootChildNodes.item(j);
+					break;
+				}
+
+				// Si es un nodo de firma tambien miramos en sus nodos hijos
+				if (SIGNATURE_STR.equals(rootChildNodes.item(j).getLocalName())) {
+					final NodeList subChildsNodes = rootChildNodes.item(j).getChildNodes();
+					for (int k = subChildsNodes.getLength() - 1; k >= 0; k--) {
+						nodeAttributeId = subChildsNodes.item(k).getAttributes() != null ? subChildsNodes.item(k).getAttributes().getNamedItem(ID_IDENTIFIER) : null;
+						if (nodeAttributeId != null && dataElementId.equals(nodeAttributeId.getNodeValue())) {
+							dataObjectElement = (Element) subChildsNodes.item(k);
+							break;
+						}
+					}
+					if (dataObjectElement != null) {
+						break;
+					}
+				}
+			}
+		}
+    	return dataObjectElement;
+    }
 }

@@ -19,7 +19,7 @@ import es.gob.afirma.keystores.AOKeyStore;
 import es.gob.afirma.keystores.AOKeyStoreManager;
 import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
 import es.gob.afirma.keystores.callbacks.CachePasswordCallback;
-import es.gob.afirma.miniapplet.keystores.filters.SSLFilter;
+import es.gob.afirma.keystores.filters.SSLFilter;
 
 /**
  * Prueba el filtrado de certificado a partir de un numero de serie en hexadecimal. No prueba la

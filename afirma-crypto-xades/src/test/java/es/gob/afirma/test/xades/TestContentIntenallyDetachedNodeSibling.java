@@ -29,9 +29,9 @@ import es.gob.afirma.signers.xades.AOXAdESSigner;
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public final class TestContentIntenallyDetachedNodeSibling {
 
-    private static final String CERT_PATH = "ANF_PF_Activo.pfx"; //$NON-NLS-1$
+    private static final String CERT_PATH = "PFActivoFirSHA256.pfx"; //$NON-NLS-1$
     private static final String CERT_PASS = "12341234"; //$NON-NLS-1$
-    private static final String CERT_ALIAS = "anf usuario activo"; //$NON-NLS-1$
+    private static final String CERT_ALIAS = "fisico activo prueba"; //$NON-NLS-1$
 
     private static final Properties[] XADES_MODES;
 

@@ -18,8 +18,9 @@ public final class CrlCertificateVerifier extends CertificateVerifier {
 	private final Properties conf = new Properties();
 
 	/** Construye un validador de certificados por CRL.
-	 * @param confFile Fichero de propiedades con las opciones de configuraci&oacute;n */
-	public CrlCertificateVerifier(final String confFile) {
+	 * @param confFile Fichero de propiedades con las opciones de configuraci&oacute;n
+	 * @param cert Certificado inicialmente a validar. */
+	public CrlCertificateVerifier(final String confFile, final X509Certificate cert) {
 		try {
 			this.conf.load(CrlCertificateVerifier.class.getResourceAsStream(confFile));
 		}
@@ -41,6 +42,7 @@ public final class CrlCertificateVerifier extends CertificateVerifier {
 				"No se ha podido cargar el certificado raiz del emisor (" + issuerCertFile + "): " + e, e //$NON-NLS-1$ //$NON-NLS-2$
 			);
 		}
+		setSubjectCert(cert);
 	}
 
 	@Override

@@ -12,7 +12,6 @@ package es.gob.afirma.signers.xades;
 
 import static es.gob.afirma.signers.xades.AOXAdESSigner.DIGEST_METHOD;
 import static es.gob.afirma.signers.xades.AOXAdESSigner.LOGGER;
-import static es.gob.afirma.signers.xades.AOXAdESSigner.OBJURI;
 import static es.gob.afirma.signers.xades.AOXAdESSigner.SIGNATURE_NODE_NAME;
 import static es.gob.afirma.signers.xades.AOXAdESSigner.SIGNATURE_TAG;
 import static es.gob.afirma.signers.xades.AOXAdESSigner.STYLE_REFERENCE_PREFIX;
@@ -240,8 +239,15 @@ public final class XAdESCoSigner {
 					}
 
 					// Creamos la referencia a los datos con las transformaciones de la original
-					referenceList.add(fac.newReference(
-							((Element) currentElement).getAttribute("URI"), digestMethod, currentTransformList, OBJURI, referenceId)); //$NON-NLS-1$
+					referenceList.add(
+						fac.newReference(
+							((Element) currentElement).getAttribute("URI"), //$NON-NLS-1$
+							digestMethod,
+							currentTransformList,
+							XMLConstants.OBJURI,
+							referenceId
+						)
+					);
 
 				}
 				// Firmas enveloping y detached
@@ -313,15 +319,29 @@ public final class XAdESCoSigner {
 						envelopingObject = fac.newXMLObject(structures, objectId, mimeType, encoding);
 
 						// Agregamos la referencia al nuevo objeto de datos
-						referenceList.add(fac.newReference(
-								"#" + objectId, digestMethod, currentTransformList, OBJURI, referenceId)); //$NON-NLS-1$
+						referenceList.add(
+							fac.newReference(
+								"#" + objectId, //$NON-NLS-1$
+								digestMethod,
+								currentTransformList,
+								XMLConstants.OBJURI,
+								referenceId
+							)
+						);
 
 					}
 					// Firma detached
 					else {
 						// Agregamos la referencia a los datos ya existentes
-						referenceList.add(fac.newReference(
-								((Element) currentElement).getAttribute("URI"), digestMethod, currentTransformList, OBJURI, referenceId)); //$NON-NLS-1$
+						referenceList.add(
+							fac.newReference(
+								((Element) currentElement).getAttribute("URI"), //$NON-NLS-1$
+								digestMethod,
+								currentTransformList,
+								XMLConstants.OBJURI,
+								referenceId
+							)
+						);
 
 					}
 

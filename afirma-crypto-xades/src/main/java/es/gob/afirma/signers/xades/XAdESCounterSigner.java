@@ -542,13 +542,19 @@ public final class XAdESCounterSigner {
 					(TransformParameterSpec) null));
 
 			// Aunque el metodo utilizado para generar las contrafirmas hacen
-			// que no sea necesario
-			// indicar el tipo de la referencia, lo agregamos por si resultase
+			// que no sea necesario indicar el tipo de la referencia, lo agregamos por si resultase
 			// de utilidad
-			referenceList.add(fac.newReference(
-					"#" + signatureValue.getAttribute("Id"), digestMethod, //$NON-NLS-1$ //$NON-NLS-2$
-					transformList, XAdESCounterSigner.CSURI, referenceId));
-		} catch (final Exception e) {
+			referenceList.add(
+				fac.newReference(
+					"#" + signatureValue.getAttribute("Id"), //$NON-NLS-1$ //$NON-NLS-2$
+					digestMethod,
+					transformList,
+					XAdESCounterSigner.CSURI,
+					referenceId
+				)
+			);
+		}
+		catch (final Exception e) {
 			throw new AOException("No se ha podido realizar la contrafirma", e); //$NON-NLS-1$
 		}
 
@@ -591,7 +597,7 @@ public final class XAdESCounterSigner {
 		}
 
 		// SignerRole
-		SignerRole signerRole = XAdESUtil.parseSignerRole(extraParams);
+		final SignerRole signerRole = XAdESUtil.parseSignerRole(extraParams);
 		if (signerRole != null) {
 			xades.setSignerRole(signerRole);
 		}

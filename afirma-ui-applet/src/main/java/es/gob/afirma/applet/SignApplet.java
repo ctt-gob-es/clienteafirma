@@ -58,6 +58,7 @@ import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOFormatFileException;
 import es.gob.afirma.core.AOInvalidFormatException;
 import es.gob.afirma.core.ciphers.CipherConstants.AOCipherAlgorithm;
+import es.gob.afirma.core.misc.AOFileUtils;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.MimeHelper;
@@ -112,7 +113,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 	private static final String GOOGLE_ANALYTICS_TRACKING_CODE = "UA-41615516-3"; //$NON-NLS-1$
 
 	/** Estado del  modo DEBUG. Mantener a {@code false} en la compilaci&oacute;n final. */
-	private static final boolean DEBUG = true;
+	private static final boolean DEBUG = false;
 
 	private static final String CR = "\n"; //$NON-NLS-1$
 
@@ -130,6 +131,10 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 	private static final String APPLET_PARAM_LOCALE = "locale"; //$NON-NLS-1$
 
 	private static final String DEFAULT_MESSAGE_DIGEST_ALGORITHM = "SHA1"; //$NON-NLS-1$
+
+	/** Tama&ntilde;o m&aacute;ximo para mostrar al usuario en el nombre de ruta de un fichero.
+	 * Si los nombres son m&aacute;s largos se acortan con puntos suspensivos en el medio. */
+	private static final int MAX_PATHNAME_LENGTH = 80;
 
 	/** Logger para la visualizaci&oacute;n de los mensajes por consola. */
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
@@ -709,7 +714,8 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 			return false;
 		}
 
-		if (!checkUserPermision(AppletMessages.getString("SignApplet.5") + CR + filename //$NON-NLS-1$
+		if (!checkUserPermision(AppletMessages.getString("SignApplet.5") + CR + //$NON-NLS-1$
+				AOFileUtils.pathLengthShortener(filename, MAX_PATHNAME_LENGTH)
 				+ CR + AppletMessages.getString("SignApplet.12"))) { //$NON-NLS-1$
 			setError(AppletMessages.getString("SignApplet.496", filename)); //$NON-NLS-1$
 			return false;
@@ -925,28 +931,38 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 			try {
 				final URI uriObject = AOUtil.createURI(uri);
 				if ("file".equalsIgnoreCase(uriObject.getScheme())) { //$NON-NLS-1$
-						if (!checkUserPermision(AppletMessages.getString("SignApplet.19") + CR + uri + //$NON-NLS-1$
-								CR + AppletMessages.getString("SignApplet.12"))) { //$NON-NLS-1$
-							setError(AppletMessages.getString("SignApplet.494", uri)); //$NON-NLS-1$
-							return;
-						}
+					if (!checkUserPermision(
+							AppletMessages.getString("SignApplet.19") + CR +  //$NON-NLS-1$
+								AOFileUtils.pathLengthShortener(uri, MAX_PATHNAME_LENGTH) + CR +
+									AppletMessages.getString("SignApplet.12")) //$NON-NLS-1$
+					) {
+						setError(AppletMessages.getString("SignApplet.494", uri)); //$NON-NLS-1$
+						return;
+					}
 				}
-				else if (!getCodeBase().getHost().equals(uriObject.getHost()) &&
-						!checkUserPermision(AppletMessages.getString("SignApplet.34") + CR + //$NON-NLS-1$
-								uriObject.getScheme() + "://" + uriObject.getHost() + CR + //$NON-NLS-1$
-								AppletMessages.getString("SignApplet.12"))) { //$NON-NLS-1$
+				else if (
+					!getCodeBase().getHost().equals(uriObject.getHost()) &&
+					!checkUserPermision(
+						AppletMessages.getString("SignApplet.34") + CR + uriObject.getScheme() + "://" + uriObject.getHost() + CR + AppletMessages.getString("SignApplet.12") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+					)
+				) {
 					setError(AppletMessages.getString("SignApplet.494", uri)); //$NON-NLS-1$
 					return;
 				}
-			} catch (final NullPointerException e) {
+			}
+			catch (final NullPointerException e) {
 				LOGGER.warning("No se ha podido obtener informacion de la ruta indicada, se preguntara si debe permitirse el acceso"); //$NON-NLS-1$
 				// En caso de error obteniendo informacion de la ruta, se pregunta siempre
-				if (!checkUserPermision(AppletMessages.getString("SignApplet.19") + CR + uri + //$NON-NLS-1$
-						CR + AppletMessages.getString("SignApplet.12"))) { //$NON-NLS-1$
+				if (!checkUserPermision(
+						AppletMessages.getString("SignApplet.19") + CR + //$NON-NLS-1$
+							AOFileUtils.pathLengthShortener(uri, MAX_PATHNAME_LENGTH) + CR +
+								AppletMessages.getString("SignApplet.12")) //$NON-NLS-1$
+				) {
 					setError(AppletMessages.getString("SignApplet.494", uri)); //$NON-NLS-1$
 					return;
 				}
-			} catch (final URISyntaxException e) {
+			}
+			catch (final URISyntaxException e) {
 				// Si la URI es erronea lo obviamos para evitar que el integrador tenga que hacer la comprobacion
 				// de error despues de este set (rompiendo compatibilidad con despliegues previos). El problema
 				// se detectara durante la operacion con el recurso.
@@ -978,8 +994,13 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 		if (!normalizePath(uri).equals(this.userSelectedPath)) {
 			try {
 				if (!getCodeBase().getHost().equals(AOUtil.createURI(uri).getHost()) &&
-						!checkUserPermision(AppletMessages.getString("SignApplet.19") + CR + uri + //$NON-NLS-1$
-								CR + AppletMessages.getString("SignApplet.12"))) { //$NON-NLS-1$
+						!checkUserPermision(
+							AppletMessages.getString("SignApplet.19") + CR + //$NON-NLS-1$
+								AOFileUtils.pathLengthShortener(uri, MAX_PATHNAME_LENGTH) + CR +
+									AppletMessages.getString("SignApplet.12") //$NON-NLS-1$
+							)
+						)
+				{
 					setError(AppletMessages.getString("SignApplet.494", uri)); //$NON-NLS-1$
 					return;
 				}
@@ -1071,7 +1092,8 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 				LOGGER.warning("No se ha podido obtener el CodeBase del Applet: " + e); //$NON-NLS-1$
 			}
 			if (codeBase == null || !codeBase.getHost().equals(uri.getHost()) &&
-					!checkUserPermision(AppletMessages.getString("SignApplet.33") + CR + filename + //$NON-NLS-1$
+					!checkUserPermision(AppletMessages.getString("SignApplet.33") + CR + //$NON-NLS-1$
+							AOFileUtils.pathLengthShortener(filename, MAX_PATHNAME_LENGTH) +
 							CR + AppletMessages.getString("SignApplet.12"))) { //$NON-NLS-1$
 				setError(AppletMessages.getString("SignApplet.494", filename)); //$NON-NLS-1$
 				this.electronicSignatureFile = null;
@@ -1234,7 +1256,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 
 				// Configuramos la politica
 				SignApplet.this.configurePolicy();
-				
+
 				// Obtenemos los parametros necesarios segun tipo de
 				// contrafirma. Esto son los firmantes
 				// para la contrafirma de firmantes, los nodos para la
@@ -1395,7 +1417,8 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 			this.outputFile = null;
 			return;
 		}
-		if (!checkUserPermision(AppletMessages.getString("SignApplet.5") + CR + filename + //$NON-NLS-1$
+		if (!checkUserPermision(AppletMessages.getString("SignApplet.5") + CR + //$NON-NLS-1$
+				AOFileUtils.pathLengthShortener(filename, MAX_PATHNAME_LENGTH) +
 				CR + AppletMessages.getString("SignApplet.12"))) { //$NON-NLS-1$
 			setError(AppletMessages.getString("SignApplet.494", filename)); //$NON-NLS-1$
 			return;
@@ -1487,10 +1510,15 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 
 		setError(null);
 
-		if (filename != null && filename.trim().length() > 0 && !normalizePath(filename).equals(this.userSelectedPath) &&
-				!checkUserPermision(
-						AppletMessages.getString("SignApplet.19") + CR + filename + //$NON-NLS-1$
-						CR + AppletMessages.getString("SignApplet.12"))) { //$NON-NLS-1$
+		if (filename != null && filename.trim().length() > 0 &&
+				!normalizePath(filename).equals(this.userSelectedPath) &&
+					!checkUserPermision(
+						AppletMessages.getString("SignApplet.19") + CR + //$NON-NLS-1$
+							AOFileUtils.pathLengthShortener(filename, MAX_PATHNAME_LENGTH) + CR +
+								AppletMessages.getString("SignApplet.12") //$NON-NLS-1$
+						)
+					)
+		{
 			setError(AppletMessages.getString("SignApplet.494", filename)); //$NON-NLS-1$
 			return;
 		}
@@ -1529,9 +1557,9 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 			final String description,
 			final String qualifier,
 			final String hashB64) {
-		
+
 		LOGGER.info("Invocando setPolicy con el identificador: " + identifier); //$NON-NLS-1$
-		
+
 		// El identificador puede ser un OID o una URI (incluyendo una URN de tipo OID)
 		if (identifier != null) {
 			// Probamos primero si es un OID
@@ -1679,9 +1707,8 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 					return Boolean.FALSE;
 				}
 
-
-				// En el caso de las firmas CAdES de fichero o datos, si se configura el
-				// modo explicito, se realizara el calculo de hash desde fuera (siempre sera SHA1)
+				// En el caso de las firmas XAdES de fichero o datos, si se configura el
+				// modo explicito, se realizara el calculo de hash desde fuera (siempre sera SHA512)
 				if (SignApplet.this.getSigFormat().toLowerCase().startsWith(AOSignConstants.SIGN_FORMAT_XADES.toLowerCase()) &&
 						(SignApplet.this.getInternalFileUri() != null || SignApplet.this.getInternalData() != null) &&
 						mode.equals(AOSignConstants.SIGN_MODE_EXPLICIT)) {
@@ -1744,6 +1771,15 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 				catch (final AOFormatFileException e) {
 					getLogger().severe(e.getMessage());
 					SignApplet.this.setError(AppletMessages.getString("SignApplet.11")); //$NON-NLS-1$
+					return Boolean.FALSE;
+				}
+				catch (final AOInvalidFormatException e) {
+					getLogger().severe(e.getMessage());
+					if (e.getClass().getName().endsWith("InvalidEFacturaDataException")) { //$NON-NLS-1$
+						SignApplet.this.setError(AppletMessages.getString("SignApplet.13")); //$NON-NLS-1$
+					} else {
+						SignApplet.this.setError(AppletMessages.getString("SignApplet.11")); //$NON-NLS-1$
+					}
 					return Boolean.FALSE;
 				}
 				catch (final AOException e) {
@@ -1999,7 +2035,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 
 				// Configuramos la politica
 				SignApplet.this.configurePolicy();
-				
+
 				// Finalmente, configuramos el modo, la URI y operamos
 				SignApplet.this.getGenericConfig().setProperty("mode", mode); //$NON-NLS-1$
 				if (SignApplet.this.getInternalFileUri() != null) {
@@ -2842,8 +2878,11 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 		}
 
 		if (!normalizePath(filename).equals(this.userSelectedPath)) {
-			if (!checkUserPermision(AppletMessages.getString("SignApplet.19") + CR + filename + //$NON-NLS-1$
-					CR + AppletMessages.getString("SignApplet.12"))) { //$NON-NLS-1$
+			if (!checkUserPermision(
+					AppletMessages.getString("SignApplet.19") + CR + //$NON-NLS-1$
+						AOFileUtils.pathLengthShortener(filename, MAX_PATHNAME_LENGTH) + CR +
+							AppletMessages.getString("SignApplet.12") //$NON-NLS-1$
+			)) {
 				setError(AppletMessages.getString("SignApplet.494", filename)); //$NON-NLS-1$
 				return null;
 			}
@@ -2963,8 +3002,11 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 		}
 
 		if (!normalizePath(filename).equals(this.userSelectedPath)) {
-			if (!checkUserPermision(AppletMessages.getString("SignApplet.19") + CR + filename +  //$NON-NLS-1$
-					CR + AppletMessages.getString("SignApplet.12"))) { //$NON-NLS-1$
+			if (!checkUserPermision(
+				AppletMessages.getString("SignApplet.19") + CR + //$NON-NLS-1$
+					AOFileUtils.pathLengthShortener(filename, MAX_PATHNAME_LENGTH) + CR +
+						AppletMessages.getString("SignApplet.12") //$NON-NLS-1$
+			)) {
 				setError(AppletMessages.getString("SignApplet.494", filename)); //$NON-NLS-1$
 				return null;
 			}
@@ -3153,7 +3195,8 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 		setError(null);
 
 		if (directory != null && directory.trim().length() > 0 && !checkUserPermision(
-				AppletMessages.getString("SignApplet.103") + CR + directory  + //$NON-NLS-1$
+				AppletMessages.getString("SignApplet.103") + CR + //$NON-NLS-1$
+				AOFileUtils.pathLengthShortener(directory, MAX_PATHNAME_LENGTH) +
 				CR + AppletMessages.getString("SignApplet.12"))) { //$NON-NLS-1$
 			setError(AppletMessages.getString("SignApplet.495", directory)); //$NON-NLS-1$
 			return;
@@ -3177,7 +3220,8 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 		setError(null);
 
 		if (directory != null && directory.trim().length() > 0 && !checkUserPermision(
-				AppletMessages.getString("SignApplet.105") + CR + directory + //$NON-NLS-1$
+				AppletMessages.getString("SignApplet.105") + CR + //$NON-NLS-1$
+				AOFileUtils.pathLengthShortener(directory, MAX_PATHNAME_LENGTH) +
 				CR + AppletMessages.getString("SignApplet.12"))) { //$NON-NLS-1$
 			setError(AppletMessages.getString("SignApplet.495", directory)); //$NON-NLS-1$
 			return;
@@ -4183,7 +4227,8 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 			return false;
 		}
 
-		if (!checkUserPermision(AppletMessages.getString("SignApplet.79") + CR + filename + //$NON-NLS-1$
+		if (!checkUserPermision(AppletMessages.getString("SignApplet.79") + CR + //$NON-NLS-1$
+				AOFileUtils.pathLengthShortener(filename, MAX_PATHNAME_LENGTH) +
 				CR + AppletMessages.getString("SignApplet.12"))) { //$NON-NLS-1$
 			setError(AppletMessages.getString("SignApplet.494", filename)); //$NON-NLS-1$
 			return false;
@@ -4267,7 +4312,8 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 			return false;
 		}
 
-		if (!checkUserPermision(AppletMessages.getString("SignApplet.88") + CR + filename + //$NON-NLS-1$
+		if (!checkUserPermision(AppletMessages.getString("SignApplet.88") + CR + //$NON-NLS-1$
+				AOFileUtils.pathLengthShortener(filename, MAX_PATHNAME_LENGTH) +
 				CR + AppletMessages.getString("SignApplet.12"))) { //$NON-NLS-1$
 			setError(AppletMessages.getString("SignApplet.494", filename)); //$NON-NLS-1$
 			return false;
@@ -4357,7 +4403,8 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 			return false;
 		}
 
-		if (!checkUserPermision(AppletMessages.getString("SignApplet.66") + CR + filename + //$NON-NLS-1$
+		if (!checkUserPermision(AppletMessages.getString("SignApplet.66") + CR + //$NON-NLS-1$
+				AOFileUtils.pathLengthShortener(filename, MAX_PATHNAME_LENGTH) +
 				CR + AppletMessages.getString("SignApplet.12"))) { //$NON-NLS-1$
 			setError(AppletMessages.getString("SignApplet.496", filename)); //$NON-NLS-1$
 			return false;
@@ -4399,7 +4446,8 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 			return false;
 		}
 
-		if (!checkUserPermision(AppletMessages.getString("SignApplet.71") + CR + filename + //$NON-NLS-1$
+		if (!checkUserPermision(AppletMessages.getString("SignApplet.71") + CR + //$NON-NLS-1$
+				AOFileUtils.pathLengthShortener(filename, MAX_PATHNAME_LENGTH) +
 				CR + AppletMessages.getString("SignApplet.12"))) { //$NON-NLS-1$
 			setError(AppletMessages.getString("SignApplet.496", filename)); //$NON-NLS-1$
 			return false;
@@ -4552,7 +4600,8 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 			return false;
 		}
 
-		if (!checkUserPermision(AppletMessages.getString("SignApplet.94") + CR + filename + //$NON-NLS-1$
+		if (!checkUserPermision(AppletMessages.getString("SignApplet.94") + CR + //$NON-NLS-1$
+				AOFileUtils.pathLengthShortener(filename, MAX_PATHNAME_LENGTH) +
 				CR + AppletMessages.getString("SignApplet.12"))) { //$NON-NLS-1$
 			setError(AppletMessages.getString("SignApplet.494", filename)); //$NON-NLS-1$
 			return false;

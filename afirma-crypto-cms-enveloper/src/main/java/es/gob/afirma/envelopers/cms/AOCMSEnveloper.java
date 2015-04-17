@@ -596,37 +596,34 @@ public class AOCMSEnveloper implements AOEnveloper {
     	// Elementos que contienen los elementos OID Data
     	final org.bouncycastle.asn1.ASN1ObjectIdentifier doi = (org.bouncycastle.asn1.ASN1ObjectIdentifier) objects.nextElement();
 
-    	byte[] datos;
     	try {
     		if (doi.equals(org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers.data)) {
     			Logger.getLogger("es.gob.afirma").warning("La extraccion de datos de los envoltorios CMS Data no esta implementada"); //$NON-NLS-1$ //$NON-NLS-2$
-    			datos = null;
+    			return null;
     		}
-    		else if (doi.equals(org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers.digestedData)) {
+    		if (doi.equals(org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers.digestedData)) {
     			Logger.getLogger("es.gob.afirma").warning("La extraccion de datos de los envoltorios CMS DigestedData no esta implementada"); //$NON-NLS-1$ //$NON-NLS-2$
-    			datos = null;
+    			return null;
     		}
-    		else if (doi.equals(org.bouncycastle.asn1.cms.CMSObjectIdentifiers.compressedData)) {
-    			datos = AOCMSEnveloper.recoverCMSCompressedData(cmsEnvelop);
+    		if (doi.equals(org.bouncycastle.asn1.cms.CMSObjectIdentifiers.compressedData)) {
+    			return CMSCompressedData.getContentCompressedData(cmsEnvelop);
     		}
-    		else if (doi.equals(org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers.encryptedData)) {
-    			datos = AOCMSEnveloper.recoverCMSEncryptedData(cmsEnvelop, this.cipherKey);
+    		if (doi.equals(org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers.encryptedData)) {
+    			return new CMSDecipherEncryptedData().dechiperEncryptedData(cmsEnvelop, this.cipherKey);
     		}
-    		else if (doi.equals(org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers.envelopedData)) {
-    			datos = AOCMSEnveloper.recoverCMSEnvelopedData(cmsEnvelop, addresseePke);
+    		if (doi.equals(org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers.envelopedData)) {
+    			return CMSDecipherEnvelopData.dechiperEnvelopData(cmsEnvelop, addresseePke);
     		}
-    		else if (doi.equals(org.bouncycastle.asn1.cms.CMSObjectIdentifiers.authEnvelopedData)) {
-    			datos = AOCMSEnveloper.recoverCMSAuthenticatedEnvelopedData(cmsEnvelop, addresseePke);
+    		if (doi.equals(org.bouncycastle.asn1.cms.CMSObjectIdentifiers.authEnvelopedData)) {
+    			return CMSDecipherAuthenticatedEnvelopedData.dechiperAuthenticatedEnvelopedData(cmsEnvelop, addresseePke);
     		}
-    		else if (doi.equals(org.bouncycastle.asn1.cms.CMSObjectIdentifiers.authenticatedData)) {
-    			datos = AOCMSEnveloper.recoverCMSAuthenticatedData(cmsEnvelop, addresseePke);
+    		if (doi.equals(org.bouncycastle.asn1.cms.CMSObjectIdentifiers.authenticatedData)) {
+    			return new CMSDecipherAuthenticatedData().decipherAuthenticatedData(cmsEnvelop, addresseePke);
     		}
-    		else if (doi.equals(org.bouncycastle.asn1.cms.CMSObjectIdentifiers.signedAndEnvelopedData)) {
-    			datos = AOCMSEnveloper.recoverCMSSignedEnvelopedData(cmsEnvelop, addresseePke);
+    		if (doi.equals(org.bouncycastle.asn1.cms.CMSObjectIdentifiers.signedAndEnvelopedData)) {
+    			return CMSDecipherSignedAndEnvelopedData.dechiperSignedAndEnvelopData(cmsEnvelop, addresseePke);
     		}
-    		else {
-    			throw new AOInvalidFormatException("Los datos introducidos no se corresponden con un tipo de objeto CMS soportado"); //$NON-NLS-1$
-    		}
+    		throw new AOInvalidFormatException("Los datos introducidos no se corresponden con un tipo de objeto CMS soportado"); //$NON-NLS-1$
     	}
     	catch (final AOInvalidRecipientException e) {
     		throw new InvalidKeyException("La clave indicada no pertenece a ninguno de los destinatarios del envoltorio", e); //$NON-NLS-1$
@@ -649,221 +646,6 @@ public class AOCMSEnveloper implements AOEnveloper {
     	catch (final BadPaddingException e) {
     		throw new AOException("relleno invalido: " + e, e); //$NON-NLS-1$
 		}
-
-    	return datos;
     }
 
-    /** Recupera el contenido de un envoltorio CompressedData.
-     * @param compressedData
-     *        Envoltorio CMS de tipo CompressedData.
-     * @return Contenido del envoltorio.
-     * @throws IOException
-     *         Cuando ocurre un error al descomprimir los datos. */
-    static byte[] recoverCMSCompressedData(final byte[] compressedData) throws IOException {
-		return CMSCompressedData.getContentCompressedData(compressedData);
-    }
-
-    /** Recupera el contenido de un envoltorio EncryptedData.
-     * @param encryptedData
-     *        Envoltorio CMS de tipo EncryptedData.
-     * @param passkey
-     *        Contrase&ntilde;a o clave (base64) necesaria para desencriptar
-     *        los datos.
-     * @return Contenido del envoltorio.
-     * @throws InvalidKeyException
-     *         Cuando la clave proporcionada no es v&aacute;lida.
-     * @throws AOException
-     *         Cuando se produce un error al desenvolver los datos.
-     * @throws BadPaddingException Si hay problemas estableciendo el relleno de los datos
-     * @throws IllegalBlockSizeException Si no cuadran los tama&ntilde;os de bloque de los algoritmos usados
-     * @throws InvalidAlgorithmParameterException Si no se soporta alg&uacute;n par&aacute;metro necesario
-     *                                            para alg&uacute;n algoritmo
-     * @throws NoSuchPaddingException Si no se soporta alg&uacute;n m&eacute;todo de relleno
-     * @throws NoSuchAlgorithmException Si el JRE no soporta alg&uacute;n algoritmo necesario
-     * @throws IOException En caso de error en la lectura o tratamiento de datos
-     * @throws InvalidKeySpecException Cuando ocurren problemas relacionados con la estructura interna de las claves */
-    static byte[] recoverCMSEncryptedData(final byte[] encryptedData,
-    		                              final String passkey) throws InvalidKeyException,
-                                                                       AOException,
-                                                                       NoSuchAlgorithmException,
-                                                                       NoSuchPaddingException,
-                                                                       InvalidAlgorithmParameterException,
-                                                                       IllegalBlockSizeException,
-                                                                       BadPaddingException,
-                                                                       InvalidKeySpecException,
-                                                                       IOException {
-        return new CMSDecipherEncryptedData().dechiperEncryptedData(encryptedData, passkey);
-    }
-
-    /** Recupera el contenido de un envoltorio EnvelopedData.
-     * @param envelopedData
-     *        Envoltorio CMS de tipo EnvelopedData.
-     * @param ke
-     *        Clave de un destinatario del sobre.
-     * @return Contenido del envoltorio.
-     * @throws IOException
-     *         Si ocurre alg&uacute;n problema leyendo o escribiendo los
-     *         datos
-     * @throws CertificateEncodingException
-     *         Si se produce alguna excepci&oacute;n con los certificados de
-     *         firma.
-     * @throws AOException
-     *         Cuando ocurre un error durante el proceso de descifrado
-     *         (formato o clave incorrecto,...)
-     * @throws AOInvalidRecipientException
-     *         Cuando se indica un certificado que no est&aacute; entre los
-     *         destinatarios del sobre.
-     * @throws InvalidKeyException
-     *         Cuando la clave almacenada en el sobre no es v&aacute;lida.
-     * @throws NoSuchPaddingException Si no se soporta alg&uacute;n m&eacute;todo de relleno
-     * @throws NoSuchAlgorithmException Si el JRE no soporta alg&uacute;n algoritmo necesario
-     * @throws BadPaddingException Si hay problemas estableciendo el relleno de los datos
-     * @throws IllegalBlockSizeException Si no cuadran los tama&ntilde;os de bloque de los algoritmos usados
-     * @throws InvalidAlgorithmParameterException Si no se soporta alg&uacute;n par&aacute;metro necesario
-     *                                            para alg&uacute;n algoritmo */
-    static byte[] recoverCMSEnvelopedData(final byte[] envelopedData,
-    		                              final PrivateKeyEntry ke) throws IOException,
-                                                                           CertificateEncodingException,
-                                                                           AOException,
-                                                                           InvalidKeyException,
-                                                                           NoSuchAlgorithmException,
-                                                                           NoSuchPaddingException, InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException {
-		return CMSDecipherEnvelopData.dechiperEnvelopData(envelopedData, ke);
-    }
-
-    /** Recupera el contenido de un envoltorio SignedEnvelopedData.
-     * @param signedEnvelopedData
-     *        Envoltorio CMS de tipo SignedEnvelopedData.
-     * @param ke
-     *        Clave de un destinatario del sobre.
-     * @return Contenido del envoltorio.
-     * @throws IOException
-     *         Si ocurre alg&uacute;n problema leyendo o escribiendo los
-     *         datos
-     * @throws CertificateEncodingException
-     *         Si se produce alguna excepci&oacute;n con los certificados de
-     *         firma.
-     * @throws AOException
-     *         Cuando ocurre un error durante el proceso de descifrado
-     *         (formato o clave incorrecto,...)
-     * @throws AOInvalidRecipientException
-     *         Cuando se indica un certificado que no est&aacute; entre los
-     *         destinatarios del sobre.
-     * @throws InvalidKeyException
-     *         Cuando la clave almacenada en el sobre no es v&aacute;lida.
-     * @throws NoSuchPaddingException Si no se soporta alg&uacute;n m&eacute;todo de relleno
-     * @throws NoSuchAlgorithmException Si el JRE no soporta alg&uacute;n algoritmo necesario
-     * @throws BadPaddingException Si hay problemas estableciendo el relleno de los datos
-     * @throws IllegalBlockSizeException Si no cuadran los tama&ntilde;os de bloque de los algoritmos usados
-     * @throws InvalidAlgorithmParameterException Si no se soporta alg&uacute;n par&aacute;metro necesario
-     *                                            para alg&uacute;n algoritmo */
-    static byte[] recoverCMSSignedEnvelopedData(final byte[] signedEnvelopedData,
-    		                                    final PrivateKeyEntry ke) throws IOException,
-                                                                                 CertificateEncodingException,
-                                                                                 AOException,
-                                                                                 InvalidKeyException,
-                                                                                 NoSuchAlgorithmException,
-                                                                                 NoSuchPaddingException,
-                                                                                 InvalidAlgorithmParameterException,
-                                                                                 IllegalBlockSizeException,
-                                                                                 BadPaddingException {
-		return CMSDecipherSignedAndEnvelopedData.dechiperSignedAndEnvelopData(signedEnvelopedData, ke);
-    }
-
-    /** Comprueba la integridad de un envoltorio AuthenticatedData y, si es
-     * correcto, extrae su contenido.
-     * @param authenticatedData Envoltorio CMS de tipo AuthenticatedData.
-     * @param ke Clave de un destinatario del sobre.
-     * @return Contenido del envoltorio.
-     * @throws IOException Si ocurre alg&uacute;n problema leyendo o escribiendo los
-     *                     datos
-     * @throws CertificateEncodingException Si el certificado proporcionado no se adec&uacute;a a la
-     *                                      norma X.509v3
-     * @throws InvalidKeyException Cuando la clave almacenada en el sobre no es v&aacute;lida.
-     * @throws NoSuchAlgorithmException Cuando no se reconoce el algoritmo
-     *                                  utilizado para generar el c&oacute;digo de autenticaci&oacute;n.
-     * @throws NoSuchPaddingException Si no se soporta alg&uacute;n m&eacute;todo de relleno
-     * @throws AOException Si se produce cualquier otro error durante el proceso */
-    static byte[] recoverCMSAuthenticatedData(final byte[] authenticatedData,
-    		                                  final PrivateKeyEntry ke) throws IOException,
-                                                                               CertificateEncodingException,
-                                                                               AOException,
-                                                                               InvalidKeyException,
-                                                                               NoSuchAlgorithmException,
-                                                                               NoSuchPaddingException {
-        return new CMSDecipherAuthenticatedData().decipherAuthenticatedData(authenticatedData, ke);
-    }
-
-    /** Recupera el contenido de un envoltorio AuthenticatedEnvelopedData.
-     * @param authenticatedEnvelopedData
-     *        Envoltorio CMS de tipo AuthenticatedEnvelopedData.
-     * @param ke
-     *        Clave de un destinatario del sobre.
-     * @return Contenido del envoltorio.
-     * @throws IOException
-     *         Si ocurre algun error gen&eacute;rico de entrada/salida
-     * @throws IOException
-     *         Si ocurre alg&uacute;n problema leyendo o escribiendo los
-     *         datos
-     * @throws CertificateEncodingException
-     *         Si se produce alguna excepci&oacute;n con los certificados de
-     *         firma.
-     * @throws AOException
-     *         Cuando ocurre un error durante el proceso de descifrado
-     *         (formato o clave incorrecto,...)
-     * @throws AOInvalidRecipientException
-     *         Cuando se indica un certificado que no est&aacute; entre los
-     *         destinatarios del sobre.
-     * @throws InvalidKeyException
-     *         Cuando la clave almacenada en el sobre no es v&aacute;lida.
-     * @throws NoSuchPaddingException Si no se soporta alg&uacute;n m&eacute;todo de relleno
-     * @throws NoSuchAlgorithmException Si el JRE no soporta alg&uacute;n algoritmo necesario
-     * @throws BadPaddingException Si hay problemas estableciendo el relleno de los datos
-     * @throws IllegalBlockSizeException Si no cuadran los tama&ntilde;os de bloque de los algoritmos usados
-     * @throws InvalidAlgorithmParameterException Si no se soporta alg&uacute;n par&aacute;metro necesario
-     *                                            para alg&uacute;n algoritmo */
-    static byte[] recoverCMSAuthenticatedEnvelopedData(final byte[] authenticatedEnvelopedData,
-    												   final PrivateKeyEntry ke) throws IOException,
-                                                                                        CertificateEncodingException,
-                                                                                        AOException,
-                                                                                        InvalidKeyException,
-                                                                                        NoSuchAlgorithmException,
-                                                                                        NoSuchPaddingException,
-                                                                                        InvalidAlgorithmParameterException,
-                                                                                        IllegalBlockSizeException,
-                                                                                        BadPaddingException {
-		return CMSDecipherAuthenticatedEnvelopedData.dechiperAuthenticatedEnvelopedData(authenticatedEnvelopedData, ke);
-    }
-
-    /** M&eacute;todo que comprueba que unos datos se corresponden con una
-     * estructura CMS/PKCS#7. Se realiza la verificaci&oacute;n sobre los los
-     * siguientes tipos reconocidos:
-     * <ul>
-     * <li>Data</li>
-     * <li>Signed Data</li>
-     * <li>Digested Data</li>
-     * <li>Encrypted Data</li>
-     * <li>Enveloped Data</li>
-     * <li>Signed and Enveloped Data</li>
-     * <li>Authenticated Data</li>
-     * <li>Authenticated and Enveloped Data</li>
-     * </ul>
-     * @param cmsData
-     *        Datos que deseamos comprobar.
-     * @return La validez del archivo cumpliendo la estructura. */
-    public static boolean isCMSValid(final byte[] cmsData) {
-        return CMSHelper.isCMSValid(cmsData);
-    }
-
-    /** M&eacute;todo que comprueba que unos datos se corresponden con una
-     * estructura CMS/PKCS#7 concreta.
-     * @param data
-     *        Datos que deseamos comprobar.
-     * @param type
-     *        Tipo de contenido del envoltorio que queremos comprobar.
-     * @return Indica los datos son una envoltura CMS con el tipo de contenido
-     *         indicado. */
-    public static boolean isCMSValid(final byte[] data, final String type) {
-        return CMSHelper.isCMSValid(data, type);
-    }
 }

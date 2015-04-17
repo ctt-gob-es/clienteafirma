@@ -633,7 +633,7 @@ public final class XAdESSigner {
 						"#" + (nodeToSign != null ? nodeToSign : objectId), //$NON-NLS-1$
 						digestMethod,
 						transformList,
-						AOXAdESSigner.OBJURI,
+						XMLConstants.OBJURI,
 						referenceId
 					)
 				);
@@ -656,7 +656,7 @@ public final class XAdESSigner {
 							"#" + objectStyleId, //$NON-NLS-1$
 							digestMethod,
 							Collections.singletonList(canonicalizationTransform),
-							AOXAdESSigner.OBJURI,
+							XMLConstants.OBJURI,
 							referenceStyleId
 						)
 					);
@@ -683,10 +683,10 @@ public final class XAdESSigner {
 				try {
 					referenceList.add(
 						fac.newReference(
-								xmlStyle.getStyleHref(),
+							xmlStyle.getStyleHref(),
 							digestMethod,
 							Collections.singletonList(canonicalizationTransform),
-							null,
+							XMLConstants.OBJURI,
 							referenceStyleId
 						)
 					);
@@ -722,7 +722,7 @@ public final class XAdESSigner {
 							tmpUri,
 							digestMethod,
 							transformList,
-							null,
+							XMLConstants.OBJURI, // Es un nodo de datos a firmar
 							referenceId
 						)
 					);
@@ -742,7 +742,7 @@ public final class XAdESSigner {
 							tmpStyleUri,
 							digestMethod,
 							Collections.singletonList(canonicalizationTransform),
-							null,
+							XMLConstants.OBJURI, // Es un nodo de datos a firmar
 							referenceStyleId
 						)
 					);
@@ -771,7 +771,7 @@ public final class XAdESSigner {
 							xmlStyle.getStyleHref(),
 							digestMethod,
 							Collections.singletonList(canonicalizationTransform),
-							null,
+							XMLConstants.OBJURI,
 							referenceStyleId
 						)
 					);
@@ -824,7 +824,14 @@ public final class XAdESSigner {
 						"Metodo de Message Digest para la referencia Externally Detached no soportado: " + precalculatedHashAlgorithm //$NON-NLS-1$
 					);
 				}
-				ref = fac.newReference("", dm, null, null, referenceId, data); //$NON-NLS-1$
+				ref = fac.newReference(
+					"",  //$NON-NLS-1$
+					dm,
+					null,
+					XMLConstants.OBJURI,
+					referenceId,
+					data
+				);
 			}
 			// Tenemos URI y no nos han establecido algoritmo de message digest,
 			// por lo que es una referencia externa accesible
@@ -837,7 +844,7 @@ public final class XAdESSigner {
 							"", //$NON-NLS-1$
 							digestMethod,
 							null,
-							null,
+							XMLConstants.OBJURI,
 							referenceId,
 							MessageDigest.getInstance(
 								AOSignConstants.getDigestAlgorithmName(digestMethodAlgorithm)
@@ -887,7 +894,7 @@ public final class XAdESSigner {
 								xmlStyle.getStyleHref(),
 								digestMethod,
 								Collections.singletonList(canonicalizationTransform),
-								null,
+								XMLConstants.OBJURI,
 								referenceStyleId
 							)
 						);
@@ -960,7 +967,7 @@ public final class XAdESSigner {
 						nodeToSign != null ? "#" + nodeToSign : "", //$NON-NLS-1$ //$NON-NLS-2$
 						digestMethod,
 						transformList,
-						null,
+						XMLConstants.OBJURI,
 						referenceId
 					)
 				);
@@ -985,7 +992,7 @@ public final class XAdESSigner {
 							xmlStyle.getStyleHref(),
 							digestMethod,
 							Collections.singletonList(canonicalizationTransform),
-							null,
+							XMLConstants.OBJURI,
 							referenceStyleId
 						)
 					);
@@ -1153,7 +1160,7 @@ public final class XAdESSigner {
 						tmpStyleUri,
 						digestMethod,
 						Collections.singletonList(canonicalizationTransform),
-						null,
+						XMLConstants.OBJURI, // Es un nodo a firmar
 						referenceStyleId
 					)
 				);

@@ -65,11 +65,11 @@ public final class CertificateVerifierFactory {
 		}
 		else if ("ocsp".equalsIgnoreCase(validationMethod)) { //$NON-NLS-1$
 			LOGGER.info("Se usara OCSP para la validacion"); //$NON-NLS-1$
-			return new OcspCertificateVerifier(validationProperties);
+			return new OcspCertificateVerifier(validationProperties, cert);
 		}
 		else if ("crl".equalsIgnoreCase(validationMethod)) { //$NON-NLS-1$"
 			LOGGER.info("Se usaran listas de revocacion para la validacion"); //$NON-NLS-1$
-			return new CrlCertificateVerifier(validationProperties);
+			return new CrlCertificateVerifier(validationProperties, cert);
 		}
 		throw new IllegalStateException(
 			"No se soporta el medio de validacion: " + validationMethod //$NON-NLS-1$

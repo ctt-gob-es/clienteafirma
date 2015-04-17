@@ -145,7 +145,6 @@ final class PolicyPanel extends JPanel implements ItemListener {
 		this.policiesCombo.getAccessibleContext().setAccessibleDescription(
 			SimpleAfirmaMessages.getString("PreferencesPanel.47") //$NON-NLS-1$
 		);
-		this.policiesCombo.addItemListener(this);
 
 		final boolean enableTextFields = this.policiesCombo.getSelectedIndex() > POLICY_INDEX_NONE;
 		final boolean editableTextFields = this.policiesCombo.getSelectedIndex() == getCustomPolicyIndex();
@@ -208,6 +207,10 @@ final class PolicyPanel extends JPanel implements ItemListener {
 		add(policyQualifierLabel, c);
 		c.gridy++;
 		add(this.qualifierField, c);
+
+		// Agregamos el listener ahora para que se configuren los parametros de la politica
+		// cuando la seleccionemos a continuacion en el ComboBox
+		this.policiesCombo.addItemListener(this);
 
 		// Seleccionamos la politica actualmente configurada si la hay
 		if (this.currentPolicy != null) {
@@ -277,11 +280,10 @@ final class PolicyPanel extends JPanel implements ItemListener {
 		// si es a medida.
 		// Si es XAdES y la politica es AGE, hay que seleccionar Enveloped.
 		if (this.subFormatCombo != null) {
-			if (enabled && (
-				AOSignConstants.SIGN_FORMAT_PADES.equalsIgnoreCase(this.signatureFormat) ||
-				AOSignConstants.SIGN_FORMAT_XADES.equalsIgnoreCase(this.signatureFormat) && !editable
-			 )) {
-				this.subFormatCombo.setSelectedIndex(0);
+			if (enabled && !editable || editable && AOSignConstants.SIGN_FORMAT_PADES.equalsIgnoreCase(this.signatureFormat)) {
+				if (this.subFormatCombo.getItemCount() > 0) {
+					this.subFormatCombo.setSelectedIndex(0);
+				}
 				this.subFormatCombo.setEnabled(false);
 			}
 			else {

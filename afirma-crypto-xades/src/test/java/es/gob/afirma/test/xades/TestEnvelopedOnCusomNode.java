@@ -18,9 +18,9 @@ import es.gob.afirma.signers.xades.AOXAdESSigner;
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public final class TestEnvelopedOnCusomNode {
 
-    private static final String CERT_PATH = "ANF_con cadena_certificacion.jks"; //$NON-NLS-1$
+    private static final String CERT_PATH = "PFActivoFirSHA256.pfx"; //$NON-NLS-1$
     private static final String CERT_PASS = "12341234"; //$NON-NLS-1$
-    private static final String CERT_ALIAS = "anf usuario activo"; //$NON-NLS-1$
+    private static final String CERT_ALIAS = "fisico activo prueba"; //$NON-NLS-1$
 
     private static final Properties p3 = new Properties();
     static {
@@ -55,7 +55,7 @@ public final class TestEnvelopedOnCusomNode {
 	public void TestInsertSignatureOnSignedNode() throws Exception {
         Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$
         final PrivateKeyEntry pke;
-        final KeyStore ks = KeyStore.getInstance("JKS"); //$NON-NLS-1$
+        final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
 
         ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH), CERT_PASS.toCharArray());
         pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
@@ -86,7 +86,7 @@ public final class TestEnvelopedOnCusomNode {
 
         Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$
         final PrivateKeyEntry pke;
-        final KeyStore ks = KeyStore.getInstance("JKS"); //$NON-NLS-1$
+        final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
 
         ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH), CERT_PASS.toCharArray());
         pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
@@ -117,7 +117,7 @@ public final class TestEnvelopedOnCusomNode {
 	public void testAvoidXpathExtraTransformsOnEnveloped() throws Exception {
         Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$
         final PrivateKeyEntry pke;
-        final KeyStore ks = KeyStore.getInstance("JKS"); //$NON-NLS-1$
+        final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
 
         ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH), CERT_PASS.toCharArray());
         pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));

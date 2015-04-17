@@ -18,15 +18,12 @@ import java.util.Properties;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.AOException;
-import es.gob.afirma.core.misc.MimeHelper;
 import es.gob.afirma.core.signers.AOCounterSigner;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSimpleSigner;
 import es.gob.afirma.core.signers.AdESPolicy;
 import es.gob.afirma.core.signers.CounterSignTarget;
-import es.gob.afirma.signers.cades.AOCAdESSigner;
 import es.gob.afirma.signers.cades.CAdESSignerMetadataHelper;
-import es.gob.afirma.signers.cades.CAdESValidator;
 import es.gob.afirma.signers.cades.CommitmentTypeIndicationsHelper;
 import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
 import es.gob.afirma.signers.pkcs7.ReadNodesTree;
@@ -90,13 +87,6 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
     		algorithm
 		);
 
-        String contentDescription = MimeHelper.DEFAULT_CONTENT_DESCRIPTION;
-        final byte[] data = new AOCAdESSigner().getData(sign);
-        if (data != null) {
-        	final MimeHelper mimeHelper = new MimeHelper(data);
-			contentDescription = mimeHelper.getDescription();
-        }
-
         // Creamos el contrafirmador
         final CAdESCounterSigner cadesCountersigner = new CAdESCounterSigner();
 
@@ -107,106 +97,6 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
 
         // Datos firmados.
         byte[] dataSigned = null;
-        // Si la firma que nos introducen es SignedData
-        if (CAdESValidator.isCAdESSignedData(sign, false)) {
-            try {
-                // CASO DE FIRMA DE ARBOL
-                if (targetType == CounterSignTarget.TREE) {
-                    final int[] nodes = {
-                        0
-                    };
-
-                    dataSigned = cadesCountersigner.counterSigner(
-                    	   csp,
-	                       sign,
-	                       CounterSignTarget.TREE,
-	                       nodes,
-	                       key,
-	                       certChain,
-	                       AdESPolicy.buildAdESPolicy(extraParams),
-	                       signingCertificateV2,
-	                       contentDescription,
-	                       CommitmentTypeIndicationsHelper.getCommitmentTypeIndications(extraParams),
-	                       CAdESSignerMetadataHelper.getCAdESSignerMetadata(extraParams)
-                    );
-                }
-                // CASO DE FIRMA DE HOJAS
-                else if (targetType == CounterSignTarget.LEAFS) {
-                    final int[] nodes = {
-                        0
-                    };
-                    dataSigned =
-                    		cadesCountersigner.counterSigner(
-                        		csp,
-                                sign,
-                                CounterSignTarget.LEAFS,
-                                nodes,
-                                key,
-                                certChain,
-                                AdESPolicy.buildAdESPolicy(extraParams),
-								signingCertificateV2,
-                                contentDescription,
-                                CommitmentTypeIndicationsHelper.getCommitmentTypeIndications(extraParams),
-                                CAdESSignerMetadataHelper.getCAdESSignerMetadata(extraParams)
-                    		);
-                }
-                // CASO DE FIRMA DE NODOS
-                else if (targetType == CounterSignTarget.NODES) {
-                    int[] nodesID = new int[targets.length];
-                    for (int i = 0; i < targets.length; i++) {
-                        nodesID[i] = ((Integer) targets[i]).intValue();
-                    }
-					nodesID = ReadNodesTree.simplyArray(nodesID);
-                    dataSigned =
-                    		cadesCountersigner.counterSigner(
-                        		csp,
-                                sign,
-                                CounterSignTarget.NODES,
-                                nodesID,
-                                key,
-                                certChain,
-                                AdESPolicy.buildAdESPolicy(extraParams),
-								signingCertificateV2,
-                                contentDescription,
-                                CommitmentTypeIndicationsHelper.getCommitmentTypeIndications(xParams),
-                                CAdESSignerMetadataHelper.getCAdESSignerMetadata(extraParams)
-                            );
-                }
-                // CASO DE FIRMA DE NODOS DE UNO O VARIOS FIRMANTES
-                else if (targetType == CounterSignTarget.SIGNERS) {
-
-                    // clase que lee los nodos de un fichero firmado (p7s, csig,
-                    // sig)
-                    final String[] signers = new String[targets.length];
-                    for (int i = 0; i < targets.length; i++) {
-                        signers[i] = (String) targets[i];
-                    }
-                    final int[] nodes2 = new ReadNodesTree().readNodesFromSigners(signers, sign);
-                    dataSigned =
-                    		cadesCountersigner.counterSigner(
-                        		csp,
-                                sign,
-                                CounterSignTarget.SIGNERS,
-                                nodes2,
-                                key,
-                                certChain,
-                                AdESPolicy.buildAdESPolicy(extraParams),
-                                signingCertificateV2,
-                                contentDescription,
-                                CommitmentTypeIndicationsHelper.getCommitmentTypeIndications(xParams),
-                                CAdESSignerMetadataHelper.getCAdESSignerMetadata(extraParams)
-                    		);
-
-                }
-
-                return dataSigned;
-
-            }
-            catch (final Exception e) {
-                throw new AOException("Error generando la Contrafirma CAdES", e); //$NON-NLS-1$
-            }
-        }
-        // Signed and enveloped
 
         try {
             // CASO DE FIRMA DE ARBOL
@@ -215,18 +105,17 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
                     0
                 };
 
-                dataSigned = new CAdESCounterSignerEnveloped().counterSigner(
-            		csp,
-                    sign,
-                    CounterSignTarget.TREE,
-                    nodes,
-                    key,
-                    certChain,
-                    AdESPolicy.buildAdESPolicy(extraParams),
-                    signingCertificateV2,
-                    contentDescription,
-                    CommitmentTypeIndicationsHelper.getCommitmentTypeIndications(xParams),
-                    CAdESSignerMetadataHelper.getCAdESSignerMetadata(extraParams)
+                dataSigned = cadesCountersigner.counterSigner(
+                	   csp,
+                       sign,
+                       CounterSignTarget.TREE,
+                       nodes,
+                       key,
+                       certChain,
+                       AdESPolicy.buildAdESPolicy(extraParams),
+                       signingCertificateV2,
+                       CommitmentTypeIndicationsHelper.getCommitmentTypeIndications(extraParams),
+                       CAdESSignerMetadataHelper.getCAdESSignerMetadata(extraParams)
                 );
             }
             // CASO DE FIRMA DE HOJAS
@@ -234,19 +123,19 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
                 final int[] nodes = {
                     0
                 };
-                dataSigned = new CAdESCounterSignerEnveloped().counterSigner(
-            		csp,
-                    sign,
-                    CounterSignTarget.LEAFS,
-                    nodes,
-                    key,
-                    certChain,
-                    AdESPolicy.buildAdESPolicy(extraParams),
-                    signingCertificateV2,
-                    contentDescription,
-                    CommitmentTypeIndicationsHelper.getCommitmentTypeIndications(xParams),
-                    CAdESSignerMetadataHelper.getCAdESSignerMetadata(extraParams)
-        		);
+                dataSigned =
+                		cadesCountersigner.counterSigner(
+                    		csp,
+                            sign,
+                            CounterSignTarget.LEAFS,
+                            nodes,
+                            key,
+                            certChain,
+                            AdESPolicy.buildAdESPolicy(extraParams),
+							signingCertificateV2,
+                            CommitmentTypeIndicationsHelper.getCommitmentTypeIndications(extraParams),
+                            CAdESSignerMetadataHelper.getCAdESSignerMetadata(extraParams)
+                		);
             }
             // CASO DE FIRMA DE NODOS
             else if (targetType == CounterSignTarget.NODES) {
@@ -255,19 +144,19 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
                     nodesID[i] = ((Integer) targets[i]).intValue();
                 }
 				nodesID = ReadNodesTree.simplyArray(nodesID);
-                dataSigned = new CAdESCounterSignerEnveloped().counterSigner(
-            		csp,
-                    sign,
-                    CounterSignTarget.NODES,
-                    nodesID,
-                    key,
-                    certChain,
-                    AdESPolicy.buildAdESPolicy(extraParams),
-                    signingCertificateV2,
-                    contentDescription,
-                    CommitmentTypeIndicationsHelper.getCommitmentTypeIndications(xParams),
-                    CAdESSignerMetadataHelper.getCAdESSignerMetadata(extraParams)
-                );
+                dataSigned =
+                		cadesCountersigner.counterSigner(
+                    		csp,
+                            sign,
+                            CounterSignTarget.NODES,
+                            nodesID,
+                            key,
+                            certChain,
+                            AdESPolicy.buildAdESPolicy(extraParams),
+							signingCertificateV2,
+                            CommitmentTypeIndicationsHelper.getCommitmentTypeIndications(xParams),
+                            CAdESSignerMetadataHelper.getCAdESSignerMetadata(extraParams)
+                        );
             }
             // CASO DE FIRMA DE NODOS DE UNO O VARIOS FIRMANTES
             else if (targetType == CounterSignTarget.SIGNERS) {
@@ -279,27 +168,29 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
                     signers[i] = (String) targets[i];
                 }
                 final int[] nodes2 = new ReadNodesTree().readNodesFromSigners(signers, sign);
-                dataSigned = new CAdESCounterSignerEnveloped().counterSigner(
-            		csp,
-                    sign,
-                    CounterSignTarget.SIGNERS,
-                    nodes2,
-                    key,
-                    certChain,
-                    AdESPolicy.buildAdESPolicy(extraParams),
-                    signingCertificateV2,
-                    contentDescription,
-                    CommitmentTypeIndicationsHelper.getCommitmentTypeIndications(xParams),
-                    CAdESSignerMetadataHelper.getCAdESSignerMetadata(extraParams)
-                );
+                dataSigned =
+                		cadesCountersigner.counterSigner(
+                    		csp,
+                            sign,
+                            CounterSignTarget.SIGNERS,
+                            nodes2,
+                            key,
+                            certChain,
+                            AdESPolicy.buildAdESPolicy(extraParams),
+                            signingCertificateV2,
+                            CommitmentTypeIndicationsHelper.getCommitmentTypeIndications(xParams),
+                            CAdESSignerMetadataHelper.getCAdESSignerMetadata(extraParams)
+                		);
+
             }
 
             return dataSigned;
 
         }
         catch (final Exception e) {
-            throw new AOException("Error generando la Contrafirma CAdES: " + e, e); //$NON-NLS-1$
+            throw new AOException("Error generando la Contrafirma CAdES", e); //$NON-NLS-1$
         }
+
     }
 
 }

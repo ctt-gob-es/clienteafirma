@@ -9,7 +9,7 @@ import java.util.logging.Logger;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.Base64;
-import es.gob.afirma.core.misc.UrlHttpManagerFactory;
+import es.gob.afirma.core.misc.http.UrlHttpManagerFactory;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.signfolder.server.proxy.TriphaseSignDocumentRequest.TriphaseConfigDataBean;
 
@@ -38,7 +38,7 @@ public class TriSigner {
 	private static final String PARAMETER_NAME_CERT = "cert"; //$NON-NLS-1$
 	private static final String PARAMETER_NAME_EXTRA_PARAM = "params"; //$NON-NLS-1$
 	private static final String PARAMETER_NAME_SESSION_DATA = "session"; //$NON-NLS-1$
-	
+
 	/** Indicador de finalizaci&oacute;n correcta de proceso. */
 	private static final String SUCCESS = "OK"; //$NON-NLS-1$
 
@@ -47,7 +47,7 @@ public class TriSigner {
 	 * Prefirma el documento de una petici&oacute;n y muta la propia peticion para almacenar en ella
 	 * el resultado.
 	 * @param docReq Petici&oacute;n de firma de un documento.
-	 * @param docManager Manejador que permite la descarga de un documento si es necesario. 
+	 * @param docManager Manejador que permite la descarga de un documento si es necesario.
 	 * @param signerCert Certificado de firma.
 	 * @throws IOException Cuando no se puede obtener el documento para prefirmar.
 	 * @throws AOException Cuando ocurre un error al generar la prefirma.
@@ -78,7 +78,7 @@ public class TriSigner {
 			if (docReq.getParams() != null) {
 				urlBuffer.append(HTTP_AND).append(PARAMETER_NAME_EXTRA_PARAM).append(HTTP_EQUALS).append(docReq.getParams());
 			}
-			
+
 			docReq.setPartialResult(parseTriphaseResult(UrlHttpManagerFactory.getInstalledManager().readUrlByPost(urlBuffer.toString())));
 			urlBuffer.setLength(0);
 		}
@@ -101,7 +101,7 @@ public class TriSigner {
 	public static void doPostSign(final TriphaseSignDocumentRequest docReq,
 			final X509Certificate signerCert,
 			final String signServiceUrl) throws IOException, AOException {
-		
+
 		final byte[] triSignFinalResult;
 		try {
 			final StringBuffer urlBuffer = new StringBuffer();
@@ -115,18 +115,18 @@ public class TriSigner {
 			if (docReq.getParams() != null && docReq.getParams().length() > 0) {
 				urlBuffer.append(HTTP_AND).append(PARAMETER_NAME_EXTRA_PARAM).append(HTTP_EQUALS).append(docReq.getParams());
 			}
-			
-			// Datos de sesion en forma de properies codificado en Base64 URL SAFE  
+
+			// Datos de sesion en forma de properies codificado en Base64 URL SAFE
 			final String sessionData = docReq.getPartialResult().toPropertiesBase64();
 			if (sessionData != null) {
 				urlBuffer.append(HTTP_AND).append(PARAMETER_NAME_SESSION_DATA).append(HTTP_EQUALS)
 				.append(sessionData);
 			}
-			
+
 			if (docReq.getPartialResult().isNeedData() != null && docReq.getPartialResult().isNeedData().booleanValue()) {
 				urlBuffer.append(HTTP_AND).append(PARAMETER_NAME_DOCID).append(HTTP_EQUALS).append(docReq.getContent());
 			}
-			
+
 			triSignFinalResult = UrlHttpManagerFactory.getInstalledManager().readUrlByPost(urlBuffer.toString());
 			urlBuffer.setLength(0);
 		}
@@ -162,9 +162,9 @@ public class TriSigner {
 	private static String digestToSignatureAlgorithmName(final String digestAlgorithm) {
 		return digestAlgorithm.replace("-", "").toUpperCase() + "withRSA";  //$NON-NLS-1$ //$NON-NLS-2$//$NON-NLS-3$
 	}
-	
+
 	/**
-	 * Normalizamos el nombre del formato de firma. 
+	 * Normalizamos el nombre del formato de firma.
 	 * @param format Formato de firma.
 	 * @return Nombre de formato normalizado o el mismo formato de entrada si no se ha encontrado correspondencia.
 	 */
@@ -179,14 +179,14 @@ public class TriSigner {
 		}
 		return normalizeFormat;
 	}
-	
-	private static TriphaseConfigDataBean parseTriphaseResult(byte[] triphaseResult) throws IOException {
-		
-		Properties resultProperties = new Properties();
+
+	private static TriphaseConfigDataBean parseTriphaseResult(final byte[] triphaseResult) throws IOException {
+
+		final Properties resultProperties = new Properties();
 		resultProperties.load(new ByteArrayInputStream(Base64.decode(triphaseResult, 0, triphaseResult.length, true)));
 
-		TriphaseConfigDataBean triphaseConfig = new TriphaseConfigDataBean();
-		
+		final TriphaseConfigDataBean triphaseConfig = new TriphaseConfigDataBean();
+
 		int sc = 1;
 		if (resultProperties.containsKey("SIGN_COUNT")) { //$NON-NLS-1$
 			sc = Integer.parseInt(resultProperties.getProperty("SIGN_COUNT")); //$NON-NLS-1$
@@ -202,16 +202,16 @@ public class TriSigner {
 			triphaseConfig.addSession(resultProperties.containsKey("SESSION." + i) ?  //$NON-NLS-1$
 					Base64.encode(resultProperties.getProperty("SESSION." + i).getBytes()) :  //$NON-NLS-1$
 						null);
-			
+
 			if (resultProperties.containsKey("PRE." + i)) { //$NON-NLS-1$
 				triphaseConfig.addPreSign(resultProperties.getProperty("PRE." + i)); //$NON-NLS-1$
 			}
-			
+
 			if (resultProperties.containsKey("PK1." + i)) { //$NON-NLS-1$
 				triphaseConfig.addPk1(resultProperties.getProperty("PK1." + i)); //$NON-NLS-1$
 			}
 		}
-		
+
 		return triphaseConfig;
 	}
 }

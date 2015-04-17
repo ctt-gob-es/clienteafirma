@@ -191,9 +191,9 @@ public final class AOUtil {
             return null;
         }
 
-        String rdn = getRDNvalue("cn", principal); //$NON-NLS-1$
+        String rdn = getRDNvalueFromLdapName("cn", principal); //$NON-NLS-1$
         if (rdn == null) {
-            rdn = getRDNvalue("ou", principal); //$NON-NLS-1$
+            rdn = getRDNvalueFromLdapName("ou", principal); //$NON-NLS-1$
         }
 
         if (rdn != null) {
@@ -203,23 +203,21 @@ public final class AOUtil {
         final int i = principal.indexOf('=');
         if (i != -1) {
             LOGGER .warning("No se ha podido obtener el Common Name ni la Organizational Unit, se devolvera el fragmento mas significativo"); //$NON-NLS-1$
-            return getRDNvalue(principal.substring(0, i), principal);
+            return getRDNvalueFromLdapName(principal.substring(0, i), principal);
         }
 
         LOGGER.warning("Principal no valido, se devolvera la entrada"); //$NON-NLS-1$
         return principal;
     }
 
-    /**
-     * Recupera el valor de un RDN de un principal. El valor de retorno no incluye
+    /** Recupera el valor de un RDN (<i>Relative Distinguished Name</i>) de un principal. El valor de retorno no incluye
      * el nombre del RDN, el igual, ni las posibles comillas que envuelvan el valor.
      * La funci&oacute;n no es sensible a la capitalizaci&oacute;n del RDN. Si no se
      * encuentra, se devuelve {@code null}.
      * @param rdn RDN que deseamos encontrar.
-     * @param principal Principal del que extraer el RDN
-     * @return Valor del RDN indicado o {@code null} si no se encuentra.
-     */
-    private static String getRDNvalue(final String rdn, final String principal) {
+     * @param principal Principal del que extraer el RDN (seg&uacute;n la <a href="http://www.ietf.org/rfc/rfc4514.txt">RFC 4514</a>).
+     * @return Valor del RDN indicado o {@code null} si no se encuentra. */
+    public static String getRDNvalueFromLdapName(final String rdn, final String principal) {
 
         int offset1 = 0;
         while ((offset1 = principal.toLowerCase(Locale.US).indexOf(rdn.toLowerCase(), offset1)) != -1) {
@@ -254,7 +252,8 @@ public final class AOUtil {
             int offset2;
             if (principal.charAt(offset1) == ',') {
                 return ""; //$NON-NLS-1$
-            } else if (principal.charAt(offset1) == '"') {
+            }
+            else if (principal.charAt(offset1) == '"') {
                 offset1++;
                 if (offset1 >= principal.length()) {
                     return ""; //$NON-NLS-1$
@@ -263,9 +262,11 @@ public final class AOUtil {
                 offset2 = principal.indexOf('"', offset1);
                 if (offset2 == offset1) {
                     return ""; //$NON-NLS-1$
-                } else if (offset2 != -1) {
+                }
+                else if (offset2 != -1) {
                     return principal.substring(offset1, offset2);
-                } else {
+                }
+                else {
                     return principal.substring(offset1);
                 }
             }
@@ -288,12 +289,11 @@ public final class AOUtil {
      * recomendable */
     private static final String BASE_64_ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz=_-\n+/0123456789\r~"; //$NON-NLS-1$
 
-    /** @param data
-     *        Datos a comprobar si podr6iacute;an o no ser Base64
+    /** @param data Datos a comprobar si podr6iacute;an o no ser Base64.
      * @return <code>true</code> si los datos proporcionado pueden ser una
      *         codificaci&oacute;n base64 de un original binario (que no tiene
      *         necesariamente porqu&eacute; serlo), <code>false</code> en caso
-     *         contrario */
+     *         contrario. */
     public static boolean isBase64(final byte[] data) {
 
         int count = 0;

@@ -9,7 +9,15 @@
  <body>
  <p>Valores aceptados como par&aacute;metros adicionales para las firmas CAdES:</p>
  <dl>
-   <dt><b><i>includeOnlySignningCertificate</i></b> (propiedad compartida con XAdES y PAdES)</dt>
+    <dt><b><i>contentTypeOid</i></b> (propiedad compartida con XAdES, no aplica a contrafirmas)</dt>
+	<dd>
+	 OID que identifica el tipo de datos a firmar.
+	</dd>
+   <dt><b><i>contentDescription</i></b></dt>
+    <dd>
+     Descripci&oacute;n textual del tipo de contenido a firmar. Necesita que se establezca tambi&eacute;n la propiedad <code>contentTypeOid</code>.
+    </dd>
+    <dt><b><i>includeOnlySignningCertificate</i></b> (propiedad compartida con XAdES y PAdES)</dt>
 	<dd>
 	 Si se establece a <code>true</code> se incluye en la firma &uacute;nicamente el certificado del firmante (y no la cadena de certificaci&oacute;n completa).
 	 Si no se establece o se establece a <code>false</code> se incluir&aacute; toda la cadena de certificaci&oacute;n.

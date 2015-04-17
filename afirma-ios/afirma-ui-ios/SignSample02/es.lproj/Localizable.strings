@@ -1,0 +1,50 @@
+/* 
+  Localizable.strings
+  SignSample02
+
+  Created by Tomas on 30/08/13.
+ 
+ NSLocalizedString(@"cerrar",nil)
+ 
+*/
+"processing" = "Procesando...";
+"atencion" = "¡Atención!";
+"cerrar" = "Cerrar";
+"conectar" = "Conectar";
+"url_forja" = "http://blogs.forja.cenatic.es/clienteafirma/?p=42";
+"seleccion_almacen" = "Por favor, seleccione un almacen de claves y certificados";
+"no_almacenes" = "No dispone de almacenes de claves y certificados en la aplicación. Para añadir almacenes de claves y certificados a la aplicación, por favor, añádalos desde la configuración de la aplicación en iTunes.";
+"error" = "Error";
+"no_datos_firmar" = "No se han indicado datos para firmar. Por favor, vuelva de nuevo al navegador donde inició la operación e inténtelo de nuevo";
+"seleccion_almacen_guradar" = "Seleccione un almacén para guardar";
+"error_descarga_fichero" = "Se ha producido un error al intentar descargar el fichero. Inténtelo de nuevo más tarde.";
+"ok" = "¡OK!";
+"finalizado" = "Proceso finalizado. Se ha completado el proceso de firma y se ha guardado la firma correctamente en la nube:";
+"error_guardar_firma" = "Se ha Producido un error al guardar la firma:";
+"help_acercade" = "Acerca de...";
+"help_instalar_certificados" ="Cómo instalar certificados";
+"help_preguntas" = "Preguntas más comunes";
+"preg_borrar_almacen" = "¿Desea borrar el almacén ";
+"borrar" = "Borrar";
+"seleccion_almacen_borrar" = "Por favor, seleccione el almacen de claves y certificados que desea eliminar";
+"bienvenida" = "¡Bienvenido al Cliente @firma!";
+"bienvenida_msg" = "Para empezar a usar el Cliente @firma debe instalar un almacén de claves y certificados. Puede importar un almacén desde una la configuración de la aplicación de iTunes.";
+"error_borrar_almacen" = "No se ha podido borrar el almacén seleccionado.";
+"introducir_contrasenia" = "Por favor, introduzca la contraseña del almacén de claves ";
+"error_contrasenia" = "La contraseña del almacén de claves es incorrecta";
+"error_carga_almacen" = "No se ha podido cargar el almacén de claves";
+"seleccion_fichero_firma" = "Seleccione un fichero para proceder con la firma";
+"error_descarga_fichero" = "Se ha producido un error al intentar descargar el fichero. Inténtelo de nuevo más tarde.";
+"error_datos_firmar" = "No se han indicado datos para firmar. Por favor, vuelva de nuevo al navegador donde inició la operación e inténtelo de nuevo más tarde.";
+"error_objetivo_contrafirma" = "El objetivo indicado para la contrafirma no está soportado";
+"error_codigo_desconocido" = "Código de operación desconocido. Por favor, vuelva de nuevo al navegador donde inició la operación e inténtelo de nuevo más tarde";
+"error_url_servidor" = "No se ha indicado la URL del servidor. Por favor, vuelva de nuevo al navegador donde inició la operación e inténtelo de nuevo más tarde";
+"error_formato_firma" = "No se ha indicado un formato de firma. Por favor, vuelva de nuevo al navegador donde inició la operación e inténtelo de nuevo más tarde";
+"error_formato_no_soportado" = "Formato no soportado";
+"error_algoritmo_no_soportado" = "El Algoritmo no es váLido o no está soportado. Por favor, vuelva de nuevo al navegador donde inició la operación e inténtelo de nuevo más tarde";
+"proceso_finalizado_trifasico" = "Se ha completado el proceso de firma. Por favor, vuelva al navegador desde el que inició la operación para continuar";
+"error_proceso_firma" = "Se ha producido un error en el proceso de firma. Por favor, vuelva de nuevo al navegador donde inició la operación e inténtelo de nuevo más tarde";
+"error_conexion_servidor" = "No se ha podido establecer la conexión con el servidor. Por favor, vuelva de nuevo al navegador donde inició la operación e intentelo de nuevo.";
+
+
+

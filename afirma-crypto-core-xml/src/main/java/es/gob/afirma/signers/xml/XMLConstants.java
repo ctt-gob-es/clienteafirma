@@ -98,4 +98,7 @@ public final class XMLConstants {
 
     /** MimeType por defecto para los datos firmados. */
     public static final String DEFAULT_MIMETYPE = "application/octet-stream"; //$NON-NLS-1$
+
+    /** URI que define una referencia de tipo OBJECT. */
+    public static final String OBJURI = "http://www.w3.org/2000/09/xmldsig#Object"; //$NON-NLS-1$
 }

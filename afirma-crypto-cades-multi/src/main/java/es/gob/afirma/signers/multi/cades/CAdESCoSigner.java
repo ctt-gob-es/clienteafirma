@@ -260,7 +260,8 @@ final class CAdESCoSigner {
 				contentType,
 				contentDescription,
 				ctis,
-				csm
+				csm,
+                false  // No es contrafirma
 			);
 			this.signedAttr2 = SigUtils.getAttributeSet(new AttributeTable(contextExpecific));
 			signedAttr = SigUtils.getAttributeSet(new AttributeTable(contextExpecific));
@@ -278,7 +279,8 @@ final class CAdESCoSigner {
 				contentType,
 				contentDescription,
 				ctis,
-				csm
+				csm,
+                false  // No es contrafirma
 			);
 			this.signedAttr2 = SigUtils.getAttributeSet(new AttributeTable(contextExpecific));
 			signedAttr = SigUtils.getAttributeSet(new AttributeTable(contextExpecific));
@@ -466,7 +468,8 @@ final class CAdESCoSigner {
 				contentType,
 				contentDescription,
 				ctis,
-				csm
+				csm,
+                false  // No es contrafirma
 			);
 			this.signedAttr2 = SigUtils.getAttributeSet(new AttributeTable(contextExpecific));
 			signedAttr = SigUtils.getAttributeSet(new AttributeTable(contextExpecific));
@@ -484,7 +487,8 @@ final class CAdESCoSigner {
 				contentType,
 				contentDescription,
 				ctis,
-				csm
+				csm,
+                false  // No es contrafirma
 			);
 			this.signedAttr2 = SigUtils.getAttributeSet(new AttributeTable(contextExpecific));
 			signedAttr = SigUtils.getAttributeSet(new AttributeTable(contextExpecific));

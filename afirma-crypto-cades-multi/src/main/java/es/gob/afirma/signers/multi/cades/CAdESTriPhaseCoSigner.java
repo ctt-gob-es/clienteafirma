@@ -134,7 +134,8 @@ public final class CAdESTriPhaseCoSigner {
 			contentType,
 			contentDescription,
 			ctis,
-			csm
+			csm,
+            false  // No es contrafirma
 		);
 		return SigUtils.getAttributeSet(new AttributeTable(contextExpecific));
 	}
@@ -222,21 +223,23 @@ public final class CAdESTriPhaseCoSigner {
 
 		// Construimos el Signed Data y lo devolvemos
 		return new ContentInfo(
-				PKCSObjectIdentifiers.signedData,
-				new SignedData(
-						sd.getDigestAlgorithms(),
-						encInfo,
-						certificates,
-						(ASN1Set) null, // CRLS no usado
-						new DERSet(signerInfos) // UnsignedAttr
-						)
-				).getEncoded(ASN1Encoding.DER);
+			PKCSObjectIdentifiers.signedData,
+			new SignedData(
+					sd.getDigestAlgorithms(),
+					encInfo,
+					certificates,
+					(ASN1Set) null, // CRLS no usado
+					new DERSet(signerInfos) // UnsignedAttr
+			)
+		).getEncoded(ASN1Encoding.DER);
 
 	}
 
 	private static ContentInfo getContentInfoFromContent(final byte[] content) throws IOException {
 		// Ya que el contenido puede ser grande, lo recuperamos solo una vez
-		final ASN1ObjectIdentifier contentTypeOID = new ASN1ObjectIdentifier(PKCSObjectIdentifiers.data.getId());
+		final ASN1ObjectIdentifier contentTypeOID = new ASN1ObjectIdentifier(
+			PKCSObjectIdentifiers.data.getId()
+		);
 		// si se introduce el contenido o no
 		if (content != null) {
 			final ByteArrayOutputStream bOut = new ByteArrayOutputStream();

@@ -1,0 +1,47 @@
+/*
+ Localizable.strings
+ SignSample02
+ 
+ Created by Tomas on 30/08/13.
+ 
+ NSLocalizedString(@"cerrar",nil)
+ 
+ */
+"processing" = "Processing...";
+"atencion" = "Warning!";
+"cerrar" = "Close";
+"conectar" = "Connect";
+"url_forja" = "http://blogs.forja.cenatic.es/clienteafirma/?p=42";
+"seleccion_almacen" = "Please, select a keychain";
+"no_almacenes" = "Keychain not available in the application. In order to add a keychain to the application, please use the option in iTunes configuration panel.";
+"error" = "Error";
+"no_datos_firmar" = "Data to sign not found. Please, go back to the browser where you started the operation and try again";
+"seleccion_almacen_guradar" = "Select a keychain to save";
+"error_descarga_fichero" = "Error downloading the file. Try again later.";
+"ok" = "OK!";
+"finalizado" = "Process complete. The signing process has finished and the signature is properly saved in the cloud:";
+"error_guardar_firma" = "Error saving the signature:";
+"help_acercade" = "About...";
+"help_instalar_certificados" = "How to install certificates";
+"help_preguntas" = "Frequently Asked Questions";
+"preg_borrar_almacen" = "Do you want to delete the keychain?";
+"borrar" = "Delete";
+"seleccion_almacen_borrar" = "Please, select the keychain to delete";
+"bienvenida" = "Welcome to Cliente @firma!";
+"bienvenida_msg" = "In order to begin to use Cliente @firma, first you must install a keychain. You are able to import a keychain from the iTunes configuration panel.";
+"error_borrar_almacen" = "Error deleting selected keychain.";
+"introducir_contrasenia" = "Please, enter your keychain password ";
+"error_contrasenia" = "Wrong keychain password";
+"error_carga_almacen" = "Error loading the keychain";
+"seleccion_fichero_firma" = "Select a file to proceed with the signature";
+"error_descarga_fichero" = "Error downloading the file. Try again later.";
+"error_datos_firmar" = "No data to sign available. Please, go back to the browser where you started the operation and try again later";
+"error_objetivo_contrafirma" = "Selected countersign target is not supported";
+"error_codigo_desconocido" = "Unknown operation code. Please, go back to the browser where you started the operation and try again later";
+"error_url_servidor" = "Server URL not found. Please, go back to the browser where you started the operation and try again later";
+"error_formato_firma" = "Signature format not found. Please, go back to the browser where you started the operation and try again later";
+"error_formato_no_soportado" = "Format not supported";
+"error_algoritmo_no_soportado" = "Algorithm not valid or supported. Please, go back to the browser where you started the operation and try again later";
+"proceso_finalizado_trifasico" = "Signing process complete. Please, go back to the browser where you started the operation to continue";
+"error_proceso_firma" = "Error signing. Please, go back to the browser where you started the operation and try again later";
+"error_conexion_servidor" = "Couldn't open connection to server. Please, go back to the browser where you started the operation and try again later";

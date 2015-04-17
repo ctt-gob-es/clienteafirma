@@ -125,7 +125,7 @@ public final class ReadNodesTree {
                 aossi.setPkcs1(si.getEncryptedDigest().getOctets());
                 this.rama = new AOTreeNode(aossi);
                 this.listaCert.add(nameSigner);
-                getUnsignedAtributesWithCertificates(si.getUnauthenticatedAttributes(), this.rama, certificates);
+                getUnsignedAtributes(true, si.getUnauthenticatedAttributes(), this.rama, certificates);
                 raiz.add(this.rama);
             }
         }
@@ -137,7 +137,7 @@ public final class ReadNodesTree {
                 final SignerInfo si = SignerInfo.getInstance(atribute);
                 this.rama = new AOTreeNode(nameSigner);
                 this.lista.add(nameSigner);
-                getUnsignedAtributes(si.getUnauthenticatedAttributes(), this.rama, certificates);
+                getUnsignedAtributes(false, si.getUnauthenticatedAttributes(), this.rama, certificates);
 
                 raiz.add(this.rama);
             }
@@ -145,16 +145,16 @@ public final class ReadNodesTree {
 
         return new AOTreeModel(raiz);
     }
-
     /** M&eacute;todo para obtener las contrafirmas.
-     * @param signerInfouAtrib
-     *        Atributos en los que puede estar la contrafirma.
-     * @param ramahija
-     *        Rama hija donde buscar los siguientes nodos.
-     * @param certificates
-     *        Certificados. */
-    private void getUnsignedAtributesWithCertificates(final ASN1Set signerInfouAtrib, final AOTreeNode ramahija, final ASN1Set certificates) {
-
+     * @param withCertificates <code>true</code> para hacer la obtenci&oacute;n con certificados, <code>false</code>
+     *                         en caso contrario.
+     * @param signerInfouAtrib Atributos en los que puede estar la contrafirma.
+     * @param ramahija Rama hija donde buscar los siguientes nodos.
+     * @param certificates Certificados. */
+    private void getUnsignedAtributes(final boolean withCertificates,
+    		                          final ASN1Set signerInfouAtrib,
+    		                          final AOTreeNode ramahija,
+    		                          final ASN1Set certificates) {
         if (signerInfouAtrib != null) {
             final Enumeration<?> eAtributes = signerInfouAtrib.getObjects();
             while (eAtributes.hasMoreElements()) {
@@ -168,65 +168,36 @@ public final class ReadNodesTree {
                             final ASN1Sequence atrib = (ASN1Sequence) obj;
                             final IssuerAndSerialNumber issuerSerial = IssuerAndSerialNumber.getInstance(atrib.getObjectAt(1));
                             final SignerInfo si = SignerInfo.getInstance(atrib);
-                            final X509Certificate[] nameSigner = searchCert(certificates, issuerSerial.getSerialNumber());
-                            final Date signingTime = getSigningTime(si);
-                            final AOSimpleSignInfo aossi = new AOSimpleSignInfo(nameSigner, signingTime);
-                            aossi.setPkcs1(si.getEncryptedDigest().getOctets());
-                            this.rama2 = new AOTreeNode(aossi);
-                            this.listaCert.add(nameSigner);
-                            ramahija.add(this.rama2);
-                            getUnsignedAtributesWithCertificates(si.getUnauthenticatedAttributes(), this.rama2, certificates);
+                            if (withCertificates) {
+                                final X509Certificate[] nameSigner = searchCert(certificates, issuerSerial.getSerialNumber());
+                                final Date signingTime = getSigningTime(si);
+                                final AOSimpleSignInfo aossi = new AOSimpleSignInfo(nameSigner, signingTime);
+                                aossi.setPkcs1(si.getEncryptedDigest().getOctets());
+                                this.rama2 = new AOTreeNode(aossi);
+                                this.listaCert.add(nameSigner);
+                                ramahija.add(this.rama2);
+                                getUnsignedAtributes(true, si.getUnauthenticatedAttributes(), this.rama2, certificates);
+                            }
+                            else {
+                                final String nameSigner = searchName(certificates, issuerSerial.getSerialNumber());
+                                this.rama2 = new AOTreeNode(nameSigner);
+                                this.lista.add(nameSigner);
+                                ramahija.add(this.rama2);
+                                getUnsignedAtributes(false, si.getUnauthenticatedAttributes(), this.rama2, certificates);
+                            }
                         }
                     }
                 }
             }
-
         }
-    }
 
-    /** M&eacute;todo para obtener las contrafirmas.
-     * @param signerInfouAtrib
-     *        Atributos en los que puede estar la contrafirma.
-     * @param ramahija
-     *        Rama hija donde buscar los siguientes nodos.
-     * @param certificates
-     *        Certificados. */
-    private void getUnsignedAtributes(final ASN1Set signerInfouAtrib, final AOTreeNode ramahija, final ASN1Set certificates) {
-
-        if (signerInfouAtrib != null) {
-            final Enumeration<?> eAtributes = signerInfouAtrib.getObjects();
-            while (eAtributes.hasMoreElements()) {
-                final Attribute data = Attribute.getInstance(eAtributes.nextElement());
-                if (!data.getAttrType().equals(PKCSObjectIdentifiers.id_aa_signatureTimeStampToken)) {
-                    final ASN1Set setInto = data.getAttrValues();
-                    final Enumeration<?> eAtributesData = setInto.getObjects();
-                    while (eAtributesData.hasMoreElements()) {
-                        final Object obj = eAtributesData.nextElement();
-                        if (obj instanceof ASN1Sequence) {
-                            final ASN1Sequence atrib = (ASN1Sequence) obj;
-                            final IssuerAndSerialNumber issuerSerial = IssuerAndSerialNumber.getInstance(atrib.getObjectAt(1));
-                            final SignerInfo si = SignerInfo.getInstance(atrib);
-                            final String nameSigner = searchName(certificates, issuerSerial.getSerialNumber());
-                            this.rama2 = new AOTreeNode(nameSigner);
-                            this.lista.add(nameSigner);
-                            ramahija.add(this.rama2);
-                            getUnsignedAtributes(si.getUnauthenticatedAttributes(), this.rama2, certificates);
-                        }
-                    }
-                }
-            }
-
-        }
     }
 
     /** Lee los nodos pertenecientes a un firmante.
-     * @param signers
-     *        Firmante del que se buscan los nodos.
-     * @param data
-     *        Fichero que representa la firma.
+     * @param signers Firmante del que se buscan los nodos.
+     * @param data Fichero que representa la firma.
      * @return Los nodos que tiene ese firmante.
-     * @throws java.io.IOException
-     *         Si hay problemas en la lectura de datos */
+     * @throws java.io.IOException Si hay problemas en la lectura de datos */
     public int[] readNodesFromSigners(final String[] signers, final byte[] data) throws IOException {
         int[] solucion;
 

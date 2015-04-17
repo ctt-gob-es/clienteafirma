@@ -19,6 +19,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.security.KeyStore.PrivateKeyEntry;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -61,6 +63,13 @@ public class DirectorySignatureHelper {
 
     /** Fichero de log por defecto. */
     private static final String DEFAULT_LOG_FILE = "result.log"; //$NON-NLS-1$
+
+    /** Algoritmo de huella digital por defecto que se utilizar&aacute;, por ejemplo, para
+     * la generaci&oacute;n de las firmas expl&iacute;citas XAdES. */
+	private static final String DEFAULT_MESSAGE_DIGEST_ALGORITHM = "SHA1"; //$NON-NLS-1$
+
+	/** Generador de huellas digitales utilizado internamente. */
+    private static MessageDigest md = null;
 
     /** Algoritmo de firma. */
     private String algorithm = null;
@@ -593,15 +602,27 @@ public class DirectorySignatureHelper {
             if (CADES_SIGNER.equals(signerClassName) ||
             		XADES_SIGNER.equals(signerClassName) ||
             		XMLDSIG_SIGNER.equals(signerClassName)) {
-                final MimeHelper mimeHelper = new MimeHelper(dataToSign);
-                final String mimeType = mimeHelper.getMimeType();
-                if (mimeType != null) {
-                	signConfig.setProperty("mimeType", mimeType); //$NON-NLS-1$
-                	final String dataOid = MimeHelper.transformMimeTypeToOid(mimeType);
-                	if (dataOid != null) {
-                		signConfig.setProperty("contentTypeOid", dataOid); //$NON-NLS-1$
-                	}
+
+                // Forzamos que las firmas XAdES Explicitas se realicen sobre el hash de los datos
+            	// y que el mimetype sea el definido para hashes
+            	String mimeType;
+                if ((XADES_SIGNER.equals(signerClassName) || XMLDSIG_SIGNER.equals(signerClassName))
+                		&& AOSignConstants.SIGN_MODE_EXPLICIT.equalsIgnoreCase(this.mode)) {
+                	dataToSign = digest(dataToSign);
+                	mimeType = ("hash/" + DEFAULT_MESSAGE_DIGEST_ALGORITHM).toLowerCase(); //$NON-NLS-1$
                 }
+                else {
+                	final MimeHelper mimeHelper = new MimeHelper(dataToSign);
+                	mimeType = mimeHelper.getMimeType();
+                }
+
+                if (mimeType != null) {
+            		signConfig.setProperty("mimeType", mimeType); //$NON-NLS-1$
+            		final String dataOid = MimeHelper.transformMimeTypeToOid(mimeType);
+            		if (dataOid != null) {
+            			signConfig.setProperty("contentTypeOid", dataOid); //$NON-NLS-1$
+            		}
+            	}
             }
 
             byte[] signData = null;
@@ -829,13 +850,24 @@ public class DirectorySignatureHelper {
                         final PrivateKeyEntry keyEntry,
                         final Properties signConfig) throws IOException {
 
+    	byte[] dataToSign = data;
+
     	// Deteccion del MIMEType y Oid de los datos, solo para CAdES, XAdES y XMLDSig
         final String signerClassName = signer.getClass().getName();
         if (CADES_SIGNER.equals(signerClassName) ||
         		XADES_SIGNER.equals(signerClassName) ||
         		XMLDSIG_SIGNER.equals(signerClassName)) {
-            final MimeHelper mimeHelper = new MimeHelper(data);
-            final String mimeType = mimeHelper.getMimeType();
+
+        	String mimeType;
+        	if ((XADES_SIGNER.equals(signerClassName) || XMLDSIG_SIGNER.equals(signerClassName)) &&
+        			AOSignConstants.SIGN_MODE_EXPLICIT.equalsIgnoreCase(signConfig.getProperty("mode"))) { //$NON-NLS-1$
+        		dataToSign = digest(dataToSign);
+        		mimeType = ("hash/" + DEFAULT_MESSAGE_DIGEST_ALGORITHM).toLowerCase(); //$NON-NLS-1$
+        	}
+        	else {
+        		final MimeHelper mimeHelper = new MimeHelper(dataToSign);
+        		mimeType = mimeHelper.getMimeType();
+        	}
             if (mimeType != null) {
             	signConfig.setProperty("mimeType", mimeType); //$NON-NLS-1$
             	final String dataOid = MimeHelper.transformMimeTypeToOid(mimeType);
@@ -847,13 +879,13 @@ public class DirectorySignatureHelper {
 
         // Configuramos y ejecutamos la operacion
         try {
-            return signer.sign(
-        		data,
-        		algo,
-        		keyEntry.getPrivateKey(),
-        		keyEntry.getCertificateChain(),
-        		signConfig
-    		);
+        	return signer.sign(
+        			dataToSign,
+        			algo,
+        			keyEntry.getPrivateKey(),
+        			keyEntry.getCertificateChain(),
+        			signConfig
+        			);
         }
         catch (final Exception e) {
             LOGGER.severe("No ha sido posible firmar el fichero de datos '" + signConfig.getProperty(URI_STR) + "': " + e);  //$NON-NLS-1$//$NON-NLS-2$
@@ -1307,5 +1339,23 @@ public class DirectorySignatureHelper {
     		}
     	}
     	return null;
+    }
+
+    /**
+     * Genera la huella digital de los datos con el algoritmo indicado por
+     * {@code DEFAULT_MESSAGE_DIGEST_ALGORITHM}.
+     * @param data Datos de la que generar la huella.
+     * @return Huella digital.
+     */
+    private static byte[] digest(final byte[] data) {
+    	if (md == null) {
+    		try {
+				md = MessageDigest.getInstance(DEFAULT_MESSAGE_DIGEST_ALGORITHM);
+			} catch (final NoSuchAlgorithmException e) {
+				LOGGER.severe("Se ha utilizado internamente un algoritmo de huella digital no soportado: " + e); //$NON-NLS-1$
+				throw new IllegalArgumentException("Algoritmo no soportado", e); //$NON-NLS-1$
+			}
+    	}
+    	return md.digest(data);
     }
 }

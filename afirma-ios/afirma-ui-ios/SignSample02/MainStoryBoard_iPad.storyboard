@@ -1,0 +1,422 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="2.0" toolsVersion="3084" systemVersion="11G63b" targetRuntime="iOS.CocoaTouch.iPad" propertyAccessControl="none" useAutolayout="YES" initialViewController="oXt-Wl-tio">
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="2083"/>
+    </dependencies>
+    <scenes>
+        <!--Navigation Controller-->
+        <scene sceneID="9zR-zd-mmm">
+            <objects>
+                <navigationController definesPresentationContext="YES" id="oXt-Wl-tio" sceneMemberID="viewController">
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="iwP-rE-YNG">
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <connections>
+                        <segue destination="FiJ-J0-m6p" kind="relationship" relationship="rootViewController" id="mCH-Qh-CjI"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Rpb-tz-mUw" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-1028" y="-110"/>
+        </scene>
+        <!--About View Controller-->
+        <scene sceneID="v4Q-D1-Ugd">
+            <objects>
+                <viewController id="FiJ-J0-m6p" customClass="AOAboutViewController" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="FUv-99-v4I">
+                        <rect key="frame" x="0.0" y="20" width="768" height="1004"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" showsHorizontalScrollIndicator="NO" editable="NO" textAlignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="8Ub-S5-UfZ">
+                                <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="469" type="user" id="0zm-Hh-cSJ"/>
+                                    <constraint firstAttribute="height" constant="420" id="SqZ-tq-M2k"/>
+                                </constraints>
+                                <string key="text">Bienvenido a "Cliente @firma iOS" 0.1 Beta.
+
+Esta aplicación permite realizar firmas electrónicas en las páginas de los proveedores de servicios que lo soporten.
+
+Para funcionar correctamente debe instalar un certificado electrónico y su clave privada en su dispositivo a través de iTunes. Consulte la documentación de su sitema iOs y con su proveedor de servicios de  certificación.
+
+Cliente @firma para Apple iOS v0.1.
+© Derechos de copia: Gobierno de España, 2013 (Ministerio de Hacienda y Administraciones Públicas, Secretaría de Estado de Administraciones Públicas).
+
+El Cliente @firma para Apple iOS es software libre y puede ser distribuido y/o modificado bajo los términos de la licencia EUPL (European Software License) versión 1.1.
+
+Puede contactar con el tenedor de los derechos de copia en la siguiente dirección de correo electrónico: soporte.afirma@seap.minhap.es.</string>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                            </textView>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" image="logo_cliente.png" translatesAutoresizingMaskIntoConstraints="NO" id="HOR-WT-1d4">
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="280" type="user" id="Mr8-N7-LOs"/>
+                                    <constraint firstAttribute="height" constant="83" id="gyV-Xp-cwY"/>
+                                </constraints>
+                            </imageView>
+                            <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="KoX-uW-hfd">
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="73" id="PK5-PZ-VOb"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
+                                <state key="normal" title="Al Inicio">
+                                    <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <state key="highlighted">
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <segue destination="BdW-y5-nVW" kind="push" identifier="toSelectionScreen" id="2EB-G0-Tn7"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="8Ub-S5-UfZ" firstAttribute="top" secondItem="FUv-99-v4I" secondAttribute="top" constant="122" id="HLC-Du-kbi"/>
+                            <constraint firstItem="HOR-WT-1d4" firstAttribute="centerX" secondItem="8Ub-S5-UfZ" secondAttribute="centerX" type="user" id="NSm-lA-Dux"/>
+                            <constraint firstItem="KoX-uW-hfd" firstAttribute="leading" secondItem="FUv-99-v4I" secondAttribute="leading" constant="20" symbolic="YES" type="default" id="QBb-LP-D1S"/>
+                            <constraint firstItem="HOR-WT-1d4" firstAttribute="top" secondItem="FUv-99-v4I" secondAttribute="top" constant="20" symbolic="YES" type="default" id="U1U-wk-45a"/>
+                            <constraint firstAttribute="bottom" secondItem="KoX-uW-hfd" secondAttribute="bottom" constant="20" symbolic="YES" type="default" id="kni-YJ-Vmh"/>
+                            <constraint firstItem="8Ub-S5-UfZ" firstAttribute="centerX" secondItem="FUv-99-v4I" secondAttribute="centerX" type="default" id="vdx-ab-SgN"/>
+                        </constraints>
+                    </view>
+                    <navigationItem key="navigationItem" id="YYJ-23-JhL"/>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="uXD-aP-FVd" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-14" y="-110"/>
+        </scene>
+        <!--Certificate Selection View Controller - Solicitud de certificado-->
+        <scene sceneID="HbR-9a-0Y9">
+            <objects>
+                <viewController title="Solicitud de certificado" id="BdW-y5-nVW" customClass="AOCertificateSelectionViewController" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="n9S-c5-sfB">
+                        <rect key="frame" x="0.0" y="20" width="768" height="1004"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        <subviews>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" image="logo_cliente.png" translatesAutoresizingMaskIntoConstraints="NO" id="IWI-e2-02M">
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="280" type="user" id="87n-Ox-qJA"/>
+                                    <constraint firstAttribute="height" constant="83" id="Qd9-sI-VmQ"/>
+                                </constraints>
+                            </imageView>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" showsHorizontalScrollIndicator="NO" editable="NO" textAlignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="fhk-ie-nSo">
+                                <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="114" id="B9t-SC-WSS"/>
+                                    <constraint firstAttribute="width" constant="469" type="user" id="KpU-XL-Cz3"/>
+                                </constraints>
+                                <string key="text">Por favor, seleccione el almacén de claves y certificados que desea utilizar para el proceso de firma.
+Si no aparecen almacenes en la lista, podrá importarlos desde las opciones de la aplicación en iTunes.</string>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                            </textView>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="none" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" translatesAutoresizingMaskIntoConstraints="NO" id="Dd5-HU-hFJ">
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="220" id="x0h-aW-rHs"/>
+                                </constraints>
+                                <connections>
+                                    <outlet property="dataSource" destination="BdW-y5-nVW" id="vxG-V8-aa0"/>
+                                    <outlet property="delegate" destination="BdW-y5-nVW" id="4mN-bt-XTr"/>
+                                </connections>
+                            </tableView>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="dqi-Cj-y1X">
+                                <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
+                                <state key="normal" title="Seleccionar">
+                                    <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <state key="highlighted">
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <segue destination="GAJ-C9-ffl" kind="push" identifier="toPinScreen" id="qUh-zg-YVY"/>
+                                </connections>
+                            </button>
+                            <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="hJ6-O2-w2o">
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="73" id="AoU-vL-D8z"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
+                                <state key="normal" title="Al Inicio">
+                                    <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <state key="highlighted">
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <segue destination="FiJ-J0-m6p" kind="push" identifier="toFirstScreen" id="aG4-vU-0Oo"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="dqi-Cj-y1X" firstAttribute="top" secondItem="hJ6-O2-w2o" secondAttribute="bottom" constant="8" symbolic="YES" type="default" id="18B-4b-8om"/>
+                            <constraint firstItem="fhk-ie-nSo" firstAttribute="trailing" secondItem="Dd5-HU-hFJ" secondAttribute="trailing" type="default" id="9l4-X8-pHj"/>
+                            <constraint firstAttribute="bottom" secondItem="dqi-Cj-y1X" secondAttribute="bottom" constant="20" symbolic="YES" type="default" id="FN1-wc-fRK"/>
+                            <constraint firstItem="IWI-e2-02M" firstAttribute="top" secondItem="n9S-c5-sfB" secondAttribute="top" constant="20" symbolic="YES" type="default" id="Fn2-oQ-ZeU"/>
+                            <constraint firstItem="fhk-ie-nSo" firstAttribute="centerX" secondItem="IWI-e2-02M" secondAttribute="centerX" type="default" id="HHJ-ju-X8y"/>
+                            <constraint firstItem="dqi-Cj-y1X" firstAttribute="centerX" secondItem="IWI-e2-02M" secondAttribute="centerX" type="default" id="Zv3-0B-DE8"/>
+                            <constraint firstAttribute="trailing" secondItem="dqi-Cj-y1X" secondAttribute="trailing" constant="20" symbolic="YES" type="default" id="Zxb-BZ-NRE"/>
+                            <constraint firstItem="hJ6-O2-w2o" firstAttribute="leading" secondItem="n9S-c5-sfB" secondAttribute="leading" constant="20" symbolic="YES" type="default" id="cZu-3H-uJG"/>
+                            <constraint firstItem="dqi-Cj-y1X" firstAttribute="leading" secondItem="n9S-c5-sfB" secondAttribute="leading" constant="20" symbolic="YES" type="default" id="eKD-vZ-8KI"/>
+                            <constraint firstItem="Dd5-HU-hFJ" firstAttribute="leading" secondItem="fhk-ie-nSo" secondAttribute="leading" type="default" id="rg5-Ep-jLO"/>
+                            <constraint firstItem="fhk-ie-nSo" firstAttribute="top" secondItem="n9S-c5-sfB" secondAttribute="top" constant="124" id="soX-fa-CiJ"/>
+                            <constraint firstItem="Dd5-HU-hFJ" firstAttribute="top" secondItem="n9S-c5-sfB" secondAttribute="top" constant="265" id="zJL-Do-T3D"/>
+                        </constraints>
+                    </view>
+                    <navigationItem key="navigationItem" id="VxL-B1-PSv"/>
+                    <connections>
+                        <outlet property="selectionButton" destination="dqi-Cj-y1X" id="asj-Bp-Uo7"/>
+                        <outlet property="tblView" destination="Dd5-HU-hFJ" id="svS-cH-gSo"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="udQ-we-IkE" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1085" y="1492"/>
+        </scene>
+        <!--Pin View Controller - Solicitud de PIN-->
+        <scene sceneID="9jM-Wg-Zub">
+            <objects>
+                <viewController title="Solicitud de PIN" id="GAJ-C9-ffl" customClass="AOPinViewController" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="XML-nt-6if">
+                        <rect key="frame" x="0.0" y="20" width="768" height="1004"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        <subviews>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" image="logo_cliente.png" translatesAutoresizingMaskIntoConstraints="NO" id="dyX-6s-tTM">
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="280" type="user" id="CzN-tC-ade"/>
+                                    <constraint firstAttribute="height" constant="83" id="D5t-ce-XVi"/>
+                                </constraints>
+                            </imageView>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" showsHorizontalScrollIndicator="NO" editable="NO" text="Por favor, introduzca su contraseña del almacén de claves y certificados." textAlignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="xDL-pz-I3p">
+                                <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="469" type="user" id="la7-X7-Y20"/>
+                                    <constraint firstAttribute="height" constant="50" id="zDB-Dy-vem"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                            </textView>
+                            <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="CYs-fW-9q5">
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits" secureTextEntry="YES"/>
+                                <connections>
+                                    <action selector="pinButtonPressed:" destination="GAJ-C9-ffl" eventType="editingChanged" id="4gO-Yn-etg"/>
+                                    <outlet property="delegate" destination="GAJ-C9-ffl" id="Est-3D-QDu"/>
+                                </connections>
+                            </textField>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" showsHorizontalScrollIndicator="NO" editable="NO" textAlignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="xEa-tO-dEN">
+                                <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="469" type="user" id="gPb-sJ-8oE"/>
+                                    <constraint firstAttribute="height" constant="152" id="rcY-r5-p0X"/>
+                                </constraints>
+                                <string key="text">Una vez introducida la contraseña de su almacén de certificados y claves se le mostrará el certificado con el que se realizará el proceso de firma.
+
+Si ha olvidado la contraseña utilice iTunes para sustituir su almacén PKCS#12.</string>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                            </textView>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="M6j-4b-wrk">
+                                <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
+                                <state key="normal" title="Aceptar">
+                                    <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <state key="highlighted">
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <segue destination="zg9-9u-ifb" kind="push" identifier="pinEntered" id="WFs-EB-ElY"/>
+                                </connections>
+                            </button>
+                            <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="RpB-6d-HOh">
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="73" id="gr8-fG-DyN"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
+                                <state key="normal" title="Al Inicio">
+                                    <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <state key="highlighted">
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <segue destination="FiJ-J0-m6p" kind="push" identifier="toFirstScreen" id="nwd-Gl-Nbi"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="CYs-fW-9q5" firstAttribute="trailing" secondItem="xDL-pz-I3p" secondAttribute="trailing" type="default" id="0Jp-EN-B0A"/>
+                            <constraint firstItem="CYs-fW-9q5" firstAttribute="leading" secondItem="xDL-pz-I3p" secondAttribute="leading" type="default" id="0t2-9L-raD"/>
+                            <constraint firstAttribute="trailing" secondItem="M6j-4b-wrk" secondAttribute="trailing" constant="20" symbolic="YES" type="default" id="3lf-pg-xou"/>
+                            <constraint firstItem="M6j-4b-wrk" firstAttribute="leading" secondItem="XML-nt-6if" secondAttribute="leading" constant="20" symbolic="YES" type="default" id="3uQ-jw-QHk"/>
+                            <constraint firstItem="RpB-6d-HOh" firstAttribute="leading" secondItem="XML-nt-6if" secondAttribute="leading" constant="20" symbolic="YES" type="default" id="C4Y-A9-SdS"/>
+                            <constraint firstItem="dyX-6s-tTM" firstAttribute="top" secondItem="XML-nt-6if" secondAttribute="top" constant="20" symbolic="YES" type="default" id="Dlp-Rc-l0M"/>
+                            <constraint firstItem="M6j-4b-wrk" firstAttribute="top" secondItem="RpB-6d-HOh" secondAttribute="bottom" constant="8" symbolic="YES" type="default" id="KHu-K9-KgL"/>
+                            <constraint firstAttribute="bottom" secondItem="M6j-4b-wrk" secondAttribute="bottom" constant="20" symbolic="YES" type="default" id="Pzu-tn-Uv0"/>
+                            <constraint firstItem="xEa-tO-dEN" firstAttribute="leading" secondItem="CYs-fW-9q5" secondAttribute="leading" type="default" id="fee-ht-WAL"/>
+                            <constraint firstItem="xDL-pz-I3p" firstAttribute="top" secondItem="XML-nt-6if" secondAttribute="top" constant="126" id="gAy-fZ-XRt"/>
+                            <constraint firstItem="xEa-tO-dEN" firstAttribute="centerX" secondItem="M6j-4b-wrk" secondAttribute="centerX" type="default" id="kL9-LU-AZp"/>
+                            <constraint firstItem="xDL-pz-I3p" firstAttribute="centerX" secondItem="dyX-6s-tTM" secondAttribute="centerX" type="default" id="pVR-U9-4KK"/>
+                            <constraint firstItem="xEa-tO-dEN" firstAttribute="top" secondItem="CYs-fW-9q5" secondAttribute="bottom" constant="8" symbolic="YES" type="default" id="qWf-rs-0xa"/>
+                            <constraint firstItem="CYs-fW-9q5" firstAttribute="top" secondItem="xDL-pz-I3p" secondAttribute="bottom" constant="8" symbolic="YES" type="default" id="thY-xB-eqt"/>
+                        </constraints>
+                    </view>
+                    <navigationItem key="navigationItem" id="CVX-5L-LnU"/>
+                    <connections>
+                        <outlet property="nombreCert" destination="xDL-pz-I3p" id="4zU-KM-NiP"/>
+                        <outlet property="pinButton" destination="M6j-4b-wrk" id="d15-an-ozG"/>
+                        <outlet property="pinTextField" destination="CYs-fW-9q5" id="Q4d-bG-fqe"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="cyJ-SD-d8X" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2203" y="1121"/>
+        </scene>
+        <!--Sign View Controller - Firma Electrónica-->
+        <scene sceneID="Ior-uI-bhK">
+            <objects>
+                <viewController title="Firma Electrónica" id="zg9-9u-ifb" customClass="AOSignViewController" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="zvO-RC-BJv">
+                        <rect key="frame" x="0.0" y="20" width="768" height="1004"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        <subviews>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" image="logo_cliente.png" translatesAutoresizingMaskIntoConstraints="NO" id="O5N-UJ-Apf">
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="83" id="S1l-vT-gpj"/>
+                                    <constraint firstAttribute="width" constant="280" type="user" id="xZw-ng-1EG"/>
+                                </constraints>
+                            </imageView>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" showsHorizontalScrollIndicator="NO" editable="NO" text="Se ha seleccionado el siguiente certificado del almacén:" translatesAutoresizingMaskIntoConstraints="NO" id="bar-ZC-vY0">
+                                <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="469" type="user" id="gOL-UB-674"/>
+                                    <constraint firstAttribute="height" constant="34" id="lDm-WW-tIC"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                            </textView>
+                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="0Dx-m0-MPg">
+                                <fontDescription key="fontDescription" name="Helvetica-BoldOblique" family="Helvetica" pointSize="17"/>
+                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" showsHorizontalScrollIndicator="NO" editable="NO" text="Se va a utilizar este certificado para realizar la firma. Pulse el siguiente botón para iniciar el proceso." translatesAutoresizingMaskIntoConstraints="NO" id="zdR-IB-SHo">
+                                <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="61" id="NgS-XY-ofc"/>
+                                    <constraint firstAttribute="width" constant="469" type="user" id="zMe-T3-pV1"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                            </textView>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="g7K-e3-dGQ">
+                                <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
+                                <state key="normal" title="Firmar">
+                                    <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <state key="highlighted">
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="buttonPressed:" destination="zg9-9u-ifb" eventType="touchUpInside" id="wG3-7C-OJI"/>
+                                </connections>
+                            </button>
+                            <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="he1-LA-Yfj">
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="73" id="S54-0k-zKn"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
+                                <state key="normal" title="Al Inicio">
+                                    <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <state key="highlighted">
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <segue destination="FiJ-J0-m6p" kind="push" id="mid-dV-KjV"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstAttribute="trailing" secondItem="g7K-e3-dGQ" secondAttribute="trailing" constant="20" symbolic="YES" type="default" id="DQ7-b8-0Gy"/>
+                            <constraint firstAttribute="bottom" secondItem="g7K-e3-dGQ" secondAttribute="bottom" constant="20" symbolic="YES" type="default" id="DhK-AL-spj"/>
+                            <constraint firstItem="g7K-e3-dGQ" firstAttribute="leading" secondItem="zvO-RC-BJv" secondAttribute="leading" constant="20" symbolic="YES" type="default" id="GYp-Qd-a0z"/>
+                            <constraint firstItem="0Dx-m0-MPg" firstAttribute="top" secondItem="bar-ZC-vY0" secondAttribute="bottom" constant="8" symbolic="YES" type="default" id="Jvs-GB-ecb"/>
+                            <constraint firstItem="zdR-IB-SHo" firstAttribute="leading" secondItem="0Dx-m0-MPg" secondAttribute="leading" type="default" id="PSR-dJ-yKO"/>
+                            <constraint firstItem="g7K-e3-dGQ" firstAttribute="top" secondItem="he1-LA-Yfj" secondAttribute="bottom" constant="8" symbolic="YES" type="default" id="TWa-fI-TzN"/>
+                            <constraint firstItem="g7K-e3-dGQ" firstAttribute="centerX" secondItem="zdR-IB-SHo" secondAttribute="centerX" type="default" id="XJ2-D4-Lvx"/>
+                            <constraint firstItem="O5N-UJ-Apf" firstAttribute="top" secondItem="zvO-RC-BJv" secondAttribute="top" constant="20" symbolic="YES" type="default" id="XRK-ev-BrE"/>
+                            <constraint firstItem="0Dx-m0-MPg" firstAttribute="trailing" secondItem="bar-ZC-vY0" secondAttribute="trailing" type="default" id="csi-wk-arv"/>
+                            <constraint firstItem="zdR-IB-SHo" firstAttribute="top" secondItem="0Dx-m0-MPg" secondAttribute="bottom" constant="8" symbolic="YES" type="default" id="hIy-um-PLr"/>
+                            <constraint firstItem="bar-ZC-vY0" firstAttribute="centerX" secondItem="O5N-UJ-Apf" secondAttribute="centerX" type="default" id="pRa-KL-exa"/>
+                            <constraint firstItem="he1-LA-Yfj" firstAttribute="leading" secondItem="zvO-RC-BJv" secondAttribute="leading" constant="20" symbolic="YES" type="default" id="pif-ih-sog"/>
+                            <constraint firstItem="bar-ZC-vY0" firstAttribute="top" secondItem="O5N-UJ-Apf" secondAttribute="bottom" constant="8" symbolic="YES" type="default" id="vjN-Cz-4c3"/>
+                            <constraint firstItem="0Dx-m0-MPg" firstAttribute="leading" secondItem="bar-ZC-vY0" secondAttribute="leading" type="default" id="xo1-RR-XWj"/>
+                        </constraints>
+                    </view>
+                    <navigationItem key="navigationItem" id="U4D-9Y-YYq"/>
+                    <connections>
+                        <outlet property="nombreCert" destination="0Dx-m0-MPg" id="0tn-ea-JNo"/>
+                        <outlet property="signButton" destination="g7K-e3-dGQ" id="H24-4Y-UXZ"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="bpA-bK-0RN" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="3181" y="1121"/>
+        </scene>
+    </scenes>
+    <resources>
+        <image name="logo_cliente.png" width="726" height="200"/>
+    </resources>
+    <classes>
+        <class className="AOAboutViewController" superclassName="UIViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/AOAboutViewController.h"/>
+        </class>
+        <class className="AOCertificateSelectionViewController" superclassName="UIViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/AOCertificateSelectionViewController.h"/>
+            <relationships>
+                <relationship kind="outlet" name="selectionButton" candidateClass="UIButton"/>
+                <relationship kind="outlet" name="tblView" candidateClass="UITableView"/>
+            </relationships>
+        </class>
+        <class className="AOPinViewController" superclassName="UIViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/AOPinViewController.h"/>
+            <relationships>
+                <relationship kind="action" name="pinButtonPressed:"/>
+                <relationship kind="outlet" name="nombreCert" candidateClass="UITextView"/>
+                <relationship kind="outlet" name="pinButton" candidateClass="UIButton"/>
+                <relationship kind="outlet" name="pinTextField" candidateClass="UITextField"/>
+            </relationships>
+        </class>
+        <class className="AOSignViewController" superclassName="UIViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/AOSignViewController.h"/>
+            <relationships>
+                <relationship kind="action" name="buttonPressed:"/>
+                <relationship kind="outlet" name="nombreCert" candidateClass="UILabel"/>
+                <relationship kind="outlet" name="signButton" candidateClass="UIButton"/>
+            </relationships>
+        </class>
+        <class className="NSLayoutConstraint" superclassName="NSObject">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/NSLayoutConstraint.h"/>
+        </class>
+    </classes>
+    <simulatedMetricsContainer key="defaultSimulatedMetrics">
+        <simulatedStatusBarMetrics key="statusBar" statusBarStyle="blackTranslucent"/>
+        <simulatedOrientationMetrics key="orientation"/>
+        <simulatedScreenMetrics key="destination"/>
+    </simulatedMetricsContainer>
+    <inferredMetricsTieBreakers>
+        <segue reference="mid-dV-KjV"/>
+    </inferredMetricsTieBreakers>
+</document>

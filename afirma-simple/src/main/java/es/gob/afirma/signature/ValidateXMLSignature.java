@@ -14,6 +14,7 @@ import java.io.ByteArrayInputStream;
 import java.security.Key;
 import java.security.KeyException;
 import java.security.PublicKey;
+import java.security.cert.Certificate;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
@@ -30,6 +31,7 @@ import javax.xml.crypto.dsig.XMLSignature;
 import javax.xml.crypto.dsig.dom.DOMValidateContext;
 import javax.xml.crypto.dsig.keyinfo.KeyInfo;
 import javax.xml.crypto.dsig.keyinfo.KeyValue;
+import javax.xml.crypto.dsig.keyinfo.X509Data;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.w3c.dom.Document;
@@ -73,7 +75,10 @@ public final class ValidateXMLSignature {
 
         try {
 
-        	final DOMValidateContext valContext = new DOMValidateContext(new KeyValueKeySelector(), nl.item(0));
+        	final DOMValidateContext valContext = new DOMValidateContext(
+    			new KeyValueKeySelector(),
+    			nl.item(0)
+			);
 
         	final XMLSignature signature = Utils.getDOMFactory().unmarshalXMLSignature(valContext);
             if (!signature.validate(valContext)) {
@@ -97,6 +102,7 @@ public final class ValidateXMLSignature {
     		return new SignValidity(SIGN_DETAIL_TYPE.OK, null);
         }
         catch (final Exception e) {
+        	LOGGER.warning("No se ha podido validar la firma: " + e); //$NON-NLS-1$
             return new SignValidity(SIGN_DETAIL_TYPE.UNKNOWN, null);
         }
     }
@@ -115,17 +121,30 @@ public final class ValidateXMLSignature {
             for (int i = 0; i < list.size(); i++) {
                 final XMLStructure xmlStructure = (XMLStructure) list.get(i);
                 if (xmlStructure instanceof KeyValue) {
-                    final PublicKey pk;
+                    final PublicKey publicKey;
                     try {
-                        pk = ((KeyValue)xmlStructure).getPublicKey();
+                        publicKey = ((KeyValue)xmlStructure).getPublicKey();
                     }
                     catch (final KeyException ke) {
                         throw new KeySelectorException(ke);
                     }
-                    // make sure algorithm is compatible with method
-                    if (algEquals(((SignatureMethod) method).getAlgorithm(), pk.getAlgorithm())) {
-                        return new SimpleKeySelectorResult(pk);
+
+                    if (algEquals(((SignatureMethod) method).getAlgorithm(), publicKey.getAlgorithm())) {
+                        return new SimpleKeySelectorResult(publicKey);
                     }
+                }
+                // Si no hay KeyValue intentamos sacar la clave publica del primer Certificado
+                // que encontramos en X509Data
+                else if (xmlStructure instanceof X509Data) {
+                	final List<Object> x509DataObjects = ((X509Data)xmlStructure).getContent();
+                	for (final Object o : x509DataObjects) {
+                		if (o instanceof Certificate) {
+                			final PublicKey publicKey = ((Certificate)o).getPublicKey();
+                			if (algEquals(((SignatureMethod) method).getAlgorithm(), publicKey.getAlgorithm())) {
+                                return new SimpleKeySelectorResult(publicKey);
+                            }
+                		}
+                	}
                 }
             }
             throw new KeySelectorException("No se ha encontrado el elemento KeyValue"); //$NON-NLS-1$
@@ -147,7 +166,7 @@ public final class ValidateXMLSignature {
             this.pk = pk;
         }
 
-        @Override
+		@Override
 		public Key getKey() { return this.pk; }
     }
 }

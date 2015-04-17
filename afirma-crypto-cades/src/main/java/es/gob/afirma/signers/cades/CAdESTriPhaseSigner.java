@@ -191,7 +191,8 @@ public final class CAdESTriPhaseSigner {
                      contentType,
                      contentDescription,
                      ctis,
-                     csm
+                     csm,
+                     false  // No es contrafirma
                   )
                )
             );
@@ -302,20 +303,38 @@ public final class CAdESTriPhaseSigner {
             catch (final Exception e) {
                 throw new AOException("Error en la escritura del contenido implicito en el ContentInfo", e); //$NON-NLS-1$
             }
-            contentInfo = new ContentInfo(new ASN1ObjectIdentifier(PKCSObjectIdentifiers.data.getId()), new BEROctetString(baos.toByteArray()));
+            contentInfo = new ContentInfo(
+        		new ASN1ObjectIdentifier(
+    				PKCSObjectIdentifiers.data.getId()
+				),
+				new BEROctetString(baos.toByteArray())
+    		);
         }
         else {
-            contentInfo = new ContentInfo(new ASN1ObjectIdentifier(PKCSObjectIdentifiers.data.getId()), null);
+            contentInfo = new ContentInfo(
+        		new ASN1ObjectIdentifier(
+    				PKCSObjectIdentifiers.data.getId()
+				),
+				null
+			);
         }
 
         // Certificados
         final List<ASN1Encodable> ce = new ArrayList<ASN1Encodable>();
         for (final Certificate cert : signerCertificateChain) {
             try {
-                ce.add(org.bouncycastle.asn1.x509.Certificate.getInstance(ASN1Primitive.fromByteArray(cert.getEncoded())));
+                ce.add(
+            		org.bouncycastle.asn1.x509.Certificate.getInstance(
+        				ASN1Primitive.fromByteArray(
+    						cert.getEncoded()
+						)
+    				)
+        		);
             }
             catch(final Exception e) {
-                Logger.getLogger("es.gob.afirma").severe("Error insertando el certificado '" + AOUtil.getCN((X509Certificate) cert) + "' en la cadena de confianza"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                Logger.getLogger("es.gob.afirma").severe( //$NON-NLS-1$
+            		"Error insertando el certificado '" + AOUtil.getCN((X509Certificate) cert) + "' en la cadena de confianza: " + e //$NON-NLS-1$ //$NON-NLS-2$
+        		);
             }
         }
         final ASN1Set certificates = SigUtils.createBerSetFromList(ce);

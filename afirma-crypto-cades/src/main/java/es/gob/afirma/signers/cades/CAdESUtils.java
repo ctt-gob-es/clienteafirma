@@ -367,6 +367,8 @@ public final class CAdESUtils {
      * @param contentDescription Descripci&oacute;n textual del tipo de contenido firmado.
      * @param ctis Lista de compromisos adquiridos con esta firma
      * @param csm Metadatos sobre el firmante
+     * @param isCountersign <code>true</code> si desea generarse el <code>SignerInfo</code> de una
+     *                      contrafirma, <code>false</code> en caso contrario.
      * @return Los datos necesarios para generar la firma referente a los datos del usuario.
      * @throws java.security.NoSuchAlgorithmException Cuando se introduce un algoritmo no v&aacute;lido.
      * @throws java.io.IOException Cuando se produce un error de entrada/salida.
@@ -382,9 +384,10 @@ public final class CAdESUtils {
                                                          final String contentType,
                                                          final String contentDescription,
                                                          final List<CommitmentTypeIndicationBean> ctis,
-                                                         final CAdESSignerMetadata csm) throws NoSuchAlgorithmException,
-                                                                                               IOException,
-                                                                                               CertificateEncodingException {
+                                                         final CAdESSignerMetadata csm,
+                                                         final boolean isCountersign) throws NoSuchAlgorithmException,
+                                                                                             IOException,
+                                                                                             CertificateEncodingException {
         // // ATRIBUTOS
 
         // authenticatedAttributes (http://tools.ietf.org/html/rfc3852#section-11)
@@ -393,6 +396,7 @@ public final class CAdESUtils {
                 data,
                 dataDigest,
                 signDate,
+                isCountersign,
                 padesMode
         );
 
@@ -415,6 +419,7 @@ public final class CAdESUtils {
     		);
         }
 
+        // ContentHints, que se crea en base al ContentType
         if (contentType != null && !padesMode) {
         	final ContentHints contentHints;
         	if (contentDescription != null) {
@@ -570,20 +575,24 @@ public final class CAdESUtils {
     }
 
     private static ASN1EncodableVector initContexExpecific(final String dataDigestAlgorithmName,
-                                                   final byte[] data,
-                                                   final byte[] dataDigest,
-                                                   final Date signDate,
-                                                   final boolean padesMode) throws NoSuchAlgorithmException {
+                                                           final byte[] data,
+                                                           final byte[] dataDigest,
+                                                           final Date signDate,
+                                                           final boolean isCountersign,
+                                                           final boolean padesMode) throws NoSuchAlgorithmException {
         // authenticatedAttributes
         final ASN1EncodableVector contexExpecific = new ASN1EncodableVector();
 
-        // ContentType es obligatorio, y debe tener siempre el valor "id-data"
-        contexExpecific.add(
-    		new Attribute(
-				CMSAttributes.contentType,
-				new DERSet(PKCSObjectIdentifiers.data)
-			)
-		);
+        // ContentType es obligatorio excepto en contrafirmas (donde no debe aparecer nunca),
+        // debe tener siempre el valor "id-data"
+        if (!isCountersign) {
+	        contexExpecific.add(
+	    		new Attribute(
+					CMSAttributes.contentType,
+					new DERSet(PKCSObjectIdentifiers.data)
+				)
+			);
+        }
 
         // fecha de firma, no se anade en modo PAdES, pero es obligatorio en CAdES
         if (!padesMode) {

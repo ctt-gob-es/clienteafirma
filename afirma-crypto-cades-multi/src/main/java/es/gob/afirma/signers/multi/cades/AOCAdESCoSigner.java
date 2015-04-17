@@ -24,7 +24,6 @@ import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AdESPolicy;
 import es.gob.afirma.signers.cades.AOCAdESSigner;
 import es.gob.afirma.signers.cades.CAdESSignerMetadataHelper;
-import es.gob.afirma.signers.cades.CAdESValidator;
 import es.gob.afirma.signers.cades.CommitmentTypeIndicationsHelper;
 import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
 
@@ -41,6 +40,9 @@ public final class AOCAdESCoSigner implements AOCoSigner {
                          final PrivateKey key,
                          final java.security.cert.Certificate[] certChain,
                          final Properties xParams) throws AOException, IOException {
+
+    	//****************************************************************************************************
+    	//*************** LECTURA PARAMETROS ADICIONALES *****************************************************
 
         final Properties extraParams = xParams != null ? xParams : new Properties();
 
@@ -63,18 +65,25 @@ public final class AOCAdESCoSigner implements AOCoSigner {
         	signingCertificateV2 = !"SHA1".equals(AOSignConstants.getDigestAlgorithmName(algorithm));	 //$NON-NLS-1$
         }
 
+        final String contentTypeOid = extraParams.getProperty("contentTypeOid"); //$NON-NLS-1$
+        final String contentDescription = extraParams.getProperty("contentDescription"); //$NON-NLS-1$
+
+        //*************** FIN LECTURA PARAMETROS ADICIONALES *************************************************
+    	//****************************************************************************************************
+
         final P7ContentSignerParameters csp = new P7ContentSignerParameters(
     		data,
     		algorithm
 		);
 
-        String contentTypeOid = MimeHelper.DEFAULT_CONTENT_OID_DATA;
-        String contentDescription = MimeHelper.DEFAULT_CONTENT_DESCRIPTION;
+        String altContentTypeOid = MimeHelper.DEFAULT_CONTENT_OID_DATA;
+        String altContentDescription = MimeHelper.DEFAULT_CONTENT_DESCRIPTION;
 		if (data != null) {
 			try {
 				final MimeHelper mimeHelper = new MimeHelper(data);
-				contentDescription = mimeHelper.getDescription();
-				contentTypeOid = MimeHelper.transformMimeTypeToOid(mimeHelper.getMimeType());
+				altContentTypeOid = MimeHelper.transformMimeTypeToOid(mimeHelper.getMimeType());
+				altContentDescription = mimeHelper.getDescription();
+
 			}
 			catch (final Exception e) {
 				Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
@@ -82,56 +91,30 @@ public final class AOCAdESCoSigner implements AOCoSigner {
 			}
 		}
 
-		// Si la firma que nos introducen es SignedData
-		if (CAdESValidator.isCAdESSignedData(sign, false)) {
-			try {
-				final String mode = extraParams.getProperty("mode", AOSignConstants.DEFAULT_SIGN_MODE); //$NON-NLS-1$
-				final boolean omitContent = mode.equals(AOSignConstants.SIGN_MODE_EXPLICIT) || precalculatedDigest != null;
+		try {
+			final String mode = extraParams.getProperty("mode", AOSignConstants.DEFAULT_SIGN_MODE); //$NON-NLS-1$
+			final boolean omitContent = mode.equals(AOSignConstants.SIGN_MODE_EXPLICIT) || precalculatedDigest != null;
 
-				return new CAdESCoSigner().coSigner(
-						csp,
-						sign,
-						omitContent,
-						AdESPolicy.buildAdESPolicy(extraParams),
-						signingCertificateV2,
-						key,
-						onlySigningCertificate ?
-								new X509Certificate[] { (X509Certificate) certChain[0] } :
-									certChain,
-									messageDigest,
-									contentTypeOid,
-									contentDescription,
-									CommitmentTypeIndicationsHelper.getCommitmentTypeIndications(extraParams),
-									CAdESSignerMetadataHelper.getCAdESSignerMetadata(extraParams)
-						);
+			return new CAdESCoSigner().coSigner(
+				csp,
+				sign,
+				omitContent,
+				AdESPolicy.buildAdESPolicy(extraParams),
+				signingCertificateV2,
+				key,
+				onlySigningCertificate ? new X509Certificate[] { (X509Certificate) certChain[0] } : certChain,
+				messageDigest,
+				contentTypeOid != null ? contentTypeOid : altContentTypeOid,
+                contentDescription != null ? contentDescription : altContentDescription,
+				CommitmentTypeIndicationsHelper.getCommitmentTypeIndications(extraParams),
+				CAdESSignerMetadataHelper.getCAdESSignerMetadata(extraParams)
+			);
 
-			}
-			catch (final Exception e) {
-				throw new AOException("Error generando la Cofirma CAdES", e); //$NON-NLS-1$
-			}
+		}
+		catch (final Exception e) {
+			throw new AOException("Error generando la Cofirma CAdES", e); //$NON-NLS-1$
 		}
 
-		try {
-            return new CAdESCoSignerEnveloped().coSigner(
-                 csp,
-                 sign,
-                 AdESPolicy.buildAdESPolicy(extraParams),
-                 signingCertificateV2,
-                 key,
-                 onlySigningCertificate ?
-            		 new X509Certificate[] { (X509Certificate) certChain[0] } :
-            			 certChain,
-                 messageDigest,
-                 contentTypeOid,
-                 contentDescription,
-                 CommitmentTypeIndicationsHelper.getCommitmentTypeIndications(extraParams),
-                 CAdESSignerMetadataHelper.getCAdESSignerMetadata(extraParams)
-            );
-
-        }
-        catch (final Exception e) {
-            throw new AOException("Error generando la Cofirma CAdES. La firma no es una CAdES corriente.", e); //$NON-NLS-1$
-        }
     }
 
     /** {@inheritDoc} */
@@ -169,55 +152,26 @@ public final class AOCAdESCoSigner implements AOCoSigner {
 			contentTypeOid = MimeHelper.transformMimeTypeToOid(mimeHelper.getMimeType());
         }
 
-
-        // Si la firma que nos introducen es SignedData
-        if (CAdESValidator.isCAdESSignedData(sign, false)) {
-            try {
-				return new CAdESCoSigner().coSigner(
-				    typeAlgorithm,
-				    onlySigningCertificate ?
-						new X509Certificate[] { (X509Certificate) certChain[0] } :
-							(X509Certificate[]) certChain,
-				    new ByteArrayInputStream(sign),
-				    AdESPolicy.buildAdESPolicy(extraParams),
-				    signingCertificateV2,
-				    key,
-				    certChain,
-				    null, // null porque no nos pueden dar un hash en este metodo, tendria que ser en el que incluye datos
-				    contentTypeOid,
-				    contentDescription,
-				    CommitmentTypeIndicationsHelper.getCommitmentTypeIndications(extraParams),
-				    CAdESSignerMetadataHelper.getCAdESSignerMetadata(extraParams)
-				);
-			}
-            catch (final Exception e) {
-                throw new AOException("Error generando la Cofirma CADES", e); //$NON-NLS-1$
-            }
-        }
-
-        // Signed And Enveloped.
         try {
-            return new CAdESCoSignerEnveloped().coSigner(
-                 typeAlgorithm,
-                 onlySigningCertificate ?
-         			new X509Certificate[] { (X509Certificate) certChain[0] } :
-     				(X509Certificate[]) certChain,
-                 new ByteArrayInputStream(sign),
-                 AdESPolicy.buildAdESPolicy(extraParams),
-                 signingCertificateV2,
-                 key,
-                 Boolean.parseBoolean(extraParams.getProperty("includeOnlySignningCertificate", Boolean.FALSE.toString())) ? //$NON-NLS-1$
-            		 new X509Certificate[] { (X509Certificate) certChain[0] } :
-            			 certChain,
-                 null, // null porque no nos pueden dar un hash en este metodo, tendria que ser en el que incluye datos
-                 contentTypeOid,
-                 contentDescription,
-                 CommitmentTypeIndicationsHelper.getCommitmentTypeIndications(extraParams),
-                 CAdESSignerMetadataHelper.getCAdESSignerMetadata(extraParams)
-            );
-        }
+			return new CAdESCoSigner().coSigner(
+			    typeAlgorithm,
+			    onlySigningCertificate ?
+					new X509Certificate[] { (X509Certificate) certChain[0] } :
+						(X509Certificate[]) certChain,
+			    new ByteArrayInputStream(sign),
+			    AdESPolicy.buildAdESPolicy(extraParams),
+			    signingCertificateV2,
+			    key,
+			    certChain,
+			    null, // null porque no nos pueden dar un hash en este metodo, tendria que ser en el que incluye datos
+			    contentTypeOid,
+			    contentDescription,
+			    CommitmentTypeIndicationsHelper.getCommitmentTypeIndications(extraParams),
+			    CAdESSignerMetadataHelper.getCAdESSignerMetadata(extraParams)
+			);
+		}
         catch (final Exception e) {
-        	throw new AOException("Error generando la Cofirma CAdES. La firma no es una CAdES corriente.", e); //$NON-NLS-1$
+            throw new AOException("Error generando la Cofirma CADES", e); //$NON-NLS-1$
         }
 
     }

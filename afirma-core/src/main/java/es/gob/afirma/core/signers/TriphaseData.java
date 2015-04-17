@@ -94,7 +94,6 @@ public class TriphaseData {
 	 * @param xml Texto XML con la informaci&oacute;n del mensaje.
 	 * @return Mensaje de datos.
 	 * @throws IOException Cuando hay problemas en el tratamiento de datos.
-	 * @throws Exception Cuando el XML no describa un mensaje o no se pueda analizar.
 	 */
 	public static TriphaseData parser(final byte[] xml) throws IOException {
 

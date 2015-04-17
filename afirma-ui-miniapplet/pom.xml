@@ -46,7 +46,7 @@
 
 				<dependency>
 					<groupId>es.gob.afirma</groupId>
-					<artifactId>afirma-keystores-filters-rfc</artifactId>
+					<artifactId>afirma-keystores-filters</artifactId>
 					<version>${project.version}</version>
 				</dependency>
 

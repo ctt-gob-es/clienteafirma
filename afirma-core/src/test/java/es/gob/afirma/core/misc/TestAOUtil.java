@@ -25,6 +25,14 @@ public final class TestAOUtil {
 		System.out.println(Platform.getSystemLibDir());
 	}
 
+	/** Prueba de paso a formato URI de ruta de fichero.
+	 * @throws Exception En cualquier error. */
+	@SuppressWarnings("static-method")
+	@Test
+	public void testCreateUri() throws Exception {
+		System.out.println(AOUtil.createURI("c:\\kaka\\naca\\/das des\\a.txt")); //$NON-NLS-1$
+	}
+
     /** Prueba para el getCN(), reconstruido para prescindir de javax.naming.
      * @throws Exception En cualquier error. */
     @SuppressWarnings("static-method")

@@ -120,6 +120,9 @@ public final class AOCAdESSigner implements AOSigner {
 
         final String mode = extraParams.getProperty("mode", AOSignConstants.DEFAULT_SIGN_MODE); //$NON-NLS-1$
 
+        final String contentTypeOid = extraParams.getProperty("contentTypeOid"); //$NON-NLS-1$
+        final String contentDescription = extraParams.getProperty("contentDescription"); //$NON-NLS-1$
+
     	//*************** FIN LECTURA PARAMETROS ADICIONALES *************************************************
     	//****************************************************************************************************
 
@@ -147,13 +150,14 @@ public final class AOCAdESSigner implements AOSigner {
                 omitContent = true;
             }
 
-            String contentTypeOid = MimeHelper.DEFAULT_CONTENT_OID_DATA;
-            String contentDescription = MimeHelper.DEFAULT_CONTENT_DESCRIPTION;
+
+            String altContentTypeOid = MimeHelper.DEFAULT_CONTENT_OID_DATA;
+            String altContentDescription = MimeHelper.DEFAULT_CONTENT_DESCRIPTION;
 			if (data != null) {
 				try {
 					final MimeHelper mimeHelper = new MimeHelper(data);
-					contentDescription = mimeHelper.getDescription();
-					contentTypeOid = MimeHelper.transformMimeTypeToOid(mimeHelper.getMimeType());
+					altContentDescription = mimeHelper.getDescription();
+					altContentTypeOid = MimeHelper.transformMimeTypeToOid(mimeHelper.getMimeType());
 				}
 				catch (final Exception e) {
 					Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
@@ -175,8 +179,8 @@ public final class AOCAdESSigner implements AOSigner {
                    dataDigest,
                    digestAlgoritmName,
                    Boolean.parseBoolean(extraParams.getProperty("padesMode", "false")), //$NON-NLS-1$ //$NON-NLS-2$
-                   contentTypeOid,
-                   contentDescription,
+                   contentTypeOid != null ? contentTypeOid : altContentTypeOid,
+                   contentDescription != null ? contentDescription : altContentDescription,
                    CommitmentTypeIndicationsHelper.getCommitmentTypeIndications(extraParams),
                    CAdESSignerMetadataHelper.getCAdESSignerMetadata(extraParams)
             );

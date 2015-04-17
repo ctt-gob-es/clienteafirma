@@ -1,0 +1,202 @@
+SIGNEDDATA DEFINITIONS ::= 
+BEGIN
+
+EncapsulatedSignedData ::= SEQUENCE {
+        oid ContentType,
+        content [0] EXPLICIT SignedData OPTIONAL 
+		}
+
+SignedData ::= SEQUENCE {
+        version CMSVersion,
+        digestAlgorithms DigestAlgorithmIdentifiers,
+        encapContentInfo EncapsulatedContentInfo,
+        certificates [0] CertificateSet OPTIONAL,
+        crls [1] RevocationInfoChoices OPTIONAL,
+        signerInfos SignerInfos }
+
+CMSVersion ::= INTEGER { v0(0), v1(1), v2(2), v3(3), v4(4), v5(5) }
+CertificateSerialNumber  ::=  INTEGER
+
+DigestAlgorithmIdentifiers ::= SET OF DigestAlgorithmIdentifier
+DigestAlgorithmIdentifier ::= AlgorithmIdentifier
+AlgorithmIdentifier  ::=  SEQUENCE  {
+     algorithm               OBJECT IDENTIFIER,
+     parameters              ANY DEFINED BY algorithm OPTIONAL  }
+                               
+
+
+EncapsulatedContentInfo ::= SEQUENCE {
+        eContentType ContentType,
+        eContent [0] EXPLICIT OCTET STRING OPTIONAL }
+
+      ContentType ::= OBJECT IDENTIFIER
+
+CertificateSet ::= ANY
+RevocationInfoChoices ::= ANY
+   
+
+	SignerInfos ::= SET OF SignerInfo
+	
+	SignerInfo ::= SEQUENCE {
+        version CMSVersion,
+        sid SignerIdentifier,
+        digestAlgorithm DigestAlgorithmIdentifier,
+        signedAttrs [0] IMPLICIT SignedAttributes OPTIONAL,
+        signatureAlgorithm SignatureAlgorithmIdentifier,
+        signature SignatureValue,
+        unsignedAttrs [1] IMPLICIT UnsignedAttributes OPTIONAL }
+
+      SignerIdentifier ::= IssuerAndSerialNumber
+		
+	  IssuerAndSerialNumber ::= SEQUENCE {
+        issuer Name,
+        serialNumber CertificateSerialNumber }
+		
+	Name ::= CHOICE {
+     RDNSequence }
+
+   RDNSequence ::= SEQUENCE OF RelativeDistinguishedName
+
+   RelativeDistinguishedName ::=
+     SET OF AttributeTypeAndValue
+
+   AttributeTypeAndValue ::= SEQUENCE {
+     type     AttributeType,
+     value    AttributeValue }
+
+   AttributeType ::= OBJECT IDENTIFIER
+   
+   IssuerSerial  ::=  SEQUENCE {
+                 issuer         GeneralNames,
+                 serial         CertificateSerialNumber,
+                 issuerUID      UniqueIdentifier OPTIONAL
+            }
+
+	  GeneralNames ::= SEQUENCE SIZE (1..MAX) OF ANY
+	  
+	  SubjectKeyIdentifier ::= OCTET STRING
+	  	  
+      SignedAttributes ::= SET SIZE (1..MAX) OF Attribute
+	  
+      UnsignedAttributes ::= SET SIZE (1..MAX) OF Attribute
+
+      AttributeValue ::= ANY
+
+      SignatureValue ::= OCTET STRING
+
+	  UniqueIdentifier  ::=  BIT STRING
+	  
+	SignatureAlgorithmIdentifier ::= AlgorithmIdentifier
+	
+	Attribute ::= SEQUENCE {
+                  type      AttributeType,
+                  values    SET OF AttributeValue
+                   
+            }
+	
+	MessageDigest ::= OCTET STRING
+	
+	ContentHints ::= SEQUENCE {
+	contentDescription UTF8String (SIZE (1..MAX)) OPTIONAL,
+	contentType ContentType }
+	
+	SigningCertificate ::=  SEQUENCE {
+		certs        SEQUENCE OF ESSCertID,
+		policies     SEQUENCE OF PolicyInformation OPTIONAL
+	}
+
+	id-aa-signingCertificate OBJECT IDENTIFIER ::= { iso(1)
+		member-body(2) us(840) rsadsi(113549) pkcs(1) pkcs9(9)
+		smime(16) id-aa(2) 12 }
+
+	ESSCertID ::=  SEQUENCE {
+		 certHash                 Hash,
+		 issuerSerial             IssuerSerial OPTIONAL
+	}
+
+	Hash ::= OCTET STRING 
+
+	PolicyInformation ::= SEQUENCE {
+		 policyIdentifier   CertPolicyId,
+		 policyQualifiers   SEQUENCE SIZE (1..MAX) OF
+				 PolicyQualifierInfo OPTIONAL }
+				 
+	CertPolicyId ::= OBJECT IDENTIFIER
+
+	PolicyQualifierInfo ::= SEQUENCE {
+		   policyQualifierId  PolicyQualifierId,
+		   qualifier        ANY DEFINED BY policyQualifierId }
+
+
+	PolicyQualifierId ::=
+		OBJECT IDENTIFIER ( id-qt-cps | id-qt-unotice )
+			 
+	
+    id-qt-cps      OBJECT IDENTIFIER ::=  { id-qt 1 }
+    id-qt-unotice  OBJECT IDENTIFIER ::=  { id-qt 2 }
+
+	CPSuri ::= IA5String
+
+	SigningCertificateV2 ::=  SEQUENCE {
+           certs        SEQUENCE OF ESSCertIDv2,
+           policies     SEQUENCE OF PolicyInformation OPTIONAL
+    }
+	ESSCertIDv2 ::=  SEQUENCE {
+            hashAlgorithm           AlgorithmIdentifier
+                   DEFAULT {algorithm id-sha256},
+            certHash                 Hash,
+            issuerSerial             IssuerSerial OPTIONAL
+    }
+	id-sha256 OBJECT IDENTIFIER ::= {
+        joint-iso-itu-t(2) country(16) us(840) organization(1) gov(101)
+        csor(3) nistalgorithm(4) hashalgs(2) 1 }
+		
+	SigningTime ::= UTCTime
+
+	--------------------------------
+	---  Politicas de firma
+	--------------------------------
+	SignaturePolicyId ::= SEQUENCE {
+		sigPolicyId SigPolicyId,
+		sigPolicyHash SigPolicyHash,
+		sigPolicyQualifiers SEQUENCE SIZE (1..MAX) OF
+		SigPolicyQualifierInfo OPTIONAL
+	}
+
+	SigPolicyId ::= OBJECT IDENTIFIER
+
+	SigPolicyHash ::= OtherHashAlgAndValue
+
+	OtherHashAlgAndValue ::= SEQUENCE {
+			hashAlgorithm AlgorithmIdentifier,
+			hashValue OtherHashValue 
+	}
+
+	OtherHashValue ::= OCTET STRING
+
+	SigPolicyQualifierInfo ::= SEQUENCE {
+			sigPolicyQualifierId SigPolicyQualifierId,
+			sigQualifier ANY DEFINED BY sigPolicyQualifierId 
+	}
+
+	SigPolicyQualifierId ::= OBJECT IDENTIFIER
+
+	SPuri ::= IA5String
+
+	SPUserNotice ::= SEQUENCE {
+		noticeRef NoticeReference OPTIONAL,
+		explicitText DisplayText OPTIONAL
+	}
+
+	NoticeReference ::= SEQUENCE {
+		organization DisplayText,
+		noticeNumbers SEQUENCE OF INTEGER 
+	}
+
+	DisplayText ::= CHOICE {
+		visibleString VisibleString (SIZE (1..200)),
+		bmpString BMPString (SIZE (1..200)),
+		utf8String UTF8String (SIZE (1..200)) 
+	}
+		
+END

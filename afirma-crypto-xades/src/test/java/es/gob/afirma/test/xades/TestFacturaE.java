@@ -41,9 +41,9 @@ import es.gob.afirma.signers.xml.Utils;
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public final class TestFacturaE {
 
-    private static final String CERT_PATH = "ANF_PF_Activo.pfx"; //$NON-NLS-1$
+    private static final String CERT_PATH = "PFActivoFirSHA256.pfx"; //$NON-NLS-1$
     private static final String CERT_PASS = "12341234"; //$NON-NLS-1$
-    private static final String CERT_ALIAS = "anf usuario activo"; //$NON-NLS-1$
+    private static final String CERT_ALIAS = "fisico activo prueba"; //$NON-NLS-1$
 
     private static final Properties[] XADES_MODES;
 
@@ -140,7 +140,7 @@ public final class TestFacturaE {
 
                     AOTreeModel tree = signer.getSignersStructure(result, false);
                     Assert.assertEquals("Datos", ((AOTreeNode) tree.getRoot()).getUserObject()); //$NON-NLS-1$
-                    Assert.assertEquals("ANF Usuario Activo", ((AOTreeNode) tree.getRoot()).getChildAt(0).getUserObject()); //$NON-NLS-1$
+                    Assert.assertEquals("FISICO ACTIVO PRUEBA", ((AOTreeNode) tree.getRoot()).getChildAt(0).getUserObject()); //$NON-NLS-1$
 
                     tree = signer.getSignersStructure(result, true);
                     Assert.assertEquals("Datos", ((AOTreeNode) tree.getRoot()).getUserObject()); //$NON-NLS-1$

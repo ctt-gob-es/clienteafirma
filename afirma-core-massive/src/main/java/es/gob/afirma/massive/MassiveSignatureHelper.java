@@ -14,6 +14,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -49,6 +51,13 @@ public final class MassiveSignatureHelper {
     private static final String MIME_TYPE = "mimeType"; //$NON-NLS-1$
 
     private static final AOException SIGN_DATA_NOT_GENERATED = new AOException("No se generaron datos de firma"); //$NON-NLS-1$
+
+    /** Algoritmo de huella digital por defecto que se utilizar&aacute;, por ejemplo, para
+     * la generaci&oacute;n de las firmas expl&iacute;citas XAdES. */
+	private static final String DEFAULT_MESSAGE_DIGEST_ALGORITHM = "SHA1"; //$NON-NLS-1$
+
+	/** Generador de huellas digitales utilizado internamente. */
+    private static MessageDigest md = null;
 
     /** Configuracion de la operaci&oacute;n masiva. */
     private MassiveSignConfiguration massiveConfiguration = null;
@@ -229,6 +238,7 @@ public final class MassiveSignatureHelper {
         config.setProperty("headLess", Boolean.toString(true)); //$NON-NLS-1$
         try {
             if (this.massiveConfiguration.getMassiveOperation().equals(MassiveType.SIGN)) { // Firma
+            	checkvalidSignFormat(this.massiveConfiguration);
                 operation = "sign"; //$NON-NLS-1$
                 signData = signDataFromHash(this.massiveSignSigner, hash, config);
             }
@@ -255,6 +265,22 @@ public final class MassiveSignatureHelper {
         this.addLog("Operaci\u00F3n sobre hash: Correcta"); //$NON-NLS-1$
 
         return signData;
+    }
+
+    private static void checkvalidSignFormat(final MassiveSignConfiguration config) {
+    	if (AOSignConstants.SIGN_FORMAT_PADES.equals(config.getSignatureFormat()) ||
+    			AOSignConstants.SIGN_FORMAT_PDF.equals(config.getSignatureFormat())) {
+            throw new UnsupportedOperationException("El formato de firma PDF/PAdES no puede realizarse sobre un hash"); //$NON-NLS-1$
+        } else if (AOSignConstants.SIGN_FORMAT_ODF.equals(config.getSignatureFormat()) ||
+        		AOSignConstants.SIGN_FORMAT_ODF_ALT1.equals(config.getSignatureFormat())) {
+            throw new UnsupportedOperationException("El formato de firma ODF no puede realizarse sobre un hash"); //$NON-NLS-1$
+        } else if (AOSignConstants.SIGN_FORMAT_OOXML.equals(config.getSignatureFormat()) ||
+        		AOSignConstants.SIGN_FORMAT_OOXML_ALT1.equals(config.getSignatureFormat())) {
+            throw new UnsupportedOperationException("El formato de firma OOXML no puede realizarse sobre un hash"); //$NON-NLS-1$
+        } else if (AOSignConstants.SIGN_FORMAT_FACTURAE.equals(config.getSignatureFormat()) ||
+        		AOSignConstants.SIGN_FORMAT_FACTURAE_ALT1.equals(config.getSignatureFormat())) {
+            throw new UnsupportedOperationException("El formato de firma OOXML no puede realizarse sobre un hash"); //$NON-NLS-1$
+        }
     }
 
     /** Realiza la operaci&oacute;n de multifirma sobre un fichero.
@@ -370,6 +396,8 @@ public final class MassiveSignatureHelper {
             config.setProperty("uri", uri.toString()); //$NON-NLS-1$
         }
 
+        byte[] dataToSign = data;
+
         // Deteccion del MIMEType u OID del tipo de datos, solo para CAdES, XAdES y XMLDSig
         final String signerClassName = signer.getClass().getName();
         if (CADES_SIGNER.equals(signerClassName) ||
@@ -379,11 +407,17 @@ public final class MassiveSignatureHelper {
         	final String mimeType;
         	if (config.containsKey(MIME_TYPE)) {
         		mimeType = config.getProperty(MIME_TYPE);
+        	} else if ((XADES_SIGNER.equals(signerClassName) || XMLDSIG_SIGNER.equals(signerClassName))
+            		&& AOSignConstants.SIGN_MODE_EXPLICIT.equalsIgnoreCase(config.getProperty(MODE))) {
+        		// Forzamos que las firmas XAdES Explicitas firmen el hash de los datos y lo marcamos como tal
+        		dataToSign = digest(dataToSign);
+        		mimeType = ("hash/" + DEFAULT_MESSAGE_DIGEST_ALGORITHM).toLowerCase(); //$NON-NLS-1$
         	} else {
-        		final MimeHelper mimeHelper = new MimeHelper(data);
+        		final MimeHelper mimeHelper = new MimeHelper(dataToSign);
         		mimeType = mimeHelper.getMimeType();
-        		config.setProperty(MIME_TYPE, mimeType);
         	}
+
+        	config.setProperty(MIME_TYPE, mimeType);
 
         	if (!config.containsKey("contentTypeOid")) { //$NON-NLS-1$
             	final String dataOid = MimeHelper.transformMimeTypeToOid(mimeType);
@@ -394,7 +428,7 @@ public final class MassiveSignatureHelper {
         }
 
         final byte[] signData = signer.sign(
-            data,
+        	dataToSign,
             this.massiveConfiguration.getAlgorithm(),
             this.massiveConfiguration.getKeyEntry().getPrivateKey(),
             this.massiveConfiguration.getKeyEntry().getCertificateChain(),
@@ -676,4 +710,21 @@ public final class MassiveSignatureHelper {
         return buffer.toString().trim();
     }
 
+    /**
+     * Genera la huella digital de los datos con el algoritmo indicado por
+     * {@code DEFAULT_MESSAGE_DIGEST_ALGORITHM}.
+     * @param data Datos de la que generar la huella.
+     * @return Huella digital.
+     */
+    private static byte[] digest(final byte[] data) {
+    	if (md == null) {
+    		try {
+				md = MessageDigest.getInstance(DEFAULT_MESSAGE_DIGEST_ALGORITHM);
+			} catch (final NoSuchAlgorithmException e) {
+				LOGGER.severe("Se ha utilizado internamente un algoritmo de huella digital no soportado: " + e); //$NON-NLS-1$
+				throw new IllegalArgumentException("Algoritmo no soportado", e); //$NON-NLS-1$
+			}
+    	}
+    	return md.digest(data);
+    }
 }

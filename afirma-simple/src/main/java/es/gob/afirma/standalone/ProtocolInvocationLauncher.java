@@ -8,6 +8,7 @@ import java.security.KeyStore.PrivateKeyEntry;
 import java.util.Arrays;
 import java.util.Dictionary;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.security.auth.callback.PasswordCallback;
@@ -31,6 +32,8 @@ import es.gob.afirma.keystores.AOKeyStore;
 import es.gob.afirma.keystores.AOKeyStoreDialog;
 import es.gob.afirma.keystores.AOKeyStoreManager;
 import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
+import es.gob.afirma.keystores.filters.CertFilterManager;
+import es.gob.afirma.keystores.filters.CertificateFilter;
 import es.gob.afirma.standalone.crypto.CypherDataManager;
 import es.gob.afirma.standalone.ui.MainMenu;
 
@@ -316,9 +319,13 @@ public final class ProtocolInvocationLauncher {
 			showError(SAF_08);
 			return SAF_08;
 		}
+
+		final CertFilterManager filterManager = new CertFilterManager(options.getExtraParams());
+		final List<CertificateFilter> filters = filterManager.getFilters();
+		final boolean mandatoryCertificate = filterManager.isMandatoryCertificate();
 		final PrivateKeyEntry pke;
 		try {
-			final AOKeyStoreDialog dialog = new AOKeyStoreDialog(ksm, null, true, false, true);
+			final AOKeyStoreDialog dialog = new AOKeyStoreDialog(ksm, null, true, true, true, filters, mandatoryCertificate);
 			dialog.show();
 			pke = ksm.getKeyEntry(dialog.getSelectedAlias(), ksm.getType().getCertificatePasswordCallback(null));
 		}
@@ -446,9 +453,9 @@ public final class ProtocolInvocationLauncher {
 			AOUIFactory.getSaveDataToFile(
 				options.getData(),
 				options.getTitle(),
-				System.getProperty("user.dir"), //$NON-NLS-1$
+				null,
 				options.getFileName(),
-				options.getExtensions() != null ? options.getExtensions().split(",") : null, //$NON-NLS-1$
+				options.getExtensions() != null ? new String[] { options.getExtensions() } : null,
 				options.getFileTypeDescription(),
 				null
 			);

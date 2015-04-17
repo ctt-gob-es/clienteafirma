@@ -40,8 +40,7 @@ public final class CMSDecipherAuthenticatedEnvelopedData {
 		// No permitimos la instanciacion
 	}
 
-    /** &Eacute;ste m&eacute;todo descifra el contenido de un CMS
-     * AuthenticatedEnvelopedData.
+    /** Descifra el contenido de un CMSAuthenticatedEnvelopedData.
      * @param cmsData
      *        Datos del tipo AuthenticatedEnvelopedData para obtener los
      *        datos cifrados.
