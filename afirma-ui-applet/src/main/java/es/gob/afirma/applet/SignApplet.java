@@ -1708,13 +1708,13 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 				}
 
 				// En el caso de las firmas XAdES de fichero o datos, si se configura el
-				// modo explicito, se realizara el calculo de hash desde fuera (siempre sera SHA512)
+				// modo explicito, se realizara el calculo de hash desde fuera (siempre sera el por defecto)
 				if (SignApplet.this.getSigFormat().toLowerCase().startsWith(AOSignConstants.SIGN_FORMAT_XADES.toLowerCase()) &&
 						(SignApplet.this.getInternalFileUri() != null || SignApplet.this.getInternalData() != null) &&
 						mode.equals(AOSignConstants.SIGN_MODE_EXPLICIT)) {
 
 					final String digestAlgo = DEFAULT_MESSAGE_DIGEST_ALGORITHM;
-					SignApplet.this.getGenericConfig().setProperty("mimeType", ("hash/" + DEFAULT_MESSAGE_DIGEST_ALGORITHM).toLowerCase());  //$NON-NLS-1$//$NON-NLS-2$
+					SignApplet.this.getGenericConfig().setProperty("mimeType", ("hash/" + digestAlgo).toLowerCase());  //$NON-NLS-1$//$NON-NLS-2$
 					try {
 						dataToSign = CryptoUtils.getMessageDigest(dataToSign, digestAlgo);
 					}
@@ -2016,6 +2016,15 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 					getLogger().severe("La firma implicita de huella digital exige que se introduzcan los datos a los que corresponde la huella digital"); //$NON-NLS-1$
 					setError(AppletMessages.getString("SignApplet.216")); //$NON-NLS-1$
 					return Boolean.FALSE;
+				}
+
+				// En el caso de las firmas XAdES de fichero o datos, si se configura el
+				// modo explicito, se indica que el tipo de datos es un hash (siempre sera el algoritmo por defecto)
+				if (SignApplet.this.getSigFormat().toLowerCase().startsWith(AOSignConstants.SIGN_FORMAT_XADES.toLowerCase()) &&
+						(SignApplet.this.getInternalFileUri() != null || SignApplet.this.getInternalData() != null) &&
+						mode.equals(AOSignConstants.SIGN_MODE_EXPLICIT)) {
+
+					SignApplet.this.getGenericConfig().setProperty("mimeType", ("hash/" + DEFAULT_MESSAGE_DIGEST_ALGORITHM).toLowerCase());  //$NON-NLS-1$//$NON-NLS-2$
 				}
 
 				// Configuramos el mimetype de los datos
