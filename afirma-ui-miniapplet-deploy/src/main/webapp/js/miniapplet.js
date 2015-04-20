@@ -362,10 +362,12 @@ var MiniApplet = {
 			if (MiniApplet.clientType == MiniApplet.TYPE_APPLET) {
 				try {
 					this.setData(dataB64);
+					var certSignaturePair = this.buildData(MiniApplet.clienteFirma.sign(algorithm, format, params));
+					var sepPos = certSignaturePair.indexOf('|');
 					if (successCallback == undefined || successCallback == null) {
-						return this.buildData(MiniApplet.clienteFirma.sign(algorithm, format, params));
+						return certSignaturePair.substring(sepPos + 1);
 					}
-					successCallback(this.buildData(MiniApplet.clienteFirma.sign(algorithm, format, params)));
+					successCallback(certSignaturePair.substring(sepPos + 1), certSignaturePair.substring(0, sepPos));
 				} catch(e) {
 					if (errorCallback == undefined || errorCallback == null) {
 						throw e;
@@ -411,10 +413,12 @@ var MiniApplet = {
 			if (MiniApplet.clientType == MiniApplet.TYPE_APPLET) {
 				try {
 					this.setData(signB64);
+					var certSignaturePair = this.buildData(MiniApplet.clienteFirma.coSign(dataB64, algorithm, format, params));
+					var sepPos = certSignaturePair.indexOf('|');
 					if (successCallback == undefined || successCallback == null) {
-						return this.buildData(MiniApplet.clienteFirma.coSign(dataB64, algorithm, format, params));
+						return certSignaturePair.substring(sepPos + 1);
 					}
-					successCallback(this.buildData(MiniApplet.clienteFirma.coSign(dataB64, algorithm, format, params)));
+					successCallback(certSignaturePair.substring(sepPos + 1), certSignaturePair.substring(0, sepPos));
 				} catch(e) {
 					if (errorCallback == undefined || errorCallback == null) {
 						throw e;
@@ -447,10 +451,12 @@ var MiniApplet = {
 			if (MiniApplet.clientType == MiniApplet.TYPE_APPLET) {
 				try {
 					this.setData(signB64);
+					var certSignaturePair = this.buildData(MiniApplet.clienteFirma.counterSign(algorithm, format, params));
+					var sepPos = certSignaturePair.indexOf('|');
 					if (successCallback == undefined || successCallback == null) {
-						return this.buildData(MiniApplet.clienteFirma.counterSign(algorithm, format, params));
+						return certSignaturePair.substring(sepPos + 1);
 					}
-					successCallback(this.buildData(MiniApplet.clienteFirma.counterSign(algorithm, format, params)));
+					successCallback(certSignaturePair.substring(sepPos + 1), certSignaturePair.substring(0, sepPos));
 				} catch(e) {
 					if (errorCallback == undefined || errorCallback == null) {
 						throw e;
@@ -1224,8 +1230,14 @@ var MiniApplet = {
 				}
 				
 				// Ejecutamos la funcion callback de exito y notificamos que se dejen de realizar peticiones
-				successCallback(html);
-				
+				var sepPos = html == null ? -1 : html.indexOf('|');
+				if (sepPos == -1) {
+					successCallback(html);	
+				}
+				else {
+					successCallback(html.substring(sepPos + 1), html.substring(0, sepPos));
+				}
+
 				return false;
 			};
 
