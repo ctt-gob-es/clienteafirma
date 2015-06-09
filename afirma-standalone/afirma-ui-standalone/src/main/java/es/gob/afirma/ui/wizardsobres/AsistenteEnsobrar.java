@@ -25,8 +25,8 @@ public final class AsistenteEnsobrar {
     private final String rutaFichero;
 
     /** Constructor.
-     * @param rutafichero
-     * @param tipo */
+     * @param rutafichero Ruta hacia el fichero a ensobrar.
+     * @param tipo Tipo de ensobrado. */
     public AsistenteEnsobrar(final String rutafichero, final int tipo) {
         this.rutaFichero = rutafichero;
         this.tipo = tipo;

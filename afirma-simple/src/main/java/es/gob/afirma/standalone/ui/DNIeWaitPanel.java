@@ -13,20 +13,20 @@ package es.gob.afirma.standalone.ui;
 import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Image;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.beans.PropertyChangeListener;
+import java.io.InputStream;
 import java.util.logging.Logger;
 
+import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JPanel;
-import javax.xml.parsers.DocumentBuilderFactory;
-
-import org.apache.batik.swing.JSVGCanvas;
 
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.standalone.LookAndFeelManager;
@@ -88,33 +88,35 @@ public final class DNIeWaitPanel extends JPanel implements KeyListener {
 
         // Texto informativo
         final ResizingTextPanel textPanel = new ResizingTextPanel(SimpleAfirmaMessages.getString("DNIeWaitPanel.3")); //$NON-NLS-1$
+        final ResizingTextPanel textPanelExtra = new ResizingTextPanel(
+    		SimpleAfirmaMessages.getString("DNIeWaitPanel.7") //$NON-NLS-1$
+		);
 
         textPanel.setFocusable(false);
+        textPanelExtra.setFocusable(false);
 
         // Imagen central
-        final JSVGCanvas vectorDNIeHelpPicture = new JSVGCanvas();
-        vectorDNIeHelpPicture.setBackground(new Color(255, 255, 255, 0));
-        final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        dbf.setNamespaceAware(true);
+        ScalablePane vectorDNIeHelpPicture;
         try {
-        	vectorDNIeHelpPicture.setDocument(
-    			dbf.newDocumentBuilder().parse(
-					this.getClass().getResourceAsStream("/resources/lectordnie.svg") //$NON-NLS-1$
-    			)
-        	);
+        	final InputStream is = this.getClass().getResourceAsStream("/resources/lectordnie.png"); //$NON-NLS-1$
+        	final Image image = ImageIO.read(is);
+        	is.close();
+        	vectorDNIeHelpPicture = new ScalablePane(image, true);
+        	vectorDNIeHelpPicture.setBackground(new Color(255, 255, 255, 0));
+        	vectorDNIeHelpPicture.setFocusable(false);
+        } catch (final Exception e) {
+        	Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
+        			"No se ha podido cargar la imagen explicativa de insercion de DNIe, esta no se mostrara: " + e //$NON-NLS-1$
+        			);
+        	vectorDNIeHelpPicture = null;
         }
-        catch (final Exception e) {
-            Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
-              "No se ha podido cargar la imagen explicativa de insercion de DNIe, esta no se mostrara: " + e //$NON-NLS-1$
-            );
-        }
-        vectorDNIeHelpPicture.setFocusable(false);
 
         // Configuramos los colores
         if (!LookAndFeelManager.HIGH_CONTRAST) {
             this.setBackground(LookAndFeelManager.WINDOW_COLOR);
             dniePanel.setBackground(LookAndFeelManager.WINDOW_COLOR);
             textPanel.setBackground(LookAndFeelManager.WINDOW_COLOR);
+            textPanelExtra.setBackground(LookAndFeelManager.WINDOW_COLOR);
         }
 
         final GridBagConstraints c = new GridBagConstraints();
@@ -123,18 +125,22 @@ public final class DNIeWaitPanel extends JPanel implements KeyListener {
         c.weighty = 1.0;
         c.gridx = 0;
         c.gridy = 0;
-        this.add(vectorDNIeHelpPicture, c);
+        if (vectorDNIeHelpPicture != null) {
+        	this.add(vectorDNIeHelpPicture, c);
+        }
         c.weighty = 0.0;
-        c.insets = new Insets(10, 0, 5, 0);
+        c.insets = new Insets(0, 0, 5, 0);
         c.gridy = 1;
-        c.ipady = 60;
+        c.ipady = 50;
         this.add(textPanel, c);
-        c.weightx = 1.0;
-        c.insets = new Insets(0, 0, 0, 0);
         c.gridy = 2;
+        c.ipady = 30;
+        this.add(textPanelExtra, c);
+        c.weightx = 1.0;
+        c.insets = new Insets(20, 0, 0, 0);
+        c.gridy = 3;
         c.ipady = 0;
         this.add(dniePanel, c);
-
     }
 
     /** Construye un panel de espera a insercci&oacute;n de DNIe.

@@ -282,18 +282,15 @@ public abstract class JAccessibilityDialogWizard extends JDialogWizard{
 		return this.botoneraSuperior;
 	}
 
-	/**
-	 * Asigna la botonera.
-	 * @param botonera
-	 */
+	/** Asigna la botonera.
+	 * @param botonera Botonera a asignar. */
 	public void setBotonera(final BotoneraInferior botonera) {
 		this.botonera = botonera;
 	}
 
 	/**
 	 * Asigna la botonera.
-	 * @param botonera
-	 */
+	 * @param botonera Botonera a asignar. */
 	public void setBotoneraSuperior(final BotoneraSuperior botonera) {
 		this.botoneraSuperior=botonera;
 		Utils.setContrastColor(this.botoneraSuperior);

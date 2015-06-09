@@ -153,10 +153,18 @@ public final class Platform {
      * @return Arquitectura de la JVM. */
     public static String getJavaArch() {
         if (javaArch == null) {
-            javaArch = System.getProperty("sun.arch.data.model"); //$NON-NLS-1$
-            if (javaArch == null) {
-                javaArch = System.getProperty("com.ibm.vm.bitmode"); //$NON-NLS-1$
-            }
+        	try {
+	            javaArch = System.getProperty("sun.arch.data.model"); //$NON-NLS-1$
+	            if (javaArch == null) {
+	                javaArch = System.getProperty("com.ibm.vm.bitmode"); //$NON-NLS-1$
+	            }
+        	}
+        	catch(final Exception e) {
+        		LOGGER.severe(
+    				"No se ha podido determinar si la JVM es de 32 o 64 bits, se asume que es 32: " + e //$NON-NLS-1$
+				);
+        		return "32"; //$NON-NLS-1$
+        	}
         }
         return javaArch;
     }

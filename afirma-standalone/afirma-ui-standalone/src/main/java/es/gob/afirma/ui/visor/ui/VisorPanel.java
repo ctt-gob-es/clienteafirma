@@ -39,13 +39,14 @@ import javax.swing.JPanel;
 import javax.swing.JWindow;
 import javax.swing.SwingUtilities;
 
+import es.gob.afirma.cert.signvalidation.SignValidity;
+import es.gob.afirma.cert.signvalidation.SignValidity.SIGN_DETAIL_TYPE;
+import es.gob.afirma.cert.signvalidation.SignValidity.VALIDITY_ERROR;
+import es.gob.afirma.cert.signvalidation.ValidateBinarySignature;
+import es.gob.afirma.cert.signvalidation.ValidatePdfSignature;
+import es.gob.afirma.cert.signvalidation.ValidateXMLSignature;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Platform;
-import es.gob.afirma.signature.SignValidity;
-import es.gob.afirma.signature.SignValidity.SIGN_DETAIL_TYPE;
-import es.gob.afirma.signature.SignValidity.VALIDITY_ERROR;
-import es.gob.afirma.signature.ValidateBinarySignature;
-import es.gob.afirma.signature.ValidateXMLSignature;
 import es.gob.afirma.ui.principal.PrincipalGUI;
 import es.gob.afirma.ui.utils.Constants;
 import es.gob.afirma.ui.utils.CustomDialog;
@@ -325,7 +326,8 @@ public final class VisorPanel extends JAccessibilityDialogWizard {
         if (signature != null) {
             try {
                 validity = validateSign(signature, data);
-            } catch (final Exception e) {
+            }
+            catch (final Exception e) {
                 validity = new SignValidity(SIGN_DETAIL_TYPE.KO, null);
             }
         }
@@ -423,7 +425,7 @@ public final class VisorPanel extends JAccessibilityDialogWizard {
      */
     private static SignValidity validateSign(final byte[] sign, final byte[] data) throws IOException {
         if (DataAnalizerUtil.isSignedPDF(sign)) {
-        	return new SignValidity(SIGN_DETAIL_TYPE.UNKNOWN, VALIDITY_ERROR.UNKOWN_VALIDITY_PDF);
+        	return ValidatePdfSignature.validate(sign);
         }
         else if (DataAnalizerUtil.isSignedInvoice(sign)) { // Factura electronica
             return ValidateXMLSignature.validate(sign);
@@ -435,10 +437,10 @@ public final class VisorPanel extends JAccessibilityDialogWizard {
             return ValidateBinarySignature.validate(sign, data);
         }
         else if (DataAnalizerUtil.isSignedODF(sign)) {
-            return new SignValidity(SIGN_DETAIL_TYPE.OK, null);
+            return new SignValidity(SIGN_DETAIL_TYPE.UNKNOWN, VALIDITY_ERROR.ODF_UNKOWN_VALIDITY);
         }
         else if (DataAnalizerUtil.isSignedOOXML(sign)) {
-            return new SignValidity(SIGN_DETAIL_TYPE.OK, null);
+            return new SignValidity(SIGN_DETAIL_TYPE.UNKNOWN, VALIDITY_ERROR.OOXML_UNKOWN_VALIDITY);
         }
         return new SignValidity(SIGN_DETAIL_TYPE.KO, null);
     }

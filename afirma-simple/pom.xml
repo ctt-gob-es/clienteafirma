@@ -107,6 +107,18 @@
 			<artifactId>afirma-crypto-xades</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+
+		<dependency>
+			<groupId>es.gob.afirma</groupId>
+			<artifactId>afirma-crypto-odf</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>es.gob.afirma</groupId>
+			<artifactId>afirma-crypto-ooxml</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 		
 		<dependency>
 			<groupId>es.gob.afirma</groupId>
@@ -134,7 +146,7 @@
 
 		<dependency>
 			<groupId>es.gob.afirma</groupId>
-			<artifactId>afirma-crypto-certvalidation</artifactId>
+			<artifactId>afirma-crypto-validation</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 
@@ -160,12 +172,6 @@
 			<groupId>com.apple</groupId>
 			<artifactId>applejavaextensions</artifactId>
 			<version>1.5.4</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.apache.xmlgraphics</groupId>
-			<artifactId>batik-swing</artifactId>
-			<version>1.7</version>
 		</dependency>
 
 		<dependency>
@@ -197,7 +203,7 @@
 			<url>http://devel01.uji.es:8080/nexus/content/repositories/snapshots</url>
 		</snapshotRepository>
 	</distributionManagement>
-	
+
 	<build>
 		<plugins>
 			<plugin>

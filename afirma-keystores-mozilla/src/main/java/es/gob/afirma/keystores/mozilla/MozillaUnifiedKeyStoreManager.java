@@ -111,23 +111,25 @@ public final class MozillaUnifiedKeyStoreManager extends AggregatedKeyStoreManag
 			LOGGER.info("El almacen externo '" + descr + "' ha podido inicializarse, se anadiran sus entradas"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
-		// Anadimos el controlador Java del DNIe **SIEMPRE**
-		try {
-			final AOKeyStoreManager tmpKsm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
-				AOKeyStore.DNIEJAVA,
-				null,
-				null,
-				null,
-				parentComponent
-			);
-			LOGGER.info("El DNIe 100% Java ha podido inicializarse, se anadiran sus entradas"); //$NON-NLS-1$
-			addKeyStoreManager(tmpKsm);
-		}
-		catch (final AOCancelledOperationException ex) {
-			LOGGER.warning("Se cancelo el acceso al almacen DNIe 100% Java: " + ex); //$NON-NLS-1$
-		}
-		catch (final Exception ex) {
-			LOGGER.warning("No se ha podido inicializar el controlador DNIe 100% Java: " + ex); //$NON-NLS-1$
+		// Anadimos el controlador Java del DNIe SIEMPRE a menos que se indique "es.gob.afirma.keystores.mozilla.disableDnieNativeDriver=true"
+		if (!Boolean.getBoolean("es.gob.afirma.keystores.mozilla.disableDnieNativeDriver")) { //$NON-NLS-1$
+			try {
+				final AOKeyStoreManager tmpKsm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
+					AOKeyStore.DNIEJAVA,
+					null,
+					null,
+					null,
+					parentComponent
+				);
+				LOGGER.info("El DNIe 100% Java ha podido inicializarse, se anadiran sus entradas"); //$NON-NLS-1$
+				addKeyStoreManager(tmpKsm);
+			}
+			catch (final AOCancelledOperationException ex) {
+				LOGGER.warning("Se cancelo el acceso al almacen DNIe 100% Java: " + ex); //$NON-NLS-1$
+			}
+			catch (final Exception ex) {
+				LOGGER.warning("No se ha podido inicializar el controlador DNIe 100% Java: " + ex); //$NON-NLS-1$
+			}
 		}
 
 		if (lacksKeyStores()) {

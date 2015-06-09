@@ -45,10 +45,10 @@ import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.signers.AOSignConstants;
-import es.gob.afirma.envelopers.cms.AOCMSEnveloper;
 import es.gob.afirma.envelopers.cms.AOCMSMultiEnveloper;
 import es.gob.afirma.envelopers.cms.CMSAuthenticatedEnvelopedData;
 import es.gob.afirma.envelopers.cms.CMSEnvelopedData;
+import es.gob.afirma.envelopers.cms.CMSHelper;
 import es.gob.afirma.keystores.AOKeyStore;
 import es.gob.afirma.keystores.AOKeyStoreManager;
 import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
@@ -284,13 +284,13 @@ final class PanelRemitentes extends JAccessibilityDialogWizard {
      * @return Tipo de sobre */
     private String comprobarTipo(final byte[] data) {
         String tipo = null;
-        if (AOCMSEnveloper.isCMSValid(data, AOSignConstants.CMS_CONTENTTYPE_ENVELOPEDDATA)) {
+        if (CMSHelper.isCMSValid(data, AOSignConstants.CMS_CONTENTTYPE_ENVELOPEDDATA)) {
             tipo = AOSignConstants.CMS_CONTENTTYPE_ENVELOPEDDATA;
         }
-        else if (AOCMSEnveloper.isCMSValid(data, AOSignConstants.CMS_CONTENTTYPE_SIGNEDANDENVELOPEDDATA)) {
+        else if (CMSHelper.isCMSValid(data, AOSignConstants.CMS_CONTENTTYPE_SIGNEDANDENVELOPEDDATA)) {
             tipo = AOSignConstants.CMS_CONTENTTYPE_SIGNEDANDENVELOPEDDATA;
         }
-        else if (AOCMSEnveloper.isCMSValid(data, AOSignConstants.CMS_CONTENTTYPE_AUTHENVELOPEDDATA)) {
+        else if (CMSHelper.isCMSValid(data, AOSignConstants.CMS_CONTENTTYPE_AUTHENVELOPEDDATA)) {
             tipo = AOSignConstants.CMS_CONTENTTYPE_AUTHENVELOPEDDATA;
         }
         else {

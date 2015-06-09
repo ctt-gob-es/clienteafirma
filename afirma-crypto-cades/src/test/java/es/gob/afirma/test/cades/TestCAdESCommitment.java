@@ -81,10 +81,8 @@ public final class TestCAdESCommitment {
 		AOSignConstants.SIGN_ALGORITHM_SHA512WITHRSA,
 	};
 
-	/**
-	 * Prueba de firma convencional.
-	 * @throws Exception en cualquier error
-	 */
+	/** Prueba de firma con CommitmentTypeIndications.
+	 * @throws Exception en cualquier error. */
 	@SuppressWarnings("static-method")
 	@Test
 	public void testSignature() throws Exception {

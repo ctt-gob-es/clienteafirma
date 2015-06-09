@@ -60,6 +60,9 @@ public final class CustomUriDereferencer implements URIDereferencer {
 		catch (final Exception e) {
 			return Class.forName(DEFAULT_SUN_NODESET_DATA);
 		}
+		catch (final Error e) {
+			return Class.forName(DEFAULT_SUN_NODESET_DATA);
+		}
 	}
 
 	private static Class<?> getOctetStreamDataClass() throws ClassNotFoundException {
@@ -69,6 +72,9 @@ public final class CustomUriDereferencer implements URIDereferencer {
 		catch (final Exception e) {
 			return Class.forName(DEFAULT_SUN_OCTET_STREAM_DATA);
 		}
+		catch (final Error e) {
+			return Class.forName(DEFAULT_SUN_OCTET_STREAM_DATA);
+		}
 	}
 
 	private static Class<?> getXmlSignatureInputClass() throws ClassNotFoundException {
@@ -76,6 +82,9 @@ public final class CustomUriDereferencer implements URIDereferencer {
 			return Class.forName(DEFAULT_APACHE_XML_SIGNATURE_INPUT_CLASSNAME);
 		}
 		catch (final Exception e) {
+			return Class.forName(DEFAULT_SUN_XML_SIGNATURE_INPUT_CLASSNAME);
+		}
+		catch (final Error e) {
 			return Class.forName(DEFAULT_SUN_XML_SIGNATURE_INPUT_CLASSNAME);
 		}
 	}
@@ -89,6 +98,9 @@ public final class CustomUriDereferencer implements URIDereferencer {
 			return Class.forName(DEFAULT_APACHE_URI_DEREFERENCER_CLASSNAME);
 		}
 		catch (final Exception e) {
+			return Class.forName(DEFAULT_SUN_URI_DEREFERENCER_CLASSNAME);
+		}
+		catch (final Error e) {
 			return Class.forName(DEFAULT_SUN_URI_DEREFERENCER_CLASSNAME);
 		}
 	}
@@ -192,6 +204,9 @@ public final class CustomUriDereferencer implements URIDereferencer {
 			return (Data) nodeSetDataConstructor.newInstance(in);
 		}
 		catch (final Exception ioe) {
+			throw new URIReferenceException(ioe);
+		}
+		catch (final Error ioe) {
 			throw new URIReferenceException(ioe);
 		}
 	}

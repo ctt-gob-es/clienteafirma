@@ -16,8 +16,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.event.HyperlinkEvent;
 
-import es.gob.afirma.signature.SignValidity;
-import es.gob.afirma.signature.SignValidity.SIGN_DETAIL_TYPE;
+import es.gob.afirma.cert.signvalidation.SignValidity;
+import es.gob.afirma.cert.signvalidation.SignValidity.SIGN_DETAIL_TYPE;
 import es.gob.afirma.ui.principal.Main;
 import es.gob.afirma.ui.utils.CustomDialog;
 import es.gob.afirma.ui.utils.GeneralConfig;
@@ -37,7 +37,6 @@ final class SignResultPanel extends JPanel {
     	this.descTextLabel = new JEditorPane();
     	this.resultTextLabel = new JLabel();
     	this.resultOperationIcon = new JLabel();
-
     	createUI(validity);
     }
 
@@ -146,11 +145,9 @@ final class SignResultPanel extends JPanel {
         }
 	}
 
-	/**
-	 * Establece el contenido del panel de descripcio&oacute;n del panel de validaci&oacute;n
+	/** Establece el contenido del panel de descripcio&oacute;n del panel de validaci&oacute;n
 	 * de firma.
-	 * @param validity Resultado de la validaci&oacute;n.
-	 */
+	 * @param validity Resultado de la validaci&oacute;n. */
     private void setResultDescription(final SignValidity validity) {
     	String errorMessage;
         final String resultOperationIconTooltip;
@@ -160,7 +157,8 @@ final class SignResultPanel extends JPanel {
                 if (GeneralConfig.isHighContrast() || Main.isOSHighContrast()){
                 	this.descTextLabel.setText(Messages.getString("SignResultPanel.25")); //$NON-NLS-1$
                 	this.descTextLabel.getAccessibleContext().setAccessibleName(this.resultTextLabel.getText()+". "+Messages.getString("SignResultPanel.3_Lector_pantalla") +". "+ Messages.getString("SignResultPanel.enter_link"));  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-                } else {
+                }
+                else {
                 	this.descTextLabel.setText(Messages.getString("SignResultPanel.3")); //$NON-NLS-1$
                 	this.descTextLabel.getAccessibleContext().setAccessibleName(this.resultTextLabel.getText()+". "+Messages.getString("SignResultPanel.3_Lector_pantalla") +". "+ Messages.getString("SignResultPanel.enter_link"));  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
                 }
@@ -171,7 +169,8 @@ final class SignResultPanel extends JPanel {
                 if (GeneralConfig.isHighContrast() || Main.isOSHighContrast()){
                 	this.descTextLabel.setText(Messages.getString("SignResultPanel.24")); //$NON-NLS-1$
                 	this.descTextLabel.getAccessibleContext().setAccessibleName(this.resultTextLabel.getText()+". "+Messages.getString("SignResultPanel.9_Lector_pantalla") +". "+ Messages.getString("SignResultPanel.enter_link"));   //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$//$NON-NLS-4$
-                } else {
+                }
+                else {
                 	this.descTextLabel.setText(Messages.getString("SignResultPanel.9")); //$NON-NLS-1$
                 	this.descTextLabel.getAccessibleContext().setAccessibleName(this.resultTextLabel.getText()+". "+Messages.getString("SignResultPanel.9_Lector_pantalla") +". "+ Messages.getString("SignResultPanel.enter_link"));   //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$//$NON-NLS-4$
                 }
@@ -197,17 +196,21 @@ final class SignResultPanel extends JPanel {
                 }
                 if (GeneralConfig.isHighContrast() || Main.isOSHighContrast()){
                 	this.descTextLabel.setText("<html><p style=\"color:#FFFFFF\">" + errorMessage + "</p></html>"); //$NON-NLS-1$ //$NON-NLS-2$
-                } else {
+                }
+                else {
                 	this.descTextLabel.setText("<html><p>" + errorMessage + "</p></html>"); //$NON-NLS-1$ //$NON-NLS-2$
                 }
                 resultOperationIconTooltip = Messages.getString("SignResultPanel.6"); //$NON-NLS-1$
                 break;
+            // Validez desconocida
             default:
                 this.resultTextLabel.setText(Messages.getString("SignResultPanel.11")); //$NON-NLS-1$
                 if (validity.getError() != null) {
                     switch (validity.getError()) {
                     case NO_DATA: errorMessage = Messages.getString("SignResultPanel.15"); break; //$NON-NLS-1$
-                    case UNKOWN_VALIDITY_PDF: errorMessage = Messages.getString("SignResultPanel.26"); break; //$NON-NLS-1$
+                    case PDF_UNKOWN_VALIDITY: errorMessage = Messages.getString("SignResultPanel.26"); break; //$NON-NLS-1$
+                    case OOXML_UNKOWN_VALIDITY: errorMessage = Messages.getString("SignResultPanel.27"); break; //$NON-NLS-1$
+                    case ODF_UNKOWN_VALIDITY: errorMessage = Messages.getString("SignResultPanel.28"); break; //$NON-NLS-1$
                     default:
                         errorMessage = Messages.getString("SignResultPanel.12"); //$NON-NLS-1$
                     }
@@ -217,7 +220,8 @@ final class SignResultPanel extends JPanel {
                 }
                 if (GeneralConfig.isHighContrast() || Main.isOSHighContrast()){
                 	this.descTextLabel.setText("<html><p style=\"color:#FFFFFF\">" + errorMessage + "</p></html>"); //$NON-NLS-1$ //$NON-NLS-2$
-                } else {
+                }
+                else {
                 	this.descTextLabel.setText("<html><p>" + errorMessage + "</p></html>"); //$NON-NLS-1$ //$NON-NLS-2$
                 }
                 resultOperationIconTooltip = Messages.getString("SignResultPanel.13"); //$NON-NLS-1$
@@ -227,14 +231,11 @@ final class SignResultPanel extends JPanel {
         this.resultOperationIcon.setToolTipText(resultOperationIconTooltip);
 	}
 
-	/**
-     * Actualiza el contenido del panel con el nuevo estado de validez.
-     * @param validity Validez de la firma.
-     */
+	/** Actualiza el contenido del panel con el nuevo estado de validez.
+     * @param validity Validez de la firma. */
     void update(final SignValidity validity) {
         setResultIcon(validity.getValidity());
         setResultDescription(validity);
-
         repaint();
     }
 }

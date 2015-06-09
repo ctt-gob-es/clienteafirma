@@ -34,7 +34,6 @@ import java.util.logging.Formatter;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
-import java.util.prefs.Preferences;
 
 import javax.swing.JComponent;
 import javax.swing.JFrame;
@@ -46,6 +45,8 @@ import com.dmurph.tracking.AnalyticsConfigData;
 import com.dmurph.tracking.JGoogleAnalyticsTracker;
 import com.dmurph.tracking.JGoogleAnalyticsTracker.GoogleAnalyticsVersion;
 
+import es.gob.afirma.cert.signvalidation.SignValidity;
+import es.gob.afirma.cert.signvalidation.SignValidity.SIGN_DETAIL_TYPE;
 import es.gob.afirma.core.LogManager;
 import es.gob.afirma.core.LogManager.App;
 import es.gob.afirma.core.misc.Platform;
@@ -54,8 +55,6 @@ import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.keystores.AOKeyStore;
 import es.gob.afirma.keystores.AOKeyStoreManager;
 import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
-import es.gob.afirma.signature.SignValidity;
-import es.gob.afirma.signature.SignValidity.SIGN_DETAIL_TYPE;
 import es.gob.afirma.standalone.ui.ClosePanel;
 import es.gob.afirma.standalone.ui.DNIeWaitPanel;
 import es.gob.afirma.standalone.ui.MainMenu;
@@ -64,8 +63,8 @@ import es.gob.afirma.standalone.ui.SignDetailPanel;
 import es.gob.afirma.standalone.ui.SignPanel;
 import es.gob.afirma.standalone.updater.Updater;
 
-/** Aplicaci&oacute;n gr&aacute;fica de firma electr&oacute;nica f&aacute;cil
- * basada en @firma. C&oacute;digos de salida de la aplicaci&oacute;n:
+/** Aplicaci&oacute;n gr&aacute;fica de AutoFirma.
+ * C&oacute;digos de salida de la aplicaci&oacute;n:
  * <ul>
  *  <li>-1 - Error en el subsistema de tarjetas e imposibilidad de abrir el almac&eacute;n local por defecto</li>
  *  <li>-2 - Imposibilidad de abrir el almac&eacute;n local por defecto</li>
@@ -94,7 +93,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 	private static final String SYSTEM_PROPERTY_DEBUG_LEVEL = "afirma_debug_level"; //$NON-NLS-1$
 
 	/** Directorio de datos de la aplicaci&oacute;n. */
-	public static final String APPLICATION_HOME = Platform.getUserHome() + File.separator + ".afirma" + File.separator + "firmafacil"; //$NON-NLS-1$ //$NON-NLS-2$
+	public static final String APPLICATION_HOME = Platform.getUserHome() + File.separator + ".afirma" + File.separator + "AutoFirma"; //$NON-NLS-1$ //$NON-NLS-2$
 
     /** Clave de la preferencia para el guardado del idioma por defecto. */
     public static final String PREFERENCES_LOCALE = "default.locale"; //$NON-NLS-1$
@@ -106,9 +105,6 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
     public static final boolean DEBUG = false;
 
     static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
-
-    /** Preferencias generales establecidas para el aplicativo. */
-    private Preferences preferences;
 
     private JFrame window;
     private Container container;
@@ -172,8 +168,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 	void initialize(final File preSelectedFile) {
 
         // Cargamos las preferencias establecidas
-        this.preferences = Preferences.userNodeForPackage(SimpleAfirma.class);
-        setDefaultLocale(buildLocale(this.preferences.get(PREFERENCES_LOCALE, Locale.getDefault().toString())));
+        setDefaultLocale(buildLocale(PreferencesManager.get(PREFERENCES_LOCALE, Locale.getDefault().toString())));
 
         // Una excepcion en un constructor no siempre deriva en un objeto nulo,
         // por eso usamos un booleano para ver si fallo, en vez de una comprobacion
@@ -199,7 +194,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
         }
         else {
         	final MainScreen mainScreen = new MainScreen();
-        	this.currentPanel = new SignPanel(mainScreen, this, true);
+        	this.currentPanel = new SignPanel(mainScreen, this);
            	mainScreen.showMainScreen(this, this.currentPanel, DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT);
         	this.window = mainScreen;
         	this.window.setTitle(SimpleAfirmaMessages.getString("SimpleAfirma.10")); //$NON-NLS-1$
@@ -299,7 +294,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 
     	configureMenuBar(firstTime);
 
-        final JPanel newPanel = new SignPanel(this.window, this, firstTime);
+        final JPanel newPanel = new SignPanel(this.window, this);
         this.container.add(newPanel, BorderLayout.CENTER);
         if (this.currentPanel != null) {
             this.currentPanel.setVisible(false);
@@ -351,7 +346,14 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
     	this.mainMenu.setEnabledSignCommand(false);
     	this.mainMenu.setEnabledOpenCommand(false);
 
-        final JPanel newPanel = new SignDetailPanel(this, sign, fileName, signingCert, new SignValidity(SIGN_DETAIL_TYPE.GENERATED, null), null);
+        final JPanel newPanel = new SignDetailPanel(
+    		this,
+    		sign,
+    		fileName,
+    		signingCert,
+    		new SignValidity(SIGN_DETAIL_TYPE.GENERATED, null),
+    		null
+		);
         this.container.add(newPanel, BorderLayout.CENTER);
         if (this.window != null && fileName != null) {
             this.window.getRootPane().putClientProperty("Window.documentFile", new File(fileName)); //$NON-NLS-1$
@@ -395,28 +397,28 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 
     /** Establece el idioma de la aplicaci&oacute;n.
      * @param l Locale a establecer */
-    public void setDefaultLocale(final Locale l) {
+    public static void setDefaultLocale(final Locale l) {
         if (l != null) {
             Locale.setDefault(l);
-            setPreference(PREFERENCES_LOCALE, l.toString());
+            PreferencesManager.put(PREFERENCES_LOCALE, l.toString());
             SimpleAfirmaMessages.changeLocale();
         }
     }
 
-    /** Recupera una de las preferencias establecidas para la aplicaci&oacute;n.
-     * @param key Clave de la preferencia.
-     * @param defaultValue Valor por defecto.
-     * @return Devuelve el valor de la preferencia indicada o {@code defaultValue} si no est&aacute;a establecida. */
-    public String getPreference(final String key, final String defaultValue) {
-        return this.preferences.get(key, defaultValue);
-    }
-
-    /** Establece una preferencia para la aplicaci&oacute;n.
-     * @param key Clave de la preferencia.
-     * @param value Valor asignado. */
-    public void setPreference(final String key, final String value) {
-        this.preferences.put(key, value);
-    }
+//    /** Recupera una de las preferencias establecidas para la aplicaci&oacute;n.
+//     * @param key Clave de la preferencia.
+//     * @param defaultValue Valor por defecto.
+//     * @return Devuelve el valor de la preferencia indicada o {@code defaultValue} si no est&aacute;a establecida. */
+//    public static String getPreference(final String key, final String defaultValue) {
+//        return PreferencesManager.get(key, defaultValue);
+//    }
+//
+//    /** Establece una preferencia para la aplicaci&oacute;n.
+//     * @param key Clave de la preferencia.
+//     * @param value Valor asignado. */
+//    public static void setPreference(final String key, final String value) {
+//    	PreferencesManager.put(key, value);
+//    }
 
     /** Habilita o desabilita el men&uacute; <i>Archivo</i> de la barra de
      * men&uacute;.
@@ -451,7 +453,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
     /** Muestra la ayuda de la aplicaci&oacute;n. */
     public static void showHelp() {
         if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
-            final File helpFile = new File(APPLICATION_HOME + "\\FirmaFacil.chm"); //$NON-NLS-1$
+            final File helpFile = new File(APPLICATION_HOME + "\\AutoFirmaV2.chm"); //$NON-NLS-1$
             // Si el fichero no existe lo creamos
             if (!helpFile.exists()) {
 	            try {
@@ -521,8 +523,8 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 						final AnalyticsConfigData config = new AnalyticsConfigData(GOOGLE_ANALYTICS_TRACKING_CODE);
 						final JGoogleAnalyticsTracker tracker = new JGoogleAnalyticsTracker(config, GoogleAnalyticsVersion.V_4_7_2);
 						tracker.trackPageView(
-							"firmafacil", //$NON-NLS-1$
-							"Firma Facil con @firma", //$NON-NLS-1$
+							"AutoFirma", //$NON-NLS-1$
+							"AutoFirma", //$NON-NLS-1$
 							getIp()
 						);
 			    	}
@@ -535,6 +537,13 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 
     	// Configuramos el log de la aplicacion
     	configureLog();
+
+        // Propiedades especificas para Mac OS X
+        if (Platform.OS.MACOSX.equals(Platform.getOS())) {
+            com.apple.eawt.Application.getApplication().setDockIconImage(
+        		Toolkit.getDefaultToolkit().getImage(SimpleAfirma.class.getResource("/resources/logo_cliente_256.png")) //$NON-NLS-1$);
+    		);
+        }
 
     	// Comprobamos actualizaciones
     	Updater.checkForUpdates(null);
@@ -649,7 +658,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
     /** Pregunta al usuario si desea cerrar la aplicaci&oacute;n.
      * @return <code>true</code> si el usuario responde que s&iacute;, <code>false</code> en caso contrario */
     public boolean askForClosing() {
-    	if (Preferences.userRoot().getBoolean(PreferencesNames.PREFERENCE_OMIT_ASKONCLOSE, false)) {
+    	if (PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_OMIT_ASKONCLOSE, false)) {
     		closeApplication(0);
             return true;
     	}

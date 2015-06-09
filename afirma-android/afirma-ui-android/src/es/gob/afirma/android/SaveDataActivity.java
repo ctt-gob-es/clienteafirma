@@ -12,6 +12,7 @@ import java.util.List;
 
 import android.app.ListActivity;
 import android.app.ProgressDialog;
+import android.media.MediaScannerConnection;
 import android.os.AsyncTask.Status;
 import android.os.Bundle;
 import android.os.Environment;
@@ -290,6 +291,14 @@ public final class SaveDataActivity extends ListActivity implements DownloadData
 		showMessage(getString(R.string.data_saved, outFile.getName()));
 
 		Log.d(ES_GOB_AFIRMA, "Los datos se han guardado correctamente"); //$NON-NLS-1$
+
+		// Refrescamos el directorio para permitir acceder al fichero
+		MediaScannerConnection.scanFile(
+				this,
+				new String[] { outFile.toString(),
+						outFile.getParentFile().toString()},
+				null,
+				null);
 
 		closeActivity();
 	}

@@ -16,25 +16,23 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import es.gob.afirma.signers.cades.AOCAdESSigner;
 import es.gob.afirma.signers.cms.AOCMSSigner;
+import es.gob.afirma.signers.odf.AOODFSigner;
+import es.gob.afirma.signers.ooxml.AOOOXMLSigner;
 import es.gob.afirma.signers.pades.AOPDFSigner;
 import es.gob.afirma.signers.xades.AOFacturaESigner;
 import es.gob.afirma.signers.xades.AOXAdESSigner;
 
-/**
- * M&eacute;todos de utilidad para el an&aacute;lisis de ficheros de datos.
- * @author Carlos Gamuci
- */
+/** Utilidad para el an&aacute;lisis de ficheros de datos.
+ * @author Carlos Gamuci. */
 public final class DataAnalizerUtil {
 
     private DataAnalizerUtil() {
         // No permitimos la instanciacion
     }
-
-    /**
-     * Comprueba si los datos introducidos se corresponden a un fichero XML.
+    
+    /** Comprueba si los datos introducidos se corresponden a un fichero XML.
      * @param data Datos a analizar.
-     * @return Devuelve {@code true} si los datos son XML.
-     */
+     * @return Devuelve {@code true} si los datos son XML. */
     public static boolean isXML(final byte[] data) {
         try {
             DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new ByteArrayInputStream(data));
@@ -45,13 +43,10 @@ public final class DataAnalizerUtil {
         return true;
     }
 
-    /**
-     * Comprueba si los datos introducidos se corresponden a una firma XML soportada.
+    /** Comprueba si los datos introducidos se corresponden a una firma XML soportada.
      * @param data Datos a analizar.
-     * @return Devuelve {@code true} si los datos son una firma XML soportada.
-     */
+     * @return Devuelve {@code true} si los datos son una firma XML soportada. */
     public static boolean isSignedXML(final byte[] data) {
-
         try {
             return new AOXAdESSigner().isSign(data);
         }
@@ -60,11 +55,9 @@ public final class DataAnalizerUtil {
         }
     }
 
-    /**
-     * Comprueba si los datos introducidos se corresponden a un fichero PDF.
+    /** Comprueba si los datos introducidos se corresponden a un fichero PDF.
      * @param data Datos a analizar.
-     * @return Devuelve {@code true} si los datos son un PDF.
-     */
+     * @return Devuelve {@code true} si los datos son un PDF. */
     public static boolean isPDF(final byte[] data) {
         try {
             return new AOPDFSigner().isValidDataFile(data);
@@ -110,6 +103,74 @@ public final class DataAnalizerUtil {
     public static boolean isFacturae(final byte[] file) {
         try {
             return new AOFacturaESigner().isValidDataFile(file);
+        }
+        catch(final Exception e) {
+            return false;
+        }
+    }
+
+	/**
+     * Comprueba si los datos introducidos se corresponden con una factura
+     * electr&oacute;nica firmada.
+     * @param data Datos a analizar.
+     * @return Devuelve {@code true} si los datos son una firma XML soportada.
+     */
+    public static boolean isSignedFacturae(final byte[] data) {
+
+        try {
+            return new AOFacturaESigner().isSign(data);
+        }
+        catch(final Exception e) {
+            return false;
+        }
+    }
+    
+    /** Comprueba si los datos introducidos se corresponden a un documento ODF.
+     * @param data Datos a analizar.
+     * @return Devuelve {@code true} si los datos son ODF. */
+    public static boolean isODF(final byte[] data) {
+        try {
+            return new AOODFSigner().isValidDataFile(data);
+        }
+        catch(final Exception e) {
+            return false;
+        }
+    }
+
+    /**
+     * Comprueba si los datos introducidos se corresponden a una firma ODF soportada.
+     * @param data Datos a analizar.
+     * @return Devuelve {@code true} si los datos son una firma ODF soportada.
+     */
+    public static boolean isSignedODF(final byte[] data) {
+        try {
+            return new AOODFSigner().isSign(data);
+        }
+        catch(final Exception e) {
+            return false;
+        }
+    }
+    
+    /** Comprueba si los datos introducidos se corresponden a un documento OOXML.
+     * @param data Datos a analizar.
+     * @return Devuelve {@code true} si los datos son OOXML. */
+    public static boolean isOOXML(final byte[] data) {
+        try {
+            return new AOOOXMLSigner().isValidDataFile(data);
+        }
+        catch(final Exception e) {
+            return false;
+        }
+    }
+
+    /**
+     * Comprueba si los datos introducidos se corresponden a una firma OOXML soportada.
+     * @param data Datos a analizar.
+     * @return Devuelve {@code true} si los datos son una firma OOXML soportada.
+     */
+    public static boolean isSignedOOXML(final byte[] data) {
+        try {
+            return new AOOOXMLSigner().isSign(data);
         }
         catch(final Exception e) {
             return false;

@@ -20,7 +20,6 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Date;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
@@ -217,42 +216,61 @@ public final class XAdESSigner {
 
 		final boolean avoidXpathExtraTransformsOnEnveloped = Boolean.parseBoolean(extraParams.getProperty(
 				"avoidXpathExtraTransformsOnEnveloped", Boolean.FALSE.toString())); //$NON-NLS-1$
+
 		final boolean onlySignningCert = Boolean.parseBoolean(extraParams.getProperty(
 				"includeOnlySignningCertificate", Boolean.FALSE.toString())); //$NON-NLS-1$
+
 		final boolean useManifest = Boolean.parseBoolean(extraParams.getProperty(
 				"useManifest", Boolean.FALSE.toString())); //$NON-NLS-1$
+
 		final String envelopedNodeXPath = extraParams.getProperty(
 				"insertEnvelopedSignatureOnNodeByXPath"); //$NON-NLS-1$
+
 		String nodeToSign = extraParams.getProperty(
 				"nodeToSign"); //$NON-NLS-1$
+
 		final String format = extraParams.getProperty(
 				"format", AOSignConstants.SIGN_FORMAT_XADES_ENVELOPING); //$NON-NLS-1$
+
 		final String digestMethodAlgorithm = extraParams.getProperty(
 				"referencesDigestMethod", AOXAdESSigner.DIGEST_METHOD); //$NON-NLS-1$
+
 		final String canonicalizationAlgorithm = extraParams.getProperty(
 				"canonicalizationAlgorithm", CanonicalizationMethod.INCLUSIVE); //$NON-NLS-1$
+
 		final String xadesNamespace = extraParams.getProperty(
 				"xadesNamespace", AOXAdESSigner.XADESNS); //$NON-NLS-1$
+
 		final String signedPropertiesTypeUrl = extraParams.getProperty(
 				"signedPropertiesTypeUrl", AOXAdESSigner.XADES_SIGNED_PROPERTIES_TYPE); //$NON-NLS-1$
+
 		final boolean ignoreStyleSheets = Boolean.parseBoolean(extraParams.getProperty(
 				"ignoreStyleSheets", Boolean.FALSE.toString())); //$NON-NLS-1$
+
 		final boolean avoidBase64Transforms = Boolean.parseBoolean(extraParams.getProperty(
 				"avoidBase64Transforms", Boolean.FALSE.toString())); //$NON-NLS-1$
+
 		final boolean headLess = Boolean.parseBoolean(extraParams.getProperty(
 				"headLess", Boolean.TRUE.toString())); //$NON-NLS-1$
+
 		final boolean addKeyInfoKeyValue = Boolean.parseBoolean(extraParams.getProperty(
 				"addKeyInfoKeyValue", Boolean.TRUE.toString())); //$NON-NLS-1$
+
 		final boolean addKeyInfoKeyName = Boolean.parseBoolean(extraParams.getProperty(
 				"addKeyInfoKeyName", Boolean.FALSE.toString())); //$NON-NLS-1$
+
 		final String precalculatedHashAlgorithm = extraParams.getProperty(
 				"precalculatedHashAlgorithm"); //$NON-NLS-1$
+
 		final boolean facturaeSign = Boolean.parseBoolean(extraParams.getProperty(
 				"facturaeSign", Boolean.FALSE.toString())); //$NON-NLS-1$
+
 		String mimeType = extraParams.getProperty(
 				"mimeType", XMLConstants.DEFAULT_MIMETYPE); //$NON-NLS-1$
+
 		String encoding = extraParams.getProperty(
 				"encoding"); //$NON-NLS-1$
+
 		if ("base64".equalsIgnoreCase(encoding)) { //$NON-NLS-1$
 			encoding = XMLConstants.BASE64_ENCODING;
 		}
@@ -1035,7 +1053,7 @@ public final class XAdESSigner {
 		xades.setSigningCertificate((X509Certificate) certChain[0]);
 
 		// SignaturePolicyIdentifier
-		final SignaturePolicyIdentifier spi = AOXAdESSigner.getPolicy(
+		final SignaturePolicyIdentifier spi = XAdESUtil.getPolicy(
 			extraParams.getProperty("policyIdentifier"), //$NON-NLS-1$
 			extraParams.getProperty("policyIdentifierHash"), //$NON-NLS-1$
 			extraParams.getProperty("policyIdentifierHashAlgorithm"), //$NON-NLS-1$
@@ -1061,16 +1079,6 @@ public final class XAdESSigner {
 		final SignerRole signerRole = XAdESUtil.parseSignerRole(extraParams);
 		if (signerRole != null) {
 			xades.setSignerRole(signerRole);
-		}
-
-		// SigningTime
-		if (Boolean.parseBoolean(
-			extraParams.getProperty(
-				"applySystemDate", //$NON-NLS-1$
-				Boolean.TRUE.toString()
-			)
-		)) {
-			xades.setSigningTime(new Date());
 		}
 
 		// DataObjectFormat

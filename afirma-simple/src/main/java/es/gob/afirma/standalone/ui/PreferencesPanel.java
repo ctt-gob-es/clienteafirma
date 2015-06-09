@@ -10,32 +10,31 @@
 
 package es.gob.afirma.standalone.ui;
 
-import static es.gob.afirma.standalone.PreferencesNames.PREFERENCE_CADES_IMPLICIT;
-import static es.gob.afirma.standalone.PreferencesNames.PREFERENCE_CADES_POLICY_IDENTIFIER;
-import static es.gob.afirma.standalone.PreferencesNames.PREFERENCE_CADES_POLICY_IDENTIFIER_HASH;
-import static es.gob.afirma.standalone.PreferencesNames.PREFERENCE_CADES_POLICY_IDENTIFIER_HASH_ALGORITHM;
-import static es.gob.afirma.standalone.PreferencesNames.PREFERENCE_CADES_POLICY_QUALIFIER;
-import static es.gob.afirma.standalone.PreferencesNames.PREFERENCE_OMIT_ASKONCLOSE;
-import static es.gob.afirma.standalone.PreferencesNames.PREFERENCE_PADES_FORMAT;
-import static es.gob.afirma.standalone.PreferencesNames.PREFERENCE_PADES_POLICY_IDENTIFIER;
-import static es.gob.afirma.standalone.PreferencesNames.PREFERENCE_PADES_POLICY_IDENTIFIER_HASH;
-import static es.gob.afirma.standalone.PreferencesNames.PREFERENCE_PADES_POLICY_IDENTIFIER_HASH_ALGORITHM;
-import static es.gob.afirma.standalone.PreferencesNames.PREFERENCE_PADES_POLICY_QUALIFIER;
-import static es.gob.afirma.standalone.PreferencesNames.PREFERENCE_PADES_SIGNER_CONTACT;
-import static es.gob.afirma.standalone.PreferencesNames.PREFERENCE_PADES_SIGN_PRODUCTION_CITY;
-import static es.gob.afirma.standalone.PreferencesNames.PREFERENCE_PADES_SIGN_REASON;
-import static es.gob.afirma.standalone.PreferencesNames.PREFERENCE_SIGNATURE_ALGORITHM;
-import static es.gob.afirma.standalone.PreferencesNames.PREFERENCE_XADES_POLICY_IDENTIFIER;
-import static es.gob.afirma.standalone.PreferencesNames.PREFERENCE_XADES_POLICY_IDENTIFIER_HASH;
-import static es.gob.afirma.standalone.PreferencesNames.PREFERENCE_XADES_POLICY_IDENTIFIER_HASH_ALGORITHM;
-import static es.gob.afirma.standalone.PreferencesNames.PREFERENCE_XADES_POLICY_QUALIFIER;
-import static es.gob.afirma.standalone.PreferencesNames.PREFERENCE_XADES_SIGNATURE_PRODUCTION_CITY;
-import static es.gob.afirma.standalone.PreferencesNames.PREFERENCE_XADES_SIGNATURE_PRODUCTION_COUNTRY;
-import static es.gob.afirma.standalone.PreferencesNames.PREFERENCE_XADES_SIGNATURE_PRODUCTION_POSTAL_CODE;
-import static es.gob.afirma.standalone.PreferencesNames.PREFERENCE_XADES_SIGNATURE_PRODUCTION_PROVINCE;
-import static es.gob.afirma.standalone.PreferencesNames.PREFERENCE_XADES_SIGNER_CERTIFIED_ROLE;
-import static es.gob.afirma.standalone.PreferencesNames.PREFERENCE_XADES_SIGNER_CLAIMED_ROLE;
-import static es.gob.afirma.standalone.PreferencesNames.PREFERENCE_XADES_SIGN_FORMAT;
+import static es.gob.afirma.standalone.PreferencesManager.PREFERENCE_CADES_IMPLICIT;
+import static es.gob.afirma.standalone.PreferencesManager.PREFERENCE_CADES_POLICY_IDENTIFIER;
+import static es.gob.afirma.standalone.PreferencesManager.PREFERENCE_CADES_POLICY_IDENTIFIER_HASH;
+import static es.gob.afirma.standalone.PreferencesManager.PREFERENCE_CADES_POLICY_IDENTIFIER_HASH_ALGORITHM;
+import static es.gob.afirma.standalone.PreferencesManager.PREFERENCE_CADES_POLICY_QUALIFIER;
+import static es.gob.afirma.standalone.PreferencesManager.PREFERENCE_OMIT_ASKONCLOSE;
+import static es.gob.afirma.standalone.PreferencesManager.PREFERENCE_PADES_FORMAT;
+import static es.gob.afirma.standalone.PreferencesManager.PREFERENCE_PADES_POLICY_IDENTIFIER;
+import static es.gob.afirma.standalone.PreferencesManager.PREFERENCE_PADES_POLICY_IDENTIFIER_HASH;
+import static es.gob.afirma.standalone.PreferencesManager.PREFERENCE_PADES_POLICY_IDENTIFIER_HASH_ALGORITHM;
+import static es.gob.afirma.standalone.PreferencesManager.PREFERENCE_PADES_POLICY_QUALIFIER;
+import static es.gob.afirma.standalone.PreferencesManager.PREFERENCE_PADES_SIGNER_CONTACT;
+import static es.gob.afirma.standalone.PreferencesManager.PREFERENCE_PADES_SIGN_PRODUCTION_CITY;
+import static es.gob.afirma.standalone.PreferencesManager.PREFERENCE_PADES_SIGN_REASON;
+import static es.gob.afirma.standalone.PreferencesManager.PREFERENCE_SIGNATURE_ALGORITHM;
+import static es.gob.afirma.standalone.PreferencesManager.PREFERENCE_XADES_POLICY_IDENTIFIER;
+import static es.gob.afirma.standalone.PreferencesManager.PREFERENCE_XADES_POLICY_IDENTIFIER_HASH;
+import static es.gob.afirma.standalone.PreferencesManager.PREFERENCE_XADES_POLICY_IDENTIFIER_HASH_ALGORITHM;
+import static es.gob.afirma.standalone.PreferencesManager.PREFERENCE_XADES_POLICY_QUALIFIER;
+import static es.gob.afirma.standalone.PreferencesManager.PREFERENCE_XADES_SIGNATURE_PRODUCTION_CITY;
+import static es.gob.afirma.standalone.PreferencesManager.PREFERENCE_XADES_SIGNATURE_PRODUCTION_COUNTRY;
+import static es.gob.afirma.standalone.PreferencesManager.PREFERENCE_XADES_SIGNATURE_PRODUCTION_POSTAL_CODE;
+import static es.gob.afirma.standalone.PreferencesManager.PREFERENCE_XADES_SIGNATURE_PRODUCTION_PROVINCE;
+import static es.gob.afirma.standalone.PreferencesManager.PREFERENCE_XADES_SIGNER_CLAIMED_ROLE;
+import static es.gob.afirma.standalone.PreferencesManager.PREFERENCE_XADES_SIGN_FORMAT;
 
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
@@ -48,7 +47,6 @@ import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
-import java.util.prefs.Preferences;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
@@ -69,6 +67,7 @@ import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AdESPolicy;
 import es.gob.afirma.core.ui.AOUIFactory;
+import es.gob.afirma.standalone.PreferencesManager;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.ui.PolicyPanel.PolicyItem;
 
@@ -76,25 +75,9 @@ final class PreferencesPanel extends JPanel implements KeyListener {
 
 	private static final long serialVersionUID = -3168095095548385291L;
 
-	private static final Preferences PREFERENCES = Preferences.userRoot();
-
 	private static final String SIGN_FORMAT_CADES = "CAdES"; //$NON-NLS-1$
 	private static final String SIGN_FORMAT_XADES = "XAdES"; //$NON-NLS-1$
 	private static final String SIGN_FORMAT_PADES = "PAdES"; //$NON-NLS-1$
-
-	private static final AdESPolicy POLICY_CADES_AGE_1_8 = new AdESPolicy(
-		"2.16.724.1.3.1.1.2.1.8", //$NON-NLS-1$
-		"7SxX3erFuH31TvAw9LZ70N7p1vA=", //$NON-NLS-1$
-		"SHA1", //$NON-NLS-1$
-		"http://administracionelectronica.gob.es/es/ctt/politicafirma/politica_firma_AGE_v1_8.pdf" //$NON-NLS-1$
-	);
-
-	private static final AdESPolicy POLICY_XADES_AGE_1_8 = new AdESPolicy(
-		"urn:oid:2.16.724.1.3.1.1.2.1.8", //$NON-NLS-1$
-		"V8lVVNGDCPen6VELRD1Ja8HARFk=", //$NON-NLS-1$
-		"SHA1", //$NON-NLS-1$
-		"http://administracionelectronica.gob.es/es/ctt/politicafirma/politica_firma_AGE_v1_8.pdf" //$NON-NLS-1$
-	);
 
 	private static final AdESPolicy POLICY_CADES_PADES_AGE_1_9 = new AdESPolicy(
 		"2.16.724.1.3.1.1.2.1.9", //$NON-NLS-1$
@@ -125,17 +108,17 @@ final class PreferencesPanel extends JPanel implements KeyListener {
 
 	private final JCheckBox avoidAskForClose = new JCheckBox(
 		SimpleAfirmaMessages.getString("PreferencesPanel.36"), //$NON-NLS-1$
-		PREFERENCES.getBoolean(PREFERENCE_OMIT_ASKONCLOSE, false)
+		PreferencesManager.getBoolean(PREFERENCE_OMIT_ASKONCLOSE, false)
 	);
 
 	private final JTextField padesSignReason = new JTextField(
-		PREFERENCES.get(PREFERENCE_PADES_SIGN_REASON, "") //$NON-NLS-1$
+		PreferencesManager.get(PREFERENCE_PADES_SIGN_REASON, "") //$NON-NLS-1$
 	);
 	private final JTextField padesSignProductionCity = new JTextField(
-		PREFERENCES.get(PREFERENCE_PADES_SIGN_PRODUCTION_CITY, "") //$NON-NLS-1$
+		PreferencesManager.get(PREFERENCE_PADES_SIGN_PRODUCTION_CITY, "") //$NON-NLS-1$
 	);
 	private final JTextField padesSignerContact = new JTextField(
-		PREFERENCES.get(PREFERENCE_PADES_SIGNER_CONTACT, "") //$NON-NLS-1$
+		PreferencesManager.get(PREFERENCE_PADES_SIGNER_CONTACT, "") //$NON-NLS-1$
 	);
 
     private final Window window;
@@ -150,26 +133,23 @@ final class PreferencesPanel extends JPanel implements KeyListener {
 
 	private final JCheckBox cadesImplicit = new JCheckBox(
 		SimpleAfirmaMessages.getString("PreferencesPanel.1"), //$NON-NLS-1$
-		Boolean.parseBoolean(PREFERENCES.get(PREFERENCE_CADES_IMPLICIT, "true")) //$NON-NLS-1$
+		Boolean.parseBoolean(PreferencesManager.get(PREFERENCE_CADES_IMPLICIT, "true")) //$NON-NLS-1$
 	);
 
 	private final JTextField xadesSignatureProductionCity = new JTextField(
-		PREFERENCES.get(PREFERENCE_XADES_SIGNATURE_PRODUCTION_CITY, "") //$NON-NLS-1$
+		PreferencesManager.get(PREFERENCE_XADES_SIGNATURE_PRODUCTION_CITY, "") //$NON-NLS-1$
 	);
 	private final JTextField xadesSignatureProductionProvince = new JTextField(
-		PREFERENCES.get(PREFERENCE_XADES_SIGNATURE_PRODUCTION_PROVINCE, "") //$NON-NLS-1$
+		PreferencesManager.get(PREFERENCE_XADES_SIGNATURE_PRODUCTION_PROVINCE, "") //$NON-NLS-1$
 	);
 	private final JTextField xadesSignatureProductionPostalCode = new JTextField(
-		PREFERENCES.get(PREFERENCE_XADES_SIGNATURE_PRODUCTION_POSTAL_CODE, "") //$NON-NLS-1$
+		PreferencesManager.get(PREFERENCE_XADES_SIGNATURE_PRODUCTION_POSTAL_CODE, "") //$NON-NLS-1$
 	);
 	private final JTextField xadesSignatureProductionCountry = new JTextField(
-		PREFERENCES.get(PREFERENCE_XADES_SIGNATURE_PRODUCTION_COUNTRY, "") //$NON-NLS-1$
+		PreferencesManager.get(PREFERENCE_XADES_SIGNATURE_PRODUCTION_COUNTRY, "") //$NON-NLS-1$
 	);
 	private final JTextField xadesSignerClaimedRole = new JTextField(
-		PREFERENCES.get(PREFERENCE_XADES_SIGNER_CLAIMED_ROLE, "") //$NON-NLS-1$
-	);
-	private final JTextField xadesSignerCertifiedRole = new JTextField(
-		PREFERENCES.get(PREFERENCE_XADES_SIGNER_CERTIFIED_ROLE, "") //$NON-NLS-1$
+		PreferencesManager.get(PREFERENCE_XADES_SIGNER_CLAIMED_ROLE, "") //$NON-NLS-1$
 	);
 	private final JComboBox xadesSignFormat = new JComboBox(
 		new String[] {
@@ -214,30 +194,30 @@ final class PreferencesPanel extends JPanel implements KeyListener {
 		//****************************************************************************
 		//**** PREFERENCIAS GENERALES ************************************************
 		//****************************************************************************
-		PreferencesPanel.PREFERENCES.put(PREFERENCE_SIGNATURE_ALGORITHM, this.signarureAlgorithms.getSelectedItem().toString());
-		PreferencesPanel.PREFERENCES.putBoolean(PREFERENCE_OMIT_ASKONCLOSE, this.avoidAskForClose.isSelected());
+		PreferencesManager.put(PREFERENCE_SIGNATURE_ALGORITHM, this.signarureAlgorithms.getSelectedItem().toString());
+		PreferencesManager.putBoolean(PREFERENCE_OMIT_ASKONCLOSE, this.avoidAskForClose.isSelected());
 
 		//****************************************************************************
 		//**** PREFERENCIAS CADES ****************************************************
 		//****************************************************************************
-		PreferencesPanel.PREFERENCES.put(PREFERENCE_CADES_IMPLICIT, Boolean.valueOf(this.cadesImplicit.isSelected()).toString());
+		PreferencesManager.put(PREFERENCE_CADES_IMPLICIT, Boolean.valueOf(this.cadesImplicit.isSelected()).toString());
 		final AdESPolicy cadesPolicy = this.cadesPolicyPanel.getCurrentPolicy();
 		if (cadesPolicy != null) {
-			PreferencesPanel.PREFERENCES.put(PREFERENCE_CADES_POLICY_IDENTIFIER, cadesPolicy.getPolicyIdentifier());
-			PreferencesPanel.PREFERENCES.put(PREFERENCE_CADES_POLICY_IDENTIFIER_HASH, cadesPolicy.getPolicyIdentifierHash());
-			PreferencesPanel.PREFERENCES.put(PREFERENCE_CADES_POLICY_IDENTIFIER_HASH_ALGORITHM, cadesPolicy.getPolicyIdentifierHashAlgorithm());
+			PreferencesManager.put(PREFERENCE_CADES_POLICY_IDENTIFIER, cadesPolicy.getPolicyIdentifier());
+			PreferencesManager.put(PREFERENCE_CADES_POLICY_IDENTIFIER_HASH, cadesPolicy.getPolicyIdentifierHash());
+			PreferencesManager.put(PREFERENCE_CADES_POLICY_IDENTIFIER_HASH_ALGORITHM, cadesPolicy.getPolicyIdentifierHashAlgorithm());
 			if (cadesPolicy.getPolicyQualifier() != null) {
-				PreferencesPanel.PREFERENCES.put(PREFERENCE_CADES_POLICY_QUALIFIER, cadesPolicy.getPolicyQualifier().toString());
+				PreferencesManager.put(PREFERENCE_CADES_POLICY_QUALIFIER, cadesPolicy.getPolicyQualifier().toString());
 			}
 			else {
-				PreferencesPanel.PREFERENCES.remove(PREFERENCE_CADES_POLICY_QUALIFIER);
+				PreferencesManager.remove(PREFERENCE_CADES_POLICY_QUALIFIER);
 			}
 		}
 		else {
-			PreferencesPanel.PREFERENCES.remove(PREFERENCE_CADES_POLICY_IDENTIFIER);
-			PreferencesPanel.PREFERENCES.remove(PREFERENCE_CADES_POLICY_IDENTIFIER_HASH);
-			PreferencesPanel.PREFERENCES.remove(PREFERENCE_CADES_POLICY_IDENTIFIER_HASH_ALGORITHM);
-			PreferencesPanel.PREFERENCES.remove(PREFERENCE_CADES_POLICY_QUALIFIER);
+			PreferencesManager.remove(PREFERENCE_CADES_POLICY_IDENTIFIER);
+			PreferencesManager.remove(PREFERENCE_CADES_POLICY_IDENTIFIER_HASH);
+			PreferencesManager.remove(PREFERENCE_CADES_POLICY_IDENTIFIER_HASH_ALGORITHM);
+			PreferencesManager.remove(PREFERENCE_CADES_POLICY_QUALIFIER);
 		}
 		this.cadesPolicyPanel.saveCurrentPolicy();
 
@@ -245,89 +225,89 @@ final class PreferencesPanel extends JPanel implements KeyListener {
 		//**** PREFERENCIAS PADES ****************************************************
 		//****************************************************************************
 		if ("".equals(this.padesSignerContact.getText())) { //$NON-NLS-1$
-			PreferencesPanel.PREFERENCES.remove(PREFERENCE_PADES_SIGNER_CONTACT);
+			PreferencesManager.remove(PREFERENCE_PADES_SIGNER_CONTACT);
 		}
 		else {
-			PreferencesPanel.PREFERENCES.put(PREFERENCE_PADES_SIGNER_CONTACT, this.padesSignerContact.getText());
+			PreferencesManager.put(PREFERENCE_PADES_SIGNER_CONTACT, this.padesSignerContact.getText());
 		}
 		if ("".equals(this.padesSignProductionCity.getText())) { //$NON-NLS-1$
-			PreferencesPanel.PREFERENCES.remove(PREFERENCE_PADES_SIGN_PRODUCTION_CITY);
+			PreferencesManager.remove(PREFERENCE_PADES_SIGN_PRODUCTION_CITY);
 		}
 		else {
-			PreferencesPanel.PREFERENCES.put(PREFERENCE_PADES_SIGN_PRODUCTION_CITY, this.padesSignProductionCity.getText());
+			PreferencesManager.put(PREFERENCE_PADES_SIGN_PRODUCTION_CITY, this.padesSignProductionCity.getText());
 		}
 		if ("".equals(this.padesSignReason.getText())) { //$NON-NLS-1$
-			PreferencesPanel.PREFERENCES.remove(PREFERENCE_PADES_SIGN_REASON);
+			PreferencesManager.remove(PREFERENCE_PADES_SIGN_REASON);
 		}
 		else {
-			PreferencesPanel.PREFERENCES.put(PREFERENCE_PADES_SIGN_REASON, this.padesSignReason.getText());
+			PreferencesManager.put(PREFERENCE_PADES_SIGN_REASON, this.padesSignReason.getText());
 		}
 
-		PreferencesPanel.PREFERENCES.put(PREFERENCE_PADES_FORMAT, ((ValueTextPair) this.padesBasicFormat.getSelectedItem()).getValue());
+		PreferencesManager.put(PREFERENCE_PADES_FORMAT, ((ValueTextPair) this.padesBasicFormat.getSelectedItem()).getValue());
 
 		final AdESPolicy padesPolicy = this.padesPolicyPanel.getCurrentPolicy();
 		if (padesPolicy != null) {
-			PreferencesPanel.PREFERENCES.put(PREFERENCE_PADES_POLICY_IDENTIFIER, padesPolicy.getPolicyIdentifier());
-			PreferencesPanel.PREFERENCES.put(PREFERENCE_PADES_POLICY_IDENTIFIER_HASH, padesPolicy.getPolicyIdentifierHash());
-			PreferencesPanel.PREFERENCES.put(PREFERENCE_PADES_POLICY_IDENTIFIER_HASH_ALGORITHM, padesPolicy.getPolicyIdentifierHashAlgorithm());
+			PreferencesManager.put(PREFERENCE_PADES_POLICY_IDENTIFIER, padesPolicy.getPolicyIdentifier());
+			PreferencesManager.put(PREFERENCE_PADES_POLICY_IDENTIFIER_HASH, padesPolicy.getPolicyIdentifierHash());
+			PreferencesManager.put(PREFERENCE_PADES_POLICY_IDENTIFIER_HASH_ALGORITHM, padesPolicy.getPolicyIdentifierHashAlgorithm());
 			if (padesPolicy.getPolicyQualifier() != null) {
-				PreferencesPanel.PREFERENCES.put(PREFERENCE_PADES_POLICY_QUALIFIER, padesPolicy.getPolicyQualifier().toString());
+				PreferencesManager.put(PREFERENCE_PADES_POLICY_QUALIFIER, padesPolicy.getPolicyQualifier().toString());
 			}
 			else {
-				PreferencesPanel.PREFERENCES.remove(PREFERENCE_PADES_POLICY_QUALIFIER);
+				PreferencesManager.remove(PREFERENCE_PADES_POLICY_QUALIFIER);
 			}
 		}
 		else {
-			PreferencesPanel.PREFERENCES.remove(PREFERENCE_PADES_POLICY_IDENTIFIER);
-			PreferencesPanel.PREFERENCES.remove(PREFERENCE_PADES_POLICY_IDENTIFIER_HASH);
-			PreferencesPanel.PREFERENCES.remove(PREFERENCE_PADES_POLICY_IDENTIFIER_HASH_ALGORITHM);
-			PreferencesPanel.PREFERENCES.remove(PREFERENCE_PADES_POLICY_QUALIFIER);
+			PreferencesManager.remove(PREFERENCE_PADES_POLICY_IDENTIFIER);
+			PreferencesManager.remove(PREFERENCE_PADES_POLICY_IDENTIFIER_HASH);
+			PreferencesManager.remove(PREFERENCE_PADES_POLICY_IDENTIFIER_HASH_ALGORITHM);
+			PreferencesManager.remove(PREFERENCE_PADES_POLICY_QUALIFIER);
 		}
 		this.padesPolicyPanel.saveCurrentPolicy();
 
 		//****************************************************************************
 		//**** PREFERENCIAS XADES ****************************************************
 		//****************************************************************************
-		PreferencesPanel.PREFERENCES.put(PREFERENCE_XADES_SIGN_FORMAT, this.xadesSignFormat.getSelectedItem().toString());
+		PreferencesManager.put(PREFERENCE_XADES_SIGN_FORMAT, this.xadesSignFormat.getSelectedItem().toString());
 		if ("".equals(this.xadesSignatureProductionCity.getText())) { //$NON-NLS-1$
-			PreferencesPanel.PREFERENCES.remove(PREFERENCE_XADES_SIGNATURE_PRODUCTION_CITY);
+			PreferencesManager.remove(PREFERENCE_XADES_SIGNATURE_PRODUCTION_CITY);
 		}
 		else {
-			PreferencesPanel.PREFERENCES.put(PREFERENCE_XADES_SIGNATURE_PRODUCTION_CITY, this.xadesSignatureProductionCity.getText());
+			PreferencesManager.put(PREFERENCE_XADES_SIGNATURE_PRODUCTION_CITY, this.xadesSignatureProductionCity.getText());
 		}
 		if ("".equals(this.xadesSignatureProductionCountry.getText())) { //$NON-NLS-1$
-			PreferencesPanel.PREFERENCES.remove(PREFERENCE_XADES_SIGNATURE_PRODUCTION_COUNTRY);
+			PreferencesManager.remove(PREFERENCE_XADES_SIGNATURE_PRODUCTION_COUNTRY);
 		}
 		else {
-			PreferencesPanel.PREFERENCES.put(PREFERENCE_XADES_SIGNATURE_PRODUCTION_COUNTRY, this.xadesSignatureProductionCountry.getText());
+			PreferencesManager.put(PREFERENCE_XADES_SIGNATURE_PRODUCTION_COUNTRY, this.xadesSignatureProductionCountry.getText());
 		}
 		if ("".equals(this.xadesSignatureProductionPostalCode.getText())) { //$NON-NLS-1$
-			PreferencesPanel.PREFERENCES.remove(PREFERENCE_XADES_SIGNATURE_PRODUCTION_POSTAL_CODE);
+			PreferencesManager.remove(PREFERENCE_XADES_SIGNATURE_PRODUCTION_POSTAL_CODE);
 		}
 		else {
-			PreferencesPanel.PREFERENCES.put(PREFERENCE_XADES_SIGNATURE_PRODUCTION_POSTAL_CODE, this.xadesSignatureProductionPostalCode.getText());
+			PreferencesManager.put(PREFERENCE_XADES_SIGNATURE_PRODUCTION_POSTAL_CODE, this.xadesSignatureProductionPostalCode.getText());
 		}
 		if ("".equals(this.xadesSignatureProductionProvince.getText())) { //$NON-NLS-1$
-			PreferencesPanel.PREFERENCES.remove(PREFERENCE_XADES_SIGNATURE_PRODUCTION_PROVINCE);
+			PreferencesManager.remove(PREFERENCE_XADES_SIGNATURE_PRODUCTION_PROVINCE);
 		}
 		else {
-			PreferencesPanel.PREFERENCES.put(PREFERENCE_XADES_SIGNATURE_PRODUCTION_PROVINCE, this.xadesSignatureProductionProvince.getText());
-		}
-		if ("".equals(this.xadesSignerCertifiedRole.getText())) { //$NON-NLS-1$
-			PreferencesPanel.PREFERENCES.remove(PREFERENCE_XADES_SIGNER_CERTIFIED_ROLE);
-		}
-		else {
-			PreferencesPanel.PREFERENCES.put(PREFERENCE_XADES_SIGNER_CERTIFIED_ROLE, this.xadesSignerCertifiedRole.getText());
+			PreferencesManager.put(PREFERENCE_XADES_SIGNATURE_PRODUCTION_PROVINCE, this.xadesSignatureProductionProvince.getText());
 		}
 		if ("".equals(this.xadesSignerClaimedRole.getText())) { //$NON-NLS-1$
-			PreferencesPanel.PREFERENCES.remove(PREFERENCE_XADES_SIGNER_CLAIMED_ROLE);
+			PreferencesManager.remove(PREFERENCE_XADES_SIGNER_CLAIMED_ROLE);
 		}
 		else {
-			PreferencesPanel.PREFERENCES.put(PREFERENCE_XADES_SIGNER_CLAIMED_ROLE, this.xadesSignerClaimedRole.getText());
+			PreferencesManager.put(PREFERENCE_XADES_SIGNER_CLAIMED_ROLE, this.xadesSignerClaimedRole.getText());
+		}
+		if ("".equals(this.xadesSignerClaimedRole.getText())) { //$NON-NLS-1$
+			PreferencesManager.remove(PREFERENCE_XADES_SIGNER_CLAIMED_ROLE);
+		}
+		else {
+			PreferencesManager.put(PREFERENCE_XADES_SIGNER_CLAIMED_ROLE, this.xadesSignerClaimedRole.getText());
 		}
 
 		try {
-			PreferencesPanel.PREFERENCES.flush();
+			PreferencesManager.flush();
 		}
 		catch (final Exception e) {
 			Logger.getLogger("es.gob.afirma").severe("Error al guardar las preferencias de firma: " + e); //$NON-NLS-1$ //$NON-NLS-2$
@@ -335,21 +315,21 @@ final class PreferencesPanel extends JPanel implements KeyListener {
 
 		final AdESPolicy xadesPolicy = this.xadesPolicyPanel.getCurrentPolicy();
 		if (xadesPolicy != null) {
-			PreferencesPanel.PREFERENCES.put(PREFERENCE_XADES_POLICY_IDENTIFIER, xadesPolicy.getPolicyIdentifier());
-			PreferencesPanel.PREFERENCES.put(PREFERENCE_XADES_POLICY_IDENTIFIER_HASH, xadesPolicy.getPolicyIdentifierHash());
-			PreferencesPanel.PREFERENCES.put(PREFERENCE_XADES_POLICY_IDENTIFIER_HASH_ALGORITHM, xadesPolicy.getPolicyIdentifierHashAlgorithm());
+			PreferencesManager.put(PREFERENCE_XADES_POLICY_IDENTIFIER, xadesPolicy.getPolicyIdentifier());
+			PreferencesManager.put(PREFERENCE_XADES_POLICY_IDENTIFIER_HASH, xadesPolicy.getPolicyIdentifierHash());
+			PreferencesManager.put(PREFERENCE_XADES_POLICY_IDENTIFIER_HASH_ALGORITHM, xadesPolicy.getPolicyIdentifierHashAlgorithm());
 			if (xadesPolicy.getPolicyQualifier() != null) {
-				PreferencesPanel.PREFERENCES.put(PREFERENCE_XADES_POLICY_QUALIFIER, xadesPolicy.getPolicyQualifier().toString());
+				PreferencesManager.put(PREFERENCE_XADES_POLICY_QUALIFIER, xadesPolicy.getPolicyQualifier().toString());
 			}
 			else {
-				PreferencesPanel.PREFERENCES.remove(PREFERENCE_XADES_POLICY_QUALIFIER);
+				PreferencesManager.remove(PREFERENCE_XADES_POLICY_QUALIFIER);
 			}
 		}
 		else {
-			PreferencesPanel.PREFERENCES.remove(PREFERENCE_XADES_POLICY_IDENTIFIER);
-			PreferencesPanel.PREFERENCES.remove(PREFERENCE_XADES_POLICY_IDENTIFIER_HASH);
-			PreferencesPanel.PREFERENCES.remove(PREFERENCE_XADES_POLICY_IDENTIFIER_HASH_ALGORITHM);
-			PreferencesPanel.PREFERENCES.remove(PREFERENCE_XADES_POLICY_QUALIFIER);
+			PreferencesManager.remove(PREFERENCE_XADES_POLICY_IDENTIFIER);
+			PreferencesManager.remove(PREFERENCE_XADES_POLICY_IDENTIFIER_HASH);
+			PreferencesManager.remove(PREFERENCE_XADES_POLICY_IDENTIFIER_HASH_ALGORITHM);
+			PreferencesManager.remove(PREFERENCE_XADES_POLICY_QUALIFIER);
 		}
 		this.xadesPolicyPanel.saveCurrentPolicy();
 
@@ -436,12 +416,6 @@ final class PreferencesPanel extends JPanel implements KeyListener {
 
         final List<PolicyPanel.PolicyItem> xadesPolicies = new ArrayList<PolicyPanel.PolicyItem>();
         xadesPolicies.add(
-    		new PolicyPanel.PolicyItem(
-        		SimpleAfirmaMessages.getString("PreferencesPanel.25"), //$NON-NLS-1$
-        		POLICY_XADES_AGE_1_8
-    		)
-		);
-        xadesPolicies.add(
     		new PolicyItem(
         		SimpleAfirmaMessages.getString("PreferencesPanel.73"), //$NON-NLS-1$
         		POLICY_XADES_AGE_1_9
@@ -490,20 +464,20 @@ final class PreferencesPanel extends JPanel implements KeyListener {
         metadata.add(this.xadesSignatureProductionCountry, c);
 
         final JLabel xadesSignerCertifiedRoleLabel = new JLabel(SimpleAfirmaMessages.getString("PreferencesPanel.14")); //$NON-NLS-1$
-        xadesSignerCertifiedRoleLabel.setLabelFor(this.xadesSignerCertifiedRole);
+        xadesSignerCertifiedRoleLabel.setLabelFor(this.xadesSignerClaimedRole);
         c.gridy++;
         metadata.add(xadesSignerCertifiedRoleLabel, c);
-        this.xadesSignerCertifiedRole.getAccessibleContext().setAccessibleDescription(SimpleAfirmaMessages.getString("PreferencesPanel.68")); //$NON-NLS-1$
-        this.xadesSignerCertifiedRole.addKeyListener(this.modificationListener);
-        this.xadesSignerCertifiedRole.addKeyListener(this);
+        this.xadesSignerClaimedRole.getAccessibleContext().setAccessibleDescription(SimpleAfirmaMessages.getString("PreferencesPanel.68")); //$NON-NLS-1$
+        this.xadesSignerClaimedRole.addKeyListener(this.modificationListener);
+        this.xadesSignerClaimedRole.addKeyListener(this);
         c.gridy++;
-        metadata.add(this.xadesSignerCertifiedRole, c);
+        metadata.add(this.xadesSignerClaimedRole, c);
 
         final FlowLayout fLayout = new FlowLayout(FlowLayout.LEADING);
 	    final JPanel format = new JPanel(fLayout);
         format.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(), SimpleAfirmaMessages.getString("PreferencesPanel.15"))); //$NON-NLS-1$
         this.xadesSignFormat.setSelectedItem(
-    		PREFERENCES.get(PREFERENCE_XADES_SIGN_FORMAT, AOSignConstants.SIGN_FORMAT_XADES_ENVELOPING)
+    		PreferencesManager.get(PREFERENCE_XADES_SIGN_FORMAT, AOSignConstants.SIGN_FORMAT_XADES_ENVELOPING)
 		);
         this.xadesSignFormat.getAccessibleContext().setAccessibleDescription(SimpleAfirmaMessages.getString("PreferencesPanel.53")); //$NON-NLS-1$
         this.xadesSignFormat.addItemListener(this.modificationListener);
@@ -533,9 +507,6 @@ final class PreferencesPanel extends JPanel implements KeyListener {
         c.gridy = 0;
 
         final List<PolicyPanel.PolicyItem> cadesPolicies = new ArrayList<PolicyPanel.PolicyItem>();
-        cadesPolicies.add(new PolicyPanel.PolicyItem(
-        		SimpleAfirmaMessages.getString("PreferencesPanel.25"), //$NON-NLS-1$
-        		POLICY_CADES_AGE_1_8));
         cadesPolicies.add(new PolicyItem(
         		SimpleAfirmaMessages.getString("PreferencesPanel.73"), //$NON-NLS-1$
         		POLICY_CADES_PADES_AGE_1_9));
@@ -590,7 +561,7 @@ final class PreferencesPanel extends JPanel implements KeyListener {
 				}
 			)
 		);
-		this.signarureAlgorithms.setSelectedItem(PreferencesPanel.PREFERENCES.get(PREFERENCE_SIGNATURE_ALGORITHM, "SHA1withRSA")); //$NON-NLS-1$
+		this.signarureAlgorithms.setSelectedItem(PreferencesManager.get(PREFERENCE_SIGNATURE_ALGORITHM, "SHA1withRSA")); //$NON-NLS-1$
 		signatureAgorithmPanel.add(this.signarureAlgorithms);
 
 		panel.add(signatureAgorithmPanel, c);
@@ -718,7 +689,7 @@ final class PreferencesPanel extends JPanel implements KeyListener {
 			}
 		);
 		this.padesBasicFormat.setModel(padesFormatModel);
-		final String selectedValue = PreferencesPanel.PREFERENCES.get(
+		final String selectedValue = PreferencesManager.get(
 			PREFERENCE_PADES_FORMAT,
 			AOSignConstants.PADES_SUBFILTER_BASIC
 		);
@@ -829,15 +800,15 @@ final class PreferencesPanel extends JPanel implements KeyListener {
 	 * @return Pol&iacute;tica de firma configurada. */
 	private static AdESPolicy getXadesPreferedPolicy() {
 
-		if (PREFERENCES.get(PREFERENCE_XADES_POLICY_IDENTIFIER, null) == null) {
+		if (PreferencesManager.get(PREFERENCE_XADES_POLICY_IDENTIFIER, null) == null) {
 			return null;
 		}
 		try {
 			return new AdESPolicy(
-				PREFERENCES.get(PREFERENCE_XADES_POLICY_IDENTIFIER, null),
-				PREFERENCES.get(PREFERENCE_XADES_POLICY_IDENTIFIER_HASH, null),
-				PREFERENCES.get(PREFERENCE_XADES_POLICY_IDENTIFIER_HASH_ALGORITHM, null),
-				PREFERENCES.get(PREFERENCE_XADES_POLICY_QUALIFIER, null)
+				PreferencesManager.get(PREFERENCE_XADES_POLICY_IDENTIFIER, null),
+				PreferencesManager.get(PREFERENCE_XADES_POLICY_IDENTIFIER_HASH, null),
+				PreferencesManager.get(PREFERENCE_XADES_POLICY_IDENTIFIER_HASH_ALGORITHM, null),
+				PreferencesManager.get(PREFERENCE_XADES_POLICY_QUALIFIER, null)
 				);
 		}
 		catch (final Exception e) {
@@ -852,15 +823,15 @@ final class PreferencesPanel extends JPanel implements KeyListener {
 	 */
 	private static AdESPolicy getPadesPreferedPolicy() {
 
-		if (PREFERENCES.get(PREFERENCE_PADES_POLICY_IDENTIFIER, null) == null) {
+		if (PreferencesManager.get(PREFERENCE_PADES_POLICY_IDENTIFIER, null) == null) {
 			return null;
 		}
 		try {
 			return new AdESPolicy(
-					PREFERENCES.get(PREFERENCE_PADES_POLICY_IDENTIFIER, null),
-					PREFERENCES.get(PREFERENCE_PADES_POLICY_IDENTIFIER_HASH, null),
-					PREFERENCES.get(PREFERENCE_PADES_POLICY_IDENTIFIER_HASH_ALGORITHM, null),
-					PREFERENCES.get(PREFERENCE_PADES_POLICY_QUALIFIER, null)
+					PreferencesManager.get(PREFERENCE_PADES_POLICY_IDENTIFIER, null),
+					PreferencesManager.get(PREFERENCE_PADES_POLICY_IDENTIFIER_HASH, null),
+					PreferencesManager.get(PREFERENCE_PADES_POLICY_IDENTIFIER_HASH_ALGORITHM, null),
+					PreferencesManager.get(PREFERENCE_PADES_POLICY_QUALIFIER, null)
 					);
 		}
 		catch (final Exception e) {
@@ -875,15 +846,15 @@ final class PreferencesPanel extends JPanel implements KeyListener {
 	 */
 	private static AdESPolicy getCadesPreferedPolicy() {
 
-		if (PREFERENCES.get(PREFERENCE_CADES_POLICY_IDENTIFIER, null) == null) {
+		if (PreferencesManager.get(PREFERENCE_CADES_POLICY_IDENTIFIER, null) == null) {
 			return null;
 		}
 		try {
 			return new AdESPolicy(
-					PREFERENCES.get(PREFERENCE_CADES_POLICY_IDENTIFIER, null),
-					PREFERENCES.get(PREFERENCE_CADES_POLICY_IDENTIFIER_HASH, null),
-					PREFERENCES.get(PREFERENCE_CADES_POLICY_IDENTIFIER_HASH_ALGORITHM, null),
-					PREFERENCES.get(PREFERENCE_CADES_POLICY_QUALIFIER, null)
+					PreferencesManager.get(PREFERENCE_CADES_POLICY_IDENTIFIER, null),
+					PreferencesManager.get(PREFERENCE_CADES_POLICY_IDENTIFIER_HASH, null),
+					PreferencesManager.get(PREFERENCE_CADES_POLICY_IDENTIFIER_HASH_ALGORITHM, null),
+					PreferencesManager.get(PREFERENCE_CADES_POLICY_QUALIFIER, null)
 					);
 		}
 		catch (final Exception e) {

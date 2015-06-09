@@ -19,10 +19,9 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
-import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.standalone.LookAndFeelManager;
 
-/** Pantalla principal de la aplicaci&oacute;n de Firma F&aacute;cil con AFirma.
+/** Pantalla principal de la aplicaci&oacute;n de AutoFirma.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public final class MainScreen extends JFrame {
 
@@ -57,19 +56,14 @@ public final class MainScreen extends JFrame {
         this.add(firstPanel, BorderLayout.CENTER);
 
         try {
-            setIconImage(Toolkit.getDefaultToolkit().getImage(this.getClass().getResource("/resources/afirma_ico.png")) //$NON-NLS-1$
+            setIconImage(
+        		Toolkit.getDefaultToolkit().getImage(this.getClass().getResource("/resources/afirma_ico.png")) //$NON-NLS-1$
             );
         }
         catch (final Exception e) {
             Logger.getLogger("es.gob.afirma").warning("No se ha podido cargar el icono de la aplicacion: " + e);  //$NON-NLS-1$//$NON-NLS-2$
         }
 
-        // Propiedades especificas para Mac OS X
-        if (Platform.OS.MACOSX.equals(Platform.getOS())) {
-            com.apple.eawt.Application.getApplication().setDockIconImage(
-        		Toolkit.getDefaultToolkit().getImage(this.getClass().getResource("/resources/logo_cliente_256.png")) //$NON-NLS-1$);
-    		);
-        }
         this.setVisible(true);
     }
 }

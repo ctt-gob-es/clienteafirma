@@ -90,8 +90,6 @@ public final class AOPDFSigner implements AOSigner {
      * <p>Se aceptan los siguientes algoritmos en el par&aacute;metro <code>algorithm</code>:</p>
      * <ul>
      *  <li><i>SHA1withRSA</i></li>
-     *  <li><i>MD5withRSA</i> (no recomendado por vulnerable)</li>
-     *  <li><i>MD2withRSA</i> (no recomendado por vulnerable)</li>
      *  <li><i>SHA256withRSA</i></li>
      *  <li><i>SHA384withRSA</i></li>
      *  <li><i>SHA512withRSA</i></li>
@@ -99,8 +97,9 @@ public final class AOPDFSigner implements AOSigner {
      * @param key Clave privada a usar para firmar
      * @param certChain Cadena de certificados del firmante
      * @param xParams Par&aacute;metros adicionales para la firma (<a href="doc-files/extraparams.html">detalle</a>)
-     * @return Documento PDF firmado en formato PAdES
-     * @throws AOException Cuando ocurre cualquier problema durante el proceso */
+     * @return Documento PDF firmado en formato PAdES.
+     * @throws AOException Cuando ocurre cualquier problema durante el proceso.
+     * @throws IOException Cuando hay errores en el tratamiento de datos. */
     @Override
 	public byte[] sign(final byte[] inPDF,
 			           final String algorithm,
@@ -195,8 +194,6 @@ public final class AOPDFSigner implements AOSigner {
      * <p>Se aceptan los siguientes algoritmos en el par&aacute;metro <code>algorithm</code>:</p>
      * <ul>
      *  <li><i>SHA1withRSA</i></li>
-     *  <li><i>MD5withRSA</i> (no recomendado por vulnerable)</li>
-     *  <li><i>MD2withRSA</i> (no recomendado por vulnerable)</li>
      *  <li><i>SHA256withRSA</i></li>
      *  <li><i>SHA384withRSA</i></li>
      *  <li><i>SHA512withRSA</i></li>
@@ -244,8 +241,6 @@ public final class AOPDFSigner implements AOSigner {
      * <p>Se aceptan los siguientes algoritmos en el par&aacute;metro <code>algorithm</code>:</p>
      * <ul>
      *  <li><i>SHA1withRSA</i></li>
-     *  <li><i>MD5withRSA</i> (no recomendado por vulnerable)</li>
-     *  <li><i>MD2withRSA</i> (no recomendado por vulnerable)</li>
      *  <li><i>SHA256withRSA</i></li>
      *  <li><i>SHA384withRSA</i></li>
      *  <li><i>SHA512withRSA</i></li>

@@ -26,11 +26,33 @@ import es.gob.afirma.core.misc.Platform;
 
 final class AOSecMod {
 
+	private static final int FIRST_ASCII_PRINTABLE_CODE = 32;
+	private static final int LAST_ASCII_PRINTABLE_CODE = 126;
+
     /** Listado de m&oacute;dulos almacenados en el fichero "Secmod.db". */
     private static List<ModuleName> modules = null;
 
     private AOSecMod() {
         // No permitimos la instanciacion
+    }
+
+    /** Limpia una cadena de texto eliminando los caracteres ASCII no imprimibles que pudiese
+     * tener al comienzo.
+     * @param commonName Cadena de texto de entrada.
+     * @return Texto con los caracteres ASCII no imprimibles que pudiese
+     * tener al comienzo eliminados. */
+    private static String cleanModuleName(final String commonName) {
+    	if (commonName == null) {
+    		return ""; //$NON-NLS-1$
+    	}
+    	final char[] chars = commonName.toCharArray();
+    	int nameOffset = 0;
+    	for (int i=0; i<chars.length; i++) {
+    		if (chars[i] < FIRST_ASCII_PRINTABLE_CODE || chars[i] > LAST_ASCII_PRINTABLE_CODE) {
+    			nameOffset = i + 1;
+    		}
+    	}
+    	return commonName.substring(nameOffset);
     }
 
     /** Obtiene un m&oacute;dulo de seguridad (PKCS#11) de la base de datos de Mozilla.
@@ -55,7 +77,9 @@ final class AOSecMod {
         int namesRunningOffset = namesOffset;
 
         int len = getShort(secmoddb, namesRunningOffset + 0);
-        final String commonName = new String(secmoddb, namesRunningOffset + 2, len);
+        final String commonName = cleanModuleName(
+    		new String(secmoddb, namesRunningOffset + 2, len)
+		);
 
         namesRunningOffset += len + 2;
 

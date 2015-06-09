@@ -29,14 +29,14 @@ public class IconLabel extends JLabel {
     }
 
     /** Asigna el icono.
-     * @param icon */
+     * @param icon Icono. */
     @Override
     public void setIcon(final Icon icon) {
         this.icon = icon;
     }
 
     /** Asignar el icono original.
-     * @param originalIcon */
+     * @param originalIcon Icono original. */
     public void setOriginalIcon(final Icon originalIcon) {
         this.originalIcon = originalIcon;
     }

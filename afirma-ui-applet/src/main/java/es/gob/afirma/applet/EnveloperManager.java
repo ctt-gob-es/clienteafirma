@@ -41,6 +41,7 @@ import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.envelopers.cms.AOCMSEnveloper;
+import es.gob.afirma.envelopers.cms.CMSHelper;
 
 /** Manejador para el ensobrado de datos por parte del Applet Cliente @firma.
  * Esta clase almacena toda la informaci&oacute;n relevante para las operaciones
@@ -407,9 +408,9 @@ final class EnveloperManager {
         // Comprobamos si requiere un certificado para la extraccion de los
         // datos
     	PrivateKeyEntry pke = null;
-        if (AOCMSEnveloper.isCMSValid(envelop, AOSignConstants.CMS_CONTENTTYPE_ENVELOPEDDATA) || AOCMSEnveloper.isCMSValid(envelop,
-                                                                                                             AOSignConstants.CMS_CONTENTTYPE_SIGNEDANDENVELOPEDDATA)
-            || AOCMSEnveloper.isCMSValid(envelop, AOSignConstants.CMS_CONTENTTYPE_AUTHENVELOPEDDATA)) {
+    	if (CMSHelper.isCMSValid(envelop, AOSignConstants.CMS_CONTENTTYPE_ENVELOPEDDATA)
+    			|| CMSHelper.isCMSValid(envelop, AOSignConstants.CMS_CONTENTTYPE_SIGNEDANDENVELOPEDDATA)
+    			|| CMSHelper.isCMSValid(envelop, AOSignConstants.CMS_CONTENTTYPE_AUTHENVELOPEDDATA)) {
             if (!this.ksConfigManager.isSelectedCertificate()) {
                 try {
                     this.ksConfigManager.selectCertificate();
@@ -420,7 +421,7 @@ final class EnveloperManager {
             }
             pke = this.ksConfigManager.getCertificateKeyEntry();
         }
-        else if (AOCMSEnveloper.isCMSValid(envelop, AOSignConstants.CMS_CONTENTTYPE_ENCRYPTEDDATA)) {
+        else if (CMSHelper.isCMSValid(envelop, AOSignConstants.CMS_CONTENTTYPE_ENCRYPTEDDATA)) {
             if (this.cipherManager.getCipherAlgorithm().supportsKey()) {
                 this.enveloper.setCipherKey(Base64.encode(this.cipherManager.getCipherKey()));
             }

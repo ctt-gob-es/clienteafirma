@@ -95,9 +95,8 @@ public final class CAdESValidator {
      *                     de tipo CAdES, si se establece a <code>false</code> no se comprueba, por lo que se aceptan
      *                     <code>SignedData</code> de CMS y PKCS#7.
      * @return <code>true</code> si los datos proporcionados se corresponden con una estructura de tipo <i>SignedData</i>,
-     * <code>false</code> en caso contrario.
-     * @throws IOException Si ocurren problemas leyendo los datos */
-    public static boolean isCAdESSignedData(final byte[] data, final boolean enforceCAdES) throws IOException {
+     * <code>false</code> en caso contrario. */
+    public static boolean isCAdESSignedData(final byte[] data, final boolean enforceCAdES) {
         try {
         	final ASN1InputStream is = new ASN1InputStream(data);
             // LEEMOS EL FICHERO QUE NOS INTRODUCEN

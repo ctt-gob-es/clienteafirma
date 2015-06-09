@@ -14,7 +14,7 @@ import java.util.logging.Logger;
 
 
 /** Utilidades para la firma CMS. */
-final class CMSHelper {
+public final class CMSHelper {
 
     private CMSHelper() {
         // No permitimos la instanciacion
@@ -36,7 +36,7 @@ final class CMSHelper {
      * @param data
      *        Fichero (como array de octetos) que deseamos comprobar.
      * @return La validez del archivo cumpliendo la estructura. */
-    static boolean isCMSValid(final byte[] data) {
+    public static boolean isCMSValid(final byte[] data) {
         // si se lee en el CMSDATA, el inputstream ya esta leido y en los demas
         // siempre sera nulo
         if (data == null) {
@@ -94,7 +94,7 @@ final class CMSHelper {
      *        Tipo de dato que queremos.
      * @return Indica si el fichero es una envoltura CMS con el tipo de
      *         contenido indicado. */
-    static boolean isCMSValid(final byte[] data, final String type) {
+    public static boolean isCMSValid(final byte[] data, final String type) {
         if (type.equals(AOCMSEnveloper.CMS_CONTENTTYPE_DATA)) {
 			return ValidateCMS.isCMSData(data);
         }

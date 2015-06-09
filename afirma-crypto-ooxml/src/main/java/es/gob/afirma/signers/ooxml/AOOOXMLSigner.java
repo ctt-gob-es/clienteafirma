@@ -192,7 +192,12 @@ public final class AOOOXMLSigner implements AOSigner {
             LOGGER.warning("Se ha introducido una firma nula para su comprobacion"); //$NON-NLS-1$
             return false;
         }
-        return isOOXMLFile(sign) && OOXMLUtil.countOOXMLSignatures(sign) > 0;
+        try {
+        	return isOOXMLFile(sign) && OOXMLUtil.countOOXMLSignatures(sign) > 0;
+        }
+        catch(final Exception e) {
+        	return false;
+        }
     }
 
     /** Indica si los datos son un documento OOXML susceptible de ser firmado.

@@ -1,0 +1,23 @@
+PODS:
+  - CocoaLumberjack (1.9.2):
+    - CocoaLumberjack/Extensions (= 1.9.2)
+  - CocoaLumberjack/Core (1.9.2)
+  - CocoaLumberjack/Extensions (1.9.2):
+    - CocoaLumberjack/Core
+  - OpenSSL (1.0.200)
+  - SVProgressHUD (1.1.2)
+  - T21Log (2.0):
+    - CocoaLumberjack (= 1.9.2)
+
+DEPENDENCIES:
+  - OpenSSL (~> 1.0)
+  - SVProgressHUD
+  - T21Log (~> 2.0)
+
+SPEC CHECKSUMS:
+  CocoaLumberjack: 205769c032b5fef85b92472046bcc8b7e7c8a817
+  OpenSSL: 4c7be3eca71139f52984542d8c4c0752154d26c3
+  SVProgressHUD: da7a49e789af645d9279ffbca62318945a832438
+  T21Log: 4c60d7071b8b2951c01c6e0cdbcd9b8fdc021313
+
+COCOAPODS: 0.35.0

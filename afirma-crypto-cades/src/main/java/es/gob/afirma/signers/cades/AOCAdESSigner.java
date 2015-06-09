@@ -168,8 +168,8 @@ public final class AOCAdESSigner implements AOSigner {
 
 			cadesSignedData = GenCAdESEPESSignedData.generateSignedData(
 				   new P7ContentSignerParameters(
-			    		data,
-			    		algorithm
+					   precalculatedDigestAlgorithmName != null ? null : data,
+			    	   algorithm
 				   ),
                    omitContent,
                    AdESPolicy.buildAdESPolicy(extraParams),
@@ -413,10 +413,9 @@ public final class AOCAdESSigner implements AOSigner {
 
     /** Indica si un dato es una firma compatible con los m&eacute;todos de firma, cofirma y contrafirma de esta clase.
      * @param data Datos que deseamos comprobar.
-     * @return <code>true</code> si el dato es una firma reconocida por esta clase (&uacute;nicamente CAdES), <code>false</code> en caso contrario.
-     * @throws IOException Si ocurren problemas relacionados con la lectura de los datos */
+     * @return <code>true</code> si el dato es una firma reconocida por esta clase (&uacute;nicamente CAdES), <code>false</code> en caso contrario. */
     @Override
-	public boolean isSign(final byte[] data) throws IOException {
+	public boolean isSign(final byte[] data) {
         if (data == null) {
             LOGGER.warning("Se han introducido datos nulos para su comprobacion"); //$NON-NLS-1$
             return false;

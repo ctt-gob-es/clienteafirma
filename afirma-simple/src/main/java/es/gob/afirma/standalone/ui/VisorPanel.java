@@ -27,12 +27,13 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
+import es.gob.afirma.cert.signvalidation.SignValidity;
+import es.gob.afirma.cert.signvalidation.SignValidity.SIGN_DETAIL_TYPE;
+import es.gob.afirma.cert.signvalidation.SignValidity.VALIDITY_ERROR;
+import es.gob.afirma.cert.signvalidation.ValidateBinarySignature;
+import es.gob.afirma.cert.signvalidation.ValidatePdfSignature;
+import es.gob.afirma.cert.signvalidation.ValidateXMLSignature;
 import es.gob.afirma.core.misc.AOUtil;
-import es.gob.afirma.signature.SignValidity;
-import es.gob.afirma.signature.SignValidity.SIGN_DETAIL_TYPE;
-import es.gob.afirma.signature.SignValidity.VALIDITY_ERROR;
-import es.gob.afirma.signature.ValidateBinarySignature;
-import es.gob.afirma.signature.ValidateXMLSignature;
 import es.gob.afirma.standalone.DataAnalizerUtil;
 import es.gob.afirma.standalone.LookAndFeelManager;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
@@ -174,7 +175,10 @@ public final class VisorPanel extends JPanel implements KeyListener {
      * @throws IOException Si ocurren problemas relacionados con la lectura de la firma */
     private static SignValidity validateSign(final byte[] sign) throws IOException {
         if (DataAnalizerUtil.isSignedPDF(sign)) {
-            return new SignValidity(SIGN_DETAIL_TYPE.UNKNOWN, VALIDITY_ERROR.UNKOWN_VALIDITY_PDF);
+        	return ValidatePdfSignature.validate(sign);
+        }
+        else if (DataAnalizerUtil.isSignedFacturae(sign)) { // Factura electronica
+            return ValidateXMLSignature.validate(sign);
         }
         else if (DataAnalizerUtil.isSignedXML(sign)) {
             return ValidateXMLSignature.validate(sign);
@@ -182,7 +186,13 @@ public final class VisorPanel extends JPanel implements KeyListener {
         else if(DataAnalizerUtil.isSignedBinary(sign)) {
             return ValidateBinarySignature.validate(sign, null);
         }
-        return new SignValidity(SIGN_DETAIL_TYPE.KO, null);
+        else if(DataAnalizerUtil.isSignedODF(sign)) {
+        	return new SignValidity(SIGN_DETAIL_TYPE.UNKNOWN, VALIDITY_ERROR.ODF_UNKOWN_VALIDITY);
+        }
+        else if(DataAnalizerUtil.isSignedOOXML(sign)) {
+        	return new SignValidity(SIGN_DETAIL_TYPE.UNKNOWN, VALIDITY_ERROR.OOXML_UNKOWN_VALIDITY);
+        }
+        return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.UNKOWN_SIGNATURE_FORMAT);
     }
 
 	@Override

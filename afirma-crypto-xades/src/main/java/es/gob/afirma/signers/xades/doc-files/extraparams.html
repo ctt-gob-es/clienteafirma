@@ -123,8 +123,8 @@
       La huella digital debe indicarse en lugar de los datos, en el mismo par&aacute;metro del m&eacute;todo de firma.
      </li>
      <li>
-      Solo puede indicarse una huella cuando no se incluyan los datos dentro de la propia firma, es decir, en firmas
-      <i>externally detached</i>, siendo conveniente adem&aacute;s hacer uso de un <i>Manifest</i>.
+      <b>Solo puede indicarse una huella cuando no se incluyan los datos dentro de la propia firma, es decir, en firmas
+      <i>externally detached</i>, siendo conveniente adem&aacute;s hacer uso de un <i>Manifest</i>.</b>
      </li>
     </ul>
    </dd>
@@ -192,7 +192,6 @@
      <li><i>http://www.w3.org/2000/09/xmldsig#sha1</i> (SHA-1)</li>
      <li><i>http://www.w3.org/2001/04/xmlenc#sha256</i> (SHA-256, valor recomendado)</li>
      <li><i>http://www.w3.org/2001/04/xmlenc#sha512</i> (SHA-512)</li>
-     <li><i>http://www.w3.org/2001/04/xmlenc#ripemd160 (RIPEMD-160)</i></li>
     </ul>
    </dd>
   <dt><b><i>mimeType</i></b> (no aplica a contrafirmas)</dt>
@@ -238,11 +237,6 @@
     por ejemplo, para la dereferenciaci&oacute;n de hojas de estilo enlazadas con rutas relativas).
     &Uacute;til para los procesos desatendidos y por lotes.
    </dd>
-  <dt><b><i>applySystemDate</i></b></dt>
-   <dd>
-    Indica si se debe introducir en la firma el atributo <i>signingTime</i> con la fecha actual
-    del sistema. Por defecto, se encuentra a <code>true</code>.
-   </dd>
  </dl>
  <p>
   Respecto al uso de los par&aacute;metros <code>xmlTransform</code>n<code>Type</code>,
@@ -262,7 +256,7 @@
   &nbsp;&nbsp;&nbsp;&nbsp;<b><i>union</i></b>: Uni&oacute;n<br>
   &nbsp;&nbsp;-<b>Cuerpo</b>: Especificado mediante sentencias de tipo XPATH2.<br>
   <br>Transformaci&oacute;n <b>BASE64</b>. 
-  La transformación es inversa, es decir, los datos se descodifican desde Base64 antes de firmarse, 
+  La transformaciï¿½n es inversa, es decir, los datos se descodifican desde Base64 antes de firmarse, 
   por lo que estos deben estar previamente codificados en Base64 e indicarse mediante el par&aacute;metro
   adicional <code>encodign=base64</code><br>
   &nbsp;&nbsp;-<b>Tipo</b>: <code>http://www.w3.org/2000/09/xmldsig#base64</code><br>

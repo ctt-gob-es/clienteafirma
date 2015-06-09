@@ -24,7 +24,7 @@ public final class HelpResourceManager {
 
 	static void createWindowsHelpResources(final File helpFile) throws IOException {
 		extractResource(
-			"help/WinHelp/FirmaFacil.chm", //$NON-NLS-1$
+			"help/WinHelp/AutoFirmaV2.chm", //$NON-NLS-1$
 			helpFile
 		);
 	}

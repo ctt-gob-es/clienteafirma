@@ -371,7 +371,7 @@ public final class CabeceraAsistente extends JPanel {
     }
 
     /** Asigna la botonera.
-     * @param botonera */
+     * @param botonera Botonera a asignar. */
     public void setBotoneraSuperior(final BotoneraSuperior botonera) {
         this.botoneraSuperior = botonera;
     }

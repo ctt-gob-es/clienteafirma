@@ -65,7 +65,7 @@ public final class PdfTimestamper {
                 final PdfReader pdfReader = PdfUtil.getPdfReader(
             		inPDF,
             		extraParams,
-            		Boolean.getBoolean(extraParams.getProperty("headLess")) //$NON-NLS-1$
+            		Boolean.parseBoolean(extraParams.getProperty("headLess")) //$NON-NLS-1$
         		);
 
             	// Comprobamos el nivel de certificacion del PDF

@@ -1,10 +1,10 @@
 Manifest-Version: 1.0
 Name: es/gob/afirma
 Specification-Title: MiniApplet Afirma
-Specification-Version: v1.3 (Beta)
+Specification-Version: v1.3 (Beta 5)
 Specification-Vendor: Gobierno de Espana
 Implementation-Title: es.gob.afirma
-Implementation-Version: build01
+Implementation-Version: build05
 Implementation-Vendor: Gobierno de Espana
 Application-Name: MiniApplet @firma
 Permissions: all-permissions

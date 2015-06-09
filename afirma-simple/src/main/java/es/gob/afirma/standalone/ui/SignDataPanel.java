@@ -55,11 +55,11 @@ import es.gob.afirma.cert.certvalidation.CertificateVerifier;
 import es.gob.afirma.cert.certvalidation.CertificateVerifierFactory;
 import es.gob.afirma.cert.certvalidation.ValidationResult;
 import es.gob.afirma.core.misc.Platform;
+import es.gob.afirma.core.misc.Platform.OS;
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.AOSignerFactory;
 import es.gob.afirma.core.signers.AOSimpleSignInfo;
 import es.gob.afirma.core.ui.AOUIFactory;
-import es.gob.afirma.signers.pades.AOPDFSigner;
 import es.gob.afirma.standalone.DataAnalizerUtil;
 import es.gob.afirma.standalone.LookAndFeelManager;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
@@ -74,6 +74,9 @@ final class SignDataPanel extends JPanel {
     private static final String FILE_ICON_PDF = "/resources/icon_pdf.png";  //$NON-NLS-1$
     private static final String FILE_ICON_SIGN = "/resources/icon_sign.png"; //$NON-NLS-1$
     private static final String FILE_ICON_FACTURAE = "/resources/icon_facturae.png"; //$NON-NLS-1$
+    private static final String FILE_ICON_OOXML_WIN = "/resources/icon_office_win.png"; //$NON-NLS-1$
+    private static final String FILE_ICON_OOXML_MAC = "/resources/icon_office_mac.png"; //$NON-NLS-1$
+    private static final String FILE_ICON_ODF = "/resources/icon_openoffice.png"; //$NON-NLS-1$
 
     private final JLabel certDescText = new JLabel();
     private final JLabel filePathText = new JLabel();
@@ -123,7 +126,7 @@ final class SignDataPanel extends JPanel {
         filePathPanel.add(Box.createRigidArea(new Dimension(0, 40)));
         filePathPanel.add(Box.createRigidArea(new Dimension(5, 0)));
 
-        final boolean isPDF = new AOPDFSigner().isValidDataFile(sign);
+        boolean isOpennable = false;
 
         if (fileTypeIcon != null) {
             filePathPanel.add(fileTypeIcon);
@@ -132,12 +135,23 @@ final class SignDataPanel extends JPanel {
             final String fileIcon;
             final String fileTooltip;
             if (DataAnalizerUtil.isPDF(sign)) {
+            	isOpennable = true;
                 fileIcon = FILE_ICON_PDF;
                 fileTooltip = SimpleAfirmaMessages.getString("SignDataPanel.9"); //$NON-NLS-1$
             }
             else if (DataAnalizerUtil.isFacturae(sign)) {
                 fileIcon = FILE_ICON_FACTURAE;
                 fileTooltip = SimpleAfirmaMessages.getString("SignDataPanel.10"); //$NON-NLS-1$
+            }
+            else if (DataAnalizerUtil.isOOXML(sign)) {
+            	isOpennable = true;
+                fileIcon = Platform.getOS() == OS.MACOSX ? FILE_ICON_OOXML_MAC : FILE_ICON_OOXML_WIN;
+                fileTooltip = SimpleAfirmaMessages.getString("SignDataPanel.40"); //$NON-NLS-1$
+            }
+            else if (DataAnalizerUtil.isODF(sign)) {
+            	isOpennable = true;
+                fileIcon = FILE_ICON_ODF;
+                fileTooltip = SimpleAfirmaMessages.getString("SignPanel.41"); //$NON-NLS-1$
             }
             else {
                 fileIcon = FILE_ICON_SIGN;
@@ -151,7 +165,7 @@ final class SignDataPanel extends JPanel {
 
         // Boton de apertura del fichero firmado
         JButton openFileButton = null;
-        if (isPDF && signFile != null) {
+        if (isOpennable && signFile != null) {
             openFileButton = new JButton(SimpleAfirmaMessages.getString("SignDataPanel.3")); //$NON-NLS-1$
             openFileButton.setPreferredSize(new Dimension(150, 24));
             openFileButton.setMnemonic('v');

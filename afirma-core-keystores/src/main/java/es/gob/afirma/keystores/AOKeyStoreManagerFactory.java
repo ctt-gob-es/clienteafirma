@@ -23,8 +23,6 @@ import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.keystores.callbacks.NullPasswordCallback;
-import es.gob.afirma.keystores.java.JavaKeyStoreManager;
-import es.gob.afirma.keystores.pkcs12.Pkcs12KeyStoreManager;
 
 /** Obtiene clases de tipo AOKeyStoreManager seg&uacute;n se necesiten,
  * proporcionando adem&aacute;s ciertos m&eacute;todos de utilidad. Contiene
@@ -71,7 +69,17 @@ public final class AOKeyStoreManagerFactory {
                                                          final PasswordCallback pssCallback,
                                                          final Object parentComponent) throws AOKeystoreAlternativeException,
                                                                                               IOException {
-    	final boolean forceReset = Boolean.getBoolean(FORCE_STORE_RESET);
+    	boolean forceReset;
+    	// Se usa try-catch para capturar errores de permisos de lectura de variables
+    	try {
+    		forceReset = Boolean.getBoolean(FORCE_STORE_RESET);
+    	}
+    	catch(final Exception e) {
+    		forceReset = false;
+    		Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
+				"No se ha podido leer la variable '" + FORCE_STORE_RESET + "', se usara 'false' como valor por defecto: " + e //$NON-NLS-1$ //$NON-NLS-2$
+			);
+    	}
     	if (forceReset) {
     		Logger.getLogger("es.gob.afirma").info( //$NON-NLS-1$
 				"No se mantendran los almacenes de claves precargados (es.gob.afirma.keystores.ForceReset=true)" //$NON-NLS-1$
@@ -171,10 +179,10 @@ public final class AOKeyStoreManagerFactory {
             }
         }
 
-        InputStream is = null;
         try {
-            is = new FileInputStream(storeFilename);
+        	final InputStream is = new FileInputStream(storeFilename);
             ksm.init(null, is, pssCallback, null, forceReset);
+            is.close();
         }
         catch (final AOException e) {
             throw new AOKeystoreAlternativeException(
@@ -182,11 +190,6 @@ public final class AOKeyStoreManagerFactory {
                "No se ha podido abrir el almacen de tipo PKCS#12 para el fichero " + lib, //$NON-NLS-1$
                e
             );
-        }
-        finally {
-        	if (is != null) {
-                is.close();
-        	}
         }
         return ksm;
 	}
@@ -224,21 +227,17 @@ public final class AOKeyStoreManagerFactory {
     		}
     	}
 
-    	InputStream is = null;
     	try {
-    		is = new FileInputStream(storeFilename);
+    		final InputStream is = new FileInputStream(storeFilename);
     		ksm.init(null, is, pssCallback, null, forceReset);
+    		is.close();
     	}
     	catch (final AOException e) {
-    		throw new AOKeystoreAlternativeException(AOKeyStore.JAVA,
-    				"No se ha podido abrir el almacen de tipo JKS para el fichero " + lib, //$NON-NLS-1$
-    				e
-    				);
-    	}
-    	finally {
-    		if (is != null) {
-    			is.close();
-    		}
+    		throw new AOKeystoreAlternativeException(
+				AOKeyStore.JAVA,
+				"No se ha podido abrir el almacen de tipo JKS para el fichero " + lib, //$NON-NLS-1$
+				e
+			);
     	}
     	return ksm;
     }
@@ -304,10 +303,10 @@ public final class AOKeyStoreManagerFactory {
             }
         }
 
-        InputStream is = null;
         try {
-            is = new FileInputStream(storeFilename);
+        	final InputStream is = new FileInputStream(storeFilename);
             ksm.init(store, is, pssCallback, null, forceReset);
+            is.close();
         }
         catch (final AOException e) {
             throw new AOKeystoreAlternativeException(
@@ -315,11 +314,6 @@ public final class AOKeyStoreManagerFactory {
                "No se ha podido abrir el almacen de tipo " + store.getName(), //$NON-NLS-1$
                e
             );
-        }
-        finally {
-        	if (is != null) {
-        		is.close();
-        	}
         }
         return ksm;
     }

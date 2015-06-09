@@ -15,7 +15,6 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.File;
 import java.util.Locale;
-import java.util.prefs.Preferences;
 
 import javax.swing.JApplet;
 import javax.swing.JFrame;
@@ -34,9 +33,6 @@ public class VisorFirma extends JApplet implements WindowListener {
 
     /** Serial ID */
     private static final long serialVersionUID = 7060676034863587322L;
-
-    /** Preferencias generales establecidas para el aplicativo. */
-    private Preferences preferences;
 
     private JFrame window;
     private Container container = null;
@@ -65,8 +61,7 @@ public class VisorFirma extends JApplet implements WindowListener {
         }
 
         // Cargamos las preferencias establecidas
-        this.preferences = Preferences.userNodeForPackage(SimpleAfirma.class);
-        setDefaultLocale(buildLocale(this.preferences.get(SimpleAfirma.PREFERENCES_LOCALE, Locale.getDefault().toString())));
+        setDefaultLocale(buildLocale(PreferencesManager.get(SimpleAfirma.PREFERENCES_LOCALE, Locale.getDefault().toString())));
 
         if (asApplet) {
             this.container = this;
@@ -115,10 +110,10 @@ public class VisorFirma extends JApplet implements WindowListener {
     /** Establece el idioma de la aplicaci&oacute;n.
      * @param l
      *        Locale a establecer */
-    public void setDefaultLocale(final Locale l) {
+    public static void setDefaultLocale(final Locale l) {
         if (l != null) {
             Locale.setDefault(l);
-            setPreference(SimpleAfirma.PREFERENCES_LOCALE, l.toString());
+            PreferencesManager.put(SimpleAfirma.PREFERENCES_LOCALE, l.toString());
             SimpleAfirmaMessages.changeLocale();
         }
     }
@@ -132,16 +127,6 @@ public class VisorFirma extends JApplet implements WindowListener {
 //    public String getPreference(final String key, final String defaultValue) {
 //        return this.preferences.get(key, defaultValue);
 //    }
-
-    /** Establece una preferencia para la aplicaci&oacute;n.
-     * @param key
-     *        Clave de la preferencia.
-     * @param value
-     *        Valor asignado. */
-    private void setPreference(final String key, final String value) {
-        this.preferences.put(key, value);
-    }
-
 
     @Override
     public void windowClosing(final WindowEvent e) {

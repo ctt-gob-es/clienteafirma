@@ -10,6 +10,7 @@ import java.util.Properties;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
+import javax.xml.crypto.dsig.DigestMethod;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
@@ -17,13 +18,17 @@ import javax.xml.xpath.XPathFactory;
 import net.java.xades.security.xml.XAdES.CommitmentTypeIdImpl;
 import net.java.xades.security.xml.XAdES.CommitmentTypeIndication;
 import net.java.xades.security.xml.XAdES.CommitmentTypeIndicationImpl;
+import net.java.xades.security.xml.XAdES.SignaturePolicyIdentifier;
+import net.java.xades.security.xml.XAdES.SignaturePolicyIdentifierImpl;
 import net.java.xades.security.xml.XAdES.SignerRole;
 import net.java.xades.security.xml.XAdES.SignerRoleImpl;
 
+import org.ietf.jgss.Oid;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.signers.AOSignConstants;
 
 final class XAdESUtil {
 
@@ -74,7 +79,7 @@ final class XAdESUtil {
 		}
 		return (Element) nodeList.item(0);
 	}
-	
+
 	static SignerRole parseSignerRole(final Properties extraParams) {
 		if (extraParams == null) {
 			return null;
@@ -84,7 +89,7 @@ final class XAdESUtil {
 			final String claimedRole = extraParams.getProperty("signerClaimedRoles"); //$NON-NLS-1$
 			signerRole = new SignerRoleImpl();
 			if (claimedRole != null) {
-				String[] roles = claimedRole.split(Pattern.quote("|")); //$NON-NLS-1$
+				final String[] roles = claimedRole.split(Pattern.quote("|")); //$NON-NLS-1$
 				for (final String role : roles) {
 					signerRole.addClaimedRole(role);
 				}
@@ -193,5 +198,73 @@ final class XAdESUtil {
 		}
 		return ret;
 	}
+
+	static SignaturePolicyIdentifier getPolicy(final String id,
+			                                   final String identifierHash,
+			                                   final String identifierHashAlgorithm,
+			                                   final String description,
+			                                   final String qualifier) {
+		if (id == null) {
+			return null;
+		}
+
+		String identifier;
+		try {
+			new Oid(id);
+			LOGGER.warning(
+				"Se proporciono directamente un OID como identificador de politica (" + id + "), se tranformara en URN con el prefijo 'urn:oid:'" //$NON-NLS-1$ //$NON-NLS-2$
+			);
+			identifier = "urn:oid:" + id; //$NON-NLS-1$
+		}
+		catch (final Exception e1) {
+			identifier = id;
+		}
+
+		String hashAlgo = null;
+		if (identifierHashAlgorithm != null) {
+			String normalDigAlgo = null;
+			try {
+				normalDigAlgo = AOSignConstants
+						.getDigestAlgorithmName(identifierHashAlgorithm);
+			}
+			catch (final Exception e) {
+				LOGGER.warning("El algoritmo de huella digital para el identificador de politica de firma no es valido, se intentara dereferenciar la politica y se aplicara SHA1: " + e); //$NON-NLS-1$
+			}
+			if ("SHA1".equals(normalDigAlgo)) { //$NON-NLS-1$
+				hashAlgo = DigestMethod.SHA1;
+			}
+			else if ("SHA-256".equals(normalDigAlgo)) { //$NON-NLS-1$
+				hashAlgo = DigestMethod.SHA256;
+			}
+			else if ("SHA-512".equals(normalDigAlgo)) { //$NON-NLS-1$
+				hashAlgo = DigestMethod.SHA512;
+			}
+			else if ("RIPEMD160".equals(normalDigAlgo)) { //$NON-NLS-1$
+				hashAlgo = DigestMethod.RIPEMD160;
+			}
+		}
+		final SignaturePolicyIdentifier spi = new SignaturePolicyIdentifierImpl(
+				false);
+		try {
+			spi.setIdentifier(identifier, hashAlgo != null ? identifierHash
+					: null, hashAlgo);
+		}
+		catch (final Exception e) {
+			LOGGER.warning(
+				"No se ha podido acceder al identificador ('" + identifier + "') de la politica de firma, no se anadira este campo: " + e //$NON-NLS-1$ //$NON-NLS-2$
+			);
+			return null;
+		}
+		// FIXME: Error en JXAdES. Si la descripcion es nula toda la firma
+		// falla.
+		final String desc = description != null ? description : ""; //$NON-NLS-1$
+		spi.setDescription(desc);
+
+		if (qualifier != null) {
+			spi.setQualifier(qualifier);
+		}
+		return spi;
+	}
+
 
 }

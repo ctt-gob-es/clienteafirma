@@ -149,6 +149,12 @@
 			<artifactId>afirma-core-massive</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		
+		<dependency>
+			<groupId>es.gob.afirma</groupId>
+			<artifactId>afirma-crypto-validation</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 
 		<dependency>
 			<groupId>javax.help</groupId>

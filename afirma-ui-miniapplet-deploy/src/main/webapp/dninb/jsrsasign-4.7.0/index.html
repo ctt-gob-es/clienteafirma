@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8' />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <meta name="description" content="opensource free pure JavaScript cryptographic library supports RSA/RSAPSS/ECDSA/DSA signing/validation, ASN.1, PKCS#1/5/8 private/public key, X.509 certificate, CRL, CMS SignedData, TimeStamp and CAdES" />
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>jsrsasign - RSA Signing and Verification in JavaScript</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/kjur/jsrsasign">Fork Me on GitHub</a>
+
+          <h1 id="project_title">jsrsasign</h1>
+          <h2 id="project_tagline">opensource free pure JavaScript cryptographic library supports RSA/RSAPSS/ECDSA/DSA signing/validation, ASN.1, PKCS#1/5/8 private/public key, X.509 certificate, CRL, CMS SignedData, TimeStamp and CAdES</h2>
+
+          <section id="downloads">
+            <a class="zip_download_link" href="https://github.com/kjur/jsrsasign/zipball/master">Download this project as a .zip file</a>
+            <a class="tar_download_link" href="https://github.com/kjur/jsrsasign/tarball/master">Download this project as a tar.gz file</a>
+          </section>
+          <a href="http://kjur.github.io/jsrsasign/">TOP</a> | 
+          <a href="https://github.com/kjur/jsrsasign/tags/" target="_blank">DOWNLOADS</a> | 
+          <a href="https://github.com/kjur/jsrsasign/wiki#programming-tutorial">TUTORIALS</a> | 
+          <a href="http://kjur.github.io/jsrsasign/api/" target="_blank">API REFERENCE</a> | 
+          <a href="http://kjur.github.io/jsrsasign/index.html#demo" target="_blank">DEMOS</a> | 
+          <a href="https://npmjs.org/package/jsrsasign" target="_blank">NPM</a> | 
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+
+<!-- now editing -->
+<h3>FEATURES</h3>
+The 'jsrsasign' library provides following features in pure JavaScript.
+<ul>
+<li><a href="api/symbols/KJUR.crypto.Signature.html">Signature</a> - RSA/RSAPSS/ECDSA/DSA digital signtature class wrapper of Java JCE style</li>
+<li><a href="api/symbols/KJUR.crypto.MessageDigest.html">MessageDigest</a> - cryptographic hash calculation class wrapper of Java JCE style</li>
+<li><a href="api/symbols/KJUR.crypto.Mac.html">MAC</a> - message authentication code hash calculation class wrapper of Java JCE style</li>
+<li><a href="api/symbols/KJUR.asn1.html">ASN.1 encoder/generator</a></li>
+<li><a href="api/symbols/KJUR.asn1.x509.html">ASN.1 structure for X.509 ceritificate, CRL and CSR(PKCS#10) generation</a></li>
+<li><a href="api/symbols/KJUR.asn1.cms.html">ASN.1 structure for CMS SignedData generation</a></li>
+<li><a href="api/symbols/KJUR.asn1.tsp.html">ASN.1 structure for RFC 3161 TimeStamp generation</a></li>
+<li><a href="api/symbols/KJUR.asn1.cades.html">ASN.1 structure for RFC 5126 CAdES Long Term Signature generation</a></li>
+<li><a href="api/symbols/ASN1HEX.html">simple ASN.1 data parser</a></li>
+<li><a href="api/symbols/X509.html">simple X.509 certificate parser/reader</a></li>
+<li><a href="api/symbols/KEYUTIL.html">KEYUTIL</a> - loading RSA/EC/DSA private/public key from PEM formatted PKCS#1/5/8 and X.509 certificate</li>
+<li>Supported formats and algorithms are listed <a href="index_alg.html">here</a>.</li>
+</ul>
+
+<h3>NEWS</h3>
+<dl>
+<dt><b>2014-Jun-08</b>: 
+<dd><a href="https://github.com/kjur/jsrsasign/archive/4.7.0.tar.gz">Release 4.7.0</a> is now available.
+<ul>
+<li>RFC 5126 CAdES Long Term Signature support</li>
+<li>Demo for CAdES BES/EPES/T is <a href="tool_cades.html">here</a>.
+</ul>
+
+<dt><b>2014-May-26</b>: 
+<dd><a href="https://github.com/kjur/jsrsasign/archive/4.6.0.tar.gz">Release 4.6.0</a> is now available.
+<ul>
+<li>RFC 3161 Time Stamp support</li>
+<li>Demo for time stamp <a href="tool_tsreq.html">request</a>
+and <a href="tool_tsres.html">response</a> are available.</li>
+</ul>
+
+<dt><b>2014-May-18</b>: 
+<dd>Release 4.5.0 is now available.
+<ul>
+<li>RFC 5652 CMS SignedData generation</li>
+<li>simple CMS SignedData generator <a href="tool_cmssign.html">tool</a></li>
+</ul>
+
+<dd>
+<dt><b>2014-Apr-19</b>: 
+<dd>Release 4.2.2 is now available.
+<ul>
+<li>PKCS#10 CSR(certificate signing request) support in keyutil.js</li>
+<li>AuthorityKeyIdentifier v3 extension support in asn1x509.js</li>
+<li>Fake certificate converter <a href="tool_forfact.html">tool</a> from CSR for <a href="https://factorable.net/keycheck.html">factorable.net key check</a></li>
+</ul>
+
+<dt><b>2013-Oct-12</b>: 
+<dd>Release 4.2.1 is now available.
+<ul>
+<li>Add generic PEM private/public key exporting method <a href="http://kjur.github.io/jsrsasign/api/symbols/KEYUTIL#.getPEM">KEYUTIL.getPEM</a> and it provides support to export to PEM PKCS#8 encrypted private key.</li>
+</ul>
+
+<dt><b>2013-Oct-07</b>: 
+<dd>Node.js <a href="https://npmjs.org/package/jsrsasign" target="_blank">npm module of jsrsasign</a> is now registered in the repository. It also includes <a href="http://kjur.github.io/jsjws/">'jsjws'</a>.
+
+<dt><b>2013-Oct-06</b>: 
+<dd>Release 4.2.0 is now available.
+<ul>
+<li>DSA/ECDSA algorithms is now supported most of class and methods like Signature, KEYUTIL, KJUR.asn1.x509 DSA</li>
+<li><a href="http://kjur.github.io/jsrsasign/api/symbols/KJUR.asn1.x509.X509Util.html#.newCertPEM">KJUR.asn1.x509.X509Util.newCertPEM</a> method to provide easy issuance of a certificate by JSON data.</li>
+</ul>
+
+</dl>
+Old news is <a href="index_oldnews.html">here</a>.
+
+<h3><a name="demo">ONLINE TOOL & DEMO</a></h3>
+<ul>
+<li><a href="tool_ca.html" target="_blank">JavaScript Certification Authority</a></li>
+<li><a href="tool_pkcs5view.html" target="_blank">Encrypted PKCS#5 Private Key Viewer</a></li>
+<li><a href="tool_certview.html" target="_blank">Online Certificate Viewer</a></li>
+<li><a href="tool_forfact.html" target="_blank">Fake certificate converter from CSR for factorable.net checking</a></li>
+<li><a href="tool_cmssign.html" target="_blank">Simple CMS SignedData generator</a></li>
+</ul>
+
+<ul>
+<li><a href="sample-ecdsa.html">Sample Application for ECDSA signing with JavaScript(NEW!!!)</a>
+<li><a href="sample-rsasign.html">Sample Application for RSA signing with JavaScript</a>
+<br clear="all"/>
+<img src="sample-rsasign.png" width="480px" style="border: 2px #dddddd solid;"/>
+<br clear="all"/>
+</li>
+</ul>
+
+<h3>DOWNLOAD</h3>
+
+<ul>
+<li>Use git to clonse the official jsrsasign repository
+<blockquote>git clone git://github.com/kjur/jsrsasign.git</blockquote>
+</li>
+<li>Alternatively, you can download a zip file for the
+<a href="https://github.com/kjur/jsrsasign/archive/master.zip">latest development version</a> 
+or a <a href="https://github.com/kjur/jsrsasign/tags/">previous releases</a>.
+</li>
+</ul>
+<a href="http://github.com/kjur/jsrsasign/blob/master/ChangeLog.txt">See 'ChangeLog.txt' in detail.</a>
+
+<h3>SOURCE CODES</h3>
+<p>
+The 'jsrsasign' library contains following source codes. 
+<ul>
+<li><b><a href="asn1-1.0.js">asn1.js</a></b> - ASN.1 DER primitive encoder class.
+<a href="asn1-1.0.min.js">(mini)</a>
+</li>
+<li><b><a href="asn1x509-1.0.js">asn1x509.js</a></b> - ASN.1 structured for X.509 certificate.
+<a href="asn1x509-1.0.min.js">(mini)</a>
+</li>
+<li><b><a href="crypto-1.1.js">crypto.js</a></b> - MessageDigest and Signature class like Java JCE.
+<a href="crypto-1.1.min.js">(mini)</a>
+</li>
+<li><b><a href="pkcs5pkey-1.0.js">pkcs5pkey.js</a></b> - encrypted PKCS#5 private key reader.
+<a href="pkcs5pkey-1.0.min.js">(mini)</a>
+</li>
+<li><b><a href="rsasign-1.2.js">rsasign.js</a></b> - RSAKey class extension for RSA signing and verification.
+<a href="rsasign-1.2.min.js">(mini)</a>
+</li>
+<li><b><a href="x509-1.1.js">x509.js</a></b> - X509 class to read subject public key from a PEM formatted X.509 certificate.
+<a href="x509-1.1.min.js">(mini)</a>
+</li>
+<li><b><a href="rsapem-1.1.js">rsapem.js</a></b> - RSAKey class extension to read PKCS#1 RSA private key PEM file
+<a href="rsapem-1.1.min.js">(mini)</a>
+</li>
+<li><b><a href="asn1hex-1.1.js">asn1hex.js</a></b> - simple ASN.1 parser to read hexadecimal encoded ASN.1 DER
+<a href="asn1hex-1.1.min.js">(mini)</a>
+</li>
+
+
+<li><b><a href="ecdsa-modified-1.0.js">ecdsa-modified.js</a></b> - modified version of BitcoinJS ECDSA codes
+<a href="ecdsa-modified-1.0.min.js">(mini)</a>
+</li>
+
+<li><b><a href="ecparam-1.0.js">ecparam.js</a></b> - ECC parameters
+<a href="ecparam-1.0.min.js">(mini)</a>
+</li>
+
+
+</ul>
+As for github repository, see <a href="https://github.com/kjur/jsrsasign">https://github.com/kjur/jsrsasign</a>.
+</p>
+
+<h3><a href="api/">API DOCUMENT</a></h3>
+The 'jsrsasign'(RSA-Sign JavaScript Library) JavaScript API
+document is available <a href="api/">here</a>.
+
+<h3><a href="license/">LICENSE</a></h3>
+The 'jsrsasign'(RSA-Sign JavaScript Library) is licensed under the terms of 
+the MIT license reproduced which is simple and easy to understand and places 
+almost no restrictions. 
+<ul>
+<li><a href="http://github.com/kjur/jsrsasign/blob/master/LICENSE.txt">LICENSE.txt - RSA-Sign JavaScript Library LICENSE</a></li>
+</ul>
+
+<h3>PROGRAMMING TUTORIALS</h3>
+<ul>
+<li><a href="https://github.com/kjur/jsrsasign/wiki/Tutorial-for-MessageDigest-class" target="_blank">MessageDigest class tutorial</a></li>
+<li><a href="https://github.com/kjur/jsrsasign/wiki/Tutorial-for-Signature-class" target="_blank">Signature class tutorial</a></li>
+<li><a href="https://github.com/kjur/jsrsasign/wiki/Tutorial-for-ASN1-DER-Primitive-Encoder" target="_blank">ASN1 DER Primitive Encoder tutorial</a></li>
+<li><a href="https://github.com/kjur/jsrsasign/wiki/Tutorial-for-ASN.1-structure-classes-of-X.509-certificate" target="_blank">ASN.1 structure classes for X.509 certificate tutorial</a></li>
+<li><a href="https://github.com/kjur/jsrsasign/wiki/Tutorial-for-reading-PKCS%235-RSA-private-key-with-password" target="_blank">Reading PKCS#5 RSA private key with password tutorial</a></li>
+<li><a href="https://github.com/kjur/jsrsasign/wiki/Tutorial-to-sign-and-verify-with-RSAKey-extension" target="_blank">Signing and verifying with RSAKey extension (*DEPRECATED*)</a></li>
+<li><a href="https://github.com/kjur/jsrsasign/wiki#programming-tutorial" target="_blank">List of programming tutorials</a></li>
+</ul>
+
+You can see the list of QUnit unit tests <a href="index_ut.html">here</a> 
+and I hope they help you understand 'jsrsasign' library.
+
+<h3>MY RELATED PROJECT</h3>
+<ul>
+<li><a href="http://kjur.github.com/jsjws/">jsjws - JSON Web Signature(JWS) JavaScript Library</a>
+</ul>
+
+<!-- **************************************************************************** -->
+<a name="projects"></a>
+<h3>PROJECTS THAT USE JSRSASIGN</h3>
+<dl>
+
+<dt>
+<a href="https://github.com/mozilla/jwcrypto" target="_blank">jwcrypto</a>
+<dd>
+JavaScript implementation of JWS, JWT and JWC. The jycrypto is also used by
+<a href="https://github.com/mozilla/browserid">Mozilla BrowserID/Persona</a>.
+<a href="https://github.com/mozilla/jwcrypto/tree/master/libs/external">(used here)</a>
+
+<dt>
+<a href="https://github.com/michaelrhanson/jwt-js" target="_blank">jwt-js</a>
+<dd>
+ JSON Web Tokens implemented in pure JavaScript. 
+<a href="https://github.com/michaelrhanson/jwt-js/tree/master/lib/kurushima-jsrsa">(used here)</a>
+
+<dt>
+<a href="https://npmjs.org/package/node-bignumber" target="_blank">npm node-bignumber</a>
+<dd>
+A pure javascript implementation of BigIntegers and RSA crypto for Node.js
+<a href="https://github.com/JoeDoyle23/node-bignumber/blob/master/lib/rsa/rsa.js">(used here)</a>
+
+<dt>
+<a href="https://npmjs.org/package/bignumber-jt" target="_blank">npm bignumber-jt</a>
+<dd>
+A pure javascript implementation of BigIntegers and RSA crypto.
+<a href="https://github.com/Rcomian/node-bignumber/blob/master/lib/rsa/sign.js">(used here)</a>
+
+<dt>
+<a href="http://netlogic.cs.memphis.edu/script/ndn-js/">NDN.JS</a>
+<dd>
+a JavaScript client library for Named Data Networking of Univ. of Memphis.
+<a href="http://netlogic.cs.memphis.edu/script/ndn-js/js/securityLib/">(used here)</a>
+
+<dt>
+<a href="http://wwwtyro.github.io/cryptico/">cryptio</a>
+<dd>
+An easy-to-use encryption system utilizing RSA and AES for javascript.
+<a href="https://github.com/wwwtyro/cryptico/blob/master/rsa.js">(used here)</a>
+
+<dt>
+<a href="https://code.google.com/p/jspackcrx/" target="_blank">jspackcrx</a>
+<dd>
+Package Chrome extension files using pure JavaScript.
+<a href="https://code.google.com/p/jspackcrx/source/browse/#svn%2Ftrunk%2Flibs%253Fstate%253Dclosed">(used here)</a>
+
+<dt>
+<a href="https://github.com/duerig/xml-signer">xml-signer</a>
+<dd>
+xmldsig signatures in a browser
+<a href="https://github.com/duerig/xml-signer/tree/master/lib/jsrsasign">(used here)</a>
+
+</dl>
+
+<!-- **************************************************************************** -->
+<h3>DEPENDENCY</h3>
+<p>
+<ul>
+<li><a href="http://www-cs-students.stanford.edu/~tjw/jsbn/" target="_blank">Tom Wu's jsbn library</a> - BigInteger, RSA and ECC</li>
+<li><a href="https://github.com/bitcoinjs/bitcoinjs-lib/" target="_blank">BitcoinJS library</a> - ECDSA signature algorithm</li>
+<li><a href="https://code.google.com/p/crypto-js/">CryptoJS</a> - symmetric key encryption algorithms, message digest, message authentication codes and PBKDF</li>
+<li><a href="http://openpgpjs.org/">OpenPGP.js</a> - DSA signature algorithm</a>
+<li><a href="http://yuilibrary.com/">Yahoo YUI library</a> - for class inheritance</a>
+</ul>
+</p>
+
+<p></p>
+
+<!-- now editing -->
+
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">jsrsasign maintained by <a href="https://github.com/kjur">kjur</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+<div align="center" style="color: white">
+Copyright &copy; 2010-2014 Kenji Urushima. All rights reserved.
+</div>
+      </footer>
+    </div>
+
+  </body>
+</html>

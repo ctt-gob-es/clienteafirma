@@ -47,7 +47,6 @@ public final class TestGetSignersStructure {
 	/** Prueba de extraccion de firmantes.
 	 * @throws IOException Cuando ocurre un error al leer el fichero de pruebas.
 	 * @throws Exception En cualquier error. */
-	@SuppressWarnings("static-method")
 	@Test
 	public void testGetSignersStructure() throws Exception {
 
@@ -70,12 +69,12 @@ public final class TestGetSignersStructure {
 
 			final File tempFile = File.createTempFile("test", ".pdf"); //$NON-NLS-1$ //$NON-NLS-2$
 			try {
-
 				final FileOutputStream fos = new FileOutputStream(tempFile);
 				final byte[] signature = signer.sign(testPdf, AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA, this.pke.getPrivateKey(), this.pke.getCertificateChain(), null);
 				fos.write(signature);
 				fos.close();
-			} catch (final AOException e) {
+			}
+			catch (final AOException e) {
 				Assert.fail("Error durante la firma con el certificado del almacen: " + filename + ":\n" + e); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 

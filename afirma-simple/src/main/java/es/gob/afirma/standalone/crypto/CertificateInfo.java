@@ -58,9 +58,9 @@ public final class CertificateInfo {
 					". " + //$NON-NLS-1$
 					SimpleAfirmaMessages.getString("CertificateInfo.2") + //$NON-NLS-1$
 					": " + //$NON-NLS-1$
-					(isMac ? "<b>" : "<a href=\"#\">") + //$NON-NLS-1$ //$NON-NLS-2$
+					"<b>" + //$NON-NLS-1$
 					AOUtil.getCN(cert.getIssuerX500Principal().toString()) +
-					(isMac ? "</b>" : "</a>") + //$NON-NLS-1$ //$NON-NLS-2$
+					"</b>" + //$NON-NLS-1$
 					"</html>"; //$NON-NLS-1$
         	}
         }

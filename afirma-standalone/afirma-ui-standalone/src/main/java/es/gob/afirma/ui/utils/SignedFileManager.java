@@ -15,7 +15,7 @@ public final class SignedFileManager {
      * @return filtro */
     public static FileFilter getCommonSignedFileFilter() {
         final FileFilter fileFilter = new ExtFilter(new String[] {
-          "csig", "xsig" //$NON-NLS-1$ //$NON-NLS-2$
+          "csig", "xsig", "pdf" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         }, Messages.getString("SignedFileManager.commonSignedFile")); //$NON-NLS-1$
         return fileFilter;
     }
@@ -29,37 +29,66 @@ public final class SignedFileManager {
     public static ExtFilter getOutFileFilter(final String signFormat) {
 
         if (signFormat.equals(AOSignConstants.SIGN_FORMAT_CMS) || signFormat.equals(AOSignConstants.SIGN_FORMAT_CADES)) {
-            return new ExtFilter(new String[] {
-            "csig"}, Messages.getString("SignedFileManager.43")); //$NON-NLS-1$ //$NON-NLS-2$
+            return new ExtFilter(
+        		new String[] {
+        			"csig" //$NON-NLS-1$
+				},
+				Messages.getString("SignedFileManager.43") //$NON-NLS-1$
+			);
         }
         else if (signFormat.equals(AOSignConstants.SIGN_FORMAT_PDF)) {
-            return new ExtFilter(new String[] {
-            "pdf"}, Messages.getString("SignedFileManager.30")); //$NON-NLS-1$ //$NON-NLS-2$
+            return new ExtFilter(
+        		new String[] {
+        			"pdf" //$NON-NLS-1$
+				},
+				Messages.getString("SignedFileManager.30") //$NON-NLS-1$
+			);
         }
         else if (signFormat.equals(AOSignConstants.SIGN_FORMAT_ODF)) {
-            return new ExtFilter(new String[] {
-                                               "odt", "ods", "odp"}, Messages.getString("SignedFileManager.16")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+            return new ExtFilter(
+        		new String[] {
+                   "odt", "ods", "odp" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+               },
+               Messages.getString("SignedFileManager.16") //$NON-NLS-1$
+           );
         }
         else if (signFormat.equals(AOSignConstants.SIGN_FORMAT_OOXML)) {
-            return new ExtFilter(new String[] {
-                                               "docx", "xlsx", "pptx", "ppsx"}, Messages.getString("SignedFileManager.50")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+            return new ExtFilter(
+        		new String[] {
+    				"docx", "xlsx", "pptx", "ppsx" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+				},
+				Messages.getString("SignedFileManager.50") //$NON-NLS-1$
+			);
         }
-        else if (signFormat.equals(AOSignConstants.SIGN_FORMAT_XMLDSIG_DETACHED) || signFormat.equals(AOSignConstants.SIGN_FORMAT_XMLDSIG_ENVELOPING)
-                || signFormat.equals(AOSignConstants.SIGN_FORMAT_XMLDSIG_ENVELOPED)
-                || signFormat.equals(AOSignConstants.SIGN_FORMAT_XMLDSIG_EXTERNALLY_DETACHED)
-                || signFormat.equals(AOSignConstants.SIGN_FORMAT_XADES_DETACHED)
-                || signFormat.equals(AOSignConstants.SIGN_FORMAT_XADES_ENVELOPING)
-                || signFormat.equals(AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED)
-                || signFormat.equals(AOSignConstants.SIGN_FORMAT_XADES_EXTERNALLY_DETACHED)) {
-            return new ExtFilter(new String[] {
-            "xsig"}, Messages.getString("SignedFileManager.17")); //$NON-NLS-1$ //$NON-NLS-2$
+        else if (signFormat.equals(AOSignConstants.SIGN_FORMAT_XMLDSIG_DETACHED)
+        	  || signFormat.equals(AOSignConstants.SIGN_FORMAT_XMLDSIG_ENVELOPING)
+              || signFormat.equals(AOSignConstants.SIGN_FORMAT_XMLDSIG_ENVELOPED)
+              || signFormat.equals(AOSignConstants.SIGN_FORMAT_XMLDSIG_EXTERNALLY_DETACHED)
+              || signFormat.equals(AOSignConstants.SIGN_FORMAT_XADES_DETACHED)
+              || signFormat.equals(AOSignConstants.SIGN_FORMAT_XADES_ENVELOPING)
+              || signFormat.equals(AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED)
+              || signFormat.equals(AOSignConstants.SIGN_FORMAT_XADES_EXTERNALLY_DETACHED)) {
+            return new ExtFilter(
+        		new String[] {
+        			"xsig" //$NON-NLS-1$
+				},
+				Messages.getString("SignedFileManager.17") //$NON-NLS-1$
+			);
         }
         else if (signFormat.equals(AOSignConstants.SIGN_FORMAT_FACTURAE)) {
-            return new ExtFilter(new String[] {
-            "xml"}, Messages.getString("SignedFileManager.18")); //$NON-NLS-1$ //$NON-NLS-2$
+            return new ExtFilter(
+        		new String[] {
+        			"xsig" //$NON-NLS-1$
+				},
+				Messages.getString("SignedFileManager.18") //$NON-NLS-1$
+			);
         }
-        return new ExtFilter(new String[] {
-        "sig"}, Messages.getString("SignedFileManager.52")); //$NON-NLS-1$ //$NON-NLS-2$
+        return new ExtFilter(
+    		new String[] {
+    			"sig" //$NON-NLS-1$
+			},
+			Messages.getString("SignedFileManager.52") //$NON-NLS-1$
+		);
     }
 
     /** Obtiene el nombre que le corresponde a un fichero tras su firma
@@ -90,11 +119,12 @@ public final class SignedFileManager {
                 || signFormat.equals(AOSignConstants.SIGN_FORMAT_XADES_DETACHED)
                 || signFormat.equals(AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED)
                 || signFormat.equals(AOSignConstants.SIGN_FORMAT_XADES_ENVELOPING)
-                || signFormat.equals(AOSignConstants.SIGN_FORMAT_XADES_EXTERNALLY_DETACHED)) {
+                || signFormat.equals(AOSignConstants.SIGN_FORMAT_XADES_EXTERNALLY_DETACHED)
+                || signFormat.equals(AOSignConstants.SIGN_FORMAT_FACTURAE)) {
             return inName + ".xsig"; //$NON-NLS-1$
         }
         if (signFormat.equals(AOSignConstants.SIGN_FORMAT_PDF) || signFormat.equals(AOSignConstants.SIGN_FORMAT_ODF)
-                || signFormat.equals(AOSignConstants.SIGN_FORMAT_OOXML) || signFormat.equals(AOSignConstants.SIGN_FORMAT_FACTURAE)) {
+                || signFormat.equals(AOSignConstants.SIGN_FORMAT_OOXML)) {
             final int i = inName.lastIndexOf('.');
             if (i > 0 && i < inName.length() - 1) {
                 return inName.substring(0, i) + ".signed" + inName.substring(i).toLowerCase(); //$NON-NLS-1$

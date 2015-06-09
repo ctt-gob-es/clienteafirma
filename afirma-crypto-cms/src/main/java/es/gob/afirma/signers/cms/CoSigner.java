@@ -10,13 +10,10 @@
 
 package es.gob.afirma.signers.cms;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
-import java.security.Signature;
-import java.security.SignatureException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -37,7 +34,6 @@ import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1Set;
 import org.bouncycastle.asn1.ASN1TaggedObject;
 import org.bouncycastle.asn1.ASN1UTCTime;
-import org.bouncycastle.asn1.BEROctetString;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERPrintableString;
 import org.bouncycastle.asn1.DERSet;
@@ -55,10 +51,7 @@ import org.bouncycastle.asn1.x500.style.RFC4519Style;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.TBSCertificateStructure;
-import org.bouncycastle.cms.CMSProcessable;
-import org.bouncycastle.cms.CMSProcessableByteArray;
 
-import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.signers.pkcs7.AOAlgorithmID;
@@ -121,27 +114,11 @@ final class CoSigner {
 
         // 3. CONTENTINFO
         // si se introduce el contenido o no
-        ContentInfo encInfo = null;
-        final ASN1ObjectIdentifier contentTypeOID = new ASN1ObjectIdentifier(dataType);
 
         // Ya que el contenido puede ser grande, lo recuperamos solo una vez
-        byte[] content2 = null;
+        final byte[] content2 = parameters.getContent();
 
-        if (!omitContent) {
-            final ByteArrayOutputStream bOut = new ByteArrayOutputStream();
-            content2 = parameters.getContent();
-            final CMSProcessable msg = new CMSProcessableByteArray(content2);
-            try {
-                msg.write(bOut);
-            }
-            catch (final Exception ex) {
-                throw new IOException("Error en la escritura del procesable CMS: " + ex, ex); //$NON-NLS-1$
-            }
-            encInfo = new ContentInfo(contentTypeOID, new BEROctetString(bOut.toByteArray()));
-        }
-        else {
-            encInfo = new ContentInfo(contentTypeOID, null);
-        }
+        final ContentInfo encInfo = CmsUtil.getContentInfo(content2, omitContent, dataType);
 
         // 4. CERTIFICADOS
         // obtenemos la lista de certificados
@@ -217,7 +194,7 @@ final class CoSigner {
 
         final ASN1OctetString sign2;
         try {
-            sign2 = firma(signatureAlgorithm, key);
+            sign2 = CmsUtil.firma(signatureAlgorithm, key, this.signedAttr2);
         }
         catch (final Exception ex) {
             throw new IOException("Error al generar la firma: " + ex, ex); //$NON-NLS-1$
@@ -393,7 +370,7 @@ final class CoSigner {
 
         final ASN1OctetString sign2;
         try {
-            sign2 = firma(signatureAlgorithm, key);
+            sign2 = CmsUtil.firma(signatureAlgorithm, key, this.signedAttr2);
         }
         catch (final Exception ex) {
             throw new IOException("Error al generar la firma: " + ex, ex); //$NON-NLS-1$
@@ -568,55 +545,4 @@ final class CoSigner {
 
     }
 
-    /** Realiza la firma usando los atributos del firmante.
-     * @param signatureAlgorithm Algoritmo para la firma.
-     * @param key Clave para firmar.
-     * @return Firma de los atributos.
-     * @throws AOException Cuando ocurre cualquier problema durante el proceso */
-    private ASN1OctetString firma(final String signatureAlgorithm, final PrivateKey key) throws AOException {
-
-        final Signature sig;
-        try {
-            sig = Signature.getInstance(signatureAlgorithm);
-        }
-        catch (final Exception e) {
-            throw new AOException("Error obteniendo la clase de firma para el algoritmo " + signatureAlgorithm, e); //$NON-NLS-1$
-        }
-
-        final byte[] tmp;
-        try {
-            tmp = this.signedAttr2.getEncoded(ASN1Encoding.DER);
-        }
-        catch (final IOException ex) {
-            throw new AOException("Error obteniendo los atributos firmados", ex); //$NON-NLS-1$
-        }
-
-        // Indicar clave privada para la firma
-        try {
-            sig.initSign(key);
-        }
-        catch (final Exception e) {
-            throw new AOException("Error al inicializar la firma con la clave privada", e); //$NON-NLS-1$
-        }
-
-        // Actualizamos la configuracion de firma
-        try {
-            sig.update(tmp);
-        }
-        catch (final SignatureException e) {
-            throw new AOException("Error al configurar la informacion de firma", e); //$NON-NLS-1$
-        }
-
-        // firmamos.
-        final byte[] realSig;
-        try {
-            realSig = sig.sign();
-        }
-        catch (final Exception e) {
-            throw new AOException("Error durante el proceso de firma", e); //$NON-NLS-1$
-        }
-
-        return new DEROctetString(realSig);
-
-    }
 }

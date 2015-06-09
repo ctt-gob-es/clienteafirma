@@ -34,8 +34,6 @@ import com.lowagie.text.pdf.PdfStamper;
 
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
-import es.gob.afirma.core.misc.Platform;
-import es.gob.afirma.core.misc.Platform.OS;
 import es.gob.afirma.core.ui.AOUIFactory;
 
 /** Gestor del n&uacute;cleo de firma PDF. Esta clase realiza las operaciones necesarias tanto para
@@ -48,8 +46,6 @@ public final class PdfSessionManager {
     static final int LAST_PAGE = -1;
 
     private static final int UNDEFINED = -1;
-    private static final int DEFAULT_LAYER_2_FONT_SIZE = 12;
-    private static final int COURIER = 0;
 
     private static final int CSIZE = 27000;
 
@@ -126,12 +122,13 @@ public final class PdfSessionManager {
 		try {
 			pdfVersion = extraParams.getProperty("pdfVersion") != null ? //$NON-NLS-1$
 				Integer.parseInt(extraParams.getProperty("pdfVersion")) : //$NON-NLS-1$
-					UNDEFINED;
+					PDF_MAX_VERSION;
 		}
 		catch(final Exception e) {
-			pdfVersion = UNDEFINED;
+			LOGGER.warning("Error en el establecimiento de la version PDF, se usara " + PDF_MAX_VERSION + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$
+			pdfVersion = PDF_MAX_VERSION;
 		}
-		if (pdfVersion == UNDEFINED || pdfVersion < PDF_MIN_VERSION || pdfVersion > PDF_MAX_VERSION) {
+		if (pdfVersion != UNDEFINED && (pdfVersion < PDF_MIN_VERSION || pdfVersion > PDF_MAX_VERSION)) {
 			LOGGER.warning("Se ha establecido un valor invalido para version, se ignorara: " + pdfVersion); //$NON-NLS-1$
 			pdfVersion = UNDEFINED;
 		}
@@ -140,10 +137,18 @@ public final class PdfSessionManager {
 		// **** Texto firma visible ****
 
 		// Texto en capa 4
-		final String layer4Text = extraParams.getProperty("layer4Text"); //$NON-NLS-1$
+		final String layer4Text = PdfUtil.getLayerText(
+			extraParams.getProperty("layer4Text"), //$NON-NLS-1$
+			(X509Certificate) certChain[0],
+			signTime
+		);
 
 		// Texto en capa 2
-		final String layer2Text = extraParams.getProperty("layer2Text"); //$NON-NLS-1$
+		final String layer2Text = PdfUtil.getLayerText(
+			extraParams.getProperty("layer2Text"), //$NON-NLS-1$
+			(X509Certificate) certChain[0],
+			signTime
+		);
 
 		// Tipo de letra en capa 2
 		int layer2FontFamily;
@@ -191,7 +196,7 @@ public final class PdfSessionManager {
 		final PdfReader pdfReader = PdfUtil.getPdfReader(
 			inPDF,
 			extraParams,
-			Boolean.getBoolean(extraParams.getProperty("headLess")) //$NON-NLS-1$
+			Boolean.parseBoolean(extraParams.getProperty("headLess")) //$NON-NLS-1$
 		);
 
 		PdfUtil.checkPdfCertification(pdfReader.getCertificationLevel(), extraParams);
@@ -247,7 +252,7 @@ public final class PdfSessionManager {
 	        // Comprobamos que el signer esta en modo interactivo, y si no lo
             // esta no pedimos contrasena por dialogo, principalmente para no interrumpir un firmado por lotes
             // desatendido
-            if (Boolean.getBoolean(extraParams.getProperty("headLess"))) { //$NON-NLS-1$
+            if (Boolean.parseBoolean(extraParams.getProperty("headLess"))) { //$NON-NLS-1$
                 throw new BadPdfPasswordException(e);
             }
             // La contrasena que nos han proporcionada no es buena o no nos
@@ -330,101 +335,8 @@ public final class PdfSessionManager {
 
 		// Capa 2
 		if (layer2Text != null) {
-
 			sap.setLayer2Text(layer2Text);
-
-			final int layer2FontColorR;
-			final int layer2FontColorG;
-			final int layer2FontColorB;
-
-			if ("black".equalsIgnoreCase(layer2FontColor)) { //$NON-NLS-1$
-				layer2FontColorR = 0;
-				layer2FontColorG = 0;
-				layer2FontColorB = 0;
-			}
-			else if ("white".equalsIgnoreCase(layer2FontColor)) { //$NON-NLS-1$
-				layer2FontColorR = 255;
-				layer2FontColorG = 255;
-				layer2FontColorB = 255;
-			}
-			else if ("lightGray".equalsIgnoreCase(layer2FontColor)) { //$NON-NLS-1$
-				layer2FontColorR = 192;
-				layer2FontColorG = 192;
-				layer2FontColorB = 192;
-			}
-			else if ("gray".equalsIgnoreCase(layer2FontColor)) { //$NON-NLS-1$
-				layer2FontColorR = 128;
-				layer2FontColorG = 128;
-				layer2FontColorB = 128;
-			}
-			else if ("darkGray".equalsIgnoreCase(layer2FontColor)) { //$NON-NLS-1$
-				layer2FontColorR = 64;
-				layer2FontColorG = 64;
-				layer2FontColorB = 64;
-			}
-			else if ("red".equalsIgnoreCase(layer2FontColor)) { //$NON-NLS-1$
-				layer2FontColorR = 255;
-				layer2FontColorG = 0;
-				layer2FontColorB = 0;
-			}
-			else if ("pink".equalsIgnoreCase(layer2FontColor)) { //$NON-NLS-1$
-				layer2FontColorR = 255;
-				layer2FontColorG = 175;
-				layer2FontColorB = 175;
-			}
-			else if (layer2FontColor == null) {
-				layer2FontColorR = 0;
-				layer2FontColorG = 0;
-				layer2FontColorB = 0;
-			}
-			else {
-				LOGGER.warning("No se soporta el color '" + layer2FontColor + "' para el texto de la capa 4, se usara negro"); //$NON-NLS-1$ //$NON-NLS-2$
-				layer2FontColorR = 0;
-				layer2FontColorG = 0;
-				layer2FontColorB = 0;
-			}
-
-			com.lowagie.text.Font font;
-			try {
-				Class<?> colorClass;
-				if (Platform.getOS() == OS.ANDROID) {
-					colorClass = Class.forName("harmony.java.awt.Color"); //$NON-NLS-1$
-				}
-				else {
-					colorClass = Class.forName("java.awt.Color"); //$NON-NLS-1$
-				}
-				final Object color = colorClass.getConstructor(Integer.TYPE, Integer.TYPE, Integer.TYPE).newInstance(
-					Integer.valueOf(layer2FontColorR),
-					Integer.valueOf(layer2FontColorG),
-					Integer.valueOf(layer2FontColorB)
-				);
-
-				font = com.lowagie.text.Font.class
-					.getConstructor(Integer.TYPE, Float.TYPE, Integer.TYPE, colorClass)
-						.newInstance(
-							// Family (COURIER = 0, HELVETICA = 1, TIMES_ROMAN = 2, SYMBOL = 3, ZAPFDINGBATS = 4)
-							Integer.valueOf(layer2FontFamily == UNDEFINED ? COURIER : layer2FontFamily),
-							// Size (DEFAULTSIZE = 12)
-							Float.valueOf(layer2FontSize == UNDEFINED ? DEFAULT_LAYER_2_FONT_SIZE : layer2FontSize),
-							// Style (NORMAL = 0, BOLD = 1, ITALIC = 2, BOLDITALIC = 3, UNDERLINE = 4, STRIKETHRU = 8)
-							Integer.valueOf(layer2FontStyle == UNDEFINED ? com.lowagie.text.Font.NORMAL : layer2FontStyle),
-							// Color
-							color
-				);
-			}
-			catch (final Exception e) {
-				font = new com.lowagie.text.Font(
-					// Family (COURIER = 0, HELVETICA = 1, TIMES_ROMAN = 2, SYMBOL = 3, ZAPFDINGBATS = 4)
-					layer2FontFamily == UNDEFINED ? COURIER : layer2FontFamily,
-					// Size (DEFAULTSIZE = 12)
-					layer2FontSize == UNDEFINED ? DEFAULT_LAYER_2_FONT_SIZE : layer2FontSize,
-					// Style (NORMAL = 0, BOLD = 1, ITALIC = 2, BOLDITALIC = 3, UNDERLINE = 4, STRIKETHRU = 8)
-					layer2FontStyle == UNDEFINED ? com.lowagie.text.Font.NORMAL : layer2FontStyle,
-					// Color
-					null
-				);
-			}
-			sap.setLayer2Font(font);
+			sap.setLayer2Font(PdfUtil.getFont(layer2FontFamily, layer2FontSize, layer2FontStyle, layer2FontColor));
 		}
 
 		// Capa 4

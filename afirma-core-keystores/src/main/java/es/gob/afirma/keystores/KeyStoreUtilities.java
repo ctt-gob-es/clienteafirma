@@ -193,7 +193,7 @@ public final class KeyStoreUtilities {
             if (certFilters != null && certFilters.size() > 0) {
             	final Map<String, String> filteredAliases = new Hashtable<String, String>();
                 for (final CertificateFilter cf : certFilters) {
-                	for (final String filteredAlias : cf.matches(aliassesByFriendlyName.keySet().toArray(new String[0]), ksm)) {
+                	for (final String filteredAlias : cf.matches(aliassesByFriendlyName.keySet().toArray(new String[aliassesByFriendlyName.size()]), ksm)) {
                 		filteredAliases.put(filteredAlias, aliassesByFriendlyName.get(filteredAlias));
                 	}
                 }

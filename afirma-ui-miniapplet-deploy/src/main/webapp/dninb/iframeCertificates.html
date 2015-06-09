@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Insert title here</title>
+<link rel="stylesheet" href="iframeStyle.css">
+<link rel="stylesheet" href="jquery-ui-1.11.4.custom/jquery-ui.min.css">
+<script src="jquery-ui-1.11.4.custom/external/jquery/jquery.js"></script>
+<script src="jquery-ui-1.11.4.custom/jquery-ui.min.js"></script>
+<script src="certificateManager.js"></script>
+
+
+<script src="jsrsasign-4.7.0/x509-1.1.js"></script>
+<script src="jsrsasign-4.7.0/asn1hex-1.1.js"></script>
+<script src="jsrsasign-4.7.0/ext/base64.js"></script>
+<script src="jsrsasign-4.7.0/ext/rsa.js"></script>
+<script src="jsrsasign-4.7.0/ext/jsbn.js"></script>
+<script src="jsrsasign-4.7.0/ext/jsbn2.js"></script>
+<script src="jsrsasign-4.7.0/ext/rsa2.js"></script>
+<script src="jsrsasign-4.7.0/ext/sha1.js"></script>
+
+ <style>
+  #feedback { font-size: 1.4em; }
+  #selectable .ui-selecting { background: #FECA40; }
+  #selectable .ui-selected { background: #F39814; color: white; }
+  #selectable { list-style-type: none; margin: 0; padding: 0; width: 100%; }
+  #selectable li { margin: 3px; padding: 0.4em;   }
+  </style>
+
+
+
+
+</head>
+<body style="width: 90%;  margin: 0 auto;">
+
+<div class="DNInBCSS">
+<div style="display: table;width: 100%;padding-top: 0.5em;padding-bottom: 0.5em; padding-left:1em;">
+<h3 style="display: table-cell;vertical-align: middle; text-align:left;">Seleccione un certificado</h3>
+<div style="height: 100%;display: table-cell;text-align: center;margin: 0 auto;margin-top: 2%;vertical-align: middle;margin-right: 1em;">
+
+<button onclick="parent.DNInBUtils.mostrarAyuda()" title="Ayuda online de @firma.">
+<img alt="" src="resources/toolbar/ic_help_black_18dp.png" >
+</button>
+</div>
+</div>
+<hr style="clear: left; margin:0;">
+
+<div class="DNInBCSS">
+<ol id="selectable">
+</ol>
+</div>
+</div>
+</body>
+</html>

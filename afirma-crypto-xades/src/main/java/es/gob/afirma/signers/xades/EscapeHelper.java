@@ -196,10 +196,10 @@ final class EscapeHelper {
 			sb.append(rdn.getType());
 			sb.append('=');
 			sb.append(escapeCharacters(Rdn.escapeValue(rdn.getValue())));
-			sb.append(", "); //$NON-NLS-1$
+			sb.append(","); //$NON-NLS-1$
 		}
 		sb.append("<EOF>"); //$NON-NLS-1$
-		return sb.toString().replace(", <EOF>", ""); //$NON-NLS-1$ //$NON-NLS-2$
+		return sb.toString().replace(",<EOF>", ""); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	private static String escapeCharacters(final String str) {

@@ -10,7 +10,6 @@
 
 package es.gob.afirma.signers.cms;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -32,7 +31,6 @@ import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.ASN1Set;
 import org.bouncycastle.asn1.ASN1UTCTime;
-import org.bouncycastle.asn1.BEROctetString;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERPrintableString;
 import org.bouncycastle.asn1.DERSet;
@@ -49,8 +47,6 @@ import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.TBSCertificateStructure;
-import org.bouncycastle.cms.CMSProcessable;
-import org.bouncycastle.cms.CMSProcessableByteArray;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.signers.AOSignConstants;
@@ -149,27 +145,10 @@ final class GenSignedData {
         // 3. CONTENTINFO
         // si se introduce el contenido o no
 
-        ContentInfo encInfo;
-        final ASN1ObjectIdentifier contentTypeOID = new ASN1ObjectIdentifier(dataType);
-
         // Ya que el contenido puede ser grande, lo recuperamos solo una vez
-        byte[] content2 = null;
+        final byte[] content2 = parameters.getContent();
 
-        if (!omitContent) {
-            final ByteArrayOutputStream bOut = new ByteArrayOutputStream();
-            content2 = parameters.getContent();
-            final CMSProcessable msg = new CMSProcessableByteArray(content2);
-            try {
-                msg.write(bOut);
-            }
-            catch (final Exception ex) {
-                throw new IOException("Error en la escritura del procesable CMS: " + ex, ex); //$NON-NLS-1$
-            }
-            encInfo = new ContentInfo(contentTypeOID, new BEROctetString(bOut.toByteArray()));
-        }
-        else {
-            encInfo = new ContentInfo(contentTypeOID, null);
-        }
+        final ContentInfo encInfo = CmsUtil.getContentInfo(content2, omitContent, dataType);
 
         // 4. CERTIFICADOS
         // obtenemos la lista de certificados
@@ -198,13 +177,14 @@ final class GenSignedData {
         // // ATRIBUTOS
 
         // ATRIBUTOS FIRMADOS
-        final ASN1Set signedAttr =
-                generateSignedInfo(digestAlgorithm,
-                                   content2 != null ? content2 : parameters.getContent(),
-                                   dataType,
-                                   applyTimestamp,
-                                   atrib,
-                                   messageDigest);
+        final ASN1Set signedAttr = generateSignedInfo(
+    		digestAlgorithm,
+            content2,
+            dataType,
+            applyTimestamp,
+            atrib,
+            messageDigest
+        );
 
         // ATRIBUTOS NO FIRMADOS.
 

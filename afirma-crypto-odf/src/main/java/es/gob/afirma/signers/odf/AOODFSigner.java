@@ -20,6 +20,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.lang.reflect.Method;
 import java.nio.charset.Charset;
 import java.security.MessageDigest;
 import java.security.PrivateKey;
@@ -215,23 +216,31 @@ public final class AOODFSigner implements AOSigner {
                 );
             }
 
+            // Configuramos mediante reflexion las transformaciones y referencias
+
+            final Class<?> canonicalizerClass = Class.forName("com.sun.org.apache.xml.internal.security.c14n.Canonicalizer"); //$NON-NLS-1$
+            final String algo_id_c14n_omit_comments =
+            		(String) canonicalizerClass.getField("ALGO_ID_C14N_OMIT_COMMENTS").get(null); //$NON-NLS-1$
+
             // Transforms
             final List<Transform> transformList = new ArrayList<Transform>(1);
             transformList.add(
-        		fac.newTransform(
-    				com.sun.org.apache.xml.internal.security.c14n.Canonicalizer.ALGO_ID_C14N_OMIT_COMMENTS,
-    				(TransformParameterSpec) null
-				)
-    		);
+            		fac.newTransform(
+            				algo_id_c14n_omit_comments,
+            				(TransformParameterSpec) null
+            				)
+            		);
 
             // References
             final List<Reference> referenceList = new ArrayList<Reference>();
 
-            com.sun.org.apache.xml.internal.security.Init.init();
+            Class.forName("com.sun.org.apache.xml.internal.security.Init").getMethod("init").invoke(null); //$NON-NLS-1$ //$NON-NLS-2$
 
-            final com.sun.org.apache.xml.internal.security.c14n.Canonicalizer canonicalizer = com.sun.org.apache.xml.internal.security.c14n.Canonicalizer.getInstance(
-        		com.sun.org.apache.xml.internal.security.c14n.Canonicalizer.ALGO_ID_C14N_OMIT_COMMENTS
-    		);
+            final Object canonicalizer = canonicalizerClass.
+            		getMethod("getInstance", String.class).invoke(null, algo_id_c14n_omit_comments); //$NON-NLS-1$
+
+            final Method canonicalizeSubtreeMethod =
+            		canonicalizerClass.getMethod("canonicalizeSubtree", org.w3c.dom.Node.class); //$NON-NLS-1$
 
             //
             // Anadimos tambien referencias manualmente al propio manifest.xml y
@@ -247,22 +256,23 @@ public final class AOODFSigner implements AOSigner {
                 zf.getInputStream(zf.getEntry("mimetype")))))); //$NON-NLS-1$
 
                 referenceList.add(
-            		fac.newReference(
-        				MANIFEST_PATH,
-                        dm,
-                        transformList,
-                        null,
-                        null,
-                        md.digest(
-                    		canonicalizer.canonicalizeSubtree(
-                            	// Recupera el fichero y su raiz
-                                dbf.newDocumentBuilder().parse(
-                            		new ByteArrayInputStream(manifestData)
-                        		).getDocumentElement()
-                    		)
-                		)
-            		)
-        		);
+                		fac.newReference(
+                				MANIFEST_PATH,
+                				dm,
+                				transformList,
+                				null,
+                				null,
+                				md.digest(
+                						(byte[]) canonicalizeSubtreeMethod.invoke(
+                								canonicalizer,
+                								// Recupera el fichero y su raiz
+                								dbf.newDocumentBuilder().parse(
+                										new ByteArrayInputStream(manifestData)
+                										).getDocumentElement()
+                								)
+                						)
+                				)
+                		);
             }
 
             // para cada nodo de manifest.xml
@@ -281,10 +291,13 @@ public final class AOODFSigner implements AOSigner {
                         // crea la referencia
                         reference = fac.newReference(fullPath.replaceAll(" ", "%20"), dm, transformList, null, null, //$NON-NLS-1$ //$NON-NLS-2$
                         // Obtiene su forma canonica y su DigestValue
-                                                     md.digest(canonicalizer.canonicalizeSubtree(
-                                                     // Recupera el fichero y su raiz
-                                                     dbf.newDocumentBuilder().parse(zf.getInputStream(zf.getEntry(fullPath))).getDocumentElement())));
-
+                        		md.digest(
+                        				(byte[]) canonicalizeSubtreeMethod.invoke(
+                        						canonicalizer,
+                        						// Recupera el fichero y su raiz
+                        						dbf.newDocumentBuilder().parse(zf.getInputStream(zf.getEntry(fullPath))).getDocumentElement())
+                        				)
+                        		);
                     }
 
                     // si no es uno de los archivos xml
@@ -447,9 +460,8 @@ public final class AOODFSigner implements AOSigner {
             throw new AOFormatFileException("Estructura de archivo no valida: " + fullPath + ": " + saxex); //$NON-NLS-1$ //$NON-NLS-2$
         }
         catch (final Exception e) {
-            throw new AOException("No ha sido posible generar la firma ODF", e); //$NON-NLS-1$
+            throw new AOException("No ha sido posible generar la firma ODF: " + e, e); //$NON-NLS-1$
         }
-
     }
 
     /** A&ntilde;ade una firma electr&oacute;nica a un documento ODF.

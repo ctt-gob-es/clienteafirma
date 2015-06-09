@@ -1,7 +1,6 @@
 package es.gob.afirma.ui.visor.ui;
 
 import java.awt.Color;
-import java.awt.Cursor;
 import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -38,7 +37,6 @@ import javax.swing.JTextField;
 import javax.swing.JTree;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.UIManager;
-import javax.swing.event.HyperlinkEvent;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeSelectionModel;
 
@@ -50,8 +48,6 @@ import es.gob.afirma.signers.pades.AOPDFSigner;
 import es.gob.afirma.ui.utils.CustomDialog;
 import es.gob.afirma.ui.utils.Messages;
 import es.gob.afirma.ui.utils.Utils;
-import es.gob.afirma.ui.visor.crypto.CertAnalizer;
-import es.gob.afirma.ui.visor.crypto.CertificateInfo;
 import es.gob.afirma.ui.visor.crypto.CompleteSignInfo;
 
 final class SignDataPanel extends JPanel {
@@ -70,7 +66,7 @@ final class SignDataPanel extends JPanel {
     private final JScrollPane detailPanel = new JScrollPane();
     private final JLabel certIcon = new JLabel();
     private final JEditorPane certDescription = new JEditorPane();
-    private JButton validateCertButton = null;
+    private final JButton validateCertButton = null;
 
     SignDataPanel(final File signFile, final byte[] sign, final JComponent fileTypeIcon, final X509Certificate cert) {
     	this(signFile, sign, null, fileTypeIcon, cert);
@@ -153,66 +149,6 @@ final class SignDataPanel extends JPanel {
     	}
 
     	final JPanel panelValidateCertButton = new JPanel(new GridLayout(1, 1));
-        final CertificateInfo certInfo = CertAnalizer.getCertInformation(cert);
-
-        if (certInfo != null) {
-            this.certIcon.setIcon(certInfo.getIcon());
-            this.certIcon.setToolTipText(certInfo.getIconTooltip());
-
-            // Para que se detecten apropiadamente los hipervinculos hay que establecer
-            // el tipo de contenido antes que el contenido
-            this.certDescription.setContentType("text/html"); //$NON-NLS-1$
-
-            this.certDescription.setEditable(false);
-            this.certDescription.setOpaque(false);
-            this.certDescription.setText(certInfo.getDescriptionText());
-            this.certDescription.setToolTipText(Messages.getString("SignDataPanel.12")); //$NON-NLS-1$
-            this.certDescription.getAccessibleContext().setAccessibleName(Messages.getString("SignDataPanel.13")); //$NON-NLS-1$
-            this.certDescription.getAccessibleContext().setAccessibleDescription(Messages.getString("SignDataPanel.14")); //$NON-NLS-1$
-
-            final EditorFocusManager editorFocusManager = new EditorFocusManager (this.certDescription, new EditorFocusManagerAction() {
-                @Override
-                public void openHyperLink(final HyperlinkEvent he, final int linkIndex) {
-                    openCertificate(cert);
-                }
-            });
-            this.certDescription.addFocusListener(editorFocusManager);
-            this.certDescription.addKeyListener(editorFocusManager);
-            this.certDescription.addHyperlinkListener(editorFocusManager);
-
-
-            if (certInfo.getCertVerifier() != null) {
-                this.validateCertButton = new JButton();
-                //this.validateCertButton.setPreferredSize(new Dimension(150, 24));
-                this.validateCertButton.setText(Messages.getString("SignDataPanel.15")); //$NON-NLS-1$
-                this.validateCertButton.setMnemonic(KeyEvent.VK_V);
-                this.validateCertButton.setToolTipText(Messages.getString("SignDataPanel.16")); //$NON-NLS-1$
-                this.validateCertButton.getAccessibleContext().setAccessibleName(Messages.getString("SignDataPanel.17")); //$NON-NLS-1$
-                this.validateCertButton.getAccessibleContext()
-                .setAccessibleDescription(Messages.getString("SignDataPanel.18")); //$NON-NLS-1$
-                this.validateCertButton.addActionListener(new ActionListener() {
-					@Override
-					public void actionPerformed(final ActionEvent ae) {
-					    SignDataPanel.this.setCursor(new Cursor(Cursor.WAIT_CURSOR));
-						try {
-							certInfo.getCertVerifier().checkCertificate(new X509Certificate[] { cert }, true);
-							CustomDialog.showMessageDialog(SignDataPanel.this, true, Messages.getString("SignDataPanel.19"), Messages.getString("SignDataPanel.20"), JOptionPane.INFORMATION_MESSAGE);  //$NON-NLS-1$//$NON-NLS-2$
-						}
-						catch(final Exception e) {
-							LOGGER.severe("Error en la validacion del certificado: " + e); //$NON-NLS-1$
-						}
-						finally {
-						    SignDataPanel.this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-						}
-					}
-				});
-
-                Utils.remarcar(this.validateCertButton);
-                Utils.setContrastColor(this.validateCertButton);
-                Utils.setFontBold(this.validateCertButton);
-            }
-
-        }
 
         this.certDescPanel = new JPanel();
         this.certDescPanel.setBorder(BorderFactory.createLineBorder(Color.GRAY));

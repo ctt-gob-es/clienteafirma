@@ -455,8 +455,12 @@ public final class CAdESUtils {
         	}
         }
 
-        // id-aa-ets-signerLocation
-        if (csm != null && CAdESSignerMetadataHelper.getSignerLocation(csm.getSignerLocation()) != null) {
+        // id-aa-ets-signerLocation (OID=1.2.840.113549.1.9.16.2.17)
+        // Este atributo no se anade en PAdES:
+        // 4.5.9 signer-location Attribute
+        // For all profiles covered in the present document the signer-location attribute shall not be present.
+        // NOTE: The location can be indicated by the value of the Location entry in the signature dictionary.
+        if (!padesMode && csm != null && CAdESSignerMetadataHelper.getSignerLocation(csm.getSignerLocation()) != null) {
     		contexExpecific.add(
 				new Attribute(
 					PKCSObjectIdentifiers.id_aa_ets_signerLocation,

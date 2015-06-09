@@ -25,8 +25,6 @@ import javax.xml.crypto.dsig.Transform;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import net.java.xades.security.xml.XAdES.SignaturePolicyIdentifier;
-import net.java.xades.security.xml.XAdES.SignaturePolicyIdentifierImpl;
 import net.java.xades.security.xml.XAdES.SignatureProductionPlace;
 import net.java.xades.security.xml.XAdES.SignatureProductionPlaceImpl;
 import net.java.xades.util.XMLUtils;
@@ -60,7 +58,7 @@ import es.gob.afirma.signers.xml.XMLConstants;
  *  relativos a las politicas de firma) son:
  * </p>
  * <ul>
- *  <li><i>SigningTime</i> (opcional)</li>
+ *  <li><i>SigningTime</i></li>
  *  <li><i>SigningCerticate</i></li>
  *  <li><i>IssuerSerial</i></li>
  *  <li><i>SignedDataObjectProperties</i></li>
@@ -617,58 +615,6 @@ public final class AOXAdESSigner implements AOSigner {
             return null;
         }
         return new SignatureProductionPlaceImpl(city, province, postalCode, country);
-    }
-
-    static SignaturePolicyIdentifier getPolicy(final String identifier,
-                                               final String identifierHash,
-                                               final String identifierHashAlgorithm,
-                                               final String description,
-                                               final String qualifier) {
-        if (identifier == null) {
-            return null;
-        }
-
-        String hashAlgo = null;
-        if (identifierHashAlgorithm != null) {
-            String normalDigAlgo = null;
-            try {
-                normalDigAlgo = AOSignConstants.getDigestAlgorithmName(identifierHashAlgorithm);
-            }
-            catch(final Exception e) {
-                LOGGER.warning("El algoritmo de huella digital para el identificador de politica de firma no es valido, se intentara dereferenciar la politica y se aplicara SHA1: " + e); //$NON-NLS-1$
-            }
-            if ("SHA1".equals(normalDigAlgo)) { //$NON-NLS-1$
-                hashAlgo = DigestMethod.SHA1;
-            }
-            else if ("SHA-256".equals(normalDigAlgo)) { //$NON-NLS-1$
-                hashAlgo = DigestMethod.SHA256;
-            }
-            else if ("SHA-512".equals(normalDigAlgo)) { //$NON-NLS-1$
-                hashAlgo = DigestMethod.SHA512;
-            }
-            else if ("RIPEMD160".equals(normalDigAlgo)) { //$NON-NLS-1$
-                hashAlgo = DigestMethod.RIPEMD160;
-            }
-        }
-        final SignaturePolicyIdentifier spi = new SignaturePolicyIdentifierImpl(false);
-        try {
-            spi.setIdentifier(identifier, hashAlgo != null ? identifierHash : null, hashAlgo);
-        }
-        catch (final Exception e) {
-            LOGGER.warning("No se ha podido acceder al identificador ('" + identifier //$NON-NLS-1$
-                                                      + "') de la politica " //$NON-NLS-1$
-                                                      + "de firma, no se anadira este campo"); //$NON-NLS-1$
-            return null;
-        }
-        // FIXME: Error en JXAdES. Si la descripcion es nula toda la firma
-        // falla.
-        final String desc = description != null ? description : ""; //$NON-NLS-1$
-        spi.setDescription(desc);
-
-        if (qualifier != null) {
-            spi.setQualifier(qualifier);
-        }
-        return spi;
     }
 
     /** Cofirma datos en formato XAdES.

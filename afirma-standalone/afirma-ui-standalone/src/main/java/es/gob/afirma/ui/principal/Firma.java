@@ -493,12 +493,13 @@ final class Firma extends JPanel {
             setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 
             // Guardamos la firma en fichero
-            final File savedFile =
-                    SelectionDialog.saveDataToFile(Messages.getString("Firma.filechooser.save.title"), //$NON-NLS-1$
-                                                   signedData,
-                                                   SignedFileManager.getOutFileName(Firma.getFilename(campoFichero.getText()), formato),
-                                                   SignedFileManager.getOutFileFilter(formato),
-                                                   this);
+            final File savedFile = SelectionDialog.saveDataToFile(
+        		Messages.getString("Firma.filechooser.save.title"), //$NON-NLS-1$
+                signedData,
+                SignedFileManager.getOutFileName(Firma.getFilename(campoFichero.getText()), formato),
+                SignedFileManager.getOutFileFilter(formato),
+                this
+            );
 
             if (savedFile != null) {
                 CustomDialog.showMessageDialog(SwingUtilities.getRoot(this), true, Messages.getString("Firma.msg.ok"), //$NON-NLS-1$

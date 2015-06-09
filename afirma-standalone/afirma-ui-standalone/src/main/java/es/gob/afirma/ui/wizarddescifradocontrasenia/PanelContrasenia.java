@@ -102,11 +102,9 @@ final class PanelContrasenia extends JAccessibilityDialogWizard {
 	public PanelContrasenia() {
         initComponents();
     }
-	/**
-	 * Constructor.
-	 * @param algoritmo
-	 * @param rutaFichero
-	 */
+	/** Constructor.
+	 * @param algoritmo Algoritmo de cifrado.
+	 * @param rutaFichero Ruta hacia el ficharo a cifrar. */
 	public PanelContrasenia(final String algoritmo, final String rutaFichero) {
 		this.cipherConfig = new CipherConfig(algoritmo);
 		this.rutaFichero = rutaFichero;

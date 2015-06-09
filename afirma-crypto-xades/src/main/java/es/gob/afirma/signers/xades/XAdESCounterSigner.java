@@ -17,7 +17,6 @@ import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
@@ -574,7 +573,7 @@ public final class XAdESCounterSigner {
 		xades.setSigningCertificate(cert);
 
 		// SignaturePolicyIdentifier
-		final SignaturePolicyIdentifier spi = AOXAdESSigner.getPolicy(
+		final SignaturePolicyIdentifier spi = XAdESUtil.getPolicy(
 				extraParams.getProperty("policyIdentifier"), //$NON-NLS-1$
 				extraParams.getProperty("policyIdentifierHash"), //$NON-NLS-1$
 				extraParams.getProperty("policyIdentifierHashAlgorithm"), //$NON-NLS-1$
@@ -600,12 +599,6 @@ public final class XAdESCounterSigner {
 		final SignerRole signerRole = XAdESUtil.parseSignerRole(extraParams);
 		if (signerRole != null) {
 			xades.setSignerRole(signerRole);
-		}
-
-		// SigningTime
-		if (Boolean.parseBoolean(extraParams.getProperty(
-				"applySystemDate", Boolean.TRUE.toString()))) { //$NON-NLS-1$
-			xades.setSigningTime(new Date());
 		}
 
 		// DataObjectFormats

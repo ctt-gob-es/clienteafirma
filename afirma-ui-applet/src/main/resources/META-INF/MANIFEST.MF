@@ -4,7 +4,7 @@ Specification-Title: Cliente @firma
 Specification-Version: 3.4
 Specification-Vendor: Gobierno de Espana
 Implementation-Title: es.gob.afirma
-Implementation-Version: build01
+Implementation-Version: build08
 Implementation-Vendor: Gobierno de Espana
 Application-Name: Cliente @firma
 Permissions: all-permissions

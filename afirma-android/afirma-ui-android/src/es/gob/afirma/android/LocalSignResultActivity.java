@@ -15,6 +15,7 @@ import android.content.IntentFilter;
 import android.hardware.usb.UsbConstants;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbManager;
+import android.media.MediaScannerConnection;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -404,8 +405,13 @@ public final class LocalSignResultActivity extends FragmentActivity implements K
 
 		showSuccessMessage(finalSignatureFilename, outDirectory, originalDirectory);
 
-		//refresco del media scanner despues de guardar el ficheo porque esta dando problemas en la version 4.3
-		sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED,android.net.Uri.fromFile(new File(outDirectory))));
+		// Refrescamos el directorio para permitir acceder al fichero
+		MediaScannerConnection.scanFile(
+				this,
+				new String[] { new File(outDirectory, finalSignatureFilename).toString(),
+						new File(outDirectory).toString()},
+				null,
+				null);
 	}
 
 	/** Muestra los elementos de pantalla informando de un error ocurrido durante la operaci&oacute;n de

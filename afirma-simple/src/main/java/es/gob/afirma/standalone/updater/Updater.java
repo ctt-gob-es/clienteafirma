@@ -70,9 +70,10 @@ public final class Updater {
 		updateSite = updaterProperties.getProperty("updateSite"); //$NON-NLS-1$
 
 		if (url == null) {
-			LOGGER.severe(
+			LOGGER.warning(
 				"El archivo de recursos del actualizador no contiene una URL de comprobacion" //$NON-NLS-1$
 			);
+			return null;
 		}
 		try {
 			version = new String(UrlHttpManagerFactory.getInstalledManager().readUrlByGet(url));
@@ -102,7 +103,7 @@ public final class Updater {
 			return Integer.parseInt(newVersion) > Integer.parseInt(getCurrentVersion());
 		}
 		catch(final Exception e) {
-			LOGGER.severe(
+			LOGGER.warning(
 				"No ha podido comparar la version actual del aplicativo con la ultima disponible: " + e //$NON-NLS-1$
 			);
 			return false;

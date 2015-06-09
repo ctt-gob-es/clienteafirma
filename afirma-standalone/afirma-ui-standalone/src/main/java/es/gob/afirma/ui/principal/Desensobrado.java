@@ -43,10 +43,10 @@ import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.MimeHelper;
 import es.gob.afirma.core.signers.AOSignConstants;
-import es.gob.afirma.envelopers.cms.AOCMSEnveloper;
 import es.gob.afirma.envelopers.cms.CMSDecipherAuthenticatedEnvelopedData;
 import es.gob.afirma.envelopers.cms.CMSDecipherEnvelopData;
 import es.gob.afirma.envelopers.cms.CMSDecipherSignedAndEnvelopedData;
+import es.gob.afirma.envelopers.cms.CMSHelper;
 import es.gob.afirma.keystores.AOCertificatesNotFoundException;
 import es.gob.afirma.keystores.AOKeyStore;
 import es.gob.afirma.keystores.AOKeyStoreManager;
@@ -173,15 +173,15 @@ final class Desensobrado extends JPanel {
             byte[] recoveredData = null;
             try {
                 // EnvelopedData
-                if (AOCMSEnveloper.isCMSValid(envelopData, AOSignConstants.CMS_CONTENTTYPE_ENVELOPEDDATA)) {
+                if (CMSHelper.isCMSValid(envelopData, AOSignConstants.CMS_CONTENTTYPE_ENVELOPEDDATA)) {
 					recoveredData = CMSDecipherEnvelopData.dechiperEnvelopData(envelopData, privateKeyEntry);
                     // SignedAndEnvelopedData
                 }
-                else if (AOCMSEnveloper.isCMSValid(envelopData, AOSignConstants.CMS_CONTENTTYPE_SIGNEDANDENVELOPEDDATA)) {
+                else if (CMSHelper.isCMSValid(envelopData, AOSignConstants.CMS_CONTENTTYPE_SIGNEDANDENVELOPEDDATA)) {
 					recoveredData = CMSDecipherSignedAndEnvelopedData.dechiperSignedAndEnvelopData(envelopData, privateKeyEntry);
                     // AuthenticatedAndEnvelopedData
                 }
-                else if (AOCMSEnveloper.isCMSValid(envelopData, AOSignConstants.CMS_CONTENTTYPE_AUTHENVELOPEDDATA)) {
+                else if (CMSHelper.isCMSValid(envelopData, AOSignConstants.CMS_CONTENTTYPE_AUTHENVELOPEDDATA)) {
 					recoveredData = CMSDecipherAuthenticatedEnvelopedData.dechiperAuthenticatedEnvelopedData(
 						envelopData,
 						privateKeyEntry

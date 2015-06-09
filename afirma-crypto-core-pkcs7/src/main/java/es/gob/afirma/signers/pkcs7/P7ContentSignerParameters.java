@@ -32,7 +32,7 @@ public final class P7ContentSignerParameters {
      * @param signatureAlgorithm Tipo de datos. */
     public P7ContentSignerParameters(final byte[] data2, final String signatureAlgorithm) {
 
-        this.data = data2.clone();
+        this.data = data2 != null ? data2.clone() : null;
 
         if (signatureAlgorithm == null || signatureAlgorithm.length() < 1) {
             LOGGER.warning("No se especifico algoritmo para la firma CADES, se utilizara " + AOSignConstants.DEFAULT_SIGN_ALGO); //$NON-NLS-1$
@@ -48,7 +48,7 @@ public final class P7ContentSignerParameters {
     /** M&eacute;todo que devuelve el contenido
      * @return el contenido */
     public byte[] getContent() {
-        return this.data.clone();
+        return this.data != null ? this.data.clone() : null;
     }
 
     /** M&eacute;todo que devuelve la firma.

@@ -202,7 +202,7 @@ public final class TsaParams {
 				new TsaRequestExtension[] {
 					new TsaRequestExtension(
 						extraParams.getProperty("tsaExtensionOid"), //$NON-NLS-1$
-						Boolean.getBoolean(extraParams.getProperty("tsaExtensionCritical", "false")), //$NON-NLS-1$ //$NON-NLS-2$
+						Boolean.parseBoolean(extraParams.getProperty("tsaExtensionCritical", "false")), //$NON-NLS-1$ //$NON-NLS-2$
 						Base64.decode(extraParams.getProperty("tsaExtensionValueBase64")) //$NON-NLS-1$
 					)
 				} : null;
@@ -211,7 +211,9 @@ public final class TsaParams {
         	throw new IllegalArgumentException("Las extensiones del sello de tiempo no estan adecuadamente codificadas: " + e, e); //$NON-NLS-1$
         }
 
-        this.verifyHostname = Boolean.parseBoolean(extraParams.getProperty("verifyHostname", Boolean.TRUE.toString())); //$NON-NLS-1$
+        this.verifyHostname = Boolean.parseBoolean(
+    		extraParams.getProperty("verifyHostname", Boolean.TRUE.toString()) //$NON-NLS-1$
+		);
 	}
 
 	boolean doTsaRequireCert() {

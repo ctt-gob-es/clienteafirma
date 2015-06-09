@@ -25,6 +25,8 @@ import es.gob.afirma.keystores.AOKeyStoreManager;
 import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
 import es.gob.afirma.keystores.AOKeystoreAlternativeException;
 import es.gob.afirma.keystores.callbacks.CachePasswordCallback;
+import es.gob.afirma.keystores.filters.CertFilterManager;
+import es.gob.afirma.keystores.filters.CertificateFilter;
 import es.gob.afirma.signers.cades.AOCAdESSigner;
 import es.gob.afirma.signers.pades.AOPDFSigner;
 import es.gob.afirma.signers.xades.AOFacturaESigner;
@@ -38,16 +40,17 @@ final class CommandLineLauncher {
 		// No permitimos la instanciacion
 	}
 
-	private static final String PARAM_INPUT  = "-i"; //$NON-NLS-1$
-	private static final String PARAM_OUTPUT = "-o"; //$NON-NLS-1$
-	private static final String PARAM_ALIAS  = "-alias"; //$NON-NLS-1$
-	private static final String PARAM_STORE  = "-store"; //$NON-NLS-1$
-	private static final String PARAM_FORMAT = "-format"; //$NON-NLS-1$
-	private static final String PARAM_PASSWD = "-password"; //$NON-NLS-1$
-	private static final String PARAM_XML    = "-xml"; //$NON-NLS-1$
-	private static final String PARAM_ALGO   = "-algorithm"; //$NON-NLS-1$
-	private static final String PARAM_CONFIG   = "-config"; //$NON-NLS-1$
-	private static final String PARAM_GUI    = "-gui"; //$NON-NLS-1$
+	private static final String PARAM_INPUT   = "-i"; //$NON-NLS-1$
+	private static final String PARAM_OUTPUT  = "-o"; //$NON-NLS-1$
+	private static final String PARAM_ALIAS   = "-alias"; //$NON-NLS-1$
+	private static final String PARAM_FILTER  = "-filter"; //$NON-NLS-1$
+	private static final String PARAM_STORE   = "-store"; //$NON-NLS-1$
+	private static final String PARAM_FORMAT  = "-format"; //$NON-NLS-1$
+	private static final String PARAM_PASSWD  = "-password"; //$NON-NLS-1$
+	private static final String PARAM_XML     = "-xml"; //$NON-NLS-1$
+	private static final String PARAM_ALGO    = "-algorithm"; //$NON-NLS-1$
+	private static final String PARAM_CONFIG  = "-config"; //$NON-NLS-1$
+	private static final String PARAM_GUI     = "-gui"; //$NON-NLS-1$
 
 	private static final String STORE_AUTO = "auto"; //$NON-NLS-1$
 	private static final String STORE_MAC  = "mac"; //$NON-NLS-1$
@@ -72,6 +75,9 @@ final class CommandLineLauncher {
 
 	private static final String EXTRA_PARAM_TARGET = "target"; //$NON-NLS-1$
 
+	/** Clave con la que se configuran los filtros en el CertFilterManager. */
+	private static final String KEY_FILTERS = "filters";  //$NON-NLS-1$
+
 	private static final int STATUS_ERROR = -1;
 	private static final int STATUS_SUCCESS = 0;
 
@@ -93,6 +99,7 @@ final class CommandLineLauncher {
 
 		String store = null;
 		String alias = null;
+		String filter = null;
 		File inputFile = null;
 		File outputFile = null;
 		String format = null;
@@ -154,14 +161,36 @@ final class CommandLineLauncher {
 						closeApp(STATUS_ERROR, pw,
 								buildSyntaxError(CommandLineMessages.getString("CommandLineLauncher.26", args[i]))); //$NON-NLS-1$
 					}
+					if (filter != null) {
+						closeApp(STATUS_ERROR, pw,
+								buildSyntaxError(CommandLineMessages.getString("CommandLineLauncher.28", args[i]))); //$NON-NLS-1$
+					}
 					alias = args[i+1];
+					i++;
+				}
+				else if (PARAM_FILTER.equals(args[i])) {
+
+					if (filter != null) {
+						closeApp(STATUS_ERROR, pw,
+								buildSyntaxError(CommandLineMessages.getString("CommandLineLauncher.26", args[i]))); //$NON-NLS-1$
+					}
+					if (alias != null) {
+						closeApp(STATUS_ERROR, pw,
+								buildSyntaxError(CommandLineMessages.getString("CommandLineLauncher.28", args[i]))); //$NON-NLS-1$
+					}
+					filter = args[i+1];
 					i++;
 				}
 				else if (PARAM_INPUT.equals(args[i])) {
 
 					if (inputFile != null) {
-						closeApp(STATUS_ERROR, pw,
-								buildSyntaxError(CommandLineMessages.getString("CommandLineLauncher.26", args[i]))); //$NON-NLS-1$
+						closeApp(
+							STATUS_ERROR,
+							pw,
+							buildSyntaxError(
+								CommandLineMessages.getString("CommandLineLauncher.26", args[i]) //$NON-NLS-1$
+							)
+						);
 					}
 
 					inputFile = new File(args[i+1]);
@@ -268,7 +297,7 @@ final class CommandLineLauncher {
 				closeApp(STATUS_ERROR, pw, CommandLineMessages.getString("CommandLineLauncher.5")); //$NON-NLS-1$
 			}
 
-			if (alias == null) {
+			if (alias == null && filter == null) {
 				closeApp(STATUS_ERROR, pw, CommandLineMessages.getString("CommandLineLauncher.17")); //$NON-NLS-1$
 			}
 
@@ -279,10 +308,35 @@ final class CommandLineLauncher {
 			boolean failed = false;
 			byte[] res = null;
 			try {
+				// Obtenemos el almacen
+				final AOKeyStoreManager ksm;
+				try {
+					ksm = getKsm(store, password);
+				}
+				catch (final Exception e) {
+					throw new CommandLineException("No se ha podido inicializar el almacen de claves: " + e, e); //$NON-NLS-1$
+				}
+
+				String selectedAlias = alias;
+				if (filter != null) {
+					selectedAlias = filterCertificates(ksm, filter);
+				}
+
 				res = buildSuccessSignMessage(
-						sign(command, format, algorithm, extraParams, inputFile, alias, store, password),
-						xml);
-			} catch (final CommandLineException e) {
+					sign(
+						command,
+						format,
+						algorithm,
+						extraParams,
+						inputFile,
+						selectedAlias,
+						ksm,
+						password
+					),
+					xml
+				);
+			}
+			catch (final CommandLineException e) {
 				res = buildErrorMessage(e.getMessage(), e, xml);
 				failed = true;
 			}
@@ -296,8 +350,11 @@ final class CommandLineLauncher {
 					fos.close();
 				}
 				catch(final Exception e) {
-					closeApp(STATUS_ERROR, pw,
-							CommandLineMessages.getString("CommandLineLauncher.21", outputFile.getAbsolutePath())); //$NON-NLS-1$
+					closeApp(
+						STATUS_ERROR,
+						pw,
+						CommandLineMessages.getString("CommandLineLauncher.21", outputFile.getAbsolutePath()) //$NON-NLS-1$
+					);
 				}
 
 			}
@@ -333,22 +390,45 @@ final class CommandLineLauncher {
 		}
 	}
 
+	/**
+	 * Filtra los certificados del almacen y devuelve el alias del &uacute;nico certificado
+	 * que pasa el filtro.
+	 * @param ksm Gestor del almac&eacute;n en el que aplicar el filtro.
+	 * @param filterConfig Configuraci&oacute;n del filtro de certificados.
+	 * @return Alias del certificado seleccionado.
+	 * @throws CommandLineException Cuando no se ha encontrado ning&uacute;n certificado que pase
+	 * el filtro o cuando se encuentra m&aacute;s de uno.
+	 */
+	private static String filterCertificates(final AOKeyStoreManager ksm, final String filterConfig) throws CommandLineException {
+
+		final Properties config = new Properties();
+		config.setProperty(KEY_FILTERS, filterConfig);
+
+		// Componemos el filtro (solo puede haber 1)
+		final CertificateFilter filter = new CertFilterManager(config).getFilters().get(0);
+
+		final String[] filteredAliases = filter.matches(ksm.getAliases(), ksm);
+
+		if (filteredAliases == null || filteredAliases.length == 0) {
+			throw new CommandLineException("No se han encontrado certificados que se ajusten al filtro establecido"); //$NON-NLS-1$
+		}
+
+		if (filteredAliases.length > 1) {
+			throw new CommandLineException("Se ha encontrado mas de un certificado a partir del fitro establecido"); //$NON-NLS-1$
+		}
+
+		return filteredAliases[0];
+	}
+
 	private static byte[] sign(final String op,
 			                 final String fmt,
 			                 final String algorithm,
 			                 final String extraParams,
 			                 final File inputFile,
 			                 final String alias,
-			                 final String store,
+			                 final AOKeyStoreManager ksm,
 			                 final String storePassword) throws CommandLineException {
-		// Almacen
-		final AOKeyStoreManager ksm;
-		try {
-			ksm = getKsm(store, storePassword);
-		}
-		catch (final Exception e) {
-			throw new CommandLineException("No se ha podido inicializar el almacen de claves", e); //$NON-NLS-1$
-		}
+
 		final PrivateKeyEntry ke;
 		try {
 			ke = ksm.getKeyEntry(

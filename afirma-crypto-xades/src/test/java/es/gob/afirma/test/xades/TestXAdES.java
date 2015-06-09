@@ -12,11 +12,9 @@ package es.gob.afirma.test.xades;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.InputStream;
 import java.security.KeyStore;
 import java.security.KeyStore.PrivateKeyEntry;
-import java.security.MessageDigest;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.Properties;
@@ -69,7 +67,7 @@ public final class TestXAdES {
         final Properties p1 = new Properties();
         p1.setProperty("format", AOSignConstants.SIGN_FORMAT_XADES_DETACHED); //$NON-NLS-1$
         p1.setProperty("mode", AOSignConstants.SIGN_MODE_IMPLICIT); //$NON-NLS-1$
-        p1.setProperty("policyIdentifier", "urn:oid:2.16.724.1.3.1.1.2.1.8"); //$NON-NLS-1$ //$NON-NLS-2$
+        p1.setProperty("policyIdentifier", "2.16.724.1.3.1.1.2.1.8"); //$NON-NLS-1$ //$NON-NLS-2$
         p1.setProperty("policyIdentifierHash", "V8lVVNGDCPen6VELRD1Ja8HARFk=");  //$NON-NLS-1$//$NON-NLS-2$
         p1.setProperty("policyIdentifierHashAlgorithm", DigestMethod.SHA1);         //$NON-NLS-1$
         p1.setProperty("policyDescription", "Politica de firma electronica para las Administraciones Publicas en Espana"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -102,7 +100,7 @@ public final class TestXAdES {
 
 
         XADES_MODES = new Properties[] {
-                p1 , p2, p3, p4, p5, p6
+                p1, p2, p3, p4, p5, p6
         };
     }
 
@@ -492,8 +490,7 @@ public final class TestXAdES {
 
     }
 
-    /**
-     * Comprueba que el nodo UnsignedSignatureProperties (en caso de aparecer)
+    /** Comprueba que el nodo UnsignedSignatureProperties (en caso de aparecer)
      * de la firma XAdES contiene atributos. Busca el nodo con el namespace
      * indicado.
      * @param sign Firma.
@@ -535,7 +532,7 @@ public final class TestXAdES {
      */
     @SuppressWarnings("static-method")
 	@Test
-    public void TestDetection() throws Exception {
+    public void testDetection() throws Exception {
     	final String[] files = new String[] { "firmaIgae.xsig.xml" }; //$NON-NLS-1$
     	final AOSigner signer = new AOXAdESSigner();
     	for (final String f : files) {
@@ -543,14 +540,4 @@ public final class TestXAdES {
     	}
     }
 
-    public static void main(final String[] args) throws Exception {
-
-    	final FileInputStream fis = new FileInputStream("C:/Users/carlos/.m2/repository/net/java/xades/jxades/1.0-Afirma/jxades-1.0-Afirma.jar");
-    	final byte[] data = AOUtil.getDataFromInputStream(fis);
-    	fis.close();
-
-    	final byte[] digest = MessageDigest.getInstance("SHA1").digest(data);
-
-    	System.out.println(AOUtil.hexify(digest, false).toLowerCase());
-	}
 }

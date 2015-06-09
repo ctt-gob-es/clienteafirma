@@ -1,13 +1,16 @@
 package es.gob.afirma.signfolder.server.proxy;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.util.Hashtable;
 import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
+import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -46,8 +49,27 @@ public final class StorageService extends HttpServlet {
 
 		LOGGER.info("Se recibe una peticion de almacenamiento"); //$NON-NLS-1$
 
-		final String operation = request.getParameter(PARAMETER_NAME_OPERATION);
-		final String syntaxVersion = request.getParameter(PARAMETER_NAME_SYNTAX_VERSION);
+		// Leemos la entrada
+		int n;
+		final byte[] buffer = new byte[1024];
+		final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		final ServletInputStream sis = request.getInputStream();
+		while ((n = sis.read(buffer)) > 0) {
+			baos.write(buffer, 0, n);
+		}
+		baos.close();
+		sis.close();
+
+		// Separamos los parametros y sus valores
+		final Hashtable<String, String> params = new Hashtable<String, String>();
+		final String[] urlParams = new String(baos.toByteArray()).split("&"); //$NON-NLS-1$
+		for (final String param : urlParams) {
+			final int equalsPos = param.indexOf('=');
+			params.put(param.substring(0, equalsPos), param.substring(equalsPos + 1));
+		}
+
+		final String operation = params.get(PARAMETER_NAME_OPERATION);
+		final String syntaxVersion = params.get(PARAMETER_NAME_SYNTAX_VERSION);
 		response.setHeader("Access-Control-Allow-Origin", "*"); //$NON-NLS-1$ //$NON-NLS-2$
 		response.setContentType("text/plain"); //$NON-NLS-1$
 		response.setCharacterEncoding("utf-8"); //$NON-NLS-1$
@@ -75,7 +97,7 @@ public final class StorageService extends HttpServlet {
 		}
 
 		if (OPERATION_STORE.equalsIgnoreCase(operation)) {
-			storeSign(out, request, config);
+			storeSign(out, params, config);
 		} else {
 			out.println(ErrorManager.genError(ErrorManager.ERROR_UNSUPPORTED_OPERATION_NAME, null));
 		}
@@ -88,11 +110,11 @@ public final class StorageService extends HttpServlet {
 	 * @param request Petici&oacute;n.
 	 * @throws IOException Cuando ocurre un error al general la respuesta.
 	 */
-	private static void storeSign(final PrintWriter out, final HttpServletRequest request, final StorageConfig config) throws IOException {
+	private static void storeSign(final PrintWriter out, final Hashtable<String, String> params, final StorageConfig config) throws IOException {
 
 		LOGGER.info("Solicitud de guardado"); //$NON-NLS-1$
 
-		final String id = request.getParameter(PARAMETER_NAME_ID);
+		final String id = params.get(PARAMETER_NAME_ID);
 		if (id == null) {
 			LOGGER.severe(ErrorManager.genError(ErrorManager.ERROR_MISSING_DATA_ID, null));
 			out.println(ErrorManager.genError(ErrorManager.ERROR_MISSING_DATA_ID, null));
@@ -102,7 +124,7 @@ public final class StorageService extends HttpServlet {
 		LOGGER.info("Se solicita guardar un fichero con el identificador: " + id); //$NON-NLS-1$
 
 		// Si no se indican los datos, se transmite el error en texto plano a traves del fichero generado
-		String dataText = request.getParameter(PARAMETER_NAME_DATA);
+		String dataText = params.get(PARAMETER_NAME_DATA);
 		if (dataText == null) {
 			LOGGER.severe(ErrorManager.genError(ErrorManager.ERROR_MISSING_DATA, null));
 			dataText = ErrorManager.genError(ErrorManager.ERROR_MISSING_DATA, null);

@@ -1,11 +1,14 @@
 package es.gob.afirma.test.simple;
 
+import java.io.File;
+
 import org.junit.Ignore;
 import org.junit.Test;
 
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.http.UrlHttpManagerFactory;
 import es.gob.afirma.standalone.SimpleAfirma;
+import es.gob.afirma.standalone.VisorFirma;
 
 /** Pruebas de invocaci&oacute;n por protocolo.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
@@ -14,6 +17,7 @@ public class TestProtocolInvocation {
 	private static final String LINE_NODATA = "afirma://sign?op=sign&id=000954750801&key=70192563&stservlet=http://comparece.dipucr.es:8080/afirma-signature-storage/StorageService&format=CAdES&algorithm=SHA1withRSA&properties=bW9kZT1leHBsaWNpdApzZXJ2ZXJVcmw9aHR0cDovL2NvbXBhcmVjZS5kaXB1Y3IuZXM6ODA4MC9hZmlybWEtc2VydmVyLXRyaXBoYXNlLXNpZ25lci9TaWduYXR1cmVTZXJ2aWNl"; //$NON-NLS-1$
 	private static final String LINE_CUSTOM_STORE = "afirma://sign?op=sign&keystore=Mozilla%20%2F%20Firefox%20(unificado)&id=000954750801&key=70192563&stservlet=http://comparece.dipucr.es:8080/afirma-signature-storage/StorageService&format=CAdES&algorithm=SHA1withRSA&properties=bW9kZT1leHBsaWNpdApzZXJ2ZXJVcmw9aHR0cDovL2NvbXBhcmVjZS5kaXB1Y3IuZXM6ODA4MC9hZmlybWEtc2VydmVyLXRyaXBoYXNlLXNpZ25lci9TaWduYXR1cmVTZXJ2aWNl"; //$NON-NLS-1$
 	private static final String LINE_SAVE = "afirma://save?dat=bW9kZT1leHBsaWNpdApzZXJ2ZXJVcmw9aHR0cDovL2NvbXBhcmVjZS5kaXB1Y3IuZXM6ODA4MC9hZmlybWEtc2VydmVyLXRyaXBoYXNlLXNpZ25lci9TaWduYXR1cmVTZXJ2aWNl"; //$NON-NLS-1$
+	private static final String LINE_SIGN_HASH = "afirma://sign?op=sign&id=001261524336&stservlet=http://172.24.31.97:8080/afirma-signature-storage/StorageService&format=CAdES&algorithm=SHA1withRSA&properties=c2VydmVyVXJsPWh0dHA6Ly8xMC45MC40My43Nzo4MDg4L2FmaXJtYS1zZXJ2ZXItdHJpcGhhc2Utc2lnbmVyL1NpZ25hdHVyZVNlcnZpY2UKcHJlY2FsY3VsYXRlZEhhc2hBbGdvcml0aG09U0hBMQptb2RlPWV4cGxpY2l0Cg%3D%3D&dat=Jhxa1FdwzBSHXI9G6qPspCVoEEo%3D"; //$NON-NLS-1$
 
 	private static final String LINE_SERVICE = "afirma://service?ports=1234,4321&unused=dummy"; //$NON-NLS-1$
 
@@ -33,6 +37,14 @@ public class TestProtocolInvocation {
 	@Ignore // Necesita NSS
 	public void testCustomStore() {
 		SimpleAfirma.main(new String[] { LINE_CUSTOM_STORE });
+	}
+
+	/** Prueba de protocolo con firma de hash. */
+	@SuppressWarnings("static-method")
+	@Test
+	@Ignore // Requiere de servidor remoto y UI
+	public void testSignHash() {
+		SimpleAfirma.main(new String[] { LINE_SIGN_HASH });
 	}
 
 	/** Prueba de protocolo para servicio local.
@@ -60,4 +72,12 @@ public class TestProtocolInvocation {
 
 	}
 
+	/** Prueba de apertura de firma con el visor.
+	 * @param args No se usa.
+	 * @throws Exception Error al cargar el recurso de prueba. */
+	public static void main(final String[] args) throws Exception {
+
+		final File file = new File(TestProtocolInvocation.class.getResource("/ANF_PF_Activo.pfx").toURI()); //$NON-NLS-1$
+		new VisorFirma(false).initialize(false, file);
+	}
 }

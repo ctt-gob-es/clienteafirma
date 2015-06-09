@@ -123,6 +123,9 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 			                                            IOException,
 			                                            AOException,
 			                                            CertificateEncodingException {
+
+		LOGGER.info("Solicitada firma con algoritmo " + algorithm + " y formato " + format); //$NON-NLS-1$ //$NON-NLS-2$
+
 		this.clearError();
 
 		final byte[] dataBinary;

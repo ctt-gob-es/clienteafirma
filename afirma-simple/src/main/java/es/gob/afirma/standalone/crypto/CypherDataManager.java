@@ -72,7 +72,9 @@ public final class CypherDataManager {
 	 * @throws GeneralSecurityException Cuando falla el proceso de cifrado.
 	 * @throws IOException En caso de errores en el tratamiento de datos. */
 	public static String cipherData(final byte[] data, final byte[] cipherKey) throws InvalidKeyException, GeneralSecurityException, IOException {
-		return Integer.toString((DesCipher.getPaddingLength() - data.length % DesCipher.getPaddingLength()) % DesCipher.getPaddingLength()) +
-				PADDING_CHAR_SEPARATOR + Base64.encode(DesCipher.cipher(data, cipherKey), true);
+		return new StringBuilder((int)(data.length * 1.2)).
+				append(Integer.toString((DesCipher.getPaddingLength() - data.length % DesCipher.getPaddingLength()) % DesCipher.getPaddingLength())).
+				append(PADDING_CHAR_SEPARATOR).
+				append(Base64.encode(DesCipher.cipher(data, cipherKey), true)).toString();
 	}
 }

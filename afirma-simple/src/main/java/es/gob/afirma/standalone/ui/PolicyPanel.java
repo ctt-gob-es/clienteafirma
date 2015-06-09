@@ -2,6 +2,8 @@ package es.gob.afirma.standalone.ui;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyListener;
@@ -14,6 +16,8 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+
+import org.ietf.jgss.Oid;
 
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AdESPolicy;
@@ -36,7 +40,12 @@ final class PolicyPanel extends JPanel implements ItemListener {
 	};
 
 	private JComboBox policiesCombo;
+
 	private JTextField identifierField;
+	JTextField getIdentifierField() {
+		return this.identifierField;
+	}
+
 	private JTextField hashField;
 	private JComboBox hashAlgorithmField;
 	private JTextField qualifierField;
@@ -154,6 +163,37 @@ final class PolicyPanel extends JPanel implements ItemListener {
 		this.identifierField.setEditable(editableTextFields);
 		this.identifierField.getAccessibleContext().setAccessibleDescription(
 			SimpleAfirmaMessages.getString("PreferencesPanel.54") //$NON-NLS-1$
+		);
+		this.identifierField.addFocusListener(
+			new FocusListener() {
+
+				/** Ajusta la introducci&oacute;n del prefijo "urn:oid" de forma autom&aacute;tica
+				 * para evitar confusiones por parte del usuario. */
+				@SuppressWarnings("unused")
+				@Override
+				public void focusLost(final FocusEvent e) {
+					if (!"XAdES".equals(signFormat)) { //$NON-NLS-1$
+						PolicyPanel.this.getIdentifierField().setText(
+							PolicyPanel.this.getIdentifierField().getText().replace("urn:oid:", "") //$NON-NLS-1$ //$NON-NLS-2$
+						);
+					}
+					else {
+						try {
+							new Oid(PolicyPanel.this.getIdentifierField().getText());
+						}
+						catch(final Exception ex) {
+							return;
+						}
+						// Es un OID, lo pasamos a URN de tipo OID
+						PolicyPanel.this.getIdentifierField().setText(
+							"urn:oid:" + PolicyPanel.this.getIdentifierField().getText() //$NON-NLS-1$
+						);
+					}
+				}
+
+				@Override
+				public void focusGained(final FocusEvent e) { /* Vacio */ }
+			}
 		);
 		final JLabel policyIdentifierLabel = new JLabel(
 			SimpleAfirmaMessages.getString("PreferencesPanel." + signFormat + ".27") //$NON-NLS-1$ //$NON-NLS-2$

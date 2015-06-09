@@ -6,11 +6,11 @@ import java.io.InputStream;
 import org.junit.Assert;
 import org.junit.Test;
 
+import es.gob.afirma.cert.signvalidation.SignValidity;
+import es.gob.afirma.cert.signvalidation.SignValidity.SIGN_DETAIL_TYPE;
+import es.gob.afirma.cert.signvalidation.ValidateBinarySignature;
+import es.gob.afirma.cert.signvalidation.ValidateXMLSignature;
 import es.gob.afirma.core.misc.AOUtil;
-import es.gob.afirma.signature.SignValidity;
-import es.gob.afirma.signature.SignValidity.SIGN_DETAIL_TYPE;
-import es.gob.afirma.signature.ValidateBinarySignature;
-import es.gob.afirma.signature.ValidateXMLSignature;
 
 /** Realiza pruebas de validaci&oacute;n del core de firma. */
 public class ValidateSignatureTest {

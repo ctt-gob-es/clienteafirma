@@ -16,23 +16,23 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Image;
 import java.awt.Insets;
 import java.awt.event.KeyListener;
+import java.io.InputStream;
 import java.net.URI;
 import java.util.logging.Logger;
 
+import javax.imageio.ImageIO;
 import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.event.HyperlinkEvent;
-import javax.xml.parsers.DocumentBuilderFactory;
 
-import org.apache.batik.swing.JSVGCanvas;
-
+import es.gob.afirma.cert.signvalidation.SignValidity;
 import es.gob.afirma.core.ui.AOUIFactory;
-import es.gob.afirma.signature.SignValidity;
 import es.gob.afirma.standalone.LookAndFeelManager;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 
@@ -60,32 +60,34 @@ final class SignResultPanel extends JPanel {
         // el tipo de contenido antes que el contenido
         this.descTextLabel.setContentType("text/html"); //$NON-NLS-1$
 
-        final JSVGCanvas resultOperationIcon = new JSVGCanvas();
-        resultOperationIcon.setBackground(new Color(255, 255, 255, 0));
-        resultOperationIcon.setFocusable(false);
-        final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        dbf.setNamespaceAware(true);
+        String iconFilename;
+        switch (validity.getValidity()) {
+        case KO:
+            iconFilename = "ko_icon.png"; //$NON-NLS-1$
+            break;
+        case OK:
+            iconFilename = "ok_icon.png"; //$NON-NLS-1$
+            break;
+        case GENERATED:
+            iconFilename = "ok_icon.png"; //$NON-NLS-1$
+            break;
+        default:
+            iconFilename = "unknown_icon.png"; //$NON-NLS-1$
+        }
+
+        ScalablePane resultOperationIcon;
         try {
-            String iconFilename;
-            switch (validity.getValidity()) {
-            case KO:
-                iconFilename = "ko_icon.svg"; //$NON-NLS-1$
-                break;
-            case OK:
-                iconFilename = "ok_icon.svg"; //$NON-NLS-1$
-                break;
-            case GENERATED:
-                iconFilename = "ok_icon.svg"; //$NON-NLS-1$
-                break;
-            default:
-                iconFilename = "unknown_icon.svg"; //$NON-NLS-1$
-            }
-            resultOperationIcon.setDocument(dbf.newDocumentBuilder()
-               .parse(this.getClass()
-                          .getResourceAsStream("/resources/" + iconFilename))); //$NON-NLS-1$
+        	final InputStream is = this.getClass().getResourceAsStream("/resources/" + iconFilename); //$NON-NLS-1$
+        	final Image image = ImageIO.read(is);
+        	is.close();
+        	resultOperationIcon = new ScalablePane(image);
+            resultOperationIcon.setBackground(new Color(255, 255, 255, 0));
+            resultOperationIcon.setFocusable(false);
+            resultOperationIcon.setMinimumSize(new Dimension(120, 120));
         }
         catch (final Exception e) {
             Logger.getLogger("es.gob.afirma").warning("No se ha podido cargar el icono de resultado o validez de firma, este no se mostrara: " + e); //$NON-NLS-1$ //$NON-NLS-2$
+            resultOperationIcon = null;
         }
 
         String errorMessage;
@@ -127,7 +129,9 @@ final class SignResultPanel extends JPanel {
                 if (validity.getError() != null) {
                     switch (validity.getError()) {
                     case NO_DATA: errorMessage = SimpleAfirmaMessages.getString("SignResultPanel.15"); break; //$NON-NLS-1$
-                    case UNKOWN_VALIDITY_PDF: errorMessage = SimpleAfirmaMessages.getString("SignResultPanel.24"); break; //$NON-NLS-1$
+                    case PDF_UNKOWN_VALIDITY: errorMessage = SimpleAfirmaMessages.getString("SignResultPanel.24"); break; //$NON-NLS-1$
+                    case OOXML_UNKOWN_VALIDITY: errorMessage = SimpleAfirmaMessages.getString("SignResultPanel.25"); break; //$NON-NLS-1$
+                    case ODF_UNKOWN_VALIDITY: errorMessage = SimpleAfirmaMessages.getString("SignResultPanel.26"); break; //$NON-NLS-1$
                     default:
                         errorMessage = SimpleAfirmaMessages.getString("SignResultPanel.12"); //$NON-NLS-1$
                     }
@@ -139,8 +143,9 @@ final class SignResultPanel extends JPanel {
                 resultOperationIconTooltip = SimpleAfirmaMessages.getString("SignResultPanel.13"); //$NON-NLS-1$
                 break;
         }
-        resultOperationIcon.setPreferredSize(new Dimension(120, 120));
-        resultOperationIcon.setToolTipText(resultOperationIconTooltip);
+        if (resultOperationIcon != null) {
+        	resultOperationIcon.setToolTipText(resultOperationIconTooltip);
+        }
 
         final EditorFocusManager editorFocusManager = new EditorFocusManager (this.descTextLabel, new EditorFocusManagerAction() {
             @Override
@@ -190,8 +195,10 @@ final class SignResultPanel extends JPanel {
         c.weightx = 0.0;
         c.weighty = 1.0;
         c.gridheight = 2;
-        c.insets = new Insets(11, 11, 11, 5);
-        this.add(resultOperationIcon, c);
+        c.insets = new Insets(11, 11, 0, 5);
+        if (resultOperationIcon != null) {
+        	this.add(resultOperationIcon, c);
+        }
         c.weightx = 1.0;
         c.weighty = 0.0;
         c.gridx = 1;

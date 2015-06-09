@@ -5,10 +5,10 @@ import java.io.InputStream;
 import org.junit.Assert;
 import org.junit.Test;
 
+import es.gob.afirma.cert.signvalidation.SignValidity;
+import es.gob.afirma.cert.signvalidation.SignValidity.SIGN_DETAIL_TYPE;
+import es.gob.afirma.cert.signvalidation.ValidateBinarySignature;
 import es.gob.afirma.core.misc.AOUtil;
-import es.gob.afirma.signature.SignValidity;
-import es.gob.afirma.signature.SignValidity.SIGN_DETAIL_TYPE;
-import es.gob.afirma.signature.ValidateBinarySignature;
 
 /** Prueba de validaci&oacute;n de firma binaria. */
 public class TestValidatebinarySignature {
@@ -21,7 +21,7 @@ public class TestValidatebinarySignature {
 
 
 	/** Prueba de validaci&oacute;n de firma CAdES impl&iacute;cita.
-	 * @throws Exception */
+	 * @throws Exception En cualquier error. */
 	@Test
 	public void testValidarFirmaCadesImplicita() throws Exception {
 
@@ -40,13 +40,11 @@ public class TestValidatebinarySignature {
 		}
 
 		Assert.assertNotNull("No se ha obtenido ningun resultado del proceso de validacion de la firma " + signatureFile, validity); //$NON-NLS-1$
-		if (validity != null) {
-			Assert.assertEquals("El resultado de la validacion no es correcto para la firma " + signatureFile, SIGN_DETAIL_TYPE.OK, validity.getValidity()); //$NON-NLS-1$
-		}
+		Assert.assertEquals("El resultado de la validacion no es correcto para la firma " + signatureFile, SIGN_DETAIL_TYPE.OK, validity.getValidity()); //$NON-NLS-1$
 	}
 
 	/** Prueba de validaci&oacute;n de firma CMS impl&iacute;cita.
-	 * @throws Exception */
+	 * @throws Exception En cualquier error. */
 	@Test
 	public void testValidarFirmaCmsImplicita() throws Exception {
 
@@ -65,13 +63,11 @@ public class TestValidatebinarySignature {
 		}
 
 		Assert.assertNotNull("No se ha obtenido ningun resultado del proceso de validacion de la firma " + signatureFile, validity); //$NON-NLS-1$
-		if (validity != null) {
-			Assert.assertEquals("El resultado de la validacion no es correcto para la firma " + signatureFile, SIGN_DETAIL_TYPE.OK, validity.getValidity()); //$NON-NLS-1$
-		}
+		Assert.assertEquals("El resultado de la validacion no es correcto para la firma " + signatureFile, SIGN_DETAIL_TYPE.OK, validity.getValidity()); //$NON-NLS-1$
 	}
 
 	/** Prueba de validaci&oacute;n de firma CAdES expl&iacute;cita.
-	 * @throws Exception */
+	 * @throws Exception En cualquier error. */
 	@Test
 	public void testValidarFirmaCadesExplicita() throws Exception {
 
@@ -102,13 +98,11 @@ public class TestValidatebinarySignature {
 		}
 
 		Assert.assertNotNull("No se ha obtenido ningun resultado del proceso de validacion de la firma " + signatureFile, validity); //$NON-NLS-1$
-		if (validity != null) {
-			Assert.assertEquals("El resultado de la validacion no es correcto para la firma " + signatureFile, SIGN_DETAIL_TYPE.OK, validity.getValidity()); //$NON-NLS-1$
-		}
+		Assert.assertEquals("El resultado de la validacion no es correcto para la firma " + signatureFile, SIGN_DETAIL_TYPE.OK, validity.getValidity()); //$NON-NLS-1$
 	}
 
 	/** Prueba de validaci&oacute;n de firma CMS expl&iacute;cita.
-	 * @throws Exception */
+	 * @throws Exception En cualquier error. */
 	@Test
 	public void testValidarFirmaCmsExplicita() throws Exception {
 
@@ -132,8 +126,6 @@ public class TestValidatebinarySignature {
 		}
 
 		Assert.assertNotNull("No se ha obtenido ningun resultado del proceso de validacion de la firma " + signatureFile, validity); //$NON-NLS-1$
-		if (validity != null) {
-			Assert.assertEquals("El resultado de la validacion no es correcto para la firma " + signatureFile, SIGN_DETAIL_TYPE.OK, validity.getValidity()); //$NON-NLS-1$
-		}
+		Assert.assertEquals("El resultado de la validacion no es correcto para la firma " + signatureFile, SIGN_DETAIL_TYPE.OK, validity.getValidity()); //$NON-NLS-1$
 	}
 }

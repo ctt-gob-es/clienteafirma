@@ -1,0 +1,64 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" 
+          "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta charset="utf-8">
+<title>QUnit 'ecdsamod.js' static method test</title>
+<script type="text/javascript" src="jquery-1.4.2.min.js"></script>
+<script type="text/javascript" src="qunit.js"></script>
+<link rel="stylesheet" href="qunit.css" type="text/css" media="screen" />
+<!-- crypto-js, yahoo -->
+<script src="http://crypto-js.googlecode.com/svn/tags/3.1.2/build/components/core.js"></script>
+<script src="http://crypto-js.googlecode.com/svn/tags/3.1.2/build/components/sha256.js"></script>
+<script src="http://yui.yahooapis.com/2.9.0/build/yahoo/yahoo-min.js"></script>
+<!-- tom wo's -->
+<script src="../ext/jsbn.js"></script>
+<script src="../ext/jsbn2.js"></script>
+<script src="../ext/prng4.js"></script>
+<script src="../ext/rng.js"></script>
+<script src="../ext/ec.js"></script>
+<!-- bitcoin -->
+<script src="../ext/ec-patch.js"></script>
+<!-- kjur -->
+<script src="../asn1hex-1.1.js"></script>
+<script src="../asn1-1.0.js"></script>
+<script src="../crypto-1.1.js"></script>
+<script src="../ecdsa-modified-1.0.js"></script>
+<script src="../ecparam-1.0.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){
+var o = KJUR.crypto.ECDSA;
+
+test("asn1SigToConcatSig k1.sig.aaa.1", function() {
+  equal(o.asn1SigToConcatSig('3045022100f729843c8bb5f285380ef5e4d708608d7449dadfa50129112668e972d30f210b0220051c589f0ebdad7a41370e9d9ce405734e854788387f21997028312a305ddae8'), 'f729843c8bb5f285380ef5e4d708608d7449dadfa50129112668e972d30f210b051c589f0ebdad7a41370e9d9ce405734e854788387f21997028312a305ddae8', '1');
+});
+
+test("concatSigToASN1Sig k1.sig.aaa.1", function() {
+  equal(o.concatSigToASN1Sig('f729843c8bb5f285380ef5e4d708608d7449dadfa50129112668e972d30f210b051c589f0ebdad7a41370e9d9ce405734e854788387f21997028312a305ddae8'), '3045022100f729843c8bb5f285380ef5e4d708608d7449dadfa50129112668e972d30f210b0220051c589f0ebdad7a41370e9d9ce405734e854788387f21997028312a305ddae8', '1');
+});
+
+});
+</script>
+  
+</head>
+<body>
+<div id="qunit"></div>
+<div id="qunit-fixture">test markup</div>
+
+<b>NOTE:</b>
+<p>
+Currently this library works for only secp256r1, secp256k1 and secp384r1 EC curves
+besides some other curves are pre-defined.
+</p>
+
+<p>
+ECC related QUnit test pages: 
+<a href="qunit-do-crypto.html">crypto.js</a> | 
+<a href="qunit-do-crypto-ecdsa.html">crypto.js Signature class for ECDSA</a> | 
+<a href="qunit-do-ecdsamod.html">ecdsa-modified.js</a> | 
+<a href="qunit-do-ecparam.html">ecparam.js</a> | 
+</p>
+
+</body>
+</html>

@@ -2,6 +2,7 @@ package es.gob.afirma.core.misc.protocol;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLDecoder;
@@ -19,8 +20,10 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.Platform;
+import es.gob.afirma.core.misc.http.UrlHttpManagerFactory;
 
 /** Clase de utilidad para el an&aacute;lisis sint&aacute;ctico de URL.
  * @author Alberto Mart&iacute;nez */
@@ -33,20 +36,6 @@ public final class ProtocolInvocationUriParser {
 		SUPPORTED_SIGNATURE_ALGORITHMS.add("SHA256withRSA"); //$NON-NLS-1$
 		SUPPORTED_SIGNATURE_ALGORITHMS.add("SHA384withRSA"); //$NON-NLS-1$
 		SUPPORTED_SIGNATURE_ALGORITHMS.add("SHA512withRSA"); //$NON-NLS-1$
-	}
-
-	/** Formatos de firma soportados. Siempre en min&uacute;sculas. */
-	private static final Set<String> SUPPORTED_SIGNATURE_FORMATS = new HashSet<String>();
-	static {
-		SUPPORTED_SIGNATURE_FORMATS.add("cades"); //$NON-NLS-1$
-		SUPPORTED_SIGNATURE_FORMATS.add("pades"); //$NON-NLS-1$
-		// En Android no soportamos XAdES
-		if (!Platform.getOS().equals(Platform.OS.ANDROID)) {
-			SUPPORTED_SIGNATURE_FORMATS.add("xades"); //$NON-NLS-1$
-		}
-		SUPPORTED_SIGNATURE_FORMATS.add("cadestri"); //$NON-NLS-1$
-		SUPPORTED_SIGNATURE_FORMATS.add("xadestri"); //$NON-NLS-1$
-		SUPPORTED_SIGNATURE_FORMATS.add("padestri"); //$NON-NLS-1$
 	}
 
 	private static final String DEFAULT_URL_ENCODING = "UTF-8"; //$NON-NLS-1$
@@ -243,7 +232,6 @@ public final class ProtocolInvocationUriParser {
 			ret.setMinimumVersion("0"); //$NON-NLS-1$
 		}
 
-
 		ret.setSessionId(signatureSessionId);
 
 		ret.setDesKey(verifyCipherKey(params));
@@ -273,12 +261,40 @@ public final class ProtocolInvocationUriParser {
 		}
 		else {
 			final byte[] data;
-			// Comprobamos que los datos se pueden tratar como base 64
-			try {
-				data = Base64.decode(URLDecoder.decode(params.get(DATA_PARAM), DEFAULT_URL_ENCODING).replace("_", "/").replace("-", "+")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			final String dataParamValue = URLDecoder.decode(params.get(DATA_PARAM), DEFAULT_URL_ENCODING);
+
+			// Miramos primero si los datos son una URL, en cuyo caso descargamos los datos
+			if (dataParamValue.startsWith("http://") || dataParamValue.startsWith("http://")) { //$NON-NLS-1$ //$NON-NLS-2$
+				try {
+					data = UrlHttpManagerFactory.getInstalledManager().readUrlByGet(dataParamValue);
+				}
+				catch (final Exception e) {
+					throw new ParameterException(
+						"Se ha indicado una URL para descargar los datos, pero la descraga no se ha podido realizar: " + e //$NON-NLS-1$
+					);
+				}
 			}
-			catch (final Exception e) {
-				throw new ParameterException("Los datos introducidos no se pueden tratar como base 64: " + e); //$NON-NLS-1$
+			else if (dataParamValue.startsWith("ftp://")) { //$NON-NLS-1$
+				try {
+				 	final InputStream ftpStream = new URL(dataParamValue).openStream();
+					data = AOUtil.getDataFromInputStream(ftpStream);
+					ftpStream.close();
+				}
+				catch (final Exception e) {
+					throw new ParameterException(
+						"Se ha indicado un FTP para descargar los datos, pero la descraga no se ha podido realizar: " + e //$NON-NLS-1$
+					);
+				}
+			}
+			// No son URL, son los datos en si
+			else {
+				// Comprobamos que los datos se pueden tratar como base 64
+				try {
+					data = Base64.decode(dataParamValue.replace("_", "/").replace("-", "+")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+				}
+				catch (final Exception e) {
+					throw new ParameterException("Los datos introducidos no se pueden tratar como base 64: " + e); //$NON-NLS-1$
+				}
 			}
 
 			ret.setData(data);
@@ -328,10 +344,6 @@ public final class ProtocolInvocationUriParser {
 		}
 
 		final String format = URLDecoder.decode(params.get(FORMAT_PARAM), DEFAULT_URL_ENCODING);
-		if (!SUPPORTED_SIGNATURE_FORMATS.contains(format.toLowerCase(Locale.ENGLISH))) {
-			throw new ParameterException("Formato de firma no soportado: " + format); //$NON-NLS-1$
-		}
-
 		ret.setSignFormat(format);
 
 		// Comprobamos que se ha especificado el algoritmo

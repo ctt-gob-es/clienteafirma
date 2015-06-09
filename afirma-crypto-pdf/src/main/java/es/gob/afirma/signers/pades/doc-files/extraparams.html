@@ -12,8 +12,8 @@
   <dt><b><i>allowCosigningUnregisteredSignatures</i></b></dt>
   <dd>
    Si se establece a <code>true</code> se permite firmar un PDF incluso si este contiene firmas previas no
-   registradas dentro de campos Acrobat (<i>AcroFields</i>), condici&oacute;n obligatoria sin la cual es muy
-   probable que se corrompan las firmas previas.<br>
+   registradas dentro de campos Acrobat (<i>AcroFields</i>). El firmar un PDF que contenga firmas no registradas puede 
+   dar como resultado que se invaliden estas firmas previas, por lo que no se recomienda permitirlo.<br>
    Si no se establece o se establece a o <code>false</code>, al intentar firmar un PDF que contenga firmas
    no registradas se lanza una excepci&oacute;n de tipo <code>PdfHasUnregisteredSignaturesException</code>.
   </dd>
@@ -126,12 +126,12 @@
    </dd>
   <dt><b><i>signaturePage</i></b></dt>
    <dd>
-    P&aacute;gina del documento PDF donde insertar la firma. Puede usarse -1 para referirse a la 
-    &uacute;ltima p&aacute;gina del documento PDF si se desconoce el n&uacute;mero total de
-    p&aacute;ginas de este.<br>
+    P&aacute;gina del documento PDF donde insertar la firma. Si no se establece o es -1 se
+    usar&aacute; la &uacute;ltima p&aacute;gina del documento PDF.<br>
     Las p&aacute;ginas comienzan su numeraci&oacute;n desde el uno.
-    Este par&aacute;metro se ignora si se ha establecido valor al par&aacute;metro <code>signatureField</code>, y necesita que se
-    establezcan valores v&aacute;lidos a los par&aacute;metros <code>signaturePositionOnPageLowerLeftX</code>, <code>signaturePositionOnPageLowerLeftY</code>,
+    Este par&aacute;metro se ignora si se ha establecido valor al par&aacute;metro
+    <code>signatureField</code>, y necesita que se establezcan valores v&aacute;lidos a los
+    par&aacute;metros <code>signaturePositionOnPageLowerLeftX</code>, <code>signaturePositionOnPageLowerLeftY</code>,
     <code>signaturePositionOnPageUpperRightX</code> y <code>signaturePositionOnPageUpperRightY</code>.
    </dd>
   <dt><b><i>signaturePositionOnPageLowerLeftX</i></b></dt>

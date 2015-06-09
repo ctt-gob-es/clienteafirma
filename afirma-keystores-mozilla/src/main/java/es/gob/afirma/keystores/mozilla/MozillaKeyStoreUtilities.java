@@ -141,7 +141,7 @@ final class MozillaKeyStoreUtilities {
 				return dir;
 			}
 		}
-		throw new FileNotFoundException("No se ha podido deternimar el directorio de NSS en Windows a partir de 'compatibility.ini' de Firefox"); //$NON-NLS-1$
+		throw new FileNotFoundException("No se ha podido determinar el directorio de NSS en Windows a partir de 'compatibility.ini' de Firefox"); //$NON-NLS-1$
 	}
 
 	/** Obtiene el directorio de las bibliotecas NSS (<i>Netscape Security
@@ -371,6 +371,9 @@ final class MozillaKeyStoreUtilities {
 		if (Boolean.getBoolean(USE_ENV_VARS)) {
 			try {
 				profilesIniPath = System.getenv(AFIRMA_PROFILES_INI);
+				if (profilesIniPath == null) {
+					profilesIniPath = System.getProperty(AFIRMA_PROFILES_INI);
+				}
 			}
 			catch(final Exception e) {
 				LOGGER.warning("No se tiene acceso a la variable de entorno '" + AFIRMA_PROFILES_INI + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
@@ -477,7 +480,7 @@ final class MozillaKeyStoreUtilities {
 	}
 
 	private static boolean isDniePkcs11Library(final String driverName) {
-		if (driverName == null) {
+		if (driverName == null || Boolean.getBoolean("es.gob.afirma.keystores.mozilla.disableDnieNativeDriver")) { //$NON-NLS-1$
 			return false;
 		}
 		for (final String libName : DNI_P11_NAMES) {

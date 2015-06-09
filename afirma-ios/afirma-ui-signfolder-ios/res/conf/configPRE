@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>requestListURL</key>
+	<string>http://193.106.176.71/eFirmaMock/requestList</string>
+	<key>requestDetailURL</key>
+	<string>http://193.106.176.71/eFirmaMock/requestDetail</string>
+	<key>requestPreSignURL</key>
+	<string>http://193.106.176.71/eFirmaMock/requestPresign</string>
+	<key>requestPostSignURL</key>
+	<string>http://193.106.176.71/eFirmaMock/requestPostSign</string>
+	<key>requestPreviewURL</key>
+	<string>http://193.106.176.71/eFirmaMock/requestPreview</string>
+	<key>requestRejectURL</key>
+	<string>http://193.106.176.71/eFirmaMock/requestReject</string>
+</dict>
+</plist>

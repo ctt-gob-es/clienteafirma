@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<VariablesViewState
+   version = "1.0">
+   <ContextStates>
+      <ContextState
+         contextName = "+[PostSignXMLController buildRequestWithCert:witRequestList:]:PostSignXMLController.m">
+         <PersistentStrings>
+            <PersistentString
+               value = "document.p">
+            </PersistentString>
+            <PersistentString
+               value = "document.sigfrmt">
+            </PersistentString>
+            <PersistentString
+               value = "request">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "-[UnassignedRequestTableViewController doParse:]:UnassignedRequestTableViewController.m">
+         <PersistentStrings>
+            <PersistentString
+               value = "data">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "-[RejectedRequestViewController prepareForSegue:sender:]:RejectedRequestViewController.m">
+         <PersistentStrings>
+            <PersistentString
+               value = "reqid">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+   </ContextStates>
+</VariablesViewState>
