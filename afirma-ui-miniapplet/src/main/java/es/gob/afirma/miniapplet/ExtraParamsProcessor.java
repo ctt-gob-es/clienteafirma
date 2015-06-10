@@ -25,6 +25,8 @@ final class ExtraParamsProcessor {
 	/** Tama&ntilde;o equivalente a 1 MegaBytes en bytes. */
 	private static final int SIZE_1MB = 1024 * 1024;
 
+	private static final String ETSI_CADES_DETACHED = "ETSI.CAdES.detached"; //$NON-NLS-1$
+
 	/** Clave expansible para pol&iacute;ticas de firma. */
 	private static final String EXPANDIBLE_POLICY_KEY = "expPolicy"; //$NON-NLS-1$
 
@@ -190,7 +192,10 @@ final class ExtraParamsProcessor {
 					else if (format.equals(AOSignConstants.SIGN_FORMAT_PDF) ||
 							 format.equals(AOSignConstants.SIGN_FORMAT_PADES) ||
 							 format.equals(AOSignConstants.SIGN_FORMAT_PDF_TRI)) {
-						p.setProperty("signatureSubFilter", "ETSI.CAdES.detached"); //$NON-NLS-1$ //$NON-NLS-2$
+						if (!ETSI_CADES_DETACHED.equals(p.getProperty("signatureSubFilter", ETSI_CADES_DETACHED))) { //$NON-NLS-1$
+							throw new IncompatiblePolicyException("En PAdES con politica firma AGE debe usarse siempre el filtro 'ETSI.CAdES.detached'"); //$NON-NLS-1$
+						}
+						p.setProperty("signatureSubFilter", ETSI_CADES_DETACHED); //$NON-NLS-1$
 						normalizedFormat = PolicyPropertiesManager.FORMAT_PADES;
 					}
 				}
