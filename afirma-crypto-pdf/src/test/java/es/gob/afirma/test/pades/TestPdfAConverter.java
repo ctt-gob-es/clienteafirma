@@ -14,7 +14,7 @@ import es.gob.afirma.signers.pades.PdfAConverter.PDFX;
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public final class TestPdfAConverter {
 
-	private final static String TEST_FILE = "TEST_PDF.pdf"; //$NON-NLS-1$
+	private final static String TEST_FILE = "CertificadoResidencia.pdf"; //$NON-NLS-1$
 
 	/** Prueba de conversi&oacute;n a PDF/A-1B.
 	 * @throws Exception En cualquier error. */
