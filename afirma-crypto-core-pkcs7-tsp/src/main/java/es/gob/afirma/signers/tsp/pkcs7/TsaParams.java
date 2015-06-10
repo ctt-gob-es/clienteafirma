@@ -177,7 +177,7 @@ public final class TsaParams {
         	this.sslKeyStore = null;
         }
         this.sslKeyStorePassword = extraParams.getProperty("tsaSslKeyStorePassword", ""); //$NON-NLS-1$ //$NON-NLS-2$
-        this.sslKeyStoreType = extraParams.getProperty("tsaSslKeyStoreType", null); //$NON-NLS-1$
+        this.sslKeyStoreType = extraParams.getProperty("tsaSslKeyStoreType", "PKCS12"); //$NON-NLS-1$ //$NON-NLS-2$
 
         // TrustStore con los certificados de confianza para el SSL
         final String trustStoreDataB64 = extraParams.getProperty("tsaSslTrustStore"); //$NON-NLS-1$
@@ -195,7 +195,7 @@ public final class TsaParams {
         	this.sslTrustStore = null;
         }
         this.sslTrustStorePassword = extraParams.getProperty("tsaSslTrustStorePassword", ""); //$NON-NLS-1$ //$NON-NLS-2$
-        this.sslTrustStoreType = extraParams.getProperty("tsaSslTrustStoreType", null); //$NON-NLS-1$
+        this.sslTrustStoreType = extraParams.getProperty("tsaSslTrustStoreType", "PKCS12"); //$NON-NLS-1$ //$NON-NLS-2$
 
         try {
 	        this.extensions = extraParams.getProperty("tsaExtensionOid") != null && extraParams.getProperty("tsaExtensionValueBase64") != null ? //$NON-NLS-1$ //$NON-NLS-2$
