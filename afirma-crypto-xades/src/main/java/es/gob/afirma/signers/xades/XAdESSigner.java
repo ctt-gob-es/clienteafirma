@@ -214,7 +214,7 @@ public final class XAdESSigner {
 
 		final Properties extraParams = xParams != null ? xParams : new Properties();
 
-		final boolean avoidXpathExtraTransformsOnEnveloped = Boolean.parseBoolean(extraParams.getProperty(
+		boolean avoidXpathExtraTransformsOnEnveloped = Boolean.parseBoolean(extraParams.getProperty(
 				"avoidXpathExtraTransformsOnEnveloped", Boolean.FALSE.toString())); //$NON-NLS-1$
 
 		final boolean onlySignningCert = Boolean.parseBoolean(extraParams.getProperty(
@@ -958,6 +958,7 @@ public final class XAdESSigner {
 					final String ident = docSignature.getDocumentElement().getAttribute(ID_IDENTIFIER);
 					if (ident != null && !"".equals(ident)) { //$NON-NLS-1$
 						nodeToSign = ident;
+						avoidXpathExtraTransformsOnEnveloped = true;
 					}
 				}
 
