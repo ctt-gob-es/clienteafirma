@@ -32,8 +32,7 @@ final class ExtraParamsProcessor {
 		/* Constructor no publico */
 	}
 
-	/**
-	 * Transforma la entrada introducida en un properties.
+	/** Transforma la entrada introducida en un properties.
 	 * Las entradas deben estar separadas por salto de l&iacute;nea y tener la forma
 	 * {@code CLAVE=VALOR} en donde CLAVE es el identificador del par&aacute;metro y
 	 * VALOR el valor asignado a este.
@@ -42,8 +41,7 @@ final class ExtraParamsProcessor {
 	 * el signo igual en una posici&oacute;n la cadena distinta a la primera.
 	 * Si se introduce null se devuelve un Properties vac&iacute;o.
 	 * @param entries Listado de pares CLAVE - VALOR.
-	 * @return Properties con las claves indicadas cargadas como par&aacute;metro.
-	 */
+	 * @return Properties con las claves indicadas cargadas como par&aacute;metro. */
 	static Properties convertToProperties(final String entries) {
 
 		final Properties params = new Properties();
@@ -53,11 +51,11 @@ final class ExtraParamsProcessor {
 
 		try {
 			params.load(new ByteArrayInputStream(entries.getBytes()));
-		} catch (final Exception e) {
+		}
+		catch (final Exception e) {
 			Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
-					"Se han encontrado entradas no validas en la configuracion de la operacion: " //$NON-NLS-1$
-					+ e);
-			return params;
+				"Se han encontrado entradas no validas en la configuracion de la operacion: " + e//$NON-NLS-1$
+			);
 		}
 
 		return params;
@@ -80,13 +78,13 @@ final class ExtraParamsProcessor {
      *  </li>
      * </ul>
 	 * @param params Par&aacute;metros definidos para la operaci&oacute;n.
-	 * @return Propiedades expandidas. */
-	static Properties expandProperties(final Properties params) {
+	 * @return Propiedades expandidas.
+	 * @throws IncompatiblePolicyException Si el formato de firma es incompatible con la pol&iacute;tica indicada. */
+	static Properties expandProperties(final Properties params) throws IncompatiblePolicyException {
 		return expandProperties(params, null, null);
 	}
 
-	/**
-	 * Devuelve la colecci&oacute;n de propiedades de entrada con las entradas que correspondan
+	/** Devuelve la colecci&oacute;n de propiedades de entrada con las entradas que correspondan
 	 * expandidos. Se expandiran una serie de claves con valores predefinidos y se les
 	 * asignar&aacute; el valor correspondiente.
 	 * Una vez expandidos, se eliminaran estos par&aacute;metros de la lista. Si el expandir
@@ -106,8 +104,8 @@ final class ExtraParamsProcessor {
 	 * @param signedData Datos firmados.
 	 * @param format Formato de firma.
 	 * @return Propiedades expandidas.
-	 */
-	static Properties expandProperties(final Properties params, final byte[] signedData, final String format) {
+	 * @throws IncompatiblePolicyException Si el formato de firma es incompatible con la pol&iacute;tica indicada. */
+	static Properties expandProperties(final Properties params, final byte[] signedData, final String format) throws IncompatiblePolicyException {
 
 		final Properties p = new Properties();
 		for (final String key : params.keySet().toArray(new String[0])) {
@@ -119,40 +117,50 @@ final class ExtraParamsProcessor {
 		return p;
 	}
 
-	/**
-	 * Funci&oacute;n para obtener el nombre del formato de firma en base al manejador de firma.
+	/** Funci&oacute;n para obtener el nombre del formato de firma en base al manejador de firma.
 	 * @param signer Manejador de firma.
 	 * @return Nombre del formato de firma preferente del que se encarga el manejador o {@code null} si no
-	 * se reconoce.
-	 */
+	 * se reconoce. */
 	static String updateFormat(final AOSigner signer) {
 
 		//XXX: Utilizamos los nombres de las clases para evitar cargarlas pero habria que buscar un modo mejor
 		final String signerClassname = signer.getClass().getName();
 		if (signerClassname.equals("es.gob.afirma.signers.xades.AOXAdESSigner")) { //$NON-NLS-1$
 			return AOSignConstants.SIGN_FORMAT_XADES;
-		} else if (signerClassname.equals("es.gob.afirma.signers.cades.AOCAdESSigner")) { //$NON-NLS-1$
+		}
+		if (signerClassname.equals("es.gob.afirma.signers.cades.AOCAdESSigner")) { //$NON-NLS-1$
 			return AOSignConstants.SIGN_FORMAT_CADES;
-		} else if (signerClassname.equals("es.gob.afirma.signers.pades.AOPDFSigner")) { //$NON-NLS-1$
+		}
+		if (signerClassname.equals("es.gob.afirma.signers.pades.AOPDFSigner")) { //$NON-NLS-1$
 			return AOSignConstants.SIGN_FORMAT_PADES;
-		} else if (signerClassname.equals("es.gob.afirma.signers.xades.AOFacturaESigner")) { //$NON-NLS-1$
+		}
+		if (signerClassname.equals("es.gob.afirma.signers.xades.AOFacturaESigner")) { //$NON-NLS-1$
 			return AOSignConstants.SIGN_FORMAT_FACTURAE;
 		}
 		return null;
 	}
 
-	/**
-	 * Expande las propiedades de pol&iacute;tica de firma modificando el conjunto de propiedades.
+	/** Expande las propiedades de pol&iacute;tica de firma modificando el conjunto de propiedades.
 	 * @param p Propiedades configuradas.
 	 * @param signedData Datos firmados.
 	 * @param format Formato de firma.
-	 */
-	static void expandPolicyKeys(final Properties p, final byte[] signedData, final String format) {
+	 * @throws IncompatiblePolicyException Si el formato de firma es incompatible con la pol&iacute;tica indicada. */
+	static void expandPolicyKeys(final Properties p, final byte[] signedData, final String format) throws IncompatiblePolicyException {
 		if (p.containsKey(EXPANDIBLE_POLICY_KEY)) {
 
+			final String policy = p.getProperty(EXPANDIBLE_POLICY_KEY);
+			// Si es AGE 1.8 solo aceptamos CAdES y XAdES
+			if (PolicyPropertiesManager.POLICY_ID_AGE_1_8.equals(policy) &&
+				!AOSignConstants.SIGN_FORMAT_XADES.equalsIgnoreCase(format) &&
+					!AOSignConstants.SIGN_FORMAT_CADES.equalsIgnoreCase(format)) {
+				throw new IncompatiblePolicyException(
+					"La politica de firma 1.8 de la AGE solo puede usarse con XAdES o CAdES, y no con " + format //$NON-NLS-1$
+				);
+			}
+
 			// Consideraciones de la politica 1.8 de la AGE y la ultima version de esta misma politica
-			if (PolicyPropertiesManager.POLICY_ID_AGE.equals(p.getProperty(EXPANDIBLE_POLICY_KEY)) ||
-					PolicyPropertiesManager.POLICY_ID_AGE_1_8.equals(p.getProperty(EXPANDIBLE_POLICY_KEY))) {
+			if (PolicyPropertiesManager.POLICY_ID_AGE.equals(policy) ||
+					PolicyPropertiesManager.POLICY_ID_AGE_1_8.equals(policy)) {
 
 				String normalizedFormat = null;
 				if (format != null) {
@@ -164,7 +172,8 @@ final class ExtraParamsProcessor {
 								!AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED.equals(p.getProperty("format"))) { //$NON-NLS-1$
 							p.setProperty("format", AOSignConstants.SIGN_FORMAT_XADES_DETACHED); //$NON-NLS-1$
 						}
-					} else if (format.equals(AOSignConstants.SIGN_FORMAT_CADES)) {
+					}
+					else if (format.equals(AOSignConstants.SIGN_FORMAT_CADES)) {
 						normalizedFormat = PolicyPropertiesManager.FORMAT_CADES;
 
 						// La politica indica que la firma debe ser implicita siempre que el tamano
@@ -174,21 +183,34 @@ final class ExtraParamsProcessor {
 						// PAdES siempre es implicita e ignora este parametro.
 						if (!p.containsKey("mode") && signedData != null) { //$NON-NLS-1$
 							p.setProperty("mode", signedData.length < SIZE_1MB ? //$NON-NLS-1$
-									AOSignConstants.SIGN_MODE_IMPLICIT : AOSignConstants.SIGN_MODE_EXPLICIT);
+								AOSignConstants.SIGN_MODE_IMPLICIT :
+									AOSignConstants.SIGN_MODE_EXPLICIT);
 						}
-					} else if (format.equals(AOSignConstants.SIGN_FORMAT_PDF) ||
-							format.equals(AOSignConstants.SIGN_FORMAT_PADES) ||
-							format.equals(AOSignConstants.SIGN_FORMAT_PDF_TRI)) {
+					}
+					else if (format.equals(AOSignConstants.SIGN_FORMAT_PDF) ||
+							 format.equals(AOSignConstants.SIGN_FORMAT_PADES) ||
+							 format.equals(AOSignConstants.SIGN_FORMAT_PDF_TRI)) {
+						p.setProperty("signatureSubFilter", "ETSI.CAdES.detached"); //$NON-NLS-1$ //$NON-NLS-2$
 						normalizedFormat = PolicyPropertiesManager.FORMAT_PADES;
 					}
 				}
 				try {
-					PolicyPropertiesManager.setProperties(p, p.getProperty(EXPANDIBLE_POLICY_KEY), normalizedFormat);
-				} catch (final IOException e) {
+					PolicyPropertiesManager.setProperties(p, policy, normalizedFormat);
+				}
+				catch (final IOException e) {
 					Logger.getLogger("es.gob.afirma").warning("No se han encontrado podido cargar el fichero de propiedades: " + e); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 			}
 			p.remove(EXPANDIBLE_POLICY_KEY);
+		}
+	}
+
+	static class IncompatiblePolicyException extends Exception {
+
+		private static final long serialVersionUID = -6420193548487585455L;
+
+		IncompatiblePolicyException(final String description) {
+			super(description);
 		}
 	}
 }

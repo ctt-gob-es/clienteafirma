@@ -16,6 +16,7 @@ import java.security.PrivilegedActionException;
 import java.security.cert.CertificateEncodingException;
 
 import es.gob.afirma.core.AOException;
+import es.gob.afirma.miniapplet.ExtraParamsProcessor.IncompatiblePolicyException;
 
 /** Contiene los puntos de entrada de las funcionalidades criptogr&aacute;ficas
  * del Mini-Applet del Cliente AFirma.
@@ -63,8 +64,14 @@ interface MiniAfirma {
      * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
      * @throws es.gob.afirma.core.MissingLibraryException Cuando no se encuentra una biblioteca necesaria para la operaci&oacute;n.
      * @throws AOException Cuando se produce un error desconocido.
-     * @throws CertificateEncodingException Cuando no se puede codificar el certificado usado para la firma. */
-    String sign(String algorithm, String format, String extraParams) throws PrivilegedActionException, IOException, AOException, CertificateEncodingException;
+     * @throws CertificateEncodingException Cuando no se puede codificar el certificado usado para la firma.
+     * @throws IncompatiblePolicyException Si se pide una pol&iacute;tica de firma concreta (por nombre, no indicando los par&aacute;metros
+     *                                     individualmente) incompatible con el formato de firma indicado. */
+    String sign(String algorithm, String format, String extraParams) throws PrivilegedActionException,
+                                                                            IOException,
+                                                                            AOException,
+                                                                            CertificateEncodingException,
+                                                                            IncompatiblePolicyException;
 
 	/** Fija el firmante que se establezca para ser reutilizado (sin intervenci&oacute;n del usuario) en todas
 	 * las operaciones posteriores hasta que se desactive esta opci&oacute;n.
@@ -111,8 +118,14 @@ interface MiniAfirma {
      * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
      * @throws es.gob.afirma.core.MissingLibraryException Cuando no se encuentra una biblioteca necesaria para la operaci&oacute;n.
      * @throws AOException Cuando se produce un error desconocido.
-     * @throws CertificateEncodingException Cuando no se puede codificar el certificado usado para la firma. */
-    String coSign(String data, String algorithm, String format, String extraParams) throws PrivilegedActionException, IOException, AOException, CertificateEncodingException;
+     * @throws CertificateEncodingException Cuando no se puede codificar el certificado usado para la firma.
+     * @throws IncompatiblePolicyException Si se pide una pol&iacute;tica de firma concreta (por nombre, no indicando los par&aacute;metros
+     *                                     individualmente) incompatible con el formato de firma indicado. */
+    String coSign(String data, String algorithm, String format, String extraParams) throws PrivilegedActionException,
+                                                                                           IOException,
+                                                                                           AOException,
+                                                                                           CertificateEncodingException,
+                                                                                           IncompatiblePolicyException;
 
     /** Realiza una firma en cascada (Contrafirma) sobre una firma. La firma se deber&aacute;
      * haber establecido previamente mediante el uso reiterado del m&eacute;todo
@@ -140,8 +153,14 @@ interface MiniAfirma {
      * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
      * @throws es.gob.afirma.core.MissingLibraryException Cuando no se encuentra una biblioteca necesaria para la operaci&oacute;n.
      * @throws AOException Cuando se produce un error desconocido.
-     * @throws CertificateEncodingException Cuando no se puede codificar el certificado usado para la firma. */
-    String counterSign(String algorithm, String format, String extraParams) throws PrivilegedActionException, IOException, AOException, CertificateEncodingException;
+     * @throws CertificateEncodingException Cuando no se puede codificar el certificado usado para la firma.
+     * @throws IncompatiblePolicyException Si se pide una pol&iacute;tica de firma concreta (por nombre, no indicando los par&aacute;metros
+     *                                     individualmente) incompatible con el formato de firma indicado. */
+    String counterSign(String algorithm, String format, String extraParams) throws PrivilegedActionException,
+                                                                                   IOException,
+                                                                                   AOException,
+                                                                                   CertificateEncodingException,
+                                                                                   IncompatiblePolicyException;
 
     /** Muestra un di&aacute;logo modal que permite al usuario seleccionar
      * el directorio y el nombre de fichero para el guardado de datos.

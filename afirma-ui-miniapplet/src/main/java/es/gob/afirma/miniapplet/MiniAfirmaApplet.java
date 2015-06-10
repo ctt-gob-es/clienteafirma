@@ -45,6 +45,7 @@ import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.crypto.jarverifier.JarSignatureCertExtractor;
 import es.gob.afirma.keystores.AOKeyStore;
 import es.gob.afirma.keystores.filters.CertFilterManager;
+import es.gob.afirma.miniapplet.ExtraParamsProcessor.IncompatiblePolicyException;
 
 /** MiniApplet de firma del proyecto Afirma. */
 public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
@@ -122,7 +123,8 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 					   final String extraParams) throws PrivilegedActionException,
 			                                            IOException,
 			                                            AOException,
-			                                            CertificateEncodingException {
+			                                            CertificateEncodingException,
+			                                            IncompatiblePolicyException {
 
 		LOGGER.info("Solicitada firma con algoritmo " + algorithm + " y formato " + format); //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -197,10 +199,16 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 			// El base 64 es un 30% mayor que los datos originales, asi que calculamos el tamano al alza en base al tamano de la firma
 			// (normalmente mayor que el del certificado)
 			final StringBuilder result = new StringBuilder((int) Math.floor(signature.length * 1.4));
-			return chunkReturn(result.
+			return chunkReturn(
+				result.
 					append(Base64.encode(pke.getCertificate().getEncoded())).
 					append('|').
-					append(Base64.encode(signature)).toString());
+					append(Base64.encode(signature)).toString()
+			);
+		}
+		catch (final IncompatiblePolicyException e) {
+			setError(e);
+			throw e;
 		}
 		catch (final AOFormatFileException e) {
 			setError(e);
@@ -226,6 +234,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 			setError(e);
 			throw new AOException("Ocurrio un error grave durante la operaci\u00F3n de firma", e); //$NON-NLS-1$
 		}
+
 	}
 
 	/** {@inheritDoc} */
@@ -235,7 +244,9 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 			             final String format,
 			             final String extraParams) throws PrivilegedActionException,
 			             							      IOException,
-				                                          AOException, CertificateEncodingException {
+				                                          AOException,
+				                                          CertificateEncodingException,
+				                                          IncompatiblePolicyException {
 		this.clearError();
 
 		byte[] signature;
@@ -311,24 +322,29 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 
 			final PrivateKeyEntry pke = this.selectPrivateKey(params);
 			final byte[] cosignature = AccessController.doPrivileged(
-					new CoSignAction(
-							signer,
-							signature,
-							dataBinary,
-							MiniAfirmaApplet.cleanParam(algorithm),
-							pke,
-							ExtraParamsProcessor.expandProperties(params, dataBinary, signatureFormat)
-							)
-					);
+				new CoSignAction(
+					signer,
+					signature,
+					dataBinary,
+					MiniAfirmaApplet.cleanParam(algorithm),
+					pke,
+					ExtraParamsProcessor.expandProperties(params, dataBinary, signatureFormat)
+				)
+			);
 
 			// El base 64 es un 30% mayor que los datos originales, asi que calculamos el tamano al alza en base al tamano de la firma
 			// (normalmente mayor que el del certificado)
 			final StringBuilder result = new StringBuilder((int) Math.floor(cosignature.length * 1.4));
 			return chunkReturn(result.
-					append(Base64.encode(pke.getCertificate().getEncoded())).
-					append('|').
-					append(Base64.encode(cosignature)).toString());
+				append(Base64.encode(pke.getCertificate().getEncoded())).
+				append('|').
+				append(Base64.encode(cosignature)).toString()
+			);
 
+		}
+		catch (final IncompatiblePolicyException e) {
+			setError(e);
+			throw e;
 		}
 		catch (final AOFormatFileException e) {
 			setError(e);
@@ -362,7 +378,9 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 			                  final String format,
 			                  final String extraParams) throws PrivilegedActionException,
 			                  								   IOException,
-					                                           AOException, CertificateEncodingException {
+					                                           AOException,
+					                                           CertificateEncodingException,
+					                                           IncompatiblePolicyException {
 		this.clearError();
 
 		byte[] signature;
@@ -418,14 +436,14 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 
 			final PrivateKeyEntry pke = this.selectPrivateKey(params);
 			final byte[] countersignature = AccessController.doPrivileged(
-					new CounterSignAction(
-							signer,
-							signature,
-							MiniAfirmaApplet.cleanParam(algorithm),
-							this.selectPrivateKey(params),
-							ExtraParamsProcessor.expandProperties(params, null, signatureFormat)
-							)
-					);
+				new CounterSignAction(
+						signer,
+						signature,
+						MiniAfirmaApplet.cleanParam(algorithm),
+						this.selectPrivateKey(params),
+						ExtraParamsProcessor.expandProperties(params, null, signatureFormat)
+				)
+			);
 
 			// El base 64 es un 30% mayor que los datos originales, asi que calculamos el tamano al alza en base al tamano de la firma
 			// (normalmente mayor que el del certificado)
@@ -434,6 +452,10 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 					append(Base64.encode(pke.getCertificate().getEncoded())).
 					append('|').
 					append(Base64.encode(countersignature)).toString());
+		}
+		catch (final IncompatiblePolicyException e) {
+			setError(e);
+			throw e;
 		}
 		catch (final AOFormatFileException e) {
 			setError(e);
