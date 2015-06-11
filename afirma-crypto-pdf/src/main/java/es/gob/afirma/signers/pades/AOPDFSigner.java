@@ -111,6 +111,10 @@ public final class AOPDFSigner implements AOSigner {
 
         checkIText();
 
+        final java.security.cert.Certificate[] certificateChain = Boolean.parseBoolean(extraParams.getProperty("includeOnlySignningCertificate", Boolean.FALSE.toString())) ? //$NON-NLS-1$
+    		new X509Certificate[] { (X509Certificate) certChain[0] } :
+    			certChain;
+
         final GregorianCalendar signTime = new GregorianCalendar();
 
         // Sello de stiempo
@@ -130,7 +134,7 @@ public final class AOPDFSigner implements AOSigner {
 			pre = PAdESTriPhaseSigner.preSign(
 				algorithm,
 				data,
-				certChain,
+				certificateChain,
 				signTime,
 				extraParams
 			);
@@ -144,7 +148,7 @@ public final class AOPDFSigner implements AOSigner {
     		pre.getSign(),
     		algorithm,
     		key,
-    		certChain,
+    		certificateChain,
     		extraParams
 		);
 
@@ -153,7 +157,7 @@ public final class AOPDFSigner implements AOSigner {
 			return PAdESTriPhaseSigner.postSign(
 				algorithm,
 				data,
-				certChain,
+				certificateChain,
 				interSign,
 				pre,
 				null,
