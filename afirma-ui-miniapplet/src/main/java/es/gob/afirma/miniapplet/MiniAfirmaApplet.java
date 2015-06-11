@@ -440,7 +440,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 						signer,
 						signature,
 						MiniAfirmaApplet.cleanParam(algorithm),
-						this.selectPrivateKey(params),
+						pke,
 						ExtraParamsProcessor.expandProperties(params, null, signatureFormat)
 				)
 			);
