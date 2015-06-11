@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 
@@ -97,13 +98,18 @@ public class TriphaseData {
 	 */
 	public static TriphaseData parser(final byte[] xml) throws IOException {
 
+		if (xml == null) {
+			throw new IllegalArgumentException("El XML de entrada no puede ser nulo"); //$NON-NLS-1$
+		}
+
 		final InputStream is = new ByteArrayInputStream(xml);
 		Document doc;
 		try {
 			doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(is);
 		}
 		catch (final Exception e) {
-			throw new IOException("Error al cargar el fichero XML", e); //$NON-NLS-1$
+			Logger.getLogger("es.gob.afirma").severe("Error al cargar el fichero XML: " + e + "\n" + new String(xml)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			throw new IOException("Error al cargar el fichero XML: " + e, e); //$NON-NLS-1$
 		}
 		is.close();
 
