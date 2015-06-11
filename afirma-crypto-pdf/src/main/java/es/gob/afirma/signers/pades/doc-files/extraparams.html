@@ -306,7 +306,23 @@
   <dt><b><i>tsaUsr</i></b></dt>
    <dd>Nombre de usuario de la TSA.</dd>
   <dt><b><i>tsaPwd</i></b></dt>
-   <dd>Contrase&ntilde;a del usuario de la TSA. Se ignora si no se ha establecido adem&aacute;s <code>tsaUsr</code>.</dd>
+   <dd>
+    Contrase&ntilde;a del usuario de la TSA. Se ignora si no se ha establecido adem&aacute;s <code>tsaUsr</code>.
+   </dd>
+  <dt><b><i>tsaExtensionOid</i></b></dt>
+   <dd>
+    OID de la extensi&oacute;n a a&ntilde;adir a la petici&oacute;n al servidor de sello de tiempo (opcional). Solo se permite indicar una extensi&oacute;n.
+   </dd>
+  <dt><b><i>tsaExtensionValueBase64</i></b></dt>
+   <dd>
+    Valor, en binario convertido a Base64, de la extensi&oacute;n a a&ntilde;adir a la petici&oacute;n al servidor de sello de tiempo.
+    Se ignora si no se ha establecido adem&aacute;s <code>tsaUsr</code>.
+   </dd>
+     <dt><b><i>tsaExtensionCritical</i></b></dt>
+   <dd>
+    Indica si la extensi&oacute;n indicada en <code>tsaExtensionOid</code> es cr&iacute;tica (valor <code>true</code>) o no (valor <code>false</code>).
+    Se ignora si no se ha establecido adem&aacute;s <code>tsaUsr</code>.
+   </dd>
   <dt><b><i>tsaSslKeyStore</i></b></dt>
    <dd>
     Almac&eacute;n de claves codificado en Base64 que contiene el certificado SSL cliente que pedir&aacute; la TSA al establecer la 
