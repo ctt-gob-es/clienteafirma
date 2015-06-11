@@ -264,7 +264,7 @@ public final class ProtocolInvocationUriParser {
 			final String dataParamValue = URLDecoder.decode(params.get(DATA_PARAM), DEFAULT_URL_ENCODING);
 
 			// Miramos primero si los datos son una URL, en cuyo caso descargamos los datos
-			if (dataParamValue.startsWith("http://") || dataParamValue.startsWith("http://")) { //$NON-NLS-1$ //$NON-NLS-2$
+			if (dataParamValue.startsWith("http://") || dataParamValue.startsWith("https://")) { //$NON-NLS-1$ //$NON-NLS-2$
 				try {
 					data = UrlHttpManagerFactory.getInstalledManager().readUrlByGet(dataParamValue);
 				}
@@ -575,13 +575,10 @@ public final class ProtocolInvocationUriParser {
 		if ("localhost".equals(servletUrl.getHost()) || "127.0.0.1".equals(servletUrl.getHost())) { //$NON-NLS-1$ //$NON-NLS-2$
 			throw new ParameterLocalAccessRequestedException("El host de la URL proporcionada para el Servlet es local"); //$NON-NLS-1$
 		}
-		if (!(servletUrl.toString().endsWith(SERVLET_NAME_STORAGE) || servletUrl.toString().endsWith(SERVLET_NAME_RETRIEVE))) {
-			throw new ParameterException("El protocolo de la URL proporcionada para el servlet no apunta a un servlet declarado"); //$NON-NLS-1$
-		}
+		// El servlet no puede recibir parametros
 		if (servletUrl.toString().indexOf('?') != -1 || servletUrl.toString().indexOf('=') != -1) {
 			throw new ParameterException("Se han encontrado parametros en la URL del servlet"); //$NON-NLS-1$
 		}
-
 		return servletUrl;
 	}
 
@@ -597,4 +594,8 @@ public final class ProtocolInvocationUriParser {
 		return properties;
 	}
 
+	public static void main(final String[] args) throws Exception {
+		getParametersToSign(
+				"afirma://sign?op=sign&id=xa3cfXhrBSh3PTgVgUVc&key=46428506&stservlet=http://192.168.179.113:8080/afirma-signature-storage/StorageService&format=CAdES&algorithm=SHA1withRSA&properties=c2VydmVyVXJsPWh0dHA6Ly8xNzIuMjQuMzAuMjM1OjgwODAvYWZpcm1hLXNlcnZlci10cmlwaGFzZS1zaWduZXIvU2lnbmF0dXJlU2VydmljZQo%3D&dat=http%3A%2F%2F192.168.179.113%3A8080%2Fafirma-ui-miniapplet-deploy%2Fminiapplet-full_1_3.jar");
+	}
 }
