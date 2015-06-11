@@ -109,7 +109,13 @@
 					<artifactId>afirma-crypto-pdf</artifactId>
 					<version>${project.version}</version>
 				</dependency>
-				
+
+				<dependency>
+					<groupId>es.gob.afirma</groupId>
+					<artifactId>afirma-crypto-odf</artifactId>
+					<version>${project.version}</version>
+				</dependency>
+
 				<dependency>
 					<groupId>es.gob.afirma</groupId>
 					<artifactId>afirma-crypto-ooxml</artifactId>
@@ -181,12 +187,6 @@
 					<artifactId>junit</artifactId>
 					<version>4.8.2</version>
 					<scope>test</scope>
-				</dependency>
-				
-				<dependency>
-					<groupId>es.gob.afirma</groupId>
-					<artifactId>afirma-crypto-odf</artifactId>
-					<version>${project.version}</version>
 				</dependency>
 
 			</dependencies>
