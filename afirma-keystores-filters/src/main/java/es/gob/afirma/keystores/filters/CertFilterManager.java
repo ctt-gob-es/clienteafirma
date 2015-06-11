@@ -15,8 +15,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
-import es.gob.afirma.keystores.filters.CertificateFilter;
-import es.gob.afirma.keystores.filters.MultipleCertificateFilter;
 import es.gob.afirma.keystores.filters.rfc.KeyUsageFilter;
 import es.gob.afirma.keystores.filters.rfc.RFC2254CertificateFilter;
 import es.gob.afirma.keystores.filters.rfc.SscdFilter;
@@ -29,7 +27,7 @@ import es.gob.afirma.keystores.filters.rfc.SscdFilter;
  */
 public final class CertFilterManager {
 
-	private static final String HEADLESS_PREFIX_KEY = "headless"; //$NON-NLS-1$
+	private static final String HEADLESS_PREFIX_KEY = "headLess"; //$NON-NLS-1$
 
 	private static final String FILTER_PREFIX_KEY = "filter"; //$NON-NLS-1$
 	private static final String FILTERS_PREFIX_KEY = "filters"; //$NON-NLS-1$
@@ -48,7 +46,7 @@ public final class CertFilterManager {
 	private static final String FILTER_TYPE_ISSUER_RFC2254 = "issuer.rfc2254:"; //$NON-NLS-1$
 	private static final String FILTER_TYPE_ISSUER_CONTAINS = "issuer.contains:"; //$NON-NLS-1$
 	private static final String FILTER_TYPE_THUMBPRINT = "thumbprint:"; //$NON-NLS-1$
-	
+
 	private static final String FILTER_PREFIX_KEYUSAGE = "keyusage.";  //$NON-NLS-1$
 	private static final String FILTER_TYPE_KEYUSAGE_DIGITAL_SIGNATURE = FILTER_PREFIX_KEYUSAGE + "digitalsignature:"; //$NON-NLS-1$
 	private static final String FILTER_TYPE_KEYUSAGE_NON_REPUDIATION = FILTER_PREFIX_KEYUSAGE + "nonrepudiation:"; //$NON-NLS-1$
@@ -59,7 +57,7 @@ public final class CertFilterManager {
 	private static final String FILTER_TYPE_KEYUSAGE_CRL_SIGN = FILTER_PREFIX_KEYUSAGE + "crlsign:"; //$NON-NLS-1$
 	private static final String FILTER_TYPE_KEYUSAGE_ENCIPHER_ONLY = FILTER_PREFIX_KEYUSAGE + "encipheronly:"; //$NON-NLS-1$
 	private static final String FILTER_TYPE_KEYUSAGE_DECIPHER_ONLY = FILTER_PREFIX_KEYUSAGE + "decipheronly:"; //$NON-NLS-1$
-	
+
 	private static final String[] PATTERN_KEYUSAGES_FILTER = new String[] {
 		FILTER_TYPE_KEYUSAGE_DIGITAL_SIGNATURE,
 		FILTER_TYPE_KEYUSAGE_NON_REPUDIATION,
@@ -71,7 +69,7 @@ public final class CertFilterManager {
 		FILTER_TYPE_KEYUSAGE_ENCIPHER_ONLY,
 		FILTER_TYPE_KEYUSAGE_DECIPHER_ONLY
 	};
-	
+
 	private boolean mandatoryCertificate = false;
 
 	private final List<CertificateFilter> filters = new ArrayList<CertificateFilter>();
@@ -94,7 +92,7 @@ public final class CertFilterManager {
 		}
 
 		// Creamos el filtro adecuado a cada uno de esos filtros
-		for (String filterValue : filterValues) {
+		for (final String filterValue : filterValues) {
 			this.filters.add(parseFilter(filterValue));
 		}
 	}
@@ -129,7 +127,7 @@ public final class CertFilterManager {
 		// Se ordena para que los KeyUsage esten consecutivos
 		Arrays.sort(sortedFilterValues);
 		for (int i = 0; i < sortedFilterValues.length; i++) {
-			String filter = sortedFilterValues[i];
+			final String filter = sortedFilterValues[i];
 			if (filter.toLowerCase().startsWith(FILTER_TYPE_DNIE)) {
 				filtersList.add(new SignatureDNIeFilter());
 			}
@@ -188,14 +186,14 @@ public final class CertFilterManager {
 	 * @param pos Posici&oacute;n del primer identificador de filtro de <i>KeyUsage</i>.
 	 * @return Patr&oacute;n para definir el filtro de <i>KeyUsages</i>.
 	 */
-	private static Boolean[] generateKeyUsageFiltersPattern(final String[] sortedFilterValues, int pos) {
-		
+	private static Boolean[] generateKeyUsageFiltersPattern(final String[] sortedFilterValues, final int pos) {
+
 		int i = pos;
 		String filter = sortedFilterValues[pos];
 		final Boolean[] kuPattern = new Boolean[PATTERN_KEYUSAGES_FILTER.length];
 		do {
 			processKeyUsageFilterDeclaration(filter, kuPattern);
-			if (sortedFilterValues.length > (i + 1) && sortedFilterValues[i + 1].startsWith(FILTER_PREFIX_KEYUSAGE)) {
+			if (sortedFilterValues.length > i + 1 && sortedFilterValues[i + 1].startsWith(FILTER_PREFIX_KEYUSAGE)) {
 				filter = sortedFilterValues[++i];
 			}
 			else {
@@ -204,22 +202,22 @@ public final class CertFilterManager {
 			// Nos valemos de que los filtros se han ordenado alfabeticamente,
 			// asi que todos los filtros de KeyUsage estaran juntos
 		} while (filter.toLowerCase().startsWith(FILTER_PREFIX_KEYUSAGE));
-		
+
 		return kuPattern;
 	}
-	
+
 	private static void processKeyUsageFilterDeclaration (final String filter, final Boolean[] kuPattern) {
-		
+
 		int patternPosition = -1;
 		for (int i = 0; patternPosition < 0 && i < PATTERN_KEYUSAGES_FILTER.length; i++) {
 			if (filter.toLowerCase().startsWith(PATTERN_KEYUSAGES_FILTER[i])) {
 				patternPosition = i;
-			}	
+			}
 		}
-		
+
 		if (patternPosition >= 0) {
 			final String value = filter.substring(filter.indexOf(':') + 1);
-			kuPattern[patternPosition] = value.equalsIgnoreCase("null") ? null : Boolean.valueOf(value); //$NON-NLS-1$	
+			kuPattern[patternPosition] = value.equalsIgnoreCase("null") ? null : Boolean.valueOf(value); //$NON-NLS-1$
 		}
 	}
 
@@ -228,7 +226,7 @@ public final class CertFilterManager {
 	 * @return Listado de certificados.
 	 */
 	public List<CertificateFilter> getFilters() {
-		return (this.filters != null ? new ArrayList<CertificateFilter>(this.filters) : null);
+		return this.filters != null ? new ArrayList<CertificateFilter>(this.filters) : null;
 	}
 
 	/**
