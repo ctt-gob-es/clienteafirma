@@ -219,17 +219,17 @@ public final class AOODFSigner implements AOSigner {
             // Configuramos mediante reflexion las transformaciones y referencias
 
             final Class<?> canonicalizerClass = Class.forName("com.sun.org.apache.xml.internal.security.c14n.Canonicalizer"); //$NON-NLS-1$
-            final String algo_id_c14n_omit_comments =
+            final String algoIdC14nOmitComments =
             		(String) canonicalizerClass.getField("ALGO_ID_C14N_OMIT_COMMENTS").get(null); //$NON-NLS-1$
 
             // Transforms
             final List<Transform> transformList = new ArrayList<Transform>(1);
             transformList.add(
-            		fac.newTransform(
-            				algo_id_c14n_omit_comments,
-            				(TransformParameterSpec) null
-            				)
-            		);
+        		fac.newTransform(
+    				algoIdC14nOmitComments,
+    				(TransformParameterSpec) null
+				)
+    		);
 
             // References
             final List<Reference> referenceList = new ArrayList<Reference>();
@@ -237,7 +237,7 @@ public final class AOODFSigner implements AOSigner {
             Class.forName("com.sun.org.apache.xml.internal.security.Init").getMethod("init").invoke(null); //$NON-NLS-1$ //$NON-NLS-2$
 
             final Object canonicalizer = canonicalizerClass.
-            		getMethod("getInstance", String.class).invoke(null, algo_id_c14n_omit_comments); //$NON-NLS-1$
+            		getMethod("getInstance", String.class).invoke(null, algoIdC14nOmitComments); //$NON-NLS-1$
 
             final Method canonicalizeSubtreeMethod =
             		canonicalizerClass.getMethod("canonicalizeSubtree", org.w3c.dom.Node.class); //$NON-NLS-1$
@@ -256,23 +256,23 @@ public final class AOODFSigner implements AOSigner {
                 zf.getInputStream(zf.getEntry("mimetype")))))); //$NON-NLS-1$
 
                 referenceList.add(
-                		fac.newReference(
-                				MANIFEST_PATH,
-                				dm,
-                				transformList,
-                				null,
-                				null,
-                				md.digest(
-                						(byte[]) canonicalizeSubtreeMethod.invoke(
-                								canonicalizer,
-                								// Recupera el fichero y su raiz
-                								dbf.newDocumentBuilder().parse(
-                										new ByteArrayInputStream(manifestData)
-                										).getDocumentElement()
-                								)
-                						)
-                				)
-                		);
+            		fac.newReference(
+        				MANIFEST_PATH,
+        				dm,
+        				transformList,
+        				null,
+        				null,
+        				md.digest(
+        						(byte[]) canonicalizeSubtreeMethod.invoke(
+        								canonicalizer,
+        								// Recupera el fichero y su raiz
+        								dbf.newDocumentBuilder().parse(
+        										new ByteArrayInputStream(manifestData)
+    									).getDocumentElement()
+    							)
+    						)
+    				)
+        		);
             }
 
             // para cada nodo de manifest.xml
@@ -295,9 +295,10 @@ public final class AOODFSigner implements AOSigner {
                         				(byte[]) canonicalizeSubtreeMethod.invoke(
                         						canonicalizer,
                         						// Recupera el fichero y su raiz
-                        						dbf.newDocumentBuilder().parse(zf.getInputStream(zf.getEntry(fullPath))).getDocumentElement())
-                        				)
-                        		);
+                        						dbf.newDocumentBuilder().parse(zf.getInputStream(zf.getEntry(fullPath))).getDocumentElement()
+                						)
+                				)
+                		);
                     }
 
                     // si no es uno de los archivos xml
@@ -342,8 +343,7 @@ public final class AOODFSigner implements AOSigner {
                 docSignatures.appendChild(rootSignatures);
 
                 // En OpenOffice 3.2 y superiores no anadimos la propia firma al
-                // manifest
-                // para evitar referencias circulares
+                // manifest para evitar referencias circulares
                 if (useOpenOffice31Mode) {
                     final Element nodeDocumentSignatures = docManifest.createElement("manifest:file-entry"); //$NON-NLS-1$
                     nodeDocumentSignatures.setAttribute("manifest:media-type", ""); //$NON-NLS-1$ //$NON-NLS-2$
