@@ -70,7 +70,8 @@ public final class TestPdfVersioning {
         final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
 
         final Properties extraParams = new Properties();
-        extraParams.put("pdfVersion", "8"); //$NON-NLS-1$ //$NON-NLS-2$
+        extraParams.put("pdfVersion", "7"); //$NON-NLS-1$ //$NON-NLS-2$
+        extraParams.put("includeOnlySignningCertificate", "false"); //$NON-NLS-1$ //$NON-NLS-2$
 
         final byte[] result = signer.sign(
     		testPdf,
