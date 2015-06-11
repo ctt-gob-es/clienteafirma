@@ -329,8 +329,7 @@ final class MozillaKeyStoreUtilities {
 	 * aplicaci&oacute;n. Los nombres apareceran ordenados de tal forma las
 	 * bibliotecas no tengan dependencias de otra que no haya aparecido
 	 * anterioremente en la lista.
-	 * @param path
-	 *        Ruta al directorio de NSS (terminado en barra).
+	 * @param path Ruta al directorio de NSS (terminado en barra).
 	 * @return Listado con los nombres de las bibliotecas. */
 	private static String[] getSoftkn3Dependencies(final String path) {
 
@@ -350,12 +349,13 @@ final class MozillaKeyStoreUtilities {
 		}
 		else if (Platform.getOS().equals(Platform.OS.LINUX) || Platform.getOS().equals(Platform.OS.SOLARIS)) {
 			return new String[] {
-				nssPath + "libnspr4.so",     // Firefox 2 y superior //$NON-NLS-1$
-				nssPath + "libplds4.so",     // Firefox 2 y superior //$NON-NLS-1$
-				nssPath + "libplc4.so",      // Firefox 2 y superior //$NON-NLS-1$
-				nssPath + "libnssutil3.so",  // Firefox 2 y superior //$NON-NLS-1$
-				nssPath + "libsqlite3.so",   // Firefox 2            //$NON-NLS-1$
-				nssPath + "libmozsqlite3.so" // Firefox 3 y superior //$NON-NLS-1$
+				nssPath + "libnspr4.so",      // Firefox 2 y superior //$NON-NLS-1$
+				nssPath + "libplds4.so",      // Firefox 2 y superior //$NON-NLS-1$
+				nssPath + "libplc4.so",       // Firefox 2 y superior //$NON-NLS-1$
+				nssPath + "libnssutil3.so",   // Firefox 2 y superior //$NON-NLS-1$
+				nssPath + "libsqlite3.so",    // Firefox 2            //$NON-NLS-1$
+				nssPath + "libmozsqlite3.so", // Firefox 3 y superior //$NON-NLS-1$
+				nssPath + "libsqlite3.so"     // Variante de SQLite en ciertos Linux / Firefox //$NON-NLS-1$
 			};
 		}
 
