@@ -16,9 +16,9 @@ var MiniApplet = ( function ( window, undefined ) {
 		
 		var JAR_NAME = 'miniapplet-full_1_3.jar';
 
-		var JAVA_ARGUMENTS = '-Xms512M -Xmx512M';
+		var JAVA_ARGUMENTS = '-Xms512M -Xmx512M ';
 		
-		var CUSTOM_JAVA_ARGUMENTS = null;
+		var SYSTEM_PROPERTIES = null;
 		
 		var clienteFirma = null;
 
@@ -77,6 +77,12 @@ var MiniApplet = ( function ( window, undefined ) {
 		var KEYSTORE_PKCS11 = "PKCS11";
 
 		var KEYSTORE_FIREFOX = "MOZ_UNI";
+		
+		var KEYSTORE_JAVA = "JKS";
+		
+		var KEYSTORE_JCEKS = "JCEKS";
+		
+		var KEYSTORE_JAVACE = "CaseExactJKS";
 
 		/* Valores para la configuracion de la comprobacion de tiempo */
 
@@ -230,7 +236,7 @@ var MiniApplet = ( function ( window, undefined ) {
 		 * */
 		var checkTime = function (checkType, maxMillis) {
 
-			if (checkType == undefined || checkType == null || checkType == CT_NO
+			if (checkType == undefined || checkType == null || checkType == CHECKTIME_NO
 					|| maxMillis == undefined || maxMillis == null || maxMillis <= 0) {
 				return;
 			}
@@ -250,6 +256,7 @@ var MiniApplet = ( function ( window, undefined ) {
 				return;
 			}
 
+			// Evaluamos la desincronizacion 
 			var delay =  Math.abs(clientDate.getTime() - serverDate.getTime());
 			if (delay > maxMillis) {
 				 if (checkType == CHECKTIME_RECOMMENDED) {
@@ -320,7 +327,7 @@ var MiniApplet = ( function ( window, undefined ) {
 					'code': 'es.gob.afirma.miniapplet.MiniAfirmaApplet',
 					'java-vm-args': JAVA_ARGUMENTS,
 					'java_arguments': JAVA_ARGUMENTS,
-					'custom_java_arguments': CUSTOM_JAVA_ARGUMENTS,
+					'system_properties': SYSTEM_PROPERTIES,
 					'codebase_lookup': false,
 					'separate_jvm': true,
 					'locale': selectedLocale
@@ -341,10 +348,10 @@ var MiniApplet = ( function ( window, undefined ) {
 		 * de claves que se debe cargar. */
 		function configureKeyStore() {
 			if (isFirefoxUAM()) {
-				if (CUSTOM_JAVA_ARGUMENTS == null) {
-					CUSTOM_JAVA_ARGUMENTS = "";
+				if (SYSTEM_PROPERTIES == null) {
+					SYSTEM_PROPERTIES = "";
 				}
-				CUSTOM_JAVA_ARGUMENTS += " -Des.gob.afirma.keystores.mozilla.UseEnvironmentVariables=true";
+				SYSTEM_PROPERTIES += " -Des.gob.afirma.keystores.mozilla.UseEnvironmentVariables=true ";
 			}
 		}
 
@@ -638,18 +645,34 @@ var MiniApplet = ( function ( window, undefined ) {
 			if (severeTimeDelay) {
 				return;
 			}
-			if (clientType == null) {
-				clienteFirma = document.getElementById("miniApplet");
+			if (clientType == null || clientType == TYPE_JAVASCRIPT) {
+				var tempCliente = document.getElementById("miniApplet");
+				var appletLoaded;
 				try {
-					clienteFirma.echo();
-					clientType = TYPE_APPLET;
-				} catch (e) {
-					cargarAppAfirma(codeBase);
+					appletLoaded = tempCliente != null && tempCliente.echo() != "Cliente JavaScript"; 
 				}
-				setServlets(storageServletAddress, retrieverServletAddress);
+				catch (e) {
+					appletLoaded = false;
+				}
+				if (appletLoaded) {
+					clienteFirma = tempCliente;
+					clientType = TYPE_APPLET;
+					setServlets(storageServletAddress, retrieverServletAddress);
+				}
+				else if (clientType != TYPE_JAVASCRIPT) {
+					cargarAppAfirma(codeBase);	
+					setServlets(storageServletAddress, retrieverServletAddress);
+				}
 			}
 		}
 
+		/**
+		 * Comprueba si esta cargado el MiniApplet. 
+		 */
+		function isMiniAppletLoaded() {
+			return echo() != "Cliente JavaScript";
+		}
+		
 		/**
 		 * Establece los datos que debera procesar el applet MiniApplet. 
 		 */
@@ -695,9 +718,7 @@ var MiniApplet = ( function ( window, undefined ) {
 		 * soportan los applets.
 		 */
 		function cargarAppAfirma(clientAddress) {
-			document.miniapplet = new AppAfirmaJS(clientAddress, window, undefined);
-			clienteFirma = document.miniapplet;
-			
+			clienteFirma = new AppAfirmaJS(clientAddress, window, undefined);
 			clientType = TYPE_JAVASCRIPT;
 		}
 
@@ -1411,18 +1432,25 @@ var MiniApplet = ( function ( window, undefined ) {
 		/* Metodos que publicamos del objeto MiniApplet */
 		return {
 			
-			/* Configuracion de la comprobacion de hora. */		
+			/* Publicamos las variables para la comprobacion de hora. */		
 			CHECKTIME_NO : CHECKTIME_NO,
 			CHECKTIME_RECOMMENDED : CHECKTIME_RECOMMENDED,
 			CHECKTIME_OBLIGATORY : CHECKTIME_OBLIGATORY,
 			
-			/* Configuracion del almacen de certificados. */		
+			/* Publicamos las variables para establecer parametros personalizados en la JVM */
+			JAVA_ARGUMENTS : JAVA_ARGUMENTS,
+			SYSTEM_PROPERTIES : SYSTEM_PROPERTIES,
+			
+			/* Publicamos las variables para configurar un almacen de certificados concreto. */		
 			KEYSTORE_WINDOWS : KEYSTORE_WINDOWS,
 			KEYSTORE_APPLE : KEYSTORE_APPLE,
 			KEYSTORE_PKCS12 : KEYSTORE_PKCS12,
 			KEYSTORE_PKCS11 : KEYSTORE_PKCS11,
 			KEYSTORE_FIREFOX : KEYSTORE_FIREFOX,
-		
+			KEYSTORE_JAVA : KEYSTORE_JAVA,
+			KEYSTORE_JCEKS : KEYSTORE_JCEKS,
+			KEYSTORE_JAVACE : KEYSTORE_JAVACE,
+			
 			/* Metodos visibles. */
 			cargarMiniApplet : cargarMiniApplet,
 			cargarAppAfirma : cargarAppAfirma,
