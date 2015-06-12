@@ -40,9 +40,6 @@ public final class ProtocolInvocationUriParser {
 
 	private static final String DEFAULT_URL_ENCODING = "UTF-8"; //$NON-NLS-1$
 
-	private static final String SERVLET_NAME_STORAGE = "StorageService"; //$NON-NLS-1$
-	private static final String SERVLET_NAME_RETRIEVE = "RetrieveService"; //$NON-NLS-1$
-
 	/** N&uacute;mero m&aacute;ximo de caracteres permitidos para el identificador de sesi&oacute;n de la firma. */
 	private static final int MAX_ID_LENGTH = 20;
 
@@ -594,8 +591,4 @@ public final class ProtocolInvocationUriParser {
 		return properties;
 	}
 
-	public static void main(final String[] args) throws Exception {
-		getParametersToSign(
-				"afirma://sign?op=sign&id=xa3cfXhrBSh3PTgVgUVc&key=46428506&stservlet=http://192.168.179.113:8080/afirma-signature-storage/StorageService&format=CAdES&algorithm=SHA1withRSA&properties=c2VydmVyVXJsPWh0dHA6Ly8xNzIuMjQuMzAuMjM1OjgwODAvYWZpcm1hLXNlcnZlci10cmlwaGFzZS1zaWduZXIvU2lnbmF0dXJlU2VydmljZQo%3D&dat=http%3A%2F%2F192.168.179.113%3A8080%2Fafirma-ui-miniapplet-deploy%2Fminiapplet-full_1_3.jar");
-	}
 }
