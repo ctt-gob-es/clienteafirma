@@ -137,14 +137,14 @@ public final class PdfSessionManager {
 		// **** Texto firma visible ****
 
 		// Texto en capa 4
-		final String layer4Text = PdfUtil.getLayerText(
+		final String layer4Text = PdfVisibleAreasUtils.getLayerText(
 			extraParams.getProperty("layer4Text"), //$NON-NLS-1$
 			(X509Certificate) certChain[0],
 			signTime
 		);
 
 		// Texto en capa 2
-		final String layer2Text = PdfUtil.getLayerText(
+		final String layer2Text = PdfVisibleAreasUtils.getLayerText(
 			extraParams.getProperty("layer2Text"), //$NON-NLS-1$
 			(X509Certificate) certChain[0],
 			signTime
@@ -336,7 +336,14 @@ public final class PdfSessionManager {
 		// Capa 2
 		if (layer2Text != null) {
 			sap.setLayer2Text(layer2Text);
-			sap.setLayer2Font(PdfUtil.getFont(layer2FontFamily, layer2FontSize, layer2FontStyle, layer2FontColor));
+			sap.setLayer2Font(
+				PdfVisibleAreasUtils.getFont(
+					layer2FontFamily,
+					layer2FontSize,
+					layer2FontStyle,
+					layer2FontColor
+				)
+			);
 		}
 
 		// Capa 4
