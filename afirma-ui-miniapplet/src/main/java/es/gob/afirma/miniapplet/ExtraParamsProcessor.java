@@ -12,6 +12,8 @@ package es.gob.afirma.miniapplet;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.lang.reflect.Method;
+import java.util.Locale;
 import java.util.Properties;
 import java.util.logging.Logger;
 
@@ -116,6 +118,8 @@ final class ExtraParamsProcessor {
 
 		expandPolicyKeys(p, signedData, format);
 
+
+
 		return p;
 	}
 
@@ -123,7 +127,7 @@ final class ExtraParamsProcessor {
 	 * @param signer Manejador de firma.
 	 * @return Nombre del formato de firma preferente del que se encarga el manejador o {@code null} si no
 	 * se reconoce. */
-	static String updateFormat(final AOSigner signer) {
+	static String getSignFormat(final AOSigner signer) {
 
 		//XXX: Utilizamos los nombres de las clases para evitar cargarlas pero habria que buscar un modo mejor
 		final String signerClassname = signer.getClass().getName();
@@ -153,8 +157,11 @@ final class ExtraParamsProcessor {
 			final String policy = p.getProperty(EXPANDIBLE_POLICY_KEY);
 			// Si es AGE 1.8 solo aceptamos CAdES y XAdES
 			if (PolicyPropertiesManager.POLICY_ID_AGE_1_8.equals(policy) &&
-				!AOSignConstants.SIGN_FORMAT_XADES.equalsIgnoreCase(format) &&
-					!AOSignConstants.SIGN_FORMAT_CADES.equalsIgnoreCase(format)) {
+				!AOSignConstants.SIGN_FORMAT_XADES.toLowerCase(Locale.US).startsWith(
+						format.toLowerCase(Locale.US)) &&
+				!AOSignConstants.SIGN_FORMAT_XADES_TRI.equalsIgnoreCase(format) &&
+					!AOSignConstants.SIGN_FORMAT_CADES.equalsIgnoreCase(format) &&
+					!AOSignConstants.SIGN_FORMAT_CADES_TRI.equalsIgnoreCase(format)) {
 				throw new IncompatiblePolicyException(
 					"La politica de firma 1.8 de la AGE solo puede usarse con XAdES o CAdES, y no con " + format //$NON-NLS-1$
 				);
@@ -166,7 +173,8 @@ final class ExtraParamsProcessor {
 
 				String normalizedFormat = null;
 				if (format != null) {
-					if (format.startsWith(AOSignConstants.SIGN_FORMAT_XADES)) {
+					if (format.startsWith(AOSignConstants.SIGN_FORMAT_XADES) ||
+							format.startsWith(AOSignConstants.SIGN_FORMAT_XADES_TRI)) {
 						normalizedFormat = PolicyPropertiesManager.FORMAT_XADES;
 
 						// La firma XAdES conforme a la politica de firma de la AGE debe ser Detached o Enveloped
@@ -175,7 +183,8 @@ final class ExtraParamsProcessor {
 							p.setProperty("format", AOSignConstants.SIGN_FORMAT_XADES_DETACHED); //$NON-NLS-1$
 						}
 					}
-					else if (format.equals(AOSignConstants.SIGN_FORMAT_CADES)) {
+					else if (format.equals(AOSignConstants.SIGN_FORMAT_CADES) ||
+							format.equals(AOSignConstants.SIGN_FORMAT_CADES_TRI)) {
 						normalizedFormat = PolicyPropertiesManager.FORMAT_CADES;
 
 						// La politica indica que la firma debe ser implicita siempre que el tamano
@@ -191,7 +200,8 @@ final class ExtraParamsProcessor {
 					}
 					else if (format.equals(AOSignConstants.SIGN_FORMAT_PDF) ||
 							 format.equals(AOSignConstants.SIGN_FORMAT_PADES) ||
-							 format.equals(AOSignConstants.SIGN_FORMAT_PDF_TRI)) {
+							 format.equals(AOSignConstants.SIGN_FORMAT_PDF_TRI) ||
+							 format.equals(AOSignConstants.SIGN_FORMAT_PADES_TRI)) {
 						if (!ETSI_CADES_DETACHED.equals(p.getProperty("signatureSubFilter", ETSI_CADES_DETACHED))) { //$NON-NLS-1$
 							throw new IncompatiblePolicyException("En PAdES con politica firma AGE debe usarse siempre el filtro 'ETSI.CAdES.detached'"); //$NON-NLS-1$
 						}
@@ -216,6 +226,25 @@ final class ExtraParamsProcessor {
 
 		IncompatiblePolicyException(final String description) {
 			super(description);
+		}
+	}
+
+	/**
+	 * Establece propiedades de firma concretas para cuando el formato indicado sea "AUTO". Las
+	 * propiedades dependen del signer que se vaya a usar.
+	 * @param params
+	 * @param signatureFormat
+	 */
+	public static void configAutoFormat(final AOSigner signer, final byte[] data, final Properties params) {
+
+		final String signerClassname = signer.getClass().getName();
+		if (signerClassname.equals("es.gob.afirma.signers.pades.AOPDFSigner")) { //$NON-NLS-1$
+			try {
+				final Method configureMethod = signer.getClass().getMethod("configureRespectfulProperties", byte[].class, Properties.class); //$NON-NLS-1$
+				configureMethod.invoke(null, data, params);
+			} catch (final Exception e) {
+				Logger.getLogger("es.gob.afirma").warning("Error al configurar una firma PAdES igual a las existentes: " + e); //$NON-NLS-1$ //$NON-NLS-2$
+			}
 		}
 	}
 }
