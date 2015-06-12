@@ -178,6 +178,50 @@ public final class TestXAdES {
     	}
     }
 
+    /** Prueba de firma de nodo indicado expl&iacute;citamente.
+     * @throws Exception En cualquier error. */
+    @SuppressWarnings("static-method")
+	@Test
+    public void testNodeTbsWithNamespace() throws Exception {
+
+    	Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$
+    	Logger.getLogger("com.sun.org.apache.xml.internal.security.utils.CachedXPathFuncHereAPI").setLevel(Level.WARNING); //$NON-NLS-1$
+
+        final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
+        ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH), CERT_PASS.toCharArray());
+
+        final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
+
+    	final byte[] data = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream("SimpleXmlWithNamespace.xml")); //$NON-NLS-1$
+
+    	final String[] formats = new String[] {
+    			AOSignConstants.SIGN_FORMAT_XADES_ENVELOPING,
+    			//AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED,
+    			//AOSignConstants.SIGN_FORMAT_XADES_DETACHED
+    	};
+
+    	final AOXAdESSigner signer = new AOXAdESSigner();
+
+        final Properties p = new Properties();
+        p.setProperty("nodeToSign", "Schroeder"); //$NON-NLS-1$ //$NON-NLS-2$
+        p.setProperty("mode", "implicit"); //$NON-NLS-1$ //$NON-NLS-2$
+
+    	for (final String format : formats) {
+    		p.setProperty("format", format); //$NON-NLS-1$
+    		final byte[] signature = signer.sign(data,
+				AOSignConstants.SIGN_ALGORITHM_SHA512WITHRSA,
+				pke.getPrivateKey(),
+				pke.getCertificateChain(),
+				p
+			);
+    		final File f = File.createTempFile("xades-NODESIGN-" + format + "-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+    		final java.io.FileOutputStream fos = new java.io.FileOutputStream(f);
+    		fos.write(signature);
+    		fos.flush(); fos.close();
+    		System.out.println("Firma " + format + " para comprobacion manual: " + f.getAbsolutePath()); //$NON-NLS-1$ //$NON-NLS-2$
+    	}
+    }
+
     /** Pruebas de cofirma.
      * @throws Exception Cuando ocurre un error */
     @SuppressWarnings("static-method")
