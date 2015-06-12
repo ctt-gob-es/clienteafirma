@@ -143,7 +143,6 @@ public final class AOSimpleSignInfo {
         else if (this.signingTime != null) {
             desc += " (" + DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT).format(this.signingTime) + ")";  //$NON-NLS-1$//$NON-NLS-2$
         }
-        desc += " (" + this.certs[0].getSubjectX500Principal() + ")"; //$NON-NLS-1$ //$NON-NLS-2$
 
         return desc;
     }
