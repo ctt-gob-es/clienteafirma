@@ -376,10 +376,14 @@ public final class AOPDFSigner implements AOSigner {
     			continue;
     		}
     		if (asSimpleSignInfo) {
+
+    			final X509Certificate[] certChain = new X509Certificate[pcks7.getSignCertificateChain().length];
+    			for (int j = 0; j < certChain.length; j++) {
+    				certChain[j] = (X509Certificate) pcks7.getSignCertificateChain()[j];
+    			}
+
     			final AOSimpleSignInfo ssi = new AOSimpleSignInfo(
-					new X509Certificate[] {
-    					pcks7.getSigningCertificate()
-					},
+					certChain,
 					pcks7.getSignDate().getTime()
 				);
 
@@ -545,6 +549,29 @@ public final class AOPDFSigner implements AOSigner {
         // otros datos de relevancia que se almacenan en el objeto AOSignInfo
     }
 
+    /**
+     * Configura, cuando no lo esten ya, las propiedades necesarias para que las firmas
+     * sobre unos datos respeten el formato que tuviesen firmas anteriores.
+     * @param data Datos que se desean firmar.
+     * @param config Configuraci&oacute;n establecida.
+     */
+    public static void configureRespectfulProperties(final byte[] data, final Properties config) {
+
+    	if (config != null && !config.containsKey("signatureSubFilter")) { //$NON-NLS-1$
+    		String filter;
+    		try {
+    			filter = PdfUtil.getFirstSupportedSignSubFilter(data, config);
+    		} catch (final Exception e) {
+    			LOGGER.warning("Error al configurar la firma PDF para que sea igual a las existentes: " + e); //$NON-NLS-1$
+    			return;
+    		}
+
+    		if (filter != null) {
+    			config.setProperty("signatureSubFilter", filter.substring(filter.indexOf('/') + 1)); //$NON-NLS-1$
+    		}
+    	}
+    }
+
     @SuppressWarnings("static-method")
 	private void checkIText() {
     	try {
@@ -554,5 +581,4 @@ public final class AOPDFSigner implements AOSigner {
     		throw new InvalidITextException(e);
     	}
     }
-
 }

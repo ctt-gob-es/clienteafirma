@@ -9,7 +9,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -49,10 +48,10 @@ final class PdfUtil {
 	private static final Set<String> SUPPORTED_SUBFILTERS;
 	static {
 		SUPPORTED_SUBFILTERS = new HashSet<String>();
-		SUPPORTED_SUBFILTERS.add("/ETSI.RFC3161".toLowerCase(Locale.US)); //$NON-NLS-1$
-		SUPPORTED_SUBFILTERS.add(FILTER_ADOBE_PKCS7_DETACHED.toLowerCase(Locale.US));
-		SUPPORTED_SUBFILTERS.add("/ETSI.CAdES.detached".toLowerCase(Locale.US)); //$NON-NLS-1$
-		SUPPORTED_SUBFILTERS.add("/adbe.pkcs7.sha1".toLowerCase(Locale.US)); //$NON-NLS-1$
+		SUPPORTED_SUBFILTERS.add("/ETSI.RFC3161"); //$NON-NLS-1$
+		SUPPORTED_SUBFILTERS.add(FILTER_ADOBE_PKCS7_DETACHED);
+		SUPPORTED_SUBFILTERS.add("/ETSI.CAdES.detached"); //$NON-NLS-1$
+		SUPPORTED_SUBFILTERS.add("/adbe.pkcs7.sha1"); //$NON-NLS-1$
 	}
 
 	private PdfUtil() {
@@ -215,6 +214,16 @@ final class PdfUtil {
 		return pdfHasUnregisteredSignatures(pdfReader);
 	}
 
+	/**
+	 * Obtiene el primer filtro de firma obtenido de un documento PDF.
+	 * Si no se encuentra ninguno, devuelve {@code null}.
+	 * @param pdf PDF que analizar.
+	 * @param xParams Par&aacute;metros extra con la configuraci&oacute;n de la operaci&oacute;n.
+	 * @return Filtro de firma o {@code null} si no se encuentra.
+	 * @throws IOException Cuando ocurre un error al leer el PDF.
+	 * @throws InvalidPdfException Cuando los datos proporcionados no son un PDF.
+	 * @throws BadPdfPasswordException Cuando se ha insertado una contrase&ntilde;a err&oacute;nea en el PDF.
+	 */
 	static String getFirstSupportedSignSubFilter(final byte[] pdf, final Properties xParams) throws IOException,
 	                                                                                                InvalidPdfException,
 	                                                                                                BadPdfPasswordException {
@@ -237,7 +246,7 @@ final class PdfUtil {
     			if (PdfName.SIG.equals(d.get(PdfName.TYPE))) {
 
     				final String subFilter = d.get(PdfName.SUBFILTER) != null ?
-						d.get(PdfName.SUBFILTER).toString().toLowerCase(Locale.US) : null;
+						d.get(PdfName.SUBFILTER).toString() : null;
 
 					if (SUPPORTED_SUBFILTERS.contains(subFilter)) {
 						return subFilter;
@@ -247,8 +256,8 @@ final class PdfUtil {
     		}
     	}
 
-    	LOGGER.info("No se ha encontrado ningun filtro de firma soportado, se devolvera " + FILTER_ADOBE_PKCS7_DETACHED); //$NON-NLS-1$
-		return FILTER_ADOBE_PKCS7_DETACHED;
+    	LOGGER.info("No se ha encontrado ningun filtro de firma soportado, se devolvera null"); //$NON-NLS-1$
+		return null;
 	}
 
 	static boolean pdfHasUnregisteredSignatures(final PdfReader pdfReader) {
@@ -261,7 +270,7 @@ final class PdfUtil {
     			if (PdfName.SIG.equals(d.get(PdfName.TYPE))) {
 
     				final String subFilter = d.get(PdfName.SUBFILTER) != null ?
-    						d.get(PdfName.SUBFILTER).toString().toLowerCase(Locale.US) : null;
+    						d.get(PdfName.SUBFILTER).toString() : null;
 
     				if (subFilter == null || !SUPPORTED_SUBFILTERS.contains(subFilter)) {
     					ret = true;
