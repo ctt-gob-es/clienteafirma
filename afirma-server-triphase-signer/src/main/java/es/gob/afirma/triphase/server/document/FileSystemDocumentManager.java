@@ -14,7 +14,7 @@ import es.gob.afirma.core.signers.AOSignConstants;
 
 /** Implementaci&oacute;n de acceso a gestor documental usando simplemente el sistema de ficheros.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
-final public class FileSystemDocumentManager implements DocumentManager {
+public final class FileSystemDocumentManager implements DocumentManager {
 
 	private static final String IN_DIR_PARAM = "indir"; //$NON-NLS-1$
 	private static final String OUT_DIR_PARAM = "outdir"; //$NON-NLS-1$

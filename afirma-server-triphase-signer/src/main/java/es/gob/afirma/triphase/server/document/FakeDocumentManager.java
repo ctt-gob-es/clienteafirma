@@ -10,7 +10,7 @@ import es.gob.afirma.core.misc.AOUtil;
 
 /** Fachada simulada de gestor documental.
  * @author Tom&aacute;s Garc&iacute;a-;er&aacute;s */
-final class FakeDocumentManager implements DocumentManager {
+public final class FakeDocumentManager implements DocumentManager {
 
 	private static final String PDF_DOC = "TEST_PDF.pdf"; //$NON-NLS-1$
 	private static Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$

@@ -6,7 +6,11 @@ import java.util.Properties;
 
 import es.gob.afirma.core.misc.Base64;
 
-final class SelfishDocumentManager implements DocumentManager {
+public final class SelfishDocumentManager implements DocumentManager {
+
+	public SelfishDocumentManager(final Properties config) {
+		// No hacemos nada
+	}
 
 	@Override
 	public byte[] getDocument(final String id, final X509Certificate cert, final Properties config) throws IOException {

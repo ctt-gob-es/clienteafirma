@@ -114,6 +114,14 @@ final class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 			}
 		}
 
+
+		System.out.println("=============");
+		for (final String k : extraParams.keySet().toArray(new String[extraParams.size()])) {
+			System.out.println(k + ": " + extraParams.getProperty(k));
+		}
+		System.out.println("=============");
+
+
 		LOGGER.info("Se invocan las funciones internas de prefirma CAdES"); //$NON-NLS-1$
 		final byte[] presign = CAdESTriPhaseSigner.preSign(
 				digestAlgorithm,
@@ -173,7 +181,7 @@ final class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 			throw new AOException("No se ha encontrado la informacion de firma en la peticion"); //$NON-NLS-1$
 		}
 
-		Map<String, String> config = triphaseData.getSign(0);
+		final Map<String, String> config = triphaseData.getSign(0);
 
 		LOGGER.info("Se invocan las funciones internas de postfirma CAdES"); //$NON-NLS-1$
 		final byte[] signature = CAdESTriPhaseSigner.postSign(
@@ -305,7 +313,7 @@ final class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 			throw new AOException("No se ha encontrado la informacion de firma en la peticion"); //$NON-NLS-1$
 		}
 
-		Map<String, String> config = triphaseData.getSign(0);
+		final Map<String, String> config = triphaseData.getSign(0);
 
 		final byte[] pk1 = Base64.decode(config.get(PROPERTY_NAME_PKCS1_SIGN));
 		config.remove(PROPERTY_NAME_PKCS1_SIGN);
@@ -444,7 +452,7 @@ final class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 		if (subArray.length > array.length) {
 			return -1;
 		}
-		for (int i = 0; i <= (array.length - subArray.length); i++) {
+		for (int i = 0; i <= array.length - subArray.length; i++) {
 			if (array[i] == subArray[0]) {
 				int j;
 				for (j = 1; j < subArray.length; j++) {
