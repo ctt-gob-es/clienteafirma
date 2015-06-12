@@ -61,7 +61,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 
 	private static final String APPLET_PARAM_USER_AGENT = "userAgent"; //$NON-NLS-1$
 
-	private static final String APPLET_PARAM_CUSTOM_JAVA_ARGUMENTS = "custom_java_arguments"; //$NON-NLS-1$
+	private static final String APPLET_PARAM_SYSTEM_PROPERTIES = "system_properties"; //$NON-NLS-1$
 
 	private static final String APPLET_PARAM_LOCALE = "locale"; //$NON-NLS-1$
 
@@ -182,7 +182,8 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 			String signatureFormat = format;
 			final AOSigner signer = MiniAfirmaApplet.selectSigner(MiniAfirmaApplet.cleanParam(signatureFormat), null);
 			if (SIGNATURE_FORMAT_AUTO.equalsIgnoreCase(signatureFormat)) {
-				signatureFormat = ExtraParamsProcessor.updateFormat(signer);
+				signatureFormat = ExtraParamsProcessor.getSignFormat(signer);
+				ExtraParamsProcessor.configAutoFormat(signer, dataBinary, params);
 			}
 
 			final PrivateKeyEntry pke = this.selectPrivateKey(params);
@@ -317,7 +318,8 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 			String signatureFormat = format;
 			final AOSigner signer = MiniAfirmaApplet.selectSigner(MiniAfirmaApplet.cleanParam(signatureFormat), signature);
 			if (SIGNATURE_FORMAT_AUTO.equalsIgnoreCase(signatureFormat)) {
-				signatureFormat = ExtraParamsProcessor.updateFormat(signer);
+				signatureFormat = ExtraParamsProcessor.getSignFormat(signer);
+				ExtraParamsProcessor.configAutoFormat(signer, signature, params);
 			}
 
 			final PrivateKeyEntry pke = this.selectPrivateKey(params);
@@ -431,7 +433,8 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 			String signatureFormat = format;
 			final AOSigner signer = MiniAfirmaApplet.selectSigner(MiniAfirmaApplet.cleanParam(signatureFormat), signature);
 			if (SIGNATURE_FORMAT_AUTO.equalsIgnoreCase(signatureFormat)) {
-				signatureFormat = ExtraParamsProcessor.updateFormat(signer);
+				signatureFormat = ExtraParamsProcessor.getSignFormat(signer);
+				ExtraParamsProcessor.configAutoFormat(signer, signature, params);
 			}
 
 			final PrivateKeyEntry pke = this.selectPrivateKey(params);
@@ -707,8 +710,8 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 	@Override
 	public void init() {
 
-		// Establecemos propiedades del sistema en base a argumentos de Java
-		setSystemProperties(this.getParameter(APPLET_PARAM_CUSTOM_JAVA_ARGUMENTS));
+//		// Establecemos propiedades del sistema en base a argumentos de Java
+		setSystemProperties(this.getParameter(APPLET_PARAM_SYSTEM_PROPERTIES));
 
 		// Establecemos la localizacion
 		setLocale(this.getParameter(APPLET_PARAM_LOCALE));
@@ -1107,14 +1110,14 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 	/**
 	 * Establece las propiedades del sistema indicadas como argumentos y separadas por '-D'.
 	 * Las propiedades deben establecerse como clave=valor.
-	 * @param javaArguments Argumentos de invocaci&oacute;n a la JVM.
+	 * @param systemProperties Texto con las propiedades que establecer.
 	 */
-	private static void setSystemProperties(final String javaArguments) {
+	private static void setSystemProperties(final String systemProperties) {
 
-		LOGGER.info("setSystemProperties: " + javaArguments); //$NON-NLS-1$
+		LOGGER.info("setSystemProperties: " + systemProperties); //$NON-NLS-1$
 
-		if (javaArguments != null && javaArguments.trim().length() > 0) {
-			final String[] properties = javaArguments.split("-D");  //$NON-NLS-1$
+		if (systemProperties != null && systemProperties.trim().length() > 0) {
+			final String[] properties = systemProperties.split("-D");  //$NON-NLS-1$
 			for (final String property : properties) {
 				final int equalIndex = property.indexOf('=');
 				if (equalIndex != -1) {
