@@ -81,9 +81,8 @@ public final class AOPDFSigner implements AOSigner {
      *  Si un PDF est&aacute; protegido con contrase&ntilde;a por estar cifrado, se mostrar&aacute; un di&aacute;logo gr&aacute;fico advirtiendo al usuario de esta
      *  situaci&oacute;n y solicitando la contrase&ntilde;a de apertura del PDF.<br>Si desea evitar interacciones directas con los usuarios
      *  consulte la documentaci&oacute;n de las opciones <code>ownerPassword</code> y <code>headLess</code>.
-     *  Adicionalmente, es posible, si el fichero de entrada estaba cifrado y protegido con contrase&ntilde;a, que la salida sea un documento PDF
-     *  igualmente cifrado y protegido con contrase&ntilde;a. Consulte la documentaci&oacute;n de la opci&oacute;n <code>avoidEncryptingSignedPdfs</code>
-     *  para m&aacute;s informaci&oacute;n.
+     *  Adicionalmente, si el fichero de entrada estaba cifrado y protegido con contrase&ntilde;a, la salida ser&aacute;a un documento PDF
+     *  igualmente cifrado y protegido con contrase&ntilde;a..
      * </p>
      * @param inPDF Documento PDF a firmar
      * @param algorithm Algoritmo a usar para la firma.
@@ -187,9 +186,8 @@ public final class AOPDFSigner implements AOSigner {
      *  Si un PDF est&aacute; protegido con contrase&ntilde;a por estar cifrado, se mostrar&aacute; un di&aacute;logo gr&aacute;fico advirtiendo al usuario de esta
      *  situaci&oacute;n y solicitando la contrase&ntilde;a de apertura del PDF.<br>Si desea evitar interacciones directas con los usuarios
      *  consulte la documentaci&oacute;n de las opciones <code>ownerPassword</code> y <code>headLess</code>.
-     *  Adicionalmente, es posible, si el fichero de entrada estaba cifrado y protegido con contrase&ntilde;a, que la salida sea un documento PDF
-     *  igualmente cifrado y protegido con contrase&ntilde;a. Consulte la documentaci&oacute;n de la opci&oacute;n <code>avoidEncryptingSignedPdfs</code>
-     *  para m&aacute;s informaci&oacute;n.
+     *  Adicionalmente, si el fichero de entrada estaba cifrado y protegido con contrase&ntilde;a, la salida ser&aacute; un documento PDF
+     *  igualmente cifrado y protegido con contrase&ntilde;a.
      * </p>
      * En general, es recomendable prescindir de este m&eacute;todo y llamar directamente al m&eacute;todo <code>sign(...)</code>
      * @param data Se ignora el valor de este par&aacute;metro. <b>El documento PDF debe proporcionarse mediante el par&aacute;tro <code>sign</code></b>.
@@ -235,9 +233,8 @@ public final class AOPDFSigner implements AOSigner {
      *  Si un PDF est&aacute; protegido con contrase&ntilde;a por estar cifrado, se mostrar&aacute; un di&aacute;logo gr&aacute;fico advirtiendo al usuario de esta
      *  situaci&oacute;n y solicitando la contrase&ntilde;a de apertura del PDF.<br>Si desea evitar interacciones directas con los usuarios
      *  consulte la documentaci&oacute;n de las opciones <code>ownerPassword</code> y <code>headLess</code>.
-     *  Adicionalmente, es posible, si el fichero de entrada estaba cifrado y protegido con contrase&ntilde;a, que la salida sea un documento PDF
-     *  igualmente cifrado y protegido con contrase&ntilde;a. Consulte la documentaci&oacute;n de la opci&oacute;n <code>avoidEncryptingSignedPdfs</code>
-     *  para m&aacute;s informaci&oacute;n.
+     *  Adicionalmente, si el fichero de entrada estaba cifrado y protegido con contrase&ntilde;a, la salida ser&aacute; un documento PDF
+     *  igualmente cifrado y protegido con contrase&ntilde;a.
      * </p>
      * En general, es recomendable prescindir de este m&eacute;todo y llamar directamente al m&eacute;todo <code>sign(...)</code>
      * @param sign Documento PDF a firmar
@@ -377,7 +374,7 @@ public final class AOPDFSigner implements AOSigner {
     		}
     		if (asSimpleSignInfo) {
 
-    			final X509Certificate[] certChain = new X509Certificate[pcks7.getSignCertificateChain().length];
+       			final X509Certificate[] certChain = new X509Certificate[pcks7.getSignCertificateChain().length];
     			for (int j = 0; j < certChain.length; j++) {
     				certChain[j] = (X509Certificate) pcks7.getSignCertificateChain()[j];
     			}
@@ -549,19 +546,18 @@ public final class AOPDFSigner implements AOSigner {
         // otros datos de relevancia que se almacenan en el objeto AOSignInfo
     }
 
-    /**
-     * Configura, cuando no lo esten ya, las propiedades necesarias para que las firmas
+    /** Configura, cuando no lo esten ya, las propiedades necesarias para que las firmas
      * sobre unos datos respeten el formato que tuviesen firmas anteriores.
      * @param data Datos que se desean firmar.
-     * @param config Configuraci&oacute;n establecida.
-     */
+     * @param config Configuraci&oacute;n establecida. */
     public static void configureRespectfulProperties(final byte[] data, final Properties config) {
 
     	if (config != null && !config.containsKey("signatureSubFilter")) { //$NON-NLS-1$
     		String filter;
     		try {
     			filter = PdfUtil.getFirstSupportedSignSubFilter(data, config);
-    		} catch (final Exception e) {
+    		}
+    		catch (final Exception e) {
     			LOGGER.warning("Error al configurar la firma PDF para que sea igual a las existentes: " + e); //$NON-NLS-1$
     			return;
     		}
@@ -581,4 +577,5 @@ public final class AOPDFSigner implements AOSigner {
     		throw new InvalidITextException(e);
     	}
     }
+
 }
