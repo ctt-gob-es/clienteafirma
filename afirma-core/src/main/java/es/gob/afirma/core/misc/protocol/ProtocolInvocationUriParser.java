@@ -299,17 +299,17 @@ public final class ProtocolInvocationUriParser {
 
 		// Tomamos el tipo de operacion
 		final String op = params.get(OPERATION_PARAM);
-		if (!OP_ID_SIGN.equalsIgnoreCase(op) && !OP_ID_COSIGN.equalsIgnoreCase(op) && !OP_ID_COUNTERSIGN.equalsIgnoreCase(op)) {
-			throw new ParameterException("Se ha indicado un codigo de operacion incorrecto"); //$NON-NLS-1$
-		}
 		if (OP_ID_SIGN.equalsIgnoreCase(op)) {
 			ret.setOperation(UrlParametersToSign.OP_SIGN);
 		}
 		else if (OP_ID_COSIGN.equalsIgnoreCase(op)) {
 			ret.setOperation(UrlParametersToSign.OP_COSIGN);
 		}
-		else {
+		else if (OP_ID_COUNTERSIGN.equalsIgnoreCase(op)) {
 			ret.setOperation(UrlParametersToSign.OP_COUNTERSIGN);
+		}
+		else {
+			throw new ParameterException("Se ha indicado un codigo de operacion incorrecto"); //$NON-NLS-1$
 		}
 
 		// Si hemos recibido el identificador para la descarga de la configuracion,
