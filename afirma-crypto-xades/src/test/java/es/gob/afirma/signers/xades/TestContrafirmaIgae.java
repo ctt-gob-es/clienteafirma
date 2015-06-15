@@ -1,4 +1,4 @@
-package es.gob.afirma.test.xades;
+package es.gob.afirma.signers.xades;
 
 import java.io.File;
 import java.io.IOException;
@@ -18,7 +18,6 @@ import org.junit.Test;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.signers.CounterSignTarget;
-import es.gob.afirma.signers.xades.AOXAdESSigner;
 
 /**
  * Test para la comprobaci&oacute;n de las contrafirmas sobre firmas generadas por

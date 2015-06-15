@@ -8,7 +8,7 @@
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  ******************************************************************************/
 
-package es.gob.afirma.test.xades;
+package es.gob.afirma.signers.xades;
 
 import java.io.File;
 import java.security.KeyStore;
@@ -23,7 +23,6 @@ import org.junit.Test;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSigner;
-import es.gob.afirma.signers.xades.AOXAdESSigner;
 
 /** Pruebas del firma <i>Internally Detached</i> de nodo.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */

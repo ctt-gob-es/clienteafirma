@@ -8,7 +8,7 @@
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  ******************************************************************************/
 
-package es.gob.afirma.test.xades;
+package es.gob.afirma.signers.xades;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -29,7 +29,6 @@ import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.CounterSignTarget;
-import es.gob.afirma.signers.xades.AOXAdESSigner;
 
 
 

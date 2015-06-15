@@ -8,7 +8,7 @@
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  ******************************************************************************/
 
-package es.gob.afirma.test.xades;
+package es.gob.afirma.signers.xades;
 
 import java.security.KeyStore;
 import java.security.KeyStore.PrivateKeyEntry;
@@ -23,7 +23,6 @@ import org.junit.Test;
 
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.signers.AOSignConstants;
-import es.gob.afirma.signers.xades.AOXAdESSigner;
 
 /**
  * Pruebas del m&oacute;dulo XAdES de Afirma.

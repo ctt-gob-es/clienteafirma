@@ -1,4 +1,4 @@
-package es.gob.afirma.test.xades;
+package es.gob.afirma.signers.xades;
 
 import java.io.File;
 import java.security.KeyStore;
@@ -10,7 +10,6 @@ import org.junit.Test;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.signers.AOSignConstants;
-import es.gob.afirma.signers.xades.AOXAdESSigner;
 
 /** Pruebas de transformaciones adicionales en firmas XAdES.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
