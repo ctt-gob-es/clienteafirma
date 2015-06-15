@@ -60,10 +60,10 @@ public final class PreferencesManager {
 	public static final String PREFERENCE_CADES_POLICY_IDENTIFIER = "cadesPolicyIdentifier"; //$NON-NLS-1$
 
 	/** Huella digital del identificador de la pol&iacute;tica de firma para CAdES. */
-	public static final String PREFERENCE_CADES_POLICY_IDENTIFIER_HASH = "cadesPolicyIdentifierHash"; //$NON-NLS-1$
+	public static final String PREFERENCE_CADES_POLICY_HASH = "cadesPolicyIdentifierHash"; //$NON-NLS-1$
 
 	/** Algoritmo de la huella digital del identificador de la pol&iacute;tica de firma para CAdES. */
-	public static final String PREFERENCE_CADES_POLICY_IDENTIFIER_HASH_ALGORITHM = "cadesPolicyIdentifierHashAlgorithm"; //$NON-NLS-1$
+	public static final String PREFERENCE_CADES_POLICY_HASH_ALGORITHM = "cadesPolicyIdentifierHashAlgorithm"; //$NON-NLS-1$
 
 	/** Calificador de la pol&iacute;tica de firma para CAdES. */
 	public static final String PREFERENCE_CADES_POLICY_QUALIFIER = "cadesPolicyQualifier"; //$NON-NLS-1$

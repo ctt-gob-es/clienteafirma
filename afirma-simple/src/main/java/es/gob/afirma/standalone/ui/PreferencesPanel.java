@@ -12,8 +12,8 @@ package es.gob.afirma.standalone.ui;
 
 import static es.gob.afirma.standalone.PreferencesManager.PREFERENCE_CADES_IMPLICIT;
 import static es.gob.afirma.standalone.PreferencesManager.PREFERENCE_CADES_POLICY_IDENTIFIER;
-import static es.gob.afirma.standalone.PreferencesManager.PREFERENCE_CADES_POLICY_IDENTIFIER_HASH;
-import static es.gob.afirma.standalone.PreferencesManager.PREFERENCE_CADES_POLICY_IDENTIFIER_HASH_ALGORITHM;
+import static es.gob.afirma.standalone.PreferencesManager.PREFERENCE_CADES_POLICY_HASH;
+import static es.gob.afirma.standalone.PreferencesManager.PREFERENCE_CADES_POLICY_HASH_ALGORITHM;
 import static es.gob.afirma.standalone.PreferencesManager.PREFERENCE_CADES_POLICY_QUALIFIER;
 import static es.gob.afirma.standalone.PreferencesManager.PREFERENCE_OMIT_ASKONCLOSE;
 import static es.gob.afirma.standalone.PreferencesManager.PREFERENCE_PADES_FORMAT;
@@ -204,8 +204,8 @@ final class PreferencesPanel extends JPanel implements KeyListener {
 		final AdESPolicy cadesPolicy = this.cadesPolicyPanel.getCurrentPolicy();
 		if (cadesPolicy != null) {
 			PreferencesManager.put(PREFERENCE_CADES_POLICY_IDENTIFIER, cadesPolicy.getPolicyIdentifier());
-			PreferencesManager.put(PREFERENCE_CADES_POLICY_IDENTIFIER_HASH, cadesPolicy.getPolicyIdentifierHash());
-			PreferencesManager.put(PREFERENCE_CADES_POLICY_IDENTIFIER_HASH_ALGORITHM, cadesPolicy.getPolicyIdentifierHashAlgorithm());
+			PreferencesManager.put(PREFERENCE_CADES_POLICY_HASH, cadesPolicy.getPolicyIdentifierHash());
+			PreferencesManager.put(PREFERENCE_CADES_POLICY_HASH_ALGORITHM, cadesPolicy.getPolicyIdentifierHashAlgorithm());
 			if (cadesPolicy.getPolicyQualifier() != null) {
 				PreferencesManager.put(PREFERENCE_CADES_POLICY_QUALIFIER, cadesPolicy.getPolicyQualifier().toString());
 			}
@@ -215,8 +215,8 @@ final class PreferencesPanel extends JPanel implements KeyListener {
 		}
 		else {
 			PreferencesManager.remove(PREFERENCE_CADES_POLICY_IDENTIFIER);
-			PreferencesManager.remove(PREFERENCE_CADES_POLICY_IDENTIFIER_HASH);
-			PreferencesManager.remove(PREFERENCE_CADES_POLICY_IDENTIFIER_HASH_ALGORITHM);
+			PreferencesManager.remove(PREFERENCE_CADES_POLICY_HASH);
+			PreferencesManager.remove(PREFERENCE_CADES_POLICY_HASH_ALGORITHM);
 			PreferencesManager.remove(PREFERENCE_CADES_POLICY_QUALIFIER);
 		}
 		this.cadesPolicyPanel.saveCurrentPolicy();
@@ -852,8 +852,8 @@ final class PreferencesPanel extends JPanel implements KeyListener {
 		try {
 			return new AdESPolicy(
 					PreferencesManager.get(PREFERENCE_CADES_POLICY_IDENTIFIER, null),
-					PreferencesManager.get(PREFERENCE_CADES_POLICY_IDENTIFIER_HASH, null),
-					PreferencesManager.get(PREFERENCE_CADES_POLICY_IDENTIFIER_HASH_ALGORITHM, null),
+					PreferencesManager.get(PREFERENCE_CADES_POLICY_HASH, null),
+					PreferencesManager.get(PREFERENCE_CADES_POLICY_HASH_ALGORITHM, null),
 					PreferencesManager.get(PREFERENCE_CADES_POLICY_QUALIFIER, null)
 					);
 		}

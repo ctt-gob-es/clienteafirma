@@ -122,8 +122,6 @@ final class ExtraParamsHelper {
 
         // Preferencias de politica de firma
         final String policyId = PreferencesManager.get(PreferencesManager.PREFERENCE_PADES_POLICY_IDENTIFIER, ""); //$NON-NLS-1$
-
-
         if (!"".equals(policyId)) { //$NON-NLS-1$
         	p.put(
         		"policyIdentifier", //$NON-NLS-1$
@@ -179,37 +177,36 @@ final class ExtraParamsHelper {
 		return p;
 	}
 
-	/** Obtiene la configuraci&oacute;n para las firmas CAdES.
-	 * @return Propiedades para la configuraci&oacute;n de las firmas CAdES. */
+	/**
+	 * Obtiene la configuraci&oacute;n para las firmas CAdES.
+	 * @return Propiedades para la configuraci&oacute;n de las firmas CAdES.
+	 */
 	private static Properties loadCAdESExtraParams() {
 		final Properties p = new Properties();
 
         // Preferencias de politica de firma
         final String policyId = PreferencesManager.get(PreferencesManager.PREFERENCE_CADES_POLICY_IDENTIFIER, ""); //$NON-NLS-1$
         if (!"".equals(policyId)) { //$NON-NLS-1$
-        	p.put(
-        		"policyIdentifier", //$NON-NLS-1$
-        		policyId
-        	);
-	        if (!"".equals(PreferencesManager.get(PreferencesManager.PREFERENCE_CADES_POLICY_IDENTIFIER_HASH, ""))) { //$NON-NLS-1$ //$NON-NLS-2$
-				p.put(
-			    	"policyIdentifierHash", //$NON-NLS-1$
-			        PreferencesManager.get(PreferencesManager.PREFERENCE_CADES_POLICY_IDENTIFIER_HASH, "") //$NON-NLS-1$
-			    );
-		    }
-		    if (!"".equals(PreferencesManager.get(PreferencesManager.PREFERENCE_CADES_POLICY_IDENTIFIER_HASH_ALGORITHM, ""))) { //$NON-NLS-1$ //$NON-NLS-2$
-				p.put(
-			    	"policyIdentifierHashAlgorithm", //$NON-NLS-1$
-			        PreferencesManager.get(PreferencesManager.PREFERENCE_CADES_POLICY_IDENTIFIER_HASH_ALGORITHM, "") //$NON-NLS-1$
-				);
-		    }
-		    if (!"".equals(PreferencesManager.get(PreferencesManager.PREFERENCE_CADES_POLICY_QUALIFIER, ""))) { //$NON-NLS-1$ //$NON-NLS-2$
-				p.put(
-			    	"policyQualifier", //$NON-NLS-1$
-			        PreferencesManager.get(PreferencesManager.PREFERENCE_CADES_POLICY_QUALIFIER, "") //$NON-NLS-1$
-			    );
-		    }
-        }
+			p.put("policyIdentifier", policyId); //$NON-NLS-1$
+	    }
+        if (!"".equals(PreferencesManager.get(PreferencesManager.PREFERENCE_CADES_POLICY_HASH, ""))) { //$NON-NLS-1$ //$NON-NLS-2$
+			p.put(
+		    	"policyIdentifierHash", //$NON-NLS-1$
+		        PreferencesManager.get(PreferencesManager.PREFERENCE_CADES_POLICY_HASH, "") //$NON-NLS-1$
+		    );
+	    }
+	    if (!"".equals(PreferencesManager.get(PreferencesManager.PREFERENCE_CADES_POLICY_HASH_ALGORITHM, ""))) { //$NON-NLS-1$ //$NON-NLS-2$
+			p.put(
+		    	"policyIdentifierHashAlgorithm", //$NON-NLS-1$
+		        PreferencesManager.get(PreferencesManager.PREFERENCE_CADES_POLICY_HASH_ALGORITHM, "") //$NON-NLS-1$
+			);
+	    }
+	    if (!"".equals(PreferencesManager.get(PreferencesManager.PREFERENCE_CADES_POLICY_QUALIFIER, ""))) { //$NON-NLS-1$ //$NON-NLS-2$
+			p.put(
+		    	"policyQualifier", //$NON-NLS-1$
+		        PreferencesManager.get(PreferencesManager.PREFERENCE_CADES_POLICY_QUALIFIER, "") //$NON-NLS-1$
+		    );
+	    }
 
         // Preferencias de CAdES
         // Esta propiedad se comparte con otros formatos, hay que comprobar que signer tenemos
