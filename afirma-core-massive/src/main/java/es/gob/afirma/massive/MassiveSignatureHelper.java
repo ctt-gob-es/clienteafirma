@@ -175,7 +175,7 @@ public final class MassiveSignatureHelper {
 
         final Properties config = (Properties) this.massiveConfiguration.getExtraParams().clone(); // Configuracion
 
-        config.setProperty("headLess", Boolean.toString(true));  //$NON-NLS-1$
+        config.setProperty("headless", Boolean.toString(true));  //$NON-NLS-1$
         byte[] signData = null; // Firma resultante
 
         // Ejecutamos la operacion que corresponda
@@ -235,7 +235,7 @@ public final class MassiveSignatureHelper {
 
         // Ejecutamos la operacion que corresponda
         final Properties config = (Properties) this.massiveConfiguration.getExtraParams().clone();
-        config.setProperty("headLess", Boolean.toString(true)); //$NON-NLS-1$
+        config.setProperty("headless", Boolean.toString(true)); //$NON-NLS-1$
         try {
             if (this.massiveConfiguration.getMassiveOperation().equals(MassiveType.SIGN)) { // Firma
             	checkvalidSignFormat(this.massiveConfiguration);
@@ -333,7 +333,7 @@ public final class MassiveSignatureHelper {
         // Ejecutamos la operacion que corresponda
         byte[] signData = null;
         final Properties config = (Properties) this.massiveConfiguration.getExtraParams().clone();
-        config.setProperty("headLess", Boolean.toString(true));  //$NON-NLS-1$
+        config.setProperty("headless", Boolean.toString(true));  //$NON-NLS-1$
 
         try {
             if (this.massiveConfiguration.getMassiveOperation().equals(MassiveType.SIGN)) { // Firma

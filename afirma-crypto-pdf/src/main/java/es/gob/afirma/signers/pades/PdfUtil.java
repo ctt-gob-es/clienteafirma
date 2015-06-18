@@ -47,7 +47,7 @@ final class PdfUtil {
 
 	static PdfReader getPdfReader(final byte[] inPDF,
 			                      final Properties extraParams,
-			                      final boolean headLess) throws BadPdfPasswordException,
+			                      final boolean headless) throws BadPdfPasswordException,
 			                                                     InvalidPdfException,
 			                                                     IOException {
 		// Contrasena del propietario del PDF
@@ -72,7 +72,7 @@ final class PdfUtil {
 			// Comprobamos que el signer esta en modo interactivo, y si no lo
 			// esta no pedimos contrasena por dialogo, principalmente para no interrumpir un firmado por lotes
 			// desatendido
-			if (headLess) {
+			if (headless) {
 				throw new BadPdfPasswordException(e);
 			}
 			// La contrasena que nos han proporcionada no es buena o no nos
@@ -108,7 +108,7 @@ final class PdfUtil {
 				!Boolean.parseBoolean(extraParams.getProperty("allowSigningCertifiedPdfs"))) { //$NON-NLS-1$
 			// Si no permitimos dialogos graficos o directamente hemos indicado que no permitimos firmar PDF certificados lanzamos
 			// una excepcion
-			if (Boolean.parseBoolean(extraParams.getProperty("headLess")) || "false".equalsIgnoreCase(extraParams.getProperty("allowSigningCertifiedPdfs"))) {  //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			if (Boolean.parseBoolean(extraParams.getProperty("headless")) || "false".equalsIgnoreCase(extraParams.getProperty("allowSigningCertifiedPdfs"))) {  //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				throw new PdfIsCertifiedException();
 			}
 			// En otro caso, perguntamos al usuario
@@ -148,7 +148,7 @@ final class PdfUtil {
 		final PdfReader pdfReader = PdfUtil.getPdfReader(
 			pdf,
 			extraParams,
-			Boolean.parseBoolean(extraParams.getProperty("headLess")) //$NON-NLS-1$
+			Boolean.parseBoolean(extraParams.getProperty("headless")) //$NON-NLS-1$
 		);
 		return pdfHasUnregisteredSignatures(pdfReader);
 	}
@@ -173,7 +173,7 @@ final class PdfUtil {
 		final PdfReader pdfReader = PdfUtil.getPdfReader(
 			pdf,
 			extraParams,
-			Boolean.parseBoolean(extraParams.getProperty("headLess")) //$NON-NLS-1$
+			Boolean.parseBoolean(extraParams.getProperty("headless")) //$NON-NLS-1$
 		);
 
     	for (int i = 0; i < pdfReader.getXrefSize(); i++) {

@@ -296,7 +296,7 @@ public final class AOXMLDSigSigner implements AOSigner {
      *    No declara transformaciones Base64 incluso si son necesarias si se establece a <code>true</code>, si se establece a <code>false</code>
      *    act&uacute;a normalmente (s&iacute; las declara)
      *   </dd>
-     *  <dt><b><i>headLess</i></b></dt>
+     *  <dt><b><i>headless</i></b></dt>
      *   <dd>
      *    Evita cualquier interacci&oacute;n con el usuraio si se establece a <code>true</code>, si se establece a <code>false</code> act&uacute;a
      *    normalmente (puede mostrar di&aacute;logos, por ejemplo, para la dereferenciaci&oacute;n de hojas de estilo enlazadas con rutas relativas).
@@ -335,8 +335,8 @@ public final class AOXMLDSigSigner implements AOSigner {
 				"ignoreStyleSheets", Boolean.FALSE.toString())); //$NON-NLS-1$
 		final boolean avoidBase64Transforms = Boolean.parseBoolean(extraParams.getProperty(
 				"avoidBase64Transforms", Boolean.FALSE.toString())); //$NON-NLS-1$
-		final boolean headLess = Boolean.parseBoolean(extraParams.getProperty(
-				"headLess", Boolean.TRUE.toString())); //$NON-NLS-1$
+		final boolean headless = Boolean.parseBoolean(extraParams.getProperty(
+				"headless", Boolean.TRUE.toString())); //$NON-NLS-1$
         String mimeType = extraParams.getProperty("mimeType"); //$NON-NLS-1$
         String encoding = extraParams.getProperty("encoding"); //$NON-NLS-1$
         if ("base64".equalsIgnoreCase(encoding)) { //$NON-NLS-1$
@@ -387,7 +387,7 @@ public final class AOXMLDSigSigner implements AOSigner {
                 // Obtenemos la hoja de estilo del XML
                 if (!ignoreStyleSheets) {
                 	try {
-                		xmlStyle = new XmlStyle(data, headLess);
+                		xmlStyle = new XmlStyle(data, headless);
                 	}
 					catch (final IsInnerlException ex) {
 						LOGGER.info(

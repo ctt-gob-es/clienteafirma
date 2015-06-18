@@ -196,7 +196,7 @@ public final class PdfSessionManager {
 		final PdfReader pdfReader = PdfUtil.getPdfReader(
 			inPDF,
 			extraParams,
-			Boolean.parseBoolean(extraParams.getProperty("headLess")) //$NON-NLS-1$
+			Boolean.parseBoolean(extraParams.getProperty("headless")) //$NON-NLS-1$
 		);
 
 		PdfUtil.checkPdfCertification(pdfReader.getCertificationLevel(), extraParams);
@@ -252,7 +252,7 @@ public final class PdfSessionManager {
 	        // Comprobamos que el signer esta en modo interactivo, y si no lo
             // esta no pedimos contrasena por dialogo, principalmente para no interrumpir un firmado por lotes
             // desatendido
-            if (Boolean.parseBoolean(extraParams.getProperty("headLess"))) { //$NON-NLS-1$
+            if (Boolean.parseBoolean(extraParams.getProperty("headless"))) { //$NON-NLS-1$
                 throw new BadPdfPasswordException(e);
             }
             // La contrasena que nos han proporcionada no es buena o no nos

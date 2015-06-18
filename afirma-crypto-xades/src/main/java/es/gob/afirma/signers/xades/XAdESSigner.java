@@ -250,8 +250,8 @@ public final class XAdESSigner {
 		final boolean avoidBase64Transforms = Boolean.parseBoolean(extraParams.getProperty(
 				"avoidBase64Transforms", Boolean.FALSE.toString())); //$NON-NLS-1$
 
-		final boolean headLess = Boolean.parseBoolean(extraParams.getProperty(
-				"headLess", Boolean.TRUE.toString())); //$NON-NLS-1$
+		final boolean headless = Boolean.parseBoolean(extraParams.getProperty(
+				"headless", Boolean.TRUE.toString())); //$NON-NLS-1$
 
 		final boolean addKeyInfoKeyValue = Boolean.parseBoolean(extraParams.getProperty(
 				"addKeyInfoKeyValue", Boolean.TRUE.toString())); //$NON-NLS-1$
@@ -331,7 +331,7 @@ public final class XAdESSigner {
 			// ************************************************
 			if (!ignoreStyleSheets) {
 				try {
-					xmlStyle = new XmlStyle(data, headLess);
+					xmlStyle = new XmlStyle(data, headless);
 				}
 				catch (final IsInnerlException ex) {
 					LOGGER.info(

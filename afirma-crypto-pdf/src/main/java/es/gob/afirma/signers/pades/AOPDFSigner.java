@@ -74,13 +74,13 @@ public final class AOPDFSigner implements AOSigner {
      *  las firmas previamente existentes.<br>
      *  Si se detecta un documento PDF certificado, se mostrar&aacute; un di&aacute;logo gr&aacute;fico advirtiendo al usuario de esta
      *  situaci&oacute;n y pidiendo confirmaci&oacute;n para continuar.<br>Si desea evitar interacciones directas con los usuarios
-     *  consulte la documentaci&oacute;n de las opciones <code>allowSigningCertifiedPdfs</code> y <code>headLess</code>.<br>
+     *  consulte la documentaci&oacute;n de las opciones <code>allowSigningCertifiedPdfs</code> y <code>headless</code>.<br>
      * </p>
      * <p>
      *  Notas sobre documentos protegidos con contrase&ntilde;a:<br>
      *  Si un PDF est&aacute; protegido con contrase&ntilde;a por estar cifrado, se mostrar&aacute; un di&aacute;logo gr&aacute;fico advirtiendo al usuario de esta
      *  situaci&oacute;n y solicitando la contrase&ntilde;a de apertura del PDF.<br>Si desea evitar interacciones directas con los usuarios
-     *  consulte la documentaci&oacute;n de las opciones <code>ownerPassword</code> y <code>headLess</code>.
+     *  consulte la documentaci&oacute;n de las opciones <code>ownerPassword</code> y <code>headless</code>.
      *  Adicionalmente, si el fichero de entrada estaba cifrado y protegido con contrase&ntilde;a, la salida ser&aacute;a un documento PDF
      *  igualmente cifrado y protegido con contrase&ntilde;a..
      * </p>
@@ -179,13 +179,13 @@ public final class AOPDFSigner implements AOSigner {
      *  las firmas previamente existentes.<br>
      *  Si se detecta un documento PDF certificado, se mostrar&aacute; un di&aacute;logo gr&aacute;fico advirtiendo al usuario de esta
      *  situaci&oacute;n y pidiendo confirmaci&oacute;n para continuar.<br>Si desea evitar interacciones directas con los usuarios
-     *  consulte la documentaci&oacute;n de las opciones <code>allowSigningCertifiedPdfs</code> y <code>headLess</code>.<br>
+     *  consulte la documentaci&oacute;n de las opciones <code>allowSigningCertifiedPdfs</code> y <code>headless</code>.<br>
      * </p>
      * <p>
      *  Notas sobre documentos protegidos con contrase&ntilde;a:<br>
      *  Si un PDF est&aacute; protegido con contrase&ntilde;a por estar cifrado, se mostrar&aacute; un di&aacute;logo gr&aacute;fico advirtiendo al usuario de esta
      *  situaci&oacute;n y solicitando la contrase&ntilde;a de apertura del PDF.<br>Si desea evitar interacciones directas con los usuarios
-     *  consulte la documentaci&oacute;n de las opciones <code>ownerPassword</code> y <code>headLess</code>.
+     *  consulte la documentaci&oacute;n de las opciones <code>ownerPassword</code> y <code>headless</code>.
      *  Adicionalmente, si el fichero de entrada estaba cifrado y protegido con contrase&ntilde;a, la salida ser&aacute; un documento PDF
      *  igualmente cifrado y protegido con contrase&ntilde;a.
      * </p>
@@ -226,13 +226,13 @@ public final class AOPDFSigner implements AOSigner {
      *  las firmas previamente existentes.<br>
      *  Si se detecta un documento PDF certificado, se mostrar&aacute; un di&aacute;logo gr&aacute;fico advirtiendo al usuario de esta
      *  situaci&oacute;n y pidiendo confirmaci&oacute;n para continuar.<br>Si desea evitar interacciones directas con los usuarios
-     *  consulte la documentaci&oacute;n de las opciones <code>allowSigningCertifiedPdfs</code> y <code>headLess</code>.<br>
+     *  consulte la documentaci&oacute;n de las opciones <code>allowSigningCertifiedPdfs</code> y <code>headless</code>.<br>
      * </p>
      * <p>
      *  Notas sobre documentos protegidos con contrase&ntilde;a:<br>
      *  Si un PDF est&aacute; protegido con contrase&ntilde;a por estar cifrado, se mostrar&aacute; un di&aacute;logo gr&aacute;fico advirtiendo al usuario de esta
      *  situaci&oacute;n y solicitando la contrase&ntilde;a de apertura del PDF.<br>Si desea evitar interacciones directas con los usuarios
-     *  consulte la documentaci&oacute;n de las opciones <code>ownerPassword</code> y <code>headLess</code>.
+     *  consulte la documentaci&oacute;n de las opciones <code>ownerPassword</code> y <code>headless</code>.
      *  Adicionalmente, si el fichero de entrada estaba cifrado y protegido con contrase&ntilde;a, la salida ser&aacute; un documento PDF
      *  igualmente cifrado y protegido con contrase&ntilde;a.
      * </p>

@@ -352,11 +352,11 @@ public class TestPAdES {
         Assert.assertNotNull(prueba, result);
         Assert.assertTrue(signer.isSign(result));
 
-        prueba = "Firma PAdES de PDF certificado en SHA512withRSA indicando unicamente headLess=true"; //$NON-NLS-1$
+        prueba = "Firma PAdES de PDF certificado en SHA512withRSA indicando unicamente headless=true"; //$NON-NLS-1$
         System.out.println(prueba);
 
         extraParams = new Properties();
-        extraParams.put("headLess", "true"); //$NON-NLS-1$ //$NON-NLS-2$
+        extraParams.put("headless", "true"); //$NON-NLS-1$ //$NON-NLS-2$
 
         boolean failed = false;
         try {

@@ -369,7 +369,7 @@ public class DirectorySignatureHelper {
         }
 
         final Properties signConfig = (Properties) config.clone();
-        signConfig.setProperty("headLess", "true"); //$NON-NLS-1$ //$NON-NLS-2$
+        signConfig.setProperty("headless", "true"); //$NON-NLS-1$ //$NON-NLS-2$
 
         // Establecemos la configuracion de firma por defecto si no se indica
         if (!signConfig.containsKey(MODE_KEY) && this.mode != null) {
@@ -471,7 +471,7 @@ public class DirectorySignatureHelper {
         }
 
         final Properties signConfig = (Properties) config.clone();
-        signConfig.setProperty("headLess", "true"); //$NON-NLS-1$ //$NON-NLS-2$
+        signConfig.setProperty("headless", "true"); //$NON-NLS-1$ //$NON-NLS-2$
 
         final AOSigner signer = configuredSigner != null ? configuredSigner : this.defaultSigner;
 

@@ -27,7 +27,7 @@ import es.gob.afirma.keystores.filters.rfc.SscdFilter;
  */
 public final class CertFilterManager {
 
-	private static final String HEADLESS_PREFIX_KEY = "headLess"; //$NON-NLS-1$
+	private static final String HEADLESS_PREFIX_KEY = "headless"; //$NON-NLS-1$
 
 	private static final String FILTER_PREFIX_KEY = "filter"; //$NON-NLS-1$
 	private static final String FILTERS_PREFIX_KEY = "filters"; //$NON-NLS-1$

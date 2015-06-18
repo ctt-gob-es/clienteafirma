@@ -43,7 +43,7 @@ public final class XmlStyle {
 
 	/** Crea un estilo XML (XSL) a firmar.
 	 * @param data XML en formato binario
-	 * @param headLess Indica si deben omitirse las interacciones con el usuario mediante interfaz gr&aacute;fico
+	 * @param headless Indica si deben omitirse las interacciones con el usuario mediante interfaz gr&aacute;fico
 	 * @throws IOException Cuando hay errores de entrada / salida
 	 * @throws TransformerConfigurationException Si hay problemas en la configuraci&oacute;n de alguna transformaci&oacute;n
 	 * @throws CannotDereferenceException Si no se puede obtener el estilo referenciado
@@ -51,7 +51,7 @@ public final class XmlStyle {
 	 * @throws ReferenceIsNotXmlException Cuando el estilo referenciado no est&aacute; en formato XML
 	 * @throws javax.xml.transform.TransformerFactoryConfigurationError Cuando hay errores de configuraci&oacute; en la
 	 *                                                                  factor&iacute;a de transformaciones */
-	public XmlStyle(final byte[] data, final boolean headLess) throws IOException,
+	public XmlStyle(final byte[] data, final boolean headless) throws IOException,
 	                                                                  TransformerConfigurationException,
 	                                                                  CannotDereferenceException,
 	                                                                  IsInnerlException,
@@ -70,7 +70,7 @@ public final class XmlStyle {
 
 			final Document tmpDoc = dereferenceStyleSheet(
 				this.href,
-				headLess
+				headless
 			);
 
 			// Cuidado!! Solo rellenamos el Elemento DOM si no es HTTP o HTTPS,
@@ -151,14 +151,14 @@ public final class XmlStyle {
 
     /** Dereferencia una hoja de estilo en forma de Documento DOM.
      * @param id Identificador de la hoja de estilo
-     * @param headLess <code>true</code> si <b>no</b> se desea que se pregunte al
+     * @param headless <code>true</code> si <b>no</b> se desea que se pregunte al
      *                 usuario para dereferenciar las hojas de estilo enlazadas con rutas locales
      * @return Documento DOM con la hoja de estilo
      * @throws CannotDereferenceException Si no se puede dereferenciar
      * @throws IsInnerlException Si no se puede dereferenciar por ser una referencia local
      * @throws ReferenceIsNotXmlException Si el objeto dereferenciado no puede transformarse en un
      *                                    Documento DOM */
-    private static Document dereferenceStyleSheet(final String id, final boolean headLess) throws CannotDereferenceException,
+    private static Document dereferenceStyleSheet(final String id, final boolean headless) throws CannotDereferenceException,
                                                                                                  IsInnerlException,
                                                                                                  ReferenceIsNotXmlException {
         if (id == null || "".equals(id)) { //$NON-NLS-1$
@@ -188,7 +188,7 @@ public final class XmlStyle {
             if (fileName.startsWith("#")) { //$NON-NLS-1$
                 throw new IsInnerlException(e);
             }
-            else if (!headLess && id.startsWith("file://")) { //$NON-NLS-1$
+            else if (!headless && id.startsWith("file://")) { //$NON-NLS-1$
             	// Preguntamos al usuario para la dereferenciacion
             	if (AOUIFactory.showConfirmDialog(null,
             			XmlStyleMessages.getString("XmlStyle.5"), //$NON-NLS-1$

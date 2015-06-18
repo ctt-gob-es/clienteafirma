@@ -50,7 +50,7 @@ public final class TestPasswordPDF {
         System.out.println(prueba);
 
         final Properties extraParams = new Properties();
-        extraParams.put("headLess", "true"); //$NON-NLS-1$ //$NON-NLS-2$
+        extraParams.put("headless", "true"); //$NON-NLS-1$ //$NON-NLS-2$
         extraParams.put("ownerPassword", "password"); //$NON-NLS-1$ //$NON-NLS-2$
 
         final byte[] result = signer.sign(
@@ -95,7 +95,7 @@ public final class TestPasswordPDF {
         System.out.println(prueba);
 
         final Properties extraParams = new Properties();
-        extraParams.put("headLess", "true"); //$NON-NLS-1$ //$NON-NLS-2$
+        extraParams.put("headless", "true"); //$NON-NLS-1$ //$NON-NLS-2$
         extraParams.put("userPassword", "1111"); //$NON-NLS-1$ //$NON-NLS-2$
 
         final byte[] result = signer.sign(
