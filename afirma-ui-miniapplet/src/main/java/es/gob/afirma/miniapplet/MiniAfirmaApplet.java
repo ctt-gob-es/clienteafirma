@@ -14,6 +14,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.security.AccessController;
@@ -177,6 +178,13 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 		}
 
 		final Properties params = ExtraParamsProcessor.convertToProperties(extraParams);
+
+		// Informacion sobre los parametros adicionales indicados
+		final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		final PrintStream ps = new PrintStream(baos);
+		params.list(ps);
+		LOGGER.info("Recibidos los siguientes parametros adicionales:\n" + baos.toString()); //$NON-NLS-1$
+
 
 		try {
 			String signatureFormat = format;

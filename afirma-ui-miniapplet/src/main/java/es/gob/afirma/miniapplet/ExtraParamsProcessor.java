@@ -229,20 +229,21 @@ final class ExtraParamsProcessor {
 		}
 	}
 
-	/**
-	 * Establece propiedades de firma concretas para cuando el formato indicado sea "AUTO". Las
-	 * propiedades dependen del signer que se vaya a usar.
-	 * @param params
-	 * @param signatureFormat
-	 */
-	public static void configAutoFormat(final AOSigner signer, final byte[] data, final Properties params) {
+	/** Establece propiedades de firma concretas para cuando el formato indicado sea "AUTO".
+	 * Las propiedades dependen del signer que se vaya a usar.
+	 * @param signer Firmador usado.
+	 * @param data Datos a firmar.
+	 * @param params Par&aacute;metros adicionales.
+	 * @param signatureFormat Formato de firma a usar. */
+	static void configAutoFormat(final AOSigner signer, final byte[] data, final Properties params) {
 
 		final String signerClassname = signer.getClass().getName();
 		if (signerClassname.equals("es.gob.afirma.signers.pades.AOPDFSigner")) { //$NON-NLS-1$
 			try {
 				final Method configureMethod = signer.getClass().getMethod("configureRespectfulProperties", byte[].class, Properties.class); //$NON-NLS-1$
 				configureMethod.invoke(null, data, params);
-			} catch (final Exception e) {
+			}
+			catch (final Exception e) {
 				Logger.getLogger("es.gob.afirma").warning("Error al configurar una firma PAdES igual a las existentes: " + e); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		}
