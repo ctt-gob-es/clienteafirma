@@ -127,13 +127,13 @@ public final class AOCAdESSigner implements AOSigner {
     	//****************************************************************************************************
 
         final byte[] dataDigest;
-        final String digestAlgoritmName;
+        final String digestAlgorithmName;
         if (precalculatedDigestAlgorithmName != null) {
-        	digestAlgoritmName = AOSignConstants.getDigestAlgorithmName(precalculatedDigestAlgorithmName);
+        	digestAlgorithmName = AOSignConstants.getDigestAlgorithmName(precalculatedDigestAlgorithmName);
             dataDigest = data;
         }
         else {
-        	digestAlgoritmName = AOSignConstants.getDigestAlgorithmName(algorithm);
+        	digestAlgorithmName = AOSignConstants.getDigestAlgorithmName(algorithm);
             try {
 				dataDigest = MessageDigest.getInstance(AOSignConstants.getDigestAlgorithmName(algorithm)).digest(data);
 			}
@@ -142,17 +142,18 @@ public final class AOCAdESSigner implements AOSigner {
 			}
         }
 
+        boolean omitContent = false;
+        if (mode.equals(AOSignConstants.SIGN_MODE_EXPLICIT) || precalculatedDigestAlgorithmName != null) {
+            omitContent = true;
+        }
+
+        String altContentTypeOid = MimeHelper.DEFAULT_CONTENT_OID_DATA;
+        String altContentDescription = MimeHelper.DEFAULT_CONTENT_DESCRIPTION;
+
         final byte[] cadesSignedData;
 
         try {
-            boolean omitContent = false;
-            if (mode.equals(AOSignConstants.SIGN_MODE_EXPLICIT) || precalculatedDigestAlgorithmName != null) {
-                omitContent = true;
-            }
 
-
-            String altContentTypeOid = MimeHelper.DEFAULT_CONTENT_OID_DATA;
-            String altContentDescription = MimeHelper.DEFAULT_CONTENT_DESCRIPTION;
 			if (data != null) {
 				try {
 					final MimeHelper mimeHelper = new MimeHelper(data);
@@ -177,7 +178,7 @@ public final class AOCAdESSigner implements AOSigner {
                    key,
                    Boolean.parseBoolean(extraParams.getProperty("includeOnlySignningCertificate", Boolean.FALSE.toString())) ? new X509Certificate[] { (X509Certificate) certChain[0] } : certChain, //$NON-NLS-1$
                    dataDigest,
-                   digestAlgoritmName,
+                   digestAlgorithmName,
                    Boolean.parseBoolean(extraParams.getProperty("padesMode", "false")), //$NON-NLS-1$ //$NON-NLS-2$
                    contentTypeOid != null ? contentTypeOid : altContentTypeOid,
                    contentDescription != null ? contentDescription : altContentDescription,
