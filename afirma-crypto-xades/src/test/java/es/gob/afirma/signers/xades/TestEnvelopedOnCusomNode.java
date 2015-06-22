@@ -24,16 +24,12 @@ public final class TestEnvelopedOnCusomNode {
     private static final Properties p4 = new Properties();
     static {
 	    p4.setProperty("format", AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED); //$NON-NLS-1$
-	    p4.setProperty("mode", AOSignConstants.SIGN_MODE_IMPLICIT); //$NON-NLS-1$
-	    p4.setProperty("includeOnlySignningCertificate", "true"); //$NON-NLS-1$ //$NON-NLS-2$
 	    p4.setProperty("insertEnvelopedSignatureOnNodeByXPath", "namespace:Facturae"); //$NON-NLS-1$ //$NON-NLS-2$
-	    p4.setProperty("useManifest", "true"); //$NON-NLS-1$ //$NON-NLS-2$
     }
 
     private static final Properties p3 = new Properties();
     static {
 	    p3.setProperty("format", AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED); //$NON-NLS-1$
-	    p3.setProperty("mode", AOSignConstants.SIGN_MODE_IMPLICIT); //$NON-NLS-1$
 	    p3.setProperty("includeOnlySignningCertificate", "true"); //$NON-NLS-1$ //$NON-NLS-2$
 	    p3.setProperty("insertEnvelopedSignatureOnNodeByXPath", "/bookstore/book[1]/title"); //$NON-NLS-1$ //$NON-NLS-2$
 	    p3.setProperty("useManifest", "true"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -42,7 +38,6 @@ public final class TestEnvelopedOnCusomNode {
     private static final Properties p2 = new Properties();
     static {
 	    p2.setProperty("format", AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED); //$NON-NLS-1$
-	    p2.setProperty("mode", AOSignConstants.SIGN_MODE_IMPLICIT); //$NON-NLS-1$
 	    p2.setProperty("includeOnlySignningCertificate", "true"); //$NON-NLS-1$ //$NON-NLS-2$
 	    p2.setProperty("nodeToSign", "2"); //$NON-NLS-1$ //$NON-NLS-2$
 	    p2.setProperty("useManifest", "true"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -51,7 +46,6 @@ public final class TestEnvelopedOnCusomNode {
     private static final Properties p1 = new Properties();
     static {
 	    p1.setProperty("format", AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED); //$NON-NLS-1$
-	    p1.setProperty("mode", AOSignConstants.SIGN_MODE_IMPLICIT); //$NON-NLS-1$
 	    p1.setProperty("avoidXpathExtraTransformsOnEnveloped", "true"); //$NON-NLS-1$ //$NON-NLS-2$
     }
 
