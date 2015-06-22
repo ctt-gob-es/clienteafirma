@@ -145,18 +145,13 @@ public final class MozillaUnifiedKeyStoreManager extends AggregatedKeyStoreManag
 					),
 					parentComponent         // Parent
 				);
-				LOGGER.info("El DNIe 100% Java ha podido inicializarse, se anadiran sus entradas"); //$NON-NLS-1$
+				LOGGER.info("La tarjeta CERES ha podido inicializarse, se anadiran sus entradas"); //$NON-NLS-1$
 				addKeyStoreManager(tmpKsm);
 			}
-			catch (final AOCancelledOperationException ex) {
-				LOGGER.warning("Se cancelo el acceso al almacen DNIe 100% Java: " + ex); //$NON-NLS-1$
-			}
 			catch (final Exception ex) {
-				LOGGER.warning("No se ha podido inicializar el controlador DNIe 100% Java: " + ex); //$NON-NLS-1$
+				LOGGER.warning("No se ha podido inicializar la tarjeta CERES: " + ex); //$NON-NLS-1$
 			}
 		}
-
-
 
 		if (lacksKeyStores()) {
 			LOGGER.warning("No se ha podido inicializar ningun almacen, interno o externo, de Firefox"); //$NON-NLS-1$
