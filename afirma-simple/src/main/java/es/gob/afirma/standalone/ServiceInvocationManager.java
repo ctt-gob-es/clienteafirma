@@ -32,13 +32,14 @@ final class ServiceInvocationManager {
 
 			final SocketChannel socketChannel = serverSocketChannel.accept();
 
-			if (!isLocalAddress((InetSocketAddress) socketChannel.getRemoteAddress())) {
-				socketChannel.close();
-				serverSocketChannel.close();
-				throw new SecurityException(
-					"Se ha detectado un acceso no autorizado desde " + ((InetSocketAddress) socketChannel.getRemoteAddress()).getHostString() //$NON-NLS-1$
-				);
-			}
+			//TODO: Descomentar y hacer compatible con Java 6
+//			if (!isLocalAddress((InetSocketAddress) socketChannel.getRemoteAddress())) {
+//				socketChannel.close();
+//				serverSocketChannel.close();
+//				throw new SecurityException(
+//					"Se ha detectado un acceso no autorizado desde " + ((InetSocketAddress) socketChannel.getRemoteAddress()).getHostString() //$NON-NLS-1$
+//				);
+//			}
 
 			LOGGER.info("Aceptada conexion desde: " + socketChannel); //$NON-NLS-1$
 			socketChannel.configureBlocking(false);
@@ -190,15 +191,16 @@ final class ServiceInvocationManager {
 		return response.toString();
 	}
 
-	private static boolean isLocalAddress(final InetSocketAddress a) {
-		final String hostString = a.getHostString();
-		if ("0:0:0:0:0:0:0:1".equals(hostString) || //$NON-NLS-1$
-			"127.0.0.1".equals(hostString) || //$NON-NLS-1$
-			"localhost".equals(hostString)) { //$NON-NLS-1$
-			return true;
-		}
-		return false;
-	}
+	//TODO: Descomentar y hacer compatible con Java 6
+//	private static boolean isLocalAddress(final InetSocketAddress a) {
+//		final String hostString = a.getHostString();
+//		if ("0:0:0:0:0:0:0:1".equals(hostString) || //$NON-NLS-1$
+//			"127.0.0.1".equals(hostString) || //$NON-NLS-1$
+//			"localhost".equals(hostString)) { //$NON-NLS-1$
+//			return true;
+//		}
+//		return false;
+//	}
 
 	private static String getCommandUri(final String httpResponse) {
 		if (httpResponse == null) {
