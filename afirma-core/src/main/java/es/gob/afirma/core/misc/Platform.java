@@ -52,18 +52,6 @@ public final class Platform {
         OTHER
     }
 
-    /** Version del entorno de ejecuci&oacute;n de Java. */
-    public enum JREVER {
-        /** Java 4 y anteriores. */
-        J4,
-        /** Java 5. */
-        J5,
-        /** Java 6. */
-        J6,
-        /** Java 7. */
-        J7
-    }
-
     /** Sistema operativo. */
     private static OS os = null;
 
