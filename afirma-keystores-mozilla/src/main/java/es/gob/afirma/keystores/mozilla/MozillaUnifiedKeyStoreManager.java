@@ -132,6 +132,32 @@ public final class MozillaUnifiedKeyStoreManager extends AggregatedKeyStoreManag
 			}
 		}
 
+		// Anadimos el controlador Java de CERES SIEMPRE a menos que se indique "es.gob.afirma.keystores.mozilla.disableCeresNativeDriver=true"
+		if (!Boolean.getBoolean("es.gob.afirma.keystores.mozilla.disableCeresNativeDriver")) { //$NON-NLS-1$
+			try {
+				final AOKeyStoreManager tmpKsm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
+					AOKeyStore.CERES,       // Store
+					null,                   // Lib (null)
+					null,                   // Description (null)
+					new UIPasswordCallback( // PasswordCallback
+						FirefoxKeyStoreMessages.getString("MozillaUnifiedKeyStoreManager.1") + " " + AOKeyStore.CERES.getName(), //$NON-NLS-1$ //$NON-NLS-2$
+						parentComponent
+					),
+					parentComponent         // Parent
+				);
+				LOGGER.info("El DNIe 100% Java ha podido inicializarse, se anadiran sus entradas"); //$NON-NLS-1$
+				addKeyStoreManager(tmpKsm);
+			}
+			catch (final AOCancelledOperationException ex) {
+				LOGGER.warning("Se cancelo el acceso al almacen DNIe 100% Java: " + ex); //$NON-NLS-1$
+			}
+			catch (final Exception ex) {
+				LOGGER.warning("No se ha podido inicializar el controlador DNIe 100% Java: " + ex); //$NON-NLS-1$
+			}
+		}
+
+
+
 		if (lacksKeyStores()) {
 			LOGGER.warning("No se ha podido inicializar ningun almacen, interno o externo, de Firefox"); //$NON-NLS-1$
 		}

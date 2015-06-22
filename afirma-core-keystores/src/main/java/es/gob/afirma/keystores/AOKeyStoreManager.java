@@ -134,6 +134,9 @@ public class AOKeyStoreManager implements KeyStoreManager {
         	case SINGLE:
         		this.ks =  AOKeyStoreManagerHelperSingle.initSingle(store, pssCallBack);
         		break;
+        	case CERES:
+        		this.ks = AOKeyStoreManagerHelperCeresJava.initCeresJava(pssCallBack);
+            	break;
         	case DNIEJAVA:
                 // En el "params" debemos traer los parametros:
                 // [0] -parent: Componente padre para la modalidad

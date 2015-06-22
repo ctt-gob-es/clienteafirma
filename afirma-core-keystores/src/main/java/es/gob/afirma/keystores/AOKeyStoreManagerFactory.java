@@ -92,29 +92,29 @@ public final class AOKeyStoreManagerFactory {
     	}
 
     	// Almacen JKS, en cualquier sistema operativo
-    	else if (AOKeyStore.JAVA.equals(store)) {
+    	if (AOKeyStore.JAVA.equals(store)) {
     		return new AggregatedKeyStoreManager(getJavaKeyStoreManager(lib, pssCallback, forceReset, parentComponent));
         }
 
     	// Fichero P7, X509, JCEKS o CaseExactKS en cualquier sistema operativo
-        else if (AOKeyStore.SINGLE.equals(store) ||
+        if (AOKeyStore.SINGLE.equals(store) ||
     		AOKeyStore.JAVACE.equals(store) ||
     		AOKeyStore.JCEKS.equals(store)) {
         		return new AggregatedKeyStoreManager(getFileKeyStoreManager(store, lib, pssCallback, forceReset, parentComponent));
         }
 
         // Token PKCS#11, en cualquier sistema operativo
-        else if (AOKeyStore.PKCS11.equals(store)) {
+        if (AOKeyStore.PKCS11.equals(store)) {
         	return new AggregatedKeyStoreManager(getPkcs11KeyStoreManager(lib, description, pssCallback, forceReset, parentComponent));
         }
 
         // Almacen de certificados de Windows
-        else if (Platform.getOS().equals(Platform.OS.WINDOWS) && AOKeyStore.WINDOWS.equals(store)) {
+        if (Platform.getOS().equals(Platform.OS.WINDOWS) && AOKeyStore.WINDOWS.equals(store)) {
         	return new AggregatedKeyStoreManager(getWindowsMyCapiKeyStoreManager(forceReset));
         }
 
         // Libreta de direcciones de Windows
-        else if (Platform.getOS().equals(Platform.OS.WINDOWS) && (AOKeyStore.WINADDRESSBOOK.equals(store) || AOKeyStore.WINCA.equals(store))) {
+        if (Platform.getOS().equals(Platform.OS.WINDOWS) && (AOKeyStore.WINADDRESSBOOK.equals(store) || AOKeyStore.WINCA.equals(store))) {
         	return new AggregatedKeyStoreManager(getWindowsAddressBookKeyStoreManager(store, forceReset));
         }
 
@@ -122,18 +122,23 @@ public final class AOKeyStoreManagerFactory {
         // los dispositivos externos configuramos. A esto, le agregamos en Mac OS X el gestor de
         // DNIe para que agregue los certificados de este mediante el controlador Java del DNIe si
         // se encuentra la biblioteca y hay un DNIe insertado
-        else if (AOKeyStore.MOZ_UNI.equals(store)) {
+        if (AOKeyStore.MOZ_UNI.equals(store)) {
         	return getMozillaUnifiedKeyStoreManager(pssCallback, forceReset, parentComponent);
         }
 
         // Apple Safari sobre Mac OS X.
-        else if (Platform.getOS().equals(Platform.OS.MACOSX) && AOKeyStore.APPLE.equals(store)) {
+        if (Platform.getOS().equals(Platform.OS.MACOSX) && AOKeyStore.APPLE.equals(store)) {
         	return getMacOSXKeyStoreManager(store, lib, pssCallback, forceReset, parentComponent);
         }
 
         // Driver Java para DNIe
-        else if (AOKeyStore.DNIEJAVA.equals(store)) {
+        if (AOKeyStore.DNIEJAVA.equals(store)) {
         	return new AggregatedKeyStoreManager(getDnieJavaKeyStoreManager(pssCallback, forceReset, parentComponent));
+        }
+
+    	// Driver Java para CERES
+        if (AOKeyStore.CERES.equals(store)) {
+        	return new AggregatedKeyStoreManager(getCeresJavaKeyStoreManager(pssCallback, forceReset));
         }
 
         throw new AOKeystoreAlternativeException(
@@ -241,6 +246,23 @@ public final class AOKeyStoreManagerFactory {
     	}
     	return ksm;
     }
+
+	private static AOKeyStoreManager getCeresJavaKeyStoreManager(final PasswordCallback pssCallback,
+			                                                     final boolean forceReset) throws AOKeystoreAlternativeException,
+											                                                      IOException {
+		final AOKeyStoreManager ksm = new AOKeyStoreManager();
+		try {
+			ksm.init(AOKeyStore.CERES, null, pssCallback, null, forceReset);
+		}
+		catch (final AOKeyStoreManagerException e) {
+			throw new AOKeystoreAlternativeException(
+				getAlternateKeyStoreType(AOKeyStore.DNIEJAVA),
+				"Error al inicializar el modulo CERES 100% Java: " + e, //$NON-NLS-1$
+				e
+			);
+		}
+		return ksm;
+	}
 
 	private static AOKeyStoreManager getDnieJavaKeyStoreManager(final PasswordCallback pssCallback,
 																final boolean forceReset,

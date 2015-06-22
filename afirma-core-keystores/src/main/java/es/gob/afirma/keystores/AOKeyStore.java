@@ -110,6 +110,14 @@ public enum AOKeyStore {
 		new CachePasswordCallback("wincadummy".toCharArray()), //$NON-NLS-1$
 		NullPasswordCallback.getInstance()
 	),
+	/** Tarjeta CERES con controlador nativo Java. */
+	CERES(
+		"Tarjeta FNMT-RCM CERES", //$NON-NLS-1$
+		13,
+		"CERES", //$NON-NLS-1$
+		null,
+		null
+	),
     /** DNIe con controlador nativo Java. */
     DNIEJAVA(
 		"DNIe 100% Java", //$NON-NLS-1$
