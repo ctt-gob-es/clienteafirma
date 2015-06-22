@@ -136,14 +136,11 @@ public final class MozillaUnifiedKeyStoreManager extends AggregatedKeyStoreManag
 		if (!Boolean.getBoolean("es.gob.afirma.keystores.mozilla.disableCeresNativeDriver")) { //$NON-NLS-1$
 			try {
 				final AOKeyStoreManager tmpKsm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
-					AOKeyStore.CERES,       // Store
-					null,                   // Lib (null)
-					null,                   // Description (null)
-					new UIPasswordCallback( // PasswordCallback
-						FirefoxKeyStoreMessages.getString("MozillaUnifiedKeyStoreManager.1") + " " + AOKeyStore.CERES.getName(), //$NON-NLS-1$ //$NON-NLS-2$
-						parentComponent
-					),
-					parentComponent         // Parent
+					AOKeyStore.CERES, // Store
+					null,             // Lib (null)
+					null,             // Description (null)
+					null,             // PasswordCallback (no hay en la carga, hay en la firma
+					parentComponent   // Parent
 				);
 				LOGGER.info("La tarjeta CERES ha podido inicializarse, se anadiran sus entradas"); //$NON-NLS-1$
 				addKeyStoreManager(tmpKsm);
