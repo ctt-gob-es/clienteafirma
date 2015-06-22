@@ -56,6 +56,13 @@ public final class AOOOXMLSigner implements AOSigner {
         }
     }
 
+    /** Consutruye un firmador OOXML, comprobando que se cuente con un JRE adecuado. */
+    public AOOOXMLSigner() {
+    	if (System.getProperty("java.version").startsWith("1.6")) { //$NON-NLS-1$ //$NON-NLS-2$
+    		throw new UnsupportedJreVersionException();
+    	}
+    }
+
     /** Si la entrada es un documento OOXML, devuelve el mismo documento sin ninguna modificaci&oacute;n.
      * @param sign Documento OOXML
      * @return Documento de entrada si este es OOXML, <code>null</code> en cualquier otro caso

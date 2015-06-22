@@ -31,14 +31,6 @@ import es.gob.afirma.signers.ooxml.AOOOXMLSigner;
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public final class TestOOXML {
 
-    private static final String CERT_PATH = "PFActivoFirSHA1.pfx"; //$NON-NLS-1$
-    private static final String CERT_PASS = "12341234"; //$NON-NLS-1$
-    private static final String CERT_ALIAS = "fisico activo prueba"; //$NON-NLS-1$
-
-    private static final String CERT_PATH2 = "PJActivoFirSHA1.pfx"; //$NON-NLS-1$
-    private static final String CERT_PASS2 = "12341234"; //$NON-NLS-1$
-    private static final String CERT_ALIAS2 = "juridico activo prueba-b12345678"; //$NON-NLS-1$
-
     private static final String CERT_PATH3 = "CAMERFIRMA_PF_SW_Clave_usuario_Activo.p12"; //$NON-NLS-1$
     private static final String CERT_PASS3 = "1111"; //$NON-NLS-1$
     private static final String CERT_ALIAS3 = "1"; //$NON-NLS-1$
@@ -71,10 +63,7 @@ public final class TestOOXML {
 
     /** Algoritmos de firma a probar. */
     private final static String[] ALGOS = new String[] {
-            AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA,
-            AOSignConstants.SIGN_ALGORITHM_SHA512WITHRSA,
-            AOSignConstants.SIGN_ALGORITHM_SHA256WITHRSA,
-            AOSignConstants.SIGN_ALGORITHM_SHA384WITHRSA
+        AOSignConstants.SIGN_ALGORITHM_SHA512WITHRSA
     };
 
     /** Prueba de reconocimiento de formato. */
@@ -100,12 +89,12 @@ public final class TestOOXML {
 	@Test
     public void testSignature() throws Exception {
 
-        //Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$
+        Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$
         final PrivateKeyEntry pke;
 
         final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
-        ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH), CERT_PASS.toCharArray());
-        pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
+        ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH3), CERT_PASS3.toCharArray());
+        pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS3, new KeyStore.PasswordProtection(CERT_PASS3.toCharArray()));
 
         final AOSigner signer = new AOOOXMLSigner();
 
@@ -161,8 +150,6 @@ public final class TestOOXML {
     public void testCoSignature() throws Exception {
 
         Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$
-        final PrivateKeyEntry pke1 = loadKeyEntry(CERT_PATH, CERT_ALIAS, CERT_PASS);
-        final PrivateKeyEntry pke2 = loadKeyEntry(CERT_PATH2, CERT_ALIAS2, CERT_PASS2);
         final PrivateKeyEntry pke3 = loadKeyEntry(CERT_PATH3, CERT_ALIAS3, CERT_PASS3);
 
         final AOSigner signer = new AOOOXMLSigner();
@@ -180,10 +167,10 @@ public final class TestOOXML {
 	                System.out.println(prueba);
 
 	                // Firma simple
-	                final byte[] sign1 = sign(signer, data, algo, pke1, extraParams);
+	                final byte[] sign1 = sign(signer, data, algo, pke3, extraParams);
 
 	                // Cofirma sin indicar los datos
-	                final byte[] sign2 = cosign(signer, sign1, algo, pke2, extraParams);
+	                final byte[] sign2 = cosign(signer, sign1, algo, pke3, extraParams);
 
 	                //checkSign(signer, sign2, prueba);
 
@@ -202,8 +189,8 @@ public final class TestOOXML {
 	        signer.sign(
 	    		data,
 	    		"SHA1withRSA", //$NON-NLS-1$
-	    		pke1.getPrivateKey(),
-	    		pke1.getCertificateChain(),
+	    		pke3.getPrivateKey(),
+	    		pke3.getCertificateChain(),
 	    		null
 			);
         }
