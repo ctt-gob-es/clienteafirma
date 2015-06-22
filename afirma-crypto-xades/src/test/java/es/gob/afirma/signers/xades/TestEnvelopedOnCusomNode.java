@@ -24,7 +24,7 @@ public final class TestEnvelopedOnCusomNode {
     private static final Properties p4 = new Properties();
     static {
 	    p4.setProperty("format", AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED); //$NON-NLS-1$
-	    p4.setProperty("insertEnvelopedSignatureOnNodeByXPath", "namespace:Facturae"); //$NON-NLS-1$ //$NON-NLS-2$
+	    p4.setProperty("insertEnvelopedSignatureOnNodeByXPath", "//*[namespace-uri()='http://www.facturae.es/Facturae/2007/v3.0/Facturae'][local-name()='Facturae']"); //$NON-NLS-1$ //$NON-NLS-2$
     }
 
     private static final Properties p3 = new Properties();
