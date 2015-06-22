@@ -19,6 +19,7 @@ import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.security.AccessController;
 import java.security.KeyStore.PrivateKeyEntry;
+import java.security.MessageDigest;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 import java.security.cert.CertificateEncodingException;
@@ -131,7 +132,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 
 		this.clearError();
 
-		final byte[] dataBinary;
+		byte[] dataBinary;
 		if (this.dataStore.length() > 0) {
 			try {
 				dataBinary = Base64.decode(this.dataStore.toString());
@@ -187,11 +188,22 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 
 
 		try {
-			String signatureFormat = format;
-			final AOSigner signer = MiniAfirmaApplet.selectSigner(MiniAfirmaApplet.cleanParam(signatureFormat), null);
+			String signatureFormat = MiniAfirmaApplet.cleanParam(format);
+			final AOSigner signer = MiniAfirmaApplet.selectSigner(signatureFormat, null);
 			if (SIGNATURE_FORMAT_AUTO.equalsIgnoreCase(signatureFormat)) {
 				signatureFormat = ExtraParamsProcessor.getSignFormat(signer);
 				ExtraParamsProcessor.configAutoFormat(signer, dataBinary, params);
+			}
+
+			// XXX: Codigo de soporte de firmas XAdES explicitas (Eliminar cuando se abandone el soporte de XAdES explicitas)
+			if (isXadesExplicitConfigurated(signatureFormat, params)) {
+				try {
+					dataBinary = MessageDigest.getInstance("SHA1").digest(dataBinary); //$NON-NLS-1$
+					params.setProperty("mimeType", "hash/sha1"); //$NON-NLS-1$ //$NON-NLS-2$
+				} catch (final Exception e) {
+					LOGGER.warning("Error al generar la huella digital de los datos para firmar como 'XAdES explicit', " //$NON-NLS-1$
+							+ "se realizara una firma XAdES corriente: " + e); //$NON-NLS-1$
+				}
 			}
 
 			final PrivateKeyEntry pke = this.selectPrivateKey(params);
@@ -1161,5 +1173,18 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 	@Override
 	public String getCurrentLog() {
 		return AccessController.doPrivileged(new GetCurrentLogAction());
+	}
+
+	/**
+	 * Este metodo sirve para identificar cuando se ha configurado una firma con el formato XAdES
+	 * y la propiedad {@code mode} con el valor {@code explicit}. Esta no es una firma correcta,
+	 * pero por compatibilidad con los tipos de firmas del applet pesado se ha incluido aqu&iacute;.
+	 * @return {@code true} si se configura una firma XAdES explicit, {@code false} en caso contrario.
+	 * @deprecated Uso temporal hasta que se elimine el soporte de firmas XAdES explicitas.
+	 */
+	@Deprecated
+	private static boolean isXadesExplicitConfigurated(final String format, final Properties config) {
+		return format != null && format.toLowerCase().startsWith("xades") && //$NON-NLS-1$
+				config != null && config.containsKey("mode") && "explicit".equalsIgnoreCase(config.getProperty("mode")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 }
