@@ -53,19 +53,22 @@ public class CertificateManagerDialog {
 	public PrivateKeyEntry show(final Component parentComponent, final AOKeyStoreManager ksm, final List<CertificateFilter> filters, final boolean mandatoryCertificate) throws KeyStoreException, NoSuchAlgorithmException, UnrecoverableEntryException, AOCertificatesNotFoundException {
 
 		final AOKeyStoreDialog dialog = new AOKeyStoreDialog(
-				ksm,
-				parentComponent,
-				true,
-				true,
-				true,
-				filters,
-				mandatoryCertificate
-				);
+			ksm,
+			parentComponent,
+			true,
+			true,
+			true,
+			filters,
+			mandatoryCertificate
+		);
 		dialog.show();
 
 		this.selectedAlias = dialog.getSelectedAlias();
 
-		return ksm.getKeyEntry(this.selectedAlias, ksm.getType().getCertificatePasswordCallback(parentComponent));
+		return ksm.getKeyEntry(
+			this.selectedAlias,
+			ksm.getType().getCertificatePasswordCallback(parentComponent)
+		);
 	}
 
 	/**

@@ -32,7 +32,6 @@ import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
 
-import javax.security.auth.callback.PasswordCallback;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -54,7 +53,6 @@ import es.gob.afirma.keystores.AOKeyStore;
 import es.gob.afirma.keystores.AOKeyStoreManager;
 import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
 import es.gob.afirma.keystores.KeyStoreConfiguration;
-import es.gob.afirma.keystores.callbacks.NullPasswordCallback;
 import es.gob.afirma.signers.pades.BadPdfPasswordException;
 import es.gob.afirma.signers.pades.InvalidPdfException;
 import es.gob.afirma.signers.xades.AOFacturaESigner;
@@ -68,7 +66,6 @@ import es.gob.afirma.ui.listeners.ElementDescriptionMouseListener;
 import es.gob.afirma.ui.utils.CertificateManagerDialog;
 import es.gob.afirma.ui.utils.ConfigureCaret;
 import es.gob.afirma.ui.utils.CustomDialog;
-import es.gob.afirma.ui.utils.ExtFilter;
 import es.gob.afirma.ui.utils.GeneralConfig;
 import es.gob.afirma.ui.utils.HelpUtils;
 import es.gob.afirma.ui.utils.KeyStoreLoader;
@@ -77,7 +74,6 @@ import es.gob.afirma.ui.utils.ProfileManager;
 import es.gob.afirma.ui.utils.RequestFocusListener;
 import es.gob.afirma.ui.utils.SelectionDialog;
 import es.gob.afirma.ui.utils.SignedFileManager;
-import es.gob.afirma.ui.utils.UIPasswordCallbackAccessibility;
 import es.gob.afirma.ui.utils.Utils;
 
 /** Clase que muestra los elementos necesarios para realizar una firma. */
@@ -153,45 +149,18 @@ final class Firma extends JPanel {
         }
 
         // Mensaje que indica que se va a realizar el proceso de firma y que puede llevar un tiempo
-        CustomDialog.showMessageDialog(SwingUtilities.getRoot(this),
-                                       true,
-                                       Messages.getString("Firma.msg.info"), Messages.getString("PrincipalGUI.TabConstraints.tabTitleFirma"), JOptionPane.INFORMATION_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
+        CustomDialog.showMessageDialog(
+    		SwingUtilities.getRoot(this),
+            true,
+            Messages.getString("Firma.msg.info"), //$NON-NLS-1$
+            Messages.getString("PrincipalGUI.TabConstraints.tabTitleFirma"), //$NON-NLS-1$
+            JOptionPane.INFORMATION_MESSAGE
+        );
 
         try {
             final KeyStoreConfiguration kssc = (KeyStoreConfiguration) comboAlmacen.getSelectedItem();
             final AOKeyStore store = kssc.getType();
-            String lib = kssc.getLib();
-            PasswordCallback pssCallback;
-
-            if (store == AOKeyStore.WINDOWS || store == AOKeyStore.SINGLE) {
-                pssCallback = NullPasswordCallback.getInstance();
-            }
-            else if (store == AOKeyStore.DNIEJAVA) {
-                pssCallback = null;
-            }
-            else if (store == AOKeyStore.PKCS12) {
-                pssCallback =
-                        new UIPasswordCallbackAccessibility(Messages.getString("Msg.pedir.contraenia") + " " + store.getName() + ". \r\nSi no ha establecido ninguna, deje el campo en blanco.", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-                                                            SwingUtilities.getRoot(this),
-                                                            Messages.getString("CustomDialog.showInputPasswordDialog.title"), KeyEvent.VK_O, Messages.getString("CustomDialog.showInputPasswordDialog.title") //$NON-NLS-1$ //$NON-NLS-2$
-                        );
-                final File selectedFile =
-                        SelectionDialog.showFileOpenDialog(this, Messages.getString("Open.repository.pkcs12"), Main.getPreferences().get("dialog.load.repository.pkcs12", null), (ExtFilter) Utils.getRepositoryFileFilterPkcs12()); //$NON-NLS-1$ //$NON-NLS-2$
-                if (selectedFile != null) {
-                    lib = selectedFile.getAbsolutePath();
-                    Main.getPreferences().put("dialog.load.repository.pkcs12", lib); //$NON-NLS-1$
-                }
-                else {
-                    return;
-                }
-            }
-            else {
-                pssCallback =
-                        new UIPasswordCallbackAccessibility(Messages.getString("Msg.pedir.contraenia") + " " + store.getName() + ". \r\nSi no ha establecido ninguna, deje el campo en blanco.", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-                                                            SwingUtilities.getRoot(this),
-                                                            Messages.getString("CustomDialog.showInputPasswordDialog.title"), KeyEvent.VK_O, Messages.getString("CustomDialog.showInputPasswordDialog.title") //$NON-NLS-1$ //$NON-NLS-2$
-                        );
-            }
+            final String lib = kssc.getLib();
 
             // Keystore
             final AOKeyStoreManager keyStoreManager;
@@ -199,7 +168,13 @@ final class Firma extends JPanel {
             try {
             	setCursor(new Cursor(Cursor.WAIT_CURSOR));
 
-                keyStoreManager = AOKeyStoreManagerFactory.getAOKeyStoreManager(store, lib, kssc.toString(), pssCallback, this);
+                keyStoreManager = AOKeyStoreManagerFactory.getAOKeyStoreManager(
+            		store,
+            		lib,
+            		kssc.toString(),
+            		store.getStorePasswordCallback(this),
+            		this
+        		);
             }
             catch (final IOException e) {
             	// Condiciones especificas para el proveedor Java de DNIe
@@ -224,18 +199,26 @@ final class Firma extends JPanel {
             	}
 
                 // Control de la excepcion generada al introducir mal la contrasena para el almacen
-                CustomDialog.showMessageDialog(SwingUtilities.getRoot(this), true, msg,
-                								Messages.getString("error"), //$NON-NLS-1$
-                								JOptionPane.ERROR_MESSAGE);
+                CustomDialog.showMessageDialog(
+            		SwingUtilities.getRoot(this),
+            		true,
+            		msg,
+                	Messages.getString("error"), //$NON-NLS-1$
+                	JOptionPane.ERROR_MESSAGE
+            	);
 
                 setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 
                 return;
             }
             catch (final Exception e) {
-                CustomDialog.showMessageDialog(SwingUtilities.getRoot(this), true, Messages.getString("Firma.msg.error.almacen"), //$NON-NLS-1$
-                                               Messages.getString("error"), //$NON-NLS-1$
-                                               JOptionPane.ERROR_MESSAGE);
+                CustomDialog.showMessageDialog(
+            		SwingUtilities.getRoot(this),
+            		true,
+            		Messages.getString("Firma.msg.error.almacen"), //$NON-NLS-1$
+                    Messages.getString("error"), //$NON-NLS-1$
+                    JOptionPane.ERROR_MESSAGE
+                );
 
                 setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 
