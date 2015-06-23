@@ -19,7 +19,7 @@ final class ErrorManager {
 		errorMessages.put(Integer.valueOf(10), "Error en el almacen final del documento"); //$NON-NLS-1$
 		errorMessages.put(Integer.valueOf(11), "Operacion desconocida"); //$NON-NLS-1$
 		errorMessages.put(Integer.valueOf(12), "Error realizando la postfirma"); //$NON-NLS-1$
-		errorMessages.put(Integer.valueOf(13), "No se ha indicado la sub-operacion a realizar"); //$NON-NLS-1$
+		errorMessages.put(Integer.valueOf(13), "No se indicado una sub-operacion valida a realizar (firma, cofirma,...)"); //$NON-NLS-1$
 		errorMessages.put(Integer.valueOf(14), "Error al recuperar el documento"); //$NON-NLS-1$
 		errorMessages.put(Integer.valueOf(15), "El formato de los datos de sesion suministrados es erroneo"); //$NON-NLS-1$
 	}

@@ -164,7 +164,9 @@ public final class SignatureService extends HttpServlet {
 			// Obtenemos el codigo de operacion
 			//final String subOperation = request.getParameter(PARAM_NAME_SUB_OPERATION);
 			final String subOperation = parameters.get(PARAM_NAME_SUB_OPERATION);
-			if (subOperation == null) {
+			if (subOperation == null || !PARAM_VALUE_SUB_OPERATION_SIGN.equals(subOperation)
+					&& !PARAM_VALUE_SUB_OPERATION_COSIGN.equals(subOperation)
+					&& !PARAM_VALUE_SUB_OPERATION_COUNTERSIGN.equals(subOperation)) {
 				out.print(ErrorManager.getErrorMessage(13));
 				out.close();
 				return;
