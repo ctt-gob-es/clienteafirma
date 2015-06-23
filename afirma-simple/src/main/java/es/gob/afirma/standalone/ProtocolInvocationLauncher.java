@@ -464,7 +464,7 @@ public final class ProtocolInvocationLauncher {
 			LOGGER.warning(
 				"Se omite el cifrado de los datos resultantes por no haberse proporcionado una clave de cifrado" //$NON-NLS-1$
 			);
-			dataToSend.append(Base64.encode(sign, true));
+			dataToSend.append(Base64.encode(certEncoded, true));
 			dataToSend.append(CERT_SIGNATURE_SEPARATOR);
 			dataToSend.append(Base64.encode(sign, true));
 		}
