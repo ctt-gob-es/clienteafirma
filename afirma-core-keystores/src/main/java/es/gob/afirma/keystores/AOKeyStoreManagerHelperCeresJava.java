@@ -18,6 +18,11 @@ final class AOKeyStoreManagerHelperCeresJava {
 		// No permitimos la instanciacion
 	}
 
+	/** Inicializa el almac&eacute;n 100% Java para tarjeta CERES.
+	 * @param pssCallBack No se usa, no se necesita el PIN en la inicializaci&oacute;n (se pide luego, en la firma).
+	 * @return <code>KeyStore</code> inicializado.
+	 * @throws AOKeyStoreManagerException Si no se puede inicializar el almac&eacute;n.
+	 * @throws IOException Si hay problemas en la lectura de datos. */
     static KeyStore initCeresJava(final PasswordCallback pssCallBack) throws AOKeyStoreManagerException,
     		                                                                 IOException {
     	final Provider p;
@@ -45,7 +50,7 @@ final class AOKeyStoreManagerHelperCeresJava {
 
         LOGGER.info("Cargando KeyStore CERES 100% Java"); //$NON-NLS-1$
         try {
-			ks.load(null, pssCallBack == null ? null : pssCallBack.getPassword());
+			ks.load(null, null);
 		}
         catch (final NoSuchAlgorithmException e) {
         	throw new AOKeyStoreManagerException("Error de algoritmo al obtener el almacen CERES 100% Java: " + e, e);  //$NON-NLS-1$
