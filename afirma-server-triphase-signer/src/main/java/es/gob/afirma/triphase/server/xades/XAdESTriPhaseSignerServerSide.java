@@ -83,7 +83,7 @@ public final class XAdESTriPhaseSignerServerSide {
 
 	private static final String XML_DEFAULT_ENCODING = "UTF-8"; //$NON-NLS-1$
 
-	/** Codigo de indice en la cadena de reemplazo. */
+	/** C&oacute;digo de indice en la cadena de reemplazo. */
 	public static final String REPLACEMENT_CODE = "%i"; //$NON-NLS-1$
 
 	/** Cadena por la que reemplazaremos el PKCS#1 impostado de la firma. */
@@ -92,7 +92,7 @@ public final class XAdESTriPhaseSignerServerSide {
 	private static final String XML_NODE_ID = "Id"; //$NON-NLS-1$
 
 	/** Cantidad de caracteres del PKCS#1 para los que buscaremos coincidencia.
-	 * Cogemos un valor menor que el maximo definido por MIME como longitud de linea para los base 64 (76). */
+	 * Cogemos un valor menor que el maximo definido por MIME como longitud de linea para los Base64 (76). */
 	private static final int NUM_CHARACTERS_TO_COMPARE = 60;
 
 	/** Prefirma (firma simple) en formato XAdES.
@@ -195,8 +195,8 @@ public final class XAdESTriPhaseSignerServerSide {
 
 		// Generamos un par de claves para hacer la firma temporal, que despues sustituiremos por la real
 		final RSAPrivateKey prk = (RSAPrivateKey) generateKeyPair(
-				((RSAPublicKey)((X509Certificate)certChain[0]).getPublicKey()).getModulus().bitLength()
-				).getPrivate();
+			((RSAPublicKey)((X509Certificate)certChain[0]).getPublicKey()).getModulus().bitLength()
+		).getPrivate();
 
 		final byte[] result;
 		switch (op) {
@@ -270,8 +270,9 @@ public final class XAdESTriPhaseSignerServerSide {
 			final String cleanPkcs1String = cleanBase64(pkcs1String);
 			if (cleanSignatureValue.equals(cleanPkcs1String)) {
 				xmlResult = xmlResult.replace(
-						pkcs1String,
-						REPLACEMENT_STRING.replace(REPLACEMENT_CODE, Integer.toString(i)));
+					pkcs1String,
+					REPLACEMENT_STRING.replace(REPLACEMENT_CODE, Integer.toString(i))
+				);
 			}
 		}
 		return new XmlPreSignResult(xmlResult.getBytes(xmlEncoding), signedInfos);
@@ -281,9 +282,9 @@ public final class XAdESTriPhaseSignerServerSide {
 		return base64 == null ? null : base64.replace("\n", "").replace("\r", "").replace("\t", "").replace(" ", ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$
 	}
 
-	/** Recupera los signedInfo de una firma XML, excluyendo los de las firmas indicadas a trav&eacute;s
+	/** Recupera los <code>SignedInfo</code> de una firma XML, excluyendo los de las firmas indicadas a trav&eacute;s
 	 * de su Id.
-	 * @param xmlSign XML del que se
+	 * @param xmlSign XML del que se desea recuperar los <code>SignedInfo</code>.
 	 * @param pk Clave publicada usada en las firmas de las que se desea obtener los signedInfo.
 	 * @param excludedIds Identificadores de las firmas excluidas.
 	 * @return Listado de signedInfos.
