@@ -1,14 +1,11 @@
 package es.gob.afirma.test.simple;
 
-import java.io.File;
-
 import org.junit.Ignore;
 import org.junit.Test;
 
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.http.UrlHttpManagerFactory;
 import es.gob.afirma.standalone.SimpleAfirma;
-import es.gob.afirma.standalone.VisorFirma;
 
 /** Pruebas de invocaci&oacute;n por protocolo.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
@@ -19,7 +16,7 @@ public class TestProtocolInvocation {
 	private static final String LINE_SAVE = "afirma://save?dat=bW9kZT1leHBsaWNpdApzZXJ2ZXJVcmw9aHR0cDovL2NvbXBhcmVjZS5kaXB1Y3IuZXM6ODA4MC9hZmlybWEtc2VydmVyLXRyaXBoYXNlLXNpZ25lci9TaWduYXR1cmVTZXJ2aWNl"; //$NON-NLS-1$
 	private static final String LINE_SIGN_HASH = "afirma://sign?op=sign&id=001261524336&stservlet=http://172.24.31.97:8080/afirma-signature-storage/StorageService&format=CAdES&algorithm=SHA1withRSA&properties=c2VydmVyVXJsPWh0dHA6Ly8xMC45MC40My43Nzo4MDg4L2FmaXJtYS1zZXJ2ZXItdHJpcGhhc2Utc2lnbmVyL1NpZ25hdHVyZVNlcnZpY2UKcHJlY2FsY3VsYXRlZEhhc2hBbGdvcml0aG09U0hBMQptb2RlPWV4cGxpY2l0Cg%3D%3D&dat=Jhxa1FdwzBSHXI9G6qPspCVoEEo%3D"; //$NON-NLS-1$
 
-	private static final String LINE_SERVICE = "afirma://service?ports=1234,4321&unused=dummy"; //$NON-NLS-1$
+	private static final String LINE_SERVICE = "afirma://service?ports=51234,54321&unused=dummy"; //$NON-NLS-1$
 
 	// firma://warmup
 
@@ -51,7 +48,7 @@ public class TestProtocolInvocation {
 	 * @throws Exception En cualquier error */
 	@SuppressWarnings("static-method")
 	@Test
-	@Ignore // Necesita UI
+	//@Ignore // Necesita UI
 	public void testService() throws Exception {
 		new Thread(
 			new Runnable() {
@@ -65,7 +62,7 @@ public class TestProtocolInvocation {
 		Thread.sleep(4000);
 
 		final byte[] res = UrlHttpManagerFactory.getInstalledManager().readUrlByPost(
-			"http://127.0.0.1:1234/kaka?cmd=" + Base64.encode(LINE_SAVE.getBytes(), true) //$NON-NLS-1$
+			"http://127.0.0.1:51234/kaka?cmd=" + Base64.encode(LINE_SAVE.getBytes(), true) //$NON-NLS-1$
 		);
 
 		System.out.println("RES=" + new String(Base64.decode(new String(res)))); //$NON-NLS-1$
@@ -77,7 +74,13 @@ public class TestProtocolInvocation {
 	 * @throws Exception Error al cargar el recurso de prueba. */
 	public static void main(final String[] args) throws Exception {
 
-		final File file = new File(TestProtocolInvocation.class.getResource("/ANF_PF_Activo.pfx").toURI()); //$NON-NLS-1$
-		new VisorFirma(false).initialize(false, file);
+		new Thread(
+				new Runnable() {
+					@Override
+					public void run() {
+						SimpleAfirma.main(new String[] { LINE_SERVICE });
+					}
+				}
+			).start();
 	}
 }
