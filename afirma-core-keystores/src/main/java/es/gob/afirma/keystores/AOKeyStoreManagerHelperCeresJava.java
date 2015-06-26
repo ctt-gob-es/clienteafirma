@@ -1,6 +1,7 @@
 package es.gob.afirma.keystores;
 
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.security.KeyStore;
 import java.security.NoSuchAlgorithmException;
 import java.security.Provider;
@@ -23,8 +24,9 @@ final class AOKeyStoreManagerHelperCeresJava {
 	 * @return <code>KeyStore</code> inicializado.
 	 * @throws AOKeyStoreManagerException Si no se puede inicializar el almac&eacute;n.
 	 * @throws IOException Si hay problemas en la lectura de datos. */
-    static KeyStore initCeresJava(final PasswordCallback pssCallBack) throws AOKeyStoreManagerException,
-    		                                                                 IOException {
+    static KeyStore initCeresJava(final PasswordCallback pssCallBack,
+                                  final Object parentComponent) throws AOKeyStoreManagerException,
+    		                                                           IOException {
     	final Provider p;
     	if (Security.getProvider(AOKeyStore.CERES.getProviderName()) == null) {
     		try {
@@ -37,6 +39,15 @@ final class AOKeyStoreManagerHelperCeresJava {
 					e
 				);
     		}
+    	}
+
+    	try {
+    		final Class<?> managerClass = Class.forName("es.gob.jmulticard.ui.passwordcallback.PasswordCallbackManager"); //$NON-NLS-1$
+    		final Method setDialogOwnerFrameMethod = managerClass.getMethod("setDialogOwner", Object.class); //$NON-NLS-1$
+    		setDialogOwnerFrameMethod.invoke(null, parentComponent);
+    	}
+    	catch (final Exception e) {
+    		LOGGER.warning("No se ha podido establecer el componente padre para los dialogos del almacen: " + e); //$NON-NLS-1$
     	}
 
     	final KeyStore ks;

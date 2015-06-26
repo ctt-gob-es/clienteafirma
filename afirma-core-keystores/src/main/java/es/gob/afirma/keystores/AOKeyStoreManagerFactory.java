@@ -130,7 +130,7 @@ public final class AOKeyStoreManagerFactory {
 
     	// Driver Java para CERES
         if (AOKeyStore.CERES.equals(store)) {
-        	return new AggregatedKeyStoreManager(getCeresJavaKeyStoreManager(pssCallback, forceReset));
+        	return new AggregatedKeyStoreManager(getCeresJavaKeyStoreManager(pssCallback, forceReset, parentComponent));
         }
 
         throw new AOKeystoreAlternativeException(
@@ -240,11 +240,12 @@ public final class AOKeyStoreManagerFactory {
     }
 
 	private static AOKeyStoreManager getCeresJavaKeyStoreManager(final PasswordCallback pssCallback,
-			                                                     final boolean forceReset) throws AOKeystoreAlternativeException,
+			                                                     final boolean forceReset,
+			                                                     final Object parentComponent) throws AOKeystoreAlternativeException,
 											                                                      IOException {
 		final AOKeyStoreManager ksm = new AOKeyStoreManager();
 		try {
-			ksm.init(AOKeyStore.CERES, null, pssCallback, null, forceReset);
+			ksm.init(AOKeyStore.CERES, null, pssCallback, new Object[] { parentComponent }, forceReset);
 		}
 		catch (final AOKeyStoreManagerException e) {
 			throw new AOKeystoreAlternativeException(
