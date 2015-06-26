@@ -122,7 +122,7 @@ public final class SaveDataActivity extends ListActivity implements DownloadData
 			}
 			catch (final ParameterException e) {
 				showMessage(getString(R.string.error_bad_params));
-				Log.e(ES_GOB_AFIRMA, "Error en los parametros de firma: " + e.toString()); //$NON-NLS-1$
+				Log.e(ES_GOB_AFIRMA, "Error en los parametros de entrada: " + e.toString()); //$NON-NLS-1$
 				closeActivity();
 				return;
 			}
