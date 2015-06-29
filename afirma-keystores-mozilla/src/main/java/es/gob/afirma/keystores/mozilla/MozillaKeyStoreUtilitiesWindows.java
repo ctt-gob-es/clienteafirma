@@ -8,7 +8,6 @@ import java.util.logging.Logger;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Platform;
-import es.gob.afirma.keystores.KeyStoreUtilities;
 
 final class MozillaKeyStoreUtilitiesWindows {
 
@@ -53,15 +52,32 @@ final class MozillaKeyStoreUtilitiesWindows {
 		// No permitimos la instanciacion
 	}
 
-	static String cleanMozillaUserProfileDirectoryWindows(final String dir) {
-		String finalDir = dir;
-		for (final char c : finalDir.toCharArray()) {
-			if (P11_CONFIG_VALID_CHARS.indexOf(c) == -1) {
-				finalDir = finalDir.replace(Platform.getUserHome(), KeyStoreUtilities.getShort(Platform.getUserHome()));
-				break;
-			}
+	/** Obtiene el nombre corto (8+3) de un fichero o directorio indicado (con ruta).
+	 * @param originalPath Ruta completa hacia el fichero o directorio que queremos pasar a nombre corto.
+	 * @return Nombre corto del fichero o directorio con su ruta completa, o la cadena originalmente indicada si no puede
+	 *         obtenerse la versi&oacute;n corta */
+	static String getShort(final String originalPath) {
+		if (originalPath == null || !Platform.OS.WINDOWS.equals(Platform.getOS())) {
+			return originalPath;
 		}
-		return finalDir.replace('\\', '/');
+		final File dir = new File(originalPath);
+		if (!dir.exists()) {
+			return originalPath;
+		}
+		try {
+			final Process p = new ProcessBuilder(
+					"cmd.exe", "/c", "for %f in (\"" + originalPath + "\") do @echo %~sf" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			).start();
+			return new String(AOUtil.getDataFromInputStream(p.getInputStream())).trim();
+		}
+		catch(final Exception e) {
+			LOGGER.warning("No se ha podido obtener el nombre corto de " + originalPath + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+		return originalPath;
+	}
+
+	static String cleanMozillaUserProfileDirectoryWindows(final String dir) {
+		return getShort(dir).replace('\\', '/');
 	}
 
 	static String getSystemNSSLibDirWindows() throws IOException {
