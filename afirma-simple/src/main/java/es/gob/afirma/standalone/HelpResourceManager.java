@@ -69,9 +69,8 @@ public final class HelpResourceManager {
 			);
     	}
 
-        final FileOutputStream fos = new FileOutputStream(destination);
-        fos.write(helpDocument);
-        fos.flush();
-        fos.close();
+        try (final FileOutputStream fos = new FileOutputStream(destination); ) {
+        	fos.write(helpDocument);
+        }
 	}
 }

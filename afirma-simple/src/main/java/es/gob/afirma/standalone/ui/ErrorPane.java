@@ -22,15 +22,13 @@ import javax.swing.SwingConstants;
 
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 
-/**
- * Componente para mostrar di&aacute;logos de error. En caso de no indicar
+/** Componente para mostrar di&aacute;logos de error. En caso de no indicar
  * la excepci&oacute;n que origin&oacute; el error, su comportamiento es
  * equivalente a
  * {@code JOptionPane.showMessageDialog(parentComponent, message)}.
  * En caso de indicarlo, se mostrar&aacute; el mensaje de error y se
  * dar&aacute; la opci&oacute;n de ampliar la informaci&oacute;n para ver
- * la traza del error que la origin&oacute;.
- */
+ * la traza del error que la origin&oacute;. */
 public class ErrorPane {
 
 	private static JPanel mainPanel;
@@ -118,18 +116,14 @@ public class ErrorPane {
 		JOptionPane.showMessageDialog(parentComponent, mainPanel);
 	}
 
-
-
 	/** Obtiene la traza de una excepci&oacute;n o error.
-	 * @param t Excepcion o error del que obtener la traza.
+	 * @param t Excepci&oacute;n o error del que obtener la traza.
 	 * @return Traza. */
 	private static String getTrace(final Throwable t) {
-
 		final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-    	final PrintWriter writer = new PrintWriter(baos);
-    	t.printStackTrace(writer);
-    	writer.close();
-
+		try ( final PrintWriter writer = new PrintWriter(baos); ) {
+			t.printStackTrace(writer);
+		}
     	return new String(baos.toByteArray());
 	}
 

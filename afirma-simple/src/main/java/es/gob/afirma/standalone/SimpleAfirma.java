@@ -725,14 +725,15 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 
     static String getIp() throws IOException {
         final URL whatismyip = new URL(IP_DISCOVERY_AUTOMATION);
-        BufferedReader in = null;
-        in = new BufferedReader(
-    		new InputStreamReader(
-                whatismyip.openStream()
-            )
-		);
-        final String ip = in.readLine();
-        in.close();
-        return ip;
+        try (
+    		BufferedReader in = new BufferedReader(
+	    		new InputStreamReader(
+	                whatismyip.openStream()
+	            )
+			);
+		) {
+        	return in.readLine();
+        }
     }
+
 }

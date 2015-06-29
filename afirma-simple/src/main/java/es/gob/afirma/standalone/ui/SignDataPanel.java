@@ -384,12 +384,11 @@ final class SignDataPanel extends JPanel {
         try {
             final File tmp = File.createTempFile("afirma", ".cer");  //$NON-NLS-1$//$NON-NLS-2$
             tmp.deleteOnExit();
-            final OutputStream fos = new FileOutputStream(tmp);
-            final OutputStream bos = new BufferedOutputStream(fos);
-            bos.write(cert.getEncoded());
-            bos.flush();
-            bos.close();
-            fos.close();
+            try (
+        		final OutputStream bos = new BufferedOutputStream(new FileOutputStream(tmp));
+    		) {
+            	bos.write(cert.getEncoded());
+            }
             Desktop.getDesktop().open(tmp);
         }
         catch(final Exception e) {

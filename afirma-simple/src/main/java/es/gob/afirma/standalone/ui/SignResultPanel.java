@@ -76,10 +76,10 @@ final class SignResultPanel extends JPanel {
         }
 
         ScalablePane resultOperationIcon;
-        try {
-        	final InputStream is = this.getClass().getResourceAsStream("/resources/" + iconFilename); //$NON-NLS-1$
+        try (
+    		final InputStream is = this.getClass().getResourceAsStream("/resources/" + iconFilename); //$NON-NLS-1$
+		) {
         	final Image image = ImageIO.read(is);
-        	is.close();
         	resultOperationIcon = new ScalablePane(image);
             resultOperationIcon.setBackground(new Color(255, 255, 255, 0));
             resultOperationIcon.setFocusable(false);

@@ -93,301 +93,294 @@ final class CommandLineLauncher {
 
 		final Console console = System.console();
 
-		final PrintWriter pw = console != null ? console.writer() : null;
+		try (
+			final PrintWriter pw = console != null ? console.writer() : null;
+		) {
 
-		final String command = args[0].toLowerCase();
+			final String command = args[0].toLowerCase();
 
-		String store = null;
-		String alias = null;
-		String filter = null;
-		File inputFile = null;
-		File outputFile = null;
-		String format = null;
-		String password = null;
-		String algorithm = null;
-		String extraParams = null;
-		boolean xml = false;
-		boolean gui = false;
-		try {
-			for (int i = 1; i < args.length; i++) {
+			String store = null;
+			String alias = null;
+			String filter = null;
+			File inputFile = null;
+			File outputFile = null;
+			String format = null;
+			String password = null;
+			String algorithm = null;
+			String extraParams = null;
+			boolean xml = false;
+			boolean gui = false;
+			try {
+				for (int i = 1; i < args.length; i++) {
 
-				if (PARAM_XML.equals(args[i])) {
+					if (PARAM_XML.equals(args[i])) {
 
-					xml = true;
-				}
-				else if (PARAM_GUI.equals(args[i])) {
-
-					gui = true;
-				}
-				else if (PARAM_STORE.equals(args[i])) {
-
-					if (store != null) {
-						closeApp(STATUS_ERROR, pw,
-								buildSyntaxError(CommandLineMessages.getString("CommandLineLauncher.26", args[i]))); //$NON-NLS-1$
+						xml = true;
 					}
-					store = args[i+1];
-					i++;
-				}
-				else if (PARAM_ALGO.equals(args[i])) {
+					else if (PARAM_GUI.equals(args[i])) {
 
-					if (algorithm != null) {
-						closeApp(STATUS_ERROR, pw,
-								buildSyntaxError(CommandLineMessages.getString("CommandLineLauncher.26", args[i]))); //$NON-NLS-1$
+						gui = true;
 					}
-					algorithm = args[i+1];
-					i++;
-				}
-				else if (PARAM_CONFIG.equals(args[i])) {
+					else if (PARAM_STORE.equals(args[i])) {
 
-					if (extraParams != null) {
-						closeApp(STATUS_ERROR, pw,
-								buildSyntaxError(CommandLineMessages.getString("CommandLineLauncher.26", args[i]))); //$NON-NLS-1$
+						if (store != null) {
+							closeApp(STATUS_ERROR, pw,
+									buildSyntaxError(CommandLineMessages.getString("CommandLineLauncher.26", args[i]))); //$NON-NLS-1$
+						}
+						store = args[i+1];
+						i++;
 					}
-					extraParams = args[i+1];
-					i++;
-				}
-				else if (PARAM_PASSWD.equals(args[i])) {
+					else if (PARAM_ALGO.equals(args[i])) {
 
-					if (password != null) {
-						closeApp(STATUS_ERROR, pw,
-								buildSyntaxError(CommandLineMessages.getString("CommandLineLauncher.26", args[i]))); //$NON-NLS-1$
+						if (algorithm != null) {
+							closeApp(STATUS_ERROR, pw,
+									buildSyntaxError(CommandLineMessages.getString("CommandLineLauncher.26", args[i]))); //$NON-NLS-1$
+						}
+						algorithm = args[i+1];
+						i++;
 					}
-					password = args[i+1];
-					i++;
-				}
-				else if (PARAM_ALIAS.equals(args[i])) {
+					else if (PARAM_CONFIG.equals(args[i])) {
 
-					if (alias != null) {
-						closeApp(STATUS_ERROR, pw,
-								buildSyntaxError(CommandLineMessages.getString("CommandLineLauncher.26", args[i]))); //$NON-NLS-1$
+						if (extraParams != null) {
+							closeApp(STATUS_ERROR, pw,
+									buildSyntaxError(CommandLineMessages.getString("CommandLineLauncher.26", args[i]))); //$NON-NLS-1$
+						}
+						extraParams = args[i+1];
+						i++;
 					}
+					else if (PARAM_PASSWD.equals(args[i])) {
+
+						if (password != null) {
+							closeApp(STATUS_ERROR, pw,
+									buildSyntaxError(CommandLineMessages.getString("CommandLineLauncher.26", args[i]))); //$NON-NLS-1$
+						}
+						password = args[i+1];
+						i++;
+					}
+					else if (PARAM_ALIAS.equals(args[i])) {
+
+						if (alias != null) {
+							closeApp(STATUS_ERROR, pw,
+									buildSyntaxError(CommandLineMessages.getString("CommandLineLauncher.26", args[i]))); //$NON-NLS-1$
+						}
+						if (filter != null) {
+							closeApp(STATUS_ERROR, pw,
+									buildSyntaxError(CommandLineMessages.getString("CommandLineLauncher.28", args[i]))); //$NON-NLS-1$
+						}
+						alias = args[i+1];
+						i++;
+					}
+					else if (PARAM_FILTER.equals(args[i])) {
+
+						if (filter != null) {
+							closeApp(STATUS_ERROR, pw,
+									buildSyntaxError(CommandLineMessages.getString("CommandLineLauncher.26", args[i]))); //$NON-NLS-1$
+						}
+						if (alias != null) {
+							closeApp(STATUS_ERROR, pw,
+									buildSyntaxError(CommandLineMessages.getString("CommandLineLauncher.28", args[i]))); //$NON-NLS-1$
+						}
+						filter = args[i+1];
+						i++;
+					}
+					else if (PARAM_INPUT.equals(args[i])) {
+
+						if (inputFile != null) {
+							closeApp(
+								STATUS_ERROR,
+								pw,
+								buildSyntaxError(
+									CommandLineMessages.getString("CommandLineLauncher.26", args[i]) //$NON-NLS-1$
+								)
+							);
+						}
+
+						inputFile = new File(args[i+1]);
+
+						if (!inputFile.exists()) {
+							closeApp(STATUS_ERROR, pw, CommandLineMessages.getString("CommandLineLauncher.0") + " " + args[i+1]); //$NON-NLS-1$ //$NON-NLS-2$
+						}
+						if (!inputFile.canRead()) {
+							closeApp(STATUS_ERROR, pw, CommandLineMessages.getString("CommandLineLauncher.1") + " " + args[i+1]); //$NON-NLS-1$ //$NON-NLS-2$
+						}
+						if (!inputFile.isFile()) {
+							closeApp(STATUS_ERROR, pw, CommandLineMessages.getString("CommandLineLauncher.2") + " " + args[i+1]); //$NON-NLS-1$ //$NON-NLS-2$
+						}
+						i++;
+					}
+					else if (PARAM_FORMAT.equals(args[i])) {
+
+						if (format != null) {
+							closeApp(STATUS_ERROR, pw,
+									buildSyntaxError(CommandLineMessages.getString("CommandLineLauncher.26", args[i]))); //$NON-NLS-1$
+						}
+
+						format = args[i+1].toLowerCase();
+						if (!format.equals(FORMAT_XADES) &&
+							!format.equals(FORMAT_CADES) &&
+							!format.equals(FORMAT_PADES) &&
+							!format.equals(FORMAT_FACTURAE) &&
+							!format.equals(FORMAT_AUTO)) {
+								closeApp(STATUS_ERROR, pw, CommandLineMessages.getString("CommandLineLauncher.4", args[i+1])); //$NON-NLS-1$
+						}
+						i++;
+					}
+					else if (PARAM_OUTPUT.equals(args[i])) {
+
+						if (outputFile != null) {
+							closeApp(STATUS_ERROR, pw,
+									buildSyntaxError(CommandLineMessages.getString("CommandLineLauncher.26", args[i]))); //$NON-NLS-1$
+						}
+
+						outputFile = new File(args[i+1]);
+						final String parent = outputFile.getParent();
+						if (parent != null && !new File(parent).canWrite()) {
+							closeApp(STATUS_ERROR, pw, CommandLineMessages.getString("CommandLineLauncher.3", args[i+1])); //$NON-NLS-1$
+						}
+						i++;
+					}
+					else {
+						closeApp(STATUS_ERROR, pw, CommandLineMessages.getString("CommandLineLauncher.25", args[i])); //$NON-NLS-1$
+					}
+				}
+
+				if (gui) {
+
+					if (inputFile == null) {
+						closeApp(STATUS_ERROR, pw, buildSyntaxError(CommandLineMessages.getString("CommandLineLauncher.5"))); //$NON-NLS-1$
+					}
+
+					if (COMMAND_SIGN.equals(command)) {
+
+						final SimpleAfirma simpleAfirma = new SimpleAfirma();
+						simpleAfirma.initialize(inputFile);
+						simpleAfirma.loadFileToSign(inputFile);
+					}
+					else if (COMMAND_VERIFY.equals(command)) {
+
+						new VisorFirma(true).initialize(false, inputFile);
+					}
+					else {
+						closeApp(STATUS_ERROR, pw, buildSyntaxError(CommandLineMessages.getString("CommandLineLauncher.15", command))); //$NON-NLS-1$
+					}
+
+					return;
+				}
+
+				if (store == null) {
+					store = STORE_AUTO;
+				}
+
+				if (COMMAND_LIST.equals(command)) {
+
+					final String aliases = listAliases(store, password, xml);
+
+					closeApp(STATUS_SUCCESS, pw, aliases);
+				}
+				else if (!COMMAND_SIGN.equals(command) && !COMMAND_COSIGN.equals(command) && !COMMAND_COUNTERSIGN.equals(command)) {
+					closeApp(STATUS_ERROR, pw,
+							buildSyntaxError(CommandLineMessages.getString("CommandLineLauncher.15", command))); //$NON-NLS-1$
+				}
+
+				if (format == null) {
+					format = FORMAT_AUTO;
+				}
+
+				if (algorithm == null) {
+					algorithm = DEFAULT_SIGN_ALGORITHM;
+				}
+
+				if (inputFile == null) {
+					closeApp(STATUS_ERROR, pw, CommandLineMessages.getString("CommandLineLauncher.5")); //$NON-NLS-1$
+				}
+
+				if (alias == null && filter == null) {
+					closeApp(STATUS_ERROR, pw, CommandLineMessages.getString("CommandLineLauncher.17")); //$NON-NLS-1$
+				}
+
+				if (outputFile == null && !xml) {
+					closeApp(STATUS_ERROR, pw, CommandLineMessages.getString("CommandLineLauncher.19")); //$NON-NLS-1$
+				}
+
+				boolean failed = false;
+				byte[] res = null;
+				try {
+					// Obtenemos el almacen
+					final AOKeyStoreManager ksm;
+					try {
+						ksm = getKsm(store, password);
+					}
+					catch (final Exception e) {
+						throw new CommandLineException("No se ha podido inicializar el almacen de claves: " + e, e); //$NON-NLS-1$
+					}
+
+					String selectedAlias = alias;
 					if (filter != null) {
-						closeApp(STATUS_ERROR, pw,
-								buildSyntaxError(CommandLineMessages.getString("CommandLineLauncher.28", args[i]))); //$NON-NLS-1$
+						selectedAlias = filterCertificates(ksm, filter);
 					}
-					alias = args[i+1];
-					i++;
-				}
-				else if (PARAM_FILTER.equals(args[i])) {
 
-					if (filter != null) {
-						closeApp(STATUS_ERROR, pw,
-								buildSyntaxError(CommandLineMessages.getString("CommandLineLauncher.26", args[i]))); //$NON-NLS-1$
-					}
-					if (alias != null) {
-						closeApp(STATUS_ERROR, pw,
-								buildSyntaxError(CommandLineMessages.getString("CommandLineLauncher.28", args[i]))); //$NON-NLS-1$
-					}
-					filter = args[i+1];
-					i++;
+					res = buildSuccessSignMessage(
+						sign(
+							command,
+							format,
+							algorithm,
+							extraParams,
+							inputFile,
+							selectedAlias,
+							ksm,
+							password
+						),
+						xml
+					);
 				}
-				else if (PARAM_INPUT.equals(args[i])) {
+				catch (final CommandLineException e) {
+					res = buildErrorMessage(e.getMessage(), e, xml);
+					failed = true;
+				}
 
-					if (inputFile != null) {
+				if (outputFile != null) {
+
+					try (
+						final OutputStream fos = new FileOutputStream(outputFile);
+					) {
+						fos.write(res);
+					}
+					catch(final Exception e) {
 						closeApp(
 							STATUS_ERROR,
 							pw,
-							buildSyntaxError(
-								CommandLineMessages.getString("CommandLineLauncher.26", args[i]) //$NON-NLS-1$
-							)
+							CommandLineMessages.getString("CommandLineLauncher.21", outputFile.getAbsolutePath()) //$NON-NLS-1$
 						);
 					}
 
-					inputFile = new File(args[i+1]);
-
-					if (!inputFile.exists()) {
-						closeApp(STATUS_ERROR, pw, CommandLineMessages.getString("CommandLineLauncher.0") + " " + args[i+1]); //$NON-NLS-1$ //$NON-NLS-2$
-					}
-					if (!inputFile.canRead()) {
-						closeApp(STATUS_ERROR, pw, CommandLineMessages.getString("CommandLineLauncher.1") + " " + args[i+1]); //$NON-NLS-1$ //$NON-NLS-2$
-					}
-					if (!inputFile.isFile()) {
-						closeApp(STATUS_ERROR, pw, CommandLineMessages.getString("CommandLineLauncher.2") + " " + args[i+1]); //$NON-NLS-1$ //$NON-NLS-2$
-					}
-					i++;
 				}
-				else if (PARAM_FORMAT.equals(args[i])) {
 
-					if (format != null) {
-						closeApp(STATUS_ERROR, pw,
-								buildSyntaxError(CommandLineMessages.getString("CommandLineLauncher.26", args[i]))); //$NON-NLS-1$
-					}
+				// Devolvemos el mensaje segun la configuracion establecida
 
-					format = args[i+1].toLowerCase();
-					if (!format.equals(FORMAT_XADES) &&
-						!format.equals(FORMAT_CADES) &&
-						!format.equals(FORMAT_PADES) &&
-						!format.equals(FORMAT_FACTURAE) &&
-						!format.equals(FORMAT_AUTO)) {
-							closeApp(STATUS_ERROR, pw, CommandLineMessages.getString("CommandLineLauncher.4", args[i+1])); //$NON-NLS-1$
-					}
-					i++;
-				}
-				else if (PARAM_OUTPUT.equals(args[i])) {
-
+				// Si se ha solicitado que se obtenga el resultado en XML el resultado siempre se indicara que el proceso
+				// termino correctamente y el desarrollador debera analizarlo para conocer el resultado de la operacion.
+				// Si no se produjo error, también indicaremos que el proceso finalizo correctamente.
+				// El mensaje a mostrar sera puramente informativo si el usuario solucito que la salida se redrigiese a un
+				// fichero, mientras que si no configuro fichero de salida se devolvera la firma resultante
+				if (xml || !failed) {
 					if (outputFile != null) {
-						closeApp(STATUS_ERROR, pw,
-								buildSyntaxError(CommandLineMessages.getString("CommandLineLauncher.26", args[i]))); //$NON-NLS-1$
+						closeApp(STATUS_SUCCESS, pw, CommandLineMessages.getString("CommandLineLauncher.22")); //$NON-NLS-1$
 					}
-
-					outputFile = new File(args[i+1]);
-					final String parent = outputFile.getParent();
-					if (parent != null && !new File(parent).canWrite()) {
-						closeApp(STATUS_ERROR, pw, CommandLineMessages.getString("CommandLineLauncher.3", args[i+1])); //$NON-NLS-1$
+					else {
+						closeApp(STATUS_SUCCESS, pw, new String(res));
 					}
-					i++;
 				}
+				// Si la operacion finalizo con errores y la salida no debe hacer en forma de XML, indicamos directamente el
+				// resultado
 				else {
-					closeApp(STATUS_ERROR, pw, CommandLineMessages.getString("CommandLineLauncher.25", args[i])); //$NON-NLS-1$
+					closeApp(STATUS_ERROR, pw, new String(res));
 				}
 			}
-
-			if (gui) {
-
-				if (inputFile == null) {
-					closeApp(STATUS_ERROR, pw, buildSyntaxError(CommandLineMessages.getString("CommandLineLauncher.5"))); //$NON-NLS-1$
-				}
-
-				if (COMMAND_SIGN.equals(command)) {
-
-					final SimpleAfirma simpleAfirma = new SimpleAfirma();
-					simpleAfirma.initialize(inputFile);
-					simpleAfirma.loadFileToSign(inputFile);
-				}
-				else if (COMMAND_VERIFY.equals(command)) {
-
-					new VisorFirma(true).initialize(false, inputFile);
-				}
-				else {
-					closeApp(STATUS_ERROR, pw, buildSyntaxError(CommandLineMessages.getString("CommandLineLauncher.15", command))); //$NON-NLS-1$
-				}
-
-				if (pw != null) {
-					pw.flush();
-					pw.close();
-				}
-
-				return;
-			}
-
-			if (store == null) {
-				store = STORE_AUTO;
-			}
-
-			if (COMMAND_LIST.equals(command)) {
-
-				final String aliases = listAliases(store, password, xml);
-
-				closeApp(STATUS_SUCCESS, pw, aliases);
-			}
-			else if (!COMMAND_SIGN.equals(command) && !COMMAND_COSIGN.equals(command) && !COMMAND_COUNTERSIGN.equals(command)) {
-				closeApp(STATUS_ERROR, pw,
-						buildSyntaxError(CommandLineMessages.getString("CommandLineLauncher.15", command))); //$NON-NLS-1$
-			}
-
-			if (format == null) {
-				format = FORMAT_AUTO;
-			}
-
-			if (algorithm == null) {
-				algorithm = DEFAULT_SIGN_ALGORITHM;
-			}
-
-			if (inputFile == null) {
-				closeApp(STATUS_ERROR, pw, CommandLineMessages.getString("CommandLineLauncher.5")); //$NON-NLS-1$
-			}
-
-			if (alias == null && filter == null) {
-				closeApp(STATUS_ERROR, pw, CommandLineMessages.getString("CommandLineLauncher.17")); //$NON-NLS-1$
-			}
-
-			if (outputFile == null && !xml) {
-				closeApp(STATUS_ERROR, pw, CommandLineMessages.getString("CommandLineLauncher.19")); //$NON-NLS-1$
-			}
-
-			boolean failed = false;
-			byte[] res = null;
-			try {
-				// Obtenemos el almacen
-				final AOKeyStoreManager ksm;
-				try {
-					ksm = getKsm(store, password);
-				}
-				catch (final Exception e) {
-					throw new CommandLineException("No se ha podido inicializar el almacen de claves: " + e, e); //$NON-NLS-1$
-				}
-
-				String selectedAlias = alias;
-				if (filter != null) {
-					selectedAlias = filterCertificates(ksm, filter);
-				}
-
-				res = buildSuccessSignMessage(
-					sign(
-						command,
-						format,
-						algorithm,
-						extraParams,
-						inputFile,
-						selectedAlias,
-						ksm,
-						password
-					),
-					xml
-				);
-			}
-			catch (final CommandLineException e) {
-				res = buildErrorMessage(e.getMessage(), e, xml);
-				failed = true;
-			}
-
-			if (outputFile != null) {
-
-				try {
-					final OutputStream fos = new FileOutputStream(outputFile);
-					fos.write(res);
-					fos.flush();
-					fos.close();
-				}
-				catch(final Exception e) {
-					closeApp(
-						STATUS_ERROR,
-						pw,
-						CommandLineMessages.getString("CommandLineLauncher.21", outputFile.getAbsolutePath()) //$NON-NLS-1$
-					);
-				}
-
-			}
-
-			// Devolvemos el mensaje segun la configuracion establecida
-
-			// Si se ha solicitado que se obtenga el resultado en XML el resultado siempre se indicara que el proceso
-			// termino correctamente y el desarrollador debera analizarlo para conocer el resultado de la operacion.
-			// Si no se produjo error, también indicaremos que el proceso finalizo correctamente.
-			// El mensaje a mostrar sera puramente informativo si el usuario solucito que la salida se redrigiese a un
-			// fichero, mientras que si no configuro fichero de salida se devolvera la firma resultante
-			if (xml || !failed) {
-				if (outputFile != null) {
-					closeApp(STATUS_SUCCESS, pw, CommandLineMessages.getString("CommandLineLauncher.22")); //$NON-NLS-1$
-				}
-				else {
-					closeApp(STATUS_SUCCESS, pw, new String(res));
-				}
-			}
-			// Si la operacion finalizo con errores y la salida no debe hacer en forma de XML, indicamos directamente el
-			// resultado
-			else {
-				closeApp(STATUS_ERROR, pw, new String(res));
+			catch(final ArrayIndexOutOfBoundsException e) {
+				closeApp(STATUS_ERROR, pw, buildSyntaxError());
 			}
 		}
-		catch(final ArrayIndexOutOfBoundsException e) {
-			closeApp(STATUS_ERROR, pw, buildSyntaxError());
-		}
 
-		if (pw != null) {
-			pw.flush();
-			pw.close();
-		}
 	}
 
 	/**
@@ -445,10 +438,10 @@ final class CommandLineLauncher {
 
 		// Leemos el fichero de entrada
 		final byte[] data;
-		try {
+		try (
 			final InputStream input = new FileInputStream(inputFile);
+		) {
 			data = AOUtil.getDataFromInputStream(input);
-			input.close();
 		}
 		catch(final Exception e) {
 			throw new CommandLineException("No se ha podido leer el fichero de entrada: " + inputFile.getAbsolutePath(), e); //$NON-NLS-1$
@@ -770,8 +763,6 @@ final class CommandLineLauncher {
 			if (message != null) {
 				pw.write(message);
 			}
-			pw.flush();
-			pw.close();
 		}
 		System.exit(status);
 	}

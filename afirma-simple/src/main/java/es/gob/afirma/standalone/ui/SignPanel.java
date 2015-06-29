@@ -213,30 +213,30 @@ public final class SignPanel extends JPanel {
             return;
         }
 
-        final InputStream fis = new FileInputStream(file);
-
         final byte[] data;
-        try {
-            data = AOUtil.getDataFromInputStream(fis);
+
+        try (
+    		final InputStream fis = new FileInputStream(file);
+		) {
+	        try {
+	            data = AOUtil.getDataFromInputStream(fis);
+	        }
+	        catch(final OutOfMemoryError e) {
+	        	AOUIFactory.showErrorMessage(
+	                 SignPanel.this,
+	                 SimpleAfirmaMessages.getString("SignPanel.26"), //$NON-NLS-1$
+	                 SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
+	                 JOptionPane.ERROR_MESSAGE
+	            );
+	            this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+	            return;
+	        }
         }
-        catch(final OutOfMemoryError e) {
-        	AOUIFactory.showErrorMessage(
-                 SignPanel.this,
-                 SimpleAfirmaMessages.getString("SignPanel.26"), //$NON-NLS-1$
-                 SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
-                 JOptionPane.ERROR_MESSAGE
-            );
-            this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-            return;
-        }
-        finally {
-            fis.close();
-        }
+
         if (data == null || data.length < 1) {
             throw new IOException("No se ha podido leer el fichero"); //$NON-NLS-1$
         }
         this.dataToSign = data;
-
 
         String fileDescription;
         String iconPath;
@@ -308,10 +308,10 @@ public final class SignPanel extends JPanel {
             this.signer = new AOCAdESSigner();
         }
 
-        try {
-        	final InputStream is = this.getClass().getResourceAsStream(iconPath);
+        try (
+    		final InputStream is = this.getClass().getResourceAsStream(iconPath);
+		) {
         	this.fileTypeVectorIcon = new ScalablePane(ImageIO.read(is), true);
-            is.close();
         }
         catch (final Exception e) {
             LOGGER.warning(

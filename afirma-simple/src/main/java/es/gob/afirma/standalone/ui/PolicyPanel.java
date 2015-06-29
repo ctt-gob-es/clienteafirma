@@ -22,6 +22,7 @@ import org.ietf.jgss.Oid;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AdESPolicy;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
+import es.gob.afirma.standalone.ui.PreferencesPanel.ValueTextPair;
 
 /** Panel con los componentes para la configuracion de una pol&iacute;tica de firma. */
 final class PolicyPanel extends JPanel implements ItemListener {
@@ -39,7 +40,7 @@ final class PolicyPanel extends JPanel implements ItemListener {
 		"SHA-256" //$NON-NLS-1$
 	};
 
-	private JComboBox policiesCombo;
+	private JComboBox<PolicyItem> policiesCombo;
 
 	private JTextField identifierField;
 	JTextField getIdentifierField() {
@@ -47,7 +48,7 @@ final class PolicyPanel extends JPanel implements ItemListener {
 	}
 
 	private JTextField hashField;
-	private JComboBox hashAlgorithmField;
+	private JComboBox<String> hashAlgorithmField;
 	private JTextField qualifierField;
 
 	/** Men&uacute; desplegable con la selecci&oacute;n de sub-formato de firma.
@@ -60,7 +61,7 @@ final class PolicyPanel extends JPanel implements ItemListener {
 	 *  En el caso de XAdES, si la pol&iacute;tica de firma es la de la AGE, hay que
 	 *  restringir al tipo <i>Enveloped</i>.
 	 * </p> */
-	private final JComboBox subFormatCombo;
+	private final JComboBox<ValueTextPair> subFormatCombo;
 
 	private final String signatureFormat;
 
@@ -87,7 +88,7 @@ final class PolicyPanel extends JPanel implements ItemListener {
 	PolicyPanel(final String signFormat,
 			    final List<PolicyItem> policies,
 			    final AdESPolicy currentPolicy,
-			    final JComboBox adesSubFormat) {
+			    final JComboBox<ValueTextPair> adesSubFormat) {
 
 		this.subFormatCombo = adesSubFormat;
 		this.signatureFormat = signFormat;
@@ -106,7 +107,7 @@ final class PolicyPanel extends JPanel implements ItemListener {
 		// 0: Ninguna politica
 		// De 1 a N: Politicas prefijadas
 		// Ultima: Politica personalizada
-		this.policies = new ArrayList<PolicyPanel.PolicyItem>();
+		this.policies = new ArrayList<>();
 		this.policies.add(
 			new PolicyItem(
 				SimpleAfirmaMessages.getString("PreferencesPanel.24"), //$NON-NLS-1$
@@ -143,9 +144,9 @@ final class PolicyPanel extends JPanel implements ItemListener {
 		c.gridy = 0;
 
 		// Los elementos del menu desplegable se identifican por su orden
-		this.policiesCombo = new JComboBox();
+		this.policiesCombo = new JComboBox<>();
 		this.policiesCombo.setModel(
-			new DefaultComboBoxModel(
+			new DefaultComboBoxModel<>(
 				this.policies.toArray(new PolicyItem[this.policies.size()])
 			)
 		);
@@ -219,7 +220,7 @@ final class PolicyPanel extends JPanel implements ItemListener {
 		c.gridy++;
 		add(this.hashField, c);
 
-		this.hashAlgorithmField = new JComboBox(POLICY_HASH_ALGORITHMS);
+		this.hashAlgorithmField = new JComboBox<>(POLICY_HASH_ALGORITHMS);
 		this.hashAlgorithmField.setEnabled(enableTextFields);
 		this.hashAlgorithmField.getAccessibleContext().setAccessibleDescription(
 			SimpleAfirmaMessages.getString("PreferencesPanel.50") //$NON-NLS-1$
@@ -255,7 +256,7 @@ final class PolicyPanel extends JPanel implements ItemListener {
 		// Seleccionamos la politica actualmente configurada si la hay
 		if (this.currentPolicy != null) {
 			for (int i = 0; i < this.policiesCombo.getItemCount(); i++) {
-				if (((PolicyItem) this.policiesCombo.getItemAt(i)).equals(this.currentPolicy)) {
+				if (this.policiesCombo.getItemAt(i).equals(this.currentPolicy)) {
 					this.policiesCombo.setSelectedIndex(i);
 				}
 			}
@@ -414,7 +415,7 @@ final class PolicyPanel extends JPanel implements ItemListener {
 			((PolicyItem) this.policiesCombo.getSelectedItem()).setPolicy(policy);
 		}
 		else {
-			((PolicyItem) this.policiesCombo.getItemAt(getCustomPolicyIndex())).setPolicy(null);
+			this.policiesCombo.getItemAt(getCustomPolicyIndex()).setPolicy(null);
 		}
 		this.currentPolicy = policy;
 	}

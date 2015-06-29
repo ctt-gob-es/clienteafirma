@@ -41,8 +41,7 @@ import es.gob.afirma.standalone.VisorFirma;
 
 /** Panel para la espera y detecci&oacute;n autom&aacute;tica de insercci&oacute;n de DNIe.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s
- * @author Carlos Gamuci
- */
+ * @author Carlos Gamuci. */
 public final class VisorPanel extends JPanel implements KeyListener {
 
     /** Version ID */
@@ -90,10 +89,8 @@ public final class VisorPanel extends JPanel implements KeyListener {
         byte[] sign = signature != null ?  signature.clone() : null;
 
         if (sign == null && signFile != null) {
-            try {
-                final FileInputStream fis = new FileInputStream(signFile);
+            try ( final FileInputStream fis = new FileInputStream(signFile); ) {
                 sign = AOUtil.getDataFromInputStream(fis);
-                fis.close();
             }
             catch (final Exception e) {
                 Logger.getLogger("es.gob.afirma").warning("No se ha podido cargar el fichero de firma: " + e); //$NON-NLS-1$ //$NON-NLS-2$

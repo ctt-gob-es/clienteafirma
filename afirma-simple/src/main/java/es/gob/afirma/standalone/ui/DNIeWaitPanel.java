@@ -98,16 +98,18 @@ public final class DNIeWaitPanel extends JPanel implements KeyListener {
         // Imagen central
         ScalablePane vectorDNIeHelpPicture;
         try {
-        	final InputStream is = this.getClass().getResourceAsStream("/resources/lectordnie.png"); //$NON-NLS-1$
-        	final Image image = ImageIO.read(is);
-        	is.close();
+        	final Image image;
+        	try ( final InputStream is = this.getClass().getResourceAsStream("/resources/lectordnie.png"); ) { //$NON-NLS-1$
+        		image = ImageIO.read(is);
+        	}
         	vectorDNIeHelpPicture = new ScalablePane(image, true);
         	vectorDNIeHelpPicture.setBackground(new Color(255, 255, 255, 0));
         	vectorDNIeHelpPicture.setFocusable(false);
-        } catch (final Exception e) {
+        }
+        catch (final Exception e) {
         	Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
-        			"No se ha podido cargar la imagen explicativa de insercion de DNIe, esta no se mostrara: " + e //$NON-NLS-1$
-        			);
+    			"No se ha podido cargar la imagen explicativa de insercion de DNIe, esta no se mostrara: " + e //$NON-NLS-1$
+			);
         	vectorDNIeHelpPicture = null;
         }
 
