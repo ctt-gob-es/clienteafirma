@@ -167,14 +167,13 @@ public final class ValidateBinarySignature {
         else {
         	s = new CMSSignedData(new CMSProcessableByteArray(data), sign);
         }
-        final Store store = s.getCertificates();
+        final Store<X509CertificateHolder> store = s.getCertificates();
 
         final CertificateFactory certFactory = CertificateFactory.getInstance("X.509"); //$NON-NLS-1$
 
         for (final Object si : s.getSignerInfos().getSigners()) {
         	final SignerInformation signer = (SignerInformation) si;
 
-            @SuppressWarnings("unchecked")
 			final Iterator<X509CertificateHolder> certIt = store.getMatches(new CertHolderBySignerIdSelector(signer.getSID())).iterator();
             final X509Certificate cert = (X509Certificate) certFactory.generateCertificate(
         		new ByteArrayInputStream(
@@ -195,7 +194,7 @@ public final class ValidateBinarySignature {
 
     }
 
-    private static final class CertHolderBySignerIdSelector implements Selector {
+    private static final class CertHolderBySignerIdSelector implements Selector<X509CertificateHolder> {
 
     	private final SignerId signerId;
     	CertHolderBySignerIdSelector(final SignerId sid) {
@@ -207,11 +206,8 @@ public final class ValidateBinarySignature {
 
     	/** {@inheritDoc} */
 		@Override
-		public boolean match(final Object o) {
-			if (!(o instanceof X509CertificateHolder)) {
-				return false;
-			}
-			return CertHolderBySignerIdSelector.this.signerId.getSerialNumber().equals(((X509CertificateHolder)o).getSerialNumber());
+		public boolean match(final X509CertificateHolder o) {
+			return CertHolderBySignerIdSelector.this.signerId.getSerialNumber().equals(o.getSerialNumber());
 		}
 
 		/** {@inheritDoc} */
