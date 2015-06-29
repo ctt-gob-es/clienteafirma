@@ -3,8 +3,7 @@ package es.gob.afirma.keystores.filters.rfc;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 /** Prueba de los filtros por SSCD.
