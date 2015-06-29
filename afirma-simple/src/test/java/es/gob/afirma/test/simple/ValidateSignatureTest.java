@@ -25,10 +25,10 @@ public class ValidateSignatureTest {
 	public void testValidateXMLSign() throws IOException {
 
 			final String signaturePath = XMLDSIG_ENVELOPED;
-
-			final InputStream is = ClassLoader.getSystemResourceAsStream(signaturePath);
-			final byte[] signature = AOUtil.getDataFromInputStream(is);
-			is.close();
+			final byte[] signature;
+			try ( final InputStream is = ClassLoader.getSystemResourceAsStream(signaturePath); ) {
+				signature = AOUtil.getDataFromInputStream(is);
+			}
 			final SignValidity validity = ValidateXMLSignature.validate(signature);
 			System.out.println(signaturePath + ":\n\t" + validity + "\n====================");  //$NON-NLS-1$//$NON-NLS-2$
 			Assert.assertEquals("No es valida la firma " + signaturePath, SIGN_DETAIL_TYPE.OK, validity.getValidity()); //$NON-NLS-1$
@@ -41,10 +41,10 @@ public class ValidateSignatureTest {
 	public void testValidateBinarySign() throws IOException {
 
 			final String signaturePath = CADES_EXPLICIT;
-
-			final InputStream is = ClassLoader.getSystemResourceAsStream(signaturePath);
-			final byte[] signature = AOUtil.getDataFromInputStream(is);
-			is.close();
+			final byte[] signature;
+			try ( final InputStream is = ClassLoader.getSystemResourceAsStream(signaturePath); ) {
+				signature = AOUtil.getDataFromInputStream(is);
+			}
 			final SignValidity validity = ValidateBinarySignature.validate(signature, null);
 			System.out.println(signaturePath + ":\n\t" + validity + "\n===================="); //$NON-NLS-1$ //$NON-NLS-2$
 			Assert.assertEquals("No es valida la firma " + signaturePath, SIGN_DETAIL_TYPE.UNKNOWN, validity.getValidity()); //$NON-NLS-1$
