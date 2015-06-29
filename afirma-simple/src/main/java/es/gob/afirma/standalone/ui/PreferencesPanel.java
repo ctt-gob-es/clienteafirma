@@ -11,9 +11,9 @@
 package es.gob.afirma.standalone.ui;
 
 import static es.gob.afirma.standalone.PreferencesManager.PREFERENCE_CADES_IMPLICIT;
-import static es.gob.afirma.standalone.PreferencesManager.PREFERENCE_CADES_POLICY_IDENTIFIER;
 import static es.gob.afirma.standalone.PreferencesManager.PREFERENCE_CADES_POLICY_HASH;
 import static es.gob.afirma.standalone.PreferencesManager.PREFERENCE_CADES_POLICY_HASH_ALGORITHM;
+import static es.gob.afirma.standalone.PreferencesManager.PREFERENCE_CADES_POLICY_IDENTIFIER;
 import static es.gob.afirma.standalone.PreferencesManager.PREFERENCE_CADES_POLICY_QUALIFIER;
 import static es.gob.afirma.standalone.PreferencesManager.PREFERENCE_OMIT_ASKONCLOSE;
 import static es.gob.afirma.standalone.PreferencesManager.PREFERENCE_PADES_FORMAT;
@@ -96,7 +96,7 @@ final class PreferencesPanel extends JPanel implements KeyListener {
 	private static final String PADES_FORMAT_BASIC_TEXT = SimpleAfirmaMessages.getString("PreferencesPanel.71"); //$NON-NLS-1$
 	private static final String PADES_FORMAT_BES_TEXT = SimpleAfirmaMessages.getString("PreferencesPanel.72"); //$NON-NLS-1$
 
-	private final JComboBox signarureAlgorithms = new JComboBox();
+	private final JComboBox<String> signarureAlgorithms = new JComboBox<>();
 
 	private final JButton applyButton = new JButton(SimpleAfirmaMessages.getString("PreferencesPanel.0")); //$NON-NLS-1$
 
@@ -126,8 +126,8 @@ final class PreferencesPanel extends JPanel implements KeyListener {
         return this.window;
     }
 
-	private final JComboBox padesBasicFormat = new JComboBox();
-	JComboBox getBasicPadesFormat() {
+	private final JComboBox<ValueTextPair> padesBasicFormat = new JComboBox<>();
+	JComboBox<ValueTextPair> getBasicPadesFormat() {
 		return this.padesBasicFormat;
 	}
 
@@ -414,7 +414,7 @@ final class PreferencesPanel extends JPanel implements KeyListener {
         gbc.weightx = 1.0;
         gbc.gridy = 0;
 
-        final List<PolicyPanel.PolicyItem> xadesPolicies = new ArrayList<PolicyPanel.PolicyItem>();
+        final List<PolicyPanel.PolicyItem> xadesPolicies = new ArrayList<>();
         xadesPolicies.add(
     		new PolicyItem(
         		SimpleAfirmaMessages.getString("PreferencesPanel.73"), //$NON-NLS-1$
@@ -506,7 +506,7 @@ final class PreferencesPanel extends JPanel implements KeyListener {
         c.weightx = 1.0;
         c.gridy = 0;
 
-        final List<PolicyPanel.PolicyItem> cadesPolicies = new ArrayList<PolicyPanel.PolicyItem>();
+        final List<PolicyPanel.PolicyItem> cadesPolicies = new ArrayList<>();
         cadesPolicies.add(new PolicyItem(
         		SimpleAfirmaMessages.getString("PreferencesPanel.73"), //$NON-NLS-1$
         		POLICY_CADES_PADES_AGE_1_9));
@@ -552,7 +552,7 @@ final class PreferencesPanel extends JPanel implements KeyListener {
 		this.signarureAlgorithms.addItemListener(this.modificationListener);
 		this.signarureAlgorithms.addKeyListener(this);
 		this.signarureAlgorithms.setModel(
-			new DefaultComboBoxModel(
+			new DefaultComboBoxModel<>(
 				new String[] {
 					"SHA1withRSA", //$NON-NLS-1$
 					"SHA512withRSA", //$NON-NLS-1$
@@ -594,7 +594,7 @@ final class PreferencesPanel extends JPanel implements KeyListener {
         gbc.weightx = 1.0;
         gbc.gridy = 0;
 
-        final List<PolicyPanel.PolicyItem> padesPolicies = new ArrayList<PolicyPanel.PolicyItem>();
+        final List<PolicyPanel.PolicyItem> padesPolicies = new ArrayList<>();
         padesPolicies.add(
     		new PolicyItem(
         		SimpleAfirmaMessages.getString("PreferencesPanel.73"), //$NON-NLS-1$
@@ -682,7 +682,7 @@ final class PreferencesPanel extends JPanel implements KeyListener {
 		this.padesBasicFormat.addItemListener(this.modificationListener);
 		this.padesBasicFormat.addKeyListener(this);
 
-		final DefaultComboBoxModel padesFormatModel = new DefaultComboBoxModel(
+		final DefaultComboBoxModel<ValueTextPair> padesFormatModel = new DefaultComboBoxModel<>(
 			new ValueTextPair[] {
 				new ValueTextPair(AOSignConstants.PADES_SUBFILTER_BES, PADES_FORMAT_BES_TEXT),
 				new ValueTextPair(AOSignConstants.PADES_SUBFILTER_BASIC, PADES_FORMAT_BASIC_TEXT)
@@ -881,11 +881,9 @@ final class PreferencesPanel extends JPanel implements KeyListener {
 	@Override
 	public void keyTyped(final KeyEvent e) { /* Vacio */ }
 
-	/**
-	 * Par de cadenas para su uso en ComboBox. Una cadena es el valor del elemento seleccionado y
-	 * la otra el texto que se debe mostrar.
-	 */
-	private class ValueTextPair {
+	/** Par de cadenas para su uso en ComboBox. Una cadena es el valor del elemento seleccionado y
+	 * la otra el texto que se debe mostrar. */
+	static final class ValueTextPair {
 
 		private final String value;
 		private final String text;

@@ -26,46 +26,48 @@ final class ServiceInvocationManager {
 		LOGGER.info("Iniciando servicio local de firma..."); //$NON-NLS-1$
 
 		try {
-			final ServerSocketChannel serverSocketChannel = ServerSocketChannel.open();
-			tryPorts(getPorts(url), serverSocketChannel.socket());
-			serverSocketChannel.configureBlocking(true);
+			try ( final ServerSocketChannel serverSocketChannel = ServerSocketChannel.open(); ) {
 
-			final SocketChannel socketChannel = serverSocketChannel.accept();
+				tryPorts(getPorts(url), serverSocketChannel.socket());
+				serverSocketChannel.configureBlocking(true);
 
-			//TODO: Descomentar y hacer compatible con Java 6
-//			if (!isLocalAddress((InetSocketAddress) socketChannel.getRemoteAddress())) {
-//				socketChannel.close();
-//				serverSocketChannel.close();
-//				throw new SecurityException(
-//					"Se ha detectado un acceso no autorizado desde " + ((InetSocketAddress) socketChannel.getRemoteAddress()).getHostString() //$NON-NLS-1$
-//				);
-//			}
+				try ( final SocketChannel socketChannel = serverSocketChannel.accept(); ) {
 
-			LOGGER.info("Aceptada conexion desde: " + socketChannel); //$NON-NLS-1$
-			socketChannel.configureBlocking(false);
+					if (!isLocalAddress((InetSocketAddress) socketChannel.getRemoteAddress())) {
+						socketChannel.close();
+						serverSocketChannel.close();
+						throw new SecurityException(
+							"Se ha detectado un acceso no autorizado desde " + ((InetSocketAddress) socketChannel.getRemoteAddress()).getHostString() //$NON-NLS-1$
+						);
+					}
 
-			final String commandUri = getCommandUri(read(socketChannel));
-			LOGGER.info("Comando URI recibido por HTTP: " + commandUri); //$NON-NLS-1$
-			if (commandUri.startsWith("afirma://service?") || commandUri.startsWith("afirma://service/?")) { //$NON-NLS-1$ //$NON-NLS-2$
-				//TODO: No permitir acceso recursivo
+					LOGGER.info("Aceptada conexion desde: " + socketChannel); //$NON-NLS-1$
+					socketChannel.configureBlocking(false);
+
+					final String commandUri = getCommandUri(read(socketChannel));
+					LOGGER.info("Comando URI recibido por HTTP: " + commandUri); //$NON-NLS-1$
+					if (commandUri.startsWith("afirma://service?") || commandUri.startsWith("afirma://service/?")) { //$NON-NLS-1$ //$NON-NLS-2$
+						//TODO: No permitir acceso recursivo
+					}
+
+					final String operationResult = ProtocolInvocationLauncher.launch(commandUri);
+
+					// Gestion de la respuesta
+					final byte[] response = createHttpResponse(
+						operationResult != null && !operationResult.startsWith("SAF_"), //$NON-NLS-1$
+						operationResult != null ? operationResult : "NULL" //$NON-NLS-1$
+					);
+
+					final ByteBuffer bb = ByteBuffer.allocate(response.length);
+					bb.clear();
+					bb.put(response);
+					bb.flip();
+					socketChannel.write(bb);
+
+					socketChannel.close();
+					serverSocketChannel.close();
+				}
 			}
-
-			final String operationResult = ProtocolInvocationLauncher.launch(commandUri);
-
-			// Gestion de la respuesta
-			final byte[] response = createHttpResponse(
-				operationResult != null && !operationResult.startsWith("SAF_"), //$NON-NLS-1$
-				operationResult != null ? operationResult : "NULL" //$NON-NLS-1$
-			);
-
-			final ByteBuffer bb = ByteBuffer.allocate(response.length);
-			bb.clear();
-			bb.put(response);
-			bb.flip();
-			socketChannel.write(bb);
-
-			socketChannel.close();
-			serverSocketChannel.close();
 
 		}
 		catch (final IOException e) {
@@ -95,11 +97,9 @@ final class ServiceInvocationManager {
 		return sb.toString().getBytes();
 	}
 
-	/**
-	 * Obtiene los puertos que se deben probar para la conexi&oacute;n externa.
+	/** Obtiene los puertos que se deben probar para la conexi&oacute;n externa.
 	 * @param url URL de la que extraer los puertos.
-	 * @return Listados de puertos.
-	 */
+	 * @return Listados de puertos. */
 	private static int[] getPorts(final String url) {
 		if (url == null) {
 			throw new IllegalArgumentException("La URI de invocacion no puede ser nula"); //$NON-NLS-1$
@@ -191,16 +191,15 @@ final class ServiceInvocationManager {
 		return response.toString();
 	}
 
-	//TODO: Descomentar y hacer compatible con Java 6
-//	private static boolean isLocalAddress(final InetSocketAddress a) {
-//		final String hostString = a.getHostString();
-//		if ("0:0:0:0:0:0:0:1".equals(hostString) || //$NON-NLS-1$
-//			"127.0.0.1".equals(hostString) || //$NON-NLS-1$
-//			"localhost".equals(hostString)) { //$NON-NLS-1$
-//			return true;
-//		}
-//		return false;
-//	}
+	private static boolean isLocalAddress(final InetSocketAddress a) {
+		final String hostString = a.getHostString();
+		if ("0:0:0:0:0:0:0:1".equals(hostString) || //$NON-NLS-1$
+			"127.0.0.1".equals(hostString) || //$NON-NLS-1$
+			"localhost".equals(hostString)) { //$NON-NLS-1$
+			return true;
+		}
+		return false;
+	}
 
 	private static String getCommandUri(final String httpResponse) {
 		if (httpResponse == null) {

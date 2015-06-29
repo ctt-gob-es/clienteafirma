@@ -73,7 +73,7 @@ public final class ProtocolInvocationLauncher {
 	private static final String SAF_18 = "SAF_18"; //$NON-NLS-1$
 	private static final String SAF_19 = "SAF_19"; //$NON-NLS-1$
 
-	private static final Dictionary<String, String> ERRORS = new Hashtable<String, String>();
+	private static final Dictionary<String, String> ERRORS = new Hashtable<>();
 	static {
 		ERRORS.put(SAF_00, ProtocolMessages.getString("ProtocolLauncher.0")); //$NON-NLS-1$
 		ERRORS.put(SAF_01, ProtocolMessages.getString("ProtocolLauncher.1")); //$NON-NLS-1$
@@ -311,9 +311,10 @@ public final class ProtocolInvocationLauncher {
 			}
 
 			try {
-				final InputStream fis = new FileInputStream(selectedDataFile);
-				final byte[] data = AOUtil.getDataFromInputStream(fis);
-				fis.close();
+				final byte[] data;
+				try ( final InputStream fis = new FileInputStream(selectedDataFile); ) {
+					data = AOUtil.getDataFromInputStream(fis);
+				}
 				if (data == null) {
 					throw new IOException("La lectura de datos para firmar ha devuelto un nulo"); //$NON-NLS-1$
 				}
