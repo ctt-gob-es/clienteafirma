@@ -17,7 +17,7 @@ import es.gob.afirma.keystores.callbacks.NullPasswordCallback;
 
 abstract class FileKeyStoreManager extends AOKeyStoreManager {
 
-	protected PasswordCallback cachePasswordCallback;
+	private PasswordCallback cachePasswordCallback;
 
 	/** Inicializa un almac&eacute;n de claves y certificados de tipo fichero.
 	 * @param store Flujo de datos hacia el propio almac&eacute;n (fichero)
