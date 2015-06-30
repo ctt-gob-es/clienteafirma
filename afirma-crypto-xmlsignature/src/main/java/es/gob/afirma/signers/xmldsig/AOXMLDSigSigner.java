@@ -1158,11 +1158,10 @@ public final class AOXMLDSigSigner implements AOSigner {
         return false;
     }
 
-    /** Comprueba si la firma es enveloped
-     * @param element
-     *        Elemento que contiene el nodo ra&iacute;z del documento que se
-     *        quiere comprobar
-     * @return Valor booleano, siendo verdadero cuando la firma es enveloped */
+    /** Comprueba si la firma es <i>enveloped</i>.
+     * @param element Elemento que contiene el nodo ra&iacute;z del documento que se
+     *                quiere comprobar.
+     * @return Valor booleano, siendo verdadero cuando la firma es <i>enveloped</i>. */
     private static boolean isEnveloped(final Element element) {
         final NodeList transformList = element.getElementsByTagNameNS(XMLConstants.DSIGNNS, "Transform"); //$NON-NLS-1$
         for (int i = 0; i < transformList.getLength(); i++) {
@@ -1173,18 +1172,15 @@ public final class AOXMLDSigSigner implements AOSigner {
         return false;
     }
 
-    /** Comprueba si la firma es enveloping
-     * @param element
-     *        Elemento que contiene el nodo ra&iacute;z del documento que se
-     *        quiere comprobar
-     * @return Valor booleano, siendo verdadero cuando la firma es enveloping */
+    /** Comprueba si la firma es <i>enveloping</i>.
+     * @param element Elemento que contiene el nodo ra&iacute;z del documento que se quiere comprobar.
+     * @return Valor booleano, siendo verdadero cuando la firma es <i>enveloping</i>. */
     private static boolean isEnveloping(final Element element) {
         if (element == null) {
             return false;
         }
-        return element.getLocalName() != null && element.getLocalName().equals(SIGNATURE_STR) ||
-        		element.getNodeName().equals(AFIRMA) &&
-        		element.getFirstChild().getLocalName() != null && element.getFirstChild().getLocalName().equals(SIGNATURE_STR);
+        return SIGNATURE_STR.equals(element.getLocalName()) ||
+        		AFIRMA.equals(element.getNodeName()) && SIGNATURE_STR.equals(element.getFirstChild().getLocalName());
     }
 
     /** {@inheritDoc} */
