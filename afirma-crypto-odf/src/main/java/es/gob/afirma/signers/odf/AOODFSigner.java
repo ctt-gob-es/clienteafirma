@@ -571,7 +571,6 @@ public final class AOODFSigner implements AOSigner {
 
             for (int i = 0; i < numSignatures; i++) {
                 final Element signature = (Element) signatures.item(i);
-                final String sigId = signature.getAttribute("Id"); //$NON-NLS-1$
 
                 final String strCert = signature.getElementsByTagNameNS(XMLDSIG_NAMESPACE, "X509Certificate").item(0).getTextContent(); //$NON-NLS-1$
                 final AOTreeNode node;
@@ -582,14 +581,15 @@ public final class AOODFSigner implements AOSigner {
                 else {
                     node = new AOTreeNode(AOUtil.getCN(Utils.createCert(strCert)));
                 }
-                arrayIds[i] = sigId;
+                arrayIds[i] = signature.getAttribute("Id"); //$NON-NLS-1$
                 arrayNodes[i] = node;
 
-                final String typeReference =
-                        ((Element) signature.getElementsByTagNameNS(XMLDSIG_NAMESPACE, "Reference").item(0)).getAttribute("Type"); //$NON-NLS-1$ //$NON-NLS-2$
-                if (typeReference.equals("http://uri.etsi.org/01903#CountersignedSignature")) { //$NON-NLS-1$
-                    final String uri =
-                            ((Element) signature.getElementsByTagNameNS(XMLDSIG_NAMESPACE, "Reference").item(0)).getAttribute("URI"); //$NON-NLS-1$ //$NON-NLS-2$
+                final String typeReference = ((Element) signature.getElementsByTagNameNS(
+            		XMLDSIG_NAMESPACE,
+            		"Reference" //$NON-NLS-1$
+        		).item(0)).getAttribute("Type"); //$NON-NLS-1$
+                if ("http://uri.etsi.org/01903#CountersignedSignature".equals(typeReference)) { //$NON-NLS-1$
+                    final String uri = ((Element) signature.getElementsByTagNameNS(XMLDSIG_NAMESPACE, "Reference").item(0)).getAttribute("URI"); //$NON-NLS-1$ //$NON-NLS-2$
                     arrayRef[i] = uri.substring(1, uri.length() - 5);
                 }
                 else {
