@@ -80,9 +80,7 @@ public final class AOFileUtils {
 		final int free = limit - i;
 
 		if (free < SHORTENER_ELLIPSE.length()) {
-			for (int j = 0; j < ellipseArray.length; j++) {
-				shortPathArray[j] = ellipseArray[j];
-			}
+			System.arraycopy(ellipseArray, 0, shortPathArray, 0, ellipseArray.length);
 		}
 		else {
 			int j = 0;
