@@ -121,18 +121,6 @@ var MiniApplet = ( function ( window, undefined ) {
 			(navigator.userAgent.toUpperCase().indexOf("IPHONE") != -1);
 		}
 
-		/** Comprueba si se permite la ejecucion de ActiveX. */
-		function isActivexEnabled() {
-			var supported = null;
-			try {
-				supported = !!new ActiveXObject("htmlfile");
-			} catch (e) {
-				supported = false;
-			}
-
-			return supported;
-		}
-
 		/** Determina con un boolean si nos encontramos en Windows 8/8.1 */
 		function isWindows8() {
 			return navigator.userAgent.indexOf("Windows NT 6.2") != -1 ||	/* Windows 8 */
@@ -152,13 +140,6 @@ var MiniApplet = ( function ( window, undefined ) {
 		
 		function isFirefoxUAM() {
 		    return navigator.userAgent.indexOf("UAM") > 0;
-		}
-		
-		/** Determina con un boolean si nos encontramos en un entorno Windows 8 en modo "Modern UI".
-		 * Este metodo no es infalible dado que el navegador no ofrece forma de saberlo.
-		 * La comprobacion . */
-		function isWindows8ModernUI() {
-			return isWindows8() && !isActivexEnabled() && isInternetExplorer();
 		}
 
 		/**
@@ -738,7 +719,7 @@ var MiniApplet = ( function ( window, undefined ) {
 			var retrieverServletAddress = null;
 			var storageServletAddress = null;
 
-			if (clientAddress != null) {
+			if (clientAddress != undefined && clientAddress != null) {
 				if (clientAddress.indexOf("://") != -1 && clientAddress.indexOf("/", clientAddress.indexOf("://") + 3) != -1) {
 					var servletsBase = clientAddress.substring(0, clientAddress.indexOf("/", clientAddress.indexOf("://") + 3));
 					retrieverServletAddress = servletsBase + "/SignatureRetrieverServer/RetrieveService";
