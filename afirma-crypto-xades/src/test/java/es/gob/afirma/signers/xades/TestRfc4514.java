@@ -13,6 +13,9 @@ public final class TestRfc4514 {
 		System.out.println(
 			EscapeHelper.escapeLdapName("O=Atos, OU=Consultoria, CN=\"Tomas, el grande\"") //$NON-NLS-1$
 		);
+		System.out.println(
+			EscapeHelper.escapeLdapName("CN=COLEGIO DE REGISTRADORES DE LA PROPIEDAD MERCANTILES Y BIENES MUEBLES DE ESPA\u00F1A,2.5.4.5=#1309513238363330313247,O=COLEGIO DE REGISTRADORES DE LA PROPIEDAD MERCANTILES Y BIENES MUEBLES DE ESPA\u00F1A,L=MADRID,C=ES") //$NON-NLS-1$
+		);
 	}
 
 }
