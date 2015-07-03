@@ -773,10 +773,6 @@ var MiniApplet = ( function ( window, undefined ) {
 				if (dataB64 != null && !isValidUrl(dataB64)) {
 					dataB64 = dataB64.replace(/\+/g, "-").replace(/\//g, "_");
 				}
-
-				if (isPolicyConfigurated(extraParams)) {
-					extraParams = expandPolicy(format, extraParams);
-				}
 				
 				var idSession = generateNewIdSession();
 				var cipherKey = generateCipherKey();
@@ -1028,47 +1024,6 @@ var MiniApplet = ( function ( window, undefined ) {
 				}
 			    seed = (seed * 9301 + 49297) % 233280;
 			    return seed / 233280;
-			}
-			
-			/**
-			 * Identifica si debe expandirse la propiedad de politica de firma.
-			 * @param config Configuracion de la firma.
-			 * @returns Indica con true si debe expandirse el parametro de politica, false en caso contrario.
-			 */
-			var EXPAND_POLICIY_KEY_AND_VALUE = "expPolicy=FirmaAGE";
-			function isPolicyConfigurated (config) {
-				return (config != undefined && config != null) ?
-					config.indexOf(EXPAND_POLICIY_KEY_AND_VALUE) > -1 : false;
-			}
-			
-			/**
-			 * Expande la variable de firma politica de firma si la encuentra en los extra params.
-			 **/
-			function expandPolicy (format, config) {
-				var expandedPolicy;
-				if (compareFormats(format, "XAdES")) {
-					expandedPolicy = "policyIdentifier=urn:oid:2.16.724.1.3.1.1.2.1.9\n";
-				}else {
-					expandedPolicy = "policyIdentifier=2.16.724.1.3.1.1.2.1.9\n";
-				}
-				expandedPolicy +=
-					"policyQualifier=http://administracionelectronica.gob.es/es/ctt/politicafirma/politica_firma_AGE_v1_8.pdf\n" +
-					"policyIdentifierHashAlgorithm=http://www.w3.org/2000/09/xmldsig#sha1\n" +
-					"policyIdentifierHash=V8lVVNGDCPen6VELRD1Ja8HARFk=";
-
-				return config.replace(EXPAND_POLICIY_KEY_AND_VALUE, expandedPolicy);
-			}
-			
-			/**
-			 * Compara que un nombre de formato sea equivalente a un formato de firma monofasico.
-			 * Por ejemplo, que XAdEStri sea igual a XAdES.
-			 **/
-			function compareFormats (format, supportedFormat) {
-				format = format.toUpperCase();
-				supportedFormat = supportedFormat.toUpperCase();
-				return format == supportedFormat ||
-						(format.length > supportedFormat.length &&
-								format.substr(0, supportedFormat.length) == supportedFormat);
 			}
 			
 			/**
