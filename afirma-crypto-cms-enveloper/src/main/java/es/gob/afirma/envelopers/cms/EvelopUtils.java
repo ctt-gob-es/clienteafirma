@@ -94,12 +94,8 @@ final class EvelopUtils {
                     new DERSet(new DERPrintableString(new String(e.getValue())))
                 ));
             }
+            return EvelopUtils.getAttributeSet(new AttributeTable(contexExpecific));
         }
-        else {
-            return null;
-        }
-
-        return EvelopUtils.getAttributeSet(new AttributeTable(contexExpecific));
-
+        return null;
     }
 }
