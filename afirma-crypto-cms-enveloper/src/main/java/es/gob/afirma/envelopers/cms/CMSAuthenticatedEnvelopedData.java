@@ -146,7 +146,7 @@ public final class CMSAuthenticatedEnvelopedData {
         if (signerCertificateChain.length != 0) {
             // introducimos una lista vacia en los CRL ya que no podemos
             // modificar el codigo de bc.
-            certrevlist = SigUtils.createBerSetFromList(new ArrayList<ASN1Encodable>());
+            certrevlist = EvelopUtils.createBerSetFromList(new ArrayList<ASN1Encodable>());
             origInfo = new OriginatorInfo(certificates, certrevlist);
         }
 
@@ -226,7 +226,7 @@ public final class CMSAuthenticatedEnvelopedData {
 
         }
 
-        return SigUtils.getAttributeSet(new AttributeTable(contexExpecific));
+        return EvelopUtils.getAttributeSet(new AttributeTable(contexExpecific));
     }
 
     /*************************************************************************/

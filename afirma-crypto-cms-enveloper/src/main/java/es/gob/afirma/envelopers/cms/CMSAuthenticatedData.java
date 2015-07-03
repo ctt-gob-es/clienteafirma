@@ -162,7 +162,7 @@ import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
             // introducimos una lista vacia en los CRL ya que no podemos
             // modificar el codigo de bc.
             final List<ASN1Encodable> crl = new ArrayList<ASN1Encodable>();
-            certrevlist = SigUtils.createBerSetFromList(crl);
+            certrevlist = EvelopUtils.createBerSetFromList(crl);
             origInfo = new OriginatorInfo(certificates, certrevlist);
         }
 
@@ -170,11 +170,11 @@ import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
         final Info infos = Utils.initVariables(content2, config, certDest, cipherKey);
 
         // 3. MACALGORITHM
-        final AlgorithmIdentifier macAlgorithm = SigUtils.makeAlgId(config.getAlgorithm().getOid());
+        final AlgorithmIdentifier macAlgorithm = EvelopUtils.makeAlgId(config.getAlgorithm().getOid());
 
         // 4. DIGESTALGORITMIDENTIFIER
         final String digestAlgorithm = AOSignConstants.getDigestAlgorithmName(parameters.getSignatureAlgorithm());
-        final AlgorithmIdentifier digAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID(digestAlgorithm));
+        final AlgorithmIdentifier digAlgId = EvelopUtils.makeAlgId(AOAlgorithmID.getOID(digestAlgorithm));
 
 
         // 5. ENCAPSULATEDCONTENTINFO
@@ -286,7 +286,7 @@ import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
 
         }
 
-        return SigUtils.getAttributeSet(new AttributeTable(contexExpecific));
+        return EvelopUtils.getAttributeSet(new AttributeTable(contexExpecific));
     }
 
     /*************************************************************************/

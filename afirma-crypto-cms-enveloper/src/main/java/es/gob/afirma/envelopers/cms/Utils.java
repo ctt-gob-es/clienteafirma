@@ -176,7 +176,7 @@ final class Utils {
             for (final X509Certificate element : signerCertificateChain) {
                 ce.add(Certificate.getInstance(ASN1Primitive.fromByteArray(element.getEncoded())));
             }
-            return SigUtils.createBerSetFromList(ce);
+            return EvelopUtils.createBerSetFromList(ce);
         }
         return null;
     }
@@ -497,7 +497,7 @@ final class Utils {
             return null;
         }
 
-        return SigUtils.getAttributeSet(new AttributeTable(contexExpecific));
+        return EvelopUtils.getAttributeSet(new AttributeTable(contexExpecific));
     }
 
     static byte[] genMac(final String encryptionAlg, final byte[] content, final SecretKey ciphKey) throws NoSuchAlgorithmException, InvalidKeyException {
@@ -523,7 +523,7 @@ final class Utils {
                 }
                 // se introducen la nueva cadena de certificados.
                 if (ce.size() != 0) {
-                    certificates = SigUtils.createBerSetFromList(ce);
+                    certificates = EvelopUtils.createBerSetFromList(ce);
                     origInfo = new OriginatorInfo(certificates, certrevlist);
                 }
             }
@@ -554,7 +554,7 @@ final class Utils {
                 }
                 // se introducen la nueva cadena de certificados.
                 if (ce.size() != 0) {
-                    certificates = SigUtils.createBerSetFromList(ce);
+                    certificates = EvelopUtils.createBerSetFromList(ce);
                     v.add(certificates);
                     origInfo = new OriginatorInfo(new BERSet(v), certrevlist);
                 }
@@ -764,7 +764,7 @@ final class Utils {
             return null;
         }
 
-        return SigUtils.getAttributeSet(new AttributeTable(contexExpecific));
+        return EvelopUtils.getAttributeSet(new AttributeTable(contexExpecific));
     }
 
     /** Obtiene la estructura ASN.1 de firma usando los atributos del firmante.

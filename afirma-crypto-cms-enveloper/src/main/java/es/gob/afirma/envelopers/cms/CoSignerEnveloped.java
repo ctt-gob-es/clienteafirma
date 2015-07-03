@@ -155,7 +155,7 @@ final class CoSignerEnveloped {
         }
 
         // atributos no firmados.
-        final ASN1Set unSignedAttr = generateUnsignerInfo(uatrib);
+        final ASN1Set unSignedAttr = EvelopUtils.generateUnsignedInfo(uatrib);
 
         // // FIN ATRIBUTOS
 
@@ -300,7 +300,7 @@ final class CoSignerEnveloped {
         ASN1Set signedAttr = null;
 
         // atributos no firmados.
-        final ASN1Set unSignedAttr = generateUnsignerInfo(uatrib);
+        final ASN1Set unSignedAttr = EvelopUtils.generateUnsignedInfo(uatrib);
 
         // // FIN ATRIBUTOS
 
@@ -492,40 +492,6 @@ final class CoSignerEnveloped {
         }
 
         this.signedAttr2 = SigUtils.getAttributeSet(new AttributeTable(contexExpecific));
-
-        return SigUtils.getAttributeSet(new AttributeTable(contexExpecific));
-
-    }
-
-    /** M&eacute;todo que genera la parte que contiene la informaci&oacute;n del
-     * Usuario. Se generan los atributos no firmados.
-     * @param uatrib
-     *        Conjunto de atributos no firmados que se insertar&aacute;n
-     *        dentro del archivo de firma.
-     * @return Los atributos no firmados de la firma */
-    private static ASN1Set generateUnsignerInfo(final Map<String, byte[]> uatrib) {
-
-        // // ATRIBUTOS
-
-        // authenticatedAttributes
-        final ASN1EncodableVector contexExpecific = new ASN1EncodableVector();
-
-        // agregamos la lista de atributos a mayores.
-        if (uatrib.size() != 0) {
-            final Iterator<Map.Entry<String, byte[]>> it = uatrib.entrySet().iterator();
-            while (it.hasNext()) {
-                final Map.Entry<String, byte[]> e = it.next();
-                contexExpecific.add(new Attribute(
-            		// el oid
-                    new ASN1ObjectIdentifier(e.getKey().toString()),
-                    // el array de bytes en formato string
-                    new DERSet(new DERPrintableString(new String(e.getValue()))))
-                );
-            }
-        }
-        else {
-            return null;
-        }
 
         return SigUtils.getAttributeSet(new AttributeTable(contexExpecific));
 

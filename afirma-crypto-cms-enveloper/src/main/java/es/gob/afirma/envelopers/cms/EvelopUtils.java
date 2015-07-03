@@ -11,7 +11,9 @@
 package es.gob.afirma.envelopers.cms;
 
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import org.bouncycastle.asn1.ASN1Encodable;
@@ -20,15 +22,17 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Set;
 import org.bouncycastle.asn1.BERSet;
 import org.bouncycastle.asn1.DERNull;
+import org.bouncycastle.asn1.DERPrintableString;
 import org.bouncycastle.asn1.DERSet;
+import org.bouncycastle.asn1.cms.Attribute;
 import org.bouncycastle.asn1.cms.AttributeTable;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 
 /** Clase que contiene una serie de m&eacute;todos utilizados por GenSignedData,
  * GenCadesSignedData, CoSigner y CounterSigner. */
-final class SigUtils {
+final class EvelopUtils {
 
-    private SigUtils() {
+    private EvelopUtils() {
         // No permitimos la instanciacion
     }
 
@@ -64,5 +68,38 @@ final class SigUtils {
         }
         Logger.getLogger("es.gob.afirma").warning("Los atributos eran nulos, se devolvera null"); //$NON-NLS-1$ //$NON-NLS-2$
         return null;
+    }
+
+    /** Genera la parte que contiene la informaci&oacute;n del Usuario.
+     * Se generan los atributos no firmados.
+     * @param uatrib Lista de atributos no firmados que se insertar&aacute;n dentro
+     *               del archivo de firma.
+     * @return Los atributos no firmados de la firma. */
+    static ASN1Set generateUnsignedInfo(final Map<String, byte[]> uatrib) {
+
+        // // ATRIBUTOS
+
+        // authenticatedAttributes
+        final ASN1EncodableVector contexExpecific = new ASN1EncodableVector();
+
+        // agregamos la lista de atributos a mayores.
+        if (uatrib.size() != 0) {
+            final Iterator<Map.Entry<String, byte[]>> it = uatrib.entrySet().iterator();
+            while (it.hasNext()) {
+                final Map.Entry<String, byte[]> e = it.next();
+                contexExpecific.add(new Attribute(
+            		// el oid
+                    new ASN1ObjectIdentifier(e.getKey().toString()),
+                    // el array de bytes en formato string
+                    new DERSet(new DERPrintableString(new String(e.getValue())))
+                ));
+            }
+        }
+        else {
+            return null;
+        }
+
+        return EvelopUtils.getAttributeSet(new AttributeTable(contexExpecific));
+
     }
 }

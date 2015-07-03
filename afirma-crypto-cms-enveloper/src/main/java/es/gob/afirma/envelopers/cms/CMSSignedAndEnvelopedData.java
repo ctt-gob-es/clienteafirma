@@ -135,7 +135,7 @@ final class CMSSignedAndEnvelopedData {
 
         final String signatureAlgorithm = parameters.getSignatureAlgorithm();
         final String digestAlgorithm = AOSignConstants.getDigestAlgorithmName(signatureAlgorithm);
-        final AlgorithmIdentifier digAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID(digestAlgorithm));
+        final AlgorithmIdentifier digAlgId = EvelopUtils.makeAlgId(AOAlgorithmID.getOID(digestAlgorithm));
 
         final ASN1EncodableVector digestAlgs = new ASN1EncodableVector();
         digestAlgs.add(digAlgId);
@@ -163,10 +163,10 @@ final class CMSSignedAndEnvelopedData {
         final ASN1Set signedAttr = generateSignerInfo(signerCertificateChain[0], digestAlgorithm, content2, dataType, atrib);
 
         ASN1Set unSignedAttr = null;
-        unSignedAttr = generateUnsignerInfo(uatrib);
+        unSignedAttr = EvelopUtils.generateUnsignedInfo(uatrib);
 
         // digEncryptionAlgorithm
-        final AlgorithmIdentifier encAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID("RSA")); //$NON-NLS-1$
+        final AlgorithmIdentifier encAlgId = EvelopUtils.makeAlgId(AOAlgorithmID.getOID("RSA")); //$NON-NLS-1$
 
         final ASN1OctetString sign2 = Utils.firma(signatureAlgorithm, keyEntry, this.signedAttr2);
 
@@ -227,42 +227,9 @@ final class CMSSignedAndEnvelopedData {
             }
         }
 
-        this.signedAttr2 = SigUtils.getAttributeSet(new AttributeTable(contexExpecific));
+        this.signedAttr2 = EvelopUtils.getAttributeSet(new AttributeTable(contexExpecific));
 
-        return SigUtils.getAttributeSet(new AttributeTable(contexExpecific));
+        return EvelopUtils.getAttributeSet(new AttributeTable(contexExpecific));
     }
 
-    /** M&eacute;todo que genera la parte que contiene la informaci&oacute;n del
-     * Usuario. Se generan los atributos no firmados.
-     * @param uatrib
-     *        Lista de atributos no firmados que se insertar&aacute;n dentro
-     *        del archivo de firma.
-     * @return Los atributos no firmados de la firma. */
-    private static ASN1Set generateUnsignerInfo(final Map<String, byte[]> uatrib) {
-
-        // // ATRIBUTOS
-
-        // authenticatedAttributes
-        final ASN1EncodableVector contexExpecific = new ASN1EncodableVector();
-
-        // agregamos la lista de atributos a mayores.
-        if (uatrib.size() != 0) {
-            final Iterator<Map.Entry<String, byte[]>> it = uatrib.entrySet().iterator();
-            while (it.hasNext()) {
-                final Map.Entry<String, byte[]> e = it.next();
-                contexExpecific.add(new Attribute(
-                		// el oid
-                        new ASN1ObjectIdentifier(e.getKey().toString()),
-                        // el array de bytes en formato string
-                        new DERSet(new DERPrintableString(new String(e.getValue())))
-                ));
-            }
-        }
-        else {
-            return null;
-        }
-
-        return SigUtils.getAttributeSet(new AttributeTable(contexExpecific));
-
-    }
 }

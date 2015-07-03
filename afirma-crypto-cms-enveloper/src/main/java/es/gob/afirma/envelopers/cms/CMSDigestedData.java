@@ -68,7 +68,7 @@ final class CMSDigestedData {
     		                      final String dataType) throws NoSuchAlgorithmException, IOException {
 
         // Obtenemos el algoritmo para hacer el digest
-        final AlgorithmIdentifier digAlgId = SigUtils.makeAlgId(
+        final AlgorithmIdentifier digAlgId = EvelopUtils.makeAlgId(
                 AOAlgorithmID.getOID(AOSignConstants.getDigestAlgorithmName(digestAlgorithm)));
 
         // indicamos el tipo de contenido
