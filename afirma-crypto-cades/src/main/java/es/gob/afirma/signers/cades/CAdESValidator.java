@@ -43,6 +43,13 @@ public final class CAdESValidator {
         // No permitimos la instanciacion
     }
 
+    private static Enumeration<?> getCAdESObjects(final byte[] data) throws IOException {
+    	final ASN1InputStream is = new ASN1InputStream(data);
+        final ASN1Sequence dsq = (ASN1Sequence) is.readObject();
+        is.close();
+        return dsq.getObjects();
+    }
+
     /** Verifica si los datos proporcionados se corresponden con una estructura de tipo <i>Data</i>.
      * @param data Datos PKCS#7/CMS/CAdES.
      * @return <code>true</code> si los datos proporcionados se corresponden con una estructura de tipo <i>Data</i>,
@@ -52,18 +59,7 @@ public final class CAdESValidator {
 	static boolean isCAdESData(final byte[] data) throws IOException {
 
         // LEEMOS EL FICHERO QUE NOS INTRODUCEN
-    	final ASN1InputStream is = new ASN1InputStream(data);
-    	final Enumeration<?> e;
-    	try {
-    		e = ((ASN1Sequence) is.readObject()).getObjects();
-    	}
-    	catch(final ClassCastException ex) {
-        	// No es una secuencia
-        	return false;
-        }
-        finally {
-        	is.close();
-        }
+        final Enumeration<?> e = getCAdESObjects(data);
 
         // Elementos que contienen los elementos OID Data
         final ASN1ObjectIdentifier doi = (ASN1ObjectIdentifier) e.nextElement();
@@ -98,11 +94,8 @@ public final class CAdESValidator {
      * <code>false</code> en caso contrario. */
     public static boolean isCAdESSignedData(final byte[] data, final boolean enforceCAdES) {
         try {
-        	final ASN1InputStream is = new ASN1InputStream(data);
             // LEEMOS EL FICHERO QUE NOS INTRODUCEN
-            final ASN1Sequence dsq = (ASN1Sequence) is.readObject();
-            is.close();
-            final Enumeration<?> e = dsq.getObjects();
+            final Enumeration<?> e = getCAdESObjects(data);
 
             // Elementos que contienen los elementos OID Data
             final ASN1ObjectIdentifier doi = (ASN1ObjectIdentifier) e.nextElement();
@@ -176,19 +169,8 @@ public final class CAdESValidator {
         boolean isValid = false;
 
         // LEEMOS EL FICHERO QUE NOS INTRODUCEN
-        final ASN1InputStream is = new ASN1InputStream(data);
-        final ASN1Sequence dsq;
-        try {
-        	dsq = (ASN1Sequence) is.readObject();
-        }
-        catch(final Exception e) {
-        	// No es una secuencia valida
-        	return false;
-        }
-        finally {
-        	is.close();
-        }
-        final Enumeration<?> e = dsq.getObjects();
+        final Enumeration<?> e = getCAdESObjects(data);
+
         // Elementos que contienen los elementos OID Data
         final ASN1ObjectIdentifier doi = (ASN1ObjectIdentifier) e.nextElement();
         if (doi.equals(PKCSObjectIdentifiers.digestedData)) {
@@ -221,19 +203,7 @@ public final class CAdESValidator {
         boolean isValid = false;
 
         // LEEMOS EL FICHERO QUE NOS INTRODUCEN
-        final ASN1InputStream is = new ASN1InputStream(data);
-        final ASN1Sequence dsq;
-        try {
-        	dsq = (ASN1Sequence) is.readObject();
-        }
-        catch(final Exception e) {
-        	// No es una secuencia valida
-        	return false;
-        }
-        finally {
-        	is.close();
-        }
-        final Enumeration<?> e = dsq.getObjects();
+        final Enumeration<?> e = getCAdESObjects(data);
 
         // Elementos que contienen los elementos OID Data
         final ASN1ObjectIdentifier doi = (ASN1ObjectIdentifier) e.nextElement();
@@ -276,19 +246,8 @@ public final class CAdESValidator {
         boolean isValid = false;
 
         // LEEMOS EL FICHERO QUE NOS INTRODUCEN
-        final ASN1InputStream is = new ASN1InputStream(data);
-        final ASN1Sequence dsq;
-        try {
-        	dsq = (ASN1Sequence) is.readObject();
-        }
-        catch(final Exception e) {
-        	// No es una secuencia valida
-        	return false;
-        }
-        finally {
-        	is.close();
-        }
-        final Enumeration<?> e = dsq.getObjects();
+        final Enumeration<?> e = getCAdESObjects(data);
+
         // Elementos que contienen los elementos OID Data
         final ASN1ObjectIdentifier doi = (ASN1ObjectIdentifier) e.nextElement();
         if (doi.equals(PKCSObjectIdentifiers.envelopedData)) {
@@ -320,20 +279,7 @@ public final class CAdESValidator {
         boolean isValid = false;
 
         // LEEMOS EL FICHERO QUE NOS INTRODUCEN
-        final ASN1InputStream is = new ASN1InputStream(data);
-        final ASN1Sequence dsq;
-        try {
-        	dsq = (ASN1Sequence) is.readObject();
-        }
-        catch(final Exception e) {
-        	// No es una secuencia valida
-        	return false;
-        }
-        finally {
-        	is.close();
-        }
-        is.close();
-        final Enumeration<?> e = dsq.getObjects();
+        final Enumeration<?> e = getCAdESObjects(data);
 
         // Elementos que contienen los elementos OID Data
         final ASN1ObjectIdentifier doi = (ASN1ObjectIdentifier) e.nextElement();
