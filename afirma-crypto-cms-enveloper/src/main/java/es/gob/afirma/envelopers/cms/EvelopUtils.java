@@ -79,11 +79,12 @@ final class EvelopUtils {
 
         // // ATRIBUTOS
 
-        // authenticatedAttributes
-        final ASN1EncodableVector contexExpecific = new ASN1EncodableVector();
-
         // agregamos la lista de atributos a mayores.
         if (uatrib.size() != 0) {
+
+            // authenticatedAttributes
+            final ASN1EncodableVector contexExpecific = new ASN1EncodableVector();
+
             final Iterator<Map.Entry<String, byte[]>> it = uatrib.entrySet().iterator();
             while (it.hasNext()) {
                 final Map.Entry<String, byte[]> e = it.next();
