@@ -22,6 +22,7 @@ import net.java.xades.security.xml.XAdES.SignaturePolicyIdentifier;
 import net.java.xades.security.xml.XAdES.SignaturePolicyIdentifierImpl;
 import net.java.xades.security.xml.XAdES.SignerRole;
 import net.java.xades.security.xml.XAdES.SignerRoleImpl;
+import net.java.xades.security.xml.XAdES.XAdES_EPES;
 
 import org.ietf.jgss.Oid;
 import org.w3c.dom.Element;
@@ -54,6 +55,36 @@ final class XAdESUtil {
 
 	private XAdESUtil() {
 		// No permitimos la instanciacion
+	}
+
+	static AOXMLAdvancedSignature getXmlAdvancedSignature(final XAdES_EPES xades,
+			                                              final String signedPropertiesTypeUrl,
+			                                              final String digestMethodAlgorithm,
+			                                              final String canonicalizationAlgorithm) throws AOException {
+		final AOXMLAdvancedSignature xmlSignature;
+		try {
+			xmlSignature = AOXMLAdvancedSignature.newInstance(xades);
+		}
+		catch (final Exception e) {
+			throw new AOException(
+				"No se ha podido instanciar la firma XML Avanzada de JXAdES", e //$NON-NLS-1$
+			);
+		}
+
+		// Establecemos el tipo de propiedades firmadas
+		xmlSignature.setSignedPropertiesTypeUrl(signedPropertiesTypeUrl);
+
+		try {
+			xmlSignature.setDigestMethod(digestMethodAlgorithm);
+			xmlSignature.setCanonicalizationMethod(canonicalizationAlgorithm);
+		}
+		catch (final Exception e) {
+			throw new AOException(
+				"No se ha podido establecer el algoritmo de huella digital: " + e, e //$NON-NLS-1$
+			);
+		}
+
+		return xmlSignature;
 	}
 
 	static Element getFirstElmentFromXPath(final String xpathExpression, final Element sourceElement) throws AOException {

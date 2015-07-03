@@ -466,7 +466,8 @@ public final class XAdESCounterSigner {
 
 		if (doc == null) {
 			throw new IllegalArgumentException(
-				"El documento DOM no puede ser nulo"); //$NON-NLS-1$
+				"El documento DOM no puede ser nulo" //$NON-NLS-1$
+			);
 		}
 
 		final Properties extraParams = xParams != null ? xParams : new Properties();
@@ -486,12 +487,17 @@ public final class XAdESCounterSigner {
 
 		// recupera o crea un nodo UnsignedSignatureProperties
 		final NodeList usp = signature.getElementsByTagNameNS(
-				"*", "UnsignedSignatureProperties"); //$NON-NLS-1$ //$NON-NLS-2$
+			"*", "UnsignedSignatureProperties" //$NON-NLS-1$ //$NON-NLS-2$
+		);
+
 		Element unsignedSignatureProperties;
+
 		if (usp.getLength() == 0) {
 			unsignedSignatureProperties = doc.createElement(
-					sigPrefix + ":UnsignedSignatureProperties"); //$NON-NLS-1$
-		} else {
+				sigPrefix + ":UnsignedSignatureProperties" //$NON-NLS-1$
+			);
+		}
+		else {
 			unsignedSignatureProperties = (Element) usp.item(0);
 		}
 
@@ -528,9 +534,11 @@ public final class XAdESCounterSigner {
 		final DigestMethod digestMethod;
 		try {
 			digestMethod = fac.newDigestMethod(digestMethodAlgorithm, null);
-		} catch (final Exception e) {
+		}
+		catch (final Exception e) {
 			throw new AOException(
-					"No se ha podido obtener un generador de huellas digitales para el algoritmo '" + digestMethodAlgorithm + "'", e); //$NON-NLS-1$ //$NON-NLS-2$
+				"No se ha podido obtener un generador de huellas digitales para el algoritmo '" + digestMethodAlgorithm + "'", e //$NON-NLS-1$ //$NON-NLS-2$
+			);
 		}
 		final String referenceId = "Reference-" + UUID.randomUUID().toString(); //$NON-NLS-1$
 
@@ -574,11 +582,12 @@ public final class XAdESCounterSigner {
 
 		// SignaturePolicyIdentifier
 		final SignaturePolicyIdentifier spi = XAdESUtil.getPolicy(
-				extraParams.getProperty("policyIdentifier"), //$NON-NLS-1$
-				extraParams.getProperty("policyIdentifierHash"), //$NON-NLS-1$
-				extraParams.getProperty("policyIdentifierHashAlgorithm"), //$NON-NLS-1$
-				extraParams.getProperty("policyDescription"), //$NON-NLS-1$
-				extraParams.getProperty("policyQualifier")); //$NON-NLS-1$
+			extraParams.getProperty("policyIdentifier"), //$NON-NLS-1$
+			extraParams.getProperty("policyIdentifierHash"), //$NON-NLS-1$
+			extraParams.getProperty("policyIdentifierHashAlgorithm"), //$NON-NLS-1$
+			extraParams.getProperty("policyDescription"), //$NON-NLS-1$
+			extraParams.getProperty("policyQualifier") //$NON-NLS-1$
+		);
 		if (spi != null) {
 			xades.setSignaturePolicyIdentifier(spi);
 		}
@@ -610,30 +619,17 @@ public final class XAdESCounterSigner {
 		xades.setDataObjectFormats(dataObjectFormats);
 
 		// crea la firma
-		final AOXMLAdvancedSignature xmlSignature;
-		try {
-			xmlSignature = AOXMLAdvancedSignature.newInstance(xades);
-		} catch (final Exception e) {
-			throw new AOException(
-					"No se ha podido instanciar la firma Avanzada XML JXAdES", e); //$NON-NLS-1$
-		}
-
-		// Establecemos el tipo de propiedades firmadas
-		xmlSignature.setSignedPropertiesTypeUrl(signedPropertiesTypeUrl);
+		final AOXMLAdvancedSignature xmlSignature = XAdESUtil.getXmlAdvancedSignature(
+			xades,
+			signedPropertiesTypeUrl,
+			digestMethodAlgorithm,
+			canonicalizationAlgorithm
+		);
 
 		try {
-			xmlSignature.setDigestMethod(digestMethodAlgorithm);
-			xmlSignature.setCanonicalizationMethod(canonicalizationAlgorithm);
-		} catch (final Exception e) {
-			XAdESCounterSigner.LOGGER
-					.severe("No se ha podido establecer el algoritmo de huella digital (" + XMLConstants.SIGN_ALGOS_URI.get(algorithm) //$NON-NLS-1$
-							+ "), es posible que el usado en la firma difiera del indicado: " //$NON-NLS-1$
-							+ e);
-		}
-
-		try {
-			final boolean onlySignningCert = Boolean.parseBoolean(extraParams
-					.getProperty("includeOnlySignningCertificate", Boolean.FALSE.toString())); //$NON-NLS-1$
+			final boolean onlySignningCert = Boolean.parseBoolean(
+				extraParams.getProperty("includeOnlySignningCertificate", Boolean.FALSE.toString()) //$NON-NLS-1$
+			);
 			if (onlySignningCert) {
 				xmlSignature.sign(
 					(X509Certificate) certChain[0],
@@ -654,10 +650,13 @@ public final class XAdESCounterSigner {
 					Boolean.parseBoolean(extraParams.getProperty("addKeyInfoKeyName", Boolean.FALSE.toString())) //$NON-NLS-1$
 				);
 			}
-		} catch (final NoSuchAlgorithmException e) {
+		}
+		catch (final NoSuchAlgorithmException e) {
 			throw new UnsupportedOperationException(
-					"Los formatos de firma XML no soportan el algoritmo de firma '" + algorithm + "'", e); //$NON-NLS-1$ //$NON-NLS-2$
-		} catch (final Exception e) {
+				"Los formatos de firma XML no soportan el algoritmo de firma '" + algorithm + "'", e //$NON-NLS-1$ //$NON-NLS-2$
+			);
+		}
+		catch (final Exception e) {
 			throw new AOException("No se ha podido realizar la contrafirma", e); //$NON-NLS-1$
 		}
 	}

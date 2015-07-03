@@ -411,26 +411,12 @@ public final class XAdESCoSigner {
 		}
 
 		// crea la firma
-		final AOXMLAdvancedSignature xmlSignature;
-		try {
-			xmlSignature = AOXMLAdvancedSignature.newInstance(xades);
-		}
-		catch (final Exception e) {
-			throw new AOException("No se ha podido instanciar la firma Avanzada XML JXAdES", e); //$NON-NLS-1$
-		}
-
-		// Establecemos el tipo de SignedProperties
-		xmlSignature.setSignedPropertiesTypeUrl(signedPropertiesTypeUrl);
-
-		try {
-			xmlSignature.setDigestMethod(digestMethodAlgorithm);
-			xmlSignature.setCanonicalizationMethod(canonicalizationAlgorithm);
-		}
-		catch (final Exception e) {
-			LOGGER.severe("No se ha podido establecer el algoritmo de huella digital (" + algoUri //$NON-NLS-1$
-					+ "), es posible que el usado en la firma difiera del indicado: " //$NON-NLS-1$
-					+ e);
-		}
+		final AOXMLAdvancedSignature xmlSignature = XAdESUtil.getXmlAdvancedSignature(
+			xades,
+			signedPropertiesTypeUrl,
+			digestMethodAlgorithm,
+			canonicalizationAlgorithm
+		);
 
 		// en el caso de formato enveloping se inserta el elemento Object con el
 		// documento a firmar
