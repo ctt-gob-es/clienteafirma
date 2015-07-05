@@ -1260,7 +1260,7 @@ var MiniApplet = {
 				var portError = false;
 				var httpRequest = getHttpRequest();
 				do {
-					httpRequest.open("POST", "https://127.0.0.1:" + ports[i] + "/afirma", false);
+					httpRequest.open("POST", "http://127.0.0.1:" + ports[i] + "/afirma", false);
 					httpRequest.setRequestHeader("Content-type","application/x-www-form-urlencoded");
 
 					try {
