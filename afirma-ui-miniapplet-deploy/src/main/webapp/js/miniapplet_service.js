@@ -486,7 +486,7 @@ var MiniApplet = {
 
 				appletTag += "</object>";
 
-				// Al agregar con append() estos nodos no se carga automaticamente el applet en IE10 e inferiores, así que
+				// Al agregar con append() estos nodos no se carga automaticamente el applet en IE10 e inferiores, asï¿½ que
 				// hay que usar document.write() o innerHTML. Para asegurarnos de no pisar HTML previo, crearemos un <div>
 				// en la pagina, lo recogeremos e insertaremos dentro suyo el codigo del applet.
 				var divElem = document.createElement("div");
@@ -618,13 +618,15 @@ var MiniApplet = {
 			this.errorMessage = '';
 			this.errorType = '';
 
-			if (clientAddress.indexOf("://") != -1 && clientAddress.indexOf("/", clientAddress.indexOf("://") + 3) != -1) {
-				var servletsBase = clientAddress.substring(0, clientAddress.indexOf("/", clientAddress.indexOf("://") + 3));
-				this.retrieverServletAddress = servletsBase + "/SignatureRetrieverServer/RetrieveService";
-				this.storageServletAddress = servletsBase + "/SignatureStorageServer/StorageService";
-			} else {
-				this.retrieverServletAddress = clientAddress + "/SignatureRetrieverServer/RetrieveService";
-				this.storageServletAddress = clientAddress + "/SignatureStorageServer/StorageService";
+			if (clientAddress != undefined || clientAddress != null) {
+				if (clientAddress.indexOf("://") != -1 && clientAddress.indexOf("/", clientAddress.indexOf("://") + 3) != -1) {
+					var servletsBase = clientAddress.substring(0, clientAddress.indexOf("/", clientAddress.indexOf("://") + 3));
+					this.retrieverServletAddress = servletsBase + "/SignatureRetrieverServer/RetrieveService";
+					this.storageServletAddress = servletsBase + "/SignatureStorageServer/StorageService";
+				} else {
+					this.retrieverServletAddress = clientAddress + "/SignatureRetrieverServer/RetrieveService";
+					this.storageServletAddress = clientAddress + "/SignatureStorageServer/StorageService";
+				}
 			}
 
 			/**
@@ -966,7 +968,7 @@ var MiniApplet = {
 					return 4000;
 				}
 				else {
-					return 30000;
+					return 20000;	//TODO: Cambiar a 30000
 				}
 			};
 			
@@ -1137,17 +1139,34 @@ var MiniApplet = {
 					return false;
 				}
 
-				// Si no se obtuvo un error y se definio una clave de cifrado privada, desciframos.
-				// Los datos cifrados van precedidos por la cantidad de caracteres agregados manualmente al final para
-				// cumplir con los requisitos de padding del algoritmo de cifrado. Este numero se separa de la cadena
-				// cifrada con el caracter '.'. Devuelve el resultado del descifrado en Base64.
-				if (cipherKey != undefined && cipherKey != null) {
-					html = decipher(html, cipherKey);
+				// Si no se obtuvo un error, habremos recibido la firma y posiblemente el certificado (que antecederia a la
+				// firma y se separaria de ella con '|'). Si se definio una clave de cifrado, consideramos que la firma
+				// y el certificado (en caso de estar) llegan cifrados. El cifrado de ambos elementos es independiente
+				var certificate;
+				var signature;
+				var sepPos = html == null ? -1 : html.indexOf('|');
+
+				if (sepPos == -1) {
+					if (cipherKey != undefined && cipherKey != null) {
+						signature = decipher(html, cipherKey);
+					}
+					else {
+						signature = html;
+					}
 				}
-				
-				// Ejecutamos la funcion callback de exito y notificamos que se dejen de realizar peticiones
-				successCallback(html);
-				
+				else {
+					if (cipherKey != undefined && cipherKey != null) {
+						certificate = decipher(html.substring(0, sepPos), cipherKey);
+						signature = decipher(html.substring(sepPos + 1), cipherKey);
+					}
+					else {
+						certificate = html.substring(0, sepPos);
+						signature = html.substring(sepPos + 1);
+					}
+				}
+
+				successCallback(signature, certificate);
+
 				return false;
 			};
 			
@@ -1169,7 +1188,7 @@ var MiniApplet = {
 					}
 					return;
 				}
-				
+
 				// Termina bien y no devuelve ningun resultado
 				if (html == "OK") {
 					if (successCallback != undefined && successCallback != null) {
@@ -1202,11 +1221,23 @@ var MiniApplet = {
 					return;
 				}
 				
-				// Interpretamos el resultado como un base 64 con los datos cifrados
+				// Interpretamos el resultado como un base 64 y el certificado y los datos cifrados
 				if (cipherKey != undefined && cipherKey != null) {
-					html = decipher(html, cipherKey);
+					
+					var signature;
+					var certificate = null;
+					var sepPos = html.indexOf("|");
+
+					if (sepPos == -1) {
+						signature = decipher(Base64.decode(html, true), cipherKey);
+					}
+					else {
+						certificate = decipher(html.substring(0, sepPos), cipherKey);
+						signature = decipher(html.substring(sepPos + 1), cipherKey);
+					}
+
 					if (successCallback != undefined && successCallback != null) {
-						successCallback(html);		
+						successCallback(signature, certificate);		
 					}
 				}
 			};
@@ -1229,7 +1260,7 @@ var MiniApplet = {
 				var portError = false;
 				var httpRequest = getHttpRequest();
 				do {
-					httpRequest.open("POST", "http://127.0.0.1:" + ports[i] + "/afirma", false);
+					httpRequest.open("POST", "https://127.0.0.1:" + ports[i] + "/afirma", false);
 					httpRequest.setRequestHeader("Content-type","application/x-www-form-urlencoded");
 
 					try {
@@ -1251,11 +1282,15 @@ var MiniApplet = {
 
 				// Operamos segun el resultado
 				if (httpRequest.readyState == 4 && httpRequest.status == 200) {
-					MiniApplet.clienteFirma.successServiceResponseFunction(Base64.decode(httpRequest.responseText, true), cipherKey, successCallback, errorCallback);
+					if (successCallback != null) {
+						MiniApplet.clienteFirma.successServiceResponseFunction(Base64.decode(httpRequest.responseText, true), cipherKey, successCallback, errorCallback);
+					}
 					return;
 				}
 				
-				MiniApplet.clienteFirma.errorResponseFunction(null, httpRequest.responseText, errorCallback);
+				if (errorCallback != null) {
+					MiniApplet.clienteFirma.errorResponseFunction(null, httpRequest.responseText, errorCallback);
+				}
 			};
 			
 			this.getStoredFileFromServlet = function (idDocument, servletAddress, cipherKey, successCallback, errorCallback) {
