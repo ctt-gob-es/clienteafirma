@@ -267,7 +267,7 @@ public final class ProtocolInvocationUriParser {
 				}
 				catch (final Exception e) {
 					throw new ParameterException(
-						"Se ha indicado una URL para descargar los datos, pero la descraga no se ha podido realizar: " + e //$NON-NLS-1$
+						"Se ha indicado una URL para descargar los datos, pero la descarga no se ha podido realizar: " + e //$NON-NLS-1$
 					);
 				}
 			}
@@ -279,7 +279,7 @@ public final class ProtocolInvocationUriParser {
 				}
 				catch (final Exception e) {
 					throw new ParameterException(
-						"Se ha indicado un FTP para descargar los datos, pero la descraga no se ha podido realizar: " + e //$NON-NLS-1$
+						"Se ha indicado un FTP para descargar los datos, pero la descarga no se ha podido realizar: " + e //$NON-NLS-1$
 					);
 				}
 			}
