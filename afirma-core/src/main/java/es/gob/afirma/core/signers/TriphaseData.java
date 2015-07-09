@@ -17,85 +17,69 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-/**
- * Mensaje con la informaci&oacute;n requerida para la ejecuci&oacute;n de una operaci&oacute;n trif&aacute;sica.
- */
-public class TriphaseData {
+/** Mensaje con la informaci&oacute;n requerida para la ejecuci&oacute;n de una
+ * operaci&oacute;n trif&aacute;sica. */
+public final class TriphaseData {
 
 	private final String format;
 	private final String operation;
 	private final List<Map<String, String>> signs;
 
-	/**
-	 * Construye el mensaje especificando formato y operaci&oacute;n (firma, cofirma o contrafirma).
+	/** Construye el mensaje especificando formato y operaci&oacute;n (firma, cofirma o contrafirma).
 	 * @param format Formato de firma avanzada.
-	 * @param operation Operaci&oacute;n criptogr&aacute;fica (firma, cofirma o contrafirma)
-	 */
+	 * @param operation Operaci&oacute;n criptogr&aacute;fica (firma, cofirma o contrafirma). */
 	public TriphaseData(final String format, final String operation) {
 		this.format = format;
 		this.operation = operation;
 		this.signs = new ArrayList<Map<String,String>>();
 	}
 
-	/**
-	 * Construye el mensaje especificando la configuraci&oacute;n completa.
+	/** Construye el mensaje especificando la configuraci&oacute;n completa.
 	 * @param format Formato de firma avanzada.
 	 * @param operation Operaci&oacute;n criptogr&aacute;fica (firma, cofirma o contrafirma)
-	 * @param signs Configuraci&oacute;n espec&iacute;fica
-	 */
+	 * @param signs Configuraci&oacute;n espec&iacute;fica. */
 	private TriphaseData(final String format, final String operation, final List<Map<String,String>> signs) {
 		this.format = format;
 		this.operation = operation;
 		this.signs = signs;
 	}
 
-	/**
-	 * Agrega la configuracion para una nueva operaci&oacute;n trif&aacute;sica.
-	 * @param config Configuraci&oacute;n de la operaci&oacute;n trif&aacute;sica.
-	 */
+	/** Agrega la configuracion para una nueva operaci&oacute;n trif&aacute;sica.
+	 * @param config Configuraci&oacute;n de la operaci&oacute;n trif&aacute;sica. */
 	public void addSignOperation(final Map<String, String> config) {
 		this.signs.add(config);
 	}
 
-	/**
-	 * Recupera el formato de firma.
-	 * @return Nombre del formato de firma.
-	 */
+	/** Recupera el formato de firma.
+	 * @return Nombre del formato de firma. */
 	public String getFormat() {
 		return this.format;
 	}
 
-	/**
-	 * Recupera la operaci&oacute;n criptogr&aacute;fica que se debe realizar.
-	 * @return Identificador de la operaci&oacute;n criptogr&aacute;fica.
-	 */
+	/** Recupera la operaci&oacute;n criptogr&aacute;fica que se debe realizar.
+	 * @return Identificador de la operaci&oacute;n criptogr&aacute;fica. */
 	public String getOperation() {
 		return this.operation;
 	}
 
-	/**
-	 *Recupera los datos de una operacion de firma.
+	/** Recupera los datos de una operaci&oacute;n de firma.
 	 * @param idx Posici&oacute;n de los datos de firma a recuperar.
-	 * @return Datos de firma.
-	 */
+	 * @return Datos de firma. */
 	public Map<String, String> getSign(final int idx) {
 		// Devolvemos la referencia real porque queremos permitir que se modifique
 		return this.signs.get(idx);
 	}
 
-	/**
-	 * Indica el n&uacute;mero de operaciones de firma que hay registradas.
-	 * @return N&uacute;mero de firmas.
-	 */
+	/** Indica el n&uacute;mero de operaciones de firma que hay registradas.
+	 * @return N&uacute;mero de firmas. */
 	public int getSignsCount() {
 		return this.signs.size();
 	}
 
-	/** Obtiene un mensaje de firma trif&aacute;sica a partir de un XML que lo describe.
+	/** Obtiene una sesi&oacute;n de firma trif&aacute;sica a partir de un XML que lo describe.
 	 * @param xml Texto XML con la informaci&oacute;n del mensaje.
 	 * @return Mensaje de datos.
-	 * @throws IOException Cuando hay problemas en el tratamiento de datos.
-	 */
+	 * @throws IOException Cuando hay problemas en el tratamiento de datos. */
 	public static TriphaseData parser(final byte[] xml) throws IOException {
 
 		if (xml == null) {
@@ -136,11 +120,9 @@ public class TriphaseData {
 		return new TriphaseData(format, operation, signsNodes);
 	}
 
-	/**
-	 * Parsea el nodo con el listado de firmas.
+	/** Analiza el nodo con el listado de firmas.
 	 * @param signsNode Nodo con el listado de firmas.
-	 * @return Listado con la informaci&oacute;n de cada operaci&oacute;n de firma.
-	 */
+	 * @return Listado con la informaci&oacute;n de cada operaci&oacute;n de firma. */
 	private static List<Map<String, String>> parseSignsNode(final Node signsNode) {
 
 		final NodeList childNodes = signsNode.getChildNodes();
@@ -156,11 +138,9 @@ public class TriphaseData {
 		return signs;
 	}
 
-	/**
-	 * Obtiene una lista de par&aacute;metros del XML.
+	/** Obtiene una lista de par&aacute;metros del XML.
 	 * @param paramsNode Nodo con la lista de par&aacute;metros.
-	 * @return Mapa con los par&aacute;metro encontrados y sus valores.
-	 */
+	 * @return Mapa con los par&aacute;metro encontrados y sus valores. */
 	private static Map<String, String> parseParamsListNode(final Node paramsNode) {
 
 		final NodeList childNodes = paramsNode.getChildNodes();
@@ -198,28 +178,26 @@ public class TriphaseData {
 		return -1;
 	}
 
-	/**
-	 * Genera un XML con la descripci&oacute;n del mensaje trif&aacute;sico.
-	 * @return Texto XML con la descripci&oacute;n.
-	 */
+	/** Genera un XML con la descripci&oacute;n del mensaje trif&aacute;sico.
+	 * @return Texto XML con la descripci&oacute;n. */
 	@Override
 	public String toString() {
 
 		final StringBuilder builder = new StringBuilder();
-		builder.append("<xml frmt=\"").append(this.format).append("\" op=\"").append(this.operation).append("\">"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		builder.append("<firmas>"); //$NON-NLS-1$
+		builder.append("<xml frmt=\"").append(this.format).append("\" op=\"").append(this.operation).append("\">\n"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		builder.append(" <firmas>\n"); //$NON-NLS-1$
 		final Iterator<Map<String, String>> firmasIt = this.signs.iterator();
 		while (firmasIt.hasNext()) {
-			builder.append("<firma>"); //$NON-NLS-1$
+			builder.append("  <firma>\n"); //$NON-NLS-1$
 			final Map<String, String> signConfig = firmasIt.next();
 			final Iterator<String> firmaIt = signConfig.keySet().iterator();
 			while (firmaIt.hasNext()) {
 				final String p = firmaIt.next();
-				builder.append("<param n=\"").append(p).append("\">").append(signConfig.get(p)).append("</param>"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				builder.append("   <param n=\"").append(p).append("\">").append(signConfig.get(p)).append("</param>\n"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			}
-			builder.append("</firma>"); //$NON-NLS-1$
+			builder.append("  </firma>\n"); //$NON-NLS-1$
 		}
-		builder.append("</firmas>"); //$NON-NLS-1$
+		builder.append(" </firmas>\n"); //$NON-NLS-1$
 		builder.append("</xml>"); //$NON-NLS-1$
 		return builder.toString();
 	}
