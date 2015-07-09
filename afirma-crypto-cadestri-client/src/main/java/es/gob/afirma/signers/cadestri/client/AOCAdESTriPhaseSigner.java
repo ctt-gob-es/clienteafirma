@@ -166,12 +166,11 @@ public final class AOCAdESTriPhaseSigner implements AOSigner {
 	 * @return Resultado de la operaci&oacute;n de firma.
 	 * @throws AOException Cuando se produce un error durante la operaci&oacute;n. */
 	private static byte[] triPhaseOperation(final String cryptoOperation,
-			final byte[] docId,
-			final String algorithm,
-			final PrivateKey key,
-			final Certificate[] certChain,
-			final Properties extraParams) throws AOException {
-
+			                                final byte[] docId,
+			                                final String algorithm,
+			                                final PrivateKey key,
+			                                final Certificate[] certChain,
+			                                final Properties extraParams) throws AOException {
 		if (extraParams == null) {
 			throw new IllegalArgumentException("Se necesitan parametros adicionales"); //$NON-NLS-1$
 		}
@@ -206,7 +205,15 @@ public final class AOCAdESTriPhaseSigner implements AOSigner {
 		// Empezamos la prefirma
 		final byte[] preSignResult;
 		try {
-			preSignResult = PreSigner.preSign(algorithm, certChain, cryptoOperation, documentId, urlManager, signServerUrl, extraParams);
+			preSignResult = PreSigner.preSign(
+				algorithm,
+				certChain,
+				cryptoOperation,
+				documentId,
+				urlManager,
+				signServerUrl,
+				extraParams
+			);
 		}
 		catch (final CertificateEncodingException e) {
 			throw new AOException("Error decodificando el certificado del firmante: " + e, e); //$NON-NLS-1$
@@ -236,17 +243,18 @@ public final class AOCAdESTriPhaseSigner implements AOSigner {
 			for (int i = 0; i < triphaseData.getSignsCount(); i++) {
 				final Map<String, String> signConfig = triphaseData.getSign(i);
 				final byte[] pkcs1sign = new AOPkcs1Signer().sign(
-						Base64.decode(signConfig.get(PROPERTY_NAME_PRESIGN)),
-						algorithm,
-						key,
-						certChain,
-						null // No hay parametros en PKCS#1
-						);
+					Base64.decode(signConfig.get(PROPERTY_NAME_PRESIGN)),
+					algorithm,
+					key,
+					certChain,
+					null // No hay parametros en PKCS#1
+				);
 				signConfig.put(PROPERTY_NAME_PKCS1_SIGN, Base64.encode(pkcs1sign));
 			}
-		} catch (final IOException e) {
+		}
+		catch (final Exception e) {
 			LOGGER.severe("Ocurrio un error en la decodificacion de una prefirma: " + e); //$NON-NLS-1$
-			throw new AOException("Ocurrio un error en la decodificacion de una prefirma", e); //$NON-NLS-1$
+			throw new AOException("Ocurrio un error en la decodificacion de una prefirma: " + e, e); //$NON-NLS-1$
 		}
 
 		final String preResultAsBase64 = Base64.encode(triphaseData.toString().getBytes(), true);
@@ -258,16 +266,16 @@ public final class AOCAdESTriPhaseSigner implements AOSigner {
 		final byte[] triSignFinalResult;
 		try {
 			triSignFinalResult = PostSigner.postSign(
-					algorithm,
-					certChain,
-					cryptoOperation,
-					documentId,
-					extraParams,
-					true,	// Aqui los datos son la identificador de documento original
-					urlManager,
-					signServerUrl,
-					preResultAsBase64
-					);
+				algorithm,
+				certChain,
+				cryptoOperation,
+				documentId,
+				extraParams,
+				true,	// Aqui los datos son el identificador de documento original
+				urlManager,
+				signServerUrl,
+				preResultAsBase64
+			);
 		}
 		catch (final CertificateEncodingException e1) {
 			throw new AOException(
