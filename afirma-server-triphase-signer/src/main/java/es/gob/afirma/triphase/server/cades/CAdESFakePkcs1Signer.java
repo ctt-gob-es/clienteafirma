@@ -72,6 +72,7 @@ public final class CAdESFakePkcs1Signer implements AOSimpleSigner {
 			           final PrivateKey key,
 			           final Certificate[] certChain,
 			           final Properties extraParams) throws AOException {
+
 		// La clave debe ser nula porque este proceso se realiza en servidor, pero el tamano de la clave
 		// puede salir del Certificado
 
@@ -89,8 +90,12 @@ public final class CAdESFakePkcs1Signer implements AOSimpleSigner {
 			sha512 = MessageDigest.getInstance(MD_ALGORITHM).digest(data);
 		}
 		catch (final Exception e) {
-			throw new AOException("Ocurrio un error al generar el PKCS#1 temporal de los datos", e); //$NON-NLS-1$
+			throw new AOException(
+				"Ocurrio un error al generar el PKCS#1 temporal de los datos: " + e, e //$NON-NLS-1$
+			);
 		}
+
+		// Metemos una huella SHA512 que se repite hasta completar el hueco
 		final byte[] dummyData = new byte[p1Size.intValue()];
 		for (int i = 0; i < dummyData.length; i += sha512.length) {
 			System.arraycopy(sha512, 0, dummyData, i, sha512.length);
@@ -103,6 +108,8 @@ public final class CAdESFakePkcs1Signer implements AOSimpleSigner {
 			signConfig.put(PARAM_DUMMY_PK1, Base64.encode(dummyData));
 			this.triphaseData.addSignOperation(signConfig);
 		}
+
+		// Devolvemos el dato unico que luego sera reemplazado por la firma adecuada
 		return dummyData;
 	}
 }
