@@ -188,7 +188,7 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
 
         }
         catch (final Exception e) {
-            throw new AOException("Error generando la Contrafirma CAdES", e); //$NON-NLS-1$
+            throw new AOException("Error generando la Contrafirma CAdES: " + e, e); //$NON-NLS-1$
         }
 
     }
