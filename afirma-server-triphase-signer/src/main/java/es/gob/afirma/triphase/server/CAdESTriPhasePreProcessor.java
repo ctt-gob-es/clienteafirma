@@ -45,13 +45,13 @@ final class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 	/** Prefijo para cada prefirma. */
 	private static final String PROPERTY_NAME_PRESIGN = "PRE"; //$NON-NLS-1$
 
-	/** Firma PKCS#1. */
+	/** Etiqueta de firma PKCS#1 en el XML de sesi&oacute;n trif&aacute;sica. */
 	private static final String PROPERTY_NAME_PKCS1_SIGN = "PK1"; //$NON-NLS-1$
 
-	/** Firma PKCS#1 temporal. */
+	/** Etiqueta de firma PKCS#1 temporal en el XML de sesi&oacute;n trif&aacute;sica. */
 	private static final String PROPERTY_NAME_DUMMY_PK1 = "DPK1"; //$NON-NLS-1$
 
-	/** Fecha de firma. */
+	/** Etiqueta de fecha de firma en el XML de sesi&oacute;n trif&aacute;sica. */
 	private static final String PARAM_DATE = "DATE"; //$NON-NLS-1$
 
 	/** Manejador de log. */
@@ -415,13 +415,11 @@ final class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 		return newSign;
 	}
 
-	/**
-	 * Reemplaza un subarray por otro del mismo tama&ntilde;o dentro un un array contenedor.
+	/** Reemplaza un subarray por otro del mismo tama&ntilde;o dentro un un array contenedor.
 	 * @param source Array contenedor en el que se realiza la b&uacute;squeda.
 	 * @param search SubArray que hay que sustituir.
 	 * @param replace SubArray por el que se sustituye.
-	 * @return Array contenedor con el reemplazo hecho.
-	 */
+	 * @return Array contenedor con el reemplazo hecho.	 */
 	private static byte[] searchAndReplace(final byte[] source, final byte[] search, final byte[] replace) {
 		if (search.length != replace.length) {
 			return source;
@@ -431,23 +429,17 @@ final class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 			throw new IllegalArgumentException("No se ha encontrado la cadena a sustituir"); //$NON-NLS-1$
 		}
 		final byte[] result = Arrays.copyOf(source, source.length);
-
-
-
 		for (final byte element : replace) {
 			result[p] = element;
 			p++;
 		}
-
 		return result;
 	}
 
-	/**
-	 * Busca un subarray dentro de otro array.
+	/** Busca un subarray dentro de otro array.
 	 * @param array Array sobre el que se realiza la b&uacute;squeda.
 	 * @param subArray SubArray que buscamos.
-	 * @return Posici&oacute;n en la que se encuentra por primera vez o -1 si no se encuentra.
-	 */
+	 * @return Posici&oacute;n en la que se encuentra por primera vez o -1 si no se encuentra. */
 	private static int searchFor(final byte[] array, final byte[] subArray) {
 		if (subArray.length > array.length) {
 			return -1;
