@@ -31,6 +31,8 @@ public final class AOCAdESTriPhaseCounterSigner {
 	}
 
 	/** Realiza la pre-contrafirma trif&aacute;sica.
+	 * B&aacute;sicamente, se realiza una contrafirma completa usando un firmador PKCS#1 <i>falso</i>,
+	 * que almacena los octetos a firmar e introduce en vez de las firmas,
      * @param sign Flujo de lectura de los datos a firmar.
      * @param algorithm Algoritmo a usar para la firma (SHA1withRSA, SHA512withRSA, etc.).
      * @param targetType Tipo de objetivo de la contrafirma.
@@ -55,11 +57,14 @@ public final class AOCAdESTriPhaseCounterSigner {
 					AOSignConstants.MASSIVE_OPERATION_COUNTERSIGN_TREE;
 
 		final TriphaseData triphaseData = new TriphaseData(
-				AOSignConstants.SIGN_FORMAT_CADES, operation);
+			AOSignConstants.SIGN_FORMAT_CADES,
+			operation
+		);
 
-
-		//final CAdESPreSignResult cpcs = new CAdESPreSignResult();
-		final AOCAdESCounterSigner countersigner = new AOCAdESCounterSigner(new CAdESFakePkcs1Signer(triphaseData, true), date);
+		final AOCAdESCounterSigner countersigner = new AOCAdESCounterSigner(
+			new CAdESFakePkcs1Signer(triphaseData, true),
+			date
+		);
 
 		// No queremos la contrafirma sino los PKCS#1 generados y almacenados internamente en
 		// la siguiente operacion
