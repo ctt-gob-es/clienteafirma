@@ -20,6 +20,25 @@ public final class AOCAdESASiCSSigner implements AOSigner {
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
+    /** Firma datos en formato CAdES devolviendo el resultado empaquetado como ASiC-S.
+     * @param data Datos que deseamos firmar.
+     * @param algorithm Algoritmo a usar para la firma.
+     * <p>Se aceptan los siguientes algoritmos en el par&aacute;metro <code>algorithm</code>:</p>
+     * <ul>
+     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA1withRSA</i></li>
+     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA256withRSA</i></li>
+     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA384withRSA</i></li>
+     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA512withRSA</i></li>
+     * </ul>
+     * @param key Clave privada a usar para firmar.
+     * @param certChain Cadena de certificados del firmante.
+     * @param xParams Par&aacute;metros adicionales para la firma (<a href="doc-files/extraparams-asic-s.html">detalle</a>).<br>
+     *                Adicionalmente, se pueden usar tambi&eacute;n los <a href="doc-files/extraparams.html">par&aacute;metros
+     *                definidos para las firmas CAdES normales</a> menos el par&aacute;metro <code>mode</code>, que aunque se
+     *                estableca no tendr&aacute; ning&uacute;n efecto, ya que un contenedor ASiC contendra siempre, y de forma
+     *                separada, datos y firma.
+     * @return Firma en formato CAdES
+     * @throws AOException Cuando ocurre cualquier problema durante el proceso */
 	@Override
 	public byte[] sign(final byte[] data,
 			           final String algorithm,
@@ -27,8 +46,12 @@ public final class AOCAdESASiCSSigner implements AOSigner {
 			           final Certificate[] certChain,
 			           final Properties xParams) throws AOException,
 			                                            IOException {
+
 		final Properties extraParams = xParams != null ? xParams : new Properties();
+
+		extraParams.put("mode", "explicit"); //$NON-NLS-1$ //$NON-NLS-2$
 		final byte[] signature = new AOCAdESSigner().sign(data, algorithm, key, certChain, extraParams);
+
 		return ASiCUtil.createSContainer(
 			signature,
 			data,
