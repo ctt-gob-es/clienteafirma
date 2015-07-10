@@ -9,6 +9,12 @@
  <body>
  <p>Valores aceptados como par&aacute;metros adicionales para las firmas CAdES:</p>
  <dl>
+    <dt><b><i>asicsFilename</i></b></dt>
+    <dd>
+     En las firmas simples CAdES ASiC-S, determina el nombre del fichero de datos dentro del contenedor.<br>
+     Si no se estabkece este par&aacute;metro se usa el nombre <i>dataobject</i> con la extensi&oacute;n correspondiente
+     al tipo de datos, o <i>.bin</i> si esta primera no puede determinarse de forma autom&aacute;tica.
+    </dd>
     <dt><b><i>contentTypeOid</i></b> (propiedad compartida con XAdES, no aplica a contrafirmas)</dt>
 	<dd>
 	 OID que identifica el tipo de datos a firmar.
