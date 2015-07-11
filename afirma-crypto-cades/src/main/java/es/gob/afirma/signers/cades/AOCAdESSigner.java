@@ -245,35 +245,43 @@ public final class AOCAdESSigner implements AOSigner {
      *  <li>&nbsp;&nbsp;&nbsp;<i>SHA384withRSA</i></li>
      *  <li>&nbsp;&nbsp;&nbsp;<i>SHA512withRSA</i></li>
      * </ul>
-     * @param key Clave privada a usar para firmar
-     * @param extraParams Par&aacute;metros adicionales para la firma (<a href="doc-files/extraparams.html">detalle</a>)
-     * @return Firma CAdES
-     * @throws AOException Cuando ocurre cualquier problema durante el proceso */
+     * @param key Clave privada a usar para firmar.
+     * @param extraParams Par&aacute;metros adicionales para la firma (<a href="doc-files/extraparams.html">detalle</a>).
+     * @return Firma CAdES.
+     * @throws AOException Cuando ocurre cualquier problema durante el proceso.
+     * @throws IOException Si hay problemas en el tratamiento de datos. */
     @Override
 	public byte[] cosign(final byte[] data,
                          final byte[] sign,
                          final String algorithm,
                          final PrivateKey key,
                          final java.security.cert.Certificate[] certChain,
-                         final Properties extraParams) throws AOException {
+                         final Properties extraParams) throws AOException, IOException {
 
     	checkAlgorithm(algorithm);
 
     	new BCChecker().checkBouncyCastle();
 
         try {
-            return ((AOCoSigner)Class.forName("es.gob.afirma.signers.multi.cades.AOCAdESCoSigner").newInstance()).cosign( //$NON-NLS-1$
-        		data,
-        		sign,
-        		algorithm,
-        		key,
-        		certChain,
-        		extraParams
-    		);
-        }
-        catch(final Exception e) {
-            throw new AOException("Error general en la cofirma: " + e, e); //$NON-NLS-1$
-        }
+			return ((AOCoSigner)Class.forName("es.gob.afirma.signers.multi.cades.AOCAdESCoSigner").newInstance()).cosign( //$NON-NLS-1$
+				data,
+				sign,
+				algorithm,
+				key,
+				certChain,
+				extraParams
+			);
+		}
+        catch (final InstantiationException e) {
+        	throw new AOException("No se ha podido instanciar la clase de cofirmas CAdES: " + e, e); //$NON-NLS-1$
+		}
+        catch (final IllegalAccessException e) {
+        	throw new AOException("No se ha podido instanciar la clase de cofirmas CAdES: " + e, e); //$NON-NLS-1$
+		}
+        catch (final ClassNotFoundException e) {
+        	throw new AOException("No se ha encontrado la clase de cofirmas CAdES: " + e, e); //$NON-NLS-1$
+		}
+
     }
 
     /** Cofirma una firma CAdES o CMS existente en formato CAdES. Para realizar la

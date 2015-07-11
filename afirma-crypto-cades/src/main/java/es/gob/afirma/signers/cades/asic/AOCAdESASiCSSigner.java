@@ -8,6 +8,7 @@ import java.util.logging.Logger;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOInvalidFormatException;
+import es.gob.afirma.core.signers.AOCoSigner;
 import es.gob.afirma.core.signers.AOSignInfo;
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.CounterSignTarget;
@@ -37,8 +38,9 @@ public final class AOCAdESASiCSSigner implements AOSigner {
      *                definidos para las firmas CAdES normales</a> menos el par&aacute;metro <code>mode</code>, que aunque se
      *                estableca no tendr&aacute; ning&uacute;n efecto, ya que un contenedor ASiC contendra siempre, y de forma
      *                separada, datos y firma.
-     * @return Firma en formato CAdES
-     * @throws AOException Cuando ocurre cualquier problema durante el proceso */
+     * @return Firma en formato CAdES.
+     * @throws AOException Cuando ocurre cualquier problema durante el proceso.
+     * @throws IOException Si hay problemas en el tratamiento de datos. */
 	@Override
 	public byte[] sign(final byte[] data,
 			           final String algorithm,
@@ -55,6 +57,7 @@ public final class AOCAdESASiCSSigner implements AOSigner {
 		return ASiCUtil.createSContainer(
 			signature,
 			data,
+			ASiCUtil.ENTRY_NAME_BINARY_SIGNATURE,
 			extraParams.getProperty("asicsFilename") //$NON-NLS-1$
 		);
 	}
@@ -102,23 +105,116 @@ public final class AOCAdESASiCSSigner implements AOSigner {
 		return new AOCAdESASiCSSigner().getSignInfo(ASiCUtil.getASiCSSignature(signData));
 	}
 
+    /** Cofirma en formato CAdES los datos encontrador en un contenedor ASiC-S que ya tuviese una firma CAdES o CMS,
+     * a&ntilde;adiendo esta nueva firma a la del contenedor (se sustituye la antigua por la el nuevo fichero con todas las firmas).
+     * No se pueden cofirmar con esta clase contenedores ASiC-S que ya contengan firmas XML.
+     * <p>
+     *  Nota sobre cofirmas cruzadas entre PKCS#7/CMS y CAdES:<br>
+     *  Las cofirmas de un documento dan como resultado varias firmas a un mismo nivel sobre este mismo documento,
+     *  es decir, que ninguna firma envuelve a la otra ni una prevalece sobre la otra.
+     *  A nivel de formato interno, esto quiere decir que cuando cofirmamos un documento ya firmado previamente,
+     *  esta firma previa no se modifica. Si tenemos en cuenta que CAdES es en realidad un subconjunto de CMS, el
+     *  resultado de una cofirma CAdES sobre un documento firmado previamente con CMS (o viceversa), son dos firmas
+     *  independientes, una en CAdES y otra en CMS.<br>
+     *  Dado que todas las firmas CAdES son CMS pero no todas las firmas CMS son CAdES, el resultado global de la firma
+     *  se adec&uacute;a al est&aacute;ndar mas amplio, CMS en este caso.
+     *  Otro efecto de compatibilidad de formatos de las cofirmas con varios formatos en un unico documento es la ruptura
+     *  de la compatibilidad con PKCS#7, ya que, aunque las firmas generadas por el cliente mediante CMS son compatibles
+     *  con PKCS#7, las generadas con CAdES no lo son, por lo que, en el momento que se introduzca una estructura CAdES,
+     *  se pierde la compatibilidad PKCS#7 en el global de la firma.
+     * </p>
+     * <p><b>IMPORTANTE: Este m&eacute;todo requiere la presencia de <code>es.gob.afirma.signers.multi.cades.asic.AOCAdESASiCSCoSigner</code> en el CLASSPATH</b></p>
+     * @param data Se ignora este par&aacute;metro, los datos se cojen del contenedor ASiC-S.
+     * @param sign Contenedor ASiC-S (con un fichero de firmas CAdES o CMS).
+     * @param algorithm Algoritmo a usar para la firma.
+     * <p>Se aceptan los siguientes algoritmos en el par&aacute;metro <code>algorithm</code>:</p>
+     * <ul>
+     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA1withRSA</i></li>
+     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA256withRSA</i></li>
+     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA384withRSA</i></li>
+     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA512withRSA</i></li>
+     * </ul>
+     * @param key Clave privada a usar para firmar
+     * @param extraParams Par&aacute;metros adicionales para la firma (<a href="doc-files/extraparams-asic-s.html">detalle</a>).<br>
+     *                    Adicionalmente, se pueden usar tambi&eacute;n los <a href="doc-files/extraparams.html">par&aacute;metros
+     *                    definidos para las firmas CAdES normales</a> menos el par&aacute;metro <code>mode</code>, que aunque se
+     *                    estableca no tendr&aacute; ning&uacute;n efecto, ya que un contenedor ASiC contendra siempre, y de forma
+     *                    separada, datos y firma.
+     * @return Contenedor ASiC-S con su fichero de firmas conteniendo la nueva firma.
+     * @throws AOException Cuando ocurre cualquier problema durante el proceso.
+     * @throws IOException Si hay problemas en el tratamiento de datos. */
 	@Override
 	public byte[] cosign(final byte[] data,
 			             final byte[] sign,
 			             final String algorithm,
 			             final PrivateKey key,
 			             final Certificate[] certChain,
-			             final Properties extraParams) {
-		throw new UnsupportedOperationException("ASiC-S no soporta cofirmas"); //$NON-NLS-1$
+			             final Properties extraParams) throws AOException, IOException {
+        try {
+			return ((AOCoSigner)Class.forName("es.gob.afirma.signers.multi.cades.asic.AOCAdESASiCSCoSigner").newInstance()).cosign( //$NON-NLS-1$
+				data,
+				sign,
+				algorithm,
+				key,
+				certChain,
+				extraParams
+			);
+		}
+        catch (final InstantiationException e) {
+        	throw new AOException("No se ha podido instanciar la clase de cofirmas CAdES: " + e, e); //$NON-NLS-1$
+		}
+        catch (final IllegalAccessException e) {
+        	throw new AOException("No se ha podido instanciar la clase de cofirmas CAdES: " + e, e); //$NON-NLS-1$
+		}
+        catch (final ClassNotFoundException e) {
+        	throw new AOException("No se ha encontrado la clase de cofirmas CAdES: " + e, e); //$NON-NLS-1$
+		}
 	}
 
+    /** Cofirma en formato CAdES los datos encontrador en un contenedor ASiC-S que ya tuviese una firma CAdES o CMS,
+     * a&ntilde;adiendo esta nueva firma a la del contenedor (se sustituye la antigua por la el nuevo fichero con todas las firmas).
+     * No se pueden cofirmar con esta clase contenedores ASiC-S que ya contengan firmas XML.
+     * <p>
+     *  Nota sobre cofirmas cruzadas entre PKCS#7/CMS y CAdES:<br>
+     *  Las cofirmas de un documento dan como resultado varias firmas a un mismo nivel sobre este mismo documento,
+     *  es decir, que ninguna firma envuelve a la otra ni una prevalece sobre la otra.
+     *  A nivel de formato interno, esto quiere decir que cuando cofirmamos un documento ya firmado previamente,
+     *  esta firma previa no se modifica. Si tenemos en cuenta que CAdES es en realidad un subconjunto de CMS, el
+     *  resultado de una cofirma CAdES sobre un documento firmado previamente con CMS (o viceversa), son dos firmas
+     *  independientes, una en CAdES y otra en CMS.<br>
+     *  Dado que todas las firmas CAdES son CMS pero no todas las firmas CMS son CAdES, el resultado global de la firma
+     *  se adec&uacute;a al est&aacute;ndar mas amplio, CMS en este caso.
+     *  Otro efecto de compatibilidad de formatos de las cofirmas con varios formatos en un unico documento es la ruptura
+     *  de la compatibilidad con PKCS#7, ya que, aunque las firmas generadas por el cliente mediante CMS son compatibles
+     *  con PKCS#7, las generadas con CAdES no lo son, por lo que, en el momento que se introduzca una estructura CAdES,
+     *  se pierde la compatibilidad PKCS#7 en el global de la firma.
+     * </p>
+     * <p><b>IMPORTANTE: Este m&eacute;todo requiere la presencia de <code>es.gob.afirma.signers.multi.cades.asic.AOCAdESASiCSCoSigner</code> en el CLASSPATH</b></p>
+     * @param sign Contenedor ASiC-S (con un fichero de firmas CAdES o CMS).
+     * @param algorithm Algoritmo a usar para la firma.
+     * <p>Se aceptan los siguientes algoritmos en el par&aacute;metro <code>algorithm</code>:</p>
+     * <ul>
+     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA1withRSA</i></li>
+     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA256withRSA</i></li>
+     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA384withRSA</i></li>
+     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA512withRSA</i></li>
+     * </ul>
+     * @param key Clave privada a usar para firmar
+     * @param extraParams Par&aacute;metros adicionales para la firma (<a href="doc-files/extraparams-asic-s.html">detalle</a>).<br>
+     *                    Adicionalmente, se pueden usar tambi&eacute;n los <a href="doc-files/extraparams.html">par&aacute;metros
+     *                    definidos para las firmas CAdES normales</a> menos el par&aacute;metro <code>mode</code>, que aunque se
+     *                    estableca no tendr&aacute; ning&uacute;n efecto, ya que un contenedor ASiC contendra siempre, y de forma
+     *                    separada, datos y firma.
+     * @return Contenedor ASiC-S con su fichero de firmas conteniendo la nueva firma.
+     * @throws AOException Cuando ocurre cualquier problema durante el proceso.
+     * @throws IOException Si hay problemas en el tratamiento de datos. */
 	@Override
 	public byte[] cosign(final byte[] sign,
 			             final String algorithm,
 			             final PrivateKey key,
 			             final Certificate[] certChain,
-			             final Properties extraParams) {
-		throw new UnsupportedOperationException("ASiC-S no soporta cofirmas"); //$NON-NLS-1$
+			             final Properties extraParams) throws AOException, IOException {
+		return cosign(null, sign, algorithm, key, certChain, extraParams);
 	}
 
 	@Override

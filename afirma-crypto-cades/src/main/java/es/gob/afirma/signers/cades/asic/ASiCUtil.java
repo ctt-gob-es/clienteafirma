@@ -10,21 +10,37 @@ import java.util.zip.ZipOutputStream;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.MimeHelper;
 
-final class ASiCUtil {
+/** Utilidades para firmas ASiC.
+ * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
+public final class ASiCUtil {
 
 	private static final String ASIC_S_MIMETYPE = "application/vnd.etsi.asic-s+zip"; //$NON-NLS-1$
 
 	private static final String DEFAULT_DATAOBJECT_EXTENSION = "bin"; //$NON-NLS-1$
-	private static final String ENTRY_NAME_SIGNATURE = "META-INF/signature.p7s"; //$NON-NLS-1$
+
+	/** Nombre por defecto del fichero de firmas binarias. */
+	public static final String ENTRY_NAME_BINARY_SIGNATURE = "META-INF/signature.p7s"; //$NON-NLS-1$
+
+	/** Nombre por defecto del fichero de firmas XML. */
+	public static final String ENTRY_NAME_XML_SIGNATURE = "META-INF/signatures.xml"; //$NON-NLS-1$
+
 	private static final String ENTRY_NAME_MIMETYPE = "mimetype"; //$NON-NLS-1$
 
 	private ASiCUtil() {
 		// No instanciable
 	}
 
-	static byte[] createSContainer(final byte[] signature,
-			                       final byte[] data,
-			                       final String dataFilename) throws IOException {
+	/** Crea un contenedor ASiC-S.
+	 * @param signature Objeto de firmas
+	 * @param data Objeto de datos
+	 * @param signatureFilename Nombre del objeto de firmas (debe contener la ruta, por ejemplo <code>"META-INF/signature.p7s"</code>).
+	 * @param dataFilename Nombre Nombre del objeto de datos (no debe contener ninguna ruta).
+	 * @return Contenedor ASiC-S.
+	 * @throws IOException Si hay errores en el tratamiento de datos. */
+	public static byte[] createSContainer(final byte[] signature,
+			                              final byte[] data,
+			                              final String signatureFilename,
+			                              final String dataFilename) throws IOException {
 
 		if (signature == null || signature.length < 1) {
 			throw new IllegalArgumentException(
@@ -63,7 +79,7 @@ final class ASiCUtil {
 		zos.write(data);
 
 		// La firma
-		ze = new ZipEntry(ENTRY_NAME_SIGNATURE);
+		ze = new ZipEntry(signatureFilename != null ? signatureFilename : ENTRY_NAME_BINARY_SIGNATURE);
 		zos.putNextEntry(ze);
 		zos.write(data);
 
@@ -72,7 +88,11 @@ final class ASiCUtil {
 		return baos.toByteArray();
 	}
 
-	static byte[] getASiCSSignature(final byte[] asic) throws IOException {
+	/** Obtiene la firma de un contenedor ASiC-S.
+	 * @param asic Contendor ASiC-S.
+	 * @return Firma de un contenedor ASiC-S.
+	 * @throws IOException Si hay alg&uacute;n error en el tratamiento de datos. */
+	public static byte[] getASiCSSignature(final byte[] asic) throws IOException {
 		if (asic == null || asic.length < 1) {
 			throw new IllegalArgumentException(
 				"La firma ASiC proporcionada no puede ser nula ni vacia" //$NON-NLS-1$
@@ -81,7 +101,7 @@ final class ASiCUtil {
 		final ZipInputStream zis = new ZipInputStream(new ByteArrayInputStream(asic));
 		ZipEntry entry;
 		while((entry = zis.getNextEntry()) != null) {
-			if (ENTRY_NAME_SIGNATURE.equals(entry.getName())) {
+			if (ENTRY_NAME_BINARY_SIGNATURE.equals(entry.getName()) || ENTRY_NAME_XML_SIGNATURE.equals(entry.getName())) {
 				final byte[] sig = AOUtil.getDataFromInputStream(zis);
 				zis.close();
 				return sig;
@@ -90,7 +110,11 @@ final class ASiCUtil {
 		throw new IOException("Los datos proporcionados no son una firma ASiC-S"); //$NON-NLS-1$
 	}
 
-	static byte[] getASiCSData(final byte[] asic) throws IOException {
+	/** Obtiene los datos de un contenedor ASiC-S.
+	 * @param asic Contendor ASiC-S.
+	 * @return Datos firmados de un contenedor ASiC-S.
+	 * @throws IOException Si hay alg&uacute;n error en el tratamiento de datos. */
+	public static byte[] getASiCSData(final byte[] asic) throws IOException {
 		if (asic == null || asic.length < 1) {
 			throw new IllegalArgumentException(
 				"La firma ASiC proporcionada no puede ser nula ni vacia" //$NON-NLS-1$
@@ -99,7 +123,10 @@ final class ASiCUtil {
 		final ZipInputStream zis = new ZipInputStream(new ByteArrayInputStream(asic));
 		ZipEntry entry;
 		while((entry = zis.getNextEntry()) != null) {
-			if (!ENTRY_NAME_SIGNATURE.equals(entry.getName()) && !ENTRY_NAME_MIMETYPE.equals(entry.getName())) {
+			if (!ENTRY_NAME_BINARY_SIGNATURE.equals(entry.getName()) &&
+				!ENTRY_NAME_XML_SIGNATURE.equals(entry.getName()) &&
+				!ENTRY_NAME_MIMETYPE.equals(entry.getName())
+			) {
 				final byte[] data = AOUtil.getDataFromInputStream(zis);
 				zis.close();
 				return data;
@@ -108,5 +135,27 @@ final class ASiCUtil {
 		throw new IOException("Los datos proporcionados no son una firma ASiC-S"); //$NON-NLS-1$
 	}
 
-
+	/** Obtiene el nombre del objeto de datos de un contenedor ASiC-S.
+	 * @param asic Contendor ASiC-S.
+	 * @return Nombre del objeto de datos de un contenedor ASiC-S.
+	 * @throws IOException Si hay alg&uacute;n error en el tratamiento de datos. */
+	public static String getASiCSDataFilename(final byte[] asic) throws IOException {
+		if (asic == null || asic.length < 1) {
+			throw new IllegalArgumentException(
+				"La firma ASiC proporcionada no puede ser nula ni vacia" //$NON-NLS-1$
+			);
+		}
+		final ZipInputStream zis = new ZipInputStream(new ByteArrayInputStream(asic));
+		ZipEntry entry;
+		while((entry = zis.getNextEntry()) != null) {
+			final String entryName = entry.getName();
+			if (!ENTRY_NAME_BINARY_SIGNATURE.equals(entryName) &&
+				!ENTRY_NAME_XML_SIGNATURE.equals(entryName) &&
+				!ENTRY_NAME_MIMETYPE.equals(entryName)
+			) {
+				return entryName;
+			}
+		}
+		throw new IOException("Los datos proporcionados no son una firma ASiC-S"); //$NON-NLS-1$
+	}
 }

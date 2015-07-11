@@ -15,7 +15,12 @@ public final class ASiCSTests {
 	@SuppressWarnings("static-method")
 	@Test
 	public void testContainerCreation() throws Exception {
-		final byte[] zipFile = ASiCUtil.createSContainer("FIRMA".getBytes(), "DATOS".getBytes(), null); //$NON-NLS-1$ //$NON-NLS-2$
+		final byte[] zipFile = ASiCUtil.createSContainer(
+			"FIRMA".getBytes(), //$NON-NLS-1$
+			"DATOS".getBytes(), //$NON-NLS-1$
+			null,
+			null
+		);
 
 		final OutputStream fos = new FileOutputStream(File.createTempFile("ASIC-", ".zip")); //$NON-NLS-1$ //$NON-NLS-2$
 		fos.write(zipFile);
