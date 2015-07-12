@@ -832,30 +832,17 @@ public final class XAdESSigner {
 					(uri == null ||
 			         uri.getScheme().equals("") || //$NON-NLS-1$
 			         uri.getScheme().equals("file"))) { //$NON-NLS-1$
-				DigestMethod dm = null;
+
+				final DigestMethod dm;
 				try {
-					// Convertimos el algo del Message Digest externo a la nomenclatura XML
-					if (AOSignConstants.getDigestAlgorithmName(precalculatedHashAlgorithm).equalsIgnoreCase("SHA1")) { //$NON-NLS-1$
-						dm = fac.newDigestMethod(DigestMethod.SHA1, null);
-					}
-					else if (AOSignConstants.getDigestAlgorithmName(precalculatedHashAlgorithm).equalsIgnoreCase("SHA-256")) { //$NON-NLS-1$
-						dm = fac.newDigestMethod(DigestMethod.SHA256, null);
-					}
-					else if (AOSignConstants.getDigestAlgorithmName(precalculatedHashAlgorithm).equalsIgnoreCase("SHA-512")) { //$NON-NLS-1$
-						dm = fac.newDigestMethod(DigestMethod.SHA512, null);
-					}
-					else if (AOSignConstants.getDigestAlgorithmName(precalculatedHashAlgorithm).equalsIgnoreCase("RIPEMD160")) { //$NON-NLS-1$
-						dm = fac.newDigestMethod(DigestMethod.RIPEMD160, null);
-					}
+					dm = fac.newDigestMethod(
+						XAdESUtil.getDigestMethodByCommonName(precalculatedHashAlgorithm),
+						null
+					);
 				}
 				catch (final Exception e) {
 					throw new AOException(
 						"No se ha podido crear el metodo de huella digital para la referencia Externally Detached: " + e, e //$NON-NLS-1$
-					);
-				}
-				if (dm == null) {
-					throw new AOException(
-						"Metodo de Message Digest para la referencia Externally Detached no soportado: " + precalculatedHashAlgorithm //$NON-NLS-1$
 					);
 				}
 				ref = fac.newReference(
@@ -1072,13 +1059,21 @@ public final class XAdESSigner {
 		xades.setSigningCertificate((X509Certificate) certChain[0]);
 
 		// SignaturePolicyIdentifier
-		final SignaturePolicyIdentifier spi = XAdESUtil.getPolicy(
-			extraParams.getProperty("policyIdentifier"), //$NON-NLS-1$
-			extraParams.getProperty("policyIdentifierHash"), //$NON-NLS-1$
-			extraParams.getProperty("policyIdentifierHashAlgorithm"), //$NON-NLS-1$
-			extraParams.getProperty("policyDescription"), //$NON-NLS-1$
-			extraParams.getProperty("policyQualifier") //$NON-NLS-1$
-		);
+		final SignaturePolicyIdentifier spi;
+		try {
+			spi = XAdESUtil.getPolicy(
+				extraParams.getProperty("policyIdentifier"), //$NON-NLS-1$
+				extraParams.getProperty("policyIdentifierHash"), //$NON-NLS-1$
+				extraParams.getProperty("policyIdentifierHashAlgorithm"), //$NON-NLS-1$
+				extraParams.getProperty("policyDescription"), //$NON-NLS-1$
+				extraParams.getProperty("policyQualifier") //$NON-NLS-1$
+			);
+		}
+		catch (final NoSuchAlgorithmException e1) {
+			throw new AOException(
+				"El algoritmo indicado para la politica (" + extraParams.getProperty("policyIdentifierHashAlgorithm") + ") no esta soportado: " + e1, e1 //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			);
+		}
 		if (spi != null) {
 			xades.setSignaturePolicyIdentifier(spi);
 		}

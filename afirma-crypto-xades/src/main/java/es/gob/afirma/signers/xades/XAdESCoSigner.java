@@ -374,12 +374,20 @@ public final class XAdESCoSigner {
 		xades.setSigningCertificate(cert);
 
 		// SignaturePolicyIdentifier
-		final SignaturePolicyIdentifier spi =
-				XAdESUtil.getPolicy(extraParams.getProperty("policyIdentifier"), //$NON-NLS-1$
-						extraParams.getProperty("policyIdentifierHash"), //$NON-NLS-1$
-						extraParams.getProperty("policyIdentifierHashAlgorithm"), //$NON-NLS-1$
-						extraParams.getProperty("policyDescription"), //$NON-NLS-1$
-						extraParams.getProperty("policyQualifier")); //$NON-NLS-1$
+		final SignaturePolicyIdentifier spi;
+		try {
+			spi = XAdESUtil.getPolicy(extraParams.getProperty("policyIdentifier"), //$NON-NLS-1$
+					extraParams.getProperty("policyIdentifierHash"), //$NON-NLS-1$
+					extraParams.getProperty("policyIdentifierHashAlgorithm"), //$NON-NLS-1$
+					extraParams.getProperty("policyDescription"), //$NON-NLS-1$
+					extraParams.getProperty("policyQualifier") //$NON-NLS-1$
+			);
+		}
+		catch (final NoSuchAlgorithmException e1) {
+			throw new AOException(
+				"El algoritmo indicado para la politica (" + extraParams.getProperty("policyIdentifierHashAlgorithm") + ") no esta soportado: " + e1, e1 //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			);
+		}
 		if (spi != null) {
 			xades.setSignaturePolicyIdentifier(spi);
 		}

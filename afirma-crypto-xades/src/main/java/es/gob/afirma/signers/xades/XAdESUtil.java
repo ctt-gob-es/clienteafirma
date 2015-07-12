@@ -2,6 +2,7 @@ package es.gob.afirma.signers.xades;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -234,7 +235,7 @@ final class XAdESUtil {
 			                                   final String identifierHash,
 			                                   final String identifierHashAlgorithm,
 			                                   final String description,
-			                                   final String qualifier) {
+			                                   final String qualifier) throws NoSuchAlgorithmException {
 		if (id == null) {
 			return null;
 		}
@@ -251,31 +252,9 @@ final class XAdESUtil {
 			identifier = id;
 		}
 
-		String hashAlgo = null;
-		if (identifierHashAlgorithm != null) {
-			String normalDigAlgo = null;
-			try {
-				normalDigAlgo = AOSignConstants
-						.getDigestAlgorithmName(identifierHashAlgorithm);
-			}
-			catch (final Exception e) {
-				LOGGER.warning("El algoritmo de huella digital para el identificador de politica de firma no es valido, se intentara dereferenciar la politica y se aplicara SHA1: " + e); //$NON-NLS-1$
-			}
-			if ("SHA1".equals(normalDigAlgo)) { //$NON-NLS-1$
-				hashAlgo = DigestMethod.SHA1;
-			}
-			else if ("SHA-256".equals(normalDigAlgo)) { //$NON-NLS-1$
-				hashAlgo = DigestMethod.SHA256;
-			}
-			else if ("SHA-512".equals(normalDigAlgo)) { //$NON-NLS-1$
-				hashAlgo = DigestMethod.SHA512;
-			}
-			else if ("RIPEMD160".equals(normalDigAlgo)) { //$NON-NLS-1$
-				hashAlgo = DigestMethod.RIPEMD160;
-			}
-		}
-		final SignaturePolicyIdentifier spi = new SignaturePolicyIdentifierImpl(
-				false);
+		final String hashAlgo = identifierHashAlgorithm != null ? getDigestMethodByCommonName(identifierHashAlgorithm) : null;
+
+		final SignaturePolicyIdentifier spi = new SignaturePolicyIdentifierImpl(false);
 		try {
 			spi.setIdentifier(identifier, hashAlgo != null ? identifierHash
 					: null, hashAlgo);
@@ -286,8 +265,7 @@ final class XAdESUtil {
 			);
 			return null;
 		}
-		// FIXME: Error en JXAdES. Si la descripcion es nula toda la firma
-		// falla.
+		// Error en JXAdES. Si la descripcion es nula toda la firma falla.
 		final String desc = description != null ? description : ""; //$NON-NLS-1$
 		spi.setDescription(desc);
 
@@ -295,6 +273,20 @@ final class XAdESUtil {
 			spi.setQualifier(qualifier);
 		}
 		return spi;
+	}
+
+	static String getDigestMethodByCommonName(final String identifierHashAlgorithm) throws NoSuchAlgorithmException {
+		final String normalDigAlgo = AOSignConstants.getDigestAlgorithmName(identifierHashAlgorithm);
+		if ("SHA1".equalsIgnoreCase(normalDigAlgo)) { //$NON-NLS-1$
+			return DigestMethod.SHA1;
+		}
+		if ("SHA-256".equalsIgnoreCase(normalDigAlgo)) { //$NON-NLS-1$
+			return DigestMethod.SHA256;
+		}
+		if ("SHA-512".equalsIgnoreCase(normalDigAlgo)) { //$NON-NLS-1$
+			return DigestMethod.SHA512;
+		}
+		throw new NoSuchAlgorithmException("No se soporta el algoritmo: " + normalDigAlgo); //$NON-NLS-1$
 	}
 
 
