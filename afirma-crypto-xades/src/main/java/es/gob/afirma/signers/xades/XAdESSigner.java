@@ -81,6 +81,8 @@ public final class XAdESSigner {
 
     private static final String ID_IDENTIFIER = "Id"; //$NON-NLS-1$
 
+    private static final String EXTRAPARAM_URI ="uri"; //$NON-NLS-1$
+
 	/** Firma datos en formato XAdES.
 	 * <p>
 	 * Este m&eacute;todo, al firmar un XML, firmas tambi&eacute;n sus hojas de
@@ -280,10 +282,12 @@ public final class XAdESSigner {
 
 		URI uri = null;
 		try {
-			uri = AOUtil.createURI(extraParams.getProperty("uri")); //$NON-NLS-1$
+			uri = AOUtil.createURI(extraParams.getProperty(EXTRAPARAM_URI)) != null ?
+					AOUtil.createURI(extraParams.getProperty(EXTRAPARAM_URI)) :
+						null;
 		}
 		catch (final Exception e) {
-			// Ignoramos errores, el parametro es opcional
+			LOGGER.warning("Se ha pasado una URI invalida como referencia a los datos a firmar: " + e); //$NON-NLS-1$
 		}
 
 		Utils.checkIllegalParams(format, AOSignConstants.SIGN_MODE_IMPLICIT, uri, precalculatedHashAlgorithm, true);
@@ -451,75 +455,84 @@ public final class XAdESSigner {
 		// ********* Contenido no XML *******************************
 		// **********************************************************
 		catch (final Exception e) {
+
 			// Error cuando los datos no son XML y se pide firma enveloped o si se pide firmar
 			// un nodo XML especifico
-			if (format.equals(AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED) || nodeToSign != null) {
+			if (AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED.equals(format) || nodeToSign != null) {
 				throw new InvalidXMLException(e);
 			}
-			// Para los formatos de firma internally detached y enveloping
-			// se trata de convertir el documento a base64
-			XAdESSigner.LOGGER.info(
-				"El documento no es un XML valido. Se convertira a Base64: " + e //$NON-NLS-1$
-			);
 
-			try {
-				// Crea un nuevo nodo XML para contener los datos en base 64
-				final Document docFile = dbf.newDocumentBuilder().newDocument();
-				dataElement = docFile.createElement(AOXAdESSigner.DETACHED_CONTENT_ELEMENT_NAME);
-				uri = null;
-				if (mimeType == null) {
-					mimeType = XMLConstants.DEFAULT_MIMETYPE;
-				}
+			// Para los formatos de firma internally detached y enveloping se trata de convertir el documento a base64
+			if (AOSignConstants.SIGN_FORMAT_XADES_DETACHED.equals(format) || AOSignConstants.SIGN_FORMAT_XADES_ENVELOPING.equals(format)) {
 
-				dataElement.setAttributeNS(null, ID_IDENTIFIER, contentId);
-				dataElement.setAttributeNS(null, AOXAdESSigner.MIMETYPE_STR, mimeType);
+				XAdESSigner.LOGGER.info(
+					"El documento no es un XML valido. Se convertira a Base64: " + e //$NON-NLS-1$
+				);
 
-				// Si es base 64, lo firmamos indicando como contenido el dato pero, ya que puede
-				// poseer un formato particular o caracteres valido pero extranos para el XML,
-				// realizamos una decodificacion y recodificacion para asi homogenizar el formato.
-				if (AOUtil.isBase64(data)
-						&& (XMLConstants.BASE64_ENCODING.equals(encoding) || "base64".equalsIgnoreCase(encoding))) { //$NON-NLS-1$
-					XAdESSigner.LOGGER.info(
-						"El documento se ha indicado como Base64, se insertara como tal en el XML" //$NON-NLS-1$
-					);
+				try {
+					// Crea un nuevo nodo XML para contener los datos en base 64
+					final Document docFile = dbf.newDocumentBuilder().newDocument();
+					dataElement = docFile.createElement(AOXAdESSigner.DETACHED_CONTENT_ELEMENT_NAME);
+					uri = null;
+					if (mimeType == null) {
+						mimeType = XMLConstants.DEFAULT_MIMETYPE;
+					}
 
-					// Adicionalmente, si es un base 64 intentamos obtener el tipo del contenido
-					// decodificado para asi reestablecer el MimeType.
-					final byte[] decodedData = Base64.decode(new String(data));
-					final MimeHelper mimeTypeHelper = new MimeHelper(decodedData);
-					final String tempMimeType = mimeTypeHelper.getMimeType();
-					mimeType = tempMimeType != null ? tempMimeType : XMLConstants.DEFAULT_MIMETYPE;
+					dataElement.setAttributeNS(null, ID_IDENTIFIER, contentId);
 					dataElement.setAttributeNS(null, AOXAdESSigner.MIMETYPE_STR, mimeType);
-					dataElement.setTextContent(Base64.encode(decodedData));
-				}
-				else {
-					if (XMLConstants.BASE64_ENCODING.equals(encoding)) {
-						XAdESSigner.LOGGER.info(
-							"El documento se ha indicado como Base64, pero no es un Base64 valido. Se convertira a Base64 antes de insertarlo en el XML y se declarara la transformacion" //$NON-NLS-1$
-						);
-					}
-					else {
-						XAdESSigner.LOGGER.info(
-							"El documento se considera binario, se convertira a Base64 antes de insertarlo en el XML y se declarara la transformacion" //$NON-NLS-1$
-						);
-					}
 
-					if (mimeType == XMLConstants.DEFAULT_MIMETYPE) {
-						final MimeHelper mimeTypeHelper = new MimeHelper(data);
+					// Si es base 64, lo firmamos indicando como contenido el dato pero, ya que puede
+					// poseer un formato particular o caracteres valido pero extranos para el XML,
+					// realizamos una decodificacion y recodificacion para asi homogenizar el formato.
+					if (AOUtil.isBase64(data)
+							&& (XMLConstants.BASE64_ENCODING.equals(encoding) || "base64".equalsIgnoreCase(encoding))) { //$NON-NLS-1$
+						XAdESSigner.LOGGER.info(
+							"El documento se ha indicado como Base64, se insertara como tal en el XML" //$NON-NLS-1$
+						);
+
+						// Adicionalmente, si es un base 64 intentamos obtener el tipo del contenido
+						// decodificado para asi reestablecer el MimeType.
+						final byte[] decodedData = Base64.decode(new String(data));
+						final MimeHelper mimeTypeHelper = new MimeHelper(decodedData);
 						final String tempMimeType = mimeTypeHelper.getMimeType();
 						mimeType = tempMimeType != null ? tempMimeType : XMLConstants.DEFAULT_MIMETYPE;
 						dataElement.setAttributeNS(null, AOXAdESSigner.MIMETYPE_STR, mimeType);
+						dataElement.setTextContent(Base64.encode(decodedData));
 					}
+					else {
+						if (XMLConstants.BASE64_ENCODING.equals(encoding)) {
+							XAdESSigner.LOGGER.info(
+								"El documento se ha indicado como Base64, pero no es un Base64 valido. Se convertira a Base64 antes de insertarlo en el XML y se declarara la transformacion" //$NON-NLS-1$
+							);
+						}
+						else {
+							XAdESSigner.LOGGER.info(
+								"El documento se considera binario, se convertira a Base64 antes de insertarlo en el XML y se declarara la transformacion" //$NON-NLS-1$
+							);
+						}
 
-					dataElement.setTextContent(Base64.encode(data));
-					wasEncodedToBase64 = true;
+						if (mimeType == XMLConstants.DEFAULT_MIMETYPE) {
+							final MimeHelper mimeTypeHelper = new MimeHelper(data);
+							final String tempMimeType = mimeTypeHelper.getMimeType();
+							mimeType = tempMimeType != null ? tempMimeType : XMLConstants.DEFAULT_MIMETYPE;
+							dataElement.setAttributeNS(null, AOXAdESSigner.MIMETYPE_STR, mimeType);
+						}
+
+						dataElement.setTextContent(Base64.encode(data));
+						wasEncodedToBase64 = true;
+					}
+					isBase64 = true;
+					encoding = XMLConstants.BASE64_ENCODING;
+					dataElement.setAttributeNS(null, AOXAdESSigner.ENCODING_STR, encoding);
 				}
-				isBase64 = true;
-				encoding = XMLConstants.BASE64_ENCODING;
-				dataElement.setAttributeNS(null, AOXAdESSigner.ENCODING_STR, encoding);
+				catch (final Exception ex) {
+					throw new AOException("Error al convertir los datos a base64", ex); //$NON-NLS-1$
+				}
 			}
-			catch (final Exception ex) {
-				throw new AOException("Error al convertir los datos a base64", ex); //$NON-NLS-1$
+
+			else {
+				// En el resto de formatos (Externally Detached) no hay nodo de datos
+				dataElement = null;
 			}
 		}
 
@@ -633,8 +646,12 @@ public final class XAdESSigner {
 				// crea el nuevo elemento Object que contiene el documento a firmar
 				final List<XMLStructure> structures = new ArrayList<XMLStructure>(1);
 
-				// Si los datos se han convertido a base64, bien por ser
-				// binarios o explicitos
+				// Comprobacion de costesia
+				if (dataElement == null) {
+					throw new IllegalStateException("El elemento (nodo) de datos no puede ser nulo en este punto"); //$NON-NLS-1$
+				}
+
+				// Si los datos se han convertido a base64, bien por ser binarios o explicitos
 				structures.add(
 					new DOMStructure(
 						isBase64 ? dataElement.getFirstChild() : dataElement
@@ -806,8 +823,7 @@ public final class XAdESSigner {
 
 		}
 
-		// Crea una referencia al documento mediante la URI externa si la
-		// tenemos o usando un Message Digest
+		// Crea una referencia al documento mediante la URI externa si la tenemos o usando un Message Digest
 		// precalculado si no tenemos otro remedio
 		else if (format.equals(AOSignConstants.SIGN_FORMAT_XADES_EXTERNALLY_DETACHED)) {
 			Reference ref = null;
@@ -859,7 +875,7 @@ public final class XAdESSigner {
 				if (uri != null && uri.getScheme().equals("file")) { //$NON-NLS-1$
 					try {
 						ref = fac.newReference(
-							"", //$NON-NLS-1$
+							extraParams.getProperty(EXTRAPARAM_URI),
 							digestMethod,
 							null,
 							XMLConstants.OBJURI,
@@ -867,9 +883,11 @@ public final class XAdESSigner {
 							MessageDigest.getInstance(
 								AOSignConstants.getDigestAlgorithmName(digestMethodAlgorithm)
 							).digest(
-								AOUtil.getDataFromInputStream(
-									AOUtil.loadFile(uri)
-								)
+								data != null ?
+									data :
+										AOUtil.getDataFromInputStream(
+											AOUtil.loadFile(uri)
+										)
 							)
 						);
 					}
