@@ -235,7 +235,7 @@ public class AOCMSMultiEnveloper {
         // Si se establecion un remitente
         if (ke != null) {
             return new CMSEnvelopedData().genEnvelopedData(
-        		AOCMSMultiEnveloper.createContentSignerParementers(content, this.signatureAlgorithm),
+        		AOCMSMultiEnveloper.createContentSignerParamenters(content, this.signatureAlgorithm),
         		(X509Certificate[]) ke.getCertificateChain(),
                 cipherConfig,
                 recipientsCerts,
@@ -292,7 +292,7 @@ public class AOCMSMultiEnveloper {
                                                                                 BadPaddingException,
                                                                                 SignatureException {
         return new CMSSignedAndEnvelopedData().genSignedAndEnvelopedData(
-    		AOCMSMultiEnveloper.createContentSignerParementers(content, this.signatureAlgorithm),
+    		AOCMSMultiEnveloper.createContentSignerParamenters(content, this.signatureAlgorithm),
     		(X509Certificate[]) ke.getCertificateChain(),
             cipherConfig,
             recipientsCerts,
@@ -340,7 +340,7 @@ public class AOCMSMultiEnveloper {
     																IllegalBlockSizeException,
     																BadPaddingException {
     	return CMSAuthenticatedData.genAuthenticatedData(
-    			AOCMSMultiEnveloper.createContentSignerParementers(content, this.signatureAlgorithm), // ContentSignerParameters
+    			AOCMSMultiEnveloper.createContentSignerParamenters(content, this.signatureAlgorithm), // ContentSignerParameters
     			(X509Certificate[]) ke.getCertificateChain(), // Certificados del firmante (remitente)
     			null, // Algoritmo de autenticacion (usamos el por defecto)
     			cipherConfig, // Configuracion del cipher
@@ -385,7 +385,7 @@ public class AOCMSMultiEnveloper {
                                                                                     IllegalBlockSizeException,
                                                                                     BadPaddingException {
 		return CMSAuthenticatedEnvelopedData.genAuthenticatedEnvelopedData(
-			AOCMSMultiEnveloper.createContentSignerParementers(content, this.signatureAlgorithm), // ContentSignerParameters
+			AOCMSMultiEnveloper.createContentSignerParamenters(content, this.signatureAlgorithm), // ContentSignerParameters
 			(X509Certificate[]) ke.getCertificateChain(), // Certificados del firmante (remitente)
             null, // Algoritmo de autenticacion (usamos el por defecto)
             cipherConfig, // Configuracion del cipher
@@ -400,12 +400,10 @@ public class AOCMSMultiEnveloper {
 
     /** Genera el bloque de datos con la informaci&oacute;n del remitente de un
      * mensaje.
-     * @param content
-     *        Mensaje.
-     * @param digestAlgorithm
-     *        Algoritmo de huella digital.
+     * @param content Mensaje.
+     * @param digestAlgorithm Algoritmo de huella digital.
      * @return Bloque de datos con la informaci&oacute;n del remitente. */
-    private static P7ContentSignerParameters createContentSignerParementers(final byte[] content,
+    private static P7ContentSignerParameters createContentSignerParamenters(final byte[] content,
     		                                                                final String digestAlgorithm) {
         return new P7ContentSignerParameters(content, digestAlgorithm);
     }
