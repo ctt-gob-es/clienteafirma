@@ -35,7 +35,6 @@ import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOInvalidFormatException;
 import es.gob.afirma.core.ciphers.AOCipherConfig;
-import es.gob.afirma.core.ciphers.CipherConstants.AOCipherAlgorithm;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.signers.cms.AOCMSSigner;
 import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
@@ -44,70 +43,19 @@ import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
 /** Funcionalidad de sobres digitales con CAdES. */
 public class AOCMSMultiEnveloper {
 
-    private static final Logger LOGGER = Logger.getLogger("es.gob.afirma");  //$NON-NLS-1$
-
     private String dataTypeOID = null;
     private final Map<String, byte[]> atrib = new HashMap<String, byte[]>();
     private final Map<String, byte[]> uatrib = new HashMap<String, byte[]>();
 
-  //TODO
-    /** M&eacute;todo que realiza el resto de firmas permitidas por CADES. Son
-     * las siguientes: <br>
-     * <ul>
-     * <li>Data</li>
-     * <li>Signed Data</li>
-     * <li>Digested Data</li>
-     * <li>Enveloped Data</li>
-     * <li>Signed and Enveloped Data</li>
-     * </ul>
-     * Para la generaci&oacute;n de la clave interna se utiliza por defecto el
-     * AES.
-     * En el caso de que sea tipo "Enveloped data" o
-     * "Signed and enveloped data", la clave se generar&aacute; usando el
-     * algoritmo pasado como par&aacute;metro. Dicha clave se cifrar&aacute;
-     * despu&eacute;s con la clave p&uacute;blica del certificado que identifica
-     * al usuario destinatario.
-     * Nota: El par&aacute;metro algorithm no es el agoritmo de cifrado, es para
-     * el digestAlgorithm usado en los "Unsigned Attributes".
-     * @param cmsData
-     *        Envoltorio que queremos cofirmar.
-     * @param digestAlgorithm
-     *        Algoritmo a usar para la firma (SHA1withRSA, MD5withRSA,...)
-     * @param type
-     *        Tipo de "envelop" que se quiere hacer.
-     * @param keyEntry
-     *        Clave privada a usar para firmar.
-     * @param certDest
-     *        Certificados de los usuarios a los que va destinado el sobre
-     *        digital.
-     * @param cipherAlgorithm
-     *        Algoritmo utilizado para cifrar
-     * @param dataType Tipo de datos
-     * @param extraParams
-     *        Par&aacute;metros adicionales
-     * @return Envoltorio CADES.
-     * @throws AOException
-     *         Cuando ocurre cualquier problema en el proceso. */
-    public static byte[] coEnvelop(final byte[] cmsData,
-                          final String digestAlgorithm,
-                          final String type,
-                          final PrivateKeyEntry keyEntry,
-                          final X509Certificate[] certDest,
-                          final AOCipherAlgorithm cipherAlgorithm,
-                          final String dataType,
-                          final Properties extraParams) throws AOException {
-        return null;
-    }
-
   /** Cofirma un sobre digital CMS.
- * @param data Datos contenidos en el sobre digital a cofirmar
- * @param sign Sobre digital
- * @param algorithm Algoritmo de firma
- * @param keyEntry Entrada de clave privada a usar para la firma
- * @param xParams Par&aacute;metros adicionales. &Uacute;nicamente se lee <i>precalculatedHashAlgorithm</i>
- * @return Sobre digtal cofirmado
- * @throws AOException Si ocurre cualquier problema durante el proceso */
-public byte[] cosign(final byte[] data, final byte[] sign, final String algorithm, final PrivateKeyEntry keyEntry, final Properties xParams) throws AOException {
+   * @param data Datos contenidos en el sobre digital a cofirmar
+   * @param sign Sobre digital
+   * @param algorithm Algoritmo de firma
+   * @param keyEntry Entrada de clave privada a usar para la firma
+   * @param xParams Par&aacute;metros adicionales. &Uacute;nicamente se lee <i>precalculatedHashAlgorithm</i>
+   * @return Sobre digtal cofirmado
+   * @throws AOException Si ocurre cualquier problema durante el proceso */
+  public byte[] cosign(final byte[] data, final byte[] sign, final String algorithm, final PrivateKeyEntry keyEntry, final Properties xParams) throws AOException {
 
         final String precalculatedDigest = xParams != null ? xParams.getProperty("precalculatedHashAlgorithm") : null; //$NON-NLS-1$
 
@@ -627,6 +575,8 @@ public byte[] cosign(final byte[] data, final byte[] sign, final String algorith
 
         // Elementos que contienen los elementos OID Data
         final org.bouncycastle.asn1.ASN1ObjectIdentifier doi = (org.bouncycastle.asn1.ASN1ObjectIdentifier) objects.nextElement();
+
+        final Logger LOGGER = Logger.getLogger("es.gob.afirma");  //$NON-NLS-1$
 
         if (doi.equals(org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers.data)) {
             LOGGER.warning("La extraccion de datos de los envoltorios CMS Data no esta implementada"); //$NON-NLS-1$

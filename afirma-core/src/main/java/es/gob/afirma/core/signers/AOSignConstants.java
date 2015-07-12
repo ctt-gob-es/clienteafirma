@@ -209,7 +209,7 @@ public final class AOSignConstants {
 	};
 
 	/** Algoritmo de firma por defecto. */
-	public static final String DEFAULT_SIGN_ALGO = SIGN_ALGORITHM_SHA1WITHRSA;
+	public static final String DEFAULT_SIGN_ALGO = SIGN_ALGORITHM_SHA512WITHRSA;
 
 	// ************************************************************
 	// ****************** MODOS DE FIRMA **************************
