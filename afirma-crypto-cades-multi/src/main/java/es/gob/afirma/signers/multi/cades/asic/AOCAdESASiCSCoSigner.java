@@ -7,7 +7,7 @@ import java.util.Properties;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.signers.AOCoSigner;
-import es.gob.afirma.signers.cades.asic.ASiCUtil;
+import es.gob.afirma.core.signers.asic.ASiCUtil;
 import es.gob.afirma.signers.multi.cades.AOCAdESCoSigner;
 
 /** Operaciones de cofirma CAdES ASiC-S.

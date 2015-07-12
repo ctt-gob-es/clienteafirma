@@ -8,7 +8,7 @@ import java.util.Properties;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.signers.AOCounterSigner;
 import es.gob.afirma.core.signers.CounterSignTarget;
-import es.gob.afirma.signers.cades.asic.ASiCUtil;
+import es.gob.afirma.core.signers.asic.ASiCUtil;
 import es.gob.afirma.signers.multi.cades.AOCAdESCounterSigner;
 
 /** Operaciones de contrafirma CAdES ASiC-S.

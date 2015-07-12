@@ -1,4 +1,4 @@
-package es.gob.afirma.signers.cades.asic;
+package es.gob.afirma.core.signers.asic;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -30,11 +30,20 @@ public final class ASiCUtil {
 		// No instanciable
 	}
 
+	/** Obtiene el nombre por defecto a asignar al objeto de datos dentro de un contenedor ASiC-S.
+	 * @param data Contenido del objeto de datos.
+	 * @return Nombre por defecto del objeto de datos dentro de un contenedor ASiC-S. */
+	public static String getASiCSDefaultDataFilename(final byte[] data) {
+		final String extension = new MimeHelper(data).getExtension();
+		return "dataobject." + (extension != null && !"".equals(extension) ? extension : DEFAULT_DATAOBJECT_EXTENSION); //$NON-NLS-1$ //$NON-NLS-2$
+	}
+
 	/** Crea un contenedor ASiC-S.
 	 * @param signature Objeto de firmas
 	 * @param data Objeto de datos
 	 * @param signatureFilename Nombre del objeto de firmas (debe contener la ruta, por ejemplo <code>"META-INF/signature.p7s"</code>).
-	 * @param dataFilename Nombre Nombre del objeto de datos (no debe contener ninguna ruta).
+	 * @param dataFilename Nombre Nombre del objeto de datos (no debe contener ninguna ruta). Si se proporciona <code>null</code> se usa el
+	 *                     nombre por defecto.
 	 * @return Contenedor ASiC-S.
 	 * @throws IOException Si hay errores en el tratamiento de datos. */
 	public static byte[] createSContainer(final byte[] signature,
@@ -69,8 +78,7 @@ public final class ASiCUtil {
 			entryName = dataFilename;
 		}
 		else {
-			final String extension = new MimeHelper(data).getExtension();
-			entryName = "dataobject." + (extension != null && !"".equals(extension) ? extension : DEFAULT_DATAOBJECT_EXTENSION); //$NON-NLS-1$ //$NON-NLS-2$
+			entryName = getASiCSDefaultDataFilename(data);
 		}
 		ze = new ZipEntry(
 			entryName

@@ -6,6 +6,8 @@ import java.io.OutputStream;
 
 import org.junit.Test;
 
+import es.gob.afirma.core.signers.asic.ASiCUtil;
+
 /** Pruebas de firmas ASiC-S.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
 public final class ASiCSTests {

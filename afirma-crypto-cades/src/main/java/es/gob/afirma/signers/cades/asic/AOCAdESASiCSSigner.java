@@ -13,6 +13,7 @@ import es.gob.afirma.core.signers.AOCounterSigner;
 import es.gob.afirma.core.signers.AOSignInfo;
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.CounterSignTarget;
+import es.gob.afirma.core.signers.asic.ASiCUtil;
 import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.signers.cades.AOCAdESSigner;
 
