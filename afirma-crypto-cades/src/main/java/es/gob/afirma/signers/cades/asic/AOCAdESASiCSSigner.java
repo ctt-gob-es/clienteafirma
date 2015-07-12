@@ -9,6 +9,7 @@ import java.util.logging.Logger;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOInvalidFormatException;
 import es.gob.afirma.core.signers.AOCoSigner;
+import es.gob.afirma.core.signers.AOCounterSigner;
 import es.gob.afirma.core.signers.AOSignInfo;
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.CounterSignTarget;
@@ -18,8 +19,6 @@ import es.gob.afirma.signers.cades.AOCAdESSigner;
 /** Firmador CAdES ASiC-S.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
 public final class AOCAdESASiCSSigner implements AOSigner {
-
-	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
     /** Firma datos en formato CAdES devolviendo el resultado empaquetado como ASiC-S.
      * @param data Datos que deseamos firmar.
@@ -79,7 +78,7 @@ public final class AOCAdESASiCSSigner implements AOSigner {
 			sign = ASiCUtil.getASiCSSignature(is);
 		}
 		catch(final Exception e) {
-			LOGGER.info("La firma proporcionada no es ASiC-S: " + e); //$NON-NLS-1$
+			Logger.getLogger("es.gob.afirma").info("La firma proporcionada no es ASiC-S: " + e); //$NON-NLS-1$ //$NON-NLS-2$
 			return false;
 		}
 		return new AOCAdESASiCSSigner().isSign(sign);
@@ -224,8 +223,27 @@ public final class AOCAdESASiCSSigner implements AOSigner {
 			                  final Object[] targets,
 			                  final PrivateKey key,
 			                  final Certificate[] certChain,
-			                  final Properties extraParams) {
-		throw new UnsupportedOperationException("ASiC-S no soporta contrafirmas"); //$NON-NLS-1$
+			                  final Properties extraParams) throws AOException,
+			                                                       IOException {
+        try {
+			return ((AOCounterSigner)Class.forName("es.gob.afirma.signers.multi.cades.asic.AOCAdESASiCSCounterSigner").newInstance()).countersign( //$NON-NLS-1$
+				sign,
+				algorithm,
+				targetType,
+				targets,
+				key,
+				certChain,
+				extraParams
+			);
+		}
+        catch (final InstantiationException e) {
+        	throw new AOException("No se ha podido instanciar la clase de cofirmas CAdES: " + e, e); //$NON-NLS-1$
+		}
+        catch (final IllegalAccessException e) {
+        	throw new AOException("No se ha podido instanciar la clase de cofirmas CAdES: " + e, e); //$NON-NLS-1$
+		}
+        catch (final ClassNotFoundException e) {
+        	throw new AOException("No se ha encontrado la clase de cofirmas CAdES: " + e, e); //$NON-NLS-1$
+		}
 	}
-
 }
