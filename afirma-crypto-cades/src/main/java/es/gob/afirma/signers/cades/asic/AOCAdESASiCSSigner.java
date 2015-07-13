@@ -161,7 +161,7 @@ public final class AOCAdESASiCSSigner implements AOSigner {
 			);
 		}
         catch (final InstantiationException e) {
-        	throw new AOException("No se ha podido instanciar la clase de cofirmas CAdES: " + e, e); //$NON-NLS-1$
+        	throw new AOException("Error al instanciar la clase de cofirmas CAdES: " + e, e); //$NON-NLS-1$
 		}
         catch (final IllegalAccessException e) {
         	throw new AOException("No se ha podido instanciar la clase de cofirmas CAdES: " + e, e); //$NON-NLS-1$
@@ -238,7 +238,7 @@ public final class AOCAdESASiCSSigner implements AOSigner {
 			);
 		}
         catch (final InstantiationException e) {
-        	throw new AOException("No se ha podido instanciar la clase de cofirmas CAdES: " + e, e); //$NON-NLS-1$
+        	throw new AOException("Error al instanciar la clase de cofirmas CAdES: " + e, e); //$NON-NLS-1$
 		}
         catch (final IllegalAccessException e) {
         	throw new AOException("No se ha podido instanciar la clase de cofirmas CAdES: " + e, e); //$NON-NLS-1$
