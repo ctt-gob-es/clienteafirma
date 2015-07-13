@@ -41,6 +41,11 @@ public final class AOCAdESASiCSCounterSigner implements AOCounterSigner {
 		);
 
 		// Devolvemos un nuevo ASiC
-		return ASiCUtil.createSContainer(newCounterSign, packagedData, ASiCUtil.getASiCSDataFilename(sign), ASiCUtil.ENTRY_NAME_BINARY_SIGNATURE);
+		return ASiCUtil.createSContainer(
+			newCounterSign,
+			packagedData,
+			ASiCUtil.getASiCSDataFilename(sign),
+			ASiCUtil.ENTRY_NAME_BINARY_SIGNATURE
+		);
 	}
 }

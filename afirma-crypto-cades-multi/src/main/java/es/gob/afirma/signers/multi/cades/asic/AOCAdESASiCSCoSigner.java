@@ -41,7 +41,12 @@ public final class AOCAdESASiCSCoSigner implements AOCoSigner {
 		final byte[] newSign = new AOCAdESCoSigner().cosign(packagedData, packagedSign, algorithm, key, certChain, extraParams);
 
 		// Devolvemos un nuevo ASiC
-		return ASiCUtil.createSContainer(newSign, packagedData, ASiCUtil.getASiCSDataFilename(sign), ASiCUtil.ENTRY_NAME_BINARY_SIGNATURE);
+		return ASiCUtil.createSContainer(
+			newSign,
+			packagedData,
+			ASiCUtil.getASiCSDataFilename(sign),
+			ASiCUtil.ENTRY_NAME_BINARY_SIGNATURE
+		);
 	}
 
 }

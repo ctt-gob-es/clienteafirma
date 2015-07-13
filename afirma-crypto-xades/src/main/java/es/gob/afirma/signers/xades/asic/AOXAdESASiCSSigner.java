@@ -94,7 +94,7 @@ public final class AOXAdESASiCSSigner implements AOSigner {
 			newCoSign,
 			packagedData,
 			ASiCUtil.ENTRY_NAME_XML_SIGNATURE,
-			extraParams.getProperty("asicsFilename") //$NON-NLS-1$
+			ASiCUtil.getASiCSDataFilename(sign)
 		);
 	}
 
@@ -126,7 +126,7 @@ public final class AOXAdESASiCSSigner implements AOSigner {
 			newCounterSign,
 			packagedData,
 			ASiCUtil.ENTRY_NAME_XML_SIGNATURE,
-			extraParams.getProperty("asicsFilename") //$NON-NLS-1$
+			ASiCUtil.getASiCSDataFilename(sign)
 		);
 
 	}
