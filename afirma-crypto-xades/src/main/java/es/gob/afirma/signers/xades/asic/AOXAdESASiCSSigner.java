@@ -64,7 +64,7 @@ public final class AOXAdESASiCSSigner implements AOSigner {
 			             final Certificate[] certChain,
 			             final Properties extraParams) throws AOException,
 			                                                  IOException {
-		throw new UnsupportedOperationException("Aun no implementado"); //$NON-NLS-1$
+		return cosign(sign, algorithm, key, certChain, extraParams);
 	}
 
 	@Override
@@ -72,9 +72,30 @@ public final class AOXAdESASiCSSigner implements AOSigner {
 			             final String algorithm,
 			             final PrivateKey key,
 			             final Certificate[] certChain,
-			             final Properties extraParams) throws AOException,
+			             final Properties xParams) throws AOException,
 			                                                  IOException {
-		throw new UnsupportedOperationException("Aun no implementado"); //$NON-NLS-1$
+		// Extraemos firma y datos del ASiC
+		final byte[] packagedData = ASiCUtil.getASiCSData(sign);
+		final byte[] packagedSign = ASiCUtil.getASiCSXMLSignature(sign);
+
+		final Properties extraParams = setASiCProperties(xParams, packagedData);
+
+		// Creamos la contrafirma
+		final byte[] newCoSign = new AOXAdESSigner().cosign(
+			packagedData,
+			packagedSign,
+			algorithm,
+			key,
+			certChain,
+			extraParams
+		);
+
+		return ASiCUtil.createSContainer(
+			newCoSign,
+			packagedData,
+			ASiCUtil.ENTRY_NAME_XML_SIGNATURE,
+			extraParams.getProperty("asicsFilename") //$NON-NLS-1$
+		);
 	}
 
 	@Override
@@ -146,21 +167,18 @@ public final class AOXAdESASiCSSigner implements AOSigner {
 
 	@Override
 	public String getSignedName(final String originalName, final String inText) {
-		// TODO Auto-generated method stub
-		return null;
+		return originalName + (inText != null ? inText : "") + ".asics"; //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	@Override
 	public byte[] getData(final byte[] signData) throws AOException, IOException {
-		// TODO Auto-generated method stub
-		return null;
+		return ASiCUtil.getASiCSData(signData);
 	}
 
 	@Override
 	public AOSignInfo getSignInfo(final byte[] signData) throws AOException,
-			IOException {
-		// TODO Auto-generated method stub
-		return null;
+			                                                    IOException {
+		return new AOXAdESASiCSSigner().getSignInfo(ASiCUtil.getASiCSXMLSignature(signData));
 	}
 
 	private static Properties setASiCProperties(final Properties xParams, final byte[] data) {
