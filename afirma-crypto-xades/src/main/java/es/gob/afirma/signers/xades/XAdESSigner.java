@@ -79,7 +79,8 @@ public final class XAdESSigner {
     private static final String HTTP_PROTOCOL_PREFIX = "http://"; //$NON-NLS-1$
     private static final String HTTPS_PROTOCOL_PREFIX = "https://"; //$NON-NLS-1$
 
-    private static final String ID_IDENTIFIER = "Id"; //$NON-NLS-1$
+    /** Identificador de identificadores en los nodos XML. */
+    static final String ID_IDENTIFIER = "Id"; //$NON-NLS-1$
 
     private static final String EXTRAPARAM_URI ="uri"; //$NON-NLS-1$
 
@@ -558,8 +559,7 @@ public final class XAdESSigner {
 					docSignature.appendChild(docSignature.adoptNode(dataElement));
 				}
 				else {
-					final Element afirmaRoot = docSignature.createElement(AOXAdESSigner.AFIRMA);
-					afirmaRoot.setAttributeNS(null, ID_IDENTIFIER, "AfirmaRoot-" + UUID.randomUUID().toString());  //$NON-NLS-1$
+					final Element afirmaRoot = XAdESUtil.getRootElement(docSignature, extraParams);
 					docSignature.appendChild(afirmaRoot);
 				}
 			}

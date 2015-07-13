@@ -34,29 +34,23 @@ public final class AOXAdESASiCSSigner implements AOSigner {
 					   final Properties xParams) throws AOException,
 					                                    IOException {
 
-		final Properties extraParams = xParams != null ? xParams : new Properties();
+		final Properties extraParams = setASiCProperties(xParams, data);
 
-		final String dataFilename = extraParams.getProperty("asicsFilename") != null ? //$NON-NLS-1$
-										extraParams.getProperty("asicsFilename") : //$NON-NLS-1$
-											ASiCUtil.getASiCSDefaultDataFilename(data);
+		final byte[] xadesSignature = new AOXAdESSigner().sign(
+			data,
+			algorithm,
+			key,
+			certChain,
+			extraParams
+		);
 
-		// Siempre con MANIFEST
-		extraParams.put("useManifest", "true"); //$NON-NLS-1$ //$NON-NLS-2$
+		return ASiCUtil.createSContainer(
+			xadesSignature,
+			data,
+			ASiCUtil.ENTRY_NAME_XML_SIGNATURE,
+			extraParams.getProperty("asicsFilename") //$NON-NLS-1$
+		);
 
-		// Aprovechamos para anadir atributos utiles
-		extraParams.put("addKeyInfoKeyName", "true"); //$NON-NLS-1$ //$NON-NLS-2$
-
-		// La URI de referencia es el nombre de fichero dentro del ASiC
-		extraParams.put("uri", dataFilename); //$NON-NLS-1$
-
-		// Siempre <i>Externally Detached</i>
-		extraParams.put("format", AOSignConstants.SIGN_FORMAT_XADES_EXTERNALLY_DETACHED); //$NON-NLS-1$
-
-		final byte[] xadesSignature = new AOXAdESSigner().sign(data, algorithm, key, certChain, extraParams);
-
-		System.out.println(new String(xadesSignature));
-
-		throw new UnsupportedOperationException("Aun no implementado"); //$NON-NLS-1$
 	}
 
 	@Override
@@ -129,6 +123,35 @@ public final class AOXAdESASiCSSigner implements AOSigner {
 			IOException {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	private static Properties setASiCProperties(final Properties xParams, final byte[] data) {
+
+		final Properties extraParams = xParams != null ? xParams : new Properties();
+
+		final String dataFilename = extraParams.getProperty("asicsFilename") != null ? //$NON-NLS-1$
+				extraParams.getProperty("asicsFilename") : //$NON-NLS-1$
+					ASiCUtil.getASiCSDefaultDataFilename(data);
+
+		// Siempre con MANIFEST
+		extraParams.put("useManifest", "true"); //$NON-NLS-1$ //$NON-NLS-2$
+
+		// Aprovechamos para anadir atributos utiles
+		extraParams.put("addKeyInfoKeyName", "true"); //$NON-NLS-1$ //$NON-NLS-2$
+
+		// La URI de referencia es el nombre de fichero dentro del ASiC
+		extraParams.put("uri", dataFilename); //$NON-NLS-1$
+
+		// Siempre <i>Externally Detached</i>
+		extraParams.put("format", AOSignConstants.SIGN_FORMAT_XADES_EXTERNALLY_DETACHED); //$NON-NLS-1$
+
+		// Raiz de ASiC
+		extraParams.put("RootXmlNodeName", "asic:XAdESSignatures"); //$NON-NLS-1$ //$NON-NLS-2$
+		extraParams.put("RootXmlNodeNamespace", "http://uri.etsi.org/02918/v1.2.1#"); //$NON-NLS-1$ //$NON-NLS-2$
+		extraParams.put("RootXmlNodeNamespacePrefix", "xmlns:asic"); //$NON-NLS-1$ //$NON-NLS-2$
+
+		return extraParams;
+
 	}
 
 }

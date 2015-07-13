@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.UUID;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
@@ -28,6 +29,7 @@ import net.java.xades.security.xml.XAdES.SignerRoleImpl;
 import net.java.xades.security.xml.XAdES.XAdES_EPES;
 
 import org.ietf.jgss.Oid;
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
@@ -326,5 +328,29 @@ final class XAdESUtil {
 		throw new NoSuchAlgorithmException("No se soporta el algoritmo: " + normalDigAlgo); //$NON-NLS-1$
 	}
 
+	static Element getRootElement(final Document docSignature, final Properties extraParams) {
+
+		final Properties xParams = extraParams != null ? extraParams : new Properties();
+		final String nodeName            = xParams.getProperty("RootXmlNodeName" , AOXAdESSigner.AFIRMA); //$NON-NLS-1$
+		final String nodeNamespace       = xParams.getProperty("RootXmlNodeNamespace"); //$NON-NLS-1$
+		final String nodeNamespacePrefix = xParams.getProperty("RootXmlNodeNamespacePrefix"); //$NON-NLS-1$
+
+		final Element afirmaRoot;
+		if (nodeNamespace == null) {
+			afirmaRoot = docSignature.createElement(nodeName);
+		}
+		else {
+			afirmaRoot = docSignature.createElementNS(nodeNamespace, nodeName);
+			if (nodeNamespacePrefix != null) {
+				afirmaRoot.setAttribute(
+					nodeNamespacePrefix.startsWith("xmlns:") ?  nodeNamespacePrefix : "xmlns:" + nodeNamespacePrefix, //$NON-NLS-1$ //$NON-NLS-2$
+					nodeNamespace
+				);
+			}
+		}
+		afirmaRoot.setAttributeNS(null, XAdESSigner.ID_IDENTIFIER, nodeName + "-Root-" + UUID.randomUUID().toString());  //$NON-NLS-1$
+
+		return afirmaRoot;
+	}
 
 }
