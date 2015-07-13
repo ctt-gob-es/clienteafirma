@@ -21,6 +21,8 @@ import es.gob.afirma.signers.cades.AOCAdESSigner;
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
 public final class AOCAdESASiCSSigner implements AOSigner {
 
+	private static final Logger LOGGER = Logger.getLogger("es.agob.afirma"); //$NON-NLS-1$
+
     /** Firma datos en formato CAdES devolviendo el resultado empaquetado como ASiC-S.
      * @param data Datos que deseamos firmar.
      * @param algorithm Algoritmo a usar para la firma.
@@ -67,7 +69,7 @@ public final class AOCAdESASiCSSigner implements AOSigner {
 			                               final boolean asSimpleSignInfo) throws AOInvalidFormatException,
 			                                                                      IOException {
 		return new AOCAdESSigner().getSignersStructure(
-			ASiCUtil.getASiCSSignature(sign),
+			ASiCUtil.getASiCSBinarySignature(sign),
 			asSimpleSignInfo
 		);
 	}
@@ -76,18 +78,22 @@ public final class AOCAdESASiCSSigner implements AOSigner {
 	public boolean isSign(final byte[] is) throws IOException {
 		final byte[] sign;
 		try {
-			sign = ASiCUtil.getASiCSSignature(is);
+			sign = ASiCUtil.getASiCSBinarySignature(is);
 		}
 		catch(final Exception e) {
-			Logger.getLogger("es.gob.afirma").info("La firma proporcionada no es ASiC-S: " + e); //$NON-NLS-1$ //$NON-NLS-2$
+			LOGGER.info("La firma proporcionada no es ASiC-S: " + e); //$NON-NLS-1$
 			return false;
 		}
 		return new AOCAdESASiCSSigner().isSign(sign);
 	}
 
 	@Override
-	public boolean isValidDataFile(final byte[] is) throws IOException {
-		return true;
+	public boolean isValidDataFile(final byte[] data) throws IOException {
+		if (data == null) {
+			LOGGER.warning("Se han introducido datos nulos para su comprobacion"); //$NON-NLS-1$
+            return false;
+        }
+        return true;
 	}
 
 	@Override
@@ -102,7 +108,7 @@ public final class AOCAdESASiCSSigner implements AOSigner {
 
 	@Override
 	public AOSignInfo getSignInfo(final byte[] signData) throws AOException, IOException {
-		return new AOCAdESASiCSSigner().getSignInfo(ASiCUtil.getASiCSSignature(signData));
+		return new AOCAdESASiCSSigner().getSignInfo(ASiCUtil.getASiCSBinarySignature(signData));
 	}
 
     /** Cofirma en formato CAdES los datos encontrador en un contenedor ASiC-S que ya tuviese una firma CAdES o CMS,

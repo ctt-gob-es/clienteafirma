@@ -35,7 +35,7 @@ public final class AOCAdESASiCSCoSigner implements AOCoSigner {
 			                                                  IOException {
 		// Extraemos firma y datos del ASiC
 		final byte[] packagedData = ASiCUtil.getASiCSData(sign);
-		final byte[] packagedSign = ASiCUtil.getASiCSSignature(sign);
+		final byte[] packagedSign = ASiCUtil.getASiCSBinarySignature(sign);
 
 		// Creamos la cofirma
 		final byte[] newSign = new AOCAdESCoSigner().cosign(packagedData, packagedSign, algorithm, key, certChain, extraParams);

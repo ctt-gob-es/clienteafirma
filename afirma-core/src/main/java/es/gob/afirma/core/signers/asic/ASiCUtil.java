@@ -96,26 +96,50 @@ public final class ASiCUtil {
 		return baos.toByteArray();
 	}
 
+	/** Obtiene la firma de un contenedor CAdES ASiC-S.
+	 * @param asic Contendor CAdES ASiC-S.
+	 * @return Firma de un contenedor CAdES ASiC-S.
+	 * @throws IOException Si hay alg&uacute;n error en el tratamiento de datos. */
+	public static byte[] getASiCSBinarySignature(final byte[] asic) throws IOException {
+		return getASiCSSignature(asic, ENTRY_NAME_BINARY_SIGNATURE);
+	}
+
+	/** Obtiene la firma de un contenedor XAdES ASiC-S.
+	 * @param asic Contendor XAdES ASiC-S.
+	 * @return Firma de un contenedor XAdES ASiC-S.
+	 * @throws IOException Si hay alg&uacute;n error en el tratamiento de datos. */
+	public static byte[] getASiCSXMLSignature(final byte[] asic) throws IOException {
+		return getASiCSSignature(asic, ENTRY_NAME_XML_SIGNATURE);
+	}
+
 	/** Obtiene la firma de un contenedor ASiC-S.
 	 * @param asic Contendor ASiC-S.
+	 * @param signatureFilename Nombre de la entrada del ZIP con las firmas a obtener.
 	 * @return Firma de un contenedor ASiC-S.
 	 * @throws IOException Si hay alg&uacute;n error en el tratamiento de datos. */
-	public static byte[] getASiCSSignature(final byte[] asic) throws IOException {
+	private static byte[] getASiCSSignature(final byte[] asic, final String signatureFilename) throws IOException {
 		if (asic == null || asic.length < 1) {
 			throw new IllegalArgumentException(
 				"La firma ASiC proporcionada no puede ser nula ni vacia" //$NON-NLS-1$
 			);
 		}
+		if (signatureFilename == null) {
+			throw new IllegalArgumentException(
+				"La firma entrada de firma del ASiC no puede ser nula" //$NON-NLS-1$
+			);
+		}
 		final ZipInputStream zis = new ZipInputStream(new ByteArrayInputStream(asic));
 		ZipEntry entry;
 		while((entry = zis.getNextEntry()) != null) {
-			if (ENTRY_NAME_BINARY_SIGNATURE.equals(entry.getName()) || ENTRY_NAME_XML_SIGNATURE.equals(entry.getName())) {
+			if (signatureFilename.equals(entry.getName())) {
 				final byte[] sig = AOUtil.getDataFromInputStream(zis);
 				zis.close();
 				return sig;
 			}
 		}
-		throw new IOException("Los datos proporcionados no son una firma ASiC-S"); //$NON-NLS-1$
+		throw new IOException(
+			"Los datos proporcionados no son una firma ASiC-S conteniendo la entrada " + signatureFilename //$NON-NLS-1$
+		);
 	}
 
 	/** Obtiene los datos de un contenedor ASiC-S.

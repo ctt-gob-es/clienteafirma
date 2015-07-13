@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
 import java.util.Properties;
+import java.util.logging.Logger;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOInvalidFormatException;
@@ -25,6 +26,8 @@ import es.gob.afirma.signers.xades.AOXAdESSigner;
  * </p>
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
 public final class AOXAdESASiCSSigner implements AOSigner {
+
+	private static final Logger LOGGER = Logger.getLogger("es.agob.afirma"); //$NON-NLS-1$
 
 	@Override
 	public byte[] sign(final byte[] data,
@@ -83,27 +86,62 @@ public final class AOXAdESASiCSSigner implements AOSigner {
 			                  final Certificate[] certChain,
 			                  final Properties extraParams) throws AOException,
 			                                                       IOException {
-		throw new UnsupportedOperationException("Aun no implementado"); //$NON-NLS-1$
+		// Extraemos firma y datos del ASiC
+		final byte[] packagedData = ASiCUtil.getASiCSData(sign);
+		final byte[] packagedSign = ASiCUtil.getASiCSXMLSignature(sign);
+
+		// Creamos la contrafirma
+		final byte[] newCounterSign = new AOXAdESSigner().countersign(
+			packagedSign,
+			algorithm,
+			targetType,
+			targets,
+			key,
+			certChain,
+			extraParams
+		);
+
+		return ASiCUtil.createSContainer(
+			newCounterSign,
+			packagedData,
+			ASiCUtil.ENTRY_NAME_XML_SIGNATURE,
+			extraParams.getProperty("asicsFilename") //$NON-NLS-1$
+		);
+
 	}
 
 	@Override
 	public AOTreeModel getSignersStructure(final byte[] sign,
 			                               final boolean asSimpleSignInfo) throws AOInvalidFormatException,
 			                                                                      IOException {
-		// TODO Auto-generated method stub
-		return null;
+		return new AOXAdESSigner().getSignersStructure(
+			ASiCUtil.getASiCSXMLSignature(sign),
+			asSimpleSignInfo
+		);
 	}
 
 	@Override
 	public boolean isSign(final byte[] is) throws IOException {
-		// TODO Auto-generated method stub
-		return false;
+		final byte[] sign;
+		try {
+			sign = ASiCUtil.getASiCSXMLSignature(is);
+		}
+		catch(final Exception e) {
+			LOGGER.info("La firma proporcionada no es XAdES ASiC-S: " + e); //$NON-NLS-1$
+			return false;
+		}
+		return new AOXAdESSigner().isSign(
+			ASiCUtil.getASiCSXMLSignature(sign)
+		);
 	}
 
 	@Override
-	public boolean isValidDataFile(final byte[] is) throws IOException {
-		// TODO Auto-generated method stub
-		return false;
+	public boolean isValidDataFile(final byte[] data) throws IOException {
+		if (data == null) {
+			LOGGER.warning("Se han introducido datos nulos para su comprobacion"); //$NON-NLS-1$
+            return false;
+        }
+        return true;
 	}
 
 	@Override

@@ -27,7 +27,7 @@ public final class AOCAdESASiCSCounterSigner implements AOCounterSigner {
 			                                                       IOException {
 		// Extraemos firma y datos del ASiC
 		final byte[] packagedData = ASiCUtil.getASiCSData(sign);
-		final byte[] packagedSign = ASiCUtil.getASiCSSignature(sign);
+		final byte[] packagedSign = ASiCUtil.getASiCSBinarySignature(sign);
 
 		// Creamos la contrafirma
 		final byte[] newCounterSign = new AOCAdESCounterSigner().countersign(
