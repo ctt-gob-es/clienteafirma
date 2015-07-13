@@ -21,6 +21,8 @@ import net.java.xades.security.xml.XAdES.CommitmentTypeIndication;
 import net.java.xades.security.xml.XAdES.CommitmentTypeIndicationImpl;
 import net.java.xades.security.xml.XAdES.SignaturePolicyIdentifier;
 import net.java.xades.security.xml.XAdES.SignaturePolicyIdentifierImpl;
+import net.java.xades.security.xml.XAdES.SignatureProductionPlace;
+import net.java.xades.security.xml.XAdES.SignatureProductionPlaceImpl;
 import net.java.xades.security.xml.XAdES.SignerRole;
 import net.java.xades.security.xml.XAdES.SignerRoleImpl;
 import net.java.xades.security.xml.XAdES.XAdES_EPES;
@@ -231,11 +233,46 @@ final class XAdESUtil {
 		return ret;
 	}
 
-	static SignaturePolicyIdentifier getPolicy(final String id,
-			                                   final String identifierHash,
-			                                   final String identifierHashAlgorithm,
-			                                   final String description,
-			                                   final String qualifier) throws NoSuchAlgorithmException {
+	static SignatureProductionPlace getSignatureProductionPlace(final Properties extraParams) {
+		if (extraParams == null) {
+			return null;
+		}
+		return getSignatureProductionPlace(
+			extraParams.getProperty("signatureProductionCity"), //$NON-NLS-1$
+			extraParams.getProperty("signatureProductionProvince"), //$NON-NLS-1$
+			extraParams.getProperty("signatureProductionPostalCode"), //$NON-NLS-1$
+			extraParams.getProperty("signatureProductionCountry") //$NON-NLS-1$
+		);
+	}
+
+    private static SignatureProductionPlace getSignatureProductionPlace(final String city,
+                                                                        final String province,
+                                                                        final String postalCode,
+                                                                        final String country) {
+    	if (city == null && province == null && postalCode == null && country == null) {
+    		return null;
+    	}
+    	return new SignatureProductionPlaceImpl(city, province, postalCode, country);
+    }
+
+	static SignaturePolicyIdentifier getPolicy(final Properties extraParams) throws NoSuchAlgorithmException {
+		if (extraParams == null) {
+			return null;
+		}
+		return getPolicy(
+			extraParams.getProperty("policyIdentifier"), //$NON-NLS-1$
+			extraParams.getProperty("policyIdentifierHash"), //$NON-NLS-1$
+			extraParams.getProperty("policyIdentifierHashAlgorithm"), //$NON-NLS-1$
+			extraParams.getProperty("policyDescription"), //$NON-NLS-1$
+			extraParams.getProperty("policyQualifier") //$NON-NLS-1$
+		);
+	}
+
+	private static SignaturePolicyIdentifier getPolicy(final String id,
+			                                           final String identifierHash,
+			                                           final String identifierHashAlgorithm,
+			                                           final String description,
+			                                           final String qualifier) throws NoSuchAlgorithmException {
 		if (id == null) {
 			return null;
 		}

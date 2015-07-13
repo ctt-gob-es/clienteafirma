@@ -1061,13 +1061,7 @@ public final class XAdESSigner {
 		// SignaturePolicyIdentifier
 		final SignaturePolicyIdentifier spi;
 		try {
-			spi = XAdESUtil.getPolicy(
-				extraParams.getProperty("policyIdentifier"), //$NON-NLS-1$
-				extraParams.getProperty("policyIdentifierHash"), //$NON-NLS-1$
-				extraParams.getProperty("policyIdentifierHashAlgorithm"), //$NON-NLS-1$
-				extraParams.getProperty("policyDescription"), //$NON-NLS-1$
-				extraParams.getProperty("policyQualifier") //$NON-NLS-1$
-			);
+			spi = XAdESUtil.getPolicy(extraParams);
 		}
 		catch (final NoSuchAlgorithmException e1) {
 			throw new AOException(
@@ -1079,12 +1073,7 @@ public final class XAdESSigner {
 		}
 
 		// SignatureProductionPlace
-		final SignatureProductionPlace spp = AOXAdESSigner.getSignatureProductionPlace(
-			extraParams.getProperty("signatureProductionCity"), //$NON-NLS-1$
-			extraParams.getProperty("signatureProductionProvince"), //$NON-NLS-1$
-			extraParams.getProperty("signatureProductionPostalCode"), //$NON-NLS-1$
-			extraParams.getProperty("signatureProductionCountry") //$NON-NLS-1$
-		);
+		final SignatureProductionPlace spp = XAdESUtil.getSignatureProductionPlace(extraParams);
 		if (spp != null) {
 			xades.setSignatureProductionPlace(spp);
 		}

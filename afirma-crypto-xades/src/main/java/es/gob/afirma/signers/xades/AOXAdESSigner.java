@@ -25,8 +25,6 @@ import javax.xml.crypto.dsig.Transform;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import net.java.xades.security.xml.XAdES.SignatureProductionPlace;
-import net.java.xades.security.xml.XAdES.SignatureProductionPlaceImpl;
 import net.java.xades.util.XMLUtils;
 
 import org.w3c.dom.Document;
@@ -605,16 +603,6 @@ public final class AOXAdESSigner implements AOSigner {
 			}
 		}
 		return false;
-    }
-
-    static SignatureProductionPlace getSignatureProductionPlace(final String city,
-                                                                final String province,
-                                                                final String postalCode,
-                                                                final String country) {
-        if (city == null && province == null && postalCode == null && country == null) {
-            return null;
-        }
-        return new SignatureProductionPlaceImpl(city, province, postalCode, country);
     }
 
     /** Cofirma datos en formato XAdES.
