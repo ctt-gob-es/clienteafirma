@@ -55,7 +55,6 @@ public final class PreferencesManager {
 	/** Calificador de la pol&iacute;tica de firma para PAdES. */
 	public static final String PREFERENCE_PADES_POLICY_QUALIFIER = "padesPolicyQualifier"; //$NON-NLS-1$
 
-
 	/** Identificador de la pol&iacute;tica de firma para CAdES. */
 	public static final String PREFERENCE_CADES_POLICY_IDENTIFIER = "cadesPolicyIdentifier"; //$NON-NLS-1$
 
@@ -92,7 +91,6 @@ public final class PreferencesManager {
 	/** Formato de las firmas XAdES. */
 	public static final String PREFERENCE_XADES_SIGN_FORMAT = "xadesSignFormat"; //$NON-NLS-1$
 
-
 	/** Motivo de la firma en firmas PAdES. */
 	public static final String PREFERENCE_PADES_SIGN_REASON = "padesSignReason"; //$NON-NLS-1$
 
@@ -105,63 +103,51 @@ public final class PreferencesManager {
 	/** Formato de firma PAdES (PAdES B&aacute;sico o PAdES-BES). */
 	public static final String PREFERENCE_PADES_FORMAT = "padesBasicFormat"; //$NON-NLS-1$
 
-	/**
-	 * Recupera el valor de una cadena de texto almacenada entre las preferencias de la
+	/** Recupera el valor de una cadena de texto almacenada entre las preferencias de la
 	 * aplicaci&oacute;n.
 	 * @param key Clave del valor que queremos recuperar.
 	 * @param def Valor que se devolver&aacute;a si la preferencia no se encontraba almacenada.
-	 * @return La preferencia almacenada o {@code def} si no se encontr&oacute;.
-	 */
+	 * @return La preferencia almacenada o {@code def} si no se encontr&oacute;. */
 	public static String get(final String key, final String def) {
 		return preferences.get(key, def);
 	}
 
-	/**
-	 * Recupera el valor {@code true} o {@code false} almacenado entre las preferencias de la
+	/** Recupera el valor {@code true} o {@code false} almacenado entre las preferencias de la
 	 * aplicaci&oacute;n.
 	 * @param key Clave del valor que queremos recuperar.
 	 * @param def Valor que se devolver&aacute;a si la preferencia no se encontraba almacenada.
-	 * @return La preferencia almacenada o {@code def} si no se encontr&oacute;.
-	 */
+	 * @return La preferencia almacenada o {@code def} si no se encontr&oacute;. */
 	public static boolean getBoolean(final String key, final boolean def) {
 		return preferences.getBoolean(key, def);
 	}
 
-	/**
-	 * Establece una cadena de texto en la configuraci&oacute;n de la aplicaci&oacute;n
+	/** Establece una cadena de texto en la configuraci&oacute;n de la aplicaci&oacute;n
 	 * identific&aacute;ndola con una clave. Para realizar el guardado completo, es
 	 * necesario ejecutar el m&eacute;todo {@code flush()}.
 	 * @param key Clave con la que identificaremos el valor.
-	 * @param value Valor que se desea almacenar.
-	 */
+	 * @param value Valor que se desea almacenar. */
 	public static void put(final String key, final String value) {
 		preferences.put(key, value);
 	}
 
-	/**
-	 * Establece un {@code true} o {@code false} en la configuraci&oacute;n de la aplicaci&oacute;n
+	/** Establece un {@code true} o {@code false} en la configuraci&oacute;n de la aplicaci&oacute;n
 	 * identific&aacute;ndolo con una clave. Para realizar el guardado completo, es
 	 * necesario ejecutar el m&eacute;todo {@code flush()}.
 	 * @param key Clave con la que identificaremos el valor.
-	 * @param value Valor que se desea almacenar.
-	 */
+	 * @param value Valor que se desea almacenar. */
 	public static void putBoolean(final String key, final boolean value) {
 		preferences.putBoolean(key, value);
 	}
 
-	/**
-	 * Elimina una clave de entre la configuraci&oacute;n de la aplicaci&oacute;n.
-	 * @param key Clave que eliminar.
-	 */
+	/** Elimina una clave de entre la configuraci&oacute;n de la aplicaci&oacute;n.
+	 * @param key Clave que eliminar. */
 	public static void remove(final String key) {
 		preferences.remove(key);
 	}
 
-	/**
-	 * Almacena en las preferencias de la aplicaci&oacute;n todos los valores
+	/** Almacena en las preferencias de la aplicaci&oacute;n todos los valores
 	 * establecidos hasta el momento.
-	 * @throws BackingStoreException Cuando ocurre un error durnate el guardado.
-	 */
+	 * @throws BackingStoreException Cuando ocurre un error durante el guardado. */
 	public static void flush() throws BackingStoreException {
 		preferences.flush();
 	}
