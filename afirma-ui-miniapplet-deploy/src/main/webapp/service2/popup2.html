@@ -1,0 +1,64 @@
+<!doctype html>
+<html> <!-- Ejemplo basico de lanzador de la aplicacion -->
+  <head>
+	<title>Diálogo de firma</title>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
+	<link rel="stylesheet" type="text/css" href="css/estilos.css" media="screen">
+	<script type="text/javascript" src="js/autofirma_service2.js"></script>
+	<script type="text/javascript">
+
+	// Anadimos un listener para capturar los mensajes enviados a la pagina
+	window.addEventListener("message", receiveMessage, false);
+
+	var i = 0;
+	var opParams = new Array();
+	var abort = false;
+	function receiveMessage(event) {
+
+		var data = event.data;
+		if (abort) {
+			return;
+		} else if (data.key == "origin") {
+			if (data.value.indexOf(event.origin) != 0) {
+				abort = true;
+				alert("Se ha localizado una llamada desde un origen distinto al declarado");
+			}
+			else {
+				AutoFirma.setOrigin(event.origin);
+			}
+		} else if (data.key == "op") {
+			opParams[0] = {key:data.key, value:data.value};
+		} else if (data.key == "id") {
+			opParams[1] = {key:data.key, value:data.value};
+		} else if (data.key == "key") {
+			opParams[2] = {key:data.key, value:data.value};
+		} else if (data.key == "format") {
+			opParams[3] = {key:data.key, value:data.value};
+		} else if (data.key == "algorithm") {
+			opParams[4] = {key:data.key, value:data.value};
+		} else if (data.key == "properties") {
+			opParams[5] = {key:data.key, value:data.value};
+		} else if (data.key == "dat") {
+			opParams[6] = {key:data.key, value:data.value};
+		}
+		i++;
+		
+		if (i == 9) {
+			AutoFirma.signOperation(opParams);
+		}
+	}
+
+	</script>
+  </head>
+	<body>
+
+		<div id="dialogoEspera" style="background-color: rgba(50,50,50,0.3); width: 100%; height: 100%; z-index: 9990; position: absolute; left: 0; top: 0; ">
+			<div style="background-color: white; position: fixed; top: 20%; left: 10%; width: 70%; padding: 20px; border: 2px solid black; border-radius: 15px;">
+				<div><span style="text-align: center; font-weight: bold; font-size: 20pt;">Firmando...</span></div>
+				<div><span style="text-align: center; font-size: 15pt;">Por favor, no cierre esta ventana hasta que haya finalizado la operaci&oacute;n.</span></div>
+			</div>
+		</div>
+		<iframe name="myIframe" id="myIframe" style="display: none;" src="https://valide.redsara.es/firmaMovil/iframe_secure2.html" sandbox="allow-same-origin allow-scripts"></iframe>
+
+	</body>
+</html>	

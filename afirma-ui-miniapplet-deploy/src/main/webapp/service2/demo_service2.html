@@ -1,0 +1,234 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<title>VALIDe</title>
+	<link rel="stylesheet" type="text/css" href="css/estilos.css" media="screen">
+	<meta http-equiv="Expires" content="0">
+	<meta http-equiv="Last-Modified" content="0">
+	<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+	<meta http-equiv="content-script-type" content="text/javascript"> 
+	<meta http-equiv="Pragma" content="no-cache">
+	<meta http-equiv="Expires" content="0">
+	<meta http-equiv="Cache-Control" content="no-cache,no-store">
+	<meta name="lang" content="es">
+	<meta name="author" content="Dirección General para el impulso de la Administración Electrónica">
+	<meta name="organization" content="Ministerio de Hacienda y Administraciones Públicas">
+	<meta name="locality" content="Madrid, España">
+	<meta name="keywords" content="VALIDe, validacion firmas, validacion certificados, realizar firma, demostrador @firma, @firma, cliente firma, firma electrónica, certificado electrónico, CMS, CAdES, XAdES, XMLDSig">
+	<meta name="description" content="Firma móvil. Web de pruebas del Cliente @firma móvil ">
+	<style>
+		OBJECT   { width:1px; height:1px; position:absolute; top:50%; left:50%; }
+		APPLET   { width:1px; height:1px; position:absolute; top:50%; left:50%; }
+	</style>
+	<script type="text/javascript" src="js/miniapplet_service2.js"></script>
+	<script type="text/javascript" defer="defer">
+	<!--
+		/* Indica si debe firmarse un fichero (true) o el formulario de la pagina (false) */ 
+		var firmarFichero = false;
+		var firmarDatosGenerados = false;
+	
+		function firmar() {
+		
+			var signWindow = window.open("http://valide.redsara.es/firmaMovil/popup2.html", "Prueba", "width=500,height=260");
+		
+			var divMensaje = document.getElementById('divmensaje');
+			divMensaje.innerHTML='';
+			var divFirma = document.getElementById('divfirma');
+			divFirma.innerHTML='';
+			
+			mostrarDialogoEspera();
+			
+			var params = 	"mode=explicit";
+
+			var serializedForm = "fNif=" + encodeURIComponent(document.getElementById("fNif").value) + "&" +
+					"fNombre=" + encodeURIComponent(document.getElementById("fNombre").value);
+			var dataB64 = MiniApplet.getBase64FromText(serializedForm);
+			
+			var format = document.getElementById("fFormat").value;
+
+			try {
+				MiniApplet.sign(dataB64, "SHA1withRSA", format, params, successCallback, errorCallback, signWindow);
+			}
+			catch (excep) {
+				//Se puede recuperar el mensaje de error y pintarlo en la pantalla
+				var msg = MiniApplet.getErrorMessage();
+				if (msg==undefined || msg==null) msg = excep.message;
+				if (msg==undefined || msg==null) msg = '';
+				divMensaje.innerHTML='<br><div class="iconErrorFirma">Error al firmar</div><br>' + msg + '<br>';
+			}
+		}
+		
+		function successCallback(signatureB64) {
+			
+			ocultarDialogoEspera();
+			
+			var divMensaje = document.getElementById('divmensaje');
+			divMensaje.innerHTML='<br><div class="iconOKFirma">La firma se ha realizado correctamente</div>';
+			
+			var divFirma = document.getElementById('divfirma');
+			var content = '<br><textarea id="firmaB64" cols="76" rows="6">' + signatureB64 + '</textarea><br>';
+//				'<br><div class="botoneraCentro">' +
+//				'<input class="botonM marginR15" id="botonGuardar" value="Guardar datos" onclick="javascript:guardar();" type="button">' +
+//				'</div><br>';
+			
+			divFirma.innerHTML = content;
+		}
+		
+		function errorCallback(errorType, errorMessage) {
+			
+			ocultarDialogoEspera();
+			
+			var divMensaje = document.getElementById('divmensaje');
+			divMensaje.innerHTML='<br><div class="iconErrorFirma">Error al firmar</div><br>' +
+					'<div style="width: 300pt">' + errorMessage + '</div>' + '<br>';
+		}
+		
+		function guardar() {
+			MiniApplet.saveDataToFile(document.getElementById("firmaB64").innerHTML, "Guardar firma", "firma.csig", "csig", "Firma CAdES");
+		}
+		
+		function mostrarPantalla() {
+			document.getElementById("cargandoApplet").style.display = "none";
+			document.getElementById("pantalla").style.display = "block";
+		}
+		
+		function mostrarFormulario(form) {
+			if (form == "fileData") {
+				firmarFichero = true;
+				firmarDatosGenerados = false;
+				document.getElementById("formulario").style.display = "none";
+			} else if (form == "generatedData") {
+				firmarFichero = false;
+				firmarDatosGenerados = true;
+				document.getElementById("formulario").style.display = "none";
+			} else {
+				firmarFichero = false;
+				firmarDatosGenerados = false;
+				document.getElementById("formulario").style.display = "block";
+			}
+		}
+		
+		function mostrarDialogoEspera() {
+			document.getElementById("dialogoEspera").style.display = "block";
+		}
+		
+		function ocultarDialogoEspera() {
+			document.getElementById("dialogoEspera").style.display = "none";
+		}
+	-->  
+</script>
+		
+<body onload="mostrarPantalla()">
+	<!-- CONTENEDOR ** -->
+	<div id="contenedor" style="background-color: rgb(230,230,230)">
+		<div id="cabecera">
+			
+
+<div class="cabecera">
+	<a title="Cliente Afirma" class="floatLeft">
+		<img src="img/logo_cliente.png" alt="Cliente @firma" title="Ciente @firma" style="width: 180px; height: 57px; margin-left: 26px; margin-top: 10px;">
+	</a>
+	<a href="http://www.lamoncloa.gob.es/home.htm" title="Gobierno de España">
+		<img src="img/logoGobEsp.PNG" alt="www.lamoncloa.gob.es" title="Gobierno de España" class="logoGobEsp">
+	</a>
+</div>
+<div class="clear"></div>
+		</div>
+		<div id="contenidoTop"></div>
+		<div id="contenido">
+			<div id="cuerpo" style="background-color: rgb(248,248,248);">
+				<div class="bloqueDerechoInterior">
+					
+
+
+<div id="dialogoEspera" style="display: none;background-color: rgba(50,50,50,0.3); width: 100%; height: 100%; z-index: 9990; position: absolute; left: 0; top: 0; ">
+<!--
+	<div style="background-color: white; position: fixed; top: 30%; left: 35%; width: 30%; padding: 20px; border: 2px solid black; border-radius: 15px;">
+		<span style="text-align: center; font-weight: bold; font-size: 20pt;">Cargando datos...</span>
+	</div>
+-->
+</div>
+<div style="display: none;" id="cargandoApplet" class="error cursiva">
+	<br>
+	Cargando el applet para la extracción de certificados. Tenga paciencia.
+	<br><br>
+	<span>ESPERE POR FAVOR...</span>
+</div>
+<div id="pantalla" style="display: block;">
+<form id="sede">
+	<h2>
+		<img src="img/icon_realizarFirma.png" alt="validar sede" class="VASub VANormalIE7">
+		<span>Firma con AutoFirma mediante invocaci&oacute;n por servicio</span>
+	</h2>
+	<p>Una firma electr&oacute;nica es un conjunto de datos asociados a un mensaje que
+ permite asegurar la identidad del firmante y la integridad del mensaje.</p>
+	<div class="separadorSeccion"></div>
+	<fieldset style="background-color: rgb(252,252,252)">
+	<div id="divmensaje"></div>
+	<p>Para realizar la firma de un fichero,  datos generados o un formulario localizado en su equipo:</p><br/>
+
+	<div class="lb2AnchoMaxMB">
+			<span>1. Seleccione el formato de firma que desea utilizar</span>
+	</div>
+	<div>
+			<select id="fFormat">
+				<option value="CAdES" selected>CAdES</option>
+<!--				<option value="PAdES">PAdES</option> -->
+				<option value="XAdES">XAdES</option>
+			</select>
+	</div><br/>
+	<div class="lblAnchoMaxMB">
+			<span>2. Complete el formulario a firmar</span>
+	</div><br/>
+	<br/>
+	<div style="margin-left:20px;">
+		<div id="seleccionTarget" style="display:none" >
+			<input name="formTarget" value="fileData" id="targetFile" onclick="javascript:mostrarFormulario(this.value);" type="radio" />Fichero<br>
+			<input name="formTarget" value="generatedData" id="targetGeneratedData" onclick="javascript:mostrarFormulario(this.value);" type="radio" />Datos generados (100kb)<br>
+			<input name="formTarget" value="formData" onclick="javascript:mostrarFormulario(this.value);" type="radio" checked="checked" />Formulario<br>
+		</div>
+		<div id="formulario">
+			<label for="fNif">NIF:</label><br/>
+			<input name="fNif" id="fNif" type="text" /><br/>
+			<label for="fNombre">Nombre:</label><br/>
+			<input name="fNombre" id="fNombre" type="text" />
+		</div>
+	</div>
+	<div class="botoneraCentro">
+		<input class="botonP marginR15" id="botonFirmar" value="Firmar" onclick="javascript:firmar();" type="button"><br>
+	</div>
+	<br>
+	<div id="divfirma"></div>
+	</fieldset>
+</form>
+
+	<div class="nota"><p>
+	Nota: Es necesario tener instalado AutoFirma para el funcionamiento de esta demostraci&oacute;n.
+	</p></div>
+
+</div>
+				</div>
+
+				 <div class="clear"></div>
+			</div><!-- FIN DE CUERPO -->
+		</div><!-- FIN DE CONTENIDO -->
+		<div id="contenidoBottom"></div>
+		<div id="pie">
+			
+<!-- LOGOS PIE ** -->
+<div id="logos">
+	<img src="img/btn_w3c_aa.gif" class="logo_w3c" alt="W3C AA">
+	<img src="img/btn_w3c_css.gif" class="logo_w3c" alt="W3C CSS">
+	<img src="img/btn_w3c_xhtml.gif" class="logo_w3c" alt="W3C HTML">
+</div>
+<!-- FIN DE LOGOS PIE ** -->
+<!-- MENÚ PIE ** -->
+
+		</div>
+	</div> <!-- FIN DE CONTENEDOR -->
+	
+	<script type="text/javascript">
+		MiniApplet.cargarAppAfirma("https://valide.redsara.es");
+	</script>
+	
+</body></html>

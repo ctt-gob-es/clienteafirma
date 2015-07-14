@@ -1,0 +1,32 @@
+<!doctype html>
+<html> <!-- IFrame que hace de pasarela entre las aplicaciones y la pagina de firma. -->
+  <head>
+    <script type="text/javascript">
+
+	window.addEventListener("message", receiveMessage, false);
+
+	function receiveMessage(event) {
+
+		var baseUri = localStorage.getItem("signPageBaseUri");
+		if (baseUri && baseUri.indexOf(event.origin) == 0) {
+		
+			localStorage.removeItem("signEstado");
+			localStorage.removeItem("signDatos");
+		
+			// Se ha obtenido un resultado
+			if (event.data.result == "signature") {
+				localStorage.setItem("signEstado", "OK");
+				localStorage.setItem("signDatos", event.data.signature);	//TODO: Agregar tambien el certificado de firma
+			}
+			// Se ha producido un error
+			else {
+				localStorage.setItem("signEstado", "KO");
+				localStorage.setItem("signDatos", event.data.type + ": " + event.data.message);
+			}
+		}
+	}
+	</script>
+  </head>
+	<body>
+	</body>
+</html>	
