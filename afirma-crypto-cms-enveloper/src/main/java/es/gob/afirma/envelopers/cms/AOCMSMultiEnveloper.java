@@ -574,14 +574,14 @@ public class AOCMSMultiEnveloper {
         // Elementos que contienen los elementos OID Data
         final org.bouncycastle.asn1.ASN1ObjectIdentifier doi = (org.bouncycastle.asn1.ASN1ObjectIdentifier) objects.nextElement();
 
-        final Logger LOGGER = Logger.getLogger("es.gob.afirma");  //$NON-NLS-1$
+        final Logger logger = Logger.getLogger("es.gob.afirma");  //$NON-NLS-1$
 
         if (doi.equals(org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers.data)) {
-            LOGGER.warning("La extraccion de datos de los envoltorios CMS Data no esta implementada"); //$NON-NLS-1$
+            logger.warning("La extraccion de datos de los envoltorios CMS Data no esta implementada"); //$NON-NLS-1$
             return null;
         }
         if (doi.equals(org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers.digestedData)) {
-            LOGGER.warning("La extraccion de datos de los envoltorios CMS DigestedData no esta implementada");  //$NON-NLS-1$
+            logger.warning("La extraccion de datos de los envoltorios CMS DigestedData no esta implementada");  //$NON-NLS-1$
             return null;
         }
         if (doi.equals(org.bouncycastle.asn1.cms.CMSObjectIdentifiers.compressedData)) {
