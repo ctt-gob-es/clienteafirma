@@ -826,10 +826,11 @@ public final class SignPanel extends JPanel {
 
             SignPanel.this.getProgressMonitor().setProgress(999);
 
-            // Deshabilitamos la posibilidad de cancelar el dialogo de espera
+            // Deshabilitamos la posibilidad de cancelar el dialogo de espera y le establecemos un titulo
             try {
                 final JDialog dialog = (JDialog) SignPanel.this.getProgressMonitor().getAccessibleContext().getAccessibleParent();
                 dialog.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+                dialog.setTitle(SimpleAfirmaMessages.getString("SignPanel.25")); //$NON-NLS-1$
                 ((JOptionPane)dialog.getContentPane().getComponent(0)).setOptions(new Object[]{});
             }
             catch(final Exception e) { /* Ignoramos los errores */ }
@@ -854,10 +855,8 @@ public final class SignPanel extends JPanel {
                 );
             }
 
-            try { Thread.sleep(1000); } catch(final Exception e) { /* Ignoramos los errores */ }
             // ***************** FIN PREPARACION DIALOGO PROGRESO *****************************************
             // ********************************************************************************************
-
 
             // ************************************************************************************
             // ****************** PROCESO DE FIRMA ************************************************
