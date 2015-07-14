@@ -38,9 +38,6 @@ import net.java.xades.security.xml.XAdES.DataObjectFormat;
 import net.java.xades.security.xml.XAdES.DataObjectFormatImpl;
 import net.java.xades.security.xml.XAdES.ObjectIdentifier;
 import net.java.xades.security.xml.XAdES.ObjectIdentifierImpl;
-import net.java.xades.security.xml.XAdES.SignaturePolicyIdentifier;
-import net.java.xades.security.xml.XAdES.SignatureProductionPlace;
-import net.java.xades.security.xml.XAdES.SignerRole;
 import net.java.xades.security.xml.XAdES.XAdES;
 import net.java.xades.security.xml.XAdES.XAdES_EPES;
 
@@ -580,31 +577,7 @@ public final class XAdESCounterSigner {
 		final X509Certificate cert = (X509Certificate) certChain[0];
 		xades.setSigningCertificate(cert);
 
-		// SignaturePolicyIdentifier
-		final SignaturePolicyIdentifier spi;
-		try {
-			spi = XAdESUtil.getPolicy(extraParams);
-		}
-		catch (final NoSuchAlgorithmException e1) {
-			throw new AOException(
-				"El algoritmo indicado para la politica (" + extraParams.getProperty("policyIdentifierHashAlgorithm") + ") no esta soportado: " + e1, e1 //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-			);
-		}
-		if (spi != null) {
-			xades.setSignaturePolicyIdentifier(spi);
-		}
-
-		// SignatureProductionPlace
-		final SignatureProductionPlace spp = XAdESUtil.getSignatureProductionPlace(extraParams);
-		if (spp != null) {
-			xades.setSignatureProductionPlace(spp);
-		}
-
-		// SignerRole
-		final SignerRole signerRole = XAdESUtil.parseSignerRole(extraParams);
-		if (signerRole != null) {
-			xades.setSignerRole(signerRole);
-		}
+		XAdESCommonMetadataUtil.addCommonMetadata(xades, extraParams);
 
 		// DataObjectFormats
 		final ObjectIdentifier objectIdentifier = new ObjectIdentifierImpl("OIDAsURN", "urn:oid:1.2.840.10003.5.109.10", null, new ArrayList<String>(0)); //$NON-NLS-1$ //$NON-NLS-2$
