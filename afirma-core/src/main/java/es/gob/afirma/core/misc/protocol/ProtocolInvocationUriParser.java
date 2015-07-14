@@ -533,7 +533,7 @@ public final class ProtocolInvocationUriParser {
 
 	/** Extrae y verifica la clave de cifrado de los parametros de entrada. Si no se especifica  se devuelve.
 	 *  @param params Par&aacute;metros extra&iacute;dos de la URI.
-	 *  @return Clave de cifrado o null si no se declar&oacute; en los par&aacute;metros.
+	 *  @return Clave de cifrado o null si no se declar&oacute; un valor en los par&aacute;metros.
 	 *  @throws ParameterException Cuando la clave de cifrado es err&oacute;nea. */
 	private static byte[] verifyCipherKey(final Map<String, String> params) throws ParameterException {
 
@@ -542,9 +542,14 @@ public final class ProtocolInvocationUriParser {
 			return null;
 		}
 
-		// Comprobamos que la clave de cifrado tenga la longitud correcta
+		// Si se ha indicado el parametro pero no un valor, se intepretara que no hay cifrado
 		final String key = params.get(KEY_PARAM);
-		if (key == null || key.length() != CIPHER_KEY_LENGTH) {
+		if (key == null || key.length() == 0) {
+			return null;
+		}
+
+		// Comprobamos que la clave de cifrado tenga la longitud correcta
+		if (key.length() != CIPHER_KEY_LENGTH) {
 			throw new ParameterException("La longitud de la clave de cifrado no es correcta"); //$NON-NLS-1$
 		}
 		return key.getBytes();
