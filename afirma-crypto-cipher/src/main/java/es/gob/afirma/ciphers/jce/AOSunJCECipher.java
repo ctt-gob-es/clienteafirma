@@ -75,7 +75,6 @@ public final class AOSunJCECipher implements AOCipher {
         new AOCipherConfig(AOCipherAlgorithm.AES, AOCipherBlockMode.CFB, AOCipherPadding.ISO10126PADDING),
         new AOCipherConfig(AOCipherAlgorithm.AES, AOCipherBlockMode.OFB, AOCipherPadding.PKCS5PADDING),
         new AOCipherConfig(AOCipherAlgorithm.AES, AOCipherBlockMode.OFB, AOCipherPadding.ISO10126PADDING),
-        new AOCipherConfig(AOCipherAlgorithm.ARCFOUR, AOCipherBlockMode.ECB, AOCipherPadding.NOPADDING),
         new AOCipherConfig(AOCipherAlgorithm.BLOWFISH, AOCipherBlockMode.ECB, AOCipherPadding.PKCS5PADDING),
         new AOCipherConfig(AOCipherAlgorithm.BLOWFISH, AOCipherBlockMode.ECB, AOCipherPadding.ISO10126PADDING),
         new AOCipherConfig(AOCipherAlgorithm.BLOWFISH, AOCipherBlockMode.CBC, AOCipherPadding.PKCS5PADDING),
@@ -112,8 +111,6 @@ public final class AOSunJCECipher implements AOCipher {
         new AOCipherConfig(AOCipherAlgorithm.TRIPLEDES, AOCipherBlockMode.CFB, AOCipherPadding.ISO10126PADDING),
         new AOCipherConfig(AOCipherAlgorithm.TRIPLEDES, AOCipherBlockMode.OFB, AOCipherPadding.PKCS5PADDING),
         new AOCipherConfig(AOCipherAlgorithm.TRIPLEDES, AOCipherBlockMode.OFB, AOCipherPadding.ISO10126PADDING),
-        new AOCipherConfig(AOCipherAlgorithm.RC2, AOCipherBlockMode.ECB, AOCipherPadding.PKCS5PADDING),
-        new AOCipherConfig(AOCipherAlgorithm.RC2, AOCipherBlockMode.ECB, AOCipherPadding.ISO10126PADDING),
         new AOCipherConfig(AOCipherAlgorithm.PBEWITHSHA1ANDDESEDE, AOCipherBlockMode.CBC, AOCipherPadding.PKCS5PADDING),
         new AOCipherConfig(AOCipherAlgorithm.PBEWITHSHA1ANDRC2_40, AOCipherBlockMode.CBC, AOCipherPadding.PKCS5PADDING),
         new AOCipherConfig(AOCipherAlgorithm.PBEWITHMD5ANDDES, AOCipherBlockMode.CBC, AOCipherPadding.PKCS5PADDING)

@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -13,41 +13,47 @@ package es.gob.afirma.core.ciphers;
 /** Constantes de cifrado (usando JCE).
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public final class CipherConstants {
-    
+
     private CipherConstants() {
         // No permitimos la instanciacion
     }
-    
+
     /** Algoritmos de cifrado soportados. */
     public enum AOCipherAlgorithm {
 
         /** Advanced Encryption Standard (AES). */
         AES("AES", "Advanced Encryption Standard (AES)", false, true, "2.16.840.1.101.3.4.1"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-        /** Alleged RC4. */
-        ARCFOUR("ARCFOUR", "Alleged RC4", false, true, "1.2.840.113549.3.4"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+
         /** Blowfish. */
         BLOWFISH("Blowfish", "Blowfish", false, true, "1.3.6.1.4.1.3029.1.1.1"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+
         /** Data Encryption Standard (DES). */
         DES("DES", "Data Encryption Standard (DES)", false, true, "1.2.840.113549.3.6"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+
         /** Triple DES (3DES). */
         TRIPLEDES("DESede", "Triple DES (3DES)", false, true, "1.2.840.113549.3.7"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-        /** RC2. */
-        RC2("RC2", "RC2", false, true, "1.2.840.113549.3.3"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+
         /** Contrase&ntilde;a con MD5 y DES. */
         PBEWITHMD5ANDDES("PBEWithMD5AndDES", "Contrase\u00F1a con MD5 y DES", true, false, "1.2.840.113549.1.5.3"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+
         /** Contrase&ntilde;a con SHA1 y 3DES. */
         PBEWITHSHA1ANDDESEDE("PBEWithSHA1AndDESede", "Contrase\u00F1a con SHA1 y 3DES", true, false, "1.2.840.113549.1.5.10"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+
         /** Contrase&ntilde;a con SHA1 y RC2. */
         PBEWITHSHA1ANDRC2_40("PBEWithSHA1AndRC2_40", "Contrase\u00F1a con SHA1 y RC2", true, false, "1.2.840.113549.1.5.11"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
         /** MAC HMACMD5 **/
         HMACMD5("HmacMD5", "HmacMD5", false, true, "1.3.6.1.5.5.8.1.1"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+
         /** MAC HMACSHA1 **/
         HMACSHA1("HmacSHA1", "HmacSHA1", false, true, "1.2.840.113549.2.7"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+
         /** MAC HMACSHA256 **/
         HMACSHA256("HmacSHA256", "HmacSHA256", false, true, "1.2.840.113549.2.9"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+
         /** MAC HMACSHA384 **/
         HMACSHA384("HmacSHA384", "HmacSHA384", false, true, "1.2.840.113549.2.10"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+
         /** MAC HMACSHA512 **/
         HMACSHA512("HmacSHA512", "HmacSHA512", false, true, "1.2.840.113549.2.11"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
@@ -214,5 +220,5 @@ public final class CipherConstants {
         }
     }
 
-    
+
 }

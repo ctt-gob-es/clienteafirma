@@ -70,12 +70,10 @@ final class Cifrado extends JPanel {
 
     // Constantes algoritmos / Mecanismo Clave de cifrado
     private final String[] algoritmoVr = new String[] {
-                                                       CipherConstants.AOCipherAlgorithm.AES.getName(),
-                                                       CipherConstants.AOCipherAlgorithm.ARCFOUR.getName(),
-                                                       CipherConstants.AOCipherAlgorithm.BLOWFISH.getName(),
-                                                       CipherConstants.AOCipherAlgorithm.DES.getName(),
-                                                       CipherConstants.AOCipherAlgorithm.TRIPLEDES.getName(),
-                                                       CipherConstants.AOCipherAlgorithm.RC2.getName()
+           CipherConstants.AOCipherAlgorithm.AES.getName(),
+           CipherConstants.AOCipherAlgorithm.BLOWFISH.getName(),
+           CipherConstants.AOCipherAlgorithm.DES.getName(),
+           CipherConstants.AOCipherAlgorithm.TRIPLEDES.getName(),
     };
 
     // Constantes de los mecanismos de cifrado
@@ -129,12 +127,10 @@ final class Cifrado extends JPanel {
         }
         else {
             final String[] algoritmoLr = new String[] {
-                                                       "Advanced Encryption Standard (AES)", //$NON-NLS-1$
-                                                       "Alleged RC4", //$NON-NLS-1$
-                                                       "Blowfish", //$NON-NLS-1$
-                                                       "Data Encryption Standard (DES)", //$NON-NLS-1$
-                                                       "Triple DES (3DES)", //$NON-NLS-1$
-                                                       "RC2" //$NON-NLS-1$
+                   "Advanced Encryption Standard (AES)", //$NON-NLS-1$
+                   "Blowfish", //$NON-NLS-1$
+                   "Data Encryption Standard (DES)", //$NON-NLS-1$
+                   "Triple DES (3DES)", //$NON-NLS-1$
             };
             comboAlgoritmo.setModel(new DefaultComboBoxModel(algoritmoLr));
         }

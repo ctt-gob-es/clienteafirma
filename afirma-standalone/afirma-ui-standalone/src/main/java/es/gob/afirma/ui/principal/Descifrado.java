@@ -64,11 +64,9 @@ final class Descifrado extends JPanel {
     private static final List<String> ALGORITMO_LR = new ArrayList<String>(
 		Arrays.asList(
 			"Advanced Encryption Standard (AES)",
-            "Alleged RC4",
             "Blowfish",
             "Data Encryption Standard (DES)",
-            "Triple DES (3DES)",
-			"RC2"
+            "Triple DES (3DES)"
         )
     );
 

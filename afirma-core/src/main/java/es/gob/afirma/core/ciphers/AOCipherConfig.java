@@ -39,7 +39,7 @@ public final class AOCipherConfig {
 
         // En caso de nulos tomamos defectos y algunas combinaciones
         // predefinidas
-        final AOCipherAlgorithm ciphAlgo = (algo != null) ? algo : AOCipherAlgorithm.getDefault();
+        final AOCipherAlgorithm ciphAlgo = algo != null ? algo : AOCipherAlgorithm.getDefault();
 
         AOCipherBlockMode ciphMode = mode;
         if (ciphMode == null) {
@@ -54,12 +54,7 @@ public final class AOCipherConfig {
 
         AOCipherPadding ciphPadding = padd;
         if (ciphPadding == null) {
-            if (ciphAlgo.equals(AOCipherAlgorithm.ARCFOUR)) {
-                ciphPadding = AOCipherPadding.NOPADDING;
-            }
-            else {
-                ciphPadding = AOCipherPadding.PKCS5PADDING;
-            }
+            ciphPadding = AOCipherPadding.PKCS5PADDING;
         }
         this.algo = ciphAlgo;
         this.mode = ciphMode;
