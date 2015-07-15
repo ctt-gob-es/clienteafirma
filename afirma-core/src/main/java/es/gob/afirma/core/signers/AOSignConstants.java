@@ -23,6 +23,9 @@ public final class AOSignConstants {
 	/** Identificador de la firma CMS. */
 	public static final String SIGN_FORMAT_CMS = "CMS/PKCS#7"; //$NON-NLS-1$
 
+	/** Identificador de la firma CAdES ASiC-S. */
+	public static final String SIGN_FORMAT_CADES_ASIC_S = "CAdES-ASiC-S"; //$NON-NLS-1$
+
 	/** Identificador de la firma CAdES. */
 	public static final String SIGN_FORMAT_CADES = "CAdES"; //$NON-NLS-1$
 
@@ -31,6 +34,9 @@ public final class AOSignConstants {
 
 	/** Identificador de la firma PKCS1 (RAW). */
 	public static final String SIGN_FORMAT_PKCS1 = "NONE"; //$NON-NLS-1$
+
+	/** Identificador de la firma XAdES-ASiC-S. */
+	public static final String SIGN_FORMAT_XADES_ASIC_S = "XAdES-ASiC-S"; //$NON-NLS-1$
 
 	/** Identificador de la firma XAdES Internally Detached. */
 	public static final String SIGN_FORMAT_XADES_DETACHED = "XAdES Detached"; //$NON-NLS-1$
