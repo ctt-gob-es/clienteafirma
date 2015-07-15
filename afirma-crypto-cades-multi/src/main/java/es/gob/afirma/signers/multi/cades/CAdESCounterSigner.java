@@ -16,13 +16,11 @@ import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.logging.Logger;
 
-import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1Encoding;
 import org.bouncycastle.asn1.ASN1InputStream;
@@ -44,7 +42,6 @@ import org.bouncycastle.asn1.cms.SignerInfo;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
-import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.TBSCertificateStructure;
 
 import es.gob.afirma.core.AOException;
@@ -133,24 +130,7 @@ final class CAdESCounterSigner {
 
         // 4. CERTIFICADOS
         // obtenemos la lista de certificados
-        ASN1Set certificates = null;
-
-        final ASN1Set certificatesSigned = sd.getCertificates();
-        final ASN1EncodableVector vCertsSig = new ASN1EncodableVector();
-        final Enumeration<?> certs = certificatesSigned.getObjects();
-
-        // COGEMOS LOS CERTIFICADOS EXISTENTES EN EL FICHERO
-        while (certs.hasMoreElements()) {
-            vCertsSig.add((ASN1Encodable) certs.nextElement());
-        }
-        // e introducimos los del firmante actual.
-        if (certChain.length != 0) {
-            final List<ASN1Encodable> ce = new ArrayList<ASN1Encodable>();
-            for (final java.security.cert.Certificate element : certChain) {
-                ce.add(Certificate.getInstance(ASN1Primitive.fromByteArray(element.getEncoded())));
-            }
-            certificates = SigUtils.fillRestCerts(ce, vCertsSig);
-        }
+        final ASN1Set certificates = CAdESMultiUtil.getCertificates(sd, certChain);
 
         // CRLS no usado
         final ASN1Set certrevlist = null;

@@ -15,7 +15,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
-import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -139,28 +138,6 @@ final class CAdESCoSigner {
 		return SignedData.getInstance(contentSignedData);
 	}
 
-	private static ASN1Set getCertificates(final SignedData sd, final java.security.cert.Certificate[] certChain) throws CertificateEncodingException, IOException {
-		ASN1Set certificates = null;
-
-		final ASN1Set certificatesSigned = sd.getCertificates();
-		final ASN1EncodableVector vCertsSig = new ASN1EncodableVector();
-		final Enumeration<?> certs = certificatesSigned.getObjects();
-
-		// COGEMOS LOS CERTIFICADOS EXISTENTES EN EL FICHERO
-		while (certs.hasMoreElements()) {
-			vCertsSig.add((ASN1Encodable) certs.nextElement());
-		}
-
-		if (certChain.length != 0) {
-			final List<ASN1Encodable> ce = new ArrayList<ASN1Encodable>();
-			for (final java.security.cert.Certificate element : certChain) {
-				ce.add(Certificate.getInstance(ASN1Primitive.fromByteArray(element.getEncoded())));
-			}
-			certificates = SigUtils.fillRestCerts(ce, vCertsSig);
-		}
-		return certificates;
-	}
-
 	private ASN1Set signedAttr2;
 
 	/** Se crea una cofirma a partir de los datos del firmante, el archivo
@@ -230,7 +207,7 @@ final class CAdESCoSigner {
 
 		// 4. CERTIFICADOS
 		// obtenemos la lista de certificados
-		final ASN1Set certificates = getCertificates(sd, certChain);
+		final ASN1Set certificates = CAdESMultiUtil.getCertificates(sd, certChain);
 
 		// buscamos que tipo de algoritmo es y lo codificamos con su OID
 		final String signatureAlgorithm = parameters.getSignatureAlgorithm();
