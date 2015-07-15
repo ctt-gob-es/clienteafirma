@@ -10,87 +10,135 @@ if (document.all && !window.setTimeout.isPolyfill) {
 	window.setTimeout.isPolyfill = true;
 }
 
-var AutoFirma = {
+var AutoFirma = ( function ( window, undefined ) {
 
-		VERSION : "1.3",
-			
-		origin : null,
+		var VERSION = "1.3";
+
+		var origin = null;
 		
 		/* Cadena que determina el fin de una respuesta */
-		EOF : "%%EOF%%",
+		var EOF = "%%EOF%%";
 
 		/**
 		 * Determina con un boolean si se accede a la web con Chrome
 		 */
-		isChrome : function () {
+		function isChrome () {
 			return navigator.userAgent.toUpperCase().indexOf("CHROME") != -1 ||
 				navigator.userAgent.toUpperCase().indexOf("CHROMIUM") != -1;
-		},
+		}
 		
-		setOrigin : function(origin) {
-			if (AutoFirma.origin == null) {
-				AutoFirma.origin = origin;
+		/**
+		 * Establece el origen desde el que se realizara la operacion, pero solo la primera vez
+		 * que se invoca a este metodo. En las siguientes invocaciones no se hara nada para evitar
+		 * que se cambie el origen.
+		 * @param originDomain Origen de la pagina.
+		 * @returns
+		 */
+		function setOrigin (originDomain) {
+			if (origin == null) {
+				origin = originDomain;
 			}
-		},
+		}
 
 		/**
 		 * Realiza una operacion de firma/multifirma.
 		 * @param params Array con todos los parametros para la ejecucion de la operacion de firma.
 		 */
-		signOperation : function(params) {
+		function signOperation (params) {
 
-			var idSession = AutoFirma.generateNewIdSession();
-			var cipherKey = ""; //AutoFirma.generateCipherKey();
+			var idSession = generateNewIdSession();
+			var cipherKey = ""; //generateCipherKey();
 		
-			var url = AutoFirma.buildUrl(params);
+			var url = buildUrl(params);
 			
-			AutoFirma.execAppIntent(url, idSession, cipherKey);
-		},
+			execAppIntent(url, idSession, cipherKey);
+		}
 
 		/**
 		 * Funciones auxiliares del objeto JS del cliente de firma.
 		 **/
-		generateNewIdSession : function() {
-			return AutoFirma.zeroFill(Math.floor((Math.random() * 2147483648) + 1), 12);
-		},
+		var MAX_NUMBER = 2147483648;
 
-		/**
-		 * Genera un numero aleatorio para utilizar como clave de cifrado.
-		 */
-		generateCipherKey : function() {
-			return AutoFirma.zeroFill(Math.floor(((Math.random() * 2147483648) + 1) % 100000000), 8);
-		},
-		
-		zeroFill : function(number, width) {
+		/* Caracteres validos para los ID de sesion */
+		var VALID_CHARS_TO_ID = "1234567890abcdefghijklmnopqrstuwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+		/* Genera un identificador de sesion. */
+		function generateNewIdSession () {
+			var ID_LENGTH = 20;
+			var random = "";
+			var randomInts;
+			if (typeof window.crypto != "undefined" && typeof window.crypto.getRandomValues != "undefined") {
+				randomInts = new Uint32Array(ID_LENGTH);
+				window.crypto.getRandomValues(randomInts);
+			}
+			else {
+				randomInts = new Array(ID_LENGTH);
+				for (var i = 0; i < ID_LENGTH; i++) {
+					randomInts[i] = rnd() * MAX_NUMBER;
+				}
+			}
+
+			for (var i = 0; i < ID_LENGTH; i++) {
+				random += VALID_CHARS_TO_ID.charAt(Math.floor(randomInts[i] % VALID_CHARS_TO_ID.length));
+			}
+
+			return random;
+		}
+
+		/* Genera un numero aleatorio para utilizar como clave de cifrado. */
+		function generateCipherKey() {
+			var random;
+			if (typeof window.crypto != "undefined" && typeof window.crypto.getRandomValues != "undefined") {
+				var randomInts = new Uint32Array(1);
+				window.crypto.getRandomValues(randomInts);
+				random = zeroFill(randomInts[0] % 100000000, 8);
+			}
+			else {
+				random = zeroFill(Math.floor(((rnd() * MAX_NUMBER) + 1) % 100000000), 8);
+			}
+
+			return random;
+		}
+
+		/* Completa un numero con ceros a la izquierda. */
+		function zeroFill(number, width) {
 			width -= number.toString().length;
 			if (width > 0) {
 				return new Array(width + (/\./.test(number) ? 2 : 1)).join('0')
 				+ number;
 			}
 			return number + "";
-		},
-		
+		}
+
+		/**
+		 * Genera numeros aleatorios con una distribucion homogenea
+		 */
+		var seed;
+		function rnd () {
+			if (seed == undefined) {
+				seed = new Date().getMilliseconds() * 1000 * Math.random();
+			}
+		    seed = (seed * 9301 + 49297) % 233280;
+		    return seed / 233280;
+		}
+
 		/**
 		 * Construye una URL para la invocaci&oacute;n del Cliente @firma nativo.
 		 * params: Par\u00E1metros para la configuraci\u00F3n de la operaci\u00F3n.
 		 */
-		buildUrl : function(params) {
+		function buildUrl (params) {
 
 			// Operacion seleccionada
 			var intentURL;
 			if (params != null && params != undefined && params.length > 0) {
-				intentURL = AutoFirma.getProtocol() + '://' + params[0].value + '?';	// Agregamos como dominio el identificador del tipo de operacion
+				intentURL = 'afirma://' + params[0].value + '?';	// Agregamos como dominio el identificador del tipo de operacion
 				for (var i = 0; i < params.length; i++) {
 					intentURL += (i != 0 ? '&' : '') + params[i].key + '=' + encodeURIComponent(params[i].value); 
 				}
 			}
 			return intentURL;
-		},
+		}
 
-		getProtocol : function () {
-			return "afirma";
-		},
-		
 		/**
 		 * Invoca un Intent con la operacion seleccionada, la configuraci\u00F3n establecida y las campos del
 		 * formulario pasado como parametro. Si se define un callback para tratar el caso de exito o error de
@@ -103,22 +151,22 @@ var AutoFirma = {
 		 * successCallback: Actuaci\u00F3n a realizar cuando se recupera el resultado de la operaci&oacute;n.
 		 * errorCallback: Actuaci\u00F3n a realizar cuando ocurre un error al recuperar el resultado.
 		 */
-		execAppIntent : function (url, idSession, cipherKey) {
+		function execAppIntent (url, idSession, cipherKey) {
 
 			// Calculamos los puertos
-			var ports = AutoFirma.getRandomPorts();
+			var ports = getRandomPorts();
 			
 			// Invocamos a la aplicacion nativa
-			AutoFirma.openNativeApp(ports, idSession);
+			openNativeApp(ports, idSession);
 
 			// Enviamos la peticion a la app despues de esperar un tiempo prudencia
-			setTimeout(AutoFirma.executeOperationByService, AutoFirma.getWaitingTime(), ports, url, cipherKey);
-		},
+			setTimeout(executeOperationByService, getWaitingTime(), ports, url, cipherKey);
+		}
 		
 		/**
 		 * Obtiene un puerto aleatorio para la comunicaci\u00F3n con la aplicaci\u00F3n nativa.
 		 */
-		getRandomPorts : function () {
+		function getRandomPorts () {
 			var MIN_PORT = 49152;
 			var MAX_PORT = 65535;
 			 
@@ -128,12 +176,12 @@ var AutoFirma = {
 			ports[2] = Math.floor((Math.random() * (MAX_PORT - MIN_PORT))) + MIN_PORT;
 			
 			return ports;
-		},
+		}
 		
 		/**
 		 * Obtiene un puerto aleatorio para la comunicaci\u00F3n con la aplicaci\u00F3n nativa.
 		 */
-		openNativeApp : function (ports, idSession) {
+		function openNativeApp (ports, idSession) {
 			
 			var portsLine = "";
 			for (var i = 0; i < ports.length; i++) {
@@ -142,59 +190,67 @@ var AutoFirma = {
 					portsLine += ",";
 				}
 			}
-			AutoFirma.openUrl("afirma://service?ports=" + portsLine + "&idsession=" + idSession)
-		},
+			openUrl("afirma://service?ports=" + portsLine + "&idsession=" + idSession)
+		}
 		
 		/**
 		 * Llama a la aplicacion de firma a traves de la URL de invocacion sin que afecte
 		 * a la pagina que se esta mostrando.
 		 * @param url URL de invocacion.
 		 */
-		openUrl : function (url) {
+		function openUrl (url) {
 			
 			// Usamos document.location porque tiene mejor soporte por los navegadores que
 			// window.location que es el mecanismo estandar
-			if (AutoFirma.isChrome()) {
+			if (isChrome()) {
 				document.location = url;
 			}
 			else {
-				var iframeElem = document.createElement("iframe");
-				
-				var srcAttr = document.createAttribute("src");
-				srcAttr.value = url;
-				iframeElem.setAttributeNode(srcAttr);
-				
-				var heightAttr = document.createAttribute("height");
-				heightAttr.value = 1;
-				iframeElem.setAttributeNode(heightAttr);
-				
-				var widthAttr = document.createAttribute("width");
-				widthAttr.value = 1;
-				iframeElem.setAttributeNode(widthAttr);
-				
-				var seamlessAttr = document.createAttribute("seamless");
-				seamlessAttr.value = "seamless";
-				iframeElem.setAttributeNode(seamlessAttr);
-				
-				document.body.appendChild(iframeElem);
+				if (document.getElementById("iframeAfirma") != null) {
+					document.getElementById("iframeAfirma").src = url;
+				}
+				else {
+					var iframeElem = document.createElement("iframe");
+
+					var idAttr = document.createAttribute("id");
+					idAttr.value = "iframeAfirma";
+					iframeElem.setAttributeNode(idAttr);
+
+					var srcAttr = document.createAttribute("src");
+					srcAttr.value = url;
+					iframeElem.setAttributeNode(srcAttr);
+
+					var heightAttr = document.createAttribute("height");
+					heightAttr.value = 1;
+					iframeElem.setAttributeNode(heightAttr);
+
+					var widthAttr = document.createAttribute("width");
+					widthAttr.value = 1;
+					iframeElem.setAttributeNode(widthAttr);
+
+					var styleAttr = document.createAttribute("style");
+					styleAttr.value = "display: none;";
+					iframeElem.setAttributeNode(styleAttr);
+
+					document.body.appendChild(iframeElem);
+				}
 			}
-		},
-		
+		}
+
 		/**
 		 * Determina el tiempo de espera prudencial (en milisegundos) que, dependiendo del
 		 * sistema, es necesario esperar desde la llamada a la aplicaci\u00F3n nativa hasta
 		 * que se le pueda solicitar que realice una operaci\u00F3n.
 		 */
-		getWaitingTime : function () {
+		function getWaitingTime () {
 			return 20000;	//TODO: Cambiar a 30000
-		},
+		}
 
-		
-		executeOperationByService : function (ports, url, cipherKey) {
+		function executeOperationByService (ports, url, cipherKey) {
 
 			var i = 0;
 			var portError = false;
-			var httpRequest = AutoFirma.getHttpRequest();
+			var httpRequest = getHttpRequest();
 			do {
 				httpRequest.open("POST", "http://127.0.0.1:" + ports[i] + "/afirma", false);
 				httpRequest.setRequestHeader("Content-type","application/x-www-form-urlencoded");
@@ -210,7 +266,7 @@ var AutoFirma = {
 						i++;
 					} else {
 						// Interpretamos que este error viene de la aplicacion
-						AutoFirma.errorServiceResponseFunction("java.lang.IOException", "Ocurrio un error de red en la llamada al servicio de firma");
+						errorServiceResponseFunction("java.lang.IOException", "Ocurrio un error de red en la llamada al servicio de firma");
 						return;
 					}
 				}
@@ -218,16 +274,16 @@ var AutoFirma = {
 
 			// Operamos segun el resultado
 			if (httpRequest.readyState == 4 && httpRequest.status == 200) {
-				AutoFirma.successServiceResponseFunction(Base64.decode(httpRequest.responseText, true), cipherKey);
+				successServiceResponseFunction(Base64.decode(httpRequest.responseText, true), cipherKey);
 				return;
 			}
 			
 			if (errorCallback != null) {
-				AutoFirma.errorServiceResponseFunction(null, httpRequest.responseText);
+				errorServiceResponseFunction(null, httpRequest.responseText);
 			}
-		},
+		}
 		
-		getHttpRequest : function() {
+		function getHttpRequest() {
 			var activexmodes=["Msxml2.XMLHTTP", "Microsoft.XMLHTTP"]; //activeX versions to check for in IE
 			if (window.ActiveXObject){ //Test for support for ActiveXObject in IE first (as XMLHttpRequest in IE7 is broken)
 				for (var i=0; i<activexmodes.length; i++) {
@@ -245,8 +301,8 @@ var AutoFirma = {
 			else {
 				return false;
 			}
-		},
-		
+		}
+
 		/**
 		 * Lee el resultado devuelto por el servicio, 'CANCEL' o empieza por 'SAF-', ejecutara el metodo
 		 * de error, si es 'OK' o cualquier otra cosa (que se intepretara como el resultado en base 64)
@@ -254,35 +310,35 @@ var AutoFirma = {
 		 * @param data Resultado obtenido.
 		 * @param cipherKey Clave para el descifrado del resultado si no es un error.
 		 */
-		successServiceResponseFunction : function(data, cipherKey) {
+		function successServiceResponseFunction (data, cipherKey) {
 
 			// No se ha obtenido respuesta
 			if (data == undefined || data == null) {
-				AutoFirma.errorServiceResponseFunction("es.gob.afirma.core.AOCancelledOperationException", "Operacion cancelada por el usuario");
+				errorServiceResponseFunction("es.gob.afirma.core.AOCancelledOperationException", "Operacion cancelada por el usuario");
 				return;
 			}
 
 			// Termina bien y no devuelve ningun resultado
 			if (data == "OK") {
-				AutoFirma.sendOkToIframe();
+				sendOkToIframe();
 				return;
 			}
 			
 			// Se ha cancelado la operacion
 			if (data == "CANCEL") {
-				AutoFirma.errorServiceResponseFunction("es.gob.afirma.core.AOCancelledOperationException", "Operacion cancelada por el usuario");
+				errorServiceResponseFunction("es.gob.afirma.core.AOCancelledOperationException", "Operacion cancelada por el usuario");
 				return;
 			}
 
 			// Se ha producido un error
 			if (data.lenght > 4 && data.substr(0, 4) == "SAF_") {
-				AutoFirma.errorServiceResponseFunction("java.lang.Exception", data);
+				errorServiceResponseFunction("java.lang.Exception", data);
 				return;
 			}
 			
 			// Se ha producido un error y no se ha identificado el tipo
 			if (data == "NULL") {
-				AutoFirma.errorServiceResponseFunction("java.lang.Exception", "Error desconocido");
+				errorServiceResponseFunction("java.lang.Exception", "Error desconocido");
 				return;
 			}
 			
@@ -293,68 +349,68 @@ var AutoFirma = {
 
 			if (sepPos == -1) {
 				if (cipherKey != undefined && cipherKey != null && cipherKey.length > 0) {
-					signature = AutoFirma.decipher(Base64.decode(data, true), cipherKey);
+					signature = decipher(Base64.decode(data, true), cipherKey);
 				} else {
 					signature = Base64.decode(data, true).replace(/\-/g, "+").replace(/\_/g, "/");
 				}
 			}
 			else {
 				if (cipherKey != undefined && cipherKey != null && cipherKey.length > 0) {
-					certificate = AutoFirma.decipher(data.substring(0, sepPos), cipherKey);
-					signature = AutoFirma.decipher(data.substring(sepPos + 1), cipherKey);
+					certificate = decipher(data.substring(0, sepPos), cipherKey);
+					signature = decipher(data.substring(sepPos + 1), cipherKey);
 				} else {
 					certificate = data.substring(0, sepPos).replace(/\-/g, "+").replace(/\_/g, "/");
 					signature = data.substring(sepPos + 1).replace(/\-/g, "+").replace(/\_/g, "/");
 				}
 			}
 
-			AutoFirma.sendSignatureToIframe(signature, certificate);
-		},
+			sendSignatureToIframe(signature, certificate);
+		}
 
 		
-		errorServiceResponseFunction : function(type, message) {
-			AutoFirma.sendErrorToIframe(
+		function errorServiceResponseFunction (type, message) {
+			sendErrorToIframe(
 				type ? type : "java.lang.Exception",
 				message ? message : "No se ha podido extablecer la comunicaci\u00F3n entre la aplicaci\u00F3n de firma y la p\u00E1gina web"
 			);
-		},
+		}
 		
 		/**
 		 * Notificamos al iframe que hace de pasarela con la aplicacion principal que ha ocurrido un error.
 		 * type: 	Tipo de error.
 		 * message:	Mensaje de error.
 		 */
-		sendErrorToIframe : function(type, message) {
+		function sendErrorToIframe (type, message) {
 			var wrapper = new Object();
 			wrapper.result = "error";
 			wrapper.type = type;
 			wrapper.message = message;
-			window.frames[0].postMessage(wrapper, AutoFirma.origin);
-		},
+			window.frames[0].postMessage(wrapper, origin);
+		}
 		
 		/**
 		 * Notificamos al iframe que hace de pasarela con la aplicacion principal que ha ocurrido un error.
 		 * type: 	Tipo de error.
 		 * message:	Mensaje de error.
 		 */
-		sendSignatureToIframe : function(signature, certificate) {
+		function sendSignatureToIframe (signature, certificate) {
 			var wrapper = new Object();
 			wrapper.result = "signature";
 			wrapper.signature = signature;
 			wrapper.cert = certificate;
-			window.frames[0].postMessage(wrapper, AutoFirma.origin);
-		},
+			window.frames[0].postMessage(wrapper, origin);
+		}
 		
 		/**
 		 * Notificamos al iframe que hace de pasarela con la aplicacion principal que ha ocurrido un error.
 		 * type: 	Tipo de error.
 		 * message:	Mensaje de error.
 		 */
-		sendOkToIframe : function() {
+		function sendOkToIframe () {
 			var wrapper = new Object();
 			wrapper.result = "Ok";
-			window.frames[0].postMessage(wrapper, AutoFirma.origin);
-		},
+			window.frames[0].postMessage(wrapper, origin);
+		}
 		
 		/**
 		 * Realiza un descifrado DES compatible con Java (Algoritmo DES, modo CBC, sin Padding).
@@ -363,19 +419,22 @@ var AutoFirma = {
 		 * para descifrar.
 		 * Como resultado devuelve la cadena de texto descifrada en base 64.
 		 */
-		decipher : function(cipheredData, key) {
-							
+		function decipher(cipheredData, key) {
+			
 			var dotPos = cipheredData.indexOf('.');
 			var padding = cipheredData.substr(0, dotPos);
 			
 			var deciphered = des(key, base64ToString(cipheredData.substr(dotPos + 1).replace(/\-/g, "+").replace(/\_/g, "/")), 0, 0, null);
 			
-			return stringToBase64(deciphered.substr(0, deciphered.length - padding))//; - 8));
-		},
-};
-
-
-
+			return stringToBase64(deciphered.substr(0, deciphered.length - padding - 8));
+		}
+		
+		/* Metodos que publicamos del objeto AppAfirmaJS */
+		return {
+			setOrigin : setOrigin,
+			signOperation : signOperation
+		}
+})(window, undefined);
 
 
 /**
