@@ -17,6 +17,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.Signature;
 import java.security.SignatureException;
+import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -68,6 +69,31 @@ final class CoSignerEnveloped {
 
     private ASN1Set signedAttr2;
 
+    private static ASN1Set getCertificates(final SignedAndEnvelopedData sd,
+    		                               final X509Certificate[] signerCertificateChain) throws CertificateEncodingException,
+    		                                                                                      IOException {
+        ASN1Set certificates = null;
+
+        final ASN1Set certificatesSigned = sd.getCertificates();
+        final ASN1EncodableVector vCertsSig = new ASN1EncodableVector();
+        final Enumeration<?> certs = certificatesSigned.getObjects();
+
+        // COGEMOS LOS CERTIFICADOS EXISTENTES EN EL FICHERO
+        while (certs.hasMoreElements()) {
+            vCertsSig.add((ASN1Encodable) certs.nextElement());
+        }
+
+        if (signerCertificateChain.length != 0) {
+            final List<ASN1Encodable> ce = new ArrayList<ASN1Encodable>();
+            for (final X509Certificate element : signerCertificateChain) {
+                ce.add(Certificate.getInstance(ASN1Primitive.fromByteArray(element.getEncoded())));
+            }
+            certificates = SigUtils.fillRestCerts(ce, vCertsSig);
+        }
+
+        return certificates;
+    }
+
     /** Constructor de la clase. Se crea una cofirma a partir de los datos del
      * firmante, el archivo que se firma y del archivo que contiene las firmas.
      * @param parameters par&aacute;metros necesarios que contienen tanto la firma del
@@ -113,24 +139,7 @@ final class CoSignerEnveloped {
 
         // 4. CERTIFICADOS
         // obtenemos la lista de certificados
-        ASN1Set certificates = null;
-
-        final ASN1Set certificatesSigned = sd.getCertificates();
-        final ASN1EncodableVector vCertsSig = new ASN1EncodableVector();
-        final Enumeration<?> certs = certificatesSigned.getObjects();
-
-        // COGEMOS LOS CERTIFICADOS EXISTENTES EN EL FICHERO
-        while (certs.hasMoreElements()) {
-            vCertsSig.add((ASN1Encodable) certs.nextElement());
-        }
-
-        if (signerCertificateChain.length != 0) {
-            final List<ASN1Encodable> ce = new ArrayList<ASN1Encodable>();
-            for (final X509Certificate element : signerCertificateChain) {
-                ce.add(Certificate.getInstance(ASN1Primitive.fromByteArray(element.getEncoded())));
-            }
-            certificates = SigUtils.fillRestCerts(ce, vCertsSig);
-        }
+        final ASN1Set certificates = getCertificates(sd, signerCertificateChain);
 
         // buscamos que timo de algoritmo es y lo codificamos con su OID
         final String signatureAlgorithm = parameters.getSignatureAlgorithm();
@@ -255,9 +264,8 @@ final class CoSignerEnveloped {
         e.nextElement();
         // Contenido de signedAndEnvelopedData
         final ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
-        final ASN1Sequence contentSignedData = (ASN1Sequence) doj.getObject();// contenido
-                                                                        // del
-                                                                        // signedAndEnvelopedData
+        // Contenido del signedAndEnvelopedData
+        final ASN1Sequence contentSignedData = (ASN1Sequence) doj.getObject();
 
         final SignedAndEnvelopedData sd = new SignedAndEnvelopedData(contentSignedData);
 
@@ -265,24 +273,7 @@ final class CoSignerEnveloped {
 
         // 4. CERTIFICADOS
         // obtenemos la lista de certificados
-        ASN1Set certificates = null;
-
-        final ASN1Set certificatesSigned = sd.getCertificates();
-        final ASN1EncodableVector vCertsSig = new ASN1EncodableVector();
-        final Enumeration<?> certs = certificatesSigned.getObjects();
-
-        // COGEMOS LOS CERTIFICADOS EXISTENTES EN EL FICHERO
-        while (certs.hasMoreElements()) {
-            vCertsSig.add((ASN1Encodable) certs.nextElement());
-        }
-
-        if (signerCertificateChain.length != 0) {
-            final List<ASN1Encodable> ce = new ArrayList<ASN1Encodable>();
-            for (final X509Certificate element : signerCertificateChain) {
-                ce.add(Certificate.getInstance(ASN1Primitive.fromByteArray(element.getEncoded())));
-            }
-            certificates = SigUtils.fillRestCerts(ce, vCertsSig);
-        }
+        final ASN1Set certificates = getCertificates(sd, signerCertificateChain);
 
         // buscamos que tipo de algoritmo es y lo codificamos con su OID
         final String digestAlgorithm =  AOSignConstants.getDigestAlgorithmName(signatureAlgorithm);
