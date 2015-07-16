@@ -53,10 +53,10 @@ public final class AOCAdESTriPhaseSigner implements AOSigner {
 	/** Nombre de la propiedad con los nodos objetivo para la contrafirma. */
 	private static final String PROPERTY_NAME_CS_TARGET = "target"; //$NON-NLS-1$
 
-	/** Prefijo para cada prefirma. */
+	/** Etiqueta de cada prefirma en el XML de sesi&oacute;n trif&aacute;sica. */
 	private static final String PROPERTY_NAME_PRESIGN = "PRE"; //$NON-NLS-1$
 
-	/** Firma PKCS#1. */
+	/** Etiqueta de cada firma PKCS#1 en el XML de sesi&oacute;n trif&aacute;sica. */
 	private static final String PROPERTY_NAME_PKCS1_SIGN = "PK1"; //$NON-NLS-1$
 
 	/** Indicador de finalizaci&oacute;n correcta de proceso. */
