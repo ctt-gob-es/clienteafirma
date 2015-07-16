@@ -5,11 +5,13 @@ import java.io.IOException;
 import java.net.BindException;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
+import java.net.SocketTimeoutException;
 import java.net.URI;
 import java.nio.ByteBuffer;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.nio.charset.Charset;
+import java.util.Date;
 import java.util.Properties;
 import java.util.logging.Logger;
 
@@ -21,9 +23,19 @@ final class ServiceInvocationManager {
 
 	private static final int READ_BUFFER_SIZE = 2048;
 
+	/** M&aacute;ximo tiempo de espera entre operaciones. */
+	private static int MAX_WAITING_TIME = 60000;
+
+	/** Tiempo de espera de cada socket. */
+	private static int SOCKET_TIMEOUT = 15000;
+
+	/** Momento en el que se realiz&oacute; la operaci&oacute;n anterior. */
+	private static long lastOperationTime = 0;
+
 	static void startService(final String url) {
 
-		LOGGER.info("Iniciando servicio local de firma..."); //$NON-NLS-1$
+		LOGGER.info("Iniciando servicio local de firma...: " + url); //$NON-NLS-1$
+
 
 		try {
 			try ( final ServerSocketChannel serverSocketChannel = ServerSocketChannel.open(); ) {
@@ -31,45 +43,79 @@ final class ServiceInvocationManager {
 				tryPorts(getPorts(url), serverSocketChannel.socket());
 				serverSocketChannel.configureBlocking(true);
 
-				try ( final SocketChannel socketChannel = serverSocketChannel.accept(); ) {
+				while(!isExpiratedExecution()){
 
-					if (!isLocalAddress((InetSocketAddress) socketChannel.getRemoteAddress())) {
-						socketChannel.close();
-						serverSocketChannel.close();
-						throw new SecurityException(
-							"Se ha detectado un acceso no autorizado desde " + ((InetSocketAddress) socketChannel.getRemoteAddress()).getHostString() //$NON-NLS-1$
-						);
+					LOGGER.info("Quedamos a la espera de una llamada por socket"); //$NON-NLS-1$
+
+					try ( final SocketChannel socketChannel = serverSocketChannel.accept(); ) {
+
+						LOGGER.info("Detectada conexion entrante"); //$NON-NLS-1$
+
+						if (!isLocalAddress((InetSocketAddress) socketChannel.getRemoteAddress())) {
+							socketChannel.close();
+							serverSocketChannel.close();
+							LOGGER.severe("Se ha detectado un acceso no autorizado desde " + //$NON-NLS-1$
+								 ((InetSocketAddress) socketChannel.getRemoteAddress()).getHostString());
+							continue;
+						}
+
+						LOGGER.info("Aceptada conexion desde: " + socketChannel); //$NON-NLS-1$
+						socketChannel.configureBlocking(false);
+
+						final String commandUri;
+						try {
+
+							final String httpRequest = read(socketChannel);
+							if (httpRequest.trim().length() == 0) {
+								LOGGER.warning("Se recibe una peticion HTTP vacia"); //$NON-NLS-1$
+								continue;
+							}
+							LOGGER.info("Peticion HTTP recibida:\n" + httpRequest); //$NON-NLS-1$
+
+							commandUri = getCommandUri(httpRequest);
+						}
+						catch (final IllegalArgumentException e) {
+							LOGGER.warning("Los parametros recibidos a traves del socket no son validos, se ignorara la peticion: " + e); //$NON-NLS-1$
+							continue;
+						}
+						LOGGER.info("Comando URI recibido por HTTP: " + commandUri); //$NON-NLS-1$
+						if (commandUri.startsWith("afirma://service?") || commandUri.startsWith("afirma://service/?")) { //$NON-NLS-1$ //$NON-NLS-2$
+							LOGGER.warning("Invocacion recursiva para la apertura del servicio, se ignorara:\n" + commandUri); //$NON-NLS-1$
+							continue;
+						}
+
+
+						// TODO: Hay que incorporar el soporte de distintos tipos de llamadas.
+						// Primeramente, una llamada de tipo echo
+
+						final String operationResult = ProtocolInvocationLauncher.launch(commandUri);
+
+						// Gestion de la respuesta
+						final byte[] response = createHttpResponse(
+								operationResult != null && !operationResult.startsWith("SAF_"), //$NON-NLS-1$
+								operationResult != null ? operationResult : "NULL" //$NON-NLS-1$
+								);
+
+						LOGGER.info("Resultado: " + operationResult); //$NON-NLS-1$
+
+						updateLastAccess();
+
+						final ByteBuffer bb = ByteBuffer.allocate(response.length);
+						bb.clear();
+						bb.put(response);
+						bb.flip();
+						socketChannel.write(bb);
+
 					}
-
-					LOGGER.info("Aceptada conexion desde: " + socketChannel); //$NON-NLS-1$
-					socketChannel.configureBlocking(false);
-
-					final String commandUri = getCommandUri(read(socketChannel));
-					LOGGER.info("Comando URI recibido por HTTP: " + commandUri); //$NON-NLS-1$
-					if (commandUri.startsWith("afirma://service?") || commandUri.startsWith("afirma://service/?")) { //$NON-NLS-1$ //$NON-NLS-2$
-						//TODO: No permitir acceso recursivo
+					catch (final SocketTimeoutException e) {
+						LOGGER.info("Tiempo de espera del socket terminado"); //$NON-NLS-1$
 					}
-
-					final String operationResult = ProtocolInvocationLauncher.launch(commandUri);
-
-					// Gestion de la respuesta
-					final byte[] response = createHttpResponse(
-						operationResult != null && !operationResult.startsWith("SAF_"), //$NON-NLS-1$
-						operationResult != null ? operationResult : "NULL" //$NON-NLS-1$
-					);
-
-					final ByteBuffer bb = ByteBuffer.allocate(response.length);
-					bb.clear();
-					bb.put(response);
-					bb.flip();
-					socketChannel.write(bb);
-
-					socketChannel.close();
-					serverSocketChannel.close();
 				}
+				LOGGER.warning("Se ha caducado la conexion. Se deja de escuchar en el puerto..."); //$NON-NLS-1$
 			}
 
 		}
+
 		catch (final IOException e) {
 			// No hacemos nada ya que no tenemos forma de transmitir el error de vuelta y no
 			// debemos mostrar dialogos graficos
@@ -79,6 +125,31 @@ final class ServiceInvocationManager {
 
 	}
 
+	/**
+	 * Comprueba si el servicio ya ha sobrepasado el tiempo m&aacute;ximo de espera.
+	 * @return {@code true} si se ha sobrepasado
+	 */
+	private static boolean isExpiratedExecution() {
+		if (lastOperationTime == 0) {
+			updateLastAccess();
+		}
+		return lastOperationTime + MAX_WAITING_TIME < new Date().getTime();
+	}
+
+	/**
+	 * Actualiza la hora del &uacute;ltimo acceso al servicio para que el tiempo de
+	 * expiraci&oacute;n l&iacute;mite se calcule a partir de esta.
+	 */
+	private static void updateLastAccess() {
+		lastOperationTime = new Date().getTime();
+	}
+
+	/**
+	 * Crea una respuesta HTTP para enviar a traves del socket.
+	 * @param ok Indica si la operacion finaliz&oacute; bien o mal.
+	 * @param response
+	 * @return
+	 */
 	private static byte[] createHttpResponse(final boolean ok, final String response) {
 		final StringBuilder sb = new StringBuilder();
 		if (ok) {
@@ -152,6 +223,7 @@ final class ServiceInvocationManager {
 		}
 		for (final int port : ports) {
 			try {
+				socket.setSoTimeout(SOCKET_TIMEOUT);
 				socket.bind(new InetSocketAddress(port));
 				LOGGER.info("Establecido el puerto " + port + " para el servicio Cliente @firma"); //$NON-NLS-1$ //$NON-NLS-2$
 				return;
@@ -201,21 +273,22 @@ final class ServiceInvocationManager {
 		return false;
 	}
 
-	private static String getCommandUri(final String httpResponse) {
-		if (httpResponse == null) {
+	private static String getCommandUri(final String httpRequest) {
+		if (httpRequest == null) {
 			throw new IllegalArgumentException(
 				"Los datos recibidos por HTTP son nulos" //$NON-NLS-1$
 			);
 		}
-		if (!httpResponse.contains("cmd=")) { //$NON-NLS-1$
+		final int pos = httpRequest.indexOf("cmd="); //$NON-NLS-1$
+		if (pos == -1) {
 			throw new IllegalArgumentException(
-				"Los datos recibidos por HTTP no contienen un parametro 'cmd'" //$NON-NLS-1$
+				"Los datos recibidos por HTTP no contienen un parametro 'cmd': " + httpRequest //$NON-NLS-1$
 			);
 		}
 
 		final String cmdUri;
 		try {
-			cmdUri = new String(Base64.decode(httpResponse.split("cmd=")[1].trim(), true)); //$NON-NLS-1$
+			cmdUri = new String(Base64.decode(httpRequest.substring(pos + "cmd=".length()).trim(), true)); //$NON-NLS-1$
 		}
 		catch(final Exception e) {
 			throw new IllegalArgumentException(
@@ -224,9 +297,16 @@ final class ServiceInvocationManager {
 		}
 		if (!cmdUri.startsWith("afirma://")) { //$NON-NLS-1$
 			throw new IllegalArgumentException(
-				"Los datos recibidos en el parametro 'cmd' por HTTP no son una URI del tipo 'afirma://'" //$NON-NLS-1$
+				"Los datos recibidos en el parametro 'cmd' por HTTP no son una URI del tipo 'afirma://': " + cmdUri //$NON-NLS-1$
 			);
 		}
 		return cmdUri;
+	}
+
+	public static void main(final String[] args) {
+
+		final String url = "afirma://service/?ports=59188,58339,64805&amp;idsession=001599791810";
+
+		startService(url);
 	}
 }
