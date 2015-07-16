@@ -29,7 +29,7 @@ final class AOKeyStoreManagerHelperFullJava {
 	static KeyStore initCeresJava(final Object parentComponent) throws AOKeyStoreManagerException,
                                                                        IOException {
 		return init(
-			"Tarjeta CERES", //$NON-NLS-1$
+			AOKeyStore.CERES,
 			null,
 			parentComponent,
 			PROVIDER_CERES
@@ -45,7 +45,7 @@ final class AOKeyStoreManagerHelperFullJava {
     		                     final Object parentComponent) throws AOKeyStoreManagerException,
     		                                                                 IOException {
     	return init(
-			"DNIe", //$NON-NLS-1$
+			AOKeyStore.DNIEJAVA,
 			pssCallBack,
 			parentComponent,
 			PROVIDER_DNIE
@@ -53,7 +53,7 @@ final class AOKeyStoreManagerHelperFullJava {
     }
 
 
-    private static KeyStore init(final String storeName,
+    private static KeyStore init(final AOKeyStore store,
     		                     final PasswordCallback pssCallBack,
     		                     final Object parentComponent,
     		                     final String providerClassName) throws AOKeyStoreManagerException,
@@ -66,7 +66,7 @@ final class AOKeyStoreManagerHelperFullJava {
     		}
     		catch (final Exception e) {
     			throw new AOKeyStoreManagerException(
-					"No se ha podido instanciar e instalar el proveedor 100% Java de Afirma para " + storeName + ": " + e, //$NON-NLS-1$ //$NON-NLS-2$
+					"No se ha podido instanciar e instalar el proveedor 100% Java de Afirma para " + store.toString() + ": " + e, //$NON-NLS-1$ //$NON-NLS-2$
 					e
 				);
     		}
@@ -84,24 +84,24 @@ final class AOKeyStoreManagerHelperFullJava {
     	final KeyStore ks;
         // Inicializamos
         try {
-            ks = KeyStore.getInstance(AOKeyStore.CERES.getProviderName());
+            ks = KeyStore.getInstance(store.getProviderName());
         }
         catch (final Exception e) {
-            throw new AOKeyStoreManagerException("No se ha podido obtener el almacen 100% Java para " + storeName + ": " + e, e); //$NON-NLS-1$ //$NON-NLS-2$
+            throw new AOKeyStoreManagerException("No se ha podido obtener el almacen 100% Java para " + store.toString() + ": " + e, e); //$NON-NLS-1$ //$NON-NLS-2$
         }
 
-        LOGGER.info("Cargando KeyStore 100% Java para " + storeName); //$NON-NLS-1$
+        LOGGER.info("Cargando KeyStore 100% Java para " + store.toString()); //$NON-NLS-1$
         try {
 			ks.load(null, pssCallBack == null ? null : pssCallBack.getPassword());
 		}
         catch (final NoSuchAlgorithmException e) {
         	throw new AOKeyStoreManagerException(
-    			"Error de algoritmo al obtener el almacen CERES 100% Java para " + storeName + ": " + e, e  //$NON-NLS-1$ //$NON-NLS-2$
+    			"Error de algoritmo al obtener el almacen 100% Java para " + store.toString() + ": " + e, e  //$NON-NLS-1$ //$NON-NLS-2$
 			);
 		}
         catch (final CertificateException e) {
 			throw new AOKeyStoreManagerException(
-				"Error de certificado al obtener el almacen 100% Java para " + storeName + ": " + e, e  //$NON-NLS-1$ //$NON-NLS-2$
+				"Error de certificado al obtener el almacen 100% Java para " + store.toString() + ": " + e, e  //$NON-NLS-1$ //$NON-NLS-2$
 			);
 		}
 
