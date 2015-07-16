@@ -302,11 +302,4 @@ final class ServiceInvocationManager {
 		}
 		return cmdUri;
 	}
-
-	public static void main(final String[] args) {
-
-		final String url = "afirma://service/?ports=59188,58339,64805&amp;idsession=001599791810";
-
-		startService(url);
-	}
 }
