@@ -151,24 +151,37 @@ final class CounterSigner {
         ASN1EncodableVector signerInfos = new ASN1EncodableVector();
 
         // FIRMA EN ARBOL
-        if (targetType.equals(CounterSignTarget.TREE)) {
+        if (CounterSignTarget.TREE.equals(targetType)) {
             signerInfos = counterTree(signerInfosSd, parameters, key, certChain);
-        } // FIRMA DE LAS HOJAS
-        else if (targetType.equals(CounterSignTarget.LEAFS)) {
+        }
+
+        // FIRMA DE LAS HOJAS
+        else if (CounterSignTarget.LEAFS.equals(targetType)) {
             signerInfos = counterLeaf(signerInfosSd, parameters, key, certChain);
-        } // FIRMA DE NODOS
-        else if (targetType.equals(CounterSignTarget.NODES)) {
-            // Firma de Nodos
-            SignedData sigDat;
+        }
+
+        // FIRMA DE NODOS O FIRMANTES CONCRETOS
+        else if (CounterSignTarget.NODES.equals(targetType) || targetType.equals(CounterSignTarget.SIGNERS)) {
+
             SignedData aux = sd;
 
-            int nodo = 0;
             for (int i = targets.length - 1; i >= 0; i--) {
-                nodo = targets[i];
-                signerInfos = counterNode(aux, parameters, key, certChain, nodo);
-                sigDat = new SignedData(sd.getDigestAlgorithms(), sd.getEncapContentInfo(), certificates, certrevlist, new DERSet(signerInfos));
+                signerInfos = counterNode(
+            		aux,
+            		parameters,
+            		key,
+            		certChain,
+            		targets[i]
+        		);
+                final SignedData sigDat = new SignedData(
+            		sd.getDigestAlgorithms(),
+            		sd.getEncapContentInfo(),
+            		certificates,
+            		certrevlist,
+            		new DERSet(signerInfos)
+        		);
 
-                // Esto se realiza as&iacute; por problemas con los casting.
+                // Esto se realiza asi por problemas con los casting.
                 final ASN1InputStream sd2 = new ASN1InputStream(sigDat.getEncoded(ASN1Encoding.DER));
                 final ASN1Sequence contentSignedData2 = (ASN1Sequence) sd2.readObject();// contenido del SignedData
                 sd2.close();
@@ -179,33 +192,11 @@ final class CounterSigner {
             // construimos el Signed Data y lo devolvemos
             return new ContentInfo(PKCSObjectIdentifiers.signedData, aux).getEncoded(ASN1Encoding.DER);
         }
-        else if (targetType.equals(CounterSignTarget.SIGNERS)) {
-            // Firma de Nodos
-            SignedData sigDat;
-            SignedData aux = sd;
 
-            int nodo = 0;
-            for (int i = targets.length - 1; i >= 0; i--) {
-                nodo = targets[i];
-                signerInfos = counterNode(
-            		aux,
-            		parameters,
-            		key,
-            		certChain,
-            		nodo
-        		);
-                sigDat = new SignedData(sd.getDigestAlgorithms(), sd.getEncapContentInfo(), certificates, certrevlist, new DERSet(signerInfos));
-
-                // Esto se realiza as&iacute; por problemas con los casting.
-                final ASN1InputStream sd2 = new ASN1InputStream(sigDat.getEncoded(ASN1Encoding.DER));
-                final ASN1Sequence contentSignedData2 = (ASN1Sequence) sd2.readObject();// contenido del SignedData
-                sd2.close();
-
-                aux = SignedData.getInstance(contentSignedData2);
-            }
-
-            // construimos el Signed Data y lo devolvemos
-            return new ContentInfo(PKCSObjectIdentifiers.signedData, aux).getEncoded(ASN1Encoding.DER);
+        else {
+        	throw new IllegalArgumentException(
+    			"Tipo de objetivo para la contrafirma no soportado: " + targetType //$NON-NLS-1$
+			);
         }
 
         // construimos el Signed Data y lo devolvemos
