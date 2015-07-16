@@ -65,7 +65,9 @@ public final class StorageService extends HttpServlet {
 		final String[] urlParams = new String(baos.toByteArray()).split("&"); //$NON-NLS-1$
 		for (final String param : urlParams) {
 			final int equalsPos = param.indexOf('=');
-			params.put(param.substring(0, equalsPos), param.substring(equalsPos + 1));
+			if (equalsPos != -1) {
+				params.put(param.substring(0, equalsPos), param.substring(equalsPos + 1));
+			}
 		}
 
 		final String operation = params.get(PARAMETER_NAME_OPERATION);
