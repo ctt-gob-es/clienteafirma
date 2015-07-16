@@ -1,5 +1,8 @@
 package es.gob.afirma.signers.xades;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.security.KeyStore;
 import java.security.KeyStore.PrivateKeyEntry;
 
@@ -37,6 +40,10 @@ public final class TestXAdESASiC {
         		pke.getCertificateChain(),
         		null
 		);
+
+        final OutputStream os = new FileOutputStream(File.createTempFile("ASIC-XAdES-",  ".zip")); //$NON-NLS-1$ //$NON-NLS-2$
+        os.write(result);
+        os.close();
     }
 
 }
