@@ -83,7 +83,7 @@ final class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 
 		boolean omitContent = false;
 		if (extraParams.containsKey("mode")) { //$NON-NLS-1$
-			omitContent = "explicit".equalsIgnoreCase(extraParams.getProperty("mode")); //$NON-NLS-1$ //$NON-NLS-2$
+			omitContent = !"implicit".equalsIgnoreCase(extraParams.getProperty("mode")); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
 		String contentTypeOid = MimeHelper.DEFAULT_CONTENT_OID_DATA;
@@ -115,11 +115,11 @@ final class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 		}
 
 
-		System.out.println("=============");
-		for (final String k : extraParams.keySet().toArray(new String[extraParams.size()])) {
-			System.out.println(k + ": " + extraParams.getProperty(k));
-		}
-		System.out.println("=============");
+//		System.out.println("=============");
+//		for (final String k : extraParams.keySet().toArray(new String[extraParams.size()])) {
+//			System.out.println(k + ": " + extraParams.getProperty(k));
+//		}
+//		System.out.println("=============");
 
 
 		LOGGER.info("Se invocan las funciones internas de prefirma CAdES"); //$NON-NLS-1$
@@ -172,7 +172,7 @@ final class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 
 		boolean omitContent = false;
 		if (extraParams.containsKey("mode")) { //$NON-NLS-1$
-			omitContent = "explicit".equalsIgnoreCase(extraParams.getProperty("mode")); //$NON-NLS-1$ //$NON-NLS-2$
+			omitContent = !"implicit".equalsIgnoreCase(extraParams.getProperty("mode")); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
 		// Cargamos la configuracion de la operacion
