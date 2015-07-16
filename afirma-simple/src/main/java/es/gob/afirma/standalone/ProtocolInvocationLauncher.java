@@ -135,7 +135,7 @@ public final class ProtocolInvocationLauncher {
 			return SAF_02;
 		}
 		if (urlString.startsWith("afirma://service?") || urlString.startsWith("afirma://service/?")) { //$NON-NLS-1$ //$NON-NLS-2$
-			LOGGER.info("Se inicia la invocacion por servicio"); //$NON-NLS-1$
+			LOGGER.info("Se inicia la invocacion por servicio: " + urlString); //$NON-NLS-1$
 			ServiceInvocationManager.startService(urlString);
 			return RESULT_OK;
 		}
@@ -231,6 +231,8 @@ public final class ProtocolInvocationLauncher {
 					params = ProtocolInvocationUriParser.getParametersToSign(xmlData);
 				}
 
+				LOGGER.info("Se inicia la operacion de firma"); //$NON-NLS-1$
+
 				return processSign(params);
 			}
 			catch(final ParameterNeedsUpdatedVersionException e) {
@@ -276,6 +278,8 @@ public final class ProtocolInvocationLauncher {
 				return SAF_06;
 			}
 		}
+
+		LOGGER.info("Seleccion del almacen de certificados");
 
 		final AOKeyStore aoks = AOKeyStore.getKeyStore(options.getDefaultKeyStore());
 		if (aoks == null) {
@@ -326,6 +330,8 @@ public final class ProtocolInvocationLauncher {
 				return SAF_00;
 			}
 		}
+
+		LOGGER.info("Seleccion del manejador de firma");
 
 		// En caso de haber programado el formato "AUTO", se selecciona el firmador a partir
 		// de los datos (firma) proporcionados
@@ -378,6 +384,9 @@ public final class ProtocolInvocationLauncher {
 			showError(SAF_08);
 			return SAF_08;
 		}
+
+		LOGGER.info("Se ejecuta la operacion criptografica");
+
 		final byte[] sign;
 		switch(options.getOperation()) {
 			case UrlParametersToSign.OP_SIGN:
@@ -446,6 +455,8 @@ public final class ProtocolInvocationLauncher {
 			showError(SAF_18);
 			return SAF_18;
 		}
+
+		LOGGER.info("Se componen los datos a devolver a traves del servicio");
 
 		// Si tenemos clave de cifrado, ciframos el certificado y la firma
 		final StringBuilder dataToSend = new StringBuilder();
