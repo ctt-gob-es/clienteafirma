@@ -43,6 +43,7 @@ import es.gob.afirma.core.LogManager;
 import es.gob.afirma.core.LogManager.App;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.Platform;
+import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.crypto.jarverifier.JarSignatureCertExtractor;
 import es.gob.afirma.keystores.AOKeyStore;
@@ -186,13 +187,21 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 		params.list(ps);
 		LOGGER.info("Recibidos los siguientes parametros adicionales:\n" + baos.toString()); //$NON-NLS-1$
 
-
 		try {
 			String signatureFormat = MiniAfirmaApplet.cleanParam(format);
 			final AOSigner signer = MiniAfirmaApplet.selectSigner(signatureFormat, null);
 			if (SIGNATURE_FORMAT_AUTO.equalsIgnoreCase(signatureFormat)) {
 				signatureFormat = ExtraParamsProcessor.getSignFormat(signer);
 				ExtraParamsProcessor.configAutoFormat(signer, dataBinary, params);
+			}
+
+			// XXX: Codigo para la identificacion de firmas XAdES enveloped explicita
+			// (Eliminar cuando se abandone el soporte de XAdES explicitas)
+			if (isXadesEnvelopedExplicit(signatureFormat, params)) {
+				final IllegalArgumentException e = new IllegalArgumentException(
+						"El formato Enveloped es incompatible con el modo de firma explicito"); //$NON-NLS-1$
+				setError(e);
+				throw e;
 			}
 
 			// XXX: Codigo de soporte de firmas XAdES explicitas (Eliminar cuando se abandone el soporte de XAdES explicitas)
@@ -1177,6 +1186,20 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 
 	/**
 	 * Este metodo sirve para identificar cuando se ha configurado una firma con el formato XAdES
+	 * de tipo enveloped y la propiedad {@code mode} con el valor {@code explicit}. Este tipo de firma
+	 * no existe.
+	 * @return {@code true} si se configura una firma XAdES Enveloped explicit, {@code false} en caso contrario.
+	 * @deprecated Uso temporal hasta que se elimine el soporte de firmas XAdES explicitas.
+	 */
+	@Deprecated
+	private static boolean isXadesEnvelopedExplicit(final String format, final Properties config) {
+		return isXadesExplicitConfigurated(format, config) &&
+				AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED.equalsIgnoreCase(config.getProperty("format")) //$NON-NLS-1$
+			;
+	}
+
+	/**
+	 * Este metodo sirve para identificar cuando se ha configurado una firma con el formato XAdES
 	 * y la propiedad {@code mode} con el valor {@code explicit}. Esta no es una firma correcta,
 	 * pero por compatibilidad con los tipos de firmas del applet pesado se ha incluido aqu&iacute;.
 	 * @return {@code true} si se configura una firma XAdES explicit, {@code false} en caso contrario.
@@ -1184,7 +1207,8 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 	 */
 	@Deprecated
 	private static boolean isXadesExplicitConfigurated(final String format, final Properties config) {
-		return format != null && format.toLowerCase().startsWith("xades") && //$NON-NLS-1$
-				config != null && config.containsKey("mode") && "explicit".equalsIgnoreCase(config.getProperty("mode")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		return format != null && format.toLowerCase().startsWith("xades") && config != null && //$NON-NLS-1$
+				AOSignConstants.SIGN_MODE_EXPLICIT.equalsIgnoreCase(config.getProperty("mode")) //$NON-NLS-1$
+			;
 	}
 }
