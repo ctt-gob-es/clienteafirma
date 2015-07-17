@@ -164,6 +164,7 @@ var AutoFirma = ( function ( window, undefined ) {
 			// Invocamos a la aplicacion nativa
 			openNativeApp(ports, idSession);
 
+			
 			// Enviamos la peticion a la app despues de esperar un tiempo prudencia
 			setTimeout(executeOperationByService, getWaitingTime(), ports, url, cipherKey);
 		}
@@ -248,9 +249,50 @@ var AutoFirma = ( function ( window, undefined ) {
 		 * que se le pueda solicitar que realice una operaci\u00F3n.
 		 */
 		function getWaitingTime () {
-			return 20000;	//TODO: Cambiar a 30000
+			//return 20000 en IE no funciona con menos de 30s
+			return 30000;	//TODO: Cambiar a 30000
+		}
+		
+		var httpRequest = getHttpRequest();
+		function executeOperationByService (ports, url, cipherKey) {
+
+			var i = 0;
+			var portError = false;
+			
+			do {
+				httpRequest.open("POST", "http://127.0.0.1:" + ports[i] + "/afirma", true);
+				httpRequest.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+				httpRequest.onreadystatechange = function(cipherKey){
+					console.log(httpRequest.status +"  "+httpRequest.readyState )
+					if(httpRequest.status == 404)
+						errorServiceResponseFunction(null,httpRequest.responseText);
+					else if (httpRequest.readyState == 4 && httpRequest.status == 200) {
+						successServiceResponseFunction(Base64.decode(httpRequest.responseText, true), cipherKey);
+						return;
+					}
+				}
+
+				try {
+					httpRequest.send("cmd=" + Base64.encode(url, true));
+					portError = false;
+				}
+				catch(e) {
+					if (httpRequest.status == 404) {
+						// Interpretamos que este error viene por un problema con el puerto
+						portError = true;
+						i++;
+					} else {
+						// Interpretamos que este error viene de la aplicacion
+						errorServiceResponseFunction("java.lang.IOException", "Ocurrio un error de red en la llamada al servicio de firma");
+						return;
+					}
+				}
+			} while (portError && i < ports.length);
+			// Operamos segun el resultado
+			
 		}
 
+		/*
 		function executeOperationByService (ports, url, cipherKey) {
 
 			var i = 0;
@@ -276,17 +318,16 @@ var AutoFirma = ( function ( window, undefined ) {
 					}
 				}
 			} while (portError && i < ports.length);
-
 			// Operamos segun el resultado
 			if (httpRequest.readyState == 4 && httpRequest.status == 200) {
 				successServiceResponseFunction(Base64.decode(httpRequest.responseText, true), cipherKey);
 				return;
 			}
+
+			errorServiceResponseFunction(null, httpRequest.responseText);
 			
-			if (errorCallback != null) {
-				errorServiceResponseFunction(null, httpRequest.responseText);
-			}
 		}
+		*/
 		
 		function getHttpRequest() {
 			var activexmodes=["Msxml2.XMLHTTP", "Microsoft.XMLHTTP"]; //activeX versions to check for in IE
@@ -316,7 +357,6 @@ var AutoFirma = ( function ( window, undefined ) {
 		 * @param cipherKey Clave para el descifrado del resultado si no es un error.
 		 */
 		function successServiceResponseFunction (data, cipherKey) {
-
 			// No se ha obtenido respuesta
 			if (data == undefined || data == null) {
 				errorServiceResponseFunction("es.gob.afirma.core.AOCancelledOperationException", "Operacion cancelada por el usuario");

@@ -751,8 +751,9 @@ var MiniApplet = ( function ( window, undefined ) {
 					//TODO: Por problemas con IE no podemos usar esto
 					//resultCallbackFunction = generateResultCallback(modalWindow, successCallback, errorCallback);
 					
-					var localWindow = modalWindow;
+					
 					resultCallbackFunction = function(event) {
+						var localWindow = modalWindow;
 						// Se llamara a este evento ante 2 entradas "signDatos" que almacenara el resultado de
 						// la operacion y "signEstado" que se recibira antes y almacenara un "OK" o un "KO" segun
 						// haya terminado bien o mal la operacion
@@ -872,8 +873,7 @@ var MiniApplet = ( function ( window, undefined ) {
 			function signOperation (signId, dataB64, algorithm, format, extraParams, successCallback, errorCallback) {
 		
 				// Si no se ha abierto una pagina modal externamente, la abrimos nosotros (aunque muy probablemente quede bloqueada)
-				//modalWindow = (!signWindow ? window.open(DEFAULT_SIGNATURE_PAGE, "Pagina de firma", "width=400,height=300") : signWindow);
-				modalWindow = window.open(DEFAULT_SIGNATURE_PAGE, "Pagina de firma", "width=500,height=260");
+				modalWindow = window.open(DEFAULT_SIGNATURE_PAGE, "Pagina de firma"+Date.now(), "width=500,height=260");
 				
 				/** Almacenamos el dominio en local para poder evaluarlo desde el iframe de firma. */
 				localStorage.setItem("signPageBaseUri", DEFAULT_SIGNATURE_PAGE);	// TODO: Podria ser el de la ventana exterior, pero hay que averiguar como obtenerlo
