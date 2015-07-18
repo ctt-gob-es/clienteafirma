@@ -96,7 +96,7 @@ public class TestPdfTriphase {
 	 * @throws Exception */
 	@Test
 	//@Ignore
-	public void firma() throws Exception {
+	public void testFirma() throws Exception {
 		final AOSigner signer = new AOPDFTriPhaseSigner();
 
 		final Properties config = new Properties();
@@ -105,12 +105,12 @@ public class TestPdfTriphase {
 		}
 
 		final byte[] result = signer.sign(
-				this.data,
-				"SHA512withRSA",  //$NON-NLS-1$
-				this.pke.getPrivateKey(),
-				this.pke.getCertificateChain(),
-				config
-				);
+			this.data,
+			"SHA512withRSA",  //$NON-NLS-1$
+			this.pke.getPrivateKey(),
+			this.pke.getCertificateChain(),
+			config
+		);
 
 		Assert.assertNotNull("Error durante el proceso de firma, resultado nulo", result); //$NON-NLS-1$
 		Assert.assertFalse("Se recibio un codigo de error desde el servidor", new String(result).startsWith("ERR-")); //$NON-NLS-1$ //$NON-NLS-2$

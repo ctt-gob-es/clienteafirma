@@ -21,26 +21,16 @@ import org.w3c.dom.NodeList;
  * operaci&oacute;n trif&aacute;sica. */
 public final class TriphaseData {
 
-	private final String format;
-	private final String operation;
 	private final List<Map<String, String>> signs;
 
-	/** Construye el mensaje especificando formato y operaci&oacute;n (firma, cofirma o contrafirma).
-	 * @param format Formato de firma avanzada.
-	 * @param operation Operaci&oacute;n criptogr&aacute;fica (firma, cofirma o contrafirma). */
-	public TriphaseData(final String format, final String operation) {
-		this.format = format;
-		this.operation = operation;
+	/** Construye el mensaje especificando formato y operaci&oacute;n (firma, cofirma o contrafirma). */
+	public TriphaseData() {
 		this.signs = new ArrayList<Map<String,String>>();
 	}
 
 	/** Construye el mensaje especificando la configuraci&oacute;n completa.
-	 * @param format Formato de firma avanzada.
-	 * @param operation Operaci&oacute;n criptogr&aacute;fica (firma, cofirma o contrafirma)
 	 * @param signs Configuraci&oacute;n espec&iacute;fica. */
-	private TriphaseData(final String format, final String operation, final List<Map<String,String>> signs) {
-		this.format = format;
-		this.operation = operation;
+	private TriphaseData(final List<Map<String,String>> signs) {
 		this.signs = signs;
 	}
 
@@ -48,18 +38,6 @@ public final class TriphaseData {
 	 * @param config Configuraci&oacute;n de la operaci&oacute;n trif&aacute;sica. */
 	public void addSignOperation(final Map<String, String> config) {
 		this.signs.add(config);
-	}
-
-	/** Recupera el formato de firma.
-	 * @return Nombre del formato de firma. */
-	public String getFormat() {
-		return this.format;
-	}
-
-	/** Recupera la operaci&oacute;n criptogr&aacute;fica que se debe realizar.
-	 * @return Identificador de la operaci&oacute;n criptogr&aacute;fica. */
-	public String getOperation() {
-		return this.operation;
 	}
 
 	/** Recupera los datos de una operaci&oacute;n de firma.
@@ -79,7 +57,7 @@ public final class TriphaseData {
 	/** Obtiene una sesi&oacute;n de firma trif&aacute;sica a partir de un XML que lo describe.
 	 * Un ejemplo de XML podr&iacute;a ser el siguiente:
 	 * <pre>
-	 * &lt;xml frmt="CAdES" op="FIRMAR"&gt;
+	 * &lt;xml&gt;
 	 *  &lt;firmas&gt;
 	 *   &lt;firma&gt;
 	 *    &lt;param n="NEED_PRE"&gt;true&lt;/param&gt;
@@ -132,7 +110,7 @@ public final class TriphaseData {
 
 		final List<Map<String, String>> signsNodes = parseSignsNode(childNodes.item(idx));
 
-		return new TriphaseData(format, operation, signsNodes);
+		return new TriphaseData(signsNodes);
 	}
 
 	/** Analiza el nodo con el listado de firmas.
@@ -199,7 +177,7 @@ public final class TriphaseData {
 	public String toString() {
 
 		final StringBuilder builder = new StringBuilder();
-		builder.append("<xml frmt=\"").append(this.format).append("\" op=\"").append(this.operation).append("\">\n"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		builder.append("<xml>\n"); //$NON-NLS-1$
 		builder.append(" <firmas>\n"); //$NON-NLS-1$
 		final Iterator<Map<String, String>> firmasIt = this.signs.iterator();
 		while (firmasIt.hasNext()) {

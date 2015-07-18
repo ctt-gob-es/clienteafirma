@@ -35,15 +35,15 @@ final class PAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 	/** Firma PKCS#1. */
 	private static final String PROPERTY_NAME_PKCS1_SIGN = "PK1"; //$NON-NLS-1$
 
-	/** Manejador de log. */
+	/** Manejador de registro. */
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	@Override
 	public byte[] preProcessPreSign(final byte[] data,
-			final String algorithm,
-			final X509Certificate cert,
-			final Properties extraParams) throws IOException, AOException {
-
+			                        final String algorithm,
+			                        final X509Certificate cert,
+			                        final Properties extraParams) throws IOException,
+			                                                             AOException {
 		LOGGER.info("Prefirma PAdES - Firma - INICIO"); //$NON-NLS-1$
 
 		final GregorianCalendar signTime = new GregorianCalendar();
@@ -53,12 +53,12 @@ final class PAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 		final PdfSignResult preSignature;
 		try {
 			preSignature = PAdESTriPhaseSigner.preSign(
-					AOSignConstants.getDigestAlgorithmName(algorithm),
-					data,
-					new X509Certificate[] { cert },
-					signTime,
-					extraParams
-					);
+				AOSignConstants.getDigestAlgorithmName(algorithm),
+				data,
+				new X509Certificate[] { cert },
+				signTime,
+				extraParams
+			);
 		}
 		catch (final DocumentException e) {
 			LOGGER.severe("El documento no es un PDF y no se puede firmar: " + e); //$NON-NLS-1$
@@ -67,8 +67,7 @@ final class PAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 
 		LOGGER.info("Se prepara la respuesta de la prefirma PAdES"); //$NON-NLS-1$
 
-		final TriphaseData triphaseData = new TriphaseData(
-				AOSignConstants.SIGN_FORMAT_PADES, AOSignConstants.MASSIVE_OPERATION_SIGN);
+		final TriphaseData triphaseData = new TriphaseData();
 
 		// Ahora pasamos al cliente:
 		// 1.- La prefirma para que haga el PKCS#1
@@ -118,22 +117,23 @@ final class PAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 
 		// Ya con todos los datos hacemos la postfirma
 		final PdfSignResult signResult = new PdfSignResult(
-				new String(Base64.decode(signConfig.get(PROPERTY_NAME_PDF_UNIQUE_ID))),
-				Base64.decode(signConfig.get(PROPERTY_NAME_PRESIGN)),
-				null,
-				cal,
-				extraParams);
+			new String(Base64.decode(signConfig.get(PROPERTY_NAME_PDF_UNIQUE_ID))),
+			Base64.decode(signConfig.get(PROPERTY_NAME_PRESIGN)),
+			null,
+			cal,
+			extraParams
+		);
 
 		LOGGER.info("Se invocan las funciones internas de postfirma PAdES"); //$NON-NLS-1$
 		final byte[] postsign = PAdESTriPhaseSigner.postSign(
-				AOSignConstants.getDigestAlgorithmName(algorithm),
-				docBytes,
-				new X509Certificate[] { cert },
-				Base64.decode(signConfig.get(PROPERTY_NAME_PKCS1_SIGN)),
-				signResult,
-				null,
-				null
-				);
+			AOSignConstants.getDigestAlgorithmName(algorithm),
+			docBytes,
+			new X509Certificate[] { cert },
+			Base64.decode(signConfig.get(PROPERTY_NAME_PKCS1_SIGN)),
+			signResult,
+			null,
+			null
+		);
 
 		LOGGER.info("Postfirma PAdES - Firma - FIN"); //$NON-NLS-1$
 

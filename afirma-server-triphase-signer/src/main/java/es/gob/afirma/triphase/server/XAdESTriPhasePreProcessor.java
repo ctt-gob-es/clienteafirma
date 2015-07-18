@@ -18,9 +18,9 @@ import org.xml.sax.SAXException;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.Base64;
-import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.signers.TriphaseData;
+import es.gob.afirma.signers.xml.XMLConstants;
 import es.gob.afirma.triphase.server.xades.XAdESTriPhaseSignerServerSide;
 import es.gob.afirma.triphase.server.xades.XAdESTriPhaseSignerServerSide.Op;
 import es.gob.afirma.triphase.server.xades.XmlPreSignException;
@@ -58,9 +58,9 @@ final class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 
 	@Override
 	public byte[] preProcessPreCoSign(final byte[] data,
-			final String algorithm,
-			final X509Certificate cert,
-			final Properties extraParams) throws IOException, AOException {
+			                          final String algorithm,
+			                          final X509Certificate cert,
+			                          final Properties extraParams) throws IOException, AOException {
 
 		LOGGER.info("Prefirma XAdES - Cofirma - INICIO"); //$NON-NLS-1$
 
@@ -92,10 +92,11 @@ final class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 			final Properties extraParams,
 			final Op op) throws IOException, AOException {
 
-		final String algoUri = SIGN_ALGOS_URI.get(algorithm);
+		final String algoUri = XMLConstants.SIGN_ALGOS_URI.get(algorithm);
 		if (algoUri == null) {
 			throw new AOException(
-					"El formato de firma XAdES no soporta el algoritmo de firma '" + algorithm + "'"); //$NON-NLS-1$ //$NON-NLS-2$
+				"El formato de firma XAdES no soporta el algoritmo de firma '" + algorithm + "'" //$NON-NLS-1$ //$NON-NLS-2$
+			);
 		}
 
 		final XmlPreSignResult preSignature;
@@ -108,33 +109,32 @@ final class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 					op);
 		}
 		catch (final InvalidKeyException e) {
-			throw new AOException("Error en la prefirma XAdES", e); //$NON-NLS-1$
+			throw new AOException("Error en la prefirma XAdES por problemas con las claves RSA: " + e, e); //$NON-NLS-1$
 		}
 		catch (final NoSuchAlgorithmException e) {
-			throw new AOException("Error en la prefirma XAdES", e); //$NON-NLS-1$
+			throw new AOException("Error en la prefirma XAdES por no soportarse un algoritmo: " + e, e); //$NON-NLS-1$
 		}
 		catch (final SignatureException e) {
-			throw new AOException("Error en la prefirma XAdES", e); //$NON-NLS-1$
+			throw new AOException("Error en la prefirma XAdES en la firma RSA: " + e, e); //$NON-NLS-1$
 		}
 		catch (final SAXException e) {
-			throw new AOException("Error en la prefirma XAdES", e); //$NON-NLS-1$
+			throw new AOException("Error en la prefirma XAdES en el proceso SAX del XML: " + e, e); //$NON-NLS-1$
 		}
 		catch (final ParserConfigurationException e) {
-			throw new AOException("Error en la prefirma XAdES", e); //$NON-NLS-1$
+			throw new AOException("Error en la prefirma XAdES por problemas en el parser SAX: " + e, e); //$NON-NLS-1$
 		}
 		catch (final MarshalException e) {
-			throw new AOException("Error en la prefirma XAdES", e); //$NON-NLS-1$
+			throw new AOException("Error en la prefirma XAdES al empaquetar el XML: " + e, e); //$NON-NLS-1$
 		}
 		catch (final XMLSignatureException e) {
-			throw new AOException("Error en la prefirma XAdES", e); //$NON-NLS-1$
+			throw new AOException("Error en la prefirma XAdES en la firma XMLDSig: " + e, e); //$NON-NLS-1$
 		}
 		catch (final XmlPreSignException e) {
-			throw new AOException("Error en la prefirma XAdES", e); //$NON-NLS-1$
+			throw new AOException("Error en la prefirma XAdES: " + e, e); //$NON-NLS-1$
 		}
 
 		// Ahora pasamos al cliente los datos de la prefirma
-		final TriphaseData triphaseData = new TriphaseData(
-				AOSignConstants.SIGN_FORMAT_XADES, AOSignConstants.MASSIVE_OPERATION_SIGN);
+		final TriphaseData triphaseData = new TriphaseData();
 
 		for (int i = 0; i < preSignature.getSignedInfos().size(); i++) {
 			final Map<String, String> signConfig = new HashMap<String, String>();
@@ -231,42 +231,4 @@ final class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 		return xmlBase.getBytes();
 	}
 
-	private static final String URL_SHA1_RSA    = "http://www.w3.org/2000/09/xmldsig#rsa-sha1"; //$NON-NLS-1$
-	private static final String URL_SHA256_RSA  = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"; //$NON-NLS-1$
-	private static final String URL_SHA384_RSA  = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha384"; //$NON-NLS-1$
-	private static final String URL_SHA512_RSA  = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha512"; //$NON-NLS-1$
-
-	/** URIs de los algoritmos de firma */
-	public static final Map<String, String> SIGN_ALGOS_URI = new HashMap<String, String>() {
-		private static final long serialVersionUID = 1897588397257599853L;
-		{
-			put(AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA, URL_SHA1_RSA);
-			// Introducimos variantes para hacerlo mas robusto
-			put("RSA", URL_SHA1_RSA); //$NON-NLS-1$
-			put("SHA-1withRSA", URL_SHA1_RSA); //$NON-NLS-1$
-			put("SHA1withRSAEncryption", URL_SHA1_RSA); //$NON-NLS-1$
-			put("SHA-1withRSAEncryption", URL_SHA1_RSA); //$NON-NLS-1$
-			put("SHAwithRSAEncryption", URL_SHA1_RSA); //$NON-NLS-1$
-			put("SHAwithRSA", URL_SHA1_RSA); //$NON-NLS-1$
-
-			put(AOSignConstants.SIGN_ALGORITHM_SHA256WITHRSA, URL_SHA256_RSA);
-			// Introducimos variantes para hacerlo mas robusto
-			put("SHA-256withRSA", URL_SHA256_RSA); //$NON-NLS-1$
-			put("SHA256withRSAEncryption", URL_SHA256_RSA); //$NON-NLS-1$
-			put("SHA-256withRSAEncryption", URL_SHA256_RSA); //$NON-NLS-1$
-
-			put(AOSignConstants.SIGN_ALGORITHM_SHA384WITHRSA, URL_SHA384_RSA);
-			// Introducimos variantes para hacerlo mas robusto
-			put("SHA-384withRSA", URL_SHA384_RSA); //$NON-NLS-1$
-			put("SHA384withRSAEncryption", URL_SHA384_RSA); //$NON-NLS-1$
-			put("SHA-384withRSAEncryption", URL_SHA384_RSA); //$NON-NLS-1$
-
-			put(AOSignConstants.SIGN_ALGORITHM_SHA512WITHRSA, URL_SHA512_RSA);
-			// Introducimos variantes para hacerlo mas robusto
-			put("SHA-512withRSA", URL_SHA512_RSA); //$NON-NLS-1$
-			put("SHA512withRSAEncryption", URL_SHA512_RSA); //$NON-NLS-1$
-			put("SHA-512withRSAEncryption", URL_SHA512_RSA); //$NON-NLS-1$
-
-		}
-	};
 }

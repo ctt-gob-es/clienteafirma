@@ -54,9 +54,9 @@ final class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 
 	@Override
 	public byte[] preProcessPreSign(final byte[] data,
-			final String algorithm,
-			final X509Certificate cert,
-			final Properties extraParams) throws IOException, AOException {
+			                        final String algorithm,
+			                        final X509Certificate cert,
+			                        final Properties extraParams) throws IOException, AOException {
 
 		LOGGER.info("Prefirma CAdES - Firma - INICIO"); //$NON-NLS-1$
 
@@ -128,8 +128,7 @@ final class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 		LOGGER.info("Se prepara la respuesta de la prefirma CAdES"); //$NON-NLS-1$
 
 		// Generamos el mensaje para la configuracion de la operacion
-		final TriphaseData triphaseData = new TriphaseData(
-				AOSignConstants.SIGN_FORMAT_CADES, AOSignConstants.MASSIVE_OPERATION_SIGN);
+		final TriphaseData triphaseData = new TriphaseData();
 
 		final Map<String, String> signConfig = new HashMap<String, String>();
 		signConfig.put(PROPERTY_NAME_PRESIGN, Base64.encode(presign));
@@ -147,11 +146,12 @@ final class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 
 	@Override
 	public byte[] preProcessPostSign(final byte[] data,
-			final String algorithm,
-			final X509Certificate cert,
-			final Properties extraParams,
-			final byte[] session) throws NoSuchAlgorithmException, AOException, IOException {
-
+			                         final String algorithm,
+			                         final X509Certificate cert,
+			                         final Properties extraParams,
+			                         final byte[] session) throws NoSuchAlgorithmException,
+			                                                      AOException,
+			                                                      IOException {
 		LOGGER.info("Postfirma CAdES - Firma - INICIO"); //$NON-NLS-1$
 
 		// Generamos el mensaje para la configuracion de la operacion
@@ -172,12 +172,12 @@ final class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 
 		LOGGER.info("Se invocan las funciones internas de postfirma CAdES"); //$NON-NLS-1$
 		final byte[] signature = CAdESTriPhaseSigner.postSign(
-				AOSignConstants.getDigestAlgorithmName(algorithm),
-				omitContent ? null : data,
-						new X509Certificate[] { cert },
-						Base64.decode(config.get(PROPERTY_NAME_PKCS1_SIGN)),
-						Base64.decode(config.get(PROPERTY_NAME_PRESIGN))
-				);
+			AOSignConstants.getDigestAlgorithmName(algorithm),
+			omitContent ? null : data,
+			new X509Certificate[] { cert },
+			Base64.decode(config.get(PROPERTY_NAME_PKCS1_SIGN)),
+			Base64.decode(config.get(PROPERTY_NAME_PRESIGN))
+		);
 
 		LOGGER.info("Postfirma CAdES - Firma - FIN"); //$NON-NLS-1$
 
@@ -234,24 +234,24 @@ final class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 		final byte[] presign;
 		try {
 			presign = CAdESTriPhaseCoSigner.preCoSign(
-					data,
-					algorithm,
-					new X509Certificate[] { cert },
-					AdESPolicy.buildAdESPolicy(extraParams),
-					signingCertificateV2,
-					messageDigest,
-					contentTypeOid,
-					contentDescription,
-					new Date(),
-					CommitmentTypeIndicationsHelper.getCommitmentTypeIndications(extraParams),
-					CAdESSignerMetadataHelper.getCAdESSignerMetadata(extraParams)
-					);
+				data,
+				algorithm,
+				new X509Certificate[] { cert },
+				AdESPolicy.buildAdESPolicy(extraParams),
+				signingCertificateV2,
+				messageDigest,
+				contentTypeOid,
+				contentDescription,
+				new Date(),
+				CommitmentTypeIndicationsHelper.getCommitmentTypeIndications(extraParams),
+				CAdESSignerMetadataHelper.getCAdESSignerMetadata(extraParams)
+			);
 		}
 		catch (final CertificateEncodingException e) {
-			throw new AOException("Error de codificaci\u00F3n de certificado en la pre-cofirma CAdES", e); //$NON-NLS-1$
+			throw new AOException("Error de codificacion de certificado en la pre-cofirma CAdES: " + e, e); //$NON-NLS-1$
 		}
 		catch (final NoSuchAlgorithmException e) {
-			throw new AOException("Error de algoritmo no soportado en la pre-cofirma CAdES", e); //$NON-NLS-1$
+			throw new AOException("Error de algoritmo no soportado en la pre-cofirma CAdES: " + e, e); //$NON-NLS-1$
 		}
 
 		LOGGER.info("Se prepara la respuesta de la pre-cofirma CAdES"); //$NON-NLS-1$
@@ -259,8 +259,7 @@ final class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 		// Ahora pasamos al cliente los datos de la prefirma
 		final String presignB64 = Base64.encode(presign).replace("\n", "").replace("\r", ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 
-		final TriphaseData triphaseData = new TriphaseData(
-				AOSignConstants.SIGN_FORMAT_CADES, AOSignConstants.MASSIVE_OPERATION_COSIGN);
+		final TriphaseData triphaseData = new TriphaseData();
 
 		final Map<String, String> signConfig = new HashMap<String, String>();
 		signConfig.put(PROPERTY_NAME_PRESIGN, presignB64);
@@ -276,10 +275,10 @@ final class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 
 	@Override
 	public byte[] preProcessPostCoSign(final byte[] sign,
-			final String algorithm,
-			final X509Certificate cert,
-			final Properties extraParams,
-			final byte[] session) throws NoSuchAlgorithmException, AOException, IOException {
+			                           final String algorithm,
+			                           final X509Certificate cert,
+			                           final Properties extraParams,
+			                           final byte[] session) throws NoSuchAlgorithmException, AOException, IOException {
 
 		LOGGER.info("Postfirma CAdES - Cofirma - INICIO"); //$NON-NLS-1$
 
@@ -318,10 +317,10 @@ final class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 					algorithm,
 					new X509Certificate[] { cert },
 					sign
-					);
+			);
 		}
 		catch (final CertificateEncodingException e) {
-			throw new AOException("Error de codificaci\u00F3n de certificado en la post-cofirma CAdES", e); //$NON-NLS-1$
+			throw new AOException("Error de codificacion de certificado en la post-cofirma CAdES: " + e, e); //$NON-NLS-1$
 		}
 
 		LOGGER.info("Postfirma CAdES - Cofirma - FIN"); //$NON-NLS-1$

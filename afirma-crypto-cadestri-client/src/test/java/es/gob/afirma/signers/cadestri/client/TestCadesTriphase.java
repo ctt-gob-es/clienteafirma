@@ -49,7 +49,7 @@ public final class TestCadesTriphase {
 	 * @throws AOException
 	 * @throws IOException */
 	@Test
-	@Ignore // Necesita el servidor
+	//@Ignore // Necesita el servidor
 	public void firma() throws AOException, IOException {
 		final AOSigner signer = new AOCAdESTriPhaseSigner();
 
@@ -71,11 +71,10 @@ public final class TestCadesTriphase {
 	}
 
 	/** Prueba de cofirma CAdES trif&aacute;sica.
-	 * @throws AOException
-	 * @throws IOException */
+	 * @throws Exception en cualquier error. */
 	@Test
 	@Ignore // Necesita el servidor
-	public void cofirma() throws AOException, IOException {
+	public void cofirma() throws Exception {
 		final AOSigner signer = new AOCAdESTriPhaseSigner();
 
 		final Properties config = new Properties(this.serverConfig);
@@ -105,11 +104,10 @@ public final class TestCadesTriphase {
 	}
 
 	/** Prueba de contrafirma CAdES trif&aacute;sica.
-	 * @throws AOException
-	 * @throws IOException */
+	 * @throws Exception en cualquier error. */
 	@Test
-	@Ignore // Necesita el servidor
-	public void contrafirma() throws AOException, IOException {
+	//@Ignore // Necesita el servidor
+	public void contrafirma() throws Exception {
 		final AOSigner signer = new AOCAdESTriPhaseSigner();
 
 		final Properties config = new Properties(this.serverConfig);
@@ -141,7 +139,7 @@ public final class TestCadesTriphase {
 	}
 
 	/** Carga el almac&acute;n de pruebas.
-	 * @throws Exception */
+	 * @throws Exception en cualquier error. */
 	@Before
 	public void loadKeystore() throws Exception {
 

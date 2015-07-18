@@ -15,7 +15,6 @@ import java.util.Date;
 import java.util.Properties;
 
 import es.gob.afirma.core.AOException;
-import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.signers.TriphaseData;
 import es.gob.afirma.signers.multi.cades.AOCAdESCounterSigner;
@@ -51,15 +50,7 @@ public final class AOCAdESTriPhaseCounterSigner {
                                         final Properties xParams,
                                         final Date date) throws AOException,
                                                                 IOException {
-
-		final String operation = targetType == CounterSignTarget.LEAFS ?
-				AOSignConstants.MASSIVE_OPERATION_COUNTERSIGN_LEAFS :
-					AOSignConstants.MASSIVE_OPERATION_COUNTERSIGN_TREE;
-
-		final TriphaseData triphaseData = new TriphaseData(
-			AOSignConstants.SIGN_FORMAT_CADES,
-			operation
-		);
+		final TriphaseData triphaseData = new TriphaseData();
 
 		final AOCAdESCounterSigner countersigner = new AOCAdESCounterSigner(
 			new CAdESFakePkcs1Signer(triphaseData, true),
