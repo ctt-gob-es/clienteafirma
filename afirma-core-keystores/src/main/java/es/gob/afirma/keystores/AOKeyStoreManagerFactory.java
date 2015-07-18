@@ -143,25 +143,20 @@ public final class AOKeyStoreManagerFactory {
         );
     }
 
-    private static AOKeyStoreManager getPkcs12KeyStoreManager(final String lib,
-    		                                                  final PasswordCallback pssCallback,
-    		                                                  final boolean forceReset,
-    		                                                  final Object parentComponent) throws IOException,
-    		                                                  						               AOKeystoreAlternativeException {
-
-    	final AOKeyStoreManager ksm = new Pkcs12KeyStoreManager();
+    private static AOKeyStoreManager addFileKeyStoreManager(final AOKeyStoreManager ksm,
+    		                                                final String[] exts,
+    		                                                final String desc,
+    		                                                final String lib,
+  		                                                    final PasswordCallback pssCallback,
+  		                                                    final boolean forceReset,
+  		                                                    final Object parentComponent) throws AOKeystoreAlternativeException, IOException {
         String storeFilename = null;
         if (lib != null && !"".equals(lib) && new File(lib).exists()) { //$NON-NLS-1$
             storeFilename = lib;
         }
         if (storeFilename == null) {
-            String desc = null;
-            final String[] exts = new String[] {
-                "pfx", "p12" //$NON-NLS-1$ //$NON-NLS-2$
-            };
-            desc = KeyStoreMessages.getString("AOKeyStoreManagerFactory.0"); //$NON-NLS-1$
             storeFilename = AOUIFactory.getLoadFiles(
-        		KeyStoreMessages.getString("AOKeyStoreManagerFactory.4") + " " + "PKCS#12", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        		KeyStoreMessages.getString("AOKeyStoreManagerFactory.4") + " " + ksm.getType().getName(), //$NON-NLS-1$ //$NON-NLS-2$
         		null,
         		null,
         		exts,
@@ -184,59 +179,47 @@ public final class AOKeyStoreManagerFactory {
         catch (final AOException e) {
             throw new AOKeystoreAlternativeException(
         	   AOKeyStore.JAVA,
-               "No se ha podido abrir el almacen de tipo PKCS#12 para el fichero " + lib, //$NON-NLS-1$
+               "No se ha podido abrir el almacen de tipo " + ksm.getType().getName() + " para el fichero " + lib, //$NON-NLS-1$ //$NON-NLS-2$
                e
             );
         }
         return ksm;
+    }
+
+    private static AOKeyStoreManager getPkcs12KeyStoreManager(final String lib,
+    		                                                  final PasswordCallback pssCallback,
+    		                                                  final boolean forceReset,
+    		                                                  final Object parentComponent) throws IOException,
+    		                                                  						               AOKeystoreAlternativeException {
+    	return addFileKeyStoreManager(
+			new Pkcs12KeyStoreManager(),
+			new String[] {
+                "pfx", "p12" //$NON-NLS-1$ //$NON-NLS-2$
+            },
+            KeyStoreMessages.getString("AOKeyStoreManagerFactory.0"), //$NON-NLS-1$
+			lib,
+			pssCallback,
+			forceReset,
+			parentComponent
+		);
 	}
 
     private static AOKeyStoreManager getJavaKeyStoreManager(final String lib,
     														final PasswordCallback pssCallback,
     														final boolean forceReset,
     														final Object parentComponent) throws IOException,
-    															AOKeystoreAlternativeException {
-
-    	final AOKeyStoreManager ksm = new JavaKeyStoreManager();
-    	String storeFilename = null;
-    	if (lib != null && !"".equals(lib) && new File(lib).exists()) { //$NON-NLS-1$
-    		storeFilename = lib;
-    	}
-    	if (storeFilename == null) {
-    		String desc = null;
-    		final String[] exts = new String[] {
-    				"jks" //$NON-NLS-1$
-    		};
-    		desc = KeyStoreMessages.getString("AOKeyStoreManagerFactory.1"); //$NON-NLS-1$
-    		storeFilename = AOUIFactory.getLoadFiles(
-    				KeyStoreMessages.getString("AOKeyStoreManagerFactory.4") + " " + "JKS", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-    				null,
-    				null,
-    				exts,
-    				desc,
-    				false,
-    				false,
-    				null,
-    				parentComponent
-    				)[0].getAbsolutePath();
-    		if (storeFilename == null) {
-    			throw new AOCancelledOperationException("No se ha seleccionado el almacen de certificados"); //$NON-NLS-1$
-    		}
-    	}
-
-    	try {
-    		final InputStream is = new FileInputStream(storeFilename);
-    		ksm.init(null, is, pssCallback, null, forceReset);
-    		is.close();
-    	}
-    	catch (final AOException e) {
-    		throw new AOKeystoreAlternativeException(
-				AOKeyStore.JAVA,
-				"No se ha podido abrir el almacen de tipo JKS para el fichero " + lib, //$NON-NLS-1$
-				e
-			);
-    	}
-    	return ksm;
+    															                                 AOKeystoreAlternativeException {
+    	return addFileKeyStoreManager(
+			new JavaKeyStoreManager(),
+			new String[] {
+                "jks" //$NON-NLS-1$
+            },
+            KeyStoreMessages.getString("AOKeyStoreManagerFactory.1"), //$NON-NLS-1$
+			lib,
+			pssCallback,
+			forceReset,
+			parentComponent
+		);
     }
 
 	private static AOKeyStoreManager getCeresJavaKeyStoreManager(final PasswordCallback pssCallback,
