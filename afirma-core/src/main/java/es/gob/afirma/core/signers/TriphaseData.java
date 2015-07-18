@@ -91,16 +91,6 @@ public final class TriphaseData {
 		is.close();
 
 		final Element rootElement = doc.getDocumentElement();
-		final String format = rootElement.getAttribute("frmt"); //$NON-NLS-1$
-		if (format == null || format.trim().length() == 0) {
-			throw new IllegalArgumentException("No se encontro el nodo 'format' en el XML proporcionado"); //$NON-NLS-1$
-		}
-
-		final String operation = rootElement.getAttribute("op"); //$NON-NLS-1$
-		if (operation == null || operation.trim().length() == 0) {
-			throw new IllegalArgumentException("No se encontro el nodo 'op' en el XML proporcionado"); //$NON-NLS-1$
-		}
-
 		final NodeList childNodes = rootElement.getChildNodes();
 
 		final int idx = nextNodeElementIndex(childNodes, 0);
