@@ -30,12 +30,6 @@ import es.gob.afirma.triphase.server.cades.CAdESFakePkcs1Signer;
 
 final class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 
-//	/** Clave de la propiedad de firma. */
-//	private static final String PROPERTY_NAME_SIGN = "SIGN"; //$NON-NLS-1$
-//
-//	/** Nombre de la propiedad que contiene el n&uacute;mero de firmas proporcionadas. */
-//	private static final String PROPERTY_NAME_SIGN_COUNT = "SIGN_COUNT"; //$NON-NLS-1$
-
 	/** Indica si la postfirma requiere la prefirma. */
 	private static final String PROPERTY_NAME_NEED_DATA = "NEED_DATA"; //$NON-NLS-1$
 
@@ -109,18 +103,11 @@ final class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 			digestAlgorithm = AOSignConstants.getDigestAlgorithmName(algorithm);
 			try {
 				messageDigest = MessageDigest.getInstance(digestAlgorithm).digest(data);
-			} catch (final NoSuchAlgorithmException e) {
+			}
+			catch (final NoSuchAlgorithmException e) {
 				throw new IllegalArgumentException("Algoritmo de huella digital no soportado: " + digestAlgorithm, e); //$NON-NLS-1$
 			}
 		}
-
-
-//		System.out.println("=============");
-//		for (final String k : extraParams.keySet().toArray(new String[extraParams.size()])) {
-//			System.out.println(k + ": " + extraParams.getProperty(k));
-//		}
-//		System.out.println("=============");
-
 
 		LOGGER.info("Se invocan las funciones internas de prefirma CAdES"); //$NON-NLS-1$
 		final byte[] presign = CAdESTriPhaseSigner.preSign(
