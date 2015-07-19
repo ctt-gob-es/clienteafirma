@@ -61,9 +61,9 @@ public final class TriphaseData {
 	 *  &lt;firmas&gt;
 	 *   &lt;firma&gt;
 	 *    &lt;param n="NEED_PRE"&gt;true&lt;/param&gt;
-	 *    &lt;param n="PRE"&gt;MYICXDAYBgkqhkiG9w0BCQMxCwYJKoZIhvcNAQcBMBwGCSqGSIb3DQEJBTEPFw0xNTA3MTgxMzU5MzBaMCQGCyqGSIb3DQEJEAIEMRUwEwwGYmluYXJ5BgkqhkiG9w0BBwEwTwYJKoZIhvcNAQkEMUIEQLsLJoe58Rp1EQy/eFcOp8i6uxCIDVM6GrOIEThxvWQ8R9uW4bGXk0drWz8wAAcZYaptbKsMHIc8TXUVUSxiu7swggGpBgsqhkiG9w0BCRACLzGCAZgwggGUMIIBkDCCAYwwDQYJYIZIAWUDBAIDBQAEQKZAfc/mFcG6ZmAvy5X7vfiXMtJh4HDO5RrYvaZWTTmQEOD/1RZ3O59W7dGLhUyBLMukJJgoNpd9KyGLNnw+Ux8wggE3MIIBKaSCASUwggEhMQswCQYDVQQGEwJFUzESMBAGA1UECAwJQmFyY2Vsb25hMVgwVgYDVQQHDE9CYXJjZWxvbmEgKHNlZSBjdXJyZW50IGFkZHJlc3MgYXQgaHR0cDovL3d3dy5hbmYuZXMvZXMvYWRkcmVzcy1kaXJlY2Npb24uaHRtbCApMScwJQYDVQQKDB5BTkYgQXV0b3JpZGFkIGRlIENlcnRpZmljYWNpb24xLjAsBgNVBAsMJUFORiBBdXRvcmlkYWQgSW50ZXJtZWRpYSBkZSBJZGVudGlkYWQxGjAYBgkqhkiG9w0BCQEWC2luZm9AYW5mLmVzMRIwEAYDVQQFEwlHNjMyODc1MTAxGzAZBgNVBAMMEkFORiBBc3N1cmVkIElEIENBMQIIBRpYweGvykA=&lt;/param&gt;
+	 *    &lt;param n="PRE"&gt;MYICXDAYBgkqhkiG9[...]w0BA=&lt;/param&gt;
 	 *    &lt;param n="NEED_DATA"&gt;true&lt;/param&gt;
-	 *    &lt;param n="PK1"&gt;EMijB9pJ0lj27Xqov2RcNBRLHTSWPv+LAwCXdMrscOm3wA5sMsK7UlojtsJ4PlcGSdZK8oO0+wHsWmMFxY4Y6C3FqypG4YSccAnWEkDzRnwAn222fnoVfZJ9YDGqpxhwRq3wqIDagV62wuu7nfdr6fgQ3NYtihME7S8jxWVRnCM=&lt;/param&gt;
+	 *    &lt;param n="PK1"&gt;EMijB9pJ0lj27Xqov[---]RnCM=&lt;/param&gt;
 	 *   &lt;/firma&gt;
 	 *  &lt;/firmas&gt;
 	 * &lt;/xml&gt;
@@ -76,8 +76,6 @@ public final class TriphaseData {
 		if (xml == null) {
 			throw new IllegalArgumentException("El XML de entrada no puede ser nulo"); //$NON-NLS-1$
 		}
-
-		System.out.println(new String(xml));
 
 		final InputStream is = new ByteArrayInputStream(xml);
 		Document doc;
