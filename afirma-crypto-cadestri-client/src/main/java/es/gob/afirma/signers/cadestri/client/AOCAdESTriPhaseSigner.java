@@ -17,7 +17,6 @@ import java.net.URL;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
-import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Logger;
 
@@ -241,15 +240,15 @@ public final class AOCAdESTriPhaseSigner implements AOSigner {
 
 		try {
 			for (int i = 0; i < triphaseData.getSignsCount(); i++) {
-				final Map<String, String> signConfig = triphaseData.getSign(i);
+				final TriphaseData.TriSign signConfig = triphaseData.getSign(i);
 				final byte[] pkcs1sign = new AOPkcs1Signer().sign(
-					Base64.decode(signConfig.get(PROPERTY_NAME_PRESIGN)),
+					Base64.decode(signConfig.getProperty(PROPERTY_NAME_PRESIGN)),
 					algorithm,
 					key,
 					certChain,
 					null // No hay parametros en PKCS#1
 				);
-				signConfig.put(PROPERTY_NAME_PKCS1_SIGN, Base64.encode(pkcs1sign));
+				signConfig.addProperty(PROPERTY_NAME_PKCS1_SIGN, Base64.encode(pkcs1sign));
 			}
 		}
 		catch (final Exception e) {

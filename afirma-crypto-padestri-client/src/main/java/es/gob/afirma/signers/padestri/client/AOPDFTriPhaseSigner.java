@@ -18,7 +18,6 @@ import java.security.PrivateKey;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Logger;
 
@@ -175,7 +174,7 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
 		try {
 			triphaseData = TriphaseData.parser(Base64.decode(preSignResult, 0, preSignResult.length, true));
 		}
-		catch (Exception e) {
+		catch (final Exception e) {
 			LOGGER.severe("Error al analizar la prefirma enviada por el servidor: " + e); //$NON-NLS-1$
 			throw new AOException("Error al analizar la prefirma enviada por el servidor", e); //$NON-NLS-1$
 		}
@@ -189,8 +188,8 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
 		// identificadores de datos o en una operacion de contrafirma.
 		for (int i = 0; i < triphaseData.getSignsCount(); i++) {
 
-			Map<String, String> signConfig = triphaseData.getSign(i);
-			final String base64PreSign = signConfig.get(PROPERTY_NAME_PRESIGN);
+			final TriphaseData.TriSign signConfig = triphaseData.getSign(i);
+			final String base64PreSign = signConfig.getProperty(PROPERTY_NAME_PRESIGN);
 			if (base64PreSign == null) {
 				throw new AOException("El servidor no ha devuelto la prefirma numero " + i + ": " + new String(preSignResult)); //$NON-NLS-1$ //$NON-NLS-2$
 			}
@@ -212,12 +211,12 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
 					);
 
 			// Configuramos la peticion de postfirma indicando las firmas PKCS#1 generadas
-			signConfig.put(PROPERTY_NAME_PKCS1_SIGN, Base64.encode(pkcs1sign));
+			signConfig.addProperty(PROPERTY_NAME_PKCS1_SIGN, Base64.encode(pkcs1sign));
 
 			// Si no es necesaria la prefirma para completar la postfirma, la eliminamos
-			if (signConfig.containsKey(PROPERTY_NAME_NEED_PRE) &&
-					!Boolean.parseBoolean(signConfig.get(PROPERTY_NAME_NEED_PRE))) {
-				signConfig.remove(PROPERTY_NAME_PRESIGN);
+			if (signConfig.getProperty(PROPERTY_NAME_NEED_PRE) != null &&
+					!Boolean.parseBoolean(signConfig.getProperty(PROPERTY_NAME_NEED_PRE))) {
+				signConfig.deleteProperty(PROPERTY_NAME_PRESIGN);
 			}
 		}
 

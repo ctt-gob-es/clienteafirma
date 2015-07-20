@@ -19,7 +19,6 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Logger;
 
@@ -362,8 +361,8 @@ public final class AOXAdESTriPhaseSigner implements AOSigner {
 		// Es posible que se ejecute mas de una firma como resultado de haber proporcionado varios
 		// identificadores de datos o en una operacion de contrafirma.
 		for (int i = 0; i < triphaseData.getSignsCount(); i++) {
-			final Map<String, String> signConfig = triphaseData.getSign(i);
-			final String base64PreSign = signConfig.get(PROPERTY_NAME_PRESIGN);
+			final TriphaseData.TriSign signConfig = triphaseData.getSign(i);
+			final String base64PreSign = signConfig.getProperty(PROPERTY_NAME_PRESIGN);
 			if (base64PreSign == null) {
 				throw new AOException("El servidor no ha devuelto la prefirma numero " + i + ": " + new String(preSignResult)); //$NON-NLS-1$ //$NON-NLS-2$
 			}
@@ -385,10 +384,10 @@ public final class AOXAdESTriPhaseSigner implements AOSigner {
 					);
 
 			// Configuramos la peticion de postfirma indicando las firmas PKCS#1 generadas
-			signConfig.put(PROPERTY_NAME_PKCS1_SIGN, Base64.encode(pkcs1sign));
+			signConfig.addProperty(PROPERTY_NAME_PKCS1_SIGN, Base64.encode(pkcs1sign));
 
 			// Borramos la prefirma, que no sera necesaria en la postfirma
-			signConfig.remove(PROPERTY_NAME_PRESIGN);	//TODO: Homogenizar usando variable indicada desde servidor
+			signConfig.deleteProperty(PROPERTY_NAME_PRESIGN);	//TODO: Homogenizar usando variable indicada desde servidor
 		}
 
 		final String preResultAsBase64 = Base64.encode(triphaseData.toString().getBytes(), true);
