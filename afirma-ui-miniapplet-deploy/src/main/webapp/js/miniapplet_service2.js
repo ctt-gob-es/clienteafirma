@@ -692,7 +692,7 @@ var MiniApplet = ( function ( window, undefined ) {
 		 * soportan los applets.
 		 */
 		function cargarAppAfirma(clientAddress) {
-			if (!isIOS() && !isAndroid() && localStorage != null && window.addEventListener && window.postMessage){
+			if (!isIOS() && !isAndroid() && window.localStorage && window.addEventListener && window.postMessage){
 				clienteFirma = new AppAfirmaJSSocket(clientAddress, window, undefined);
 				clientType = TYPE_JAVASCRIPT_SOCKET;
 			}
@@ -745,19 +745,16 @@ var MiniApplet = ( function ( window, undefined ) {
 			// Registramos un callback para la obtencion de los mensajes de devolucion. Lo almacenamos para no
 			// registrarlo para cada operacion
 			function registryCallbacks (successCallback, errorCallback) {
-				
+				var results ="";
 				if (resultCallbackFunction == null) {
 				
-					//TODO: Por problemas con IE no podemos usar esto
-					//resultCallbackFunction = generateResultCallback(modalWindow, successCallback, errorCallback);
-					
-					
 					resultCallbackFunction = function(event) {
 						var localWindow = modalWindow;
 						// Se llamara a este evento ante 2 entradas "signDatos" que almacenara el resultado de
 						// la operacion y "signEstado" que se recibira antes y almacenara un "OK" o un "KO" segun
 						// haya terminado bien o mal la operacion
-						if (event.key == "signDatos" && event.newValue) {
+						if (event.key == "signEstado" && event.newValue){
+						//if (event.key == "signDatos" && event.newValue) {
 				
 							try {
 								var signEstado = localStorage.getItem("signEstado");
@@ -765,19 +762,39 @@ var MiniApplet = ( function ( window, undefined ) {
 									errorCallback("java.lang.Exception", localStorage.getItem(event.key));
 								}
 								else if (signEstado == "OK") {
-									successCallback(localStorage.getItem(event.key));
+									//lo han mandado en una envio
+									if(localStorage.getItem("EOF")=="EOF"){
+										if(results==""){
+											successCallback(localStorage.getItem("signDatos"));
+										}
+										else successCallback(results+localStorage.getItem("signDatos"));
+										//successCallback(localStorage.getItem("signDatos"));
+										
+										try {
+											localWindow.close();
+										} catch(e) {}
+									}
+									// no cabe en un solo envio, lo almacenamos para poder mandarlo todo junto
+									else{
+										if(localStorage.getItem("EOF")=="-"){
+											results+=localStorage.getItem("signDatos");
+											localStorage.removeItem("signDatos");
+										}
+									}
+									
 								}
 								else {
 									errorCallback("java.lang.Exception", "No se conoce si el resultado obtenido es correcto");
+									try {
+										localWindow.close();
+									} catch(e) {}
 								}
 							} catch(e) {
 								// Ocurrio un error al invocar a la funcion resultado
 							}
 							localStorage.removeItem("signEstado");
 							localStorage.removeItem("signDatos");
-							try {
-								localWindow.close();
-							} catch(e) {}
+							localStorage.removeItem("EOF");
 						}
 					};
 					

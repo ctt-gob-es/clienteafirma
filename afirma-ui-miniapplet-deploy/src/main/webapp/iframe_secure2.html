@@ -1,0 +1,69 @@
+<!doctype html>
+<html> <!-- IFrame que hace de pasarela entre las aplicaciones y la pagina de firma. -->
+  <head>
+    <script type="text/javascript">
+
+	// Anadimos un listener para capturar los mensajes enviados a la pagina
+	// para las versiones viejas de IE no funciona el evento addEventListener y tenemos que usar attachEvent
+		var enviar;
+		//var MAX_STORAGE_LENGHT = 4764000;
+		var MAX_STORAGE_LENGHT = 5000;
+		window.addEventListener('storage', sendStorage, false);
+		window.addEventListener("message", receiveMessage, false);
+
+	function receiveMessage(event) {
+		
+
+		
+		var baseUri = localStorage.getItem("signPageBaseUri");
+		if (baseUri && baseUri.indexOf(event.origin) == 0) {
+		
+			localStorage.removeItem("signEstado");
+			localStorage.removeItem("signDatos");
+		
+			// Se ha obtenido un resultado
+			if (event.data.result == "signature") {
+				// cabe en un envio
+				if (event.data.signature.length < MAX_STORAGE_LENGHT){
+					localStorage.setItem("signEstado", "OK");
+					localStorage.setItem("signDatos", event.data.signature);
+					localStorage.setItem("EOF","EOF");
+				}
+				// hay que hacer multiples envios,
+				else{
+						send=event.data.signature.substring(0,MAX_STORAGE_LENGHT);
+						enviar=event.data.signature.split(send)[1];
+						localStorage.setItem("signEstado", "OK");
+						localStorage.setItem("signDatos", send);
+						localStorage.setItem("EOF","-");
+				}
+			}
+			// Se ha producido un error
+			else {
+				localStorage.setItem("signEstado", "KO");
+				localStorage.setItem("signDatos", event.data.type + ": " + event.data.message);
+			}
+		}
+	}
+	function sendStorage(event){
+		//tengo que mandar datos si esta en nulo
+		if(localStorage.getItem("signDatos")==null && enviar.length>0){
+			var send=enviar.substring(0,MAX_STORAGE_LENGHT);
+			enviar=enviar.split(send)[1];
+			localStorage.setItem("signEstado", "OK");
+			localStorage.setItem("signDatos", send);
+			if(enviar==""){
+				localStorage.setItem("EOF","EOF");
+			}
+			else{
+				localStorage.setItem("EOF","-");
+			}
+		}
+		
+	
+	}
+	</script>
+  </head>
+	<body>
+	</body>
+</html>	
