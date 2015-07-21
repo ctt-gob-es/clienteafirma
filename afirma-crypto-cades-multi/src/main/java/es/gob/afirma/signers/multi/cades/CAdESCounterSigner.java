@@ -303,7 +303,14 @@ final class CAdESCounterSigner {
                     // Recorremos los SignerInfo del SignerInfos de forma recursiva
                     final Enumeration<?> eAtributesData = signerInfos.getObjects();
                     while (eAtributesData.hasMoreElements()) {
-                        final SignerInfo si = SignerInfo.getInstance(eAtributesData.nextElement());
+                    	final SignerInfo si;
+                    	try {
+                    		si = SignerInfo.getInstance(eAtributesData.nextElement());
+                    	}
+                    	catch(final Exception e) {
+                    		// Podemos encontrar objetos que no sean un SignerInfo
+                    		continue;
+                    	}
                         signerInfosU.add(
                     		counterSignSignerInfo(
                 				si,
