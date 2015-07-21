@@ -105,7 +105,7 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
                     0
                 };
 
-                dataSigned = cadesCountersigner.counterSigner(
+                dataSigned = cadesCountersigner.counterSign(
                 	   csp,
                        sign,
                        CounterSignTarget.TREE,
@@ -124,7 +124,7 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
                     0
                 };
                 dataSigned =
-                		cadesCountersigner.counterSigner(
+                		cadesCountersigner.counterSign(
                     		csp,
                             sign,
                             CounterSignTarget.LEAFS,
@@ -145,7 +145,7 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
                 }
 				nodesID = ReadNodesTree.simplyArray(nodesID);
                 dataSigned =
-                		cadesCountersigner.counterSigner(
+                		cadesCountersigner.counterSign(
                     		csp,
                             sign,
                             CounterSignTarget.NODES,
@@ -169,7 +169,7 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
                 }
                 final int[] nodes2 = new ReadNodesTree().readNodesFromSigners(signers, sign);
                 dataSigned =
-                		cadesCountersigner.counterSigner(
+                		cadesCountersigner.counterSign(
                     		csp,
                             sign,
                             CounterSignTarget.SIGNERS,

@@ -207,7 +207,7 @@ final class CAdESCoSigner {
 
 		// 4. CERTIFICADOS
 		// obtenemos la lista de certificados
-		final ASN1Set certificates = CAdESMultiUtil.getCertificates(sd, certChain);
+		final ASN1Set certificates = CAdESMultiUtil.addCertificates(sd, certChain);
 
 		// buscamos que tipo de algoritmo es y lo codificamos con su OID
 		final String signatureAlgorithm = parameters.getSignatureAlgorithm();
