@@ -330,7 +330,15 @@ public final class SignDataActivity extends FragmentActivity implements Keystore
 		runOnUiThread(new Runnable() {
 			@Override
 			public void run() {
-				SignDataActivity.this.getMessageDialog().show(getSupportFragmentManager(), "ErrorDialog"); //$NON-NLS-1$;
+				try {
+					SignDataActivity.this.getMessageDialog().show(getSupportFragmentManager(), "ErrorDialog"); //$NON-NLS-1$;
+				}
+				catch (final Exception e) {
+					// Si falla el mostrar el error (posiblemente por no disponer de un contexto grafico para mostrarlo)
+					// se mostrara en un
+					Toast.makeText(SignDataActivity.this, message, Toast.LENGTH_LONG).show();
+				}
+
 			}
 		});
 	}
