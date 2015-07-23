@@ -33,7 +33,25 @@ var MiniApplet = ( function ( window, undefined ) {
 		var severeTimeDelay = false;
 
 		var selectedLocale = null;
+		
+		var LOCALIZED_STRINGS = new Array();
+		LOCALIZED_STRINGS["es_ES"] = {
+				checktime_warn: "Se ha detectado un desfase horario entre su sistema y el servidor. Se recomienda que se corrija antes de pulsar Aceptar para continuar.",
+				checktime_err: "Se ha detectado un desfase horario entre su sistema y el servidor. Debe corregir la hora de su sistema antes de continuar.",
+				checktime_local_time: "Hora de su sistema",
+				checktime_server_time: "Hora del servidor"
+		};
+		LOCALIZED_STRINGS["gl_ES"] = {
+				checktime_warn: "Destectouse un desfase horario entre o seu sistema e o servidor. Recoméndase corrixilo antes de pulsar Aceptar para continuar.",
+				checktime_err: "Destectouse un desfase horario entre o seu sistema e o servidor. Debe corrixir a hora do seu sistema antes de continuar.",
+				checktime_local_time: "Hora do seu sistema",
+				checktime_server_time: "Hora do servidor"
+		};
 
+		var DEFAULT_LOCALE = LOCALIZED_STRINGS["es_ES"];
+		
+		var currentLocale = DEFAULT_LOCALE;
+		
 		/* ------------------------------------------------ */
 		/* Constantes para la operacion interna del Cliente */
 		/* ------------------------------------------------ */
@@ -91,7 +109,7 @@ var MiniApplet = ( function ( window, undefined ) {
 		var CHECKTIME_RECOMMENDED = "CT_RECOMMENDED";
 
 		var CHECKTIME_OBLIGATORY = "CT_OBLIGATORY";
-
+		
 		/* ------------------------------------ */
 		/* Funciones de comprobacion de entorno */
 		/* ------------------------------------ */
@@ -237,18 +255,18 @@ var MiniApplet = ( function ( window, undefined ) {
 			}
 
 			// Evaluamos la desincronizacion 
-			var delay =  Math.abs(clientDate.getTime() - serverDate.getTime());
+			var delay =  Math.abs(clientDate.getTime() - serverDate.getTime() - 100);
 			if (delay > maxMillis) {
 				 if (checkType == CHECKTIME_RECOMMENDED) {
-					 alert("Se ha detectado un desfase horario entre su sistema y el servidor. Se recomienda que se corrija antes de pulsar Aceptar para continuar." +
-							 "\nHora de su sistema: " + clientDate.toLocaleString() +
-							 "\nHora del servidor: " + serverDate.toLocaleString());
+					 alert(currentLocale.checktime_warn +
+							 "\n" + currentLocale.checktime_local_time + ": " + clientDate.toLocaleString() +
+							 "\n" + currentLocale.checktime_server_time + ": " + serverDate.toLocaleString());
 				 }
 				 else if (checkType == CHECKTIME_OBLIGATORY) {
 					 severeTimeDelay = true;
-					 alert("Se ha detectado un desfase horario entre su sistema y el servidor. Debe corregir la hora de su sistema antes de continuar." +
-							 "\nHora de su sistema: " + clientDate.toLocaleString() +
-							 "\nHora del servidor: " + serverDate.toLocaleString());
+					 alert(currentLocale.checktime_err +
+							 "\n" + currentLocale.checktime_local_time + ": " + clientDate.toLocaleString() +
+							 "\n" + currentLocale.checktime_server_time + ": " + serverDate.toLocaleString());
 				 }
 			}
 		}
@@ -509,6 +527,7 @@ var MiniApplet = ( function ( window, undefined ) {
 
 		var setLocale = function (locale) {
 			selectedLocale = locale;
+			currentLocale = (locale == null || LOCALIZED_STRINGS[locale] == null ? DEFAULT_LOCALE : LOCALIZED_STRINGS[locale]); 
 		}
 
 		var getErrorMessage = function () {
