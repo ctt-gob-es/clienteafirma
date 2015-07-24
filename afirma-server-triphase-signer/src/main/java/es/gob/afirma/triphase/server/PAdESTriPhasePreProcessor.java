@@ -8,6 +8,7 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.UUID;
 import java.util.logging.Logger;
 
 import com.lowagie.text.DocumentException;
@@ -17,6 +18,7 @@ import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.signers.TriphaseData;
+import es.gob.afirma.core.signers.TriphaseData.TriSign;
 import es.gob.afirma.signers.pades.InvalidPdfException;
 import es.gob.afirma.signers.pades.PAdESTriPhaseSigner;
 import es.gob.afirma.signers.pades.PdfSignResult;
@@ -79,7 +81,7 @@ final class PAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 		signConfig.put(PROPERTY_NAME_SIGN_TIME, Long.toString(signTime.getTimeInMillis()));
 		signConfig.put(PROPERTY_NAME_PDF_UNIQUE_ID, Base64.encode(preSignature.getFileID().getBytes()));
 
-		triphaseData.addSignOperation(signConfig);
+		triphaseData.addSignOperation(new TriSign(signConfig, UUID.randomUUID().toString()));
 
 		LOGGER.info("Prefirma PAdES - Firma - FIN"); //$NON-NLS-1$
 
@@ -106,10 +108,10 @@ final class PAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 		// Preparo la fecha de firma
 		final GregorianCalendar cal = (GregorianCalendar) Calendar.getInstance();
 
-		final Map<String, String> signConfig = triphaseData.getSign(0);
+		final TriSign signConfig = triphaseData.getSign(0);
 
 		try {
-			cal.setTimeInMillis(Long.parseLong(signConfig.get(PROPERTY_NAME_SIGN_TIME)));
+			cal.setTimeInMillis(Long.parseLong(signConfig.getProperty(PROPERTY_NAME_SIGN_TIME)));
 		}
 		catch (final Exception e) {
 			LOGGER.warning("La hora de firma indicada no es valida: " + e.toString()); //$NON-NLS-1$
@@ -117,8 +119,8 @@ final class PAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 
 		// Ya con todos los datos hacemos la postfirma
 		final PdfSignResult signResult = new PdfSignResult(
-			new String(Base64.decode(signConfig.get(PROPERTY_NAME_PDF_UNIQUE_ID))),
-			Base64.decode(signConfig.get(PROPERTY_NAME_PRESIGN)),
+			new String(Base64.decode(signConfig.getProperty(PROPERTY_NAME_PDF_UNIQUE_ID))),
+			Base64.decode(signConfig.getProperty(PROPERTY_NAME_PRESIGN)),
 			null,
 			cal,
 			extraParams
@@ -129,7 +131,7 @@ final class PAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 			AOSignConstants.getDigestAlgorithmName(algorithm),
 			docBytes,
 			new X509Certificate[] { cert },
-			Base64.decode(signConfig.get(PROPERTY_NAME_PKCS1_SIGN)),
+			Base64.decode(signConfig.getProperty(PROPERTY_NAME_PKCS1_SIGN)),
 			signResult,
 			null,
 			null

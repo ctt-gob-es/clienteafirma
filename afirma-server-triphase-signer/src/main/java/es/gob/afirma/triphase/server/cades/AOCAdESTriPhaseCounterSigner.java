@@ -53,7 +53,7 @@ public final class AOCAdESTriPhaseCounterSigner {
 		final TriphaseData triphaseData = new TriphaseData();
 
 		final AOCAdESCounterSigner countersigner = new AOCAdESCounterSigner(
-			new CAdESFakePkcs1Signer(triphaseData, true),
+			new CAdESFakePkcs1Signer(triphaseData, null, true),
 			date
 		);
 
@@ -70,7 +70,7 @@ public final class AOCAdESTriPhaseCounterSigner {
 		);
 
 		for (int i = 0; i < triphaseData.getSignsCount(); i++) {
-			triphaseData.getSign(i).put(PARAM_DATE, Long.toString(date.getTime()));
+			triphaseData.getSign(i).addProperty(PARAM_DATE, Long.toString(date.getTime()));
 		}
 
 		return triphaseData.toString().getBytes();

@@ -8,6 +8,7 @@ import java.security.cert.X509Certificate;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.UUID;
 import java.util.logging.Logger;
 
 import javax.xml.crypto.MarshalException;
@@ -20,6 +21,7 @@ import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.signers.TriphaseData;
+import es.gob.afirma.core.signers.TriphaseData.TriSign;
 import es.gob.afirma.signers.xml.XMLConstants;
 import es.gob.afirma.triphase.server.xades.XAdESTriPhaseSignerServerSide;
 import es.gob.afirma.triphase.server.xades.XAdESTriPhaseSignerServerSide.Op;
@@ -145,7 +147,7 @@ final class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 			if (i == 0) {
 				signConfig.put(PROPERTY_NAME_SCHEMA_BASE, Base64.encode(preSignature.getXmlSign()));
 			}
-			triphaseData.addSignOperation(signConfig);
+			triphaseData.addSignOperation(new TriSign(signConfig, UUID.randomUUID().toString()));
 		}
 
 		return triphaseData.toString().getBytes();
@@ -214,11 +216,11 @@ final class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 		}
 
 		// El XML base se incluye como datos de sesion de la primera firma y solo de la primera
-		String xmlBase = new String(Base64.decode(triphaseData.getSign(0).get(PROPERTY_NAME_SCHEMA_BASE)));
+		String xmlBase = new String(Base64.decode(triphaseData.getSign(0).getProperty(PROPERTY_NAME_SCHEMA_BASE)));
 
 		// Sustituimos los valores dummy de la firmapor los reales
 		for (int i = 0; i < triphaseData.getSignsCount(); i++) {
-			final String pkcs1Base64 = triphaseData.getSign(i).get(PROPERTY_NAME_PKCS1_SIGN);
+			final String pkcs1Base64 = triphaseData.getSign(i).getProperty(PROPERTY_NAME_PKCS1_SIGN);
 			if (pkcs1Base64 == null) {
 				throw new IllegalArgumentException("La propiedades adicionales no contienen la firma PKCS#1"); //$NON-NLS-1$
 			}

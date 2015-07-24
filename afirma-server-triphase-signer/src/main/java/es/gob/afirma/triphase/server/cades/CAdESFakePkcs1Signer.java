@@ -13,6 +13,7 @@ import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.signers.AOSimpleSigner;
 import es.gob.afirma.core.signers.TriphaseData;
+import es.gob.afirma.core.signers.TriphaseData.TriSign;
 
 /** Sustituto del firmador PKCS#1 para firmas trif&aacute;sicas.
  * No firma realmente, sino que devuelve unos datos aleatorios del tama&ntilde;o adecuado y
@@ -48,15 +49,16 @@ public final class CAdESFakePkcs1Signer implements AOSimpleSigner {
 	private static final String PARAM_DUMMY_PK1 = "DPK1";   //$NON-NLS-1$
 
 	private final TriphaseData triphaseData;
-
+	private final String id;
 	private final boolean registry;
 
 	/** Construye el sustituto del firmador PKCS#1 para firmas trif&aacute;sicas.
 	 * @param triphaseData Resultado donde ir almacenando los pares de datos a firmar
-	 *                             y datos aleatorios a sustituir.
+	 *                     y datos aleatorios a sustituir.
+	 * @param signId Identificador de la firma a realizarº
 	 * @param registry Indica si las firmas realizadas deben quedar registrada internamente.
-	 * 						Esto es de utilidad en la prefirma, no en la postfirma.*/
-	public CAdESFakePkcs1Signer(final TriphaseData triphaseData, final boolean registry) {
+	 *                 Esto es de utilidad en la prefirma, no en la postfirma.*/
+	public CAdESFakePkcs1Signer(final TriphaseData triphaseData, final String signId, final boolean registry) {
 		if (triphaseData == null) {
 			throw new IllegalArgumentException(
 				"Es necesario un resultado de PreContrafirma para ir almacenando las firmas" //$NON-NLS-1$
@@ -64,6 +66,7 @@ public final class CAdESFakePkcs1Signer implements AOSimpleSigner {
 		}
 		this.triphaseData = triphaseData;
 		this.registry = registry;
+		this.id = signId;
 	}
 
 	@Override
@@ -106,7 +109,7 @@ public final class CAdESFakePkcs1Signer implements AOSimpleSigner {
 			final Map<String, String> signConfig = new HashMap<String, String>();
 			signConfig.put(PARAM_PRE, Base64.encode(data));
 			signConfig.put(PARAM_DUMMY_PK1, Base64.encode(dummyData));
-			this.triphaseData.addSignOperation(signConfig);
+			this.triphaseData.addSignOperation(new TriSign(signConfig, this.id));
 		}
 
 		// Devolvemos el dato unico que luego sera reemplazado por la firma adecuada

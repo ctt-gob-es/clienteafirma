@@ -1,9 +1,11 @@
 package es.gob.afirma.triphase.server;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.lang.reflect.Constructor;
+import java.net.HttpURLConnection;
 import java.net.URLDecoder;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
@@ -80,7 +82,6 @@ public final class SignatureService extends HttpServlet {
 			if (configIs == null) {
 				throw new RuntimeException("No se encuentra el fichero de configuracion del servicio: " + CONFIG_FILE); //$NON-NLS-1$
 			}
-
 			config = new Properties();
 			config.load(configIs);
 			configIs.close();
@@ -91,24 +92,32 @@ public final class SignatureService extends HttpServlet {
 
 		if (!config.containsKey(CONFIG_PARAM_DOCUMENT_MANAGER_CLASS)) {
 			throw new IllegalArgumentException(
-					"No se ha indicado el document manager (" + CONFIG_PARAM_DOCUMENT_MANAGER_CLASS + ") en el fichero de propiedades"); //$NON-NLS-1$ //$NON-NLS-2$
+				"No se ha indicado el document manager (" + CONFIG_PARAM_DOCUMENT_MANAGER_CLASS + ") en el fichero de propiedades" //$NON-NLS-1$ //$NON-NLS-2$
+			);
 		}
 
 		Class<?> docManagerClass;
 		try {
 			docManagerClass = Class.forName(config.getProperty(CONFIG_PARAM_DOCUMENT_MANAGER_CLASS));
-		} catch (final ClassNotFoundException e) {
-			throw new RuntimeException("La clase DocumentManager indicada no existe: " + config.getProperty(CONFIG_PARAM_DOCUMENT_MANAGER_CLASS), e); //$NON-NLS-1$
+		}
+		catch (final ClassNotFoundException e) {
+			throw new RuntimeException(
+				"La clase DocumentManager indicada no existe (" + config.getProperty(CONFIG_PARAM_DOCUMENT_MANAGER_CLASS) + "): " + e, e //$NON-NLS-1$ //$NON-NLS-2$
+			);
 		}
 
 		try {
 			final Constructor<?> docManagerConstructor = docManagerClass.getConstructor(Properties.class);
 			DOC_MANAGER = (DocumentManager) docManagerConstructor.newInstance(config);
-		} catch (final Exception e) {
+		}
+		catch (final Exception e) {
 			try {
 				DOC_MANAGER = (DocumentManager) docManagerClass.newInstance();
-			} catch (final Exception e2) {
-				throw new RuntimeException("No se ha podido inicializar el DocumentManager. Debe tener un constructor vacio o que reciba un Properties", e); //$NON-NLS-1$
+			}
+			catch (final Exception e2) {
+				throw new RuntimeException(
+					"No se ha podido inicializar el DocumentManager. Debe tener un constructor vacio o que reciba un Properties: " + e2, e //$NON-NLS-1$
+				);
 			}
 		}
 
@@ -153,250 +162,258 @@ public final class SignatureService extends HttpServlet {
 		PrintWriter out = null;
 		try {
 			out = response.getWriter();
-			final String operation = parameters.get(PARAM_NAME_OPERATION);
-			if (operation == null) {
-				LOGGER.warning("No se ha indicado la operacion trifasica a realizar"); //$NON-NLS-1$
-				out.print(ErrorManager.getErrorMessage(1));
-				out.close();
-				return;
-			}
-
-			// Obtenemos el codigo de operacion
-			//final String subOperation = request.getParameter(PARAM_NAME_SUB_OPERATION);
-			final String subOperation = parameters.get(PARAM_NAME_SUB_OPERATION);
-			if (subOperation == null || !PARAM_VALUE_SUB_OPERATION_SIGN.equals(subOperation)
-					&& !PARAM_VALUE_SUB_OPERATION_COSIGN.equals(subOperation)
-					&& !PARAM_VALUE_SUB_OPERATION_COUNTERSIGN.equals(subOperation)) {
-				out.print(ErrorManager.getErrorMessage(13));
-				out.close();
-				return;
-			}
-
-			// Obtenemos los parametros adicionales para la firma
-			final Properties extraParams = new Properties();
-			try {
-				if (parameters.containsKey(PARAM_NAME_EXTRA_PARAM)) {
-					extraParams.load(
-						new ByteArrayInputStream(
-							Base64.decode(parameters.get(PARAM_NAME_EXTRA_PARAM).trim(), true)
-						)
-					);
-				}
-			}
-			catch (final Exception e) {
-				LOGGER.severe("El formato de los parametros adicionales suministrado es erroneo: " +  e); //$NON-NLS-1$
-				out.print(ErrorManager.getErrorMessage(6) + ": " + e); //$NON-NLS-1$);
-				out.close();
-				return;
-			}
-
-			// Obtenemos los parametros adicionales para la firma
-			byte[] sessionData = null;
-			try {
-				if (parameters.containsKey(PARAM_NAME_SESSION_DATA)) {
-					sessionData = Base64.decode(parameters.get(PARAM_NAME_SESSION_DATA).trim(), true);
-				}
-			}
-			catch (final Exception e) {
-				LOGGER.severe("El formato de los datos de sesion suministrados es erroneo: "  + e); //$NON-NLS-1$
-				out.print(ErrorManager.getErrorMessage(6) + ": " + e); //$NON-NLS-1$
-				out.close();
-				return;
-			}
-
-			// Obtenemos el certificado
-			final String cert = parameters.get(PARAM_NAME_CERT);
-			if (cert == null) {
-				LOGGER.warning("No se ha indicado certificado de firma"); //$NON-NLS-1$
-				out.print(ErrorManager.getErrorMessage(5));
-				out.close();
-				return;
-			}
-			final X509Certificate signerCert;
-			try {
-				signerCert = (X509Certificate) CertificateFactory.getInstance("X.509").generateCertificate( //$NON-NLS-1$
-					new ByteArrayInputStream(Base64.decode(cert, true))
-				);
-			}
-			catch(final Exception e) {
-				LOGGER.severe("Error al decodificar el certificado: " + e);  //$NON-NLS-1$
-				out.print(ErrorManager.getErrorMessage(7));
-				out.close();
-				return;
-			}
-
-
-			byte[] docBytes = null;
-			final String docId = parameters.get(PARAM_NAME_DOCID);
-			if (docId != null) {
-				try {
-					docBytes = DOC_MANAGER.getDocument(docId, signerCert, extraParams);
-				} catch (final Throwable e) {
-					LOGGER.warning("Error al recuperar el documento: " + e); //$NON-NLS-1$
-					out.print(ErrorManager.getErrorMessage(14) + ": " + e); //$NON-NLS-1$
-					e.printStackTrace();
-					out.close();
-					return;
-				}
-			}
-
-			// Obtenemos el algoritmo de firma
-			final String algorithm = parameters.get(PARAM_NAME_ALGORITHM);
-			if (algorithm == null) {
-				LOGGER.warning("No se ha indicado algoritmo de firma"); //$NON-NLS-1$
-				out.print(ErrorManager.getErrorMessage(3));
-				out.close();
-				return;
-			}
-
-			// Obtenemos el formato de firma
-			final String format = parameters.get(PARAM_NAME_FORMAT);
-			LOGGER.info("Formato de firma seleccionado: " + format); //$NON-NLS-1$
-			if (format == null) {
-				LOGGER.warning("No se ha indicado formato de firma"); //$NON-NLS-1$
-				out.print(ErrorManager.getErrorMessage(4));
-				out.close();
-				return;
-			}
-
-			// Instanciamos el preprocesador adecuado
-			final TriPhasePreProcessor prep;
-			if (AOSignConstants.SIGN_FORMAT_PADES.equalsIgnoreCase(format) || AOSignConstants.SIGN_FORMAT_PADES_TRI.equalsIgnoreCase(format)) {
-				prep = new PAdESTriPhasePreProcessor();
-			}
-			else if (AOSignConstants.SIGN_FORMAT_CADES.equalsIgnoreCase(format) || AOSignConstants.SIGN_FORMAT_CADES_TRI.equalsIgnoreCase(format)) {
-				prep = new CAdESTriPhasePreProcessor();
-			}
-			else if (AOSignConstants.SIGN_FORMAT_XADES.equalsIgnoreCase(format) || AOSignConstants.SIGN_FORMAT_XADES_TRI.equalsIgnoreCase(format)) {
-				prep = new XAdESTriPhasePreProcessor();
-			}
-			else {
-				LOGGER.severe("Formato de firma no soportado: " + format); //$NON-NLS-1$
-				out.print(ErrorManager.getErrorMessage(8));
-				out.close();
-				return;
-			}
-
-			if (PARAM_VALUE_OPERATION_PRESIGN.equals(operation)) {
-
-				LOGGER.info(" == PREFIRMA en servidor"); //$NON-NLS-1$
-
-				try {
-					final byte[] preRes;
-					if (PARAM_VALUE_SUB_OPERATION_SIGN.equals(subOperation)) {
-						preRes = prep.preProcessPreSign(docBytes, algorithm, signerCert, extraParams);
-					}
-					else if (PARAM_VALUE_SUB_OPERATION_COSIGN.equals(subOperation)) {
-						preRes = prep.preProcessPreCoSign(docBytes, algorithm, signerCert, extraParams);
-					}
-					else if (PARAM_VALUE_SUB_OPERATION_COUNTERSIGN.equals(subOperation)) {
-
-						CounterSignTarget target = CounterSignTarget.LEAFS;
-						if (extraParams.containsKey(PARAM_NAME_TARGET_TYPE)) {
-							final String targetValue = extraParams.getProperty(PARAM_NAME_TARGET_TYPE).trim();
-							if (CounterSignTarget.TREE.toString().equalsIgnoreCase(targetValue)) {
-								target = CounterSignTarget.TREE;
-							}
-						}
-
-						preRes = prep.preProcessPreCounterSign(docBytes, algorithm, signerCert, extraParams, target);
-					}
-					else {
-						out.close();
-						throw new AOException("No se reconoce el codigo de sub-operacion: " + subOperation); //$NON-NLS-1$
-					}
-
-					LOGGER.info(" Se calculado el resultado de la prefirma y se devuelve. Numero de bytes: " + preRes.length); //$NON-NLS-1$
-
-					out.print(
-						Base64.encode(
-							preRes,
-							true
-						)
-					);
-
-					LOGGER.info(" FIN PREFIRMA"); //$NON-NLS-1$
-				}
-				catch (final Exception e) {
-					LOGGER.severe("Error en la prefirma: " + e); //$NON-NLS-1$
-					e.printStackTrace();
-					out.print(ErrorManager.getErrorMessage(9) + ": " + e); //$NON-NLS-1$
-					out.close();
-					return;
-				}
-			}
-			else if (PARAM_VALUE_OPERATION_POSTSIGN.equals(operation)) {
-
-				LOGGER.info(" == POSTFIRMA en servidor"); //$NON-NLS-1$
-
-				final byte[] signedDoc;
-				try {
-					if (PARAM_VALUE_SUB_OPERATION_SIGN.equals(subOperation)) {
-						signedDoc = prep.preProcessPostSign(docBytes, algorithm, signerCert, extraParams, sessionData);
-					}
-					else if (PARAM_VALUE_SUB_OPERATION_COSIGN.equals(subOperation)) {
-						signedDoc = prep.preProcessPostCoSign(docBytes, algorithm, signerCert, extraParams, sessionData);
-					}
-					else if (PARAM_VALUE_SUB_OPERATION_COUNTERSIGN.equals(subOperation)) {
-
-						CounterSignTarget target = CounterSignTarget.LEAFS;
-						if (extraParams.containsKey(PARAM_NAME_TARGET_TYPE)) {
-							final String targetValue = extraParams.getProperty(PARAM_NAME_TARGET_TYPE).trim();
-							if (CounterSignTarget.TREE.toString().equalsIgnoreCase(targetValue)) {
-								target = CounterSignTarget.TREE;
-							}
-						}
-
-						signedDoc = prep.preProcessPostCounterSign(docBytes, algorithm, signerCert, extraParams, sessionData, target);
-					}
-					else {
-						out.close();
-						throw new AOException("No se reconoce el codigo de sub-operacion: " + subOperation); //$NON-NLS-1$
-					}
-				}
-				catch (final Exception e) {
-					LOGGER.severe("Error en la postfirma: " + e); //$NON-NLS-1$
-					out.print(ErrorManager.getErrorMessage(12) + ": " + e); //$NON-NLS-1$
-					e.printStackTrace();
-					out.close();
-					return;
-				}
-
-				// Establecemos parametros adicionales que se pueden utilizar para guardar el documento
-				extraParams.setProperty(PARAM_NAME_FORMAT, format);
-
-				LOGGER.info(" Se ha calculado el resultado de la postfirma y se devuelve. Numero de bytes: " + signedDoc.length); //$NON-NLS-1$
-
-				// Devolvemos al servidor documental el documento firmado
-				final String newDocId;
-				try {
-					newDocId = DOC_MANAGER.storeDocument(docId, signerCert, signedDoc, extraParams);
-				}
-				catch(final Throwable e) {
-					LOGGER.severe("Error al almacenar el documento: " + e); //$NON-NLS-1$
-					out.print(ErrorManager.getErrorMessage(10) + ": " + e); //$NON-NLS-1$
-					e.printStackTrace();
-					out.close();
-					return;
-				}
-
-				LOGGER.info(" FIN POSTFIRMA"); //$NON-NLS-1$
-
-				out.println(SUCCESS + " " + NEW_DOCID_TAG + "=" + newDocId); //$NON-NLS-1$ //$NON-NLS-2$
-			}
-			else {
-				out.println(ErrorManager.getErrorMessage(11));
-			}
-			out.close();
 		}
         catch (final Exception e) {
-        	LOGGER.severe("No se pude contestar a la peticion: " + e); //$NON-NLS-1$
-        	e.printStackTrace();
-        	if (out != null) {
-        		out.close();
-        	}
+        	LOGGER.severe("No se pudo contestar a la peticion: " + e); //$NON-NLS-1$
+        	try {
+				response.sendError(HttpURLConnection.HTTP_INTERNAL_ERROR, "No se pude contestar a la peticion: " + e); //$NON-NLS-1$
+			}
+        	catch (final IOException e1) {
+        		LOGGER.severe("No se pudo enviar un error HTTP 500: " + e1); //$NON-NLS-1$
+			}
         	return;
         }
+
+		final String operation = parameters.get(PARAM_NAME_OPERATION);
+		if (operation == null) {
+			LOGGER.warning("No se ha indicado la operacion trifasica a realizar"); //$NON-NLS-1$
+			out.print(ErrorManager.getErrorMessage(1));
+			out.close();
+			return;
+		}
+
+		// Obtenemos el codigo de operacion
+		//final String subOperation = request.getParameter(PARAM_NAME_SUB_OPERATION);
+		final String subOperation = parameters.get(PARAM_NAME_SUB_OPERATION);
+		if (subOperation == null || !PARAM_VALUE_SUB_OPERATION_SIGN.equals(subOperation)
+				&& !PARAM_VALUE_SUB_OPERATION_COSIGN.equals(subOperation)
+				&& !PARAM_VALUE_SUB_OPERATION_COUNTERSIGN.equals(subOperation)) {
+			out.print(ErrorManager.getErrorMessage(13));
+			out.close();
+			return;
+		}
+
+		// Obtenemos los parametros adicionales para la firma
+		final Properties extraParams = new Properties();
+		try {
+			if (parameters.containsKey(PARAM_NAME_EXTRA_PARAM)) {
+				extraParams.load(
+					new ByteArrayInputStream(
+						Base64.decode(parameters.get(PARAM_NAME_EXTRA_PARAM).trim(), true)
+					)
+				);
+			}
+		}
+		catch (final Exception e) {
+			LOGGER.severe("El formato de los parametros adicionales suministrado es erroneo: " +  e); //$NON-NLS-1$
+			out.print(ErrorManager.getErrorMessage(6) + ": " + e); //$NON-NLS-1$);
+			out.close();
+			return;
+		}
+
+		// Obtenemos los parametros adicionales para la firma
+		byte[] sessionData = null;
+		try {
+			if (parameters.containsKey(PARAM_NAME_SESSION_DATA)) {
+				sessionData = Base64.decode(parameters.get(PARAM_NAME_SESSION_DATA).trim(), true);
+			}
+		}
+		catch (final Exception e) {
+			LOGGER.severe("El formato de los datos de sesion suministrados es erroneo: "  + e); //$NON-NLS-1$
+			out.print(ErrorManager.getErrorMessage(6) + ": " + e); //$NON-NLS-1$
+			out.close();
+			return;
+		}
+
+		if (sessionData !=null) {
+			LOGGER.info("Recibidos los siguientes datos de sesion:\n" + new String(sessionData)); //$NON-NLS-1$
+		}
+
+		// Obtenemos el certificado
+		final String cert = parameters.get(PARAM_NAME_CERT);
+		if (cert == null) {
+			LOGGER.warning("No se ha indicado certificado de firma"); //$NON-NLS-1$
+			out.print(ErrorManager.getErrorMessage(5));
+			out.close();
+			return;
+		}
+		final X509Certificate signerCert;
+		try {
+			signerCert = (X509Certificate) CertificateFactory.getInstance("X.509").generateCertificate( //$NON-NLS-1$
+				new ByteArrayInputStream(Base64.decode(cert, true))
+			);
+		}
+		catch(final Exception e) {
+			LOGGER.severe("Error al decodificar el certificado: " + e);  //$NON-NLS-1$
+			out.print(ErrorManager.getErrorMessage(7));
+			out.close();
+			return;
+		}
+
+
+		byte[] docBytes = null;
+		final String docId = parameters.get(PARAM_NAME_DOCID);
+		if (docId != null) {
+			try {
+				docBytes = DOC_MANAGER.getDocument(docId, signerCert, extraParams);
+			} catch (final Throwable e) {
+				LOGGER.warning("Error al recuperar el documento: " + e); //$NON-NLS-1$
+				out.print(ErrorManager.getErrorMessage(14) + ": " + e); //$NON-NLS-1$
+				e.printStackTrace();
+				out.close();
+				return;
+			}
+		}
+
+		// Obtenemos el algoritmo de firma
+		final String algorithm = parameters.get(PARAM_NAME_ALGORITHM);
+		if (algorithm == null) {
+			LOGGER.warning("No se ha indicado algoritmo de firma"); //$NON-NLS-1$
+			out.print(ErrorManager.getErrorMessage(3));
+			out.close();
+			return;
+		}
+
+		// Obtenemos el formato de firma
+		final String format = parameters.get(PARAM_NAME_FORMAT);
+		LOGGER.info("Formato de firma seleccionado: " + format); //$NON-NLS-1$
+		if (format == null) {
+			LOGGER.warning("No se ha indicado formato de firma"); //$NON-NLS-1$
+			out.print(ErrorManager.getErrorMessage(4));
+			out.close();
+			return;
+		}
+
+		// Instanciamos el preprocesador adecuado
+		final TriPhasePreProcessor prep;
+		if (AOSignConstants.SIGN_FORMAT_PADES.equalsIgnoreCase(format) || AOSignConstants.SIGN_FORMAT_PADES_TRI.equalsIgnoreCase(format)) {
+			prep = new PAdESTriPhasePreProcessor();
+		}
+		else if (AOSignConstants.SIGN_FORMAT_CADES.equalsIgnoreCase(format) || AOSignConstants.SIGN_FORMAT_CADES_TRI.equalsIgnoreCase(format)) {
+			prep = new CAdESTriPhasePreProcessor();
+		}
+		else if (AOSignConstants.SIGN_FORMAT_XADES.equalsIgnoreCase(format) || AOSignConstants.SIGN_FORMAT_XADES_TRI.equalsIgnoreCase(format)) {
+			prep = new XAdESTriPhasePreProcessor();
+		}
+		else {
+			LOGGER.severe("Formato de firma no soportado: " + format); //$NON-NLS-1$
+			out.print(ErrorManager.getErrorMessage(8));
+			out.close();
+			return;
+		}
+
+		if (PARAM_VALUE_OPERATION_PRESIGN.equals(operation)) {
+
+			LOGGER.info(" == PREFIRMA en servidor"); //$NON-NLS-1$
+
+			try {
+				final byte[] preRes;
+				if (PARAM_VALUE_SUB_OPERATION_SIGN.equals(subOperation)) {
+					preRes = prep.preProcessPreSign(docBytes, algorithm, signerCert, extraParams);
+				}
+				else if (PARAM_VALUE_SUB_OPERATION_COSIGN.equals(subOperation)) {
+					preRes = prep.preProcessPreCoSign(docBytes, algorithm, signerCert, extraParams);
+				}
+				else if (PARAM_VALUE_SUB_OPERATION_COUNTERSIGN.equals(subOperation)) {
+
+					CounterSignTarget target = CounterSignTarget.LEAFS;
+					if (extraParams.containsKey(PARAM_NAME_TARGET_TYPE)) {
+						final String targetValue = extraParams.getProperty(PARAM_NAME_TARGET_TYPE).trim();
+						if (CounterSignTarget.TREE.toString().equalsIgnoreCase(targetValue)) {
+							target = CounterSignTarget.TREE;
+						}
+					}
+
+					preRes = prep.preProcessPreCounterSign(docBytes, algorithm, signerCert, extraParams, target);
+				}
+				else {
+					out.close();
+					throw new AOException("No se reconoce el codigo de sub-operacion: " + subOperation); //$NON-NLS-1$
+				}
+
+				LOGGER.info(" Se calculado el resultado de la prefirma y se devuelve. Numero de bytes: " + preRes.length); //$NON-NLS-1$
+
+				out.print(
+					Base64.encode(
+						preRes,
+						true
+					)
+				);
+
+				LOGGER.info(" FIN PREFIRMA"); //$NON-NLS-1$
+			}
+			catch (final Exception e) {
+				LOGGER.severe("Error en la prefirma: " + e); //$NON-NLS-1$
+				e.printStackTrace();
+				out.print(ErrorManager.getErrorMessage(9) + ": " + e); //$NON-NLS-1$
+				out.close();
+				return;
+			}
+		}
+		else if (PARAM_VALUE_OPERATION_POSTSIGN.equals(operation)) {
+
+			LOGGER.info(" == POSTFIRMA en servidor"); //$NON-NLS-1$
+
+			final byte[] signedDoc;
+			try {
+				if (PARAM_VALUE_SUB_OPERATION_SIGN.equals(subOperation)) {
+					signedDoc = prep.preProcessPostSign(docBytes, algorithm, signerCert, extraParams, sessionData);
+				}
+				else if (PARAM_VALUE_SUB_OPERATION_COSIGN.equals(subOperation)) {
+					signedDoc = prep.preProcessPostCoSign(docBytes, algorithm, signerCert, extraParams, sessionData);
+				}
+				else if (PARAM_VALUE_SUB_OPERATION_COUNTERSIGN.equals(subOperation)) {
+
+					CounterSignTarget target = CounterSignTarget.LEAFS;
+					if (extraParams.containsKey(PARAM_NAME_TARGET_TYPE)) {
+						final String targetValue = extraParams.getProperty(PARAM_NAME_TARGET_TYPE).trim();
+						if (CounterSignTarget.TREE.toString().equalsIgnoreCase(targetValue)) {
+							target = CounterSignTarget.TREE;
+						}
+					}
+
+					signedDoc = prep.preProcessPostCounterSign(docBytes, algorithm, signerCert, extraParams, sessionData, target);
+				}
+				else {
+					out.close();
+					throw new AOException("No se reconoce el codigo de sub-operacion: " + subOperation); //$NON-NLS-1$
+				}
+			}
+			catch (final Exception e) {
+				LOGGER.severe("Error en la postfirma: " + e); //$NON-NLS-1$
+				out.print(ErrorManager.getErrorMessage(12) + ": " + e); //$NON-NLS-1$
+				e.printStackTrace();
+				out.close();
+				return;
+			}
+
+			// Establecemos parametros adicionales que se pueden utilizar para guardar el documento
+			extraParams.setProperty(PARAM_NAME_FORMAT, format);
+
+			LOGGER.info(" Se ha calculado el resultado de la postfirma y se devuelve. Numero de bytes: " + signedDoc.length); //$NON-NLS-1$
+
+			// Devolvemos al servidor documental el documento firmado
+			final String newDocId;
+			try {
+				newDocId = DOC_MANAGER.storeDocument(docId, signerCert, signedDoc, extraParams);
+			}
+			catch(final Throwable e) {
+				LOGGER.severe("Error al almacenar el documento: " + e); //$NON-NLS-1$
+				out.print(ErrorManager.getErrorMessage(10) + ": " + e); //$NON-NLS-1$
+				e.printStackTrace();
+				out.close();
+				return;
+			}
+
+			LOGGER.info(" FIN POSTFIRMA"); //$NON-NLS-1$
+
+			out.println(SUCCESS + " " + NEW_DOCID_TAG + "=" + newDocId); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+		else {
+			out.println(ErrorManager.getErrorMessage(11));
+		}
+		out.close();
+
 
 	}
 }

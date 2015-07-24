@@ -10,6 +10,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.UUID;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.AOException;
@@ -19,6 +20,7 @@ import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AdESPolicy;
 import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.signers.TriphaseData;
+import es.gob.afirma.core.signers.TriphaseData.TriSign;
 import es.gob.afirma.signers.cades.CAdESSignerMetadataHelper;
 import es.gob.afirma.signers.cades.CAdESTriPhaseSigner;
 import es.gob.afirma.signers.cades.CommitmentTypeIndicationsHelper;
@@ -137,7 +139,7 @@ final class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 			signConfig.put(PROPERTY_NAME_NEED_DATA, Boolean.TRUE.toString());
 		}
 
-		triphaseData.addSignOperation(signConfig);
+		triphaseData.addSignOperation(new TriSign(signConfig, UUID.randomUUID().toString()));
 
 		LOGGER.info("Prefirma CAdES - Firma - FIN"); //$NON-NLS-1$
 
@@ -168,15 +170,15 @@ final class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 			throw new AOException("No se ha encontrado la informacion de firma en la peticion"); //$NON-NLS-1$
 		}
 
-		final Map<String, String> config = triphaseData.getSign(0);
+		final TriSign config = triphaseData.getSign(0);
 
 		LOGGER.info("Se invocan las funciones internas de postfirma CAdES"); //$NON-NLS-1$
 		final byte[] signature = CAdESTriPhaseSigner.postSign(
 			AOSignConstants.getDigestAlgorithmName(algorithm),
 			omitContent ? null : data,
 			new X509Certificate[] { cert },
-			Base64.decode(config.get(PROPERTY_NAME_PKCS1_SIGN)),
-			Base64.decode(config.get(PROPERTY_NAME_PRESIGN))
+			Base64.decode(config.getProperty(PROPERTY_NAME_PKCS1_SIGN)),
+			Base64.decode(config.getProperty(PROPERTY_NAME_PRESIGN))
 		);
 
 		LOGGER.info("Postfirma CAdES - Firma - FIN"); //$NON-NLS-1$
@@ -266,7 +268,7 @@ final class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 		signConfig.put(PROPERTY_NAME_NEED_DATA, Boolean.toString(true));
 		signConfig.put(PROPERTY_NAME_NEED_PRE, Boolean.toString(true));
 
-		triphaseData.addSignOperation(signConfig);
+		triphaseData.addSignOperation(new TriSign(signConfig, UUID.randomUUID().toString()));
 
 		LOGGER.info("Prefirma CAdES - Cofirma - FIN"); //$NON-NLS-1$
 
@@ -299,13 +301,13 @@ final class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 			throw new AOException("No se ha encontrado la informacion de firma en la peticion"); //$NON-NLS-1$
 		}
 
-		final Map<String, String> config = triphaseData.getSign(0);
+		final TriSign config = triphaseData.getSign(0);
 
-		final byte[] pk1 = Base64.decode(config.get(PROPERTY_NAME_PKCS1_SIGN));
-		config.remove(PROPERTY_NAME_PKCS1_SIGN);
+		final byte[] pk1 = Base64.decode(config.getProperty(PROPERTY_NAME_PKCS1_SIGN));
+		config.deleteProperty(PROPERTY_NAME_PKCS1_SIGN);
 
-		final byte[] presign = Base64.decode(config.get(PROPERTY_NAME_PRESIGN));
-		config.remove(PROPERTY_NAME_PRESIGN);
+		final byte[] presign = Base64.decode(config.getProperty(PROPERTY_NAME_PRESIGN));
+		config.deleteProperty(PROPERTY_NAME_PRESIGN);
 
 		LOGGER.info("Se invocan las funciones internas de post-cofirma CAdES"); //$NON-NLS-1$
 		final byte[] signature;
@@ -369,9 +371,16 @@ final class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 		// Recreamos la firma
 		final TriphaseData triphaseData = TriphaseData.parser(session);
 
-		final Date date = new Date(Long.parseLong(triphaseData.getSign(0).get(PARAM_DATE)));
+		final Date date = new Date(Long.parseLong(triphaseData.getSign(0).getProperty(PARAM_DATE)));
 
-		byte[] newSign = new AOCAdESCounterSigner(new CAdESFakePkcs1Signer(triphaseData, false), date).countersign(
+		byte[] newSign = new AOCAdESCounterSigner(
+			new CAdESFakePkcs1Signer(
+				triphaseData,
+				null,
+				false
+			),
+			date
+		).countersign(
 			sign,
 			algorithm,
 			targetType,
@@ -386,13 +395,13 @@ final class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 		// en la sesion se comparte el valor de los datos que se firman con PKCS#1
 		for (int i = 0; i < triphaseData.getSignsCount(); i++) {
 
-			final Map<String, String> signConfig = triphaseData.getSign(i);
+			final TriSign signConfig = triphaseData.getSign(i);
 
 			// Los datos que hay que sustituir en la firma recien creada
-			final byte[] dataToReplace = Base64.decode(signConfig.get(PROPERTY_NAME_DUMMY_PK1));
+			final byte[] dataToReplace = Base64.decode(signConfig.getProperty(PROPERTY_NAME_DUMMY_PK1));
 
 			// La firma real PKCS#1
-			final byte[] pkcs1Sign = Base64.decode(signConfig.get(PROPERTY_NAME_PKCS1_SIGN));
+			final byte[] pkcs1Sign = Base64.decode(signConfig.getProperty(PROPERTY_NAME_PKCS1_SIGN));
 
 			// Reemplazamos
 			newSign = searchAndReplace(newSign, dataToReplace, pkcs1Sign);
