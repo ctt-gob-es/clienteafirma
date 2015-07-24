@@ -2,7 +2,6 @@ package es.gob.afirma.core.misc.protocol;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLDecoder;
@@ -20,10 +19,9 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.Platform;
-import es.gob.afirma.core.misc.http.UrlHttpManagerFactory;
+import es.gob.afirma.core.misc.http.DataDownloader;
 
 /** Clase de utilidad para el an&aacute;lisis sint&aacute;ctico de URL.
  * @author Alberto Mart&iacute;nez */
@@ -258,42 +256,14 @@ public final class ProtocolInvocationUriParser {
 		}
 		else {
 			final byte[] data;
-			final String dataParamValue = URLDecoder.decode(params.get(DATA_PARAM), DEFAULT_URL_ENCODING);
-
-			// Miramos primero si los datos son una URL, en cuyo caso descargamos los datos
-			if (dataParamValue.startsWith("http://") || dataParamValue.startsWith("https://")) { //$NON-NLS-1$ //$NON-NLS-2$
-				try {
-					data = UrlHttpManagerFactory.getInstalledManager().readUrlByGet(dataParamValue);
-				}
-				catch (final Exception e) {
-					throw new ParameterException(
-						"Se ha indicado una URL para descargar los datos, pero la descarga no se ha podido realizar: " + e //$NON-NLS-1$
-					);
-				}
+			try {
+				data = DataDownloader.downloadData(URLDecoder.decode(params.get(DATA_PARAM), DEFAULT_URL_ENCODING));
 			}
-			else if (dataParamValue.startsWith("ftp://")) { //$NON-NLS-1$
-				try {
-				 	final InputStream ftpStream = new URL(dataParamValue).openStream();
-					data = AOUtil.getDataFromInputStream(ftpStream);
-					ftpStream.close();
-				}
-				catch (final Exception e) {
-					throw new ParameterException(
-						"Se ha indicado un FTP para descargar los datos, pero la descarga no se ha podido realizar: " + e //$NON-NLS-1$
-					);
-				}
+			catch (final Exception e) {
+				throw new ParameterException(
+					"No se han podido obtener los datos: " + e, e //$NON-NLS-1$
+				);
 			}
-			// No son URL, son los datos en si
-			else {
-				// Comprobamos que los datos se pueden tratar como base 64
-				try {
-					data = Base64.decode(dataParamValue.replace("_", "/").replace("-", "+")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-				}
-				catch (final Exception e) {
-					throw new ParameterException("Los datos introducidos no se pueden tratar como base 64: " + e); //$NON-NLS-1$
-				}
-			}
-
 			ret.setData(data);
 		}
 
