@@ -26,6 +26,7 @@ final class PdfVisibleAreasUtils {
 	private static final String LAYERTEXT_TAG_DATE_DELIMITER = "="; //$NON-NLS-1$
 	private static final String LAYERTEXT_TAG_SUBJECTCN = "$$SUBJECTCN$$"; //$NON-NLS-1$
 	private static final String LAYERTEXT_TAG_ISSUERCN = "$$ISSUERCN$$"; //$NON-NLS-1$
+	private static final String LAYERTEXT_TAG_CERTSERIAL = "$$CERTSERIAL$$"; //$NON-NLS-1$
 
 	private static final Map<String, ColorValues> COLORS = new HashMap<String, ColorValues>(7);
 	static {
@@ -110,7 +111,8 @@ final class PdfVisibleAreasUtils {
 		String ret = cert == null ?
 			txt :
 				txt.replace(LAYERTEXT_TAG_SUBJECTCN, AOUtil.getCN(cert))
-				   .replace(LAYERTEXT_TAG_ISSUERCN, AOUtil.getCN(cert.getIssuerX500Principal().getName()));
+				   .replace(LAYERTEXT_TAG_ISSUERCN, AOUtil.getCN(cert.getIssuerX500Principal().getName()))
+				   .replace(LAYERTEXT_TAG_CERTSERIAL, cert.getSerialNumber().toString());
 		if (txt.contains(LAYERTEXT_TAG_DATE_PREFIX)) {
 			final int strIdx = txt.indexOf(LAYERTEXT_TAG_DATE_PREFIX);
 			final String sdTag = txt.substring(

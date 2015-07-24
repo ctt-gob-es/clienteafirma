@@ -230,15 +230,14 @@ public class TestSignField {
 		final Properties extraParams = new Properties();
 		extraParams.put("signaturePositionOnPageLowerLeftX", "100"); //$NON-NLS-1$ //$NON-NLS-2$
 		extraParams.put("signaturePositionOnPageLowerLeftY", "100"); //$NON-NLS-1$ //$NON-NLS-2$
-		extraParams.put("signaturePositionOnPageUpperRightX", "200"); //$NON-NLS-1$ //$NON-NLS-2$
-		extraParams.put("signaturePositionOnPageUpperRightY", "200"); //$NON-NLS-1$ //$NON-NLS-2$
+		extraParams.put("signaturePositionOnPageUpperRightX", "300"); //$NON-NLS-1$ //$NON-NLS-2$
+		extraParams.put("signaturePositionOnPageUpperRightY", "300"); //$NON-NLS-1$ //$NON-NLS-2$
 
-		extraParams.put("layer2Text", "Este es el texto de prueba 'Hola Mundo'"); //$NON-NLS-1$ //$NON-NLS-2$
+		extraParams.put("layer2Text", "Firmado por $$SUBJECTCN$$ el $$SIGNDATE=dd/MM/yyyy$$."); //$NON-NLS-1$ //$NON-NLS-2$
 		extraParams.put("layer2FontFamily", "1"); //$NON-NLS-1$ //$NON-NLS-2$
 		extraParams.put("layer2FontSize", "14"); //$NON-NLS-1$ //$NON-NLS-2$
 		extraParams.put("layer2FontStyle", "3"); //$NON-NLS-1$ //$NON-NLS-2$
 		extraParams.put("layer2FontColor", "red"); //$NON-NLS-1$ //$NON-NLS-2$
-//		extraParams.put("layer4Text ", "Texto secundario"); //$NON-NLS-1$
 
 		final byte[] testPdf = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(TEST_FILE));
 

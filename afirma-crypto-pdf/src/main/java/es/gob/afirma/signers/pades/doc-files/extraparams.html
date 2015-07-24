@@ -170,11 +170,34 @@
    <dd>Imagen JPEG codificada en Base64 de la r&uacute;brica de la firma manuscrita que se desea aparezca como firma visible en el PDF.</dd>
   <dt><b><i>layer2Text</i></b></dt>
    <dd>
-    Texto a escribir dentro de la "capa 2" de la firma visible.<br>
-    Este texto se escribe &uacute;nicamente si no se ha especificado una
-    imagen de r&uacute;brica, y necesita que se indique la p&aacute;gina y la situaci&oacute;n d&oacute;nde mostrar el recuadro de firma
-    mediante los par&aacute;metros <code>signaturePositionOnPageLowerLeftX</code>, <code>signaturePositionOnPageLowerLeftY</code>,
-    <code>signaturePositionOnPageUpperRightX</code>, <code>signaturePositionOnPageUpperRightY</code> y <code>signaturePage</code>.
+    <p>
+     Texto a escribir dentro de la "capa 2" de la firma visible.<br>
+     Este texto se escribe &uacute;nicamente si no se ha especificado una
+     imagen de r&uacute;brica, y necesita que se indique la p&aacute;gina y la situaci&oacute;n d&oacute;nde mostrar el recuadro de firma
+     mediante los par&aacute;metros <code>signaturePositionOnPageLowerLeftX</code>, <code>signaturePositionOnPageLowerLeftY</code>,
+     <code>signaturePositionOnPageUpperRightX</code>, <code>signaturePositionOnPageUpperRightY</code> y <code>signaturePage</code>.
+    </p>
+    <p>
+     Este texto puede incluir una serie de palabras clave que ser&aacute;n sustituidas por los textos apropiados del titular o emisor del
+     certificado de firma:
+     <dl>
+      <dt><i><b>$$SUBJECTCN$$</b></i></dt>
+       <dd>Nombre com&uacute;n (CN, <i>Common Name</i>) dentro del <code>X.500 Principal</code> del titular del certificado de firma.</dd>
+      <dt><i><b>$$ISSUERCN$$</b></i></dt>
+       <dd>Nombre com&uacute;n (CN, <i>Common Name</i>) dentro del <code>X.500 Principal</code> del emisor del certificado de firma.</dd>
+      <dt><i><b>$$CERTSERIAL$$</b></i></dt>
+       <dd>N&uacute;mero de serie del certificado de firma.</dd>
+      <dt><i><b>$$SIGNDATE=<code>PATR&Oacute;N</code>$$</b></i></dt>
+       <dd>
+        Fecha de la firma, donde <code>PATR&Oacute;N</code> debe indicar el formato en el que debe mostrarse la fecha, siguiendo el esquema
+        definido por Oracle para la clase <a href="http://docs.oracle.com/javase/7/docs/api/java/text/SimpleDateFormat.html">SimpleDateFormat</a>.
+       </dd>
+     </dl>
+     As&iacute;, por ejemplo, el texto "<code>Firmado por $$SUBJECTCN$$ el d&iacute;a $$SIGNDATE=dd/MM/yyyy$$.</code>" resultar&aacute; finalmente
+     en el PDF como "<code>Firmado por Tom&aacute;s Garc&iacute;a-Mer&aacute;s el d&iacute;a 04/01/2016.</code>" suponiendo que el CN del certificado
+     de firma es <code>Tom&aacute;s Garc&iacute;a-Mer&aacute;s</code> y que la firma se realiza el 04/01/2016.
+     
+    </p>
    </dd>
   <dt><b><i>layer2FontFamily</i></b></dt>
    <dd>
