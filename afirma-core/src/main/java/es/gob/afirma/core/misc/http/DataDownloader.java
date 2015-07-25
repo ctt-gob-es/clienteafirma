@@ -12,6 +12,10 @@ import es.gob.afirma.core.misc.Base64;
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
 public final class DataDownloader {
 
+	private DataDownloader() {
+		// No instanciable
+	}
+
 	/** Descarga datos del origen indicado.
 	 * @param dataSource Origen de los datos. Este puede ser, y se eval&uacute;a en este orden:
 	 *                   <ol>
