@@ -46,7 +46,7 @@ final class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 	@Override
 	public byte[] preProcessPreSign(final byte[] data,
 			final String algorithm,
-			final X509Certificate cert,
+			final X509Certificate[] cert,
 			final Properties extraParams) throws IOException, AOException {
 
 		LOGGER.info("Prefirma XAdES - Firma - INICIO"); //$NON-NLS-1$
@@ -61,7 +61,7 @@ final class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 	@Override
 	public byte[] preProcessPreCoSign(final byte[] data,
 			                          final String algorithm,
-			                          final X509Certificate cert,
+			                          final X509Certificate[] cert,
 			                          final Properties extraParams) throws IOException, AOException {
 
 		LOGGER.info("Prefirma XAdES - Cofirma - INICIO"); //$NON-NLS-1$
@@ -75,10 +75,12 @@ final class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 
 
 	@Override
-	public byte[] preProcessPreCounterSign(final byte[] sign, final String algorithm,
-			final X509Certificate cert, final Properties extraParams,
-			final CounterSignTarget targets) throws IOException, AOException {
-
+	public byte[] preProcessPreCounterSign(final byte[] sign,
+			                               final String algorithm,
+			                               final X509Certificate[] cert,
+			                               final Properties extraParams,
+			                               final CounterSignTarget targets) throws IOException,
+			                                                                       AOException {
 		LOGGER.info("Prefirma XAdES - Contrafirma - INICIO"); //$NON-NLS-1$
 
 		final byte[] presign = preProcessPre(sign, algorithm, cert, extraParams, Op.COUNTERSIGN);
@@ -90,7 +92,7 @@ final class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 
 	private static byte[] preProcessPre(final byte[] data,
 			final String algorithm,
-			final X509Certificate cert,
+			final X509Certificate[] cert,
 			final Properties extraParams,
 			final Op op) throws IOException, AOException {
 
@@ -106,7 +108,7 @@ final class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 			preSignature = XAdESTriPhaseSignerServerSide.preSign(
 					data,
 					algorithm,
-					new X509Certificate[] { cert },
+					cert,
 					extraParams,
 					op);
 		}
@@ -156,7 +158,7 @@ final class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 	@Override
 	public byte[] preProcessPostSign(final byte[] data,
 			final String algorithm,
-			final X509Certificate cert,
+			final X509Certificate[] cert,
 			final Properties extraParams,
 			final byte[] session) throws NoSuchAlgorithmException,
 			AOException, IOException {
@@ -173,7 +175,7 @@ final class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 	@Override
 	public byte[] preProcessPostCoSign(final byte[] data,
 			final String algorithm,
-			final X509Certificate cert,
+			final X509Certificate[] cert,
 			final Properties extraParams,
 			final byte[] session) throws NoSuchAlgorithmException,
 			AOException, IOException {
@@ -189,13 +191,13 @@ final class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 
 	@Override
 	public byte[] preProcessPostCounterSign(final byte[] sign,
-			final String algorithm,
-			final X509Certificate cert,
-			final Properties extraParams,
-			final byte[] session,
-			final CounterSignTarget targets) throws NoSuchAlgorithmException,
-			AOException, IOException {
-
+			                                final String algorithm,
+			                                final X509Certificate[] cert,
+			                                final Properties extraParams,
+			                                final byte[] session,
+			                                final CounterSignTarget targets) throws NoSuchAlgorithmException,
+			                                                                        AOException,
+			                                                                        IOException {
 		LOGGER.info("Postfirma XAdES - Contrafirma - INICIO"); //$NON-NLS-1$
 
 		final byte[] signature = preProcessPost(session);

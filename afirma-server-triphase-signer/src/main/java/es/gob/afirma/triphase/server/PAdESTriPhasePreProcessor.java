@@ -43,7 +43,7 @@ final class PAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 	@Override
 	public byte[] preProcessPreSign(final byte[] data,
 			                        final String algorithm,
-			                        final X509Certificate cert,
+			                        final X509Certificate[] cert,
 			                        final Properties extraParams) throws IOException,
 			                                                             AOException {
 		LOGGER.info("Prefirma PAdES - Firma - INICIO"); //$NON-NLS-1$
@@ -57,7 +57,7 @@ final class PAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 			preSignature = PAdESTriPhaseSigner.preSign(
 				AOSignConstants.getDigestAlgorithmName(algorithm),
 				data,
-				new X509Certificate[] { cert },
+				cert,
 				signTime,
 				extraParams
 			);
@@ -90,11 +90,12 @@ final class PAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 
 	@Override
 	public byte[] preProcessPostSign(final byte[] docBytes,
-			final String algorithm,
-			final X509Certificate cert,
-			final Properties extraParams,
-			final byte[] session) throws NoSuchAlgorithmException, AOException, IOException {
-
+			                         final String algorithm,
+			                         final X509Certificate[] cert,
+			                         final Properties extraParams,
+			                         final byte[] session) throws NoSuchAlgorithmException,
+			                                                      AOException,
+			                                                      IOException {
 		LOGGER.info("Postfirma PAdES - Firma - INICIO"); //$NON-NLS-1$
 
 		final TriphaseData triphaseData = TriphaseData.parser(session);
@@ -130,7 +131,7 @@ final class PAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 		final byte[] postsign = PAdESTriPhaseSigner.postSign(
 			AOSignConstants.getDigestAlgorithmName(algorithm),
 			docBytes,
-			new X509Certificate[] { cert },
+			cert,
 			Base64.decode(signConfig.getProperty(PROPERTY_NAME_PKCS1_SIGN)),
 			signResult,
 			null,
@@ -144,33 +145,40 @@ final class PAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 
 	@Override
 	public byte[] preProcessPreCoSign(final byte[] data,
-			final String algorithm,
-			final X509Certificate cert,
-			final Properties extraParams) throws IOException, AOException {
+			                          final String algorithm,
+			                          final X509Certificate[] cert,
+			                          final Properties extraParams) throws IOException,
+			                                                               AOException {
 		return preProcessPreSign(data, algorithm, cert, extraParams);
 	}
 
 	@Override
 	public byte[] preProcessPostCoSign(final byte[] data,
-			final String algorithm,
-			final X509Certificate cert,
-			final Properties extraParams,
-			final byte[] session) throws NoSuchAlgorithmException, AOException, IOException {
+			                           final String algorithm,
+			                           final X509Certificate[] cert,
+			                           final Properties extraParams,
+			                           final byte[] session) throws NoSuchAlgorithmException,
+			                                                        AOException,
+			                                                        IOException {
 		return preProcessPostSign(data, algorithm, cert, extraParams, session);
 	}
 
 	@Override
-	public byte[] preProcessPreCounterSign(final byte[] sign, final String algorithm,
-			final X509Certificate cert, final Properties extraParams,
-			final CounterSignTarget targets) throws IOException, AOException {
+	public byte[] preProcessPreCounterSign(final byte[] sign,
+			                               final String algorithm,
+			                               final X509Certificate[] cert,
+			                               final Properties extraParams,
+			                               final CounterSignTarget targets) throws IOException, AOException {
 		throw new UnsupportedOperationException("La operacion de contrafirma no esta soportada en PAdES."); //$NON-NLS-1$
 	}
 
 	@Override
-	public byte[] preProcessPostCounterSign(final byte[] sign, final String algorithm,
-			final X509Certificate cert, final Properties extraParams, final byte[] session,
-			final CounterSignTarget targets) throws NoSuchAlgorithmException,
-			AOException, IOException {
+	public byte[] preProcessPostCounterSign(final byte[] sign,
+			                                final String algorithm,
+			                                final X509Certificate[] cert,
+			                                final Properties extraParams,
+			                                final byte[] session,
+			                                final CounterSignTarget targets) throws NoSuchAlgorithmException, AOException, IOException {
 		throw new UnsupportedOperationException("La operacion de contrafirma no esta soportada en PAdES."); //$NON-NLS-1$
 	}
 }

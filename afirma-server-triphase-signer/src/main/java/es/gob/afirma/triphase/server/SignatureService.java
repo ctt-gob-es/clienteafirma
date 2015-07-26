@@ -309,10 +309,20 @@ public final class SignatureService extends HttpServlet {
 			try {
 				final byte[] preRes;
 				if (PARAM_VALUE_SUB_OPERATION_SIGN.equals(subOperation)) {
-					preRes = prep.preProcessPreSign(docBytes, algorithm, signerCert, extraParams);
+					preRes = prep.preProcessPreSign(
+						docBytes,
+						algorithm,
+						new X509Certificate[] { signerCert },
+						extraParams
+					);
 				}
 				else if (PARAM_VALUE_SUB_OPERATION_COSIGN.equals(subOperation)) {
-					preRes = prep.preProcessPreCoSign(docBytes, algorithm, signerCert, extraParams);
+					preRes = prep.preProcessPreCoSign(
+						docBytes,
+						algorithm,
+						new X509Certificate[] { signerCert },
+						extraParams
+					);
 				}
 				else if (PARAM_VALUE_SUB_OPERATION_COUNTERSIGN.equals(subOperation)) {
 
@@ -324,7 +334,13 @@ public final class SignatureService extends HttpServlet {
 						}
 					}
 
-					preRes = prep.preProcessPreCounterSign(docBytes, algorithm, signerCert, extraParams, target);
+					preRes = prep.preProcessPreCounterSign(
+						docBytes,
+						algorithm,
+						new X509Certificate[] { signerCert },
+						extraParams,
+						target
+					);
 				}
 				else {
 					out.close();
@@ -357,10 +373,22 @@ public final class SignatureService extends HttpServlet {
 			final byte[] signedDoc;
 			try {
 				if (PARAM_VALUE_SUB_OPERATION_SIGN.equals(subOperation)) {
-					signedDoc = prep.preProcessPostSign(docBytes, algorithm, signerCert, extraParams, sessionData);
+					signedDoc = prep.preProcessPostSign(
+						docBytes,
+						algorithm,
+						new X509Certificate[] { signerCert },
+						extraParams,
+						sessionData
+					);
 				}
 				else if (PARAM_VALUE_SUB_OPERATION_COSIGN.equals(subOperation)) {
-					signedDoc = prep.preProcessPostCoSign(docBytes, algorithm, signerCert, extraParams, sessionData);
+					signedDoc = prep.preProcessPostCoSign(
+						docBytes,
+						algorithm,
+						new X509Certificate[] { signerCert },
+						extraParams,
+						sessionData
+					);
 				}
 				else if (PARAM_VALUE_SUB_OPERATION_COUNTERSIGN.equals(subOperation)) {
 
@@ -372,7 +400,14 @@ public final class SignatureService extends HttpServlet {
 						}
 					}
 
-					signedDoc = prep.preProcessPostCounterSign(docBytes, algorithm, signerCert, extraParams, sessionData, target);
+					signedDoc = prep.preProcessPostCounterSign(
+						docBytes,
+						algorithm,
+						new X509Certificate[] { signerCert },
+						extraParams,
+						sessionData,
+						target
+					);
 				}
 				else {
 					out.close();

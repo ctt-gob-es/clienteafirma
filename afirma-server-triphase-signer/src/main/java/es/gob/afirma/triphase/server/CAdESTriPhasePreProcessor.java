@@ -57,7 +57,7 @@ final class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 	@Override
 	public byte[] preProcessPreSign(final byte[] data,
 			                        final String algorithm,
-			                        final X509Certificate cert,
+			                        final X509Certificate[] cert,
 			                        final Properties extraParams) throws IOException, AOException {
 
 		LOGGER.info("Prefirma CAdES - Firma - INICIO"); //$NON-NLS-1$
@@ -115,7 +115,7 @@ final class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 		final byte[] presign = CAdESTriPhaseSigner.preSign(
 				digestAlgorithm,
 				omitContent ? null : data,
-						new X509Certificate[] { cert },
+						cert,
 						AdESPolicy.buildAdESPolicy(extraParams),
 						signingCertificateV2,
 						messageDigest,
@@ -149,7 +149,7 @@ final class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 	@Override
 	public byte[] preProcessPostSign(final byte[] data,
 			                         final String algorithm,
-			                         final X509Certificate cert,
+			                         final X509Certificate[] cert,
 			                         final Properties extraParams,
 			                         final byte[] session) throws NoSuchAlgorithmException,
 			                                                      AOException,
@@ -176,7 +176,7 @@ final class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 		final byte[] signature = CAdESTriPhaseSigner.postSign(
 			AOSignConstants.getDigestAlgorithmName(algorithm),
 			omitContent ? null : data,
-			new X509Certificate[] { cert },
+			cert,
 			Base64.decode(config.getProperty(PROPERTY_NAME_PKCS1_SIGN)),
 			Base64.decode(config.getProperty(PROPERTY_NAME_PRESIGN))
 		);
@@ -189,7 +189,7 @@ final class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 	@Override
 	public byte[] preProcessPreCoSign(final byte[] sign,
 			final String algorithm,
-			final X509Certificate cert,
+			final X509Certificate[] cert,
 			final Properties extraParams) throws IOException, AOException {
 
 		LOGGER.info("Prefirma CAdES - Cofirma - INICIO"); //$NON-NLS-1$
@@ -238,7 +238,7 @@ final class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 			presign = CAdESTriPhaseCoSigner.preCoSign(
 				data,
 				algorithm,
-				new X509Certificate[] { cert },
+				cert,
 				AdESPolicy.buildAdESPolicy(extraParams),
 				signingCertificateV2,
 				messageDigest,
@@ -278,7 +278,7 @@ final class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 	@Override
 	public byte[] preProcessPostCoSign(final byte[] sign,
 			                           final String algorithm,
-			                           final X509Certificate cert,
+			                           final X509Certificate[] cert,
 			                           final Properties extraParams,
 			                           final byte[] session) throws NoSuchAlgorithmException, AOException, IOException {
 
@@ -317,7 +317,7 @@ final class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 					presign,
 					data, // Contenido
 					algorithm,
-					new X509Certificate[] { cert },
+					cert,
 					sign
 			);
 		}
@@ -334,7 +334,7 @@ final class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 	@Override
 	public byte[] preProcessPreCounterSign(final byte[] sign,
 			                               final String algorithm,
-			                               final X509Certificate cert,
+			                               final X509Certificate[] cert,
 			                               final Properties extraParams,
 			                               final CounterSignTarget targetType) throws IOException,
 			                                                                          AOException {
@@ -346,7 +346,7 @@ final class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 				algorithm,
 				targetType,
 				null,
-				new X509Certificate[] { cert },
+				cert,
 				extraParams,
 				new Date()
 			);
@@ -355,7 +355,7 @@ final class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 	@Override
 	public byte[] preProcessPostCounterSign(final byte[] sign,
 			                                final String algorithm,
-			                                final X509Certificate cert,
+			                                final X509Certificate[] cert,
 			                                final Properties extraParams,
 			                                final byte[] session,
 			                                final CounterSignTarget targetType) throws NoSuchAlgorithmException,
@@ -386,7 +386,7 @@ final class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 			targetType,
 			null,
 			null,
-			new X509Certificate[] { cert },
+			cert,
 			extraParams
 		);
 
