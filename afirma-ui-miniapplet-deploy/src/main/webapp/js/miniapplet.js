@@ -323,9 +323,9 @@ var MiniApplet = ( function ( window, undefined ) {
 					'userAgent': window.navigator.userAgent,
 					'archive': codeBase + '/' + JAR_NAME,
 					'code': 'es.gob.afirma.miniapplet.MiniAfirmaApplet',
-					'java-vm-args': JAVA_ARGUMENTS,
-					'java_arguments': JAVA_ARGUMENTS,
-					'system_properties': SYSTEM_PROPERTIES,
+					'java-vm-args': MiniApplet.JAVA_ARGUMENTS,
+					'java_arguments': MiniApplet.JAVA_ARGUMENTS,
+					'system_properties': MiniApplet.SYSTEM_PROPERTIES,
 					'codebase_lookup': false,
 					'separate_jvm': true,
 					'locale': selectedLocale
