@@ -280,6 +280,11 @@ var MiniApplet = ( function ( window, undefined ) {
 				return;
 			}
 			
+			// Sincronizamos las variables que puedan haberse establecido de forma externa
+			// antes de la llamada al metodo de carga
+			JAVA_ARGUMENTS = MiniApplet.JAVA_ARGUMENTS;
+			SYSTEM_PROPERTIES = MiniApplet.SYSTEM_PROPERTIES;
+			
 			// Si estamos claramente en un sistema movil o que no permite la ejecucion de Java,
 			// cargamos directamente el Cliente JavaScript
 			if (isAndroid() || isIOS() || isWindowsRT()) {
@@ -296,17 +301,17 @@ var MiniApplet = ( function ( window, undefined ) {
 
 			// Configuramos los argumentos para la seleccion de almacen
 			configureKeyStore();
-			
+
 			// Incluso si el navegador informa que hay Java, puede no haberlo (Internet Explorer
 			// siempre dice que hay), asi que cargamos el applet, pero tenemos en cuenta que en
 			// caso de error debemos cargar el cliente JavaScript
 			codeBase = (base != undefined && base != null) ? base : './';
-			
+
 			var keystoreConfig = keystore;
 			if (keystoreConfig == undefined) {
 				keystoreConfig = null;
 			}
-			
+
 			var attributes = {
 					'id': 'miniApplet',
 					'name': 'MiniApplet @firma (Gobierno de Espa\u00F1a)',
@@ -314,7 +319,7 @@ var MiniApplet = ( function ( window, undefined ) {
 					'width': 1,
 					'height': 1
 			};
-			
+
 			// Los argumentos de java no llegan al propio applet en las pruebas con Java 6 y 7,
 			// asi que (salvo los argumentos de carga) vamos a pasarlos como un parametro mas al
 			// applet para luego establecerlos internamente.
@@ -323,9 +328,9 @@ var MiniApplet = ( function ( window, undefined ) {
 					'userAgent': window.navigator.userAgent,
 					'archive': codeBase + '/' + JAR_NAME,
 					'code': 'es.gob.afirma.miniapplet.MiniAfirmaApplet',
-					'java-vm-args': MiniApplet.JAVA_ARGUMENTS,
-					'java_arguments': MiniApplet.JAVA_ARGUMENTS,
-					'system_properties': MiniApplet.SYSTEM_PROPERTIES,
+					'java-vm-args': JAVA_ARGUMENTS,
+					'java_arguments': JAVA_ARGUMENTS,
+					'system_properties': SYSTEM_PROPERTIES,
 					'codebase_lookup': false,
 					'separate_jvm': true,
 					'locale': selectedLocale
