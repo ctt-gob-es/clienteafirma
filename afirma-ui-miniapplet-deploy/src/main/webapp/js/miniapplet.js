@@ -96,11 +96,11 @@ var MiniApplet = ( function ( window, undefined ) {
 
 		var KEYSTORE_FIREFOX = "MOZ_UNI";
 		
-		var KEYSTORE_JAVA = "JKS";
+		var KEYSTORE_JAVA = "JAVA";
 		
 		var KEYSTORE_JCEKS = "JCEKS";
 		
-		var KEYSTORE_JAVACE = "CaseExactJKS";
+		var KEYSTORE_JAVACE = "JAVACE";
 
 		/* Valores para la configuracion de la comprobacion de tiempo */
 
