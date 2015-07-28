@@ -102,16 +102,19 @@ public class PinDialog extends DialogFragment {
 
 		final EditText editTextPin = (EditText) view.findViewById(R.id.etPin);
 		alertDialogBuilder.setView(view);
-		alertDialogBuilder.setNegativeButton(getActivity().getString(R.string.cancel), new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(final DialogInterface dialog, final int id) {
-				dialog.dismiss();
-				//Cancelamos el proceso
-				if (PinDialog.this.getKsmListener() != null) {
-					PinDialog.this.getKsmListener().setKeyStoreManager(null);
+		alertDialogBuilder.setNegativeButton(
+			getActivity().getString(R.string.cancel),
+			new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(final DialogInterface dialog, final int id) {
+					dialog.dismiss();
+					//Cancelamos el proceso
+					if (PinDialog.this.getKsmListener() != null) {
+						PinDialog.this.getKsmListener().setKeyStoreManager(null);
+					}
 				}
 			}
-		});
+		);
 		alertDialogBuilder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(final DialogInterface dialog, final int which) {
@@ -176,19 +179,23 @@ public class PinDialog extends DialogFragment {
 
 						// Comprobamos si tiene clave privada o no
 						try {
-							ks.getEntry(alias, null);
+							ks.getEntry(
+								alias,
+								new KeyStore.PasswordProtection(editTextPin.getText().toString().toCharArray())
+							);
 						}
 						catch(final Exception e) {
 							Log.w(ES_GOB_AFIRMA, "Se omite el certificado '" + AOUtil.getCN(cert) + "' por no tener clave privada: " + e); //$NON-NLS-1$ //$NON-NLS-2$
 							continue;
 						}
 						arrayListCertificate.add(
-								new CertificateInfoForAliasSelect(
-										AOUtil.getCN(cert),
-										cert.getNotBefore(), cert.getNotAfter(),
-										alias,
-										AOUtil.getCN(cert.getIssuerX500Principal().toString()))
-								);
+							new CertificateInfoForAliasSelect(
+								AOUtil.getCN(cert),
+								cert.getNotBefore(), cert.getNotAfter(),
+								alias,
+								AOUtil.getCN(cert.getIssuerX500Principal().toString())
+							)
+						);
 
 					}
 
