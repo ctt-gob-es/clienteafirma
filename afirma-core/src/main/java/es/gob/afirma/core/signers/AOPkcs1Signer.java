@@ -42,6 +42,10 @@ public final class AOPkcs1Signer implements AOSimpleSigner {
 				java.util.logging.Logger.getLogger("es.gob.afirma").info("Detectada clave privada DNIe 100% Java"); //$NON-NLS-1$ //$NON-NLS-2$
 				sig = Signature.getInstance(algorithm, "DNIeJCAProvider"); //$NON-NLS-1$
 			}
+			else if ("es.gob.jmulticard.jse.provider.ceres.CeresPrivateKey".equals(key.getClass().getName())) { //$NON-NLS-1$
+				java.util.logging.Logger.getLogger("es.gob.afirma").info("Detectada clave privada CERES 100% Java"); //$NON-NLS-1$ //$NON-NLS-2$
+				sig = Signature.getInstance(algorithm, "CeresJCAProvider"); //$NON-NLS-1$
+			}
 			else {
 				sig = Signature.getInstance(algorithm);
 			}

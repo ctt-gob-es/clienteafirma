@@ -46,7 +46,9 @@ public final class KeyStoreManagerFactory {
 
 				final Class<?> androidCCIDConnectionClass = Class.forName("es.inteco.labs.android.usb.AndroidCCIDConnection"); //$NON-NLS-1$
 				final Object androidCCIDConnectionObject = androidCCIDConnectionClass.getConstructor(
-						UsbManager.class, UsbDevice.class).newInstance(usbManager, usbDevice);
+					UsbManager.class,
+					UsbDevice.class
+				).newInstance(usbManager, usbDevice);
 
 				final Class<?> dnieProviderClass = Class.forName("es.gob.jmulticard.jse.provider.DnieProvider"); //$NON-NLS-1$
 				final Provider p = (Provider) dnieProviderClass.getConstructor(
@@ -77,6 +79,48 @@ public final class KeyStoreManagerFactory {
 			}
 			catch (final Exception e) {
 				Log.w("es.gob.afirma", "No se ha podido instanciar el controlador del DNIe: " + e); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+		}
+
+		// Si no, una tarjeta CERES
+		if (usbDevice != null && usbManager != null) {
+			try {
+
+				final Class<?> androidCCIDConnectionClass = Class.forName("es.inteco.labs.android.usb.AndroidCCIDConnection"); //$NON-NLS-1$
+				final Object androidCCIDConnectionObject = androidCCIDConnectionClass.getConstructor(
+					UsbManager.class,
+					UsbDevice.class
+				).newInstance(usbManager, usbDevice);
+
+				final Class<?> dnieProviderClass = Class.forName("es.gob.jmulticard.jse.provider.ceres.CeresProvider"); //$NON-NLS-1$
+				final Provider p = (Provider) dnieProviderClass.getConstructor(
+						Class.forName("es.gob.jmulticard.apdu.connection.ApduConnection") //$NON-NLS-1$
+				).newInstance(androidCCIDConnectionObject);
+
+				Security.addProvider(p);
+
+				// Obtenemos el almacen unicamente para ver si falla
+				KeyStore.getInstance("CERES", p); //$NON-NLS-1$
+
+				// Si llegamos hasta aqui preguntamos el PIN al usuario
+				// KeyStore: "DNI", Proveedor: "DNIeJCAProvider"
+				final PinDialog pinDialog = PinDialog.newInstance("CeresJCAProvider", "CERES", ksml); //$NON-NLS-1$ //$NON-NLS-2$
+				pinDialog.setLoadKeyStoreManagerTask(ksfl);
+				pinDialog.show(activity.getFragmentManager(), "PinDialog"); //$NON-NLS-1$
+
+				return;
+			}
+			catch (final ClassNotFoundException e) {
+				Log.w("es.gob.afirma", "No se encuentran las bibliotecas de acceso a la tarjeta CERES: " + e.toString()); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+			catch (final NoSuchMethodException e) {
+				Log.w("es.gob.afirma", "No se encuentran las bibliotecas de acceso a la tarjeta CERES: " + e.toString()); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+			catch (final KeyStoreException e) {
+				Log.w("es.gob.afirma", "Se ha encontrado un CCID USB, pero no una tarjeta CERES en el: " + e); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+			catch (final Exception e) {
+				Log.w("es.gob.afirma", "No se ha podido instanciar el controlador de la tarjeta CERES: " + e); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		}
 
