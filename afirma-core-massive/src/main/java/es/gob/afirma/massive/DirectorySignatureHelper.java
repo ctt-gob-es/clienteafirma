@@ -66,7 +66,7 @@ public class DirectorySignatureHelper {
 
     /** Algoritmo de huella digital por defecto que se utilizar&aacute;, por ejemplo, para
      * la generaci&oacute;n de las firmas expl&iacute;citas XAdES. */
-	private static final String DEFAULT_MESSAGE_DIGEST_ALGORITHM = "SHA1"; //$NON-NLS-1$
+	private static final String DEFAULT_MESSAGE_DIGEST_ALGORITHM = "SHA-512"; //$NON-NLS-1$
 
 	/** Generador de huellas digitales utilizado internamente. */
     private static MessageDigest md = null;
