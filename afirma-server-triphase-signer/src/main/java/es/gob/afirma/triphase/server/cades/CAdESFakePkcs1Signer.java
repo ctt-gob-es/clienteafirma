@@ -55,7 +55,7 @@ public final class CAdESFakePkcs1Signer implements AOSimpleSigner {
 	/** Construye el sustituto del firmador PKCS#1 para firmas trif&aacute;sicas.
 	 * @param triphaseData Resultado donde ir almacenando los pares de datos a firmar
 	 *                     y datos aleatorios a sustituir.
-	 * @param signId Identificador de la firma a realizarº
+	 * @param signId Identificador de la firma a realizar
 	 * @param registry Indica si las firmas realizadas deben quedar registrada internamente.
 	 *                 Esto es de utilidad en la prefirma, no en la postfirma.*/
 	public CAdESFakePkcs1Signer(final TriphaseData triphaseData, final String signId, final boolean registry) {
