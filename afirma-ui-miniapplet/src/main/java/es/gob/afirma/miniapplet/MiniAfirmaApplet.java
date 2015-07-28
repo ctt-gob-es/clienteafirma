@@ -737,6 +737,9 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 		}
 	}
 
+	/** Obtiene la URL base del Applet.
+	 * Al contrario que el <a href="http://docs.oracle.com/javase/7/docs/api/java/applet/Applet.html#getCodeBase%28%29">m&eacute;todo original</a>,
+	 * este funciona incluso en despliegues locales (<a href="http://bugs.java.com/bugdatabase/view_bug.do?bug_id=8017250">Bug 8017250 de Java</a>). */
 	@Override
 	public URL getCodeBase() {
 		URL codebase = null;
@@ -1210,6 +1213,8 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 	 * Este metodo sirve para identificar cuando se ha configurado una firma con el formato XAdES
 	 * de tipo enveloped y la propiedad {@code mode} con el valor {@code explicit}. Este tipo de firma
 	 * no existe.
+	 * @param format Formato declarado para la firma.
+	 * @param config Par&aacute;metros adicionales declarados para la firma.
 	 * @return {@code true} si se configura una firma XAdES Enveloped explicit, {@code false} en caso contrario.
 	 * @deprecated Uso temporal hasta que se elimine el soporte de firmas XAdES explicitas.
 	 */
@@ -1224,6 +1229,8 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 	 * Este metodo sirve para identificar cuando se ha configurado una firma con el formato XAdES
 	 * y la propiedad {@code mode} con el valor {@code explicit}. Esta no es una firma correcta,
 	 * pero por compatibilidad con los tipos de firmas del applet pesado se ha incluido aqu&iacute;.
+	 * @param format Formato declarado para la firma.
+	 * @param config Par&aacute;metros adicionales declarados para la firma.
 	 * @return {@code true} si se configura una firma XAdES explicit, {@code false} en caso contrario.
 	 * @deprecated Uso temporal hasta que se elimine el soporte de firmas XAdES explicitas.
 	 */

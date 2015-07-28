@@ -233,8 +233,7 @@ final class ExtraParamsProcessor {
 	 * Las propiedades dependen del signer que se vaya a usar.
 	 * @param signer Firmador usado.
 	 * @param data Datos a firmar.
-	 * @param params Par&aacute;metros adicionales.
-	 * @param signatureFormat Formato de firma a usar. */
+	 * @param params Par&aacute;metros adicionales. */
 	static void configAutoFormat(final AOSigner signer, final byte[] data, final Properties params) {
 
 		final String signerClassname = signer.getClass().getName();
