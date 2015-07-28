@@ -17,6 +17,8 @@ import java.io.InputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.security.AccessController;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.MessageDigest;
@@ -732,6 +734,26 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 		catch (final UnsupportedEncodingException e) {
 			setError(e);
 			throw e;
+		}
+	}
+
+	@Override
+	public URL getCodeBase() {
+		URL codebase = null;
+		try {
+			codebase = super.getCodeBase();
+		}
+		catch (final Exception e) { /* Ignorada */ }
+		if (codebase != null) {
+			return codebase;
+		}
+		try {
+			return new URL(
+				MiniAfirmaApplet.class.getResource("/miniappletmessages.properties").toString().replace("/miniappletmessages.properties", "") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			);
+		}
+		catch (final MalformedURLException e) {
+			throw new IllegalStateException("No se puede determinar el codebase del Aeplet: " + e, e); //$NON-NLS-1$
 		}
 	}
 

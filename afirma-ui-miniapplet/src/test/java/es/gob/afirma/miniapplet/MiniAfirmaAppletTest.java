@@ -26,6 +26,14 @@ import es.gob.afirma.core.misc.Base64;
 /** Pruebas del MiniApplet.  */
 public final class MiniAfirmaAppletTest {
 
+	/** Prueba de obtenci&oacute;n del <code>CodeBase</code> del Applet cuando no est&aacute;
+	 * publicado en una Web. */
+	@SuppressWarnings("static-method")
+	@Test
+	public void testLocalCodebase() {
+		System.out.println(new MiniAfirmaApplet().getCodeBase().toString());
+	}
+
 	/** Prueba de firma simple con DNIe. */
 	@SuppressWarnings("static-method")
 	@Test
