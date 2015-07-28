@@ -43,14 +43,18 @@ public final class KeyStoreManagerFactory {
 		// Primero buscamos un DNIe en el CCID USB
 		if (usbDevice != null && usbManager != null) {
 			try {
+
 				final Class<?> androidCCIDConnectionClass = Class.forName("es.inteco.labs.android.usb.AndroidCCIDConnection"); //$NON-NLS-1$
 				final Object androidCCIDConnectionObject = androidCCIDConnectionClass.getConstructor(
 						UsbManager.class, UsbDevice.class).newInstance(usbManager, usbDevice);
 
 				final Class<?> dnieProviderClass = Class.forName("es.gob.jmulticard.jse.provider.DnieProvider"); //$NON-NLS-1$
-				final Provider p = (Provider) dnieProviderClass.getConstructor(androidCCIDConnectionClass).newInstance(androidCCIDConnectionObject);
+				final Provider p = (Provider) dnieProviderClass.getConstructor(
+						Class.forName("es.gob.jmulticard.apdu.connection.ApduConnection") //$NON-NLS-1$
+				).newInstance(androidCCIDConnectionObject);
 
 				Security.addProvider(p);
+
 				// Obtenemos el almacen unicamente para ver si falla
 				KeyStore.getInstance("DNI", p); //$NON-NLS-1$
 
