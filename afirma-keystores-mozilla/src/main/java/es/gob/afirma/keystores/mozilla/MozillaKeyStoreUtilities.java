@@ -393,7 +393,7 @@ final class MozillaKeyStoreUtilities {
 				final File profilesIniFile = new File(profilesIniPath);
 				if (profilesIniFile.isFile() && profilesIniFile.canRead()) {
 					LOGGER.info(
-						"'profiles.ini' de Firefox determinado a partir de la variable de entorno '" + AFIRMA_PROFILES_INI + "'" //$NON-NLS-1$ //$NON-NLS-2$
+						"Fichero de perfiles de Firefox determinado a partir de la variable de entorno '" + AFIRMA_PROFILES_INI + "'" //$NON-NLS-1$ //$NON-NLS-2$
 					);
 					return profilesIniPath;
 				}
