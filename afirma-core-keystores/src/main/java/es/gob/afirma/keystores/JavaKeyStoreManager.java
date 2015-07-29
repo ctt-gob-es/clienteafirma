@@ -20,6 +20,10 @@ import javax.security.auth.callback.PasswordCallback;
  */
 public final class JavaKeyStoreManager extends FileKeyStoreManager {
 
+	public JavaKeyStoreManager() {
+		setKeyStoreType(AOKeyStore.JAVA);
+	}
+
 	/** {@inheritDoc} */
 	@Override
 	public void init(final AOKeyStore type,
@@ -28,7 +32,6 @@ public final class JavaKeyStoreManager extends FileKeyStoreManager {
                      final Object[] params,
                      final boolean forceReset) throws AOKeyStoreManagerException,
                                                       IOException {
-		setKeyStoreType(AOKeyStore.JAVA);
 		setKeyStore(init(store, pssCallBack));
 	}
 

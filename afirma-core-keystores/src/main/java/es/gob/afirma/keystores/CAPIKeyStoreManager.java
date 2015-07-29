@@ -27,6 +27,10 @@ public final class CAPIKeyStoreManager extends AOKeyStoreManager {
 	// Se persiste de forma estatica
 	private static KeyStore capiKsMy = null;
 
+	public CAPIKeyStoreManager() {
+		setKeyStoreType(AOKeyStore.WINDOWS);
+	}
+
     /** Obtiene la clave privada de un certificado.
      * @param alias Alias del certificado.
      * @param pssCallback <i>CallBback</i> para obtener la contrase&ntilde;a del
@@ -61,7 +65,6 @@ public final class CAPIKeyStoreManager extends AOKeyStoreManager {
 			if (forceReset) {
 				capiKsMy = null;
 			}
-			setKeyStoreType(AOKeyStore.WINDOWS);
 			setKeyStore(initCapi());
         }
 		else {
