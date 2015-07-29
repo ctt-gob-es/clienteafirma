@@ -24,7 +24,7 @@ public class AggregatedKeyStoreManager extends AOKeyStoreManager {
 			throw new IllegalArgumentException("El gestor principal de almacenes no puede ser nulo"); //$NON-NLS-1$
 		}
 		addKeyStoreManager(mainKsm);
-		this.setKeyStoreType(mainKsm.getType());
+		setKeyStoreType(mainKsm.getType());
 	}
 
 	protected AggregatedKeyStoreManager() {
@@ -114,7 +114,7 @@ public class AggregatedKeyStoreManager extends AOKeyStoreManager {
 			"Se ha pedido comprobar la clave privada de un certificado no contenido en este gestor" //$NON-NLS-1$
 		);
 	}
-	
+
 	/**
 	 * Elimina todos los almacenes del de claves del almac&eacute;n agregado.
 	 */
