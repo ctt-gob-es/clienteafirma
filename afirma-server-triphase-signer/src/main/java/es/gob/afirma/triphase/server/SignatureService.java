@@ -225,7 +225,7 @@ public final class SignatureService extends HttpServlet {
 			return;
 		}
 
-		if (sessionData !=null) {
+		if (sessionData != null) {
 			LOGGER.info("Recibidos los siguientes datos de sesion:\n" + new String(sessionData)); //$NON-NLS-1$
 		}
 
