@@ -279,9 +279,9 @@ public final class AOKeyStoreManagerFactory {
                 };
                 desc = KeyStoreMessages.getString("AOKeyStoreManagerFactory.2"); //$NON-NLS-1$
             }
-            else if (store == AOKeyStore.JCEKS) {
+            else if (store == AOKeyStore.JCEKS || store == AOKeyStore.JAVACE) {
                 exts = new String[] {
-                        "jceks", "jks" //$NON-NLS-1$ //$NON-NLS-2$
+                        "jceks", "jks", "jce" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                 };
                 desc = KeyStoreMessages.getString("AOKeyStoreManagerFactory.3"); //$NON-NLS-1$
             }
