@@ -232,7 +232,7 @@ public final class AOKeyStoreManagerFactory {
 		}
 		catch (final AOKeyStoreManagerException e) {
 			throw new AOKeystoreAlternativeException(
-				getAlternateKeyStoreType(AOKeyStore.DNIEJAVA),
+				getAlternateKeyStoreType(AOKeyStore.PKCS12),
 				"Error al inicializar el modulo CERES 100% Java: " + e, //$NON-NLS-1$
 				e
 			);
@@ -251,7 +251,7 @@ public final class AOKeyStoreManagerFactory {
     	}
     	catch (final AOKeyStoreManagerException e) {
     	   throw new AOKeystoreAlternativeException(
-                getAlternateKeyStoreType(AOKeyStore.DNIEJAVA),
+                getAlternateKeyStoreType(AOKeyStore.PKCS12),
                 "Error al inicializar el modulo DNIe 100% Java: " + e, //$NON-NLS-1$
                 e
            );
