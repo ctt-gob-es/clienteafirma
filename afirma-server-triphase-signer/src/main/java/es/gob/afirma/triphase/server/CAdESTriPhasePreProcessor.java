@@ -77,7 +77,7 @@ final class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 			signingCertificateV2 = !"SHA1".equals(AOSignConstants.getDigestAlgorithmName(algorithm));	 //$NON-NLS-1$
 		}
 
-		boolean omitContent = false;
+		boolean omitContent = true;
 		if (extraParams.containsKey("mode")) { //$NON-NLS-1$
 			omitContent = !"implicit".equalsIgnoreCase(extraParams.getProperty("mode")); //$NON-NLS-1$ //$NON-NLS-2$
 		}
@@ -159,7 +159,7 @@ final class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 		// Generamos el mensaje para la configuracion de la operacion
 		final TriphaseData triphaseData = TriphaseData.parser(session);
 
-		boolean omitContent = false;
+		boolean omitContent = true;
 		if (extraParams.containsKey("mode")) { //$NON-NLS-1$
 			omitContent = !"implicit".equalsIgnoreCase(extraParams.getProperty("mode")); //$NON-NLS-1$ //$NON-NLS-2$
 		}
