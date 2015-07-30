@@ -8,7 +8,7 @@
  * You may contact the copyright holder at: soporte.afirma5@mpt.es
  */
 
-package es.gob.afirma.test.keystores;
+package es.gob.afirma.keystores;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;

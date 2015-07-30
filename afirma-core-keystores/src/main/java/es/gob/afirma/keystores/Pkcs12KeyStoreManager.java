@@ -20,7 +20,7 @@ import javax.security.auth.callback.PasswordCallback;
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public final class Pkcs12KeyStoreManager extends FileKeyStoreManager {
 
-	public Pkcs12KeyStoreManager() {
+	Pkcs12KeyStoreManager() {
 		setKeyStoreType(AOKeyStore.PKCS12);
 	}
 

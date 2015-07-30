@@ -27,7 +27,7 @@ public final class CAPIKeyStoreManager extends AOKeyStoreManager {
 	// Se persiste de forma estatica
 	private static KeyStore capiKsMy = null;
 
-	public CAPIKeyStoreManager() {
+	CAPIKeyStoreManager() {
 		setKeyStoreType(AOKeyStore.WINDOWS);
 	}
 

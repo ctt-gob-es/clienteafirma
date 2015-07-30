@@ -20,7 +20,7 @@ import javax.security.auth.callback.PasswordCallback;
  */
 public final class JavaKeyStoreManager extends FileKeyStoreManager {
 
-	public JavaKeyStoreManager() {
+	JavaKeyStoreManager() {
 		setKeyStoreType(AOKeyStore.JAVA);
 	}
 
