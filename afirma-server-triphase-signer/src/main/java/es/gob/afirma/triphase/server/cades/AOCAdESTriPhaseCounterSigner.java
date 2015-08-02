@@ -15,7 +15,6 @@ import java.util.Date;
 import java.util.Properties;
 
 import es.gob.afirma.core.AOException;
-import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.signers.TriphaseData;
 import es.gob.afirma.signers.multi.cades.AOCAdESCounterSigner;
@@ -53,19 +52,8 @@ public final class AOCAdESTriPhaseCounterSigner {
                                                                 IOException {
 		final TriphaseData triphaseData = new TriphaseData();
 
-		final String operation;
-		if (CounterSignTarget.LEAFS.equals(targetType)) {
-			operation = AOSignConstants.MASSIVE_OPERATION_COUNTERSIGN_LEAFS;
-		}
-		else if (CounterSignTarget.TREE.equals(targetType)) {
-			operation = AOSignConstants.MASSIVE_OPERATION_COUNTERSIGN_TREE;
-		}
-		else {
-			operation = "CONTRAFIRMAR"; //$NON-NLS-1$
-		}
-
 		final AOCAdESCounterSigner countersigner = new AOCAdESCounterSigner(
-			new CAdESFakePkcs1Signer(triphaseData, null, operation, true),
+			new CAdESFakePkcs1Signer(triphaseData, null, true),
 			date
 		);
 

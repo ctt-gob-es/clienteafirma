@@ -86,10 +86,7 @@ public final class PAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 		triphaseData.addSignOperation(
 			new TriSign(
 				signConfig,
-				UUID.randomUUID().toString(),
-				algorithm,
-				AOSignConstants.SIGN_FORMAT_PADES,
-				AOSignConstants.MASSIVE_OPERATION_SIGN
+				UUID.randomUUID().toString()
 			)
 		);
 

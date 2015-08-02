@@ -19,7 +19,6 @@ import org.xml.sax.SAXException;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.Base64;
-import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.signers.TriphaseData;
 import es.gob.afirma.core.signers.TriphaseData.TriSign;
@@ -144,21 +143,6 @@ public final class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 		// Ahora pasamos al cliente los datos de la prefirma
 		final TriphaseData triphaseData = new TriphaseData();
 
-		final String operation;
-		switch (op) {
-		case SIGN:
-			operation = AOSignConstants.MASSIVE_OPERATION_SIGN;
-			break;
-		case COSIGN:
-			operation = AOSignConstants.MASSIVE_OPERATION_COSIGN;
-			break;
-		case COUNTERSIGN:
-			operation = "CONTRAFIRMA"; //$NON-NLS-1$
-			break;
-		default:
-			throw new IllegalArgumentException("Tipo de operacion no soportada en modo trifasico: " + op); //$NON-NLS-1$
-		}
-
 		for (int i = 0; i < preSignature.getSignedInfos().size(); i++) {
 			final Map<String, String> signConfig = new HashMap<String, String>();
 			signConfig.put(PROPERTY_NAME_PRESIGN, Base64.encode(preSignature.getSignedInfos().get(i)));
@@ -172,10 +156,7 @@ public final class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 			triphaseData.addSignOperation(
 				new TriSign(
 					signConfig,
-					UUID.randomUUID().toString(),
-					algorithm,
-					AOSignConstants.SIGN_FORMAT_XADES,
-					operation
+					UUID.randomUUID().toString()
 				)
 			);
 		}

@@ -21,7 +21,6 @@ import java.util.Properties;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.Base64;
-import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSimpleSigner;
 import es.gob.afirma.core.signers.TriphaseData;
 import es.gob.afirma.core.signers.TriphaseData.TriSign;
@@ -61,19 +60,16 @@ public final class CAdESFakePkcs1Signer implements AOSimpleSigner {
 
 	private final TriphaseData triphaseData;
 	private final String id;
-	private final String operation;
 	private final boolean registry;
 
 	/** Construye el sustituto del firmador PKCS#1 para firmas trif&aacute;sicas.
 	 * @param triphaseData Resultado donde ir almacenando los pares de datos a firmar
 	 *                     y datos aleatorios a sustituir.
 	 * @param signId Identificador de la firma a realizar
-	 * @param op Operaci&oacute;n concreta de firma ('FIRMAR', 'COFIRMAR', etc.).
 	 * @param registry Indica si las firmas realizadas deben quedar registrada internamente.
 	 *                 Esto es de utilidad en la prefirma, no en la postfirma.*/
 	public CAdESFakePkcs1Signer(final TriphaseData triphaseData,
 			                    final String signId,
-			                    final String op,
 			                    final boolean registry) {
 		if (triphaseData == null) {
 			throw new IllegalArgumentException(
@@ -83,7 +79,6 @@ public final class CAdESFakePkcs1Signer implements AOSimpleSigner {
 		this.triphaseData = triphaseData;
 		this.registry = registry;
 		this.id = signId;
-		this.operation = op;
 	}
 
 	@Override
@@ -129,10 +124,7 @@ public final class CAdESFakePkcs1Signer implements AOSimpleSigner {
 			this.triphaseData.addSignOperation(
 				new TriSign(
 					signConfig,
-					this.id,
-					algorithm,
-					AOSignConstants.SIGN_FORMAT_CADES,
-					this.operation
+					this.id
 				)
 			);
 		}

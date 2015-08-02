@@ -144,10 +144,7 @@ public final class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 		triphaseData.addSignOperation(
 			new TriSign(
 				signConfig,
-				UUID.randomUUID().toString(),
-				algorithm,
-				AOSignConstants.SIGN_FORMAT_CADES,
-				AOSignConstants.MASSIVE_OPERATION_SIGN
+				UUID.randomUUID().toString()
 			)
 		);
 
@@ -281,10 +278,7 @@ public final class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 		triphaseData.addSignOperation(
 			new TriSign(
 				signConfig,
-				UUID.randomUUID().toString(),
-				algorithm,
-				AOSignConstants.SIGN_FORMAT_CADES,
-				AOSignConstants.MASSIVE_OPERATION_COSIGN
+				UUID.randomUUID().toString()
 			)
 		);
 
@@ -391,22 +385,10 @@ public final class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 
 		final Date date = new Date(Long.parseLong(triphaseData.getSign(0).getProperty(PARAM_DATE)));
 
-		final String operation;
-		if (CounterSignTarget.LEAFS.equals(targetType)) {
-			operation = AOSignConstants.MASSIVE_OPERATION_COUNTERSIGN_LEAFS;
-		}
-		else if (CounterSignTarget.TREE.equals(targetType)) {
-			operation = AOSignConstants.MASSIVE_OPERATION_COUNTERSIGN_TREE;
-		}
-		else {
-			operation = "CONTRAFIRMAR"; //$NON-NLS-1$
-		}
-
 		byte[] newSign = new AOCAdESCounterSigner(
 			new CAdESFakePkcs1Signer(
 				triphaseData,
 				null,
-				operation,
 				false
 			),
 			date
