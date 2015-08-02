@@ -117,7 +117,7 @@ public final class TriphaseData {
 	 *    &lt;param n="NEED_PRE"&gt;true&lt;/param&gt;
 	 *    &lt;param n="PRE"&gt;MYICXDAYBgkqhkiG9[...]w0BA=&lt;/param&gt;
 	 *    &lt;param n="NEED_DATA"&gt;true&lt;/param&gt;
-	 *    &lt;param n="PK1"&gt;EMijB9pJ0lj27Xqov[---]RnCM=&lt;/param&gt;
+	 *    &lt;param n="PK1"&gt;EMijB9pJ0lj27Xqov[...]RnCM=&lt;/param&gt;
 	 *   &lt;/firma&gt;
 	 *  &lt;/firmas&gt;
 	 * &lt;/xml&gt;
