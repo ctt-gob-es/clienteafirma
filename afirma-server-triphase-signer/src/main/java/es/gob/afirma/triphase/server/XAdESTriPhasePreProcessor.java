@@ -19,6 +19,7 @@ import org.xml.sax.SAXException;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.Base64;
+import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.signers.TriphaseData;
 import es.gob.afirma.core.signers.TriphaseData.TriSign;
@@ -47,9 +48,9 @@ public final class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 
 	@Override
 	public byte[] preProcessPreSign(final byte[] data,
-			final String algorithm,
-			final X509Certificate[] cert,
-			final Properties extraParams) throws IOException, AOException {
+			                        final String algorithm,
+			                        final X509Certificate[] cert,
+			                        final Properties extraParams) throws IOException, AOException {
 
 		LOGGER.info("Prefirma XAdES - Firma - INICIO"); //$NON-NLS-1$
 
@@ -93,10 +94,10 @@ public final class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 	}
 
 	private static byte[] preProcessPre(final byte[] data,
-			final String algorithm,
-			final X509Certificate[] cert,
-			final Properties extraParams,
-			final Op op) throws IOException, AOException {
+			                            final String algorithm,
+			                            final X509Certificate[] cert,
+			                            final Properties extraParams,
+			                            final Op op) throws IOException, AOException {
 
 		final String algoUri = XMLConstants.SIGN_ALGOS_URI.get(algorithm);
 		if (algoUri == null) {
@@ -108,11 +109,12 @@ public final class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 		final XmlPreSignResult preSignature;
 		try {
 			preSignature = XAdESTriPhaseSignerServerSide.preSign(
-					data,
-					algorithm,
-					cert,
-					extraParams,
-					op);
+				data,
+				algorithm,
+				cert,
+				extraParams,
+				op
+			);
 		}
 		catch (final InvalidKeyException e) {
 			throw new AOException("Error en la prefirma XAdES por problemas con las claves RSA: " + e, e); //$NON-NLS-1$
@@ -142,6 +144,21 @@ public final class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 		// Ahora pasamos al cliente los datos de la prefirma
 		final TriphaseData triphaseData = new TriphaseData();
 
+		final String operation;
+		switch (op) {
+		case SIGN:
+			operation = AOSignConstants.MASSIVE_OPERATION_SIGN;
+			break;
+		case COSIGN:
+			operation = AOSignConstants.MASSIVE_OPERATION_COSIGN;
+			break;
+		case COUNTERSIGN:
+			operation = "CONTRAFIRMA"; //$NON-NLS-1$
+			break;
+		default:
+			throw new IllegalArgumentException("Tipo de operacion no soportada en modo trifasico: " + op); //$NON-NLS-1$
+		}
+
 		for (int i = 0; i < preSignature.getSignedInfos().size(); i++) {
 			final Map<String, String> signConfig = new HashMap<String, String>();
 			signConfig.put(PROPERTY_NAME_PRESIGN, Base64.encode(preSignature.getSignedInfos().get(i)));
@@ -151,7 +168,16 @@ public final class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 			if (i == 0) {
 				signConfig.put(PROPERTY_NAME_SCHEMA_BASE, Base64.encode(preSignature.getXmlSign()));
 			}
-			triphaseData.addSignOperation(new TriSign(signConfig, UUID.randomUUID().toString()));
+
+			triphaseData.addSignOperation(
+				new TriSign(
+					signConfig,
+					UUID.randomUUID().toString(),
+					algorithm,
+					AOSignConstants.SIGN_FORMAT_XADES,
+					operation
+				)
+			);
 		}
 
 		return triphaseData.toString().getBytes();

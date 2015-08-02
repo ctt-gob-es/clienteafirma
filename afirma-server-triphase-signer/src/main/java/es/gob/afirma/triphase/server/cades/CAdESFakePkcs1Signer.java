@@ -1,3 +1,13 @@
+/* Copyright (C) 2011 [Gobierno de Espana]
+ * This file is part of "Cliente @Firma".
+ * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
+ *   - the GNU General Public License as published by the Free Software Foundation;
+ *     either version 2 of the License, or (at your option) any later version.
+ *   - or The European Software License; either version 1.1 or (at your option) any later version.
+ * Date: 11/01/11
+ * You may contact the copyright holder at: soporte.afirma5@mpt.es
+ */
+
 package es.gob.afirma.triphase.server.cades;
 
 import java.security.MessageDigest;
@@ -11,6 +21,7 @@ import java.util.Properties;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.Base64;
+import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSimpleSigner;
 import es.gob.afirma.core.signers.TriphaseData;
 import es.gob.afirma.core.signers.TriphaseData.TriSign;
@@ -50,15 +61,20 @@ public final class CAdESFakePkcs1Signer implements AOSimpleSigner {
 
 	private final TriphaseData triphaseData;
 	private final String id;
+	private final String operation;
 	private final boolean registry;
 
 	/** Construye el sustituto del firmador PKCS#1 para firmas trif&aacute;sicas.
 	 * @param triphaseData Resultado donde ir almacenando los pares de datos a firmar
 	 *                     y datos aleatorios a sustituir.
 	 * @param signId Identificador de la firma a realizar
+	 * @param op Operaci&oacute;n concreta de firma ('FIRMAR', 'COFIRMAR', etc.).
 	 * @param registry Indica si las firmas realizadas deben quedar registrada internamente.
 	 *                 Esto es de utilidad en la prefirma, no en la postfirma.*/
-	public CAdESFakePkcs1Signer(final TriphaseData triphaseData, final String signId, final boolean registry) {
+	public CAdESFakePkcs1Signer(final TriphaseData triphaseData,
+			                    final String signId,
+			                    final String op,
+			                    final boolean registry) {
 		if (triphaseData == null) {
 			throw new IllegalArgumentException(
 				"Es necesario un resultado de PreContrafirma para ir almacenando las firmas" //$NON-NLS-1$
@@ -67,6 +83,7 @@ public final class CAdESFakePkcs1Signer implements AOSimpleSigner {
 		this.triphaseData = triphaseData;
 		this.registry = registry;
 		this.id = signId;
+		this.operation = op;
 	}
 
 	@Override
@@ -109,7 +126,15 @@ public final class CAdESFakePkcs1Signer implements AOSimpleSigner {
 			final Map<String, String> signConfig = new HashMap<String, String>();
 			signConfig.put(PARAM_PRE, Base64.encode(data));
 			signConfig.put(PARAM_DUMMY_PK1, Base64.encode(dummyData));
-			this.triphaseData.addSignOperation(new TriSign(signConfig, this.id));
+			this.triphaseData.addSignOperation(
+				new TriSign(
+					signConfig,
+					this.id,
+					algorithm,
+					AOSignConstants.SIGN_FORMAT_CADES,
+					this.operation
+				)
+			);
 		}
 
 		// Devolvemos el dato unico que luego sera reemplazado por la firma adecuada

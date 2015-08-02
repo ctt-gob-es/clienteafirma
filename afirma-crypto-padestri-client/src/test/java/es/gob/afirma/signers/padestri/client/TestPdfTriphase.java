@@ -35,14 +35,12 @@ public class TestPdfTriphase {
 	private static final String PROPERTY_VALUE_SIGN_SERVER_URL = "http://localhost:8080/afirma-server-triphase-signer/SignatureService"; //$NON-NLS-1$
 
 	private static final String PROPERTY_NAME_DOC_ID = "documentId"; //$NON-NLS-1$
-//	private static final String PROPERTY_VALUE_DOC_ID = "docIdPrueba"; //$NON-NLS-1$
 
 	private static final String PDF_FILENAME = "TEST_PDF.pdf"; //$NON-NLS-1$
 
 	private static final String PROPERTY_NAME_ATTACH = "attach"; //$NON-NLS-1$
 	private static final String PROPERTY_NAME_ATTACH_FILENAME = "attachFileName"; //$NON-NLS-1$
 	private static final String PROPERTY_NAME_ATTACH_DESCRIPTION = "attachDescription"; //$NON-NLS-1$
-
 
 	private static final String CERT_PATH = "ANF PFISICA ACTIVO.pfx"; //$NON-NLS-1$
 	private static final String CERT_PASS = "12341234"; //$NON-NLS-1$
@@ -79,17 +77,8 @@ public class TestPdfTriphase {
 		// Establecemos la configuracion
 		this.serverConfig = new Properties();
 		this.serverConfig.setProperty(PROPERTY_NAME_SIGN_SERVER_URL, PROPERTY_VALUE_SIGN_SERVER_URL);
-//		this.serverConfig.setProperty(PROPERTY_NAME_DOC_ID, PROPERTY_VALUE_DOC_ID);
 
 		this.data = loadFile(PDF_FILENAME);
-		//		final int dataLength = Base64.decode(base64, Base64.URL_SAFE).length;
-
-//		this.serverConfig.setProperty(PROPERTY_NAME_DOC_ID, base64);
-
-		//		System.out.println("Base64 final: " + base64.substring(base64.length() - 100));
-		//
-		//		System.out.println("PDF length: " + dataLength);
-		//		System.out.println(new String(Arrays.copyOfRange(Base64.decode(this.serverConfig.getProperty(PROPERTY_NAME_DOC_ID)), dataLength - 100, dataLength)));
 	}
 
 	/** Prueba de firma trif&aacute;sica normal.

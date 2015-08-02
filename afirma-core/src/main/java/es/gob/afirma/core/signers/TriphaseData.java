@@ -28,11 +28,21 @@ public final class TriphaseData {
 
 		private final Map<String,String> dict;
 		private final String id;
+		private final String algorithm;
+		private final String format;
+		private final String operation;
 
 		/** Crea los datos de una firma trif&aacute;sica individual.
 		 * @param d Propiedades de la firma.
-		 * @param i Identificador de la firma. */
-		public TriSign(final Map<String,String> d, final String i) {
+		 * @param i Identificador de la firma.
+		 * @param algo Algoritmo de la firma (por ejemplo: 'SHA512withRSA').
+		 * @param fmt Formato de la firma ('PAdES', 'CAdES', 'XAdES', etc,).
+		 * @param op Operaci&oacute;n concreta de firma ('FIRMAR', 'COFIRMAR', etc.). */
+		public TriSign(final Map<String,String> d,
+				       final String i,
+				       final String algo,
+				       final String fmt,
+				       final String op) {
 			if (d == null) {
 				throw new IllegalArgumentException(
 					"El diccionario de propiedades de la firma no puede ser nulo" //$NON-NLS-1$
@@ -40,6 +50,27 @@ public final class TriphaseData {
 			}
 			this.dict = d;
 			this.id = i;
+			this.algorithm = algo;
+			this.format = fmt;
+			this.operation = op;
+		}
+
+		/** Obtiene la operaci&oacute;n concreta de firma.
+		 * @return Operaci&oacute;n concreta de firma ('FIRMAR', 'COFIRMAR', etc.). */
+		public String getOperation() {
+			return this.operation;
+		}
+
+		/** Obtiene el formato de la firma ('PAdES', 'CAdES', 'XAdES', etc,).
+		 * @return Formato de la firma ('PAdES', 'CAdES', 'XAdES', etc,). */
+		public String getFormat() {
+			return this.format;
+		}
+
+		/** Obtiene el algoritmo de firma.
+		 * @return Algoritmo de firma (por ejemplo: 'SHA512withRSA'). */
+		public String getAlgorithm() {
+			return this.algorithm;
 		}
 
 		/** Obtiene el identificador de la firma.
@@ -166,18 +197,38 @@ public final class TriphaseData {
 		int idx = nextNodeElementIndex(childNodes, 0);
 		while (idx != -1) {
 			final Node currentNode = childNodes.item(idx);
+
 			String id = null;
+			String format = null;
+			String operation = null;
+			String algorithm = null;
+
 			final NamedNodeMap nnm = currentNode.getAttributes();
 			if (nnm != null) {
-				final Node idNode = nnm.getNamedItem("Id"); //$NON-NLS-1$
-				if (idNode != null) {
-					id = idNode.getNodeValue();
+				Node tmpNode = nnm.getNamedItem("Id"); //$NON-NLS-1$
+				if (tmpNode != null) {
+					id = tmpNode.getNodeValue();
+				}
+				tmpNode = nnm.getNamedItem("format"); //$NON-NLS-1$
+				if (tmpNode != null) {
+					format = tmpNode.getNodeValue();
+				}
+				tmpNode = nnm.getNamedItem("operation"); //$NON-NLS-1$
+				if (tmpNode != null) {
+					operation = tmpNode.getNodeValue();
+				}
+				tmpNode = nnm.getNamedItem("algorithm"); //$NON-NLS-1$
+				if (tmpNode != null) {
+					algorithm = tmpNode.getNodeValue();
 				}
 			}
 			signs.add(
 				new TriSign(
 					parseParamsListNode(currentNode),
-					id
+					id,
+					algorithm,
+					format,
+					operation
 				)
 			);
 			idx = nextNodeElementIndex(childNodes, idx + 1);
@@ -238,11 +289,31 @@ public final class TriphaseData {
 		while (firmasIt.hasNext()) {
 			final TriSign signConfig = firmasIt.next();
 			builder.append("  <firma"); //$NON-NLS-1$
+
 			if (signConfig.getId() != null) {
 				builder.append(" Id=\""); //$NON-NLS-1$
 				builder.append(signConfig.getId());
 				builder.append("\""); //$NON-NLS-1$
 			}
+
+			if (signConfig.getId() != null) {
+				builder.append(" algorithm=\""); //$NON-NLS-1$
+				builder.append(signConfig.getAlgorithm());
+				builder.append("\""); //$NON-NLS-1$
+			}
+
+			if (signConfig.getId() != null) {
+				builder.append(" format=\""); //$NON-NLS-1$
+				builder.append(signConfig.getFormat());
+				builder.append("\""); //$NON-NLS-1$
+			}
+
+			if (signConfig.getId() != null) {
+				builder.append(" operation=\""); //$NON-NLS-1$
+				builder.append(signConfig.getOperation());
+				builder.append("\""); //$NON-NLS-1$
+			}
+
 			builder.append(">\n"); //$NON-NLS-1$
 			final Iterator<String> firmaIt = signConfig.getDict().keySet().iterator();
 			while (firmaIt.hasNext()) {

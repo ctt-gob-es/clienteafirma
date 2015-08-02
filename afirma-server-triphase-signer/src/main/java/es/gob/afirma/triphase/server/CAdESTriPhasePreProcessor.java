@@ -141,7 +141,15 @@ public final class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 			signConfig.put(PROPERTY_NAME_NEED_DATA, Boolean.TRUE.toString());
 		}
 
-		triphaseData.addSignOperation(new TriSign(signConfig, UUID.randomUUID().toString()));
+		triphaseData.addSignOperation(
+			new TriSign(
+				signConfig,
+				UUID.randomUUID().toString(),
+				algorithm,
+				AOSignConstants.SIGN_FORMAT_CADES,
+				AOSignConstants.MASSIVE_OPERATION_SIGN
+			)
+		);
 
 		LOGGER.info("Prefirma CAdES - Firma - FIN"); //$NON-NLS-1$
 
@@ -270,7 +278,15 @@ public final class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 		signConfig.put(PROPERTY_NAME_NEED_DATA, Boolean.toString(true));
 		signConfig.put(PROPERTY_NAME_NEED_PRE, Boolean.toString(true));
 
-		triphaseData.addSignOperation(new TriSign(signConfig, UUID.randomUUID().toString()));
+		triphaseData.addSignOperation(
+			new TriSign(
+				signConfig,
+				UUID.randomUUID().toString(),
+				algorithm,
+				AOSignConstants.SIGN_FORMAT_CADES,
+				AOSignConstants.MASSIVE_OPERATION_COSIGN
+			)
+		);
 
 		LOGGER.info("Prefirma CAdES - Cofirma - FIN"); //$NON-NLS-1$
 
@@ -361,8 +377,8 @@ public final class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 			                                final Properties extraParams,
 			                                final byte[] session,
 			                                final CounterSignTarget targetType) throws NoSuchAlgorithmException,
-			                                                                        AOException,
-			                                                                        IOException {
+			                                                                           AOException,
+			                                                                           IOException {
 
 		LOGGER.info("Postfirma CAdES - Contrafirma - INICIO"); //$NON-NLS-1$
 
@@ -375,10 +391,22 @@ public final class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 
 		final Date date = new Date(Long.parseLong(triphaseData.getSign(0).getProperty(PARAM_DATE)));
 
+		final String operation;
+		if (CounterSignTarget.LEAFS.equals(targetType)) {
+			operation = AOSignConstants.MASSIVE_OPERATION_COUNTERSIGN_LEAFS;
+		}
+		else if (CounterSignTarget.TREE.equals(targetType)) {
+			operation = AOSignConstants.MASSIVE_OPERATION_COUNTERSIGN_TREE;
+		}
+		else {
+			operation = "CONTRAFIRMAR"; //$NON-NLS-1$
+		}
+
 		byte[] newSign = new AOCAdESCounterSigner(
 			new CAdESFakePkcs1Signer(
 				triphaseData,
 				null,
+				operation,
 				false
 			),
 			date

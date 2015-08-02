@@ -83,7 +83,15 @@ public final class PAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 		signConfig.put(PROPERTY_NAME_SIGN_TIME, Long.toString(signTime.getTimeInMillis()));
 		signConfig.put(PROPERTY_NAME_PDF_UNIQUE_ID, Base64.encode(preSignature.getFileID().getBytes()));
 
-		triphaseData.addSignOperation(new TriSign(signConfig, UUID.randomUUID().toString()));
+		triphaseData.addSignOperation(
+			new TriSign(
+				signConfig,
+				UUID.randomUUID().toString(),
+				algorithm,
+				AOSignConstants.SIGN_FORMAT_PADES,
+				AOSignConstants.MASSIVE_OPERATION_SIGN
+			)
+		);
 
 		LOGGER.info("Prefirma PAdES - Firma - FIN"); //$NON-NLS-1$
 
