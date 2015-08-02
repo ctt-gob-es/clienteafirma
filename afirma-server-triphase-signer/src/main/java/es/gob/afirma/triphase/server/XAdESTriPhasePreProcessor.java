@@ -28,7 +28,9 @@ import es.gob.afirma.triphase.server.xades.XAdESTriPhaseSignerServerSide.Op;
 import es.gob.afirma.triphase.server.xades.XmlPreSignException;
 import es.gob.afirma.triphase.server.xades.XmlPreSignResult;
 
-final class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
+/** Procesador de firmas trif&aacute;sicas XAdES.
+ * @author Tom&aacute;s Garc&iacute;a Mer&aacute;s. */
+public final class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 
 	/** Prefijo para cada prefirma. */
 	private static final String PROPERTY_NAME_PRESIGN = "PRE"; //$NON-NLS-1$

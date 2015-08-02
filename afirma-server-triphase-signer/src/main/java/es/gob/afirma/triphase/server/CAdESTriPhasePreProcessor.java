@@ -30,7 +30,9 @@ import es.gob.afirma.signers.pkcs7.ObtainContentSignedData;
 import es.gob.afirma.triphase.server.cades.AOCAdESTriPhaseCounterSigner;
 import es.gob.afirma.triphase.server.cades.CAdESFakePkcs1Signer;
 
-final class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
+/** Procesador de firmas trif&aacute;sicas CAdES.
+ * @author Tom&aacute;s Garc&iacute;a Mer&aacute;s. */
+public final class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 
 	/** Indica si la postfirma requiere la prefirma. */
 	private static final String PROPERTY_NAME_NEED_DATA = "NEED_DATA"; //$NON-NLS-1$

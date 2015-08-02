@@ -144,7 +144,7 @@ public final class ProtocolInvocationLauncher {
 
 			try {
 				UrlParametersToSave params = ProtocolInvocationUriParser.getParametersToSave(urlString);
-
+				LOGGER.info("parametros de la llamada ="+urlString); //$NON-NLS-1$
 				// Si se indica un identificador de fichero, es que la configuracion se tiene que
 				// descargar desde el servidor intermedio
 				if (params.getFileId() != null) {

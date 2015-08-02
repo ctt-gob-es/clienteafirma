@@ -11,10 +11,14 @@ if (document.all && !window.setTimeout.isPolyfill) {
 }
 
 var AutoFirma = ( function ( window, undefined ) {
-
+		// maxima cantidad caracteres para un mensaje al iframe
+		var MESSAGE_MAX_SIZE = 400000;
+		var URL_MAX_SIZE = 1048576;
+		// tiempo de espera para lanzar peticiones
+		var WAITING_TIME = 1000;
 		var VERSION = "1.3";
-
 		var origin = null;
+		var urlToSend="";
 		
 		/* Cadena que determina el fin de una respuesta */
 		var EOF = "%%EOF%%";
@@ -166,7 +170,9 @@ var AutoFirma = ( function ( window, undefined ) {
 
 			
 			// Enviamos la peticion a la app despues de esperar un tiempo prudencia
-			setTimeout(executeOperationByService, getWaitingTime(), ports, url, cipherKey);
+			executeEchoByServiceByPort(ports, url, cipherKey);
+			
+			
 		}
 		
 		/**
@@ -175,7 +181,6 @@ var AutoFirma = ( function ( window, undefined ) {
 		function getRandomPorts () {
 			var MIN_PORT = 49152;
 			var MAX_PORT = 65535;
-			 
 			var ports = new Array();
 			ports[0] = Math.floor((Math.random() * (MAX_PORT - MIN_PORT))) + MIN_PORT;
 			ports[1] = Math.floor((Math.random() * (MAX_PORT - MIN_PORT))) + MIN_PORT;
@@ -244,90 +249,183 @@ var AutoFirma = ( function ( window, undefined ) {
 		}
 
 		/**
-		 * Determina el tiempo de espera prudencial (en milisegundos) que, dependiendo del
-		 * sistema, es necesario esperar desde la llamada a la aplicaci\u00F3n nativa hasta
-		 * que se le pueda solicitar que realice una operaci\u00F3n.
-		 */
-		function getWaitingTime () {
-			//return 20000 en IE no funciona con menos de 30s
-			return 30000;	//TODO: Cambiar a 30000
+		 * Llama a la funcion de mandar peticiones eco para cada puerto a probar.
+		 */		
+		function executeEchoByServiceByPort (ports, url, cipherKey) {
+			executeEchoByService (ports[0], url, cipherKey)
+			executeEchoByService (ports[1], url, cipherKey)
+			executeEchoByService (ports[2], url, cipherKey)
 		}
+		 var connection=false;
 		
-		var httpRequest = getHttpRequest();
-		function executeOperationByService (ports, url, cipherKey) {
-
-			var i = 0;
-			var portError = false;
-			
-			do {
-				httpRequest.open("POST", "http://127.0.0.1:" + ports[i] + "/afirma", true);
-				httpRequest.setRequestHeader("Content-type","application/x-www-form-urlencoded");
-				httpRequest.onreadystatechange = function(cipherKey){
-					console.log(httpRequest.status +"  "+httpRequest.readyState )
-					if(httpRequest.status == 404)
-						errorServiceResponseFunction(null,httpRequest.responseText);
-					else if (httpRequest.readyState == 4 && httpRequest.status == 200) {
-						successServiceResponseFunction(Base64.decode(httpRequest.responseText, true), cipherKey);
-						return;
-					}
-				}
-
-				try {
-					httpRequest.send("cmd=" + Base64.encode(url, true));
-					portError = false;
-				}
-				catch(e) {
-					if (httpRequest.status == 404) {
-						// Interpretamos que este error viene por un problema con el puerto
-						portError = true;
-						i++;
-					} else {
-						// Interpretamos que este error viene de la aplicacion
-						errorServiceResponseFunction("java.lang.IOException", "Ocurrio un error de red en la llamada al servicio de firma");
-						return;
-					}
-				}
-			} while (portError && i < ports.length);
-			// Operamos segun el resultado
-			
-		}
-
-		/*
-		function executeOperationByService (ports, url, cipherKey) {
-
-			var i = 0;
-			var portError = false;
+		/**
+		* Intenta conectar con la aplicación nativa mandando una peticion echo al puerto.
+		* Si la aplicación responde lanzamos la ejecucion del servicio.
+		* Si la aplicación no responde volvemos a lanzar cada 2 segundos otra peticion echo hasta que una
+		* peticion sea aceptada.
+		*/
+		function executeEchoByService (port, url, cipherKey) {
 			var httpRequest = getHttpRequest();
-			do {
-				httpRequest.open("POST", "http://127.0.0.1:" + ports[i] + "/afirma", false);
-				httpRequest.setRequestHeader("Content-type","application/x-www-form-urlencoded");
-
-				try {
-					httpRequest.send("cmd=" + Base64.encode(url, true));
-					portError = false;
+			httpRequest.open("POST", "http://127.0.0.1:" + port + "/afirma", true);
+			httpRequest.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+			httpRequest.onreadystatechange = function() {
+				if (httpRequest.readyState == 4 && httpRequest.status == 200 && Base64.decode(httpRequest.responseText) == "OK" && !connection) {
+					console.log("httpRequest.readyState " + httpRequest.readyState + " httpRequest.status" + httpRequest.status + "respuesta =" + Base64.decode(httpRequest.responseText));
+					connection = true;
+					executeOperationByService(port, url, cipherKey)
 				}
-				catch(e) {
-					if (httpRequest.status == 404) {
-						// Interpretamos que este error viene por un problema con el puerto
-						portError = true;
-						i++;
-					} else {
-						// Interpretamos que este error viene de la aplicacion
-						errorServiceResponseFunction("java.lang.IOException", "Ocurrio un error de red en la llamada al servicio de firma");
-						return;
+				else {
+					if (!connection){
+						setTimeout(executeEchoByService, WAITING_TIME, port, url, cipherKey);
 					}
 				}
-			} while (portError && i < ports.length);
-			// Operamos segun el resultado
-			if (httpRequest.readyState == 4 && httpRequest.status == 200) {
-				successServiceResponseFunction(Base64.decode(httpRequest.responseText, true), cipherKey);
-				return;
+				
 			}
 
-			errorServiceResponseFunction(null, httpRequest.responseText);
+			try {
+				if (!connection){
+					httpRequest.send("cmd=" + Base64.encode("echo", true));
+					console.log("mandando peticion echo al puerto "+port);
+				}
+			}
+			// si hay una excepcion que no explote la aplicacion
+			catch(e) {
+				alert(e);
+			}			
+		}
+		
+		var recibidos=0;
+		/**
+		* Manda los datos a la aplicación nativa en varios fragmentos porque ha habido que dividir los datos.
+		* Se va mandando cada petición cuando se reciba la anterior.
+		*/
+		function executeOperationRecursive (port, url, cipherKey,i,iFinal) {
+			try{
+				var httpRequest = getHttpRequest();
+				httpRequest.open("POST", "http://127.0.0.1:" + port + "/afirma", true);
+				httpRequest.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+				urlToSend = url.substring(( (i-1) * URL_MAX_SIZE), URL_MAX_SIZE * i);
+				httpRequest.onreadystatechange = function(evt,cipherKey){
+					if(httpRequest.status == 404){
+						errorServiceResponseFunction(null, httpRequest.responseText);
+					}
+					// respuesta afirmativa, hay que mandar mas fragmentos
+					if (httpRequest.readyState == 4){
+						console.log(httpRequest);
+						console.log("la aplicación ha recibido el fragmento "+i);
+						recibidos+=1;
+						if(recibidos < iFinal){	
+							setTimeout(executeOperationRecursive, WAITING_TIME, port, url, cipherKey, i+1, iFinal);
+						}
+						else{
+							httpRequest = getHttpRequest();
+							httpRequest.open("POST", "http://127.0.0.1:" + port + "/afirma", true);
+							httpRequest.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+							httpRequest.onreadystatechange = function() {
+								console.log(httpRequest);
+								if (httpRequest.readyState == 4)	{
+									setTimeout(prueba, WAITING_TIME,port,url, cipherKey);
+								}	
+							}
+
+							try {
+									httpRequest.send("cmd=" + Base64.encode("echo", true));
+									console.log("mandando peticion echo al puerto "+port);
+							}
+							// si hay una excepcion que no explote la aplicacion
+							catch(e) {
+							}
+						}
+	
+					}
+					/*
+					else{
+						
+						if(iTotal<i){
+							console.log("se vuelve a lanzar la petición actual");
+							setTimeout(executeOperationRecursive, 4000,port,url, cipherKey,i,iFinal);
+						}
+						
+						
+					} 
+					*/		
+				}
+				httpRequest.send("fragment=" + i + Base64.encode(urlToSend, true));
+				console.log("manda la parte " + i);
+				
+			}		
+			catch(e) {
+				if (httpRequest.status == 404) {
+					alert(e);
+				} else {
+					errorServiceResponseFunction("java.lang.IOException", "Ocurrio un error de red en la llamada al servicio de firma");
+				}
+			}		
 			
 		}
+		
+		var p=false;
+		function prueba (port, url, cipherKey){
+			httpRequest = getHttpRequest();
+			httpRequest.open("POST", "http://127.0.0.1:" + port + "/afirma", true);
+			httpRequest.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+			httpRequest.onreadystatechange = function() {
+				if (httpRequest.readyState == 4 && httpRequest.status == 200) {
+					console.log(httpRequest);
+					successServiceResponseFunction(Base64.decode(httpRequest.responseText, true), cipherKey);
+				}
+			}
+			if(!p){
+					p=true;
+					httpRequest.send("firm");
+				}
+		}
+		
+		/**
+		* Comrpueba si hay que dividir los datos que se se mandan a la aplicacion nativa.
+		* Si hay que dividirlos se llama a la funcion executeOperationRecursive.
+		* Si cabe en un solo envio se manda directamente.
 		*/
+		function executeOperationByService (port, url, cipherKey) {
+			try {
+				var httpRequest = getHttpRequest();
+				httpRequest.open("POST", "http://127.0.0.1:" + port + "/afirma", true);
+				httpRequest.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+				// el envio se debe fragmentar, llamamos a una función que se encarga de mandar la peticion recursivamente
+				if(url.length > URL_MAX_SIZE){
+					console.log("se haran "+Math.ceil(url.length/URL_MAX_SIZE)+" fragmentos");
+					setTimeout(executeOperationRecursive,WAITING_TIME,port, url, cipherKey,1,Math.ceil(url.length/URL_MAX_SIZE));
+				}
+				// el envio no se fragmenta
+				else{
+					httpRequest.onreadystatechange = function(cipherKey){
+						console.log(httpRequest.status +"  "+httpRequest.readyState )
+						if(httpRequest.status == 404)
+
+						{
+							errorServiceResponseFunction(null,httpRequest.responseText);
+						}
+						else if (httpRequest.readyState == 4 && httpRequest.status == 200) {
+							console.log(httpRequest);
+							successServiceResponseFunction(Base64.decode(httpRequest.responseText, true), cipherKey);
+						}
+					}
+					httpRequest.send("cmd=" + Base64.encode(url, true));
+					console.log("se ha mandando cmd para invocar la firma");
+				}
+
+			
+			}
+			catch(e) {
+				if (httpRequest.status == 404) {
+					// Interpretamos que este error viene por un problema con el puerto
+				} else {
+						// Interpretamos que este error viene de la aplicacion
+						errorServiceResponseFunction("java.lang.IOException", "Ocurrio un error de red en la llamada al servicio de firma");
+						return;
+				}
+			}
+		}
 		
 		function getHttpRequest() {
 			var activexmodes=["Msxml2.XMLHTTP", "Microsoft.XMLHTTP"]; //activeX versions to check for in IE
@@ -376,7 +474,7 @@ var AutoFirma = ( function ( window, undefined ) {
 			}
 
 			// Se ha producido un error
-			if (data.lenght > 4 && data.substr(0, 4) == "SAF_") {
+			if (data.length > 4 && data.substr(0, 4) == "SAF_") {
 				errorServiceResponseFunction("java.lang.Exception", data);
 				return;
 			}
@@ -441,9 +539,28 @@ var AutoFirma = ( function ( window, undefined ) {
 		function sendSignatureToIframe (signature, certificate) {
 			var wrapper = new Object();
 			wrapper.result = "signature";
-			wrapper.signature = signature;
 			wrapper.cert = certificate;
-			window.frames[0].postMessage(wrapper, origin);
+			wrapper.numParts=Math.ceil(signature.length/MESSAGE_MAX_SIZE);
+			if(signature.length > MESSAGE_MAX_SIZE){
+				var totalData=signature;
+				var send;
+				i=1;
+				do{
+					send=totalData.substring(0,MESSAGE_MAX_SIZE);
+					totalData = totalData.substring(MESSAGE_MAX_SIZE)
+					wrapper.signature = send;
+					console.log("parte "+i+" tamaño"+send.length);
+					wrapper.order=i;
+					window.frames[0].postMessage(wrapper, origin);
+					i+=1;
+				}
+				while (totalData.length>0);	
+			}
+			else {
+				wrapper.signature = signature;
+				window.frames[0].postMessage(wrapper, origin);
+			}
+			
 		}
 		
 		/**

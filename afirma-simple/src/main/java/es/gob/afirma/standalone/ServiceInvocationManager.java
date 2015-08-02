@@ -27,15 +27,24 @@ final class ServiceInvocationManager {
 	private static int MAX_WAITING_TIME = 60000;
 
 	/** Tiempo de espera de cada socket. */
-	private static int SOCKET_TIMEOUT = 15000;
+	//private static int SOCKET_TIMEOUT = 15000;
+	private static int SOCKET_TIMEOUT = 60000; //FIXME CAMBIAR TIEMPO, ESTA PARA PRUEBAS
 
 	/** Momento en el que se realiz&oacute; la operaci&oacute;n anterior. */
 	private static long lastOperationTime = 0;
+
+	private static final int RESPONSE_MAX_SIZE = 1048576;
+
 
 	static void startService(final String url) {
 
 		LOGGER.info("Iniciando servicio local de firma...: " + url); //$NON-NLS-1$
 
+		final StringBuilder totalhttpRequest= new StringBuilder();
+//		final int partsToSend;
+//		final String responseToSend="";
+		byte[] response = null;
+		int num=1;
 
 		try {
 			try ( final ServerSocketChannel serverSocketChannel = ServerSocketChannel.open(); ) {
@@ -45,10 +54,9 @@ final class ServiceInvocationManager {
 
 				while(!isExpiratedExecution()){
 
-					LOGGER.info("Quedamos a la espera de una llamada por socket"); //$NON-NLS-1$
+					//LOGGER.info("Quedamos a la espera de una llamada por socket"); //$NON-NLS-1$
 
 					try ( final SocketChannel socketChannel = serverSocketChannel.accept(); ) {
-
 						LOGGER.info("Detectada conexion entrante"); //$NON-NLS-1$
 
 						if (!isLocalAddress((InetSocketAddress) socketChannel.getRemoteAddress())) {
@@ -58,20 +66,19 @@ final class ServiceInvocationManager {
 								 ((InetSocketAddress) socketChannel.getRemoteAddress()).getHostString());
 							continue;
 						}
-
 						LOGGER.info("Aceptada conexion desde: " + socketChannel); //$NON-NLS-1$
 						socketChannel.configureBlocking(false);
 
 						final String commandUri;
+
 						try {
 
 							final String httpRequest = read(socketChannel);
 							if (httpRequest.trim().length() == 0) {
-								LOGGER.warning("Se recibe una peticion HTTP vacia"); //$NON-NLS-1$
+								LOGGER.info("Peticion Vacia recidida que se ignora:\n" + httpRequest);
 								continue;
 							}
-							LOGGER.info("Peticion HTTP recibida:\n" + httpRequest); //$NON-NLS-1$
-
+							LOGGER.info("Peticion HTTP recibida:\n" + httpRequest);
 							commandUri = getCommandUri(httpRequest);
 						}
 						catch (final IllegalArgumentException e) {
@@ -84,27 +91,71 @@ final class ServiceInvocationManager {
 							continue;
 						}
 
+						String operationResult="";
 
-						// TODO: Hay que incorporar el soporte de distintos tipos de llamadas.
-						// Primeramente, una llamada de tipo echo
+						// PETICION ECHO
+						if (commandUri.startsWith("echo")) { //$NON-NLS-1$
+							response = createHttpResponse(true,"OK");
+							sendData(response,socketChannel,"echo");
 
-						final String operationResult = ProtocolInvocationLauncher.launch(commandUri);
+						}
 
-						// Gestion de la respuesta
-						final byte[] response = createHttpResponse(
-								operationResult != null && !operationResult.startsWith("SAF_"), //$NON-NLS-1$
-								operationResult != null ? operationResult : "NULL" //$NON-NLS-1$
-								);
+						// PETICION FRAGMENT
+						else if(commandUri.startsWith("fragment=")){
+							final char s=commandUri.charAt("fragment=".length());
+							if(Character.getNumericValue(s)==num){
+								num+=1;
+								totalhttpRequest.append(commandUri.substring("fragment=".length()+1));
+								LOGGER.info("Se han almacenado los datos "+totalhttpRequest.toString());
+								operationResult="MORE_DATA_NEED";
+								response = createHttpResponse(
+										operationResult != null && !operationResult.startsWith("SAF_"), //$NON-NLS-1$
+												operationResult != null ? operationResult : "NULL" //$NON-NLS-1$
+										);
+								sendData(response,socketChannel,"fragment");
+							}
+							else {
+								LOGGER.info("recibida peticion fragment duplicada, la ignoramos");
+								continue;
+							}
+						}
+						else if (commandUri.startsWith("firm")){
+							LOGGER.info("-------------------------Usamos la url que hemos ido almacenando por fragmentos---------------------------");
+							operationResult = ProtocolInvocationLauncher.launch(totalhttpRequest.toString());
+							response = createHttpResponse(
+									operationResult != null && !operationResult.startsWith("SAF_"), //$NON-NLS-1$
+											operationResult != null ? operationResult : "NULL" //$NON-NLS-1$
+									);
+							sendData(response,socketChannel,"firm");
+							/*
+							final ByteBuffer bb = ByteBuffer.allocate(response.length);
+							bb.clear();
+							bb.put(response);
+							bb.flip();
+							socketChannel.write(bb);
+							LOGGER.info("Respuesta mandada");
+							*/
+						}
+						// FIRMA
+						else {
+								LOGGER.info("-------------------------------------Usamos la url que acabamos de recibir-------------------------------------------------");
+								operationResult = ProtocolInvocationLauncher.launch(commandUri);
 
-						LOGGER.info("Resultado: " + operationResult); //$NON-NLS-1$
+							response = createHttpResponse(
+									operationResult != null && !operationResult.startsWith("SAF_"), //$NON-NLS-1$
+											operationResult != null ? operationResult : "NULL" //$NON-NLS-1$
+									);
+							//partsToSend=(int) Math.ceil(operationResult.length()/RESPONSE_MAX_SIZE);
+							//if(partsToSend==1){
+								final ByteBuffer bb = ByteBuffer.allocate(response.length);
+								bb.clear();
+								bb.put(response);
+								bb.flip();
+								socketChannel.write(bb);
+								LOGGER.info("Respuesta mandada");
+						//	}
+						}
 
-						updateLastAccess();
-
-						final ByteBuffer bb = ByteBuffer.allocate(response.length);
-						bb.clear();
-						bb.put(response);
-						bb.flip();
-						socketChannel.write(bb);
 
 					}
 					catch (final SocketTimeoutException e) {
@@ -122,6 +173,23 @@ final class ServiceInvocationManager {
 			LOGGER.severe("Ocurrio un error en la comunicacion a traves del socket: " + e); //$NON-NLS-1$
 			e.printStackTrace();
 		}
+
+	}
+
+	private static int sendData(byte[] response, SocketChannel socketChannel, String peti){
+		final ByteBuffer bb = ByteBuffer.allocate(response.length);
+		bb.clear();
+		bb.put(response);
+		bb.flip();
+		try {
+			final int tamResponse=socketChannel.write(bb);
+			LOGGER.info("recibida peticion " + peti +". Tamano respuesta="+ tamResponse);
+			return tamResponse;
+		} catch (final IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return -1;
 
 	}
 
@@ -158,8 +226,9 @@ final class ServiceInvocationManager {
 		else  {
 			sb.append("HTTP/1.1 500 Internal Server Error"); //$NON-NLS-1$
 		}
-		sb.append("Connection: close\n"); //$NON-NLS-1$
+		sb.append("Connection: keep-alive\n"); //$NON-NLS-1$
 		sb.append("Server: Cliente @firma\n"); //$NON-NLS-1$
+		sb.append("Content-Type: text/html; charset=utf-8\n");
 		sb.append("Access-Control-Allow-Origin: *\n"); //$NON-NLS-1$
 		sb.append('\n');
 		if (response != null) {
@@ -244,7 +313,7 @@ final class ServiceInvocationManager {
 
 	private static String read(final SocketChannel channel) throws IOException {
 
-		final StringBuilder response = new StringBuilder();
+		final StringBuilder data = new StringBuilder();
 
 		final ByteBuffer buffer = ByteBuffer.allocate(READ_BUFFER_SIZE);
 		buffer.clear();
@@ -254,13 +323,10 @@ final class ServiceInvocationManager {
 		while (readed > 0) {
 		 readed = channel.read(buffer);
 		 buffer.flip();
-		 response.append(charset.decode(buffer));
+		 data.append(charset.decode(buffer));
 		 buffer.clear();
 		}
-
-		LOGGER.info("Datos recibidos en el socket servidor:\n" + response ); //$NON-NLS-1$
-
-		return response.toString();
+		return data.toString();
 	}
 
 	private static boolean isLocalAddress(final InetSocketAddress a) {
@@ -279,27 +345,64 @@ final class ServiceInvocationManager {
 				"Los datos recibidos por HTTP son nulos" //$NON-NLS-1$
 			);
 		}
-		final int pos = httpRequest.indexOf("cmd="); //$NON-NLS-1$
+		String uriType="cmd=";
+		int pos = httpRequest.indexOf("cmd="); //$NON-NLS-1$
 		if (pos == -1) {
-			throw new IllegalArgumentException(
-				"Los datos recibidos por HTTP no contienen un parametro 'cmd': " + httpRequest //$NON-NLS-1$
-			);
+			// viene sin cmd porque es una peticion de datos fragmentada
+			pos = httpRequest.indexOf("fragment=");
+			if(pos!=-1){
+				uriType="fragment=";
+				final char s=httpRequest.charAt(pos + uriType.length());
+				uriType=uriType.concat(String.valueOf(s));
+			}
+			else {
+				pos=httpRequest.indexOf("firm");
+				uriType="firm";
+				if (pos == -1) {
+					throw new IllegalArgumentException(
+						"Los datos recibidos por HTTP no contienen un parametro 'cmd': " + httpRequest //$NON-NLS-1$
+					);
+				}
+
+			}
+
+
 		}
 
-		final String cmdUri;
+		String cmdUri;
 		try {
-			cmdUri = new String(Base64.decode(httpRequest.substring(pos + "cmd=".length()).trim(), true)); //$NON-NLS-1$
+
+			if(uriType=="firm"){
+				cmdUri=uriType;
+			}
+			else {
+				cmdUri = new String(Base64.decode(httpRequest.substring(pos + uriType.length()).trim(), true));
+				if(uriType.startsWith("fragment=")){
+					cmdUri=uriType.concat(cmdUri);
+				}
+			}
+
 		}
+
 		catch(final Exception e) {
 			throw new IllegalArgumentException(
 				"Los datos recibidos en el parametro 'cmd' por HTTP no estan en Base64: " + e //$NON-NLS-1$
 			);
 		}
-		if (!cmdUri.startsWith("afirma://")) { //$NON-NLS-1$
-			throw new IllegalArgumentException(
-				"Los datos recibidos en el parametro 'cmd' por HTTP no son una URI del tipo 'afirma://': " + cmdUri //$NON-NLS-1$
-			);
+		if (!cmdUri.startsWith("afirma://") && !cmdUri.startsWith("echo") && !cmdUri.startsWith("fragment=")  && !cmdUri.startsWith("firm")) { //$NON-NLS-1$
+
+				throw new IllegalArgumentException(
+							"Los datos recibidos en el parametro 'cmd' por HTTP no son una URI del tipo 'afirma://': " + cmdUri //$NON-NLS-1$
+						);
+
 		}
+
+
 		return cmdUri;
+	}
+
+
+	public static void main(String[] args) {
+		startService("afirma://service/?ports=55752,53018,54550&amp;idsession=qkAFg5ouimR0XY3Urmmz"); //$NON-NLS-1$
 	}
 }

@@ -713,6 +713,8 @@ var MiniApplet = ( function ( window, undefined ) {
 			var UnsupportedOperationException = "java.lang.UnsupportedOperationException";
 
 			var DEFAULT_SIGNATURE_PAGE = "http://demo.com/popup2.html";
+			// tamaño maximo en caracteres para un mensaje al popup2
+			var MESSAGE_MAX_SIZE = 400000;
 
 			/**
 			 *  Atributos para la configuracion del objeto sustituto del applet Java de firma
@@ -759,7 +761,8 @@ var MiniApplet = ( function ( window, undefined ) {
 							try {
 								var signEstado = localStorage.getItem("signEstado");
 								if (signEstado == "KO") {
-									errorCallback("java.lang.Exception", localStorage.getItem(event.key));
+									errorCallback("java.lang.Exception", localStorage.getItem("signDatos"));
+									localWindow.close();
 								}
 								else if (signEstado == "OK") {
 									//lo han mandado en una envio
@@ -805,53 +808,31 @@ var MiniApplet = ( function ( window, undefined ) {
 			/**
             * Envia datos a la ventana de firma.
 			*/
-			/**
-			function sendData(window, key, data) {
-				var wrapper = new Object();
-				wrapper.key = key;
-				wrapper.value = data;
-				window.postMessage(wrapper, SIGNATURE_PAGE);
-			}*/
 			function sendData(window,data) {
-				window.postMessage(data, DEFAULT_SIGNATURE_PAGE);
-			}
-			
-/** TODO: Esto no lo podemos usar por problemas con Internet Explorer
-
-			// Creamos al vuelo una funcion callback que incorpore los metodos para los casos de exito y
-			// error ya que al ser ejecutada como parte de un evento de una ventana, no conservaremos la
-			// referencia a estas funciones
-			this.generateResultCallback = function(signWindow, successCallback, errorCallback) {
-				
-				return function(event) {
-					// Se llamara a este evento ante 2 entradas "signDatos" que almacenara el resultado de
-					// la operacion y "signEstado" que se recibira antes y almacenara un "OK" o un "KO" segun
-					// haya terminado bien o mal la operacion
-					if (event.key == "signDatos" && event.newValue) {
-			
-						try {
-							var signEstado = localStorage.getItem("signEstado");
-							if (signEstado == "KO") {
-								errorCallback("java.lang.Exception", localStorage.getItem(event.key));
-							}
-							else if (signEstado == "OK") {
-								successCallback(localStorage.getItem(event.key));
-							}
-							else {
-								errorCallback("java.lang.Exception", "No se conoce si el resultado obtenido es correcto");
-							}
-						} catch(e) {
-							// Ocurrio un error al invocar a la funcion resultado
-						}
-						localStorage.removeItem("signEstado");
-						localStorage.removeItem("signDatos");
-						try {
-							signWindow.close();
-						} catch(e) {}
+				// mandamos varias peticiones si el tamaño del documento excede del maximo
+				if(data.dat.value.length > MESSAGE_MAX_SIZE){
+					var totalData=data.dat.value;
+					// calculamos el numero de elementos que le vamos a pasar 
+					data.numParts=Math.ceil(data.dat.value.length/MESSAGE_MAX_SIZE);
+					var send;
+					var i=1;
+					do{
+						send=totalData.substring(0,MESSAGE_MAX_SIZE);
+						totalData=totalData.substring(MESSAGE_MAX_SIZE)
+						data.dat.value=send;
+						console.log("parte "+i+" tamaño"+send.length);
+						data.order=i;
+						window.postMessage(data, DEFAULT_SIGNATURE_PAGE);
+						i+=1;
 					}
+					while (totalData.length>0);	
 				}
-			};
-*/
+				// cabe en un envio, seguimos como siempre
+				else{
+					window.postMessage(data, DEFAULT_SIGNATURE_PAGE);
+				}
+
+			}
 
 			/**
 			 * Inicia el proceso de firma electronica.
@@ -944,6 +925,8 @@ var MiniApplet = ( function ( window, undefined ) {
 				data.algorithm = generateDataKeyValue ("algorithm", algorithm)
 				data.properties = generateDataKeyValue ("properties", Base64.encode(extraParams));
 				data.dat = generateDataKeyValue ("dat", dataB64);
+				data.order = 1;
+				data.numParts =1;
 				return data;
 			}
 			function generateDataKeyValue(key, value) {
@@ -1463,7 +1446,7 @@ var MiniApplet = ( function ( window, undefined ) {
 				}
 
 				// Se ha producido un error
-				if (html.lenght > 4 && html.substr(0, 4) == "SAF_") {
+				if (html.length > 4 && html.substr(0, 4) == "SAF_") {
 					if (errorCallback != undefined && errorCallback != null) {
 						errorCallback("java.lang.Exception", html);
 					}
@@ -1521,6 +1504,7 @@ var MiniApplet = ( function ( window, undefined ) {
 
 					try {
 						httpRequest.send("cmd=" + Base64.encode(url, true));
+						console.log("se ha mandado cmd");
 						portError = false;
 					}
 					catch(e) {

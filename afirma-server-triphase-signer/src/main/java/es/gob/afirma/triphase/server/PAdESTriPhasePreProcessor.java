@@ -23,7 +23,9 @@ import es.gob.afirma.signers.pades.InvalidPdfException;
 import es.gob.afirma.signers.pades.PAdESTriPhaseSigner;
 import es.gob.afirma.signers.pades.PdfSignResult;
 
-final class PAdESTriPhasePreProcessor implements TriPhasePreProcessor {
+/** Procesador de firmas trif&aacute;sicas PAdES.
+ * @author Tom&aacute;s Garc&iacute;a Mer&aacute;s. */
+public final class PAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 
 	/** Momento de la firma, establecido en el servidor. */
 	private static final String PROPERTY_NAME_SIGN_TIME = "TIME"; //$NON-NLS-1$

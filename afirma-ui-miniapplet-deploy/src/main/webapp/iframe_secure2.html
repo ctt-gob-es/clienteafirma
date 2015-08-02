@@ -6,36 +6,54 @@
 	// Anadimos un listener para capturar los mensajes enviados a la pagina
 	// para las versiones viejas de IE no funciona el evento addEventListener y tenemos que usar attachEvent
 		var enviar;
-		//var MAX_STORAGE_LENGHT = 4764000;
-		var MAX_STORAGE_LENGHT = 5000;
+		var MAX_STORAGE_LENGTH = 4664000;
+		var totalData = [];
 		window.addEventListener('storage', sendStorage, false);
 		window.addEventListener("message", receiveMessage, false);
 
 	function receiveMessage(event) {
 		
-
 		
 		var baseUri = localStorage.getItem("signPageBaseUri");
 		if (baseUri && baseUri.indexOf(event.origin) == 0) {
-		
+			
 			localStorage.removeItem("signEstado");
 			localStorage.removeItem("signDatos");
-		
+			
 			// Se ha obtenido un resultado
 			if (event.data.result == "signature") {
-				// cabe en un envio
-				if (event.data.signature.length < MAX_STORAGE_LENGHT){
-					localStorage.setItem("signEstado", "OK");
-					localStorage.setItem("signDatos", event.data.signature);
-					localStorage.setItem("EOF","EOF");
+				var storage=false;
+				// si solo viene una parte no tenemos que guardar en array
+				if(event.data.numParts==1){
+					totalData=event.data.signature;
+					storage=true;
 				}
-				// hay que hacer multiples envios,
 				else{
-						send=event.data.signature.substring(0,MAX_STORAGE_LENGHT);
-						enviar=event.data.signature.split(send)[1];
+					totalData.push([event.data.order,event.data.signature]);
+					// comprobamos si era la ultima parte
+					if(event.data.numParts==totalData.length){
+						totalData=reorderDataFromArray();
+						storage=true;
+					}
+				}
+
+				if(storage){
+
+					// cabe en un envio
+					if (totalData.length < MAX_STORAGE_LENGTH){
+						localStorage.setItem("signEstado", "OK");
+						localStorage.setItem("signDatos", totalData);
+						localStorage.setItem("EOF","EOF");
+						totalData="";
+					}
+					// hay que hacer multiples envios,
+					else{
+						send=totalData.substring(0,MAX_STORAGE_LENGTH);
+						enviar=totalData.split(send)[1];
 						localStorage.setItem("signEstado", "OK");
 						localStorage.setItem("signDatos", send);
 						localStorage.setItem("EOF","-");
+					}
 				}
 			}
 			// Se ha producido un error
@@ -44,23 +62,41 @@
 				localStorage.setItem("signDatos", event.data.type + ": " + event.data.message);
 			}
 		}
+		
 	}
 	function sendStorage(event){
 		//tengo que mandar datos si esta en nulo
-		if(localStorage.getItem("signDatos")==null && enviar.length>0){
-			var send=enviar.substring(0,MAX_STORAGE_LENGHT);
-			enviar=enviar.split(send)[1];
-			localStorage.setItem("signEstado", "OK");
-			localStorage.setItem("signDatos", send);
-			if(enviar==""){
-				localStorage.setItem("EOF","EOF");
+		try{
+			if(localStorage.getItem("signDatos")==null && enviar.length>0){
+				var send=enviar.substring(0,MAX_STORAGE_LENGTH);
+				enviar=enviar.split(send)[1];
+				localStorage.setItem("signEstado", "OK");
+				localStorage.setItem("signDatos", send);
+				if(enviar==""){
+					localStorage.setItem("EOF","EOF");
+				}
+				else{
+					localStorage.setItem("EOF","-");
+				}
 			}
-			else{
-				localStorage.setItem("EOF","-");
-			}
+		}
+		catch(e){
+			console.log("error");
 		}
 		
 	
+	}
+	function reorderDataFromArray(){
+		var data="";
+		for(i=0;i<totalData.length;i++){
+			for(j=0;j<totalData.length;j++){
+				if(totalData[j][0] == i+1){
+					data+=totalData[j][1];
+					break;
+				}
+			}
+		}
+		return data;
 	}
 	</script>
   </head>

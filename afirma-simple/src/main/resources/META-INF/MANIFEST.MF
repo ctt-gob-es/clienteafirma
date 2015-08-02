@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Main-Class: es.gob.afirma.standalone.SimpleAfirma
 SplashScreen-Image: splash.gif
 Specification-Title: AutoFirma
-Specification-Version: v1.4 (Beta 5)
+Specification-Version: v1.4
 Specification-Vendor: Gobierno de España
 Implementation-Title: es.gob.afirma
 Implementation-Version: build01
