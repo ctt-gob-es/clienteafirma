@@ -11,15 +11,27 @@ if (document.all && !window.setTimeout.isPolyfill) {
 }
 
 var AutoFirma = ( function ( window, undefined ) {
-		// maxima cantidad caracteres para un mensaje al iframe
-		var MESSAGE_MAX_SIZE = 400000;
+		// Maxima cantidad caracteres para un mensaje al iframe
+		var MESSAGE_MAX_SIZE = 400000;		// Maximo tam de la url, por si hay que fragmentar
 		var URL_MAX_SIZE = 1048576;
-		// tiempo de espera para lanzar peticiones
-		var WAITING_TIME = 1000;
-		var VERSION = "1.3";
-		var origin = null;
-		var urlToSend="";
+		// Numero maximo de reintentos antes de resetear la conexion
+		var NUMBER_RESET_COUNTER = 3;
+		// Reintentos de comunicacion para una conexion nueva
+		var NEW_CONNECTION_RETRIES = 20;
+		// Tiempo de espera para lanzar peticiones
+		var WAITING_TIME = 500;
 		
+		var LAUNCHING_TIME = 2000;
+
+		var origin = null;
+		var urlToSend = "";
+		var cipherKey = "";
+		var currentPort = "";
+		var connection = false;
+		var totalResponseRequest = "";
+		var recibidos = 0;
+		var reintentSave = false;
+		var urlHttpRequest = "";
 		/* Cadena que determina el fin de una respuesta */
 		var EOF = "%%EOF%%";
 
@@ -49,13 +61,9 @@ var AutoFirma = ( function ( window, undefined ) {
 		 * @param params Array con todos los parametros para la ejecucion de la operacion de firma.
 		 */
 		function signOperation (params) {
-
 			var idSession = generateNewIdSession();
-			var cipherKey = ""; //generateCipherKey();
-		
 			var url = buildUrl(params);
-			
-			execAppIntent(url, idSession, cipherKey);
+			execAppIntent(url, idSession);
 		}
 
 		/**
@@ -135,14 +143,22 @@ var AutoFirma = ( function ( window, undefined ) {
 			// Operacion seleccionada
 			var intentURL;
 			var params = [];
-			// convertimos el objeto con los datos en un array del tipo key value
+			// Convertimos el objeto con los datos en un array del tipo key value
 			for(var x in arr){
 			  params.push(arr[x]);
 			}
+			// Sacamos el puerto y la clave de cifrado.
+			currentPort = params[params.length -2].value;
+			cipherKey = params[params.length -1].value;
+			// no los vamos a generar en la url
+			params.pop(params.length - 1);
+			params.pop(params.length - 1);
 			if (params != null && params != undefined && params.length > 0) {
 				intentURL = 'afirma://' + encodeURIComponent(arr.op.value) + '?';	// Agregamos como dominio el identificador del tipo de operacion
 				for (var i = 0; i < params.length; i++) {
-					intentURL += (i != 0 ? '&' : '') + params[i].key + '=' + encodeURIComponent(params[i].value); 
+					if (params[i].value != null && params[i].value != "null") {
+						intentURL += (i != 0 ? '&' : '') + params[i].key + '=' + encodeURIComponent(params[i].value); 
+					}
 				}
 			}
 			return intentURL;
@@ -156,23 +172,26 @@ var AutoFirma = ( function ( window, undefined ) {
 		 *
 		 * url: URL tradicional de llamada a la aplicaci\u00F3n nativa.
 		 * idSession: Identificador de la sesi\u00F3n para la recuperaci\u00F3n del resultado.
-		 * cipherKey: Clave de cifrado para la respuesta del servidor.
 		 * successCallback: Actuaci\u00F3n a realizar cuando se recupera el resultado de la operaci&oacute;n.
 		 * errorCallback: Actuaci\u00F3n a realizar cuando ocurre un error al recuperar el resultado.
 		 */
-		function execAppIntent (url, idSession, cipherKey) {
-
-			// Calculamos los puertos
-			var ports = getRandomPorts();
-			
-			// Invocamos a la aplicacion nativa
-			openNativeApp(ports, idSession);
-
-			
-			// Enviamos la peticion a la app despues de esperar un tiempo prudencia
-			executeEchoByServiceByPort(ports, url, cipherKey);
-			
-			
+		function execAppIntent (url, idSession) {
+			// Primera ejecucion, no hay puerto definido
+			if(currentPort == ""){
+				// Calculamos los puertos
+				var ports = getRandomPorts();
+				cipherKey = generateCipherKey();
+				// Invocamos a la aplicacion nativa
+				openNativeApp(ports, idSession, cipherKey);
+				// Enviamos la peticion a la app despues de esperar un tiempo prudencial
+				setTimeout(executeEchoByServiceByPort, LAUNCHING_TIME, ports, url);
+				//executeEchoByServiceByPort(ports, url);
+			}
+			// Se ha ejecutado anteriormente y tenemos un puerto calculado.
+			else {
+				connection = false;
+				executeEchoByService (currentPort, url, NUMBER_RESET_COUNTER)
+			}
 		}
 		
 		/**
@@ -185,14 +204,13 @@ var AutoFirma = ( function ( window, undefined ) {
 			ports[0] = Math.floor((Math.random() * (MAX_PORT - MIN_PORT))) + MIN_PORT;
 			ports[1] = Math.floor((Math.random() * (MAX_PORT - MIN_PORT))) + MIN_PORT;
 			ports[2] = Math.floor((Math.random() * (MAX_PORT - MIN_PORT))) + MIN_PORT;
-			
 			return ports;
 		}
 		
 		/**
 		 * Obtiene un puerto aleatorio para la comunicaci\u00F3n con la aplicaci\u00F3n nativa.
 		 */
-		function openNativeApp (ports, idSession) {
+		function openNativeApp (ports, idSession, cipherKey) {
 			
 			var portsLine = "";
 			for (var i = 0; i < ports.length; i++) {
@@ -201,9 +219,10 @@ var AutoFirma = ( function ( window, undefined ) {
 					portsLine += ",";
 				}
 			}
-			openUrl("afirma://service?ports=" + portsLine + "&idsession=" + idSession)
-		}
 		
+			openUrl("afirma://service?ports=" + portsLine + "&idsession=" + idSession + "&cipherKey=" + cipherKey)
+		}
+
 		/**
 		 * Llama a la aplicacion de firma a traves de la URL de invocacion sin que afecte
 		 * a la pagina que se esta mostrando.
@@ -251,12 +270,13 @@ var AutoFirma = ( function ( window, undefined ) {
 		/**
 		 * Llama a la funcion de mandar peticiones eco para cada puerto a probar.
 		 */		
-		function executeEchoByServiceByPort (ports, url, cipherKey) {
-			executeEchoByService (ports[0], url, cipherKey)
-			executeEchoByService (ports[1], url, cipherKey)
-			executeEchoByService (ports[2], url, cipherKey)
+		function executeEchoByServiceByPort (ports, url) {
+			connection = false;
+			executeEchoByService (ports[0], url, NEW_CONNECTION_RETRIES);
+			executeEchoByService (ports[1], url, NEW_CONNECTION_RETRIES);
+			executeEchoByService (ports[2], url, NEW_CONNECTION_RETRIES);
 		}
-		 var connection=false;
+		
 		
 		/**
 		* Intenta conectar con la aplicación nativa mandando una peticion echo al puerto.
@@ -264,165 +284,209 @@ var AutoFirma = ( function ( window, undefined ) {
 		* Si la aplicación no responde volvemos a lanzar cada 2 segundos otra peticion echo hasta que una
 		* peticion sea aceptada.
 		*/
-		function executeEchoByService (port, url, cipherKey) {
+		function executeEchoByService (port, url, timeoutResetCounter ) {
 			var httpRequest = getHttpRequest();
 			httpRequest.open("POST", "http://127.0.0.1:" + port + "/afirma", true);
-			httpRequest.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+			httpRequest.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 			httpRequest.onreadystatechange = function() {
-				if (httpRequest.readyState == 4 && httpRequest.status == 200 && Base64.decode(httpRequest.responseText) == "OK" && !connection) {
-					console.log("httpRequest.readyState " + httpRequest.readyState + " httpRequest.status" + httpRequest.status + "respuesta =" + Base64.decode(httpRequest.responseText));
+				
+				if (httpRequest.readyState == 4 && httpRequest.status == 200 && Base64.decode(httpRequest.responseText, true) == "OK" && !connection) {
+					currentPort = port;
+					urlHttpRequest = "http://127.0.0.1:" + port + "/afirma";
+					console.log( "PUERTO DEFINIDO " + port);
 					connection = true;
-					executeOperationByService(port, url, cipherKey)
+					// Comprobamos el tipo de operacion, firma o guardado.
+					document.getElementById("operation").innerHTML = AfirmaSocket.FIRMANDO;
+					if (url.indexOf("afirma://save") > -1) {
+						reintentSave = true;
+						console.log ("es save");
+						document.getElementById("operation").innerHTML = AfirmaSocket.GUARDANDO;
+					}
+					executeOperationByService(url);
 				}
-				else {
-					if (!connection){
-						setTimeout(executeEchoByService, WAITING_TIME, port, url, cipherKey);
+				else if (!connection && httpRequest.readyState != 2 && httpRequest.readyState != 3) {
+					timeoutResetCounter--;
+					console.log("Quedan " + timeoutResetCounter + " reintentos para el puerto " + port);
+					if (timeoutResetCounter == 0) {
+						currentPort = "";
+						timeoutResetCounter = NUMBER_RESET_COUNTER;		
+						execAppIntent(url, generateNewIdSession());
+					}
+					else {
+						// Intentamos reconectar dentro del tiempo de reintento
+						setTimeout(executeEchoByService, WAITING_TIME, port, url, timeoutResetCounter);
 					}
 				}
-				
 			}
 
-			try {
-				if (!connection){
-					httpRequest.send("cmd=" + Base64.encode("echo", true));
-					console.log("mandando peticion echo al puerto "+port);
-				}
+			if (!connection) {
+				httpRequest.send("echo=echo");
+				console.log("mandando peticion echo al puerto " + port);
 			}
-			// si hay una excepcion que no explote la aplicacion
-			catch(e) {
-				alert(e);
-			}			
 		}
-		
-		var recibidos=0;
+
 		/**
 		* Manda los datos a la aplicación nativa en varios fragmentos porque ha habido que dividir los datos.
 		* Se va mandando cada petición cuando se reciba la anterior.
 		*/
-		function executeOperationRecursive (port, url, cipherKey,i,iFinal) {
+		function executeOperationRecursive (url, i, iFinal) {
 			try{
 				var httpRequest = getHttpRequest();
-				httpRequest.open("POST", "http://127.0.0.1:" + port + "/afirma", true);
+				httpRequest.open("POST", urlHttpRequest, true);
 				httpRequest.setRequestHeader("Content-type","application/x-www-form-urlencoded");
-				urlToSend = url.substring(( (i-1) * URL_MAX_SIZE), URL_MAX_SIZE * i);
-				httpRequest.onreadystatechange = function(evt,cipherKey){
-					if(httpRequest.status == 404){
-						errorServiceResponseFunction(null, httpRequest.responseText);
+				urlToSend = url.substring(( (i-1) * URL_MAX_SIZE), Math.min(URL_MAX_SIZE * i, url.length));
+				httpRequest.onreadystatechange = function(evt) {
+					if (httpRequest.status == 404) {
+						errorServiceResponseFunction("java.lang.Exception", httpRequest.responseText, currentPort, cipherKey);
+						return;
 					}
-					// respuesta afirmativa, hay que mandar mas fragmentos
-					if (httpRequest.readyState == 4){
-						console.log(httpRequest);
-						console.log("la aplicación ha recibido el fragmento "+i);
-						recibidos+=1;
-						if(recibidos < iFinal){	
-							setTimeout(executeOperationRecursive, WAITING_TIME, port, url, cipherKey, i+1, iFinal);
-						}
-						else{
-							httpRequest = getHttpRequest();
-							httpRequest.open("POST", "http://127.0.0.1:" + port + "/afirma", true);
-							httpRequest.setRequestHeader("Content-type","application/x-www-form-urlencoded");
-							httpRequest.onreadystatechange = function() {
-								console.log(httpRequest);
-								if (httpRequest.readyState == 4)	{
-									setTimeout(prueba, WAITING_TIME,port,url, cipherKey);
-								}	
-							}
-
-							try {
-									httpRequest.send("cmd=" + Base64.encode("echo", true));
-									console.log("mandando peticion echo al puerto "+port);
-							}
-							// si hay una excepcion que no explote la aplicacion
-							catch(e) {
+					// Respuesta afirmativa, hay que mandar mas fragmentos
+					if (httpRequest.readyState == 4 && httpRequest.status == 200 && httpRequest.responseText != "" ) {
+						console.log("la aplicacion ha recibido el fragmento " + i);
+						recibidos++;
+						
+						// Faltan mas peticiones por enviar
+						if (Base64.decode(httpRequest.responseText, true) == "MORE_DATA_NEED") {
+							if (recibidos < iFinal ){
+								executeOperationRecursive(url, i+1, iFinal);
 							}
 						}
-	
+						// Todas las peticiones se han recibido, hay que mandar operacion firma
+						// respuesta es OK
+						else if (Base64.decode(httpRequest.responseText, true) == "OK") {
+							if(recibidos == iFinal ){
+								console.log(" intentamos realizar la operacion de firma");
+								doFirm();
+							}
+						}
 					}
-					/*
-					else{
-						
-						if(iTotal<i){
-							console.log("se vuelve a lanzar la petición actual");
-							setTimeout(executeOperationRecursive, 4000,port,url, cipherKey,i,iFinal);
-						}
-						
-						
-					} 
-					*/		
+					else if (httpRequest.responseText == "" && httpRequest.status == 0 && httpRequest.readyState != 2 && httpRequest.readyState != 3) {
+							console.log("hay que volver a mandar peticion");
+							setTimeout(executeOperationRecursive, WAITING_TIME, url, i, iFinal);
+					}
 				}
-				httpRequest.send("fragment=" + i + Base64.encode(urlToSend, true));
-				console.log("manda la parte " + i);
-				
-			}		
+				httpRequest.send("fragment=%" + i + "%" + iFinal + "%"  + Base64.encode(urlToSend, true));
+				console.log("manda la parte " + i +" de "+iFinal);
+			}
 			catch(e) {
 				if (httpRequest.status == 404) {
 					alert(e);
 				} else {
-					errorServiceResponseFunction("java.lang.IOException", "Ocurrio un error de red en la llamada al servicio de firma");
+					errorServiceResponseFunction("java.lang.IOException", "Ocurrio un error de red en la llamada al servicio de firma", currentPort, cipherKey);
 				}
 			}		
-			
 		}
 		
-		var p=false;
-		function prueba (port, url, cipherKey){
+		function doFirm () {
 			httpRequest = getHttpRequest();
-			httpRequest.open("POST", "http://127.0.0.1:" + port + "/afirma", true);
+			httpRequest.open("POST", urlHttpRequest, true);
 			httpRequest.setRequestHeader("Content-type","application/x-www-form-urlencoded");
 			httpRequest.onreadystatechange = function() {
-				if (httpRequest.readyState == 4 && httpRequest.status == 200) {
-					console.log(httpRequest);
-					successServiceResponseFunction(Base64.decode(httpRequest.responseText, true), cipherKey);
+
+				if (httpRequest.status == 404){
+					errorServiceResponseFunction("java.lang.Exception", httpRequest.responseText, currentPort, cipherKey);
+				}
+
+				// Si es una operacion guardar no hay que recomponer respuesta
+				if (reintentSave){
+					successServiceResponseFunction( "SAVE_OK", currentPort, cipherKey);
+				}
+				else {
+					if (httpRequest.readyState == 4 && httpRequest.status == 200 && httpRequest.responseText != "") {
+						totalResponseRequest = "";
+						addFragmentRequest (1, Base64.decode(httpRequest.responseText, true));
+					}
+					// No recibimos la respuesta, volvemos a llamar.
+					else {
+						if (httpRequest.status == 0 && httpRequest.readyState != 2 && httpRequest.readyState != 3 ){
+							setTimeout(doFirm, WAITING_TIME);	
+						}
+					}
 				}
 			}
-			if(!p){
-					p=true;
-					httpRequest.send("firm");
+			console.log("manda peticion para operar con los datos fragmentados");
+			httpRequest.send("firm=");
+		}
+
+		function addFragmentRequest (part, totalParts){
+			httpRequest = getHttpRequest();
+			httpRequest.open("POST", urlHttpRequest, true);
+			httpRequest.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+			httpRequest.onreadystatechange = function() {
+				if (httpRequest.readyState == 4 && httpRequest.status == 200 && httpRequest.responseText != "") {
+					console.log( "Recibida la parte "+part+" de "+totalParts);
+					totalResponseRequest += Base64.decode( httpRequest.responseText, true);
+					if (part == totalParts){
+						successServiceResponseFunction(totalResponseRequest, currentPort, cipherKey);
+					}
+					else{
+						addFragmentRequest(part+1, totalParts);
+					}
 				}
+				else {
+					if (httpRequest.responseText == "" && httpRequest.status == 0 && httpRequest.readyState != 2 && httpRequest.readyState != 3){
+						console.log("volvemos a intentar mandar peticion");
+						setTimeout(addFragmentRequest, WAITING_TIME, part, totalParts);
+					}
+				}
+			}
+			if (part <= totalParts)
+				httpRequest.send("send=%"+part+"%"+totalParts);
 		}
 		
 		/**
-		* Comrpueba si hay que dividir los datos que se se mandan a la aplicacion nativa.
+		* Comprueba si hay que dividir los datos que se se mandan a la aplicacion nativa.
 		* Si hay que dividirlos se llama a la funcion executeOperationRecursive.
 		* Si cabe en un solo envio se manda directamente.
 		*/
-		function executeOperationByService (port, url, cipherKey) {
+		function executeOperationByService (url) {
 			try {
 				var httpRequest = getHttpRequest();
-				httpRequest.open("POST", "http://127.0.0.1:" + port + "/afirma", true);
+				httpRequest.open("POST", urlHttpRequest, true);
 				httpRequest.setRequestHeader("Content-type","application/x-www-form-urlencoded");
-				// el envio se debe fragmentar, llamamos a una función que se encarga de mandar la peticion recursivamente
-				if(url.length > URL_MAX_SIZE){
-					console.log("se haran "+Math.ceil(url.length/URL_MAX_SIZE)+" fragmentos");
-					setTimeout(executeOperationRecursive,WAITING_TIME,port, url, cipherKey,1,Math.ceil(url.length/URL_MAX_SIZE));
+				// El envio se debe fragmentar, llamamos a una función que se encarga de mandar la peticion recursivamente
+				console.log ("url.length=" + url.length + " URL_MAX_SIZE=" + URL_MAX_SIZE);
+				// Comprobamos si es una operacion save
+				if (url.length > URL_MAX_SIZE){
+					console.log("se haran " + Math.ceil(url.length / URL_MAX_SIZE) + " fragmentos");
+					executeOperationRecursive(url, 1, Math.ceil(url.length/URL_MAX_SIZE) );
 				}
-				// el envio no se fragmenta
-				else{
-					httpRequest.onreadystatechange = function(cipherKey){
-						console.log(httpRequest.status +"  "+httpRequest.readyState )
-						if(httpRequest.status == 404)
-
-						{
-							errorServiceResponseFunction(null,httpRequest.responseText);
+				// El envio no se fragmenta
+				else {
+					httpRequest.onreadystatechange = function(){
+						if (httpRequest.status == 404){
+							errorServiceResponseFunction("java.lang.Exception", httpRequest.responseText, currentPort, cipherKey);
 						}
-						else if (httpRequest.readyState == 4 && httpRequest.status == 200) {
-							console.log(httpRequest);
-							successServiceResponseFunction(Base64.decode(httpRequest.responseText, true), cipherKey);
+						// Se ha realizado la operacion save, no intentamos hacer un reintento
+						if (reintentSave){
+							reintentSave = false;
+							successServiceResponseFunction( "SAVE_OK", currentPort, cipherKey);
+						}
+						else {
+							if (httpRequest.readyState == 4 && httpRequest.status == 200 && httpRequest.responseText != "") {
+								// Juntamos los fragmentos
+								totalResponseRequest = "";
+								addFragmentRequest (1, Base64.decode(httpRequest.responseText, true));
+							}		
+							// Volvemos a mandar la peticion si no manda texto en la respuesta y la peticion esta en estado ready
+							else if (httpRequest.responseText == "" && httpRequest.status == 0 && httpRequest.readyState != 2 && httpRequest.readyState != 3 ){
+								console.log("volvemos a intentar mandar send sin fragmentar.");
+								setTimeout(executeOperationByService, WAITING_TIME,url);
+							}
 						}
 					}
 					httpRequest.send("cmd=" + Base64.encode(url, true));
-					console.log("se ha mandando cmd para invocar la firma");
+					console.log("se ha mandando cmd para invocar la firma sin fragmentar");
 				}
 
-			
 			}
 			catch(e) {
 				if (httpRequest.status == 404) {
 					// Interpretamos que este error viene por un problema con el puerto
 				} else {
-						// Interpretamos que este error viene de la aplicacion
-						errorServiceResponseFunction("java.lang.IOException", "Ocurrio un error de red en la llamada al servicio de firma");
-						return;
+					// Interpretamos que este error viene de la aplicacion
+					errorServiceResponseFunction("java.lang.IOException", "Ocurrio un error de red en la llamada al servicio de firma", currentPort, cipherKey);
+					return;
 				}
 			}
 		}
@@ -453,38 +517,44 @@ var AutoFirma = ( function ( window, undefined ) {
 		 * se ejecutara el metodo de exito. En este ultimo caso, se descifrara el resultado. 
 		 * @param data Resultado obtenido.
 		 * @param cipherKey Clave para el descifrado del resultado si no es un error.
+		 * @param port para saber a que puerto conectar la siguiente peticion que se haga.
 		 */
-		function successServiceResponseFunction (data, cipherKey) {
+		function successServiceResponseFunction (data, port, cipherKey) {
 			// No se ha obtenido respuesta
 			if (data == undefined || data == null) {
-				errorServiceResponseFunction("es.gob.afirma.core.AOCancelledOperationException", "Operacion cancelada por el usuario");
+				errorServiceResponseFunction("es.gob.afirma.core.AOCancelledOperationException", "Operacion cancelada por el usuario", currentPort, cipherKey);
 				return;
 			}
 
 			// Termina bien y no devuelve ningun resultado
 			if (data == "OK") {
-				sendOkToIframe();
+				sendOkToIframe(port, "OK", cipherKey);
+				return;
+			}
+			
+			if (data == "SAVE_OK"){
+				sendOkToIframe(port, "SAVE_OK", cipherKey);
 				return;
 			}
 			
 			// Se ha cancelado la operacion
 			if (data == "CANCEL") {
-				errorServiceResponseFunction("es.gob.afirma.core.AOCancelledOperationException", "Operacion cancelada por el usuario");
+				errorServiceResponseFunction("es.gob.afirma.core.AOCancelledOperationException", "Operacion cancelada por el usuario", port, cipherKey);
 				return;
 			}
 
 			// Se ha producido un error
 			if (data.length > 4 && data.substr(0, 4) == "SAF_") {
-				errorServiceResponseFunction("java.lang.Exception", data);
+				errorServiceResponseFunction("java.lang.Exception", data, port, cipherKey);
 				return;
 			}
-			
+
 			// Se ha producido un error y no se ha identificado el tipo
 			if (data == "NULL") {
-				errorServiceResponseFunction("java.lang.Exception", "Error desconocido");
+				errorServiceResponseFunction("java.lang.Exception", "Error desconocido", port, cipherKey);
 				return;
 			}
-			
+
 			// Interpretamos el resultado como un base 64 y el certificado y los datos cifrados
 			var signature;
 			var certificate = null;
@@ -507,14 +577,16 @@ var AutoFirma = ( function ( window, undefined ) {
 				}
 			}
 
-			sendSignatureToIframe(signature, certificate);
+			sendSignatureToIframe(signature, certificate, port, cipherKey);
 		}
 
 		
-		function errorServiceResponseFunction (type, message) {
+		function errorServiceResponseFunction (type, message, port, cipherKey) {
 			sendErrorToIframe(
 				type ? type : "java.lang.Exception",
-				message ? message : "No se ha podido extablecer la comunicaci\u00F3n entre la aplicaci\u00F3n de firma y la p\u00E1gina web"
+				message ? message : "No se ha podido extablecer la comunicaci\u00F3n entre la aplicaci\u00F3n de firma y la p\u00E1gina web",
+				port,
+				cipherKey
 			);
 		}
 		
@@ -523,40 +595,43 @@ var AutoFirma = ( function ( window, undefined ) {
 		 * type: 	Tipo de error.
 		 * message:	Mensaje de error.
 		 */
-		function sendErrorToIframe (type, message) {
+		function sendErrorToIframe (type, message, port, cipherKey) {
 			var wrapper = new Object();
 			wrapper.result = "error";
 			wrapper.type = type;
 			wrapper.message = message;
+			wrapper.port = port;
+			wrapper.key =  cipherKey;
 			window.frames[0].postMessage(wrapper, origin);
 		}
-		
+
 		/**
-		 * Notificamos al iframe que hace de pasarela con la aplicacion principal que ha ocurrido un error.
-		 * type: 	Tipo de error.
-		 * message:	Mensaje de error.
+		 * Enviamos la firma al iframe que hace de pasarela con la aplicacion principal.
 		 */
-		function sendSignatureToIframe (signature, certificate) {
+		function sendSignatureToIframe (signature, certificate, port, cipherKey) {
 			var wrapper = new Object();
 			wrapper.result = "signature";
-			wrapper.cert = certificate;
-			wrapper.numParts=Math.ceil(signature.length/MESSAGE_MAX_SIZE);
+			wrapper.cert = certificate;			
+			wrapper.port = port;
+			wrapper.key = cipherKey;
 			if(signature.length > MESSAGE_MAX_SIZE){
-				var totalData=signature;
+				wrapper.numParts = Math.ceil(signature.length / MESSAGE_MAX_SIZE);
+				var totalData = signature;
 				var send;
-				i=1;
+				i = 1;
 				do{
-					send=totalData.substring(0,MESSAGE_MAX_SIZE);
+					send = totalData.substring(0, MESSAGE_MAX_SIZE);
 					totalData = totalData.substring(MESSAGE_MAX_SIZE)
 					wrapper.signature = send;
-					console.log("parte "+i+" tamaño"+send.length);
-					wrapper.order=i;
+					console.log("parte " + i + " tam" + send.length);
+					wrapper.order = i;
 					window.frames[0].postMessage(wrapper, origin);
-					i+=1;
+					i++;
 				}
-				while (totalData.length>0);	
+				while (totalData.length > 0);	
 			}
 			else {
+				wrapper.numParts = 1;
 				wrapper.signature = signature;
 				window.frames[0].postMessage(wrapper, origin);
 			}
@@ -564,13 +639,13 @@ var AutoFirma = ( function ( window, undefined ) {
 		}
 		
 		/**
-		 * Notificamos al iframe que hace de pasarela con la aplicacion principal que ha ocurrido un error.
-		 * type: 	Tipo de error.
-		 * message:	Mensaje de error.
+		 * Enviamos un OK al iframe que hace de pasarela con la aplicacion principal.
 		 */
-		function sendOkToIframe () {
+		function sendOkToIframe (port, saveOk, cipherKey) {
 			var wrapper = new Object();
-			wrapper.result = "Ok";
+			wrapper.result = (saveOk ? saveOk : "Ok");
+			wrapper.port = port;
+			wrapper.key = cipherKey;
 			window.frames[0].postMessage(wrapper, origin);
 		}
 		
@@ -588,7 +663,7 @@ var AutoFirma = ( function ( window, undefined ) {
 			
 			var deciphered = des(key, base64ToString(cipheredData.substr(dotPos + 1).replace(/\-/g, "+").replace(/\_/g, "/")), 0, 0, null);
 			
-			return stringToBase64(deciphered.substr(0, deciphered.length - padding - 8));
+			return stringToBase64(deciphered.substr(0, deciphered.length - padding));
 		}
 		
 		/* Metodos que publicamos del objeto AppAfirmaJS */
@@ -605,11 +680,11 @@ var AutoFirma = ( function ( window, undefined ) {
  */
 var Base64 = {
 
-		// private property
+		// Private property
 		_keyStr : "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",
 		_keyStr_URL_SAFE : "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_=",
 
-		// public method for encoding
+		// Public method for encoding
 		encode : function (input, URL_SAFE) {
 			
 			var keyStr = (URL_SAFE == true) ? this._keyStr_URL_SAFE : this._keyStr;
@@ -646,7 +721,7 @@ var Base64 = {
 			return output;
 		},
 
-		// public method for decoding
+		// Public method for decoding
 		decode : function (input, URL_SAFE) {
 			
 			var keyStr = (URL_SAFE == true) ? this._keyStr_URL_SAFE : this._keyStr;
@@ -686,7 +761,7 @@ var Base64 = {
 
 		},
 
-		// private method for UTF-8 encoding
+		// Private method for UTF-8 encoding
 		_utf8_encode : function (string) {
 			string = string.replace(/\r\n/g,"\n");
 			var utftext = "";
@@ -713,7 +788,7 @@ var Base64 = {
 			return utftext;
 		},
 
-		// private method for UTF-8 decoding
+		// Private method for UTF-8 decoding
 		_utf8_decode : function (utftext) {
 			var string = "";
 			var i = 0;
@@ -745,28 +820,9 @@ var Base64 = {
 
 };
 
-//Paul Tero, July 2001
-//http://www.tero.co.uk/des/
-
-//Optimised for performance with large blocks by Michael Hayworth, November 2001
-//http://www.netdealing.com
-
-//THIS SOFTWARE IS PROVIDED "AS IS" AND
-//ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-//IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-//ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE
-//FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-//DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
-//OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
-//HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
-//LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
-//OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
-//SUCH DAMAGE.
-
-//des
-//this takes the key, the message, and whether to encrypt or decrypt
+//This takes the key, the message, and whether to encrypt or decrypt
 function des (key, message, encrypt, mode, iv, padding) {
-	  //declaring this locally speeds things up a bit
+	  //Declaring this locally speeds things up a bit
 	  var spfunction1 = new Array (0x1010400,0,0x10000,0x1010404,0x1010004,0x10404,0x4,0x10000,0x400,0x1010400,0x1010404,0x400,0x1000404,0x1010004,0x1000000,0x4,0x404,0x1000400,0x1000400,0x10400,0x10400,0x1010000,0x1010000,0x1000404,0x10004,0x1000004,0x1000004,0x10004,0,0x404,0x10404,0x1000000,0x10000,0x1010404,0x4,0x1010000,0x1010400,0x1000000,0x1000000,0x400,0x1010004,0x10000,0x10400,0x1000004,0x400,0x4,0x1000404,0x10404,0x1010404,0x10004,0x1010000,0x1000404,0x1000004,0x404,0x10404,0x1010400,0x404,0x1000400,0x1000400,0,0x10004,0x10400,0,0x1010004);
 	  var spfunction2 = new Array (-0x7fef7fe0,-0x7fff8000,0x8000,0x108020,0x100000,0x20,-0x7fefffe0,-0x7fff7fe0,-0x7fffffe0,-0x7fef7fe0,-0x7fef8000,-0x80000000,-0x7fff8000,0x100000,0x20,-0x7fefffe0,0x108000,0x100020,-0x7fff7fe0,0,-0x80000000,0x8000,0x108020,-0x7ff00000,0x100020,-0x7fffffe0,0,0x108000,0x8020,-0x7fef8000,-0x7ff00000,0x8020,0,0x108020,-0x7fefffe0,0x100000,-0x7fff7fe0,-0x7ff00000,-0x7fef8000,0x8000,-0x7ff00000,-0x7fff8000,0x20,-0x7fef7fe0,0x108020,0x20,0x8000,-0x80000000,0x8020,-0x7fef8000,0x100000,-0x7fffffe0,0x100020,-0x7fff7fe0,-0x7fffffe0,0x100020,0x108000,0,-0x7fff8000,0x8020,-0x80000000,-0x7fefffe0,-0x7fef7fe0,0x108000);
 	  var spfunction3 = new Array (0x208,0x8020200,0,0x8020008,0x8000200,0,0x20208,0x8000200,0x20008,0x8000008,0x8000008,0x20000,0x8020208,0x20008,0x8020000,0x208,0x8000000,0x8,0x8020200,0x200,0x20200,0x8020000,0x8020008,0x20208,0x8000208,0x20200,0x20000,0x8000208,0x8,0x8020208,0x200,0x8000000,0x8020200,0x8000000,0x20008,0x208,0x20000,0x8020200,0x8000200,0,0x200,0x20008,0x8020208,0x8000200,0x8000008,0x200,0,0x8020008,0x8000208,0x20000,0x8000000,0x8020208,0x8,0x20208,0x20200,0x8000008,0x8020000,0x8000208,0x208,0x8020000,0x20208,0x8,0x8020008,0x20200);
@@ -776,24 +832,24 @@ function des (key, message, encrypt, mode, iv, padding) {
 	  var spfunction7 = new Array (0x200000,0x4200002,0x4000802,0,0x800,0x4000802,0x200802,0x4200800,0x4200802,0x200000,0,0x4000002,0x2,0x4000000,0x4200002,0x802,0x4000800,0x200802,0x200002,0x4000800,0x4000002,0x4200000,0x4200800,0x200002,0x4200000,0x800,0x802,0x4200802,0x200800,0x2,0x4000000,0x200800,0x4000000,0x200800,0x200000,0x4000802,0x4000802,0x4200002,0x4200002,0x2,0x200002,0x4000000,0x4000800,0x200000,0x4200800,0x802,0x200802,0x4200800,0x802,0x4000002,0x4200802,0x4200000,0x200800,0,0x2,0x4200802,0,0x200802,0x4200000,0x800,0x4000002,0x4000800,0x800,0x200002);
 	  var spfunction8 = new Array (0x10001040,0x1000,0x40000,0x10041040,0x10000000,0x10001040,0x40,0x10000000,0x40040,0x10040000,0x10041040,0x41000,0x10041000,0x41040,0x1000,0x40,0x10040000,0x10000040,0x10001000,0x1040,0x41000,0x40040,0x10040040,0x10041000,0x1040,0,0,0x10040040,0x10000040,0x10001000,0x41040,0x40000,0x41040,0x40000,0x10041000,0x1000,0x40,0x10040040,0x1000,0x41040,0x10001000,0x40,0x10000040,0x10040000,0x10040040,0x10000000,0x40000,0x10001040,0,0x10041040,0x40040,0x10000040,0x10040000,0x10001000,0x10001040,0,0x10041040,0x41000,0x41000,0x1040,0x1040,0x40040,0x10000000,0x10041000);
 
-	  //create the 16 or 48 subkeys we will need
+	  //Create the 16 or 48 subkeys we will need
 	  var keys = des_createKeys (key);
 	  var m=0, i, j, temp, right1, right2, left, right, looping;
 	  var cbcleft, cbcleft2, cbcright, cbcright2;
 	  var endloop, loopinc;
 	  var len = message.length;
 	  var chunk = 0;
-	  //set up the loops for single and triple des
+	  //Set up the loops for single and triple des
 	  var iterations = keys.length == 32 ? 3 : 9; //single or triple des
 	  if (iterations == 3) {looping = encrypt ? new Array (0, 32, 2) : new Array (30, -2, -2);}
 	  else {looping = encrypt ? new Array (0, 32, 2, 62, 30, -2, 64, 96, 2) : new Array (94, 62, -2, 32, 64, 2, 30, -2, -2);}
 
-	  //pad the message depending on the padding parameter
+	  //Pad the message depending on the padding parameter
 	  if (padding == 2) message += "        "; //pad the message with spaces
 	  else if (padding == 1) {temp = 8-(len%8); message += String.fromCharCode (temp,temp,temp,temp,temp,temp,temp,temp); if (temp==8) len+=8;} //PKCS7 padding
 	  else if (!padding) message += "\0\0\0\0\0\0\0\0"; //pad the message out with null bytes
 
-	  //store the result here
+	  //Store the result here
 	  result = "";
 	  tempresult = "";
 
@@ -803,15 +859,15 @@ function des (key, message, encrypt, mode, iv, padding) {
 	    m=0;
 	  }
 
-	  //loop through each 64 bit chunk of the message
+	  //Loop through each 64 bit chunk of the message
 	  while (m < len) {
 	    left = (message.charCodeAt(m++) << 24) | (message.charCodeAt(m++) << 16) | (message.charCodeAt(m++) << 8) | message.charCodeAt(m++);
 	    right = (message.charCodeAt(m++) << 24) | (message.charCodeAt(m++) << 16) | (message.charCodeAt(m++) << 8) | message.charCodeAt(m++);
 
-	    //for Cipher Block Chaining mode, xor the message with the previous result
+	    //For Cipher Block Chaining mode, xor the message with the previous result
 	    if (mode == 1) {if (encrypt) {left ^= cbcleft; right ^= cbcright;} else {cbcleft2 = cbcleft; cbcright2 = cbcright; cbcleft = left; cbcright = right;}}
 
-	    //first each 64 but chunk of the message must be permuted according to IP
+	    //First each 64 but chunk of the message must be permuted according to IP
 	    temp = ((left >>> 4) ^ right) & 0x0f0f0f0f; right ^= temp; left ^= (temp << 4);
 	    temp = ((left >>> 16) ^ right) & 0x0000ffff; right ^= temp; left ^= (temp << 16);
 	    temp = ((right >>> 2) ^ left) & 0x33333333; left ^= temp; right ^= (temp << 2);
@@ -821,15 +877,15 @@ function des (key, message, encrypt, mode, iv, padding) {
 	    left = ((left << 1) | (left >>> 31)); 
 	    right = ((right << 1) | (right >>> 31)); 
 
-	    //do this either 1 or 3 times for each chunk of the message
+	    //Do this either 1 or 3 times for each chunk of the message
 	    for (j=0; j<iterations; j+=3) {
 	      endloop = looping[j+1];
 	      loopinc = looping[j+2];
-	      //now go through and perform the encryption or decryption  
+	      //Now go through and perform the encryption or decryption  
 	      for (i=looping[j]; i!=endloop; i+=loopinc) { //for efficiency
 	        right1 = right ^ keys[i]; 
 	        right2 = ((right >>> 4) | (right << 28)) ^ keys[i+1];
-	        //the result is attained by passing these bytes through the S selection functions
+	        //The result is attained by passing these bytes through the S selection functions
 	        temp = left;
 	        left = right;
 	        right = temp ^ (spfunction2[(right1 >>> 24) & 0x3f] | spfunction4[(right1 >>> 16) & 0x3f]
@@ -838,33 +894,32 @@ function des (key, message, encrypt, mode, iv, padding) {
 	              | spfunction5[(right2 >>>  8) & 0x3f] | spfunction7[right2 & 0x3f]);
 	      }
 	      temp = left; left = right; right = temp; //unreverse left and right
-	    } //for either 1 or 3 iterations
+	    } //For either 1 or 3 iterations
 
-	    //move then each one bit to the right
+	    //Move then each one bit to the right
 	    left = ((left >>> 1) | (left << 31)); 
 	    right = ((right >>> 1) | (right << 31)); 
 
-	    //now perform IP-1, which is IP in the opposite direction
+	    //Now perform IP-1, which is IP in the opposite direction
 	    temp = ((left >>> 1) ^ right) & 0x55555555; right ^= temp; left ^= (temp << 1);
 	    temp = ((right >>> 8) ^ left) & 0x00ff00ff; left ^= temp; right ^= (temp << 8);
 	    temp = ((right >>> 2) ^ left) & 0x33333333; left ^= temp; right ^= (temp << 2);
 	    temp = ((left >>> 16) ^ right) & 0x0000ffff; right ^= temp; left ^= (temp << 16);
 	    temp = ((left >>> 4) ^ right) & 0x0f0f0f0f; right ^= temp; left ^= (temp << 4);
 
-	    //for Cipher Block Chaining mode, xor the message with the previous result
+	    //For Cipher Block Chaining mode, xor the message with the previous result
 	    if (mode == 1) {if (encrypt) {cbcleft = left; cbcright = right;} else {left ^= cbcleft2; right ^= cbcright2;}}
 	    tempresult += String.fromCharCode ((left>>>24), ((left>>>16) & 0xff), ((left>>>8) & 0xff), (left & 0xff), (right>>>24), ((right>>>16) & 0xff), ((right>>>8) & 0xff), (right & 0xff));
 
 	    chunk += 8;
 	    if (chunk == 512) {result += tempresult; tempresult = ""; chunk = 0;}
-	  } //for every 8 characters, or 64 bits in the message
+	  } //For every 8 characters, or 64 bits in the message
 
-	  //return the result as an array
+	  //Return the result as an array
 	  return result + tempresult;
-	} //end of des
+	} //End of des
 
-	//des_createKeys
-	//this takes as input a 64 bit key (even though only 56 bits are used)
+	//This takes as input a 64 bit key (even though only 56 bits are used)
 	//as an array of 2 integers, and returns 16 48 bit keys
 	function des_createKeys (key) {
 	  //declaring this locally speeds things up a bit
@@ -883,13 +938,13 @@ function des (key, message, encrypt, mode, iv, padding) {
 	  pc2bytes12 = new Array (0,0x1000,0x8000000,0x8001000,0x80000,0x81000,0x8080000,0x8081000,0x10,0x1010,0x8000010,0x8001010,0x80010,0x81010,0x8080010,0x8081010);
 	  pc2bytes13 = new Array (0,0x4,0x100,0x104,0,0x4,0x100,0x104,0x1,0x5,0x101,0x105,0x1,0x5,0x101,0x105);
 
-	  //how many iterations (1 for des, 3 for triple des)
+	  //How many iterations (1 for des, 3 for triple des)
 	  var iterations = key.length > 8 ? 3 : 1; //changed by Paul 16/6/2007 to use Triple DES for 9+ byte keys
-	  //stores the return keys
+	  //Stores the return keys
 	  var keys = new Array (32 * iterations);
-	  //now define the left shifts which need to be done
+	  //Now define the left shifts which need to be done
 	  var shifts = new Array (0, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0);
-	  //other variables
+	  //Other variables
 	  var lefttemp, righttemp, m=0, n=0, temp;
 
 	  for (var j=0; j<iterations; j++) { //either 1 or 3 iterations
@@ -904,20 +959,20 @@ function des (key, message, encrypt, mode, iv, padding) {
 	    temp = ((right >>> 8) ^ left) & 0x00ff00ff; left ^= temp; right ^= (temp << 8);
 	    temp = ((left >>> 1) ^ right) & 0x55555555; right ^= temp; left ^= (temp << 1);
 
-	    //the right side needs to be shifted and to get the last four bits of the left side
+	    //The right side needs to be shifted and to get the last four bits of the left side
 	    temp = (left << 8) | ((right >>> 20) & 0x000000f0);
-	    //left needs to be put upside down
+	    //Left needs to be put upside down
 	    left = (right << 24) | ((right << 8) & 0xff0000) | ((right >>> 8) & 0xff00) | ((right >>> 24) & 0xf0);
 	    right = temp;
 
-	    //now go through and perform these shifts on the left and right keys
+	    //Now go through and perform these shifts on the left and right keys
 	    for (var i=0; i < shifts.length; i++) {
-	      //shift the keys either one or two bits to the left
+	      //Shift the keys either one or two bits to the left
 	      if (shifts[i]) {left = (left << 2) | (left >>> 26); right = (right << 2) | (right >>> 26);}
 	      else {left = (left << 1) | (left >>> 27); right = (right << 1) | (right >>> 27);}
 	      left &= -0xf; right &= -0xf;
 
-	      //now apply PC-2, in such a way that E is easier when encrypting or decrypting
+	      //Now apply PC-2, in such a way that E is easier when encrypting or decrypting
 	      //this conversion will look like PC-2 except only the last 6 bits of each byte are used
 	      //rather than 48 consecutive bits and the order of lines will be according to 
 	      //how the S selection functions will be applied: S2, S4, S6, S8, S1, S3, S5, S7
@@ -932,10 +987,10 @@ function des (key, message, encrypt, mode, iv, padding) {
 	      temp = ((righttemp >>> 16) ^ lefttemp) & 0x0000ffff; 
 	      keys[n++] = lefttemp ^ temp; keys[n++] = righttemp ^ (temp << 16);
 	    }
-	  } //for each iterations
+	  } //For each iterations
 	  //return the keys we've created
 	  return keys;
-	} //end of des_createKeys
+	} //End of des_createKeys
 
 //Convierte una cadena a Base 64. Debido a un error en el algoritmo original, pasaremos
 // de cadena a hexadecimal y de hexadecimal a Base64
@@ -950,11 +1005,11 @@ function base64ToString (s) {
 	
   var decode = new Object();
   for (var i=0; i<BASE64.length; i++) {decode[BASE64[i]] = i;} //inverse of the array
-  decode['='] = 0; //add the equals sign as well
+  decode['='] = 0; //Add the equals sign as well
   var r = "", c1, c2, c3, c4, len=s.length; //define variables
-  s += "===="; //just to make sure it is padded correctly
+  s += "===="; //Just to make sure it is padded correctly
   for (var i=0; i<len; i+=4) { //4 input characters at a time
-    c1 = s.charAt(i); //the 1st base64 input characther
+    c1 = s.charAt(i); //The 1st base64 input characther
     c2 = s.charAt(i+1);
     c3 = s.charAt(i+2);
     c4 = s.charAt(i+3);

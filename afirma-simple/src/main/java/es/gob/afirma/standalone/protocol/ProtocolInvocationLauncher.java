@@ -1,0 +1,204 @@
+package es.gob.afirma.standalone.protocol;
+
+import java.io.IOException;
+import java.util.logging.Logger;
+
+import es.gob.afirma.core.misc.Platform;
+import es.gob.afirma.core.misc.protocol.ParameterLocalAccessRequestedException;
+import es.gob.afirma.core.misc.protocol.ParameterNeedsUpdatedVersionException;
+import es.gob.afirma.core.misc.protocol.ProtocolInvocationUriParser;
+import es.gob.afirma.core.misc.protocol.UrlParametersForBatch;
+import es.gob.afirma.core.misc.protocol.UrlParametersToSave;
+import es.gob.afirma.core.misc.protocol.UrlParametersToSign;
+import es.gob.afirma.standalone.protocol.ProtocolInvocationLauncherUtil.DecryptionException;
+import es.gob.afirma.standalone.protocol.ProtocolInvocationLauncherUtil.InvalidEncryptedDataLengthException;
+import es.gob.afirma.standalone.ui.MainMenu;
+
+/** Gestiona la ejecuci&oacute;n del Cliente Afirma en una invocaci&oacute;n
+ * por protocolo y bajo un entorno compatible <code>Swing</code>.
+ * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
+public final class ProtocolInvocationLauncher {
+
+	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+
+	private static final String RESULT_OK = "OK"; //$NON-NLS-1$
+
+	/** Lanza la aplicaci&oacute;n y realiza las acciones indicadas en la URL.
+	 * @param urlString URL de invocaci&oacute;n por protocolo.
+	 * @param cipherKey Clave de firma.
+	 * @return Resultado de la operaci&oacute;n. */
+	public static String launch(final String urlString)  {
+
+	    // En OS X sobrecargamos el "Acerca de..." del sistema operativo, que tambien
+	    // aparece en la invocacion por protocolo
+	    if (Platform.OS.MACOSX.equals(Platform.getOS())) {
+	    	com.apple.eawt.Application.getApplication().setAboutHandler(
+                 new com.apple.eawt.AboutHandler() {
+                     @Override
+                     public void handleAbout(final com.apple.eawt.AppEvent.AboutEvent ae) {
+                         MainMenu.showAbout(null);
+                     }
+                 }
+            );
+	    }
+
+		if (urlString == null) {
+			LOGGER.severe("No se ha proporcionado una URL para la invocacion"); //$NON-NLS-1$
+			ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_01);
+			return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_01);
+		}
+		if (!urlString.startsWith("afirma://")) { //$NON-NLS-1$
+			LOGGER.severe("La URL de invocacion no comienza por 'afirma://'"); //$NON-NLS-1$
+			ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_02);
+			return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_02);
+		}
+
+		// Firma por lotes predefinidos en ficheros XML
+		if (urlString.startsWith("afirma://batch?") || urlString.startsWith("afirma://batch/?")) { //$NON-NLS-1$ //$NON-NLS-2$
+			try {
+
+				final UrlParametersForBatch params = ProtocolInvocationUriParser.getParametersForBatch(urlString);
+
+				// Si se indica un identificador de fichero, es que el XML de definicion de lote se tiene que
+				// descargar desde el servidor intermedio
+				if (params.getFileId() != null) {
+					final byte[] xmlBatchDefinition;
+					try {
+						xmlBatchDefinition = ProtocolInvocationLauncherUtil.getDataFromRetrieveServlet(params);
+					}
+					catch(final InvalidEncryptedDataLengthException e) {
+						ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_16);
+						return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_16);
+					}
+					catch(final DecryptionException e) {
+						ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_15);
+						return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_15);
+
+					}
+					params.setData(xmlBatchDefinition);
+				}
+
+				return ProtocolInvocationLauncherBatch.processBatch(params);
+
+			}
+			catch(final Exception e) {
+				LOGGER.severe("Error en los parametros de firma por lote: " + e); //$NON-NLS-1$
+				ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_03);
+				return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_03);
+			}
+		}
+
+		if (urlString.startsWith("afirma://service?") || urlString.startsWith("afirma://service/?")) { //$NON-NLS-1$ //$NON-NLS-2$
+			LOGGER.info("Se inicia la invocacion por servicio: " + urlString); //$NON-NLS-1$
+			ServiceInvocationManager.startService(urlString);
+			return RESULT_OK;
+		}
+
+		else if (urlString.startsWith("afirma://save?") || urlString.startsWith("afirma://save/?")) { //$NON-NLS-1$ //$NON-NLS-2$
+			LOGGER.info("Se invoca a la aplicacion para el guardado de datos"); //$NON-NLS-1$
+
+			try {
+				UrlParametersToSave params = ProtocolInvocationUriParser.getParametersToSave(urlString);
+				LOGGER.info("Parametros de la llamada = " + urlString); //$NON-NLS-1$
+
+				// Si se indica un identificador de fichero, es que la configuracion se tiene que
+				// descargar desde el servidor intermedio
+				if (params.getFileId() != null) {
+
+					final byte[] xmlData;
+					try {
+						xmlData = ProtocolInvocationLauncherUtil.getDataFromRetrieveServlet(params);
+					}
+					catch(final InvalidEncryptedDataLengthException e) {
+						ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_16);
+						return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_16);
+					}
+					catch(final DecryptionException e) {
+						ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_15);
+						return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_15);
+
+					}
+
+					params = ProtocolInvocationUriParser.getParametersToSave(xmlData);
+				}
+				return ProtocolInvocationLauncherSave.processSave(params);
+			}
+			catch(final ParameterNeedsUpdatedVersionException e) {
+				LOGGER.severe("Se necesita una version mas moderna de AutoFirma para procesar la peticion: " + e); //$NON-NLS-1$
+				ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_14);
+				return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_14);
+			}
+			catch(final ParameterLocalAccessRequestedException e) {
+				LOGGER.severe("Se ha pedido un acceso a una direccion local (localhost o 127.0.0.1): " + e); //$NON-NLS-1$
+				ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_13);
+				return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_13);
+			}
+			catch (final Exception e) {
+				LOGGER.severe("Error en los parametros de guardado: " + e); //$NON-NLS-1$
+				ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_03);
+				return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_03);
+			}
+		}
+
+		else if (urlString.startsWith("afirma://sign?")   || urlString.startsWith("afirma://sign/?") || //$NON-NLS-1$ //$NON-NLS-2$
+				 urlString.startsWith("afirma://cosign?") || urlString.startsWith("afirma://cosign/?") || //$NON-NLS-1$ //$NON-NLS-2$
+				 urlString.startsWith("afirma://countersign?") || urlString.startsWith("afirma://countersign/?") //$NON-NLS-1$ //$NON-NLS-2$
+		) {
+			LOGGER.info("Se invoca a la aplicacion para realizar una operacion de firma/multifirma"); //$NON-NLS-1$
+
+			try {
+				UrlParametersToSign params = ProtocolInvocationUriParser.getParametersToSign(urlString);
+
+				// Si se indica un identificador de fichero, es que la configuracion se tiene que
+				// descargar desde el servidor intermedio
+				if (params.getFileId() != null) {
+
+					final byte[] xmlData;
+					try {
+						xmlData = ProtocolInvocationLauncherUtil.getDataFromRetrieveServlet(params);
+					}
+					catch(final InvalidEncryptedDataLengthException e) {
+						ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_16);
+						return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_16);
+					}
+					catch(final DecryptionException e) {
+						ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_15);
+						return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_15);
+					}
+					catch (final IOException e) {
+						ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_16);
+						return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_16);
+					}
+
+					params = ProtocolInvocationUriParser.getParametersToSign(xmlData);
+				}
+
+				LOGGER.info("Se inicia la operacion de firma"); //$NON-NLS-1$
+
+				return ProtocolInvocationLauncherSign.processSign(params);
+			}
+			catch(final ParameterNeedsUpdatedVersionException e) {
+				LOGGER.severe("Se necesita una version mas moderna de AutoFirma para procesar la peticion: " + e); //$NON-NLS-1$
+				ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_14);
+				return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_14);
+			}
+			catch(final ParameterLocalAccessRequestedException e) {
+				LOGGER.severe("Se ha pedido un acceso a una direccion local (localhost o 127.0.0.1): " + e); //$NON-NLS-1$
+				ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_13);
+				return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_13);
+			}
+			catch (final Exception e) {
+				LOGGER.severe("Error en los parametros de firma: " + e); //$NON-NLS-1$
+				ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_03);
+				return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_03);
+			}
+		}
+
+		else {
+			LOGGER.severe("No se ha identificado el motivo de la invocacion de la aplicacion"); //$NON-NLS-1$
+			ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_04);
+			return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_04);
+		}
+	}
+
+}

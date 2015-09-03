@@ -413,12 +413,11 @@ public final class AOXAdESSigner implements AOSigner {
     	return XAdESSigner.sign(data, algorithm, key, certChain, xParams);
     }
 
-    /** Comprueba si la firma es detached. Previamente debe haberse comprobado que el XML se
+    /** Comprueba si la firma es <i>detached</i>. Previamente debe haberse comprobado que el XML se
      * corresponde con una firma XAdES.
-     * @param element
-     *        Elemento que contiene el nodo ra&iacute;z del documento que se
-     *        quiere comprobar
-     * @return Valor booleano, siendo verdadero cuando la firma es detached */
+     * @param element Elemento que contiene el nodo ra&iacute;z del documento que se
+     *                quiere comprobar
+     * @return <code>true</code> si la firma es <i>detached</i>, <code>false</code> en caso contrario. */
     public static boolean isDetached(final Element element) {
         if (element == null) {
             return false;
@@ -443,19 +442,20 @@ public final class AOXAdESSigner implements AOSigner {
         			return true;
         		}
         	}
-        } catch (final Exception e) {
+        }
+        catch (final Exception e) {
         	return false;
         }
 
         return false;
     }
 
-    /** Comprueba si la firma es enveloped. Previamente debe haberse comprabado que el XML se
+    /** Comprueba si la firma es <i>enveloped</i>. Previamente debe haberse comprabado que el XML se
      * corresponde con una firma XAdES.
-     * @param element
-     *        Elemento que contiene el nodo ra&iacute;z del documento que se
-     *        quiere comprobar
-     * @return Valor booleano, siendo verdadero cuando la firma es enveloped */
+     * @param element Elemento que contiene el nodo ra&iacute;z del documento que se
+     *        	      quiere comprobar
+     * @return <code>true</code> cuando la firma es <i>enveloped</i>, <code>false</code> en caso
+     *         contrario. */
     public static boolean isEnveloped(final Element element) {
         final NodeList transformList = element.getElementsByTagNameNS(XMLConstants.DSIGNNS, "Transform"); //$NON-NLS-1$
         for (int i = 0; i < transformList.getLength(); i++) {
@@ -466,12 +466,12 @@ public final class AOXAdESSigner implements AOSigner {
         return false;
     }
 
-    /** Comprueba si la firma es enveloping. Previamente debe haberse comprabado que el XML se
+    /** Comprueba si la firma es <i>enveloping</i>. Previamente debe haberse comprabado que el XML se
      * corresponde con una firma XAdES.
-     * @param element
-     *        Elemento que contiene el nodo ra&iacute;z del documento que se
-     *        quiere comprobar
-     * @return Valor booleano, siendo verdadero cuando la firma es enveloping */
+     * @param element Elemento que contiene el nodo ra&iacute;z del documento que se
+     *                quiere comprobar.
+     * @return <code>true</code> cuando la firma es <i>enveloping</i>, <code>false</code> en caso
+     *         contrario. */
     public static boolean isEnveloping(final Element element) {
         if (element.getLocalName().equals(SIGNATURE_TAG) ||
            element.getLocalName().equals(AFIRMA) && element.getFirstChild().getLocalName().equals(SIGNATURE_TAG)) {
@@ -513,8 +513,8 @@ public final class AOXAdESSigner implements AOSigner {
                 else {
                 	//TODO: Deshacer solo el Base64 si existe la transformacion Base64 (COMPROBAR)
                 	return isBase64TransformationDeclared(rootSig, firstChild.getAttribute(ID_IDENTIFIER)) ?
-                				Base64.decode(firstChild.getTextContent()) :
-                					firstChild.getTextContent().getBytes();
+        				Base64.decode(firstChild.getTextContent()) :
+        					firstChild.getTextContent().getBytes();
                 }
             }
 
@@ -540,8 +540,8 @@ public final class AOXAdESSigner implements AOSigner {
                 else {
                 	//TODO: Deshacer solo el Base64 si existe la transformacion Base64 (COMPROBAR)
                 	return isBase64TransformationDeclared(rootSig, object.getAttribute(ID_IDENTIFIER)) ?
-                				Base64.decode(object.getTextContent()) :
-                					object.getTextContent().getBytes();
+        				Base64.decode(object.getTextContent()) :
+        					object.getTextContent().getBytes();
                 }
             }
         }
@@ -886,10 +886,8 @@ public final class AOXAdESSigner implements AOSigner {
     }
 
     /** Comprueba que los nodos de firma proporcionados sean firmas en formato XAdES.
-     * @param signNodes
-     *        Listado de nodos de firma.
-     * @return Devuelve {@code true} cuando todos los nodos sean firmas en este
-     *         formato. */
+     * @param signNodes Listado de nodos de firma.
+     * @return {@code true} cuando todos los nodos sean firmas en este formato. */
     private static boolean checkSignNodes(final List<Node> signNodes) {
         String xadesNamespace;
         for (final Node signNode : signNodes) {

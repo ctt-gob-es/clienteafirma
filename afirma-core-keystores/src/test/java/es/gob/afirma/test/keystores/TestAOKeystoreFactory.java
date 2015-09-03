@@ -61,8 +61,7 @@ public class TestAOKeystoreFactory {
     		System.out.println(alias);
     	}
     	final PrivateKeyEntry pke = ksm.getKeyEntry(
-			ksm.getAliases()[0],
-			AOKeyStore.WINDOWS.getCertificatePasswordCallback(null)
+			ksm.getAliases()[0]
 		);
     	System.out.println(pke.toString());
 

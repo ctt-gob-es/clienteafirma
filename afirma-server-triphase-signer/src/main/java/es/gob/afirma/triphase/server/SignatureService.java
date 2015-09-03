@@ -24,6 +24,13 @@ import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.triphase.server.document.DocumentManager;
+import es.gob.afirma.triphase.server.processors.CAdESASiCSTriPhasePreProcessor;
+import es.gob.afirma.triphase.server.processors.CAdESTriPhasePreProcessor;
+import es.gob.afirma.triphase.server.processors.FacturaETriPhasePreProcessor;
+import es.gob.afirma.triphase.server.processors.PAdESTriPhasePreProcessor;
+import es.gob.afirma.triphase.server.processors.TriPhasePreProcessor;
+import es.gob.afirma.triphase.server.processors.XAdESASiCSTriPhasePreProcessor;
+import es.gob.afirma.triphase.server.processors.XAdESTriPhasePreProcessor;
 
 /**
  * Servicio de firma electronica en 3 fases.
@@ -185,9 +192,9 @@ public final class SignatureService extends HttpServlet {
 		// Obtenemos el codigo de operacion
 		//final String subOperation = request.getParameter(PARAM_NAME_SUB_OPERATION);
 		final String subOperation = parameters.get(PARAM_NAME_SUB_OPERATION);
-		if (subOperation == null || !PARAM_VALUE_SUB_OPERATION_SIGN.equals(subOperation)
-				&& !PARAM_VALUE_SUB_OPERATION_COSIGN.equals(subOperation)
-				&& !PARAM_VALUE_SUB_OPERATION_COUNTERSIGN.equals(subOperation)) {
+		if (subOperation == null || !PARAM_VALUE_SUB_OPERATION_SIGN.equalsIgnoreCase(subOperation)
+				&& !PARAM_VALUE_SUB_OPERATION_COSIGN.equalsIgnoreCase(subOperation)
+				&& !PARAM_VALUE_SUB_OPERATION_COUNTERSIGN.equalsIgnoreCase(subOperation)) {
 			out.print(ErrorManager.getErrorMessage(13));
 			out.close();
 			return;
@@ -226,7 +233,7 @@ public final class SignatureService extends HttpServlet {
 		}
 
 		if (sessionData != null) {
-			LOGGER.info("Recibidos los siguientes datos de sesion:\n" + new String(sessionData)); //$NON-NLS-1$
+			LOGGER.info("Recibidos los siguientes datos de sesion para '" + operation + "':\n" + new String(sessionData)); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
 		// Obtenemos el certificado
@@ -256,10 +263,13 @@ public final class SignatureService extends HttpServlet {
 		if (docId != null) {
 			try {
 				docBytes = DOC_MANAGER.getDocument(docId, signerCert, extraParams);
-			} catch (final Throwable e) {
+				LOGGER.warning(
+					"Recuperado documento de " + docBytes.length + " octetos" //$NON-NLS-1$ //$NON-NLS-2$
+				);
+			}
+			catch (final Throwable e) {
 				LOGGER.warning("Error al recuperar el documento: " + e); //$NON-NLS-1$
 				out.print(ErrorManager.getErrorMessage(14) + ": " + e); //$NON-NLS-1$
-				e.printStackTrace();
 				out.close();
 				return;
 			}
@@ -286,14 +296,30 @@ public final class SignatureService extends HttpServlet {
 
 		// Instanciamos el preprocesador adecuado
 		final TriPhasePreProcessor prep;
-		if (AOSignConstants.SIGN_FORMAT_PADES.equalsIgnoreCase(format) || AOSignConstants.SIGN_FORMAT_PADES_TRI.equalsIgnoreCase(format)) {
-			prep = new PAdESTriPhasePreProcessor();
+		if (AOSignConstants.SIGN_FORMAT_PADES.equalsIgnoreCase(format) ||
+			AOSignConstants.SIGN_FORMAT_PADES_TRI.equalsIgnoreCase(format)) {
+					prep = new PAdESTriPhasePreProcessor();
 		}
-		else if (AOSignConstants.SIGN_FORMAT_CADES.equalsIgnoreCase(format) || AOSignConstants.SIGN_FORMAT_CADES_TRI.equalsIgnoreCase(format)) {
-			prep = new CAdESTriPhasePreProcessor();
+		else if (AOSignConstants.SIGN_FORMAT_CADES.equalsIgnoreCase(format) ||
+				 AOSignConstants.SIGN_FORMAT_CADES_TRI.equalsIgnoreCase(format)) {
+					prep = new CAdESTriPhasePreProcessor();
 		}
-		else if (AOSignConstants.SIGN_FORMAT_XADES.equalsIgnoreCase(format) || AOSignConstants.SIGN_FORMAT_XADES_TRI.equalsIgnoreCase(format)) {
-			prep = new XAdESTriPhasePreProcessor();
+		else if (AOSignConstants.SIGN_FORMAT_XADES.equalsIgnoreCase(format) ||
+				 AOSignConstants.SIGN_FORMAT_XADES_TRI.equalsIgnoreCase(format)) {
+					prep = new XAdESTriPhasePreProcessor();
+		}
+		else if (AOSignConstants.SIGN_FORMAT_CADES_ASIC_S.equalsIgnoreCase(format) ||
+				 AOSignConstants.SIGN_FORMAT_CADES_ASIC_S_TRI.equalsIgnoreCase(format)) {
+					prep = new CAdESASiCSTriPhasePreProcessor();
+		}
+		else if (AOSignConstants.SIGN_FORMAT_XADES_ASIC_S.equalsIgnoreCase(format) ||
+				 AOSignConstants.SIGN_FORMAT_XADES_ASIC_S_TRI.equalsIgnoreCase(format)) {
+					prep = new XAdESASiCSTriPhasePreProcessor();
+		}
+		else if (AOSignConstants.SIGN_FORMAT_FACTURAE.equalsIgnoreCase(format) ||
+				 AOSignConstants.SIGN_FORMAT_FACTURAE_TRI.equalsIgnoreCase(format) ||
+				 AOSignConstants.SIGN_FORMAT_FACTURAE_ALT1.equalsIgnoreCase(format)) {
+					prep = new FacturaETriPhasePreProcessor();
 		}
 		else {
 			LOGGER.severe("Formato de firma no soportado: " + format); //$NON-NLS-1$
@@ -302,13 +328,13 @@ public final class SignatureService extends HttpServlet {
 			return;
 		}
 
-		if (PARAM_VALUE_OPERATION_PRESIGN.equals(operation)) {
+		if (PARAM_VALUE_OPERATION_PRESIGN.equalsIgnoreCase(operation)) {
 
 			LOGGER.info(" == PREFIRMA en servidor"); //$NON-NLS-1$
 
 			try {
 				final byte[] preRes;
-				if (PARAM_VALUE_SUB_OPERATION_SIGN.equals(subOperation)) {
+				if (PARAM_VALUE_SUB_OPERATION_SIGN.equalsIgnoreCase(subOperation)) {
 					preRes = prep.preProcessPreSign(
 						docBytes,
 						algorithm,
@@ -316,7 +342,7 @@ public final class SignatureService extends HttpServlet {
 						extraParams
 					);
 				}
-				else if (PARAM_VALUE_SUB_OPERATION_COSIGN.equals(subOperation)) {
+				else if (PARAM_VALUE_SUB_OPERATION_COSIGN.equalsIgnoreCase(subOperation)) {
 					preRes = prep.preProcessPreCoSign(
 						docBytes,
 						algorithm,
@@ -324,7 +350,7 @@ public final class SignatureService extends HttpServlet {
 						extraParams
 					);
 				}
-				else if (PARAM_VALUE_SUB_OPERATION_COUNTERSIGN.equals(subOperation)) {
+				else if (PARAM_VALUE_SUB_OPERATION_COUNTERSIGN.equalsIgnoreCase(subOperation)) {
 
 					CounterSignTarget target = CounterSignTarget.LEAFS;
 					if (extraParams.containsKey(PARAM_NAME_TARGET_TYPE)) {
@@ -347,7 +373,7 @@ public final class SignatureService extends HttpServlet {
 					throw new AOException("No se reconoce el codigo de sub-operacion: " + subOperation); //$NON-NLS-1$
 				}
 
-				LOGGER.info(" Se calculado el resultado de la prefirma y se devuelve. Numero de bytes: " + preRes.length); //$NON-NLS-1$
+				LOGGER.info("Se ha calculado el resultado de la prefirma y se devuelve. Numero de bytes: " + preRes.length); //$NON-NLS-1$
 
 				out.print(
 					Base64.encode(
@@ -360,13 +386,12 @@ public final class SignatureService extends HttpServlet {
 			}
 			catch (final Exception e) {
 				LOGGER.severe("Error en la prefirma: " + e); //$NON-NLS-1$
-				e.printStackTrace();
 				out.print(ErrorManager.getErrorMessage(9) + ": " + e); //$NON-NLS-1$
 				out.close();
 				return;
 			}
 		}
-		else if (PARAM_VALUE_OPERATION_POSTSIGN.equals(operation)) {
+		else if (PARAM_VALUE_OPERATION_POSTSIGN.equalsIgnoreCase(operation)) {
 
 			LOGGER.info(" == POSTFIRMA en servidor"); //$NON-NLS-1$
 
@@ -417,7 +442,6 @@ public final class SignatureService extends HttpServlet {
 			catch (final Exception e) {
 				LOGGER.severe("Error en la postfirma: " + e); //$NON-NLS-1$
 				out.print(ErrorManager.getErrorMessage(12) + ": " + e); //$NON-NLS-1$
-				e.printStackTrace();
 				out.close();
 				return;
 			}
@@ -435,7 +459,6 @@ public final class SignatureService extends HttpServlet {
 			catch(final Throwable e) {
 				LOGGER.severe("Error al almacenar el documento: " + e); //$NON-NLS-1$
 				out.print(ErrorManager.getErrorMessage(10) + ": " + e); //$NON-NLS-1$
-				e.printStackTrace();
 				out.close();
 				return;
 			}

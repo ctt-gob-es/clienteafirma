@@ -6,8 +6,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.UnrecoverableEntryException;
 
-import javax.security.auth.callback.PasswordCallback;
-
 /** Gestor de claves del llavero de Apple OS X.
  * OS X necesita su propio gestor por la peculiaridades en la recuperaci&oacute;n de claves privadas
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
@@ -18,8 +16,7 @@ final class AppleKeyStoreManager extends AOKeyStoreManager {
 	}
 
 	@Override
-	public KeyStore.PrivateKeyEntry getKeyEntry(final String alias,
-			                                    final PasswordCallback pssCallback) throws KeyStoreException,
+	public KeyStore.PrivateKeyEntry getKeyEntry(final String alias) throws KeyStoreException,
 			                                    										   NoSuchAlgorithmException,
 			                                    										   UnrecoverableEntryException {
 		if (getKeyStore() == null) {

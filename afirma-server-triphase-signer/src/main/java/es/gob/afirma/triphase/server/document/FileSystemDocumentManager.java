@@ -47,11 +47,28 @@ public final class FileSystemDocumentManager implements DocumentManager {
 
 		final File file = new File(this.inDir, new String(Base64.decode(id)));
 
+		if( !isParent(new File(this.inDir), file ) ) {
+		    throw new IOException(
+	    		"Se ha pedido un fichero fuera del directorio configurado: " + file.getAbsolutePath() //$NON-NLS-1$
+    		);
+		}
+
 		LOGGER.info("Buscamos el fichero: " + file.getAbsolutePath()); //$NON-NLS-1$
 
+		if (!file.exists()) {
+			throw new IOException("No se puede cargar el documento, no existe"); //$NON-NLS-1$
+		}
 
-		if (!file.exists() || !file.isFile() || !file.canRead()) {
-			throw new IOException("No se puede cargar el documento"); //$NON-NLS-1$
+		if (!file.isFile()) {
+			throw new IOException(
+				"No se puede cargar el documento, el elmento existe, pero no es un fichero" //$NON-NLS-1$
+			);
+		}
+
+		if (!file.canRead()) {
+			throw new IOException(
+				"No se puede cargar el documento, no se tienen permisos de lectura sobre el" //$NON-NLS-1$
+			);
 		}
 
 		byte[] data;
@@ -68,7 +85,7 @@ public final class FileSystemDocumentManager implements DocumentManager {
 					fis.close();
 				}
 				catch (final IOException e2) {
-					LOGGER.warning("El fichero queda sin cerrar"); //$NON-NLS-1$
+					LOGGER.warning("El fichero queda sin cerrar: " + file.getAbsolutePath()); //$NON-NLS-1$
 				}
 			}
 			throw e;
@@ -90,9 +107,11 @@ public final class FileSystemDocumentManager implements DocumentManager {
 		final String format = prop.getProperty(FORMAT_PROPERTY);
 		if (AOSignConstants.SIGN_FORMAT_CADES.equalsIgnoreCase(format)) {
 			newId += ".csig";  //$NON-NLS-1$
-		} else if (AOSignConstants.SIGN_FORMAT_XADES.equalsIgnoreCase(format)) {
+		}
+		else if (AOSignConstants.SIGN_FORMAT_XADES.equalsIgnoreCase(format)) {
 			newId += ".xsig"; //$NON-NLS-1$
-		} else if (lastDotPos < initialId.length() - 1) {
+		}
+		else if (lastDotPos < initialId.length() - 1) {
 			newId += initialId.substring(lastDotPos);
 		}
 
@@ -114,7 +133,7 @@ public final class FileSystemDocumentManager implements DocumentManager {
 					fos.close();
 				}
 				catch (final IOException e2) {
-					LOGGER.warning("El fichero queda sin cerrar"); //$NON-NLS-1$
+					LOGGER.warning("El fichero queda sin cerrar: " + file.getAbsolutePath()); //$NON-NLS-1$
 				}
 			}
 			throw e;
@@ -124,5 +143,24 @@ public final class FileSystemDocumentManager implements DocumentManager {
 		return Base64.encode(newId.getBytes());
 	}
 
+	private static boolean isParent(final File p, final File file) {
+	    File f;
+	    final File parent;
+	    try {
+	        parent = p.getCanonicalFile();
+	        f = file.getCanonicalFile();
+	    }
+	    catch( final IOException e ) {
+	        return false;
+	    }
+
+	    while( f != null ) {
+	        if(parent.equals(f)) {
+	            return true;
+	        }
+	        f = f.getParentFile();
+	    }
+	    return false;
+	}
 
 }

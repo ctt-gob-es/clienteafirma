@@ -470,8 +470,7 @@ final class PanelRemitentes extends JAccessibilityDialogWizard {
         // Recuperamos la clave del certificado
         try {
             return keyStoreManager.getKeyEntry(
-        		seleccionado,
-        		kconf1.getType().getCertificatePasswordCallback(this)
+        		seleccionado
     		);
         }
         catch (final KeyStoreException e) {

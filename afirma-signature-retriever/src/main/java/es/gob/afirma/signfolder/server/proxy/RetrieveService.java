@@ -59,12 +59,12 @@ public final class RetrieveService extends HttpServlet {
 			out.println(ErrorManager.genError(ErrorManager.ERROR_MISSING_SYNTAX_VERSION, null));
 			return;
 		}
-		
+
 		final RetrieveConfig config;
 		try {
 			config = new RetrieveConfig();
 			config.load(CONFIG_FILE);
-		} 
+		}
 		catch (final IOException e) {
 			LOGGER.severe(ErrorManager.genError(ErrorManager.ERROR_CONFIGURATION_FILE_PROBLEM, null));
 			out.println(ErrorManager.genError(ErrorManager.ERROR_CONFIGURATION_FILE_PROBLEM, null));
@@ -73,7 +73,8 @@ public final class RetrieveService extends HttpServlet {
 
 		if (OPERATION_RETRIEVE.equalsIgnoreCase(operation)) {
 			retrieveSign(out, request, config);
-		} else {
+		}
+		else {
 			LOGGER.warning(ErrorManager.genError(ErrorManager.ERROR_UNSUPPORTED_OPERATION_NAME, null));
 			out.println(ErrorManager.genError(ErrorManager.ERROR_UNSUPPORTED_OPERATION_NAME, null));
 		}
@@ -81,12 +82,10 @@ public final class RetrieveService extends HttpServlet {
 		out.close();
 	}
 
-	/**
-	 * Recupera la firma del servidor.
+	/** Recupera la firma del servidor.
 	 * @param response Respuesta a la petici&oacute;n.
 	 * @param request Petici&oacute;n.
-	 * @throws IOException Cuando ocurre un error al general la respuesta.
-	 */
+	 * @throws IOException Cuando ocurre un error al general la respuesta. */
 	private static void retrieveSign(final PrintWriter out, final HttpServletRequest request, final RetrieveConfig config) throws IOException {
 
 		final String id = request.getParameter(PARAMETER_NAME_ID);
@@ -98,7 +97,6 @@ public final class RetrieveService extends HttpServlet {
 
 		LOGGER.info("Se solicita el fichero con el identificador: " + id); //$NON-NLS-1$
 
-		//final File inFile = new File(config.getTempDir(), request.getRemoteAddr().replace(":", "_") + "-" + id); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		final File inFile = new File(config.getTempDir(), id);
 
 		// No hacemos distincion si el archivo no existe, no es un fichero, no puede leerse o ha caducado
@@ -106,13 +104,16 @@ public final class RetrieveService extends HttpServlet {
 		if (!inFile.exists() || !inFile.isFile() || !inFile.canRead() || isExpired(inFile, config.getExpirationTime())) {
 
 			if (!inFile.exists()) {
-				LOGGER.warning("El fichero con el identificador '" + id + "' no existe"); //$NON-NLS-1$ //$NON-NLS-2$
-			} else if (!inFile.isFile()) {
-				LOGGER.warning("El archivo con el identificador '" + id + "' no es un fichero"); //$NON-NLS-1$ //$NON-NLS-2$
-			} else if (!inFile.canRead()) {
-				LOGGER.warning("El fichero con el identificador '" + id + "' no tiene permisos de lectura"); //$NON-NLS-1$ //$NON-NLS-2$
-			} else {
-				LOGGER.warning("El fichero con el identificador '" + id + "' esta caducado"); //$NON-NLS-1$ //$NON-NLS-2$
+				LOGGER.warning("El fichero con el identificador '" + id + "' no existe: " + inFile.getAbsolutePath()); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+			else if (!inFile.isFile()) {
+				LOGGER.warning("El archivo con el identificador '" + id + "' no es un fichero: " + inFile.getAbsolutePath()); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+			else if (!inFile.canRead()) {
+				LOGGER.warning("El fichero con el identificador '" + id + "' no tiene permisos de lectura: " + inFile.getAbsolutePath()); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+			else {
+				LOGGER.warning("El fichero con el identificador '" + id + "' esta caducado: " + inFile.getAbsolutePath()); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 
 			out.println(ErrorManager.genError(ErrorManager.ERROR_INVALID_DATA_ID, null));
@@ -153,7 +154,8 @@ public final class RetrieveService extends HttpServlet {
 						LOGGER.fine("Eliminamos el fichero caducado: " + file.getAbsolutePath()); //$NON-NLS-1$
 						file.delete();
 					}
-				} catch(final Exception e) {
+				}
+				catch(final Exception e) {
 					// Ignoramos cualquier error suponiendo que el fichero ha sido eliminado por otro hilo
 				}
 			}
@@ -167,13 +169,11 @@ public final class RetrieveService extends HttpServlet {
 	private static final int BUFFER_SIZE = 4096;
 
 	/** Lee un flujo de datos de entrada y los recupera en forma de array de
-     * bytes. Este m&eacute;todo consume pero no cierra el flujo de datos de
+     * octetos. Este m&eacute;todo consume pero no cierra el flujo de datos de
      * entrada.
-     * @param input
-     *        Flujo de donde se toman los datos.
+     * @param input Flujo de donde se toman los datos.
      * @return Los datos obtenidos del flujo.
-     * @throws IOException
-     *         Cuando ocurre un problema durante la lectura */
+     * @throws IOException Cuando ocurre un problema durante la lectura. */
     private static byte[] getDataFromInputStream(final InputStream input) throws IOException {
         if (input == null) {
             return new byte[0];

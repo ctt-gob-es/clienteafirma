@@ -35,7 +35,7 @@ public final class ASiCUtil {
 	 * @return Nombre por defecto del objeto de datos dentro de un contenedor ASiC-S. */
 	public static String getASiCSDefaultDataFilename(final byte[] data) {
 		final String extension = new MimeHelper(data).getExtension();
-		return "dataobject." + (extension != null && !"".equals(extension) ? extension : DEFAULT_DATAOBJECT_EXTENSION); //$NON-NLS-1$ //$NON-NLS-2$
+		return "dataobject." + (extension != null && !extension.isEmpty() ? extension : DEFAULT_DATAOBJECT_EXTENSION); //$NON-NLS-1$
 	}
 
 	/** Crea un contenedor ASiC-S.

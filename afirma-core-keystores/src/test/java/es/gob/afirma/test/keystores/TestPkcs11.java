@@ -47,7 +47,7 @@ public final class TestPkcs11 {
 		}
 
 		final Signature s = Signature.getInstance("SHA1withRSA"); //$NON-NLS-1$
-		s.initSign(ksm.getKeyEntry(al, AOKeyStore.PKCS11.getCertificatePasswordCallback(null)).getPrivateKey());
+		s.initSign(ksm.getKeyEntry(al).getPrivateKey());
 		s.update("Hola".getBytes()); //$NON-NLS-1$
 		System.out.println("Firma: " + new String(s.sign())); //$NON-NLS-1$
 

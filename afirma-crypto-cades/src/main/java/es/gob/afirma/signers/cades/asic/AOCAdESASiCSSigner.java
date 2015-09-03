@@ -111,7 +111,7 @@ public final class AOCAdESASiCSSigner implements AOSigner {
 		return new AOCAdESASiCSSigner().getSignInfo(ASiCUtil.getASiCSBinarySignature(signData));
 	}
 
-    /** Cofirma en formato CAdES los datos encontrador en un contenedor ASiC-S que ya tuviese una firma CAdES o CMS,
+    /** Cofirma en formato CAdES los datos encontrados en un contenedor ASiC-S que ya tuviese una firma CAdES o CMS,
      * a&ntilde;adiendo esta nueva firma a la del contenedor (se sustituye la antigua por la el nuevo fichero con todas las firmas).
      * No se pueden cofirmar con esta clase contenedores ASiC-S que ya contengan firmas XML.
      * <p>

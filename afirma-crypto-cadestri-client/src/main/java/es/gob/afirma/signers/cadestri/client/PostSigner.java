@@ -1,6 +1,5 @@
 package es.gob.afirma.signers.cadestri.client;
 
-import static es.gob.afirma.signers.cadestri.client.ProtocolConstants.CADES_FORMAT;
 import static es.gob.afirma.signers.cadestri.client.ProtocolConstants.HTTP_AND;
 import static es.gob.afirma.signers.cadestri.client.ProtocolConstants.HTTP_CGI;
 import static es.gob.afirma.signers.cadestri.client.ProtocolConstants.HTTP_EQUALS;
@@ -31,21 +30,23 @@ final class PostSigner {
 		// No instanciable
 	}
 
-	static byte[] postSign(final String algorithm,
-			             final Certificate[] certChain,
-			             final String cryptoOperation,
-			             final String documentId,
-			             final Properties extraParams,
-			             final boolean needData,
-			             final UrlHttpManager urlManager,
-			             final URL signServerUrl,
-			             final String preResultAsBase64) throws IOException, CertificateEncodingException {
+	static byte[] postSign(final String format,
+						   final String algorithm,
+						   final Certificate[] certChain,
+						   final String cryptoOperation,
+						   final String documentId,
+						   final Properties extraParams,
+						   final boolean needData,
+						   final UrlHttpManager urlManager,
+						   final URL signServerUrl,
+						   final String preResultAsBase64) throws IOException,
+						                                          CertificateEncodingException {
 
 		final StringBuffer urlBuffer = new StringBuffer();
 		urlBuffer.append(signServerUrl).append(HTTP_CGI).
 		append(PARAMETER_NAME_OPERATION).append(HTTP_EQUALS).append(OPERATION_POSTSIGN).append(HTTP_AND).
 		append(PARAMETER_NAME_CRYPTO_OPERATION).append(HTTP_EQUALS).append(cryptoOperation).append(HTTP_AND).
-		append(PARAMETER_NAME_FORMAT).append(HTTP_EQUALS).append(CADES_FORMAT).append(HTTP_AND).
+		append(PARAMETER_NAME_FORMAT).append(HTTP_EQUALS).append(format).append(HTTP_AND).
 		append(PARAMETER_NAME_ALGORITHM).append(HTTP_EQUALS).append(algorithm).append(HTTP_AND).
 		append(PARAMETER_NAME_CERT).append(HTTP_EQUALS).append(Base64.encode(certChain[0].getEncoded(), true));
 

@@ -71,10 +71,9 @@ public class TestKeyStoreWindowsCertACA {
 
         PrivateKeyEntry pke = null;
         try {
-        	 pke = ksm.getKeyEntry(
-        			ALIAS,
-        			null
-        			);
+        	pke = ksm.getKeyEntry(
+    			ALIAS
+			);
         }
         catch (final Exception e) {
         	e.printStackTrace();

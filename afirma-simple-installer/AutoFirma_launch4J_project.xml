@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch4jConfig>
+  <dontWrapJar>false</dontWrapJar>
+  <headerType>gui</headerType>
+  <jar>AutoFirma.jar</jar>
+  <outfile>AutoFirma.exe</outfile>
+  <errTitle>Error, por favor, actualice su versión de Java.</errTitle>
+  <cmdLine></cmdLine>
+  <chdir>.</chdir>
+  <priority>normal</priority>
+  <downloadUrl>http://java.com/download</downloadUrl>
+  <supportUrl></supportUrl>
+  <stayAlive>false</stayAlive>
+  <restartOnCrash>false</restartOnCrash>
+  <manifest></manifest>
+  <icon>ic_launcher.ico</icon>
+  <jre>
+    <path>./jre</path>
+    <bundledJre64Bit>false</bundledJre64Bit>
+    <bundledJreAsFallback>false</bundledJreAsFallback>
+    <minVersion>1.6.0</minVersion>
+    <maxVersion>1.8.0</maxVersion>
+    <jdkPreference>preferJre</jdkPreference>
+    <runtimeBits>64/32</runtimeBits>
+  </jre>
+  <splash>
+    <file>splash.bmp</file>
+    <waitForWindow>true</waitForWindow>
+    <timeout>60</timeout>
+    <timeoutErr>true</timeoutErr>
+  </splash>
+  <versionInfo>
+    <fileVersion>1.4.1.0</fileVersion>
+    <txtFileVersion>1.4.1</txtFileVersion>
+    <fileDescription>AutoFirma</fileDescription>
+    <copyright>Gobierno de España</copyright>
+    <productVersion>1.4.1.0</productVersion>
+    <txtProductVersion>1.4.1</txtProductVersion>
+    <productName>AutoFirma</productName>
+    <companyName>Gobierno de España</companyName>
+    <internalName>AutoFirma</internalName>
+    <originalFilename>AutoFirma.exe</originalFilename>
+  </versionInfo>
+  <messages>
+    <startupErr>Ocurrió un error mientras arrancaba la aplicación.</startupErr>
+    <bundledJreErr>Esta aplicación fue configurada para utilizar una versión embebida de Java Runtime Environment (JRE) pero el runtime no se encuentra o está corrupto.</bundledJreErr>
+    <jreVersionErr>La aplicación requiere un Java Runtime Environment (JRE)</jreVersionErr>
+    <launcherErr>El registro hace referencia a una instalación de Java Runtime Environment (JRE) que no existe o está corrupta.</launcherErr>
+    <instanceAlreadyExistsMsg>Ya se encuentra corriendo una instancia de esta aplicación.</instanceAlreadyExistsMsg>
+  </messages>
+</launch4jConfig>

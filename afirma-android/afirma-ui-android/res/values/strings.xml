@@ -17,7 +17,7 @@
     <string name="ca_not_found">No hay autoridades de certificaci\u00F3n configuradas.</string>
     <string name="title_activity_sign_data">Firma de datos</string>
     <string name="error_bad_params">No se ha realizado correctamente la invocaci\u00F3n de la aplicaci\u00F3n. Consulte a su proveedor de servicios.</string>
-    <string name="error_server_connect">Ocurri\u00F3 un error en la conexi\u00F3n entre la aplicaci\00F3n y la p\u00E1gina web.</string>
+    <string name="error_server_connect">Ocurri\u00F3 un error en la conexi\u00F3n entre la aplicaci\u00F3n y la p\u00E1gina web.</string>
     <string name="error_server_error">No se ha podido devolver el resultado de firma a la p\u00E1gina web</string>
     <string name="file_chooser_directorio_actual">Directorio actual:</string>
     <string name="file_chooser_directorio">Directorio</string>

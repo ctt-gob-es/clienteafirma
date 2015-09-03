@@ -50,10 +50,10 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
      *        a&uacute;n no v&aacute;lidos
      */
     public AOKeyStoreDialog(final AOKeyStoreManager ksm,
-    		final Object parentComponent,
-    		final boolean checkPrivateKeys,
-    		final boolean showExpiredCertificates,
-    		final boolean checkValidity) {
+    		                final Object parentComponent,
+    		                final boolean checkPrivateKeys,
+    		                final boolean showExpiredCertificates,
+    		                final boolean checkValidity) {
 
 		if (ksm == null) {
     		throw new IllegalArgumentException("El almacen de claves no puede ser nulo"); //$NON-NLS-1$
@@ -141,7 +141,7 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 			((AggregatedKeyStoreManager) this.ksm).removeAll();
 			((AggregatedKeyStoreManager) this.ksm).addKeyStoreManager((AOKeyStoreManager) ksm);
 		}
-		
+
 		this.ksm = ksm;
 	}
 
@@ -151,11 +151,7 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 		PrivateKeyEntry pke = null;
 		if (this.checkPrivateKeys) {
 			try {
-				pke = this.ksm.getKeyEntry(
-						alias,
-						this.ksm instanceof AOKeyStoreManager ?
-								((AOKeyStoreManager) this.ksm).getType().getCertificatePasswordCallback(this.parentComponent) :
-									null);
+				pke = this.ksm.getKeyEntry(alias);
 			}
 			catch (final Exception e) {
 				LOGGER.severe("No se ha podido extraer la clave del almacen: " + e); //$NON-NLS-1$

@@ -11,7 +11,6 @@ import java.util.Enumeration;
 import java.util.logging.Logger;
 
 import org.junit.Ignore;
-import org.junit.Test;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.Platform;
@@ -34,7 +33,6 @@ public final class SimpleTest {
     /** Prueba de la obtenci&oacute;n de almac&eacute;n y alias con Mozilla NSS.
      * @throws Exception En cualquier error. */
     @SuppressWarnings("static-method")
-    @Test
     @Ignore // Necesita NSS
     public void testKeyStoreManagerCreation() throws Exception {
     	final AOKeyStoreManager ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
@@ -51,8 +49,7 @@ public final class SimpleTest {
     	final Signature sig = Signature.getInstance("SHA512withRSA"); //$NON-NLS-1$
     	sig.initSign(
 			ksm.getKeyEntry(
-				aliases[0],
-				ksm.getType().getCertificatePasswordCallback(null)
+				aliases[0]
 			).getPrivateKey()
 		);
     	sig.update("Hola".getBytes()); //$NON-NLS-1$

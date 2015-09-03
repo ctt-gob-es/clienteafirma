@@ -68,6 +68,7 @@ import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.AOSignerFactory;
 import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.ui.AOUIFactory;
+import es.gob.afirma.core.util.tree.AOTreeUtil;
 import es.gob.afirma.crypto.jarverifier.JarSignatureCertExtractor;
 import es.gob.afirma.envelopers.cms.AOInvalidRecipientException;
 import es.gob.afirma.keystores.AOCertificatesNotFoundException;
@@ -1166,7 +1167,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 
 				// Mostramos el el arbol de firmas
 				try {
-					return AOUtil.showTreeAsString(signer.getSignersStructure(originalSign, false), null, null);
+					return AOTreeUtil.showTreeAsString(signer.getSignersStructure(originalSign, false), null, null);
 				}
 				catch (final Exception e) {
 					getLogger().severe("Arbol de firmas no valido: " + e); //$NON-NLS-1$

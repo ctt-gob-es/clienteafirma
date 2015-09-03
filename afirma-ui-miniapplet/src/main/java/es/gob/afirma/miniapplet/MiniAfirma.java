@@ -16,11 +16,11 @@ import java.security.PrivilegedActionException;
 import java.security.cert.CertificateEncodingException;
 
 import es.gob.afirma.core.AOException;
-import es.gob.afirma.miniapplet.ExtraParamsProcessor.IncompatiblePolicyException;
+import es.gob.afirma.core.signers.ExtraParamsProcessor.IncompatiblePolicyException;
 
 /** Contiene los puntos de entrada de las funcionalidades criptogr&aacute;ficas
- * del Mini-Applet del Cliente AFirma.
- * El Applet acepta como par&aacute;metros de entrada (desde el HTML):
+ * del MiniApplet del Cliente AFirma.
+ * El MiniApplet acepta como par&aacute;metros de entrada (desde el HTML en el momento de la carga):
  * <dl>
  *  <dt>keystore</dt>
  *  <dd>Indica el almac&eacute;n de claves y certificados que se debe usar, aceptando los siguientes valores:
@@ -39,7 +39,7 @@ import es.gob.afirma.miniapplet.ExtraParamsProcessor.IncompatiblePolicyException
  *   solicitan al usuario mediante di&aacute;logos gr&aacute;ficos
  *  </dd>
  * </dl>
- * @version 1.01 */
+ * @version 1.02 */
 interface MiniAfirma {
 
     /** Firma unos datos seg&uacute;n la configuracion proporcionada.
@@ -191,9 +191,9 @@ interface MiniAfirma {
      * @throws PrivilegedActionException Cuando ocurre un error de seguridad. */
     String getFileNameContentBase64(final String title, final String extensions, final String description, final String filePath) throws IOException, PrivilegedActionException;
 
-    /** Muestra un di&aacute;logo modal para la selecci&oacute;n de m&uacute;ltiples ficheros de los
-     * que se devolver&aacute; sus nombres y sus contenidos en Base64. El
-     * resultado devuelto es un array en el que cada elemento contiene, por cada fichero seleccionado,
+    /** Muestra un di&aacute;logo modal para la selecci&oacute;n de m&uacute;ltiples ficheros, de los
+     * que se devolver&aacute; sus nombres y sus contenidos en Base64.
+     * El resultado devuelto es un array en el que cada elemento contiene, por cada fichero seleccionado,
      * su nombre y su contenido (en Base64) separados por el car&aacute;cter '|'.
      * Si el usuario cancela la operaci&oacute;n de selecci&oacute;n
      * del fichero se devuelve {@code null}.
@@ -308,4 +308,140 @@ interface MiniAfirma {
 	/** Obtiene el registro (<i>log</i>), en formato XML, acumulado desde la carga inicial del Applet.
 	 * @return <i>log</i> en formato XML del Applet */
 	String getCurrentLog();
+
+	/** Procesa un lote de firmas, que se realizar&aacute;n siempre de forma tri&aacute;sica.
+	 * Los lotes deben proporcionase definidos en un fichero XML con el siguiente esquema XSD:
+	 * <pre>
+	 * &lt;xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema"&gt;
+  	 * &lt;xs:element name="signbatch"&gt;
+	 *     &lt;xs:complexType&gt;
+	 *       &lt;xs:sequence&gt;
+	 *         &lt;xs:element name="singlesign" maxOccurs="unbounded" minOccurs="1"&gt;
+	 *           &lt;xs:complexType&gt;
+	 *             &lt;xs:sequence&gt;
+	 *               &lt;xs:element type="xs:string" name="datasource"/&gt;
+	 *               &lt;xs:element name="format"&gt;
+	 *                 &lt;xs:simpleType&gt;
+	 *                   &lt;xs:restriction base="xs:string"&gt;
+	 *                     &lt;xs:enumeration value="XAdES"/&gt;
+	 *                     &lt;xs:enumeration value="CAdES"/&gt;
+	 *                     &lt;xs:enumeration value="PAdES"/&gt;
+	 *                   &lt;/xs:restriction&gt;
+	 *                 &lt;/xs:simpleType&gt;
+	 *               &lt;/xs:element&gt;
+	 *               &lt;xs:element name="suboperation"&gt;
+	 *                 &lt;xs:simpleType&gt;
+	 *                   &lt;xs:restriction base="xs:string"&gt;
+	 *                     &lt;xs:enumeration value="sign"/&gt;
+	 *                     &lt;xs:enumeration value="cosign"/&gt;
+	 *                   &lt;/xs:restriction&gt;
+	 *                 &lt;/xs:simpleType&gt;
+	 *               &lt;/xs:element&gt;
+	 *               &lt;xs:element name="extraparams"&gt;
+	 *                 &lt;xs:simpleType&gt;
+	 *                  &lt;xs:restriction  base="xs:base64Binary" /&gt;
+	 *                 &lt;/xs:simpleType&gt;
+	 *               &lt;/xs:element&gt;
+	 *               &lt;xs:element name="signsaver"&gt;
+	 *                 &lt;xs:complexType&gt;
+	 *                   &lt;xs:sequence&gt;
+	 *                     &lt;xs:element type="xs:string" name="class"/&gt;
+	 *                     &lt;xs:element name="config"&gt;
+	 *                       &lt;xs:simpleType&gt;
+	 *                         &lt;xs:restriction  base="xs:base64Binary" /&gt;
+	 *                       &lt;/xs:simpleType&gt;
+	 *                     &lt;/xs:element&gt;
+	 *                   &lt;/xs:sequence&gt;
+	 *                 &lt;/xs:complexType&gt;
+	 *               &lt;/xs:element&gt;
+	 *             &lt;/xs:sequence&gt;
+	 *             &lt;xs:attribute type="xs:string" name="id" use="required"/&gt;
+	 *           &lt;/xs:complexType&gt;
+	 *         &lt;/xs:element&gt;
+	 *       &lt;/xs:sequence&gt;
+	 *       &lt;xs:attribute type="xs:string" name="stoponerror" use="optional"/&gt;
+	 *       &lt;xs:attribute type="xs:string" name="algorithm" use="required"&gt;
+	 *         &lt;xs:simpleType&gt;
+	 *           &lt;xs:restriction base="xs:string"&gt;
+	 *             &lt;xs:enumeration value="SHA1withRSA"/&gt;
+	 *             &lt;xs:enumeration value="SHA256withRSA"/&gt;
+	 *             &lt;xs:enumeration value="SHA384withRSA"/&gt;
+	 *             &lt;xs:enumeration value="SHA512withRSA"/&gt;
+	 *           &lt;/xs:restriction&gt;
+	 *         &lt;/xs:simpleType&gt;
+	 *       &lt;xs:attribute&gt;
+	 *     &lt;/xs:complexType&gt;
+	 *   &lt;/xs:element&gt;
+	 * &lt;/xs:schema&gt;
+	 * </pre>
+	 * Un ejemplo de definici&oacute;n XML de lote de firmas podr&iacute;a ser
+	 * este (ejemplo con dos firmas en el lote):
+	 * <pre>
+	 * &lt;?xml version="1.0" encoding="UTF-8" ?&gt;
+	 * &lt;signbatch stoponerror="true" algorithm="SHA1withRSA"&gt;
+	 *  &lt;singlesign id="f8526f7b-d30a-4720-9e35-fe3494217944"&gt;
+	 *   &lt;datasource&gt;http://google.com&lt;/datasource&gt;
+	 *   &lt;format&gt;XAdES&lt;/format&gt;
+	 *   &lt;suboperation&gt;sign&lt;/suboperation&gt;
+	 *   &lt;extraparams&gt;Iw0KI1RodSBBdW[...]QNCg==&lt;/extraparams&gt;
+	 *   &lt;signsaver&gt;
+	 *    &lt;class&gt;es.gob.afirma.signers.batch.SignSaverFile&lt;/class&gt;
+	 *    &lt;config&gt;Iw0KI1RodSBBdWcgMT[...]wNCg==&lt;/config&gt;
+	 *   &lt;/signsaver&gt;
+	 *  &lt;/singlesign&gt;
+	 *  &lt;singlesign id="0e9cc5de-63ee-45ee-ae02-4a6591ab9a46"&gt;
+	 *   &lt;datasource&gt;SG9sYSBNdW5kbw==&lt;/datasource&gt;
+	 *   &lt;format&gt;CAdES&lt;/format&gt;
+	 *   &lt;suboperation&gt;sign&lt;/suboperation&gt;
+	 *   &lt;extraparams&gt;Iw0KI1RodSBBdWc[...]NCg==&lt;/extraparams&gt;
+	 *   &lt;signsaver&gt;
+	 *    &lt;class&gt;es.gob.afirma.signers.batch.SignSaverFile&lt;/class&gt;
+	 *    &lt;config&gt;Iw0KI1RodSBBdWcgMTM[...]Cg==&lt;/config&gt;
+	 *   &lt;/signsaver&gt;
+	 *  &lt;/singlesign&gt;
+	 * &lt;/signbatch&gt;
+	 * </pre>
+	 * @param batchB64 XML de definici&oacute;n del lote de firmas.
+	 * @param batchPresignerUrl URL del servicio remoto de preproceso de lotes de firma.
+	 * @param batchPostSignerUrl URL del servicio remoto de postproceso de lotes de firma.
+	 * @param extraParams Par&aacute;metros adicionales para es establecimiento de filtros de
+	 *                    certificados (se ignorar&aacute;n todos los par&aacute;metros
+	 *                    proporcionados que no est&eacute;n relacionados con los filtros).
+	 * @return Registro del resultado general del proceso por lote, en un XML con este esquema:
+	 * <pre>
+	 * &lt;xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema"&gt;
+	 *  &lt;xs:element name="signs"&gt;
+	 *    &lt;xs:complexType&gt;
+	 *      &lt;xs:sequence&gt;
+	 *        &lt;xs:element name="sign" maxOccurs="unbounded" minOccurs="1"&gt;
+	 *          &lt;xs:complexType&gt;
+	 *            &lt;xs:sequence&gt;
+	 *              &lt;xs:element name="result"&gt;
+	 *                &lt;xs:simpleType&gt;
+	 *                  &lt;xs:restriction base="xs:string"&gt;
+	 *                    &lt;xs:enumeration value="OK"/&gt;
+	 *                    &lt;xs:enumeration value="KO"/&gt;
+	 *                    &lt;xs:enumeration value="NP"/&gt;
+	 *                  &lt;/xs:restriction&gt;
+	 *                &lt;/xs:simpleType&gt;
+	 *              &lt;/xs:element&gt;
+	 *              &lt;xs:element type="xs:string" name="reason" minOccurs="0"/&gt;
+	 *            &lt;/xs:sequence&gt;
+	 *            &lt;xs:attribute type="xs:string" name="id" use="required"/&gt;
+	 *          &lt;/xs:complexType&gt;
+	 *        &lt;/xs:element&gt;
+	 *      &lt;/xs:sequence&gt;
+	 *    &lt;/xs:complexType&gt;
+	 *  &lt;/xs:element&gt;
+	 * &lt;/xs:schema&gt;
+	 * </pre>
+	 * @throws IOException Si hay problemas de tratamiento de datos o de conectividad de red.
+	 * @throws AOException En cualquier otro error.
+	 * @throws PrivilegedActionException Cuando ocurre un error de seguridad, t&iacute;picamente en
+	 *                                   la obtenci&oacute;n de la clave y el certificado de firma. */
+	String signBatch(final String batchB64,
+                     final String batchPresignerUrl,
+                     final String batchPostSignerUrl,
+                     final String extraParams) throws IOException, AOException,
+                                                                   PrivilegedActionException;
 }

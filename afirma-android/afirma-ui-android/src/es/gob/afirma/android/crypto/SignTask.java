@@ -8,9 +8,9 @@ import java.util.Properties;
 import android.content.ActivityNotFoundException;
 import android.os.AsyncTask;
 import android.util.Log;
-import es.gob.afirma.android.network.UriParser;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOUnsupportedSignFormatException;
+import es.gob.afirma.core.misc.protocol.UrlParametersToSign.Operation;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.AOSignerFactory;
@@ -33,8 +33,8 @@ public class SignTask extends AsyncTask<Void, Void, byte[]>{
 	private static final String COUNTERSIGN_TARGET_TREE = "tree"; //$NON-NLS-1$
 
 	private static final String SIGN_FORMAT_AUTO = "AUTO"; //$NON-NLS-1$
-	
-	private final int op;
+
+	private final Operation op;
 	private final byte[] data;
 	private final String format;
 	private final String algorithm;
@@ -52,9 +52,8 @@ public class SignTask extends AsyncTask<Void, Void, byte[]>{
 	 * @param algorithm Algoritmo de firma.
 	 * @param pke Clave privada para la firma.
 	 * @param extraParams Par&aacute;metros adicionales para la configuraci&oacute;n de la firma.
-	 * @param signListener Manejador para el tratamiento del resultado de la firma.
-	 * @param ctx Contexto Android para el uso de Google Analytics */
-	public SignTask(final int op,
+	 * @param signListener Manejador para el tratamiento del resultado de la firma. */
+	public SignTask(final Operation op,
 			        final byte[] data,
 			        final String format,
 			        final String algorithm,
@@ -77,7 +76,9 @@ public class SignTask extends AsyncTask<Void, Void, byte[]>{
 		// Obtenemos el manejador de firma apropiado
 		final AOSigner signer = getSupportedCompatibleSigner(this.format, this.op, this.data);
 		if (signer == null) {
-			this.t = new AOUnsupportedSignFormatException("No se ha indicado un formato de firma soportado o el fichero indicado no se reconoce como fichero de firma"); //$NON-NLS-1$
+			this.t = new AOUnsupportedSignFormatException(
+				"No se ha indicado un formato de firma soportado o el fichero indicado no se reconoce como fichero de firma" //$NON-NLS-1$
+			);
 			return null;
 		}
 
@@ -87,7 +88,7 @@ public class SignTask extends AsyncTask<Void, Void, byte[]>{
 			// Ejecutamos la operacion pertinente. Si no se indico nada, por defecto, el metodo
 			// que devuelve la operacion indica que es firma
 			switch (this.op) {
-			case UriParser.OP_SIGN:
+			case SIGN:
 				sign = signer.sign(
 						this.data,
 						this.algorithm,
@@ -96,7 +97,7 @@ public class SignTask extends AsyncTask<Void, Void, byte[]>{
 						this.extraParams
 						);
 				break;
-			case UriParser.OP_COSIGN:
+			case COSIGN:
 				sign = signer.cosign(
 						this.data,
 						this.algorithm,
@@ -105,7 +106,7 @@ public class SignTask extends AsyncTask<Void, Void, byte[]>{
 						this.extraParams
 						);
 				break;
-			default:
+			case COUNTERSIGN:
 				CounterSignTarget target = CounterSignTarget.LEAFS;
 				if (this.extraParams.containsKey(COUNTERSIGN_TARGET_KEY)) {
 					final String targetValue = this.extraParams.getProperty(COUNTERSIGN_TARGET_KEY).trim();
@@ -115,14 +116,17 @@ public class SignTask extends AsyncTask<Void, Void, byte[]>{
 				}
 
 				sign = signer.countersign(
-						this.data,
-						this.algorithm,
-						target,
-						null,
-						this.pke.getPrivateKey(),
-						this.pke.getCertificateChain(),
-						this.extraParams
-						);
+					this.data,
+					this.algorithm,
+					target,
+					null,
+					this.pke.getPrivateKey(),
+					this.pke.getCertificateChain(),
+					this.extraParams
+				);
+				break;
+			default:
+				throw new IllegalStateException("Tipo de operacion de firma no soportado: " + this.op); //$NON-NLS-1$
 			}
 		}
 		catch (final AOException e) {
@@ -146,30 +150,24 @@ public class SignTask extends AsyncTask<Void, Void, byte[]>{
 		return sign;
 	}
 
-	private static AOSigner getSupportedCompatibleSigner(final String format, final int operation, final byte[] signature) {
+	private static AOSigner getSupportedCompatibleSigner(final String format, final Operation operation, final byte[] signature) {
 
-		
-		AOSigner signer;
-		
 		// La firma XAdES monofasica no esta soportada en Android, asi que pasamos a firma XAdES trifasica
 		if (format.toLowerCase(Locale.ENGLISH).startsWith(AOSignConstants.SIGN_FORMAT_XADES.toLowerCase(Locale.ENGLISH))) {
-			signer = AOSignerFactory.getSigner(AOSignConstants.SIGN_FORMAT_XADES_TRI);
+			return AOSignerFactory.getSigner(AOSignConstants.SIGN_FORMAT_XADES_TRI);
 		}
 		// Si se indica el formato AUTO, intentaremos identificar el formato de la firma
-		else if (format.equalsIgnoreCase(SIGN_FORMAT_AUTO) && (operation == UriParser.OP_COSIGN || operation == UriParser.OP_COUNTERSIGN)) {
+		else if (format.equalsIgnoreCase(SIGN_FORMAT_AUTO) && (Operation.COSIGN.equals(operation) || Operation.COUNTERSIGN.equals(operation))) {
 			try {
-				signer = AOSignerFactory.getSigner(signature);
-			} catch (IOException e) {
-				Log.e(ES_GOB_AFIRMA, "No se ha podido identificar el formato de la firma, asi que se devolvera un manejador nulo"); //$NON-NLS-1$
-				signer = null;
+				return AOSignerFactory.getSigner(signature);
+			}
+			catch (final IOException e) {
+				Log.e(ES_GOB_AFIRMA, "No se ha podido identificar el formato de la firma, se devolvera un manejador nulo: " + e); //$NON-NLS-1$
+				return null;
 			}
 		}
 		// En cualquier otro caso obtenemos el manejador del formato indicado
-		else {
-			signer = AOSignerFactory.getSigner(format);
-		}
-		
-		return signer;
+		return AOSignerFactory.getSigner(format);
 	}
 
 	@Override
@@ -183,22 +181,16 @@ public class SignTask extends AsyncTask<Void, Void, byte[]>{
 		}
 	}
 
-	/**
-	 * Interfaz que debe implementar el manejador del resultado de la operaci&oacute;n de firma.
-	 * @author Carlos Gamuci
-	 */
+	/** Interfaz que debe implementar el manejador del resultado de la operaci&oacute;n de firma.
+	 * @author Carlos Gamuci. */
 	public interface SignListener {
 
-		/**
-		 * Gestiona el resultado de la operaci&oacute;n de firma cuando termina correctamente.
-		 * @param signature Firma/cofirma/contrafirma generada.
-		 */
-		public void onSignSuccess(byte[] signature);
+		/** Gestiona el resultado de la operaci&oacute;n de firma cuando termina correctamente.
+		 * @param signature Firma/cofirma/contrafirma generada. */
+		void onSignSuccess(byte[] signature);
 
-		/**
-		 * Gestiona un error en la operaci&oacute;n de firma.
-		 * @param t Excepcion o error lanzada en la operaci&oacute;n de firma.
-		 */
-		public void onSignError(Throwable t);
+		/** Gestiona un error en la operaci&oacute;n de firma.
+		 * @param t Excepcion o error lanzada en la operaci&oacute;n de firma. */
+		void onSignError(Throwable t);
 	}
 }

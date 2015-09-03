@@ -3,14 +3,16 @@ package es.gob.afirma.keystores;
 import java.io.IOException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableEntryException;
+import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.security.auth.callback.PasswordCallback;
+import es.gob.afirma.core.misc.AOUtil;
 
 /** Gestor de claves consistente a su vez en un agregado de varios gestores, que se tratan y manejan como
  * si fuese un gestor normal de un &uacute;nico almac&eacute;n.
@@ -36,6 +38,42 @@ public class AggregatedKeyStoreManager extends AOKeyStoreManager {
 	 * @param ksm Gestor de claves principal */
 	public final void addKeyStoreManager(final AOKeyStoreManager ksm) {
 		if (ksm != null) {
+			// Si es preferente hay que eliminar antes de anadir los posibles duplicados que hubiese
+			if (ksm.isPreferred()) {
+				final String[] newAliases = ksm.getAliases();
+				MessageDigest md = null;
+				try {
+					md = MessageDigest.getInstance("SHA1"); //$NON-NLS-1$
+				}
+				catch (final NoSuchAlgorithmException e) {
+					LOGGER.severe(
+						"No se ha podido instanciar el generador de huellas digitales SHA1, pueden aparecer duplicados en la lista de certificados: " + e //$NON-NLS-1$
+					);
+				}
+				if (md != null) {
+					for (final String alias : newAliases) {
+						final String currentThumbprint;
+						try {
+							currentThumbprint = AOUtil.hexify(
+								md.digest(ksm.getCertificate(alias).getEncoded()),
+								false
+							);
+						}
+						catch (final CertificateEncodingException e) {
+							LOGGER.severe(
+								"No se ha obtener la huela del certificado '" + alias + "', pueden aparecer duplicados en la lista de certificados: " + e //$NON-NLS-1$ //$NON-NLS-2$
+							);
+							continue;
+						}
+						LOGGER.info(
+							"El certificado de huella '" + currentThumbprint + "' se tomara unicamente del almacen preferente" //$NON-NLS-1$ //$NON-NLS-2$
+						);
+						for (final AOKeyStoreManager currentKsm : this.ksms) {
+							currentKsm.deactivateEntry(currentThumbprint);
+						}
+					}
+				}
+			}
 			this.ksms.add(ksm);
 		}
 	}
@@ -63,13 +101,12 @@ public class AggregatedKeyStoreManager extends AOKeyStoreManager {
 	}
 
 	@Override
-	public KeyStore.PrivateKeyEntry getKeyEntry(final String alias,
-			                                    final PasswordCallback pssCallback) throws KeyStoreException,
-                                                                                           NoSuchAlgorithmException,
-                                                                                           UnrecoverableEntryException {
+	public KeyStore.PrivateKeyEntry getKeyEntry(final String alias) throws KeyStoreException,
+                                                                           NoSuchAlgorithmException,
+                                                                           UnrecoverableEntryException {
 		for (final AOKeyStoreManager ksm : this.ksms) {
 			if (Arrays.asList(ksm.getAliases()).contains(alias)) {
-				return ksm.getKeyEntry(alias, pssCallback);
+				return ksm.getKeyEntry(alias);
 			}
 		}
 		LOGGER.warning(

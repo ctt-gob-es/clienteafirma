@@ -13,6 +13,11 @@ import javax.security.auth.callback.PasswordCallback;
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public interface KeyStoreManager {
 
+	/** Desactiva una entrada del almace&eacute;n. A partir de su desactivaci&oacute;n no se incluir&aacute; su alias en
+	 * <code>getAliases()</code>.
+	 * @param certificateThumbprint Huella digital SHA1 del certificado cuya entrada se desea deactivar. */
+	void deactivateEntry(final String certificateThumbprint);
+
 	/** Indica si el certificado contiene clave privada.
 	 * @param alias Alias del certificado.
 	 * @return <code>true</code> si el certificado contiene clave privada, <code>false</code> en caso contrario.
@@ -51,13 +56,24 @@ public interface KeyStoreManager {
      * @throws es.gob.afirma.core.AOCancelledOperationException
      * 		   Cuando el usuario cancela el proceso antes de que finalice
      */
-    KeyStore.PrivateKeyEntry getKeyEntry(String alias,
-             PasswordCallback pssCallback) throws KeyStoreException,
-                                                  NoSuchAlgorithmException,
-                                                  UnrecoverableEntryException;
+    KeyStore.PrivateKeyEntry getKeyEntry(String alias) throws KeyStoreException,
+                                                              NoSuchAlgorithmException,
+                                                              UnrecoverableEntryException;
 
 	/** Refresca los certificados del almac&eacute;n actual.
 	 * @throws IOException En caso de errores de entrada / salida */
 	void refresh() throws IOException;
+
+	/** Establece el <code>PasswordCallback</code> a usar para la obtenci&oacute;n de
+	 * entradas concretas (claves privadas).
+	 * @param pwc <code>PasswordCallback</code> a usar para la obtenci&oacute;n de
+	 *            entradas concretas (claves privadas). */
+	void setEntryPasswordCallBack(PasswordCallback pwc);
+
+	/** Establece el componente padre para la modalidad de los di&aacute;logos gr&aacute;ficos
+	 * si los hubiese.
+	 * @param parent Componente padre para la modalidad de los di&aacute;logos gr&aacute;ficos
+	 *               (t&iacute;picamente un <code>java.awt.Component</code>). */
+	void setParentComponent(Object parent);
 
 }

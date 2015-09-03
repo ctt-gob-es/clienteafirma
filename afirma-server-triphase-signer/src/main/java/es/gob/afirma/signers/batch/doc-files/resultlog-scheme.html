@@ -1,0 +1,61 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"> 
+<html>
+ <head>
+  <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+  <title>
+   Esquema del XML de resumen de resultado de la ejecuci&oacute;n de un lote de firmas
+  </title>
+ </head>
+ <body>
+  <p>
+   Cuando se termina de procesar un lote de firma, el cliente recibe como respuesta un XML que describe 
+   como ha resultado el proceso.<br>
+   Este XML es acorde al siguiente esquema:
+  </p>
+  <pre>
+  &lt;xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema"&gt;
+  &lt;xs:element name="signs"&gt;
+    &lt;xs:complexType&gt;
+      &lt;xs:sequence&gt;
+        &lt;xs:element name="signresult" maxOccurs="unbounded" minOccurs="0"&gt;
+          &lt;xs:complexType&gt;
+            &lt;xs:simpleContent&gt;
+              &lt;xs:extension base="xs:string"&gt;
+                &lt;xs:attribute type="xs:string" name="id" use="optional"/&gt;
+                &lt;xs:attribute type="xs:string" name="result" use="optional"/&gt;
+                &lt;xs:attribute type="xs:string" name="description" use="optional"/&gt;
+              &lt;/xs:extension&gt;
+            &lt;/xs:simpleContent&gt;
+          &lt;/xs:complexType&gt;
+        &lt;/xs:element&gt;
+      &lt;/xs:sequence&gt;
+    &lt;/xs:complexType&gt;
+  &lt;/xs:element&gt;
+  </pre>
+  <p>
+   Un ejemplo de XML devuelto podr&iacute;a ser el siguiente:
+  </p>
+  <pre>
+  &lt;?xml version="1.0" encoding="UTF-8" ?&gt;
+  &lt;signs&gt;
+   &lt;signresult id="001-XAdES" result="DONE_AND_SAVED" description=""/&gt;
+   &lt;signresult id="002-CAdES" result="DONE_AND_SAVED" description=""/&gt;
+   &lt;signresult id="003-CAdES" result="DONE_AND_SAVED" description=""/&gt;
+   &lt;signresult id="004-CAdES" result="DONE_AND_SAVED" description=""/&gt;
+  &lt;/signs&gt;
+  </pre>
+  <p>
+   En &eacute;l distinguimos un nodo <code>signresult</code> por cada una de las firmas del lote, 
+   con su correspondiente identificador.<br>
+   Este puede tener tres atributos:
+  </p>
+  <dl>
+   <dt><code>id</code></dt>
+    <dd>Identificador de la firma.</dd>
+   <dt><code>result</code></dt>
+    <dd>Resultado del proceso.</dd>
+   <dt><code>description</code> (opcional)</dt>
+    <dd>Descripción del resultado del proceso.</dd>
+  </dl>
+ </body>
+</html>

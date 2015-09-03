@@ -127,7 +127,8 @@ final class SelectPrivateKeyAction implements PrivilegedExceptionAction<PrivateK
 				);
 		dialog.show();
 
-		return ksm.getKeyEntry(dialog.getSelectedAlias(), this.keyStore.getCertificatePasswordCallback(this.parent));
+		ksm.setParentComponent(this.parent);
+		return ksm.getKeyEntry(dialog.getSelectedAlias());
 	}
 
 

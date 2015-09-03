@@ -24,4 +24,9 @@ public final class CachePasswordCallback extends PasswordCallback {
         super(">", false); //$NON-NLS-1$
         this.setPassword(password);
     }
+
+    @Override
+	public String toString() {
+    	return "PasswordCallback con contrasena '" + new String(getPassword()) + "'"; //$NON-NLS-1$ //$NON-NLS-2$
+    }
 }

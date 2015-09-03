@@ -66,8 +66,7 @@ public class CertificateManagerDialog {
 		this.selectedAlias = dialog.getSelectedAlias();
 
 		return ksm.getKeyEntry(
-			this.selectedAlias,
-			ksm.getType().getCertificatePasswordCallback(parentComponent)
+			this.selectedAlias
 		);
 	}
 

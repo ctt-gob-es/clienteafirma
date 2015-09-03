@@ -26,7 +26,6 @@ import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.keystores.AOKeyStore;
 import es.gob.afirma.keystores.AOKeyStoreManager;
 import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
-import es.gob.afirma.keystores.callbacks.CachePasswordCallback;
 
 /** Pruebas espec&iacute;ficas para los almacenes de Mac OS X.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
@@ -65,8 +64,7 @@ public class TestMacKeyChain {
         Assert.assertNotNull(aliases);
 
         final PrivateKeyEntry pke = ksm.getKeyEntry(
-    		"anf usuario activo", //$NON-NLS-1$
-    		AOKeyStore.APPLE.getCertificatePasswordCallback(null)
+    		"anf usuario activo" //$NON-NLS-1$
 		);
         Assert.assertNotNull(pke);
 
@@ -99,7 +97,7 @@ public class TestMacKeyChain {
         final String[] aliases = ksm.getAliases();
         Assert.assertNotNull(aliases);
 
-        final PrivateKeyEntry pke = ksm.getKeyEntry("anf usuario activo", new CachePasswordCallback("dummy".toCharArray())); //$NON-NLS-1$ //$NON-NLS-2$
+        final PrivateKeyEntry pke = ksm.getKeyEntry("anf usuario activo"); //$NON-NLS-1$
         Assert.assertNotNull(pke);
 
         final X509Certificate cert = (X509Certificate) pke.getCertificate();

@@ -20,8 +20,8 @@ import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.keystores.AOKeyStore;
 import es.gob.afirma.keystores.AOKeyStoreManager;
 import es.gob.afirma.keystores.AOKeyStoreManagerException;
-import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
 import es.gob.afirma.keystores.AggregatedKeyStoreManager;
+import es.gob.afirma.keystores.KeyStoreUtilities;
 import es.gob.afirma.keystores.callbacks.UIPasswordCallback;
 
 /** Representa a un <i>AOKeyStoreManager</i> para acceso a almacenes de claves de Firefox accedidos
@@ -111,44 +111,7 @@ public final class MozillaUnifiedKeyStoreManager extends AggregatedKeyStoreManag
 			LOGGER.info("El almacen externo '" + descr + "' ha podido inicializarse, se anadiran sus entradas"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
-		// Anadimos el controlador Java del DNIe SIEMPRE a menos que se indique "es.gob.afirma.keystores.mozilla.disableDnieNativeDriver=true"
-		if (!Boolean.getBoolean("es.gob.afirma.keystores.mozilla.disableDnieNativeDriver")) { //$NON-NLS-1$
-			try {
-				final AOKeyStoreManager tmpKsm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
-					AOKeyStore.DNIEJAVA,
-					null,
-					null,
-					null,
-					parentComponent
-				);
-				LOGGER.info("El DNIe 100% Java ha podido inicializarse, se anadiran sus entradas"); //$NON-NLS-1$
-				addKeyStoreManager(tmpKsm);
-			}
-			catch (final AOCancelledOperationException ex) {
-				LOGGER.warning("Se cancelo el acceso al almacen DNIe 100% Java: " + ex); //$NON-NLS-1$
-			}
-			catch (final Exception ex) {
-				LOGGER.warning("No se ha podido inicializar el controlador DNIe 100% Java: " + ex); //$NON-NLS-1$
-			}
-		}
-
-		// Anadimos el controlador Java de CERES SIEMPRE a menos que se indique "es.gob.afirma.keystores.mozilla.disableCeresNativeDriver=true"
-		if (!Boolean.getBoolean("es.gob.afirma.keystores.mozilla.disableCeresNativeDriver")) { //$NON-NLS-1$
-			try {
-				final AOKeyStoreManager tmpKsm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
-					AOKeyStore.CERES, // Store
-					null,             // Lib (null)
-					null,             // Description (null)
-					null,             // PasswordCallback (no hay en la carga, hay en la firma
-					parentComponent   // Parent
-				);
-				LOGGER.info("La tarjeta CERES ha podido inicializarse, se anadiran sus entradas"); //$NON-NLS-1$
-				addKeyStoreManager(tmpKsm);
-			}
-			catch (final Exception ex) {
-				LOGGER.warning("No se ha podido inicializar la tarjeta CERES: " + ex); //$NON-NLS-1$
-			}
-		}
+		KeyStoreUtilities.addPreferredKeyStoreManagers(this, parentComponent);
 
 		if (lacksKeyStores()) {
 			LOGGER.warning("No se ha podido inicializar ningun almacen, interno o externo, de Firefox"); //$NON-NLS-1$

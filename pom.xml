@@ -18,6 +18,7 @@
 	<modules>
 		<module>afirma-core</module>
 		<module>afirma-core-keystores</module>
+		<module>afirma-crypto-batch-client</module>
 		<module>afirma-crypto-cadestri-client</module>
 		<module>afirma-crypto-cipher</module>
 		<module>afirma-crypto-core-pkcs7</module>

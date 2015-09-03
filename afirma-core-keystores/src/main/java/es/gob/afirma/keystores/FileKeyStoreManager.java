@@ -17,6 +17,7 @@ import es.gob.afirma.keystores.callbacks.NullPasswordCallback;
 
 abstract class FileKeyStoreManager extends AOKeyStoreManager {
 
+	/** Contiene una copia de la contrase&ntilde;a que se uso para inicializar el almac&eacute;n. */
 	private PasswordCallback cachePasswordCallback;
 
 	/** Inicializa un almac&eacute;n de claves y certificados de tipo fichero.
@@ -82,18 +83,21 @@ abstract class FileKeyStoreManager extends AOKeyStoreManager {
      * @throws UnrecoverableEntryException Si la contrase&ntilde;a proporcionada no es v&aacute;lida para obtener la clave privada
      * @throws es.gob.afirma.core.AOCancelledOperationException Cuando el usuario cancela el proceso antes de que finalice */
     @Override
-	public KeyStore.PrivateKeyEntry getKeyEntry(final String alias,
-    		                                    final PasswordCallback pssCallback) throws KeyStoreException,
-    		                                                                               NoSuchAlgorithmException,
-    		                                                                               UnrecoverableEntryException {
+	public KeyStore.PrivateKeyEntry getKeyEntry(final String alias) throws KeyStoreException,
+    		                                                               NoSuchAlgorithmException,
+    		                                                               UnrecoverableEntryException {
         if (lacksKeyStores()) {
             throw new IllegalStateException("Se han pedido claves a un almacen no inicializado"); //$NON-NLS-1$
         }
 
+        // Hacemos una copia del EntryPasswordCallback para usarla si fallan los primeros intentos
+        final PasswordCallback originalPwc = getEntryPasswordCallBack();
+
         // Primero probamos si la contrasena de la clave es la misma que la del almacen
+        setEntryPasswordCallBack(this.cachePasswordCallback);
         try {
         	return super.getKeyEntry(
-    			alias, this.cachePasswordCallback
+    			alias
 			);
         }
         catch(final Exception e) {
@@ -101,9 +105,10 @@ abstract class FileKeyStoreManager extends AOKeyStoreManager {
         }
 
         // Luego probamos con null
+        setEntryPasswordCallBack(NullPasswordCallback.getInstance());
         try {
         	return super.getKeyEntry(
-    			alias, NullPasswordCallback.getInstance()
+    			alias
 			);
         }
         catch(final Exception e) {
@@ -111,8 +116,9 @@ abstract class FileKeyStoreManager extends AOKeyStoreManager {
         }
 
         // Finalmente pedimos la contrasena
+        setEntryPasswordCallBack(originalPwc);
         return super.getKeyEntry(
-    		alias, pssCallback
+    		alias
 		);
     }
 

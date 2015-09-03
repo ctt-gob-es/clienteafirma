@@ -26,15 +26,17 @@ import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.http.UrlHttpManager;
 import es.gob.afirma.core.misc.http.UrlHttpManagerFactory;
 import es.gob.afirma.core.signers.AOPkcs1Signer;
+import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSignInfo;
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.signers.TriphaseData;
+import es.gob.afirma.core.signers.TriphaseDataSigner;
 import es.gob.afirma.core.util.tree.AOTreeModel;
 
 /** Firmador CAdES en tres fases.
  * @author Tom&acute;s Garc&iacute;a-Mer&aacute;s */
-public final class AOCAdESTriPhaseSigner implements AOSigner {
+public class AOCAdESTriPhaseSigner implements AOSigner {
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
@@ -52,23 +54,26 @@ public final class AOCAdESTriPhaseSigner implements AOSigner {
 	/** Nombre de la propiedad con los nodos objetivo para la contrafirma. */
 	private static final String PROPERTY_NAME_CS_TARGET = "target"; //$NON-NLS-1$
 
-	/** Etiqueta de cada prefirma en el XML de sesi&oacute;n trif&aacute;sica. */
-	private static final String PROPERTY_NAME_PRESIGN = "PRE"; //$NON-NLS-1$
-
-	/** Etiqueta de cada firma PKCS#1 en el XML de sesi&oacute;n trif&aacute;sica. */
-	private static final String PROPERTY_NAME_PKCS1_SIGN = "PK1"; //$NON-NLS-1$
-
 	/** Indicador de finalizaci&oacute;n correcta de proceso. */
 	private static final String SUCCESS = "OK"; //$NON-NLS-1$
 
 
 	@Override
 	public byte[] sign(final byte[] data,
-			final String algorithm,
-			final PrivateKey key,
-			final Certificate[] certChain,
-			final Properties extraParams) throws AOException, IOException {
-		return triPhaseOperation(CRYPTO_OPERATION_SIGN, data, algorithm, key, certChain, extraParams);
+			           final String algorithm,
+			           final PrivateKey key,
+			           final Certificate[] certChain,
+			           final Properties extraParams) throws AOException,
+			                                                IOException {
+		return triPhaseOperation(
+			AOSignConstants.SIGN_FORMAT_CADES,
+			CRYPTO_OPERATION_SIGN,
+			data,
+			algorithm,
+			key,
+			certChain,
+			extraParams
+		);
 	}
 
 	@Override
@@ -83,12 +88,20 @@ public final class AOCAdESTriPhaseSigner implements AOSigner {
 
 	@Override
 	public byte[] cosign(final byte[] sign,
-			final String algorithm,
-			final PrivateKey key,
-			final Certificate[] certChain,
-			final Properties extraParams)
-					throws AOException, IOException {
-		return triPhaseOperation(CRYPTO_OPERATION_COSIGN, sign, algorithm, key, certChain, extraParams);
+			             final String algorithm,
+			             final PrivateKey key,
+			             final Certificate[] certChain,
+			             final Properties extraParams) throws AOException,
+			                                                  IOException {
+		return triPhaseOperation(
+			AOSignConstants.SIGN_FORMAT_CADES,
+			CRYPTO_OPERATION_COSIGN,
+			sign,
+			algorithm,
+			key,
+			certChain,
+			extraParams
+		);
 	}
 
 	@Override
@@ -112,7 +125,15 @@ public final class AOCAdESTriPhaseSigner implements AOSigner {
 
 		extraParams.setProperty(PROPERTY_NAME_CS_TARGET, targetType.toString());
 
-		return triPhaseOperation(CRYPTO_OPERATION_COUNTERSIGN, sign, algorithm, key, certChain, extraParams);
+		return triPhaseOperation(
+			AOSignConstants.SIGN_FORMAT_CADES,
+			CRYPTO_OPERATION_COUNTERSIGN,
+			sign,
+			algorithm,
+			key,
+			certChain,
+			extraParams
+		);
 	}
 
 	/** {@inheritDoc} */
@@ -146,7 +167,7 @@ public final class AOCAdESTriPhaseSigner implements AOSigner {
 	/** {@inheritDoc} */
 	@Override
 	public byte[] getData(final byte[] signData) throws AOException, IOException {
-		throw new UnsupportedOperationException("No se soporta ela obtencion de datos n firma trifasica"); //$NON-NLS-1$
+		throw new UnsupportedOperationException("No se soporta ela obtencion de datos en firma trifasica"); //$NON-NLS-1$
 	}
 
 	/** {@inheritDoc} */
@@ -156,6 +177,7 @@ public final class AOCAdESTriPhaseSigner implements AOSigner {
 	}
 
 	/** Ejecuta una operaci&oacute;n de firma/multifirma en 3 fases.
+	 * @param format Formato de firma ("CAdES" o "CAdES-ASiC-S" en este caso)
 	 * @param cryptoOperation Tipo de operaci&oacute;n.
 	 * @param docId Identificador del documento a firmar/multifirmar. Posiblemente, el propio documento.
 	 * @param algorithm Algoritmo de firma
@@ -164,12 +186,13 @@ public final class AOCAdESTriPhaseSigner implements AOSigner {
 	 * @param extraParams Par&aacute;metros para la configuraci&oacute;n de la operaci&oacute;n.
 	 * @return Resultado de la operaci&oacute;n de firma.
 	 * @throws AOException Cuando se produce un error durante la operaci&oacute;n. */
-	private static byte[] triPhaseOperation(final String cryptoOperation,
-			                                final byte[] docId,
-			                                final String algorithm,
-			                                final PrivateKey key,
-			                                final Certificate[] certChain,
-			                                final Properties extraParams) throws AOException {
+	protected static byte[] triPhaseOperation(final String format,
+			                                  final String cryptoOperation,
+			                                  final byte[] docId,
+			                                  final String algorithm,
+			                                  final PrivateKey key,
+			                                  final Certificate[] certChain,
+			                                  final Properties extraParams) throws AOException {
 		if (extraParams == null) {
 			throw new IllegalArgumentException("Se necesitan parametros adicionales"); //$NON-NLS-1$
 		}
@@ -205,6 +228,7 @@ public final class AOCAdESTriPhaseSigner implements AOSigner {
 		final byte[] preSignResult;
 		try {
 			preSignResult = PreSigner.preSign(
+				format,
 				algorithm,
 				certChain,
 				cryptoOperation,
@@ -233,30 +257,13 @@ public final class AOCAdESTriPhaseSigner implements AOSigner {
 			throw new AOException("Error al analizar la prefirma enviada por el servidor", e); //$NON-NLS-1$
 		}
 
-		// Comprobamos que se incluyan las prefirmas en los datos recibidos
-		if (triphaseData.getSignsCount() < 1) {
-			throw new AOException("No se han recibido prefirmas que firmar");  //$NON-NLS-1$
-		}
-
-		try {
-			for (int i = 0; i < triphaseData.getSignsCount(); i++) {
-				final TriphaseData.TriSign signConfig = triphaseData.getSign(i);
-				final byte[] pkcs1sign = new AOPkcs1Signer().sign(
-					Base64.decode(signConfig.getProperty(PROPERTY_NAME_PRESIGN)),
-					algorithm,
-					key,
-					certChain,
-					null // No hay parametros en PKCS#1
-				);
-				signConfig.addProperty(PROPERTY_NAME_PKCS1_SIGN, Base64.encode(pkcs1sign));
-			}
-		}
-		catch (final Exception e) {
-			LOGGER.severe("Ocurrio un error en la decodificacion de una prefirma: " + e); //$NON-NLS-1$
-			throw new AOException("Ocurrio un error en la decodificacion de una prefirma: " + e, e); //$NON-NLS-1$
-		}
-
-		final String preResultAsBase64 = Base64.encode(triphaseData.toString().getBytes(), true);
+		final String preResultAsBase64 = Base64.encode(TriphaseDataSigner.doSign(
+			new AOPkcs1Signer(),
+			algorithm,
+			key,
+			certChain,
+			triphaseData
+		).toString().getBytes(), true);
 
 		// ---------
 		// POSTFIRMA
@@ -265,6 +272,7 @@ public final class AOCAdESTriPhaseSigner implements AOSigner {
 		final byte[] triSignFinalResult;
 		try {
 			triSignFinalResult = PostSigner.postSign(
+				format,
 				algorithm,
 				certChain,
 				cryptoOperation,

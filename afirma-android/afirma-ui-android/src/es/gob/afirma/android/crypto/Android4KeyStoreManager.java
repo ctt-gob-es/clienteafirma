@@ -6,12 +6,15 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.security.KeyChain;
 import android.security.KeyChainAliasCallback;
+import android.util.Log;
 import es.gob.afirma.core.AOCancelledOperationException;
 
 /** Gestor simple de claves y certificados para dispositivos Android 4.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 @TargetApi(14)
 public final class Android4KeyStoreManager implements MobileKeyStoreManager {
+
+	private static final String ES_GOB_AFIRMA = "es.gob.afirma"; //$NON-NLS-1$
 
     private final Activity activity;
 
@@ -37,7 +40,8 @@ public final class Android4KeyStoreManager implements MobileKeyStoreManager {
             throw new IllegalArgumentException("La clase a notificar la seleccion de clave no puede ser nula"); //$NON-NLS-1$
         }
         KeyChain.choosePrivateKeyAlias(
-    		this.activity, new KeyChainAliasCallback() {
+    		this.activity,
+    		new KeyChainAliasCallback() {
 		        /** {@inheritDoc} */
 		        @Override
 		        public void alias(final String alias) {
@@ -59,6 +63,7 @@ public final class Android4KeyStoreManager implements MobileKeyStoreManager {
 	                		);
 			            }
 			            catch (final Throwable e) {
+			            	Log.e(ES_GOB_AFIRMA, "Error en la obtencion de claves: " + e); //$NON-NLS-1$
 			                pksl.keySelected(new KeySelectedEvent(e));
 			            }
 		        	}

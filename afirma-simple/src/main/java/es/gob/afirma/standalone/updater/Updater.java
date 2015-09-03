@@ -49,7 +49,7 @@ public final class Updater {
 	private static String getCurrentVersion() {
 		loadProperties();
 		if (currentVersion == null) {
-			currentVersion = updaterProperties.getProperty("currentVersion"); //$NON-NLS-1$
+			currentVersion = updaterProperties.getProperty("currentVersion", "0"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		return currentVersion;
 	}
@@ -76,7 +76,7 @@ public final class Updater {
 			return null;
 		}
 		try {
-			version = new String(UrlHttpManagerFactory.getInstalledManager().readUrlByGet(url));
+			version = new String(UrlHttpManagerFactory.getInstalledManager().readUrlByGet(url)).trim();
 		}
 		catch (final Exception e) {
 			LOGGER.severe(

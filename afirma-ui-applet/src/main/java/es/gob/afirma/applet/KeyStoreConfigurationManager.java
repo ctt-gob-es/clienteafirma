@@ -252,7 +252,8 @@ final class KeyStoreConfigurationManager {
         // En caso de ser todos certificados con clave privada, obtenemos la
         // referencia a esta
         if (this.checkPrivateKey) {
-            this.ke = this.getKeyStoreManager().getKeyEntry(this.selectedAlias, this.getCertificatePasswordCallback());
+        	this.getKeyStoreManager().setEntryPasswordCallBack(this.getCertificatePasswordCallback());
+            this.ke = this.getKeyStoreManager().getKeyEntry(this.selectedAlias);
         }
     }
 

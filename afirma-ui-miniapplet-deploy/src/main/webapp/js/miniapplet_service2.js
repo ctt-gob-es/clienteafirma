@@ -34,6 +34,8 @@ var MiniApplet = ( function ( window, undefined ) {
 
 		var selectedLocale = null;
 
+		var defaultKeyStore = null;
+		
 		/* ------------------------------------------------ */
 		/* Constantes para la operacion interna del Cliente */
 		/* ------------------------------------------------ */
@@ -257,23 +259,28 @@ var MiniApplet = ( function ( window, undefined ) {
 		/** Carga el MiniApplet. */
 		var cargarMiniApplet = function (base, keystore) {
 
-			// Antes que nada, comprobamos que no haya un desfase horario declarado como
-			// grave.
+			// Antes que nada, comprobamos que no haya un desfase horario declarado como grave.
 			if (severeTimeDelay) {
 				return;
 			}
-			
+
+			// Establecemos cual sera el keystore por defecto
+			defaultKeystore = keystore;
+			if (defaultKeystore == undefined) {
+				defaultKeystore = null;
+			}
+
 			// Si estamos claramente en un sistema movil o que no permite la ejecucion de Java,
 			// cargamos directamente el Cliente JavaScript
 			if (isAndroid() || isIOS() || isWindowsRT()) {
-				cargarAppAfirma(base);
+				cargarAppAfirma(base, defaultKeystore);
 				return;
 			}
 
 			// Si estamos en un entorno que permite Java, comprobamos si esta disponible
 			// y en caso de no estarlo, tambien cargamos el Cliente JavaScript.
 			if (!isJavaEnabled()) {
-				cargarAppAfirma(base);
+				cargarAppAfirma(base, defaultKeystore);
 				return;
 			}
 
@@ -284,11 +291,6 @@ var MiniApplet = ( function ( window, undefined ) {
 			// siempre dice que hay), asi que cargamos el applet, pero tenemos en cuenta que en
 			// caso de error debemos cargar el cliente JavaScript
 			codeBase = (base != undefined && base != null) ? base : './';
-			
-			var keystoreConfig = keystore;
-			if (keystoreConfig == undefined) {
-				keystoreConfig = null;
-			}
 			
 			var attributes = {
 					'id': 'miniApplet',
@@ -302,7 +304,7 @@ var MiniApplet = ( function ( window, undefined ) {
 			// asi que (salvo los argumentos de carga) vamos a pasarlos como un parametro mas al
 			// applet para luego establecerlos internamente.
 			var parameters = {
-					'keystore': keystoreConfig,
+					'keystore': defaultKeystore,
 					'userAgent': window.navigator.userAgent,
 					'archive': codeBase + '/' + JAR_NAME,
 					'code': 'es.gob.afirma.miniapplet.MiniAfirmaApplet',
@@ -321,7 +323,7 @@ var MiniApplet = ( function ( window, undefined ) {
 			// Si no esta definido el cliente es porque se ha intentado cargar el applet
 			// y no se ha podido, asi que se usara la aplicacion nativa
 			if (clienteFirma == null) {
-				cargarAppAfirma(codeBase);
+				cargarAppAfirma(codeBase, defaultKeystore);
 			}
 		}
 
@@ -370,7 +372,10 @@ var MiniApplet = ( function ( window, undefined ) {
 					errorCallback(clienteFirma.getErrorType(), clienteFirma.getErrorMessage());
 				}
 			}
-			else if (clientType == TYPE_JAVASCRIPT_WEB_SERVICE || clientType == TYPE_JAVASCRIPT_SOCKET ) {
+			else if (clientType == TYPE_JAVASCRIPT_SOCKET ) {
+				clienteFirma.sign(dataB64, algorithm, format, params, successCallback, errorCallback);
+			}
+			else {
 				clienteFirma.sign(dataB64, algorithm, format, params, successCallback, errorCallback);
 			}
 		}
@@ -422,7 +427,10 @@ var MiniApplet = ( function ( window, undefined ) {
 					errorCallback(clienteFirma.getErrorType(), clienteFirma.getErrorMessage());
 				}
 			}
-			else if (clientType == TYPE_JAVASCRIPT_WEB_SERVICE || clientType == TYPE_JAVASCRIPT_SOCKET ) {
+			else if (clientType == TYPE_JAVASCRIPT_SOCKET) {
+				clienteFirma.coSign(signB64, dataB64, algorithm, format, params, successCallback, errorCallback);
+			}
+			else {
 				clienteFirma.coSign(signB64, dataB64, algorithm, format, params, successCallback, errorCallback);
 			}
 		}
@@ -461,7 +469,10 @@ var MiniApplet = ( function ( window, undefined ) {
 					errorCallback(clienteFirma.getErrorType(), clienteFirma.getErrorMessage());
 				}
 			}
-			else if (clientType == TYPE_JAVASCRIPT_WEB_SERVICE || clientType == TYPE_JAVASCRIPT_SOCKET ) {
+			else if (clientType == TYPE_JAVASCRIPT_SOCKET) {
+				clienteFirma.counterSign(signB64, algorithm, format, params, successCallback, errorCallback);
+			}
+			else {
 				clienteFirma.counterSign(signB64, algorithm, format, params, successCallback, errorCallback);
 			}
 		}
@@ -476,16 +487,18 @@ var MiniApplet = ( function ( window, undefined ) {
 			return clienteFirma.getTextFromBase64(dataB64, charset);
 		}
 
-		var saveDataToFile = function (dataB64, title, fileName, extension, description) {
+		var saveDataToFile = function (dataB64, title, fileName, extension, description,  successCallback, errorCallback) {
 			forceLoad();
 			if (clientType == TYPE_APPLET) {
 				setData(dataB64);
 				return clienteFirma.saveDataToFile(title, fileName, extension, description);
 			}
-			else if (clientType == TYPE_JAVASCRIPT_WEB_SERVICE || clientType == TYPE_JAVASCRIPT_SOCKET ) {
-				return clienteFirma.saveDataToFile(dataB64, title, fileName, extension, description);
+			else if (clientType == TYPE_JAVASCRIPT_SOCKET ) {
+				clienteFirma.saveDataToFile(dataB64, title, fileName, extension, description, successCallback, errorCallback);
 			}
-			return null;
+			else {
+				clienteFirma.saveDataToFile(dataB64, title, fileName, extension, description);
+			}
 		}
 
 		var getFileNameContentBase64 = function (title, extensions, description, filePath) {
@@ -541,7 +554,7 @@ var MiniApplet = ( function ( window, undefined ) {
 			
 			storageServletAddress = storageServlet;
 			retrieverServletAddress = retrieverServlet;
-			
+
 			if (clienteFirma && clienteFirma.setServlets) {
 				clienteFirma.setServlets(storageServlet,  retrieverServlet);
 			}
@@ -572,7 +585,7 @@ var MiniApplet = ( function ( window, undefined ) {
 
 				appletTag += "</object>";
 
-				// Al agregar con append() estos nodos no se carga automaticamente el applet en IE10 e inferiores, as� que
+				// Al agregar con append() estos nodos no se carga automaticamente el applet en IE10 e inferiores, asï¿½ que
 				// hay que usar document.write() o innerHTML. Para asegurarnos de no pisar HTML previo, crearemos un <div>
 				// en la pagina, lo recogeremos e insertaremos dentro suyo el codigo del applet.
 				var divElem = document.createElement("div");
@@ -639,9 +652,8 @@ var MiniApplet = ( function ( window, undefined ) {
 					clienteFirma = tempCliente;
 					clientType = TYPE_APPLET;
 				}
-				//clientType != TYPE_JAVASCRIPT_WEB_SERVICE && clientType != TYPE_JAVASCRIPT_SOCKET
 				else if (clientType == null ) {
-					cargarAppAfirma(codeBase);	
+					cargarAppAfirma(codeBase, defaultKeystore);	
 				}
 				setServlets(storageServletAddress, retrieverServletAddress);
 			}
@@ -689,18 +701,24 @@ var MiniApplet = ( function ( window, undefined ) {
 
 		/**
 		 * Establece el objeto que simula ser el Applet de firma en sistemas en los que no se
-		 * soportan los applets.
+		 * soportan los applets. Se usara comunicacion mediante socket si el entorno es compatible con:
+		 *  - localStorage
+		 *  - addEventListener
+		 *  - postMessage
+		 *  - Si las constantes AfirmaSocket.POPUP_URL y AfirmaSocket.IFRAME_URL estan inicializadas.
+		 * En caso contrario, la comunicacion se realizara mediante un servidor intermedio.
 		 */
-		function cargarAppAfirma(clientAddress) {
-			if (!isIOS() && !isAndroid() && window.localStorage && window.addEventListener && window.postMessage){
+		function cargarAppAfirma(clientAddress, keystore) {
+			if (!isIOS() && !isAndroid() && window.localStorage && window.addEventListener && window.postMessage && AfirmaSocket && AfirmaSocket.POPUP_URL && AfirmaSocket.IFRAME_URL ){
 				clienteFirma = new AppAfirmaJSSocket(clientAddress, window, undefined);
+				clienteFirma.setKeyStore(keystore);
 				clientType = TYPE_JAVASCRIPT_SOCKET;
 			}
 			else {
 				clienteFirma = new AppAfirmaJSWebService(clientAddress, window, undefined);
+				clienteFirma.setKeyStore(keystore);
 				clientType = TYPE_JAVASCRIPT_WEB_SERVICE;
 			}
-			
 		}
 
 		/**
@@ -712,17 +730,23 @@ var MiniApplet = ( function ( window, undefined ) {
 
 			var UnsupportedOperationException = "java.lang.UnsupportedOperationException";
 
-			var DEFAULT_SIGNATURE_PAGE = "http://demo.com/popup2.html";
-			// tamaño maximo en caracteres para un mensaje al popup2
+			var DEFAULT_SIGNATURE_PAGE = AfirmaSocket.POPUP_URL;
+			// tamano maximo en caracteres para un mensaje al popup2
 			var MESSAGE_MAX_SIZE = 400000;
-
+			
 			/**
 			 *  Atributos para la configuracion del objeto sustituto del applet Java de firma
 			 */
 			var errorMessage = '';
 			var errorType = '';
-			var retrieverServletAddress = null;
-			var storageServletAddress = null;
+
+			/** Puerto actual */
+			var port = "";
+
+			/** Clave de cifrado. */
+			var cipherKey = "";
+
+			var writePort;
 
 			/** Ventana para el intercambio de datos (tiene que estar sobre http). */
 			var modalWindow = null;
@@ -730,67 +754,61 @@ var MiniApplet = ( function ( window, undefined ) {
 			/** Dominio desde el que se realiza la llamada al servicio */
 			var baseUri = clientAddress;
 
+			/** Dominio desde el que se realiza la llamada al servicio */
+			var defaultKeystore = null;
+			
 			/** Funcion callback que se lanza al obtener un resultado. */
 			var resultCallbackFunction = null;
-
-			if (clientAddress != undefined && clientAddress != null) {
-				if (clientAddress.indexOf("://") != -1 && clientAddress.indexOf("/", clientAddress.indexOf("://") + 3) != -1) {
-					var servletsBase = clientAddress.substring(0, clientAddress.indexOf("/", clientAddress.indexOf("://") + 3));
-					retrieverServletAddress = servletsBase + "/afirma-signature-retrieve/RetrieveService";
-					storageServletAddress = servletsBase + "/afirma-signature-storage/StorageService";
-				} else {
-					retrieverServletAddress = clientAddress + "/afirma-signature-retrieve/RetrieveService";
-					storageServletAddress = clientAddress + "/afirma-signature-storage/StorageService";
-				}
-			}
 
 			// Registramos un callback para la obtencion de los mensajes de devolucion. Lo almacenamos para no
 			// registrarlo para cada operacion
 			function registryCallbacks (successCallback, errorCallback) {
-				var results ="";
+				var results = "";
 				if (resultCallbackFunction == null) {
-				
+
 					resultCallbackFunction = function(event) {
 						var localWindow = modalWindow;
 						// Se llamara a este evento ante 2 entradas "signDatos" que almacenara el resultado de
 						// la operacion y "signEstado" que se recibira antes y almacenara un "OK" o un "KO" segun
 						// haya terminado bien o mal la operacion
-						if (event.key == "signEstado" && event.newValue){
-						//if (event.key == "signDatos" && event.newValue) {
-				
+						if (event.key == "signEstado" && event.newValue) {
+
 							try {
+								// usamos una variable auxiliar para que solo entre la primera vez que se recibe
+								if (writePort) {
+									port = localStorage.getItem("port");
+									cipherKey = localStorage.getItem("key");
+									writePort = false;
+								}
+
 								var signEstado = localStorage.getItem("signEstado");
 								if (signEstado == "KO") {
 									errorCallback("java.lang.Exception", localStorage.getItem("signDatos"));
 									localWindow.close();
 								}
 								else if (signEstado == "OK") {
-									//lo han mandado en una envio
-									if(localStorage.getItem("EOF")=="EOF"){
-										if(results==""){
+									//Lo han mandado en una envio
+									if(localStorage.getItem("EOF") == "EOF") {
+										if(results == "") {
 											successCallback(localStorage.getItem("signDatos"));
 										}
-										else successCallback(results+localStorage.getItem("signDatos"));
-										//successCallback(localStorage.getItem("signDatos"));
-										
-										try {
-											localWindow.close();
-										} catch(e) {}
-									}
-									// no cabe en un solo envio, lo almacenamos para poder mandarlo todo junto
-									else{
-										if(localStorage.getItem("EOF")=="-"){
-											results+=localStorage.getItem("signDatos");
-											localStorage.removeItem("signDatos");
+										else {
+											successCallback(results + localStorage.getItem("signDatos"));
 										}
+										localWindow.close();
 									}
-									
+									// No cabe en un solo envio, lo almacenamos para poder mandarlo todo junto
+									else if (localStorage.getItem("EOF") == "-" ) {
+										results += localStorage.getItem("signDatos");
+									}
+								}
+								else if (signEstado == "SAVE_OK") {
+									successCallback(signEstado);
+									localWindow.close();
 								}
 								else {
 									errorCallback("java.lang.Exception", "No se conoce si el resultado obtenido es correcto");
-									try {
-										localWindow.close();
-									} catch(e) {}
+									localWindow.close();
 								}
 							} catch(e) {
 								// Ocurrio un error al invocar a la funcion resultado
@@ -798,6 +816,8 @@ var MiniApplet = ( function ( window, undefined ) {
 							localStorage.removeItem("signEstado");
 							localStorage.removeItem("signDatos");
 							localStorage.removeItem("EOF");
+							localStorage.removeItem("port");
+							localStorage.removeItem("key");
 						}
 					};
 					
@@ -808,32 +828,40 @@ var MiniApplet = ( function ( window, undefined ) {
 			/**
             * Envia datos a la ventana de firma.
 			*/
-			function sendData(window,data) {
-				// mandamos varias peticiones si el tamaño del documento excede del maximo
-				if(data.dat.value.length > MESSAGE_MAX_SIZE){
-					var totalData=data.dat.value;
-					// calculamos el numero de elementos que le vamos a pasar 
-					data.numParts=Math.ceil(data.dat.value.length/MESSAGE_MAX_SIZE);
-					var send;
-					var i=1;
-					do{
-						send=totalData.substring(0,MESSAGE_MAX_SIZE);
-						totalData=totalData.substring(MESSAGE_MAX_SIZE)
-						data.dat.value=send;
-						console.log("parte "+i+" tamaño"+send.length);
-						data.order=i;
-						window.postMessage(data, DEFAULT_SIGNATURE_PAGE);
-						i+=1;
-					}
-					while (totalData.length>0);	
+			function sendData(window, data) {
+				// Mandamos varias peticiones si el tamano del documento excede del maximo
+				if (!data.dat.value) {
+					window.postMessage(data, DEFAULT_SIGNATURE_PAGE);
 				}
-				// cabe en un envio, seguimos como siempre
+				else if(data.dat.value.length > MESSAGE_MAX_SIZE){
+					var totalData = data.dat.value;
+					// Calculamos el numero de elementos que le vamos a pasar 
+					data.numParts = Math.ceil(data.dat.value.length / MESSAGE_MAX_SIZE);
+					var send;
+					var i = 1;
+					do{
+						send = totalData.substring(0, MESSAGE_MAX_SIZE);
+						totalData = totalData.substring(MESSAGE_MAX_SIZE)
+						data.dat.value = send;
+						data.order = i;
+						window.postMessage(data, DEFAULT_SIGNATURE_PAGE);
+						i++;
+					}
+					while (totalData.length > 0);	
+				}
+				// Cabe en un envio, seguimos como siempre
 				else{
 					window.postMessage(data, DEFAULT_SIGNATURE_PAGE);
 				}
-
 			}
 
+			/**
+			 * Establece el almacen de certificados de que se debe utilizar por defecto.
+			 */
+			function setKeyStore (keystore) {
+				defaultKeystore = keystore;
+			}
+			
 			/**
 			 * Inicia el proceso de firma electronica.
 			 * Implementada en el applet Java de firma
@@ -869,22 +897,22 @@ var MiniApplet = ( function ( window, undefined ) {
 			 * @param errorCallback M&eacute;todo a ejecutar en caso de error.
 			 */
 			function signOperation (signId, dataB64, algorithm, format, extraParams, successCallback, errorCallback) {
-		
+				// Cuando recibamos los datos del iframe guardaremos el puerto solo el primer envio para evitar errores.
+				writePort = true;
 				// Si no se ha abierto una pagina modal externamente, la abrimos nosotros (aunque muy probablemente quede bloqueada)
-				modalWindow = window.open(DEFAULT_SIGNATURE_PAGE, "Pagina de firma"+Date.now(), "width=500,height=260");
+				modalWindow = window.open(DEFAULT_SIGNATURE_PAGE, "Pagina de firma" + Date.now(), "width=500,height=260");
 				
 				/** Almacenamos el dominio en local para poder evaluarlo desde el iframe de firma. */
 				localStorage.setItem("signPageBaseUri", DEFAULT_SIGNATURE_PAGE);	// TODO: Podria ser el de la ventana exterior, pero hay que averiguar como obtenerlo
 
 				registryCallbacks(successCallback, errorCallback);
 
-				setTimeout(signByService, 3000, modalWindow, baseUri, signId, dataB64, algorithm, format, extraParams, successCallback, errorCallback);
+				setTimeout(signByService, 1000, modalWindow, signId, dataB64, algorithm, format, extraParams, successCallback, errorCallback);
 			}
 
 			/**
 			 * Funcion de firma medante invocacion a un servicio.
 			 * @param signWindow Ventana modal que hara de pasarela para la firma.
-			 * @param baseUri URI base desde la que se solicita la firma (para dar permisos).
 			 * @param signId Identificador de la operacion a realizar (sign, cosign y countersign).
 			 * @param dataB64 Datos o firma en base 64.
 			 * @param algorithm Algoritmo de firma.
@@ -893,7 +921,7 @@ var MiniApplet = ( function ( window, undefined ) {
 			 * @param successCallback M&eacute;todo a ejecutar en caso de &eacute;xito.
 			 * @param errorCallback M&eacute;todo a ejecutar en caso de error.
 			 */
-			function signByService (signWindow, baseUri, signId, dataB64, algorithm, format, extraParams, successCallback, errorCallback) {
+			function signByService (signWindow, signId, dataB64, algorithm, format, extraParams, successCallback, errorCallback) {
 
 				if (dataB64 == undefined || dataB64 == "") {
 					dataB64 = null;
@@ -904,31 +932,86 @@ var MiniApplet = ( function ( window, undefined ) {
 				}
 
 				var idSession = generateNewIdSession();
-				//TODO: Aplicar clave de cifrado
-				var cipherKey = ""; //generateCipherKey();
-				
-				var data = generateData(baseUri, signId, idSession, cipherKey, format, algorithm, extraParams, dataB64);
 
+				var data = generateDataToSign(signId, idSession, algorithm, format, extraParams, dataB64);
 				sendData(signWindow, data);
 			}
+
 			/**
-			 * Genera el objeto con los datos de la transacción
+			 * Genera el objeto con los datos de la transaccion para la firma
 			 */
-			function generateData(baseUri, signId, idSession, cipherKey, format, algorithm, extraParams, dataB64){
-				
+			function generateDataToSign(signId, idSession, algorithm, format, extraParams, dataB64) {
 				var data = new Object();
 				data.origin = generateDataKeyValue("origin", baseUri);
 				data.op = generateDataKeyValue("op", signId);
+				data.keystore = generateDataKeyValue("keystore", defaultKeystore);
 				data.id = generateDataKeyValue("id",idSession);
-				data.key = generateDataKeyValue ("key", cipherKey);
+				data.algorithm = generateDataKeyValue ("algorithm", algorithm);
 				data.format = generateDataKeyValue ("format", format); 
-				data.algorithm = generateDataKeyValue ("algorithm", algorithm)
-				data.properties = generateDataKeyValue ("properties", Base64.encode(extraParams));
-				data.dat = generateDataKeyValue ("dat", dataB64);
+				data.properties = generateDataKeyValue ("properties", extraParams != null ? Base64.encode(extraParams) : null);
+				data.dat = generateDataKeyValue ("dat", dataB64 == "" ? null : dataB64);
 				data.order = 1;
-				data.numParts =1;
+				data.numParts = 1;
+				data.port = generateDataKeyValue ("port", port);
+				data.key = generateDataKeyValue ("key", cipherKey);
+				
 				return data;
 			}
+
+			/**
+			 * Inicia el proceso de guardado de una firma.
+			 */
+			function saveDataToFile (dataB64, title, filename, extension, description, successCallback, errorCallback) {
+				// Cuando recibamos los datos del iframe guardaremos el puerto solo el primer envio para evitar errores.
+				writePort = true;
+				// Si no se ha abierto una pagina modal externamente, la abrimos nosotros (aunque muy probablemente quede bloqueada)
+				modalWindow = window.open(DEFAULT_SIGNATURE_PAGE, "Pagina de firma"+Date.now(), "width=500,height=260");
+				
+				/** Almacenamos el dominio en local para poder evaluarlo desde el iframe de firma. */
+				localStorage.setItem("signPageBaseUri", DEFAULT_SIGNATURE_PAGE);
+
+				registryCallbacks(successCallback, errorCallback);
+
+				setTimeout(saveByService, 3000, modalWindow, dataB64, title, filename, extension, description);
+			}
+
+			function saveByService ( signWindow, dataB64, title, filename, extension, description) {
+				
+				if (dataB64 == undefined || dataB64 == "") {
+					dataB64 = null;
+				}
+
+				if (dataB64 != null && !isValidUrl(dataB64)) {
+					dataB64 = dataB64.replace(/\+/g, "-").replace(/\//g, "_");
+				}
+
+				var idSession = generateNewIdSession();
+
+				var data = generateDataToSave(dataB64, title, filename, extension, description, idSession);
+				sendData(signWindow, data);
+			}
+
+			/**
+			* Genera el objeto de datos para la operacion de guardar
+			*/
+			function generateDataToSave(dataB64, title, filename, extension, description, id) {
+				var data = new Object();
+				data.origin = generateDataKeyValue("origin", baseUri);
+				data.op = generateDataKeyValue ("op", "save");
+				data.id = generateDataKeyValue ("id", id);
+				data.title = generateDataKeyValue ("title", title);
+				data.filename = generateDataKeyValue ("filename", filename);
+				data.extension = generateDataKeyValue ("extension", extension);
+				data.description = generateDataKeyValue ("description", description);
+				data.dat = generateDataKeyValue ("dat", dataB64);
+				data.order = 1;
+				data.numParts = 1;
+				data.port = generateDataKeyValue ("port", port);
+				data.key = generateDataKeyValue ("key", cipherKey);
+				
+				return data;
+			}
+
 			function generateDataKeyValue(key, value) {
 				var data  = new Object();
 				data.key = key;
@@ -941,7 +1024,7 @@ var MiniApplet = ( function ( window, undefined ) {
 			 * Implementada en el applet Java de firma.
 			 */
 			function getBase64FromText (plainText, charset) {
-				return Base64.encode(plainText);
+				return plainText != null ? Base64.encode(plainText) : null;
 			}
 
 			/**
@@ -949,60 +1032,10 @@ var MiniApplet = ( function ( window, undefined ) {
 			 * Implementada en el applet Java de firma.
 			 */
 			function getTextFromBase64 (base64Text, charset) {
-				return Base64.decode(base64Text);
+				return base64Text != null ? Base64.decode(base64Text) : null;
 			}
 
-			/**
-			 * Guardado de datos en disco. Se realiza mediante la invocacion de una app nativa. 
-			 */
-			function saveDataToFile (dataB64, title, filename, extension, description) {
-
-				if (dataB64 != undefined && dataB64 != null && dataB64 != "") {
-					dataB64 = dataB64.replace(/\+/g, "-").replace(/\//g, "_");
-				}
-
-				var idSession = generateNewIdSession();
-				var cipherKey = generateCipherKey();
-
-				var i = 0;
-				var params = new Array();
-				params[i++] = {key:"op", value:"save"};
-				if (idSession != null && idSession != undefined) {		params[i++] = {key:"id", value:encodeURIComponent(idSession)}; }
-				if (cipherKey != null && cipherKey != undefined) {		params[i++] = {key:"key", value:encodeURIComponent(cipherKey)}; }
-				if (storageServletAddress != null &&
-						storageServletAddress != undefined) {			params[i++] = {key:"stservlet", value:storageServletAddress}; }
-				if (title != null && title != undefined) {				params[i++] = {key:"title", value:encodeURIComponent(title)}; }
-				if (filename != null && filename != undefined) {		params[i++] = {key:"filename", value:encodeURIComponent(filename)}; }
-				if (extension != null && extension != undefined) {		params[i++] = {key:"extension", value:encodeURIComponent(extension)}; }
-				if (description != null && description != undefined) {	params[i++] = {key:"description", value:encodeURIComponent(description)}; }
-				if (dataB64 != null && dataB64 != undefined && dataB64 != "") {			params[i++] = {key:"dat", value:encodeURIComponent(dataB64)}; }
-
-				var url = buildUrl("save", params);
-
-				// Si la URL es muy larga, realizamos un preproceso para que los datos se suban al
-				// servidor y la aplicacion nativa los descargue, en lugar de pasarlos directamente 
-				if (isURLTooLong(url)) {
-					if (storageServletAddress == null || storageServletAddress == undefined) {
-						throwException("java.lang.IllegalArgumentException", "No se ha indicado la direccion del servlet para el guardado de datos");
-						return;
-					}
-
-					var fileId = preProccessData(cipherKey, storageServletAddress, "save", params);
-					if (!fileId) {
-						throwException("java.net.UnknownHostException", "No se han podido enviar los datos a la aplicacion de firma");
-						return;
-					}
-
-					url = buildUrlWithoutData("save", fileId, retrieverServletAddress, cipherKey);
-					if (isURLTooLong(url)) {
-						throwException("java.lang.IllegalArgumentException", "La URL de invocacion al servicio de firma es demasiado larga. No se soportan tantas propiedades de configuracion.");
-						return;
-					}
-				}
-
-				execAppIntent(url, idSession, cipherKey);
-			}
-
+			
 			/**
 			 * Carga de un fichero. Operacion no soportada. 
 			 * Implementada en el applet Java de firma.
@@ -1067,14 +1100,6 @@ var MiniApplet = ( function ( window, undefined ) {
 			}
 
 			/**
-			 * Establece las rutas de los servlets encargados de almacenar y recuperar las firmas de los dispositivos moviles.
-			 */
-			function setServlets (storageServlet,  retrieverServlet) {
-				storageServletAddress = storageServlet;
-				retrieverServletAddress = retrieverServlet;
-			}
-
-			/**
 			 * Establece el error indicado como error interno y lanza una excepcion.
 			 */
 			function throwException (type, message) {
@@ -1112,21 +1137,6 @@ var MiniApplet = ( function ( window, undefined ) {
 				return random;
 			}
 
-			/* Genera un numero aleatorio para utilizar como clave de cifrado. */
-			function generateCipherKey() {
-				var random;
-				if (typeof window.crypto != "undefined" && typeof window.crypto.getRandomValues != "undefined") {
-					var randomInts = new Uint32Array(1);
-					window.crypto.getRandomValues(randomInts);
-					random = zeroFill(randomInts[0] % 100000000, 8);
-				}
-				else {
-					random = zeroFill(Math.floor(((rnd() * MAX_NUMBER) + 1) % 100000000), 8);
-				}
-
-				return random;
-			}
-
 			/* Completa un numero con ceros a la izquierda. */
 			function zeroFill(number, width) {
 				width -= number.toString().length;
@@ -1149,478 +1159,11 @@ var MiniApplet = ( function ( window, undefined ) {
 			    return seed / 233280;
 			}
 
-			/**
-			 * Invoca un Intent con la operacion seleccionada, la configuraci\u00F3n establecida y las campos del
-			 * formulario pasado como parametro. Si se define un callback para tratar el caso de exito o error de
-			 * la operacion, se intentara descargar el resultado devuelto por la app del servidor intermedio de
-			 * comunicacion. 
-			 *
-			 * intentURL: URL para la invocacion del Cliente JavaScript
-			 * idSession: Identificador de la sesi\u00F3n para la recuperaci\u00F3n del resultado.
-			 * cipherKey: Clave de cifrado para la respuesta del servidor.
-			 * successCallback: Actuaci\u00F3n a realizar cuando se recupera el resultado de la operaci&oacute;n.
-			 * errorCallback: Actuaci\u00F3n a realizar cuando ocurre un error al recuperar el resultado.
-			 */
-			function execAppIntent (intentURL, idSession, cipherKey, successCallback, errorCallback) {
-
-				// Calculamos los puertos
-				var ports = getRandomPorts();
-				
-				// Invocamos a la aplicacion nativa
-				openNativeApp(ports, idSession);
-
-				// Enviamos la peticion a la app despues de esperar un tiempo prudencia
-				setTimeout(executeOperationByService, getWaitingTime(), ports, intentURL, cipherKey, successCallback, errorCallback);
-			}
-
-			/**
-			 * Obtiene un puerto aleatorio para la comunicaci\u00F3n con la aplicaci\u00F3n nativa.
-			 */
-			function getRandomPorts () {
-				var MIN_PORT = 49152;
-				var MAX_PORT = 65535;
-				 
-				var ports = new Array();
-				ports[0] = Math.floor((Math.random() * (MAX_PORT - MIN_PORT))) + MIN_PORT;
-				ports[1] = Math.floor((Math.random() * (MAX_PORT - MIN_PORT))) + MIN_PORT;
-				ports[2] = Math.floor((Math.random() * (MAX_PORT - MIN_PORT))) + MIN_PORT;
-				
-				return ports;
-			}
-
-			/**
-			 * Obtiene un puerto aleatorio para la comunicaci\u00F3n con la aplicaci\u00F3n nativa.
-			 */
-			function openNativeApp (ports, idSession) {
-
-				var portsLine = "";
-				for (var i = 0; i < ports.length; i++) {
-					portsLine += ports[i];
-					if (i < (ports.length - 1)) {
-						portsLine += ",";
-					}
-				}
-				openUrl("afirma://service?ports=" + portsLine + "&idsession=" + idSession)
-			}
-
-			/**
-			 * Determina el tiempo de espera prudencial (en milisegundos) que, dependiendo del
-			 * sistema, es necesario esperar desde la llamada a la aplicaci\u00F3n nativa hasta
-			 * que se le pueda solicitar que realice una operaci\u00F3n.
-			 */
-			function getWaitingTime () {
-				return isAndroid() ? 4000 : 20000;
-			}
-
-			/**
-			 * Construye una URL para la invocaci&oacute;n del Cliente @firma nativo.
-			 *
-			 * op: Funcion a invocar en el cliente nativo.
-			 * params: Par\u00E1metros para la configuraci\u00F3n de la operaci\u00F3n.
-			 */
-			function buildUrl (op, params) {
-
-				// Operacion seleccionada
-				var intentURL = 'afirma://' + op + '?';
-				if (params != null && params != undefined) {
-					for (var i = 0; i < params.length; i++) {
-						intentURL += (i != 0 ? '&' : '') + params[i].key + '=' + params[i].value; 
-					}
-				}
-				return intentURL;
-			}
-
-			/**
-			 * Generan un XML con los datos de configuracion de la operacion indicada,
-			 * los cifra y lo envia a un servidor para su descarga.
-			 * @param cipherKey Clave de cifrado. Si no se indica, no se cifra.
-			 * @param storageServletAddress URL del servlet que almacena.
-			 * @param op Operacion que se configura.
-			 * @param params Parametros de configuracion de la operacion 
-			 * @returns El identificador con el que se ha guardado el fichero en servidor o false
-			 * si se produjo algun error.  
-			 */
-			function preProccessData (cipherKey, storageServletAddress, op, params) {
-
-				// Identificador del fichero (equivalente a un id de sesion) del que deben recuperarse los datos
-				var fileId = generateNewIdSession(); 
-
-				var httpRequest = getHttpRequest();
-				if (!httpRequest) {
-					throwException("java.lang.Exception", "Su navegador no permite preprocesar los datos que desea tratar");
-				}
-
-				var requestData =
-					"op=put&v=1_0&id=" + fileId + "&dat=" + 
-					cipher(buildXML(op, params), cipherKey);
-
-				httpRequest.open("POST", storageServletAddress, false);
-				httpRequest.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-				try {
-					httpRequest.send(requestData);
-				}
-				catch(e) {
-					errorMessage = "No se pudo conectar con el servidor remoto";
-					errorType = "java.io.IOException";
-				}
-				
-				if (httpRequest.readyState==4 && httpRequest.status==200) {
-					return fileId;	
-				}
-
-				return false;
-			}
-
-			/**
-			 * Construye un XML con lo valores del array de parametros proporcionado.
-			 * @param op Operacion que configuramos
-			 * @param params Array con los parametros del array. 
-			 * @returns XML.
-			 */
-			function buildXML (op, params) {
-				op = (op == null ? "op" : op);
-				var xml = '<' + op +'>';
-				for (var i = 0; i < params.length; i++) {
-					xml += '<e k="' + params[i].key + '" v="' + params[i].value + '"/>';
-				}
-				return Base64.encode(xml + '</' + op + '>');
-			}
-
-			/**
-			 * Crea una URL a partir de los parametros introducidos para la invocaci&oacute;n de
-			 * una app nativa para que descargue la configuracion de la operaci&oacute;n a realizar.
-			 * @param op Codigo de la operacion a la que tiene que invocar la URL.
-			 * @param id Identificador para la descarga.
-			 * @param rtServlet Servlet para la descarga de la configuraci&oacute;n.
-			 * @param cipherKey Clave para el descifrado.
-			 * @returns URL para la llamada a la app con los datos necesarios para que descargue
-			 * la configuraci&oacute;n de la operaci&oacute;n a realizar.
-			 */
-			function buildUrlWithoutData (op, id, rtServlet, cipherKey) {
-				var j = 0;
-				var newParams = new Array();
-				newParams[j++] = {key:"fileid", value:id};
-				if (rtServlet != null || rtServlet != undefined) {
-					newParams[j++] = {key:"rtservlet", value:rtServlet};
-				}
-				if (cipherKey != null || cipherKey != undefined) {
-					newParams[j++] = {key:"key", value:cipherKey};
-				}
-				return buildUrl(op, newParams);
-			};
-
-			/**
-			 * Llama a la aplicacion de firma a traves de la URL de invocacion sin que afecte
-			 * a la pagina que se esta mostrando.
-			 * @param url URL de invocacion.
-			 */
-			function openUrl (url) {
-				
-				// Usamos document.location porque tiene mejor soporte por los navegadores que
-				// window.location que es el mecanismo estandar
-				if (isChrome()) {
-					document.location = url;
-				}
-				else {
-					if (document.getElementById("iframeAfirma") != null) {
-						document.getElementById("iframeAfirma").src = url;
-					}
-					else {
-						var iframeElem = document.createElement("iframe");
-
-						var idAttr = document.createAttribute("id");
-						idAttr.value = "iframeAfirma";
-						iframeElem.setAttributeNode(idAttr);
-
-						var srcAttr = document.createAttribute("src");
-						srcAttr.value = url;
-						iframeElem.setAttributeNode(srcAttr);
-
-						var heightAttr = document.createAttribute("height");
-						heightAttr.value = 1;
-						iframeElem.setAttributeNode(heightAttr);
-
-						var widthAttr = document.createAttribute("width");
-						widthAttr.value = 1;
-						iframeElem.setAttributeNode(widthAttr);
-
-						var styleAttr = document.createAttribute("style");
-						styleAttr.value = "display: none;";
-						iframeElem.setAttributeNode(styleAttr);
-
-						document.body.appendChild(iframeElem);
-					}
-				}
-			}
-
-			var iterations = 0;
-
-			/**
-			 * Ejecuta el metodo de error si el html recuperado es tal o el metodo de exito si no lo es,
-			 * en cuyo caso previamente descifrara el resultado. 
-			 * @param html Resultado obtenido.
-			 * @param cipherKey Clave para el descifrado del resultado si no es un error.
-			 * @param successCallback Metodo a ejecutar en caso de exito.
-			 * @param errorCallback Metodo a ejecutar en caso de error.
-			 * @returns Devuelve true si se ha fallado pero se puede volver a reintentar, false en caso de
-			 * error determinante o exito.
-			 */
-			function successResponseFunction (html, cipherKey, successCallback, errorCallback) {
-
-				// Si se obtiene el mensaje de  error de que el identificador no existe, seguimos intentandolo
-				if (html.substr(0, 6).toLowerCase() == "err-06") {
-					return true;
-				}
-
-				// Si se obtiene otro mensaje de error, se deja de intentar y se ejecuta la funcion callback de error
-				if (html.substr(0, 4).toLowerCase() == "err-" && html.indexOf(":=") != -1) {
-					errorMessage = html.substring(html.indexOf(":=") + 2);
-					errorType = "java.lang.Exception";
-					errorCallback(errorType, errorMessage);
-					return false;
-				}
-
-				// Si no se obtuvo un error, habremos recibido la firma y posiblemente el certificado (que antecederia a la
-				// firma y se separaria de ella con '|'). Si se definio una clave de cifrado, consideramos que la firma
-				// y el certificado (en caso de estar) llegan cifrados. El cifrado de ambos elementos es independiente
-				var certificate;
-				var signature;
-				var sepPos = html == null ? -1 : html.indexOf('|');
-				if (sepPos == -1) {
-					if (cipherKey != undefined && cipherKey != null) {
-						signature = decipher(html, cipherKey);
-					}
-					else {
-						signature = html;
-					}
-				}
-				else {
-					if (cipherKey != undefined && cipherKey != null) {
-						certificate = decipher(html.substring(0, sepPos), cipherKey);
-						signature = decipher(html.substring(sepPos + 1), cipherKey);
-					}
-					else {
-						certificate = html.substring(0, sepPos);
-						signature = html.substring(sepPos + 1);
-					}
-				}
-
-				successCallback(signature, certificate);
-
-				return false;
-			}
-
-			/**
-			 * Lee el resultado devuelto por el servicio, 'CANCEL' o empieza por 'SAF-', ejecutara el metodo
-			 * de error, si es 'OK' o cualquier otra cosa (que se intepretara como el resultado en base 64)
-			 * se ejecutara el metodo de exito. En este ultimo caso, se descifrara el resultado. 
-			 * @param html Resultado obtenido.
-			 * @param cipherKey Clave para el descifrado del resultado si no es un error.
-			 * @param successCallback Metodo a ejecutar en caso de exito.
-			 * @param errorCallback Metodo a ejecutar en caso de error.
-			 */
-			function successServiceResponseFunction (html, cipherKey, successCallback, errorCallback) {
-
-				// No se ha obtenido respuesta
-				if (html == undefined || html == null) {
-					if (errorCallback != undefined && errorCallback != null) {
-						errorCallback("es.gob.afirma.core.AOCancelledOperationException", "Operacion cancelada por el usuario");
-					}
-					return;
-				}
-
-				// Termina bien y no devuelve ningun resultado
-				if (html == "OK") {
-					if (successCallback != undefined && successCallback != null) {
-						successCallback();
-					}
-					return;
-				}
-				
-				// Se ha cancelado la operacion
-				if (html == "CANCEL") {
-					if (errorCallback != undefined && errorCallback != null) {
-						errorCallback("es.gob.afirma.core.AOCancelledOperationException", "Operacion cancelada por el usuario");
-					}
-					return;
-				}
-
-				// Se ha producido un error
-				if (html.length > 4 && html.substr(0, 4) == "SAF_") {
-					if (errorCallback != undefined && errorCallback != null) {
-						errorCallback("java.lang.Exception", html);
-					}
-					return;
-				}
-				
-				// Se ha producido un error y no se ha identificado el tipo
-				if (html == "NULL") {
-					if (errorCallback != undefined && errorCallback != null) {
-						errorCallback("java.lang.Exception", "Error desconocido");
-					}
-					return;
-				}
-				
-				// Interpretamos el resultado como un base 64 y el certificado y los datos cifrados
-				if (cipherKey != undefined && cipherKey != null) {
-					
-					var signature;
-					var certificate = null;
-					var sepPos = html.indexOf("|");
-
-					if (sepPos == -1) {
-						signature = decipher(Base64.decode(html, true), cipherKey);
-					}
-					else {
-						certificate = decipher(html.substring(0, sepPos), cipherKey);
-						signature = decipher(html.substring(sepPos + 1), cipherKey);
-					}
-
-					if (successCallback != undefined && successCallback != null) {
-						successCallback(signature, certificate);		
-					}
-				}
-			}
-
-			function errorResponseFunction (type, message, errorCallback) {
-
-				errorType = (type != null && type.length > 0) ?
-						type : "java.lang.Exception";
-				errorMessage = (message != null && message.length > 0) ?
-						message : "No se ha podido extablecer la comunicaci\u00F3n entre la aplicaci\u00F3n de firma y la p\u00E1gina web";
-				if (errorCallback != undefined && errorCallback != null) {
-					errorCallback(errorType, errorMessage);
-				}
-			}
-
-			function executeOperationByService (ports, url, cipherKey, successCallback, errorCallback) {
-
-				var i = 0;
-				var portError = false;
-				var httpRequest = getHttpRequest();
-				do {
-					httpRequest.open("POST", "http://127.0.0.1:" + ports[i] + "/afirma", false);
-					httpRequest.setRequestHeader("Content-type","application/x-www-form-urlencoded");
-
-					try {
-						httpRequest.send("cmd=" + Base64.encode(url, true));
-						console.log("se ha mandado cmd");
-						portError = false;
-					}
-					catch(e) {
-						if (httpRequest.status == 404) {
-							// Interpretamos que este error viene por un problema con el puerto
-							portError = true;
-							i++;
-						} else {
-							// Interpretamos que este error viene de la aplicacion
-							MiniApplet.clienteFirma.errorResponseFunction("java.lang.IOException", "Ocurrio un error de red en la llamada al servicio de firma", errorCallback);
-							return;
-						}
-					}
-				} while (portError && i < ports.length);
-
-				// Operamos segun el resultado
-				if (httpRequest.readyState == 4 && httpRequest.status == 200) {
-					if (successCallback != null) {
-						MiniApplet.clienteFirma.successServiceResponseFunction(Base64.decode(httpRequest.responseText, true), cipherKey, successCallback, errorCallback);
-					}
-					return;
-				}
-				
-				if (errorCallback != null) {
-					MiniApplet.clienteFirma.errorResponseFunction(null, httpRequest.responseText, errorCallback);
-				}
-			}
-
-			function getStoredFileFromServlet (idDocument, servletAddress, cipherKey, successCallback, errorCallback) {
-
-				var httpRequest = getHttpRequest();
-				if (!httpRequest) {
-					throwException("java.lang.Exception", "Su navegador no permite obtener el resulado de la operaci\u00F3n");
-				}
-
-				iterations = 0;
-				setTimeout(retrieveRequest, 4000, httpRequest, servletAddress, "op=get&v=1_0&id=" + idDocument + "&it=0", cipherKey, successCallback, errorCallback);
-			}
-
-			var NUM_MAX_ITERATIONS = 15;
-
-			function retrieveRequest(httpRequest, url, params, cipherKey, successCallback, errorCallback) {
-
-				// Contamos la nueva llamada al servidor
-				if (iterations > NUM_MAX_ITERATIONS) {
-					errorResponseFunction("java.util.concurrent.TimeoutException", "El tiempo para la recepcion de la firma por la pagina web ha expirado", errorCallback);
-					return;
-				}
-				iterations++;
-
-				httpRequest.open("POST", url, false);
-				httpRequest.setRequestHeader("Content-type","application/x-www-form-urlencoded");
-
-				try {
-					httpRequest.send(params);
-				}
-				catch(e) {
-					// Error en la llamada para al recuperacion del resultado. No lo encuentra o problema
-					// de tipo cross-domain
-					errorResponseFunction("java.lang.IOException", "Ocurrio un error de red en la llamada al servicio de firma", errorCallback);
-					return;
-				}
-
-				if (httpRequest.readyState==4) {
-					if (httpRequest.status==200) {
-						var needContinue = successResponseFunction(httpRequest.responseText, cipherKey, successCallback, errorCallback);
-						if (!needContinue) {
-							return;
-						}
-					}
-					else {
-						errorResponseFunction(null, httpRequest.responseText, errorCallback);
-						return;
-					}
-				}
-
-				setTimeout(retrieveRequest, 4000, httpRequest, url, params.replace("&it=" + (iterations-1), "&it=" + iterations), cipherKey, successCallback, errorCallback);
-			}
-
-			/**
-			 * Realiza un descifrado DES compatible con Java (Algoritmo DES, modo CBC, sin Padding).
-			 * Recibe en base 64 la cadena de texto cifrado antecedido por el padding anadido manualmente
-			 * a los datos para permitir el cifrado DES (separado por un punto ('.')), ademas de la clave
-			 * para descifrar.
-			 * Como resultado devuelve la cadena de texto descifrada en base 64.
-			 */
-			function decipher(cipheredData, key) {
-								
-				var dotPos = cipheredData.indexOf('.');
-				var padding = cipheredData.substr(0, dotPos);
-				
-				var deciphered = des(key, base64ToString(cipheredData.substr(dotPos + 1).replace(/\-/g, "+").replace(/\_/g, "/")), 0, 0, null);
-				
-				return stringToBase64(deciphered.substr(0, deciphered.length - padding - 8));
-			}
-			
-			/**
-			 * Realiza un cifrado DES compatible con Java (Algoritmo DES, modo CBC, sin Padding).
-			 * @param dataB64 Cadena de texto base 64.
-			 * @param key Clave de cifrado.
-			 * @return Base 64 cifrado.
-			 */
-			function cipher(dataB64, key) {
-
-				var data = base64ToString(dataB64.replace(/\-/g, "+").replace(/\_/g, "/"));
-				var padding = (8 - (data.length % 8)) % 8;
-				
-				// Los datos cifrados los pasamos a base 64 y, antes de devolverlos le anteponemos el padding que
-				// le habra agregado el metodo de cifrado separados por un punto ('.').
-				return padding  + "." + stringToBase64(des(key, data, 1, 0, null)).replace(/\+/g, "-").replace(/\//g, "_");
-			}
-
 			/* Metodos que publicamos del objeto AppAfirmaJS */
 			return {
 				echo : echo,
 				checkTime : checkTime,
+				setKeyStore : setKeyStore,
 				sign : sign,
 				coSign : coSign,
 				counterSign : counterSign,
@@ -1629,7 +1172,6 @@ var MiniApplet = ( function ( window, undefined ) {
 				getMultiFileNameContentBase64 : getMultiFileNameContentBase64,
 				getBase64FromText : getBase64FromText,
 				getTextFromBase64 : getTextFromBase64,
-				setServlets : setServlets,
 				setStickySignatory : setStickySignatory,
 				setLocale : setLocale,
 				getErrorMessage : getErrorMessage,
@@ -1653,6 +1195,7 @@ var MiniApplet = ( function ( window, undefined ) {
 			 */
 			var errorMessage = '';
 			var errorType = '';
+			var defaultKeystore = null;
 			var retrieverServletAddress = null;
 			var storageServletAddress = null;
 
@@ -1667,6 +1210,13 @@ var MiniApplet = ( function ( window, undefined ) {
 				}
 			}
 
+			/**
+			 * Establece el almacen de certificados de que se debe utilizar por defecto.
+			 */
+			function setKeyStore (keystore) {
+				defaultKeystore = keystore;
+			}
+			
 			/**
 			 * Inicia el proceso de firma electronica.
 			 * Implementada en el applet Java de firma
@@ -1710,7 +1260,7 @@ var MiniApplet = ( function ( window, undefined ) {
 				if (dataB64 != null && !isValidUrl(dataB64)) {
 					dataB64 = dataB64.replace(/\+/g, "-").replace(/\//g, "_");
 				}
-				
+
 				var idSession = generateNewIdSession();
 				var cipherKey = generateCipherKey();
 
@@ -1719,6 +1269,8 @@ var MiniApplet = ( function ( window, undefined ) {
 				if (signId != null && signId != undefined) {			params[i++] = {key:"op", value:encodeURIComponent(signId)}; }
 				if (idSession != null && idSession != undefined) {		params[i++] = {key:"id", value:encodeURIComponent(idSession)}; }
 				if (cipherKey != null && cipherKey != undefined) {		params[i++] = {key:"key", value:encodeURIComponent(cipherKey)}; }
+				if (defaultKeystore != null &&
+						defaultKeystore != undefined) {					params[i++] = {key:"keystore", value:encodeURIComponent(defaultKeystore)}; }
 				if (storageServletAddress != null &&
 						storageServletAddress != undefined) {			params[i++] = {key:"stservlet", value:encodeURIComponent(storageServletAddress)}; }
 				if (format != null && format != undefined) {			params[i++] = {key:"format", value:encodeURIComponent(format)}; }
@@ -1757,7 +1309,8 @@ var MiniApplet = ( function ( window, undefined ) {
 			 * Implementada en el applet Java de firma.
 			 */
 			function getBase64FromText (plainText, charset) {
-				return Base64.encode(plainText);
+				return plainText != null ? Base64.encode(plainText) : null ;
+				 Base64.encode(plainText);
 			}
 
 			/**
@@ -2288,6 +1841,7 @@ var MiniApplet = ( function ( window, undefined ) {
 			return {
 				echo : echo,
 				checkTime : checkTime,
+				setKeyStore : setKeyStore,
 				sign : sign,
 				coSign : coSign,
 				counterSign : counterSign,
@@ -2344,7 +1898,9 @@ var MiniApplet = ( function ( window, undefined ) {
 			setLocale : setLocale,
 			getErrorMessage : getErrorMessage,
 			getErrorType : getErrorType,
-			getCurrentLog : getCurrentLog
+			getCurrentLog : getCurrentLog,
+			isAndroid : isAndroid,
+			isIOS : isIOS
 		};
 })(window, undefined);
 
@@ -2491,12 +2047,10 @@ var Base64 = {
 					string += String.fromCharCode(((c & 15) << 12) | ((c2 & 63) << 6) | (c3 & 63));
 					i += 3;
 				}
-
 			}
 
 			return string;
 		}
-
 };
 
 //Paul Tero, July 2001

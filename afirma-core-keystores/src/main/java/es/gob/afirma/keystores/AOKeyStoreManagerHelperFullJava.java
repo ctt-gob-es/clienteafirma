@@ -23,6 +23,8 @@ final class AOKeyStoreManagerHelperFullJava {
 	}
 
 	/** Inicializa el almac&eacute;n 100% Java para tarjeta CERES.
+	 * @param parentComponent Componente padre para la modalidad del di&aacute;logo de solicitud
+	 *                        de PIN.
 	 * @return <code>KeyStore</code> inicializado.
 	 * @throws AOKeyStoreManagerException Si no se puede inicializar el almac&eacute;n.
 	 * @throws IOException Si hay problemas en la lectura de datos. */
@@ -38,6 +40,8 @@ final class AOKeyStoreManagerHelperFullJava {
 
 	/** Inicializa el almac&eacute;n 100% Java para DNIe.
 	 * @param pssCallBack <code>PasswordCallback</code> para la obtenci&oacute;n del PIN.
+	 * @param parentComponent Componente padre para la modalidad del di&aacute;logo de solicitud
+	 *                        de PIN.
 	 * @return <code>KeyStore</code> inicializado.
 	 * @throws AOKeyStoreManagerException Si no se puede inicializar el almac&eacute;n.
 	 * @throws IOException Si hay problemas en la lectura de datos. */

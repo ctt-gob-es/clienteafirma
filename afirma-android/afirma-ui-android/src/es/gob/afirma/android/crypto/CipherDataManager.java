@@ -36,7 +36,7 @@ public final class CipherDataManager {
 	 * @param cipherKey Clave de descifrado.
 	 * @return Datos descifrados y con el relleno eliminado.
 	 * @throws InvalidKeyException Cuando la clave proporcionada no es una claves DES v&aacute;lida.
-	 * @throws GeneralSecurityException
+	 * @throws GeneralSecurityException Si hay errores de seguridad.
 	 * @throws IOException Si hay problemas en el tratamiento de los datos, */
 	public static byte[] decipherData(final byte[] cipheredDataB64,
 			                          final byte[] cipherKey) throws InvalidKeyException,
@@ -60,7 +60,7 @@ public final class CipherDataManager {
 
 	/** Descifra una cadena de datos. Esta cadena viene precedida por el n&uacute;mero de caracteres de relleno que
 	 * se agregaron y separado por un punto (.) de la cadena base 64 con los datos cifrados.
-	 * @param dataB64 Cadena de datos con la forma: PADDING.CIPHERDATAB64.
+	 * @param data Cadena de datos con la forma: PADDING.CIPHERDATAB64.
 	 * @param cipherKey Clave de cifrado.
 	 * @return Datos descifrados.
 	 * @throws InvalidKeyException Cuando la clave no es v&aacute;lida.
@@ -94,7 +94,7 @@ public final class CipherDataManager {
 	 * el caracter separador y los datos cifrados y en base 64.
 	 * @throws InvalidKeyException Cuando la clave no es v&aacute;lida.
 	 * @throws GeneralSecurityException Cuando falla el proceso de cifrado.
-	 * @throws IOException */
+	 * @throws IOException Si hay errores en el propio proceso de cifrado o en el tratamiento general de los datos. */
 	public static String cipherData(final byte[] data, final byte[] cipherKey) throws InvalidKeyException, GeneralSecurityException, IOException {
 		return getNeededPaddingAsString(data) + PADDING_CHAR_SEPARATOR + Base64.encode(cipher(data, cipherKey), true);
 	}

@@ -15,8 +15,6 @@ import java.util.logging.Logger;
 
 import org.junit.Test;
 
-import es.gob.afirma.keystores.AOKeyStoreManager;
-import es.gob.afirma.keystores.Pkcs12KeyStoreManager;
 import es.gob.afirma.keystores.callbacks.CachePasswordCallback;
 
 /** Pruebas de almac&eacute;n PKCS#12 con distintas conttrase&ntilde;as
@@ -44,7 +42,14 @@ public class TestP12MultiPassword {
 				continue;
 			}
 			System.out.println("Certificado: " + ksm.getAliases()[i]); //$NON-NLS-1$
-			System.out.println(ksm.getKeyEntry(ksm.getAliases()[i], new CachePasswordCallback("12341234".toCharArray())).getClass().getName()); //$NON-NLS-1$
+			ksm.setEntryPasswordCallBack(
+				new CachePasswordCallback("12341234".toCharArray()) //$NON-NLS-1$
+			);
+			System.out.println(
+				ksm.getKeyEntry(
+					ksm.getAliases()[i]
+				).getClass().getName()
+			);
 		}
 	}
 

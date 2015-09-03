@@ -17,8 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import javax.security.auth.x500.X500Principal;
-
+import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.keystores.KeyStoreManager;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Platform;
@@ -34,8 +33,6 @@ public final class KeyStoreUtilities {
     static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
     private static final String OPENSC_USR_LIB_LINUX = "/usr/lib/opensc-pkcs11.so"; //$NON-NLS-1$
-
-    private static final X500Principal DNIE_ISSUER = new X500Principal("CN=AC DNIE 001, OU=DNIE, O=DIRECCION GENERAL DE LA POLICIA, C=ES"); //$NON-NLS-1$
 
     /** Nombre de los ficheros de biblioteca de los controladores de la FNMT para DNIe y CERES
      * que no tienen implementados el algoritmo SHA1withRSA.
@@ -319,12 +316,50 @@ public final class KeyStoreUtilities {
 		return originalPath;
 	}
 
-	static boolean containsDnie(final AOKeyStoreManager originalKsm) {
-		for (final String alias : originalKsm.getAliases()) {
-			if (originalKsm.getCertificate(alias).getIssuerX500Principal().equals(DNIE_ISSUER)) {
-				return true;
+	/** A&ntilde;ade los almacenes preferentes (por ahora DNIe 100% Java y CERES 100% Java a un almac&eacute;n agredado.
+	 * @param aksm Almac&eacute;n agredado al que se desea a&ntilde;adir los almacenes preferentes.
+	 * @param parentComponent Componente padre para los di&aacute;logos de los almacenes preferentes
+	 *                        (solicitud de PIN, confirmaci&oacute;n de firma, etc.). */
+	public static void addPreferredKeyStoreManagers(final AggregatedKeyStoreManager aksm, final Object parentComponent) {
+		// Anadimos el controlador Java del DNIe SIEMPRE a menos que se indique "es.gob.afirma.keystores.mozilla.disableDnieNativeDriver=true"
+		if (!Boolean.getBoolean("es.gob.afirma.keystores.mozilla.disableDnieNativeDriver")) { //$NON-NLS-1$
+			try {
+				final AOKeyStoreManager tmpKsm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
+					AOKeyStore.DNIEJAVA,
+					null,
+					null,
+					null,
+					parentComponent
+				);
+				LOGGER.info("El DNIe 100% Java ha podido inicializarse, se anadiran sus entradas"); //$NON-NLS-1$
+				tmpKsm.setPreferred(true);
+				aksm.addKeyStoreManager(tmpKsm);
+			}
+			catch (final AOCancelledOperationException ex) {
+				LOGGER.warning("Se cancelo el acceso al almacen DNIe 100% Java: " + ex); //$NON-NLS-1$
+			}
+			catch (final Exception ex) {
+				LOGGER.warning("No se ha podido inicializar el controlador DNIe 100% Java: " + ex); //$NON-NLS-1$
 			}
 		}
-		return false;
+
+		// Anadimos el controlador Java de CERES SIEMPRE a menos que se indique "es.gob.afirma.keystores.mozilla.disableCeresNativeDriver=true"
+		if (!Boolean.getBoolean("es.gob.afirma.keystores.mozilla.disableCeresNativeDriver")) { //$NON-NLS-1$
+			try {
+				final AOKeyStoreManager tmpKsm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
+					AOKeyStore.CERES, // Store
+					null,             // Lib (null)
+					null,             // Description (null)
+					null,             // PasswordCallback (no hay en la carga, hay en la firma
+					parentComponent   // Parent
+				);
+				LOGGER.info("La tarjeta CERES ha podido inicializarse, se anadiran sus entradas"); //$NON-NLS-1$
+				tmpKsm.setPreferred(true);
+				aksm.addKeyStoreManager(tmpKsm);
+			}
+			catch (final Exception ex) {
+				LOGGER.warning("No se ha podido inicializar la tarjeta CERES: " + ex); //$NON-NLS-1$
+			}
+		}
 	}
 }

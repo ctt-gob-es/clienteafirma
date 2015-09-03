@@ -50,7 +50,7 @@ public final class AdESPolicy {
                            final String identifierHashAlgorithm,
                            final String qualifier) {
 
-        if (identifier == null || "".equals(identifier)) { //$NON-NLS-1$
+        if (identifier == null || identifier.isEmpty()) {
             throw new IllegalArgumentException("El identificador de politica no puede ser nulo ni vacio"); //$NON-NLS-1$
         }
 
@@ -72,7 +72,7 @@ public final class AdESPolicy {
         }
         else {
 
-        	if (identifierHashAlgorithm == null || "".equals(identifierHashAlgorithm)) { //$NON-NLS-1$
+        	if (identifierHashAlgorithm == null || identifierHashAlgorithm.isEmpty()) {
                 throw new IllegalArgumentException("Si se indica la huella digital del identificador de politica es obligatorio indicar tambien el algoritmo"); //$NON-NLS-1$
             }
 
@@ -84,7 +84,7 @@ public final class AdESPolicy {
         	this.policyIdentifierHashAlgorithm = AOSignConstants.getDigestAlgorithmName(identifierHashAlgorithm);
         }
 
-        if (qualifier != null && !"".equals(qualifier)) { //$NON-NLS-1$
+        if (qualifier != null && !qualifier.isEmpty()) {
             try {
                 this.policyQualifier = new URL(qualifier);
             }

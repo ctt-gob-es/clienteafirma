@@ -23,12 +23,14 @@ import java.beans.PropertyChangeListener;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.RandomAccessFile;
 import java.net.URL;
 import java.nio.channels.FileLock;
 import java.security.cert.X509Certificate;
 import java.util.Locale;
+import java.util.Properties;
 import java.util.logging.FileHandler;
 import java.util.logging.Formatter;
 import java.util.logging.Level;
@@ -55,6 +57,7 @@ import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.keystores.AOKeyStore;
 import es.gob.afirma.keystores.AOKeyStoreManager;
 import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
+import es.gob.afirma.standalone.protocol.ProtocolInvocationLauncher;
 import es.gob.afirma.standalone.ui.ClosePanel;
 import es.gob.afirma.standalone.ui.DNIeWaitPanel;
 import es.gob.afirma.standalone.ui.MainMenu;
@@ -180,6 +183,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 	        }
 	        catch(final Exception e) {
 	        	LOGGER.info("No se ha podido obtener la lista de lectores de tarjetas del sistema: " + e); //$NON-NLS-1$
+	        	e.printStackTrace();
 	        	showDNIeScreen = false;
 	        }
         }
@@ -189,7 +193,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
            	final MainScreen mainScreen = new MainScreen();
            	mainScreen.showMainScreen(this, this.currentPanel, DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT);
            	this.window = mainScreen;
-            this.window.setTitle(SimpleAfirmaMessages.getString("SimpleAfirma.10")); //$NON-NLS-1$
+            this.window.setTitle(SimpleAfirmaMessages.getString("SimpleAfirma.10", getVersion())); //$NON-NLS-1$
             this.container = this.window;
         }
         else {
@@ -197,7 +201,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
         	this.currentPanel = new SignPanel(mainScreen, this);
            	mainScreen.showMainScreen(this, this.currentPanel, DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT);
         	this.window = mainScreen;
-        	this.window.setTitle(SimpleAfirmaMessages.getString("SimpleAfirma.10")); //$NON-NLS-1$
+        	this.window.setTitle(SimpleAfirmaMessages.getString("SimpleAfirma.10", getVersion())); //$NON-NLS-1$
         	this.container = this.window;
 
         	loadDefaultKeyStore();
@@ -290,7 +294,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
      * @param firstTime <code>true</code> si se la primera vez que se carga, <code>en caso contrario</code>. */
     public void loadMainApp(final boolean firstTime) {
 
-    	this.window.setTitle(SimpleAfirmaMessages.getString("SimpleAfirma.10")); //$NON-NLS-1$
+    	this.window.setTitle(SimpleAfirmaMessages.getString("SimpleAfirma.10", getVersion())); //$NON-NLS-1$
 
     	configureMenuBar(firstTime);
 
@@ -357,7 +361,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
         this.container.add(newPanel, BorderLayout.CENTER);
         if (this.window != null && fileName != null) {
             this.window.getRootPane().putClientProperty("Window.documentFile", new File(fileName)); //$NON-NLS-1$
-            this.window.setTitle(SimpleAfirmaMessages.getString("SimpleAfirma.10") + " - " + new File(fileName).getName()); //$NON-NLS-1$ //$NON-NLS-2$
+            this.window.setTitle(SimpleAfirmaMessages.getString("SimpleAfirma.10", getVersion()) + " - " + new File(fileName).getName()); //$NON-NLS-1$ //$NON-NLS-2$
         }
         if (this.currentPanel != null) {
             this.currentPanel.setVisible(false);
@@ -739,4 +743,28 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
         }
     }
 
+    private static String version = null;
+
+	/** Recupera el identificador del numero de version del MiniApplet a partir de su Manifest.
+	 * @return Identificador de la versi&oacute;n. */
+	public static String getVersion() {
+
+		if (version != null) {
+			return version;
+		}
+
+		try (
+			final InputStream manifestIs = SimpleAfirma.class.getClassLoader().getResourceAsStream("META-INF/MANIFEST.MF"); //$NON-NLS-1$
+		) {
+			final Properties metadata = new Properties();
+			metadata.load(manifestIs);
+			version = metadata.getProperty("Specification-Version", ""); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+		catch (final Exception e) {
+			LOGGER.warning("No se ha podido identificar el numero de version de AutoFirma a partir del Manifest: " + e); //$NON-NLS-1$
+			version = ""; //$NON-NLS-1$
+		}
+
+		return version;
+	}
 }

@@ -33,13 +33,13 @@ import es.gob.afirma.android.gui.DownloadFileTask.DownloadDataListener;
 import es.gob.afirma.android.gui.FileArrayAdapter;
 import es.gob.afirma.android.gui.FileOption;
 import es.gob.afirma.android.network.AndroidUrlHttpManager;
-import es.gob.afirma.android.network.UriParser;
-import es.gob.afirma.android.network.UriParser.ParameterException;
-import es.gob.afirma.android.network.UriParser.UrlParametersToSave;
 import es.gob.afirma.core.misc.MimeHelper;
 import es.gob.afirma.core.misc.http.UrlHttpManagerFactory;
+import es.gob.afirma.core.misc.protocol.ParameterException;
+import es.gob.afirma.core.misc.protocol.ProtocolInvocationUriParser;
+import es.gob.afirma.core.misc.protocol.UrlParametersToSave;
 
-/** Actividad Android para la elecci&oacue;n de un fichero en el almacenamiento del dispositivo. */
+/** Actividad Android para la elecci&oacute;n de un fichero en el almacenamiento del dispositivo. */
 public final class SaveDataActivity extends ListActivity implements DownloadDataListener {
 
 	private static final String ES_GOB_AFIRMA = "es.gob.afirma"; //$NON-NLS-1$
@@ -118,7 +118,7 @@ public final class SaveDataActivity extends ListActivity implements DownloadData
 		// Recogemos los datos de la URI
 		if (this.parameters == null) {
 			try {
-				this.parameters = UriParser.getParametersToSave(getIntent().getDataString());
+				this.parameters = ProtocolInvocationUriParser.getParametersToSave(getIntent().getDataString());
 			}
 			catch (final ParameterException e) {
 				showMessage(getString(R.string.error_bad_params));
@@ -139,7 +139,6 @@ public final class SaveDataActivity extends ListActivity implements DownloadData
 
 	private void fill(final File f) {
 
-		//Descomentar
 		((TextView) findViewById(R.id.current_directory)).setText(getString(R.string.file_chooser_directorio_actual) + " " + f.getName());  //$NON-NLS-1$
 
 		final List<FileOption> dir = new ArrayList<FileOption>();
@@ -170,12 +169,14 @@ public final class SaveDataActivity extends ListActivity implements DownloadData
 
 		//TODO: Comprobar que se muestran los mensajes de error antes de cerrar la aplicacion
 
-		runOnUiThread(new Runnable() {
-			@Override
-			public void run() {
-				Toast.makeText(SaveDataActivity.this, message, Toast.LENGTH_LONG).show();
+		runOnUiThread(
+			new Runnable() {
+				@Override
+				public void run() {
+					Toast.makeText(SaveDataActivity.this, message, Toast.LENGTH_LONG).show();
+				}
 			}
-		});
+		);
 	}
 
 	@Override
@@ -282,8 +283,9 @@ public final class SaveDataActivity extends ListActivity implements DownloadData
 			final FileOutputStream fos = new FileOutputStream(outFile);
 			fos.write(data);
 			fos.close();
-		} catch (final IOException e) {
-			Log.e(ES_GOB_AFIRMA, "No se han podido guardar los datos: " + e.toString()); //$NON-NLS-1$
+		}
+		catch (final IOException e) {
+			Log.e(ES_GOB_AFIRMA, "No se han podido guardar los datos: " + e); //$NON-NLS-1$
 			showMessage(getString(R.string.error_saving_data));
 			return;
 		}
@@ -293,12 +295,19 @@ public final class SaveDataActivity extends ListActivity implements DownloadData
 		Log.d(ES_GOB_AFIRMA, "Los datos se han guardado correctamente"); //$NON-NLS-1$
 
 		// Refrescamos el directorio para permitir acceder al fichero
-		MediaScannerConnection.scanFile(
+		try {
+			MediaScannerConnection.scanFile(
 				this,
 				new String[] { outFile.toString(),
-						outFile.getParentFile().toString()},
+					outFile.getParentFile().toString()
+				},
 				null,
-				null);
+				null
+			);
+		}
+		catch(final Exception e) {
+			Log.w(ES_GOB_AFIRMA, "Error refrescando el MediaScanner: " + e); //$NON-NLS-1$
+		}
 
 		closeActivity();
 	}
@@ -313,17 +322,20 @@ public final class SaveDataActivity extends ListActivity implements DownloadData
 		byte[] decipheredData;
 		try {
 			decipheredData = CipherDataManager.decipherData(data, this.parameters.getDesKey());
-		} catch (final IOException e) {
-			Log.e(ES_GOB_AFIRMA, "Los datos proporcionados no estan correctamente codificados en base 64: " + e.toString()); //$NON-NLS-1$
+		}
+		catch (final IOException e) {
+			Log.e(ES_GOB_AFIRMA, "Los datos proporcionados no estan correctamente codificados en Base64: " + e); //$NON-NLS-1$
 			showMessage(getString(R.string.error_bad_params));
 			closeActivity();
 			return;
-		} catch (final GeneralSecurityException e) {
-			Log.e(ES_GOB_AFIRMA, "Error al descifrar los datos recuperados del servidor para la firma: " + e.toString()); //$NON-NLS-1$
+		}
+		catch (final GeneralSecurityException e) {
+			Log.e(ES_GOB_AFIRMA, "Error al descifrar los datos recuperados del servidor para la firma: " + e); //$NON-NLS-1$
 			showMessage(getString(R.string.error_bad_params));
 			closeActivity();
 			return;
-		} catch (final IllegalArgumentException e) {
+		}
+		catch (final IllegalArgumentException e) {
 			Log.e(ES_GOB_AFIRMA, "Los datos recuperados no son un base64 valido: " + e.toString()); //$NON-NLS-1$
 			showMessage(getString(R.string.error_bad_params));
 			closeActivity();
@@ -331,24 +343,20 @@ public final class SaveDataActivity extends ListActivity implements DownloadData
 		}
 
 		try {
-			this.parameters = UriParser.getParametersToSave(decipheredData);
+			this.parameters = ProtocolInvocationUriParser.getParametersToSave(decipheredData);
 		}
 		catch (final ParameterException e) {
 			showMessage(getString(R.string.error_bad_params));
-			Log.e(ES_GOB_AFIRMA, "Error en los parametros XML de configuracion de guardado: " + e.toString()); //$NON-NLS-1$
+			Log.e(ES_GOB_AFIRMA, "Error en los parametros XML de configuracion de guardado: " + e); //$NON-NLS-1$
 			closeActivity();
 			return;
 		}
 		catch (final UnsupportedEncodingException e) {
 			showMessage(getString(R.string.error_bad_params));
-			Log.e(ES_GOB_AFIRMA, "Error de codificacion en el XML de configuracion de guardado: " + e.toString()); //$NON-NLS-1$
+			Log.e(ES_GOB_AFIRMA, "Error de codificacion en el XML de configuracion de guardado: " + e); //$NON-NLS-1$
 			closeActivity();
 			return;
 		}
-
-		//		if (this.progressDialog != null && this.progressDialog.isShowing()) {
-		//			this.progressDialog.dismiss();
-		//		}
 
 		// Establecemos el titulo de la ventana si se definio
 		if (this.parameters.getTitle() != null) {

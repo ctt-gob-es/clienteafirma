@@ -1,0 +1,267 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"> 
+<html>
+ <head>
+  <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+  <title>
+   Esquema del XML de definici&oacute;n de lotes de firmas
+  </title>
+ </head>
+ <body>
+  El esquema XML de definici&oacute;n de lotes de firmas es el siguiente:
+  <pre>
+ &lt;xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema"&gt;
+   &lt;xs:element name="signbatch"&gt;
+     &lt;xs:complexType&gt;
+       &lt;xs:sequence&gt;
+         &lt;xs:element name="singlesign" maxOccurs="unbounded" minOccurs="1"&gt;
+           &lt;xs:complexType&gt;
+             &lt;xs:sequence&gt;
+               &lt;xs:element type="xs:string" name="datasource"/&gt;
+               &lt;xs:element name="format"&gt;
+                 &lt;xs:simpleType&gt;
+                   &lt;xs:restriction base="xs:string"&gt;
+                     &lt;xs:enumeration value="XAdES"/&gt;
+                     &lt;xs:enumeration value="CAdES"/&gt;
+                     &lt;xs:enumeration value="PAdES"/&gt;
+                   &lt;/xs:restriction&gt;
+                 &lt;/xs:simpleType&gt;
+               &lt;/xs:element&gt;
+               &lt;xs:element name="suboperation"&gt;
+                 &lt;xs:simpleType&gt;
+                   &lt;xs:restriction base="xs:string"&gt;
+                     &lt;xs:enumeration value="sign"/&gt;
+                     &lt;xs:enumeration value="cosign"/&gt;
+                   &lt;/xs:restriction&gt;
+                 &lt;/xs:simpleType&gt;
+               &lt;/xs:element&gt;
+               &lt;xs:element name="extraparams"&gt;
+                 &lt;xs:simpleType&gt;
+                  &lt;xs:restriction  base="xs:base64Binary" /&gt;
+                 &lt;/xs:simpleType&gt;
+               &lt;/xs:element&gt;
+               &lt;xs:element name="signsaver"&gt;
+                 &lt;xs:complexType&gt;
+                   &lt;xs:sequence&gt;
+                     &lt;xs:element type="xs:string" name="class"/&gt;
+                     &lt;xs:element name="config"&gt;
+                       &lt;xs:simpleType&gt;
+                         &lt;xs:restriction  base="xs:base64Binary" /&gt;
+                       &lt;/xs:simpleType&gt;
+                     &lt;/xs:element&gt;
+                   &lt;/xs:sequence&gt;
+                 &lt;/xs:complexType&gt;
+               &lt;/xs:element&gt;
+             &lt;/xs:sequence&gt;
+             &lt;xs:attribute type="xs:string" name="Id" use="required"/&gt;
+           &lt;/xs:complexType&gt;
+         &lt;/xs:element&gt;
+       &lt;/xs:sequence&gt;
+       &lt;xs:attribute type="xs:integer" name="concurrenttimeout" use="optional"/&gt;
+       &lt;xs:attribute name="stoponerror" use="optional"&gt;
+         &lt;xs:simpleType&gt;
+           &lt;xs:restriction base="xs:string"&gt;
+             &lt;xs:enumeration value="true"/&gt;
+             &lt;xs:enumeration value="false"/&gt;
+           &lt;/xs:restriction&gt;
+         &lt;/xs:simpleType&gt;
+       &lt;xs:attribute name="algorithm" use="required"&gt;
+         &lt;xs:simpleType&gt;
+           &lt;xs:restriction base="xs:string"&gt;
+             &lt;xs:enumeration value="SHA1withRSA"/&gt;
+             &lt;xs:enumeration value="SHA256withRSA"/&gt;
+             &lt;xs:enumeration value="SHA384withRSA"/&gt;
+             &lt;xs:enumeration value="SHA512withRSA"/&gt;
+           &lt;/xs:restriction&gt;
+         &lt;/xs:simpleType&gt;
+       &lt;xs:attribute&gt;
+     &lt;/xs:complexType&gt;
+   &lt;/xs:element&gt;
+ &lt;/xs:schema&gt;
+ </pre>
+ Un ejemplo de definici&oacute;n XML de lote de firmas podr&iacute;a ser
+ este (ejemplo con dos firmas en el lote):
+ <pre>
+ &lt;?xml version="1.0" encoding="UTF-8" ?&gt;
+ &lt;signbatch stoponerror="true" algorithm="SHA512withRSA" concurrenttimeout="9223372036854775807"&gt;
+  &lt;singlesign Id="f8526f7b-d30a-4720-9e35-fe3494217944"&gt;
+   &lt;datasource&gt;http://google.com&lt;/datasource&gt;
+   &lt;format&gt;XAdES&lt;/format&gt;
+   &lt;suboperation&gt;sign&lt;/suboperation&gt;
+   &lt;extraparams&gt;Iw0KI1RodSBBdW[...]QNCg==&lt;/extraparams&gt;
+   &lt;signsaver&gt;
+    &lt;class&gt;es.gob.afirma.signers.batch.SignSaverFile&lt;/class&gt;
+    &lt;config&gt;Iw0KI1RodSBBdWcgMT[...]wNCg==&lt;/config&gt;
+   &lt;/signsaver&gt;
+  &lt;/singlesign&gt;
+  &lt;singlesign Id="0e9cc5de-63ee-45ee-ae02-4a6591ab9a46"&gt;
+   &lt;datasource&gt;SG9sYSBNdW5kbw==&lt;/datasource&gt;
+   &lt;format&gt;CAdES&lt;/format&gt;
+   &lt;suboperation&gt;sign&lt;/suboperation&gt;
+   &lt;extraparams&gt;Iw0KI1RodSBBdWc[...]NCg==&lt;/extraparams&gt;
+   &lt;signsaver&gt;
+    &lt;class&gt;es.gob.afirma.signers.batch.SignSaverFile&lt;/class&gt;
+    &lt;config&gt;Iw0KI1RodSBBdWcgMTM[...]Cg==&lt;/config&gt;
+   &lt;/signsaver&gt;
+  &lt;/singlesign&gt;
+ &lt;/signbatch&gt;
+ </pre>
+ En este se distinguen los siguientes elementos:
+ <p><b><u>Cabecera de definici&oacute;n de lote</u></b></p>
+ <p>
+  En el ejemplo, es la l&iacute;nea <code>&lt;signbatch stoponerror="false"&gt;</code>, 
+  que contiene dos atributos configurables por el integrador:
+ </p>
+ <dl>
+  <dt><code>stoponerror</code></dt>
+  <dd>
+   <p>
+    Cuando se establece a <code>false</code> se indica que el proceso debe continuar incluso
+    si alguna de las firmas del lote no puede completarse, y cuando se establece a <code>true</code>
+    el proceso se para en el momento en el que se produce el primer error.
+   </p>
+  </dd>
+  <dt><code>algorithm</code></dt>
+  <dd>
+   <p>
+    Algoritmo de firma a usar en todo el lote.<br>
+    Se admiten los siguientes algoritmos:
+   </p>
+   <ol>
+    <li><code>SHA1withRSA</code> (no se recomienda por obsoleto)</li>
+    <li><code>SHA256withRSA</code></li>
+    <li><code>SHA384withRSA</code></li>
+    <li><code>SHA512withRSA</code></li>
+   </ol>
+  </dd>
+ </dl> 
+ <p><b><u>Definici&oacute;n de cada firma dentro del lote</u></b></p>
+ <p>
+  Dentro del elemento de definici&oacute;n de lote debemos incluir uno o varios elementos de tipo
+  <code>singlesign</code>, que es obligatorio cuenten en origen con un identificados &uacute;nico 
+  (en el ejemplo se observa la primera cabecera de definici&oacute;n de firma 
+  <code>&lt;singlesign id="7725374e-728d-4a33-9db9-3a4efea4cead"&gt;</code>, que indica que es una 
+  firma dentro del lote identificada por la cadena <code>7725374e-728d-4a33-9db9-3a4efea4cead</code>.
+ </p>
+ <p><u>Configuraci&oacute;n de cada firma dentro del lote</u></p>
+  Cada una de las firmas dentro del lote puede ser configurada individualmente con los siguientes par&aacute;metros:
+  <dl>
+   <dt>
+    Origen de los datos a firmar
+   </dt>
+    <dd>
+     <p>
+      El origen de los datos debe indicarse dentro del elemento <code>datasource</code> del XML, por ejemplo: 
+      <code>&lt;datasource&gt;http://google.com&lt;/datasource&gt;</code>
+     </p>
+     El origen de los datos a firmar puede indicarse:
+     <ol>
+      <li>
+       Con una URL (se admite HTTP y HTTPS). En este caso el servidor (nunca el cliente) descargar&aacute; 
+       directamente los datos a firmar.
+      </li>
+      <li>
+       Indicando directamente los datos a firmar codificados en Base64. 
+       En este caso el servidor descodificar&aacute; el Base64 para obtener los datos a firmar.</li>
+     </ol>
+    </dd>
+   <dt>
+    Formato de firma
+   </dt>
+    <dd>
+     <p>
+      El formato de firma a utilizar debe indicarse dentro del elemento <code>format</code> del XML, por ejemplo 
+      <code>&lt;format&gt;XAdES&lt;/format&gt;</code>.
+     </p>
+     Se admiten los siguientes formatos:
+     <ol>
+      <li><code>XAdES</code></li>
+      <li><code>CAdES</code></li>
+      <li><code>PAdES</code> (v&aacute;lido &uacute;nicamente para documentos PDF)</li>
+     </ol>
+    </dd>
+   <dt>
+    Operaci&oacute;n de firma
+   </dt>
+    <dd>
+     <p>
+      La operaci&oacute;n concreta de firma a realizar debe indicarse dentro del elemento <code>suboperation</code> 
+      del XML, por ejemplo <code>&lt;suboperation&gt;sign&lt;/suboperation&gt;</code>.
+     </p>
+     Se admiten las siguientes operaciones:
+     <ol>
+      <li><code>sign</code> (firma)</li>
+      <li><code>cosign</code> (cofirma)</li>
+     </ol>
+    </dd>
+   <dt>
+    Par&aacute;metros adicionales para la firma
+   </dt>
+   	<dd>
+   	 <p>
+   	  Los par&aacute;metros adicionales para el formato y la operaci&oacute;n concreta de firma (tal y como se describe
+   	  en la documentaci&oacute;n del MiniApplet) deben indicarse dentro del elemento <code>extraparams</code> del XML, 
+   	  por ejemplo <code>&lt;extraparams&gt;bW9kZT1pbXBsaWNpdA0Kc2lnbmF0dXJlUHJvZHVjdGlvbkNpdHk9TWFkcmlk&lt;/extraparams&gt;</code>.
+   	 <p>
+   	 <p>
+      Estos par&aacute;metros adicionales deben indicarse codificando su representaci&oacute;n textual como Base64.<br> 
+      As&iacute;, las siguientes propiedades (indicando cada par&aacute;metro en una l&iacute;nea de texto con el formato
+      nombre_parámetro=valor):
+     </p>
+     <p><code>
+      mode=implicit<br>
+      signatureProductionCity=Madrid
+     </code></p>
+     Quedar&iacute;an codificadas en Base64 como:
+     <p><code>
+     bW9kZT1pbXBsaWNpdA0Kc2lnbmF0dXJlUHJvZHVjdGlvbkNpdHk9TWFkcmlk
+     </code></p>
+   	 Si no se desea establecer par&aacute;metros adicionales debe dejarse el nodo vac&iacute;o.<br>&nbsp;
+   	</dd>
+   <dt>
+    Configuraci&oacute;n del guardado de la firma
+   </dt>
+   	<dd>
+   	 <p>
+   	  El guardado de la firma una vez esta se finaliza es una tarea que realiza igualmente el servidor, utilizando 
+   	  para ello clases especiales de guardado que el integrador debe codificar seg&uacute;n sus necesidades.<br>
+      Estas clases deben implementar el interfaz <code>SignSaver</code>.
+     </p>
+     <p>
+      La forma de indicar qu&eacute; clase de guardado a usar y con qu&eacute; configuraci&oacute;n es mediante el 
+      nodo <code>signsaver</code>code>, que contiene a su vez dos nodos:
+     </p>
+     <ol>
+      <li><code>class</code>, con el nombre cualificado de la clase a usar.</li>
+      <li><code>config</code>, con las propiedades de configuraci&oacute;n codificadas en Base64.</li>
+     </ol>
+     <p>
+      As&iacute;, en el ejemplo tenemos el siguiente nodo:
+     </p>
+     <pre>
+      &lt;signsaver&gt;
+        &lt;class&gt;es.gob.afirma.signers.batch.SignSaverFile&lt;/class&gt;
+        &lt;config&gt;
+          Iw0KI1RodSBBdWcgMjAgMTI6MTM6NDEgQ0VTVCAyMDE1DQpGaWxlTmFtZT1DXDpcXFVzZXJzXFx0b21hc1xcQXBwRGF0YVxcTG9jYWxcXFRlbXBcXEZJUk1BMi54bWwNCg==
+        &lt;/config&gt;
+      &lt;/signsaver&gt;
+     </pre>
+     <p>
+      Este indica que debe usarse la clase de guardado <code>es.gob.afirma.signers.batch.SignSaverFile</code>
+      con la configuraci&oacute;n <code>Iw0KI1RodSBBdWcgMjAgMTI6MTM6NDEgQ0VTVCAyMDE1DQpGaWxlTmFtZT1DXDpcXFVzZXJzXFx0b21hc1xcQXBwRGF0YVxcTG9jYWxcXFRlbXBcXEZJUk1BMi54bWwNCg==</code>,
+      que si la descodificamos vemos que contiene:
+   	 <p>
+   	 <p>
+   	  <code>
+   	   FileName=C\:\\Users\\tomas\\AppData\\Local\\Temp\\FIRMA2.xml
+   	  </code>
+   	 </p>
+   	 <p>
+   	  Que es la configuraci&oacute;n que necesita para guardar la firma (esta clase simplemente guarda 
+   	  la firma en el fichero que se le indique en la configuraci&oacute;n).
+   	 </p>
+   	</dd>
+  </dl>
+ <p>
+ </p>
+ </body>
+</html>

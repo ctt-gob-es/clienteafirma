@@ -384,9 +384,10 @@ final class SignText {
                                 }
                             }
 
+                            this.kss.setEntryPasswordCallBack(this.passCbk);
                             this.result = firmar(
                                 stringToSign,
-                                this.kss.getKeyEntry(al, this.passCbk),
+                                this.kss.getKeyEntry(al),
                                 this.kss.getCertificate(al)
                             );
                         }

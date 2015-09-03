@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.security.KeyStore;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.util.Properties;
@@ -17,6 +18,7 @@ import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.CounterSignTarget;
+import es.gob.afirma.signers.cadestri.client.asic.AOCAdESASiCSTriPhaseSigner;
 
 /** Pruebas de firma CAdES trif&aacute;sica.
  * @author Tom&acute;s Garc&iacute;a-Mer&aacute;s */
@@ -50,7 +52,37 @@ public final class TestCadesTriphase {
 	 * @throws IOException */
 	@Test
 	//@Ignore // Necesita el servidor
-	public void firma() throws AOException, IOException {
+	public void testTriPhaseSignCAdESASiCS() throws AOException, IOException {
+		final AOSigner signer = new AOCAdESASiCSTriPhaseSigner();
+
+		final Properties config = new Properties(this.serverConfig);
+		for (final String key : this.serverConfig.keySet().toArray(new String[this.serverConfig.size()])) {
+			config.setProperty(key, this.serverConfig.getProperty(key));
+		}
+
+		final byte[] result = signer.sign("Hola Mundo".getBytes(), "SHA512withRSA", this.pke.getPrivateKey(), this.pke.getCertificateChain(), config); //$NON-NLS-1$ //$NON-NLS-2$
+
+		Assert.assertNotNull("Error durante el proceso de firma, resultado nulo", result); //$NON-NLS-1$
+
+		final FileOutputStream os = new FileOutputStream(File.createTempFile("firma_tri_", ".csig")); //$NON-NLS-1$ //$NON-NLS-2$
+		os.write(result);
+		os.close();
+
+		System.out.println("OK"); //$NON-NLS-1$
+
+		final File f = File.createTempFile("CAdES-ASiC-S_", ".zip"); //$NON-NLS-1$ //$NON-NLS-2$
+		final OutputStream fos = new FileOutputStream(f);
+		fos.write(result);
+		fos.close();
+		java.util.logging.Logger.getLogger("es.gob.afirma").info("El resultado de la firma se almaceno en: " + f.getAbsolutePath()); //$NON-NLS-1$ //$NON-NLS-2$
+
+	}
+
+	/** Prueba de firma CAdES trif&aacute;sica.
+	 * @throws Exception en cualquier error. */
+	@Test
+	//@Ignore // Necesita el servidor
+	public void testTriPhaseSignCAdES() throws Exception {
 		final AOSigner signer = new AOCAdESTriPhaseSigner();
 
 		final Properties config = new Properties(this.serverConfig);

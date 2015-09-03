@@ -169,6 +169,12 @@
 					<artifactId>afirma-crypto-xadestri-client</artifactId>
 					<version>${project.version}</version>
 				</dependency>
+				
+				<dependency>
+					<groupId>es.gob.afirma</groupId>
+					<artifactId>afirma-crypto-batch-client</artifactId>
+				    <version>${project.version}</version>
+				</dependency>
 
 				<dependency>
 					<groupId>es.gob</groupId>
@@ -225,7 +231,6 @@
 							<excludes>
 								<exclude>META-INF/*.SF</exclude>
 								<exclude>META-INF/*.DSA</exclude>
-								<exclude>META-INF/*.RSA</exclude>
 								<exclude>META-INF/*.RSA</exclude>
 								<exclude>*.crt</exclude>
 							</excludes>

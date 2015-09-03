@@ -39,15 +39,15 @@ import es.gob.afirma.android.crypto.MobileKeyStoreManager.PrivateKeySelectionLis
 import es.gob.afirma.android.crypto.SignTask;
 import es.gob.afirma.android.crypto.SignTask.SignListener;
 import es.gob.afirma.android.network.AndroidUrlHttpManager;
-import es.gob.afirma.android.network.UriParser;
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.http.UrlHttpManagerFactory;
+import es.gob.afirma.core.misc.protocol.UrlParametersToSign.Operation;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSignerFactory;
 
-/** Esta actividad permite firmar un fichero local. La firma se guarda en un fichero .csig.
- * Esta clase tiene mucho c&oacute;fdigo duplicado de la clase LocalSignResultActivity.
- * Hay crear una nueva clase con los m&ecute;todos duplicados.
+/** Esta actividad permite firmar un fichero local. La firma se guarda en un fichero <i>.csig</i>.
+ * Esta clase tiene mucho c&oacute;digo duplicado de la clase <code>LocalSignResultActivity</code>.
+ * Hay crear una nueva clase con los m&eacute;todos duplicados.
  * @author Astrid Idoate Gil. */
 public final class LocalSignResultActivity extends FragmentActivity implements KeystoreManagerListener,
 		                                                                       PrivateKeySelectionListener,
@@ -119,11 +119,11 @@ public final class LocalSignResultActivity extends FragmentActivity implements K
 					}
 					// Ya sea con dispositivo con sin el, se continua la ejecucion cargando el almacen
 					new LoadKeyStoreManagerTask(
-							LocalSignResultActivity.this,
-							LocalSignResultActivity.this,
-							LocalSignResultActivity.this.getUsbDevice(),
-							LocalSignResultActivity.this.getUsbManager()
-							).execute();
+						LocalSignResultActivity.this,
+						LocalSignResultActivity.this,
+						LocalSignResultActivity.this.getUsbDevice(),
+						LocalSignResultActivity.this.getUsbManager()
+					).execute();
 				}
 			}
 		}
@@ -346,7 +346,7 @@ public final class LocalSignResultActivity extends FragmentActivity implements K
 				AOSignConstants.SIGN_FORMAT_PADES : AOSignConstants.SIGN_FORMAT_CADES;
 
 		new SignTask(
-			UriParser.OP_SIGN,
+			Operation.SIGN,
 			this.dataToSign,
 			this.format,
 			DEFAULT_SIGNATURE_ALGORITHM,
@@ -399,19 +399,25 @@ public final class LocalSignResultActivity extends FragmentActivity implements K
 		}
 		catch (final Exception e) {
 			showErrorMessage(getString(R.string.error_saving_signature));
-			e.printStackTrace();
+			Log.e(ES_GOB_AFIRMA, "Error guardando la firma: " + e); //$NON-NLS-1$
 			return;
 		}
 
 		showSuccessMessage(finalSignatureFilename, outDirectory, originalDirectory);
 
 		// Refrescamos el directorio para permitir acceder al fichero
-		MediaScannerConnection.scanFile(
+		try {
+			MediaScannerConnection.scanFile(
 				this,
 				new String[] { new File(outDirectory, finalSignatureFilename).toString(),
 						new File(outDirectory).toString()},
 				null,
-				null);
+				null
+			);
+		}
+		catch(final Exception e) {
+			Log.w(ES_GOB_AFIRMA, "Error refrescando el MediaScanner: " + e); //$NON-NLS-1$
+		}
 	}
 
 	/** Muestra los elementos de pantalla informando de un error ocurrido durante la operaci&oacute;n de
@@ -436,7 +442,8 @@ public final class LocalSignResultActivity extends FragmentActivity implements K
 	/** Muestra los elementos de pantalla informando de que la firma se ha generado correctamente y
 	 * donde se ha almacenado.
 	 * @param filename Nombre del fichero almacenado.
-	 * @param directory Directorio en el que se ha almacenado la firma. */
+	 * @param directory Directorio en el que se ha almacenado la firma.
+	 * @param originalDirectory Directorio donde estaba originalmente el fichero que se firm&oacute;. */
 	private void showSuccessMessage(final String filename, final String directory, final boolean originalDirectory) {
 
 		dismissProgressDialog();
@@ -467,7 +474,7 @@ public final class LocalSignResultActivity extends FragmentActivity implements K
 		EasyTracker.getTracker().sendEvent(
 			"Operacion local", //$NON-NLS-1$
 			"Firma realizada", //$NON-NLS-1$
-			"Operacion='" + UriParser.OP_SIGN + "', formato='" + this.format + "', algoritmo='" + DEFAULT_SIGNATURE_ALGORITHM + "'", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			"Operacion='" + Operation.SIGN + "', formato='" + this.format + "', algoritmo='" + DEFAULT_SIGNATURE_ALGORITHM + "'", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			Long.valueOf(0L)
 		);
 
@@ -481,7 +488,7 @@ public final class LocalSignResultActivity extends FragmentActivity implements K
 		EasyTracker.getTracker().sendEvent(
 			"Operacion local", //$NON-NLS-1$
 			"Firma error", //$NON-NLS-1$
-			"Operacion='" + UriParser.OP_SIGN + "', formato='" + this.format + "', algoritmo='" + DEFAULT_SIGNATURE_ALGORITHM + "'", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			"Operacion='" + Operation.SIGN + "', formato='" + this.format + "', algoritmo='" + DEFAULT_SIGNATURE_ALGORITHM + "'", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			Long.valueOf(0L)
 		);
 

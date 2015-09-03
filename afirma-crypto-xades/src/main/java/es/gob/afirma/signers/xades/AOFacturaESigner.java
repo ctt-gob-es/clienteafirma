@@ -135,15 +135,31 @@ public final class AOFacturaESigner implements AOSigner {
         if (isSign(data)) {
         	throw new EFacturaAlreadySignedException();
         }
-        final Properties xParams = (Properties) EXTRA_PARAMS.clone();
-        if (extraParams != null) {
-            for (final Object k : extraParams.keySet()) {
+        return XADES_SIGNER.sign(
+    		data,
+    		algorithm,
+    		key,
+    		certChain,
+    		getFacturaEExtraParams(extraParams)
+		);
+    }
+
+    /** Obtiene los par&aacute;metros adicionales necesarios para generar una firma XAdES compatible con FacturaE,
+     * combin&aacute;ndolo con los par&aacute;metros proporcionados.
+     * Si los par&aacute;metros proporcionados contienen opciones incompatibles con FacturaE, estas se modifican o
+     * eliminan.
+     * @param originalExtraParams Par&aacute;metros proporcionados originalmente.
+     * @return Par&aacute;metros adicionales necesarios para generar una firma FacturaE. */
+    public static Properties getFacturaEExtraParams(final Properties originalExtraParams) {
+    	final Properties xParams = (Properties) EXTRA_PARAMS.clone();
+    	if (originalExtraParams != null) {
+            for (final Object k : originalExtraParams.keySet()) {
                 if (ALLOWED_PARAMS.contains(k)) {
-                    xParams.put(k, extraParams.get(k));
+                    xParams.put(k, originalExtraParams.get(k));
                 }
             }
         }
-        return XADES_SIGNER.sign(data, algorithm, key, certChain, xParams);
+    	return xParams;
     }
 
     /** {@inheritDoc} */

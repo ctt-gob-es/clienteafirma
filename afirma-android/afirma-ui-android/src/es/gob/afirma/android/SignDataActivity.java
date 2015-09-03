@@ -45,12 +45,12 @@ import es.gob.afirma.android.gui.DownloadFileTask.DownloadDataListener;
 import es.gob.afirma.android.gui.SendDataTask;
 import es.gob.afirma.android.gui.SendDataTask.SendDataListener;
 import es.gob.afirma.android.network.AndroidUrlHttpManager;
-import es.gob.afirma.android.network.UriParser;
-import es.gob.afirma.android.network.UriParser.ParameterException;
-import es.gob.afirma.android.network.UriParser.UrlParametersToSign;
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOUnsupportedSignFormatException;
 import es.gob.afirma.core.misc.http.UrlHttpManagerFactory;
+import es.gob.afirma.core.misc.protocol.ParameterException;
+import es.gob.afirma.core.misc.protocol.ProtocolInvocationUriParser;
+import es.gob.afirma.core.misc.protocol.UrlParametersToSign;
 import es.gob.afirma.core.signers.AOSignConstants;
 
 /** Actividad dedicada a la firma de los datos recibidos en la entrada mediante un certificado
@@ -160,14 +160,10 @@ public final class SignDataActivity extends FragmentActivity implements Keystore
 		Log.d(ES_GOB_AFIRMA, "URI de invocacion: " + getIntent().getDataString()); //$NON-NLS-1$
 
 		try {
-			this.parameters = UriParser.getParametersToSign(getIntent().getDataString());
+			this.parameters = ProtocolInvocationUriParser.getParametersToSign(getIntent().getDataString());
 		}
 		catch (final ParameterException e) {
 			Log.e(ES_GOB_AFIRMA, "Error en los parametros de firma: " + e.toString(), e); //$NON-NLS-1$
-			showErrorMessage(getString(R.string.error_bad_params));
-		}
-		catch (final UnsupportedEncodingException e) {
-			Log.e(ES_GOB_AFIRMA, "Error de codificacion", e); //$NON-NLS-1$
 			showErrorMessage(getString(R.string.error_bad_params));
 		}
 		catch (final Throwable e) {
@@ -270,7 +266,8 @@ public final class SignDataActivity extends FragmentActivity implements Keystore
 			throw new IllegalArgumentException("La entrada a la clave privada no puede ser nula"); //$NON-NLS-1$
 		}
 
-		new SignTask(this.parameters.getOperation(),
+		new SignTask(
+			this.parameters.getOperation(),
 			this.parameters.getData(),
 			this.parameters.getSignatureFormat(),
 			this.parameters.getSignatureAlgorithm(),
@@ -281,7 +278,9 @@ public final class SignDataActivity extends FragmentActivity implements Keystore
 	}
 
 	/** Env&iacute;a los datos indicado a un servlet. En caso de error, cierra la aplicaci&oacute;n.
-	 * @param data Datos que se desean enviar. */
+	 * @param data Datos que se desean enviar.
+	 * @param needCloseApp <code>true</code> si la aplicaci&oacute;n debe cerrarse el finalizar la operaci&oacute;n,
+	 *                     <code>false</code> en caso contrario. */
 	private void sendData(final String data, final boolean critical, final boolean needCloseApp) {
 
 		Log.i(ES_GOB_AFIRMA, "Se almacena el resultado en el servidor con el Id: " + this.parameters.getId()); //$NON-NLS-1$
@@ -298,7 +297,9 @@ public final class SignDataActivity extends FragmentActivity implements Keystore
 
 	/** Muestra un mensaje de error y lo env&iacute;a al servidor para que la p&aacute;gina Web
 	 * tenga constancia de &eacute;l.
-	 * @param errorId Identificador del error. */
+	 * @param errorId Identificador del error.
+	 * @param needCloseApp <code>true</code> si el error implica que la aplicaci&oacute;n deba cerrarse,
+	 *                     <code>false</code> en caso contrario. */
 	private void launchError(final String errorId, final boolean critical, final boolean needCloseApp) {
 		try {
 			sendData(URLEncoder.encode(ErrorManager.genError(errorId, null), DEFAULT_URL_ENCODING), critical, needCloseApp);
@@ -472,15 +473,10 @@ public final class SignDataActivity extends FragmentActivity implements Keystore
 		Log.i(ES_GOB_AFIRMA, "Se han descifrado los datos y se inicia su analisis"); //$NON-NLS-1$
 
 		try {
-			this.parameters = UriParser.getParametersToSign(decipheredData);
+			this.parameters = ProtocolInvocationUriParser.getParametersToSign(decipheredData);
 		}
 		catch (final ParameterException e) {
 			Log.e(ES_GOB_AFIRMA, "Error en los parametros XML de configuracion de firma: " + e.toString(), e); //$NON-NLS-1$
-			showErrorMessage(getString(R.string.error_bad_params));
-			return;
-		}
-		catch (final UnsupportedEncodingException e) {
-			Log.e(ES_GOB_AFIRMA, "Error de codificacion en el XML de configuracion de firma", e); //$NON-NLS-1$
 			showErrorMessage(getString(R.string.error_bad_params));
 			return;
 		}

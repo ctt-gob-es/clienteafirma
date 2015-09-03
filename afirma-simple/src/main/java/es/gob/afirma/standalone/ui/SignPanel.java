@@ -72,6 +72,7 @@ import es.gob.afirma.core.signers.AOSignInfo;
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.AOSignerFactory;
 import es.gob.afirma.core.ui.AOUIFactory;
+import es.gob.afirma.keystores.AOCertificatesNotFoundException;
 import es.gob.afirma.keystores.AOKeyStoreDialog;
 import es.gob.afirma.keystores.AOKeyStoreManager;
 import es.gob.afirma.signers.cades.AOCAdESSigner;
@@ -341,7 +342,7 @@ public final class SignPanel extends JPanel {
 
         if (this.window != null) {
             this.window.getRootPane().putClientProperty("Window.documentFile", file); //$NON-NLS-1$
-            this.window.setTitle(SimpleAfirmaMessages.getString("SimpleAfirma.10") + " - " + file.getName()); //$NON-NLS-1$ //$NON-NLS-2$
+            this.window.setTitle(SimpleAfirmaMessages.getString("SimpleAfirma.10", SimpleAfirma.getVersion()) + " - " + file.getName()); //$NON-NLS-1$ //$NON-NLS-2$
         }
 
         this.currentFile = file;
@@ -798,10 +799,23 @@ public final class SignPanel extends JPanel {
             try {
             	final AOKeyStoreDialog dialog = new AOKeyStoreDialog(ksm, SignPanel.this, true, false, true);
             	dialog.show();
-            	pke = ksm.getKeyEntry(dialog.getSelectedAlias(), ksm.getType().getCertificatePasswordCallback(SignPanel.this));
+            	ksm.setParentComponent(SignPanel.this);
+            	pke = ksm.getKeyEntry(
+        			dialog.getSelectedAlias()
+    			);
             }
             catch (final AOCancelledOperationException e) {
                 return null;
+            }
+            catch(final AOCertificatesNotFoundException e) {
+            	LOGGER.severe("El almacen no contiene ningun certificado que se pueda usar para firmar: " + e); //$NON-NLS-1$
+            	AOUIFactory.showErrorMessage(
+                    SignPanel.this,
+                    SimpleAfirmaMessages.getString("SignPanel.29"), //$NON-NLS-1$,
+                    SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
+                    JOptionPane.ERROR_MESSAGE
+                );
+            	return null;
             }
             catch (final Exception e) {
             	LOGGER.severe("Ocurrio un error al extraer la clave privada del certificiado seleccionado: " + e); //$NON-NLS-1$

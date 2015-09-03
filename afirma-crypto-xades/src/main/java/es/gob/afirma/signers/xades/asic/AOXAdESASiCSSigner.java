@@ -181,7 +181,13 @@ public final class AOXAdESASiCSSigner implements AOSigner {
 		return new AOXAdESASiCSSigner().getSignInfo(ASiCUtil.getASiCSXMLSignature(signData));
 	}
 
-	private static Properties setASiCProperties(final Properties xParams, final byte[] data) {
+	/** Establece los par&aacute;metros necesarios (modificando los actuales incompatibles si fuese necesario)
+	 * para crear firmas XAdES-ASiC-S.
+	 * @param xParams Par&aacute;metros adicionales actuales de la firma (puede ser <code>null</code> si no
+	 *                hay ninguno.
+	 * @param data Datos que se van a firmar.
+	 * @return Par&aacute;metros actuales con los adicionales necesarios a&ntilde;adidos. */
+	public static Properties setASiCProperties(final Properties xParams, final byte[] data) {
 
 		final Properties extraParams = xParams != null ? xParams : new Properties();
 

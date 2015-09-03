@@ -1,32 +1,81 @@
 package es.gob.afirma.core.misc.protocol;
 
 import java.net.URL;
-import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
+
+import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.core.signers.ExtraParamsProcessor;
 
 /** Par&aacute;metros de la URL de llamada a la aplicaci&oacute;n. */
-public final class UrlParametersToSign {
+public final class UrlParametersToSign extends UrlParameters {
 
-	/** Identificador de la operaci&oacute;n de firma. */
-	public static final int OP_SIGN = 1;
+	/** N&uacute;mero m&aacute;ximo de caracteres permitidos para el identificador de sesi&oacute;n de la firma. */
+	private static final int MAX_ID_LENGTH = 20;
 
-	/** Identificador de la operaci&oacute;n de cofirma. */
-	public static final int OP_COSIGN = 2;
+	/** Par&aacute;metro de entrada con el formato de firma. */
+	private static final String FORMAT_PARAM = "format"; //$NON-NLS-1$
 
-	/** Identificador de la operaci&oacute;n de contrafirma. */
-	public static final int OP_COUNTERSIGN = 3;
+	/** Par&aacute;metro de entrada con el algoritmo de firma. */
+	private static final String ALGORITHM_PARAM = "algorithm"; //$NON-NLS-1$
 
-	private String id;
-	private int operation;
-	private byte[] desKey;
+	/** Par&aacute;metro de entrada con el identificador del documento. */
+	private static final String ID_PARAM = "id"; //$NON-NLS-1$
+
+	/** Par&aacute;metro de entrada con la m&iacute;nima versi&oacute;n requerida del aplicativo a usar en la invocaci&oacute;n por protocolo. */
+	private static final String VER_PARAM = "ver"; //$NON-NLS-1$
+
+	/** Tipo de operaci&oacute;n de firma. */
+	public enum Operation {
+
+		/** Operaci&oacute;n de firma. */
+		SIGN,
+
+		/** Operaci&oacute;n de cofirma. */
+		COSIGN,
+
+		/** Operaci&oacute;n de contrafirma. */
+		COUNTERSIGN,
+
+		/** Selecci&oacute;n autom&aacute;tica de tipo. */
+		AUTO;
+
+		/** Obtiene el tipo de operaci&oacute;n de firma a partir de su nombre, o <code>null</code>
+		 * si el nombre no corresponde a ninguna operaci&oacute;n conocida.
+		 * @param opName Nombre de la operaci&oacute;n de firma.
+		 * @return Operaci&oacute;n de firma. */
+		public static Operation getOperation(final String opName) {
+			if ("SIGN".equalsIgnoreCase(opName)) { //$NON-NLS-1$
+				return SIGN;
+			}
+			if ("COSIGN".equalsIgnoreCase(opName)) { //$NON-NLS-1$
+				return COSIGN;
+			}
+			if ("COUNTERSIGN".equalsIgnoreCase(opName)) { //$NON-NLS-1$
+				return COUNTERSIGN;
+			}
+			if ("AUTO".equalsIgnoreCase(opName)) { //$NON-NLS-1$
+				return AUTO;
+			}
+			return null;
+		}
+	}
+
+	/** Algoritmos de firma soportados. */
+	private static final Set<String> SUPPORTED_SIGNATURE_ALGORITHMS = new HashSet<String>();
+	static {
+		SUPPORTED_SIGNATURE_ALGORITHMS.add("SHA1withRSA"); //$NON-NLS-1$
+		SUPPORTED_SIGNATURE_ALGORITHMS.add("SHA256withRSA"); //$NON-NLS-1$
+		SUPPORTED_SIGNATURE_ALGORITHMS.add("SHA384withRSA"); //$NON-NLS-1$
+		SUPPORTED_SIGNATURE_ALGORITHMS.add("SHA512withRSA"); //$NON-NLS-1$
+	}
+
+	private Operation operation;
 	private String signFormat;
 	private String signAlgorithm;
-	private byte[] data;
-	private String fileId;
-	private URL storageServer;
-	private URL retrieveServer;
-	private Properties extraParams;
-	private String defaultKeyStore;
 	private String minimumVerstion;
 
 	/** Obtiene la versi&oacute;n m&iacute;nima requerida del aplicativo.
@@ -35,28 +84,10 @@ public final class UrlParametersToSign {
 		return this.minimumVerstion;
 	}
 
-	/** Obtiene el nombre del almac&eacute;n de claves a usar por defecto.
-	 * @return Nombre del almac&eacute;n de claves a usar por defecto */
-	public String getDefaultKeyStore() {
-		return this.defaultKeyStore;
-	}
-
-	/** Obtiene el identificador de sesi&oacute;n.
-	 * @return Identificador de sesi&oacute;n */
-	public String getId() {
-		return this.id;
-	}
-
-	/** Tipo de operaci&oacute;n a realizar (firma, cofirma o contrafirma).
+	/** Obtiene el tipo de operaci&oacute;n a realizar (firma, cofirma o contrafirma).
 	 * @return Operaci&oacute;n. */
-	public int getOperation() {
+	public Operation getOperation() {
 		return this.operation;
-	}
-
-	/** Obtiene la clave DES de cifrado.
-	 * @return Clave DES de cifrado */
-	public byte[] getDesKey() {
-		return this.desKey;
 	}
 
 	/** Obtiene el formato de firma.
@@ -71,52 +102,14 @@ public final class UrlParametersToSign {
 		return this.signAlgorithm;
 	}
 
-	/** Obtiene los datos a firmar.
-	 * @return Datos a firmar */
-	public byte[] getData() {
-		return this.data;
-	}
-
-	/** Obtiene el identificador de fichero a firmar.
-	 * @return Identificador del fichero */
-	public String getFileId() {
-		return this.fileId;
-	}
-
-	/** Obtiene la URL del servlet de almacenamiento temporal en servidor.
-	 * @return URL del servlet de almacenamiento temporal en servidor */
-	public URL getStorageServletUrl() {
-		return this.storageServer;
-	}
-
-	/** Obtiene la URL del servlet de recuperaci&oacute;n de ficheros del servidor temporal.
-	 * @return URL del servlet de recuperaci&oacute;n de ficheros. */
-	public URL getRetrieveServletUrl() {
-		return this.retrieveServer;
-	}
-
-	/** Obtiene los par&aacute;metros adicionales de la firma.
-	 * @return Par&aacute;metros adicionales de la firma */
-	public Properties getExtraParams() {
-		return this.extraParams;
-	}
-
 	UrlParametersToSign() {
-		this.data = null;
-		this.fileId = null;
-		this.retrieveServer = null;
+		setData(null);
+		setFileId(null);
+		setRetrieveServletUrl(null);
 	}
 
-	void setSessionId(final String sessionId) {
-		this.id = sessionId;
-	}
-
-	void setOperation(final int operation) {
+	void setOperation(final Operation operation) {
 		this.operation = operation;
-	}
-
-	void setDesKey(final byte[] key) {
-		this.desKey = key != null ? Arrays.copyOf(key, key.length) : null;
 	}
 
 	void setSignFormat(final String format) {
@@ -127,36 +120,124 @@ public final class UrlParametersToSign {
 		this.signAlgorithm = algo;
 	}
 
-	/** Establece los datos a tratar (firmar, guardar, etc.).
-	 * @param dat Datos a tratar */
-	public void setData(final byte[] dat) {
-		this.data = dat != null ? Arrays.copyOf(dat, dat.length) : null;
-	}
-
-	void setFileId(final String fileId) {
-		this.fileId = fileId;
-	}
-
-	void setStorageServletUrl(final URL url) {
-		this.storageServer = url;
-	}
-
-	void setRetrieveServletUrl(final URL url) {
-		this.retrieveServer = url;
-	}
-
-	void setExtraParams(final Properties properties) {
-		this.extraParams = properties != null ? properties : new Properties();
-	}
-
 	void setMinimumVersion(final String minVer) {
 		this.minimumVerstion = minVer;
 	}
 
-	/** Establece el nombre del almac&eacute;n de claves a usar por defecto.
-	 * @param storeName Nombre del almac&eacute;n de claves a usar por defecto */
-	void setDefaultKeyStore(final String storeName) {
-		this.defaultKeyStore = storeName;
+	void setSignParameters(final Map<String, String> params) throws ParameterException {
+
+		// Comprobamos que el identificador de sesion de la firma no sea mayor de un cierto numero de caracteres
+		String signatureSessionId = null;
+		if (params.containsKey(ID_PARAM)) {
+			signatureSessionId = params.get(ID_PARAM);
+		}
+		else if (params.containsKey(FILE_ID_PARAM)) {
+			 signatureSessionId = params.get(FILE_ID_PARAM);
+		}
+		
+		if (signatureSessionId != null) {
+			if (signatureSessionId.length() > MAX_ID_LENGTH) {
+				throw new ParameterException("La longitud del identificador para la firma es mayor de " + MAX_ID_LENGTH + " caracteres."); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+
+			// Comprobamos que el identificador de sesion de la firma sea alfanumerico (se usara como nombre de fichero)
+			for (final char c : signatureSessionId.toLowerCase(Locale.ENGLISH).toCharArray()) {
+				if ((c < 'a' || c > 'z') && (c < '0' || c > '9')) {
+					throw new ParameterException("El identificador de la firma debe ser alfanumerico."); //$NON-NLS-1$
+				}
+			}
+
+			setSessionId(signatureSessionId);
+		}
+		
+		// Version minima requerida del aplicativo
+		if (params.containsKey(VER_PARAM)) {
+			setMinimumVersion(params.get(VER_PARAM));
+		}
+		else {
+			setMinimumVersion("0"); //$NON-NLS-1$
+		}
+
+		// Tomamos el tipo de operacion
+		final Operation op = Operation.getOperation(
+			params.get(
+				ProtocolConstants.OPERATION_PARAM
+			)
+		);
+		if (op != null) {
+			setOperation(op);
+		}
+		else {
+			throw new ParameterException("Se ha indicado un codigo de operacion incorrecto"); //$NON-NLS-1$
+		}
+
+		// Si hemos recibido el identificador para la descarga de la configuracion,
+		// no encontraremos el resto de parametros
+		if (getFileId() != null) {
+			return;
+		}
+
+		// Comprobamos la validez de la URL del servlet de guardado en caso de indicarse
+		if (params.containsKey(STORAGE_SERVLET_PARAM)) {
+
+			// Comprobamos que la URL sea valida
+			URL storageServletUrl;
+			try {
+				storageServletUrl = validateURL(params.get(STORAGE_SERVLET_PARAM));
+			}
+			catch (final ParameterLocalAccessRequestedException e) {
+				throw new ParameterLocalAccessRequestedException("La URL del servicio de guardado no puede ser local", e); //$NON-NLS-1$
+			}
+			catch (final ParameterException e) {
+				throw new ParameterException("Error al validar la URL del servicio de guardado: " + e, e); //$NON-NLS-1$
+			}
+			setStorageServletUrl(storageServletUrl);
+		}
+
+		// Comprobamos que se ha especificado el formato
+		if (!params.containsKey(FORMAT_PARAM)) {
+			throw new ParameterException("No se ha recibido el formato de firma"); //$NON-NLS-1$
+		}
+
+		final String format = params.get(FORMAT_PARAM);
+		setSignFormat(format);
+
+		// Comprobamos que se ha especificado el algoritmo
+		if (!params.containsKey(ALGORITHM_PARAM)) {
+			throw new ParameterException("No se ha recibido el algoritmo de firma"); //$NON-NLS-1$
+		}
+		final String algo = params.get(ALGORITHM_PARAM);
+		if (!SUPPORTED_SIGNATURE_ALGORITHMS.contains(algo)) {
+			throw new ParameterException("Algoritmo de firma no soportado: " + algo); //$NON-NLS-1$
+		}
+
+		setSignAlgorithm(algo);
+
+		String props = null;
+		if (params.containsKey(PROPERTIES_PARAM)) {
+			props = params.get(PROPERTIES_PARAM);
+		}
+
+		if (props != null) {
+			try {
+				setExtraParams(
+					ExtraParamsProcessor.expandProperties(
+						AOUtil.base642Properties(props),
+						null,
+						format
+					)
+				);
+			}
+			catch (final Exception e) {
+				setExtraParams(new Properties());
+			}
+		}
+		else {
+			setExtraParams(new Properties());
+		}
+
+		setDefaultKeyStore(verifyDefaultKeyStoreName(params));
+
 	}
 
 }

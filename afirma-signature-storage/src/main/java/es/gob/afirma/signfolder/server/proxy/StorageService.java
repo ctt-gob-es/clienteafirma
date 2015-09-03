@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.net.URLDecoder;
 import java.util.Hashtable;
 import java.util.logging.Logger;
 
@@ -25,6 +26,9 @@ public final class StorageService extends HttpServlet {
 
 	/** Fichero de configuraci&oacute;n. */
 	private static final String CONFIG_FILE = "configuration.properties"; //$NON-NLS-1$
+
+	/** Codificaci&oacute;n de texto. */
+	private static final String DEFAULT_ENCODING = "utf-8"; //$NON-NLS-1$
 
 	/** Log para registrar las acciones del servicio. */
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma");  //$NON-NLS-1$
@@ -126,7 +130,7 @@ public final class StorageService extends HttpServlet {
 		LOGGER.info("Se solicita guardar un fichero con el identificador: " + id); //$NON-NLS-1$
 
 		// Si no se indican los datos, se transmite el error en texto plano a traves del fichero generado
-		String dataText = params.get(PARAMETER_NAME_DATA);
+		String dataText = URLDecoder.decode(params.get(PARAMETER_NAME_DATA), DEFAULT_ENCODING);
 		if (dataText == null) {
 			LOGGER.severe(ErrorManager.genError(ErrorManager.ERROR_MISSING_DATA, null));
 			dataText = ErrorManager.genError(ErrorManager.ERROR_MISSING_DATA, null);

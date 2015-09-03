@@ -14,6 +14,8 @@ final class MozillaKeyStoreUtilitiesOsX {
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
+	private static final String LIBRARY_FOLDER = "/usr/local/lib"; //$NON-NLS-1$
+
 	private MozillaKeyStoreUtilitiesOsX() {
 		// No dejamos instanciar
 	}
@@ -61,7 +63,9 @@ final class MozillaKeyStoreUtilitiesOsX {
 				sb.append("ln -s "); //$NON-NLS-1$
 				sb.append(nssBinDir);
 				sb.append(lib);
-				sb.append(" /usr/lib/"); //$NON-NLS-1$
+				sb.append(" "); //$NON-NLS-1$
+				sb.append(LIBRARY_FOLDER);
+				sb.append(File.separator);
 				sb.append(lib);
 				sb.append("; "); //$NON-NLS-1$
 			}

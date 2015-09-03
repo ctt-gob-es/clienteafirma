@@ -28,7 +28,7 @@ public class CertificateInfoForAliasSelect implements Serializable {
 	 * @param commonName Nombre com&uacute;n del certificado.
 	 * @param notBeforeDate Fecha en la que comienza la validez del certificado.
 	 * @param notAfterDate Fecha de expiraci&oacute;n del certificado.
-	 * @param alias
+	 * @param alias Alias del certificado.
 	 * @param issuer Emisor del certificado.
 	 */
 	public CertificateInfoForAliasSelect(final String commonName,final Date notBeforeDate, final Date notAfterDate, final String alias, final String issuer) {

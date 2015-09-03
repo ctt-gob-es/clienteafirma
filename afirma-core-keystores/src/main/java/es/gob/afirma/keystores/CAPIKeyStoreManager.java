@@ -44,10 +44,9 @@ public final class CAPIKeyStoreManager extends AOKeyStoreManager {
      * @throws es.gob.afirma.core.AOCancelledOperationException Cuando el usuario cancela el proceso
      *                                                          antes de que finalice. */
     @Override
-	public KeyStore.PrivateKeyEntry getKeyEntry(final String alias,
-    		                                    final PasswordCallback pssCallback) throws KeyStoreException,
-    		                                                                               NoSuchAlgorithmException,
-    		                                                                               UnrecoverableEntryException {
+	public KeyStore.PrivateKeyEntry getKeyEntry(final String alias) throws KeyStoreException,
+    		                                                               NoSuchAlgorithmException,
+    		                                                               UnrecoverableEntryException {
         if (capiKsMy == null) {
             throw new IllegalStateException("Se han pedido claves a un almacen no inicializado"); //$NON-NLS-1$
         }
@@ -104,7 +103,7 @@ public final class CAPIKeyStoreManager extends AOKeyStoreManager {
      *      provider,
      *      new KeyStore.CallbackHandlerProtection(
      *          new CallbackHandler() {
-	 *              @Override
+	 *              &#64;Override
 	 *              public void handle(final Callback[] callbacks) throws IOException, UnsupportedCallbackException {
 	 *                  for (final Callback callback2 : callbacks) {
 	 *                      if (callback2 instanceof TextOutputCallback) {
@@ -305,7 +304,11 @@ public final class CAPIKeyStoreManager extends AOKeyStoreManager {
         LOGGER.info("Solicitando los alias al KeyStore (" + capiKsMy.getProvider() + ")"); //$NON-NLS-1$ //$NON-NLS-2$
 
         try {
-        	setCachedAliases(Collections.list(CAPIKeyStoreManager.capiKsMy.aliases()).toArray(new String[0]));
+        	setCachedAliases(
+    			cleanDeactivatedAliases(
+        			Collections.list(CAPIKeyStoreManager.capiKsMy.aliases()).toArray(new String[0])
+    			)
+			);
         }
         catch (final Exception e) {
             LOGGER.severe("Error intentando obtener los alias del almacen de claves, se devolvera una enumeracion vacia: " + e); //$NON-NLS-1$

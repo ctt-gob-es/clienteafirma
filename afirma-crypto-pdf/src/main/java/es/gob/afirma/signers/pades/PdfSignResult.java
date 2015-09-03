@@ -1,7 +1,5 @@
 package es.gob.afirma.signers.pades;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -18,6 +16,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 
 
@@ -105,28 +104,6 @@ public final class PdfSignResult implements Serializable {
     	return this.signTime;
     }
 
-    private static String properties2Base64(final Properties p) throws IOException {
-    	if (p == null) {
-    		return ""; //$NON-NLS-1$
-    	}
-    	final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-    	p.store(baos, "PAdES"); //$NON-NLS-1$
-    	return Base64.encode(baos.toByteArray());
-    }
-
-    private static Properties base642Properties(final String base64) throws IOException {
-    	final Properties p = new Properties();
-    	if (base64 == null) {
-    		return p;
-    	}
-    	p.load(
-			new ByteArrayInputStream(
-				Base64.decode(base64)
-			)
-		);
-    	return p;
-    }
-
 	/** M&eacute;todo necesario para la serializaci&oacute;n de un objeto.
 	 * @param out Datos de salida.
 	 * @throws IOException Cuando no se puede serializar. */
@@ -143,7 +120,7 @@ public final class PdfSignResult implements Serializable {
     	final StringBuilder sb = new StringBuilder()
     		.append("<signResult>\n") //$NON-NLS-1$
     		.append(" <extraParams>\n") //$NON-NLS-1$
-    		.append(properties2Base64(getExtraParams())).append('\n')
+    		.append(AOUtil.properties2Base64(getExtraParams())).append('\n')
     		.append(" </extraParams>\n") //$NON-NLS-1$
     		.append(" <pdfId>\n") //$NON-NLS-1$
     		.append(getFileID()).append('\n')
@@ -186,7 +163,7 @@ public final class PdfSignResult implements Serializable {
     	if (!"extraParams".equalsIgnoreCase(node.getNodeName())) { //$NON-NLS-1$
     		throw new IOException("No se encontro el nodo 'extraParams' del PdfSignResultSerializado"); //$NON-NLS-1$
     	}
-    	this.extraParams = base642Properties(node.getTextContent().trim());
+    	this.extraParams = AOUtil.base642Properties(node.getTextContent().trim());
 
     	// pdfId
     	i = getNextElementNode(nodeList, ++i);

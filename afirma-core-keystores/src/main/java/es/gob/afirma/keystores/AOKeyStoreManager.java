@@ -14,35 +14,64 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableEntryException;
 import java.security.cert.Certificate;
+import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.security.auth.callback.PasswordCallback;
 
 import es.gob.afirma.core.keystores.KeyStoreManager;
+import es.gob.afirma.core.misc.AOUtil;
 
 /** Clase gestora de claves y certificados. B&aacute;sicamente se encarga de
  * crear KeyStores de distintos tipos, utilizando el proveedor JCA apropiado para cada caso
- * @version 0.4 */
+ * @version 0.6 */
 public class AOKeyStoreManager implements KeyStoreManager {
 
+	private Object parentComponent = null;
+	private Object getParentComponent() {
+		return this.parentComponent;
+	}
+
+	@Override
+	public void setParentComponent(final Object p) {
+		this.parentComponent = p;
+	}
+
     protected static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+
+    private final Set<String> deactivatedCertificatesThumbprints = new HashSet<String>();
 
     private String[] cachedAliases = null;
     protected void resetCachedAliases() {
     	this.cachedAliases = null;
     }
+
     protected String[] getCachedAliases() {
     	return this.cachedAliases;
     }
+
     protected void setCachedAliases(final String[] ca) {
     	this.cachedAliases = ca.clone();
+    }
+
+    private boolean preferred = false;
+
+    protected boolean isPreferred() {
+    	return this.preferred;
+    }
+
+    void setPreferred(final boolean p) {
+    	this.preferred = p;
     }
 
     /** Tipo de almac&eacute;n. */
@@ -64,7 +93,7 @@ public class AOKeyStoreManager implements KeyStoreManager {
 	public void refresh() throws IOException {
     	resetCachedAliases();
     	try {
-			this.init(this.ksType, this.storeIs, this.callBack, this.storeParams, true);
+			this.init(this.ksType, this.storeIs, this.storePasswordCallBack, this.storeParams, true);
 		}
     	catch (final AOKeyStoreManagerException e) {
 			throw new IOException("Error al refrescar el almacen: " + e, e); //$NON-NLS-1$
@@ -86,9 +115,20 @@ public class AOKeyStoreManager implements KeyStoreManager {
     }
 
     private InputStream storeIs;
-    private PasswordCallback callBack;
-    private Object[] storeParams;
+    private PasswordCallback storePasswordCallBack;
 
+    private PasswordCallback entryPasswordCallBack = null;
+
+    @Override
+    public void setEntryPasswordCallBack(final PasswordCallback pwc) {
+    	this.entryPasswordCallBack = pwc;
+    }
+
+    protected PasswordCallback getEntryPasswordCallBack() {
+    	return this.entryPasswordCallBack;
+    }
+
+    private Object[] storeParams;
 
     /** Inicializa el almac&eacute;n. Se encarga tambi&eacute;n de a&ntilde;adir o
      * retirar los <i>Provider</i> necesarios para operar con dicho almac&eacute;n
@@ -120,7 +160,7 @@ public class AOKeyStoreManager implements KeyStoreManager {
         // Guardamos los parametros de inicializacion por si hay que reiniciar
         this.ksType = type;
         this.storeIs = store;
-        this.callBack = pssCallBack;
+        this.storePasswordCallBack = pssCallBack;
         if (params == null) {
         	this.storeParams = null;
         }
@@ -135,16 +175,20 @@ public class AOKeyStoreManager implements KeyStoreManager {
         		this.ks =  AOKeyStoreManagerHelperSingle.initSingle(store, pssCallBack);
         		break;
         	case CERES:
+                // En el "params" debemos traer los parametros:
+                // [0] -parent: Componente padre para la modalidad
+        		setParentComponent(params != null && params.length > 0 ? params[0] : null);
         		this.ks = AOKeyStoreManagerHelperFullJava.initCeresJava(
-    				params != null && params.length > 0 ? params[0] : null
+    				getParentComponent()
 				);
             	break;
         	case DNIEJAVA:
                 // En el "params" debemos traer los parametros:
                 // [0] -parent: Componente padre para la modalidad
+        		setParentComponent(params != null && params.length > 0 ? params[0] : null);
             	this.ks = AOKeyStoreManagerHelperFullJava.initDnieJava(
         			pssCallBack,
-        			params != null && params.length > 0 ? params[0] : null
+        			getParentComponent()
     			);
             	break;
         	case JAVACE:
@@ -180,17 +224,21 @@ public class AOKeyStoreManager implements KeyStoreManager {
     }
 
     @Override
-	public KeyStore.PrivateKeyEntry getKeyEntry(final String alias,
-    		                                    final PasswordCallback pssCallback) throws KeyStoreException,
-    		                                                                               NoSuchAlgorithmException,
-    		                                                                               UnrecoverableEntryException {
+	public KeyStore.PrivateKeyEntry getKeyEntry(final String alias) throws KeyStoreException,
+    		                                                               NoSuchAlgorithmException,
+    		                                                               UnrecoverableEntryException {
         if (this.ks == null) {
             throw new IllegalStateException("Se han pedido claves a un almacen no inicializado"); //$NON-NLS-1$
         }
         if (alias == null) {
         	throw new IllegalArgumentException("El alias no puede ser nulo"); //$NON-NLS-1$
         }
-		return (KeyStore.PrivateKeyEntry) this.ks.getEntry(alias, pssCallback != null ? new KeyStore.PasswordProtection(pssCallback.getPassword()) : null);
+		return (KeyStore.PrivateKeyEntry) this.ks.getEntry(
+				alias,
+				this.entryPasswordCallBack != null ?
+						new KeyStore.PasswordProtection(this.entryPasswordCallBack.getPassword()) :
+							new KeyStore.PasswordProtection(getType().getCertificatePasswordCallback(getParentComponent()).getPassword())
+		);
     }
 
     @Override
@@ -266,7 +314,7 @@ public class AOKeyStoreManager implements KeyStoreManager {
         	return this.cachedAliases;
         }
 		try {
-			this.cachedAliases = Collections.list(this.ks.aliases()).toArray(new String[0]);
+			this.cachedAliases = cleanDeactivatedAliases(Collections.list(this.ks.aliases()).toArray(new String[0]));
 		}
 		catch (final KeyStoreException e) {
 			LOGGER.severe(
@@ -301,5 +349,50 @@ public class AOKeyStoreManager implements KeyStoreManager {
 	@Override
 	public boolean isKeyEntry(final String alias) throws KeyStoreException {
 		return getKeyStore().isKeyEntry(alias);
+	}
+
+	protected String[] cleanDeactivatedAliases(final String[] currentAliases) {
+
+		if (this.deactivatedCertificatesThumbprints.isEmpty()) {
+			return currentAliases;
+		}
+		final List<String> cleanedAliases = new ArrayList<String>();
+		final MessageDigest md;
+		try {
+			md = MessageDigest.getInstance("SHA1"); //$NON-NLS-1$
+		}
+		catch (final NoSuchAlgorithmException e) {
+			LOGGER.severe(
+				"No se ha podido instanciar el generador de huellas digitales SHA1, pueden aparecer duplicados en la lista de certificados: " + e //$NON-NLS-1$
+			);
+			return currentAliases;
+		}
+		for (final String alias : currentAliases) {
+			final String currentThumbprint;
+			try {
+				currentThumbprint = AOUtil.hexify(
+					md.digest(getCertificate(alias).getEncoded()),
+					false
+				);
+			}
+			catch (final CertificateEncodingException e) {
+				LOGGER.severe(
+					"No se ha obtener la huela del certificado '" + alias + "', pueden aparecer duplicados en la lista de certificados: " + e //$NON-NLS-1$ //$NON-NLS-2$
+				);
+				continue;
+			}
+			if (!this.deactivatedCertificatesThumbprints.contains(currentThumbprint)) {
+				cleanedAliases.add(alias);
+			}
+		}
+		return cleanedAliases.toArray(new String[0]);
+	}
+
+	@Override
+	public void deactivateEntry(final String certificateThumbprint) {
+		if (certificateThumbprint != null) {
+			this.deactivatedCertificatesThumbprints.add(certificateThumbprint);
+		}
+		resetCachedAliases();
 	}
 }

@@ -26,6 +26,9 @@ public final class AOSignConstants {
 	/** Identificador de la firma CAdES ASiC-S. */
 	public static final String SIGN_FORMAT_CADES_ASIC_S = "CAdES-ASiC-S"; //$NON-NLS-1$
 
+	/** Identificador de la firma CAdES ASiC-S trif&aacute;sica. */
+	public static final String SIGN_FORMAT_CADES_ASIC_S_TRI = "CAdES-ASiC-S-tri"; //$NON-NLS-1$
+
 	/** Identificador de la firma CAdES. */
 	public static final String SIGN_FORMAT_CADES = "CAdES"; //$NON-NLS-1$
 
@@ -37,6 +40,9 @@ public final class AOSignConstants {
 
 	/** Identificador de la firma XAdES-ASiC-S. */
 	public static final String SIGN_FORMAT_XADES_ASIC_S = "XAdES-ASiC-S"; //$NON-NLS-1$
+
+	/** Identificador de la firma XAdES-ASiC-S trif&aacute;sica. */
+	public static final String SIGN_FORMAT_XADES_ASIC_S_TRI = "XAdES-ASiC-S-tri"; //$NON-NLS-1$
 
 	/** Identificador de la firma XAdES Internally Detached. */
 	public static final String SIGN_FORMAT_XADES_DETACHED = "XAdES Detached"; //$NON-NLS-1$
@@ -100,6 +106,9 @@ public final class AOSignConstants {
 
 	/** Identificador de la firma Factura-e (derivado de XAdES-EPES). */
 	public static final String SIGN_FORMAT_FACTURAE = "FacturaE"; //$NON-NLS-1$
+
+	/** Identificador de la firma Factura-e (derivado de XAdES-EPES) trif&aacute;sica. */
+	public static final String SIGN_FORMAT_FACTURAE_TRI = "FacturaEtri"; //$NON-NLS-1$
 
 	/** Identificador alternativo de la firma Factura-e (derivado de XAdES-EPES). */
 	public static final String SIGN_FORMAT_FACTURAE_ALT1 = "Factura-e"; //$NON-NLS-1$

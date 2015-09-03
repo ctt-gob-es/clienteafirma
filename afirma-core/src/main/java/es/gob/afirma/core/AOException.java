@@ -28,4 +28,10 @@ public class AOException extends Exception {
     public AOException(final String msg, final Throwable cause) {
         super(msg, cause);
     }
+
+    /** Contruye una excepci&oacute;n gen&eacute;rica definiendo su causa.
+     * @param cause Causa del error. */
+    public AOException(final Throwable cause) {
+        super(cause);
+    }
 }

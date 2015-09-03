@@ -60,7 +60,6 @@ import es.gob.afirma.signers.xades.XAdESCounterSigner;
 import es.gob.afirma.signers.xades.XAdESSigner;
 import es.gob.afirma.signers.xml.Utils;
 
-
 /** Parte servidora del firmador trif&aacute;sico XAdES.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public final class XAdESTriPhaseSignerServerSide {
@@ -99,7 +98,7 @@ public final class XAdESTriPhaseSignerServerSide {
 	 * @param data Datos a prefirmar
 	 * @param algorithm Algoritmo de firma
 	 * @param certChain Cadena de certificados del firmante
-	 * @param xParams Par&aacute;metros adicionales de la firma
+	 * @param extraParams Par&aacute;metros adicionales de la firma
 	 * @param op Operaci&oacute;n espec&iacute;fica de firma a realizar
 	 * @return Listado de prefirma XML
 	 * @throws NoSuchAlgorithmException Si el JRE no soporta alg&uacute;n algoritmo necesario.
@@ -113,19 +112,19 @@ public final class XAdESTriPhaseSignerServerSide {
 	 * @throws SignatureException Si hay problemas con la firma PKCS#1.
 	 * @throws XmlPreSignException Si hay un error en la pre-firma XAdES. */
 	public static XmlPreSignResult preSign(final byte[] data,
-			final String algorithm,
-			final Certificate[] certChain,
-			final Properties xParams,
-			final Op op) throws NoSuchAlgorithmException,
-			AOException,
-			SAXException,
-			IOException,
-			ParserConfigurationException,
-			MarshalException,
-			XMLSignatureException,
-			InvalidKeyException,
-			SignatureException,
-			XmlPreSignException {
+			                               final String algorithm,
+			                               final Certificate[] certChain,
+			                               final Properties extraParams,
+			                               final Op op) throws NoSuchAlgorithmException,
+			                                                   AOException,
+			                                                   SAXException,
+			                                                   IOException,
+			                                                   ParserConfigurationException,
+			                                                   MarshalException,
+			                                                   XMLSignatureException,
+			                                                   InvalidKeyException,
+			                                                   SignatureException,
+			                                                   XmlPreSignException {
 		if (data == null || data.length < 1) {
 			throw new IllegalArgumentException("Los datos a prefirmar no pueden ser nulos ni vacios"); //$NON-NLS-1$
 		}
@@ -134,8 +133,8 @@ public final class XAdESTriPhaseSignerServerSide {
 		}
 		if (certChain == null || certChain.length < 1) {
 			throw new IllegalArgumentException(
-					"La cadena de certificados no puede ser nula y debe contener al menos un certificado" //$NON-NLS-1$
-					);
+				"La cadena de certificados no puede ser nula y debe contener al menos un certificado" //$NON-NLS-1$
+			);
 		}
 
 		// Miramos si la entrada es un XML que ya contenga firmas (almacenando los ID para luego localizar cual es la firma
@@ -206,7 +205,7 @@ public final class XAdESTriPhaseSignerServerSide {
 				algorithm,
 				prk,
 				certChain,
-				xParams
+				extraParams
 			);
 			break;
 		case COSIGN:
@@ -215,12 +214,12 @@ public final class XAdESTriPhaseSignerServerSide {
 				algorithm,
 				prk,
 				certChain,
-				xParams
+				extraParams
 			);
 			break;
 		case COUNTERSIGN:
 			final CounterSignTarget targets =
-				xParams != null && CounterSignTarget.LEAFS.name().equalsIgnoreCase(xParams.getProperty(COUNTERSIGN_TARGET_KEY)) ?
+				extraParams != null && CounterSignTarget.LEAFS.name().equalsIgnoreCase(extraParams.getProperty(COUNTERSIGN_TARGET_KEY)) ?
 					CounterSignTarget.LEAFS : CounterSignTarget.TREE;
 
 			result = XAdESCounterSigner.countersign(
@@ -230,12 +229,12 @@ public final class XAdESTriPhaseSignerServerSide {
 				null,
 				prk,
 				certChain,
-				xParams
+				extraParams
 			);
 			break;
 		default:
 			throw new IllegalStateException(
-				"No se puede dar una operacion no contemplada en el enumerado de operaciones" //$NON-NLS-1$
+				"No se puede dar una operacion no contemplada en el enumerado de operaciones: " + op //$NON-NLS-1$
 			);
 		}
 

@@ -47,10 +47,12 @@ import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSigner;
+import es.gob.afirma.core.signers.ExtraParamsProcessor;
+import es.gob.afirma.core.signers.ExtraParamsProcessor.IncompatiblePolicyException;
 import es.gob.afirma.crypto.jarverifier.JarSignatureCertExtractor;
 import es.gob.afirma.keystores.AOKeyStore;
 import es.gob.afirma.keystores.filters.CertFilterManager;
-import es.gob.afirma.miniapplet.ExtraParamsProcessor.IncompatiblePolicyException;
+import es.gob.afirma.signers.batch.client.BatchSigner;
 
 /** MiniApplet de firma del proyecto Afirma. */
 public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
@@ -1225,19 +1227,50 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 			;
 	}
 
-	/**
-	 * Este metodo sirve para identificar cuando se ha configurado una firma con el formato XAdES
+	/** Identifica cuando se ha configurado una firma con el formato XAdES
 	 * y la propiedad {@code mode} con el valor {@code explicit}. Esta no es una firma correcta,
-	 * pero por compatibilidad con los tipos de firmas del applet pesado se ha incluido aqu&iacute;.
+	 * pero por compatibilidad con los tipos de firmas del Applet pesado se ha incluido aqu&iacute;.
 	 * @param format Formato declarado para la firma.
 	 * @param config Par&aacute;metros adicionales declarados para la firma.
-	 * @return {@code true} si se configura una firma XAdES explicit, {@code false} en caso contrario.
-	 * @deprecated Uso temporal hasta que se elimine el soporte de firmas XAdES explicitas.
-	 */
+	 * @return {@code true} si se configura una firma <i>XAdES explicit</i>, {@code false} en caso contrario.
+	 * @deprecated Uso temporal hasta que se elimine el soporte de firmas XAdES expl&iacute;citas. */
 	@Deprecated
 	private static boolean isXadesExplicitConfigurated(final String format, final Properties config) {
 		return format != null && format.toLowerCase().startsWith("xades") && config != null && //$NON-NLS-1$
 				AOSignConstants.SIGN_MODE_EXPLICIT.equalsIgnoreCase(config.getProperty("mode")) //$NON-NLS-1$
 			;
+	}
+
+	@Override
+	public String signBatch(final String batchB64,
+			                final String batchPreSignerUrl,
+			                final String batchPostSignerUrl,
+			                final String extraParams) throws IOException,
+			                                                 AOException,
+			                                                 PrivilegedActionException {
+
+		final Properties params = ExtraParamsProcessor.convertToProperties(extraParams);
+		final PrivateKeyEntry pke;
+		try {
+			pke = this.selectPrivateKey(params);
+		}
+		catch (final PrivilegedActionException e) {
+			setError(e);
+			throw e;
+		}
+		try {
+			return BatchSigner.sign(
+				batchB64,
+				batchPreSignerUrl,
+				batchPostSignerUrl,
+				pke.getCertificateChain(),
+				pke.getPrivateKey()
+			);
+		}
+		catch (final CertificateEncodingException e) {
+			final AOException aoe = new AOException(e);
+			setError(e);
+			throw aoe;
+		}
 	}
 }

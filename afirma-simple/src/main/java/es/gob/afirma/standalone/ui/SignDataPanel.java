@@ -259,7 +259,7 @@ final class SignDataPanel extends JPanel {
 							int validationMessageType = JOptionPane.ERROR_MESSAGE;
 							switch(vr) {
 								case VALID:
-									validationMessage = SimpleAfirmaMessages.getString("SignDataPanel.20"); //$NON-NLS-1$
+									validationMessage = SimpleAfirmaMessages.getString("SignDataPanel.19"); //$NON-NLS-1$
 									validationMessageType = JOptionPane.INFORMATION_MESSAGE;
 									break;
 								case EXPIRED:

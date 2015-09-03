@@ -1,6 +1,5 @@
 package es.gob.afirma.signers.cadestri.client;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Properties;
@@ -25,8 +24,6 @@ final class ProtocolConstants {
 	static final String PARAMETER_NAME_EXTRA_PARAM = "params"; //$NON-NLS-1$
 	static final String PARAMETER_NAME_SESSION_DATA = "session"; //$NON-NLS-1$
 
-	static final String CADES_FORMAT = "CAdES"; //$NON-NLS-1$
-
 	/** Nombre de la propiedad de URL del servidor de firma trif&aacute;sica. */
 	static final String PROPERTY_NAME_SIGN_SERVER_URL = "serverUrl"; //$NON-NLS-1$
 
@@ -46,12 +43,6 @@ final class ProtocolConstants {
 		final ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		p.store(baos, ""); //$NON-NLS-1$
 		return Base64.encode(baos.toByteArray(), true);
-	}
-
-	static Properties base642Properties(final String base64) throws IOException {
-		final Properties p = new Properties();
-		p.load(new ByteArrayInputStream(Base64.decode(base64, true)));
-		return p;
 	}
 
 }

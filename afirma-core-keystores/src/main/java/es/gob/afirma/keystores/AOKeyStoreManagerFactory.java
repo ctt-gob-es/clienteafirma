@@ -34,7 +34,6 @@ public final class AOKeyStoreManagerFactory {
         // No permitimos la instanciacion
     }
 
-
     private static final String FORCE_STORE_RESET = "es.gob.afirma.keystores.ForceReset"; //$NON-NLS-1$
 
     /** Obtiene el <code>KeyStoreManager</code> del tipo indicado.
@@ -102,7 +101,9 @@ public final class AOKeyStoreManagerFactory {
 
         // Almacen de certificados de Windows
         if (Platform.getOS().equals(Platform.OS.WINDOWS) && AOKeyStore.WINDOWS.equals(store)) {
-        	return new AggregatedKeyStoreManager(getWindowsMyCapiKeyStoreManager(forceReset));
+        	final AggregatedKeyStoreManager aksm = new AggregatedKeyStoreManager(getWindowsMyCapiKeyStoreManager(forceReset));
+    		KeyStoreUtilities.addPreferredKeyStoreManagers(aksm, parentComponent);
+    		return aksm;
         }
 
         // Libreta de direcciones de Windows
@@ -120,7 +121,7 @@ public final class AOKeyStoreManagerFactory {
 
         // Apple Safari sobre Mac OS X.
         if (Platform.getOS().equals(Platform.OS.MACOSX) && AOKeyStore.APPLE.equals(store)) {
-        	return getMacOSXKeyStoreManager(store, lib, pssCallback, forceReset, parentComponent);
+        	return getMacOSXKeyStoreManager(store, lib, forceReset, parentComponent);
         }
 
         // Driver Java para DNIe
@@ -237,6 +238,7 @@ public final class AOKeyStoreManagerFactory {
 				e
 			);
 		}
+		ksm.setPreferred(true);
 		return ksm;
 	}
 
@@ -256,6 +258,7 @@ public final class AOKeyStoreManagerFactory {
                 e
            );
 		}
+    	ksm.setPreferred(true);
     	return ksm;
     }
 
@@ -399,7 +402,8 @@ public final class AOKeyStoreManagerFactory {
         return ksm;
     }
 
-    private static AOKeyStoreManager getWindowsMyCapiKeyStoreManager(final boolean forceReset) throws AOKeystoreAlternativeException, IOException {
+    private static AOKeyStoreManager getWindowsMyCapiKeyStoreManager(final boolean forceReset) throws AOKeystoreAlternativeException,
+    		                                                                                              IOException {
     	final AOKeyStoreManager ksmCapi = new CAPIKeyStoreManager();
 		try {
 			ksmCapi.init(AOKeyStore.WINDOWS, null, null, null, forceReset);
@@ -411,6 +415,7 @@ public final class AOKeyStoreManagerFactory {
                  e
              );
 		}
+
 		return ksmCapi;
     }
 
@@ -445,7 +450,6 @@ public final class AOKeyStoreManagerFactory {
 
     private static AggregatedKeyStoreManager getMacOSXKeyStoreManager(final AOKeyStore store,
     		                                                          final String lib,
-    		                                                          final PasswordCallback pssCallback,
     		                                                          final boolean forceReset,
     		                                                          final Object parentComponent) throws IOException,
                                                                                                            AOKeystoreAlternativeException {
@@ -464,17 +468,10 @@ public final class AOKeyStoreManagerFactory {
             throw new AOKeystoreAlternativeException(getAlternateKeyStoreType(store), "Error al inicializar el Llavero de Mac OS X", e); //$NON-NLS-1$
         }
         final AggregatedKeyStoreManager aksm = new AggregatedKeyStoreManager(ksm);
-        // Le agregamos el gestor de DNIe para que agregue los certificados mediante el
-        // controlador Java del DNIe si se encuentra la biblioteca y hay un DNIe insertado
-    	if (!KeyStoreUtilities.containsDnie(ksm)) {
-    		try {
-    			aksm.addKeyStoreManager(getDnieJavaKeyStoreManager(pssCallback, forceReset, parentComponent));
-    		}
-    		catch(final Exception e) {
-    			// Se ignora
-    		}
-    	}
-    	return aksm;
+
+        KeyStoreUtilities.addPreferredKeyStoreManagers(aksm, parentComponent);
+
+        return aksm;
     }
 
     /** Devuelve el almac&eacute;n de claves alternativo al actual m&aacute;s apropiado para usar

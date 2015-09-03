@@ -280,9 +280,9 @@ public final class XAdESSigner {
 
 		URI uri = null;
 		try {
-			uri = AOUtil.createURI(extraParams.getProperty(EXTRAPARAM_URI)) != null ?
-					AOUtil.createURI(extraParams.getProperty(EXTRAPARAM_URI)) :
-						null;
+			uri = extraParams.getProperty(EXTRAPARAM_URI) != null ?
+				AOUtil.createURI(extraParams.getProperty(EXTRAPARAM_URI)) :
+					null;
 		}
 		catch (final Exception e) {
 			LOGGER.warning("Se ha pasado una URI invalida como referencia a los datos a firmar: " + e); //$NON-NLS-1$

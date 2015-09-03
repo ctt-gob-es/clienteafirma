@@ -423,10 +423,14 @@ final class CommandLineLauncher {
 			                 final String storePassword) throws CommandLineException {
 
 		final PrivateKeyEntry ke;
+		ksm.setEntryPasswordCallBack(
+			new CachePasswordCallback(
+				storePassword != null ? storePassword.toCharArray() : "dummy".toCharArray() //$NON-NLS-1$
+			)
+		);
 		try {
 			ke = ksm.getKeyEntry(
-				alias,
-				new CachePasswordCallback(storePassword != null ? storePassword.toCharArray() : "dummy".toCharArray()) //$NON-NLS-1$
+				alias
 			);
 		}
 		catch (final Exception e) {

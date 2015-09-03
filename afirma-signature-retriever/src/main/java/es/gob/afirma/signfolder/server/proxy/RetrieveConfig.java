@@ -17,7 +17,7 @@ public class RetrieveConfig {
 
 	/** Directorio temporal por defecto. */
 	private static String DEFAULT_TMP_DIR;
-	
+
 	/** Clave para la configuraci&oacute;n del tiempo de caducidad de los ficheros temporales. */
 	private static final String EXPIRATION_TIME_KEY =  "expTime"; //$NON-NLS-1$
 
@@ -28,20 +28,21 @@ public class RetrieveConfig {
 
 	static {
 		try {
-			DEFAULT_TMP_DIR = System.getProperty("java.io.tmpdir"); //$NON-NLS-1$ 
+			DEFAULT_TMP_DIR = System.getProperty("java.io.tmpdir"); //$NON-NLS-1$
 		}
-		catch (Exception e) {
+		catch (final Exception e) {
 			try {
-				DEFAULT_TMP_DIR = File.createTempFile("tmp", null).getParentFile().getAbsolutePath(); //$NON-NLS-1$ 
+				DEFAULT_TMP_DIR = File.createTempFile("tmp", null).getParentFile().getAbsolutePath(); //$NON-NLS-1$
 			}
-			catch (Exception e1) {
-				e1.printStackTrace();
+			catch (final Exception e1) {
 				DEFAULT_TMP_DIR = null;
-				Logger.getLogger("es.gob.afirma").warning("No se ha podido cargar un directorio temporal por defecto, se debera configurar expresamente en el fichero de propiedades"); //$NON-NLS-1$ //$NON-NLS-2$
-			} 
+				Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
+					"No se ha podido cargar un directorio temporal por defecto, se debera configurar expresamente en el fichero de propiedades: "  + e1 //$NON-NLS-1$
+				);
+			}
 		}
 	}
-	
+
 	/**
 	 * Crear el objeto de configuracion para el servicio de almacenamiento.
 	 * @param context Contexto del servlet.
@@ -62,9 +63,11 @@ public class RetrieveConfig {
  				final InputStream is = RetrieveConfig.class.getClassLoader().getResourceAsStream(path);
 				this.config.load(is);
 				is.close();
-			} catch (final IOException e) {
+			}
+ 			catch (final IOException e) {
 				Logger.getLogger("es.gob.afirma").severe( //$NON-NLS-1$
-						"No se ha podido cargar el fichero con las propiedades: " + e.toString()); //$NON-NLS-1$
+					"No se ha podido cargar el fichero con las propiedades: " + e.toString() //$NON-NLS-1$
+				);
 			}
 		}
 	}

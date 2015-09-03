@@ -1,0 +1,43 @@
+package es.gob.afirma.standalone.protocol;
+
+import java.util.logging.Logger;
+
+import es.gob.afirma.core.AOCancelledOperationException;
+import es.gob.afirma.core.misc.protocol.UrlParametersToSave;
+import es.gob.afirma.core.ui.AOUIFactory;
+
+final class ProtocolInvocationLauncherSave {
+
+	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+
+	private static final String RESULT_OK = "OK"; //$NON-NLS-1$
+	private static final String RESULT_CANCEL = "CANCEL"; //$NON-NLS-1$
+
+	private ProtocolInvocationLauncherSave() {
+		// No instanciable
+	}
+
+	static String processSave(final UrlParametersToSave  options) {
+		try {
+			AOUIFactory.getSaveDataToFile(
+				options.getData(),
+				options.getTitle(),
+				null,
+				options.getFileName(),
+				options.getExtensions() != null ? new String[] { options.getExtensions() } : null,
+				options.getFileTypeDescription(),
+				null
+			);
+		}
+		catch(final AOCancelledOperationException e) {
+			return RESULT_CANCEL;
+		}
+		catch (final Exception e) {
+			LOGGER.severe("Error en el guardado de datos: " + e); //$NON-NLS-1$
+			ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_05);
+			return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_05);
+		}
+		return RESULT_OK;
+	}
+
+}

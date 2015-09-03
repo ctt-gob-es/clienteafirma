@@ -10,7 +10,6 @@
 
 package es.gob.afirma.signers.padestri.client;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.security.PrivateKey;
@@ -20,10 +19,12 @@ import java.util.Properties;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.http.UrlHttpManagerFactory;
 import es.gob.afirma.core.signers.AOPkcs1Signer;
 import es.gob.afirma.core.signers.TriphaseData;
+import es.gob.afirma.core.signers.TriphaseDataSigner;
 
 /** Utilidades para el firmador PAdES en tres fases.
  * @author Tom&acute;s Garc&iacute;a-Mer&aacute;s */
@@ -64,17 +65,6 @@ final class PDFTriPhaseSignerUtil {
 
 	private static final String PADES_FORMAT = "pades"; //$NON-NLS-1$
 
-	// Nombres de las propiedades intercambiadas con el servidor como Properties
-
-	/** Prefijo para las propiedades que almacenan prefirmas. */
-	private static final String PROPERTY_NAME_PRESIGN = "PRE"; //$NON-NLS-1$
-
-	/** Firma PKCS#1. */
-	private static final String PROPERTY_NAME_PKCS1_SIGN = "PK1"; //$NON-NLS-1$
-
-	/** Indica si la postfirma requiere la prefirma. */
-	private static final String PROPERTY_NAME_NEED_PRE = "NEED_PRE"; //$NON-NLS-1$
-
 	/** Indicador de finalizaci&oacute;n correcta de proceso. */
 	private static final String SUCCESS = "OK"; //$NON-NLS-1$
 
@@ -107,7 +97,7 @@ final class PDFTriPhaseSignerUtil {
 
 			if (extraParams.size() > 0) {
 				urlBuffer.append(HTTP_AND).append(PARAMETER_NAME_EXTRA_PARAM).append(HTTP_EQUALS).
-				append(properties2Base64(extraParams));
+				append(AOUtil.properties2Base64(extraParams));
 			}
 
 			return UrlHttpManagerFactory.getInstalledManager().readUrlByPost(urlBuffer.toString());
@@ -134,48 +124,14 @@ final class PDFTriPhaseSignerUtil {
 			LOGGER.severe("Error al analizar la prefirma enviada por el servidor: " + e); //$NON-NLS-1$
 			throw new AOException("Error al analizar la prefirma enviada por el servidor", e); //$NON-NLS-1$
 		}
-		// Comprobamos que se incluyan las prefirmas en los datos recibidos
-		if (triphaseData.getSignsCount() < 1) {
-			throw new AOException("No se han recibido prefirmas que firmar");  //$NON-NLS-1$
-		}
 
-		// Es posible que se ejecute mas de una firma como resultado de haber proporcionado varios
-		// identificadores de datos o en una operacion de contrafirma.
-		for (int i = 0; i < triphaseData.getSignsCount(); i++) {
-
-			final TriphaseData.TriSign signConfig = triphaseData.getSign(i);
-			final String base64PreSign = signConfig.getProperty(PROPERTY_NAME_PRESIGN);
-			if (base64PreSign == null) {
-				throw new AOException("El servidor no ha devuelto la prefirma numero " + i + ": " + new String(preSignResult)); //$NON-NLS-1$ //$NON-NLS-2$
-			}
-
-			final byte[] preSign;
-			try {
-				preSign = Base64.decode(base64PreSign);
-			}
-			catch (final IOException e) {
-				throw new AOException("Error decodificando la prefirma: " + e, e); //$NON-NLS-1$
-			}
-
-			final byte[] pkcs1sign = new AOPkcs1Signer().sign(
-				preSign,
-				algorithm,
-				key,
-				certChain,
-				null // No hay parametros en PKCS#1
-			);
-
-			// Configuramos la peticion de postfirma indicando las firmas PKCS#1 generadas
-			signConfig.addProperty(PROPERTY_NAME_PKCS1_SIGN, Base64.encode(pkcs1sign));
-
-			// Si no es necesaria la prefirma para completar la postfirma, la eliminamos
-			if (signConfig.getProperty(PROPERTY_NAME_NEED_PRE) != null &&
-					!Boolean.parseBoolean(signConfig.getProperty(PROPERTY_NAME_NEED_PRE))) {
-				signConfig.deleteProperty(PROPERTY_NAME_PRESIGN);
-			}
-		}
-
-		return triphaseData.toString().getBytes();
+		return TriphaseDataSigner.doSign(
+			new AOPkcs1Signer(),
+			algorithm,
+			key,
+			certChain,
+			triphaseData
+		).toString().getBytes();
 
 	}
 
@@ -199,7 +155,7 @@ final class PDFTriPhaseSignerUtil {
 
 			if (extraParams.size() > 0) {
 				urlBuffer.append(HTTP_AND).append(PARAMETER_NAME_EXTRA_PARAM).append(HTTP_EQUALS).
-				append(properties2Base64(extraParams));
+				append(AOUtil.properties2Base64(extraParams));
 			}
 
 			triSignFinalResult = UrlHttpManagerFactory.getInstalledManager().readUrlByPost(urlBuffer.toString());
@@ -228,12 +184,5 @@ final class PDFTriPhaseSignerUtil {
 		}
 
 	}
-
-	private static String properties2Base64(final Properties p) throws IOException {
-		final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		p.store(baos, ""); //$NON-NLS-1$
-		return Base64.encode(baos.toByteArray(), true);
-	}
-
 
 }

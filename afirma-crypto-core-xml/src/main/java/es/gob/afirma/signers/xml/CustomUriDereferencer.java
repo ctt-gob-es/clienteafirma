@@ -173,12 +173,7 @@ public final class CustomUriDereferencer implements URIDereferencer {
             	return getStreamData(doc);
             }
 
-            // Buscamos el nodo en todo el XML
-        	String id = uriValue;
-        	if (uriValue.length() > 0 && uriValue.charAt(0) == '#') {
-        		id = uriValue.substring(1);
-        	}
-        	final Node targetNode = getElementById(doc, id);
+            final Node targetNode = getNodeByInternalUriReference(uriValue, doc);
 
             if (targetNode == null) {
             	throw new URIReferenceException(e);
@@ -186,6 +181,19 @@ public final class CustomUriDereferencer implements URIDereferencer {
 
             return getStreamData(targetNode);
 		}
+	}
+
+	/** Obtiene un nodo de un XML a partir de su URI de referencia interna.
+	 * @param uriValue Referencia interna del nodo
+	 * @param doc Documento XML.
+	 * @return Nodo a partir de su URI de referencia interna. */
+	public static Node getNodeByInternalUriReference(final String uriValue, final Document doc) {
+        // Buscamos el nodo en todo el XML
+    	String id = uriValue;
+    	if (uriValue.length() > 0 && uriValue.charAt(0) == '#') {
+    		id = uriValue.substring(1);
+    	}
+    	return getElementById(doc, id);
 	}
 
 	private static Data getStreamData(final Node targetNode) throws URIReferenceException {

@@ -11,6 +11,7 @@
 package es.gob.afirma.core.misc;
 
 import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -24,10 +25,8 @@ import java.nio.channels.FileChannel;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Locale;
+import java.util.Properties;
 import java.util.logging.Logger;
-
-import es.gob.afirma.core.util.tree.AOTreeModel;
-import es.gob.afirma.core.util.tree.AOTreeNode;
 
 /** M&eacute;todos generales de utilidad para toda la aplicaci&oacute;n.
  * @version 0.3 */
@@ -51,7 +50,7 @@ public final class AOUtil {
      * @throws URISyntaxException Si no se puede crear una URI soportada a partir de la cadena de entrada */
     public static URI createURI(final String file) throws URISyntaxException {
 
-        if (file == null || "".equals(file)) { //$NON-NLS-1$
+        if (file == null || file.isEmpty()) {
             throw new IllegalArgumentException("No se puede crear una URI a partir de un nulo"); //$NON-NLS-1$
         }
 
@@ -377,71 +376,6 @@ public final class AOUtil {
         return stringbuffer.toString();
     }
 
-    /** Genera una cadena representativa del &aacute;rbol que recibe.
-     * @param tree
-     *        &Aacute;rbol que se desea representar.
-     * @param linePrefx
-     *        Prefijo de cada l&iacute;nea de firma (por defecto, cadena
-     *        vac&iacute;a).
-     * @param identationString
-     *        Cadena para la identaci&oacute;n de los nodos de firma (por
-     *        defecto, tabulador).
-     * @return Cadena de texto. */
-    public static String showTreeAsString(final AOTreeModel tree, final String linePrefx, final String identationString) {
-
-        if (tree == null || tree.getRoot() == null) {
-            LOGGER.severe("Se ha proporcionado un arbol de firmas vacio"); //$NON-NLS-1$
-            return null;
-        }
-
-        if (!(tree.getRoot() instanceof AOTreeNode)) {
-            LOGGER.severe("La raiz del arbol de firmas no es de tipo DafaultMutableTreeNode"); //$NON-NLS-1$
-            return null;
-        }
-
-        final StringBuilder buffer = new StringBuilder();
-
-        // Transformamos en cadenas de texto cada rama que surja del nodo raiz
-        // del arbol
-        final AOTreeNode root = (AOTreeNode) tree.getRoot();
-        for (int i = 0; i < root.getChildCount(); i++) {
-            archiveTreeNode(root.getChildAt(i), 0, linePrefx != null ? linePrefx : "", identationString != null ? identationString : "\t", buffer);  //$NON-NLS-1$//$NON-NLS-2$
-        }
-
-        return buffer.toString();
-    }
-
-    /** Transforma en cadena una rama completa de un &aacute;rbol. Para una
-     * correcta indexaci&oacute; es necesario indicar la profundidad en la que
-     * esta el nodo del que pende la rama. En el caso de las ramas que penden
-     * del nodo ra&iacute;z del &aacute;rbol la profundidad es cero (0).
-     * @param node
-     *        Nodo del que cuelga la rama.
-     * @param depth
-     *        Profundidad del nodo del que pende la rama.
-     * @param linePrefx
-     *        Prefijo de cada l&iacute;nea de firma (por defecto, cadena
-     *        vac&iacute;a).
-     * @param identationString
-     *        Cadena para la identaci&oacute;n de los nodos de firma (por
-     *        defecto, tabulador).
-     * @param buffer
-     *        Buffer en donde se genera la cadena de texto. */
-    private static void archiveTreeNode(final AOTreeNode node,
-                                              final int depth,
-                                              final String linePrefx,
-                                              final String identationString,
-                                              final StringBuilder buffer) {
-        buffer.append('\n').append(linePrefx);
-        for (int i = 0; i < depth; i++) {
-            buffer.append(identationString);
-        }
-        buffer.append(node.getUserObject());
-        for (int i = 0; i < node.getChildCount(); i++) {
-            archiveTreeNode(node.getChildAt(i), depth + 1, linePrefx, identationString, buffer);
-        }
-    }
-
     /** Carga una librer&iacute;a nativa del sistema.
      * @param path Ruta a la libreria de sistema.
      * @throws IOException Si ocurre alg&uacute;n problema durante la carga */
@@ -529,6 +463,36 @@ public final class AOUtil {
         }
 
         return parts.toArray(new String[0]);
+    }
+
+	/** Convierte un objeto de propiedades en una cadena Base64.
+	 * @param p Objeto de propiedades a convertir.
+	 * @return Base64 que descodificado es un fichero de propiedades en texto plano.
+	 * @throws IOException Si hay problemas en la conversi&oacute;n a Base64. */
+	public static String properties2Base64(final Properties p) throws IOException {
+		if (p == null) {
+			return ""; //$NON-NLS-1$
+		}
+		final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		p.store(baos, ""); //$NON-NLS-1$
+		return Base64.encode(baos.toByteArray(), true);
+	}
+
+	/** Convierte una cadena Base64 en un objeto de propiedades.
+	 * @param base64 Base64 que descodificado es un fichero de propiedades en texto plano.
+	 * @return Objeto de propiedades.
+	 * @throws IOException Si hay problemas en el proceso. */
+    public static Properties base642Properties(final String base64) throws IOException {
+    	final Properties p = new Properties();
+    	if (base64 == null || base64.isEmpty()) {
+    		return p;
+    	}
+    	p.load(
+			new ByteArrayInputStream(
+				Base64.decode(base64)
+			)
+		);
+    	return p;
     }
 
 }

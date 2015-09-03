@@ -4,10 +4,14 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -29,18 +33,34 @@ public final class TriphaseData {
 		private final Map<String,String> dict;
 		private final String id;
 
+		/** Constructor de copia. Crea una firma trif&aacute;sica individual a partir
+		 * de otra, de forma completamente inmutable.
+		 * @param ts Firma trif&aacute;sica original. */
+		public TriSign(final TriSign ts) {
+			this.id = ts.getId();
+			this.dict = new ConcurrentHashMap<String, String>(ts.getDict().size());
+			final Set<String> keys = ts.getDict().keySet();
+			for (final String key : keys) {
+				this.dict.put(key, ts.getProperty(key));
+			}
+		}
+
 		/** Crea los datos de una firma trif&aacute;sica individual.
 		 * @param d Propiedades de la firma.
 		 * @param i Identificador de la firma. */
-		public TriSign(final Map<String,String> d,
-				       final String i) {
+		public TriSign(final Map<String, String> d, final String i) {
 			if (d == null) {
 				throw new IllegalArgumentException(
 					"El diccionario de propiedades de la firma no puede ser nulo" //$NON-NLS-1$
 				);
 			}
 			this.dict = d;
-			this.id = i;
+			this.id = i != null ? i : UUID.randomUUID().toString();
+		}
+
+		@Override
+		public String toString() {
+			return "Firma trifasica individual con identificador " + getId(); //$NON-NLS-1$
 		}
 
 		/** Obtiene el identificador de la firma.
@@ -71,25 +91,51 @@ public final class TriphaseData {
 		}
 
 		Map<String,String> getDict() {
-			return this.dict;
+			return Collections.unmodifiableMap(this.dict);
 		}
 
 	}
 
 	private final List<TriSign> signs;
 
-	/** Construye el mensaje especificando formato y operaci&oacute;n (firma, cofirma o contrafirma). */
+	/** Devuelve una firma individual con el identificador dado o <code>null</code> si no hay ninguna
+	 * firma con ese identificador.
+	 * Si hubiese varias firmas con el mismo identificador se devuleve el primero en encontrarse.
+	 * @param signId Identificador de la firma.
+	 * @return Firma individual con el identificador dado. */
+	public TriSign getTriSign(final String signId) {
+		if (signId == null) {
+			throw new IllegalArgumentException(
+				"El ID de la firma no puede ser nulo" //$NON-NLS-1$
+			);
+		}
+		for (final TriSign ts : this.signs) {
+			if (signId.equals(ts.getId())) {
+				return ts;
+			}
+		}
+		return null;
+	}
+
+	/** Obtiene todas las firmas de la sesi&oacute;n.
+	 * @return Lista con todas las firmas de la sesi&oacute;n. */
+	public List<TriSign> getTriSigns() {
+		return this.signs;
+	}
+
+	/** Construye unos datos de sesi&oacute;n trif&aacute;sica vac&iacute;os. */
 	public TriphaseData() {
 		this.signs = new ArrayList<TriSign>();
 	}
 
-	/** Construye el mensaje especificando la configuraci&oacute;n completa.
-	 * @param signs Configuraci&oacute;n espec&iacute;fica. */
-	private TriphaseData(final List<TriSign> signs) {
+	/** Construye unos datos de sesi&oacute;n trif&aacute;sica indicando una lista de
+	 * configuraci&oacute;n de firmas individuales.
+	 * @param signs Lista de firmas individuales.. */
+	public TriphaseData(final List<TriSign> signs) {
 		this.signs = signs;
 	}
 
-	/** Agrega la configuracion para una nueva operaci&oacute;n trif&aacute;sica.
+	/** Agrega la configuraci&oacute;n para una nueva operaci&oacute;n trif&aacute;sica.
 	 * @param config Configuraci&oacute;n de la operaci&oacute;n trif&aacute;sica. */
 	public void addSignOperation(final TriSign config) {
 		this.signs.add(config);
@@ -210,9 +256,9 @@ public final class TriphaseData {
 		return params;
 	}
 
-	/** Recupera el &iacute;ndice siguiente nodo de la lista de tipo Element. Empieza a comprobar
-	 * los nodos a partir del &iacute;ndice marcado. Si no encuentra un nodo de tipo elemento,
-	 * devuelve -1.
+	/** Recupera el &iacute;ndice del siguiente nodo de la lista de tipo <code>Element</code>.
+	 * Empieza a comprobar los nodos a partir del &iacute;ndice marcado. Si no encuentra un
+	 * nodo de tipo <i>elemento</i> devuelve -1.
 	 * @param nodes Listado de nodos.
 	 * @param currentIndex &Iacute;ndice del listado a partir del cual se empieza la comprobaci&oacute;n.
 	 * @return &Iacute;ndice del siguiente node de tipo Element o -1 si no se encontr&oacute;. */
@@ -252,7 +298,11 @@ public final class TriphaseData {
 			final Iterator<String> firmaIt = signConfig.getDict().keySet().iterator();
 			while (firmaIt.hasNext()) {
 				final String p = firmaIt.next();
-				builder.append("   <param n=\"").append(p).append("\">").append(signConfig.getProperty(p)).append("</param>\n"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				builder.append("   <param n=\"") //$NON-NLS-1$
+					.append(p)
+						.append("\">") //$NON-NLS-1$
+							.append(signConfig.getProperty(p))
+								.append("</param>\n"); //$NON-NLS-1$
 			}
 			builder.append("  </firma>\n"); //$NON-NLS-1$
 		}

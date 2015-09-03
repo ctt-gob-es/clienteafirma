@@ -1,15 +1,23 @@
 package es.gob.afirma.core.misc.protocol;
 
-import java.net.URL;
-import java.util.Arrays;
+import java.util.Map;
+
 
 /** Par&aacute;metros para el guardado de datos. */
-public final class UrlParametersToSave {
+public final class UrlParametersToSave extends UrlParameters {
 
-	private byte[] data = null;
-	private String fileId = null;
-	private byte[] desKey = null;
-	private URL retrieveServletUrl = null;
+	/** Par&aacute;metro de entrada con el t&iacute;tulo de la actividad o del di&aacute;logo de guardado. */
+	private static final String TITLE_PARAM = "title"; //$NON-NLS-1$
+
+	/** Par&aacute;metro de entrada con la descripci&oacute;n del tipo de fichero de salida. */
+	private static final String FILETYPE_DESCRIPTION = "desc"; //$NON-NLS-1$
+
+	/** Par&aacute;metro de entrada con el nombre propuesto para un fichero. */
+	private static final String FILENAME_PARAM = "filename"; //$NON-NLS-1$
+
+	/** Par&aacute;metro de entrada con las extensiones recomendadas para el fichero de salida. */
+	private static final String FILENAME_EXTS = "exts"; //$NON-NLS-1$
+
 	private String title = null;
 	private String filename = null;
 	private String extensions = null;
@@ -40,30 +48,6 @@ public final class UrlParametersToSave {
 		this.title = title;
 	}
 
-	/** Establece los datos a guardar.
-	 * @param dat Datos a guardar */
-	void setData(final byte[] dat) {
-		this.data = dat != null ? Arrays.copyOf(dat, dat.length) : null;
-	}
-
-	/** Establece el identificador de los datos en el servidor intermedio.
-	 * @param fileId Identificador de los datos en el servidor intermedio */
-	void setFileId(final String fileId) {
-		this.fileId = fileId;
-	}
-
-	/** Establece la clave DES de cifrado de los datos a subir al servidor intermedio.
-	 * @param key Clave DES de cifrado de los datos a subir al servidor intermedio */
-	void setDesKey(final byte[] key) {
-		this.desKey = key != null ? Arrays.copyOf(key, key.length) : null;
-	}
-
-	/** Establece la URL de subida al servidor intermedio.
-	 * @param retrieveServletUrl URL de subida al servidor intermedio */
-	void setRetrieveServletUrl(final URL retrieveServletUrl) {
-		this.retrieveServletUrl = retrieveServletUrl;
-	}
-
 	/** Obtiene la descripci&oacute;n del tipo de fichero a guardar.
 	 * @return Descripci&oacute;n del tipo de fichero a guardar */
 	public String getFileTypeDescription() {
@@ -89,28 +73,76 @@ public final class UrlParametersToSave {
 		return this.title;
 	}
 
-	/** Obtiene los datos a guardar
-	 * @return Datos a guardar */
-	public byte[] getData() {
-		return this.data;
+	void setSaveParameters(final Map<String, String> params) throws ParameterException {
+
+		// Comprobamos que se nos hayan indicado los datos o, en su defecto, el
+		// identificador de fichero remoto
+		// para descargar los datos y la ruta del servicio remoto para el
+		// fichero
+		if (!params.containsKey(FILE_ID_PARAM) && !params.containsKey(DATA_PARAM)) {
+			throw new ParameterException(
+				"Error al validar la URL del servlet de recuperacion: " + //$NON-NLS-1$
+					"La URI debe contener o un identificador de fichero o los datos a guardar" //$NON-NLS-1$
+			);
+		}
+
+		setTitle(verifyTitle(params));
+		setFilename(verifyFilename(params));
+		setExtensions(verifyExtensions(params));
+		setFileTypeDescription(verifyFileTypeDescription(params));
 	}
 
-	/** Obtiene el identificador de los datos en el servidor intermedio.
-	 * @return Identificador de los datos en el servidor intermedio */
-	public String getFileId() {
-		return this.fileId;
+	private static String verifyFilename(final Map<String, String> params) throws ParameterException {
+		String filename = null;
+		if (params.containsKey(FILENAME_PARAM)) {
+			filename = params.get(FILENAME_PARAM);
+			// Determinamos si el nombre tiene algun caracter que no consideremos valido para un nombre de fichero
+			for (final char invalidChar : "\\/:*?\"<>|".toCharArray()) { //$NON-NLS-1$
+				if (filename.indexOf(invalidChar) != -1) {
+					throw new ParameterException("Se ha indicado un nombre de fichero con el caracter invalido: " + invalidChar); //$NON-NLS-1$
+				}
+			}
+		}
+		return filename;
 	}
 
-	/** Obtiene la clave DES de cifrado de los datos a subir al servidor intermedio.
-	 * @return Clave DES de cifrado de los datos a subir al servidor intermedio */
-	public byte[] getDesKey() {
-		return this.desKey;
+	private static String verifyExtensions(final Map<String, String> params) throws ParameterException {
+		String extensions = null;
+		if (params.containsKey(FILENAME_EXTS)) {
+			extensions = params.get(FILENAME_EXTS);
+			// Determinamos si el nombre tiene algun caracter que no consideremos valido para un nombre de fichero
+			for (final char invalidChar : "\\/:*?\"<>|; ".toCharArray()) { //$NON-NLS-1$
+				if (extensions.indexOf(invalidChar) != -1) {
+					throw new ParameterException("Se ha indicado una lista de extensiones de nombre de fichero con caracteres invalidos: " + invalidChar); //$NON-NLS-1$
+				}
+			}
+		}
+		return extensions;
 	}
 
-	/** Obtiene la URL de subida al servidor intermedio.
-	 * @return URL de subida al servidor intermedio */
-	public URL getRetrieveServletUrl() {
-		return this.retrieveServletUrl;
+	private static String verifyTitle(final Map<String, String> params) {
+		if (params.containsKey(TITLE_PARAM)) {
+			return params.get(TITLE_PARAM);
+		}
+		return ProtocoloMessages.getString("ProtocolInvocationUriParser.1"); //$NON-NLS-1$
+	}
+
+	private static String verifyFileTypeDescription(final Map<String, String> params) {
+		String desc = null;
+		if (params.containsKey(FILETYPE_DESCRIPTION)) {
+			desc = params.get(FILETYPE_DESCRIPTION);
+			// Anadimos las extensiones si fuese preciso
+			if (params.containsKey(FILENAME_EXTS) && !desc.endsWith(")")) { //$NON-NLS-1$
+				final StringBuilder sb = new StringBuilder(desc).append(" ("); //$NON-NLS-1$
+				for (final String ext : params.get(FILENAME_EXTS).split(",")) { //$NON-NLS-1$
+					sb.append("*."); //$NON-NLS-1$
+					sb.append(ext);
+				}
+				sb.append(")"); //$NON-NLS-1$
+				desc = sb.toString();
+			}
+		}
+		return desc;
 	}
 
 }

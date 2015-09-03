@@ -44,6 +44,11 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 	private static final HostnameVerifier DEFAULT_HOSTNAME_VERIFIER = HttpsURLConnection.getDefaultHostnameVerifier();
 	private static final SSLSocketFactory DEFAULT_SSL_SOCKET_FACTORY = HttpsURLConnection.getDefaultSSLSocketFactory();
 
+	private enum Method {
+		GET,
+		POST
+	}
+
 	protected UrlHttpManagerImpl() {
 		// Instanciacion "default"
 	}
@@ -72,32 +77,31 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 		return readUrlByPost(url, DEFAULT_TIMEOUT, "application/x-www-form-urlencoded"); //$NON-NLS-1$
 	}
 
-	/** Lee una URL HTTP o HTTPS por POST si se indican par&aacute;metros en la URL y por GET en caso contrario.
-	 * En HTTPS no se hacen comprobaciones del certificado servidor.
-	 * @param url URL a leer
-	 * @param timeout Tiempo m&aacute;ximo en milisegundos que se debe esperar por la respuesta. Un timeout de 0
-	 * se interpreta como un timeout infinito. Si se indica -1, se usar&aacute; el por defecto de Java.
-	 * @return Contenido de la URL
-	 * @throws IOException Si no se puede leer la URL */
-	@Override
-	public byte[] readUrlByPost(final String url, final int timeout, final String contentType) throws IOException {
+	private byte[] readUrl(final String url,
+			               final int timeout,
+			               final String contentType,
+			               final Method method) throws IOException {
 		if (url == null) {
 			throw new IllegalArgumentException("La URL a leer no puede ser nula"); //$NON-NLS-1$
 		}
 
 		// Si la URL no tiene parametros la leemos por GET
-		if (!url.contains("?")) { //$NON-NLS-1$
+		if (!url.contains("?") && Method.POST.equals(method)) { //$NON-NLS-1$
 			Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
 				"Se ha pedido una peticion POST sin parametros, pero se realizara por GET" //$NON-NLS-1$
 			);
-			return readUrlByGet(url);
+			return readUrl(url, timeout, contentType, Method.GET);
 		}
 
-		final StringTokenizer st = new StringTokenizer(url, "?"); //$NON-NLS-1$
-		final String request = st.nextToken();
-		final String urlParameters = st.nextToken();
+		String urlParameters = null;
+		String request = null;
+		if (Method.POST.equals(method)) {
+			final StringTokenizer st = new StringTokenizer(url, "?"); //$NON-NLS-1$
+			request = st.nextToken();
+			urlParameters = st.nextToken();
+		}
 
-		final URL uri = new URL(request);
+		final URL uri = new URL(request != null ? request : url);
 
 		if (uri.getProtocol().equals(HTTPS)) {
 			try {
@@ -111,7 +115,8 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 		}
 
 		final HttpURLConnection conn = (HttpURLConnection) uri.openConnection(Proxy.NO_PROXY);
-		conn.setRequestMethod("POST"); //$NON-NLS-1$
+
+		conn.setRequestMethod(method.toString());
 
 		conn.addRequestProperty("Accept", "*/*"); //$NON-NLS-1$ //$NON-NLS-2$
 		conn.addRequestProperty("Connection", "keep-alive"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -126,13 +131,15 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 			conn.setReadTimeout(timeout);
 		}
 
-		conn.setDoOutput(true);
-
-		final OutputStreamWriter writer = new OutputStreamWriter(conn.getOutputStream());
-
-		writer.write(urlParameters);
-		writer.flush();
-		writer.close();
+		if (urlParameters != null) {
+			conn.setDoOutput(true);
+			final OutputStreamWriter writer = new OutputStreamWriter(
+				conn.getOutputStream()
+			);
+			writer.write(urlParameters);
+			writer.flush();
+			writer.close();
+		}
 
 		conn.connect();
 		final int resCode = conn.getResponseCode();
@@ -141,7 +148,7 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 			if (uri.getProtocol().equals(HTTPS)) {
 				enableSslChecks();
 			}
-			throw new HttpError(resCode);
+			throw new HttpError(resCode, conn.getResponseMessage());
 		}
 
 		final InputStream is = conn.getInputStream();
@@ -153,32 +160,28 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 		}
 
 		return data;
+
 	}
 
-	/** Lee una URL HTTP o HTTPS por GET. En HTTPS no se hacen comprobaciones del certificado servidor.
+	/** Lee una URL HTTP o HTTPS por POST si se indican par&aacute;metros en la URL y por GET en caso contrario.
+	 * En HTTPS no se hacen comprobaciones del certificado servidor.
 	 * @param url URL a leer
+	 * @param timeout Tiempo m&aacute;ximo en milisegundos que se debe esperar por la respuesta. Un timeout de 0
+	 * se interpreta como un timeout infinito. Si se indica -1, se usar&aacute; el por defecto de Java.
 	 * @return Contenido de la URL
 	 * @throws IOException Si no se puede leer la URL */
 	@Override
+	public byte[] readUrlByPost(final String url, final int timeout, final String contentType) throws IOException {
+		return readUrl(url, timeout, contentType, Method.POST);
+	}
+
+	/** Lee una URL HTTP o HTTPS por GET. En HTTPS no se hacen comprobaciones del certificado servidor.
+	 * @param url URL a leer.
+	 * @return Contenido de la URL (de la lectura del contenido referenciado).
+	 * @throws IOException Si no se puede leer la URL. */
+	@Override
 	public byte[] readUrlByGet(final String url) throws IOException {
-		final URL uri = new URL(url);
-		if (uri.getProtocol().equals("https")) { //$NON-NLS-1$
-			try {
-				disableSslChecks();
-			}
-			catch(final Exception e) {
-				Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
-					"No se ha podido ajustar la confianza SSL, es posible que no se pueda completar la conexion: " + e //$NON-NLS-1$
-				);
-			}
-		}
-		final InputStream is = uri.openStream();
-		final byte[] data = AOUtil.getDataFromInputStream(is);
-		is.close();
-		if (uri.getProtocol().equals("https")) { //$NON-NLS-1$
-			enableSslChecks();
-		}
-		return data;
+		return readUrl(url, DEFAULT_TIMEOUT, null, Method.GET);
 	}
 
 	/** Habilita las comprobaciones de certificados en conexiones SSL dej&aacute;ndolas con su
