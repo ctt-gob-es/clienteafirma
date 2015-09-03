@@ -740,7 +740,7 @@ var MiniApplet = ( function ( window, undefined ) {
 		 */
 		function cargarAppAfirma(clientAddress, keystore) {
 			// ponemos la comprobacion window.postMessage para que internet explorer 8 no entre por aqui y tire por servicio web
-			if (!isIOS() && !isAndroid() && window.postMessage){
+			if (!isIOS() && !isAndroid() && !isInternetExplorer()){
 				clienteFirma = new AppAfirmaJSSocket(clientAddress, window, undefined);
 				clienteFirma.setKeyStore(keystore);
 				clientType = TYPE_JAVASCRIPT_SOCKET;
