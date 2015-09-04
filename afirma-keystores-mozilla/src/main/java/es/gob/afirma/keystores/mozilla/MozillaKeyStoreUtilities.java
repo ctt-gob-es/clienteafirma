@@ -34,7 +34,7 @@ import es.gob.afirma.keystores.mozilla.AOSecMod.ModuleName;
 
 /** Clase con m&eacute;toos de utilidad para la gesti&oacute;n del almac&eacute;n
  * de certificados de Mozilla. */
-final class MozillaKeyStoreUtilities {
+public final class MozillaKeyStoreUtilities {
 
 	private static final String LIB_NSPR4_SO = "/lib/libnspr4.so"; //$NON-NLS-1$
 
@@ -416,7 +416,7 @@ final class MozillaKeyStoreUtilities {
 	/** Obtiene el directorio del perfil de usuario de Mozilla / Firefox.
 	 * @return Ruta completa del directorio del perfil de usuario de Mozilla / Firefox
 	 * @throws IOException Cuando hay errores de entrada / salida */
-	static String getMozillaUserProfileDirectory() throws IOException {
+	public static String getMozillaUserProfileDirectory() throws IOException {
 		final String dir = NSPreferences.getFireFoxUserProfileDirectory(new File(getProfilesIniPath()));
 		if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
 			return MozillaKeyStoreUtilitiesWindows.cleanMozillaUserProfileDirectoryWindows(dir);
