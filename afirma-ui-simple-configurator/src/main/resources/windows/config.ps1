@@ -1,0 +1,3 @@
+$ScriptPath = Split-Path $MyInvocation.MyCommand.Path
+. "$ScriptPath\New-SelfsignedCertificateEx.ps1"
+New-SelfsignedCertificateEx -Subject "CN=127.0.0.1" -EnhancedKeyUsage "1.3.6.1.5.5.7.3.1", "1.3.6.1.5.5.7.3.2" -KeyUsage "KeyEncipherment, DigitalSignature" -AllowSMIME -Path "$ScriptPath\%%KS_FILENAME%%" -Password (ConvertTo-SecureString "%%KS_PASSWORD%%" -AsPlainText -Force) -Exportable -FriendlyName "%%CERT_ALIAS%%" -NotAfter (get-date).AddYears(10)
