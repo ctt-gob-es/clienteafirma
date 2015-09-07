@@ -27,8 +27,10 @@ public final class LogManager {
 		MINIAPPLET,
 		/** Applet. */
 		APPLET,
-		/** Firma F&aacute;cil. */
+		/** AutoFirma. */
 		SIMPLE,
+		/** Configurador de la instalaci&oacute;n de AutoFirma. */
+		SIMPLE_CONFIGURATOR,
 		/** StandAlone. */
 		STANDALONE,
 		/** Cliente para Android. */
