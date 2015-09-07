@@ -19,6 +19,8 @@ import java.util.logging.Logger;
 
 import javax.swing.JOptionPane;
 
+import es.gob.afirma.core.LogManager;
+import es.gob.afirma.core.LogManager.App;
 import es.gob.afirma.core.misc.Platform;
 
 /**
@@ -37,6 +39,16 @@ public class AutoFirmaConfigurator implements WindowListener {
 	private Configurator configurator;
 
 	private ConfiguratorConsole mainScreen;
+
+	static {
+		// Instalamos el registro a disco
+		try {
+			LogManager.install(App.SIMPLE_CONFIGURATOR);
+		}
+		catch(final Exception e) {
+			Logger.getLogger("es.gob.afirma").severe("No ha sido posible instalar el gestor de registro: " + e); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+	}
 
 	/**
 	 * Configurador de AutoFirma.

@@ -128,14 +128,13 @@ public class ConfiguratorWindows implements Configurator {
 	private static void installResource(final String resource, final File outDir) throws IOException {
 		int n;
 		final byte[] buffer = new byte[1024];
-		final InputStream configScriptIs = ConfiguratorWindows.class.getResourceAsStream(resource);
-		final FileOutputStream configScriptOs = new FileOutputStream(outDir);
-		while ((n = configScriptIs.read(buffer)) > 0) {
-			configScriptOs.write(buffer, 0, n);
+		try (final InputStream configScriptIs = ConfiguratorWindows.class.getResourceAsStream(resource);
+				final FileOutputStream configScriptOs = new FileOutputStream(outDir);) {
+			while ((n = configScriptIs.read(buffer)) > 0) {
+				configScriptOs.write(buffer, 0, n);
+			}
+			configScriptOs.flush();
 		}
-		configScriptOs.flush();
-		configScriptOs.close();
-		configScriptIs.close();
 	}
 
 	/**
@@ -147,22 +146,23 @@ public class ConfiguratorWindows implements Configurator {
 	 */
 	private static void installResourceWithReplaces(final String resource, final File outDir, final String[][] replaces) throws IOException {
 		int n;
+		String resourceText;
 		final byte[] buffer = new byte[1024];
-		final InputStream configScriptIs = ConfiguratorWindows.class.getResourceAsStream(resource);
-		final ByteArrayOutputStream tempOs = new ByteArrayOutputStream();
-		while ((n = configScriptIs.read(buffer)) > 0) {
-			tempOs.write(buffer, 0, n);
-		}
-		configScriptIs.close();
+		try (final InputStream configScriptIs = ConfiguratorWindows.class.getResourceAsStream(resource);
+				final ByteArrayOutputStream tempOs = new ByteArrayOutputStream();) {
+			while ((n = configScriptIs.read(buffer)) > 0) {
+				tempOs.write(buffer, 0, n);
+			}
 
-		String resourceText = new String(tempOs.toByteArray());
-		for (final String[] replacePair : replaces) {
-			resourceText = resourceText.replace(replacePair[0], replacePair[1]);
+			resourceText = new String(tempOs.toByteArray());
+			for (final String[] replacePair : replaces) {
+				resourceText = resourceText.replace(replacePair[0], replacePair[1]);
+			}
 		}
 
-		final FileOutputStream configScriptOs = new FileOutputStream(outDir);
-		configScriptOs.write(resourceText.getBytes());
-		configScriptOs.close();
+		try (final FileOutputStream configScriptOs = new FileOutputStream(outDir);) {
+			configScriptOs.write(resourceText.getBytes());
+		}
 	}
 
 	/**
@@ -214,38 +214,75 @@ public class ConfiguratorWindows implements Configurator {
 			throw new IOException("No se ha podido reconstruir la ruta del script de configuracion: " + psScriptFile.getAbsolutePath(), e); //$NON-NLS-1$
 		}
 
-		final String[] powerShellCommands = new String[] {
+		// Primero habilitamos la ejecucion de scripts para el usuario actual
+		String[] powerShellCommands = new String[] {
+				POWERSHELL_EXE,
+				"set-executionpolicy", //$NON-NLS-1$
+				"-Scope", //$NON-NLS-1$
+				"CurrentUser", //$NON-NLS-1$
+				"remotesigned" //$NON-NLS-1$
+			};
+
+		LOGGER.info("=================\nHabilitamos el uso de scripts"); //$NON-NLS-1$
+
+		Process process = new ProcessBuilder(powerShellCommands).directory(appConfigDir).start();
+
+		LOGGER.info("=================\nRecuperamos el control"); //$NON-NLS-1$
+
+		try (final InputStream resIs = process.getInputStream();
+				final BufferedReader resReader = new BufferedReader(new InputStreamReader(resIs));) {
+			String line;
+			while ((line = resReader.readLine()) != null) {
+				LOGGER.info(line);
+			}
+		}
+
+		try (final InputStream errIs = process.getErrorStream();
+				final BufferedReader errReader = new BufferedReader(new InputStreamReader(errIs));) {
+			String line;
+			boolean error = false;
+			while ((line = errReader.readLine()) != null) {
+				error = true;
+				LOGGER.severe(line);
+			}
+			if (error) {
+				throw new ConfigurationException("Error en ejecucion del script de generacion de claves SSL"); //$NON-NLS-1$
+			}
+		}
+
+		// Ejecutamos el script de generacion del almacen
+		powerShellCommands = new String[] {
 			POWERSHELL_EXE,
 			"\"" + psScriptPath + "\"" //$NON-NLS-1$ //$NON-NLS-2$
 		};
 
 		LOGGER.info("=================\nLanzamos el script"); //$NON-NLS-1$
 
+		process = new ProcessBuilder(powerShellCommands).directory(appConfigDir).start();
 
-		final Process process = new ProcessBuilder(powerShellCommands).directory(appConfigDir).start();
+		LOGGER.info("=================\nRecuperamos el control despues del script"); //$NON-NLS-1$
 
-		String line;
 		try (final InputStream resIs = process.getInputStream();
 				final BufferedReader resReader = new BufferedReader(new InputStreamReader(resIs));) {
+			String line;
 			while ((line = resReader.readLine()) != null) {
 				LOGGER.info(line);
 			}
 		}
 
-		boolean error = false;
 		try (final InputStream errIs = process.getErrorStream();
 				final BufferedReader errReader = new BufferedReader(new InputStreamReader(errIs));) {
+			String line;
+			boolean error = false;
 			while ((line = errReader.readLine()) != null) {
 				error = true;
 				LOGGER.severe(line);
 			}
+			if (error) {
+				throw new ConfigurationException("Error en ejecucion del script de generacion de claves SSL"); //$NON-NLS-1$
+			}
 		}
 
-		LOGGER.info("=================\nRecuperamos el control despues del script"); //$NON-NLS-1$
-
-		if (error) {
-			throw new ConfigurationException("Error en ejecucion del script de generacion de claves SSL"); //$NON-NLS-1$
-		}
 	}
 
 	/**

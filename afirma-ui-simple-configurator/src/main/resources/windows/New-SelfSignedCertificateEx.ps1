@@ -263,14 +263,14 @@ function New-SelfSignedCertificateEx {
 #endregion
 
 #region Basic Constraints processing
-	if ($PSBoundParameters.Keys.Contains("IsCA")) {
-		# http://msdn.microsoft.com/en-us/library/aa378108(v=vs.85).aspx
-		$BasicConstraints = New-Object -ComObject X509Enrollment.CX509ExtensionBasicConstraints
-		if (!$IsCA) {$PathLength = -1}
-		$BasicConstraints.InitializeEncode($IsCA,$PathLength)
-		$BasicConstraints.Critical = $IsCA
-		$ExtensionsToAdd += "BasicConstraints"
-	}
+#	if ($PSBoundParameters.Keys.Contains("IsCA")) {
+#		# http://msdn.microsoft.com/en-us/library/aa378108(v=vs.85).aspx
+#		$BasicConstraints = New-Object -ComObject X509Enrollment.CX509ExtensionBasicConstraints
+#		if (!$IsCA) {$PathLength = -1}
+#		$BasicConstraints.InitializeEncode($IsCA,$PathLength)
+#		$BasicConstraints.Critical = $IsCA
+#		$ExtensionsToAdd += "BasicConstraints"
+#	}
 #endregion
 
 #region SAN processing
