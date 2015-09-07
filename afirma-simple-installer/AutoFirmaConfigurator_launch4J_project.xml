@@ -12,7 +12,7 @@
   <supportUrl></supportUrl>
   <stayAlive>true</stayAlive>
   <restartOnCrash>false</restartOnCrash>
-  <manifest>C:\Users\carlos\Documents\Afirma\SVN\cliente-afirma\trunk\afirma-simple-installer\AutoFirmaConfigurator.manifest</manifest>
+  <manifest>AutoFirmaConfigurator.manifest</manifest>
   <icon>ic_launcher.ico</icon>
   <jre>
     <path>./jre</path>
