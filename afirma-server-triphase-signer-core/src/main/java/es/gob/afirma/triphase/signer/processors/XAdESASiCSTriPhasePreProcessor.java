@@ -7,6 +7,7 @@ import java.util.Properties;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.signers.CounterSignTarget;
+import es.gob.afirma.core.signers.TriphaseData;
 import es.gob.afirma.core.signers.asic.ASiCUtil;
 import es.gob.afirma.signers.xades.asic.AOXAdESASiCSSigner;
 
@@ -33,7 +34,19 @@ public final class XAdESASiCSTriPhasePreProcessor extends XAdESTriPhasePreProces
 			                         final String algorithm,
 			                         final X509Certificate[] cert,
 			                         final Properties extraParams,
-			                         final byte[] session) throws NoSuchAlgorithmException,
+			                         final byte[] triphaseDataBytes) throws NoSuchAlgorithmException,
+			                                                      AOException,
+			                                                      IOException {
+
+		return preProcessPostSign(data, algorithm, cert, extraParams, TriphaseData.parser(triphaseDataBytes));
+	}
+
+	@Override
+	public byte[] preProcessPostSign(final byte[] data,
+			                         final String algorithm,
+			                         final X509Certificate[] cert,
+			                         final Properties extraParams,
+			                         final TriphaseData triphaseData) throws NoSuchAlgorithmException,
 			                                                      AOException,
 			                                                      IOException {
 		final byte[] xadesSignature = super.preProcessPostSign(
@@ -41,7 +54,7 @@ public final class XAdESASiCSTriPhasePreProcessor extends XAdESTriPhasePreProces
 			algorithm,
 			cert,
 			AOXAdESASiCSSigner.setASiCProperties(extraParams, data),
-			session
+			triphaseData
 		);
 		return ASiCUtil.createSContainer(
 			xadesSignature,
@@ -61,6 +74,28 @@ public final class XAdESASiCSTriPhasePreProcessor extends XAdESTriPhasePreProces
 	}
 
 	@Override
+	public byte[] preProcessPostCoSign(final byte[] data,
+			                           final String algorithm,
+			                           final X509Certificate[] cert,
+			                           final Properties extraParams,
+			                           final byte[] triphaseDataBytes) throws NoSuchAlgorithmException,
+			                                                        AOException,
+			                                                        IOException {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public byte[] preProcessPostCoSign(final byte[] data,
+			                           final String algorithm,
+			                           final X509Certificate[] cert,
+			                           final Properties extraParams,
+			                           final TriphaseData triphaseData) throws NoSuchAlgorithmException,
+			                                                        AOException,
+			                                                        IOException {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
 	public byte[] preProcessPreCounterSign(final byte[] sign,
 			                               final String algorithm,
 			                               final X509Certificate[] cert,
@@ -71,13 +106,14 @@ public final class XAdESASiCSTriPhasePreProcessor extends XAdESTriPhasePreProces
 	}
 
 	@Override
-	public byte[] preProcessPostCoSign(final byte[] data,
-			                           final String algorithm,
-			                           final X509Certificate[] cert,
-			                           final Properties extraParams,
-			                           final byte[] session) throws NoSuchAlgorithmException,
-			                                                        AOException,
-			                                                        IOException {
+	public byte[] preProcessPostCounterSign(final byte[] sign,
+			                                final String algorithm,
+			                                final X509Certificate[] cert,
+			                                final Properties extraParams,
+			                                final byte[] triphaseDataBytes,
+			                                final CounterSignTarget targets) throws NoSuchAlgorithmException,
+			                                                                        AOException,
+			                                                                        IOException {
 		throw new UnsupportedOperationException();
 	}
 
@@ -86,7 +122,7 @@ public final class XAdESASiCSTriPhasePreProcessor extends XAdESTriPhasePreProces
 			                                final String algorithm,
 			                                final X509Certificate[] cert,
 			                                final Properties extraParams,
-			                                final byte[] session,
+			                                final TriphaseData triphaseData,
 			                                final CounterSignTarget targets) throws NoSuchAlgorithmException,
 			                                                                        AOException,
 			                                                                        IOException {
