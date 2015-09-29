@@ -23,7 +23,7 @@ final class BatchServerUtil {
 	static {
 		final Properties p = new Properties();
 		try {
-			p.load(BatchServerUtil.class.getResourceAsStream("/config.properties")); //$NON-NLS-1$
+			p.load(BatchServerUtil.class.getResourceAsStream("/signbatch.properties")); //$NON-NLS-1$
 		}
 		catch(final Exception e) {
 			Logger.getLogger("es.gob.afirma").severe( //$NON-NLS-1$
