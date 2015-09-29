@@ -25,9 +25,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-
-import com.google.analytics.tracking.android.EasyTracker;
-
 import es.gob.afirma.R;
 import es.gob.afirma.android.ReadLocalFileTask.ReadLocalFileListener;
 import es.gob.afirma.android.crypto.LoadKeyStoreManagerTask;
@@ -470,13 +467,13 @@ public final class LocalSignResultActivity extends FragmentActivity implements K
 	@Override
 	public void onSignSuccess(final byte[] signature) {
 
-		// Notificamos a Google Analytics la operacion realizada
-		EasyTracker.getTracker().sendEvent(
-			"Operacion local", //$NON-NLS-1$
-			"Firma realizada", //$NON-NLS-1$
-			"Operacion='" + Operation.SIGN + "', formato='" + this.format + "', algoritmo='" + DEFAULT_SIGNATURE_ALGORITHM + "'", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-			Long.valueOf(0L)
-		);
+//		// Notificamos a Google Analytics la operacion realizada
+//		EasyTracker.getTracker().sendEvent(
+//			"Operacion local", //$NON-NLS-1$
+//			"Firma realizada", //$NON-NLS-1$
+//			"Operacion='" + Operation.SIGN + "', formato='" + this.format + "', algoritmo='" + DEFAULT_SIGNATURE_ALGORITHM + "'", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+//			Long.valueOf(0L)
+//		);
 
 		saveData(signature);
 	}
@@ -484,13 +481,13 @@ public final class LocalSignResultActivity extends FragmentActivity implements K
 	@Override
 	public void onSignError(final Throwable t) {
 
-		// Notificamos a Google Analytics la operacion realizada
-		EasyTracker.getTracker().sendEvent(
-			"Operacion local", //$NON-NLS-1$
-			"Firma error", //$NON-NLS-1$
-			"Operacion='" + Operation.SIGN + "', formato='" + this.format + "', algoritmo='" + DEFAULT_SIGNATURE_ALGORITHM + "'", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-			Long.valueOf(0L)
-		);
+//		// Notificamos a Google Analytics la operacion realizada
+//		EasyTracker.getTracker().sendEvent(
+//			"Operacion local", //$NON-NLS-1$
+//			"Firma error", //$NON-NLS-1$
+//			"Operacion='" + Operation.SIGN + "', formato='" + this.format + "', algoritmo='" + DEFAULT_SIGNATURE_ALGORITHM + "'", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+//			Long.valueOf(0L)
+//		);
 
 
 		if (t instanceof MSCBadPinException) {
