@@ -28,7 +28,7 @@ public final class LogManager {
 		/** Applet. */
 		APPLET,
 		/** AutoFirma. */
-		SIMPLE,
+		AUTOFIRMA,
 		/** Configurador de la instalaci&oacute;n de AutoFirma. */
 		SIMPLE_CONFIGURATOR,
 		/** StandAlone. */

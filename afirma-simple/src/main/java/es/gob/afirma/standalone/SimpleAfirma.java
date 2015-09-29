@@ -78,7 +78,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 	static {
 		// Instalamos el registro a disco
 		try {
-			LogManager.install(App.SIMPLE);
+			LogManager.install(App.AUTOFIRMA);
 		}
 		catch(final Exception e) {
 			Logger.getLogger("es.gob.afirma").severe("No ha sido posible instalar el gestor de registro: " + e); //$NON-NLS-1$ //$NON-NLS-2$
