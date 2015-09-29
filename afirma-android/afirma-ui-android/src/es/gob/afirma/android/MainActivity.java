@@ -36,18 +36,6 @@ import es.gob.afirma.android.gui.VerifyCaAppsTask.CaAppsVerifiedListener;
  * @author Alberto Mart&iacute;nez */
 public final class MainActivity extends FragmentActivity implements CaAppsVerifiedListener, DialogInterface.OnClickListener {
 
-//	@Override
-//	  public void onStart() {
-//	    super.onStart();
-//	    EasyTracker.getInstance().activityStart(this); // Add this method.
-//	}
-
-//	@Override
-//	  public void onStop() {
-//	    super.onStop();
-//	    EasyTracker.getInstance().activityStop(this); // Add this method.
-//	}
-
 	private final static String ES_GOB_AFIRMA = "es.gob.afirma"; //$NON-NLS-1$
 
 	private final static String EXTRA_RESOURCE_TITLE = "es.gob.afirma.android.title"; //$NON-NLS-1$
@@ -87,6 +75,7 @@ public final class MainActivity extends FragmentActivity implements CaAppsVerifi
 		// Comprobamos si esta instalada la aplicacion de algun proveedor de servicios de certificacion
 		// para mostrar el boton de peticion de certificados en caso afirmativo
 		verifyCaApps();
+
 	}
 
 	/** @param v Vista sobre la que se hace clic. */
@@ -117,11 +106,13 @@ public final class MainActivity extends FragmentActivity implements CaAppsVerifi
 				ad.show();
 			}
 		}
+
 		//Boton firmar fichero local
 		else if(v.getId() == R.id.buttonSign){
 			final Intent intent = new Intent(getApplicationContext(), LocalSignResultActivity.class);
 			startActivity(intent);
 		}
+
 		// Instalacion de certificados
 		else {
 			final Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
@@ -150,24 +141,14 @@ public final class MainActivity extends FragmentActivity implements CaAppsVerifi
 					baos.write(buffer, 0, n);
 				}
 				is.close();
-			} catch (final IOException e) {
+			}
+			catch (final IOException e) {
 				showErrorMessage(getString(R.string.error_loading_selected_file, filename));
 				Log.e(ES_GOB_AFIRMA, "Error al cargar el fichero: " + e.toString()); //$NON-NLS-1$
 				e.printStackTrace();
 				return;
 			}
-/* COMENTADO PARA EVITAR UTILIZAR LA CLASE PFX DE BOUNCyCASTLE
-			// Comprobamos que es un PKCS#12 valido porque de no serlo la importacion en Android
-			// bloquea la aplicacion
-			try {
-				org.bouncycastle.asn1.pkcs.Pfx.getInstance(baos.toByteArray());
-			} catch (final Exception e) {
-				Log.e(ES_GOB_AFIRMA, "El fichero seleccionado no era un PKCS#12 valido: " + e.toString()); //$NON-NLS-1$
-				showErrorMessage(getString(R.string.error_no_valid_p12));
-				e.printStackTrace();
-				return;
-			}
-*/
+
 			final Intent intent = KeyChain.createInstallIntent();
 			intent.putExtra(KeyChain.EXTRA_PKCS12, baos.toByteArray());
 			startActivity(intent);
@@ -210,9 +191,9 @@ public final class MainActivity extends FragmentActivity implements CaAppsVerifi
 
 		@Override
 		public View getView(final int position, final View convertView, final ViewGroup parent) {
-			View v;
+
 			final LayoutInflater vi = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-			v = vi.inflate(R.layout.array_adapter_apps, null);
+			final View v = vi.inflate(R.layout.array_adapter_apps, null);
 
 			final AppProperties appProperties = this.items.get(position);
 

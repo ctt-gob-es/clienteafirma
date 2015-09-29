@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    
     <string name="app_name">Cliente m\u00F3vil @firma</string>
     <string name="title_activity_cert_chooser">Importar certificado</string>
     <string name="title_activity_choose_sign_file">Seleccione el fichero a firmar</string>
