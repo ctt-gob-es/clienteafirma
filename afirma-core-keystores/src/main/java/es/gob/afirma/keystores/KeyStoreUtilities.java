@@ -313,15 +313,17 @@ public final class KeyStoreUtilities {
 			}
 		}
 
-		// Anadimos el controlador PKCS#11 de FNMT-RCM TIF SIEMPRE
-		try {
-			final AOKeyStoreManager tmpKsm = new CNPKeyStoreManager(false, parentComponent);
-			LOGGER.info("La tarjeta FNMT-CRM TIF ha podido inicializarse, se anadiran sus entradas"); //$NON-NLS-1$
-			tmpKsm.setPreferred(true);
-			aksm.addKeyStoreManager(tmpKsm);
-		}
-		catch (final Exception ex) {
-			LOGGER.warning("No se ha podido inicializar la tarjeta FNMT-RCM TIF: " + ex); //$NON-NLS-1$
+		// Anadimos el controlador PKCS#11 de FNMT-RCM TIF en Windows
+		if (AOKeyStore.WINDOWS.equals(aksm.getType())) {
+			try {
+				final AOKeyStoreManager tmpKsm = new CNPKeyStoreManager(false, parentComponent);
+				LOGGER.info("La tarjeta FNMT-CRM TIF ha podido inicializarse, se anadiran sus entradas"); //$NON-NLS-1$
+				tmpKsm.setPreferred(true);
+				aksm.addKeyStoreManager(tmpKsm);
+			}
+			catch (final Exception ex) {
+				LOGGER.warning("No se ha podido inicializar la tarjeta FNMT-RCM TIF: " + ex); //$NON-NLS-1$
+			}
 		}
 	}
 }
