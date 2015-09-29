@@ -292,8 +292,10 @@ public final class KeyStoreUtilities {
 			}
 		}
 
-		// Anadimos el controlador Java de CERES SIEMPRE a menos que se indique "es.gob.afirma.keystores.mozilla.disableCeresNativeDriver=true"
-		if (!Boolean.getBoolean("es.gob.afirma.keystores.mozilla.disableCeresNativeDriver")) { //$NON-NLS-1$
+		// Anadimos el controlador Java de CERES SIEMPRE excepto:
+		// -En Linux (el PKCS#11 de FNMT funciona adecuadamente, y esta tarjeta no es critica)
+		// -Que se indique "es.gob.afirma.keystores.mozilla.disableCeresNativeDriver=true"
+		if (!Boolean.getBoolean("es.gob.afirma.keystores.mozilla.disableCeresNativeDriver") && !Platform.OS.LINUX.equals(Platform.getOS())) { //$NON-NLS-1$
 			try {
 				final AOKeyStoreManager tmpKsm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
 					AOKeyStore.CERES, // Store
