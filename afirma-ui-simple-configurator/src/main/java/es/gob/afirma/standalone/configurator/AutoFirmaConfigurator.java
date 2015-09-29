@@ -43,7 +43,7 @@ public class AutoFirmaConfigurator implements WindowListener {
 	static {
 		// Instalamos el registro a disco
 		try {
-			LogManager.install(App.SIMPLE_CONFIGURATOR);
+			LogManager.install(App.AUTOFIRMA_CONFIGURATOR);
 		}
 		catch(final Exception e) {
 			Logger.getLogger("es.gob.afirma").severe("No ha sido posible instalar el gestor de registro: " + e); //$NON-NLS-1$ //$NON-NLS-2$

@@ -30,7 +30,7 @@ public final class LogManager {
 		/** AutoFirma. */
 		AUTOFIRMA,
 		/** Configurador de la instalaci&oacute;n de AutoFirma. */
-		SIMPLE_CONFIGURATOR,
+		AUTOFIRMA_CONFIGURATOR,
 		/** StandAlone. */
 		STANDALONE,
 		/** Cliente para Android. */
