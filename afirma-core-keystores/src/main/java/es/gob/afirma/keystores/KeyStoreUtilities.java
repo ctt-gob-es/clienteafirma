@@ -283,6 +283,7 @@ public final class KeyStoreUtilities {
 				LOGGER.info("El DNIe 100% Java ha podido inicializarse, se anadiran sus entradas"); //$NON-NLS-1$
 				tmpKsm.setPreferred(true);
 				aksm.addKeyStoreManager(tmpKsm);
+				return; // Si instancia DNIe no pruebo otras tarjetas, no deberia haber varias tarjetas instaladas
 			}
 			catch (final AOCancelledOperationException ex) {
 				LOGGER.warning("Se cancelo el acceso al almacen DNIe 100% Java: " + ex); //$NON-NLS-1$
@@ -307,6 +308,7 @@ public final class KeyStoreUtilities {
 				LOGGER.info("La tarjeta CERES ha podido inicializarse, se anadiran sus entradas"); //$NON-NLS-1$
 				tmpKsm.setPreferred(true);
 				aksm.addKeyStoreManager(tmpKsm);
+				return; // Si instancia CERES no pruebo otras tarjetas, no deberia haber varias tarjetas instaladas
 			}
 			catch (final Exception ex) {
 				LOGGER.warning("No se ha podido inicializar la tarjeta CERES: " + ex); //$NON-NLS-1$
