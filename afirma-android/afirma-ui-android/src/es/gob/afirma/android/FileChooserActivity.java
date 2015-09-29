@@ -15,9 +15,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.TextView;
-
-import com.google.analytics.tracking.android.EasyTracker;
-
 import es.gob.afirma.R;
 import es.gob.afirma.android.gui.FileArrayAdapter;
 import es.gob.afirma.android.gui.FileOption;
@@ -25,17 +22,17 @@ import es.gob.afirma.android.gui.FileOption;
 /** Actividad Android para la elecci&oacute;n de un fichero en el almacenamiento del dispositivo. */
 public final class FileChooserActivity extends ListActivity {
 
-	@Override
-	  public void onStart() {
-	    super.onStart();
-	    EasyTracker.getInstance().activityStart(this); // Add this method.
-	}
-
-	@Override
-	  public void onStop() {
-	    super.onStop();
-	    EasyTracker.getInstance().activityStop(this); // Add this method.
-	}
+//	@Override
+//	  public void onStart() {
+//	    super.onStart();
+//	    EasyTracker.getInstance().activityStart(this); // Add this method.
+//	}
+//
+//	@Override
+//	  public void onStop() {
+//	    super.onStop();
+//	    EasyTracker.getInstance().activityStop(this); // Add this method.
+//	}
 
 	private static final String ES_GOB_AFIRMA = "es.gob.afirma"; //$NON-NLS-1$
 

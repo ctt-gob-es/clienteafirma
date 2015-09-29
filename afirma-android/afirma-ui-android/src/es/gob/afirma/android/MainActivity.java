@@ -27,9 +27,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
-
-import com.google.analytics.tracking.android.EasyTracker;
-
 import es.gob.afirma.R;
 import es.gob.afirma.android.gui.AppProperties;
 import es.gob.afirma.android.gui.VerifyCaAppsTask;
@@ -39,17 +36,17 @@ import es.gob.afirma.android.gui.VerifyCaAppsTask.CaAppsVerifiedListener;
  * @author Alberto Mart&iacute;nez */
 public final class MainActivity extends FragmentActivity implements CaAppsVerifiedListener, DialogInterface.OnClickListener {
 
-	@Override
-	  public void onStart() {
-	    super.onStart();
-	    EasyTracker.getInstance().activityStart(this); // Add this method.
-	}
+//	@Override
+//	  public void onStart() {
+//	    super.onStart();
+//	    EasyTracker.getInstance().activityStart(this); // Add this method.
+//	}
 
-	@Override
-	  public void onStop() {
-	    super.onStop();
-	    EasyTracker.getInstance().activityStop(this); // Add this method.
-	}
+//	@Override
+//	  public void onStop() {
+//	    super.onStop();
+//	    EasyTracker.getInstance().activityStop(this); // Add this method.
+//	}
 
 	private final static String ES_GOB_AFIRMA = "es.gob.afirma"; //$NON-NLS-1$
 

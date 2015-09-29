@@ -23,9 +23,6 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.google.analytics.tracking.android.EasyTracker;
-
 import es.gob.afirma.R;
 import es.gob.afirma.android.crypto.CipherDataManager;
 import es.gob.afirma.android.gui.DownloadFileTask;
@@ -194,7 +191,7 @@ public final class SaveDataActivity extends ListActivity implements DownloadData
 	protected void onStart() {
 		super.onStart();
 
-		EasyTracker.getInstance().activityStart(this);
+		//EasyTracker.getInstance().activityStart(this);
 
 		((Button) findViewById(R.id.saveButton)).setOnClickListener(new SaveDataAction(this));
 
@@ -433,9 +430,9 @@ public final class SaveDataActivity extends ListActivity implements DownloadData
 		finish();
 	}
 
-	@Override
-	protected void onStop() {
-		super.onStop();
-		EasyTracker.getInstance().activityStop(this);
-	}
+//	@Override
+//	protected void onStop() {
+//		super.onStop();
+//		EasyTracker.getInstance().activityStop(this);
+//	}
 }

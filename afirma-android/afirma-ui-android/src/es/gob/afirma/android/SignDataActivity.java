@@ -27,9 +27,6 @@ import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.widget.Toast;
-
-import com.google.analytics.tracking.android.EasyTracker;
-
 import es.gob.afirma.R;
 import es.gob.afirma.android.crypto.CipherDataManager;
 import es.gob.afirma.android.crypto.LoadKeyStoreManagerTask;
@@ -179,7 +176,7 @@ public final class SignDataActivity extends FragmentActivity implements Keystore
 	public void onStart() {
 		super.onStart();
 
-		EasyTracker.getInstance().activityStart(this);
+		//EasyTracker.getInstance().activityStart(this);
 
 		if (this.parameters != null) {
 
@@ -686,7 +683,7 @@ public final class SignDataActivity extends FragmentActivity implements Keystore
 	protected void onStop() {
 		dismissProgressDialog();
 		dismissMessageDialog();
-		EasyTracker.getInstance().activityStop(this);
+		//EasyTracker.getInstance().activityStop(this);
 		super.onStop();
 	}
 

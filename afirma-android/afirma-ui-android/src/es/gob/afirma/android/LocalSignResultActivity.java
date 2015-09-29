@@ -166,11 +166,11 @@ public final class LocalSignResultActivity extends FragmentActivity implements K
 		UrlHttpManagerFactory.install(new AndroidUrlHttpManager());
 	}
 
-	@Override
-	  public void onStart() {
-	    super.onStart();
-	    EasyTracker.getInstance().activityStart(this); // Instanciacion de Google Analytics
-	}
+//	@Override
+//	  public void onStart() {
+//	    super.onStart();
+//	    EasyTracker.getInstance().activityStart(this); // Instanciacion de Google Analytics
+//	}
 
 	@Override
 	  public void onStop() {
@@ -178,7 +178,7 @@ public final class LocalSignResultActivity extends FragmentActivity implements K
 
 	    dismissProgressDialog();
 
-	    EasyTracker.getInstance().activityStop(this); // Parada de Google Analytics
+//	    EasyTracker.getInstance().activityStop(this); // Parada de Google Analytics
 	}
 
 	void finishLocalSign(final byte[] data) {
