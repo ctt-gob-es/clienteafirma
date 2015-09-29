@@ -10,7 +10,6 @@ import java.security.Security;
 import java.security.Signature;
 import java.util.Enumeration;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import es.gob.afirma.keystores.AOKeyStore;
@@ -24,14 +23,15 @@ public final class TestPkcs11 {
 	//private static final String LIB_NAME = "C:\\WINDOWS\\System32\\DNIe_P11_priv.dll"; //$NON-NLS-1$
 	//private static final String LIB_NAME = "C:\\WINDOWS\\SysWOW64\\siecap11.dll"; //$NON-NLS-1$
 	//private static final String LIB_NAME = "C:\\Users\\tomas\\workspace_32\\afirma-core-keystores\\src\\test\\resources\\CardOS\\cardos11.dll"; //$NON-NLS-1$
-	private static final String LIB_NAME = "C:\\WINDOWS\\SysWOW64\\cardos11.dll"; //$NON-NLS-1$
-	private static final char[] PIN = "0000".toCharArray(); //$NON-NLS-1$
+	//private static final String LIB_NAME = "C:\\WINDOWS\\SysWOW64\\cardos11.dll"; //$NON-NLS-1$
+	private static final String LIB_NAME = "C:\\WINDOWS\\SysWOW64\\TIF_P11.dll"; //$NON-NLS-1$
+	private static final char[] PIN = "88888888Y".toCharArray(); //$NON-NLS-1$
 
 	/** Prueba de firma con PKCS#11.
 	 * @throws Exception En cualquier error. */
 	@SuppressWarnings("static-method")
 	@Test
-	@Ignore //Dependiente del PKCS#11
+	//@Ignore //Dependiente del PKCS#11
 	public void testPkcs11() throws Exception {
 		final AOKeyStoreManager ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
     		AOKeyStore.PKCS11,
@@ -46,7 +46,7 @@ public final class TestPkcs11 {
 			al = alias;
 		}
 
-		final Signature s = Signature.getInstance("SHA1withRSA"); //$NON-NLS-1$
+		final Signature s = Signature.getInstance("SHA256withRSA"); //$NON-NLS-1$
 		s.initSign(ksm.getKeyEntry(al).getPrivateKey());
 		s.update("Hola".getBytes()); //$NON-NLS-1$
 		System.out.println("Firma: " + new String(s.sign())); //$NON-NLS-1$
@@ -66,7 +66,7 @@ public final class TestPkcs11 {
 				(
 					"name=pkcs11-win_dll\n" + //$NON-NLS-1$
 					"library=" + LIB_NAME + "\n" + //$NON-NLS-1$ //$NON-NLS-2$
-					"showInfo=true" //$NON-NLS-1$
+					"showInfo=false" //$NON-NLS-1$
 				).getBytes()
 			)
 		);
@@ -81,9 +81,18 @@ public final class TestPkcs11 {
 
 		final Signature s = Signature.getInstance("SHA1withRSA", p); //$NON-NLS-1$
 		s.initSign(
-			((PrivateKeyEntry)ks.getEntry(alias, null)).getPrivateKey()
+			((PrivateKeyEntry)ks.getEntry(
+				alias,
+				null
+			)).getPrivateKey()
 		);
-		s.update("Hola".getBytes()); //$NON-NLS-1$
+		try {
+			s.update("Hola".getBytes()); //$NON-NLS-1$
+		}
+		catch(final Exception e) {
+			e.printStackTrace();
+			throw e;
+		}
 		System.out.println("Firma: " + new String(s.sign())); //$NON-NLS-1$
 
 	}

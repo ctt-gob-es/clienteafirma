@@ -57,17 +57,6 @@ public final class ProtocolInvocationUriParser {
 		return ProtocolInvocationUriParserUtil.getParametersToSign(parserUri(uri));
 	}
 
-	/** Comprueba que est&eacute;n disponibles en una URI todos los parametros disponibles en la
-	 * entrada de datos para la operaci&oacute;n de firma por lotes predefinidos en XML.
-	 * @param uri URL de llamada.
-	 * @return Par&aacute;metros.
-	 * @throws ParameterException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto. */
-	public static UrlParametersForBatch getParametersForBatch(final String uri) throws ParameterException {
-		return ProtocolInvocationUriParserUtil.getParametersForBatch(
-			parserUri(uri)
-		);
-	}
-
 	/** Comprueba que est&eacute;n disponibles en un XML todos los parametros disponibles en la
 	 * entrada de datos para la operaci&oacute;n de firma.
 	 * @param xml XML de entrada
@@ -99,4 +88,22 @@ public final class ProtocolInvocationUriParser {
 		return ProtocolInvocationUriParserUtil.getParametersToSave(parserUri(uri));
 	}
 
+
+	/** Comprueba que est&eacute;n disponibles en una URI todos los parametros disponibles en la
+	 * entrada de datos para la operaci&oacute;n de firma por lotes predefinidos.
+	 * @param uri URL de llamada.
+	 * @return Par&aacute;metros.
+	 * @throws ParameterException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto. */
+	public static UrlParametersForBatch getParametersForBatch(final String uri) throws ParameterException {
+		return ProtocolInvocationUriParserUtil.getParametersForBatch(parserUri(uri)	);
+	}
+	
+	/** Comprueba que est&eacute;n disponibles en un XML todos los parametros disponibles en la
+	 * entrada de datos para la operaci&oacute;n de firma por lotes definidos en XML.
+	 * @param xml XML de entrada
+	 * @return Par&aacute;metros
+	 * @throws ParameterException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto */
+	public static UrlParametersForBatch getParametersForBatch(final byte[] xml) throws ParameterException {
+		return ProtocolInvocationUriParserUtil.getParametersForBatch(ProtocolInvocationUriParserUtil.parseXml(xml));
+	}
 }

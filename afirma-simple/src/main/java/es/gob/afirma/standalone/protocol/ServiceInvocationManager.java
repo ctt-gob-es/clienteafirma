@@ -42,7 +42,6 @@ final class ServiceInvocationManager {
 	private static int SOCKET_TIMEOUT = 60000;
 
 	/** Maximo numero de caracteres que podemos enviar en una respuesta. */
-	//private static final int RESPONSE_MAX_SIZE = 1048500;
 	private static final int RESPONSE_MAX_SIZE = 1000000;
 	//  peticiones que podemos recibir
 	private static final String CMD = "cmd="; //$NON-NLS-1$
@@ -107,7 +106,6 @@ final class ServiceInvocationManager {
 			// mostramos la informacion del server socket
 			while (true){
 				try ( final SSLSocket socketChannel = (SSLSocket) ssocket.accept() ) {
-				//	printSocketInfo(socketChannel);
 					LOGGER.info("Detectada conexion entrante"); //$NON-NLS-1$
 					// comprobamos que la direccion es local. Si no es local se descarta la peticion
 					if (!isLocalAddress((InetSocketAddress) socketChannel.getRemoteSocketAddress())) {
@@ -308,26 +306,7 @@ final class ServiceInvocationManager {
 	 */
 	private static void getCommandUri(final String httpRequest, final Socket socketChannel) {
 		checkNullParameter(httpRequest, "Los datos recibidos por HTTP son nulos");
-
-		final String[] supportedUriTypes = new String[] {CMD, ECHO, FRAGMENT, SIGN, SEND};
-
-		int i = 0;
-		String uriType = null;
-		while (uriType == null && i < supportedUriTypes.length) {
-			if (httpRequest.indexOf(supportedUriTypes[i]) != -1) {
-				uriType = supportedUriTypes[i];
-			}
-			i++;
-		}
-
-		// Si es una peticion no soportada, se lanza una excepcion
-		if (uriType == null) {
-			LOGGER.info("FALLA POR ESTO: " + httpRequest);
-			throw new IllegalArgumentException(
-					"Los datos recibidos por HTTP no contienen comando reconocido" //$NON-NLS-1$
-					);
-		}
-
+		String uriType = getUriTypeFromRequest(httpRequest);
 		LOGGER.info("Recibido comando de tipo: " + uriType);
 
 		try {
@@ -352,16 +331,40 @@ final class ServiceInvocationManager {
 				case SEND:
 					doSendPetition(httpRequest.substring(httpRequest.indexOf(SEND) + SEND.length()), socketChannel);
 					break;
-
-			default:
-				throw new IllegalStateException("Estado no permitido");
-			}
+				// nunca deberia entrar aqui
+				default:
+					throw new IllegalStateException("Estado no permitido");
+				}
 		}
 		catch(final Exception e) {
 			throw new IllegalArgumentException(
 				"Error al procesar el comando de tipo '" + uriType + "': " + e //$NON-NLS-1$
 			, e);
 		}
+	}
+
+	/**
+	 * Devuelve el uriType de la petici&oacute;n recibida. Lanza una excepci&oacute;n en caso de que la peticion no sea petici&oacute;n.
+	 * @param httpRequest La petici&oacute;n a tratar. 
+	 * @return String uriType de la petici&oacute;n.
+	 */
+	private static String getUriTypeFromRequest(final String httpRequest){
+		final String[] supportedUriTypes = new String[] {CMD, ECHO, FRAGMENT, SIGN, SEND};
+
+		int i = 0;
+		String uriType = null;
+		while (uriType == null && i < supportedUriTypes.length) {
+			if (httpRequest.indexOf(supportedUriTypes[i]) != -1) {
+				uriType = supportedUriTypes[i];
+			}
+			i++;
+		}
+		if (uriType == null) {
+			throw new IllegalArgumentException(
+					"Los datos recibidos por HTTP no contienen comando reconocido: "+httpRequest //$NON-NLS-1$
+					);
+		}
+		return uriType;
 	}
 
 
@@ -405,7 +408,7 @@ final class ServiceInvocationManager {
 			// Si la operacion es de guardado
 			if (totalhttpRequest.toString().startsWith("afirma://save?") || totalhttpRequest.toString().startsWith("afirma://save/?")){ //$NON-NLS-1$  //$NON-NLS-2$
 
-				final String operationResult = ProtocolInvocationLauncher.launch(totalhttpRequest.toString());
+				final String operationResult = ProtocolInvocationLauncher.launch(totalhttpRequest.toString(), true);
 				if (operationResult.equals(OK)){
 					sendData(createHttpResponse(true, SAVE_OK), socketChannel, "-------------------------------------- Operacion save -----------------------------------------");
 				}
@@ -417,7 +420,7 @@ final class ServiceInvocationManager {
 			}
 			// Si no, la operacion es de firma
 			else {
-				final String operationResult = ProtocolInvocationLauncher.launch(totalhttpRequest.toString());
+				final String operationResult = ProtocolInvocationLauncher.launch(totalhttpRequest.toString(), true);
 				calculateNumberPartsResponse(operationResult);
 			}
 		}
@@ -440,7 +443,7 @@ final class ServiceInvocationManager {
 			timer.stop();
 			LOGGER.info("Comando URI recibido por HTTP: " + cmdUri); //$NON-NLS-1$
 			if (cmdUri.startsWith("afirma://save?") || cmdUri.startsWith("afirma://save/?")){
-				final String operationResult = ProtocolInvocationLauncher.launch(cmdUri.toString());
+				final String operationResult = ProtocolInvocationLauncher.launch(cmdUri.toString(), true);
 				if (operationResult.equals(OK)){
 					sendData(createHttpResponse(true, SAVE_OK), socketChannel, "save");
 				}
@@ -453,10 +456,10 @@ final class ServiceInvocationManager {
 			else {
 				if (toSend.isEmpty()){
 					// Usamos la url que acabamos de recibir sin fragmentar
-					final String operationResult = ProtocolInvocationLauncher.launch(cmdUri.toString());
+					final String operationResult = ProtocolInvocationLauncher.launch(cmdUri.toString(), true);
 					calculateNumberPartsResponse(operationResult);
 				}
-				sendData(createHttpResponse(true, Integer.toString(parts)), socketChannel, "Se mandaran " + parts + "partes");
+				sendData(createHttpResponse(true, Integer.toString(parts)), socketChannel, "Se mandaran " + parts + " partes");
 			}
 		}
 		else{

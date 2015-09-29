@@ -33,6 +33,22 @@ public class AggregatedKeyStoreManager extends AOKeyStoreManager {
 		// Vacio
 	}
 
+    /** Devuelve el tipo de almac&eacute;n de claves para un alias determinado.
+     * @param alias Alias de la entrada para la cual se desea conocer su tipo de almac&eacute;n.
+     * @return Tipo de almac&eacute;n de claves para el alias indicado. */
+    @Override
+	protected AOKeyStore getType(final String alias) {
+    	for (final AOKeyStoreManager ksm : this.ksms) {
+    		if (ksm.getCertificate(alias) != null) {
+    			return ksm.getType(alias);
+    		}
+    	}
+    	LOGGER.warning(
+			"Se ha pedido el tipo de almacen de un alias no contenido en este gestor, se devolvera el tipo por defecto" //$NON-NLS-1$
+		);
+    	return getType();
+    }
+
 	/** Contruye un gestor de claves consistente a su vez en un agregado de varios gestores,
 	 * a partir de un almac&acute;n principal.
 	 * @param ksm Gestor de claves principal */
@@ -152,9 +168,7 @@ public class AggregatedKeyStoreManager extends AOKeyStoreManager {
 		);
 	}
 
-	/**
-	 * Elimina todos los almacenes del de claves del almac&eacute;n agregado.
-	 */
+	/** Elimina todos los almacenes del de claves del almac&eacute;n agregado. */
 	public void removeAll() {
 		this.ksms.clear();
 	}

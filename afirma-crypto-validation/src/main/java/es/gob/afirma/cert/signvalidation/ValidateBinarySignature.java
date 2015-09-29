@@ -30,7 +30,6 @@ import org.bouncycastle.cms.CMSProcessableByteArray;
 import org.bouncycastle.cms.CMSSignedData;
 import org.bouncycastle.cms.CMSSignerDigestMismatchException;
 import org.bouncycastle.cms.DefaultCMSSignatureAlgorithmNameGenerator;
-import org.bouncycastle.cms.SignerId;
 import org.bouncycastle.cms.SignerInformation;
 import org.bouncycastle.cms.SignerInformationVerifier;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -38,7 +37,6 @@ import org.bouncycastle.operator.DefaultSignatureAlgorithmIdentifierFinder;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.bc.BcDigestCalculatorProvider;
 import org.bouncycastle.operator.jcajce.JcaContentVerifierProviderBuilder;
-import org.bouncycastle.util.Selector;
 import org.bouncycastle.util.Store;
 
 import es.gob.afirma.cert.signvalidation.SignValidity.SIGN_DETAIL_TYPE;
@@ -191,30 +189,6 @@ public final class ValidateBinarySignature {
             }
 
         }
-
-    }
-
-    private static final class CertHolderBySignerIdSelector implements Selector<X509CertificateHolder> {
-
-    	private final SignerId signerId;
-    	CertHolderBySignerIdSelector(final SignerId sid) {
-    		if (sid == null) {
-    			throw new IllegalArgumentException("El ID del firmante no puede ser nulo"); //$NON-NLS-1$
-    		}
-    		this.signerId = sid;
-    	}
-
-    	/** {@inheritDoc} */
-		@Override
-		public boolean match(final X509CertificateHolder o) {
-			return CertHolderBySignerIdSelector.this.signerId.getSerialNumber().equals(o.getSerialNumber());
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		public Object clone() {
-			throw new UnsupportedOperationException();
-		}
 
     }
 

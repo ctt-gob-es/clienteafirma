@@ -11,6 +11,7 @@
 package es.gob.afirma.signers.padestri.client;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.net.URL;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
@@ -77,6 +78,13 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
 		// ---------
 
 		final byte[] preSignResult = PDFTriPhaseSignerUtil.doPresign(signServerUrl, algorithm, certChain, documentId, extraParams);
+
+		try {
+			LOGGER.info("Recibido el XML de prefirma PAdES:\n" + new String(Base64.decode(new String(preSignResult), true))); //$NON-NLS-1$
+		}
+		catch (final IOException e) {
+			// Se ignora
+		}
 
 		// ----------
 		// FIRMA

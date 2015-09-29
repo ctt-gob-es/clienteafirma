@@ -3,6 +3,9 @@ package es.gob.afirma.core.misc.protocol;
 import java.net.URL;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Properties;
+
+import es.gob.afirma.core.misc.AOUtil;
 
 /** Par&aacute;metros para el proceso de lotes de firmas predefinidos en XML.
  * En este caso, los datos son el XML de definici&oacute;n de lote.
@@ -54,26 +57,23 @@ public final class UrlParametersForBatch extends UrlParameters {
 			);
 		}
 
-		if (!params.containsKey(PARAM_ID) && !params.containsKey(FILE_ID_PARAM)) {
-			throw new ParameterException(
-					"No se ha recibido el identificador de sesion de la operacion" //$NON-NLS-1$
-				);
-		}
-
-		// Comprobamos que el identificador de sesion de la firma no sea mayor de un cierto numero de caracteres
-		final String signatureSessionId = params.containsKey(PARAM_ID) ? params.get(PARAM_ID) : params.get(FILE_ID_PARAM);
-		if (signatureSessionId.length() > MAX_ID_LENGTH) {
-			throw new ParameterException("La longitud del identificador para la firma es mayor de " + MAX_ID_LENGTH + " caracteres."); //$NON-NLS-1$ //$NON-NLS-2$
-		}
-
-		// Comprobamos que el identificador de sesion de la firma sea alfanumerico (se usara como nombre de fichero)
-		for (final char c : signatureSessionId.toLowerCase(Locale.ENGLISH).toCharArray()) {
-			if ((c < 'a' || c > 'z') && (c < '0' || c > '9')) {
-				throw new ParameterException("El identificador de la firma debe ser alfanumerico."); //$NON-NLS-1$
+		// idSession para el service Web. Con socket no se usa
+		if (params.containsKey(PARAM_ID) || params.containsKey(FILE_ID_PARAM)) {
+			// Comprobamos que el identificador de sesion de la firma no sea mayor de un cierto numero de caracteres
+			final String signatureSessionId = params.containsKey(PARAM_ID) ? params.get(PARAM_ID) : params.get(FILE_ID_PARAM);
+			if (signatureSessionId.length() > MAX_ID_LENGTH) {
+				throw new ParameterException("La longitud del identificador para la firma es mayor de " + MAX_ID_LENGTH + " caracteres."); //$NON-NLS-1$ //$NON-NLS-2$
 			}
-		}
 
-		setSessionId(signatureSessionId);
+			// Comprobamos que el identificador de sesion de la firma sea alfanumerico (se usara como nombre de fichero)
+			for (final char c : signatureSessionId.toLowerCase(Locale.ENGLISH).toCharArray()) {
+				if ((c < 'a' || c > 'z') && (c < '0' || c > '9')) {
+					throw new ParameterException("El identificador de la firma debe ser alfanumerico."); //$NON-NLS-1$
+				}
+			}
+
+			setSessionId(signatureSessionId);
+		}
 
 		setDefaultKeyStore(verifyDefaultKeyStoreName(params));
 
@@ -105,6 +105,25 @@ public final class UrlParametersForBatch extends UrlParameters {
 			}
 			setStorageServletUrl(storageServletUrl);
 		}
+
+		String props = null;
+		if (params.containsKey(PROPERTIES_PARAM)) {
+			props = params.get(PROPERTIES_PARAM);
+		}
+
+		if (props != null) {
+			try {
+				setExtraParams(AOUtil.base642Properties(props));
+			}
+			catch (final Exception e) {
+				setExtraParams(new Properties());
+			}
+		}
+		else {
+			setExtraParams(new Properties());
+		}
+
+		setDefaultKeyStore(verifyDefaultKeyStoreName(params));
 	}
 
 }

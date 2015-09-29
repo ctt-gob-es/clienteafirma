@@ -143,6 +143,7 @@ public final class ValidateXMLSignature {
                     }
                     return new SimpleKeySelectorResult(publicKey);
                 }
+
                 // Si no hay KeyValue intentamos sacar la clave publica del primer Certificado
                 // que encontramos en X509Data
                 else if (xmlStructure instanceof X509Data) {

@@ -104,7 +104,8 @@ public final class AOPDFSigner implements AOSigner {
 			           final String algorithm,
 			           final PrivateKey key,
 			           final java.security.cert.Certificate[] certChain,
-			           final Properties xParams) throws AOException, IOException {
+			           final Properties xParams) throws AOException,
+			                                            IOException {
 
         final Properties extraParams = xParams != null ? xParams : new Properties();
 
@@ -114,7 +115,7 @@ public final class AOPDFSigner implements AOSigner {
     		new X509Certificate[] { (X509Certificate) certChain[0] } :
     			certChain;
 
-        final GregorianCalendar signTime = new GregorianCalendar();
+    	final GregorianCalendar signTime = PdfUtil.getSignTime(extraParams.getProperty("signTime")); //$NON-NLS-1$
 
         // Sello de stiempo
         byte[] data;

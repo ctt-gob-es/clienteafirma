@@ -1,4 +1,4 @@
-package es.gob.afirma.triphase.server.processors;
+package es.gob.afirma.triphase.signer.processors;
 
 import java.io.IOException;
 import java.security.InvalidKeyException;
@@ -24,10 +24,10 @@ import es.gob.afirma.core.signers.TriphaseData;
 import es.gob.afirma.core.signers.TriphaseData.TriSign;
 import es.gob.afirma.signers.xades.AOFacturaESigner;
 import es.gob.afirma.signers.xml.XMLConstants;
-import es.gob.afirma.triphase.server.xades.XAdESTriPhaseSignerServerSide;
-import es.gob.afirma.triphase.server.xades.XAdESTriPhaseSignerServerSide.Op;
-import es.gob.afirma.triphase.server.xades.XmlPreSignException;
-import es.gob.afirma.triphase.server.xades.XmlPreSignResult;
+import es.gob.afirma.triphase.signer.xades.XAdESTriPhaseSignerServerSide;
+import es.gob.afirma.triphase.signer.xades.XmlPreSignException;
+import es.gob.afirma.triphase.signer.xades.XmlPreSignResult;
+import es.gob.afirma.triphase.signer.xades.XAdESTriPhaseSignerServerSide.Op;
 
 /** Procesador de firmas trif&aacute;sicas XAdES.
  * @author Tom&aacute;s Garc&iacute;a Mer&aacute;s. */
@@ -209,6 +209,18 @@ public class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 			                                                      AOException,
 			                                                      IOException {
 
+		return preProcessPostSign(data, algorithm, cert, extraParams, TriphaseData.parser(session));
+	}
+
+	@Override
+	public byte[] preProcessPostSign(final byte[] data,
+			                         final String algorithm,
+			                         final X509Certificate[] cert,
+			                         final Properties extraParams,
+			                         final TriphaseData triphaseData) throws NoSuchAlgorithmException,
+			                                                      AOException,
+			                                                      IOException {
+
 		// Con FacturaE solo podemos firmar facturas
 		if (this.facturae && !new AOFacturaESigner().isValidDataFile(data)) {
 			throw new AOInvalidFormatException(
@@ -219,7 +231,7 @@ public class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 		// Si es FacturaE modificamos los parametros adicionales
 		final Properties xParams = this.facturae ? AOFacturaESigner.getFacturaEExtraParams(extraParams) : extraParams;
 
-		return preProcessPost(data, algorithm, cert, xParams, Op.SIGN, session);
+		return preProcessPost(data, algorithm, cert, xParams, Op.SIGN, triphaseData);
 	}
 
 	@Override
@@ -231,7 +243,19 @@ public class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 			                                                        AOException,
 			                                                        IOException {
 
-		return preProcessPost(data, algorithm, cert, extraParams, Op.COSIGN, session);
+		return preProcessPost(data, algorithm, cert, extraParams, Op.COSIGN, TriphaseData.parser(session));
+	}
+
+	@Override
+	public byte[] preProcessPostCoSign(final byte[] data,
+			                           final String algorithm,
+			                           final X509Certificate[] cert,
+			                           final Properties extraParams,
+			                           final TriphaseData triphaseData) throws NoSuchAlgorithmException,
+			                                                        AOException,
+			                                                        IOException {
+
+		return preProcessPost(data, algorithm, cert, extraParams, Op.COSIGN, triphaseData);
 	}
 
 	@Override
@@ -244,7 +268,20 @@ public class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 			                                                                        AOException,
 			                                                                        IOException {
 
-		return preProcessPost(sign, algorithm, cert, extraParams, Op.COUNTERSIGN, session);
+		return preProcessPost(sign, algorithm, cert, extraParams, Op.COUNTERSIGN, TriphaseData.parser(session));
+	}
+
+	@Override
+	public byte[] preProcessPostCounterSign(final byte[] sign,
+			                                final String algorithm,
+			                                final X509Certificate[] cert,
+			                                final Properties extraParams,
+			                                final TriphaseData triphaseData,
+			                                final CounterSignTarget targets) throws NoSuchAlgorithmException,
+			                                                                        AOException,
+			                                                                        IOException {
+
+		return preProcessPost(sign, algorithm, cert, extraParams, Op.COUNTERSIGN, triphaseData);
 	}
 
 	private static byte[] preProcessPost(final byte[] data,
@@ -252,10 +289,8 @@ public class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
                                          final X509Certificate[] cert,
                                          final Properties extraParams,
                                          final Op op,
-                                         final byte[] session) throws IOException,
+                                         final TriphaseData triphaseData) throws IOException,
                                                                       AOException {
-
-		final TriphaseData triphaseData = TriphaseData.parser(session);
 
 		if (triphaseData.getSignsCount() < 1) {
 			LOGGER.severe("No se ha encontrado la informacion de firma en la peticion"); //$NON-NLS-1$

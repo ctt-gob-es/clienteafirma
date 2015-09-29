@@ -1,4 +1,4 @@
-package es.gob.afirma.triphase.server.processors;
+package es.gob.afirma.triphase.signer.processors;
 
 import java.io.IOException;
 import java.security.MessageDigest;
@@ -26,8 +26,8 @@ import es.gob.afirma.signers.cades.CommitmentTypeIndicationsHelper;
 import es.gob.afirma.signers.multi.cades.AOCAdESCounterSigner;
 import es.gob.afirma.signers.multi.cades.CAdESTriPhaseCoSigner;
 import es.gob.afirma.signers.pkcs7.ObtainContentSignedData;
-import es.gob.afirma.triphase.server.cades.AOCAdESTriPhaseCounterSigner;
-import es.gob.afirma.triphase.server.cades.CAdESFakePkcs1Signer;
+import es.gob.afirma.triphase.signer.cades.AOCAdESTriPhaseCounterSigner;
+import es.gob.afirma.triphase.signer.cades.CAdESFakePkcs1Signer;
 
 /** Procesador de firmas trif&aacute;sicas CAdES.
  * @author Tom&aacute;s Garc&iacute;a Mer&aacute;s. */
@@ -157,13 +157,28 @@ public class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 			                         final String algorithm,
 			                         final X509Certificate[] cert,
 			                         final Properties extraParams,
-			                         final byte[] triphaseDataBytes) throws NoSuchAlgorithmException,
+			                         final byte[] session) throws NoSuchAlgorithmException,
 			                                                                AOException,
 			                                                                IOException {
+
+		if (session == null) {
+			throw new IllegalArgumentException("Los datos de prefirma no pueden ser nulos"); //$NON-NLS-1$
+		}
+
+		return preProcessPostSign(data, algorithm, cert, extraParams, TriphaseData.parser(session));
+	}
+
+	@Override
+	public byte[] preProcessPostSign(final byte[] data, final String algorithm,
+			final X509Certificate[] cert, final Properties extraParams,
+			final TriphaseData triphaseData) throws NoSuchAlgorithmException,
+			IOException, AOException {
+
 		LOGGER.info("Postfirma CAdES - Firma - INICIO"); //$NON-NLS-1$
 
-		// Generamos el mensaje para la configuracion de la operacion
-		final TriphaseData triphaseData = TriphaseData.parser(triphaseDataBytes);
+		if (triphaseData == null) {
+			throw new IllegalArgumentException("Los datos de prefirma no pueden ser nulos"); //$NON-NLS-1$
+		}
 
 		boolean omitContent = true;
 		if (extraParams.containsKey("mode")) { //$NON-NLS-1$
@@ -191,8 +206,8 @@ public class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 			AOSignConstants.getDigestAlgorithmName(algorithm),
 			omitContent ? null : data,
 			cert,
-			Base64.decode(preSignB64),
-			Base64.decode(config.getProperty(PROPERTY_NAME_PRESIGN))
+			Base64.decode(config.getProperty(PROPERTY_NAME_PKCS1_SIGN)),
+			Base64.decode(preSignB64)
 		);
 
 		LOGGER.info("Postfirma CAdES - Firma - FIN"); //$NON-NLS-1$
@@ -301,9 +316,25 @@ public class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 			                           final Properties extraParams,
 			                           final byte[] session) throws NoSuchAlgorithmException, AOException, IOException {
 
+		if (session == null) {
+			throw new IllegalArgumentException("Los datos de prefirma no pueden ser nulos"); //$NON-NLS-1$
+		}
+
+		return preProcessPostCoSign(sign, algorithm, cert, extraParams, TriphaseData.parser(session));
+	}
+
+	@Override
+	public byte[] preProcessPostCoSign(final byte[] sign,
+			                           final String algorithm,
+			                           final X509Certificate[] cert,
+			                           final Properties extraParams,
+			                           final TriphaseData triphaseData) throws NoSuchAlgorithmException, AOException, IOException {
+
 		LOGGER.info("Postfirma CAdES - Cofirma - INICIO"); //$NON-NLS-1$
 
-		final TriphaseData triphaseData = TriphaseData.parser(session);
+		if (triphaseData == null) {
+			throw new IllegalArgumentException("Los datos de prefirma no pueden ser nulos"); //$NON-NLS-1$
+		}
 
 		byte[] messageDigest = null;
 		final byte[] data = ObtainContentSignedData.obtainData(sign);
@@ -380,14 +411,28 @@ public class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 			                                                                           AOException,
 			                                                                           IOException {
 
-		LOGGER.info("Postfirma CAdES - Contrafirma - INICIO"); //$NON-NLS-1$
-
 		if (session == null) {
 			throw new IllegalArgumentException("Los datos de prefirma no pueden ser nulos"); //$NON-NLS-1$
 		}
 
-		// Recreamos la firma
-		final TriphaseData triphaseData = TriphaseData.parser(session);
+		return preProcessPostCounterSign(sign, algorithm, cert, extraParams, TriphaseData.parser(session), targetType);
+	}
+
+	@Override
+	public byte[] preProcessPostCounterSign(final byte[] sign,
+			                                final String algorithm,
+			                                final X509Certificate[] cert,
+			                                final Properties extraParams,
+			                                final TriphaseData triphaseData,
+			                                final CounterSignTarget targetType) throws NoSuchAlgorithmException,
+			                                                                           AOException,
+			                                                                           IOException {
+
+		LOGGER.info("Postfirma CAdES - Contrafirma - INICIO"); //$NON-NLS-1$
+
+		if (triphaseData == null) {
+			throw new IllegalArgumentException("Los datos de prefirma no pueden ser nulos"); //$NON-NLS-1$
+		}
 
 		final Date date = new Date(Long.parseLong(triphaseData.getSign(0).getProperty(PARAM_DATE)));
 

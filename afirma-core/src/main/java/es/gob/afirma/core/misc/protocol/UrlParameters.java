@@ -256,13 +256,13 @@ public abstract class UrlParameters {
 			return params.get(KEYSTORE);
 		}
 		if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
-			return "Windows / Internet Explorer"; //$NON-NLS-1$
+			return "WINDOWS"; //$NON-NLS-1$
 		}
 		if (Platform.OS.MACOSX.equals(Platform.getOS())) {
-			return "Mac OS X / Safari"; //$NON-NLS-1$
+			return "APPLE"; //$NON-NLS-1$
 		}
 		if (Platform.OS.LINUX.equals(Platform.getOS()) || Platform.OS.SOLARIS.equals(Platform.getOS())) {
-			return "Mozilla / Firefox (unificado)"; //$NON-NLS-1$
+			return "MOZ_UNI"; //$NON-NLS-1$
 		}
 		return null;
 	}

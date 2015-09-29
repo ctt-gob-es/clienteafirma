@@ -20,7 +20,7 @@
 		OBJECT   { width:1px; height:1px; position:absolute; top:50%; left:50%; }
 		APPLET   { width:1px; height:1px; position:absolute; top:50%; left:50%; }
 	</style>
-	<script type="text/javascript" src="js/miniapplet_service3.js"></script>
+	<script type="text/javascript" src="js/miniapplet.js"></script>
 	<script type="text/javascript" defer="defer">
 	
 	<!--
@@ -28,8 +28,7 @@
 		var firmarFichero = true;
 		var firmarDatosGenerados = false;
 		// puerto en uso de la aplicacion
-		var currentPort = "";
-	
+
 		function firmar(type) {
 			var divMensaje = document.getElementById('divmensaje');
 			divMensaje.innerHTML='';
@@ -37,7 +36,9 @@
 			divFirma.style.display = "none";	
 			mostrarDialogoEspera();
 
-			var params = "mode=implicit";
+			var params = "mode=implicit"+
+						"\nfilter=qualified:051a58c1e1afca40"+
+						"\nheadless=true";
 			
 			var dataB64 = null;
 			
@@ -81,23 +82,15 @@
 		}
 
 		function guardar() {
-			mostrarDialogoEspera();
-			MiniApplet.saveDataToFile(document.getElementById("firmaB64").value, "Guardar firma", "firma.csig", "csig", "Firma CAdES",successCallback, errorCallback ,currentPort);
+			MiniApplet.saveDataToFile(document.getElementById("firmaB64").value, "Guardar firma", "firma.csig", "csig", "Firma CAdES");
 		}
 
 		function successCallback(signatureB64, certificate) {
-			
 			ocultarDialogoEspera();
-			if (signatureB64 != "SAVE_OK"){
-				var divMensaje = document.getElementById('divmensaje');
-				divMensaje.innerHTML='<br><div class="iconOKFirma">La firma se ha realizado correctamente</div>';
-				document.getElementById('divfirma').style.display = "block";
-				document.getElementById("firmaB64").value = signatureB64;
-			}
-			else {
-				var divMensaje = document.getElementById('divmensaje');
-				divMensaje.innerHTML='<br><div class="iconOKFirma">Se ha guardado el fichero correctamente</div>';
-			}
+			var divMensaje = document.getElementById('divmensaje');
+			divMensaje.innerHTML='<br><div class="iconOKFirma">La firma se ha realizado correctamente</div>';
+			document.getElementById('divfirma').style.display = "block";
+			document.getElementById("firmaB64").value = signatureB64;			
 		}
 		
 		function errorCallback(errorType, errorMessage) {
@@ -260,7 +253,7 @@
 	</div> <!-- FIN DE CONTENEDOR -->
 	
 	<script type="text/javascript">
-		MiniApplet.cargarAppAfirma("https://demo.com");
+		MiniApplet.cargarMiniApplet('http://demo.com:8080/afirma-ui-miniapplet-deploy');
 		MiniApplet.setServlets("http://demo.com:8080/afirma-signature-storage/StorageService", "http://demo.com:8080/afirma-signature-retriever/RetrieveService");
 	</script>
 	

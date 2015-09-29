@@ -246,6 +246,13 @@ public final class Platform {
             if (!systemRoot.endsWith("\\")) { //$NON-NLS-1$
                 systemRoot += "\\"; //$NON-NLS-1$
             }
+            if ("32".equals(Platform.getJavaArch())) { //$NON-NLS-1$
+            	final File tmpFile = new File(systemRoot + "SysWOW64");  //$NON-NLS-1$
+            	if (tmpFile.isDirectory()) {
+            		return tmpFile.getAbsolutePath();
+            	}
+            }
+
             return systemRoot + "System32"; //$NON-NLS-1$
         }
         return "/usr/lib"; //$NON-NLS-1$

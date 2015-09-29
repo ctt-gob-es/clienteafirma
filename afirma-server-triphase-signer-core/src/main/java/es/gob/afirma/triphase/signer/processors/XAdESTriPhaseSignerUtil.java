@@ -1,4 +1,4 @@
-package es.gob.afirma.triphase.server.processors;
+package es.gob.afirma.triphase.signer.processors;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;

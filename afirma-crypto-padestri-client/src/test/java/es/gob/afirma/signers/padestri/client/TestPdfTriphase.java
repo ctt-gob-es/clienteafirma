@@ -42,9 +42,9 @@ public class TestPdfTriphase {
 	private static final String PROPERTY_NAME_ATTACH_FILENAME = "attachFileName"; //$NON-NLS-1$
 	private static final String PROPERTY_NAME_ATTACH_DESCRIPTION = "attachDescription"; //$NON-NLS-1$
 
-	private static final String CERT_PATH = "ANF PFISICA ACTIVO.pfx"; //$NON-NLS-1$
-	private static final String CERT_PASS = "12341234"; //$NON-NLS-1$
-	private static final String CERT_ALIAS = "anf usuario activo"; //$NON-NLS-1$
+    private static final String CERT_PATH = "PFActivoFirSHA256.pfx"; //$NON-NLS-1$
+    private static final String CERT_PASS = "12341234"; //$NON-NLS-1$
+    private static final String CERT_ALIAS = "fisico activo prueba"; //$NON-NLS-1$
 
 	private static final String CERT_PATH2 = "ANF PJURIDICA ACTIVO.pfx"; //$NON-NLS-1$
 	private static final String CERT_PASS2 = "12341234"; //$NON-NLS-1$

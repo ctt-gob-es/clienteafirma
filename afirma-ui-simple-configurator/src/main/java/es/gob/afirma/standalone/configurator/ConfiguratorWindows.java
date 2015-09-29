@@ -31,7 +31,7 @@ import es.gob.afirma.keystores.mozilla.MozillaKeyStoreUtilities;
  */
 public class ConfiguratorWindows implements Configurator {
 
-	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+	static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	private static final String AFIRMA_DIR = ".afirma/AutoFirma"; //$NON-NLS-1$
 	private static final String RESOURCE_BASE = "/windows/"; //$NON-NLS-1$
@@ -39,8 +39,10 @@ public class ConfiguratorWindows implements Configurator {
 	private static final String CERTUTIL_EXE = "certutil.exe"; //$NON-NLS-1$
 
 	private static final String FILE_AUTOFIRMA_CERTIFICATE = "autofirma.cer"; //$NON-NLS-1$
-	private static final String FILE_PS_CONFIG_SCRIPT = "config.ps1"; //$NON-NLS-1$
+	private static final String FILE_PS_PREPARATE_SCRIPT = "prepare.ps1"; //$NON-NLS-1$
+	private static final String FILE_PS_GENERATE_SCRIPT = "generate.ps1"; //$NON-NLS-1$
 	private static final String FILE_PS_GENERATE_KEYS_SCRIPT = "New-SelfSignedCertificateEx.ps1"; //$NON-NLS-1$
+	private static final String FILE_PREPARED = "prepared"; //$NON-NLS-1$
 	private static final String FILE_CERTUTIL = "certutil.zip"; //$NON-NLS-1$
 	private static final String DIR_CERTUTIL = "certutil"; //$NON-NLS-1$
 
@@ -53,38 +55,41 @@ public class ConfiguratorWindows implements Configurator {
 	private static final String REPLACE_KS_PASSWORD = "%%KS_PASSWORD%%"; //$NON-NLS-1$
 	private static final String REPLACE_CERT_ALIAS = "%%CERT_ALIAS%%"; //$NON-NLS-1$
 
+	private static final int WAITING_PERIOD = 2000;
 
 	@Override
 	public void configure(final ConfiguratorConsole window) throws IOException, ConfigurationException, GeneralSecurityException {
 
 		window.print(Messages.getString("ConfiguratorWindows.2")); //$NON-NLS-1$
 
-		final File appConfiDir = getAppConfigDir();
+		final File appConfigDir = getAppConfigDir();
 
-		window.print(Messages.getString("ConfiguratorWindows.3") + appConfiDir.getAbsolutePath()); //$NON-NLS-1$
+		window.print(Messages.getString("ConfiguratorWindows.3") + appConfigDir.getAbsolutePath()); //$NON-NLS-1$
 
 		window.print(Messages.getString("ConfiguratorWindows.4")); //$NON-NLS-1$
 
-		copyConfigurationFiles(appConfiDir);
+		copyConfigurationFiles(appConfigDir);
 
-		window.print(Messages.getString("ConfiguratorWindows.5")); //$NON-NLS-1$
+		if (!checkSSLKeyStoreGenerated(appConfigDir)) {
+			window.print(Messages.getString("ConfiguratorWindows.5")); //$NON-NLS-1$
 
-		executePowerShellScript(appConfiDir);
+			executePowerShellScript(appConfigDir);
 
-		window.print(Messages.getString("ConfiguratorWindows.6")); //$NON-NLS-1$
+			window.print(Messages.getString("ConfiguratorWindows.6")); //$NON-NLS-1$
 
-		importCARootOnWindowsKeyStore(appConfiDir);
+			importCARootOnWindowsKeyStore(appConfigDir);
 
-		final File firefoxProfilesDir = getFirefoxProfilesDir();
-		if (firefoxProfilesDir != null) {
-			window.print(Messages.getString("ConfiguratorWindows.9")); //$NON-NLS-1$
+			final File firefoxProfilesDir = getFirefoxProfilesDir();
+			if (firefoxProfilesDir != null) {
+				window.print(Messages.getString("ConfiguratorWindows.9")); //$NON-NLS-1$
 
-			importCARootOnFirefoxKeyStore(appConfiDir, firefoxProfilesDir);
+				importCARootOnFirefoxKeyStore(appConfigDir, firefoxProfilesDir);
+			}
 		}
 
 		window.print(Messages.getString("ConfiguratorWindows.7")); //$NON-NLS-1$
 
-		removeConfigurationFiles(appConfiDir);
+		removeConfigurationFiles(appConfigDir);
 
 		window.print(Messages.getString("ConfiguratorWindows.8")); //$NON-NLS-1$
 
@@ -102,10 +107,12 @@ public class ConfiguratorWindows implements Configurator {
 
 	private static void copyConfigurationFiles(final File appConfigDir) throws IOException {
 
+		final File psPreparateScriptFile = new File(appConfigDir, FILE_PS_PREPARATE_SCRIPT);
 		final File psGenerateScriptFile = new File(appConfigDir, FILE_PS_GENERATE_KEYS_SCRIPT);
-		final File psConfigScriptFile = new File(appConfigDir, FILE_PS_CONFIG_SCRIPT);
+		final File psConfigScriptFile = new File(appConfigDir, FILE_PS_GENERATE_SCRIPT);
 
-		/// Script para la generacion del certificado SSL
+		/// Copiamos los scripts PowerShell
+		installResource(RESOURCE_BASE + FILE_PS_PREPARATE_SCRIPT, psPreparateScriptFile);
 		installResource(RESOURCE_BASE + FILE_PS_GENERATE_KEYS_SCRIPT, psGenerateScriptFile);
 
 		// Script para la ejecutar la generacion del certificado SSL
@@ -114,7 +121,7 @@ public class ConfiguratorWindows implements Configurator {
 			{REPLACE_KS_PASSWORD, new String(KS_PASSWORD)},
 			{REPLACE_CERT_ALIAS, CERT_ALIAS}
 		};
-		installResourceWithReplaces(RESOURCE_BASE + FILE_PS_CONFIG_SCRIPT, psConfigScriptFile, replaces);
+		installResourceWithReplaces(RESOURCE_BASE + FILE_PS_GENERATE_SCRIPT, psConfigScriptFile, replaces);
 
 		uncompressResource(RESOURCE_BASE + FILE_CERTUTIL, appConfigDir);
 	}
@@ -194,95 +201,95 @@ public class ConfiguratorWindows implements Configurator {
 	}
 
 	/**
+	 * Comprueba si ya existe un almac&eacute;n de certificados generado.
+	 * @param appConfigDir Directorio de configuraci&oacute;n de la aplicaci&oacute;n.
+	 * @return {@code true} si ya existe un almacen de certificados SSL, {@code false} en caso contrario.
+	 */
+	private static boolean checkSSLKeyStoreGenerated(final File appConfigDir) {
+		return new File(appConfigDir, KS_FILENAME).exists();
+	}
+
+	/**
 	 * Ejecuta el script PowerShell para la generaci&oacute;n del almac&eacute;n de claves SSL.
 	 * @throws IOException Cuando ocurre un error
 	 * @throws ConfigurationException
 	 */
 	private static void executePowerShellScript(final File appConfigDir) throws IOException, ConfigurationException {
 
-		final File psScriptFile = new File(appConfigDir, FILE_PS_CONFIG_SCRIPT);
-
-		if (!psScriptFile.exists() || !psScriptFile.isFile() || !psScriptFile.canRead()) {
-			throw new IOException("No se encuentra o no se puede leer el script para la configuracion de los sockets de AutoFirma: " + psScriptFile.getAbsolutePath()); //$NON-NLS-1$
+		// Confirmamos que se han copiado los ficheros necesarios
+		final File psPreparateScriptFile = new File(appConfigDir, FILE_PS_PREPARATE_SCRIPT);
+		if (!psPreparateScriptFile.exists() || !psPreparateScriptFile.isFile() || !psPreparateScriptFile.canRead()) {
+			throw new IOException("No se encuentra o no se puede leer el script para la preparacion inicial: " + psPreparateScriptFile.getAbsolutePath()); //$NON-NLS-1$
 		}
 
-		final String psScriptPath;
-		try {
-			psScriptPath = psScriptFile.getCanonicalPath();
-		}
-		catch (final IOException e) {
-			throw new IOException("No se ha podido reconstruir la ruta del script de configuracion: " + psScriptFile.getAbsolutePath(), e); //$NON-NLS-1$
+		final File psGenerateScriptFile = new File(appConfigDir, FILE_PS_GENERATE_SCRIPT);
+		if (!psGenerateScriptFile.exists() || !psGenerateScriptFile.isFile() || !psGenerateScriptFile.canRead()) {
+			throw new IOException("No se encuentra o no se puede leer el script para la configuracion de los sockets de AutoFirma: " + psGenerateScriptFile.getAbsolutePath()); //$NON-NLS-1$
 		}
 
-		// Primero habilitamos la ejecucion de scripts para el usuario actual
-		String[] powerShellCommands = new String[] {
-				POWERSHELL_EXE,
-				"set-executionpolicy", //$NON-NLS-1$
-				"-Scope", //$NON-NLS-1$
-				"CurrentUser", //$NON-NLS-1$
-				"remotesigned" //$NON-NLS-1$
-			};
+		LOGGER.info("Habilitamos el uso de scripts PowerShell"); //$NON-NLS-1$
 
-		LOGGER.info("=================\nHabilitamos el uso de scripts"); //$NON-NLS-1$
+		// Repetimos el desbloqueo de los scripts hasta conseguirlo
+		prepareExecutionsScripts(appConfigDir);
 
-		Process process = new ProcessBuilder(powerShellCommands).directory(appConfigDir).start();
+		LOGGER.info("Ejecucion de scripts habilitada. Lanzamos el script de generacion del par de claves SSL"); //$NON-NLS-1$
 
-		LOGGER.info("=================\nRecuperamos el control"); //$NON-NLS-1$
+		new Thread(new GenerateCertificateRunnable(appConfigDir)).start();
 
-		try (final InputStream resIs = process.getInputStream();
-				final BufferedReader resReader = new BufferedReader(new InputStreamReader(resIs));) {
-			String line;
-			while ((line = resReader.readLine()) != null) {
-				LOGGER.info(line);
+		LOGGER.info("Esperamos hastya que se hayan creado las claves SSL"); //$NON-NLS-1$
+
+		waitToSSLKeyStore(appConfigDir);
+
+		if (!checkSSLKeyStoreGenerated(appConfigDir)) {
+			throw new ConfigurationException("No se ha genero el almacen de claves tras la ejecucion script"); //$NON-NLS-1$
+		}
+
+		restrictExecutionsScripts(appConfigDir);
+
+	}
+
+	/**
+	 * Habilita la ejecuci&oacute;n de scripts y se queda esperando hasta que pueda comprobarse
+	 * que ha sido as&iacute;.
+	 * @param appConfigDir Directorio de configuraci&oacute;n de la aplicaci&oacute;n.
+	 */
+	private static void prepareExecutionsScripts(final File appConfigDir) {
+		do {
+			new Thread(new PreparateScriptsRunnable(appConfigDir)).start();
+
+			try {
+				Thread.sleep(WAITING_PERIOD);
+			} catch (final InterruptedException e) {
+				LOGGER.warning("No se puede ejecutar una espera. Se abandona la espera de la habilitacion de scripts para evitar bloqueos: " + e); //$NON-NLS-1$
+				break;
 			}
-		}
 
-		try (final InputStream errIs = process.getErrorStream();
-				final BufferedReader errReader = new BufferedReader(new InputStreamReader(errIs));) {
-			String line;
-			boolean error = false;
-			while ((line = errReader.readLine()) != null) {
-				error = true;
-				LOGGER.severe(line);
+		} while (!checkPreparateScripts(appConfigDir));
+	}
+
+	/**
+	 * Comprueba si ya se ha desbloqueado la ejecuci&oacute;n de scripts.
+	 * @param appConfigDir Directorio de configuraci&oacute;n de la aplicaci&oacute;n.
+	 * @return {@code true} si ya se ha desbloqueado la ejecuci&oacute;n de scripts, {@code false} en caso contrario.
+	 */
+	private static boolean checkPreparateScripts(final File appConfigDir) {
+		// Si se ha creado el fichero FILE_PREPARED mediante la ejecucion de script, es que los scripts funcionan
+		return new File(appConfigDir, FILE_PREPARED).exists();
+	}
+
+	/**
+	 * Realiza una espera activa hasta que se detecte que se ha creado el almac&eacute;n de certificados SSL.
+	 * @param appConfigDir Directorio de configuraci&oacute;n.
+	 */
+	private static void waitToSSLKeyStore(final File appConfigDir) {
+		do {
+			try {
+				Thread.sleep(WAITING_PERIOD);
+			} catch (final InterruptedException e) {
+				LOGGER.warning("No se puede ejecutar una espera. Se abandona la espera de la generacion de las claves SSL para evitar bloqueos: " + e); //$NON-NLS-1$
+				break;
 			}
-			if (error) {
-				throw new ConfigurationException("Error en ejecucion del script de generacion de claves SSL"); //$NON-NLS-1$
-			}
-		}
-
-		// Ejecutamos el script de generacion del almacen
-		powerShellCommands = new String[] {
-			POWERSHELL_EXE,
-			"\"" + psScriptPath + "\"" //$NON-NLS-1$ //$NON-NLS-2$
-		};
-
-		LOGGER.info("=================\nLanzamos el script"); //$NON-NLS-1$
-
-		process = new ProcessBuilder(powerShellCommands).directory(appConfigDir).start();
-
-		LOGGER.info("=================\nRecuperamos el control despues del script"); //$NON-NLS-1$
-
-		try (final InputStream resIs = process.getInputStream();
-				final BufferedReader resReader = new BufferedReader(new InputStreamReader(resIs));) {
-			String line;
-			while ((line = resReader.readLine()) != null) {
-				LOGGER.info(line);
-			}
-		}
-
-		try (final InputStream errIs = process.getErrorStream();
-				final BufferedReader errReader = new BufferedReader(new InputStreamReader(errIs));) {
-			String line;
-			boolean error = false;
-			while ((line = errReader.readLine()) != null) {
-				error = true;
-				LOGGER.severe(line);
-			}
-			if (error) {
-				throw new ConfigurationException("Error en ejecucion del script de generacion de claves SSL"); //$NON-NLS-1$
-			}
-		}
-
+		} while(!new File(appConfigDir, KS_FILENAME).exists());
 	}
 
 	/**
@@ -295,9 +302,11 @@ public class ConfiguratorWindows implements Configurator {
 			return;
 		}
 
-		deleteFile(new File(appConfigDir, FILE_PS_CONFIG_SCRIPT));
+		deleteFile(new File(appConfigDir, FILE_PS_PREPARATE_SCRIPT));
+		deleteFile(new File(appConfigDir, FILE_PS_GENERATE_SCRIPT));
 		deleteFile(new File(appConfigDir, FILE_PS_GENERATE_KEYS_SCRIPT));
 		deleteFile(new File(appConfigDir, FILE_AUTOFIRMA_CERTIFICATE));
+		deleteFile(new File(appConfigDir, FILE_PREPARED));
 		deleteDir(new File(appConfigDir, DIR_CERTUTIL));
 	}
 
@@ -496,26 +505,55 @@ public class ConfiguratorWindows implements Configurator {
 	}
 
 	@Override
-	public void uninstall() throws GeneralSecurityException, IOException {
+	public void uninstall() {
+
+		LOGGER.info("Desinstalamos el certificado raiz del almacen de Windows"); //$NON-NLS-1$
 
 		uninstallRootCAWindowsKeyStore();
 
+		LOGGER.info("Desinstalamos el certificado raiz del almacen de Firefox"); //$NON-NLS-1$
+
 		uninstallRootCAMozillaKeyStore();
-	}
-
-	private static void uninstallRootCAWindowsKeyStore() throws GeneralSecurityException, IOException {
-		final KeyStore ks = KeyStore.getInstance("Windows-ROOT"); //$NON-NLS-1$
-		ks.load(null,  null);
-		ks.deleteEntry(ROOT_CA_ALIAS);
-	}
-
-	private static void uninstallRootCAMozillaKeyStore() throws IOException, GeneralSecurityException {
 
 		final File appConfigDir = getAppConfigDir();
 
-		uncompressResource(RESOURCE_BASE + FILE_CERTUTIL, appConfigDir);
+		LOGGER.info("Borramos: " + new File(appConfigDir, KS_FILENAME).getAbsolutePath()); //$NON-NLS-1$
 
-		executeCertUtilToDelete(appConfigDir);
+		deleteFile(new File(appConfigDir, KS_FILENAME));
+
+		LOGGER.info("Borramos: " + appConfigDir.getAbsolutePath()); //$NON-NLS-1$
+
+		deleteDir(appConfigDir);
+	}
+
+	private static void uninstallRootCAWindowsKeyStore() {
+		try {
+			final KeyStore ks = KeyStore.getInstance("Windows-ROOT"); //$NON-NLS-1$
+			ks.load(null,  null);
+			ks.deleteEntry(ROOT_CA_ALIAS);
+		}
+		catch (final Exception e) {
+			LOGGER.warning("No se pudo desinstalar el certificado SSL raiz del almacen de Windows: " + e); //$NON-NLS-1$
+		}
+	}
+
+	private static void uninstallRootCAMozillaKeyStore() {
+
+		final File appConfigDir = getAppConfigDir();
+
+		try {
+		uncompressResource(RESOURCE_BASE + FILE_CERTUTIL, appConfigDir);
+		}
+		catch (final Exception e) {
+			LOGGER.warning("No se pudo descomprimir certutil para la desinstalacion del certificado SSL raiz del almacen de Mozilla Firefox. Se aborta la operacion: " + e); //$NON-NLS-1$
+		}
+
+		try {
+			executeCertUtilToDelete(appConfigDir);
+		}
+		catch (final Exception e) {
+			LOGGER.warning("No se pudo desinstalar el certificado SSL raiz del almacen de Mozilla Firefox: " + e); //$NON-NLS-1$
+		}
 
 		deleteDir(new File(appConfigDir, DIR_CERTUTIL));
 	}
@@ -575,6 +613,128 @@ public class ConfiguratorWindows implements Configurator {
 
 		if (error) {
 			throw new KeyStoreException("Error en el borrado del certificado de CA en alguno de los perfiles de usuario de Firefox"); //$NON-NLS-1$
+		}
+	}
+
+	private static void restrictExecutionsScripts(final File appConfigDir) {
+		// Por ultimo, deshabilitamos de nuevo la ejecucion de scripts
+		final String[] powerShellCommands = new String[] {
+				POWERSHELL_EXE,
+				"set-executionpolicy", //$NON-NLS-1$
+				"-Scope", //$NON-NLS-1$
+				"CurrentUser", //$NON-NLS-1$
+				"Restricted" //$NON-NLS-1$
+		};
+
+		LOGGER.info("Deshabilitamos el uso de scripts PowerShell"); //$NON-NLS-1$
+
+		try {
+			new ProcessBuilder(powerShellCommands).directory(appConfigDir).start();
+		} catch (final IOException e) {
+			LOGGER.warning("Error al ejecutar el comando para rehabilitar la restriccion de ejecucion de comandos PowerShell: " + e); //$NON-NLS-1$
+		}
+	}
+
+	/**
+	 * Runnable que habilita la ejecuci&oacute;n de scripts PowerShell.
+	 */
+	private static class PreparateScriptsRunnable implements Runnable {
+
+		private final File appConfigDir;
+
+		public PreparateScriptsRunnable(final File appConfigDir) {
+			this.appConfigDir = appConfigDir;
+		}
+
+		@Override
+		public void run() {
+
+			String[] powerShellCommands = new String[] {
+					POWERSHELL_EXE,
+					"set-executionpolicy", //$NON-NLS-1$
+					"-Scope", //$NON-NLS-1$
+					"CurrentUser", //$NON-NLS-1$
+					"remotesigned" //$NON-NLS-1$
+				};
+
+			try {
+				new ProcessBuilder(powerShellCommands).directory(this.appConfigDir).start();
+			} catch (final IOException e) {
+				LOGGER.warning("Error al ejecutar el script para habilitar la ejecucion de scripts PowerShell: " + e); //$NON-NLS-1$
+			}
+
+
+			// Ejecutamos el script para la comprobacion de la ejecucion de scripts
+			final File psConfigScript = new File(this.appConfigDir, FILE_PS_PREPARATE_SCRIPT);
+			String psScriptPath;
+			try {
+				psScriptPath = psConfigScript.getAbsoluteFile().getCanonicalPath();
+			}
+			catch (final IOException e) {
+				LOGGER.warning("No se ha podido reconstruir la ruta del script de configuracion: " + psConfigScript.getAbsolutePath() + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$
+				psScriptPath = psConfigScript.getAbsolutePath();
+			}
+
+			powerShellCommands = new String[] {
+				POWERSHELL_EXE,
+				"\"" + psScriptPath + "\"" //$NON-NLS-1$ //$NON-NLS-2$
+			};
+
+			try {
+				final Process process = new ProcessBuilder(powerShellCommands).directory(this.appConfigDir).start();
+
+				// Un problema entre Java y PowerShell hace que no sea posible en algunos equipos
+				// leer la salida del proceso y que se quede este bloqueado por el stream de salida.
+				// Lo cerramos para que eso no ocurra.
+				process.getOutputStream().close();
+			} catch (final IOException e) {
+				LOGGER.warning("Error al ejecutar el script para comprobar el permiso de ejecucion de scripts: " + e); //$NON-NLS-1$
+			}
+
+		}
+
+	}
+
+	/**
+	 * Runnable que lanza el script de generaci&oacute;n de claves SSL.
+	 */
+	private static class GenerateCertificateRunnable implements Runnable {
+
+		private final File appConfigDir;
+
+		public GenerateCertificateRunnable(final File appConfigDir) {
+			this.appConfigDir = appConfigDir;
+		}
+
+		@Override
+		public void run() {
+
+			final File psConfigScript = new File(this.appConfigDir, FILE_PS_GENERATE_SCRIPT);
+			String psScriptPath;
+			try {
+				psScriptPath = psConfigScript.getAbsoluteFile().getCanonicalPath();
+			}
+			catch (final IOException e) {
+				LOGGER.warning("No se ha podido reconstruir la ruta del script de configuracion: " + psConfigScript.getAbsolutePath() + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$
+				psScriptPath = psConfigScript.getAbsolutePath();
+			}
+
+			// Ejecutamos el script de generacion del almacen
+			final String[] cmds = new String[] {
+				POWERSHELL_EXE,
+				"\"" + psScriptPath + "\"" //$NON-NLS-1$ //$NON-NLS-2$
+			};
+
+			try {
+				final Process process = new ProcessBuilder(cmds).directory(this.appConfigDir).start();
+
+				// Un problema entre Java y PowerShell hace que no sea posible en algunos equipos
+				// leer la salida del proceso y que se quede este bloqueado por el stream de salida.
+				// Lo cerramos para que eso no ocurra.
+				process.getOutputStream().close();
+			} catch (final IOException e) {
+				LOGGER.warning("Error al ejecutar el script para la generacion de las claves SSL: " + e); //$NON-NLS-1$
+			}
 		}
 	}
 }

@@ -21,6 +21,7 @@ import es.gob.afirma.keystores.filters.CertificateFilter;
 import es.gob.afirma.signers.batch.client.BatchSigner;
 import es.gob.afirma.standalone.crypto.CypherDataManager;
 
+
 final class ProtocolInvocationLauncherBatch {
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
@@ -36,9 +37,9 @@ final class ProtocolInvocationLauncherBatch {
 
 	/** Procesa un lote de firma en invocaci&oacute;n por protocolo.
 	 * @param options Par&aacute;metros de la operaci&oacute;n. */
-	static String processBatch(final UrlParametersForBatch options) {
+	static String processBatch(final UrlParametersForBatch options, final boolean bySocket) throws WebServiceCommunicationExceptionBatchOperation {
 
-		final AOKeyStore aoks = AOKeyStore.getKeyStore(options.getDefaultKeyStore());
+		final AOKeyStore aoks = AOKeyStore.valueOf(options.getDefaultKeyStore());
 		if (aoks == null) {
 			LOGGER.severe("No hay un KeyStore con el nombre: " + options.getDefaultKeyStore()); //$NON-NLS-1$
 			ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_07);
@@ -59,6 +60,9 @@ final class ProtocolInvocationLauncherBatch {
 		catch (final Exception e3) {
 			LOGGER.severe("Error obteniendo el AOKeyStoreManager: " + e3); //$NON-NLS-1$
 			ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_08);
+			if (!bySocket){
+				throw new WebServiceCommunicationExceptionBatchOperation(ProtocolInvocationLauncherErrorManager.SAF_08);
+			}
 			return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_08);
 		}
 
@@ -74,34 +78,52 @@ final class ProtocolInvocationLauncherBatch {
 			);
 		}
 		catch (final AOCancelledOperationException e) {
+			LOGGER.severe("Operacion cancelada por el usuario" + e);
+			if (!bySocket){
+				throw new WebServiceCommunicationExceptionBatchOperation(RESULT_CANCEL);
+			}
 			return RESULT_CANCEL;
 		}
 		catch(final AOCertificatesNotFoundException e) {
 			LOGGER.severe("No hay certificados validos en el almacen: " + e); //$NON-NLS-1$
 			ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_19);
+			if (!bySocket){
+				throw new WebServiceCommunicationExceptionBatchOperation(ProtocolInvocationLauncherErrorManager.SAF_19);
+			}
 			return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_19);
 		}
 		catch (final Exception e) {
 			LOGGER.severe("Error al mostrar el dialogo de seleccion de certificados: " + e); //$NON-NLS-1$
 			ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_08);
+			if (!bySocket){
+				throw new WebServiceCommunicationExceptionBatchOperation(ProtocolInvocationLauncherErrorManager.SAF_08);
+			}
 			return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_08);
 		}
 
 		String batchResult;
 		try {
-			batchResult = BatchSigner.sign(
-				Base64.encode(options.getData(), true),
-				options.getBatchPresignerUrl(),
-				options.getBatchPostSignerUrl(),
-				pke.getCertificateChain(),
-				pke.getPrivateKey()
-			);
+			batchResult = 
+					BatchSigner.sign(
+							Base64.encode(options.getData(), true),
+							options.getBatchPresignerUrl(),
+							options.getBatchPostSignerUrl(),
+							pke.getCertificateChain(),
+							pke.getPrivateKey()
+					);
+			// Devuelve los datos sin codificar en el caso de petición por socket, por lo que hay que codificarlo
+			if (bySocket){
+				batchResult = Base64.encode(batchResult.getBytes());
+			}
 		}
 		catch (final Exception e) {
 			LOGGER.severe(
 				"Error en el proceso del lote de firmas: " + e //$NON-NLS-1$
 			);
 			ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_20);
+			if (!bySocket){
+				throw new WebServiceCommunicationExceptionBatchOperation(ProtocolInvocationLauncherErrorManager.SAF_20);
+			}
 			return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_20);
 		}
 
@@ -116,6 +138,9 @@ final class ProtocolInvocationLauncherBatch {
 			catch (final Exception e) {
 				LOGGER.severe("Error en el cifrado de los datos a enviar: " + e); //$NON-NLS-1$
 				ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_12);
+				if (!bySocket){
+					throw new WebServiceCommunicationExceptionBatchOperation(ProtocolInvocationLauncherErrorManager.SAF_12);
+				}
 				return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_12);
 			}
 		}
@@ -133,6 +158,9 @@ final class ProtocolInvocationLauncherBatch {
 			catch (final Exception e) {
 				LOGGER.severe("Error al enviar los datos al servidor: " + e); //$NON-NLS-1$
 				ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_11);
+				if (!bySocket){
+					throw new WebServiceCommunicationExceptionBatchOperation(ProtocolInvocationLauncherErrorManager.SAF_11);
+				}
 				return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_11);
 			}
 		}
@@ -145,6 +173,14 @@ final class ProtocolInvocationLauncherBatch {
 		return batchResult;
 	}
 
+	public static void sendErrorToServer(final String data, final UrlParametersForBatch options){
+		try {
+			sendData(data, options);
+		} catch (IOException e1) {
+			LOGGER.severe("Error al enviar los datos del error en la operacion firma por lotes al servidor" + e1);
+		}	
+	}
+	
 	private static void sendData(final String data, final UrlParametersForBatch options) throws IOException {
 
 		final StringBuffer url = new StringBuffer(options.getStorageServletUrl().toString());
@@ -159,6 +195,30 @@ final class ProtocolInvocationLauncherBatch {
 		LOGGER.info(
 			"Resultado del envio de datos de lote al servidor intermedio: " + new String(result) //$NON-NLS-1$
 		);
+	}
+	
+	public static String getResultCancel() {
+		return RESULT_CANCEL;
+	}
+
+	/** Error en los par&aacute;metros de la URL recibida por la aplicaci&oacute;n. */
+	public static class WebServiceCommunicationExceptionBatchOperation extends Exception {
+		private static final long serialVersionUID = -6382342237658143382L;
+		private String errorCode ;
+		
+		WebServiceCommunicationExceptionBatchOperation(final String code) {
+			setErrorCode(code);
+		}
+
+		public String getErrorCode() {
+			return errorCode;
+		}
+
+		public void setErrorCode(String errorCode) {
+			this.errorCode = errorCode;
+		}
+
+		
 	}
 
 }

@@ -20,8 +20,6 @@ public interface Configurator {
 
 	/**
 	 * Desinstala los componentes necesarios del sistema.
-	 * @throws IOException
-	 * @throws GeneralSecurityException
 	 */
-	void uninstall() throws GeneralSecurityException, IOException;
+	void uninstall();
 }

@@ -32,24 +32,22 @@ public final class KeyStoreUtilities {
 
     static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
-    private static final String OPENSC_USR_LIB_LINUX = "/usr/lib/opensc-pkcs11.so"; //$NON-NLS-1$
-
-    /** Nombre de los ficheros de biblioteca de los controladores de la FNMT para DNIe y CERES
-     * que no tienen implementados el algoritmo SHA1withRSA.
-     */
+    /** Nombre de los ficheros de biblioteca de los controladores de la FNMT para DNIe, CERES y TIF
+     * que no tienen implementados el algoritmo SHA1withRSA. */
     private static final String[] FNMT_PKCS11_LIBS_WITHOUT_SHA1 = {
     	"DNIe_P11_priv.dll", //$NON-NLS-1$
     	"DNIe_P11_pub.dll", //$NON-NLS-1$
     	"FNMT_P11.dll", //$NON-NLS-1$
     	"UsrPkcs11.dll", //$NON-NLS-1$
-    	"UsrPubPkcs11.dll" //$NON-NLS-1$
+    	"UsrPubPkcs11.dll", //$NON-NLS-1$
+    	"TIF_P11.dll" //$NON-NLS-1$
     };
 
     /** Crea las l&iacute;neas de configuraci&oacute;n para el proveedor PKCS#11
      * de Sun.
      * @param lib Nombre (con o sin ruta) de la biblioteca PKCS#11
      * @param name Nombre que queremos tenga el proveedor. CUIDADO: SunPKCS11
-     *            a&ntilde;ade el prefijo <i>SunPKCS11-</i>.
+     *             a&ntilde;ade el prefijo <i>SunPKCS11-</i>.
      * @param slot Lector de tarjetas en el que buscar la biblioteca.
      * @return Fichero con las propiedades de configuracion del proveedor
      *         PKCS#11 de Sun para acceder al KeyStore de un token gen&eacute;rico */
@@ -241,57 +239,6 @@ public final class KeyStoreUtilities {
         return aliassesByFriendlyName;
     }
 
-    static String getPKCS11DNIeLib() throws AOKeyStoreManagerException {
-        if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
-            final String lib = Platform.getSystemLibDir();
-            if (new File(lib + "\\DNIe_P11_priv.dll").exists()) { //$NON-NLS-1$
-            	return lib + "\\DNIe_P11_priv.dll"; //$NON-NLS-1$
-            }
-            if (new File(lib + "\\UsrPkcs11.dll").exists()) { //$NON-NLS-1$
-                return lib + "\\UsrPkcs11.dll";  //$NON-NLS-1$
-            }
-            if (new File(lib + "\\opensc-pkcs11.dll").exists()) { //$NON-NLS-1$
-                return lib + "\\opensc-pkcs11.dll";  //$NON-NLS-1$
-            }
-            // No soportamos AutBioPkcs11.dll
-            throw new AOKeyStoreManagerException("No hay controlador PKCS#11 de DNIe instalado en este sistema Windows"); //$NON-NLS-1$
-        }
-        if (Platform.OS.MACOSX.equals(Platform.getOS())) {
-            if (new File("/Library/OpenSC/lib/libopensc-dnie.dylib").exists()) { //$NON-NLS-1$
-                return "/Library/OpenSC/lib/libopensc-dnie.dylib";  //$NON-NLS-1$
-            }
-            if (new File("/Library/OpenSC/lib/opensc-pkcs11.so").exists()) { //$NON-NLS-1$
-                return "/Library/OpenSC/lib/opensc-pkcs11.so"; //$NON-NLS-1$
-            }
-            if (new File("/Library/OpenSC/lib/libopensc-dnie.1.0.3.dylib").exists()) { //$NON-NLS-1$
-                return "/Library/OpenSC/lib/libopensc-dnie.1.0.3.dylib";  //$NON-NLS-1$
-            }
-            if (new File(OPENSC_USR_LIB_LINUX).exists()) {
-                return OPENSC_USR_LIB_LINUX;
-            }
-            throw new AOKeyStoreManagerException("No hay controlador PKCS#11 de DNIe instalado en este sistema Mac OS X"); //$NON-NLS-1$
-        }
-        if (new File("/usr/local/lib/libopensc-dnie.so").exists()) { //$NON-NLS-1$
-            return "/usr/local/lib/libopensc-dnie.so"; //$NON-NLS-1$
-        }
-        if (new File("/usr/lib/libopensc-dnie.so").exists()) { //$NON-NLS-1$
-            return "/usr/lib/libopensc-dnie.so"; //$NON-NLS-1$
-        }
-        if (new File("/lib/libopensc-dnie.so").exists()) { //$NON-NLS-1$
-            return "/lib/libopensc-dnie.so"; //$NON-NLS-1$
-        }
-        if (new File(OPENSC_USR_LIB_LINUX).exists()) {
-            return OPENSC_USR_LIB_LINUX;
-        }
-        if (new File("/lib/opensc-pkcs11.so").exists()) { //$NON-NLS-1$
-            return "/lib/opensc-pkcs11.so";  //$NON-NLS-1$
-        }
-        if (new File("/usr/local/lib/opensc-pkcs11.so").exists()) { //$NON-NLS-1$
-            return "/usr/local/lib/opensc-pkcs11.so"; //$NON-NLS-1$
-        }
-        throw new AOKeyStoreManagerException("No hay controlador PKCS#11 de DNIe instalado en este sistema"); //$NON-NLS-1$
-    }
-
 	/** Obtiene el nombre corto (8+3) de un fichero o directorio indicado (con ruta).
 	 * @param originalPath Ruta completa hacia el fichero o directorio que queremos pasar a nombre corto.
 	 * @return Nombre corto del fichero o directorio con su ruta completa, o la cadena originalmente indicada si no puede
@@ -321,8 +268,10 @@ public final class KeyStoreUtilities {
 	 * @param parentComponent Componente padre para los di&aacute;logos de los almacenes preferentes
 	 *                        (solicitud de PIN, confirmaci&oacute;n de firma, etc.). */
 	public static void addPreferredKeyStoreManagers(final AggregatedKeyStoreManager aksm, final Object parentComponent) {
-		// Anadimos el controlador Java del DNIe SIEMPRE a menos que se indique "es.gob.afirma.keystores.mozilla.disableDnieNativeDriver=true"
-		if (!Boolean.getBoolean("es.gob.afirma.keystores.mozilla.disableDnieNativeDriver")) { //$NON-NLS-1$
+		// Anadimos el controlador Java del DNIe SIEMPRE excepto:
+		// -Si el almacen principal es MSCAPI
+		// -Que se indique "es.gob.afirma.keystores.mozilla.disableDnieNativeDriver=true"
+		if (!Boolean.getBoolean("es.gob.afirma.keystores.mozilla.disableDnieNativeDriver") && !AOKeyStore.WINDOWS.equals(aksm.getType())) { //$NON-NLS-1$
 			try {
 				final AOKeyStoreManager tmpKsm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
 					AOKeyStore.DNIEJAVA,
@@ -360,6 +309,17 @@ public final class KeyStoreUtilities {
 			catch (final Exception ex) {
 				LOGGER.warning("No se ha podido inicializar la tarjeta CERES: " + ex); //$NON-NLS-1$
 			}
+		}
+
+		// Anadimos el controlador PKCS#11 de FNMT-RCM TIF SIEMPRE
+		try {
+			final AOKeyStoreManager tmpKsm = new CNPKeyStoreManager(false, parentComponent);
+			LOGGER.info("La tarjeta FNMT-CRM TIF ha podido inicializarse, se anadiran sus entradas"); //$NON-NLS-1$
+			tmpKsm.setPreferred(true);
+			aksm.addKeyStoreManager(tmpKsm);
+		}
+		catch (final Exception ex) {
+			LOGGER.warning("No se ha podido inicializar la tarjeta FNMT-RCM TIF: " + ex); //$NON-NLS-1$
 		}
 	}
 }

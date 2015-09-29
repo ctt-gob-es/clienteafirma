@@ -37,6 +37,8 @@ public final class LogManager {
 		ANDROID,
 		/** Firma manuscrita digitalizada biom&eacute;trica. */
 		HANDWRITTEN,
+		/** DNInB. */
+		DNINB,
 		/** Otra. */
 		OTHER
 	}

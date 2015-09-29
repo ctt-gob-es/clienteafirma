@@ -9,6 +9,19 @@
  <body>
  <p>Valores aceptados como par&aacute;metros adicionales para las firmas PAdES:</p>
  <dl>
+  <dt><b><i>doNotCompressPdf</i></b></dt>
+  <dd>
+   Si se establece a <code>true</code> no se comprime el PDF resultante. Si no se establece o se establece a
+   <code>false</code>, el PDF de salida (firmado) se comprime para que ocupe menos tama&ntilde;o.
+  </dd>
+  <dt><b><i>signTime</i></b></dt>
+  <dd>
+   Establece la fecha y hora indicadas como momento de la firma. Debe establecerse en el formato <code>yyyy:MM:dd:HH:mm:ss</code>.
+   Por ejemplo, la cadena <code>2010:12:25:12:30:01</code> indica el venticinco de diciembre de 2010 a las 12 horas, treinta minutos
+   y un segundo.<br>
+   Se toma siempre como zona horaria la establecida en la m&aacute;quina donde se ejecuta el firmador.<br>
+   Este par&aacute;metro solo funciona en firmas monof&aacute;sicas.
+  </dd>
   <dt><b><i>allowCosigningUnregisteredSignatures</i></b></dt>
   <dd>
    Si se establece a <code>true</code> se permite firmar un PDF incluso si este contiene firmas previas no

@@ -55,11 +55,11 @@ public final class AOKeyStoreManagerFactory {
      * @throws es.gob.afirma.core.MissingLibraryException Cuando no se localice una biblioteca necesaria para el
      *                                                    uso del almac&eacute;n. */
     public static AggregatedKeyStoreManager getAOKeyStoreManager(final AOKeyStore store,
-                                                         final String lib,
-                                                         final String description,
-                                                         final PasswordCallback pssCallback,
-                                                         final Object parentComponent) throws AOKeystoreAlternativeException,
-                                                                                              IOException {
+                                                                 final String lib,
+                                                                 final String description,
+                                                                 final PasswordCallback pssCallback,
+                                                                 final Object parentComponent) throws AOKeystoreAlternativeException,
+                                                                                                      IOException {
     	boolean forceReset;
     	// Se usa try-catch para capturar errores de permisos de lectura de variables
     	try {
@@ -112,9 +112,7 @@ public final class AOKeyStoreManagerFactory {
         }
 
         // Almacen de Mozilla que muestra tanto los certificados del almacemo los de
-        // los dispositivos externos configuramos. A esto, le agregamos en Mac OS X el gestor de
-        // DNIe para que agregue los certificados de este mediante el controlador Java del DNIe si
-        // se encuentra la biblioteca y hay un DNIe insertado
+        // los dispositivos externos configuramos.
         if (AOKeyStore.MOZ_UNI.equals(store)) {
         	return getMozillaUnifiedKeyStoreManager(pssCallback, forceReset, parentComponent);
         }
@@ -403,7 +401,7 @@ public final class AOKeyStoreManagerFactory {
     }
 
     private static AOKeyStoreManager getWindowsMyCapiKeyStoreManager(final boolean forceReset) throws AOKeystoreAlternativeException,
-    		                                                                                              IOException {
+    		                                                                                          IOException {
     	final AOKeyStoreManager ksmCapi = new CAPIKeyStoreManager();
 		try {
 			ksmCapi.init(AOKeyStore.WINDOWS, null, null, null, forceReset);

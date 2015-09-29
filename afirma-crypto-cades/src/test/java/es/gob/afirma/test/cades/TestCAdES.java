@@ -190,11 +190,6 @@ public final class TestCAdES {
 				}
 			}
 		}
-
-		signer.sign(
-				DATA.get(0), "SHA1withRSA", pke.getPrivateKey(), pke.getCertificateChain(), null //$NON-NLS-1$
-				);
-
 	}
 
 }

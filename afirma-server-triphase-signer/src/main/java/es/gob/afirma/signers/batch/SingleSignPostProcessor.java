@@ -8,7 +8,7 @@ import java.util.Collections;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.signers.TriphaseData;
 import es.gob.afirma.core.signers.TriphaseData.TriSign;
-import es.gob.afirma.triphase.server.processors.TriPhasePreProcessor;
+import es.gob.afirma.triphase.signer.processors.TriPhasePreProcessor;
 
 final class SingleSignPostProcessor {
 

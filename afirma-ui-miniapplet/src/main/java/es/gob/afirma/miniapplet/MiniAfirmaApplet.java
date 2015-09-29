@@ -1248,26 +1248,48 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 			                final String extraParams) throws IOException,
 			                                                 AOException,
 			                                                 PrivilegedActionException {
-
 		final Properties params = ExtraParamsProcessor.convertToProperties(extraParams);
 		final PrivateKeyEntry pke;
 		try {
 			pke = this.selectPrivateKey(params);
 		}
 		catch (final PrivilegedActionException e) {
+			LOGGER.severe("error al seleccionar certificado: " + e); //$NON-NLS-1$
 			setError(e);
 			throw e;
 		}
+		catch (final RuntimeException e) {
+			setError(e);
+			throw e;
+		}
+		catch (final OutOfMemoryError e) {
+			setError(e, "Error de falta de memoria durante la operaci\u00F3n de firma de lote"); //$NON-NLS-1$
+			throw e;
+		}
+		catch (final Error e) {
+			setError(e);
+			throw new AOException("Ocurrio un error grave durante la operaci\u00F3n de firma de lote", e); //$NON-NLS-1$
+		}
+
 		try {
-			return BatchSigner.sign(
-				batchB64,
-				batchPreSignerUrl,
-				batchPostSignerUrl,
-				pke.getCertificateChain(),
-				pke.getPrivateKey()
-			);
+			return Base64.encode(
+					BatchSigner.sign(
+							batchB64,
+							batchPreSignerUrl,
+							batchPostSignerUrl,
+							pke.getCertificateChain(),
+							pke.getPrivateKey()
+					).getBytes("utf-8") //$NON-NLS-1$
+				);
 		}
 		catch (final CertificateEncodingException e) {
+			LOGGER.severe("Error al codificar el certificado al realizar la firma por lotes: " + e); //$NON-NLS-1$
+			final AOException aoe = new AOException(e);
+			setError(e);
+			throw aoe;
+		}
+		catch (final Exception e) {
+			LOGGER.severe("Error al realizar la firma por lotes: " + e); //$NON-NLS-1$
 			final AOException aoe = new AOException(e);
 			setError(e);
 			throw aoe;

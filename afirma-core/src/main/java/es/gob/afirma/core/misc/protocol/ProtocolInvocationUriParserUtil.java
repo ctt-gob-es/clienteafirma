@@ -19,7 +19,7 @@ final class ProtocolInvocationUriParserUtil {
 
 	static final String DEFAULT_URL_ENCODING = "UTF-8"; //$NON-NLS-1$
 
-	ProtocolInvocationUriParserUtil() {
+	private ProtocolInvocationUriParserUtil() {
 		// No instanciable
 	}
 

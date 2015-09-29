@@ -1,4 +1,4 @@
-package es.gob.afirma.triphase.server.processors;
+package es.gob.afirma.triphase.signer.processors;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
@@ -106,9 +106,20 @@ public final class PAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 			                         final byte[] session) throws NoSuchAlgorithmException,
 			                                                      AOException,
 			                                                      IOException {
-		LOGGER.info("Postfirma PAdES - Firma - INICIO"); //$NON-NLS-1$
 
-		final TriphaseData triphaseData = TriphaseData.parser(session);
+		return preProcessPostSign(docBytes, algorithm, cert, extraParams, TriphaseData.parser(session));
+	}
+
+	@Override
+	public byte[] preProcessPostSign(final byte[] docBytes,
+			                         final String algorithm,
+			                         final X509Certificate[] cert,
+			                         final Properties extraParams,
+			                         final TriphaseData triphaseData) throws NoSuchAlgorithmException,
+			                                                      AOException,
+			                                                      IOException {
+
+		LOGGER.info("Postfirma PAdES - Firma - INICIO"); //$NON-NLS-1$
 
 		// Cargamos la configuracion de la operacion
 		if (triphaseData.getSignsCount() < 1) {
@@ -170,7 +181,18 @@ public final class PAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 			                           final byte[] session) throws NoSuchAlgorithmException,
 			                                                        AOException,
 			                                                        IOException {
-		return preProcessPostSign(data, algorithm, cert, extraParams, session);
+		return preProcessPostSign(data, algorithm, cert, extraParams, TriphaseData.parser(session));
+	}
+
+	@Override
+	public byte[] preProcessPostCoSign(final byte[] data,
+			                           final String algorithm,
+			                           final X509Certificate[] cert,
+			                           final Properties extraParams,
+			                           final TriphaseData triphaseData) throws NoSuchAlgorithmException,
+			                                                        AOException,
+			                                                        IOException {
+		return preProcessPostSign(data, algorithm, cert, extraParams, triphaseData);
 	}
 
 	@Override
@@ -179,6 +201,16 @@ public final class PAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 			                               final X509Certificate[] cert,
 			                               final Properties extraParams,
 			                               final CounterSignTarget targets) throws IOException, AOException {
+		throw new UnsupportedOperationException("La operacion de contrafirma no esta soportada en PAdES."); //$NON-NLS-1$
+	}
+
+	@Override
+	public byte[] preProcessPostCounterSign(final byte[] sign,
+			                                final String algorithm,
+			                                final X509Certificate[] cert,
+			                                final Properties extraParams,
+			                                final TriphaseData triphaseData,
+			                                final CounterSignTarget targets) throws NoSuchAlgorithmException, AOException, IOException {
 		throw new UnsupportedOperationException("La operacion de contrafirma no esta soportada en PAdES."); //$NON-NLS-1$
 	}
 

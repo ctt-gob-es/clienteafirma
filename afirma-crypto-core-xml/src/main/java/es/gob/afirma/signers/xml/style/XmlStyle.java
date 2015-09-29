@@ -159,9 +159,9 @@ public final class XmlStyle {
      * @throws ReferenceIsNotXmlException Si el objeto dereferenciado no puede transformarse en un
      *                                    Documento DOM */
     private static Document dereferenceStyleSheet(final String id, final boolean headless) throws CannotDereferenceException,
-                                                                                                 IsInnerlException,
-                                                                                                 ReferenceIsNotXmlException {
-        if (id == null || "".equals(id)) { //$NON-NLS-1$
+                                                                                                  IsInnerlException,
+                                                                                                  ReferenceIsNotXmlException {
+        if (id == null || id.isEmpty()) {
             throw new CannotDereferenceException("La hoja de estilo era nula o vacia"); //$NON-NLS-1$
         }
 
@@ -212,7 +212,9 @@ public final class XmlStyle {
             		}
             		catch(final AOCancelledOperationException ex) {
             			LOGGER.warning("El usuario ha cancelado la seleccion de hoja de estilo: " + ex); //$NON-NLS-1$
-            			throw new CannotDereferenceException("No se ha podido dereferenciar la hoja de estilo", e); //$NON-NLS-1$
+            			throw new CannotDereferenceException(
+        					"No se ha podido dereferenciar la hoja de estilo: " + ex, e //$NON-NLS-1$
+    					);
             		}
             		try {
             			final InputStream is = new FileInputStream(xmlStyleFile);
@@ -220,12 +222,16 @@ public final class XmlStyle {
         				is.close();
             		}
             		catch (final Exception ex) {
-            			throw new CannotDereferenceException("No se ha podido dereferenciar la hoja de estilo", ex); //$NON-NLS-1$
+            			throw new CannotDereferenceException(
+        					"No se ha podido dereferenciar la hoja de estilo: " + e, ex //$NON-NLS-1$
+    					);
             		}
             	}
             }
             else {
-                throw new CannotDereferenceException("No se ha podido dereferenciar la hoja de estilo: " + id, e); //$NON-NLS-1$
+                throw new CannotDereferenceException(
+            		"No se ha podido dereferenciar la hoja de estilo '" + id + "': " + e, e //$NON-NLS-1$ //$NON-NLS-2$
+        		);
             }
         }
 

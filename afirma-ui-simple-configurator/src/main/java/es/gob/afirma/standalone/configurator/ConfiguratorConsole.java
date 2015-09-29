@@ -87,7 +87,12 @@ public class ConfiguratorConsole extends JFrame {
      * @param text Texto a mostrar.
      */
     void print(final String text) {
-    	this.console.append(text);
-    	this.console.append("\n"); //$NON-NLS-1$
+    	try {
+    		this.console.append(text);
+    		this.console.append("\n"); //$NON-NLS-1$
+    	}
+    	catch (final Exception e) {
+    		Logger.getLogger("es.gob.afirma").warning("No se pudo mostrar por consola el mensaje:\n" + text);  //$NON-NLS-1$//$NON-NLS-2$
+    	}
     }
 }

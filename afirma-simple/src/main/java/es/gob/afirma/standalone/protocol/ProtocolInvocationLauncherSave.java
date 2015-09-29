@@ -30,6 +30,7 @@ final class ProtocolInvocationLauncherSave {
 			);
 		}
 		catch(final AOCancelledOperationException e) {
+			LOGGER.severe("Operacion cancelada por el usuario" + e);
 			return RESULT_CANCEL;
 		}
 		catch (final Exception e) {
@@ -38,6 +39,14 @@ final class ProtocolInvocationLauncherSave {
 			return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_05);
 		}
 		return RESULT_OK;
+	}
+
+	public static String getResultOk() {
+		return RESULT_OK;
+	}
+
+	public static String getResultCancel() {
+		return RESULT_CANCEL;
 	}
 
 }

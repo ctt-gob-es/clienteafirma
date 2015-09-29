@@ -8,6 +8,19 @@
  * You may contact the copyright holder at: soporte.afirma5@mpt.es
  */
 
-/** Firmador trif&aacute;sico (parte servidora) XAdES.
+package es.gob.afirma.triphase.signer.xades;
+
+/** Error en una prefirma XML. Habitualmente causado por la imposibilidad de hacer la sustituci&oacute;n del PKCS#1.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
-package es.gob.afirma.triphase.server.xades;
+public final class XmlPreSignException extends Exception {
+
+	private static final long serialVersionUID = 3950771737016341242L;
+
+	XmlPreSignException(final String msg) {
+		super(msg);
+	}
+
+	XmlPreSignException() {
+		super();
+	}
+}

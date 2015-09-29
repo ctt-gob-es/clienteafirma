@@ -4,6 +4,9 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
@@ -43,6 +46,30 @@ final class PdfUtil {
 
 	private PdfUtil() {
 		// No instanciable
+	}
+
+	static GregorianCalendar getSignTime(final String stStr) {
+		if (stStr == null) {
+			return new GregorianCalendar();
+		}
+
+		Date date;
+		final SimpleDateFormat formatter = new SimpleDateFormat("yyyy:MM:dd:HH:mm:ss"); //$NON-NLS-1$
+		try {
+			date = formatter.parse(stStr);
+		}
+		catch(final Exception e) {
+			LOGGER.severe(
+				"La fecha indicada ('" + stStr + "') como momento de firma para PAdES no sigue el patron 'yyyy:MM:dd:HH:mm:ss': " + e //$NON-NLS-1$ //$NON-NLS-2$
+			);
+			return new GregorianCalendar();
+		}
+
+		// Creamos el calendar a partir de un Date para que tome de el
+		final GregorianCalendar calendar = new GregorianCalendar();
+		calendar.setTime(date);
+
+		return calendar;
 	}
 
 	static PdfReader getPdfReader(final byte[] inPDF,
@@ -239,5 +266,4 @@ final class PdfUtil {
     	}
     	return ret;
 	}
-
 }

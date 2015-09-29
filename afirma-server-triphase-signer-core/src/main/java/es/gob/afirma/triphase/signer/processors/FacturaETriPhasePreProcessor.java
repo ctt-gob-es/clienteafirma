@@ -1,4 +1,4 @@
-package es.gob.afirma.triphase.server.processors;
+package es.gob.afirma.triphase.signer.processors;
 
 /** Procesador de firmas trif&aacute;sicas XAdES FacturaE.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */

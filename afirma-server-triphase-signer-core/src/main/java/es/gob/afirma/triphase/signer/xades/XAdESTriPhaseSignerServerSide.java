@@ -8,7 +8,7 @@
  * You may contact the copyright holder at: soporte.afirma5@mpt.es
  */
 
-package es.gob.afirma.triphase.server.xades;
+package es.gob.afirma.triphase.signer.xades;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;

@@ -8,7 +8,7 @@
  * You may contact the copyright holder at: soporte.afirma5@mpt.es
  */
 
-package es.gob.afirma.triphase.server.cades;
+package es.gob.afirma.triphase.signer.cades;
 
 import java.io.IOException;
 import java.util.Date;

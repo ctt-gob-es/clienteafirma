@@ -13,6 +13,7 @@ package es.gob.afirma.keystores;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.KeyStore;
+import java.security.KeyStore.ProtectionParameter;
 import java.security.KeyStoreException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -112,6 +113,13 @@ public class AOKeyStoreManager implements KeyStoreManager {
      * @return Tipo de almac&eacute;n de claves */
     public AOKeyStore getType() {
         return this.ksType;
+    }
+
+    /** Devuelve el tipo de almac&eacute;n de claves para un alias determinado.
+     * @param alias Alias de la entrada para la cual se desea conocer su tipo de almac&eacute;n.
+     * @return Tipo de almac&eacute;n de claves para el alias indicado. */
+    protected AOKeyStore getType(final String alias) {
+    	return getType();
     }
 
     private InputStream storeIs;
@@ -233,11 +241,24 @@ public class AOKeyStoreManager implements KeyStoreManager {
         if (alias == null) {
         	throw new IllegalArgumentException("El alias no puede ser nulo"); //$NON-NLS-1$
         }
+
+        final ProtectionParameter protParam;
+        if (this.entryPasswordCallBack != null) {
+        	protParam = new KeyStore.PasswordProtection(this.entryPasswordCallBack.getPassword());
+        }
+        else {
+        	final PasswordCallback pwc = getType(alias).getCertificatePasswordCallback(getParentComponent());
+        	if (pwc != null) {
+        		protParam = new KeyStore.PasswordProtection(pwc.getPassword());
+        	}
+        	else {
+        		protParam = null;
+        	}
+        }
+
 		return (KeyStore.PrivateKeyEntry) this.ks.getEntry(
-				alias,
-				this.entryPasswordCallBack != null ?
-						new KeyStore.PasswordProtection(this.entryPasswordCallBack.getPassword()) :
-							new KeyStore.PasswordProtection(getType().getCertificatePasswordCallback(getParentComponent()).getPassword())
+			alias,
+			protParam
 		);
     }
 

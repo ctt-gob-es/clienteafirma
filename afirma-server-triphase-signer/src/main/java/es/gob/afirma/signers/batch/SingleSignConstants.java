@@ -2,10 +2,10 @@ package es.gob.afirma.signers.batch;
 
 import es.gob.afirma.core.AOInvalidFormatException;
 import es.gob.afirma.core.signers.AOSignConstants;
-import es.gob.afirma.triphase.server.processors.CAdESTriPhasePreProcessor;
-import es.gob.afirma.triphase.server.processors.PAdESTriPhasePreProcessor;
-import es.gob.afirma.triphase.server.processors.TriPhasePreProcessor;
-import es.gob.afirma.triphase.server.processors.XAdESTriPhasePreProcessor;
+import es.gob.afirma.triphase.signer.processors.CAdESTriPhasePreProcessor;
+import es.gob.afirma.triphase.signer.processors.PAdESTriPhasePreProcessor;
+import es.gob.afirma.triphase.signer.processors.TriPhasePreProcessor;
+import es.gob.afirma.triphase.signer.processors.XAdESTriPhasePreProcessor;
 
 /** Constantes para la definici&oacute;n de una firma independiente.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */

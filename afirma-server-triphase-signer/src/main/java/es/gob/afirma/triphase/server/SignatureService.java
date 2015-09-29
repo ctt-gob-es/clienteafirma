@@ -24,13 +24,13 @@ import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.triphase.server.document.DocumentManager;
-import es.gob.afirma.triphase.server.processors.CAdESASiCSTriPhasePreProcessor;
-import es.gob.afirma.triphase.server.processors.CAdESTriPhasePreProcessor;
-import es.gob.afirma.triphase.server.processors.FacturaETriPhasePreProcessor;
-import es.gob.afirma.triphase.server.processors.PAdESTriPhasePreProcessor;
-import es.gob.afirma.triphase.server.processors.TriPhasePreProcessor;
-import es.gob.afirma.triphase.server.processors.XAdESASiCSTriPhasePreProcessor;
-import es.gob.afirma.triphase.server.processors.XAdESTriPhasePreProcessor;
+import es.gob.afirma.triphase.signer.processors.CAdESASiCSTriPhasePreProcessor;
+import es.gob.afirma.triphase.signer.processors.CAdESTriPhasePreProcessor;
+import es.gob.afirma.triphase.signer.processors.FacturaETriPhasePreProcessor;
+import es.gob.afirma.triphase.signer.processors.PAdESTriPhasePreProcessor;
+import es.gob.afirma.triphase.signer.processors.TriPhasePreProcessor;
+import es.gob.afirma.triphase.signer.processors.XAdESASiCSTriPhasePreProcessor;
+import es.gob.afirma.triphase.signer.processors.XAdESTriPhasePreProcessor;
 
 /**
  * Servicio de firma electronica en 3 fases.

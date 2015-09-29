@@ -89,7 +89,7 @@ public final class ASiCUtil {
 		// La firma
 		ze = new ZipEntry(signatureFilename != null ? signatureFilename : ENTRY_NAME_BINARY_SIGNATURE);
 		zos.putNextEntry(ze);
-		zos.write(data);
+		zos.write(signature);
 
 		zos.close();
 

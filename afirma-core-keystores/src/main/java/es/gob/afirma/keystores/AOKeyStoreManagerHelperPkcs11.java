@@ -35,8 +35,8 @@ final class AOKeyStoreManagerHelperPkcs11 {
      *         apertura del almac&eacute;n.
      * @throws es.gob.afirma.keystores.MissingSunPKCS11Exception Si no se encuentra la biblioteca SunPKCS11 */
     static KeyStore initPKCS11(final PasswordCallback pssCallBack,
-    		                          final Object[] params) throws AOKeyStoreManagerException,
-    		                                                        IOException {
+    		                   final Object[] params) throws AOKeyStoreManagerException,
+    		                                                 IOException {
 
         // En el "params" debemos traer los parametros:
         // [0] -p11lib: Biblioteca PKCS#11, debe estar en el Path (Windows) o en el LD_LIBRARY_PATH (UNIX, Linux, Mac OS X)
@@ -88,10 +88,13 @@ final class AOKeyStoreManagerHelperPkcs11 {
                     p11Provider = (Provider) sunPKCS11Contructor.newInstance(new ByteArrayInputStream(config));
                 }
                 catch (final Exception ex) {
-                    throw new AOKeyStoreManagerException("No se ha podido instanciar el proveedor SunPKCS11 para la la biblioteca " + p11lib, ex); //$NON-NLS-1$
+                    throw new AOKeyStoreManagerException(
+                		"No se ha podido instanciar el proveedor SunPKCS11 para la la biblioteca " + p11lib + ": " + ex, ex  //$NON-NLS-1$//$NON-NLS-2$
+            		);
                 }
             }
             Security.addProvider(p11Provider);
+
         }
         else {
             LOGGER.info("El proveedor SunPKCS11 solicitado ya estaba instanciado, se reutilizara esa instancia: " + p11Provider.getName()); //$NON-NLS-1$
@@ -104,7 +107,7 @@ final class AOKeyStoreManagerHelperPkcs11 {
         catch (final Exception e) {
             Security.removeProvider(p11Provider.getName());
             p11Provider = null;
-            throw new AOKeyStoreManagerException("No se ha podido obtener el almacen PKCS#11", e); //$NON-NLS-1$
+            throw new AOKeyStoreManagerException("No se ha podido obtener el almacen PKCS#11: " + e, e); //$NON-NLS-1$
         }
 
         try {
@@ -115,7 +118,7 @@ final class AOKeyStoreManagerHelperPkcs11 {
                     e.getCause() instanceof BadPaddingException) {
                 throw new IOException("Contrasena invalida: " + e, e); //$NON-NLS-1$
             }
-            throw new AOKeyStoreManagerException("No se ha podido obtener el almacen PKCS#11 solicitado", e); //$NON-NLS-1$
+            throw new AOKeyStoreManagerException("No se ha podido obtener el almacen PKCS#11 solicitado: " + e, e); //$NON-NLS-1$
         }
         catch (final CertificateException e) {
             Security.removeProvider(p11Provider.getName());

@@ -117,13 +117,7 @@ public class AutoFirmaConfigurator implements WindowListener {
 		}
 
 		// Creamos el almacen para la configuracion del SSL
-		try {
-			this.configurator.uninstall();
-		} catch (final IOException e) {
-			LOGGER.warning("Error al acceder al almacen de certificados. No se eliminara la CA del certificados SSL: " + e); //$NON-NLS-1$
-		} catch (final GeneralSecurityException e) {
-			LOGGER.warning("Error al eliminar la CA del certificado SSL. No se eliminara la CA del certificados SSL: " + e); //$NON-NLS-1$
-		}
+		this.configurator.uninstall();
 	}
 
 	private static void showErrorMessage(final Component parent, final String errorText) {

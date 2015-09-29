@@ -5,7 +5,7 @@ import java.security.cert.X509Certificate;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.signers.TriphaseData;
-import es.gob.afirma.triphase.server.processors.TriPhasePreProcessor;
+import es.gob.afirma.triphase.signer.processors.TriPhasePreProcessor;
 
 final class SingleSignPreProcessor {
 

@@ -43,8 +43,6 @@ public final class CustomUriDereferencer implements URIDereferencer {
 	private static final String DEFAULT_SUN_NODESET_DATA =           "org.jcp.xml.dsig.internal.dom.ApacheNodeSetData"; //$NON-NLS-1$
 	private static final String DEFAULT_APACHE_NODESET_DATA = "org.apache.jcp.xml.dsig.internal.dom.ApacheNodeSetData"; //$NON-NLS-1$
 
-
-
 	private final URIDereferencer defaultUriDereferencer;
 
 	/** Crea un dereferenciador a medida que act&uacute;a solo cuando falla el dereferenciador por defecto
@@ -140,7 +138,7 @@ public final class CustomUriDereferencer implements URIDereferencer {
 				}
 				catch (final Exception e1) {
 					throw new URIReferenceException(
-						"No se ha podido descargar manualmente el contenido externo: " + e1, e1 //$NON-NLS-1$
+						"No se ha podido descargar manualmente el contenido externo (" + e + "): " + e1, e1 //$NON-NLS-1$ //$NON-NLS-2$
 					);
 				}
 				try {
@@ -148,17 +146,17 @@ public final class CustomUriDereferencer implements URIDereferencer {
 				}
 				catch (final ParserConfigurationException e1) {
 					throw new URIReferenceException(
-						"No se ha podido crear un XML a partir del contenido externo dereferenciado por error del analizador: " + e1, e1 //$NON-NLS-1$
+						"No se ha podido crear un XML a partir del contenido externo dereferenciado por error del analizador (" + e + "): " + e1, e1 //$NON-NLS-1$ //$NON-NLS-2$
 					);
 				}
 				catch (final SAXException e1) {
 					throw new URIReferenceException(
-						"No se ha podido crear un XML a partir del contenido externo dereferenciado por error SAX: " + e1, e1 //$NON-NLS-1$
+						"No se ha podido crear un XML a partir del contenido externo dereferenciado por error SAX (" + e + "): " + e1, e1 //$NON-NLS-1$ //$NON-NLS-2$
 					);
 				}
 				catch (final IOException e1) {
 					throw new URIReferenceException(
-						"No se ha podido crear un XML a partir del contenido externo dereferenciado: " + e1, e1 //$NON-NLS-1$
+						"No se ha podido crear un XML a partir del contenido externo dereferenciado (" + e + "): " + e1, e1 //$NON-NLS-1$ //$NON-NLS-2$
 					);
 				}
 			}
