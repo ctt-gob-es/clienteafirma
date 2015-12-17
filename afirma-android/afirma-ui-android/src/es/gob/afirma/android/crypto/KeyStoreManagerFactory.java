@@ -188,6 +188,7 @@ public final class KeyStoreManagerFactory {
 		}
 
 		// Si no encontramos el almacen anterior, accedemos al almacen del sistema
+		Log.i(ES_GOB_AFIRMA, "Estableciendo almacen del sistema"); //$NON-NLS-1$
 		ksfl.setKeyStore(new Android4KeyStoreManager(activity));
 	}
 
