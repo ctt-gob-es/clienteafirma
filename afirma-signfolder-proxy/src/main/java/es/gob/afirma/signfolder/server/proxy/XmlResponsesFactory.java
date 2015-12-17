@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
+import java.util.Map;
 
 import es.gob.afirma.core.misc.Base64;
 
@@ -44,14 +45,17 @@ final class XmlResponsesFactory {
 				.append("\" sigfrmt=\"").append(docReq.getSignatureFormat()) //$NON-NLS-1$
 				.append("\" mdalgo=\"").append(docReq.getMessageDigestAlgorithm()).append("\">") //$NON-NLS-1$ //$NON-NLS-2$
 				.append("<params>").append(docReq.getParams() != null ? docReq.getParams() : "").append("</params>") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-				.append("<result>") //$NON-NLS-1$
-				.append(docReq.getPartialResult().toXMLConfig())
-				.append("</result></doc>"); //$NON-NLS-1$
+				.append("<result>"); //$NON-NLS-1$
+				// Ahora mismo las firmas se envian de una en una, asi que usamos directamente la primera de ellas
+				final Map<String, String> triSign = docReq.getPartialResult().getTriSigns().get(0).getDict();
+				for (final String key : triSign.keySet().toArray(new String[triSign.size()])) {
+					sb.append("<p n=\"").append(key).append("\">").append(triSign.get(key)).append("</p>"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				}
+				sb.append("</result></doc>"); //$NON-NLS-1$
 			}
 			sb.append("</req>"); //$NON-NLS-1$
 		}
 		else {
-
 			String exceptionb64 = null;
 			final Throwable t = triphaseRequest.getThrowable();
 			if (t != null) {
@@ -121,9 +125,9 @@ final class XmlResponsesFactory {
 				if (doc.getSize() != null) {
 					sb.append("<sz>").append(doc.getSize()).append("</sz>"); //$NON-NLS-1$ //$NON-NLS-2$
 				}
-				sb.append("<mmtp>").append(doc.getMimeType()).append("</mmtp>"); //$NON-NLS-1$ //$NON-NLS-2$
-				sb.append("<sigfrmt>").append(doc.getSignFormat()).append("</sigfrmt>"); //$NON-NLS-1$ //$NON-NLS-2$
-				sb.append("<mdalgo>").append(doc.getMessageDigestAlgorithm()).append("</mdalgo>"); //$NON-NLS-1$ //$NON-NLS-2$
+				sb.append("<mmtp>").append(escapeXmlCharacters(doc.getMimeType())).append("</mmtp>"); //$NON-NLS-1$ //$NON-NLS-2$
+				sb.append("<sigfrmt>").append(escapeXmlCharacters(doc.getSignFormat())).append("</sigfrmt>"); //$NON-NLS-1$ //$NON-NLS-2$
+				sb.append("<mdalgo>").append(escapeXmlCharacters(doc.getMessageDigestAlgorithm())).append("</mdalgo>"); //$NON-NLS-1$ //$NON-NLS-2$
 				sb.append("<params>").append(doc.getParams() != null ? escapeXmlCharacters(doc.getParams()) : "").append("</params>"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				sb.append("</doc>"); //$NON-NLS-1$
 			}
@@ -252,6 +256,6 @@ final class XmlResponsesFactory {
 	 * @return Cadena con los caracteres escapados.
 	 */
 	private static String escapeXmlCharacters(final String text) {
-		return text == null ? null : text.replace("<", "&lt;").replace(">", "&gt;");  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		return text == null ? null : text.replace("<", "&_lt;").replace(">", "&_gt;");  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 	}
 }

@@ -3,7 +3,10 @@ package es.gob.afirma.signfolder.server.proxy;
 import java.io.IOException;
 import java.security.cert.CertificateException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -12,7 +15,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import es.gob.afirma.core.misc.Base64;
-import es.gob.afirma.signfolder.server.proxy.TriphaseSignDocumentRequest.TriphaseConfigDataBean;
+import es.gob.afirma.core.signers.TriphaseData;
 
 /** Analizador de XML para la generaci&oacute;n de objetos de tipo
  * {@link es.gob.afirma.signfolder.server.proxy.TriphaseRequestBean} a partir
@@ -61,11 +64,11 @@ final class SignRequestsParser {
 		final byte[] certEncoded;
 		try {
 			certEncoded = Base64.decode(requestNodes.item(nodeIndex).getTextContent().trim());
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			throw new IllegalArgumentException(
 					"No se ha podido obtener la codificacion del certificado a partir del XML: " + e); //$NON-NLS-1$
 		}
-		
+
 		nodeIndex = XmlUtils.nextNodeElementIndex(requestNodes, ++nodeIndex);
 		if (nodeIndex == -1 || !REQUESTS_LIST_NODE.equalsIgnoreCase(requestNodes.item(nodeIndex).getNodeName())) {
 			throw new IllegalArgumentException("La peticion de firma trifasica no contiene el nodo " + //$NON-NLS-1$
@@ -120,13 +123,13 @@ final class SignRequestsParser {
 
 			attributeNode = attributes.getNamedItem(STATUS_ATTRIBUTE);
 			// statusOk = true, salvo que la propiedad status tenga el valor "KO"
-			statusOk = (attributeNode == null || !"KO".equalsIgnoreCase(attributeNode.getNodeValue())); //$NON-NLS-1$
+			statusOk = attributeNode == null || !"KO".equalsIgnoreCase(attributeNode.getNodeValue()); //$NON-NLS-1$
 
 			// Si la peticion no se ha procesado correctamente se descarta
 			if (!statusOk) {
 				return new TriphaseRequest(ref, false, null);
 			}
-			
+
 			// Cargamos el listado de peticiones
 			final NodeList requestsNode = trisignRequestNode.getChildNodes();
 			for (int i = 0; i < requestsNode.getLength(); i++) {
@@ -154,10 +157,30 @@ final class SignRequestsParser {
 		private static final String MESSAGE_DIGEST_ALGORITHM_ATTRIBUTE = "mdalgo"; //$NON-NLS-1$
 		private static final String PARAMS_TRIPHASE_NODE = "params"; //$NON-NLS-1$
 		private static final String RESULT_TRIPHASE_RESULT_NODE = "result"; //$NON-NLS-1$
-		
-		/** Operacion criptograficapor defecto. */
-		private static final String DEFAULT_CRYPTO_OPERATION = "sign"; //$NON-NLS-1$
-		
+
+		/** Operacion criptografica de firma del Portafirmas. */
+		private static final String PORTAFIRMAS_CRYPTO_OPERATION_SIGN = "FIRMAR"; //$NON-NLS-1$
+		/** Operacion criptografica de cofirma del Portafirmas. */
+		private static final String PORTAFIRMAS_CRYPTO_OPERATION_COSIGN = "COFIRMAR"; //$NON-NLS-1$
+		/** Operacion criptografica de contrafirma del Portafirmas. */
+		private static final String PORTAFIRMAS_CRYPTO_OPERATION_COUNTERSIGN = "CONTRAFIRMAR"; //$NON-NLS-1$
+
+		/** Operacion criptografica de firma de Afirma. */
+		private static final String AFIRMA_CRYPTO_OPERATION_SIGN = "sign"; //$NON-NLS-1$
+		/** Operacion criptografica de cofirma de Afirma. */
+		private static final String AFIRMA_CRYPTO_OPERATION_COSIGN = "cosign"; //$NON-NLS-1$
+		/** Operacion criptografica de contrafirma de Afirma. */
+		private static final String AFIRMA_CRYPTO_OPERATION_COUNTERSIGN = "countersign"; //$NON-NLS-1$
+
+		/** Formato de firma PDF. */
+		private static final String SIGN_FORMAT_PDF = "PDF"; //$NON-NLS-1$
+		/** Formato de firma OOXML. */
+		private static final String SIGN_FORMAT_OOXML = "OOXML"; //$NON-NLS-1$
+		/** Formato de firma ODF. */
+		private static final String SIGN_FORMAT_ODF = "ODF"; //$NON-NLS-1$
+		/** Formato de firma autom&aacute;tico. */
+		private static final String SIGN_FORMAT_AUTO = "AUTO"; //$NON-NLS-1$
+
 		static TriphaseSignDocumentRequest parse(final Node trisignDocumentRequestNode) {
 
 			if (!DOCUMENT_REQUEST_NODE.equalsIgnoreCase(trisignDocumentRequestNode.getNodeName())) {
@@ -169,8 +192,8 @@ final class SignRequestsParser {
 			// Datos de la peticion
 			final String docId;
 			final String cryptoOperation;
-			final String signatureFormat;
 			final String messageDigestAlgorithm;
+			String signatureFormat;
 
 			// Cargamos los atributos
 			Node attributeNode = null;
@@ -182,10 +205,7 @@ final class SignRequestsParser {
 			}
 			docId = attributeNode.getNodeValue();
 
-			// Operacion criptografica (sign, cosign, countersign-leafs o countersigns-tree)
-			attributeNode = attributes.getNamedItem(CRYPTO_OPERATION_ATTRIBUTE);
-			cryptoOperation = attributeNode == null ? DEFAULT_CRYPTO_OPERATION : attributeNode.getNodeValue();
-			
+			// Formato de firma
 			attributeNode = attributes.getNamedItem(SIGNATURE_FORMAT_ATTRIBUTE);
 			if (attributeNode == null) {
 				throw new IllegalArgumentException("No se ha encontrado el atributo obligatorio '" + //$NON-NLS-1$
@@ -194,82 +214,120 @@ final class SignRequestsParser {
 			signatureFormat = attributeNode.getNodeValue();
 
 			attributeNode = attributes.getNamedItem(MESSAGE_DIGEST_ALGORITHM_ATTRIBUTE);
-			messageDigestAlgorithm = (attributeNode != null ? attributeNode.getNodeValue() : null);
+			messageDigestAlgorithm = attributeNode != null ? attributeNode.getNodeValue() : null;
 
-			String params = null;
 			final NodeList docNodeChilds = trisignDocumentRequestNode.getChildNodes();
 			if (docNodeChilds == null || docNodeChilds.getLength() == 0) {
 				return new TriphaseSignDocumentRequest(docId, signatureFormat, messageDigestAlgorithm, null);
 			}
-			
+
+			String params = null;
 			int nodeIndex = XmlUtils.nextNodeElementIndex(docNodeChilds, 0);
 			if (nodeIndex > -1 && PARAMS_TRIPHASE_NODE.equalsIgnoreCase(docNodeChilds.item(nodeIndex).getNodeName())) {
 				params = docNodeChilds.item(nodeIndex).getTextContent().trim();
 				nodeIndex = XmlUtils.nextNodeElementIndex(docNodeChilds, ++nodeIndex);
 			}
-			
+
 			// Resultado parcial
-			TriphaseConfigDataBean partialResult = null;
+			TriphaseData partialResult = null;
 			if (nodeIndex > -1 && RESULT_TRIPHASE_RESULT_NODE.equalsIgnoreCase(docNodeChilds.item(nodeIndex).getNodeName())) {
 				try {
-					partialResult = TriphaseConfigDataParser.parse(docNodeChilds.item(nodeIndex).getChildNodes());
-				} catch (Exception e) {
+					partialResult = TriphaseConfigDataParser.parse(docNodeChilds.item(nodeIndex).getChildNodes(), docId);
+				} catch (final Exception e) {
 					throw new IllegalArgumentException("El resultado parcial no esta correctamente codificado en base64 URL SAFE"); //$NON-NLS-1$
 				}
 			}
 
+			// La operacion criptografica (sign, cosign, countersign-leafs o countersigns-tree)
+			// se siempre 'sign' cuando se declare el formato PDF/PAdES, OOXML o ODF (Logica
+			// heredada del Portafirmas web).
+			// Si no, se tomara del atributo correspondiente
+			if (signatureFormat.equals(SIGN_FORMAT_PDF) ||
+				signatureFormat.equals(SIGN_FORMAT_OOXML) ||
+				signatureFormat.equals(SIGN_FORMAT_ODF)) {
+					cryptoOperation = PORTAFIRMAS_CRYPTO_OPERATION_SIGN;
+
+				if (signatureFormat.equals(SIGN_FORMAT_PDF)) {
+					// Configuramos la politica de firma de la AGE v1.9 para PAdES
+					params = params == null ? "\n" : params + "\n"; //$NON-NLS-1$ //$NON-NLS-2$
+					params += "signatureSubFilter=ETSI.CAdES.detached" + //$NON-NLS-1$
+							"\npolicyIdentifier=2.16.724.1.3.1.1.2.1.9" + //$NON-NLS-1$
+							"\npolicyIdentifierHash=G7roucf600+f03r/o0bAOQ6WAs0=" + //$NON-NLS-1$
+							"\npolicyIdentifierHashAlgorithm=1.3.14.3.2.26" + //$NON-NLS-1$
+							"\npolicyQualifier=https://sede.060.gob.es/politica_de_firma_anexo_1.pdf"; //$NON-NLS-1$
+				}
+			}
+			else {
+				attributeNode = attributes.getNamedItem(CRYPTO_OPERATION_ATTRIBUTE);
+				cryptoOperation = attributeNode == null ?
+						PORTAFIRMAS_CRYPTO_OPERATION_SIGN : attributeNode.getNodeValue();
+			}
+
+			// Si se indico que la operacion es cofirma o contrafirma, se cambia el formato por AUTO (Logica
+			// heredada del Portafirmas web).
+			if (PORTAFIRMAS_CRYPTO_OPERATION_COSIGN.equals(cryptoOperation)) {
+				signatureFormat = SIGN_FORMAT_AUTO;
+			} else if (PORTAFIRMAS_CRYPTO_OPERATION_COUNTERSIGN.equals(cryptoOperation)) {
+				signatureFormat = SIGN_FORMAT_AUTO;
+				params = params == null ? "\n" : params + "\n"; //$NON-NLS-1$ //$NON-NLS-2$
+				params += "target=leafs"; //$NON-NLS-1$
+			}
+
 			return new TriphaseSignDocumentRequest(
-					docId, cryptoOperation, signatureFormat,
+					docId, normalizeOperationType(cryptoOperation), signatureFormat,
 					messageDigestAlgorithm, params, null,
 					partialResult);
 		}
+
+		/**
+		 * Normalizamos el nombre del tipo de operaci&oacute;n criptogr&aacute;fica..
+		 * @param operationType Tipo de operaci&oacute;n.
+		 * @return Nombre del tipo de operaci&oacute;n normalizado o el mismo de entrada
+		 * si no se ha encontrado correspondencia.
+		 */
+		private static String normalizeOperationType(final String operationType) {
+			String normalizedOp = operationType;
+			if (PORTAFIRMAS_CRYPTO_OPERATION_SIGN.equalsIgnoreCase(normalizedOp)) {
+				normalizedOp = AFIRMA_CRYPTO_OPERATION_SIGN;
+			} else if (PORTAFIRMAS_CRYPTO_OPERATION_COSIGN.equalsIgnoreCase(normalizedOp)) {
+				normalizedOp = AFIRMA_CRYPTO_OPERATION_COSIGN;
+			} else if (PORTAFIRMAS_CRYPTO_OPERATION_COUNTERSIGN.equalsIgnoreCase(normalizedOp)) {
+				normalizedOp = AFIRMA_CRYPTO_OPERATION_COUNTERSIGN;
+			}
+
+			return normalizedOp;
+		}
 	}
-	
+
 	/**
 	 * Analizador XML de los datos de sesi&oacute;n de una firma trif&aacute;sica en particular.
 	 */
 	private static class TriphaseConfigDataParser {
-		
-		private static final String ATTRIBUTE_KEY = "k"; //$NON-NLS-1$
-		private static final String VALUE_SIGN_COUNT = "sc"; //$NON-NLS-1$
-		private static final String VALUE_NEED_PRE = "np"; //$NON-NLS-1$
-		private static final String VALUE_NEED_DATA = "nd"; //$NON-NLS-1$
-		private static final String VALUE_SESSION_PREFIX = "ss."; //$NON-NLS-1$
-		private static final String VALUE_PK1_PREFIX = "pk1."; //$NON-NLS-1$
-		private static final String VALUE_PRE_PREFIX = "pre."; //$NON-NLS-1$
-		
-		static TriphaseConfigDataBean parse (final NodeList params) {
 
-			final TriphaseConfigDataBean config = new TriphaseConfigDataBean();
+		private static final String ATTRIBUTE_KEY = "n"; //$NON-NLS-1$
+
+		static TriphaseData parse (final NodeList params, final String id) {
+
+			final Map<String, String> config = new HashMap<String, String>();
 			try {
-				
 				int numIndex = 0;
 				while ((numIndex = XmlUtils.nextNodeElementIndex(params, numIndex)) > -1) {
 					final Element param = (Element) params.item(numIndex);
-					String key = param.getAttribute(ATTRIBUTE_KEY);
+					final String key = param.getAttribute(ATTRIBUTE_KEY);
 					if (key == null) {
 						throw new IllegalArgumentException("Se ha indicado un parametro de firma trifasica sin clave"); //$NON-NLS-1$
 					}
-					if (VALUE_SIGN_COUNT.equalsIgnoreCase(key)) {
-						config.setSignCount(Integer.valueOf(param.getTextContent().trim()));
-					} else if (VALUE_NEED_PRE.equalsIgnoreCase(key)) {
-						config.setNeedPreSign(Boolean.valueOf(param.getTextContent().trim()));
-					} else if (VALUE_NEED_DATA.equalsIgnoreCase(key)) {
-						config.setNeedData(Boolean.valueOf(param.getTextContent().trim()));
-					} else if (key.startsWith(VALUE_SESSION_PREFIX)) {
-						config.addSession(param.getTextContent().trim());
-					} else if (key.startsWith(VALUE_PK1_PREFIX)) {
-						config.addPk1(param.getTextContent().trim());
-					} else if (key.startsWith(VALUE_PRE_PREFIX)) {
-						config.addPreSign(param.getTextContent().trim());
-					}
+
+					System.out.println("Datos enviados al servicio: " + key + "=" + param.getTextContent().trim());
+
+					config.put(key, param.getTextContent().trim());
 					numIndex++;
 				}
 			} catch (final Exception e) {
 				throw new IllegalArgumentException("Se ha encontrado datos de sesion mal formados", e); //$NON-NLS-1$
 			}
 
-			return config;
+			return new TriphaseData(Arrays.asList(new TriphaseData.TriSign(config, id)));
 		}
 	}
 }

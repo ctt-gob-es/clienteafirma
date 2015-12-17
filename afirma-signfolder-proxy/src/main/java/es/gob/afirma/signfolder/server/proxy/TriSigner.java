@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.logging.Logger;
 
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -24,8 +23,8 @@ import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.http.UrlHttpManagerFactory;
 import es.gob.afirma.core.signers.AOSignConstants;
+import es.gob.afirma.core.signers.TriphaseData;
 import es.gob.afirma.core.signers.TriphaseData.TriSign;
-import es.gob.afirma.signfolder.server.proxy.TriphaseSignDocumentRequest.TriphaseConfigDataBean;
 
 /**
  * Manejador para el uso est&aacute;tico de las operaciones de prefirma y postfirma.
@@ -59,6 +58,11 @@ public class TriSigner {
 	/** Indicador de finalizaci&oacute;n correcta de proceso. */
 	private static final String SUCCESS = "OK"; //$NON-NLS-1$
 
+	/** Codificaci&oacute;n de texto por defecto. */
+	private static final String DEFAULT_ENCODING = "utf-8"; //$NON-NLS-1$
+
+	/** Manejador del log. */
+	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	/**
 	 * Prefirma el documento de una petici&oacute;n y muta la propia peticion para almacenar en ella
@@ -130,19 +134,25 @@ public class TriSigner {
 			append(PARAMETER_NAME_CERT).append(HTTP_EQUALS).append(Base64.encode(signerCert.getEncoded(), true));
 
 			if (docReq.getParams() != null && docReq.getParams().length() > 0) {
-				urlBuffer.append(HTTP_AND).append(PARAMETER_NAME_EXTRA_PARAM).append(HTTP_EQUALS).append(docReq.getParams());
+				urlBuffer.append(HTTP_AND).append(PARAMETER_NAME_EXTRA_PARAM).append(HTTP_EQUALS)
+				.append(Base64.encode(docReq.getParams().getBytes(DEFAULT_ENCODING), true));
 			}
 
 			// Datos de sesion en forma de properies codificado en Base64 URL SAFE
-			final String sessionData = docReq.getPartialResult().toPropertiesBase64();
-			if (sessionData != null) {
+
+			if (docReq.getPartialResult() != null) {
+				final String sessionData = docReq.getPartialResult().toString();
 				urlBuffer.append(HTTP_AND).append(PARAMETER_NAME_SESSION_DATA).append(HTTP_EQUALS)
-				.append(sessionData);
+				.append(Base64.encode(sessionData.getBytes(DEFAULT_ENCODING), true));
 			}
 
-			if (docReq.getPartialResult().isNeedData() != null && docReq.getPartialResult().isNeedData().booleanValue()) {
-				urlBuffer.append(HTTP_AND).append(PARAMETER_NAME_DOCID).append(HTTP_EQUALS).append(docReq.getContent());
+			final String content = docReq.getContent();
+			if (content != null) {
+				urlBuffer.append(HTTP_AND).append(PARAMETER_NAME_DOCID).append(HTTP_EQUALS).append(content);
 			}
+
+			System.out.println("Llamada al servicio de firma: " + urlBuffer.toString());
+
 
 			triSignFinalResult = UrlHttpManagerFactory.getInstalledManager().readUrlByPost(urlBuffer.toString());
 			urlBuffer.setLength(0);
@@ -165,7 +175,7 @@ public class TriSigner {
 			docReq.setResult(Base64.decode(stringTrimmedResult.replace(SUCCESS + " NEWID=", ""), true)); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		catch (final IOException e) {
-			Logger.getLogger("es.gob.afirma").warning("El resultado de NEWID del servidor no estaba en Base64: " + e); //$NON-NLS-1$ //$NON-NLS-2$
+			LOGGER.warning("El resultado de NEWID del servidor no estaba en Base64: " + e); //$NON-NLS-1$
 			throw new AOException("El resultado devuelto por el servidor no es correcto", e); //$NON-NLS-1$
 		}
 	}
@@ -197,31 +207,14 @@ public class TriSigner {
 		return normalizeFormat;
 	}
 
-	private static TriphaseConfigDataBean parseTriphaseResult(final byte[] triphaseResult) throws IOException {
+	private static TriphaseData parseTriphaseResult(final byte[] triphaseResult) throws IOException {
 
-		final TriphaseConfigDataBean triphaseConfig;
 
-		final byte[] triphaseResponse = Base64.decode(triphaseResult, 0, triphaseResult.length, true);
+		//final byte[] triphaseResponse = Base64.decode(triphaseResult, 0, triphaseResult.length, true);
 
 		// Comprobamos si la respuesta es de tipo proporties o XML (las 2 variantes que ha sufrido el firmador trifásico)
-		if (isXML(triphaseResponse)) {
-			triphaseConfig = loadTriphaseResponseAsXML(triphaseResponse);
-		}
-		else {
-			triphaseConfig = loadTriphaseResponseAsProperties(triphaseResponse);
-		}
-
-		return triphaseConfig;
-	}
-
-	private static boolean isXML(final byte[] triphaseResponse) {
-		try {
-			DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new ByteArrayInputStream(triphaseResponse));
-		}
-		catch (final Exception e) {
-			return false;
-		}
-		return true;
+		LOGGER.info("Respuesta de prefirma del servicio de firma:\n" + new String(triphaseResult)); //$NON-NLS-1$
+		return loadTriphaseResponse(triphaseResult);
 	}
 
 	/** Obtiene una sesi&oacute;n de firma trif&aacute;sica a partir de un XML que lo describe.
@@ -239,20 +232,20 @@ public class TriSigner {
 	 * &lt;/xml&gt;
 	 * </pre>
 	 * @param triphaseResponse Texto XML con la informaci&oacute;n del mensaje.
-	 * @return Objeto con la informaci&oacute;n trif&aacute;sica de firma.
+	 * @return Listado con el resultado de datos de la prefirma de cada uno de los documentos.
 	 * @throws IOException Cuando hay problemas en el tratamiento de datos. */
-	private static TriphaseConfigDataBean loadTriphaseResponseAsXML(final byte[] triphaseResponse) throws IOException {
+	private static TriphaseData loadTriphaseResponse(final byte[] triphaseResponse) throws IOException {
 		if (triphaseResponse == null) {
 			throw new IllegalArgumentException("El XML de entrada no puede ser nulo"); //$NON-NLS-1$
 		}
 
-		final InputStream is = new ByteArrayInputStream(triphaseResponse);
+		final InputStream is = new ByteArrayInputStream(Base64.decode(triphaseResponse, 0, triphaseResponse.length, true));
 		Document doc;
 		try {
 			doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(is);
 		}
 		catch (final Exception e) {
-			Logger.getLogger("es.gob.afirma").severe("Error al cargar la respuesta XML: " + e + "\n" + new String(triphaseResponse)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			LOGGER.severe("Error al cargar la respuesta XML: " + e + "\n" + new String(triphaseResponse)); //$NON-NLS-1$ //$NON-NLS-2$
 			throw new IOException("Error al cargar la respuesta XML: " + e, e); //$NON-NLS-1$
 		}
 		is.close();
@@ -265,57 +258,13 @@ public class TriSigner {
 			throw new IllegalArgumentException("No se encontro el nodo 'firmas' en el XML proporcionado"); //$NON-NLS-1$
 		}
 
-		final List<TriSign> signsNodes = parseSignsNode(childNodes.item(idx));
-
-		final TriphaseConfigDataBean triphaseData = new TriphaseConfigDataBean();
-
-		// Guardamos el numero de firmas
-		triphaseData.setSignCount(Integer.valueOf(signsNodes.size()));
-
-		//TODO: Por limitacion del sistema anterior, el parametro needData afectada a todas las firmas.
-		// Obtenemos el valor del parametro needData de la primera firma y lo aplicacion a todas ellas.
-		final String needData = signsNodes.get(0).getProperty("NEED_DATA"); //$NON-NLS-1$
-		if (needData != null) {
-			try {
-				triphaseData.setNeedData(Boolean.valueOf(needData));
-			}
-			catch (final Exception e) {
-				triphaseData.setNeedData(Boolean.TRUE);
-			}
-		}
-
-		//TODO: Por limitacion del sistema anterior, el parametro needPre afectada a todas las firmas.
-		// Obtenemos el valor del parametro needPre de la primera firma y lo aplicacion a todas ellas.
-		final String needPre = signsNodes.get(0).getProperty("NEED_PRE"); //$NON-NLS-1$
-		if (needPre != null) {
-			try {
-				triphaseData.setNeedPreSign(Boolean.valueOf(needPre));
-			}
-			catch (final Exception e) {
-				triphaseData.setNeedPreSign(Boolean.TRUE);
-			}
-		}
-
-		// Leemos los parametros esenciales de cada firma
-		for (final TriSign triSign : signsNodes) {
-			if (triSign.getProperty("PK1") != null) { //$NON-NLS-1$
-				triphaseData.addPk1(triSign.getProperty("PK1")); //$NON-NLS-1$
-			}
-			if (triSign.getProperty("PRE") != null) { //$NON-NLS-1$
-				triphaseData.addPreSign(triSign.getProperty("PRE")); //$NON-NLS-1$
-			}
-			if (triSign.getProperty("SESSION") != null) { //$NON-NLS-1$
-				triphaseData.addSession(triSign.getProperty("SESSION")); //$NON-NLS-1$
-			}
-		}
-
-		return triphaseData;
+		return parseSignsNode(childNodes.item(idx));
 	}
 
 	/** Analiza el nodo con el listado de firmas.
 	 * @param signsNode Nodo con el listado de firmas.
 	 * @return Listado con la informaci&oacute;n de cada operaci&oacute;n de firma. */
-	private static List<TriSign> parseSignsNode(final Node signsNode) {
+	private static TriphaseData parseSignsNode(final Node signsNode) {
 
 		final NodeList childNodes = signsNode.getChildNodes();
 
@@ -342,7 +291,7 @@ public class TriSigner {
 			idx = nextNodeElementIndex(childNodes, idx + 1);
 		}
 
-		return signs;
+		return new TriphaseData(signs);
 	}
 
 	/** Obtiene una lista de par&aacute;metros del XML.
@@ -383,41 +332,5 @@ public class TriSigner {
 			i++;
 		}
 		return -1;
-	}
-
-	private static TriphaseConfigDataBean loadTriphaseResponseAsProperties(final byte[] triphaseResponse) throws IOException {
-
-		final TriphaseConfigDataBean triphaseConfig = new TriphaseConfigDataBean();
-
-		final Properties resultProperties = new Properties();
-
-		resultProperties.load(new ByteArrayInputStream(triphaseResponse));
-
-		int sc = 1;
-		if (resultProperties.containsKey("SIGN_COUNT")) { //$NON-NLS-1$
-			sc = Integer.parseInt(resultProperties.getProperty("SIGN_COUNT")); //$NON-NLS-1$
-			triphaseConfig.setSignCount(new Integer(sc));
-		}
-		if (resultProperties.containsKey("NEED_PRE")) { //$NON-NLS-1$
-			triphaseConfig.setNeedPreSign(Boolean.valueOf(resultProperties.getProperty("NEED_PRE"))); //$NON-NLS-1$
-		}
-		if (resultProperties.containsKey("NEED_DATA")) { //$NON-NLS-1$
-			triphaseConfig.setNeedData(Boolean.valueOf(resultProperties.getProperty("NEED_DATA"))); //$NON-NLS-1$
-		}
-		for (int i = 0; i < sc; i++) {
-			triphaseConfig.addSession(resultProperties.containsKey("SESSION." + i) ?  //$NON-NLS-1$
-					Base64.encode(resultProperties.getProperty("SESSION." + i).getBytes()) :  //$NON-NLS-1$
-						null);
-
-			if (resultProperties.containsKey("PRE." + i)) { //$NON-NLS-1$
-				triphaseConfig.addPreSign(resultProperties.getProperty("PRE." + i)); //$NON-NLS-1$
-			}
-
-			if (resultProperties.containsKey("PK1." + i)) { //$NON-NLS-1$
-				triphaseConfig.addPk1(resultProperties.getProperty("PK1." + i)); //$NON-NLS-1$
-			}
-		}
-
-		return triphaseConfig;
 	}
 }

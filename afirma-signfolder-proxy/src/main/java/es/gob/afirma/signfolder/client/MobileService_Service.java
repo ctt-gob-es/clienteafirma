@@ -1,8 +1,10 @@
 
 package es.gob.afirma.signfolder.client;
 
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Properties;
 import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
@@ -18,7 +20,7 @@ import javax.xml.ws.WebServiceFeature;
  * Generated source version: 2.1
  *
  */
-@WebServiceClient(name = "MobileService", targetNamespace = "urn:juntadeandalucia:cice:pfirma:mobile:v2.0", wsdlLocation = "http://portafirma.seap.minhap.es/portafirma/servicesv2/MobileService?wsdl")
+@WebServiceClient(name = "MobileService", targetNamespace = "urn:juntadeandalucia:cice:pfirma:mobile:v2.0", wsdlLocation = "https://pf.seap.minhap.es/pf/servicesv2/MobileService?wsdl")
 public class MobileService_Service
     extends Service
 {
@@ -26,14 +28,30 @@ public class MobileService_Service
     private final static URL MOBILESERVICE_WSDL_LOCATION;
     private final static Logger logger = Logger.getLogger(es.gob.afirma.signfolder.client.MobileService_Service.class.getName());
 
+    private static final String CONFIG_FILE = "config.properties"; //$NON-NLS-1$
+    private static final String PROPERTY_WSDL_URL = "signfolder.ws.url"; //$NON-NLS-1$
+
     static {
+
+    	String wsdlPath = "/MobileService.wsdl"; //$NON-NLS-1$
+    	try {
+			final Properties config = new Properties();
+    		final InputStream configIs = MobileService_Service.class.getClassLoader().getResourceAsStream(CONFIG_FILE);
+			config.load(configIs);
+			configIs.close();
+
+			wsdlPath = config.getProperty(PROPERTY_WSDL_URL);
+		} catch (final Exception e) {
+			throw new RuntimeException("No se ha podido cargar el fichero de configuracion del servicio: " + CONFIG_FILE); //$NON-NLS-1$
+		}
+
         URL url = null;
         try {
             URL baseUrl;
             baseUrl = es.gob.afirma.signfolder.client.MobileService_Service.class.getResource(".");
-            url = new URL(baseUrl, "http://portafirma.seap.minhap.es/portafirma/servicesv2/MobileService?wsdl");
+            url = new URL(baseUrl, wsdlPath);
         } catch (final MalformedURLException e) {
-            logger.warning("Failed to create URL for the wsdl Location: 'http://portafirma.seap.minhap.es/portafirma/servicesv2/MobileService?wsdl', retrying as a local file");
+            logger.warning("Failed to create URL for the wsdl Location: '" + url + "', retrying as a local file");
             logger.warning(e.getMessage());
         }
         MOBILESERVICE_WSDL_LOCATION = url;

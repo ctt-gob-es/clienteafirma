@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import es.gob.afirma.core.misc.Base64;
+import es.gob.afirma.core.signers.TriphaseData;
 
 
 /** Datos temporales de un documento para su firma en tres fases
@@ -40,7 +41,7 @@ public final class TriphaseSignDocumentRequest {
 	private String content;
 
 	/** Atributos de configuracion trifasica de la firma. */
-	private TriphaseConfigDataBean partialResult;
+	private TriphaseData partialResult;
 
 	/** Algoritmo de firma. */
 	private final String algorithm;
@@ -72,7 +73,7 @@ public final class TriphaseSignDocumentRequest {
 			                    final String messageDigestAlgorithm,
 			                    final String params,
 			                    final String contentB64,
-			                    final TriphaseConfigDataBean partialResult) {
+			                    final TriphaseData partialResult) {
 		this.id = docId;
 		this.cryptoOperation = cryptoOperation == null ? DEFAULT_CRYPTO_OPERATION : cryptoOperation;
 		this.signatureFormat = signatureFormat;
@@ -144,13 +145,13 @@ public final class TriphaseSignDocumentRequest {
 	/** Recupera la configuraci&oacute;n del resultado parcial obtenido en la fase actual de la firma.
 	 * @return Datos actuales de la firma (que dependen de la fase en la que est&eacute;)
 	 * o {@code null} si aun no se ha iniciado el proceso y por lo tanto todav&iacute;a no hay ning&uacute;n resultado. */
-	public TriphaseConfigDataBean getPartialResult() {
+	public TriphaseData getPartialResult() {
 		return this.partialResult;
 	}
 
 	/** Establece el resultado parcial de la firma en tres fases.
 	 * @param result Resultado parcial de la firma en tres fases (su significado depende de la fase actual de firma) */
-	public void setPartialResult(final TriphaseConfigDataBean result) {
+	public void setPartialResult(final TriphaseData result) {
 		this.partialResult = result;
 	}
 
@@ -301,6 +302,7 @@ public final class TriphaseSignDocumentRequest {
 		 * @return XML de configuraci&oacute;n.
 		 */
 		public String toXMLConfig() {
+
 			final StringBuilder builder = new StringBuilder();
 			if (this.signCount != null)
 			builder.append(NODE_PART_1).append("sc").append(NODE_PART_2).append(this.signCount.intValue()).append(NODE_PART_3); //$NON-NLS-1$
@@ -337,13 +339,91 @@ public final class TriphaseSignDocumentRequest {
 		}
 
 		/**
-		 * Devuelve la cadena Base 64 URL SAFE resultado de codificar la cadena que representa los datos
-		 * de la configuraci&oacute;n del objeto representados como un Properties.
+		 * Devuelve la cadena Base 64 URL SAFE resultado de codificar los datos de sesion de firma
+		 * a modo de Properties.
 		 * @return Cadena Base 64 URL SAFE.
 		 * @throws IOException  Cuando los datos de sesi&oacute;n no estaban correctamente codificados.
 		 */
 		public String toPropertiesBase64() throws IOException {
 			final StringBuilder builder = new StringBuilder();
+			if (this.signCount != null) {
+				builder.append("SIGN_COUNT=").append(this.signCount.intValue()).append("\n"); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+			if (this.needPreSign != null) {
+				builder.append("NEED_DATA=").append(this.needData.booleanValue()).append("\n"); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+
+			if (this.needPreSign != null) {
+				if (this.needPreSign.booleanValue() && this.preSigns != null) {
+					builder.append("NEED_PRE=").append(this.needPreSign.booleanValue()).append("\n"); //$NON-NLS-1$ //$NON-NLS-2$
+					for (int i = 0; i < this.preSigns.size(); i++) {
+						builder.append("PRE.").append(i).append("=").append(this.preSigns.get(i)).append("\n"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+					}
+				}
+			}
+			if (this.sessions != null) {
+				try {
+					for (int i = 0; i < this.sessions.size(); i++) {
+						builder.append("SESSION.").append(i).append("=").append(new String(Base64.decode(this.sessions.get(i)))).append("\n"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+					}
+				} catch (final IOException e) {
+					throw new IOException("Error en la codificacion de los datos de sesion", e); //$NON-NLS-1$
+				}
+			}
+			if (this.pk1s != null) {
+				for (int i = 0; i < this.pk1s.size(); i++) {
+					builder.append("PK1.").append(i).append("=").append(this.pk1s.get(i)).append("\n"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				}
+			}
+
+			try {
+				return Base64.encode(builder.toString().getBytes(), true);
+			} catch (final Exception e) {
+				// Este caso nunca se dara
+				return null;
+			}
+
+		}
+
+		/**
+		 * Devuelve la cadena Base 64 URL SAFE resultado de codificar la cadena que representa los datos
+		 * de la configuraci&oacute;n del objeto representados como un Properties.
+		 * @return Cadena Base 64 URL SAFE.
+		 * @throws IOException  Cuando los datos de sesi&oacute;n no estaban correctamente codificados.
+		 */
+		public String toXMLBase64() throws IOException {
+
+
+
+
+//			<xml>
+//			 <firmas>
+//			  <firma Id="ca0831a4-75cb-4565-a987-7e4360a79c4d">
+//			   <param n="NEED_PRE">true</param>
+//			   <param n="TIME">1450084976458</param>
+//			   <param n="PRE">MYICGDAYBgkqhkiG9w0BCQMxCwYJKoZIhvcNAQcBME8GCSqGSIb3DQEJBDFCBEAqMU/8p1J6di92xTgFfHJfIegzwX4vJBrX+zgkMH8ix3LcJH+20vsy6KS68mxF+7ptvJ9fCpED+M5MPjYc/LjBMIIBqQYLKoZIhvcNAQkQAi8xggGYMIIBlDCCAZAwggGMMA0GCWCGSAFlAwQCAwUABEBS3pv8h303FIUMZ5H1WSrrrnfXklrnFQir6KwirhOFZy/sdyOa4ibFdwdebh+yP4WtMpKF1Eo+77TbTQQg+o/cMIIBNzCCASmkggElMIIBITELMAkGA1UEBhMCRVMxEjAQBgNVBAgMCUJhcmNlbG9uYTFYMFYGA1UEBwxPQmFyY2Vsb25hIChzZWUgY3VycmVudCBhZGRyZXNzIGF0IGh0dHA6Ly93d3cuYW5mLmVzL2VzL2FkZHJlc3MtZGlyZWNjaW9uLmh0bWwgKTEnMCUGA1UECgweQU5GIEF1dG9yaWRhZCBkZSBDZXJ0aWZpY2FjaW9uMS4wLAYDVQQLDCVBTkYgQXV0b3JpZGFkIEludGVybWVkaWEgZGUgSWRlbnRpZGFkMRowGAYJKoZIhvcNAQkBFgtpbmZvQGFuZi5lczESMBAGA1UEBRMJRzYzMjg3NTEwMRswGQYDVQQDDBJBTkYgQXNzdXJlZCBJRCBDQTECCAIr7Y/Cv8NA</param>
+//			   <param n="PID">Wzw1MzIxNWZiNzQ1ODQzYWUxZGNkYTY5ZjA5NDIwNjQ5ZT48MDlkNDI3NzFhYTMwYjEyNWU3NDBiMzBlOWQwNDA4Mzc+XQ==</param>
+//			   <param n="PK1">on0c7fJZPYSfUsSl/UT70VNAwH8QBVoYQp2BsgwRlF9nfGsFWmeAkDcnwKj496iB3Owf4cHIfkYjKyTFi2hILIXdxGhKTccmdGjZzIh9DyZVq82YX9RJEQ1kQcEckF0R43aLcCeOTDY1Yy8eTCrFykKKXs5yT/QPs8Wbk4xTy0zLZF7mqxX7CNyh0yT2QxUaQMUG6bQXlUK+FqJiT7cxRT7h+0RafoZgZ1gQaeItFEJu3SMDC79uyyzaQKqDDy4ATEnOgE+SADWrxFORGBNjPQ2lqtYkjaWQj+aXZ9voXzcMz+I6DJjC9P9hHZ71KQa3O0kLjFyjbnF4qKICj9JT5g==</param>
+//			  </firma>
+//			 </firmas>
+//			</xml>
+
+			final StringBuilder builder = new StringBuilder();
+//			builder.append("<xml><firmas>");
+//			for (int i = 0; i < (this.preSigns == null ? 0 : this.preSigns.size()); i++) {
+//				builder.append("<firma Id='").append(i).append("'>");
+//				if (this.needData != null) {
+//					builder.append("<param n='").append("NEED_DATA").append("'>").append(this.needData.booleanValue()).append("</param>");
+//				}
+//				if (this.needPreSign != null) {
+//					builder.append("<param n='").append("NEED_PRE").append("'>").append(this.needPreSign.booleanValue()).append("</param>");
+//				}
+//				builder.append("<param n='").append("PRE").append("'>").append(this.getPreSign(i)).append("</param>")
+//				.append("<param n='").append("PK1").append("'>").append(this.getPk1(i)).append("</param>")
+//				.append("</firma>");
+//			}
+//			builder.append("</firmas></xml>");
+
 			if (this.signCount != null) {
 				builder.append("SIGN_COUNT=").append(this.signCount.intValue()).append("\n"); //$NON-NLS-1$ //$NON-NLS-2$
 			}

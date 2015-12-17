@@ -6,7 +6,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -14,11 +13,9 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 import java.util.logging.Level;
-import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 import javax.activation.DataHandler;
-import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -32,9 +29,9 @@ import javax.xml.ws.soap.SOAPFaultException;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
-import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
+import es.gob.afirma.core.signers.TriphaseData;
 import es.gob.afirma.signfolder.client.MobileApplication;
 import es.gob.afirma.signfolder.client.MobileApplicationList;
 import es.gob.afirma.signfolder.client.MobileDocSignInfo;
@@ -53,7 +50,6 @@ import es.gob.afirma.signfolder.client.MobileStringList;
 
 /** Servicio Web para firma trif&aacute;sica.
  * @author Tom&aacute;s Garc&iacute;a-;er&aacute;s */
-@WebServlet(urlPatterns = { "/ProxyService" }, description = "Proxy del portafirmas")
 public final class ProxyService extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
@@ -84,6 +80,10 @@ public final class ProxyService extends HttpServlet {
 	private static final String CRYPTO_OPERATION_TYPE_COSIGN = "cosign"; //$NON-NLS-1$
 	private static final String CRYPTO_OPERATION_TYPE_COUNTERSIGN = "countersign"; //$NON-NLS-1$
 
+	private static final String JAVA_HTTP_PORT_VARIABLE = "tomcat.httpport"; //$NON-NLS-1$
+	private static final String TOMCAT_HTTP_PORT_VARIABLE = "${" + JAVA_HTTP_PORT_VARIABLE + "}"; //$NON-NLS-1$ //$NON-NLS-2$
+
+
 	private static final String DATE_TIME_FORMAT = "dd/MM/yyyy  HH:mm"; //$NON-NLS-1$
 
 	/** Tama&ntilde;o de la p&aacute;gina de resultados. */
@@ -95,23 +95,24 @@ public final class ProxyService extends HttpServlet {
 
 	private final Properties config;
 
+	private String signatureServiceUrl = null;
+
 	static {
-		final InputStream is = ProxyService.class.getResourceAsStream("/log.properties"); //$NON-NLS-1$
-		try {
-			LogManager.getLogManager().readConfiguration(is);
-		} catch (final Exception e) {
-			Logger.getLogger("es.gob.afirma").log(Level.WARNING, "Error al cargar el fichero de configuracion del log", e); //$NON-NLS-1$ //$NON-NLS-2$
-		} finally {
-			if (is != null) {
-				try { is.close(); } catch (final IOException e) {
-					Logger.getLogger("es.gob.afirma").log(Level.WARNING, "No se pudo cerrar el fichero de configuracion del log", e); //$NON-NLS-1$ //$NON-NLS-2$
-				}
-			}
-		}
+//		final InputStream is = ProxyService.class.getResourceAsStream("/log.properties"); //$NON-NLS-1$
+//		try {
+//			LogManager.getLogManager().readConfiguration(is);
+//		} catch (final Exception e) {
+//			Logger.getLogger("es.gob.afirma").log(Level.WARNING, "Error al cargar el fichero de configuracion del log", e); //$NON-NLS-1$ //$NON-NLS-2$
+//		} finally {
+//			if (is != null) {
+//				try { is.close(); } catch (final IOException e) {
+//					Logger.getLogger("es.gob.afirma").log(Level.WARNING, "No se pudo cerrar el fichero de configuracion del log", e); //$NON-NLS-1$ //$NON-NLS-2$
+//				}
+//			}
+//		}
+//		LOGGER.info("LoggerManager cargado"); //$NON-NLS-1$
 
 		LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
-
-		LOGGER.info("LoggerManager cargado"); //$NON-NLS-1$
 	}
 
 
@@ -119,6 +120,8 @@ public final class ProxyService extends HttpServlet {
 	 * @throws ParserConfigurationException Cuando no puede crearse un <code>DocumentBuilder</code> XML */
 	public ProxyService() throws ParserConfigurationException {
 		this.documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+
+		LOGGER.info("Cargamos el fichero de configuracion del Proxy: " + CONFIG_FILE); //$NON-NLS-1$
 
 		final InputStream configIs = ProxyService.class.getClassLoader().getResourceAsStream(CONFIG_FILE);
 		if (configIs == null) {
@@ -139,13 +142,19 @@ public final class ProxyService extends HttpServlet {
 			// No hacemos nada
 		}
 
+		LOGGER.info("Las propiedades cargadas del fichero de configuracion son:"); //$NON-NLS-1$
+		for (final String key : this.config.keySet().toArray(new String[this.config.size()])) {
+			LOGGER.info(key + ": " + this.config.getProperty(key)); //$NON-NLS-1$
+		}
+		LOGGER.info("---"); //$NON-NLS-1$
+
 		// Si esta configurada la variable SIGNATURE_SERVICE_URL en el sistema, se utiliza en lugar de propiedad
 		// interna de la aplicacion
 		try {
 			final String systemSignatureServiceUrl = System.getProperty(SIGNATURE_SERVICE_URL);
 			if (systemSignatureServiceUrl != null) {
 				this.config.setProperty(KEY_SIGNATURE_SERVICE, systemSignatureServiceUrl);
-				LOGGER.info("Se utilizara el servicio de firma configurado en la variable " + SIGNATURE_SERVICE_URL + " del sistema: " + systemSignatureServiceUrl);	 //$NON-NLS-1$ //$NON-NLS-2$
+				LOGGER.info("Se sustituye la URL del servicio de firma por la configurada en la propiedad del sistema " + SIGNATURE_SERVICE_URL + " con el valor: " + systemSignatureServiceUrl);	 //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		}
 		catch (final Exception e) {
@@ -306,8 +315,6 @@ public final class ProxyService extends HttpServlet {
 			responser.print((String) ret);
 		}
 		LOGGER.info("Fin peticion ProxyService"); //$NON-NLS-1$
-
-		return;
 	}
 
 	/**
@@ -321,6 +328,9 @@ public final class ProxyService extends HttpServlet {
 	 * @throws CertificateException Cuando ocurre alg&uacute;n problema con el certificado de firma.
 	 */
 	private String processPreSigns(final byte[] xml) throws SAXException, IOException, CertificateException {
+
+		System.out.println("XML peticion de prefirma: " + new String(xml));
+
 
 		final Document xmlDoc = this.documentBuilder.parse(new ByteArrayInputStream(xml));
 		final TriphaseRequestBean triRequests = SignRequestsParser.parse(xmlDoc);
@@ -387,7 +397,8 @@ public final class ProxyService extends HttpServlet {
 						throw new Exception("No se encontro correlacion entre los documentos declarados en la peticion y los documentos descargados"); //$NON-NLS-1$
 					}
 
-					doPreSign(triRequests.getCertificate(), docRequest);
+					LOGGER.info("Procedemos a realizar la prefirma"); //$NON-NLS-1$
+					TriSigner.doPreSign(docRequest, triRequests.getCertificate(), getSignatureServiceUrl(this.config));
 				}
 			} catch (final Exception mex) {
 				LOGGER.warning("Error en la prefirma de la peticion " + //$NON-NLS-1$
@@ -417,18 +428,6 @@ public final class ProxyService extends HttpServlet {
 		}
 
 		return normalizedOp;
-	}
-
-	/**
-	 * Descarga un documento del portafirmas, lo prefirma y devuelve la informacion generada.
-	 * @param cert Certificado para la autenticaci&oacute;n.
-	 * @param docRequest Petici&oacute;n de firma trif&aacute;sica.
-	 * @throws AOException Cuando ocurre un error al realizar la prefirma.
-	 * @throws IOException Cuando existe un problema de comunicaci&oacute;n con el servidor de firma.
-	 */
-	private void doPreSign(final X509Certificate cert, final TriphaseSignDocumentRequest docRequest) throws IOException, AOException {
-
-		TriSigner.doPreSign(docRequest, cert, this.config.getProperty(KEY_SIGNATURE_SERVICE));
 	}
 
 	/**
@@ -463,7 +462,8 @@ public final class ProxyService extends HttpServlet {
 			// Tomamos nota de que firmas requieren el documento original
 			final Set<String> requestNeedContent = new HashSet<String>();
 			for (final TriphaseSignDocumentRequest docRequest: triRequest) {
-				if (Boolean.TRUE.equals(docRequest.getPartialResult().isNeedData())) {
+				final TriphaseData triData = docRequest.getPartialResult();
+				if (triData.getSignsCount() > 0 && !Boolean.parseBoolean(triData.getSign(0).getDict().get("NEED_DATA"))) {
 					requestNeedContent.add(docRequest.getId());
 				}
 			}
@@ -501,9 +501,8 @@ public final class ProxyService extends HttpServlet {
 						}
 					}
 
-					LOGGER.info("Parametros en la postfirma:\n" + docRequest.getParams()); //$NON-NLS-1$
-
-					doPostSign(triRequests.getCertificate(), docRequest);
+					LOGGER.info("Procedemos a realizar la postfirma"); //$NON-NLS-1$
+					TriSigner.doPostSign(docRequest, triRequests.getCertificate(), getSignatureServiceUrl(this.config));
 				}
 			} catch (final Exception ex) {
 				LOGGER.warning("Ocurrio un error al postfirmar un documento: " + ex);  //$NON-NLS-1$
@@ -551,15 +550,23 @@ public final class ProxyService extends HttpServlet {
 	}
 
 	/**
-	 * Descarga un documento del portafirmas, lo postfirma y actualiza la petici&oacute;n de firma del
-	 * documento pasado por par&aacute;metro con el resultado de la postfirma.
-	 * @param cert Certificado de firma.
-	 * @param docRequest Petici&oacute;n de firma de un documento.
-	 * @throws IOException Cuando no se puede obtener el documento para postfirmar.
-	 * @throws AOException Cuando ocurre un error al generar la postfirma.
+	 * Obtiene la URL del servicio de firma, traduciendo las variables utilizadas para
+	 * su configuraci&oacute;n si es necesario.
+	 * @param conf Configuraci&oacute;n del servicio.
+	 * @return URL del servicio trif&aacute;asico de firma.
 	 */
-	private void doPostSign(final X509Certificate cert, final TriphaseSignDocumentRequest docRequest) throws IOException, AOException {
-		TriSigner.doPostSign(docRequest, cert, this.config.getProperty(KEY_SIGNATURE_SERVICE));
+	private String getSignatureServiceUrl(final Properties conf) {
+		if (this.signatureServiceUrl == null) {
+			String url = conf.getProperty(KEY_SIGNATURE_SERVICE);
+			if (url.contains(TOMCAT_HTTP_PORT_VARIABLE)) {
+				url = url.replace(TOMCAT_HTTP_PORT_VARIABLE, System.getProperty(JAVA_HTTP_PORT_VARIABLE));
+			}
+			this.signatureServiceUrl = url;
+		}
+
+		LOGGER.info("URL del servicio de firma trifasica: " + this.signatureServiceUrl); //$NON-NLS-1$
+
+		return this.signatureServiceUrl;
 	}
 
 	/**
