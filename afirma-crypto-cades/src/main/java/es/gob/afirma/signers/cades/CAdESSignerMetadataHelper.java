@@ -27,16 +27,16 @@ public final class CAdESSignerMetadataHelper {
 			return null;
 		}
 		// signerLocationPostalAddress
-		final String postalAddressOneLine = extraParams.getProperty("signatureProductionPostalCode"); //$NON-NLS-1$
+		final String postalAddressOneLine = extraParams.getProperty(CAdESExtraParams.SIGNATURE_PRODUCTION_POSTAL_CODE);
 		final String[] postalAddress = postalAddressOneLine == null ?
 			null :
 				postalAddressOneLine.split("\n"); //$NON-NLS-1$
 
 		// signerLocationCountryName
-		final String country = extraParams.getProperty("signatureProductionCountry"); //$NON-NLS-1$
+		final String country = extraParams.getProperty(CAdESExtraParams.SIGNATURE_PRODUCTION_COUNTRY);
 
 		// signerLocationLocalityName
-		final String locality = extraParams.getProperty("signatureProductionCity"); //$NON-NLS-1$
+		final String locality = extraParams.getProperty(CAdESExtraParams.SIGNATURE_PRODUCTION_CITY);
 		if (postalAddress != null || country != null || locality != null) {
 			return new CAdESSignerMetadata(
 				country,

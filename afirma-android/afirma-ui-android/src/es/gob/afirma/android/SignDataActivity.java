@@ -496,6 +496,8 @@ public final class SignDataActivity extends FragmentActivity implements Keystore
 	@Override
 	public void onSignSuccess(final byte[] signature) {
 
+		Log.i(ES_GOB_AFIRMA, "Firma generada correctamente. Se cifra el resultado.");
+
 		// Ciframos si nos dieron clave privada, si no subimos los datos sin cifrar
 		final String data;
 		try {
@@ -517,7 +519,11 @@ public final class SignDataActivity extends FragmentActivity implements Keystore
 			return;
 		}
 
+		Log.i(ES_GOB_AFIRMA, "Firma cifrada. Se envia al servidor.");
+
 		sendData(data, true, true);
+
+		Log.i(ES_GOB_AFIRMA, "Firma enviada.");
 	}
 
 	@Override

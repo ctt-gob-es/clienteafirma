@@ -88,7 +88,7 @@ final class PanelDestinatarios extends JAccessibilityDialogWizard {
     private static final long serialVersionUID = 1L;
 
     /** Lista de certificados. */
-    private final List<CertificateDestiny> listaCertificados = new ArrayList<CertificateDestiny>();
+    private final List<CertificateDestiny> listaCertificados = new ArrayList<>();
     List<CertificateDestiny> getListaCertificados() {
     	return this.listaCertificados;
     }

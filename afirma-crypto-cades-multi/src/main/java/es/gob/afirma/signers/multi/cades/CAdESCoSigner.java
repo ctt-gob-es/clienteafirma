@@ -157,6 +157,8 @@ final class CAdESCoSigner {
 	 * @param contentType Tipo de contenido definido por su OID.
 	 * @param contentDescription Descripci&oacute;n textual del tipo de contenido firmado.
 	 * @param ctis Indicaciones sobre los tipos de compromisos adquiridos con la firma.
+	 * @param includeSigningTimeAttribute <code>true</code> para incluir el atributo <i>SigningTime</i> de PKCS#9 (OID:1.2.840.113549.1.9.5),
+     *                                    <code>false</code> para no incluirlo.
 	 * @param csm Metadatos sobre el firmante
 	 * @return El archivo de firmas con la nueva firma.
 	 * @throws IOException Si ocurre alg&uacute;n problema leyendo o escribiendo los datos
@@ -175,6 +177,7 @@ final class CAdESCoSigner {
 			        final String contentType,
 			        final String contentDescription,
 			        final List<CommitmentTypeIndicationBean> ctis,
+			        final boolean includeSigningTimeAttribute,
 			        final CAdESSignerMetadata csm) throws IOException,
 			                                              NoSuchAlgorithmException,
 			                                              CertificateException {
@@ -233,6 +236,7 @@ final class CAdESCoSigner {
 				signingCertificateV2,
 				null,
 				new Date(),
+				includeSigningTimeAttribute,
 				false,
 				contentType,
 				contentDescription,
@@ -252,6 +256,7 @@ final class CAdESCoSigner {
 				signingCertificateV2,
 				messageDigest,
 				new Date(),
+				includeSigningTimeAttribute,
 				false,
 				contentType,
 				contentDescription,
@@ -319,6 +324,8 @@ final class CAdESCoSigner {
 	 * @param contentType Tipo de contenido definido por su OID.
 	 * @param contentDescription Descripci&oacute;n textual del tipo de contenido firmado.
 	 * @param ctis Indicaciones sobre los tipos de compromisos adquiridos con la firma.
+	 * @param includeSigningTimeAttribute <code>true</code> para incluir el atributo <i>SigningTime</i> de PKCS#9 (OID:1.2.840.113549.1.9.5),
+     *                                    <code>false</code> para no incluirlo.
 	 * @param csm Metadatos sobre el firmante
 	 * @return El archivo de firmas con la nueva firma.
 	 * @throws java.io.IOException Si ocurre alg&uacute;n problema leyendo o escribiendo los datos
@@ -337,6 +344,7 @@ final class CAdESCoSigner {
 			        final String contentType,
 			        final String contentDescription,
 			        final List<CommitmentTypeIndicationBean> ctis,
+			        final boolean includeSigningTimeAttribute,
                     final CAdESSignerMetadata csm) throws IOException,
 			                                              NoSuchAlgorithmException,
 			                                              CertificateException,
@@ -441,6 +449,7 @@ final class CAdESCoSigner {
 				signingCertificateV2,
 				null, // MessageDigest
 				new Date(),
+				includeSigningTimeAttribute,
 				false,
 				contentType,
 				contentDescription,
@@ -460,6 +469,7 @@ final class CAdESCoSigner {
 				signingCertificateV2,
 				messageDigest,
 				new Date(),
+				includeSigningTimeAttribute,
 				false,
 				contentType,
 				contentDescription,

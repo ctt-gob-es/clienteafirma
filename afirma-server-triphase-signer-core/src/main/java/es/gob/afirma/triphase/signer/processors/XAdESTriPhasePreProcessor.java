@@ -23,11 +23,12 @@ import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.signers.TriphaseData;
 import es.gob.afirma.core.signers.TriphaseData.TriSign;
 import es.gob.afirma.signers.xades.AOFacturaESigner;
+import es.gob.afirma.signers.xml.Utils;
 import es.gob.afirma.signers.xml.XMLConstants;
 import es.gob.afirma.triphase.signer.xades.XAdESTriPhaseSignerServerSide;
+import es.gob.afirma.triphase.signer.xades.XAdESTriPhaseSignerServerSide.Op;
 import es.gob.afirma.triphase.signer.xades.XmlPreSignException;
 import es.gob.afirma.triphase.signer.xades.XmlPreSignResult;
-import es.gob.afirma.triphase.signer.xades.XAdESTriPhaseSignerServerSide.Op;
 
 /** Procesador de firmas trif&aacute;sicas XAdES.
  * @author Tom&aacute;s Garc&iacute;a Mer&aacute;s. */
@@ -48,13 +49,16 @@ public class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 	/** Manejador de log. */
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
-	/** Construye un procesador de firmas trif&aacute;sicas XAdES. */
-	public XAdESTriPhasePreProcessor() {
-		this(false);
+	/** Construye un procesador de firmas trif&aacute;sicas XAdES.
+	 * @param installXmlDSigProvider Indica si se debe instalar expresamente un proveedor de firmas XML. */
+	public XAdESTriPhasePreProcessor(final boolean installXmlDSigProvider) {
+		this(false, installXmlDSigProvider);
 	}
 
-	protected XAdESTriPhasePreProcessor(final boolean factura) {
+	protected XAdESTriPhasePreProcessor(final boolean factura, final boolean installXmlDSigProvider) {
 		this.facturae = factura;
+
+		Utils.installXmlDSigProvider(installXmlDSigProvider);
 	}
 
 	@Override
@@ -290,7 +294,7 @@ public class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
                                          final Properties extraParams,
                                          final Op op,
                                          final TriphaseData triphaseData) throws IOException,
-                                                                      AOException {
+                                                                                 AOException {
 
 		if (triphaseData.getSignsCount() < 1) {
 			LOGGER.severe("No se ha encontrado la informacion de firma en la peticion"); //$NON-NLS-1$
@@ -335,7 +339,11 @@ public class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 		}
 
 		try {
-			return  XAdESTriPhaseSignerUtil.insertCommonParts(xmlBase.getBytes(), preSignature.getXmlSign());
+			return  XAdESTriPhaseSignerUtil.insertCommonParts(
+				xmlBase.getBytes(),
+				preSignature.getXmlSign(),
+				extraParams
+			);
 		}
 		catch (final Exception e) {
 			throw new AOException(

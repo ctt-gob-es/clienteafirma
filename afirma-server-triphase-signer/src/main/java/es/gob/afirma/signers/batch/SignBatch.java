@@ -81,7 +81,7 @@ public abstract class SignBatch {
 		}
 
 		final InputStream is = new ByteArrayInputStream(xml);
-		Document doc;
+		final Document doc;
 		try {
 			doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(is);
 		}

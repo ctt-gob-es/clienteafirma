@@ -7,7 +7,7 @@
  * Date: 11/01/11
  * You may contact the copyright holder at: soporte.afirma5@mpt.es
  */
-
+//Prueba
 package es.gob.afirma.core;
 
 /** Excepci&oacute;n gen&eacute;rica.

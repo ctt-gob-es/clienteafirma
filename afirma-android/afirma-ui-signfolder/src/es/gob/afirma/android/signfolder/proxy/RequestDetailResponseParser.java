@@ -227,7 +227,7 @@ final class RequestDetailResponseParser {
 	/**
 	 * Obtiene el listado de lineas de firmante. Cada linea de firmante puede poseer un
 	 * indeterminado n&uacute;mero de firmantes.
-	 * @param getSignLines Nodos con la informaci&oacute;n de los documentos..
+	 * @param signLinesNode Nodos con la informaci&oacute;n de los documentos..
 	 * @return Listado de documentos.
 	 */
 	private static Vector<String>[] getSignLines(final NodeList signLinesNode) {

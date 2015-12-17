@@ -215,20 +215,15 @@ final class XmlRequestsFactory {
 
 		sb.append(XML_TRISIGN_CLOSE);
 
+		// Imprimimos la peticion en el log
 		Log.i("es.gob.afirma", "Peticion postfirma:"); //$NON-NLS-1$ //$NON-NLS-2$
-
-		int i = 0;
-		final int l = 1024;
-		final String xml = sb.toString();
-		while (xml.length() >= l * (i + 1)) {
-			Log.i("es.gob.afirma", i + " " + xml.substring(l * i, l * (i + 1))); //$NON-NLS-1$ //$NON-NLS-2$
-			i++;
+		final int BUFFER_LENGTH = 1000;
+		final String urlString = sb.toString();
+		for (int i = 0; i < urlString.length() / BUFFER_LENGTH + 1; i++) {
+			Log.i("es.gob.afirma", urlString .substring(i * BUFFER_LENGTH, Math.min((i + 1) * BUFFER_LENGTH, urlString.length()))); //$NON-NLS-1$
 		}
-		Log.i("es.gob.afirma", i + " " + xml.substring(l * i)); //$NON-NLS-1$ //$NON-NLS-2$
 
-		throw new IllegalArgumentException();
-
-//		return sb.toString();
+		return sb.toString();
 	}
 
 	static String createRejectRequest(final String[] requestIds, final String certB64) {

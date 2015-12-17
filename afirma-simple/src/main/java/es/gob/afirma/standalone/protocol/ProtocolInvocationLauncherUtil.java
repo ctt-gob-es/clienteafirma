@@ -44,7 +44,7 @@ final class ProtocolInvocationLauncherUtil {
 						.append("op=get&v=1_0&id=") //$NON-NLS-1$
 							.append(params.getFileId());
 
-		LOGGER.info("Intentamos recuperar los datos del servidor con la URL:\n" + dataUrl.toString());
+		LOGGER.info("Intentamos recuperar los datos del servidor con la URL:\n" + dataUrl.toString()); //$NON-NLS-1$
 
 		// Leemos los datos
 		final byte[] recoveredData = UrlHttpManagerFactory.getInstalledManager().readUrlByPost(dataUrl.toString());

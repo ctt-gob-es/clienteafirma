@@ -107,12 +107,14 @@ final class CrlHelper {
 				return ValidationResult.SERVER_ERROR;
 			}
 			// Comprobamos la firma de la CRL
-			try {
-				crl.verify(vaPublicKey);
-			}
-			catch (final Exception e) {
-				LOGGER.severe("No se ha podido comprobar la firma de la CRL: " + e); //$NON-NLS-1$
-				return ValidationResult.SERVER_ERROR;
+			if (vaPublicKey != null) {
+				try {
+					crl.verify(vaPublicKey);
+				}
+				catch (final Exception e) {
+					LOGGER.severe("No se ha podido comprobar la firma de la CRL: " + e); //$NON-NLS-1$
+					return ValidationResult.SERVER_ERROR;
+				}
 			}
 			if (crl.isRevoked(cert)) {
 				return ValidationResult.REVOKED;
@@ -173,7 +175,7 @@ final class CrlHelper {
 	private static List<String> getCrlDistributionPoints(final X509Certificate cert) throws IOException {
 		final byte[] crldpExt = cert.getExtensionValue(Extension.cRLDistributionPoints.getId());
 		if (crldpExt == null) {
-			return new ArrayList<String>();
+			return new ArrayList<String>(0);
 		}
 		final ASN1Primitive derObjCrlDP;
 		final ASN1InputStream oAsnInStream = new ASN1InputStream(new ByteArrayInputStream(crldpExt));

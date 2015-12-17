@@ -58,13 +58,13 @@ public final class PdfPreProcessor {
 			throw new IllegalArgumentException("No se puede adjuntar un fichero a un PdfStamper nulo"); //$NON-NLS-1$
 		}
 		// Contenido a adjuntar (en Base64)
-		final String b64Attachment = extraParams.getProperty("attach"); //$NON-NLS-1$
+		final String b64Attachment = extraParams.getProperty(PdfExtraParams.ATTACH);
 
 		// Nombre que se pondra al fichero adjunto en el PDF
-		final String attachmentFileName = extraParams.getProperty("attachFileName"); //$NON-NLS-1$
+		final String attachmentFileName = extraParams.getProperty(PdfExtraParams.ATTACH_FILENAME);
 
 		// Descripcion del adjunto
-		final String attachmentDescription = extraParams.getProperty("attachDescription"); //$NON-NLS-1$
+		final String attachmentDescription = extraParams.getProperty(PdfExtraParams.ATTACH_DESCRIPTION);
 
 		if (b64Attachment != null && attachmentFileName != null) {
 			final byte[] attachment;
@@ -133,19 +133,19 @@ public final class PdfPreProcessor {
 			return;
 		}
 
-		final String imageDataBase64 = extraParams.getProperty("image"); //$NON-NLS-1$
+		final String imageDataBase64 = extraParams.getProperty(PdfExtraParams.IMAGE);
 		if (imageDataBase64 == null || imageDataBase64.length() < 1) {
 			return;
 		}
 		final byte[] image = Base64.decode(imageDataBase64);
 
-		final Rectangle rect = getPositionOnPage(extraParams, "image"); //$NON-NLS-1$
+		final Rectangle rect = getPositionOnPage(extraParams, PdfExtraParams.IMAGE);
 
 		if (rect == null) {
 			return;
 		}
 
-		final String imagePage = extraParams.getProperty("imagePage"); //$NON-NLS-1$
+		final String imagePage = extraParams.getProperty(PdfExtraParams.IMAGE_PAGE);
 		if (imagePage == null) {
 			return;
 		}

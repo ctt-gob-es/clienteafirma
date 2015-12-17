@@ -30,7 +30,7 @@ final class ProtocolInvocationLauncherSave {
 			);
 		}
 		catch(final AOCancelledOperationException e) {
-			LOGGER.severe("Operacion cancelada por el usuario" + e);
+			LOGGER.severe("Operacion cancelada por el usuario" + e); //$NON-NLS-1$
 			return RESULT_CANCEL;
 		}
 		catch (final Exception e) {

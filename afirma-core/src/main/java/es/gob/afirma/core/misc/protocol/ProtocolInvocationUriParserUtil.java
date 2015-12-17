@@ -106,4 +106,15 @@ final class ProtocolInvocationUriParserUtil {
 		return ret;
 	}
 
+	/** Comprueba que est&eacute;n disponibles todos los parametros disponibles en la entrada de
+	 * datos para la operaci&oacute;n de selecci&oacute;n de certificado.
+	 * @param params Par&aacute;metros para el proceso de firma
+	 * @return Par&aacute;metros
+	 * @throws ParameterException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto. */
+	static UrlParametersToSelectCert getParametersToSelectCert(final Map<String, String> params) throws ParameterException {
+		final UrlParametersToSelectCert ret = new UrlParametersToSelectCert();
+		ret.setCommonParameters(params);
+		ret.setSelectCertParameters(params);
+		return ret;
+	}
 }

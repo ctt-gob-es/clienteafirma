@@ -1,11 +1,9 @@
 package es.gob.afirma.signfolder.server.proxy;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.PrintWriter;
 import java.nio.charset.Charset;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -15,7 +13,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
-import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 import javax.activation.DataHandler;
@@ -90,15 +89,34 @@ public final class ProxyService extends HttpServlet {
 	/** Tama&ntilde;o de la p&aacute;gina de resultados. */
 	private static final String MOBILE_REJECT_DESCRIPTION = "Rechazo desde dispositivo movil"; //$NON-NLS-1$
 
-	static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+	static final Logger LOGGER;
 
 	private final DocumentBuilder documentBuilder;
 
 	private final Properties config;
 
+	static {
+		final InputStream is = ProxyService.class.getResourceAsStream("/log.properties"); //$NON-NLS-1$
+		try {
+			LogManager.getLogManager().readConfiguration(is);
+		} catch (final Exception e) {
+			Logger.getLogger("es.gob.afirma").log(Level.WARNING, "Error al cargar el fichero de configuracion del log", e); //$NON-NLS-1$ //$NON-NLS-2$
+		} finally {
+			if (is != null) {
+				try { is.close(); } catch (final IOException e) {
+					Logger.getLogger("es.gob.afirma").log(Level.WARNING, "No se pudo cerrar el fichero de configuracion del log", e); //$NON-NLS-1$ //$NON-NLS-2$
+				}
+			}
+		}
+
+		LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+
+		LOGGER.info("LoggerManager cargado"); //$NON-NLS-1$
+	}
+
+
 	/** Construye un Servlet que sirve operaciones de firma trif&aacute;sica.
 	 * @throws ParserConfigurationException Cuando no puede crearse un <code>DocumentBuilder</code> XML */
-	@SuppressWarnings("resource")
 	public ProxyService() throws ParserConfigurationException {
 		this.documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 
@@ -110,27 +128,27 @@ public final class ProxyService extends HttpServlet {
 		try {
 			this.config = new Properties();
 			this.config.load(configIs);
-		} catch (Exception e) {
-			try { configIs.close(); } catch (Exception ex) { /* No hacemos nada */ }
+		} catch (final Exception e) {
+			try { configIs.close(); } catch (final Exception ex) { /* No hacemos nada */ }
 			throw new RuntimeException("No se ha podido cargar el fichero de configuracion del servicio: " + CONFIG_FILE); //$NON-NLS-1$
 		}
 
 		try {
 			configIs.close();
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			// No hacemos nada
 		}
 
 		// Si esta configurada la variable SIGNATURE_SERVICE_URL en el sistema, se utiliza en lugar de propiedad
 		// interna de la aplicacion
 		try {
-			String systemSignatureServiceUrl = System.getProperty(SIGNATURE_SERVICE_URL);
+			final String systemSignatureServiceUrl = System.getProperty(SIGNATURE_SERVICE_URL);
 			if (systemSignatureServiceUrl != null) {
 				this.config.setProperty(KEY_SIGNATURE_SERVICE, systemSignatureServiceUrl);
 				LOGGER.info("Se utilizara el servicio de firma configurado en la variable " + SIGNATURE_SERVICE_URL + " del sistema: " + systemSignatureServiceUrl);	 //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		}
-		catch (Exception e) {
+		catch (final Exception e) {
 			LOGGER.warning("No se ha podido recuperar la URL del servicio de firma configurado en la variable " + SIGNATURE_SERVICE_URL + " del sistema: " + e);	 //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
@@ -162,7 +180,7 @@ public final class ProxyService extends HttpServlet {
 		final Responser responser;
 		try {
 			responser = new Responser(response);
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			LOGGER.severe("No se puede responder a la peticion: " + e);	 //$NON-NLS-1$
 			return;
 		}
@@ -188,7 +206,7 @@ public final class ProxyService extends HttpServlet {
 			LOGGER.info("Los datos de entrada no estan comprimidos: " + e); //$NON-NLS-1$
 			try {
 				xml = Base64.decode(data, true);
-			} catch (Exception ex) {
+			} catch (final Exception ex) {
 				LOGGER.warning("Los datos de entrada no estan correctamente codificados: " + ex); //$NON-NLS-1$
 				return;
 			}
@@ -240,44 +258,37 @@ public final class ProxyService extends HttpServlet {
 			}
 			else {
 				LOGGER.info("Se ha indicado un codigo de operacion no valido"); //$NON-NLS-1$
-				ret = ErrorManager.genError(ErrorManager.ERROR_UNSUPPORTED_OPERATION_NAME, null);
+				ret = ErrorManager.genError(ErrorManager.ERROR_UNSUPPORTED_OPERATION_NAME);
 			}
 		}
 		catch (final SAXException e) {
-			LOGGER.severe(ErrorManager.genError(ErrorManager.ERROR_BAD_XML, null) + ": " + e); //$NON-NLS-1$
-			LOGGER.severe(getStackTrace(e));
-			responser.print(ErrorManager.genError(ErrorManager.ERROR_BAD_XML, null));
+			LOGGER.log(Level.SEVERE, ErrorManager.genError(ErrorManager.ERROR_BAD_XML) + ": " + e, e); //$NON-NLS-1$
+			responser.print(ErrorManager.genError(ErrorManager.ERROR_BAD_XML));
 			return;
 		}
 		catch (final CertificateException e) {
-			LOGGER.severe(ErrorManager.genError(ErrorManager.ERROR_BAD_CERTIFICATE, null) + ": " + e); //$NON-NLS-1$
-			LOGGER.severe(getStackTrace(e));
-			responser.print(ErrorManager.genError(ErrorManager.ERROR_BAD_CERTIFICATE, null));
+			LOGGER.log(Level.SEVERE, ErrorManager.genError(ErrorManager.ERROR_BAD_CERTIFICATE) + ": " + e, e); //$NON-NLS-1$
+			responser.print(ErrorManager.genError(ErrorManager.ERROR_BAD_CERTIFICATE));
 			return;
 		} catch (final MobileException e) {
-			LOGGER.severe(ErrorManager.genError(ErrorManager.ERROR_COMMUNICATING_PORTAFIRMAS, null) + ": " + e); //$NON-NLS-1$
-			LOGGER.severe(getStackTrace(e));
-			responser.print(ErrorManager.genError(ErrorManager.ERROR_COMMUNICATING_PORTAFIRMAS, null));
+			LOGGER.log(Level.SEVERE, ErrorManager.genError(ErrorManager.ERROR_COMMUNICATING_PORTAFIRMAS) + ": " + e, e); //$NON-NLS-1$
+			responser.print(ErrorManager.genError(ErrorManager.ERROR_COMMUNICATING_PORTAFIRMAS));
 			return;
 		} catch (final IOException e) {
-			LOGGER.severe(ErrorManager.genError(ErrorManager.ERROR_COMMUNICATING_PORTAFIRMAS, null) + ": " + e); //$NON-NLS-1$
-			LOGGER.severe(getStackTrace(e));
-			responser.print(ErrorManager.genError(ErrorManager.ERROR_COMMUNICATING_PORTAFIRMAS, null));
+			LOGGER.log(Level.SEVERE, ErrorManager.genError(ErrorManager.ERROR_COMMUNICATING_PORTAFIRMAS) + ": " + e, e); //$NON-NLS-1$
+			responser.print(ErrorManager.genError(ErrorManager.ERROR_COMMUNICATING_PORTAFIRMAS));
 			return;
 		} catch (final SOAPFaultException e) {
-			LOGGER.severe(ErrorManager.genError(ErrorManager.ERROR_AUTHENTICATING_REQUEST, null) + ": " + e); //$NON-NLS-1$
-			LOGGER.severe(getStackTrace(e));
-			responser.print(ErrorManager.genError(ErrorManager.ERROR_AUTHENTICATING_REQUEST, null));
+			LOGGER.log(Level.SEVERE, ErrorManager.genError(ErrorManager.ERROR_AUTHENTICATING_REQUEST) + ": " + e, e); //$NON-NLS-1$
+			responser.print(ErrorManager.genError(ErrorManager.ERROR_AUTHENTICATING_REQUEST));
 			return;
 		} catch (final WebServiceException e) {
-			LOGGER.severe(ErrorManager.genError(ErrorManager.ERROR_COMMUNICATING_SERVICE, null) + ": " + e); //$NON-NLS-1$
-			LOGGER.severe(getStackTrace(e));
-			responser.print(ErrorManager.genError(ErrorManager.ERROR_COMMUNICATING_SERVICE, null));
+			LOGGER.log(Level.SEVERE, ErrorManager.genError(ErrorManager.ERROR_COMMUNICATING_SERVICE) + ": " + e, e); //$NON-NLS-1$
+			responser.print(ErrorManager.genError(ErrorManager.ERROR_COMMUNICATING_SERVICE));
 			return;
 		} catch (final Exception e) {
-			LOGGER.severe(ErrorManager.genError(ErrorManager.ERROR_UNKNOWN_ERROR, null) + ": " + e); //$NON-NLS-1$
-			LOGGER.severe(getStackTrace(e));
-			responser.print(ErrorManager.genError(ErrorManager.ERROR_UNKNOWN_ERROR, null));
+			LOGGER.log(Level.SEVERE, ErrorManager.genError(ErrorManager.ERROR_UNKNOWN_ERROR) + ": " + e, e); //$NON-NLS-1$
+			responser.print(ErrorManager.genError(ErrorManager.ERROR_UNKNOWN_ERROR));
 			return;
 		}
 
@@ -286,12 +297,12 @@ public final class ProxyService extends HttpServlet {
 			responser.write((InputStream) ret);
 			try {
 				((InputStream) ret).close();
-			} catch (IOException e) {
+			} catch (final IOException e) {
 				LOGGER.warning("No se pudo cerrar el flujo de datos: " + e); //$NON-NLS-1$
 			}
 		}
 		else {
-			LOGGER.info("XML de respuesta:\n" + ret);
+			LOGGER.info("XML de respuesta:\n" + ret); //$NON-NLS-1$
 			responser.print((String) ret);
 		}
 		LOGGER.info("Fin peticion ProxyService"); //$NON-NLS-1$
@@ -299,17 +310,11 @@ public final class ProxyService extends HttpServlet {
 		return;
 	}
 
-	private static String getStackTrace(Throwable t) {
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		t.printStackTrace(new PrintWriter(baos));
-		return new String(baos.toByteArray());
-	}
-
 	/**
 	 * Procesa las peticiones de prefirma. Se realiza la prefirma de cada uno de los documentos de las peticiones indicadas.
 	 * Si se produce alg&uacute;n error al procesar un documento de alguna de las peticiones, se establece como incorrecta
 	 * la petici&oacute;n al completo.
-	 * @param xmlData XML con los datos para el proceso de las prefirmas.
+	 * @param xml XML con los datos para el proceso de las prefirmas.
 	 * @return XML con el resultado a la petici&oacute;n de prefirma.
 	 * @throws SAXException Cuando ocurre alg&uacute;n error al procesar los XML.
 	 * @throws IOException Cuando ocurre algun problema de comunicaci&oacute;n con el servidor.
@@ -327,10 +332,10 @@ public final class ProxyService extends HttpServlet {
 
 		// Prefirmamos cada uno de los documentos de cada una de las peticiones. Si falla la prefirma de
 		// un documento, se da por erronea la prefirma de toda la peticion
-		for (TriphaseRequest singleRequest : triRequests) {
+		for (final TriphaseRequest singleRequest : triRequests) {
 
 			try {
-				MobileDocumentList downloadedDocs = service.getDocumentsToSign(triRequests.getCertificate().getEncoded(), singleRequest.getRef());
+				final MobileDocumentList downloadedDocs = service.getDocumentsToSign(triRequests.getCertificate().getEncoded(), singleRequest.getRef());
 				LOGGER.info("Recuperamos el documento"); //$NON-NLS-1$
 				if (singleRequest.size() != downloadedDocs.getDocument().size()) {
 					LOGGER.info("No se han recuperado tantos documentos para la peticion " + singleRequest.getRef() + "' como los indicados en la propia peticion"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -339,13 +344,13 @@ public final class ProxyService extends HttpServlet {
 				}
 
 				// Prefirmamos cada documento de la peticion
-				for (TriphaseSignDocumentRequest docRequest : singleRequest) {
+				for (final TriphaseSignDocumentRequest docRequest : singleRequest) {
 
 					LOGGER.info(" == PREFIRMA == "); //$NON-NLS-1$
 
 					// Buscamos para la prefirma el documento descargado que corresponde para la peticion
 					// de firma del documento actual
-					for (MobileDocument downloadedDoc : downloadedDocs.getDocument()) {
+					for (final MobileDocument downloadedDoc : downloadedDocs.getDocument()) {
 						if (downloadedDoc.getIdentifier().equals(docRequest.getId())) {
 
 							LOGGER.info(" Procesamos documento con el id: " + downloadedDoc.getIdentifier()); //$NON-NLS-1$
@@ -416,7 +421,8 @@ public final class ProxyService extends HttpServlet {
 
 	/**
 	 * Descarga un documento del portafirmas, lo prefirma y devuelve la informacion generada.
-	 * @return Prefirma del documento.
+	 * @param cert Certificado para la autenticaci&oacute;n.
+	 * @param docRequest Petici&oacute;n de firma trif&aacute;sica.
 	 * @throws AOException Cuando ocurre un error al realizar la prefirma.
 	 * @throws IOException Cuando existe un problema de comunicaci&oacute;n con el servidor de firma.
 	 */
@@ -429,7 +435,7 @@ public final class ProxyService extends HttpServlet {
 	 * Procesa las peticiones de postfirma. Se realiza la postfirma de cada uno de los documentos de las peticiones indicadas.
 	 * Si se produce alg&uacute;n error al procesar un documento de alguna de las peticiones, se establece como incorrecta
 	 * la petici&oacute;n al completo.
-	 * @param xmlData XML con los datos para el proceso de las prefirmas.
+	 * @param xml XML con los datos para el proceso de las prefirmas.
 	 * @return XML con el resultado a la petici&oacute;n de prefirma.
 	 * @throws SAXException Cuando ocurre alg&uacute;n error al procesar los XML.
 	 * @throws IOException Cuando ocurre algun problema de comunicaci&oacute;n con el servidor.
@@ -447,7 +453,7 @@ public final class ProxyService extends HttpServlet {
 
 		// Postfirmamos cada uno de los documentos de cada una de las peticiones. Si falla la
 		// postfirma de un solo documento, se da por erronea la postfirma de toda la peticion
-		for (TriphaseRequest triRequest : triRequests) {
+		for (final TriphaseRequest triRequest : triRequests) {
 
 			LOGGER.info(" == POSTFIRMA == "); //$NON-NLS-1$
 
@@ -456,7 +462,7 @@ public final class ProxyService extends HttpServlet {
 
 			// Tomamos nota de que firmas requieren el documento original
 			final Set<String> requestNeedContent = new HashSet<String>();
-			for (TriphaseSignDocumentRequest docRequest: triRequest) {
+			for (final TriphaseSignDocumentRequest docRequest: triRequest) {
 				if (Boolean.TRUE.equals(docRequest.getPartialResult().isNeedData())) {
 					requestNeedContent.add(docRequest.getId());
 				}
@@ -467,7 +473,7 @@ public final class ProxyService extends HttpServlet {
 			if (!requestNeedContent.isEmpty()) {
 				try {
 					downloadedDocs = service.getDocumentsToSign(triRequests.getCertificate().getEncoded(), triRequest.getRef());
-				} catch (Exception ex) {
+				} catch (final Exception ex) {
 					LOGGER.warning("Ocurrio un error al descargar los documentos de la peticion " + triRequest.getRef() + ": " + ex);  //$NON-NLS-1$//$NON-NLS-2$
 					triRequest.setStatusOk(false);
 					continue;
@@ -476,15 +482,15 @@ public final class ProxyService extends HttpServlet {
 
 			// Para cada documento, le asignamos su documento (si es necesario) y lo postfirmamos
 			try {
-				for (TriphaseSignDocumentRequest docRequest : triRequest) {
+				for (final TriphaseSignDocumentRequest docRequest : triRequest) {
 
 					// Asignamos el documento a la peticion si es necesario
 					if (downloadedDocs != null && requestNeedContent.contains(docRequest.getId())) {
 						// Buscamos para la postfirma el documento descargado que corresponde para la peticion
 						// de firma del documento actual
-						for (MobileDocument downloadedDoc : downloadedDocs.getDocument()) {
+						for (final MobileDocument downloadedDoc : downloadedDocs.getDocument()) {
 							if (downloadedDoc.getIdentifier().equals(docRequest.getId())) {
-								Object content = downloadedDoc.getData().getValue().getContent();
+								final Object content = downloadedDoc.getData().getValue().getContent();
 								if (content instanceof InputStream) {
 									docRequest.setContent(Base64.encode(AOUtil.getDataFromInputStream((InputStream) content), true));
 								}
@@ -499,7 +505,7 @@ public final class ProxyService extends HttpServlet {
 
 					doPostSign(triRequests.getCertificate(), docRequest);
 				}
-			} catch (Exception ex) {
+			} catch (final Exception ex) {
 				LOGGER.warning("Ocurrio un error al postfirmar un documento: " + ex);  //$NON-NLS-1$
 				ex.printStackTrace();
 				triRequest.setStatusOk(false);
@@ -510,7 +516,7 @@ public final class ProxyService extends HttpServlet {
 			try {
 				service.saveSign(triRequests.getCertificate().getEncoded(),
 						triRequest.getRef(), transformToWsParams(triRequest));
-			} catch (Exception ex) {
+			} catch (final Exception ex) {
 				LOGGER.warning(
 						"Ocurrio un error al guardar la peticion de firma " + triRequest.getRef() + //$NON-NLS-1$
 						": " + ex); //$NON-NLS-1$
@@ -526,13 +532,13 @@ public final class ProxyService extends HttpServlet {
 	 * @param req Petici&oacute;n de firma con el resultado asociado a cada documento.
 	 * @return Listado de firmas de documentos.
 	 */
-	private static MobileDocSignInfoList transformToWsParams(TriphaseRequest req) {
+	private static MobileDocSignInfoList transformToWsParams(final TriphaseRequest req) {
 
 		final MobileDocSignInfoList signInfoList = new MobileDocSignInfoList();
 		final List<MobileDocSignInfo> list = signInfoList.getMobileDocSignInfo();
 
 		MobileDocSignInfo signInfo;
-		for (TriphaseSignDocumentRequest docReq : req) {
+		for (final TriphaseSignDocumentRequest docReq : req) {
 			signInfo = new MobileDocSignInfo();
 			signInfo.setDocumentId(docReq.getId());
 			signInfo.setSignFormat(docReq.getSignatureFormat());
@@ -549,8 +555,8 @@ public final class ProxyService extends HttpServlet {
 	 * documento pasado por par&aacute;metro con el resultado de la postfirma.
 	 * @param cert Certificado de firma.
 	 * @param docRequest Petici&oacute;n de firma de un documento.
-	 * @throws AOException
-	 * @throws IOException
+	 * @throws IOException Cuando no se puede obtener el documento para postfirmar.
+	 * @throws AOException Cuando ocurre un error al generar la postfirma.
 	 */
 	private void doPostSign(final X509Certificate cert, final TriphaseSignDocumentRequest docRequest) throws IOException, AOException {
 		TriSigner.doPostSign(docRequest, cert, this.config.getProperty(KEY_SIGNATURE_SERVICE));
@@ -558,7 +564,7 @@ public final class ProxyService extends HttpServlet {
 
 	/**
 	 * Procesa la petici&oacute;n de un listado de peticiones de firma.
-	 * @param xmlData XML con la solicitud.
+	 * @param xml XML con la solicitud.
 	 * @return XML con la respuesta a la petici&oacute;n.
 	 * @throws SAXException Cuando ocurre alg&uacute;n error al procesar los XML.
 	 * @throws IOException Cuando ocurre algun errlr al leer el XML.
@@ -591,15 +597,15 @@ public final class ProxyService extends HttpServlet {
 
 		// Listado de formatos de firma soportados
 		final MobileStringList formatsList = new MobileStringList();
-		for (String supportedFormat : listRequest.getFormats()) {
+		for (final String supportedFormat : listRequest.getFormats()) {
 			formatsList.getStr().add(supportedFormat);
 		}
 
 		// Listado de filtros para la consulta
 		final MobileRequestFilterList filterList = new MobileRequestFilterList();
 		if (listRequest.getFilters() != null) {
-			for (String filterKey : listRequest.getFilters().keySet().toArray(new String[listRequest.getFilters().size()])) {
-				MobileRequestFilter filter = new MobileRequestFilter();
+			for (final String filterKey : listRequest.getFilters().keySet().toArray(new String[listRequest.getFilters().size()])) {
+				final MobileRequestFilter filter = new MobileRequestFilter();
 				filter.setKey(filterKey);
 				filter.setValue(listRequest.getFilters().get(filterKey));
 				filterList.getRequestFilter().add(filter);
@@ -617,9 +623,9 @@ public final class ProxyService extends HttpServlet {
 
 		final SimpleDateFormat dateFormater = new SimpleDateFormat("dd/MM/yyyy"); //$NON-NLS-1$
 		final List<SignRequest> signRequests = new ArrayList<SignRequest>(mobileRequestsList.getSize().intValue());
-		for (MobileRequest request : mobileRequestsList.getRequestList()) {
+		for (final MobileRequest request : mobileRequestsList.getRequestList()) {
 
-			final List<MobileDocument> docList = (request.getDocumentList() != null) ?
+			final List<MobileDocument> docList = request.getDocumentList() != null ?
 					request.getDocumentList().getDocument() : new ArrayList<MobileDocument>();
 
 			final SignRequestDocument[] docs = new SignRequestDocument[docList.size()];
@@ -637,7 +643,7 @@ public final class ProxyService extends HttpServlet {
 							doc.getSignAlgorithm().getValue(),
 							prepareSignatureParamenters(doc.getSignatureParameters()));
 				}
-			} catch (Exception e) {
+			} catch (final Exception e) {
 				final String id = request.getIdentifier() != null ?
 						request.getIdentifier().getValue() : "null";  //$NON-NLS-1$
 				LOGGER.warning("Se ha encontrado un error al analizar los datos de los documentos de la peticion con ID '" + id + "' y no se mostrara: " + e.toString()); //$NON-NLS-1$ //$NON-NLS-2$
@@ -663,7 +669,7 @@ public final class ProxyService extends HttpServlet {
 				mobileRequestsList.getSize().intValue());
 	}
 
-	private static String prepareSignatureParamenters(JAXBElement<String> parameters) {
+	private static String prepareSignatureParamenters(final JAXBElement<String> parameters) {
 		if (parameters == null) {
 			return null;
 		}
@@ -683,7 +689,6 @@ public final class ProxyService extends HttpServlet {
 	 * Rechaza el listado de solicitudes indicado en la petici&oacute;n de rechazo.
 	 * @param rejectRequest Petici&oacute;n de rechazo.
 	 * @return Resultado del rechazo de cada solicitud.
-	 * @throws MobileException Cuando se produce alg&uacute;n error durante el rechazo.
 	 */
 	private static RequestResult[] doReject(final RejectRequest rejectRequest) {
 
@@ -762,9 +767,9 @@ public final class ProxyService extends HttpServlet {
 		// Listado de remitentes de la peticion
 		//		final Vector signLines = new Vector<String>();
 		final List<MobileSignLine> mobileSignLines = mobileRequest.getSignLineList().getMobileSignLine();
-		final Vector<String>[] signLines = new Vector[mobileSignLines.size()];
+		final List<String>[] signLines = new ArrayList[mobileSignLines.size()];
 		for (int i = 0; i < signLines.length; i++) {
-			signLines[i] = new Vector<String>();
+			signLines[i] = new ArrayList<String>();
 			for (final String line : mobileSignLines.get(i).getMobileSignerList().getValue().getStr()) {
 				signLines[i].add(line);
 			}
@@ -895,7 +900,7 @@ public final class ProxyService extends HttpServlet {
 
 	private String processConfigueApp(final byte[] xml) throws SAXException, IOException, MobileException {
 		final Document doc = this.documentBuilder.parse(new ByteArrayInputStream(xml));
-		final GenericRequest request = ConfigurationRequestParser.parse(doc);
+		final ConfigurationRequest request = ConfigurationRequestParser.parse(doc);
 
 		LOGGER.info("Solicitamos la configuracion al Portafirmas"); //$NON-NLS-1$
 
@@ -912,18 +917,18 @@ public final class ProxyService extends HttpServlet {
 	 * <li>Listado de aplicaciones.</li>
 	 * </ul>
 	 * @param request Datos gen&eacute;ricos necesarios para la petici&oacute;n.
-	 * @return Configuraci&oracute;n de la aplicaci&oacute;n.
+	 * @return Configuraci&oacute;n de la aplicaci&oacute;n.
 	 * @throws MobileException Cuando ocurre un error al contactar con el Portafirmas.
 	 * @throws IOException Cuando no ha sido posible leer el documento.
 	 */
-	private static AppConfiguration loadConfiguration(final GenericRequest request) throws MobileException, IOException {
+	private static AppConfiguration loadConfiguration(final ConfigurationRequest request) throws MobileException, IOException {
 
 		final MobileService service = new MobileService_Service().getMobileServicePort();
 		final MobileApplicationList appList = service.queryApplicationsMobile(request.getCertEncoded());
 
 		final List<String> appIds = new ArrayList<String>();
 		final List<String> appNames = new ArrayList<String>();
-		for (MobileApplication app : appList.getApplicationList()) {
+		for (final MobileApplication app : appList.getApplicationList()) {
 			appIds.add(app.getId());
 			appNames.add(app.getName() != null ? app.getName() : app.getId());
 		}
@@ -939,7 +944,7 @@ public final class ProxyService extends HttpServlet {
 
 		LOGGER.info("Solicitamos la aprobacion de peticiones al Portafirmas"); //$NON-NLS-1$
 
-		ApproveRequestList approvedList = approveRequests(appRequests);
+		final ApproveRequestList approvedList = approveRequests(appRequests);
 
 		LOGGER.info("Hemos obtenido la listad de peticiones aprobadas del Portafirmas"); //$NON-NLS-1$
 
@@ -950,10 +955,10 @@ public final class ProxyService extends HttpServlet {
 		final MobileService_Service mobileService = new MobileService_Service();
 		final MobileService service = mobileService.getMobileServicePort();
 
-		for (ApproveRequest appReq : appRequests) {
+		for (final ApproveRequest appReq : appRequests) {
 			try {
 				service.approveRequest(appRequests.getCertEncoded(), appReq.getRequestId());
-			} catch (MobileException e) {
+			} catch (final MobileException e) {
 				appReq.setOk(false);
 			}
 		}
@@ -979,7 +984,6 @@ public final class ProxyService extends HttpServlet {
 		/**
 		 * Imprime una respuesta en la salida del servicio y cierra el flujo.
 		 * @param message Mensaje que imprimir como respuesta.
-		 * @throws IOException
 		 */
 		public void print(final String message) {
 			try {
@@ -987,14 +991,14 @@ public final class ProxyService extends HttpServlet {
 				os.write(message.getBytes(Charset.forName(DEFAULT_CHARSET)));
 				os.close();
 			}
-			catch (Exception e) {
+			catch (final Exception e) {
 				LOGGER.info("Error al devolver el resultado al cliente a traves del metodo print: " + e); //$NON-NLS-1$
 			}
 		}
 
 		public void write(final InputStream message) {
 			int n = -1;
-			byte[] buffer = new byte[1024];
+			final byte[] buffer = new byte[1024];
 			try {
 				final OutputStream os = this.response.getOutputStream();
 				while ((n = message.read(buffer)) > 0) {
@@ -1002,23 +1006,10 @@ public final class ProxyService extends HttpServlet {
 				}
 				os.close();
 			}
-			catch (Exception e) {
+			catch (final Exception e) {
 				LOGGER.info("Error al devolver el resultado al cliente a traves del metodo write: " + e); //$NON-NLS-1$
 			}
 		}
 	}
 
-	private static MobileDocumentList buildMobileDocumentListTests() {
-
-		MobileDocument doc = new MobileDocument();
-		doc.setMime("application/pdf");
-		doc.setName("1.pdf");
-		doc.setIdentifier("0wrolUzuqN");
-		doc.setOperationType("firmar");
-
-		MobileDocumentList docList = new MobileDocumentList();
-		docList.getDocument().add(doc);
-
-		return docList;
-	}
 }

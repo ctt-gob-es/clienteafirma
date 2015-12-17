@@ -1,5 +1,5 @@
  
- AutoFirma 1.4.1
+ AutoFirma 1.4.2
  Copyright 2011, 2015 Gobierno de España
  
  AutoFirma es Software Libre; puedes redistribuirlo y/o modificarlo

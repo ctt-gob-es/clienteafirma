@@ -347,11 +347,8 @@ final class PanelEntrada extends JAccessibilityDialogWizard {
 	}
 
 	byte[] readFile(final String filepath) {
-		try {
-			final InputStream fileIn = AOUtil.loadFile(AOUtil.createURI(filepath));
-			final byte[] data = AOUtil.getDataFromInputStream(fileIn);
-			fileIn.close();
-			return data;
+		try (final InputStream fileIn = AOUtil.loadFile(AOUtil.createURI(filepath));) {
+			return AOUtil.getDataFromInputStream(fileIn);
 		}
 		catch (final FileNotFoundException e) {
 			CustomDialog.showMessageDialog(

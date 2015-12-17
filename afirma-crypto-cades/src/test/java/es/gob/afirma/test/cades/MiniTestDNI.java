@@ -70,6 +70,7 @@ public final class MiniTestDNI {
         		messageDigest,
         		"SHA-512", //$NON-NLS-1$
         		false,
+        		false,
         		null,
         		null,
         		null,

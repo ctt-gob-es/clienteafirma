@@ -295,17 +295,17 @@ final class SignDataPanel extends JPanel {
         }
     }
 
-	@SuppressWarnings("static-method")
 	void openCertificate(final X509Certificate cert) {
         try {
             final File tmp = File.createTempFile("afirma", ".cer");  //$NON-NLS-1$//$NON-NLS-2$
             tmp.deleteOnExit();
-            final OutputStream fos = new FileOutputStream(tmp);
-            final OutputStream bos = new BufferedOutputStream(fos);
-            bos.write(cert.getEncoded());
-            bos.flush();
-            bos.close();
-            try { fos.close(); } catch(final Exception e) { /* Ignoramos los errores */ }
+            try (
+        		final OutputStream fos = new FileOutputStream(tmp);
+        		final OutputStream bos = new BufferedOutputStream(fos);
+    		) {
+            	bos.write(cert.getEncoded());
+            	bos.flush();
+            }
             Desktop.getDesktop().open(tmp);
         }
         catch(final Exception e) {
@@ -422,8 +422,7 @@ final class SignDataPanel extends JPanel {
         return tree;
     }
 
-    void load(final File signFile, final byte[] sign, final File dataFile, final byte[] data) {
-
+    void load(final File signFile, final byte[] sign, final File dataFile) {
     	this.loadSignatureFileProperties(signFile, sign, null);	//TODO: Introducir el tipo de icono
     	this.loadSignatureDataProperties(sign, dataFile);
     }

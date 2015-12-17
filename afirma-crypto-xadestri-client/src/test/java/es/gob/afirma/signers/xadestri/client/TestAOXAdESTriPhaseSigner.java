@@ -104,6 +104,42 @@ public class TestAOXAdESTriPhaseSigner {
 		}
 	}
 
+	/** Prueba de firma XAdES Detached de fichero grande.
+	 * @throws Exception */
+	@SuppressWarnings("static-method")
+	@Test
+	public void pruebaFirmaXAdESDetached() throws Exception {
+
+		final byte[] data = AOUtil.getDataFromInputStream(
+			ClassLoader.getSystemResourceAsStream("TEST_PDF_Certified.pdf") //$NON-NLS-1$
+		);
+
+		final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
+		ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH), CERT_PASS.toCharArray());
+		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
+
+		final AOXAdESTriPhaseSigner signer = new AOXAdESTriPhaseSigner();
+
+		final Properties config = new Properties();
+		config.put("format", "XAdES Detached"); //$NON-NLS-1$ //$NON-NLS-2$
+		config.setProperty("serverUrl", SERVER_URL); //$NON-NLS-1$
+
+		final byte[] result = signer.sign(
+			data,
+			AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA,
+			pke.getPrivateKey(),
+			pke.getCertificateChain(),
+			config
+		);
+
+		final File tempFile = File.createTempFile("xades-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$
+		final FileOutputStream fos = new FileOutputStream(tempFile);
+		fos.write(result);
+		fos.close();
+
+		System.out.println("El resultado de la firma se ha guardado en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
+	}
+
 	/** Prueba de firma XAdES.
 	 * @throws Exception */
 	@SuppressWarnings("static-method")
@@ -130,6 +166,35 @@ public class TestAOXAdESTriPhaseSigner {
 
 			System.out.println("El resultado de la firma se ha guardado en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
 		}
+	}
+
+	/** Prueba de cofirma con MANIFEST.
+	 * @throws Exception */
+	@SuppressWarnings("static-method")
+	@Test
+//	@Ignore // Necesita un servidor trifasico
+	public void pruebaCofirmaXAdESManifest() throws Exception {
+
+		final byte[] sign = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(SIGNATURE_FILENAME));
+
+		final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
+		ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH), CERT_PASS.toCharArray());
+		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
+
+		final Properties config = new Properties();
+		config.setProperty("serverUrl", SERVER_URL); //$NON-NLS-1$
+		config.setProperty("useManifest", "true"); //$NON-NLS-1$ //$NON-NLS-2$
+
+		final AOXAdESTriPhaseSigner signer = new AOXAdESTriPhaseSigner();
+
+		final byte[] result = signer.cosign(sign, AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA, pke.getPrivateKey(), pke.getCertificateChain(), config);
+
+		final File tempFile = File.createTempFile("xades-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$
+		final FileOutputStream fos = new FileOutputStream(tempFile);
+		fos.write(result);
+		fos.close();
+
+		System.out.println("El resultado de la cofirma se ha guardado en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
 	}
 
 	/** Prueba de cofirma.

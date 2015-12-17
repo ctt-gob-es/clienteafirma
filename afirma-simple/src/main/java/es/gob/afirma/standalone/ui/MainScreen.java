@@ -32,13 +32,19 @@ public final class MainScreen extends JFrame {
      * @param firstPanel Primera pantalla de la aplicaci&oacute;n.
      * @param width Ancho de la ventana
      * @param height Alto de la ventana */
-    public void showMainScreen(final WindowListener wlist, final JPanel firstPanel, final int width, final int height) {
-    	SwingUtilities.invokeLater(new Runnable() {
-    		@Override
-    		public void run() {
-    			createUI(wlist, firstPanel, width, height);
-    		}
-    	});
+    public void showMainScreen(final WindowListener wlist,
+    		                   final JPanel firstPanel,
+    		                   final int width,
+    		                   final int height) {
+
+    	SwingUtilities.invokeLater(
+			new Runnable() {
+	    		@Override
+	    		public void run() {
+	    			createUI(wlist, firstPanel, width, height);
+	    		}
+	    	}
+		);
     }
 
     void createUI(final WindowListener wlist, final JPanel firstPanel, final int width, final int height) {
@@ -57,11 +63,15 @@ public final class MainScreen extends JFrame {
 
         try {
             setIconImage(
-        		Toolkit.getDefaultToolkit().getImage(this.getClass().getResource("/resources/afirma_ico.png")) //$NON-NLS-1$
+        		Toolkit.getDefaultToolkit().getImage(
+    				this.getClass().getResource("/resources/afirma_ico.png") //$NON-NLS-1$
+				)
             );
         }
         catch (final Exception e) {
-            Logger.getLogger("es.gob.afirma").warning("No se ha podido cargar el icono de la aplicacion: " + e);  //$NON-NLS-1$//$NON-NLS-2$
+            Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
+        		"No se ha podido cargar el icono de la aplicacion: " + e  //$NON-NLS-1$
+    		);
         }
 
         this.setVisible(true);

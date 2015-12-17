@@ -279,11 +279,9 @@ public final class SelectionDialog {
                     tryAgain = true;
                 }
                 else { // Hemos seleccionado la opcion de sobrescribir
-                    try {
-                    	final FileOutputStream fos = new FileOutputStream(file);
+                    try (final FileOutputStream fos = new FileOutputStream(file);) {
                         fos.write(data);
                         fos.flush();
-                        fos.close();
                     }
                     catch (final Exception ex) {
                         Logger.getLogger("es.gob.afirma").warning("No se pudo guardar la informacion en el fichero indicado: " + ex); //$NON-NLS-1$ //$NON-NLS-2$

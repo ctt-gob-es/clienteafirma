@@ -26,7 +26,6 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="5dp"
             android:layout_marginTop="5dp"
-            android:background="@color/red"
             android:singleLine="true"
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:textIsSelectable="false" />

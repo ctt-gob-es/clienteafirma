@@ -30,6 +30,7 @@ public final class AOSignerFactory {
 	private static final String SIGNER_CLASS_CADES_ASIC_S = "es.gob.afirma.signers.cades.asic.AOCAdESASiCSSigner"; //$NON-NLS-1$
 	private static final String SIGNER_CLASS_CMS          = "es.gob.afirma.signers.cms.AOCMSSigner"; //$NON-NLS-1$
 	private static final String SIGNER_CLASS_FACTURAE     = "es.gob.afirma.signers.xades.AOFacturaESigner"; //$NON-NLS-1$
+	private static final String SIGNER_CLASS_FACTURAE_TRI = "es.gob.afirma.signers.xadestri.client.AOFacturaETriPhaseSigner"; //$NON-NLS-1$
 	private static final String SIGNER_CLASS_XADES        = "es.gob.afirma.signers.xades.AOXAdESSigner"; //$NON-NLS-1$
 	private static final String SIGNER_CLASS_XADES_TRI    = "es.gob.afirma.signers.xadestri.client.AOXAdESTriPhaseSigner"; //$NON-NLS-1$
 	private static final String SIGNER_CLASS_XADES_ASIC_S = "es.gob.afirma.signers.xades.asic.AOXAdESASiCSSigner"; //$NON-NLS-1$
@@ -50,11 +51,12 @@ public final class AOSignerFactory {
 		{AOSignConstants.SIGN_FORMAT_CMS,                SIGNER_CLASS_CMS,          Boolean.TRUE.toString()},
 		{AOSignConstants.SIGN_FORMAT_FACTURAE,           SIGNER_CLASS_FACTURAE,     Boolean.TRUE.toString()},
 		{AOSignConstants.SIGN_FORMAT_FACTURAE_ALT1,      SIGNER_CLASS_FACTURAE,     Boolean.FALSE.toString()},
+		{AOSignConstants.SIGN_FORMAT_FACTURAE_TRI,       SIGNER_CLASS_FACTURAE_TRI, Boolean.FALSE.toString()},
 		{AOSignConstants.SIGN_FORMAT_XADES,              SIGNER_CLASS_XADES,        Boolean.TRUE.toString()},
 		{AOSignConstants.SIGN_FORMAT_XADES_DETACHED,     SIGNER_CLASS_XADES,        Boolean.FALSE.toString()},
 		{AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED,    SIGNER_CLASS_XADES,        Boolean.FALSE.toString()},
 		{AOSignConstants.SIGN_FORMAT_XADES_ENVELOPING,   SIGNER_CLASS_XADES,        Boolean.FALSE.toString()},
-		{AOSignConstants.SIGN_FORMAT_XADES_TRI,          SIGNER_CLASS_XADES_TRI,    Boolean.TRUE.toString()},
+		{AOSignConstants.SIGN_FORMAT_XADES_TRI,          SIGNER_CLASS_XADES_TRI,    Boolean.FALSE.toString()},
 		{AOSignConstants.SIGN_FORMAT_XADES_ASIC_S,       SIGNER_CLASS_XADES_ASIC_S, Boolean.TRUE.toString()},
 		{AOSignConstants.SIGN_FORMAT_XMLDSIG,            SIGNER_CLASS_XMLDSIG,      Boolean.TRUE.toString()},
 		{AOSignConstants.SIGN_FORMAT_XMLDSIG_DETACHED,   SIGNER_CLASS_XMLDSIG,      Boolean.FALSE.toString()},

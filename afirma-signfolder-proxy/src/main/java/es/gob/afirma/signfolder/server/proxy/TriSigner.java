@@ -2,17 +2,34 @@ package es.gob.afirma.signfolder.server.proxy;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Logger;
+
+import javax.xml.parsers.DocumentBuilderFactory;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.http.UrlHttpManagerFactory;
 import es.gob.afirma.core.signers.AOSignConstants;
+import es.gob.afirma.core.signers.TriphaseData.TriSign;
 import es.gob.afirma.signfolder.server.proxy.TriphaseSignDocumentRequest.TriphaseConfigDataBean;
 
+/**
+ * Manejador para el uso est&aacute;tico de las operaciones de prefirma y postfirma.
+ */
 public class TriSigner {
 
 	/** Identificador de la operaci&oacute;n de prefirma en servidor. */
@@ -47,8 +64,8 @@ public class TriSigner {
 	 * Prefirma el documento de una petici&oacute;n y muta la propia peticion para almacenar en ella
 	 * el resultado.
 	 * @param docReq Petici&oacute;n de firma de un documento.
-	 * @param docManager Manejador que permite la descarga de un documento si es necesario.
 	 * @param signerCert Certificado de firma.
+	 * @param signServiceUrl URL del servicio de firma.
 	 * @throws IOException Cuando no se puede obtener el documento para prefirmar.
 	 * @throws AOException Cuando ocurre un error al generar la prefirma.
 	 */
@@ -94,7 +111,7 @@ public class TriSigner {
 	 * Postfirma el documento de una petici&oacute;n.
 	 * @param docReq Petici&oacute;n de firma de un documento.
 	 * @param signerCert Certificado de firma.
-	 * @return Properties en base64 con el resultado de la operacion de postfirma.
+	 * @param signServiceUrl URL del servicio de firma.
 	 * @throws IOException Cuando no se puede obtener el documento para postfirmar.
 	 * @throws AOException Cuando ocurre un error al generar la postfirma.
 	 */
@@ -182,10 +199,199 @@ public class TriSigner {
 
 	private static TriphaseConfigDataBean parseTriphaseResult(final byte[] triphaseResult) throws IOException {
 
-		final Properties resultProperties = new Properties();
-		resultProperties.load(new ByteArrayInputStream(Base64.decode(triphaseResult, 0, triphaseResult.length, true)));
+		final TriphaseConfigDataBean triphaseConfig;
+
+		final byte[] triphaseResponse = Base64.decode(triphaseResult, 0, triphaseResult.length, true);
+
+		// Comprobamos si la respuesta es de tipo proporties o XML (las 2 variantes que ha sufrido el firmador trifásico)
+		if (isXML(triphaseResponse)) {
+			triphaseConfig = loadTriphaseResponseAsXML(triphaseResponse);
+		}
+		else {
+			triphaseConfig = loadTriphaseResponseAsProperties(triphaseResponse);
+		}
+
+		return triphaseConfig;
+	}
+
+	private static boolean isXML(final byte[] triphaseResponse) {
+		try {
+			DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new ByteArrayInputStream(triphaseResponse));
+		}
+		catch (final Exception e) {
+			return false;
+		}
+		return true;
+	}
+
+	/** Obtiene una sesi&oacute;n de firma trif&aacute;sica a partir de un XML que lo describe.
+	 * Un ejemplo de XML podr&iacute;a ser el siguiente:
+	 * <pre>
+	 * &lt;xml&gt;
+	 *  &lt;firmas&gt;
+	 *   &lt;firma Id=\"001\"&gt;
+	 *    &lt;param n="NEED_PRE"&gt;true&lt;/param&gt;
+	 *    &lt;param n="PRE"&gt;MYICXDAYBgkqhkiG9[...]w0BA=&lt;/param&gt;
+	 *    &lt;param n="NEED_DATA"&gt;true&lt;/param&gt;
+	 *    &lt;param n="PK1"&gt;EMijB9pJ0lj27Xqov[...]RnCM=&lt;/param&gt;
+	 *   &lt;/firma&gt;
+	 *  &lt;/firmas&gt;
+	 * &lt;/xml&gt;
+	 * </pre>
+	 * @param triphaseResponse Texto XML con la informaci&oacute;n del mensaje.
+	 * @return Objeto con la informaci&oacute;n trif&aacute;sica de firma.
+	 * @throws IOException Cuando hay problemas en el tratamiento de datos. */
+	private static TriphaseConfigDataBean loadTriphaseResponseAsXML(final byte[] triphaseResponse) throws IOException {
+		if (triphaseResponse == null) {
+			throw new IllegalArgumentException("El XML de entrada no puede ser nulo"); //$NON-NLS-1$
+		}
+
+		final InputStream is = new ByteArrayInputStream(triphaseResponse);
+		Document doc;
+		try {
+			doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(is);
+		}
+		catch (final Exception e) {
+			Logger.getLogger("es.gob.afirma").severe("Error al cargar la respuesta XML: " + e + "\n" + new String(triphaseResponse)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			throw new IOException("Error al cargar la respuesta XML: " + e, e); //$NON-NLS-1$
+		}
+		is.close();
+
+		final Element rootElement = doc.getDocumentElement();
+		final NodeList childNodes = rootElement.getChildNodes();
+
+		final int idx = nextNodeElementIndex(childNodes, 0);
+		if (idx == -1 || !"firmas".equalsIgnoreCase(childNodes.item(idx).getNodeName())) { //$NON-NLS-1$
+			throw new IllegalArgumentException("No se encontro el nodo 'firmas' en el XML proporcionado"); //$NON-NLS-1$
+		}
+
+		final List<TriSign> signsNodes = parseSignsNode(childNodes.item(idx));
+
+		final TriphaseConfigDataBean triphaseData = new TriphaseConfigDataBean();
+
+		// Guardamos el numero de firmas
+		triphaseData.setSignCount(Integer.valueOf(signsNodes.size()));
+
+		//TODO: Por limitacion del sistema anterior, el parametro needData afectada a todas las firmas.
+		// Obtenemos el valor del parametro needData de la primera firma y lo aplicacion a todas ellas.
+		final String needData = signsNodes.get(0).getProperty("NEED_DATA"); //$NON-NLS-1$
+		if (needData != null) {
+			try {
+				triphaseData.setNeedData(Boolean.valueOf(needData));
+			}
+			catch (final Exception e) {
+				triphaseData.setNeedData(Boolean.TRUE);
+			}
+		}
+
+		//TODO: Por limitacion del sistema anterior, el parametro needPre afectada a todas las firmas.
+		// Obtenemos el valor del parametro needPre de la primera firma y lo aplicacion a todas ellas.
+		final String needPre = signsNodes.get(0).getProperty("NEED_PRE"); //$NON-NLS-1$
+		if (needPre != null) {
+			try {
+				triphaseData.setNeedPreSign(Boolean.valueOf(needPre));
+			}
+			catch (final Exception e) {
+				triphaseData.setNeedPreSign(Boolean.TRUE);
+			}
+		}
+
+		// Leemos los parametros esenciales de cada firma
+		for (final TriSign triSign : signsNodes) {
+			if (triSign.getProperty("PK1") != null) { //$NON-NLS-1$
+				triphaseData.addPk1(triSign.getProperty("PK1")); //$NON-NLS-1$
+			}
+			if (triSign.getProperty("PRE") != null) { //$NON-NLS-1$
+				triphaseData.addPreSign(triSign.getProperty("PRE")); //$NON-NLS-1$
+			}
+			if (triSign.getProperty("SESSION") != null) { //$NON-NLS-1$
+				triphaseData.addSession(triSign.getProperty("SESSION")); //$NON-NLS-1$
+			}
+		}
+
+		return triphaseData;
+	}
+
+	/** Analiza el nodo con el listado de firmas.
+	 * @param signsNode Nodo con el listado de firmas.
+	 * @return Listado con la informaci&oacute;n de cada operaci&oacute;n de firma. */
+	private static List<TriSign> parseSignsNode(final Node signsNode) {
+
+		final NodeList childNodes = signsNode.getChildNodes();
+
+		final List<TriSign> signs = new ArrayList<TriSign>();
+		int idx = nextNodeElementIndex(childNodes, 0);
+		while (idx != -1) {
+			final Node currentNode = childNodes.item(idx);
+
+			String id = null;
+
+			final NamedNodeMap nnm = currentNode.getAttributes();
+			if (nnm != null) {
+				final Node tmpNode = nnm.getNamedItem("Id"); //$NON-NLS-1$
+				if (tmpNode != null) {
+					id = tmpNode.getNodeValue();
+				}
+			}
+			signs.add(
+				new TriSign(
+					parseParamsListNode(currentNode),
+					id
+				)
+			);
+			idx = nextNodeElementIndex(childNodes, idx + 1);
+		}
+
+		return signs;
+	}
+
+	/** Obtiene una lista de par&aacute;metros del XML.
+	 * @param paramsNode Nodo con la lista de par&aacute;metros.
+	 * @return Mapa con los par&aacute;metro encontrados y sus valores. */
+	private static Map<String, String> parseParamsListNode(final Node paramsNode) {
+
+		final NodeList childNodes = paramsNode.getChildNodes();
+
+		final Map<String, String> params = new HashMap<String, String>();
+		int idx = nextNodeElementIndex(childNodes, 0);
+		while (idx != -1) {
+			final Node paramNode = childNodes.item(idx);
+			final String key = paramNode.getAttributes().getNamedItem("n").getNodeValue(); //$NON-NLS-1$
+			final String value = paramNode.getTextContent().trim();
+			params.put(key, value);
+
+			idx = nextNodeElementIndex(childNodes, idx + 1);
+		}
+
+		return params;
+	}
+
+	/** Recupera el &iacute;ndice del siguiente nodo de la lista de tipo <code>Element</code>.
+	 * Empieza a comprobar los nodos a partir del &iacute;ndice marcado. Si no encuentra un
+	 * nodo de tipo <i>elemento</i> devuelve -1.
+	 * @param nodes Listado de nodos.
+	 * @param currentIndex &Iacute;ndice del listado a partir del cual se empieza la comprobaci&oacute;n.
+	 * @return &Iacute;ndice del siguiente node de tipo Element o -1 si no se encontr&oacute;. */
+	private static int nextNodeElementIndex(final NodeList nodes, final int currentIndex) {
+		Node node;
+		int i = currentIndex;
+		while (i < nodes.getLength()) {
+			node = nodes.item(i);
+			if (node.getNodeType() == Node.ELEMENT_NODE) {
+				return i;
+			}
+			i++;
+		}
+		return -1;
+	}
+
+	private static TriphaseConfigDataBean loadTriphaseResponseAsProperties(final byte[] triphaseResponse) throws IOException {
 
 		final TriphaseConfigDataBean triphaseConfig = new TriphaseConfigDataBean();
+
+		final Properties resultProperties = new Properties();
+
+		resultProperties.load(new ByteArrayInputStream(triphaseResponse));
 
 		int sc = 1;
 		if (resultProperties.containsKey("SIGN_COUNT")) { //$NON-NLS-1$

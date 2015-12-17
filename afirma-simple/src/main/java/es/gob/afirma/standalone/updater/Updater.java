@@ -6,7 +6,6 @@ import java.util.Properties;
 import java.util.logging.Logger;
 
 import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
 
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.misc.http.UrlHttpManagerFactory;
@@ -20,7 +19,17 @@ public final class Updater {
 	private static String currentVersion = null;
 	private static String updateSite = "https://github.com/ctt-gob-es/clienteafirma/"; //$NON-NLS-1$
 
-	private static Properties updaterProperties = null;
+	private static final String AUTOFIRMA_AVOID_UPDATE_CHECK = "AUTOFIRMA_AVOID_UPDATE_CHECK"; //$NON-NLS-1$
+
+	private static Properties updaterProperties = new Properties();
+
+	static {
+		loadProperties();
+	}
+
+	private Updater() {
+		// No instanciable
+	}
 
 	static String getUpdateSite() {
 		return updateSite;
@@ -40,14 +49,13 @@ public final class Updater {
 			LOGGER.severe(
 				"No se ha podido cargar el archivo de recursos del actualizador: " + e //$NON-NLS-1$
 			);
-			updaterProperties = null;
+			updaterProperties = new Properties();
 		}
 	}
 
 	/** Obtiene la versi&oacute;n actual del aplicativo.
 	 * @return Versi&oacute;n actual del aplicativo. */
 	private static String getCurrentVersion() {
-		loadProperties();
 		if (currentVersion == null) {
 			currentVersion = updaterProperties.getProperty("currentVersion", "0"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
@@ -58,8 +66,6 @@ public final class Updater {
 	 * @return &Uacute;ltima versi&oacute;n disponible del programa o <code>null</code> si no
 	 *         se ha podido obtener. */
 	private static String getLatestVersion() {
-
-		loadProperties();
 
 		if (updaterProperties == null) {
 			return null;
@@ -129,8 +135,18 @@ public final class Updater {
 	/** Comprueba si hay actualizaciones del aplicativo, y en caso afirmativo lo notifica al usuario.
 	 * @param parent Componente padre para la modalidad. */
 	public static void checkForUpdates(final Object parent) {
-		if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
-			SwingUtilities.invokeLater(
+
+		boolean omitCheck = Boolean.parseBoolean(updaterProperties.getProperty("avoidUpdateCheck")); //$NON-NLS-1$
+		try {
+			omitCheck = Boolean.TRUE.toString().equalsIgnoreCase(System.getenv(AUTOFIRMA_AVOID_UPDATE_CHECK));
+		}
+		catch(final Exception e) {
+			LOGGER.warning(
+				"No se ha podido comprobar el valor de la variable de entorno " + AUTOFIRMA_AVOID_UPDATE_CHECK + ": " + e //$NON-NLS-1$ //$NON-NLS-2$
+			);
+		}
+		if (Platform.OS.WINDOWS.equals(Platform.getOS()) && !omitCheck) {
+			new Thread(
 				new Runnable() {
 					@Override
 					public void run() {
@@ -159,7 +175,7 @@ public final class Updater {
 						}
 					}
 				}
-			);
+			).start();
 		}
 	}
 

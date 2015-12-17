@@ -121,6 +121,7 @@ public class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 					signingCertificateV2,
 					messageDigest,
 					new Date(),
+					Boolean.parseBoolean(extraParams.getProperty("includeSigningTimeAttribute", "false")), //$NON-NLS-1$ //$NON-NLS-2$
 					false,           // PAdES Mode
 					contentTypeOid,
 					contentDescription,
@@ -274,6 +275,7 @@ public class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 				contentTypeOid,
 				contentDescription,
 				new Date(),
+				Boolean.parseBoolean(extraParams.getProperty("includeSigningTimeAttribute", "false")), //$NON-NLS-1$ //$NON-NLS-2$
 				CommitmentTypeIndicationsHelper.getCommitmentTypeIndications(extraParams),
 				CAdESSignerMetadataHelper.getCAdESSignerMetadata(extraParams)
 			);

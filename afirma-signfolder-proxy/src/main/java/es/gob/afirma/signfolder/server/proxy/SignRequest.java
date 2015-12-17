@@ -40,10 +40,10 @@ public class SignRequest {
 
 	/** Indica el tipo de la petici&oacute;n (firma o visto bueno). */
 	private final String type;
-	
+
 	/** Listado de documentos de la petici&oacute;n. */
 	private final SignRequestDocument[] docs;
-	
+
 	/** Construye la petici&oacute;n de firma.
 	 * @param id Identificador &uacute;nico.
 	 * @param subject Asunto.
@@ -53,6 +53,7 @@ public class SignRequest {
 	 * @param priority Prioridad.
 	 * @param workflow Si pertenece a un flujo de trabajo.
 	 * @param forward Si se ha reenviado esta petici&oacute;n.
+	 * @param type Tipo de petici&oacute;n (firma o visto bueno).
 	 * @param docs Documentos de la petici&oacute;n. */
 	public SignRequest(final String id,
 			final String subject,
@@ -130,7 +131,7 @@ public class SignRequest {
 	public String getType() {
 		return this.type;
 	}
-	
+
 	/** Recupera el listado de documentos de la petici&oacute;n de firma.
 	 * @return Listado de documentos. */
 	public SignRequestDocument[] getDocumentsRequests() {

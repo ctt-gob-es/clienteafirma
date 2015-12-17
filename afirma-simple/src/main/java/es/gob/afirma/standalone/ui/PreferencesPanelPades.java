@@ -8,6 +8,7 @@ import static es.gob.afirma.standalone.PreferencesManager.PREFERENCE_PADES_POLIC
 import static es.gob.afirma.standalone.PreferencesManager.PREFERENCE_PADES_SIGNER_CONTACT;
 import static es.gob.afirma.standalone.PreferencesManager.PREFERENCE_PADES_SIGN_PRODUCTION_CITY;
 import static es.gob.afirma.standalone.PreferencesManager.PREFERENCE_PADES_SIGN_REASON;
+import static es.gob.afirma.standalone.PreferencesManager.PREFERENCE_PADES_VISIBLE;
 
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
@@ -19,6 +20,7 @@ import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -57,6 +59,11 @@ final class PreferencesPanelPades extends JPanel {
 
 	private final JTextField padesSignerContact = new JTextField(
 		PreferencesManager.get(PREFERENCE_PADES_SIGNER_CONTACT, "") //$NON-NLS-1$
+	);
+
+	private final JCheckBox visiblePdfSignature = new JCheckBox(
+		SimpleAfirmaMessages.getString("PreferencesPanel.79"), //$NON-NLS-1$
+		Boolean.parseBoolean(PreferencesManager.get(PREFERENCE_PADES_VISIBLE, "false")) //$NON-NLS-1$
 	);
 
 
@@ -195,10 +202,34 @@ final class PreferencesPanelPades extends JPanel {
 		gbc.gridy++;
 		add(padesPreferencesPanel, gbc);
 
+		gbc.gridy++;
+		add(createVisiblePdfPanel(), gbc);
+
 	    gbc.gridy++;
 	    gbc.weighty = 1.0;
 	    add(new JPanel(), gbc); // Panel de relleno
+	}
 
+	private JPanel createVisiblePdfPanel() {
+		final JPanel panel = new JPanel();
+        panel.setBorder(
+    		BorderFactory.createTitledBorder(
+        		SimpleAfirmaMessages.getString("PreferencesPanel.80") //$NON-NLS-1$
+			)
+		);
+        panel.setLayout(new GridBagLayout());
+
+        final GridBagConstraints c = new GridBagConstraints();
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.weightx = 1.0;
+
+        this.visiblePdfSignature.setMnemonic('i');
+
+        panel.add(this.visiblePdfSignature, c);
+
+        //TODO: Incluir las opciones de configuracion de la rubrica
+
+        return panel;
 	}
 
 	@SuppressWarnings("unused")
@@ -216,6 +247,10 @@ final class PreferencesPanelPades extends JPanel {
 	}
 
 	void savePreferences() {
+
+		// Firma PDF visible
+		PreferencesManager.put(PREFERENCE_PADES_VISIBLE, Boolean.toString(this.visiblePdfSignature.isSelected()));
+
 		if ("".equals(this.padesSignerContact.getText())) { //$NON-NLS-1$
 			PreferencesManager.remove(PREFERENCE_PADES_SIGNER_CONTACT);
 		}

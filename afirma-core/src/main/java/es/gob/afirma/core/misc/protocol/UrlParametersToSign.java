@@ -38,10 +38,7 @@ public final class UrlParametersToSign extends UrlParameters {
 		COSIGN,
 
 		/** Operaci&oacute;n de contrafirma. */
-		COUNTERSIGN,
-
-		/** Selecci&oacute;n autom&aacute;tica de tipo. */
-		AUTO;
+		COUNTERSIGN;
 
 		/** Obtiene el tipo de operaci&oacute;n de firma a partir de su nombre, o <code>null</code>
 		 * si el nombre no corresponde a ninguna operaci&oacute;n conocida.
@@ -56,9 +53,6 @@ public final class UrlParametersToSign extends UrlParameters {
 			}
 			if ("COUNTERSIGN".equalsIgnoreCase(opName)) { //$NON-NLS-1$
 				return COUNTERSIGN;
-			}
-			if ("AUTO".equalsIgnoreCase(opName)) { //$NON-NLS-1$
-				return AUTO;
 			}
 			return null;
 		}
@@ -112,7 +106,11 @@ public final class UrlParametersToSign extends UrlParameters {
 		this.operation = operation;
 	}
 
-	void setSignFormat(final String format) {
+	/**
+	 * Establece el nombre del formato de firma que se debe utilizar.
+	 * @param format Formato de firma.
+	 */
+	public void setSignFormat(final String format) {
 		this.signFormat = format;
 	}
 
@@ -134,7 +132,7 @@ public final class UrlParametersToSign extends UrlParameters {
 		else if (params.containsKey(FILE_ID_PARAM)) {
 			 signatureSessionId = params.get(FILE_ID_PARAM);
 		}
-		
+
 		if (signatureSessionId != null) {
 			if (signatureSessionId.length() > MAX_ID_LENGTH) {
 				throw new ParameterException("La longitud del identificador para la firma es mayor de " + MAX_ID_LENGTH + " caracteres."); //$NON-NLS-1$ //$NON-NLS-2$
@@ -149,7 +147,7 @@ public final class UrlParametersToSign extends UrlParameters {
 
 			setSessionId(signatureSessionId);
 		}
-		
+
 		// Version minima requerida del aplicativo
 		if (params.containsKey(VER_PARAM)) {
 			setMinimumVersion(params.get(VER_PARAM));
@@ -239,5 +237,4 @@ public final class UrlParametersToSign extends UrlParameters {
 		setDefaultKeyStore(verifyDefaultKeyStoreName(params));
 
 	}
-
 }

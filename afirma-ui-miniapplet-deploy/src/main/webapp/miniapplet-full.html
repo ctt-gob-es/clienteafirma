@@ -2,10 +2,15 @@
 <html> <!-- Ejemplo basico de lanzador de la aplicacion -->
   <head>
 	<title>Ejemplo de despliegue del MiniApplet @firma</title>
-        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
 	<script type="text/javascript" src="js/miniapplet.js"></script>
 	<script type="text/javascript">
 
+		// IMPORTANTE: PARA PRUEBAS, USAR SIEMPRE UNA IP O NOMBRE DE DOMINIO, NUNCA 'LOCALHOST' O '127.0.0.1'
+		// SI NO SE HACE ASI, AUTOFIRMA BLOQUEARA LA FIRMA POR SEGURIDAD
+		//var HOST = "http://prevalide.redsara.es/firmaMovil";
+		var HOST = "http://172.24.31.8:8080";
+	
 		function saveSignature() {
 			MiniApplet.saveDataToFile(
 					document.getElementById('result').value,
@@ -14,16 +19,16 @@
 					null,
 					null);
 		}
-		
-		function showResultCallback(signatureB64) {
+
+		function showResultCallback(signatureB64, certificateB64) {
 			showLog("Firma OK");
 			document.getElementById('result').value = signatureB64;
 		}
-		
+
 		function showLogCallback(errorType, errorMessage) {
 			showLog("Type: " + errorType + "\nMessage: " + errorMessage);
 		}
-	
+
 		function doSign() {
 			try {
 				var data = document.getElementById("data").value;
@@ -35,7 +40,7 @@
 					document.getElementById("params").value,
 					showResultCallback,
 					showLogCallback);
-			
+				
 			} catch(e) {
 				try {
 					showLog("Type: " + MiniApplet.getErrorType() + "\nMessage: " + MiniApplet.getErrorMessage());
@@ -44,12 +49,63 @@
 				}
 			}
 		}
+
+		function doSignBatch() {
+			try {
+				var batch = createBatchConfiguration();
+
+				MiniApplet.signBatch(
+					MiniApplet.getBase64FromText(batch),
+					'http://' + HOST + '/afirma-server-triphase-signer/BatchPresigner', //$NON-NLS-1$
+					'http://' + HOST + '/afirma-server-triphase-signer/BatchPostsigner', //$NON-NLS-1$
+					document.getElementById("params").value,
+					mostrarResultado,
+					showLogCallback);
+
+			} catch(e) {
+				try {
+					showLog("Type: " + MiniApplet.getErrorType() + "\nMessage: " + MiniApplet.getErrorMessage());
+				} catch(ex) {
+					showLog("Error: " + e);
+				}
+			}
+		}
+
+		function createBatchConfiguration() {
+			
+			var config1 = MiniApplet.getBase64FromText("FileName=C:/salida/batch/FIRMA1.xml");
+			var config2 = MiniApplet.getBase64FromText("FileName=C:/salida/batch/FIRMA2.xml");
+			
+			return "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\r\n" + //$NON-NLS-1$
+			"<signbatch stoponerror=\"false\" algorithm=\"SHA256withRSA\">\r\n" + //$NON-NLS-1$
+			" <singlesign Id=\"7725374e-728d-4a33-9db9-3a4efea4cead\">\r\n" + //$NON-NLS-1$
+			"  <datasource>http://google.com</datasource>\r\n" + //$NON-NLS-1$
+			"  <format>XAdES</format>\r\n" + //$NON-NLS-1$
+			"  <suboperation>sign</suboperation>\r\n" + //$NON-NLS-1$
+			"  <extraparams>Iw0KI1RodSBBdWcgMTMgMTY6Mjk6MDUgQ0VTVCAyMDE1DQpTaWduYXR1cmVJZD03NzI1Mzc0ZS03MjhkLTRhMzMtOWRiOS0zYTRlZmVhNGNlYWQNCg==</extraparams>\r\n" + //$NON-NLS-1$
+			"  <signsaver>\r\n" + //$NON-NLS-1$
+			"   <class>es.gob.afirma.signers.batch.SignSaverFile</class>\r\n" + //$NON-NLS-1$
+			"   <config>" + config1 + "</config>\r\n" + //$NON-NLS-1$
+			"  </signsaver>\r\n" + //$NON-NLS-1$
+			" </singlesign>\r\n" + //$NON-NLS-1$
+			" <singlesign Id=\"93d1531c-cd32-4c8e-8cc8-1f1cfe66f64a\">\r\n" + //$NON-NLS-1$
+			"  <datasource>SG9sYSBNdW5kbw==</datasource>\r\n" + //$NON-NLS-1$
+			"  <format>CAdES</format>\r\n" + //$NON-NLS-1$
+			"  <suboperation>sign</suboperation>\r\n" + //$NON-NLS-1$
+			"  <extraparams>Iw0KI1RodSBBdWcgMTMgMTY6Mjk6MDUgQ0VTVCAyMDE1DQpTaWduYXR1cmVJZD05M2QxNTMxYy1jZDMyLTRjOGUtOGNjOC0xZjFjZmU2NmY2NGENCg==</extraparams>\r\n" + //$NON-NLS-1$
+			"  <signsaver>\r\n" + //$NON-NLS-1$
+			"   <class>es.gob.afirma.signers.batch.SignSaverFile</class>\r\n" + //$NON-NLS-1$
+			"   <config>" + config2 + "</config>\r\n" + //$NON-NLS-1$
+			"  </signsaver>\r\n" + //$NON-NLS-1$
+			" </singlesign>\r\n" + //$NON-NLS-1$
+			"</signbatch>"; //$NON-NLS-1$
+		}
 		
 		function doCoSign() {
 			try {
 				var signature = document.getElementById("signature").value;
 				var data = document.getElementById("data").value;
-				
+
 				MiniApplet.coSign(
 					(signature != undefined && signature != null && signature != "") ? signature : null,
 					(data != undefined && data != null && data != "") ? data : null,
@@ -63,11 +119,11 @@
 				showLog("Type: " + MiniApplet.getErrorType() + "\nMessage: " + MiniApplet.getErrorMessage());
 			}
 		}
-		
+
 		function doCounterSign() {
 			try {
 				var signature = document.getElementById("signature").value;
-				
+
 				MiniApplet.counterSign(
 					(signature != undefined && signature != null && signature != "") ? signature : null,
 					document.getElementById("algorithm").value,
@@ -79,7 +135,7 @@
 				showLog("Type: " + MiniApplet.getErrorType() + "\nMessage: " + MiniApplet.getErrorMessage());
 			}
 		}
-		
+
 		function showAppletLog() {
 			try {
 				showLog(MiniApplet.getCurrentLog());
@@ -87,7 +143,7 @@
 				showLog("Type: " + MiniApplet.getErrorType() + "\nMessage: " + MiniApplet.getErrorMessage());
 			}
 		}
-		
+
 		/**
 		 * Funcion para la carga de un fichero. Almacena el contenido del fichero en un campo oculto y muestra su nombre.
 		 * LA CARGA INDEPENDIENTE DE FICHEROS DEBE EVITARSE EN LA MEDIDA DE LO POSIBLE. Si deseas firmar, cofirmar o contrafirmar
@@ -138,12 +194,7 @@
   </head>
 	<body>
 		<script type="text/javascript">
-			// IMPORTANTE: PARA PRUEBAS, USAR SIEMPRE UNA IP O NOMBRE DE DOMINIO, NUNCA 'LOCALHOST' O '127.0.0.1'
-			// SI NO SE HACE ASI, FIRMAFACIL BLOQUEARA LA FIRMA POR SEGURIDAD
-			var HOST = "XX.XX.XX.XX:8080";
-
 			MiniApplet.cargarMiniApplet('http://' + HOST + '/afirma-ui-miniapplet-deploy');
-			//MiniApplet.cargarAppAfirma('miniapplet-full_1_3.jar');
 			MiniApplet.setServlets("http://" + HOST + "/afirma-signature-storage/StorageService", "http://" + HOST + "/afirma-signature-retriever/RetrieveService");
 		</script>
 
@@ -173,6 +224,9 @@
 		 <option value="XAdES">XAdES</option>
 		 <option value="XAdEStri">XAdEStri</option>
 		 <option value="FacturaE">FacturaE</option>
+		 <option value="FacturaEtri">FacturaEtri</option>
+		 <option value="ODF">ODF</option>
+		 <option value="OOXML">OOXML</option>
 		 <option value="AUTO">AUTO</option>
 		 </select>
 		 <span>(El formato AUTO detecta el formato en las operaciones de multifirma)</span>
@@ -192,14 +246,15 @@
 		 <input type="button" value="Limpiar" onclick="cleanExtraParams();">&nbsp;
 		 <span>(Insertar las propiedades de una en una)</span>
 		 <br>
-		 <textarea id="params" cols="50" rows="5" readonly>serverUrl=http://XX.XX.XX.XX:8080/afirma-server-triphase-signer/SignatureService
+<!--		 <textarea id="params" cols="50" rows="5" readonly>serverUrl=http://prevalide.redsara.es/firmaMovil/afirma-server-triphase-signer/SignatureService -->
+		<textarea id="params" cols="50" rows="5" readonly>serverUrl=http://172.24.31.8:8080/afirma-server-triphase-signer/SignatureService
 </textarea>
-
 		</div>
 		</fieldset>
 		<br/>
-		
+
 		<input type="button" value="Firmar" onclick="doSign();">&nbsp;
+		<input type="button" value="Firmar Batch" onclick="doSignBatch();">&nbsp;
 		<input type="button" value="Cofirmar" onclick="doCoSign();">&nbsp;
 		<input type="button" value="Contrafirmar" onclick="doCounterSign();">
 		<input type="button" value="Mostrar Log" onclick="showAppletLog();">

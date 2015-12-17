@@ -21,7 +21,7 @@ import es.gob.afirma.core.misc.Base64;
 public class ListRequestParser {
 
 	private final static int DEFAULT_PAGE_SIZE = 50;
-	
+
 	private final static String LIST_REQUEST_NODE = "rqtlst"; //$NON-NLS-1$
 	private final static String CERT_NODE = "cert"; //$NON-NLS-1$
 	private final static String FORMATS_NODE = "fmts"; //$NON-NLS-1$
@@ -34,7 +34,7 @@ public class ListRequestParser {
 	private final static String STATE_ATTRIBUTE = "state"; //$NON-NLS-1$
 	private final static String PAGE_ATTRIBUTE = "pg"; //$NON-NLS-1$
 	private final static String PAGE_SIZE_ATTRIBUTE = "sz"; //$NON-NLS-1$
-	
+
 
 	private ListRequestParser() {
 		// No se permite el constructor por defecto
@@ -72,12 +72,12 @@ public class ListRequestParser {
 		// Identificamos el numero de pagina solicitado
 		final String pageAttr = doc.getDocumentElement().getAttribute(PAGE_ATTRIBUTE);
 		numPage = pageAttr == null ? 1 : Integer.parseInt(pageAttr);
-		
+
 		// Configuramos el tamano de las paginas
 		final String pageSizeAttr = doc.getDocumentElement().getAttribute(PAGE_SIZE_ATTRIBUTE);
 		pageSize = pageSizeAttr == null ? DEFAULT_PAGE_SIZE : Integer.parseInt(pageSizeAttr);
 
-		
+
 		final byte[] certEncoded;
 
 		// Establecemos el certificado para la autenticacion
@@ -86,7 +86,7 @@ public class ListRequestParser {
 		if (nodeIndex != -1 && CERT_NODE.equalsIgnoreCase(requestNodes.item(nodeIndex).getNodeName())) {
 			try {
 				certEncoded = Base64.decode(requestNodes.item(nodeIndex).getTextContent().trim());
-			} catch (Exception e) {
+			} catch (final Exception e) {
 				throw new IllegalArgumentException(
 						"No se ha podido obtener la codificacion del certificado a partir del XML: " + e); //$NON-NLS-1$
 			}
@@ -151,9 +151,9 @@ public class ListRequestParser {
 	}
 
 	/**
-	 *
-	 * @param childNodes
-	 * @return
+	 * Extrae la configuraci&oacute;n de los filtros de un listado de nodos XML.
+	 * @param nodes Listado de nodos.
+	 * @return Configuraci&oacute;n de los filtros.
 	 */
 	private static Map<String, String> getFilters(final NodeList nodes) {
 

@@ -23,7 +23,7 @@ final class RejectRequestsTask extends AsyncTask<Void, Void, RequestResult[]> {
 	 * @param requests Listado de peticiones que se desean rechazar.
 	 * @param certB64 Certificado codificado en base64 para autenticar la operaci&oacute;n.
 	 * @param commManager Manejador de las comunicaciones para el rechazo de las peticiones.
-	 * @param listView Lista que debe actualizar tras el rechazo.
+	 * @param listener Manejador que gestiona el comportamiento de la operaci&oacute;n al finalizar.
 	 */
 	 RejectRequestsTask(final SignRequest[] requests, final String certB64, final CommManager commManager, final OperationRequestListener listener) {
 		this.requestIds = new String[requests.length];
@@ -42,8 +42,7 @@ final class RejectRequestsTask extends AsyncTask<Void, Void, RequestResult[]> {
 	 * @param requests Listado de peticiones que se desean rechazar.
 	 * @param certB64 Certificado codificado en base64 para autenticar la operaci&oacute;n.
 	 * @param commManager Manejador de las comunicaciones para el rechazo de las peticiones.
-	 * @param listView Lista que debe actualizar tras el rechazo.
-	 * @param activity Actividad sobre la que se ejecuta la operaci&oacute;n.
+	 * @param listener Manejador que gestiona el comportamiento de la operaci&oacute;n al finalizar.
 	 */
 	RejectRequestsTask(final RequestDetail[] requests, final String certB64, final CommManager commManager, final OperationRequestListener listener) {
 		this.requestIds = new String[requests.length];
@@ -62,8 +61,7 @@ final class RejectRequestsTask extends AsyncTask<Void, Void, RequestResult[]> {
 	 * @param requestId Identificador de la petici&oacute;n a rechazar.
 	 * @param certB64 Certificado codificado en base64 para autenticar la operaci&oacute;n.
 	 * @param commManager Manejador de las comunicaciones para el rechazo de las peticiones.
-	 * @param listView Lista que debe actualizar tras el rechazo.
-	 * @param activity Actividad sobre la que se ejecuta la operaci&oacute;n.
+	 * @param listener Manejador que gestiona el comportamiento de la operaci&oacute;n al finalizar.
 	 */
 	RejectRequestsTask(final String requestId, final String certB64, final CommManager commManager, final OperationRequestListener listener) {
 		this.requestIds = new String[] { requestId };

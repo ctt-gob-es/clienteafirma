@@ -58,20 +58,24 @@ final class MultifirmaMasiva extends JPanel {
 
     /** Carga el combo almac&eacute;n con los almacenes y repositorios disponibles
      * @param comboAlmacen Combo con los almacenes y repositorios */
-    private static void cargarComboAlmacen(final JComboBox comboAlmacen) {
-        comboAlmacen.setModel(new DefaultComboBoxModel(KeyStoreLoader.getKeyStoresToSign()));
+    private static void cargarComboAlmacen(final JComboBox<KeyStoreConfiguration> comboAlmacen) {
+        comboAlmacen.setModel(new DefaultComboBoxModel<>(KeyStoreLoader.getKeyStoresToSign()));
     }
 
     /** Firma masivamente haciendo uso del almacen / repositorio
      * @param comboAlmacen Combo con los almacenes / repositorios de certificados
      * @param alerta1 Checkbox para emitir un pitido al finalizar la operacion */
     @SuppressWarnings("unused")
-    void firmarActionPerformed(final JComboBox comboAlmacen, final JCheckBox alerta1) {
+    void firmarActionPerformed(final JComboBox<KeyStoreConfiguration> comboAlmacen, final JCheckBox alerta1) {
 
         // Mensaje que indica que se va a realizar el proceso de firma y que puede llevar un tiempo
-        CustomDialog.showMessageDialog(SwingUtilities.getRoot(this),
-                                       true,
-                                       Messages.getString("Firma.msg.info"), Messages.getString("PrincipalGUI.TabConstraints.tabTitleMultifirmaMasiva"), JOptionPane.INFORMATION_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
+        CustomDialog.showMessageDialog(
+    		SwingUtilities.getRoot(this),
+           true,
+           Messages.getString("Firma.msg.info"), //$NON-NLS-1$
+           Messages.getString("PrincipalGUI.TabConstraints.tabTitleMultifirmaMasiva"), //$NON-NLS-1$
+           JOptionPane.INFORMATION_MESSAGE
+       );
 
         final KeyStoreConfiguration kssc = (KeyStoreConfiguration) comboAlmacen.getSelectedItem();
 
@@ -102,7 +106,7 @@ final class MultifirmaMasiva extends JPanel {
         c.fill = GridBagConstraints.BOTH;
 
         // Combo con los almacenes / repositorios disponibles
-        final JComboBox comboAlmacen = new JComboBox();
+        final JComboBox<KeyStoreConfiguration> comboAlmacen = new JComboBox<>();
         comboAlmacen.setToolTipText(Messages.getString("Firma.almacen.certificados.description")); // NOI18N //$NON-NLS-1$
         // comboAlmacen.getAccessibleContext().setAccessibleName(etiquetaAlmacen.getText()+" "+Messages.getString("Firma.almacen.certificados.description")
         // + " ALT + A."); // NOI18N

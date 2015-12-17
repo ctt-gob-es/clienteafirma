@@ -36,6 +36,7 @@ import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOInvalidFormatException;
 import es.gob.afirma.core.ciphers.AOCipherConfig;
 import es.gob.afirma.core.signers.AOSignConstants;
+import es.gob.afirma.signers.cms.AOCMSExtraParams;
 import es.gob.afirma.signers.cms.AOCMSSigner;
 import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
 
@@ -57,7 +58,7 @@ public class AOCMSMultiEnveloper {
    * @throws AOException Si ocurre cualquier problema durante el proceso */
   public byte[] cosign(final byte[] data, final byte[] sign, final String algorithm, final PrivateKeyEntry keyEntry, final Properties xParams) throws AOException {
 
-        final String precalculatedDigest = xParams != null ? xParams.getProperty("precalculatedHashAlgorithm") : null; //$NON-NLS-1$
+        final String precalculatedDigest = xParams != null ? xParams.getProperty(AOCMSExtraParams.PRECALCULATED_HASH_ALGORITHM) : null;
 
         byte[] messageDigest = null;
         if (precalculatedDigest != null) {

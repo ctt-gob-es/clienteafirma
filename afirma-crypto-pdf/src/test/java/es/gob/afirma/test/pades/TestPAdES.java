@@ -402,10 +402,8 @@ public class TestPAdES {
 
     }
 
-    /**
-     * Prueba la firma de un PDF certificado.
-     * @throws Exception en cualquier error
-     */
+    /** Prueba la firma de un PDF certificado.
+     * @throws Exception en cualquier error. */
     @SuppressWarnings("static-method")
 	@Test
     public void testCertificatedSignature() throws Exception {

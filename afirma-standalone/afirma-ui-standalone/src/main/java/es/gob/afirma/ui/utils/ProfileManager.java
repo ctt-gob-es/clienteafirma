@@ -140,7 +140,7 @@ public final class ProfileManager {
     private static Set<String> getProfileIdsSet() {
 
         final String profiles = Main.getPreferences().get(KEY_PROFILES, null);
-        final HashSet<String> profilesSet = new HashSet<String>();
+        final HashSet<String> profilesSet = new HashSet<>();
         if (profiles != null && profiles.trim().length() > 0) {
             for (final String profileId : profiles.split(IDS_SEPARATOR)) {
                 profilesSet.add(profileId);
@@ -421,7 +421,7 @@ public final class ProfileManager {
     /** Recupera el listado de nombres de perfiles registrados en la aplicaci&oacute;n.
      * @return Nombres de los perfiles. */
     public static String[] getProfilesNames() {
-        final List<String> names = new ArrayList<String>();
+        final List<String> names = new ArrayList<>();
         final Iterator<String> i = getProfileIdsSet().iterator();
         while (i.hasNext()) {
             names.add(getPreference(PREFIX_KEY + i.next() + KEY_PROFILE_NAME));

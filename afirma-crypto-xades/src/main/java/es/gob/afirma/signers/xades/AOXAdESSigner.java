@@ -290,7 +290,7 @@ public final class AOXAdESSigner implements AOSigner {
     static final String ENCODING_STR = "Encoding"; //$NON-NLS-1$
 
     static {
-        Utils.installXmlDSigProvider();
+        Utils.installXmlDSigProvider(false);
     }
 
     /** Firma datos en formato XAdES.
@@ -410,6 +410,7 @@ public final class AOXAdESSigner implements AOSigner {
                        final PrivateKey key,
                        final Certificate[] certChain,
                        final Properties xParams) throws AOException {
+
     	return XAdESSigner.sign(data, algorithm, key, certChain, xParams);
     }
 
@@ -641,6 +642,7 @@ public final class AOXAdESSigner implements AOSigner {
                          final PrivateKey key,
                          final Certificate[] certChain,
                          final Properties xParams) throws AOException {
+
     	return XAdESCoSigner.cosign(sign, algorithm, key, certChain, xParams);
     }
 

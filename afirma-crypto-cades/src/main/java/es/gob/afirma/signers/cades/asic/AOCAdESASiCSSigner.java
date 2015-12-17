@@ -16,6 +16,7 @@ import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.signers.asic.ASiCUtil;
 import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.signers.cades.AOCAdESSigner;
+import es.gob.afirma.signers.cades.CAdESExtraParams;
 
 /** Firmador CAdES ASiC-S.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
@@ -53,14 +54,16 @@ public final class AOCAdESASiCSSigner implements AOSigner {
 
 		final Properties extraParams = xParams != null ? xParams : new Properties();
 
-		extraParams.put("mode", "explicit"); //$NON-NLS-1$ //$NON-NLS-2$
+		// solo para firmas simples CAdES ASiC-S
+		extraParams.put(CAdESExtraParams.MODE, "explicit"); //$NON-NLS-1$
+
 		final byte[] signature = new AOCAdESSigner().sign(data, algorithm, key, certChain, extraParams);
 
 		return ASiCUtil.createSContainer(
 			signature,
 			data,
 			ASiCUtil.ENTRY_NAME_BINARY_SIGNATURE,
-			extraParams.getProperty("asicsFilename") //$NON-NLS-1$
+			extraParams.getProperty(CAdESASiCExtraParams.ASICS_FILENAME)
 		);
 	}
 
@@ -81,7 +84,6 @@ public final class AOCAdESASiCSSigner implements AOSigner {
 			sign = ASiCUtil.getASiCSBinarySignature(is);
 		}
 		catch(final Exception e) {
-			LOGGER.info("La firma proporcionada no es ASiC-S: " + e); //$NON-NLS-1$
 			return false;
 		}
 		return new AOCAdESASiCSSigner().isSign(sign);
@@ -157,7 +159,7 @@ public final class AOCAdESASiCSSigner implements AOSigner {
 			             final Certificate[] certChain,
 			             final Properties extraParams) throws AOException, IOException {
         try {
-			return ((AOCoSigner)Class.forName("es.gob.afirma.signers.multi.cades.asic.AOCAdESASiCSCoSigner").newInstance()).cosign( //$NON-NLS-1$
+			return ((AOCoSigner) Class.forName("es.gob.afirma.signers.multi.cades.asic.AOCAdESASiCSCoSigner").newInstance()).cosign( //$NON-NLS-1$
 				data,
 				sign,
 				algorithm,
@@ -233,7 +235,7 @@ public final class AOCAdESASiCSSigner implements AOSigner {
 			                  final Properties extraParams) throws AOException,
 			                                                       IOException {
         try {
-			return ((AOCounterSigner)Class.forName("es.gob.afirma.signers.multi.cades.asic.AOCAdESASiCSCounterSigner").newInstance()).countersign( //$NON-NLS-1$
+			return ((AOCounterSigner) Class.forName("es.gob.afirma.signers.multi.cades.asic.AOCAdESASiCSCounterSigner").newInstance()).countersign( //$NON-NLS-1$
 				sign,
 				algorithm,
 				targetType,

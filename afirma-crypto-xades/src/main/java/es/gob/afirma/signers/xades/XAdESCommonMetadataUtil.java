@@ -32,7 +32,7 @@ final class XAdESCommonMetadataUtil {
 		}
 		catch (final NoSuchAlgorithmException e1) {
 			throw new AOException(
-				"El algoritmo indicado para la politica (" + extraParams.getProperty("policyIdentifierHashAlgorithm") + ") no esta soportado: " + e1, e1 //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				"El algoritmo indicado para la politica (" + extraParams.getProperty(XAdESExtraParams.POLICY_IDENTIFIER_HASH_ALGORITHM) + ") no esta soportado: " + e1, e1 //$NON-NLS-1$ //$NON-NLS-2$
 			);
 		}
 		if (spi != null) {
@@ -59,7 +59,7 @@ final class XAdESCommonMetadataUtil {
 		}
 		SignerRole signerRole = null;
 		try {
-			final String claimedRole = extraParams.getProperty("signerClaimedRoles"); //$NON-NLS-1$
+			final String claimedRole = extraParams.getProperty(XAdESExtraParams.SIGNER_CLAIMED_ROLES);
 			signerRole = new SignerRoleImpl();
 			if (claimedRole != null) {
 				final String[] roles = claimedRole.split(Pattern.quote("|")); //$NON-NLS-1$
@@ -79,10 +79,10 @@ final class XAdESCommonMetadataUtil {
 			return null;
 		}
 		return getSignatureProductionPlace(
-			extraParams.getProperty("signatureProductionCity"), //$NON-NLS-1$
-			extraParams.getProperty("signatureProductionProvince"), //$NON-NLS-1$
-			extraParams.getProperty("signatureProductionPostalCode"), //$NON-NLS-1$
-			extraParams.getProperty("signatureProductionCountry") //$NON-NLS-1$
+			extraParams.getProperty(XAdESExtraParams.SIGNATURE_PRODUCTION_CITY),
+			extraParams.getProperty(XAdESExtraParams.SIGNATURE_PRODUCTION_PROVINCE),
+			extraParams.getProperty(XAdESExtraParams.SIGNATURE_PRODUCTION_POSTAL_CODE),
+			extraParams.getProperty(XAdESExtraParams.SIGNATURE_PRODUCTION_COUNTRY)
 		);
 	}
 
@@ -101,11 +101,11 @@ final class XAdESCommonMetadataUtil {
 			return null;
 		}
 		return getPolicy(
-			extraParams.getProperty("policyIdentifier"), //$NON-NLS-1$
-			extraParams.getProperty("policyIdentifierHash"), //$NON-NLS-1$
-			extraParams.getProperty("policyIdentifierHashAlgorithm"), //$NON-NLS-1$
-			extraParams.getProperty("policyDescription"), //$NON-NLS-1$
-			extraParams.getProperty("policyQualifier") //$NON-NLS-1$
+			extraParams.getProperty(XAdESExtraParams.POLICY_IDENTIFIER),
+			extraParams.getProperty(XAdESExtraParams.POLICY_IDENTIFIER_HASH),
+			extraParams.getProperty(XAdESExtraParams.POLICY_IDENTIFIER_HASH_ALGORITHM),
+			extraParams.getProperty(XAdESExtraParams.POLICY_DESCRIPTION),
+			extraParams.getProperty(XAdESExtraParams.POLICY_QUALIFIER)
 		);
 	}
 
@@ -122,9 +122,8 @@ final class XAdESCommonMetadataUtil {
 
 		String identifier;
 		try {
-			new Oid(id);
 			logger.warning(
-				"Se proporciono directamente un OID como identificador de politica (" + id + "), se tranformara en URN con el prefijo 'urn:oid:'" //$NON-NLS-1$ //$NON-NLS-2$
+				"Se proporciono directamente un OID como identificador de politica (" + new Oid(id) + "), se tranformara en URN con el prefijo 'urn:oid:'" //$NON-NLS-1$ //$NON-NLS-2$
 			);
 			identifier = "urn:oid:" + id; //$NON-NLS-1$
 		}

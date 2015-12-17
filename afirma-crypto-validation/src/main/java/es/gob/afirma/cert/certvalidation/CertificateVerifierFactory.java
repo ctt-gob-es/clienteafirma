@@ -33,8 +33,10 @@ public final class CertificateVerifierFactory {
 
 	/** Obtiene un validador para el certificado proporcionado.
 	 * @param cert Certificado a validar
-	 * @return Validador para el certificado proporcionado */
-	public static CertificateVerifier getCertificateVerifier(final X509Certificate cert) {
+	 * @return Validador para el certificado proporcionado
+	 * @throws CertificateVerifierFactoryException Si o se conocen mecanismos de validacion
+	 *                                             para los certificados del emisor indicado.*/
+	public static CertificateVerifier getCertificateVerifier(final X509Certificate cert) throws CertificateVerifierFactoryException {
 		if (cert == null) {
 			throw new IllegalArgumentException("El certificado no puede ser nulo"); //$NON-NLS-1$
 		}
@@ -57,9 +59,14 @@ public final class CertificateVerifierFactory {
 		final String validationProperties = p.getProperty(crc + ".validation.properties"); //$NON-NLS-1$
 		final String validationMethod     = p.getProperty(crc + ".validation.type"); //$NON-NLS-1$
 		if (validationMethod == null) {
-			throw new IllegalStateException(
-					"No se conocen mecanismos de validacion para los certificados de este emisor" //$NON-NLS-1$
+			try {
+				return new CrlCertificateVerifier(cert);
+			}
+			catch(final Exception e) {
+				throw new CertificateVerifierFactoryException(
+					"No se conocen mecanismos de validacion para los certificados de este emisor: " + cert.getIssuerX500Principal(), e //$NON-NLS-1$
 				);
+			}
 		}
 		else if ("ocsp".equalsIgnoreCase(validationMethod)) { //$NON-NLS-1$
 			LOGGER.info("Se usara OCSP para la validacion"); //$NON-NLS-1$

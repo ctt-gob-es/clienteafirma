@@ -13,6 +13,8 @@
 		<afirma.keytool.keystore>${basedir}/afirma.keystore</afirma.keytool.keystore>
 		<afirma.keytool.alias>codesign</afirma.keytool.alias>
 		<afirma.keytool.password>afirma</afirma.keytool.password>
+		<afirma.jar.name>miniapplet-full</afirma.jar.name>
+		<afirma.legible.version>1_4</afirma.legible.version>
 	</properties>
 
 	<profiles>
@@ -203,6 +205,16 @@
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.1</version>
+				<configuration>
+					<source>1.6</source>
+					<target>1.6</target>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-shade-plugin</artifactId>
 				<version>1.6</version>
 				<executions>
@@ -292,7 +304,7 @@
 					<keystore>${afirma.keytool.keystore}</keystore>
 					<alias>${afirma.keytool.alias}</alias>
 					<storepass>${afirma.keytool.password}</storepass>
-					<signedjar>${project.build.directory}/${project.build.finalName}-${file-tag}-signed.jar</signedjar>
+					<signedjar>${project.build.directory}/${afirma.jar.name}_${afirma.legible.version}.jar</signedjar>
 					<verify>true</verify>
 					<archive>
 						<manifestFile>src/main/resources/META-INF/MANIFEST.MF</manifestFile>

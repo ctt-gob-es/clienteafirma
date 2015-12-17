@@ -10,7 +10,7 @@ import java.security.Signature;
 import java.util.Enumeration;
 import java.util.logging.Logger;
 
-import org.junit.Ignore;
+import org.junit.Test;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.Platform;
@@ -33,7 +33,8 @@ public final class SimpleTest {
     /** Prueba de la obtenci&oacute;n de almac&eacute;n y alias con Mozilla NSS.
      * @throws Exception En cualquier error. */
     @SuppressWarnings("static-method")
-    @Ignore // Necesita NSS
+    @Test
+    //@Ignore // Necesita NSS
     public void testKeyStoreManagerCreation() throws Exception {
     	final AOKeyStoreManager ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
     	    AOKeyStore.MOZ_UNI, // Store

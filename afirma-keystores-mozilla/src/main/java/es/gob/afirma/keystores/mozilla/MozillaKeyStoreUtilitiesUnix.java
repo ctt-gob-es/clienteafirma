@@ -16,6 +16,21 @@ final class MozillaKeyStoreUtilitiesUnix {
 
 	private static final String SOFTOKN3_SO = "libsoftokn3.so"; //$NON-NLS-1$
 
+	private static final String[] NSS_PATHS = new String[] {
+		"/usr/lib/firefox", //$NON-NLS-1$
+		"/usr/lib/firefox-" + searchLastFirefoxVersion("/usr/lib/"), //$NON-NLS-1$ //$NON-NLS-2$
+		"/opt/firefox", //$NON-NLS-1$
+		"/opt/firefox-" + searchLastFirefoxVersion("/opt/"), //$NON-NLS-1$ //$NON-NLS-2$
+		"/lib", //$NON-NLS-1$
+		"/usr/lib", //$NON-NLS-1$
+		"/usr/lib/nss", //$NON-NLS-1$
+		"/usr/lib/i386-linux-gnu/nss", /* En algunos Ubuntu y Debian */ //$NON-NLS-1$
+		"/opt/fedora-ds/clients/lib", //$NON-NLS-1$
+		"/opt/google/chrome", /* NSS de Chrome cuando no hay NSS de Mozilla de la misma arquietctura */ //$NON-NLS-1$
+		"/usr/lib/thunderbird", /* Si hay Thunderbird pero no Firefox */ //$NON-NLS-1$
+		"/usr/lib64" /* NSS cuando solo hay Firefox de 64 en el sistema */ //$NON-NLS-1$
+	};
+
 	private MozillaKeyStoreUtilitiesUnix() {
 		// No instanciable
 	}
@@ -36,7 +51,7 @@ final class MozillaKeyStoreUtilitiesUnix {
 			catch (final Exception e) {
 				nssLibDir = null;
 				LOGGER.warning(
-						"Descartamos el NSS situado entre /lib y /usr/lib porque no puede cargarse adecuadamente: " + e //$NON-NLS-1$
+					"Descartamos el NSS situado entre /lib y /usr/lib porque no puede cargarse adecuadamente: " + e //$NON-NLS-1$
 				);
 			}
 			if (nssLibDir != null) {
@@ -46,30 +61,22 @@ final class MozillaKeyStoreUtilitiesUnix {
 		// *********************************************************************
 		// *********************************************************************
 
-		final String[] paths =
-			new String[] {
-				"/usr/lib/firefox", //$NON-NLS-1$
-				"/usr/lib/firefox-" + searchLastFirefoxVersion("/usr/lib/"), //$NON-NLS-1$ //$NON-NLS-2$
-				"/opt/firefox", //$NON-NLS-1$
-				"/opt/firefox-" + searchLastFirefoxVersion("/opt/"), //$NON-NLS-1$ //$NON-NLS-2$
-				"/lib", //$NON-NLS-1$
-				"/usr/lib", //$NON-NLS-1$
-				"/usr/lib/nss", //$NON-NLS-1$
-				"/usr/lib/i386-linux-gnu/nss", /* En algunos Ubuntu */ //$NON-NLS-1$
-				"/opt/fedora-ds/clients/lib", //$NON-NLS-1$
-				"/opt/google/chrome", /* NSS de Chrome cuando no hay NSS de Mozilla de la misma arquietctura */ //$NON-NLS-1$
-				"/usr/lib/thunderbird", /* Si hay Thunderbird pero no Firefox */ //$NON-NLS-1$
-				"/usr/lib64" /* NSS cuando solo hay Firefox de 64 en el sistema */ //$NON-NLS-1$
-		};
+		for (final String path : NSS_PATHS) {
 
-		for (final String path : paths) {
 			String tailingLib = "/libnspr4.so"; //$NON-NLS-1$
+
+			// Si esta SQLite lo ponemos como extremo de la carga
 			if (new File(path + "/mozsqlite3.so").exists()) { //$NON-NLS-1$
 				tailingLib = "/mozsqlite3.so"; //$NON-NLS-1$
 			}
 			else if (new File(path + "/libmozsqlite3.so").exists()) { //$NON-NLS-1$
 				tailingLib = "/libmozsqlite3.so"; //$NON-NLS-1$
 			}
+			// En Debian Sid
+			else if (new File(path + "/libsqlite3.so.0").exists()) { //$NON-NLS-1$
+				tailingLib = "/libsqlite3.so.0"; //$NON-NLS-1$
+			}
+
 			if (new File(path + "/" + SOFTOKN3_SO).exists() && new File(path + tailingLib).exists()) { //$NON-NLS-1$
 				try {
 					System.load(path + tailingLib);
@@ -78,9 +85,7 @@ final class MozillaKeyStoreUtilitiesUnix {
 				catch (final Exception e) {
 					nssLibDir = null;
 					LOGGER.warning(
-							"Descartamos el NSS situado en '" + path //$NON-NLS-1$
-							+ "' porque no puede cargarse adecuadamente: " //$NON-NLS-1$
-							+ e
+						"Descartamos el NSS situado en '" + path + "' porque no puede cargarse adecuadamente: " + e //$NON-NLS-1$ //$NON-NLS-2$
 					);
 				}
 				if (nssLibDir != null) {

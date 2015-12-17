@@ -110,7 +110,7 @@ final class PanelRemitentes extends JAccessibilityDialogWizard {
     private AOKeyStoreManager keyStoreManager;
 
     /** Lista con los remitentes */
-    private final List<CertificateDestiny> listaCertificadosRe = new ArrayList<CertificateDestiny>();
+    private final List<CertificateDestiny> listaCertificadosRe = new ArrayList<>();
 
     /** @return the listaCertificadosRe */
     protected List<CertificateDestiny> getListaCertificadosRe() {
@@ -221,16 +221,18 @@ final class PanelRemitentes extends JAccessibilityDialogWizard {
     /** Ensobra el fichero dado
      * @return True o false si la operacion ha sido satisfactoria */
     public boolean anadirRemitentes() {
-        try {
-            final FileInputStream dataFis = new FileInputStream(this.rutafichero);
+        try (final FileInputStream dataFis = new FileInputStream(this.rutafichero); ) {
+
             byte[] envelopedData = AOUtil.getDataFromInputStream(dataFis);
 
             // Anadimos solo el ultimo
-            final PrivateKeyEntry privateKey =
-                    getPrivateKeyEntry(this.keyStoreManager, this.listaCertificadosRe.get(this.listaCertificadosRe.size() - 1).getAlias(), this.kconf);
+            final PrivateKeyEntry privateKey = getPrivateKeyEntry(
+        		this.keyStoreManager,
+        		this.listaCertificadosRe.get(this.listaCertificadosRe.size() - 1).getAlias(),
+        		this.kconf
+    		);
             final String contentType = comprobarTipo(envelopedData);
             if (contentType == null) {
-            	dataFis.close();
                 return false;
             }
 
@@ -275,8 +277,8 @@ final class PanelRemitentes extends JAccessibilityDialogWizard {
 
     /** Carga un combo con los repositorios/almacenes disponibles
      * @param comboRepositorios Combo donde se deben cargar los repositorios */
-    private static void cargarCombo(final JComboBox comboRepositorios) {
-        comboRepositorios.setModel(new DefaultComboBoxModel(KeyStoreLoader.getKeyStoresToSign()));
+    private static void cargarCombo(final JComboBox<KeyStoreConfiguration> comboRepositorios) {
+        comboRepositorios.setModel(new DefaultComboBoxModel<>(KeyStoreLoader.getKeyStoresToSign()));
     }
 
     /** Comprueba el tipo de todos los certificados
@@ -366,7 +368,7 @@ final class PanelRemitentes extends JAccessibilityDialogWizard {
      * @param comboRepositorios Combo con el repositorio / almacen
      * @param eliminar Boton para eliminar un remitente de la lista
      * @param anadir Boton para anadir un remitente a la lista */
-    void eliminarActionPerformed(final JComboBox comboRepositorios, final JButton eliminar, final JButton anadir) {
+    void eliminarActionPerformed(final JComboBox<KeyStoreConfiguration> comboRepositorios, final JButton eliminar, final JButton anadir) {
         for (int i = 0; i < this.listaCertificadosRe.size(); i++) {
             if (this.listaCertificadosRe.get(i).getAlias().equals(this.listaRemitentes.getSelectedValue())) {
                 this.listaCertificadosRe.remove(this.listaCertificadosRe.get(i));
@@ -397,7 +399,7 @@ final class PanelRemitentes extends JAccessibilityDialogWizard {
      * @throws UnrecoverableEntryException
      * @throws NoSuchAlgorithmException
      * @throws KeyStoreException */
-    private PrivateKeyEntry getPrivateKeyEntry(final AOKeyStoreManager keyStoreManager1,
+    private static PrivateKeyEntry getPrivateKeyEntry(final AOKeyStoreManager keyStoreManager1,
     		                                   final String seleccionado,
     		                                   final KeyStoreConfiguration kconf1) throws KeyStoreException,
     		                                                                              NoSuchAlgorithmException,
@@ -458,7 +460,7 @@ final class PanelRemitentes extends JAccessibilityDialogWizard {
         c.fill = GridBagConstraints.BOTH;
 
         // Combo con los repositorios / almacenes
-        final JComboBox comboRepositorios = new JComboBox();
+        final JComboBox<KeyStoreConfiguration> comboRepositorios = new JComboBox<>();
         comboRepositorios.setToolTipText(Messages.getString("Wizard.comboRepositorios.description")); //$NON-NLS-1$
         comboRepositorios.getAccessibleContext().setAccessibleName(this.etiquetaAnadir.getText() + " " //$NON-NLS-1$
                                                                    + comboRepositorios.getToolTipText()
@@ -538,7 +540,7 @@ final class PanelRemitentes extends JAccessibilityDialogWizard {
 
         // Listado de remitentes
         this.listaRemitentes.setToolTipText(Messages.getString("Wizard.sobres.listaRemitentes.description")); //$NON-NLS-1$
-        this.listaRemitentes.setModel(new DefaultListModel());
+        this.listaRemitentes.setModel(new DefaultListModel<>());
         this.listaRemitentes.getAccessibleContext().setAccessibleName(senderLabel.getText() + " " + this.listaRemitentes.getToolTipText()); //$NON-NLS-1$
         this.listaRemitentes.getAccessibleContext().setAccessibleDescription(this.listaRemitentes.getToolTipText());
         Utils.remarcar(this.listaRemitentes);

@@ -19,6 +19,7 @@ import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.logging.Logger;
 
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
@@ -27,6 +28,7 @@ import org.bouncycastle.asn1.DERIA5String;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.DERSet;
+import org.bouncycastle.asn1.DERUTCTime;
 import org.bouncycastle.asn1.DERUTF8String;
 import org.bouncycastle.asn1.cms.Attribute;
 import org.bouncycastle.asn1.cms.CMSAttributes;
@@ -162,6 +164,8 @@ import es.gob.afirma.signers.pkcs7.SigUtils;
  *
  *  */
 public final class CAdESUtils {
+
+	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
     private CAdESUtils() {
         // No permitimos la instanciacion
@@ -354,19 +358,21 @@ public final class CAdESUtils {
      *
      * </pre>
      *
-     * @param cert Certificado del firmante
+     * @param cert Certificado del firmante.
      * @param digestAlgorithmName Nombre del algoritmo de huella digital a usar
-     * @param data Datos firmados
-     * @param policy Pol&iacute;tica de firma
+     * @param data Datos firmados.
+     * @param policy Pol&iacute;tica de firma.
      * @param signingCertificateV2 {@code true} para utilizar la versi&oacute;n 2 del campo
      *                             signingCertificate, {@code false} para utilizar la versi&oacute;n 1.
      * @param dataDigest Huella digital de los datos firmados
      * @param signDate Fecha de la firma (debe establecerse externamente para evitar desincronismos en la firma trif&aacute;sica)
-     * @param padesMode <code>true</code> para generar una firma CAdES compatible PAdES, <code>false</code> para generar una firma CAdES normal
+     * @param includeSigningTimeAttribute <code>true</code> para incluir el atributo <i>SigningTime</i> de PKCS#9 (OID:1.2.840.113549.1.9.5),
+     *                                    <code>false</code> para no incluirlo. Este atributo nunca se incluye en el modo PAdES.
+     * @param padesMode <code>true</code> para generar una firma CAdES compatible PAdES, <code>false</code> para generar una firma CAdES normal.
      * @param contentType Tipo de contenido definido por su OID.
      * @param contentDescription Descripci&oacute;n textual del tipo de contenido firmado.
-     * @param ctis Lista de compromisos adquiridos con esta firma
-     * @param csm Metadatos sobre el firmante
+     * @param ctis Lista de compromisos adquiridos con esta firma.
+     * @param csm Metadatos sobre el firmante.
      * @param isCountersign <code>true</code> si desea generarse el <code>SignerInfo</code> de una
      *                      contrafirma, <code>false</code> en caso contrario.
      * @return Los datos necesarios para generar la firma referente a los datos del usuario.
@@ -380,6 +386,7 @@ public final class CAdESUtils {
                                                          final boolean signingCertificateV2,
                                                          final byte[] dataDigest,
                                                          final Date signDate,
+                                                         final boolean includeSigningTimeAttribute,
                                                          final boolean padesMode,
                                                          final String contentType,
                                                          final String contentDescription,
@@ -388,10 +395,17 @@ public final class CAdESUtils {
                                                          final boolean isCountersign) throws NoSuchAlgorithmException,
                                                                                              IOException,
                                                                                              CertificateEncodingException {
+    	if (padesMode) {
+    		LOGGER.info("Se ha seleccionado la generacion de CAdES para inclusion en PAdES"); //$NON-NLS-1$
+    	}
+    	if (includeSigningTimeAttribute) {
+    		LOGGER.info("Se incluira el atributo SigningTime (OID:1.2.840.113549.1.9.5) en la firma CAdES"); //$NON-NLS-1$
+    	}
+
         // // ATRIBUTOS
 
         // authenticatedAttributes (http://tools.ietf.org/html/rfc3852#section-11)
-        final ASN1EncodableVector contexExpecific = initContexExpecific(
+        final ASN1EncodableVector contextSpecific = initContextSpecific(
                 digestAlgorithmName,
                 data,
                 dataDigest,
@@ -401,12 +415,12 @@ public final class CAdESUtils {
         );
 
         if (signingCertificateV2) {
-            contexExpecific.add(
+            contextSpecific.add(
         		getSigningCertificateV2((X509Certificate) cert, digestAlgorithmName, policy)
     		);
         }
         else {
-            contexExpecific.add(
+            contextSpecific.add(
         		getSigningCertificateV1((X509Certificate) cert, digestAlgorithmName, policy)
     		);
         }
@@ -414,7 +428,7 @@ public final class CAdESUtils {
         // SIGPOLICYID ATTRIBUTE
 
         if (policy != null && policy.getPolicyIdentifier() != null) {
-            contexExpecific.add(
+            contextSpecific.add(
         		getSigPolicyId(digestAlgorithmName, policy)
     		);
         }
@@ -431,7 +445,7 @@ public final class CAdESUtils {
         	else {
         		contentHints = new ContentHints(new ASN1ObjectIdentifier(contentType));
         	}
-        	contexExpecific.add(
+        	contextSpecific.add(
     			new Attribute(
         			PKCSObjectIdentifiers.id_aa_contentHint,
         			new DERSet(contentHints.toASN1Primitive())
@@ -444,7 +458,7 @@ public final class CAdESUtils {
         // commitment-type-indication
         if (ctis != null && ctis.size() > 0) {
         	for (final CommitmentTypeIndicationBean ctib : ctis) {
-        		contexExpecific.add(
+        		contextSpecific.add(
     				new Attribute(
 						PKCSObjectIdentifiers.id_aa_ets_commitmentType,
 						new DERSet(
@@ -461,7 +475,7 @@ public final class CAdESUtils {
         // For all profiles covered in the present document the signer-location attribute shall not be present.
         // NOTE: The location can be indicated by the value of the Location entry in the signature dictionary.
         if (!padesMode && csm != null && CAdESSignerMetadataHelper.getSignerLocation(csm.getSignerLocation()) != null) {
-    		contexExpecific.add(
+    		contextSpecific.add(
 				new Attribute(
 					PKCSObjectIdentifiers.id_aa_ets_signerLocation,
 					new DERSet(
@@ -471,7 +485,19 @@ public final class CAdESUtils {
 			);
         }
 
-        return contexExpecific;
+        if (includeSigningTimeAttribute /* && !padesMode */) {
+        	contextSpecific.add(
+    			new Attribute(
+					PKCSObjectIdentifiers.pkcs_9_at_signingTime,
+					new DERSet(
+						new DERUTCTime(signDate)
+					)
+				)
+			);
+        }
+
+
+        return contextSpecific;
     }
 
     /** Obtiene un <i>PolicyInformation</i> a partir de los datos de la pol&iacute;tica.
@@ -578,19 +604,19 @@ public final class CAdESUtils {
 
     }
 
-    private static ASN1EncodableVector initContexExpecific(final String dataDigestAlgorithmName,
+    private static ASN1EncodableVector initContextSpecific(final String dataDigestAlgorithmName,
                                                            final byte[] data,
                                                            final byte[] dataDigest,
                                                            final Date signDate,
                                                            final boolean isCountersign,
                                                            final boolean padesMode) throws NoSuchAlgorithmException {
         // authenticatedAttributes
-        final ASN1EncodableVector contexExpecific = new ASN1EncodableVector();
+        final ASN1EncodableVector contextSpecific = new ASN1EncodableVector();
 
         // ContentType es obligatorio excepto en contrafirmas (donde no debe aparecer nunca),
         // debe tener siempre el valor "id-data"
         if (!isCountersign) {
-	        contexExpecific.add(
+	        contextSpecific.add(
 	    		new Attribute(
 					CMSAttributes.contentType,
 					new DERSet(PKCSObjectIdentifiers.data)
@@ -600,7 +626,7 @@ public final class CAdESUtils {
 
         // fecha de firma, no se anade en modo PAdES, pero es obligatorio en CAdES
         if (!padesMode) {
-            contexExpecific.add(
+            contextSpecific.add(
         		new Attribute(
     				CMSAttributes.signingTime,
     				new DERSet(new ASN1UTCTime(signDate))
@@ -609,7 +635,7 @@ public final class CAdESUtils {
         }
 
         // MessageDigest
-        contexExpecific.add(
+        contextSpecific.add(
     		new Attribute(
 				CMSAttributes.messageDigest,
 				new DERSet(
@@ -620,7 +646,7 @@ public final class CAdESUtils {
 			)
 		);
 
-        return contexExpecific;
+        return contextSpecific;
     }
 
 }

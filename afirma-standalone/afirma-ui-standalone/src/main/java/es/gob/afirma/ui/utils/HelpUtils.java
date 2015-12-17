@@ -72,7 +72,7 @@ public final class HelpUtils {
 	}
 
     /** Mapa de componentes y su indice en la ayuda. */
-    private static Hashtable<String, Component> components = new Hashtable<String, Component>();
+    private static Hashtable<String, Component> components = new Hashtable<>();
     /** Controlador de ayuda. */
     private static HelpBroker helpBroker = null;
     static HelpBroker getHelpBroker() {

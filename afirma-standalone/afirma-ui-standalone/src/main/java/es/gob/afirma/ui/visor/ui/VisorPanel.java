@@ -333,7 +333,7 @@ public final class VisorPanel extends JAccessibilityDialogWizard {
         }
 
     	this.resultPanel.update(validity);
-    	this.dataPanel.load(signFile, signature, dataFile, null);
+    	this.dataPanel.load(signFile, signature, dataFile);
     	if (this.loadExternalDataListener != null) {
     		this.dataPanel.removePropertyChangeListener(this.loadExternalDataListener);
     	}
@@ -477,11 +477,8 @@ public final class VisorPanel extends JAccessibilityDialogWizard {
      * @return Datos contenidos en el fichero o {@code null} si ocurri&oacute; alg&uacute;n error.
      */
     byte[] loadFile(final File file) {
-    	try {
-    		final FileInputStream fis = new FileInputStream(file);
-    		final byte[] ret = AOUtil.getDataFromInputStream(fis);
-			fis.close();
-			return ret;
+    	try ( final FileInputStream fis = new FileInputStream(file); ) {
+    		return AOUtil.getDataFromInputStream(fis);
 		}
         catch(final OutOfMemoryError e) {
         	CustomDialog.showMessageDialog(

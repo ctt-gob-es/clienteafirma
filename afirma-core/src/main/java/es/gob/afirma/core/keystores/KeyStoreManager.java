@@ -41,11 +41,7 @@ public interface KeyStoreManager {
     X509Certificate[] getCertificateChain(String alias);
 
     /** Obtiene la clave privada de un certificado.
-     * @param alias
-     *        Alias del certificado
-     * @param pssCallback
-     *        <i>CallBback</i> para obtener la contrase&ntilde;a del
-     *        certificado que contiene la clave
+     * @param alias Alias del certificado
      * @return Clave privada del certificado correspondiente al alias
      * @throws KeyStoreException
      * 		   Cuando ocurren errores en el tratamiento del almac&eacute;n de claves

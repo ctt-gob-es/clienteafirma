@@ -138,12 +138,12 @@ public class SignTask extends AsyncTask<Void, Void, byte[]>{
 				this.t = new MSCBadPinException("Se inserto un PIN incorrecto para la tarjeta critografica", e); //$NON-NLS-1$
 			}
 			else {
-				Log.e(ES_GOB_AFIRMA, "Error durante la operacion de firma: " + e); //$NON-NLS-1$
+				Log.e(ES_GOB_AFIRMA, "Error durante la operacion de firma: " + e, e); //$NON-NLS-1$
 				this.t = e;
 			}
 		}
 		catch (final Exception e) {
-			Log.e(ES_GOB_AFIRMA, "Error en la firma: " + e); //$NON-NLS-1$
+			Log.e(ES_GOB_AFIRMA, "Error en la firma: " + e, e); //$NON-NLS-1$
 			this.t = e;
 		}
 
@@ -157,12 +157,16 @@ public class SignTask extends AsyncTask<Void, Void, byte[]>{
 			return AOSignerFactory.getSigner(AOSignConstants.SIGN_FORMAT_XADES_TRI);
 		}
 		// Si se indica el formato AUTO, intentaremos identificar el formato de la firma
+		else if (format.toLowerCase(Locale.ENGLISH).startsWith(AOSignConstants.SIGN_FORMAT_FACTURAE.toLowerCase(Locale.ENGLISH))) {
+			return AOSignerFactory.getSigner(AOSignConstants.SIGN_FORMAT_FACTURAE_TRI);
+		}
+		// Si se indica el formato AUTO, intentaremos identificar el formato de la firma
 		else if (format.equalsIgnoreCase(SIGN_FORMAT_AUTO) && (Operation.COSIGN.equals(operation) || Operation.COUNTERSIGN.equals(operation))) {
 			try {
 				return AOSignerFactory.getSigner(signature);
 			}
 			catch (final IOException e) {
-				Log.e(ES_GOB_AFIRMA, "No se ha podido identificar el formato de la firma, se devolvera un manejador nulo: " + e); //$NON-NLS-1$
+				Log.e(ES_GOB_AFIRMA, "No se ha podido identificar el formato de la firma, se devolvera un manejador nulo: " + e, e); //$NON-NLS-1$
 				return null;
 			}
 		}

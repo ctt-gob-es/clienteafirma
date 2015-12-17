@@ -60,7 +60,7 @@ public final class PdfSessionManager {
 
     /** Obtiene los datos PDF relevantes en cuanto a las firmas electr&oacute;nicas, consistentes en los datos
      * a ser firmados con CAdES o PKCS#7 y los metadatos necesarios para su correcta inserci&oacute;n en el PDF.
-     * @param inPDF Documento PDF que se desea firmar
+     * @param pdfBytes Documento PDF que se desea firmar
      * @param certChain Cadena de certificados del firmante
      * @param signTime Hora de la firma
      * @param extraParams Par&aacute;metros adicionales de la firma
@@ -68,7 +68,7 @@ public final class PdfSessionManager {
      * @throws AOException En caso de que ocurra cualquier otro tipo de error
      * @throws IOException En caso de errores de entrada / salida
      * @throws DocumentException Si ocurren errores en la estampaci&iacute;n de la firma PDF */
-    public static PdfTriPhaseSession getSessionData(final byte[] inPDF,
+    public static PdfTriPhaseSession getSessionData(final byte[] pdfBytes,
                                                     final Certificate[] certChain,
                                                     final Calendar signTime,
                                                     final Properties extraParams) throws AOException,
@@ -80,37 +80,37 @@ public final class PdfSessionManager {
 		// *********************************************************************************************************************
 
     	// Imagen de la rubrica
-		final Image rubric = PdfPreProcessor.getImage(extraParams.getProperty("signatureRubricImage")); //$NON-NLS-1$
+		final Image rubric = PdfPreProcessor.getImage(extraParams.getProperty(PdfExtraParams.SIGNATURE_RUBRIC_IMAGE));
 
 		// Motivo de la firma
-		final String reason = extraParams.getProperty("signReason"); //$NON-NLS-1$
+		final String reason = extraParams.getProperty(PdfExtraParams.SIGN_REASON);
 
 		// Nombre del campo de firma preexistente en el PDF a usar
-		final String signatureField = extraParams.getProperty("signatureField"); //$NON-NLS-1$
+		final String signatureField = extraParams.getProperty(PdfExtraParams.SIGNATURE_FIELD);
 
 		// Lugar de realizacion de la firma
-		final String signatureProductionCity = extraParams.getProperty("signatureProductionCity"); //$NON-NLS-1$
+		final String signatureProductionCity = extraParams.getProperty(PdfExtraParams.SIGNATURE_PRODUCTION_CITY);
 
 		// Datos de contacto (correo electronico) del firmante
-		final String signerContact = extraParams.getProperty("signerContact"); //$NON-NLS-1$
+		final String signerContact = extraParams.getProperty(PdfExtraParams.SIGNER_CONTACT);
 
 		// Pagina donde situar la firma visible
 		int page = LAST_PAGE;
 		try {
-			page = Integer.parseInt(extraParams.getProperty("signaturePage")); //$NON-NLS-1$
+			page = Integer.parseInt(extraParams.getProperty(PdfExtraParams.SIGNATURE_PAGE));
 		}
 		catch (final Exception e) {
 			/* Se deja la pagina tal y como esta */
 		}
 
 		// Nombre del subfiltro de firma en el diccionario PDF
-		final String signatureSubFilter = extraParams.getProperty("signatureSubFilter"); //$NON-NLS-1$
+		final String signatureSubFilter = extraParams.getProperty(PdfExtraParams.SIGNATURE_SUBFILTER);
 
 		// Nivel de certificacion del PDF
 		int certificationLevel;
 		try {
-			certificationLevel = extraParams.getProperty("certificationLevel") != null ? //$NON-NLS-1$
-				Integer.parseInt(extraParams.getProperty("certificationLevel")) : //$NON-NLS-1$
+			certificationLevel = extraParams.getProperty(PdfExtraParams.CERTIFICATION_LEVEL) != null ?
+				Integer.parseInt(extraParams.getProperty(PdfExtraParams.CERTIFICATION_LEVEL)) :
 					UNDEFINED;
 		}
 		catch(final Exception e) {
@@ -120,8 +120,8 @@ public final class PdfSessionManager {
 		// Establecimiento de version PDF
 		int pdfVersion;
 		try {
-			pdfVersion = extraParams.getProperty("pdfVersion") != null ? //$NON-NLS-1$
-				Integer.parseInt(extraParams.getProperty("pdfVersion")) : //$NON-NLS-1$
+			pdfVersion = extraParams.getProperty(PdfExtraParams.PDF_VERSION) != null ?
+				Integer.parseInt(extraParams.getProperty(PdfExtraParams.PDF_VERSION)) :
 					PDF_MAX_VERSION;
 		}
 		catch(final Exception e) {
@@ -138,14 +138,14 @@ public final class PdfSessionManager {
 
 		// Texto en capa 4
 		final String layer4Text = PdfVisibleAreasUtils.getLayerText(
-			extraParams.getProperty("layer4Text"), //$NON-NLS-1$
+			extraParams.getProperty(PdfExtraParams.LAYER4_TEXT),
 			(X509Certificate) certChain[0],
 			signTime
 		);
 
 		// Texto en capa 2
 		final String layer2Text = PdfVisibleAreasUtils.getLayerText(
-			extraParams.getProperty("layer2Text"), //$NON-NLS-1$
+			extraParams.getProperty(PdfExtraParams.LAYER2_TEXT),
 			(X509Certificate) certChain[0],
 			signTime
 		);
@@ -153,8 +153,8 @@ public final class PdfSessionManager {
 		// Tipo de letra en capa 2
 		int layer2FontFamily;
 		try {
-			layer2FontFamily = extraParams.getProperty("layer2FontFamily") != null ? //$NON-NLS-1$
-				Integer.parseInt(extraParams.getProperty("layer2FontFamily")) : //$NON-NLS-1$
+			layer2FontFamily = extraParams.getProperty(PdfExtraParams.LAYER2_FONTFAMILY) != null ?
+				Integer.parseInt(extraParams.getProperty(PdfExtraParams.LAYER2_FONTFAMILY)) :
 					-1;
 		}
 		catch(final Exception e) {
@@ -164,8 +164,8 @@ public final class PdfSessionManager {
 		// Tamano del tipo de letra en capa 2
 		int layer2FontSize;
 		try {
-			layer2FontSize = extraParams.getProperty("layer2FontSize") != null ? //$NON-NLS-1$
-				Integer.parseInt(extraParams.getProperty("layer2FontSize")) : //$NON-NLS-1$
+			layer2FontSize = extraParams.getProperty(PdfExtraParams.LAYER2_FONTSIZE) != null ?
+				Integer.parseInt(extraParams.getProperty(PdfExtraParams.LAYER2_FONTSIZE)) :
 					-1;
 		}
 		catch(final Exception e) {
@@ -175,8 +175,8 @@ public final class PdfSessionManager {
 		// Estilo del tipo de letra en capa 2
 		int layer2FontStyle;
 		try {
-			layer2FontStyle = extraParams.getProperty("layer2FontStyle") != null ? //$NON-NLS-1$
-				Integer.parseInt(extraParams.getProperty("layer2FontStyle")) : //$NON-NLS-1$
+			layer2FontStyle = extraParams.getProperty(PdfExtraParams.LAYER2_FONTSTYLE) != null ?
+				Integer.parseInt(extraParams.getProperty(PdfExtraParams.LAYER2_FONTSTYLE)) :
 					-1;
 		}
 		catch(final Exception e) {
@@ -184,7 +184,7 @@ public final class PdfSessionManager {
 		}
 
 		// Color del tipo de letra en capa 2
-		final String layer2FontColor = extraParams.getProperty("layer2FontColor"); //$NON-NLS-1$
+		final String layer2FontColor = extraParams.getProperty(PdfExtraParams.LAYER2_FONTCOLOR);
 
 		// ** Fin texto firma visible **
 		// *****************************
@@ -193,15 +193,35 @@ public final class PdfSessionManager {
 		// **************** FIN LECTURA PARAMETROS ADICIONALES *****************************************************************
 		// *********************************************************************************************************************
 
+		byte[] inPDF;
+		try {
+			inPDF = XmpHelper.addSignHistoryToXmp(pdfBytes, signTime);
+		}
+		catch (final Exception e1) {
+			LOGGER.warning("No ha podido registrarse la firma en el historico XMP: " + e1); //$NON-NLS-1$
+			inPDF = pdfBytes;
+		}
+
 		final PdfReader pdfReader = PdfUtil.getPdfReader(
 			inPDF,
 			extraParams,
-			Boolean.parseBoolean(extraParams.getProperty("headless")) //$NON-NLS-1$
+			Boolean.parseBoolean(extraParams.getProperty(PdfExtraParams.HEADLESS))
 		);
+
+		// **************************************************************
+		// ***** Comprobaciones y parametros necesarios para PDF-A1 *****
+		final byte[] xmpBytes = pdfReader.getMetadata();
+		final boolean pdfA1 = PdfUtil.isPdfA1(xmpBytes);
+		if (pdfA1) {
+			LOGGER.info("Detectado PDF-A1, no se comprimira el PDF"); //$NON-NLS-1$
+		}
+
+		// *** Fin comprobaciones y parametros necesarios para PDF-A1 ***
+		// **************************************************************
 
 		PdfUtil.checkPdfCertification(pdfReader.getCertificationLevel(), extraParams);
 
-		if (PdfUtil.pdfHasUnregisteredSignatures(pdfReader) && !Boolean.TRUE.toString().equalsIgnoreCase(extraParams.getProperty("allowCosigningUnregisteredSignatures"))) { //$NON-NLS-1$
+		if (PdfUtil.pdfHasUnregisteredSignatures(pdfReader) && !Boolean.TRUE.toString().equalsIgnoreCase(extraParams.getProperty(PdfExtraParams.ALLOW_COSIGNING_UNREGISTERED_SIGNATURES))) {
 			throw new PdfHasUnregisteredSignaturesException();
 		}
 
@@ -252,14 +272,14 @@ public final class PdfSessionManager {
 	        // Comprobamos que el signer esta en modo interactivo, y si no lo
             // esta no pedimos contrasena por dialogo, principalmente para no interrumpir un firmado por lotes
             // desatendido
-            if (Boolean.parseBoolean(extraParams.getProperty("headless"))) { //$NON-NLS-1$
+            if (Boolean.parseBoolean(extraParams.getProperty(PdfExtraParams.HEADLESS))) {
                 throw new BadPdfPasswordException(e);
             }
             // La contrasena que nos han proporcionada no es buena o no nos
             // proporcionaron ninguna
             final String userPwd = new String(
                 AOUIFactory.getPassword(
-                    extraParams.getProperty("userPassword") == null ? CommonPdfMessages.getString("AOPDFSigner.0") : CommonPdfMessages.getString("AOPDFSigner.1"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                    extraParams.getProperty(PdfExtraParams.USER_PASSWORD) == null ? CommonPdfMessages.getString("AOPDFSigner.0") : CommonPdfMessages.getString("AOPDFSigner.1"), //$NON-NLS-1$ //$NON-NLS-2$
                     null
                 )
             );
@@ -275,7 +295,8 @@ public final class PdfSessionManager {
 		// Aplicamos todos los atributos de firma
 		final PdfSignatureAppearance sap = stp.getSignatureAppearance();
 		// La compresion solo para versiones superiores a la 4
-		if (pdfVersion > PDF_MIN_VERSION && !Boolean.parseBoolean(extraParams.getProperty("doNotCompressPdf"))) { //$NON-NLS-1$
+		// Hacemos la comprobacion a "false", porque es el valor que deshabilita esta opcion
+		if (pdfVersion > PDF_MIN_VERSION && !pdfA1 && !"false".equalsIgnoreCase(extraParams.getProperty(PdfExtraParams.COMPRESS_PDF))) { //$NON-NLS-1$
 			stp.setFullCompression();
 		}
 		sap.setAcro6Layers(true);

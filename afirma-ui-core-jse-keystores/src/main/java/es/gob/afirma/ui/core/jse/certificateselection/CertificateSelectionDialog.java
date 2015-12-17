@@ -58,7 +58,8 @@ public final class CertificateSelectionDialog extends MouseAdapter {
 	    Arrays.sort(certs, CERT_NAME_COMPARATOR);
 	    this.csd = new CertificateSelectionPanel(certs, this);
 		this.optionPane = certs.length > 1 ?
-				new CertOptionPane(this.csd) : new JOptionPane();
+			new CertOptionPane(this.csd) :
+				new JOptionPane();
 
 		this.csd.addCertificateListMouseListener(this);
 

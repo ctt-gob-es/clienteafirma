@@ -1,0 +1,4 @@
+library= name="Netscape Internal Crypto Module"   parameters="configdir=/u/relyea/.netscape certprefix= secmod=secmod.db" NSS="Flags=internal,pkcs11module TrustOrder=1 CipherOrder=-1 ciphers= slotParams={0x1=[slotFlags='RSA,DSA,DH,RC4,RC2,DES,MD2,MD5,SHA1,SSL,TLS,PublicCerts,Random'] 0x2=[slotFlags='RSA' askpw=only]}"
+library=dkck32.dll name="DataKey SignaSURE 3600" NSS="TrustOrder=50 ciphers= " 
+library=swft32.dll name="Netscape Software Fortezza" parameters="keyfile=/u/relyea/keyfile" NSS="TrustOrder=50 ciphers=FORTEZZA slotParams=0x1=[slotFlags='FORTEZZA']"
+library=core32.dll name="Litronic Netsign"

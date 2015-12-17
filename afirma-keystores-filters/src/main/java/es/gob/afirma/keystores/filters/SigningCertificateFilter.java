@@ -12,11 +12,9 @@ package es.gob.afirma.keystores.filters;
 
 import java.security.cert.X509Certificate;
 
-import es.gob.afirma.keystores.filters.CertificateFilter;
-
 /**
  * Filtro que muestra &uacute;nicamente los certificados preparados para firma. Esto no se
- * realiza mediante KeyUsage, sino que se mostran todos los certificados con clave privada
+ * realiza mediante KeyUsage, sino que se muestran todos los certificados con clave privada
  * disponibles en el almac&eacute;n y retirar aquellos certificados que se conoce que no
  * son espec&iacute;ficos para firma, como el certificado de autenticaci&oacute;n del DNIe,
  * por ejemplo.
@@ -25,9 +23,9 @@ import es.gob.afirma.keystores.filters.CertificateFilter;
 public final class SigningCertificateFilter extends CertificateFilter {
 
 	private final AuthenticationDNIeFilter authenticationDnieCertFilter;
-	
+
 	/**
-	 * Contruye el filtro de certificados.
+	 * Contruye el filtro de certificados de firma.
 	 */
 	public SigningCertificateFilter() {
 		this.authenticationDnieCertFilter = new AuthenticationDNIeFilter();

@@ -65,7 +65,7 @@ public final class AOCMSSigner implements AOSigner {
 
         final Properties extraParams = xParams != null ? xParams : new Properties();
 
-        final String precalculatedDigest = extraParams.getProperty("precalculatedHashAlgorithm"); //$NON-NLS-1$
+        final String precalculatedDigest = extraParams.getProperty(AOCMSExtraParams.PRECALCULATED_HASH_ALGORITHM);
 
         byte[] messageDigest = null;
         if (precalculatedDigest != null) {
@@ -79,14 +79,14 @@ public final class AOCMSSigner implements AOSigner {
             this.dataType = PKCSObjectIdentifiers.data.getId();
         }
 
-        final String mode = extraParams.getProperty("mode", AOSignConstants.DEFAULT_SIGN_MODE); //$NON-NLS-1$
+        final String mode = extraParams.getProperty(AOCMSExtraParams.MODE, AOSignConstants.DEFAULT_SIGN_MODE);
 
         final boolean omitContent = mode.equals(AOSignConstants.SIGN_MODE_EXPLICIT) || precalculatedDigest != null;
         try {
 			return new GenSignedData().generateSignedData(
 				csp,
 			    omitContent,
-			    Boolean.parseBoolean(extraParams.getProperty("applySystemDate", "true")), //$NON-NLS-1$ //$NON-NLS-2$
+			    Boolean.parseBoolean(extraParams.getProperty(AOCMSExtraParams.APPLY_SYSTEM_DATE, "true")), //$NON-NLS-1$
 			    this.dataType,
 			    key,
 			    certChain,
@@ -117,7 +117,7 @@ public final class AOCMSSigner implements AOSigner {
 
         final Properties extraParams = xParams != null ? xParams : new Properties();
 
-        final String precalculatedDigest = extraParams.getProperty("precalculatedHashAlgorithm"); //$NON-NLS-1$
+        final String precalculatedDigest = extraParams.getProperty(AOCMSExtraParams.PRECALCULATED_HASH_ALGORITHM);
 
         byte[] messageDigest = null;
         if (precalculatedDigest != null) {
@@ -131,7 +131,7 @@ public final class AOCMSSigner implements AOSigner {
             this.dataType = PKCSObjectIdentifiers.data.getId();
         }
 
-        final String mode = extraParams.getProperty("mode", AOSignConstants.DEFAULT_SIGN_MODE); //$NON-NLS-1$
+        final String mode = extraParams.getProperty(AOCMSExtraParams.MODE, AOSignConstants.DEFAULT_SIGN_MODE);
 
         final boolean omitContent = mode.equals(AOSignConstants.SIGN_MODE_EXPLICIT) || precalculatedDigest != null;
 

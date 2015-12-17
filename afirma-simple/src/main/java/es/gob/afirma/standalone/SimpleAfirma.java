@@ -37,11 +37,9 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
-import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
 
 import com.dmurph.tracking.AnalyticsConfigData;
 import com.dmurph.tracking.JGoogleAnalyticsTracker;
@@ -109,7 +107,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 
     static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
-    private JFrame window;
+    private final JFrame window = new MainScreen();
     private Container container;
     private JPanel currentPanel;
 
@@ -121,7 +119,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
     /** Construye la aplicaci&oacute;n principal y establece el
      * <i>Look&amp;Feel</i>. */
     public SimpleAfirma() {
-       LookAndFeelManager. applyLookAndFeel();
+       LookAndFeelManager.applyLookAndFeel();
        this.mainMenu = new MainMenu(this.window, this);
     }
 
@@ -176,36 +174,31 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
         // Una excepcion en un constructor no siempre deriva en un objeto nulo,
         // por eso usamos un booleano para ver si fallo, en vez de una comprobacion
         // de igualdad a null
-        boolean showDNIeScreen = preSelectedFile == null;
+        boolean showDNIeScreen = preSelectedFile == null && !PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_HIDE_DNIE_START_SCREEN, false);
         if (showDNIeScreen) {
 	        try {
 	        	showDNIeScreen = !javax.smartcardio.TerminalFactory.getDefault().terminals().list().isEmpty();
 	        }
 	        catch(final Exception e) {
 	        	LOGGER.info("No se ha podido obtener la lista de lectores de tarjetas del sistema: " + e); //$NON-NLS-1$
-	        	e.printStackTrace();
 	        	showDNIeScreen = false;
 	        }
         }
 
+        this.window.setTitle(SimpleAfirmaMessages.getString("SimpleAfirma.10", getVersion())); //$NON-NLS-1$
+
         if (showDNIeScreen) {
            	this.currentPanel = new DNIeWaitPanel(this);
-           	final MainScreen mainScreen = new MainScreen();
-           	mainScreen.showMainScreen(this, this.currentPanel, DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT);
-           	this.window = mainScreen;
-            this.window.setTitle(SimpleAfirmaMessages.getString("SimpleAfirma.10", getVersion())); //$NON-NLS-1$
+           	((MainScreen) this.window).showMainScreen(this, this.currentPanel, DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT);
             this.container = this.window;
         }
         else {
-        	final MainScreen mainScreen = new MainScreen();
-        	this.currentPanel = new SignPanel(mainScreen, this);
-           	mainScreen.showMainScreen(this, this.currentPanel, DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT);
-        	this.window = mainScreen;
-        	this.window.setTitle(SimpleAfirmaMessages.getString("SimpleAfirma.10", getVersion())); //$NON-NLS-1$
+        	this.currentPanel = new SignPanel(this.window, this);
+        	((MainScreen) this.window).showMainScreen(this, this.currentPanel, DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT);
         	this.container = this.window;
 
         	loadDefaultKeyStore();
-        	configureMenuBar(true);
+        	configureMenuBar();
 
         	if (preSelectedFile != null) {
         		loadFileToSign(preSelectedFile);
@@ -213,22 +206,13 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
         }
     }
 
-	private void configureMenuBar(final boolean firstTime) {
+	private void configureMenuBar() {
 		if (this.window != null) {
         	if (Platform.OS.MACOSX.equals(Platform.getOS())) {
             	this.window.getRootPane().putClientProperty("Window.documentFile", null); //$NON-NLS-1$
             }
             this.window.setJMenuBar(this.mainMenu);
             this.mainMenu.setEnabledOpenCommand(true);
-            if (firstTime) {
-            	MainMenuManager.setMenuManagement(
-        			this.window.getRootPane().getActionMap(),
-        			this.window.getRootPane().getInputMap(
-            			JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
-        			),
-        			this.mainMenu
-    			);
-            }
         }
 	}
 
@@ -267,7 +251,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
     	}
     	if (DNIeWaitPanel.PROP_DNIE_REJECTED.equals(evt.getPropertyName())) {
     		loadDefaultKeyStore();
-            loadMainApp(true);
+            loadMainApp();
     	}
     	if (DNIeWaitPanel.PROP_HELP_REQUESTED.equals(evt.getPropertyName())) {
     		showHelp();
@@ -286,17 +270,16 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
             finally {
                 this.container.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
             }
-            loadMainApp(true);
+            loadMainApp();
     	}
     }
 
-    /** Carga el panel de firma en el interfaz.
-     * @param firstTime <code>true</code> si se la primera vez que se carga, <code>en caso contrario</code>. */
-    public void loadMainApp(final boolean firstTime) {
+    /** Carga el panel de firma en el interfaz. */
+    public void loadMainApp() {
 
     	this.window.setTitle(SimpleAfirmaMessages.getString("SimpleAfirma.10", getVersion())); //$NON-NLS-1$
 
-    	configureMenuBar(firstTime);
+    	configureMenuBar();
 
         final JPanel newPanel = new SignPanel(this.window, this);
         this.container.add(newPanel, BorderLayout.CENTER);
@@ -409,21 +392,6 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
         }
     }
 
-//    /** Recupera una de las preferencias establecidas para la aplicaci&oacute;n.
-//     * @param key Clave de la preferencia.
-//     * @param defaultValue Valor por defecto.
-//     * @return Devuelve el valor de la preferencia indicada o {@code defaultValue} si no est&aacute;a establecida. */
-//    public static String getPreference(final String key, final String defaultValue) {
-//        return PreferencesManager.get(key, defaultValue);
-//    }
-//
-//    /** Establece una preferencia para la aplicaci&oacute;n.
-//     * @param key Clave de la preferencia.
-//     * @param value Valor asignado. */
-//    public static void setPreference(final String key, final String value) {
-//    	PreferencesManager.put(key, value);
-//    }
-
     /** Habilita o desabilita el men&uacute; <i>Archivo</i> de la barra de
      * men&uacute;.
      * @param e <code>true</code> para habilitar el men&uacute;
@@ -519,7 +487,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
     public static void main(final String[] args) {
 
 		// Google Analytics
-    	SwingUtilities.invokeLater(
+    	new Thread(
 			new Runnable() {
 				@Override
 				public void run() {
@@ -537,7 +505,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 			    	}
 				}
 			}
-		);
+		).start();
 
     	// Configuramos el log de la aplicacion
     	configureLog();
@@ -665,7 +633,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
     /** Pregunta al usuario si desea cerrar la aplicaci&oacute;n.
      * @return <code>true</code> si el usuario responde que s&iacute;, <code>false</code> en caso contrario */
     public boolean askForClosing() {
-    	if (PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_OMIT_ASKONCLOSE, false)) {
+    	if (PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_OMIT_ASKONCLOSE, false)) {
     		closeApplication(0);
             return true;
     	}

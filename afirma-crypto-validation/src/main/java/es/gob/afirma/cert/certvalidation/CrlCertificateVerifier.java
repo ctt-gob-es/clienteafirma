@@ -15,36 +15,52 @@ public final class CrlCertificateVerifier extends CertificateVerifier {
 	private final Properties conf = new Properties();
 
 	/** Construye un validador de certificados por CRL.
+	 * @param cert Certificado inicialmente a validar. */
+	public CrlCertificateVerifier(final X509Certificate cert) {
+		this(null, cert);
+	}
+
+	/** Construye un validador de certificados por CRL.
 	 * @param confFile Fichero de propiedades con las opciones de configuraci&oacute;n
 	 * @param cert Certificado inicialmente a validar. */
 	public CrlCertificateVerifier(final String confFile, final X509Certificate cert) {
-		try {
-			this.conf.load(CrlCertificateVerifier.class.getResourceAsStream(confFile));
-		}
-		catch (final Exception e) {
-			throw new IllegalArgumentException(
-				"No se ha podido cargar la configuracion del servidor (" + confFile + ": " + e, e //$NON-NLS-1$ //$NON-NLS-2$
-			);
+		if (confFile != null) {
+			try {
+				this.conf.load(CrlCertificateVerifier.class.getResourceAsStream(confFile));
+			}
+			catch (final Exception e) {
+				throw new IllegalArgumentException(
+					"No se ha podido cargar la configuracion del servidor (" + confFile + ": " + e, e //$NON-NLS-1$ //$NON-NLS-2$
+				);
+			}
 		}
 		final String issuerCertFile = this.conf.getProperty("issuerCertFile"); //$NON-NLS-1$
-		try {
-			setIssuerCert((X509Certificate) CertificateFactory.getInstance(
-				"X.509" //$NON-NLS-1$
-			).generateCertificate(
-				OcspCertificateVerifier.class.getResourceAsStream(issuerCertFile)
-			));
-		}
-		catch (final CertificateException e) {
-			throw new IllegalArgumentException(
-				"No se ha podido cargar el certificado raiz del emisor (" + issuerCertFile + "): " + e, e //$NON-NLS-1$ //$NON-NLS-2$
-			);
+		if (issuerCertFile != null) {
+			try {
+				setIssuerCert(
+					(X509Certificate) CertificateFactory.getInstance(
+						"X.509" //$NON-NLS-1$
+					).generateCertificate(
+						OcspCertificateVerifier.class.getResourceAsStream(issuerCertFile)
+					)
+				);
+			}
+			catch (final CertificateException e) {
+				throw new IllegalArgumentException(
+					"No se ha podido cargar el certificado raiz del emisor (" + issuerCertFile + "): " + e, e //$NON-NLS-1$ //$NON-NLS-2$
+				);
+			}
 		}
 		setSubjectCert(cert);
 	}
 
 	@Override
 	protected ValidationResult verifyRevocation(final X509Certificate cert) {
-		return CrlHelper.verifyCertificateCRLs(cert, this.getIssuerCert().getPublicKey(), null);
+		return CrlHelper.verifyCertificateCRLs(
+			cert,
+			this.getIssuerCert() != null ? this.getIssuerCert().getPublicKey() : null,
+			null
+		);
 	}
 
 }

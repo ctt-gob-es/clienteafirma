@@ -15,6 +15,7 @@ import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.signers.asic.ASiCUtil;
 import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.signers.xades.AOXAdESSigner;
+import es.gob.afirma.signers.xades.XAdESExtraParams;
 
 /** Manejador de firmas XML XAdES ASiC-S.
  * Todas las firmas XAdES ASiC-S se generan de forma <i>externally detached</i> con MANIFEST para evitar problemas de resoluci&oacute;n en
@@ -27,7 +28,7 @@ import es.gob.afirma.signers.xades.AOXAdESSigner;
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
 public final class AOXAdESASiCSSigner implements AOSigner {
 
-	private static final Logger LOGGER = Logger.getLogger("es.agob.afirma"); //$NON-NLS-1$
+	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	@Override
 	public byte[] sign(final byte[] data,
@@ -51,7 +52,7 @@ public final class AOXAdESASiCSSigner implements AOSigner {
 			xadesSignature,
 			data,
 			ASiCUtil.ENTRY_NAME_XML_SIGNATURE,
-			extraParams.getProperty("asicsFilename") //$NON-NLS-1$
+			extraParams.getProperty(XAdESASiCExtraParams.ASICS_FILENAME)
 		);
 
 	}
@@ -148,7 +149,6 @@ public final class AOXAdESASiCSSigner implements AOSigner {
 			sign = ASiCUtil.getASiCSXMLSignature(is);
 		}
 		catch(final Exception e) {
-			LOGGER.info("La firma proporcionada no es XAdES ASiC-S: " + e); //$NON-NLS-1$
 			return false;
 		}
 		return new AOXAdESSigner().isSign(
@@ -191,26 +191,26 @@ public final class AOXAdESASiCSSigner implements AOSigner {
 
 		final Properties extraParams = xParams != null ? xParams : new Properties();
 
-		final String dataFilename = extraParams.getProperty("asicsFilename") != null ? //$NON-NLS-1$
-				extraParams.getProperty("asicsFilename") : //$NON-NLS-1$
+		final String dataFilename = extraParams.getProperty(XAdESASiCExtraParams.ASICS_FILENAME) != null ?
+				extraParams.getProperty(XAdESASiCExtraParams.ASICS_FILENAME) :
 					ASiCUtil.getASiCSDefaultDataFilename(data);
 
 		// Siempre con MANIFEST
-		extraParams.put("useManifest", "true"); //$NON-NLS-1$ //$NON-NLS-2$
+		extraParams.put(XAdESExtraParams.USE_MANIFEST, "true"); //$NON-NLS-1$
 
 		// Aprovechamos para anadir atributos utiles
-		extraParams.put("addKeyInfoKeyName", "true"); //$NON-NLS-1$ //$NON-NLS-2$
+		extraParams.put(XAdESExtraParams.ADD_KEY_INFO_KEY_NAME, "true"); //$NON-NLS-1$
 
 		// La URI de referencia es el nombre de fichero dentro del ASiC
-		extraParams.put("uri", dataFilename); //$NON-NLS-1$
+		extraParams.put(XAdESExtraParams.URI, dataFilename);
 
 		// Siempre <i>Externally Detached</i>
-		extraParams.put("format", AOSignConstants.SIGN_FORMAT_XADES_EXTERNALLY_DETACHED); //$NON-NLS-1$
+		extraParams.put(XAdESExtraParams.FORMAT, AOSignConstants.SIGN_FORMAT_XADES_EXTERNALLY_DETACHED);
 
 		// Raiz de ASiC
-		extraParams.put("RootXmlNodeName", "asic:XAdESSignatures"); //$NON-NLS-1$ //$NON-NLS-2$
-		extraParams.put("RootXmlNodeNamespace", "http://uri.etsi.org/02918/v1.2.1#"); //$NON-NLS-1$ //$NON-NLS-2$
-		extraParams.put("RootXmlNodeNamespacePrefix", "xmlns:asic"); //$NON-NLS-1$ //$NON-NLS-2$
+		extraParams.put(XAdESExtraParams.ROOT_XML_NODE_NAME, "asic:XAdESSignatures"); //$NON-NLS-1$
+		extraParams.put(XAdESExtraParams.ROOT_XML_NODE_NAMESPACE, "http://uri.etsi.org/02918/v1.2.1#"); //$NON-NLS-1$
+		extraParams.put(XAdESExtraParams.ROOT_XML_NODE_NAMESPACE_PREFIX, "xmlns:asic"); //$NON-NLS-1$
 
 		return extraParams;
 

@@ -44,7 +44,7 @@ public class PanelConfiguracionAccessibilityTest {
 			final PanelConfiguracion panelConfiguracion = new PanelConfiguracion();
 
 			//Lista de mnemonicos
-			final List <Integer> keyCodes = new ArrayList<Integer>();
+			final List <Integer> keyCodes = new ArrayList<>();
 			//Conjunto de mnemonicos
 			Set <Integer> keyCodesSet = null;
 
@@ -80,7 +80,7 @@ public class PanelConfiguracionAccessibilityTest {
 			}
 
 			//Se crea un conjunto a partir de la lista para eliminar duplicados
-			keyCodesSet = new HashSet<Integer>(keyCodes);
+			keyCodesSet = new HashSet<>(keyCodes);
 			//Si el tamano de la lista y del conjunto no son iguales, no hay duplicados
 			assertTrue(keyCodesSet.size() == keyCodes.size());
 		}

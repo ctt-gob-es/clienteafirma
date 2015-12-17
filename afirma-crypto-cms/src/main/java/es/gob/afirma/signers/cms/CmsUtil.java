@@ -27,6 +27,7 @@ final class CmsUtil {
     /** Realiza la firma usando los atributos del firmante.
      * @param signatureAlgorithm Algoritmo para la firma.
      * @param key Clave para firmar.
+     * @param signedAttr2 Atributos firmados CMS.
      * @return Firma de los atributos.
      * @throws AOException Cuando ocurre cualquier problema durante el proceso */
     static ASN1OctetString firma(final String signatureAlgorithm, final PrivateKey key, final ASN1Set signedAttr2) throws AOException {

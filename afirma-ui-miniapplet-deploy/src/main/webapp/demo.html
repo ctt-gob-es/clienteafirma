@@ -36,18 +36,19 @@
 			mostrarDialogoEspera();
 			
 			var params = 	"mode=explicit\n" +
-							"serverUrl=https://valide.redsara.es/firmaMovil/TriPhaseSignerServer/SignatureService";
-							//"serverUrl=http://192.168.178.237:8080/afirma-server-triphase-signer/SignatureService";
+							//"serverUrl=https://valide.redsara.es/firmaMovil/afirma-server-triphase-signer/SignatureService";
+							//"serverUrl=http://prevalide.redsara.es/firmaMovil/afirma-server-triphase-signer/SignatureService";
+							"serverUrl=http://10.1.46.147:8080/afirma-server-triphase-signer/SignatureService";
 
 			var dataB64 = null;
-			
+
 			if (firmarDatosGenerados) {
 				// Generamos una cadena de mas de 100.000 caracteres
 				var data = "1234567890";
 				for (var i = 0; i < 13; i++) {
 					data += data;
 				}
-				dataB64 = MiniApplet.getBase64FromText(data);
+				dataB64 = MiniApplet.getBase64FromText(data.substring(0, data.length - 2));
 			}
 			else if (!firmarFichero) {
 				var serializedForm = "fNif=" + encodeURIComponent(document.getElementById("fNif").value) + "&" +
@@ -78,7 +79,7 @@
 			
 			var divFirma = document.getElementById('divfirma');
 			var content = '<br><textarea id="firmaB64" cols="76" rows="6">' + signatureB64 + '</textarea><br>';
-			if (!MiniApplet.isIOS() && !MiniApplet.isWindowsRT() && !MiniApplet.isWindows8ModernUI()) {
+			if (!MiniApplet.isIOS()) {
 				content += '<br><div class="botoneraCentro">' +
 					'<input class="botonM marginR15" id="botonGuardar" value="Guardar datos" onclick="javascript:guardar();" type="button">' +
 					'</div><br>';
@@ -104,19 +105,29 @@
 			document.getElementById("cargandoApplet").style.display = "none";
 			document.getElementById("pantalla").style.display = "block";
 			
-			if (MiniApplet.isIOS() || MiniApplet.isWindowsRT() || MiniApplet.isWindows8ModernUI()) {
+			if (MiniApplet.isIOS()) {
 				document.getElementById("targetFile").style.display = "none";
 				document.getElementById("targetGeneratedData").checked = "checked";
 				firmarFichero = false;
 				firmarDatosGenerados = true;
+
+				var storeLink = document.getElementById("afirmaStoreLink");
+				storeLink.href="https://itunes.apple.com/es/app/cliente-firma-movil/id627410001?mt=8&uo=4";
+				storeLink.innerHTML = "Descargue el Cliente @firma iOS";
+				
+				document.getElementById("faq_link").style.display = "none";
 			}
-			
-			if (MiniApplet.isIOS()) {
-				document.getElementById("afirmaStoreLink").href="https://itunes.apple.com/es/app/cliente-firma-movil/id627410001?mt=8&uo=4";
-			}
-			
-			if (MiniApplet.isWindowsRT() || MiniApplet.isWindows8ModernUI()) {
-				document.getElementById("afirmaStoreLink").href="http://windows.microsoft.com/es-es/windows-8/apps";
+			else if (MiniApplet.isAndroid()) {
+				document.getElementById("targetFile").style.display = "inline";
+				document.getElementById("targetFile").checked = "checked";
+				firmarFichero = false;
+				firmarDatosGenerados = true;
+
+				var storeLink = document.getElementById("afirmaStoreLink");
+				storeLink.href="https://play.google.com/store/apps/details?id=es.gob.afirma";
+				storeLink.innerHTML = "Descargue el Cliente @firma Android";
+				
+				document.getElementById("faq_link").style.display = "none";
 			}
 		}
 		
@@ -166,10 +177,9 @@
 		<div id="contenido">
 			<div id="cuerpo" style="background-color: rgb(248,248,248);">
 				<div class="bloqueDerechoInterior">
-					
 
 
-<div id="dialogoEspera" style="display: none;background-color: rgba(50,50,50,0.3); width: 100%; height: 100%; z-index: 9990; position: absolute; left: 0; top: 0; ">
+<div id="dialogoEspera" style="display: none;background-color: rgba(50,50,50,0.3); width: 100%; height: 100%; z-index: 9990; position: fixed; left: 0; top: 0; ">
 	<div style="background-color: white; position: fixed; top: 30%; left: 35%; width: 30%; padding: 20px; border: 2px solid black; border-radius: 15px;">
 		<span style="text-align: center; font-weight: bold; font-size: 20pt;">Cargando datos...</span>
 	</div>
@@ -194,7 +204,8 @@
 	<p>Para realizar la firma de un formulario o un fichero localizado en su dispositivo m&oacute;vil:</p><br/>
 
 	<div class="lblAnchoMaxMB">
-			<span>1. <a id="afirmaStoreLink" href="https://play.google.com/store/apps/details?id=es.gob.afirma">Descargue el Cliente m&oacute;vil @firma</a></span>
+			<span>1. <a id="afirmaStoreLink" href="http://firmaelectronica.gob.es/Home/Descargas.html">Descargue Autofirma</a></span>
+			<span id="faq_link" style="display: block; padding-left: 50px; padding-top: 10px">Si tiene dudas o alg&uacute;n problema durante la instalaci&oacute;n, consulte la <a target="_blank" href="http://incidencias-ctt.administracionelectronica.gob.es/wiki/doku.php?id=instalacion_de_autofirma">Wiki del proyecto</a></span>
 	</div><br/>
 	<div class="lb2AnchoMaxMB">
 			<span>2. Seleccione el formato de firma que desea utilizar</span>
@@ -238,22 +249,23 @@
 	<div class="nota"><p>
 	Nota: La firma electrónica se realiza mediante una aplicaci&oacute;n firmada por la D.G. para Impulso de 
 la Administración Electrónica por su seguridad.
-	<!-- <a href="https://valide.redsara.es/valide/requisitos.html" class="enlace">
+	<a href="https://valide.redsara.es/valide/requisitos.html" class="enlace">
 		Pulsa aquí para ver los requisitos de funcionamiento
-	</a> -->
+	</a>
 	</p></div>
 
 </div>
 				</div>
 
-<!-- 				
 <div style="float: left; width: 200px; margin-left: 30px; margin-top: 60px;">
 <a href="https://play.google.com/store/apps/details?id=es.gob.afirma">
-  <img alt="Get it on Google Play"
-       src="img/es_generic_rgb_wo_60.png" />
+  <img alt="Get it on Google Play" src="https://developer.android.com/images/brand/es_generic_rgb_wo_45.png"/>
 </a>
 </div>
- -->
+
+<div style="float: left; width: 200px; margin-left: 30px; margin-top: 20px;">
+<a href="https://itunes.apple.com/es/app/cliente-firma-movil/id627410001?mt=8&uo=4" target="itunes_store"style="display:inline-block;overflow:hidden;background:url(https://linkmaker.itunes.apple.com/htmlResources/assets/es_es//images/web/linkmaker/badge_appstore-lrg.png) no-repeat;width:135px;height:40px;@media only screen{background-image:url(https://linkmaker.itunes.apple.com/htmlResources/assets/es_es//images/web/linkmaker/badge_appstore-lrg.svg);}"></a>
+</div>
 				 <div class="clear"></div>
 			</div><!-- FIN DE CUERPO -->
 		</div><!-- FIN DE CONTENIDO -->
@@ -273,11 +285,12 @@ la Administración Electrónica por su seguridad.
 	</div> <!-- FIN DE CONTENEDOR -->
 	
 	<script type="text/javascript">
-		MiniApplet.cargarMiniApplet('https://valide.redsara.es/firmaMovil');
-		MiniApplet.setServlets("https://valide.redsara.es/firmaMovil/SignatureStorageServer/StorageService", "https://valide.redsara.es/firmaMovil/SignatureRetrieverServer/RetrieveService");
-		//MiniApplet.cargarMiniApplet('http://192.168.178.237:8080/afirma-ui-miniapplet-deploy');
-		//MiniApplet.setServlets("http://192.168.178.237:8080/afirma-signature-storage/StorageService", "http://192.168.178.237:8080/afirma-signature-retriever/RetrieveService");
-		
+		//MiniApplet.cargarMiniApplet('https://valide.redsara.es/firmaMovil');
+		//MiniApplet.setServlets("https://valide.redsara.es/firmaMovil/afirma-signature-storage/StorageService", "https://valide.redsara.es/firmaMovil/afirma-signature-retriever/RetrieveService");
+		//MiniApplet.cargarMiniApplet('http://prevalide.redsara.es/firmaMovil');
+		//MiniApplet.setServlets("http://prevalide.redsara.es/firmaMovil/afirma-signature-storage/StorageService", "http://prevalide.redsara.es/miniapplet/afirma-signature-retriever/RetrieveService");
+		MiniApplet.cargarMiniApplet('http://10.1.46.147:8080/afirma-ui-miniapplet-deploy');
+		MiniApplet.setServlets("http://10.1.46.147:8080/afirma-signature-storage/StorageService", "http://10.1.46.147:8080/afirma-signature-retriever/RetrieveService");
 	</script>
 	
 </body></html>

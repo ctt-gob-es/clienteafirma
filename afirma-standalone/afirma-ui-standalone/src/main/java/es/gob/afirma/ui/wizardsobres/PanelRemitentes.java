@@ -120,10 +120,10 @@ final class PanelRemitentes extends JAccessibilityDialogWizard {
     private List<CertificateDestiny> listaCertificados;
 
     /** Lista con los remitentes */
-    private final List<CertificateDestiny> listaCertificadosRe = new ArrayList<CertificateDestiny>();
+    private final List<CertificateDestiny> listaCertificadosRe = new ArrayList<>();
 
     /** Lista de remitentes. */
-    private final JList listaRemitentes = new JList();
+    private final JList<String> listaRemitentes = new JList<>();
 
     /** Clave del certificado */
     private PrivateKeyEntry privateKeyEntry;
@@ -457,7 +457,7 @@ final class PanelRemitentes extends JAccessibilityDialogWizard {
      * @return
      * @throws AOException
      * @throws UnrecoverableKeyException */
-    private PrivateKeyEntry getPrivateKeyEntry(final AOKeyStoreManager keyStoreManager,
+    private static PrivateKeyEntry getPrivateKeyEntry(final AOKeyStoreManager keyStoreManager,
     		                                   final String seleccionado,
     		                                   final KeyStoreConfiguration kconf1) throws AOException,
                                                                                                                                                       UnrecoverableKeyException {
@@ -672,11 +672,8 @@ final class PanelRemitentes extends JAccessibilityDialogWizard {
      * @throws java.io.FileNotFoundException
      * @throws IOException */
     private static byte[] readFile(final String filepath) throws IOException {
-        try {
-        	final InputStream fileIn = AOUtil.loadFile(AOUtil.createURI(filepath));
-            final byte[] data = AOUtil.getDataFromInputStream(fileIn);
-            fileIn.close();
-            return data;
+        try ( final InputStream fileIn = AOUtil.loadFile(AOUtil.createURI(filepath)); ) {
+            return AOUtil.getDataFromInputStream(fileIn);
         }
         catch (final URISyntaxException e) {
         	throw new IOException("Ruta hacia el fichero de datos invalida: " + filepath, e); //$NON-NLS-1$

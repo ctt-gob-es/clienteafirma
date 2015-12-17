@@ -41,9 +41,9 @@ import es.gob.afirma.signers.cades.CAdESValidator;
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public final class TestCAdES {
 
-	private static final String CERT_PATH = "ANF_PF_Activo.pfx"; //$NON-NLS-1$
-	private static final String CERT_PASS = "12341234"; //$NON-NLS-1$
-	private static final String CERT_ALIAS = "anf usuario activo"; //$NON-NLS-1$
+    private static final String CERT_PATH = "PFActivoFirSHA256.pfx"; //$NON-NLS-1$
+    private static final String CERT_PASS = "12341234"; //$NON-NLS-1$
+    private static final String CERT_ALIAS = "fisico activo prueba"; //$NON-NLS-1$
 
 	private static final String[] DATA_FILES = {
 		"txt", //$NON-NLS-1$
@@ -55,7 +55,8 @@ public final class TestCAdES {
 		for (final String dataFile : DATA_FILES) {
 			try {
 				DATA.add(AOUtil.getDataFromInputStream(TestCAdES.class.getResourceAsStream(dataFile)));
-			} catch (final IOException e) {
+			}
+			catch (final IOException e) {
 				Logger.getLogger("es.gob.afirma").severe("No se ha podido cargar el fichero de pruebas: " + dataFile);  //$NON-NLS-1$//$NON-NLS-2$
 				DATA.add(null);
 			}
@@ -105,6 +106,32 @@ public final class TestCAdES {
 		AOSignConstants.SIGN_ALGORITHM_SHA256WITHRSA,
 		AOSignConstants.SIGN_ALGORITHM_SHA384WITHRSA
 	};
+
+	/** Prueba de firma de JPEG para establecimiento de ContentHint.
+	 * @throws Exception En cualquier error. */
+	@SuppressWarnings("static-method")
+	@Test
+	public void testXmlSign() throws Exception {
+
+		final PrivateKeyEntry pke;
+
+		final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
+		ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH), CERT_PASS.toCharArray());
+		pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
+
+		final AOSigner signer = new AOCAdESSigner();
+
+		final Properties p = new Properties();
+		p.put("mode", AOSignConstants.SIGN_MODE_EXPLICIT); //$NON-NLS-1$
+
+		final byte[] data = AOUtil.getDataFromInputStream(TestCAdES.class.getResourceAsStream("/rubric.jpg")); //$NON-NLS-1$
+
+		final byte[] sign = signer.sign(data, "SHA1withRSA", pke.getPrivateKey(), pke.getCertificateChain(), p); //$NON-NLS-1$
+
+		final OutputStream fos = new FileOutputStream(File.createTempFile("JPG_", ".csig")); //$NON-NLS-1$ //$NON-NLS-2$
+		fos.write(sign);
+		fos.close();
+	}
 
 	/**
 	 * Prueba de firma convencional.
@@ -174,7 +201,7 @@ public final class TestCAdES {
 
 					AOTreeModel tree = signer.getSignersStructure(result, false);
 					Assert.assertEquals("Datos", ((AOTreeNode) tree.getRoot()).getUserObject()); //$NON-NLS-1$
-					Assert.assertEquals("ANF Usuario Activo", ((AOTreeNode) tree.getRoot()).getChildAt(0).getUserObject()); //$NON-NLS-1$
+					Assert.assertEquals("FISICO ACTIVO PRUEBA", ((AOTreeNode) tree.getRoot()).getChildAt(0).getUserObject()); //$NON-NLS-1$
 
 					tree = signer.getSignersStructure(result, true);
 					Assert.assertEquals("Datos", ((AOTreeNode) tree.getRoot()).getUserObject()); //$NON-NLS-1$

@@ -84,8 +84,8 @@ final class Desensobrado extends JPanel {
     /** Carga el combo almacen respecto al sistema operativo en el que se encuentra
      * la aplicaci&oacute;
      * @param comboAlmacen Combo donde se cargan los tipos de almacen */
-    private static void cargarComboAlmacen(final JComboBox comboAlmacen) {
-        comboAlmacen.setModel(new DefaultComboBoxModel(KeyStoreLoader.getKeyStoresToUnWrap()));
+    private static void cargarComboAlmacen(final JComboBox<KeyStoreConfiguration> comboAlmacen) {
+        comboAlmacen.setModel(new DefaultComboBoxModel<>(KeyStoreLoader.getKeyStoresToUnWrap()));
     }
 
     /** Pulsar boton examinar: Muestra una ventana para seleccinar un archivo.
@@ -103,16 +103,20 @@ final class Desensobrado extends JPanel {
      * @param comboAlmacen Combo con el almacen de claves
      * @param campoFichero Campo con el nombre del fichero a extraer
      * @param checkIniciar Checkbox que indica si los datos se deben de iniciar */
-    void extraerActionPerformed(final JComboBox comboAlmacen, final JTextField campoFichero, final JCheckBox checkIniciar) {
+    void extraerActionPerformed(final JComboBox<KeyStoreConfiguration> comboAlmacen, final JTextField campoFichero, final JCheckBox checkIniciar) {
 
     	setCursor(new Cursor(Cursor.WAIT_CURSOR));
 
         // Obtenemos la ruta del sobre
         final String envelopPath = campoFichero.getText();
         if (envelopPath == null || envelopPath.equals("") || !new File(envelopPath).exists() || !new File(envelopPath).isFile()) { //$NON-NLS-1$
-            CustomDialog.showMessageDialog(SwingUtilities.getRoot(this),
-                                           true,
-                                           Messages.getString("Desensobrado.msg.erro.fichero"), Messages.getString("Desensobrado.msg.titulo"), JOptionPane.WARNING_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
+            CustomDialog.showMessageDialog(
+        		SwingUtilities.getRoot(this),
+                true,
+                Messages.getString("Desensobrado.msg.erro.fichero"), //$NON-NLS-1$
+                Messages.getString("Desensobrado.msg.titulo"), //$NON-NLS-1$
+                JOptionPane.WARNING_MESSAGE
+            );
             campoFichero.requestFocusInWindow(); // Foco al campo que contiene el path al fichero
         }
         else {
@@ -431,10 +435,14 @@ final class Desensobrado extends JPanel {
         c.fill = GridBagConstraints.BOTH;
 
         // Combo con el almacen o repositorio de certificados
-        final JComboBox comboAlmacen = new JComboBox();
+        final JComboBox<KeyStoreConfiguration> comboAlmacen = new JComboBox<>();
         comboAlmacen.setToolTipText(Messages.getString("Desensobrado.almacen.combo.description")); // NOI18N //$NON-NLS-1$
-        comboAlmacen.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.getBar(),
-                                                                          Messages.getString("Desensobrado.almacen.combo.description.status"))); //$NON-NLS-1$
+        comboAlmacen.addMouseListener(
+    		new ElementDescriptionMouseListener(
+				PrincipalGUI.getBar(),
+				Messages.getString("Desensobrado.almacen.combo.description.status") //$NON-NLS-1$
+			)
+		);
         comboAlmacen.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.getBar(),
                                                                           Messages.getString("Desensobrado.almacen.combo.description.status"))); //$NON-NLS-1$
 

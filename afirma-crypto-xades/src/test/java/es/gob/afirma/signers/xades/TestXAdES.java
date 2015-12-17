@@ -288,6 +288,61 @@ public final class TestXAdES {
 
     }
 
+    /** Pruebas de cofirmacon Manifest.
+     * @throws Exception Cuando ocurre un error */
+    @SuppressWarnings("static-method")
+	@Test
+    public void testCoSignManifest() throws Exception {
+        Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$
+        final PrivateKeyEntry pke;
+
+        final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
+        ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH), CERT_PASS.toCharArray());
+        pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
+
+        final AOSigner signer = new AOXAdESSigner();
+
+        final Properties p = new Properties();
+        p.put("mode", "implicit"); //$NON-NLS-1$ //$NON-NLS-2$
+        p.put("ignoreStyleSheets", "false"); //$NON-NLS-1$ //$NON-NLS-2$
+        p.put("useManifest", "true"); //$NON-NLS-1$ //$NON-NLS-2$
+
+        String prueba;
+
+        for (final String algo : ALGOS) {
+          for(final String filename : TEST_FILES_MULTISIGN) {
+
+            prueba = "Cofirma XAdES con el algoritmo '" + //$NON-NLS-1$
+            algo + "' y el fichero '" + filename + "'"; //$NON-NLS-1$ //$NON-NLS-2$
+
+            System.out.println();
+            System.out.println(prueba);
+
+            final byte[] data = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(filename));
+
+            final byte[] result = signer.cosign(
+        		data,
+        		algo,
+        		pke.getPrivateKey(),
+        		pke.getCertificateChain(),
+        		p
+    		);
+
+            final File f = File.createTempFile(algo + "-" + filename.replace(".xml", "") + "-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+            final java.io.FileOutputStream fos = new java.io.FileOutputStream(f);
+            fos.write(result);
+            fos.flush(); fos.close();
+            System.out.println("Temporal para comprobacion manual: " + f.getAbsolutePath()); //$NON-NLS-1$
+
+            Assert.assertTrue("UnsignedProperties invalidas", isValidUnsignedProperties(new ByteArrayInputStream(result),null)); //$NON-NLS-1$
+
+            Assert.assertNotNull(prueba, result);
+            Assert.assertTrue("El resultado no se reconoce como firma", signer.isSign(result)); //$NON-NLS-1$
+          }
+        }
+
+    }
+
     /** Pruebas de contrafirma.
      * @throws Exception Cuando ocurre un error */
     @SuppressWarnings("static-method")
@@ -343,6 +398,64 @@ public final class TestXAdES {
         }
 
     }
+
+    /** Pruebas de contrafirma con Manifest.
+     * @throws Exception Cuando ocurre un error */
+    @SuppressWarnings("static-method")
+	@Test
+    public void testCounterSignManifes() throws Exception {
+        Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$
+        final PrivateKeyEntry pke;
+
+        final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
+        ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH), CERT_PASS.toCharArray());
+        pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
+
+        final AOSigner signer = new AOXAdESSigner();
+
+        final Properties p = new Properties();
+        p.put("mode", "implicit"); //$NON-NLS-1$ //$NON-NLS-2$
+        p.put("ignoreStyleSheets", "false"); //$NON-NLS-1$ //$NON-NLS-2$
+        p.put("useManifest", "true"); //$NON-NLS-1$ //$NON-NLS-2$
+
+        String prueba;
+
+        for (final String algo : ALGOS) {
+          for(final String filename : TEST_FILES_MULTISIGN) {
+
+            prueba = "Contrafirma XAdES con el algoritmo '" + //$NON-NLS-1$
+            algo + "' y el fichero '" + filename + "'"; //$NON-NLS-1$ //$NON-NLS-2$
+
+            System.out.println();
+            System.out.println(prueba);
+
+            final byte[] data = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(filename));
+
+            final byte[] result = signer.countersign(
+        		data,
+        		algo,
+        		CounterSignTarget.LEAFS,
+        		null,
+        		pke.getPrivateKey(),
+        		pke.getCertificateChain(),
+        		p
+    		);
+
+            final File f = File.createTempFile(algo + "-" + filename.replace(".xml", "") + "-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+            final java.io.FileOutputStream fos = new java.io.FileOutputStream(f);
+            fos.write(result);
+            fos.flush(); fos.close();
+            System.out.println("Temporal para comprobacion manual: " + f.getAbsolutePath()); //$NON-NLS-1$
+
+            Assert.assertTrue("UnsignedProperties invalidas", isValidUnsignedProperties(new ByteArrayInputStream(result),null)); //$NON-NLS-1$
+
+            Assert.assertNotNull(prueba, result);
+            Assert.assertTrue("El resultado no se reconoce como firma", signer.isSign(result)); //$NON-NLS-1$
+          }
+        }
+
+    }
+
 
     /** Prueba con hoja de estilo externa.
      * <b>Necesita GUI</b>

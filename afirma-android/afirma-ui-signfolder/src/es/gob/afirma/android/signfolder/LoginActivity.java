@@ -35,7 +35,7 @@ import es.gob.afirma.android.signfolder.proxy.CommManager;
 import es.gob.afirma.android.signfolder.proxy.RequestAppConfiguration;
 import es.gob.afirma.core.misc.Base64;
 
-/** Actividad para entrada con usuario y contrase&ntilde;a al servicio de ortafirmas. */
+/** Actividad para entrada con usuario y contrase&ntilde;a al servicio de Portafirmas. */
 public final class LoginActivity extends FragmentActivity implements KeystoreManagerListener,
                                                                      PrivateKeySelectionListener,
                                                                      LoadConfigurationListener,

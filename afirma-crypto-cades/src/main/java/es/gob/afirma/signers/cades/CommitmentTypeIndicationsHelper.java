@@ -64,7 +64,7 @@ public final class CommitmentTypeIndicationsHelper {
 			return ret;
 		}
 
-		String tmpStr = xParams.getProperty("commitmentTypeIndications"); //$NON-NLS-1$
+		String tmpStr = xParams.getProperty(CAdESExtraParams.COMMITMENT_TYPE_INDICATIONS);
 		if (tmpStr == null) {
 			return ret;
 		}
@@ -89,7 +89,7 @@ public final class CommitmentTypeIndicationsHelper {
 		for(int i=0;i<=nCtis;i++) {
 
 			// Identifier
-			tmpStr = xParams.getProperty("commitmentTypeIndication" + Integer.toString(i) + "Identifier"); //$NON-NLS-1$ //$NON-NLS-2$
+			tmpStr = xParams.getProperty(CAdESExtraParams.COMMITMENT_TYPE_INDICATIONS + Integer.toString(i) + CAdESExtraParams.IDENTIFIER);
 			if (tmpStr == null) {
 				continue;
 			}
@@ -103,7 +103,7 @@ public final class CommitmentTypeIndicationsHelper {
 			identifier = ident.toString();
 
 			// Qualifiers
-			tmpStr = xParams.getProperty("commitmentTypeIndication" + Integer.toString(i) + "CommitmentTypeQualifiers"); //$NON-NLS-1$ //$NON-NLS-2$
+			tmpStr = xParams.getProperty(CAdESExtraParams.COMMITMENT_TYPE_INDICATIONS + Integer.toString(i) + CAdESExtraParams.COMMITMENT_TYPE_QUALIFIERS);
 			if (tmpStr == null) {
 				commitmentTypeQualifiers = null;
 			}

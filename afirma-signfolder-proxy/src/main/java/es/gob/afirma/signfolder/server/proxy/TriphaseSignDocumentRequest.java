@@ -11,8 +11,13 @@ import es.gob.afirma.core.misc.Base64;
  * @author Carlos Gamuci Mill&aacute;n */
 public final class TriphaseSignDocumentRequest {
 
+	/** Operaci&oacute;n de firma simple. */
 	public static final String CRYPTO_OPERATION_SIGN = "sign"; //$NON-NLS-1$
+
+	/** Operaci&oacute;n de firma paralela o cofirma. */
 	public static final String CRYPTO_OPERATION_COSIGN = "cosign"; //$NON-NLS-1$
+
+	/** Operaci&oacute;n de firma en cascada o contrafirma. */
 	public static final String CRYPTO_OPERATION_COUNTERSIGN = "countersign"; //$NON-NLS-1$
 
 	private static final String DEFAULT_ALGORITHM = "SHA-512"; //$NON-NLS-1$
@@ -74,7 +79,7 @@ public final class TriphaseSignDocumentRequest {
 		this.params = params;
 		this.content = contentB64;
 		this.partialResult = partialResult;
-		this.algorithm = (messageDigestAlgorithm != null) ? messageDigestAlgorithm : DEFAULT_ALGORITHM;
+		this.algorithm = messageDigestAlgorithm != null ? messageDigestAlgorithm : DEFAULT_ALGORITHM;
 	}
 
 	/** Recupera el identificador del documento.
@@ -132,7 +137,7 @@ public final class TriphaseSignDocumentRequest {
 
 	/** Establece el contenido del documento en Base64 URL SAFE.
 	 * @param content Contenido del documento codificado en base64 URL SAFE. */
-	public void setContent(String content) {
+	public void setContent(final String content) {
 		this.content = content;
 	}
 
@@ -170,74 +175,131 @@ public final class TriphaseSignDocumentRequest {
 		private static final String NODE_PART_2 = "'>"; //$NON-NLS-1$
 		private static final String NODE_PART_3 = "</p>"; //$NON-NLS-1$
 
-		private final List<String> preSign;
+		private final List<String> preSigns;
 		private Boolean needPreSign;
 		private Boolean needData;
 		private Integer signCount;
-		private final List<String> session;
-		private final List<String> pk1;
+		private final List<String> sessions;
+		private final List<String> pk1s;
 
+		/**
+		 * Inicializa el objeto sin configuraci&oacute;n establecida.
+		 */
 		public TriphaseConfigDataBean() {
-			this.preSign = new ArrayList<String>();
+			this.preSigns = new ArrayList<String>();
 			this.needPreSign = null;
 			this.needData = null;
 			this.signCount = null;
-			this.session = new ArrayList<String>();
-			this.pk1 = new ArrayList<String>();
+			this.sessions = new ArrayList<String>();
+			this.pk1s = new ArrayList<String>();
 		}
 
-		public String getPreSign(int index) {
-			return this.preSign.get(index);
+		/**
+		 * Recupera la prefirma el elemento indicado.
+		 * @param index &Iacute;ndice del elemento del que obtener la prefirma.
+		 * @return Prefirma en base 64.
+		 */
+		public String getPreSign(final int index) {
+			return this.preSigns.get(index);
 		}
 
-		public void addPreSign(String preSign) {
-			this.preSign.add(preSign);
+		/**
+		 * Agrega una nueva prefirma al listado.
+		 * @param preSign Prefirma en base 64.
+		 */
+		public void addPreSign(final String preSign) {
+			this.preSigns.add(preSign);
 		}
 
+		/**
+		 * Indica si ser&aacute; necesaria la prefirma para generar la postfirma.
+		 * @return {@code true} si la prefirma ser&aacute; necesaria, {@code false} en caso contrario.
+		 */
 		public Boolean isNeedPreSign() {
 			return this.needPreSign;
 		}
 
-		public void setNeedPreSign(Boolean needPreSign) {
+		/**
+		 * Establece si la prefirma ser&aacute; necesaria para la generaci&oacute;n de la postfirma.
+		 * @param needPreSign {@code true} si la prefirma ser&aacute; necesarios, {@code false} en
+		 * caso contrario.
+		 */
+		public void setNeedPreSign(final Boolean needPreSign) {
 			this.needPreSign = needPreSign;
 		}
 
+		/**
+		 * Indica si ser&aacute;n necesarios los datos para generar la postfirma.
+		 * @return {@code true} si los datos ser&aacute;n necesarios, {@code false} en caso contrario.
+		 */
 		public Boolean isNeedData() {
 			return this.needData;
 		}
 
-		public void setNeedData(Boolean needData) {
+		/**
+		 * Establece si los datos ser&aacute;n necesarios para la generaci&oacute;n de la postfirma.
+		 * @param needData {@code true} si los datos ser&aacute;n necesarios, {@code false} en caso
+		 * contrario.
+		 */
+		public void setNeedData(final Boolean needData) {
 			this.needData = needData;
 		}
 
+		/**
+		 * Devuelve el n&uacute;mero de firmas.
+		 * @return N&acute;mero de firmas.
+		 */
 		public Integer getSignCount() {
 			return this.signCount;
 		}
 
-		public void setSignCount(Integer signCount) {
+		/**
+		 * Establece el n&uacute;mero de firmas.
+		 * @param signCount N&acute;mero de firmas.
+		 */
+		public void setSignCount(final Integer signCount) {
 			this.signCount = signCount;
 		}
 
-		public String getSession(int index) {
-			return this.session.get(index);
+		/**
+		 * Obtiene los datos generados como parte de una operaci&oacute;n de firma trif&aacute;sica.
+		 * @param index &Iacute;ndice de la firma.
+		 * @return Datos generados (Identificadores aleatorios, hora de firma, etc.)
+		 */
+		public String getSession(final int index) {
+			return this.sessions.get(index);
 		}
 
 		/**
 		 * Los datos de sesi&oacute;n siempre se almacenan como Base64.
 		 * @param session Datos de sesi&oacute;n.
 		 */
-		public void addSession(String session) {
-			this.session.add(session);
+		public void addSession(final String session) {
+			this.sessions.add(session);
 		}
 
-		public String getPk1(int index) {
-			return this.pk1.get(index);
+		/**
+		 * Recupera el PKCS#1 de una de las firmas generadas.
+		 * @param index &Iacute;ndice de la firma.
+		 * @return PKCS#1 de la firma en base 64.
+		 */
+		public String getPk1(final int index) {
+			return this.pk1s.get(index);
 		}
 
-		public void addPk1(String pk1) {
-			this.pk1.add( pk1);
+		/**
+		 * Agrega al listado un nuevo PKCS#1.
+		 * @param pk1 PKCS#1 en base 64.
+		 */
+		public void addPk1(final String pk1) {
+			this.pk1s.add( pk1);
 		}
 
+		/**
+		 * Genera el XML que seliariza la petici&oacute;n de firma trif&aacute;sica (prefirma o
+		 * posfirma) de una solicitud de firma.
+		 * @return XML de configuraci&oacute;n.
+		 */
 		public String toXMLConfig() {
 			final StringBuilder builder = new StringBuilder();
 			if (this.signCount != null)
@@ -251,23 +313,23 @@ public final class TriphaseSignDocumentRequest {
 				builder.append(NODE_PART_1).append("np").append(NODE_PART_2).append(this.needPreSign.booleanValue()).append(NODE_PART_3); //$NON-NLS-1$
 			}
 
-			if (this.preSign != null) {
-				for (int i = 0; i < this.preSign.size(); i++) {
-					builder.append(NODE_PART_1).append("pre.").append(i).append(NODE_PART_2).append(this.preSign.get(i)).append(NODE_PART_3); //$NON-NLS-1$
+			if (this.preSigns != null) {
+				for (int i = 0; i < this.preSigns.size(); i++) {
+					builder.append(NODE_PART_1).append("pre.").append(i).append(NODE_PART_2).append(this.preSigns.get(i)).append(NODE_PART_3); //$NON-NLS-1$
 				}
 			}
 
-			if (this.session != null) {
-				for (int i = 0; i < this.session.size(); i++) {
-					if (this.session.get(i) != null) {
-						builder.append(NODE_PART_1).append("ss.").append(i).append(NODE_PART_2).append(this.session.get(i)).append(NODE_PART_3); //$NON-NLS-1$
+			if (this.sessions != null) {
+				for (int i = 0; i < this.sessions.size(); i++) {
+					if (this.sessions.get(i) != null) {
+						builder.append(NODE_PART_1).append("ss.").append(i).append(NODE_PART_2).append(this.sessions.get(i)).append(NODE_PART_3); //$NON-NLS-1$
 					}
 				}
 			}
 
-			if (this.pk1 != null) {
-				for (int i = 0; i < this.pk1.size(); i++) {
-					builder.append(NODE_PART_1).append("pk1.").append(i).append(NODE_PART_2).append(this.pk1.get(i)).append(NODE_PART_3); //$NON-NLS-1$
+			if (this.pk1s != null) {
+				for (int i = 0; i < this.pk1s.size(); i++) {
+					builder.append(NODE_PART_1).append("pk1.").append(i).append(NODE_PART_2).append(this.pk1s.get(i)).append(NODE_PART_3); //$NON-NLS-1$
 				}
 			}
 
@@ -290,31 +352,31 @@ public final class TriphaseSignDocumentRequest {
 			}
 
 			if (this.needPreSign != null) {
-				if (this.needPreSign.booleanValue() && this.preSign != null) {
+				if (this.needPreSign.booleanValue() && this.preSigns != null) {
 					builder.append("NEED_PRE=").append(this.needPreSign.booleanValue()).append("\n"); //$NON-NLS-1$ //$NON-NLS-2$
-					for (int i = 0; i < this.preSign.size(); i++) {
-						builder.append("PRE.").append(i).append("=").append(this.preSign.get(i)).append("\n"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+					for (int i = 0; i < this.preSigns.size(); i++) {
+						builder.append("PRE.").append(i).append("=").append(this.preSigns.get(i)).append("\n"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 					}
 				}
 			}
-			if (this.session != null) {
+			if (this.sessions != null) {
 				try {
-					for (int i = 0; i < this.session.size(); i++) {
-						builder.append("SESSION.").append(i).append("=").append(new String(Base64.decode(this.session.get(i)))).append("\n"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+					for (int i = 0; i < this.sessions.size(); i++) {
+						builder.append("SESSION.").append(i).append("=").append(new String(Base64.decode(this.sessions.get(i)))).append("\n"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 					}
-				} catch (IOException e) {
+				} catch (final IOException e) {
 					throw new IOException("Error en la codificacion de los datos de sesion", e); //$NON-NLS-1$
 				}
 			}
-			if (this.pk1 != null) {
-				for (int i = 0; i < this.pk1.size(); i++) {
-					builder.append("PK1.").append(i).append("=").append(this.pk1.get(i)).append("\n"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			if (this.pk1s != null) {
+				for (int i = 0; i < this.pk1s.size(); i++) {
+					builder.append("PK1.").append(i).append("=").append(this.pk1s.get(i)).append("\n"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				}
 			}
 
 			try {
 				return Base64.encode(builder.toString().getBytes(), true);
-			} catch (Exception e) {
+			} catch (final Exception e) {
 				// Este caso nunca se dara
 				return null;
 			}

@@ -1,7 +1,11 @@
 package es.gob.afirma.signers.batch;
 
+import java.io.InputStream;
+import java.util.Properties;
+
 import es.gob.afirma.core.AOInvalidFormatException;
 import es.gob.afirma.core.signers.AOSignConstants;
+import es.gob.afirma.triphase.server.SignatureService;
 import es.gob.afirma.triphase.signer.processors.CAdESTriPhasePreProcessor;
 import es.gob.afirma.triphase.signer.processors.PAdESTriPhasePreProcessor;
 import es.gob.afirma.triphase.signer.processors.TriPhasePreProcessor;
@@ -10,6 +14,27 @@ import es.gob.afirma.triphase.signer.processors.XAdESTriPhasePreProcessor;
 /** Constantes para la definici&oacute;n de una firma independiente.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
 public final class SingleSignConstants {
+
+	private static final String CONFIG_FILE = "config.properties"; //$NON-NLS-1$
+
+	private static final String CONFIG_PARAM_INSTALL_XMLDSIG = "alternative.xmldsig"; //$NON-NLS-1$
+
+	private static final Properties config;
+
+	static {
+		try {
+			final InputStream configIs = SignatureService.class.getClassLoader().getResourceAsStream(CONFIG_FILE);
+			if (configIs == null) {
+				throw new RuntimeException("No se encuentra el fichero de configuracion del servicio: " + CONFIG_FILE); //$NON-NLS-1$
+			}
+			config = new Properties();
+			config.load(configIs);
+			configIs.close();
+		}
+		catch(final Exception e) {
+			throw new RuntimeException("Error en la carga del fichero de propiedades: " + e, e); //$NON-NLS-1$
+		}
+	}
 
 	/** Tipo de operaci&oacute;n de firma. */
 	public enum SignSubOperation {
@@ -149,7 +174,8 @@ public final class SingleSignConstants {
 			case CADES:
 				return new CAdESTriPhasePreProcessor();
 			case XADES:
-				return new XAdESTriPhasePreProcessor();
+				final boolean installXmlDSig = Boolean.parseBoolean(config.getProperty(CONFIG_PARAM_INSTALL_XMLDSIG, Boolean.FALSE.toString()));
+				return new XAdESTriPhasePreProcessor(installXmlDSig);
 			default:
 				throw new AOInvalidFormatException("Formato de firma no soportado: " + sSign.getSignFormat()); //$NON-NLS-1$
 		}

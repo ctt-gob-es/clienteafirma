@@ -79,6 +79,8 @@ public final class GenCAdESEPESSignedData {
      *                   se ignora, us&aacute;ndose &uacute;nicamente cuando el par&aacute;metro <code>parameters</code> es nulo.
      * @param dataDigestAlgorithmName Algoritmo de huella digital usado para calcular el valor indicado en el par&aacute;metro <code>dataDigest</code>.
      *                                Si <code>dataDigest</code> es nulo el valor de este par&aacute;metro se ignora.
+     * @param includeSigningTimeAttribute <code>true</code> para incluir el atributo <i>SigningTime</i> de PKCS#9 (OID:1.2.840.113549.1.9.5),
+     *                                    <code>false</code> para no incluirlo. Este atributo nunca se incluye en el modo PAdES.
      * @param padesMode <code>true</code> para generar una firma CAdES compatible PAdES, <code>false</code> para generar una firma CAdES normal.
      * @param contentType Tipo de contenido definido por su OID.
      * @param contentDescription Descripci&oacute;n textual del tipo de contenido.
@@ -97,6 +99,7 @@ public final class GenCAdESEPESSignedData {
                                             final Certificate[] certChain,
                                             final byte[] dataDigest,
                                             final String dataDigestAlgorithmName,
+                                            final boolean includeSigningTimeAttribute,
                                             final boolean padesMode,
                                             final String contentType,
                                             final String contentDescription,
@@ -123,6 +126,7 @@ public final class GenCAdESEPESSignedData {
             signingCertificateV2,
             dataDigest,
             signDate,
+            includeSigningTimeAttribute,
             padesMode,
             contentType,
             contentDescription,
@@ -137,22 +141,7 @@ public final class GenCAdESEPESSignedData {
             omitContent ? null : content,
             certChain,
             signature,
-            // Volvemos a crear la prefirma simulando una firma trifasica en la que la postfirma no cuenta con el
-            // resultado de la prefirma
-            CAdESTriPhaseSigner.preSign(
-        		AOSignConstants.getDigestAlgorithmName(dataDigestAlgorithmName),
-                omitContent ? null : content,
-                certChain,
-                policy,
-                signingCertificateV2,
-                dataDigest,
-                signDate,
-                padesMode,
-                contentType,
-                contentDescription,
-                ctis,
-                csm
-            )
+            preSignature
         );
 
     }

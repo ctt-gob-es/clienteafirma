@@ -12,9 +12,9 @@ if (document.all && !window.setTimeout.isPolyfill) {
 
 var MiniApplet = ( function ( window, undefined ) {
 
-		var VERSION = "1.3";
+		var VERSION = "1.4";
 		
-		var JAR_NAME = 'miniapplet-full_1_3.jar';
+		var JAR_NAME = 'miniapplet-full_1_4.jar';
 
 		var JAVA_ARGUMENTS = '-Xms512M -Xmx512M ';
 		
@@ -97,13 +97,15 @@ var MiniApplet = ( function ( window, undefined ) {
 
 		var KEYSTORE_PKCS11 = "PKCS11";
 
-		var KEYSTORE_FIREFOX = "MOZ_UNI";
+		var KEYSTORE_MOZILLA = "MOZ_UNI";
 		
 		var KEYSTORE_JAVA = "JAVA";
 		
 		var KEYSTORE_JCEKS = "JCEKS";
 		
 		var KEYSTORE_JAVACE = "JAVACE";
+		
+		var KEYSTORE_DNIE = "DNIEJAVA";
 
 		/* Valores para la configuracion de la comprobacion de tiempo */
 
@@ -113,6 +115,13 @@ var MiniApplet = ( function ( window, undefined ) {
 
 		var CHECKTIME_OBLIGATORY = "CT_OBLIGATORY";
 
+		
+		// Tiempo de espera entre los intentos de conexion con autofirma.
+		var AUTOFIRMA_LAUNCHING_TIME = 2000;
+		
+		// Reintentos de conexion totales para detectar que esta instalado AutoFirma
+		var AUTOFIRMA_CONNECTION_RETRIES = 10;
+		
 		/* ------------------------------------ */
 		/* Funciones de comprobacion de entorno */
 		/* ------------------------------------ */
@@ -169,7 +178,6 @@ var MiniApplet = ( function ( window, undefined ) {
 		function isFirefox(){
 			return navigator.userAgent.toUpperCase().indexOf("FIREFOX") != -1
 		}
-			
 
 		/**
 		 * Determina con un boolean si se accede a la web con Chrome
@@ -178,8 +186,6 @@ var MiniApplet = ( function ( window, undefined ) {
 			return navigator.userAgent.toUpperCase().indexOf("CHROME") != -1 ||
 				navigator.userAgent.toUpperCase().indexOf("CHROMIUM") != -1;
 		}
-		
-		
 
 		function isURLTooLong(url) {
 			if (isAndroid()) {
@@ -245,45 +251,58 @@ var MiniApplet = ( function ( window, undefined ) {
 		 *  - maxMillis:	Tiempo maximo de desfase en milisegundos.
 		 * Cuando el HTML es local, no se realiza ningun tipo de comprobacion.
 		 * */
-		var checkTime = function (checkType, maxMillis) {
-
-			if (checkType == undefined || checkType == null || checkType == CHECKTIME_NO
-					|| maxMillis == undefined || maxMillis == null || maxMillis <= 0) {
-				return;
+		var checkTime = function (checkType, maxMillis, checkURL) {
+			try{
+			
+				if (checkType == undefined || checkType == null || checkType == CHECKTIME_NO
+						|| maxMillis == undefined || maxMillis == null || maxMillis <= 0) {
+					return;
+				}
+				
+				// Si checkURL existe mandamos la peticion ahi, en caso contrario nos inventamos una url.
+				var URL;
+				if (checkURL){
+					URL = checkURL;
+				}
+				else {
+					URL = document.URL + '/' + Math.random();
+				}
+				// Hacemos una llamada al servidor para conocer su hora
+				var xhr = getHttpRequest(); 
+				xhr.open('GET', URL, false); 
+				xhr.send(); 
+	
+				// Recogemos la hora local, nada mas obtener la respuesta del servidor
+				var clientDate = new Date();
+				
+				// Tomamos la hora a partir de la respuesta del servidor. Si esta es 0, estamos en local
+				var serverDate = new Date(xhr.getResponseHeader("Date"));
+				if (serverDate == null || serverDate.getTime() == 0) {
+					// No hacemos nada si estamos en local 
+					return;
+				}
+	
+				// Evaluamos la desincronizacion 
+				var delay =  Math.abs(clientDate.getTime() - serverDate.getTime());
+				if (delay > maxMillis) {
+					 if (checkType == CHECKTIME_RECOMMENDED) {
+						 alert(currentLocale.checktime_warn +
+								 "\n" + currentLocale.checktime_local_time + ": " + clientDate.toLocaleString() +
+								 "\n" + currentLocale.checktime_server_time + ": " + serverDate.toLocaleString());
+					 }
+					 else if (checkType == CHECKTIME_OBLIGATORY) {
+						 severeTimeDelay = true;
+						 alert(currentLocale.checktime_err +
+								 "\n" + currentLocale.checktime_local_time + ": " + clientDate.toLocaleString() +
+								 "\n" + currentLocale.checktime_server_time + ": " + serverDate.toLocaleString());
+					 }
+				}
 			}
-			
-			// Hacemos una llamada al servidor para conocer su hora
-			var xhr = getHttpRequest(); 
-			xhr.open('GET', document.URL + '/' + Math.random(), false); 
-			xhr.send(); 
-
-			// Recogemos la hora local, nada mas obtener la respuesta del servidor
-			var clientDate = new Date();
-			
-			// Tomamos la hora a partir de la respuesta del servidor. Si esta es 0, estamos en local
-			var serverDate = new Date(xhr.getResponseHeader("Date"));
-			if (serverDate == null || serverDate.getTime() == 0) {
+			catch (e) {
 				// No hacemos nada si estamos en local 
 				return;
 			}
-
-			// Evaluamos la desincronizacion 
-			var delay =  Math.abs(clientDate.getTime() - serverDate.getTime());
-			if (delay > maxMillis) {
-				 if (checkType == CHECKTIME_RECOMMENDED) {
-					 alert(currentLocale.checktime_warn +
-							 "\n" + currentLocale.checktime_local_time + ": " + clientDate.toLocaleString() +
-							 "\n" + currentLocale.checktime_server_time + ": " + serverDate.toLocaleString());
-				 }
-				 else if (checkType == CHECKTIME_OBLIGATORY) {
-					 severeTimeDelay = true;
-					 alert(currentLocale.checktime_err +
-							 "\n" + currentLocale.checktime_local_time + ": " + clientDate.toLocaleString() +
-							 "\n" + currentLocale.checktime_server_time + ": " + serverDate.toLocaleString());
-				 }
-			}
 		}
-
 		/** Carga el MiniApplet. */
 		var cargarMiniApplet = function (base, keystore) {
 
@@ -368,7 +387,7 @@ var MiniApplet = ( function ( window, undefined ) {
 
 		function getDefaultKeystore(){
 			if(isFirefox()){
-				return KEYSTORE_FIREFOX;
+				return KEYSTORE_MOZILLA;
 			}
 			return null;
 		}
@@ -564,17 +583,14 @@ var MiniApplet = ( function ( window, undefined ) {
 			return clienteFirma.getTextFromBase64(dataB64, charset);
 		}
 
-		var saveDataToFile = function (dataB64, title, fileName, extension, description) {
+		var saveDataToFile = function (dataB64, title, fileName, extension, description, successCallback, errorCallback) {
 			forceLoad();
 			if (clientType == TYPE_APPLET) {
 				setData(dataB64);
 				return clienteFirma.saveDataToFile(title, fileName, extension, description);
 			}
-			else if (clientType == TYPE_JAVASCRIPT_SOCKET ) {
-				clienteFirma.saveDataToFile(dataB64, title, fileName, extension, description);
-			}
 			else {
-				clienteFirma.saveDataToFile(dataB64, title, fileName, extension, description);
+				clienteFirma.saveDataToFile(dataB64, title, fileName, extension, description, successCallback, errorCallback);
 			}
 		}
 
@@ -663,7 +679,7 @@ var MiniApplet = ( function ( window, undefined ) {
 
 				appletTag += "</object>";
 
-				// Al agregar con append() estos nodos no se carga automaticamente el applet en IE10 e inferiores, asi que
+				// Al agregar estos nodos con append() no se carga automaticamente el applet en IE10 e inferiores, asi que
 				// hay que usar document.write() o innerHTML. Para asegurarnos de no pisar HTML previo, crearemos un <div>
 				// en la pagina, lo recogeremos e insertaremos dentro suyo el codigo del applet.
 				var divElem = document.createElement("div");
@@ -786,9 +802,8 @@ var MiniApplet = ( function ( window, undefined ) {
 		 *  - Si las constantes AfirmaSocket.POPUP_URL y AfirmaSocket.IFRAME_URL estan inicializadas.
 		 * En caso contrario, la comunicacion se realizara mediante un servidor intermedio.
 		 */
-		function cargarAppAfirma(clientAddress, keystore) {
-			// Solo entra por el socket para chrome y firefox.		
-			if (!isIOS() && !isAndroid() && !isInternetExplorer()){
+		function cargarAppAfirma(clientAddress, keystore) {	
+			if (!isIOS() && !isAndroid()){
 				clienteFirma = new AppAfirmaJSSocket(clientAddress, window, undefined);
 				clienteFirma.setKeyStore(keystore);
 				clientType = TYPE_JAVASCRIPT_SOCKET;
@@ -814,14 +829,14 @@ var MiniApplet = ( function ( window, undefined ) {
 			/** Puerto actual */
 			var port = "";
 			
+			var idSession;
+			
+			var PROTOCOL_VERSION = 1;
+			
+			// tiempo de retardo para peticiones
 			var WAITING_TIME = 500;
 			
-			var LAUNCHING_TIME = 2000;
-
 			var URL_REQUEST = "https://127.0.0.1:";
-			
-			// Numero de reintentos de conexion al socket para cada puerto.
-			var NUMBER_RESET_COUNTER = 3;
 			
 			// Respuesta del socket a la peticion realizada
 			var totalResponseRequest = "";
@@ -838,8 +853,7 @@ var MiniApplet = ( function ( window, undefined ) {
 			// Maxima longitud permitida para una URL, si la url se excede se divide la peticion en fragmentos
 			var URL_MAX_SIZE = 1048576;
 
-			// Reintentos de comunicacion para una conexion nueva
-			var NEW_CONNECTION_RETRIES = 3;
+			
 
 			var connection = false;
 		
@@ -854,6 +868,48 @@ var MiniApplet = ( function ( window, undefined ) {
 			
 			// funcion error callback
 			var errorCallback = null;
+			
+			/* Mayor entero. */
+			var MAX_NUMBER = 2147483648;
+
+			/* Caracteres validos para los ID de sesion */
+			var VALID_CHARS_TO_ID = "1234567890abcdefghijklmnopqrstuwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+			/* Genera un identificador de sesion. */
+			function generateNewIdSession () {
+				var ID_LENGTH = 20;
+				var random = "";
+				var randomInts;
+				if (typeof window.crypto != "undefined" && typeof window.crypto.getRandomValues != "undefined") {
+					randomInts = new Uint32Array(ID_LENGTH);
+					window.crypto.getRandomValues(randomInts);
+				}
+				else {
+					randomInts = new Array(ID_LENGTH);
+					for (var i = 0; i < ID_LENGTH; i++) {
+						randomInts[i] = rnd() * MAX_NUMBER;
+					}
+				}
+
+				for (var i = 0; i < ID_LENGTH; i++) {
+					random += VALID_CHARS_TO_ID.charAt(Math.floor(randomInts[i] % VALID_CHARS_TO_ID.length));
+				}
+
+				return random;
+			}
+			
+			/**
+			 * Genera numeros aleatorios con una distribucion homogenea.
+			 */
+			var seed;
+			function rnd () {
+				if (seed == undefined) {
+					seed = new Date().getMilliseconds() * 1000 * Math.random();
+				}
+			    seed = (seed * 9301 + 49297) % 233280;
+			    return seed / 233280;
+			}
+			
 			/**
 			 * Establece el almacen de certificados de que se debe utilizar por defecto.
 			 */
@@ -997,12 +1053,12 @@ var MiniApplet = ( function ( window, undefined ) {
 					// Invocamos a la aplicacion nativa
 					openNativeApp(ports);
 					// Enviamos la peticion a la app despues de esperar un tiempo prudencial
-					setTimeout(executeEchoByServiceByPort, LAUNCHING_TIME, ports, url);
+					setTimeout(executeEchoByServiceByPort, MiniApplet.AUTOFIRMA_LAUNCHING_TIME, ports, url);
 				}
 				// Se ha ejecutado anteriormente y tenemos un puerto calculado.
 				else {
 					connection = false;
-					executeEchoByService (port, url, NUMBER_RESET_COUNTER)
+					executeEchoByService (port, url, MiniApplet.AUTOFIRMA_CONNECTION_RETRIES)
 				}
 			}
 			
@@ -1029,8 +1085,8 @@ var MiniApplet = ( function ( window, undefined ) {
 						portsLine += ",";
 					}
 				}
-				
-				openUrl("afirma://service?ports=" + portsLine);
+				idSession = generateNewIdSession();
+				openUrl("afirma://service?ports=" + portsLine + "&v=" + PROTOCOL_VERSION + "&idsession=" + idSession);
 			}
 			
 			/**
@@ -1094,9 +1150,9 @@ var MiniApplet = ( function ( window, undefined ) {
 
 			function executeEchoByServiceByPort (ports, url) {
 				connection = false;
-				executeEchoByService (ports[0], url, NEW_CONNECTION_RETRIES);
-				executeEchoByService (ports[1], url, NEW_CONNECTION_RETRIES);
-				executeEchoByService (ports[2], url, NEW_CONNECTION_RETRIES);
+				executeEchoByService (ports[0], url, MiniApplet.AUTOFIRMA_CONNECTION_RETRIES);
+				executeEchoByService (ports[1], url, MiniApplet.AUTOFIRMA_CONNECTION_RETRIES);
+				executeEchoByService (ports[2], url, MiniApplet.AUTOFIRMA_CONNECTION_RETRIES);
 			}
 
 			/**
@@ -1112,6 +1168,7 @@ var MiniApplet = ( function ( window, undefined ) {
 				httpRequest.onreadystatechange = function() {
 					
 					if (httpRequest.readyState == 4 && httpRequest.status == 200 && Base64.decode(httpRequest.responseText, true) == "OK" && !connection) {
+						////console.log("puerto asignado puerto:" + currentPort);
 						port = currentPort;
 						urlHttpRequest = URL_REQUEST + port + "/afirma";
 						connection = true;
@@ -1119,14 +1176,22 @@ var MiniApplet = ( function ( window, undefined ) {
 						if (url.indexOf("afirma://save") > -1) {
 							isSaveOperation = true;
 						}
+						else {
+							isSaveOperation = false;
+						}
 						// comprobamos que sea una operacion de firma por lotes
-						else if (url.indexOf("afirma://batch") > -1){
+						if (url.indexOf("afirma://batch") > -1){
 							isBatchOperation = true
 						}
+						else {
+							isBatchOperation = false
+						}
+						
 						executeOperationByService(url);
 					}
-					else if (!connection && httpRequest.readyState != 2 && httpRequest.readyState != 3) {
+					else if (!connection && httpRequest.readyState != 2 && httpRequest.readyState !=3) {
 						timeoutResetCounter--;
+						////console.log("quedan "+timeoutResetCounter+" peticiones a"+currentPort)
 						if (timeoutResetCounter == 0) {
 							// si es la primera ejecucion y hemos llegado aqui la aplicacion no esta instalada
 							if(port == ""){
@@ -1134,21 +1199,22 @@ var MiniApplet = ( function ( window, undefined ) {
 							}
 							else {
 								port = "";
-								timeoutResetCounter = NUMBER_RESET_COUNTER;		
+								timeoutResetCounter = MiniApplet.AUTOFIRMA_CONNECTION_RETRIES;		
 								execAppIntent(url);
 							}
 						}
 						else {
 							// Intentamos reconectar dentro del tiempo de reintento
-							setTimeout(executeEchoByService, LAUNCHING_TIME, currentPort, url, timeoutResetCounter);
+							setTimeout(executeEchoByService, MiniApplet.AUTOFIRMA_LAUNCHING_TIME, currentPort, url, timeoutResetCounter);
 						}
 					}
 				}
-
+				
 				if (!connection) {
 					// mandamos un echo con - por lo que las variables de control se resetearan
 					// se anade EOF para que cuando el socket SSL lea la peticion del buffer sepa que ha llegado al final y no se quede en espera
-					httpRequest.send("echo=-%EOF");
+					httpRequest.send("echo=-idsession=" + idSession + "@EOF");
+					////console.log("probamos puerto " +currentPort)
 				}
 			}
 			
@@ -1158,103 +1224,126 @@ var MiniApplet = ( function ( window, undefined ) {
 			* Si cabe en un solo envio se manda directamente.
 			*/
 			function executeOperationByService (url) {
-				try {
-					var httpRequest = getHttpRequest();
-					httpRequest.open("POST", urlHttpRequest, true);
-					httpRequest.setRequestHeader("Content-type","application/x-www-form-urlencoded");
-					// El envio se debe fragmentar, llamamos a una función que se encarga de mandar la peticion recursivamente
-					if (url.length > URL_MAX_SIZE){
-						executeOperationRecursive(url, 1, Math.ceil(url.length/URL_MAX_SIZE) );
-					}
-					// El envio no se fragmenta
-					else {
-						httpRequest.onreadystatechange = function(){
-							if (httpRequest.status == 404){
-								errorServiceResponseFunction("java.lang.Exception", httpRequest.responseText, currentPort);
+
+				var httpRequest = getHttpRequest();
+				httpRequest.open("POST", urlHttpRequest, true);
+				httpRequest.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+				// Como internet explorer añade basura hacemos las peticiones muy pequeñas para que funcionen correctamente.
+				if (isInternetExplorer()){
+					URL_MAX_SIZE = 12000;
+				}
+				// Si el envio se debe fragmentar, llamamos a una función que se encarga de mandar la peticion recursivamente
+				if (url.length > URL_MAX_SIZE){
+					executeOperationRecursive(url, 1, Math.ceil(url.length/URL_MAX_SIZE) );
+				}
+				// El envio no se fragmenta
+				else {
+					httpRequest.onreadystatechange = function(){
+						if (httpRequest.status == 404){
+							errorServiceResponseFunction("java.lang.IOException", httpRequest.responseText);
+						}
+						// operacion guardar
+						if (isSaveOperation){
+							if(httpRequest.readyState == 4 && Base64.decode(httpRequest.responseText) != ""){
+								successServiceResponseFunction(Base64.decode(httpRequest.responseText));
 							}
-							// Se ha realizado la operacion save, no intentamos hacer un reintento
-							if (isSaveOperation){
-								isSaveOperation = false;
-								return;
-							}
-							else {
-								if (httpRequest.readyState == 4 && httpRequest.status == 200 && httpRequest.responseText != "") {
-									// Juntamos los fragmentos
-									totalResponseRequest = "";
-									addFragmentRequest (1, Base64.decode(httpRequest.responseText, true));
-								}		
-								// Volvemos a mandar la peticion si no manda texto en la respuesta y la peticion esta en estado ready
-								else if (httpRequest.responseText == "" && httpRequest.status == 0 && httpRequest.readyState != 2 && httpRequest.readyState != 3 ){
-									setTimeout(executeOperationByService, WAITING_TIME,url);
+							return;
+						}
+						// operacion de firma
+						else {
+							if (httpRequest.readyState == 4 && httpRequest.status == 200 && httpRequest.responseText != "") {
+								if(Base64.decode(httpRequest.responseText) == "MEMORY_ERROR"){
+									successServiceResponseFunction(Base64.decode(httpRequest.responseText));
 								}
+								// Juntamos los fragmentos
+								totalResponseRequest = "";
+								addFragmentRequest (1, Base64.decode(httpRequest.responseText, true));
+							}		
+							// Volvemos a mandar la peticion si no manda texto en la respuesta y la peticion esta en estado ready
+							else if (httpRequest.responseText == "" && httpRequest.status == 0 && httpRequest.readyState == 0 ){
+								setTimeout(executeOperationByService, WAITING_TIME,url);
 							}
 						}
-						// se anade EOF para que cuando el socket SSL lea la peticion del buffer sepa que ha llegado al final y no se quede en espera
-						httpRequest.send("cmd=" + Base64.encode(url, true) + "%EOF");
 					}
+					httpRequest.onerror = function(e) { 
+						// status error 0 es que no se ha podido comunicar con la aplicacion
+						if (e.target.status == 0){
+							errorServiceResponseFunction("java.lang.IOException", "Se ha perdido la conexión con la aplicación @firma "+e.target.statusText);
+						}
+						// error desconocido 
+						else{
+							errorServiceResponseFunction("java.lang.IOException", "Ocurrio un error de red en la llamada al servicio de firma "+e.target.statusText);
+						}
+					}
+					// se anade EOF para que cuando el socket SSL lea la peticion del buffer sepa que ha llegado al final y no se quede en espera
+					httpRequest.send("cmd=" + Base64.encode(url, true) + "idsession=" + idSession +"@EOF");
+						
+				}
 
-				}
-				catch(e) {
-					if (httpRequest.status == 404) {
-						// Interpretamos que este error viene por un problema con el puerto
-					} else {
-						// Interpretamos que este error viene de la aplicacion
-						errorServiceResponseFunction("java.lang.IOException", "Ocurrio un error de red en la llamada al servicio de firma", currentPort);
-						return;
-					}
-				}
 			}
 			
-				/**
+			/**
 			* Manda los datos a la aplicación nativa en varios fragmentos porque ha habido que dividir los datos.
 			* Se va mandando cada petición cuando se reciba la anterior.
 			*/
 			function executeOperationRecursive (url, i, iFinal) {
-				try{
-					var httpRequest = getHttpRequest();
-					httpRequest.open("POST", urlHttpRequest, true);
-					httpRequest.setRequestHeader("Content-type","application/x-www-form-urlencoded");
-					var urlToSend = url.substring(( (i-1) * URL_MAX_SIZE), Math.min(URL_MAX_SIZE * i, url.length));
-					httpRequest.onreadystatechange = function(evt) {
-						if (httpRequest.status == 404) {
-							errorServiceResponseFunction("java.lang.Exception", httpRequest.responseText, currentPort);
-							return;
-						}
-						// Respuesta afirmativa, hay que mandar mas fragmentos
-						if (httpRequest.readyState == 4 && httpRequest.status == 200 && httpRequest.responseText != "" ) {
-							recibidos++;
-							
-							// Faltan mas peticiones por enviar
-							if (Base64.decode(httpRequest.responseText, true) == "MORE_DATA_NEED") {
-								if (recibidos < iFinal ){
-									executeOperationRecursive(url, i+1, iFinal);
-								}
-							}
-							// Todas las peticiones se han recibido, hay que mandar operacion firma
-							// respuesta es OK
-							else if (Base64.decode(httpRequest.responseText, true) == "OK") {
-								if(recibidos == iFinal ){
-									recibidos = 0;
-									doFirm();
-								}
-							}
-						}
-						else if (httpRequest.responseText == "" && httpRequest.status == 0 && httpRequest.readyState != 2 && httpRequest.readyState != 3) {
-							setTimeout(executeOperationRecursive, WAITING_TIME, url, i, iFinal);
-						}
-					}
-					// se anade EOF para que cuando el socket SSL lea la peticion del buffer sepa que ha llegado al final y no se quede en espera
-					httpRequest.send("fragment=%" + i + "%" + iFinal + "%"  + Base64.encode(urlToSend, true)+"%EOF");
-				}
-				catch(e) {
+				
+				var httpRequest = getHttpRequest();
+				httpRequest.open("POST", urlHttpRequest, true);
+				httpRequest.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+				var urlToSend = url.substring(( (i-1) * URL_MAX_SIZE), Math.min(URL_MAX_SIZE * i, url.length));
+				httpRequest.onreadystatechange = function(evt) {
 					if (httpRequest.status == 404) {
-						alert(e);
-					} else {
-						errorServiceResponseFunction("java.lang.IOException", "Ocurrio un error de red en la llamada al servicio de firma", currentPort);
+						errorServiceResponseFunction("java.lang.Exception", httpRequest.responseText);
+						return;
 					}
-				}		
+					// Respuesta afirmativa, hay que mandar mas fragmentos
+					if (httpRequest.readyState == 4 && httpRequest.status == 200 && httpRequest.responseText != "" ) {
+						recibidos++;
+						
+						// Faltan mas peticiones por enviar
+						if (Base64.decode(httpRequest.responseText, true) == "MORE_DATA_NEED") {
+							if (recibidos < iFinal ){
+								////console.log("recibido el fragmento "+recibidos + "de "+iFinal)
+								executeOperationRecursive(url, i+1, iFinal);
+							}
+						}
+						// Todas las peticiones se han recibido, hay que mandar operacion firma
+						// respuesta es OK
+						else if (Base64.decode(httpRequest.responseText, true) == "OK") {
+							if(recibidos == iFinal ){
+								////console.log("recibido todo, realizamos la operacion");
+								recibidos = 0;
+								doFirm();
+							}
+						}
+						else if(Base64.decode(httpRequest.responseText) == "MEMORY_ERROR"){
+							successServiceResponseFunction(Base64.decode(httpRequest.responseText));
+						}
+					}
+					else if (httpRequest.responseText == "" && httpRequest.status == 0 && httpRequest.readyState == 0) {
+						setTimeout(executeOperationRecursive, WAITING_TIME, url, i, iFinal);
+					}
+				}
+				httpRequest.onerror = function(e) { 
+					// status error 0 es que no se ha podido comunicar con la aplicacion
+					if (e.target.status == 0){
+						errorServiceResponseFunction("java.lang.IOException", "Se ha perdido la conexión con la aplicación @firma "+e.target.statusText);
+					}
+					// error desconocido 
+					else{
+						errorServiceResponseFunction("java.lang.IOException", "Ocurrio un error de red en la llamada al servicio de firma "+e.target.statusText);
+					}
+				}
+				// se anade EOF para que cuando el socket SSL lea la peticion del buffer sepa que ha llegado al final y no se quede en espera
+				httpRequest.send("fragment=@" + i + "@" + iFinal + "@"  + Base64.encode(urlToSend, true) + "idsession=" + idSession +"@EOF");
+				//console.log("mandado parte "+i+" de"+iFinal);
+	
 			}
 			
+			/**
+			 * Realiza una operacion que se ha mandando en varios fragmentos.
+			 */
 			function doFirm () {
 				httpRequest = getHttpRequest();
 				httpRequest.open("POST", urlHttpRequest, true);
@@ -1262,36 +1351,58 @@ var MiniApplet = ( function ( window, undefined ) {
 				httpRequest.onreadystatechange = function() {
 
 					if (httpRequest.status == 404){
-						errorServiceResponseFunction("java.lang.Exception", httpRequest.responseText, currentPort);
+						errorServiceResponseFunction("java.lang.Exception", httpRequest.responseText);
 					}
 
-					// Si es una operacion guardar no hay que recomponer respuesta
+					// Se ha realizado la operacion save, no controlamos reintentos ni el exito de la peticion
 					if (isSaveOperation){
-						isSaveOperation = false;
+						if(httpRequest.readyState == 4 && Base64.decode(httpRequest.responseText) != ""){
+							successServiceResponseFunction(Base64.decode(httpRequest.responseText));
+						}
 						return;
 					}
 					else {
 						if (httpRequest.readyState == 4 && httpRequest.status == 200 && httpRequest.responseText != "") {
+							if(Base64.decode(httpRequest.responseText) == "MEMORY_ERROR"){
+								successServiceResponseFunction(Base64.decode(httpRequest.responseText));
+							}
 							totalResponseRequest = "";
 							addFragmentRequest (1, Base64.decode(httpRequest.responseText, true));
 						}
 						// No recibimos la respuesta, volvemos a llamar.
 						else {
-							if (httpRequest.status == 0 && httpRequest.readyState != 2 && httpRequest.readyState != 3 ){
+							if (httpRequest.status == 0 && httpRequest.readyState == 0 ){
 								setTimeout(doFirm, WAITING_TIME);	
 							}
 						}
 					}
 				}
-				httpRequest.send("firm=%EOF");
+				httpRequest.onerror = function(e) { 
+					// status error 0 es que no se ha podido comunicar con la aplicacion
+					if (e.target.status == 0){
+						errorServiceResponseFunction("java.lang.IOException", "Se ha perdido la conexión con la aplicación @firma "+e.target.statusText);
+					}
+					// error desconocido 
+					else{
+						errorServiceResponseFunction("java.lang.IOException", "Ocurrio un error de red en la llamada al servicio de firma "+e.target.statusText);
+					}
+				}
+				httpRequest.send("firm=idsession=" + idSession +"@EOF");
 			}
 
+			/**
+			 * Se encarga de solicitar y montar la respuesta de la operacion realizada.
+			 */
 			function addFragmentRequest (part, totalParts){
 				httpRequest = getHttpRequest();
 				httpRequest.open("POST", urlHttpRequest, true);
 				httpRequest.setRequestHeader("Content-type","application/x-www-form-urlencoded");
 				httpRequest.onreadystatechange = function() {
 					if (httpRequest.readyState == 4 && httpRequest.status == 200 && httpRequest.responseText != "") {
+						if(Base64.decode(httpRequest.responseText) == "MEMORY_ERROR"){
+							successServiceResponseFunction(Base64.decode(httpRequest.responseText));
+						}
+						//console.log("recibida la parte "+part);
 						totalResponseRequest += Base64.decode( httpRequest.responseText, true);
 						// si estan todas las partes llamamos al successcallback
 						if (part == totalParts){
@@ -1311,14 +1422,25 @@ var MiniApplet = ( function ( window, undefined ) {
 						}
 					}
 					else {
-						if (httpRequest.responseText == "" && httpRequest.status == 0 && httpRequest.readyState != 2 && httpRequest.readyState != 3){
+						if (httpRequest.responseText == "" && httpRequest.status == 0 && httpRequest.readyState == 0){
 							setTimeout(addFragmentRequest, WAITING_TIME, part, totalParts);
 						}
 					}
 				}
+				httpRequest.onerror = function(e) { 
+					// status error 0 es que no se ha podido comunicar con la aplicacion
+					if (e.target.status == 0){
+						errorServiceResponseFunction("java.lang.IOException", "Se ha perdido la conexión con la aplicación @firma "+e.target.statusText);
+					}
+					// error desconocido 
+					else{
+						errorServiceResponseFunction("java.lang.IOException", "Ocurrio un error de red en la llamada al servicio de firma "+e.target.statusText);
+					}
+				}
 				if (part <= totalParts){
 					// se anade EOF para que cuando el socket SSL lea la peticion del buffer sepa que ha llegado al final y no se quede en espera
-					httpRequest.send("send=%"+part+"%"+totalParts+"%EOF");
+					httpRequest.send("send=@"+part+"@"+totalParts+"idsession=" + idSession +"@EOF");
+					//console.log("solicitarmos la parte "+part+" de "+ totalParts)
 				}
 			}
 			
@@ -1347,6 +1469,12 @@ var MiniApplet = ( function ( window, undefined ) {
 					return;
 				}
 
+				// Error de memoria
+				if (data == "MEMORY_ERROR") {
+					errorCallback("es.gob.afirma.core.OutOfMemoryError", "El fichero que se pretende firmar o guardar excede de la memoria disponible para aplicacion");
+					return;
+				}
+				
 				// Se ha producido un error
 				if (data.length > 4 && data.substr(0, 4) == "SAF_") {
 					errorCallback("java.lang.Exception", data);
@@ -1356,6 +1484,12 @@ var MiniApplet = ( function ( window, undefined ) {
 				// Se ha producido un error y no se ha identificado el tipo
 				if (data == "NULL") {
 					errorCallback("java.lang.Exception", "Error desconocido");
+					return;
+				}
+				
+				// Operacion guardado con exito
+				if (data == "SAVE_OK") {
+					successCallback(data);
 					return;
 				}
 
@@ -1384,6 +1518,11 @@ var MiniApplet = ( function ( window, undefined ) {
 					}
 				}
 				successCallback(signature, certificate);
+			}
+			
+			function errorServiceResponseFunction(exception, message){
+				errorCallback(exception, message);
+				return;
 			}
 			
 			function successBatchResponseFunction (data){
@@ -1421,7 +1560,9 @@ var MiniApplet = ( function ( window, undefined ) {
 			/**
 			 * Inicia el proceso de guardado de una firma.
 			 */
-			function saveDataToFile (dataB64, title, filename, extension, description) {
+			function saveDataToFile (dataB64, title, filename, extension, description, successCallbackSave, errorCallbackSave) {
+				successCallback = successCallbackSave;
+				errorCallback = errorCallbackSave;
 				saveByService(dataB64, title, filename, extension, description);
 			}
 
@@ -1768,11 +1909,11 @@ var MiniApplet = ( function ( window, undefined ) {
 			function getTextFromBase64 (base64Text, charset) {
 				return Base64.decode(base64Text);
 			}
-
+			
 			/**
 			 * Guardado de datos en disco. Se realiza mediante la invocacion de una app nativa. 
 			 */
-			function saveDataToFile (dataB64, title, filename, extension, description) {
+			function saveDataToFile (dataB64, title, filename, extension, description, successCallback, errorCallback) {
 
 				if (dataB64 != undefined && dataB64 != null && dataB64 != "") {
 					dataB64 = dataB64.replace(/\+/g, "-").replace(/\//g, "_");
@@ -2155,8 +2296,6 @@ var MiniApplet = ( function ( window, undefined ) {
 				}
 			}
 
-			var iterations = 0;
-
 			/**
 			 * Ejecuta el metodo de error si el html recuperado es tal o el metodo de exito si no lo es,
 			 * en cuyo caso previamente descifrara el resultado. 
@@ -2235,6 +2374,9 @@ var MiniApplet = ( function ( window, undefined ) {
 				}
 			}
 
+			var NUM_MAX_ITERATIONS = 15;
+			var iterations = 0;
+
 			function getStoredFileFromServlet (idDocument, servletAddress, cipherKey, successCallback, errorCallback) {
 
 				var httpRequest = getHttpRequest();
@@ -2245,8 +2387,6 @@ var MiniApplet = ( function ( window, undefined ) {
 				iterations = 0;
 				setTimeout(retrieveRequest, 4000, httpRequest, servletAddress, "op=get&v=1_0&id=" + idDocument + "&it=0", cipherKey, successCallback, errorCallback);
 			}
-
-			var NUM_MAX_ITERATIONS = 15;
 
 			function retrieveRequest(httpRequest, url, params, cipherKey, successCallback, errorCallback) {
 
@@ -2354,6 +2494,8 @@ var MiniApplet = ( function ( window, undefined ) {
 		/* Metodos que publicamos del objeto MiniApplet */
 		return {
 			
+			VERSION : VERSION,
+			
 			/* Publicamos las variables para la comprobacion de hora. */		
 			CHECKTIME_NO : CHECKTIME_NO,
 			CHECKTIME_RECOMMENDED : CHECKTIME_RECOMMENDED,
@@ -2368,10 +2510,15 @@ var MiniApplet = ( function ( window, undefined ) {
 			KEYSTORE_APPLE : KEYSTORE_APPLE,
 			KEYSTORE_PKCS12 : KEYSTORE_PKCS12,
 			KEYSTORE_PKCS11 : KEYSTORE_PKCS11,
-			KEYSTORE_FIREFOX : KEYSTORE_FIREFOX,
+			KEYSTORE_MOZILLA : KEYSTORE_MOZILLA,
 			KEYSTORE_JAVA : KEYSTORE_JAVA,
 			KEYSTORE_JCEKS : KEYSTORE_JCEKS,
 			KEYSTORE_JAVACE : KEYSTORE_JAVACE,
+			KEYSTORE_DNIE : KEYSTORE_DNIE,
+
+			/* Constantes para la deteccion de la aplicacion de autofirma */
+			AUTOFIRMA_LAUNCHING_TIME : AUTOFIRMA_LAUNCHING_TIME,
+			AUTOFIRMA_CONNECTION_RETRIES : AUTOFIRMA_CONNECTION_RETRIES,
 			
 			/* Metodos visibles. */
 			cargarMiniApplet : cargarMiniApplet,

@@ -102,7 +102,6 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 		c.weightx = 0.0;
 		c.gridx++;
 
-
 		final JButton refresh = new JButton(
 			new ImageIcon(
 				UtilToolBar.class.getResource("/resources/toolbar/ic_autorenew_black_18dp.png"), //$NON-NLS-1$
@@ -153,7 +152,6 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 
 		c.insets = new Insets(13, 0, 8, 15);
 		c.gridx++;
-
 
 		final JButton help = new JButton(
 			new ImageIcon(
@@ -299,39 +297,6 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 		private static final Font SUBJECT_FONT = new Font(VERDANA_FONT_NAME, Font.BOLD, 14);
 		private static final Font DETAILS_FONT = new Font(VERDANA_FONT_NAME, Font.PLAIN, 11);
 
-		private static final ImageIcon ICON_DNIE_NORMAL = new ImageIcon(
-			CertificateSelectionPanel.class.getClassLoader().getResource("resources/dnieicon.png") //$NON-NLS-1$
-		);
-		private static final ImageIcon ICON_DNIE_WARNING = new ImageIcon(
-			CertificateSelectionPanel.class.getClassLoader().getResource("resources/dnieicon_w.png") //$NON-NLS-1$
-		);
-		private static final ImageIcon ICON_DNIE_ERROR = new ImageIcon(
-			CertificateSelectionPanel.class.getClassLoader().getResource("resources/dnieicon_e.png") //$NON-NLS-1$
-		);
-		private static final ImageIcon ICON_OTHER_NORMAL = new ImageIcon(
-			CertificateSelectionPanel.class.getClassLoader().getResource("resources/certicon.png") //$NON-NLS-1$
-		);
-		private static final ImageIcon ICON_OTHER_WARNING = new ImageIcon(
-			CertificateSelectionPanel.class.getClassLoader().getResource("resources/certicon_w.png") //$NON-NLS-1$
-		);
-		private static final ImageIcon ICON_OTHER_ERROR = new ImageIcon(
-			CertificateSelectionPanel.class.getClassLoader().getResource("resources/certicon_e.png") //$NON-NLS-1$
-		);
-		static {
-			ICON_DNIE_NORMAL.setDescription(CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.4")); //$NON-NLS-1$
-			ICON_DNIE_NORMAL.getAccessibleContext().setAccessibleDescription(CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.4")); //$NON-NLS-1$
-			ICON_DNIE_WARNING.setDescription(CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.7")); //$NON-NLS-1$
-			ICON_DNIE_WARNING.getAccessibleContext().setAccessibleDescription(CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.7")); //$NON-NLS-1$
-			ICON_DNIE_ERROR.setDescription(CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.9")); //$NON-NLS-1$
-			ICON_DNIE_ERROR.getAccessibleContext().setAccessibleDescription(CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.9")); //$NON-NLS-1$
-			ICON_OTHER_NORMAL.setDescription(CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.11")); //$NON-NLS-1$
-			ICON_OTHER_NORMAL.getAccessibleContext().setAccessibleDescription(CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.11")); //$NON-NLS-1$
-			ICON_OTHER_WARNING.setDescription(CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.13")); //$NON-NLS-1$
-			ICON_OTHER_WARNING.getAccessibleContext().setAccessibleDescription(CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.13")); //$NON-NLS-1$
-			ICON_OTHER_ERROR.setDescription(CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.15")); //$NON-NLS-1$
-			ICON_OTHER_ERROR.getAccessibleContext().setAccessibleDescription(CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.15")); //$NON-NLS-1$
-		}
-
 		private static final long EXPIRITY_WARNING_LEVEL = 1000*60*60*25*7;
 
 		private JLabel propertiesLink = null;
@@ -343,39 +308,18 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 			final long notAfter = cert.getNotAfter().getTime();
 			final long actualDate = new Date().getTime();
 			if (actualDate >= notAfter || actualDate <= cert.getNotBefore().getTime()) {
-				if (isDNIeCert(cert)) {
-					return ICON_DNIE_ERROR;
-				}
-				return ICON_OTHER_ERROR;
+				return CertificateIconManager.getErrorIcon(cert);
 			}
 			if (notAfter - actualDate < EXPIRITY_WARNING_LEVEL) {
-				if (isDNIeCert(cert)) {
-					return ICON_DNIE_WARNING;
-				}
-				return ICON_OTHER_WARNING;
+				return CertificateIconManager.getWarningIcon(cert);
 			}
-			if (isDNIeCert(cert)) {
-				return ICON_DNIE_NORMAL;
-			}
-			return ICON_OTHER_NORMAL;
+			return CertificateIconManager.getNormalIcon(cert);
 		}
 
 		CertificateLine(final String friendlyName, final X509Certificate cert) {
 			this.friendlyName = friendlyName;
 			this.cert = cert;
 			createUI();
-		}
-
-		/** Indica si un certificado pertenece a un DNIe.
-		 * @param certificate Certificado.
-		 * @return Devuelve {@code true} si el certificado pertenece a un DNIe, {@code false}
-		 * en caso contrario. */
-		private static boolean isDNIeCert(final X509Certificate certificate) {
-			if (certificate == null) {
-				return false;
-			}
-			final String issuer = certificate.getIssuerX500Principal().toString().toUpperCase();
-			return issuer.contains("O=DIRECCION GENERAL DE LA POLICIA") && issuer.contains("OU=DNIE"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
 		X509Certificate getCertificate() {

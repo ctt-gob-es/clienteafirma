@@ -5,9 +5,7 @@ import java.util.Hashtable;
 
 final class ErrorManager {
 
-	private static final String ERROR_NUMBER = "%#%"; //$NON-NLS-1$
-	private static final String ERROR_MESSAGE = "%MSG%"; //$NON-NLS-1$
-	private static final String ERROR_TEMPLATE = ERROR_NUMBER + ":=" + ERROR_MESSAGE; //$NON-NLS-1$
+	private static final String ERROR_SEPARATOR = ":="; //$NON-NLS-1$
 
 	private static final String GENERIC_ERROR = "Error generico"; //$NON-NLS-1$
 
@@ -62,11 +60,13 @@ final class ErrorManager {
 		// No instanciable
 	}
 
+	static String genError(final String number) {
+		return genError(number, null);
+	}
+
 	static String genError(final String number, final String msg) {
-		return
-			ERROR_TEMPLATE.replace(ERROR_NUMBER, number).replace(
-				ERROR_MESSAGE,
-				(msg != null) ? msg : ((ERRORS.get(number) != null) ? ERRORS.get(number) : GENERIC_ERROR)
-			);
+		final String resultMsg = msg != null ? msg : ERRORS.get(number);
+		return new StringBuilder(number).append(ERROR_SEPARATOR).
+				append(resultMsg != null ? resultMsg : GENERIC_ERROR).toString();
 	}
 }

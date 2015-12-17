@@ -2,7 +2,6 @@ package es.gob.afirma.android.crypto;
 
 import java.security.KeyStore.PrivateKeyEntry;
 
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.security.KeyChain;
 import android.security.KeyChainAliasCallback;
@@ -11,7 +10,6 @@ import es.gob.afirma.core.AOCancelledOperationException;
 
 /** Gestor simple de claves y certificados para dispositivos Android 4.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
-@TargetApi(14)
 public final class Android4KeyStoreManager implements MobileKeyStoreManager {
 
 	private static final String ES_GOB_AFIRMA = "es.gob.afirma"; //$NON-NLS-1$

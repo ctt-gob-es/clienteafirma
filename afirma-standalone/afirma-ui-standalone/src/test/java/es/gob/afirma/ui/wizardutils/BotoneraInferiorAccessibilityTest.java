@@ -15,9 +15,6 @@ import javax.swing.JPanel;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import es.gob.afirma.ui.wizardutils.BotoneraInferior;
-import es.gob.afirma.ui.wizardutils.JDialogWizard;
-
 
 /**
  * Testeo de accesibilidad para la clase BotoneraInferior.
@@ -42,13 +39,13 @@ public class BotoneraInferiorAccessibilityTest {
 		try {
 			//Instancia del panel que se va a analizar
 			//Lista de dialogos
-			final List<JDialogWizard> dialogs = new ArrayList<JDialogWizard>();
+			final List<JDialogWizard> dialogs = new ArrayList<>();
 			dialogs.add(new JDialogWizard());
 			//Panel botonera inferior
 			final BotoneraInferior botoneraInferior = new BotoneraInferior(dialogs, 1);
 
 			//Lista de mnemonicos
-			final List <Integer> keyCodes = new ArrayList<Integer>();
+			final List <Integer> keyCodes = new ArrayList<>();
 			//Conjunto de mnemonicos
 			Set <Integer> keyCodesSet = null;
 
@@ -56,7 +53,7 @@ public class BotoneraInferiorAccessibilityTest {
 			getKeyCodeList (botoneraInferior, keyCodes);
 
 			//Se crea un conjunto a partir de la lista para eliminar duplicados
-			keyCodesSet = new HashSet<Integer>(keyCodes);
+			keyCodesSet = new HashSet<>(keyCodes);
 			//Si el tamano de la lista y del conjunto no son iguales, no hay duplicados
 			assertTrue(keyCodesSet.size() == keyCodes.size());
 		}

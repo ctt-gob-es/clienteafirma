@@ -130,8 +130,8 @@ final class PanelFormatos extends JAccessibilityDialogWizard implements ItemList
     }
 
     // Combo con los formatos
-    private final JComboBox comboFormatos = new JComboBox();
-    JComboBox getComboFormatos() {
+    private final JComboBox<String> comboFormatos = new JComboBox<>();
+    JComboBox<String> getComboFormatos() {
     	return this.comboFormatos;
     }
 
@@ -140,7 +140,7 @@ final class PanelFormatos extends JAccessibilityDialogWizard implements ItemList
     private final JLabel etiquetaFormato = new JLabel();
 
     /** Listado con las constantes de los formatos del combo. */
-    private static final List<String> FORMATS = new ArrayList<String>(Arrays.asList(
+    private static final List<String> FORMATS = new ArrayList<>(Arrays.asList(
 		AOSignConstants.SIGN_FORMAT_XADES_DETACHED,
         AOSignConstants.SIGN_FORMAT_XADES_ENVELOPING,
         AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED,
@@ -177,7 +177,7 @@ final class PanelFormatos extends JAccessibilityDialogWizard implements ItemList
 
     /** Carga el combo con los diferentes formatos */
     private void cargarCombo() {
-        this.comboFormatos.setModel(new DefaultComboBoxModel(new String[] {
+        this.comboFormatos.setModel(new DefaultComboBoxModel<>(new String[] {
                "Firma est\u00E1ndar (XAdES Detached)",
                "XAdES Enveloping",
                "XAdES Enveloped",
@@ -408,7 +408,7 @@ final class PanelFormatos extends JAccessibilityDialogWizard implements ItemList
         if (radio.getName().equals("radioFirma")) { //$NON-NLS-1$
             this.comboFormatos.setEnabled(true);
             this.etiquetaFormato.setDisplayedMnemonic(KeyEvent.VK_R); // Se asigna un atajo a la etiqueta
-            if (this.comboFormatos.getItemCount() != 0 && this.FORMATS.get(this.comboFormatos.getSelectedIndex())
+            if (this.comboFormatos.getItemCount() != 0 && PanelFormatos.FORMATS.get(this.comboFormatos.getSelectedIndex())
                     .equals(AOSignConstants.SIGN_FORMAT_CADES)) {
                 this.checkFormato.setSelected(true);
                 this.checkFormato.setMnemonic(KeyEvent.VK_I); // Se asigna un atajo al checkbox

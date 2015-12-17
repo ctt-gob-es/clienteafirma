@@ -44,8 +44,10 @@ public final class CertFilterManager {
 	private static final String FILTER_TYPE_SUBJECT_RFC2254 = "subject.rfc2254:"; //$NON-NLS-1$
 	private static final String FILTER_TYPE_SUBJECT_CONTAINS = "subject.contains:"; //$NON-NLS-1$
 	private static final String FILTER_TYPE_ISSUER_RFC2254 = "issuer.rfc2254:"; //$NON-NLS-1$
+	private static final String FILTER_TYPE_ISSUER_RFC2254_RECURSE = "issuer.rfc2254.recurse:"; //$NON-NLS-1$
 	private static final String FILTER_TYPE_ISSUER_CONTAINS = "issuer.contains:"; //$NON-NLS-1$
 	private static final String FILTER_TYPE_THUMBPRINT = "thumbprint:"; //$NON-NLS-1$
+	private static final String FILTER_TYPE_POLICY_ID = "policyid:"; //$NON-NLS-1$
 
 	private static final String FILTER_PREFIX_KEYUSAGE = "keyusage.";  //$NON-NLS-1$
 	private static final String FILTER_TYPE_KEYUSAGE_DIGITAL_SIGNATURE = FILTER_PREFIX_KEYUSAGE + "digitalsignature:"; //$NON-NLS-1$
@@ -162,6 +164,9 @@ public final class CertFilterManager {
 			else if (filter.toLowerCase().startsWith(FILTER_TYPE_ISSUER_RFC2254)) {
 				filtersList.add(new RFC2254CertificateFilter(null, filter.substring(FILTER_TYPE_ISSUER_RFC2254.length())));
 			}
+			else if (filter.toLowerCase().startsWith(FILTER_TYPE_ISSUER_RFC2254_RECURSE)) {
+				filtersList.add(new RFC2254CertificateFilter(null, filter.substring(FILTER_TYPE_ISSUER_RFC2254_RECURSE.length()), true));
+			}
 			else if (filter.toLowerCase().startsWith(FILTER_TYPE_ISSUER_CONTAINS)) {
 				filtersList.add(new TextContainedCertificateFilter(null, new String[] { filter.substring(FILTER_TYPE_ISSUER_CONTAINS.length()) }));
 			}
@@ -169,6 +174,12 @@ public final class CertFilterManager {
 				final String[] params = filter.substring(FILTER_TYPE_THUMBPRINT.length()).split(":"); //$NON-NLS-1$
 				if (params.length == 2) {
 					filtersList.add(new ThumbPrintCertificateFilter(params[0], params.length > 1 ? params[1] : null));
+				}
+			}
+			else if (filter.toLowerCase().startsWith(FILTER_TYPE_POLICY_ID)) {
+				final String oids = filter.substring(FILTER_TYPE_POLICY_ID.length());
+				if (oids != null && !oids.isEmpty()) {
+					filtersList.add(new PolicyIdFilter(Arrays.asList(oids.split(",")))); //$NON-NLS-1$
 				}
 			}
 		}
@@ -238,6 +249,4 @@ public final class CertFilterManager {
 	public boolean isMandatoryCertificate() {
 		return this.mandatoryCertificate;
 	}
-
-
 }

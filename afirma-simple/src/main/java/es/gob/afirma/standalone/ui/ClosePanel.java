@@ -37,13 +37,13 @@ public final class ClosePanel extends JPanel {
 		setLayout(new GridLayout(0,1));
 		add(new JLabel(SimpleAfirmaMessages.getString("SimpleAfirma.47"))); //$NON-NLS-1$
 		this.ask.setSelected(PreferencesManager.getBoolean(
-				PreferencesManager.PREFERENCE_OMIT_ASKONCLOSE, false));
+				PreferencesManager.PREFERENCE_GENERAL_OMIT_ASKONCLOSE, false));
 		this.ask.addItemListener(new ItemListener() {
 			/** {@inheritDoc} */
 			@Override
 			public void itemStateChanged(final ItemEvent e) {
 				PreferencesManager.putBoolean(
-						PreferencesManager.PREFERENCE_OMIT_ASKONCLOSE, ClosePanel.this.getAskCheckBox().isSelected());
+						PreferencesManager.PREFERENCE_GENERAL_OMIT_ASKONCLOSE, ClosePanel.this.getAskCheckBox().isSelected());
 			}
 		});
 		add(this.ask);

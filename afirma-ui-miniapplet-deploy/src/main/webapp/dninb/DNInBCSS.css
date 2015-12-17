@@ -1,9 +1,0 @@
-.DNInBCSS *:not(button) > span{
-cursor:default;
-}
-.DNInBCSS *:not(button) > h3{
-cursor:default;
-}
-.DNInBCSS *:not(button) > p {
-cursor:default;
-}

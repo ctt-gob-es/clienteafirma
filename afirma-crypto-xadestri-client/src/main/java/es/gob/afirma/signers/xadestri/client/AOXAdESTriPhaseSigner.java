@@ -282,7 +282,7 @@ public class AOXAdESTriPhaseSigner implements AOSigner {
 	 * tienen que volver a remitir los datos en la postfirma y si se env&iacute;a {@code np} y es
 	 * {@code true} se tiene que reenviar la prefirma en la petici&oacute;n de postfirma. Si no, se
 	 * puede omitir esta informaci&oacute;n reduciendo la cantidad de datos que se env&iacute;a.
-	 * @param formar Formato de firma ("XAdES" o "XAdES-ASiC-S" en este caso).
+	 * @param format Formato de firma ("XAdES" o "XAdES-ASiC-S" en este caso).
 	 * @param cryptoOperation Tipo de operaci&oacute;n.
 	 * @param data Datos o firma sobre la que operar
 	 * @param algorithm Algoritmo de firma

@@ -96,15 +96,17 @@ public abstract class CertificateVerifier {
 		}
 
 		// Comprobamos el emisor
-		try {
-			verifyIssuer(cert);
-		}
-		catch(final SignatureException e) {
-			return ValidationResult.CA_NOT_SUPPORTED;
-		}
-		catch(final Exception e) {
-			LOGGER.severe("Error durante la verificacion del emisor del certificado: " + e); //$NON-NLS-1$
-			return ValidationResult.SERVER_ERROR;
+		if (this.issuerCert != null) {
+			try {
+				verifyIssuer(cert);
+			}
+			catch(final SignatureException e) {
+				return ValidationResult.CA_NOT_SUPPORTED;
+			}
+			catch(final Exception e) {
+				LOGGER.severe("Error durante la verificacion del emisor del certificado: " + e); //$NON-NLS-1$
+				return ValidationResult.SERVER_ERROR;
+			}
 		}
 
 		return verifyRevocation(cert);

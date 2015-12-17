@@ -183,8 +183,8 @@ public final class PAdESTriPhaseSigner {
 	    // La norma PAdES establece que si el algoritmo de huella digital es SHA1 debe usarse SigningCertificateV2, y en cualquier
 	    // otro caso deberia usarse SigningCertificateV2
 	    boolean signingCertificateV2;
-	    if (extraParams.containsKey("signingCertificateV2")) { //$NON-NLS-1$
-	    	signingCertificateV2 = Boolean.parseBoolean(extraParams.getProperty("signingCertificateV2")); //$NON-NLS-1$
+	    if (extraParams.containsKey(PdfExtraParams.SIGNING_CERTIFICATE_V2)) {
+	    	signingCertificateV2 = Boolean.parseBoolean(extraParams.getProperty(PdfExtraParams.SIGNING_CERTIFICATE_V2));
 	    }
 	    else {
 	    	signingCertificateV2 = !"SHA1".equals(AOSignConstants.getDigestAlgorithmName(digestAlgorithmName));	 //$NON-NLS-1$
@@ -212,6 +212,7 @@ public final class PAdESTriPhaseSigner {
                 signingCertificateV2, // signingCertificateV2
                 md, // Valor de la huella digital del contenido
                 signTime.getTime(), // Fecha de la firma (debe establecerse externamente para evitar desincronismos en la firma trifasica)
+                Boolean.parseBoolean(extraParams.getProperty(PdfExtraParams.INCLUDE_ONLY_SIGNNING_CERTIFICATE, "false")), //$NON-NLS-1$ //TODO: Poner esto siempre a false!!!!!
                 true, // Modo PAdES
                 PDF_OID,
                 PDF_DESC,
@@ -302,7 +303,7 @@ public final class PAdESTriPhaseSigner {
         //***************** SELLO DE TIEMPO ****************
 
         // El sello a nivel de firma nunca se aplica si han pedido solo sello a nivel de documento
-        if (!TsaParams.TS_DOC.equals(extraParams.getProperty("tsType"))) { //$NON-NLS-1$
+        if (!TsaParams.TS_DOC.equals(extraParams.getProperty(PdfExtraParams.TS_TYPE))) {
 	        TsaParams tsaParams;
 	        try {
 	        	tsaParams = new TsaParams(extraParams);

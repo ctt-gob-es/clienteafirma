@@ -126,7 +126,7 @@ final class PanelMultifirma extends JAccessibilityDialogWizard {
     }
 
     // Combo con las opciones de firma
-    private final JComboBox comboFirmas = new JComboBox();
+    private final JComboBox<String> comboFirmas = new JComboBox<>();
 
     /** Configuracion del KeyStore */
     private KeyStoreConfiguration kssc = null;
@@ -179,7 +179,7 @@ final class PanelMultifirma extends JAccessibilityDialogWizard {
         }
 
         // Generamos el modelo de la lista a partir del modelo del arbol
-        final HashSet<String> signersSet = new HashSet<String>();
+        final HashSet<String> signersSet = new HashSet<>();
 
         // Recorremos todos los nodos menos el root que no contiene informacion de firmante
         final DefaultMutableTreeNode root = (DefaultMutableTreeNode) modeloArbolSwing.getRoot();
@@ -457,7 +457,7 @@ final class PanelMultifirma extends JAccessibilityDialogWizard {
                 comboOpcionesItemStateChanged(etiqueta, panelArbol, panelLista);
             }
         });
-        this.comboFirmas.setModel(new DefaultComboBoxModel(new String[] {
+        this.comboFirmas.setModel(new DefaultComboBoxModel<>(new String[] {
              Messages.getString("Wizard.multifirma.simple.contrafirma.ventana2.combo.firmas.opcion1"), //$NON-NLS-1$
              Messages.getString("Wizard.multifirma.simple.contrafirma.ventana2.combo.firmas.opcion2"), //$NON-NLS-1$
              Messages.getString("Wizard.multifirma.simple.contrafirma.ventana2.combo.firmas.opcion3"), //$NON-NLS-1$
@@ -624,11 +624,8 @@ final class PanelMultifirma extends JAccessibilityDialogWizard {
     }
 
     private byte[] readFile(final String filepath) {
-        try {
-        	final InputStream fileIn = AOUtil.loadFile(AOUtil.createURI(filepath));
-            final byte[] data = AOUtil.getDataFromInputStream(fileIn);
-            fileIn.close();
-            return data;
+        try ( final InputStream fileIn = AOUtil.loadFile(AOUtil.createURI(filepath)); ) {
+            return AOUtil.getDataFromInputStream(fileIn);
         }
         catch (final FileNotFoundException e) {
             CustomDialog.showMessageDialog(

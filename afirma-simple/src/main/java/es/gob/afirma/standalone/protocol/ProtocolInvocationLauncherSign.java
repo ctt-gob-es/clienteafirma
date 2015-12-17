@@ -1,14 +1,16 @@
 package es.gob.afirma.standalone.protocol;
 
-import java.io.ByteArrayOutputStream;
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintWriter;
 import java.security.KeyStore.PrivateKeyEntry;
+import java.security.MessageDigest;
 import java.security.cert.CertificateEncodingException;
 import java.util.List;
+import java.util.Properties;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.security.auth.callback.PasswordCallback;
@@ -20,6 +22,7 @@ import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.http.UrlHttpManagerFactory;
 import es.gob.afirma.core.misc.protocol.UrlParametersToSign;
 import es.gob.afirma.core.misc.protocol.UrlParametersToSign.Operation;
+import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.AOSignerFactory;
 import es.gob.afirma.core.signers.CounterSignTarget;
@@ -31,6 +34,7 @@ import es.gob.afirma.keystores.AOKeyStoreManager;
 import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
 import es.gob.afirma.keystores.filters.CertFilterManager;
 import es.gob.afirma.keystores.filters.CertificateFilter;
+import es.gob.afirma.standalone.DataAnalizerUtil;
 import es.gob.afirma.standalone.crypto.CypherDataManager;
 
 final class ProtocolInvocationLauncherSign {
@@ -41,6 +45,8 @@ final class ProtocolInvocationLauncherSign {
 
 	private static final String RESULT_CANCEL = "CANCEL"; //$NON-NLS-1$
 
+	private static final String FORMAT_AUTO = "AUTO"; //$NON-NLS-1$
+
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 
@@ -48,8 +54,7 @@ final class ProtocolInvocationLauncherSign {
 		// No instanciable
 	}
 
-
-	static String processSign(final UrlParametersToSign options, boolean bySocket) throws WebServiceCommunicationExceptionSignOperation {
+	static String processSign(final UrlParametersToSign options, final boolean bySocket) throws WebServiceCommunicationExceptionSignOperation {
 
 		if (options == null) {
 			LOGGER.severe("Las opciones de firma son nulas"); //$NON-NLS-1$
@@ -63,12 +68,12 @@ final class ProtocolInvocationLauncherSign {
 		// En caso de que no se haya solicitado una operacion de multifirma con el formato AUTO
 		// configuramos el servidor en base al nombre de formato
 		AOSigner signer = null;
-		if (!Operation.AUTO.toString().equalsIgnoreCase(options.getSignatureFormat())) {
+		if (!FORMAT_AUTO.equalsIgnoreCase(options.getSignatureFormat())) {
 			signer = AOSignerFactory.getSigner(options.getSignatureFormat());
 			if (signer == null) {
 				LOGGER.severe("No hay un firmador configurado para el formato: " + options.getSignatureFormat()); //$NON-NLS-1$
 				ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_06);
-				if (!bySocket){
+				if (!bySocket) {
 					throw new WebServiceCommunicationExceptionSignOperation(ProtocolInvocationLauncherErrorManager.SAF_06);
 				}
 				return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_06);
@@ -113,8 +118,11 @@ final class ProtocolInvocationLauncherSign {
 
 			try {
 				final byte[] data;
-				try ( final InputStream fis = new FileInputStream(selectedDataFile); ) {
-					data = AOUtil.getDataFromInputStream(fis);
+				try (
+					final InputStream fis = new FileInputStream(selectedDataFile);
+					final InputStream bis = new BufferedInputStream(fis);
+				) {
+					data = AOUtil.getDataFromInputStream(bis);
 				}
 				if (data == null) {
 					throw new IOException("La lectura de datos para firmar ha devuelto un nulo"); //$NON-NLS-1$
@@ -123,31 +131,76 @@ final class ProtocolInvocationLauncherSign {
 			}
 			catch(final Exception e) {
 				LOGGER.severe("Error en la lectura de los datos a firmar: " + e); //$NON-NLS-1$
-				ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_00);
+				ProtocolInvocationLauncherErrorManager.showError(
+					ProtocolInvocationLauncherErrorManager.SAF_00
+				);
 				if (!bySocket){
-					throw new WebServiceCommunicationExceptionSignOperation(ProtocolInvocationLauncherErrorManager.SAF_00);
+					throw new WebServiceCommunicationExceptionSignOperation(
+						ProtocolInvocationLauncherErrorManager.SAF_00
+					);
 				}
-				return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_00);
+				return ProtocolInvocationLauncherErrorManager.getErrorMessage(
+					ProtocolInvocationLauncherErrorManager.SAF_00
+				);
 			}
 		}
 
 		// En caso de haber programado el formato "AUTO", se selecciona el firmador a partir
 		// de los datos (firma) proporcionados
 		if (signer == null) {
-			try {
-				signer = AOSignerFactory.getSigner(options.getData());
-			} catch (final IOException e) {
-				LOGGER.severe("No se han podido analizar los datos para determinar si son una firma: " + e); //$NON-NLS-1$
-				// signer sera null
+			if (Operation.SIGN == options.getOperation()) {
+				if (DataAnalizerUtil.isPDF(options.getData())) {
+					signer = AOSignerFactory.getSigner(AOSignConstants.SIGN_FORMAT_PADES);
+					options.setSignFormat(AOSignConstants.SIGN_FORMAT_PADES);
+				}
+				else if (DataAnalizerUtil.isFacturae(options.getData())) {
+					signer = AOSignerFactory.getSigner(AOSignConstants.SIGN_FORMAT_FACTURAE);
+					options.setSignFormat(AOSignConstants.SIGN_FORMAT_FACTURAE);
+				}
+				else if (DataAnalizerUtil.isXML(options.getData())) {
+					signer = AOSignerFactory.getSigner(AOSignConstants.SIGN_FORMAT_XADES);
+					options.setSignFormat(AOSignConstants.SIGN_FORMAT_XADES);
+				}
+				else if (DataAnalizerUtil.isODF(options.getData())) {
+					signer = AOSignerFactory.getSigner(AOSignConstants.SIGN_FORMAT_ODF);
+					options.setSignFormat(AOSignConstants.SIGN_FORMAT_ODF);
+				}
+				else if (DataAnalizerUtil.isOOXML(options.getData())) {
+					signer = AOSignerFactory.getSigner(AOSignConstants.SIGN_FORMAT_OOXML);
+					options.setSignFormat(AOSignConstants.SIGN_FORMAT_OOXML);
+				}
+				else {
+					signer = AOSignerFactory.getSigner(AOSignConstants.SIGN_FORMAT_CADES);
+					options.setSignFormat(AOSignConstants.SIGN_FORMAT_CADES);
+				}
+			}
+			else {
+				try {
+					signer = AOSignerFactory.getSigner(options.getData());
+				}
+				catch (final IOException e) {
+					LOGGER.severe(
+							"No se han podido analizar los datos para determinar si son una firma: " + e //$NON-NLS-1$
+							);
+					// signer sera null
+				}
 			}
 
 			if (signer == null) {
-				LOGGER.severe("Los datos no se corresponden con una firma electronica o no se pudieron analizar"); //$NON-NLS-1$
-				ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_17);
+				LOGGER.severe(
+					"Los datos no se corresponden con una firma electronica o no se pudieron analizar" //$NON-NLS-1$
+				);
+				ProtocolInvocationLauncherErrorManager.showError(
+					ProtocolInvocationLauncherErrorManager.SAF_17
+				);
 				if (!bySocket){
-					throw new WebServiceCommunicationExceptionSignOperation(ProtocolInvocationLauncherErrorManager.SAF_17);
+					throw new WebServiceCommunicationExceptionSignOperation(
+						ProtocolInvocationLauncherErrorManager.SAF_17
+					);
 				}
-				return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_17);
+				return ProtocolInvocationLauncherErrorManager.getErrorMessage(
+					ProtocolInvocationLauncherErrorManager.SAF_17
+				);
 			}
 		}
 
@@ -164,26 +217,45 @@ final class ProtocolInvocationLauncherSign {
 		}
 		catch (final Exception e3) {
 			LOGGER.severe("Error obteniendo el AOKeyStoreManager: " + e3); //$NON-NLS-1$
-			ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_08);
+			ProtocolInvocationLauncherErrorManager.showError(
+				ProtocolInvocationLauncherErrorManager.SAF_08
+			);
 			if (!bySocket){
-				throw new WebServiceCommunicationExceptionSignOperation(ProtocolInvocationLauncherErrorManager.SAF_08);	
+				throw new WebServiceCommunicationExceptionSignOperation(
+					ProtocolInvocationLauncherErrorManager.SAF_08
+				);
 			}
-			return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_08);
+			return ProtocolInvocationLauncherErrorManager.getErrorMessage(
+				ProtocolInvocationLauncherErrorManager.SAF_08
+			);
 		}
+
+		LOGGER.info("Obtenido gestor de almacenes de claves: " + ksm); //$NON-NLS-1$
 
 		final CertFilterManager filterManager = new CertFilterManager(options.getExtraParams());
 		final List<CertificateFilter> filters = filterManager.getFilters();
 		final boolean mandatoryCertificate = filterManager.isMandatoryCertificate();
 		final PrivateKeyEntry pke;
+
+		LOGGER.info("Cargando dialogo de seleccion de certificados..."); //$NON-NLS-1$
+
 		try {
-			final AOKeyStoreDialog dialog = new AOKeyStoreDialog(ksm, null, true, true, true, filters, mandatoryCertificate);
+			final AOKeyStoreDialog dialog = new AOKeyStoreDialog(
+				ksm,
+				null,
+				true,
+				true,
+				true,
+				filters,
+				mandatoryCertificate
+			);
 			dialog.show();
 			pke = ksm.getKeyEntry(
 				dialog.getSelectedAlias()
 			);
 		}
 		catch (final AOCancelledOperationException e) {
-			LOGGER.severe("Operacion cancelada por el usuario" + e);
+			LOGGER.severe("Operacion cancelada por el usuario" + e); //$NON-NLS-1$
 			if (!bySocket){
 				throw new WebServiceCommunicationExceptionSignOperation(getResultCancel());
 			}
@@ -193,17 +265,43 @@ final class ProtocolInvocationLauncherSign {
 			LOGGER.severe("No hay certificados validos en el almacen: " + e); //$NON-NLS-1$
 			ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_19);
 			if (!bySocket){
-				throw new WebServiceCommunicationExceptionSignOperation(ProtocolInvocationLauncherErrorManager.SAF_19);
+				throw new WebServiceCommunicationExceptionSignOperation(
+					ProtocolInvocationLauncherErrorManager.SAF_19
+				);
 			}
-			return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_19);
+			return ProtocolInvocationLauncherErrorManager.getErrorMessage(
+				ProtocolInvocationLauncherErrorManager.SAF_19
+			);
 		}
 		catch (final Exception e) {
 			LOGGER.severe("Error al mostrar el dialogo de seleccion de certificados: " + e); //$NON-NLS-1$
 			ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_08);
 			if (!bySocket){
-				throw new WebServiceCommunicationExceptionSignOperation(ProtocolInvocationLauncherErrorManager.SAF_08);
+				throw new WebServiceCommunicationExceptionSignOperation(
+					ProtocolInvocationLauncherErrorManager.SAF_08
+				);
 			}
-			return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_08);
+			return ProtocolInvocationLauncherErrorManager.getErrorMessage(
+				ProtocolInvocationLauncherErrorManager.SAF_08
+			);
+		}
+
+		LOGGER.info("Iniciando operacion de firma..."); //$NON-NLS-1$
+
+
+		// XXX: Codigo de soporte de firmas XAdES explicitas (Eliminar cuando se abandone el soporte de XAdES explicitas)
+		if (isXadesExplicitConfigurated(options.getSignatureFormat(), options.getExtraParams())) {
+			LOGGER.warning(
+				"Se ha pedido una firma XAdES explicita, este formato dejara de soportarse en proximas versiones" //$NON-NLS-1$
+			);
+			try {
+				options.setData(MessageDigest.getInstance("SHA1").digest(options.getData())); //$NON-NLS-1$
+				options.getExtraParams().setProperty("mimeType", "hash/sha1"); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+			catch (final Exception e) {
+				LOGGER.warning("Error al generar la huella digital de los datos para firmar como 'XAdES explicit', " //$NON-NLS-1$
+					+ "se realizara una firma XAdES corriente: " + e); //$NON-NLS-1$
+			}
 		}
 
 		final byte[] sign;
@@ -219,18 +317,18 @@ final class ProtocolInvocationLauncherSign {
 					);
 				}
 				catch (final Exception e) {
-					LOGGER.severe("Error al realizar la operacion firma" + e);
-					final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-					try (
-						final PrintWriter pw = new PrintWriter(baos);
-					) {
-						LOGGER.warning("Error en el proceso de firma: " + new String(baos.toByteArray())+" "+e); //$NON-NLS-1$
-					}
-					ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_09);
+					LOGGER.log(Level.SEVERE, "Error al realizar la operacion firma: " + e, e); //$NON-NLS-1$
+					ProtocolInvocationLauncherErrorManager.showError(
+						ProtocolInvocationLauncherErrorManager.SAF_09
+					);
 					if (!bySocket){
-						throw new WebServiceCommunicationExceptionSignOperation(ProtocolInvocationLauncherErrorManager.SAF_09);
+						throw new WebServiceCommunicationExceptionSignOperation(
+							ProtocolInvocationLauncherErrorManager.SAF_09
+						);
 					}
-					return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_09);
+					return ProtocolInvocationLauncherErrorManager.getErrorMessage(
+						ProtocolInvocationLauncherErrorManager.SAF_09
+					);
 				}
 				break;
 			case COSIGN:
@@ -244,18 +342,18 @@ final class ProtocolInvocationLauncherSign {
 					);
 				}
 				catch (final Exception e) {
-					LOGGER.severe("Error al realizar la operacion cofirma" + e);
-					final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-					try (
-						final PrintWriter pw = new PrintWriter(baos);
-					) {
-						LOGGER.warning("Error en el proceso de cofirma: " + new String(baos.toByteArray()) + " " + e); //$NON-NLS-1$
-					}
-					ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_09);
+					LOGGER.log(Level.SEVERE, "Error al realizar la operacion cofirma: " + e, e); //$NON-NLS-1$
+					ProtocolInvocationLauncherErrorManager.showError(
+						ProtocolInvocationLauncherErrorManager.SAF_09
+					);
 					if (!bySocket){
-						throw new WebServiceCommunicationExceptionSignOperation(ProtocolInvocationLauncherErrorManager.SAF_09);
+						throw new WebServiceCommunicationExceptionSignOperation(
+							ProtocolInvocationLauncherErrorManager.SAF_09
+						);
 					}
-					return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_09);
+					return ProtocolInvocationLauncherErrorManager.getErrorMessage(
+						ProtocolInvocationLauncherErrorManager.SAF_09
+					);
 				}
 				break;
 			case COUNTERSIGN:
@@ -263,7 +361,9 @@ final class ProtocolInvocationLauncherSign {
 					sign = signer.countersign(
 						options.getData(),
 						options.getSignatureAlgorithm(),
-						"tree".equalsIgnoreCase(options.getExtraParams().getProperty("target")) ? CounterSignTarget.TREE : CounterSignTarget.LEAFS, //$NON-NLS-1$ //$NON-NLS-2$
+						"tree".equalsIgnoreCase(options.getExtraParams().getProperty("target")) ? //$NON-NLS-1$ //$NON-NLS-2$
+							CounterSignTarget.TREE :
+								CounterSignTarget.LEAFS,
 						null, // Targets
 						pke.getPrivateKey(),
 						pke.getCertificateChain(),
@@ -271,27 +371,33 @@ final class ProtocolInvocationLauncherSign {
 					);
 				}
 				catch (final Exception e) {
-					LOGGER.severe("Error al realizar la contrafirma" + e);
-					final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-					try (
-						final PrintWriter pw = new PrintWriter(baos);
-					) {
-						LOGGER.warning("Error en el proceso de contrafirma: " + new String(baos.toByteArray()) + " " + e); //$NON-NLS-1$
-					}
-					ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_09);
+					LOGGER.log(Level.SEVERE, "Error al realizar la contrafirma" + e, e); //$NON-NLS-1$
+					ProtocolInvocationLauncherErrorManager.showError(
+						ProtocolInvocationLauncherErrorManager.SAF_09
+					);
 					if (!bySocket){
-						throw new WebServiceCommunicationExceptionSignOperation(ProtocolInvocationLauncherErrorManager.SAF_09);
+						throw new WebServiceCommunicationExceptionSignOperation(
+							ProtocolInvocationLauncherErrorManager.SAF_09
+						);
 					}
-					return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_09);
+					return ProtocolInvocationLauncherErrorManager.getErrorMessage(
+						ProtocolInvocationLauncherErrorManager.SAF_09
+					);
 				}
 				break;
 			default:
-				LOGGER.severe("Error al realizar la operacion firma");
-				ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_04);
+				LOGGER.severe("Error al realizar la operacion firma"); //$NON-NLS-1$
+				ProtocolInvocationLauncherErrorManager.showError(
+					ProtocolInvocationLauncherErrorManager.SAF_04
+				);
 				if (!bySocket){
-					throw new WebServiceCommunicationExceptionSignOperation(ProtocolInvocationLauncherErrorManager.SAF_04);	
+					throw new WebServiceCommunicationExceptionSignOperation(
+						ProtocolInvocationLauncherErrorManager.SAF_04
+					);
 				}
-				return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_04);
+				return ProtocolInvocationLauncherErrorManager.getErrorMessage(
+					ProtocolInvocationLauncherErrorManager.SAF_04
+				);
 		}
 
 		// Concatenamos el certificado utilizado para firmar y la firma con un separador
@@ -304,9 +410,13 @@ final class ProtocolInvocationLauncherSign {
 			LOGGER.severe("Error en la decodificacion del certificado de firma: " + e); //$NON-NLS-1$
 			ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_18);
 			if (!bySocket){
-				throw new WebServiceCommunicationExceptionSignOperation(ProtocolInvocationLauncherErrorManager.SAF_18);
+				throw new WebServiceCommunicationExceptionSignOperation(
+					ProtocolInvocationLauncherErrorManager.SAF_18
+				);
 			}
-			return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_18);
+			return ProtocolInvocationLauncherErrorManager.getErrorMessage(
+				ProtocolInvocationLauncherErrorManager.SAF_18
+			);
 		}
 
 		// Si tenemos clave de cifrado, ciframos el certificado y la firma
@@ -323,9 +433,13 @@ final class ProtocolInvocationLauncherSign {
 				LOGGER.severe("Error en el cifrado de los datos a enviar: " + e); //$NON-NLS-1$
 				ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_12);
 				if (!bySocket){
-					throw new WebServiceCommunicationExceptionSignOperation(ProtocolInvocationLauncherErrorManager.SAF_12);
+					throw new WebServiceCommunicationExceptionSignOperation(
+						ProtocolInvocationLauncherErrorManager.SAF_12
+					);
 				}
-				return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_12);
+				return ProtocolInvocationLauncherErrorManager.getErrorMessage(
+					ProtocolInvocationLauncherErrorManager.SAF_12
+				);
 			}
 		}
 		else {
@@ -347,7 +461,9 @@ final class ProtocolInvocationLauncherSign {
 			catch (final Exception e) {
 				LOGGER.severe("Error al enviar los datos al servidor: " + e); //$NON-NLS-1$
 				ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_11);
-				return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_11);
+				return ProtocolInvocationLauncherErrorManager.getErrorMessage(
+					ProtocolInvocationLauncherErrorManager.SAF_11
+				);
 			}
 		}
 		else {
@@ -362,11 +478,11 @@ final class ProtocolInvocationLauncherSign {
 	public static void sendErrorToServer(final String data, final UrlParametersToSign options){
 		try {
 			sendData(new StringBuilder().append(data), options);
-		} catch (IOException e1) {
-			LOGGER.severe("Error al enviar los datos del error en la operacion firma al servidor" + e1);
-		}	
+		} catch (final IOException e1) {
+			LOGGER.severe("Error al enviar los datos del error en la operacion firma al servidor" + e1); //$NON-NLS-1$
+		}
 	}
-	
+
 	private static void sendData(final StringBuilder data, final UrlParametersToSign options) throws IOException {
 
 		final StringBuffer url = new StringBuffer(options.getStorageServletUrl().toString());
@@ -380,7 +496,7 @@ final class ProtocolInvocationLauncherSign {
 
 		LOGGER.info("Resultado: " + new String(result)); //$NON-NLS-1$
 	}
-	
+
 	public static String getResultCancel() {
 		return RESULT_CANCEL;
 	}
@@ -389,22 +505,31 @@ final class ProtocolInvocationLauncherSign {
 	public static class WebServiceCommunicationExceptionSignOperation extends Exception {
 		private static final long serialVersionUID = -6382342237658143382L;
 		private String errorCode ;
-		
+
 		WebServiceCommunicationExceptionSignOperation(final String code) {
 			setErrorCode(code);
 		}
 
 		public String getErrorCode() {
-			return errorCode;
+			return this.errorCode;
 		}
 
-		public void setErrorCode(String errorCode) {
+		public void setErrorCode(final String errorCode) {
 			this.errorCode = errorCode;
 		}
-
-		
 	}
-	
 
-
+	/** Identifica cuando se ha configurado una firma con el formato XAdES
+	 * y la propiedad {@code mode} con el valor {@code explicit}. Esta no es una firma correcta,
+	 * pero por compatibilidad con los tipos de firmas del Applet pesado se ha incluido aqu&iacute;.
+	 * @param format Formato declarado para la firma.
+	 * @param config Par&aacute;metros adicionales declarados para la firma.
+	 * @return {@code true} si se configura una firma <i>XAdES explicit</i>, {@code false} en caso contrario.
+	 * @deprecated Uso temporal hasta que se elimine el soporte de firmas XAdES expl&iacute;citas. */
+	@Deprecated
+	private static boolean isXadesExplicitConfigurated(final String format, final Properties config) {
+		return format != null && format.toLowerCase().startsWith("xades") && config != null && //$NON-NLS-1$
+				AOSignConstants.SIGN_MODE_EXPLICIT.equalsIgnoreCase(config.getProperty("mode")) //$NON-NLS-1$
+			;
+	}
 }

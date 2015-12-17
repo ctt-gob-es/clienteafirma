@@ -42,9 +42,9 @@ import es.gob.afirma.ui.utils.Utils;
 public class MainOptionsPane {
 
     // Constantes de los algoritmos de huella digital
-	static final List<String> ALGORITHM_K = new ArrayList<String>(Arrays.asList("SHA-1", "SHA-512", "SHA-384", "SHA-256")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+	static final List<String> ALGORITHM_K = new ArrayList<>(Arrays.asList("SHA-1", "SHA-512", "SHA-384", "SHA-256")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 
-	static final List<String> ALGORITHM_V = new ArrayList<String>(Arrays.asList("SHA1withRSA", "SHA512withRSA", "SHA384withRSA", "SHA256withRSA")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+	static final List<String> ALGORITHM_V = new ArrayList<>(Arrays.asList("SHA1withRSA", "SHA512withRSA", "SHA384withRSA", "SHA256withRSA")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 
     /** Algoritmo por defecto para su uso por defecto en las firmas. */
     public static final String DEFAULT_DEFAULT_ALGORITHM = "SHA1withRSA"; //$NON-NLS-1$
@@ -83,7 +83,7 @@ public class MainOptionsPane {
     private final JCheckBox checkXML;
 
     /** Algoritmo a utilizar por defecto. */
-    private final JComboBox comboAlgoritmo;
+    private final JComboBox<String> comboAlgoritmo;
 
     /** Panel sobre el que se montan los componentes. */
     private final JPanel panel;
@@ -95,19 +95,19 @@ public class MainOptionsPane {
     }
 
     /** Identificador de la pol&iacute;tica (puede ser una URN, OID,...). */
-    private final JTextField textPolicyIdentifier;
+    final JTextField textPolicyIdentifier;
 
     /** Etiqueta del calificador de la pol&iacute;tica. */
-    private final JLabel policyQualifierLabel;
+    final JLabel policyQualifierLabel;
 
     /** Calificador de la pol&iacute;tica de firma. */
-    private final JTextField textPolicyQualifier;
+    final JTextField textPolicyQualifier;
 
     /** Etiqueta de la huella digital SHA 1 de la pol&iacute;tica. */
-    private final JLabel policyHashLabel;
+    final JLabel policyHashLabel;
 
     /** Huella digital SHA1 de la pol&iacute;tica de firma. */
-    private final JTextField textPolicyHash;
+    final JTextField textPolicyHash;
 
     /** Crea la vista y componentes de la pesta&ntilde;a principal de configuraci&oacute;n. */
     public MainOptionsPane() {
@@ -174,10 +174,10 @@ public class MainOptionsPane {
         c2.fill = GridBagConstraints.BOTH;
 
         // Combo con los algoritmos de huella digital
-        this.comboAlgoritmo = new JComboBox();
+        this.comboAlgoritmo = new JComboBox<>();
         this.comboAlgoritmo.getAccessibleContext().setAccessibleName(etiquetaAlgoritmo.getText() + " ALT + R."); // NOI18N //$NON-NLS-1$
         this.comboAlgoritmo.getAccessibleContext().setAccessibleDescription(Messages.getString("Opciones.criptografia.algoritmo.parte")); //$NON-NLS-1$
-        this.comboAlgoritmo.setModel(new DefaultComboBoxModel(ALGORITHM_K.toArray()));
+        this.comboAlgoritmo.setModel(new DefaultComboBoxModel<>(ALGORITHM_K.toArray(new String[0])));
 
         Utils.remarcar(this.comboAlgoritmo);
 
@@ -252,7 +252,7 @@ public class MainOptionsPane {
 
         // Accesibilidad -- Lectores de pantalla
         this.policyIdentifierLabel.setFocusable(true);
-        this.policyIdentifierLabel.getAccessibleContext().setAccessibleName(this.policyIdentifierLabel.getText() + ". " + "Este cuadro de texto esta deshabilitado por defecto.");
+        this.policyIdentifierLabel.getAccessibleContext().setAccessibleName(this.policyIdentifierLabel.getText() + ". " + "Este cuadro de texto esta deshabilitado por defecto."); //$NON-NLS-1$
 
         Utils.remarcar(this.policyIdentifierLabel);
         Utils.setContrastColor(this.policyIdentifierLabel);
@@ -398,13 +398,13 @@ public class MainOptionsPane {
                 // Asignacion de mnemonicos segun el estado
                 if (state) {
                     MainOptionsPane.this.getPolicyIdentifierLabel().setDisplayedMnemonic(KeyEvent.VK_I);
-                    MainOptionsPane.this.getPolicyIdentifierLabel().getAccessibleContext().setAccessibleName(MainOptionsPane.this.policyIdentifierLabel.getText() + "ALT + I.");
+                    MainOptionsPane.this.getPolicyIdentifierLabel().getAccessibleContext().setAccessibleName(MainOptionsPane.this.getPolicyIdentifierLabel().getText() + "ALT + I."); //$NON-NLS-1$
                     MainOptionsPane.this.getPolicyIdentifierLabel().setFocusable(false);
                     MainOptionsPane.this.policyQualifierLabel.setDisplayedMnemonic(KeyEvent.VK_T);
-                    MainOptionsPane.this.policyQualifierLabel.getAccessibleContext().setAccessibleName(MainOptionsPane.this.policyQualifierLabel.getText() + "ALT + T.");
+                    MainOptionsPane.this.policyQualifierLabel.getAccessibleContext().setAccessibleName(MainOptionsPane.this.policyQualifierLabel.getText() + "ALT + T."); //$NON-NLS-1$
                     MainOptionsPane.this.policyQualifierLabel.setFocusable(false);
                     MainOptionsPane.this.policyHashLabel.setDisplayedMnemonic(KeyEvent.VK_D);
-                    MainOptionsPane.this.policyHashLabel.getAccessibleContext().setAccessibleName(MainOptionsPane.this.policyHashLabel.getText() + "ALT + D.");
+                    MainOptionsPane.this.policyHashLabel.getAccessibleContext().setAccessibleName(MainOptionsPane.this.policyHashLabel.getText() + "ALT + D."); //$NON-NLS-1$
                     MainOptionsPane.this.policyHashLabel.setFocusable(false);
 
                 }
@@ -412,15 +412,15 @@ public class MainOptionsPane {
                     // Se eliminan los atajos porque los cuadros de texto estan deshabilitados
                     MainOptionsPane.this.getPolicyIdentifierLabel().setDisplayedMnemonic(0);
                     MainOptionsPane.this.getPolicyIdentifierLabel().getAccessibleContext()
-                    .setAccessibleName(MainOptionsPane.this.getPolicyIdentifierLabel().getText() + ". " + "Este cuadro de texto esta deshabilitado por defecto.");
+                    .setAccessibleName(MainOptionsPane.this.getPolicyIdentifierLabel().getText() + ". " + "Este cuadro de texto esta deshabilitado por defecto."); //$NON-NLS-1$
                     MainOptionsPane.this.getPolicyIdentifierLabel().setFocusable(true);
                     MainOptionsPane.this.policyQualifierLabel.setDisplayedMnemonic(0);
                     MainOptionsPane.this.policyQualifierLabel.getAccessibleContext()
-                    .setAccessibleName(MainOptionsPane.this.policyQualifierLabel.getText() + ". " + "Este cuadro de texto esta deshabilitado por defecto.");
+                    .setAccessibleName(MainOptionsPane.this.policyQualifierLabel.getText() + ". " + "Este cuadro de texto esta deshabilitado por defecto."); //$NON-NLS-1$
                     MainOptionsPane.this.policyQualifierLabel.setFocusable(true);
                     MainOptionsPane.this.policyHashLabel.setDisplayedMnemonic(0);
                     MainOptionsPane.this.policyHashLabel.getAccessibleContext()
-                    .setAccessibleName(MainOptionsPane.this.policyHashLabel.getText() + ". " + "Este cuadro de texto esta deshabilitado por defecto.");
+                    .setAccessibleName(MainOptionsPane.this.policyHashLabel.getText() + ". " + "Este cuadro de texto esta deshabilitado por defecto."); //$NON-NLS-1$
                     MainOptionsPane.this.policyHashLabel.setFocusable(true);
                 }
             }
@@ -588,7 +588,6 @@ public class MainOptionsPane {
      * en caso contrario.
      */
     public boolean checkSha1MessageDigestLength() {
-
     	try {
     		final MessageDigest md = MessageDigest.getInstance("SHA1"); //$NON-NLS-1$
     		if (Base64.decode(this.textPolicyHash.getText()).length == md.getDigestLength()) {
@@ -599,12 +598,12 @@ public class MainOptionsPane {
     	}
     	// Si se obtiene una excepcion es que la URL estaba mal formada
     	CustomDialog.showMessageDialog(
-    			this.textPolicyHash,
-    			true,
-    			"No se ha insertado una huella digital SHA1 correcta. Inserte una huella digital correcta en base 64.",
-    			"Huella digital incorrecta para la pol\u00EDtica de firma",
-    			JOptionPane.ERROR_MESSAGE
-    			);
+			this.textPolicyHash,
+			true,
+			"No se ha insertado una huella digital SHA1 correcta. Inserte una huella digital correcta en Base64.",
+			"Huella digital incorrecta para la pol\u00EDtica de firma",
+			JOptionPane.ERROR_MESSAGE
+		);
     	this.textPolicyHash.requestFocus();
     	this.textPolicyHash.setSelectionStart(0);
     	this.textPolicyHash.setSelectionEnd(this.textPolicyHash.getText().length());

@@ -4,6 +4,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Logger;
 
 /** Clase de utilidad para el an&aacute;lisis sint&aacute;ctico de URL.
  * @author Alberto Mart&iacute;nez */
@@ -11,6 +12,83 @@ public final class ProtocolInvocationUriParser {
 
 	private ProtocolInvocationUriParser() {
 		// Constructor privado. No se permite instancias
+	}
+
+	/** Comprueba que est&eacute;n disponibles en una URI todos los parametros disponibles en la
+	 * entrada de datos para la operaci&oacute;n de firma.
+	 * @param uri URL de llamada.
+	 * @return Par&aacute;metros.
+	 * @throws ParameterException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto. */
+	public static UrlParametersToSign getParametersToSign(final String uri) throws ParameterException {
+		return ProtocolInvocationUriParserUtil.getParametersToSign(parserUri(uri));
+	}
+
+	/** Comprueba que est&eacute;n disponibles en un XML todos los parametros disponibles en la
+	 * entrada de datos para la operaci&oacute;n de firma.
+	 * @param xml XML de entrada
+	 * @return Par&aacute;metros
+	 * @throws ParameterException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto. */
+	public static UrlParametersToSign getParametersToSign(final byte[] xml) throws ParameterException {
+		return ProtocolInvocationUriParserUtil.getParametersToSign(ProtocolInvocationUriParserUtil.parseXml(xml));
+	}
+
+	/** Comprueba que est&eacute;n disponibles en una URI todos los parametros disponibles en la
+	 * entrada de datos para la operaci&oacute;n de selecci&oacute;n de certificados.
+	 * @param uri URL de llamada.
+	 * @return Par&aacute;metros.
+	 * @throws ParameterException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto. */
+	public static UrlParametersToSelectCert getParametersToSelectCert(final String uri) throws ParameterException {
+		return ProtocolInvocationUriParserUtil.getParametersToSelectCert(parserUri(uri));
+	}
+
+	/** Comprueba que est&eacute;n disponibles en un XML todos los parametros disponibles en la
+	 * entrada de datos para la operaci&oacute;n de selecci&oacute;n de certificados.
+	 * @param xml XML de entrada
+	 * @return Par&aacute;metros
+	 * @throws ParameterException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto. */
+	public static UrlParametersToSelectCert getParametersToSelectCert(final byte[] xml) throws ParameterException {
+		return ProtocolInvocationUriParserUtil.getParametersToSelectCert(ProtocolInvocationUriParserUtil.parseXml(xml));
+	}
+
+	/** Recupera todos los par&aacute;metros necesarios para la configuraci&oacute;n de una
+	 * operaci&oacute;n de guardado de datos en el dispositivo.Si falta alg&uacute;n par&aacute;metro o
+	 * es err&oacute;neo se lanzar&aacute; una excepci&oacute;n.
+	 * @param xml XML con los par&aacute;metros
+	 * @return Par&aacute;metros
+	 * @throws ParameterException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto
+	 * @throws UnsupportedEncodingException Si no se soporta UTF-8 en URL (no debe ocurrir nunca). */
+	public static UrlParametersToSave getParametersToSave(final byte[] xml) throws ParameterException, UnsupportedEncodingException {
+		return ProtocolInvocationUriParserUtil.getParametersToSave(ProtocolInvocationUriParserUtil.parseXml(xml));
+	}
+
+	/** Recupera de una URI todos los par&aacute;metros necesarios para la configuraci&oacute;n de una
+	 * operaci&oacute;n de guardado de datos en el dispositivo.Si falta alg&uacute;n par&aacute;metro o
+	 * es err&oacute;neo se lanzar&aacute; una excepci&oacute;n.
+	 * @param uri Url de llamada
+	 * @return Par&aacute;metros
+	 * @throws ParameterException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto
+	 * @throws UnsupportedEncodingException Si no se soporta UTF-8 en URL (no debe ocurrir nunca). */
+	public static UrlParametersToSave getParametersToSave(final String uri) throws ParameterException, UnsupportedEncodingException {
+		return ProtocolInvocationUriParserUtil.getParametersToSave(parserUri(uri));
+	}
+
+
+	/** Comprueba que est&eacute;n disponibles en una URI todos los parametros disponibles en la
+	 * entrada de datos para la operaci&oacute;n de firma por lotes predefinidos.
+	 * @param uri URL de llamada.
+	 * @return Par&aacute;metros.
+	 * @throws ParameterException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto. */
+	public static UrlParametersForBatch getParametersForBatch(final String uri) throws ParameterException {
+		return ProtocolInvocationUriParserUtil.getParametersForBatch(parserUri(uri));
+	}
+
+	/** Comprueba que est&eacute;n disponibles en un XML todos los parametros disponibles en la
+	 * entrada de datos para la operaci&oacute;n de firma por lotes definidos en XML.
+	 * @param xml XML de entrada
+	 * @return Par&aacute;metros
+	 * @throws ParameterException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto. */
+	public static UrlParametersForBatch getParametersForBatch(final byte[] xml) throws ParameterException {
+		return ProtocolInvocationUriParserUtil.getParametersForBatch(ProtocolInvocationUriParserUtil.parseXml(xml));
 	}
 
 	/** Analiza la URL de entrada para obtener la lista de par&aacute;metros asociados.
@@ -39,71 +117,15 @@ public final class ProtocolInvocationUriParser {
 		}
 
 		// Agregamos como codigo de operacion el nombre de host de la URL
-		String path = uri.substring(uri.indexOf("://") + "://".length(), uri.indexOf('?')); //$NON-NLS-1$ //$NON-NLS-2$
+
+		Logger.getLogger("es.gob.afirma").info("URI: " + uri);
+
+		String path = uri.substring(uri.indexOf("://") + "://".length(), uri.indexOf('?') != -1 ? uri.indexOf('?') : uri.length()); //$NON-NLS-1$ //$NON-NLS-2$
 		if (path.endsWith("/")) { //$NON-NLS-1$
 			path = path.substring(0, path.length() - 1);
 		}
 		params.put(ProtocolConstants.OPERATION_PARAM, path.substring(path.lastIndexOf('/') + 1));
 
 		return params;
-	}
-
-	/** Comprueba que est&eacute;n disponibles en una URI todos los parametros disponibles en la
-	 * entrada de datos para la operaci&oacute;n de firma.
-	 * @param uri URL de llamada.
-	 * @return Par&aacute;metros.
-	 * @throws ParameterException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto. */
-	public static UrlParametersToSign getParametersToSign(final String uri) throws ParameterException {
-		return ProtocolInvocationUriParserUtil.getParametersToSign(parserUri(uri));
-	}
-
-	/** Comprueba que est&eacute;n disponibles en un XML todos los parametros disponibles en la
-	 * entrada de datos para la operaci&oacute;n de firma.
-	 * @param xml XML de entrada
-	 * @return Par&aacute;metros
-	 * @throws ParameterException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto */
-	public static UrlParametersToSign getParametersToSign(final byte[] xml) throws ParameterException {
-		return ProtocolInvocationUriParserUtil.getParametersToSign(ProtocolInvocationUriParserUtil.parseXml(xml));
-	}
-
-	/** Recupera todos los par&aacute;metros necesarios para la configuraci&oacute;n de una
-	 * operaci&oacute;n de guardado de datos en el dispositivo.Si falta alg&uacute;n par&aacute;metro o
-	 * es err&oacute;neo se lanzar&aacute; una excepci&oacute;n.
-	 * @param xml XML con los par&aacute;metros
-	 * @return Par&aacute;metros
-	 * @throws ParameterException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto
-	 * @throws UnsupportedEncodingException Si no se soporta UTF-8 en URL (no debe ocurrir nunca) */
-	public static UrlParametersToSave getParametersToSave(final byte[] xml) throws ParameterException, UnsupportedEncodingException {
-		return ProtocolInvocationUriParserUtil.getParametersToSave(ProtocolInvocationUriParserUtil.parseXml(xml));
-	}
-
-	/** Recupera de una URI todos los par&aacute;metros necesarios para la configuraci&oacute;n de una
-	 * operaci&oacute;n de guardado de datos en el dispositivo.Si falta alg&uacute;n par&aacute;metro o
-	 * es err&oacute;neo se lanzar&aacute; una excepci&oacute;n.
-	 * @param uri Url de llamada
-	 * @return Par&aacute;metros
-	 * @throws ParameterException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto
-	 * @throws UnsupportedEncodingException Si no se soporta UTF-8 en URL (no debe ocurrir nunca) */
-	public static UrlParametersToSave getParametersToSave(final String uri) throws ParameterException, UnsupportedEncodingException {
-		return ProtocolInvocationUriParserUtil.getParametersToSave(parserUri(uri));
-	}
-
-
-	/** Comprueba que est&eacute;n disponibles en una URI todos los parametros disponibles en la
-	 * entrada de datos para la operaci&oacute;n de firma por lotes predefinidos.
-	 * @param uri URL de llamada.
-	 * @return Par&aacute;metros.
-	 * @throws ParameterException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto. */
-	public static UrlParametersForBatch getParametersForBatch(final String uri) throws ParameterException {
-		return ProtocolInvocationUriParserUtil.getParametersForBatch(parserUri(uri)	);
-	}
-	
-	/** Comprueba que est&eacute;n disponibles en un XML todos los parametros disponibles en la
-	 * entrada de datos para la operaci&oacute;n de firma por lotes definidos en XML.
-	 * @param xml XML de entrada
-	 * @return Par&aacute;metros
-	 * @throws ParameterException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto */
-	public static UrlParametersForBatch getParametersForBatch(final byte[] xml) throws ParameterException {
-		return ProtocolInvocationUriParserUtil.getParametersForBatch(ProtocolInvocationUriParserUtil.parseXml(xml));
 	}
 }

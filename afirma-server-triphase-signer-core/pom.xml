@@ -11,13 +11,6 @@
 		<project.build.sourceEncoding>utf-8</project.build.sourceEncoding>
 	</properties>
 
-	<repositories>
-		<repository>
-			<id>uji</id>
-			<url>http://devel.uji.es/nexus/content/groups/public/</url>
-		</repository>
-	</repositories>
-	
 	<dependencies>
 		<dependency>
 			<groupId>es.gob.afirma</groupId>
@@ -51,21 +44,5 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
-	
-	<scm>
-		<connection>scm:svn:http://svn-ctt.administracionelectronica.gob.es/svn/clienteafirma/project/afirma-web/server/afirma-server-triphase-signer/trunk</connection>
-		<url>http://svn-ctt.administracionelectronica.gob.es/svn/clienteafirma/project/afirma-web/server/afirma-server-triphase-signer/trunk</url>
-	</scm>
-
-	<distributionManagement>
-		<repository>
-			<id>nexus</id>
-			<url>http://devel01.uji.es:8080/nexus/content/repositories/releases</url>
-		</repository>
-		<snapshotRepository>
-			<id>nexus</id>
-			<url>http://devel01.uji.es:8080/nexus/content/repositories/snapshots</url>
-		</snapshotRepository>
-	</distributionManagement>
 
 </project>

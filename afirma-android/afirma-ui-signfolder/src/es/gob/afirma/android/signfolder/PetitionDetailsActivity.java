@@ -634,8 +634,7 @@ public final class PetitionDetailsActivity extends FragmentActivity implements L
 	/**
 	 * Abre y elimina un fichero
 	 * @param documentFile Documento que se debe abrir.
-	 * @param mimeType Tipo del documento.
-	 * @param context Contento desde el que se abre el documento.
+	 * @param mimetype Tipo del documento.
 	 */
 	private void openFile(final File documentFile, final String mimetype) {
 

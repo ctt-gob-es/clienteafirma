@@ -18,7 +18,6 @@ import java.util.ResourceBundle;
 public final class SimpleAfirmaMessages {
 
     private static final String BUNDLE_NAME = "properties/simpleafirmamessages"; //$NON-NLS-1$
-
     private static ResourceBundle bundle = ResourceBundle.getBundle(BUNDLE_NAME/*, Locale.getDefault()*/);
 
     private SimpleAfirmaMessages() { /* No permitimos la instanciacion */ }

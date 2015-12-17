@@ -11,6 +11,7 @@
 package es.gob.afirma.keystores;
 
 import java.io.File;
+import java.io.IOException;
 import java.security.cert.X509Certificate;
 import java.util.Hashtable;
 import java.util.List;
@@ -293,39 +294,41 @@ public final class KeyStoreUtilities {
 			}
 		}
 
-		// Anadimos el controlador Java de CERES SIEMPRE excepto:
-		// -En Linux (el PKCS#11 de FNMT funciona adecuadamente, y esta tarjeta no es critica)
-		// -Que se indique "es.gob.afirma.keystores.mozilla.disableCeresNativeDriver=true"
-		if (!Boolean.getBoolean("es.gob.afirma.keystores.mozilla.disableCeresNativeDriver") && !Platform.OS.LINUX.equals(Platform.getOS())) { //$NON-NLS-1$
+		// Anadimos el controlador Java de CERES SIEMPRE a menos que:
+		// -Se indique "es.gob.afirma.keystores.mozilla.disableCeresNativeDriver=true"
+		if (!Boolean.getBoolean("es.gob.afirma.keystores.mozilla.disableCeresNativeDriver")) { //$NON-NLS-1$
 			try {
-				final AOKeyStoreManager tmpKsm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
-					AOKeyStore.CERES, // Store
-					null,             // Lib (null)
-					null,             // Description (null)
-					null,             // PasswordCallback (no hay en la carga, hay en la firma
-					parentComponent   // Parent
-				);
-				LOGGER.info("La tarjeta CERES ha podido inicializarse, se anadiran sus entradas"); //$NON-NLS-1$
-				tmpKsm.setPreferred(true);
-				aksm.addKeyStoreManager(tmpKsm);
+				aksm.addKeyStoreManager(getCeres(parentComponent));
 				return; // Si instancia CERES no pruebo otras tarjetas, no deberia haber varias tarjetas instaladas
 			}
 			catch (final Exception ex) {
-				LOGGER.warning("No se ha podido inicializar la tarjeta CERES: " + ex); //$NON-NLS-1$
+				if (Platform.OS.LINUX.equals(Platform.getOS())) {
+					// En Linux reintentamos, que a veces no ve bien la tarjeta CERES
+					try {
+						aksm.addKeyStoreManager(getCeres(parentComponent));
+						return; // Si instancia CERES no pruebo otras tarjetas, no deberia haber varias tarjetas instaladas
+					}
+					catch (final Exception e2) {
+						LOGGER.warning("No se ha podido inicializar la tarjeta CERES en el segundo intento: " + e2); //$NON-NLS-1$
+					}
+				}
+				else {
+					LOGGER.warning("No se ha podido inicializar la tarjeta CERES: " + ex); //$NON-NLS-1$
+				}
 			}
 		}
+	}
 
-		// Anadimos el controlador PKCS#11 de FNMT-RCM TIF en Windows
-		if (AOKeyStore.WINDOWS.equals(aksm.getType())) {
-			try {
-				final AOKeyStoreManager tmpKsm = new CNPKeyStoreManager(false, parentComponent);
-				LOGGER.info("La tarjeta FNMT-CRM TIF ha podido inicializarse, se anadiran sus entradas"); //$NON-NLS-1$
-				tmpKsm.setPreferred(true);
-				aksm.addKeyStoreManager(tmpKsm);
-			}
-			catch (final Exception ex) {
-				LOGGER.warning("No se ha podido inicializar la tarjeta FNMT-RCM TIF: " + ex); //$NON-NLS-1$
-			}
-		}
+	private static AOKeyStoreManager getCeres(final Object parentComponent) throws AOKeystoreAlternativeException, IOException {
+		final AOKeyStoreManager tmpKsm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
+			AOKeyStore.CERES, // Store
+			null,             // Lib (null)
+			null,             // Description (null)
+			null,             // PasswordCallback (no hay en la carga, hay en la firma
+			parentComponent   // Parent
+		);
+		LOGGER.info("La tarjeta CERES ha podido inicializarse, se anadiran sus entradas"); //$NON-NLS-1$
+		tmpKsm.setPreferred(true);
+		return tmpKsm;
 	}
 }

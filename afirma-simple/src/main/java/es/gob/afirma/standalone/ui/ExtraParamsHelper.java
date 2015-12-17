@@ -31,10 +31,8 @@ final class ExtraParamsHelper {
 		return p;
 	}
 
-	/**
-	 * Obtiene la configuraci&oacute;n para las firmas XAdES.
-	 * @return Propiedades para la configuraci&oacute;n de las firmas XAdES.
-	 */
+	/** Obtiene la configuraci&oacute;n para las firmas XAdES.
+	 * @return Propiedades para la configuraci&oacute;n de las firmas XAdES. */
 	private static Properties loadXAdESExtraParams() {
 
 		final Properties p = new Properties();
@@ -111,10 +109,8 @@ final class ExtraParamsHelper {
 		return p;
 	}
 
-	/**
-	 * Obtiene la configuraci&oacute;n para las firmas PAdES.
-	 * @return Propiedades para la configuraci&oacute;n de las firmas PAdES.
-	 */
+	/** Obtiene la configuraci&oacute;n para las firmas PAdES.
+	 * @return Propiedades para la configuraci&oacute;n de las firmas PAdES. */
 	private static Properties loadPAdESExtraParams() {
 
 		final Properties p = new Properties();
@@ -177,10 +173,8 @@ final class ExtraParamsHelper {
 		return p;
 	}
 
-	/**
-	 * Obtiene la configuraci&oacute;n para las firmas CAdES.
-	 * @return Propiedades para la configuraci&oacute;n de las firmas CAdES.
-	 */
+	/** Obtiene la configuraci&oacute;n para las firmas CAdES.
+	 * @return Propiedades para la configuraci&oacute;n de las firmas CAdES. */
 	private static Properties loadCAdESExtraParams() {
 		final Properties p = new Properties();
 

@@ -5,6 +5,7 @@ import java.security.KeyStore.PrivateKeyEntry;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.util.List;
 import java.util.Properties;
 
 
@@ -16,6 +17,19 @@ import java.util.Properties;
 public final class OcspCertificateVerifier extends CertificateVerifier {
 
 	private final Properties conf = new Properties();
+
+	/** Construye un validador de certificados por OCSP.
+	 * @param cert Certificado inicialmente a validar. */
+	public OcspCertificateVerifier(final X509Certificate cert) {
+		setSubjectCert(cert);
+		try {
+			this.conf.setProperty("responderUrl", getBestResponder(OcspHelper.getAIALocations(cert))); //$NON-NLS-1$
+		}
+		catch (final Exception e) {
+			throw new IllegalArgumentException(e);
+		}
+		this.conf.setProperty("signOcspRequest", "false"); //$NON-NLS-1$ //$NON-NLS-2$
+	}
 
 	/** Construye un validador de certificados por OCSP.
 	 * @param confFile Fichero de propiedades con las opciones de configuraci&oacute;n
@@ -31,11 +45,13 @@ public final class OcspCertificateVerifier extends CertificateVerifier {
 		}
 		final String issuerCertFile = this.conf.getProperty("issuerCertFile"); //$NON-NLS-1$
 		try {
-			this.setIssuerCert((X509Certificate) CertificateFactory.getInstance(
-				"X.509" //$NON-NLS-1$
-			).generateCertificate(
-				OcspCertificateVerifier.class.getResourceAsStream(issuerCertFile)
-			));
+			this.setIssuerCert(
+				(X509Certificate) CertificateFactory.getInstance(
+					"X.509" //$NON-NLS-1$
+				).generateCertificate(
+					OcspCertificateVerifier.class.getResourceAsStream(issuerCertFile)
+				)
+			);
 		}
 		catch (final CertificateException e) {
 			throw new IllegalArgumentException(
@@ -101,7 +117,9 @@ public final class OcspCertificateVerifier extends CertificateVerifier {
 			rawOcspResponse = OcspHelper.sendOcspRequest(responderUrl, ocspRequest);
 		}
 		catch (final Exception e) {
-			LOGGER.severe("Error enviado la peticion OCSP al servidor: " + e); //$NON-NLS-1$
+			LOGGER.severe(
+				"Error enviado la peticion OCSP al servidor (" + responderUrl + "): " + e //$NON-NLS-1$ //$NON-NLS-2$
+			);
 			return ValidationResult.SERVER_ERROR;
 		}
 		try {
@@ -111,6 +129,21 @@ public final class OcspCertificateVerifier extends CertificateVerifier {
 			LOGGER.severe("Error analizando la respuesta del servidor OCSP: " + e); //$NON-NLS-1$
 			return ValidationResult.SERVER_ERROR;
 		}
+	}
+
+	private static String getBestResponder(final List<String> responders) {
+		if (responders == null || responders.isEmpty()) {
+			throw new IllegalArgumentException("No hay servidores OCSP configurados"); //$NON-NLS-1$
+		}
+		String best = responders.get(0);
+		if (responders.size() > 1) {
+			for (int i=1;i<responders.size();i++) {
+				if (responders.get(i).toLowerCase().contains("ocsp")) { //$NON-NLS-1$
+					best = responders.get(i);
+				}
+			}
+		}
+		return best;
 	}
 
 }

@@ -46,42 +46,55 @@ final class SimpleKeyStoreManager {
                 return AOKeyStoreManagerFactory.getAOKeyStoreManager(AOKeyStore.DNIEJAVA, null, null, AOKeyStore.DNIEJAVA.getStorePasswordCallback(parent), parent);
             }
             catch (final Exception e) {
-            	if ("es.gob.jmulticard.apdu.connection.CardNotPresentException".equals(e.getClass().getName())) { //$NON-NLS-1$
-            		if (0 == AOUIFactory.showConfirmDialog(
-        				parent,
-        				SimpleAfirmaMessages.getString("SimpleKeyStoreManager.1"),  //$NON-NLS-1$
-        				SimpleAfirmaMessages.getString("SimpleKeyStoreManager.2"),  //$NON-NLS-1$
-        				JOptionPane.YES_NO_OPTION,
-        				JOptionPane.WARNING_MESSAGE
-    				)) {
-            			return getKeyStore(true, parent);
+            	String exClassName = e.getClass().getName();
+            	Throwable t = e.getCause();
+            	if (t != null) {
+            		t = t.getCause();
+            		if (t != null) {
+            			t = t.getCause();
+            			if (t != null) {
+            				exClassName = t.getClass().getName();
+            			}
             		}
             	}
-            	else if ("es.gob.jmulticard.card.InvalidCardException".equals(e.getClass().getName())) { //$NON-NLS-1$
-            		AOUIFactory.showErrorMessage(
-        				parent,
-        				SimpleAfirmaMessages.getString("SimpleKeyStoreManager.3"), //$NON-NLS-1$
-        				SimpleAfirmaMessages.getString("SimpleKeyStoreManager.4"), //$NON-NLS-1$
-        				JOptionPane.WARNING_MESSAGE
-    				);
-        			return getKeyStore(true, parent);
-            	}
-            	else if ("es.gob.jmulticard.card.dnie.BurnedDnieCardException".equals(e.getClass().getName())) { //$NON-NLS-1$
-            		AOUIFactory.showErrorMessage(
-        				parent,
-        				SimpleAfirmaMessages.getString("SimpleKeyStoreManager.5"), //$NON-NLS-1$
-        				SimpleAfirmaMessages.getString("SimpleKeyStoreManager.6"), //$NON-NLS-1$
-        				JOptionPane.WARNING_MESSAGE
-    				);
-            	}
-            	else {
-            		Logger.getLogger("es.gob.afirma").severe("No se ha podido inicializar el controlador 100% Java del DNIe: " + e); //$NON-NLS-1$ //$NON-NLS-2$
-            		AOUIFactory.showMessageDialog(
-        				parent,
-        				SimpleAfirmaMessages.getString("SimpleKeyStoreManager.7"), //$NON-NLS-1$
-        				SimpleAfirmaMessages.getString("SimpleKeyStoreManager.8"), //$NON-NLS-1$
-        				JOptionPane.ERROR_MESSAGE
-    				);
+            	switch(exClassName) {
+            		case "es.gob.jmulticard.apdu.connection.CardNotPresentException": //$NON-NLS-1$
+                		if (0 == AOUIFactory.showConfirmDialog(
+            				parent,
+            				SimpleAfirmaMessages.getString("SimpleKeyStoreManager.1"),  //$NON-NLS-1$
+            				SimpleAfirmaMessages.getString("SimpleKeyStoreManager.2"),  //$NON-NLS-1$
+            				JOptionPane.YES_NO_OPTION,
+            				JOptionPane.WARNING_MESSAGE
+        				)) {
+                			return getKeyStore(true, parent);
+                		}
+                		break;
+            		case "es.gob.jmulticard.card.InvalidCardException": //$NON-NLS-1$
+                		AOUIFactory.showErrorMessage(
+            				parent,
+            				SimpleAfirmaMessages.getString("SimpleKeyStoreManager.3"), //$NON-NLS-1$
+            				SimpleAfirmaMessages.getString("SimpleKeyStoreManager.4"), //$NON-NLS-1$
+            				JOptionPane.WARNING_MESSAGE
+        				);
+            			return getKeyStore(true, parent);
+            		case "es.gob.jmulticard.card.dnie.BurnedDnieCardException": //$NON-NLS-1$
+	            		AOUIFactory.showErrorMessage(
+            				parent,
+            				SimpleAfirmaMessages.getString("SimpleKeyStoreManager.5"), //$NON-NLS-1$
+            				SimpleAfirmaMessages.getString("SimpleKeyStoreManager.6"), //$NON-NLS-1$
+            				JOptionPane.WARNING_MESSAGE
+        				);
+	            		break;
+            		default:
+                		Logger.getLogger("es.gob.afirma").severe( //$NON-NLS-1$
+            				"No se ha podido inicializar el controlador 100% Java del DNIe: " + e //$NON-NLS-1$
+        				);
+                		AOUIFactory.showMessageDialog(
+            				parent,
+            				SimpleAfirmaMessages.getString("SimpleKeyStoreManager.7"), //$NON-NLS-1$
+            				SimpleAfirmaMessages.getString("SimpleKeyStoreManager.8"), //$NON-NLS-1$
+            				JOptionPane.ERROR_MESSAGE
+        				);
             	}
             }
         }

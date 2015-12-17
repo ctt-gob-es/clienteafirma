@@ -20,7 +20,7 @@ public final class KeyStoreLoader {
      * @return Listado de almacenes. */
     public static KeyStoreConfiguration[] getKeyStoresToSign() {
 
-        final List<KeyStoreConfiguration> stores = new ArrayList<KeyStoreConfiguration>();
+        final List<KeyStoreConfiguration> stores = new ArrayList<>();
 
         if (Platform.getOS().equals(Platform.OS.WINDOWS)) {
             stores.add(new KeyStoreConfiguration(AOKeyStore.WINDOWS, null, null));
@@ -41,7 +41,7 @@ public final class KeyStoreLoader {
      * @return Listado de almacenes. */
     public static KeyStoreConfiguration[] getKeyStoresToWrap() {
 
-        final List<KeyStoreConfiguration> stores = new ArrayList<KeyStoreConfiguration>();
+        final List<KeyStoreConfiguration> stores = new ArrayList<>();
 
         stores.add(new KeyStoreConfiguration(AOKeyStore.SINGLE, null, null));
         stores.add(new KeyStoreConfiguration(AOKeyStore.PKCS12, null, null));
@@ -59,7 +59,7 @@ public final class KeyStoreLoader {
      * @return Listado de almacenes. */
     public static KeyStoreConfiguration[] getKeyStoresToUnWrap() {
 
-        final List<KeyStoreConfiguration> stores = new ArrayList<KeyStoreConfiguration>();
+        final List<KeyStoreConfiguration> stores = new ArrayList<>();
 
         if (Platform.getOS().equals(Platform.OS.WINDOWS)) {
             stores.add(new KeyStoreConfiguration(AOKeyStore.WINDOWS, null, null));

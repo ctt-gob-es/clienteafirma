@@ -111,13 +111,9 @@ final class AOKeyStoreManagerHelperPkcs11 {
         }
 
         try {
-            ks.load(null, pssCallBack != null ? pssCallBack.getPassword() : null);
+        	loadKs(ks, pssCallBack, true, p11lib);
         }
         catch (final IOException e) {
-            if (e.getCause() instanceof UnrecoverableKeyException ||
-                    e.getCause() instanceof BadPaddingException) {
-                throw new IOException("Contrasena invalida: " + e, e); //$NON-NLS-1$
-            }
             throw new AOKeyStoreManagerException("No se ha podido obtener el almacen PKCS#11 solicitado: " + e, e); //$NON-NLS-1$
         }
         catch (final CertificateException e) {
@@ -130,8 +126,34 @@ final class AOKeyStoreManagerHelperPkcs11 {
             p11Provider = null;
             throw new AOKeyStoreManagerException("No se ha podido verificar la integridad del almacen PKCS#11 solicitado", e); //$NON-NLS-1$
 		}
+
         return ks;
     }
 
+    private static void loadKs(final KeyStore ks,
+    		                   final PasswordCallback pssCallBack,
+    		                   final boolean doRetry,
+    		                   final String p11lib) throws NoSuchAlgorithmException,
+    		                                               CertificateException,
+    		                                               IOException {
+        try {
+            ks.load(null, pssCallBack != null ? pssCallBack.getPassword() : null);
+        }
+        catch (final IOException e) {
+            if (e.getCause() instanceof UnrecoverableKeyException ||
+                    e.getCause() instanceof BadPaddingException) {
+                throw new IOException("Contrasena invalida: " + e, e); //$NON-NLS-1$
+            }
+            // OpenSC en linux tiende a fallar en ciertos sistemas Linux por la lentitud de PC/SC en inicializarse, por lo que
+            // reintentamos
+            if (doRetry && "opensc-pkcs11.so".equals(p11lib)) { //$NON-NLS-1$
+            	loadKs(ks, pssCallBack, false, p11lib);
+            }
+            else {
+            	throw e;
+            }
+        }
+
+    }
 
 }

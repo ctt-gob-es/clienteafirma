@@ -1,5 +1,6 @@
 package es.gob.afirma.signfolder.server.proxy;
 
+import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -8,6 +9,7 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.URLDecoder;
 import java.util.Hashtable;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
@@ -23,9 +25,6 @@ import javax.servlet.http.HttpServletResponse;
 public final class StorageService extends HttpServlet {
 
 	private static final long serialVersionUID = -3272368448371213403L;
-
-	/** Fichero de configuraci&oacute;n. */
-	private static final String CONFIG_FILE = "configuration.properties"; //$NON-NLS-1$
 
 	/** Codificaci&oacute;n de texto. */
 	private static final String DEFAULT_ENCODING = "utf-8"; //$NON-NLS-1$
@@ -48,10 +47,24 @@ public final class StorageService extends HttpServlet {
 	private static final String OPERATION_STORE = "put"; //$NON-NLS-1$
 	private static final String SUCCESS = "OK"; //$NON-NLS-1$
 
+	/** Fichero de configuraci&oacute;n. */
+	private static final String CONFIG_FILE = "configuration.properties"; //$NON-NLS-1$
+
+	private static StorageConfig CONFIG;
+	static {
+		try {
+			CONFIG = new StorageConfig();
+			CONFIG.load(CONFIG_FILE);
+		} catch (final IOException e) {
+			CONFIG = null;
+			LOGGER.log(Level.SEVERE, ErrorManager.genError(ErrorManager.ERROR_CONFIGURATION_FILE_PROBLEM), e);
+		}
+	}
+
 	@Override
 	protected void service(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException {
 
-		LOGGER.info("Se recibe una peticion de almacenamiento"); //$NON-NLS-1$
+		LOGGER.info(" == INICIO GUARDADO == "); //$NON-NLS-1$
 
 		// Leemos la entrada
 		int n;
@@ -83,31 +96,24 @@ public final class StorageService extends HttpServlet {
 		final PrintWriter out = response.getWriter();
 		if (operation == null) {
 			LOGGER.warning("No se ha indicado codigo de operacion"); //$NON-NLS-1$
-			out.println(ErrorManager.genError(ErrorManager.ERROR_MISSING_OPERATION_NAME, null));
+			out.println(ErrorManager.genError(ErrorManager.ERROR_MISSING_OPERATION_NAME));
+			out.flush();
 			return;
 		}
 		if (syntaxVersion == null) {
 			LOGGER.warning("No se ha indicado la version del formato de llamada"); //$NON-NLS-1$
-			out.println(ErrorManager.genError(ErrorManager.ERROR_MISSING_SYNTAX_VERSION, null));
-			return;
-		}
-
-		final StorageConfig config;
-		try {
-			config = new StorageConfig();
-			config.load(CONFIG_FILE);
-		} catch (final IOException e) {
-			LOGGER.severe(ErrorManager.genError(ErrorManager.ERROR_CONFIGURATION_FILE_PROBLEM, null));
-			out.println(ErrorManager.genError(ErrorManager.ERROR_CONFIGURATION_FILE_PROBLEM, null));
+			out.println(ErrorManager.genError(ErrorManager.ERROR_MISSING_SYNTAX_VERSION));
+			out.flush();
 			return;
 		}
 
 		if (OPERATION_STORE.equalsIgnoreCase(operation)) {
-			storeSign(out, params, config);
+			storeSign(out, params, StorageService.CONFIG);
 		} else {
-			out.println(ErrorManager.genError(ErrorManager.ERROR_UNSUPPORTED_OPERATION_NAME, null));
+			out.println(ErrorManager.genError(ErrorManager.ERROR_UNSUPPORTED_OPERATION_NAME));
 		}
-		out.close();
+		out.flush();
+		LOGGER.info("== FIN DEL GUARDADO =="); //$NON-NLS-1$
 	}
 
 	/**
@@ -118,12 +124,10 @@ public final class StorageService extends HttpServlet {
 	 */
 	private static void storeSign(final PrintWriter out, final Hashtable<String, String> params, final StorageConfig config) throws IOException {
 
-		LOGGER.info("Solicitud de guardado"); //$NON-NLS-1$
-
 		final String id = params.get(PARAMETER_NAME_ID);
 		if (id == null) {
-			LOGGER.severe(ErrorManager.genError(ErrorManager.ERROR_MISSING_DATA_ID, null));
-			out.println(ErrorManager.genError(ErrorManager.ERROR_MISSING_DATA_ID, null));
+			LOGGER.severe(ErrorManager.genError(ErrorManager.ERROR_MISSING_DATA_ID));
+			out.println(ErrorManager.genError(ErrorManager.ERROR_MISSING_DATA_ID));
 			return;
 		}
 
@@ -132,11 +136,9 @@ public final class StorageService extends HttpServlet {
 		// Si no se indican los datos, se transmite el error en texto plano a traves del fichero generado
 		String dataText = URLDecoder.decode(params.get(PARAMETER_NAME_DATA), DEFAULT_ENCODING);
 		if (dataText == null) {
-			LOGGER.severe(ErrorManager.genError(ErrorManager.ERROR_MISSING_DATA, null));
-			dataText = ErrorManager.genError(ErrorManager.ERROR_MISSING_DATA, null);
+			LOGGER.severe(ErrorManager.genError(ErrorManager.ERROR_MISSING_DATA));
+			dataText = ErrorManager.genError(ErrorManager.ERROR_MISSING_DATA);
 		}
-
-		final byte[] data = dataText.getBytes();
 
 		if (!config.getTempDir().exists()) {
 			config.getTempDir().mkdirs();
@@ -145,12 +147,14 @@ public final class StorageService extends HttpServlet {
 		final File outFile = new File(config.getTempDir(), id);
 		try {
 			final OutputStream fos = new FileOutputStream(outFile);
-			fos.write(data);
-			fos.flush();
+			final BufferedOutputStream bos = new BufferedOutputStream(fos);
+			bos.write(dataText.getBytes());
+			bos.flush();
+			bos.close();
 			fos.close();
 		} catch (final IOException e) {
 			LOGGER.severe("No se ha podido generar el fichero temporal para el envio de datos a la web: " + e); //$NON-NLS-1$
-			out.println(ErrorManager.genError(ErrorManager.ERROR_COMMUNICATING_WITH_WEB, null));
+			out.println(ErrorManager.genError(ErrorManager.ERROR_COMMUNICATING_WITH_WEB));
 			return;
 		}
 

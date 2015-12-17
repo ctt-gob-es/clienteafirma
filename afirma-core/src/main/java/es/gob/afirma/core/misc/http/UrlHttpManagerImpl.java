@@ -10,6 +10,8 @@
 
 package es.gob.afirma.core.misc.http;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
@@ -17,13 +19,20 @@ import java.net.HttpURLConnection;
 import java.net.Proxy;
 import java.net.URL;
 import java.security.KeyManagementException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.UnrecoverableKeyException;
+import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.StringTokenizer;
 import java.util.logging.Logger;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.KeyManager;
+import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocketFactory;
@@ -36,6 +45,8 @@ import es.gob.afirma.core.misc.AOUtil;
  * @author Carlos Gamuci */
 public class UrlHttpManagerImpl implements UrlHttpManager {
 
+	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+
 	/** Tiempo de espera por defecto para descartar una conexi&oacute;n HTTP. */
 	public static final int DEFAULT_TIMEOUT = -1;
 
@@ -43,6 +54,13 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 
 	private static final HostnameVerifier DEFAULT_HOSTNAME_VERIFIER = HttpsURLConnection.getDefaultHostnameVerifier();
 	private static final SSLSocketFactory DEFAULT_SSL_SOCKET_FACTORY = HttpsURLConnection.getDefaultSSLSocketFactory();
+	private static final String KEYSTORE = "javax.net.ssl.keyStore"; //$NON-NLS-1$
+	private static final String KEYSTORE_PASS = "javax.net.ssl.keyStorePassword"; //$NON-NLS-1$
+	private static final String KEYSTORE_TYPE = "javax.net.ssl.keyStoreType"; //$NON-NLS-1$
+	private static final String KEYSTORE_INSTANCE = "SunJSSE"; //$NON-NLS-1$
+	private static final String KEYSTORE_DEFAULT_TYPE = "JKS"; //$NON-NLS-1$
+	private static final String KEYMANAGER_INSTANCE = "SunX509";//$NON-NLS-1$
+	private static final String SSL_CONTEXT = "SSL";//$NON-NLS-1$
 
 	private enum Method {
 		GET,
@@ -148,7 +166,7 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 			if (uri.getProtocol().equals(HTTPS)) {
 				enableSslChecks();
 			}
-			throw new HttpError(resCode, conn.getResponseMessage());
+			throw new HttpError(resCode, conn.getResponseMessage(), url);
 		}
 
 		final InputStream is = conn.getInputStream();
@@ -194,10 +212,17 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 	/** Deshabilita las comprobaciones de certificados en conexiones SSL, acept&aacute;dose entonces
 	 * cualquier certificado.
 	 * @throws KeyManagementException Si hay problemas en la gesti&oacute;n de claves SSL.
-	 * @throws NoSuchAlgorithmException Si el JRE no soporta alg&uacute;n algoritmo necesario. */
-	public static void disableSslChecks() throws KeyManagementException, NoSuchAlgorithmException {
-		final SSLContext sc = SSLContext.getInstance("SSL"); //$NON-NLS-1$
-		sc.init(null, DUMMY_TRUST_MANAGER, new java.security.SecureRandom());
+	 * @throws NoSuchAlgorithmException Si el JRE no soporta alg&uacute;n algoritmo necesario.
+	 * @throws KeyStoreException Si no se puede cargar el KeyStore SSL.
+	 * @throws IOException Si hay errores en la carga del fichero KeyStore SSL.
+	 * @throws CertificateException Si los certificados del KeyStore SSL son inv&aacute;lidos.
+	 * @throws UnrecoverableKeyException Si una clave del KeyStore SSL es inv&aacute;lida.
+	 * @throws NoSuchProviderException Si ocurre un error al recuperar la instancia del Keystore.*/
+	public static void disableSslChecks() throws KeyManagementException,
+	                                             NoSuchAlgorithmException,
+	                                             KeyStoreException, UnrecoverableKeyException, CertificateException, IOException, NoSuchProviderException {
+		final SSLContext sc = SSLContext.getInstance(SSL_CONTEXT);
+		sc.init(getKeyManager(), DUMMY_TRUST_MANAGER, new java.security.SecureRandom());
 		HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
 		HttpsURLConnection.setDefaultHostnameVerifier(
 			new HostnameVerifier() {
@@ -207,6 +232,49 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 				}
 			}
 		);
+	}
+
+	/**
+	 * Devuelve un KeyManager a utilizar cuando se desea deshabilitar las comprobaciones de certificados en las conexiones SSL.
+	 * @return KeyManager[] Se genera un KeyManager[] utilizando el keystore almacenado en las propiedades del sistema.
+	 * @throws KeyStoreException Si no se puede cargar el KeyStore SSL.
+	 * @throws NoSuchAlgorithmException Si el JRE no soporta alg&uacute;n algoritmo necesario.
+	 * @throws CertificateException Si los certificados del KeyStore SSL son inv&aacute;lidos.
+	 * @throws IOException Si hay errores en la carga del fichero KeyStore SSL.
+	 * @throws UnrecoverableKeyException Si una clave del KeyStore SSL es inv&aacute;lida.
+	 * @throws NoSuchProviderException Si ocurre un error al recuperar la instancia del Keystore.
+	 */
+	private static KeyManager[] getKeyManager() throws KeyStoreException,
+	                                                   NoSuchAlgorithmException,
+	                                                   CertificateException,
+	                                                   IOException,
+	                                                   UnrecoverableKeyException, NoSuchProviderException {
+		final String keyStore = System.getProperty(KEYSTORE);
+		final String keyStorePassword = System.getProperty(KEYSTORE_PASS);
+		final String keyStoreType = System.getProperty(KEYSTORE_TYPE);
+		if (keyStore == null || keyStore.isEmpty()) {
+			return null;
+		}
+		final File f = new File(keyStore);
+		if (!f.isFile() || !f.canRead()) {
+			LOGGER.warning("El KeyStore SSL no existe o no es legible: " + f.getAbsolutePath()); //$NON-NLS-1$
+			return null;
+		}
+		final KeyStore keystore = KeyStore.getInstance(
+			keyStoreType != null && !keyStoreType.isEmpty() ? keyStoreType : KEYSTORE_DEFAULT_TYPE, KEYSTORE_INSTANCE
+		);
+		final InputStream fis = new FileInputStream(f);
+		keystore.load(
+			fis,
+			keyStorePassword != null ? keyStorePassword.toCharArray() : null
+		);
+		fis.close();
+		final KeyManagerFactory keyFac = KeyManagerFactory.getInstance(KEYMANAGER_INSTANCE);
+		keyFac.init(
+			keystore,
+			keyStorePassword != null ? keyStorePassword.toCharArray() : null
+		);
+		return keyFac.getKeyManagers();
 	}
 
 }

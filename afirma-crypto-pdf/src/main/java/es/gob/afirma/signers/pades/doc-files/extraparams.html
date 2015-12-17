@@ -9,10 +9,12 @@
  <body>
  <p>Valores aceptados como par&aacute;metros adicionales para las firmas PAdES:</p>
  <dl>
-  <dt><b><i>doNotCompressPdf</i></b></dt>
+  <dt><b><i>compressPdf</i></b></dt>
   <dd>
-   Si se establece a <code>true</code> no se comprime el PDF resultante. Si no se establece o se establece a
-   <code>false</code>, el PDF de salida (firmado) se comprime para que ocupe menos tama&ntilde;o.
+   Si se establece a <code>false</code> no se comprime el PDF resultante. Si no se establece o se establece a
+   cualquier otro valor distinto de <code>false</code>, el PDF de salida (firmado) se comprime para que ocupe 
+   menos tama&ntilde;o.<br>
+   Igualmente, esta propiedad no tiene efecto en los PDF-A1, este tipo de PDF nunca se comprime al guardarse.
   </dd>
   <dt><b><i>signTime</i></b></dt>
   <dd>
@@ -27,13 +29,13 @@
    Si se establece a <code>true</code> se permite firmar un PDF incluso si este contiene firmas previas no
    registradas dentro de campos Acrobat (<i>AcroFields</i>). El firmar un PDF que contenga firmas no registradas puede 
    dar como resultado que se invaliden estas firmas previas, por lo que no se recomienda permitirlo.<br>
-   Si no se establece o se establece a o <code>false</code>, al intentar firmar un PDF que contenga firmas
+   Si no se establece o se establece a <code>false</code>, al intentar firmar un PDF que contenga firmas
    no registradas se lanza una excepci&oacute;n de tipo <code>PdfHasUnregisteredSignaturesException</code>.
   </dd>
   <dt><b><i>includeOnlySignningCertificate</i></b> (propiedad compartida con XAdES y CAdES)</dt>
    <dd>
 	Si se establece a <code>true</code> se incluye en la firma &uacute;nicamente el certificado del firmante (y no la cadena de certificaci&oacute;n completa).
-	Si no se establece o se establece a o <code>false</code> se incluir&aacute; toda la cadena de certificaci&oacute;n.
+	Si no se establece o se establece a <code>false</code> se incluir&aacute; toda la cadena de certificaci&oacute;n.
    </dd>
   <dt><b><i>alwaysCreateRevision</i></b></dt>
    <dd>

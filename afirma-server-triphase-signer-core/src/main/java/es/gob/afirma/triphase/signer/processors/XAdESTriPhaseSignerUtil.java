@@ -28,9 +28,18 @@ final class XAdESTriPhaseSignerUtil {
 	private static final String DS_NAMESPACE_URL = "http://www.w3.org/2000/09/xmldsig#"; //$NON-NLS-1$
 	private static final String SA_NAMESPACE_URL = "http://uri.etsi.org/01903#SignedProperties"; //$NON-NLS-1$
 
-	static byte[] insertCommonParts(final byte[] xmlBase, final byte[] xmlSource) throws SAXException,
-	                                                                                     IOException,
-	                                                                                     ParserConfigurationException {
+	private static final String USE_MANIFEST = "useManifest"; //$NON-NLS-1$
+
+	static byte[] insertCommonParts(final byte[] xmlBase,
+			                        final byte[] xmlSource,
+			                        final Properties extraParams) throws SAXException,
+	                                                                     IOException,
+	                                                                     ParserConfigurationException {
+
+		if (extraParams != null && Boolean.parseBoolean(extraParams.getProperty(USE_MANIFEST))) {
+			return xmlBase;
+		}
+
 		final Document docBase = getDocumentFromBytes(xmlBase);
 		final List<List<String>> elDeliBase = getCommonContentDelimiters(
 			getInmutableReferences(
@@ -74,10 +83,17 @@ final class XAdESTriPhaseSignerUtil {
 	}
 
 	static String removeCommonParts(final byte[] xml, final Properties extraParams) {
+
 		if (xml == null || xml.length < 1) {
 			throw new IllegalArgumentException("El XML de entrada no puede ser nulo ni vacio"); //$NON-NLS-1$
 		}
+
 		String ret = new String(xml);
+
+		if (extraParams != null && Boolean.parseBoolean(extraParams.getProperty(USE_MANIFEST))) {
+			return ret;
+		}
+
 		final org.w3c.dom.Document doc;
 		try {
 			doc = XAdESTriPhaseSignerUtil.getDocumentFromBytes(xml);

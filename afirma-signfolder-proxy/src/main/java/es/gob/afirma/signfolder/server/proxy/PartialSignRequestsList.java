@@ -7,13 +7,13 @@ package es.gob.afirma.signfolder.server.proxy;
 public class PartialSignRequestsList {
 
 	private final SignRequest[] currentSignRequests;
-	
+
 	private final int totalSignRequests;
-	
+
 	/**
 	 * Construye el listado parcial.
-	 * @param currentSignRequests
-	 * @param totalSignRequests
+	 * @param currentSignRequests Listado de peticiones de firma cargadas actualmente.
+	 * @param totalSignRequests N&uacute;mero total de peticiones de firma.
 	 */
 	public PartialSignRequestsList(final SignRequest[] currentSignRequests, final int totalSignRequests) {
 		this.currentSignRequests = currentSignRequests;

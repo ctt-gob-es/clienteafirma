@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Hashtable;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -53,6 +52,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.DocumentType;
 import org.w3c.dom.Element;
 
+import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
@@ -79,12 +79,11 @@ public final class XAdESSigner {
     /** Identificador de identificadores en los nodos XML. */
     static final String ID_IDENTIFIER = "Id"; //$NON-NLS-1$
 
-    private static final String EXTRAPARAM_URI ="uri"; //$NON-NLS-1$
 
-	/** Firma datos en formato XAdES.
-	 * <p>
-	 * Este m&eacute;todo, al firmar un XML, firmas tambi&eacute;n sus hojas de
-	 * estilo XSL asociadas, siguiendo el siguiente criterio:
+    /** Firma datos en formato XAdES.
+     * <p>
+     * Este m&eacute;todo, al firmar un XML, firmas tambi&eacute;n sus hojas de
+     * estilo XSL asociadas, siguiendo el siguiente criterio:
      * <ul>
      *  <li>Firmas XML <i>Enveloped</i>
      *   <ul>
@@ -179,23 +178,23 @@ public final class XAdESSigner {
      *   </ul>
      *  </li>
      * </ul>
-	 * @param data Datos que deseamos firmar.
-	 * @param algorithm
-	 *            Algoritmo a usar para la firma.
-	 *            <p>
-	 *              Se aceptan los siguientes algoritmos en el par&aacute;metro <code>algorithm</code>:
-	 *            </p>
-	 *            <ul>
-	 *              <li>&nbsp;&nbsp;&nbsp;<i>SHA1withRSA</i></li>
-	 *              <li>&nbsp;&nbsp;&nbsp;<i>SHA256withRSA</i></li>
-	 *              <li>&nbsp;&nbsp;&nbsp;<i>SHA384withRSA</i></li>
-	 *              <li>&nbsp;&nbsp;&nbsp;<i>SHA512withRSA</i></li>
-	 *            </ul>
-	 * @param certChain Cadena de certificados del firmante
-	 * @param pk Clave privada del firmante
-	 * @param xParams Par&aacute;metros adicionales para la firma (<a href="doc-files/extraparams.html">detalle</a>)
-	 * @return Firma en formato XAdES
-	 * @throws AOException Cuando ocurre cualquier problema durante el proceso */
+     * @param data Datos que deseamos firmar.
+     * @param algorithm
+     *            Algoritmo a usar para la firma.
+     *            <p>
+     *              Se aceptan los siguientes algoritmos en el par&aacute;metro <code>algorithm</code>:
+     *            </p>
+     *            <ul>
+     *              <li>&nbsp;&nbsp;&nbsp;<i>SHA1withRSA</i></li>
+     *              <li>&nbsp;&nbsp;&nbsp;<i>SHA256withRSA</i></li>
+     *              <li>&nbsp;&nbsp;&nbsp;<i>SHA384withRSA</i></li>
+     *              <li>&nbsp;&nbsp;&nbsp;<i>SHA512withRSA</i></li>
+     *            </ul>
+     * @param certChain Cadena de certificados del firmante
+     * @param pk Clave privada del firmante
+     * @param xParams Par&aacute;metros adicionales para la firma (<a href="doc-files/extraparams.html">detalle</a>)
+     * @return Firma en formato XAdES
+     * @throws AOException Cuando ocurre cualquier problema durante el proceso */
 	public static byte[] sign(final byte[] data,
 			                  final String algorithm,
 			                  final PrivateKey pk,
@@ -215,61 +214,61 @@ public final class XAdESSigner {
 		final Properties extraParams = xParams != null ? xParams : new Properties();
 
 		final boolean avoidXpathExtraTransformsOnEnveloped = Boolean.parseBoolean(extraParams.getProperty(
-				"avoidXpathExtraTransformsOnEnveloped", Boolean.FALSE.toString())); //$NON-NLS-1$
+		        XAdESExtraParams.AVOID_XPATH_EXTRA_TRANSFORMS_ON_ENVELOPED, Boolean.FALSE.toString()));
 
 		final boolean onlySignningCert = Boolean.parseBoolean(extraParams.getProperty(
-				"includeOnlySignningCertificate", Boolean.FALSE.toString())); //$NON-NLS-1$
+		        XAdESExtraParams.INCLUDE_ONLY_SIGNNING_CERTIFICATE, Boolean.FALSE.toString()));
 
 		final boolean useManifest = Boolean.parseBoolean(extraParams.getProperty(
-				"useManifest", Boolean.FALSE.toString())); //$NON-NLS-1$
+		        XAdESExtraParams.USE_MANIFEST, Boolean.FALSE.toString()));
 
 		final String envelopedNodeXPath = extraParams.getProperty(
-				"insertEnvelopedSignatureOnNodeByXPath"); //$NON-NLS-1$
+		        XAdESExtraParams.INSERT_ENVELOPED_SIGNATURE_ON_NODE_BY_XPATH);
 
 		String nodeToSign = extraParams.getProperty(
-				"nodeToSign"); //$NON-NLS-1$
+		        XAdESExtraParams.NODE_TOSIGN);
 
 		final String format = extraParams.getProperty(
-				"format", AOSignConstants.SIGN_FORMAT_XADES_ENVELOPING); //$NON-NLS-1$
+		        XAdESExtraParams.FORMAT, AOSignConstants.SIGN_FORMAT_XADES_ENVELOPING);
 
 		final String digestMethodAlgorithm = extraParams.getProperty(
-				"referencesDigestMethod", AOXAdESSigner.DIGEST_METHOD); //$NON-NLS-1$
+		        XAdESExtraParams.REFERENCES_DIGEST_METHOD, AOXAdESSigner.DIGEST_METHOD);
 
 		final String canonicalizationAlgorithm = extraParams.getProperty(
-				"canonicalizationAlgorithm", CanonicalizationMethod.INCLUSIVE); //$NON-NLS-1$
+		        XAdESExtraParams.CANONICALIZATION_ALGORITHM, CanonicalizationMethod.INCLUSIVE);
 
 		final String xadesNamespace = extraParams.getProperty(
-				"xadesNamespace", AOXAdESSigner.XADESNS); //$NON-NLS-1$
+		        XAdESExtraParams.XADES_NAMESPACE, AOXAdESSigner.XADESNS);
 
 		final String signedPropertiesTypeUrl = extraParams.getProperty(
-				"signedPropertiesTypeUrl", AOXAdESSigner.XADES_SIGNED_PROPERTIES_TYPE); //$NON-NLS-1$
+		        XAdESExtraParams.SIGNED_PROPERTIES_TYPE_URL, AOXAdESSigner.XADES_SIGNED_PROPERTIES_TYPE);
 
 		final boolean ignoreStyleSheets = Boolean.parseBoolean(extraParams.getProperty(
-				"ignoreStyleSheets", Boolean.FALSE.toString())); //$NON-NLS-1$
+		        XAdESExtraParams.IGNORE_STYLE_SHEETS, Boolean.FALSE.toString()));
 
 		final boolean avoidBase64Transforms = Boolean.parseBoolean(extraParams.getProperty(
-				"avoidBase64Transforms", Boolean.FALSE.toString())); //$NON-NLS-1$
+		        XAdESExtraParams.AVOID_BASE64_TRANSFORMS, Boolean.FALSE.toString()));
 
 		final boolean headless = Boolean.parseBoolean(extraParams.getProperty(
-				"headless", Boolean.TRUE.toString())); //$NON-NLS-1$
+		        XAdESExtraParams.HEADLESS, Boolean.TRUE.toString()));
 
 		final boolean addKeyInfoKeyValue = Boolean.parseBoolean(extraParams.getProperty(
-				"addKeyInfoKeyValue", Boolean.TRUE.toString())); //$NON-NLS-1$
+		        XAdESExtraParams.ADD_KEY_INFO_KEY_VALUE, Boolean.TRUE.toString()));
 
 		final boolean addKeyInfoKeyName = Boolean.parseBoolean(extraParams.getProperty(
-				"addKeyInfoKeyName", Boolean.FALSE.toString())); //$NON-NLS-1$
+		        XAdESExtraParams.ADD_KEY_INFO_KEY_NAME, Boolean.FALSE.toString()));
 
 		final String precalculatedHashAlgorithm = extraParams.getProperty(
-				"precalculatedHashAlgorithm"); //$NON-NLS-1$
+		        XAdESExtraParams.PRECALCULATED_HASH_ALGORITHM);
 
 		final boolean facturaeSign = Boolean.parseBoolean(extraParams.getProperty(
-				"facturaeSign", Boolean.FALSE.toString())); //$NON-NLS-1$
+		        XAdESExtraParams.FACTURAE_SIGN, Boolean.FALSE.toString()));
 
 		String mimeType = extraParams.getProperty(
-				"mimeType", XMLConstants.DEFAULT_MIMETYPE); //$NON-NLS-1$
+		        XAdESExtraParams.MIME_TYPE, XMLConstants.DEFAULT_MIMETYPE);
 
 		String encoding = extraParams.getProperty(
-				"encoding"); //$NON-NLS-1$
+		        XAdESExtraParams.ENCODING);
 
 		if ("base64".equalsIgnoreCase(encoding)) { //$NON-NLS-1$
 			encoding = XMLConstants.BASE64_ENCODING;
@@ -280,15 +279,24 @@ public final class XAdESSigner {
 
 		URI uri = null;
 		try {
-			uri = extraParams.getProperty(EXTRAPARAM_URI) != null ?
-				AOUtil.createURI(extraParams.getProperty(EXTRAPARAM_URI)) :
+			uri = extraParams.getProperty( XAdESExtraParams.URI) != null ?
+				AOUtil.createURI(extraParams.getProperty( XAdESExtraParams.URI)) :
 					null;
 		}
 		catch (final Exception e) {
 			LOGGER.warning("Se ha pasado una URI invalida como referencia a los datos a firmar: " + e); //$NON-NLS-1$
 		}
 
-		Utils.checkIllegalParams(format, AOSignConstants.SIGN_MODE_IMPLICIT, uri, precalculatedHashAlgorithm, true);
+		Utils.checkIllegalParams(
+			format,
+			extraParams.getProperty(
+				XAdESExtraParams.MODE,
+				AOSignConstants.SIGN_MODE_IMPLICIT
+			),
+			uri,
+			precalculatedHashAlgorithm,
+			true
+		);
 
 		// Un externally detached con URL permite los datos nulos o vacios
 		if ((data == null || data.length == 0)
@@ -859,7 +867,7 @@ public final class XAdESSigner {
 				if (uri != null && uri.getScheme().equals("file")) { //$NON-NLS-1$
 					try {
 						ref = fac.newReference(
-							extraParams.getProperty(EXTRAPARAM_URI),
+							extraParams.getProperty( XAdESExtraParams.URI),
 							digestMethod,
 							null,
 							XMLConstants.OBJURI,
@@ -1057,7 +1065,7 @@ public final class XAdESSigner {
 		XAdESCommonMetadataUtil.addCommonMetadata(xades, extraParams);
 
 		// DataObjectFormat
-		String oid = extraParams.getProperty("contentTypeOid"); //$NON-NLS-1$
+		String oid = extraParams.getProperty( XAdESExtraParams.CONTENT_TYPE_OID);
 		if (oid == null && mimeType != null) {
 			try {
 				oid = MimeHelper.transformMimeTypeToOid(mimeType);
@@ -1146,27 +1154,8 @@ public final class XAdESSigner {
 		// ********************************* GESTION MANIFEST **********************************
 
 		if (useManifest) {
-
-			// Creamos un nodo padre donde insertar el Manifest
-			final List<XMLStructure> objectContent = new LinkedList<XMLStructure>();
-
-			final String manifestId = "Manifest-" + UUID.randomUUID().toString(); //$NON-NLS-1$
-			objectContent.add(fac.newManifest(new ArrayList<Reference>(referenceList), manifestId));
-
-			final String manifestObjectId = "ManifestObject-" + UUID.randomUUID().toString(); //$NON-NLS-1$
-			xmlSignature.addXMLObject(fac.newXMLObject(objectContent, manifestObjectId, null, null));
-
-			// Si usamos un manifest las referencias no van en la firma, sino en el Manifest, y se
-			// usa entonces en la firma una unica referencia a este Manifest
-			referenceList.clear();
-			referenceList.add(
-				fac.newReference(
-					"#" + manifestId, //$NON-NLS-1$
-					digestMethod,
-					Collections.singletonList(canonicalizationTransform),
-					AOXAdESSigner.MANIFESTURI,
-					referenceId
-				)
+			XAdESUtil.createManifest(
+				referenceList, fac, xmlSignature, digestMethod, canonicalizationTransform, referenceId
 			);
 		}
 
@@ -1195,6 +1184,9 @@ public final class XAdESSigner {
 			);
 		}
 		catch (final Exception e) {
+        	if ("es.gob.jmulticard.ui.passwordcallback.CancelledOperationException".equals(e.getClass().getName())) { //$NON-NLS-1$
+        		throw new AOCancelledOperationException();
+        	}
 			throw new AOException("Error al generar la firma XAdES: " + e, e); //$NON-NLS-1$
 		}
 

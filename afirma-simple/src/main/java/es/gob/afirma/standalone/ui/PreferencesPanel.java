@@ -107,6 +107,8 @@ final class PreferencesPanel extends JPanel implements KeyListener {
 	private PreferencesPanelGeneral preferencesPanelGeneral;
 	private PreferencesPanelCades preferencesPanelCades;
 	private PreferencesPanelPades preferencesPanelPades;
+	private PreferencesPanelKeyStores preferencesPanelKeyStores;
+
 
 	private final JTabbedPane tabbedPane = new JTabbedPane();
 
@@ -115,31 +117,54 @@ final class PreferencesPanel extends JPanel implements KeyListener {
 		this.preferencesPanelGeneral = new PreferencesPanelGeneral(this, this.modificationListener);
 		this.preferencesPanelCades = new PreferencesPanelCades(this, this.modificationListener);
 		this.preferencesPanelPades = new PreferencesPanelPades(this, this.modificationListener);
+		this.preferencesPanelKeyStores = new PreferencesPanelKeyStores(this, this.modificationListener);
 
 		this.tabbedPane.addKeyListener(this);
 
+		int count = this.tabbedPane.getTabCount();
 		this.tabbedPane.addTab(
 			SimpleAfirmaMessages.getString("PreferencesPanel.2"), //$NON-NLS-1$
 			null,
 			this.preferencesPanelGeneral,
 			SimpleAfirmaMessages.getString("PreferencesPanel.40") //$NON-NLS-1$
 		);
+		this.tabbedPane.setMnemonicAt(count, KeyEvent.VK_G);
 
+		count = this.tabbedPane.getTabCount();
 		this.tabbedPane.addTab(
 			SimpleAfirmaMessages.getString("PreferencesPanel.3"), //$NON-NLS-1$
 			null,
 			this.preferencesPanelPades,
 			SimpleAfirmaMessages.getString("PreferencesPanel.41") //$NON-NLS-1$
 		);
+		this.tabbedPane.setMnemonicAt(count, KeyEvent.VK_F);
 
+		count = this.tabbedPane.getTabCount();
 		this.tabbedPane.addTab(
 			SimpleAfirmaMessages.getString("PreferencesPanel.4"), //$NON-NLS-1$
 			null,
 			this.preferencesPanelCades,
 			SimpleAfirmaMessages.getString("PreferencesPanel.42") //$NON-NLS-1$
 		);
+		this.tabbedPane.setMnemonicAt(count, KeyEvent.VK_E);
 
-		this.tabbedPane.addTab(SimpleAfirmaMessages.getString("PreferencesPanel.5"), null, createXadesPanel(), SimpleAfirmaMessages.getString("PreferencesPanel.43")); //$NON-NLS-1$ //$NON-NLS-2$
+		count = this.tabbedPane.getTabCount();
+		this.tabbedPane.addTab(
+			SimpleAfirmaMessages.getString("PreferencesPanel.5"), //$NON-NLS-1$
+			null,
+			createXadesPanel(),
+			SimpleAfirmaMessages.getString("PreferencesPanel.43") //$NON-NLS-1$
+		);
+		this.tabbedPane.setMnemonicAt(count, KeyEvent.VK_X);
+
+//		count = this.tabbedPane.getTabCount();
+//		this.tabbedPane.addTab(
+//			SimpleAfirmaMessages.getString("PreferencesPanel.84"), //$NON-NLS-1$
+//			null,
+//			this.preferencesPanelKeyStores,
+//			SimpleAfirmaMessages.getString("PreferencesPanel.85") //$NON-NLS-1$
+//		);
+//		this.tabbedPane.setMnemonicAt(count, KeyEvent.VK_V);
 
 		this.setLayout(new GridBagLayout());
 

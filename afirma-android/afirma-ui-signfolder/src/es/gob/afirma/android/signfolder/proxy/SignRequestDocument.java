@@ -53,7 +53,7 @@ public final class SignRequestDocument {
 	 * @param signFormat Formato de firma a aplicar.
 	 * @param messageDigestAlgorithm Algoritmo de huella digital que debe usarse en la firma del documento.
 	 * @param params Par&aacute;metros de configuraci&oacute;n de la firma.
-	 * @param operationId Identificador de la operaci&oacute;n que se debe realizar sobre le documento.
+	 * @param cryptoOperation Identificador de la operaci&oacute;n que se debe realizar sobre le documento.
 	 */
 	private SignRequestDocument(final String id, final String name, final int size, final String mimeType, final String signFormat, final String messageDigestAlgorithm, final String params, final String cryptoOperation) {
 		this.id = id;

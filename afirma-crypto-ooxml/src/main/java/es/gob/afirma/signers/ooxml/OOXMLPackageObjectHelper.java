@@ -48,6 +48,7 @@ final class OOXMLPackageObjectHelper {
     private static final String[] CONTENT_DIRS = new String[] {
     	"word", //$NON-NLS-1$
     	"excel", //$NON-NLS-1$
+    	"xl", //$NON-NLS-1$
     	"powerpoint" //$NON-NLS-1$
     };
 

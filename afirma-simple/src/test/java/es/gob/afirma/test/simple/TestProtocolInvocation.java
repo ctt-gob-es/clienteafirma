@@ -39,7 +39,7 @@ public class TestProtocolInvocation {
 	/** Prueba de protocolo con firma de hash. */
 	@SuppressWarnings("static-method")
 	@Test
-	@Ignore // Requiere de servidor remoto y UI
+	//@Ignore // Requiere de servidor remoto y UI
 	public void testSignHash() {
 		SimpleAfirma.main(new String[] { LINE_SIGN_HASH });
 	}

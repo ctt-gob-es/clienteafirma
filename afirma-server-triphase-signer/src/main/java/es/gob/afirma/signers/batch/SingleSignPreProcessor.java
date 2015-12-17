@@ -2,8 +2,13 @@ package es.gob.afirma.signers.batch;
 
 import java.io.IOException;
 import java.security.cert.X509Certificate;
+import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.signers.ExtraParamsProcessor;
+import es.gob.afirma.core.signers.ExtraParamsProcessor.IncompatiblePolicyException;
 import es.gob.afirma.core.signers.TriphaseData;
 import es.gob.afirma.triphase.signer.processors.TriPhasePreProcessor;
 
@@ -48,6 +53,16 @@ final class SingleSignPreProcessor {
 
 		final byte[] docBytes = sSign.getData();
 
+		Properties extraParams;
+		try {
+			extraParams = ExtraParamsProcessor.expandProperties(sSign.getExtraParams());
+		}
+		catch (final IncompatiblePolicyException e) {
+			Logger.getLogger("es.gob.afirma").log( //$NON-NLS-1$
+					Level.WARNING, "No se ha podido expandir la politica de firma. Se realizara una firma basica: " + e, e); //$NON-NLS-1$
+			extraParams = sSign.getExtraParams();
+		}
+
 		switch(sSign.getSubOperation()) {
 			case SIGN:
 				return TriphaseData.parser(
@@ -55,7 +70,7 @@ final class SingleSignPreProcessor {
 						docBytes,
 						algorithm.toString(),
 						certChain,
-						sSign.getExtraParams()
+						extraParams
 					)
 				);
 			case COSIGN:
@@ -64,7 +79,7 @@ final class SingleSignPreProcessor {
 						docBytes,
 						algorithm.toString(),
 						certChain,
-						sSign.getExtraParams()
+						extraParams
 					)
 				);
 			default:

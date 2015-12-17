@@ -123,7 +123,7 @@ public final class AOXMLDSigSigner implements AOSigner {
     private Document doc;
 
     static {
-    	Utils.installXmlDSigProvider();
+    	Utils.installXmlDSigProvider(false);
     }
 
     /** Firma datos en formato XMLDSig 1.0 (XML Digital Signature).
@@ -327,32 +327,32 @@ public final class AOXMLDSigSigner implements AOSigner {
 
         final Properties extraParams = xParams != null ? xParams : new Properties();
 
-        final String format = extraParams.getProperty("format", AOSignConstants.SIGN_FORMAT_XMLDSIG_ENVELOPING); //$NON-NLS-1$
-        final String mode = extraParams.getProperty("mode", AOSignConstants.SIGN_MODE_IMPLICIT); //$NON-NLS-1$
-        final String digestMethodAlgorithm = extraParams.getProperty("referencesDigestMethod", DIGEST_METHOD); //$NON-NLS-1$
-        final String canonicalizationAlgorithm = extraParams.getProperty("canonicalizationAlgorithm", CanonicalizationMethod.INCLUSIVE); //$NON-NLS-1$
+        final String format = extraParams.getProperty(AOXMLDSigExtraParams.FORMAT, AOSignConstants.SIGN_FORMAT_XMLDSIG_ENVELOPING);
+        final String mode = extraParams.getProperty(AOXMLDSigExtraParams.MODE, AOSignConstants.SIGN_MODE_IMPLICIT);
+        final String digestMethodAlgorithm = extraParams.getProperty(AOXMLDSigExtraParams.REFERENCES_DIGEST_METHOD, DIGEST_METHOD);
+        final String canonicalizationAlgorithm = extraParams.getProperty(AOXMLDSigExtraParams.CANONICALIZATION_ALGORITHM, CanonicalizationMethod.INCLUSIVE);
 		final boolean ignoreStyleSheets = Boolean.parseBoolean(extraParams.getProperty(
-				"ignoreStyleSheets", Boolean.FALSE.toString())); //$NON-NLS-1$
+		        AOXMLDSigExtraParams.IGNORE_STYLE_SHEETS, Boolean.FALSE.toString()));
 		final boolean avoidBase64Transforms = Boolean.parseBoolean(extraParams.getProperty(
-				"avoidBase64Transforms", Boolean.FALSE.toString())); //$NON-NLS-1$
+		        AOXMLDSigExtraParams.AVOID_BASE64_TRANSFORMS, Boolean.FALSE.toString()));
 		final boolean headless = Boolean.parseBoolean(extraParams.getProperty(
-				"headless", Boolean.TRUE.toString())); //$NON-NLS-1$
-        String mimeType = extraParams.getProperty("mimeType"); //$NON-NLS-1$
-        String encoding = extraParams.getProperty("encoding"); //$NON-NLS-1$
+		        AOXMLDSigExtraParams.HEADLESS, Boolean.TRUE.toString()));
+        String mimeType = extraParams.getProperty(AOXMLDSigExtraParams.MIME_TYPE);
+        String encoding = extraParams.getProperty(AOXMLDSigExtraParams.ENCODING);
         if ("base64".equalsIgnoreCase(encoding)) { //$NON-NLS-1$
             encoding = XMLConstants.BASE64_ENCODING;
         }
-        final String xmlSignaturePrefix = extraParams.getProperty("xmlSignaturePrefix", XML_SIGNATURE_PREFIX); //$NON-NLS-1$
+        final String xmlSignaturePrefix = extraParams.getProperty(AOXMLDSigExtraParams.XML_SIGNATURE_PREFIX, XML_SIGNATURE_PREFIX);
 
         URI uri = null;
         try {
-            uri = AOUtil.createURI(extraParams.getProperty("uri")); //$NON-NLS-1$
+            uri = AOUtil.createURI(extraParams.getProperty(AOXMLDSigExtraParams.URI));
         }
         catch (final Exception e) {
             // Se ignora, puede estar ausente
         }
 
-        final String precalculatedHashAlgorithm = extraParams.getProperty("precalculatedHashAlgorithm"); //$NON-NLS-1$
+        final String precalculatedHashAlgorithm = extraParams.getProperty(AOXMLDSigExtraParams.PRECALCULATED_HASH_ALGORITHM);
 
         Utils.checkIllegalParams(format, mode, uri, precalculatedHashAlgorithm, false);
 
@@ -1024,7 +1024,7 @@ public final class AOXMLDSigSigner implements AOSigner {
             Certificate[] certs = null;
             final boolean onlySignningCert = Boolean.parseBoolean(
             		extraParams.getProperty(
-            				"includeOnlySignningCertificate", Boolean.FALSE.toString())); //$NON-NLS-1$
+            		        AOXMLDSigExtraParams.INCLUDE_ONLY_SIGNNING_CERTIFICATE, Boolean.FALSE.toString()));
 			if (!onlySignningCert) {
 				certs = certChain;
 			}
@@ -1318,9 +1318,9 @@ public final class AOXMLDSigSigner implements AOSigner {
 
         final Properties extraParams = xParams != null ? xParams : new Properties();
 
-        final String digestMethodAlgorithm = extraParams.getProperty("referencesDigestMethod", DIGEST_METHOD); //$NON-NLS-1$
-        final String canonicalizationAlgorithm = extraParams.getProperty("canonicalizationAlgorithm", CanonicalizationMethod.INCLUSIVE); //$NON-NLS-1$
-        final String xmlSignaturePrefix = extraParams.getProperty("xmlSignaturePrefix", XML_SIGNATURE_PREFIX); //$NON-NLS-1$
+        final String digestMethodAlgorithm = extraParams.getProperty(AOXMLDSigExtraParams.REFERENCES_DIGEST_METHOD, DIGEST_METHOD);
+        final String canonicalizationAlgorithm = extraParams.getProperty(AOXMLDSigExtraParams.CANONICALIZATION_ALGORITHM, CanonicalizationMethod.INCLUSIVE);
+        final String xmlSignaturePrefix = extraParams.getProperty(AOXMLDSigExtraParams.XML_SIGNATURE_PREFIX, XML_SIGNATURE_PREFIX);
 
         // nueva instancia de DocumentBuilderFactory que permita espacio de
         // nombres (necesario para XML)
@@ -1508,7 +1508,7 @@ public final class AOXMLDSigSigner implements AOSigner {
             Certificate[] certs = null;
             final boolean onlySignningCert = Boolean.parseBoolean(
         		extraParams.getProperty(
-    				"includeOnlySignningCertificate", //$NON-NLS-1$
+        		        AOXMLDSigExtraParams.INCLUDE_ONLY_SIGNNING_CERTIFICATE,
     				Boolean.FALSE.toString()
 				)
     		);
@@ -1732,15 +1732,15 @@ public final class AOXMLDSigSigner implements AOSigner {
 
         final Properties extraParams = xParams != null ? xParams : new Properties();
 
-        final String digestMethodAlgorithm = extraParams.getProperty("referencesDigestMethod", DIGEST_METHOD); //$NON-NLS-1$
-        final String canonicalizationAlgorithm = extraParams.getProperty("canonicalizationAlgorithm", CanonicalizationMethod.INCLUSIVE); //$NON-NLS-1$
-        String encoding = extraParams.getProperty("encoding"); //$NON-NLS-1$
+        final String digestMethodAlgorithm = extraParams.getProperty(AOXMLDSigExtraParams.REFERENCES_DIGEST_METHOD, DIGEST_METHOD);
+        final String canonicalizationAlgorithm = extraParams.getProperty(AOXMLDSigExtraParams.CANONICALIZATION_ALGORITHM, CanonicalizationMethod.INCLUSIVE);
+        String encoding = extraParams.getProperty(AOXMLDSigExtraParams.ENCODING);
         if ("base64".equalsIgnoreCase(encoding)) { //$NON-NLS-1$
             encoding = XMLConstants.BASE64_ENCODING;
         }
-        final String xmlSignaturePrefix = extraParams.getProperty("xmlSignaturePrefix", XML_SIGNATURE_PREFIX); //$NON-NLS-1$
+        final String xmlSignaturePrefix = extraParams.getProperty(AOXMLDSigExtraParams.XML_SIGNATURE_PREFIX, XML_SIGNATURE_PREFIX);
         final boolean onlySignningCert = Boolean.parseBoolean(
-        		extraParams.getProperty("includeOnlySignningCertificate", Boolean.FALSE.toString())); //$NON-NLS-1$
+        		extraParams.getProperty(AOXMLDSigExtraParams.INCLUDE_ONLY_SIGNNING_CERTIFICATE, Boolean.FALSE.toString()));
 
         this.algo = algorithm;
 

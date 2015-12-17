@@ -841,7 +841,7 @@ public class UtilsTest {
 
 	try {
 	    // Lista de mnemonicos usados
-	    final List<Character> mnemonicList = new ArrayList<Character>();
+	    final List<Character> mnemonicList = new ArrayList<>();
 	    mnemonicList.add(new Character('a'));
 	    mnemonicList.add(new Character('b'));
 	    mnemonicList.add(new Character('c'));
@@ -1163,7 +1163,8 @@ public class UtilsTest {
      * Comprobaci&oacute;n del correcto subrayado de los mnem&oacute;nicos para
      * texto HTML
      */
-    @Test
+    @SuppressWarnings("static-method")
+	@Test
     public void testRemarkMnemonic() {
 	UtilsTest.LOGGER.info("testRemarkMnemonic"); //$NON-NLS-1$
 
@@ -1285,7 +1286,8 @@ public class UtilsTest {
      * Comprobaci&oacute;n del correcto visionado u ocultaci&oacute;n del tool
      * tip
      */
-    @Test
+    @SuppressWarnings("static-method")
+	@Test
     public void testShowToolTip() {
 	UtilsTest.LOGGER.info("testShowToolTip"); //$NON-NLS-1$
 	try {

@@ -75,8 +75,6 @@ abstract class FileKeyStoreManager extends AOKeyStoreManager {
 
     /** Obtiene la clave privada de un certificado en un almac&eacute;n de tipo fichero.
      * @param alias Alias del certificado
-     * @param pssCallback <i>CallBback</i> para obtener la contrase&ntilde;a del certificado que contiene la clave,
-     *                    se utilizar&aacute; en caso de que sea distinta a la del propio almac&eacute;n
      * @return Clave privada del certificado correspondiente al alias
      * @throws KeyStoreException Cuando ocurren errores en el tratamiento del almac&eacute;n de claves
      * @throws NoSuchAlgorithmException Cuando no se puede identificar el algoritmo para la recuperaci&oacute;n de la clave.

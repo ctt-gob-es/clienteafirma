@@ -53,22 +53,22 @@ final class Ensobrado extends JPanel {
     private static final long serialVersionUID = 1L;
 
     // Checkbox con texto "Anadir nuevos remitentes al sobre
-    private final JCheckBox checkAnadir = new JCheckBox();
+    final JCheckBox checkAnadir = new JCheckBox();
 
     // Combo de tipos de sobre digital
-    private final JComboBox comboTipos = new JComboBox();
+    final JComboBox<String> comboTipos = new JComboBox<>();
     Ensobrado() {
         initComponents();
     }
 
     /** Carga el combo de opciones con las diferentes opciones */
     private void cargarComboTipos() {
-        final List<String> opciones = new ArrayList<String>();
+        final List<String> opciones = new ArrayList<>();
         opciones.add(Messages.getString("Ensobrado.combo.autenticado")); //$NON-NLS-1$
         opciones.add(Messages.getString("Ensobrado.combo.firmado")); //$NON-NLS-1$
         opciones.add(Messages.getString("Ensobrado.combo.simple")); //$NON-NLS-1$
 
-        this.comboTipos.setModel(new DefaultComboBoxModel(opciones.toArray()));
+        this.comboTipos.setModel(new DefaultComboBoxModel<>(opciones.toArray(new String[0])));
     }
 
     /** Pulsar boton examinar: Muestra una ventana para seleccinar un archivo.
@@ -103,7 +103,7 @@ final class Ensobrado extends JPanel {
             }
             else {
                 // Se muestra el asistente
-            	Main.getPreferences().put("envelop.combo.contenttype", this.comboTipos.getSelectedItem().toString());
+            	Main.getPreferences().put("envelop.combo.contenttype", this.comboTipos.getSelectedItem().toString()); //$NON-NLS-1$
                 new AsistenteEnsobrar(campoFichero.getText(), this.comboTipos.getSelectedIndex());
             }
         }

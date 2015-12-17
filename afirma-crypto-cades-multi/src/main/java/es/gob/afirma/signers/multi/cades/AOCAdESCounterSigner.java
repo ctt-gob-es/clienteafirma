@@ -23,6 +23,7 @@ import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSimpleSigner;
 import es.gob.afirma.core.signers.AdESPolicy;
 import es.gob.afirma.core.signers.CounterSignTarget;
+import es.gob.afirma.signers.cades.CAdESExtraParams;
 import es.gob.afirma.signers.cades.CAdESSignerMetadataHelper;
 import es.gob.afirma.signers.cades.CommitmentTypeIndicationsHelper;
 import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
@@ -31,6 +32,7 @@ import es.gob.afirma.signers.pkcs7.ReadNodesTree;
 /** Contrafirmador CAdES. */
 public class AOCAdESCounterSigner implements AOCounterSigner {
 
+    private static final String ALGORITHM = "SHA1"; //$NON-NLS-1$
 	private final AOSimpleSigner ss;
 	private final Date date;
 
@@ -67,7 +69,7 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
         final Properties extraParams = xParams != null ? xParams : new Properties();
 
         // Control general para todo el metodo de la inclusion de la cadena completa o solo el certificado del firmante
-		final java.security.cert.Certificate[] certChain = Boolean.parseBoolean(extraParams.getProperty("includeOnlySignningCertificate", Boolean.FALSE.toString())) ? //$NON-NLS-1$
+		final java.security.cert.Certificate[] certChain = Boolean.parseBoolean(extraParams.getProperty(CAdESExtraParams.INCLUDE_ONLY_SIGNNING_CERTIFICATE, Boolean.FALSE.toString())) ? 
        		 new X509Certificate[] { (X509Certificate) cChain[0] } :
        			 cChain;
 
@@ -75,11 +77,11 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
         if (AOSignConstants.isSHA2SignatureAlgorithm(algorithm)) {
         	signingCertificateV2 = true;
         }
-        else if (extraParams.containsKey("signingCertificateV2")) { //$NON-NLS-1$
-        	signingCertificateV2 = Boolean.parseBoolean(extraParams.getProperty("signingCertificateV2")); //$NON-NLS-1$
+        else if (extraParams.containsKey(CAdESExtraParams.SIGNING_CERTIFICATE_V2)) { 
+        	signingCertificateV2 = Boolean.parseBoolean(extraParams.getProperty(CAdESExtraParams.SIGNING_CERTIFICATE_V2));
         }
         else {
-        	signingCertificateV2 = !"SHA1".equals(AOSignConstants.getDigestAlgorithmName(algorithm));	 //$NON-NLS-1$
+        	signingCertificateV2 = !ALGORITHM.equals(AOSignConstants.getDigestAlgorithmName(algorithm));
         }
 
         final P7ContentSignerParameters csp = new P7ContentSignerParameters(
@@ -115,6 +117,7 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
                        AdESPolicy.buildAdESPolicy(extraParams),
                        signingCertificateV2,
                        CommitmentTypeIndicationsHelper.getCommitmentTypeIndications(extraParams),
+                       Boolean.parseBoolean(extraParams.getProperty(CAdESExtraParams.INCLUDE_SIGNING_TIME_ATTRIBUTE, Boolean.FALSE.toString())),
                        CAdESSignerMetadataHelper.getCAdESSignerMetadata(extraParams)
                 );
             }
@@ -134,6 +137,7 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
                             AdESPolicy.buildAdESPolicy(extraParams),
 							signingCertificateV2,
                             CommitmentTypeIndicationsHelper.getCommitmentTypeIndications(extraParams),
+                            Boolean.parseBoolean(extraParams.getProperty(CAdESExtraParams.INCLUDE_SIGNING_TIME_ATTRIBUTE, Boolean.FALSE.toString())),
                             CAdESSignerMetadataHelper.getCAdESSignerMetadata(extraParams)
                 		);
             }
@@ -154,7 +158,8 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
                             certChain,
                             AdESPolicy.buildAdESPolicy(extraParams),
 							signingCertificateV2,
-                            CommitmentTypeIndicationsHelper.getCommitmentTypeIndications(xParams),
+                            CommitmentTypeIndicationsHelper.getCommitmentTypeIndications(extraParams),
+                            Boolean.parseBoolean(extraParams.getProperty(CAdESExtraParams.INCLUDE_SIGNING_TIME_ATTRIBUTE, Boolean.FALSE.toString())),
                             CAdESSignerMetadataHelper.getCAdESSignerMetadata(extraParams)
                         );
             }
@@ -178,7 +183,8 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
                             certChain,
                             AdESPolicy.buildAdESPolicy(extraParams),
                             signingCertificateV2,
-                            CommitmentTypeIndicationsHelper.getCommitmentTypeIndications(xParams),
+                            CommitmentTypeIndicationsHelper.getCommitmentTypeIndications(extraParams),
+                            Boolean.parseBoolean(extraParams.getProperty(CAdESExtraParams.INCLUDE_SIGNING_TIME_ATTRIBUTE, Boolean.FALSE.toString())),
                             CAdESSignerMetadataHelper.getCAdESSignerMetadata(extraParams)
                 		);
 

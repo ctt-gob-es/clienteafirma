@@ -69,6 +69,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOFormatFileException;
 import es.gob.afirma.core.AOInvalidFormatException;
@@ -80,7 +81,6 @@ import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.core.util.tree.AOTreeNode;
 import es.gob.afirma.signers.xml.Utils;
-
 
 /** Manejador de firmas electr&oacute;nicas XML de ficheros ODF en formato compatible
  * con OpenOffice.org 3.2 y superiores.
@@ -117,7 +117,7 @@ public final class AOODFSigner implements AOSigner {
     }
 
     static {
-        Utils.installXmlDSigProvider();
+        Utils.installXmlDSigProvider(false);
     }
 
     /** A&ntilde;ade una firma electr&oacute;nica a un documento ODF.
@@ -145,8 +145,8 @@ public final class AOODFSigner implements AOSigner {
 
         final Properties extraParams = xParams != null ? xParams : new Properties();
 
-        final String digestMethodAlgorithm = extraParams.getProperty("referencesDigestMethod", DIGEST_METHOD); //$NON-NLS-1$
-        final boolean useOpenOffice31Mode = "true".equalsIgnoreCase(extraParams.getProperty("useOpenOffice31Mode")); //$NON-NLS-1$ //$NON-NLS-2$
+        final String digestMethodAlgorithm = extraParams.getProperty(AOODFExtraParams.REFERENCES_DIGEST_METHOD, DIGEST_METHOD);
+        final boolean useOpenOffice31Mode = "true".equalsIgnoreCase(extraParams.getProperty(AOODFExtraParams.USE_OPEN_OFFICE_31_MODE)); //$NON-NLS-1$
 
         if (!isValidDataFile(data)) {
             throw new AOFormatFileException("Los datos introducidos no se corresponden con un documento ODF"); //$NON-NLS-1$
@@ -460,6 +460,9 @@ public final class AOODFSigner implements AOSigner {
             throw new AOFormatFileException("Estructura de archivo no valida: " + fullPath + ": " + saxex); //$NON-NLS-1$ //$NON-NLS-2$
         }
         catch (final Exception e) {
+        	if ("es.gob.jmulticard.ui.passwordcallback.CancelledOperationException".equals(e.getClass().getName())) { //$NON-NLS-1$
+        		throw new AOCancelledOperationException();
+        	}
             throw new AOException("No ha sido posible generar la firma ODF: " + e, e); //$NON-NLS-1$
         }
     }

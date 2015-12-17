@@ -41,24 +41,24 @@ public final class AOFacturaESigner implements AOSigner {
 
     private static final Set<String> ALLOWED_PARAMS = new HashSet<String>(5);
     static {
-        ALLOWED_PARAMS.add("signatureProductionCity"); //$NON-NLS-1$
-        ALLOWED_PARAMS.add("signatureProductionProvince"); //$NON-NLS-1$
-        ALLOWED_PARAMS.add("signatureProductionPostalCode"); //$NON-NLS-1$
-        ALLOWED_PARAMS.add("signatureProductionCountry"); //$NON-NLS-1$
-		ALLOWED_PARAMS.add("xadesNamespace"); //$NON-NLS-1$
-		ALLOWED_PARAMS.add("signedPropertiesTypeUrl"); //$NON-NLS-1$
+        ALLOWED_PARAMS.add(XAdESExtraParams.SIGNATURE_PRODUCTION_CITY); 
+        ALLOWED_PARAMS.add(XAdESExtraParams.SIGNATURE_PRODUCTION_PROVINCE); 
+        ALLOWED_PARAMS.add(XAdESExtraParams.SIGNATURE_PRODUCTION_POSTAL_CODE); 
+        ALLOWED_PARAMS.add(XAdESExtraParams.SIGNATURE_PRODUCTION_COUNTRY); 
+		ALLOWED_PARAMS.add(XAdESExtraParams.XADES_NAMESPACE); 
+		ALLOWED_PARAMS.add(XAdESExtraParams.SIGNED_PROPERTIES_TYPE_URL);
     }
 
     private static final Properties EXTRA_PARAMS = new Properties();
     static {
-        EXTRA_PARAMS.setProperty("format", AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED); //$NON-NLS-1$
-        EXTRA_PARAMS.setProperty("mode", AOSignConstants.SIGN_MODE_IMPLICIT); //$NON-NLS-1$
-        EXTRA_PARAMS.setProperty("policyIdentifier", "http://www.facturae.es/politica_de_firma_formato_facturae/politica_de_firma_formato_facturae_v3_1.pdf"); //$NON-NLS-1$ //$NON-NLS-2$
-        EXTRA_PARAMS.setProperty("policyIdentifierHash", "Ohixl6upD6av8N7pEvDABhEL6hM=");  //$NON-NLS-1$//$NON-NLS-2$
-        EXTRA_PARAMS.setProperty("policyIdentifierHashAlgorithm", DigestMethod.SHA1);         //$NON-NLS-1$
-        EXTRA_PARAMS.setProperty("policyDescription", "facturae31"); //$NON-NLS-1$ //$NON-NLS-2$
-        EXTRA_PARAMS.setProperty("signerClaimedRoles", "emisor"); //$NON-NLS-1$ //$NON-NLS-2$
-        EXTRA_PARAMS.setProperty("facturaeSign", "true"); //$NON-NLS-1$ //$NON-NLS-2$:P
+        EXTRA_PARAMS.setProperty(XAdESExtraParams.FORMAT, AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED);
+        EXTRA_PARAMS.setProperty(XAdESExtraParams.MODE, AOSignConstants.SIGN_MODE_IMPLICIT); 
+        EXTRA_PARAMS.setProperty(XAdESExtraParams.POLICY_IDENTIFIER, "http://www.facturae.es/politica_de_firma_formato_facturae/politica_de_firma_formato_facturae_v3_1.pdf"); //$NON-NLS-1$
+        EXTRA_PARAMS.setProperty(XAdESExtraParams.POLICY_IDENTIFIER_HASH, "Ohixl6upD6av8N7pEvDABhEL6hM=");  //$NON-NLS-1$
+        EXTRA_PARAMS.setProperty(XAdESExtraParams.POLICY_IDENTIFIER_HASH_ALGORITHM, DigestMethod.SHA1);         
+        EXTRA_PARAMS.setProperty(XAdESExtraParams.POLICY_DESCRIPTION, "facturae31"); //$NON-NLS-1$ 
+        EXTRA_PARAMS.setProperty(XAdESExtraParams.SIGNER_CLAIMED_ROLES, "emisor"); //$NON-NLS-1$
+        EXTRA_PARAMS.setProperty(XAdESExtraParams.FACTURAE_SIGN, "true"); //$NON-NLS-1$ 
     }
 
     /** Operaci&oacute;n no soportada. */

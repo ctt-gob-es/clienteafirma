@@ -78,9 +78,9 @@ public final class CustomDialog extends JAccessibilityCustomDialog implements Ac
 	private JPanel mainPanel = null;
 
 	/**
-	 * Campo de texto o campo de contrasena
+	 * Campo de texto o campo de contrase&ntilde;a.
 	 */
-	private JComponent component = null;
+	JComponent component = null;
 
 
 	/**
@@ -114,10 +114,8 @@ public final class CustomDialog extends JAccessibilityCustomDialog implements Ac
 		return this.restoreButton;
 	}
 
-	/**
-	 * Boton de maximizar.
-	 */
-	private JButton maximizeButton = null;
+	/** Bot&oacute;n de maximizar. */
+	JButton maximizeButton = null;
 
 	/**
 	 * Respuesta al mensaje

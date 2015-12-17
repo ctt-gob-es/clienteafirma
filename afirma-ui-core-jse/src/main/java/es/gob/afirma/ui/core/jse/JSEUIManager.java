@@ -165,13 +165,12 @@ public class JSEUIManager implements AOUIManager {
 
     	try {
     		final Class<?> csdClass = Class.forName(
-    				"es.gob.afirma.ui.core.jse.certificateselection.CertificateSelectionDialog" //$NON-NLS-1$
+				"es.gob.afirma.ui.core.jse.certificateselection.CertificateSelectionDialog" //$NON-NLS-1$
     		);
-    		final Constructor<?> csdConstructor =
-    				csdClass.getConstructor(
-    						Component.class,
-    						KeyStoreDialogManager.class
-    						);
+    		final Constructor<?> csdConstructor = csdClass.getConstructor(
+				Component.class,
+				KeyStoreDialogManager.class
+			);
     		final Object csd =  csdConstructor.newInstance(parent, ksdm);
     		final Method showDialogMethod = csdClass.getMethod("showDialog"); //$NON-NLS-1$
 
@@ -185,7 +184,7 @@ public class JSEUIManager implements AOUIManager {
     			throw (RuntimeException) e.getCause();
     		}
     		throw new IllegalStateException(
-				"Ocurrio un error durante al extraer el certificado seleccionado: " + e, e.getCause() //$NON-NLS-1$
+				"Ocurrio un error durante la extraccion del certificado seleccionado: " + e, e.getCause() //$NON-NLS-1$
 			);
     	}
     	catch (final Exception e) {
@@ -387,6 +386,11 @@ public class JSEUIManager implements AOUIManager {
         	};
         }
         else {
+        	if (icon != null) {
+        		LOGGER.warning(
+    				"Se ha proporcionado un icono del tipo " + icon.getClass().getName() + ", pero solo se admite Image" //$NON-NLS-1$ //$NON-NLS-2$
+				);
+        	}
         	jfc = new JFileChooser();
         }
         if (selectDirectory) {

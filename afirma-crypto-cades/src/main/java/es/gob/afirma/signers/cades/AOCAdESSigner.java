@@ -21,6 +21,7 @@ import java.util.Locale;
 import java.util.Properties;
 import java.util.logging.Logger;
 
+import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOInvalidFormatException;
 import es.gob.afirma.core.misc.MimeHelper;
@@ -46,10 +47,10 @@ import es.gob.afirma.signers.tsp.pkcs7.TsaParams;
  *
  *   // Establecemos los parametros adicionales
  *   final Properties extraParams = new Properties();
- *   extraParams.setProperty("mode", AOSignConstants.SIGN_MODE_IMPLICIT);
- *   extraParams.setProperty("policyIdentifier", "urn:oid:2.16.724.1.3.1.1.2.1.8");
- *   extraParams.setProperty("policyIdentifierHash", "V8lVVNGDCPen6VELRD1Ja8HARFk=");
- *   extraParams.setProperty("policyIdentifierHashAlgorithm", "urn:oid:1.3.14.3.2.26");
+ *   extraParams.setProperty(CAdESExtraParams.MODE, AOSignConstants.SIGN_MODE_IMPLICIT);
+ *   extraParams.setProperty(CAdESExtraParams.POLICY_IDENTIFIER, "urn:oid:2.16.724.1.3.1.1.2.1.8");
+ *   extraParams.setProperty(CAdESExtraParams.POLICY_IDENTIFIER_HASH, "V8lVVNGDCPen6VELRD1Ja8HARFk=");
+ *   extraParams.setProperty(CAdESExtraParams.POLIY_IDENTIFIER_HAS_HALGORITHM, "urn:oid:1.3.14.3.2.26");
  *
  *   // Usamos un PKCS#12 / PFX para obtener el certificado y su clave privada
  *   final InputStream fis = new FileInputStream("cert.pfx");
@@ -90,8 +91,10 @@ public final class AOCAdESSigner implements AOSigner {
                        final Certificate[] certChain,
                        final Properties xParams) throws AOException {
 
+
     	if (certChain == null || certChain.length < 1) {
-    		throw new IllegalArgumentException("La cadena de certificados debe contener al menos un elemento"); //$NON-NLS-1$
+
+    	    throw new IllegalArgumentException("La cadena de certificados debe contener al menos un elemento"); //$NON-NLS-1$
     	}
 
     	checkAlgorithm(algorithm);
@@ -104,24 +107,24 @@ public final class AOCAdESSigner implements AOSigner {
         final Properties extraParams = xParams != null ? xParams : new Properties();
 
         // Algoritmo usado cuando se proporciona la huella digital precalculada
-        final String precalculatedDigestAlgorithmName = extraParams.getProperty("precalculatedHashAlgorithm"); //$NON-NLS-1$
+        final String precalculatedDigestAlgorithmName = extraParams.getProperty(CAdESExtraParams.PRECALCULATED_HASH_ALGORITHM);
 
         // Forzado del SigningCertificateV2
         final boolean signingCertificateV2;
         if (AOSignConstants.isSHA2SignatureAlgorithm(algorithm)) {
         	signingCertificateV2 = true;
         }
-        else if (extraParams.containsKey("signingCertificateV2")) { //$NON-NLS-1$
-       		signingCertificateV2 = Boolean.parseBoolean(extraParams.getProperty("signingCertificateV2")); //$NON-NLS-1$
+        else if (extraParams.containsKey(CAdESExtraParams.SIGNING_CERTIFICATE_V2)) {
+       		signingCertificateV2 = Boolean.parseBoolean(extraParams.getProperty(CAdESExtraParams.SIGNING_CERTIFICATE_V2));
         }
         else {
         	signingCertificateV2 = !"SHA1".equals(AOSignConstants.getDigestAlgorithmName(algorithm));	 //$NON-NLS-1$
         }
 
-        final String mode = extraParams.getProperty("mode", AOSignConstants.DEFAULT_SIGN_MODE); //$NON-NLS-1$
+        final String mode = extraParams.getProperty(CAdESExtraParams.MODE, AOSignConstants.DEFAULT_SIGN_MODE);
 
-        final String contentTypeOid = extraParams.getProperty("contentTypeOid"); //$NON-NLS-1$
-        final String contentDescription = extraParams.getProperty("contentDescription"); //$NON-NLS-1$
+        final String contentTypeOid = extraParams.getProperty(CAdESExtraParams.CONTENT_TYPE_OID);
+        final String contentDescription = extraParams.getProperty(CAdESExtraParams.CONTENT_DESCRIPTION);
 
     	//*************** FIN LECTURA PARAMETROS ADICIONALES *************************************************
     	//****************************************************************************************************
@@ -176,10 +179,11 @@ public final class AOCAdESSigner implements AOSigner {
                    AdESPolicy.buildAdESPolicy(extraParams),
                    signingCertificateV2,
                    key,
-                   Boolean.parseBoolean(extraParams.getProperty("includeOnlySignningCertificate", Boolean.FALSE.toString())) ? new X509Certificate[] { (X509Certificate) certChain[0] } : certChain, //$NON-NLS-1$
+                   Boolean.parseBoolean(extraParams.getProperty(CAdESExtraParams.INCLUDE_ONLY_SIGNNING_CERTIFICATE, Boolean.FALSE.toString())) ? new X509Certificate[] { (X509Certificate) certChain[0] } : certChain,
                    dataDigest,
                    digestAlgorithmName,
-                   Boolean.parseBoolean(extraParams.getProperty("padesMode", "false")), //$NON-NLS-1$ //$NON-NLS-2$
+                   Boolean.parseBoolean(extraParams.getProperty(CAdESExtraParams.INCLUDE_SIGNING_TIME_ATTRIBUTE, "false")), //$NON-NLS-1$
+                   Boolean.parseBoolean(extraParams.getProperty(CAdESExtraParams.PADES_MODE, "false")), //$NON-NLS-1$
                    contentTypeOid != null ? contentTypeOid : altContentTypeOid,
                    contentDescription != null ? contentDescription : altContentDescription,
                    CommitmentTypeIndicationsHelper.getCommitmentTypeIndications(extraParams),
@@ -187,6 +191,9 @@ public final class AOCAdESSigner implements AOSigner {
             );
         }
         catch (final Exception e) {
+        	if ("es.gob.jmulticard.ui.passwordcallback.CancelledOperationException".equals(e.getClass().getName())) { //$NON-NLS-1$
+        		throw new AOCancelledOperationException();
+        	}
             throw new AOException("Error generando la firma CAdES: " + e, e); //$NON-NLS-1$
         }
 

@@ -41,10 +41,10 @@ public final class ContextOptionsPane {
 
     /** Clave para el formato b&aacute;sico de firma PAdES. */
     public static final String KEY_PADES_FORMAT = "context.pades.format"; //$NON-NLS-1$
-    
+
     private static final String PADES_FORMAT_BASIC_TEXT = Messages.getString("Opciones.firmas.pades.basic"); //$NON-NLS-1$
 	private static final String PADES_FORMAT_BES_TEXT = Messages.getString("Opciones.firmas.pades.bes"); //$NON-NLS-1$
-	
+
     /** Informaci&oacute;n de contacto para la firma. */
     private final JTextField campoDatos;
 
@@ -55,8 +55,8 @@ public final class ContextOptionsPane {
     private final JTextField campoMotivo;
 
     /** Formato b&aacute;sico para las firmas PAdES. */
-    private final JComboBox campoFormato;
-    
+    private final JComboBox<ValueTextPair> campoFormato;
+
     /** Panel sobre el que se montan los componentes. */
     private final JPanel panel;
 
@@ -174,13 +174,13 @@ public final class ContextOptionsPane {
         // Asignacion de mnemonico
         etiquetaDatos.setDisplayedMnemonic(KeyEvent.VK_D);
 
-        
-        
-        
-        
-        
-        
-        
+
+
+
+
+
+
+
         c2.insets = new Insets(13, 13, 0, 13);
         c2.gridy++;
 
@@ -195,15 +195,18 @@ public final class ContextOptionsPane {
         c2.gridy++;
 
         // Combo para la seleccion del formato de PAdES
-        this.campoFormato = new JComboBox();
+        this.campoFormato = new JComboBox<>();
         this.campoFormato.getAccessibleContext().setAccessibleName(etiquetaDatos.getText() + " ALT + F."); // NOI18N //$NON-NLS-1$
         this.campoFormato.getAccessibleContext().setAccessibleDescription(Messages.getString("Opciones.firmas.formatoPades")); // NOI18N //$NON-NLS-1$
         this.campoFormato.setModel(
-        		new DefaultComboBoxModel(new ValueTextPair[] {
-        				new ValueTextPair(AOSignConstants.PADES_SUBFILTER_BASIC, PADES_FORMAT_BASIC_TEXT),
-        				new ValueTextPair(AOSignConstants.PADES_SUBFILTER_BES, PADES_FORMAT_BES_TEXT)
-        		}));
-		
+    		new DefaultComboBoxModel<>(
+				new ValueTextPair[] {
+    				new ValueTextPair(AOSignConstants.PADES_SUBFILTER_BASIC, PADES_FORMAT_BASIC_TEXT),
+    				new ValueTextPair(AOSignConstants.PADES_SUBFILTER_BES, PADES_FORMAT_BES_TEXT)
+				}
+			)
+		);
+
         Utils.remarcar(this.campoFormato);
         Utils.setContrastColor(this.campoFormato);
         Utils.setFontBold(this.campoFormato);
@@ -214,16 +217,16 @@ public final class ContextOptionsPane {
         // Asignacion de mnemonico
         etiquetaPadesFormat.setDisplayedMnemonic(KeyEvent.VK_F);
 
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
+
+
+
+
+
+
+
+
+
+
         this.panel.add(contextPanel, c);
 
         c.gridy++;
@@ -295,7 +298,7 @@ public final class ContextOptionsPane {
             config.setProperty("signerContact", this.campoDatos.getText().trim()); //$NON-NLS-1$
         }
         config.setProperty("signatureSubFilter", ((ValueTextPair) this.campoFormato.getSelectedItem()).getValue()); //$NON-NLS-1$
-        
+
         return config;
     }
 
@@ -305,9 +308,9 @@ public final class ContextOptionsPane {
         this.campoMotivo.setText(config.getProperty(ContextOptionsPane.KEY_SUBJECT));
         this.campoLugar.setText(config.getProperty(ContextOptionsPane.KEY_PRODUCTION_PLACE));
         this.campoDatos.setText(config.getProperty(ContextOptionsPane.KEY_CONTACT_INFO));
-        
+
         final String selectedValue = config.getProperty(ContextOptionsPane.KEY_PADES_FORMAT);
-        final ComboBoxModel padesFormatModel = this.campoFormato.getModel();
+        final ComboBoxModel<ValueTextPair> padesFormatModel = this.campoFormato.getModel();
 		for (int i = 0; i < padesFormatModel.getSize(); i++) {
 			if (padesFormatModel.getElementAt(i).equals(selectedValue)) {
 				this.campoFormato.setSelectedIndex(i);
@@ -337,31 +340,27 @@ public final class ContextOptionsPane {
         Opciones.setUpdate(true);
         restore(this.panel);
     }
-    
+
     /**
 	 * Par de cadenas para su uso en ComboBox. Una cadena es el valor del elemento seleccionado y
 	 * la otra el texto que se debe mostrar.
 	 */
 	private class ValueTextPair {
-		
+
 		private final String value;
 		private final String text;
-		
-		public ValueTextPair(String value, String text) {
+
+		ValueTextPair(final String value, final String text) {
 			this.value = value;
 			this.text = text;
 		}
-		
-		public String getValue() {
+
+		String getValue() {
 			return this.value;
 		}
-		
-		public String getText() {
-			return this.text;
-		}
-		
+
 		@Override
-		public boolean equals(Object obj) {
+		public boolean equals(final Object obj) {
 			if (obj == null) {
 				return false;
 			}
@@ -370,7 +369,7 @@ public final class ContextOptionsPane {
 			}
 			return this.value.equals(obj.toString());
 		}
-		
+
 		@Override
 		public String toString() {
 			return this.text;

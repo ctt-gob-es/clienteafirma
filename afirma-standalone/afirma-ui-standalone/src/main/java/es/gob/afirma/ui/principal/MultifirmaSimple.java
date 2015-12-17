@@ -53,14 +53,14 @@ final class MultifirmaSimple extends JPanel {
 
     /** Carga el combo almacen con los almacenes y repositorios disponibles
      * @param comboAlmacen Combo con los almacenes y repositorios */
-    private static void cargarComboAlmacen(final JComboBox comboAlmacen) {
-        comboAlmacen.setModel(new DefaultComboBoxModel(KeyStoreLoader.getKeyStoresToSign()));
+    private static void cargarComboAlmacen(final JComboBox<KeyStoreConfiguration> comboAlmacen) {
+        comboAlmacen.setModel(new DefaultComboBoxModel<>(KeyStoreLoader.getKeyStoresToSign()));
     }
 
     /** Se realiza la multifirma
      * @param comboAlmacen Combo con el almacen / repositorio de certificados
      * @param cofirma Radiobutton cofirma. No es necesario pasar el de contrafirma ya que solo existen dos */
-    void firmarActionPerformed(final JComboBox comboAlmacen, final JRadioButton cofirma) {
+    void firmarActionPerformed(final JComboBox<KeyStoreConfiguration> comboAlmacen, final JRadioButton cofirma) {
         // Mensaje que indica que se va a realizar el proceso de firma y que puede llevar un tiempo
         CustomDialog.showMessageDialog(SwingUtilities.getRoot(this),
                                        true,
@@ -99,7 +99,7 @@ final class MultifirmaSimple extends JPanel {
         c.fill = GridBagConstraints.BOTH;
 
         // Combo con los almacenes / repositorios disponibles
-        final JComboBox comboAlmacen = new JComboBox();
+        final JComboBox<KeyStoreConfiguration> comboAlmacen = new JComboBox<>();
         comboAlmacen.setToolTipText(Messages.getString("Firma.almacen.certificados.description")); // NOI18N //$NON-NLS-1$
         // comboAlmacen.getAccessibleContext().setAccessibleName(etiquetaAlmacen.getText()+" "+Messages.getString("Firma.almacen.certificados.description")+" ALT + A.");
         // // NOI18N

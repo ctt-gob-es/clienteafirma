@@ -4,7 +4,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -12,7 +14,11 @@ import java.util.UUID;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
+import javax.xml.crypto.XMLStructure;
 import javax.xml.crypto.dsig.DigestMethod;
+import javax.xml.crypto.dsig.Reference;
+import javax.xml.crypto.dsig.Transform;
+import javax.xml.crypto.dsig.XMLSignatureFactory;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
@@ -116,7 +122,7 @@ final class XAdESUtil {
 		if (xParams == null) {
 			return ret;
 		}
-		String tmpStr = xParams.getProperty("commitmentTypeIndications"); //$NON-NLS-1$
+		String tmpStr = xParams.getProperty(XAdESExtraParams.COMMITMENT_TYPE_INDICATIONS);
 		if (tmpStr == null) {
 			return ret;
 		}
@@ -224,9 +230,9 @@ final class XAdESUtil {
 	static Element getRootElement(final Document docSignature, final Properties extraParams) {
 
 		final Properties xParams = extraParams != null ? extraParams : new Properties();
-		final String nodeName            = xParams.getProperty("RootXmlNodeName" , AOXAdESSigner.AFIRMA); //$NON-NLS-1$
-		final String nodeNamespace       = xParams.getProperty("RootXmlNodeNamespace"); //$NON-NLS-1$
-		final String nodeNamespacePrefix = xParams.getProperty("RootXmlNodeNamespacePrefix"); //$NON-NLS-1$
+		final String nodeName            = xParams.getProperty(XAdESExtraParams.ROOT_XML_NODE_NAME , AOXAdESSigner.AFIRMA);
+		final String nodeNamespace       = xParams.getProperty(XAdESExtraParams.ROOT_XML_NODE_NAMESPACE);
+		final String nodeNamespacePrefix = xParams.getProperty(XAdESExtraParams.ROOT_XML_NODE_NAMESPACE_PREFIX);
 
 		final Element afirmaRoot;
 		if (nodeNamespace == null) {
@@ -244,6 +250,52 @@ final class XAdESUtil {
 		afirmaRoot.setAttributeNS(null, XAdESSigner.ID_IDENTIFIER, nodeName + "-Root-" + UUID.randomUUID().toString());  //$NON-NLS-1$
 
 		return afirmaRoot;
+	}
+
+	static List<Reference> createManifest(final List<Reference> referenceList,
+			                              final XMLSignatureFactory fac,
+			                              final AOXMLAdvancedSignature xmlSignature,
+			                              final DigestMethod digestMethod,
+			                              final Transform canonicalizationTransform,
+			                              final String referenceId) {
+
+		// Con Manifest vamos a incluir las referencias de "referencesList" en el Manifest y luego
+		// limpiar este mismo "referencesList" incluyendo posteriormente unica referencia al propio
+		// Manifest. Como es este "referencesList" lo que se firma, queda ya listo con el Manifest
+		// que contiene las referencias que de no usar Manifest estarian en "referencesList".
+
+		// Creamos un nodo padre donde insertar el Manifest
+		final List<XMLStructure> objectContent = new LinkedList<XMLStructure>();
+
+		final String manifestId = "Manifest-" + UUID.randomUUID().toString(); //$NON-NLS-1$
+		objectContent.add(
+			fac.newManifest(
+				new ArrayList<Reference>(referenceList),
+				manifestId
+			)
+		);
+
+		final String manifestObjectId = "ManifestObject-" + UUID.nameUUIDFromBytes(referenceId.getBytes()).toString(); //$NON-NLS-1$
+		xmlSignature.addXMLObject(
+			fac.newXMLObject(
+				objectContent, manifestObjectId, null, null
+			)
+		);
+
+		// Si usamos un manifest las referencias no van en la firma, sino en el Manifest, y se
+		// usa entonces en la firma una unica referencia a este Manifest
+		referenceList.clear();
+		referenceList.add(
+			fac.newReference(
+				"#" + manifestId, //$NON-NLS-1$
+				digestMethod,
+				Collections.singletonList(canonicalizationTransform),
+				AOXAdESSigner.MANIFESTURI,
+				referenceId
+			)
+		);
+
+		return referenceList;
 	}
 
 }

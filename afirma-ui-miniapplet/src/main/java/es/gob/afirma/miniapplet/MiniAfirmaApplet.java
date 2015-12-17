@@ -193,7 +193,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 
 		try {
 			String signatureFormat = MiniAfirmaApplet.cleanParam(format);
-			final AOSigner signer = MiniAfirmaApplet.selectSigner(signatureFormat, null);
+			final AOSigner signer = MiniAfirmaApplet.selectSigner(signatureFormat, dataBinary, null);
 			if (SIGNATURE_FORMAT_AUTO.equalsIgnoreCase(signatureFormat)) {
 				signatureFormat = ExtraParamsProcessor.getSignFormat(signer);
 				ExtraParamsProcessor.configAutoFormat(signer, dataBinary, params);
@@ -210,12 +210,16 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 
 			// XXX: Codigo de soporte de firmas XAdES explicitas (Eliminar cuando se abandone el soporte de XAdES explicitas)
 			if (isXadesExplicitConfigurated(signatureFormat, params)) {
+				LOGGER.warning(
+					"Se ha pedido una firma XAdES explicita, este formato dejara de soportarse en proximas versiones" //$NON-NLS-1$
+				);
 				try {
 					dataBinary = MessageDigest.getInstance("SHA1").digest(dataBinary); //$NON-NLS-1$
 					params.setProperty("mimeType", "hash/sha1"); //$NON-NLS-1$ //$NON-NLS-2$
-				} catch (final Exception e) {
+				}
+				catch (final Exception e) {
 					LOGGER.warning("Error al generar la huella digital de los datos para firmar como 'XAdES explicit', " //$NON-NLS-1$
-							+ "se realizara una firma XAdES corriente: " + e); //$NON-NLS-1$
+						+ "se realizara una firma XAdES corriente: " + e); //$NON-NLS-1$
 				}
 			}
 
@@ -349,7 +353,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 
 		try {
 			String signatureFormat = format;
-			final AOSigner signer = MiniAfirmaApplet.selectSigner(MiniAfirmaApplet.cleanParam(signatureFormat), signature);
+			final AOSigner signer = MiniAfirmaApplet.selectSigner(MiniAfirmaApplet.cleanParam(signatureFormat), null, signature);
 			if (SIGNATURE_FORMAT_AUTO.equalsIgnoreCase(signatureFormat)) {
 				signatureFormat = ExtraParamsProcessor.getSignFormat(signer);
 				ExtraParamsProcessor.configAutoFormat(signer, signature, params);
@@ -464,7 +468,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 
 		try {
 			String signatureFormat = format;
-			final AOSigner signer = MiniAfirmaApplet.selectSigner(MiniAfirmaApplet.cleanParam(signatureFormat), signature);
+			final AOSigner signer = MiniAfirmaApplet.selectSigner(MiniAfirmaApplet.cleanParam(signatureFormat), null, signature);
 			if (SIGNATURE_FORMAT_AUTO.equalsIgnoreCase(signatureFormat)) {
 				signatureFormat = ExtraParamsProcessor.getSignFormat(signer);
 				ExtraParamsProcessor.configAutoFormat(signer, signature, params);
@@ -924,25 +928,36 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 		return keyEntry;
 	}
 
-	/** Devuelve un manejador de firma compatible con un formato de firma o, de no establecerse, con
-	 * una firma electr&oacute;nica concreta.
+	/**
+	 * Devuelve un manejador de firma compatible con un formato de firma o, de no establecerse, con una firma electr&oacute;nica concreta.
 	 * @param format Formato de firma.
+	 * @param data Datos a firmar
 	 * @param sign Firma electr&oacute;nica.
 	 * @return Manejador de firma.
-	 * @throws AOFormatFileException Cuando el formato o la firma no estan soportados.
-	 * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
-	 * @throws IOException Cuando se produce un error durante la lectura de los datos.
-	 * @throws NullPointerException Cuando no se indica ni formato ni firma como par&aacute;nmetro.
+	 * @throws AOFormatFileException Cuando el formato o la firma no estan soportados
+	 * @throws PrivilegedActionException Cuando se produce un error durante la lectura de los datos.
+	 * @throws IOException Cuando no se indica ni formato ni firma como par&aacute;nmetro.
 	 */
 	private static AOSigner selectSigner(final String format,
+			 							 final byte[] data,
 			                             final byte[] sign) throws AOFormatFileException,
 			                                                       PrivilegedActionException, IOException {
+
+		if (format == null) {
+			throw new IllegalArgumentException(
+				"No se ha indicado el formato para la operacion de firma" //$NON-NLS-1$
+			);
+		}
+
 		final AOSigner signer;
-		if (format != null && !SIGNATURE_FORMAT_AUTO.equalsIgnoreCase(format)) {
+		if (!SIGNATURE_FORMAT_AUTO.equalsIgnoreCase(format)) {
 			signer = MiniAfirmaApplet.getSigner(format);
 			if (signer == null) {
 				throw new AOFormatFileException("No esta soportado el formato de firma: " + format); //$NON-NLS-1$
 			}
+		}
+		else if (data != null) {
+			signer = MiniAfirmaApplet.getSigner(format, data);
 		}
 		else if (sign != null) {
 			signer = MiniAfirmaApplet.getSigner(sign);
@@ -953,12 +968,11 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 			}
 		}
 		else {
-			// Si llegamos aqui es por no haberse indicado el formato de firma y que no disponemos de
-			// una firma del que tomarlo (por lo que no puede ser una multifirma)
 			throw new IllegalArgumentException(
-				"No se ha indicado el formato para la operacion de firma" //$NON-NLS-1$
-			);
+					"No se han introducido datos para la seleccion del signer" //$NON-NLS-1$
+					);
 		}
+
 		return signer;
 	}
 
@@ -970,6 +984,17 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 	 */
 	private static AOSigner getSigner(final String format) throws PrivilegedActionException {
 		return AccessController.doPrivileged(new SelectSignerAction(format));
+	}
+
+	/** Recupera un manejador de firma compatible con el formato indicado. Si este es {@code AUTO}, se
+	 * calcular&aacute; en base a los datos proporcionados. Si no se encuentra uno compatible, se
+	 * devuelve {@code null}.
+	 * @param format Nombre de un formato de firma.
+	 * @return Manejador de firma.
+	 * @throws PrivilegedActionException Cuando ocurre un problema de seguridad.
+	 */
+	private static AOSigner getSigner(final String format, final byte[] data) throws PrivilegedActionException {
+		return AccessController.doPrivileged(new SelectSignerAction(format, data));
 	}
 
 	/** Recupera un manejador de firma compatible con la firma indicada. Si no se encuentra uno

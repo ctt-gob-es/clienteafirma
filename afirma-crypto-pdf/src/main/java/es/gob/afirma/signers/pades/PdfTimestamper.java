@@ -7,6 +7,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Properties;
+import java.util.logging.Logger;
 
 import com.lowagie.text.DocumentException;
 import com.lowagie.text.exceptions.BadPasswordException;
@@ -32,6 +33,13 @@ public final class PdfTimestamper {
 
 	private static final int CSIZE = 27000;
 
+    private static final int UNDEFINED = -1;
+
+    private static final Logger LOGGER = Logger.getLogger("es.gob.afirma");  //$NON-NLS-1$
+
+    private static final int PDF_MAX_VERSION = 7;
+    private static final int PDF_MIN_VERSION = 2;
+
 	private PdfTimestamper() {
 		// No instanciable
 	}
@@ -49,8 +57,8 @@ public final class PdfTimestamper {
 			                   final Calendar signTime) throws AOException, IOException, NoSuchAlgorithmException {
     	// Comprobamos si se ha pedido un sello de tiempo
     	if (extraParams != null) {
-    		final String tsa = extraParams.getProperty("tsaURL"); //$NON-NLS-1$
-    		final String tsType = extraParams.getProperty("tsType"); //$NON-NLS-1$
+    		final String tsa = extraParams.getProperty(PdfExtraParams.TSA_URL);
+    		final String tsType = extraParams.getProperty(PdfExtraParams.TS_TYPE);
 
     		// Solo hacemos este tipo de sello en esta situacion:
     		// Han establecido URL de TSA y nos piden sello de tipo 2 (a nivel de documento) o de tipo 3
@@ -65,11 +73,27 @@ public final class PdfTimestamper {
                 final PdfReader pdfReader = PdfUtil.getPdfReader(
             		inPDF,
             		extraParams,
-            		Boolean.parseBoolean(extraParams.getProperty("headless")) //$NON-NLS-1$
+            		Boolean.parseBoolean(extraParams.getProperty(PdfExtraParams.HEADLESS))
         		);
 
             	// Comprobamos el nivel de certificacion del PDF
                 PdfUtil.checkPdfCertification(pdfReader.getCertificationLevel(), extraParams);
+
+        		// Establecimiento de version PDF
+        		int pdfVersion;
+        		try {
+        			pdfVersion = extraParams.getProperty(PdfExtraParams.PDF_VERSION) != null ?
+        				Integer.parseInt(extraParams.getProperty(PdfExtraParams.PDF_VERSION)) :
+        					PDF_MAX_VERSION;
+        		}
+        		catch(final Exception e) {
+        			LOGGER.warning("Error en el establecimiento de la version PDF, se usara " + PDF_MAX_VERSION + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$
+        			pdfVersion = PDF_MAX_VERSION;
+        		}
+        		if (pdfVersion != UNDEFINED && (pdfVersion < PDF_MIN_VERSION || pdfVersion > PDF_MAX_VERSION)) {
+        			LOGGER.warning("Se ha establecido un valor invalido para version, se ignorara: " + pdfVersion); //$NON-NLS-1$
+        			pdfVersion = UNDEFINED;
+        		}
 
                 final ByteArrayOutputStream baos = new ByteArrayOutputStream();
         		final PdfStamper stp;
@@ -77,7 +101,7 @@ public final class PdfTimestamper {
         			stp = PdfStamper.createSignature(
         				pdfReader, // PDF de entrada
         				baos,      // Salida
-        				'\0',      // Mantener version
+        				pdfVersion == UNDEFINED ? '\0' /* Mantener version */ : Integer.toString(pdfVersion).toCharArray()[0] /* Version a medida */,
         				null,      // No crear temporal
         				PdfUtil.getAppendMode(extraParams, pdfReader), // Append Mode
         				signTime   // Momento de la firma
@@ -92,6 +116,12 @@ public final class PdfTimestamper {
 
         		// Aplicamos todos los atributos de firma
         		final PdfSignatureAppearance sap = stp.getSignatureAppearance();
+
+        		// La compresion solo para versiones superiores a la 4
+        		// Hacemos la comprobacion a "false", porque es el valor que deshabilita esta opcion
+        		if (pdfVersion > PDF_MIN_VERSION && !"false".equalsIgnoreCase(extraParams.getProperty(PdfExtraParams.COMPRESS_PDF))) { //$NON-NLS-1$
+        			stp.setFullCompression();
+        		}
         		stp.setFullCompression();
 
         		PdfUtil.enableLtv(stp);

@@ -11,12 +11,18 @@
 package es.gob.afirma.standalone;
 
 import java.awt.Container;
+import java.awt.Dialog.ModalityType;
+import java.awt.Frame;
+import java.awt.GraphicsEnvironment;
+import java.awt.Point;
+import java.awt.Window;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.File;
 import java.util.Locale;
 
 import javax.swing.JApplet;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
@@ -25,18 +31,17 @@ import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.standalone.ui.MainScreen;
 import es.gob.afirma.standalone.ui.VisorPanel;
 
-/**
- * Ventana para la visualizaci&oacute;n de datos de firma.
- * @author Carlos Gamuci
- */
+/** Ventana para la visualizaci&oacute;n de datos de firma.
+ * @author Carlos Gamuci. */
 public class VisorFirma extends JApplet implements WindowListener {
 
     /** Serial ID */
     private static final long serialVersionUID = 7060676034863587322L;
 
-    private JFrame window;
+    private Window window;
     private Container container = null;
     private JPanel currentPanel;
+    private final Frame parentComponent;
 
     private final boolean standalone;
 
@@ -45,14 +50,17 @@ public class VisorFirma extends JApplet implements WindowListener {
 
     /** Crea la pantalla para la visualizaci&oacute;n de la informaci&oacute;n de la firma indicada.
      * @param standalone <code>true</code> si el visor se ha arrancado como aplicaci&oacute;n independiente,
-     *                   <code>false</code> si se ha arrancado desde otra aplicaci&oacute;n Java. */
-    public VisorFirma(final boolean standalone) {
+     *                   <code>false</code> si se ha arrancado desde otra aplicaci&oacute;n Java.
+     * @param parent Componente padre. Si no es nulo, se crea el visor como un di&aacute;logo modal respecto
+     *               a &eacute;l. */
+    public VisorFirma(final boolean standalone, final Frame parent) {
         this.standalone = standalone;
         LookAndFeelManager.applyLookAndFeel();
+        this.parentComponent = parent;
     }
 
     /** Reinicia la pantalla con los datos de una nueva firma.
-     * @param asApplet Indica que si se desea cargar la pantalla en forma de applet.
+     * @param asApplet Indica que si se desea cargar la pantalla en forma de Applet.
      * @param sigFile Nuevo fichero de firma. */
     public void initialize(final boolean asApplet, final File sigFile) {
 
@@ -61,25 +69,56 @@ public class VisorFirma extends JApplet implements WindowListener {
         }
 
         // Cargamos las preferencias establecidas
-        setDefaultLocale(buildLocale(PreferencesManager.get(SimpleAfirma.PREFERENCES_LOCALE, Locale.getDefault().toString())));
+        setDefaultLocale(
+    		buildLocale(
+				PreferencesManager.get(
+					SimpleAfirma.PREFERENCES_LOCALE,
+					Locale.getDefault().toString()
+				)
+			)
+		);
 
         if (asApplet) {
             this.container = this;
         }
         else {
-            this.currentPanel = new VisorPanel(this.signFile, null, this, this.standalone);
+            this.currentPanel = new VisorPanel(
+        		this.signFile,
+        		null,
+        		this,
+        		this.standalone
+    		);
 
-           	final MainScreen mainScreen = new MainScreen();
-           	mainScreen.showMainScreen(this, this.currentPanel, 780, 500);
-            this.container = mainScreen;
+            if (this.parentComponent == null) {
+	           	final MainScreen mainScreen = new MainScreen();
+	           	mainScreen.showMainScreen(this, this.currentPanel, 780, 500);
+	            this.container = mainScreen;
+            }
+            else {
+            	final JDialog dialog = new JDialog(this.parentComponent);
+            	dialog.setModalityType(ModalityType.APPLICATION_MODAL);
+            	dialog.setSize(780, 500);
+            	dialog.setResizable(false);
+            	final Point cp = GraphicsEnvironment.getLocalGraphicsEnvironment().getCenterPoint();
+        		dialog.setLocation(cp.x - 780/2, cp.y - 500/2);
+        		dialog.add(this.currentPanel);
+            	this.container = dialog;
+            }
 
             if (this.window != null) {
                 this.window.dispose();
             }
 
-            this.window = (JFrame) this.container;
-            this.window.getRootPane().putClientProperty("Window.documentFile", this.signFile); //$NON-NLS-1$
-            this.window.setTitle(SimpleAfirmaMessages.getString("VisorFirma.0") + (this.signFile != null ? " - " + this.signFile.getAbsolutePath() : ""));  //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            this.window = (Window) this.container;
+            if (this.window instanceof JFrame) {
+            	((JFrame)this.window).getRootPane().putClientProperty("Window.documentFile", this.signFile); //$NON-NLS-1$
+            	((JFrame)this.window).setTitle(SimpleAfirmaMessages.getString("VisorFirma.0") + (this.signFile != null ? " - " + this.signFile.getAbsolutePath() : ""));  //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            }
+            else if (this.window instanceof JDialog) {
+            	((JDialog)this.window).getRootPane().putClientProperty("Window.documentFile", this.signFile); //$NON-NLS-1$
+            	((JDialog)this.window).setTitle(SimpleAfirmaMessages.getString("VisorFirma.0") + (this.signFile != null ? " - " + this.signFile.getAbsolutePath() : ""));  //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            	this.window.setVisible(true);
+            }
         }
     }
 
@@ -96,20 +135,8 @@ public class VisorFirma extends JApplet implements WindowListener {
         }
     }
 
-//    /** Listado de localizaciones soportadas por la aplicaci&oacute;n. */
-//    private static final Locale[] locales = new Locale[] {
-//        Locale.getDefault(), new Locale("en") //$NON-NLS-1$
-//    };
-
-//    /** Obtiene los idiomas disponibles para la aplicaci&oacute;n
-//     * @return Locales disponibles para la aplicaci&oacute;n */
-//    public static Locale[] getAvailableLocales() {
-//        return locales;
-//    }
-
     /** Establece el idioma de la aplicaci&oacute;n.
-     * @param l
-     *        Locale a establecer */
+     * @param l <code>Locale</code> a establecer. */
     public static void setDefaultLocale(final Locale l) {
         if (l != null) {
             Locale.setDefault(l);
@@ -117,16 +144,6 @@ public class VisorFirma extends JApplet implements WindowListener {
             SimpleAfirmaMessages.changeLocale();
         }
     }
-
-//    /** Recupera una de las preferencias establecidas para la aplicaci&oacute;n.
-//     * @param key
-//     *        Clave de la preferencia.
-//     * @param defaultValue
-//     *        Valor por defecto.
-//     * @return Devuelve el valor de la preferencia indicada o {@code defaultValue} si no est&aacute;a establecida. */
-//    public String getPreference(final String key, final String defaultValue) {
-//        return this.preferences.get(key, defaultValue);
-//    }
 
     @Override
     public void windowClosing(final WindowEvent e) {
@@ -141,9 +158,8 @@ public class VisorFirma extends JApplet implements WindowListener {
     @Override public void windowDeactivated(final WindowEvent e) { /* No implementado */ }
 
     /** Cierra la aplicaci&oacute;n.
-     * @param exitCode
-     *        C&oacute;digo de cierre de la aplicaci&oacute;n (negativo
-     *        indica error y cero indica salida normal */
+     * @param exitCode C&oacute;digo de cierre de la aplicaci&oacute;n (negativo
+     *                 indica error y cero indica salida normal. */
     public void closeApplication(final int exitCode) {
         if (this.window != null) {
             this.window.dispose();

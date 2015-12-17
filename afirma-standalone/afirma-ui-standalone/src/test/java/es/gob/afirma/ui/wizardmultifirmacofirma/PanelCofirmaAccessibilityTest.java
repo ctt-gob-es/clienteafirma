@@ -44,7 +44,7 @@ public class PanelCofirmaAccessibilityTest {
 			//Instancia del panel que se va a analizar
 			final PanelCofirma panelCofirma = new PanelCofirma( null);
 			//Lista de componentes asociados
-			final List <Component> componentList = new ArrayList<Component>();
+			final List <Component> componentList = new ArrayList<>();
 			//Conjunto de componentes asociados
 			Set <Component> componentSet = null;
 
@@ -81,7 +81,7 @@ public class PanelCofirmaAccessibilityTest {
 			}
 
 			//Se crea un conjunto a partir de la lista para eliminar duplicados
-			componentSet = new HashSet<Component>(componentList);
+			componentSet = new HashSet<>(componentList);
 			//Si el tamano de la lista y del conjunto no son iguales, no hay duplicados
 			assertTrue(componentSet.size() == componentList.size());
 		}
@@ -104,7 +104,7 @@ public class PanelCofirmaAccessibilityTest {
 			final PanelCofirma panelCofirma = new PanelCofirma( null);
 
 			//Lista de mnemonicos
-			final List <Integer> keyCodes = new ArrayList<Integer>();
+			final List <Integer> keyCodes = new ArrayList<>();
 			//Conjunto de mnemonicos
 			Set <Integer> keyCodesSet = null;
 
@@ -140,7 +140,7 @@ public class PanelCofirmaAccessibilityTest {
 			}
 
 			//Se crea un conjunto a partir de la lista para eliminar duplicados
-			keyCodesSet = new HashSet<Integer>(keyCodes);
+			keyCodesSet = new HashSet<>(keyCodes);
 			//Si el tamano de la lista y del conjunto no son iguales, no hay duplicados
 			assertTrue(keyCodesSet.size() == keyCodes.size());
 		}

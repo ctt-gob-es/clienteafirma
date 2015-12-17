@@ -32,7 +32,7 @@ final class UtilActions {
 		}
 		HELP_URI = p.getProperty(
 			"helpUrl", //$NON-NLS-1$
-			"http://incidencias-ctt.administracionelectronica.gob.es/wiki/doku.php?id=forja-ctt_wiki:clienteafirma:start" //$NON-NLS-1$
+			"http://incidencias-ctt.administracionelectronica.gob.es/wiki/doku.php?id=forja-ctt_wiki:clienteafirma:adenda_-_uso_del_dialogo_grafico_de_seleccion_de_certificados" //$NON-NLS-1$
 		);
 	}
 

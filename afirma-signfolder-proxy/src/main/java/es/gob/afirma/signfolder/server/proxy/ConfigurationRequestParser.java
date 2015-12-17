@@ -25,7 +25,7 @@ public class ConfigurationRequestParser {
 	 * @param doc Documento XML.
 	 * @return Identificador de documento.
 	 * @throws IllegalArgumentException Cuando el XML no tiene el formato esperado.	 */
-	static GenericRequest parse(final Document doc) {
+	static ConfigurationRequest parse(final Document doc) {
 
 		if (doc == null) {
 			throw new IllegalArgumentException("El documento proporcionado no puede ser nulo");  //$NON-NLS-1$
@@ -59,6 +59,6 @@ public class ConfigurationRequestParser {
 					"No se ha podido obtener la codificacion del certificado a partir del XML: " + e); //$NON-NLS-1$
 		}
 		
-		return new GenericRequest(certEncoded);
+		return new ConfigurationRequest(certEncoded);
 	}
 }

@@ -33,8 +33,6 @@ public final class CAPIKeyStoreManager extends AOKeyStoreManager {
 
     /** Obtiene la clave privada de un certificado.
      * @param alias Alias del certificado.
-     * @param pssCallback <i>CallBback</i> para obtener la contrase&ntilde;a del
-     *                    certificado que contiene la clave.
      * @return Clave privada del certificado correspondiente al alias.
      * @throws KeyStoreException Cuando ocurren errores en el tratamiento del almac&eacute;n de claves.
      * @throws NoSuchAlgorithmException Cuando no se puede identificar el algoritmo para la

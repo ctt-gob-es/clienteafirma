@@ -567,3 +567,18 @@ h1 span{ margin-left:10px;}
 	margin-bottom: 3px;
 }
 .pantalla{display:none;}
+
+table {
+	border: 2px solid red;
+	border-collapse: collapse;
+}
+
+td {
+	border: 1px solid black;
+	padding: 6px;
+}
+
+th {
+	border: 1px solid black;
+	padding: 6px;
+}

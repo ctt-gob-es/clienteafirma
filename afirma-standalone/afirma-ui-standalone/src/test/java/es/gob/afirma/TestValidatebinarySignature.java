@@ -72,10 +72,10 @@ public class TestValidatebinarySignature {
 	public void testValidarFirmaCadesExplicita() throws Exception {
 
 		final String signatureFile = SIGNATURE_CADES_EXPLICIT_FILENAME;
-
-		final InputStream signIs = getClass().getClassLoader().getResourceAsStream(signatureFile);
-		final byte[] signature = AOUtil.getDataFromInputStream(signIs);
-		signIs.close();
+		final byte[] signature;
+		try ( final InputStream signIs = getClass().getClassLoader().getResourceAsStream(signatureFile); ) {
+			signature = AOUtil.getDataFromInputStream(signIs);
+		}
 		if (signature == null || signature.length == 0) {
 			Assert.fail("No se ha cargado correctamente la firma a validar"); //$NON-NLS-1$
 		}
@@ -113,15 +113,16 @@ public class TestValidatebinarySignature {
 		signIs.close();
 
 		final String dataFile = DATA_FILENAME;
-
-		final InputStream dataIs = getClass().getClassLoader().getResourceAsStream(dataFile);
-		final byte[] data = AOUtil.getDataFromInputStream(dataIs);
-		dataIs.close();
+		final byte[] data;
+		try ( final InputStream dataIs = getClass().getClassLoader().getResourceAsStream(dataFile); ) {
+			data = AOUtil.getDataFromInputStream(dataIs);
+		}
 
 		SignValidity validity = null;
 		try {
 			validity = ValidateBinarySignature.validate(signature, data);
-		} catch (final Exception e) {
+		}
+		catch (final Exception e) {
 			Assert.fail("Ocurrio el siguiente error durante la validacion de la firma " + signatureFile + ": " + e.toString()); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 

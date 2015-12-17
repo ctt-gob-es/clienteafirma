@@ -78,8 +78,8 @@ final class EditorFocusManager extends KeyAdapter implements FocusListener, Hype
         }
 
         final AccessibleHypertext accessibleHypertext = (AccessibleHypertext) this.displayPane.getAccessibleContext().getAccessibleText();
-        this.hyperLinks = new ArrayList<AccessibleHyperlink>(accessibleHypertext.getLinkCount());
-        this.hyperLinksTargets = new HashMap<AccessibleHyperlink, URL>(accessibleHypertext.getLinkCount());
+        this.hyperLinks = new ArrayList<>(accessibleHypertext.getLinkCount());
+        this.hyperLinksTargets = new HashMap<>(accessibleHypertext.getLinkCount());
         for (int i=0; i<accessibleHypertext.getLinkCount(); i++) {
             final AccessibleHyperlink ahl = accessibleHypertext.getLink(i);
             this.hyperLinks.add(ahl);

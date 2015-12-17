@@ -92,9 +92,9 @@ final class TriSigner {
 	}
 
 	/**
-	 * Recupera el nombre del formato de firma trif&aacute;sico equivalente al formato indicado.
-	 * @param signFormat Formato de firma.
-	 * @return Formato de firma trif&aacute;sico.
+	 * Obtiene el nombre de un algoritmo de firma que usa un algoritmo de huella espec&iacute;fico.
+	 * @param mdAlgorithm Algoritmo de huella digital.
+	 * @return Algoritmo de firma que utiliza el algoritmo de huella digital indicado.
 	 */
 	private static String getSignatureAlgorithm(final String mdAlgorithm) {
 		return mdAlgorithm.replace("-", "") + "withRSA"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -124,7 +124,15 @@ final class TriSigner {
 		}
 
 		for (int i = 0; i < signCount; i++) {
-			final byte[] preSign = config.getPreSign(i);
+			byte[] preSign;
+			try {
+				preSign = config.getPreSign(i);
+			}
+			catch (final IndexOutOfBoundsException e) {
+				// Cuando la respuesta no indica el numero de firmas y no se ha devuelto ninguna
+				Log.e(SFConstants.LOG_TAG, "No se ha devuelto ningun resultado de firma"); //$NON-NLS-1$
+				preSign = null;
+			}
 			if (preSign == null) {
 				throw new AOException("El servidor no ha devuelto la prefirma numero " + i); //$NON-NLS-1$
 			}

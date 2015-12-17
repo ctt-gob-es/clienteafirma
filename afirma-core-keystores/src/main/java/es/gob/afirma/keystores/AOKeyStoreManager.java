@@ -335,7 +335,9 @@ public class AOKeyStoreManager implements KeyStoreManager {
         	return this.cachedAliases;
         }
 		try {
-			this.cachedAliases = cleanDeactivatedAliases(Collections.list(this.ks.aliases()).toArray(new String[0]));
+			this.cachedAliases = cleanDeactivatedAliases(
+				Collections.list(this.ks.aliases()).toArray(new String[0])
+			);
 		}
 		catch (final KeyStoreException e) {
 			LOGGER.severe(

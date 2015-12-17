@@ -62,12 +62,12 @@ final class OOXMLXAdESSigner {
     }
 
     /** Obtiene el XML de firma XAdES <i>enveloping</i> OOXML.
-     * @param ooXmlDocument Documento OOXML original
-     * @param algorithm Algoritmo de firma
-     * @param pk Clave privada para la firma
-     * @param certChain Cadena de certificados del firmante
-     * @param xParams Par&aacute;metros adicionales de la firma
-     * @return XML de firma
+     * @param ooXmlDocument Documento OOXML original.
+     * @param algorithm Algoritmo de firma.
+     * @param pk Clave privada para la firma.
+     * @param certChain Cadena de certificados del firmante.
+     * @param xParams Par&aacute;metros adicionales de la firma.
+     * @return XML de firma.
      * @throws ParserConfigurationException Si hay problemas con el analizador XML por defecto.
      * @throws GeneralSecurityException Si ocurre alg&uacute;n problema de seguridad.
      * @throws TransformerException Si hay problemas con los motores de transformadas.
@@ -121,10 +121,10 @@ final class OOXMLXAdESSigner {
 
 		// SignatureProductionPlace
 		final SignatureProductionPlace spp = getSignatureProductionPlace(
-			extraParams.getProperty("signatureProductionCity"), //$NON-NLS-1$
-			extraParams.getProperty("signatureProductionProvince"), //$NON-NLS-1$
-			extraParams.getProperty("signatureProductionPostalCode"), //$NON-NLS-1$
-			extraParams.getProperty("signatureProductionCountry") //$NON-NLS-1$
+			extraParams.getProperty(OOXMLExtraParams.SIGNATURE_PRODUCTION_CITY),
+			extraParams.getProperty(OOXMLExtraParams.SIGNATURE_PRODUCTION_PROVINCE),
+			extraParams.getProperty(OOXMLExtraParams.SIGNATURE_PRODUCTION_POSTAL_CODE),
+			extraParams.getProperty(OOXMLExtraParams.SIGNATURE_PRODUCTION_COUNTRY)
 		);
 		if (spp != null) {
 			xades.setSignatureProductionPlace(spp);
@@ -133,8 +133,8 @@ final class OOXMLXAdESSigner {
 		// SignerRole
 		SignerRole signerRole = null;
 		try {
-			final String claimedRole = extraParams.getProperty("signerClaimedRole"); //$NON-NLS-1$
-			final String certifiedRole = extraParams.getProperty("signerCertifiedRole"); //$NON-NLS-1$
+			final String claimedRole = extraParams.getProperty(OOXMLExtraParams.SIGNER_CLAIMED_ROLES);
+			final String certifiedRole = extraParams.getProperty(OOXMLExtraParams.SIGNER_CERTIFIED_ROLE);
 			signerRole = new SignerRoleImpl();
 			if (claimedRole != null) {
 				signerRole.addClaimedRole(claimedRole);
@@ -213,9 +213,9 @@ final class OOXMLXAdESSigner {
 				fac,
 				docSignature,
 				signatureId,
-				extraParams.getProperty("signatureComments"), //$NON-NLS-1$
-				extraParams.getProperty("signatureAddress1"), //$NON-NLS-1$
-				extraParams.getProperty("signatureAddress2") //$NON-NLS-1$
+				extraParams.getProperty(OOXMLExtraParams.SIGNATURE_COMMENTS),
+				extraParams.getProperty(OOXMLExtraParams.SIGNATURE_ADDRESS1),
+				extraParams.getProperty(OOXMLExtraParams.SIGNATURE_ADDRESS2)
 			)
 		);
 		referenceList.add(

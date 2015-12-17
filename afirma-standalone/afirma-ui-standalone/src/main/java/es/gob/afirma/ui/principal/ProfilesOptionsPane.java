@@ -46,7 +46,7 @@ final class ProfilesOptionsPane {
     private final Opciones parent;
 
     /** Listado con los perfiles detectados por la aplicaci&oacute;n. */
-    final JList profileManagmentList;
+    final JList<String> profileManagmentList;
 
     /** Crea la vista y componentes de la pesta&ntilde;a principal de configuraci&oacute;n.
      * @param parent Ventana de opciones sobre la que se muestra el panel. */
@@ -95,8 +95,8 @@ final class ProfilesOptionsPane {
         // Listado de perfiles cargados
 
         // Panel que contiene a la lista de destintatarios
-        this.profileManagmentList = new JList(ProfileManager.getProfilesNames());
-        final DefaultListModel listModel = new DefaultListModel();
+        this.profileManagmentList = new JList<>(ProfileManager.getProfilesNames());
+        final DefaultListModel<String> listModel = new DefaultListModel<>();
         listModel.addElement(ProfileManager.DEFAULT_PROFILE_NAME);
         for (final String name : ProfileManager.getProfilesNames()) {
             listModel.addElement(name);
@@ -293,7 +293,7 @@ final class ProfilesOptionsPane {
     /** Recupera los nombres de perfil que aparecen en el listado del panel.
      * @return Listado de nombres de perfil. */
     String[] getProfiles() {
-        final List<String> profilesNames = new ArrayList<String>();
+        final List<String> profilesNames = new ArrayList<>();
         for (int i = 0; i < this.profileManagmentList.getModel().getSize(); i++) {
             profilesNames.add(this.profileManagmentList.getModel().getElementAt(i).toString());
         }

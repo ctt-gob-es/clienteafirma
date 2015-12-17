@@ -59,7 +59,7 @@ public final class UserProfile extends JAccessibilityFrameAdvisor {
     private static final long serialVersionUID = 1L;
 
     /** Combo perfiles. */
-    private final JComboBox comboPerfiles = new JComboBox();
+    private final JComboBox<String> comboPerfiles = new JComboBox<>();
 
     /** Constructor. */
     public UserProfile() {
@@ -305,13 +305,13 @@ public final class UserProfile extends JAccessibilityFrameAdvisor {
         c.weighty = 0.02;
 
         // Lista de usuarios
-        final List<String> profileNames = new ArrayList<String>();
+        final List<String> profileNames = new ArrayList<>();
         profileNames.add(ProfileManager.DEFAULT_PROFILE_NAME);
         for (final String profileName : ProfileManager.getProfilesNames()) {
             profileNames.add(profileName);
         }
 
-        this.comboPerfiles.setModel(new DefaultComboBoxModel(profileNames.toArray(new String[0])));
+        this.comboPerfiles.setModel(new DefaultComboBoxModel<>(profileNames.toArray(new String[0])));
         // Preselecionado el ultimo perfil cargado
         if (ProfileManager.getLastProfileName() != null) {
             this.comboPerfiles.setSelectedItem(ProfileManager.getLastProfileName());

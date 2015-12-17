@@ -10,7 +10,7 @@ import es.gob.afirma.core.misc.Base64;
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
 public final class SelfishDocumentManager implements DocumentManager {
 
-	/** Constructor vac6iacute;o.
+	/** Constructor vac&iacute;o.
 	 * @param config No se usa. */
 	public SelfishDocumentManager(final Properties config) {
 		// No hacemos nada

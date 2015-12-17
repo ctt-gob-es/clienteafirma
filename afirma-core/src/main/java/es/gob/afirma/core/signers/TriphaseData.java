@@ -90,10 +90,13 @@ public final class TriphaseData {
 			this.dict.remove(key);
 		}
 
-		Map<String,String> getDict() {
+		/**
+		 * Recupera un mapa no mutable de los par&aacute;metros de la firma trif&aacute;sica.
+		 * @return Mapa no mutable.
+		 */
+		public Map<String,String> getDict() {
 			return Collections.unmodifiableMap(this.dict);
 		}
-
 	}
 
 	private final List<TriSign> signs;

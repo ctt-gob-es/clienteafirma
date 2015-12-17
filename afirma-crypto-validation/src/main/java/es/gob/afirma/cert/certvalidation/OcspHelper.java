@@ -18,9 +18,19 @@ import java.security.UnrecoverableEntryException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.List;
 
+import org.bouncycastle.asn1.ASN1InputStream;
+import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.DERIA5String;
+import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x509.AccessDescription;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
+import org.bouncycastle.asn1.x509.AuthorityInformationAccess;
+import org.bouncycastle.asn1.x509.Extension;
+import org.bouncycastle.asn1.x509.GeneralName;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateHolder;
 import org.bouncycastle.cert.ocsp.BasicOCSPResp;
@@ -158,13 +168,13 @@ final class OcspHelper {
 	 * @throws CertificateEncodingException Si hay problemas en el tratamiento de los certificados.
 	 * @throws IOException Si hay problemas en el tratamiento de datos. */
 	static byte[] createOcspRequest(final X509Certificate certToValidate,
-                                           final X509Certificate issuerCert) throws CertificateEncodingException,
-                                                                                    NoSuchAlgorithmException,
-                                                                                    OCSPException,
-                                                                                    IOException {
+                                    final X509Certificate issuerCert) throws CertificateEncodingException,
+                                                                             NoSuchAlgorithmException,
+                                                                             OCSPException,
+                                                                             IOException {
 		final CertificateID certId = new CertificateID(
 			new Sha1DigestCalculator(),
-			new JcaX509CertificateHolder(issuerCert),
+			new JcaX509CertificateHolder(issuerCert != null ? issuerCert : certToValidate),
 			certToValidate.getSerialNumber()
 		);
 		final OCSPReqBuilder ocspRequestBuilder = new OCSPReqBuilder();
@@ -213,7 +223,7 @@ final class OcspHelper {
 	}
 
 	/** Analiza una respuesta OCSP.
-	 * <code><pre>
+	 * <pre>
 	 * OCSPResponse ::= SEQUENCE {
      *  responseStatus         OCSPResponseStatus,
      *  responseBytes          [0] EXPLICIT ResponseBytes OPTIONAL
@@ -228,7 +238,7 @@ final class OcspHelper {
      *  sigRequired           (5),      --Must sign the request
      *  unauthorized          (6)       --Request unauthorized
      * }
-	 * </pre></code>
+	 * </pre>
 	 * @param resp Respuesta OCSP.
 	 * @return Resultado de la validaci&oacute;n seg&uacute;n la respuesta OCSP.
 	 * @throws IOException Si hay problemas en el tratamiento de datos.
@@ -237,7 +247,7 @@ final class OcspHelper {
 		if (resp == null) {
 			throw new IOException("La respuesta OCSP es nula"); //$NON-NLS-1$
 		}
-		
+
 		final OCSPResp ocspResponse = new OCSPResp(resp);
 
 		if (ocspResponse.getStatus() == OCSPResp.SUCCESSFUL) {
@@ -267,5 +277,36 @@ final class OcspHelper {
 		}
 		throw new IllegalArgumentException("La validacion ha devuelto un estado desconocido: " + ocspResponse.getStatus()); //$NON-NLS-1$
 	}
+
+    static List<String> getAIALocations(final X509Certificate cert) throws IOException {
+        final byte[] aiaExtensionValue = cert.getExtensionValue(Extension.authorityInfoAccess.getId());
+        if (aiaExtensionValue == null) {
+            return new ArrayList<String>(0);
+        }
+        final ASN1InputStream asn1In = new ASN1InputStream(aiaExtensionValue);
+        AuthorityInformationAccess authorityInformationAccess;
+
+        final DEROctetString aiaDEROctetString = (DEROctetString) asn1In.readObject();
+        final ASN1InputStream asn1InOctets = new ASN1InputStream(aiaDEROctetString.getOctets());
+        final ASN1Sequence aiaASN1Sequence = (ASN1Sequence) asn1InOctets.readObject();
+        authorityInformationAccess = AuthorityInformationAccess.getInstance(aiaASN1Sequence);
+        asn1InOctets.close();
+        asn1In.close();
+
+        final List<String> ocspUrlList = new ArrayList<String>();
+        final AccessDescription[] accessDescriptions = authorityInformationAccess.getAccessDescriptions();
+        for (final AccessDescription accessDescription : accessDescriptions) {
+            final GeneralName gn = accessDescription.getAccessLocation();
+            if (gn.getTagNo() == GeneralName.uniformResourceIdentifier) {
+                final DERIA5String str = DERIA5String.getInstance(gn.getName());
+                final String accessLocation = str.getString();
+                ocspUrlList.add(accessLocation);
+            }
+        }
+        if (ocspUrlList.isEmpty()) {
+        	return new ArrayList<String>(0);
+        }
+        return ocspUrlList;
+    }
 
 }

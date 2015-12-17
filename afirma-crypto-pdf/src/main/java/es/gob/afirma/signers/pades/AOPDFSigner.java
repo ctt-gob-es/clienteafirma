@@ -28,6 +28,7 @@ import com.lowagie.text.pdf.AcroFields;
 import com.lowagie.text.pdf.PdfPKCS7;
 import com.lowagie.text.pdf.PdfReader;
 
+import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOInvalidFormatException;
 import es.gob.afirma.core.misc.AOUtil;
@@ -111,11 +112,11 @@ public final class AOPDFSigner implements AOSigner {
 
         checkIText();
 
-        final java.security.cert.Certificate[] certificateChain = Boolean.parseBoolean(extraParams.getProperty("includeOnlySignningCertificate", Boolean.FALSE.toString())) ? //$NON-NLS-1$
+        final java.security.cert.Certificate[] certificateChain = Boolean.parseBoolean(extraParams.getProperty(PdfExtraParams.INCLUDE_ONLY_SIGNNING_CERTIFICATE, Boolean.FALSE.toString())) ?
     		new X509Certificate[] { (X509Certificate) certChain[0] } :
     			certChain;
 
-    	final GregorianCalendar signTime = PdfUtil.getSignTime(extraParams.getProperty("signTime")); //$NON-NLS-1$
+    	final GregorianCalendar signTime = PdfUtil.getSignTime(extraParams.getProperty(PdfExtraParams.SIGN_TIME));
 
         // Sello de stiempo
         byte[] data;
@@ -144,13 +145,22 @@ public final class AOPDFSigner implements AOSigner {
 		}
 
         // Firma PKCS#1
-        final byte[] interSign = new AOPkcs1Signer().sign(
-    		pre.getSign(),
-    		algorithm,
-    		key,
-    		certificateChain,
-    		extraParams
-		);
+        final byte[] interSign;
+        try {
+	        interSign = new AOPkcs1Signer().sign(
+	    		pre.getSign(),
+	    		algorithm,
+	    		key,
+	    		certificateChain,
+	    		extraParams
+			);
+        }
+        catch (final Exception e) {
+        	if ("es.gob.jmulticard.ui.passwordcallback.CancelledOperationException".equals(e.getClass().getName())) { //$NON-NLS-1$
+        		throw new AOCancelledOperationException();
+        	}
+            throw new AOException("Error durante la firma OOXML: " + e, e); //$NON-NLS-1$
+        }
 
         // Postfirma
         try {
@@ -435,7 +445,7 @@ public final class AOPDFSigner implements AOSigner {
         	final Properties extraParams = System.getProperties();
         	try {
 				if (PdfUtil.pdfHasUnregisteredSignatures(data, extraParams) &&
-						Boolean.TRUE.toString().equalsIgnoreCase(extraParams.getProperty("allowCosigningUnregisteredSignatures"))) { //$NON-NLS-1$
+						Boolean.TRUE.toString().equalsIgnoreCase(extraParams.getProperty(PdfExtraParams.ALLOW_COSIGNING_UNREGISTERED_SIGNATURES))) {
 					return true;
 				}
 			}
@@ -564,7 +574,7 @@ public final class AOPDFSigner implements AOSigner {
     		}
 
     		if (filter != null) {
-    			config.setProperty("signatureSubFilter", filter.substring(filter.indexOf('/') + 1)); //$NON-NLS-1$
+    			config.setProperty(PdfExtraParams.SIGNATURE_SUBFILTER, filter.substring(filter.indexOf('/') + 1));
     		}
     	}
     }

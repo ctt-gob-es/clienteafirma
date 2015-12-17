@@ -3,7 +3,7 @@ package es.gob.afirma.signfolder.server.proxy;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Vector;
+import java.util.List;
 
 import es.gob.afirma.core.misc.Base64;
 
@@ -58,7 +58,7 @@ final class XmlResponsesFactory {
 				final ByteArrayOutputStream baos = new ByteArrayOutputStream();
 				t.printStackTrace(new PrintWriter(baos));
 				exceptionb64 = Base64.encode(baos.toByteArray());
-				try { baos.close(); } catch (IOException e) { /* No hacemos nada */ }
+				try { baos.close(); } catch (final IOException e) { /* No hacemos nada */ }
 			}
 
 			if (exceptionb64 != null) {
@@ -109,22 +109,22 @@ final class XmlResponsesFactory {
 			.append("\" type=\"").append(sr.getType()) //$NON-NLS-1$
 			.append("\">"); //$NON-NLS-1$
 
-			sb.append("<subj>").append(sr.getSubject()).append("</subj>"); //$NON-NLS-1$ //$NON-NLS-2$
-			sb.append("<snder>").append(sr.getSender()).append("</snder>"); //$NON-NLS-1$ //$NON-NLS-2$
+			sb.append("<subj>").append(escapeXmlCharacters(sr.getSubject())).append("</subj>"); //$NON-NLS-1$ //$NON-NLS-2$
+			sb.append("<snder>").append(escapeXmlCharacters(sr.getSender())).append("</snder>"); //$NON-NLS-1$ //$NON-NLS-2$
 			sb.append("<view>").append(sr.getView()).append("</view>"); //$NON-NLS-1$ //$NON-NLS-2$
 			sb.append("<date>").append(sr.getDate()).append("</date>"); //$NON-NLS-1$ //$NON-NLS-2$
 
 			sb.append("<docs>"); //$NON-NLS-1$
 			for (final SignRequestDocument doc : sr.getDocumentsRequests()) {
 				sb.append("<doc docid=\"").append(doc.getId()).append("\">"); //$NON-NLS-1$ //$NON-NLS-2$
-				sb.append("<nm>").append(doc.getName()).append("</nm>"); //$NON-NLS-1$ //$NON-NLS-2$
+				sb.append("<nm>").append(escapeXmlCharacters(doc.getName())).append("</nm>"); //$NON-NLS-1$ //$NON-NLS-2$
 				if (doc.getSize() != null) {
 					sb.append("<sz>").append(doc.getSize()).append("</sz>"); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 				sb.append("<mmtp>").append(doc.getMimeType()).append("</mmtp>"); //$NON-NLS-1$ //$NON-NLS-2$
 				sb.append("<sigfrmt>").append(doc.getSignFormat()).append("</sigfrmt>"); //$NON-NLS-1$ //$NON-NLS-2$
 				sb.append("<mdalgo>").append(doc.getMessageDigestAlgorithm()).append("</mdalgo>"); //$NON-NLS-1$ //$NON-NLS-2$
-				sb.append("<params>").append(doc.getParams() != null ? doc.getParams() : "").append("</params>"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				sb.append("<params>").append(doc.getParams() != null ? escapeXmlCharacters(doc.getParams()) : "").append("</params>"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				sb.append("</doc>"); //$NON-NLS-1$
 			}
 			sb.append("</docs>"); //$NON-NLS-1$
@@ -168,23 +168,23 @@ final class XmlResponsesFactory {
 		.append("\" type=\"").append(requestDetails.getType()) //$NON-NLS-1$
 		.append("\">"); //$NON-NLS-1$
 
-		sb.append("<subj>").append(requestDetails.getSubject()).append("</subj>"); //$NON-NLS-1$ //$NON-NLS-2$
+		sb.append("<subj>").append(escapeXmlCharacters(requestDetails.getSubject())).append("</subj>"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		sb.append("<snders>"); //$NON-NLS-1$
-		for (final Object sender : requestDetails.getSenders()) {
-			sb.append("<snder>").append(sender).append("</snder>"); //$NON-NLS-1$ //$NON-NLS-2$
+		for (final String sender : requestDetails.getSenders()) {
+			sb.append("<snder>").append(escapeXmlCharacters(sender)).append("</snder>"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		sb.append("</snders>"); //$NON-NLS-1$
 
 		sb.append("<date>").append(requestDetails.getDate()).append("</date>"); //$NON-NLS-1$ //$NON-NLS-2$
-		sb.append("<app>").append(requestDetails.getApp()).append("</app>"); //$NON-NLS-1$ //$NON-NLS-2$
+		sb.append("<app>").append(escapeXmlCharacters(requestDetails.getApp())).append("</app>"); //$NON-NLS-1$ //$NON-NLS-2$
 		sb.append("<ref>").append(requestDetails.getRef()).append("</ref>"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		sb.append("<sgnlines>"); //$NON-NLS-1$
-		for (final Vector<String> signLine : requestDetails.getSignLines()) {
+		for (final List<String> signLine : requestDetails.getSignLines()) {
 			sb.append("<sgnline>"); //$NON-NLS-1$
-			for (final Object receiver : signLine) {
-				sb.append("<rcvr>").append(receiver).append("</rcvr>"); //$NON-NLS-1$ //$NON-NLS-2$
+			for (final String receiver : signLine) {
+				sb.append("<rcvr>").append(escapeXmlCharacters(receiver)).append("</rcvr>"); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 			sb.append("</sgnline>"); //$NON-NLS-1$
 		}
@@ -193,14 +193,14 @@ final class XmlResponsesFactory {
 		sb.append("<docs>"); //$NON-NLS-1$
 		for (final SignRequestDocument doc : requestDetails.getDocs()) {
 			sb.append("<doc docid=\"").append(doc.getId()).append("\">"); //$NON-NLS-1$ //$NON-NLS-2$
-			sb.append("<nm>").append(doc.getName()).append("</nm>"); //$NON-NLS-1$ //$NON-NLS-2$
+			sb.append("<nm>").append(escapeXmlCharacters(doc.getName())).append("</nm>"); //$NON-NLS-1$ //$NON-NLS-2$
 			if (doc.getSize() != null) {
 				sb.append("<sz>").append(doc.getSize()).append("</sz>"); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 			sb.append("<mmtp>").append(doc.getMimeType()).append("</mmtp>"); //$NON-NLS-1$ //$NON-NLS-2$
 			sb.append("<sigfrmt>").append(doc.getSignFormat()).append("</sigfrmt>"); //$NON-NLS-1$ //$NON-NLS-2$
 			sb.append("<mdalgo>").append(doc.getMessageDigestAlgorithm()).append("</mdalgo>"); //$NON-NLS-1$ //$NON-NLS-2$
-			sb.append("<params>").append(doc.getParams()).append("</params>"); //$NON-NLS-1$ //$NON-NLS-2$
+			sb.append("<params>").append(doc.getParams() != null ? escapeXmlCharacters(doc.getParams()) : "").append("</params>"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			sb.append("</doc>"); //$NON-NLS-1$
 		}
 		sb.append("</docs>"); //$NON-NLS-1$
@@ -209,25 +209,6 @@ final class XmlResponsesFactory {
 
 		return sb.toString();
 	}
-
-//	/**
-//	 * Crea un XML con la informaci&oacute;n necesaria para la previsualizaci&oacute;n de un documento.
-//	 * @param docData Datos del documento.
-//	 * @return XML con la informaci&oacute;n del documento.
-//	 */
-//	static String createPreviewResponse(final DocumentData docData) {
-//
-//		final StringBuilder sb = new StringBuilder();
-//		sb.append(XML_HEADER);
-//
-//		sb.append("<prw docid=\"").append(docData.getDocId()).append("\">"); //$NON-NLS-1$ //$NON-NLS-2$
-//		sb.append("<name>").append(docData.getFilename()).append("</name>"); //$NON-NLS-1$ //$NON-NLS-2$
-//		sb.append("<mmtp>").append(docData.getMimetype()).append("</mmtp>"); //$NON-NLS-1$ //$NON-NLS-2$
-//		sb.append("<data>").append(docData.getDataB64()).append("</data>"); //$NON-NLS-1$ //$NON-NLS-2$
-//		sb.append("</prw>"); //$NON-NLS-1$
-//
-//		return sb.toString();
-//	}
 
 	/**
 	 * Crea un XML con la informaci&oacute;n para configurar la aplicaci&oacute;n.
@@ -242,7 +223,7 @@ final class XmlResponsesFactory {
 		sb.append("<appConf>"); //$NON-NLS-1$
 		for (int i = 0; i < appConfig.getAppIdsList().size(); i++) {
 			sb.append("<app id=\"").append(appConfig.getAppIdsList().get(i)).append("\">");  //$NON-NLS-1$//$NON-NLS-2$
-			sb.append(appConfig.getAppNamesList().get(i));
+			sb.append(escapeXmlCharacters(appConfig.getAppNamesList().get(i)));
 			sb.append("</app>"); //$NON-NLS-1$
 		}
 		sb.append("</appConf>"); //$NON-NLS-1$
@@ -250,17 +231,27 @@ final class XmlResponsesFactory {
 		return sb.toString();
 	}
 
-	public static String createApproveRequestsResponse(ApproveRequestList approveRequests) {
+	public static String createApproveRequestsResponse(final ApproveRequestList approveRequests) {
 		final StringBuilder sb = new StringBuilder();
 		sb.append(XML_HEADER);
 
 		sb.append("<apprq>"); //$NON-NLS-1$
-		for (ApproveRequest req :  approveRequests) {
+		for (final ApproveRequest req :  approveRequests) {
 			sb.append("<r id=\"").append(req.getRequestId()) //$NON-NLS-1$
 			.append("\" ok=\"").append(req.isOk() ? "OK" : "KO").append("\"/>");  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		}
 		sb.append("</apprq>"); //$NON-NLS-1$
 
 		return sb.toString();
+	}
+
+	/**
+	 * Sustituye los caracteres que pueden conllevar a la malformaci&oacute;n de un XML por sus
+	 * correspondientes versiones escapadas de HTML.
+	 * @param text Texto a escapar.
+	 * @return Cadena con los caracteres escapados.
+	 */
+	private static String escapeXmlCharacters(final String text) {
+		return text == null ? null : text.replace("<", "&lt;").replace(">", "&gt;");  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 	}
 }

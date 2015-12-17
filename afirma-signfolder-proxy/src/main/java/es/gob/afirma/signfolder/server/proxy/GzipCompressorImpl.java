@@ -28,19 +28,19 @@ public class GzipCompressorImpl {
 			final GZIPOutputStream gzipOs = new GZIPOutputStream(baos);
 			gzipOs.write(data);
 			gzipOs.finish();
-			
+
 			compressedData = baos.toByteArray();
 			try {
 				gzipOs.close();
 			} catch (final Exception e) {
 				// No tratamos el error
-			}	
-		} catch (IOException e) {
+			}
+		} catch (final IOException e) {
 			// Este error no deberia ocurrir nunca
-			Logger.getLogger("es.gob.afirma").warning("Error al comprimir los datos. Se devuelven los datos originales: " + e);
+			Logger.getLogger("es.gob.afirma").warning("Error al comprimir los datos. Se devuelven los datos originales: " + e); //$NON-NLS-1$ //$NON-NLS-2$
 			return data;
 		}
-		
+
 		return compressedData;
 	}
 

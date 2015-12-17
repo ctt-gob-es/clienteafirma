@@ -4,7 +4,7 @@
   <headerType>gui</headerType>
   <jar>AutoFirma.jar</jar>
   <outfile>AutoFirma.exe</outfile>
-  <errTitle>Error, por favor, actualice su versión de Java.</errTitle>
+  <errTitle>Error: Se ha superado el tiempo de espera antes de recibir peticiones.</errTitle>
   <cmdLine></cmdLine>
   <chdir>.</chdir>
   <priority>normal</priority>
@@ -18,7 +18,7 @@
     <path>./jre</path>
     <bundledJre64Bit>false</bundledJre64Bit>
     <bundledJreAsFallback>false</bundledJreAsFallback>
-    <minVersion>1.6.0</minVersion>
+    <minVersion>1.7.0</minVersion>
     <maxVersion>1.8.0</maxVersion>
     <jdkPreference>preferJre</jdkPreference>
     <runtimeBits>64/32</runtimeBits>
@@ -26,16 +26,16 @@
   <splash>
     <file>splash.bmp</file>
     <waitForWindow>true</waitForWindow>
-    <timeout>60</timeout>
-    <timeoutErr>true</timeoutErr>
+    <timeout>80</timeout>
+    <timeoutErr>false</timeoutErr>
   </splash>
   <versionInfo>
-    <fileVersion>1.4.1.0</fileVersion>
-    <txtFileVersion>1.4.1</txtFileVersion>
+    <fileVersion>1.4.2.0</fileVersion>
+    <txtFileVersion>1.4.2</txtFileVersion>
     <fileDescription>AutoFirma</fileDescription>
     <copyright>Gobierno de España</copyright>
-    <productVersion>1.4.1.0</productVersion>
-    <txtProductVersion>1.4.1</txtProductVersion>
+    <productVersion>1.4.2.0</productVersion>
+    <txtProductVersion>1.4.2</txtProductVersion>
     <productName>AutoFirma</productName>
     <companyName>Gobierno de España</companyName>
     <internalName>AutoFirma</internalName>

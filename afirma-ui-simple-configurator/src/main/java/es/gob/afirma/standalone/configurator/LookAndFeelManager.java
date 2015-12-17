@@ -21,12 +21,10 @@ import javax.swing.UIManager.LookAndFeelInfo;
 
 import es.gob.afirma.core.misc.Platform;
 
-/**
- * Maneja el LookAndFeel aplicado al aplicativo.
- * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s
- * @author Carlos Gamuci
- */
-public final class LookAndFeelManager {
+/** Maneja el LookAndFeel aplicado al aplicativo.
+ * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s.
+ * @author Carlos Gamuci. */
+final class LookAndFeelManager {
 
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 

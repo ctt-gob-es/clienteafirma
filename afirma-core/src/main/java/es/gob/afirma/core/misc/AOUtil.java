@@ -286,9 +286,9 @@ public final class AOUtil {
      * A&ntilde;adimos el car&aacute;cter &tilde; porque en ciertas
      * codificaciones de Base64 est&aacute; aceptado, aunque no es nada
      * recomendable */
-    private static final String BASE_64_ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz=_-\n+/0123456789\r~"; //$NON-NLS-1$
+    private static final String BASE_64_ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz=_-\t\n+/0123456789\r~"; //$NON-NLS-1$
 
-    /** @param data Datos a comprobar si podr6iacute;an o no ser Base64.
+    /** @param data Datos a comprobar si podr&iacute;an o no ser Base64.
      * @return <code>true</code> si los datos proporcionado pueden ser una
      *         codificaci&oacute;n base64 de un original binario (que no tiene
      *         necesariamente porqu&eacute; serlo), <code>false</code> en caso
@@ -315,7 +315,7 @@ public final class AOUtil {
     /** Equivalencias de hexadecimal a texto por la posici&oacute;n del vector.
      * Para ser usado en <code>hexify()</code> */
     private static final char[] HEX_CHARS = {
-            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'
+        '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'
     };
 
     /** Convierte un vector de octetos en una cadena de caracteres que contiene

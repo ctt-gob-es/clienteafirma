@@ -150,12 +150,14 @@ public final class CAdESTriPhaseSigner {
      * @param signingCertificateV2 <code>true</code> para usar SigningCertificateV2, <code>false</code> para usar V1
      * @param dataDigest Valor de la huella digital del contenido (usar <code>null</code> si se estableci&oacute; <code>content</code>)
      * @param signDate Fecha de la firma (debe establecerse externamente para evitar desincronismos en la firma trif&aacute;sica)
-     * @param padesMode <code>true</code> para generar una firma CAdES compatible PAdES, <code>false</code> para generar una firma CAdES normal
+     * @param includeSigningTimeAttribute <code>true</code> para incluir el atributo <i>SigningTime</i> de PKCS#9 (OID:1.2.840.113549.1.9.5),
+     *                                    <code>false</code> para no incluirlo. Este atributo nunca se incluye en el modo PAdES.
+     * @param padesMode <code>true</code> para generar una firma CAdES compatible PAdES, <code>false</code> para generar una firma CAdES normal.
      * @param contentType Tipo de contenido definido por su OID.
      * @param contentDescription Descripci&oacute;n textual del tipo de contenido firmado.
      * @param ctis Indicaciones sobre los tipos de compromisos adquiridos con la firma.
      * @param csm Metadatos sobre el firmante.
-     * @return Atributos CAdES a firmar (prefirma) en formato ASN.1
+     * @return Atributos CAdES a firmar (prefirma) en formato ASN.1.
      * @throws AOException Cuando se produce cualquier error durante el proceso. */
     public static byte[] preSign(final String digestAlgorithmName,
                           final byte[] content,
@@ -164,6 +166,7 @@ public final class CAdESTriPhaseSigner {
                           final boolean signingCertificateV2,
                           final byte[] dataDigest,
                           final Date signDate,
+                          final boolean includeSigningTimeAttribute,
                           final boolean padesMode,
                           final String contentType,
                           final String contentDescription,
@@ -187,6 +190,7 @@ public final class CAdESTriPhaseSigner {
                      signingCertificateV2,
                      dataDigest,
                      signDate,
+                     includeSigningTimeAttribute,
                      padesMode,
                      contentType,
                      contentDescription,

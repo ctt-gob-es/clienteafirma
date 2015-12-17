@@ -36,6 +36,11 @@ public final class SignSaverHttpPost implements SignSaver {
 		this.param = postParam;
 	}
 
+	/** Constructor vac&iacute;o. */
+	public SignSaverHttpPost() {
+		// Vacio
+	}
+
 	@Override
 	public void saveSign(final SingleSign sign, final byte[] dataToSave) throws IOException {
 		UrlHttpManagerFactory.getInstalledManager().readUrlByPost(

@@ -17,7 +17,7 @@ import es.gob.afirma.android.crypto.LoadKeyStoreManagerTask.KeystoreManagerListe
 import es.gob.afirma.android.gui.PinDialog;
 import es.gob.afirma.android.signfolder.SFConstants;
 
-/** Facrtor&iacute;a de gestores de contrase&ntuilde;as y claves para Android. */
+/** Factor&iacute;a de gestores de contrase&ntilde;as y claves para Android. */
 public final class KeyStoreManagerFactory {
 
 	private KeyStoreManagerFactory() {
@@ -27,7 +27,7 @@ public final class KeyStoreManagerFactory {
 	private static final String ES_GOB_AFIRMA = "es.gob.afirma"; //$NON-NLS-1$
 	private static final String AET_PKCS11_STORE = "PKCS11KeyStore"; //$NON-NLS-1$
 
-	/** Obtiene el gestor de contrase&ntuilde;as y claves m&aacute;s apropiado seg&uacute;n el entorno
+	/** Obtiene el gestor de contrase&ntilde;as y claves m&aacute;s apropiado seg&uacute;n el entorno
 	 * operativo y el hardware encontrado.
 	 * @param activity Actividad padre
 	 * @param ksfl Clase donde hay que establecer el almac&eacute;n

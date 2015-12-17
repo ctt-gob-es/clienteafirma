@@ -1,6 +1,6 @@
 package es.gob.afirma.signfolder.server.proxy;
 
-import java.util.Vector;
+import java.util.List;
 
 /**
  * Datos identificados de un fichero para su descarga o previsualizaci&oacute;n.
@@ -24,10 +24,10 @@ public class Detail {
 	private String app = null;
 
 	private String ref = null;
-	
+
 	private String type = null;
 
-	private Vector[] signLines;
+	private List<String>[] signLines;
 
 	private SignRequestDocument[] docs;
 
@@ -190,13 +190,13 @@ public class Detail {
 	public void setType(final String type) {
 		this.type = type;
 	}
-	
+
 	/**
 	 * Recupera el listado de l&iacute;neas de firma de la petici&oacute;n. Las l&iacute;neas de firma
 	 * se componen de un listado de nombre de usuarios por los que debe pasar o ha pasado la firma.
 	 * @return Listado de l&iacute;neas de firma.
 	 */
-	public Vector[] getSignLines() {
+	public List<String>[] getSignLines() {
 		return this.signLines;
 	}
 
@@ -205,7 +205,7 @@ public class Detail {
 	 * se componen de un listado de nombre de usuarios por los que debe pasar o ha pasado la firma.
 	 * @param signLines Listado de l&iacute;neas de firma.
 	 */
-	public void setSignLines(final Vector[] signLines) {
+	public void setSignLines(final List<String>[] signLines) {
 		this.signLines = signLines;
 	}
 

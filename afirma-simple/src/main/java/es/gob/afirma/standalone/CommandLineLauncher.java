@@ -58,6 +58,7 @@ final class CommandLineLauncher {
 	private static final String STORE_P12  = "pkcs12"; //$NON-NLS-1$
 	private static final String STORE_NSS  = "mozilla"; //$NON-NLS-1$
 	private static final String STORE_DNI  = "dni"; //$NON-NLS-1$
+	private static final String STORE_P11  = "pkcs11"; //$NON-NLS-1$
 
 	private static final String FORMAT_AUTO     = "auto"; //$NON-NLS-1$
 	private static final String FORMAT_XADES    = "xades"; //$NON-NLS-1$
@@ -110,6 +111,7 @@ final class CommandLineLauncher {
 			String extraParams = null;
 			boolean xml = false;
 			boolean gui = false;
+
 			try {
 				for (int i = 1; i < args.length; i++) {
 
@@ -124,8 +126,11 @@ final class CommandLineLauncher {
 					else if (PARAM_STORE.equals(args[i])) {
 
 						if (store != null) {
-							closeApp(STATUS_ERROR, pw,
-									buildSyntaxError(CommandLineMessages.getString("CommandLineLauncher.26", args[i]))); //$NON-NLS-1$
+							closeApp(
+								STATUS_ERROR,
+								pw,
+								buildSyntaxError(CommandLineMessages.getString("CommandLineLauncher.26", args[i])) //$NON-NLS-1$
+							);
 						}
 						store = args[i+1];
 						i++;
@@ -133,8 +138,11 @@ final class CommandLineLauncher {
 					else if (PARAM_ALGO.equals(args[i])) {
 
 						if (algorithm != null) {
-							closeApp(STATUS_ERROR, pw,
-									buildSyntaxError(CommandLineMessages.getString("CommandLineLauncher.26", args[i]))); //$NON-NLS-1$
+							closeApp(
+								STATUS_ERROR,
+								pw,
+								buildSyntaxError(CommandLineMessages.getString("CommandLineLauncher.26", args[i])) //$NON-NLS-1$
+							);
 						}
 						algorithm = args[i+1];
 						i++;
@@ -142,8 +150,11 @@ final class CommandLineLauncher {
 					else if (PARAM_CONFIG.equals(args[i])) {
 
 						if (extraParams != null) {
-							closeApp(STATUS_ERROR, pw,
-									buildSyntaxError(CommandLineMessages.getString("CommandLineLauncher.26", args[i]))); //$NON-NLS-1$
+							closeApp(
+								STATUS_ERROR,
+								pw,
+								buildSyntaxError(CommandLineMessages.getString("CommandLineLauncher.26", args[i])) //$NON-NLS-1$
+							);
 						}
 						extraParams = args[i+1];
 						i++;
@@ -151,8 +162,11 @@ final class CommandLineLauncher {
 					else if (PARAM_PASSWD.equals(args[i])) {
 
 						if (password != null) {
-							closeApp(STATUS_ERROR, pw,
-									buildSyntaxError(CommandLineMessages.getString("CommandLineLauncher.26", args[i]))); //$NON-NLS-1$
+							closeApp(
+								STATUS_ERROR,
+								pw,
+								buildSyntaxError(CommandLineMessages.getString("CommandLineLauncher.26", args[i])) //$NON-NLS-1$
+							);
 						}
 						password = args[i+1];
 						i++;
@@ -240,14 +254,22 @@ final class CommandLineLauncher {
 						i++;
 					}
 					else {
-						closeApp(STATUS_ERROR, pw, CommandLineMessages.getString("CommandLineLauncher.25", args[i])); //$NON-NLS-1$
+						closeApp(
+							STATUS_ERROR,
+							pw,
+							CommandLineMessages.getString("CommandLineLauncher.25", args[i]) //$NON-NLS-1$
+						);
 					}
 				}
 
 				if (gui) {
 
 					if (inputFile == null) {
-						closeApp(STATUS_ERROR, pw, buildSyntaxError(CommandLineMessages.getString("CommandLineLauncher.5"))); //$NON-NLS-1$
+						closeApp(
+							STATUS_ERROR,
+							pw,
+							buildSyntaxError(CommandLineMessages.getString("CommandLineLauncher.5")) //$NON-NLS-1$
+						);
 					}
 
 					if (COMMAND_SIGN.equals(command)) {
@@ -257,11 +279,14 @@ final class CommandLineLauncher {
 						simpleAfirma.loadFileToSign(inputFile);
 					}
 					else if (COMMAND_VERIFY.equals(command)) {
-
-						new VisorFirma(true).initialize(false, inputFile);
+						new VisorFirma(true, null).initialize(false, inputFile);
 					}
 					else {
-						closeApp(STATUS_ERROR, pw, buildSyntaxError(CommandLineMessages.getString("CommandLineLauncher.15", command))); //$NON-NLS-1$
+						closeApp(
+							STATUS_ERROR,
+							pw,
+							buildSyntaxError(CommandLineMessages.getString("CommandLineLauncher.15", command)) //$NON-NLS-1$
+						);
 					}
 
 					return;
@@ -278,8 +303,11 @@ final class CommandLineLauncher {
 					closeApp(STATUS_SUCCESS, pw, aliases);
 				}
 				else if (!COMMAND_SIGN.equals(command) && !COMMAND_COSIGN.equals(command) && !COMMAND_COUNTERSIGN.equals(command)) {
-					closeApp(STATUS_ERROR, pw,
-							buildSyntaxError(CommandLineMessages.getString("CommandLineLauncher.15", command))); //$NON-NLS-1$
+					closeApp(
+						STATUS_ERROR,
+						pw,
+						buildSyntaxError(CommandLineMessages.getString("CommandLineLauncher.15", command)) //$NON-NLS-1$
+					);
 				}
 
 				if (format == null) {
@@ -383,16 +411,15 @@ final class CommandLineLauncher {
 
 	}
 
-	/**
-	 * Filtra los certificados del almacen y devuelve el alias del &uacute;nico certificado
+	/** Filtra los certificados del almac&eacute;n y devuelve el alias del &uacute;nico certificado
 	 * que pasa el filtro.
 	 * @param ksm Gestor del almac&eacute;n en el que aplicar el filtro.
 	 * @param filterConfig Configuraci&oacute;n del filtro de certificados.
 	 * @return Alias del certificado seleccionado.
 	 * @throws CommandLineException Cuando no se ha encontrado ning&uacute;n certificado que pase
-	 * el filtro o cuando se encuentra m&aacute;s de uno.
-	 */
-	private static String filterCertificates(final AOKeyStoreManager ksm, final String filterConfig) throws CommandLineException {
+	 *                              el filtro o cuando se encuentra m&aacute;s de uno. */
+	private static String filterCertificates(final AOKeyStoreManager ksm,
+			                                 final String filterConfig) throws CommandLineException {
 
 		final Properties config = new Properties();
 		config.setProperty(KEY_FILTERS, filterConfig);
@@ -403,24 +430,28 @@ final class CommandLineLauncher {
 		final String[] filteredAliases = filter.matches(ksm.getAliases(), ksm);
 
 		if (filteredAliases == null || filteredAliases.length == 0) {
-			throw new CommandLineException("No se han encontrado certificados que se ajusten al filtro establecido"); //$NON-NLS-1$
+			throw new CommandLineException(
+				"No se han encontrado certificados que se ajusten al filtro establecido" //$NON-NLS-1$
+			);
 		}
 
 		if (filteredAliases.length > 1) {
-			throw new CommandLineException("Se ha encontrado mas de un certificado a partir del fitro establecido"); //$NON-NLS-1$
+			throw new CommandLineException(
+				"Se ha encontrado mas de un certificado a partir del fitro establecido" //$NON-NLS-1$
+			);
 		}
 
 		return filteredAliases[0];
 	}
 
 	private static byte[] sign(final String op,
-			                 final String fmt,
-			                 final String algorithm,
-			                 final String extraParams,
-			                 final File inputFile,
-			                 final String alias,
-			                 final AOKeyStoreManager ksm,
-			                 final String storePassword) throws CommandLineException {
+			                   final String fmt,
+			                   final String algorithm,
+			                   final String extraParams,
+			                   final File inputFile,
+			                   final String alias,
+			                   final AOKeyStoreManager ksm,
+			                   final String storePassword) throws CommandLineException {
 
 		final PrivateKeyEntry ke;
 		ksm.setEntryPasswordCallBack(
@@ -448,7 +479,9 @@ final class CommandLineLauncher {
 			data = AOUtil.getDataFromInputStream(input);
 		}
 		catch(final Exception e) {
-			throw new CommandLineException("No se ha podido leer el fichero de entrada: " + inputFile.getAbsolutePath(), e); //$NON-NLS-1$
+			throw new CommandLineException(
+				"No se ha podido leer el fichero de entrada: " + inputFile.getAbsolutePath(), e //$NON-NLS-1$
+			);
 		}
 
 		// Si el formato es "auto", miramos si es XML o PDF para asignar XAdES o PAdES
@@ -484,16 +517,21 @@ final class CommandLineLauncher {
 					// Solo procesamos las lineas con contenido que no sean comentario
 					if (keyValue.length() > 0 && keyValue.charAt(0) != '#') {
 						extraParamsProperties.setProperty(
-								keyValue.substring(0, keyValue.indexOf('=')),
-								keyValue.substring(keyValue.indexOf('=') + 1));
+							keyValue.substring(0, keyValue.indexOf('=')),
+							keyValue.substring(keyValue.indexOf('=') + 1)
+						);
 					}
 					beginIndex = endIndex + "\\n".length();  //$NON-NLS-1$
 				}
 				extraParamsProperties.setProperty(
-						params.substring(beginIndex, params.indexOf('=', beginIndex)),
-						params.substring(params.indexOf('=', beginIndex) + 1));
-			} catch (final Exception e) {
-				throw new CommandLineException("Error en los parametros de configuracion de firma:\n" + extraParams, e); //$NON-NLS-1$
+					params.substring(beginIndex, params.indexOf('=', beginIndex)),
+					params.substring(params.indexOf('=', beginIndex) + 1)
+				);
+			}
+			catch (final Exception e) {
+				throw new CommandLineException(
+					"Error en los parametros de configuracion de firma:\n" + extraParams, e //$NON-NLS-1$
+				);
 			}
 		}
 
@@ -512,8 +550,10 @@ final class CommandLineLauncher {
 			signer = new AOFacturaESigner();
 		}
 		else {
-			throw new CommandLineException("No se reconoce o no esta soportado el formato de firma: " + format, //$NON-NLS-1$
-					new AOUnsupportedSignFormatException("No se reconoce o no esta soportado el formato de firma:" + format)); //$NON-NLS-1$
+			throw new CommandLineException(
+				"No se reconoce o no esta soportado el formato de firma: " + format, //$NON-NLS-1$
+				new AOUnsupportedSignFormatException("No se reconoce o no esta soportado el formato de firma:" + format) //$NON-NLS-1$
+			);
 		}
 
 		// Obtenemos el resultado de la operacion adecuada
@@ -521,21 +561,21 @@ final class CommandLineLauncher {
 		try {
 			if (COMMAND_SIGN.equals(op)) {
 				resBytes = signer.sign(
-						data,
-						algorithm,
-						ke.getPrivateKey(),
-						ke.getCertificateChain(),
-						extraParamsProperties
-						);
+					data,
+					algorithm,
+					ke.getPrivateKey(),
+					ke.getCertificateChain(),
+					extraParamsProperties
+				);
 			}
 			else if (COMMAND_COSIGN.equals(op)) {
 				resBytes = signer.cosign(
-						data, // Firma
-						algorithm,
-						ke.getPrivateKey(),
-						ke.getCertificateChain(),
-						extraParamsProperties
-						);
+					data, // Firma
+					algorithm,
+					ke.getPrivateKey(),
+					ke.getCertificateChain(),
+					extraParamsProperties
+				);
 			}
 			else if (COMMAND_COUNTERSIGN.equals(op)) {
 				CounterSignTarget csTarget = CounterSignTarget.LEAFS;
@@ -545,14 +585,14 @@ final class CommandLineLauncher {
 				}
 
 				resBytes = signer.countersign(
-						data, // Firma
-						algorithm,
-						csTarget,
-						null,
-						ke.getPrivateKey(),
-						ke.getCertificateChain(),
-						extraParamsProperties
-						);
+					data, // Firma
+					algorithm,
+					csTarget,
+					null,
+					ke.getPrivateKey(),
+					ke.getCertificateChain(),
+					extraParamsProperties
+				);
 			}
 			else {
 				throw new CommandLineException("Operacion no soportada: " + op); //$NON-NLS-1$
@@ -597,7 +637,9 @@ final class CommandLineLauncher {
 
 	private static AOKeyStoreManager getKsm(final String storeType, final String pwd) throws AOKeystoreAlternativeException, IOException {
 		if (storeType == null) {
-			throw new IllegalArgumentException("El tipo de almacen de claves no puede ser nulo"); //$NON-NLS-1$
+			throw new IllegalArgumentException(
+				"El tipo de almacen de claves no puede ser nulo" //$NON-NLS-1$
+			);
 		}
 		final AOKeyStore store;
 		String lib = null;
@@ -632,6 +674,17 @@ final class CommandLineLauncher {
 			}
 			if (!new File(libName).canRead()) {
 				throw new IllegalArgumentException("No se tienen permisos de lectura para el fichero PKCS#12 indicado: " + libName); //$NON-NLS-1$
+			}
+			lib = libName;
+		}
+		else if (storeType.startsWith(STORE_P11 + ":")) { //$NON-NLS-1$
+			store = AOKeyStore.PKCS11;
+			final String libName = storeType.replace(STORE_P11 + ":", ""); //$NON-NLS-1$ //$NON-NLS-2$
+			if (!new File(libName).exists()) {
+				throw new IllegalArgumentException("La biblioteca PKCS#11 indicada no existe: " + libName); //$NON-NLS-1$
+			}
+			if (!new File(libName).canRead()) {
+				throw new IllegalArgumentException("No se tienen permisos de lectura para la biblioteca PKCS#11 indicada: " + libName); //$NON-NLS-1$
 			}
 			lib = libName;
 		}

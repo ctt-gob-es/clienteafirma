@@ -86,12 +86,13 @@ final class ShowFileLinkAction {
             try {
                 final File tmp = File.createTempFile("afirma", "." + ext);   //$NON-NLS-1$//$NON-NLS-2$
                 tmp.deleteOnExit();
-                final OutputStream fos = new FileOutputStream(tmp);
-                final OutputStream bos = new BufferedOutputStream(fos);
-                bos.write(data);
-                bos.flush();
-                bos.close();
-                try { fos.close(); } catch(final Exception e) { /* Ignoramos los errores */ }
+                try (
+	                final OutputStream fos = new FileOutputStream(tmp);
+	                final OutputStream bos = new BufferedOutputStream(fos);
+        		) {
+                	bos.write(data);
+                	bos.flush();
+                }
                 Desktop.getDesktop().open(tmp);
             }
             catch(final Exception e) {

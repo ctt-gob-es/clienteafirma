@@ -56,10 +56,13 @@ final class Cifrado extends JPanel {
     private static final long serialVersionUID = 1L;
 
     // Algoritmos para mecanismo contrasena de cifrado
-    private final List<String> algoritmoLc = new ArrayList<String>(Arrays.asList(Messages.getString("Cifrado.origenLc.0"), //$NON-NLS-1$
-                                                                                 Messages.getString("Cifrado.origenLc.1"), //$NON-NLS-1$
-                                                                                 Messages.getString("Cifrado.origenLc.2") //$NON-NLS-1$
-    ));
+    private final List<String> algoritmoLc = new ArrayList<>(
+		Arrays.asList(
+			Messages.getString("Cifrado.origenLc.0"), //$NON-NLS-1$
+            Messages.getString("Cifrado.origenLc.1"), //$NON-NLS-1$
+            Messages.getString("Cifrado.origenLc.2") //$NON-NLS-1$
+		)
+	);
 
     // Constantes algoritmos / Mecanismo Contrasena de cifrado
     private final String[] algoritmoVc = new String[] {
@@ -77,7 +80,12 @@ final class Cifrado extends JPanel {
     };
 
     // Constantes de los mecanismos de cifrado
-    private final List<String> mecanismos = new ArrayList<String>(Arrays.asList(AOCipherConstants.KEY_MODE_PASSWORD, AOCipherConstants.KEY_MODE_USERINPUT));
+    private final List<String> mecanismos = new ArrayList<>(
+		Arrays.asList(
+			AOCipherConstants.KEY_MODE_PASSWORD,
+			AOCipherConstants.KEY_MODE_USERINPUT
+		)
+	);
 
     public Cifrado() {
         initComponents();
@@ -87,7 +95,7 @@ final class Cifrado extends JPanel {
      * @param comboMecanismo Combo con el mecanismo de cifrado
      * @param comboAlgoritmo Combo con el algoritmo de cifrado
      * @param campoFichero Campo con el nombre del fichero a cifrar */
-    void cifrarActionPerformed(final JComboBox comboMecanismo, final JComboBox comboAlgoritmo, final JTextField campoFichero) {
+    void cifrarActionPerformed(final JComboBox<String> comboMecanismo, final JComboBox<String> comboAlgoritmo, final JTextField campoFichero) {
         String algoritmo;
         final String mecanismo = this.mecanismos.get(comboMecanismo.getSelectedIndex());
         if (mecanismo.equals(AOCipherConstants.KEY_MODE_PASSWORD)) {
@@ -120,19 +128,19 @@ final class Cifrado extends JPanel {
     /** Cambio de seleccion en el combo de los mecanismos
      * @param comboMecanismo Combo que contiene el listado de mecanismos de cifrado
      * @param comboAlgoritmo Combo que contiene el listado de algoritmos */
-    void comboMecanismoItemStateChanged(final JComboBox comboMecanismo, final JComboBox comboAlgoritmo) {
+    void comboMecanismoItemStateChanged(final JComboBox<String> comboMecanismo, final JComboBox<String> comboAlgoritmo) {
         final String mecanismo = this.mecanismos.get(comboMecanismo.getSelectedIndex());
         if (mecanismo.equals(AOCipherConstants.KEY_MODE_PASSWORD)) {
-            comboAlgoritmo.setModel(new DefaultComboBoxModel(this.algoritmoLc.toArray()));
+            comboAlgoritmo.setModel(new DefaultComboBoxModel<>(this.algoritmoLc.toArray(new String[0])));
         }
         else {
             final String[] algoritmoLr = new String[] {
-                   "Advanced Encryption Standard (AES)", //$NON-NLS-1$
-                   "Blowfish", //$NON-NLS-1$
-                   "Data Encryption Standard (DES)", //$NON-NLS-1$
-                   "Triple DES (3DES)", //$NON-NLS-1$
+               "Advanced Encryption Standard (AES)", //$NON-NLS-1$
+               "Blowfish", //$NON-NLS-1$
+               "Data Encryption Standard (DES)", //$NON-NLS-1$
+               "Triple DES (3DES)", //$NON-NLS-1$
             };
-            comboAlgoritmo.setModel(new DefaultComboBoxModel(algoritmoLr));
+            comboAlgoritmo.setModel(new DefaultComboBoxModel<>(algoritmoLr));
         }
     }
 
@@ -252,11 +260,15 @@ final class Cifrado extends JPanel {
         c.fill = GridBagConstraints.BOTH;
 
         // Combo mecanismos de cifrado
-        final JComboBox comboMecanismo = new JComboBox();
-        final JComboBox comboAlgoritmo = new JComboBox();
+        final JComboBox<String> comboMecanismo = new JComboBox<>();
+        final JComboBox<String> comboAlgoritmo = new JComboBox<>();
         comboMecanismo.setToolTipText(Messages.getString("Cifrado.origen.clave.combo.description")); // NOI18N //$NON-NLS-1$
-        comboMecanismo.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.getBar(),
-                                                                            Messages.getString("Cifrado.origen.clave.combo.description.status"))); //$NON-NLS-1$
+        comboMecanismo.addMouseListener(
+    		new ElementDescriptionMouseListener(
+				PrincipalGUI.getBar(),
+                Messages.getString("Cifrado.origen.clave.combo.description.status") //$NON-NLS-1$
+			)
+		);
         comboMecanismo.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.getBar(),
                                                                             Messages.getString("Cifrado.origen.clave.combo.description.status"))); //$NON-NLS-1$
         comboMecanismo.addItemListener(new ItemListener() {
@@ -267,8 +279,14 @@ final class Cifrado extends JPanel {
         });
 
         comboMecanismo.getAccessibleContext().setAccessibleDescription(Messages.getString("Cifrado.origen.clave.combo.description")); // NOI18N //$NON-NLS-1$
-        comboMecanismo.setModel(new DefaultComboBoxModel(new String[] {
-                                                                       Messages.getString("Cifrado.origenL.0"), Messages.getString("Cifrado.origenL.1")})); //$NON-NLS-1$ //$NON-NLS-2$
+        comboMecanismo.setModel(
+    		new DefaultComboBoxModel<>(
+        		new String[] {
+    				Messages.getString("Cifrado.origenL.0"), //$NON-NLS-1$
+    				Messages.getString("Cifrado.origenL.1") //$NON-NLS-1$
+        		}
+    		)
+		);
         Utils.remarcar(comboMecanismo);
         Utils.setContrastColor(comboMecanismo);
         Utils.setFontBold(comboMecanismo);
@@ -330,7 +348,7 @@ final class Cifrado extends JPanel {
                                                                             Messages.getString("Cifrado.formato.combo.description.status"))); //$NON-NLS-1$
 
         comboAlgoritmo.getAccessibleContext().setAccessibleDescription(Messages.getString("Cifrado.formato.combo.description")); // NOI18N //$NON-NLS-1$
-        comboAlgoritmo.setModel(new DefaultComboBoxModel(this.algoritmoLc.toArray()));
+        comboAlgoritmo.setModel(new DefaultComboBoxModel<>(this.algoritmoLc.toArray(new String[0])));
         Utils.remarcar(comboAlgoritmo);
         Utils.setContrastColor(comboAlgoritmo);
         Utils.setFontBold(comboAlgoritmo);

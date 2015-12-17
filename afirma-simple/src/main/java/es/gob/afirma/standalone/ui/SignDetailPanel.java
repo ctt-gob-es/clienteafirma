@@ -159,6 +159,6 @@ public final class SignDetailPanel extends JPanel {
 
     /** Vuelve a la pantalla de selecci&oacute;n de fichero para la firma. */
     void goToBack() {
-        this.saf.loadMainApp(false);
+        this.saf.loadMainApp();
     }
 }

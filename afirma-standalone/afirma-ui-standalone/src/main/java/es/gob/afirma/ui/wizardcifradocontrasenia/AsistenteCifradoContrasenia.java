@@ -37,7 +37,7 @@ public final class AsistenteCifradoContrasenia extends JDialog {
     /** Inicializacion de componentes */
     private void initComponents() {
         // Generamos la lista para el control de la botonera
-        final List<JDialogWizard> ventanas = new ArrayList<JDialogWizard>();
+        final List<JDialogWizard> ventanas = new ArrayList<>();
 
         // Obtenemos todas las paginas
         // Pagina 1: Panel presentacion

@@ -74,6 +74,8 @@ public final class CAdESTriPhaseCoSigner {
 	 * @param contentType Tipo de los datos a firmar
 	 * @param contentDescription Contenido de los datos a firmar
 	 * @param signDate Fecha de la firma
+	 * @param includeSigningTimeAttribute <code>true</code> para incluir el atributo <i>SigningTime</i> de PKCS#9 (OID:1.2.840.113549.1.9.5),
+     *                                    <code>false</code> para no incluirlo.
 	 * @param ctis Indicaciones sobre los tipos de compromisos adquiridos con la firma.
 	 * @param csm Metadatos sobre el firmante
 	 * @return Pre-cofirma CAdES (SignedAttributes de CAdES)
@@ -89,10 +91,11 @@ public final class CAdESTriPhaseCoSigner {
 			                       final String contentType,
 			                       final String contentDescription,
 			                       final Date signDate,
+			                       final boolean includeSigningTimeAttribute,
 			                       final List<CommitmentTypeIndicationBean> ctis,
 			                       final CAdESSignerMetadata csm) throws CertificateEncodingException,
-			                                                                             NoSuchAlgorithmException,
-			                                                                             IOException {
+			                                                             NoSuchAlgorithmException,
+			                                                             IOException {
 		return getSignedAttributes(
 			messageDigest,
 			signerCertificateChain,
@@ -103,6 +106,7 @@ public final class CAdESTriPhaseCoSigner {
 			contentType,
 			contentDescription,
 			signDate,
+			includeSigningTimeAttribute,
 			ctis,
 			csm
 		).getEncoded(ASN1Encoding.DER);
@@ -117,6 +121,7 @@ public final class CAdESTriPhaseCoSigner {
 			                                   final String contentType,
 			                                   final String contentDescription,
 			                                   final Date signDate,
+			                                   final boolean includeSigningTimeAttribute,
 			                                   final List<CommitmentTypeIndicationBean> ctis,
 			                                   final CAdESSignerMetadata csm) throws CertificateEncodingException,
 			                                                                         NoSuchAlgorithmException,
@@ -130,6 +135,7 @@ public final class CAdESTriPhaseCoSigner {
 			signingCertificateV2,
 			messageDigest,
 			signDate,
+			includeSigningTimeAttribute,
 			false,
 			contentType,
 			contentDescription,

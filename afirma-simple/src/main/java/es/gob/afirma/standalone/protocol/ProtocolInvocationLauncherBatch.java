@@ -36,7 +36,12 @@ final class ProtocolInvocationLauncherBatch {
 	}
 
 	/** Procesa un lote de firma en invocaci&oacute;n por protocolo.
-	 * @param options Par&aacute;metros de la operaci&oacute;n. */
+	 * @param options Par&aacute;metros de la operaci&oacute;n.
+	 * @param bySocket <code>true</code> para usar comunicaci&oacute;n por <i>socket</i> local,
+	 *                 <code>false</code> para usar servidor intermedio.
+	 * @return XML de respuesta del procesado.
+	 * @throws WebServiceCommunicationExceptionBatchOperation Si hay errores en la
+	 *                                                        comunicaci&oacute;n por <i>socket</i> local. */
 	static String processBatch(final UrlParametersForBatch options, final boolean bySocket) throws WebServiceCommunicationExceptionBatchOperation {
 
 		final AOKeyStore aoks = AOKeyStore.valueOf(options.getDefaultKeyStore());
@@ -78,7 +83,7 @@ final class ProtocolInvocationLauncherBatch {
 			);
 		}
 		catch (final AOCancelledOperationException e) {
-			LOGGER.severe("Operacion cancelada por el usuario" + e);
+			LOGGER.severe("Operacion cancelada por el usuario" + e); //$NON-NLS-1$
 			if (!bySocket){
 				throw new WebServiceCommunicationExceptionBatchOperation(RESULT_CANCEL);
 			}
@@ -103,7 +108,7 @@ final class ProtocolInvocationLauncherBatch {
 
 		String batchResult;
 		try {
-			batchResult = 
+			batchResult =
 					BatchSigner.sign(
 							Base64.encode(options.getData(), true),
 							options.getBatchPresignerUrl(),
@@ -176,11 +181,11 @@ final class ProtocolInvocationLauncherBatch {
 	public static void sendErrorToServer(final String data, final UrlParametersForBatch options){
 		try {
 			sendData(data, options);
-		} catch (IOException e1) {
-			LOGGER.severe("Error al enviar los datos del error en la operacion firma por lotes al servidor" + e1);
-		}	
+		} catch (final IOException e1) {
+			LOGGER.severe("Error al enviar los datos del error en la operacion firma por lotes al servidor" + e1); //$NON-NLS-1$
+		}
 	}
-	
+
 	private static void sendData(final String data, final UrlParametersForBatch options) throws IOException {
 
 		final StringBuffer url = new StringBuffer(options.getStorageServletUrl().toString());
@@ -196,7 +201,7 @@ final class ProtocolInvocationLauncherBatch {
 			"Resultado del envio de datos de lote al servidor intermedio: " + new String(result) //$NON-NLS-1$
 		);
 	}
-	
+
 	public static String getResultCancel() {
 		return RESULT_CANCEL;
 	}
@@ -205,20 +210,20 @@ final class ProtocolInvocationLauncherBatch {
 	public static class WebServiceCommunicationExceptionBatchOperation extends Exception {
 		private static final long serialVersionUID = -6382342237658143382L;
 		private String errorCode ;
-		
+
 		WebServiceCommunicationExceptionBatchOperation(final String code) {
 			setErrorCode(code);
 		}
 
 		public String getErrorCode() {
-			return errorCode;
+			return this.errorCode;
 		}
 
-		public void setErrorCode(String errorCode) {
+		public void setErrorCode(final String errorCode) {
 			this.errorCode = errorCode;
 		}
 
-		
+
 	}
 
 }

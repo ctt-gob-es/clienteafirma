@@ -116,8 +116,8 @@ public final class PAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 			                         final X509Certificate[] cert,
 			                         final Properties extraParams,
 			                         final TriphaseData triphaseData) throws NoSuchAlgorithmException,
-			                                                      AOException,
-			                                                      IOException {
+			                                                                 AOException,
+			                                                                 IOException {
 
 		LOGGER.info("Postfirma PAdES - Firma - INICIO"); //$NON-NLS-1$
 

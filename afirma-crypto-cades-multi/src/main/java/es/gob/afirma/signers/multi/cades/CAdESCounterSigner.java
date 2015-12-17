@@ -122,6 +122,8 @@ final class CAdESCounterSigner {
      *                             atributo <i>Signing Certificate</i> <code>false</code> para
      *                             usar la versi&oacute;n 1
      * @param ctis Indicaciones sobre los tipos de compromisos adquiridos con la firma.
+     * @param includeSigningTimeAttribute <code>true</code> para incluir el atributo <i>SigningTime</i> de PKCS#9 (OID:1.2.840.113549.1.9.5),
+     *                                    <code>false</code> para no incluirlo.
      * @param csm Metadatos sobre el firmante.
      * @return El archivo de firmas con la nueva firma.
      * @throws IOException Cuando se produce algun error con la lectura o escritura de datos.
@@ -139,6 +141,7 @@ final class CAdESCounterSigner {
                        final AdESPolicy policy,
                        final boolean signingCertificateV2,
                        final List<CommitmentTypeIndicationBean> ctis,
+                       final boolean includeSigningTimeAttribute,
                        final CAdESSignerMetadata csm) throws IOException,
                                                              NoSuchAlgorithmException,
                                                              CertificateException,
@@ -178,6 +181,7 @@ final class CAdESCounterSigner {
             policy,
             signingCertificateV2,
             ctis,
+            includeSigningTimeAttribute,
             csm,
             targetType
         );
@@ -205,6 +209,8 @@ final class CAdESCounterSigner {
      * @param certChain Cadena de certificados del firmante.
      * @param policy Pol&iacute;tica de firma.
      * @param ctis Indicaciones sobre los tipos de compromisos adquiridos con la firma.
+     * @param includeSigningTimeAttribute <code>true</code> para incluir el atributo <i>SigningTime</i> de PKCS#9 (OID:1.2.840.113549.1.9.5),
+     *                                    <code>false</code> para no incluirlo.
      * @param csm Metadatos sobre el firmante.
      * @param targetType Lo que se quiere firmar. Puede ser el &aacute;rbol completo,
      *                   las hojas, un nodo determinado o unos determinados firmantes.
@@ -220,6 +226,7 @@ final class CAdESCounterSigner {
                                                        final AdESPolicy policy,
                                                        final boolean signingCertificateV2,
                                                        final List<CommitmentTypeIndicationBean> ctis,
+                                                       final boolean includeSigningTimeAttribute,
                                                        final CAdESSignerMetadata csm,
                                                        final CounterSignTarget targetType) throws NoSuchAlgorithmException,
                                                                                                   IOException,
@@ -243,6 +250,7 @@ final class CAdESCounterSigner {
                     policy,
                     signingCertificateV2,
                     ctis,
+                    includeSigningTimeAttribute,
                     csm,
                     targetType
                 )
@@ -260,6 +268,8 @@ final class CAdESCounterSigner {
      * @param signingCertificateV2 <code>true</code> si se desea usar <i>SigningCertificateV2</i>, <code>false</code>
      *        para usar <i>SigningCertificateV1</i>.
      * @param ctis Indicaciones sobre los tipos de compromisos adquiridos con la firma.
+     * @param includeSigningTimeAttribute <code>true</code> para incluir el atributo <i>SigningTime</i> de PKCS#9 (OID:1.2.840.113549.1.9.5),
+     *                                    <code>false</code> para no incluirlo.
      * @param csm Metadatos sobre el firmante.
      * @param targetType Lo que se quiere firmar. Puede ser el &aacute;rbol completo,
      *                   las hojas, un nodo determinado o unos determinados firmantes.
@@ -276,6 +286,7 @@ final class CAdESCounterSigner {
                                              final AdESPolicy policy,
                                              final boolean signingCertificateV2,
                                              final List<CommitmentTypeIndicationBean> ctis,
+                                             final boolean includeSigningTimeAttribute,
                                              final CAdESSignerMetadata csm,
                                              final CounterSignTarget targetType) throws NoSuchAlgorithmException,
                                                                                         IOException,
@@ -320,6 +331,7 @@ final class CAdESCounterSigner {
                 				policy,
                 				signingCertificateV2,
                 				ctis,
+                				includeSigningTimeAttribute,
                 				csm,
                 				targetType
             				)
@@ -347,6 +359,7 @@ final class CAdESCounterSigner {
 					policy,
 					signingCertificateV2,
 					ctis,
+					includeSigningTimeAttribute,
 					csm
 				)
 			);
@@ -374,6 +387,8 @@ final class CAdESCounterSigner {
      * @param signingCertificateV2 <code>true</code> si se desea usar <i>SigningCertificateV2</i>, <code>false</code>
      *        para usar <i>SigningCertificateV1</i>.
      * @param ctis Indicaciones sobre los tipos de compromisos adquiridos con la firma.
+     * @param includeSigningTimeAttribute <code>true</code> para incluir el atributo <i>SigningTime</i> de PKCS#9 (OID:1.2.840.113549.1.9.5),
+     *                                    <code>false</code> para no incluirlo.
      * @param csm Metadatos sobre el firmante.
      * @return <i>SignerInfo</i> contrafirmado.
      * @throws NoSuchAlgorithmException Si no se soporta alguno de los algoritmos necesarios.
@@ -386,6 +401,7 @@ final class CAdESCounterSigner {
                                                  final AdESPolicy policy,
                                                  final boolean signingCertificateV2,
                                                  final List<CommitmentTypeIndicationBean> ctis,
+                                                 final boolean includeSigningTimeAttribute,
                                                  final CAdESSignerMetadata csm) throws NoSuchAlgorithmException,
                                                                                        IOException,
                                                                                        CertificateException {
@@ -401,6 +417,7 @@ final class CAdESCounterSigner {
              signingCertificateV2,
              null,
              this.date != null ? this.date : new Date(), // Usamos fecha y hora actual nueva si no se nos ha indicado otra distinta
+    		 includeSigningTimeAttribute,
              false,
              null, // En contrafirma el ContentType no se pone
              null, // En contrafirma el ContentDescription no se pone

@@ -50,6 +50,11 @@ public abstract class UrlParameters {
 		return this.extraParams != null ? this.extraParams : new Properties();
 	}
 
+	/**
+	 * Establece los par&aacute;metros adicionales para la configuraci&oacute;n
+	 * de la operaci&oacute;n de firma.
+	 * @param properties Propiedades adicionales.
+	 */
 	void setExtraParams(final Properties properties) {
 		this.extraParams = properties != null ? properties : new Properties();
 	}
@@ -192,7 +197,7 @@ public abstract class UrlParameters {
 		}
 	}
 
-	/** Extr&aacute;e y verifica la clave de cifrado de los par&aacute;metros de entrada.
+	/** Extrae y verifica la clave de cifrado de los par&aacute;metros de entrada.
 	 *  @param params Par&aacute;metros extra&iacute;dos de la URI.
 	 *  @return Clave de cifrado o null si no se declar&oacute; un valor en los par&aacute;metros.
 	 *  @throws ParameterException Cuando la clave de cifrado es err&oacute;nea. */

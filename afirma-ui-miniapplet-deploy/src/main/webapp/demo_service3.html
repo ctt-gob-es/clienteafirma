@@ -38,7 +38,7 @@
 
 			var params = "mode=implicit"+
 						"\nfilter=qualified:051a58c1e1afca40"+
-						"\nheadless=true";
+						"\nheadless=true"+"\nprienbaeserros=3";
 			
 			var dataB64 = null;
 			
@@ -82,7 +82,8 @@
 		}
 
 		function guardar() {
-			MiniApplet.saveDataToFile(document.getElementById("firmaB64").value, "Guardar firma", "firma.csig", "csig", "Firma CAdES");
+		//	mostrarDialogoEspera();
+			MiniApplet.saveDataToFile(document.getElementById("firmaB64").value, "Guardar firma", "firma.csig", "csig", "Firma CAdES", successCallbackSave, errorCallbackSave);
 		}
 
 		function successCallback(signatureB64, certificate) {
@@ -93,11 +94,28 @@
 			document.getElementById("firmaB64").value = signatureB64;			
 		}
 		
+		function successCallbackSave(data){
+			if(data == "SAVE_OK"){
+				var divMensaje = document.getElementById('divmensaje');
+				divMensaje.innerHTML='<br><div class="iconOKFirma">Se ha guardado correctamente</div>';
+			}
+			else alert ("error");
+			ocultarDialogoEspera();
+		}
+		
 		function errorCallback(errorType, errorMessage) {
 			ocultarDialogoEspera();
 			
 			var divMensaje = document.getElementById('divmensaje');
 			divMensaje.innerHTML='<br><div class="iconErrorFirma">Error al firmar</div><br>' +
+					'<div style="width: 300pt">' + errorMessage + '</div>' + '<br>';
+		}
+		
+		function errorCallbackSave(errorType, errorMessage) {
+			ocultarDialogoEspera();
+			
+			var divMensaje = document.getElementById('divmensaje');
+			divMensaje.innerHTML='<br><div class="iconErrorFirma">Error al guardar</div><br>' +
 					'<div style="width: 300pt">' + errorMessage + '</div>' + '<br>';
 		}
 
@@ -253,7 +271,7 @@
 	</div> <!-- FIN DE CONTENEDOR -->
 	
 	<script type="text/javascript">
-		MiniApplet.cargarMiniApplet('http://demo.com:8080/afirma-ui-miniapplet-deploy');
+		MiniApplet.cargarMiniApplet("http://localhost:8080/afirma-ui-miniapplet-deploy/demo.html");
 		MiniApplet.setServlets("http://demo.com:8080/afirma-signature-storage/StorageService", "http://demo.com:8080/afirma-signature-retriever/RetrieveService");
 	</script>
 	

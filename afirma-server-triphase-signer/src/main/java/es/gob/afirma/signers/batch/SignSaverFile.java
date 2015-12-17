@@ -9,10 +9,18 @@ import java.util.Properties;
 import java.util.logging.Logger;
 
 /** Guarda firmas envi&aacute;ndolas a un servicio HTTP POST.
+ * <b>Esta clase es &uacute;nicamente un ejemplo de implementaci&oacue;n del interfaz <code>SignSaver</code>
+ * para depuraci&oacute;n, <u>nunca</u> debe usarse en entornos reales</b> (no hay comprobaciones de
+ * qu&eacute; ficheros pueden sobrescribirse).
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
 public final class SignSaverFile implements SignSaver {
 
 	private static final String PROP_FILENAME = "FileName"; //$NON-NLS-1$
+
+	/** El guardado real est&aacute; deshabilitado por defecto, habilitar para usar esta clase
+	 * para depuraci&oacute;n. No debe usarse para entornos reales, ya que no hay comprobaciones de
+	 * qu&eacute; ficheros pueden sobrescribirse. */
+	private static final boolean DISABLED = true;
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
@@ -44,15 +52,22 @@ public final class SignSaverFile implements SignSaver {
 
 	@Override
 	public void saveSign(final SingleSign sign, final byte[] dataToSave) throws IOException {
-		final OutputStream fos = new FileOutputStream(this.filename);
-		final BufferedOutputStream bos = new BufferedOutputStream(
-			fos,
-			dataToSave.length
-		);
-		bos.write(dataToSave);
-		bos.flush();
-		fos.close();
-		LOGGER.info("Guardada finalmente la firma '" + sign.getId() + "' en: " + this.filename); //$NON-NLS-1$ //$NON-NLS-2$
+		if (!DISABLED) {
+			final OutputStream fos = new FileOutputStream(this.filename);
+			final BufferedOutputStream bos = new BufferedOutputStream(
+				fos,
+				dataToSave.length
+			);
+			bos.write(dataToSave);
+			bos.flush();
+			fos.close();
+			LOGGER.info("Guardada finalmente la firma '" + sign.getId() + "' en: " + this.filename); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+		else {
+			LOGGER.info(
+				"El guardado esta deshabilitado. La ruta de guadado solicitada es: " +  this.filename //$NON-NLS-1$
+			);
+		}
 	}
 
 	@Override

@@ -21,9 +21,14 @@ public final class HttpError extends IOException {
 
 	/** Crea una excepci&oacute;n de error de conexi&oacute;n HTTP.
 	 * @param resCode C&oacute;digo HTTP de respuesta.
-	 * @param resDescription Descripci&oacute;n del error. */
-	HttpError(final int resCode, final String resDescription) {
-		super("Error en conexion HTTP con codigo de respuesta " + resCode + " y descripcion: " + resDescription); //$NON-NLS-1$ //$NON-NLS-2$
+	 * @param resDescription Descripci&oacute;n del error.
+	 * @param url URL a la que se intent&oacute; conectar.  */
+	HttpError(final int resCode, final String resDescription, final String url) {
+		super(
+			"Error en conexion HTTP con codigo de respuesta " + resCode + //$NON-NLS-1$
+				" y descripcion '" + resDescription  + //$NON-NLS-1$
+					"' para la direccion: " + url //$NON-NLS-1$
+		);
 		this.responseCode = resCode;
 		this.responseDescription = resDescription;
 	}

@@ -351,13 +351,11 @@ final class PanelCofirma extends JAccessibilityDialogWizard {
             return false;
         }
 
-		byte[] sign;
+		final byte[] sign;
 		byte[] data;
 
-		try {
-			final InputStream signIs = new FileInputStream(ficheroFirma);
+		try ( final InputStream signIs = new FileInputStream(ficheroFirma); ) {
 		    sign = AOUtil.getDataFromInputStream(signIs);
-		    signIs.close();
 		}
 		catch (final Exception e) {
 			CustomDialog.showMessageDialog(this, true, Messages.getString("Wizard.multifirma.simple.error.firma"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
@@ -412,9 +410,9 @@ final class PanelCofirma extends JAccessibilityDialogWizard {
 		    }
 
 		    if (data == null) {
-		    	final InputStream dataIs = new FileInputStream(ficheroDatos);
-		        data = AOUtil.getDataFromInputStream(dataIs);
-		        dataIs.close();
+		    	try ( final InputStream dataIs = new FileInputStream(ficheroDatos); ) {
+		    		data = AOUtil.getDataFromInputStream(dataIs);
+		    	}
 		    }
 
 		    if (!signer.isValidDataFile(data)) {

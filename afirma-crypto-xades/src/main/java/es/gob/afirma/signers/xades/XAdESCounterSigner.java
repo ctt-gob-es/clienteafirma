@@ -116,7 +116,7 @@ public final class XAdESCounterSigner {
 		final Properties extraParams = xParams != null ? xParams
 				: new Properties();
 
-		String encoding = extraParams.getProperty("encoding"); //$NON-NLS-1$
+		String encoding = extraParams.getProperty(XAdESExtraParams.ENCODING);
 		if ("base64".equalsIgnoreCase(encoding)) { //$NON-NLS-1$
 			encoding = XMLConstants.BASE64_ENCODING;
 		}
@@ -470,13 +470,15 @@ public final class XAdESCounterSigner {
 		final Properties extraParams = xParams != null ? xParams : new Properties();
 
 		final String digestMethodAlgorithm = extraParams.getProperty(
-				"referencesDigestMethod", AOXAdESSigner.DIGEST_METHOD); //$NON-NLS-1$
+		        XAdESExtraParams.REFERENCES_DIGEST_METHOD, AOXAdESSigner.DIGEST_METHOD);
 		final String canonicalizationAlgorithm = extraParams.getProperty(
-				"canonicalizationAlgorithm", CanonicalizationMethod.INCLUSIVE); //$NON-NLS-1$
+		        XAdESExtraParams.CANONICALIZATION_ALGORITHM, CanonicalizationMethod.INCLUSIVE);
 		final String xadesNamespace = extraParams.getProperty(
-				"xadesNamespace", AOXAdESSigner.XADESNS); //$NON-NLS-1$
+		        XAdESExtraParams.XADES_NAMESPACE, AOXAdESSigner.XADESNS);
 		final String signedPropertiesTypeUrl = extraParams.getProperty(
-				"signedPropertiesTypeUrl", AOXAdESSigner.XADES_SIGNED_PROPERTIES_TYPE); //$NON-NLS-1$
+		        XAdESExtraParams.SIGNED_PROPERTIES_TYPE_URL, AOXAdESSigner.XADES_SIGNED_PROPERTIES_TYPE);
+		final boolean useManifest = Boolean.parseBoolean(extraParams.getProperty(
+		        XAdESExtraParams.USE_MANIFEST, Boolean.FALSE.toString()));
 
 		// crea un nodo CounterSignature
 		final Element counterSignature = doc.createElement(
@@ -521,8 +523,10 @@ public final class XAdESCounterSigner {
 		qualifyingProperties.appendChild(unsignedProperties);
 
 		// obtiene el nodo SignatureValue
-		final Element signatureValue = (Element) signature
-				.getElementsByTagNameNS(XMLConstants.DSIGNNS, "SignatureValue").item(0); //$NON-NLS-1$
+		final Element signatureValue = (Element) signature.getElementsByTagNameNS(
+			XMLConstants.DSIGNNS,
+			"SignatureValue" //$NON-NLS-1$
+		).item(0);
 
 		// crea la referencia a la firma que se contrafirma
 		final List<Reference> referenceList = new ArrayList<Reference>();
@@ -595,9 +599,36 @@ public final class XAdESCounterSigner {
 			canonicalizationAlgorithm
 		);
 
+		// *************************************************************************************
+		// ********************************* GESTION MANIFEST **********************************
+
+		if (useManifest) {
+			try {
+				XAdESUtil.createManifest(
+					referenceList,
+					fac,
+					xmlSignature,
+					digestMethod,
+					fac.newTransform(
+						canonicalizationAlgorithm,
+						(TransformParameterSpec) null
+					),
+					referenceId
+				);
+			}
+			catch (final Exception e) {
+				throw new AOException(
+					"Error creando el algoritmo de canonicalizacion para el MANIFEST: " + e, e //$NON-NLS-1$
+				);
+			}
+		}
+
+		// ********************************* FIN GESTION MANIFEST ******************************
+		// *************************************************************************************
+
 		try {
 			final boolean onlySignningCert = Boolean.parseBoolean(
-				extraParams.getProperty("includeOnlySignningCertificate", Boolean.FALSE.toString()) //$NON-NLS-1$
+				extraParams.getProperty(XAdESExtraParams.INCLUDE_ONLY_SIGNNING_CERTIFICATE, Boolean.FALSE.toString())
 			);
 			if (onlySignningCert) {
 				xmlSignature.sign(
@@ -615,8 +646,8 @@ public final class XAdESCounterSigner {
 					XMLConstants.SIGN_ALGOS_URI.get(algorithm),
 					referenceList,
 					"Signature-" + UUID.randomUUID().toString(), //$NON-NLS-1$
-					Boolean.parseBoolean(extraParams.getProperty("addKeyInfoKeyValue", Boolean.TRUE.toString())), //$NON-NLS-1$
-					Boolean.parseBoolean(extraParams.getProperty("addKeyInfoKeyName", Boolean.FALSE.toString())) //$NON-NLS-1$
+					Boolean.parseBoolean(extraParams.getProperty(XAdESExtraParams.ADD_KEY_INFO_KEY_VALUE, Boolean.TRUE.toString())),
+					Boolean.parseBoolean(extraParams.getProperty(XAdESExtraParams.ADD_KEY_INFO_KEY_NAME, Boolean.FALSE.toString()))
 				);
 			}
 		}

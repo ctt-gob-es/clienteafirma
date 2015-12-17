@@ -45,6 +45,10 @@ final class ErrorManager {
 		// No instanciable
 	}
 
+	static String genError(final String number) {
+		return genError(number, null);
+	}
+
 	static String genError(final String number, final String msg) {
 		return
 				ERROR_TEMPLATE.replace(ERROR_NUMBER, number).replace(

@@ -1,5 +1,6 @@
 package es.gob.afirma.android.signfolder.proxy;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -16,6 +17,7 @@ import org.xml.sax.SAXException;
 import android.util.Log;
 import es.gob.afirma.android.network.AndroidUrlHttpManager;
 import es.gob.afirma.android.signfolder.SFConstants;
+import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 
 /** Gestor de comunicaciones con el servidor de portafirmas m&oacute;vil.
@@ -93,7 +95,11 @@ public final class CommManager {
 		sb.append("="); //$NON-NLS-1$
 		sb.append(dataB64UrlSafe);
 
-		Log.i("es.gob.afirma", "URL de peticion:\n" + sb.toString()); //$NON-NLS-1$ //$NON-NLS-2$
+		Log.i("es.gob.afirma", "URL de peticion:"); //$NON-NLS-1$ //$NON-NLS-2$"
+		final String urlString = sb.toString();
+		for (int i = 0; i < urlString.length() / 1000 + 1; i++) {
+			Log.i("es.gob.afirma", urlString .substring(i * 1000, Math.min((i + 1) * 1000, urlString.length())));
+		}
 
 		return sb.toString();
 	}
@@ -110,8 +116,6 @@ public final class CommManager {
 	 * </ul>
 	 * @param certEncodedB64 Certificado codificado en Base64.
 	 * @param signRequestState Estado de las peticiones que se desean obtener.
-	 * @param signFormats Listado de formatos de firmas soportados (para que solo se
-	 *                    env&iacuteM;n.
 	 * @param filters
 	 *            Listado de filtros que deben cumplir las peticiones
 	 *            recuperadas. Los filtros soportados son:
@@ -157,7 +161,6 @@ public final class CommManager {
 
 	/** Inicia la pre-firma remota de las peticiones.
 	 * @param request Petici&oacute;n de firma.
-	 * @param requests Peticiones a pre-firmar.
 	 * @param cert Certificado del firmante.
 	 * @return Prefirmas de las peticiones enviadas.
 	 * @throws IOException Si ocurre algun error durante el tratamiento de datos.
@@ -205,18 +208,16 @@ public final class CommManager {
 	/**
 	 * Obtiene los datos de un documento.
 	 *
-	 * @param requestId
-	 *            Identificador de la petici&oacute;n.
 	 * @param certB64
 	 *            Certificado codificado en base64.
+	 * @param requestId
+	 *            Identificador de la petici&oacute;n.
 	 * @return Datos del documento.
 	 * @throws SAXException
 	 *             Cuando se encuentra un XML mal formado.
 	 * @throws IOException
 	 *             Cuando existe alg&uacute;n problema en la lectura/escritura
 	 *             de XML o al recuperar la respuesta del servidor.
-	 * @throws CertificateEncodingException
-	 *             Si no se puede obtener la codificaci&oacute;n del certificado
 	 */
 	public RequestDetail getRequestDetail(final String certB64,
 			final String requestId) throws SAXException, IOException {
@@ -239,8 +240,6 @@ public final class CommManager {
 	 * @throws IOException
 	 *             Cuando existe alg&uacute;n problema en la lectura/escritura
 	 *             de XML o al recuperar la respuesta del servidor.
-	 * @throws CertificateEncodingException
-	 *             Si no se puede obtener la codificaci&oacute;n del certificado
 	 */
 	public RequestAppConfiguration getApplicationList(final String certB64)
 			throws SAXException, IOException {
@@ -287,8 +286,7 @@ public final class CommManager {
 	 * @return Datos del documento.
 	 * @throws SAXException Cuando se encuentra un XML mal formado.
 	 * @throws IOException Cuando existe alg&uacute;n problema en la lectura/escritura
-	 *                     de XML o al recuperar la respuesta del servidor.
-	 * @throws CertificateEncodingException Si no se puede obtener la codificaci&oacute;n del certificado. */
+	 *                     de XML o al recuperar la respuesta del servidor. */
 	public DocumentData getPreviewDocument(final String documentId,
 			final String filename, final String mimetype,
 			final String certB64) throws SAXException, IOException {
@@ -304,8 +302,7 @@ public final class CommManager {
 	 * @return Datos del documento.
 	 * @throws SAXException Cuando se encuentra un XML mal formado.
 	 * @throws IOException Cuando existe alg&uacute;n problema en la lectura/escritura
-	 *                     de XML o al recuperar la respuesta del servidor.
-	 * @throws CertificateEncodingException Si no se puede obtener la codificaci&oacute;n del certificado. */
+	 *                     de XML o al recuperar la respuesta del servidor. */
 	public DocumentData getPreviewSign(final String documentId,
 			final String filename, final String mimetype,
 			final String certB64) throws SAXException, IOException {
@@ -322,8 +319,7 @@ public final class CommManager {
 	 * @return Datos del documento.
 	 * @throws SAXException Cuando se encuentra un XML mal formado.
 	 * @throws IOException Cuando existe alg&uacute;n problema en la lectura/escritura
-	 *                     de XML o al recuperar la respuesta del servidor.
-	 * @throws CertificateEncodingException Si no se puede obtener la codificaci&oacute;n del certificado. */
+	 *                     de XML o al recuperar la respuesta del servidor. */
 	public DocumentData getPreviewReport(final String documentId,
 			final String filename, final String mimetype,
 			final String certB64) throws SAXException, IOException {
@@ -339,10 +335,8 @@ public final class CommManager {
 	 * @param mimetype MIME-Type del documento.
 	 * @param certB64 Certificado codificado en base64.
 	 * @return Datos del documento.
-	 * @throws SAXException Cuando se encuentra un XML mal formado.
 	 * @throws IOException Cuando existe alg&uacute;n problema en la lectura/escritura
-	 *                     de XML o al recuperar la respuesta del servidor.
-	 * @throws CertificateEncodingException Si no se puede obtener la codificaci&oacute;n del certificado. */
+	 *                     de XML o al recuperar la respuesta del servidor. */
 	public DocumentData getPreview(final String operation,
 			final String documentId, final String filename,
 			final String mimetype, final String certB64) throws IOException {
@@ -409,11 +403,15 @@ public final class CommManager {
 		final InputStream is = AndroidUrlHttpManager.getRemoteDataByPost(url, this.timeout);
 
 //TODO: Borrar
-//		byte[] data = AOUtil.getDataFromInputStream(is);
-//		Log.i(SFConstants.LOG_TAG, "XML respuesta:\n" + new String(data));
-//		final Document doc = this.db.parse(new ByteArrayInputStream(data));
+		final byte[] data = AOUtil.getDataFromInputStream(is);
 
-		final Document doc = this.db.parse(is);
+		final String xml = new String(data);
+		Log.i(SFConstants.LOG_TAG, "XML respuesta:\n" + xml);
+
+		final Document doc = this.db.parse(new ByteArrayInputStream(xml.getBytes("utf-8")));
+		//final Document doc = this.db.parse(new ByteArrayInputStream(data));
+
+//		final Document doc = this.db.parse(is);
 		is.close();
 
 		if (url.startsWith(HTTPS)) {

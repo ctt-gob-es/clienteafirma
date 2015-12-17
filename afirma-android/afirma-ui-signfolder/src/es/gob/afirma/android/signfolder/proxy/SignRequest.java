@@ -170,7 +170,7 @@ public class SignRequest {
 	}
 
 	/** Indica si el elemento esta seleccionado en el listado presentado al usuario.
-	 * @return {@ocde true} si el elemento est&aacute; selecionado, {@code false} en caso contrario.
+	 * @return {@code true} si el elemento est&aacute; selecionado, {@code false} en caso contrario.
 	 */
 	public boolean isSelected() {
 		return this.selected;

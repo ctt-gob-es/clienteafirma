@@ -26,10 +26,14 @@ import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JPanel;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.standalone.LookAndFeelManager;
+import es.gob.afirma.standalone.PreferencesManager;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 
 /** Panel para la espera y detecci&oacute;n autom&aacute;tica de insercci&oacute;n de DNIe.
@@ -59,35 +63,49 @@ public final class DNIeWaitPanel extends JPanel implements KeyListener {
 
         // Boton para cargar DNIe
         final JButton dniButton = new JButton(SimpleAfirmaMessages.getString("DNIeWaitPanel.4")); //$NON-NLS-1$
-        dniButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(final ActionEvent e) {
-				DNIeWaitPanel.this.firePropertyChange(PROP_DNIE_REQUESTED, false, true);
+        dniButton.addActionListener(
+    		new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					DNIeWaitPanel.this.firePropertyChange(PROP_DNIE_REQUESTED, false, true);
+				}
 			}
-		});
+		);
         dniButton.setMnemonic('C');
-        dniButton.getAccessibleContext().setAccessibleDescription(SimpleAfirmaMessages.getString(SimpleAfirmaMessages.getString("DNIeWaitPanel.5"))); //$NON-NLS-1$
-        dniButton.getAccessibleContext().setAccessibleName(SimpleAfirmaMessages.getString(SimpleAfirmaMessages.getString("DNIeWaitPanel.6"))); //$NON-NLS-1$
+        dniButton.getAccessibleContext().setAccessibleDescription(
+    		SimpleAfirmaMessages.getString(SimpleAfirmaMessages.getString("DNIeWaitPanel.5")) //$NON-NLS-1$
+		);
+        dniButton.getAccessibleContext().setAccessibleName(
+    		SimpleAfirmaMessages.getString(SimpleAfirmaMessages.getString("DNIeWaitPanel.6")) //$NON-NLS-1$
+		);
         dniButton.requestFocus();
         dniButton.addKeyListener(this);
         dniePanel.add(dniButton);
 
         // Boton para saltar de pantalla
         final JButton noDNIButton = new JButton(SimpleAfirmaMessages.getString("DNIeWaitPanel.0")); //$NON-NLS-1$
-        noDNIButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(final ActionEvent e) {
-				DNIeWaitPanel.this.firePropertyChange(PROP_DNIE_REJECTED, false, true);
+        noDNIButton.addActionListener(
+    		new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					DNIeWaitPanel.this.firePropertyChange(PROP_DNIE_REJECTED, false, true);
+				}
 			}
-		});
-        noDNIButton.setMnemonic('n');
-        noDNIButton.getAccessibleContext().setAccessibleDescription(SimpleAfirmaMessages.getString("DNIeWaitPanel.1")); //$NON-NLS-1$
-        noDNIButton.getAccessibleContext().setAccessibleName(SimpleAfirmaMessages.getString("DNIeWaitPanel.2")); //$NON-NLS-1$
+		);
+        noDNIButton.setMnemonic('u');
+        noDNIButton.getAccessibleContext().setAccessibleDescription(
+    		SimpleAfirmaMessages.getString("DNIeWaitPanel.1") //$NON-NLS-1$
+		);
+        noDNIButton.getAccessibleContext().setAccessibleName(
+    		SimpleAfirmaMessages.getString("DNIeWaitPanel.2") //$NON-NLS-1$
+		);
         noDNIButton.addKeyListener(this);
         dniePanel.add(noDNIButton);
 
         // Texto informativo
-        final ResizingTextPanel textPanel = new ResizingTextPanel(SimpleAfirmaMessages.getString("DNIeWaitPanel.3")); //$NON-NLS-1$
+        final ResizingTextPanel textPanel = new ResizingTextPanel(
+    		SimpleAfirmaMessages.getString("DNIeWaitPanel.3") //$NON-NLS-1$
+		);
         final ResizingTextPanel textPanelExtra = new ResizingTextPanel(
     		SimpleAfirmaMessages.getString("DNIeWaitPanel.7") //$NON-NLS-1$
 		);
@@ -143,6 +161,24 @@ public final class DNIeWaitPanel extends JPanel implements KeyListener {
         c.gridy = 3;
         c.ipady = 0;
         this.add(dniePanel, c);
+
+        c.gridy = 4;
+        final JCheckBox hideDniWaitScreen = new JCheckBox(
+    		SimpleAfirmaMessages.getString("DNIeWaitPanel.8"), //$NON-NLS-1$
+    		PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_HIDE_DNIE_START_SCREEN, false)
+		);
+        hideDniWaitScreen.addChangeListener(
+    		new ChangeListener() {
+				@Override
+				public void stateChanged(final ChangeEvent e) {
+					PreferencesManager.putBoolean(
+						PreferencesManager.PREFERENCE_GENERAL_HIDE_DNIE_START_SCREEN,
+						hideDniWaitScreen.isSelected()
+					);
+				}
+			}
+    	);
+        //this.add(hideDniWaitScreen, c);
     }
 
     /** Construye un panel de espera a insercci&oacute;n de DNIe.

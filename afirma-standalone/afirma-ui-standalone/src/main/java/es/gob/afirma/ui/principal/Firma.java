@@ -84,7 +84,7 @@ final class Firma extends JPanel {
     private static final long serialVersionUID = 1L;
 
     // Nombres de los diferentes formatos de firmado
-    private static final List<String> FORMATOS_AVANZADOS = new ArrayList<String>(
+    private static final List<String> FORMATOS_AVANZADOS = new ArrayList<>(
 		Arrays.asList(
 			Messages.getString("Firma.formato.estandar"), //$NON-NLS-1$
 			"CAdES", //$NON-NLS-1$
@@ -94,7 +94,7 @@ final class Firma extends JPanel {
 	);
 
     // Constantes de los diferentes formatos de firmado
-    private static final List<String> FORMATOS = new ArrayList<String>(
+    private static final List<String> FORMATOS = new ArrayList<>(
 		Arrays.asList(
 			AOSignConstants.SIGN_FORMAT_XADES_DETACHED,
             AOSignConstants.SIGN_FORMAT_CADES,
@@ -109,8 +109,8 @@ final class Firma extends JPanel {
 
     /** Carga el combo de almacen y repositorios
      * @param comboAlmacen Combo donde se guarda la lista */
-    private static void cargarComboAlmacen(final JComboBox comboAlmacen) {
-        comboAlmacen.setModel(new DefaultComboBoxModel(KeyStoreLoader.getKeyStoresToSign()));
+    private static void cargarComboAlmacen(final JComboBox<KeyStoreConfiguration> comboAlmacen) {
+        comboAlmacen.setModel(new DefaultComboBoxModel<>(KeyStoreLoader.getKeyStoresToSign()));
     }
 
     /** Pulsar bot&oacute;n examinar: Muestra una ventana para seleccinar un archivo.
@@ -127,7 +127,9 @@ final class Firma extends JPanel {
      * @param comboAlmacen Combo con el almacen / repositorio de certificados
      * @param comboFormato Combo con los formatos de firmado
      * @param campoFichero Campo con el nombre del archivo a firmar */
-    void firmarActionPerformed(final JComboBox comboAlmacen, final JComboBox comboFormato, final JTextField campoFichero) {// GEN-FIRST:event_firmarActionPerformed
+    void firmarActionPerformed(final JComboBox<KeyStoreConfiguration> comboAlmacen,
+    		                   final JComboBox<String> comboFormato,
+    		                   final JTextField campoFichero) {// GEN-FIRST:event_firmarActionPerformed
 
     	final String formatName = comboFormato.getSelectedItem().toString();
     	if (GeneralConfig.isAvanzados()) {
@@ -291,10 +293,8 @@ final class Firma extends JPanel {
             }
 
             final byte[] fileData;
-            try {
-            	final InputStream fileIn = AOUtil.loadFile(uri);
+            try ( final InputStream fileIn = AOUtil.loadFile(uri); ) {
                 fileData = AOUtil.getDataFromInputStream(fileIn);
-                fileIn.close();
             }
             catch(final FileNotFoundException e) {
                 CustomDialog.showMessageDialog(SwingUtilities.getRoot(this), true, Messages.getString("Firma.msg.error.fichero.noencontrado"), //$NON-NLS-1$
@@ -623,7 +623,7 @@ final class Firma extends JPanel {
         c.fill = GridBagConstraints.BOTH;
 
         // Combo con las opciones del almacen o repositorio
-        final JComboBox comboAlmacen = new JComboBox();
+        final JComboBox<KeyStoreConfiguration> comboAlmacen = new JComboBox<>();
         comboAlmacen.setToolTipText(Messages.getString("Firma.almacen.certificados.description")); // NOI18N //$NON-NLS-1$
         comboAlmacen.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.getBar(),
                                                                           Messages.getString("Firma.almacen.certificados.description"))); //$NON-NLS-1$
@@ -672,7 +672,7 @@ final class Firma extends JPanel {
         c.fill = GridBagConstraints.BOTH;
 
         // Combo con los diferentes formatos de firma
-        final JComboBox comboFormato = new JComboBox();
+        final JComboBox<String> comboFormato = new JComboBox<>();
         comboFormato.setToolTipText(Messages.getString("Firma.formato.description")); // NOI18N //$NON-NLS-1$
         comboFormato.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.getBar(),
                                                                           Messages.getString("Firma.formato.description.status"))); //$NON-NLS-1$
@@ -693,7 +693,7 @@ final class Firma extends JPanel {
             Firma.FORMATOS_AVANZADOS.add("ODF"); //$NON-NLS-1$
             Firma.FORMATOS.add(AOSignConstants.SIGN_FORMAT_ODF);
         }
-        comboFormato.setModel(new DefaultComboBoxModel(Firma.FORMATOS_AVANZADOS.toArray()));
+        comboFormato.setModel(new DefaultComboBoxModel<>(Firma.FORMATOS_AVANZADOS.toArray(new String[0])));
         Utils.remarcar(comboFormato);
         Utils.setContrastColor(comboFormato);
         Utils.setFontBold(comboFormato);

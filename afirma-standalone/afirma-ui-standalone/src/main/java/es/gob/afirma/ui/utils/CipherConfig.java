@@ -45,7 +45,7 @@ public final class CipherConfig {
     };
 
     static {
-        final Vector<CipherConfigures> configs = new Vector<CipherConfigures>();
+        final Vector<CipherConfigures> configs = new Vector<>();
         for (final AOCipher cipher : SUPPORTED_CIPHER_PROVIDERS) {
             for (final AOCipherConfig config : cipher.getSupportedConfigs()) {
                 configs.add(new CipherConfigures(config, cipher));

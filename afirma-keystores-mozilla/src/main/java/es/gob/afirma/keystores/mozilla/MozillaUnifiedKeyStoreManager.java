@@ -70,7 +70,9 @@ public final class MozillaUnifiedKeyStoreManager extends AggregatedKeyStoreManag
 		final Map<String, String> externalStores = MozillaKeyStoreUtilities.getMozillaPKCS11Modules(true, true);
 
 		if (externalStores.size() > 0) {
-			final StringBuilder logStr = new StringBuilder("Encontrados los siguientes modulos PKCS#11 externos instalados en Mozilla / Firefox: "); //$NON-NLS-1$
+			final StringBuilder logStr = new StringBuilder(
+				"Encontrados los siguientes modulos PKCS#11 externos instalados en Mozilla / Firefox: " //$NON-NLS-1$
+			);
 			for (final String key : externalStores.keySet()) {
 				logStr.append("'"); //$NON-NLS-1$
 				logStr.append(externalStores.get(key));
@@ -100,7 +102,9 @@ public final class MozillaUnifiedKeyStoreManager extends AggregatedKeyStoreManag
 				addKeyStoreManager(tmpKsm);
 			}
 			catch (final AOCancelledOperationException ex) {
-				LOGGER.warning("Se cancelo el acceso al almacen externo  '" + descr + "', se continuara con el siguiente: " + ex); //$NON-NLS-1$ //$NON-NLS-2$
+				LOGGER.warning(
+					"Se cancelo el acceso al almacen externo  '" + descr + "', se continuara con el siguiente: " + ex //$NON-NLS-1$ //$NON-NLS-2$
+				);
 				continue;
 			}
 			catch (final Exception ex) {

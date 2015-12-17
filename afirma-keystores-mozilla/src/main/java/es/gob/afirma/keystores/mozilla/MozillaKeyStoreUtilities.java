@@ -115,7 +115,6 @@ public final class MozillaKeyStoreUtilities {
 			.append("' ") //$NON-NLS-1$
 			.append("certPrefix='' ") //$NON-NLS-1$
 			.append("keyPrefix='' ") //$NON-NLS-1$
-			.append("secmod='secmod.db' ") //$NON-NLS-1$
 			.append("flags='readOnly'") //$NON-NLS-1$
 			.append("\""); //$NON-NLS-1$
 
@@ -211,20 +210,43 @@ public final class MozillaKeyStoreUtilities {
 	 *                            base de datos de m&oacute;dulos de Mozilla (<i>secmod.db</i>), si se
 	 *                            establece a <code>false</code> se devuelven &uacute;nicamente los
 	 *                            m&oacute;dulos PKCS#11 de la base de datos.
-	 * @return Nombres de las bibliotecas de los m&oacute;dulos de seguridad de
-	 *         Mozilla / Firefox */
+	 * @return Nombres de las bibliotecas de los m&oacute;dulos de seguridad de Mozilla / Firefox */
 	static Map<String, String> getMozillaPKCS11Modules(final boolean excludeDnie,
 			                                           final boolean includeKnownModules) {
-
-		final Map<String, String> modsByDesc = new ConcurrentHashMap<String, String>();
-		final List<ModuleName> modules;
+		final String profileDir;
 		try {
-			modules =  AOSecMod.getModules(getMozillaUserProfileDirectory());
+			profileDir = getMozillaUserProfileDirectory();
 		}
-		catch (final Exception t) {
-			LOGGER.severe("No se han podido obtener los modulos externos de Mozilla, se devolvera una lista vacia o unicamente con el DNIe: " + t); //$NON-NLS-1$
+		catch (final IOException e) {
+			LOGGER.severe(
+				"No se ha podido obtener el directorio de perfil de Mozilla para leer la lista de modulos PKCS#11: " + e //$NON-NLS-1$
+			);
 			return new ConcurrentHashMap<String, String>(0);
 		}
+
+		List<ModuleName> modules;
+		try {
+			modules =  AOSecMod.getModules(profileDir);
+		}
+		catch (final Exception t) {
+			LOGGER.severe(
+				"No se han podido obtener los modulos externos de Mozilla desde 'secmod.db': " + t //$NON-NLS-1$
+			);
+			modules = null;
+		}
+		if (modules == null) {
+			try {
+				modules = Pkcs11Txt.getModules(profileDir);
+			}
+			catch (final Exception e) {
+				LOGGER.severe(
+					"No se han podido obtener los modulos externos de Mozilla desde 'pkcs11.txt': " + e //$NON-NLS-1$
+				);
+				return new ConcurrentHashMap<String, String>(0);
+			}
+		}
+
+		final Map<String, String> modsByDesc = new ConcurrentHashMap<String, String>();
 
 		for (final AOSecMod.ModuleName module : modules) {
 			final String moduleLib =  module.getLib();
@@ -281,8 +303,7 @@ public final class MozillaKeyStoreUtilities {
 	 * al almac&eacute;n de certificados. Hacemos esto por precauci&oacute;n ya
 	 * que esto se har&iacute;a autom&aacute;ticamente si las dependencias
 	 * estuviesen en el PATH del sistema.
-	 * @param nssDirectory
-	 *        Directorio en donde se encuentran las bibliotecas de NSS. */
+	 * @param nssDirectory Directorio en donde se encuentran las bibliotecas de NSS. */
 	static void loadNSSDependencies(final String nssDirectory) {
 
 		final String dependList[];
@@ -356,7 +377,7 @@ public final class MozillaKeyStoreUtilities {
 				nssPath + "libnssutil3.so",   // Firefox 2 y superior //$NON-NLS-1$
 				nssPath + "libsqlite3.so",    // Firefox 2            //$NON-NLS-1$
 				nssPath + "libmozsqlite3.so", // Firefox 3 y superior //$NON-NLS-1$
-				nssPath + "libsqlite3.so"     // Variante de SQLite en ciertos Linux / Firefox //$NON-NLS-1$
+				nssPath + "libsqlite3.so.0"   // Variante de SQLite en ciertos Debian //$NON-NLS-1$
 			};
 		}
 

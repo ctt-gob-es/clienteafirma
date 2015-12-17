@@ -369,8 +369,12 @@ public final class Utils {
         }
 
         if (xades) { // XAdES
+            if (format.equals(AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED) && mode.equals(AOSignConstants.SIGN_MODE_EXPLICIT)) {
+                throw new UnsupportedOperationException("No se puede realizar una firma enveloped sobre un contenido explicito"); //$NON-NLS-1$
+            }
             if (format.equals(AOSignConstants.SIGN_FORMAT_XADES_EXTERNALLY_DETACHED) && uri == null && externallyDetachedHashAlgorithm == null) {
-                throw new UnsupportedOperationException("La firma XML Externally Detached necesita un Message Digest precalculado o una URI accesible" //$NON-NLS-1$
+                throw new UnsupportedOperationException(
+            		"La firma XML Externally Detached necesita un Message Digest precalculado o una URI accesible" //$NON-NLS-1$
                 );
             }
             if (!format.equals(AOSignConstants.SIGN_FORMAT_XADES_DETACHED) && !format.equals(AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED)
@@ -380,12 +384,13 @@ public final class Utils {
             }
         }
         else { // XMLDSig
-               // Combinaciones prohibidas
+
             if (format.equals(AOSignConstants.SIGN_FORMAT_XMLDSIG_ENVELOPED) && mode.equals(AOSignConstants.SIGN_MODE_EXPLICIT)) {
                 throw new UnsupportedOperationException("No se puede realizar una firma enveloped sobre un contenido explicito"); //$NON-NLS-1$
             }
             if (format.equals(AOSignConstants.SIGN_FORMAT_XMLDSIG_EXTERNALLY_DETACHED) && mode.equals(AOSignConstants.SIGN_MODE_IMPLICIT)) {
-                throw new UnsupportedOperationException("No se puede realizar una firma XML Externally Detached con contenido Implicito" //$NON-NLS-1$
+                throw new UnsupportedOperationException(
+            		"No se puede realizar una firma XML Externally Detached con contenido Implicito" //$NON-NLS-1$
                 );
             }
             if (format.equals(AOSignConstants.SIGN_FORMAT_XMLDSIG_EXTERNALLY_DETACHED) && uri == null && externallyDetachedHashAlgorithm == null) {
@@ -683,23 +688,46 @@ public final class Utils {
 		return fac;
     }
 
-    /** Instala el proveedor de firmas XMLDSig para el entorno de ejecuci&oacute;n de Java en uso. */
-    public static void installXmlDSigProvider() {
-    	if (Security.getProvider("XMLDSig") == null) { //$NON-NLS-1$
-        	LOGGER.info("Instalamos el proveedor de firma XML de Apache"); //$NON-NLS-1$
-        	try {
-        		Security.addProvider((Provider) Class.forName("org.apache.jcp.xml.dsig.internal.dom.XMLDSigRI").newInstance()); //$NON-NLS-1$
-        	}
-        	catch (final Exception e) {
-        		LOGGER.info("No se encontro el proveedor de firma XML de Apache, se instalara el de Sun: " + e); //$NON-NLS-1$
-        		try {
-        			Security.addProvider((Provider)
-        					Class.forName("org.jcp.xml.dsig.internal.dom.XMLDSigRI").newInstance()); //$NON-NLS-1$
-        		}
-        		catch (final Exception e2) {
-        			LOGGER.warning("No se ha podido agregar el proveedor de firma XMLDSig de Sun para firmas XML: " + e2); //$NON-NLS-1$
-        		}
-        	}
-        }
+    private static final String XMLDSIG = "XMLDSig"; //$NON-NLS-1$
+
+    /** Instala el proveedor de firmas XMLDSig para el entorno de ejecuci&oacute;n de Java en uso.
+     * @param forceApacheProvider Indica si debe forzarse al uso de uno de los proveedores de Apache.
+     */
+    public static void installXmlDSigProvider(final boolean forceApacheProvider) {
+
+    	final Provider provider = Security.getProvider(XMLDSIG);
+
+    	if (provider == null || forceApacheProvider) {
+    		Class<?> classProvider = null;
+    		try {
+    			classProvider = Class.forName("org.apache.jcp.xml.dsig.internal.dom.XMLDSigRI"); //$NON-NLS-1$
+    			if (provider == null || !classProvider.isInstance(provider)) {
+    				Security.removeProvider(XMLDSIG);
+    				LOGGER.info("Instalamos el proveedor de firma XML de Apache"); //$NON-NLS-1$
+    				Security.addProvider((Provider) classProvider.newInstance());
+    			}
+    		}
+    		catch (final Exception e) {
+    			try {
+    				classProvider = Class.forName("org.jcp.xml.dsig.internal.dom.XMLDSigRI"); //$NON-NLS-1$
+    				if (provider == null || !classProvider.isInstance(provider)) {
+    					Security.removeProvider(XMLDSIG);
+    					LOGGER.info("No se encontro el proveedor de firma XML de Apache, se instalara el de Sun: " + e); //$NON-NLS-1$
+    					Security.addProvider((Provider) classProvider.newInstance());
+    				}
+    			}
+    			catch (final Exception e2) {
+    				LOGGER.warning("No se ha podido agregar el proveedor de firma XMLDSig de Sun para firmas XML: " + e2); //$NON-NLS-1$
+    			}
+    		}
+    	}
+
+    	final Provider p = Security.getProvider(XMLDSIG);
+    	if (p != null) {
+    		LOGGER.info("Se usara el proveedor de XMLDSig '" + p.getName() + "': " + p.getClass().getName()); //$NON-NLS-1$ //$NON-NLS-2$
+    	}
+    	else {
+    		LOGGER.warning("No hay proveedor instalado para XMLDSig"); //$NON-NLS-1$
+    	}
     }
 }

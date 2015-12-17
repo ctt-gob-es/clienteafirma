@@ -48,6 +48,30 @@ final class PdfUtil {
 		// No instanciable
 	}
 
+	static boolean isPdfA1(final byte[] metadata) {
+		if (metadata == null) {
+			return false;
+		}
+		final String rdf = new String(metadata);
+		return rdf.replace("\n", "") //$NON-NLS-1$ //$NON-NLS-2$
+					.replace("\r", "") //$NON-NLS-1$ //$NON-NLS-2$
+					  .replace("\t", "") //$NON-NLS-1$ //$NON-NLS-2$
+					    .replace(" ", "") //$NON-NLS-1$ //$NON-NLS-2$
+					      .contains("<pdfaid:part>1</pdfaid:part>"); //$NON-NLS-1$
+	}
+
+	static boolean isPdfAx(final byte[] metadata) {
+		if (metadata == null) {
+			return false;
+		}
+		final String rdf = new String(metadata);
+		return rdf.replace("\n", "") //$NON-NLS-1$ //$NON-NLS-2$
+					.replace("\r", "") //$NON-NLS-1$ //$NON-NLS-2$
+					  .replace("\t", "") //$NON-NLS-1$ //$NON-NLS-2$
+					    .replace(" ", "") //$NON-NLS-1$ //$NON-NLS-2$
+					      .contains("<pdfaid:part>"); //$NON-NLS-1$
+	}
+
 	static GregorianCalendar getSignTime(final String stStr) {
 		if (stStr == null) {
 			return new GregorianCalendar();
@@ -78,10 +102,10 @@ final class PdfUtil {
 			                                                     InvalidPdfException,
 			                                                     IOException {
 		// Contrasena del propietario del PDF
-		final String ownerPassword = extraParams.getProperty("ownerPassword"); //$NON-NLS-1$
+		final String ownerPassword = extraParams.getProperty(PdfExtraParams.OWNER_PASSWORD);
 
 		// Contrasena del usuario del PDF
-		final String userPassword =  extraParams.getProperty("userPassword"); //$NON-NLS-1$
+		final String userPassword =  extraParams.getProperty(PdfExtraParams.USER_PASSWORD);
 
 		PdfReader pdfReader;
 		try {
@@ -132,10 +156,10 @@ final class PdfUtil {
 
 	static void checkPdfCertification(final int pdfCertificationLevel, final Properties extraParams) throws PdfIsCertifiedException {
 		if (pdfCertificationLevel != PdfSignatureAppearance.NOT_CERTIFIED &&
-				!Boolean.parseBoolean(extraParams.getProperty("allowSigningCertifiedPdfs"))) { //$NON-NLS-1$
+				!Boolean.parseBoolean(extraParams.getProperty(PdfExtraParams.ALLOW_SIGNING_CERTIFIED_PDFS))) {
 			// Si no permitimos dialogos graficos o directamente hemos indicado que no permitimos firmar PDF certificados lanzamos
 			// una excepcion
-			if (Boolean.parseBoolean(extraParams.getProperty("headless")) || "false".equalsIgnoreCase(extraParams.getProperty("allowSigningCertifiedPdfs"))) {  //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			if (Boolean.parseBoolean(extraParams.getProperty(PdfExtraParams.HEADLESS)) || "false".equalsIgnoreCase(extraParams.getProperty(PdfExtraParams.ALLOW_SIGNING_CERTIFIED_PDFS))) {  //$NON-NLS-1$
 				throw new PdfIsCertifiedException();
 			}
 			// En otro caso, perguntamos al usuario
@@ -148,7 +172,7 @@ final class PdfUtil {
 			) {
 				throw new AOCancelledOperationException("El usuario no ha permitido la firma de un PDF certificado"); //$NON-NLS-1$
 			}
-			extraParams.setProperty("allowSigningCertifiedPdfs", "true"); //$NON-NLS-1$ //$NON-NLS-2$
+			extraParams.setProperty(PdfExtraParams.ALLOW_SIGNING_CERTIFIED_PDFS, "true"); //$NON-NLS-1$
 		}
 	}
 
@@ -164,10 +188,10 @@ final class PdfUtil {
 	}
 
 	static boolean getAppendMode(final Properties extraParams, final PdfReader pdfReader) {
-		if (extraParams.getProperty("ownerPassword") != null || extraParams.getProperty("userPassword") != null) { //$NON-NLS-1$ //$NON-NLS-2$
+		if (extraParams.getProperty(PdfExtraParams.OWNER_PASSWORD) != null || extraParams.getProperty(PdfExtraParams.USER_PASSWORD) != null) {
 			return true;
 		}
-		return Boolean.parseBoolean(extraParams.getProperty("alwaysCreateRevision")) || pdfReader.getAcroFields().getSignatureNames().size() > 0; //$NON-NLS-1$
+		return Boolean.parseBoolean(extraParams.getProperty(PdfExtraParams.ALWAYS_CREATE_REVISION)) || pdfReader.getAcroFields().getSignatureNames().size() > 0;
 	}
 
 	static boolean pdfHasUnregisteredSignatures(final byte[] pdf, final Properties xParams) throws InvalidPdfException, BadPdfPasswordException, IOException {
@@ -175,7 +199,7 @@ final class PdfUtil {
 		final PdfReader pdfReader = PdfUtil.getPdfReader(
 			pdf,
 			extraParams,
-			Boolean.parseBoolean(extraParams.getProperty("headless")) //$NON-NLS-1$
+			Boolean.parseBoolean(extraParams.getProperty(PdfExtraParams.HEADLESS))
 		);
 		return pdfHasUnregisteredSignatures(pdfReader);
 	}
@@ -200,7 +224,7 @@ final class PdfUtil {
 		final PdfReader pdfReader = PdfUtil.getPdfReader(
 			pdf,
 			extraParams,
-			Boolean.parseBoolean(extraParams.getProperty("headless")) //$NON-NLS-1$
+			Boolean.parseBoolean(extraParams.getProperty(PdfExtraParams.HEADLESS))
 		);
 
     	for (int i = 0; i < pdfReader.getXrefSize(); i++) {

@@ -43,6 +43,7 @@ import javax.xml.crypto.dsig.Reference;
 import javax.xml.crypto.dsig.Transform;
 import javax.xml.crypto.dsig.XMLObject;
 import javax.xml.crypto.dsig.XMLSignatureFactory;
+import javax.xml.crypto.dsig.spec.TransformParameterSpec;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import net.java.xades.security.xml.XAdES.DataObjectFormat;
@@ -101,10 +102,11 @@ public final class XAdESCoSigner {
 	 * @return Cofirma en formato XAdES
 	 * @throws AOException Cuando ocurre cualquier problema durante el proceso */
 	public static byte[] cosign(final byte[] sign,
-			final String algorithm,
-			final PrivateKey pk,
-			final Certificate[] certChain,
-			final Properties xParams) throws AOException {
+			                    final String algorithm,
+			                    final PrivateKey pk,
+			                    final Certificate[] certChain,
+			                    final Properties xParams) throws AOException {
+
 		final String algoUri = XMLConstants.SIGN_ALGOS_URI.get(algorithm);
 		if (algoUri == null) {
 			throw new UnsupportedOperationException("Los formatos de firma XML no soportan el algoritmo de firma '" + algorithm + "'"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -113,24 +115,26 @@ public final class XAdESCoSigner {
 		final Properties extraParams = xParams != null ? xParams: new Properties();
 
 		final String digestMethodAlgorithm = extraParams.getProperty(
-				"referencesDigestMethod", DIGEST_METHOD); //$NON-NLS-1$
+		        XAdESExtraParams.REFERENCES_DIGEST_METHOD, DIGEST_METHOD);
 		final String canonicalizationAlgorithm = extraParams.getProperty(
-				"canonicalizationAlgorithm", CanonicalizationMethod.INCLUSIVE); //$NON-NLS-1$
+		        XAdESExtraParams.CANONICALIZATION_ALGORITHM, CanonicalizationMethod.INCLUSIVE);
 		final String xadesNamespace = extraParams.getProperty(
-				"xadesNamespace", XADESNS); //$NON-NLS-1$
+		        XAdESExtraParams.XADES_NAMESPACE, XADESNS);
 		final String signedPropertiesTypeUrl = extraParams.getProperty(
-				"signedPropertiesTypeUrl", XADES_SIGNED_PROPERTIES_TYPE); //$NON-NLS-1$
+		        XAdESExtraParams.SIGNED_PROPERTIES_TYPE_URL, XADES_SIGNED_PROPERTIES_TYPE);
 		final boolean addKeyInfoKeyValue = Boolean.parseBoolean(extraParams.getProperty(
-				"addKeyInfoKeyValue", Boolean.TRUE.toString())); //$NON-NLS-1$
+		        XAdESExtraParams.ADD_KEY_INFO_KEY_VALUE, Boolean.TRUE.toString()));
 		final boolean addKeyInfoKeyName = Boolean.parseBoolean(extraParams.getProperty(
-				"addKeyInfoKeyName", Boolean.FALSE.toString())); //$NON-NLS-1$
+		        XAdESExtraParams.ADD_KEY_INFO_KEY_NAME, Boolean.FALSE.toString()));
+		final boolean useManifest = Boolean.parseBoolean(extraParams.getProperty(
+		        XAdESExtraParams.USE_MANIFEST, Boolean.FALSE.toString()));
 
-		String mimeType = extraParams.getProperty("mimeType"); //$NON-NLS-1$
-		String encoding = extraParams.getProperty("encoding"); //$NON-NLS-1$
+		String mimeType = extraParams.getProperty(XAdESExtraParams.MIME_TYPE);
+		String encoding = extraParams.getProperty(XAdESExtraParams.ENCODING);
 		if ("base64".equalsIgnoreCase(encoding)) { //$NON-NLS-1$
 			encoding = XMLConstants.BASE64_ENCODING;
 		}
-		String oid = extraParams.getProperty("contentTypeOid"); //$NON-NLS-1$
+		String oid = extraParams.getProperty(XAdESExtraParams.CONTENT_TYPE_OID);
 
 		ObjectIdentifierImpl objectIdentifier = null;
 
@@ -167,7 +171,9 @@ public final class XAdESCoSigner {
 			digestMethod = fac.newDigestMethod(digestMethodAlgorithm, null);
 		}
 		catch (final Exception e) {
-			throw new AOException("No se ha podido obtener un generador de huellas digitales para el algoritmo '" + digestMethodAlgorithm + "'", e); //$NON-NLS-1$ //$NON-NLS-2$
+			throw new AOException(
+				"No se ha podido obtener un generador de huellas digitales para el algoritmo '" + digestMethodAlgorithm + "'", e //$NON-NLS-1$ //$NON-NLS-2$
+			);
 		}
 
 		// Objeto en donde se almacenaran los datos firmados en caso de tratarse de
@@ -181,7 +187,9 @@ public final class XAdESCoSigner {
 		// Buscamos dentro de ese Signature todas las referencias que apunten a datos para firmarlas
 		final List<Reference> referenceList = new ArrayList<Reference>();
 		Node currentElement;
-		final NodeList nl = ((Element) docSig.getElementsByTagNameNS(XMLConstants.DSIGNNS, SIGNATURE_TAG).item(0)).getElementsByTagNameNS(XMLConstants.DSIGNNS, "Reference"); //$NON-NLS-1$
+		final NodeList nl = ((Element) docSig.getElementsByTagNameNS(
+			XMLConstants.DSIGNNS, SIGNATURE_TAG).item(0)
+		).getElementsByTagNameNS(XMLConstants.DSIGNNS, "Reference"); //$NON-NLS-1$
 
 		// Se considera que la primera referencia de la firma son los datos que debemos firmar, ademas
 		// de varias referencias especiales
@@ -254,7 +262,9 @@ public final class XAdESCoSigner {
 					final Element docElement = docSig.getDocumentElement();
 
 					// Comprobamos si el nodo raiz o sus hijos inmediatos son el nodo de datos
-					Node nodeAttributeId = docElement.getAttributes() != null ? docElement.getAttributes().getNamedItem(ID_IDENTIFIER) : null;
+					Node nodeAttributeId = docElement.getAttributes() != null ?
+						docElement.getAttributes().getNamedItem(ID_IDENTIFIER) :
+							null;
 					if (nodeAttributeId != null && dataNodeId.equals(nodeAttributeId.getNodeValue())) {
 						dataObjectElement = docElement;
 					}
@@ -263,7 +273,9 @@ public final class XAdESCoSigner {
 						final NodeList rootChildNodes = docElement.getChildNodes();
 						for (int j = rootChildNodes.getLength() - 1; j >= 0; j--) {
 
-							nodeAttributeId = rootChildNodes.item(j).getAttributes() != null ? rootChildNodes.item(j).getAttributes().getNamedItem(ID_IDENTIFIER) : null;
+							nodeAttributeId = rootChildNodes.item(j).getAttributes() != null ?
+								rootChildNodes.item(j).getAttributes().getNamedItem(ID_IDENTIFIER) :
+									null;
 							if (nodeAttributeId != null && dataNodeId.equals(nodeAttributeId.getNodeValue())) {
 								dataObjectElement = (Element) rootChildNodes.item(j);
 								break;
@@ -273,7 +285,9 @@ public final class XAdESCoSigner {
 							if (SIGNATURE_TAG.equals(rootChildNodes.item(j).getLocalName())) {
 								final NodeList subChildsNodes = rootChildNodes.item(j).getChildNodes();
 								for (int k = subChildsNodes.getLength() - 1; k >= 0; k--) {
-									nodeAttributeId = subChildsNodes.item(k).getAttributes() != null ? subChildsNodes.item(k).getAttributes().getNamedItem(ID_IDENTIFIER) : null;
+									nodeAttributeId = subChildsNodes.item(k).getAttributes() != null ?
+										subChildsNodes.item(k).getAttributes().getNamedItem(ID_IDENTIFIER) :
+											null;
 									if (nodeAttributeId != null && dataNodeId.equals(nodeAttributeId.getNodeValue())) {
 										dataObjectElement = (Element) subChildsNodes.item(k);
 										break;
@@ -294,7 +308,9 @@ public final class XAdESCoSigner {
 						}
 					}
 
-					final NodeList signatureChildNodes = docSig.getElementsByTagNameNS(XMLConstants.DSIGNNS, SIGNATURE_TAG).item(0).getChildNodes();
+					final NodeList signatureChildNodes = docSig.getElementsByTagNameNS(
+						XMLConstants.DSIGNNS, SIGNATURE_TAG
+					).item(0).getChildNodes();
 					for (int j = 0; j < signatureChildNodes.getLength(); j++) {
 						final Node subNode = signatureChildNodes.item(j);
 						final NamedNodeMap nnm = subNode.getAttributes();
@@ -396,10 +412,40 @@ public final class XAdESCoSigner {
 			xmlSignature.addXMLObject(envelopingObject);
 		}
 
+		// *************************************************************************************
+		// ********************************* GESTION MANIFEST **********************************
+
+		if (useManifest) {
+			try {
+				XAdESUtil.createManifest(
+					referenceList,
+					fac,
+					xmlSignature,
+					digestMethod,
+					fac.newTransform(
+						canonicalizationAlgorithm,
+						(TransformParameterSpec) null
+					),
+					referenceId
+				);
+			}
+			catch (final Exception e) {
+				throw new AOException(
+					"Error creando el algoritmo de canonicalizacion para el MANIFEST: " + e, e //$NON-NLS-1$
+				);
+			}
+		}
+
+		// ********************************* FIN GESTION MANIFEST ******************************
+		// *************************************************************************************
+
 		try {
 			final boolean onlySignningCert = Boolean.parseBoolean(
-					extraParams.getProperty("includeOnlySignningCertificate", Boolean.FALSE.toString()) //$NON-NLS-1$
-					);
+				extraParams.getProperty(
+					XAdESExtraParams.INCLUDE_ONLY_SIGNNING_CERTIFICATE,
+					Boolean.FALSE.toString()
+				)
+			);
 			if (onlySignningCert) {
 				xmlSignature.sign(
 						(X509Certificate) certChain[0],
@@ -422,7 +468,9 @@ public final class XAdESCoSigner {
 			}
 		}
 		catch (final NoSuchAlgorithmException e) {
-			throw new UnsupportedOperationException("No se soporta el algoritmo de firma '" + algorithm + "': " + e, e); //$NON-NLS-1$ //$NON-NLS-2$
+			throw new UnsupportedOperationException(
+				"No se soporta el algoritmo de firma '" + algorithm + "': " + e, e //$NON-NLS-1$ //$NON-NLS-2$
+			);
 		}
 		catch (final Exception e) {
 			throw new AOException("Error al generar la cofirma", e); //$NON-NLS-1$

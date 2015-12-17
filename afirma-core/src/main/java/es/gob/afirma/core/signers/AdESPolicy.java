@@ -151,6 +151,9 @@ public final class AdESPolicy {
     		return null;
     	}
 
+    	System.out.println("HashAlgorithm de la politica: " + extraParams.getProperty("policyIdentifierHashAlgorithm"));
+    	System.out.println("Hash de la politica: " + extraParams.getProperty("policyIdentifierHash"));
+
     	return new AdESPolicy(
     			policyID,
     			extraParams.getProperty("policyIdentifierHash"), //$NON-NLS-1$

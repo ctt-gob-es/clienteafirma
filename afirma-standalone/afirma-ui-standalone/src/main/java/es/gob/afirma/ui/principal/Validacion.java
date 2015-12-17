@@ -195,9 +195,10 @@ final class Validacion extends JPanel {
 
 		        // Si el fichero es una firma explicita activamos el campo de seleccion
 		        // de datos, si es una firma implicita activamos el boton de validacion
-		        final InputStream is = AOUtil.loadFile(AOUtil.createURI(path));
-		        final byte[] signData = AOUtil.getDataFromInputStream(is);
-		        is.close();
+				final byte[] signData;
+				try ( final InputStream is = AOUtil.loadFile(AOUtil.createURI(path)); ) {
+					signData = AOUtil.getDataFromInputStream(is);
+				}
 		        final AOSigner signer = AOSignerFactory.getSigner(signData);
 		        if (signer == null) {
 		        	label.setEnabled(false);

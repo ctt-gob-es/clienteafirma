@@ -18,7 +18,6 @@ import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 
 import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
 import com.dmurph.tracking.AnalyticsConfigData;
@@ -59,15 +58,15 @@ public final class Main {
 
     static String getIp() throws IOException {
         final URL whatismyip = new URL(IP_DISCOVERY_AUTOMATION);
-        BufferedReader in = null;
-        in = new BufferedReader(
-    		new InputStreamReader(
-                whatismyip.openStream()
-            )
-		);
-        final String ip = in.readLine();
-        in.close();
-        return ip;
+        try (
+    		final BufferedReader in = new BufferedReader(
+	    		new InputStreamReader(
+	                whatismyip.openStream()
+	            )
+			);
+		) {
+        	return in.readLine();
+        }
     }
 
     /** Arranca la interfaz de escritorio del Cliente @firma.
@@ -75,7 +74,7 @@ public final class Main {
     public static void main(final String[] args) {
 
 		// Google Analytics
-    	SwingUtilities.invokeLater(
+    	new Thread(
 			new Runnable() {
 				@Override
 				public void run() {
@@ -93,7 +92,7 @@ public final class Main {
 			    	}
 				}
 			}
-		);
+		).start();
 
         if (System.getProperty("java.version").compareTo("1.6.0_18") < 0) { //$NON-NLS-1$ //$NON-NLS-2$
             CustomDialog.showMessageDialog(null, true, Messages.getString("main.requerido") + //$NON-NLS-1$

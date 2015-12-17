@@ -78,11 +78,14 @@ public final class DataDownloader {
 		// No son URL, son los datos en si
 
 		// Comprobamos que los datos se pueden tratar como base 64
-		try {
-			return Base64.decode(dataSource.replace("_", "/").replace("-", "+")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-		}
-		catch (final Exception e) {
-			Logger.getLogger("es.gob.afirma").warning("Los datos introducidos no se pueden tratar como base 64: " + e); //$NON-NLS-1$ //$NON-NLS-2$
+		if (AOUtil.isBase64(dataSource.getBytes())) {
+			Logger.getLogger("es.gob.afirma").info("El contenido a obtener es Base64"); //$NON-NLS-1$ //$NON-NLS-2$
+			try {
+				return Base64.decode(dataSource.replace("_", "/").replace("-", "+")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			}
+			catch (final Exception e) {
+				Logger.getLogger("es.gob.afirma").warning("Los datos introducidos no se pueden tratar como base 64: " + e); //$NON-NLS-1$ //$NON-NLS-2$
+			}
 		}
 
 		return dataSource.getBytes();

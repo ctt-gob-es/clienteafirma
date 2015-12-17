@@ -4,8 +4,13 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
 import java.util.Collections;
+import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.signers.ExtraParamsProcessor;
+import es.gob.afirma.core.signers.ExtraParamsProcessor.IncompatiblePolicyException;
 import es.gob.afirma.core.signers.TriphaseData;
 import es.gob.afirma.core.signers.TriphaseData.TriSign;
 import es.gob.afirma.triphase.signer.processors.TriPhasePreProcessor;
@@ -55,6 +60,16 @@ final class SingleSignPostProcessor {
 		// Instanciamos el preprocesador adecuado
 		final TriPhasePreProcessor prep = SingleSignConstants.getTriPhasePreProcessor(sSign);
 
+		Properties extraParams;
+		try {
+			extraParams = ExtraParamsProcessor.expandProperties(sSign.getExtraParams());
+		}
+		catch (final IncompatiblePolicyException e) {
+			Logger.getLogger("es.gob.afirma").log( //$NON-NLS-1$
+					Level.WARNING, "No se ha podido expandir la politica de firma. Se realizara una firma basica: " + e, e); //$NON-NLS-1$
+			extraParams = sSign.getExtraParams();
+		}
+
 		final byte[] docBytes = sSign.getData();
 
 		final byte[] signedDoc;
@@ -64,7 +79,7 @@ final class SingleSignPostProcessor {
 					docBytes,
 					algorithm.toString(),
 					certChain,
-					sSign.getExtraParams(),
+					extraParams,
 					td.toString().getBytes()
 				);
 				break;
@@ -73,7 +88,7 @@ final class SingleSignPostProcessor {
 					docBytes,
 					algorithm.toString(),
 					certChain,
-					sSign.getExtraParams(),
+					extraParams,
 					td.toString().getBytes()
 				);
 				break;

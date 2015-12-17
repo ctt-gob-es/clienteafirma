@@ -77,7 +77,10 @@ final class PreferencesPanelCades extends JPanel {
 	    final FlowLayout fLayout = new FlowLayout(FlowLayout.LEADING);
 	    final JPanel signatureMode = new JPanel(fLayout);
 	    signatureMode.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(), SimpleAfirmaMessages.getString("PreferencesPanel.16"))); //$NON-NLS-1$
-	    this.cadesImplicit.getAccessibleContext().setAccessibleDescription(SimpleAfirmaMessages.getString("PreferencesPanel.45")); //$NON-NLS-1$
+	    this.cadesImplicit.getAccessibleContext().setAccessibleDescription(
+    		SimpleAfirmaMessages.getString("PreferencesPanel.45") //$NON-NLS-1$
+		);
+	    this.cadesImplicit.setMnemonic('i');
 	    this.cadesImplicit.addItemListener(modificationListener);
 	    this.cadesImplicit.addKeyListener(keyListener);
 	    signatureMode.add(this.cadesImplicit);

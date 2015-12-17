@@ -112,24 +112,6 @@ public final class OfficeAnalizer {
      * @throws IOException Si no se puede leer el fichero */
     static String getMimeType(final byte[] data) throws IOException {
 
-    	final String testString = new String(data);
-
-    	if (testString.contains("Microsoft Excel")) { //$NON-NLS-1$
-    		return "application/vnd.ms-excel"; //$NON-NLS-1$
-    	}
-    	if (testString.contains("Microsoft Office Word")) { //$NON-NLS-1$
-    		return "application/msword"; //$NON-NLS-1$
-    	}
-    	if (testString.contains("Microsoft Office PowerPoint")) { //$NON-NLS-1$
-    		return "application/vnd.ms-powerpoint"; //$NON-NLS-1$
-    	}
-    	if (testString.contains("Microsoft Project")) { //$NON-NLS-1$
-    		return "application/vnd.ms-project"; //$NON-NLS-1$
-    	}
-    	if (testString.contains("Microsoft Visio")) { //$NON-NLS-1$
-    		return "application/vnd.visio"; //$NON-NLS-1$
-    	}
-
         final ZipFile zipFile;
         try {
             zipFile = AOFileUtils.createTempZipFile(data);
@@ -148,6 +130,34 @@ public final class OfficeAnalizer {
         else if (isOOXMLFile(zipFile)) {
             tempMimetype = getOOXMLMimeType(zipFile.getInputStream(zipFile.getEntry("[Content_Types].xml"))); //$NON-NLS-1$
         }
+        else {
+        	// Comprobamos si se trata de un documento de Office 97-2003 con una estructura zip interna
+        	try {
+        		final String testString = new String(data);
+
+        		if (testString.contains("Microsoft Excel")) { //$NON-NLS-1$
+        			return "application/vnd.ms-excel"; //$NON-NLS-1$
+        		}
+        		if (testString.contains("Microsoft Office Word")) { //$NON-NLS-1$
+        			return "application/msword"; //$NON-NLS-1$
+        		}
+        		if (testString.contains("Microsoft Office PowerPoint")) { //$NON-NLS-1$
+        			return "application/vnd.ms-powerpoint"; //$NON-NLS-1$
+        		}
+        		if (testString.contains("Microsoft Project")) { //$NON-NLS-1$
+        			return "application/vnd.ms-project"; //$NON-NLS-1$
+        		}
+        		if (testString.contains("Microsoft Visio")) { //$NON-NLS-1$
+        			return "application/vnd.visio"; //$NON-NLS-1$
+        		}
+        	}
+        	catch (final Error e) {
+        		LOGGER.warning(
+        				"No se ha podido completar el analisis del documento, se considerara ZIP: " + e //$NON-NLS-1$
+        		);
+        	}
+        }
+
         if (tempMimetype != null) {
             mimetype = tempMimetype;
         }

@@ -10,6 +10,13 @@
 
 package es.gob.afirma.standalone.ui;
 
+import static es.gob.afirma.standalone.PreferencesManager.PREFERENCE_GENERAL_DEFAULT_FORMAT_BIN;
+import static es.gob.afirma.standalone.PreferencesManager.PREFERENCE_GENERAL_DEFAULT_FORMAT_FACTURAE;
+import static es.gob.afirma.standalone.PreferencesManager.PREFERENCE_GENERAL_DEFAULT_FORMAT_ODF;
+import static es.gob.afirma.standalone.PreferencesManager.PREFERENCE_GENERAL_DEFAULT_FORMAT_OOXML;
+import static es.gob.afirma.standalone.PreferencesManager.PREFERENCE_GENERAL_DEFAULT_FORMAT_PDF;
+import static es.gob.afirma.standalone.PreferencesManager.PREFERENCE_GENERAL_DEFAULT_FORMAT_XML;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -68,6 +75,7 @@ import javax.swing.WindowConstants;
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Platform;
+import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSignInfo;
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.AOSignerFactory;
@@ -75,7 +83,6 @@ import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.keystores.AOCertificatesNotFoundException;
 import es.gob.afirma.keystores.AOKeyStoreDialog;
 import es.gob.afirma.keystores.AOKeyStoreManager;
-import es.gob.afirma.signers.cades.AOCAdESSigner;
 import es.gob.afirma.signers.odf.AOODFSigner;
 import es.gob.afirma.signers.ooxml.AOOOXMLSigner;
 import es.gob.afirma.signers.pades.AOPDFSigner;
@@ -90,6 +97,8 @@ import es.gob.afirma.standalone.PreferencesManager;
 import es.gob.afirma.standalone.SimpleAfirma;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.VisorFirma;
+import es.gob.afirma.standalone.ui.pdf.SignPdfDialog;
+import es.gob.afirma.standalone.ui.pdf.SignPdfDialog.SignPdfDialogListener;
 
 /** Panel de selecci&oacute;n y firma del fichero objetivo.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
@@ -107,7 +116,6 @@ public final class SignPanel extends JPanel {
     private static final String FILE_ICON_SIGN = "/resources/icon_sign_large.png"; //$NON-NLS-1$
     private static final String FILE_ICON_FACTURAE = "/resources/icon_facturae_large.png"; //$NON-NLS-1$
     private static final String FILE_ICON_OOXML_WIN = "/resources/icon_office_win_large.png"; //$NON-NLS-1$
-    private static final String FILE_ICON_OOXML_MAC = "/resources/icon_office_mac_large.png"; //$NON-NLS-1$
     private static final String FILE_ICON_ODF = "/resources/icon_openoffice_large.png"; //$NON-NLS-1$
 
     private AOSigner signer;
@@ -248,7 +256,12 @@ public final class SignPanel extends JPanel {
             iconPath = FILE_ICON_PDF;
             iconTooltip = SimpleAfirmaMessages.getString("SignPanel.0"); //$NON-NLS-1$
             fileDescription = SimpleAfirmaMessages.getString("SignPanel.9"); //$NON-NLS-1$
-            this.signer = new AOPDFSigner();
+            this.signer = AOSignerFactory.getSigner(
+        		PreferencesManager.get(
+    				PREFERENCE_GENERAL_DEFAULT_FORMAT_PDF,
+    				AOSignConstants.SIGN_FORMAT_PADES
+				)
+    		);
         }
         // Comprobamos si es una factura electronica
         else if (DataAnalizerUtil.isFacturae(data)) {
@@ -264,7 +277,12 @@ public final class SignPanel extends JPanel {
         	iconPath = FILE_ICON_FACTURAE;
         	iconTooltip = SimpleAfirmaMessages.getString("SignPanel.17"); //$NON-NLS-1$
         	fileDescription = SimpleAfirmaMessages.getString("SignPanel.20"); //$NON-NLS-1$
-        	this.signer = new AOFacturaESigner();
+        	this.signer = AOSignerFactory.getSigner(
+        		PreferencesManager.get(
+    				PREFERENCE_GENERAL_DEFAULT_FORMAT_FACTURAE,
+    				AOSignConstants.SIGN_FORMAT_FACTURAE
+				)
+    		);
         }
         // Comprobamos si es un fichero de firma (los PDF y las facturas pasaran por la condicion anterior)
         else if ((this.signer = AOSignerFactory.getSigner(data)) != null) {
@@ -285,28 +303,48 @@ public final class SignPanel extends JPanel {
             iconPath = FILE_ICON_XML;
             iconTooltip = SimpleAfirmaMessages.getString("SignPanel.8"); //$NON-NLS-1$
             fileDescription = SimpleAfirmaMessages.getString("SignPanel.10"); //$NON-NLS-1$
-            this.signer = new AOXAdESSigner();
+            this.signer = AOSignerFactory.getSigner(
+        		PreferencesManager.get(
+    				PREFERENCE_GENERAL_DEFAULT_FORMAT_XML,
+    				AOSignConstants.SIGN_FORMAT_XADES
+				)
+    		);
         }
         // Comprobamos si es un OOXML
         else if (DataAnalizerUtil.isOOXML(data)) {
-        	iconPath = Platform.OS.MACOSX.equals(Platform.getOS()) ? FILE_ICON_OOXML_MAC : FILE_ICON_OOXML_WIN;
+        	iconPath = FILE_ICON_OOXML_WIN;
         	iconTooltip = SimpleAfirmaMessages.getString("SignPanel.38"); //$NON-NLS-1$
             fileDescription = SimpleAfirmaMessages.getString("SignPanel.37"); //$NON-NLS-1$
-            this.signer = new AOOOXMLSigner();
+            this.signer = AOSignerFactory.getSigner(
+	    		PreferencesManager.get(
+    				PREFERENCE_GENERAL_DEFAULT_FORMAT_OOXML,
+    				AOSignConstants.SIGN_FORMAT_OOXML
+				)
+    		);
         }
         // Comprobamos si es un OOXML
         else if (DataAnalizerUtil.isODF(data)) {
         	iconPath = FILE_ICON_ODF;
         	iconTooltip = SimpleAfirmaMessages.getString("SignPanel.32"); //$NON-NLS-1$
             fileDescription = SimpleAfirmaMessages.getString("SignPanel.31"); //$NON-NLS-1$
-            this.signer = new AOODFSigner();
+            this.signer = AOSignerFactory.getSigner(
+	    		PreferencesManager.get(
+    				PREFERENCE_GENERAL_DEFAULT_FORMAT_ODF,
+    				AOSignConstants.SIGN_FORMAT_ODF
+				)
+    		);
         }
         // Cualquier otro tipo de fichero
         else {
             iconPath = FILE_ICON_BINARY;
             iconTooltip = SimpleAfirmaMessages.getString("SignPanel.12"); //$NON-NLS-1$
             fileDescription = SimpleAfirmaMessages.getString("SignPanel.11"); //$NON-NLS-1$
-            this.signer = new AOCAdESSigner();
+            this.signer = AOSignerFactory.getSigner(
+	    		PreferencesManager.get(
+    				PREFERENCE_GENERAL_DEFAULT_FORMAT_BIN,
+    				AOSignConstants.SIGN_FORMAT_CADES
+				)
+    		);
         }
 
         try (
@@ -587,12 +625,14 @@ public final class SignPanel extends JPanel {
 
         LowerPanel() {
             super(true);
-            SwingUtilities.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    createUI();
-                }
-            });
+            SwingUtilities.invokeLater(
+        		new Runnable() {
+	                @Override
+	                public void run() {
+	                    createUI();
+	                }
+	            }
+    		);
         }
 
         void createUI() {
@@ -619,12 +659,14 @@ public final class SignPanel extends JPanel {
             SignPanel.this.getSignButton().setMnemonic('F');
             SignPanel.this.getSignButton().setEnabled(false);
             buttonPanel.add(SignPanel.this.getSignButton());
-            SignPanel.this.getSignButton().addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(final ActionEvent ae) {
-                    sign();
-                }
-            });
+            SignPanel.this.getSignButton().addActionListener(
+        		new ActionListener() {
+	                @Override
+	                public void actionPerformed(final ActionEvent ae) {
+	                    sign();
+	                }
+	            }
+    		);
 
             // Establecemos la configuracion de color
             if (!LookAndFeelManager.HIGH_CONTRAST) {
@@ -643,24 +685,27 @@ public final class SignPanel extends JPanel {
         private static final long serialVersionUID = -8648491975442788750L;
 
         FilePanel(final Component icon,
-                          final String fileSize,
-                          final File file,
-                          final String fileDescription,
-                          final Date fileLastModified) {
+                  final String fileSize,
+                  final File file,
+                  final String fileDescription,
+                  final Date fileLastModified) {
+
             super(true);
-            SwingUtilities.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    createUI(icon, fileSize, file, fileDescription, fileLastModified);
-                }
-            });
+            SwingUtilities.invokeLater(
+        		new Runnable() {
+	                @Override
+	                public void run() {
+	                    createUI(icon, fileSize, file, fileDescription, fileLastModified);
+	                }
+	            }
+    		);
         }
 
         void createUI(final Component icon,
-                              final String fileSize,
-                              final File file,
-                              final String fileDescription,
-                              final Date fileLastModified) {
+                      final String fileSize,
+                      final File file,
+                      final String fileDescription,
+                      final Date fileLastModified) {
 
             this.setBorder(BorderFactory.createLineBorder(Color.black));
             this.setLayout(new GridBagLayout());
@@ -669,8 +714,10 @@ public final class SignPanel extends JPanel {
             pathLabel.setFont(pathLabel.getFont().deriveFont(Font.BOLD, pathLabel.getFont().getSize() + 3f));
 
             final JLabel descLabel = new JLabel(SimpleAfirmaMessages.getString("SignPanel.46") + fileDescription); //$NON-NLS-1$
-            final JLabel dateLabel = new JLabel(SimpleAfirmaMessages.getString("SignPanel.47") + //$NON-NLS-1$
-                                                DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.SHORT).format(fileLastModified));
+            final JLabel dateLabel = new JLabel(
+        		SimpleAfirmaMessages.getString("SignPanel.47") + //$NON-NLS-1$
+                    DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.SHORT).format(fileLastModified)
+            );
 
             final JLabel sizeLabel = new JLabel(
         		SimpleAfirmaMessages.getString("SignPanel.49") + (fileSize.equals("0") ? "<1" : fileSize) + " KB" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
@@ -724,26 +771,28 @@ public final class SignPanel extends JPanel {
             openFileButton.setMnemonic('v');
             openFileButton.addActionListener(new ActionListener() {
                 @Override
-                public void actionPerformed(final ActionEvent ae) {
-                    if (file.getName().endsWith(".csig") || file.getName().endsWith(".xsig")) { //$NON-NLS-1$ //$NON-NLS-2$
-                        new VisorFirma(false).initialize(false, file);
-                    }
-                    else {
-                        try {
-                            Desktop.getDesktop().open(file);
-                        }
-                        catch (final IOException e) {
-                        	AOUIFactory.showErrorMessage(
-                                FilePanel.this,
-                                SimpleAfirmaMessages.getString("SignPanel.53"), //$NON-NLS-1$
-                                SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
-                                JOptionPane.ERROR_MESSAGE
-                            );
-                            return;
-                        }
-                    }
-                }
-            });
+                public void actionPerformed(
+            		final ActionEvent ae) {
+	                    if (file.getName().endsWith(".csig") || file.getName().endsWith(".xsig")) { //$NON-NLS-1$ //$NON-NLS-2$
+	                        new VisorFirma(false, null).initialize(false, file);
+	                    }
+	                    else {
+	                        try {
+	                            Desktop.getDesktop().open(file);
+	                        }
+	                        catch (final IOException e) {
+	                        	AOUIFactory.showErrorMessage(
+	                                FilePanel.this,
+	                                SimpleAfirmaMessages.getString("SignPanel.53"), //$NON-NLS-1$
+	                                SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
+	                                JOptionPane.ERROR_MESSAGE
+	                            );
+	                            return;
+	                        }
+	                    }
+	                }
+	            }
+    		);
             this.add(openFileButton, c);
             pathLabel.setLabelFor(openFileButton);
             descLabel.setLabelFor(openFileButton);
@@ -785,13 +834,12 @@ public final class SignPanel extends JPanel {
             super();
         }
 
-        @Override
-        public Void doInBackground() {
+        void doSignature(final AOSigner currentSigner, final Properties initialExtraParams) {
 
             SignPanel.this.setCursor(new Cursor(Cursor.WAIT_CURSOR));
 
             if (SignPanel.this.getSigner() == null || SignPanel.this.getDataToSign() == null || SignPanel.this.getSimpleAfirma() == null) {
-                return null;
+                return;
             }
             final AOKeyStoreManager ksm = SignPanel.this.getSimpleAfirma().getAOKeyStoreManager();
 
@@ -805,7 +853,7 @@ public final class SignPanel extends JPanel {
     			);
             }
             catch (final AOCancelledOperationException e) {
-                return null;
+                return;
             }
             catch(final AOCertificatesNotFoundException e) {
             	LOGGER.severe("El almacen no contiene ningun certificado que se pueda usar para firmar: " + e); //$NON-NLS-1$
@@ -815,7 +863,7 @@ public final class SignPanel extends JPanel {
                     SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
                     JOptionPane.ERROR_MESSAGE
                 );
-            	return null;
+            	return;
             }
             catch (final Exception e) {
             	LOGGER.severe("Ocurrio un error al extraer la clave privada del certificiado seleccionado: " + e); //$NON-NLS-1$
@@ -825,14 +873,11 @@ public final class SignPanel extends JPanel {
                     SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
                     JOptionPane.ERROR_MESSAGE
                 );
-            	return null;
+            	return;
         	}
             finally {
                 SignPanel.this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
             }
-
-            setSignCommandEnabled(false);
-
 
             // ********************************************************************************************
             // ***************** PREPARACION DIALOGO PROGRESO ********************************************
@@ -874,7 +919,10 @@ public final class SignPanel extends JPanel {
 
             // ************************************************************************************
             // ****************** PROCESO DE FIRMA ************************************************
-            final Properties prefProps = ExtraParamsHelper.loadExtraParamsForSigner(SignPanel.this.getSigner());
+            final Properties prefProps = ExtraParamsHelper.loadExtraParamsForSigner(currentSigner);
+            if (initialExtraParams != null){
+            	prefProps.putAll(initialExtraParams);
+            }
 
             // Anadimos las propiedades del sistema, habilitando asi que se puedan indicar opciones de uso con -D en linea
             // de comandos
@@ -882,7 +930,9 @@ public final class SignPanel extends JPanel {
             p.putAll(prefProps);
             p.putAll(System.getProperties());
 
-            final String signatureAlgorithm = PreferencesManager.get(PreferencesManager.PREFERENCE_SIGNATURE_ALGORITHM, "SHA512withRSA"); //$NON-NLS-1$
+            final String signatureAlgorithm = PreferencesManager.get(
+        		PreferencesManager.PREFERENCE_GENERAL_SIGNATURE_ALGORITHM, "SHA512withRSA" //$NON-NLS-1$
+    		);
 
             final byte[] signResult;
             try {
@@ -907,7 +957,7 @@ public final class SignPanel extends JPanel {
             }
             catch(final AOCancelledOperationException e) {
                 setSignCommandEnabled(true);
-                return null;
+                return;
             }
             catch(final PdfIsCertifiedException e) {
             	LOGGER.warning("PDF no firmado por estar certificado: " + e); //$NON-NLS-1$
@@ -918,7 +968,7 @@ public final class SignPanel extends JPanel {
                     JOptionPane.ERROR_MESSAGE
                 );
                 setSignCommandEnabled(true);
-                return null;
+                return;
             }
             catch(final BadPdfPasswordException e) {
             	LOGGER.warning("PDF protegido con contrasena mal proporcionada: " + e); //$NON-NLS-1$
@@ -929,7 +979,7 @@ public final class SignPanel extends JPanel {
                     JOptionPane.ERROR_MESSAGE
                 );
                 setSignCommandEnabled(true);
-                return null;
+                return;
             }
             catch(final PdfHasUnregisteredSignaturesException e) {
             	LOGGER.warning("PDF con firmas no registradas: " + e); //$NON-NLS-1$
@@ -940,7 +990,7 @@ public final class SignPanel extends JPanel {
                     JOptionPane.ERROR_MESSAGE
                 );
                 setSignCommandEnabled(true);
-                return null;
+                return;
             }
             catch(final Exception e) {
                 LOGGER.severe("Error durante el proceso de firma: " + e); //$NON-NLS-1$
@@ -951,7 +1001,7 @@ public final class SignPanel extends JPanel {
                     JOptionPane.ERROR_MESSAGE
                 );
                 setSignCommandEnabled(true);
-                return null;
+                return;
             }
             catch(final OutOfMemoryError ooe) {
                 LOGGER.severe("Falta de memoria en el proceso de firma: " + ooe); //$NON-NLS-1$
@@ -962,7 +1012,7 @@ public final class SignPanel extends JPanel {
                     JOptionPane.ERROR_MESSAGE
                 );
                 setSignCommandEnabled(true);
-                return null;
+                return;
             }
             finally {
                 SignPanel.this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
@@ -1024,25 +1074,25 @@ public final class SignPanel extends JPanel {
 	                filterExtensions = new String[] {
 	                    "odt" //$NON-NLS-1$
 	                };
-	                filterDescription = SimpleAfirmaMessages.getString("SignPanel.91"); //$NON-NLS-1$
+	                filterDescription = SimpleAfirmaMessages.getString("SignPanel.96"); //$NON-NLS-1$
             	}
             	else if (newFileName.toLowerCase().endsWith("odp")) { //$NON-NLS-1$
 	                filterExtensions = new String[] {
 	                    "odp" //$NON-NLS-1$
 	                };
-	                filterDescription = SimpleAfirmaMessages.getString("SignPanel.92"); //$NON-NLS-1$
+	                filterDescription = SimpleAfirmaMessages.getString("SignPanel.97"); //$NON-NLS-1$
             	}
             	else if (newFileName.toLowerCase().endsWith("ods")) { //$NON-NLS-1$
 	                filterExtensions = new String[] {
 	                    "ods" //$NON-NLS-1$
 	                };
-	                filterDescription = SimpleAfirmaMessages.getString("SignPanel.93"); //$NON-NLS-1$
+	                filterDescription = SimpleAfirmaMessages.getString("SignPanel.98"); //$NON-NLS-1$
             	}
             	else {
             		filterExtensions = new String[] {
     	                    "odf" //$NON-NLS-1$
     	                };
-    	                filterDescription = SimpleAfirmaMessages.getString("SignPanel.94"); //$NON-NLS-1$
+    	                filterDescription = SimpleAfirmaMessages.getString("SignPanel.99"); //$NON-NLS-1$
             	}
             }
             else {
@@ -1084,11 +1134,11 @@ public final class SignPanel extends JPanel {
                       JOptionPane.ERROR_MESSAGE
                   );
                   setSignCommandEnabled(true);
-                  return null;
+                  return;
             }
             catch(final AOCancelledOperationException e) {
             	setSignCommandEnabled(true);
-            	return null;
+            	return;
             }
             finally {
             	SignPanel.this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
@@ -1101,10 +1151,32 @@ public final class SignPanel extends JPanel {
         		fd.getAbsolutePath(),
         		(X509Certificate) pke.getCertificate()
     		);
-
-            return null;
         }
 
+        @Override
+        public Void doInBackground() {
+            //setSignCommandEnabled(false);
+            //getSelectButton().setEnabled(false);
+            final AOSigner currentSigner = SignPanel.this.getSigner();
+            if (Boolean.parseBoolean(
+        		PreferencesManager.get(PreferencesManager.PREFERENCE_PADES_VISIBLE, "false")) && //$NON-NLS-1$
+            	currentSigner instanceof AOPDFSigner
+        	) {
+        		SignPdfDialog.getVisibleSignatureExtraParams(
+    				SignPanel.this.getDataToSign(),
+    				SignPanel.this.getWindow(),
+    				new SignPdfDialogListener() {
+						@Override
+						public void propertiesCreated(final Properties extraParams) {
+							doSignature(currentSigner, extraParams);
+						}
+					}
+				);
+            }
+            else {
+            	doSignature(currentSigner, null);
+            }
+            return null;
+        }
     }
-
 }
