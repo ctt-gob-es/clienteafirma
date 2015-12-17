@@ -123,7 +123,10 @@ public final class MozillaKeyStoreUtilities {
 	}
 
 	static String getNssPathFromCompatibilityFile() throws IOException {
-		final File compatibility = new File(getMozillaUserProfileDirectory(), "compatibility.ini");  //$NON-NLS-1$
+		final File compatibility = new File(
+			getMozillaUserProfileDirectory(),
+			"compatibility.ini"  //$NON-NLS-1$
+		);
 		if (compatibility.exists() && compatibility.canRead()) {
 			final InputStream fis = new FileInputStream(compatibility);
 			// Cargamos el fichero con la codificacion por defecto (que es la que con mas probabilidad tiene el fichero)
@@ -141,7 +144,9 @@ public final class MozillaKeyStoreUtilities {
 				return dir;
 			}
 		}
-		throw new FileNotFoundException("No se ha podido determinar el directorio de NSS en Windows a partir de 'compatibility.ini' de Firefox"); //$NON-NLS-1$
+		throw new FileNotFoundException(
+			"No se ha podido determinar el directorio de NSS en Windows a partir de 'compatibility.ini' de Firefox" //$NON-NLS-1$
+		);
 	}
 
 	/** Obtiene el directorio de las bibliotecas NSS (<i>Netscape Security
@@ -162,12 +167,16 @@ public final class MozillaKeyStoreUtilities {
 				nssLibDir = System.getenv(AFIRMA_NSS_HOME);
 			}
 			catch(final Exception e) {
-				LOGGER.warning("No se tiene acceso a la variable de entorno '" + AFIRMA_NSS_HOME + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
+				LOGGER.warning(
+					"No se tiene acceso a la variable de entorno '" + AFIRMA_NSS_HOME + "': " + e //$NON-NLS-1$ //$NON-NLS-2$
+				);
 			}
 			if (nssLibDir != null) {
 				final File nssDir = new File(nssLibDir);
 				if (nssDir.isDirectory() && nssDir.canRead()) {
-					LOGGER.info("Directorio de NSS determinado a partir de la variable de entorno '" + AFIRMA_NSS_HOME + "'"); //$NON-NLS-1$ //$NON-NLS-2$
+					LOGGER.info(
+						"Directorio de NSS determinado a partir de la variable de entorno '" + AFIRMA_NSS_HOME + "'" //$NON-NLS-1$ //$NON-NLS-2$
+					);
 				}
 				else {
 					LOGGER.warning(
@@ -466,8 +475,8 @@ public final class MozillaKeyStoreUtilities {
 		Provider p = null;
 		try {
 			p = (Provider) Class.forName("sun.security.pkcs11.SunPKCS11") //$NON-NLS-1$
-			.getConstructor(InputStream.class)
-			.newInstance(new ByteArrayInputStream(p11NSSConfigFile.getBytes()));
+				.getConstructor(InputStream.class)
+					.newInstance(new ByteArrayInputStream(p11NSSConfigFile.getBytes()));
 		}
 		catch (final Exception e) {
 			// No se ha podido cargar el proveedor sin precargar las dependencias
@@ -483,7 +492,7 @@ public final class MozillaKeyStoreUtilities {
 			try {
 				p = (Provider) Class.forName("sun.security.pkcs11.SunPKCS11") //$NON-NLS-1$
 					.getConstructor(InputStream.class)
-					.newInstance(new ByteArrayInputStream(p11NSSConfigFile.getBytes()));
+						.newInstance(new ByteArrayInputStream(p11NSSConfigFile.getBytes()));
 			}
 			catch (final Exception e2) {
 				// Un ultimo intento de cargar el proveedor valiendonos de que es posible que

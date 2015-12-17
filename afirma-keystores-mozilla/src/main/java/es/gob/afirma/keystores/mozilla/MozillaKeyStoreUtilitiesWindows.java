@@ -1,13 +1,17 @@
 package es.gob.afirma.keystores.mozilla;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Platform;
+import es.gob.afirma.keystores.mozilla.bintutil.MsPortableExecutable;
+import es.gob.afirma.keystores.mozilla.bintutil.PeMachineType;
 
 final class MozillaKeyStoreUtilitiesWindows {
 
@@ -46,8 +50,6 @@ final class MozillaKeyStoreUtilitiesWindows {
 	// Firefox x
 	private static final String NSS3_DLL = "nss3.dll"; //$NON-NLS-1$
 
-
-
 	private MozillaKeyStoreUtilitiesWindows() {
 		// No permitimos la instanciacion
 	}
@@ -82,7 +84,9 @@ final class MozillaKeyStoreUtilitiesWindows {
 
 	static String getSystemNSSLibDirWindows() throws IOException {
 
-		String dir = MozillaKeyStoreUtilities.getNssPathFromCompatibilityFile();
+		String dir = getShort(
+			MozillaKeyStoreUtilities.getNssPathFromCompatibilityFile()
+		);
 
 		if (dir == null) {
 			throw new FileNotFoundException("No se encuentra el dierctorio de NSS en Windows"); //$NON-NLS-1$
@@ -90,10 +94,14 @@ final class MozillaKeyStoreUtilitiesWindows {
 
 		// Tenemos la ruta del NSS, comprobamos adecuacion por bugs de Java
 		boolean illegalChars = false;
-		for (final char c : dir.toCharArray()) {
-			if (P11_CONFIG_VALID_CHARS.indexOf(c) == -1) {
-				illegalChars = true;
-				break;
+		// Solo lo comprobamos en Java 6, en versiones superiores no esta este bug y no es necesario hacer nada
+		final String javaVer = System.getProperty("java.version"); //$NON-NLS-1$
+		if (javaVer == null || javaVer.startsWith("1.6")) { //$NON-NLS-1$
+			for (final char c : dir.toCharArray()) {
+				if (P11_CONFIG_VALID_CHARS.indexOf(c) == -1) {
+					illegalChars = true;
+					break;
+				}
 			}
 		}
 
@@ -101,8 +109,7 @@ final class MozillaKeyStoreUtilitiesWindows {
 		// para bibliotecas en java inferior a 6u30
 		if (illegalChars) {
 
-			// Tenemos una ruta con caracteres ilegales para la
-			// configuracion de SunPKCS#11 por el bug 6581254:
+			// Tenemos una ruta con caracteres ilegales para la configuracion de SunPKCS#11 por el bug 6581254:
 			// http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6581254
 			try {
 
@@ -130,12 +137,43 @@ final class MozillaKeyStoreUtilitiesWindows {
 
 			}
 			catch (final Exception e) {
-				LOGGER.warning("No se ha podido duplicar NSS en un directorio temporal, si esta version de JRE esta afectada por el error 6581254 de Java es posible que no pueda cargarse: " + e); //$NON-NLS-1$
+				LOGGER.warning(
+					"No se ha podido duplicar NSS en un directorio temporal, si esta version de JRE esta afectada por " + //$NON-NLS-1$
+						"el error 6581254 de Java es posible que no pueda cargarse: " + e //$NON-NLS-1$
+				);
 			}
 
 		}
 
 		if (dir != null) {
+			final File nssP11 = new File(dir, SOFTOKN3_DLL);
+			if (!nssP11.exists() || !nssP11.canRead()) {
+				throw new FileNotFoundException(
+					"No se ha encontrado un NSS en Windows para el directorio " + dir //$NON-NLS-1$
+				);
+			}
+			try {
+				final InputStream fis = new FileInputStream(nssP11);
+				final PeMachineType peArch = new MsPortableExecutable(
+					AOUtil.getDataFromInputStream(fis)
+				).getPeMachineType();
+				fis.close();
+				final String javaArch = Platform.getJavaArch();
+				if (peArch.equals(PeMachineType.INTEL_386) && "32".equals(javaArch) || //$NON-NLS-1$
+					peArch.equals(PeMachineType.X64) && "64".equals(javaArch)) { //$NON-NLS-1$
+						LOGGER.info("Arquitectura del NSS encontrado: " + peArch); //$NON-NLS-1$
+				}
+				else {
+					throw new FileNotFoundException(
+						"Este Java es de " + javaArch + " bits, pero el NSS encontrado es para la arquitectura " +  peArch //$NON-NLS-1$ //$NON-NLS-2$
+					);
+				}
+			}
+			catch(final Exception e) {
+				LOGGER.warning(
+					"No se ha podido analizar la arquitectura del NSS encontrado: " + e //$NON-NLS-1$
+				);
+			}
 			return dir;
 		}
 
