@@ -20,12 +20,18 @@ public final class DownloadFileTask extends BasicHttpTransferDataTask {
 
 	private static final String ERROR_PREFIX = "ERR-"; //$NON-NLS-1$
 
+	private static final String ERROR_NO_DATA = ERROR_PREFIX + "06"; //$NON-NLS-1$
+
+	private static final int MAX_DOWNLOAD_TRIES = 10;
+
 	private final String fileId;
 	private final URL retrieveServletUrl;
 	private final DownloadDataListener ddListener;
 
 	private String errorMessage = null;
 	private Throwable errorThowable = null;
+
+	private int downloadTries = 0;
 
 	/** Crea una tarea para la descarga de un fichero del servidor intermedio.
 	 * @param fileId Identificadod del fichero en el servidor intermedio
@@ -54,9 +60,25 @@ public final class DownloadFileTask extends BasicHttpTransferDataTask {
 			// Llamamos al servicio para guardar los datos
 			data = this.readUrlByPost(url.toString());
 
-			Log.i(ES_GOB_AFIRMA, "Descarga de datos finalizada"); //$NON-NLS-1$
-
 			if (ERROR_PREFIX.equalsIgnoreCase(new String(data, 0, 4, DEFAULT_URL_ENCODING))) {
+
+				// Si el problema es que no hay datos, lo reeintentamos hasta un maximo de veces
+				if (new String(data).startsWith(ERROR_NO_DATA)) {
+
+					Log.i(ES_GOB_AFIRMA, "Los datos no estaban disponibles en servidor"); //$NON-NLS-1$
+
+					if (this.downloadTries < MAX_DOWNLOAD_TRIES) {
+						this.downloadTries++;
+						try {
+							Thread.sleep(2000);
+						}
+						catch (final Exception e) {
+							Log.i(ES_GOB_AFIRMA, "No se pudo realizar la espera entre tiempos de descarga"); //$NON-NLS-1$
+						}
+						return doInBackground(arg0);
+					}
+				}
+
 				this.errorMessage = "El servidor devolvio el siguiente error al descargar los datos: " + new String(data, DEFAULT_URL_ENCODING); //$NON-NLS-1$
 				this.errorThowable = new IOException(this.errorMessage);
 				return null;
@@ -84,6 +106,8 @@ public final class DownloadFileTask extends BasicHttpTransferDataTask {
 			this.errorThowable = new AOCancelledOperationException(this.errorMessage);
 			return null;
 		}
+
+		Log.i(ES_GOB_AFIRMA, "Descarga de datos finalizada"); //$NON-NLS-1$
 
 		return data;
 	}

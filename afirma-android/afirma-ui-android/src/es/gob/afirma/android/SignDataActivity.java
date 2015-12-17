@@ -146,8 +146,8 @@ public final class SignDataActivity extends FragmentActivity implements Keystore
 			return;
 		}
 
-		// Establecemos el layout con la interfaz
-		setContentView(R.layout.activity_sign_data);
+//		// Establecemos el layout con la interfaz
+//		setContentView(R.layout.activity_sign_data);
 
 		// Aseguramos que se muestra el panel con el mensaje de espera
 		this.progressDialog = ProgressDialog.show(
