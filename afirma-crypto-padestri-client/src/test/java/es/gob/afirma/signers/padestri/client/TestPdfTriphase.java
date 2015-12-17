@@ -108,6 +108,41 @@ public class TestPdfTriphase {
 		System.out.println("La firma se ha guardado en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
 	}
 
+	/**
+	 * Prueba de firma trifasica PDF con los mismos parametros que se usan para la firma PAdES en
+	 * el portafirmas del MinHAP.
+	 * @throws Exception Cuando ocurre cualquier error.
+	 */
+	@Test
+	public void testFirmaParamsPortafirmas() throws Exception {
+
+		final AOSigner signer = new AOPDFTriPhaseSigner();
+
+		final Properties config = new Properties();
+		for (final String key : this.serverConfig.keySet().toArray(new String[this.serverConfig.size()])) {
+			config.setProperty(key, this.serverConfig.getProperty(key));
+		}
+		config.setProperty("signatureSubFilter", "ETSI.CAdES.detached"); //$NON-NLS-1$ //$NON-NLS-2$
+		config.setProperty("policyIdentifier", "2.16.724.1.3.1.1.2.1.9"); //$NON-NLS-1$ //$NON-NLS-2$
+		config.setProperty("policyIdentifierHash", "G7roucf600+f03r/o0bAOQ6WAs0="); //$NON-NLS-1$ //$NON-NLS-2$
+		config.setProperty("policyIdentifierHashAlgorithm", "1.3.14.3.2.26"); //$NON-NLS-1$ //$NON-NLS-2$
+		config.setProperty("policyQualifier", "https://sede.060.gob.es/politica_de_firma_anexo_1.pdf"); //$NON-NLS-1$ //$NON-NLS-2$
+
+		final byte[] result = signer.sign(
+			this.data,
+			"SHA512withRSA",  //$NON-NLS-1$
+			this.pke.getPrivateKey(),
+			this.pke.getCertificateChain(),
+			config
+		);
+
+		Assert.assertNotNull("Error durante el proceso de firma, resultado nulo", result); //$NON-NLS-1$
+		Assert.assertFalse("Se recibio un codigo de error desde el servidor", new String(result).startsWith("ERR-")); //$NON-NLS-1$ //$NON-NLS-2$
+
+		final File tempFile = savePdfTempFile(result);
+		System.out.println("La firma se ha guardado en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
+	}
+
 	/** Prueba de firma trif&aacute;sica con adjunto en el PDF.
 	 * @throws Exception */
 	@Test
