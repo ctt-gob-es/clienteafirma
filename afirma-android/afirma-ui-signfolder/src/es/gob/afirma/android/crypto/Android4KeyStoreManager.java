@@ -3,7 +3,6 @@ package es.gob.afirma.android.crypto;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.KeyStoreException;
 
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.security.KeyChain;
 import android.security.KeyChainAliasCallback;
@@ -11,7 +10,6 @@ import es.gob.afirma.android.signfolder.CryptoConfiguration;
 
 /** Gestor simple de claves y certificados para dispositivos Android 4.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
-@TargetApi(14)
 public final class Android4KeyStoreManager implements MobileKeyStoreManager {
 
     private final Activity activity;
@@ -52,10 +50,10 @@ public final class Android4KeyStoreManager implements MobileKeyStoreManager {
 			            					Android4KeyStoreManager.this.getActivity(),
 			            					alias)
 			            			);
-			            	
+
 			            	CryptoConfiguration.setCertificatePrivateKeyEntry(pke);
 			            	CryptoConfiguration.setCertificateAlias(alias);
-			            	
+
 			                pksl.keySelected(
 		                		new KeySelectedEvent(
 	                				pke,

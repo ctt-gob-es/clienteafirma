@@ -1,6 +1,5 @@
 package es.gob.afirma.android.signfolder;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -10,7 +9,6 @@ import android.support.v4.app.DialogFragment;
 
 /** Di&aacute;logo modal con el que mostrar al usuario un mensaje y un bot&oacute;n para ocultar el
  * di&aacute;logo y, opcionalmente, realizar una acci&oacute;n. */
-@SuppressLint("ValidFragment")
 final class MessageDialog extends DialogFragment {
 
 	private String title = null;
@@ -28,7 +26,6 @@ final class MessageDialog extends DialogFragment {
 	 * @param message Mensaje que mostrar al usuario.
 	 * @param listener Manejador con la acci&oacute;n a realizar al cerrar el di&aacute;logo.
 	 */
-	@SuppressLint("ValidFragment")
 	MessageDialog(final String message, final DialogInterface.OnClickListener positiveListener, final Activity activity) {
 		this.message = message;
 		this.positiveListener = positiveListener;

@@ -1,6 +1,5 @@
 package es.gob.afirma.android.signfolder;
 
-import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
 import android.app.Dialog;
@@ -11,7 +10,6 @@ import android.view.View;
 
 /** Di&aacute;logo modal con el que mostrar al usuario un mensaje y un bot&oacute;n para ocultar el
  * di&aacute;logo y, opcionalmente, realizar una acci&oacute;n. */
-@SuppressLint("ValidFragment")
 final class CustomAlertDialog extends DialogFragment {
 
 	private static final String BUNDLE_ID_DIALOG = "dialog"; //$NON-NLS-1$

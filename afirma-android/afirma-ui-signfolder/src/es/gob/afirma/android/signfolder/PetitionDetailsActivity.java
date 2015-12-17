@@ -10,7 +10,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Vector;
 
-import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
@@ -835,7 +834,6 @@ public final class PetitionDetailsActivity extends FragmentActivity implements L
 	 * Muestra un mensaje en un toast.
 	 * @param message
 	 */
-	@SuppressLint("ShowToast")
 	void showToastMessage(final String message) {
 
 		final Toast toast = Toast.makeText(this, message, Toast.LENGTH_LONG);

@@ -3,7 +3,6 @@ package es.gob.afirma.android.signfolder;
 import java.util.ArrayList;
 import java.util.List;
 
-import android.annotation.TargetApi;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -49,7 +48,6 @@ import es.gob.afirma.android.signfolder.proxy.SignRequest.RequestType;
  *
  * @author Carlos Gamuci
  */
-@TargetApi(14)
 public final class PetitionListActivity extends FragmentActivity implements
 		OperationRequestListener, LoadSignRequestListener, OnItemClickListener,
 		DialogFragmentListener {
@@ -617,7 +615,7 @@ public final class PetitionListActivity extends FragmentActivity implements
 
 				setVisibilityLoadingMessage(false, null, null);
 
-				String errorMsg = getString(operation == REJECT_OPERATION ? R.string.error_msg_rejecting_requests
+				final String errorMsg = getString(operation == REJECT_OPERATION ? R.string.error_msg_rejecting_requests
 						: R.string.error_msg_procesing_requests);
 				Log.w(SFConstants.LOG_TAG, "Error: " + errorMsg); //$NON-NLS-1$
 				showErrorDialog(DIALOG_ERROR_PROCESSING, errorMsg);
