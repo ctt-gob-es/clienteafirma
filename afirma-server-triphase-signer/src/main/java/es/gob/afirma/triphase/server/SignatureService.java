@@ -78,7 +78,7 @@ public final class SignatureService extends HttpServlet {
 	private static final String CONFIG_PARAM_INSTALL_XMLDSIG = "alternative.xmldsig"; //$NON-NLS-1$
 
 	/** Or&iacute;genes permitidos por defecto desde los que se pueden realizar peticiones al servicio. */
-	private static final String CONFIG_DEFAULT_VALUE_ALLOW_ORIGIN = "*"; //$NON-NLS-1$
+	private static final String ALL_ORIGINS_ALLOWED = "*"; //$NON-NLS-1$
 
 	private static final Properties config;
 
@@ -154,10 +154,7 @@ public final class SignatureService extends HttpServlet {
 			}
 		}
 
-		String allowOrigin = CONFIG_DEFAULT_VALUE_ALLOW_ORIGIN;
-		if (config.contains(CONFIG_PARAM_ALLOW_ORIGIN)) {
-			allowOrigin = config.getProperty(CONFIG_PARAM_ALLOW_ORIGIN);
-		}
+		final String allowOrigin = config.getProperty(CONFIG_PARAM_ALLOW_ORIGIN, ALL_ORIGINS_ALLOWED);
 
 		response.setHeader("Access-Control-Allow-Origin", allowOrigin); //$NON-NLS-1$
 		response.setContentType("text/plain"); //$NON-NLS-1$
@@ -181,14 +178,13 @@ public final class SignatureService extends HttpServlet {
 
 		final String operation = parameters.get(PARAM_NAME_OPERATION);
 		if (operation == null) {
-			LOGGER.warning("No se ha indicado la operacion trifasica a realizar"); //$NON-NLS-1$
+			LOGGER.severe("No se ha indicado la operacion trifasica a realizar"); //$NON-NLS-1$
 			out.print(ErrorManager.getErrorMessage(1));
 			out.flush();
 			return;
 		}
 
 		// Obtenemos el codigo de operacion
-		//final String subOperation = request.getParameter(PARAM_NAME_SUB_OPERATION);
 		final String subOperation = parameters.get(PARAM_NAME_SUB_OPERATION);
 		if (subOperation == null || !PARAM_VALUE_SUB_OPERATION_SIGN.equalsIgnoreCase(subOperation)
 				&& !PARAM_VALUE_SUB_OPERATION_COSIGN.equalsIgnoreCase(subOperation)
