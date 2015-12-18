@@ -54,13 +54,13 @@ final class ProtocolInvocationLauncherSign {
 		// No instanciable
 	}
 
-	static String processSign(final UrlParametersToSign options, final boolean bySocket) throws WebServiceCommunicationExceptionSignOperation {
+	static String processSign(final UrlParametersToSign options, final boolean bySocket) throws SocketOperationException {
 
 		if (options == null) {
 			LOGGER.severe("Las opciones de firma son nulas"); //$NON-NLS-1$
 			ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_01);
 			if (!bySocket){
-				throw new WebServiceCommunicationExceptionSignOperation(ProtocolInvocationLauncherErrorManager.SAF_01);
+				throw new SocketOperationException(ProtocolInvocationLauncherErrorManager.SAF_01);
 			}
 			return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_01);
 		}
@@ -74,7 +74,7 @@ final class ProtocolInvocationLauncherSign {
 				LOGGER.severe("No hay un firmador configurado para el formato: " + options.getSignatureFormat()); //$NON-NLS-1$
 				ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_06);
 				if (!bySocket) {
-					throw new WebServiceCommunicationExceptionSignOperation(ProtocolInvocationLauncherErrorManager.SAF_06);
+					throw new SocketOperationException(ProtocolInvocationLauncherErrorManager.SAF_06);
 				}
 				return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_06);
 			}
@@ -111,7 +111,7 @@ final class ProtocolInvocationLauncherSign {
 			catch(final AOCancelledOperationException e) {
 				LOGGER.info("carga de datos de firma cancelada por el usuario: " + e); //$NON-NLS-1$
 				if (!bySocket){
-					throw new WebServiceCommunicationExceptionSignOperation(getResultCancel());
+					throw new SocketOperationException(getResultCancel());
 				}
 				return getResultCancel();
 			}
@@ -135,7 +135,7 @@ final class ProtocolInvocationLauncherSign {
 					ProtocolInvocationLauncherErrorManager.SAF_00
 				);
 				if (!bySocket){
-					throw new WebServiceCommunicationExceptionSignOperation(
+					throw new SocketOperationException(
 						ProtocolInvocationLauncherErrorManager.SAF_00
 					);
 				}
@@ -194,7 +194,7 @@ final class ProtocolInvocationLauncherSign {
 					ProtocolInvocationLauncherErrorManager.SAF_17
 				);
 				if (!bySocket){
-					throw new WebServiceCommunicationExceptionSignOperation(
+					throw new SocketOperationException(
 						ProtocolInvocationLauncherErrorManager.SAF_17
 					);
 				}
@@ -221,7 +221,7 @@ final class ProtocolInvocationLauncherSign {
 				ProtocolInvocationLauncherErrorManager.SAF_08
 			);
 			if (!bySocket){
-				throw new WebServiceCommunicationExceptionSignOperation(
+				throw new SocketOperationException(
 					ProtocolInvocationLauncherErrorManager.SAF_08
 				);
 			}
@@ -257,7 +257,7 @@ final class ProtocolInvocationLauncherSign {
 		catch (final AOCancelledOperationException e) {
 			LOGGER.severe("Operacion cancelada por el usuario" + e); //$NON-NLS-1$
 			if (!bySocket){
-				throw new WebServiceCommunicationExceptionSignOperation(getResultCancel());
+				throw new SocketOperationException(getResultCancel());
 			}
 			return getResultCancel();
 		}
@@ -265,7 +265,7 @@ final class ProtocolInvocationLauncherSign {
 			LOGGER.severe("No hay certificados validos en el almacen: " + e); //$NON-NLS-1$
 			ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_19);
 			if (!bySocket){
-				throw new WebServiceCommunicationExceptionSignOperation(
+				throw new SocketOperationException(
 					ProtocolInvocationLauncherErrorManager.SAF_19
 				);
 			}
@@ -277,7 +277,7 @@ final class ProtocolInvocationLauncherSign {
 			LOGGER.severe("Error al mostrar el dialogo de seleccion de certificados: " + e); //$NON-NLS-1$
 			ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_08);
 			if (!bySocket){
-				throw new WebServiceCommunicationExceptionSignOperation(
+				throw new SocketOperationException(
 					ProtocolInvocationLauncherErrorManager.SAF_08
 				);
 			}
@@ -322,7 +322,7 @@ final class ProtocolInvocationLauncherSign {
 						ProtocolInvocationLauncherErrorManager.SAF_09
 					);
 					if (!bySocket){
-						throw new WebServiceCommunicationExceptionSignOperation(
+						throw new SocketOperationException(
 							ProtocolInvocationLauncherErrorManager.SAF_09
 						);
 					}
@@ -347,7 +347,7 @@ final class ProtocolInvocationLauncherSign {
 						ProtocolInvocationLauncherErrorManager.SAF_09
 					);
 					if (!bySocket){
-						throw new WebServiceCommunicationExceptionSignOperation(
+						throw new SocketOperationException(
 							ProtocolInvocationLauncherErrorManager.SAF_09
 						);
 					}
@@ -376,7 +376,7 @@ final class ProtocolInvocationLauncherSign {
 						ProtocolInvocationLauncherErrorManager.SAF_09
 					);
 					if (!bySocket){
-						throw new WebServiceCommunicationExceptionSignOperation(
+						throw new SocketOperationException(
 							ProtocolInvocationLauncherErrorManager.SAF_09
 						);
 					}
@@ -391,7 +391,7 @@ final class ProtocolInvocationLauncherSign {
 					ProtocolInvocationLauncherErrorManager.SAF_04
 				);
 				if (!bySocket){
-					throw new WebServiceCommunicationExceptionSignOperation(
+					throw new SocketOperationException(
 						ProtocolInvocationLauncherErrorManager.SAF_04
 					);
 				}
@@ -410,7 +410,7 @@ final class ProtocolInvocationLauncherSign {
 			LOGGER.severe("Error en la decodificacion del certificado de firma: " + e); //$NON-NLS-1$
 			ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_18);
 			if (!bySocket){
-				throw new WebServiceCommunicationExceptionSignOperation(
+				throw new SocketOperationException(
 					ProtocolInvocationLauncherErrorManager.SAF_18
 				);
 			}
@@ -433,7 +433,7 @@ final class ProtocolInvocationLauncherSign {
 				LOGGER.severe("Error en el cifrado de los datos a enviar: " + e); //$NON-NLS-1$
 				ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_12);
 				if (!bySocket){
-					throw new WebServiceCommunicationExceptionSignOperation(
+					throw new SocketOperationException(
 						ProtocolInvocationLauncherErrorManager.SAF_12
 					);
 				}
@@ -499,24 +499,6 @@ final class ProtocolInvocationLauncherSign {
 
 	public static String getResultCancel() {
 		return RESULT_CANCEL;
-	}
-
-	/** Error en los par&aacute;metros de la URL recibida por la aplicaci&oacute;n. */
-	public static class WebServiceCommunicationExceptionSignOperation extends Exception {
-		private static final long serialVersionUID = -6382342237658143382L;
-		private String errorCode ;
-
-		WebServiceCommunicationExceptionSignOperation(final String code) {
-			setErrorCode(code);
-		}
-
-		public String getErrorCode() {
-			return this.errorCode;
-		}
-
-		public void setErrorCode(final String errorCode) {
-			this.errorCode = errorCode;
-		}
 	}
 
 	/** Identifica cuando se ha configurado una firma con el formato XAdES

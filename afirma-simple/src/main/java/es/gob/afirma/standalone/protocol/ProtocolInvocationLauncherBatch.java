@@ -40,9 +40,9 @@ final class ProtocolInvocationLauncherBatch {
 	 * @param bySocket <code>true</code> para usar comunicaci&oacute;n por <i>socket</i> local,
 	 *                 <code>false</code> para usar servidor intermedio.
 	 * @return XML de respuesta del procesado.
-	 * @throws WebServiceCommunicationExceptionBatchOperation Si hay errores en la
+	 * @throws SocketOperationException Si hay errores en la
 	 *                                                        comunicaci&oacute;n por <i>socket</i> local. */
-	static String processBatch(final UrlParametersForBatch options, final boolean bySocket) throws WebServiceCommunicationExceptionBatchOperation {
+	static String processBatch(final UrlParametersForBatch options, final boolean bySocket) throws SocketOperationException {
 
 		final AOKeyStore aoks = AOKeyStore.valueOf(options.getDefaultKeyStore());
 		if (aoks == null) {
@@ -66,7 +66,7 @@ final class ProtocolInvocationLauncherBatch {
 			LOGGER.severe("Error obteniendo el AOKeyStoreManager: " + e3); //$NON-NLS-1$
 			ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_08);
 			if (!bySocket){
-				throw new WebServiceCommunicationExceptionBatchOperation(ProtocolInvocationLauncherErrorManager.SAF_08);
+				throw new SocketOperationException(ProtocolInvocationLauncherErrorManager.SAF_08);
 			}
 			return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_08);
 		}
@@ -85,7 +85,7 @@ final class ProtocolInvocationLauncherBatch {
 		catch (final AOCancelledOperationException e) {
 			LOGGER.severe("Operacion cancelada por el usuario" + e); //$NON-NLS-1$
 			if (!bySocket){
-				throw new WebServiceCommunicationExceptionBatchOperation(RESULT_CANCEL);
+				throw new SocketOperationException(RESULT_CANCEL);
 			}
 			return RESULT_CANCEL;
 		}
@@ -93,7 +93,7 @@ final class ProtocolInvocationLauncherBatch {
 			LOGGER.severe("No hay certificados validos en el almacen: " + e); //$NON-NLS-1$
 			ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_19);
 			if (!bySocket){
-				throw new WebServiceCommunicationExceptionBatchOperation(ProtocolInvocationLauncherErrorManager.SAF_19);
+				throw new SocketOperationException(ProtocolInvocationLauncherErrorManager.SAF_19);
 			}
 			return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_19);
 		}
@@ -101,7 +101,7 @@ final class ProtocolInvocationLauncherBatch {
 			LOGGER.severe("Error al mostrar el dialogo de seleccion de certificados: " + e); //$NON-NLS-1$
 			ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_08);
 			if (!bySocket){
-				throw new WebServiceCommunicationExceptionBatchOperation(ProtocolInvocationLauncherErrorManager.SAF_08);
+				throw new SocketOperationException(ProtocolInvocationLauncherErrorManager.SAF_08);
 			}
 			return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_08);
 		}
@@ -116,7 +116,7 @@ final class ProtocolInvocationLauncherBatch {
 							pke.getCertificateChain(),
 							pke.getPrivateKey()
 					);
-			// Devuelve los datos sin codificar en el caso de petición por socket, por lo que hay que codificarlo
+			// Devuelve los datos sin codificar en el caso de peticion por socket, por lo que hay que codificarlo
 			if (bySocket){
 				batchResult = Base64.encode(batchResult.getBytes());
 			}
@@ -127,7 +127,7 @@ final class ProtocolInvocationLauncherBatch {
 			);
 			ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_20);
 			if (!bySocket){
-				throw new WebServiceCommunicationExceptionBatchOperation(ProtocolInvocationLauncherErrorManager.SAF_20);
+				throw new SocketOperationException(ProtocolInvocationLauncherErrorManager.SAF_20);
 			}
 			return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_20);
 		}
@@ -144,7 +144,7 @@ final class ProtocolInvocationLauncherBatch {
 				LOGGER.severe("Error en el cifrado de los datos a enviar: " + e); //$NON-NLS-1$
 				ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_12);
 				if (!bySocket){
-					throw new WebServiceCommunicationExceptionBatchOperation(ProtocolInvocationLauncherErrorManager.SAF_12);
+					throw new SocketOperationException(ProtocolInvocationLauncherErrorManager.SAF_12);
 				}
 				return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_12);
 			}
@@ -164,7 +164,7 @@ final class ProtocolInvocationLauncherBatch {
 				LOGGER.severe("Error al enviar los datos al servidor: " + e); //$NON-NLS-1$
 				ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_11);
 				if (!bySocket){
-					throw new WebServiceCommunicationExceptionBatchOperation(ProtocolInvocationLauncherErrorManager.SAF_11);
+					throw new SocketOperationException(ProtocolInvocationLauncherErrorManager.SAF_11);
 				}
 				return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_11);
 			}
@@ -205,25 +205,4 @@ final class ProtocolInvocationLauncherBatch {
 	public static String getResultCancel() {
 		return RESULT_CANCEL;
 	}
-
-	/** Error en los par&aacute;metros de la URL recibida por la aplicaci&oacute;n. */
-	public static class WebServiceCommunicationExceptionBatchOperation extends Exception {
-		private static final long serialVersionUID = -6382342237658143382L;
-		private String errorCode ;
-
-		WebServiceCommunicationExceptionBatchOperation(final String code) {
-			setErrorCode(code);
-		}
-
-		public String getErrorCode() {
-			return this.errorCode;
-		}
-
-		public void setErrorCode(final String errorCode) {
-			this.errorCode = errorCode;
-		}
-
-
-	}
-
 }

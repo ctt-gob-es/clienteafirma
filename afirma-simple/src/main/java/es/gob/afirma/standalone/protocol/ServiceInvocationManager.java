@@ -521,7 +521,7 @@ final class ServiceInvocationManager {
 				LOGGER.info("PETICION PROCESADA: " + totalhttpRequest); //$NON-NLS-1$
 			}
 
-			// Si la operacion es de guardado
+			// Si la operacion es de guardado (Respuesta fija)
 			if (totalhttpRequest.toString().startsWith("afirma://save?") || totalhttpRequest.toString().startsWith("afirma://save/?")){ //$NON-NLS-1$  //$NON-NLS-2$
 			    isSave = true;
 				final String operationResult = ProtocolInvocationLauncher.launch(totalhttpRequest.toString(), true);
@@ -537,7 +537,7 @@ final class ServiceInvocationManager {
 						);
 				}
 			}
-			// Si no, la operacion es de firma
+			// Si hay que devolver el valor obtenido
 			else {
 				final String operationResult = ProtocolInvocationLauncher.launch(totalhttpRequest.toString(), true);
 				calculateNumberPartsResponse(operationResult);
@@ -553,7 +553,7 @@ final class ServiceInvocationManager {
 	}
 
 	/**
-	 * Realiza las acciones pertinentes en caso de que la petici&oacute;n contenta una peticion cmd=.
+	 * Realiza las acciones pertinentes en caso de que la petici&oacute;n contenga una peticion cmd=.
 	 * @param cmd Valor del par&aacute;metro CMD.
 	 * @param socketChannel Socket donde se recibe la petici&oacute;n.
 	 * @throws IOException Error en la lectura o env&iacute;o de datos.
@@ -644,7 +644,7 @@ final class ServiceInvocationManager {
 					"Se ha solicitado enviar un fragmento invalido: " + part + "de " + partTotal //$NON-NLS-1$ //$NON-NLS-2$
 					);
 		}
-		sendData(createHttpResponse(true, toSend.get(part-1)), socketChannel, "Mandada la parte " + part +"de " + partTotal); //$NON-NLS-1$ //$NON-NLS-2$
+		sendData(createHttpResponse(true, toSend.get(part-1)), socketChannel, "Mandada la parte " + part + " de " + partTotal); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 

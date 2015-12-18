@@ -3,15 +3,15 @@ package es.gob.afirma.standalone.protocol;
 import java.io.IOException;
 import java.util.logging.Logger;
 
+import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.misc.protocol.ParameterLocalAccessRequestedException;
 import es.gob.afirma.core.misc.protocol.ParameterNeedsUpdatedVersionException;
 import es.gob.afirma.core.misc.protocol.ProtocolInvocationUriParser;
 import es.gob.afirma.core.misc.protocol.UrlParametersForBatch;
 import es.gob.afirma.core.misc.protocol.UrlParametersToSave;
+import es.gob.afirma.core.misc.protocol.UrlParametersToSelectCert;
 import es.gob.afirma.core.misc.protocol.UrlParametersToSign;
-import es.gob.afirma.standalone.protocol.ProtocolInvocationLauncherBatch.WebServiceCommunicationExceptionBatchOperation;
-import es.gob.afirma.standalone.protocol.ProtocolInvocationLauncherSign.WebServiceCommunicationExceptionSignOperation;
 import es.gob.afirma.standalone.protocol.ProtocolInvocationLauncherUtil.DecryptionException;
 import es.gob.afirma.standalone.protocol.ProtocolInvocationLauncherUtil.InvalidEncryptedDataLengthException;
 import es.gob.afirma.standalone.ui.MainMenu;
@@ -68,8 +68,24 @@ public final class ProtocolInvocationLauncher {
             return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_02);
         }
 
-        // Firma por lotes predefinidos en ficheros XML
-        if (urlString.startsWith("afirma://batch?") || urlString.startsWith("afirma://batch/?")) { //$NON-NLS-1$ //$NON-NLS-2$
+        // Se invoca la aplicacion para iniciar la comunicacion por socket
+        if (urlString.startsWith("afirma://service?") || urlString.startsWith("afirma://service/?")) { //$NON-NLS-1$ //$NON-NLS-2$
+            LOGGER.info("Se inicia la invocacion por servicio: " + urlString); //$NON-NLS-1$
+            try {
+            	ServiceInvocationManager.startService(urlString);
+            }
+            catch(final UnsupportedProtocolException e) {
+            	LOGGER.severe("La version del protocolo no esta soportada (" + e.getVersion() + "): " + e); //$NON-NLS-1$ //$NON-NLS-2$
+            	final String errorCode = e.isNewVersionNeeded() ?
+            			ProtocolInvocationLauncherErrorManager.SAF_21 : ProtocolInvocationLauncherErrorManager.SAF_22;
+            	ProtocolInvocationLauncherErrorManager.showError(errorCode);
+            	return ProtocolInvocationLauncherErrorManager.getErrorMessage(errorCode);
+            }
+
+            return RESULT_OK;
+        }
+        // Se solicita una operacion de firma batch
+        else if (urlString.startsWith("afirma://batch?") || urlString.startsWith("afirma://batch/?")) { //$NON-NLS-1$ //$NON-NLS-2$
             try {
 
                 UrlParametersForBatch params = ProtocolInvocationUriParser.getParametersForBatch(urlString);
@@ -97,9 +113,9 @@ public final class ProtocolInvocationLauncher {
                 try{
                     return  ProtocolInvocationLauncherBatch.processBatch(params, bySocket);
                 }
-                catch(final WebServiceCommunicationExceptionBatchOperation e){
+                catch(final SocketOperationException e){
                     LOGGER.severe("Error durante la operacion de firma por lotes: " + e); //$NON-NLS-1$
-                    if (e.getErrorCode() == ProtocolInvocationLauncherSign.getResultCancel()){
+                    if (e.getErrorCode() == ProtocolInvocationLauncherBatch.getResultCancel()){
                         ProtocolInvocationLauncherBatch.sendErrorToServer(e.getErrorCode(), params);
                     }
                     else {
@@ -113,23 +129,28 @@ public final class ProtocolInvocationLauncher {
                 return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_03);
             }
         }
-
-        if (urlString.startsWith("afirma://service?") || urlString.startsWith("afirma://service/?")) { //$NON-NLS-1$ //$NON-NLS-2$
-            LOGGER.info("Se inicia la invocacion por servicio: " + urlString); //$NON-NLS-1$
+        // Se solicita una operacion de seleccion de certificado
+        else if (urlString.startsWith("afirma://selectcert?") || urlString.startsWith("afirma://selectcert/?")) { //$NON-NLS-1$ //$NON-NLS-2$
             try {
-            	ServiceInvocationManager.startService(urlString);
+                final UrlParametersToSelectCert params = ProtocolInvocationUriParser.getParametersToSelectCert(urlString);
+                try {
+                    return ProtocolInvocationLauncherSelectCert.processSelectCert(params);
+                }
+                catch (final AOCancelledOperationException e) {
+                	return ProtocolInvocationLauncherSelectCert.getResultCancel();
+                }
+                catch (final SocketOperationException e) {
+                    LOGGER.severe("Error durante la operacion de seleccion de certificados: " + e); //$NON-NLS-1$
+                   	return ProtocolInvocationLauncherErrorManager.getErrorMessage(e.getErrorCode());
+                }
             }
-            catch(final UnsupportedProtocolException e) {
-            	LOGGER.severe("La version del protocolo no esta soportada (" + e.getVersion() + "): " + e); //$NON-NLS-1$ //$NON-NLS-2$
-            	final String errorCode = e.isNewVersionNeeded() ?
-            			ProtocolInvocationLauncherErrorManager.SAF_21 : ProtocolInvocationLauncherErrorManager.SAF_22;
-            	ProtocolInvocationLauncherErrorManager.showError(errorCode);
-            	return ProtocolInvocationLauncherErrorManager.getErrorMessage(errorCode);
+            catch (final Exception e) {
+                LOGGER.severe("Error en los parametros de seleccion de certificados: " + e); //$NON-NLS-1$
+                ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_03);
+                return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_03);
             }
-
-            return RESULT_OK;
         }
-
+        // Se solicita una operacion de guardado
         else if (urlString.startsWith("afirma://save?") || urlString.startsWith("afirma://save/?")) { //$NON-NLS-1$ //$NON-NLS-2$
             LOGGER.info("Se invoca a la aplicacion para el guardado de datos"); //$NON-NLS-1$
 
@@ -177,7 +198,7 @@ public final class ProtocolInvocationLauncher {
                 return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_03);
             }
         }
-
+        // Se solicita una operacion de firma/cofirma/contrafirma
         else if (urlString.startsWith("afirma://sign?")        || urlString.startsWith("afirma://sign/?") || //$NON-NLS-1$ //$NON-NLS-2$
                  urlString.startsWith("afirma://cosign?")      || urlString.startsWith("afirma://cosign/?") || //$NON-NLS-1$ //$NON-NLS-2$
                  urlString.startsWith("afirma://countersign?") || urlString.startsWith("afirma://countersign/?") //$NON-NLS-1$ //$NON-NLS-2$
@@ -220,7 +241,7 @@ public final class ProtocolInvocationLauncher {
                     return ProtocolInvocationLauncherSign.processSign(params, bySocket);
                 }
                 // solo entra en la excepcion en el caso de que haya que devolver errores en el servidor en el envio por servicio web
-                catch(final WebServiceCommunicationExceptionSignOperation e){
+                catch(final SocketOperationException e){
                     LOGGER.severe("La operacion indicada no esta soportada: " + e); //$NON-NLS-1$
                     if (e.getErrorCode() == ProtocolInvocationLauncherSign.getResultCancel()){
                         ProtocolInvocationLauncherSign.sendErrorToServer(e.getErrorCode(), params);
@@ -254,9 +275,6 @@ public final class ProtocolInvocationLauncher {
             ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_04);
             return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_04);
         }
-    throw new IllegalStateException("Estado no permitido"); //$NON-NLS-1$
+        throw new IllegalStateException("Estado no permitido"); //$NON-NLS-1$
     }
-
-
-
 }
