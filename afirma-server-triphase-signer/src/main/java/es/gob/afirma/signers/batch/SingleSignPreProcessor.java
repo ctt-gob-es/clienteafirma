@@ -7,6 +7,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.signers.ExtraParamsProcessor;
 import es.gob.afirma.core.signers.ExtraParamsProcessor.IncompatiblePolicyException;
 import es.gob.afirma.core.signers.TriphaseData;
@@ -55,7 +56,7 @@ final class SingleSignPreProcessor {
 
 		Properties extraParams;
 		try {
-			extraParams = ExtraParamsProcessor.expandProperties(sSign.getExtraParams());
+			extraParams = ExtraParamsProcessor.expandProperties(sSign.getExtraParams(), null, sSign.getSignFormat().name());
 		}
 		catch (final IncompatiblePolicyException e) {
 			Logger.getLogger("es.gob.afirma").log( //$NON-NLS-1$
@@ -80,6 +81,24 @@ final class SingleSignPreProcessor {
 						algorithm.toString(),
 						certChain,
 						extraParams
+					)
+				);
+			case COUNTERSIGN:
+				final CounterSignTarget target = CounterSignTarget.getTarget(
+					extraParams.getProperty("target", CounterSignTarget.LEAFS.name()) //$NON-NLS-1$
+				);
+				if (!target.equals(CounterSignTarget.LEAFS) && !target.equals(CounterSignTarget.TREE)) {
+					throw new IllegalArgumentException(
+						"Objetivo de contrafirma no soportado en proceso por lotes: " + target //$NON-NLS-1$
+					);
+				}
+				return TriphaseData.parser(
+					prep.preProcessPreCounterSign(
+						docBytes,
+						algorithm.toString(),
+						certChain,
+						extraParams,
+						target
 					)
 				);
 			default:

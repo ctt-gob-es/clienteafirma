@@ -1,3 +1,13 @@
+/* Copyright (C) 2011 [Gobierno de Espana]
+ * This file is part of "Cliente @Firma".
+ * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
+ *   - the GNU General Public License as published by the Free Software Foundation;
+ *     either version 2 of the License, or (at your option) any later version.
+ *   - or The European Software License; either version 1.1 or (at your option) any later version.
+ * Date: 11/01/11
+ * You may contact the copyright holder at: soporte.afirma5@mpt.es
+ */
+
 package es.gob.afirma.core.misc.http;
 
 import java.io.BufferedInputStream;
@@ -14,17 +24,6 @@ import es.gob.afirma.core.misc.Base64;
 /** Case de utilidad para la descarga de datos.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
 public final class DataDownloader {
-
-	/** Propiedad para habilitar o deshabilitar el uso de "file://" en la descarga de datos.
-	 * Debe usarse para deshabilitar el libre acceso al sistema de ficheros. */
-	private static boolean canUseFiles = false;
-
-	/** Habilita o deshabilita el uso de "file://" en la descarga de datos.
-	 * @param enable <code>true</code> para habilitar el uso de "file://" en la descarga de datos,
-	 *               <code>false</code>para deshabilitarlo. */
-	public static void enableFilesUsage(final boolean enable) {
-		canUseFiles = enable;
-	}
 
 	private DataDownloader() {
 		// No instanciable
@@ -49,8 +48,9 @@ public final class DataDownloader {
 
 		// Miramos primero si los datos son una URL, en cuyo caso descargamos los datos
 		if (dataSource.startsWith("http://") || dataSource.startsWith("https://")) { //$NON-NLS-1$ //$NON-NLS-2$
-			return UrlHttpManagerFactory.getInstalledManager().readUrlByGet(dataSource);
+			return UrlHttpManagerFactory.getInstalledManager().readUrl(dataSource, UrlHttpMethod.GET);
 		}
+
 		if (dataSource.startsWith("ftp://")) { //$NON-NLS-1$
 		 	final InputStream ftpStream = new URL(dataSource).openStream();
 			final byte[] data = AOUtil.getDataFromInputStream(ftpStream);
@@ -58,27 +58,26 @@ public final class DataDownloader {
 			return data;
 		}
 
-		else if (dataSource.startsWith("file:/") && canUseFiles) { //$NON-NLS-1$
-				final InputStream is;
+		if (dataSource.startsWith("file:/")) { //$NON-NLS-1$
 				try {
-					is = AOUtil.loadFile(new URI(dataSource));
+					final InputStream is = AOUtil.loadFile(new URI(dataSource));
+					final InputStream bis = new BufferedInputStream(is);
+					final byte[] ret = AOUtil.getDataFromInputStream(bis);
+					bis.close();
+					is.close();
+					return ret;
 				}
 				catch (final URISyntaxException e) {
 					throw new IOException(
-						"Error obteniendo el flujo de lectura del fichero (" + dataSource + "): " + e, e //$NON-NLS-1$ //$NON-NLS-2$
+						"Error leyendo el fichero (" + dataSource + "): " + e, e //$NON-NLS-1$ //$NON-NLS-2$
 					);
 				}
-				final InputStream bis = new BufferedInputStream(is);
-				final byte[] ret = AOUtil.getDataFromInputStream(bis);
-				bis.close();
-				is.close();
-				return ret;
 		}
 
 		// No son URL, son los datos en si
 
 		// Comprobamos que los datos se pueden tratar como base 64
-		if (AOUtil.isBase64(dataSource.getBytes())) {
+		if (Base64.isBase64(dataSource.getBytes())) {
 			Logger.getLogger("es.gob.afirma").info("El contenido a obtener es Base64"); //$NON-NLS-1$ //$NON-NLS-2$
 			try {
 				return Base64.decode(dataSource.replace("_", "/").replace("-", "+")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$

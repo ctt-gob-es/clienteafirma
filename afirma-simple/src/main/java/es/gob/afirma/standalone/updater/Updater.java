@@ -9,6 +9,7 @@ import javax.swing.JOptionPane;
 
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.misc.http.UrlHttpManagerFactory;
+import es.gob.afirma.core.misc.http.UrlHttpMethod;
 import es.gob.afirma.core.ui.AOUIFactory;
 
 /** Utilidad para la gesti&oacute;n de actualizaciones de la aplicaci&oacute;n.
@@ -21,7 +22,7 @@ public final class Updater {
 
 	private static final String AUTOFIRMA_AVOID_UPDATE_CHECK = "AUTOFIRMA_AVOID_UPDATE_CHECK"; //$NON-NLS-1$
 
-	private static Properties updaterProperties = new Properties();
+	private static Properties updaterProperties = null;
 
 	static {
 		loadProperties();
@@ -82,7 +83,7 @@ public final class Updater {
 			return null;
 		}
 		try {
-			version = new String(UrlHttpManagerFactory.getInstalledManager().readUrlByGet(url)).trim();
+			version = new String(UrlHttpManagerFactory.getInstalledManager().readUrl(url, UrlHttpMethod.GET)).trim();
 		}
 		catch (final Exception e) {
 			LOGGER.severe(
@@ -172,6 +173,9 @@ public final class Updater {
 									e.printStackTrace();
 								}
 							}
+						}
+						else {
+							LOGGER.info("Se ha encontrado instalada la ultima version disponible de AutoFirma"); //$NON-NLS-1$
 						}
 					}
 				}

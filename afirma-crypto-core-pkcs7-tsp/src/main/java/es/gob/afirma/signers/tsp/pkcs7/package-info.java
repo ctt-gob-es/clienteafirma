@@ -16,14 +16,10 @@
  *  <ul>
  *   <li>Dependencia con el m&oacute;dulo N&uacute;cleo (<i>afirma-core</i>) del Cliente.</li>
  *   <li>Dependencia con el m&oacute;dulo PKCS#7 (<i>afirma-crypto-core-pkcs7</i>) del Cliente.</li>
- *   <li>Dependencia con BouncyCastle 1.46 o superior (Proveedor + <i>Mail</i> + TSP).</li>
+ *   <li>Dependencia con SpongyCastle 1.54 o superior (Proveedor + <i>Mail</i> + TSP).</li>
  *  </ul>
  *  <p>
- *   Este m&oacute;dulo es compatible con cualquier entorno JSE 1.5 o superior y con Android 3 o superior.<br>
- *   Para compatibilidad con Android 2.x es necesario sustituir BouncyCastle por SpongyCastle. No hay llamadas
- *   al Proveedor de BouncyCastle por nombre ni instanciaciones din&aacute;micas de clases de BouncyCastle, por
- *   lo que una simple sustituci&oacute;n de <code>import org.bouncycastle.</code> por <code>org.spongycastle.</code>
- *   es suficiente.
+ *   Este m&oacute;dulo es compatible con cualquier entorno JSE 1.6 o superior y con Android 4 o superior.<br>
  *  </p>
  *  <p>Desde este m&oacute;dulo no se realizan llamadas a interfaces gr&aacute;ficas.</p>
  */

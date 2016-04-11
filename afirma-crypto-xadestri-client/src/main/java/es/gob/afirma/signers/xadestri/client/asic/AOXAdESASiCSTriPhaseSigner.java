@@ -20,7 +20,6 @@ import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.signers.asic.ASiCUtil;
 import es.gob.afirma.signers.xadestri.client.AOXAdESTriPhaseSigner;
 
-
 /** Manejador de firma XAdES-ASiC-S trif&aacute;sicas.
  * Mediante este manejador un usuario puede firmar un documento remoto
  * indicando el identificador del documento. Este manejador requiere de un servicio remoto que genere la estructura
@@ -45,10 +44,10 @@ public final class AOXAdESASiCSTriPhaseSigner extends AOXAdESTriPhaseSigner {
 
 	@Override
 	public byte[] sign(final byte[] data,
-			final String algorithm,
-			final PrivateKey key,
-			final Certificate[] certChain,
-			final Properties xParams) throws AOException {
+			           final String algorithm,
+			           final PrivateKey key,
+			           final Certificate[] certChain,
+			           final Properties xParams) throws AOException {
 		return triPhaseOperation(
 			AOSignConstants.SIGN_FORMAT_XADES_ASIC_S,
 			CRYPTO_OPERATION_SIGN,
@@ -67,7 +66,7 @@ public final class AOXAdESASiCSTriPhaseSigner extends AOXAdESTriPhaseSigner {
 			             final PrivateKey key,
 			             final Certificate[] certChain,
 			             final Properties xParams) throws AOException {
-		throw new UnsupportedOperationException("No se soportan cofirmas trifasicas"); //$NON-NLS-1$
+		throw new UnsupportedOperationException("No se soportan cofirmas trifasicas XAdES-ASiC-S"); //$NON-NLS-1$
 	}
 
 	@Override
@@ -76,7 +75,7 @@ public final class AOXAdESASiCSTriPhaseSigner extends AOXAdESTriPhaseSigner {
 			             final PrivateKey key,
 			             final Certificate[] certChain,
 			             final Properties xParams) throws AOException {
-		throw new UnsupportedOperationException("No se soportan cofirmas trifasicas"); //$NON-NLS-1$
+		throw new UnsupportedOperationException("No se soportan cofirmas trifasicas XAdES-ASiC-S"); //$NON-NLS-1$
 	}
 
 	@Override
@@ -88,7 +87,7 @@ public final class AOXAdESASiCSTriPhaseSigner extends AOXAdESTriPhaseSigner {
 			                  final Certificate[] certChain,
 			                  final Properties xParams) throws AOException {
 
-		throw new UnsupportedOperationException("No se soportan contrafirmas trifasicas"); //$NON-NLS-1$
+		throw new UnsupportedOperationException("No se soportan contrafirmas trifasicas XAdES-ASiC-S"); //$NON-NLS-1$
 	}
 
 	/** {@inheritDoc} */

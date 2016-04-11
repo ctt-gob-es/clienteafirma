@@ -1,11 +1,19 @@
+/* Copyright (C) 2011 [Gobierno de Espana]
+ * This file is part of "Cliente @Firma".
+ * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
+ *   - the GNU General Public License as published by the Free Software Foundation;
+ *     either version 2 of the License, or (at your option) any later version.
+ *   - or The European Software License; either version 1.1 or (at your option) any later version.
+ * Date: 11/01/11
+ * You may contact the copyright holder at: soporte.afirma5@mpt.es
+ */
+
 package es.gob.afirma.cert.certvalidation;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.security.PublicKey;
 import java.security.cert.CRLException;
 import java.security.cert.CertificateException;
@@ -22,18 +30,19 @@ import javax.naming.NamingException;
 import javax.naming.directory.Attribute;
 import javax.naming.directory.InitialDirContext;
 
-import org.bouncycastle.asn1.ASN1InputStream;
-import org.bouncycastle.asn1.ASN1Primitive;
-import org.bouncycastle.asn1.DERIA5String;
-import org.bouncycastle.asn1.DEROctetString;
-import org.bouncycastle.asn1.x509.CRLDistPoint;
-import org.bouncycastle.asn1.x509.DistributionPoint;
-import org.bouncycastle.asn1.x509.DistributionPointName;
-import org.bouncycastle.asn1.x509.Extension;
-import org.bouncycastle.asn1.x509.GeneralName;
-import org.bouncycastle.asn1.x509.GeneralNames;
+import org.spongycastle.asn1.ASN1InputStream;
+import org.spongycastle.asn1.ASN1Primitive;
+import org.spongycastle.asn1.DERIA5String;
+import org.spongycastle.asn1.DEROctetString;
+import org.spongycastle.asn1.x509.CRLDistPoint;
+import org.spongycastle.asn1.x509.DistributionPoint;
+import org.spongycastle.asn1.x509.DistributionPointName;
+import org.spongycastle.asn1.x509.Extension;
+import org.spongycastle.asn1.x509.GeneralName;
+import org.spongycastle.asn1.x509.GeneralNames;
 
 import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.core.misc.http.DataDownloader;
 
 /** Utilidades varias para el uso de lista de revocaci&oacute;n de certificados.
  * Clase cedida por <a href="http://www.yohago.com/">YoHago</a>.
@@ -86,6 +95,7 @@ final class CrlHelper {
 		}
 
 		boolean checked = false;
+		boolean cannotDownload = false;
 		for (final String crlDP : crlDistPoints) {
 
 			// Descargamos
@@ -94,7 +104,10 @@ final class CrlHelper {
 				crlBytes = downloadCRL(crlDP);
 			}
 			catch (final Exception e1) {
-				LOGGER.severe("No se ha podido descargar la CRL (" + crlDP + "), se continuara con el siguiente punto de distribucion: " + e1); //$NON-NLS-1$ //$NON-NLS-2$
+				LOGGER.severe(
+					"No se ha podido descargar la CRL (" + crlDP + "), se continuara con el siguiente punto de distribucion: " + e1 //$NON-NLS-1$ //$NON-NLS-2$
+				);
+				cannotDownload = true;
 				continue;
 			}
 
@@ -126,6 +139,11 @@ final class CrlHelper {
 		if (checked) {
 			return ValidationResult.VALID;
 		}
+
+		if (cannotDownload) {
+			return ValidationResult.CANNOT_DOWNLOAD_CRL;
+		}
+
 		return ValidationResult.UNKNOWN;
 	}
 
@@ -165,11 +183,7 @@ final class CrlHelper {
 	}
 
 	private static byte[] downloadCRLFromWeb(final String crlURL) throws IOException {
-	 	final URL url = new URL(crlURL);
-	 	final InputStream crlStream = url.openStream();
-		final byte[] ret = AOUtil.getDataFromInputStream(crlStream);
-		crlStream.close();
-		return ret;
+	 	return DataDownloader.downloadData(crlURL);
 	}
 
 	private static List<String> getCrlDistributionPoints(final X509Certificate cert) throws IOException {

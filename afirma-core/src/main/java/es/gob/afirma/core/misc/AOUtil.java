@@ -18,6 +18,8 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.MappedByteBuffer;
@@ -44,6 +46,9 @@ public final class AOUtil {
             "http", "https", "file", "urn" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
     };
 
+    private static final String DEFAULT_ENCODING = "utf-8"; //$NON-NLS-1$
+
+
     /** Crea una URI a partir de un nombre de fichero local o una URL.
      * @param file Nombre del fichero local o URL
      * @return URI (<code>file://</code>) del fichero local o URL
@@ -56,7 +61,7 @@ public final class AOUtil {
 
         String filename = file.trim();
 
-        if ("".equals(filename)) { //$NON-NLS-1$
+        if (filename.isEmpty()) {
             throw new IllegalArgumentException("La URI no puede ser una cadena vacia"); //$NON-NLS-1$
         }
 
@@ -281,37 +286,6 @@ public final class AOUtil {
         return null;
     }
 
-    /** Caracterres aceptados en una codificaci&oacute;n Base64 seg&uacute;n la
-     * <a href="http://www.faqs.org/rfcs/rfc3548.html">RFC 3548</a>. Importante:
-     * A&ntilde;adimos el car&aacute;cter &tilde; porque en ciertas
-     * codificaciones de Base64 est&aacute; aceptado, aunque no es nada
-     * recomendable */
-    private static final String BASE_64_ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz=_-\t\n+/0123456789\r~"; //$NON-NLS-1$
-
-    /** @param data Datos a comprobar si podr&iacute;an o no ser Base64.
-     * @return <code>true</code> si los datos proporcionado pueden ser una
-     *         codificaci&oacute;n base64 de un original binario (que no tiene
-     *         necesariamente porqu&eacute; serlo), <code>false</code> en caso
-     *         contrario. */
-    public static boolean isBase64(final byte[] data) {
-
-        int count = 0;
-
-        // Comprobamos que todos los caracteres de la cadena pertenezcan al
-        // alfabeto base 64
-        for (final byte b : data) {
-        	if (BASE_64_ALPHABET.indexOf((char) b) == -1) {
-        		return false;
-        	}
-
-        	if (b != '\n' && b != '\r') {
-        		count++;
-        	}
-        }
-        // Comprobamos que la cadena tenga una longitud multiplo de 4 caracteres
-        return count % 4 == 0;
-    }
-
     /** Equivalencias de hexadecimal a texto por la posici&oacute;n del vector.
      * Para ser usado en <code>hexify()</code> */
     private static final char[] HEX_CHARS = {
@@ -465,16 +439,17 @@ public final class AOUtil {
         return parts.toArray(new String[0]);
     }
 
-	/** Convierte un objeto de propiedades en una cadena Base64.
+	/** Convierte un objeto de propiedades en una cadena Base64 URL SAFE.
 	 * @param p Objeto de propiedades a convertir.
-	 * @return Base64 que descodificado es un fichero de propiedades en texto plano.
+	 * @return Base64 URL SAFE que descodificado es un fichero de propiedades en texto plano.
 	 * @throws IOException Si hay problemas en la conversi&oacute;n a Base64. */
 	public static String properties2Base64(final Properties p) throws IOException {
 		if (p == null) {
 			return ""; //$NON-NLS-1$
 		}
 		final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		p.store(baos, ""); //$NON-NLS-1$
+		final OutputStreamWriter osw = new OutputStreamWriter(baos, DEFAULT_ENCODING);
+		p.store(osw, ""); //$NON-NLS-1$
 		return Base64.encode(baos.toByteArray(), true);
 	}
 
@@ -487,11 +462,11 @@ public final class AOUtil {
     	if (base64 == null || base64.isEmpty()) {
     		return p;
     	}
-    	p.load(
-			new ByteArrayInputStream(
-				Base64.decode(base64)
-			)
-		);
+    	p.load(new InputStreamReader(
+    			new ByteArrayInputStream(Base64.decode(base64)),
+    			DEFAULT_ENCODING)
+    	);
+
     	return p;
     }
 

@@ -22,12 +22,12 @@ import javax.crypto.Cipher;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 
-import org.bouncycastle.asn1.ASN1Encoding;
-import org.bouncycastle.asn1.ASN1Sequence;
-import org.bouncycastle.asn1.ASN1Set;
-import org.bouncycastle.asn1.DEROctetString;
-import org.bouncycastle.asn1.cms.AuthenticatedData;
-import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
+import org.spongycastle.asn1.ASN1Encoding;
+import org.spongycastle.asn1.ASN1Sequence;
+import org.spongycastle.asn1.ASN1Set;
+import org.spongycastle.asn1.DEROctetString;
+import org.spongycastle.asn1.cms.AuthenticatedData;
+import org.spongycastle.asn1.x509.AlgorithmIdentifier;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.ciphers.CipherConstants.AOCipherAlgorithm;

@@ -1,3 +1,13 @@
+/* Copyright (C) 2011 [Gobierno de Espana]
+ * This file is part of "Cliente @Firma".
+ * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
+ *   - the GNU General Public License as published by the Free Software Foundation;
+ *     either version 2 of the License, or (at your option) any later version.
+ *   - or The European Software License; either version 1.1 or (at your option) any later version.
+ * Date: 11/01/11
+ * You may contact the copyright holder at: soporte.afirma5@mpt.es
+ */
+
 package es.gob.afirma.core.misc.protocol;
 
 import java.net.URL;
@@ -70,12 +80,12 @@ public final class UrlParametersToSign extends UrlParameters {
 	private Operation operation;
 	private String signFormat;
 	private String signAlgorithm;
-	private String minimumVerstion;
+	private String minimumVersion;
 
 	/** Obtiene la versi&oacute;n m&iacute;nima requerida del aplicativo.
 	 * @return Versi&oacute;n m&iacute;nima requerida del aplicativo. */
 	public String getMinimumVersion() {
-		return this.minimumVerstion;
+		return this.minimumVersion;
 	}
 
 	/** Obtiene el tipo de operaci&oacute;n a realizar (firma, cofirma o contrafirma).
@@ -119,7 +129,7 @@ public final class UrlParametersToSign extends UrlParameters {
 	}
 
 	void setMinimumVersion(final String minVer) {
-		this.minimumVerstion = minVer;
+		this.minimumVersion = minVer;
 	}
 
 	void setSignParameters(final Map<String, String> params) throws ParameterException {

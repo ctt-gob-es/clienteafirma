@@ -1,10 +1,9 @@
 package es.gob.afirma.android.signfolder.proxy;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Iterator;
 
-import android.util.Log;
-import es.gob.afirma.android.signfolder.SFConstants;
 import es.gob.afirma.core.misc.Base64;
 
 /** Datos temporales de un documento para su firma en tres fases
@@ -113,134 +112,77 @@ public final class TriphaseSignDocumentRequest {
 	}
 
 	/** Clase que almacena los resultados parciales de la firma trif&aacute;sica. */
-	public static final class TriphaseConfigData {
+	public static final class TriphaseConfigData extends HashMap<String, String> {
 
-		private static final String NODE_PART_1 = "<p k='"; //$NON-NLS-1$
+		/** Serial Id. */
+		private static final long serialVersionUID = 6376166034628843888L;
+
+		private static final String NODE_PART_1 = "<p n='"; //$NON-NLS-1$
 		private static final String NODE_PART_2 = "'>"; //$NON-NLS-1$
 		private static final String NODE_PART_3 = "</p>"; //$NON-NLS-1$
 
-		private final List<byte[]> preSign;
-		private Boolean needPreSign;
-		private Boolean needData;
-		private Integer signCount;
-		private final List<String> session;
-		private final List<byte[]> pk1;
+		private static final String PARAM_PRE = "PRE"; //$NON-NLS-1$
+		private static final String PARAM_NEED_PRE = "NEED_PRE"; //$NON-NLS-1$
+		private static final String PARAM_NEED_DATA = "NEED_DATA"; //$NON-NLS-1$
+		private static final String PARAM_PKCS1 = "PK1"; //$NON-NLS-1$
 
-		TriphaseConfigData() {
-			this.preSign = new ArrayList<byte[]>();
-			this.needPreSign = null;
-			this.needData = null;
-			this.signCount = null;
-			this.session = new ArrayList<String>();
-			this.pk1 = new ArrayList<byte[]>();
+		/** Obtiene la prefirma del documento.
+		 * @return Prefirma.
+		 * @throws IOException El valor no es un base64 v&aacute;lido. */
+		public byte[] getPreSign() throws IOException {
+			return Base64.decode(get(PARAM_PRE));
 		}
 
-		/** Obtiene la prefirma indicada.
-		 * @param index &Iacute;dice de la prefirma a obtener.
-		 * @return Prefirma. */
-		public byte[] getPreSign(final int index) {
-			return this.preSign.get(index);
-		}
-
-		void addPreSign(final byte[] preSignature) {
-			this.preSign.add(preSignature);
-		}
-
-		/** Establece una prefirma.
-		 * @param index I&iacute;dice de la prefirma a establecer.
-		 * @param preSign Prefirma a establecer. */
-		public void setPreSign(final int index, final byte[] preSign) {
-			this.preSign.set(index, preSign);
-		}
-
-		/** Indica si el proceso necesita realizar la prefirma.
-		 * @return <code>true</code> si el proceso necesita realizar la prefirma,
-		 *         <code>false</code> en caso contrario. */
+		/** Indica si el proceso necesita la prefirma para realizar la postfirma.
+		 * @return <code>true</code> si el proceso necesita la prefirma,
+		 *         <code>false</code> en caso contrario (por defecto). */
 		public Boolean isNeedPreSign() {
-			return this.needPreSign;
+			return Boolean.valueOf(get(PARAM_NEED_PRE));
 		}
 
-		void setNeedPreSign(final Boolean needPreSign) {
-			this.needPreSign = needPreSign;
+		/** Indica si el proceso necesita los datos para realizar la postfirma.
+		 * @return <code>true</code> si el proceso necesita los datos (por defecto),
+		 *         <code>false</code> en caso contrario. */
+		public Boolean isNeedData() {
+			String needData = get(PARAM_NEED_DATA);
+			if (needData == null) {
+				needData = Boolean.TRUE.toString();
+			}
+			return Boolean.valueOf(needData);
 		}
 
-		Boolean isNeedData() {
-			return this.needData;
-		}
-
-		void setNeedData(final Boolean needData) {
-			this.needData = needData;
-		}
-
-		/** Obtiene el n&uacute;mero de firmas.
-		 * @return N&uacute;mero de firmas. */
-		public Integer getSignCount() {
-			return this.signCount;
-		}
-
-		void setSignCount(final Integer signCount) {
-			this.signCount = signCount;
-		}
-
-		/** Obtiene la sesi&oacute;n de operaci&oacute;n trif&aacute;sica de firma de la firma indicada.
-		 * @param index N&uacute;mero de firma.
-		 * @return Sesi&oacute;n de operaci&oacute;n trif&aacute;sica de firma de la firma indicada. */
-		public String getSession(final int index) {
-			return this.session.get(index);
-		}
-
-		/** Almacena los datos de sesi&oacute;n codificados en base64.
-		 * @param ses Datos de sesi&oacute;n. */
-		public void addSession(final String ses) {
-			this.session.add(ses);
+		/** Elimina la prefirma de entre los datos de la operaci&oacute;n. */
+		public void removePreSign() {
+			remove(PARAM_PRE);
 		}
 
 		/** Obtiene la firma PKCS#1 de la firma indicada.
 		 * @param index &Iacute;ndice de la firma de la cual se quiere obtener el PKCS#1.
-		 * @return Firma PKCS#1. */
-		public byte[] getPk1(final int index) {
-			return this.pk1.get(index);
+		 * @return Firma PKCS#1.
+		 * @throws IOException El valor no es un base64 v&aacute;lido. */
+		public byte[] getPk1(final int index) throws IOException {
+			return Base64.decode(get(PARAM_PKCS1));
 		}
 
 		/** Almacena la firma PKCS#1.
 		 * @param pkcs1 Firma PKCS#1. */
-		public void addPk1(final byte[] pkcs1) {
-			this.pk1.add(pkcs1);
+		public void setPk1(final byte[] pkcs1) {
+			put(PARAM_PKCS1, Base64.encode(pkcs1));
 		}
 
-		String toXMLConfig() {
+		/**
+		 * Devuelve la configuraci&oacute;n a modo de listado XML.
+		 * @return Cadena con el listado XML de elementos.
+		 */
+		public String toXMLParamList() {
 
+			String key;
 			final StringBuilder builder = new StringBuilder();
-			if (this.signCount != null) {
-				builder.append(NODE_PART_1).append("sc").append(NODE_PART_2).append(this.signCount.intValue()).append(NODE_PART_3); //$NON-NLS-1$
+			final Iterator<String> it = keySet().iterator();
+			while (it.hasNext()) {
+				key = it.next();
+				builder.append(NODE_PART_1).append(key).append(NODE_PART_2).append(get(key)).append(NODE_PART_3);
 			}
-
-			if (this.needData != null) {
-				builder.append(NODE_PART_1).append("nd").append(NODE_PART_2).append(this.needData.booleanValue()).append(NODE_PART_3); //$NON-NLS-1$
-			}
-
-			if (this.needPreSign != null) {
-				if (this.needPreSign.booleanValue() && this.preSign != null) {
-					builder.append(NODE_PART_1).append("np").append(NODE_PART_2).append(this.needPreSign.booleanValue()).append(NODE_PART_3); //$NON-NLS-1$
-					for (int i = 0; i < this.preSign.size(); i++) {
-						builder.append(NODE_PART_1).append("pre.").append(i).append(NODE_PART_2).append(Base64.encode(this.preSign.get(i))).append(NODE_PART_3); //$NON-NLS-1$
-					}
-				}
-			}
-			if (this.session != null) {
-				for (int i = 0; i < this.session.size(); i++) {
-					if (this.session.get(i) != null) {
-						builder.append(NODE_PART_1).append("ss.").append(i).append(NODE_PART_2).append(this.session.get(i)).append(NODE_PART_3); //$NON-NLS-1$
-					}
-				}
-			}
-			if (this.pk1 != null) {
-				for (int i = 0; i < this.pk1.size(); i++) {
-					builder.append(NODE_PART_1).append("pk1.").append(i).append(NODE_PART_2).append(Base64.encode(this.pk1.get(i))).append(NODE_PART_3); //$NON-NLS-1$
-				}
-			}
-
-			Log.i(SFConstants.LOG_TAG, "XML peticion:\n" + builder.toString()); //$NON-NLS-1$
 
 			return builder.toString();
 		}

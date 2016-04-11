@@ -27,10 +27,11 @@ public final class TestGetSignersStructure {
     private static final String CERT_ALIAS = "fisico activo prueba"; //$NON-NLS-1$
 
 	private final static String[] TEST_FILES = {
-		"getSignersStructure_06-14-12020 EXP.pdf", //$NON-NLS-1$
+//		"getSignersStructure_06-14-12020 EXP.pdf", //$NON-NLS-1$
 		"getSignersStructure_INFORME ABOGACIA DEL ESTADO.pdf", //$NON-NLS-1$
 		"getSignersStructure_MARZO 2015 PRIMER ENVIO.pdf", //$NON-NLS-1$
-		"getSignersStructure_Sentencia 343-2012.pdf" //$NON-NLS-1$
+		"getSignersStructure_Sentencia 343-2012.pdf", //$NON-NLS-1$
+		"pades-t.pdf" //$NON-NLS-1$
 	};
 
 	private PrivateKeyEntry pke = null;

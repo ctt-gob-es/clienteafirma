@@ -86,6 +86,10 @@ public final class GenCAdESEPESSignedData {
      * @param contentDescription Descripci&oacute;n textual del tipo de contenido.
      * @param ctis Indicaciones sobre los tipos de compromisos adquiridos con la firma.
      * @param csm Metadatos sobre el firmante.
+     * @param doNotIncludePolicyOnSigningCertificate Si se establece a <code>true</code> omite la inclusi&oacute;n de la
+     *                                               pol&iacute;tica de certificaci&oacute;n en el <i>SigningCertificate</i>,
+     *                                               si se establece a <code>false</code> se incluye siempre que el certificado
+     *                                               la declare.
      * @return La firma generada codificada en ASN.1 binario.
      * @throws NoSuchAlgorithmException Si no se soporta alguno de los algoritmos de firma o huella digital indicados
      * @throws CertificateException En caso de cualquier problema con los certificados de firma.
@@ -104,10 +108,11 @@ public final class GenCAdESEPESSignedData {
                                             final String contentType,
                                             final String contentDescription,
                                             final List<CommitmentTypeIndicationBean> ctis,
-                                            final CAdESSignerMetadata csm) throws NoSuchAlgorithmException,
-                                                                                  CertificateException,
-                                                                                  IOException,
-                                                                                  AOException {
+                                            final CAdESSignerMetadata csm,
+                                            final boolean doNotIncludePolicyOnSigningCertificate) throws NoSuchAlgorithmException,
+                                                                                                         CertificateException,
+                                                                                                         IOException,
+                                                                                                         AOException {
         if (parameters == null) {
             throw new IllegalArgumentException("Los parametros no pueden ser nulos"); //$NON-NLS-1$
         }
@@ -131,7 +136,8 @@ public final class GenCAdESEPESSignedData {
             contentType,
             contentDescription,
             ctis,
-            csm
+            csm,
+            doNotIncludePolicyOnSigningCertificate
         );
 
         final byte[] signature = new AOPkcs1Signer().sign(preSignature, signatureAlgorithm, key, certChain, null);

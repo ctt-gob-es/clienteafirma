@@ -30,9 +30,9 @@ public final class TestCommitmentTypeIndications {
 	    p3.setProperty("commitmentTypeIndication0DocumentationReferences", "http://es.atos.net/es-es/home.html|http://atos.net/en-us/home.html"); //$NON-NLS-1$ //$NON-NLS-2$
 	    p3.setProperty("commitmentTypeIndication0CommitmentTypeQualifiers", "Q1|Q2|Q3"); //$NON-NLS-1$ //$NON-NLS-2$
 	    p3.setProperty("commitmentTypeIndication1Identifier", "3"); //$NON-NLS-1$ //$NON-NLS-2$
-	    p3.setProperty("commitmentTypeIndication2Description", "Cafre"); //$NON-NLS-1$ //$NON-NLS-2$
-	    p3.setProperty("commitmentTypeIndication3DocumentationReferences", "http://google.com"); //$NON-NLS-1$ //$NON-NLS-2$
-	    p3.setProperty("commitmentTypeIndication4CommitmentTypeQualifiers", "U1|U2|U3"); //$NON-NLS-1$ //$NON-NLS-2$
+	    p3.setProperty("commitmentTypeIndication1Description", "Cafre"); //$NON-NLS-1$ //$NON-NLS-2$
+	    p3.setProperty("commitmentTypeIndication1DocumentationReferences", "http://google.com"); //$NON-NLS-1$ //$NON-NLS-2$
+	    p3.setProperty("commitmentTypeIndication1CommitmentTypeQualifiers", "U1|U2|U3"); //$NON-NLS-1$ //$NON-NLS-2$
 	    p3.setProperty("signerClaimedRoles", "Papa de Roma|Cardenal emerito de Pamplona"); //$NON-NLS-1$ //$NON-NLS-2$
 	    p3.setProperty("addKeyInfoKeyValue", Boolean.TRUE.toString()); //$NON-NLS-1$
 	    p3.setProperty("addKeyInfoKeyName", Boolean.TRUE.toString()); //$NON-NLS-1$

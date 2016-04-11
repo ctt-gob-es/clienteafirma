@@ -14,17 +14,17 @@ import java.io.IOException;
 import java.util.Enumeration;
 import java.util.logging.Logger;
 
-import org.bouncycastle.asn1.ASN1InputStream;
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.ASN1Sequence;
-import org.bouncycastle.asn1.ASN1Set;
-import org.bouncycastle.asn1.ASN1TaggedObject;
-import org.bouncycastle.asn1.cms.Attribute;
-import org.bouncycastle.asn1.cms.SignedData;
-import org.bouncycastle.asn1.cms.SignerInfo;
-import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
+import org.spongycastle.asn1.ASN1InputStream;
+import org.spongycastle.asn1.ASN1ObjectIdentifier;
+import org.spongycastle.asn1.ASN1Sequence;
+import org.spongycastle.asn1.ASN1Set;
+import org.spongycastle.asn1.ASN1TaggedObject;
+import org.spongycastle.asn1.cms.Attribute;
+import org.spongycastle.asn1.cms.SignedData;
+import org.spongycastle.asn1.cms.SignerInfo;
+import org.spongycastle.asn1.pkcs.PKCSObjectIdentifiers;
 
-import es.gob.afirma.signers.pkcs7.BCChecker;
+import es.gob.afirma.signers.pkcs7.SCChecker;
 
 /** Clase que permite verificar si unos datos se corresponden con una firma CMS. */
 final class ValidateCMSSignedData {
@@ -39,7 +39,7 @@ final class ValidateCMSSignedData {
      * @return si es de este tipo.
      * @throws IOException Si ocurren errores durante la lectura de los datos */
     public static boolean isCMSSignedData(final byte[] data) throws IOException {
-    	new BCChecker().checkBouncyCastle();
+    	new SCChecker().checkSpongyCastle();
         boolean isValid = true;
         ASN1InputStream is = null;
         try {

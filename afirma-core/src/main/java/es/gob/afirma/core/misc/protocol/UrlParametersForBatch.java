@@ -1,3 +1,13 @@
+/* Copyright (C) 2011 [Gobierno de Espana]
+ * This file is part of "Cliente @Firma".
+ * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
+ *   - the GNU General Public License as published by the Free Software Foundation;
+ *     either version 2 of the License, or (at your option) any later version.
+ *   - or The European Software License; either version 1.1 or (at your option) any later version.
+ * Date: 11/01/11
+ * You may contact the copyright holder at: soporte.afirma5@mpt.es
+ */
+
 package es.gob.afirma.core.misc.protocol;
 
 import java.net.URL;
@@ -21,8 +31,13 @@ public final class UrlParametersForBatch extends UrlParameters {
 	private static final String PARAM_BATCH_POSTSIGNER = "batchpostsignerurl"; //$NON-NLS-1$
 	private static final String PARAM_BATCH_PRESIGNER = "batchpresignerurl"; //$NON-NLS-1$
 
+	/** Par&aacute;metro de entrada con la m&iacute;nima versi&oacute;n requerida del aplicativo a usar en la invocaci&oacute;n por protocolo. */
+	private static final String VER_PARAM = "ver"; //$NON-NLS-1$
+
 	private String batchPreSignerUrl = null;
 	private String batchPostSignerUrl = null;
+
+	private String minimumVersion;
 
 	/** Obtiene la URL del servicio de preprocesado de lotes de firma.
 	 * @return URL del servicio de preprocesado de lotes de firma. */
@@ -46,17 +61,6 @@ public final class UrlParametersForBatch extends UrlParameters {
 
 	void setBatchParameters(final Map<String, String> params) throws ParameterException {
 
-		if (!params.containsKey(PARAM_BATCH_POSTSIGNER)) {
-			throw new ParameterException(
-				"No se ha recibido la URL del postprocesador de lotes" //$NON-NLS-1$
-			);
-		}
-		if (!params.containsKey(PARAM_BATCH_PRESIGNER)) {
-			throw new ParameterException(
-				"No se ha recibido la URL del preprocesador de lotes" //$NON-NLS-1$
-			);
-		}
-
 		// idSession para el service Web. Con socket no se usa
 		if (params.containsKey(PARAM_ID) || params.containsKey(FILE_ID_PARAM)) {
 			// Comprobamos que el identificador de sesion de la firma no sea mayor de un cierto numero de caracteres
@@ -73,6 +77,31 @@ public final class UrlParametersForBatch extends UrlParameters {
 			}
 
 			setSessionId(signatureSessionId);
+		}
+
+		// Version minima requerida del aplicativo
+		if (params.containsKey(VER_PARAM)) {
+			setMinimumVersion(params.get(VER_PARAM));
+		}
+		else {
+			setMinimumVersion("0"); //$NON-NLS-1$
+		}
+
+		// Si hemos recibido el identificador para la descarga de la configuracion,
+		// no encontraremos el resto de parametros
+		if (getFileId() != null) {
+			return;
+		}
+
+		if (!params.containsKey(PARAM_BATCH_POSTSIGNER)) {
+			throw new ParameterException(
+				"No se ha recibido la URL del postprocesador de lotes" //$NON-NLS-1$
+			);
+		}
+		if (!params.containsKey(PARAM_BATCH_PRESIGNER)) {
+			throw new ParameterException(
+				"No se ha recibido la URL del preprocesador de lotes" //$NON-NLS-1$
+			);
 		}
 
 		setDefaultKeyStore(verifyDefaultKeyStoreName(params));
@@ -124,6 +153,16 @@ public final class UrlParametersForBatch extends UrlParameters {
 		}
 
 		setDefaultKeyStore(verifyDefaultKeyStoreName(params));
+	}
+
+	/** Obtiene la versi&oacute;n m&iacute;nima requerida del aplicativo.
+	 * @return Versi&oacute;n m&iacute;nima requerida del aplicativo. */
+	public String getMinimumVersion() {
+		return this.minimumVersion;
+	}
+
+	void setMinimumVersion(final String minimumVersion) {
+		this.minimumVersion = minimumVersion;
 	}
 
 }

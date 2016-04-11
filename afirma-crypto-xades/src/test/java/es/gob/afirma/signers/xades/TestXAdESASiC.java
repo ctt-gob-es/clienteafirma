@@ -34,7 +34,7 @@ public final class TestXAdESASiC {
         final AOSigner signer = new AOXAdESASiCSSigner();
 
         final byte[] result = signer.sign(
-        		"HOLA".getBytes(), //$NON-NLS-1$
+        		"<?xml version=\"1.0\" encoding=\"UTF-8\" ?><NODO>Valor</NODO>".getBytes(), //$NON-NLS-1$
         		"SHA512withRSA", //$NON-NLS-1$
         		pke.getPrivateKey(),
         		pke.getCertificateChain(),

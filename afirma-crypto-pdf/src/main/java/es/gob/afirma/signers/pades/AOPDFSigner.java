@@ -22,11 +22,12 @@ import java.util.Locale;
 import java.util.Properties;
 import java.util.logging.Logger;
 
-import com.lowagie.text.DocumentException;
-import com.lowagie.text.exceptions.BadPasswordException;
-import com.lowagie.text.pdf.AcroFields;
-import com.lowagie.text.pdf.PdfPKCS7;
-import com.lowagie.text.pdf.PdfReader;
+import com.aowagie.text.exceptions.BadPasswordException;
+import com.aowagie.text.pdf.AcroFields;
+import com.aowagie.text.pdf.PdfDictionary;
+import com.aowagie.text.pdf.PdfName;
+import com.aowagie.text.pdf.PdfPKCS7;
+import com.aowagie.text.pdf.PdfReader;
 
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
@@ -66,6 +67,9 @@ public final class AOPDFSigner implements AOSigner {
     private static final String PDF_FILE_HEADER = "%PDF-"; //$NON-NLS-1$
 
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma");  //$NON-NLS-1$
+
+	private static final PdfName PDFNAME_ETSI_RFC3161 = new PdfName("ETSI.RFC3161"); //$NON-NLS-1$
+	private static final PdfName PDFNAME_DOCTIMESTAMP = new PdfName("DocTimeStamp"); //$NON-NLS-1$
 
     /** Firma un documento PDF en formato PAdES.
      * <p>
@@ -140,8 +144,8 @@ public final class AOPDFSigner implements AOSigner {
 				extraParams
 			);
 		}
-        catch (final DocumentException e) {
-			throw new InvalidPdfException(e);
+        catch (final InvalidPdfException e) {
+			throw e;
 		}
 
         // Firma PKCS#1
@@ -370,15 +374,23 @@ public final class AOPDFSigner implements AOSigner {
 
     	final List<String> names = af.getSignatureNames();
     	Object pkcs1Object = null;
-    	for (int i = 0; i < names.size(); ++i) {
+    	for (final String signatureName : names) {
+
+    		// Comprobamos si es una firma o un sello
+    		final PdfDictionary pdfDictionary = af.getSignatureDictionary(signatureName);
+    		if (PDFNAME_ETSI_RFC3161.equals(pdfDictionary.get(PdfName.SUBFILTER)) || PDFNAME_DOCTIMESTAMP.equals(pdfDictionary.get(PdfName.SUBFILTER))) {
+    			// Ignoramos los sellos
+    			continue;
+    		}
+
     		final PdfPKCS7 pcks7;
     		try {
-    			pcks7 = af.verifySignature(names.get(i).toString());
+    			pcks7 = af.verifySignature(signatureName);
     		}
     		catch(final Exception e) {
     			LOGGER.severe(
 					"El PDF contiene una firma corrupta o con un formato desconocido (" + //$NON-NLS-1$
-						names.get(i).toString() +
+						signatureName +
 							"), se continua con las siguientes si las hubiese: " + e //$NON-NLS-1$
 				);
     			continue;
@@ -398,7 +410,7 @@ public final class AOPDFSigner implements AOSigner {
     			// Extraemos el PKCS1 de la firma
     			try {
     				// iText antiguo
-    				final Field digestField = Class.forName("com.lowagie.text.pdf.PdfPKCS7").getDeclaredField("digest"); //$NON-NLS-1$ //$NON-NLS-2$
+    				final Field digestField = Class.forName("com.aowagie.text.pdf.PdfPKCS7").getDeclaredField("digest"); //$NON-NLS-1$ //$NON-NLS-2$
     				digestField.setAccessible(true);
     				pkcs1Object = digestField.get(pcks7);
     			}

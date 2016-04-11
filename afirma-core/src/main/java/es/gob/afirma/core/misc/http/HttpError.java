@@ -1,3 +1,13 @@
+/* Copyright (C) 2011 [Gobierno de Espana]
+ * This file is part of "Cliente @Firma".
+ * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
+ *   - the GNU General Public License as published by the Free Software Foundation;
+ *     either version 2 of the License, or (at your option) any later version.
+ *   - or The European Software License; either version 1.1 or (at your option) any later version.
+ * Date: 11/01/11
+ * You may contact the copyright holder at: soporte.afirma5@mpt.es
+ */
+
 package es.gob.afirma.core.misc.http;
 
 import java.io.IOException;
@@ -23,7 +33,7 @@ public final class HttpError extends IOException {
 	 * @param resCode C&oacute;digo HTTP de respuesta.
 	 * @param resDescription Descripci&oacute;n del error.
 	 * @param url URL a la que se intent&oacute; conectar.  */
-	HttpError(final int resCode, final String resDescription, final String url) {
+	public HttpError(final int resCode, final String resDescription, final String url) {
 		super(
 			"Error en conexion HTTP con codigo de respuesta " + resCode + //$NON-NLS-1$
 				" y descripcion '" + resDescription  + //$NON-NLS-1$

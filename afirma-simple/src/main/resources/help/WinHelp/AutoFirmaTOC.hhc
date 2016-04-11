@@ -31,6 +31,10 @@
 			<param name="Local" value="Spanish.lproj\pgs\MenuPreferencias.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Ventana de configuraci&oacute;n de la firma visible de PDF">
+			<param name="Local" value="Spanish.lproj\pgs\VentanaPdfVisible.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="Licencia de uso y distribuci&oacute;n">
 			<param name="Local" value="Spanish.lproj\pgs\Licencia.html">
 			</OBJECT>

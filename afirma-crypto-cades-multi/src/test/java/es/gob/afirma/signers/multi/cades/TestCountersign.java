@@ -19,13 +19,15 @@ import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.signers.cades.AOCAdESSigner;
 
 /** Prueba de contrafirmas CAdES.
- * @author Carlos Gamuci */
+ * @author Carlos Gamuci. */
 public class TestCountersign {
 
-	private static final String PKCS12_KEYSTORE = "ANF_PF_Activo.pfx"; //$NON-NLS-1$
+	private static final String PKCS12_KEYSTORE = "PFActivoFirSHA256.pfx"; //$NON-NLS-1$
 	private static final String PASSWORD = "12341234"; //$NON-NLS-1$
 	private static final String IMPLICIT_SHA1_COUNTERSIGN_FILE = "contrafirma_implicita.csig"; //$NON-NLS-1$
 	private static final String EXPLICIT_SHA1_COUNTERSIGN_FILE = "contrafirma_explicita.csig"; //$NON-NLS-1$
+	private static final String IMPLICIT_SHA1_CADES_A_FILE = "cadesA.csig"; //$NON-NLS-1$
+	private static final String IMPLICIT_SHA1_CADES_T_FILE = "CAdES-T.asn1"; //$NON-NLS-1$
 
 	private static InputStream ksIs;
 	private static KeyStore ks;
@@ -109,10 +111,8 @@ public class TestCountersign {
 		fos.close();
 	}
 
-	/**
-	 * Prueba de contrafirma de todo el &aacute;rbol de firmas de una firma impl&iacute;cita.
-	 * @throws Exception Cuando se produce un error.
-	 */
+	/** Prueba de contrafirma de todo el &aacute;rbol de firmas de una firma impl&iacute;cita.
+	 * @throws Exception Cuando se produce un error. */
 	@Test
 	public void prueba_contrafirma_de_arbol_de_firma_implicita() throws Exception {
 
@@ -177,6 +177,83 @@ public class TestCountersign {
 		fos.write(countersign);
 		fos.close();
 	}
+
+	/** Prueba de contrafirma de los nodos hoja de una firma CAdES-A.
+	 * @throws Exception Cuando se produce un error. */
+	@Test
+	public void prueba_contrafirma_cades_A() throws Exception {
+
+		final InputStream is = getClass().getClassLoader().getResourceAsStream(IMPLICIT_SHA1_CADES_A_FILE);
+		final byte[] sign = AOUtil.getDataFromInputStream(is);
+		is.close();
+
+		System.out.println("Sellos antes de la contrafirma:\n " + TimestampsAnalyzer.getCmsTimestamps(sign)); //$NON-NLS-1$
+
+		final Properties config = new Properties();
+
+		final AOCAdESSigner signer = new AOCAdESSigner();
+		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(PASSWORD.toCharArray()));
+		final byte[] countersign = signer.countersign(
+			sign,
+			AOSignConstants.SIGN_ALGORITHM_SHA512WITHRSA,
+			CounterSignTarget.TREE,
+			null,
+			pke.getPrivateKey(),
+			pke.getCertificateChain(),
+			config
+		);
+
+		final File tempFile = File.createTempFile("CountersignCadesA", ".csig"); //$NON-NLS-1$ //$NON-NLS-2$
+
+		System.out.println("Prueba de contrafirma de una firma CAdES-A."); //$NON-NLS-1$
+		System.out.println("El resultado se almacena en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
+
+		final FileOutputStream fos = new FileOutputStream(tempFile);
+		fos.write(countersign);
+		fos.close();
+
+		System.out.println("Sellos despues de la contrafirma:\n " + TimestampsAnalyzer.getCmsTimestamps(countersign)); //$NON-NLS-1$
+	}
+
+	/** Prueba de contrafirma de los nodos hoja de una firma CAdES-T.
+	 * @throws Exception Cuando se produce un error. */
+	@Test
+	public void prueba_contrafirma_cades_T() throws Exception {
+
+		final InputStream is = getClass().getClassLoader().getResourceAsStream(IMPLICIT_SHA1_CADES_T_FILE);
+		final byte[] sign = AOUtil.getDataFromInputStream(is);
+		is.close();
+
+		System.out.println("Sellos antes de la contrafirma:\n " + TimestampsAnalyzer.getCmsTimestamps(sign)); //$NON-NLS-1$
+		System.out.println();
+
+		final Properties config = new Properties();
+
+		final AOCAdESSigner signer = new AOCAdESSigner();
+		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(PASSWORD.toCharArray()));
+		final byte[] countersign = signer.countersign(
+			sign,
+			AOSignConstants.SIGN_ALGORITHM_SHA512WITHRSA,
+			CounterSignTarget.TREE,
+			null,
+			pke.getPrivateKey(),
+			pke.getCertificateChain(),
+			config
+		);
+
+		final File tempFile = File.createTempFile("CountersignCadesT_", ".csig"); //$NON-NLS-1$ //$NON-NLS-2$
+
+		System.out.println("Prueba de contrafirma de una firma CAdES-T."); //$NON-NLS-1$
+		System.out.println("El resultado se almacena en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
+
+		final FileOutputStream fos = new FileOutputStream(tempFile);
+		fos.write(countersign);
+		fos.close();
+
+		System.out.println();
+		System.out.println("Sellos despues de la contrafirma:\n " + TimestampsAnalyzer.getCmsTimestamps(countersign)); //$NON-NLS-1$
+	}
+
 
 	/** Cierra el flujo de lectura del almac&eacute;n de certificados.
 	 * @throws IOException Cuando ocurre alg&uacute;n problema al cerrar el flujo de datos. */

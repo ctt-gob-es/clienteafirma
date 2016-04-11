@@ -169,6 +169,19 @@ public final class AOUIFactory {
         uiManager.showMessageDialog(parentComponent, message, title, messageType);
     }
 
+    /** JOptionPane.showMessageDialog().
+     * @param parentComponent Componente padre (se descarta si no es del tipo <code>java.awt.Component</code> en la implementaci&oacute;n Swing
+     * @param message Mensaje
+     * @param title Titulo del cuadro de di&aacute;logo
+     * @param messageType Tipo de mensaje */
+    public static void showMessageDialog(final Object parentComponent,
+    		                            final Object message,
+    		                            final String title,
+    		                            final int messageType,
+    		                            final Object icon) {
+        uiManager.showMessageDialog(parentComponent, message, title, messageType, icon);
+    }
+
     /** Muestra un di&aacute;logo de error de forma modal. Difiere del normal mostrado con <code>JOptionPane</code>
      * en que, siguiendo la gu&iacute;a de estilo de interfaces de Microsoft, el bot&oacute;n no es "OK", sino
      * "Cerrar". El comportamiento por lo dem&aacute;s es igual, incluyendo los par&aacute;metros, a

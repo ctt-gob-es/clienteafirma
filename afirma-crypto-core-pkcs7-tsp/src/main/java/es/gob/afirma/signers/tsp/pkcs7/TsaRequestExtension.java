@@ -1,5 +1,14 @@
-package es.gob.afirma.signers.tsp.pkcs7;
+/* Copyright (C) 2011 [Gobierno de Espana]
+ * This file is part of "Cliente @Firma".
+ * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
+ *   - the GNU General Public License as published by the Free Software Foundation;
+ *     either version 2 of the License, or (at your option) any later version.
+ *   - or The European Software License; either version 1.1 or (at your option) any later version.
+ * Date: 11/01/11
+ * You may contact the copyright holder at: soporte.afirma5@mpt.es
+ */
 
+package es.gob.afirma.signers.tsp.pkcs7;
 
 /** Extensi&oacute;n para una solicitud de TSA seg&uacute;n RFC 2161. */
 public final class TsaRequestExtension {
@@ -18,7 +27,7 @@ public final class TsaRequestExtension {
 	 * @param isCritical <code>true</code> si la extensi&oacute;n es cr&iacute;tica, <code>false</code> en caso contrario
 	 * @param value Valor de la extensi&oacute;n */
 	public TsaRequestExtension(final String oid, final boolean isCritical, final byte[] value) {
-		if (oid == null || "".equals(oid)) { //$NON-NLS-1$
+		if (oid == null || oid.isEmpty()) {
 			throw new IllegalArgumentException("Las extensiones TSA necesitan obligatoriamente un OID"); //$NON-NLS-1$
 		}
 		if (value == null || value.length < 1) {

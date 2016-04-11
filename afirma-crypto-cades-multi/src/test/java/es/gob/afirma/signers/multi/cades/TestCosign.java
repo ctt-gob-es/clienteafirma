@@ -16,6 +16,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.AOFormatFileException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.signers.cades.AOCAdESSigner;
@@ -26,15 +27,17 @@ import es.gob.afirma.signers.cades.AOCAdESSigner;
  */
 public class TestCosign {
 
-	private static final String PKCS12_KEYSTORE = "ANF_PF_Activo.pfx"; //$NON-NLS-1$
+	private static final String PKCS12_KEYSTORE = "PFActivoFirSHA1.pfx"; //$NON-NLS-1$
 
 	private static final String PASSWORD = "12341234"; //$NON-NLS-1$
 
 	private static final String IMPLICIT_SHA1_SIGN_FILE = "firma_implicita.csig"; //$NON-NLS-1$
-
 	private static final String EXPLICIT_SHA1_SIGN_FILE = "firma_explicita.csig"; //$NON-NLS-1$
+	private static final String IMPLICIT_SHA1_CADES_A_FILE = "cadesA.csig"; //$NON-NLS-1$
+	private static final String IMPLICIT_SHA1_CADES_T_FILE = "CADES-T.csig"; //$NON-NLS-1$
 
 	private static final String DATA_FILE = "data"; //$NON-NLS-1$
+	private static final String DATA_FILE_PDF = "Original.pdf"; //$NON-NLS-1$
 
 	private static InputStream ksIs;
 	private static KeyStore ks;
@@ -52,10 +55,8 @@ public class TestCosign {
 		data = AOUtil.getDataFromInputStream(getClass().getClassLoader().getResourceAsStream(DATA_FILE));
 	}
 
-	/**
-	 * Prueba de cofirma implicita de una firma implicita sin indicar los datos de firma.
-	 * @throws Exception Cuando se produce un error.
-	 */
+	/** Prueba de cofirma implicita de una firma impl&iacute;cita sin indicar los datos de firma.
+	 * @throws Exception Cuando se produce un error. */
 	@Test
 	public void prueba_cofirmar_firma_implicita_sin_indicar_datos() throws Exception {
 
@@ -83,6 +84,75 @@ public class TestCosign {
 		final FileOutputStream fos = new FileOutputStream(tempFile);
 		fos.write(cosign);
 		fos.close();
+	}
+
+	/** Prueba de cofirma implicita de una firma impl&iacute;cita CAdES-T sin indicar los datos de firma.
+	 * @throws Exception Cuando se produce un error. */
+	@Test
+	public void prueba_cofirmar_firma_implicita_T_sin_indicar_datos() throws Exception {
+
+		final InputStream is = getClass().getClassLoader().getResourceAsStream(
+			IMPLICIT_SHA1_CADES_T_FILE
+		);
+		final byte[] sign = AOUtil.getDataFromInputStream(is);
+		is.close();
+
+		final Properties config = new Properties();
+		config.setProperty("mode", AOSignConstants.SIGN_MODE_IMPLICIT); //$NON-NLS-1$
+
+		final AOCAdESSigner signer = new AOCAdESSigner();
+		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(
+			ks.aliases().nextElement(),
+			new KeyStore.PasswordProtection(PASSWORD.toCharArray())
+		);
+		try {
+			signer.cosign(
+				sign,
+				AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA,
+				pke.getPrivateKey(),
+				pke.getCertificateChain(),
+				config
+			);
+		}
+		catch(final AOFormatFileException e) {
+			return;
+		}
+		Assert.fail("Deberia haber encontrado sellos y fallar"); //$NON-NLS-1$
+	}
+
+	/** Prueba de cofirma implicita de una firma impl&iacute;cita CAdES-T sin indicar los datos de firma.
+	 * @throws Exception Cuando se produce un error. */
+	@Test
+	public void prueba_cofirmar_firma_implicita_A_indicando_datos() throws Exception {
+
+		final InputStream is = getClass().getClassLoader().getResourceAsStream(
+			IMPLICIT_SHA1_CADES_A_FILE
+		);
+		final byte[] sign = AOUtil.getDataFromInputStream(is);
+		is.close();
+
+		final Properties config = new Properties();
+		config.setProperty("mode", AOSignConstants.SIGN_MODE_EXPLICIT); //$NON-NLS-1$
+
+		final AOCAdESSigner signer = new AOCAdESSigner();
+		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(
+			ks.aliases().nextElement(),
+			new KeyStore.PasswordProtection(PASSWORD.toCharArray())
+		);
+		try {
+			signer.cosign(
+				AOUtil.getDataFromInputStream(getClass().getClassLoader().getResourceAsStream(DATA_FILE_PDF)),
+				sign,
+				AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA,
+				pke.getPrivateKey(),
+				pke.getCertificateChain(),
+				config
+			);
+		}
+		catch(final AOFormatFileException e) {
+			return;
+		}
+		Assert.fail("Deberia haber encontrado sellos y fallar"); //$NON-NLS-1$
 	}
 
 	/** Prueba de cofirma implicita de una firma implicita indicando los datos firmados.

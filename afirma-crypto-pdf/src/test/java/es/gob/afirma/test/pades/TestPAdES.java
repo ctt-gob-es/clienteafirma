@@ -22,7 +22,7 @@ import java.util.logging.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.lowagie.text.pdf.PdfReader;
+import com.aowagie.text.pdf.PdfReader;
 
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.signers.AOSignConstants;

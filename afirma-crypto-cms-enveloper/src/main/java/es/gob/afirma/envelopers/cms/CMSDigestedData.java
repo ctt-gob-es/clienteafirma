@@ -14,12 +14,12 @@ import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-import org.bouncycastle.asn1.ASN1Encoding;
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.DEROctetString;
-import org.bouncycastle.asn1.cms.ContentInfo;
-import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
-import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
+import org.spongycastle.asn1.ASN1Encoding;
+import org.spongycastle.asn1.ASN1ObjectIdentifier;
+import org.spongycastle.asn1.DEROctetString;
+import org.spongycastle.asn1.cms.ContentInfo;
+import org.spongycastle.asn1.pkcs.PKCSObjectIdentifiers;
+import org.spongycastle.asn1.x509.AlgorithmIdentifier;
 
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.signers.pkcs7.AOAlgorithmID;
@@ -41,8 +41,7 @@ import es.gob.afirma.signers.pkcs7.DigestedData;
  * </pre>
  *
  * La implementaci&oacute;n del c&oacute;digo ha seguido los pasos necesarios
- * para crear un mensaje DigestedData de BouncyCastle: <a
- * href="http://www.bouncycastle.org/">www.bouncycastle.org</a> */
+ * para crear un mensaje DigestedData de SpongyCastle. */
 final class CMSDigestedData {
 
 	private CMSDigestedData() {

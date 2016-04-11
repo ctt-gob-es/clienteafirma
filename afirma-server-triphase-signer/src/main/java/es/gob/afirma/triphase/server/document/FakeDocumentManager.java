@@ -2,6 +2,7 @@ package es.gob.afirma.triphase.server.document;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.security.cert.X509Certificate;
 import java.util.Properties;
 import java.util.logging.Logger;
@@ -17,15 +18,15 @@ public final class FakeDocumentManager implements DocumentManager {
 
 	/** {@inheritDoc} */
 	@Override
-	public byte[] getDocument(final String id, final X509Certificate cert, final Properties config) throws IOException {
+	public byte[] getDocument(final String id, final X509Certificate[] certChain, final Properties config) throws IOException {
 		return AOUtil.getDataFromInputStream(this.getClass().getResourceAsStream(PDF_DOC));
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	public String storeDocument(final String id, final X509Certificate cert, final byte[] data, final Properties config) throws IOException {
+	public String storeDocument(final String id, final X509Certificate[] certChain, final byte[] data, final Properties config) throws IOException {
 		final File tempFile = File.createTempFile("fakeDocumentRetriever-" + id, ".pdf"); //$NON-NLS-1$ //$NON-NLS-2$
-		FileOutputStream fos = null;
+		OutputStream fos = null;
 		try {
 			fos = new FileOutputStream(tempFile);
 			fos.write(data);

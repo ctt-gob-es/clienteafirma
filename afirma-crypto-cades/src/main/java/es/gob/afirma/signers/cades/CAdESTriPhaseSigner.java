@@ -19,28 +19,28 @@ import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
 
-import org.bouncycastle.asn1.ASN1Encodable;
-import org.bouncycastle.asn1.ASN1EncodableVector;
-import org.bouncycastle.asn1.ASN1Encoding;
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.ASN1OctetString;
-import org.bouncycastle.asn1.ASN1Primitive;
-import org.bouncycastle.asn1.ASN1Set;
-import org.bouncycastle.asn1.BEROctetString;
-import org.bouncycastle.asn1.DEROctetString;
-import org.bouncycastle.asn1.DERSet;
-import org.bouncycastle.asn1.cms.AttributeTable;
-import org.bouncycastle.asn1.cms.ContentInfo;
-import org.bouncycastle.asn1.cms.IssuerAndSerialNumber;
-import org.bouncycastle.asn1.cms.SignedData;
-import org.bouncycastle.asn1.cms.SignerIdentifier;
-import org.bouncycastle.asn1.cms.SignerInfo;
-import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
-import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
-import org.bouncycastle.asn1.x509.TBSCertificateStructure;
-import org.bouncycastle.cms.CMSProcessable;
-import org.bouncycastle.cms.CMSProcessableByteArray;
+import org.spongycastle.asn1.ASN1Encodable;
+import org.spongycastle.asn1.ASN1EncodableVector;
+import org.spongycastle.asn1.ASN1Encoding;
+import org.spongycastle.asn1.ASN1ObjectIdentifier;
+import org.spongycastle.asn1.ASN1OctetString;
+import org.spongycastle.asn1.ASN1Primitive;
+import org.spongycastle.asn1.ASN1Set;
+import org.spongycastle.asn1.BEROctetString;
+import org.spongycastle.asn1.DEROctetString;
+import org.spongycastle.asn1.DERSet;
+import org.spongycastle.asn1.cms.AttributeTable;
+import org.spongycastle.asn1.cms.ContentInfo;
+import org.spongycastle.asn1.cms.IssuerAndSerialNumber;
+import org.spongycastle.asn1.cms.SignedData;
+import org.spongycastle.asn1.cms.SignerIdentifier;
+import org.spongycastle.asn1.cms.SignerInfo;
+import org.spongycastle.asn1.pkcs.PKCSObjectIdentifiers;
+import org.spongycastle.asn1.x500.X500Name;
+import org.spongycastle.asn1.x509.AlgorithmIdentifier;
+import org.spongycastle.asn1.x509.TBSCertificateStructure;
+import org.spongycastle.cms.CMSProcessable;
+import org.spongycastle.cms.CMSProcessableByteArray;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.AOUtil;
@@ -157,6 +157,10 @@ public final class CAdESTriPhaseSigner {
      * @param contentDescription Descripci&oacute;n textual del tipo de contenido firmado.
      * @param ctis Indicaciones sobre los tipos de compromisos adquiridos con la firma.
      * @param csm Metadatos sobre el firmante.
+     * @param doNotIncludePolicyOnSigningCertificate Si se establece a <code>true</code> omite la inclusi&oacute;n de la
+     *                                               pol&iacute;tica de certificaci&oacute;n en el <i>SigningCertificate</i>,
+     *                                               si se establece a <code>false</code> se incluye siempre que el certificado
+     *                                               la declare.
      * @return Atributos CAdES a firmar (prefirma) en formato ASN.1.
      * @throws AOException Cuando se produce cualquier error durante el proceso. */
     public static byte[] preSign(final String digestAlgorithmName,
@@ -171,7 +175,8 @@ public final class CAdESTriPhaseSigner {
                           final String contentType,
                           final String contentDescription,
                           final List<CommitmentTypeIndicationBean> ctis,
-                          final CAdESSignerMetadata csm) throws AOException {
+                          final CAdESSignerMetadata csm,
+                          final boolean doNotIncludePolicyOnSigningCertificate) throws AOException {
 
         if (signerCertificateChain == null || signerCertificateChain.length == 0) {
             throw new IllegalArgumentException("La cadena de certificados debe contener al menos una entrada"); //$NON-NLS-1$
@@ -196,7 +201,8 @@ public final class CAdESTriPhaseSigner {
                      contentDescription,
                      ctis,
                      csm,
-                     false  // No es contrafirma
+                     false,  // No es contrafirma
+                     doNotIncludePolicyOnSigningCertificate
                   )
                )
             );
@@ -328,7 +334,7 @@ public final class CAdESTriPhaseSigner {
         for (final Certificate cert : signerCertificateChain) {
             try {
                 ce.add(
-            		org.bouncycastle.asn1.x509.Certificate.getInstance(
+            		org.spongycastle.asn1.x509.Certificate.getInstance(
         				ASN1Primitive.fromByteArray(
     						cert.getEncoded()
 						)

@@ -20,8 +20,8 @@ public final class InvalidXMLException extends AOFormatFileException {
 
 	/** Construye una excepci&oacute;n para notificar que se ha encontrado un objeto
 	 * que no es un XML apto para ser firmado con los par&aacute;metros indicados.
-	 * @param e Origen de la excepci&oacute;n */
-	public InvalidXMLException(final Exception e) {
+	 * @param e Causa de la excepci&oacute;n */
+	public InvalidXMLException(final Throwable e) {
 		super("Los datos proporcionados no son un XML apto para su firma con los parametros indicados: " + e, e); //$NON-NLS-1$
 	}
 
@@ -30,6 +30,14 @@ public final class InvalidXMLException extends AOFormatFileException {
 	 * @param msg Mensaje de la excepci&oacute;n */
 	public InvalidXMLException(final String msg) {
 		super(msg);
+	}
+
+	/** Construye una excepci&oacute;n para notificar que se ha encontrado un objeto
+	 * que no es un XML apto para ser firmado con los par&aacute;metros indicados.
+	 * @param msg Mensaje de la excepci&oacute;n.
+	 * @param e Causa de la excepci&oacute;n. */
+	public InvalidXMLException(final String msg, final Throwable e) {
+		super(msg, e);
 	}
 
 }

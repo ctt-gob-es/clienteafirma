@@ -286,8 +286,8 @@ public final class AOXAdESSigner implements AOSigner {
 
     static final String STYLE_REFERENCE_PREFIX = "StyleReference-"; //$NON-NLS-1$
 
-    static final String MIMETYPE_STR = "MimeType"; //$NON-NLS-1$
-    static final String ENCODING_STR = "Encoding"; //$NON-NLS-1$
+    static final String XMLDSIG_ATTR_MIMETYPE_STR = "MimeType"; //$NON-NLS-1$
+    static final String XMLDSIG_ATTR_ENCODING_STR = "Encoding"; //$NON-NLS-1$
 
     static {
         Utils.installXmlDSigProvider(false);
@@ -506,7 +506,7 @@ public final class AOXAdESSigner implements AOSigner {
 
                 final Element firstChild = (Element) rootSig.getFirstChild();
                 // si el documento es un xml se extrae como tal
-                if (firstChild.getAttribute(MIMETYPE_STR).equals("text/xml")) { //$NON-NLS-1$
+                if (firstChild.getAttribute(XMLDSIG_ATTR_MIMETYPE_STR).equals("text/xml")) { //$NON-NLS-1$
                     elementRes = (Element) firstChild.getFirstChild();
                 }
                 // si el documento es binario se deshace la codificacion en
@@ -533,7 +533,7 @@ public final class AOXAdESSigner implements AOSigner {
                 // Obtiene el nodo Object de la primera firma
                 final Element object = (Element) rootSig.getElementsByTagNameNS(XMLConstants.DSIGNNS, "Object").item(0); //$NON-NLS-1$
                 // Si el documento es un xml se extrae como tal
-                if (object.getAttribute(MIMETYPE_STR).equals("text/xml")) { //$NON-NLS-1$
+                if (object.getAttribute(XMLDSIG_ATTR_MIMETYPE_STR).equals("text/xml")) { //$NON-NLS-1$
                     elementRes = (Element) object.getFirstChild();
                 }
                 // Si el documento es binario se deshace la codificacion en
@@ -782,8 +782,18 @@ public final class AOXAdESSigner implements AOSigner {
             arrayIds.add(signature.getAttribute(ID_IDENTIFIER));
 
             // Recogemos los objetos que identificaran a los nodos de firma
-            arrayNodes.add(new AOTreeNode(asSimpleSignInfo ? Utils.getSimpleSignInfoNode(Utils.guessXAdESNamespaceURL(signDoc.getDocumentElement()),
-                                                                                       signature) : Utils.getStringInfoNode(signature)));
+            arrayNodes.add(
+        		new AOTreeNode(
+    				asSimpleSignInfo ?
+						Utils.getSimpleSignInfoNode(
+							Utils.guessXAdESNamespaceURL(
+								signDoc.getDocumentElement()
+							),
+                            signature
+                        ) :
+                        	Utils.getStringInfoNode(signature)
+            	)
+    		);
 
             // Recogemos el identificador de la firma a la que se referencia (si
             // no es contrafirma sera cadena vacia)
@@ -877,26 +887,12 @@ public final class AOXAdESSigner implements AOSigner {
             }
 
             // Si no se encuentran firmas, no es un documento de firma
-            if (signNodes.size() == 0 || !checkSignNodes(signNodes)) {
+            if (signNodes.size() == 0 || !XAdESUtil.checkSignNodes(signNodes)) {
                 return false;
             }
         }
         catch (final Exception e) {
             return false;
-        }
-        return true;
-    }
-
-    /** Comprueba que los nodos de firma proporcionados sean firmas en formato XAdES.
-     * @param signNodes Listado de nodos de firma.
-     * @return {@code true} cuando todos los nodos sean firmas en este formato. */
-    private static boolean checkSignNodes(final List<Node> signNodes) {
-        String xadesNamespace;
-        for (final Node signNode : signNodes) {
-            xadesNamespace = Utils.guessXAdESNamespaceURL(signNode);
-            if (((Element) signNode).getElementsByTagNameNS(xadesNamespace, "QualifyingProperties").getLength() == 0) { //$NON-NLS-1$
-                return false;
-            }
         }
         return true;
     }

@@ -317,9 +317,6 @@ final class SignRequestsParser {
 					if (key == null) {
 						throw new IllegalArgumentException("Se ha indicado un parametro de firma trifasica sin clave"); //$NON-NLS-1$
 					}
-
-					System.out.println("Datos enviados al servicio: " + key + "=" + param.getTextContent().trim());
-
 					config.put(key, param.getTextContent().trim());
 					numIndex++;
 				}

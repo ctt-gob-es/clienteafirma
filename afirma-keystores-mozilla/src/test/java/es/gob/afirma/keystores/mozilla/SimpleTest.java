@@ -1,8 +1,6 @@
 package es.gob.afirma.keystores.mozilla;
 
 import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.lang.reflect.InvocationTargetException;
 import java.security.KeyStore;
 import java.security.Provider;
 import java.security.Security;
@@ -13,6 +11,7 @@ import java.util.logging.Logger;
 import org.junit.Test;
 
 import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.keystores.AOKeyStore;
 import es.gob.afirma.keystores.AOKeyStoreManager;
@@ -54,7 +53,34 @@ public final class SimpleTest {
 			).getPrivateKey()
 		);
     	sig.update("Hola".getBytes()); //$NON-NLS-1$
-    	System.out.println(new String(sig.sign()));
+    	System.out.println(AOUtil.hexify(sig.sign(), false));
+    }
+
+    /** Prueba de la obtenci&oacute;n de almac&eacute;n y alias con NSS de systema.
+     * @throws Exception En cualquier error. */
+    @SuppressWarnings("static-method")
+    @Test
+    //@Ignore // Necesita NSS
+    public void testSystemKeyStoreManagerCreation() throws Exception {
+    	final AOKeyStoreManager ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
+    	    AOKeyStore.SHARED_NSS, // Store
+    	    null, // Lib
+			"TEST-KEYSTORE", // Description //$NON-NLS-1$
+			null, // PasswordCallback
+			null // Parent
+		);
+    	final String[] aliases = ksm.getAliases();
+    	for (final String alias : aliases) {
+    		System.out.println(alias);
+    	}
+    	final Signature sig = Signature.getInstance("SHA512withRSA"); //$NON-NLS-1$
+    	sig.initSign(
+			ksm.getKeyEntry(
+				aliases[0]
+			).getPrivateKey()
+		);
+    	sig.update("Hola".getBytes()); //$NON-NLS-1$
+    	System.out.println(AOUtil.hexify(sig.sign(), false));
     }
 
     private static void testDirectNssUsage() throws Exception {
@@ -72,12 +98,7 @@ public final class SimpleTest {
     	}
     }
 
-	static Provider loadNSS(final String nssDirectory, final String mozProfileDir) throws AOException,
-    																				InstantiationException,
-    																				IllegalAccessException,
-    																				InvocationTargetException,
-    																				NoSuchMethodException,
-    																				ClassNotFoundException {
+	static Provider loadNSS(final String nssDirectory, final String mozProfileDir) throws AOException {
 		final String p11NSSConfigFile = MozillaKeyStoreUtilities.createPKCS11NSSConfigFile(
 			mozProfileDir,
 			nssDirectory
@@ -87,9 +108,7 @@ public final class SimpleTest {
 
 		Provider p = null;
 		try {
-			p = (Provider) Class.forName("sun.security.pkcs11.SunPKCS11") //$NON-NLS-1$
-					.getConstructor(InputStream.class)
-					.newInstance(new ByteArrayInputStream(p11NSSConfigFile.getBytes()));
+			p = new sun.security.pkcs11.SunPKCS11(new ByteArrayInputStream(p11NSSConfigFile.getBytes()));
 		}
 		catch (final Exception e) {
 			// No se ha podido cargar el proveedor sin precargar las dependencias
@@ -103,16 +122,12 @@ public final class SimpleTest {
 			}
 
 			try {
-				p = (Provider) Class.forName("sun.security.pkcs11.SunPKCS11") //$NON-NLS-1$
-						.getConstructor(InputStream.class)
-						.newInstance(new ByteArrayInputStream(p11NSSConfigFile.getBytes()));
+				p = new sun.security.pkcs11.SunPKCS11(new ByteArrayInputStream(p11NSSConfigFile.getBytes()));
 			}
 			catch (final Exception e2) {
 				// Un ultimo intento de cargar el proveedor valiendonos de que es posible que
 				// las bibliotecas necesarias se hayan cargado tras el ultimo intento
-				p = (Provider) Class.forName("sun.security.pkcs11.SunPKCS11") //$NON-NLS-1$
-						.getConstructor(InputStream.class)
-						.newInstance(new ByteArrayInputStream(p11NSSConfigFile.getBytes()));
+				p = new sun.security.pkcs11.SunPKCS11(new ByteArrayInputStream(p11NSSConfigFile.getBytes()));
 			}
 		}
 

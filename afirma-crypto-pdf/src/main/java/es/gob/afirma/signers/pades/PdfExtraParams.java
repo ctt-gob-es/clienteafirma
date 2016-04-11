@@ -1,7 +1,23 @@
+/* Copyright (C) 2011 [Gobierno de Espana]
+ * This file is part of "Cliente @Firma".
+ * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
+ *   - the GNU General Public License as published by the Free Software Foundation;
+ *     either version 2 of the License, or (at your option) any later version.
+ *   - or The European Software License; either version 1.1 or (at your option) any later version.
+ * Date: 11/01/11
+ * You may contact the copyright holder at: soporte.afirma5@mpt.es
+ */
+
 package es.gob.afirma.signers.pades;
 
 /** Par&aacute;metros adicionales para las firmas PAdES. */
 final class PdfExtraParams {
+
+    /** Si se establece a <code>true</code> omite la inclusi&oacute;n de la
+     * pol&iacute;tica de certificaci&oacute;n en el <i>SigningCertificate</i>,
+     * si se establece a <code>false</code> se incluye siempre que el certificado
+     * la declare. */
+    static final String DO_NOT_INCLUDE_POLICY_ON_SIGNING_CERTIFICATE = "doNotIncludePolicyOnSigningCertificate"; //$NON-NLS-1$
 
     /** Si se establece a <code>true</code> se incluye en la firma &uacute;nicamente el certificado del firmante (y no la cadena de
      * certificaci&oacute;n completa). Si no se establece o se establece a <code>false</code> se incluir&aacute; toda la cadena
@@ -272,13 +288,13 @@ final class PdfExtraParams {
     /** Evita cualquier interacci&oacute;n con el usuario si se establece a <code>true</code>, si no se establece o se establece a <code>false</code>
      * act&uacute;a normalmente (puede mostrar di&aacute;logos, por ejemplo, para solicitar las contrase&ntilde;as de los PDF cifrados). &Uacute;til para
      * los procesos desatendidos y por lotes. */
-    static final String HEADLESS = "headLess";//$NON-NLS-1$
+    static final String HEADLESS = "headless";//$NON-NLS-1$
 
     /** Si se establece a <code>true</code> permite la firma o cofirma de PDF certificados sin consultarlo al usuario, si se establece a
      * <code>false</code> o cualquier otro valor se lanza una excepci&oacute;n en caso de intentar firmar o cofirmar un PDF certificado y
      * si no se establece se mostrar&aacute; un di&aacute;logo al usuario para que confirme que desea realizar la firma a pesar de que
      * el resultado ser&aacute;n una firma no v&aacute;lida.<br>
-     * <b>Si el par&aacute;metro <code>headLess</code> est&aacute; establecido a <code>true</code>, no podr&aacute; mostrar el di&aacute;logo
+     * <b>Si el par&aacute;metro <code>headless</code> est&aacute; establecido a <code>true</code>, no podr&aacute; mostrar el di&aacute;logo
      * de confirmaci&oacute;n as&iacute; que llegados a este punto se lanzar&aacute; una excepci&oacute;n.</b><br>
      * No se soporta el cifrado de documentos PDF con certificados o con algoritmo AES256. */
     static final String ALLOW_SIGNING_CERTIFIED_PDFS = "allowSigningCertifiedPdfs";//$NON-NLS-1$

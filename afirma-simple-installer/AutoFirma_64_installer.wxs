@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+   <?define VersionNumber="1.4.7" ?>
+   <?define Platform="x64" ?>
+   <?define ProjectDir ="" ?>
+   <?define ProjectName ="AutoFirma" ?>
+   <?define ManufacturerName = "Gobierno de España" ?>
+   <?define UpgradeCode="{A6D90EBF-E089-4281-9269-AE5D20BA74D2}" ?>
+   <?define PlatformProgramFilesFolder = "ProgramFiles64Folder" ?>
+	  
+   <Product Codepage="1252" Id="*" Name="$(var.ProjectName)" Language="1033" Version="$(var.VersionNumber)" Manufacturer="$(var.ManufacturerName)" UpgradeCode="$(var.UpgradeCode)" >
+ 
+		<Package Id="*" Compressed="yes" Description="$(var.ProjectName)" InstallerVersion="200" Languages="1033" Manufacturer="$(var.ManufacturerName)" Platform="x64" />
+       
+	   	<!-- Detecta versiones anteriores ya instaladas en el equipo -->
+	    <MajorUpgrade DowngradeErrorMessage="Ya existe una versión posterior en el equipo." />
+	   
+	   <!-- Ejeuta el AutoFirmaGenerator.exe al instalar -->
+		<CustomAction Id="Exec_Cmd"
+                      Property="ExecProperty"
+                      Value="&quot;[#$(var.ProjectName)Generator.exe]&quot; /S"
+                      Execute="immediate"/>
+		<CustomAction Id="ExecProperty"
+                      BinaryKey="WixCA"
+                      DllEntry="CAQuietExec"
+                      Execute="deferred"
+                      Return="check"
+                      Impersonate="no"/>
+		<!-- Ejecuta el uninstall.exe al desinstalar -->
+		<CustomAction Id="Exec_Cmd2"
+                      Property="ExecProperty2"
+                      Value="&quot;[#uninstall.exe]&quot; /S"
+                      Execute="immediate"/>
+		<CustomAction Id="ExecProperty2"
+                      BinaryKey="WixCA"
+                      DllEntry="CAQuietExec"
+                      Execute="deferred"
+                      Return="check"
+                      Impersonate="no"/>
+        <!-- Paso 1: Definición de estructura del directorio -->
+        <Directory Id="TARGETDIR" Name="SourceDir">
+            <Directory Id="$(var.PlatformProgramFilesFolder)">
+                <Directory Id="$(var.ProjectName)" Name="$(var.ProjectName)"/>
+            </Directory>
+        </Directory>
+		<Icon Id="ic_launcher.ico" SourceFile="ic_launcher.ico"/>
+		<Property Id="ARPPRODUCTICON" Value="ic_launcher.ico" />
+		
+        <!-- Paso 2: Añade los ficheros al paquete de instalación -->
+		<Media Id="1"
+		   Cabinet="media1.cab"
+		   EmbedCab="yes" />
+		<DirectoryRef Id="$(var.ProjectName)">
+            <Component Id="$(var.ProjectName)Generator.exe" Guid="{C6D90EBF-E089-4281-9269-AE5D20BA74C1}">
+                <File Id="$(var.ProjectName)Generator.exe" Source="$(var.ProjectName)Generator.exe" KeyPath="yes" Checksum="yes"/>
+            </Component>
+			<Component Id="uninstall.exe" Guid="{C6D90EBF-E089-4281-9269-AE5D20BA74C0}">
+				<File Id="uninstall.exe" Source="uninstall.exe" KeyPath="yes" Checksum="yes"/>
+            </Component>
+        </DirectoryRef>
+		
+		<!--Paso 3: Componentes a ejecutar -->
+        <Feature Id="MainApplication" Title="Main Application" Level="1">
+            <ComponentRef Id="$(var.ProjectName)Generator.exe" />	
+			<ComponentRef Id="uninstall.exe" />	
+        </Feature>
+
+		<!-- Exits successfully in the case newer version are already installed -->
+		<CustomActionRef Id="WixExitEarlyWithSuccess"/>
+        <Property Id="ALLUSERS" Value="1" />
+        <Property Id="ARPNOMODIFY" Value="1" />
+		<InstallExecuteSequence>
+			<!--  Ejeuta el AutoFirma1.4.2.exe al instalar -->
+		    <Custom Action="Exec_Cmd" Before="InstallFinalize">
+			NOT Installed AND NOT REMOVE</Custom>
+            <Custom Action="ExecProperty" Before="InstallFinalize">
+			NOT Installed AND NOT REMOVE</Custom>
+			
+			<!-- Ejecuta el uninstall.exe al desinstalar -->
+			<Custom Action="Exec_Cmd2" Before='InstallFinalize'>
+			(NOT UPGRADINGPRODUCTCODE) AND (REMOVE="ALL")</Custom>
+			<Custom Action="ExecProperty2" Before='InstallFinalize'>
+			(NOT UPGRADINGPRODUCTCODE) AND (REMOVE="ALL")</Custom>
+		</InstallExecuteSequence>
+    </Product>
+</Wix>

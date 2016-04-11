@@ -35,6 +35,14 @@ public enum AOKeyStore {
 		new CachePasswordCallback("osxdummy".toCharArray()), //$NON-NLS-1$
 		new CachePasswordCallback("osxdummy".toCharArray()) //$NON-NLS-1$
 	),
+	/** NSS compartido (de sistema). */
+	SHARED_NSS(
+		"NSS", //$NON-NLS-1$
+		2,
+		"PKCS11", //$NON-NLS-1$
+		NullPasswordCallback.getInstance(),
+		new UIPasswordCallback(KeyStoreMessages.getString("AOKeyStore.13")) //$NON-NLS-1$
+	),
     /** PKCS#12. */
     PKCS12(
 		"PKCS#12 / PFX", //$NON-NLS-1$
@@ -120,7 +128,7 @@ public enum AOKeyStore {
 	),
     /** DNIe con controlador nativo Java. */
     DNIEJAVA(
-		"DNIe 100% Java", //$NON-NLS-1$
+		"DNIe y tarjetas FNMT-TIF", //$NON-NLS-1$
 		14,
 		"DNI", //$NON-NLS-1$
 		null,

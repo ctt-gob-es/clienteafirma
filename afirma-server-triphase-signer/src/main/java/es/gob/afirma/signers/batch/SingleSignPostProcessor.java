@@ -3,12 +3,13 @@ package es.gob.afirma.signers.batch;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
-import java.util.Collections;
+import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.signers.ExtraParamsProcessor;
 import es.gob.afirma.core.signers.ExtraParamsProcessor.IncompatiblePolicyException;
 import es.gob.afirma.core.signers.TriphaseData;
@@ -62,7 +63,7 @@ final class SingleSignPostProcessor {
 
 		Properties extraParams;
 		try {
-			extraParams = ExtraParamsProcessor.expandProperties(sSign.getExtraParams());
+			extraParams = ExtraParamsProcessor.expandProperties(sSign.getExtraParams(), null, sSign.getSignFormat().name());
 		}
 		catch (final IncompatiblePolicyException e) {
 			Logger.getLogger("es.gob.afirma").log( //$NON-NLS-1$
@@ -92,6 +93,24 @@ final class SingleSignPostProcessor {
 					td.toString().getBytes()
 				);
 				break;
+			case COUNTERSIGN:
+				final CounterSignTarget target = CounterSignTarget.getTarget(
+					extraParams.getProperty("target", CounterSignTarget.LEAFS.name()) //$NON-NLS-1$
+				);
+				if (!target.equals(CounterSignTarget.LEAFS) && !target.equals(CounterSignTarget.TREE)) {
+					throw new IllegalArgumentException(
+						"Objetivo de contrafirma no soportado en proceso por lotes: " + target //$NON-NLS-1$
+					);
+				}
+				signedDoc = prep.preProcessPostCounterSign(
+					docBytes,
+					algorithm.toString(),
+					certChain,
+					extraParams,
+					td,
+					target
+				);
+				break;
 			default:
 				throw new UnsupportedOperationException(
 					"Operacion no soportada: " + sSign.getSubOperation() //$NON-NLS-1$
@@ -111,18 +130,14 @@ final class SingleSignPostProcessor {
 		if (td == null) {
 			throw new IllegalArgumentException("Los datos trifasicos no pueden ser nulos"); //$NON-NLS-1$
 		}
-		final TriSign tmpTs = td.getTriSign(signId);
+		final List<TriSign> tmpTs = td.getTriSigns(signId);
 		if (tmpTs == null) {
 			throw new IllegalArgumentException(
 				"Los datos trifasicos proporcionados no contienen una firma con ID=" + signId //$NON-NLS-1$
 			);
 		}
-		// Creamos una TriSign con el constructor de copia
-		final TriSign ts = new TriSign(
-			td.getTriSign(signId)
-		);
-		final TriphaseData ret = new TriphaseData(Collections.singletonList(ts));
-		return ret;
+
+		return new TriphaseData(tmpTs);
 	}
 
 }

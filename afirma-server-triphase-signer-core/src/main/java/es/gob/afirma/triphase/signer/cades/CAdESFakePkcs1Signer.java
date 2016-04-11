@@ -27,8 +27,11 @@ import es.gob.afirma.core.signers.TriphaseData.TriSign;
 
 /** Sustituto del firmador PKCS#1 para firmas trif&aacute;sicas.
  * No firma realmente, sino que devuelve unos datos aleatorios del tama&ntilde;o adecuado y
- * guarda estos m&aacute;s los datos que deben ser firmados para en el cliente pueda realizarse
- * la firma y la sustituci&oacute;n de los datos aleatorios por la firma real.
+ * guarda estos m&aacute;s los datos que deben ser firmados para que en el cliente pueda
+ * realizarse la firma. Si se construye un objeto con los datos generados en cliente,
+ * se dispondr&aacute; de los PKCS1 para sustituir en la verdadera firma. Los datos dummy
+ * son siempre los mismos para los mismos datos, ya que se compone a base de concatenar el
+ * hash de esos datos. Por eso, puede directamente sustituirse en la postfirma.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public final class CAdESFakePkcs1Signer implements AOSimpleSigner {
 

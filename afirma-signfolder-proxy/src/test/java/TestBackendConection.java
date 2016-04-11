@@ -20,6 +20,7 @@ import org.junit.Test;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.http.UrlHttpManager;
 import es.gob.afirma.core.misc.http.UrlHttpManagerFactory;
+import es.gob.afirma.core.misc.http.UrlHttpMethod;
 import es.gob.afirma.signfolder.client.MobileApplication;
 import es.gob.afirma.signfolder.client.MobileDocument;
 import es.gob.afirma.signfolder.client.MobileRequest;
@@ -347,7 +348,7 @@ public class TestBackendConection {
 
 		final UrlHttpManager manager = UrlHttpManagerFactory.getInstalledManager();
 
-		final byte[] result = manager.readUrlByPost(urlBuilder.toString());
+		final byte[] result = manager.readUrl(urlBuilder.toString(), UrlHttpMethod.POST);
 
 		System.out.println(new String(result));
 	}

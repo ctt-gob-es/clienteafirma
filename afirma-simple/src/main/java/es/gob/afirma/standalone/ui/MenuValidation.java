@@ -1,20 +1,15 @@
 package es.gob.afirma.standalone.ui;
 
-import java.awt.Cursor;
 import java.awt.Frame;
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.security.cert.CertificateException;
-import java.security.cert.CertificateFactory;
-import java.security.cert.X509Certificate;
 import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
@@ -22,15 +17,12 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
-import javax.swing.SwingUtilities;
 
-import es.gob.afirma.cert.certvalidation.CertificateVerifierFactory;
-import es.gob.afirma.cert.certvalidation.CertificateVerifierFactoryException;
-import es.gob.afirma.cert.certvalidation.ValidationResult;
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.AOUtil;
-import es.gob.afirma.core.misc.Base64;
+import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.ui.AOUIFactory;
+import es.gob.afirma.standalone.AutoFirmaUtil;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.VisorFirma;
 
@@ -40,24 +32,16 @@ final class MenuValidation extends JMenu {
 
 	protected static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
-	private static final String BEGIN_CERTIFICATE = "-----BEGIN CERTIFICATE-----"; //$NON-NLS-1$
-	private static final String END_CERTIFICATE = "-----END CERTIFICATE-----"; //$NON-NLS-1$
-
 	private final Frame parent;
 
 	MenuValidation(final Frame p) {
 		this.parent = p;
-		SwingUtilities.invokeLater(
-			new Runnable() {
-				@Override
-				public void run() {
-					createUI();
-				}
-			}
-		);
+		createUI();
 	}
 
 	void createUI() {
+
+		final boolean isMac = Platform.OS.MACOSX.equals(Platform.getOS());
 
 		setText(SimpleAfirmaMessages.getString("MenuValidation.0")); //$NON-NLS-1$
         setMnemonic(KeyEvent.VK_V);
@@ -68,7 +52,7 @@ final class MenuValidation extends JMenu {
         certValidationMenu.setAccelerator(
     		KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask())
 		);
-        certValidationMenu.setMnemonic(KeyEvent.VK_C);
+
         certValidationMenu.getAccessibleContext().setAccessibleDescription(
     		SimpleAfirmaMessages.getString("MenuValidation.2") //$NON-NLS-1$
 		);
@@ -89,7 +73,10 @@ final class MenuValidation extends JMenu {
         signValidationMenu.setAccelerator(
     		KeyStroke.getKeyStroke(KeyEvent.VK_I, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask())
 		);
-        signValidationMenu.setMnemonic(KeyEvent.VK_I);
+        if (!isMac) {
+        	certValidationMenu.setMnemonic(KeyEvent.VK_C);
+        	signValidationMenu.setMnemonic(KeyEvent.VK_I);
+        }
         certValidationMenu.getAccessibleContext().setAccessibleDescription(
     		SimpleAfirmaMessages.getString("MenuValidation.13") //$NON-NLS-1$
 		);
@@ -105,15 +92,6 @@ final class MenuValidation extends JMenu {
 	}
 
 	void validateSign() {
-		Image icon = null;
-		try {
-			icon = ImageIO.read(MenuValidation.class.getResource("/resources/afirma_ico.png")); //$NON-NLS-1$
-		}
-		catch (final IOException e) {
-			LOGGER.warning(
-				"No ha podido cargarse el icono del dialogo: " + e //$NON-NLS-1$
-			);
-		}
 		final File sign;
 		try {
 			sign = AOUIFactory.getLoadFiles(
@@ -124,7 +102,7 @@ final class MenuValidation extends JMenu {
 				SimpleAfirmaMessages.getString("MenuValidation.17"), //$NON-NLS-1$
 				false,
 				false,
-				icon,
+				AutoFirmaUtil.getDefaultDialogsIcon(),
 				this.parent
 			)[0];
 		}
@@ -133,7 +111,7 @@ final class MenuValidation extends JMenu {
 		}
 		if (!sign.canRead()) {
 			AOUIFactory.showErrorMessage(
-				icon,
+				AutoFirmaUtil.getDefaultDialogsIcon(),
 				SimpleAfirmaMessages.getString("MenuValidation.6"), //$NON-NLS-1$
 				SimpleAfirmaMessages.getString("MenuValidation.5"), //$NON-NLS-1$
 				JOptionPane.ERROR_MESSAGE
@@ -194,83 +172,8 @@ final class MenuValidation extends JMenu {
 			);
 			return;
 		}
-		final String certString = new String(certBytes);
-		if (certString.contains(BEGIN_CERTIFICATE)) {
-			try {
-				certBytes = Base64.decode(
-					certString.substring(
-						certString.indexOf(BEGIN_CERTIFICATE) + BEGIN_CERTIFICATE.length(),
-						certString.indexOf(END_CERTIFICATE)
-					)
-				);
-			}
-			catch (final Exception e) {
-				LOGGER.severe("Certificado PEM corrupto (" + cert.getAbsolutePath() + "): " + e); //$NON-NLS-1$ //$NON-NLS-2$
-				AOUIFactory.showErrorMessage(
-					icon,
-					SimpleAfirmaMessages.getString("MenuValidation.8"), //$NON-NLS-1$
-					SimpleAfirmaMessages.getString("MenuValidation.5"), //$NON-NLS-1$
-					JOptionPane.ERROR_MESSAGE
-				);
-				return;
-			}
-		}
-		final X509Certificate certificate;
-		try {
-			certificate = (X509Certificate) CertificateFactory.getInstance("X.509").generateCertificate( //$NON-NLS-1$
-				new ByteArrayInputStream(certBytes)
-			);
-		}
-		catch (final CertificateException e) {
-			LOGGER.severe("Error en la generacion del certificado (" + cert.getAbsolutePath() + "): " + e); //$NON-NLS-1$ //$NON-NLS-2$
-			AOUIFactory.showErrorMessage(
-				icon,
-				SimpleAfirmaMessages.getString("MenuValidation.8"), //$NON-NLS-1$
-				SimpleAfirmaMessages.getString("MenuValidation.5"), //$NON-NLS-1$
-				JOptionPane.ERROR_MESSAGE
-			);
-			return;
-		}
 
-		(this.parent != null ? this.parent : this).setCursor(new Cursor(Cursor.WAIT_CURSOR));
-
-		final ValidationResult vr;
-		try {
-			vr = CertificateVerifierFactory.getCertificateVerifier(certificate).validateCertificate();
-		}
-		catch (final CertificateVerifierFactoryException e) {
-			LOGGER.severe(
-				"No se conocen mecanismos de validacion para los certificados de este emisor (" + certificate.getIssuerX500Principal() + "): " + e //$NON-NLS-1$ //$NON-NLS-2$
-			);
-			AOUIFactory.showErrorMessage(
-				icon,
-				SimpleAfirmaMessages.getString("MenuValidation.9"), //$NON-NLS-1$
-				SimpleAfirmaMessages.getString("MenuValidation.5"), //$NON-NLS-1$
-				JOptionPane.ERROR_MESSAGE
-			);
-			(this.parent != null ? this.parent : this).setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-			return;
-		}
-
-		if (!ValidationResult.VALID.equals(vr)) {
-			AOUIFactory.showErrorMessage(
-				icon,
-				"<html>" + SimpleAfirmaMessages.getString("MenuValidation.11") + "<br>" + vr.toString() + "</html>", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-				SimpleAfirmaMessages.getString("MenuValidation.10"), //$NON-NLS-1$
-				JOptionPane.WARNING_MESSAGE
-			);
-		}
-		else {
-			AOUIFactory.showMessageDialog(
-				this.parent,
-				SimpleAfirmaMessages.getString("MenuValidation.14"), //$NON-NLS-1$
-				SimpleAfirmaMessages.getString("MenuValidation.15"), //$NON-NLS-1$
-				JOptionPane.INFORMATION_MESSAGE
-			);
-		}
-
-		(this.parent != null ? this.parent : this).setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-
+		CertValidationUi.validateCert(certBytes, this.parent, this, icon);
 	}
 
 }

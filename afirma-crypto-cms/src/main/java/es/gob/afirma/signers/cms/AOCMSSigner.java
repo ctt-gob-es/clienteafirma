@@ -20,7 +20,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Logger;
 
-import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
+import org.spongycastle.asn1.pkcs.PKCSObjectIdentifiers;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOInvalidFormatException;
@@ -29,7 +29,7 @@ import es.gob.afirma.core.signers.AOSignInfo;
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.util.tree.AOTreeModel;
-import es.gob.afirma.signers.pkcs7.BCChecker;
+import es.gob.afirma.signers.pkcs7.SCChecker;
 import es.gob.afirma.signers.pkcs7.ObtainContentSignedData;
 import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
 import es.gob.afirma.signers.pkcs7.ReadNodesTree;
@@ -61,7 +61,7 @@ public final class AOCMSSigner implements AOSigner {
 			           final java.security.cert.Certificate[] certChain,
 			           final Properties xParams) throws AOException, IOException {
 
-    	new BCChecker().checkBouncyCastle();
+    	new SCChecker().checkSpongyCastle();
 
         final Properties extraParams = xParams != null ? xParams : new Properties();
 
@@ -113,7 +113,7 @@ public final class AOCMSSigner implements AOSigner {
 			             final java.security.cert.Certificate[] certChain,
 			             final Properties xParams) throws AOException, IOException {
 
-    	new BCChecker().checkBouncyCastle();
+    	new SCChecker().checkSpongyCastle();
 
         final Properties extraParams = xParams != null ? xParams : new Properties();
 
@@ -155,7 +155,7 @@ public final class AOCMSSigner implements AOSigner {
 			             final java.security.cert.Certificate[] certChain,
 			             final Properties extraParams) throws AOException, IOException {
 
-    	new BCChecker().checkBouncyCastle();
+    	new SCChecker().checkSpongyCastle();
 
         // tipos de datos a firmar.
         if (this.dataType == null) {
@@ -187,7 +187,7 @@ public final class AOCMSSigner implements AOSigner {
                               final java.security.cert.Certificate[] certChain,
                               final Properties extraParams) throws AOException, IOException {
 
-    	new BCChecker().checkBouncyCastle();
+    	new SCChecker().checkSpongyCastle();
 
         final P7ContentSignerParameters csp = new P7ContentSignerParameters(sign, algorithm);
 
@@ -293,7 +293,7 @@ public final class AOCMSSigner implements AOSigner {
     /** {@inheritDoc} */
     @Override
 	public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo) {
-    	new BCChecker().checkBouncyCastle();
+    	new SCChecker().checkSpongyCastle();
         final ReadNodesTree rn = new ReadNodesTree();
         try {
             return rn.readNodesTree(sign, asSimpleSignInfo);

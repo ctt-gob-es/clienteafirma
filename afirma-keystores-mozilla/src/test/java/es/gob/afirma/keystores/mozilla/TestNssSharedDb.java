@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import org.junit.Test;
 
 import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.core.misc.BoundedBufferedReader;
 
 /** Pruebas de la configuraci&oacute;n especial de NSS compartido.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
@@ -22,10 +23,12 @@ public final class TestNssSharedDb {
 			TestNssSharedDb.class.getResourceAsStream("/pkcs11.txt") //$NON-NLS-1$
 		);
 
-		final BufferedReader br = new BufferedReader(
+		final BufferedReader br = new BoundedBufferedReader(
 			new InputStreamReader(
 				new ByteArrayInputStream(pkcs11Txt)
-			)
+			),
+			512, // Maximo 512 lineas
+			4096 // Maximo 4KB por linea
 		);
 	    String line;
 	    while ((line = br.readLine()) != null) {

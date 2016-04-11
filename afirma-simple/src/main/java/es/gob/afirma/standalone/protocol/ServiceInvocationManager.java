@@ -12,7 +12,6 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
@@ -33,12 +32,19 @@ import javax.net.ssl.SSLSocket;
 import javax.swing.Timer;
 
 import es.gob.afirma.core.misc.Base64;
+import es.gob.afirma.standalone.AutoFirmaUtil;
 
 final class ServiceInvocationManager {
 
 	static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	private static final int READ_BUFFER_SIZE = 2048;
+
+	/** Tamano del segmento de cada fragmento de datos que se lea del sokect que se mantendra
+	 * almacenado por si el segmento de fin de entrada queda dividido entre dos fragmentos. El valor
+	 * permite que quepa al completo en un subfragmente la etiqueta EOF y la etiqueta idSession con
+	 * su valor. */
+	private static final int BUFFERED_SECURITY_RANGE = 36;
 
 	/** Tiempo de espera de cada socket en milisegundos. */
 	private static int SOCKET_TIMEOUT = 60000;
@@ -116,7 +122,7 @@ final class ServiceInvocationManager {
 
 		try {
 			// ruta de la que debe buscar el fichero
-			final File sslKeyStoreFile = new File(getApplicationDirectory(), KEYSTORE_NAME);
+			final File sslKeyStoreFile = new File(AutoFirmaUtil.getApplicationDirectory(), KEYSTORE_NAME);
 			// pass del fichero
 			final char ksPass[] = KSPASS.toCharArray();
 			final char ctPass[] = CTPASS.toCharArray();
@@ -149,7 +155,7 @@ final class ServiceInvocationManager {
 						continue;
 					}
 					try {
-						final String httpRequest = read(socketChannel);
+						final String httpRequest = read(socketChannel.getInputStream());
 
 						// comprobamos que la peticion no es vacia
 						if (httpRequest.trim().length() != 0 ) {
@@ -333,49 +339,95 @@ final class ServiceInvocationManager {
 
 	/** Lee los datos recibidos en el socket.
 	 * Si el certificado no es correcto, al leer los datos del socket se reciben cadenas de texto en blanco.
-	 * @param socketChannel SocketChannel donde se han recibido los datos.
+	 * @param socketIs Flujo de entrada de datos del socket..
 	 * @return Los datos recibidos.
 	 * @throws IOException Si ocurren errores durante la lectura. */
-	private static String read(final SSLSocket socketChannel) throws IOException {
+	private static String read(final InputStream socketIs) throws IOException {
+		// Buffer en el que se ira almacenando toda la entrada
 		final StringBuilder data = new StringBuilder();
+		// Cadena que se ira actualizando para contener siempre la union de los
+		// 2 ultimos fragmentos con un tamano de 50 caracteres (suficiente para
+		// contener el fragmento de fin y el identificador de sesion)
+		String subFragment = ""; //$NON-NLS-1$
 		final byte[] reqBuffer = new byte[READ_BUFFER_SIZE];
 		boolean readed = true;
 		String insert;
 		// Limite de lecturas vacias de una peticion.
 		int limit = 10;
-		final InputStream socketIs = socketChannel.getInputStream();
 		while (readed) {
 			socketIs.read(reqBuffer);
 			insert = new String(reqBuffer, StandardCharsets.UTF_8);
-			if(insert.indexOf(EOF) != -1) {
+
+			subFragment += insert.substring(0, Math.min(BUFFERED_SECURITY_RANGE, insert.length()));
+
+			// Comprobamos si la etiqueta de fin se encuentra en el nuevo fragmento o si esta a medias
+			// entre este y el anterior. En base a eso, tendremos que agregar o quitar datos del buffer
+			if (subFragment.indexOf(EOF) != -1 || insert.indexOf(EOF) != -1) {
+
 				readed = false;
-				// Comprobamos si la peticion tiene un ID sesion y que esta se ajuste al indicado en la llamada por protocolo si se proporciono
-				final int sessionIdx = insert.indexOf(IDSESSION);
-				if (idSession != null){
-					// se esperaba un idSession y no se ha recibido
-					if (sessionIdx < 0) {
-						throw new IllegalArgumentException("No se ha recibido el idSession esperado."); //$NON-NLS-1$
+
+				final boolean findOnSubFragment;
+				int eofPos;
+				int idSessionPos;
+				String requestSessionId = null;
+
+				// Si se detecta el fragmento de fin en la union de ambos fragmentos,
+				// comprobamos si parte del contenido del buffer sobra o si hay algo que agregar
+				if (subFragment.indexOf(EOF) != -1) {
+					findOnSubFragment = true;
+					eofPos = subFragment.indexOf(EOF);
+					idSessionPos = subFragment.indexOf(IDSESSION);
+					if (idSessionPos != -1) {
+						requestSessionId = subFragment.substring(
+								idSessionPos + IDSESSION.length() + 1,
+								eofPos);
 					}
-					checkIdSession(insert.substring(sessionIdx));
-					data.append(insert.substring(0, sessionIdx));
 				}
-				// No hemos recibido un idSession por protocolo.
 				else {
-					// En caso de haber recibido idSession lo descartamos de la peticion ya que no lo recibimos por protocolo
-					if (sessionIdx >= 0) {
-						data.append(insert.substring(0, sessionIdx));
-					}
-					else {
-						data.append(insert.substring(0, insert.indexOf(EOF)));
+					findOnSubFragment = false;
+					eofPos = insert.indexOf(EOF);
+					idSessionPos = insert.indexOf(IDSESSION);
+					if (idSessionPos != -1) {
+						requestSessionId = insert.substring(
+								idSessionPos + IDSESSION.length() + 1,
+								eofPos);
 					}
 				}
 
+				// Comprobamos que el id de sesion transmitido es correcto
+				checkIdSession(requestSessionId);
+
+				if (findOnSubFragment) {
+					// Si el id de session es anterior al rango de seguridad, en el buffer de
+					// la peticion se habra introducido parte de este identificador y hay que
+					// borrarlos.
+					if (idSessionPos != -1 && idSessionPos < BUFFERED_SECURITY_RANGE) {
+						data.replace(data.length() - (BUFFERED_SECURITY_RANGE - idSessionPos), data.length(), ""); //$NON-NLS-1$
+					}
+					// Si la posicion del EOF es anterior al rango de seguridad, entonces
+					// en el buffer de la peticion se ha introducido parte de esta etiqueta
+					// y hay que borrarla.
+					else if (eofPos < BUFFERED_SECURITY_RANGE) {
+						data.replace(data.length() - (BUFFERED_SECURITY_RANGE - eofPos), data.length(), ""); //$NON-NLS-1$
+					}
+					// Si tanto el EOF como el id de sesion (en caso de haber) son posteriores
+					// al rango de seguridad, solo habra que incorporar los datos encontrados
+					// antes de estas posiciones (siempre y cuando no esten al principio, en
+					// cuyo caso, no hay que agregar nada)
+					else if (idSessionPos > 0 || eofPos > 0) {
+						data.append(subFragment.substring(0, idSessionPos > -1 ? idSessionPos : eofPos));
+					}
+				}
+				else {
+					data.append(insert.substring(0, idSessionPos > -1 ? idSessionPos : eofPos));
+				}
 			}
 			else {
-				// Si el certificado es erroneo, la conexion SSL no segura en lugar de leer los datos
-				// lee una cadena de caracteres en blanco.
+				// Es posible que se lean caracteres en blanco si el certificado es erroneo y/o la
+				// conexion SSL no segura. Hay que asegurarse de no agregarlos al buffer.
 				if (!insert.trim().isEmpty()) {
 					data.append(insert);
+					subFragment = insert.substring(Math.max(0, insert.length() - BUFFERED_SECURITY_RANGE));
 				}
 				// Para evitar un error de memoria si llegamos la maximo numero de caracteres vacios devolvemos una cadena vacia que sera ignorada
 				else {
@@ -548,16 +600,16 @@ final class ServiceInvocationManager {
 		}
 		// si no es una operacion save y nos vuelven a pedir una parte.
 		if (!isSave){
-		    sendData(createHttpResponse(true, Integer.toString(parts)), socketChannel, "Se mandaran " + parts + "partes");  //$NON-NLS-1$//$NON-NLS-2$
+		    sendData(
+	    		createHttpResponse(true, Integer.toString(parts)), socketChannel, "Se mandaran " + parts + " partes"  //$NON-NLS-1$//$NON-NLS-2$
+    		);
 		}
 	}
 
-	/**
-	 * Realiza las acciones pertinentes en caso de que la petici&oacute;n contenga una peticion cmd=.
-	 * @param cmd Valor del par&aacute;metro CMD.
-	 * @param socketChannel Socket donde se recibe la petici&oacute;n.
-	 * @throws IOException Error en la lectura o env&iacute;o de datos.
-	 */
+	/** Realiza las acciones pertinentes en caso de que la petici&oacute;n contenga una peticion <code>cmd=</code>.
+	 * @param cmd Valor del par&aacute;metro <code>cmd</code>.
+	 * @param socketChannel <i>Socket</i> donde se recibe la petici&oacute;n.
+	 * @throws IOException Error en la lectura o en el env&iacute;o de datos. */
 	private static void doCmdPetition (final String cmd, final Socket socketChannel) throws IOException{
 		final String cmdUri = new String(Base64.decode(cmd.trim(), true));
 		if (cmdUri.startsWith(AFIRMA) && !(cmdUri.startsWith(AFIRMA2) || cmdUri.startsWith(AFIRMA3))) {
@@ -683,28 +735,12 @@ final class ServiceInvocationManager {
 
 	/**
 	 * Comprueba que el idSession de la petici&oacute;n recibida coincida con el idSession generado al abrir la aplicaci&oacute;n por socket.
-	 * @param petition La parte final de la petici&oacute;n de donde hay que extraer el idSession. */
-	private static void checkIdSession (final String petition) {
-	    final String petitionIdSession = petition.substring(petition.indexOf(IDSESSION)+IDSESSION.length()+1, petition.indexOf(EOF));
-        if (!petitionIdSession.equals(idSession)){
-            throw new IllegalArgumentException("No coinciden los idSession recibidos."); //$NON-NLS-1$
-        }
-	}
-
-	/** Recupera el directorio en el que se encuentra la aplicaci&oacute;n.
-	 * @return Directorio de ejecuci&oacute;n. */
-	private static File getApplicationDirectory() {
-		File appDir;
-		try {
-			appDir = new File(
-				ServiceInvocationManager.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()
-			).getParentFile();
+	 * @param requestSessionId Identificador de sesi&oacute;n enviado en la petici&oacute;n. */
+	private static void checkIdSession (final String requestSessionId) {
+		// se esperaba un idSession y no se ha recibido
+		if (idSession != null && !idSession.equals(requestSessionId)) {
+			throw new IllegalArgumentException("No se ha recibido el idSession esperado."); //$NON-NLS-1$
 		}
-		catch (final URISyntaxException e) {
-			LOGGER.warning("No se pudo localizar el directorio del fichero en ejecucion"); //$NON-NLS-1$
-			appDir = null;
-		}
-		return appDir;
 	}
 
 	/** Comprueba si una versi&oacute;n de protocolo est&aacute; soportado por la implementaci&oacute;n actual.

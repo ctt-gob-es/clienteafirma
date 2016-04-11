@@ -3,7 +3,7 @@ package es.gob.afirma.triphase.signer.processors;
 import java.util.Properties;
 import java.util.UUID;
 
-final class TriPhaseUtil {
+public final class TriPhaseUtil {
 
 	private static final String PROP_ID = "SignatureId"; //$NON-NLS-1$
 
@@ -11,15 +11,18 @@ final class TriPhaseUtil {
 		// No instanciable
 	}
 
-	static String getSignatureId(final Properties extraParams) {
-		if (extraParams == null) {
+	/**
+	 * Recupera de los par&aacute;metros de configuraci&oacute;n el identificado de la firma
+	 * que se est&aacute; procesando y, en caso de no estar reflejado, genera un identificador
+	 * y lo agrega al extraParams.
+	 * @param extraParams Par&aacute;metro de configuraci&oacute;n de la firma.
+	 * @return Identificador de la firma.
+	 */
+	public static String getSignatureId(final Properties extraParams) {
+		if (extraParams == null || !extraParams.containsKey(PROP_ID)) {
 			return UUID.randomUUID().toString();
 		}
-		final String id = extraParams.getProperty(PROP_ID);
-		if (id == null) {
-			return UUID.randomUUID().toString();
-		}
-		return id;
+		return extraParams.getProperty(PROP_ID);
 	}
 
 }

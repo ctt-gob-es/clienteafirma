@@ -3,6 +3,7 @@ package es.gob.afirma.standalone.protocol;
 import java.io.IOException;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.security.auth.callback.PasswordCallback;
@@ -10,6 +11,7 @@ import javax.security.auth.callback.PasswordCallback;
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.http.UrlHttpManagerFactory;
+import es.gob.afirma.core.misc.http.UrlHttpMethod;
 import es.gob.afirma.core.misc.protocol.UrlParametersForBatch;
 import es.gob.afirma.keystores.AOCertificatesNotFoundException;
 import es.gob.afirma.keystores.AOKeyStore;
@@ -41,8 +43,9 @@ final class ProtocolInvocationLauncherBatch {
 	 *                 <code>false</code> para usar servidor intermedio.
 	 * @return XML de respuesta del procesado.
 	 * @throws SocketOperationException Si hay errores en la
-	 *                                                        comunicaci&oacute;n por <i>socket</i> local. */
-	static String processBatch(final UrlParametersForBatch options, final boolean bySocket) throws SocketOperationException {
+	 *                                  comunicaci&oacute;n por <i>socket</i> local. */
+	static String processBatch(final UrlParametersForBatch options,
+			                   final boolean bySocket) throws SocketOperationException {
 
 		final AOKeyStore aoks = AOKeyStore.valueOf(options.getDefaultKeyStore());
 		if (aoks == null) {
@@ -76,7 +79,15 @@ final class ProtocolInvocationLauncherBatch {
 		final boolean mandatoryCertificate = filterManager.isMandatoryCertificate();
 		final PrivateKeyEntry pke;
 		try {
-			final AOKeyStoreDialog dialog = new AOKeyStoreDialog(ksm, null, true, true, true, filters, mandatoryCertificate);
+			final AOKeyStoreDialog dialog = new AOKeyStoreDialog(
+				ksm,
+				null,
+				true,
+				true, // showExpiredCertificates
+				true, // checkValidity
+				filters,
+				mandatoryCertificate
+			);
 			dialog.show();
 			pke = ksm.getKeyEntry(
 				dialog.getSelectedAlias()
@@ -108,22 +119,23 @@ final class ProtocolInvocationLauncherBatch {
 
 		String batchResult;
 		try {
-			batchResult =
-					BatchSigner.sign(
-							Base64.encode(options.getData(), true),
-							options.getBatchPresignerUrl(),
-							options.getBatchPostSignerUrl(),
-							pke.getCertificateChain(),
-							pke.getPrivateKey()
-					);
+			batchResult = BatchSigner.sign(
+				Base64.encode(options.getData(), true),
+				options.getBatchPresignerUrl(),
+				options.getBatchPostSignerUrl(),
+				pke.getCertificateChain(),
+				pke.getPrivateKey()
+			);
 			// Devuelve los datos sin codificar en el caso de peticion por socket, por lo que hay que codificarlo
 			if (bySocket){
 				batchResult = Base64.encode(batchResult.getBytes());
 			}
 		}
-		catch (final Exception e) {
-			LOGGER.severe(
-				"Error en el proceso del lote de firmas: " + e //$NON-NLS-1$
+		catch(final Exception e) {
+			LOGGER.log(
+				Level.SEVERE,
+				"Error en el proceso del lote de firmas: " + e, //$NON-NLS-1$
+				e
 			);
 			ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_20);
 			if (!bySocket){
@@ -195,7 +207,7 @@ final class ProtocolInvocationLauncherBatch {
 		url.append("&dat=").append(data); //$NON-NLS-1$
 
 		// Llamamos al servicio para guardar los datos
-		final byte[] result = UrlHttpManagerFactory.getInstalledManager().readUrlByPost(url.toString());
+		final byte[] result = UrlHttpManagerFactory.getInstalledManager().readUrl(url.toString(), UrlHttpMethod.POST);
 
 		LOGGER.info(
 			"Resultado del envio de datos de lote al servidor intermedio: " + new String(result) //$NON-NLS-1$

@@ -50,7 +50,7 @@
  *   <li>Dependencia con el m&oacute;dulo N&uacute;cleo (<i>afirma-core</i>) del Cliente.</li>
  *   <li>Dependencia con el m&oacute;dulo PKCS#7 (<i>afirma-crypto-core-pkcs7</i>) del Cliente.</li>
  *   <li>Dependencia con el m&oacute;dulo CAdES (<i>afirma-crypto-cades</i>) del Cliente.</li>
- *   <li>Dependencia con BouncyCastle 1.49 o superior.</li>
+ *   <li>Dependencia con SpongyCastle 1.54 o superior.</li>
  *   <li>Dependencia con iText 2.1.7<sup>*</sup></li>
  *  </ul>
  *  <p>

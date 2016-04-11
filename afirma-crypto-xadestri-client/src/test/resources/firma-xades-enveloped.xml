@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CATALOG>
+  <PLANT Id="1">
+    <COMMON>Bloodroot</COMMON>
+    <BOTANICAL>Sanguinaria canadensis</BOTANICAL>
+    <ZONE>4</ZONE>
+    <LIGHT>Mostly Shady</LIGHT>
+    <PRICE>$2.44</PRICE>
+    <AVAILABILITY>031599</AVAILABILITY>
+  </PLANT>
+  
+  <PLANT Id="2">
+    <COMMON>Columbine</COMMON>
+    <BOTANICAL>Aquilegia canadensis</BOTANICAL>
+    <ZONE>3</ZONE>
+    <LIGHT>Mostly Shady</LIGHT>
+    <PRICE>$9.37</PRICE>
+    <AVAILABILITY>030699</AVAILABILITY>
+  </PLANT>
+  
+  <PLANT Id="3">
+    <COMMON>Marsh Marigold</COMMON>
+    <BOTANICAL>Caltha palustris</BOTANICAL>
+    <ZONE>4</ZONE>
+    <LIGHT>Mostly Sunny</LIGHT>
+    <PRICE>$6.81</PRICE>
+    <AVAILABILITY>051799</AVAILABILITY>
+  </PLANT>
+  
+  <PLANT Id="4">
+    <COMMON>Cowslip</COMMON>
+    <BOTANICAL>Caltha palustris</BOTANICAL>
+    <ZONE>4</ZONE>
+    <LIGHT>Mostly Shady</LIGHT>
+    <PRICE>$9.90</PRICE>
+    <AVAILABILITY>030699</AVAILABILITY>
+  </PLANT>
+<ds:Signature Id="Signature-f6a0cc31-b6a8-4f42-8fe2-c42706c1080d-Signature" xmlns:ds="http://www.w3.org/2000/09/xmldsig#"><ds:SignedInfo><ds:CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/><ds:SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/><ds:Reference Id="Reference-c8bf6963-33be-496f-b2c5-e64e9d9a8abb" Type="http://www.w3.org/2000/09/xmldsig#Object" URI=""><ds:Transforms><ds:Transform Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/><ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/><ds:Transform Algorithm="http://www.w3.org/TR/1999/REC-xpath-19991116"><ds:XPath xmlns:ds="http://www.w3.org/2000/09/xmldsig#">not(ancestor-or-self::ds:Signature)</ds:XPath></ds:Transform></ds:Transforms><ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha512"/><ds:DigestValue>9vN7+MFe1iE1OMsBu+QEjARy0wYFReEN81OD+YdvFk0XBG6dOnje719tdc+bhmfuawQtFGLP5AC+
+PK5+XFVoTw==</ds:DigestValue></ds:Reference><ds:Reference Type="http://uri.etsi.org/01903#SignedProperties" URI="#Signature-f6a0cc31-b6a8-4f42-8fe2-c42706c1080d-SignedProperties"><ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha512"/><ds:DigestValue>f3aiBujPOqqc+H/OFBMnF+XCgb/FJ6Y83JjBjZO3wuJdx/+xK/ckud0zx2CmAM0zUtoE3ZIOnZpS
+Wxq9VYVWkg==</ds:DigestValue></ds:Reference><ds:Reference URI="#Signature-f6a0cc31-b6a8-4f42-8fe2-c42706c1080d-KeyInfo"><ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha512"/><ds:DigestValue>2Kp61b8tUzm5NGVspKxHo65VNHGj8PsotNs90aWnmbkLqQj4ocfTsEJBAI81ztaeQE7/vxVlzXFg
+tKCLTwv8iw==</ds:DigestValue></ds:Reference></ds:SignedInfo><ds:SignatureValue Id="Signature-f6a0cc31-b6a8-4f42-8fe2-c42706c1080d-SignatureValue">k/OzXP5ml+q1aO9Mjpu44l/4KPfz5ummmOcv0pWkaBBrWkwiL3+r/SHFIyGzmx6p004VBgMyLNRsDeypK+A6sTDUxSyHZLwukbNWTlFPDXeO82mqFOcDGGmLRTxfQQq2xDtkIbomUx1tN703OtktGNMfoeMDTwWrhqm4EX0SbX8=</ds:SignatureValue><ds:KeyInfo Id="Signature-f6a0cc31-b6a8-4f42-8fe2-c42706c1080d-KeyInfo"><ds:X509Data><ds:X509Certificate>MIIKATCCB+mgAwIBAgIIBRpYweGvykAwDQYJKoZIhvcNAQEFBQAwggEhMQswCQYDVQQGEwJFUzES
+MBAGA1UECAwJQmFyY2Vsb25hMVgwVgYDVQQHDE9CYXJjZWxvbmEgKHNlZSBjdXJyZW50IGFkZHJl
+c3MgYXQgaHR0cDovL3d3dy5hbmYuZXMvZXMvYWRkcmVzcy1kaXJlY2Npb24uaHRtbCApMScwJQYD
+VQQKDB5BTkYgQXV0b3JpZGFkIGRlIENlcnRpZmljYWNpb24xLjAsBgNVBAsMJUFORiBBdXRvcmlk
+YWQgSW50ZXJtZWRpYSBkZSBJZGVudGlkYWQxGjAYBgkqhkiG9w0BCQEWC2luZm9AYW5mLmVzMRIw
+EAYDVQQFEwlHNjMyODc1MTAxGzAZBgNVBAMMEkFORiBBc3N1cmVkIElEIENBMTAeFw0xNDA1MjEx
+MzI2MjVaFw0xNjA1MjAxMzI2MjVaMIIBDjE5MDcGA1UECwwwQ2VydGlmaWNhZG8gZGUgQ2xhc2Ug
+MiBkZSBQZXJzb25hIEZpc2ljYSAoRklSTUEpMR0wGwYDVQQDDBRGSVNJQ08gQUNUSVZPIFBSVUVC
+QTEWMBQGA1UEBAwNQUNUSVZPIFBSVUVCQTEPMA0GA1UEKgwGRklTSUNPMRIwEAYDVQQFEwkzODg2
+NDE1OVgxJTAjBgkqhkiG9w0BCQEWFnNlcnZpY2lvdGVjbmljb0BhbmYuZXMxEjAQBgNVBAcMCVBP
+QkxBQ0lPTjESMBAGA1UECAwJUFJPVklOQ0lBMQswCQYDVQQGEwJlczEZMBcGCisGAQQBgZMWAQEM
+CTM4ODY0MTU5WDCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEAl6YyKnT5eNsF4csS1JT2ncR3
+IAnOtoqmypGMkumt+7I/kMmQLSBD3NnO2o9BlZzaXilcfotU0Qow918/yrQWRSiJXaiiEirIASsM
+9xWzhFAkNYDzojyj/bKGhFnIPTwc9ANy6JbASgL6Un8pIrnEzoiFixh6uIS+ysMDVncbKfECAwEA
+AaOCBM4wggTKMBkGCisGAQQBgZMWAQEECwwJMzg4NjQxNTlYMB0GA1UdDgQWBBTB0Pdpj2mGLC8E
+QzBTyXmhNlMVtDAJBgNVHRMEAjAAMDcGCCsGAQUFBwEBBCswKTAnBggrBgEFBQcwAYYbaHR0cDov
+L29jc3AuYW5mLmVzL3NwYWluL0FWMIIBhAYDVR0fBIIBezCCAXcwOqA4oDaGNGh0dHBzOi8vY3Js
+LmFuZi5lcy9jcmwvQU5GX0Fzc3VyZWRfSURfQ0ExX1NIQTI1Ni5jcmwwOqA4oDaGNGh0dHBzOi8v
+d3d3LmFuZi5lcy9jcmwvQU5GX0Fzc3VyZWRfSURfQ0ExX1NIQTI1Ni5jcmwwgfyggfmggfaGcWxk
+YXA6Ly9sZGFwLmFuZi5lczozODkvY249QU5GX0Fzc3VyZWRfSURfQ0ExX1NIQTI1Ni5jcmwsb3U9
+QU5GX0Fzc3VyZWRfSURfQ0ExX1NIQTI1NixvdT1BTkZfR2xvYmFsX1Jvb3RfQ0EsZGM9YW5mpIGA
+MH4xEzARBgoJkiaJk/IsZAEZFgNhbmYxJjAkBgNVBAMMHUFORl9Bc3N1cmVkX0lEX0NBMV9TSEEy
+NTYuY3JsMSIwIAYDVQQLDBlBTkZfQXNzdXJlZF9JRF9DQTFfU0hBMjU2MRswGQYDVQQLDBJBTkZf
+R2xvYmFsX1Jvb3RfQ0EwHwYDVR0jBBgwFoAUNS4t5ikcv4vZSnyeK+CVR9HGTz0wEwYKKwYBBAGB
+jxwKCAQFDANOSUUwHAYJKwYBBAGBjxwTBA8MDTIwMjAyOC01MDMwMzMwKAYKKwYBBAGBjxwTAQQa
+DBgxNjM4OC0zNjc3MDM5MDkzMjI0NDMzMjgwEwYKKwYBBAGBjxwUCAQFDANOSUUwSAYIKwYBBQUH
+AQMEPDA6MAoGCCsGAQUFBwsCMAgGBgQAjkYBATALBgYEAI5GAQMCAQ8wFQYGBACORgECMAsTA0VV
+UgIBAwIBATALBgNVHQ8EBAMCBkAwIQYDVR0RBBowGIEWc2VydmljaW90ZWNuaWNvQGFuZi5lczCB
+6QYDVR0gBIHhMIHeMIHbBg0rBgEEAYGPHAMEAQILMIHJMCkGCCsGAQUFBwIBFh1odHRwczovL3d3
+dy5hbmYuZXMvZG9jdW1lbnRvczCBmwYIKwYBBQUHAgIwgY4MgYtBbnRlcyBkZSBhY2VwdGFyIGVz
+dGUgY2VydGlmaWNhZG8sIGNvbXBydWViZTotQ29uZGljaW9uZXMsIGxpbWl0YWNpb25lcyB5IHVz
+b3MgYXV0b3JpemFkb3Mgc2Vnw7puIENQIGEgbGEgcXVlIHNlIHNvbWV0ZS4tRXN0YWRvIGRlIHZp
+Z2VuY2lhMIHIBgNVHQkEgcAwgb0wDgYDVQQRMQcTBTAwMDAwMBIGA1UEFDELEwk2NjYzMzIyMTEw
+HQYDVQQDMRYTFEZJU0lDTyBBQ1RJVk8gUFJVRUJBMA8GA1UEKjEIEwZGSVNJQ08wFgYDVQQEMQ8T
+DUFDVElWTyBQUlVFQkEwEgYDVQQFMQsTCTM4ODY0MTU5WDATBgNVBAIxDBMKMDcvMDUvMjAxNDAS
+BgNVBAkxCxMJRElSRUNDSU9OMBIGA1UEEDELEwlESVJFQ0NJT04wDQYJKoZIhvcNAQEFBQADggIB
+AIDjkKEWgETlzVpa3W7u1FEII4YZGMvJf1+Bvcp+AVsQAyYl06aOHGhVL+Uc+skANdwsNsnFdzLA
+22D3mapvJDeMToFgEl6aQnuMMBUxsAxtPn2IIJ4ny0duTYiIyr7SiOBzYIczBFOreYG5ZG1UQHTG
+5CB/95arL9oaLaTT9DalC8JogBgviIpcaJpce0vsdGAI35K+HYAOYjUY1Ek2VMWS7BjNlRJhIKqn
+BzU/fQjkzE3nqegzXAZDPu40lQfjUlgiEs5D6R9Dr96RBz6rz4nwzxNfie371qo0nvOHx1yAphuP
+Lf5ZH8wm2w0k+ipCkxq+XQpTn34TVpwaW9RnIyYdcRuQrii/SwPWFb3xtPxYz6Rk4TVQKazmoLPT
+DyTpmUnhNP8QrERzothNH5P3Xo2+KhuVSiFE6dCmg1e6Mur+MiWw/liTsw31BkarCv5oxbJ+FQsi
+xktLi0+SWCpkdY6agYH4WEN49BjSKLPjtBhaOq52JFeRaiAgDCijL4/61Y0rYVc+4D3Jb9FM1gwL
+TT35s5MW1AUzU/VqovgURFWi/G5T1fKb+FLhNLxwb8OF4NC6xh5Llv1Kxt54cmtQT9qow8YQdsSx
+5t7HyemOn+TMIcIXwOkfr35zkYLtBDO/Ywr6vo0zH9eOAZNSyE14YAS94aD8BjJJBsU8RhGhu9mS</ds:X509Certificate></ds:X509Data><ds:KeyValue><ds:RSAKeyValue><ds:Modulus>l6YyKnT5eNsF4csS1JT2ncR3IAnOtoqmypGMkumt+7I/kMmQLSBD3NnO2o9BlZzaXilcfotU0Qow
+918/yrQWRSiJXaiiEirIASsM9xWzhFAkNYDzojyj/bKGhFnIPTwc9ANy6JbASgL6Un8pIrnEzoiF
+ixh6uIS+ysMDVncbKfE=</ds:Modulus><ds:Exponent>AQAB</ds:Exponent></ds:RSAKeyValue></ds:KeyValue></ds:KeyInfo><ds:Object><xades:QualifyingProperties Id="Signature-f6a0cc31-b6a8-4f42-8fe2-c42706c1080d-QualifyingProperties" Target="#Signature-f6a0cc31-b6a8-4f42-8fe2-c42706c1080d-Signature" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:xades="http://uri.etsi.org/01903/v1.3.2#"><xades:SignedProperties Id="Signature-f6a0cc31-b6a8-4f42-8fe2-c42706c1080d-SignedProperties"><xades:SignedSignatureProperties><xades:SigningTime>2016-01-19T11:14:18+01:00</xades:SigningTime><xades:SigningCertificate><xades:Cert><xades:CertDigest><ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha512"/><ds:DigestValue>pkB9z+YVwbpmYC/Llfu9+Jcy0mHgcM7lGti9plZNOZAQ4P/VFnc7n1bt0YuFTIEsy6QkmCg2l30rIYs2fD5THw==</ds:DigestValue></xades:CertDigest><xades:IssuerSerial><ds:X509IssuerName>CN=ANF Assured ID CA1, SERIALNUMBER=G63287510, EMAILADDRESS=info@anf.es, OU=ANF Autoridad Intermedia de Identidad, O=ANF Autoridad de Certificacion, L=Barcelona (see current address at http://www.anf.es/es/address-direccion.html ), ST=Barcelona, C=ES</ds:X509IssuerName><ds:X509SerialNumber>367703909322443328</ds:X509SerialNumber></xades:IssuerSerial></xades:Cert></xades:SigningCertificate></xades:SignedSignatureProperties><xades:SignedDataObjectProperties><xades:DataObjectFormat ObjectReference="#Reference-c8bf6963-33be-496f-b2c5-e64e9d9a8abb"><xades:Description/><xades:ObjectIdentifier><xades:Identifier Qualifier="OIDAsURN">urn:oid:1.2.840.10003.5.109.10</xades:Identifier><xades:Description/></xades:ObjectIdentifier><xades:MimeType>text/xml</xades:MimeType><xades:Encoding>UTF-8</xades:Encoding></xades:DataObjectFormat></xades:SignedDataObjectProperties></xades:SignedProperties></xades:QualifyingProperties></ds:Object></ds:Signature></CATALOG>

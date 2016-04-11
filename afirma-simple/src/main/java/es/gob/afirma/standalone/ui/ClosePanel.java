@@ -18,8 +18,8 @@ import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import es.gob.afirma.standalone.PreferencesManager;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
+import es.gob.afirma.standalone.ui.preferences.PreferencesManager;
 
 /** Panel para preguntar si se desea cerrar la aplicaci&oacute;n.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */

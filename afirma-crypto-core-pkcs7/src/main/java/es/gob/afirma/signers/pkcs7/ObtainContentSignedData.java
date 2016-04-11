@@ -14,19 +14,21 @@ import java.io.IOException;
 import java.util.Enumeration;
 import java.util.logging.Logger;
 
-import org.bouncycastle.asn1.ASN1InputStream;
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.ASN1Sequence;
-import org.bouncycastle.asn1.ASN1Set;
-import org.bouncycastle.asn1.ASN1TaggedObject;
-import org.bouncycastle.asn1.DEROctetString;
-import org.bouncycastle.asn1.DERSet;
-import org.bouncycastle.asn1.cms.CMSAttributes;
-import org.bouncycastle.asn1.cms.ContentInfo;
-import org.bouncycastle.asn1.cms.SignedData;
-import org.bouncycastle.asn1.cms.SignerInfo;
-import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
-import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
+import org.spongycastle.asn1.ASN1InputStream;
+import org.spongycastle.asn1.ASN1ObjectIdentifier;
+import org.spongycastle.asn1.ASN1Sequence;
+import org.spongycastle.asn1.ASN1Set;
+import org.spongycastle.asn1.ASN1TaggedObject;
+import org.spongycastle.asn1.DEROctetString;
+import org.spongycastle.asn1.DERSet;
+import org.spongycastle.asn1.cms.CMSAttributes;
+import org.spongycastle.asn1.cms.ContentInfo;
+import org.spongycastle.asn1.cms.SignedData;
+import org.spongycastle.asn1.cms.SignerInfo;
+import org.spongycastle.asn1.pkcs.PKCSObjectIdentifiers;
+import org.spongycastle.asn1.x509.AlgorithmIdentifier;
+
+import es.gob.afirma.core.AOInvalidFormatException;
 
 /** Clase que obtiene el contenido de un fichero en formato SignedData. de CMS o
  * CADES. */
@@ -42,21 +44,30 @@ public final class ObtainContentSignedData {
 	 * tanto en CADES como en CMS. Si la firma no contiene los datos, devuelve <code>null</code>.
 	 * @param data
 	 *        datos que contienen la firma.
-	 * @return el contenido firmado.
-	 * @throws IOException Si no se pueden leer los datos */
-	public static byte[] obtainData(final byte[] data) throws IOException {
+	 * @return El contenido firmado o {@code null} si no es una firma con contenido..
+	 * @throws IOException Si no se pueden leer los datos
+	 * @throws AOInvalidFormatException Cuando los datos proporcionados no tienen la estructura
+	 * basica de firma ASN.1. */
+	public static byte[] obtainData(final byte[] data) throws IOException, AOInvalidFormatException {
 		byte[] contenido = null;
 
 		// LEEMOS EL FICHERO QUE NOS INTRODUCEN
-		final ASN1InputStream is = new ASN1InputStream(data);
-		final ASN1Sequence dsq  = (ASN1Sequence) is.readObject();
-		is.close();
+		ASN1ObjectIdentifier doi;
+		ASN1TaggedObject doj;
+		try {
+			final ASN1InputStream is = new ASN1InputStream(data);
+			final ASN1Sequence dsq  = (ASN1Sequence) is.readObject();
+			is.close();
 
-		final Enumeration<?> e = dsq.getObjects();
-		// Elementos que contienen los elementos OID Data
-		final ASN1ObjectIdentifier doi = (ASN1ObjectIdentifier) e.nextElement();
-		// Contenido a obtener informacion
-		final ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
+			final Enumeration<?> e = dsq.getObjects();
+			// Elementos que contienen los elementos OID Data
+			doi = (ASN1ObjectIdentifier) e.nextElement();
+			// Contenido a obtener informacion
+			doj = (ASN1TaggedObject) e.nextElement();
+		}
+		catch (final Exception e) {
+			throw new AOInvalidFormatException("Error al parsear la firma ASN.1: " + e, e); //$NON-NLS-1$
+		}
 
 		// buscamos si es signedData
 		if (doi.equals(PKCSObjectIdentifiers.signedData)) {
@@ -138,5 +149,4 @@ public final class ObtainContentSignedData {
 		}
 		return messageDigest;
 	}
-
 }

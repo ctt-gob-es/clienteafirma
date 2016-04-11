@@ -1,3 +1,13 @@
+/* Copyright (C) 2011 [Gobierno de Espana]
+ * This file is part of "Cliente @Firma".
+ * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
+ *   - the GNU General Public License as published by the Free Software Foundation;
+ *     either version 2 of the License, or (at your option) any later version.
+ *   - or The European Software License; either version 1.1 or (at your option) any later version.
+ * Date: 11/01/11
+ * You may contact the copyright holder at: soporte.afirma5@mpt.es
+ */
+
 package es.gob.afirma.signers.tsp.pkcs7;
 
 import java.io.IOException;
@@ -69,6 +79,44 @@ public final class TsaParams {
 
 		// Quitamos el punto y coma de la ultima extension
 		return ret.replace("]; ]", "]]"); //$NON-NLS-1$ //$NON-NLS-2$
+	}
+
+	/** Obtiene los par&aacute;metros adicionales de la configuraci&oacute;n de una Autoridad de Sellado de Tiempo.
+	 * @return Par&aacute;metros adicionales de la configuraci&oacute;n de una Autoridad de Sellado de Tiempo. */
+	public Properties getExtraParams() {
+		final Properties p = new Properties();
+		if (getTsaUrl() != null) {
+			p.put("tsaURL", getTsaUrl().toString()); //$NON-NLS-1$
+		}
+		if (getTsaUsr() != null && !getTsaUsr().isEmpty()) {
+			p.put("tsaUsr", getTsaUsr().toString()); //$NON-NLS-1$
+		}
+		if (getTsaPwd() != null && !getTsaPwd().isEmpty()) {
+			p.put("tsaPwd", getTsaPwd().toString()); //$NON-NLS-1$
+		}
+		if (getTsaPolicy() != null && !getTsaPolicy().isEmpty()) {
+			p.put("tsaPwd", getTsaPolicy().toString()); //$NON-NLS-1$
+		}
+		if (getExtensions() != null && getExtensions().length > 0) {
+			p.put("tsaExtensionOid", getExtensions()[0].getOid()); //$NON-NLS-1$
+			p.put("tsaExtensionValueBase64", Base64.encode(getExtensions()[0].getValue())); //$NON-NLS-1$
+			p.put("tsaExtensionCritical", Boolean.toString(getExtensions()[0].isCritical())); //$NON-NLS-1$
+		}
+		if (getTsaHashAlgorithm() != null && !getTsaHashAlgorithm().isEmpty()) {
+			p.put("tsaHashAlgorithm", getTsaHashAlgorithm()); //$NON-NLS-1$
+		}
+		if (getSslKeyStore() != null && getSslKeyStore().length > 0) {
+			p.put("tsaSslKeyStore", Base64.encode(getSslKeyStore())); //$NON-NLS-1$
+			p.put("tsaSslKeyStorePassword", getSslKeyStorePassword()); //$NON-NLS-1$
+			p.put("tsaSslKeyStoreType", getSslKeyStoreType()); //$NON-NLS-1$
+		}
+		if (getSslTrustStore() != null && getSslTrustStore().length > 0) {
+			p.put("tsaSslTrustStore", Base64.encode(getSslTrustStore())); //$NON-NLS-1$
+			p.put("tsaSslTrustStorePassword", getSslTrustStorePassword()); //$NON-NLS-1$
+			p.put("tsaSslTrustStoreType", getSslTrustStoreType()); //$NON-NLS-1$
+		}
+		p.put("verifyHostname", Boolean.toString(isVerifyHostname())); //$NON-NLS-1$
+		return p;
 	}
 
 	/** Construye los par&aacute;metros de configuraci&oacute;n de una Autoridad de Sellado de Tiempo.

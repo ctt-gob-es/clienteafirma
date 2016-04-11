@@ -114,7 +114,9 @@ final class AOXMLAdvancedSignature extends XMLAdvancedSignature {
         if (addKeyName) {
 	        newList.add(
 	    		keyInfoFactory.newKeyName(
-    				EscapeHelper.escapeLdapName(((X509Certificate) certificates.get(0)).getSubjectX500Principal().toString())
+    				EscapeHelper.escapeLdapName(
+						((X509Certificate) certificates.get(0)).getSubjectX500Principal().toString()
+					)
 				)
 			);
         }
@@ -127,9 +129,10 @@ final class AOXMLAdvancedSignature extends XMLAdvancedSignature {
               final List<?> refsIdList,
               final String signatureIdPrefix,
               final boolean addKeyInfoKeyValue,
-              final boolean addKeyInfoKeyName) throws MarshalException,
-                                                      GeneralSecurityException,
-                                                      XMLSignatureException {
+              final boolean addKeyInfoKeyName,
+              final boolean keepKeyInfoUnsigned) throws MarshalException,
+                                                        GeneralSecurityException,
+                                                        XMLSignatureException {
 
         final List<?> referencesIdList = new ArrayList<Object>(refsIdList);
 
@@ -160,22 +163,25 @@ final class AOXMLAdvancedSignature extends XMLAdvancedSignature {
         }
 
         final List<Reference> documentReferences = getReferences(referencesIdList);
+
         final String keyInfoId = getKeyInfoId(signatureIdPrefix);
-        documentReferences.add(fac.newReference("#" + keyInfoId, getDigestMethod())); //$NON-NLS-1$
+        if (!keepKeyInfoUnsigned) {
+        	documentReferences.add(fac.newReference("#" + keyInfoId, getDigestMethod())); //$NON-NLS-1$
+        }
 
         this.signature =fac.newXMLSignature(
-        		fac.newSignedInfo(
-    				fac.newCanonicalizationMethod(
-						this.canonicalizationMethod,
-						(C14NMethodParameterSpec) null
-					),
-                    fac.newSignatureMethod(signatureMethod, null),
-                    documentReferences
-                ),
-                newKeyInfo(certificates, keyInfoId, addKeyInfoKeyValue, addKeyInfoKeyName),
-                getXMLObjects(),
-                getSignatureId(signatureIdPrefix),
-                getSignatureValueId(signatureIdPrefix)
+    		fac.newSignedInfo(
+				fac.newCanonicalizationMethod(
+					this.canonicalizationMethod,
+					(C14NMethodParameterSpec) null
+				),
+                fac.newSignatureMethod(signatureMethod, null),
+                documentReferences
+            ),
+            newKeyInfo(certificates, keyInfoId, addKeyInfoKeyValue, addKeyInfoKeyName),
+            getXMLObjects(),
+            getSignatureId(signatureIdPrefix),
+            getSignatureValueId(signatureIdPrefix)
         );
 
         this.signContext = new DOMSignContext(privateKey, this.baseElement);

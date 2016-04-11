@@ -37,8 +37,8 @@ public class Ticket173586Test {
 
 		final byte[] data = getResource(DATA_FILE);
 
-		Assert.assertFalse(AOUtil.isBase64(data));
-		Assert.assertTrue(AOUtil.isBase64(Base64.encode(data).getBytes()));
+		Assert.assertFalse(Base64.isBase64(data));
+		Assert.assertTrue(Base64.isBase64(Base64.encode(data).getBytes()));
 	}
 
 	/**

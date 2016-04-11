@@ -117,20 +117,20 @@ public final class TriphaseSignDocumentRequest {
 	}
 
 	/** Recupera las propiedades de configuraci&oacute;n para la firma.
-	 * @return Propiedades de configuraci&oacute;n codificadas en Base64 o {@code null} si
+	 * @return Propiedades de configuraci&oacute;n codificadas en Base64 URL SAFE o {@code null} si
 	 * no hay par&aacute;metros establecidos. */
 	public String getParams() {
 		return this.params;
 	}
 
 	/** Establece las propiedades de configuraci&oacute;n para la firma.
-	 * @param params Propiedades de configuraci&oacute;n codificadas en Base64. */
+	 * @param params Propiedades de configuraci&oacute;n codificadas en Base64 URL SAFE. */
 	public void setParams(final String params) {
 		this.params = params;
 	}
 
 	/** Recupera el contenido del documento en Base64 URL SAFE.
-	 * @return Contenido del documento codificado en base64 URL SAFE o {@code null} si
+	 * @return Contenido del documento codificado en Base64 URL SAFE o {@code null} si
 	 * no se ha establecido. */
 	public String getContent() {
 		return this.content;
@@ -339,62 +339,12 @@ public final class TriphaseSignDocumentRequest {
 		}
 
 		/**
-		 * Devuelve la cadena Base 64 URL SAFE resultado de codificar los datos de sesion de firma
-		 * a modo de Properties.
-		 * @return Cadena Base 64 URL SAFE.
-		 * @throws IOException  Cuando los datos de sesi&oacute;n no estaban correctamente codificados.
-		 */
-		public String toPropertiesBase64() throws IOException {
-			final StringBuilder builder = new StringBuilder();
-			if (this.signCount != null) {
-				builder.append("SIGN_COUNT=").append(this.signCount.intValue()).append("\n"); //$NON-NLS-1$ //$NON-NLS-2$
-			}
-			if (this.needPreSign != null) {
-				builder.append("NEED_DATA=").append(this.needData.booleanValue()).append("\n"); //$NON-NLS-1$ //$NON-NLS-2$
-			}
-
-			if (this.needPreSign != null) {
-				if (this.needPreSign.booleanValue() && this.preSigns != null) {
-					builder.append("NEED_PRE=").append(this.needPreSign.booleanValue()).append("\n"); //$NON-NLS-1$ //$NON-NLS-2$
-					for (int i = 0; i < this.preSigns.size(); i++) {
-						builder.append("PRE.").append(i).append("=").append(this.preSigns.get(i)).append("\n"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-					}
-				}
-			}
-			if (this.sessions != null) {
-				try {
-					for (int i = 0; i < this.sessions.size(); i++) {
-						builder.append("SESSION.").append(i).append("=").append(new String(Base64.decode(this.sessions.get(i)))).append("\n"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-					}
-				} catch (final IOException e) {
-					throw new IOException("Error en la codificacion de los datos de sesion", e); //$NON-NLS-1$
-				}
-			}
-			if (this.pk1s != null) {
-				for (int i = 0; i < this.pk1s.size(); i++) {
-					builder.append("PK1.").append(i).append("=").append(this.pk1s.get(i)).append("\n"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-				}
-			}
-
-			try {
-				return Base64.encode(builder.toString().getBytes(), true);
-			} catch (final Exception e) {
-				// Este caso nunca se dara
-				return null;
-			}
-
-		}
-
-		/**
 		 * Devuelve la cadena Base 64 URL SAFE resultado de codificar la cadena que representa los datos
 		 * de la configuraci&oacute;n del objeto representados como un Properties.
 		 * @return Cadena Base 64 URL SAFE.
 		 * @throws IOException  Cuando los datos de sesi&oacute;n no estaban correctamente codificados.
 		 */
 		public String toXMLBase64() throws IOException {
-
-
-
 
 //			<xml>
 //			 <firmas>
@@ -409,25 +359,10 @@ public final class TriphaseSignDocumentRequest {
 //			</xml>
 
 			final StringBuilder builder = new StringBuilder();
-//			builder.append("<xml><firmas>");
-//			for (int i = 0; i < (this.preSigns == null ? 0 : this.preSigns.size()); i++) {
-//				builder.append("<firma Id='").append(i).append("'>");
-//				if (this.needData != null) {
-//					builder.append("<param n='").append("NEED_DATA").append("'>").append(this.needData.booleanValue()).append("</param>");
-//				}
-//				if (this.needPreSign != null) {
-//					builder.append("<param n='").append("NEED_PRE").append("'>").append(this.needPreSign.booleanValue()).append("</param>");
-//				}
-//				builder.append("<param n='").append("PRE").append("'>").append(this.getPreSign(i)).append("</param>")
-//				.append("<param n='").append("PK1").append("'>").append(this.getPk1(i)).append("</param>")
-//				.append("</firma>");
-//			}
-//			builder.append("</firmas></xml>");
-
 			if (this.signCount != null) {
 				builder.append("SIGN_COUNT=").append(this.signCount.intValue()).append("\n"); //$NON-NLS-1$ //$NON-NLS-2$
 			}
-			if (this.needPreSign != null) {
+			if (this.needData != null) {
 				builder.append("NEED_DATA=").append(this.needData.booleanValue()).append("\n"); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 

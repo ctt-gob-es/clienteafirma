@@ -22,9 +22,11 @@ import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.http.UrlHttpManagerFactory;
+import es.gob.afirma.core.misc.http.UrlHttpMethod;
 import es.gob.afirma.core.signers.AOPkcs1Signer;
 import es.gob.afirma.core.signers.TriphaseData;
 import es.gob.afirma.core.signers.TriphaseDataSigner;
+import es.gob.afirma.core.signers.TriphaseUtil;
 
 /** Utilidades para el firmador PAdES en tres fases.
  * @author Tom&acute;s Garc&iacute;a-Mer&aacute;s */
@@ -92,7 +94,7 @@ final class PDFTriPhaseSignerUtil {
 			append(PARAMETER_NAME_CRYPTO_OPERATION).append(HTTP_EQUALS).append(CRYPTO_OPERATION_SIGN).append(HTTP_AND).
 			append(PARAMETER_NAME_FORMAT).append(HTTP_EQUALS).append(PADES_FORMAT).append(HTTP_AND).
 			append(PARAMETER_NAME_ALGORITHM).append(HTTP_EQUALS).append(algorithm).append(HTTP_AND).
-			append(PARAMETER_NAME_CERT).append(HTTP_EQUALS).append(Base64.encode(certChain[0].getEncoded(), true)).append(HTTP_AND).
+			append(PARAMETER_NAME_CERT).append(HTTP_EQUALS).append(TriphaseUtil.prepareCertChainParam(certChain, extraParams)).append(HTTP_AND).
 			append(PARAMETER_NAME_DOCID).append(HTTP_EQUALS).append(documentId);
 
 			if (extraParams.size() > 0) {
@@ -100,7 +102,10 @@ final class PDFTriPhaseSignerUtil {
 				append(AOUtil.properties2Base64(extraParams));
 			}
 
-			return UrlHttpManagerFactory.getInstalledManager().readUrlByPost(urlBuffer.toString());
+			return UrlHttpManagerFactory.getInstalledManager().readUrl(
+				urlBuffer.toString(),
+				UrlHttpMethod.POST
+			);
 		}
 		catch (final CertificateEncodingException e) {
 			throw new AOException("Error decodificando el certificado del firmante: " + e, e); //$NON-NLS-1$
@@ -149,7 +154,7 @@ final class PDFTriPhaseSignerUtil {
 			append(PARAMETER_NAME_CRYPTO_OPERATION).append(HTTP_EQUALS).append(CRYPTO_OPERATION_SIGN).append(HTTP_AND).
 			append(PARAMETER_NAME_FORMAT).append(HTTP_EQUALS).append(PADES_FORMAT).append(HTTP_AND).
 			append(PARAMETER_NAME_ALGORITHM).append(HTTP_EQUALS).append(algorithm).append(HTTP_AND).
-			append(PARAMETER_NAME_CERT).append(HTTP_EQUALS).append(Base64.encode(certChain[0].getEncoded(), true)).
+			append(PARAMETER_NAME_CERT).append(HTTP_EQUALS).append(TriphaseUtil.prepareCertChainParam(certChain, extraParams)).
 			append(HTTP_AND).append(PARAMETER_NAME_DOCID).append(HTTP_EQUALS).append(documentId).
 			append(HTTP_AND).append(PARAMETER_NAME_SESSION_DATA).append(HTTP_EQUALS).append(preResultAsBase64);
 
@@ -158,7 +163,10 @@ final class PDFTriPhaseSignerUtil {
 				append(AOUtil.properties2Base64(extraParams));
 			}
 
-			triSignFinalResult = UrlHttpManagerFactory.getInstalledManager().readUrlByPost(urlBuffer.toString());
+			triSignFinalResult = UrlHttpManagerFactory.getInstalledManager().readUrl(
+				urlBuffer.toString(),
+				UrlHttpMethod.POST
+			);
 			urlBuffer.setLength(0);
 		}
 		catch (final CertificateEncodingException e) {

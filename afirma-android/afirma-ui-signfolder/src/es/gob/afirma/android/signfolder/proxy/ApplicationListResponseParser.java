@@ -13,7 +13,7 @@ final class ApplicationListResponseParser {
 
 	private static final String APP_LIST_NODE = "appConf"; //$NON-NLS-1$
 	private static final String APP_ID_ATTR = "id"; //$NON-NLS-1$
-	
+
 
 	/** Analiza un documento XML y, en caso de tener el formato correcto, obtiene la lista de aplicaciones
 	 * que pueden enviar peticiones de firma.
@@ -43,16 +43,28 @@ final class ApplicationListResponseParser {
 			}
 			try {
 				appIds.add(appNodes.item(i).getAttributes().getNamedItem(APP_ID_ATTR).getNodeValue());
-				appNames.add(appNodes.item(i).getTextContent().trim());
-			} catch (Exception e) {
+				final String appName = XmlUtils.getTextContent(appNodes.item(i));
+				if (appName != null) {
+					appNames.add(normalizeValue(appName));
+				}
+			} catch (final Exception e) {
 				throw new IllegalArgumentException("Se encontro un nodo de aplicacion no valido: " + e, e); //$NON-NLS-1$
 			}
 		}
 
-		RequestAppConfiguration config = new RequestAppConfiguration();
+		final RequestAppConfiguration config = new RequestAppConfiguration();
 		config.setAppIdsList(appIds);
 		config.setAppNamesList(appNames);
-		
+
 		return config;
+	}
+
+	/**
+	 * Deshace los cambios que hizo el proxy para asegurar que el XML est&aacute;ba bien formado.
+	 * @param value Valor que normalizar.
+	 * @return Valor normalizado.
+	 */
+	private static String normalizeValue(final String value) {
+		return value.trim().replace("&_lt;", "<").replace("&_gt;", ">"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 	}
 }

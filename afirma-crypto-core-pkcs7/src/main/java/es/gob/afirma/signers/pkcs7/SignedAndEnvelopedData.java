@@ -10,23 +10,22 @@
 
 package es.gob.afirma.signers.pkcs7;
 
-import org.bouncycastle.asn1.ASN1Encodable;
-import org.bouncycastle.asn1.ASN1EncodableVector;
-import org.bouncycastle.asn1.ASN1Integer;
-import org.bouncycastle.asn1.ASN1Object;
-import org.bouncycastle.asn1.ASN1Primitive;
-import org.bouncycastle.asn1.ASN1Sequence;
-import org.bouncycastle.asn1.ASN1Set;
-import org.bouncycastle.asn1.ASN1TaggedObject;
-import org.bouncycastle.asn1.BERSequence;
-import org.bouncycastle.asn1.DERTaggedObject;
-import org.bouncycastle.asn1.cms.EncryptedContentInfo;
+import org.spongycastle.asn1.ASN1Encodable;
+import org.spongycastle.asn1.ASN1EncodableVector;
+import org.spongycastle.asn1.ASN1Integer;
+import org.spongycastle.asn1.ASN1Object;
+import org.spongycastle.asn1.ASN1Primitive;
+import org.spongycastle.asn1.ASN1Sequence;
+import org.spongycastle.asn1.ASN1Set;
+import org.spongycastle.asn1.ASN1TaggedObject;
+import org.spongycastle.asn1.BERSequence;
+import org.spongycastle.asn1.DERTaggedObject;
+import org.spongycastle.asn1.cms.EncryptedContentInfo;
 
 /** M&eacute;todo base para la generaci&oacute;n deun tipo Signed and Enveloped
  * Data del estandar pkcs#7 basado en la RFC-2315.
  * La implementaci&oacute;n del c&oacute;digo ha seguido los pasos necesarios
- * para crear un SignedAndEnvelopedData desarrollado en BouncyCastle: <a
- * href="http://www.bouncycastle.org/">www.bouncycastle.org</a>.
+ * para crear un SignedAndEnvelopedData desarrollado en SpongyCastle.
  * <pre>
  *  SignedAndEnvelopedData ::= SEQUENCE {
  *     version                 Version,

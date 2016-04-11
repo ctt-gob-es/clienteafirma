@@ -25,12 +25,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Logger;
+import java.util.zip.DataFormatException;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
-import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
+import org.spongycastle.asn1.pkcs.PKCSObjectIdentifiers;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOInvalidFormatException;
@@ -45,8 +46,8 @@ import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
 public class AOCMSMultiEnveloper {
 
     private String dataTypeOID = null;
-    private final Map<String, byte[]> atrib = new HashMap<String, byte[]>();
-    private final Map<String, byte[]> uatrib = new HashMap<String, byte[]>();
+    private final Map<String, byte[]> atrib = new HashMap<>();
+    private final Map<String, byte[]> uatrib = new HashMap<>();
 
   /** Cofirma un sobre digital CMS.
    * @param data Datos contenidos en el sobre digital a cofirmar
@@ -122,11 +123,11 @@ public class AOCMSMultiEnveloper {
     private String signatureAlgorithm = AOSignConstants.DEFAULT_SIGN_ALGO;
 
     /** Atributos firmados que se desean agregar a los envoltorios firmados. */
-    private final Map<String, byte[]> attrib = new HashMap<String, byte[]>();
+    private final Map<String, byte[]> attrib = new HashMap<>();
 
     /** Atributos que no requieren firma y se desean agregar a todos los
      * envoltorios que los soporten. */
-    private final Map<String, byte[]> uattrib = new HashMap<String, byte[]>();
+    private final Map<String, byte[]> uattrib = new HashMap<>();
 
     /** Clave privada del usuario que genera o abre el envoltorio. */
     private PrivateKeyEntry configuredKe = null;
@@ -553,7 +554,8 @@ public class AOCMSMultiEnveloper {
      * @throws InvalidAlgorithmParameterException Si no se soporta alg&uacute;n par&aacute;metro necesario
      *                                            para alg&uacute;n algoritmo
      * @throws NoSuchPaddingException Si no se soporta alg&uacute;n m&eacute;todo de relleno
-     * @throws InvalidKeySpecException Cuando ocurren problemas relacionados con la estructura interna de las claves */
+     * @throws InvalidKeySpecException Cuando ocurren problemas relacionados con la estructura interna de las claves
+     * @throws DataFormatException Si hay problemas en el formado de datos esperado. */
     byte[] recoverData(final byte[] cmsEnvelop) throws InvalidKeyException,
                                                        CertificateEncodingException,
                                                        IOException,
@@ -562,45 +564,46 @@ public class AOCMSMultiEnveloper {
                                                        NoSuchPaddingException,
                                                        InvalidAlgorithmParameterException,
                                                        IllegalBlockSizeException,
-                                                       BadPaddingException, InvalidKeySpecException {
-
-        final org.bouncycastle.asn1.ASN1InputStream is = new org.bouncycastle.asn1.ASN1InputStream(cmsEnvelop);
-
-        // Leemos los datos
-        final org.bouncycastle.asn1.ASN1Sequence dsq = (org.bouncycastle.asn1.ASN1Sequence) is.readObject();
-        is.close();
+                                                       BadPaddingException, InvalidKeySpecException, DataFormatException {
+    	final org.spongycastle.asn1.ASN1Sequence dsq;
+    	try (
+    			final org.spongycastle.asn1.ASN1InputStream is = new org.spongycastle.asn1.ASN1InputStream(cmsEnvelop);
+		) {
+	        // Leemos los datos
+	        dsq = (org.spongycastle.asn1.ASN1Sequence) is.readObject();
+    	}
 
         final Enumeration<?> objects = dsq.getObjects();
 
         // Elementos que contienen los elementos OID Data
-        final org.bouncycastle.asn1.ASN1ObjectIdentifier doi = (org.bouncycastle.asn1.ASN1ObjectIdentifier) objects.nextElement();
+        final org.spongycastle.asn1.ASN1ObjectIdentifier doi = (org.spongycastle.asn1.ASN1ObjectIdentifier) objects.nextElement();
 
         final Logger logger = Logger.getLogger("es.gob.afirma");  //$NON-NLS-1$
 
-        if (doi.equals(org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers.data)) {
+        if (doi.equals(org.spongycastle.asn1.pkcs.PKCSObjectIdentifiers.data)) {
             logger.warning("La extraccion de datos de los envoltorios CMS Data no esta implementada"); //$NON-NLS-1$
             return null;
         }
-        if (doi.equals(org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers.digestedData)) {
+        if (doi.equals(org.spongycastle.asn1.pkcs.PKCSObjectIdentifiers.digestedData)) {
             logger.warning("La extraccion de datos de los envoltorios CMS DigestedData no esta implementada");  //$NON-NLS-1$
             return null;
         }
-        if (doi.equals(org.bouncycastle.asn1.cms.CMSObjectIdentifiers.compressedData)) {
+        if (doi.equals(org.spongycastle.asn1.cms.CMSObjectIdentifiers.compressedData)) {
         	return CMSCompressedData.getContentCompressedData(cmsEnvelop);
         }
-        if (doi.equals(org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers.encryptedData)) {
+        if (doi.equals(org.spongycastle.asn1.pkcs.PKCSObjectIdentifiers.encryptedData)) {
         	return new CMSDecipherEncryptedData().dechiperEncryptedData(cmsEnvelop, this.cipherKey);
         }
-        if (doi.equals(org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers.envelopedData)) {
+        if (doi.equals(org.spongycastle.asn1.pkcs.PKCSObjectIdentifiers.envelopedData)) {
         	return CMSDecipherEnvelopData.dechiperEnvelopData(cmsEnvelop, this.configuredKe);
         }
-        if (doi.equals(org.bouncycastle.asn1.cms.CMSObjectIdentifiers.authEnvelopedData)) {
+        if (doi.equals(org.spongycastle.asn1.cms.CMSObjectIdentifiers.authEnvelopedData)) {
             return CMSDecipherAuthenticatedEnvelopedData.dechiperAuthenticatedEnvelopedData(cmsEnvelop, this.configuredKe);
         }
-        if (doi.equals(org.bouncycastle.asn1.cms.CMSObjectIdentifiers.authenticatedData)) {
+        if (doi.equals(org.spongycastle.asn1.cms.CMSObjectIdentifiers.authenticatedData)) {
             return new CMSDecipherAuthenticatedData().decipherAuthenticatedData(cmsEnvelop, this.configuredKe);
         }
-        if (doi.equals(org.bouncycastle.asn1.cms.CMSObjectIdentifiers.signedAndEnvelopedData)) {
+        if (doi.equals(org.spongycastle.asn1.cms.CMSObjectIdentifiers.signedAndEnvelopedData)) {
         	return CMSDecipherSignedAndEnvelopedData.dechiperSignedAndEnvelopData(cmsEnvelop, this.configuredKe);
         }
         throw new AOInvalidFormatException("Los datos introducidos no se corresponden con un tipo de objeto CMS soportado"); //$NON-NLS-1$

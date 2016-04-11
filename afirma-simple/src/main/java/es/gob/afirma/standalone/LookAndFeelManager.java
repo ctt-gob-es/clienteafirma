@@ -27,7 +27,7 @@ import es.gob.afirma.core.misc.Platform;
  * @author Carlos Gamuci
  */
 public final class LookAndFeelManager {
-    
+
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	private LookAndFeelManager() {
@@ -35,7 +35,7 @@ public final class LookAndFeelManager {
 	}
 
     /** Color de fondo por defecto para los JPanel, JFrame y Applet. */
-    public static final Color WINDOW_COLOR = (UIManager.getColor("window") !=null) ? new Color(UIManager.getColor("window").getRGB()) : Color.WHITE; //$NON-NLS-1$ //$NON-NLS-2$
+    public static final Color WINDOW_COLOR = UIManager.getColor("window") !=null ? new Color(UIManager.getColor("window").getRGB()) : Color.WHITE; //$NON-NLS-1$ //$NON-NLS-2$
 
     /** Indica si el sistema operativo tiene activada una combinaci&oacute;n de colores de alto contraste. */
     public static final boolean HIGH_CONTRAST;
@@ -62,7 +62,7 @@ public final class LookAndFeelManager {
 
         final  Object defaultFontHeight = Toolkit.getDefaultToolkit().getDesktopProperty("win.defaultGUI.font.height"); //$NON-NLS-1$
         if (defaultFontHeight instanceof Integer) {
-           LARGE_FONT = (((Integer) defaultFontHeight).intValue()) > LARGE_FONT_LIMIT;
+           LARGE_FONT = ((Integer) defaultFontHeight).intValue() > LARGE_FONT_LIMIT;
         }
         // En Linux usmos siempre una configuracion como si se detectase un tamano de fuente grande
         else if (Platform.OS.LINUX.equals(Platform.getOS())) {
@@ -74,7 +74,7 @@ public final class LookAndFeelManager {
     }
 
     /** Establece el decorado de la aplicaci&oacute;n. */
-    static void applyLookAndFeel() {
+    public static void applyLookAndFeel() {
 
         final boolean defaultLookAndFeel = HIGH_CONTRAST || LARGE_FONT;
 
@@ -110,9 +110,6 @@ public final class LookAndFeelManager {
                     for (final LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
                         if ("Nimbus".equals(info.getName())) { //$NON-NLS-1$
                             UIManager.setLookAndFeel(info.getClassName());
-                            LOGGER.info(
-                                 "Establecido 'Look&Feel' Nimbus" //$NON-NLS-1$
-                            );
                             return;
                         }
                     }

@@ -136,7 +136,7 @@ public final class SignDetailPanel extends JPanel {
 
         // Establecemos la configuracion de color
         if (!LookAndFeelManager.HIGH_CONTRAST) {
-            this.setBackground(LookAndFeelManager.WINDOW_COLOR);
+            setBackground(LookAndFeelManager.WINDOW_COLOR);
             returnPanel.setBackground(LookAndFeelManager.WINDOW_COLOR);
         }
 
@@ -155,6 +155,7 @@ public final class SignDetailPanel extends JPanel {
         c.gridy = 2;
         c.insets = new Insets(0, 11, 11, 11);
         add(returnPanel, c);
+        this.returnButton.requestFocusInWindow();
     }
 
     /** Vuelve a la pantalla de selecci&oacute;n de fichero para la firma. */

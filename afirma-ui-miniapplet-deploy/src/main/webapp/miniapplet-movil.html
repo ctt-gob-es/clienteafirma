@@ -93,21 +93,35 @@
 		function showLog(newLog) {
 			document.getElementById('console').value = document.getElementById('console').value + "\n" + newLog;
 		}
+		
+		function saveData() {
+			MiniApplet.saveDataToFile(
+					document.getElementById('b64signature').value,
+					"Guardar firma electr\u00F3nica",
+					"mifirma",
+					"sig",
+					null);
+		}
+		
 	</script>
   </head>
   <body>
 		<script type="text/javascript">
-		/* MiniApplet.cargarMiniApplet('https://valide.redsara.es/firmaMovil');
-		MiniApplet.setServlets("https://valide.redsara.es/firmaMovil/SignatureStorageServer/StorageService", "https://valide.redsara.es/firmaMovil/SignatureRetrieverServer/RetrieveService"); */
-		MiniApplet.cargarMiniApplet('http://192.168.179.34:8080/afirma-ui-miniapplet-deploy');
-		MiniApplet.setServlets("http://192.168.179.34:8080/afirma-signature-storage/StorageService", "http://192.168.179.34:8080/afirma-signature-retriever/RetrieveService");
+		
+		//var URL_BASE = "http://prevalide.redsara.es/miniapplet";
+		var IP = "192.168.177.68";	//TODO: Configurar IP
+		
+		//MiniApplet.cargarMiniApplet(URL_BASE);
+		MiniApplet.cargarAppAfirma('http://'+ IP + ':8080/afirma-ui-miniapplet-deploy');
+		//MiniApplet.setServlets(URL_BASE + '/afirma-signature-storage/StorageService', URL_BASE + '/afirma-signature-retriever/RetrieveService');
+		MiniApplet.setServlets('http://'+ IP + ':8080/afirma-signature-storage/StorageService', 'http://'+ IP + ':8080/afirma-signature-retriever/RetrieveService');
 		</script>
 		<p>Cargamos el MiniApplet</p>
 		<div>
 		 <label for="plaintext">Texto</label><br />
-		 <textarea id="plaintext" cols="150" rows="10">Hola Mundo!!</textarea>
+		 <textarea id="plaintext" cols="150" rows="10"></textarea>
 		</div>
-		
+
 		<div>
 		 <label for="format">Formato</label>
 		 <select id="format">
@@ -134,7 +148,8 @@
 		 <span>&nbsp;(Insertar las propiedades de una en una)</span>
 		 <br>
 		 <!-- <textarea id="params" cols="50" rows="5" readonly>serverUrl=https://valide.redsara.es/firmaMovil/TriPhaseSignerServer/SignatureService -->
-		 <textarea id="params" cols="50" rows="5" readonly>serverUrl=http://192.168.179.34:8080/afirma-server-triphase-signer/SignatureService
+		 <!-- TODO: Configurar IP -->
+		 <textarea id="params" cols="50" rows="5" readonly>serverUrl=http://192.168.177.68:8080/afirma-server-triphase-signer/SignatureService
 		 </textarea>
 		</div>
 		
@@ -154,5 +169,6 @@
 		 <span>Firma generada</span><br />
 		 <textarea id="b64signature" cols="150" rows="10"></textarea>
 		</div>
+		<input type="button" value="Guardar" onclick="saveData();">
 	</body>
 </html>	

@@ -1,5 +1,18 @@
+/* Copyright (C) 2011 [Gobierno de Espana]
+ * This file is part of "Cliente @Firma".
+ * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
+ *   - the GNU General Public License as published by the Free Software Foundation;
+ *     either version 2 of the License, or (at your option) any later version.
+ *   - or The European Software License; either version 1.1 or (at your option) any later version.
+ * Date: 11/01/11
+ * You may contact the copyright holder at: soporte.afirma5@mpt.es
+ */
+
 package es.gob.afirma.standalone;
 
+import java.awt.Image;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.Console;
 import java.io.File;
 import java.io.FileInputStream;
@@ -8,12 +21,20 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.net.URL;
 import java.security.KeyStore.PrivateKeyEntry;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableEntryException;
+import java.security.cert.CertificateEncodingException;
+import java.security.cert.X509Certificate;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import es.gob.afirma.core.AOUnsupportedSignFormatException;
+import javax.imageio.ImageIO;
+
+import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.MimeHelper;
@@ -27,10 +48,13 @@ import es.gob.afirma.keystores.AOKeystoreAlternativeException;
 import es.gob.afirma.keystores.callbacks.CachePasswordCallback;
 import es.gob.afirma.keystores.filters.CertFilterManager;
 import es.gob.afirma.keystores.filters.CertificateFilter;
+import es.gob.afirma.signers.batch.client.BatchSigner;
 import es.gob.afirma.signers.cades.AOCAdESSigner;
 import es.gob.afirma.signers.pades.AOPDFSigner;
 import es.gob.afirma.signers.xades.AOFacturaESigner;
 import es.gob.afirma.signers.xades.AOXAdESSigner;
+import es.gob.afirma.standalone.ui.CertValidationUi;
+import es.gob.afirma.standalone.ui.hash.HashHelper;
 
 /** Clase para la gesti&oacute;n de los par&aacute;metros proporcionados desde l&iacute;nea de comandos.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
@@ -40,39 +64,7 @@ final class CommandLineLauncher {
 		// No permitimos la instanciacion
 	}
 
-	private static final String PARAM_INPUT   = "-i"; //$NON-NLS-1$
-	private static final String PARAM_OUTPUT  = "-o"; //$NON-NLS-1$
-	private static final String PARAM_ALIAS   = "-alias"; //$NON-NLS-1$
-	private static final String PARAM_FILTER  = "-filter"; //$NON-NLS-1$
-	private static final String PARAM_STORE   = "-store"; //$NON-NLS-1$
-	private static final String PARAM_FORMAT  = "-format"; //$NON-NLS-1$
-	private static final String PARAM_PASSWD  = "-password"; //$NON-NLS-1$
-	private static final String PARAM_XML     = "-xml"; //$NON-NLS-1$
-	private static final String PARAM_ALGO    = "-algorithm"; //$NON-NLS-1$
-	private static final String PARAM_CONFIG  = "-config"; //$NON-NLS-1$
-	private static final String PARAM_GUI     = "-gui"; //$NON-NLS-1$
-
-	private static final String STORE_AUTO = "auto"; //$NON-NLS-1$
-	private static final String STORE_MAC  = "mac"; //$NON-NLS-1$
-	private static final String STORE_WIN  = "windows"; //$NON-NLS-1$
-	private static final String STORE_P12  = "pkcs12"; //$NON-NLS-1$
-	private static final String STORE_NSS  = "mozilla"; //$NON-NLS-1$
-	private static final String STORE_DNI  = "dni"; //$NON-NLS-1$
-	private static final String STORE_P11  = "pkcs11"; //$NON-NLS-1$
-
-	private static final String FORMAT_AUTO     = "auto"; //$NON-NLS-1$
-	private static final String FORMAT_XADES    = "xades"; //$NON-NLS-1$
-	private static final String FORMAT_PADES    = "pades"; //$NON-NLS-1$
-	private static final String FORMAT_CADES    = "cades"; //$NON-NLS-1$
-	private static final String FORMAT_FACTURAE = "facturae"; //$NON-NLS-1$
-
-	private static final String COMMAND_LIST = "listaliases"; //$NON-NLS-1$
-	private static final String COMMAND_SIGN = "sign"; //$NON-NLS-1$
-	private static final String COMMAND_COSIGN = "cosign"; //$NON-NLS-1$
-	private static final String COMMAND_COUNTERSIGN = "countersign"; //$NON-NLS-1$
-	private static final String COMMAND_VERIFY = "verify"; //$NON-NLS-1$
-
-	private static final String DEFAULT_SIGN_ALGORITHM = "SHA512withRSA"; //$NON-NLS-1$
+	private static final String PARAM_HELP    = "-help"; //$NON-NLS-1$
 
 	private static final String EXTRA_PARAM_TARGET = "target"; //$NON-NLS-1$
 
@@ -82,11 +74,15 @@ final class CommandLineLauncher {
 	private static final int STATUS_ERROR = -1;
 	private static final int STATUS_SUCCESS = 0;
 
-	static void processCommandLine(final String[] args) {
+	private static final String STORE_AUTO = "auto"; //$NON-NLS-1$
+	private static final String STORE_MAC  = "mac"; //$NON-NLS-1$
+	private static final String STORE_WIN  = "windows"; //$NON-NLS-1$
+	private static final String STORE_P12  = "pkcs12"; //$NON-NLS-1$
+	private static final String STORE_NSS  = "mozilla"; //$NON-NLS-1$
+	private static final String STORE_DNI  = "dni"; //$NON-NLS-1$
+	private static final String STORE_P11  = "pkcs11"; //$NON-NLS-1$
 
-		if (args == null || args.length < 1) {
-			return;
-		}
+	static void processCommandLine(final String[] args) {
 
 		// Desactivamos el Logger para que no interfiera con la consola
 		//TODO: Descomentar para poner en produccion
@@ -95,320 +91,357 @@ final class CommandLineLauncher {
 		final Console console = System.console();
 
 		try (
-			final PrintWriter pw = console != null ? console.writer() : null;
+			final PrintWriter pw = console != null ? console.writer() : new PrintWriter(System.out);
 		) {
 
-			final String command = args[0].toLowerCase();
+			// Comprobamos si hay que mostrar la sintaxis de la aplicacion
+			if (args == null || args.length < 1 || PARAM_HELP.equalsIgnoreCase(args[0])) {
+				closeApp(STATUS_SUCCESS, pw, buildGeneralSyntax(null));
+				return;
+			}
 
-			String store = null;
-			String alias = null;
-			String filter = null;
-			File inputFile = null;
-			File outputFile = null;
-			String format = null;
-			String password = null;
-			String algorithm = null;
-			String extraParams = null;
-			boolean xml = false;
-			boolean gui = false;
+			// Identificamos el comando
+			final CommandLineCommand command = CommandLineCommand.parse(args[0].toLowerCase());
+			if (command == null) {
+				closeApp(STATUS_ERROR, pw, buildGeneralSyntax(CommandLineMessages.getString("CommandLineLauncher.15", args[0]))); //$NON-NLS-1$
+				return;
+			}
 
+			// Comprobamos si se debe mostrar la ayuda del comando
+			if (args.length > 1 && PARAM_HELP.equalsIgnoreCase(args[1])) {
+				closeApp(STATUS_SUCCESS, pw, CommandLineParameters.buildSyntaxError(command, null));
+				return;
+			}
+
+			// Cargamos los parametros
+			final CommandLineParameters params;
 			try {
-				for (int i = 1; i < args.length; i++) {
+				params = new CommandLineParameters(args);
+			}
+			catch (final CommandLineException e) {
+				closeApp(STATUS_ERROR, pw, CommandLineParameters.buildSyntaxError(command, e.getMessage()));
+				return;
+			}
 
-					if (PARAM_XML.equals(args[i])) {
-
-						xml = true;
-					}
-					else if (PARAM_GUI.equals(args[i])) {
-
-						gui = true;
-					}
-					else if (PARAM_STORE.equals(args[i])) {
-
-						if (store != null) {
-							closeApp(
-								STATUS_ERROR,
-								pw,
-								buildSyntaxError(CommandLineMessages.getString("CommandLineLauncher.26", args[i])) //$NON-NLS-1$
-							);
+			// Actuamos segun corresponda para cada comando
+			try {
+				switch(command) {
+					case LIST:
+						final String aliases = listAliasesByCommandLine(params);
+						closeApp(STATUS_SUCCESS, pw, aliases);
+						return;
+					case VERIFY:
+						verifyByGui(params);
+						return;
+					case SIGN:
+						if (params.isGui()) {
+							signByGui(params);
 						}
-						store = args[i+1];
-						i++;
-					}
-					else if (PARAM_ALGO.equals(args[i])) {
-
-						if (algorithm != null) {
-							closeApp(
-								STATUS_ERROR,
-								pw,
-								buildSyntaxError(CommandLineMessages.getString("CommandLineLauncher.26", args[i])) //$NON-NLS-1$
-							);
+						else {
+							final String response = signByCommandLine(command, params);
+							closeApp(STATUS_SUCCESS, pw, response);
 						}
-						algorithm = args[i+1];
-						i++;
-					}
-					else if (PARAM_CONFIG.equals(args[i])) {
-
-						if (extraParams != null) {
-							closeApp(
-								STATUS_ERROR,
-								pw,
-								buildSyntaxError(CommandLineMessages.getString("CommandLineLauncher.26", args[i])) //$NON-NLS-1$
-							);
-						}
-						extraParams = args[i+1];
-						i++;
-					}
-					else if (PARAM_PASSWD.equals(args[i])) {
-
-						if (password != null) {
-							closeApp(
-								STATUS_ERROR,
-								pw,
-								buildSyntaxError(CommandLineMessages.getString("CommandLineLauncher.26", args[i])) //$NON-NLS-1$
-							);
-						}
-						password = args[i+1];
-						i++;
-					}
-					else if (PARAM_ALIAS.equals(args[i])) {
-
-						if (alias != null) {
-							closeApp(STATUS_ERROR, pw,
-									buildSyntaxError(CommandLineMessages.getString("CommandLineLauncher.26", args[i]))); //$NON-NLS-1$
-						}
-						if (filter != null) {
-							closeApp(STATUS_ERROR, pw,
-									buildSyntaxError(CommandLineMessages.getString("CommandLineLauncher.28", args[i]))); //$NON-NLS-1$
-						}
-						alias = args[i+1];
-						i++;
-					}
-					else if (PARAM_FILTER.equals(args[i])) {
-
-						if (filter != null) {
-							closeApp(STATUS_ERROR, pw,
-									buildSyntaxError(CommandLineMessages.getString("CommandLineLauncher.26", args[i]))); //$NON-NLS-1$
-						}
-						if (alias != null) {
-							closeApp(STATUS_ERROR, pw,
-									buildSyntaxError(CommandLineMessages.getString("CommandLineLauncher.28", args[i]))); //$NON-NLS-1$
-						}
-						filter = args[i+1];
-						i++;
-					}
-					else if (PARAM_INPUT.equals(args[i])) {
-
-						if (inputFile != null) {
-							closeApp(
-								STATUS_ERROR,
-								pw,
-								buildSyntaxError(
-									CommandLineMessages.getString("CommandLineLauncher.26", args[i]) //$NON-NLS-1$
-								)
-							);
-						}
-
-						inputFile = new File(args[i+1]);
-
-						if (!inputFile.exists()) {
-							closeApp(STATUS_ERROR, pw, CommandLineMessages.getString("CommandLineLauncher.0") + " " + args[i+1]); //$NON-NLS-1$ //$NON-NLS-2$
-						}
-						if (!inputFile.canRead()) {
-							closeApp(STATUS_ERROR, pw, CommandLineMessages.getString("CommandLineLauncher.1") + " " + args[i+1]); //$NON-NLS-1$ //$NON-NLS-2$
-						}
-						if (!inputFile.isFile()) {
-							closeApp(STATUS_ERROR, pw, CommandLineMessages.getString("CommandLineLauncher.2") + " " + args[i+1]); //$NON-NLS-1$ //$NON-NLS-2$
-						}
-						i++;
-					}
-					else if (PARAM_FORMAT.equals(args[i])) {
-
-						if (format != null) {
-							closeApp(STATUS_ERROR, pw,
-									buildSyntaxError(CommandLineMessages.getString("CommandLineLauncher.26", args[i]))); //$NON-NLS-1$
-						}
-
-						format = args[i+1].toLowerCase();
-						if (!format.equals(FORMAT_XADES) &&
-							!format.equals(FORMAT_CADES) &&
-							!format.equals(FORMAT_PADES) &&
-							!format.equals(FORMAT_FACTURAE) &&
-							!format.equals(FORMAT_AUTO)) {
-								closeApp(STATUS_ERROR, pw, CommandLineMessages.getString("CommandLineLauncher.4", args[i+1])); //$NON-NLS-1$
-						}
-						i++;
-					}
-					else if (PARAM_OUTPUT.equals(args[i])) {
-
-						if (outputFile != null) {
-							closeApp(STATUS_ERROR, pw,
-									buildSyntaxError(CommandLineMessages.getString("CommandLineLauncher.26", args[i]))); //$NON-NLS-1$
-						}
-
-						outputFile = new File(args[i+1]);
-						final String parent = outputFile.getParent();
-						if (parent != null && !new File(parent).canWrite()) {
-							closeApp(STATUS_ERROR, pw, CommandLineMessages.getString("CommandLineLauncher.3", args[i+1])); //$NON-NLS-1$
-						}
-						i++;
-					}
-					else {
+						return;
+					case COSIGN:
+					case COUNTERSIGN:
+						final String response = signByCommandLine(command, params);
+						closeApp(STATUS_SUCCESS, pw, response);
+						return;
+					case CREATEHASH:
+						createHashByGui(params);
+						return;
+					case CHECKHASH:
+						checkHashByGui(params);
+						return;
+					case MASSIVE:
+						//TODO: Implementar
+						throw new UnsupportedOperationException(
+							"Firma masiva en linea de comandos aun no implementada" //$NON-NLS-1$
+						);
+					case BATCHSIGN:
+						batchByCommandLine(params);
+						return;
+					default:
 						closeApp(
 							STATUS_ERROR,
 							pw,
-							CommandLineMessages.getString("CommandLineLauncher.25", args[i]) //$NON-NLS-1$
+							CommandLineMessages.getString(
+								"CommandLineLauncher.54",  //$NON-NLS-1$
+								command.getOp()
+							)
 						);
-					}
-				}
-
-				if (gui) {
-
-					if (inputFile == null) {
-						closeApp(
-							STATUS_ERROR,
-							pw,
-							buildSyntaxError(CommandLineMessages.getString("CommandLineLauncher.5")) //$NON-NLS-1$
-						);
-					}
-
-					if (COMMAND_SIGN.equals(command)) {
-
-						final SimpleAfirma simpleAfirma = new SimpleAfirma();
-						simpleAfirma.initialize(inputFile);
-						simpleAfirma.loadFileToSign(inputFile);
-					}
-					else if (COMMAND_VERIFY.equals(command)) {
-						new VisorFirma(true, null).initialize(false, inputFile);
-					}
-					else {
-						closeApp(
-							STATUS_ERROR,
-							pw,
-							buildSyntaxError(CommandLineMessages.getString("CommandLineLauncher.15", command)) //$NON-NLS-1$
-						);
-					}
-
-					return;
-				}
-
-				if (store == null) {
-					store = STORE_AUTO;
-				}
-
-				if (COMMAND_LIST.equals(command)) {
-
-					final String aliases = listAliases(store, password, xml);
-
-					closeApp(STATUS_SUCCESS, pw, aliases);
-				}
-				else if (!COMMAND_SIGN.equals(command) && !COMMAND_COSIGN.equals(command) && !COMMAND_COUNTERSIGN.equals(command)) {
-					closeApp(
-						STATUS_ERROR,
-						pw,
-						buildSyntaxError(CommandLineMessages.getString("CommandLineLauncher.15", command)) //$NON-NLS-1$
-					);
-				}
-
-				if (format == null) {
-					format = FORMAT_AUTO;
-				}
-
-				if (algorithm == null) {
-					algorithm = DEFAULT_SIGN_ALGORITHM;
-				}
-
-				if (inputFile == null) {
-					closeApp(STATUS_ERROR, pw, CommandLineMessages.getString("CommandLineLauncher.5")); //$NON-NLS-1$
-				}
-
-				if (alias == null && filter == null) {
-					closeApp(STATUS_ERROR, pw, CommandLineMessages.getString("CommandLineLauncher.17")); //$NON-NLS-1$
-				}
-
-				if (outputFile == null && !xml) {
-					closeApp(STATUS_ERROR, pw, CommandLineMessages.getString("CommandLineLauncher.19")); //$NON-NLS-1$
-				}
-
-				boolean failed = false;
-				byte[] res = null;
-				try {
-					// Obtenemos el almacen
-					final AOKeyStoreManager ksm;
-					try {
-						ksm = getKsm(store, password);
-					}
-					catch (final Exception e) {
-						throw new CommandLineException("No se ha podido inicializar el almacen de claves: " + e, e); //$NON-NLS-1$
-					}
-
-					String selectedAlias = alias;
-					if (filter != null) {
-						selectedAlias = filterCertificates(ksm, filter);
-					}
-
-					res = buildSuccessSignMessage(
-						sign(
-							command,
-							format,
-							algorithm,
-							extraParams,
-							inputFile,
-							selectedAlias,
-							ksm,
-							password
-						),
-						xml
-					);
-				}
-				catch (final CommandLineException e) {
-					res = buildErrorMessage(e.getMessage(), e, xml);
-					failed = true;
-				}
-
-				if (outputFile != null) {
-
-					try (
-						final OutputStream fos = new FileOutputStream(outputFile);
-					) {
-						fos.write(res);
-					}
-					catch(final Exception e) {
-						closeApp(
-							STATUS_ERROR,
-							pw,
-							CommandLineMessages.getString("CommandLineLauncher.21", outputFile.getAbsolutePath()) //$NON-NLS-1$
-						);
-					}
-
-				}
-
-				// Devolvemos el mensaje segun la configuracion establecida
-
-				// Si se ha solicitado que se obtenga el resultado en XML el resultado siempre se indicara que el proceso
-				// termino correctamente y el desarrollador debera analizarlo para conocer el resultado de la operacion.
-				// Si no se produjo error, también indicaremos que el proceso finalizo correctamente.
-				// El mensaje a mostrar sera puramente informativo si el usuario solucito que la salida se redrigiese a un
-				// fichero, mientras que si no configuro fichero de salida se devolvera la firma resultante
-				if (xml || !failed) {
-					if (outputFile != null) {
-						closeApp(STATUS_SUCCESS, pw, CommandLineMessages.getString("CommandLineLauncher.22")); //$NON-NLS-1$
-					}
-					else {
-						closeApp(STATUS_SUCCESS, pw, new String(res));
-					}
-				}
-				// Si la operacion finalizo con errores y la salida no debe hacer en forma de XML, indicamos directamente el
-				// resultado
-				else {
-					closeApp(STATUS_ERROR, pw, new String(res));
+						return;
 				}
 			}
-			catch(final ArrayIndexOutOfBoundsException e) {
-				closeApp(STATUS_ERROR, pw, buildSyntaxError());
+			catch (final CommandLineException e) {
+				closeApp(STATUS_ERROR, pw, CommandLineParameters.buildSyntaxError(command, e.getMessage()));
+				return;
+			}
+			catch (final IOException e) {
+				closeApp(STATUS_ERROR, pw, e.getMessage());
+				return;
+			}
+			catch (final AOKeystoreAlternativeException e) {
+				closeApp(STATUS_ERROR, pw, CommandLineMessages.getString("CommandLineLauncher.49", e.getMessage())); //$NON-NLS-1$
+				return;
+			}
+			catch (final Exception e) {
+				closeApp(STATUS_ERROR, pw, CommandLineMessages.getString("CommandLineLauncher.50", e.getMessage())); //$NON-NLS-1$
+				return;
+			}
+
+		}
+	}
+
+	/** Mostramos el panel de validaci&oacute;n de certificados y firmas.
+	 * @param params Par&aacute;metros de configuraci&oacute;n.
+	 * @throws CommandLineException Cuando falta algun par&aacute;metro necesario. */
+	private static void verifyByGui(final CommandLineParameters params) throws CommandLineException {
+
+		final File inputFile = params.getInputFile();
+		if (inputFile == null) {
+			throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.5")); //$NON-NLS-1$
+		}
+
+		// Comprobamos si lo que nos piden validar es un certificado...
+		X509Certificate cert;
+		try (
+			InputStream bis = new BufferedInputStream(
+				new FileInputStream(inputFile)
+			);
+		) {
+			cert = DataAnalizerUtil.isCertificate(AOUtil.getDataFromInputStream(bis));
+		}
+		catch (final Exception e) {
+			cert = null;
+		}
+
+		// Si no es un certificado asumimos que es una firma
+		if (cert == null) {
+			new VisorFirma(true, null).initialize(false, inputFile);
+		}
+
+		// Y si es certificado lo validamos como tal
+		else {
+			Image icon = null;
+			try {
+				icon = ImageIO.read(
+					CommandLineLauncher.class.getResource(
+						"/resources/certificate_16.png" //$NON-NLS-1$
+					)
+				);
+			}
+			catch (final IOException e) {
+				// Se ignora
+			}
+			CertValidationUi.validateCert(cert, null, null, icon);
+		}
+	}
+
+	/** Realizamos la operaci&oacute;n de creaci&oacute;n de huellas digitales mostrando los di&aacute;logos
+	 * que fuesen necesarios.
+	 * @param params Par&aacute;metros de configuraci&oacute;n.
+	 * @throws CommandLineException Cuando falta algun par&aacute;metro necesario. */
+	private static void createHashByGui(final CommandLineParameters params) throws CommandLineException {
+
+		final File inputFile = params.getInputFile();
+		if (inputFile == null) {
+			throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.5")); //$NON-NLS-1$
+		}
+
+		HashHelper.createHashUI(params.getInputFile().getAbsolutePath());
+	}
+
+	/** Realizamos la operaci&oacute;n de comprobaci&oacute;n de huellas digitales mostrando los di&aacute;logos
+	 * que fuesen necesarios.
+	 * @param params Par&aacute;metros de configuraci&oacute;n.
+	 * @throws CommandLineException Cuando falta algun par&aacute;metro necesario. */
+	private static void checkHashByGui(final CommandLineParameters params) throws CommandLineException {
+
+		final File inputFile = params.getInputFile();
+		if (inputFile == null) {
+			throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.5")); //$NON-NLS-1$
+		}
+		HashHelper.checkHashUI(params.getInputFile().getAbsolutePath());
+	}
+
+	/** Mostramos el panel de firmas. Se usara la configuraci&oacute;n de firma establecida
+	 * en la interfaz de AutoFirma.
+	 * @param params Par&aacute;metros de configuraci&oacute;n.
+	 * @throws CommandLineException Cuando falta algun par&aacute;metro necesario. */
+	private static void signByGui(final CommandLineParameters params) throws CommandLineException {
+
+		final File inputFile = params.getInputFile();
+		if (inputFile == null) {
+			throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.5")); //$NON-NLS-1$
+		}
+
+		final SimpleAfirma simpleAfirma = new SimpleAfirma();
+		simpleAfirma.initialize(inputFile);
+		simpleAfirma.loadFileToSign(inputFile);
+	}
+
+	private static String batchByCommandLine(final CommandLineParameters params) throws CommandLineException {
+
+		final File inputFile = params.getInputFile();
+		if (inputFile == null) {
+			throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.5")); //$NON-NLS-1$
+		}
+
+		String selectedAlias = params.getAlias();
+		if (selectedAlias == null && params.getFilter() == null) {
+			throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.17")); //$NON-NLS-1$
+		}
+
+		final File outputFile  = params.getOutputFile();
+		if (outputFile == null && !params.isXml()) {
+			throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.19")); //$NON-NLS-1$
+		}
+
+		final URL preUrl = params.getPreSignUrl();
+		final URL postUrl = params.getPostSignUrl();
+		if (preUrl == null || postUrl == null) {
+			throw new CommandLineException(
+				CommandLineMessages.getString("CommandLineLauncher.60") //$NON-NLS-1$
+			);
+		}
+
+		try {
+			final AOKeyStoreManager ksm = getKsm(params.getStore(), params.getPassword());
+			if (params.getFilter() != null) {
+				selectedAlias = filterCertificates(ksm, params.getFilter());
+			}
+			final PrivateKeyEntry pke = ksm.getKeyEntry(selectedAlias);
+			if (pke == null) {
+				throw new CommandLineException(
+					CommandLineMessages.getString("CommandLineLauncher.61", selectedAlias) //$NON-NLS-1$
+				);
+			}
+			final byte[] inputXml;
+			try (
+				final InputStream fis = new FileInputStream(inputFile);
+				final InputStream bis = new BufferedInputStream(fis);
+			) {
+				inputXml = AOUtil.getDataFromInputStream(bis);
+			}
+			final String xml;
+			if (!Base64.isBase64(inputXml)) {
+				xml = Base64.encode(inputXml, true);
+			}
+			else {
+				xml = new String(inputXml).replace("+", "-").replace("/", "_"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			}
+			final String res = BatchSigner.sign(
+				xml,
+				preUrl.toString(),
+				postUrl.toString(),
+				pke.getCertificateChain(),
+				pke.getPrivateKey()
+			);
+			try (
+				final FileOutputStream fos = new FileOutputStream(outputFile);
+				final BufferedOutputStream bos = new BufferedOutputStream(fos);
+			) {
+				fos.write(res.getBytes());
+				fos.flush();
+			}
+
+			final String okMsg = CommandLineMessages.getString("CommandLineLauncher.22"); //$NON-NLS-1$
+			if (params.isXml()) {
+				if (params.getOutputFile() != null) {
+					return buildXmlResponse(true, okMsg, null);
+				}
+				return buildXmlResponse(true, okMsg, res.getBytes());
+			}
+			return okMsg;
+
+		}
+		catch (IOException |
+			   AOKeystoreAlternativeException |
+			   KeyStoreException              |
+			   NoSuchAlgorithmException       |
+			   UnrecoverableEntryException    |
+			   CertificateEncodingException   |
+			   AOException e) {
+					if (params.isXml()) {
+						return buildXmlResponse(false, e.getMessage(), null);
+					}
+					return e.getMessage();
+		}
+
+	}
+
+	/** Firma por l&iacute;nea de comandos.
+	 * @param command Comando ejecutado en l&iacute;nea de comandos.
+	 * @param params Par&aacute;metros de configuraci&oacute;n.
+	 * @return Mensaje con el resultado de la operaci&oacute;n.
+	 * @throws CommandLineException Cuando falta algun par&aacute;metro necesario. */
+	private static String signByCommandLine(final CommandLineCommand command, final CommandLineParameters params) throws CommandLineException {
+
+		if (params.getInputFile() == null) {
+			throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.5")); //$NON-NLS-1$
+		}
+
+		if (params.getAlias() == null && params.getFilter() == null) {
+			throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.17")); //$NON-NLS-1$
+		}
+
+		if (params.getOutputFile() == null && !params.isXml()) {
+			throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.19")); //$NON-NLS-1$
+		}
+
+		byte[] res;
+		try {
+			final AOKeyStoreManager ksm = getKsm(params.getStore(), params.getPassword());
+
+			String selectedAlias = params.getAlias();
+			if (params.getFilter() != null) {
+				selectedAlias = filterCertificates(ksm, params.getFilter());
+			}
+
+			res = sign(
+				command,
+				params.getFormat(),
+				params.getAlgorithm(),
+				params.getExtraParams(),
+				params.getInputFile(),
+				selectedAlias,
+				ksm,
+				params.getPassword()
+			);
+		}
+		catch (IOException | AOException | AOKeystoreAlternativeException e) {
+			if (params.isXml()) {
+				return buildXmlResponse(false, e.getMessage(), null);
+			}
+			return e.getMessage();
+		}
+
+		// Si se ha proporcionado un fichero de salida, se guarda el resultado de la firma en el.
+		// La respuesta, si se indico que fuese XML, sera un XML con el texto descriptivo de la respuesta
+		// y, si no se guardo la firma, el resultado de la firma. Si la respuesta no es XML simplemente
+		// se devuelve el texto plano con el resultado.
+		if (params.getOutputFile() != null) {
+
+			try (final OutputStream fos = new FileOutputStream(params.getOutputFile());) {
+				fos.write(res);
+			}
+			catch(final Exception e) {
+				return CommandLineMessages.getString(
+					"CommandLineLauncher.21", //$NON-NLS-1$
+					params.getOutputFile().getAbsolutePath()
+				);
 			}
 		}
 
+		final String okMsg = CommandLineMessages.getString("CommandLineLauncher.22"); //$NON-NLS-1$
+		if (params.isXml()) {
+			if (params.getOutputFile() != null) {
+				return buildXmlResponse(true, okMsg, null);
+			}
+			return buildXmlResponse(true, okMsg, res);
+		}
+		return okMsg;
 	}
 
 	/** Filtra los certificados del almac&eacute;n y devuelve el alias del &uacute;nico certificado
@@ -431,27 +464,27 @@ final class CommandLineLauncher {
 
 		if (filteredAliases == null || filteredAliases.length == 0) {
 			throw new CommandLineException(
-				"No se han encontrado certificados que se ajusten al filtro establecido" //$NON-NLS-1$
+					CommandLineMessages.getString("CommandLineLauncher.52") //$NON-NLS-1$
 			);
 		}
 
 		if (filteredAliases.length > 1) {
 			throw new CommandLineException(
-				"Se ha encontrado mas de un certificado a partir del fitro establecido" //$NON-NLS-1$
+					CommandLineMessages.getString("CommandLineLauncher.53") //$NON-NLS-1$
 			);
 		}
 
 		return filteredAliases[0];
 	}
 
-	private static byte[] sign(final String op,
+	private static byte[] sign(final CommandLineCommand command,
 			                   final String fmt,
 			                   final String algorithm,
 			                   final String extraParams,
 			                   final File inputFile,
 			                   final String alias,
 			                   final AOKeyStoreManager ksm,
-			                   final String storePassword) throws CommandLineException {
+			                   final String storePassword) throws CommandLineException, IOException, AOException {
 
 		final PrivateKeyEntry ke;
 		ksm.setEntryPasswordCallBack(
@@ -460,15 +493,13 @@ final class CommandLineLauncher {
 			)
 		);
 		try {
-			ke = ksm.getKeyEntry(
-				alias
-			);
+			ke = ksm.getKeyEntry(alias);
 		}
 		catch (final Exception e) {
-			throw new CommandLineException("No se ha podido obtener la referencia a la clave privada", e); //$NON-NLS-1$
+			throw new AOException("No se ha podido obtener la referencia a la clave privada", e); //$NON-NLS-1$
 		}
 		if (ke == null) {
-			throw new CommandLineException("No se hay ninguna entrada en el almacen con el alias indicado: " + alias); //$NON-NLS-1$
+			throw new AOException("No se hay ninguna entrada en el almacen con el alias indicado: " + alias); //$NON-NLS-1$
 		}
 
 		// Leemos el fichero de entrada
@@ -479,87 +510,84 @@ final class CommandLineLauncher {
 			data = AOUtil.getDataFromInputStream(input);
 		}
 		catch(final Exception e) {
-			throw new CommandLineException(
+			throw new IOException(
 				"No se ha podido leer el fichero de entrada: " + inputFile.getAbsolutePath(), e //$NON-NLS-1$
 			);
 		}
-
-		// Si el formato es "auto", miramos si es XML o PDF para asignar XAdES o PAdES
-		final String format;
-		if (FORMAT_AUTO.equals(fmt)) {
-			final String ext = new MimeHelper(data).getExtension();
-			if ("pdf".equals(ext)) { //$NON-NLS-1$
-				format = FORMAT_PADES;
-			}
-			else if ("xml".equals(ext)) { //$NON-NLS-1$
-				format = FORMAT_XADES;
+		String format = null;
+		Properties extraParamsProperties = null;
+		if (command != CommandLineCommand.MASSIVE) {
+			// Si el formato es "auto", miramos si es XML o PDF para asignar XAdES o PAdES
+			if (CommandLineParameters.FORMAT_AUTO.equals(fmt)) {
+				final String ext = new MimeHelper(data).getExtension();
+				if ("pdf".equals(ext)) { //$NON-NLS-1$
+					format = CommandLineParameters.FORMAT_PADES;
+				}
+				else if ("xml".equals(ext)) { //$NON-NLS-1$
+					format = CommandLineParameters.FORMAT_XADES;
+				}
+				else {
+					format = CommandLineParameters.FORMAT_CADES;
+				}
 			}
 			else {
-				format = FORMAT_CADES;
+				format = fmt;
 			}
-		}
-		else {
-			format = fmt;
-		}
 
-		Properties extraParamsProperties = null;
-		if (extraParams != null) {
-			try {
-				final String params = extraParams.trim();
-				extraParamsProperties = new Properties();
+			if (extraParams != null) {
+				try {
+					final String params = extraParams.trim();
+					extraParamsProperties = new Properties();
 
-				// La division no funciona correctamente con split porque el caracter salto de linea se protege
-				// al insertarse por consola, asi que lo hacemos manualmente.
-				int beginIndex = 0;
-				int endIndex;
-				while ((endIndex = params.indexOf("\\n", beginIndex)) != -1) { //$NON-NLS-1$
-					final String keyValue = params.substring(beginIndex, endIndex).trim();
-					// Solo procesamos las lineas con contenido que no sean comentario
-					if (keyValue.length() > 0 && keyValue.charAt(0) != '#') {
-						extraParamsProperties.setProperty(
-							keyValue.substring(0, keyValue.indexOf('=')),
-							keyValue.substring(keyValue.indexOf('=') + 1)
-						);
+					// La division no funciona correctamente con split porque el caracter salto de linea se protege
+					// al insertarse por consola, asi que lo hacemos manualmente.
+					int beginIndex = 0;
+					int endIndex;
+					while ((endIndex = params.indexOf("\\n", beginIndex)) != -1) { //$NON-NLS-1$
+						final String keyValue = params.substring(beginIndex, endIndex).trim();
+						// Solo procesamos las lineas con contenido que no sean comentario
+						if (keyValue.length() > 0 && keyValue.charAt(0) != '#') {
+							extraParamsProperties.setProperty(
+								keyValue.substring(0, keyValue.indexOf('=')),
+								keyValue.substring(keyValue.indexOf('=') + 1)
+							);
+						}
+						beginIndex = endIndex + "\\n".length();  //$NON-NLS-1$
 					}
-					beginIndex = endIndex + "\\n".length();  //$NON-NLS-1$
+					extraParamsProperties.setProperty(
+						params.substring(beginIndex, params.indexOf('=', beginIndex)),
+						params.substring(params.indexOf('=', beginIndex) + 1)
+					);
 				}
-				extraParamsProperties.setProperty(
-					params.substring(beginIndex, params.indexOf('=', beginIndex)),
-					params.substring(params.indexOf('=', beginIndex) + 1)
-				);
-			}
-			catch (final Exception e) {
-				throw new CommandLineException(
-					"Error en los parametros de configuracion de firma:\n" + extraParams, e //$NON-NLS-1$
-				);
+				catch (final Exception e) {
+					throw new CommandLineException(
+							CommandLineMessages.getString("CommandLineLauncher.51", extraParams), e); //$NON-NLS-1$
+				}
 			}
 		}
 
 		// Instanciamos un firmador del tipo adecuado
 		final AOSigner signer;
-		if (FORMAT_CADES.equals(format)) {
+		if (CommandLineParameters.FORMAT_CADES.equals(format)) {
 			signer = new AOCAdESSigner();
 		}
-		else if (FORMAT_XADES.equals(format)) {
+		else if (CommandLineParameters.FORMAT_XADES.equals(format)) {
 			signer = new AOXAdESSigner();
 		}
-		else if (FORMAT_PADES.equals(format)) {
+		else if (CommandLineParameters.FORMAT_PADES.equals(format)) {
 			signer = new AOPDFSigner();
 		}
-		else if (FORMAT_FACTURAE.equals(format)) {
+		else if (CommandLineParameters.FORMAT_FACTURAE.equals(format)) {
 			signer = new AOFacturaESigner();
 		}
 		else {
-			throw new CommandLineException(
-				"No se reconoce o no esta soportado el formato de firma: " + format, //$NON-NLS-1$
-				new AOUnsupportedSignFormatException("No se reconoce o no esta soportado el formato de firma:" + format) //$NON-NLS-1$
-			);
+			throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.4", format)); //$NON-NLS-1$
 		}
 
 		// Obtenemos el resultado de la operacion adecuada
 		final byte[] resBytes;
 		try {
-			if (COMMAND_SIGN.equals(op)) {
+			if (command == CommandLineCommand.SIGN) {
 				resBytes = signer.sign(
 					data,
 					algorithm,
@@ -568,7 +596,7 @@ final class CommandLineLauncher {
 					extraParamsProperties
 				);
 			}
-			else if (COMMAND_COSIGN.equals(op)) {
+			else if (command == CommandLineCommand.COSIGN) {
 				resBytes = signer.cosign(
 					data, // Firma
 					algorithm,
@@ -577,7 +605,7 @@ final class CommandLineLauncher {
 					extraParamsProperties
 				);
 			}
-			else if (COMMAND_COUNTERSIGN.equals(op)) {
+			else if (command == CommandLineCommand.COUNTERSIGN) {
 				CounterSignTarget csTarget = CounterSignTarget.LEAFS;
 				if (extraParamsProperties != null && extraParamsProperties.containsKey(EXTRA_PARAM_TARGET) &&
 						CounterSignTarget.TREE.name().equalsIgnoreCase(extraParamsProperties.getProperty(EXTRA_PARAM_TARGET))) {
@@ -595,7 +623,7 @@ final class CommandLineLauncher {
 				);
 			}
 			else {
-				throw new CommandLineException("Operacion no soportada: " + op); //$NON-NLS-1$
+				throw new CommandLineException("Operacion no soportada: " + command.getOp()); //$NON-NLS-1$
 			}
 		}
 		catch(final Exception e) {
@@ -605,45 +633,31 @@ final class CommandLineLauncher {
 		return resBytes;
 	}
 
-	private static String listAliases(final String store, final String password, final boolean xml) {
-		final String[] aliases;
-		try {
-			aliases = getKsm(store, password).getAliases();
-		}
-		catch (final Exception e) {
-			return CommandLineMessages.getString("CommandLineLauncher.6") + e; //$NON-NLS-1$
-		}
+	private static String listAliasesByCommandLine(final CommandLineParameters params) throws IOException, CommandLineException, AOKeystoreAlternativeException {
+
+		final String[] aliases = getKsm(params.getStore(), params.getPassword()).getAliases();
 		final StringBuilder sb = new StringBuilder();
-		if (xml) {
+
+		if (params.isXml()) {
 			sb.append("<afirma><result>ok</result><response>"); //$NON-NLS-1$
-		}
-		for (final String alias : aliases) {
-			if (xml) {
-				sb.append("<alias>"); //$NON-NLS-1$
+			for (final String alias : aliases) {
+				sb.append("<alias>").append(alias).append("</alias>"); //$NON-NLS-1$ //$NON-NLS-2$
 			}
-			sb.append(alias);
-			if (xml) {
-				sb.append("</alias>"); //$NON-NLS-1$
-			}
-			else {
-				sb.append('\n');
-			}
-		}
-		if (xml) {
 			sb.append("</response></afirma>"); //$NON-NLS-1$
 		}
+		else {
+			for (final String alias : aliases) {
+				sb.append(alias).append('\n');
+			}
+		}
+
 		return sb.toString();
 	}
 
-	private static AOKeyStoreManager getKsm(final String storeType, final String pwd) throws AOKeystoreAlternativeException, IOException {
-		if (storeType == null) {
-			throw new IllegalArgumentException(
-				"El tipo de almacen de claves no puede ser nulo" //$NON-NLS-1$
-			);
-		}
+	private static AOKeyStoreManager getKsm(final String storeType, final String pwd) throws IOException, CommandLineException, AOKeystoreAlternativeException {
 		final AOKeyStore store;
 		String lib = null;
-		if (STORE_AUTO.equals(storeType)) {
+		if (STORE_AUTO.equals(storeType) || storeType == null) {
 			if (Platform.OS.MACOSX.equals(Platform.getOS())) {
 				store = AOKeyStore.APPLE;
 			}
@@ -670,10 +684,10 @@ final class CommandLineLauncher {
 			store = AOKeyStore.PKCS12;
 			final String libName = storeType.replace(STORE_P12 + ":", ""); //$NON-NLS-1$ //$NON-NLS-2$
 			if (!new File(libName).exists()) {
-				throw new IllegalArgumentException("El fichero PKCS#12 indicado no existe: " + libName); //$NON-NLS-1$
+				throw new IOException("El fichero PKCS#12 indicado no existe: " + libName); //$NON-NLS-1$
 			}
 			if (!new File(libName).canRead()) {
-				throw new IllegalArgumentException("No se tienen permisos de lectura para el fichero PKCS#12 indicado: " + libName); //$NON-NLS-1$
+				throw new IOException("No se tienen permisos de lectura para el fichero PKCS#12 indicado: " + libName); //$NON-NLS-1$
 			}
 			lib = libName;
 		}
@@ -681,16 +695,17 @@ final class CommandLineLauncher {
 			store = AOKeyStore.PKCS11;
 			final String libName = storeType.replace(STORE_P11 + ":", ""); //$NON-NLS-1$ //$NON-NLS-2$
 			if (!new File(libName).exists()) {
-				throw new IllegalArgumentException("La biblioteca PKCS#11 indicada no existe: " + libName); //$NON-NLS-1$
+				throw new IOException("La biblioteca PKCS#11 indicada no existe: " + libName); //$NON-NLS-1$
 			}
 			if (!new File(libName).canRead()) {
-				throw new IllegalArgumentException("No se tienen permisos de lectura para la biblioteca PKCS#11 indicada: " + libName); //$NON-NLS-1$
+				throw new IOException("No se tienen permisos de lectura para la biblioteca PKCS#11 indicada: " + libName); //$NON-NLS-1$
 			}
 			lib = libName;
 		}
 		else {
-			throw new IllegalArgumentException("Tipo de almacen desconocido: " + storeType); //$NON-NLS-1$
+			throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.48", storeType)); //$NON-NLS-1$
 		}
+
 		return AOKeyStoreManagerFactory.getAOKeyStoreManager(
 			store,
 			lib,
@@ -700,132 +715,85 @@ final class CommandLineLauncher {
 		);
 	}
 
-	/**
-	 * Construye la cadena de texto que explica la sintaxis para el uso de la aplicaci&oacute;n
-	 * por l&iacute;nea de comandos.
-	 * @return Texto con la explicaci&oacute;n de la sintaxis correcta.
-	 */
-	private static String buildSyntaxError() {
-		return buildSyntaxError(null);
-	}
-
-	/**
-	 * Construye la cadena de texto que explica la sintaxis para el uso de la aplicaci&oacute;n
+	/** Construye la cadena de texto que explica la sintaxis para el uso de la aplicaci&oacute;n
 	 * por l&iacute;nea de comandos.
 	 * @param errorMessage Mensaje con el error de explica cometido.
-	 * @return Texto con el error de sintaxis y la explicaci&oacute;n de la sintaxis correcta.
-	 */
-	private static String buildSyntaxError(final String errorMessage) {
+	 * @return Texto con el error de sintaxis y la explicaci&oacute;n de la sintaxis correcta. */
+	private static String buildGeneralSyntax(final String errorMessage) {
 		final StringBuilder sb = new StringBuilder();
 		if (errorMessage != null) {
-			sb.append(errorMessage);
+			sb.append(errorMessage).append("\n"); //$NON-NLS-1$;
 		}
-		sb.append("\n") //$NON-NLS-1$
-		.append(CommandLineMessages.getString("CommandLineLauncher.7")).append(": SimpleAfirma cmd [options...]\n")  //$NON-NLS-1$//$NON-NLS-2$
-		.append("cmd\n") //$NON-NLS-1$
-		.append("  sign        (").append(CommandLineMessages.getString("CommandLineLauncher.8")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		.append("  cosign      (").append(CommandLineMessages.getString("CommandLineLauncher.9")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		.append("  countersign (").append(CommandLineMessages.getString("CommandLineLauncher.10")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		.append("  ").append(COMMAND_LIST).append(" (").append(CommandLineMessages.getString("CommandLineLauncher.11")).append(")\n")  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-		.append("options\n") //$NON-NLS-1$
-		.append("  ").append(PARAM_STORE).append(" auto|windows|mac|mozilla|dni|pkcs12:p12file\n") //$NON-NLS-1$ //$NON-NLS-2$
-		.append("  ").append(PARAM_PASSWD).append(" storepassword (").append(CommandLineMessages.getString("CommandLineLauncher.12")).append(")\n")  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-		.append("  ").append(PARAM_FORMAT).append(" auto|xades|cades|pades|facturae\n")  //$NON-NLS-1$//$NON-NLS-2$
-		.append("  ").append(PARAM_CONFIG).append(" extraParams (").append(CommandLineMessages.getString("CommandLineLauncher.27")).append(")\n")  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-		.append("  ").append(PARAM_INPUT).append(" inputfile (").append(CommandLineMessages.getString("CommandLineLauncher.13")).append(")\n")  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-		.append("  ").append(PARAM_OUTPUT).append(" outputfile (").append(CommandLineMessages.getString("CommandLineLauncher.14")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-		.append("  ").append(PARAM_ALIAS).append(" alias (").append(CommandLineMessages.getString("CommandLineLauncher.16")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-		.append("  ").append(PARAM_ALGO).append(" algo (").append(CommandLineMessages.getString("CommandLineLauncher.20")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-		.append("  ").append(PARAM_XML).append(" (").append(CommandLineMessages.getString("CommandLineLauncher.18")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-		.append("  ").append(PARAM_GUI).append(" (").append(CommandLineMessages.getString("CommandLineLauncher.23")).append(")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		else {
+			sb.append(CommandLineMessages.getString("CommandLineLauncher.34")).append("\n\n"); //$NON-NLS-1$; //$NON-NLS-2$;
+		}
+		sb.append(CommandLineMessages.getString("CommandLineLauncher.7")).append(": AutoFirma cmd [options...]\n\n")  //$NON-NLS-1$//$NON-NLS-2$
+		.append(CommandLineMessages.getString("CommandLineLauncher.33")) .append(" cmd:\n\n") //$NON-NLS-1$ //$NON-NLS-2$
+		.append("  ").append(CommandLineCommand.SIGN.getOp())			 .append("\t\t (").append(CommandLineMessages.getString("CommandLineLauncher.8")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		.append("  ").append(CommandLineCommand.COSIGN.getOp())		     .append("\t (")  .append(CommandLineMessages.getString("CommandLineLauncher.9")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		.append("  ").append(CommandLineCommand.COUNTERSIGN.getOp())	 .append("\t (")  .append(CommandLineMessages.getString("CommandLineLauncher.10")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		//TODO: Descomentar cuando se soporte firma masiva
+		//.append("  ").append(CommandLineCommand.MASSIVE.getOp())	     .append("\t (")  .append(CommandLineMessages.getString("CommandLineLauncher.35")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		.append("  ").append(CommandLineCommand.LIST.getOp())			 .append("\t (")  .append(CommandLineMessages.getString("CommandLineLauncher.11")).append(")\n")  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		.append("  ").append(CommandLineCommand.VERIFY.getOp())		     .append("\t (")  .append(CommandLineMessages.getString("CommandLineLauncher.29")).append(")\n\n")  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		.append("  ").append(CommandLineCommand.BATCHSIGN.getOp())	     .append("\t (")  .append(CommandLineMessages.getString("CommandLineLauncher.69")).append(")\n\n")  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		.append("  ").append(CommandLineCommand.CREATEHASH.getOp())	     .append("\t (")  .append(CommandLineMessages.getString("CommandLineLauncher.70")).append(")\n\n")  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		.append("  ").append(CommandLineCommand.CHECKHASH.getOp())	     .append("\t (")  .append(CommandLineMessages.getString("CommandLineLauncher.71")).append(")\n\n")  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		.append(CommandLineMessages.getString("CommandLineLauncher.30")) .append("\n\n"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		return sb.toString();
 	}
 
-	/**
-	 * Procesa de error de la operaci&oacute;n. Si se indica que debe presentarse como
-	 * XML se devolver&aacute; un XML con la forma:
-	 * <pre>
-	 * &lt;afirma&gt;
-	 *   &lt;result&gt;ko&lt;/result&gt;
-	 *   &lt;response&gt;
-	 *       &lt;description&gt;DESCRIPCION_ERROR&lt;/description&gt;
-	 *   &lt;/response&gt;
-	 * &lt;/afirma&gt;
-	 * </pre>
-	 * Si el resultado no debe ser un XML se lanzar&aacute; una excepci&oacute;n de tipo
-	 * @param message Mensaje de error.
-	 * @param e Excepci&oacute;n que provoc&oacute; el error.
-	 * @param xml Indica si debe construirse un XML con el detalle del error.
-	 * @return XML con el resultado de la operaci&oacute;n.
-	 */
-	private static byte[] buildErrorMessage(final String message, final CommandLineException e, final boolean xml) {
-
-		final StringBuilder sb = new StringBuilder();
-		if (xml) {
-			sb.append("<afirma><result>ko</result><response><description>"); //$NON-NLS-1$
-		}
-		sb.append(message);
-		if (e != null && e.getCause() != null) {
-			sb.append(": "); //$NON-NLS-1$
-			sb.append(e.getCause().toString());
-		}
-
-		if (xml) {
-			sb.append("</description></response></afirma>"); //$NON-NLS-1$
-		}
-		else {
-			sb.append('\n');
-		}
-		return sb.toString().getBytes();
-	}
-
-	/**
-	 * Construye el resultado para una firma/multifirma realizada correctamente. Si el resultado debe
+	/** Construye el resultado para una firma/multifirma. Si el resultado debe
 	 * devolverse en XML se devolver&aacute; un XML con la forma:<br>
 	 * {@code
 	 * <afirma>
-	 *   <result>ok</result>
+	 *   <result>true|false</result>
 	 * 	 <response>
+	 *     <msg>MENSAJE</msg>
 	 *     <sign>FIRMA_BASE64</sign>
 	 * 	 </response>
 	 * </afirma>
 	 * }
-	 * Si no se debe devolver el resultado en XML se devolver&aacute; directamente la firma generada.
-	 * @param resBytes Resultado de la operaci&oacute;n.
-	 * @param xml Indica si el resultado debe devolverse en XML o no.
-	 * @return Resultado de la operaci&oacute;n.
-	 */
-	private static byte[] buildSuccessSignMessage(final byte[] resBytes, final boolean xml) {
+	 * @param ok Resultado de la operaci&oacute;n.
+	 * @param msg Mensaje de respuesta.
+	 * @param resBytes Firma generada o {@code null} si se produjo un error.
+	 * @return XML resultado de la operaci&oacute;n. */
+	private static String buildXmlResponse(final boolean ok, final String msg, final byte[] resBytes) {
 
 		final StringBuilder sb = new StringBuilder();
-		if (xml) {
-			sb.append("<afirma><result>ok</result><response><sign>"); //$NON-NLS-1$");
-			sb.append(Base64.encode(resBytes));
-			sb.append("</sign></response></afirma>"); //$NON-NLS-1$
-			return sb.toString().getBytes();
+		sb.append("<afirma><result>").append(ok).append("</result>"); //$NON-NLS-1$ //$NON-NLS-2$
+		if (msg != null || resBytes != null) {
+			sb.append("<response>"); //$NON-NLS-1$
+			if (msg != null){
+				sb.append("<msg>").append(msg).append("</msg>"); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+			if (resBytes != null) {
+				sb.append("<sign>").append(Base64.encode(resBytes)).append("</sign>"); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+			sb.append("</response>"); //$NON-NLS-1$
 		}
-		return resBytes;
+		sb.append("</afirma>"); //$NON-NLS-1$
+
+		return sb.toString();
 	}
 
-	/**
-	 * Cierra la aplicaci&oacute;n mostrando un &uacute;ltimo mensaje si se le proporcionan
+	/** Cierra la aplicaci&oacute;n mostrando un &uacute;ltimo mensaje si se le proporcionan
 	 * los recursos necesarios.
 	 * @param status Estado de cierre de la aplicaci&oacute;n.
 	 * @param pw Objeto para la impresi&oacute;n por consola.
-	 * @param message Mensaje a mostrar.
-	 */
+	 * @param message Mensaje a mostrar. */
 	private static void closeApp(final int status, final PrintWriter pw, final String message) {
 		if (pw != null) {
 			if (message != null) {
 				pw.write(message);
+				pw.flush();
 			}
 		}
 		System.exit(status);
 	}
 
 	public static void main(final String[] args) {
-		processCommandLine(args);
+		processCommandLine( args );
 	}
-
 }

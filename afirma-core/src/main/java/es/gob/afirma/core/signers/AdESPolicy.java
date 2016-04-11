@@ -17,6 +17,7 @@ import java.util.Properties;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 
+
 /** Pol&iacute;tica de firma para AdES.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public final class AdESPolicy {
@@ -35,7 +36,8 @@ public final class AdESPolicy {
      * @param identifierHashAlgorithm Algoritmo de huella digital usado para el c&aacute;lculo del valor indicado
      *                                      en <code>policyIdentifierHashAlgorithm</code>. Es obligatorio si el valor
      *                                      indicado en <code>policyIdentifierHashAlgorithm</code> no es nulo
-     * @param qualifier URL que apunta a una descripci&oacute;n legible de la pol&iacute;tica (normalmente un PDF)
+     * @param qualifier URL que apunta a una descripci&oacute;n legible de la pol&iacute;tica (normalmente un PDF).
+     *                  Puede ser <code>null</code>.
      */
     public AdESPolicy(final String identifier,
                       final String identifierHash,
@@ -76,7 +78,7 @@ public final class AdESPolicy {
                 throw new IllegalArgumentException("Si se indica la huella digital del identificador de politica es obligatorio indicar tambien el algoritmo"); //$NON-NLS-1$
             }
 
-        	if (!AOUtil.isBase64(identifierHash.getBytes())) {
+        	if (!Base64.isBase64(identifierHash.getBytes())) {
         		throw new IllegalArgumentException("La huella digital de la politica debe estar en formato Base64"); //$NON-NLS-1$
         	}
 
@@ -151,15 +153,41 @@ public final class AdESPolicy {
     		return null;
     	}
 
-    	System.out.println("HashAlgorithm de la politica: " + extraParams.getProperty("policyIdentifierHashAlgorithm"));
-    	System.out.println("Hash de la politica: " + extraParams.getProperty("policyIdentifierHash"));
-
     	return new AdESPolicy(
-    			policyID,
-    			extraParams.getProperty("policyIdentifierHash"), //$NON-NLS-1$
-    			extraParams.getProperty("policyIdentifierHashAlgorithm"), //$NON-NLS-1$
-    			extraParams.getProperty("policyQualifier") //$NON-NLS-1$
-    			);
+			policyID,
+			extraParams.getProperty("policyIdentifierHash"), //$NON-NLS-1$
+			extraParams.getProperty("policyIdentifierHashAlgorithm"), //$NON-NLS-1$
+			extraParams.getProperty("policyQualifier") //$NON-NLS-1$
+		);
+    }
+
+    /** Devuelve los datos de la pol&iacute;tica como un objeto de propiedades de par&aacute;metros
+     * adicionales.
+     * @return Datos de la pol&iacute;tica como un objeto de propiedades de par&aacute;metros
+     *         adicionales. */
+    public Properties asExtraParams() {
+    	final Properties p = new Properties();
+    	p.put("policyIdentifier", getPolicyIdentifier()); //$NON-NLS-1$
+    	if (getPolicyIdentifierHash() != null) {
+    		p.put("policyIdentifierHash", getPolicyIdentifierHash()); //$NON-NLS-1$
+    	}
+    	if (getPolicyIdentifierHashAlgorithm() != null) {
+    		p.put("policyIdentifierHashAlgorithm", getPolicyIdentifierHashAlgorithm()); //$NON-NLS-1$
+    	}
+    	if (getPolicyQualifier() != null) {
+    		p.put("policyQualifier", getPolicyQualifier()); //$NON-NLS-1$
+    	}
+    	return p;
+    }
+
+    @Override
+	public String toString() {
+    	return
+			"Politica de firma: " + //$NON-NLS-1$
+			"identificador='" + getPolicyIdentifier() + "', " + //$NON-NLS-1$ //$NON-NLS-2$
+			"huella='" + getPolicyIdentifierHash() + "', " + //$NON-NLS-1$ //$NON-NLS-2$
+			"algoritmo de huella='" + getPolicyIdentifierHashAlgorithm() + "', " + //$NON-NLS-1$ //$NON-NLS-2$
+			"calificador='" + getPolicyQualifier(); //$NON-NLS-1$
     }
 
     /** {@inheritDoc} */

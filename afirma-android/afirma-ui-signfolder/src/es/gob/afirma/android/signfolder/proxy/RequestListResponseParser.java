@@ -43,7 +43,7 @@ final class RequestListResponseParser {
 
 		if (ERROR_NODE.equalsIgnoreCase(docElement.getNodeName())) {
 			final String errorType = docElement.getAttribute(CD_ATTRIBUTE);
-			throw new ServerException("El servicio proxy notifico un error (" + errorType + "): " + docElement.getTextContent()); //$NON-NLS-1$ //$NON-NLS-2$
+			throw new ServerException("El servicio proxy notifico un error (" + errorType + "): " + XmlUtils.getTextContent(docElement)); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
 		if (!LIST_NODE.equalsIgnoreCase(docElement.getNodeName())) {
@@ -51,11 +51,11 @@ final class RequestListResponseParser {
 					"' y aparece: " + doc.getDocumentElement().getNodeName()); //$NON-NLS-1$
 		}
 
-		String numRequestAttrValue = docElement.getAttribute(NUM_REQUESTS_ATTRIBUTE);
+		final String numRequestAttrValue = docElement.getAttribute(NUM_REQUESTS_ATTRIBUTE);
 		int numRequests;
 		try {
 			numRequests = numRequestAttrValue == null ? 0 : Integer.parseInt(numRequestAttrValue);
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			numRequests = 0;
 		}
 
@@ -168,14 +168,14 @@ final class RequestListResponseParser {
 				throw new IllegalArgumentException("La peticion con referencia '" + ref + //$NON-NLS-1$
 						"' no contiene el elemento " + SUBJECT_NODE); //$NON-NLS-1$
 			}
-			subject = XmlUtils.getTextContent(childNodes.item(elementIndex));
+			subject = normalizeValue(XmlUtils.getTextContent(childNodes.item(elementIndex)));
 
 			elementIndex = XmlUtils.nextNodeElementIndex(childNodes, ++elementIndex);
 			if (elementIndex == -1 || !SENDER_NODE.equalsIgnoreCase(childNodes.item(elementIndex).getNodeName())) {
 				throw new IllegalArgumentException("La peticion con referencia '" + ref + //$NON-NLS-1$
 						"' no contiene el elemento " + SENDER_NODE); //$NON-NLS-1$
 			}
-			sender = XmlUtils.getTextContent(childNodes.item(elementIndex));
+			sender = normalizeValue(XmlUtils.getTextContent(childNodes.item(elementIndex)));
 
 			elementIndex = XmlUtils.nextNodeElementIndex(childNodes, ++elementIndex);
 			if (elementIndex == -1 || !VIEW_NODE.equalsIgnoreCase(childNodes.item(elementIndex).getNodeName())) {
@@ -210,5 +210,14 @@ final class RequestListResponseParser {
 			signRequestDocumentsList.copyInto(tmpRet);
 			return new SignRequest(ref, subject, sender, view, date, priority, workflow, forward, type, tmpRet);
 		}
+	}
+
+	/**
+	 * Deshace los cambios que hizo el proxy para asegurar que el XML est&aacute;ba bien formado.
+	 * @param value Valor que normalizar.
+	 * @return Valor normalizado.
+	 */
+	static String normalizeValue(final String value) {
+		return value.trim().replace("&_lt;", "<").replace("&_gt;", ">"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 	}
 }

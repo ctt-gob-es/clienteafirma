@@ -11,7 +11,6 @@
 package es.gob.afirma.standalone.ui;
 
 import java.awt.BorderLayout;
-import java.awt.Toolkit;
 import java.awt.event.WindowListener;
 import java.util.logging.Logger;
 
@@ -19,6 +18,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
+import es.gob.afirma.standalone.AutoFirmaUtil;
 import es.gob.afirma.standalone.LookAndFeelManager;
 
 /** Pantalla principal de la aplicaci&oacute;n de AutoFirma.
@@ -63,9 +63,7 @@ public final class MainScreen extends JFrame {
 
         try {
             setIconImage(
-        		Toolkit.getDefaultToolkit().getImage(
-    				this.getClass().getResource("/resources/afirma_ico.png") //$NON-NLS-1$
-				)
+        		AutoFirmaUtil.getDefaultDialogsIcon()
             );
         }
         catch (final Exception e) {

@@ -25,6 +25,7 @@ import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.triphase.server.document.DocumentManager;
+import es.gob.afirma.triphase.signer.processors.AutoTriPhasePreProcessor;
 import es.gob.afirma.triphase.signer.processors.CAdESASiCSTriPhasePreProcessor;
 import es.gob.afirma.triphase.signer.processors.CAdESTriPhasePreProcessor;
 import es.gob.afirma.triphase.signer.processors.FacturaETriPhasePreProcessor;
@@ -33,9 +34,7 @@ import es.gob.afirma.triphase.signer.processors.TriPhasePreProcessor;
 import es.gob.afirma.triphase.signer.processors.XAdESASiCSTriPhasePreProcessor;
 import es.gob.afirma.triphase.signer.processors.XAdESTriPhasePreProcessor;
 
-/**
- * Servicio de firma electronica en 3 fases.
- */
+/** Servicio de firma electr&oacute;nica en 3 fases. */
 public final class SignatureService extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
@@ -61,9 +60,12 @@ public final class SignatureService extends HttpServlet {
 	private static final String PARAM_NAME_DOCID = "doc"; //$NON-NLS-1$
 	private static final String PARAM_NAME_ALGORITHM = "algo"; //$NON-NLS-1$
 	private static final String PARAM_NAME_FORMAT = "format"; //$NON-NLS-1$
-	private static final String PARAM_NAME_CERT = "cert"; //$NON-NLS-1$
 	private static final String PARAM_NAME_EXTRA_PARAM = "params"; //$NON-NLS-1$
 	private static final String PARAM_NAME_SESSION_DATA = "session"; //$NON-NLS-1$
+	private static final String PARAM_NAME_CERT = "cert"; //$NON-NLS-1$
+
+	/** Separador que debe usarse para incluir varios certificados dentro del mismo par&aacute;metro. */
+	private static final String PARAM_NAME_CERT_SEPARATOR = ","; //$NON-NLS-1$
 
 	/** Nombre del par&aacute;metro que identifica los nodos que deben contrafirmarse. */
 	private static final String PARAM_NAME_TARGET_TYPE = "target"; //$NON-NLS-1$
@@ -76,6 +78,8 @@ public final class SignatureService extends HttpServlet {
 	private static final String CONFIG_PARAM_DOCUMENT_MANAGER_CLASS = "document.manager"; //$NON-NLS-1$
 	private static final String CONFIG_PARAM_ALLOW_ORIGIN = "Access-Control-Allow-Origin"; //$NON-NLS-1$
 	private static final String CONFIG_PARAM_INSTALL_XMLDSIG = "alternative.xmldsig"; //$NON-NLS-1$
+
+	private static final String EXTRA_PARAM_HEADLESS = "headless"; //$NON-NLS-1$
 
 	/** Or&iacute;genes permitidos por defecto desde los que se pueden realizar peticiones al servicio. */
 	private static final String ALL_ORIGINS_ALLOWED = "*"; //$NON-NLS-1$
@@ -212,6 +216,10 @@ public final class SignatureService extends HttpServlet {
 			return;
 		}
 
+		// Introducimos los parametros necesarios para que no se traten
+		// de mostrar dialogos en servidor
+		extraParams.setProperty(EXTRA_PARAM_HEADLESS, Boolean.TRUE.toString());
+
 		// Obtenemos los parametros adicionales para la firma
 		byte[] sessionData = null;
 		try {
@@ -238,26 +246,34 @@ public final class SignatureService extends HttpServlet {
 			out.flush();
 			return;
 		}
-		final X509Certificate signerCert;
-		try {
-			signerCert = (X509Certificate) CertificateFactory.getInstance("X.509").generateCertificate( //$NON-NLS-1$
-				new ByteArrayInputStream(Base64.decode(cert, true))
-			);
-		}
-		catch(final Exception e) {
-			LOGGER.severe("Error al decodificar el certificado: " + e);  //$NON-NLS-1$
-			out.print(ErrorManager.getErrorMessage(7));
-			out.flush();
-			return;
-		}
 
+		final String[] receivedCerts = cert.split(PARAM_NAME_CERT_SEPARATOR);
+		final X509Certificate[] signerCertChain = new X509Certificate[receivedCerts.length];
+		for (int i = 0; i<receivedCerts.length; i++) {
+			try {
+				signerCertChain[i] =
+					(X509Certificate) CertificateFactory.getInstance("X.509").generateCertificate( //$NON-NLS-1$
+						new ByteArrayInputStream(
+							Base64.decode(receivedCerts[i], true)
+						)
+					)
+				;
+			}
+			catch(final Exception e) {
+
+				LOGGER.log(Level.SEVERE, "Error al decodificar el certificado: " + receivedCerts[i], e);  //$NON-NLS-1$
+				out.print(ErrorManager.getErrorMessage(7));
+				out.flush();
+				return;
+			}
+		}
 
 		byte[] docBytes = null;
 		final String docId = parameters.get(PARAM_NAME_DOCID);
 		if (docId != null) {
 			try {
-				LOGGER.info("Recuperamos el documento mediante el DocumentManager");
-				docBytes = DOC_MANAGER.getDocument(docId, signerCert, extraParams);
+				LOGGER.info("Recuperamos el documento mediante el DocumentManager"); //$NON-NLS-1$
+				docBytes = DOC_MANAGER.getDocument(docId, signerCertChain, extraParams);
 				LOGGER.info(
 					"Recuperado documento de " + docBytes.length + " octetos" //$NON-NLS-1$ //$NON-NLS-2$
 				);
@@ -331,6 +347,14 @@ public final class SignatureService extends HttpServlet {
 					);
 					prep = new FacturaETriPhasePreProcessor(installXmlDSig);
 		}
+		else if (AOSignConstants.SIGN_FORMAT_AUTO.equalsIgnoreCase(format)) {
+			final boolean installXmlDSig = Boolean.parseBoolean(
+				config.getProperty(
+					CONFIG_PARAM_INSTALL_XMLDSIG, Boolean.FALSE.toString()
+				)
+			);
+			prep = new AutoTriPhasePreProcessor(installXmlDSig);
+		}
 		else {
 			LOGGER.severe("Formato de firma no soportado: " + format); //$NON-NLS-1$
 			out.print(ErrorManager.getErrorMessage(8));
@@ -348,7 +372,7 @@ public final class SignatureService extends HttpServlet {
 					preRes = prep.preProcessPreSign(
 						docBytes,
 						algorithm,
-						new X509Certificate[] { signerCert },
+						signerCertChain,
 						extraParams
 					);
 				}
@@ -356,7 +380,7 @@ public final class SignatureService extends HttpServlet {
 					preRes = prep.preProcessPreCoSign(
 						docBytes,
 						algorithm,
-						new X509Certificate[] { signerCert },
+						signerCertChain,
 						extraParams
 					);
 				}
@@ -373,7 +397,7 @@ public final class SignatureService extends HttpServlet {
 					preRes = prep.preProcessPreCounterSign(
 						docBytes,
 						algorithm,
-						new X509Certificate[] { signerCert },
+						signerCertChain,
 						extraParams,
 						target
 					);
@@ -392,11 +416,11 @@ public final class SignatureService extends HttpServlet {
 			}
 
 			out.print(
-					Base64.encode(
-							preRes,
-							true
-							)
-					);
+				Base64.encode(
+					preRes,
+					true
+				)
+			);
 
 			out.flush();
 
@@ -412,7 +436,7 @@ public final class SignatureService extends HttpServlet {
 					signedDoc = prep.preProcessPostSign(
 						docBytes,
 						algorithm,
-						new X509Certificate[] { signerCert },
+						signerCertChain,
 						extraParams,
 						sessionData
 					);
@@ -421,7 +445,7 @@ public final class SignatureService extends HttpServlet {
 					signedDoc = prep.preProcessPostCoSign(
 						docBytes,
 						algorithm,
-						new X509Certificate[] { signerCert },
+						signerCertChain,
 						extraParams,
 						sessionData
 					);
@@ -439,7 +463,7 @@ public final class SignatureService extends HttpServlet {
 					signedDoc = prep.preProcessPostCounterSign(
 						docBytes,
 						algorithm,
-						new X509Certificate[] { signerCert },
+						signerCertChain,
 						extraParams,
 						sessionData,
 						target
@@ -462,10 +486,10 @@ public final class SignatureService extends HttpServlet {
 			LOGGER.info(" Se ha calculado el resultado de la postfirma y se devuelve. Numero de bytes: " + signedDoc.length); //$NON-NLS-1$
 
 			// Devolvemos al servidor documental el documento firmado
-			LOGGER.info("Almacenamos la firma mediante el DocumentManager");
+			LOGGER.info("Almacenamos la firma mediante el DocumentManager"); //$NON-NLS-1$
 			final String newDocId;
 			try {
-				newDocId = DOC_MANAGER.storeDocument(docId, signerCert, signedDoc, extraParams);
+				newDocId = DOC_MANAGER.storeDocument(docId, signerCertChain, signedDoc, extraParams);
 			}
 			catch(final Throwable e) {
 				LOGGER.severe("Error al almacenar el documento: " + e); //$NON-NLS-1$
@@ -473,7 +497,7 @@ public final class SignatureService extends HttpServlet {
 				out.flush();
 				return;
 			}
-			LOGGER.info("Documento almacenado");
+			LOGGER.info("Documento almacenado"); //$NON-NLS-1$
 
 			out.println(
 					new StringBuilder(newDocId.length() + SUCCESS.length()).

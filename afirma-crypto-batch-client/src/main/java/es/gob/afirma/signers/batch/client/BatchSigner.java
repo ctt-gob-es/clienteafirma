@@ -1,3 +1,13 @@
+/* Copyright (C) 2011 [Gobierno de Espana]
+ * This file is part of "Cliente @Firma".
+ * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
+ *   - the GNU General Public License as published by the Free Software Foundation;
+ *     either version 2 of the License, or (at your option) any later version.
+ *   - or The European Software License; either version 1.1 or (at your option) any later version.
+ * Date: 11/01/11
+ * You may contact the copyright holder at: soporte.afirma5@mpt.es
+ */
+
 package es.gob.afirma.signers.batch.client;
 
 import java.io.ByteArrayInputStream;
@@ -17,6 +27,7 @@ import org.w3c.dom.Node;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.http.UrlHttpManagerFactory;
+import es.gob.afirma.core.misc.http.UrlHttpMethod;
 import es.gob.afirma.core.signers.AOPkcs1Signer;
 import es.gob.afirma.core.signers.TriphaseData;
 import es.gob.afirma.core.signers.TriphaseDataSigner;
@@ -192,10 +203,11 @@ public final class BatchSigner {
 
 		final String batchUrlSafe = batchB64.replace("+", "-").replace("/",  "_");  //$NON-NLS-1$ //$NON-NLS-2$//$NON-NLS-3$ //$NON-NLS-4$
 
-		byte[] ret = UrlHttpManagerFactory.getInstalledManager().readUrlByPost(
+		byte[] ret = UrlHttpManagerFactory.getInstalledManager().readUrl(
 			batchPresignerUrl + "?" + //$NON-NLS-1$
 				BATCH_XML_PARAM + EQU + batchUrlSafe + AMP +
-				BATCH_CRT_PARAM + EQU + getCertChainAsBase64(certificates)
+				BATCH_CRT_PARAM + EQU + getCertChainAsBase64(certificates),
+			UrlHttpMethod.POST
 		);
 
 		final TriphaseData td1 = TriphaseData.parser(ret);
@@ -210,11 +222,12 @@ public final class BatchSigner {
 		);
 
 		// Llamamos al servidor de nuevo para el postproceso
-		ret = UrlHttpManagerFactory.getInstalledManager().readUrlByPost(
+		ret = UrlHttpManagerFactory.getInstalledManager().readUrl(
 			batchPostSignerUrl + "?" + //$NON-NLS-1$
 				BATCH_XML_PARAM + EQU + batchUrlSafe + AMP +
 				BATCH_CRT_PARAM + EQU + getCertChainAsBase64(certificates) + AMP +
-				BATCH_TRI_PARAM + EQU + Base64.encode(td2.toString().getBytes(), true)
+				BATCH_TRI_PARAM + EQU + Base64.encode(td2.toString().getBytes(), true),
+			UrlHttpMethod.POST
 		);
 
 		return new String(ret);

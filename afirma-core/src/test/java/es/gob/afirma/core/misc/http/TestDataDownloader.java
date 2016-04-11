@@ -22,8 +22,9 @@ public final class TestDataDownloader {
 	@SuppressWarnings("static-method")
 	@Test
 	public void testDataDownloaderInvalidUrl() throws Exception {
-		final byte[] data = UrlHttpManagerFactory.getInstalledManager().readUrlByPost(
-			"http://dasdasdasd.asd?kaka=caca" //$NON-NLS-1$
+		final byte[] data = UrlHttpManagerFactory.getInstalledManager().readUrl(
+			"http://dasdasdasd.asd?kaka=caca", //$NON-NLS-1$
+			UrlHttpMethod.POST
 		);
 		System.out.println(new String(data));
 	}

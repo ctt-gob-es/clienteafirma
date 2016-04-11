@@ -128,23 +128,19 @@ final class XmlRequestsFactory {
 
 			Log.i("es.gob.afirma", "Parametros que se agregan:\n" + document.getParams()); //$NON-NLS-1$ //$NON-NLS-2$
 
-			sb.append("<doc docid=\""); //$NON-NLS-1$
-			sb.append(document.getId());
-			sb.append("\" cop=\""); //$NON-NLS-1$
-			sb.append(document.getCryptoOperation());
-			sb.append("\" sigfrmt=\""); //$NON-NLS-1$
-			sb.append(document.getSignFormat());
-			sb.append("\" mdalgo=\""); //$NON-NLS-1$
-			sb.append(document.getMessageDigestAlgorithm());
-			if (document.getParams() == null) {
-				sb.append("\"/>"); //$NON-NLS-1$
-			} else {
-				sb.append("\">"); //$NON-NLS-1$
-				sb.append(XML_PARAMS_OPEN);
-				sb.append(document.getParams() != null ? document.getParams() : ""); //$NON-NLS-1$
-				sb.append(XML_PARAMS_CLOSE);
-				sb.append("</doc>"); //$NON-NLS-1$
-			}
+			sb.append("<doc docid=\"") //$NON-NLS-1$
+			.append(document.getId())
+			.append("\" cop=\"") //$NON-NLS-1$
+			.append(document.getCryptoOperation())
+			.append("\" sigfrmt=\"") //$NON-NLS-1$
+			.append(document.getSignFormat())
+			.append("\" mdalgo=\"") //$NON-NLS-1$
+			.append(document.getMessageDigestAlgorithm())
+			.append("\">") //$NON-NLS-1$
+			.append(XML_PARAMS_OPEN)
+			.append(document.getParams() == null ? "" : document.getParams()) //$NON-NLS-1$
+			.append(XML_PARAMS_CLOSE)
+			.append("</doc>"); //$NON-NLS-1$
 		}
 		sb.append("</req>"); //$NON-NLS-1$
 
@@ -201,10 +197,10 @@ final class XmlRequestsFactory {
 		    		.append(document.getMessageDigestAlgorithm())
 		    		.append("\">") //$NON-NLS-1$
 		    		.append(XML_PARAMS_OPEN)
-		    		.append(document.getParams())
+		    		.append(document.getParams() == null ? "" : document.getParams()) //$NON-NLS-1$
 		    		.append(XML_PARAMS_CLOSE)
 		    		.append(XML_RESULT_OPEN)
-		    		.append(document.getPartialResult().toXMLConfig())
+		    		.append(document.getPartialResult().toXMLParamList())
 		    		.append(XML_RESULT_CLOSE)
 		    		.append("</doc>"); //$NON-NLS-1$
 		    	}

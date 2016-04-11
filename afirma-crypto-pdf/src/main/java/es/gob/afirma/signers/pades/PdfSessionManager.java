@@ -19,18 +19,18 @@ import java.util.HashMap;
 import java.util.Properties;
 import java.util.logging.Logger;
 
-import com.lowagie.text.DocumentException;
-import com.lowagie.text.Image;
-import com.lowagie.text.Rectangle;
-import com.lowagie.text.exceptions.BadPasswordException;
-import com.lowagie.text.pdf.PdfDate;
-import com.lowagie.text.pdf.PdfName;
-import com.lowagie.text.pdf.PdfObject;
-import com.lowagie.text.pdf.PdfPKCS7;
-import com.lowagie.text.pdf.PdfReader;
-import com.lowagie.text.pdf.PdfSignature;
-import com.lowagie.text.pdf.PdfSignatureAppearance;
-import com.lowagie.text.pdf.PdfStamper;
+import com.aowagie.text.DocumentException;
+import com.aowagie.text.Image;
+import com.aowagie.text.Rectangle;
+import com.aowagie.text.exceptions.BadPasswordException;
+import com.aowagie.text.pdf.PdfDate;
+import com.aowagie.text.pdf.PdfName;
+import com.aowagie.text.pdf.PdfObject;
+import com.aowagie.text.pdf.PdfPKCS7;
+import com.aowagie.text.pdf.PdfReader;
+import com.aowagie.text.pdf.PdfSignature;
+import com.aowagie.text.pdf.PdfSignatureAppearance;
+import com.aowagie.text.pdf.PdfStamper;
 
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
@@ -44,6 +44,8 @@ public final class PdfSessionManager {
 
     /** Referencia a la &uacute;ltima p&aacute;gina del documento PDF. */
     static final int LAST_PAGE = -1;
+
+    static final int NEW_PAGE = -2;
 
     private static final int UNDEFINED = -1;
 
@@ -65,15 +67,16 @@ public final class PdfSessionManager {
      * @param signTime Hora de la firma
      * @param extraParams Par&aacute;metros adicionales de la firma
      * @return Datos PDF relevantes en cuanto a las firmas electr&oacute;nicas
-     * @throws AOException En caso de que ocurra cualquier otro tipo de error
-     * @throws IOException En caso de errores de entrada / salida
-     * @throws DocumentException Si ocurren errores en la estampaci&iacute;n de la firma PDF */
+     * @throws IOException En caso de errores de entrada / salida.
+     * @throws InvalidPdfException Si el formato del documento no es v&aacute;lido.
+     * @throws AOException En caso de que ocurra cualquier otro tipo de error.
+     */
     public static PdfTriPhaseSession getSessionData(final byte[] pdfBytes,
                                                     final Certificate[] certChain,
                                                     final Calendar signTime,
-                                                    final Properties extraParams) throws AOException,
-                                                                                         IOException,
-                                                                                         DocumentException {
+                                                    final Properties extraParams) throws IOException,
+                                                                                         InvalidPdfException,
+                                                                                         AOException {
 
 		// *********************************************************************************************************************
 		// **************** LECTURA PARAMETROS ADICIONALES *********************************************************************
@@ -96,11 +99,19 @@ public final class PdfSessionManager {
 
 		// Pagina donde situar la firma visible
 		int page = LAST_PAGE;
-		try {
-			page = Integer.parseInt(extraParams.getProperty(PdfExtraParams.SIGNATURE_PAGE));
+		final String pageStr = extraParams.getProperty(PdfExtraParams.SIGNATURE_PAGE, "-1"); //$NON-NLS-1$
+		if ("append".equalsIgnoreCase(pageStr)) { //$NON-NLS-1$
+			page = NEW_PAGE;
 		}
-		catch (final Exception e) {
-			/* Se deja la pagina tal y como esta */
+		else {
+			try {
+				page = Integer.parseInt(pageStr);
+			}
+			catch (final Exception e) {
+				LOGGER.warning(
+					"Se ha indicado un numero de pagina invalido ('" + pageStr + "'), se usara la ultima pagina: " + e //$NON-NLS-1$ //$NON-NLS-2$
+				);
+			}
 		}
 
 		// Nombre del subfiltro de firma en el diccionario PDF
@@ -268,6 +279,10 @@ public final class PdfSessionManager {
 				signTime   // Momento de la firma
 			);
 		}
+		catch (final DocumentException e) {
+			LOGGER.severe("Error al crear la firma para estampar: " + e); //$NON-NLS-1$
+			throw new AOException("Error al crear la firma para estampar", e); //$NON-NLS-1$
+		}
 		catch(final BadPasswordException e) {
 	        // Comprobamos que el signer esta en modo interactivo, y si no lo
             // esta no pedimos contrasena por dialogo, principalmente para no interrumpir un firmado por lotes
@@ -290,6 +305,17 @@ public final class PdfSessionManager {
             }
             extraParams.put("userPassword", userPwd); //$NON-NLS-1$
             return getSessionData(inPDF, certChain, signTime, extraParams);
+		}
+
+		// Antes de nada, miramos si nos han pedido que insertemos una pagina en blanco para poner ahi la firma
+		// visible
+
+		// Posicion de la firma
+		final Rectangle signaturePositionOnPage = getSignaturePositionOnPage(extraParams);
+		if (page == NEW_PAGE && signaturePositionOnPage != null && signatureField == null) {
+			stp.insertPage(pdfReader.getNumberOfPages() + 1, pdfReader.getPageSizeWithRotation(1));
+			// La pagina pasa a ser la nueva, que es la ultima,
+			page = LAST_PAGE;
 		}
 
 		// Aplicamos todos los atributos de firma
@@ -324,8 +350,6 @@ public final class PdfSessionManager {
 			page = pdfReader.getNumberOfPages();
 		}
 
-		// Posicion de la firma
-		final Rectangle signaturePositionOnPage = getSignaturePositionOnPage(extraParams);
 		if (signaturePositionOnPage != null && signatureField == null) {
 			sap.setVisibleSignature(signaturePositionOnPage, page, null);
 		}
@@ -380,7 +404,7 @@ public final class PdfSessionManager {
 
 		final PdfSignature dic = new PdfSignature(
 			PdfName.ADOBE_PPKLITE,
-			signatureSubFilter != null && !"".equals(signatureSubFilter) ? new PdfName(signatureSubFilter) : PdfName.ADBE_PKCS7_DETACHED //$NON-NLS-1$
+			signatureSubFilter != null && !signatureSubFilter.isEmpty() ? new PdfName(signatureSubFilter) : PdfName.ADBE_PKCS7_DETACHED
 		);
 
 		// Fecha de firma
@@ -421,9 +445,14 @@ public final class PdfSessionManager {
 		final HashMap<PdfName, Integer> exc = new HashMap<PdfName, Integer>();
 		exc.put(PdfName.CONTENTS, Integer.valueOf(CSIZE * 2 + 2));
 
-		sap.preClose(exc, signTime);
+		try {
+			sap.preClose(exc, signTime);
+		} catch (final DocumentException e) {
+			LOGGER.severe("Error al estampar la firma: " + e); //$NON-NLS-1$
+			throw new AOException("Error al estampar la firma", e); //$NON-NLS-1$
+		}
 
-		final PdfObject pdfObject = ((com.lowagie.text.pdf.PdfStamperImp) stp.getWriter()).getFileID();
+		final PdfObject pdfObject = ((com.aowagie.text.pdf.PdfStamperImp) stp.getWriter()).getFileID();
 
 		return new PdfTriPhaseSession(sap, baos, new String(pdfObject.getBytes()));
     }

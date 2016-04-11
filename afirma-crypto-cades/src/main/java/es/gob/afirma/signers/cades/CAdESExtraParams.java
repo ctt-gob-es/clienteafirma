@@ -1,30 +1,41 @@
+/* Copyright (C) 2011 [Gobierno de Espana]
+ * This file is part of "Cliente @Firma".
+ * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
+ *   - the GNU General Public License as published by the Free Software Foundation;
+ *     either version 2 of the License, or (at your option) any later version.
+ *   - or The European Software License; either version 1.1 or (at your option) any later version.
+ * Date: 11/01/11
+ * You may contact the copyright holder at: soporte.afirma5@mpt.es
+ */
+
 package es.gob.afirma.signers.cades;
 
 import java.util.logging.Logger;
 
-/**
- * @author mario
- *
- */
+/** Par&aacute;metros adicionales aceptados para las firmas CAdES. */
 public final class CAdESExtraParams {
 
     static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
-    /**
-     * Algoritmo de huella digital (a usar para la firma) cuando esta se proporciona pre-calculada. Cuando se usan modos de firma
-     * <i>expl&iacute;citos</i>, en los que los datos no se incluyen en la firma, es posible trabajar sin proporcionarlos, indicando
-     * &uacute;nicamente su huella digital en el par&aacute;metro <code>data</code> y el algoritmo usado para su c&aacute;lculo.<br>
-     * <b>Siempre que se de valor a este par&aacute;metro se supondr&aacute; que los datos proporcionados en el par&aacute;metro
-     *  <code>data</code> son la huella digital de los datos a firmar, y no los datos a firmar en s&iacute;. </b>
-     */
+    /** Si se establece a <code>true</code> omite la inclusi&oacute;n de la
+     * pol&iacute;tica de certificaci&oacute;n en el <i>SigningCertificate</i>,
+     * si se establece a <code>false</code> se incluye siempre que el certificado
+     * la declare. */
+    public static final String DO_NOT_INCLUDE_POLICY_ON_SIGNING_CERTIFICATE = "doNotIncludePolicyOnSigningCertificate"; //$NON-NLS-1$
+
+    /** Algoritmo de huella digital (a usar para la firma) cuando esta se proporciona pre-calculada.
+     * Cuando se usan modos de firma <i>expl&iacute;citos</i>, en los que los datos no se incluyen en la firma,
+     * es posible trabajar sin proporcionarlos, indicando &uacute;nicamente su huella digital en el par&aacute;metro
+     * <code>data</code> y el algoritmo usado para su c&aacute;lculo.<br>
+     * <b>Siempre que se de valor a este par&aacute;metro se supondr&aacute; que los datos proporcionados en el
+     * par&aacute;metro <code>data</code> son la huella digital de los datos a firmar, y no los datos a firmar en
+     * s&iacute;.</b> */
     public static final String PRECALCULATED_HASH_ALGORITHM = "precalculatedHashAlgorithm"; //$NON-NLS-1$
 
-    /**
-     * Debe establecerse a <code>true</code> si se desea usar la versi&oacute;n 2 del atributo
+    /** Debe establecerse a <code>true</code> si se desea usar la versi&oacute;n 2 del atributo
      *  <i>Signing Certificate</i> de CAdES. Si no se establece un valor para este par&aacute;metro
      *  se utilizar&aacute; la versi&oacute;n 1 con las firmas realizadas con algoritmos SHA1 y
-     *  la versi&oacute;n 2 con las firmas realizadas con cualquier otro algoritmo.
-   */
+     *  la versi&oacute;n 2 con las firmas realizadas con cualquier otro algoritmo. */
     public static final String SIGNING_CERTIFICATE_V2 = "signingCertificateV2"; //$NON-NLS-1$
 
     /**

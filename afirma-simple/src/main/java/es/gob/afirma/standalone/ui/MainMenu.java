@@ -18,14 +18,12 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 
 import javax.swing.Box;
-import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
-import javax.swing.WindowConstants;
 
 import com.apple.eawt.AboutHandler;
 import com.apple.eawt.AppEvent.AboutEvent;
@@ -39,10 +37,14 @@ import com.apple.eawt.QuitResponse;
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.ui.AOUIFactory;
+import es.gob.afirma.standalone.AutoFirmaUtil;
 import es.gob.afirma.standalone.SimpleAfirma;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.ui.hash.CheckHashDialog;
+import es.gob.afirma.standalone.ui.hash.CheckHashFiles;
 import es.gob.afirma.standalone.ui.hash.CreateHashDialog;
+import es.gob.afirma.standalone.ui.hash.CreateHashFiles;
+import es.gob.afirma.standalone.ui.preferences.PreferencesDialog;
 
 /** Barra de men&uacute; para toda la aplicaci&oacute;n.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
@@ -104,7 +106,7 @@ public final class MainMenu extends JMenuBar {
     public MainMenu(final JFrame p, final SimpleAfirma s) {
         this.saf = s;
         this.parent = p;
-        // Importante: No cargar en un invokeLater, da guerra en Mac OS X
+        // Importante: No cargar en un invokeLater, da guerra
         createUI();
     }
 
@@ -121,7 +123,12 @@ public final class MainMenu extends JMenuBar {
         menuArchivo.setEnabled(true);
 
         this.abrirMenuItem.setText(SimpleAfirmaMessages.getString("MainMenu.2")); //$NON-NLS-1$
-        this.abrirMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        this.abrirMenuItem.setAccelerator(
+        	KeyStroke.getKeyStroke(
+        		KeyEvent.VK_A,
+        		Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()
+        	)
+        );
         this.abrirMenuItem.getAccessibleContext().setAccessibleDescription(
     		SimpleAfirmaMessages.getString("MainMenu.3") //$NON-NLS-1$
 		);
@@ -140,7 +147,7 @@ public final class MainMenu extends JMenuBar {
 	            			null,
 	            			false,
 	            			false,
-	            			null,
+	            			AutoFirmaUtil.getDefaultDialogsIcon(),
 	            			MainMenu.this
 	        			)[0];
 	            	}
@@ -172,36 +179,53 @@ public final class MainMenu extends JMenuBar {
 		);
         menuArchivo.add(this.firmarMenuItem);
 
+        final JMenu toolsMenu = new JMenu(
+    		SimpleAfirmaMessages.getString("MainMenu.32") //$NON-NLS-1$
+		);
+        toolsMenu.setMnemonic(KeyEvent.VK_R);
+        toolsMenu.getAccessibleContext().setAccessibleDescription(
+    		SimpleAfirmaMessages.getString("MainMenu.33") //$NON-NLS-1$
+        );
+        toolsMenu.setEnabled(true);
+
         final JMenu huellaMenu = new JMenu(
     		SimpleAfirmaMessages.getString("MainMenu.25") //$NON-NLS-1$
 		);
-        huellaMenu.setMnemonic('H');
-        final JMenuItem createHuellaMenuItem = new JMenuItem(
-    		SimpleAfirmaMessages.getString("MainMenu.26") //$NON-NLS-1$
+
+        final JMenu huellaDirMenu = new JMenu(
+				SimpleAfirmaMessages.getString("MainMenu.31") //$NON-NLS-1$
 		);
-        createHuellaMenuItem.setAccelerator(
-    		KeyStroke.getKeyStroke(KeyEvent.VK_H, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask())
+		huellaDirMenu.setMnemonic('D');
+
+		final JMenu huellaFileMenu = new JMenu(
+				SimpleAfirmaMessages.getString("MainMenu.30") //$NON-NLS-1$
 		);
-        createHuellaMenuItem.setMnemonic('l');
-        createHuellaMenuItem.addActionListener(
-    		new ActionListener() {
+		huellaFileMenu.setMnemonic('F');
+
+		final JMenuItem createHashFileMenuItem = new JMenuItem(
+				SimpleAfirmaMessages.getString("MainMenu.26") //$NON-NLS-1$
+		);
+		createHashFileMenuItem.setMnemonic('a');
+		createHashFileMenuItem.setAccelerator(KeyStroke.getKeyStroke(
+				KeyEvent.VK_H, Toolkit.getDefaultToolkit()
+						.getMenuShortcutKeyMask()));
+		createHashFileMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					CreateHashDialog.startHashCreation(getParentComponent());
 				}
 			}
 		);
-        huellaMenu.add(createHuellaMenuItem);
+		huellaFileMenu.add(createHashFileMenuItem);
 
-        final JMenuItem checkHuellaMenuItem = new JMenuItem(
-    		SimpleAfirmaMessages.getString("MainMenu.27") //$NON-NLS-1$
+		final JMenuItem checkHashFileMenuItem = new JMenuItem(
+				SimpleAfirmaMessages.getString("MainMenu.27") //$NON-NLS-1$
 		);
-        checkHuellaMenuItem.setMnemonic('r');
-        checkHuellaMenuItem.setAccelerator(
-    		KeyStroke.getKeyStroke(KeyEvent.VK_U, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask())
-		);
-        checkHuellaMenuItem.addActionListener(
-    		new ActionListener() {
+		checkHashFileMenuItem.setMnemonic('o');
+		checkHashFileMenuItem.setAccelerator(KeyStroke.getKeyStroke(
+				KeyEvent.VK_U, Toolkit.getDefaultToolkit()
+						.getMenuShortcutKeyMask()));
+		checkHashFileMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					CheckHashDialog.startHashCheck(getParentComponent());
@@ -209,20 +233,60 @@ public final class MainMenu extends JMenuBar {
 			}
 		);
 
-        huellaMenu.add(checkHuellaMenuItem);
+		final JMenuItem createHashDirMenuItem = new JMenuItem(
+				SimpleAfirmaMessages.getString("MainMenu.28") //$NON-NLS-1$
+		);
+		createHashDirMenuItem.setMnemonic('a');
+		createHashDirMenuItem.setAccelerator(KeyStroke.getKeyStroke(
+				KeyEvent.VK_D, Toolkit.getDefaultToolkit()
+						.getMenuShortcutKeyMask()));
+		createHashDirMenuItem.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				CreateHashFiles.startHashCreation(getParentComponent());
+			}
+		});
 
-        //menuArchivo.add(huellaMenu);
+		final JMenuItem checkHashDirMenuItem = new JMenuItem(
+				SimpleAfirmaMessages.getString("MainMenu.29") //$NON-NLS-1$
+		);
+		checkHashDirMenuItem.setMnemonic('o');
+		checkHashDirMenuItem.setAccelerator(KeyStroke.getKeyStroke(
+				KeyEvent.VK_K, Toolkit.getDefaultToolkit()
+						.getMenuShortcutKeyMask()));
+		checkHashDirMenuItem.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				CheckHashFiles.startHashCheck(getParentComponent());
+			}
+		});
+
+		huellaDirMenu.add(createHashDirMenuItem);
+		huellaDirMenu.add(checkHashDirMenuItem);
+		huellaFileMenu.add(createHashFileMenuItem);
+		huellaFileMenu.add(checkHashFileMenuItem);
+		huellaMenu.setMnemonic('H');
+		huellaMenu.add(huellaFileMenu);
+		huellaMenu.add(huellaDirMenu);
+
+
+        if (!isMac) {
+        	huellaMenu.setMnemonic('H');
+        	createHashFileMenuItem.setMnemonic('l');
+        }
+
 
         // En Mac OS X el salir lo gestiona el propio OS
         if (!isMac) {
-            menuArchivo.addSeparator();
-            final JMenuItem salirMenuItem = new JMenuItem(SimpleAfirmaMessages.getString("MainMenu.7")); //$NON-NLS-1$
-            salirMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F4, ActionEvent.ALT_MASK));
-            salirMenuItem.getAccessibleContext().setAccessibleDescription(
-        		SimpleAfirmaMessages.getString("MainMenu.8") //$NON-NLS-1$
-             );
-            salirMenuItem.addActionListener(
-        		new ActionListener() {
+        	menuArchivo.addSeparator();
+			final JMenuItem salirMenuItem = new JMenuItem(
+					SimpleAfirmaMessages.getString("MainMenu.7")); //$NON-NLS-1$
+			salirMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F4,
+					ActionEvent.ALT_MASK));
+			salirMenuItem.getAccessibleContext().setAccessibleDescription(
+					SimpleAfirmaMessages.getString("MainMenu.8") //$NON-NLS-1$
+					);
+			salirMenuItem.addActionListener(new ActionListener() {
 	            	/** {@inheritDoc} */
 	                @Override
 	                public void actionPerformed(final ActionEvent ae) {
@@ -235,8 +299,12 @@ public final class MainMenu extends JMenuBar {
         }
 
         this.add(menuArchivo);
+        // TODO: Descomentar una vez se entregue
+        toolsMenu.add(new MenuValidation(this.parent));
+        //toolsMenu.add(new MenuDigitalEnvelope(this.parent));
+        toolsMenu.add(huellaMenu);
+        this.add(toolsMenu);
 
-        //this.add(new MenuValidation(this.parent));
 
         if (!isMac) {
             final JMenu optionsMenu = new JMenu(SimpleAfirmaMessages.getString("MainMenu.18")); //$NON-NLS-1$
@@ -371,14 +439,7 @@ public final class MainMenu extends JMenuBar {
     }
 
     void showPreferences() {
-        final JDialog preferencesDialog = new JDialog(MainMenu.this.getParentComponent(), true);
-        preferencesDialog.setTitle(SimpleAfirmaMessages.getString("MainMenu.24")); //$NON-NLS-1$
-        preferencesDialog.add(new PreferencesPanel(preferencesDialog));
-        preferencesDialog.setSize(800, 650);
-        preferencesDialog.setResizable(false);
-        preferencesDialog.setLocationRelativeTo(MainMenu.this.getParentComponent());
-        preferencesDialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-        preferencesDialog.setVisible(true);
+        PreferencesDialog.show(MainMenu.this.getParentComponent(), true);
     }
 
     /** Muestra en OS X el men&uacute; "Acerca de...".

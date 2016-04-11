@@ -27,33 +27,33 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.bouncycastle.asn1.ASN1Encodable;
-import org.bouncycastle.asn1.ASN1EncodableVector;
-import org.bouncycastle.asn1.ASN1Encoding;
-import org.bouncycastle.asn1.ASN1InputStream;
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.ASN1OctetString;
-import org.bouncycastle.asn1.ASN1Primitive;
-import org.bouncycastle.asn1.ASN1Sequence;
-import org.bouncycastle.asn1.ASN1Set;
-import org.bouncycastle.asn1.ASN1TaggedObject;
-import org.bouncycastle.asn1.DEROctetString;
-import org.bouncycastle.asn1.DERPrintableString;
-import org.bouncycastle.asn1.DERSet;
-import org.bouncycastle.asn1.DERUTCTime;
-import org.bouncycastle.asn1.cms.Attribute;
-import org.bouncycastle.asn1.cms.AttributeTable;
-import org.bouncycastle.asn1.cms.CMSAttributes;
-import org.bouncycastle.asn1.cms.ContentInfo;
-import org.bouncycastle.asn1.cms.IssuerAndSerialNumber;
-import org.bouncycastle.asn1.cms.SignerIdentifier;
-import org.bouncycastle.asn1.cms.SignerInfo;
-import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
-import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x500.style.RFC4519Style;
-import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
-import org.bouncycastle.asn1.x509.Certificate;
-import org.bouncycastle.asn1.x509.TBSCertificateStructure;
+import org.spongycastle.asn1.ASN1Encodable;
+import org.spongycastle.asn1.ASN1EncodableVector;
+import org.spongycastle.asn1.ASN1Encoding;
+import org.spongycastle.asn1.ASN1InputStream;
+import org.spongycastle.asn1.ASN1ObjectIdentifier;
+import org.spongycastle.asn1.ASN1OctetString;
+import org.spongycastle.asn1.ASN1Primitive;
+import org.spongycastle.asn1.ASN1Sequence;
+import org.spongycastle.asn1.ASN1Set;
+import org.spongycastle.asn1.ASN1TaggedObject;
+import org.spongycastle.asn1.DEROctetString;
+import org.spongycastle.asn1.DERPrintableString;
+import org.spongycastle.asn1.DERSet;
+import org.spongycastle.asn1.DERUTCTime;
+import org.spongycastle.asn1.cms.Attribute;
+import org.spongycastle.asn1.cms.AttributeTable;
+import org.spongycastle.asn1.cms.CMSAttributes;
+import org.spongycastle.asn1.cms.ContentInfo;
+import org.spongycastle.asn1.cms.IssuerAndSerialNumber;
+import org.spongycastle.asn1.cms.SignerIdentifier;
+import org.spongycastle.asn1.cms.SignerInfo;
+import org.spongycastle.asn1.pkcs.PKCSObjectIdentifiers;
+import org.spongycastle.asn1.x500.X500Name;
+import org.spongycastle.asn1.x500.style.RFC4519Style;
+import org.spongycastle.asn1.x509.AlgorithmIdentifier;
+import org.spongycastle.asn1.x509.Certificate;
+import org.spongycastle.asn1.x509.TBSCertificateStructure;
 
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.signers.pkcs7.AOAlgorithmID;
@@ -84,7 +84,7 @@ final class CoSignerEnveloped {
         }
 
         if (signerCertificateChain.length != 0) {
-            final List<ASN1Encodable> ce = new ArrayList<ASN1Encodable>();
+            final List<ASN1Encodable> ce = new ArrayList<>();
             for (final X509Certificate element : signerCertificateChain) {
                 ce.add(Certificate.getInstance(ASN1Primitive.fromByteArray(element.getEncoded())));
             }
@@ -121,11 +121,14 @@ final class CoSignerEnveloped {
                     final Map<String, byte[]> uatrib,
                     final byte[] messageDigest) throws IOException, NoSuchAlgorithmException, CertificateException {
 
-        final ASN1InputStream is = new ASN1InputStream(sign);
+    	final ASN1Sequence dsq;
+    	try (
+			final ASN1InputStream is = new ASN1InputStream(sign);
+		) {
+	        // LEEMOS EL FICHERO QUE NOS INTRODUCEN
+	        dsq = (ASN1Sequence) is.readObject();
+    	}
 
-        // LEEMOS EL FICHERO QUE NOS INTRODUCEN
-        final ASN1Sequence dsq = (ASN1Sequence) is.readObject();
-        is.close();
         final Enumeration<?> e = dsq.getObjects();
         // Elementos que contienen los elementos OID signedAndEnvelopedData
         e.nextElement();
@@ -253,12 +256,14 @@ final class CoSignerEnveloped {
                            final Map<String, byte[]> uatrib,
                            final byte[] messageDigest) throws IOException, NoSuchAlgorithmException, CertificateException {
 
-        final ASN1InputStream is = new ASN1InputStream(sign);
+    	final ASN1Sequence dsq;
+    	try (
+			final ASN1InputStream is = new ASN1InputStream(sign);
+		) {
+	        // LEEMOS EL FICHERO QUE NOS INTRODUCEN
+	        dsq = (ASN1Sequence) is.readObject();
+    	}
 
-        // LEEMOS EL FICHERO QUE NOS INTRODUCEN
-        ASN1Sequence dsq = null;
-        dsq = (ASN1Sequence) is.readObject();
-        is.close();
         final Enumeration<?> e = dsq.getObjects();
         // Elementos que contienen los elementos OID signedAndEnvelopedData
         e.nextElement();

@@ -20,6 +20,7 @@ import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.http.UrlHttpManagerFactory;
+import es.gob.afirma.core.misc.http.UrlHttpMethod;
 import es.gob.afirma.core.misc.protocol.UrlParametersToSign;
 import es.gob.afirma.core.misc.protocol.UrlParametersToSign.Operation;
 import es.gob.afirma.core.signers.AOSignConstants;
@@ -34,6 +35,7 @@ import es.gob.afirma.keystores.AOKeyStoreManager;
 import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
 import es.gob.afirma.keystores.filters.CertFilterManager;
 import es.gob.afirma.keystores.filters.CertificateFilter;
+import es.gob.afirma.standalone.AutoFirmaUtil;
 import es.gob.afirma.standalone.DataAnalizerUtil;
 import es.gob.afirma.standalone.crypto.CypherDataManager;
 
@@ -44,8 +46,6 @@ final class ProtocolInvocationLauncherSign {
 	private static final String SYNTAX_VERSION = "1_0"; //$NON-NLS-1$
 
 	private static final String RESULT_CANCEL = "CANCEL"; //$NON-NLS-1$
-
-	private static final String FORMAT_AUTO = "AUTO"; //$NON-NLS-1$
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
@@ -68,7 +68,7 @@ final class ProtocolInvocationLauncherSign {
 		// En caso de que no se haya solicitado una operacion de multifirma con el formato AUTO
 		// configuramos el servidor en base al nombre de formato
 		AOSigner signer = null;
-		if (!FORMAT_AUTO.equalsIgnoreCase(options.getSignatureFormat())) {
+		if (!AOSignConstants.SIGN_FORMAT_AUTO.equalsIgnoreCase(options.getSignatureFormat())) {
 			signer = AOSignerFactory.getSigner(options.getSignatureFormat());
 			if (signer == null) {
 				LOGGER.severe("No hay un firmador configurado para el formato: " + options.getSignatureFormat()); //$NON-NLS-1$
@@ -104,7 +104,7 @@ final class ProtocolInvocationLauncherSign {
 					ProtocolMessages.getString("ProtocolLauncher.27"), //$NON-NLS-1$
 					false,
 					false,
-					null,
+					AutoFirmaUtil.getDefaultDialogsIcon(),
 					null
 				)[0];
 			}
@@ -244,8 +244,8 @@ final class ProtocolInvocationLauncherSign {
 				ksm,
 				null,
 				true,
-				true,
-				true,
+				true, // showExpiredCertificates
+				true, // checkValidity
 				filters,
 				mandatoryCertificate
 			);
@@ -492,7 +492,7 @@ final class ProtocolInvocationLauncherSign {
 		url.append("&dat=").append(data.toString()); //$NON-NLS-1$
 
 		// Llamamos al servicio para guardar los datos
-		final byte[] result = UrlHttpManagerFactory.getInstalledManager().readUrlByPost(url.toString());
+		final byte[] result = UrlHttpManagerFactory.getInstalledManager().readUrl(url.toString(), UrlHttpMethod.POST);
 
 		LOGGER.info("Resultado: " + new String(result)); //$NON-NLS-1$
 	}

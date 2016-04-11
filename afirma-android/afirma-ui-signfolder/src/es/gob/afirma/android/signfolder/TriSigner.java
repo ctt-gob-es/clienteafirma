@@ -41,6 +41,8 @@ final class TriSigner {
 
 		Log.i(SFConstants.LOG_TAG, "TriSigner - sign: == PREFIRMA =="); //$NON-NLS-1$
 
+		//Log.i(SFConstants.LOG_TAG, " ======== Parametros prefirma: " + request.getDocs()[0].getParams());
+
 		// Mandamos a prefirmar y obtenemos los resultados
 		final TriphaseRequest[] signRequest = commMgr.preSignRequests(
 				request,
@@ -50,6 +52,8 @@ final class TriSigner {
 		// *****************************************************************************************************
 		// ******************************* FIRMA ***************************************************************
 		//******************************************************************************************************
+
+		//Log.i(SFConstants.LOG_TAG, " ======== Parametros resultado prefirma: " + signRequest[0].getDocumentsRequests()[0].getParams());
 
 		Log.i(SFConstants.LOG_TAG, "TriSigner - sign: == FIRMA =="); //$NON-NLS-1$
 
@@ -63,7 +67,7 @@ final class TriSigner {
 			}
 
 			// Recorremos cada uno de los documentos de cada peticion de firma
-			for(final TriphaseSignDocumentRequest docRequests : signRequest[i].getDocumentsRequests()) {
+			for (final TriphaseSignDocumentRequest docRequests : signRequest[i].getDocumentsRequests()) {
 				// Firmamos las prefirmas y actualizamos los parciales de cada documento de cada peticion
 				try {
 					signPhase2(docRequests, pk, certificateChain);
@@ -83,6 +87,8 @@ final class TriSigner {
 		//******************************************************************************************************
 
 		Log.i(SFConstants.LOG_TAG, "TriSigner - sign: == POSTFIRMA =="); //$NON-NLS-1$
+
+		//Log.i(SFConstants.LOG_TAG, " ======== Parametros postfirma: " + request.getDocs()[0].getParams());
 
 		// Mandamos a postfirmar y recogemos el resultado
 		return commMgr.postSignRequests(
@@ -115,42 +121,36 @@ final class TriSigner {
 
 		final TriphaseConfigData config = docRequest.getPartialResult();
 
-		// Es posible que se ejecute mas de una firma como resultado de haber proporcionado varios
+		// TODO: Es posible que se ejecute mas de una firma como resultado de haber proporcionado varios
 		// identificadores de datos o en una operacion de contrafirma.
 
-		int signCount = 1;
-		if (config.getSignCount() != null) {
-			signCount = config.getSignCount().intValue();
+		byte[] preSign;
+		try {
+			preSign = config.getPreSign();
+		}
+		catch (final IOException e) {
+			// Cuando la respuesta no indica el numero de firmas y no se ha devuelto ninguna
+			Log.e(SFConstants.LOG_TAG, "No se ha devuelto ningun resultado de firma"); //$NON-NLS-1$
+			preSign = null;
 		}
 
-		for (int i = 0; i < signCount; i++) {
-			byte[] preSign;
-			try {
-				preSign = config.getPreSign(i);
-			}
-			catch (final IndexOutOfBoundsException e) {
-				// Cuando la respuesta no indica el numero de firmas y no se ha devuelto ninguna
-				Log.e(SFConstants.LOG_TAG, "No se ha devuelto ningun resultado de firma"); //$NON-NLS-1$
-				preSign = null;
-			}
-			if (preSign == null) {
-				throw new AOException("El servidor no ha devuelto la prefirma numero " + i); //$NON-NLS-1$
-			}
+		if (preSign == null) {
+			throw new AOException("El servidor no ha devuelto la prefirma del documento"); //$NON-NLS-1$
+		}
 
-			final byte[] pkcs1sign = new AOPkcs1Signer().sign(
-					preSign,
-					signatureAlgorithm,
-					key,
-					certChain,
-					null // No hay parametros en PKCS#1
-					);
+		final byte[] pkcs1sign = new AOPkcs1Signer().sign(
+				preSign,
+				signatureAlgorithm,
+				key,
+				certChain,
+				null // No hay parametros en PKCS#1
+				);
 
-			// Configuramos la peticion de postfirma indicando las firmas PKCS#1 generadas
-			config.addPk1(pkcs1sign);
+		// Configuramos la peticion de postfirma indicando las firmas PKCS#1 generadas
+		config.setPk1(pkcs1sign);
 
-			if (config.isNeedPreSign() == null || !config.isNeedPreSign().booleanValue()) {
-				config.setPreSign(i, null);
-			}
+		if (config.isNeedPreSign() == null || !config.isNeedPreSign().booleanValue()) {
+			config.removePreSign();
 		}
 	}
 }

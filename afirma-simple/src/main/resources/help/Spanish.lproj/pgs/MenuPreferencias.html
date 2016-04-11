@@ -30,6 +30,24 @@
      <li>No pedir confirmaci&oacute;n al cerrar la aplicaci&oacute;n: Permite salir de la aplicaci&oacute;n sin confirmaci&oacute;n del usuario.</li>
     </ul>
    </li>
+   <li><b>Formatos de firma por defecto:</b> Configura que formato de firma debe aplicarse cuando se proporciona determinado tipo de documento. Los tipos de documento son:
+    <ul>
+     <li>Documentos PDF</li>
+     <li>Documentos OOXML de Microsoft Office</li>
+     <li>Facturas electrónicas</li>
+     <li>Ficheros XML genéricos</li>
+     <li>Ficheros ODF de LibreOffice u OpenOffice</li>
+     <li>Ficheros binarios gen&eacute;ricos</li>
+    </ul>
+    <p>Cualquiera de estos tipos de fichero pueden firmarse con los formatos CAdES y XAdES (acordes a la
+    configuraci&oacute;n establecida en las pesta&ntilde;as correspondientes) y algunos de ellos pueden ser
+    firmados en formatos espec&iacute;ficos.<br>
+    El tipo de documento "Ficheros binarios gen&eacute;ricos" hace referencia a cualquier documento que no
+    est&eacute; en cualquiera de las categor&iacute;as anteriores.<br>
+    <b><u>ADVERTENCIA:</u></b> No se recomienda que se modifique que las facturas electr&oacute;nicas se
+    firmen en un formato distinto al de factura electr&oacute;nica.
+    </p>
+   </li>
   </ul>
   <h3>Men&uacute; "Firmas PAdES (PDF)"</h3>
   <p align="center">
@@ -60,6 +78,13 @@
      <ul>
       <li>PAdES B&aacute;sico: Es el formato de firma PAdES generado por Adobe Acrobat y el utilizado por defecto por el Cliente @firma.</li>
       <li>PAdES-BES: Es el formato que m&aacute;s se ajusta al est&aacute;ndar PAdES, pero Adobe Reader/Acrobat no valida correctamente las multifirmas generadas a partir de &eacute;l.</li>
+     </ul>
+    </li>
+    <li><b>Firma visible:</b>
+     <ul>
+      <li>Crear firmas visibles en el PDF: Al habilitar esta opci&oacute;n y firmar un documento en formato PAdES, se le
+      presentar&aacute; al usuario una ventana para la selecci&oacute;n del &aacute;rea del PDF en el que se agregar&aacute;
+      la firma visible. Consulte el apartado <a href="VentanaPdfVisible.html">Firmas visibles PDF</a> para mayor detalle.</li>
      </ul>
     </li>
    </ul> 
@@ -126,6 +151,9 @@
       <li>XAdES Detached: Se configura el modo detached (firma y datos en una super-estructura XML).</li>
       <li>XAdES Enveloped: Se configura el modo enveloped (la firma se inserta dentro de los datos XML).</li>
      </ul>
+     <p><b><u>ADVERTENCIA:</u></b> La pol&iacute;tica de firma de la AGE, sólo permite la realización de firmas
+     en formatos Enveloped e Internally Detached (aquí referida como Detached). Así pues, sólo se podrán configurar
+     estos formatos de firma cuando se declare la política de firma de la AGE.</p>
     </li>
    </ul>
  </body>

@@ -51,7 +51,7 @@ interface MiniAfirma {
      * m&uacute;ltiples l&iacute;neas con la forma {@code CLAVE=VALOR}, en donde
      * {@code CLAVE} es el nombre de la propiedad y {@code VALOR} el valor asignado
      * a esta. Para utilizar el valor por defecto de una propiedad se dejar&aacute;
-     * de indicar esta en el listado depar&aacute;metros.
+     * de indicar esta en el listado de par&aacute;metros.
      * @param algorithm Algoritmo de firma.
      * @param format Formato de firma.
      * @param extraParams Par&aacute;metros adicionales para configurar la operac&oacute;n.
@@ -103,7 +103,7 @@ interface MiniAfirma {
      * m&uacute;ltiples l&iacute;neas con la forma {@code CLAVE=VALOR}, en donde
      * {@code CLAVE} es el nombre de la propiedad y {@code VALOR} el valor asignado
      * a esta. Para utilizar el valor por defecto de una propiedad se dejar&aacute;
-     * de indicar esta en el listado depar&aacute;metros.
+     * de indicar esta en el listado de par&aacute;metros.
      * @param data Datos en Base64 que se firmaron originalmente o {@code null} si no son necesarios.
      * @param algorithm Algoritmo de firma.
      * @param format Formato de firma.
@@ -139,7 +139,7 @@ interface MiniAfirma {
      * como una cadena de m&uacute;ltiples l&iacute;neas con la forma {@code CLAVE=VALOR}, en
      * donde {@code CLAVE} es el nombre de la propiedad y {@code VALOR} el valor asignado a
      * esta. Para utilizar el valor por defecto de una propiedad se dejar&aacute; de indicar
-     * esta en el listado depar&aacute;metros.
+     * esta en el listado de par&aacute;metros.
      * @param algorithm Algoritmo de firma.
      * @param format Formato de firma.
      * @param extraParams Par&aacute;metros adicionales para configurar la operaci&oacute;n.
@@ -444,4 +444,28 @@ interface MiniAfirma {
                      final String batchPostSignerUrl,
                      final String extraParams) throws IOException, AOException,
                                                                    PrivilegedActionException;
+
+	/**
+	 * Selecciona y recupera un certificado del almac&eacute;n actual.
+	 * Permite la configuraci&oacute;n de filtros de certificados mediante el uso de
+	 * par&aacute;metros extra. Estos par&aacute;metros se indicar&aacute;n como una
+	 * cadena de m&uacute;ltiples l&iacute;neas con la forma {@code CLAVE=VALOR}, en
+	 * donde {@code CLAVE} es el nombre de la propiedad y {@code VALOR} el valor asignado
+     * a esta.
+	 * @param extraParams Propiedades para la configuraci&oacute;n de los filtro de
+	 * certificados.
+	 * @return Certitificado seleccionado codificado en base 64.
+	 * @throws AOException Cuando ocurre un error grave durante la selecci&oacute;n del certificado.
+	 * @throws CertificateEncodingException Cuando no se haya podido decodificar el certificado.
+	 * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
+	 */
+	String selectCertificate(final String extraParams) throws AOException, CertificateEncodingException, PrivilegedActionException;
+
+	/**
+	 * Establece el almac&eacute;n de certificados que se debe utilizar en las subsiguientes
+	 * operaciones con certificados.
+	 * @param ksType Identificador del almac&eacute;n de certificados.
+	 * @throws AOException Cuando se indica un tipo de almac&eacute;n no v&aacute;lido.
+	 */
+	void setKeyStore(String ksType) throws AOException;
 }

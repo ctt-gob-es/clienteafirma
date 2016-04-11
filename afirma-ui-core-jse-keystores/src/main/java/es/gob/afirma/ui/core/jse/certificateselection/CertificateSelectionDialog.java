@@ -1,11 +1,11 @@
-/*
- * Este fichero forma parte del Cliente @firma.
- * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
- * y descargado desde www.ctt.map.es.
- * Copyright 2009,2010,2011 Gobierno de Espana
- * Este fichero se distribuye bajo  bajo licencia GPL version 2  segun las
- * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este
- * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
+/* Copyright (C) 2011 [Gobierno de Espana]
+ * This file is part of "Cliente @Firma".
+ * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
+ *   - the GNU General Public License as published by the Free Software Foundation;
+ *     either version 2 of the License, or (at your option) any later version.
+ *   - or The European Software License; either version 1.1 or (at your option) any later version.
+ * Date: 11/01/11
+ * You may contact the copyright holder at: soporte.afirma5@mpt.es
  */
 
 package es.gob.afirma.ui.core.jse.certificateselection;
@@ -34,21 +34,42 @@ import es.gob.afirma.core.ui.KeyStoreDialogManager;
 public final class CertificateSelectionDialog extends MouseAdapter {
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
-
 	private final CertificateSelectionPanel csd;
-
 	private final JOptionPane optionPane;
-
 	private final Component parent;
-
 	private final KeyStoreDialogManager ksdm;
 
+	private final boolean disableSelection;
 
 	/** Construye el di&aacute;logo de selecci&oacute;n de certificados a partir del listado con
 	 * sus nombres y los propios certificados.
 	 * @param parent Componente sobre el que se mostrar&aacute; el di&aacute;logo.
 	 * @param ksdm Gestor del almacen de claves. */
-	public CertificateSelectionDialog(final Component parent, final KeyStoreDialogManager ksdm) {
+	public CertificateSelectionDialog(final Component parent,
+			                          final KeyStoreDialogManager ksdm) {
+		this(parent, ksdm, null, null, true, false);
+	}
+
+	/** Construye el di&aacute;logo de selecci&oacute;n de certificados a partir del listado con
+	 * sus nombres y los propios certificados.
+	 * @param parent Componente sobre el que se mostrar&aacute; el di&aacute;logo.
+	 * @param ksdm Gestor del almacen de claves.
+	 * @param dialogHeadline Texto de la cabecera superior del di&aacute;logo. Si se indica <code>null</code> se usa
+	 *                       el por defecto.
+	 * @param dialogSubHeadline Texto de la cabecera inferior del di&aacute;logo. Si se indica <code>null</code> se usa
+	 *                          el por defecto.
+	 * @param showControlButons Si se indica <code>true</code> se muestran los botones de <i>refrescar</i>,
+	 *                          <i>abrir</i> y <i>ayuda</i>, si se indica <code>false</code> no se muestra
+	 *                          ninguno de los tres botones.
+	 * @param disableCertificateSelection Si se indica <code>true</code> se deshabilita la opci&oacute;n de
+	 *                                    selecci&oacute;n de certificado, dejando el di&aacute;logo solo para
+	 *                                    consulta. */
+	public CertificateSelectionDialog(final Component parent,
+			                          final KeyStoreDialogManager ksdm,
+					                  final String dialogHeadline,
+					                  final String dialogSubHeadline,
+						              final boolean showControlButons,
+						              final boolean disableCertificateSelection) {
 
 		this.parent = parent;
 	    this.ksdm = ksdm;
@@ -56,7 +77,13 @@ public final class CertificateSelectionDialog extends MouseAdapter {
 	    final NameCertificateBean[] certs = this.ksdm.getNameCertificates();
 
 	    Arrays.sort(certs, CERT_NAME_COMPARATOR);
-	    this.csd = new CertificateSelectionPanel(certs, this);
+	    this.csd = new CertificateSelectionPanel(
+    		certs,
+    		this,
+    		dialogHeadline,
+    		dialogSubHeadline,
+    		showControlButons
+		);
 		this.optionPane = certs.length > 1 ?
 			new CertOptionPane(this.csd) :
 				new JOptionPane();
@@ -65,7 +92,13 @@ public final class CertificateSelectionDialog extends MouseAdapter {
 
 		this.optionPane.setMessage(this.csd);
 		this.optionPane.setMessageType(JOptionPane.PLAIN_MESSAGE);
-		this.optionPane.setOptionType(JOptionPane.OK_CANCEL_OPTION);
+		this.optionPane.setOptionType(
+			disableCertificateSelection ?
+				JOptionPane.DEFAULT_OPTION :
+					JOptionPane.OK_CANCEL_OPTION
+		);
+
+		this.disableSelection = disableCertificateSelection;
 
 	}
 
@@ -84,16 +117,15 @@ public final class CertificateSelectionDialog extends MouseAdapter {
 		certDialog.setModal(true);
 
 		final KeyEventDispatcher dispatcher = new CertificateSelectionDispatcherListener(
-				this.optionPane,
-				this
+			this.optionPane,
+			this
 		);
 
 		KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(dispatcher);
 
 		certDialog.setVisible(true);
 
-		if (this.optionPane.getValue() == null ||
-				((Integer) this.optionPane.getValue()).intValue() != JOptionPane.OK_OPTION) {
+		if (this.optionPane.getValue() == null || ((Integer) this.optionPane.getValue()).intValue() != JOptionPane.OK_OPTION) {
 			KeyboardFocusManager.getCurrentKeyboardFocusManager().removeKeyEventDispatcher(dispatcher);
 			certDialog.dispose();
 			return null;
@@ -110,7 +142,7 @@ public final class CertificateSelectionDialog extends MouseAdapter {
 	/** {@inheritDoc} */
 	@Override
 	public void mouseClicked(final MouseEvent me) {
-		if (me.getClickCount() == 2 && this.optionPane != null) {
+		if (me.getClickCount() == 2 && this.optionPane != null && !this.disableSelection) {
 			this.optionPane.setValue(Integer.valueOf(JOptionPane.OK_OPTION));
 		}
 	}

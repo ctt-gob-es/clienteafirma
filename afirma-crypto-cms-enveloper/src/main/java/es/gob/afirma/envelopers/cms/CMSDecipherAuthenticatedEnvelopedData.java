@@ -23,10 +23,10 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
-import org.bouncycastle.asn1.ASN1Sequence;
-import org.bouncycastle.asn1.cms.AuthEnvelopedData;
-import org.bouncycastle.asn1.cms.EncryptedContentInfo;
-import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
+import org.spongycastle.asn1.ASN1Sequence;
+import org.spongycastle.asn1.cms.AuthEnvelopedData;
+import org.spongycastle.asn1.cms.EncryptedContentInfo;
+import org.spongycastle.asn1.x509.AlgorithmIdentifier;
 
 import es.gob.afirma.core.AOException;
 

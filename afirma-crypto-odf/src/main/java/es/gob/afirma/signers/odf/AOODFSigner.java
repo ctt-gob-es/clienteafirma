@@ -120,6 +120,7 @@ public final class AOODFSigner implements AOSigner {
         Utils.installXmlDSigProvider(false);
     }
 
+
     /** A&ntilde;ade una firma electr&oacute;nica a un documento ODF.
      * @param data Documento ODF a firmar
      * @param algorithm Se ignora el valor de este par&aacute;metro, se utiliza siempre el algoritmo SHA1withRSA
@@ -143,6 +144,12 @@ public final class AOODFSigner implements AOSigner {
                        final java.security.cert.Certificate[] certChain,
                        final Properties xParams) throws AOException {
 
+    	if (!AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA.equals(algorithm)) {
+    		LOGGER.warning(
+				"Se ha indicado '" + algorithm + "' como algoritmo de firma, pero se usara 'SHA1withRSA' nor necesidades del formato ODF" //$NON-NLS-1$ //$NON-NLS-2$
+			);
+    	}
+
         final Properties extraParams = xParams != null ? xParams : new Properties();
 
         final String digestMethodAlgorithm = extraParams.getProperty(AOODFExtraParams.REFERENCES_DIGEST_METHOD, DIGEST_METHOD);
@@ -156,13 +163,14 @@ public final class AOODFSigner implements AOSigner {
         boolean isCofirm = false;
 
         try {
-            // genera el archivo zip temporal a partir del InputStream de
+            // Genera el archivo zip temporal a partir del InputStream de
             // entrada
             final File zipFile = File.createTempFile("sign", ".zip"); //$NON-NLS-1$ //$NON-NLS-2$
             final FileOutputStream fos = new FileOutputStream(zipFile);
             fos.write(data);
             fos.flush();
             fos.close();
+            zipFile.deleteOnExit();
 
             // carga el fichero zip
             final ZipFile zf = new ZipFile(zipFile);
@@ -263,14 +271,14 @@ public final class AOODFSigner implements AOSigner {
         				null,
         				null,
         				md.digest(
-        						(byte[]) canonicalizeSubtreeMethod.invoke(
-        								canonicalizer,
-        								// Recupera el fichero y su raiz
-        								dbf.newDocumentBuilder().parse(
-        										new ByteArrayInputStream(manifestData)
-    									).getDocumentElement()
-    							)
-    						)
+    						(byte[]) canonicalizeSubtreeMethod.invoke(
+								canonicalizer,
+								// Recupera el fichero y su raiz
+								dbf.newDocumentBuilder().parse(
+										new ByteArrayInputStream(manifestData)
+								).getDocumentElement()
+							)
+						)
     				)
         		);
             }
@@ -291,13 +299,13 @@ public final class AOODFSigner implements AOSigner {
                         // crea la referencia
                         reference = fac.newReference(fullPath.replaceAll(" ", "%20"), dm, transformList, null, null, //$NON-NLS-1$ //$NON-NLS-2$
                         // Obtiene su forma canonica y su DigestValue
-                        		md.digest(
-                        				(byte[]) canonicalizeSubtreeMethod.invoke(
-                        						canonicalizer,
-                        						// Recupera el fichero y su raiz
-                        						dbf.newDocumentBuilder().parse(zf.getInputStream(zf.getEntry(fullPath))).getDocumentElement()
-                						)
-                				)
+                    		md.digest(
+                				(byte[]) canonicalizeSubtreeMethod.invoke(
+            						canonicalizer,
+            						// Recupera el fichero y su raiz
+            						dbf.newDocumentBuilder().parse(zf.getInputStream(zf.getEntry(fullPath))).getDocumentElement()
+        						)
+            				)
                 		);
                     }
 

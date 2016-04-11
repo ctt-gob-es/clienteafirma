@@ -627,5 +627,77 @@ public final class Base64 {
         return decode( bytes, 0, bytes.length, urlSafe);
     }
 
+    /** Caracteres aceptados en una codificaci&oacute;n Base64 seg&uacute;n la
+     * <a href="http://www.faqs.org/rfcs/rfc3548.html">RFC 3548</a>. Importante:
+     * A&ntilde;adimos el car&aacute;cter &tilde; porque en ciertas
+     * codificaciones de Base64 est&aacute; aceptado, aunque no es nada
+     * recomendable */
+    private static final String BASE_64_ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz=_-\t\n+/0123456789\r~"; //$NON-NLS-1$
+
+    /** Comprueba si un array de datos es una cadena en base 64.
+     * @param data Datos a comprobar si podr&iacute;an o no ser Base64.
+     * @return <code>true</code> si los datos proporcionado pueden ser una
+     *         codificaci&oacute;n base64 de un original binario (que no tiene
+     *         necesariamente porqu&eacute; serlo), <code>false</code> en caso
+     *         contrario. */
+    public static boolean isBase64(final byte[] data) {
+
+        int count = 0;
+
+        // Comprobamos que todos los caracteres de la cadena pertenezcan al
+        // alfabeto base 64
+
+        for (int i = 0; i < data.length; i++) {
+        	final char b = (char) data[i];
+        	if (BASE_64_ALPHABET.indexOf(b) == -1) {
+        		return false;
+        	}
+
+        	// Solo puede aparecer el signo igual en como 2 ultimos caracteres de la cadena
+        	if (b == '=' && i < data.length - 2) {
+        		return false;
+        	}
+
+        	if (b != '\n' && b != '\r') {
+        		count++;
+        	}
+        }
+
+        // Comprobamos que la cadena (sin contar los saltos de linea) tenga una longitud multiplo de 4 caracteres
+        return count % 4 == 0;
+    }
+
+    /** Comprueba si una cadena de texto es una cadena en base 64.
+     * @param data Cadena de texto a comprobar si podr&iacute;an o no ser Base64.
+     * @return <code>true</code> si los datos proporcionado pueden ser una
+     *         codificaci&oacute;n base64 de un original binario (que no tiene
+     *         necesariamente porqu&eacute; serlo), <code>false</code> en caso
+     *         contrario. */
+    public static boolean isBase64(final String data) {
+
+        int count = 0;
+
+        // Comprobamos que todos los caracteres de la cadena pertenezcan al
+        // alfabeto base 64
+
+        for (int i = 0; i < data.length(); i++) {
+        	final char b = data.charAt(i);
+        	if (BASE_64_ALPHABET.indexOf(b) == -1) {
+        		return false;
+        	}
+
+        	// Solo puede aparecer el signo igual en como 2 ultimos caracteres de la cadena
+        	if (b == '=' && i < data.length() - 2) {
+        		return false;
+        	}
+
+        	if (b != '\n' && b != '\r') {
+        		count++;
+        	}
+        }
+
+        // Comprobamos que la cadena (sin contar los saltos de linea) tenga una longitud multiplo de 4 caracteres
+        return count % 4 == 0;
+    }
 
 }   // end class Base64

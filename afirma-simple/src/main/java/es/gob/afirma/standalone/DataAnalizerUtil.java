@@ -11,9 +11,13 @@
 package es.gob.afirma.standalone;
 
 import java.io.ByteArrayInputStream;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.signers.cades.AOCAdESSigner;
 import es.gob.afirma.signers.cms.AOCMSSigner;
 import es.gob.afirma.signers.odf.AOODFSigner;
@@ -21,6 +25,7 @@ import es.gob.afirma.signers.ooxml.AOOOXMLSigner;
 import es.gob.afirma.signers.pades.AOPDFSigner;
 import es.gob.afirma.signers.xades.AOFacturaESigner;
 import es.gob.afirma.signers.xades.AOXAdESSigner;
+import es.gob.afirma.signers.xmldsig.AOXMLDSigSigner;
 
 /** Utilidad para el an&aacute;lisis de ficheros de datos.
  * @author Carlos Gamuci. */
@@ -29,7 +34,52 @@ public final class DataAnalizerUtil {
     private DataAnalizerUtil() {
         // No permitimos la instanciacion
     }
-    
+
+    /** Identifica si los datos proporcionados son un certificado X509, devolvi&eacute;ndolo en ese caso.
+     * @param data Datos a analizar.
+     * @return Certificado X509 si los datos lo eran.
+     * @throws CertificateException Cuando los datos proporcionados no son un certificado X509. */
+    public static X509Certificate isCertificate(final byte[] data) throws CertificateException {
+
+    	if (data == null || data.length < 1) {
+    		throw new CertificateException(
+				"Los datos eran nulos o vacios" //$NON-NLS-1$
+			);
+    	}
+
+    	final CertificateFactory cf = CertificateFactory.getInstance("X.509"); //$NON-NLS-1$
+
+    	// Antes de nada un intento directo
+    	try {
+	        return (X509Certificate) cf.generateCertificate(
+	            new ByteArrayInputStream(
+	                 data
+	             )
+	        );
+    	}
+        catch(final Exception e) {
+            // Ignoramos los errores
+        }
+
+    	// Despues, intento en Base64 directo sin cabeceras y con posibilidad de URLEncoding
+    	try {
+	        return (X509Certificate) cf.generateCertificate(
+	            new ByteArrayInputStream(
+	                 Base64.decode(
+	                   new String(data).replace("%0A", "").replace("%2F", "/").replace("%2B", "+").replace("%3D", "=") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$
+	                 )
+	             )
+	        );
+    	}
+        catch(final Exception e) {
+            // Ignoramos los errores
+        }
+
+    	throw new CertificateException(
+    		"Los datos proporcionados no son un certificado X.509" //$NON-NLS-1$
+		);
+    }
+
     /** Comprueba si los datos introducidos se corresponden a un fichero XML.
      * @param data Datos a analizar.
      * @return Devuelve {@code true} si los datos son XML. */
@@ -48,7 +98,7 @@ public final class DataAnalizerUtil {
      * @return Devuelve {@code true} si los datos son una firma XML soportada. */
     public static boolean isSignedXML(final byte[] data) {
         try {
-            return new AOXAdESSigner().isSign(data);
+            return new AOXAdESSigner().isSign(data) || new AOXMLDSigSigner().isSign(data);
         }
         catch(final Exception e) {
             return false;
@@ -124,7 +174,7 @@ public final class DataAnalizerUtil {
             return false;
         }
     }
-    
+
     /** Comprueba si los datos introducidos se corresponden a un documento ODF.
      * @param data Datos a analizar.
      * @return Devuelve {@code true} si los datos son ODF. */
@@ -150,7 +200,7 @@ public final class DataAnalizerUtil {
             return false;
         }
     }
-    
+
     /** Comprueba si los datos introducidos se corresponden a un documento OOXML.
      * @param data Datos a analizar.
      * @return Devuelve {@code true} si los datos son OOXML. */

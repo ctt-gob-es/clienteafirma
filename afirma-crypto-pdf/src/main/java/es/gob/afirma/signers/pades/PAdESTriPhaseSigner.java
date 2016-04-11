@@ -18,11 +18,10 @@ import java.security.cert.Certificate;
 import java.util.GregorianCalendar;
 import java.util.Properties;
 
-import com.lowagie.text.DocumentException;
-import com.lowagie.text.pdf.PdfDictionary;
-import com.lowagie.text.pdf.PdfName;
-import com.lowagie.text.pdf.PdfSignatureAppearance;
-import com.lowagie.text.pdf.PdfString;
+import com.aowagie.text.pdf.PdfDictionary;
+import com.aowagie.text.pdf.PdfName;
+import com.aowagie.text.pdf.PdfSignatureAppearance;
+import com.aowagie.text.pdf.PdfString;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.AOUtil;
@@ -167,14 +166,14 @@ public final class PAdESTriPhaseSigner {
      * @return pre-firma CAdES/PAdES (atributos CAdES a firmar)
      * @throws IOException En caso de errores de entrada / salida
      * @throws AOException En caso de cualquier otro tipo de error
-     * @throws DocumentException En caso de errores en el XML de sesi&oacute;n */
+     * @throws InvalidPdfException En caso de errores al generar los datos de sesi&oacute;n */
     public static PdfSignResult preSign(final String digestAlgorithmName,
-                                           final byte[] inPDF,
-                                           final Certificate[] signerCertificateChain,
-                                           final GregorianCalendar signTime,
-                                           final Properties xParams) throws IOException,
-                                                                            AOException,
-                                                                            DocumentException {
+                                        final byte[] inPDF,
+                                        final Certificate[] signerCertificateChain,
+                                        final GregorianCalendar signTime,
+                                        final Properties xParams) throws IOException,
+                                                                         AOException,
+                                                                         InvalidPdfException {
 
         final Properties extraParams = xParams != null ? xParams : new Properties();
 
@@ -217,7 +216,8 @@ public final class PAdESTriPhaseSigner {
                 PDF_OID,
                 PDF_DESC,
                 CommitmentTypeIndicationsHelper.getCommitmentTypeIndications(extraParams),
-                CAdESSignerMetadataHelper.getCAdESSignerMetadata(extraParams)
+                CAdESSignerMetadataHelper.getCAdESSignerMetadata(extraParams),
+                Boolean.parseBoolean(extraParams.getProperty(PdfExtraParams.DO_NOT_INCLUDE_POLICY_ON_SIGNING_CERTIFICATE, "false")) //$NON-NLS-1$
             ),
             null, // Sello de tiempo
             signTime,
@@ -354,8 +354,8 @@ public final class PAdESTriPhaseSigner {
 		try {
 			pts = PdfSessionManager.getSessionData(inPdf, signerCertificateChain, signature.getSignTime(), signature.getExtraParams());
 		}
-		catch (final DocumentException e1) {
-			throw new IOException(e1);
+		catch (final InvalidPdfException e) {
+			throw new IOException(e);
 		}
         final PdfSignatureAppearance sap = pts.getSAP();
 

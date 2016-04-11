@@ -11,7 +11,9 @@
 package es.gob.afirma.signers.multi.cades;
 
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
+import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.Properties;
@@ -64,25 +66,39 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
                               final Object[] targets,
                               final PrivateKey key,
                               final java.security.cert.Certificate[] cChain,
-                              final Properties xParams) throws AOException, IOException {
+                              final Properties xParams) throws AOException,
+                                                               IOException {
 
         final Properties extraParams = xParams != null ? xParams : new Properties();
 
         // Control general para todo el metodo de la inclusion de la cadena completa o solo el certificado del firmante
-		final java.security.cert.Certificate[] certChain = Boolean.parseBoolean(extraParams.getProperty(CAdESExtraParams.INCLUDE_ONLY_SIGNNING_CERTIFICATE, Boolean.FALSE.toString())) ? 
-       		 new X509Certificate[] { (X509Certificate) cChain[0] } :
-       			 cChain;
+		final java.security.cert.Certificate[] certChain = Boolean.parseBoolean(
+			extraParams.getProperty(
+				CAdESExtraParams.INCLUDE_ONLY_SIGNNING_CERTIFICATE,
+				Boolean.FALSE.toString()
+			)
+		) ? new X509Certificate[] { (X509Certificate) cChain[0] } : cChain;
 
         boolean signingCertificateV2;
         if (AOSignConstants.isSHA2SignatureAlgorithm(algorithm)) {
         	signingCertificateV2 = true;
         }
-        else if (extraParams.containsKey(CAdESExtraParams.SIGNING_CERTIFICATE_V2)) { 
-        	signingCertificateV2 = Boolean.parseBoolean(extraParams.getProperty(CAdESExtraParams.SIGNING_CERTIFICATE_V2));
+        else if (extraParams.containsKey(CAdESExtraParams.SIGNING_CERTIFICATE_V2)) {
+        	signingCertificateV2 = Boolean.parseBoolean(
+    			extraParams.getProperty(
+					CAdESExtraParams.SIGNING_CERTIFICATE_V2
+				)
+			);
         }
         else {
         	signingCertificateV2 = !ALGORITHM.equals(AOSignConstants.getDigestAlgorithmName(algorithm));
         }
+
+        final boolean doNotIncludePolicyOnSigningCertificate = Boolean.parseBoolean(
+    		extraParams.getProperty(
+				CAdESExtraParams.DO_NOT_INCLUDE_POLICY_ON_SIGNING_CERTIFICATE, "false" //$NON-NLS-1$
+			)
+		);
 
         final P7ContentSignerParameters csp = new P7ContentSignerParameters(
     		sign,
@@ -94,7 +110,7 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
 
         // Le asignamos el firmador PKCS#1 a medida y la fecha prefijada si procede
         if (this.ss != null) {
-        	cadesCountersigner.setpkcs1Signer(this.ss, this.date);
+        	cadesCountersigner.setPkcs1Signer(this.ss, this.date);
         }
 
         // Datos firmados.
@@ -117,8 +133,14 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
                        AdESPolicy.buildAdESPolicy(extraParams),
                        signingCertificateV2,
                        CommitmentTypeIndicationsHelper.getCommitmentTypeIndications(extraParams),
-                       Boolean.parseBoolean(extraParams.getProperty(CAdESExtraParams.INCLUDE_SIGNING_TIME_ATTRIBUTE, Boolean.FALSE.toString())),
-                       CAdESSignerMetadataHelper.getCAdESSignerMetadata(extraParams)
+                       Boolean.parseBoolean(
+                		   extraParams.getProperty(
+            				   CAdESExtraParams.INCLUDE_SIGNING_TIME_ATTRIBUTE,
+            				   Boolean.FALSE.toString()
+        				   )
+            		   ),
+                       CAdESSignerMetadataHelper.getCAdESSignerMetadata(extraParams),
+                       doNotIncludePolicyOnSigningCertificate
                 );
             }
             // CASO DE FIRMA DE HOJAS
@@ -126,20 +148,25 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
                 final int[] nodes = {
                     0
                 };
-                dataSigned =
-                		cadesCountersigner.counterSign(
-                    		csp,
-                            sign,
-                            CounterSignTarget.LEAFS,
-                            nodes,
-                            key,
-                            certChain,
-                            AdESPolicy.buildAdESPolicy(extraParams),
-							signingCertificateV2,
-                            CommitmentTypeIndicationsHelper.getCommitmentTypeIndications(extraParams),
-                            Boolean.parseBoolean(extraParams.getProperty(CAdESExtraParams.INCLUDE_SIGNING_TIME_ATTRIBUTE, Boolean.FALSE.toString())),
-                            CAdESSignerMetadataHelper.getCAdESSignerMetadata(extraParams)
-                		);
+                dataSigned = cadesCountersigner.counterSign(
+            		csp,
+                    sign,
+                    CounterSignTarget.LEAFS,
+                    nodes,
+                    key,
+                    certChain,
+                    AdESPolicy.buildAdESPolicy(extraParams),
+					signingCertificateV2,
+                    CommitmentTypeIndicationsHelper.getCommitmentTypeIndications(extraParams),
+                    Boolean.parseBoolean(
+                		extraParams.getProperty(
+            				CAdESExtraParams.INCLUDE_SIGNING_TIME_ATTRIBUTE,
+            				Boolean.FALSE.toString()
+        				)
+            		),
+                    CAdESSignerMetadataHelper.getCAdESSignerMetadata(extraParams),
+                    doNotIncludePolicyOnSigningCertificate
+        		);
             }
             // CASO DE FIRMA DE NODOS
             else if (targetType == CounterSignTarget.NODES) {
@@ -148,20 +175,20 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
                     nodesID[i] = ((Integer) targets[i]).intValue();
                 }
 				nodesID = ReadNodesTree.simplyArray(nodesID);
-                dataSigned =
-                		cadesCountersigner.counterSign(
-                    		csp,
-                            sign,
-                            CounterSignTarget.NODES,
-                            nodesID,
-                            key,
-                            certChain,
-                            AdESPolicy.buildAdESPolicy(extraParams),
-							signingCertificateV2,
-                            CommitmentTypeIndicationsHelper.getCommitmentTypeIndications(extraParams),
-                            Boolean.parseBoolean(extraParams.getProperty(CAdESExtraParams.INCLUDE_SIGNING_TIME_ATTRIBUTE, Boolean.FALSE.toString())),
-                            CAdESSignerMetadataHelper.getCAdESSignerMetadata(extraParams)
-                        );
+                dataSigned = cadesCountersigner.counterSign(
+            		csp,
+                    sign,
+                    CounterSignTarget.NODES,
+                    nodesID,
+                    key,
+                    certChain,
+                    AdESPolicy.buildAdESPolicy(extraParams),
+					signingCertificateV2,
+                    CommitmentTypeIndicationsHelper.getCommitmentTypeIndications(extraParams),
+                    Boolean.parseBoolean(extraParams.getProperty(CAdESExtraParams.INCLUDE_SIGNING_TIME_ATTRIBUTE, Boolean.FALSE.toString())),
+                    CAdESSignerMetadataHelper.getCAdESSignerMetadata(extraParams),
+                    doNotIncludePolicyOnSigningCertificate
+                );
             }
             // CASO DE FIRMA DE NODOS DE UNO O VARIOS FIRMANTES
             else if (targetType == CounterSignTarget.SIGNERS) {
@@ -185,7 +212,8 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
                             signingCertificateV2,
                             CommitmentTypeIndicationsHelper.getCommitmentTypeIndications(extraParams),
                             Boolean.parseBoolean(extraParams.getProperty(CAdESExtraParams.INCLUDE_SIGNING_TIME_ATTRIBUTE, Boolean.FALSE.toString())),
-                            CAdESSignerMetadataHelper.getCAdESSignerMetadata(extraParams)
+                            CAdESSignerMetadataHelper.getCAdESSignerMetadata(extraParams),
+                            doNotIncludePolicyOnSigningCertificate
                 		);
 
             }
@@ -193,9 +221,12 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
             return dataSigned;
 
         }
-        catch (final Exception e) {
-            throw new AOException("Error generando la Contrafirma CAdES: " + e, e); //$NON-NLS-1$
-        }
+        catch (final NoSuchAlgorithmException e) {
+        	throw new AOException("Error generando la Contrafirma CAdES: " + e, e); //$NON-NLS-1$
+		}
+        catch (final CertificateException e) {
+        	throw new AOException("Error generando la Contrafirma CAdES: " + e, e); //$NON-NLS-1$
+		}
 
     }
 

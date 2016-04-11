@@ -1,3 +1,13 @@
+/* Copyright (C) 2011 [Gobierno de Espana]
+ * This file is part of "Cliente @Firma".
+ * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
+ *   - the GNU General Public License as published by the Free Software Foundation;
+ *     either version 2 of the License, or (at your option) any later version.
+ *   - or The European Software License; either version 1.1 or (at your option) any later version.
+ * Date: 11/01/11
+ * You may contact the copyright holder at: soporte.afirma5@mpt.es
+ */
+
 package es.gob.afirma.cert.certvalidation;
 
 import java.io.BufferedOutputStream;
@@ -21,31 +31,31 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.bouncycastle.asn1.ASN1InputStream;
-import org.bouncycastle.asn1.ASN1Sequence;
-import org.bouncycastle.asn1.DERIA5String;
-import org.bouncycastle.asn1.DEROctetString;
-import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x509.AccessDescription;
-import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
-import org.bouncycastle.asn1.x509.AuthorityInformationAccess;
-import org.bouncycastle.asn1.x509.Extension;
-import org.bouncycastle.asn1.x509.GeneralName;
-import org.bouncycastle.cert.X509CertificateHolder;
-import org.bouncycastle.cert.jcajce.JcaX509CertificateHolder;
-import org.bouncycastle.cert.ocsp.BasicOCSPResp;
-import org.bouncycastle.cert.ocsp.CertificateID;
-import org.bouncycastle.cert.ocsp.CertificateStatus;
-import org.bouncycastle.cert.ocsp.OCSPException;
-import org.bouncycastle.cert.ocsp.OCSPReqBuilder;
-import org.bouncycastle.cert.ocsp.OCSPResp;
-import org.bouncycastle.cert.ocsp.RespID;
-import org.bouncycastle.cert.ocsp.RevokedStatus;
-import org.bouncycastle.cert.ocsp.UnknownStatus;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.bouncycastle.operator.DigestCalculator;
-import org.bouncycastle.operator.OperatorCreationException;
-import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
+import org.spongycastle.asn1.ASN1InputStream;
+import org.spongycastle.asn1.ASN1Sequence;
+import org.spongycastle.asn1.DERIA5String;
+import org.spongycastle.asn1.DEROctetString;
+import org.spongycastle.asn1.x500.X500Name;
+import org.spongycastle.asn1.x509.AccessDescription;
+import org.spongycastle.asn1.x509.AlgorithmIdentifier;
+import org.spongycastle.asn1.x509.AuthorityInformationAccess;
+import org.spongycastle.asn1.x509.Extension;
+import org.spongycastle.asn1.x509.GeneralName;
+import org.spongycastle.cert.X509CertificateHolder;
+import org.spongycastle.cert.jcajce.JcaX509CertificateHolder;
+import org.spongycastle.cert.ocsp.BasicOCSPResp;
+import org.spongycastle.cert.ocsp.CertificateID;
+import org.spongycastle.cert.ocsp.CertificateStatus;
+import org.spongycastle.cert.ocsp.OCSPException;
+import org.spongycastle.cert.ocsp.OCSPReqBuilder;
+import org.spongycastle.cert.ocsp.OCSPResp;
+import org.spongycastle.cert.ocsp.RespID;
+import org.spongycastle.cert.ocsp.RevokedStatus;
+import org.spongycastle.cert.ocsp.UnknownStatus;
+import org.spongycastle.jce.provider.BouncyCastleProvider;
+import org.spongycastle.operator.DigestCalculator;
+import org.spongycastle.operator.OperatorCreationException;
+import org.spongycastle.operator.jcajce.JcaContentSignerBuilder;
 
 import es.gob.afirma.core.misc.AOUtil;
 
@@ -130,7 +140,7 @@ final class OcspHelper {
 	 * @param responderUrl URL del servidor OCSP.
 	 * @param ocspRequest Solicitud OCSP a enviar.
 	 * @return Respuesta del servidor OCSP.
-	 * @throws IOException Si hay problemas en el tratamiento de datos. */
+	 * @throws IOException Si hay problemas en el tratamiento de datos o en la red. */
 	static byte[] sendOcspRequest(final URL responderUrl, final byte[] ocspRequest) throws IOException {
 		if (responderUrl == null) {
 			throw new IllegalArgumentException("La URL del servicio OCSP no puede ser nula"); //$NON-NLS-1$

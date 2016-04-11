@@ -1,6 +1,7 @@
 package es.gob.afirma.standalone.protocol;
 
 import java.io.IOException;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.AOCancelledOperationException;
@@ -110,10 +111,10 @@ public final class ProtocolInvocationLauncher {
 
                     params = ProtocolInvocationUriParser.getParametersForBatch(xmlBatchDefinition);
                 }
-                try{
+                try {
                     return  ProtocolInvocationLauncherBatch.processBatch(params, bySocket);
                 }
-                catch(final SocketOperationException e){
+                catch(final SocketOperationException e) {
                     LOGGER.severe("Error durante la operacion de firma por lotes: " + e); //$NON-NLS-1$
                     if (e.getErrorCode() == ProtocolInvocationLauncherBatch.getResultCancel()){
                         ProtocolInvocationLauncherBatch.sendErrorToServer(e.getErrorCode(), params);
@@ -124,7 +125,7 @@ public final class ProtocolInvocationLauncher {
                 }
             }
             catch(final Exception e) {
-                LOGGER.severe("Error en los parametros de firma por lote: " + e); //$NON-NLS-1$
+                LOGGER.log(Level.SEVERE, "Error en los parametros de firma por lote: " + e, e); //$NON-NLS-1$
                 ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_03);
                 return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_03);
             }
@@ -175,7 +176,6 @@ public final class ProtocolInvocationLauncher {
                         LOGGER.severe("Error al descifrar: " + e); //$NON-NLS-1$
                         ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_15);
                         return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_15);
-
                     }
 
                     params = ProtocolInvocationUriParser.getParametersToSave(xmlData);
@@ -271,7 +271,9 @@ public final class ProtocolInvocationLauncher {
         }
 
         else {
-            LOGGER.severe("No se ha identificado el motivo de la invocacion de la aplicacion"); //$NON-NLS-1$
+        	LOGGER.severe(
+        			"La operacion indicada en la URL no esta soportada: " +  //$NON-NLS-1$
+        					urlString.substring(0, Math.min(30, urlString.length())) + "..."); //$NON-NLS-1$
             ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_04);
             return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_04);
         }

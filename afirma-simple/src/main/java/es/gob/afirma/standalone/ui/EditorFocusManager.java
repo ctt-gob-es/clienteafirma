@@ -39,8 +39,11 @@ import javax.swing.text.html.HTMLDocument;
 
 import es.gob.afirma.standalone.LookAndFeelManager;
 
-final class EditorFocusManager extends KeyAdapter implements FocusListener, HyperlinkListener, ComponentListener {
-
+/** Gestor de foco en hiperv&iacute;nculos HTML.
+ * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
+public final class EditorFocusManager extends KeyAdapter implements FocusListener,
+                                                                    HyperlinkListener,
+                                                                    ComponentListener {
     private final JEditorPane displayPane;
 
     private final Style linkUnfocusedStyle;
@@ -52,7 +55,11 @@ final class EditorFocusManager extends KeyAdapter implements FocusListener, Hype
 
     private final EditorFocusManagerAction hlAction;
 
-    EditorFocusManager (final JEditorPane displayPane, final EditorFocusManagerAction efma) {
+    /** Crea un gestor de foco en hiperv&iacute;nculos HTML.
+     * @param displayPane Editor que contiene el HTML.
+     * @param efma Clase con la tarea a hacer en caso de acci&oacute;n sobre el
+     *             hiperv&iacute;nculo. */
+    public EditorFocusManager (final JEditorPane displayPane, final EditorFocusManagerAction efma) {
 
         super();
         this.displayPane = displayPane;

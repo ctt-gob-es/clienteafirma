@@ -98,7 +98,7 @@ public final class TestAOODFSignerTest {
 
 					final byte[] result = signer.sign(
 						DATA.get(i),
-						"SHA1withRSA", //$NON-NLS-1$
+						"SHA512withRSA", //$NON-NLS-1$
 						pke.getPrivateKey(),
 						pke.getCertificateChain(),
 						extraParams

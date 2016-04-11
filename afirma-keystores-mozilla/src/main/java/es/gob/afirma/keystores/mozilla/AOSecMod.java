@@ -23,8 +23,7 @@ import es.gob.afirma.core.misc.Platform;
 
 /** Clase para la obtenci&oacute;n de los m&oacute;dulos PKCS#11 instalados en la
  * base de datos <i>secmod.db</i> de Mozilla / Firefox. */
-
-final class AOSecMod {
+public final class AOSecMod {
 
 	private static final int FIRST_ASCII_PRINTABLE_CODE = 32;
 	private static final int LAST_ASCII_PRINTABLE_CODE = 126;
@@ -126,7 +125,7 @@ final class AOSecMod {
      *         Cuando ocurre cualquier problema durante el proceso */
     static List<ModuleName> getModules(final String dir) throws AOException {
 
-        if (dir == null || "".equals(dir)) { //$NON-NLS-1$
+        if (dir == null || dir.isEmpty()) {
             throw new IllegalArgumentException("El directorio del perfil de Mozilla no puede ser nulo"); //$NON-NLS-1$
         }
 
@@ -171,13 +170,16 @@ final class AOSecMod {
         return modules;
     }
 
-    /** M&oacute;dulo de seguridad (PKCS#11) de Mozilla / Firefox. */
-    static class ModuleName {
+    /** M&oacute;dulo de seguridad (PKCS#11) de NSS. */
+    public static final class ModuleName {
 
         private final String lib;
         private final String description;
 
-        ModuleName(final String l, final String d) {
+        /** Construye un m&oacute;dulo de seguridad (PKCS#11) de NSS.
+         * @param l Bibliotecas PKCS#11 (nombre incluyendo ruta completa).
+         * @param d Descripci&oacute;n del m&oacute;dulo PKCS#11. */
+        public ModuleName(final String l, final String d) {
             this.lib = l;
             this.description = d;
         }

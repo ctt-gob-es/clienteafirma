@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.io.PrintWriter;
 import java.security.cert.X509Certificate;
 import java.util.Properties;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
@@ -112,7 +113,7 @@ public final class BatchPresigner extends HttpServlet {
 			pre = batch.doPreBatch(certs);
 		}
 		catch(final Exception e) {
-			LOGGER.severe("Error en el preproceso del lote: " + e); //$NON-NLS-1$
+			LOGGER.log(Level.SEVERE, "Error en el preproceso del lote: " + e, e); //$NON-NLS-1$
 			response.sendError(
 				HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
 				"Error en el preproceso del lote: " + e //$NON-NLS-1$
@@ -121,7 +122,7 @@ public final class BatchPresigner extends HttpServlet {
 		}
 
 		String allowOrigin = CONFIG_DEFAULT_VALUE_ALLOW_ORIGIN;
-		if (BatchPresigner.config.contains(CONFIG_PARAM_ALLOW_ORIGIN)) {
+		if (BatchPresigner.config.containsKey(CONFIG_PARAM_ALLOW_ORIGIN)) {
 			allowOrigin = BatchPresigner.config.getProperty(CONFIG_PARAM_ALLOW_ORIGIN);
 		}
 
@@ -129,7 +130,7 @@ public final class BatchPresigner extends HttpServlet {
 		response.setContentType("text/xml;charset=UTF-8"); //$NON-NLS-1$
 		final PrintWriter writer = response.getWriter();
 		writer.write(pre);
-
+		writer.flush();
 	}
 
 }

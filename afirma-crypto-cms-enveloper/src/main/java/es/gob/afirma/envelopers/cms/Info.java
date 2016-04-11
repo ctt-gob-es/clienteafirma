@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -10,8 +10,8 @@
 
 package es.gob.afirma.envelopers.cms;
 
-import org.bouncycastle.asn1.ASN1EncodableVector;
-import org.bouncycastle.asn1.cms.EncryptedContentInfo;
+import org.spongycastle.asn1.ASN1EncodableVector;
+import org.spongycastle.asn1.cms.EncryptedContentInfo;
 
 /** Clase utilizada desde la clase Utils.java para manejar las variables de la
  * funcion initVariables */

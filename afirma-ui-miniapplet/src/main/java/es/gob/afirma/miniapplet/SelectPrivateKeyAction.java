@@ -79,7 +79,10 @@ final class SelectPrivateKeyAction implements PrivilegedExceptionAction<PrivateK
         else if (os == OS.WINDOWS) {
 			this.keyStore = AOKeyStore.WINDOWS;
 		}
-		else if (os == OS.LINUX || os == OS.SOLARIS) {
+		else if (os == OS.LINUX) {
+			this.keyStore = AOKeyStore.SHARED_NSS;
+		}
+		else if (os == OS.SOLARIS) {
 			this.keyStore = AOKeyStore.MOZ_UNI;
 		}
 		else if (os == OS.MACOSX) {
@@ -120,8 +123,8 @@ final class SelectPrivateKeyAction implements PrivilegedExceptionAction<PrivateK
 				ksm,
 				this,
 				true,
-				true,
-				true,
+				true, // showExpiredCertificates
+				true, // checkValidity
 				filters,
 				mandatoryCertificate
 				);

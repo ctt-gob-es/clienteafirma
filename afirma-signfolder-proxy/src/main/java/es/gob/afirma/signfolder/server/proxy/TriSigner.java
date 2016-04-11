@@ -3,12 +3,14 @@ package es.gob.afirma.signfolder.server.proxy;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.logging.Logger;
 
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -20,8 +22,10 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.http.UrlHttpManagerFactory;
+import es.gob.afirma.core.misc.http.UrlHttpMethod;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.TriphaseData;
 import es.gob.afirma.core.signers.TriphaseData.TriSign;
@@ -42,6 +46,10 @@ public class TriSigner {
 
 	/** Nombre del par&aacute;metro que identifica la operaci&oacute;n criptogr&aacute;fica en la URL del servidor de firma. */
 	private static final String PARAMETER_NAME_CRYPTO_OPERATION = "cop"; //$NON-NLS-1$
+
+	private static final String CRYPTO_OPERATION_TYPE_SIGN = "sign"; //$NON-NLS-1$
+	private static final String CRYPTO_OPERATION_TYPE_COSIGN = "cosign"; //$NON-NLS-1$
+	private static final String CRYPTO_OPERATION_TYPE_COUNTERSIGN = "countersign"; //$NON-NLS-1$
 
 	private static final String HTTP_CGI = "?"; //$NON-NLS-1$
 	private static final String HTTP_EQUALS = "="; //$NON-NLS-1$
@@ -70,12 +78,24 @@ public class TriSigner {
 	 * @param docReq Petici&oacute;n de firma de un documento.
 	 * @param signerCert Certificado de firma.
 	 * @param signServiceUrl URL del servicio de firma.
+	 * @param forcedExtraParams Par&aacute;metros de firma que se deben aplicar forzosamente.
 	 * @throws IOException Cuando no se puede obtener el documento para prefirmar.
 	 * @throws AOException Cuando ocurre un error al generar la prefirma.
 	 */
 	public static void doPreSign(final TriphaseSignDocumentRequest docReq,
 			final X509Certificate signerCert,
-			final String signServiceUrl) throws IOException, AOException {
+			final String signServiceUrl,
+			final String forcedExtraParams) throws IOException, AOException {
+
+		// Configuramos el formato y la operacion criptografica adecuada
+		String cop;
+		final String format = normalizeSignatureFormat(docReq.getSignatureFormat());
+		if (AOSignConstants.SIGN_FORMAT_PADES.equals(format)) {
+			cop = CRYPTO_OPERATION_TYPE_SIGN;
+		}
+		else {
+			 cop = normalizeOperationType(docReq.getCryptoOperation());
+		}
 
 		// Empezamos la prefirma
 		try {
@@ -91,16 +111,25 @@ public class TriSigner {
 			final StringBuffer urlBuffer = new StringBuffer();
 			urlBuffer.append(signServiceUrl).append(HTTP_CGI).
 			append(PARAMETER_NAME_OPERATION).append(HTTP_EQUALS).append(OPERATION_PRESIGN).append(HTTP_AND).
-			append(PARAMETER_NAME_CRYPTO_OPERATION).append(HTTP_EQUALS).append(docReq.getCryptoOperation()).append(HTTP_AND).
-			append(PARAMETER_NAME_FORMAT).append(HTTP_EQUALS).append(normalizeSignatureFormat(docReq.getSignatureFormat())).append(HTTP_AND).
+			append(PARAMETER_NAME_CRYPTO_OPERATION).append(HTTP_EQUALS).append(cop).append(HTTP_AND).
+			append(PARAMETER_NAME_FORMAT).append(HTTP_EQUALS).append(format).append(HTTP_AND).
 			append(PARAMETER_NAME_ALGORITHM).append(HTTP_EQUALS).append(digestToSignatureAlgorithmName(docReq.getMessageDigestAlgorithm())).append(HTTP_AND).
 			append(PARAMETER_NAME_CERT).append(HTTP_EQUALS).append(Base64.encode(signerCert.getEncoded(), true)).append(HTTP_AND).
 			append(PARAMETER_NAME_DOCID).append(HTTP_EQUALS).append(docReq.getContent());
-			if (docReq.getParams() != null) {
-				urlBuffer.append(HTTP_AND).append(PARAMETER_NAME_EXTRA_PARAM).append(HTTP_EQUALS).append(docReq.getParams());
-			}
 
-			docReq.setPartialResult(parseTriphaseResult(UrlHttpManagerFactory.getInstalledManager().readUrlByPost(urlBuffer.toString())));
+			// Forzamos que se incluyan una serie de parametros en la configuracion de firma. Si ya
+			// se incluia alguno de estos con otro valor acabara siendo pisado ya que en un properties
+			// tiene preferencia el ultimo valor leido
+			final Properties extraParams = buildExtraParams(docReq.getParams());
+			addFormatExtraParam(extraParams, docReq.getSignatureFormat());
+			addForcedExtraParams(extraParams, forcedExtraParams.split(";")); //$NON-NLS-1$
+			urlBuffer.append(HTTP_AND).append(PARAMETER_NAME_EXTRA_PARAM)
+			.append(HTTP_EQUALS).append(AOUtil.properties2Base64(extraParams));
+
+//			LOGGER.info("URL de peticion de prefirma:");
+//			LOGGER.info(urlBuffer.toString());
+
+			docReq.setPartialResult(parseTriphaseResult(UrlHttpManagerFactory.getInstalledManager().readUrl(urlBuffer.toString(), UrlHttpMethod.POST)));
 			urlBuffer.setLength(0);
 		}
 		catch (final CertificateEncodingException e) {
@@ -112,34 +141,124 @@ public class TriSigner {
 	}
 
 	/**
+	 * Compone un objeto de propiedades a partir de un listado de extraParams
+	 * proporcionados en base 64.
+	 *
+	 * @param params Cadena base64 con un listado de propiedades.
+	 * @return Conjunto de par&aacute;metros.
+	 * @throws AOException Cuando no se pueden decodificar los par&aacute;metros.
+	 */
+	private static Properties buildExtraParams(final String params) throws AOException {
+
+		 final Properties extraParams = new Properties();
+
+		 if (params != null && params.length() > 0) {
+			 byte[] paramsBytes;
+			 try {
+				 try {
+					 paramsBytes = new String(Base64.decode(params), DEFAULT_ENCODING).replace("\\n", "\n").getBytes(DEFAULT_ENCODING); //$NON-NLS-1$ //$NON-NLS-2$
+				 } catch (final UnsupportedEncodingException e) {
+					 paramsBytes = new String(Base64.decode(params)).replace("\\n", "\n").getBytes(); //$NON-NLS-1$ //$NON-NLS-2$
+				 }
+				 extraParams.load(new ByteArrayInputStream(paramsBytes));
+			 } catch (final IOException e) {
+				 throw new AOException("Error al decodificar los parametros de firma", e); //$NON-NLS-1$
+			 }
+		 }
+
+		 return extraParams;
+	 }
+
+	/**
+	 * Agrega a los extraParams cualquier par&aacute;metro necesario en base al formato
+	 * de firma establecido. Esto es necesario porque el Portafirmas utiliza el nombre
+	 * de formato para configurar las firmas cuando el cliente @firma lo hace en base
+	 * a extraParams.
+	 * @param extraParams Conjunto de par&aacute;metros.
+	 * @param format Formato de firma definido para el documento.
+	 */
+	private static void addFormatExtraParam(final Properties extraParams, final String format) {
+		if (format != null) {
+			if (format.toUpperCase().contains("XADES")) { //$NON-NLS-1$
+				if (format.toUpperCase().contains("ENVELOPING")) { //$NON-NLS-1$
+					extraParams.setProperty("format", AOSignConstants.SIGN_FORMAT_XADES_ENVELOPING); //$NON-NLS-1$
+				}
+				else if (format.toUpperCase().contains("ENVELOPED")) { //$NON-NLS-1$
+					extraParams.setProperty("format", AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED); //$NON-NLS-1$
+				}
+			}
+		}
+	}
+
+	/**
+	 * Agrega a los par&aacute;metros de configuraci&oacute;n de la firma unos
+	 * par&aacute;metros adicionales dando preferencias a estos &uacute;ltimos
+	 * en caso de pisarte.
+	 * @param extraParams Par&aacute;metros de firma.
+	 * @param forcedParams Listado de nuevos par&aacute;metros.
+	 * @throws AOException Cuando no se pueden decodificar los par&aacute;metros de firma.
+	 */
+	private static void addForcedExtraParams(final Properties extraParams, final String[] forcedParams) throws AOException {
+
+		// Si no hay prametros que agregar devolvemos los parametros originales
+		if (forcedParams == null ||
+				forcedParams.length == 0 ||
+				forcedParams.length == 1 && forcedParams[0].trim().length() == 0) {
+			return;
+		}
+
+		for (final String forcedParam : forcedParams) {
+			final int sepPos = forcedParam.indexOf('=');
+			if (sepPos != -1 && sepPos != forcedParam.length() - 1) {
+				extraParams.setProperty(forcedParam.substring(0, sepPos), forcedParam.substring(sepPos + 1));
+			}
+		}
+	}
+
+	/**
 	 * Postfirma el documento de una petici&oacute;n.
 	 * @param docReq Petici&oacute;n de firma de un documento.
 	 * @param signerCert Certificado de firma.
 	 * @param signServiceUrl URL del servicio de firma.
+	 * @param forcedExtraParams Par&aacute;metros de firma que se deben aplicar forzosamente.
 	 * @throws IOException Cuando no se puede obtener el documento para postfirmar.
 	 * @throws AOException Cuando ocurre un error al generar la postfirma.
 	 */
 	public static void doPostSign(final TriphaseSignDocumentRequest docReq,
 			final X509Certificate signerCert,
-			final String signServiceUrl) throws IOException, AOException {
+			final String signServiceUrl,
+			final String forcedExtraParams) throws IOException, AOException {
+
+		// Configuramos el formato y la operacion criptografica adecuada
+		String cop;
+		final String format = normalizeSignatureFormat(docReq.getSignatureFormat());
+		if (AOSignConstants.SIGN_FORMAT_PADES.equals(format)) {
+			cop = CRYPTO_OPERATION_TYPE_SIGN;
+		}
+		else {
+			 cop = normalizeOperationType(docReq.getCryptoOperation());
+		}
 
 		final byte[] triSignFinalResult;
 		try {
 			final StringBuffer urlBuffer = new StringBuffer();
 			urlBuffer.append(signServiceUrl).append(HTTP_CGI).
 			append(PARAMETER_NAME_OPERATION).append(HTTP_EQUALS).append(OPERATION_POSTSIGN).append(HTTP_AND).
-			append(PARAMETER_NAME_CRYPTO_OPERATION).append(HTTP_EQUALS).append(docReq.getCryptoOperation()).append(HTTP_AND).
-			append(PARAMETER_NAME_FORMAT).append(HTTP_EQUALS).append(normalizeSignatureFormat(docReq.getSignatureFormat())).append(HTTP_AND).
+			append(PARAMETER_NAME_CRYPTO_OPERATION).append(HTTP_EQUALS).append(cop).append(HTTP_AND).
+			append(PARAMETER_NAME_FORMAT).append(HTTP_EQUALS).append(format).append(HTTP_AND).
 			append(PARAMETER_NAME_ALGORITHM).append(HTTP_EQUALS).append(digestToSignatureAlgorithmName(docReq.getMessageDigestAlgorithm())).append(HTTP_AND).
 			append(PARAMETER_NAME_CERT).append(HTTP_EQUALS).append(Base64.encode(signerCert.getEncoded(), true));
 
-			if (docReq.getParams() != null && docReq.getParams().length() > 0) {
-				urlBuffer.append(HTTP_AND).append(PARAMETER_NAME_EXTRA_PARAM).append(HTTP_EQUALS)
-				.append(Base64.encode(docReq.getParams().getBytes(DEFAULT_ENCODING), true));
-			}
+			// Forzamos que se incluyan una serie de parametros en la configuracion de firma. Si ya
+			// se incluia alguno de estos con otro valor acabara siendo pisado ya que en un properties
+			// tiene preferencia el ultimo valor leido
+			final Properties extraParams = buildExtraParams(docReq.getParams());
+			addFormatExtraParam(extraParams, docReq.getSignatureFormat());
+			addForcedExtraParams(extraParams, forcedExtraParams.split(";")); //$NON-NLS-1$
+			urlBuffer.append(HTTP_AND).append(PARAMETER_NAME_EXTRA_PARAM)
+			.append(HTTP_EQUALS).append(AOUtil.properties2Base64(extraParams));
 
 			// Datos de sesion en forma de properies codificado en Base64 URL SAFE
-
 			if (docReq.getPartialResult() != null) {
 				final String sessionData = docReq.getPartialResult().toString();
 				urlBuffer.append(HTTP_AND).append(PARAMETER_NAME_SESSION_DATA).append(HTTP_EQUALS)
@@ -151,10 +270,10 @@ public class TriSigner {
 				urlBuffer.append(HTTP_AND).append(PARAMETER_NAME_DOCID).append(HTTP_EQUALS).append(content);
 			}
 
-			System.out.println("Llamada al servicio de firma: " + urlBuffer.toString());
+//			LOGGER.info("URL de peticion de postfirma:");
+//			LOGGER.info(urlBuffer.toString());
 
-
-			triSignFinalResult = UrlHttpManagerFactory.getInstalledManager().readUrlByPost(urlBuffer.toString());
+			triSignFinalResult = UrlHttpManagerFactory.getInstalledManager().readUrl(urlBuffer.toString(), UrlHttpMethod.POST);
 			urlBuffer.setLength(0);
 		}
 		catch (final CertificateEncodingException e) {
@@ -207,12 +326,26 @@ public class TriSigner {
 		return normalizeFormat;
 	}
 
+	/**
+	 * Normalizamos el nombre del tipo de operaci&oacute;n criptogr&aacute;fica..
+	 * @param operationType Tipo de operaci&oacute;n.
+	 * @return Nombre del tipo de operaci&oacute;n normalizado o el mismo de entrada
+	 * si no se ha encontrado correspondencia.
+	 */
+	private static String normalizeOperationType(final String operationType) {
+		String normalizedOp = operationType;
+		if ("firmar".equalsIgnoreCase(normalizedOp)) { //$NON-NLS-1$
+			normalizedOp = CRYPTO_OPERATION_TYPE_SIGN;
+		} else if ("cofirmar".equalsIgnoreCase(normalizedOp)) { //$NON-NLS-1$
+			normalizedOp = CRYPTO_OPERATION_TYPE_COSIGN;
+		} else if ("contrafirmar".equalsIgnoreCase(normalizedOp)) { //$NON-NLS-1$
+			normalizedOp = CRYPTO_OPERATION_TYPE_COUNTERSIGN;
+		}
+
+		return normalizedOp;
+	}
+
 	private static TriphaseData parseTriphaseResult(final byte[] triphaseResult) throws IOException {
-
-
-		//final byte[] triphaseResponse = Base64.decode(triphaseResult, 0, triphaseResult.length, true);
-
-		// Comprobamos si la respuesta es de tipo proporties o XML (las 2 variantes que ha sufrido el firmador trifásico)
 		LOGGER.info("Respuesta de prefirma del servicio de firma:\n" + new String(triphaseResult)); //$NON-NLS-1$
 		return loadTriphaseResponse(triphaseResult);
 	}

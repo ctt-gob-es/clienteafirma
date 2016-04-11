@@ -1,0 +1,12 @@
+ - Con Chrome y Edge siempre se usará la aplicación nativa de firma.
+ - Cuando el navegador sea Internet Explorer 10 o inferior (u IE 11 con modo de compatibilidad) se usará la comunicación de AutoFirma vía servidor intermedio.
+ - Se permite forzar que la comunicación con AutoFirma sea vía servidor intermedio.
+ - Pasan a asincronas las llamadas a servicios externos.
+ - Mejora en la detección de Internet Explorer 11.
+ - Mejora en la construcción de los objetos de conexión remota.
+ - Mejora de compatibilidad en la definición de los errores.
+ - Corrección en la configuración de almacenes de certificados.
+ - En Firefox siempre se realizará una pequeña espera tras la carga antes de recoger el elemento del applet.
+ - Se agrega el método para la selección de un certificado sin necesidad de firmar tanto para el applet como para AutoFirma.
+ - Se elimina el cifrado JavaScript en el comunicación por socket con AutoFirma.
+

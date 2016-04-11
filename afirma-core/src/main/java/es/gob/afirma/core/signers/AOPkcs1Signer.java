@@ -1,18 +1,34 @@
+/* Copyright (C) 2011 [Gobierno de Espana]
+ * This file is part of "Cliente @Firma".
+ * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
+ *   - the GNU General Public License as published by the Free Software Foundation;
+ *     either version 2 of the License, or (at your option) any later version.
+ *   - or The European Software License; either version 1.1 or (at your option) any later version.
+ * Date: 11/01/11
+ * You may contact the copyright holder at: soporte.afirma5@mpt.es
+ */
+
 package es.gob.afirma.core.signers;
 
+import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.Signature;
 import java.security.SignatureException;
 import java.security.cert.Certificate;
+import java.util.Locale;
 import java.util.Properties;
 
 import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.AOInvalidFormatException;
+import es.gob.afirma.core.util.tree.AOTreeModel;
 
 /** Firmador simple en formato PKCS#1.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
-public final class AOPkcs1Signer implements AOSimpleSigner {
+public final class AOPkcs1Signer implements AOSigner {
+
+	private static final String PKCS1_FILE_SUFFIX = ".p1"; //$NON-NLS-1$
 
 	/** Realiza una firma electr&oacute;nica PKCS#1 v1.5.
 	 * @param algorithm Algoritmo de firma a utilizar
@@ -77,5 +93,60 @@ public final class AOPkcs1Signer implements AOSimpleSigner {
 		catch (final SignatureException e) {
 			throw new AOException("Error durante el proceso de firma PKCS#1: " + e, e); //$NON-NLS-1$
 		}
+	}
+
+	@Override
+	public byte[] cosign(final byte[] data, final byte[] sign, final String algorithm, final PrivateKey key, final Certificate[] certChain, final Properties extraParams) throws AOException, IOException {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public byte[] cosign(final byte[] sign, final String algorithm, final PrivateKey key, final Certificate[] certChain, final Properties extraParams) throws AOException, IOException {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public byte[] countersign(final byte[] sign, final String algorithm, final CounterSignTarget targetType, final Object[] targets, final PrivateKey key, final Certificate[] certChain, final Properties extraParams) throws AOException, IOException {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo) throws AOInvalidFormatException, IOException {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public boolean isSign(final byte[] is) throws IOException {
+		return false;
+	}
+
+	@Override
+	public boolean isValidDataFile(final byte[] is) throws IOException {
+		if (is != null && is.length > 0) {
+			return true;
+		}
+		return false;
+	}
+
+	@Override
+	public String getSignedName(final String originalName, final String inText) {
+        final String inTextInt = inText != null ? inText : ""; //$NON-NLS-1$
+        if (originalName == null) {
+            return "signature.p1"; //$NON-NLS-1$
+        }
+        if (originalName.toLowerCase(Locale.US).endsWith(PKCS1_FILE_SUFFIX)) {
+            return originalName.substring(0, originalName.length() - PKCS1_FILE_SUFFIX.length()) + inTextInt + PKCS1_FILE_SUFFIX;
+        }
+        return originalName + inTextInt + PKCS1_FILE_SUFFIX;
+	}
+
+	@Override
+	public byte[] getData(final byte[] signData) throws AOException, IOException {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public AOSignInfo getSignInfo(final byte[] signData) throws AOException, IOException {
+		throw new UnsupportedOperationException();
 	}
 }

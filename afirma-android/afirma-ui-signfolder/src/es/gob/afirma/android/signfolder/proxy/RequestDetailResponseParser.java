@@ -84,7 +84,7 @@ final class RequestDetailResponseParser {
 			throw new IllegalArgumentException("No se encontro el nodo '" + //$NON-NLS-1$
 					SUBJECT_NODE + "' en la peticion con identificador " + reqDetail.getId()); //$NON-NLS-1$
 		}
-		reqDetail.setSubject(XmlUtils.getTextContent(paramsNodes.item(index)));
+		reqDetail.setSubject(normalizeValue(XmlUtils.getTextContent(paramsNodes.item(index))));
 
 		// Configuramos los remitentes
 		index = XmlUtils.nextNodeElementIndex(paramsNodes, ++index);
@@ -108,7 +108,7 @@ final class RequestDetailResponseParser {
 			throw new IllegalArgumentException("No se encontro el nodo '" + //$NON-NLS-1$
 					APPLICATION_NODE + "' en la peticion con identificador " + reqDetail.getId()); //$NON-NLS-1$
 		}
-		reqDetail.setApp(XmlUtils.getTextContent(paramsNodes.item(index)));
+		reqDetail.setApp(normalizeValue(XmlUtils.getTextContent(paramsNodes.item(index))));
 
 		// Configuramos la referencia de la solicitud
 		index = XmlUtils.nextNodeElementIndex(paramsNodes, ++index);
@@ -116,7 +116,7 @@ final class RequestDetailResponseParser {
 			throw new IllegalArgumentException("No se encontro el nodo '" + //$NON-NLS-1$
 					REFERENCE_NODE + "' en la peticion con identificador " + reqDetail.getId()); //$NON-NLS-1$
 		}
-		reqDetail.setRef(XmlUtils.getTextContent(paramsNodes.item(index)));
+		reqDetail.setRef(normalizeValue(XmlUtils.getTextContent(paramsNodes.item(index))));
 
 		// Configuramos las linea de firma de la aplicacion
 		index = XmlUtils.nextNodeElementIndex(paramsNodes, ++index);
@@ -216,7 +216,7 @@ final class RequestDetailResponseParser {
 				throw new IllegalArgumentException("Se ha encontrado el nodo " + senderNodes.item(i).getNodeName() //$NON-NLS-1$
 						+ " en el listado de remitentes de la solicitud de firma"); //$NON-NLS-1$
 			}
-			sendersList.addElement(XmlUtils.getTextContent(senderNodes.item(i)));
+			sendersList.addElement(normalizeValue(XmlUtils.getTextContent(senderNodes.item(i))));
 		}
 
 		final String[] senders = new String[sendersList.size()];
@@ -254,7 +254,7 @@ final class RequestDetailResponseParser {
 					throw new IllegalArgumentException("Se ha encontrado el nodo " + //$NON-NLS-1$
 							recivers.item(j).getNodeName()  + " en el listado de lineas de firma"); //$NON-NLS-1$
 				}
-				receiverList.addElement(XmlUtils.getTextContent(recivers.item(j)));
+				receiverList.addElement(normalizeValue(XmlUtils.getTextContent(recivers.item(j))));
 			}
 			signLinesList.addElement(receiverList);
 		}
@@ -283,5 +283,14 @@ final class RequestDetailResponseParser {
 		docsList.copyInto(docs);
 		return docs;
 
+	}
+
+	/**
+	 * Deshace los cambios que hizo el proxy para asegurar que el XML est&aacute;ba bien formado.
+	 * @param value Valor que normalizar.
+	 * @return Valor normalizado.
+	 */
+	static String normalizeValue(final String value) {
+		return value.trim().replace("&_lt;", "<").replace("&_gt;", ">"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 	}
 }

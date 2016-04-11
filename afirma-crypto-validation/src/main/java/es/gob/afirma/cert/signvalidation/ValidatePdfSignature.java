@@ -1,3 +1,13 @@
+/* Copyright (C) 2011 [Gobierno de Espana]
+ * This file is part of "Cliente @Firma".
+ * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
+ *   - the GNU General Public License as published by the Free Software Foundation;
+ *     either version 2 of the License, or (at your option) any later version.
+ *   - or The European Software License; either version 1.1 or (at your option) any later version.
+ * Date: 11/01/11
+ * You may contact the copyright holder at: soporte.afirma5@mpt.es
+ */
+
 package es.gob.afirma.cert.signvalidation;
 
 import java.io.IOException;
@@ -7,9 +17,11 @@ import java.security.cert.X509Certificate;
 import java.util.List;
 import java.util.logging.Logger;
 
-import com.lowagie.text.pdf.AcroFields;
-import com.lowagie.text.pdf.PdfPKCS7;
-import com.lowagie.text.pdf.PdfReader;
+import com.aowagie.text.pdf.AcroFields;
+import com.aowagie.text.pdf.PdfDictionary;
+import com.aowagie.text.pdf.PdfName;
+import com.aowagie.text.pdf.PdfPKCS7;
+import com.aowagie.text.pdf.PdfReader;
 
 import es.gob.afirma.cert.signvalidation.SignValidity.SIGN_DETAIL_TYPE;
 import es.gob.afirma.cert.signvalidation.SignValidity.VALIDITY_ERROR;
@@ -19,6 +31,9 @@ import es.gob.afirma.cert.signvalidation.SignValidity.VALIDITY_ERROR;
 public final class ValidatePdfSignature {
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+
+	private static final PdfName PDFNAME_ETSI_RFC3161 = new PdfName("ETSI.RFC3161"); //$NON-NLS-1$
+	private static final PdfName PDFNAME_DOCTIMESTAMP = new PdfName("DocTimeStamp"); //$NON-NLS-1$
 
 	private ValidatePdfSignature() {
 		// No instanciable
@@ -34,15 +49,22 @@ public final class ValidatePdfSignature {
 		final List<String> sigNames = af.getSignatureNames();
 		for (final String name : sigNames) {
 			final PdfPKCS7 pk = af.verifySignature(name);
-			try {
-				if (!pk.verify()) {
-					return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.NO_MATCH_DATA);
+
+    		// Comprobamos si es una firma o un sello
+    		final PdfDictionary pdfDictionary = af.getSignatureDictionary(name);
+
+    		// En los sellos no comprobamos el PKCS#1
+    		if (!PDFNAME_ETSI_RFC3161.equals(pdfDictionary.get(PdfName.SUBFILTER)) && !PDFNAME_DOCTIMESTAMP.equals(pdfDictionary.get(PdfName.SUBFILTER))) {
+				try {
+					if (!pk.verify()) {
+						return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.NO_MATCH_DATA);
+					}
 				}
-			}
-			catch (final Exception e) {
-				LOGGER.warning("Error validando la firma '" + name + "' del PDF: " + e); //$NON-NLS-1$ //$NON-NLS-2$
-				return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.CORRUPTED_SIGN);
-			}
+				catch (final Exception e) {
+					LOGGER.warning("Error validando la firma '" + name + "' del PDF: " + e); //$NON-NLS-1$ //$NON-NLS-2$
+					return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.CORRUPTED_SIGN);
+				}
+    		}
 			final X509Certificate signCert = pk.getSigningCertificate();
 			try {
 				signCert.checkValidity();

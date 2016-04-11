@@ -195,23 +195,24 @@
     <p>
      Este texto puede incluir una serie de palabras clave que ser&aacute;n sustituidas por los textos apropiados del titular o emisor del
      certificado de firma:
-     <dl>
-      <dt><i><b>$$SUBJECTCN$$</b></i></dt>
-       <dd>Nombre com&uacute;n (CN, <i>Common Name</i>) dentro del <code>X.500 Principal</code> del titular del certificado de firma.</dd>
-      <dt><i><b>$$ISSUERCN$$</b></i></dt>
-       <dd>Nombre com&uacute;n (CN, <i>Common Name</i>) dentro del <code>X.500 Principal</code> del emisor del certificado de firma.</dd>
-      <dt><i><b>$$CERTSERIAL$$</b></i></dt>
-       <dd>N&uacute;mero de serie del certificado de firma.</dd>
-      <dt><i><b>$$SIGNDATE=<code>PATR&Oacute;N</code>$$</b></i></dt>
-       <dd>
-        Fecha de la firma, donde <code>PATR&Oacute;N</code> debe indicar el formato en el que debe mostrarse la fecha, siguiendo el esquema
-        definido por Oracle para la clase <a href="http://docs.oracle.com/javase/7/docs/api/java/text/SimpleDateFormat.html">SimpleDateFormat</a>.
-       </dd>
-     </dl>
+    </p>
+    <dl>
+     <dt><i><b>$$SUBJECTCN$$</b></i></dt>
+      <dd>Nombre com&uacute;n (CN, <i>Common Name</i>) dentro del <code>X.500 Principal</code> del titular del certificado de firma.</dd>
+     <dt><i><b>$$ISSUERCN$$</b></i></dt>
+      <dd>Nombre com&uacute;n (CN, <i>Common Name</i>) dentro del <code>X.500 Principal</code> del emisor del certificado de firma.</dd>
+     <dt><i><b>$$CERTSERIAL$$</b></i></dt>
+      <dd>N&uacute;mero de serie del certificado de firma.</dd>
+     <dt><i><b>$$SIGNDATE=<code>PATR&Oacute;N</code>$$</b></i></dt>
+      <dd>
+       Fecha de la firma, donde <code>PATR&Oacute;N</code> debe indicar el formato en el que debe mostrarse la fecha, siguiendo el esquema
+       definido por Oracle para la clase <a href="http://docs.oracle.com/javase/7/docs/api/java/text/SimpleDateFormat.html">SimpleDateFormat</a>.
+      </dd>
+    </dl>
+    <p>
      As&iacute;, por ejemplo, el texto "<code>Firmado por $$SUBJECTCN$$ el d&iacute;a $$SIGNDATE=dd/MM/yyyy$$.</code>" resultar&aacute; finalmente
      en el PDF como "<code>Firmado por Tom&aacute;s Garc&iacute;a-Mer&aacute;s el d&iacute;a 04/01/2016.</code>" suponiendo que el CN del titular del certificado
      de firma es <code>Tom&aacute;s Garc&iacute;a-Mer&aacute;s</code> y que la firma se realiza el 04/01/2016.
-     
     </p>
    </dd>
   <dt><b><i>layer2FontFamily</i></b></dt>

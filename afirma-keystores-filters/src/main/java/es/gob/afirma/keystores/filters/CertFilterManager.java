@@ -48,6 +48,7 @@ public final class CertFilterManager {
 	private static final String FILTER_TYPE_ISSUER_CONTAINS = "issuer.contains:"; //$NON-NLS-1$
 	private static final String FILTER_TYPE_THUMBPRINT = "thumbprint:"; //$NON-NLS-1$
 	private static final String FILTER_TYPE_POLICY_ID = "policyid:"; //$NON-NLS-1$
+	private static final String FILTER_TYPE_PSEUDONYM = "pseudonym:"; //$NON-NLS-1$
 
 	private static final String FILTER_PREFIX_KEYUSAGE = "keyusage.";  //$NON-NLS-1$
 	private static final String FILTER_TYPE_KEYUSAGE_DIGITAL_SIGNATURE = FILTER_PREFIX_KEYUSAGE + "digitalsignature:"; //$NON-NLS-1$
@@ -181,6 +182,9 @@ public final class CertFilterManager {
 				if (oids != null && !oids.isEmpty()) {
 					filtersList.add(new PolicyIdFilter(Arrays.asList(oids.split(",")))); //$NON-NLS-1$
 				}
+			}
+			else if (filter.toLowerCase().startsWith(FILTER_TYPE_PSEUDONYM)) {
+				filtersList.add(new PseudonymFilter());
 			}
 		}
 

@@ -44,10 +44,12 @@ import javax.xml.crypto.dsig.spec.XPathType.Filter;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.OutputKeys;
 
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.ls.DOMImplementationLS;
+import org.w3c.dom.ls.LSOutput;
 import org.w3c.dom.ls.LSSerializer;
 
 import es.gob.afirma.core.misc.AOUtil;
@@ -80,7 +82,7 @@ public final class Utils {
 
         final String type = tpy != null ? tpy : "text/xsl"; //$NON-NLS-1$
 
-        if (xml == null || "".equals(xml)) { //$NON-NLS-1$
+        if (xml == null || xml.isEmpty()) {
             return "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?><?xml-stylesheet type=\"" + //$NON-NLS-1$
                    type
                    + "\" href=\"" + //$NON-NLS-1$
@@ -278,7 +280,7 @@ public final class Utils {
                     // namespace indicado
                     if ("XPath".equals(xpathTransformNode.getNodeName()) || (namespacePrefix + ":XPath").equals(xpathTransformNode.getNodeName())) { //$NON-NLS-1$ //$NON-NLS-2$
 
-                        if (namespacePrefix == null || "".equals(namespacePrefix)) { //$NON-NLS-1$
+                        if (namespacePrefix == null || namespacePrefix.isEmpty()) {
                             params = new XPathFilterParameterSpec(xpathTransformNode.getTextContent());
                         }
                         else {
@@ -370,7 +372,7 @@ public final class Utils {
 
         if (xades) { // XAdES
             if (format.equals(AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED) && mode.equals(AOSignConstants.SIGN_MODE_EXPLICIT)) {
-                throw new UnsupportedOperationException("No se puede realizar una firma enveloped sobre un contenido explicito"); //$NON-NLS-1$
+                throw new UnsupportedOperationException("El formato Enveloped es incompatible con el modo de firma explicito"); //$NON-NLS-1$
             }
             if (format.equals(AOSignConstants.SIGN_FORMAT_XADES_EXTERNALLY_DETACHED) && uri == null && externallyDetachedHashAlgorithm == null) {
                 throw new UnsupportedOperationException(
@@ -555,13 +557,25 @@ public final class Utils {
     }
 
 	private static void writeXMLwithXALAN(final Writer writer, final Node node, final String xmlEncoding) {
-        final LSSerializer serializer = ((DOMImplementationLS) node.getOwnerDocument().getImplementation()).createLSSerializer();
-        serializer.getDomConfig().setParameter("namespaces", Boolean.FALSE); //$NON-NLS-1$
-        final com.sun.org.apache.xerces.internal.dom.DOMOutputImpl output = new com.sun.org.apache.xerces.internal.dom.DOMOutputImpl();
+
+		DOMImplementationLS domImplLS;
+		final Document doc = node.getOwnerDocument();
+		if (doc.getFeature("Core", "3.0") != null && doc.getFeature("LS", "3.0") != null) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+        	domImplLS = (DOMImplementationLS) doc.getImplementation().getFeature("LS","3.0"); //$NON-NLS-1$ //$NON-NLS-2$
+        }
+        else {
+        	throw new RuntimeException("La implementacion DOM cargada no permite la serializacion"); //$NON-NLS-1$
+        }
+
+        final LSOutput output = domImplLS.createLSOutput();
         output.setCharacterStream(writer);
         if (xmlEncoding != null) {
             output.setEncoding(xmlEncoding);
         }
+
+        final LSSerializer serializer = domImplLS.createLSSerializer();
+        serializer.getDomConfig().setParameter("namespaces", Boolean.FALSE); //$NON-NLS-1$
+
         serializer.write(node, output);
     }
 
@@ -585,9 +599,13 @@ public final class Utils {
             }
         }
 
-        final AOSimpleSignInfo ssi = new AOSimpleSignInfo(new X509Certificate[] {
-            Utils.getCertificate(signature.getElementsByTagNameNS(XMLConstants.DSIGNNS, "X509Certificate").item(0)) //$NON-NLS-1$
-        }, signingTime);
+        final List<X509Certificate> certChain = new ArrayList<X509Certificate>();
+        final NodeList signatureNodes = signature.getElementsByTagNameNS(XMLConstants.DSIGNNS, "X509Certificate"); //$NON-NLS-1$
+        for (int i = 0; i < signatureNodes.getLength(); i++) {
+        	certChain.add(Utils.getCertificate(signatureNodes.item(i)));
+        }
+
+        final AOSimpleSignInfo ssi = new AOSimpleSignInfo(certChain.toArray(new X509Certificate[certChain.size()]), signingTime);
         ssi.setSignAlgorithm(((Element) signature.getElementsByTagNameNS(XMLConstants.DSIGNNS, "SignatureMethod").item(0)).getAttribute("Algorithm")); //$NON-NLS-1$ //$NON-NLS-2$
 
         byte[] pkcs1;
@@ -647,7 +665,7 @@ public final class Utils {
      *        Certificado en Base64. No debe incluir <i>Bag Attributes</i>
      * @return Certificado X509 o <code>null</code> si no se pudo crear */
     public static X509Certificate createCert(final String b64Cert) {
-        if (b64Cert == null || "".equals(b64Cert)) { //$NON-NLS-1$
+        if (b64Cert == null || b64Cert.isEmpty()) {
             LOGGER.severe("Se ha proporcionado una cadena nula o vacia, se devolvera null"); //$NON-NLS-1$
             return null;
         }

@@ -44,7 +44,7 @@ import es.gob.afirma.signers.xml.Utils;
 /** Validador de firmas XML. Basado en la documentaci&oacute;n y los ejemplo de la JSR 105. */
 public final class ValidateXMLSignature {
 
-	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+	static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	private ValidateXMLSignature() {
 		// No permitimos la instanciacion
@@ -126,7 +126,7 @@ public final class ValidateXMLSignature {
     			);
             }
             catch (final Exception e) {
-            	Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
+            	LOGGER.warning(
         			"No se ha podido instalar un dereferenciador a medida: " + e //$NON-NLS-1$
     			);
             }

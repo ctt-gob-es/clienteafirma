@@ -30,6 +30,8 @@ import es.gob.afirma.keystores.callbacks.NullPasswordCallback;
  * @version 0.3 */
 public final class AOKeyStoreManagerFactory {
 
+	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+
     private AOKeyStoreManagerFactory() {
         // No permitimos la instanciacion
     }
@@ -67,12 +69,12 @@ public final class AOKeyStoreManagerFactory {
     	}
     	catch(final Exception e) {
     		forceReset = false;
-    		Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
+    		LOGGER.warning(
 				"No se ha podido leer la variable '" + FORCE_STORE_RESET + "', se usara 'false' como valor por defecto: " + e //$NON-NLS-1$ //$NON-NLS-2$
 			);
     	}
     	if (forceReset) {
-    		Logger.getLogger("es.gob.afirma").info( //$NON-NLS-1$
+    		LOGGER.info(
 				"No se mantendran los almacenes de claves precargados (es.gob.afirma.keystores.ForceReset=true)" //$NON-NLS-1$
 			);
     	}
@@ -117,6 +119,12 @@ public final class AOKeyStoreManagerFactory {
         	return getMozillaUnifiedKeyStoreManager(pssCallback, forceReset, parentComponent);
         }
 
+        // Almacen NSS compartido (de sistema) que muestra tanto los certificados del almacemo los de
+        // los dispositivos externos configuramos.
+        if (AOKeyStore.SHARED_NSS.equals(store)) {
+        	return getSharedNssKeyStoreManager(pssCallback, forceReset, parentComponent);
+        }
+
         // Apple Safari sobre Mac OS X.
         if (Platform.getOS().equals(Platform.OS.MACOSX) && AOKeyStore.APPLE.equals(store)) {
         	return getMacOSXKeyStoreManager(store, lib, forceReset, parentComponent);
@@ -150,7 +158,7 @@ public final class AOKeyStoreManagerFactory {
   		                                                    final boolean forceReset,
   		                                                    final Object parentComponent) throws AOKeystoreAlternativeException, IOException {
         String storeFilename = null;
-        if (lib != null && !"".equals(lib) && new File(lib).exists()) { //$NON-NLS-1$
+        if (lib != null && !lib.isEmpty() && new File(lib).exists()) {
             storeFilename = lib;
         }
         if (storeFilename == null) {
@@ -268,7 +276,7 @@ public final class AOKeyStoreManagerFactory {
                                                                                                  AOKeystoreAlternativeException {
     	final AOKeyStoreManager ksm = new AOKeyStoreManager();
         String storeFilename = null;
-        if (lib != null && !"".equals(lib) && new File(lib).exists()) { //$NON-NLS-1$
+        if (lib != null && !lib.isEmpty() && new File(lib).exists()) {
             storeFilename = lib;
         }
         else {
@@ -325,7 +333,7 @@ public final class AOKeyStoreManagerFactory {
                                                                                                    AOKeystoreAlternativeException {
     	final AOKeyStoreManager ksm = new AOKeyStoreManager();
         String p11Lib = null;
-        if (lib != null && !"".equals(lib)) { //$NON-NLS-1$
+        if (lib != null && !lib.isEmpty()) {
             p11Lib = lib;
         }
         if (p11Lib != null && !new File(p11Lib).exists()) {
@@ -417,33 +425,64 @@ public final class AOKeyStoreManagerFactory {
 		return ksmCapi;
     }
 
+    private static AggregatedKeyStoreManager getNssKeyStoreManager(final String KsmClassName,
+    		                                                       final PasswordCallback pssCallback,
+    		                                                       final boolean forceReset,
+    		                                                       final Object parentComponent) throws AOKeystoreAlternativeException,
+                                                                                                        IOException {
+    	final AggregatedKeyStoreManager ksmUni;
+    	try {
+    		ksmUni = (AggregatedKeyStoreManager) Class.forName(KsmClassName).newInstance();
+    	}
+    	catch(final Exception e) {
+    		throw new AOKeystoreAlternativeException(
+				getAlternateKeyStoreType(AOKeyStore.MOZ_UNI),
+				"Error al obtener dinamicamente el almacen NSS: " + e, //$NON-NLS-1$
+				e
+			);
+    	}
+    	try {
+    		// Proporcionamos el componente padre como parametro
+    		ksmUni.init(AOKeyStore.SHARED_NSS, null, pssCallback, new Object[] { parentComponent }, forceReset);
+    	}
+    	catch (final AOException e) {
+    		throw new AOKeystoreAlternativeException(
+				getAlternateKeyStoreType(AOKeyStore.MOZ_UNI),
+				"Error al inicializar el almacen NSS: " + e, //$NON-NLS-1$
+				e
+			);
+    	}
+    	return ksmUni;
+    }
+
+    private static AggregatedKeyStoreManager getSharedNssKeyStoreManager(final PasswordCallback pssCallback,
+                                                                         final boolean forceReset,
+                                                                         final Object parentComponent) throws AOKeystoreAlternativeException,
+                                                                                                              IOException {
+    	return getNssKeyStoreManager(
+			"es.gob.afirma.keystores.mozilla.shared.SharedNssKeyStoreManager",  //$NON-NLS-1$
+			pssCallback,
+			forceReset,
+			parentComponent
+		);
+    }
+
     private static AggregatedKeyStoreManager getMozillaUnifiedKeyStoreManager(final PasswordCallback pssCallback,
     		                                                                  final boolean forceReset,
                                                                               final Object parentComponent) throws AOKeystoreAlternativeException,
     		                                                                                                       IOException {
-        final AggregatedKeyStoreManager ksmUni;
-        try {
-            ksmUni = (AggregatedKeyStoreManager) Class.forName("es.gob.afirma.keystores.mozilla.MozillaUnifiedKeyStoreManager").newInstance(); //$NON-NLS-1$
-        }
-        catch(final Exception e) {
-            throw new AOKeystoreAlternativeException(
-                 getAlternateKeyStoreType(AOKeyStore.MOZ_UNI),
-                 "Error al obtener dinamicamente el almacen NSS unificado de Mozilla Firefox: " + e, //$NON-NLS-1$
-                 e
-             );
-        }
-        try {
-        	// Proporcionamos el componente padre como parametro
-            ksmUni.init(AOKeyStore.MOZ_UNI, null, pssCallback, new Object[] { parentComponent }, forceReset);
-        }
-        catch (final AOException e) {
-            throw new AOKeystoreAlternativeException(
-                getAlternateKeyStoreType(AOKeyStore.MOZ_UNI),
-                "Error al inicializar el almacen NSS unificado de Mozilla Firefox: " + e, //$NON-NLS-1$
-                e
-            );
-        }
-        return ksmUni;
+    	if (Platform.OS.LINUX.equals(Platform.getOS()) && "sql".equals(System.getenv("NSS_DEFAULT_DB_TYPE"))) {  //$NON-NLS-1$//$NON-NLS-2$
+    		LOGGER.info(
+				"Se usara NSS compartido al haberse encontrado la variable de entorno 'NSS_DEFAULT_DB_TYPE' establecida a 'sql'" //$NON-NLS-1$
+			);
+    		return getSharedNssKeyStoreManager(pssCallback, forceReset, parentComponent);
+    	}
+        return getNssKeyStoreManager(
+    		"es.gob.afirma.keystores.mozilla.MozillaUnifiedKeyStoreManager",  //$NON-NLS-1$
+    		pssCallback,
+    		forceReset,
+    		parentComponent
+		);
     }
 
     private static AggregatedKeyStoreManager getMacOSXKeyStoreManager(final AOKeyStore store,
@@ -456,7 +495,7 @@ public final class AOKeyStoreManagerFactory {
         try {
             ksm.init(
                  store,
-                 lib == null || "".equals(lib) ? null : new FileInputStream(lib),  //$NON-NLS-1$
+                 lib == null || lib.isEmpty() ? null : new FileInputStream(lib),
         		 NullPasswordCallback.getInstance(),
                  null,
                  forceReset

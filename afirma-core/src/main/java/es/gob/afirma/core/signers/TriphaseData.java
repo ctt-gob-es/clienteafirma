@@ -1,3 +1,13 @@
+/* Copyright (C) 2011 [Gobierno de Espana]
+ * This file is part of "Cliente @Firma".
+ * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
+ *   - the GNU General Public License as published by the Free Software Foundation;
+ *     either version 2 of the License, or (at your option) any later version.
+ *   - or The European Software License; either version 1.1 or (at your option) any later version.
+ * Date: 11/01/11
+ * You may contact the copyright holder at: soporte.afirma5@mpt.es
+ */
+
 package es.gob.afirma.core.signers;
 
 import java.io.ByteArrayInputStream;
@@ -5,7 +15,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -100,6 +109,19 @@ public final class TriphaseData {
 	}
 
 	private final List<TriSign> signs;
+	private String format;
+
+	/** Obtiene el formato de las firmas.
+	 * @return Formato de la firma. */
+	public String getFormat() {
+		return this.format;
+	}
+
+	/** Establece el formato de las firmas.
+	 * @param fmt Formato de las firmas. */
+	public void setFormat(final String fmt) {
+		this.format = fmt;
+	}
 
 	/** Devuelve una firma individual con el identificador dado o <code>null</code> si no hay ninguna
 	 * firma con ese identificador.
@@ -120,6 +142,30 @@ public final class TriphaseData {
 		return null;
 	}
 
+	/** Devuelve un listado de firmas con el identificador dado o <code>null</code> si no hay ninguna
+	 * firma con ese identificador.
+	 * @param signId Identificador de la firma.
+	 * @return Listado de firmas con el identificador dado. */
+	public List<TriSign> getTriSigns(final String signId) {
+		if (signId == null) {
+			throw new IllegalArgumentException(
+				"El ID de la firma no puede ser nulo" //$NON-NLS-1$
+			);
+		}
+		final List<TriSign> tsl = new ArrayList<TriphaseData.TriSign>();
+		for (final TriSign ts : this.signs) {
+			if (signId.equals(ts.getId())) {
+				tsl.add(new TriSign(ts));
+			}
+		}
+
+		if (tsl.size() == 0) {
+			return null;
+		}
+
+		return tsl;
+	}
+
 	/** Obtiene todas las firmas de la sesi&oacute;n.
 	 * @return Lista con todas las firmas de la sesi&oacute;n. */
 	public List<TriSign> getTriSigns() {
@@ -129,13 +175,23 @@ public final class TriphaseData {
 	/** Construye unos datos de sesi&oacute;n trif&aacute;sica vac&iacute;os. */
 	public TriphaseData() {
 		this.signs = new ArrayList<TriSign>();
+		this.format = null;
 	}
 
 	/** Construye unos datos de sesi&oacute;n trif&aacute;sica indicando una lista de
 	 * configuraci&oacute;n de firmas individuales.
 	 * @param signs Lista de firmas individuales.. */
 	public TriphaseData(final List<TriSign> signs) {
+		this(signs, null);
+	}
+
+	/** Construye unos datos de sesi&oacute;n trif&aacute;sica indicando una lista de
+	 * configuraci&oacute;n de firmas individuales.
+	 * @param signs Lista de firmas individuales..
+	 * @param fmt Formato de las firmas. */
+	public TriphaseData(final List<TriSign> signs, final String fmt) {
 		this.signs = signs;
+		this.format = fmt;
 	}
 
 	/** Agrega la configuraci&oacute;n para una nueva operaci&oacute;n trif&aacute;sica.
@@ -162,8 +218,8 @@ public final class TriphaseData {
 	 * Un ejemplo de XML podr&iacute;a ser el siguiente:
 	 * <pre>
 	 * &lt;xml&gt;
-	 *  &lt;firmas&gt;
-	 *   &lt;firma Id=\"001\"&gt;
+	 *  &lt;firmas format="XAdES"&gt;
+	 *   &lt;firma Id="001"&gt;
 	 *    &lt;param n="NEED_PRE"&gt;true&lt;/param&gt;
 	 *    &lt;param n="PRE"&gt;MYICXDAYBgkqhkiG9[...]w0BA=&lt;/param&gt;
 	 *    &lt;param n="NEED_DATA"&gt;true&lt;/param&gt;
@@ -195,14 +251,26 @@ public final class TriphaseData {
 		final Element rootElement = doc.getDocumentElement();
 		final NodeList childNodes = rootElement.getChildNodes();
 
+
 		final int idx = nextNodeElementIndex(childNodes, 0);
-		if (idx == -1 || !"firmas".equalsIgnoreCase(childNodes.item(idx).getNodeName())) { //$NON-NLS-1$
+		final Node rootSignsNode = childNodes.item(idx);
+
+		if (idx == -1 || !"firmas".equalsIgnoreCase(rootSignsNode.getNodeName())) { //$NON-NLS-1$
 			throw new IllegalArgumentException("No se encontro el nodo 'firmas' en el XML proporcionado"); //$NON-NLS-1$
 		}
 
-		final List<TriSign> signsNodes = parseSignsNode(childNodes.item(idx));
+		String format = null;
+		final NamedNodeMap nnm = rootSignsNode.getAttributes();
+		if (nnm != null) {
+			final Node tmpNode = nnm.getNamedItem("format"); //$NON-NLS-1$
+			if (tmpNode != null) {
+				format = tmpNode.getNodeValue();
+			}
+		}
 
-		return new TriphaseData(signsNodes);
+		final List<TriSign> signsNodes = parseSignsNode(rootSignsNode);
+
+		return new TriphaseData(signsNodes, format);
 	}
 
 	/** Analiza el nodo con el listado de firmas.
@@ -245,7 +313,7 @@ public final class TriphaseData {
 
 		final NodeList childNodes = paramsNode.getChildNodes();
 
-		final Map<String, String> params = new HashMap<String, String>();
+		final Map<String, String> params = new ConcurrentHashMap<String, String>();
 		int idx = nextNodeElementIndex(childNodes, 0);
 		while (idx != -1) {
 			final Node paramNode = childNodes.item(idx);
@@ -285,7 +353,13 @@ public final class TriphaseData {
 
 		final StringBuilder builder = new StringBuilder();
 		builder.append("<xml>\n"); //$NON-NLS-1$
-		builder.append(" <firmas>\n"); //$NON-NLS-1$
+		builder.append(" <firmas"); //$NON-NLS-1$
+		if (this.format != null) {
+			builder.append(" format=\""); //$NON-NLS-1$
+			builder.append(this.format);
+			builder.append("\""); //$NON-NLS-1$
+		}
+		builder.append(">\n"); //$NON-NLS-1$
 		final Iterator<TriSign> firmasIt = this.signs.iterator();
 		while (firmasIt.hasNext()) {
 			final TriSign signConfig = firmasIt.next();

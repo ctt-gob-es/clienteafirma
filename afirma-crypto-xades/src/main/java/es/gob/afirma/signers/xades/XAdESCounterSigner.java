@@ -17,7 +17,6 @@ import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -32,7 +31,6 @@ import javax.xml.crypto.dsig.Transform;
 import javax.xml.crypto.dsig.XMLSignatureFactory;
 import javax.xml.crypto.dsig.spec.TransformParameterSpec;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.OutputKeys;
 
 import net.java.xades.security.xml.XAdES.DataObjectFormat;
 import net.java.xades.security.xml.XAdES.DataObjectFormatImpl;
@@ -42,7 +40,6 @@ import net.java.xades.security.xml.XAdES.XAdES;
 import net.java.xades.security.xml.XAdES.XAdES_EPES;
 
 import org.w3c.dom.Document;
-import org.w3c.dom.DocumentType;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -62,11 +59,10 @@ public final class XAdESCounterSigner {
 
 	/** Contrafirma firmas en formato XAdES.
 	 * <p>
-	 * Este m&eacute;todo contrafirma los nodos de firma indicados de un
+	 * Contrafirma los nodos de firma indicados de un
 	 * documento de firma.
 	 * </p>
-	 * @param sign
-	 *            Documento con las firmas iniciales.
+	 * @param sign Documento con las firmas iniciales.
 	 * @param algorithm
 	 *            Algoritmo a usar para la firma.
 	 *            <p>
@@ -74,10 +70,10 @@ public final class XAdESCounterSigner {
 	 *            <code>algorithm</code>:
 	 *            </p>
 	 *            <ul>
-	 *            <li>&nbsp;&nbsp;&nbsp;<i>SHA1withRSA</i></li>
-	 *            <li>&nbsp;&nbsp;&nbsp;<i>SHA256withRSA</i></li>
-	 *            <li>&nbsp;&nbsp;&nbsp;<i>SHA384withRSA</i></li>
-	 *            <li>&nbsp;&nbsp;&nbsp;<i>SHA512withRSA</i></li>
+	 *             <li>&nbsp;&nbsp;&nbsp;<i>SHA1withRSA</i></li>
+	 *             <li>&nbsp;&nbsp;&nbsp;<i>SHA256withRSA</i></li>
+	 *             <li>&nbsp;&nbsp;&nbsp;<i>SHA384withRSA</i></li>
+	 *             <li>&nbsp;&nbsp;&nbsp;<i>SHA512withRSA</i></li>
 	 *            </ul>
 	 * @param targetType
 	 *            Mecanismo de selecci&oacute;n de los nodos de firma que se
@@ -86,12 +82,12 @@ public final class XAdESCounterSigner {
 	 *            Las distintas opciones son:
 	 *            </p>
 	 *            <ul>
-	 *            <li>Todos los nodos del &aacute;rbol de firma</li>
-	 *            <li>Los nodos hoja del &aacute;rbol de firma</li>
-	 *            <li>Los nodos de firma cuyas posiciones se especifican en
-	 *            <code>target</code></li>
-	 *            <li>Los nodos de firma realizados por los firmantes cuyo
-	 *            <i>Common Name</i> se indica en <code>target</code></li>
+	 *             <li>Todos los nodos del &aacute;rbol de firma</li>
+	 *             <li>Los nodos hoja del &aacute;rbol de firma</li>
+	 *             <li>Los nodos de firma cuyas posiciones se especifican en
+	 *              <code>target</code></li>
+	 *             <li>Los nodos de firma realizados por los firmantes cuyo
+	 *              <i>Common Name</i> se indica en <code>target</code></li>
 	 *            </ul>
 	 *            <p>
 	 *            Cada uno de estos tipos se define en
@@ -99,12 +95,10 @@ public final class XAdESCounterSigner {
 	 * @param targets Listado de nodos o firmantes que se deben contrafirmar
 	 *                seg&uacute;n el {@code targetType} seleccionado.
 	 * @param key Clave privada a usar para firmar.
-	 * @param certChain Cadena de certificados del firmante
+	 * @param certChain Cadena de certificados del firmante.
 	 * @param xParams Par&aacute;metros adicionales para la firma (<a href="doc-files/extraparams.html">detalle</a>)
 	 * @return Contrafirma en formato XAdES.
-	 * @throws AOException
-	 *             Cuando ocurre cualquier problema durante el proceso
-	 */
+	 * @throws AOException Cuando ocurre cualquier problema durante el proceso. */
 	public static byte[] countersign(final byte[] sign,
 			                  final String algorithm,
 			                  final CounterSignTarget targetType,
@@ -113,13 +107,11 @@ public final class XAdESCounterSigner {
 			                  final Certificate[] certChain,
 			                  final Properties xParams) throws AOException {
 
-		final Properties extraParams = xParams != null ? xParams
-				: new Properties();
+		final Properties extraParams = xParams != null ?
+			xParams :
+				new Properties();
 
-		String encoding = extraParams.getProperty(XAdESExtraParams.ENCODING);
-		if ("base64".equalsIgnoreCase(encoding)) { //$NON-NLS-1$
-			encoding = XMLConstants.BASE64_ENCODING;
-		}
+		final String outputXmlEncoding = extraParams.getProperty(XAdESExtraParams.OUTPUT_XML_ENCODING);
 
 		if (sign == null) {
 			throw new IllegalArgumentException(
@@ -129,63 +121,40 @@ public final class XAdESCounterSigner {
 		final String algoUri = XMLConstants.SIGN_ALGOS_URI.get(algorithm);
 		if (algoUri == null) {
 			throw new UnsupportedOperationException(
-					"Los formatos de firma XML no soportan el algoritmo de firma '" + algorithm + "'"); //$NON-NLS-1$ //$NON-NLS-2$
+				"Los formatos de firma XML no soportan el algoritmo de firma '" + algorithm + "'" //$NON-NLS-1$ //$NON-NLS-2$
+			);
 		}
 
-		// nueva instancia de DocumentBuilderFactory que permita espacio de
+		// Nueva instancia de DocumentBuilderFactory que permita espacio de
 		// nombres (necesario para XML)
 		final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 		dbf.setNamespaceAware(true);
 
-		// flag que indica si el documento tiene una firma simple o esta
-		// cofirmado
+		// Flag que indica si el documento tiene una firma simple o esta cofirmado
 		// por defecto se considera que es un documento cofirmado
 		boolean esFirmaSimple = false;
 
-		// se carga el documento XML y su raiz
-		final Map<String, String> originalXMLProperties = new Hashtable<String, String>();
+		final Map<String, String> originalXMLProperties;
+
+		// Se carga el documento XML y su raiz
 		Element root;
 		Document doc;
 		try {
-			doc = dbf.newDocumentBuilder()
-					.parse(new ByteArrayInputStream(sign));
 
-			if (encoding == null) {
-				encoding = doc.getXmlEncoding();
-			}
-
-			// Ademas del encoding, sacamos otros datos del doc XML original.
-			// Hacemos la comprobacion del base64 por si se establecido desde
-			// fuera
-			if (encoding != null
-					&& !XMLConstants.BASE64_ENCODING.equals(encoding)) {
-				originalXMLProperties.put(OutputKeys.ENCODING, encoding);
-			}
-			String tmpXmlProp = doc.getXmlVersion();
-			if (tmpXmlProp != null) {
-				originalXMLProperties.put(OutputKeys.VERSION, tmpXmlProp);
-			}
-			final DocumentType dt = doc.getDoctype();
-			if (dt != null) {
-				tmpXmlProp = dt.getSystemId();
-				if (tmpXmlProp != null) {
-					originalXMLProperties.put(OutputKeys.DOCTYPE_SYSTEM,
-							tmpXmlProp);
-				}
-			}
-
+			doc = dbf.newDocumentBuilder().parse(new ByteArrayInputStream(sign));
+			originalXMLProperties = XAdESUtil.getOriginalXMLProperties(doc, outputXmlEncoding);
 			root = doc.getDocumentElement();
 
-			// si no es un documento cofirma se anade temporalmente el nodo raiz
-			// AFIRMA
-			// para que las operaciones de contrafirma funcionen correctamente
+			// Si no es un documento cofirma se anade temporalmente el nodo raiz
+			// AFIRMA para que las operaciones de contrafirma funcionen correctamente
 			if (root.getNodeName().equals(AOXAdESSigner.SIGNATURE_NODE_NAME)) {
 				esFirmaSimple = true;
 				doc = AOXAdESSigner.insertarNodoAfirma(doc);
 				root = doc.getDocumentElement();
 			}
-		} catch (final Exception e) {
-			throw new AOException("No se ha podido realizar la contrafirma", e); //$NON-NLS-1$
+		}
+		catch (final Exception e) {
+			throw new AOException("No se ha podido realizar la contrafirma: " + e, e); //$NON-NLS-1$
 		}
 
 		try {
@@ -253,13 +222,18 @@ public final class XAdESCounterSigner {
 				doc = newdoc;
 			}
 			catch (final Exception e) {
-				XAdESCounterSigner.LOGGER
-						.info("No se ha eliminado el nodo padre '<AFIRMA>': " + e); //$NON-NLS-1$
+				XAdESCounterSigner.LOGGER.info(
+					"No se ha eliminado el nodo padre '<AFIRMA>': " + e //$NON-NLS-1$
+				);
 			}
 		}
 
-		return Utils.writeXML(doc.getDocumentElement(), originalXMLProperties,
-				null, null);
+		return Utils.writeXML(
+			doc.getDocumentElement(),
+			originalXMLProperties,
+			null,
+			null
+		);
 	}
 
 	/** Realiza la contrafirma de todos los nodos hoja del &aacute;rbol.
@@ -647,7 +621,8 @@ public final class XAdESCounterSigner {
 					referenceList,
 					"Signature-" + UUID.randomUUID().toString(), //$NON-NLS-1$
 					Boolean.parseBoolean(extraParams.getProperty(XAdESExtraParams.ADD_KEY_INFO_KEY_VALUE, Boolean.TRUE.toString())),
-					Boolean.parseBoolean(extraParams.getProperty(XAdESExtraParams.ADD_KEY_INFO_KEY_NAME, Boolean.FALSE.toString()))
+					Boolean.parseBoolean(extraParams.getProperty(XAdESExtraParams.ADD_KEY_INFO_KEY_NAME, Boolean.FALSE.toString())),
+					Boolean.parseBoolean(extraParams.getProperty(XAdESExtraParams.KEEP_KEYINFO_UNSIGNED, Boolean.FALSE.toString()))
 				);
 			}
 		}

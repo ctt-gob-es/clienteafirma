@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -14,8 +13,8 @@ import java.nio.file.Paths;
 import java.nio.file.attribute.PosixFilePermission;
 import java.security.GeneralSecurityException;
 import java.security.KeyStoreException;
+import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
-import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -29,6 +28,7 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptException;
 import javax.swing.JOptionPane;
 
+import es.gob.afirma.core.misc.BoundedBufferedReader;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.keystores.mozilla.MozillaKeyStoreUtilities;
 import es.gob.afirma.keystores.mozilla.MozillaKeyStoreUtilitiesOsX;
@@ -48,6 +48,7 @@ final class ConfiguratorFirefox {
     private static final String LINUX_UNINSTALLSCRIPT_NAME = "uninstall.sh"; //$NON-NLS-1$
     private static final String LINUX_SCRIPT_NAME = "script.sh"; //$NON-NLS-1$
     private static final String LINUX_MOZILLA_PATH = "/.mozilla/firefox/profiles.ini";//$NON-NLS-1$
+    private static final String LINUX_CHROME_PATH = "/.pki/nssdb";//$NON-NLS-1$
     private static final String MACOSX_MOZILLA_PATH = "/Library/Application Support/firefox/profiles.ini";//$NON-NLS-1$
 
     static final String CERTUTIL_EXE;
@@ -83,13 +84,15 @@ final class ConfiguratorFirefox {
     }
 
     static void installRootCAMozillaKeyStore(final File targetDir,
-                                             final X509Certificate cert) throws MozillaProfileNotFoundException,
-                                                                                IOException {
+                                             final Certificate cert) throws MozillaProfileNotFoundException,
+                                                                            IOException {
         final File firefoxProfilesDir = getFirefoxProfilesDir();
         if (firefoxProfilesDir == null) {
             throw new MozillaProfileNotFoundException();
         }
-        copyConfigurationFiles(targetDir);
+        if(!Platform.getOS().equals(Platform.OS.LINUX)) {
+        	copyConfigurationFiles(targetDir);
+        }
         ConfiguratorFirefox.importCARootOnFirefoxKeyStore(
             cert,
             targetDir,
@@ -97,7 +100,45 @@ final class ConfiguratorFirefox {
         );
 
     }
+    /**
+     * Genera el script de instalaci&oacute; del certificado en Chrome para LINUX.
+     * En linux genera el script que hay que ejecutar para realizar la instalaci&oacute;n pero no lo ejecuta, de eso se encarga el instalador Debian.
+     * @param targetDir Directorio de instalaci&oacute;n del sistema
+     * @param command Usado para sacar los directorios de usuario dentro del sistema operativo.
+     *  <ul>
+     * <li>En LINUX contiene el contenido del script a ejecutar.</li>
+     * </ul>
+     * @throws IOException Cuando ocurre un error en el tratamiento de datos.
+     */
+	static void installRootCAChromeKeyStore(final File targetDir, final String[] command )
+			throws IOException {
 
+		// sacamos el listado de usuarios de la aplicacion
+		final List<String> usersDirs = getSystemUsersHomes(command);
+		
+		for ( final String userDir : usersDirs) {
+			final File file = new File((escapePath(userDir) + LINUX_CHROME_PATH));
+			if( file.isDirectory()) {
+				//Usamos el comando para importar en Chrome en Linux
+				if ( Platform.OS.LINUX.equals(Platform.getOS()) ) {
+					final String[] certutilCommands = new String[] {
+							CERTUTIL_EXE,
+					        "-d", //$NON-NLS-1$
+							"sql:" + escapePath(userDir) + LINUX_CHROME_PATH, //$NON-NLS-1$ //$NON-NLS-2$
+							"-A", //$NON-NLS-1$
+							"-n", //$NON-NLS-1$
+							"\"" + ConfiguratorUtil.CERT_ALIAS + "\"", //$NON-NLS-1$ //$NON-NLS-2$
+							"-i", //$NON-NLS-1$
+							escapePath(new File(targetDir, FILE_AUTOFIRMA_CERTIFICATE).getAbsolutePath()), 
+							"-t", //$NON-NLS-1$
+							"\"TCP,TCP,TCP\"" //$NON-NLS-1$
+					};
+					execCommandLineCertUtil(certutilCommands, true);
+				}
+			}
+		 }
+	}
+	
     /**
      * Genera el script de instalaci&oacute; del certificado en firefox para MacOSX y LINUX.
      * En linux genera el script que hay que ejecutar para realizar la instalaci&oacute;n pero no lo ejecuta, de eso se encarga el instalador Debian.
@@ -112,11 +153,12 @@ final class ConfiguratorFirefox {
      * @throws MozillaProfileNotFoundException No se ha encontrado el directorio de perfiles de Mozilla.
      * @throws IOException Cuando ocurre un error en el tratamiento de datos.
      */
-	static void installRootCAMozillaKeyStore(final File targetDir, final X509Certificate cert, final String []command )
+	static void installRootCAMozillaKeyStore(final File targetDir, final Certificate cert, final String[] command )
 			throws MozillaProfileNotFoundException, IOException {
 
 		// sacamos el listado de usuarios de la aplicacion
-		final List<String> usersDirs = getFirefoxProfilesUsersDir(command);
+		final List<String> usersDirs = getSystemUsersHomes(command);
+
 		// dados los usuarios sacamos el directorio de perfiles de mozilla en caso de que lo tengan
 		final List <File> mozillaUsersProfilesPath = getMozillaUsersProfilesPath(usersDirs);
 		// para cada usuario tenemos sus distintos directorios de perfiles
@@ -124,7 +166,9 @@ final class ConfiguratorFirefox {
 		if (profiles.isEmpty()){
 			throw new MozillaProfileNotFoundException();
 		}
-		copyConfigurationFiles(targetDir);
+        if(!Platform.getOS().equals(Platform.OS.LINUX)) {
+        	copyConfigurationFiles(targetDir);
+        }
 
 		ConfiguratorFirefox.importCARootOnFirefoxKeyStore(cert, targetDir, profiles);
 
@@ -134,7 +178,9 @@ final class ConfiguratorFirefox {
     static void uninstallRootCAMozillaKeyStore(final File targetDir) {
 
         try {
-            copyConfigurationFiles(targetDir);
+            if(!Platform.getOS().equals(Platform.OS.LINUX)) {
+            	copyConfigurationFiles(targetDir);
+            }
         }
         catch (final Exception e) {
             LOGGER.warning(
@@ -164,7 +210,7 @@ final class ConfiguratorFirefox {
 		}
 		addExexPermissionsToAllFilesOnDirectory(ConfiguratorUtil.getApplicationDirectory());
 		// sacamos el listado de usuarios de la aplicacion
-		final List<String> usersDirs = getFirefoxProfilesUsersDir(new String[]{path});
+		final List<String> usersDirs = getSystemUsersHomes(new String[]{path});
 		// dados los usuarios sacamos el directorio de perfiles de mozilla en caso de que lo tengan
 		final List <File> mozillaUsersProfilesPath = getMozillaUsersProfilesPath(usersDirs);
 		// para cada usuario tenemos sus distintos directorios de perfiles
@@ -172,8 +218,6 @@ final class ConfiguratorFirefox {
 		if (profiles.isEmpty()){
 			throw new MozillaProfileNotFoundException();
 		}
-
-
 
 		final File certutilFile = new File(targetDir, DIR_CERTUTIL + File.separator + CERTUTIL_EXE);
 
@@ -195,7 +239,7 @@ final class ConfiguratorFirefox {
                 "\"" + ConfiguratorUtil.CERT_ALIAS + "\"", //$NON-NLS-1$ //$NON-NLS-2$
         };
 
-		execCommandLineCertUtil(certutilCommands);
+		execCommandLineCertUtil(certutilCommands, false);
 
 		}
 
@@ -261,37 +305,40 @@ final class ConfiguratorFirefox {
         return path.replace(" ", "\\ "); //$NON-NLS-1$ //$NON-NLS-2$
     }
 
-    /**
-     * Copiamos el certificado en un directorio para que certutil pueda usarlo
-     * @param certUtilAbsolutePath Ruta del fichero certUtil.
+    /** Copiamos el certificado en un directorio para que Mozilla CertUtil pueda usarlo.
+     * @param certUtilAbsolutePath Ruta del ejecutable CertUtil.
      * @param cert Certificado que hay que instalar.
      * @param targetDir Directorio donde se copiar&aacute; el certificado.
-     * @return certutilFile Fichero certutil.
-     * @throws CertificateEncodingException Se lanza cuando hay un problema en la codificaci&oacute;n del certificado.
-     * @throws IOException Se lanza cuando hay un problema con el fichero certuti.
-     */
-    public static File InstallCerFile(final String certUtilAbsolutePath, final X509Certificate cert,
-			final File targetDir) throws CertificateEncodingException, IOException{
+     * @return certutilFile Fichero ejecutable CertUtil.
+     * @throws CertificateEncodingException Cuando hay un problema en la codificaci&oacute;n del certificado.
+     * @throws IOException Se lanza cuando hay un problema con el fichero CertUtil. */
+    public static File InstallCerFile(final String certUtilAbsolutePath,
+    		                          final Certificate cert,
+    		                          final File targetDir) throws CertificateEncodingException, IOException {
 
 		ConfiguratorUtil.installFile(cert.getEncoded(), new File(targetDir, FILE_AUTOFIRMA_CERTIFICATE));
 
-		final File certutilFile = new File(certUtilAbsolutePath);
+		//En linux se trabaja con la dependencia del certutil
+		if (!Platform.OS.LINUX.equals(Platform.getOS()) ) {
+			final File certutilFile = new File(certUtilAbsolutePath);
 
-		if (!certutilFile.exists() || !certutilFile.isFile()) {
-			throw new IOException("No se encuentra el ejecutable CertUtil para la instalacion en Firefox" //$NON-NLS-1$
-			);
+			if (!certutilFile.exists() || !certutilFile.isFile()) {
+				throw new IOException("No se encuentra el ejecutable CertUtil para la instalacion en Firefox" //$NON-NLS-1$
+				);
+			}
+
+			if (!certutilFile.canExecute()) {
+				addExexPermissionsToAllFilesOnDirectory(certutilFile.getParentFile());
+			}
+
+			if (!certutilFile.canExecute()) {
+				throw new IOException("No hay permisos de ejecucion para Mozilla CertUtil" //$NON-NLS-1$
+				);
+			}
+
+			return certutilFile;
 		}
-
-		if (!certutilFile.canExecute()) {
-			addExexPermissionsToAllFilesOnDirectory(certutilFile.getParentFile());
-		}
-
-		if (!certutilFile.canExecute()) {
-			throw new IOException("No hay permisos de ejecucion para Mozilla CertUtil" //$NON-NLS-1$
-			);
-		}
-
-		return certutilFile;
+		return null;
     }
 
     /**
@@ -303,30 +350,34 @@ final class ConfiguratorFirefox {
      * @throws IOException Cuando ocurre un error en el tratamiento de datos.
      * @throws GeneralSecurityException Cuando ocurre un error en la inserci&oacute;n del certificado en el KeyStore.
      */
-	private static void executeCertUtilToImport(final String certUtilAbsolutePath, final X509Certificate cert,
-			final File targetDir, final Set<File> profilesDir) throws IOException, GeneralSecurityException {
-
+	private static void executeCertUtilToImport(final String certUtilAbsolutePath,
+			                                    final Certificate cert,
+			                                    final File targetDir,
+			                                    final Set<File> profilesDir) throws IOException, GeneralSecurityException {
 		final File certutilFile = InstallCerFile(certUtilAbsolutePath, cert, targetDir);
-
+		String certUtilExec = null;
 		// Obtenemos todos los directorios de perfil de Firefox del usuario
 		boolean error = false;
-
-		 // exportamos el PATH y LD_LIBRARY_PATH en LINUX Y MACOSX
+		
+		 // exportamos el PATH y LD_LIBRARY_PATH en MACOSX
 		 if ( Platform.OS.LINUX.equals(Platform.getOS()) ) {
-             writeScriptFile(targetDir + File.separator + LINUX_SCRIPT_NAME, new StringBuilder(ConfiguratorLinux.EXPORT_PATH + certutilFile.getAbsolutePath().substring(0,certutilFile.getAbsolutePath().lastIndexOf(File.separator) )), true);
-             writeScriptFile(targetDir + File.separator + LINUX_SCRIPT_NAME, new StringBuilder(ConfiguratorLinux.EXPORT_LD_LIBRARY + certutilFile.getAbsolutePath().substring(0,certutilFile.getAbsolutePath().lastIndexOf(File.separator) )), true);
+             certUtilExec = CERTUTIL_EXE;
 		 }
-		 else if ( Platform.OS.MACOSX.equals(Platform.getOS()) ){
-		     writeScriptFile(ConfiguratorMacOSX.MAC_PATH_SCRIPT, new StringBuilder(ConfiguratorMacOSX.EXPORT_PATH + certutilFile.getAbsolutePath().substring(0,certutilFile.getAbsolutePath().lastIndexOf(File.separator) )), true);
-             writeScriptFile(ConfiguratorMacOSX.MAC_PATH_SCRIPT, new StringBuilder(ConfiguratorMacOSX.EXPORT_LIBRARY_LD + certutilFile.getAbsolutePath().substring(0,certutilFile.getAbsolutePath().lastIndexOf(File.separator) )), true);
-        }
+		 else {
+			 certUtilExec = escapePath(certutilFile.getAbsolutePath());
+
+			 if ( Platform.OS.MACOSX.equals(Platform.getOS()) ) {
+				 writeScriptFile(ConfiguratorMacOSX.mac_script_path, new StringBuilder(ConfiguratorMacOSX.EXPORT_PATH + certutilFile.getAbsolutePath().substring(0,certutilFile.getAbsolutePath().lastIndexOf(File.separator) )), true);
+				 writeScriptFile(ConfiguratorMacOSX.mac_script_path, new StringBuilder(ConfiguratorMacOSX.EXPORT_LIBRARY_LD + certutilFile.getAbsolutePath().substring(0,certutilFile.getAbsolutePath().lastIndexOf(File.separator) )), true);
+			 }
+		 }
 		for (final File profileDir : profilesDir) {
 			if (!profileDir.isDirectory()) {
 				continue;
 			}
 
 			final String[] certutilCommands = new String[] {
-			        escapePath(certutilFile.getAbsolutePath()),
+					certUtilExec,
 			        "-A", //$NON-NLS-1$
 					"-d", //$NON-NLS-1$
 					escapePath(profileDir.getAbsolutePath()), "-i", //$NON-NLS-1$
@@ -336,9 +387,9 @@ final class ConfiguratorFirefox {
 					"\"C,,\"" //$NON-NLS-1$
 			};
 
-			error = execCommandLineCertUtil(certutilCommands);
+			error = execCommandLineCertUtil(certutilCommands, false);
+		
 		}
-
 
 		if (error) {
 			throw new KeyStoreException(
@@ -355,7 +406,7 @@ final class ConfiguratorFirefox {
      * @return <code>true</code> si la ejecuci&oacute;n de CertUtil termin&oacute; con error, <code>false</code> si se
      *         ejecut&oacute; correctamente.
      * @throws IOException Si no se pudo realizar la propia ejecuci&oacute;n. */
-    private static boolean execCommandLineCertUtil(final String[] command)
+    private static boolean execCommandLineCertUtil(final String[] command, final boolean chromeImport)
             throws IOException {
 
         final StringBuilder sb = new StringBuilder();
@@ -365,64 +416,100 @@ final class ConfiguratorFirefox {
         }
 
         if (Platform.OS.MACOSX.equals(Platform.getOS())) {
-            writeScriptFile(ConfiguratorMacOSX.MAC_PATH_SCRIPT, sb, true);
+            writeScriptFile(ConfiguratorMacOSX.mac_script_path, sb, true);
             return false;
 
-        } else if (Platform.OS.LINUX.equals(Platform.getOS())) {
+        }
+        else if (Platform.OS.LINUX.equals(Platform.getOS())) {
             // Generamos el script de instalacion y desistalacion
             try {
-                // montamos el script de desinstalacion, reutilizamos datos que
+                // Montamos el script de desinstalacion, reutilizamos datos que
                 // vienen en el script de instalacion
                 final StringBuilder uninstall = new StringBuilder();
-                uninstall.append(command[0] + ' ');
-                uninstall.append("-D" + ' '); //$NON-NLS-1$
-                uninstall.append("-d" + ' ');//$NON-NLS-1$
-                uninstall.append(command[3] + ' ');
-                uninstall.append("-n" + ' ');//$NON-NLS-1$
-                uninstall.append(command[7] + ' ');
+                String path = null;
+                String uninstallPath = null;
+                
+                if(chromeImport) {
+                	//En Linux tambien se instala para todos los perfiles de 
+                	// ususario del almacen de Chrome
+	                uninstall.append(command[0] + ' ');
+	                uninstall.append("-D" + ' '); //$NON-NLS-1$
+	                uninstall.append("-d" + ' ');//$NON-NLS-1$
+	                uninstall.append(command[2] + ' ');
+	                uninstall.append("-n" + ' ');//$NON-NLS-1$
+	                uninstall.append(command[5] + ' ');
+	
+	                // tenemos en command[7] la ruta del fichero .crt, sacamos de
+	                // ahi la ruta del directorio de instalacion
+	                path = command[7].substring(0, command[7].lastIndexOf("/") + 1) + LINUX_SCRIPT_NAME; //$NON-NLS-1$
+	                uninstallPath = command[7].substring(0, command[7].lastIndexOf("/") + 1) + LINUX_UNINSTALLSCRIPT_NAME; //$NON-NLS-1$
+            	}
+            	else {
+	                uninstall.append(command[0] + ' ');
+	                uninstall.append("-D" + ' '); //$NON-NLS-1$
+	                uninstall.append("-d" + ' ');//$NON-NLS-1$
+	                uninstall.append(command[3] + ' ');
+	                uninstall.append("-n" + ' ');//$NON-NLS-1$
+	                uninstall.append(command[7] + ' ');
+	
+	                // tenemos en command[5] la ruta del fichero .cer, sacamos de
+	                // ahi la ruta del directorio de instalacion
+	                path = command[5].substring(0, command[5].lastIndexOf("/") + 1) + LINUX_SCRIPT_NAME; //$NON-NLS-1$
+	                uninstallPath = command[5].substring(0, command[5].lastIndexOf("/") + 1) + LINUX_UNINSTALLSCRIPT_NAME; //$NON-NLS-1$
+            	}
+	            final File installScript = new File(path);
+	            final File uninstallScript = new File(uninstallPath);
+	            sb.append("\n"); //$NON-NLS-1$
+	            uninstall.append("\n"); //$NON-NLS-1$
 
-                // tenemos en command[5] la ruta del fichero .cer, sacamos de
-                // ahi la ruta del directorio de instalacion
-                final String path = command[5].substring(0,
-                        command[5].lastIndexOf("/") + 1) + LINUX_SCRIPT_NAME; //$NON-NLS-1$
-                final String uninstallPath = command[5].substring(0,
-                        command[5].lastIndexOf("/") + 1) + LINUX_UNINSTALLSCRIPT_NAME; //$NON-NLS-1$
-                final File installScript = new File(path);
-                final File uninstallScript = new File(uninstallPath);
-                sb.append("\n"); //$NON-NLS-1$
-                uninstall.append("\n"); //$NON-NLS-1$
 
-                try (final FileOutputStream fout = new FileOutputStream(installScript, true);
-                        final FileOutputStream foutUninstall = new FileOutputStream(
-                                uninstallScript, true);) {
+                try (
+            		final FileOutputStream fout = new FileOutputStream(installScript, true);
+                    final FileOutputStream foutUninstall = new FileOutputStream(
+                        uninstallScript, true
+            		);
+        		) {
                     fout.write(sb.toString().getBytes());
                     foutUninstall.write(uninstall.toString().getBytes());
                 }
                 return false;
-            } catch (final Exception e) {
-                LOGGER.severe("Excepcion en la creacion del script linux para la instalacion del certificado en el almacen de Firefox: " + e); //$NON-NLS-1$
+            }
+            catch (final Exception e) {
+                LOGGER.severe(
+            		"Excepcion en la creacion del script linux para la instalacion del certificado en el almacen de Firefox: " + e //$NON-NLS-1$
+        		);
                 return true;
             }
 
-        } else {
+        }
+        else {
             LOGGER.info("Se ejecutara el siguiente comando:\n" + sb.toString()); //$NON-NLS-1$
             final Process process = new ProcessBuilder(command).start();
-            // Cuando se instala correctamente no hay salida de ningun tipo, asi
-            // que se interpreta
+            // Cuando se instala correctamente no hay salida de ningun tipo, asi que se interpreta
             // cualquier salida como un error
             String line;
-            try (final InputStream resIs = process.getInputStream();
-                    final BufferedReader resReader = new BufferedReader(
-                            new InputStreamReader(resIs));) {
+            try (
+        		final InputStream resIs = process.getInputStream();
+                final BufferedReader resReader = new BoundedBufferedReader(
+                    new InputStreamReader(resIs),
+                    256, // Maximo 256 lineas de salida
+                    1024 // Maximo 1024 caracteres por linea
+                );
+    		) {
                 while ((line = resReader.readLine()) != null) {
                     LOGGER.severe(line);
                     return true;
                 }
             }
 
-            try (final InputStream errIs = process.getErrorStream();
-                    final BufferedReader errReader = new BufferedReader(
-                            new InputStreamReader(errIs));) {
+            try (
+        		final InputStream errIs = process.getErrorStream();
+                final BufferedReader errReader = new BoundedBufferedReader(
+                    new InputStreamReader(errIs),
+                    256, // Maximo 256 lineas de salida
+                    1024 // Maximo 1024 caracteres por linea
+                );
+    		) {
                 while ((line = errReader.readLine()) != null) {
                     LOGGER.severe(line);
                     return true;
@@ -433,15 +520,13 @@ final class ConfiguratorFirefox {
         return false;
     }
 
-    /**
-     * Ejecuta un script en MacOsx.
-     * @param path El path donde se encuentra el script.
-     * @param administratorMode <code>true</code> el script se ejecuta como permisos de adminsitrador, <code>false</code>  en caso contrario
+    /** Ejecuta un script en OS X.
+     * @param path Ruta donde se encuentra el <i>script</i>.
+     * @param administratorMode <code>true</code> el <i>script</i> se ejecuta como permisos de adminsitrador, <code>false</code> en caso contrario.
      * @param delete <code>true</code> se borra el fichero despu&eacute;s de haberse ejecutado.
-     * @return El objeto que da como resultado el script, o null en caso contrario
-     * @throws IOException Excepci&oacute;n lanzada en caso de ocurrir alg&uacute;n error en la ejecuci&oacute;n del script
-     */
-    public static Object executeScriptMacOsx(final String path, final boolean administratorMode, final boolean delete) throws IOException{
+     * @return El objeto que da como resultado el <i>script</i>, o <code>null</code> en caso contrario.
+     * @throws IOException Excepci&oacute;n lanzada en caso de ocurrir alg&uacute;n error en la ejecuci&oacute;n del <i>script</i>. */
+    public static Object executeScriptMacOsx(final String path, final boolean administratorMode, final boolean delete) throws IOException {
     	final ScriptEngine se = MozillaKeyStoreUtilitiesOsX.getAppleScriptEngine();
         if (se != null) {
             LOGGER.info("Path del script: " + path); //$NON-NLS-1$
@@ -453,35 +538,37 @@ final class ConfiguratorFirefox {
             	else {
             		o = se.eval("do shell script \"" + path + "\" "); //$NON-NLS-1$ //$NON-NLS-2$
             	}
-                System.out.println("Tipo: " + o.getClass().getName()); //$NON-NLS-1$
-                System.out.println("Contenido: " + o.toString()); //$NON-NLS-1$
                 if (delete){
     				final File scriptInstall = new File(path);
     				if (scriptInstall.exists()){
     				    scriptInstall.delete();
     				}
-
                 }
                 return o;
-            } catch (final ScriptException e) {
-                throw new IOException("Error en la ejecucion de CertUtil via AppleScript: " + e, e); //$NON-NLS-1$
+            }
+            catch (final ScriptException e) {
+                throw new IOException("Error en la ejecucion del script via AppleScript: " + e, e); //$NON-NLS-1$
             }
         }
-        LOGGER.severe("No se ha podido instanciar el motor AppleScript para instalar la raiz SSL en NSS" //$NON-NLS-1$
+        LOGGER.severe(
+    		"No se ha podido instanciar el motor AppleScript" //$NON-NLS-1$
         );
         return null;
     }
 
-    private static void importCARootOnFirefoxKeyStore (final X509Certificate cert,
-            final File appConfigDir,
-            final Set<File> profilesDir){
+    private static void importCARootOnFirefoxKeyStore (final Certificate cert,
+                                                       final File appConfigDir,
+                                                       final Set<File> profilesDir) {
     	boolean installed = false;
         boolean cancelled = false;
         do {
             try {
-                // Usamos CertUtil para instalar el certificado en Firefox
+                // Usamos CertUtil para instalar el certificado en Firefox.
+            	String certutilExe = null;
+            	certutilExe = appConfigDir.getAbsolutePath() + File.separator + DIR_CERTUTIL + File.separator + CERTUTIL_EXE;
+
                 executeCertUtilToImport(
-                    appConfigDir.getAbsolutePath() + File.separator + DIR_CERTUTIL + File.separator + CERTUTIL_EXE,
+                	certutilExe,
                     cert,
                     appConfigDir,
                     profilesDir
@@ -510,10 +597,11 @@ final class ConfiguratorFirefox {
 
     }
 
-	private static void importCARootOnFirefoxKeyStore(final X509Certificate cert,
+	private static void importCARootOnFirefoxKeyStore(final Certificate cert,
                                                       final File appConfigDir,
                                                       final File profilesDir) {
-    	// en windows recibimos un unico directorio de perfil, lo convertimos a una estructura Set<File>
+
+    	// En Windows recibimos un unico directorio de perfil, lo convertimos a una estructura Set<File>
     	final Set<File> profile = new HashSet<>(Arrays.asList(profilesDir.listFiles()));
     	importCARootOnFirefoxKeyStore(cert, appConfigDir, profile);
     }
@@ -525,11 +613,19 @@ final class ConfiguratorFirefox {
      * @throws GeneralSecurityException Cuando no se puede ejecutar. */
     private static void executeCertUtilToDelete(final File targetDir) throws IOException, GeneralSecurityException {
 
-        final File certutilFile = new File(targetDir, DIR_CERTUTIL + File.separator + CERTUTIL_EXE);
+    	String certutilExe;
+    	// En linux se tiene certutil como dependencia
+		if(!Platform.getOS().equals(Platform.OS.LINUX)) {
+	        final File certutilFile = new File(targetDir, DIR_CERTUTIL + File.separator + CERTUTIL_EXE);
 
-        if (!certutilFile.exists() || !certutilFile.isFile() || !certutilFile.canExecute()) {
-            throw new IOException("No se encuentra o no se puede leer el ejecutable para la instalacion en Firefox"); //$NON-NLS-1$
-        }
+	        if (!certutilFile.exists() || !certutilFile.isFile() || !certutilFile.canExecute()) {
+	            throw new IOException("No se encuentra o no se puede leer el ejecutable para la instalacion en Firefox"); //$NON-NLS-1$
+	        }
+	        certutilExe = certutilFile.getAbsolutePath();
+    	}
+    	else {
+    		certutilExe = CERTUTIL_EXE;
+    	}
 
         // Obtenemos todos los directorios de perfil de Firefox del usuario
         boolean error = false;
@@ -540,7 +636,7 @@ final class ConfiguratorFirefox {
             }
 
             final String[] certutilCommands = new String[] {
-                    certutilFile.getAbsolutePath(),
+            		certutilExe,
                     "-D", //$NON-NLS-1$
                     "-d", //$NON-NLS-1$
                     profileDir.getAbsolutePath(),
@@ -555,7 +651,11 @@ final class ConfiguratorFirefox {
             String line;
             try (
                 final InputStream resIs = process.getInputStream();
-                final BufferedReader resReader = new BufferedReader(new InputStreamReader(resIs));
+                final BufferedReader resReader = new BoundedBufferedReader(
+            		new InputStreamReader(resIs),
+                    256, // Maximo 256 lineas de salida
+                    1024 // Maximo 1024 caracteres por linea
+        		);
             ) {
                 while ((line = resReader.readLine()) != null) {
                     error = true;
@@ -563,8 +663,14 @@ final class ConfiguratorFirefox {
                 }
             }
 
-            try (final InputStream errIs = process.getErrorStream();
-                    final BufferedReader errReader = new BufferedReader(new InputStreamReader(errIs));) {
+            try (
+        		final InputStream errIs = process.getErrorStream();
+                final BufferedReader errReader = new BoundedBufferedReader(
+            		new InputStreamReader(errIs),
+                    256, // Maximo 256 lineas de salida
+                    1024 // Maximo 1024 caracteres por linea
+        		);
+    		) {
                 while ((line = errReader.readLine()) != null) {
                     error = true;
                     LOGGER.severe(line);
@@ -600,8 +706,14 @@ final class ConfiguratorFirefox {
             if (Platform.OS.LINUX == Platform.getOS()) {
                 while ((entry = zipIs.getNextEntry()) != null) {
                     new File(outDir, "certutil").mkdirs(); //$NON-NLS-1$
-                    try (final FileOutputStream outFis = new FileOutputStream(
-                            new File(outDir, entry.getName()));) {
+                    try (
+                		final FileOutputStream outFis = new FileOutputStream(
+                            new File(
+                        		outDir,
+                        		entry.getName()
+                    		)
+                        );
+            		) {
                         while ((n = zipIs.read(buffer)) > 0) {
                             outFis.write(buffer, 0, n);
                         }
@@ -610,13 +722,21 @@ final class ConfiguratorFirefox {
 
                     zipIs.closeEntry();
                 }
-            } else {
+            }
+            else {
                 while ((entry = zipIs.getNextEntry()) != null) {
                     if (entry.isDirectory()) {
                         new File(outDir, entry.getName()).mkdirs();
-                    } else {
-                        try (final FileOutputStream outFis = new FileOutputStream(
-                                new File(outDir, entry.getName()));) {
+                    }
+                    else {
+                        try (
+                    		final FileOutputStream outFis = new FileOutputStream(
+                                new File(
+                            		outDir,
+                            		entry.getName()
+                        		)
+                            );
+                		) {
                             while ((n = zipIs.read(buffer)) > 0) {
                                 outFis.write(buffer, 0, n);
                             }
@@ -630,30 +750,27 @@ final class ConfiguratorFirefox {
         }
     }
 
-
     private static File getFirefoxProfilesDir() {
-        File profilesDir;
         try {
-            profilesDir = new File(MozillaKeyStoreUtilities.getMozillaUserProfileDirectory()).getParentFile();
+            return new File(
+        		MozillaKeyStoreUtilities.getMozillaUserProfileDirectory()
+    		).getParentFile();
         }
         catch (final Exception e) {
             LOGGER.warning("No se encontro el directorio de perfiles de Mozilla Firefox: " + e); //$NON-NLS-1$
-            profilesDir = null;
         }
-        return profilesDir;
+        return null;
     }
 
-    /**
-     * Devuelve un listado con todos directorios personales de los usuarios del sistema ejecutando un script.
+    /** Devuelve un listado con todos directorios personales de los usuarios del sistema ejecutando un script.
      * Utilizado en Linux y MacOSX
      * @param command Script para sacar los directorios de usuario dentro del sistema operativo.
-     *  <ul>
-     * <li>En LINUX contiene el contenido del script a ejecutar.</li>
-     * <li>En MacOSX contiene la ruta del script a ejecutar.</li>
+     * <ul>
+     *  <li>En Linux contiene el contenido del script a ejecutar.</li>
+     *  <li>En OS X contiene la ruta del script a ejecutar.</li>
      * </ul>
-     * @return Listado con todos directorios personales de los usuarios del sistema.
-     */
-	private static List<String> getFirefoxProfilesUsersDir(final String[] command) {
+     * @return Listado con todos directorios personales de los usuarios del sistema. */
+	private static List<String> getSystemUsersHomes(final String[] command) {
 		if (Platform.OS.LINUX.equals(Platform.getOS())) {
 			try {
 				final Process process = new ProcessBuilder(command).start();
@@ -661,15 +778,22 @@ final class ConfiguratorFirefox {
 				String line;
 				// arraylist con todos los directorios de usuario
 				final List<String> usersDir = new ArrayList<>();
-				try (final InputStream resIs = process.getInputStream();
-						final BufferedReader resReader = new BufferedReader(new InputStreamReader(resIs));) {
+				try (
+					final InputStream resIs = process.getInputStream();
+					final BufferedReader resReader = new BoundedBufferedReader(
+						new InputStreamReader(resIs),
+						2048, // Maximo 256 lineas de salida (256 perfiles)
+	                    2048 // Maximo 2048 caracteres por linea
+					);
+				) {
 					while ((line = resReader.readLine()) != null) {
 						usersDir.add(line);
 					}
 				}
 
 				return usersDir;
-			} catch (final IOException e) {
+			}
+			catch (final Exception e) {
 				LOGGER.info("Error al generar el listado de directorios de usuarios del sistema." + e); //$NON-NLS-1$
 				return null;
 			}
@@ -681,35 +805,43 @@ final class ConfiguratorFirefox {
 				final List<String> usersDir = new ArrayList<>();
 				String line;
 				final String initLine = "dir: "; //$NON-NLS-1$
-				try (final InputStream resIs = new ByteArrayInputStream(o.toString().getBytes());
-						final BufferedReader resReader = new BufferedReader(new InputStreamReader(resIs));) {
+				try (
+					final InputStream resIs = new ByteArrayInputStream(o.toString().getBytes());
+					final BufferedReader resReader = new BoundedBufferedReader(
+						new InputStreamReader(resIs),
+	                    2048, // Maximo 256 lineas de salida (256 perfiles)
+	                    2048 // Maximo 2048 caracteres por linea
+					);
+				) {
 					while ((line = resReader.readLine()) != null) {
 						if (line.startsWith(initLine)){
-							usersDir.add(line.substring(line.indexOf(initLine)+initLine.length()));
-
+							usersDir.add(
+								line.substring(
+									line.indexOf(initLine) + initLine.length()
+								)
+							);
 						}
 					}
 				}
 
 				return usersDir;
 
-			} catch (final IOException e) {
-				LOGGER.info("Error al generar el listado de directorios de usuarios del sistema." + e); //$NON-NLS-1$
+			}
+			catch (final IOException e) {
+				LOGGER.info("Error al generar el listado perfiles de Firefox del sistema: " + e); //$NON-NLS-1$
 				return null;
 			}
 		}
 
 		else {
-			throw new IllegalArgumentException("Sistema operativo no soportado."); //$NON-NLS-1$
+			throw new IllegalArgumentException("Sistema operativo no soportado: " + Platform.getOS()); //$NON-NLS-1$
 		}
 
 	}
 
-	/**
-	 * Devuelve un listado con los directorios donde se encuentra el fichero profiles.ini de firefox en linux y en MacOSX.
+	/** Devuelve un listado con los directorios donde se encuentra el fichero <i>profiles.ini</i> de firefox en Linux y en OS X.
 	 * @param users Listado de usuarios del sistema.
-	 * @return Listado de directorios donde se encuentra el fichero profiles.ini.
-	 */
+	 * @return Listado de directorios donde se encuentra el fichero <i>profiles.ini</i>. */
 	private static List<File> getMozillaUsersProfilesPath(final List<String> users){
 		String pathProfile = null;
 		final List<File> path = new ArrayList<>();
@@ -720,7 +852,7 @@ final class ConfiguratorFirefox {
 			pathProfile = MACOSX_MOZILLA_PATH;
 		}
 		else {
-			throw new IllegalArgumentException("Sistema operativo no soportado."); //$NON-NLS-1$
+			throw new IllegalArgumentException("Sistema operativo no soportado: " + Platform.getOS()); //$NON-NLS-1$
 		}
 		for (final String usr: users){
 			final File mozillaPath = new File(usr + pathProfile);
@@ -730,49 +862,50 @@ final class ConfiguratorFirefox {
 				LOGGER.info("Ruta: " + mozillaPath ); //$NON-NLS-1$
 			}
 		}
-
 		return path;
-
 	}
 
-	/**
-	 * Devuelve un listado de directorios donde se encuentran los perfiles de usuario de firefox en linux.
-	 * @param profilesPath Listado de directorios que contienen un fichero profiles.ini.
-	 * @return Listado de directorios donde se encuentran los perfiles de usuario de firefox.
-	 */
+	/** Devuelve un listado de directorios donde se encuentran los perfiles de usuario de firefox en Linux.
+	 * @param profilesPath Listado de directorios que contienen un fichero <i>profiles.ini</i>.
+	 * @return Listado de directorios donde se encuentran los perfiles de usuario de Firefox. */
 	private static Set<File> getProfiles(final List<File> profilesPath){
 		final String PATH = "Path="; //$NON-NLS-1$
 	    final Set<File> profile = new HashSet<>();
 		for (final File path: profilesPath){
 			String line;
-			try (final InputStream resIs = new FileInputStream(path);
-					final BufferedReader resReader = new BufferedReader(new InputStreamReader(resIs));) {
+			try (
+				final InputStream resIs = new FileInputStream(path);
+				final BufferedReader resReader = new BoundedBufferedReader(
+					new InputStreamReader(resIs),
+                    256, // Maximo 256 lineas de salida (256 perfiles por "profiles.ini")
+                    2048 // Maximo 2048 caracteres por linea
+				);
+			) {
 				while ((line = resReader.readLine()) != null) {
 					if (line.startsWith(PATH)){
-						final File file = new File(path.getAbsolutePath().substring(0,path.getAbsolutePath().lastIndexOf("/")+1)+line.substring(PATH.length())); //$NON-NLS-1$
+						final File file = new File(
+							path.getAbsolutePath().substring(
+								0, path.getAbsolutePath().lastIndexOf("/") + 1) + line.substring(PATH.length() //$NON-NLS-1$
+							)
+						);
 						if (file.exists() && file.isDirectory()){
 							profile.add(file);
 						}
-
 					}
 				}
-			} catch (final FileNotFoundException e) {
-				LOGGER.severe("Error al buscar el directorio profile de firefox, no se ha encontrado el directorio :" + e); //$NON-NLS-1$
-			} catch (final IOException e) {
-			    LOGGER.severe("Error al buscar el directorio profile de firefox :" + e); //$NON-NLS-1$
+			}
+			catch (final Exception e) {
+			    LOGGER.severe("Error al buscar los directorios de perfiles de Firefox: " + e); //$NON-NLS-1$
 			}
 		}
-
 		return profile;
 	}
 
-	/**
-	 * Escribe un script en un fichero dado.
-	 * @param path Ruta donde se escribir&aacute; el fichero
+	/** Escribe un <i>script</i> en un fichero dado.
+	 * @param path Ruta donde se escribir&aacute; el <i>script</i>.
 	 * @param data Datos a escribir.
-	 * @param append  <code> true </code> permite contatenar el contenido del fichero con lo que se va a escribir. <code> false </code> el fichero se sobrescribe.
-	 * @throws IOException Se produce cuando hay un error en la creaci&oacute;n del fichero.
-	 */
+	 * @param append <code>true</code> permite contatenar el contenido del fichero con lo que se va a escribir. <code>false</code> el fichero se sobrescribe.
+	 * @throws IOException Se produce cuando hay un error en la creaci&oacute;n del fichero. */
 	public static void writeScriptFile(final String path, final StringBuilder data, final boolean append ) throws IOException{
 		 LOGGER.info("Se escribira en fichero el siguiente comando:\n" + data.toString()); //$NON-NLS-1$
          final File macScript = new File(path);
@@ -780,7 +913,6 @@ final class ConfiguratorFirefox {
          try (final FileOutputStream fout = new FileOutputStream(macScript, append);) {
              fout.write(data.toString().getBytes());
          }
-
 	}
 
 }

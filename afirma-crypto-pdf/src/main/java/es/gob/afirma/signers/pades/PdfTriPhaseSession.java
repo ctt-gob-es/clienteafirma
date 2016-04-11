@@ -12,7 +12,7 @@ package es.gob.afirma.signers.pades;
 
 import java.io.ByteArrayOutputStream;
 
-import com.lowagie.text.pdf.PdfSignatureAppearance;
+import com.aowagie.text.pdf.PdfSignatureAppearance;
 
 /** Datos PDF relevantes en cuanto a las firmas electr&oacute;nicas, consistentes en los datos
  * a ser firmados con CAdES o PKCS#7 y los metadatos necesarios para su correcta inserci&oacute;n en el PDF.

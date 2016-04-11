@@ -26,10 +26,10 @@ import org.w3c.dom.ls.LSOutput;
 import org.w3c.dom.ls.LSSerializer;
 import org.xml.sax.InputSource;
 
-import com.lowagie.text.DocumentException;
-import com.lowagie.text.pdf.PdfDate;
-import com.lowagie.text.pdf.PdfReader;
-import com.lowagie.text.pdf.PdfStamper;
+import com.aowagie.text.DocumentException;
+import com.aowagie.text.pdf.PdfDate;
+import com.aowagie.text.pdf.PdfReader;
+import com.aowagie.text.pdf.PdfStamper;
 
 import es.gob.afirma.core.misc.AOUtil;
 

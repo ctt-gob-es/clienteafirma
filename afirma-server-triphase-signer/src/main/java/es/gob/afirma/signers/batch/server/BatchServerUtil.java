@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
 
-import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.signers.TriphaseData;
 import es.gob.afirma.signers.batch.SignBatch;
@@ -49,7 +48,7 @@ final class BatchServerUtil {
 				"La definicion de lote no puede ser nula" //$NON-NLS-1$
 			);
 		}
-		final byte[] xml = AOUtil.isBase64(xmlAsUrlSafeBase64.getBytes()) ?
+		final byte[] xml = Base64.isBase64(xmlAsUrlSafeBase64.getBytes()) ?
 			Base64.decode(unDoUrlSafe(xmlAsUrlSafeBase64)) :
 				xmlAsUrlSafeBase64.getBytes();
 		if (CONCURRENT) {

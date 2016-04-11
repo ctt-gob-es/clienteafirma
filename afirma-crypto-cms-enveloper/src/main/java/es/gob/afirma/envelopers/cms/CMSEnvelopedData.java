@@ -24,17 +24,17 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 
-import org.bouncycastle.asn1.ASN1Encoding;
-import org.bouncycastle.asn1.ASN1InputStream;
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.ASN1Sequence;
-import org.bouncycastle.asn1.ASN1Set;
-import org.bouncycastle.asn1.ASN1TaggedObject;
-import org.bouncycastle.asn1.DERSet;
-import org.bouncycastle.asn1.cms.ContentInfo;
-import org.bouncycastle.asn1.cms.EnvelopedData;
-import org.bouncycastle.asn1.cms.OriginatorInfo;
-import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
+import org.spongycastle.asn1.ASN1Encoding;
+import org.spongycastle.asn1.ASN1InputStream;
+import org.spongycastle.asn1.ASN1ObjectIdentifier;
+import org.spongycastle.asn1.ASN1Sequence;
+import org.spongycastle.asn1.ASN1Set;
+import org.spongycastle.asn1.ASN1TaggedObject;
+import org.spongycastle.asn1.DERSet;
+import org.spongycastle.asn1.cms.ContentInfo;
+import org.spongycastle.asn1.cms.EnvelopedData;
+import org.spongycastle.asn1.cms.OriginatorInfo;
+import org.spongycastle.asn1.pkcs.PKCSObjectIdentifiers;
 
 import es.gob.afirma.core.ciphers.AOCipherConfig;
 import es.gob.afirma.core.signers.AOSignConstants;
@@ -58,8 +58,7 @@ import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
  * </pre>
  *
  * La implementaci&oacute;n del c&oacute;digo ha seguido los pasos necesarios
- * para crear un mensaje Data de BouncyCastle: <a
- * href="http://www.bouncycastle.org/">www.bouncycastle.org</a> */
+ * para crear un mensaje Data de SpongyCastle. */
 
 public final class CMSEnvelopedData {
 
@@ -206,10 +205,14 @@ public final class CMSEnvelopedData {
      * @throws CertificateEncodingException Cuando el certificado proporcionado es inv&aacute;lido */
     public static byte[] addOriginatorInfo(final byte[] data, final X509Certificate[] signerCertificateChain) throws IOException, CertificateEncodingException {
 
-        final ASN1InputStream is = new ASN1InputStream(data);
-        // LEEMOS EL FICHERO QUE NOS INTRODUCEN
-        final ASN1Sequence dsq = (ASN1Sequence) is.readObject();
-        is.close();
+    	final ASN1Sequence dsq;
+    	try (
+			final ASN1InputStream is = new ASN1InputStream(data);
+		) {
+	        // LEEMOS EL FICHERO QUE NOS INTRODUCEN
+	        dsq = (ASN1Sequence) is.readObject();
+    	}
+
         final Enumeration<?> e = dsq.getObjects();
         // Elementos que contienen los elementos OID Data
         final ASN1ObjectIdentifier doi = (ASN1ObjectIdentifier) e.nextElement();

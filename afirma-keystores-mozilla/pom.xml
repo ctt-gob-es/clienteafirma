@@ -25,4 +25,20 @@
 			<version>${project.version}</version>
 		</dependency>
 	</dependencies>
+	
+	<build>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<version>3.2</version>
+					<configuration>
+						<fork>true</fork>
+						<compilerArgument>-XDignore.symbol.file</compilerArgument>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
 </project>

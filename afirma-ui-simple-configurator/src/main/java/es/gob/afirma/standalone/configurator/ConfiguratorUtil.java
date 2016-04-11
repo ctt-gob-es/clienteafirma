@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.URISyntaxException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -40,39 +39,39 @@ final class ConfiguratorUtil {
 	 * @param targetDir Directorio a eliminar. */
 	static void deleteDir(final File targetDir) {
 		try {
-			Files.walkFileTree(targetDir.toPath(), new SimpleFileVisitor<Path>() {
-		         @Override
-		         public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) throws IOException {
-		             Files.delete(file);
-		             return FileVisitResult.CONTINUE;
-		         }
-		         @Override
-		         public FileVisitResult postVisitDirectory(final Path dir, final IOException e) throws IOException {
-		             if (e != null) {
-		            	 throw e;
-		             }
-		             Files.delete(dir);
-	                 return FileVisitResult.CONTINUE;
-		         }
-		     });
-
+			Files.walkFileTree(
+				targetDir.toPath(),
+				new SimpleFileVisitor<Path>() {
+			         @Override
+			         public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) throws IOException {
+			             Files.delete(file);
+			             return FileVisitResult.CONTINUE;
+			         }
+			         @Override
+			         public FileVisitResult postVisitDirectory(final Path dir, final IOException e) throws IOException {
+			             if (e != null) {
+			            	 throw e;
+			             }
+			             Files.delete(dir);
+		                 return FileVisitResult.CONTINUE;
+			         }
+			   }
+			);
 		}
-		catch (final IOException e) {
-			LOGGER.warning("No se pudo borrar el directorio " + targetDir.getAbsolutePath() + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$
+		catch (final Exception e) {
+			LOGGER.warning("No se pudo borrar el directorio '" + targetDir.getAbsolutePath() + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 	}
 
-	/** Recupera el directorio en el que se encuentra la aplicaci&oacute;n.
-	 * @return Directorio de ejecuci&oacute;n.
-	 */
+	/** Recupera el directorio en el que se encuentra la aplicaci&oacute;n actual.
+	 * @return Directorio de ejecuci&oacute;n. */
 	static File getApplicationDirectory() {
-		File appDir;
 		try {
-			appDir = new File(ConfiguratorUtil.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()).getParentFile();
-		} catch (final URISyntaxException e) {
-			LOGGER.warning("No se pudo localizar el directorio del fichero en ejecucion"); //$NON-NLS-1$
-			appDir = null;
+			return new File(ConfiguratorUtil.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()).getParentFile();
 		}
-		return appDir;
+		catch (final Exception e) {
+			LOGGER.warning("No se pudo localizar el directorio del fichero en ejecucion: " + e); //$NON-NLS-1$
+		}
+		return null;
 	}
 }

@@ -1,3 +1,13 @@
+/* Copyright (C) 2011 [Gobierno de Espana]
+ * This file is part of "Cliente @Firma".
+ * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
+ *   - the GNU General Public License as published by the Free Software Foundation;
+ *     either version 2 of the License, or (at your option) any later version.
+ *   - or The European Software License; either version 1.1 or (at your option) any later version.
+ * Date: 11/01/11
+ * You may contact the copyright holder at: soporte.afirma5@mpt.es
+ */
+
 package es.gob.afirma.signers.cades;
 
 import java.util.ArrayList;
@@ -5,10 +15,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
-import org.bouncycastle.asn1.ASN1Encodable;
-import org.bouncycastle.asn1.DERSequence;
-import org.bouncycastle.asn1.DERUTF8String;
-import org.bouncycastle.asn1.esf.SignerLocation;
+import org.spongycastle.asn1.ASN1Encodable;
+import org.spongycastle.asn1.DERSequence;
+import org.spongycastle.asn1.DERUTF8String;
+import org.spongycastle.asn1.esf.SignerLocation;
 
 /** Clase de utilidad para el manejo de las estructuras CAdES <i>id-aa-ets-signerLocation</i> y
  * <i>id-aa-ets-signerAttr</i>.

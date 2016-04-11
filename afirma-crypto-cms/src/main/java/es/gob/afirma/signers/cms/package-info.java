@@ -15,10 +15,10 @@
  *  <ul>
  *   <li>Dependencia con el m&oacute;dulo N&uacute;cleo (<i>afirma-core</i>) del Cliente.</li>
  *   <li>Dependencia con el m&oacute;dulo PKCS#7 (<i>afirma-crypto-core-pkcs7</i>) del Cliente.</li>
- *   <li>Dependencia con BouncyCastle 1.46 o superior (Proveedor + <i>Mail</i>).</li>
+ *   <li>Dependencia con SpongyCastle 1.54 o superior (Proveedor + <i>Mail</i>).</li>
  *  </ul>
  *  <p>
- *   Este m&oacute;dulo es compatible con cualquier entorno JSE 1.5 o superior.
+ *   Este m&oacute;dulo es compatible con cualquier entorno JSE 1.6 o superior.
  *  </p>
  *  <p>Desde este m&oacute;dulo no se realizan llamadas a interfaces gr&aacute;ficas.</p>
  */

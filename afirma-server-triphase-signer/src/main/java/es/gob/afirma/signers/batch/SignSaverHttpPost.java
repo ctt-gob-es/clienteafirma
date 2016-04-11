@@ -6,6 +6,7 @@ import java.util.logging.Logger;
 
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.http.UrlHttpManagerFactory;
+import es.gob.afirma.core.misc.http.UrlHttpMethod;
 
 /** Guarda firmas envi&aacute;ndolas a un servicio HTTP POST.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
@@ -43,8 +44,9 @@ public final class SignSaverHttpPost implements SignSaver {
 
 	@Override
 	public void saveSign(final SingleSign sign, final byte[] dataToSave) throws IOException {
-		UrlHttpManagerFactory.getInstalledManager().readUrlByPost(
-			this.url + "?" + this.param + "=" + Base64.encode(dataToSave) //$NON-NLS-1$ //$NON-NLS-2$
+		UrlHttpManagerFactory.getInstalledManager().readUrl(
+			this.url + "?" + this.param + "=" + Base64.encode(dataToSave), //$NON-NLS-1$ //$NON-NLS-2$
+			UrlHttpMethod.POST
 		);
 	}
 

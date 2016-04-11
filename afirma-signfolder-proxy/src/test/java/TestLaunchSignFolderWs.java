@@ -7,7 +7,7 @@ public class TestLaunchSignFolderWs {
 
 	public static void main(final String[] args) {
 
-		final String IP = "10.1.46.158";
+		final String IP = "10.1.46.142";
 
 		final String endpoint = "http://" + IP + ":8090/afirma/MobileService";
 

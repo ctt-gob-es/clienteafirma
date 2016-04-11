@@ -1,0 +1,29 @@
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="entries">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="entry" maxOccurs="unbounded" minOccurs="0">
+          <xs:complexType>
+            <xs:simpleContent>
+              <xs:extension base="xs:string">
+                <xs:attribute type="xs:string" name="hash" use="required"/>
+                <xs:attribute type="xs:string" name="name" use="required"/>
+              </xs:extension>
+            </xs:simpleContent>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+      <xs:attribute name="hashAlgorithm">
+      	<xs:simpleType>
+    		<xs:restriction base="xs:string">
+      			<xs:enumeration value="SHA-1"/>
+    			<xs:enumeration value="SHA-256"/>
+    			<xs:enumeration value="SHA-384"/> 
+    			<xs:enumeration value="SHA-512"/>
+    		</xs:restriction>
+  		</xs:simpleType>
+  	  </xs:attribute>
+      <xs:attribute type="xs:boolean" name="recursive" use="required"/>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

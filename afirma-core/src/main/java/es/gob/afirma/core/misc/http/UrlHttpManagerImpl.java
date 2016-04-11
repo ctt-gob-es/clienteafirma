@@ -15,7 +15,11 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
+import java.net.CookieHandler;
+import java.net.CookieManager;
+import java.net.CookiePolicy;
 import java.net.HttpURLConnection;
+import java.net.InetAddress;
 import java.net.Proxy;
 import java.net.URL;
 import java.security.KeyManagementException;
@@ -40,12 +44,15 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
 import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.core.misc.Platform;
 
 /** Clase para la lectura y env&iacute;o de datos a URL remotas.
- * @author Carlos Gamuci */
+ * @author Carlos Gamuci. */
 public class UrlHttpManagerImpl implements UrlHttpManager {
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+
+	private static final String JAVA_PARAM_ENABLE_SSL_CHECKS = "enableSslChecks"; //$NON-NLS-1$
 
 	/** Tiempo de espera por defecto para descartar una conexi&oacute;n HTTP. */
 	public static final int DEFAULT_TIMEOUT = -1;
@@ -57,18 +64,18 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 	private static final String KEYSTORE = "javax.net.ssl.keyStore"; //$NON-NLS-1$
 	private static final String KEYSTORE_PASS = "javax.net.ssl.keyStorePassword"; //$NON-NLS-1$
 	private static final String KEYSTORE_TYPE = "javax.net.ssl.keyStoreType"; //$NON-NLS-1$
-	private static final String KEYSTORE_INSTANCE = "SunJSSE"; //$NON-NLS-1$
 	private static final String KEYSTORE_DEFAULT_TYPE = "JKS"; //$NON-NLS-1$
 	private static final String KEYMANAGER_INSTANCE = "SunX509";//$NON-NLS-1$
 	private static final String SSL_CONTEXT = "SSL";//$NON-NLS-1$
 
-	private enum Method {
-		GET,
-		POST
+	static {
+		final CookieManager cookieManager = new CookieManager();
+		cookieManager.setCookiePolicy(CookiePolicy.ACCEPT_ALL);
+		CookieHandler.setDefault(cookieManager);
 	}
 
-	protected UrlHttpManagerImpl() {
-		// Instanciacion "default"
+	UrlHttpManagerImpl() {
+		// Vacio y "default"
 	}
 
 	private static final TrustManager[] DUMMY_TRUST_MANAGER = new TrustManager[] {
@@ -85,35 +92,36 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 		}
 	};
 
-	/** Lee una URL HTTP o HTTPS por POST si se indican par&aacute;metros en la URL y por GET en caso contrario.
-	 * En HTTPS no se hacen comprobaciones del certificado servidor.
-	 * @param url URL a leer
-	 * @return Contenido de la URL
-	 * @throws IOException Si no se puede leer la URL */
 	@Override
-	public byte[] readUrlByPost(final String url) throws IOException {
-		return readUrlByPost(url, DEFAULT_TIMEOUT, "application/x-www-form-urlencoded"); //$NON-NLS-1$
+	public byte[] readUrl(final String url, final UrlHttpMethod method) throws IOException {
+		return readUrl(url, DEFAULT_TIMEOUT, null, method);
 	}
 
-	private byte[] readUrl(final String url,
-			               final int timeout,
-			               final String contentType,
-			               final Method method) throws IOException {
+	private static boolean isLocal(final URL url) {
+		if (url == null) {
+			throw new IllegalArgumentException("La URL no puede ser nula"); //$NON-NLS-1$
+		}
+		try {
+			return InetAddress.getByName(url.getHost()).isLoopbackAddress();
+		}
+		catch (final Exception e) {
+			// La direccion local siempre es conocida
+			return false;
+		}
+	}
+
+	@Override
+	public byte[] readUrl(final String url,
+			              final int timeout,
+			              final String contentType,
+			              final UrlHttpMethod method) throws IOException {
 		if (url == null) {
 			throw new IllegalArgumentException("La URL a leer no puede ser nula"); //$NON-NLS-1$
 		}
 
-		// Si la URL no tiene parametros la leemos por GET
-		if (!url.contains("?") && Method.POST.equals(method)) { //$NON-NLS-1$
-			Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
-				"Se ha pedido una peticion POST sin parametros, pero se realizara por GET" //$NON-NLS-1$
-			);
-			return readUrl(url, timeout, contentType, Method.GET);
-		}
-
 		String urlParameters = null;
 		String request = null;
-		if (Method.POST.equals(method)) {
+		if (UrlHttpMethod.POST.equals(method) || UrlHttpMethod.PUT.equals(method)) {
 			final StringTokenizer st = new StringTokenizer(url, "?"); //$NON-NLS-1$
 			request = st.nextToken();
 			urlParameters = st.nextToken();
@@ -121,7 +129,9 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 
 		final URL uri = new URL(request != null ? request : url);
 
-		if (uri.getProtocol().equals(HTTPS)) {
+		final boolean enableSSLChecks = Boolean.getBoolean(JAVA_PARAM_ENABLE_SSL_CHECKS);
+
+		if (!enableSSLChecks && uri.getProtocol().equals(HTTPS)) {
 			try {
 				disableSslChecks();
 			}
@@ -132,7 +142,13 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 			}
 		}
 
-		final HttpURLConnection conn = (HttpURLConnection) uri.openConnection(Proxy.NO_PROXY);
+		final HttpURLConnection conn;
+		if (Platform.OS.ANDROID.equals(Platform.getOS()) || isLocal(uri)) {
+			conn = (HttpURLConnection) uri.openConnection(Proxy.NO_PROXY);
+		}
+		else {
+			conn = (HttpURLConnection) uri.openConnection();
+		}
 
 		conn.setRequestMethod(method.toString());
 
@@ -173,33 +189,12 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 		final byte[] data = AOUtil.getDataFromInputStream(is);
 		is.close();
 
-		if (uri.getProtocol().equals(HTTPS)) {
+		if (!enableSSLChecks && uri.getProtocol().equals(HTTPS)) {
 			enableSslChecks();
 		}
 
 		return data;
 
-	}
-
-	/** Lee una URL HTTP o HTTPS por POST si se indican par&aacute;metros en la URL y por GET en caso contrario.
-	 * En HTTPS no se hacen comprobaciones del certificado servidor.
-	 * @param url URL a leer
-	 * @param timeout Tiempo m&aacute;ximo en milisegundos que se debe esperar por la respuesta. Un timeout de 0
-	 * se interpreta como un timeout infinito. Si se indica -1, se usar&aacute; el por defecto de Java.
-	 * @return Contenido de la URL
-	 * @throws IOException Si no se puede leer la URL */
-	@Override
-	public byte[] readUrlByPost(final String url, final int timeout, final String contentType) throws IOException {
-		return readUrl(url, timeout, contentType, Method.POST);
-	}
-
-	/** Lee una URL HTTP o HTTPS por GET. En HTTPS no se hacen comprobaciones del certificado servidor.
-	 * @param url URL a leer.
-	 * @return Contenido de la URL (de la lectura del contenido referenciado).
-	 * @throws IOException Si no se puede leer la URL. */
-	@Override
-	public byte[] readUrlByGet(final String url) throws IOException {
-		return readUrl(url, DEFAULT_TIMEOUT, null, Method.GET);
 	}
 
 	/** Habilita las comprobaciones de certificados en conexiones SSL dej&aacute;ndolas con su
@@ -220,7 +215,11 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 	 * @throws NoSuchProviderException Si ocurre un error al recuperar la instancia del Keystore.*/
 	public static void disableSslChecks() throws KeyManagementException,
 	                                             NoSuchAlgorithmException,
-	                                             KeyStoreException, UnrecoverableKeyException, CertificateException, IOException, NoSuchProviderException {
+	                                             KeyStoreException,
+	                                             UnrecoverableKeyException,
+	                                             CertificateException,
+	                                             IOException,
+	                                             NoSuchProviderException {
 		final SSLContext sc = SSLContext.getInstance(SSL_CONTEXT);
 		sc.init(getKeyManager(), DUMMY_TRUST_MANAGER, new java.security.SecureRandom());
 		HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
@@ -248,7 +247,8 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 	                                                   NoSuchAlgorithmException,
 	                                                   CertificateException,
 	                                                   IOException,
-	                                                   UnrecoverableKeyException, NoSuchProviderException {
+	                                                   UnrecoverableKeyException,
+	                                                   NoSuchProviderException {
 		final String keyStore = System.getProperty(KEYSTORE);
 		final String keyStorePassword = System.getProperty(KEYSTORE_PASS);
 		final String keyStoreType = System.getProperty(KEYSTORE_TYPE);
@@ -261,7 +261,7 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 			return null;
 		}
 		final KeyStore keystore = KeyStore.getInstance(
-			keyStoreType != null && !keyStoreType.isEmpty() ? keyStoreType : KEYSTORE_DEFAULT_TYPE, KEYSTORE_INSTANCE
+			keyStoreType != null && !keyStoreType.isEmpty() ? keyStoreType : KEYSTORE_DEFAULT_TYPE
 		);
 		final InputStream fis = new FileInputStream(f);
 		keystore.load(

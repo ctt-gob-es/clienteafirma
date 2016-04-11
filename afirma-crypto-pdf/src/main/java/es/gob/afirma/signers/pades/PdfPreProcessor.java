@@ -15,14 +15,14 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Logger;
 
-import com.lowagie.text.Annotation;
-import com.lowagie.text.DocumentException;
-import com.lowagie.text.Image;
-import com.lowagie.text.Jpeg;
-import com.lowagie.text.Rectangle;
-import com.lowagie.text.pdf.PdfContentByte;
-import com.lowagie.text.pdf.PdfReader;
-import com.lowagie.text.pdf.PdfStamper;
+import com.aowagie.text.Annotation;
+import com.aowagie.text.DocumentException;
+import com.aowagie.text.Image;
+import com.aowagie.text.Jpeg;
+import com.aowagie.text.Rectangle;
+import com.aowagie.text.pdf.PdfContentByte;
+import com.aowagie.text.pdf.PdfReader;
+import com.aowagie.text.pdf.PdfStamper;
 
 import es.gob.afirma.core.misc.Base64;
 
@@ -216,8 +216,8 @@ public final class PdfPreProcessor {
     	return null;
     }
 
-    static com.lowagie.text.Image getImage(final String imagebase64Encoded) {
-    	if (imagebase64Encoded == null || "".equals(imagebase64Encoded)) { //$NON-NLS-1$
+    static com.aowagie.text.Image getImage(final String imagebase64Encoded) {
+    	if (imagebase64Encoded == null || imagebase64Encoded.isEmpty()) {
     		return null;
     	}
     	final byte[] image;

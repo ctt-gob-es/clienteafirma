@@ -31,7 +31,7 @@ import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
 /** Operaciones de cofirma CAdES. */
 public final class AOCAdESCoSigner implements AOCoSigner {
 
-	
+
 	private static final String ALGORITHM = "SHA1"; //$NON-NLS-1$
 
 	/** {@inheritDoc} */
@@ -43,12 +43,14 @@ public final class AOCAdESCoSigner implements AOCoSigner {
                          final java.security.cert.Certificate[] certChain,
                          final Properties xParams) throws AOException, IOException {
 
+        CAdESMultiUtil.checkUnsupportedAttributes(sign);
+
     	//****************************************************************************************************
     	//*************** LECTURA PARAMETROS ADICIONALES *****************************************************
 
         final Properties extraParams = xParams != null ? xParams : new Properties();
 
-        final boolean onlySigningCertificate = Boolean.parseBoolean(extraParams.getProperty(CAdESExtraParams.INCLUDE_ONLY_SIGNNING_CERTIFICATE)); 
+        final boolean onlySigningCertificate = Boolean.parseBoolean(extraParams.getProperty(CAdESExtraParams.INCLUDE_ONLY_SIGNNING_CERTIFICATE));
 
         byte[] messageDigest = null;
         final String precalculatedDigest = extraParams.getProperty(CAdESExtraParams.PRECALCULATED_HASH_ALGORITHM);
@@ -67,8 +69,14 @@ public final class AOCAdESCoSigner implements AOCoSigner {
         	signingCertificateV2 = !ALGORITHM.equals(AOSignConstants.getDigestAlgorithmName(algorithm));
         }
 
-        final String contentTypeOid = extraParams.getProperty(CAdESExtraParams.CONTENT_TYPE_OID); 
-        final String contentDescription = extraParams.getProperty(CAdESExtraParams.CONTENT_DESCRIPTION); 
+        final String contentTypeOid = extraParams.getProperty(CAdESExtraParams.CONTENT_TYPE_OID);
+        final String contentDescription = extraParams.getProperty(CAdESExtraParams.CONTENT_DESCRIPTION);
+
+        final boolean doNotIncludePolicyOnSigningCertificate = Boolean.parseBoolean(
+    		extraParams.getProperty(
+				CAdESExtraParams.DO_NOT_INCLUDE_POLICY_ON_SIGNING_CERTIFICATE, "false" //$NON-NLS-1$
+			)
+		);
 
         //*************** FIN LECTURA PARAMETROS ADICIONALES *************************************************
     	//****************************************************************************************************
@@ -85,16 +93,16 @@ public final class AOCAdESCoSigner implements AOCoSigner {
 				final MimeHelper mimeHelper = new MimeHelper(data);
 				altContentTypeOid = MimeHelper.transformMimeTypeToOid(mimeHelper.getMimeType());
 				altContentDescription = mimeHelper.getDescription();
-
 			}
 			catch (final Exception e) {
 				Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
-						"No se han podido cargar las librerias para identificar el tipo de dato firmado: " + e); //$NON-NLS-1$
+					"No se han podido cargar las librerias para identificar el tipo de dato firmado: " + e //$NON-NLS-1$
+				);
 			}
 		}
 
 		try {
-			final String mode = extraParams.getProperty(CAdESExtraParams.MODE, AOSignConstants.DEFAULT_SIGN_MODE); 
+			final String mode = extraParams.getProperty(CAdESExtraParams.MODE, AOSignConstants.DEFAULT_SIGN_MODE);
 			final boolean omitContent = mode.equals(AOSignConstants.SIGN_MODE_EXPLICIT) || precalculatedDigest != null;
 
 			return new CAdESCoSigner().coSigner(
@@ -109,8 +117,9 @@ public final class AOCAdESCoSigner implements AOCoSigner {
 				contentTypeOid != null ? contentTypeOid : altContentTypeOid,
                 contentDescription != null ? contentDescription : altContentDescription,
 				CommitmentTypeIndicationsHelper.getCommitmentTypeIndications(extraParams),
-				Boolean.parseBoolean(extraParams.getProperty(CAdESExtraParams.INCLUDE_SIGNING_TIME_ATTRIBUTE, "false")), //$NON-NLS-1$ 
-				CAdESSignerMetadataHelper.getCAdESSignerMetadata(extraParams)
+				Boolean.parseBoolean(extraParams.getProperty(CAdESExtraParams.INCLUDE_SIGNING_TIME_ATTRIBUTE, "false")), //$NON-NLS-1$
+				CAdESSignerMetadataHelper.getCAdESSignerMetadata(extraParams),
+				doNotIncludePolicyOnSigningCertificate
 			);
 
 		}
@@ -128,9 +137,16 @@ public final class AOCAdESCoSigner implements AOCoSigner {
                          final java.security.cert.Certificate[] certChain,
                          final Properties xParams) throws AOException, IOException {
 
+        CAdESMultiUtil.checkUnsupportedAttributes(sign);
+
+    	//****************************************************************************************************
+    	//*************** LECTURA PARAMETROS ADICIONALES *****************************************************
+
         final Properties extraParams = xParams != null ? xParams : new Properties();
 
-        final boolean onlySigningCertificate = Boolean.parseBoolean(extraParams.getProperty(CAdESExtraParams.INCLUDE_ONLY_SIGNNING_CERTIFICATE)); 
+        final boolean onlySigningCertificate = Boolean.parseBoolean(extraParams.getProperty(
+    		CAdESExtraParams.INCLUDE_ONLY_SIGNNING_CERTIFICATE)
+		);
 
         boolean signingCertificateV2;
         if (AOSignConstants.isSHA2SignatureAlgorithm(algorithm)) {
@@ -140,8 +156,17 @@ public final class AOCAdESCoSigner implements AOCoSigner {
         	signingCertificateV2 = Boolean.parseBoolean(extraParams.getProperty(CAdESExtraParams.SIGNING_CERTIFICATE_V2));
         }
         else {
-        	signingCertificateV2 = !ALGORITHM.equals(AOSignConstants.getDigestAlgorithmName(algorithm));	 
+        	signingCertificateV2 = !ALGORITHM.equals(AOSignConstants.getDigestAlgorithmName(algorithm));
         }
+
+        final boolean doNotIncludePolicyOnSigningCertificate = Boolean.parseBoolean(
+    		extraParams.getProperty(
+				CAdESExtraParams.DO_NOT_INCLUDE_POLICY_ON_SIGNING_CERTIFICATE, "false" //$NON-NLS-1$
+			)
+		);
+
+        //*************** FIN LECTURA PARAMETROS ADICIONALES *************************************************
+    	//****************************************************************************************************
 
         // algoritmo de firma.
         final String typeAlgorithm = algorithm;
@@ -170,8 +195,9 @@ public final class AOCAdESCoSigner implements AOCoSigner {
 			    contentTypeOid,
 			    contentDescription,
 			    CommitmentTypeIndicationsHelper.getCommitmentTypeIndications(extraParams),
-			    Boolean.parseBoolean(extraParams.getProperty(CAdESExtraParams.INCLUDE_SIGNING_TIME_ATTRIBUTE, "false")), //$NON-NLS-1$ 
-			    CAdESSignerMetadataHelper.getCAdESSignerMetadata(extraParams)
+			    Boolean.parseBoolean(extraParams.getProperty(CAdESExtraParams.INCLUDE_SIGNING_TIME_ATTRIBUTE, "false")), //$NON-NLS-1$
+			    CAdESSignerMetadataHelper.getCAdESSignerMetadata(extraParams),
+			    doNotIncludePolicyOnSigningCertificate
 			);
 		}
         catch (final Exception e) {

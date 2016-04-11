@@ -21,32 +21,32 @@ import java.util.List;
 import java.util.Locale;
 import java.util.logging.Logger;
 
-import org.bouncycastle.asn1.ASN1EncodableVector;
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.ASN1UTCTime;
-import org.bouncycastle.asn1.DERIA5String;
-import org.bouncycastle.asn1.DEROctetString;
-import org.bouncycastle.asn1.DERSequence;
-import org.bouncycastle.asn1.DERSet;
-import org.bouncycastle.asn1.DERUTCTime;
-import org.bouncycastle.asn1.DERUTF8String;
-import org.bouncycastle.asn1.cms.Attribute;
-import org.bouncycastle.asn1.cms.CMSAttributes;
-import org.bouncycastle.asn1.ess.ContentHints;
-import org.bouncycastle.asn1.ess.ESSCertID;
-import org.bouncycastle.asn1.ess.ESSCertIDv2;
-import org.bouncycastle.asn1.ess.SigningCertificate;
-import org.bouncycastle.asn1.ess.SigningCertificateV2;
-import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
-import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
-import org.bouncycastle.asn1.x509.DigestInfo;
-import org.bouncycastle.asn1.x509.GeneralName;
-import org.bouncycastle.asn1.x509.GeneralNames;
-import org.bouncycastle.asn1.x509.IssuerSerial;
-import org.bouncycastle.asn1.x509.PolicyInformation;
-import org.bouncycastle.asn1.x509.PolicyQualifierId;
-import org.bouncycastle.asn1.x509.PolicyQualifierInfo;
+import org.spongycastle.asn1.ASN1EncodableVector;
+import org.spongycastle.asn1.ASN1ObjectIdentifier;
+import org.spongycastle.asn1.ASN1OctetString;
+import org.spongycastle.asn1.ASN1Sequence;
+import org.spongycastle.asn1.ASN1UTCTime;
+import org.spongycastle.asn1.DEROctetString;
+import org.spongycastle.asn1.DERSequence;
+import org.spongycastle.asn1.DERSet;
+import org.spongycastle.asn1.DERUTCTime;
+import org.spongycastle.asn1.DERUTF8String;
+import org.spongycastle.asn1.cms.Attribute;
+import org.spongycastle.asn1.cms.CMSAttributes;
+import org.spongycastle.asn1.ess.ContentHints;
+import org.spongycastle.asn1.ess.ESSCertID;
+import org.spongycastle.asn1.ess.ESSCertIDv2;
+import org.spongycastle.asn1.ess.SigningCertificate;
+import org.spongycastle.asn1.ess.SigningCertificateV2;
+import org.spongycastle.asn1.pkcs.PKCSObjectIdentifiers;
+import org.spongycastle.asn1.x500.X500Name;
+import org.spongycastle.asn1.x509.AlgorithmIdentifier;
+import org.spongycastle.asn1.x509.CertificatePolicies;
+import org.spongycastle.asn1.x509.DigestInfo;
+import org.spongycastle.asn1.x509.GeneralName;
+import org.spongycastle.asn1.x509.GeneralNames;
+import org.spongycastle.asn1.x509.IssuerSerial;
+import org.spongycastle.asn1.x509.PolicyInformation;
 
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.signers.AOSignConstants;
@@ -172,18 +172,21 @@ public final class CAdESUtils {
     }
 
     /** Genera una estructura <i>SigningCertificateV2</i> seg&uacute;n RFC 5035:
-     * @param cert Certificado del firmante
-     * @param digestAlgorithmName Nombre del algoritmo de huella digital a usar
-     * @param policy Pol&iacute;tica de firma
-     * @return Estructura <i>SigningCertificateV2</i> seg&uacute;n RFC 5035
-     * @throws CertificateEncodingException Si el certificado proporcionado no es v&aacute;lido
-     * @throws NoSuchAlgorithmException Si no se soporta el algoritmo de huella indicado
-     * @throws IOException Si hay errores en el tratamiento de datos */
+     * @param cert Certificado del firmante.
+     * @param digestAlgorithmName Nombre del algoritmo de huella digital a usar.
+     * @param doNotIncludePolicyOnSigningCertificate Si se establece a <code>true</code> omite la inclusi&oacute;n de la
+     *                                               pol&iacute;tica de certificaci&oacute;n en el <i>SigningCertificate</i>,
+     *                                               si se establece a <code>false</code> se incluye siempre que el certificado
+     *                                               la declare.
+     * @return Estructura <i>SigningCertificateV2</i> seg&uacute;n RFC 5035.
+     * @throws CertificateEncodingException Si el certificado proporcionado no es v&aacute;lido.
+     * @throws NoSuchAlgorithmException Si no se soporta el algoritmo de huella indicado.
+     * @throws IOException Si hay errores en el tratamiento de datos. */
     private static Attribute getSigningCertificateV2(final X509Certificate cert,
     		                                         final String digestAlgorithmName,
-    		                                         final AdESPolicy policy) throws CertificateEncodingException,
-    		                                                                  NoSuchAlgorithmException,
-    		                                                                  IOException {
+                                                     final boolean doNotIncludePolicyOnSigningCertificate) throws CertificateEncodingException,
+    		                                                                                                      NoSuchAlgorithmException,
+    		                                                                                                      IOException {
 
     	// ALGORITMO DE HUELLA DIGITAL
         final AlgorithmIdentifier digestAlgorithmOID = SigUtils.makeAlgId(AOAlgorithmID.getOID(digestAlgorithmName));
@@ -202,8 +205,10 @@ public final class CAdESUtils {
         };
 
         final SigningCertificateV2 scv2;
-        if (policy != null && policy.getPolicyIdentifier() != null) {
-            scv2 = new SigningCertificateV2(essCertIDv2, getPolicyInformation(policy)); // con politica
+        final PolicyInformation[] polInfo = doNotIncludePolicyOnSigningCertificate ? null : getPolicyInformation(cert);
+
+        if (polInfo != null) {
+            scv2 = new SigningCertificateV2(essCertIDv2, polInfo); // con politica
         }
         else {
             scv2 = new SigningCertificateV2(essCertIDv2); // Sin politica
@@ -217,16 +222,19 @@ public final class CAdESUtils {
     }
 
     /** Genera una estructura <i>SigningCertificateV2</i> seg&uacute;n RFC 5035.
-     * @param cert Certificado del firmante
-     * @param digestAlgorithmName Nombre del algoritmo de huella digital a usar
-     * @param policy Pol&iacute;tica de firma
-     * @return Estructura <i>SigningCertificate</i> seg&uacute;n RFC 5035
-     * @throws CertificateEncodingException Si el certificado proporcionado no es v&aacute;lido
-     * @throws NoSuchAlgorithmException Si no se soporta el algoritmo de huella indicado */
+     * @param cert Certificado del firmante.
+     * @param digestAlgorithmName Nombre del algoritmo de huella digital a usar.
+     * @param doNotIncludePolicyOnSigningCertificate Si se establece a <code>true</code> omite la inclusi&oacute;n de la
+     *                                               pol&iacute;tica de certificaci&oacute;n en el <i>SigningCertificate</i>,
+     *                                               si se establece a <code>false</code> se incluye siempre que el certificado
+     *                                               la declare.
+     * @return Estructura <i>SigningCertificate</i> seg&uacute;n RFC 5035.
+     * @throws CertificateEncodingException Si el certificado proporcionado no es v&aacute;lido.
+     * @throws NoSuchAlgorithmException Si no se soporta el algoritmo de huella indicado. */
     private static Attribute getSigningCertificateV1(final X509Certificate cert,
                                                      final String digestAlgorithmName,
-                                                     final AdESPolicy policy) throws CertificateEncodingException,
-                                                                                     NoSuchAlgorithmException {
+                                                     final boolean doNotIncludePolicyOnSigningCertificate) throws CertificateEncodingException,
+                                                                                                                  NoSuchAlgorithmException {
 
         // INICIO SINGNING CERTIFICATE
 
@@ -239,14 +247,16 @@ public final class CAdESUtils {
         final ESSCertID essCertID = new ESSCertID(certHash, isuerSerial);
 
         final SigningCertificate scv;
-        if (policy != null && policy.getPolicyIdentifier() != null) {
+        final PolicyInformation[] polInfo = doNotIncludePolicyOnSigningCertificate ? null : getPolicyInformation(cert);
+
+        if (polInfo != null) {
 
              // HAY QUE HACER UN SEQUENCE, YA QUE EL CONSTRUCTOR DE BOUNCY
              // CASTLE NO TIENE DICHO CONSTRUCTOR.
 
             final ASN1EncodableVector v = new ASN1EncodableVector();
             v.add(new DERSequence(essCertID));
-            v.add(new DERSequence(getPolicyInformation(policy)));
+            v.add(new DERSequence(polInfo));
             scv = SigningCertificate.getInstance(new DERSequence(v)); // con politica
         }
         else {
@@ -375,6 +385,10 @@ public final class CAdESUtils {
      * @param csm Metadatos sobre el firmante.
      * @param isCountersign <code>true</code> si desea generarse el <code>SignerInfo</code> de una
      *                      contrafirma, <code>false</code> en caso contrario.
+     * @param doNotIncludePolicyOnSigningCertificate Si se establece a <code>true</code> omite la inclusi&oacute;n de la
+     *                                               pol&iacute;tica de certificaci&oacute;n en el <i>SigningCertificate</i>,
+     *                                               si se establece a <code>false</code> se incluye siempre que el certificado
+     *                                               la declare.
      * @return Los datos necesarios para generar la firma referente a los datos del usuario.
      * @throws java.security.NoSuchAlgorithmException Cuando se introduce un algoritmo no v&aacute;lido.
      * @throws java.io.IOException Cuando se produce un error de entrada/salida.
@@ -392,9 +406,10 @@ public final class CAdESUtils {
                                                          final String contentDescription,
                                                          final List<CommitmentTypeIndicationBean> ctis,
                                                          final CAdESSignerMetadata csm,
-                                                         final boolean isCountersign) throws NoSuchAlgorithmException,
-                                                                                             IOException,
-                                                                                             CertificateEncodingException {
+                                                         final boolean isCountersign,
+                                                         final boolean doNotIncludePolicyOnSigningCertificate) throws NoSuchAlgorithmException,
+                                                                                                                      IOException,
+                                                                                                                      CertificateEncodingException {
     	if (padesMode) {
     		LOGGER.info("Se ha seleccionado la generacion de CAdES para inclusion en PAdES"); //$NON-NLS-1$
     	}
@@ -416,12 +431,12 @@ public final class CAdESUtils {
 
         if (signingCertificateV2) {
             contextSpecific.add(
-        		getSigningCertificateV2((X509Certificate) cert, digestAlgorithmName, policy)
+        		getSigningCertificateV2((X509Certificate) cert, digestAlgorithmName, doNotIncludePolicyOnSigningCertificate)
     		);
         }
         else {
             contextSpecific.add(
-        		getSigningCertificateV1((X509Certificate) cert, digestAlgorithmName, policy)
+        		getSigningCertificateV1((X509Certificate) cert, digestAlgorithmName, doNotIncludePolicyOnSigningCertificate)
     		);
         }
 
@@ -500,7 +515,7 @@ public final class CAdESUtils {
         return contextSpecific;
     }
 
-    /** Obtiene un <i>PolicyInformation</i> a partir de los datos de la pol&iacute;tica.
+    /** Obtiene un <i>PolicyInformation</i> a partir de los datos de la pol&iacute;tica de un certificado.
      * Sirve para los datos de SigningCertificate y SigningCertificateV2. Tiene que llevar algunos
      * datos de la pol&iacute;tica.
      *
@@ -560,48 +575,25 @@ public final class CAdESUtils {
      * }
      *
      * </pre>
-     * @param policy Pol&iacute;tica de la firma.
-     * @return Estructura con la pol&iacute;tica preparada para insertarla en la firma. */
-    private static PolicyInformation[] getPolicyInformation(final AdESPolicy policy){
+     * @param cert Certificado del cual queremos describir su pol&iacute;tica.
+     * @return Estructura con la pol&iacute;tica preparada para insertarla en la firma o
+     *         <code>null</code> si el certificado no tiene declarada una pol&iacute;tica. */
+    private static PolicyInformation[] getPolicyInformation(final X509Certificate cert) {
 
-        if (policy == null) {
-            throw new IllegalArgumentException("La politica de firma no puede ser nula en este punto"); //$NON-NLS-1$
+        if (cert == null) {
+            throw new IllegalArgumentException("El certificado no puede ser nulo"); //$NON-NLS-1$
         }
 
-        final PolicyQualifierId pqid = PolicyQualifierId.id_qt_cps;
-        DERIA5String uri = null;
+        final byte[] certificatePoliciesBytes = cert.getExtensionValue("2.5.29.32"); //$NON-NLS-1$
+		if (certificatePoliciesBytes == null || certificatePoliciesBytes.length < 1) {
+			return null;
+		}
 
-        if (policy.getPolicyQualifier()!=null && !policy.getPolicyQualifier().equals("")){ //$NON-NLS-1$
-            uri = new DERIA5String(policy.getPolicyQualifier().toString());
-        }
-
-        final ASN1EncodableVector v = new ASN1EncodableVector();
-        PolicyQualifierInfo pqi = null;
-        if(uri != null){
-            v.add(pqid);
-            v.add(uri);
-            pqi = PolicyQualifierInfo.getInstance(new DERSequence(v));
-        }
-
-        if (policy.getPolicyQualifier()==null || pqi == null) {
-            return new PolicyInformation[] {
-                new PolicyInformation(
-            		new ASN1ObjectIdentifier(
-        				policy.getPolicyIdentifier().toLowerCase(Locale.US).replace("urn:oid:", "") //$NON-NLS-1$ //$NON-NLS-2$
-    				)
-        		)
-            };
-        }
-
-        return new PolicyInformation[] {
-            new PolicyInformation(
-        		new ASN1ObjectIdentifier(
-    				policy.getPolicyIdentifier().toLowerCase(Locale.US).replace("urn:oid:", "") //$NON-NLS-1$ //$NON-NLS-2$
-				),
-    			new DERSequence(pqi)
-    		)
-        };
-
+		return CertificatePolicies.getInstance(
+			ASN1Sequence.getInstance(
+				ASN1OctetString.getInstance(certificatePoliciesBytes).getOctets()
+			)
+		).getPolicyInformation();
     }
 
     private static ASN1EncodableVector initContextSpecific(final String dataDigestAlgorithmName,

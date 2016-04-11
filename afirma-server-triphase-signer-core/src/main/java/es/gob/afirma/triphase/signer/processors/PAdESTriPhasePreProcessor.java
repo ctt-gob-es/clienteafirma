@@ -10,8 +10,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Logger;
 
-import com.lowagie.text.DocumentException;
-
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.signers.AOSignConstants;
@@ -66,9 +64,9 @@ public final class PAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 				extraParams
 			);
 		}
-		catch (final DocumentException e) {
+		catch (final InvalidPdfException e) {
 			LOGGER.severe("El documento no es un PDF y no se puede firmar: " + e); //$NON-NLS-1$
-			throw new InvalidPdfException(e);
+			throw e;
 		}
 
 		LOGGER.info("Se prepara la respuesta de la prefirma PAdES"); //$NON-NLS-1$

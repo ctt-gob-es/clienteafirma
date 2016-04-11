@@ -12,6 +12,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 
 import es.gob.afirma.core.signers.TriphaseData;
 import es.gob.afirma.signers.batch.SingleSign.CallableResult;
@@ -110,8 +111,9 @@ public final class SignBatchConcurrent extends SignBatch {
 						"Error en una de las firmas del lote, se parara el proceso: " + e, e //$NON-NLS-1$
 					);
 				}
-				LOGGER.severe(
-					"Error en una de las firmas del lote, se continua con el siguiente elemento: " + e //$NON-NLS-1$
+				LOGGER.log(Level.SEVERE,
+					"Error en una de las firmas del lote, se continua con el siguiente elemento: " + e, //$NON-NLS-1$
+					e
 				);
 				continue;
 			}
@@ -128,6 +130,7 @@ public final class SignBatchConcurrent extends SignBatch {
 	@Override
 	public String doPostBatch(final X509Certificate[] certChain,
                               final TriphaseData td) throws BatchException {
+
 		if (td == null) {
 			throw new IllegalArgumentException(
 				"Los datos de sesion trifasica no pueden ser nulos" //$NON-NLS-1$
@@ -185,13 +188,15 @@ public final class SignBatchConcurrent extends SignBatch {
 
 					if (this.stopOnError) {
 						LOGGER.severe(
-							"Error en una de las firmas del lote (" + tmp.getSignatureId() + "), se parara el proceso: " + tmp.getError() //$NON-NLS-1$ //$NON-NLS-2$
-						);
+								"Error en una de las firmas del lote (" + tmp.getSignatureId() + "), se parara el proceso: " + tmp.getError() //$NON-NLS-1$ //$NON-NLS-2$
+								);
 						ignoreRemaining = true;
 					}
-					LOGGER.severe(
-						"Error en una de las firmas del lote (" + tmp.getSignatureId() + "), se continua con el siguiente elemento: " + tmp.getError() //$NON-NLS-1$ //$NON-NLS-2$
-					);
+					else {
+						LOGGER.warning(
+								"Error en una de las firmas del lote (" + tmp.getSignatureId() + "), se continua con el siguiente elemento: " + tmp.getError() //$NON-NLS-1$ //$NON-NLS-2$
+								);
+					}
 				}
 				// Si todo fue bien
 				else {
@@ -204,7 +209,7 @@ public final class SignBatchConcurrent extends SignBatch {
 			// llegado a procesar
 			else {
 				getSingleSignById(tmp.getSignatureId()).setProcessResult(
-					ProcessResult.PROCESS_RESULT_SKYPPED
+					ProcessResult.PROCESS_RESULT_SKIPPED
 				);
 			}
 
@@ -242,7 +247,7 @@ public final class SignBatchConcurrent extends SignBatch {
 			);
 		}
 
-		for (final Future<CallableResult> f : results) {
+		for (final Future<CallableResult> f : saveResults) {
 			final CallableResult result;
 			try {
 				result = f.get();

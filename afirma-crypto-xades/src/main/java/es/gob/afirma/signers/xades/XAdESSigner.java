@@ -39,7 +39,6 @@ import javax.xml.crypto.dsig.XMLSignatureFactory;
 import javax.xml.crypto.dsig.spec.TransformParameterSpec;
 import javax.xml.crypto.dsig.spec.XPathFilterParameterSpec;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.OutputKeys;
 
 import net.java.xades.security.xml.XAdES.CommitmentTypeIndication;
 import net.java.xades.security.xml.XAdES.DataObjectFormat;
@@ -49,11 +48,11 @@ import net.java.xades.security.xml.XAdES.XAdES;
 import net.java.xades.security.xml.XAdES.XAdES_EPES;
 
 import org.w3c.dom.Document;
-import org.w3c.dom.DocumentType;
 import org.w3c.dom.Element;
 
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.AOUnsupportedSignFormatException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.MimeHelper;
@@ -264,22 +263,48 @@ public final class XAdESSigner {
 		final boolean facturaeSign = Boolean.parseBoolean(extraParams.getProperty(
 		        XAdESExtraParams.FACTURAE_SIGN, Boolean.FALSE.toString()));
 
+		final String outputXmlEncoding = extraParams.getProperty(
+		        XAdESExtraParams.OUTPUT_XML_ENCODING);
+
 		String mimeType = extraParams.getProperty(
-		        XAdESExtraParams.MIME_TYPE, XMLConstants.DEFAULT_MIMETYPE);
+		        XAdESExtraParams.XMLDSIG_OBJECT_MIME_TYPE, XMLConstants.DEFAULT_MIMETYPE);
 
 		String encoding = extraParams.getProperty(
-		        XAdESExtraParams.ENCODING);
+		        XAdESExtraParams.XMLDSIG_OBJECT_ENCODING);
 
+		// Dejamos que indiquen "base64" en vez de la URI, hacemos el cambio manualmente
 		if ("base64".equalsIgnoreCase(encoding)) { //$NON-NLS-1$
 			encoding = XMLConstants.BASE64_ENCODING;
 		}
 
+		// Comprobamos que sea una URI
+		if (encoding != null && !encoding.isEmpty()) {
+			try {
+				new URI(encoding);
+			}
+			catch(final Exception e) {
+				throw new AOException(
+					"La codificacion indicada en 'encoding' debe ser una URI: " + e, e //$NON-NLS-1$
+				);
+			}
+		}
+
+		final boolean keepKeyInfoUnsigned = Boolean.parseBoolean(extraParams.getProperty(
+		        XAdESExtraParams.KEEP_KEYINFO_UNSIGNED, Boolean.FALSE.toString()));
+
 		// ********** FIN LECTURA PARAMETROS ADICIONALES *************************************************
 		// ***********************************************************************************************
 
+		// Comprobamos que no se use MANIFEST con Enveloped
+		if (format.equals(AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED) && useManifest) {
+			throw new AOUnsupportedSignFormatException(
+				"El formato Enveloped es incompatible con el uso de estructuras Manifest" //$NON-NLS-1$
+			);
+		}
+
 		URI uri = null;
 		try {
-			uri = extraParams.getProperty( XAdESExtraParams.URI) != null ?
+			uri = extraParams.getProperty(XAdESExtraParams.URI) != null ?
 				AOUtil.createURI(extraParams.getProperty( XAdESExtraParams.URI)) :
 					null;
 		}
@@ -305,7 +330,7 @@ public final class XAdESSigner {
 		}
 
 		// Propiedades del documento XML original
-		final Map<String, String> originalXMLProperties = new Hashtable<String, String>();
+		Map<String, String> originalXMLProperties = new Hashtable<String, String>();
 
 		// Factoria XML
 		final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -368,33 +393,8 @@ public final class XAdESSigner {
 			// ** Fin obtencion de la hoja de estilo del XML **
 			// ************************************************
 
-			// Si no hay asignado un MimeType o es el por defecto
-			// establecemos el de XML
-			if (mimeType == null || XMLConstants.DEFAULT_MIMETYPE.equals(mimeType)) {
-				mimeType = "text/xml"; //$NON-NLS-1$
-			}
-
-			// Obtenemos el encoding del documento original
-			if (encoding == null) {
-				encoding = docum.getXmlEncoding();
-			}
-
-			// Hacemos la comprobacion del Base64 por si se establecido desde fuera
-			if (encoding != null && !XMLConstants.BASE64_ENCODING.equals(encoding)) {
-				originalXMLProperties.put(OutputKeys.ENCODING, encoding);
-			}
-
-			String tmpXmlProp = docum.getXmlVersion();
-			if (tmpXmlProp != null) {
-				originalXMLProperties.put(OutputKeys.VERSION, tmpXmlProp);
-			}
-			final DocumentType dt = docum.getDoctype();
-			if (dt != null) {
-				tmpXmlProp = dt.getSystemId();
-				if (tmpXmlProp != null) {
-					originalXMLProperties.put(OutputKeys.DOCTYPE_SYSTEM, tmpXmlProp);
-				}
-			}
+			// Obtenemos las propiedades del documento original
+			originalXMLProperties = XAdESUtil.getOriginalXMLProperties(docum, outputXmlEncoding);
 
 			// Creamos un elemento raiz nuevo unicamente si es necesario
 			if (format.equals(AOSignConstants.SIGN_FORMAT_XADES_DETACHED)) {
@@ -422,10 +422,6 @@ public final class XAdESSigner {
 				else {
 					dataElement = docum.createElement(AOXAdESSigner.DETACHED_CONTENT_ELEMENT_NAME);
 					dataElement.setAttributeNS(null, ID_IDENTIFIER, contentId);
-					dataElement.setAttributeNS(null, AOXAdESSigner.MIMETYPE_STR, mimeType);
-					if (encoding != null && !"".equals(encoding)) { //$NON-NLS-1$
-						dataElement.setAttributeNS(null, AOXAdESSigner.ENCODING_STR, encoding);
-					}
 					dataElement.appendChild(docum.getDocumentElement());
 				}
 
@@ -435,9 +431,9 @@ public final class XAdESSigner {
 						final Element tmpStyleElement = docum.createElement(AOXAdESSigner.DETACHED_STYLE_ELEMENT_NAME);
 						tmpStyleElement.setAttributeNS(null, ID_IDENTIFIER, styleId);
 						if (xmlStyle.getStyleType() != null) {
-							tmpStyleElement.setAttributeNS(null, AOXAdESSigner.MIMETYPE_STR, xmlStyle.getStyleType());
+							tmpStyleElement.setAttributeNS(null, AOXAdESSigner.XMLDSIG_ATTR_MIMETYPE_STR, xmlStyle.getStyleType());
 						}
-						tmpStyleElement.setAttributeNS(null, AOXAdESSigner.ENCODING_STR, xmlStyle.getStyleEncoding());
+						tmpStyleElement.setAttributeNS(null, AOXAdESSigner.XMLDSIG_ATTR_ENCODING_STR, xmlStyle.getStyleEncoding());
 						tmpStyleElement.appendChild(docum.adoptNode(xmlStyle.getStyleElement().cloneNode(true)));
 						xmlStyle.setStyleElement(tmpStyleElement);
 					}
@@ -465,7 +461,7 @@ public final class XAdESSigner {
 			// Error cuando los datos no son XML y se pide firma enveloped o si se pide firmar
 			// un nodo XML especifico
 			if (AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED.equals(format) || nodeToSign != null) {
-				throw new InvalidXMLException(e);
+				throw new InvalidXMLException("Las firmas XAdES Enveloped solo pueden realizarse sobre datos XML", e); //$NON-NLS-1$
 			}
 
 			// Para los formatos de firma internally detached y enveloping se trata de convertir el documento a base64
@@ -485,13 +481,13 @@ public final class XAdESSigner {
 					}
 
 					dataElement.setAttributeNS(null, ID_IDENTIFIER, contentId);
-					dataElement.setAttributeNS(null, AOXAdESSigner.MIMETYPE_STR, mimeType);
+					dataElement.setAttributeNS(null, AOXAdESSigner.XMLDSIG_ATTR_MIMETYPE_STR, mimeType);
 
-					// Si es base 64, lo firmamos indicando como contenido el dato pero, ya que puede
+					// Si es Base64, lo firmamos indicando como contenido el dato pero, ya que puede
 					// poseer un formato particular o caracteres valido pero extranos para el XML,
 					// realizamos una decodificacion y recodificacion para asi homogenizar el formato.
-					if (AOUtil.isBase64(data)
-							&& (XMLConstants.BASE64_ENCODING.equals(encoding) || "base64".equalsIgnoreCase(encoding))) { //$NON-NLS-1$
+					if (Base64.isBase64(data) && XMLConstants.BASE64_ENCODING.equals(encoding)) {
+
 						XAdESSigner.LOGGER.info(
 							"El documento se ha indicado como Base64, se insertara como tal en el XML" //$NON-NLS-1$
 						);
@@ -502,7 +498,7 @@ public final class XAdESSigner {
 						final MimeHelper mimeTypeHelper = new MimeHelper(decodedData);
 						final String tempMimeType = mimeTypeHelper.getMimeType();
 						mimeType = tempMimeType != null ? tempMimeType : XMLConstants.DEFAULT_MIMETYPE;
-						dataElement.setAttributeNS(null, AOXAdESSigner.MIMETYPE_STR, mimeType);
+						dataElement.setAttributeNS(null, AOXAdESSigner.XMLDSIG_ATTR_MIMETYPE_STR, mimeType);
 						dataElement.setTextContent(Base64.encode(decodedData));
 					}
 					else {
@@ -521,7 +517,7 @@ public final class XAdESSigner {
 							final MimeHelper mimeTypeHelper = new MimeHelper(data);
 							final String tempMimeType = mimeTypeHelper.getMimeType();
 							mimeType = tempMimeType != null ? tempMimeType : XMLConstants.DEFAULT_MIMETYPE;
-							dataElement.setAttributeNS(null, AOXAdESSigner.MIMETYPE_STR, mimeType);
+							dataElement.setAttributeNS(null, AOXAdESSigner.XMLDSIG_ATTR_MIMETYPE_STR, mimeType);
 						}
 
 						dataElement.setTextContent(Base64.encode(data));
@@ -529,10 +525,9 @@ public final class XAdESSigner {
 					}
 					isBase64 = true;
 					encoding = XMLConstants.BASE64_ENCODING;
-					dataElement.setAttributeNS(null, AOXAdESSigner.ENCODING_STR, encoding);
 				}
 				catch (final Exception ex) {
-					throw new AOException("Error al convertir los datos a base64", ex); //$NON-NLS-1$
+					throw new AOException("Error al convertir los datos a Base64", ex); //$NON-NLS-1$
 				}
 			}
 
@@ -835,7 +830,7 @@ public final class XAdESSigner {
 			// No tenemos uri, suponemos que los datos son el message digest
 			if (precalculatedHashAlgorithm != null &&
 					(uri == null ||
-			         uri.getScheme().equals("") || //$NON-NLS-1$
+			         uri.getScheme().isEmpty() ||
 			         uri.getScheme().equals("file"))) { //$NON-NLS-1$
 
 				final DigestMethod dm;
@@ -966,7 +961,7 @@ public final class XAdESSigner {
 				if (nodeToSign == null) {
 					// Tiene la raiz un Id?
 					final String ident = docSignature.getDocumentElement().getAttribute(ID_IDENTIFIER);
-					if (ident != null && !"".equals(ident)) { //$NON-NLS-1$
+					if (ident != null && !ident.isEmpty()) {
 						nodeToSign = ident;
 					}
 				}
@@ -1054,7 +1049,7 @@ public final class XAdESSigner {
 			AOXAdESSigner.XML_SIGNATURE_PREFIX,   // XMLDSig Prefix
 			digestMethodAlgorithm,                // DigestMethod
 			docSignature,                         // Document
-			signatureInsertionNode != null ?                     // Nodo donde se inserta la firma (como hijo), si no se indica se usa la raiz
+			signatureInsertionNode != null ?      // Nodo donde se inserta la firma (como hijo), si no se indica se usa la raiz
 				signatureInsertionNode:
 					docSignature.getDocumentElement()
 		);
@@ -1174,7 +1169,8 @@ public final class XAdESSigner {
 				referenceList,
 				"Signature-" + UUID.randomUUID().toString(), //$NON-NLS-1$
 				addKeyInfoKeyValue,
-				addKeyInfoKeyName
+				addKeyInfoKeyName,
+				keepKeyInfoUnsigned
 			);
 
 		}

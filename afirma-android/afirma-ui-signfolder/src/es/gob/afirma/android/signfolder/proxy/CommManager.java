@@ -1,6 +1,5 @@
 package es.gob.afirma.android.signfolder.proxy;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -17,7 +16,6 @@ import org.xml.sax.SAXException;
 import android.util.Log;
 import es.gob.afirma.android.network.AndroidUrlHttpManager;
 import es.gob.afirma.android.signfolder.SFConstants;
-import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 
 /** Gestor de comunicaciones con el servidor de portafirmas m&oacute;vil.
@@ -95,11 +93,11 @@ public final class CommManager {
 		sb.append("="); //$NON-NLS-1$
 		sb.append(dataB64UrlSafe);
 
-		Log.i("es.gob.afirma", "URL de peticion:"); //$NON-NLS-1$ //$NON-NLS-2$"
-		final String urlString = sb.toString();
-		for (int i = 0; i < urlString.length() / 1000 + 1; i++) {
-			Log.i("es.gob.afirma", urlString .substring(i * 1000, Math.min((i + 1) * 1000, urlString.length())));
-		}
+//		Log.i(SFConstants.LOG_TAG, "URL de peticion:"); //$NON-NLS-1$ //"
+//		final String urlString = sb.toString();
+//		for (int i = 0; i < urlString.length() / 1000 + 1; i++) {
+//			Log.i(SFConstants.LOG_TAG, urlString .substring(i * 1000, Math.min((i + 1) * 1000, urlString.length())));
+//		}
 
 		return sb.toString();
 	}
@@ -401,17 +399,7 @@ public final class CommManager {
 		}
 
 		final InputStream is = AndroidUrlHttpManager.getRemoteDataByPost(url, this.timeout);
-
-//TODO: Borrar
-		final byte[] data = AOUtil.getDataFromInputStream(is);
-
-		final String xml = new String(data);
-		Log.i(SFConstants.LOG_TAG, "XML respuesta:\n" + xml);
-
-		final Document doc = this.db.parse(new ByteArrayInputStream(xml.getBytes("utf-8")));
-		//final Document doc = this.db.parse(new ByteArrayInputStream(data));
-
-//		final Document doc = this.db.parse(is);
+		final Document doc = this.db.parse(is);
 		is.close();
 
 		if (url.startsWith(HTTPS)) {

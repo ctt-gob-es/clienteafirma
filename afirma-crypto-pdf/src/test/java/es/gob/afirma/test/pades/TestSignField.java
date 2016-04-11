@@ -119,6 +119,58 @@ public class TestSignField {
 
 	//TODO: Averiguar porque en MAVEN no encuentra la fuente Helvetica
 
+	/** Prueba de firma PDF visible en p&aacute;gina nueva en el PDF.
+	 * @throws Exception En cualquier error. */
+	@SuppressWarnings("static-method")
+	@Test
+	public void testNewPage() throws Exception {
+
+		Logger.getLogger("es.gob.afirma").info( //$NON-NLS-1$
+			"Prueba de firma de PDF con nueva pagina" //$NON-NLS-1$
+		);
+
+		final PrivateKeyEntry pke;
+
+        final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
+        ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH), CERT_PASS.toCharArray());
+        pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
+
+		final Properties extraParams = new Properties();
+		extraParams.put("signaturePage", "append"); //$NON-NLS-1$ //$NON-NLS-2$
+		extraParams.put("signaturePositionOnPageLowerLeftX", "100"); //$NON-NLS-1$ //$NON-NLS-2$
+		extraParams.put("signaturePositionOnPageLowerLeftY", "100"); //$NON-NLS-1$ //$NON-NLS-2$
+		extraParams.put("signaturePositionOnPageUpperRightX", "300"); //$NON-NLS-1$ //$NON-NLS-2$
+		extraParams.put("signaturePositionOnPageUpperRightY", "300"); //$NON-NLS-1$ //$NON-NLS-2$
+
+		extraParams.put("layer2Text", "Firmado por $$SUBJECTCN$$ el $$SIGNDATE=dd/MM/yyyy$$."); //$NON-NLS-1$ //$NON-NLS-2$
+		extraParams.put("layer2FontFamily", "1"); //$NON-NLS-1$ //$NON-NLS-2$
+		extraParams.put("layer2FontSize", "14"); //$NON-NLS-1$ //$NON-NLS-2$
+		extraParams.put("layer2FontStyle", "3"); //$NON-NLS-1$ //$NON-NLS-2$
+		extraParams.put("layer2FontColor", "red"); //$NON-NLS-1$ //$NON-NLS-2$
+
+		final byte[] testPdf = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(TEST_FILE));
+
+		final AOPDFSigner signer = new AOPDFSigner();
+		final byte[] signedPdf = signer.sign(
+			testPdf,
+			DEFAULT_SIGNATURE_ALGORITHM,
+			pke.getPrivateKey(),
+			pke.getCertificateChain(),
+			extraParams
+		);
+
+		final File tempFile = File.createTempFile("afirmaPDF", ".pdf"); //$NON-NLS-1$ //$NON-NLS-2$
+
+		final FileOutputStream fos = new FileOutputStream(tempFile);
+		fos.write(signedPdf);
+		fos.close();
+
+		Logger.getLogger("es.gob.afirma").info( //$NON-NLS-1$
+			"Fichero temporal para la comprobacion manual del resultado: " + //$NON-NLS-1$
+			tempFile.getAbsolutePath()
+		);
+	}
+
 	/** Prueba de firma PDF visible sin r&uacute;brica.
 	 * @throws Exception En cualquier error. */
 	@SuppressWarnings("static-method")

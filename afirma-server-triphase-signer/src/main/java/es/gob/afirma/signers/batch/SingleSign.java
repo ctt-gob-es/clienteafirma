@@ -1,8 +1,11 @@
 package es.gob.afirma.signers.batch;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Properties;
 import java.util.UUID;
 import java.util.concurrent.Callable;
@@ -15,6 +18,7 @@ import org.w3c.dom.NodeList;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.http.DataDownloader;
 import es.gob.afirma.core.signers.TriphaseData;
 import es.gob.afirma.signers.batch.SingleSign.ProcessResult.Result;
@@ -24,6 +28,26 @@ import es.gob.afirma.signers.batch.SingleSignConstants.SignSubOperation;
 /** Firma electr&oacute;nica &uacute;nica dentro de un lote.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
 public final class SingleSign {
+
+	private static final List<String> ALLOWED_DATASOURCES;
+	static {
+		final Properties p = new Properties();
+		try {
+			p.load(SingleSign.class.getResourceAsStream("/signbatch.properties")); //$NON-NLS-1$
+		}
+		catch(final Exception e) {
+			throw new IllegalStateException(
+				"No se ha podido cargar la configuracion con los permisos para la carga de datos: " + e //$NON-NLS-1$
+			);
+		}
+		final String sources = p.getProperty("allowedsources"); //$NON-NLS-1$
+		if (sources == null || sources.isEmpty()) {
+			throw new IllegalStateException(
+				"No se ha definido ningun permiso para la carga de datos" //$NON-NLS-1$
+			);
+		}
+		ALLOWED_DATASOURCES = Arrays.asList(sources.split(";")); //$NON-NLS-1$
+	}
 
 	private static final String PROP_ID = "SignatureId"; //$NON-NLS-1$
 
@@ -57,6 +81,30 @@ public final class SingleSign {
 	}
 
 	private final SignSaver signSaver;
+
+	private static void checkDataSource(final String dataSource) {
+		if (dataSource == null) {
+			throw new IllegalArgumentException(
+				"El origen de los datos no puede ser nulo" //$NON-NLS-1$
+			);
+		}
+		for (final String allowed : ALLOWED_DATASOURCES) {
+			if ("base64".equalsIgnoreCase(allowed) && Base64.isBase64(dataSource)) { //$NON-NLS-1$
+				return;
+			}
+			if (allowed.endsWith("*")) { //$NON-NLS-1$
+				if (dataSource.startsWith(allowed.replace("*", ""))) { //$NON-NLS-1$ //$NON-NLS-2$
+					return;
+				}
+			}
+			else {
+				if (dataSource.equals(allowed)) {
+					return;
+				}
+			}
+		}
+		throw new SecurityException("Origen de datos no valido"); //$NON-NLS-1$
+	}
 
 	@Override
 	public String toString() {
@@ -131,8 +179,8 @@ public final class SingleSign {
 	 * @throws AOException Si hay problemas en la propia firma electr&oacute;nica.
 	 * @throws IOException Si hay problemas en la obtenci&oacute;n, tratamiento o gradado de datos. */
 	String doPreProcess(final X509Certificate[] certChain,
-			                   final SingleSignConstants.SignAlgorithm algorithm) throws IOException,
-			                                                                             AOException {
+			            final SingleSignConstants.SignAlgorithm algorithm) throws IOException,
+			                                                                      AOException {
 		return SingleSignPreProcessor.doPreProcess(this, certChain, algorithm);
 	}
 
@@ -256,14 +304,13 @@ public final class SingleSign {
 
 		this.dataSource = el.getElementsByTagName(XML_ELEMENT_DATASOURCE).item(0).getTextContent();
 
+		this.extraParams = new Properties();
 		final NodeList tmpNl = el.getElementsByTagName(XML_ELEMENT_EXTRAPARAMS);
-		if (tmpNl == null || tmpNl.getLength() < 1) {
-			this.extraParams = new Properties();
-		}
-		else {
-			this.extraParams = AOUtil.base642Properties(
-				tmpNl.item(0).getTextContent()
-			);
+		if (tmpNl != null && tmpNl.getLength() > 0) {
+			final String extraParamsText = new String(
+						Base64.decode(tmpNl.item(0).getTextContent())
+					).replace("\\n", "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+			this.extraParams.load(new ByteArrayInputStream(extraParamsText.getBytes()));
 		}
 
 		this.format = SignFormat.getFormat(
@@ -370,14 +417,8 @@ public final class SingleSign {
 	}
 
 	byte[] getData() throws IOException {
-		Logger.getLogger("es.gob.afirma").info( //$NON-NLS-1$
-			"Iniciando descarga de datos de: " + this.dataSource //$NON-NLS-1$
-		);
-		final byte[] ret = DataDownloader.downloadData(this.dataSource);
-		Logger.getLogger("es.gob.afirma").info( //$NON-NLS-1$
-			"Descarga desde '" + this.dataSource + "' terminada, descargados " + ret.length + " octetos" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		);
-		return ret;
+		checkDataSource(this.dataSource);
+		return DataDownloader.downloadData(this.dataSource);
 	}
 
 	static final class ProcessResult {
@@ -390,7 +431,7 @@ public final class SingleSign {
 			DONE_BUT_ERROR_SAVING,
 			ERROR_PRE,
 			ERROR_POST,
-			SKYPPED,
+			SKIPPED,
 			SAVE_ROLLBACKED;
 		}
 
@@ -403,7 +444,7 @@ public final class SingleSign {
 		}
 
 		static final ProcessResult PROCESS_RESULT_OK_UNSAVED = new ProcessResult(Result.DONE_BUT_NOT_SAVED_YET, null);
-		static final ProcessResult PROCESS_RESULT_SKYPPED    = new ProcessResult(Result.SKYPPED,                null);
+		static final ProcessResult PROCESS_RESULT_SKIPPED    = new ProcessResult(Result.SKIPPED,                null);
 		static final ProcessResult PROCESS_RESULT_DONE_SAVED = new ProcessResult(Result.DONE_AND_SAVED,         null);
 		static final ProcessResult PROCESS_RESULT_ROLLBACKED = new ProcessResult(Result.SAVE_ROLLBACKED,        null);
 

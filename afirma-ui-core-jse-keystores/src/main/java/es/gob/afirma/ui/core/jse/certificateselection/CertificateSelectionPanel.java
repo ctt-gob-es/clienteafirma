@@ -1,12 +1,13 @@
-/*
- * Este fichero forma parte del Cliente @firma.
- * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
- * y descargado desde www.ctt.map.es.
- * Copyright 2009,2010,2011 Gobierno de Espana
- * Este fichero se distribuye bajo  bajo licencia GPL version 2  segun las
- * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este
- * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
+/* Copyright (C) 2011 [Gobierno de Espana]
+ * This file is part of "Cliente @Firma".
+ * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
+ *   - the GNU General Public License as published by the Free Software Foundation;
+ *     either version 2 of the License, or (at your option) any later version.
+ *   - or The European Software License; either version 1.1 or (at your option) any later version.
+ * Date: 11/01/11
+ * You may contact the copyright holder at: soporte.afirma5@mpt.es
  */
+
 package es.gob.afirma.ui.core.jse.certificateselection;
 
 import java.awt.Color;
@@ -71,12 +72,19 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 
 	private NameCertificateBean[] certificateBeans;
 
-	CertificateSelectionPanel(final NameCertificateBean[] el, final CertificateSelectionDialog selectionDialog) {
+	CertificateSelectionPanel(final NameCertificateBean[] el,
+			                  final CertificateSelectionDialog selectionDialog,
+			                  final String dialogHeadline,
+			                  final String dialogSubHeadline,
+				              final boolean showControlButons) {
 		this.certificateBeans = el == null ? new NameCertificateBean[0] : el.clone();
-		this.createUI(selectionDialog);
+		this.createUI(selectionDialog, dialogHeadline, dialogSubHeadline, showControlButons);
 	}
 
-	private void createUI(final CertificateSelectionDialog selectionDialog) {
+	private void createUI(final CertificateSelectionDialog selectionDialog,
+			              final String dialogHeadline,
+			              final String dialogSubHeadline,
+			              final boolean showControlButons) {
 
 		this.setLayout(new GridBagLayout());
 
@@ -92,7 +100,9 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 		c.gridy = 0;
 
 		final JLabel mainMessage = new JLabel(
-			CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.0") //$NON-NLS-1$
+			dialogHeadline != null ?
+				dialogHeadline :
+					CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.0") //$NON-NLS-1$
 		);
 		mainMessage.setFont(TITLE_FONT);
 		mainMessage.setForeground(Color.decode("0x0033BC")); //$NON-NLS-1$
@@ -102,79 +112,81 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 		c.weightx = 0.0;
 		c.gridx++;
 
-		final JButton refresh = new JButton(
-			new ImageIcon(
-				UtilToolBar.class.getResource("/resources/toolbar/ic_autorenew_black_18dp.png"), //$NON-NLS-1$
+		if (showControlButons) {
+			final JButton refresh = new JButton(
+				new ImageIcon(
+					UtilToolBar.class.getResource("/resources/toolbar/ic_autorenew_black_18dp.png"), //$NON-NLS-1$
+					CertificateSelectionDialogMessages.getString("UtilToolBar.1") //$NON-NLS-1$
+				)
+			);
+			refresh.setBorder(BorderFactory.createEmptyBorder());
+			refresh.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+			refresh.getAccessibleContext().setAccessibleDescription(
 				CertificateSelectionDialogMessages.getString("UtilToolBar.1") //$NON-NLS-1$
-			)
-		);
-		refresh.setBorder(BorderFactory.createEmptyBorder());
-		refresh.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-		refresh.getAccessibleContext().setAccessibleDescription(
-			CertificateSelectionDialogMessages.getString("UtilToolBar.1") //$NON-NLS-1$
-		);
-		refresh.setToolTipText(CertificateSelectionDialogMessages.getString("UtilToolBar.1")); //$NON-NLS-1$
-		refresh.addActionListener(
-			new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					UtilActions.doRefresh(selectionDialog, CertificateSelectionPanel.this);
+			);
+			refresh.setToolTipText(CertificateSelectionDialogMessages.getString("UtilToolBar.1")); //$NON-NLS-1$
+			refresh.addActionListener(
+				new ActionListener() {
+					@Override
+					public void actionPerformed(final ActionEvent e) {
+						UtilActions.doRefresh(selectionDialog, CertificateSelectionPanel.this);
+					}
 				}
-			}
-		);
-		refresh.setBackground(Color.WHITE);
-		this.add(refresh, c);
+			);
+			refresh.setBackground(Color.WHITE);
+			this.add(refresh, c);
 
-		c.gridx++;
+			c.gridx++;
 
-		final JButton open = new JButton(
-			new ImageIcon(
-				UtilToolBar.class.getResource("/resources/toolbar/ic_open_in_browser_black_18dp.png"), //$NON-NLS-1$
+			final JButton open = new JButton(
+				new ImageIcon(
+					UtilToolBar.class.getResource("/resources/toolbar/ic_open_in_browser_black_18dp.png"), //$NON-NLS-1$
+					CertificateSelectionDialogMessages.getString("UtilToolBar.2") //$NON-NLS-1$
+				)
+			);
+			open.setBorder(BorderFactory.createEmptyBorder());
+			open.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+			open.getAccessibleContext().setAccessibleDescription(
 				CertificateSelectionDialogMessages.getString("UtilToolBar.2") //$NON-NLS-1$
-			)
-		);
-		open.setBorder(BorderFactory.createEmptyBorder());
-		open.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-		open.getAccessibleContext().setAccessibleDescription(
-			CertificateSelectionDialogMessages.getString("UtilToolBar.2") //$NON-NLS-1$
-		);
-		open.setToolTipText(CertificateSelectionDialogMessages.getString("UtilToolBar.2")); //$NON-NLS-1$
-		open.addActionListener(
-			new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					UtilActions.doOpen(selectionDialog, CertificateSelectionPanel.this);
+			);
+			open.setToolTipText(CertificateSelectionDialogMessages.getString("UtilToolBar.2")); //$NON-NLS-1$
+			open.addActionListener(
+				new ActionListener() {
+					@Override
+					public void actionPerformed(final ActionEvent e) {
+						UtilActions.doOpen(selectionDialog, CertificateSelectionPanel.this);
+					}
 				}
-			}
-		);
-		open.setBackground(Color.WHITE);
-		this.add(open, c);
+			);
+			open.setBackground(Color.WHITE);
+			this.add(open, c);
 
-		c.insets = new Insets(13, 0, 8, 15);
-		c.gridx++;
+			c.insets = new Insets(13, 0, 8, 15);
+			c.gridx++;
 
-		final JButton help = new JButton(
-			new ImageIcon(
-				UtilToolBar.class.getResource("/resources/toolbar/ic_help_black_18dp.png"), //$NON-NLS-1$
+			final JButton help = new JButton(
+				new ImageIcon(
+					UtilToolBar.class.getResource("/resources/toolbar/ic_help_black_18dp.png"), //$NON-NLS-1$
+					CertificateSelectionDialogMessages.getString("UtilToolBar.3") //$NON-NLS-1$
+				)
+			);
+			help.setBorder(BorderFactory.createEmptyBorder());
+			help.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+			help.getAccessibleContext().setAccessibleDescription(
 				CertificateSelectionDialogMessages.getString("UtilToolBar.3") //$NON-NLS-1$
-			)
-		);
-		help.setBorder(BorderFactory.createEmptyBorder());
-		help.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-		help.getAccessibleContext().setAccessibleDescription(
-			CertificateSelectionDialogMessages.getString("UtilToolBar.3") //$NON-NLS-1$
-		);
-		help.setToolTipText(CertificateSelectionDialogMessages.getString("UtilToolBar.3")); //$NON-NLS-1$
-		help.addActionListener(
-			new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					UtilActions.doHelp();
+			);
+			help.setToolTipText(CertificateSelectionDialogMessages.getString("UtilToolBar.3")); //$NON-NLS-1$
+			help.addActionListener(
+				new ActionListener() {
+					@Override
+					public void actionPerformed(final ActionEvent e) {
+						UtilActions.doHelp();
+					}
 				}
-			}
-		);
-		help.setBackground(Color.WHITE);
-		this.add(help, c);
+			);
+			help.setBackground(Color.WHITE);
+			this.add(help, c);
+		}
 
 		c.gridwidth = 4;
 		c.gridx = 0;
@@ -186,7 +198,9 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 			final JTextPane textMessage = new JTextPane();
 			textMessage.setOpaque(false);
 			textMessage.setText(
-				CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.1") //$NON-NLS-1$
+				dialogSubHeadline != null ?
+					dialogSubHeadline :
+						CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.1") //$NON-NLS-1$
 			);
 			textMessage.setFont(TEXT_FONT);
 			textMessage.setBorder(null);

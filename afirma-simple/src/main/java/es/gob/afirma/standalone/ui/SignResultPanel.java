@@ -20,7 +20,6 @@ import java.awt.Image;
 import java.awt.Insets;
 import java.awt.event.KeyListener;
 import java.io.InputStream;
-import java.net.URI;
 import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
@@ -147,27 +146,27 @@ final class SignResultPanel extends JPanel {
         	resultOperationIcon.setToolTipText(resultOperationIconTooltip);
         }
 
-        final EditorFocusManager editorFocusManager = new EditorFocusManager (this.descTextLabel, new EditorFocusManagerAction() {
-            @Override
-            public void openHyperLink(final HyperlinkEvent he, final int linkIndex) {
-                try {
-                    if (he.getURL() != null) {
-                        Desktop.getDesktop().browse(he.getURL().toURI());
-                    }
-                    else {
-                        Desktop.getDesktop().browse(new URI(SimpleAfirmaMessages.getString("SignResultPanel.23." + linkIndex))); //$NON-NLS-1$
-                    }
-                }
-                catch (final Exception e) {
-                	AOUIFactory.showErrorMessage(
-                        SignResultPanel.this,
-                        SimpleAfirmaMessages.getString("SignResultPanel.0") + he.getURL(), //$NON-NLS-1$
-                        SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
-                        JOptionPane.ERROR_MESSAGE
-                    );
-                }
-            }
-        });
+        final EditorFocusManager editorFocusManager = new EditorFocusManager(
+    		this.descTextLabel,
+    		new EditorFocusManagerAction() {
+	            @Override
+	            public void openHyperLink(final HyperlinkEvent he, final int linkIndex) {
+	                try {
+	                    if (he.getURL() != null) {
+	                        Desktop.getDesktop().browse(he.getURL().toURI());
+	                    }
+	                }
+	                catch (final Exception e) {
+	                	AOUIFactory.showErrorMessage(
+	                        SignResultPanel.this,
+	                        SimpleAfirmaMessages.getString("SignResultPanel.0") + he.getURL(), //$NON-NLS-1$
+	                        SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
+	                        JOptionPane.ERROR_MESSAGE
+	                    );
+	                }
+	            }
+	        }
+		);
 
         this.descTextLabel.addFocusListener(editorFocusManager);
         this.descTextLabel.addHyperlinkListener(editorFocusManager);

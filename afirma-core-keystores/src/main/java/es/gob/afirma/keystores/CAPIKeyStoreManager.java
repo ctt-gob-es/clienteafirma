@@ -1,3 +1,13 @@
+/* Copyright (C) 2011 [Gobierno de Espana]
+ * This file is part of "Cliente @Firma".
+ * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
+ *   - the GNU General Public License as published by the Free Software Foundation;
+ *     either version 2 of the License, or (at your option) any later version.
+ *   - or The European Software License; either version 1.1 or (at your option) any later version.
+ * Date: 11/01/11
+ * You may contact the copyright holder at: soporte.afirma5@mpt.es
+ */
+
 package es.gob.afirma.keystores;
 
 import java.io.IOException;
@@ -10,7 +20,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.Provider;
 import java.security.Security;
 import java.security.UnrecoverableEntryException;
-import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Collection;
 import java.util.Collections;
@@ -19,6 +28,7 @@ import javax.security.auth.callback.PasswordCallback;
 
 import es.gob.afirma.core.InvalidOSException;
 import es.gob.afirma.core.misc.Platform;
+import es.gob.afirma.keystores.callbacks.FirstEmptyThenPinUiPasswordCallback;
 
 /** Clase gestora de claves y certificados en los almacenes <i>ROOT</i> y <i>MY</i> de CAPI.
  * @version 0.1 */
@@ -187,9 +197,11 @@ public final class CAPIKeyStoreManager extends AOKeyStoreManager {
 
 	        // Si no se ha agregado el proveedor CAPI de Sun, lo anadimos
 	        // En java 6 viene instalado de serie, pero no pasa nada por reinstalarlo
-	        if (Security.getProvider("SunMSCAPI") == null) { //$NON-NLS-1$
+	        Provider capiProvider = Security.getProvider("SunMSCAPI"); //$NON-NLS-1$
+	        if (capiProvider == null) {
 	            try {
-	                Security.addProvider((Provider) Class.forName("sun.security.mscapi.SunMSCAPI").newInstance()); //$NON-NLS-1$
+	            	capiProvider = (Provider) Class.forName("sun.security.mscapi.SunMSCAPI").newInstance(); //$NON-NLS-1$
+	                Security.addProvider(capiProvider);
 	            }
 	            catch(final Exception e) {
 	            	LOGGER.severe("No se ha podido instanciar 'sun.security.mscapi.SunMSCAPI': " + e); //$NON-NLS-1$
@@ -199,21 +211,17 @@ public final class CAPIKeyStoreManager extends AOKeyStoreManager {
 
 	        // Inicializamos
 	        try {
-	        	capiKsMy = KeyStore.getInstance(AOKeyStore.WINDOWS.getProviderName());
-	        }
+	        	capiKsMy = KeyStoreUtilities.getKeyStoreWithPasswordCallbackHandler(
+	        		AOKeyStore.WINDOWS,
+					new FirstEmptyThenPinUiPasswordCallback(
+						KeyStoreMessages.getString("CAPIKeyStoreManager.0") //$NON-NLS-1$
+					),
+					capiProvider,
+					null
+				);
+			}
 	        catch (final Exception e) {
-	            throw new AOKeyStoreManagerException("No se ha podido obtener el almacen Windows.MY: " + e, e); //$NON-NLS-1$
-	        }
-
-	        LOGGER.info("Cargando KeyStore de Windows"); //$NON-NLS-1$
-	        try {
-	        	capiKsMy.load(null, null);
-	        }
-	        catch (final CertificateException e) {
-	            throw new AOKeyStoreManagerException("No se han podido cargar los certificados del almacen Windows.MY: " + e, e); //$NON-NLS-1$
-	        }
-	        catch (final NoSuchAlgorithmException e) {
-	        	throw new AOKeyStoreManagerException("No se ha podido verificar la integridad del almacen Windows.MY: " + e, e); //$NON-NLS-1$
+	        	throw new AOKeyStoreManagerException("No se ha podido obtener el almacen Windows.MY: " + e, e); //$NON-NLS-1$
 			}
 
 	        // Tratamos los alias repetidos, situacion problematica afectada por el bug

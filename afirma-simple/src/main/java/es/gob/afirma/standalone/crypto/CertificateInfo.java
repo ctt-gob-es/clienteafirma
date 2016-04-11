@@ -42,7 +42,7 @@ public final class CertificateInfo {
     		        final String iTooltip) {
 
 		final boolean isMac = Platform.OS.MACOSX.equals(Platform.getOS());
-    	if (description == null || "".equals(description)) {  //$NON-NLS-1$
+    	if (description == null || description.isEmpty()) {
         	if (cert == null) {
         		this.descriptionText = SimpleAfirmaMessages.getString("CertificateInfo.0"); //$NON-NLS-1$
         	}
@@ -85,22 +85,19 @@ public final class CertificateInfo {
     }
 
     /** Obtiene el icono del certificado.
-     * @return Icono del certificado
-     */
+     * @return Icono del certificado. */
     public Icon getIcon() {
         return this.icon;
     }
 
     /** Obtiene el texto del <i>tooltip</i> para el icono del certificado.
-     * @return Texto del <i>tooltip</i> para el icono del certificado.
-     */
+     * @return Texto del <i>tooltip</i> para el icono del certificado. */
     public String getIconTooltip() {
     	return this.iconTooltip;
     }
 
     /** Obtiene un texto descriptivo del certificado.
-     * @return Descripci&oacute;n del certificado
-     */
+     * @return Descripci&oacute;n del certificado. */
     public String getDescriptionText() {
         return this.descriptionText;
     }

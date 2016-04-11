@@ -2,7 +2,6 @@ package es.gob.afirma.standalone.ui.pdf;
 
 import java.awt.Dimension;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.util.List;
 import java.util.Properties;
 
@@ -21,12 +20,13 @@ public final class UiTester {
 
 	//private final static String TEST_FILE = "sec1-v2.pdf"; //$NON-NLS-1$
 	private final static String TEST_FILE = "PDF_MULTISIZE.pdf"; //$NON-NLS-1$
+	private final static boolean IS_SIGN = false;
 
 	/** Prueba de di&aacute;logo fallido. */
 	@SuppressWarnings({ "static-method" })
 	@Test
 	public void testFailedDialog() {
-		SignPdfDialog.getVisibleSignatureExtraParams(new byte[] { (byte) 0xff, (byte) 0xff, (byte) 0xff }, null, new SignPdfDialogListener() {
+		SignPdfDialog.getVisibleSignatureExtraParams(IS_SIGN, new byte[] { (byte) 0xff, (byte) 0xff, (byte) 0xff }, null, new SignPdfDialogListener() {
 			@Override
 			public void propertiesCreated(final Properties extraParams) {
 				// Vacio
@@ -41,6 +41,7 @@ public final class UiTester {
 	public void testDialog() throws Exception {
 		final byte[] testPdf = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(TEST_FILE));
 		SignPdfDialog.getVisibleSignatureExtraParams(
+				IS_SIGN,
 				testPdf,
 				null,
 				new SignPdfDialogListener() {
@@ -66,14 +67,16 @@ public final class UiTester {
 		frame.setBounds(100, 20, 900, 900);
 
 		PdfLoader.loadPdfWithProgressDialog(
+			IS_SIGN,
 			frame,
 			testPdf,
 			new PdfLoaderListener() {
 				@Override
-				public void pdfLoaded(final List<BufferedImage> pages, final List<Dimension> pageSizes) {
+				public void pdfLoaded(final boolean isSign, final List<BufferedImage> pages, final List<Dimension> pageSizes) {
 					System.out.println("Cargado"); //$NON-NLS-1$
 					frame.add(
 						new SignPdfUiPanel(
+							isSign,
 							pages,
 							pageSizes,
 							new SignPdfUiPanelListener() {
@@ -92,7 +95,8 @@ public final class UiTester {
 									System.exit(0);
 								}
 
-							}
+							},
+							null
 						)
 					);
 					frame.pack();
@@ -100,7 +104,7 @@ public final class UiTester {
 
 				}
 				@Override
-				public void pdfLoadedFailed(final IOException cause) {
+				public void pdfLoadedFailed(final Throwable cause) {
 					cause.printStackTrace();
 				}
 			}

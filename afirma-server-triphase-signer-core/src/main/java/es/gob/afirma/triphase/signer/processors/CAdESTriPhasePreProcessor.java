@@ -5,11 +5,10 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
-import java.util.Arrays;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.AOException;
@@ -23,11 +22,9 @@ import es.gob.afirma.core.signers.TriphaseData.TriSign;
 import es.gob.afirma.signers.cades.CAdESSignerMetadataHelper;
 import es.gob.afirma.signers.cades.CAdESTriPhaseSigner;
 import es.gob.afirma.signers.cades.CommitmentTypeIndicationsHelper;
-import es.gob.afirma.signers.multi.cades.AOCAdESCounterSigner;
-import es.gob.afirma.signers.multi.cades.CAdESTriPhaseCoSigner;
 import es.gob.afirma.signers.pkcs7.ObtainContentSignedData;
+import es.gob.afirma.triphase.signer.cades.AOCAdESTriPhaseCoSigner;
 import es.gob.afirma.triphase.signer.cades.AOCAdESTriPhaseCounterSigner;
-import es.gob.afirma.triphase.signer.cades.CAdESFakePkcs1Signer;
 
 /** Procesador de firmas trif&aacute;sicas CAdES.
  * @author Tom&aacute;s Garc&iacute;a Mer&aacute;s. */
@@ -44,12 +41,6 @@ public class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 
 	/** Etiqueta de firma PKCS#1 en el XML de sesi&oacute;n trif&aacute;sica. */
 	private static final String PROPERTY_NAME_PKCS1_SIGN = "PK1"; //$NON-NLS-1$
-
-	/** Etiqueta de firma PKCS#1 temporal en el XML de sesi&oacute;n trif&aacute;sica. */
-	private static final String PROPERTY_NAME_DUMMY_PK1 = "DPK1"; //$NON-NLS-1$
-
-	/** Etiqueta de fecha de firma en el XML de sesi&oacute;n trif&aacute;sica. */
-	private static final String PARAM_DATE = "DATE"; //$NON-NLS-1$
 
 	/** Manejador de log. */
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
@@ -126,7 +117,8 @@ public class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 					contentTypeOid,
 					contentDescription,
 					CommitmentTypeIndicationsHelper.getCommitmentTypeIndications(extraParams),
-					CAdESSignerMetadataHelper.getCAdESSignerMetadata(extraParams)
+					CAdESSignerMetadataHelper.getCAdESSignerMetadata(extraParams),
+	                Boolean.parseBoolean(extraParams.getProperty("doNotIncludePolicyOnSigningCertificate", "false")) //$NON-NLS-1$ //$NON-NLS-2$
 				);
 
 		LOGGER.info("Se prepara la respuesta de la prefirma CAdES"); //$NON-NLS-1$
@@ -134,7 +126,7 @@ public class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 		// Generamos el mensaje para la configuracion de la operacion
 		final TriphaseData triphaseData = new TriphaseData();
 
-		final Map<String, String> signConfig = new HashMap<String, String>();
+		final Map<String, String> signConfig = new ConcurrentHashMap<String, String>();
 		signConfig.put(PROPERTY_NAME_PRESIGN, Base64.encode(presign));
 		signConfig.put(PROPERTY_NAME_NEED_PRE, Boolean.TRUE.toString());
 		if (!omitContent) {
@@ -170,11 +162,13 @@ public class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 	}
 
 	@Override
-	public byte[] preProcessPostSign(final byte[] data, final String algorithm,
-			final X509Certificate[] cert, final Properties extraParams,
-			final TriphaseData triphaseData) throws NoSuchAlgorithmException,
-			IOException, AOException {
-
+	public byte[] preProcessPostSign(final byte[] data,
+			                         final String algorithm,
+			                         final X509Certificate[] cert,
+			                         final Properties extraParams,
+			                         final TriphaseData triphaseData) throws NoSuchAlgorithmException,
+			                                                                 IOException,
+			                                                                 AOException {
 		LOGGER.info("Postfirma CAdES - Firma - INICIO"); //$NON-NLS-1$
 
 		if (triphaseData == null) {
@@ -265,7 +259,7 @@ public class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 		LOGGER.info("Se invocan las funciones internas de pre-cofirma CAdES"); //$NON-NLS-1$
 		final byte[] presign;
 		try {
-			presign = CAdESTriPhaseCoSigner.preCoSign(
+			presign = AOCAdESTriPhaseCoSigner.preCoSign(
 				data,
 				algorithm,
 				cert,
@@ -277,7 +271,8 @@ public class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 				new Date(),
 				Boolean.parseBoolean(extraParams.getProperty("includeSigningTimeAttribute", "false")), //$NON-NLS-1$ //$NON-NLS-2$
 				CommitmentTypeIndicationsHelper.getCommitmentTypeIndications(extraParams),
-				CAdESSignerMetadataHelper.getCAdESSignerMetadata(extraParams)
+				CAdESSignerMetadataHelper.getCAdESSignerMetadata(extraParams),
+                Boolean.parseBoolean(extraParams.getProperty("doNotIncludePolicyOnSigningCertificate", "false")) //$NON-NLS-1$ //$NON-NLS-2$
 			);
 		}
 		catch (final CertificateEncodingException e) {
@@ -294,7 +289,7 @@ public class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 
 		final TriphaseData triphaseData = new TriphaseData();
 
-		final Map<String, String> signConfig = new HashMap<String, String>();
+		final Map<String, String> signConfig = new ConcurrentHashMap<String, String>();
 		signConfig.put(PROPERTY_NAME_PRESIGN, presignB64);
 		signConfig.put(PROPERTY_NAME_NEED_DATA, Boolean.toString(true));
 		signConfig.put(PROPERTY_NAME_NEED_PRE, Boolean.toString(true));
@@ -364,7 +359,7 @@ public class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 		LOGGER.info("Se invocan las funciones internas de post-cofirma CAdES"); //$NON-NLS-1$
 		final byte[] signature;
 		try {
-			signature = CAdESTriPhaseCoSigner.postCoSign(
+			signature = AOCAdESTriPhaseCoSigner.postCoSign(
 					pk1,
 					presign,
 					data, // Contenido
@@ -432,91 +427,14 @@ public class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 
 		LOGGER.info("Postfirma CAdES - Contrafirma - INICIO"); //$NON-NLS-1$
 
-		if (triphaseData == null) {
-			throw new IllegalArgumentException("Los datos de prefirma no pueden ser nulos"); //$NON-NLS-1$
-		}
-
-		final Date date = new Date(Long.parseLong(triphaseData.getSign(0).getProperty(PARAM_DATE)));
-
-		byte[] newSign = new AOCAdESCounterSigner(
-			new CAdESFakePkcs1Signer(
-				triphaseData,
+		return AOCAdESTriPhaseCounterSigner.postCountersign(
+				sign,
+				algorithm,
+				targetType,
 				null,
-				false
-			),
-			date
-		).countersign(
-			sign,
-			algorithm,
-			targetType,
-			null,
-			null,
-			cert,
-			extraParams
-		);
-
-		// En esta contrafirma las firmas PKCS#1 son falsas, asi que vamos buscando los
-		// valores reales para insertarlo, teniendo en cuenta que en esta contrafirma y
-		// en la sesion se comparte el valor de los datos que se firman con PKCS#1
-		for (int i = 0; i < triphaseData.getSignsCount(); i++) {
-
-			final TriSign signConfig = triphaseData.getSign(i);
-
-			// Los datos que hay que sustituir en la firma recien creada
-			final byte[] dataToReplace = Base64.decode(signConfig.getProperty(PROPERTY_NAME_DUMMY_PK1));
-
-			// La firma real PKCS#1
-			final byte[] pkcs1Sign = Base64.decode(signConfig.getProperty(PROPERTY_NAME_PKCS1_SIGN));
-
-			// Reemplazamos
-			newSign = searchAndReplace(newSign, dataToReplace, pkcs1Sign);
-		}
-
-		return newSign;
-	}
-
-	/** Reemplaza un subarray por otro del mismo tama&ntilde;o dentro un un array contenedor.
-	 * @param source Array contenedor en el que se realiza la b&uacute;squeda.
-	 * @param search SubArray que hay que sustituir.
-	 * @param replace SubArray por el que se sustituye.
-	 * @return Array contenedor con el reemplazo hecho.	 */
-	private static byte[] searchAndReplace(final byte[] source, final byte[] search, final byte[] replace) {
-		if (search.length != replace.length) {
-			return source;
-		}
-		int p = searchFor(source, search);
-		if (p == -1) {
-			throw new IllegalArgumentException("No se ha encontrado la cadena a sustituir"); //$NON-NLS-1$
-		}
-		final byte[] result = Arrays.copyOf(source, source.length);
-		for (final byte element : replace) {
-			result[p] = element;
-			p++;
-		}
-		return result;
-	}
-
-	/** Busca un subarray dentro de otro array.
-	 * @param array Array sobre el que se realiza la b&uacute;squeda.
-	 * @param subArray SubArray que buscamos.
-	 * @return Posici&oacute;n en la que se encuentra por primera vez o -1 si no se encuentra. */
-	private static int searchFor(final byte[] array, final byte[] subArray) {
-		if (subArray.length > array.length) {
-			return -1;
-		}
-		for (int i = 0; i <= array.length - subArray.length; i++) {
-			if (array[i] == subArray[0]) {
-				int j;
-				for (j = 1; j < subArray.length; j++) {
-					if (array[i + j] != subArray[j]) {
-						break;
-					}
-				}
-				if (j == subArray.length) {
-					return i;
-				}
-			}
-		}
-		return -1;
+				cert,
+				extraParams,
+				triphaseData
+			);
 	}
 }

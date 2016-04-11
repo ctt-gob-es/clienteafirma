@@ -27,7 +27,7 @@ public class AOFormatFileException extends AOException {
      * @param msg Mensaje descriptivo de la excepci&oacute;n.
      * @param e Excepci&oacute;n que a su vez origin&oacute; esta
      */
-    public AOFormatFileException(final String msg, final Exception e) {
+    public AOFormatFileException(final String msg, final Throwable e) {
         super(msg, e);
     }
 

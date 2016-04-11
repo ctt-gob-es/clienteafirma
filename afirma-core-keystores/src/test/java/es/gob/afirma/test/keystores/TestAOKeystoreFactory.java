@@ -14,6 +14,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.security.KeyStore.PrivateKeyEntry;
+import java.security.Signature;
 import java.security.cert.X509Certificate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -21,7 +22,6 @@ import java.util.logging.Logger;
 import javax.security.auth.callback.PasswordCallback;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import es.gob.afirma.core.misc.AOUtil;
@@ -47,7 +47,7 @@ public class TestAOKeystoreFactory {
      * @throws Exception En cualquier error. */
     @SuppressWarnings("static-method")
 	@Test
-	@Ignore // Solo para Windows
+//	@Ignore // Solo para Windows
     public void testAOKeystoreFactoryCAPI() throws Exception {
     	Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$
     	final AOKeyStoreManager ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
@@ -64,6 +64,14 @@ public class TestAOKeystoreFactory {
 			ksm.getAliases()[0]
 		);
     	System.out.println(pke.toString());
+    	final Signature s = Signature.getInstance("SHA512withRSA"); //$NON-NLS-1$
+    	s.initSign(
+			ksm.getKeyEntry(
+				ksm.getAliases()[1]
+			).getPrivateKey()
+		);
+    	s.update("hola".getBytes()); //$NON-NLS-1$
+    	System.out.println(new String(s.sign()));
 
     }
 

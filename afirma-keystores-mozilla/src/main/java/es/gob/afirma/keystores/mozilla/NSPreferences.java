@@ -17,6 +17,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import es.gob.afirma.core.misc.BoundedBufferedReader;
+
 /** M&eacute;todos de utilidad para Mozilla Firefox y Nestcape.
  * Inspirada en la clase com.sun.deploy.net.proxy.NSPreferences de Sun
  * Microsystems. */
@@ -94,7 +96,11 @@ final class NSPreferences {
 
         String line = null;
         final List<FirefoxProfile> profiles = new ArrayList<FirefoxProfile>();
-        final BufferedReader in = new BufferedReader(new FileReader(iniFile));
+        final BufferedReader in = new BoundedBufferedReader(
+    		new FileReader(iniFile),
+			1024, // Maximo 1024 lineas
+			4096 // Maximo 4KB por linea
+		);
 
         while ((line = in.readLine()) != null) {
 
@@ -130,7 +136,9 @@ final class NSPreferences {
 
             // Debemos encontrar al menos el nombre y la ruta del perfil
             if (profile.getName() != null || profile.getPath() != null) {
-                profile.setAbsolutePath(profile.isRelative() ? new File(iniFile.getParent(), profile.getPath()).toString() : profile.getPath());
+                profile.setAbsolutePath(profile.isRelative() ?
+            		new File(iniFile.getParent(), profile.getPath()).toString() :
+            			profile.getPath());
 
                 profiles.add(profile);
             }

@@ -1,10 +1,16 @@
 package es.gob.afirma.standalone.ui.hash;
 
+import java.awt.Container;
+import java.awt.Cursor;
+import java.awt.FlowLayout;
 import java.awt.Frame;
+import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.Toolkit;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,18 +22,21 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
+import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.ui.AOUIFactory;
+import es.gob.afirma.standalone.AutoFirmaUtil;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 
 /** Di&aacute;logo para la comprobaci&oacute;n de huellas digitales.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
-public final class CheckHashDialog extends JDialog {
+public final class CheckHashDialog extends JDialog implements KeyListener {
 
 	/** Inicia el proceso de compobaci&oacute;n de huella digital.
 	 * @param parent Componente padre para la modalidad. */
@@ -68,40 +77,57 @@ public final class CheckHashDialog extends JDialog {
 
 	void createUI(final Frame parent) {
 
-		setLayout(new GridBagLayout());
-		setSize(300, 300);
-		setLocationRelativeTo(parent);
+		final Container c = getContentPane();
+		final GridBagLayout gbl = new GridBagLayout();
+		c.setLayout(gbl);
+		final GridBagConstraints gbc = new GridBagConstraints();
+		gbc.fill = GridBagConstraints.BOTH;
+        gbc.weightx = 1.0;
+        gbc.gridy = 0;
+        gbc.insets = new Insets(5,15,0,10);
 		setIconImage(
-			Toolkit.getDefaultToolkit().getImage(this.getClass().getResource("/resources/afirma_ico.png")) //$NON-NLS-1$
+			AutoFirmaUtil.getDefaultDialogsIcon()
 		);
 		setTitle(SimpleAfirmaMessages.getString("CheckHashDialog.0")); //$NON-NLS-1$
 
 		final JButton checkButton = new JButton(SimpleAfirmaMessages.getString("CheckHashDialog.1")); //$NON-NLS-1$
+		checkButton.addKeyListener(this);
 		checkButton.setMnemonic('C');
 		checkButton.setEnabled(false);
 		checkButton.addActionListener(
 			new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
+					CheckHashDialog.this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 					try {
 						if (checkHash(getTextFieldHashText(), getTextFieldDataText())) {
-							AOUIFactory.showConfirmDialog(
+							AOUIFactory.showMessageDialog(
 								CheckHashDialog.this,
 								SimpleAfirmaMessages.getString("CheckHashDialog.2"), //$NON-NLS-1$
 								SimpleAfirmaMessages.getString("CheckHashDialog.3"), //$NON-NLS-1$
-								JOptionPane.OK_OPTION,
-								JOptionPane.PLAIN_MESSAGE
+								JOptionPane.INFORMATION_MESSAGE
 							);
 						}
 						else {
-							AOUIFactory.showConfirmDialog(
+							AOUIFactory.showMessageDialog(
 								CheckHashDialog.this,
 								SimpleAfirmaMessages.getString("CheckHashDialog.4"), //$NON-NLS-1$
 								SimpleAfirmaMessages.getString("CheckHashDialog.5"), //$NON-NLS-1$
-								JOptionPane.OK_OPTION,
 								JOptionPane.WARNING_MESSAGE
 							);
 						}
+					}
+					catch(final OutOfMemoryError ooe) {
+						AOUIFactory.showErrorMessage(
+							parent,
+							SimpleAfirmaMessages.getString("CreateHashDialog.18"), //$NON-NLS-1$
+							SimpleAfirmaMessages.getString("CreateHashDialog.14"), //$NON-NLS-1$
+							JOptionPane.ERROR_MESSAGE
+						);
+						Logger.getLogger("es.gob.afirma").severe( //$NON-NLS-1$
+							"Fichero demasiado grande: " + ooe //$NON-NLS-1$
+						);
+						return;
 					}
 					catch(final Exception ex) {
 						Logger.getLogger("es.gob.afirma").severe( //$NON-NLS-1$
@@ -114,18 +140,24 @@ public final class CheckHashDialog extends JDialog {
 							JOptionPane.ERROR_MESSAGE
 						);
 					}
+					finally {
+						CheckHashDialog.this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+					}
 				}
 			}
 		);
 
+		this.textFieldHash.addKeyListener(this);
 		this.textFieldHash.setEditable(false);
 		this.textFieldHash.setFocusable(false);
 		this.textFieldHash.setColumns(10);
 
 		final JLabel textFieldHashLabel = new JLabel(SimpleAfirmaMessages.getString("CheckHashDialog.8")); //$NON-NLS-1$
 		textFieldHashLabel.setLabelFor(this.textFieldHash);
+		textFieldHashLabel.addKeyListener(this);
 
 		final JButton textFieldHashButton =  new JButton(SimpleAfirmaMessages.getString("CheckHashDialog.9")); //$NON-NLS-1$
+		textFieldHashButton.addKeyListener(this);
 		textFieldHashButton.setMnemonic('x');
 		textFieldHashButton.addActionListener(
 			new ActionListener() {
@@ -137,11 +169,11 @@ public final class CheckHashDialog extends JDialog {
 								SimpleAfirmaMessages.getString("CheckHashDialog.10"), //$NON-NLS-1$
 								null,
 								null,
-								new String[] { "hash", "txt" }, //$NON-NLS-1$ //$NON-NLS-2$
-								"Huellas digitales (*.txt, *.hash)", //$NON-NLS-1$,,
+								new String[] { "hash", "hashb64" }, //$NON-NLS-1$ //$NON-NLS-2$
+								SimpleAfirmaMessages.getString("CheckHashDialog.14"), //$NON-NLS-1$
 								false,
 								false,
-								null,
+								AutoFirmaUtil.getDefaultDialogsIcon(),
 								CheckHashDialog.this
 							)[0].getAbsolutePath()
 						);
@@ -157,14 +189,17 @@ public final class CheckHashDialog extends JDialog {
 			}
 		);
 
+		this.textFieldData.addKeyListener(this);
 		this.textFieldData.setEditable(false);
 		this.textFieldData.setFocusable(false);
 		this.textFieldData.setColumns(10);
 
 		final JLabel textFieldDataLabel = new JLabel(SimpleAfirmaMessages.getString("CheckHashDialog.11")); //$NON-NLS-1$
 		textFieldDataLabel.setLabelFor(this.textFieldData);
+		textFieldDataLabel.addKeyListener(this);
 
 		final JButton textFieldDataButton =  new JButton(SimpleAfirmaMessages.getString("CheckHashDialog.12")); //$NON-NLS-1$
+		textFieldDataButton.addKeyListener(this);
 		textFieldDataButton.setMnemonic('E');
 		textFieldDataButton.addActionListener(
 			new ActionListener() {
@@ -177,10 +212,10 @@ public final class CheckHashDialog extends JDialog {
 								null,
 								null,
 								null,
-								"Todos los archivos (*.*)", //$NON-NLS-1$,,
+								SimpleAfirmaMessages.getString("CheckHashDialog.14"), //$NON-NLS-1$
 								false,
 								false,
-								null,
+								AutoFirmaUtil.getDefaultDialogsIcon(),
 								CheckHashDialog.this
 							)[0].getAbsolutePath()
 						);
@@ -196,13 +231,61 @@ public final class CheckHashDialog extends JDialog {
 			}
 		);
 
-		add(textFieldHashLabel);
-		add(this.textFieldHash);
-		add(textFieldHashButton);
-		add(textFieldDataLabel);
-		add(this.textFieldData);
-		add(textFieldDataButton);
-		add(checkButton);
+		final JButton exitButton = new JButton(
+			SimpleAfirmaMessages.getString("CheckHashDialog.15") //$NON-NLS-1$
+		);
+
+		exitButton.setMnemonic('C');
+		exitButton.addActionListener(
+			new ActionListener () {
+				@Override
+				public void actionPerformed( final ActionEvent e ) {
+					CheckHashDialog.this.setVisible(false);
+					CheckHashDialog.this.dispose();
+				}
+			}
+		);
+		exitButton.getAccessibleContext().setAccessibleDescription(
+			SimpleAfirmaMessages.getString("CheckHashDialog.16") //$NON-NLS-1$
+		);
+		exitButton.addKeyListener(this);
+
+		final JPanel panel = new JPanel();
+		panel.setLayout(new FlowLayout(FlowLayout.RIGHT));
+
+		// En Mac OS X el orden de los botones es distinto
+		if (Platform.OS.MACOSX.equals(Platform.getOS())) {
+			panel.add(checkButton);
+			panel.add(exitButton);
+		}
+		else {
+			panel.add(exitButton);
+			panel.add(checkButton);
+		}
+
+		c.add(textFieldDataLabel, gbc);
+		gbc.gridy++;
+		gbc.insets = new Insets(5,10,0,10);
+		c.add(this.textFieldData, gbc);
+		gbc.weightx = 0;
+		c.add(textFieldDataButton, gbc);
+		gbc.insets = new Insets(30,15,0,10);
+		gbc.weightx = 1.0;
+		gbc.gridy++;
+		c.add(textFieldHashLabel, gbc);
+		gbc.insets = new Insets(5,10,0,10);
+		gbc.gridy++;
+		c.add(this.textFieldHash, gbc);
+		gbc.weightx = 0;
+		c.add(textFieldHashButton, gbc);
+		gbc.gridy++;
+		gbc.insets = new Insets(30,10,0,10);
+		gbc.gridwidth = GridBagConstraints.REMAINDER;
+		c.add(panel, gbc);
+		pack();
+		setSize(600, 250);
+		setResizable(false);
+		setLocationRelativeTo(parent);
 
 	}
 
@@ -214,7 +297,7 @@ public final class CheckHashDialog extends JDialog {
 		try (InputStream fis = new FileInputStream(fileNameHash)) {
 			hashBytes = AOUtil.getDataFromInputStream(fis);
 		}
-		if (AOUtil.isBase64(hashBytes)) {
+		if (Base64.isBase64(hashBytes)) {
 			hashBytes = Base64.decode(hashBytes, 0, hashBytes.length, false);
 		}
 		final byte[] dataBytes;
@@ -272,5 +355,20 @@ public final class CheckHashDialog extends JDialog {
         }
         return true;
     }
+
+	@Override
+	public void keyTyped(final KeyEvent e) { /* Vacio */ }
+
+	@Override
+	public void keyPressed(final KeyEvent e) { /* Vacio */ }
+
+	@Override
+	public void keyReleased(final KeyEvent ke) {
+		// En Mac no cerramos los dialogos con Escape
+		if (ke != null && ke.getKeyCode() == KeyEvent.VK_ESCAPE) {
+			CheckHashDialog.this.setVisible(false);
+			CheckHashDialog.this.dispose();
+		}
+	}
 
 }

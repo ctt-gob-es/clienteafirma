@@ -56,8 +56,8 @@ public class CertificateManagerDialog {
 			ksm,
 			parentComponent,
 			true,
-			true,
-			true,
+			true, // showExpiredCertificates
+			true, // checkValidity
 			filters,
 			mandatoryCertificate
 		);

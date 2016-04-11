@@ -1,3 +1,13 @@
+/* Copyright (C) 2011 [Gobierno de Espana]
+ * This file is part of "Cliente @Firma".
+ * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
+ *   - the GNU General Public License as published by the Free Software Foundation;
+ *     either version 2 of the License, or (at your option) any later version.
+ *   - or The European Software License; either version 1.1 or (at your option) any later version.
+ * Date: 11/01/11
+ * You may contact the copyright holder at: soporte.afirma5@mpt.es
+ */
+
 package es.gob.afirma.signers.cms;
 
 import java.io.ByteArrayOutputStream;
@@ -6,15 +16,15 @@ import java.security.PrivateKey;
 import java.security.Signature;
 import java.security.SignatureException;
 
-import org.bouncycastle.asn1.ASN1Encoding;
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.ASN1OctetString;
-import org.bouncycastle.asn1.ASN1Set;
-import org.bouncycastle.asn1.BEROctetString;
-import org.bouncycastle.asn1.DEROctetString;
-import org.bouncycastle.asn1.cms.ContentInfo;
-import org.bouncycastle.cms.CMSProcessable;
-import org.bouncycastle.cms.CMSProcessableByteArray;
+import org.spongycastle.asn1.ASN1Encoding;
+import org.spongycastle.asn1.ASN1ObjectIdentifier;
+import org.spongycastle.asn1.ASN1OctetString;
+import org.spongycastle.asn1.ASN1Set;
+import org.spongycastle.asn1.BEROctetString;
+import org.spongycastle.asn1.DEROctetString;
+import org.spongycastle.asn1.cms.ContentInfo;
+import org.spongycastle.cms.CMSProcessable;
+import org.spongycastle.cms.CMSProcessableByteArray;
 
 import es.gob.afirma.core.AOException;
 

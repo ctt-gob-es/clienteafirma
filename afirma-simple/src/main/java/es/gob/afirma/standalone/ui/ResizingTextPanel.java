@@ -32,14 +32,14 @@ final class ResizingTextPanel extends JPanel {
     private void changeInternalFont() {
         FontMetrics fm = getFontMetrics(this.font);
         while (true) {
-            if (getWidth() <= fm.stringWidth(this.text) + (MARGIN * 3)) {
+            if (getWidth() <= fm.stringWidth(this.text) + MARGIN * 3) {
                 break;
             }
             this.font = this.font.deriveFont((float) this.font.getSize() + 1);
             fm = getFontMetrics(this.font);
         }
         while (true) {
-            if (getWidth() > fm.stringWidth(this.text) + (MARGIN * 3)) {
+            if (getWidth() > fm.stringWidth(this.text) + MARGIN * 3) {
                 break;
             }
             this.font = this.font.deriveFont((float) this.font.getSize() - 1);
@@ -49,7 +49,7 @@ final class ResizingTextPanel extends JPanel {
 
     ResizingTextPanel(final String txt) {
         super(true);
-        this.text = txt;
+        this.text = txt != null ? txt : ""; //$NON-NLS-1$
         this.font = this.getFont();
         // En Linux ponemos un borde al panel
         if (Platform.OS.LINUX.equals(Platform.getOS())) {

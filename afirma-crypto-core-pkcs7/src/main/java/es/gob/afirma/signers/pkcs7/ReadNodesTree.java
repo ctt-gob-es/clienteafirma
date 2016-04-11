@@ -22,20 +22,21 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.logging.Logger;
 
-import org.bouncycastle.asn1.ASN1Encodable;
-import org.bouncycastle.asn1.ASN1GeneralizedTime;
-import org.bouncycastle.asn1.ASN1InputStream;
-import org.bouncycastle.asn1.ASN1Integer;
-import org.bouncycastle.asn1.ASN1Sequence;
-import org.bouncycastle.asn1.ASN1Set;
-import org.bouncycastle.asn1.ASN1TaggedObject;
-import org.bouncycastle.asn1.ASN1UTCTime;
-import org.bouncycastle.asn1.cms.Attribute;
-import org.bouncycastle.asn1.cms.CMSAttributes;
-import org.bouncycastle.asn1.cms.IssuerAndSerialNumber;
-import org.bouncycastle.asn1.cms.SignedData;
-import org.bouncycastle.asn1.cms.SignerInfo;
-import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
+import org.spongycastle.asn1.ASN1Encodable;
+import org.spongycastle.asn1.ASN1GeneralizedTime;
+import org.spongycastle.asn1.ASN1InputStream;
+import org.spongycastle.asn1.ASN1Integer;
+import org.spongycastle.asn1.ASN1ObjectIdentifier;
+import org.spongycastle.asn1.ASN1Sequence;
+import org.spongycastle.asn1.ASN1Set;
+import org.spongycastle.asn1.ASN1TaggedObject;
+import org.spongycastle.asn1.ASN1UTCTime;
+import org.spongycastle.asn1.cms.Attribute;
+import org.spongycastle.asn1.cms.CMSAttributes;
+import org.spongycastle.asn1.cms.IssuerAndSerialNumber;
+import org.spongycastle.asn1.cms.SignedData;
+import org.spongycastle.asn1.cms.SignerInfo;
+import org.spongycastle.asn1.pkcs.PKCSObjectIdentifiers;
 
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.signers.AOSimpleSignInfo;
@@ -159,7 +160,7 @@ public final class ReadNodesTree {
             final Enumeration<?> eAtributes = signerInfouAtrib.getObjects();
             while (eAtributes.hasMoreElements()) {
                 final Attribute data = Attribute.getInstance(eAtributes.nextElement());
-                if (!data.getAttrType().equals(PKCSObjectIdentifiers.id_aa_signatureTimeStampToken)) {
+                if (isValideAttributeType(data.getAttrType())) {
                     final ASN1Set setInto = data.getAttrValues();
                     final Enumeration<?> eAtributesData = setInto.getObjects();
                     while (eAtributesData.hasMoreElements()) {
@@ -191,6 +192,17 @@ public final class ReadNodesTree {
             }
         }
 
+    }
+
+    private static boolean isValideAttributeType(final ASN1ObjectIdentifier attributeType) {
+    	return  !attributeType.equals(PKCSObjectIdentifiers.id_aa_signatureTimeStampToken) &&
+    			!attributeType.equals(PKCSObjectIdentifiers.id_aa_ets_escTimeStamp) &&
+    			!attributeType.equals(PKCSObjectIdentifiers.id_aa_ets_revocationRefs) &&
+    			!attributeType.equals(PKCSObjectIdentifiers.id_aa_ets_revocationValues) &&
+    			!attributeType.equals(PKCSObjectIdentifiers.id_aa_ets_certificateRefs) &&
+    			!attributeType.equals(PKCSObjectIdentifiers.id_aa_ets_certValues) &&
+    			//id_aa_ets_archiveTimestampV2
+    			!attributeType.equals(PKCSObjectIdentifiers.id_aa.branch("48"));  //$NON-NLS-1$
     }
 
     /** Lee los nodos pertenecientes a un firmante.

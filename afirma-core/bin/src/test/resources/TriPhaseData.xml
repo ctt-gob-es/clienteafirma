@@ -1,0 +1,10 @@
+ <xml>
+  <firmas format="XAdES">
+   <firma Id="001">
+    <param n="NEED_PRE">true</param>
+    <param n="PRE">MYICXDAYBgkqhkiG</param>
+    <param n="NEED_DATA">true</param>
+    <param n="PK1">EMijB9pJ0lj27Xqo</param>
+   </firma>
+  </firmas>
+ </xml>

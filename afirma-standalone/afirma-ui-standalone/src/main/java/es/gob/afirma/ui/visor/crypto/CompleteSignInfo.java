@@ -12,7 +12,6 @@ package es.gob.afirma.ui.visor.crypto;
 
 import java.io.IOException;
 
-import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.MimeHelper;
 import es.gob.afirma.core.signers.AOSignInfo;
@@ -94,7 +93,7 @@ public final class CompleteSignInfo {
      * @param data Datos que se firmaron.
      */
     public void setData(final byte[] data) {
-    	if (AOUtil.isBase64(data)) {
+    	if (Base64.isBase64(data)) {
     		try {
     			final byte[] tmpData = Base64.decode(data, 0, data.length, false);
     			final String ext = new MimeHelper(tmpData).getExtension();

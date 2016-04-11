@@ -22,6 +22,7 @@ import static es.gob.afirma.signers.xades.AOXAdESSigner.XML_SIGNATURE_PREFIX;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.net.URI;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
@@ -29,7 +30,6 @@ import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -59,6 +59,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.AOUnsupportedSignFormatException;
 import es.gob.afirma.core.misc.MimeHelper;
 import es.gob.afirma.signers.xml.Utils;
 import es.gob.afirma.signers.xml.XMLConstants;
@@ -128,12 +129,32 @@ public final class XAdESCoSigner {
 		        XAdESExtraParams.ADD_KEY_INFO_KEY_NAME, Boolean.FALSE.toString()));
 		final boolean useManifest = Boolean.parseBoolean(extraParams.getProperty(
 		        XAdESExtraParams.USE_MANIFEST, Boolean.FALSE.toString()));
+		final boolean keepKeyInfoUnsigned = Boolean.parseBoolean(extraParams.getProperty(
+		        XAdESExtraParams.KEEP_KEYINFO_UNSIGNED, Boolean.FALSE.toString()));
+		final String outputXmlEncoding = extraParams.getProperty(
+		        XAdESExtraParams.OUTPUT_XML_ENCODING);
 
-		String mimeType = extraParams.getProperty(XAdESExtraParams.MIME_TYPE);
-		String encoding = extraParams.getProperty(XAdESExtraParams.ENCODING);
+		String mimeType = extraParams.getProperty(XAdESExtraParams.XMLDSIG_OBJECT_MIME_TYPE);
+
+		String encoding = extraParams.getProperty(XAdESExtraParams.XMLDSIG_OBJECT_ENCODING);
+
+		// Dejamos que indiquen "base64" en vez de la URI, hacemos el cambio manualmente
 		if ("base64".equalsIgnoreCase(encoding)) { //$NON-NLS-1$
 			encoding = XMLConstants.BASE64_ENCODING;
 		}
+
+		// Comprobamos que sea una URI
+		if (encoding != null && !encoding.isEmpty()) {
+			try {
+				new URI(encoding);
+			}
+			catch(final Exception e) {
+				throw new AOException(
+					"La codificacion indicada en 'encoding' debe ser una URI: " + e, e //$NON-NLS-1$
+				);
+			}
+		}
+
 		String oid = extraParams.getProperty(XAdESExtraParams.CONTENT_TYPE_OID);
 
 		ObjectIdentifierImpl objectIdentifier = null;
@@ -142,9 +163,6 @@ public final class XAdESCoSigner {
 		// nombres (necesario para XML)
 		final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 		dbf.setNamespaceAware(true);
-
-		// Propiedades del documento XML original
-		final Map<String, String> originalXMLProperties = new Hashtable<String, String>();
 
 		// Carga el documento XML de firmas y su raiz
 		Document docSig;
@@ -163,6 +181,12 @@ public final class XAdESCoSigner {
 		catch (final Exception e) {
 			throw new AOException("No se ha podido leer el documento XML de firmas", e); //$NON-NLS-1$
 		}
+
+		// Propiedades del documento XML original
+		final Map<String, String> originalXMLProperties = XAdESUtil.getOriginalXMLProperties(
+			docSig,
+			outputXmlEncoding
+		);
 
 		final XMLSignatureFactory fac = Utils.getDOMFactory();
 
@@ -221,10 +245,9 @@ public final class XAdESCoSigner {
 				// Creamos un identificador de referencia para el objeto a firmar y la almacenamos
 				// para mantener un listado con todas. En el caso de las hojas de estilo lo creamos con un
 				// identificador descriptivo
-				if (currentNodeAttributes.getNamedItem(ID_IDENTIFIER) != null && currentNodeAttributes.getNamedItem(ID_IDENTIFIER)
-						.getNodeValue()
-						.startsWith(STYLE_REFERENCE_PREFIX)) {
-					referenceId = STYLE_REFERENCE_PREFIX + UUID.randomUUID().toString();
+				if (currentNodeAttributes.getNamedItem(ID_IDENTIFIER) != null &&
+					currentNodeAttributes.getNamedItem(ID_IDENTIFIER).getNodeValue().startsWith(STYLE_REFERENCE_PREFIX)) {
+						referenceId = STYLE_REFERENCE_PREFIX + UUID.randomUUID().toString();
 				}
 				else {
 					referenceId = "Reference-" + UUID.randomUUID().toString(); //$NON-NLS-1$
@@ -233,19 +256,25 @@ public final class XAdESCoSigner {
 
 				// Buscamos y analizamos el nodo de datos para obtener su tipo
 				final String dataXmlUri = ((Element) currentElement).getAttribute("URI"); //$NON-NLS-1$
+
 				// Firmas enveloped
 				if ("".equals(dataXmlUri)) { //$NON-NLS-1$
+
+					// Comprobamos que no se use MANIFEST con Enveloped
+					if (useManifest) {
+						throw new AOUnsupportedSignFormatException(
+							"El formato Enveloped es incompatible con el uso de estructuras Manifest" //$NON-NLS-1$
+						);
+					}
+
 					if (mimeType == null) {
 						mimeType = "text/xml"; //$NON-NLS-1$
-					}
-					if (encoding == null) {
-						encoding = docSig.getInputEncoding();
 					}
 
 					// Creamos la referencia a los datos con las transformaciones de la original
 					referenceList.add(
 						fac.newReference(
-							((Element) currentElement).getAttribute("URI"), //$NON-NLS-1$
+							dataXmlUri, // Aqui siempre vale ""
 							digestMethod,
 							currentTransformList,
 							XMLConstants.OBJURI,
@@ -328,7 +357,12 @@ public final class XAdESCoSigner {
 						structures.add(new DOMStructure(dataObjectElement.getFirstChild().cloneNode(true)));
 
 						final String objectId = "Object-" + UUID.randomUUID().toString(); //$NON-NLS-1$
-						envelopingObject = fac.newXMLObject(structures, objectId, mimeType, encoding);
+						envelopingObject = fac.newXMLObject(
+							structures,
+							objectId,
+							mimeType,
+							encoding
+						);
 
 						// Agregamos la referencia al nuevo objeto de datos
 						referenceList.add(
@@ -391,8 +425,12 @@ public final class XAdESCoSigner {
 		// DataObjectFormat
 		if (objectIdentifier != null || mimeType != null || encoding != null) {
 			final ArrayList<DataObjectFormat> objectFormats = new ArrayList<DataObjectFormat>();
-			final DataObjectFormat objectFormat = new DataObjectFormatImpl(null,
-				objectIdentifier, mimeType, encoding, "#" + referenceId //$NON-NLS-1$
+			final DataObjectFormat objectFormat = new DataObjectFormatImpl(
+				null,
+				objectIdentifier,
+				mimeType,
+				encoding,
+				"#" + referenceId //$NON-NLS-1$
 			);
 			objectFormats.add(objectFormat);
 			xades.setDataObjectFormats(objectFormats);
@@ -463,7 +501,8 @@ public final class XAdESCoSigner {
 					referenceList,
 					"Signature-" + UUID.randomUUID().toString(), //$NON-NLS-1$
 					addKeyInfoKeyValue,
-					addKeyInfoKeyName
+					addKeyInfoKeyName,
+					keepKeyInfoUnsigned
 				);
 			}
 		}
@@ -476,6 +515,11 @@ public final class XAdESCoSigner {
 			throw new AOException("Error al generar la cofirma", e); //$NON-NLS-1$
 		}
 
-		return Utils.writeXML(rootSig, originalXMLProperties, null, null);
+		return Utils.writeXML(
+			rootSig,
+			originalXMLProperties,
+			null,
+			null
+		);
 	}
 }

@@ -41,21 +41,21 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
 
-import org.bouncycastle.asn1.ASN1InputStream;
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.ASN1Primitive;
-import org.bouncycastle.asn1.DERSet;
-import org.bouncycastle.asn1.cmp.PKIFailureInfo;
-import org.bouncycastle.asn1.cms.Attribute;
-import org.bouncycastle.asn1.cms.AttributeTable;
-import org.bouncycastle.asn1.x509.X509ObjectIdentifiers;
-import org.bouncycastle.cms.CMSSignedData;
-import org.bouncycastle.cms.SignerInformation;
-import org.bouncycastle.cms.SignerInformationStore;
-import org.bouncycastle.tsp.TimeStampRequest;
-import org.bouncycastle.tsp.TimeStampRequestGenerator;
-import org.bouncycastle.tsp.TimeStampResponse;
-import org.bouncycastle.tsp.TimeStampToken;
+import org.spongycastle.asn1.ASN1InputStream;
+import org.spongycastle.asn1.ASN1ObjectIdentifier;
+import org.spongycastle.asn1.ASN1Primitive;
+import org.spongycastle.asn1.DERSet;
+import org.spongycastle.asn1.cmp.PKIFailureInfo;
+import org.spongycastle.asn1.cms.Attribute;
+import org.spongycastle.asn1.cms.AttributeTable;
+import org.spongycastle.asn1.x509.X509ObjectIdentifiers;
+import org.spongycastle.cms.CMSSignedData;
+import org.spongycastle.cms.SignerInformation;
+import org.spongycastle.cms.SignerInformationStore;
+import org.spongycastle.tsp.TimeStampRequest;
+import org.spongycastle.tsp.TimeStampRequestGenerator;
+import org.spongycastle.tsp.TimeStampResponse;
+import org.spongycastle.tsp.TimeStampToken;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.AOUtil;
@@ -353,7 +353,7 @@ public final class CMSTimestamper {
         	configureHttpsConnection(tsaConnection);
         }
 
-        if (this.tsaUsername != null && !"".equals(this.tsaUsername) ) { //$NON-NLS-1$
+        if (this.tsaUsername != null && !this.tsaUsername.isEmpty()) {
             final String userPassword = this.tsaUsername + ":" + this.tsaPassword; //$NON-NLS-1$
             tsaConnection.setRequestProperty("Authorization", "Basic " + new String(Base64.encode(userPassword.getBytes()))); //$NON-NLS-1$ //$NON-NLS-2$
         }
@@ -527,6 +527,7 @@ public final class CMSTimestamper {
             response = new TimeStampResponse(rawResponse);
          }
          catch (final Exception e) {
+        	 LOGGER.severe("Respuesta de la TSA: " + new String(rawResponse)); //$NON-NLS-1$
             throw new AOException("Error obteniendo la respuesta de la TSA: " + e, e); //$NON-NLS-1$
          }
 

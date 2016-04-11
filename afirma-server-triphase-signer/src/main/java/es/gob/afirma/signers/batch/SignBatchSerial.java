@@ -3,6 +3,7 @@ package es.gob.afirma.signers.batch;
 import java.io.IOException;
 import java.security.cert.X509Certificate;
 import java.util.List;
+import java.util.logging.Level;
 
 import es.gob.afirma.core.signers.TriphaseData;
 import es.gob.afirma.signers.batch.SingleSign.ProcessResult;
@@ -34,6 +35,7 @@ public final class SignBatchSerial extends SignBatch {
 
 	@Override
 	public String doPreBatch(final X509Certificate[] certChain) throws BatchException {
+
 		final StringBuilder sb = new StringBuilder("<xml>\n <firmas>"); //$NON-NLS-1$
 		for (final SingleSign ss : this.signs) {
 			String tmp;
@@ -60,6 +62,7 @@ public final class SignBatchSerial extends SignBatch {
 	@Override
 	public String doPostBatch(final X509Certificate[] certChain,
 			                  final TriphaseData td) {
+
 		if (td == null) {
 			throw new IllegalArgumentException("Los datos de sesion trifasica no pueden ser nulos"); //$NON-NLS-1$
 		}
@@ -86,8 +89,10 @@ public final class SignBatchSerial extends SignBatch {
 					ss.setProcessResult(new ProcessResult(Result.ERROR_POST, e.toString()));
 
 					if (this.stopOnError) {
-						LOGGER.severe(
-							"Error en una de las firmas del lote (" + ss.getId() + "), se parara el proceso: " + e //$NON-NLS-1$ //$NON-NLS-2$
+						LOGGER.log(
+								Level.SEVERE,
+							"Error en una de las firmas del lote (" + ss.getId() + "), se parara el proceso: " + e, //$NON-NLS-1$ //$NON-NLS-2$
+							e
 						);
 						ignoreRemaining = true;
 					}
@@ -102,7 +107,7 @@ public final class SignBatchSerial extends SignBatch {
 			// Cuando se indica que se pare en error se marcan las firmas que no se han
 			// llegado a procesar
 			else {
-				ss.setProcessResult(ProcessResult.PROCESS_RESULT_SKYPPED);
+				ss.setProcessResult(ProcessResult.PROCESS_RESULT_SKIPPED);
 			}
 		}
 
@@ -124,6 +129,7 @@ public final class SignBatchSerial extends SignBatch {
 				ss.setProcessResult(ProcessResult.PROCESS_RESULT_DONE_SAVED);
 			}
 			catch (final IOException e) {
+				LOGGER.warning("Error en el guardado de la firma: " + e); //$NON-NLS-1$
 				error = true;
 				ss.setProcessResult(
 					new ProcessResult(

@@ -16,12 +16,12 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import org.bouncycastle.asn1.ASN1Encoding;
-import org.bouncycastle.asn1.ASN1Set;
-import org.bouncycastle.asn1.cms.ContentInfo;
-import org.bouncycastle.asn1.cms.EncryptedContentInfo;
-import org.bouncycastle.asn1.cms.EncryptedData;
-import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
+import org.spongycastle.asn1.ASN1Encoding;
+import org.spongycastle.asn1.ASN1Set;
+import org.spongycastle.asn1.cms.ContentInfo;
+import org.spongycastle.asn1.cms.EncryptedContentInfo;
+import org.spongycastle.asn1.cms.EncryptedData;
+import org.spongycastle.asn1.pkcs.PKCSObjectIdentifiers;
 
 import es.gob.afirma.core.ciphers.AOCipherConfig;
 import es.gob.afirma.core.signers.AOSignConstants;
@@ -45,8 +45,7 @@ import es.gob.afirma.core.signers.AOSignConstants;
  * </pre>
  *
  * La implementaci&oacute;n del c&oacute;digo ha seguido los pasos necesarios
- * para crear un mensaje EncryptedData de BouncyCastle: <a
- * href="http://www.bouncycastle.org/">www.bouncycastle.org</a> */
+ * para crear un mensaje EncryptedData de SpongyCastle. */
 
 final class CMSEncryptedData {
 

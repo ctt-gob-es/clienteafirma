@@ -17,10 +17,35 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import es.gob.afirma.core.misc.http.DataDownloader;
 import es.gob.afirma.core.signers.TriphaseData;
 
 /** Lote de firmas electr&oacute;nicas.
+ * Un ejemplo de representaci&oacute;n XML de un lote podr&iacute;a ser:
+ * <pre>
+ * &lt;?xml version="1.0" encoding="UTF-8" ?&gt;
+ * &lt;signbatch stoponerror="false" algorithm="SHA256withRSA" concurrenttimeout="9223372036854775807" Id="LOTE001"&gt;
+ *  &lt;singlesign Id="7725374e-728d-4a33-9db9-3a4efea4cead"&gt;
+ *   &lt;datasource&gt;http://google.com&lt;/datasource&gt;
+ *   &lt;format&gt;XAdES&lt;/format&gt;
+ *   &lt;suboperation&gt;sign&lt;/suboperation&gt;
+ *   &lt;extraparams&gt;Iw0KI1RodSBKYW4gMTQgMTU6Mzc6MTcgQ0VUIDIwMTYNClNpZ25hdHVyZUlkPTc3MjUzNzRlLTcyOGQtNGEzMy05ZGI5LTNhNGVmZWE0Y2VhZA0K&lt;/extraparams&gt;
+ *   &lt;signsaver&gt;
+ *    &lt;class&gt;es.gob.afirma.signers.batch.SignSaverFile&lt;/class&gt;
+ *    &lt;config&gt;Iw0KI1RodSBKYW4gMTQgMTU6Mzc6MTcgQ0VUIDIwMTYNCkZpbGVOYW1lPUNcOlxcVXNlcnNcXHRvbWFzXFxBcHBEYXRhXFxMb2NhbFxcVGVtcFxcRklSTUExLnhtbA0K&lt;/config&gt;
+ *   &lt;/signsaver&gt;
+ *  &lt;/singlesign&gt;
+ *  &lt;singlesign Id="93d1531c-cd32-4c8e-8cc8-1f1cfe66f64a"&gt;
+ *   &lt;datasource&gt;SG9sYSBNdW5kbw==&lt;/datasource&gt;
+ *   &lt;format&gt;CAdES&lt;/format&gt;
+ *   &lt;suboperation&gt;sign&lt;/suboperation&gt;
+ *   &lt;extraparams&gt;Iw0KI1RodSBKYW4gMTQgMTU6Mzc6MTcgQ0VUIDIwMTYNClNpZ25hdHVyZUlkPTkzZDE1MzFjLWNkMzItNGM4ZS04Y2M4LTFmMWNmZTY2ZjY0YQ0K&lt;/extraparams&gt;
+ *   &lt;signsaver&gt;
+ *    &lt;class&gt;es.gob.afirma.signers.batch.SignSaverFile&lt;/class&gt;
+ *    &lt;config&gt;Iw0KI1RodSBKYW4gMTQgMTU6Mzc6MTcgQ0VUIDIwMTYNCkZpbGVOYW1lPUNcOlxcVXNlcnNcXHRvbWFzXFxBcHBEYXRhXFxMb2NhbFxcVGVtcFxcRklSTUEyLnhtbA0K&lt;/config&gt;
+ *   &lt;/signsaver&gt;
+ *  &lt;/singlesign&gt;
+ * &lt;/signbatch&gt;
+ * </pre>
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
 public abstract class SignBatch {
 
@@ -37,10 +62,6 @@ public abstract class SignBatch {
 		if (i != null) {
 			this.id = i;
 		}
-	}
-
-	static {
-		DataDownloader.enableFilesUsage(true);
 	}
 
 	protected long concurrentTimeout = Long.MAX_VALUE;
@@ -74,12 +95,15 @@ public abstract class SignBatch {
 	 *            del formato</a>).
 	 * @throws IOException Si hay problemas en el tratamiento de datoso en el an&aacute;lisis del XML. */
 	protected SignBatch(final byte[] xml) throws IOException {
+
 		if (xml == null || xml.length < 1) {
 			throw new IllegalArgumentException(
 				"El XML de definicion de lote de firmas no puede ser nulo ni vacio" //$NON-NLS-1$
 			);
 		}
 
+		// ****************************************************
+		// *********** Carga del XML **************************
 		final InputStream is = new ByteArrayInputStream(xml);
 		final Document doc;
 		try {
@@ -92,14 +116,17 @@ public abstract class SignBatch {
 			throw new IOException("Error al cargar el fichero XML de definicion de lote: " + e, e); //$NON-NLS-1$
 		}
 		is.close();
+		// *********** Fin carga del XML **********************
+		// ****************************************************
 
 		final Node signBatchNode = doc.getDocumentElement();
 		if (!"signbatch".equalsIgnoreCase(signBatchNode.getNodeName())) { //$NON-NLS-1$
 			throw new IllegalArgumentException("No se encontro el nodo 'signbatch' en el XML proporcionado"); //$NON-NLS-1$
 		}
 
+		// ****************************************************
+		// ****** Analisis opciones generales del XML *********
 		this.stopOnError = true;
-
 		final NamedNodeMap nnm = signBatchNode.getAttributes();
 		if (nnm != null) {
 			Node tmpNode = nnm.getNamedItem("stoponerror"); //$NON-NLS-1$
@@ -138,9 +165,35 @@ public abstract class SignBatch {
 				"El nodo 'signbatch' debe contener al manos el atributo de algoritmo" //$NON-NLS-1$
 			);
 		}
+		// ****** Fin analisis opciones generales del XML *****
+		// ****************************************************
 
+		// ****************************************************
+		// ****** Analisis firmas individuales del XML ********
 		this.signs = parseSignBatchNode(signBatchNode);
+		// ****** Fin analisis firmas individuales del XML ****
+		// ****************************************************
 
+	}
+
+	protected SignBatch(final List<SingleSign> signatures,
+			            final SingleSignConstants.SignAlgorithm algo,
+			            final boolean soe) {
+
+		if (signatures == null) {
+			throw new IllegalArgumentException(
+				"La lista de firmas del lote no puede ser nula" //$NON-NLS-1$
+			);
+		}
+		if (algo == null) {
+			throw new IllegalArgumentException(
+				"El algoritmo de firma no puede ser nulo" //$NON-NLS-1$
+			);
+		}
+		this.signs = signatures;
+		this.stopOnError = soe;
+		this.algorithm = algo;
+		this.id = UUID.randomUUID().toString();
 	}
 
 	private static List<SingleSign> parseSignBatchNode(final Node n) throws DOMException, IOException {
@@ -200,26 +253,6 @@ public abstract class SignBatch {
 	 *            produzca un error. */
 	public void setStopOnError(final boolean soe) {
 		this.stopOnError = soe;
-	}
-
-	protected SignBatch(final List<SingleSign> signatures,
-			            final SingleSignConstants.SignAlgorithm algo,
-			            final boolean soe) {
-
-		if (signatures == null) {
-			throw new IllegalArgumentException(
-				"La lista de firmas del lote no puede ser nula" //$NON-NLS-1$
-			);
-		}
-		if (algo == null) {
-			throw new IllegalArgumentException(
-				"El algoritmo de firma no puede ser nulo" //$NON-NLS-1$
-			);
-		}
-		this.signs = signatures;
-		this.stopOnError = soe;
-		this.algorithm = algo;
-		this.id = UUID.randomUUID().toString();
 	}
 
 	protected String getResultLog() {

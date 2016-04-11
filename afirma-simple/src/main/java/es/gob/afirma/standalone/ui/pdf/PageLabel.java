@@ -62,7 +62,8 @@ final class PageLabel extends JLabel {
 			"signaturePositionOnPageLowerLeftX", //$NON-NLS-1$
 			Integer.toString(
 				Math.round(
-					original.x * (1/this.scale)
+					//original.x * (1/this.scale)
+						original.x * this.scale
 				)
 			)
 		);
@@ -70,7 +71,8 @@ final class PageLabel extends JLabel {
 			"signaturePositionOnPageLowerLeftY",  //$NON-NLS-1$
 			Integer.toString(
 				Math.round(
-					(getHeight() - original.y - height) * (1/this.scale)
+					//(getHeight() - original.y - height) * (1/this.scale)
+						(getHeight() - original.y - height) * this.scale
 				)
 			)
 		);
@@ -78,7 +80,7 @@ final class PageLabel extends JLabel {
 			"signaturePositionOnPageUpperRightX", //$NON-NLS-1$
 			Integer.toString(
 				Math.round(
-					(original.x + width) * (1/this.scale)
+						(original.x + width) * this.scale
 				)
 			)
 		);
@@ -86,7 +88,7 @@ final class PageLabel extends JLabel {
 			"signaturePositionOnPageUpperRightY",  //$NON-NLS-1$
 			Integer.toString(
 				Math.round(
-					(getHeight() - original.y) * (1/this.scale)
+						(getHeight() - original.y) * this.scale
 				)
 			)
 		);

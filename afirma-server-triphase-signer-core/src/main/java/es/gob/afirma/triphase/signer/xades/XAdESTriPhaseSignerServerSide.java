@@ -17,12 +17,12 @@ import java.security.Key;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.Signature;
 import java.security.SignatureException;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
-import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.ArrayList;
 import java.util.List;
@@ -94,6 +94,8 @@ public final class XAdESTriPhaseSignerServerSide {
 	 * Cogemos un valor menor que el maximo definido por MIME como longitud de linea para los Base64 (76). */
 	private static final int NUM_CHARACTERS_TO_COMPARE = 60;
 
+	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+
 	/** Prefirma (firma simple) en formato XAdES.
 	 * @param data Datos a prefirmar
 	 * @param algorithm Algoritmo de firma
@@ -149,11 +151,11 @@ public final class XAdESTriPhaseSignerServerSide {
 			}
 		}
 		catch(final Exception e) {
-			Logger.getLogger("es.gob.afirma").info("El documento a firmar no es XML, por lo que no contiene firmas previas");  //$NON-NLS-1$//$NON-NLS-2$
+			LOGGER.info("El documento a firmar no es XML, por lo que no contiene firmas previas");  //$NON-NLS-1$
 		}
 
 		if (xml == null && (op == Op.COSIGN || op == Op.COUNTERSIGN)) {
-			Logger.getLogger("es.gob.afirma").severe("Solo se pueden cofirmar y contrafirmar firmas XML");  //$NON-NLS-1$//$NON-NLS-2$
+			LOGGER.severe("Solo se pueden cofirmar y contrafirmar firmas XML");  //$NON-NLS-1$
 			throw new AOException("Los datos introducidos no se corresponden con una firma XML"); //$NON-NLS-1$
 		}
 
@@ -193,7 +195,7 @@ public final class XAdESTriPhaseSignerServerSide {
 		}
 
 		// Generamos un par de claves para hacer la firma temporal, que despues sustituiremos por la real
-		final RSAPrivateKey prk = (RSAPrivateKey) generateKeyPair(
+		final PrivateKey prk = generateKeyPair(
 			((RSAPublicKey)((X509Certificate)certChain[0]).getPublicKey()).getModulus().bitLength()
 		).getPrivate();
 
@@ -322,7 +324,7 @@ public final class XAdESTriPhaseSignerServerSide {
 
 			// Saltamos las firmas sin identificador
 			if (currentNode.getAttributes() == null || currentNode.getAttributes().getNamedItem(XML_NODE_ID) == null) {
-				Logger.getLogger("es.gob.afirma").warning("El documento contiene firmas sin identificador reconocido");  //$NON-NLS-1$//$NON-NLS-2$
+				LOGGER.warning("El documento contiene firmas sin identificador reconocido");  //$NON-NLS-1$
 				continue;
 			}
 
@@ -332,7 +334,7 @@ public final class XAdESTriPhaseSignerServerSide {
 				continue;
 			}
 
-			// Agregamos el signed indo de la firma al listado
+			// Agregamos el signed info de la firma al listado
 			final XMLValidateContext valContext = new DOMValidateContext(new SimpleKeySelector(pk), currentNode);
 			valContext.setProperty("javax.xml.crypto.dsig.cacheReference", Boolean.TRUE); //$NON-NLS-1$
 			final XMLSignature signature = Utils.getDOMFactory().unmarshalXMLSignature(valContext);

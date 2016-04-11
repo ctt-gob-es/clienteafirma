@@ -45,11 +45,11 @@
    </dd> -->
   <dt><b><i>nodeToSign</i></b> (no aplica a contrafirmas)</dt>
    <dd>
-	Indica un nombre de nodo a firmar, para el caso en el que quiera firmarse
+	Indica un identificador de nodo a firmar, para el caso en el que quiera firmarse
 	un nodo concreto en vez de todo el documento. Solo aplica a la firma de
 	documentos XML.
 	<br>
-	El nombre nodo debe estar indicado con el valor de un atributo llamado <i>Id</i>,
+	El identificador de nodo debe estar indicado con el valor de un atributo llamado <i>Id</i>,
 	y se ignorar&aacute;n los atributos con nombre distinto, aunque se hayan declarado
 	en el esquema como identificadores (con una l&iacute;nea del tipo
 	<code>&lt;xs:attribute name="otronombre" type="xs:ID"/&gt;</code>), para evitar
@@ -199,9 +199,40 @@
     MIME-Type de los datos a firmar. Si no se indica se realiza una auto-detecci&oacute;n cuyo resultado puede
     ser inexacto.
    </dd>
+  <dt><b><i>outputXmlEncoding</i></b></dt>
+   <dd>
+    Codificaci&oacute;n del XML de salida.<br>
+    Si no se indica este valor se intenta auto-detectar a partir del XML de entrada (si los datos a firmar son un XML).
+   </dd>
   <dt><b><i>encoding</i></b></dt>
    <dd>
-    Codificaci&oacute;n de los datos a firmar.
+    <p>
+     Codificaci&oacute;n de los datos a firmar (ver la <a href="https://www.w3.org/TR/xmldsig-core1/#sec-Object">
+     documentaci&oacute;n del elemento <i>Object</i> de XMLDSig</a> para m&aacute;s informaci&oacute;n).<br>
+     No confundir con la codificaci&oacute;n del XML, son valores independientes.
+    </p>
+    <p>
+     Por restricc&oacute;n de esquema de XMLDsig debe ser una URI:
+     <pre>
+         &lt;element name="Object" type="ds:ObjectType"/&gt;
+         &lt;complexType name="ObjectType" mixed="true"&gt;
+           &lt;sequence minOccurs="0" maxOccurs="unbounded"&gt;
+             &lt;any namespace="##any" processContents="lax"/&gt;
+           &lt;/sequence&gt;
+           &lt;attribute name="Id" type="ID" use="optional"/&gt;
+           &lt;attribute name="MimeType" type="string" use="optional"/&gt;
+           &lt;attribute name="Encoding" type="anyURI" use="optional"/&gt;
+         &lt;/complexType&gt;
+     </pre>
+    </p>    
+    <p>
+     Si se proporcionan datos a firmar previamente codificados en Base64 pero se desea sean considerados como
+     su forma descodificada, debe establecerse este valor a <code>http://www.w3.org/2000/09/xmldsig#base64</code>
+     y especificarse el tipo real en el par&aacute;metro <code>mimeType</code>.<br>
+     Por ejemplo, para firmar una imagen PNG haciendo que la firma se refiera a su forma binaria directa, puede
+     proporcionarse la imagen directamente codificada en Base64 indicando el <code>encoding</code> como
+     <code>http://www.w3.org/2000/09/xmldsig#base64</code> y el <code>mimeType</code> como <code>image/png</code>.
+    </p>
    </dd>
   <dt><b><i>contentTypeOid</i></b> (no aplica a contrafirmas)<dt>
    <dd>OID que identifica el tipo de datos a firmar.</dd>
@@ -256,7 +287,7 @@
   &nbsp;&nbsp;&nbsp;&nbsp;<b><i>union</i></b>: Uni&oacute;n<br>
   &nbsp;&nbsp;-<b>Cuerpo</b>: Especificado mediante sentencias de tipo XPATH2.<br>
   <br>Transformaci&oacute;n <b>BASE64</b>. 
-  La transformaci�n es inversa, es decir, los datos se descodifican desde Base64 antes de firmarse, 
+  La transformaci&oacute;n es inversa, es decir, los datos se descodifican desde Base64 antes de firmarse, 
   por lo que estos deben estar previamente codificados en Base64 e indicarse mediante el par&aacute;metro
   adicional <code>encodign=base64</code><br>
   &nbsp;&nbsp;-<b>Tipo</b>: <code>http://www.w3.org/2000/09/xmldsig#base64</code><br>

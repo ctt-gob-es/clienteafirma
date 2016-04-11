@@ -9,16 +9,14 @@ import java.util.logging.Logger;
 import es.gob.afirma.standalone.configurator.CertUtil.CertPack;
 import es.gob.afirma.standalone.configurator.ConfiguratorFirefox.MozillaProfileNotFoundException;
 
-/**
- * Configura la instalaci&oacute;n en Linux para la correcta ejecuci&oacute;n de
- * AutoFirma.
- */
+/** Configura la instalaci&oacute;n en Linux para la correcta ejecuci&oacute;n de
+ * AutoFirma. */
 final class ConfiguratorMacOSX implements Configurator {
 
 	static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	private static final String KS_FILENAME = "autofirma.pfx"; //$NON-NLS-1$
-	private static final char[] KS_PASSWORD = "654321".toCharArray(); //$NON-NLS-1$
+	private static final String KS_PASSWORD = "654321"; //$NON-NLS-1$
 	private static final String CERT_CN = "127.0.0.1"; //$NON-NLS-1$
 	static final String GET_USER_SCRIPT = "/getUsers.sh";//$NON-NLS-1$
 	private static final String MACOSX_CERTIFICATE = "/autofirma.cer";//$NON-NLS-1$
@@ -26,10 +24,11 @@ final class ConfiguratorMacOSX implements Configurator {
 	private static final String OSX_SEC_COMMAND = "security add-trusted-cert -d -r trustRoot -k %KEYCHAIN% %CERT%"; //$NON-NLS-1$
 	private static final String OSX_SEC_COMMAND_UNINSTALL = "sudo security delete-certificate -c %CERT% %KEYCHAIN%"; //$NON-NLS-1$
 	static final String OSX_GET_USERS_COMMAND = "dscacheutil -q user"; //$NON-NLS-1$
-	static final String MAC_SCRIPT_NAME = "/installCerScript.sh"; //$NON-NLS-1$
-	static final String MAC_PATH_SCRIPT = "/var/temp" + MAC_SCRIPT_NAME; //$NON-NLS-1$
+	static final String MAC_SCRIPT_NAME = "/installCerScript"; //$NON-NLS-1$
+	static final String MAC_SCRIPT_EXT = ".sh"; //$NON-NLS-1$
 	static final String EXPORT_PATH = "export PATH=$PATH:";//$NON-NLS-1$
 	static final String EXPORT_LIBRARY_LD = "export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:";//$NON-NLS-1$
+	static String mac_script_path;
 
 
 	@Override
@@ -45,8 +44,18 @@ final class ConfiguratorMacOSX implements Configurator {
 		if (!checkSSLKeyStoreGenerated(appDir)) {
 			window.print(Messages.getString("ConfiguratorMacOSX.5")); //$NON-NLS-1$
 
-			final CertPack certPack = CertUtil.generateSSLCertificate(CERT_CN, ConfiguratorUtil.CERT_ALIAS, KS_PASSWORD,
-					false);
+			try {
+				mac_script_path = File.createTempFile(MAC_SCRIPT_NAME, MAC_SCRIPT_EXT).getAbsolutePath();
+			}
+			catch(final Exception e) {
+				window.print(Messages.getString("ConfiguratorMacOSX.15"));  //$NON-NLS-1$
+				LOGGER.severe("Error creando script temporal: " + e); //$NON-NLS-1$
+				return;
+			}
+			final CertPack certPack = CertUtil.getCertPackForLocalhostSsl(
+				ConfiguratorUtil.CERT_ALIAS,
+				KS_PASSWORD
+			);
 
 			window.print(Messages.getString("ConfiguratorMacOSX.11")); //$NON-NLS-1$
 
@@ -59,21 +68,29 @@ final class ConfiguratorMacOSX implements Configurator {
 			ConfiguratorFirefox.addExexPermissionsToAllFilesOnDirectory(ConfiguratorUtil.getApplicationDirectory());
 			try {
 				window.print(Messages.getString("ConfiguratorMacOSX.13")); //$NON-NLS-1$
-				// generamos el script para instalar el certificado en mozilla
-				ConfiguratorFirefox.installRootCAMozillaKeyStore(appDir, certPack.getCertificate(),new String[] { OSX_GET_USERS_COMMAND});
-				// hay que instalar el certificado en el almacen de Apple
-				importCARootOnMacOSXKeyStore(certPack.getCertificate());
-				ConfiguratorFirefox.addExexPermissionsToFile(new File(MAC_PATH_SCRIPT));
-				ConfiguratorFirefox.executeScriptMacOsx(MAC_PATH_SCRIPT, true, true);
-			} catch (final MozillaProfileNotFoundException e) {
+				// Generamos el script para instalar el certificado en Mozilla
+				ConfiguratorFirefox.installRootCAMozillaKeyStore(
+					appDir,
+					certPack.getCaCertificate(),
+					new String[] { OSX_GET_USERS_COMMAND }
+				);
+				// Tambien hay que instalar el certificado en el almacen de Apple
+				importCARootOnMacOSXKeyStore(certPack.getCaCertificate());
+				ConfiguratorFirefox.addExexPermissionsToFile(new File(mac_script_path));
+				ConfiguratorFirefox.executeScriptMacOsx(mac_script_path, true, true);
+			}
+			catch (final MozillaProfileNotFoundException e) {
 				window.print(Messages.getString("ConfiguratorMacOSX.12")); //$NON-NLS-1$
 			}
 
-		} else {
+		}
+		else {
+			LOGGER.info("checkSSLKeyStoreGenerated existe" ); //$NON-NLS-1$
 			window.print(Messages.getString("ConfiguratorMacOSX.14")); //$NON-NLS-1$
 		}
 
 		window.print(Messages.getString("ConfiguratorMacOSX.8")); //$NON-NLS-1$
+		LOGGER.info("Finalizado" ); //$NON-NLS-1$
 	}
 
 	/**
@@ -96,10 +113,15 @@ final class ConfiguratorMacOSX implements Configurator {
 	 */
 	static void importCARootOnMacOSXKeyStore(final Certificate cert) throws GeneralSecurityException, IOException {
 		final File f = new File(ConfiguratorUtil.getApplicationDirectory() + MACOSX_CERTIFICATE);
-		final String cmd = OSX_SEC_COMMAND.replace("%KEYCHAIN%", KEYCHAIN_PATH).replace("%CERT%", //$NON-NLS-1$ //$NON-NLS-2$
-				f.getAbsolutePath().replace(" ", "\\ ")); //$NON-NLS-1$ //$NON-NLS-2$
+		final String cmd = OSX_SEC_COMMAND.replace(
+			"%KEYCHAIN%", //$NON-NLS-1$
+			KEYCHAIN_PATH
+		).replace(
+			"%CERT%", //$NON-NLS-1$
+			f.getAbsolutePath().replace(" ", "\\ ") //$NON-NLS-1$ //$NON-NLS-2$
+		);
 		LOGGER.info("comando de instalacion del certificado en el almacen de apple: " + cmd); //$NON-NLS-1$
-		ConfiguratorFirefox.writeScriptFile(MAC_PATH_SCRIPT, new StringBuilder(cmd), true);
+		ConfiguratorFirefox.writeScriptFile(mac_script_path, new StringBuilder(cmd), true);
 	}
 
 	@Override
@@ -111,9 +133,14 @@ final class ConfiguratorMacOSX implements Configurator {
 			 uninstallRootCAMacOSXKeyStore();
 			 // generamos script para borrar el almacen certificados firefox
 			ConfiguratorFirefox.generateUninstallScriptMac(ConfiguratorUtil.getApplicationDirectory());
-			ConfiguratorFirefox.addExexPermissionsToAllFilesOnDirectory(ConfiguratorUtil.getApplicationDirectory());
-			ConfiguratorFirefox.executeScriptMacOsx(ConfiguratorUtil.getApplicationDirectory().getAbsolutePath() + MAC_SCRIPT_NAME, true, true);
-		} catch (MozillaProfileNotFoundException | IOException e) {
+			ConfiguratorFirefox.addExexPermissionsToAllFilesOnDirectory(
+				ConfiguratorUtil.getApplicationDirectory()
+			);
+			ConfiguratorFirefox.executeScriptMacOsx(
+				ConfiguratorUtil.getApplicationDirectory().getAbsolutePath() + MAC_SCRIPT_NAME, true, true
+			);
+		}
+		 catch (MozillaProfileNotFoundException | IOException e) {
 			LOGGER.severe("Se ha producido un error durante la desinstalaci&oacute;n :" + e); //$NON-NLS-1$
 		}
 	}

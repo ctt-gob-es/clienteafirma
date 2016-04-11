@@ -1,3 +1,13 @@
+/* Copyright (C) 2011 [Gobierno de Espana]
+ * This file is part of "Cliente @Firma".
+ * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
+ *   - the GNU General Public License as published by the Free Software Foundation;
+ *     either version 2 of the License, or (at your option) any later version.
+ *   - or The European Software License; either version 1.1 or (at your option) any later version.
+ * Date: 11/01/11
+ * You may contact the copyright holder at: soporte.afirma5@mpt.es
+ */
+
 package es.gob.afirma.keystores;
 
 import java.io.IOException;
@@ -27,75 +37,57 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 	private final boolean checkPrivateKeys;
 	private final boolean checkValidity;
 	private final boolean showExpiredCertificates;
-	private final List<CertificateFilter> certFilters;
+	private final List<? extends CertificateFilter> certFilters;
 	private final boolean mandatoryCertificate;
 
 	private String selectedAlias = null;
 
     /** Crea un di&aacute;logo para la selecci&oacute;n de un certificado.
-     * @param ksm
-     *        Gestor de los almac&eacute;nes de certificados a los que pertenecen los alias.
-     *        Debe ser {@code null} si se quiere usar el m&eacute;todo para seleccionar
-     *        otra cosa que no sean certificados X.509 (como claves de cifrado)
-     * @param parentComponent
-     *        Componente gr&aacute;fico sobre el que mostrar los di&aacute;logos.
-     * @param checkPrivateKeys
-     *        Indica si se debe comprobar que el certificado tiene clave
-     *        privada o no, para no mostrar aquellos que carezcan de ella
-     * @param checkValidity
-     *        Indica si se debe comprobar la validez temporal de un
-     *        certificado al ser seleccionado
-     * @param showExpiredCertificates
-     *        Indica si se deben o no mostrar los certificados caducados o
-     *        a&uacute;n no v&aacute;lidos
-     */
+     * @param ksm Gestor de los almac&eacute;nes de certificados a los que pertenecen los alias.
+     *            Debe ser {@code null} si se quiere usar el m&eacute;todo para seleccionar
+     *            otra cosa que no sean certificados X.509 (como claves de cifrado).
+     * @param parentComponent Componente gr&aacute;fico sobre el que mostrar los di&aacute;logos.
+     * @param checkPrivateKeys Indica si se debe comprobar que el certificado tiene clave
+     *                         privada o no, para no mostrar aquellos que carezcan de ella.
+     * @param checkValidity Indica si se debe comprobar la validez temporal de un
+     *                      certificado al ser seleccionado.
+     * @param showExpiredCertificates Indica si se deben o no mostrar los certificados caducados o
+     *                                a&uacute;n no v&aacute;lidos. */
     public AOKeyStoreDialog(final AOKeyStoreManager ksm,
     		                final Object parentComponent,
     		                final boolean checkPrivateKeys,
     		                final boolean showExpiredCertificates,
     		                final boolean checkValidity) {
-
-		if (ksm == null) {
-    		throw new IllegalArgumentException("El almacen de claves no puede ser nulo"); //$NON-NLS-1$
-    	}
-
-		this.ksm = ksm;
-		this.parentComponent = parentComponent;
-		this.checkPrivateKeys = checkPrivateKeys;
-		this.checkValidity = checkValidity;
-		this.showExpiredCertificates = showExpiredCertificates;
-		this.certFilters = null;
-		this.mandatoryCertificate = false;
+		this(
+			ksm,
+			parentComponent,
+			checkPrivateKeys,
+			showExpiredCertificates,
+			checkValidity,
+			null,
+			false
+		);
     }
 
-    /**
-     * Crea un di&aacute;logo para la selecci&oacute;n de un certificado.
-     * @param ksm
-     *        Gestor de los almac&eacute;nes de certificados entre los que se selecciona.
-     * @param parentComponent
-     *        Componente gr&aacute;fico sobre el que mostrar los di&aacute;logos.
-     * @param checkPrivateKeys
-     *        Indica si se debe comprobar que el certificado tiene clave
-     *        privada o no, para no mostrar aquellos que carezcan de ella
-     * @param checkValidity
-     *        Indica si se debe comprobar la validez temporal de un
-     *        certificado al ser seleccionado
-     * @param showExpiredCertificates
-     *        Indica si se deben o no mostrar los certificados caducados o
-     *        aun no v&aacute;lidos
-     * @param certFilters
-     *        Filtros sobre los certificados a mostrar
-     * @param mandatoryCertificate
-     *        Indica si los certificados disponibles (tras aplicar el
-     *        filtro) debe ser solo uno.
-     */
+    /** Crea un di&aacute;logo para la selecci&oacute;n de un certificado.
+     * @param ksm Gestor de los almac&eacute;nes de certificados entre los que se selecciona.
+     * @param parentComponent Componente gr&aacute;fico sobre el que mostrar los di&aacute;logos.
+     * @param checkPrivateKeys Indica si se debe comprobar que el certificado tiene clave
+     *                         privada o no, para no mostrar aquellos que carezcan de ella.
+     * @param showExpiredCertificates Indica si se deben o no mostrar los certificados caducados o
+     *                                aun no v&aacute;lidos.
+     * @param checkValidity Indica si se debe comprobar la validez temporal de un
+     *                      certificado al ser seleccionado.
+     * @param certFilters Filtros sobre los certificados a mostrar.
+     * @param mandatoryCertificate Indica si los certificados disponibles (tras aplicar el
+     *                             filtro) debe ser solo uno. */
 	public AOKeyStoreDialog(final AOKeyStoreManager ksm,
-			final Object parentComponent,
-            final boolean checkPrivateKeys,
-            final boolean checkValidity,
-            final boolean showExpiredCertificates,
-            final List<CertificateFilter> certFilters,
-            final boolean mandatoryCertificate) {
+			                final Object parentComponent,
+                            final boolean checkPrivateKeys,
+                            final boolean showExpiredCertificates,
+                            final boolean checkValidity,
+                            final List<? extends CertificateFilter> certFilters,
+                            final boolean mandatoryCertificate) {
 
 		if (ksm == null) {
     		throw new IllegalArgumentException("El almacen de claves no puede ser nulo"); //$NON-NLS-1$

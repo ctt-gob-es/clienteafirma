@@ -1,7 +1,9 @@
 package es.gob.afirma.signfolder.server.proxy;
 
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -20,7 +22,10 @@ public class RejectsRequestParser {
 	private final static String REJECT_REQUEST_NODE = "reqrjcts"; //$NON-NLS-1$
 	private final static String REJECTS_NODE = "rjcts"; //$NON-NLS-1$
 	private final static String REJECT_NODE = "rjct"; //$NON-NLS-1$
+	private final static String REASON_NODE = "rsn"; //$NON-NLS-1$
 	private final static String ID_ATTRIBUTE = "id"; //$NON-NLS-1$
+
+	private final static String DEFAULT_ENCODING = "utf-8"; //$NON-NLS-1$
 
 	private RejectsRequestParser() {
 		// No se permite el constructor por defecto
@@ -50,7 +55,7 @@ public class RejectsRequestParser {
 		if (nodeIndex != -1 && CERT_NODE.equalsIgnoreCase(rejectRequestNodes.item(nodeIndex).getNodeName())) {
 			try {
 				certEncoded = Base64.decode(rejectRequestNodes.item(nodeIndex).getTextContent().trim());
-			} catch (Exception e) {
+			} catch (final Exception e) {
 				throw new IllegalArgumentException(
 						"No se ha podido obtener la codificacion del certificado a partir del XML: " + e); //$NON-NLS-1$
 			}
@@ -58,6 +63,21 @@ public class RejectsRequestParser {
 		} else {
 			throw new IllegalArgumentException(
 					"No se ha encontrado el certificado para la autenticacion de la peticion de rechazo de solicitudes"); //$NON-NLS-1$
+		}
+
+		// Si se indica una razon del rechazo, la almacenamos
+		String reason = null;
+		if (nodeIndex != -1 && REASON_NODE.equalsIgnoreCase(rejectRequestNodes.item(nodeIndex).getNodeName())) {
+			reason = rejectRequestNodes.item(nodeIndex).getTextContent();
+			if (reason != null) {
+				try {
+					reason = new String(Base64.decode(reason.trim()), Charset.forName(DEFAULT_ENCODING)).trim();
+				} catch (final Exception e) {
+					Logger.getLogger("es.gob.afirma").warning("No se ha podido decodificar la razon del rechazo: " + e);  //$NON-NLS-1$ //$NON-NLS-2$
+					reason = null;
+				}
+			}
+			nodeIndex = XmlUtils.nextNodeElementIndex(rejectRequestNodes, ++nodeIndex);
 		}
 
 		if (nodeIndex == -1 || !REJECTS_NODE.equalsIgnoreCase(rejectRequestNodes.item(nodeIndex).getNodeName())) {
@@ -86,6 +106,6 @@ public class RejectsRequestParser {
 			ids.add(idNode.getNodeValue().trim());
 		}
 
-		return new RejectRequest(certEncoded, ids);
+		return new RejectRequest(certEncoded, ids, reason);
 	}
 }

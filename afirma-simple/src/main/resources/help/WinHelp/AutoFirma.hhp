@@ -4,7 +4,7 @@ Compiled file=AutoFirma.chm
 Contents file=AutoFirmaTOC.hhc
 Default topic=Spanish.lproj\AutoFirma.html
 Display compile progress=No
-Language=0xc0a Español (España, internacional)
+Language=0xc0a Spanish (Modern Sort)
 
 
 [FILES]
@@ -20,6 +20,7 @@ shrd\mhap.png
 Spanish.lproj\AutoFirma.html
 Spanish.lproj\gfx\menufirmascades_mini.png
 Spanish.lproj\gfx\menufirmaspades_mini.png
+Spanish.lproj\gfx\menufirmaspadesvisible_mini.png
 Spanish.lproj\gfx\menufirmasxades_mini.png
 Spanish.lproj\gfx\menugeneral_mini.png
 Spanish.lproj\gfx\pantalladetalle_mini.png
@@ -31,6 +32,7 @@ Spanish.lproj\pgs\MenuPreferencias.html
 Spanish.lproj\pgs\PantallaDetalle.html
 Spanish.lproj\pgs\PantallaEspera.html
 Spanish.lproj\pgs\PantallaFirma.html
+Spanish.lproj\pgs\VentanaPdfVisible.html
 
 [INFOTYPES]
 

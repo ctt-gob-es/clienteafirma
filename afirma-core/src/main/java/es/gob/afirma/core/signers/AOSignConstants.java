@@ -20,6 +20,9 @@ public final class AOSignConstants {
 	// ************* FORMATOS DE FIRMA*****************************
 	// ************************************************************
 
+	/** Identificador del formato de firma seleccionado autom&aacute;ticamente. */
+	public static final String SIGN_FORMAT_AUTO = "auto"; //$NON-NLS-1$
+
 	/** Identificador de la firma CMS. */
 	public static final String SIGN_FORMAT_CMS = "CMS/PKCS#7"; //$NON-NLS-1$
 

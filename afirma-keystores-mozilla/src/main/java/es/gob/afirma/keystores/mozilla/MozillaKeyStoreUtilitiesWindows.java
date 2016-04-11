@@ -1,3 +1,13 @@
+/* Copyright (C) 2011 [Gobierno de Espana]
+ * This file is part of "Cliente @Firma".
+ * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
+ *   - the GNU General Public License as published by the Free Software Foundation;
+ *     either version 2 of the License, or (at your option) any later version.
+ *   - or The European Software License; either version 1.1 or (at your option) any later version.
+ * Date: 11/01/11
+ * You may contact the copyright holder at: soporte.afirma5@mpt.es
+ */
+
 package es.gob.afirma.keystores.mozilla;
 
 import java.io.File;
@@ -11,6 +21,7 @@ import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.keystores.mozilla.bintutil.MsPortableExecutable;
+import es.gob.afirma.keystores.mozilla.bintutil.PEParserException;
 import es.gob.afirma.keystores.mozilla.bintutil.PeMachineType;
 
 final class MozillaKeyStoreUtilitiesWindows {
@@ -94,20 +105,21 @@ final class MozillaKeyStoreUtilitiesWindows {
 
 		// Tenemos la ruta del NSS, comprobamos adecuacion por bugs de Java
 		boolean illegalChars = false;
-		// Solo lo comprobamos en Java 6, en versiones superiores no esta este bug y no es necesario hacer nada
-		final String javaVer = System.getProperty("java.version"); //$NON-NLS-1$
-		if (javaVer == null || javaVer.startsWith("1.6")) { //$NON-NLS-1$
-			for (final char c : dir.toCharArray()) {
-				if (P11_CONFIG_VALID_CHARS.indexOf(c) == -1) {
-					illegalChars = true;
-					break;
-				}
+
+		for (final char c : dir.toCharArray()) {
+			if (P11_CONFIG_VALID_CHARS.indexOf(c) == -1) {
+				illegalChars = true;
+				break;
 			}
 		}
 
 		// Cuidado, el caracter "tilde" (unicode 007E) es valido para perfil de usuario pero no
 		// para bibliotecas en java inferior a 6u30
 		if (illegalChars) {
+
+			LOGGER.info(
+				"La ruta hacia las bibliotecas NSS contiene carcateres ilegales, se copiaran a un temporal: " + dir //$NON-NLS-1$
+			);
 
 			// Tenemos una ruta con caracteres ilegales para la configuracion de SunPKCS#11 por el bug 6581254:
 			// http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6581254
@@ -125,7 +137,9 @@ final class MozillaKeyStoreUtilitiesWindows {
 				}
 				tmp.delete();
 				if (!tmp.mkdir()) {
-					throw new AOException("No se ha creado el directorio temporal"); //$NON-NLS-1$
+					throw new AOException(
+						"No se ha podido crear el directorio temporal para las bibliotecas NSS" //$NON-NLS-1$
+					);
 				}
 
 				// Copiamos la biblioteca de acceso y luego sus dependencias. Las dependencias las
@@ -164,12 +178,13 @@ final class MozillaKeyStoreUtilitiesWindows {
 						LOGGER.info("Arquitectura del NSS encontrado: " + peArch); //$NON-NLS-1$
 				}
 				else {
-					throw new FileNotFoundException(
-						"Este Java es de " + javaArch + " bits, pero el NSS encontrado es para la arquitectura " +  peArch //$NON-NLS-1$ //$NON-NLS-2$
+					LOGGER.info(
+						"Se usara un NSS local por ser este Java de " + javaArch + " bits y el NSS de sistema para la arquitectura " +  peArch //$NON-NLS-1$ //$NON-NLS-2$
 					);
+					return BundledNssHelper.getBundledNssDirectory();
 				}
 			}
-			catch(final Exception e) {
+			catch(final PEParserException e) {
 				LOGGER.warning(
 					"No se ha podido analizar la arquitectura del NSS encontrado: " + e //$NON-NLS-1$
 				);

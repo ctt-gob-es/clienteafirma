@@ -46,37 +46,37 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.PBEParameterSpec;
 
-import org.bouncycastle.asn1.ASN1Encodable;
-import org.bouncycastle.asn1.ASN1EncodableVector;
-import org.bouncycastle.asn1.ASN1Encoding;
-import org.bouncycastle.asn1.ASN1InputStream;
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.ASN1OctetString;
-import org.bouncycastle.asn1.ASN1Primitive;
-import org.bouncycastle.asn1.ASN1Sequence;
-import org.bouncycastle.asn1.ASN1Set;
-import org.bouncycastle.asn1.ASN1TaggedObject;
-import org.bouncycastle.asn1.BERSet;
-import org.bouncycastle.asn1.DERNull;
-import org.bouncycastle.asn1.DEROctetString;
-import org.bouncycastle.asn1.DERPrintableString;
-import org.bouncycastle.asn1.DERSequence;
-import org.bouncycastle.asn1.DERSet;
-import org.bouncycastle.asn1.DERUTCTime;
-import org.bouncycastle.asn1.cms.Attribute;
-import org.bouncycastle.asn1.cms.AttributeTable;
-import org.bouncycastle.asn1.cms.CMSAttributes;
-import org.bouncycastle.asn1.cms.EncryptedContentInfo;
-import org.bouncycastle.asn1.cms.IssuerAndSerialNumber;
-import org.bouncycastle.asn1.cms.KeyTransRecipientInfo;
-import org.bouncycastle.asn1.cms.OriginatorInfo;
-import org.bouncycastle.asn1.cms.RecipientIdentifier;
-import org.bouncycastle.asn1.cms.RecipientInfo;
-import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
-import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
-import org.bouncycastle.asn1.x509.Certificate;
-import org.bouncycastle.asn1.x509.TBSCertificateStructure;
+import org.spongycastle.asn1.ASN1Encodable;
+import org.spongycastle.asn1.ASN1EncodableVector;
+import org.spongycastle.asn1.ASN1Encoding;
+import org.spongycastle.asn1.ASN1InputStream;
+import org.spongycastle.asn1.ASN1ObjectIdentifier;
+import org.spongycastle.asn1.ASN1OctetString;
+import org.spongycastle.asn1.ASN1Primitive;
+import org.spongycastle.asn1.ASN1Sequence;
+import org.spongycastle.asn1.ASN1Set;
+import org.spongycastle.asn1.ASN1TaggedObject;
+import org.spongycastle.asn1.BERSet;
+import org.spongycastle.asn1.DERNull;
+import org.spongycastle.asn1.DEROctetString;
+import org.spongycastle.asn1.DERPrintableString;
+import org.spongycastle.asn1.DERSequence;
+import org.spongycastle.asn1.DERSet;
+import org.spongycastle.asn1.DERUTCTime;
+import org.spongycastle.asn1.cms.Attribute;
+import org.spongycastle.asn1.cms.AttributeTable;
+import org.spongycastle.asn1.cms.CMSAttributes;
+import org.spongycastle.asn1.cms.EncryptedContentInfo;
+import org.spongycastle.asn1.cms.IssuerAndSerialNumber;
+import org.spongycastle.asn1.cms.KeyTransRecipientInfo;
+import org.spongycastle.asn1.cms.OriginatorInfo;
+import org.spongycastle.asn1.cms.RecipientIdentifier;
+import org.spongycastle.asn1.cms.RecipientInfo;
+import org.spongycastle.asn1.pkcs.PKCSObjectIdentifiers;
+import org.spongycastle.asn1.x500.X500Name;
+import org.spongycastle.asn1.x509.AlgorithmIdentifier;
+import org.spongycastle.asn1.x509.Certificate;
+import org.spongycastle.asn1.x509.TBSCertificateStructure;
 
 import es.gob.afirma.core.ciphers.AOCipherConfig;
 import es.gob.afirma.core.ciphers.CipherConstants.AOCipherAlgorithm;
@@ -172,7 +172,7 @@ final class Utils {
      *                                      codificaci&oacute;n de los certificados X.509.*/
     static ASN1Set fetchCertificatesList(final X509Certificate[] signerCertificateChain) throws IOException, CertificateEncodingException {
         if (signerCertificateChain.length != 0) {
-            final List<ASN1Encodable> ce = new ArrayList<ASN1Encodable>();
+            final List<ASN1Encodable> ce = new ArrayList<>();
             for (final X509Certificate element : signerCertificateChain) {
                 ce.add(Certificate.getInstance(ASN1Primitive.fromByteArray(element.getEncoded())));
             }
@@ -350,9 +350,11 @@ final class Utils {
 
     	ASN1Encodable asn1Params;
         if (params != null) {
-            final ASN1InputStream aIn = new ASN1InputStream(cipher.getParameters().getEncoded("ASN.1")); //$NON-NLS-1$
-            asn1Params = aIn.readObject();
-            aIn.close();
+        	try (
+    			final ASN1InputStream aIn = new ASN1InputStream(cipher.getParameters().getEncoded("ASN.1")); //$NON-NLS-1$
+			) {
+        		asn1Params = aIn.readObject();
+        	}
         }
         else {
             asn1Params = DERNull.INSTANCE;
@@ -515,7 +517,7 @@ final class Utils {
             if (certs == null) {
                 ASN1Set certificates = null;
                 final ASN1Set certrevlist = null;
-                final List<ASN1Encodable> ce = new ArrayList<ASN1Encodable>();
+                final List<ASN1Encodable> ce = new ArrayList<>();
                 for (final X509Certificate element : signerCertificateChain) {
                     if (element != null) {
                         ce.add(Certificate.getInstance(ASN1Primitive.fromByteArray(element.getEncoded())));
@@ -546,7 +548,7 @@ final class Utils {
 
                 ASN1Set certificates = null;
                 final ASN1Set certrevlist = new BERSet(new ASN1EncodableVector());
-                final List<ASN1Encodable> ce = new ArrayList<ASN1Encodable>();
+                final List<ASN1Encodable> ce = new ArrayList<>();
                 for (final X509Certificate element : signerCertificateChain) {
                     if (element != null) {
                         ce.add(Certificate.getInstance(ASN1Primitive.fromByteArray(element.getEncoded())));
@@ -616,17 +618,20 @@ final class Utils {
     }
 
     /** Obtiene los datos envueltos
-     * @param cmsData
-     *        Bytes con los datos
-     * @return ASN1Sequence
+     * @param cmsData Datos CMS.
+     * @return ASN1Sequence Secuencia con los datos envueltos.
      * @throws IOException Cuando hay problemas de entrada / salida. */
     static ASN1Sequence fetchWrappedData(final byte[] cmsData) throws IOException {
-        // Leemos el fichero que contiene el envoltorio
-        final ASN1InputStream is = new ASN1InputStream(cmsData);
 
-        // Comenzamos a obtener los datos.
-        final ASN1Sequence dsq = (ASN1Sequence) is.readObject();
-        is.close();
+    	final ASN1Sequence dsq;
+    	try (
+	        // Leemos el fichero que contiene el envoltorio
+	        final ASN1InputStream is = new ASN1InputStream(cmsData);
+		) {
+	        // Comenzamos a obtener los datos.
+	        dsq = (ASN1Sequence) is.readObject();
+    	}
+
         final Enumeration<?> e = dsq.getObjects();
 
         // Elementos que contienen los elementos OID EnvelopedData.

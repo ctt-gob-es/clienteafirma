@@ -33,8 +33,8 @@ import javax.swing.event.ChangeListener;
 
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.standalone.LookAndFeelManager;
-import es.gob.afirma.standalone.PreferencesManager;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
+import es.gob.afirma.standalone.ui.preferences.PreferencesManager;
 
 /** Panel para la espera y detecci&oacute;n autom&aacute;tica de insercci&oacute;n de DNIe.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
@@ -55,8 +55,8 @@ public final class DNIeWaitPanel extends JPanel implements KeyListener {
 
     	this.addPropertyChangeListener(pcl);
 
-        this.setLayout(new GridBagLayout());
-        this.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
+        setLayout(new GridBagLayout());
+        setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 
         final JPanel dniePanel = new JPanel();
         dniePanel.setLayout(new GridBagLayout());
@@ -131,13 +131,15 @@ public final class DNIeWaitPanel extends JPanel implements KeyListener {
         	vectorDNIeHelpPicture = null;
         }
 
+        Color bgColor = Color.WHITE;
         // Configuramos los colores
-        if (!LookAndFeelManager.HIGH_CONTRAST) {
-            this.setBackground(LookAndFeelManager.WINDOW_COLOR);
-            dniePanel.setBackground(LookAndFeelManager.WINDOW_COLOR);
-            textPanel.setBackground(LookAndFeelManager.WINDOW_COLOR);
-            textPanelExtra.setBackground(LookAndFeelManager.WINDOW_COLOR);
+        if (!LookAndFeelManager.HIGH_CONTRAST && !Platform.OS.MACOSX.equals(Platform.getOS())) {
+        	bgColor = LookAndFeelManager.WINDOW_COLOR;
         }
+        setBackground(bgColor);
+        dniePanel.setBackground(bgColor);
+        textPanel.setBackground(bgColor);
+        textPanelExtra.setBackground(bgColor);
 
         final GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.BOTH;
@@ -178,7 +180,7 @@ public final class DNIeWaitPanel extends JPanel implements KeyListener {
 				}
 			}
     	);
-        //this.add(hideDniWaitScreen, c);
+        this.add(hideDniWaitScreen, c);
     }
 
     /** Construye un panel de espera a insercci&oacute;n de DNIe.

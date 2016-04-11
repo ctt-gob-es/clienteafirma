@@ -22,11 +22,11 @@ final class ConsoleManager {
         return false;
     }
 
-	private static final boolean headLess = getHeadLess();
+	private static final boolean headless = getHeadLess();
 	private static final java.io.Console con = System.console();
 
 	static Console getConsole(final ConsoleListener cl) {
-		if (headLess) {
+		if (headless) {
 			if (con != null) {
 			    LOGGER.info("Se utilizara la consola de tipo I/O"); //$NON-NLS-1$
 				return new IoConsole(con);
@@ -39,7 +39,7 @@ final class ConsoleManager {
 	}
 
 	static void showErrorMessage(final Component parent, final String errorText) {
-		if (!headLess) {
+		if (!headless) {
 			JOptionPane.showMessageDialog(
 				parent,
 				errorText,

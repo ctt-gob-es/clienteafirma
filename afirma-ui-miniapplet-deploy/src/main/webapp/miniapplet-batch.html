@@ -21,12 +21,16 @@
 			try {
 				var batch = createBatchConfiguration();
 				
+				showLog(batch);
+				
 				MiniApplet.signBatch(
 					MiniApplet.getBase64FromText(batch),
 //					"http://prevalide.redsara.es/firmaMovil/afirma-server-triphase-signer/BatchPresigner", //$NON-NLS-1$
 //					"http://prevalide.redsara.es/firmaMovil/afirma-server-triphase-signer/BatchPostsigner", //$NON-NLS-1$
-					"http://localhost:8080/afirma-server-triphase-signer/BatchPresigner", //$NON-NLS-1$
-					"http://localhost:8080/afirma-server-triphase-signer/BatchPostsigner", //$NON-NLS-1$
+					"http://10.1.51.27:8080/afirma-server-triphase-signer/BatchPresigner", //$NON-NLS-1$
+					"http://10.1.51.27:8080/afirma-server-triphase-signer/BatchPostsigner", //$NON-NLS-1$
+//					"http://172.24.31.241:8080/afirma-server-triphase-signer/BatchPresigner", //$NON-NLS-1$
+//					"http://172.24.31.241:8080/afirma-server-triphase-signer/BatchPostsigner", //$NON-NLS-1$
 					document.getElementById("filters").value,
 					showResultCallback,
 					showLogCallback);
@@ -41,9 +45,21 @@
 		}
 
 		function addSingleSign() {
-			singleSigns[singleSigns.length] = MiniApplet.getBase64FromText(buildSingleSign(singleSigns.length));
-			
+			singleSigns[singleSigns.length] = MiniApplet.getBase64FromText(buildSingleSign(generateUUID()));
 			document.getElementById("signButton").disabled = "";
+		}
+		
+		function generateUUID(){
+		    var d = new Date().getTime();
+		    if(window.performance && typeof window.performance.now === "function"){
+		        d += performance.now();; //use high-precision timer if available
+		    }
+		    var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+		        var r = (d + Math.random()*16)%16 | 0;
+		        d = Math.floor(d/16);
+		        return (c=='x' ? r : (r&0x3|0x8)).toString(16);
+		    });
+		    return uuid;
 		}
 		
 		function buildSingleSign(id) {
@@ -151,8 +167,8 @@
 		<script type="text/javascript">
 			// IMPORTANTE: PARA PRUEBAS, USAR SIEMPRE UNA IP O NOMBRE DE DOMINIO, NUNCA 'LOCALHOST' O '127.0.0.1'
 			// SI NO SE HACE ASI, FIRMAFACIL BLOQUEARA LA FIRMA POR SEGURIDAD
-			//var HOST = "prevalide.redsara.es/firmaMovil";
-			var HOST = "http://localhost:8080";
+			//var HOST = "http://prevalide.redsara.es/firmaMovil";
+			var HOST = "http://10.1.51.27:8080";
 
 			//MiniApplet.SYSTEM_PROPERTIES = "-Des.gob.afirma.keystores.mozilla.UseEnvironmentVariables=true";
 			MiniApplet.cargarMiniApplet(HOST + '/afirma-ui-miniapplet-deploy');
@@ -197,6 +213,7 @@
 				 <option value="CAdES" selected>CAdES</option>
 				 <option value="PAdES">PAdES</option>
 				 <option value="XAdES">XAdES</option>
+				 <option value="FacturaE">FacturaE</option>
 			 </select>
 			</div>
 			
@@ -205,6 +222,7 @@
 			 <select id="suboperation">
 			 <option value="sign">Firma</option>
 			 <option value="cosign">Cofirma</option>
+			 <option value="countersign">Contrafirma</option>
 			 </select>
 			</div>
 			
@@ -223,7 +241,7 @@
 					 <option value="es.gob.afirma.signers.batch.SignSaverHttpPost">SignSaverHttpPost</option>
 				</select>
 				<br>
-				<label id="targetValue1Label" for="targetValue1">FileName:</label><input type="text" name="targetValue1" id="targetValue1" style="width: 600px;"/>
+				<label id="targetValue1Label" for="targetValue1">Ruta completa de salida:</label><input type="text" name="targetValue1" id="targetValue1" style="width: 600px;"/>
 				<label id="targetValue2Label" for="targetValue2"  style="display: none;"></label><input type="text" name="targetValue2" id="targetValue2" style="width: 600px; display: none;"/>
 				<div style="font-weight: bold;">NOTA: Los aqu&iacute; presentados son manejadores de pruebas y no deben usarse tal cual en los entornos de producción</div>
 			</div>

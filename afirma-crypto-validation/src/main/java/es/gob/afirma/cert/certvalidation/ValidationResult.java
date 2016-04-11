@@ -1,3 +1,13 @@
+/* Copyright (C) 2011 [Gobierno de Espana]
+ * This file is part of "Cliente @Firma".
+ * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
+ *   - the GNU General Public License as published by the Free Software Foundation;
+ *     either version 2 of the License, or (at your option) any later version.
+ *   - or The European Software License; either version 1.1 or (at your option) any later version.
+ * Date: 11/01/11
+ * You may contact the copyright holder at: soporte.afirma5@mpt.es
+ */
+
 package es.gob.afirma.cert.certvalidation;
 
 import java.security.cert.CertificateEncodingException;
@@ -24,14 +34,16 @@ public enum ValidationResult {
 	REVOKED(5),
 	/** Desconocido. */
 	UNKNOWN(6),
-	/** Error interno o del servidor OCSP. */
+	/** Error interno, de red o del servidor OCSP. */
 	SERVER_ERROR(7),
 	/** No autorizado. */
 	UNAUTHORIZED(8),
 	/** Petici&oacute;n OCSP mal formada. */
 	MALFORMED_REQUEST(9),
 	/** La petici&oacute;n OCSP no est&aacute; firmada. */
-	SIG_REQUIRED(10);
+	SIG_REQUIRED(10),
+	/** No se ha podido descargar la lista de certificados revocados. */
+	CANNOT_DOWNLOAD_CRL(11);
 
 	private static final int CODE_VALID = 0;
 	private static final int CODE_CORRUPT = 1;
@@ -44,13 +56,13 @@ public enum ValidationResult {
 	private static final int CODE_UNAUTHORIZED = 8;
 	private static final int CODE_MALFORMED_REQUEST = 9;
 	private static final int CODE_SIG_REQUIRED = 10;
-
+	private static final int CODE_CANNOT_DOWNLOAD_CRL = 11;
 
 	private final int resultCode;
 	private ValidationResult(final int code) {
-		if (code < CODE_VALID || code > CODE_SIG_REQUIRED) {
+		if (code < CODE_VALID || code > CODE_CANNOT_DOWNLOAD_CRL) {
 			throw new IllegalArgumentException(
-				"El codigo de resultado debe estar comprendido entre 0 y 10: " + code //$NON-NLS-1$
+				"El codigo de resultado debe estar comprendido entre 0 y 11: " + code //$NON-NLS-1$
 			);
 		}
 		this.resultCode = code;
@@ -67,8 +79,8 @@ public enum ValidationResult {
 		.toString();
 	}
 
-	/** Indica si el resultado corresponde a un certificado X.509v3 v&aacute;lido (expedido por
-	 * FNMT-RCM, dentro de su periodo de validez y no revocado).
+	/** Indica si el resultado corresponde a un certificado X.509v3 v&aacute;lido, dentro de su
+	 * periodo de validez y no revocado).
 	 * @return <code>true</code> si corresponde a un certificado X.509v3 v&aacute;lido, <code>false</code>
 	 *         en caso contrario */
 	public boolean isValid() {
@@ -79,30 +91,32 @@ public enum ValidationResult {
 	public String toString() {
 		switch(this.resultCode) {
 			case CODE_VALID:
-				return "Valido"; //$NON-NLS-1$
+				return CertValidationMessages.getString("ValidationResult.0"); //$NON-NLS-1$
 			case CODE_CORRUPT:
-				return "No compatible X.509 o corrupto"; //$NON-NLS-1$
+				return CertValidationMessages.getString("ValidationResult.1"); //$NON-NLS-1$
 			case CODE_CA_NOT_SUPPORTED:
-				return "No es de una CA soportada"; //$NON-NLS-1$
+				return CertValidationMessages.getString("ValidationResult.2"); //$NON-NLS-1$
 			case CODE_NOT_YET_VALID:
-				return "Aun no valido"; //$NON-NLS-1$
+				return CertValidationMessages.getString("ValidationResult.3"); //$NON-NLS-1$
 			case CODE_EXPIRED:
-				return "Caducado"; //$NON-NLS-1$
+				return CertValidationMessages.getString("ValidationResult.4"); //$NON-NLS-1$
 			case CODE_REVOKED:
-				return "Revocado"; //$NON-NLS-1$
+				return CertValidationMessages.getString("ValidationResult.5"); //$NON-NLS-1$
 			case CODE_UNKNOWN:
-				return "Desconocido"; //$NON-NLS-1$
+				return CertValidationMessages.getString("ValidationResult.6"); //$NON-NLS-1$
 			case CODE_SERVER_ERROR:
-				return "Error interno o del servidor OCSP"; //$NON-NLS-1$
+				return CertValidationMessages.getString("ValidationResult.7"); //$NON-NLS-1$
 			case CODE_UNAUTHORIZED:
-				return "No autorizado"; //$NON-NLS-1$
+				return CertValidationMessages.getString("ValidationResult.8"); //$NON-NLS-1$
 			case CODE_MALFORMED_REQUEST:
-				return "Peticion OCSP mal formada"; //$NON-NLS-1$
+				return CertValidationMessages.getString("ValidationResult.9"); //$NON-NLS-1$
 			case CODE_SIG_REQUIRED:
-				return "La peticion OCSP no esta firmada"; //$NON-NLS-1$
+				return CertValidationMessages.getString("ValidationResult.10"); //$NON-NLS-1$
+			case CODE_CANNOT_DOWNLOAD_CRL:
+				return CertValidationMessages.getString("ValidationResult.11"); //$NON-NLS-1$
 			default:
 				throw new IllegalStateException(
-					"El codigo de resultado debe estar comprendido entre 0 y 7: " + this.resultCode //$NON-NLS-1$
+					"El codigo de resultado debe estar comprendido entre 0 y 11: " + this.resultCode //$NON-NLS-1$
 				);
 		}
 	}
@@ -133,9 +147,11 @@ public enum ValidationResult {
 				throw new CertificateException("Peticion OCSP mal formada"); //$NON-NLS-1$
 			case CODE_SIG_REQUIRED:
 				throw new CertificateException("La peticion OCSP no esta firmada"); //$NON-NLS-1$
+			case CODE_CANNOT_DOWNLOAD_CRL:
+				throw new CertificateException("No se ha podido descargar la lista de certificados revocados"); //$NON-NLS-1$
 			default:
 				throw new IllegalStateException(
-					"El codigo de resultado debe estar comprendido entre 0 y 7: " + this.resultCode //$NON-NLS-1$
+					"El codigo de resultado debe estar comprendido entre 0 y 11: " + this.resultCode //$NON-NLS-1$
 				);
 		}
 	}

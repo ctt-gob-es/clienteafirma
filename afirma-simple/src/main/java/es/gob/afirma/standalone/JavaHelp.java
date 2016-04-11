@@ -10,7 +10,6 @@
 
 package es.gob.afirma.standalone;
 
-import java.awt.Toolkit;
 import java.net.URL;
 import java.util.logging.Logger;
 
@@ -49,10 +48,8 @@ final class JavaHelp {
 
             // Introducimos el icono en la ventana
             helpwindow.setIconImage(
-                    Toolkit.getDefaultToolkit().createImage(
-                    		classLoader.getResource("resources/afirma_ico.png") //$NON-NLS-1$
-                    )
-            );
+        		AutoFirmaUtil.getDefaultDialogsIcon()
+    		);
         }
         catch (final Exception ex) {
             Logger.getLogger("es.gob.afirma").severe("No se ha podido cargar la ayuda: " + ex); //$NON-NLS-1$ //$NON-NLS-2$

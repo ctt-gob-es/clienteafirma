@@ -1,6 +1,17 @@
+/* Copyright (C) 2011 [Gobierno de Espana]
+ * This file is part of "Cliente @Firma".
+ * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
+ *   - the GNU General Public License as published by the Free Software Foundation;
+ *     either version 2 of the License, or (at your option) any later version.
+ *   - or The European Software License; either version 1.1 or (at your option) any later version.
+ * Date: 11/01/11
+ * You may contact the copyright holder at: soporte.afirma5@mpt.es
+ */
+
 package es.gob.afirma.core.misc.protocol;
 
 import java.net.URL;
+import java.net.URLDecoder;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Properties;
@@ -34,6 +45,9 @@ public abstract class UrlParameters {
 
 	/** Par&aacute;metro que identifica el <i>User Agent</i> del navegador Web usado. */
 	private static final String KEYSTORE ="keystore"; //$NON-NLS-1$
+
+	/** Codificaci&oacute;n por defecto. */
+	private static final String DEFAULT_ENCODING = "utf-8"; //$NON-NLS-1$
 
 	private byte[] data = null;
 	private String fileId = null;
@@ -175,18 +189,18 @@ public abstract class UrlParameters {
 						"Error al validar la URL del servlet de recuperacion: " + e, e //$NON-NLS-1$
 					);
 				}
-
 			}
 		}
 		else {
-
-			// Prohibimos por seguridad el uso de URL del tipo "file://"
-			DataDownloader.enableFilesUsage(false);
-
-			// Comprobamos que los datos se pueden tratar como Base64
+			final String dataPrm = params.get(DATA_PARAM);
+			if (dataPrm.startsWith("file:/")) { //$NON-NLS-1$
+				throw new ParameterException(
+					"No se permite la lectura de ficheros locales: " + dataPrm //$NON-NLS-1$
+				);
+			}
 			try {
 				setData(
-					DataDownloader.downloadData(params.get(DATA_PARAM))
+					DataDownloader.downloadData(dataPrm)
 				);
 			}
 			catch (final Exception e) {
@@ -230,7 +244,7 @@ public abstract class UrlParameters {
 		// Comprobamos que la URL sea valida
 		final URL servletUrl;
 		try {
-			servletUrl = new URL(url);
+			servletUrl = new URL(URLDecoder.decode(url, DEFAULT_ENCODING));
 		}
 		catch (final Exception e) {
 			throw new ParameterException(
@@ -257,16 +271,24 @@ public abstract class UrlParameters {
 	}
 
 	protected static String verifyDefaultKeyStoreName(final Map<String, String> params) {
+
+		// Si se ha especificado un almacen, se usara ese
 		if (params.containsKey(KEYSTORE)) {
 			return params.get(KEYSTORE);
 		}
+
+		// Si no se ha especificado almacen, se usara el del sistema operativo
+
 		if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
 			return "WINDOWS"; //$NON-NLS-1$
 		}
 		if (Platform.OS.MACOSX.equals(Platform.getOS())) {
 			return "APPLE"; //$NON-NLS-1$
 		}
-		if (Platform.OS.LINUX.equals(Platform.getOS()) || Platform.OS.SOLARIS.equals(Platform.getOS())) {
+		if (Platform.OS.LINUX.equals(Platform.getOS())) {
+			return "SHARED_NSS"; //$NON-NLS-1$
+		}
+		if (Platform.OS.SOLARIS.equals(Platform.getOS())) {
 			return "MOZ_UNI"; //$NON-NLS-1$
 		}
 		return null;

@@ -76,7 +76,7 @@ final class TempStoreFileSystem implements TempStore {
 		);
 		bos.write(dataToSave);
 		bos.flush();
-		fos.close();
+		bos.close();
 		LOGGER.info("Firma '" + ss.getId() + "' almacenada temporalmente en " + getFilename(ss, batchId)); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 

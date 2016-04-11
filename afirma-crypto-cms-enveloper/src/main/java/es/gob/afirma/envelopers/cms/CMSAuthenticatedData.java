@@ -31,32 +31,32 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 
-import org.bouncycastle.asn1.ASN1Encodable;
-import org.bouncycastle.asn1.ASN1EncodableVector;
-import org.bouncycastle.asn1.ASN1Encoding;
-import org.bouncycastle.asn1.ASN1InputStream;
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.ASN1Sequence;
-import org.bouncycastle.asn1.ASN1Set;
-import org.bouncycastle.asn1.ASN1TaggedObject;
-import org.bouncycastle.asn1.BEROctetString;
-import org.bouncycastle.asn1.DEROctetString;
-import org.bouncycastle.asn1.DERPrintableString;
-import org.bouncycastle.asn1.DERSet;
-import org.bouncycastle.asn1.DERTaggedObject;
-import org.bouncycastle.asn1.DERUTCTime;
-import org.bouncycastle.asn1.cms.Attribute;
-import org.bouncycastle.asn1.cms.AttributeTable;
-import org.bouncycastle.asn1.cms.AuthenticatedData;
-import org.bouncycastle.asn1.cms.CMSAttributes;
-import org.bouncycastle.asn1.cms.ContentInfo;
-import org.bouncycastle.asn1.cms.OriginatorInfo;
-import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
-import org.bouncycastle.asn1.x500.style.RFC4519Style;
-import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
-import org.bouncycastle.cms.CMSException;
-import org.bouncycastle.cms.CMSProcessable;
-import org.bouncycastle.cms.CMSProcessableByteArray;
+import org.spongycastle.asn1.ASN1Encodable;
+import org.spongycastle.asn1.ASN1EncodableVector;
+import org.spongycastle.asn1.ASN1Encoding;
+import org.spongycastle.asn1.ASN1InputStream;
+import org.spongycastle.asn1.ASN1ObjectIdentifier;
+import org.spongycastle.asn1.ASN1Sequence;
+import org.spongycastle.asn1.ASN1Set;
+import org.spongycastle.asn1.ASN1TaggedObject;
+import org.spongycastle.asn1.BEROctetString;
+import org.spongycastle.asn1.DEROctetString;
+import org.spongycastle.asn1.DERPrintableString;
+import org.spongycastle.asn1.DERSet;
+import org.spongycastle.asn1.DERTaggedObject;
+import org.spongycastle.asn1.DERUTCTime;
+import org.spongycastle.asn1.cms.Attribute;
+import org.spongycastle.asn1.cms.AttributeTable;
+import org.spongycastle.asn1.cms.AuthenticatedData;
+import org.spongycastle.asn1.cms.CMSAttributes;
+import org.spongycastle.asn1.cms.ContentInfo;
+import org.spongycastle.asn1.cms.OriginatorInfo;
+import org.spongycastle.asn1.pkcs.PKCSObjectIdentifiers;
+import org.spongycastle.asn1.x500.style.RFC4519Style;
+import org.spongycastle.asn1.x509.AlgorithmIdentifier;
+import org.spongycastle.cms.CMSException;
+import org.spongycastle.cms.CMSProcessable;
+import org.spongycastle.cms.CMSProcessableByteArray;
 
 import es.gob.afirma.core.ciphers.AOCipherConfig;
 import es.gob.afirma.core.signers.AOSignConstants;
@@ -97,8 +97,7 @@ import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
  * </pre>
  *
  * La implementaci&oacute;n del c&oacute;digo ha seguido los pasos necesarios
- * para crear un mensaje AuthenticatedData de BouncyCastle: <a
- * href="http://www.bouncycastle.org/">www.bouncycastle.org</a> */
+ * para crear un mensaje AuthenticatedData de SpongyCastle. */
 
  final class CMSAuthenticatedData {
 
@@ -161,7 +160,7 @@ import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
         if (signerCertChain.length != 0) {
             // introducimos una lista vacia en los CRL ya que no podemos
             // modificar el codigo de bc.
-            final List<ASN1Encodable> crl = new ArrayList<ASN1Encodable>();
+            final List<ASN1Encodable> crl = new ArrayList<>();
             certrevlist = EvelopUtils.createBerSetFromList(crl);
             origInfo = new OriginatorInfo(certificates, certrevlist);
         }
@@ -306,10 +305,12 @@ import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
      * @throws CertificateEncodingException Si el certificado del remitente es invalido */
     static byte[] addOriginatorInfo(final InputStream data, final X509Certificate[] signerCertificateChain) throws IOException, CertificateEncodingException {
 
-    	final ASN1InputStream is = new ASN1InputStream(data);
-        // LEEMOS EL FICHERO QUE NOS INTRODUCEN
-        final ASN1Sequence dsq = (ASN1Sequence) is.readObject();
-        is.close();
+    	final ASN1Sequence dsq;
+    	try (final ASN1InputStream is = new ASN1InputStream(data);) {
+	        // LEEMOS EL FICHERO QUE NOS INTRODUCEN
+	        dsq = (ASN1Sequence) is.readObject();
+    	}
+
         final Enumeration<?> e = dsq.getObjects();
         // Elementos que contienen los elementos OID Data
         final ASN1ObjectIdentifier doi = (ASN1ObjectIdentifier) e.nextElement();

@@ -33,6 +33,7 @@ import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.http.UrlHttpManager;
 import es.gob.afirma.core.misc.http.UrlHttpManagerFactory;
+import es.gob.afirma.core.misc.http.UrlHttpMethod;
 import es.gob.afirma.core.signers.AOPkcs1Signer;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSignInfo;
@@ -40,6 +41,7 @@ import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.signers.TriphaseData;
 import es.gob.afirma.core.signers.TriphaseDataSigner;
+import es.gob.afirma.core.signers.TriphaseUtil;
 import es.gob.afirma.core.util.tree.AOTreeModel;
 
 /** Manejador de firmas XAdES trif&aacute;sicas. Mediante este manejador un usuario puede firmar un documento remoto
@@ -102,7 +104,7 @@ public class AOXAdESTriPhaseSigner implements AOSigner {
 	private static final String PARAMETER_NAME_DOCID = "doc"; //$NON-NLS-1$
 	private static final String PARAMETER_NAME_ALGORITHM = "algo"; //$NON-NLS-1$
 	private static final String PARAMETER_NAME_FORMAT = "format"; //$NON-NLS-1$
-	private static final String PARAMETER_NAME_CERT = "cert"; //$NON-NLS-1$
+		private static final String PARAMETER_NAME_CERT = "cert"; //$NON-NLS-1$
 	private static final String PARAMETER_NAME_EXTRA_PARAM = "params"; //$NON-NLS-1$
 	private static final String PARAMETER_NAME_SESSION_DATA = "session"; //$NON-NLS-1$
 
@@ -190,10 +192,20 @@ public class AOXAdESTriPhaseSigner implements AOSigner {
 			final Certificate[] certChain,
 			final Properties xParams) throws AOException {
 
-		final Properties params = xParams != null ? xParams : new Properties();
-		if (!params.containsKey(COUNTERSIGN_TARGET_KEY)) {
-			params.setProperty(COUNTERSIGN_TARGET_KEY, COUNTERSIGN_TARGET_LEAFS);
+		// Si no se ha definido nodos objeto de la contrafirma se definen los nodos hijo
+		if (targetType == null) {
+			throw new IllegalArgumentException("No se han indicado los nodos objetivo de la contrafirma"); //$NON-NLS-1$
 		}
+
+		// Comprobamos si es un tipo de contrafirma soportado
+		if (targetType != CounterSignTarget.TREE && targetType != CounterSignTarget.LEAFS) {
+			throw new UnsupportedOperationException("El objetivo indicado para la contrafirma no esta soportado: " + targetType); //$NON-NLS-1$
+		}
+
+		final Properties params = xParams != null ? xParams : new Properties();
+
+		params.setProperty(COUNTERSIGN_TARGET_KEY, targetType.toString());
+
 		return triPhaseOperation(
 			this.signFormat,
 			CRYPTO_OPERATION_COUNTERSIGN,
@@ -322,12 +334,23 @@ public class AOXAdESTriPhaseSigner implements AOSigner {
 			);
 		}
 
-		//TODO: Retirar del extraParams la URL del servidor de firma sin mutar los parametros de entrada
+		// Retiramos del extraParams la URL del servidor de firma sin mutar los parametros de entrada
+		final Properties xParams = (Properties) extraParams.clone();
+		xParams.remove(PROPERTY_NAME_SIGN_SERVER_URL);
 
 		// Decodificamos el identificador del documento
 		final String documentId = Base64.encode(data, true);
 
 		final UrlHttpManager urlManager = UrlHttpManagerFactory.getInstalledManager();
+
+		// Preparamos el parametro de cadena de certificados
+		final String cerChainParamContent;
+		try {
+			cerChainParamContent = TriphaseUtil.prepareCertChainParam(certChain, xParams);
+		}
+		catch (final CertificateEncodingException e) {
+			throw new AOException("Error decodificando la cadena de certificados: " + e, e); //$NON-NLS-1$
+		}
 
 		// ---------
 		// PREFIRMA
@@ -351,23 +374,20 @@ public class AOXAdESTriPhaseSigner implements AOSigner {
 			append(PARAMETER_NAME_CRYPTO_OPERATION).append(HTTP_EQUALS).append(cryptoOperation).append(HTTP_AND).
 			append(PARAMETER_NAME_FORMAT).append(HTTP_EQUALS).append(format).append(HTTP_AND).
 			append(PARAMETER_NAME_ALGORITHM).append(HTTP_EQUALS).append(algorithm).append(HTTP_AND).
-			append(PARAMETER_NAME_CERT).append(HTTP_EQUALS).append(Base64.encode(certChain[0].getEncoded(), true)).append(HTTP_AND).
+			append(PARAMETER_NAME_CERT).append(HTTP_EQUALS).append(cerChainParamContent).append(HTTP_AND).
 			append(PARAMETER_NAME_DOCID).append(HTTP_EQUALS).append(documentId);
 
-			if (extraParams.size() > 0) {
+			if (xParams.size() > 0) {
 				urlBuffer.append(HTTP_AND).append(PARAMETER_NAME_EXTRA_PARAM).append(HTTP_EQUALS).
-				append(AOUtil.properties2Base64(extraParams));
+				append(AOUtil.properties2Base64(xParams));
 			}
 
 			final String postUrl = urlBuffer.toString();
 
 			LOGGER.info("Se llamara por POST a la siguiente URL:\n" + postUrl);  //$NON-NLS-1$
 
-			preSignResult = urlManager.readUrlByPost(postUrl);
+			preSignResult = urlManager.readUrl(postUrl, UrlHttpMethod.POST);
 			urlBuffer.setLength(0);
-		}
-		catch (final CertificateEncodingException e) {
-			throw new AOException("Error decodificando el certificado del firmante: " + e, e); //$NON-NLS-1$
 		}
 		catch (final IOException e) {
 			throw new AOException("Error en la llamada de prefirma al servidor: " + e, e); //$NON-NLS-1$
@@ -410,25 +430,21 @@ public class AOXAdESTriPhaseSigner implements AOSigner {
 		try {
 			final StringBuffer urlBuffer = new StringBuffer();
 			urlBuffer.append(signServerUrl).append(HTTP_CGI).
-			append(PARAMETER_NAME_OPERATION).append(HTTP_EQUALS).append(OPERATION_POSTSIGN)                       .append(HTTP_AND).
-			append(PARAMETER_NAME_CRYPTO_OPERATION).append(HTTP_EQUALS).append(cryptoOperation)                   .append(HTTP_AND).
-			append(PARAMETER_NAME_FORMAT).append(HTTP_EQUALS).append(format)                                      .append(HTTP_AND).
-			append(PARAMETER_NAME_ALGORITHM).append(HTTP_EQUALS).append(algorithm)                                .append(HTTP_AND).
-			append(PARAMETER_NAME_CERT).append(HTTP_EQUALS).append(Base64.encode(certChain[0].getEncoded(), true)).append(HTTP_AND).
+			append(PARAMETER_NAME_OPERATION).append(HTTP_EQUALS).append(OPERATION_POSTSIGN)    .append(HTTP_AND).
+			append(PARAMETER_NAME_CRYPTO_OPERATION).append(HTTP_EQUALS).append(cryptoOperation).append(HTTP_AND).
+			append(PARAMETER_NAME_FORMAT).append(HTTP_EQUALS).append(format)                   .append(HTTP_AND).
+			append(PARAMETER_NAME_ALGORITHM).append(HTTP_EQUALS).append(algorithm)             .append(HTTP_AND).
+			append(PARAMETER_NAME_CERT).append(HTTP_EQUALS).append(cerChainParamContent)       .append(HTTP_AND).
 			append(PARAMETER_NAME_DOCID).append(HTTP_EQUALS).append(documentId).append(HTTP_AND).
 			append(PARAMETER_NAME_SESSION_DATA).append(HTTP_EQUALS).append(preResultAsBase64);
 
-			if (extraParams.size() > 0) {
+			if (xParams.size() > 0) {
 				urlBuffer.append(HTTP_AND).append(PARAMETER_NAME_EXTRA_PARAM).append(HTTP_EQUALS).
-				append(AOUtil.properties2Base64(extraParams));
+				append(AOUtil.properties2Base64(xParams));
 			}
 
-			// No indicamos los datos (documentId) porque no son necesarios en la postfirma //TODO: Homogenizar indicandolo desde servidor
-			triSignFinalResult = urlManager.readUrlByPost(urlBuffer.toString());
+			triSignFinalResult = urlManager.readUrl(urlBuffer.toString(), UrlHttpMethod.POST);
 
-		}
-		catch (final CertificateEncodingException e) {
-			throw new AOException("Error decodificando el certificado del firmante: " + e, e); //$NON-NLS-1$
 		}
 		catch (final IOException e) {
 			throw new AOException("Error en la llamada de postfirma al servidor: " + e, e); //$NON-NLS-1$
@@ -446,7 +462,7 @@ public class AOXAdESTriPhaseSigner implements AOSigner {
 		}
 		catch (final IOException e) {
 			LOGGER.warning("El resultado de NEWID del servidor no estaba en Base64: " + e); //$NON-NLS-1$
-			throw new AOException("El resultado devuelto por el servidor no es correcto", e); //$NON-NLS-1$
+			throw new AOException("El resultado devuelto por el servidor no es correcto: " + e, e); //$NON-NLS-1$
 		}
 	}
 

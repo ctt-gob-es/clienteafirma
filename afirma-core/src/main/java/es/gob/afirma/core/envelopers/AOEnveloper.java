@@ -16,6 +16,7 @@ import java.security.KeyStore.PrivateKeyEntry;
 import java.security.cert.X509Certificate;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Properties;
+import java.util.zip.DataFormatException;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.ciphers.CipherConstants.AOCipherAlgorithm;
@@ -65,17 +66,13 @@ public interface AOEnveloper {
 
 
     /** Recupera los datos contenidos en un envoltorio.
-     * @param envelop
-     * 			Envoltorio de datos.
-     * @param addresseePke
-     * 			Clave privada del receptor del envoltorio (si es necesario)
+     * @param envelop Envoltorio de datos.
+     * @param addresseePke Clave privada del receptor del envoltorio (si es necesario)
      * @return Datos contenidos en el envoltorio.
-     * @throws InvalidKeyException
-     * 			Si la clave indicada no es v&aacute;lida o no pertenece a un destinatario del envoltorio.
-     * @throws AOException
-     * 			Cuando ocurre algun problema en la apetura del envoltorio.
-     * @throws IOException Si hay problema de lectura / escritura de datos
-     * @throws InvalidKeySpecException Cuando la clave es inv&aacute;lida
-     */
-    byte[] recoverData(byte[] envelop, PrivateKeyEntry addresseePke) throws InvalidKeyException, AOException, IOException, InvalidKeySpecException;
+     * @throws InvalidKeyException Si la clave indicada no es v&aacute;lida o no pertenece a un destinatario del envoltorio.
+     * @throws AOException Cuando ocurre algun problema en la apetura del envoltorio.
+     * @throws IOException Si hay problema de lectura / escritura de datos.
+     * @throws InvalidKeySpecException Cuando la clave es inv&aacute;lida.
+     * @throws DataFormatException Si hay errores en el formato de datos esperados. */
+    byte[] recoverData(byte[] envelop, PrivateKeyEntry addresseePke) throws InvalidKeyException, AOException, IOException, InvalidKeySpecException, DataFormatException;
 }

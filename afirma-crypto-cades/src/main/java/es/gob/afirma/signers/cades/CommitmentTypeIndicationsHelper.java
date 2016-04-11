@@ -1,3 +1,13 @@
+/* Copyright (C) 2011 [Gobierno de Espana]
+ * This file is part of "Cliente @Firma".
+ * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
+ *   - the GNU General Public License as published by the Free Software Foundation;
+ *     either version 2 of the License, or (at your option) any later version.
+ *   - or The European Software License; either version 1.1 or (at your option) any later version.
+ * Date: 11/01/11
+ * You may contact the copyright holder at: soporte.afirma5@mpt.es
+ */
+
 package es.gob.afirma.signers.cades;
 
 import java.util.ArrayList;
@@ -8,10 +18,10 @@ import java.util.Properties;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.DERSequence;
-import org.bouncycastle.asn1.esf.CommitmentTypeIdentifier;
-import org.bouncycastle.asn1.esf.CommitmentTypeIndication;
+import org.spongycastle.asn1.ASN1ObjectIdentifier;
+import org.spongycastle.asn1.DERSequence;
+import org.spongycastle.asn1.esf.CommitmentTypeIdentifier;
+import org.spongycastle.asn1.esf.CommitmentTypeIndication;
 
 /** Clase de utilidad para la gesti&oacute;n de los <i>CommitmentTypeIndication</i> de CAdES.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */

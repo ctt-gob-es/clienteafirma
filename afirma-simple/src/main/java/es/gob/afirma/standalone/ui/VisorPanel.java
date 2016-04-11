@@ -21,6 +21,7 @@ import java.awt.event.KeyListener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.security.cert.X509Certificate;
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
@@ -34,17 +35,28 @@ import es.gob.afirma.cert.signvalidation.ValidateBinarySignature;
 import es.gob.afirma.cert.signvalidation.ValidatePdfSignature;
 import es.gob.afirma.cert.signvalidation.ValidateXMLSignature;
 import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.core.signers.AOSimpleSignInfo;
+import es.gob.afirma.core.util.tree.AOTreeModel;
+import es.gob.afirma.core.util.tree.AOTreeNode;
+import es.gob.afirma.signers.cades.AOCAdESSigner;
+import es.gob.afirma.signers.cms.AOCMSSigner;
+import es.gob.afirma.signers.odf.AOODFSigner;
+import es.gob.afirma.signers.ooxml.AOOOXMLSigner;
+import es.gob.afirma.signers.pades.AOPDFSigner;
+import es.gob.afirma.signers.xades.AOFacturaESigner;
+import es.gob.afirma.signers.xades.AOXAdESSigner;
+import es.gob.afirma.signers.xmldsig.AOXMLDSigSigner;
 import es.gob.afirma.standalone.DataAnalizerUtil;
 import es.gob.afirma.standalone.LookAndFeelManager;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.VisorFirma;
 
-/** Panel para la espera y detecci&oacute;n autom&aacute;tica de insercci&oacute;n de DNIe.
- * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s
+/** Visor de firmas.
+ * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s.
  * @author Carlos Gamuci. */
 public final class VisorPanel extends JPanel implements KeyListener {
 
-    /** Version ID */
+    /** Version ID. */
     private static final long serialVersionUID = 8309157734617505338L;
 
     private final VisorFirma visorFirma;
@@ -52,7 +64,6 @@ public final class VisorPanel extends JPanel implements KeyListener {
     VisorFirma getVisorFirma() {
         return this.visorFirma;
     }
-
 
     /** Construye un panel con la informaci&oacute;n extra&iacute;da de una firma. Si no se
      * indica la firma, esta se cargar&aacute; desde un fichero. Es obligatorio introducir
@@ -101,13 +112,22 @@ public final class VisorPanel extends JPanel implements KeyListener {
         if (sign != null) {
             try {
                 validity = validateSign(sign);
-            } catch (final Exception e) {
+            }
+            catch (final Exception e) {
                 validity = new SignValidity(SIGN_DETAIL_TYPE.KO, null);
             }
         }
 
+        final X509Certificate cert = getCertificate(sign);
+
         final JPanel resultPanel = new SignResultPanel(validity, this);
-        final JPanel dataPanel = new SignDataPanel(signFile, sign, null, null, this);
+        final JPanel dataPanel = new SignDataPanel(
+    		signFile,
+    		sign,
+    		null,
+    		cert, // Certificado
+    		this
+		);
 
         final JPanel bottonPanel = new JPanel(true);
         bottonPanel.setLayout(new FlowLayout(FlowLayout.TRAILING));
@@ -117,27 +137,31 @@ public final class VisorPanel extends JPanel implements KeyListener {
             openSign.setMnemonic('V');
             bottonPanel.add(openSign);
             openSign.addKeyListener(this);
-            openSign.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(final ActionEvent e) {
-                    if (VisorPanel.this.getVisorFirma() != null) {
-                        VisorPanel.this.getVisorFirma().loadNewSign();
-                    }
-                }
-            });
+            openSign.addActionListener(
+        		new ActionListener() {
+	                @Override
+	                public void actionPerformed(final ActionEvent e) {
+	                    if (VisorPanel.this.getVisorFirma() != null) {
+	                        VisorPanel.this.getVisorFirma().loadNewSign();
+	                    }
+	                }
+	            }
+    		);
         }
 
         final JButton closeVisor = new JButton(SimpleAfirmaMessages.getString("VisorPanel.0")); //$NON-NLS-1$
         closeVisor.setMnemonic('C');
         closeVisor.addKeyListener(this);
-        closeVisor.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                if (VisorPanel.this.getVisorFirma() != null) {
-                    VisorPanel.this.getVisorFirma().closeApplication(0);
-                }
-            }
-        });
+        closeVisor.addActionListener(
+    		new ActionListener() {
+	            @Override
+	            public void actionPerformed(final ActionEvent e) {
+	                if (VisorPanel.this.getVisorFirma() != null) {
+	                    VisorPanel.this.getVisorFirma().closeApplication(0);
+	                }
+	            }
+	        }
+		);
         bottonPanel.add(closeVisor);
 
         // Establecemos la configuracion de color
@@ -165,11 +189,67 @@ public final class VisorPanel extends JPanel implements KeyListener {
 
     }
 
-    /**
-     * Comprueba la validez de la firma.
+    private static X509Certificate getCertificate(final byte[] sign) {
+		if (sign == null) {
+			return null;
+		}
+		final AOTreeModel tree;
+		try {
+			if (new AOFacturaESigner().isSign(sign)) {
+				tree = new AOFacturaESigner().getSignersStructure(sign, true);
+			}
+			else if (new AOXAdESSigner().isSign(sign)) {
+				tree = new AOXAdESSigner().getSignersStructure(sign, true);
+			}
+			else if (new AOXMLDSigSigner().isSign(sign)) {
+				tree = new AOXMLDSigSigner().getSignersStructure(sign, true);
+			}
+			else if (new AOPDFSigner().isSign(sign)) {
+				tree = new AOPDFSigner().getSignersStructure(sign, true);
+			}
+			else if (new AOCAdESSigner().isSign(sign)) {
+				tree = new AOCAdESSigner().getSignersStructure(sign, true);
+			}
+			else if (new AOCMSSigner().isSign(sign)) {
+				tree = new AOCMSSigner().getSignersStructure(sign, true);
+			}
+			else if (new AOOOXMLSigner().isSign(sign)) {
+				tree = new AOOOXMLSigner().getSignersStructure(sign, true);
+			}
+			else if (new AOODFSigner().isSign(sign)) {
+				tree = new AOODFSigner().getSignersStructure(sign, true);
+			}
+			else {
+				return null;
+			}
+		}
+		catch(final Exception e) {
+			Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
+				"No se ha podido obtener el certificado de la firma: " + e //$NON-NLS-1$
+			);
+			return null;
+		}
+		// Solo se muestra la informacion del certificado si hay una unica firma
+		if (AOTreeModel.getChildCount(tree.getRoot()) != 1) {
+			return null;
+		}
+		final AOTreeNode node = (AOTreeNode) AOTreeModel.getChild(tree.getRoot(),0);
+		final AOSimpleSignInfo ssi = (AOSimpleSignInfo) node.getUserObject();
+		if (ssi == null) {
+			return null;
+		}
+		final X509Certificate[] certs = ssi.getCerts();
+		if (certs == null || certs.length < 1) {
+			return null;
+		}
+		return certs[0];
+	}
+
+
+	/** Comprueba la validez de la firma.
      * @param sign Firma que se desea comprobar.
      * @return {@code true} si la firma es v&acute;lida, {@code false} en caso contrario.
-     * @throws IOException Si ocurren problemas relacionados con la lectura de la firma */
+     * @throws IOException Si ocurren problemas relacionados con la lectura de la firma. */
     private static SignValidity validateSign(final byte[] sign) throws IOException {
         if (DataAnalizerUtil.isSignedPDF(sign)) {
         	return ValidatePdfSignature.validate(sign);
@@ -201,14 +281,12 @@ public final class VisorPanel extends JPanel implements KeyListener {
 
 	@Override
 	public void keyReleased(final KeyEvent e) {
-		// TODO Auto-generated method stub
-
+		// Vacio
 	}
 
 	@Override
 	public void keyTyped(final KeyEvent e) {
-		// TODO Auto-generated method stub
-
+		// Vacio
 	}
 
 }

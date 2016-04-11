@@ -5,26 +5,26 @@ package es.gob.afirma.signfolder.server.proxy;
  */
 public class ApproveRequest {
 
-	private final String requestId;
+	private final String requestTagId;
 
 	private boolean ok;
 
 	/**
 	 * Construye la solicitud de visto bueno para una petici&oacute;n.
-	 * @param requestId Identificador de la petici&oacute;n.
+	 * @param requestTagId Identificador de la petici&oacute;n.
 	 */
-	public ApproveRequest(final String requestId) {
-		this.requestId = requestId;
+	public ApproveRequest(final String requestTagId) {
+		this.requestTagId = requestTagId;
 		this.ok = true;
 	}
 
 	/**
 	 * Construye una respuesta a la solicitud de visto bueno para una petici&oacute;n con su resultado.
-	 * @param requestId Identificador de la petici&oacute;n.
+	 * @param requestTagId Identificador de la petici&oacute;n.
 	 * @param ok Resultado de la operaci&oacute;n.
 	 */
-	public ApproveRequest(final String requestId, final boolean ok) {
-		this.requestId = requestId;
+	public ApproveRequest(final String requestTagId, final boolean ok) {
+		this.requestTagId = requestTagId;
 		this.ok = ok;
 	}
 
@@ -46,11 +46,11 @@ public class ApproveRequest {
 	}
 
 	/**
-	 * Recupera el identificador de la operaci&oacute;n.
+	 * Recupera el tag identificador de la operaci&oacute;n.
 	 * @return Identificador.
 	 */
-	public String getRequestId() {
-		return this.requestId;
+	public String getRequestTagId() {
+		return this.requestTagId;
 	}
 
 

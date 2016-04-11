@@ -186,6 +186,8 @@
 									<mainClass>es.gob.afirma.applet.SignApplet</mainClass>
 								</transformer>
 							</transformers>
+							<fork>true</fork>
+							<compilerArgument>-XDignore.symbol.file</compilerArgument>
 						</configuration>
 					</execution>
 				</executions>

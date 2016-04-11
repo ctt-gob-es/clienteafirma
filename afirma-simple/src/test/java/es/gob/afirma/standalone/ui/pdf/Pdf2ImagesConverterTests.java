@@ -14,7 +14,7 @@ import javax.swing.JFrame;
 
 import org.junit.Test;
 
-import com.lowagie.text.pdf.PdfReader;
+import com.aowagie.text.pdf.PdfReader;
 
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.standalone.ui.pdf.PdfLoader.PdfLoaderListener;
@@ -24,6 +24,7 @@ import es.gob.afirma.standalone.ui.pdf.PdfLoader.PdfLoaderListener;
 public final class Pdf2ImagesConverterTests {
 
 	private final static String TEST_FILE = "sec1-v2.pdf"; //$NON-NLS-1$
+	private final static boolean IS_SIGN = false;
 
 	/** prueba de conversi&oacute;n de PDF a conjunto de im&aacute;genes.
 	 * @throws Exception En cualquier error. */
@@ -51,17 +52,18 @@ public final class Pdf2ImagesConverterTests {
 		System.out.println("Inicio de la carga"); //$NON-NLS-1$
 		final long time = System.currentTimeMillis();
 		PdfLoader.loadPdf(
+			IS_SIGN,
 			testPdf,
 			new PdfLoaderListener() {
 				@Override
-				public void pdfLoaded(final List<BufferedImage> pages, final List<Dimension> pageSizes) {
+				public void pdfLoaded(final boolean isSign, final List<BufferedImage> pages, final List<Dimension> pageSizes) {
 					System.out.println(
 						"Tiempo: " + Long.toString((System.currentTimeMillis()-time)/1000) + "s" //$NON-NLS-1$ //$NON-NLS-2$
 					);
 					System.exit(-1);
 				}
 				@Override
-				public void pdfLoadedFailed(final IOException cause) {
+				public void pdfLoadedFailed(final Throwable cause) {
 					cause.printStackTrace();
 				}
 			}
@@ -87,18 +89,19 @@ public final class Pdf2ImagesConverterTests {
 		frame.setVisible(true);
 
 		PdfLoader.loadPdfWithProgressDialog(
+			IS_SIGN,
 			frame,
 			testPdf,
 			new PdfLoaderListener() {
 				@Override
-				public void pdfLoaded(final List<BufferedImage> pages, final List<Dimension> pageSizes) {
+				public void pdfLoaded(final boolean isSign, final List<BufferedImage> pages, final List<Dimension> pageSizes) {
 					System.out.println(
 						"Tiempo: " + Long.toString((System.currentTimeMillis()-time)/1000) + "s" //$NON-NLS-1$ //$NON-NLS-2$
 					);
 					System.exit(-1);
 				}
 				@Override
-				public void pdfLoadedFailed(final IOException cause) {
+				public void pdfLoadedFailed(final Throwable cause) {
 					cause.printStackTrace();
 				}
 			}
@@ -110,7 +113,7 @@ public final class Pdf2ImagesConverterTests {
 		final int numberOfPages = reader.getNumberOfPages();
 		final List<Dimension> pageSizes = new ArrayList<>(numberOfPages);
 		for(int i=1;i<=numberOfPages;i++) {
-			final com.lowagie.text.Rectangle rect = reader.getPageSize(i);
+			final com.aowagie.text.Rectangle rect = reader.getPageSize(i);
 			pageSizes.add(
 				new Dimension(
 					Math.round(rect.getWidth()),

@@ -26,11 +26,6 @@ final class SelectSignerAction implements PrivilegedExceptionAction<AOSigner> {
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
-	/**
-	 * Identificador con el que seleccionar la configuraci&oacute;n autom&aacute;tica de formato.
-	 */
-	private static final String SIGNATURE_FORMAT_AUTO = "AUTO"; //$NON-NLS-1$
-
     private final String format;
     private final byte[] data;
 
@@ -76,7 +71,7 @@ final class SelectSignerAction implements PrivilegedExceptionAction<AOSigner> {
 	public AOSigner run() throws IOException {
 		AOSigner signer = null;
 		if (this.format != null) {
-			if (!SIGNATURE_FORMAT_AUTO.equalsIgnoreCase(this.format)) {
+			if (!AOSignConstants.SIGN_FORMAT_AUTO.equalsIgnoreCase(this.format)) {
 				LOGGER.info("Seleccionamos el signer correspondiente al formato " + this.format); //$NON-NLS-1$
 				signer = AOSignerFactory.getSigner(this.format);
 			}

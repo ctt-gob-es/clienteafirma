@@ -1,3 +1,13 @@
+/* Copyright (C) 2011 [Gobierno de Espana]
+ * This file is part of "Cliente @Firma".
+ * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
+ *   - the GNU General Public License as published by the Free Software Foundation;
+ *     either version 2 of the License, or (at your option) any later version.
+ *   - or The European Software License; either version 1.1 or (at your option) any later version.
+ * Date: 11/01/11
+ * You may contact the copyright holder at: soporte.afirma5@mpt.es
+ */
+
 package es.gob.afirma.keystores.mozilla;
 
 import java.io.File;
@@ -17,6 +27,7 @@ final class MozillaKeyStoreUtilitiesUnix {
 	private static final String SOFTOKN3_SO = "libsoftokn3.so"; //$NON-NLS-1$
 
 	private static final String[] NSS_PATHS = new String[] {
+		"/usr/lib/x86_64-linux-gnu/nss", // Debian 64 //$NON-NLS-1$
 		"/usr/lib/firefox", //$NON-NLS-1$
 		"/usr/lib/firefox-" + searchLastFirefoxVersion("/usr/lib/"), //$NON-NLS-1$ //$NON-NLS-2$
 		"/opt/firefox", //$NON-NLS-1$
@@ -24,18 +35,18 @@ final class MozillaKeyStoreUtilitiesUnix {
 		"/lib", //$NON-NLS-1$
 		"/usr/lib", //$NON-NLS-1$
 		"/usr/lib/nss", //$NON-NLS-1$
-		"/usr/lib/i386-linux-gnu/nss", /* En algunos Ubuntu y Debian */ //$NON-NLS-1$
+		"/usr/lib/i386-linux-gnu/nss", /* En algunos Ubuntu y Debian 32 */ //$NON-NLS-1$
 		"/opt/fedora-ds/clients/lib", //$NON-NLS-1$
-		"/opt/google/chrome", /* NSS de Chrome cuando no hay NSS de Mozilla de la misma arquietctura */ //$NON-NLS-1$
+		"/opt/google/chrome", /* NSS de Chrome cuando no hay NSS de Mozilla de la misma arquitectura */ //$NON-NLS-1$
 		"/usr/lib/thunderbird", /* Si hay Thunderbird pero no Firefox */ //$NON-NLS-1$
-		"/usr/lib64" /* NSS cuando solo hay Firefox de 64 en el sistema */ //$NON-NLS-1$
+		"/usr/lib64", /* NSS cuando solo hay Firefox de 64 en el sistema */ //$NON-NLS-1$
 	};
 
 	private MozillaKeyStoreUtilitiesUnix() {
 		// No instanciable
 	}
 
-	static String getSystemNSSLibDirUnix() throws FileNotFoundException {
+	static String getNSSLibDirUnix() throws FileNotFoundException {
 
 		String nssLibDir = null;
 
@@ -125,13 +136,16 @@ final class MozillaKeyStoreUtilitiesUnix {
 			if (firefoxDirectories.size() == 1) {
 				return firefoxDirectories.get(0);
 			}
-			Collections.sort(firefoxDirectories, new Comparator<String>() {
-				/** {@inheritDoc} */
-				@Override
-				public int compare(final String o1, final String o2) {
-					return o1.compareTo(o2);
+			Collections.sort(
+				firefoxDirectories,
+				new Comparator<String>() {
+					/** {@inheritDoc} */
+					@Override
+					public int compare(final String o1, final String o2) {
+						return o1.compareTo(o2);
+					}
 				}
-			});
+			);
 			return firefoxDirectories.get(0);
 		}
 		return ""; //$NON-NLS-1$

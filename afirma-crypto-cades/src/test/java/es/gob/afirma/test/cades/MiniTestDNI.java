@@ -46,7 +46,8 @@ public final class MiniTestDNI {
 	@Test
     public void testCAdESDNIe() throws Exception {
 
-		final Constructor<?> sunPKCS11Contructor = Class.forName("sun.security.pkcs11.SunPKCS11").getConstructor(InputStream.class); //$NON-NLS-1$
+        final Constructor<?> sunPKCS11Contructor = Class.forName("sun.security.pkcs11.SunPKCS11").getConstructor(InputStream.class); //$NON-NLS-1$
+
 		final Provider p = (Provider) sunPKCS11Contructor.newInstance(new ByteArrayInputStream(DNIE_DRIVER_PATH.getBytes()));
 
         Security.addProvider(p);
@@ -74,7 +75,8 @@ public final class MiniTestDNI {
         		null,
         		null,
         		null,
-        		null
+        		null,
+        		false // SI incluir politica en SigningCertificate
 		);
 
         Assert.assertNotNull(firma);

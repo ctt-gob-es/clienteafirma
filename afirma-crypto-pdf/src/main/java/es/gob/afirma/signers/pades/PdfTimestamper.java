@@ -1,3 +1,13 @@
+/* Copyright (C) 2011 [Gobierno de Espana]
+ * This file is part of "Cliente @Firma".
+ * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
+ *   - the GNU General Public License as published by the Free Software Foundation;
+ *     either version 2 of the License, or (at your option) any later version.
+ *   - or The European Software License; either version 1.1 or (at your option) any later version.
+ * Date: 11/01/11
+ * You may contact the copyright holder at: soporte.afirma5@mpt.es
+ */
+
 package es.gob.afirma.signers.pades;
 
 import java.io.ByteArrayOutputStream;
@@ -9,16 +19,16 @@ import java.util.HashMap;
 import java.util.Properties;
 import java.util.logging.Logger;
 
-import com.lowagie.text.DocumentException;
-import com.lowagie.text.exceptions.BadPasswordException;
-import com.lowagie.text.pdf.PdfDate;
-import com.lowagie.text.pdf.PdfDictionary;
-import com.lowagie.text.pdf.PdfName;
-import com.lowagie.text.pdf.PdfReader;
-import com.lowagie.text.pdf.PdfSignature;
-import com.lowagie.text.pdf.PdfSignatureAppearance;
-import com.lowagie.text.pdf.PdfStamper;
-import com.lowagie.text.pdf.PdfString;
+import com.aowagie.text.DocumentException;
+import com.aowagie.text.exceptions.BadPasswordException;
+import com.aowagie.text.pdf.PdfDate;
+import com.aowagie.text.pdf.PdfDictionary;
+import com.aowagie.text.pdf.PdfName;
+import com.aowagie.text.pdf.PdfReader;
+import com.aowagie.text.pdf.PdfSignature;
+import com.aowagie.text.pdf.PdfSignatureAppearance;
+import com.aowagie.text.pdf.PdfStamper;
+import com.aowagie.text.pdf.PdfString;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.AOUtil;

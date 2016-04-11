@@ -1,4 +1,3 @@
-
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
@@ -499,7 +498,7 @@ public final class AOXMLDSigSigner implements AOSigner {
                     // extranos para el XML,
                     // realizamos una decodificacion y recodificacion para asi
                     // homogenizar el formato.
-                    if (AOUtil.isBase64(data) && (XMLConstants.BASE64_ENCODING.equals(encoding) || (encoding != null ? encoding : "").toLowerCase().equals("base64"))) { //$NON-NLS-1$ //$NON-NLS-2$
+                    if (Base64.isBase64(data) && (XMLConstants.BASE64_ENCODING.equals(encoding) || (encoding != null ? encoding : "").toLowerCase().equals("base64"))) { //$NON-NLS-1$ //$NON-NLS-2$
                         LOGGER.info("El documento se ha indicado como Base64, se insertara como tal en el XML"); //$NON-NLS-1$
 
                         // Adicionalmente, si es un base 64 intentamos obtener
@@ -1112,7 +1111,7 @@ public final class AOXMLDSigSigner implements AOSigner {
             throw new AOException("Error al generar la firma XMLdSig", e); //$NON-NLS-1$
         }
 
-        final String signatureNodeName = (xmlSignaturePrefix == null || "".equals(xmlSignaturePrefix) ? "" : xmlSignaturePrefix + ":") + SIGNATURE_STR; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        final String signatureNodeName = (xmlSignaturePrefix == null || xmlSignaturePrefix.isEmpty() ? "" : xmlSignaturePrefix + ":") + SIGNATURE_STR; //$NON-NLS-1$ //$NON-NLS-2$
         // Si se esta realizando una firma enveloping simple no tiene sentido el
         // nodo raiz,
         // asi que sacamos el nodo de firma a un documento aparte
@@ -1339,7 +1338,7 @@ public final class AOXMLDSigSigner implements AOSigner {
 
             // si el documento contiene una firma simple se inserta como raiz el
             // nodo AFIRMA
-            if (rootSig.getNodeName().equals((xmlSignaturePrefix == null || "".equals(xmlSignaturePrefix) ? "" : xmlSignaturePrefix + ":") + SIGNATURE_STR)) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            if (rootSig.getNodeName().equals((xmlSignaturePrefix == null || xmlSignaturePrefix.isEmpty() ? "" : xmlSignaturePrefix + ":") + SIGNATURE_STR)) { //$NON-NLS-1$ //$NON-NLS-2$
                 docSig = insertarNodoAfirma(docSig);
                 rootSig = docSig.getDocumentElement();
             }
@@ -1782,7 +1781,7 @@ public final class AOXMLDSigSigner implements AOSigner {
 
             // si el nodo raiz del documento es una firma simple, se inserta como raiz el
             // nodo AFIRMA
-            if (root.getNodeName().equals((xmlSignaturePrefix == null || "".equals(xmlSignaturePrefix) ? "" : xmlSignaturePrefix + ":") + SIGNATURE_STR)) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            if (root.getNodeName().equals((xmlSignaturePrefix == null || xmlSignaturePrefix.isEmpty() ? "" : xmlSignaturePrefix + ":") + SIGNATURE_STR)) { //$NON-NLS-1$ //$NON-NLS-2$
                 this.doc = insertarNodoAfirma(this.doc);
                 root = this.doc.getDocumentElement();
             }
@@ -2281,9 +2280,7 @@ public final class AOXMLDSigSigner implements AOSigner {
             final Document signDoc = dbf.newDocumentBuilder().parse(new ByteArrayInputStream(sign));
             final Element rootNode = signDoc.getDocumentElement();
 
-            final String xmlSignatureName = XML_SIGNATURE_PREFIX == null || "".equals(XML_SIGNATURE_PREFIX) ? //$NON-NLS-1$
-        		SIGNATURE_STR :
-        			XML_SIGNATURE_PREFIX + ":" + SIGNATURE_STR; //$NON-NLS-1$
+            final String xmlSignatureName = XML_SIGNATURE_PREFIX + ":" + SIGNATURE_STR; //$NON-NLS-1$
 
             final ArrayList<Node> signNodes = new ArrayList<Node>();
             if (rootNode.getNodeName().equals(xmlSignatureName)) {

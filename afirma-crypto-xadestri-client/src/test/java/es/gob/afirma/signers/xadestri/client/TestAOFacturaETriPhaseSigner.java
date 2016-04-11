@@ -21,6 +21,7 @@ import org.junit.Test;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSigner;
+import es.gob.afirma.core.signers.AOSignerFactory;
 
 /** Pruebas XAdES FacturaE trif&aacute;sico.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
@@ -53,7 +54,7 @@ public class TestAOFacturaETriPhaseSigner {
 		ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH), CERT_PASS.toCharArray());
 		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
 
-		final AOSigner signer = new AOFacturaETriPhaseSigner();
+		final AOSigner signer = AOSignerFactory.getSigner(AOSignConstants.SIGN_FORMAT_FACTURAE_TRI);
 
 		final byte[] result = signer.sign(
 			data,

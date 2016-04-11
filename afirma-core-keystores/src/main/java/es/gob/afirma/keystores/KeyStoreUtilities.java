@@ -12,16 +12,28 @@ package es.gob.afirma.keystores;
 
 import java.io.File;
 import java.io.IOException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.Provider;
 import java.security.cert.X509Certificate;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.callback.NameCallback;
+import javax.security.auth.callback.PasswordCallback;
+import javax.security.auth.callback.TextOutputCallback;
+import javax.security.auth.callback.UnsupportedCallbackException;
+import javax.swing.JOptionPane;
+
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.keystores.KeyStoreManager;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Platform;
+import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.keystores.filters.CertificateFilter;
 
 /** Utilidades para le manejo de almacenes de claves y certificados. */
@@ -116,7 +128,7 @@ public final class KeyStoreUtilities {
                                                                final KeyStoreManager ksm,
                                                                final boolean checkPrivateKeys,
                                                                final boolean showExpiredCertificates,
-                                                               final List<CertificateFilter> certFilters) {
+                                                               final List<? extends CertificateFilter> certFilters) {
 
         // Creamos un mapa con la relacion Alias-Nombre_a_mostrar de los
         // certificados
@@ -187,6 +199,7 @@ public final class KeyStoreUtilities {
 
             // Aplicamos los filtros de certificados
             if (certFilters != null && certFilters.size() > 0) {
+            	// Tabla para los certificados que si hay que mostrar
             	final Map<String, String> filteredAliases = new Hashtable<String, String>();
                 for (final CertificateFilter cf : certFilters) {
                 	for (final String filteredAlias : cf.matches(aliassesByFriendlyName.keySet().toArray(new String[aliassesByFriendlyName.size()]), ksm)) {
@@ -296,25 +309,14 @@ public final class KeyStoreUtilities {
 
 		// Anadimos el controlador Java de CERES SIEMPRE a menos que:
 		// -Se indique "es.gob.afirma.keystores.mozilla.disableCeresNativeDriver=true"
-		if (!Boolean.getBoolean("es.gob.afirma.keystores.mozilla.disableCeresNativeDriver")) { //$NON-NLS-1$
+		// -El sistema sea Linux
+		if (!Boolean.getBoolean("es.gob.afirma.keystores.mozilla.disableCeresNativeDriver") && !Platform.OS.LINUX.equals(Platform.getOS())) { //$NON-NLS-1$
 			try {
 				aksm.addKeyStoreManager(getCeres(parentComponent));
 				return; // Si instancia CERES no pruebo otras tarjetas, no deberia haber varias tarjetas instaladas
 			}
 			catch (final Exception ex) {
-				if (Platform.OS.LINUX.equals(Platform.getOS())) {
-					// En Linux reintentamos, que a veces no ve bien la tarjeta CERES
-					try {
-						aksm.addKeyStoreManager(getCeres(parentComponent));
-						return; // Si instancia CERES no pruebo otras tarjetas, no deberia haber varias tarjetas instaladas
-					}
-					catch (final Exception e2) {
-						LOGGER.warning("No se ha podido inicializar la tarjeta CERES en el segundo intento: " + e2); //$NON-NLS-1$
-					}
-				}
-				else {
-					LOGGER.warning("No se ha podido inicializar la tarjeta CERES: " + ex); //$NON-NLS-1$
-				}
+				LOGGER.warning("No se ha podido inicializar la tarjeta CERES: " + ex); //$NON-NLS-1$
 			}
 		}
 	}
@@ -331,4 +333,96 @@ public final class KeyStoreUtilities {
 		tmpKsm.setPreferred(true);
 		return tmpKsm;
 	}
+
+    /** Obtiene un almac&eacute;n de claves agregando un gestor de <i>callbacks</i> gen&eacute;rico.
+     * @param ks Tipo de almac&eacute;n a obtener.
+     * @param pssCallBack <i>PasswordCallback</i> para solilcitar la contrase&ntilde;a al usuario.
+     * @param provider Proveedor de <code>KeyStore</code>.
+     * @param parentComponent Componente padre para la modalidad.
+     * @return Almac&eacute;n de claves con un gestor de <i>callbacks</i> gen&eacute;rico instalado.
+     * @throws KeyStoreException Si no se puede obtener el almac&eacute;n de claves. */
+    public static KeyStore getKeyStoreWithPasswordCallbackHandler(final AOKeyStore ks,
+    		                                                      final PasswordCallback pssCallBack,
+                                                                  final Provider provider,
+                                                                  final Object parentComponent) throws KeyStoreException {
+    	final KeyStore.CallbackHandlerProtection chp = new KeyStore.CallbackHandlerProtection(
+			new CallbackHandler() {
+				@Override
+				public void handle(final Callback[] cbs) throws IOException, UnsupportedCallbackException {
+					for (final Callback callback : cbs) {
+						if (callback instanceof PasswordCallback) {
+							((PasswordCallback) callback).setPassword(pssCallBack.getPassword());
+						}
+						else if (callback instanceof TextOutputCallback) {
+							final TextOutputCallback toc = (TextOutputCallback)callback;
+							switch (toc.getMessageType()) {
+								case TextOutputCallback.INFORMATION:
+									LOGGER.info("Informacion del dispositivo criptografico: " + toc.getMessage()); //$NON-NLS-1$
+									AOUIFactory.showMessageDialog(
+										parentComponent,
+										toc.getMessage(),
+										KeyStoreMessages.getString("KeyStoreUtilities.0"), //$NON-NLS-1$
+										JOptionPane.INFORMATION_MESSAGE
+									);
+									break;
+								case TextOutputCallback.ERROR:
+									LOGGER.severe("Informacion del dispositivo criptografico: " + toc.getMessage()); //$NON-NLS-1$
+									AOUIFactory.showMessageDialog(
+										parentComponent,
+										toc.getMessage(),
+										KeyStoreMessages.getString("KeyStoreUtilities.1"), //$NON-NLS-1$
+										JOptionPane.ERROR_MESSAGE
+									);
+									break;
+								case TextOutputCallback.WARNING:
+									LOGGER.warning("Informacion del dispositivo criptografico: " + toc.getMessage()); //$NON-NLS-1$
+									AOUIFactory.showMessageDialog(
+										parentComponent,
+										toc.getMessage(),
+										KeyStoreMessages.getString("KeyStoreUtilities.2"), //$NON-NLS-1$
+										JOptionPane.WARNING_MESSAGE
+									);
+									break;
+								default:
+									LOGGER.warning(
+										"Recibida informacion del dispositivo criptografico en un formato desconocido: " + toc.getMessageType() //$NON-NLS-1$
+									);
+							}
+						}
+						else if (callback instanceof NameCallback) {
+							final Object name = AOUIFactory.showInputDialog(
+								parentComponent,
+								KeyStoreMessages.getString("KeyStoreUtilities.3"), //$NON-NLS-1$
+								KeyStoreMessages.getString("KeyStoreUtilities.4"), //$NON-NLS-1$
+								JOptionPane.WARNING_MESSAGE,
+								null,
+								null,
+								null
+							);
+							if (name != null) {
+								((NameCallback)callback).setName(name.toString());
+							}
+							throw new UnsupportedCallbackException(
+								callback,
+								"No se soporta la solicitud de nombre de usuario para dispositivos criptograficos" //$NON-NLS-1$
+							);
+						}
+						else {
+							throw new UnsupportedCallbackException(
+								callback,
+								"Recibido tipo de callback desconocido: " + callback.getClass().getName() //$NON-NLS-1$
+							);
+						}
+					}
+				}
+			}
+		);
+    	final KeyStore.Builder builder = KeyStore.Builder.newInstance(
+			ks.getProviderName(),
+			provider,
+			chp
+		);
+    	return builder.getKeyStore();
+    }
+
 }

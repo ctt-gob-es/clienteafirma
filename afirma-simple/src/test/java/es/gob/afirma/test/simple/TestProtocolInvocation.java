@@ -5,6 +5,7 @@ import org.junit.Test;
 
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.http.UrlHttpManagerFactory;
+import es.gob.afirma.core.misc.http.UrlHttpMethod;
 import es.gob.afirma.standalone.SimpleAfirma;
 
 /** Pruebas de invocaci&oacute;n por protocolo.
@@ -61,8 +62,9 @@ public class TestProtocolInvocation {
 
 		Thread.sleep(4000);
 
-		final byte[] res = UrlHttpManagerFactory.getInstalledManager().readUrlByPost(
-			"http://127.0.0.1:51234/kaka?cmd=" + Base64.encode(LINE_SAVE.getBytes(), true) //$NON-NLS-1$
+		final byte[] res = UrlHttpManagerFactory.getInstalledManager().readUrl(
+			"http://127.0.0.1:51234/kaka?cmd=" + Base64.encode(LINE_SAVE.getBytes(), true), //$NON-NLS-1$
+			UrlHttpMethod.POST
 		);
 
 		System.out.println("RES=" + new String(Base64.decode(new String(res)))); //$NON-NLS-1$

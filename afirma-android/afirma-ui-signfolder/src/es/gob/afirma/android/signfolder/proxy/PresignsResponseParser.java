@@ -225,57 +225,27 @@ public final class PresignsResponseParser {
 
 	private static class TriphaseConfigDataParser {
 
-		private static final String ATTRIBUTE_KEY = "k"; //$NON-NLS-1$
-		private static final String VALUE_SIGN_COUNT = "sc"; //$NON-NLS-1$
-		private static final String VALUE_NEED_PRE = "np"; //$NON-NLS-1$
-		private static final String VALUE_NEED_DATA = "nd"; //$NON-NLS-1$
-		private static final String VALUE_SESSION_PREFIX = "ss."; //$NON-NLS-1$
-		private static final String VALUE_PK1_PREFIX = "pk1."; //$NON-NLS-1$
-		private static final String VALUE_PRE_PREFIX = "pre."; //$NON-NLS-1$
+		private static final String ATTRIBUTE_KEY = "n"; //$NON-NLS-1$
 
 		static TriphaseConfigData parse (final NodeList params) {
 
 			final TriphaseConfigData config = new TriphaseConfigData();
-			try {
 
-				int numIndex = 0;
-				while ((numIndex = XmlUtils.nextNodeElementIndex(params, numIndex)) > -1) {
-					final Element param = (Element) params.item(numIndex);
-					final String key = param.getAttribute(ATTRIBUTE_KEY);
-					if (key == null) {
-						throw new IllegalArgumentException("Se ha indicado un parametro de firma trifasica sin clave"); //$NON-NLS-1$
-					}
-
-					Log.i(SFConstants.LOG_TAG, "Clave: " + key); //$NON-NLS-1$
-					Log.i(SFConstants.LOG_TAG, "Valor: " + param.getTextContent()); //$NON-NLS-1$
-
-					if (VALUE_SIGN_COUNT.equalsIgnoreCase(key)) {
-						config.setSignCount(Integer.valueOf(param.getTextContent().trim()));
-					}
-					else if (VALUE_NEED_PRE.equalsIgnoreCase(key)) {
-						config.setNeedPreSign(Boolean.valueOf(param.getTextContent().trim()));
-					}
-					else if (VALUE_NEED_DATA.equalsIgnoreCase(key)) {
-						config.setNeedData(Boolean.valueOf(param.getTextContent().trim()));
-					}
-					else if (key.startsWith(VALUE_SESSION_PREFIX)) {
-						config.addSession(param.getTextContent().trim());
-					}
-					else if (key.startsWith(VALUE_PK1_PREFIX)) {
-						config.addPk1(Base64.decode(param.getTextContent().trim()));
-					}
-					else if (key.startsWith(VALUE_PRE_PREFIX)) {
-						Log.i(SFConstants.LOG_TAG, "Elemento " + Integer.parseInt(key.substring(VALUE_PRE_PREFIX.length()))); //$NON-NLS-1$
-						Log.i(SFConstants.LOG_TAG, "Contenido " + param.getTextContent().trim()); //$NON-NLS-1$
-						config.addPreSign(Base64.decode(param.getTextContent().trim()));
-					}
-
-					numIndex++;
+			int numIndex = 0;
+			while ((numIndex = XmlUtils.nextNodeElementIndex(params, numIndex)) > -1) {
+				final Element param = (Element) params.item(numIndex);
+				final String key = param.getAttribute(ATTRIBUTE_KEY);
+				if (key == null) {
+					throw new IllegalArgumentException("Se ha indicado un parametro de firma trifasica sin clave"); //$NON-NLS-1$
 				}
-			} catch (final IOException e) {
-				throw new IllegalArgumentException("Se ha encontrado un Base64 mal formado", e); //$NON-NLS-1$
-			}
 
+				Log.i(SFConstants.LOG_TAG, "Clave: " + key); //$NON-NLS-1$
+				Log.i(SFConstants.LOG_TAG, "Valor: " + XmlUtils.getTextContent(param)); //$NON-NLS-1$
+
+				config.put(key, XmlUtils.getTextContent(param).trim());
+
+				numIndex++;
+			}
 			return config;
 		}
 	}

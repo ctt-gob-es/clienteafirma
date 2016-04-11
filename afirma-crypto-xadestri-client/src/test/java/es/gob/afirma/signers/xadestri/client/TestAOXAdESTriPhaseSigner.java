@@ -12,6 +12,7 @@ package es.gob.afirma.signers.xadestri.client;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.security.KeyStore;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.util.Properties;
@@ -33,9 +34,12 @@ public class TestAOXAdESTriPhaseSigner {
 	private static final String CERT_PASS = "12341234"; //$NON-NLS-1$
 	private static final String CERT_ALIAS = "fisico activo prueba"; //$NON-NLS-1$
 
+	private static final String CERT_PATH2 = "PJActivoFirSHA1.pfx"; //$NON-NLS-1$
+	private static final String CERT_PASS2 = "12341234"; //$NON-NLS-1$
+	private static final String CERT_ALIAS2 = "juridico activo prueba-b12345678"; //$NON-NLS-1$
+
 	private static final String DATA_FILENAME = "factura_sinFirmar.xml"; //$NON-NLS-1$
 	private static final String SIGNATURE_FILENAME = "firma.xml"; //$NON-NLS-1$
-	private static final String COSIGNATURE_FILENAME = "cofirma.xml"; //$NON-NLS-1$
 
 	//private static final String SERVER_URL = "https://valide.redsara.es/firmaMovil/TriPhaseSignerServer/SignatureService"; //$NON-NLS-1$
 	//private static final String SERVER_URL = "https://prevalide.redsara.es/firmaMovil/TriPhaseSignerServer/SignatureService"; //$NON-NLS-1$
@@ -140,6 +144,486 @@ public class TestAOXAdESTriPhaseSigner {
 		System.out.println("El resultado de la firma se ha guardado en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
 	}
 
+	/** Prueba de cofirma XAdES Detached de fichero grande.
+	 * @throws Exception */
+	@SuppressWarnings("static-method")
+	@Test
+	public void pruebaCofirmaXAdESDetached() throws Exception {
+
+		final InputStream is = ClassLoader.getSystemResourceAsStream("firma-xades-detached.xml"); //$NON-NLS-1$
+
+		final byte[] signature = AOUtil.getDataFromInputStream(is);
+
+		is.close();
+
+		final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
+		ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH2), CERT_PASS2.toCharArray());
+		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS2, new KeyStore.PasswordProtection(CERT_PASS2.toCharArray()));
+
+		final AOXAdESTriPhaseSigner signer = new AOXAdESTriPhaseSigner();
+
+		final Properties config = new Properties();
+		config.put("format", "XAdES Detached"); //$NON-NLS-1$ //$NON-NLS-2$
+		config.setProperty("serverUrl", SERVER_URL); //$NON-NLS-1$
+
+		final byte[] result = signer.cosign(
+			signature,
+			AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA,
+			pke.getPrivateKey(),
+			pke.getCertificateChain(),
+			config
+		);
+
+		final File tempFile = File.createTempFile("xades-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$
+		final FileOutputStream fos = new FileOutputStream(tempFile);
+		fos.write(result);
+		fos.close();
+
+		System.out.println("El resultado de la cofirma XAdES Detached se ha guardado en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
+	}
+
+	/** Prueba de contrafirma XAdES Detached.
+	 * @throws Exception */
+	@SuppressWarnings("static-method")
+	@Test
+	public void pruebaContrafirmaXAdESDetached() throws Exception {
+
+		final InputStream is = ClassLoader.getSystemResourceAsStream("cofirma-xades-detached.xml"); //$NON-NLS-1$
+
+		final byte[] signature = AOUtil.getDataFromInputStream(is);
+
+		is.close();
+		final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
+		ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH), CERT_PASS.toCharArray());
+		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
+
+		final Properties config = new Properties();
+		config.setProperty("serverUrl", SERVER_URL); //$NON-NLS-1$
+
+		final AOXAdESTriPhaseSigner signer = new AOXAdESTriPhaseSigner();
+
+		final byte[] result = signer.countersign(signature, AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA, CounterSignTarget.LEAFS, null, pke.getPrivateKey(), pke.getCertificateChain(), config);
+
+		final File tempFile = File.createTempFile("xades-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$
+		final FileOutputStream fos = new FileOutputStream(tempFile);
+		fos.write(result);
+		fos.close();
+
+		System.out.println("El resultado de la contrafirma XAdES Detached se ha guardado en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
+	}
+
+	/** Prueba de cofirma de contrafirma XAdES Detached.
+	 * @throws Exception */
+	@SuppressWarnings("static-method")
+	@Test
+	public void pruebaCofirmadeContrafirmaXAdESDetached() throws Exception {
+
+		final InputStream is = ClassLoader.getSystemResourceAsStream("contrafirma-xades-detached.xml"); //$NON-NLS-1$
+
+		final byte[] signature = AOUtil.getDataFromInputStream(is);
+
+		is.close();
+
+		final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
+		ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH2), CERT_PASS2.toCharArray());
+		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS2, new KeyStore.PasswordProtection(CERT_PASS2.toCharArray()));
+
+		final AOXAdESTriPhaseSigner signer = new AOXAdESTriPhaseSigner();
+
+		final Properties config = new Properties();
+		config.put("format", "XAdES Detached"); //$NON-NLS-1$ //$NON-NLS-2$
+		config.setProperty("serverUrl", SERVER_URL); //$NON-NLS-1$
+
+		final byte[] result = signer.cosign(
+			signature,
+			AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA,
+			pke.getPrivateKey(),
+			pke.getCertificateChain(),
+			config
+		);
+
+		final File tempFile = File.createTempFile("xades-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$
+		final FileOutputStream fos = new FileOutputStream(tempFile);
+		fos.write(result);
+		fos.close();
+
+		System.out.println("El resultado de la cofirma de contrafirma XAdES Detached se ha guardado en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
+	}
+
+	/** Prueba de contrafirmar una contrafirma XAdES Detached.
+	 * @throws Exception */
+	@SuppressWarnings("static-method")
+	@Test
+	public void pruebaContrafirmaDeContrafirmaXAdESDetached() throws Exception {
+
+		final InputStream is = ClassLoader.getSystemResourceAsStream("contrafirma-xades-detached.xml"); //$NON-NLS-1$
+
+		final byte[] signature = AOUtil.getDataFromInputStream(is);
+
+		is.close();
+		final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
+		ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH2), CERT_PASS2.toCharArray());
+		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS2, new KeyStore.PasswordProtection(CERT_PASS2.toCharArray()));
+
+		final Properties config = new Properties();
+		config.setProperty("serverUrl", SERVER_URL); //$NON-NLS-1$
+
+		final AOXAdESTriPhaseSigner signer = new AOXAdESTriPhaseSigner();
+
+		final byte[] result = signer.countersign(signature, AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA, CounterSignTarget.TREE, null, pke.getPrivateKey(), pke.getCertificateChain(), config);
+
+		final File tempFile = File.createTempFile("xades-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$
+		final FileOutputStream fos = new FileOutputStream(tempFile);
+		fos.write(result);
+		fos.close();
+
+		System.out.println("El resultado de la contrafirma de la contrafirma XAdES Detached se ha guardado en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
+	}
+
+	/** Prueba de firma XAdES Enveloping.
+	 * @throws Exception */
+	@SuppressWarnings("static-method")
+	@Test
+	public void pruebaFirmaXAdESEnveloping() throws Exception {
+
+		final byte[] data = AOUtil.getDataFromInputStream(
+			ClassLoader.getSystemResourceAsStream("TEST_PDF_Certified.pdf") //$NON-NLS-1$
+		);
+
+		final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
+		ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH), CERT_PASS.toCharArray());
+		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
+
+		final AOXAdESTriPhaseSigner signer = new AOXAdESTriPhaseSigner();
+
+		final Properties config = new Properties();
+		config.put("format", "XAdES Enveloping"); //$NON-NLS-1$ //$NON-NLS-2$
+		config.setProperty("serverUrl", SERVER_URL); //$NON-NLS-1$
+
+		final byte[] result = signer.sign(
+			data,
+			AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA,
+			pke.getPrivateKey(),
+			pke.getCertificateChain(),
+			config
+		);
+
+		final File tempFile = File.createTempFile("xades-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$
+		final FileOutputStream fos = new FileOutputStream(tempFile);
+		fos.write(result);
+		fos.close();
+
+		System.out.println("El resultado de la firma se ha guardado en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
+	}
+
+	/** Prueba de cofirma XAdES Enveloping.
+	 * @throws Exception */
+	@SuppressWarnings("static-method")
+	@Test
+	public void pruebaCofirmaXAdESEnveloping() throws Exception {
+
+		final InputStream is = ClassLoader.getSystemResourceAsStream("firma-xades-enveloping.xml"); //$NON-NLS-1$
+
+		final byte[] signature = AOUtil.getDataFromInputStream(is);
+
+		is.close();
+
+		final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
+		ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH2), CERT_PASS2.toCharArray());
+		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS2, new KeyStore.PasswordProtection(CERT_PASS2.toCharArray()));
+
+		final AOXAdESTriPhaseSigner signer = new AOXAdESTriPhaseSigner();
+
+		final Properties config = new Properties();
+		config.put("format", "XAdES Enveloping"); //$NON-NLS-1$ //$NON-NLS-2$
+		config.setProperty("serverUrl", SERVER_URL); //$NON-NLS-1$
+
+		final byte[] result = signer.cosign(
+			signature,
+			AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA,
+			pke.getPrivateKey(),
+			pke.getCertificateChain(),
+			config
+		);
+
+		final File tempFile = File.createTempFile("xades-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$
+		final FileOutputStream fos = new FileOutputStream(tempFile);
+		fos.write(result);
+		fos.close();
+
+		System.out.println("El resultado de la cofirma XAdES Enveloping se ha guardado en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
+	}
+
+	/** Prueba de contrafirma XAdES Enveloping.
+	 * @throws Exception */
+	@SuppressWarnings("static-method")
+	@Test
+	public void pruebaContrafirmaXAdESEnveloping() throws Exception {
+
+		final InputStream is = ClassLoader.getSystemResourceAsStream("cofirma-xades-enveloping.xml"); //$NON-NLS-1$
+
+		final byte[] signature = AOUtil.getDataFromInputStream(is);
+
+		is.close();
+		final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
+		ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH), CERT_PASS.toCharArray());
+		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
+
+		final Properties config = new Properties();
+		config.setProperty("serverUrl", SERVER_URL); //$NON-NLS-1$
+
+		final AOXAdESTriPhaseSigner signer = new AOXAdESTriPhaseSigner();
+
+		final byte[] result = signer.countersign(signature, AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA, CounterSignTarget.LEAFS, null, pke.getPrivateKey(), pke.getCertificateChain(), config);
+
+		final File tempFile = File.createTempFile("xades-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$
+		final FileOutputStream fos = new FileOutputStream(tempFile);
+		fos.write(result);
+		fos.close();
+
+		System.out.println("El resultado de la contrafirma XAdES Enveloping se ha guardado en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
+	}
+
+	/** Prueba de cofirma de contrafirma XAdES Enveloping.
+	 * @throws Exception */
+	@SuppressWarnings("static-method")
+	@Test
+	public void pruebaCofirmadeContrafirmaXAdESEnveloping() throws Exception {
+
+		final InputStream is = ClassLoader.getSystemResourceAsStream("contrafirma-xades-enveloping.xml"); //$NON-NLS-1$
+
+		final byte[] signature = AOUtil.getDataFromInputStream(is);
+
+		is.close();
+
+		final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
+		ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH2), CERT_PASS2.toCharArray());
+		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS2, new KeyStore.PasswordProtection(CERT_PASS2.toCharArray()));
+
+		final AOXAdESTriPhaseSigner signer = new AOXAdESTriPhaseSigner();
+
+		final Properties config = new Properties();
+		config.put("format", "XAdES Enveloping"); //$NON-NLS-1$ //$NON-NLS-2$
+		config.setProperty("serverUrl", SERVER_URL); //$NON-NLS-1$
+
+		final byte[] result = signer.cosign(
+			signature,
+			AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA,
+			pke.getPrivateKey(),
+			pke.getCertificateChain(),
+			config
+		);
+
+		final File tempFile = File.createTempFile("xades-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$
+		final FileOutputStream fos = new FileOutputStream(tempFile);
+		fos.write(result);
+		fos.close();
+
+		System.out.println("El resultado de la cofirma de contrafirma XAdES Enveloping se ha guardado en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
+	}
+
+	/** Prueba de contrafirmar una contrafirma XAdES Enveloping.
+	 * @throws Exception */
+	@SuppressWarnings("static-method")
+	@Test
+	public void pruebaContrafirmaDeContrafirmaXAdESEnveloping() throws Exception {
+
+		final InputStream is = ClassLoader.getSystemResourceAsStream("contrafirma-xades-enveloping.xml"); //$NON-NLS-1$
+
+		final byte[] signature = AOUtil.getDataFromInputStream(is);
+
+		is.close();
+		final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
+		ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH2), CERT_PASS2.toCharArray());
+		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS2, new KeyStore.PasswordProtection(CERT_PASS2.toCharArray()));
+
+		final Properties config = new Properties();
+		config.setProperty("serverUrl", SERVER_URL); //$NON-NLS-1$
+
+		final AOXAdESTriPhaseSigner signer = new AOXAdESTriPhaseSigner();
+
+		final byte[] result = signer.countersign(signature, AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA, CounterSignTarget.TREE, null, pke.getPrivateKey(), pke.getCertificateChain(), config);
+
+		final File tempFile = File.createTempFile("xades-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$
+		final FileOutputStream fos = new FileOutputStream(tempFile);
+		fos.write(result);
+		fos.close();
+
+		System.out.println("El resultado de la contrafirma de la contrafirma XAdES Enveloping se ha guardado en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
+	}
+
+	/** Prueba de firma XAdES Enveloped.
+	 * @throws Exception */
+	@SuppressWarnings("static-method")
+	@Test
+	public void pruebaFirmaXAdESEnveloped() throws Exception {
+
+		final byte[] data = AOUtil.getDataFromInputStream(
+			ClassLoader.getSystemResourceAsStream("xml_with_ids.xml") //$NON-NLS-1$
+		);
+
+		final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
+		ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH), CERT_PASS.toCharArray());
+		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
+
+		final AOXAdESTriPhaseSigner signer = new AOXAdESTriPhaseSigner();
+
+		final Properties config = new Properties();
+		config.put("format", "XAdES Enveloped"); //$NON-NLS-1$ //$NON-NLS-2$
+		config.setProperty("serverUrl", SERVER_URL); //$NON-NLS-1$
+
+		final byte[] result = signer.sign(
+			data,
+			AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA,
+			pke.getPrivateKey(),
+			pke.getCertificateChain(),
+			config
+		);
+
+		final File tempFile = File.createTempFile("xades-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$
+		final FileOutputStream fos = new FileOutputStream(tempFile);
+		fos.write(result);
+		fos.close();
+
+		System.out.println("El resultado de la firma XAdES Enveloped se ha guardado en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
+	}
+
+	/** Prueba de cofirma XAdES Enveloped.
+	 * @throws Exception */
+	@SuppressWarnings("static-method")
+	@Test
+	public void pruebaCofirmaXAdESEnveloped() throws Exception {
+
+		final InputStream is = ClassLoader.getSystemResourceAsStream("firma-xades-enveloped.xml"); //$NON-NLS-1$
+
+		final byte[] signature = AOUtil.getDataFromInputStream(is);
+
+		is.close();
+
+		final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
+		ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH2), CERT_PASS2.toCharArray());
+		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS2, new KeyStore.PasswordProtection(CERT_PASS2.toCharArray()));
+
+		final AOXAdESTriPhaseSigner signer = new AOXAdESTriPhaseSigner();
+
+		final Properties config = new Properties();
+		config.put("format", "XAdES Enveloped"); //$NON-NLS-1$ //$NON-NLS-2$
+		config.setProperty("serverUrl", SERVER_URL); //$NON-NLS-1$
+
+		final byte[] result = signer.cosign(
+			signature,
+			AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA,
+			pke.getPrivateKey(),
+			pke.getCertificateChain(),
+			config
+		);
+
+		final File tempFile = File.createTempFile("xades-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$
+		final FileOutputStream fos = new FileOutputStream(tempFile);
+		fos.write(result);
+		fos.close();
+
+		System.out.println("El resultado de la cofirma XAdES Enveloped se ha guardado en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
+	}
+
+	/** Prueba de contrafirma XAdES Enveloped.
+	 * @throws Exception */
+	@SuppressWarnings("static-method")
+	@Test
+	public void pruebaContrafirmaXAdESEnveloped() throws Exception {
+
+		final InputStream is = ClassLoader.getSystemResourceAsStream("cofirma-xades-enveloped.xml"); //$NON-NLS-1$
+
+		final byte[] signature = AOUtil.getDataFromInputStream(is);
+
+		is.close();
+		final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
+		ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH), CERT_PASS.toCharArray());
+		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
+
+		final Properties config = new Properties();
+		config.setProperty("serverUrl", SERVER_URL); //$NON-NLS-1$
+
+		final AOXAdESTriPhaseSigner signer = new AOXAdESTriPhaseSigner();
+
+		final byte[] result = signer.countersign(signature, AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA, CounterSignTarget.LEAFS, null, pke.getPrivateKey(), pke.getCertificateChain(), config);
+
+		final File tempFile = File.createTempFile("xades-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$
+		final FileOutputStream fos = new FileOutputStream(tempFile);
+		fos.write(result);
+		fos.close();
+
+		System.out.println("El resultado de la contrafirma XAdES Enveloped se ha guardado en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
+	}
+
+	/** Prueba de cofirma de contrafirma XAdES Enveloped.
+	 * @throws Exception */
+	@SuppressWarnings("static-method")
+	@Test
+	public void pruebaCofirmadeContrafirmaXAdESEnveloped() throws Exception {
+
+		final InputStream is = ClassLoader.getSystemResourceAsStream("contrafirma-xades-enveloped.xml"); //$NON-NLS-1$
+
+		final byte[] signature = AOUtil.getDataFromInputStream(is);
+
+		is.close();
+
+		final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
+		ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH2), CERT_PASS2.toCharArray());
+		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS2, new KeyStore.PasswordProtection(CERT_PASS2.toCharArray()));
+
+		final AOXAdESTriPhaseSigner signer = new AOXAdESTriPhaseSigner();
+
+		final Properties config = new Properties();
+		config.put("format", "XAdES Enveloped"); //$NON-NLS-1$ //$NON-NLS-2$
+		config.setProperty("serverUrl", SERVER_URL); //$NON-NLS-1$
+
+		final byte[] result = signer.cosign(
+			signature,
+			AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA,
+			pke.getPrivateKey(),
+			pke.getCertificateChain(),
+			config
+		);
+
+		final File tempFile = File.createTempFile("xades-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$
+		final FileOutputStream fos = new FileOutputStream(tempFile);
+		fos.write(result);
+		fos.close();
+
+		System.out.println("El resultado de la cofirma de contrafirma XAdES Enveloped se ha guardado en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
+	}
+
+	/** Prueba de contrafirmar una contrafirma XAdES Enveloped.
+	 * @throws Exception */
+	@SuppressWarnings("static-method")
+	@Test
+	public void pruebaContrafirmaDeContrafirmaXAdESEnveloped() throws Exception {
+
+		final InputStream is = ClassLoader.getSystemResourceAsStream("contrafirma-xades-enveloped.xml"); //$NON-NLS-1$
+
+		final byte[] signature = AOUtil.getDataFromInputStream(is);
+
+		is.close();
+		final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
+		ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH2), CERT_PASS2.toCharArray());
+		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS2, new KeyStore.PasswordProtection(CERT_PASS2.toCharArray()));
+
+		final Properties config = new Properties();
+		config.setProperty("serverUrl", SERVER_URL); //$NON-NLS-1$
+
+		final AOXAdESTriPhaseSigner signer = new AOXAdESTriPhaseSigner();
+
+		final byte[] result = signer.countersign(signature, AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA, CounterSignTarget.TREE, null, pke.getPrivateKey(), pke.getCertificateChain(), config);
+
+		final File tempFile = File.createTempFile("xades-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$
+		final FileOutputStream fos = new FileOutputStream(tempFile);
+		fos.write(result);
+		fos.close();
+
+		System.out.println("El resultado de la contrafirma de la contrafirma XAdES Enveloped se ha guardado en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
+	}
+
 	/** Prueba de firma XAdES.
 	 * @throws Exception */
 	@SuppressWarnings("static-method")
@@ -195,62 +679,5 @@ public class TestAOXAdESTriPhaseSigner {
 		fos.close();
 
 		System.out.println("El resultado de la cofirma se ha guardado en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
-	}
-
-	/** Prueba de cofirma.
-	 * @throws Exception */
-	@SuppressWarnings("static-method")
-	@Test
-//	@Ignore // Necesita un servidor trifasico
-	public void pruebaCofirmaXAdES() throws Exception {
-
-		final byte[] sign = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(SIGNATURE_FILENAME));
-
-		final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
-		ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH), CERT_PASS.toCharArray());
-		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
-
-		final Properties config = new Properties();
-		config.setProperty("serverUrl", SERVER_URL); //$NON-NLS-1$
-
-		final AOXAdESTriPhaseSigner signer = new AOXAdESTriPhaseSigner();
-
-		final byte[] result = signer.cosign(sign, AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA, pke.getPrivateKey(), pke.getCertificateChain(), config);
-
-		final File tempFile = File.createTempFile("xades-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$
-		final FileOutputStream fos = new FileOutputStream(tempFile);
-		fos.write(result);
-		fos.close();
-
-		System.out.println("El resultado de la cofirma se ha guardado en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
-	}
-
-	/** Prueba de contrafirma.
-	 * @throws Exception */
-	@SuppressWarnings("static-method")
-	@Test
-//	@Ignore // Necesita un servidor trifasico
-	public void pruebaContrafirmaXAdES() throws Exception {
-
-		final byte[] sign = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(COSIGNATURE_FILENAME));
-
-		final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
-		ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH), CERT_PASS.toCharArray());
-		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
-
-		final Properties config = new Properties();
-		config.setProperty("serverUrl", SERVER_URL); //$NON-NLS-1$
-		config.setProperty("target", "tree"); //$NON-NLS-1$ //$NON-NLS-2$
-
-		final AOXAdESTriPhaseSigner signer = new AOXAdESTriPhaseSigner();
-
-		final byte[] result = signer.countersign(sign, AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA, CounterSignTarget.LEAFS, null, pke.getPrivateKey(), pke.getCertificateChain(), config);
-
-		final File tempFile = File.createTempFile("xades-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$
-		final FileOutputStream fos = new FileOutputStream(tempFile);
-		fos.write(result);
-		fos.close();
-
-		System.out.println("El resultado de la contrafirma se ha guardado en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
 	}
 }

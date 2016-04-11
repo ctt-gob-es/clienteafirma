@@ -241,7 +241,7 @@ final class XmlResponsesFactory {
 
 		sb.append("<apprq>"); //$NON-NLS-1$
 		for (final ApproveRequest req :  approveRequests) {
-			sb.append("<r id=\"").append(req.getRequestId()) //$NON-NLS-1$
+			sb.append("<r id=\"").append(req.getRequestTagId()) //$NON-NLS-1$
 			.append("\" ok=\"").append(req.isOk() ? "OK" : "KO").append("\"/>");  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		}
 		sb.append("</apprq>"); //$NON-NLS-1$

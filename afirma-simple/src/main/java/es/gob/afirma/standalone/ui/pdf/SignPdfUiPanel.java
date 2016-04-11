@@ -1,12 +1,16 @@
 package es.gob.afirma.standalone.ui.pdf;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Image;
-import java.awt.Rectangle;
+import java.awt.Insets;
+import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -18,22 +22,34 @@ import java.util.Properties;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
+import javax.swing.border.TitledBorder;
 
 import es.gob.afirma.core.misc.Platform;
+import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.standalone.ui.pdf.PageLabel.PageLabelListener;
 
 final class SignPdfUiPanel extends JPanel implements PageLabel.PageLabelListener, KeyListener, ActionListener {
+
+	private static final long serialVersionUID = 8109653789776305491L;
+
+	private static final int PREFERRED_WIDTH = 466;
+	private static final int PREFERRED_HEIGHT = 410;
 
 	static interface SignPdfUiPanelListener {
 		void positionSelected(final Properties extraParams);
 		void positionCancelled();
 	}
 
-	private static final long serialVersionUID = 8109653789776305491L;
+	private final SignPdfDialog parent;
+
+	public
+	SignPdfDialog getParentDialog() {
+		return this.parent;
+	}
 
 	private Properties extraParamsForLocation = null;
 	Properties getExtraParamsForLocation() {
@@ -54,6 +70,11 @@ final class SignPdfUiPanel extends JPanel implements PageLabel.PageLabelListener
 
 	private JPanel pagePanel;
 	private final List<BufferedImage> pdfPages;
+	List<BufferedImage> getPdfPages() {
+		return this.pdfPages;
+	}
+	private final boolean isSignPdf;
+	private BufferedImage appendPage;
 	private final List<Dimension> pdfPageSizes;
 	private JLabel pageLabel;
 	private final JButton okButton = new JButton(SignPdfUiMessages.getString("SignPdfUiPanel.0")); //$NON-NLS-1$
@@ -66,9 +87,11 @@ final class SignPdfUiPanel extends JPanel implements PageLabel.PageLabelListener
 	final JButton nextPageButton = new JButton(">"); //$NON-NLS-1$
 	final JButton lastPageButton = new JButton(">>"); //$NON-NLS-1$
 
-	SignPdfUiPanel(final List<BufferedImage> pages,
+	SignPdfUiPanel(final boolean isSign,
+				   final List<BufferedImage> pages,
 				   final List<Dimension> pageSizes,
-			       final SignPdfUiPanelListener spul) {
+			       final SignPdfUiPanelListener spul,
+			       final SignPdfDialog parent) {
 
 		if (pages == null || pages.isEmpty()) {
 			throw new IllegalArgumentException(
@@ -88,16 +111,10 @@ final class SignPdfUiPanel extends JPanel implements PageLabel.PageLabelListener
 		this.pdfPages = pages;
 		this.pdfPageSizes = pageSizes;
 		this.listener = spul;
+		this.isSignPdf = isSign;
+		this.parent = parent;
 
-
-		SwingUtilities.invokeLater(
-			new Runnable() {
-				@Override
-				public void run() {
-					createUI();
-				}
-			}
-		);
+		createUI();
 	}
 
 	private void setProperties(final Properties p) {
@@ -107,37 +124,46 @@ final class SignPdfUiPanel extends JPanel implements PageLabel.PageLabelListener
 	private JLabel createPageLabel(final BufferedImage page,
 			                       final PageLabelListener pll,
 			                       final KeyListener kl,
-			                       final Component parent,
+			                       final Component parentFrame,
 			                       final Dimension pdfPageOriginalDimension) {
 
 		int pageWidth = page.getWidth();
 		int pageHeight = page.getHeight();
 
-		final Rectangle screen = SignPdfUiUtil.getScreenBounds(parent);
+		final Dimension screen = parentFrame.getPreferredSize();
+
+		// Si la previsualizacion de la pagina es mayor que la propia pantalla,
+		// hacemos reducciones incrementales del 10%
 		while (pageWidth > screen.width || pageHeight > screen.height) {
-			pageWidth = pageWidth / 2;
-			pageHeight = pageHeight / 2;
+			pageWidth = (int) Math.round(pageWidth * 0.9);
+			pageHeight = (int) Math.round(pageHeight * 0.9);
 		}
 
 		// Comprobacion de si las paginas estan rotadas
-		final int pdfOriginalHeight;
+		final float pdfRatio;
 		if (page.getWidth() <= page.getHeight() && pdfPageOriginalDimension.width <= pdfPageOriginalDimension.height) {
 			// No rotada
-			pdfOriginalHeight = pdfPageOriginalDimension.height;
+			pdfRatio = (float) pdfPageOriginalDimension.height / pageHeight;
 		}
 		else {
 			// Pagina rotada
-			pdfOriginalHeight = pdfPageOriginalDimension.width;
+			pdfRatio = (float) pdfPageOriginalDimension.width / pageWidth;
 		}
 
-		this.currentScale = Math.round(100 * ((float) pageWidth / page.getWidth()));
+		final float aspectRatio = (float) pageWidth / page.getWidth();
+		this.currentScale = Math.round(100 * aspectRatio);
+
+		// Recalculamos las dimensiones para asegurarnos de que los sucesivos redondeos del reescalado
+		// no han provocado que se altere la proporcion de altura y anchura de la pagina
+		pageWidth = Math.round(page.getWidth() * aspectRatio);
+		pageHeight = Math.round(page.getHeight() * aspectRatio);
 
 		final JLabel ret = new PageLabel(
 			page.getScaledInstance(pageWidth, pageHeight, Image.SCALE_SMOOTH),
 			pageWidth,
 			pageHeight,
 			pll,
-			(float)pdfOriginalHeight / page.getHeight()
+			pdfRatio
 		);
 
 		ret.addKeyListener(kl);
@@ -162,39 +188,44 @@ final class SignPdfUiPanel extends JPanel implements PageLabel.PageLabelListener
 
 		final GridBagConstraints gbc = new GridBagConstraints();
 		gbc.fill = GridBagConstraints.BOTH;
+		gbc.insets = new Insets(10, 10, 10, 10);
 		gbc.weightx = 1.0;
+		gbc.weighty = 1.0;
 		gbc.gridy = 0;
 
 		final JPanel mainPanel = new JPanel();
 		mainPanel.setLayout(new GridBagLayout());
-		mainPanel.setBorder(BorderFactory.createTitledBorder(SignPdfUiMessages.getString("SignPdfUiPanel.7"))); //$NON-NLS-1$
+		final TitledBorder tb = BorderFactory.createTitledBorder(SignPdfUiMessages.getString("SignPdfUiPanel.7")); //$NON-NLS-1$
+		tb.setTitleFont(getFont().deriveFont(Font.PLAIN));
+		mainPanel.setBorder(tb);
 
 		final GridBagConstraints c = new GridBagConstraints();
-		c.fill = GridBagConstraints.BOTH;
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.anchor = GridBagConstraints.PAGE_START;
 		c.weightx = 1.0;
+		c.weighty = 1.0;
 		c.gridy = 0;
 
 		mainPanel.add(createCoordenatesPanel(), c);
 
 		c.gridy++;
+		c.ipady = 3;
+		c.fill = GridBagConstraints.BOTH;
 
 		mainPanel.add(createPagePanel(), c);
 
+		c.ipady = 3;
 		c.gridy++;
-		c.ipady = 11;
-
+		c.anchor = GridBagConstraints.PAGE_END;
+		c.fill = GridBagConstraints.HORIZONTAL;
 		mainPanel.add(createPaginationPanel(), c);
 
 		add(mainPanel, gbc);
 
 		gbc.gridy++;
-		gbc.weighty = 1.0;
-
-		add(new JPanel(), gbc); // Relleno en blanco
-		gbc.gridy++;
 		gbc.weighty = 0.0;
-		gbc.ipady = 6;
 		add(createButtonsPanel(), gbc);
+		enableButtons();
 	}
 
 	/** Crea el panel con la previsualizaci&oacute;n de las p&aacute;ginas del PDF.
@@ -202,16 +233,18 @@ final class SignPdfUiPanel extends JPanel implements PageLabel.PageLabelListener
 	private JPanel createPagePanel() {
 
 		this.pagePanel = new JPanel();
-		this.pagePanel.setLayout(new FlowLayout(FlowLayout.CENTER));
+		this.pagePanel.setLayout(new GridBagLayout());
+		this.pagePanel.setPreferredSize(new Dimension(PREFERRED_WIDTH, PREFERRED_HEIGHT));
 
 		// Creamos la etiqueta y establecemos la primera pagina
 		this.pageLabel = createPageLabel(
 			this.pdfPages.get(0),
 			this,
 			this,
-			this,
+			this.pagePanel,
 			this.pdfPageSizes.get(0)
 		);
+
 		this.pagePanel.add(this.pageLabel);
 
 		return this.pagePanel;
@@ -222,7 +255,7 @@ final class SignPdfUiPanel extends JPanel implements PageLabel.PageLabelListener
 	private JPanel createPaginationPanel() {
 
 		final JPanel panel = new JPanel();
-		panel.setLayout(new FlowLayout(FlowLayout.CENTER));
+		panel.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
 
 		this.indexLabel.setText(
 			SignPdfUiMessages.getString(
@@ -296,9 +329,14 @@ final class SignPdfUiPanel extends JPanel implements PageLabel.PageLabelListener
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final Properties p = new Properties();
-					p.put("signaturePage", Integer.toString(getCurrentPage())); //$NON-NLS-1$
+					if (getCurrentPage() > getPdfPages().size()) {
+						p.put("signaturePage", "append"); //$NON-NLS-1$ //$NON-NLS-2$
+					}
+					else {
+						p.put("signaturePage", Integer.toString(getCurrentPage())); //$NON-NLS-1$
+					}
 					p.putAll(getExtraParamsForLocation());
-					getListener().positionSelected(p);
+					getParentDialog().nextPanel(p, getFragmentImage(p));
 				}
 			}
 		);
@@ -331,6 +369,52 @@ final class SignPdfUiPanel extends JPanel implements PageLabel.PageLabelListener
 		}
 
 		return panel;
+	}
+
+	BufferedImage getFragmentImage(final Properties p) {
+		final int pageNumber;
+		final BufferedImage page;
+		if (p.getProperty("signaturePage").equals("append")) { //$NON-NLS-1$ //$NON-NLS-2$
+			pageNumber = 0;
+			page = this.appendPage;
+		}
+		else {
+			pageNumber = Integer.parseInt(p.getProperty("signaturePage")) - 1; //$NON-NLS-1$
+			page = this.pdfPages.get(Integer.parseInt(p.getProperty("signaturePage")) - 1); //$NON-NLS-1$
+		}
+
+		final int newWidth = (int) this.pdfPageSizes.get(pageNumber).getWidth();
+		final int newHeight = (int) this.pdfPageSizes.get(pageNumber).getHeight();
+
+		final BufferedImage im = new BufferedImage (
+			newWidth,
+			newHeight,
+			this.pdfPages.get(pageNumber).getType()
+		);
+
+		final Graphics2D graphics2D = im.createGraphics();
+		graphics2D.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
+		RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+		graphics2D.drawImage(
+			page,
+			0,
+			0,
+			newWidth,
+			newHeight,
+			null
+		);
+
+		graphics2D.dispose();
+
+		final int uxr = Math.max(0 ,Integer.parseInt(p.getProperty("signaturePositionOnPageUpperRightX")) - 4); //$NON-NLS-1$
+		final int uyr = Math.max(0, Integer.parseInt(p.getProperty("signaturePositionOnPageUpperRightY"))); //$NON-NLS-1$
+		final int lxl = Math.max(0, Integer.parseInt(p.getProperty("signaturePositionOnPageLowerLeftX"))); //$NON-NLS-1$
+		final int lyl = Math.max(0, Integer.parseInt(p.getProperty("signaturePositionOnPageLowerLeftY"))); //$NON-NLS-1$
+		final int y = Math.max(0, newHeight - uyr);
+
+		final BufferedImage imSign = im.getSubimage(lxl, y, uxr - lxl, uyr - lyl);
+
+		return imSign;
 	}
 
 	@Override
@@ -370,6 +454,16 @@ final class SignPdfUiPanel extends JPanel implements PageLabel.PageLabelListener
 				this.currentPage++;
 				changePage();
 			}
+			else if (ke.getKeyCode() == KeyEvent.VK_RIGHT
+					&& getCurrentPage() == this.pdfPages.size()
+					&& !this.isSignPdf) {
+				this.currentPage++;
+				appendPage();
+			}
+			else if (ke.getKeyCode() == KeyEvent.VK_ESCAPE) {
+				this.currentPage++;
+				getListener().positionCancelled();
+			}
 		}
 	}
 
@@ -392,10 +486,67 @@ final class SignPdfUiPanel extends JPanel implements PageLabel.PageLabelListener
 				this.currentPage = this.pdfPages.size();
 				changePage();
 			}
+			else if (e.getSource() == this.nextPageButton
+					&& getCurrentPage() == this.pdfPages.size()
+					&& !this.isSignPdf) {
+				this.currentPage++;
+				appendPage();
+			}
+		}
+	}
+
+	private void appendPage() {
+		final int resp = AOUIFactory.showConfirmDialog(
+			SignPdfUiPanel.this,
+			SignPdfUiMessages.getString("SignPdfUiPanel.11"),  //$NON-NLS-1$
+			SignPdfUiMessages.getString("SignPdfUiPanel.10"),  //$NON-NLS-1$
+			AOUIFactory.YES_NO_OPTION,
+			AOUIFactory.WARNING_MESSAGE
+		);
+		if (JOptionPane.YES_OPTION == resp) {
+			final BufferedImage bi = new BufferedImage(
+				(int) this.pdfPageSizes.get(0).getWidth(),
+				(int) this.pdfPageSizes.get(0).getHeight(),
+				this.pdfPages.get(0).getType()
+	        );
+			final Graphics2D ig2 = bi.createGraphics();
+			ig2.setPaint (Color.WHITE);
+			ig2.fillRect (0, 0, bi.getWidth(), bi.getHeight());
+			ig2.dispose();
+
+			this.pagePanel.remove(this.pageLabel);
+			this.posX.setText(""); //$NON-NLS-1$
+			this.posY.setText(""); //$NON-NLS-1$
+			this.pageLabel = createPageLabel(
+				bi,
+				this,
+				this,
+				this.pagePanel,
+				this.pdfPageSizes.get(0)
+			);
+
+			this.indexLabel.setText(
+				SignPdfUiMessages.getString(
+					"SignPdfUiPanel.5", //$NON-NLS-1$
+					Integer.toString(getCurrentPage()),
+					Integer.toString(this.pdfPages.size()),
+					Integer.toString(this.currentScale)
+				)
+			);
+			this.nextPageButton.setEnabled(false);
+			this.previousPageButton.setEnabled(true);
+			this.appendPage = bi;
+			this.pagePanel.add(this.pageLabel);
+			this.pagePanel.repaint();
+		}
+		else {
+			this.currentPage--;
 		}
 	}
 
 	private void changePage() {
+
+		enableButtons();
 		this.pagePanel.remove(this.pageLabel);
 		this.posX.setText(""); //$NON-NLS-1$
 		this.posY.setText(""); //$NON-NLS-1$
@@ -403,7 +554,7 @@ final class SignPdfUiPanel extends JPanel implements PageLabel.PageLabelListener
 			this.pdfPages.get(getCurrentPage() - 1),
 			this,
 			this,
-			this,
+			this.pagePanel,
 			this.pdfPageSizes.get(getCurrentPage() - 1)
 		);
 
@@ -417,6 +568,43 @@ final class SignPdfUiPanel extends JPanel implements PageLabel.PageLabelListener
 		);
 		this.pagePanel.add(this.pageLabel);
 		this.pagePanel.repaint();
+	}
+
+	private void enableButtons() {
+		if (this.pdfPages.size() == 1) {
+			this.lastPageButton.setEnabled(false);
+			this.firstPageButton.setEnabled(false);
+			if (this.isSignPdf) {
+				this.nextPageButton.setEnabled(false);
+			}
+			else {
+				this.nextPageButton.setEnabled(true);
+			}
+			this.previousPageButton.setEnabled(false);
+		}
+		else if (getCurrentPage() == 1) {
+			this.firstPageButton.setEnabled(false);
+			this.previousPageButton.setEnabled(false);
+			this.nextPageButton.setEnabled(true);
+			this.lastPageButton.setEnabled(true);
+		}
+		else if (getCurrentPage() == this.pdfPages.size()) {
+			this.lastPageButton.setEnabled(false);
+			this.firstPageButton.setEnabled(true);
+			if (this.isSignPdf) {
+				this.nextPageButton.setEnabled(false);
+			}
+			else {
+				this.nextPageButton.setEnabled(true);
+			}
+			this.previousPageButton.setEnabled(true);
+		}
+		else {
+			this.firstPageButton.setEnabled(true);
+			this.previousPageButton.setEnabled(true);
+			this.nextPageButton.setEnabled(true);
+			this.lastPageButton.setEnabled(true);
+		}
 	}
 
 }

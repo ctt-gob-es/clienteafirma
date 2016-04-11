@@ -1,8 +1,19 @@
+/* Copyright (C) 2011 [Gobierno de Espana]
+ * This file is part of "Cliente @Firma".
+ * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
+ *   - the GNU General Public License as published by the Free Software Foundation;
+ *     either version 2 of the License, or (at your option) any later version.
+ *   - or The European Software License; either version 1.1 or (at your option) any later version.
+ * Date: 11/01/11
+ * You may contact the copyright holder at: soporte.afirma5@mpt.es
+ */
+
 package es.gob.afirma.keystores.mozilla;
 
 import java.io.InputStream;
 import java.security.KeyStore;
 import java.security.Provider;
+import java.util.logging.Level;
 
 import javax.security.auth.callback.PasswordCallback;
 
@@ -12,18 +23,25 @@ import es.gob.afirma.keystores.AOKeyStoreManager;
 import es.gob.afirma.keystores.AOKeyStoreManagerException;
 import es.gob.afirma.keystores.callbacks.UIPasswordCallback;
 
-final class NssKeyStoreManager extends AOKeyStoreManager {
+/** Almac&eacute;n de claves y certificados basado en NSS.
+ * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
+public final class NssKeyStoreManager extends AOKeyStoreManager {
 
 	private static Provider nssProvider = null;
+
+	private final boolean useSharedNss;
 
 	/** Componente padre sobre el que montar los di&aacute;logos modales. */
 	private final Object parentComponent;
 
-	/** Construye un gestor de almac&eacute;n de claves y certificados Mozilla (NSS).
-	 * @param parent Elemento padre para la modalidad */
-	NssKeyStoreManager(final Object parent) {
+	/** Construye un gestor de almac&eacute;n de claves y certificados NSS.
+	 * @param parent Elemento padre para la modalidad.
+	 * @param sharedNss Si se indica <code>true</code> se usa el directorio de NSS compartido (de sistema), si por
+	 *                  el contrario se indica <code>false</code> se usa el NSS espec&iacute;fico de Mozilla. */
+	public NssKeyStoreManager(final Object parent, final boolean sharedNss) {
 		setKeyStoreType(AOKeyStore.MOZ_UNI);
 		this.parentComponent = parent;
+		this.useSharedNss = sharedNss;
 	}
 
 	/** Inicializa la clase gestora de almacenes de claves.
@@ -41,7 +59,7 @@ final class NssKeyStoreManager extends AOKeyStoreManager {
 		// se cargue en un futuro, asi que guardamos una copia local del proveedor para hacer
 		// estas comprobaciones
 		// getNssProvider() hace toda la inicializacion de NSS como PKCS#11 especial en Java
-		final Provider p = getNssProvider();
+		final Provider p = getNssProvider(this.useSharedNss);
 
 		KeyStore keyStore = null;
 		if (p != null) {
@@ -86,16 +104,18 @@ final class NssKeyStoreManager extends AOKeyStoreManager {
 
 	/** Carga e instala el proveedor de seguridad para el acceso al almac&eacute;n de NSS. Si
 	 * ya estaba cargado, lo recupera directamente.
+	 * @param useSharedNss Si se indica <code>true</code> se usa el directorio de NSS compartido (de sistema), si por
+	 *                     el contrario se indica <code>false</code> se usa el NSS espec&iacute;fico de Mozilla.
 	 * @return Proveedor para el acceso a NSS. */
-	private static Provider getNssProvider() {
+	private static Provider getNssProvider(final boolean useSharedNss) {
 		if (nssProvider != null) {
 			return nssProvider;
 		}
 		try {
-			nssProvider = MozillaKeyStoreUtilities.loadNSS();
+			nssProvider = MozillaKeyStoreUtilities.loadNSS(useSharedNss);
 		}
 		catch (final Exception e) {
-			LOGGER.severe("Error inicializando el proveedor NSS: " + e); //$NON-NLS-1$
+			LOGGER.log(Level.SEVERE, "Error obteniendo el proveedor NSS: " + e, e); //$NON-NLS-1$
 			nssProvider = null;
 		}
 		return nssProvider;

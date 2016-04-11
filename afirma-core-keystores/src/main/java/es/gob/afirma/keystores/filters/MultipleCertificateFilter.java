@@ -1,23 +1,29 @@
+/* Copyright (C) 2011 [Gobierno de Espana]
+ * This file is part of "Cliente @Firma".
+ * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
+ *   - the GNU General Public License as published by the Free Software Foundation;
+ *     either version 2 of the License, or (at your option) any later version.
+ *   - or The European Software License; either version 1.1 or (at your option) any later version.
+ * Date: 11/01/11
+ * You may contact the copyright holder at: soporte.afirma5@mpt.es
+ */
+
 package es.gob.afirma.keystores.filters;
 
 import java.security.cert.X509Certificate;
 
 import es.gob.afirma.core.keystores.KeyStoreManager;
 
-/**
- * Clase que engloba m&uacute;ltiples filtros de certificados, de tal forma que
+/** Filtro que engloba m&uacute;ltiples filtros de certificados, de tal forma que
  * s&oacute;lo pasar&acute;n por el filtro aquellos que cumplan con todos los filtros
- * individualmente.
- */
+ * individualmente. */
 public final class MultipleCertificateFilter extends CertificateFilter {
 
 	/** Listado de filtros que se desean aplicar sobre los certificados. */
 	private final CertificateFilter[] filters;
 
-	/**
-	 * Crea un filtro m&uacute;ltiple a partir de un listado de filtros.
-	 * @param filters Listado de filtros.
-	 */
+	/** Crea un filtro m&uacute;ltiple a partir de un listado de filtros.
+	 * @param filters Listado de filtros. */
 	public MultipleCertificateFilter(final CertificateFilter[] filters) {
 		if (filters == null) {
 			throw new IllegalArgumentException("Listado nulo de filtros de certificados"); //$NON-NLS-1$

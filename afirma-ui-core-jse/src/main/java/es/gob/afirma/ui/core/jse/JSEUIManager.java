@@ -23,6 +23,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.logging.Logger;
+import java.util.prefs.Preferences;
 
 import javax.swing.Icon;
 import javax.swing.JDialog;
@@ -50,7 +51,35 @@ public class JSEUIManager implements AOUIManager {
     private static final int ASCII_LOWER_INDEX = 32;
     private static final int ASCII_HIGHER_INDEX = 126;
 
-    /** Pregunta al usuario por una contrase&ntilde;a.
+    /** Objecto general de preferencias donde se guarda la configuraci&oacute;n de la
+	 * aplicaci&oacute;n. */
+	private static final Preferences preferences;
+	static {
+		preferences = Preferences.userNodeForPackage(JSEUIManager.class);
+	}
+
+	/** Recupera el valor de una cadena de texto almacenada entre las preferencias de la
+	 * aplicaci&oacute;n.
+	 * @param key Clave del valor que queremos recuperar.
+	 * @param def Valor que se devolver&aacute;a si la preferencia no se encontraba almacenada.
+	 * @return La preferencia almacenada o {@code def} si no se encontr&oacute;. */
+	public static String get(final String key, final String def) {
+		return preferences.get(key, def);
+	}
+
+	/** Establece una cadena de texto en la configuraci&oacute;n de la aplicaci&oacute;n
+	 * identific&aacute;ndola con una clave. Para realizar el guardado completo, es
+	 * necesario ejecutar el m&eacute;todo {@code flush()}.
+	 * @param key Clave con la que identificaremos el valor.
+	 * @param value Valor que se desea almacenar. */
+	public static void put(final String key, final String value) {
+		preferences.put(key, value);
+	}
+
+	/** Guarda el directorio actual. */
+	public static final String PREFERENCE_DIRECTORY = "currentDir"; //$NON-NLS-1$
+
+	/** Pregunta al usuario por una contrase&ntilde;a.
      * @param text Texto que se muestra en el di&aacute;logo para pedir la contrase&ntilde;a
      * @param c Componente padre (para la modalidad)
      * @return Contrase&ntilde;a introducida por el usuario
@@ -204,14 +233,12 @@ public class JSEUIManager implements AOUIManager {
         private String acceptedChars = null;
 
         /** Crea un nuevo filtro para campo de entrada de texto.
-         * @param acceptedchars
-         *        Cadena que debe contener todos los caracteres aceptados.
-         *        Cualquier caracter no incluido en esta cadena ser&aacute;
-         *        considerado inv&aacute;lido
-         * @param beepOnError
-         *        <code>true</code> si desea que se reproduzca un sonido
-         *        cuando el usuario introduce un caracter no v&aacute;lido,
-         *        false en caso contrario */
+         * @param acceptedchars Cadena que debe contener todos los caracteres aceptados.
+         *                      Cualquier caracter no incluido en esta cadena ser&aacute;
+         *                      considerado inv&aacute;lido
+         * @param beepOnError <code>true</code> si desea que se reproduzca un sonido
+         *                    cuando el usuario introduce un caracter no v&aacute;lido,
+         *        			  false en caso contrario */
         JTextFieldFilter(final String acceptedchars, final boolean beepOnError) {
             this.beep = beepOnError;
             this.acceptedChars = acceptedchars;
@@ -289,12 +316,32 @@ public class JSEUIManager implements AOUIManager {
     }
 
     @Override
-	public void showMessageDialog(final Object parentComponent, final Object message, final String title, final int messageType) {
+   	public void showMessageDialog(final Object parentComponent,
+   								  final Object message,
+   								  final String title,
+   								  final int messageType) {
+    	Component parent = null;
+    	if (parentComponent instanceof Component) {
+    		parent = (Component) parentComponent;
+    	}
+    	JOptionPane.showMessageDialog(parent, message, title, messageType);
+    }
+
+    @Override
+	public void showMessageDialog(final Object parentComponent,
+								  final Object message,
+								  final String title,
+								  final int messageType,
+								  final Object icon) {
         Component parent = null;
         if (parentComponent instanceof Component) {
             parent = (Component) parentComponent;
         }
-        JOptionPane.showMessageDialog(parent, message, title, messageType);
+        Icon dialogIcon = null;
+        if (icon instanceof Icon) {
+            dialogIcon = (Icon) icon;
+        }
+        JOptionPane.showMessageDialog(parent, message, title, messageType, dialogIcon);
     }
 
     /** {@inheritDoc} */
@@ -396,8 +443,11 @@ public class JSEUIManager implements AOUIManager {
         if (selectDirectory) {
         	jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         }
-        if (currentDir != null) {
-        	jfc.setCurrentDirectory(new File(currentDir));
+        if (currentDir == null) {
+        	final String newDir = get(PREFERENCE_DIRECTORY, currentDir);
+        	if (newDir != null) {
+        		jfc.setCurrentDirectory(new File(newDir));
+        	}
         }
         if (filename != null) {
         	if (currentDir != null) {
@@ -424,6 +474,7 @@ public class JSEUIManager implements AOUIManager {
         	else {
 				files = new File[] { jfc.getSelectedFile() };
 			}
+        	put(PREFERENCE_DIRECTORY, jfc.getCurrentDirectory().getPath());
             return files;
         }
         throw new AOCancelledOperationException();
@@ -468,26 +519,56 @@ public class JSEUIManager implements AOUIManager {
             // El metodo setSelectedFile determina tambien el directorio actual, asi que lo usamos cuando
             // se indica el nombre de fichero
             if (selectedFile != null && currentDir != null) {
-            	fileChooser.setSelectedFile(new File(currentDir, selectedFile));
-            } else if (selectedFile != null) {
-            	fileChooser.setSelectedFile(new File(selectedFile));
-            } else if (currentDir != null) {
-            	fileChooser.setCurrentDirectory(new File(currentDir));
+            	fileChooser.setSelectedFile(
+        			new File(currentDir, selectedFile)
+    			);
+            }
+            else if (selectedFile != null) {
+            	fileChooser.setSelectedFile(
+        			new File(selectedFile)
+    			);
+            }
+            else if (currentDir == null) {
+            	final String newDir = get(PREFERENCE_DIRECTORY, currentDir);
+            	if (newDir != null) {
+            		fileChooser.setCurrentDirectory(new File(newDir));
+            	}
             }
 
             // Solo aplicamos el filtro cuando este definido para evitar que el
             // desplegable de la ventana de guardado nos aparecezca vacio
+            final FileExtensionFilter fileExtensionFilter;
             if (exts != null && exts.length > 0) {
-                fileChooser.setFileFilter(new FileExtensionFilter(exts, description));
+            	fileExtensionFilter = new FileExtensionFilter(exts, description);
+                fileChooser.setFileFilter(fileExtensionFilter);
+            }
+            else {
+            	fileExtensionFilter = null;
             }
 
             int selectedOption = JOptionPane.YES_OPTION;
             final int returnCode = fileChooser.showSaveDialog(parentComponent);
             switch(returnCode) {
+
             	case JFileChooser.CANCEL_OPTION:
             		throw new AOCancelledOperationException();
+
             	case JFileChooser.APPROVE_OPTION:
+
 	                file = fileChooser.getSelectedFile();
+
+	                // El dialogo no anade una extension por defecto aunque haya filtro, asi que lo hacemos a mano
+	                // si el usuario no ha puesto extension
+	                if (fileExtensionFilter != null && !fileExtensionFilter.accept(file)) {
+	                	if (exts != null) {
+	                		final String extension = exts[0].startsWith(".") ? exts[0] : "." + exts[0];  //$NON-NLS-1$//$NON-NLS-2$
+	                		file = new File(file.getParent(), file.getName() + extension);
+	                	}
+	                	else {
+	                		file = new File(file.getParent(), file.getName());
+	                	}
+	                }
+
 	                if (file.exists()) {
 	                    selectedOption = JOptionPane.showConfirmDialog(
                     		parentComponent,
@@ -508,6 +589,7 @@ public class JSEUIManager implements AOUIManager {
 	                    tryAgain = true;
 	                    break;
 	                }
+
 	                // Hemos seleccionado la opcion de sobreescribir
                     try {
                     	final FileOutputStream fos = new FileOutputStream(file);
@@ -526,12 +608,11 @@ public class JSEUIManager implements AOUIManager {
                         // Volvemos a intentar guardar
                         tryAgain = true;
                     }
+                    put(PREFERENCE_DIRECTORY, fileChooser.getCurrentDirectory().getPath());
                     return file;
+
 			default:
 				throw new IOException("Error al seleccionar el fichero: " + returnCode); //$NON-NLS-1$
-
-
-
             }
         }
 
@@ -543,8 +624,7 @@ public class JSEUIManager implements AOUIManager {
      * carga y guardado. Se declara como p&uacute;blico para que pueda ser usado
      * tambi&eacute;n por el interfaz de aplicaci&oacute;n de escritorio. No
      * usamos <code>FileNameExtensionFilter</code> directamente para
-     * compatibilizar con Java 1.4
-     * @version 0.3 */
+     * compatibilizar con Java 1.4. */
     private static final class ExtFilter extends FileFilter implements java.io.FileFilter {
 
         private final String[] extensions;
@@ -588,8 +668,7 @@ public class JSEUIManager implements AOUIManager {
         }
 
         /** Devuelve la extensi&oacute;n de un fichero.
-         * @param f
-         *        Fichero del cual queremos conocer la extensi&oacute;n
+         * @param f Fichero del cual queremos conocer la extensi&oacute;n
          * @return Extensi&oacute;n del fichero o cadena vac&iacute;a si este no
          *         tiene extensi&oacute;n */
         private static String getExtension(final File f) {
@@ -600,7 +679,6 @@ public class JSEUIManager implements AOUIManager {
             }
             return ""; //$NON-NLS-1$
         }
-
     }
 
 	@Override

@@ -20,7 +20,6 @@ import java.util.Properties;
 
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import es.gob.afirma.core.misc.AOUtil;
@@ -108,11 +107,9 @@ public class TestPdfTriphase {
 		System.out.println("La firma se ha guardado en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
 	}
 
-	/**
-	 * Prueba de firma trifasica PDF con los mismos parametros que se usan para la firma PAdES en
+	/** Prueba de firma trifasica PDF con los mismos parametros que se usan para la firma PAdES en
 	 * el portafirmas del MinHAP.
-	 * @throws Exception Cuando ocurre cualquier error.
-	 */
+	 * @throws Exception Cuando ocurre cualquier error. */
 	@Test
 	public void testFirmaParamsPortafirmas() throws Exception {
 
@@ -146,7 +143,7 @@ public class TestPdfTriphase {
 	/** Prueba de firma trif&aacute;sica con adjunto en el PDF.
 	 * @throws Exception */
 	@Test
-	@Ignore
+	//@Ignore
 	public void firmaConAdjunto() throws Exception {
 		final AOSigner signer = new AOPDFTriPhaseSigner();
 

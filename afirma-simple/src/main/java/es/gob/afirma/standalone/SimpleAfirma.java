@@ -14,6 +14,7 @@ import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Cursor;
 import java.awt.Desktop;
+import java.awt.Frame;
 import java.awt.HeadlessException;
 import java.awt.Toolkit;
 import java.awt.event.WindowEvent;
@@ -49,6 +50,7 @@ import es.gob.afirma.cert.signvalidation.SignValidity;
 import es.gob.afirma.cert.signvalidation.SignValidity.SIGN_DETAIL_TYPE;
 import es.gob.afirma.core.LogManager;
 import es.gob.afirma.core.LogManager.App;
+import es.gob.afirma.core.misc.BoundedBufferedReader;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.misc.Platform.OS;
 import es.gob.afirma.core.ui.AOUIFactory;
@@ -62,14 +64,10 @@ import es.gob.afirma.standalone.ui.MainMenu;
 import es.gob.afirma.standalone.ui.MainScreen;
 import es.gob.afirma.standalone.ui.SignDetailPanel;
 import es.gob.afirma.standalone.ui.SignPanel;
+import es.gob.afirma.standalone.ui.preferences.PreferencesManager;
 import es.gob.afirma.standalone.updater.Updater;
 
 /** Aplicaci&oacute;n gr&aacute;fica de AutoFirma.
- * C&oacute;digos de salida de la aplicaci&oacute;n:
- * <ul>
- *  <li>-1 - Error en el subsistema de tarjetas e imposibilidad de abrir el almac&eacute;n local por defecto</li>
- *  <li>-2 - Imposibilidad de abrir el almac&eacute;n local por defecto</li>
- * </ul>
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public final class SimpleAfirma implements PropertyChangeListener, WindowListener {
 
@@ -108,6 +106,13 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
     static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
     private final JFrame window = new MainScreen();
+
+    /** Devuelve el marco principal de la aplicaci&oacute;n.
+     * @return Marco principal de la aplicaci&oacute;n. */
+    public Frame getMainFrame() {
+    	return this.window;
+    }
+
     private Container container;
     private JPanel currentPanel;
 
@@ -119,7 +124,6 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
     /** Construye la aplicaci&oacute;n principal y establece el
      * <i>Look&amp;Feel</i>. */
     public SimpleAfirma() {
-       LookAndFeelManager.applyLookAndFeel();
        this.mainMenu = new MainMenu(this.window, this);
     }
 
@@ -141,28 +145,12 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
         }
         else {
         	LOGGER.info("No se ha podido inicializar el almacen por defecto"); //$NON-NLS-1$
-        	// Comprobamos si el problema es un Java antiguo en 64 bits, que no trae SunMSCAPI
-        	if ("64".equals(Platform.getJavaArch()) && System.getProperty("java.version").startsWith("1.6") && Platform.OS.WINDOWS.equals(Platform.getOS())) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-        		try {
-					Class.forName("sun.security.mscapi.SunMSCAPI"); //$NON-NLS-1$
-				}
-        		catch (final ClassNotFoundException e) {
-        			AOUIFactory.showErrorMessage(
-                        this.container,
-                        SimpleAfirmaMessages.getString("SimpleAfirma.5"), //$NON-NLS-1$
-                        SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
-                        JOptionPane.ERROR_MESSAGE
-                    );
-                    closeApplication(-3);
-				}
-        	}
         	AOUIFactory.showErrorMessage(
                 this.container,
                 SimpleAfirmaMessages.getString("SimpleAfirma.6"), //$NON-NLS-1$
                 SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
                 JOptionPane.ERROR_MESSAGE
             );
-
         }
     }
 
@@ -177,7 +165,9 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
         boolean showDNIeScreen = preSelectedFile == null && !PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_HIDE_DNIE_START_SCREEN, false);
         if (showDNIeScreen) {
 	        try {
-	        	showDNIeScreen = !javax.smartcardio.TerminalFactory.getDefault().terminals().list().isEmpty();
+	        	if (javax.smartcardio.TerminalFactory.getDefault().terminals().list().isEmpty()) {
+	        		showDNIeScreen = false;
+	        	}
 	        }
 	        catch(final Exception e) {
 	        	LOGGER.info("No se ha podido obtener la lista de lectores de tarjetas del sistema: " + e); //$NON-NLS-1$
@@ -237,7 +227,6 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
                 SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
                 JOptionPane.ERROR_MESSAGE
             );
-            closeApplication(-2);
         }
         finally {
             this.container.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
@@ -352,10 +341,12 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
             this.currentPanel.setEnabled(false);
         }
         this.container.repaint();
+        this.container.requestFocusInWindow();
         this.currentPanel = newPanel;
         if (this.window != null) {
             this.window.repaint();
         }
+
     }
 
     private static Locale buildLocale(final String locale) {
@@ -486,26 +477,36 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
      * @param args Par&aacute;metros en l&iacute;nea de comandos */
     public static void main(final String[] args) {
 
+       LookAndFeelManager.applyLookAndFeel();
+
+		AutoFirmaUtil.setProxySettings();
+
 		// Google Analytics
-    	new Thread(
-			new Runnable() {
-				@Override
-				public void run() {
-			    	try {
-						final AnalyticsConfigData config = new AnalyticsConfigData(GOOGLE_ANALYTICS_TRACKING_CODE);
-						final JGoogleAnalyticsTracker tracker = new JGoogleAnalyticsTracker(config, GoogleAnalyticsVersion.V_4_7_2);
-						tracker.trackPageView(
-							"AutoFirma", //$NON-NLS-1$
-							"AutoFirma", //$NON-NLS-1$
-							getIp()
-						);
-			    	}
-			    	catch(final Exception e) {
-			    		LOGGER.warning("Error registrando datos en Google Analytics: " + e); //$NON-NLS-1$
-			    	}
+		if (
+			PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_USEANALYTICS, true) &&
+			!Boolean.getBoolean("es.gob.afirma.doNotSendAnalytics") && //$NON-NLS-1$
+			!Boolean.parseBoolean(System.getenv("es.gob.afirma.doNotSendAnalytics")) //$NON-NLS-1$
+		) {
+	    	new Thread(
+				new Runnable() {
+					@Override
+					public void run() {
+				    	try {
+							final AnalyticsConfigData config = new AnalyticsConfigData(GOOGLE_ANALYTICS_TRACKING_CODE);
+							final JGoogleAnalyticsTracker tracker = new JGoogleAnalyticsTracker(config, GoogleAnalyticsVersion.V_4_7_2);
+							tracker.trackPageView(
+								"AutoFirma", //$NON-NLS-1$
+								"AutoFirma", //$NON-NLS-1$
+								getIp()
+							);
+				    	}
+				    	catch(final Exception e) {
+				    		LOGGER.warning("Error registrando datos en Google Analytics: " + e); //$NON-NLS-1$
+				    	}
+					}
 				}
-			}
-		).start();
+			).start();
+		}
 
     	// Configuramos el log de la aplicacion
     	configureLog();
@@ -518,14 +519,20 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
         }
 
     	// Comprobamos actualizaciones
-    	Updater.checkForUpdates(null);
+		if (PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_UPDATECHECK, true)) {
+			Updater.checkForUpdates(null);
+		}
+		else {
+			LOGGER.info("Se ha pedido no comprobar actualizaciones al inicio"); //$NON-NLS-1$
+		}
 
     	try {
     		// Invocacion normal modo grafico
     		if (args == null || args.length == 0) {
 
-    			// Solo compruebo en invocacion normal de modo grafico
     			if (!isSimpleAfirmaAlreadyRunning()) {
+
+        			printSystemInfo();
 
     				final SimpleAfirma saf = new SimpleAfirma();
 
@@ -579,6 +586,9 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
     			}
     		}
     		else if (args[0].toLowerCase().startsWith(PROTOCOL_URL_START_LOWER_CASE)) {
+
+    			printSystemInfo();
+
     			LOGGER.info("Invocacion por protocolo con URL:\n" + args[0]); //$NON-NLS-1$
     			ProtocolInvocationLauncher.launch(args[0]);
     			System.exit(0);
@@ -591,7 +601,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
     		CommandLineLauncher.main(args);
     	}
     	catch (final Exception e) {
-    		LOGGER.severe("Error global en la aplicacion: " + e); //$NON-NLS-1$
+    		LOGGER.log(Level.SEVERE, "Error global en la aplicacion: " + e, e); //$NON-NLS-1$
     	}
     }
 
@@ -701,10 +711,12 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
     static String getIp() throws IOException {
         final URL whatismyip = new URL(IP_DISCOVERY_AUTOMATION);
         try (
-    		BufferedReader in = new BufferedReader(
+    		BufferedReader in = new BoundedBufferedReader(
 	    		new InputStreamReader(
 	                whatismyip.openStream()
-	            )
+	            ),
+	            1, // Solo leemos una linea
+	            2048 // Maximo 2048 octetos en esa linea
 			);
 		) {
         	return in.readLine();
@@ -722,11 +734,11 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 		}
 
 		try (
-			final InputStream manifestIs = SimpleAfirma.class.getClassLoader().getResourceAsStream("META-INF/MANIFEST.MF"); //$NON-NLS-1$
+			final InputStream manifestIs = SimpleAfirma.class.getClassLoader().getResourceAsStream("properties/updater.properties"); //$NON-NLS-1$
 		) {
 			final Properties metadata = new Properties();
 			metadata.load(manifestIs);
-			version = metadata.getProperty("Specification-Version", ""); //$NON-NLS-1$ //$NON-NLS-2$
+			version = metadata.getProperty("currentVersionText", ""); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		catch (final Exception e) {
 			LOGGER.warning("No se ha podido identificar el numero de version de AutoFirma a partir del Manifest: " + e); //$NON-NLS-1$
@@ -734,5 +746,20 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 		}
 
 		return version;
+	}
+
+	/** Imprime a traves del log la informacion b&aacute;sica del sistema. */
+	private static void printSystemInfo() {
+
+    	// Logs de informacion basica
+		LOGGER.info("Sistema operativo: " + System.getProperty("os.name")); //$NON-NLS-1$ //$NON-NLS-2$
+		LOGGER.info("Version del SO: " + System.getProperty("os.version")); //$NON-NLS-1$ //$NON-NLS-2$
+		LOGGER.info("Version de Java: " + System.getProperty("java.version")); //$NON-NLS-1$ //$NON-NLS-2$
+		LOGGER.info("Arquitectura del JRE: " + Platform.getJavaArch()); //$NON-NLS-1$
+		LOGGER.info("Java Vendor: " + System.getProperty("java.vm.vendor")); //$NON-NLS-1$ //$NON-NLS-2$
+		LOGGER.info("Localizacion por defecto: " + Locale.getDefault()); //$NON-NLS-1$
+		LOGGER.info("Tamano actual en memoria: " + Runtime.getRuntime().totalMemory()/(1024*1024) + "MB"); //$NON-NLS-1$ //$NON-NLS-2$
+		LOGGER.info("Tamano maximo de memoria: " + Runtime.getRuntime().maxMemory()/(1024*1024) + "MB"); //$NON-NLS-1$ //$NON-NLS-2$
+		LOGGER.info("Memoria actualmente libre: " + Runtime.getRuntime().freeMemory()/(1024*1024) + "MB"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 }

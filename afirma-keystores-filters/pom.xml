@@ -27,9 +27,15 @@
 		</dependency>
 		
 		<dependency>
-			<groupId>org.bouncycastle</groupId>
-			<artifactId>bcprov-jdk15on</artifactId>
-			<version>1.53</version>
+			<groupId>com.madgag.spongycastle</groupId>
+			<artifactId>core</artifactId>
+			<version>1.54.0.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.madgag.spongycastle</groupId>
+			<artifactId>prov</artifactId>
+			<version>1.54.0.0</version>
 		</dependency>
 		
 	</dependencies>

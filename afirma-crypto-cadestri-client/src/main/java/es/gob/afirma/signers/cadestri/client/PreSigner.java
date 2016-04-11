@@ -1,3 +1,13 @@
+/* Copyright (C) 2011 [Gobierno de Espana]
+ * This file is part of "Cliente @Firma".
+ * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
+ *   - the GNU General Public License as published by the Free Software Foundation;
+ *     either version 2 of the License, or (at your option) any later version.
+ *   - or The European Software License; either version 1.1 or (at your option) any later version.
+ * Date: 11/01/11
+ * You may contact the copyright holder at: soporte.afirma5@mpt.es
+ */
+
 package es.gob.afirma.signers.cadestri.client;
 
 import static es.gob.afirma.signers.cadestri.client.ProtocolConstants.HTTP_AND;
@@ -18,8 +28,10 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
 import java.util.Properties;
 
-import es.gob.afirma.core.misc.Base64;
+import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.http.UrlHttpManager;
+import es.gob.afirma.core.misc.http.UrlHttpMethod;
+import es.gob.afirma.core.signers.TriphaseUtil;
 
 final class PreSigner {
 
@@ -52,16 +64,15 @@ final class PreSigner {
 		append(PARAMETER_NAME_CRYPTO_OPERATION).append(HTTP_EQUALS).append(cryptoOperation).append(HTTP_AND).
 		append(PARAMETER_NAME_FORMAT).append(HTTP_EQUALS).append(format).append(HTTP_AND).
 		append(PARAMETER_NAME_ALGORITHM).append(HTTP_EQUALS).append(algorithm).append(HTTP_AND).
-		append(PARAMETER_NAME_CERT).append(HTTP_EQUALS).append(Base64.encode(certChain[0].getEncoded(), true)).append(HTTP_AND).
+		append(PARAMETER_NAME_CERT).append(HTTP_EQUALS).append(TriphaseUtil.prepareCertChainParam(certChain, extraParams)).append(HTTP_AND).
 		append(PARAMETER_NAME_DOCID).append(HTTP_EQUALS).append(documentId);
 
 		if (extraParams.size() > 0) {
 			urlBuffer.append(HTTP_AND).append(PARAMETER_NAME_EXTRA_PARAM).append(HTTP_EQUALS).
-			append(ProtocolConstants.properties2Base64(extraParams));
+			append(AOUtil.properties2Base64(extraParams));
 		}
 
-		return urlManager.readUrlByPost(urlBuffer.toString());
-
+		return urlManager.readUrl(urlBuffer.toString(), UrlHttpMethod.POST);
 	}
 
 }

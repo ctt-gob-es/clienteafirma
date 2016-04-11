@@ -13,23 +13,23 @@ package es.gob.afirma.envelopers.cms;
 import java.util.Enumeration;
 import java.util.logging.Logger;
 
-import org.bouncycastle.asn1.ASN1InputStream;
-import org.bouncycastle.asn1.ASN1Integer;
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.ASN1Sequence;
-import org.bouncycastle.asn1.ASN1Set;
-import org.bouncycastle.asn1.ASN1TaggedObject;
-import org.bouncycastle.asn1.DEROctetString;
-import org.bouncycastle.asn1.cms.Attribute;
-import org.bouncycastle.asn1.cms.AuthEnvelopedData;
-import org.bouncycastle.asn1.cms.AuthenticatedData;
-import org.bouncycastle.asn1.cms.CMSObjectIdentifiers;
-import org.bouncycastle.asn1.cms.CompressedData;
-import org.bouncycastle.asn1.cms.EncryptedContentInfo;
-import org.bouncycastle.asn1.cms.EnvelopedData;
-import org.bouncycastle.asn1.cms.SignedData;
-import org.bouncycastle.asn1.cms.SignerInfo;
-import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
+import org.spongycastle.asn1.ASN1InputStream;
+import org.spongycastle.asn1.ASN1Integer;
+import org.spongycastle.asn1.ASN1ObjectIdentifier;
+import org.spongycastle.asn1.ASN1Sequence;
+import org.spongycastle.asn1.ASN1Set;
+import org.spongycastle.asn1.ASN1TaggedObject;
+import org.spongycastle.asn1.DEROctetString;
+import org.spongycastle.asn1.cms.Attribute;
+import org.spongycastle.asn1.cms.AuthEnvelopedData;
+import org.spongycastle.asn1.cms.AuthenticatedData;
+import org.spongycastle.asn1.cms.CMSObjectIdentifiers;
+import org.spongycastle.asn1.cms.CompressedData;
+import org.spongycastle.asn1.cms.EncryptedContentInfo;
+import org.spongycastle.asn1.cms.EnvelopedData;
+import org.spongycastle.asn1.cms.SignedData;
+import org.spongycastle.asn1.cms.SignerInfo;
+import org.spongycastle.asn1.pkcs.PKCSObjectIdentifiers;
 
 import es.gob.afirma.signers.pkcs7.DigestedData;
 import es.gob.afirma.signers.pkcs7.SignedAndEnvelopedData;
@@ -62,8 +62,10 @@ final class ValidateCMS {
 	static
     boolean isCMSData(final byte[] data) {
         boolean isValid = true;
-        try {
-            final ASN1InputStream is = new ASN1InputStream(data);
+        try (
+    		final ASN1InputStream is = new ASN1InputStream(data);
+		) {
+
             final ASN1Sequence dsq = (ASN1Sequence) is.readObject();
             is.close();
             final Enumeration<?> e = dsq.getObjects();
@@ -91,13 +93,13 @@ final class ValidateCMS {
     }
 
     /** M&eacute;todo que verifica que es una firma de tipo "Signed data"
-     * @param data
-     *        Datos CMS.
+     * @param data Datos CMS.
      * @return si es de este tipo. */
     static boolean isCMSSignedData(final byte[] data) {
         boolean isValid = true;
-        try {
-            final ASN1InputStream is = new ASN1InputStream(data);
+        try (
+    		final ASN1InputStream is = new ASN1InputStream(data);
+		) {
             final ASN1Sequence dsq = (ASN1Sequence) is.readObject();
             is.close();
             final Enumeration<?> e = dsq.getObjects();
@@ -155,8 +157,9 @@ final class ValidateCMS {
 	static
     boolean isCMSDigestedData(final byte[] data) {
         boolean isValid = true;
-        try {
-            final ASN1InputStream is = new ASN1InputStream(data);
+        try (
+    		final ASN1InputStream is = new ASN1InputStream(data);
+		) {
             final ASN1Sequence dsq = (ASN1Sequence) is.readObject();
             is.close();
             final Enumeration<?> e = dsq.getObjects();
@@ -185,13 +188,13 @@ final class ValidateCMS {
     }
 
     /** M&eacute;todo que verifica que es una firma de tipo "Encrypted data"
-     * @param data
-     *        Datos CMS.
+     * @param data Datos CMS.
      * @return si es de este tipo. */
     static boolean isCMSEncryptedData(final byte[] data) {
         boolean isValid = true;
-        try {
-            final ASN1InputStream is = new ASN1InputStream(data);
+        try (
+    		final ASN1InputStream is = new ASN1InputStream(data);
+		) {
             final ASN1Sequence dsq = (ASN1Sequence) is.readObject();
             is.close();
             final Enumeration<?> e = dsq.getObjects();
@@ -221,14 +224,14 @@ final class ValidateCMS {
     }
 
     /** M&eacute;todo que verifica que es una firma de tipo "Enveloped data"
-     * @param data
-     *        Datos CMS.
+     * @param data Datos CMS.
      * @return si es de este tipo. */
 	static
     boolean isCMSEnvelopedData(final byte[] data) {
         boolean isValid = true;
-        try {
-            final ASN1InputStream is = new ASN1InputStream(data);
+        try (
+    		final ASN1InputStream is = new ASN1InputStream(data);
+		) {
             final ASN1Sequence dsq = (ASN1Sequence) is.readObject();
             is.close();
             final Enumeration<?> e = dsq.getObjects();
@@ -262,8 +265,9 @@ final class ValidateCMS {
      * @return si es de este tipo. */
     static boolean isCMSSignedAndEnvelopedData(final byte[] data) {
         boolean isValid = true;
-        try {
-            final ASN1InputStream is = new ASN1InputStream(data);
+        try (
+    		final ASN1InputStream is = new ASN1InputStream(data);
+		) {
             final ASN1Sequence dsq = (ASN1Sequence) is.readObject();
             is.close();
             final Enumeration<?> e = dsq.getObjects();
@@ -299,10 +303,10 @@ final class ValidateCMS {
     static boolean isCMSAuthenticatedData(final byte[] data) {
         boolean isValid = true;
 
-
-        try {
-            // Leemos el fichero que contiene la firma.
+        try (
+    		// Leemos el fichero que contiene la firma.
             final ASN1InputStream is = new ASN1InputStream(data);
+		) {
             // Comenzamos a obtener los datos.
             final ASN1Sequence dsq = (ASN1Sequence) is.readObject();
             is.close();
@@ -333,9 +337,10 @@ final class ValidateCMS {
     static boolean isCMSAuthenticatedEnvelopedData(final byte[] data) {
         boolean isValid = true;
 
-        try {
-            // Leemos el fichero que contiene la firma.
+        try (
+    		// Leemos el fichero que contiene la firma.
             final ASN1InputStream is = new ASN1InputStream(data);
+		) {
             // Comenzamos a obtener los datos.
             final ASN1Sequence dsq = (ASN1Sequence) is.readObject();
             is.close();
@@ -365,9 +370,10 @@ final class ValidateCMS {
      * @return si es de este tipo. */
     static boolean isCMSCompressedData(final byte[] data) {
         boolean isValid = true;
-        try {
-            // Leemos el fichero que contiene la firma.
+        try (
+    		// Leemos el fichero que contiene la firma.
             final ASN1InputStream is = new ASN1InputStream(data);
+		) {
             // Comenzamos a obtener los datos.
             final ASN1Sequence dsq = (ASN1Sequence) is.readObject();
             is.close();

@@ -30,6 +30,7 @@ import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.standalone.ui.MainScreen;
 import es.gob.afirma.standalone.ui.VisorPanel;
+import es.gob.afirma.standalone.ui.preferences.PreferencesManager;
 
 /** Ventana para la visualizaci&oacute;n de datos de firma.
  * @author Carlos Gamuci. */
@@ -181,7 +182,7 @@ public class VisorFirma extends JApplet implements WindowListener {
 				null,
 				false,
 				false,
-				null,
+				AutoFirmaUtil.getDefaultDialogsIcon(),
 				VisorFirma.this.window
 			)[0];
     	}

@@ -11,17 +11,18 @@
 package es.gob.afirma.envelopers.cms;
 
 import java.io.IOException;
+import java.util.zip.DataFormatException;
 
-import org.bouncycastle.asn1.ASN1Encoding;
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.ASN1OctetString;
-import org.bouncycastle.asn1.ASN1Sequence;
-import org.bouncycastle.asn1.BEROctetString;
-import org.bouncycastle.asn1.DEROctetString;
-import org.bouncycastle.asn1.cms.CMSObjectIdentifiers;
-import org.bouncycastle.asn1.cms.CompressedData;
-import org.bouncycastle.asn1.cms.ContentInfo;
-import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
+import org.spongycastle.asn1.ASN1Encoding;
+import org.spongycastle.asn1.ASN1ObjectIdentifier;
+import org.spongycastle.asn1.ASN1OctetString;
+import org.spongycastle.asn1.ASN1Sequence;
+import org.spongycastle.asn1.BEROctetString;
+import org.spongycastle.asn1.DEROctetString;
+import org.spongycastle.asn1.cms.CMSObjectIdentifiers;
+import org.spongycastle.asn1.cms.CompressedData;
+import org.spongycastle.asn1.cms.ContentInfo;
+import org.spongycastle.asn1.x509.AlgorithmIdentifier;
 
 /** Clase que crea un tipo Compressed Data seg&uacute;n el RFC 3274 - CMS
  * Compressed Data.
@@ -41,8 +42,7 @@ import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
  * </pre>
  *
  * La implementaci&oacute;n del c&oacute;digo ha seguido los pasos necesarios
- * para crear un mensaje Compressed Data de BouncyCastle: <a
- * href="http://www.bouncycastle.org/">www.bouncycastle.org</a> */
+ * para crear un mensaje Compressed Data de SpongyCastle. */
 final class CMSCompressedData {
 
 	private CMSCompressedData() {
@@ -75,17 +75,14 @@ final class CMSCompressedData {
     }
 
     /** M&eacute;todo que extrae el contenido de un tipo CompressedData.
-     * @param data
-     *        El tipo CompressedData.
+     * @param data El tipo CompressedData.
      * @return El contenido del envoltorio.
-     * @throws IOException
-     *         Se produce cuando hay un error de lectura de datos. */
-    static byte[] getContentCompressedData(final byte[] data) throws IOException {
+     * @throws IOException Cuando hay un error de lectura de datos.
+     * @throws DataFormatException Si los datos no estaban comprimidos. */
+    static byte[] getContentCompressedData(final byte[] data) throws IOException, DataFormatException {
         final ASN1Sequence contentEnvelopedData = Utils.fetchWrappedData(data);
         final CompressedData compressed = CompressedData.getInstance(contentEnvelopedData);
         final DEROctetString dos = (DEROctetString) compressed.getEncapContentInfo().getContent();
-
         return BinaryUtils.uncompress(dos.getOctets());
-
     }
 }

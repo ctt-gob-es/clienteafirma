@@ -236,13 +236,13 @@ final class KeyStoreConfigurationManager {
         	this.getKeyStoreManager();
 
         	final AOKeyStoreDialog dialog = new AOKeyStoreDialog(
-        			this.ksManager, // KeyStoreManager
-                    this.parent, // Panel sobre el que mostrar el dialogo
-                    this.checkPrivateKey, // Comprobar accesibilidad de claves privadas
-                    true, // Advierte si el certificado esta caducado
+        			this.ksManager,                 // KeyStoreManager
+                    this.parent,                    // Panel sobre el que mostrar el dialogo
+                    this.checkPrivateKey,           // Comprobar accesibilidad de claves privadas
                     this.showExpiratedCertificates, // Muestra certificados caducados
-                    this.certFilters, // Filtros para los certificados
-                    this.isMandatoryCert() // Solo se admite un certificado
+                    true,                           // Advierte si el certificado esta caducado
+                    this.certFilters,               // Filtros para los certificados
+                    this.isMandatoryCert()          // Solo se admite un certificado
     				);
     		dialog.show();
 

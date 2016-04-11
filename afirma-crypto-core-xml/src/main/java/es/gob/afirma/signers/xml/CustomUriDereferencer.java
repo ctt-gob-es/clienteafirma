@@ -1,3 +1,13 @@
+/* Copyright (C) 2011 [Gobierno de Espana]
+ * This file is part of "Cliente @Firma".
+ * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
+ *   - the GNU General Public License as published by the Free Software Foundation;
+ *     either version 2 of the License, or (at your option) any later version.
+ *   - or The European Software License; either version 1.1 or (at your option) any later version.
+ * Date: 11/01/11
+ * You may contact the copyright holder at: soporte.afirma5@mpt.es
+ */
+
 package es.gob.afirma.signers.xml;
 
 import java.io.ByteArrayInputStream;
@@ -25,6 +35,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import es.gob.afirma.core.misc.http.UrlHttpManagerFactory;
+import es.gob.afirma.core.misc.http.UrlHttpMethod;
 
 /** Dereferenciador a medida de referencias XML DOM. */
 public final class CustomUriDereferencer implements URIDereferencer {
@@ -134,7 +145,7 @@ public final class CustomUriDereferencer implements URIDereferencer {
 				Logger.getLogger("es.gob.afirma").info("Se ha pedido dereferenciar una URI externa: " + uri);  //$NON-NLS-1$//$NON-NLS-2$
 				final byte[] externalContent;
 				try {
-					externalContent = UrlHttpManagerFactory.getInstalledManager().readUrlByGet(uri);
+					externalContent = UrlHttpManagerFactory.getInstalledManager().readUrl(uri, UrlHttpMethod.GET);
 				}
 				catch (final Exception e1) {
 					throw new URIReferenceException(

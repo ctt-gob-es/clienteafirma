@@ -14,8 +14,7 @@ final class ConfiguratorLinux implements Configurator {
     static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
     private static final String KS_FILENAME = "autofirma.pfx"; //$NON-NLS-1$
-    private static final char[] KS_PASSWORD = "654321".toCharArray(); //$NON-NLS-1$
-    private static final String CERT_CN = "127.0.0.1"; //$NON-NLS-1$
+    private static final String KS_PASSWORD = "654321"; //$NON-NLS-1$
     static final String EXPORT_PATH = "export PATH=$PATH:"; //$NON-NLS-1$
     static final String EXPORT_LD_LIBRARY ="export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:"; //$NON-NLS-1$
 
@@ -31,11 +30,9 @@ final class ConfiguratorLinux implements Configurator {
         if (!checkSSLKeyStoreGenerated(appDir)) {
             LOGGER.info(Messages.getString("ConfiguratorLinux.5")); //$NON-NLS-1$
 
-            final CertPack certPack = CertUtil.generateSSLCertificate(
-                CERT_CN,
+            final CertPack certPack = CertUtil.getCertPackForLocalhostSsl(
                 ConfiguratorUtil.CERT_ALIAS,
-                KS_PASSWORD,
-                false
+                KS_PASSWORD
             );
 
             LOGGER.info(Messages.getString("ConfiguratorLinux.11")); //$NON-NLS-1$
@@ -53,7 +50,8 @@ final class ConfiguratorLinux implements Configurator {
 
             try {
                 LOGGER.warning(Messages.getString("ConfiguratorLinux.13")); //$NON-NLS-1$
-                ConfiguratorFirefox.installRootCAMozillaKeyStore(appDir, certPack.getCertificate(),command);
+                ConfiguratorFirefox.installRootCAChromeKeyStore(appDir, command);
+                ConfiguratorFirefox.installRootCAMozillaKeyStore(appDir, certPack.getCaCertificate(), command);
               }
             catch(final MozillaProfileNotFoundException e) {
                 LOGGER.warning(Messages.getString("ConfiguratorLinux.12")); //$NON-NLS-1$

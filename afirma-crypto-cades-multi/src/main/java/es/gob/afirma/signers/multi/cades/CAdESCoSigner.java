@@ -22,36 +22,37 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.List;
 
-import org.bouncycastle.asn1.ASN1Encodable;
-import org.bouncycastle.asn1.ASN1EncodableVector;
-import org.bouncycastle.asn1.ASN1Encoding;
-import org.bouncycastle.asn1.ASN1InputStream;
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.ASN1OctetString;
-import org.bouncycastle.asn1.ASN1Primitive;
-import org.bouncycastle.asn1.ASN1Sequence;
-import org.bouncycastle.asn1.ASN1Set;
-import org.bouncycastle.asn1.ASN1TaggedObject;
-import org.bouncycastle.asn1.BEROctetString;
-import org.bouncycastle.asn1.DEROctetString;
-import org.bouncycastle.asn1.DERSet;
-import org.bouncycastle.asn1.cms.AttributeTable;
-import org.bouncycastle.asn1.cms.CMSAttributes;
-import org.bouncycastle.asn1.cms.ContentInfo;
-import org.bouncycastle.asn1.cms.IssuerAndSerialNumber;
-import org.bouncycastle.asn1.cms.SignedData;
-import org.bouncycastle.asn1.cms.SignerIdentifier;
-import org.bouncycastle.asn1.cms.SignerInfo;
-import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
-import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
-import org.bouncycastle.asn1.x509.Certificate;
-import org.bouncycastle.asn1.x509.TBSCertificateStructure;
-import org.bouncycastle.cms.CMSException;
-import org.bouncycastle.cms.CMSProcessable;
-import org.bouncycastle.cms.CMSProcessableByteArray;
+import org.spongycastle.asn1.ASN1Encodable;
+import org.spongycastle.asn1.ASN1EncodableVector;
+import org.spongycastle.asn1.ASN1Encoding;
+import org.spongycastle.asn1.ASN1InputStream;
+import org.spongycastle.asn1.ASN1ObjectIdentifier;
+import org.spongycastle.asn1.ASN1OctetString;
+import org.spongycastle.asn1.ASN1Primitive;
+import org.spongycastle.asn1.ASN1Sequence;
+import org.spongycastle.asn1.ASN1Set;
+import org.spongycastle.asn1.ASN1TaggedObject;
+import org.spongycastle.asn1.BEROctetString;
+import org.spongycastle.asn1.DEROctetString;
+import org.spongycastle.asn1.DERSet;
+import org.spongycastle.asn1.cms.AttributeTable;
+import org.spongycastle.asn1.cms.CMSAttributes;
+import org.spongycastle.asn1.cms.ContentInfo;
+import org.spongycastle.asn1.cms.IssuerAndSerialNumber;
+import org.spongycastle.asn1.cms.SignedData;
+import org.spongycastle.asn1.cms.SignerIdentifier;
+import org.spongycastle.asn1.cms.SignerInfo;
+import org.spongycastle.asn1.pkcs.PKCSObjectIdentifiers;
+import org.spongycastle.asn1.x500.X500Name;
+import org.spongycastle.asn1.x509.AlgorithmIdentifier;
+import org.spongycastle.asn1.x509.Certificate;
+import org.spongycastle.asn1.x509.TBSCertificateStructure;
+import org.spongycastle.cms.CMSException;
+import org.spongycastle.cms.CMSProcessable;
+import org.spongycastle.cms.CMSProcessableByteArray;
 
 import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.AOFormatFileException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.signers.AOPkcs1Signer;
 import es.gob.afirma.core.signers.AOSignConstants;
@@ -66,8 +67,7 @@ import es.gob.afirma.signers.pkcs7.SigUtils;
 
 /** Clase que implementa la cofirma digital CADES SignedData La
  * implementaci&oacute;n del c&oacute;digo ha seguido los pasos necesarios para
- * crear un mensaje SignedData de BouncyCastle: <a
- * href="http://www.bouncycastle.org/">www.bouncycastle.org</a> pero con la
+ * crear un mensaje SignedData de SpongyCastle pero con la
  * peculiaridad de que es una Cofirma.
  * Para ello, debe incluirse el atributo de pol&iacute;tica en la
  * identificaci&oacute;n del firmante de la siguiente manera:
@@ -159,13 +159,18 @@ final class CAdESCoSigner {
 	 * @param ctis Indicaciones sobre los tipos de compromisos adquiridos con la firma.
 	 * @param includeSigningTimeAttribute <code>true</code> para incluir el atributo <i>SigningTime</i> de PKCS#9 (OID:1.2.840.113549.1.9.5),
      *                                    <code>false</code> para no incluirlo.
-	 * @param csm Metadatos sobre el firmante
+	 * @param csm Metadatos sobre el firmante.
+	 * @param doNotIncludePolicyOnSigningCertificate Si se establece a <code>true</code> omite la inclusi&oacute;n de la
+     *                                               pol&iacute;tica de certificaci&oacute;n en el <i>SigningCertificate</i>,
+     *                                               si se establece a <code>false</code> se incluye siempre que el certificado
+     *                                               la declare.
 	 * @return El archivo de firmas con la nueva firma.
 	 * @throws IOException Si ocurre alg&uacute;n problema leyendo o escribiendo los datos
 	 * @throws NoSuchAlgorithmException Si no se soporta alguno de los algoritmos de firma o huella
 	 *                                  digital
 	 * @throws CertificateException Si se produce alguna excepci&oacute;n con los certificados de
-	 *                              firma.*/
+	 *                              firma.
+	 * @throws AOFormatFileException Si se proporciona una firma con sellos de tiempo. */
 	byte[] coSigner(final P7ContentSignerParameters parameters,
 			        final byte[] signature,
 			        final boolean omitContent,
@@ -178,9 +183,11 @@ final class CAdESCoSigner {
 			        final String contentDescription,
 			        final List<CommitmentTypeIndicationBean> ctis,
 			        final boolean includeSigningTimeAttribute,
-			        final CAdESSignerMetadata csm) throws IOException,
-			                                              NoSuchAlgorithmException,
-			                                              CertificateException {
+			        final CAdESSignerMetadata csm,
+                    final boolean doNotIncludePolicyOnSigningCertificate) throws IOException,
+			                                                                     NoSuchAlgorithmException,
+			                                                                     CertificateException,
+			                                                                     AOFormatFileException {
 		final SignedData sd = readData(signature);
 
 		// 3. CONTENTINFO
@@ -242,7 +249,8 @@ final class CAdESCoSigner {
 				contentDescription,
 				ctis,
 				csm,
-                false  // No es contrafirma
+                false,  // No es contrafirma
+                doNotIncludePolicyOnSigningCertificate
 			);
 			this.signedAttr2 = SigUtils.getAttributeSet(new AttributeTable(contextExpecific));
 			signedAttr = SigUtils.getAttributeSet(new AttributeTable(contextExpecific));
@@ -262,7 +270,8 @@ final class CAdESCoSigner {
 				contentDescription,
 				ctis,
 				csm,
-                false  // No es contrafirma
+                false,  // No es contrafirma
+                doNotIncludePolicyOnSigningCertificate
 			);
 			this.signedAttr2 = SigUtils.getAttributeSet(new AttributeTable(contextExpecific));
 			signedAttr = SigUtils.getAttributeSet(new AttributeTable(contextExpecific));
@@ -326,7 +335,11 @@ final class CAdESCoSigner {
 	 * @param ctis Indicaciones sobre los tipos de compromisos adquiridos con la firma.
 	 * @param includeSigningTimeAttribute <code>true</code> para incluir el atributo <i>SigningTime</i> de PKCS#9 (OID:1.2.840.113549.1.9.5),
      *                                    <code>false</code> para no incluirlo.
-	 * @param csm Metadatos sobre el firmante
+	 * @param csm Metadatos sobre el firmante.
+	 * @param doNotIncludePolicyOnSigningCertificate Si se establece a <code>true</code> omite la inclusi&oacute;n de la
+     *                                               pol&iacute;tica de certificaci&oacute;n en el <i>SigningCertificate</i>,
+     *                                               si se establece a <code>false</code> se incluye siempre que el certificado
+     *                                               la declare.
 	 * @return El archivo de firmas con la nueva firma.
 	 * @throws java.io.IOException Si ocurre alg&uacute;n problema leyendo o escribiendo los datos
 	 * @throws NoSuchAlgorithmException Si no se soporta alguno de los algoritmos de firma o huella digital
@@ -345,10 +358,11 @@ final class CAdESCoSigner {
 			        final String contentDescription,
 			        final List<CommitmentTypeIndicationBean> ctis,
 			        final boolean includeSigningTimeAttribute,
-                    final CAdESSignerMetadata csm) throws IOException,
-			                                              NoSuchAlgorithmException,
-			                                              CertificateException,
-			                                              ContainsNoDataException {
+                    final CAdESSignerMetadata csm,
+                    final boolean doNotIncludePolicyOnSigningCertificate) throws IOException,
+			                                                                     NoSuchAlgorithmException,
+			                                                                     CertificateException,
+			                                                                     ContainsNoDataException {
 		// LEEMOS EL FICHERO QUE NOS INTRODUCEN
 		final ASN1InputStream is = new ASN1InputStream(signature);
 		final ASN1Sequence dsq = (ASN1Sequence) is.readObject();
@@ -455,7 +469,8 @@ final class CAdESCoSigner {
 				contentDescription,
 				ctis,
 				csm,
-                false  // No es contrafirma
+                false,  // No es contrafirma
+                doNotIncludePolicyOnSigningCertificate
 			);
 			this.signedAttr2 = SigUtils.getAttributeSet(new AttributeTable(contextExpecific));
 			signedAttr = SigUtils.getAttributeSet(new AttributeTable(contextExpecific));
@@ -475,7 +490,8 @@ final class CAdESCoSigner {
 				contentDescription,
 				ctis,
 				csm,
-                false  // No es contrafirma
+                false,  // No es contrafirma
+                doNotIncludePolicyOnSigningCertificate
 			);
 			this.signedAttr2 = SigUtils.getAttributeSet(new AttributeTable(contextExpecific));
 			signedAttr = SigUtils.getAttributeSet(new AttributeTable(contextExpecific));

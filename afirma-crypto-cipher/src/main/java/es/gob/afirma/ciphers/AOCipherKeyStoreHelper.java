@@ -109,7 +109,7 @@ public final class AOCipherKeyStoreHelper {
             LOGGER.severe("Error obteniendo los alias del almacen, se devolvera una lista vacia: " + e); //$NON-NLS-1$
             return new String[0];
         }
-        final List<String> tmpRet = new ArrayList<String>();
+        final List<String> tmpRet = new ArrayList<>();
         while (aliases.hasMoreElements()) {
             tmpRet.add(aliases.nextElement().toString());
         }
@@ -169,9 +169,9 @@ public final class AOCipherKeyStoreHelper {
             createCipherKeyStore();
         }
 
-        final InputStream ksIs = new FileInputStream(getCipherKeystore());
-        this.ks.load(new BufferedInputStream(ksIs), this.pss);
-        ksIs.close();
+        try (final InputStream ksIs = new FileInputStream(getCipherKeystore());) {
+        	this.ks.load(new BufferedInputStream(ksIs), this.pss);
+        }
 
     }
 

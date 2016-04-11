@@ -20,4 +20,16 @@ public final class TestTriphaseSession {
 		System.out.println(td);
 	}
 
+	/** Prueba de an&aacute;lisis de XML de sesi&oacute;n trif&aacute;sica con indicaci&oacute;n de formato.
+	 * @throws Exception en cualquier error. */
+	@SuppressWarnings("static-method")
+	@Test
+	public void testTriphaseXmlParsingWithFormat() throws Exception {
+		final byte[] xml = AOUtil.getDataFromInputStream(
+			TestTriphaseSession.class.getResourceAsStream("/TriPhaseData.xml") //$NON-NLS-1$
+		);
+		final TriphaseData td = TriphaseData.parser(xml);
+		System.out.println(td);
+	}
+
 }

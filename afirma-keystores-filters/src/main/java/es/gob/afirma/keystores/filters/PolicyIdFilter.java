@@ -1,14 +1,25 @@
+/* Copyright (C) 2011 [Gobierno de Espana]
+ * This file is part of "Cliente @Firma".
+ * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
+ *   - the GNU General Public License as published by the Free Software Foundation;
+ *     either version 2 of the License, or (at your option) any later version.
+ *   - or The European Software License; either version 1.1 or (at your option) any later version.
+ * Date: 11/01/11
+ * You may contact the copyright holder at: soporte.afirma5@mpt.es
+ */
+
 package es.gob.afirma.keystores.filters;
 
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
 
-import org.bouncycastle.asn1.ASN1OctetString;
-import org.bouncycastle.asn1.ASN1Sequence;
-import org.bouncycastle.asn1.x509.CertificatePolicies;
-import org.bouncycastle.asn1.x509.PolicyInformation;
+import org.spongycastle.asn1.ASN1OctetString;
+import org.spongycastle.asn1.ASN1Sequence;
+import org.spongycastle.asn1.x509.CertificatePolicies;
+import org.spongycastle.asn1.x509.PolicyInformation;
 
 /** Filtro de certificados por identificador de pol&iacute;tica de certificaci&oacute;n.
  * Si un certificado tiene varias pol&iacute;ticas declaradas, todas deben estar dentro de la
@@ -19,18 +30,31 @@ public final class PolicyIdFilter extends CertificateFilter {
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
+	private static final String OID_SEPARATOR = ";"; //$NON-NLS-1$
+
 	final List<String> allowedOids;
 
-  /** Contruye un filtro de certificados por identificador de pol&iacute;tica de certificaci&oacute;n.
-   * @param oids OID permitidos como pol&iacute;ticas de certificaci&oacute;n del certificado. */
-  public PolicyIdFilter(final List<String> oids) {
+	/** Contruye un filtro de certificados por identificador de pol&iacute;tica de certificaci&oacute;n.
+	 * @param oids Lista de OID permitidos como pol&iacute;ticas de certificaci&oacute;n del certificado (separados por ';'). */
+	public PolicyIdFilter(final String oids) {
+		  if (oids == null || oids.isEmpty()) {
+			  throw new IllegalArgumentException(
+				  "La lista de OID permitidos no puede ser nula ni vacia" //$NON-NLS-1$
+			  );
+		  }
+		  this.allowedOids = Arrays.asList(oids.split(OID_SEPARATOR));
+	}
+
+	/** Contruye un filtro de certificados por identificador de pol&iacute;tica de certificaci&oacute;n.
+	 * @param oids OID permitidos como pol&iacute;ticas de certificaci&oacute;n del certificado. */
+	public PolicyIdFilter(final List<String> oids) {
 	  if (oids == null || oids.isEmpty()) {
 		  throw new IllegalArgumentException(
 			  "La lista de OID permitidos no puede ser nula ni vacia" //$NON-NLS-1$
 		  );
 	  }
-    this.allowedOids = oids;
-  }
+      this.allowedOids = oids;
+	}
 
   @Override
   public boolean matches(final X509Certificate cert) {

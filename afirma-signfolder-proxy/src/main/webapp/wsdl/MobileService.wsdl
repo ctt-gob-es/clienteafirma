@@ -472,8 +472,7 @@
   </wsdl:binding>
   <wsdl:service name="MobileService">
     <wsdl:port binding="pfirma:MobileServiceSoapBinding" name="MobileServicePort">
-<!--       <soap:address location="https://pf.seap.minhap.es/pf/servicesv2/MobileService"/>  -->
-		<soap:address location="http://localhost:8090/afirma/MobileService"/>
+       <soap:address location="https://pf.seap.minhap.es/pf/servicesv2/MobileService"/>
     </wsdl:port>
   </wsdl:service>
 </wsdl:definitions>

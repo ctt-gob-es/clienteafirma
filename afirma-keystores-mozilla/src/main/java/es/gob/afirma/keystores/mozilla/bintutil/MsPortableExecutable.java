@@ -1,3 +1,13 @@
+/* Copyright (C) 2011 [Gobierno de Espana]
+ * This file is part of "Cliente @Firma".
+ * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
+ *   - the GNU General Public License as published by the Free Software Foundation;
+ *     either version 2 of the License, or (at your option) any later version.
+ *   - or The European Software License; either version 1.1 or (at your option) any later version.
+ * Date: 11/01/11
+ * You may contact the copyright holder at: soporte.afirma5@mpt.es
+ */
+
 package es.gob.afirma.keystores.mozilla.bintutil;
 
 import java.util.logging.Logger;
@@ -77,12 +87,12 @@ public class MsPortableExecutable {
 
         if (sizeOfOptionalHeader == 0) {
 			sb.append(
-				" El fichero es un objeto (no tiene cabecera opcional)" //$NON-NLS-1$
+				"\n El fichero es un objeto (no tiene cabecera opcional)" //$NON-NLS-1$
 			);
 		}
         else {
 			sb.append(
-				" El fichero es ejecutable (tamano de la cabecera opcional: " + sizeOfOptionalHeader + ")" //$NON-NLS-1$ //$NON-NLS-2$
+				"\n El fichero es ejecutable (tamano de la cabecera opcional: " + sizeOfOptionalHeader + ")" //$NON-NLS-1$ //$NON-NLS-2$
 			);
 		}
 
@@ -101,7 +111,7 @@ public class MsPortableExecutable {
 			Logger.getLogger("es.gob.afirma").warning("Entradas de la tabla de simbolos de la imagen COFF para simbolos locales eliminadas (se implementa una caracteristica deprecada)"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
         if (0 != (byte) (characteristics[1] & (byte) 0x10)) {
-			Logger.getLogger("es.gob.afirma").warning("Conjunto trucando agresivamente (se implementa una caracteristica deprecada para Windows 2000 y posteriores)"); //$NON-NLS-1$ //$NON-NLS-2$
+			Logger.getLogger("es.gob.afirma").warning("Conjunto truncando agresivamente (se implementa una caracteristica deprecada para Windows 2000 y posteriores)"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
         if (0 != (byte) (characteristics[1] & (byte) 0x20)) {
 			sb.append("\n La aplicacion puede gestionar direccionamiento superior a 2GB"); //$NON-NLS-1$
@@ -175,61 +185,90 @@ public class MsPortableExecutable {
 	        	AOBinUtil.getU2(peFile, coffOffset+optionalHeaderOffset+42)
         	);
 
-//        	// Version de la imagen +44, +45, +46, +47
-//        	sb.append("\n Version de la imagen: " +
-//        		AOBinUtil.getU2(peFile, coffOffset+optionalHeaderOffset+44) +
-//	        	"." +
-//	        	AOBinUtil.getU2(peFile, coffOffset+optionalHeaderOffset+46)
-//        	);
+        	// Version de la imagen +44, +45, +46, +47
+        	sb.append("\n Version de la imagen: " + //$NON-NLS-1$
+        		AOBinUtil.getU2(peFile, coffOffset+optionalHeaderOffset+44) +
+	        	"." + //$NON-NLS-1$
+	        	AOBinUtil.getU2(peFile, coffOffset+optionalHeaderOffset+46)
+        	);
 
-//        	// Checksum +64 +65 +66 +67
-//        	sb.append("\n Checksum de la imagen: " +
-//        		AOBinUtil.hexify(new byte[] {
-//    				peFile[coffOffset+optionalHeaderOffset+64],
-//    				peFile[coffOffset+optionalHeaderOffset+65],
-//    				peFile[coffOffset+optionalHeaderOffset+66],
-//    				peFile[coffOffset+optionalHeaderOffset+67]
-//        		}, true)
-//        	);
+        	// Version del subsistema +48, +49, +50, +51
+        	sb.append("\n Version del subsistema: " + //$NON-NLS-1$
+        		AOBinUtil.getU2(peFile, coffOffset+optionalHeaderOffset+48) +
+	        	"." + //$NON-NLS-1$
+	        	AOBinUtil.getU2(peFile, coffOffset+optionalHeaderOffset+50)
+        	);
 
-        	// Subsistema Windows - WINDOWS SPECIFIC
+        	// Tamano de la imagen en memoria +56, +57, +58, +59
+        	sb.append("\n Tamano de la imagen en memoria: " + //$NON-NLS-1$
+        		AOUtil.hexify(new byte[] {
+    				peFile[coffOffset+optionalHeaderOffset+56],
+    				peFile[coffOffset+optionalHeaderOffset+57],
+    				peFile[coffOffset+optionalHeaderOffset+58],
+    				peFile[coffOffset+optionalHeaderOffset+59]
+        		}, false)
+        	);
+        	sb.append('h');
+
+        	// Tamano de las cabeceras +60, +61, +62, +63
+        	sb.append("\n Tamano de las cabeceras (DOS Stub, cabecera PE y cabeceras de seccion, en valor redondeado a un multiplo de 'FileAlignment'): " + //$NON-NLS-1$
+        		AOUtil.hexify(new byte[] {
+    				peFile[coffOffset+optionalHeaderOffset+60],
+    				peFile[coffOffset+optionalHeaderOffset+61],
+    				peFile[coffOffset+optionalHeaderOffset+62],
+    				peFile[coffOffset+optionalHeaderOffset+63]
+        		}, false)
+        	);
+        	sb.append('h');
+
+        	// Checksum +64 +65 +66 +67
+        	sb.append("\n Checksum de la imagen: " + //$NON-NLS-1$
+        		AOUtil.hexify(new byte[] {
+    				peFile[coffOffset+optionalHeaderOffset+64],
+    				peFile[coffOffset+optionalHeaderOffset+65],
+    				peFile[coffOffset+optionalHeaderOffset+66],
+    				peFile[coffOffset+optionalHeaderOffset+67]
+        		}, false)
+        	);
+
+        	// Subsistema Windows - WINDOWS SPECIFIC +68
         	sb.append("\n Tipo de subsistema Windows: "); //$NON-NLS-1$
         	switch (AOBinUtil.getU2(peFile, coffOffset+optionalHeaderOffset+68)) {
 			case 0:
-				sb.append("\n Desconocido"); //$NON-NLS-1$
+				sb.append(" Desconocido"); //$NON-NLS-1$
 				break;
 			case 1:
-				sb.append("\n Controlador de dispositiovo o proceso nativo Windows"); //$NON-NLS-1$
+				sb.append(" Controlador de dispositiovo o proceso nativo Windows"); //$NON-NLS-1$
 				break;
 			case 2:
-				sb.append("\n Windows en modo grafico (GUI)"); //$NON-NLS-1$
+				sb.append(" Windows en modo grafico (GUI)"); //$NON-NLS-1$
 				break;
 			case 3:
-				sb.append("\n Windows en modo texto"); //$NON-NLS-1$
+				sb.append(" Windows en modo texto"); //$NON-NLS-1$
 				break;
 			case 7:
-				sb.append("\n POSIX en modo texto"); //$NON-NLS-1$
+				sb.append(" POSIX en modo texto"); //$NON-NLS-1$
 				break;
 			case 9:
-				sb.append("\n Windows CE"); //$NON-NLS-1$
+				sb.append(" Windows CE"); //$NON-NLS-1$
 				break;
 			case 10:
-				sb.append("\n Aplicacion EFI (Extensible Firmware Iterface)"); //$NON-NLS-1$
+				sb.append(" Aplicacion EFI (Extensible Firmware Interface)"); //$NON-NLS-1$
 				break;
 			case 11:
-				sb.append("\n Controlador EFI (Extensible Firmware Iterface) con servicios de arranque"); //$NON-NLS-1$
+				sb.append(" Controlador EFI (Extensible Firmware Interface) con servicios de arranque"); //$NON-NLS-1$
 				break;
 			case 12:
-				sb.append("\n Controlador EFI (Extensible Firmware Iterface) con servicios de ejecucion"); //$NON-NLS-1$
+				sb.append(" Controlador EFI (Extensible Firmware Interface) con servicios de ejecucion"); //$NON-NLS-1$
 				break;
 			case 13:
-				sb.append("\n Imagen ROM EFI (Extensible Firmware Iterface)"); //$NON-NLS-1$
+				sb.append(" Imagen ROM EFI (Extensible Firmware Interface)"); //$NON-NLS-1$
 				break;
 			case 14:
-				sb.append("\n XBOX"); //$NON-NLS-1$
+				sb.append(" XBOX"); //$NON-NLS-1$
 				break;
 			default:
-				sb.append("\n No valido"); //$NON-NLS-1$
+				sb.append(" No valido"); //$NON-NLS-1$
 				break;
 			}
 

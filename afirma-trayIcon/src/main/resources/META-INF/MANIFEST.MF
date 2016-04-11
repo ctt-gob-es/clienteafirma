@@ -1,0 +1,9 @@
+Manifest-Version: 1.0
+Main-Class: es.gob.afirma.standalone.trayicon.AutoFirmaTrayIcon
+Specification-Title: Icono de notificaciones de AutoFirma
+Specification-Version: 1.4.2
+Specification-Vendor: Gobierno de España
+Implementation-Title: es.gob.afirma
+Implementation-Version: build01
+Implementation-Vendor: Gobierno de España
+Application-Name: AutoFirma

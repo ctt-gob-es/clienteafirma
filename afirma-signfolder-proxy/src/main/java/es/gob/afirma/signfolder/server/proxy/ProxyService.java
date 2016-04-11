@@ -60,6 +60,8 @@ public final class ProxyService extends HttpServlet {
 
 	private static final String KEY_SIGNATURE_SERVICE = "triphase.server.url"; //$NON-NLS-1$
 
+	private static final String KEY_FORCED_EXTRAPARAMS = "forced.extraparams"; //$NON-NLS-1$
+
 	private static final String SIGNATURE_SERVICE_URL = "TRIPHASE_SERVER_URL"; //$NON-NLS-1$
 
 	private static final String PARAMETER_NAME_OPERATION = "op"; //$NON-NLS-1$
@@ -76,18 +78,12 @@ public final class ProxyService extends HttpServlet {
 	private static final String OPERATION_SIGN_PREVIEW = "8"; //$NON-NLS-1$
 	private static final String OPERATION_REPORT_PREVIEW = "9"; //$NON-NLS-1$
 
-	private static final String CRYPTO_OPERATION_TYPE_SIGN = "sign"; //$NON-NLS-1$
-	private static final String CRYPTO_OPERATION_TYPE_COSIGN = "cosign"; //$NON-NLS-1$
-	private static final String CRYPTO_OPERATION_TYPE_COUNTERSIGN = "countersign"; //$NON-NLS-1$
+	private static final String CRYPTO_PARAM_NEED_DATA = "NEED_DATA"; //$NON-NLS-1$
 
 	private static final String JAVA_HTTP_PORT_VARIABLE = "tomcat.httpport"; //$NON-NLS-1$
 	private static final String TOMCAT_HTTP_PORT_VARIABLE = "${" + JAVA_HTTP_PORT_VARIABLE + "}"; //$NON-NLS-1$ //$NON-NLS-2$
 
-
 	private static final String DATE_TIME_FORMAT = "dd/MM/yyyy  HH:mm"; //$NON-NLS-1$
-
-	/** Tama&ntilde;o de la p&aacute;gina de resultados. */
-	private static final String MOBILE_REJECT_DESCRIPTION = "Rechazo desde dispositivo movil"; //$NON-NLS-1$
 
 	static final Logger LOGGER;
 
@@ -147,6 +143,9 @@ public final class ProxyService extends HttpServlet {
 			LOGGER.info(key + ": " + this.config.getProperty(key)); //$NON-NLS-1$
 		}
 		LOGGER.info("---"); //$NON-NLS-1$
+
+		// Expandimos la propiedad
+
 
 		// Si esta configurada la variable SIGNATURE_SERVICE_URL en el sistema, se utiliza en lugar de propiedad
 		// interna de la aplicacion
@@ -269,13 +268,11 @@ public final class ProxyService extends HttpServlet {
 				LOGGER.info("Se ha indicado un codigo de operacion no valido"); //$NON-NLS-1$
 				ret = ErrorManager.genError(ErrorManager.ERROR_UNSUPPORTED_OPERATION_NAME);
 			}
-		}
-		catch (final SAXException e) {
+		} catch (final SAXException e) {
 			LOGGER.log(Level.SEVERE, ErrorManager.genError(ErrorManager.ERROR_BAD_XML) + ": " + e, e); //$NON-NLS-1$
 			responser.print(ErrorManager.genError(ErrorManager.ERROR_BAD_XML));
 			return;
-		}
-		catch (final CertificateException e) {
+		} catch (final CertificateException e) {
 			LOGGER.log(Level.SEVERE, ErrorManager.genError(ErrorManager.ERROR_BAD_CERTIFICATE) + ": " + e, e); //$NON-NLS-1$
 			responser.print(ErrorManager.genError(ErrorManager.ERROR_BAD_CERTIFICATE));
 			return;
@@ -329,9 +326,6 @@ public final class ProxyService extends HttpServlet {
 	 */
 	private String processPreSigns(final byte[] xml) throws SAXException, IOException, CertificateException {
 
-		System.out.println("XML peticion de prefirma: " + new String(xml));
-
-
 		final Document xmlDoc = this.documentBuilder.parse(new ByteArrayInputStream(xml));
 		final TriphaseRequestBean triRequests = SignRequestsParser.parse(xmlDoc);
 
@@ -346,7 +340,7 @@ public final class ProxyService extends HttpServlet {
 
 			try {
 				final MobileDocumentList downloadedDocs = service.getDocumentsToSign(triRequests.getCertificate().getEncoded(), singleRequest.getRef());
-				LOGGER.info("Recuperamos el documento"); //$NON-NLS-1$
+				LOGGER.info("Recuperamos los documentos de la peticion"); //$NON-NLS-1$
 				if (singleRequest.size() != downloadedDocs.getDocument().size()) {
 					LOGGER.info("No se han recuperado tantos documentos para la peticion " + singleRequest.getRef() + "' como los indicados en la propia peticion"); //$NON-NLS-1$ //$NON-NLS-2$
 					throw new Exception("No se han recuperado tantos documentos para la peticion '" + //$NON-NLS-1$
@@ -365,13 +359,12 @@ public final class ProxyService extends HttpServlet {
 
 							LOGGER.info(" Procesamos documento con el id: " + downloadedDoc.getIdentifier()); //$NON-NLS-1$
 
-							docRequest.setCryptoOperation(normalizeOperationType(downloadedDoc.getOperationType()));
+							docRequest.setCryptoOperation(downloadedDoc.getOperationType());
 
-							LOGGER.info(" Operacion criptografica: " + docRequest.getCryptoOperation()); //$NON-NLS-1$
-
-							// Del servicio remoto obtener los parametros de configuracion, tal como deben pasarse al MiniApplet
+							// Del servicio remoto obtener los parametros de configuracion, tal como deben pasarse al cliente
 							// Lo pasamos a base 64 URL_SAFE para que no afecten al envio de datos
 							final String extraParams = downloadedDoc.getSignatureParameters() != null ? downloadedDoc.getSignatureParameters().getValue() : null;
+
 							if (extraParams != null) {
 								docRequest.setParams(Base64.encode(extraParams.getBytes(), true));
 							}
@@ -398,37 +391,23 @@ public final class ProxyService extends HttpServlet {
 					}
 
 					LOGGER.info("Procedemos a realizar la prefirma"); //$NON-NLS-1$
-					TriSigner.doPreSign(docRequest, triRequests.getCertificate(), getSignatureServiceUrl(this.config));
+					TriSigner.doPreSign(
+							docRequest,
+							triRequests.getCertificate(),
+							getSignatureServiceUrl(this.config),
+							getForcedExtraParams(this.config));
 				}
 			} catch (final Exception mex) {
-				LOGGER.warning("Error en la prefirma de la peticion " + //$NON-NLS-1$
-						singleRequest.getRef() + ": " + mex); //$NON-NLS-1$
+				LOGGER.log(Level.SEVERE, "Error en la prefirma de la peticion " + //$NON-NLS-1$
+						singleRequest.getRef() + ": " + mex, mex); //$NON-NLS-1$
 				singleRequest.setStatusOk(false);
 				singleRequest.setThrowable(mex);
-				mex.printStackTrace();
 			}
 		}
 		return XmlResponsesFactory.createPresignResponse(triRequests);
 	}
 
-	/**
-	 * Normalizamos el nombre del tipo de operaci&oacute;n criptogr&aacute;fica..
-	 * @param operationType Tipo de operaci&oacute;n.
-	 * @return Nombre del tipo de operaci&oacute;n normalizado o el mismo de entrada
-	 * si no se ha encontrado correspondencia.
-	 */
-	private static String normalizeOperationType(final String operationType) {
-		String normalizedOp = operationType;
-		if ("firmar".equalsIgnoreCase(normalizedOp)) { //$NON-NLS-1$
-			normalizedOp = CRYPTO_OPERATION_TYPE_SIGN;
-		} else if ("cofirmar".equalsIgnoreCase(normalizedOp)) { //$NON-NLS-1$
-			normalizedOp = CRYPTO_OPERATION_TYPE_COSIGN;
-		} else if ("contrafirmar".equalsIgnoreCase(normalizedOp)) { //$NON-NLS-1$
-			normalizedOp = CRYPTO_OPERATION_TYPE_COUNTERSIGN;
-		}
 
-		return normalizedOp;
-	}
 
 	/**
 	 * Procesa las peticiones de postfirma. Se realiza la postfirma de cada uno de los documentos de las peticiones indicadas.
@@ -462,8 +441,12 @@ public final class ProxyService extends HttpServlet {
 			// Tomamos nota de que firmas requieren el documento original
 			final Set<String> requestNeedContent = new HashSet<String>();
 			for (final TriphaseSignDocumentRequest docRequest: triRequest) {
+
 				final TriphaseData triData = docRequest.getPartialResult();
-				if (triData.getSignsCount() > 0 && !Boolean.parseBoolean(triData.getSign(0).getDict().get("NEED_DATA"))) {
+				if (triData.getSignsCount() > 0 &&
+						(!triData.getSign(0).getDict().containsKey(CRYPTO_PARAM_NEED_DATA) ||
+						Boolean.parseBoolean(triData.getSign(0).getDict().get(CRYPTO_PARAM_NEED_DATA)))) {
+					LOGGER.info("Descargamos el documento '" + docRequest.getId() + "' para su uso en la postfirma"); //$NON-NLS-1$ //$NON-NLS-2$
 					requestNeedContent.add(docRequest.getId());
 				}
 			}
@@ -497,19 +480,30 @@ public final class ProxyService extends HttpServlet {
 								else {
 									docRequest.setContent((String) content);
 								}
+								// Del servicio remoto obtener los parametros de configuracion, tal como deben pasarse al cliente
+								// Lo pasamos a base 64 URL_SAFE para que no afecten al envio de datos
+								final String extraParams = downloadedDoc.getSignatureParameters() != null ? downloadedDoc.getSignatureParameters().getValue() : null;
+								if (extraParams != null) {
+									docRequest.setParams(Base64.encode(extraParams.getBytes(), true));
+								}
 							}
 						}
 					}
 
 					LOGGER.info("Procedemos a realizar la postfirma"); //$NON-NLS-1$
-					TriSigner.doPostSign(docRequest, triRequests.getCertificate(), getSignatureServiceUrl(this.config));
+					TriSigner.doPostSign(
+							docRequest,
+							triRequests.getCertificate(),
+							getSignatureServiceUrl(this.config),
+							getForcedExtraParams(this.config));
 				}
 			} catch (final Exception ex) {
-				LOGGER.warning("Ocurrio un error al postfirmar un documento: " + ex);  //$NON-NLS-1$
-				ex.printStackTrace();
+				LOGGER.log(Level.WARNING, "Ocurrio un error al postfirmar un documento: " + ex, ex);  //$NON-NLS-1$
 				triRequest.setStatusOk(false);
 				continue;
 			}
+
+			LOGGER.info("Registramos el resultado en el portafirmas"); //$NON-NLS-1$
 
 			// Guardamos las firmas de todos los documentos de cada peticion
 			try {
@@ -567,6 +561,19 @@ public final class ProxyService extends HttpServlet {
 		LOGGER.info("URL del servicio de firma trifasica: " + this.signatureServiceUrl); //$NON-NLS-1$
 
 		return this.signatureServiceUrl;
+	}
+
+	/**
+	 * Obtiene el listado de par&aacute;metros extra con el que se deben de configurar
+	 * todas las firmas (adem&aacute;s de los par&aacute;metros que indiquen cada una
+	 * de ellas). Estos par&aacute;etros forzados tienen prioridad sobre los anteriores.
+	 * Cada uno de los parametros tendr&aacute;n la forma "clave=valor" y estar&aacute;n
+	 * separados entre s&iacute; por punto y coma (';').
+	 * @param conf Configuraci&oacute;n del servicio.
+	 * @return Listado de par&aacute;metros.
+	 */
+	private static String getForcedExtraParams(final Properties conf) {
+		return conf.getProperty(KEY_FORCED_EXTRAPARAMS);
 	}
 
 	/**
@@ -709,11 +716,10 @@ public final class ProxyService extends HttpServlet {
 			// devuelve el mismo identificador de la peticion, aunque no es obligatorio
 			// Si falla devuelve una excepcion.
 			try {
-				service.rejectRequest(rejectRequest.getCertEncoded(), id, MOBILE_REJECT_DESCRIPTION);
+				service.rejectRequest(rejectRequest.getCertEncoded(), id, rejectRequest.getRejectReason());
 				rejectionsResults.add(Boolean.TRUE);
 			} catch (final Exception e) {
-				LOGGER.warning("Error en el rechazo de la peticion " + id + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$
-				e.printStackTrace();
+				LOGGER.log(Level.WARNING, "Error en el rechazo de la peticion " + id + ": " + e, e); //$NON-NLS-1$ //$NON-NLS-2$
 				rejectionsResults.add(Boolean.FALSE);
 			}
 		}
@@ -772,7 +778,6 @@ public final class ProxyService extends HttpServlet {
 		}
 
 		// Listado de remitentes de la peticion
-		//		final Vector signLines = new Vector<String>();
 		final List<MobileSignLine> mobileSignLines = mobileRequest.getSignLineList().getMobileSignLine();
 		final List<String>[] signLines = new ArrayList[mobileSignLines.size()];
 		for (int i = 0; i < signLines.length; i++) {
@@ -964,7 +969,7 @@ public final class ProxyService extends HttpServlet {
 
 		for (final ApproveRequest appReq : appRequests) {
 			try {
-				service.approveRequest(appRequests.getCertEncoded(), appReq.getRequestId());
+				service.approveRequest(appRequests.getCertEncoded(), appReq.getRequestTagId());
 			} catch (final MobileException e) {
 				appReq.setOk(false);
 			}
@@ -1018,5 +1023,4 @@ public final class ProxyService extends HttpServlet {
 			}
 		}
 	}
-
 }

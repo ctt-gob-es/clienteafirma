@@ -16,10 +16,13 @@ import es.gob.afirma.signers.pades.AOPDFSigner;
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public final class TestPDFX {
 
-	private final static String TEST_FILE_A2B = "PDF-A2B.pdf"; //$NON-NLS-1$
+	private final static String TEST_FILE_A1A = "PDF-A.pdf"; //$NON-NLS-1$
 	private final static String TEST_FILE_A1B = "PDF-A1B.pdf"; //$NON-NLS-1$
-	//private final static String TEST_FILE_A1B_SIGNED = "PDFA1BSIGNED.pdf"; //$NON-NLS-1$
-	private final static String TEST_FILE = "PDF-A.pdf"; //$NON-NLS-1$
+	private final static String TEST_FILE_A2B = "PDF-A2B.pdf"; //$NON-NLS-1$
+	private final static String TEST_FILE_A2B_PDFTOOLS = "PDF-A2B-PdfTools.pdf"; //$NON-NLS-1$
+
+	private final static String TEST_FILE_A1B_SIGNED = "PDFA1BSIGNED.pdf"; //$NON-NLS-1$
+	//private final static String TEST_FILE = "Monitorio_29-02-2016 tipoA.pdf"; //$NON-NLS-1$
 
 	private final static String DEFAULT_SIGNATURE_ALGORITHM = "SHA512withRSA"; //$NON-NLS-1$
 
@@ -32,7 +35,7 @@ public final class TestPDFX {
 	@SuppressWarnings("static-method")
 	@Test
 	public void testRevSignature() throws Exception {
-		final byte[] testPdf = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(TEST_FILE));
+		final byte[] testPdf = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(TEST_FILE_A1B_SIGNED));
 		final AOPDFSigner signer = new AOPDFSigner();
 
         final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
@@ -64,14 +67,21 @@ public final class TestPDFX {
 	@Test
 	public void testPdfASignature() throws Exception {
 
-		final byte[] testPdfA2b = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(TEST_FILE_A2B));
+		final byte[] testPdfA2b = AOUtil.getDataFromInputStream(
+			ClassLoader.getSystemResourceAsStream(TEST_FILE_A2B)
+		);
 		final AOPDFSigner signer = new AOPDFSigner();
 
         final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
         ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH), CERT_PASS.toCharArray());
-        final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
+        final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(
+    		CERT_ALIAS,
+    		new KeyStore.PasswordProtection(CERT_PASS.toCharArray())
+		);
 
         final Properties extraParams = new Properties();
+
+        // Firma de PDF/A-2B
 
         byte[] resPdf;
         OutputStream fos;
@@ -84,9 +94,37 @@ public final class TestPDFX {
     		extraParams
 		);
 
-        fos = new FileOutputStream(File.createTempFile("PDFA2BSIGNED_", ".pdf")); //$NON-NLS-1$ //$NON-NLS-2$
+        File outputFile = File.createTempFile("PDFA2BSIGNED_", ".pdf"); //$NON-NLS-1$ //$NON-NLS-2$
+
+        fos = new FileOutputStream(outputFile);
         fos.write(resPdf);
         fos.close();
+
+        System.out.println("Fichero de firma de PDF/A-2B guardado en: " + outputFile.getAbsolutePath()); //$NON-NLS-1$
+
+        // Firma de PDF/A-1A
+
+        final byte[] testPdfA1a = AOUtil.getDataFromInputStream(
+        		ClassLoader.getSystemResourceAsStream(TEST_FILE_A1A)
+        		);
+
+        resPdf = signer.sign(
+        		testPdfA1a,
+        		DEFAULT_SIGNATURE_ALGORITHM,
+        		pke.getPrivateKey(),
+        		pke.getCertificateChain(),
+        		extraParams
+        		);
+
+        outputFile = File.createTempFile("PDFA1ASIGNED_", ".pdf"); //$NON-NLS-1$ //$NON-NLS-2$
+
+        fos = new FileOutputStream(outputFile);
+        fos.write(resPdf);
+        fos.close();
+
+        System.out.println("Fichero de firma de PDF/A-1A guardado en: " + outputFile.getAbsolutePath()); //$NON-NLS-1$
+
+     // Firma de PDF/A-1B
 
 		final byte[] testPdfA1b = AOUtil.getDataFromInputStream(
 			ClassLoader.getSystemResourceAsStream(TEST_FILE_A1B)
@@ -100,9 +138,35 @@ public final class TestPDFX {
     		extraParams
 		);
 
-        fos = new FileOutputStream(File.createTempFile("PDFA1BSIGNED_", ".pdf")); //$NON-NLS-1$ //$NON-NLS-2$
+        outputFile = File.createTempFile("PDFA1BSIGNED_", ".pdf"); //$NON-NLS-1$ //$NON-NLS-2$
+
+        fos = new FileOutputStream(outputFile);
         fos.write(resPdf);
         fos.close();
+
+        System.out.println("Fichero de firma de PDF/A-1B guardado en: " + outputFile.getAbsolutePath()); //$NON-NLS-1$
+
+        // Firma de PDF/A-2B generado con PDFTools
+
+        final byte[] testPdfAPdfTools = AOUtil.getDataFromInputStream(
+        		ClassLoader.getSystemResourceAsStream(TEST_FILE_A2B_PDFTOOLS)
+        		);
+
+        resPdf = signer.sign(
+        		testPdfAPdfTools,
+        		DEFAULT_SIGNATURE_ALGORITHM,
+        		pke.getPrivateKey(),
+        		pke.getCertificateChain(),
+        		extraParams
+        		);
+
+        outputFile = File.createTempFile("PDFA2BPDFTOOLS_SIGNED_", ".pdf"); //$NON-NLS-1$ //$NON-NLS-2$
+
+        fos = new FileOutputStream(outputFile);
+        fos.write(resPdf);
+        fos.close();
+
+        System.out.println("Fichero de firma de PDF/A-1A guardado en: " + outputFile.getAbsolutePath()); //$NON-NLS-1$
 	}
 
 }

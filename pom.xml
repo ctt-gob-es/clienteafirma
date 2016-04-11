@@ -45,6 +45,7 @@
 		<module>afirma-ui-core-jse-keystores</module>
 		<module>afirma-crypto-pdf</module>
 		<module>afirma-core-massive</module>
+		<module>afirma-server-triphase-signer-core</module>
 	</modules>
 	
 	<repositories>

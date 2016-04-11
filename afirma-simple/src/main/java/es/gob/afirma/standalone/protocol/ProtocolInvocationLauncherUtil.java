@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.misc.http.UrlHttpManagerFactory;
+import es.gob.afirma.core.misc.http.UrlHttpMethod;
 import es.gob.afirma.core.misc.protocol.UrlParameters;
 import es.gob.afirma.standalone.crypto.CypherDataManager;
 
@@ -47,7 +48,7 @@ final class ProtocolInvocationLauncherUtil {
 		LOGGER.info("Intentamos recuperar los datos del servidor con la URL:\n" + dataUrl.toString()); //$NON-NLS-1$
 
 		// Leemos los datos
-		final byte[] recoveredData = UrlHttpManagerFactory.getInstalledManager().readUrlByPost(dataUrl.toString());
+		final byte[] recoveredData = UrlHttpManagerFactory.getInstalledManager().readUrl(dataUrl.toString(), UrlHttpMethod.POST);
 
 		// Si los datos recibidos representan un error, detenemos la ejecucion
 		if (recoveredData.length > 8 && new String(Arrays.copyOf(recoveredData, 8)).toLowerCase().startsWith("err-")) { //$NON-NLS-1$

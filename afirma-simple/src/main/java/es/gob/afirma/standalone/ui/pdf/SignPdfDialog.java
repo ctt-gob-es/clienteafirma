@@ -4,17 +4,17 @@ import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.GraphicsEnvironment;
 import java.awt.Point;
-import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
 
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 
 import es.gob.afirma.core.ui.AOUIFactory;
+import es.gob.afirma.standalone.AutoFirmaUtil;
 import es.gob.afirma.standalone.ui.pdf.PdfLoader.PdfLoaderListener;
 import es.gob.afirma.standalone.ui.pdf.SignPdfUiPanel.SignPdfUiPanelListener;
 
@@ -31,6 +31,8 @@ public final class SignPdfDialog extends JDialog implements PdfLoaderListener, S
 
 	private final Frame parent;
 	private final SignPdfDialogListener listener;
+
+	private SignPdfUiPanel areaPanel;
 	SignPdfDialogListener getListener() {
 		return this.listener;
 	}
@@ -48,21 +50,31 @@ public final class SignPdfDialog extends JDialog implements PdfLoaderListener, S
 	private void createUI() {
 		setTitle(SignPdfUiMessages.getString("SignPdfDialog.3")); //$NON-NLS-1$
 		setIconImage(
-			Toolkit.getDefaultToolkit().getImage(this.getClass().getResource("/resources/afirma_ico.png")) //$NON-NLS-1$
+			AutoFirmaUtil.getDefaultDialogsIcon()
 		);
 		getAccessibleContext().setAccessibleDescription(
 			SignPdfUiMessages.getString("SignPdfDialog.2") //$NON-NLS-1$
 		);
 		setModalityType(ModalityType.TOOLKIT_MODAL);
 		setLocationRelativeTo(this.parent);
+
+		addWindowListener(new java.awt.event.WindowAdapter() {
+		    @Override
+		    public void windowClosing(final java.awt.event.WindowEvent windowEvent) {
+		    	positionCancelled();
+		    }
+		});
 	}
 
 	/** Obtiene los par&aacute;metros adicionales de una firma visible PDF mediante
 	 * un di&aacute;logo gr&aacute;fico.
+	 * @param isSign <code>true</code> si el PDF de entrada ya contiene firmas electr&oacute;nicas previas,
+	 *               <code>false</code> en caso contrario.
 	 * @param pdf PDF al que aplicar la firma visible.
 	 * @param parentFrame Marco padre para la modalidad.
 	 * @param spdl Clase a la que notificar la obtencion de propiedades de la firma visible. */
-	public static void getVisibleSignatureExtraParams(final byte[] pdf,
+	public static void getVisibleSignatureExtraParams(final boolean isSign,
+													  final byte[] pdf,
 			                                          final Frame parentFrame,
 			                                          final SignPdfDialogListener spdl) {
 		if (pdf == null || pdf.length < 3) {
@@ -82,31 +94,53 @@ public final class SignPdfDialog extends JDialog implements PdfLoaderListener, S
 		dialog.setLocation(cp.x - PREFERRED_WIDTH/2, cp.y - PREFERRED_HEIGHT/2);
 		dialog.setResizable(false);
 
-		PdfLoader.loadPdfWithProgressDialog(parentFrame, pdf, (PdfLoaderListener) dialog);
+		PdfLoader.loadPdf(
+			isSign,
+			pdf,
+			(PdfLoaderListener) dialog
+		);
 	}
 
 	@Override
-	public void pdfLoaded(final List<BufferedImage> pages, final List<Dimension> pageSizes) {
-		add(
-			new SignPdfUiPanel(
+	public void pdfLoaded(final boolean isSign, final List<BufferedImage> pages, final List<Dimension> pageSizes) {
+		this.areaPanel = new SignPdfUiPanel(
+				isSign,
 				pages,
 				pageSizes,
-				this
-			)
-		);
+				this,
+				SignPdfDialog.this
+			);
+		add(this.areaPanel);
 		pack();
 		setVisible(true);
 	}
 
+	void nextPanel(final Properties p, final BufferedImage im) {
+		remove(this.areaPanel);
+		final JPanel preview = new SignPdfUiPanelPreview(this, p, im);
+		add(preview);
+		pack();
+	}
+
 	@Override
-	public void pdfLoadedFailed(final IOException cause) {
+	public void pdfLoadedFailed(final Throwable cause) {
 		LOGGER.severe("Error creando la previsualizacion del PDF: " + cause); //$NON-NLS-1$
-		AOUIFactory.showErrorMessage(
-			this.parent,
-			SignPdfUiMessages.getString("SignPdfDialog.0"), //$NON-NLS-1$
-			SignPdfUiMessages.getString("SignPdfDialog.1"), //$NON-NLS-1$
-			JOptionPane.ERROR_MESSAGE
-		);
+		if (cause instanceof OutOfMemoryError) {
+			AOUIFactory.showErrorMessage(
+					this.parent,
+					SignPdfUiMessages.getString("SignPdfDialog.4"), //$NON-NLS-1$
+					SignPdfUiMessages.getString("SignPdfDialog.1"), //$NON-NLS-1$
+					JOptionPane.ERROR_MESSAGE
+				);
+		}
+		else {
+			AOUIFactory.showErrorMessage(
+				this.parent,
+				SignPdfUiMessages.getString("SignPdfDialog.0"), //$NON-NLS-1$
+				SignPdfUiMessages.getString("SignPdfDialog.1"), //$NON-NLS-1$
+				JOptionPane.ERROR_MESSAGE
+			);
+		}
 		setVisible(false);
 		this.listener.propertiesCreated(new Properties());
 		dispose();

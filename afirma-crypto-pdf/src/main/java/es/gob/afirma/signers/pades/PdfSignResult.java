@@ -1,3 +1,13 @@
+/* Copyright (C) 2011 [Gobierno de Espana]
+ * This file is part of "Cliente @Firma".
+ * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
+ *   - the GNU General Public License as published by the Free Software Foundation;
+ *     either version 2 of the License, or (at your option) any later version.
+ *   - or The European Software License; either version 1.1 or (at your option) any later version.
+ * Date: 11/01/11
+ * You may contact the copyright holder at: soporte.afirma5@mpt.es
+ */
+
 package es.gob.afirma.signers.pades;
 
 import java.io.IOException;
@@ -61,7 +71,7 @@ public final class PdfSignResult implements Serializable {
     	if (signingTime == null) {
     		throw new IllegalArgumentException("Es obligatorio proporcionar un momento de firmado"); //$NON-NLS-1$
     	}
-    	if (pdfFileId == null || "".equals(pdfFileId)) { //$NON-NLS-1$
+    	if (pdfFileId == null || pdfFileId.isEmpty()) {
     		throw new IllegalArgumentException("Es obligatorio proporcionar un MAC de PDF"); //$NON-NLS-1$
     	}
         if (signature == null || signature.length < 1) {
@@ -189,7 +199,7 @@ public final class PdfSignResult implements Serializable {
 				"No se encontro el nodo 'timestamp' del PdfSignResultSerializado, aunque no haya sello de tiempo el nodo debe existir (aunque vacio)" //$NON-NLS-1$
 			);
     	}
-    	this.timestamp = "".equals(node.getTextContent().trim()) ? null : Base64.decode(node.getTextContent().trim()); //$NON-NLS-1$
+    	this.timestamp = node.getTextContent().trim().isEmpty() ? null : Base64.decode(node.getTextContent().trim());
 
     	// signTime
     	i = getNextElementNode(nodeList, ++i);

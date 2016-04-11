@@ -1,117 +1,109 @@
+/* Copyright (C) 2011 [Gobierno de Espana]
+ * This file is part of "Cliente @Firma".
+ * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
+ *   - the GNU General Public License as published by the Free Software Foundation;
+ *     either version 2 of the License, or (at your option) any later version.
+ *   - or The European Software License; either version 1.1 or (at your option) any later version.
+ * Date: 11/01/11
+ * You may contact the copyright holder at: soporte.afirma5@mpt.es
+ */
+
 package es.gob.afirma.signers.xades;
 
-/**
- * Clase con los par&aacute;metros extra que pueden configurarse para el formato de firma XAdES.
- * @author mario
- */
+/** Clase con los par&aacute;metros extra que pueden configurarse para el formato de firma XAdES. */
 public final class XAdESExtraParams {
 
-    /**
-     * URL en la que se encuentra el documento a firmar, necesario en el caso
-     * del formato <i>XAdES Externally Detached</i>. <br>
-     * (no aplica a contrafirmas)
-     */
+	/** Si se indica <code>true</code>, <u>no</u> se firma una referencia al nodo <code>KeyInfo</code>, si no
+	 * se establece valor o se establece a otro valor distinto de <code>true</code>, se firma el nodo incluyendo
+	 * una referencia a &eacute;l. */
+	static final String KEEP_KEYINFO_UNSIGNED = "keepKeyInfoUnsigned"; //$NON-NLS-1$
+
+    /** URL en la que se encuentra el documento a firmar, necesario en el caso
+     * del formato <i>XAdES Externally Detached</i>
+     * (no aplica a contrafirmas). */
     public static final String URI = "uri"; //$NON-NLS-1$
 
-    /**
-     * Indica si se debe evitar la inclusi&oacute;n de la transformaci&oacute;n
+    /** Indica si se debe evitar la inclusi&oacute;n de la transformaci&oacute;n
      * XPATH2 que normalmente se a&ntilde;ade para posibilitar las cofirmas y
      * que elimina todas las firmas del documento para dejar &uacute;nicamente
      * el contenido. Por defecto, se encuentra a <code>false</code>.
-     * &Uacute;nicamente aplica a firmas <i>enveloped</i>
-     */
+     * &Uacute;nicamente aplica a firmas <i>enveloped</i>. */
     static final String AVOID_XPATH_EXTRA_TRANSFORMS_ON_ENVELOPED = "avoidXpathExtraTransformsOnEnveloped";//$NON-NLS-1$
 
-    /**
-     * Indica, mediante un <code>true</code> o <code>false</code>, que debe
+    /** Indica, mediante un <code>true</code> o <code>false</code>, que debe
      * incluirse en la firma &uacute;nicamente el certificado utilizado para
      * firmar y no su cadena de certificaci&oacute;n completa. Por defecto, se
      * incluir&aacute; toda la cadena de certificaci&oacute;n. <br>
-     * Propiedad compartida con CAdES y PAdES
-     */
+     * Propiedad compartida con CAdES y PAdES. */
     static final String INCLUDE_ONLY_SIGNNING_CERTIFICATE = "includeOnlySignningCertificate";//$NON-NLS-1$
 
-    /**
-     * Indica, mediante <code>true</code> o <code>false</code> (por defecto), si
+    /** Indica, mediante <code>true</code> o <code>false</code> (por defecto), si
      * debe usarse un <a
      * href="http://www.w3.org/TR/xmldsig-core1/#sec-o-Manifest">Manifest</a> de
      * XMLDSig con las referencias de firma en vez de firmar directamente estas
      * referencias.<br>
      * Esto permite que sea opcional la comprobaci&oacute;n del destino y
-     * huellas digitales de las referencias.
-     */
+     * huellas digitales de las referencias. */
     public static final String USE_MANIFEST = "useManifest";//$NON-NLS-1$
 
-    /**
-     * Indica, mediante una expresi&oacute;n XPath (v1), el nodo bajo el cual
+    /** Indica, mediante una expresi&oacute;n XPath (v1), el nodo bajo el cual
      * debe insertarse el nodo de firma en el caso de una firma
      * <i>Enveloped</i>.<br>
      * Si la expresi&oacute;n devuelve m&aacute;s de un nodo, se usa solo el
      * primero. Si la expresi&oacute;n no devuelve nodos o est&aacute; mal
      * construida se lanzar&aacute; una excepci&oacute;n.<br>
-     * Este par&aacute;metro solo tiene efecto en firmas <i>Enveloped</i>.
-     */
+     * Este par&aacute;metro solo tiene efecto en firmas <i>Enveloped</i>. */
     static final String INSERT_ENVELOPED_SIGNATURE_ON_NODE_BY_XPATH = "insertEnvelopedSignatureOnNodeByXPath";//$NON-NLS-1$
 
-    /**
-     * Indica si se debe evitar la inclusi&oacute;n de la transformaci&oacute;n
+    /** Indica si se debe evitar la inclusi&oacute;n de la transformaci&oacute;n
      * XPATH2 que normalmente se a&ntilde;ade para posibilitar las cofirmas y
      * que elimina todas las firmas del documento para dejar &uacute;nicamente
      * el contenido. Por defecto, se encuentra a <code>false</code>.
-     * No aplica a contrafirmas.
-     */
+     * No aplica a contrafirmas. */
     static final String NODE_TOSIGN = "nodeToSign";//$NON-NLS-1$
 
-    /**
-     * Formato de firma. Se aceptan los siguientes valores:<br>
+    /** Formato de firma. Se aceptan los siguientes valores:<br>
      * <ul>
-     * <li>
-     * <i>XAdES Detached</i> (
-     * <code>AOSignConstants.SIGN_FORMAT_XADES_DETACHED</code>)</li>
-     * <li>
-     * <i>XAdES Externally Detached</i> (
-     * <code>AOSignConstants.SIGN_FORMAT_XADES_EXTERNALLY_DETACHED</code>)
-     * <p>
-     * Para el uso del formato <i>XAdES Externally Detached</i> es necesario
-     * establecer tambi&eacute;n el par&aacute;metro <code>uri</code> con una
-     * direcci&oacute;n accesible universalmente.
-     * </p>
-     * </li>
-     * <li>
-     * <i>XAdES Enveloped</i> (
-     * <code>AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED</code>)</li>
-     * <li>
-     * <i>XAdES Enveloping</i> (
-     * <code>AOSignConstants.SIGN_FORMAT_XADES_ENVELOPING</code>)</li>
+     *  <li>
+     *   <i>XAdES Detached</i> (<code>AOSignConstants.SIGN_FORMAT_XADES_DETACHED</code>)
+     *  </li>
+     *  <li>
+     *   <i>XAdES Externally Detached</i> (<code>AOSignConstants.SIGN_FORMAT_XADES_EXTERNALLY_DETACHED</code>)
+     *   <p>
+     *    Para el uso del formato <i>XAdES Externally Detached</i> es necesario
+     *    establecer tambi&eacute;n el par&aacute;metro <code>uri</code> con una
+     *    direcci&oacute;n accesible universalmente.
+     *   </p>
+     *  </li>
+     *  <li>
+     *   <i>XAdES Enveloped</i> (<code>AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED</code>)
+     *  </li>
+     *  <li>
+     *   <i>XAdES Enveloping</i> (<code>AOSignConstants.SIGN_FORMAT_XADES_ENVELOPING</code>)
+     *  </li>
      * </ul>
      */
     public static final String FORMAT = "format";//$NON-NLS-1$
 
-    /**
-     * Algoritmo de huella digital a usar en las referencias XML
+    /** Algoritmo de huella digital a usar en las referencias XML
      * (referencesDigestMethod). Debe indicarse como una URL, acept&aacute;ndose
      * los siguientes valores:
      * <ul>
-     * <li><i>http://www.w3.org/2000/09/xmldsig#sha1</i> (SHA-1)</li>
-     * <li><i>http://www.w3.org/2001/04/xmlenc#sha256</i> (SHA-256, valor
-     * recomendado)</li>
-     * <li><i>http://www.w3.org/2001/04/xmlenc#sha512</i> (SHA-512)</li>
+     *  <li><i>http://www.w3.org/2000/09/xmldsig#sha1</i> (SHA-1)</li>
+     *  <li><i>http://www.w3.org/2001/04/xmlenc#sha256</i> (SHA-256, valor recomendado)</li>
+     *  <li><i>http://www.w3.org/2001/04/xmlenc#sha512</i> (SHA-512)</li>
      * </ul>
      */
     static final String REFERENCES_DIGEST_METHOD = "referencesDigestMethod";//$NON-NLS-1$
 
-    /**
-     * Algoritmo de canonicalizaci&oacute;n.
-     */
+    /** Algoritmo de canonicalizaci&oacute;n. */
     static final String CANONICALIZATION_ALGORITHM = "canonicalizationAlgorithm";//$NON-NLS-1$
 
-    /**
-     * URL de definici&oacute;n del espacio de nombres de XAdES (y por
+    /** URL de definici&oacute;n del espacio de nombres de XAdES (y por
      * extensi&oacute;n, versi&oacute;n de XAdES). Si se establece este
      * par&aacute;metro es posible que se necesite establecer tambi&eacute;n el
      * par&aacute;metro <code>signedPropertiesTypeUrl</code> para evitar
-     * incoherencias en la versi&oacute;n de XAdES.
-     */
+     * incoherencias en la versi&oacute;n de XAdES. */
     static final String XADES_NAMESPACE = "xadesNamespace";//$NON-NLS-1$
 
     /**
@@ -180,24 +172,35 @@ public final class XAdESExtraParams {
      */
     static final String PRECALCULATED_HASH_ALGORITHM = "precalculatedHashAlgorithm";//$NON-NLS-1$
 
-    /**
-     * Indica, mediante un <code>true</code> o <code>false</code>, si se deben
+    /** Indica, mediante un <code>true</code> o <code>false</code>, si se deben
      * realizar las necesarias restricciones de comportamiento para la firma de
      * facturas electr&oacute;nicas (FACTURAe). Estas restricciones son, no
      * introducir la transformaci&oacute;n de canonicalizaci&oacute;n de la
-     * firma, ni la transformaci&oacute;n XPATH en las firmas Enveloped.
-     */
+     * firma, ni la transformaci&oacute;n XPATH en las firmas <i>Enveloped</i>. */
     static final String FACTURAE_SIGN = "facturaeSign";//$NON-NLS-1$
 
-    /**
-     * MIME-Type de los datos a firmar. Si no se indica se realiza una auto-detecci&oacute;n cuyo resultado puede ser inexacto.
-     */
-    static final String MIME_TYPE = "mimeType";//$NON-NLS-1$
+    /** MIME-Type de los datos a firmar.
+     * Si no se indica se realiza una auto-detecci&oacute;n cuyo resultado puede ser inexacto. */
+    static final String XMLDSIG_OBJECT_MIME_TYPE = "mimeType";//$NON-NLS-1$
 
-    /**
-     * Codificaci&oacute;n de los datos a firmar. <br> No aplica a contrafirmas.
-     */
-    static final String ENCODING = "encoding";//$NON-NLS-1$
+    /** Codificaci&oacute;n de los datos a firmar.<br>No aplica a contrafirmas.
+     * Por restricc&oacute;n de esquema de XMLDsig debe ser una URI:
+     * <pre>
+     *    &lt;element name="Object" type="ds:ObjectType"/&gt;
+     *    &lt;complexType name="ObjectType" mixed="true"&gt;
+     *      &lt;sequence minOccurs="0" maxOccurs="unbounded"&gt;
+     *        &lt;any namespace="##any" processContents="lax"/&gt;
+     *      &lt;/sequence&gt;
+     *      &lt;attribute name="Id" type="ID" use="optional"/&gt;
+     *      &lt;attribute name="MimeType" type="string" use="optional"/&gt;
+     *      &lt;attribute name="Encoding" type="anyURI" use="optional"/&gt;
+     *    &lt;/complexType&gt;
+     * </pre> */
+    static final String XMLDSIG_OBJECT_ENCODING = "encoding";//$NON-NLS-1$
+
+    /** Codificaci&oacute;n del XML de salida.
+     * Si no se indica este valor se intenta auto-detectar a partir del XML de entrada (si los datos a firmar son un XML). */
+    static final String OUTPUT_XML_ENCODING = "outputXmlEncoding"; //$NON-NLS-1$
 
     /**
      * OID que identifica el tipo de datos a firmar. <br> No aplica a contrafirmas.
@@ -442,6 +445,12 @@ public final class XAdESExtraParams {
      * firma los datos firmados.
      */
     static final String MODE = "mode";//$NON-NLS-1$
+
+    /**
+     * Nombre del par&aacute;metro que almacena el identificador de la firma durante un proceso de
+     * firma de lote.
+     */
+    static final String BATCH_SIGNATURE_ID = "SignatureId"; //$NON-NLS-1$
 
     /**
      * Nombre nodo ra&iacute;z de la firma.

@@ -70,6 +70,12 @@
 			<artifactId>afirma-crypto-cms</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		
+		<dependency>
+			<groupId>es.gob.afirma</groupId>
+			<artifactId>afirma-crypto-cms-enveloper</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 
 		<dependency>
 			<groupId>es.gob.afirma</groupId>
@@ -142,6 +148,12 @@
 			<artifactId>afirma-crypto-validation</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+
+		<dependency>
+			<groupId>es.gob.afirma</groupId>
+			<artifactId>afirma-core-massive</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 		
 		<dependency>
 			<groupId>es.gob.afirma</groupId>
@@ -150,17 +162,23 @@
 		</dependency>
 
 		<dependency>
-			<groupId>org.bouncycastle</groupId>
-			<artifactId>bcprov-jdk15on</artifactId>
-			<version>1.53</version>
+			<groupId>com.madgag.spongycastle</groupId>
+			<artifactId>core</artifactId>
+			<version>1.54.0.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.madgag.spongycastle</groupId>
+			<artifactId>prov</artifactId>
+			<version>1.54.0.0</version>
 		</dependency>
 		
 		<dependency>
-			<groupId>org.bouncycastle</groupId>
-			<artifactId>bcpkix-jdk15on</artifactId>
-			<version>1.53</version>
+			<groupId>com.madgag.spongycastle</groupId>
+			<artifactId>pkix</artifactId>
+			<version>1.54.0.0</version>
 		</dependency>
-		
+				
 		<dependency>
 			<groupId>es.gob</groupId>
 			<artifactId>jmulticard-jse</artifactId>
@@ -169,7 +187,7 @@
 		
 		<dependency>
 			<groupId>com.apple</groupId>
-			<artifactId>applejavaextensions</artifactId>
+			<artifactId>AppleJavaExtensions</artifactId>
 			<version>1.5.4</version>
 		</dependency>
 
@@ -192,6 +210,12 @@
   			<version>1.8.10</version>
 		</dependency>
 		
+		<dependency>
+			<groupId>de.rosstauscher.proxy_vole</groupId>
+			<artifactId>proxy_vole</artifactId>
+			<version>1.0.1-SNAPSHOT</version>
+		</dependency>
+		
 	</dependencies>
 	
 	<scm>
@@ -208,6 +232,8 @@
 				<configuration>
 					<source>1.8</source>
 					<target>1.8</target>
+					<fork>true</fork>
+					<compilerArgument>-XDignore.symbol.file</compilerArgument>
 				</configuration>
 			</plugin>
 <!-- 			<plugin>

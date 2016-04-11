@@ -165,18 +165,18 @@ public final class ExtraParamsProcessor {
 
 				String normalizedFormat = null;
 				if (format != null) {
-					if (format.startsWith(AOSignConstants.SIGN_FORMAT_XADES) ||
-							format.startsWith(AOSignConstants.SIGN_FORMAT_XADES_TRI)) {
+					if (format.toLowerCase(Locale.US).startsWith(AOSignConstants.SIGN_FORMAT_XADES.toLowerCase(Locale.US)) ||
+							format.toLowerCase(Locale.US).startsWith(AOSignConstants.SIGN_FORMAT_XADES_TRI.toLowerCase(Locale.US))) {
 						normalizedFormat = AdESPolicyPropertiesManager.FORMAT_XADES;
 
 						// La firma XAdES conforme a la politica de firma de la AGE debe ser Detached o Enveloped
-						if (!AOSignConstants.SIGN_FORMAT_XADES_DETACHED.equals(p.getProperty("format")) && //$NON-NLS-1$
-								!AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED.equals(p.getProperty("format"))) { //$NON-NLS-1$
+						if (!AOSignConstants.SIGN_FORMAT_XADES_DETACHED.equalsIgnoreCase(p.getProperty("format")) && //$NON-NLS-1$
+								!AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED.equalsIgnoreCase(p.getProperty("format"))) { //$NON-NLS-1$
 							p.setProperty("format", AOSignConstants.SIGN_FORMAT_XADES_DETACHED); //$NON-NLS-1$
 						}
 					}
-					else if (format.equals(AOSignConstants.SIGN_FORMAT_CADES) ||
-							format.equals(AOSignConstants.SIGN_FORMAT_CADES_TRI)) {
+					else if (format.equalsIgnoreCase(AOSignConstants.SIGN_FORMAT_CADES) ||
+							format.equalsIgnoreCase(AOSignConstants.SIGN_FORMAT_CADES_TRI)) {
 						normalizedFormat = AdESPolicyPropertiesManager.FORMAT_CADES;
 
 						// La politica indica que la firma debe ser implicita siempre que el tamano
@@ -190,10 +190,10 @@ public final class ExtraParamsProcessor {
 									AOSignConstants.SIGN_MODE_EXPLICIT);
 						}
 					}
-					else if (format.equals(AOSignConstants.SIGN_FORMAT_PDF) ||
-							 format.equals(AOSignConstants.SIGN_FORMAT_PADES) ||
-							 format.equals(AOSignConstants.SIGN_FORMAT_PDF_TRI) ||
-							 format.equals(AOSignConstants.SIGN_FORMAT_PADES_TRI)) {
+					else if (format.equalsIgnoreCase(AOSignConstants.SIGN_FORMAT_PDF) ||
+							 format.equalsIgnoreCase(AOSignConstants.SIGN_FORMAT_PADES) ||
+							 format.equalsIgnoreCase(AOSignConstants.SIGN_FORMAT_PDF_TRI) ||
+							 format.equalsIgnoreCase(AOSignConstants.SIGN_FORMAT_PADES_TRI)) {
 						if (!ETSI_CADES_DETACHED.equals(p.getProperty("signatureSubFilter", ETSI_CADES_DETACHED))) { //$NON-NLS-1$
 							throw new IncompatiblePolicyException("En PAdES con politica firma AGE debe usarse siempre el filtro 'ETSI.CAdES.detached'"); //$NON-NLS-1$
 						}

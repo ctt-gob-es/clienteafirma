@@ -51,6 +51,7 @@ import es.gob.afirma.core.signers.ExtraParamsProcessor;
 import es.gob.afirma.core.signers.ExtraParamsProcessor.IncompatiblePolicyException;
 import es.gob.afirma.crypto.jarverifier.JarSignatureCertExtractor;
 import es.gob.afirma.keystores.AOKeyStore;
+import es.gob.afirma.keystores.SmartCardException;
 import es.gob.afirma.keystores.filters.CertFilterManager;
 import es.gob.afirma.signers.batch.client.BatchSigner;
 
@@ -256,6 +257,10 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 			setError(e);
 			throw e;
 		}
+		catch (final SmartCardException e) {
+			setError(e);
+			throw e;
+		}
 		catch (final PrivilegedActionException e) {
 			setError(e);
 			throw e;
@@ -397,6 +402,10 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 			setError(e);
 			throw e;
 		}
+		catch (final SmartCardException e) {
+			setError(e);
+			throw e;
+		}
 		catch (final RuntimeException e) {
 			setError(e);
 			throw e;
@@ -506,6 +515,10 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 			throw e;
 		}
 		catch (final CertificateEncodingException e) {
+			setError(e);
+			throw e;
+		}
+		catch (final SmartCardException e) {
 			setError(e);
 			throw e;
 		}
@@ -770,7 +783,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 	@Override
 	public void init() {
 
-//		// Establecemos propiedades del sistema en base a argumentos de Java
+		// Establecemos propiedades del sistema en base a argumentos de Java
 		setSystemProperties(this.getParameter(APPLET_PARAM_SYSTEM_PROPERTIES));
 
 		// Establecemos la localizacion
@@ -806,13 +819,18 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 		MiniAfirmaApplet.configureLookAndFeel();
 
 		// Google Analytics
-		final AnalyticsConfigData config = new AnalyticsConfigData(GOOGLE_ANALYTICS_TRACKING_CODE);
-		final JGoogleAnalyticsTracker tracker = new JGoogleAnalyticsTracker(config, GoogleAnalyticsVersion.V_4_7_2);
-		tracker.trackPageView(
-			getCodeBase().toString(),
-			"MiniApplet Cliente @firma " + getVersion(), //$NON-NLS-1$
-			getCodeBase().getHost().toString()
-		);
+		if (
+				!Boolean.getBoolean("es.gob.afirma.doNotSendAnalytics") && //$NON-NLS-1$
+				!Boolean.parseBoolean(System.getenv("es.gob.afirma.doNotSendAnalytics")) //$NON-NLS-1$
+			) {
+				final AnalyticsConfigData config = new AnalyticsConfigData(GOOGLE_ANALYTICS_TRACKING_CODE);
+				final JGoogleAnalyticsTracker tracker = new JGoogleAnalyticsTracker(config, GoogleAnalyticsVersion.V_4_7_2);
+				tracker.trackPageView(
+					getCodeBase().toString(),
+					"MiniApplet Cliente @firma " + getVersion(), //$NON-NLS-1$
+					getCodeBase().getHost().toString()
+				);
+		}
 
 		LOGGER.info("Miniapplet Afirma " + getVersion()); //$NON-NLS-1$
 
@@ -823,6 +841,10 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 		LOGGER.info("Java Vendor: " + System.getProperty("java.vm.vendor")); //$NON-NLS-1$ //$NON-NLS-2$
 
 		LOGGER.info("Localizacion por defecto: " + Locale.getDefault()); //$NON-NLS-1$
+
+		LOGGER.info("Tamano actual en memoria: " + Runtime.getRuntime().totalMemory()/(1024*1024) + "MB"); //$NON-NLS-1$ //$NON-NLS-2$
+		LOGGER.info("Tamano maximo de memoria: " + Runtime.getRuntime().maxMemory()/(1024*1024) + "MB"); //$NON-NLS-1$ //$NON-NLS-2$
+		LOGGER.info("Memoria actualmente libre: " + Runtime.getRuntime().freeMemory()/(1024*1024) + "MB"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	/** {@inheritDoc} */
@@ -894,6 +916,25 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 	private void clearError() {
 		this.errorType = null;
 		this.errorMessage = null;
+	}
+
+	@Override
+	public void setKeyStore(final String ksType) throws AOException {
+
+		LOGGER.info("Se configura el almacen de certificados " + ksType); //$NON-NLS-1$
+
+		this.clearError();
+
+		final AOKeyStore ks;
+		try {
+			ks = AOKeyStore.valueOf(ksType);
+		}
+		catch (final Exception e) {
+			LOGGER.severe("El almacen indicado (" + ksType + ") no existe: " + e); //$NON-NLS-1$ //$NON-NLS-2$
+			setError(e, "El almacen indicado no existe: " + ksType); //$NON-NLS-1$
+			throw new AOException("El almacen indicado no existe: " + ksType, e); //$NON-NLS-1$
+		}
+		this.keystoreType = ks;
 	}
 
 	/** Permite que el usuario seleccione un certificado del almac&eacute;n configurado, o
@@ -1175,15 +1216,15 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 	 * @return Identificador de la versi&oacute;n. */
 	private static String getVersion() {
 		try {
-			final InputStream manifestIs = MiniAfirmaApplet.class.getClassLoader().getResourceAsStream("META-INF/MANIFEST.MF"); //$NON-NLS-1$
+			final InputStream manifestIs = MiniAfirmaApplet.class.getClassLoader().getResourceAsStream("miniapplet.version"); //$NON-NLS-1$
 			final Properties metadata = new Properties();
 			metadata.load(manifestIs);
 			manifestIs.close();
 
-			return metadata.getProperty("Specification-Version", ""); //$NON-NLS-1$ //$NON-NLS-2$
+			return metadata.getProperty("version", ""); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		catch (final Exception e) {
-			LOGGER.warning("No se ha podido identificar el numero de version del MiniApplet a partir del Manifest: " + e); //$NON-NLS-1$
+			LOGGER.warning("No se ha podido leer el numero de version del MiniApplet del fichero de version: " + e); //$NON-NLS-1$
 			return ""; //$NON-NLS-1$
 		}
 	}
@@ -1283,6 +1324,10 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 			setError(e);
 			throw e;
 		}
+		catch (final SmartCardException e) {
+			setError(e);
+			throw e;
+		}
 		catch (final RuntimeException e) {
 			setError(e);
 			throw e;
@@ -1297,27 +1342,76 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 		}
 
 		try {
+
 			return Base64.encode(
-					BatchSigner.sign(
-							batchB64,
-							batchPreSignerUrl,
-							batchPostSignerUrl,
-							pke.getCertificateChain(),
-							pke.getPrivateKey()
-					).getBytes("utf-8") //$NON-NLS-1$
-				);
-		}
-		catch (final CertificateEncodingException e) {
-			LOGGER.severe("Error al codificar el certificado al realizar la firma por lotes: " + e); //$NON-NLS-1$
-			final AOException aoe = new AOException(e);
-			setError(e);
-			throw aoe;
+					AccessController.doPrivileged(
+							new PrivilegedExceptionAction<byte[]>() {
+								@Override
+								public byte[] run() throws Exception {
+									return BatchSigner.sign(
+											batchB64,
+											batchPreSignerUrl,
+											batchPostSignerUrl,
+											pke.getCertificateChain(),
+											pke.getPrivateKey()
+											).getBytes("utf-8"); //$NON-NLS-1$
+								}
+							})
+					);
 		}
 		catch (final Exception e) {
+			if (e.getCause() instanceof CertificateEncodingException) {
+				LOGGER.severe("Error al codificar el certificado al realizar la firma por lotes: " + e); //$NON-NLS-1$
+				final AOException aoe = new AOException(e);
+				setError(e);
+				throw aoe;
+			}
 			LOGGER.severe("Error al realizar la firma por lotes: " + e); //$NON-NLS-1$
 			final AOException aoe = new AOException(e);
 			setError(e);
 			throw aoe;
+		}
+	}
+
+	@Override
+	public String selectCertificate(final String extraParams) throws AOException, PrivilegedActionException, CertificateEncodingException {
+
+		LOGGER.info("Solicitada la seleccion de un certificado"); //$NON-NLS-1$
+
+		this.clearError();
+
+		final Properties params = ExtraParamsProcessor.convertToProperties(extraParams);
+
+		// Informacion sobre los parametros adicionales indicados
+		final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		final PrintStream ps = new PrintStream(baos);
+		params.list(ps);
+		LOGGER.info("Recibidos los siguientes parametros adicionales:\n" + baos.toString()); //$NON-NLS-1$
+
+		try {
+			final PrivateKeyEntry pke = this.selectPrivateKey(params);
+
+			return Base64.encode(pke.getCertificate().getEncoded());
+		}
+		catch (final CertificateEncodingException e) {
+			setError(e);
+			throw e;
+		}
+		catch (final SmartCardException e) {
+			setError(e);
+			throw e;
+		}
+		catch (final PrivilegedActionException e) {
+			setError(e);
+			throw e;
+		}
+		catch (final RuntimeException e) {
+			setError(e);
+			throw e;
+		}
+		catch (final Error e) {
+			setError(e);
+			throw new AOException("Ocurrio un error grave durante la seleccion de un certificado de firma", e); //$NON-NLS-1$
 		}
 	}
 }

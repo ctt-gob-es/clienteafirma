@@ -1,11 +1,11 @@
-/*
- * Este fichero forma parte del Cliente @firma.
- * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
- * y descargado desde www.ctt.map.es.
- * Copyright 2009,2010,2011 Gobierno de Espana
- * Este fichero se distribuye bajo  bajo licencia GPL version 2  segun las
- * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este
- * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
+/* Copyright (C) 2011 [Gobierno de Espana]
+ * This file is part of "Cliente @Firma".
+ * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
+ *   - the GNU General Public License as published by the Free Software Foundation;
+ *     either version 2 of the License, or (at your option) any later version.
+ *   - or The European Software License; either version 1.1 or (at your option) any later version.
+ * Date: 11/01/11
+ * You may contact the copyright holder at: soporte.afirma5@mpt.es
  */
 
 package es.gob.afirma.ui.core.jse;
@@ -52,8 +52,8 @@ public final class AWTUIManager extends JSEUIManager {
             if (selectedFile != null) {
                 fd.setFile(selectedFile);
             }
-            if (currentDir != null) {
-                fd.setDirectory(currentDir);
+            if (currentDir == null) {
+            	fd.setDirectory(get(PREFERENCE_DIRECTORY, currentDir));
             }
         }
 
@@ -104,8 +104,8 @@ public final class AWTUIManager extends JSEUIManager {
         final FileDialog fd = new FileDialog(parent instanceof Frame ? (Frame) parent : null, dialogTitle);
         fd.setMode(FileDialog.LOAD);
 
-        if (currentDir != null) {
-        	fd.setDirectory(currentDir);
+        if (currentDir == null) {
+        	fd.setDirectory(get(PREFERENCE_DIRECTORY, currentDir));
         }
 
         // Habilitamos si corresponde el modo de seleccion multiple. Ya que solo esta disponible
@@ -121,6 +121,7 @@ public final class AWTUIManager extends JSEUIManager {
         		return super.getLoadFiles(dialogTitle, currentDir, filename, extensions, description, selectDirectory, multiSelect, icon, parent);
         	}
         }
+
         if (filename != null) {
         	fd.setFile(filename);
         }
@@ -153,6 +154,12 @@ public final class AWTUIManager extends JSEUIManager {
 	            });
         	}
         }
+
+        if (selectDirectory) {
+        	fd.setFile("*."); //$NON-NLS-1$
+        	System.setProperty("apple.awt.fileDialogForDirectories", "true"); //$NON-NLS-1$ //$NON-NLS-2$
+        }
+
         fd.setVisible(true);
         if (fd.getFile() == null) {
             throw new AOCancelledOperationException();
@@ -175,7 +182,14 @@ public final class AWTUIManager extends JSEUIManager {
 
         	return files;
         }
-        return new File[] { new File(fd.getDirectory(), fd.getFile()) };
+
+        final File ret = new File(fd.getDirectory(), fd.getFile());
+
+        System.setProperty("apple.awt.fileDialogForDirectories", "false"); //$NON-NLS-1$ //$NON-NLS-2$
+
+        put(PREFERENCE_DIRECTORY, fd.getDirectory());
+
+        return new File[] { ret };
     }
 
 	private static boolean isJava7() {

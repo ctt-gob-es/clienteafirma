@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.security.cert.X509Certificate;
 import java.util.Properties;
 import java.util.logging.Logger;
@@ -41,7 +42,7 @@ public final class FileSystemDocumentManager implements DocumentManager {
 	}
 
 	@Override
-	public byte[] getDocument(final String id, final X509Certificate cert, final Properties prop) throws IOException {
+	public byte[] getDocument(final String id, final X509Certificate[] certChain, final Properties prop) throws IOException {
 
 		LOGGER.info("Recuperamos el documento con identificador: " + id); //$NON-NLS-1$
 
@@ -71,8 +72,8 @@ public final class FileSystemDocumentManager implements DocumentManager {
 			);
 		}
 
-		byte[] data;
-		FileInputStream fis = null;
+		final byte[] data;
+		InputStream fis = null;
 		try {
 			fis = new FileInputStream(file);
 			data = AOUtil.getDataFromInputStream(fis);
@@ -95,7 +96,10 @@ public final class FileSystemDocumentManager implements DocumentManager {
 	}
 
 	@Override
-	public String storeDocument(final String id, final X509Certificate cert, final byte[] data, final Properties prop) throws IOException {
+	public String storeDocument(final String id,
+			                    final X509Certificate[] certChain,
+			                    final byte[] data,
+			                    final Properties prop) throws IOException {
 
 		final String initialId = id != null ? new String(Base64.decode(id)) : "signature"; //$NON-NLS-1$
 		String newId = initialId;

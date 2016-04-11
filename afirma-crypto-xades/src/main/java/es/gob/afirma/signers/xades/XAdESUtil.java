@@ -1,3 +1,13 @@
+/* Copyright (C) 2011 [Gobierno de Espana]
+ * This file is part of "Cliente @Firma".
+ * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
+ *   - the GNU General Public License as published by the Free Software Foundation;
+ *     either version 2 of the License, or (at your option) any later version.
+ *   - or The European Software License; either version 1.1 or (at your option) any later version.
+ * Date: 11/01/11
+ * You may contact the copyright holder at: soporte.afirma5@mpt.es
+ */
+
 package es.gob.afirma.signers.xades;
 
 import java.net.MalformedURLException;
@@ -6,6 +16,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -19,6 +30,7 @@ import javax.xml.crypto.dsig.DigestMethod;
 import javax.xml.crypto.dsig.Reference;
 import javax.xml.crypto.dsig.Transform;
 import javax.xml.crypto.dsig.XMLSignatureFactory;
+import javax.xml.transform.OutputKeys;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
@@ -29,7 +41,9 @@ import net.java.xades.security.xml.XAdES.CommitmentTypeIndicationImpl;
 import net.java.xades.security.xml.XAdES.XAdES_EPES;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.DocumentType;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import es.gob.afirma.core.AOException;
@@ -57,9 +71,32 @@ final class XAdESUtil {
 		COMMITMENT_TYPE_IDENTIFIERS.put("6", COMMITMENT_TYPE_IDENTIFIER_PROOF_OF_CREATION); //$NON-NLS-1$
 	}
 
+	private static final String[] SUPPORTED_XADES_NAMESPACE_URIS = new String[] {
+		"http://uri.etsi.org/01903#", //$NON-NLS-1$
+	    "http://uri.etsi.org/01903/v1.2.2#", //$NON-NLS-1$
+	    "http://uri.etsi.org/01903/v1.3.2#", //$NON-NLS-1$
+	    "http://uri.etsi.org/01903/v1.4.1#" //$NON-NLS-1$
+	};
+
 	private XAdESUtil() {
 		// No permitimos la instanciacion
 	}
+
+    /** Comprueba que los nodos de firma proporcionados sean firmas en formato XAdES.
+     * @param signNodes Listado de nodos de firma.
+     * @return {@code true} cuando todos los nodos sean firmas en este formato. */
+    static boolean checkSignNodes(final List<Node> signNodes) {
+        for (final Node signNode : signNodes) {
+        	int lenCount = 0;
+        	for (final String xadesNamespace : SUPPORTED_XADES_NAMESPACE_URIS) {
+        		lenCount = lenCount + ((Element) signNode).getElementsByTagNameNS(xadesNamespace, "QualifyingProperties").getLength(); //$NON-NLS-1$
+        	}
+            if (lenCount == 0) {
+                return false;
+            }
+        }
+        return true;
+    }
 
 	static AOXMLAdvancedSignature getXmlAdvancedSignature(final XAdES_EPES xades,
 			                                              final String signedPropertiesTypeUrl,
@@ -291,11 +328,47 @@ final class XAdESUtil {
 				digestMethod,
 				Collections.singletonList(canonicalizationTransform),
 				AOXAdESSigner.MANIFESTURI,
-				referenceId
+				"Manifest" + referenceId //$NON-NLS-1$
 			)
 		);
 
 		return referenceList;
+	}
+
+	static Map<String, String> getOriginalXMLProperties(final Document docum,
+			                                            final String outputXmlEncoding) {
+
+		final Map<String, String> originalXMLProperties = new Hashtable<String, String>();
+		if (docum != null) {
+
+			if (outputXmlEncoding != null) {
+				originalXMLProperties.put(
+					OutputKeys.ENCODING,
+					outputXmlEncoding
+				);
+			}
+			else if (docum.getXmlEncoding() != null) {
+				originalXMLProperties.put(
+					OutputKeys.ENCODING,
+					docum.getXmlEncoding()
+				);
+			}
+
+			String tmpXmlProp = docum.getXmlVersion();
+			if (tmpXmlProp != null) {
+				originalXMLProperties.put(OutputKeys.VERSION, tmpXmlProp);
+			}
+
+			final DocumentType dt = docum.getDoctype();
+			if (dt != null) {
+				tmpXmlProp = dt.getSystemId();
+				if (tmpXmlProp != null) {
+					originalXMLProperties.put(OutputKeys.DOCTYPE_SYSTEM, tmpXmlProp);
+				}
+			}
+
+		}
+		return originalXMLProperties;
 	}
 
 }

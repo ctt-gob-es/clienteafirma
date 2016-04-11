@@ -12,7 +12,7 @@ package es.gob.afirma.envelopers.cms;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.logging.Logger;
+import java.util.zip.DataFormatException;
 import java.util.zip.Deflater;
 import java.util.zip.Inflater;
 
@@ -29,8 +29,9 @@ final class BinaryUtils {
     /** M&eacute;todo que comprime una entrada con un nivel de compresion dado.
      * @param input
      *        Entrada a comrpimir.
-     * @return Entrada comprimida. */
-    static byte[] compress(final byte[] input) {
+     * @return Entrada comprimida.
+     * @throws IOException Si hay problemas en el cierre de los datos comprimidos. */
+    static byte[] compress(final byte[] input) throws IOException {
 
         // Creamos el compresor con el maximo nivel de compresion
         final Deflater compressor = new Deflater();
@@ -40,55 +41,47 @@ final class BinaryUtils {
         compressor.setInput(input);
         compressor.finish();
 
-        final ByteArrayOutputStream bos = new ByteArrayOutputStream(input.length);
+        final byte[] ret;
+        try (
+    		final ByteArrayOutputStream bos = new ByteArrayOutputStream(input.length);
+		) {
+            // Comprimimos los datos
+            final byte[] buf = new byte[COMPRESS_BUFFER_SIZE];
+            while (!compressor.finished()) {
+                final int count = compressor.deflate(buf);
+                bos.write(buf, 0, count);
+            }
+            ret = bos.toByteArray();
+        }
+        return ret;
 
-        // Comprimimos los datos
-        final byte[] buf = new byte[COMPRESS_BUFFER_SIZE];
-        while (!compressor.finished()) {
-            final int count = compressor.deflate(buf);
-            bos.write(buf, 0, count);
-        }
-        try {
-            bos.close();
-        }
-        catch (final IOException e) {
-         // Ignoramos los errores en el cierre
-        }
-
-        return bos.toByteArray();
     }
 
     /** M&eacute;todo que descomprime una entrada.
      * @param compressedData Entrada a descomprimir.
-     * @return Entrada descomprimida. */
-    static byte[] uncompress(final byte[] compressedData) {
+     * @return Entrada descomprimida.
+     * @throws DataFormatException Si los datos de entrada no est&aacute;n comprmidos.
+     * @throws IOException Si hay problemas cerrando los datos descomprimidos. */
+    static byte[] uncompress(final byte[] compressedData) throws DataFormatException, IOException {
 
         // Creamos el descompresor y le pasamos los datos
         final Inflater decompressor = new Inflater();
         decompressor.setInput(compressedData);
 
-        final ByteArrayOutputStream bos = new ByteArrayOutputStream(compressedData.length);
-
-        // Descomprimimos
-        final byte[] buf = new byte[COMPRESS_BUFFER_SIZE];
-        while (!decompressor.finished()) {
-            try {
+        final byte[] ret;
+        try (
+    		final ByteArrayOutputStream bos = new ByteArrayOutputStream(compressedData.length);
+		) {
+	        // Descomprimimos
+	        final byte[] buf = new byte[COMPRESS_BUFFER_SIZE];
+	        while (!decompressor.finished()) {
                 final int count = decompressor.inflate(buf);
                 bos.write(buf, 0, count);
-            }
-            catch (final Exception e) {
-                Logger.getLogger("es.gob.afirma").severe("Error descomprimiendo los datos: " + e); //$NON-NLS-1$ //$NON-NLS-2$
-                break;
-            }
-        }
-        try {
-            bos.close();
-        }
-        catch (final IOException e) {
-        	// Ignoramos los errores en el cierre
+	        }
+	        ret = bos.toByteArray();
         }
 
-        return bos.toByteArray();
+        return ret;
 
     }
 

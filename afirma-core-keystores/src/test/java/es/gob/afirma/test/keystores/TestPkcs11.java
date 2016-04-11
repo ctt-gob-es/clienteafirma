@@ -1,8 +1,6 @@
 package es.gob.afirma.test.keystores;
 
 import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.lang.reflect.Constructor;
 import java.security.KeyStore;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.Provider;
@@ -24,8 +22,9 @@ public final class TestPkcs11 {
 	//private static final String LIB_NAME = "C:\\WINDOWS\\SysWOW64\\siecap11.dll"; //$NON-NLS-1$
 	//private static final String LIB_NAME = "C:\\Users\\tomas\\workspace_32\\afirma-core-keystores\\src\\test\\resources\\CardOS\\cardos11.dll"; //$NON-NLS-1$
 	//private static final String LIB_NAME = "C:\\WINDOWS\\SysWOW64\\cardos11.dll"; //$NON-NLS-1$
-	private static final String LIB_NAME = "C:\\WINDOWS\\SysWOW64\\TIF_P11.dll"; //$NON-NLS-1$
-	private static final char[] PIN = "88888888Y".toCharArray(); //$NON-NLS-1$
+	//private static final String LIB_NAME = "C:\\WINDOWS\\SysWOW64\\TIF_P11.dll"; //$NON-NLS-1$
+	private static final String LIB_NAME = "C:\\WINDOWS\\SysWOW64\\DNIe_P11_priv.dll"; //$NON-NLS-1$
+	private static final char[] PIN = "12345678".toCharArray(); //$NON-NLS-1$
 
 	/** Prueba de firma con PKCS#11.
 	 * @throws Exception En cualquier error. */
@@ -60,8 +59,7 @@ public final class TestPkcs11 {
 	//@Ignore // Dependiente del PKCS#11
 	public void testRawPkcs11() throws Exception {
 
-		final Constructor<?> sunPKCS11Contructor = Class.forName("sun.security.pkcs11.SunPKCS11").getConstructor(InputStream.class); //$NON-NLS-1$
-		final Provider p = (Provider) sunPKCS11Contructor.newInstance(
+		final Provider p = new sun.security.pkcs11.SunPKCS11(
 			new ByteArrayInputStream(
 				(
 					"name=pkcs11-win_dll\n" + //$NON-NLS-1$

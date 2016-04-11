@@ -8,8 +8,10 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.Vector;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
@@ -17,6 +19,8 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.DialogInterface.OnKeyListener;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -63,6 +67,7 @@ public final class PetitionDetailsActivity extends FragmentActivity implements L
 	static final int RESULT_SIGN_FAILED = 3;
 	static final int RESULT_REJECT_FAILED = 4;
 
+	private static final String PDF_MIMETYPE = "application/pdf"; //$NON-NLS-1$
 	private static final String PDF_FILE_EXTENSION = ".pdf"; //$NON-NLS-1$
 	private static final String DOC_FILE_EXTENSION = ".doc"; //$NON-NLS-1$
 	private static final String DOCX_FILE_EXTENSION = ".docx"; //$NON-NLS-1$
@@ -157,7 +162,7 @@ public final class PetitionDetailsActivity extends FragmentActivity implements L
 		}
 	}
 
-	//metodo para crear la pestaña del tab customizada
+	//metodo para crear la pestaï¿½a del tab customizada
 	private static View createTabView(final Context context, final String text) {
 		final View view = LayoutInflater.from(context).inflate(R.layout.tabs_bg, null);
 		final TextView tv = (TextView) view.findViewById(R.id.tabsText);
@@ -637,26 +642,94 @@ public final class PetitionDetailsActivity extends FragmentActivity implements L
 	 */
 	private void openFile(final File documentFile, final String mimetype) {
 
-		final Intent intent = new Intent(Intent.ACTION_VIEW);
-		intent.setDataAndType(Uri.fromFile(documentFile), mimetype);
-		try {
-			this.startActivity(intent);
-		} catch (final ActivityNotFoundException e) {
+		if (mimetype != null && mimetype.equals(PDF_MIMETYPE) ||
+				documentFile.getName().toLowerCase(Locale.US).endsWith(PDF_FILE_EXTENSION)) {
+			viewPdf(documentFile);
+		}
+		else {
+			final Intent intent = new Intent(Intent.ACTION_VIEW);
+			intent.setDataAndType(Uri.fromFile(documentFile), mimetype);
+			try {
+				this.startActivity(intent);
+			} catch (final ActivityNotFoundException e) {
 
-			Log.w(SFConstants.LOG_TAG, "No se pudo abrir el fichero guardado: " + e); //$NON-NLS-1$
-			e.printStackTrace();
+				Log.w(SFConstants.LOG_TAG, "No se pudo abrir el fichero guardado: " + e); //$NON-NLS-1$
+				e.printStackTrace();
 
-			final MessageDialog md = new MessageDialog(
-					getString(R.string.error_file_not_support), null, this);
-			md.setTitle(getString(R.string.error_title_openning_file));
-			runOnUiThread(new Runnable() {
-				@Override
-				public void run() {
-					md.show(getSupportFragmentManager(), "ErrorDialog"); //$NON-NLS-1$
-				}
-			});
+				final MessageDialog md = new MessageDialog(
+						getString(R.string.error_file_not_support), null, this);
+				md.setTitle(getString(R.string.error_title_openning_file));
+				runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						md.show(getSupportFragmentManager(), "ErrorDialog"); //$NON-NLS-1$
+					}
+				});
+			}
 		}
 	}
+
+	private void viewPdf (final File file) {
+        final String adobePackage = "com.adobe.reader"; //$NON-NLS-1$
+        final String gdrivePackage = "com.google.android.apps.viewer"; //$NON-NLS-1$
+        boolean isGdriveInstalled = false;
+
+        final Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setDataAndType(Uri.fromFile(file), PDF_MIMETYPE);
+
+        final PackageManager pm = getApplicationContext().getPackageManager();
+        final List<ResolveInfo> list = pm.queryIntentActivities(intent, 0);
+        if (list.isEmpty()) {
+            Log.w(SFConstants.LOG_TAG, "No hay visor pdf instalado"); //$NON-NLS-1$
+            new AlertDialog.Builder(PetitionDetailsActivity.this)
+                .setTitle(R.string.error)
+                .setMessage(R.string.no_pdf_viewer_msg)
+                .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                    @Override
+					public void onClick(final DialogInterface dialog, final int which) {
+                        return;
+                    }
+                })
+                .create().show();
+        }
+        else {
+
+            for (final ResolveInfo resolveInfo : list) {
+                if (resolveInfo.activityInfo.name.startsWith(adobePackage)) {
+                    intent.setPackage(resolveInfo.activityInfo.packageName);
+                    startActivity(intent);
+                    return;
+                }
+                else if (resolveInfo.activityInfo.name.startsWith(gdrivePackage)) {
+                    intent.setPackage(resolveInfo.activityInfo.packageName);
+                    isGdriveInstalled = true;
+                }
+            }
+
+            if (isGdriveInstalled) {
+            	startActivity(intent);
+                return;
+            }
+
+            Log.i(SFConstants.LOG_TAG, "Ni Adobe ni Gdrive instalado"); //$NON-NLS-1$
+            new AlertDialog.Builder(PetitionDetailsActivity.this)
+                .setTitle(R.string.aviso)
+                .setMessage(R.string.no_adobe_reader_msg)
+                .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                    @Override
+					public void onClick(final DialogInterface dialog, final int which) {
+                        startActivity(intent);
+                    }
+                })
+                .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                    @Override
+					public void onClick(final DialogInterface dialog, final int which) {
+                        return;
+                    }
+                })
+                .create().show();
+        }
+    }
 
 	@Override
 	protected void onDestroy() {
@@ -774,21 +847,16 @@ public final class PetitionDetailsActivity extends FragmentActivity implements L
 	}
 
 	private void doSign(final PrivateKey pk, final X509Certificate[] certChain) {
-		new SignRequestTask(this.reqDetails, pk, certChain, CommManager.getInstance(), this).execute();
+		new SignRequestTask(
+				this.reqDetails, pk, certChain, CommManager.getInstance(), this).execute();
 	}
 
     private void rejectRequest() {
-
-    	showProgressDialog(getString(R.string.dialog_msg_rejecting_1),null);
-
     	new RejectRequestsTask(
     			this.reqDetails.getId(), this.certB64, CommManager.getInstance(), this).execute();
     }
 
     private void approveRequest() {
-
-    	showProgressDialog(getString(R.string.dialog_msg_approving_1),null);
-
     	new ApproveRequestsTask(
     			this.reqDetails.getId(), this.certB64, CommManager.getInstance(), this).execute();
     }
@@ -925,6 +993,7 @@ public final class PetitionDetailsActivity extends FragmentActivity implements L
 		// Dialogo de confirmacion de rechazo de peticiones
 		else  if (dialogId == DIALOG_CONFIRM_REJECT) {
 			getCustomAlertDialog().dismiss();
+			showProgressDialog(getString(R.string.dialog_msg_rejecting_1), null);
 			rejectRequest();
 		}
 	}

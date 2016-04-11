@@ -65,6 +65,7 @@ import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.crypto.CertAnalyzer;
 import es.gob.afirma.standalone.crypto.CertificateInfo;
 import es.gob.afirma.standalone.crypto.CompleteSignInfo;
+import es.gob.afirma.standalone.crypto.TimestampsAnalyzer;
 
 final class SignDataPanel extends JPanel {
 
@@ -85,12 +86,14 @@ final class SignDataPanel extends JPanel {
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
     SignDataPanel(final File signFile, final byte[] sign, final JComponent fileTypeIcon, final X509Certificate cert, final KeyListener extKeyListener) {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                createUI(signFile, sign, fileTypeIcon, cert, extKeyListener);
-            }
-        });
+        SwingUtilities.invokeLater(
+    		new Runnable() {
+	            @Override
+	            public void run() {
+	                createUI(signFile, sign, fileTypeIcon, cert, extKeyListener);
+	            }
+	        }
+		);
     }
 
     void createUI(final File signFile, final byte[] sign, final JComponent fileTypeIcon, final X509Certificate cert, final KeyListener extKeyListener) {
@@ -207,11 +210,12 @@ final class SignDataPanel extends JPanel {
 
 	            this.certIcon.setIcon(certInfo.getIcon());
 	            this.certIcon.setToolTipText(certInfo.getIconTooltip());
+	            this.certIcon.setFocusable(false);
 
 	            // Para que se detecten apropiadamente los hipervinculos hay que establecer
 	            // el tipo de contenido antes que el contenido
 	            this.certDescription.setContentType("text/html"); //$NON-NLS-1$
-
+	            setFocusable(false);
 	            this.certDescription.setEditable(false);
 	            this.certDescription.setOpaque(false);
 	            this.certDescription.setText(certInfo.getDescriptionText());
@@ -349,7 +353,7 @@ final class SignDataPanel extends JPanel {
             filePathPanel.setBackground(LookAndFeelManager.WINDOW_COLOR);
         }
 
-        this.setLayout(new GridBagLayout());
+        setLayout(new GridBagLayout());
 
         final GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.HORIZONTAL;
@@ -430,6 +434,14 @@ final class SignDataPanel extends JPanel {
         catch (final Exception e) {
         	LOGGER.warning("Error al extraer los datos firmados: " + e);  //$NON-NLS-1$
         }
+        try {
+        	signInfo.setTimestampsInfo(
+    			TimestampsAnalyzer.getTimestamps(signData)
+			);
+        }
+        catch (final Exception e) {
+        	LOGGER.warning("Error al extraer los sellos de tiempo: " + e);  //$NON-NLS-1$
+        }
         return signInfo;
     }
 
@@ -439,17 +451,32 @@ final class SignDataPanel extends JPanel {
         final DefaultMutableTreeNode root = new DefaultMutableTreeNode();
 
         // Formato de firma
-        final DefaultMutableTreeNode signInfoBranch = new DefaultMutableTreeNode(SimpleAfirmaMessages.getString("SignDataPanel.25")); //$NON-NLS-1$
+        final DefaultMutableTreeNode signInfoBranch = new DefaultMutableTreeNode(
+    		SimpleAfirmaMessages.getString("SignDataPanel.25") //$NON-NLS-1$
+		);
         signInfoBranch.add(new DefaultMutableTreeNode(signInfo.getSignInfo().getFormat()));
         root.add(signInfoBranch);
 
         // Datos firmados
-        final DefaultMutableTreeNode dataInfoBranch = new DefaultMutableTreeNode(SimpleAfirmaMessages.getString("SignDataPanel.26")); //$NON-NLS-1$
+        final DefaultMutableTreeNode dataInfoBranch = new DefaultMutableTreeNode(
+    		SimpleAfirmaMessages.getString("SignDataPanel.26") //$NON-NLS-1$
+		);
         if (signInfo.getData() == null) {
-            dataInfoBranch.add(new DefaultMutableTreeNode(SimpleAfirmaMessages.getString("SignDataPanel.27"))); //$NON-NLS-1$
+            dataInfoBranch.add(
+        		new DefaultMutableTreeNode(
+    				SimpleAfirmaMessages.getString("SignDataPanel.27") //$NON-NLS-1$
+				)
+    		);
         }
         else {
-            dataInfoBranch.add(new DefaultMutableTreeNode(new ShowFileLinkAction(SimpleAfirmaMessages.getString("SignDataPanel.28"), signInfo.getData()))); //$NON-NLS-1$
+            dataInfoBranch.add(
+        		new DefaultMutableTreeNode(
+    				new ShowFileLinkAction(
+						SimpleAfirmaMessages.getString("SignDataPanel.28"),  //$NON-NLS-1$
+						signInfo.getData()
+					)
+				)
+    		);
         }
         root.add(dataInfoBranch);
 
@@ -458,6 +485,18 @@ final class SignDataPanel extends JPanel {
         final DefaultMutableTreeNode signersBranch = treeManager.getSwingTree();
         signersBranch.setUserObject(SimpleAfirmaMessages.getString("SignDataPanel.29")); //$NON-NLS-1$
         root.add(signersBranch);
+
+        // Sellos de tiempo de la firma
+        if (signInfo.getTimestampsInfo() != null && !signInfo.getTimestampsInfo().isEmpty()) {
+        	final TreeModelManager treeManagerTimestamps = new TreeModelManager(
+    			signInfo.getTimestampsTree()
+			);
+        	final DefaultMutableTreeNode timestampsBranch = treeManagerTimestamps.getSwingTree();
+        	timestampsBranch.setUserObject(
+    			SimpleAfirmaMessages.getString("SignDataPanel.42") //$NON-NLS-1$
+			);
+	        root.add(timestampsBranch);
+        }
 
         //final DefaultTreeCellRenderer treeRenderer = new DefaultTreeCellRenderer();
         final LinksTreeCellRenderer treeRenderer = new LinksTreeCellRenderer();

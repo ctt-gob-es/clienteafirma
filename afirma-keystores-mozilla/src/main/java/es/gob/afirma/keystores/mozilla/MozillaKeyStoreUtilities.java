@@ -18,7 +18,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.lang.reflect.InvocationTargetException;
 import java.security.Provider;
 import java.security.Security;
 import java.util.HashSet;
@@ -29,8 +28,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.misc.BoundedBufferedReader;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.keystores.mozilla.AOSecMod.ModuleName;
+import es.gob.afirma.keystores.mozilla.shared.SharedNssUtil;
 
 /** Clase con m&eacute;toos de utilidad para la gesti&oacute;n del almac&eacute;n
  * de certificados de Mozilla. */
@@ -49,14 +50,13 @@ public final class MozillaKeyStoreUtilities {
 
 	private static final String USE_ENV_VARS = "es.gob.afirma.keystores.mozilla.UseEnvironmentVariables"; //$NON-NLS-1$
 
+	/** Nombres del controlador nativo de DNIe en sistemas no-Linux (Windows, OS X, etc.). */
 	private static final String[] DNI_P11_NAMES = new String[] {
 		"libopensc-dnie.dylib", //$NON-NLS-1$
-		"libopensc-dnie.so", //$NON-NLS-1$
 		"usrpkcs11.dll", //$NON-NLS-1$
 		"dnie_p11_priv.dll", //$NON-NLS-1$
 		"dnie_p11_pub.dll", //$NON-NLS-1$
 		"opensc-pkcs11.dll", //$NON-NLS-1$
-		"libpkcs11-fnmtdnie.so", //$NON-NLS-1$
 		"FNMT_P11.dll", //$NON-NLS-1$
 		"TIF_P11.dll"//$NON-NLS-1$
 	};
@@ -130,7 +130,11 @@ public final class MozillaKeyStoreUtilities {
 		if (compatibility.exists() && compatibility.canRead()) {
 			final InputStream fis = new FileInputStream(compatibility);
 			// Cargamos el fichero con la codificacion por defecto (que es la que con mas probabilidad tiene el fichero)
-			final BufferedReader br = new BufferedReader(new InputStreamReader(fis));
+			final BufferedReader br = new BoundedBufferedReader(
+				new InputStreamReader(fis),
+				512, // Maximo 512 lineas
+				4096 // Maximo 4KB por linea
+			);
 			String line;
 			String dir = null;
 			while ((line = br.readLine()) != null) {
@@ -155,7 +159,7 @@ public final class MozillaKeyStoreUtilities {
 	 * @throws FileNotFoundException
 	 *         Si no se puede encontrar NSS en el sistema
      * @throws IOException En caso de errores de lectura/escritura */
-	private static String getSystemNSSLibDir() throws IOException {
+	public static String getSystemNSSLibDir() throws IOException {
 
 		if (nssLibDir != null) {
 			return nssLibDir;
@@ -192,7 +196,7 @@ public final class MozillaKeyStoreUtilities {
 		}
 
 		else if (Platform.getOS().equals(Platform.OS.LINUX) || Platform.getOS().equals(Platform.OS.SOLARIS)) {
-			nssLibDir = MozillaKeyStoreUtilitiesUnix.getSystemNSSLibDirUnix();
+			nssLibDir = MozillaKeyStoreUtilitiesUnix.getNSSLibDirUnix();
 		}
 
 		else if (Platform.getOS().equals(Platform.OS.MACOSX)) {
@@ -222,6 +226,13 @@ public final class MozillaKeyStoreUtilities {
 	 * @return Nombres de las bibliotecas de los m&oacute;dulos de seguridad de Mozilla / Firefox */
 	static Map<String, String> getMozillaPKCS11Modules(final boolean excludeDnie,
 			                                           final boolean includeKnownModules) {
+		if (!excludeDnie) {
+			LOGGER.info("Se incluiran los modulos nativos de DNIe si se encuentran configurados"); //$NON-NLS-1$
+		}
+		else {
+			LOGGER.info("Se excluiran los modulos nativos de DNIe en favor del controlador 100% Java"); //$NON-NLS-1$
+		}
+
 		final String profileDir;
 		try {
 			profileDir = getMozillaUserProfileDirectory();
@@ -233,7 +244,7 @@ public final class MozillaKeyStoreUtilities {
 			return new ConcurrentHashMap<String, String>(0);
 		}
 
-		List<ModuleName> modules;
+		final List<ModuleName> modules;
 		try {
 			modules =  AOSecMod.getModules(profileDir);
 		}
@@ -241,18 +252,28 @@ public final class MozillaKeyStoreUtilities {
 			LOGGER.severe(
 				"No se han podido obtener los modulos externos de Mozilla desde 'secmod.db': " + t //$NON-NLS-1$
 			);
-			modules = null;
+			return new ConcurrentHashMap<String, String>(0);
 		}
+
+		LOGGER.info("Obtenidos los modulos externos de Mozilla desde 'secmod.db'"); //$NON-NLS-1$
+
+		return getPkcs11ModulesFromModuleNames(modules, includeKnownModules, excludeDnie);
+	}
+
+	/** Obtiene los m&oacute;dulos PKCS#11 a partir de sus descripciones.
+	 * @param modules Descripci&oacute;n de los m&oacute;dulos PKCS#11 de NSS.
+	 * @param includeKnownModules <code>true</code> si se desea incluir m&oacute;dulos PKCS#11 que comunmente est&aacute;n
+	 *                            instalados en un sistema (y solo si realmente lo est&aacute;s) aunque no est&eacute;n
+	 *                            en la lista de descripciones proporcionada, <code>false</code> en caso contrario.
+	 * @param excludeDnie <code>true</code> si se desea excluir los m&oacute;dulos PKCS#11 de DNIe aunque est&eacute;n
+	 *                    en la lista de descripciones proporcionada, <code>false</code> en caso contrario.
+	 * @return M&oacute;dulos PKCS#11. */
+	public static Map<String, String> getPkcs11ModulesFromModuleNames(final List<ModuleName> modules,
+			                                                          final boolean includeKnownModules,
+			                                                          final boolean excludeDnie) {
+
 		if (modules == null) {
-			try {
-				modules = Pkcs11Txt.getModules(profileDir);
-			}
-			catch (final Exception e) {
-				LOGGER.severe(
-					"No se han podido obtener los modulos externos de Mozilla desde 'pkcs11.txt': " + e //$NON-NLS-1$
-				);
-				return new ConcurrentHashMap<String, String>(0);
-			}
+			return new ConcurrentHashMap<String, String>(0);
 		}
 
 		final Map<String, String> modsByDesc = new ConcurrentHashMap<String, String>();
@@ -283,6 +304,7 @@ public final class MozillaKeyStoreUtilities {
 		}
 
 		return purgeStoresTable(modsByDesc);
+
 	}
 
 	/** Obtiene el nombre (<i>commonName</i>) de un m&oacute;dulo externo de
@@ -448,24 +470,23 @@ public final class MozillaKeyStoreUtilities {
 	 * @return Ruta completa del directorio del perfil de usuario de Mozilla / Firefox
 	 * @throws IOException Cuando hay errores de entrada / salida */
 	public static String getMozillaUserProfileDirectory() throws IOException {
-		final String dir = NSPreferences.getFireFoxUserProfileDirectory(new File(getProfilesIniPath()));
+		final String dir = NSPreferences.getFireFoxUserProfileDirectory(
+			new File(getProfilesIniPath())
+		);
 		if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
 			return MozillaKeyStoreUtilitiesWindows.cleanMozillaUserProfileDirectoryWindows(dir);
 		}
 		return dir;
 	}
 
-	static Provider loadNSS() throws IOException,
-	                                 AOException,
-	                                 InstantiationException,
-	                                 IllegalAccessException,
-	                                 InvocationTargetException,
-	                                 NoSuchMethodException,
-	                                 ClassNotFoundException {
+	static Provider loadNSS(final boolean useSharedNss) throws IOException,
+	                                                           AOException {
 
 		final String nssDirectory = MozillaKeyStoreUtilities.getSystemNSSLibDir();
 		final String p11NSSConfigFile = MozillaKeyStoreUtilities.createPKCS11NSSConfigFile(
-			MozillaKeyStoreUtilities.getMozillaUserProfileDirectory(),
+			useSharedNss ?
+				"sql:/" + SharedNssUtil.getSharedUserProfileDirectory() : //$NON-NLS-1$
+					MozillaKeyStoreUtilities.getMozillaUserProfileDirectory(),
 			nssDirectory
 		);
 
@@ -474,9 +495,7 @@ public final class MozillaKeyStoreUtilities {
 
 		Provider p = null;
 		try {
-			p = (Provider) Class.forName("sun.security.pkcs11.SunPKCS11") //$NON-NLS-1$
-				.getConstructor(InputStream.class)
-					.newInstance(new ByteArrayInputStream(p11NSSConfigFile.getBytes()));
+			p = new sun.security.pkcs11.SunPKCS11(new ByteArrayInputStream(p11NSSConfigFile.getBytes()));
 		}
 		catch (final Exception e) {
 			// No se ha podido cargar el proveedor sin precargar las dependencias
@@ -490,16 +509,12 @@ public final class MozillaKeyStoreUtilities {
 			}
 
 			try {
-				p = (Provider) Class.forName("sun.security.pkcs11.SunPKCS11") //$NON-NLS-1$
-					.getConstructor(InputStream.class)
-						.newInstance(new ByteArrayInputStream(p11NSSConfigFile.getBytes()));
+				p = new sun.security.pkcs11.SunPKCS11(new ByteArrayInputStream(p11NSSConfigFile.getBytes()));
 			}
 			catch (final Exception e2) {
 				// Un ultimo intento de cargar el proveedor valiendonos de que es posible que
 				// las bibliotecas necesarias se hayan cargado tras el ultimo intento
-				p = (Provider) Class.forName("sun.security.pkcs11.SunPKCS11") //$NON-NLS-1$
-					.getConstructor(InputStream.class)
-					.newInstance(new ByteArrayInputStream(p11NSSConfigFile.getBytes()));
+				p = new sun.security.pkcs11.SunPKCS11(new ByteArrayInputStream(p11NSSConfigFile.getBytes()));
 			}
 		}
 

@@ -72,6 +72,14 @@ public interface AOUIManager {
      * @param messageType Tipo de mensaje */
     void showMessageDialog(Object parentComponent, Object message, String title, int messageType);
 
+    /** JOptionPane.showMessageDialog().
+     * @param parentComponent Componente padre (se descarta si no es del tipo <code>java.awt.Component</code> en la implementaci&oacute;n Swing
+     * @param message Mensaje
+     * @param title Titulo del cuadro de di&aacute;logo
+     * @param messageType Tipo de mensaje
+     * @param icon Icono para el di&aacute;logo */
+    void showMessageDialog(Object parentComponent, Object message, String title, int messageType, Object icon);
+
     /** Muestra un di&aacute;logo de error de forma modal. Difiere del normal mostrado con <code>JOptionPane</code>
      * en que, siguiendo la gu&iacute;a de estilo de interfaces de Microsoft, el bot&oacute;n no es "OK", sino
      * cerrar. El comportamiento por lo dem&aacute;s es igual, incluyendo los par&aacute;metros, a

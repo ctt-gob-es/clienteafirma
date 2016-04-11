@@ -39,7 +39,7 @@ import es.gob.afirma.core.misc.AOUtil;
 public class AOKeyStoreManager implements KeyStoreManager {
 
 	private Object parentComponent = null;
-	private Object getParentComponent() {
+	protected Object getParentComponent() {
 		return this.parentComponent;
 	}
 

@@ -1,3 +1,13 @@
+/* Copyright (C) 2011 [Gobierno de Espana]
+ * This file is part of "Cliente @Firma".
+ * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
+ *   - the GNU General Public License as published by the Free Software Foundation;
+ *     either version 2 of the License, or (at your option) any later version.
+ *   - or The European Software License; either version 1.1 or (at your option) any later version.
+ * Date: 11/01/11
+ * You may contact the copyright holder at: soporte.afirma5@mpt.es
+ */
+
 package es.gob.afirma.signers.xades.asic;
 
 import java.io.IOException;
@@ -39,6 +49,7 @@ public final class AOXAdESASiCSSigner implements AOSigner {
 					                                    IOException {
 
 		final Properties extraParams = setASiCProperties(xParams, data);
+		extraParams.put("keepKeyInfoUnsigned", Boolean.TRUE.toString()); //$NON-NLS-1$
 
 		final byte[] xadesSignature = new AOXAdESSigner().sign(
 			data,
@@ -80,6 +91,7 @@ public final class AOXAdESASiCSSigner implements AOSigner {
 		final byte[] packagedSign = ASiCUtil.getASiCSXMLSignature(sign);
 
 		final Properties extraParams = setASiCProperties(xParams, packagedData);
+		extraParams.put("keepKeyInfoUnsigned", Boolean.TRUE.toString()); //$NON-NLS-1$
 
 		// Creamos la contrafirma
 		final byte[] newCoSign = new AOXAdESSigner().cosign(
@@ -106,11 +118,14 @@ public final class AOXAdESASiCSSigner implements AOSigner {
 			                  final Object[] targets,
 			                  final PrivateKey key,
 			                  final Certificate[] certChain,
-			                  final Properties extraParams) throws AOException,
-			                                                       IOException {
+			                  final Properties xParams) throws AOException,
+			                                                   IOException {
 		// Extraemos firma y datos del ASiC
 		final byte[] packagedData = ASiCUtil.getASiCSData(sign);
 		final byte[] packagedSign = ASiCUtil.getASiCSXMLSignature(sign);
+
+		final Properties extraParams = setASiCProperties(xParams, packagedData);
+		extraParams.put("keepKeyInfoUnsigned", Boolean.TRUE.toString()); //$NON-NLS-1$
 
 		// Creamos la contrafirma
 		final byte[] newCounterSign = new AOXAdESSigner().countersign(
