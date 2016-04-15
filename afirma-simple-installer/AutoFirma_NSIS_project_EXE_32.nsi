@@ -1,5 +1,7 @@
 ;Incluimos el Modern UI
   !include "MUI.nsh"
+  !include "nsProcess.nsh"
+  !include "Sections.nsh"
 
 ;Seleccionamos el algoritmo de compresion utilizado para comprimir nuestra aplicacion
 SetCompressor lzma
@@ -81,6 +83,7 @@ XPStyle on
 
 Var PATH
 Var PATH_ACCESO_DIRECTO
+Var chromePath
 ;Indicamos cual sera el directorio por defecto donde instalaremos nuestra
 ;aplicacion, el usuario puede cambiar este valor en tiempo de ejecucion.
 InstallDir "$PROGRAMFILES\AutoFirma"
@@ -152,9 +155,6 @@ Section "Programa" sPrograma
 	  ;Ejecuta el desinstalador cuya ruta ha sido obtenida del registro
 	  ExecWait '"$R0" /S _?=$INSTDIR'
 	Install:
-	
-	;Se cierran los navegadores abiertos
-	Call closeAllBrowsers
 	
 	SetOutPath $INSTDIR\$PATH
 
@@ -255,20 +255,89 @@ Section "Programa" sPrograma
 	SectionIn RO
 
 	StrCpy $PATH "AutoFirma\JRE"
-	File /r "jre"
+	File /r "jre32b"
 
-	;IfErrors 0 +2
+	; Eliminamos los certificados generados en caso de que existan por una instalacion previa
+	IfFileExists "$INSTDIR\AutoFirma\autofirma.cer" 0 +1
+	Delete "$INSTDIR\AutoFirma\autofirma.cer"
+	IfFileExists "$INSTDIR\AutoFirma\autofirma.pfx" 0 +1
+	Delete "$INSTDIR\AutoFirma\autofirma.pfx"
 	
-	; Configuramos la aplicacion
+	;Se cierra Firefox y Chrome si están abiertos
+	${nsProcess::FindProcess} "firefox.exe" $R2
+	StrCmp $R2 0 0 +1
+	${nsProcess::KillProcess} "firefox.exe" $R0
+	
+	${nsProcess::FindProcess} "chrome.exe" $R3
+	StrCmp $R3 0 0 +1
+	${nsProcess::KillProcess} "chrome.exe" $R0
+	
+	
+	; Configuramos la aplicacion (generacion de certificados) e importacion en Firefox
 	ExecWait '"$INSTDIR\AutoFirma\AutoFirmaConfigurador.exe" /passive'
+	; Eliminamos los certificados de versiones previas del sistema
+	Call DeleteCertificateOnInstall
 	
 	; Importamos el certificado en el sistema
 	Push "$INSTDIR\AutoFirma\autofirma.cer"
+	Sleep 2000
 	Call AddCertificateToStore
 	Pop $0
 	${If} $0 != success
-	  MessageBox MB_OK "Error en la importación: $0"
+	  ;MessageBox MB_OK "Error en la importación: $0"
 	${EndIf}
+	
+	
+	; Obtenemos la ruta de los ficheros de GoogleChrome para cada usuario
+	; System::Call "advapi32::GetUserName(t .r0, *i ${NSIS_MAX_STRLEN} r1) i.r2"
+	
+	FindFirst $0 $1 "C:\Users\*"
+	loop1:
+	StrCmp $1 "" done1
+	StrCpy $chromePath "C:\Users\$1\AppData\Local\Google\Chrome\User Data"
+	${If} ${FileExists} "$chromePath\Local State"
+	;Se incluye AutoFirma como aplicación de confianza en Google Chrome
+	Push '"afirma":false,' #text to be replaced
+	Push '' #replace with
+	Push all #replace all ocurrences
+	Push all #replace all other occurrences
+	Push '$chromePath\Local State' #file to replace in
+	Call AdvReplaceInFile
+	
+	Push '"protocol_handler":{"excluded_schemes":{' #text to be replaced
+	Push '"protocol_handler":{"excluded_schemes":{"afirma":false,' #replace with
+	Push all #replace all ocurrences
+	Push all #replace all other occurrences
+	Push '$chromePath\Local State' #file to replace in
+	Call AdvReplaceInFile
+	
+	${EndIf}
+	FindNext $0 $1
+	Goto loop1
+	done1:
+	FindClose $0
+	
+	
+	;Se restauran los navegadores cerrados
+	${If} $R2 == 0
+		ClearErrors
+		ReadRegStr $R0 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\firefox.exe\" ""
+		${If} ${Errors} 
+			Goto EndFirefox
+		${EndIf}
+		exec "$R0 --restore-last-session"
+	${EndIf}
+	EndFirefox:
+	${If} $R3 == 0
+		ClearErrors
+		ReadRegStr $R0 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\chrome.exe\" ""
+		${If} ${Errors} 
+			Goto EndChrome
+		${EndIf}
+		exec "$R0"
+	${EndIf}
+	EndChrome:
+	${nsProcess::Unload}
 SectionEnd
 
 
@@ -325,13 +394,13 @@ Function AddCertificateToStore
  
       System::Call "crypt32::CertFreeCertificateContext(i r0)"
  
-      StrCpy $0 "Unable to open certificate store"
+      StrCpy $0 "No fue posible abrir el almacén de certificados"
  
     ${EndIf}
  
   ${Else}
  
-    StrCpy $0 "Unable to open certificate file"
+    StrCpy $0 "No fue posible abrir el fichero de certificados"
  
   ${EndIf}
  
@@ -410,6 +479,59 @@ Function VersionCheck
  Exch $R0 ; output
 FunctionEnd
 
+Function DeleteCertificateOnInstall
+  ; Save registers
+  Push $0
+  Push $1
+  Push $2
+  Push $3
+  Push $4
+  Push $5
+  ; Abre el almacen de CA del sistema
+	    System::Call "crypt32::CertOpenStore(i ${CERT_STORE_PROV_SYSTEM}, i 0, i 0, \
+      i ${CERT_STORE_OPEN_EXISTING_FLAG}|${CERT_SYSTEM_STORE_LOCAL_MACHINE}, \
+      w 'ROOT') i .r1"
+  ${If} $1 != 0
+     StrCpy $2 0
+     ; Itera sobre el almacen de certificados CA
+     ${Do}
+         System::Call "crypt32::CertEnumCertificatesInStore(i r1, i r2) i.r2"
+         ${If} $2 != 0
+            ; Obtiene el nombre del certificado
+            System::Call "crypt32::CertGetNameString(i r2, \\
+               i ${CERT_NAME_SIMPLE_DISPLAY_TYPE}, i 0, i 0, \\
+               t .r4, i ${NSIS_MAX_STRLEN}) i.r3"
+            ${If} $3 != 0
+               ; Obtiene el emisor del certificado
+               System::Call "crypt32::CertGetNameString(i r2, \\
+                  i ${CERT_NAME_SIMPLE_DISPLAY_TYPE}, \\
+                  i ${CERT_NAME_ISSUER_FLAG}, i 0, \\
+                  t .r4, i ${NSIS_MAX_STRLEN}) i.r3"
+               ${If} $3 != 0
+				  ;Si el emisor es el AutoFirma ROOT
+                  ${If} $4 == "AutoFirma ROOT"
+                    System::Call "crypt32::CertDuplicateCertificateContext(i r2) i.r5"
+				    System::Call "crypt32::CertDeleteCertificateFromStore(i r5)"
+				  ${EndIf}
+               ${EndIf}
+               
+            ${EndIf} 
+         ${Else}
+            ${ExitDo}
+         ${EndIf}
+     ${Loop}
+     System::Call "crypt32::CertCloseStore(i r1, i 0)"
+  ${EndIf}
+  
+  ; Restore registers
+  Pop $5
+  Pop $4
+  Pop $3
+  Pop $2
+  Pop $1
+  Pop $0
+FunctionEnd 
+
 Function un.DeleteCertificate
   ; Save registers
   Push $0
@@ -454,10 +576,6 @@ Function un.DeleteCertificate
      System::Call "crypt32::CertCloseStore(i r1, i 0)"
   ${EndIf}
   
-  
-  
-  
-  
   ; Restore registers
   Pop $5
   Pop $4
@@ -475,9 +593,44 @@ Section "uninstall"
 	StrCpy $PATH "AutoFirma"
 	StrCpy $PATH_ACCESO_DIRECTO "AutoFirma"
 	SetShellVarContext all
+	
+	;Se cierra Firefox y Chrome si están abiertos
+	${nsProcess::FindProcess} "firefox.exe" $R2
+	StrCmp $R2 0 0 +1
+	${nsProcess::KillProcess} "firefox.exe" $R0
+	
+	;Se cierra Firefox si está abierto
+	${nsProcess::FindProcess} "chrome.exe" $R3
+	StrCmp $R3 0 0 +1
+	${nsProcess::KillProcess} "chrome.exe" $R0
+	
 	;Eliminamos los certificados del sistema
 	Call un.DeleteCertificate
 	ExecWait '"$INSTDIR\AutoFirma\AutoFirmaConfigurador.exe" -uninstall /passive'
+	
+	; Obtenemos la ruta de los ficheros de GoogleChrome para cada usuario
+	; System::Call "advapi32::GetUserName(t .r0, *i ${NSIS_MAX_STRLEN} r1) i.r2"
+	
+	FindFirst $0 $1 "C:\Users\*"
+	loop2:
+	StrCmp $1 "" done2
+	StrCpy $chromePath "C:\Users\$1\AppData\Local\Google\Chrome\User Data"
+	${If} ${FileExists} "$chromePath\Local State"
+	
+	;Se elimina AutoFirma como aplicación de confianza en Google Chrome
+	Push '"afirma":false,' #text to be replaced
+	Push '' #replace with
+	Push all #replace all ocurrences
+	Push all #replace all other occurrences
+	Push '$chromePath\Local State' #file to replace in
+	Call un.AdvReplaceInFile
+	
+	${EndIf}
+	FindNext $0 $1
+	Goto loop2
+	done2:
+	FindClose $0
+	
 	RMDir /r $INSTDIR\$PATH
 	;Borrar directorio de instalacion si es un directorio valido (contiene "AutoFirma" o es una subcarpeta de Program Files)
 	${StrContains} $0 "Program Files (x86)\" $INSTDIR
@@ -494,8 +647,8 @@ Section "uninstall"
 	RMDir /r $SMPROGRAMS\$PATH_ACCESO_DIRECTO
 	
 	DeleteRegKey HKLM "SOFTWARE\$PATH"
-    DeleteRegKey HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH\" 
-			
+    DeleteRegKey HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH" 
+	
 	DeleteRegKey HKEY_CLASSES_ROOT "*\shell\afirma.sign"
 	DeleteRegKey HKEY_CLASSES_ROOT "*\shell\afirma.hashFile"
 	DeleteRegKey HKEY_CLASSES_ROOT "Directory\shell\afirma.hashDirectory"
@@ -514,6 +667,28 @@ Section "uninstall"
 	DeleteRegKey /ifempty HKCU "SOFTWARE\JavaSoft\Prefs\es\gob\afirma"
 	DeleteRegKey /ifempty HKCU "SOFTWARE\JavaSoft\Prefs\es\gob"
 	DeleteRegKey /ifempty HKCU "SOFTWARE\JavaSoft\Prefs\es"
+	
+	;Se restauran los navegadores cerrados
+	
+	${If} $R2 == 0
+		ClearErrors
+		ReadRegStr $R0 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\firefox.exe\" ""
+		${If} ${Errors} 
+			Goto EndFirefox1
+		${EndIf}
+		exec "$R0 --restore-last-session"
+	${EndIf}
+	EndFirefox1:
+	${If} $R3 == 0
+		ClearErrors
+		ReadRegStr $R0 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\chrome.exe\" ""
+		${If} ${Errors} 
+			Goto EndChrome1
+		${EndIf}
+		exec "$R0"
+	${EndIf}
+	EndChrome1:
+	${nsProcess::Unload}
 
 SectionEnd
 
@@ -558,23 +733,216 @@ Function un.StrContains
    Exch $STR_RETURN_VAR  
 FunctionEnd
 
-Function closeAllBrowsers
-  FindWindow $0 "IEFrame"
-  IntCmp $0 0 0 loop
-  FindWindow $0 "MozillaUIWindowClass"
-  IntCmp $0 0 0 loop
-  FindWindow $0 "Chrome_WidgetWin_0"
-  IntCmp $0 0 done loop
-  loop:
-	MessageBox MB_OK "Cierre todos los navegadores y pulse Aceptar para continuar con la instalación"
-	Sleep 2000
-    FindWindow $0 "IEFrame"
-    IntCmp $0 0 0 wait
-    FindWindow $0 "MozillaUIWindowClass"
-    IntCmp $0 0 0 wait
-    FindWindow $0 "Chrome_WidgetWin_0"
-    IntCmp $0 0 done wait
-  wait:
-    goto loop
-  done:
+Function AdvReplaceInFile
+Exch $0 ;file to replace in
+Exch
+Exch $1 ;number to replace after
+Exch
+Exch 2
+Exch $2 ;replace and onwards
+Exch 2
+Exch 3
+Exch $3 ;replace with
+Exch 3
+Exch 4
+Exch $4 ;to replace
+Exch 4
+Push $5 ;minus count
+Push $6 ;universal
+Push $7 ;end string
+Push $8 ;left string
+Push $9 ;right string
+Push $R0 ;file1
+Push $R1 ;file2
+Push $R2 ;read
+Push $R3 ;universal
+Push $R4 ;count (onwards)
+Push $R5 ;count (after)
+Push $R6 ;temp file name
+ 
+  GetTempFileName $R6
+  FileOpen $R1 $0 r ;file to search in
+  FileOpen $R0 $R6 w ;temp file
+   StrLen $R3 $4
+   StrCpy $R4 -1
+   StrCpy $R5 -1
+loop_read:
+ ClearErrors
+ FileRead $R1 $R2 ;read line
+ IfErrors exit
+ 
+   StrCpy $5 0
+   StrCpy $7 $R2
+ 
+loop_filter:
+   IntOp $5 $5 - 1
+   StrCpy $6 $7 $R3 $5 ;search
+   StrCmp $6 "" file_write1
+   StrCmp $6 $4 0 loop_filter
+ 
+StrCpy $8 $7 $5 ;left part
+IntOp $6 $5 + $R3
+IntCmp $6 0 is0 not0
+is0:
+StrCpy $9 ""
+Goto done
+not0:
+StrCpy $9 $7 "" $6 ;right part
+done:
+StrCpy $7 $8$3$9 ;re-join
+ 
+IntOp $R4 $R4 + 1
+StrCmp $2 all loop_filter
+StrCmp $R4 $2 0 file_write2
+IntOp $R4 $R4 - 1
+ 
+IntOp $R5 $R5 + 1
+StrCmp $1 all loop_filter
+StrCmp $R5 $1 0 file_write1
+IntOp $R5 $R5 - 1
+Goto file_write2
+ 
+file_write1:
+ FileWrite $R0 $7 ;write modified line
+Goto loop_read
+ 
+file_write2:
+ FileWrite $R0 $R2 ;write unmodified line
+Goto loop_read
+ 
+exit:
+  FileClose $R0
+  FileClose $R1
+ 
+   SetDetailsPrint none
+  Delete $0
+  Rename $R6 $0
+  Delete $R6
+   SetDetailsPrint lastused
+ 
+Pop $R6
+Pop $R5
+Pop $R4
+Pop $R3
+Pop $R2
+Pop $R1
+Pop $R0
+Pop $9
+Pop $8
+Pop $7
+Pop $6
+Pop $5
+;These values are stored in the stack in the reverse order they were pushed
+Pop $0
+Pop $1
+Pop $2
+Pop $3
+Pop $4
+FunctionEnd
+
+Function un.AdvReplaceInFile
+Exch $0 ;file to replace in
+Exch
+Exch $1 ;number to replace after
+Exch
+Exch 2
+Exch $2 ;replace and onwards
+Exch 2
+Exch 3
+Exch $3 ;replace with
+Exch 3
+Exch 4
+Exch $4 ;to replace
+Exch 4
+Push $5 ;minus count
+Push $6 ;universal
+Push $7 ;end string
+Push $8 ;left string
+Push $9 ;right string
+Push $R0 ;file1
+Push $R1 ;file2
+Push $R2 ;read
+Push $R3 ;universal
+Push $R4 ;count (onwards)
+Push $R5 ;count (after)
+Push $R6 ;temp file name
+ 
+  GetTempFileName $R6
+  FileOpen $R1 $0 r ;file to search in
+  FileOpen $R0 $R6 w ;temp file
+   StrLen $R3 $4
+   StrCpy $R4 -1
+   StrCpy $R5 -1
+loop_read:
+ ClearErrors
+ FileRead $R1 $R2 ;read line
+ IfErrors exit
+ 
+   StrCpy $5 0
+   StrCpy $7 $R2
+ 
+loop_filter:
+   IntOp $5 $5 - 1
+   StrCpy $6 $7 $R3 $5 ;search
+   StrCmp $6 "" file_write1
+   StrCmp $6 $4 0 loop_filter
+ 
+StrCpy $8 $7 $5 ;left part
+IntOp $6 $5 + $R3
+IntCmp $6 0 is0 not0
+is0:
+StrCpy $9 ""
+Goto done
+not0:
+StrCpy $9 $7 "" $6 ;right part
+done:
+StrCpy $7 $8$3$9 ;re-join
+ 
+IntOp $R4 $R4 + 1
+StrCmp $2 all loop_filter
+StrCmp $R4 $2 0 file_write2
+IntOp $R4 $R4 - 1
+ 
+IntOp $R5 $R5 + 1
+StrCmp $1 all loop_filter
+StrCmp $R5 $1 0 file_write1
+IntOp $R5 $R5 - 1
+Goto file_write2
+ 
+file_write1:
+ FileWrite $R0 $7 ;write modified line
+Goto loop_read
+ 
+file_write2:
+ FileWrite $R0 $R2 ;write unmodified line
+Goto loop_read
+ 
+exit:
+  FileClose $R0
+  FileClose $R1
+ 
+   SetDetailsPrint none
+  Delete $0
+  Rename $R6 $0
+  Delete $R6
+   SetDetailsPrint lastused
+ 
+Pop $R6
+Pop $R5
+Pop $R4
+Pop $R3
+Pop $R2
+Pop $R1
+Pop $R0
+Pop $9
+Pop $8
+Pop $7
+Pop $6
+Pop $5
+;These values are stored in the stack in the reverse order they were pushed
+Pop $0
+Pop $1
+Pop $2
+Pop $3
+Pop $4
 FunctionEnd
