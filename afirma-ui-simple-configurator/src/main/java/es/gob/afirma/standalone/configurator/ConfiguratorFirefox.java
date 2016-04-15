@@ -49,6 +49,8 @@ final class ConfiguratorFirefox {
     private static final String LINUX_SCRIPT_NAME = "script.sh"; //$NON-NLS-1$
     private static final String LINUX_MOZILLA_PATH = "/.mozilla/firefox/profiles.ini";//$NON-NLS-1$
     private static final String LINUX_CHROME_PATH = "/.pki/nssdb";//$NON-NLS-1$
+    private static final String LINUX_CHROMIUM_PREFS_PATH = "/.config/chromium/Local State";//$NON-NLS-1$
+    private static final String LINUX_CHROME_PREFS_PATH = "/.config/google-chrome/Local State";//$NON-NLS-1$
     private static final String MACOSX_MOZILLA_PATH = "/Library/Application Support/firefox/profiles.ini";//$NON-NLS-1$
 
     static final String CERTUTIL_EXE;
@@ -100,6 +102,129 @@ final class ConfiguratorFirefox {
         );
 
     }
+    /**
+     * Genera el script que elimina el warning al ejecutar AutoFirma desde Chrome para LINUX.
+     * En linux genera el script que hay que ejecutar para realizar la instalaci&oacute;n pero no lo ejecuta, de eso se encarga el instalador Debian.
+     * @param targetDir Directorio de instalaci&oacute;n del sistema
+     * @param userDir Directorio de usuario dentro del sistema operativo.
+     * @param browserPath Directorio de configuraci&oacute;n de Chromium o Google Chrome.
+     *  <ul>
+     * <li>En LINUX contiene el contenido del script a ejecutar.</li>
+     * </ul>
+     * @throws IOException Cuando ocurre un error en el tratamiento de datos.
+     */
+    private static void createScriptsRemoveExecutionWarningInChrome(final File targetDir, final String userDir, final String browserPath)
+			throws IOException {
+    	final String[] commandInstall = new String[] {
+				"sed",
+		        "s/\\\"protocol_handler\\\":{\\\"excluded_schemes\\\":{/\\\"protocol_handler\\\":{\\\"excluded_schemes\\\":{\\\"afirma\\\":false,/g", //$NON-NLS-1$
+				escapePath(userDir + browserPath),
+				">", //$NON-NLS-1$
+				escapePath(userDir + browserPath) + "1", //$NON-NLS-1$
+		};
+    	
+    	final String[] commandUninstall = new String[] {
+				"sed",
+		        "s/\\\"afirma\\\":false,//g", //$NON-NLS-1$
+				escapePath(userDir + browserPath),
+				">", //$NON-NLS-1$
+				escapePath(userDir + browserPath) + "1", //$NON-NLS-1$
+		};
+		
+		//Se reemplaza el fichero generado por el original
+    	final String[] commandCopy = new String[] {
+				"\\cp",
+				escapePath(userDir + browserPath) + "1", //$NON-NLS-1$
+				escapePath(userDir + browserPath),
+		};
+
+    	// Generamos el script de instalacion y desistalacion
+        try {
+            
+        	final StringBuilder sb = new StringBuilder();
+        	for (final String s : commandInstall) {
+                sb.append(s);
+                sb.append(' ');
+            }
+        	
+            final StringBuilder uninstall = new StringBuilder();
+            for (final String s : commandUninstall) {
+            	uninstall.append(s);
+            	uninstall.append(' ');
+            }
+            uninstall.append("\n"); //$NON-NLS-1$
+            sb.append("\n"); //$NON-NLS-1$
+            
+        	for (final String s : commandCopy) {
+                sb.append(s);
+                sb.append(' ');
+            }
+            for (final String s : commandCopy) {
+            	uninstall.append(s);
+            	uninstall.append(' ');
+            }
+            String path = null;
+            String uninstallPath = null;
+            sb.append("\n"); //$NON-NLS-1$
+            uninstall.append("\n"); //$NON-NLS-1$
+            
+            // Obtenemos la ruta de los scripts
+            path = new File(targetDir, LINUX_SCRIPT_NAME).getAbsolutePath(); //$NON-NLS-1$
+            uninstallPath = new File(targetDir, LINUX_UNINSTALLSCRIPT_NAME).getAbsolutePath(); //$NON-NLS-1$
+            final File installScript = new File(path);
+            final File uninstallScript = new File(uninstallPath);
+            
+
+
+            try (
+        		final FileOutputStream fout = new FileOutputStream(installScript, true);
+                final FileOutputStream foutUninstall = new FileOutputStream(
+                    uninstallScript, true
+        		);
+    		) {
+                fout.write(sb.toString().getBytes());
+                foutUninstall.write(uninstall.toString().getBytes());
+            }
+        }
+        catch (final Exception e) {
+            LOGGER.severe(
+        		"Excepcion en la creacion del script linux para la modificacion del fichero de protocolos de Google Chrome: " + e //$NON-NLS-1$
+    		);
+        }
+    	
+    }
+    /**
+     * Genera el script que elimina el warning al ejecutar AutoFirma desde Chrome para LINUX.
+     * En linux genera el script que hay que ejecutar para realizar la instalaci&oacute;n pero no lo ejecuta, de eso se encarga el instalador Debian.
+     * @param targetDir Directorio de instalaci&oacute;n del sistema
+     * @param command Usado para sacar los directorios de usuario dentro del sistema operativo.
+     *  <ul>
+     * <li>En LINUX contiene el contenido del script a ejecutar.</li>
+     * </ul>
+     * @throws IOException Cuando ocurre un error en el tratamiento de datos.
+     */
+	static void removeAppExecutionWarningInChrome(final File targetDir, final String[] command)
+			throws IOException {
+
+		// sacamos el listado de usuarios de la aplicacion
+		final List<String> usersDirs = getSystemUsersHomes(command);
+		
+		for ( final String userDir : usersDirs) {
+			// Montamos el script de instalacion y desinstalacion que
+        	// incluya el protocolo "afirma" en el fichero Local State
+			if ( Platform.OS.LINUX.equals(Platform.getOS()) ) {
+				final File fileChrome = new File((escapePath(userDir) + LINUX_CHROME_PREFS_PATH));
+				final File fileChromium = new File((escapePath(userDir) + LINUX_CHROMIUM_PREFS_PATH));
+				if( fileChrome.isFile() ) {
+					createScriptsRemoveExecutionWarningInChrome(targetDir, userDir, LINUX_CHROME_PREFS_PATH);
+				}
+				if ( fileChromium.isFile() ) {
+					createScriptsRemoveExecutionWarningInChrome(targetDir, userDir, LINUX_CHROMIUM_PREFS_PATH);
+				}
+			}
+		 }
+	}
+	
     /**
      * Genera el script de instalaci&oacute; del certificado en Chrome para LINUX.
      * En linux genera el script que hay que ejecutar para realizar la instalaci&oacute;n pero no lo ejecuta, de eso se encarga el instalador Debian.

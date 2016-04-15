@@ -50,6 +50,7 @@ final class ConfiguratorLinux implements Configurator {
 
             try {
                 LOGGER.warning(Messages.getString("ConfiguratorLinux.13")); //$NON-NLS-1$
+                ConfiguratorFirefox.removeAppExecutionWarningInChrome(appDir, command);
                 ConfiguratorFirefox.installRootCAChromeKeyStore(appDir, command);
                 ConfiguratorFirefox.installRootCAMozillaKeyStore(appDir, certPack.getCaCertificate(), command);
               }
