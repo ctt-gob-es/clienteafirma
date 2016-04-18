@@ -50,6 +50,11 @@ public abstract class UrlParameters {
 	private static final String DEFAULT_ENCODING = "utf-8"; //$NON-NLS-1$
 
 	private byte[] data = null;
+	// UAL - para firma de multiples documentos
+	private byte [][] datas = null;
+	private String [] operaciones;
+	private boolean multifirma = false; 
+	// fin UAL
 	private String fileId = null;
 	private byte[] desKey = null;
 	private URL retrieveServletUrl = null;
@@ -165,6 +170,22 @@ public abstract class UrlParameters {
 	void setSessionId(final String sessionId) {
 		this.id = sessionId;
 	}
+	
+	public byte[][] getDatas() {
+		return datas;
+	}
+
+	public void setDatas(byte[][] datas) {
+		this.datas = datas;
+	}
+
+	public String[] getOperaciones() {
+		return operaciones;
+	}
+
+	public void setOperaciones(String[] operaciones) {
+		this.operaciones = operaciones;
+	}
 
 	void setCommonParameters(final Map<String, String> params) throws ParameterException {
 
@@ -215,6 +236,35 @@ public abstract class UrlParameters {
 				setData(
 					DataDownloader.downloadData(dataPrm)
 				);
+				
+				// UAL - para firma de multiples documentos
+				String [] sDatosAfirmar = params.get(DATA_PARAM).split(":");
+				byte [][] bDatosAfirmar = new byte [sDatosAfirmar.length][];
+				String [] operaciones =  new String [sDatosAfirmar.length];
+				for (int i = 0; i < sDatosAfirmar.length; i++)
+				{
+					
+					if (sDatosAfirmar[i].contains(";"))
+					{
+						this.multifirma = true;
+						String [] sDatoIndividual = sDatosAfirmar[i].split(";");
+						byte [] bDatoIndividual = DataDownloader.downloadData(sDatoIndividual[1]);
+						operaciones[i] = sDatoIndividual[0];
+						bDatosAfirmar[i] = new byte[bDatoIndividual.length];
+						bDatosAfirmar[i] = bDatoIndividual;
+					}
+					else
+					{
+						String sDatoIndividual = sDatosAfirmar[i];
+						byte [] bDatoIndividual = DataDownloader.downloadData(sDatoIndividual);
+						operaciones[i] = params.get(ProtocolConstants.OPERATION_PARAM);
+						bDatosAfirmar[i] = new byte[bDatoIndividual.length];
+						bDatosAfirmar[i] = bDatoIndividual;
+					}
+				}
+				setDatas(bDatosAfirmar);
+				setOperaciones(operaciones);
+				// fin UAL
 			}
 			catch (final Exception e) {
 				throw new ParameterException(
