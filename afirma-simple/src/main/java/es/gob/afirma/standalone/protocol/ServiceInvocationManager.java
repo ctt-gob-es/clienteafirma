@@ -34,6 +34,7 @@ import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.keystores.mozilla.MozillaKeyStoreUtilitiesOsX;
 import es.gob.afirma.standalone.AutoFirmaUtil;
+import es.gob.afirma.standalone.configurator.AutoFirmaConfigurator;
 
 /** Gestor de la invocaci&oacute;n por <i>socket</i>. */
 public final class ServiceInvocationManager {
@@ -154,6 +155,9 @@ public final class ServiceInvocationManager {
 		checkSupportProtocol(getVersion(url));
 
 		try {
+			String[] args = new String[1];
+			   args[0]="-keep_open";
+			   AutoFirmaConfigurator.main(args);
 			// ruta de la que debe buscar el fichero
 			final File sslKeyStoreFile = new File(AutoFirmaUtil.getApplicationDirectory(), KEYSTORE_NAME);
 			// pass del fichero
