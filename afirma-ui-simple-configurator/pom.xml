@@ -33,11 +33,17 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
+			 <groupId>javax.jnlp</groupId>
+			 <artifactId>jnlp-api</artifactId>
+			 <version>7.0</version>
+			 <scope>system</scope>
+			 <systemPath>${java.home}/lib/javaws.jar</systemPath>
+		</dependency>
+		<dependency>
 		    <groupId>com.madgag.spongycastle</groupId>
 		    <artifactId>core</artifactId>
 		    <version>1.54.0.0</version>
 		</dependency>
-		
 		<dependency>
 		    <groupId>com.madgag.spongycastle</groupId>
 		    <artifactId>pkix</artifactId>

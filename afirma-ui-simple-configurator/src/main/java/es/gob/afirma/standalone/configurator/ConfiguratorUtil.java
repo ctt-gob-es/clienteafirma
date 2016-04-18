@@ -5,12 +5,14 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.URISyntaxException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.logging.Logger;
+import javax.jnlp.*; 
 
 final class ConfiguratorUtil {
 
@@ -27,11 +29,23 @@ final class ConfiguratorUtil {
 	 * @param outDir Directorio local.
 	 * @throws IOException Cuando ocurre un error durante el guardado. */
 	static void installFile(final byte[] data, final File outDir) throws IOException {
-		try (
-			final OutputStream configScriptOs = new FileOutputStream(outDir);
+		ExtendedService es; 
+		try { 
+		    es = 
+		(ExtendedService)ServiceManager.lookup("javax.jnlp.ExtendedService");
+		} catch (UnavailableServiceException e) { es=null; }
+		
+		try {
+			OutputStream configScriptOs;
+			if(es!=null){
+				configScriptOs = es.openFile(outDir).getOutputStream(true);
+			}else{
+				configScriptOs = new FileOutputStream(outDir);
+			}
 			final BufferedOutputStream bos = new BufferedOutputStream(configScriptOs);
-		) {
 			bos.write(data);
+		}catch(Exception e){
+			throw e;
 		}
 	}
 
@@ -66,6 +80,16 @@ final class ConfiguratorUtil {
 	/** Recupera el directorio en el que se encuentra la aplicaci&oacute;n actual.
 	 * @return Directorio de ejecuci&oacute;n. */
 	static File getApplicationDirectory() {
+		File appDir;
+		
+		try{
+			ServiceManager.lookup("javax.jnlp.ExtendedService");
+			appDir = new File(System.getProperty("java.io.tmpdir"));
+			return appDir;
+		} catch (UnavailableServiceException e) {
+
+		}
+		
 		try {
 			return new File(ConfiguratorUtil.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()).getParentFile();
 		}
