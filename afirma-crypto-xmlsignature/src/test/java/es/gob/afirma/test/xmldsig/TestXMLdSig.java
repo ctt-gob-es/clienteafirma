@@ -32,11 +32,8 @@ import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.core.util.tree.AOTreeNode;
 import es.gob.afirma.signers.xmldsig.AOXMLDSigSigner;
 
-/**
- * Pruebas del m&oacute;dulo XMLdSig de Afirma.
- * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s
- *
- */
+/** Pruebas del m&oacute;dulo XMLDSig.
+ * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
 public final class TestXMLdSig {
 
     private static final String CERT_PATH = "PFActivoFirSHA256.pfx"; //$NON-NLS-1$
@@ -45,7 +42,15 @@ public final class TestXMLdSig {
 
     private static final Properties[] XMLDSIG_MODES;
 
+    private static final Properties ENVELOPED_WITHOUT_XPATH_EXTRAPARAMS = new Properties();
     static {
+	    ENVELOPED_WITHOUT_XPATH_EXTRAPARAMS.setProperty("format", AOSignConstants.SIGN_FORMAT_XMLDSIG_ENVELOPED); //$NON-NLS-1$
+	    ENVELOPED_WITHOUT_XPATH_EXTRAPARAMS.setProperty("avoidXpathExtraTransformsOnEnveloped", "true"); //$NON-NLS-1$ //$NON-NLS-2$
+	    ENVELOPED_WITHOUT_XPATH_EXTRAPARAMS.setProperty("canonicalizationAlgorithm", "none"); //$NON-NLS-1$ //$NON-NLS-2$
+    }
+
+    static {
+
         final Properties p1 = new Properties();
         p1.setProperty("format", AOSignConstants.SIGN_FORMAT_XMLDSIG_DETACHED); //$NON-NLS-1$
         p1.setProperty("mode", AOSignConstants.SIGN_MODE_IMPLICIT); //$NON-NLS-1$
@@ -80,10 +85,10 @@ public final class TestXMLdSig {
 
     /** Algoritmos de firma a probar. */
     private final static String[] ALGOS = new String[] {
-//            AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA,
+            AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA,
             AOSignConstants.SIGN_ALGORITHM_SHA512WITHRSA,
-//            AOSignConstants.SIGN_ALGORITHM_SHA256WITHRSA,
-//            AOSignConstants.SIGN_ALGORITHM_SHA384WITHRSA
+            AOSignConstants.SIGN_ALGORITHM_SHA256WITHRSA,
+            AOSignConstants.SIGN_ALGORITHM_SHA384WITHRSA
     };
 
     // IMPORTANTE: Poner extension ".xml" a los ficheros de prueba con contenido XML
@@ -91,14 +96,43 @@ public final class TestXMLdSig {
             "PFActivoFirSHA256.pfx", //$NON-NLS-1$
             "base64.b64", //$NON-NLS-1$
             "sample-class-attributes.xml", //$NON-NLS-1$
-//            "xmlwithremotestyle.xml" //$NON-NLS-1$
+            "xmlwithremotestyle.xml" //$NON-NLS-1$
     };
 
+    /** Prueba de firma Enveloped sin transformaci&oacute;n XPath y sin <i>canonicalizaci&oacute;n</i>.
+     * @throws Exception En cualquier error. */
+    @SuppressWarnings("static-method")
+	@Test
+    public void testEvelopedWithoutXpath() throws Exception {
+        Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$
+        final PrivateKeyEntry pke;
+        final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
 
-    /**
-     * Prueba de firma convencional.
-     * @throws Exception en cualquier error
-     */
+        ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH), CERT_PASS.toCharArray());
+        pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
+        final AOSigner signer = new AOXMLDSigSigner();
+
+        final byte[] data = AOUtil.getDataFromInputStream(
+    		ClassLoader.getSystemResourceAsStream("sample-encoding-UTF-8.xml") //$NON-NLS-1$
+		);
+
+        final byte[] result = signer.sign(
+    		data,
+    		"SHA512withRSA", //$NON-NLS-1$
+    		pke.getPrivateKey(),
+    		pke.getCertificateChain(),
+    		ENVELOPED_WITHOUT_XPATH_EXTRAPARAMS
+		);
+
+        final File f = File.createTempFile("XmlDSig-EnvelopedWithoutXpath-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$
+        final java.io.FileOutputStream fos = new java.io.FileOutputStream(f);
+        fos.write(result);
+        fos.flush(); fos.close();
+        System.out.println("Temporal para comprobacion manual: " + f.getAbsolutePath()); //$NON-NLS-1$
+	}
+
+    /** Prueba de firma convencional.
+     * @throws Exception en cualquier error. */
     @SuppressWarnings("static-method")
 	@Test
     public void testSignature() throws Exception {

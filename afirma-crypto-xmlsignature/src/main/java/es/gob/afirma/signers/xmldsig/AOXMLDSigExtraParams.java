@@ -15,6 +15,13 @@ final class AOXMLDSigExtraParams {
     /** URL en la que se encuentra el documento a firmar, necesario en el caso del formato <i>Externally Detached</i>. */
     static final String URI ="uri"; //$NON-NLS-1$
 
+    /** Indica si se debe evitar la inclusi&oacute;n de la transformaci&oacute;n
+     * XPATH2 que normalmente se a&ntilde;ade para posibilitar las cofirmas y
+     * que elimina todas las firmas del documento para dejar &uacute;nicamente
+     * el contenido. Por defecto, se encuentra a <code>false</code>.
+     * &Uacute;nicamente aplica a firmas <i>enveloped</i>. */
+    static final String AVOID_XPATH_EXTRA_TRANSFORMS_ON_ENVELOPED = "avoidXpathExtraTransformsOnEnveloped";//$NON-NLS-1$
+
     /** Modo de firma. */
     static final String MODE = "mode"; //$NON-NLS-1$
 

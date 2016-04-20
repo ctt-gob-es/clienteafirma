@@ -326,22 +326,32 @@ public final class AOXMLDSigSigner implements AOSigner {
 
         final Properties extraParams = xParams != null ? xParams : new Properties();
 
-        final String format = extraParams.getProperty(AOXMLDSigExtraParams.FORMAT, AOSignConstants.SIGN_FORMAT_XMLDSIG_ENVELOPING);
-        final String mode = extraParams.getProperty(AOXMLDSigExtraParams.MODE, AOSignConstants.SIGN_MODE_IMPLICIT);
-        final String digestMethodAlgorithm = extraParams.getProperty(AOXMLDSigExtraParams.REFERENCES_DIGEST_METHOD, DIGEST_METHOD);
-        final String canonicalizationAlgorithm = extraParams.getProperty(AOXMLDSigExtraParams.CANONICALIZATION_ALGORITHM, CanonicalizationMethod.INCLUSIVE);
+        final String format = extraParams.getProperty(
+        		AOXMLDSigExtraParams.FORMAT, AOSignConstants.SIGN_FORMAT_XMLDSIG_ENVELOPING);
+        final String mode = extraParams.getProperty(
+        		AOXMLDSigExtraParams.MODE, AOSignConstants.SIGN_MODE_IMPLICIT);
+        final String digestMethodAlgorithm = extraParams.getProperty(
+        		AOXMLDSigExtraParams.REFERENCES_DIGEST_METHOD, DIGEST_METHOD);
+        final String canonicalizationAlgorithm = extraParams.getProperty(
+        		AOXMLDSigExtraParams.CANONICALIZATION_ALGORITHM, CanonicalizationMethod.INCLUSIVE);
 		final boolean ignoreStyleSheets = Boolean.parseBoolean(extraParams.getProperty(
 		        AOXMLDSigExtraParams.IGNORE_STYLE_SHEETS, Boolean.FALSE.toString()));
 		final boolean avoidBase64Transforms = Boolean.parseBoolean(extraParams.getProperty(
 		        AOXMLDSigExtraParams.AVOID_BASE64_TRANSFORMS, Boolean.FALSE.toString()));
 		final boolean headless = Boolean.parseBoolean(extraParams.getProperty(
 		        AOXMLDSigExtraParams.HEADLESS, Boolean.TRUE.toString()));
-        String mimeType = extraParams.getProperty(AOXMLDSigExtraParams.MIME_TYPE);
-        String encoding = extraParams.getProperty(AOXMLDSigExtraParams.ENCODING);
+		final boolean avoidXpathExtraTransformsOnEnveloped = Boolean.parseBoolean(extraParams.getProperty(
+		        AOXMLDSigExtraParams.AVOID_XPATH_EXTRA_TRANSFORMS_ON_ENVELOPED, Boolean.FALSE.toString()));
+        final String xmlSignaturePrefix = extraParams.getProperty(
+        		AOXMLDSigExtraParams.XML_SIGNATURE_PREFIX, XML_SIGNATURE_PREFIX);
+
+        String mimeType = extraParams.getProperty(
+        		AOXMLDSigExtraParams.MIME_TYPE);
+        String encoding = extraParams.getProperty(
+        		AOXMLDSigExtraParams.ENCODING);
         if ("base64".equalsIgnoreCase(encoding)) { //$NON-NLS-1$
             encoding = XMLConstants.BASE64_ENCODING;
         }
-        final String xmlSignaturePrefix = extraParams.getProperty(AOXMLDSigExtraParams.XML_SIGNATURE_PREFIX, XML_SIGNATURE_PREFIX);
 
         URI uri = null;
         try {
@@ -655,16 +665,31 @@ public final class AOXMLDSigSigner implements AOSigner {
         // Primero anadimos las transformaciones a medida
         Utils.addCustomTransforms(transformList, extraParams, xmlSignaturePrefix);
 
-        // Solo canonicalizo si es XML
+        final Transform canonicalizationTransform;
+        if ("none".equalsIgnoreCase(canonicalizationAlgorithm)) { //$NON-NLS-1$
+        	canonicalizationTransform = null;
+        }
+        else {
+        	try {
+				canonicalizationTransform = fac.newTransform(canonicalizationAlgorithm, (TransformParameterSpec) null);
+			}
+        	catch (final Exception e) {
+				throw new AOException("No se ha podido crear la transformacion de canonicalizacion para el algoritmo '" + canonicalizationAlgorithm + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+        }
+
+        // Solo canonicalizo si es XML y no me han declarado el algoritmo como "none"
         if (!isBase64) {
-            try {
-                // Transformada para la canonicalizacion inclusiva
-                transformList.add(fac.newTransform(canonicalizationAlgorithm, (TransformParameterSpec) null));
-            }
-            catch (final Exception e) {
-                LOGGER
-                      .severe("No se puede encontrar el algoritmo de canonicalizacion, la referencia no se canonicalizara: " + e); //$NON-NLS-1$
-            }
+        	if (canonicalizationTransform != null) {
+	            try {
+	                // Transformada para la canonicalizacion inclusiva
+	                transformList.add(canonicalizationTransform);
+	            }
+	            catch (final Exception e) {
+	                LOGGER
+	                      .severe("No se puede encontrar el algoritmo de canonicalizacion, la referencia no se canonicalizara: " + e); //$NON-NLS-1$
+	            }
+        	}
         }
         // Si no era XML y tuve que convertir a Base64 yo mismo declaro la
         // transformacion
@@ -724,12 +749,9 @@ public final class AOXMLDSigSigner implements AOSigner {
                 		fac.newReference(
             				"#" + objectStyleId, //$NON-NLS-1$
                             digestMethod,
-                            Collections.singletonList(
-                        		fac.newTransform(
-                    				canonicalizationAlgorithm,
-                    				(TransformParameterSpec) null
-                				)
-            				),
+                            canonicalizationTransform != null ?
+                        		Collections.singletonList(canonicalizationTransform) :
+                        			null,
             				XMLConstants.OBJURI,
                             referenceStyleId
                         )
@@ -751,7 +773,9 @@ public final class AOXMLDSigSigner implements AOSigner {
                 		fac.newReference(
             				xmlStyle.getStyleHref(),
                             digestMethod,
-                            Collections.singletonList(fac.newTransform(canonicalizationAlgorithm, (TransformParameterSpec) null)),
+                            canonicalizationTransform != null ?
+                            		Collections.singletonList(canonicalizationTransform) :
+                            			null,
                             XMLConstants.OBJURI,
                             referenceStyleId
                         )
@@ -774,8 +798,7 @@ public final class AOXMLDSigSigner implements AOSigner {
                     // inserta en el nuevo documento de firma el documento a
                     // firmar
                     docSignature.getDocumentElement().appendChild(docSignature.adoptNode(dataElement));
-                    // crea la referencia a los datos firmados que se
-                    // encontraran en el mismo documento
+                    // crea la referencia a los datos firmados que se encontraran en el mismo documento
                     referenceList.add(
                 		fac.newReference(
             				tmpUri,
@@ -789,18 +812,14 @@ public final class AOXMLDSigSigner implements AOSigner {
                 if (xmlStyle.getStyleElement() != null) {
                     // inserta en el nuevo documento de firma la hoja de estilo
                     docSignature.getDocumentElement().appendChild(docSignature.adoptNode(xmlStyle.getStyleElement()));
-                    // crea la referencia a los datos firmados que se
-                    // encontraran en el mismo documento
+                    // crea la referencia a los datos firmados que se encontraran en el mismo documento
                     referenceList.add(
                 		fac.newReference(
             				tmpStyleUri,
                             digestMethod,
-                            Collections.singletonList(
-                        		fac.newTransform(
-                    				canonicalizationAlgorithm,
-                                    (TransformParameterSpec) null
-                                )
-                            ),
+                            canonicalizationTransform != null ?
+                        		Collections.singletonList(canonicalizationTransform) :
+                        			null,
                             XMLConstants.OBJURI,
                             referenceStyleId
                         )
@@ -926,7 +945,9 @@ public final class AOXMLDSigSigner implements AOSigner {
                     		fac.newReference(
                 				xmlStyle.getStyleHref(),
                                 digestMethod,
-                                Collections.singletonList(fac.newTransform(canonicalizationAlgorithm, (TransformParameterSpec) null)),
+                                canonicalizationTransform != null ?
+                            		Collections.singletonList(canonicalizationTransform) :
+                            			null,
                                 XMLConstants.OBJURI,
                                 referenceStyleId
                             )
@@ -955,15 +976,16 @@ public final class AOXMLDSigSigner implements AOSigner {
                 // ejecutado antes otra transformacion
                 transformList.add(fac.newTransform(Transform.ENVELOPED, (TransformParameterSpec) null));
 
-                // Transformacion XPATH para eliminar el resto de firmas del
-                // documento
-                transformList.add(
-                  fac.newTransform(
-                    Transform.XPATH,
-                    new XPathFilterParameterSpec("not(ancestor-or-self::" + xmlSignaturePrefix + ":Signature)", //$NON-NLS-1$ //$NON-NLS-2$
-                    Collections.singletonMap(xmlSignaturePrefix, XMLSignature.XMLNS))
-                  )
-                );
+                if (!avoidXpathExtraTransformsOnEnveloped) {
+	                // Transformacion XPATH para eliminar el resto de firmas del documento
+	                transformList.add(
+	                  fac.newTransform(
+	                    Transform.XPATH,
+	                    new XPathFilterParameterSpec("not(ancestor-or-self::" + xmlSignaturePrefix + ":Signature)", //$NON-NLS-1$ //$NON-NLS-2$
+	                    Collections.singletonMap(xmlSignaturePrefix, XMLSignature.XMLNS))
+	                  )
+	                );
+                }
 
                 // crea la referencia
                 referenceList.add(
@@ -987,7 +1009,9 @@ public final class AOXMLDSigSigner implements AOSigner {
                 		fac.newReference(
             				xmlStyle.getStyleHref(),
             				digestMethod,
-            				Collections.singletonList(fac.newTransform(canonicalizationAlgorithm, (TransformParameterSpec) null)),
+            				canonicalizationTransform != null ?
+                        		Collections.singletonList(canonicalizationTransform) :
+                        			null,
             				XMLConstants.OBJURI,
             				referenceStyleId
         				)
@@ -1062,7 +1086,9 @@ public final class AOXMLDSigSigner implements AOSigner {
                 		fac.newReference(
             				tmpStyleUri,
                             digestMethod,
-                            Collections.singletonList(fac.newTransform(canonicalizationAlgorithm, (TransformParameterSpec) null)),
+                            canonicalizationTransform != null ?
+                        		Collections.singletonList(canonicalizationTransform) :
+                        			null,
                             XMLConstants.OBJURI,
                             referenceStyleId
                         )
@@ -1075,14 +1101,16 @@ public final class AOXMLDSigSigner implements AOSigner {
             }
 
             // genera la firma
-            final XMLSignature signature =
-                    fac.newXMLSignature(fac.newSignedInfo(fac.newCanonicalizationMethod(canonicalizationAlgorithm, (C14NMethodParameterSpec) null),
-                                                          fac.newSignatureMethod(algoUri, null),
-                                                          XmlDSigUtil.cleanReferencesList(referenceList)),
-                                        kif.newKeyInfo(content, keyInfoId),
-                                        objectList,
-                                        "Signature-" + id, //$NON-NLS-1$
-                                        "SignatureValue-" + id); //$NON-NLS-1$
+            final XMLSignature signature = fac.newXMLSignature(
+        		fac.newSignedInfo(
+					fac.newCanonicalizationMethod(canonicalizationTransform != null ? canonicalizationAlgorithm : CanonicalizationMethod.INCLUSIVE, (C14NMethodParameterSpec) null),
+    				fac.newSignatureMethod(algoUri, null),
+                    XmlDSigUtil.cleanReferencesList(referenceList)),
+                    kif.newKeyInfo(content, keyInfoId),
+                    objectList,
+                    "Signature-" + id, //$NON-NLS-1$
+                    "SignatureValue-" + id //$NON-NLS-1$
+                );
 
             final DOMSignContext signContext = new DOMSignContext(
         		key, docSignature.getDocumentElement()
@@ -1108,7 +1136,7 @@ public final class AOXMLDSigSigner implements AOSigner {
     		);
         }
         catch (final Exception e) {
-            throw new AOException("Error al generar la firma XMLdSig", e); //$NON-NLS-1$
+            throw new AOException("Error al generar la firma XMLdSig: " + e, e); //$NON-NLS-1$
         }
 
         final String signatureNodeName = (xmlSignaturePrefix == null || xmlSignaturePrefix.isEmpty() ? "" : xmlSignaturePrefix + ":") + SIGNATURE_STR; //$NON-NLS-1$ //$NON-NLS-2$
