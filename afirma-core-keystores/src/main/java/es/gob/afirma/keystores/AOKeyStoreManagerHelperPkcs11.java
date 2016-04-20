@@ -13,6 +13,8 @@ package es.gob.afirma.keystores;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.lang.reflect.Constructor;
 import java.security.KeyStore;
 import java.security.NoSuchAlgorithmException;
 import java.security.Provider;
@@ -74,17 +76,31 @@ final class AOKeyStoreManagerHelperPkcs11 {
         final String p11ProviderName = new File(p11lib).getName().replace('.', '_').replace(' ', '_');
         Provider p11Provider = Security.getProvider("SunPKCS11-" + p11ProviderName); //$NON-NLS-1$
 
+        if (p11Provider != null && Boolean.getBoolean("es.gob.afirma.keystores.DoNotReusePkcs11Provider")) { //$NON-NLS-1$
+        	LOGGER.info("Se retira el proveedor " + p11Provider); //$NON-NLS-1$
+        	Security.removeProvider(p11Provider.getName());
+        	p11Provider = null;
+        }
+
         if (p11Provider == null) {
 
-        	final byte[] config = KeyStoreUtilities.createPKCS11ConfigFile(p11lib, p11ProviderName, slot).getBytes();
-        	try {
-	        	p11Provider = new sun.security.pkcs11.SunPKCS11(new ByteArrayInputStream(config));
+            Constructor<?> sunPKCS11Contructor;
+            try {
+                sunPKCS11Contructor = Class.forName("sun.security.pkcs11.SunPKCS11").getConstructor(InputStream.class); //$NON-NLS-1$
+            }
+            catch (final Exception e) {
+                throw new MissingSunPKCS11Exception(e);
+            }
+
+            final byte[] config = KeyStoreUtilities.createPKCS11ConfigFile(p11lib, p11ProviderName, slot).getBytes();
+            try {
+                p11Provider = (Provider) sunPKCS11Contructor.newInstance(new ByteArrayInputStream(config));
             }
             catch (final Exception e) {
                 // El PKCS#11 del DNIe a veces falla a la primera pero va
                 // correctamente a la segunda asi que reintentamos una vez mas
                 try {
-                    p11Provider = new sun.security.pkcs11.SunPKCS11(new ByteArrayInputStream(config));
+                    p11Provider = (Provider) sunPKCS11Contructor.newInstance(new ByteArrayInputStream(config));
                 }
                 catch (final Exception ex) {
                     throw new AOKeyStoreManagerException(

@@ -19,6 +19,7 @@ import java.security.cert.X509Certificate;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+import java.util.StringTokenizer;
 import java.util.logging.Logger;
 
 import javax.security.auth.callback.Callback;
@@ -423,6 +424,38 @@ public final class KeyStoreUtilities {
 			chp
 		);
     	return builder.getKeyStore();
+    }
+
+    /** Busca un fichero (o una serie de ficheros) en el <i>LIBRARY PATH</i> del sistema. Deja
+     * de buscar en la primera ocurrencia.
+     * @param files Ficheros a buscar en el <i>LIBRARY PATH</i>.
+     * @return Ruta completa del fichero encontrado en el <i>LIBRARY PATH</i> o <code>null</code> si no se encontr&oacute; nada */
+    public static String searchPathForFile(final String[] files) {
+        if (files == null || files.length < 1) {
+            return null;
+        }
+
+        // Si existe el primero con el PATH completo lo devolvemos sin mas
+        if (new File(files[0]).exists()) {
+            return files[0];
+        }
+
+        final StringTokenizer st = new StringTokenizer(Platform.getJavaLibraryPath(), File.pathSeparator);
+        String libPath;
+        while (st.hasMoreTokens()) {
+            libPath = st.nextToken();
+            if (!libPath.endsWith(File.separator)) {
+                libPath = libPath + File.separator;
+            }
+            File tmpFile;
+            for (final String f : files) {
+                tmpFile = new File(libPath, f);
+                if (tmpFile.exists() && !tmpFile.isDirectory()) {
+                    return libPath + f;
+                }
+            }
+        }
+        return null;
     }
 
 }

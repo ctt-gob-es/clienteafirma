@@ -384,7 +384,7 @@ public final class AOKeyStoreManagerFactory {
         catch (final AOException e) {
             throw new AOKeystoreAlternativeException(
                  getAlternateKeyStoreType(AOKeyStore.PKCS11),
-                 "Error al inicializar el modulo PKCS#11", //$NON-NLS-1$
+                 "Error al inicializar el modulo PKCS#11: " + e, //$NON-NLS-1$
                  e
             );
         }

@@ -101,6 +101,14 @@ public enum AOKeyStore {
 		new UIPasswordCallback(KeyStoreMessages.getString("AOKeyStore.8")), //$NON-NLS-1$
 		new UIPasswordCallback(KeyStoreMessages.getString("AOKeyStore.9")) //$NON-NLS-1$
 	),
+	/** Tarjeta del Ministerio de Defensa. */
+	TEMD(
+		"TEMD (Tarjeta del Ministerio de Defensa)", //$NON-NLS-1$
+		10,
+		"PKCS11", //$NON-NLS-1$
+		null, // Sin contrasena para los certificados sueltos
+		new UIPasswordCallback(KeyStoreMessages.getString("AOKeyStore.14")) //$NON-NLS-1$
+	),
     /** Windows / Internet Explorer (CAPI, certificados de otras personas /
      * libreta de direcciones). */
     WINADDRESSBOOK(
@@ -131,6 +139,14 @@ public enum AOKeyStore {
 		"DNIe y tarjetas FNMT-TIF", //$NON-NLS-1$
 		14,
 		"DNI", //$NON-NLS-1$
+		null,
+		null
+	),
+	/** Directorio Ministerio de Defensa. */
+	LDAPMDEF(
+		"Directorio del Ministerio de Defensa", //$NON-NLS-1$
+		15,
+		"LDAPMDEF", //$NON-NLS-1$
 		null,
 		null
 	);

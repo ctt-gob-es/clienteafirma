@@ -1,6 +1,8 @@
 package es.gob.afirma.test.keystores;
 
 import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.lang.reflect.Constructor;
 import java.security.KeyStore;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.Provider;
@@ -59,14 +61,13 @@ public final class TestPkcs11 {
 	//@Ignore // Dependiente del PKCS#11
 	public void testRawPkcs11() throws Exception {
 
-		final Provider p = new sun.security.pkcs11.SunPKCS11(
-			new ByteArrayInputStream(
-				(
-					"name=pkcs11-win_dll\n" + //$NON-NLS-1$
-					"library=" + LIB_NAME + "\n" + //$NON-NLS-1$ //$NON-NLS-2$
-					"showInfo=false" //$NON-NLS-1$
-				).getBytes()
-			)
+        final Constructor<?> sunPKCS11Contructor = Class.forName("sun.security.pkcs11.SunPKCS11").getConstructor(InputStream.class); //$NON-NLS-1$
+        final Provider p = (Provider) sunPKCS11Contructor.newInstance(
+    		new ByteArrayInputStream((
+				"name=pkcs11-win_dll\n" + //$NON-NLS-1$
+				"library=" + LIB_NAME + "\n" + //$NON-NLS-1$ //$NON-NLS-2$
+				"showInfo=false" //$NON-NLS-1$
+			).getBytes())
 		);
 
 		Security.addProvider(p);
