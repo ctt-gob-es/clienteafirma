@@ -108,7 +108,7 @@ final class XAdESUtil {
 		}
 		catch (final Exception e) {
 			throw new AOException(
-				"No se ha podido instanciar la firma XML Avanzada de JXAdES", e //$NON-NLS-1$
+				"No se ha podido instanciar la firma XML Avanzada de JXAdES: " + e, e //$NON-NLS-1$
 			);
 		}
 
@@ -117,13 +117,14 @@ final class XAdESUtil {
 
 		try {
 			xmlSignature.setDigestMethod(digestMethodAlgorithm);
-			xmlSignature.setCanonicalizationMethod(canonicalizationAlgorithm);
 		}
 		catch (final Exception e) {
 			throw new AOException(
 				"No se ha podido establecer el algoritmo de huella digital: " + e, e //$NON-NLS-1$
 			);
 		}
+
+		xmlSignature.setCanonicalizationMethod(canonicalizationAlgorithm);
 
 		return xmlSignature;
 	}
@@ -326,7 +327,9 @@ final class XAdESUtil {
 			fac.newReference(
 				"#" + manifestId, //$NON-NLS-1$
 				digestMethod,
-				Collections.singletonList(canonicalizationTransform),
+				canonicalizationTransform != null ?
+					Collections.singletonList(canonicalizationTransform) :
+						new ArrayList<Transform>(0),
 				AOXAdESSigner.MANIFESTURI,
 				"Manifest" + referenceId //$NON-NLS-1$
 			)

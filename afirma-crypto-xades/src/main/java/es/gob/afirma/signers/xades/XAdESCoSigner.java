@@ -117,20 +117,31 @@ public final class XAdESCoSigner {
 
 		final String digestMethodAlgorithm = extraParams.getProperty(
 		        XAdESExtraParams.REFERENCES_DIGEST_METHOD, DIGEST_METHOD);
+
 		final String canonicalizationAlgorithm = extraParams.getProperty(
 		        XAdESExtraParams.CANONICALIZATION_ALGORITHM, CanonicalizationMethod.INCLUSIVE);
+
 		final String xadesNamespace = extraParams.getProperty(
 		        XAdESExtraParams.XADES_NAMESPACE, XADESNS);
+
 		final String signedPropertiesTypeUrl = extraParams.getProperty(
 		        XAdESExtraParams.SIGNED_PROPERTIES_TYPE_URL, XADES_SIGNED_PROPERTIES_TYPE);
+
 		final boolean addKeyInfoKeyValue = Boolean.parseBoolean(extraParams.getProperty(
 		        XAdESExtraParams.ADD_KEY_INFO_KEY_VALUE, Boolean.TRUE.toString()));
+
 		final boolean addKeyInfoKeyName = Boolean.parseBoolean(extraParams.getProperty(
 		        XAdESExtraParams.ADD_KEY_INFO_KEY_NAME, Boolean.FALSE.toString()));
+
+		final boolean addKeyInfoX509IssuerSerial = Boolean.parseBoolean(extraParams.getProperty(
+		        XAdESExtraParams.ADD_KEY_INFO_X509_ISSUER_SERIAL, Boolean.FALSE.toString()));
+
 		final boolean useManifest = Boolean.parseBoolean(extraParams.getProperty(
 		        XAdESExtraParams.USE_MANIFEST, Boolean.FALSE.toString()));
+
 		final boolean keepKeyInfoUnsigned = Boolean.parseBoolean(extraParams.getProperty(
 		        XAdESExtraParams.KEEP_KEYINFO_UNSIGNED, Boolean.FALSE.toString()));
+
 		final String outputXmlEncoding = extraParams.getProperty(
 		        XAdESExtraParams.OUTPUT_XML_ENCODING);
 
@@ -146,7 +157,9 @@ public final class XAdESCoSigner {
 		// Comprobamos que sea una URI
 		if (encoding != null && !encoding.isEmpty()) {
 			try {
+				// No se usa el objeto, solo se crea para ver si saltan excepciones
 				new URI(encoding);
+
 			}
 			catch(final Exception e) {
 				throw new AOException(
@@ -502,6 +515,7 @@ public final class XAdESCoSigner {
 					"Signature-" + UUID.randomUUID().toString(), //$NON-NLS-1$
 					addKeyInfoKeyValue,
 					addKeyInfoKeyName,
+					addKeyInfoX509IssuerSerial,
 					keepKeyInfoUnsigned
 				);
 			}

@@ -233,8 +233,11 @@ public final class XAdESSigner {
 		final String digestMethodAlgorithm = extraParams.getProperty(
 		        XAdESExtraParams.REFERENCES_DIGEST_METHOD, AOXAdESSigner.DIGEST_METHOD);
 
-		final String canonicalizationAlgorithm = extraParams.getProperty(
+		String canonicalizationAlgorithm = extraParams.getProperty(
 		        XAdESExtraParams.CANONICALIZATION_ALGORITHM, CanonicalizationMethod.INCLUSIVE);
+		if ("none".equalsIgnoreCase(canonicalizationAlgorithm)) { //$NON-NLS-1$
+			canonicalizationAlgorithm = null;
+		}
 
 		final String xadesNamespace = extraParams.getProperty(
 		        XAdESExtraParams.XADES_NAMESPACE, AOXAdESSigner.XADESNS);
@@ -256,6 +259,9 @@ public final class XAdESSigner {
 
 		final boolean addKeyInfoKeyName = Boolean.parseBoolean(extraParams.getProperty(
 		        XAdESExtraParams.ADD_KEY_INFO_KEY_NAME, Boolean.FALSE.toString()));
+
+		final boolean addKeyInfoX509IssuerSerial = Boolean.parseBoolean(extraParams.getProperty(
+		        XAdESExtraParams.ADD_KEY_INFO_X509_ISSUER_SERIAL, Boolean.FALSE.toString()));
 
 		final String precalculatedHashAlgorithm = extraParams.getProperty(
 		        XAdESExtraParams.PRECALCULATED_HASH_ALGORITHM);
@@ -591,22 +597,27 @@ public final class XAdESSigner {
 		Utils.addCustomTransforms(transformList, extraParams, AOXAdESSigner.XML_SIGNATURE_PREFIX);
 
 		final Transform canonicalizationTransform;
-		try {
-			canonicalizationTransform = fac.newTransform(
-				canonicalizationAlgorithm,
-				(TransformParameterSpec) null
-			);
+		if (canonicalizationAlgorithm != null) {
+			try {
+				canonicalizationTransform = fac.newTransform(
+					canonicalizationAlgorithm,
+					(TransformParameterSpec) null
+				);
+			}
+			catch (final Exception e1) {
+				throw new AOException(
+					"No se ha posido crear el canonizador para el algoritmo indicado (" + canonicalizationAlgorithm + "): " + e1, e1 //$NON-NLS-1$ //$NON-NLS-2$
+				);
+			}
 		}
-		catch (final Exception e1) {
-			throw new AOException(
-				"No se ha posido crear el canonizador para el algoritmo indicado (" + canonicalizationAlgorithm + "): " + e1, e1 //$NON-NLS-1$ //$NON-NLS-2$
-			);
+		else {
+			canonicalizationTransform = null;
 		}
 
 		// Solo canonicalizo si es XML
 		if (!isBase64) {
 			// Las facturas electronicas no se canonicalizan
-			if (!facturaeSign) {
+			if (!facturaeSign && canonicalizationTransform != null) {
 				try {
 					// Transformada para la canonicalizacion inclusiva
 					transformList.add(canonicalizationTransform);
@@ -720,7 +731,9 @@ public final class XAdESSigner {
 						fac.newReference(
 							xmlStyle.getStyleHref(),
 							digestMethod,
-							Collections.singletonList(canonicalizationTransform),
+							canonicalizationTransform != null ?
+								Collections.singletonList(canonicalizationTransform) :
+									new ArrayList<Transform>(0),
 							XMLConstants.OBJURI,
 							referenceStyleId
 						)
@@ -805,7 +818,9 @@ public final class XAdESSigner {
 						fac.newReference(
 							xmlStyle.getStyleHref(),
 							digestMethod,
-							Collections.singletonList(canonicalizationTransform),
+							canonicalizationTransform != null ?
+								Collections.singletonList(canonicalizationTransform) :
+									new ArrayList<Transform>(0),
 							XMLConstants.OBJURI,
 							referenceStyleId
 						)
@@ -827,11 +842,8 @@ public final class XAdESSigner {
 		// precalculado si no tenemos otro remedio
 		else if (format.equals(AOSignConstants.SIGN_FORMAT_XADES_EXTERNALLY_DETACHED)) {
 			Reference ref = null;
-			// No tenemos uri, suponemos que los datos son el message digest
-			if (precalculatedHashAlgorithm != null &&
-					(uri == null ||
-			         uri.getScheme().isEmpty() ||
-			         uri.getScheme().equals("file"))) { //$NON-NLS-1$
+			// Nos indican que los datos son el message digest
+			if (precalculatedHashAlgorithm != null) {
 
 				final DigestMethod dm;
 				try {
@@ -846,7 +858,7 @@ public final class XAdESSigner {
 					);
 				}
 				ref = fac.newReference(
-					"",  //$NON-NLS-1$
+					uri != null ? uri.toString() : "",  //$NON-NLS-1$
 					dm,
 					null,
 					XMLConstants.OBJURI,
@@ -916,7 +928,9 @@ public final class XAdESSigner {
 							fac.newReference(
 								xmlStyle.getStyleHref(),
 								digestMethod,
-								Collections.singletonList(canonicalizationTransform),
+								canonicalizationTransform != null ?
+									Collections.singletonList(canonicalizationTransform) :
+										new ArrayList<Transform>(0),
 								XMLConstants.OBJURI,
 								referenceStyleId
 							)
@@ -1014,7 +1028,9 @@ public final class XAdESSigner {
 						fac.newReference(
 							xmlStyle.getStyleHref(),
 							digestMethod,
-							Collections.singletonList(canonicalizationTransform),
+							canonicalizationTransform != null ?
+								Collections.singletonList(canonicalizationTransform) :
+									new ArrayList<Transform>(0),
 							XMLConstants.OBJURI,
 							referenceStyleId
 						)
@@ -1099,7 +1115,7 @@ public final class XAdESSigner {
 			xades,
 			signedPropertiesTypeUrl,
 			digestMethodAlgorithm,
-			canonicalizationAlgorithm
+			canonicalizationAlgorithm != null ? canonicalizationAlgorithm : CanonicalizationMethod.INCLUSIVE
 		);
 
 		// en el caso de formato enveloping se inserta el elemento Object con el
@@ -1129,7 +1145,9 @@ public final class XAdESSigner {
 					fac.newReference(
 						tmpStyleUri,
 						digestMethod,
-						Collections.singletonList(canonicalizationTransform),
+						canonicalizationTransform != null ?
+							Collections.singletonList(canonicalizationTransform) :
+								new ArrayList<Transform>(0),
 						XMLConstants.OBJURI, // Es un nodo a firmar
 						referenceStyleId
 					)
@@ -1150,7 +1168,12 @@ public final class XAdESSigner {
 
 		if (useManifest) {
 			XAdESUtil.createManifest(
-				referenceList, fac, xmlSignature, digestMethod, canonicalizationTransform, referenceId
+				referenceList,
+				fac,
+				xmlSignature,
+				digestMethod,
+				canonicalizationTransform,
+				referenceId
 			);
 		}
 
@@ -1170,6 +1193,7 @@ public final class XAdESSigner {
 				"Signature-" + UUID.randomUUID().toString(), //$NON-NLS-1$
 				addKeyInfoKeyValue,
 				addKeyInfoKeyName,
+				addKeyInfoX509IssuerSerial,
 				keepKeyInfoUnsigned
 			);
 

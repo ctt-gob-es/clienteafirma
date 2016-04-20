@@ -135,41 +135,38 @@ public final class XAdESExtraParams {
      */
     static final String AVOID_BASE64_TRANSFORMS = "avoidBase64Transforms";//$NON-NLS-1$
 
-    /**
-     * Evita cualquier interacci&oacute;n con el usuario si se establece a
+    /** Evita cualquier interacci&oacute;n con el usuario si se establece a
      * <code>true</code>, si se establece a <code>false</code> act&uacute;a
      * normalmente (puede mostrar di&aacute;logos, por ejemplo, para la
      * dereferenciaci&oacute;n de hojas de estilo enlazadas con rutas
-     * relativas). &Uacute;til para los procesos desatendidos y por lotes.
-     */
+     * relativas). &Uacute;til para los procesos desatendidos y por lotes. */
     static final String HEADLESS = "headless";//$NON-NLS-1$
 
-    /**
-     * Indica, mediante true (por defecto) o false, si debe incluirse el nodo
-     * KeyValue dentro de KeyInfo de XAdES.
-     */
+    /** Indica, mediante true (por defecto) o false, si debe incluirse el nodo
+     * KeyValue dentro de KeyInfo de XAdES. */
     static final String ADD_KEY_INFO_KEY_VALUE = "addKeyInfoKeyValue";//$NON-NLS-1$
 
-    /**
-     * Indica, mediante true o false (por defecto), si debe incluirse el nodo
-     * KeyName dentro de KeyInfo de XAdES.
-     */
+    /** Indica, mediante true o false (por defecto), si debe incluirse el nodo
+     * KeyName dentro de KeyInfo de XAdES. */
     public static final String ADD_KEY_INFO_KEY_NAME = "addKeyInfoKeyName";//$NON-NLS-1$
 
-    /**
-     * Algoritmo utilizado para el c&aacute;lculo de la huella digital cuando se
+    /** Indica, mediante true o false (por defecto), si debe incluirse el nodo
+     * X509IssuerSerial dentro de KeyInfo de XAdES. */
+    public static final String ADD_KEY_INFO_X509_ISSUER_SERIAL = "addKeyInfoX509IssuerSerial"; //$NON-NLS-1$
+
+    /** Algoritmo utilizado para el c&aacute;lculo de la huella digital cuando se
      * proporciona esta en vez de los datos a firmar. Cuando se proporcione una
      * huella en vez de datos deben tenerse en cuenta los siguientes aspectos:
      * <ul>
-     * <li>
-     * La huella digital debe indicarse en lugar de los datos, en el mismo
-     * par&aacute;metro del m&eacute;todo de firma.</li>
-     * <li>
-     * <b>Solo puede indicarse una huella cuando no se incluyan los datos dentro
-     * de la propia firma, es decir, en firmas <i>externally detached</i>,
-     * siendo conveniente adem&aacute;s hacer uso de un <i>Manifest</i>.</b></li>
-     * </ul>
-     */
+     *  <li>
+     *   La huella digital debe indicarse en lugar de los datos, en el mismo
+     *   par&aacute;metro del m&eacute;todo de firma.</li>
+     *  <li>
+     *   Solo puede indicarse una huella cuando no se incluyan los datos dentro
+     *   de la propia firma, es decir, en firmas <i>externally detached</i>,
+     *   siendo conveniente adem&aacute;s hacer uso de un <i>Manifest</i>.
+     *  </li>
+     * </ul> */
     static final String PRECALCULATED_HASH_ALGORITHM = "precalculatedHashAlgorithm";//$NON-NLS-1$
 
     /** Indica, mediante un <code>true</code> o <code>false</code>, si se deben

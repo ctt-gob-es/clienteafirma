@@ -622,6 +622,7 @@ public final class XAdESCounterSigner {
 					"Signature-" + UUID.randomUUID().toString(), //$NON-NLS-1$
 					Boolean.parseBoolean(extraParams.getProperty(XAdESExtraParams.ADD_KEY_INFO_KEY_VALUE, Boolean.TRUE.toString())),
 					Boolean.parseBoolean(extraParams.getProperty(XAdESExtraParams.ADD_KEY_INFO_KEY_NAME, Boolean.FALSE.toString())),
+					Boolean.parseBoolean(extraParams.getProperty(XAdESExtraParams.ADD_KEY_INFO_X509_ISSUER_SERIAL, Boolean.FALSE.toString())),
 					Boolean.parseBoolean(extraParams.getProperty(XAdESExtraParams.KEEP_KEYINFO_UNSIGNED, Boolean.FALSE.toString()))
 				);
 			}

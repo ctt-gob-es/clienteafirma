@@ -46,11 +46,11 @@ import es.gob.afirma.signers.xml.style.XmlStyle;
 /** Derivado de <code>net.java.xades.security.xml.XAdES.XMLAdvancedSignature</code> con los
  * siguientes cambios:
  * <ul>
- * <li>En el <i>KeyInfo</i> no se a&ntilde;aden los elementos <i>SubjectX500Principal</i> y <i>X509IssuerSerial</i></li>
- * <li>Se puede establecer el algoritmo de firma</li>
- * <li>Se puede establecer el algoritmo de canonicalizaci&oacute;n para la firma</li>
- * <li>Se puede establecer la URL del espacio de nombres de XAdES</li>
- * <li>Se puede a&ntilde;adir una hoja de estilo en modo <i>enveloping</i> dentro de la firma
+ *  <li>En el <i>KeyInfo</i> no se a&ntilde;aden los elementos <i>SubjectX500Principal</i> y <i>X509IssuerSerial</i>.</li>
+ *  <li>Se puede establecer el algoritmo de firma.</li>
+ *  <li>Se puede establecer el algoritmo de canonicalizaci&oacute;n para la firma.</li>
+ *  <li>Se puede establecer la URL del espacio de nombres de XAdES.</li>
+ *  <li>Se puede a&ntilde;adir una hoja de estilo en modo <i>enveloping</i> dentro de la firma.</li>
  * </ul> */
 final class AOXMLAdvancedSignature extends XMLAdvancedSignature {
 
@@ -95,7 +95,9 @@ final class AOXMLAdvancedSignature extends XMLAdvancedSignature {
     private KeyInfo newKeyInfo(final List<Certificate> certs,
     		                   final String keyInfoId,
     		                   final boolean addKeyValue,
-    		                   final boolean addKeyName) throws KeyException {
+    		                   final boolean addKeyName,
+    		                   final boolean addIssuerSerial) throws KeyException {
+
     	final List<Certificate> certificates = EscapeHelper.getEscapedCertificates(certs);
         final KeyInfoFactory keyInfoFactory = getXMLSignatureFactory().getKeyInfoFactory();
         final List<Certificate> x509DataList = new ArrayList<Certificate>();
@@ -120,6 +122,16 @@ final class AOXMLAdvancedSignature extends XMLAdvancedSignature {
 				)
 			);
         }
+        if (addIssuerSerial) {
+        	newList.add(
+	    		keyInfoFactory.newX509IssuerSerial(
+    				EscapeHelper.escapeLdapName(
+						((X509Certificate) certificates.get(0)).getIssuerX500Principal().toString()
+					),
+					((X509Certificate) certificates.get(0)).getSerialNumber()
+				)
+			);
+        }
         return keyInfoFactory.newKeyInfo(newList, keyInfoId);
     }
 
@@ -130,6 +142,7 @@ final class AOXMLAdvancedSignature extends XMLAdvancedSignature {
               final String signatureIdPrefix,
               final boolean addKeyInfoKeyValue,
               final boolean addKeyInfoKeyName,
+              final boolean addKeyInfoX509IssuerSerial,
               final boolean keepKeyInfoUnsigned) throws MarshalException,
                                                         GeneralSecurityException,
                                                         XMLSignatureException {
@@ -178,7 +191,13 @@ final class AOXMLAdvancedSignature extends XMLAdvancedSignature {
                 fac.newSignatureMethod(signatureMethod, null),
                 documentReferences
             ),
-            newKeyInfo(certificates, keyInfoId, addKeyInfoKeyValue, addKeyInfoKeyName),
+            newKeyInfo(
+        		certificates,
+        		keyInfoId,
+        		addKeyInfoKeyValue,
+        		addKeyInfoKeyName,
+        		addKeyInfoX509IssuerSerial
+    		),
             getXMLObjects(),
             getSignatureId(signatureIdPrefix),
             getSignatureValueId(signatureIdPrefix)
