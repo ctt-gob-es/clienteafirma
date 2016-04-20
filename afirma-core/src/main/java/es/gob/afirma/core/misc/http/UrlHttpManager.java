@@ -21,10 +21,15 @@ public interface UrlHttpManager {
 	 * @param url URL a leer
 	 * @param timeout Timeout.
 	 * @param contentType Content-Type a insertar en la cabecera de la petici&oacute;n HTTP.
+	 * @param accept Tipo de contenido que se acepta como respuesta.
 	 * @param method M&eacute;todo HTTP.
 	 * @return Contenido de la URL
 	 * @throws IOException Si no se puede leer la URL */
-	byte[] readUrl(final String url, final int timeout, final String contentType, final UrlHttpMethod method) throws IOException;
+	byte[] readUrl(final String url,
+			       final int timeout,
+			       final String contentType,
+			       final String accept,
+			       final UrlHttpMethod method) throws IOException;
 
 	/** Lee una URL HTTP o HTTPS.
 	 * @param url URL a leer.

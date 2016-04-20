@@ -14,7 +14,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStreamWriter;
+import java.io.OutputStream;
 import java.net.CookieHandler;
 import java.net.CookieManager;
 import java.net.CookiePolicy;
@@ -44,6 +44,7 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
 import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.Platform;
 
 /** Clase para la lectura y env&iacute;o de datos a URL remotas.
@@ -58,6 +59,9 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 	public static final int DEFAULT_TIMEOUT = -1;
 
 	private static final String HTTPS = "https"; //$NON-NLS-1$
+
+	private static final String URN_SEPARATOR = ":"; //$NON-NLS-1$
+	private static final String PROT_SEPARATOR = URN_SEPARATOR + "//"; //$NON-NLS-1$
 
 	private static final HostnameVerifier DEFAULT_HOSTNAME_VERIFIER = HttpsURLConnection.getDefaultHostnameVerifier();
 	private static final SSLSocketFactory DEFAULT_SSL_SOCKET_FACTORY = HttpsURLConnection.getDefaultSSLSocketFactory();
@@ -74,8 +78,8 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 		CookieHandler.setDefault(cookieManager);
 	}
 
-	UrlHttpManagerImpl() {
-		// Vacio y "default"
+	protected UrlHttpManagerImpl() {
+		// Vacio y "protected"
 	}
 
 	private static final TrustManager[] DUMMY_TRUST_MANAGER = new TrustManager[] {
@@ -94,7 +98,7 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 
 	@Override
 	public byte[] readUrl(final String url, final UrlHttpMethod method) throws IOException {
-		return readUrl(url, DEFAULT_TIMEOUT, null, method);
+		return readUrl(url, DEFAULT_TIMEOUT, null, null, method);
 	}
 
 	private static boolean isLocal(final URL url) {
@@ -111,12 +115,37 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 	}
 
 	@Override
-	public byte[] readUrl(final String url,
+	public byte[] readUrl(final String urlToRead,
 			              final int timeout,
 			              final String contentType,
+			              final String accept,
 			              final UrlHttpMethod method) throws IOException {
-		if (url == null) {
+		if (urlToRead == null) {
 			throw new IllegalArgumentException("La URL a leer no puede ser nula"); //$NON-NLS-1$
+		}
+
+		// Vemos si lleva usuario y contrasena
+		final String authString;
+		final String url;
+		final URLName un = new URLName(urlToRead);
+
+		if (un.getUsername() != null || un.getPassword() != null) {
+			final String tmpStr;
+			if (un.getUsername() != null && un.getPassword() != null) {
+				tmpStr = un.getUsername() + URN_SEPARATOR + un.getPassword();
+			}
+			else if (un.getUsername() != null) {
+				tmpStr = un.getUsername();
+			}
+			else {
+				tmpStr = un.getPassword();
+			}
+			authString = Base64.encode(tmpStr.getBytes());
+			url = un.getProtocol() + PROT_SEPARATOR + un.getHost() + (un.getPort() != -1 ? URN_SEPARATOR + Integer.toString(un.getPort()) : "") + "/" + un.getFile(); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+		else {
+			url = urlToRead;
+			authString = null;
 		}
 
 		String urlParameters = null;
@@ -152,11 +181,18 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 
 		conn.setRequestMethod(method.toString());
 
-		conn.addRequestProperty("Accept", "*/*"); //$NON-NLS-1$ //$NON-NLS-2$
+		if (authString != null) {
+			conn.addRequestProperty("Authorization", "Basic " + authString); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+		conn.addRequestProperty(
+			"Accept", //$NON-NLS-1$
+			accept != null ? accept : "*/*" //$NON-NLS-1$
+		);
 		conn.addRequestProperty("Connection", "keep-alive"); //$NON-NLS-1$ //$NON-NLS-2$
 		if (contentType != null) {
-			conn.addRequestProperty("Content-type", contentType); //$NON-NLS-1$
+			conn.addRequestProperty("Content-Type", contentType); //$NON-NLS-1$
 		}
+
 		conn.addRequestProperty("Host", uri.getHost()); //$NON-NLS-1$
 		conn.addRequestProperty("Origin", uri.getProtocol() +  "://" + uri.getHost()); //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -166,13 +202,14 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 		}
 
 		if (urlParameters != null) {
+			conn.setRequestProperty("Content-Length", String.valueOf(urlParameters.length())); //$NON-NLS-1$
 			conn.setDoOutput(true);
-			final OutputStreamWriter writer = new OutputStreamWriter(
-				conn.getOutputStream()
-			);
-			writer.write(urlParameters);
-			writer.flush();
-			writer.close();
+
+			final OutputStream os = conn.getOutputStream();
+
+			os.write(urlParameters.getBytes("UTF-8")); //$NON-NLS-1$
+
+			os.close();
 		}
 
 		conn.connect();
@@ -233,16 +270,17 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 		);
 	}
 
-	/**
-	 * Devuelve un KeyManager a utilizar cuando se desea deshabilitar las comprobaciones de certificados en las conexiones SSL.
+
+
+	/** Devuelve un KeyManager a utilizar cuando se desea deshabilitar las comprobaciones de certificados en las conexiones SSL.
 	 * @return KeyManager[] Se genera un KeyManager[] utilizando el keystore almacenado en las propiedades del sistema.
 	 * @throws KeyStoreException Si no se puede cargar el KeyStore SSL.
 	 * @throws NoSuchAlgorithmException Si el JRE no soporta alg&uacute;n algoritmo necesario.
 	 * @throws CertificateException Si los certificados del KeyStore SSL son inv&aacute;lidos.
 	 * @throws IOException Si hay errores en la carga del fichero KeyStore SSL.
 	 * @throws UnrecoverableKeyException Si una clave del KeyStore SSL es inv&aacute;lida.
-	 * @throws NoSuchProviderException Si ocurre un error al recuperar la instancia del Keystore.
-	 */
+	 * @throws NoSuchProviderException Si ocurre un error al recuperar la instancia del KeyStore. */
+
 	private static KeyManager[] getKeyManager() throws KeyStoreException,
 	                                                   NoSuchAlgorithmException,
 	                                                   CertificateException,
