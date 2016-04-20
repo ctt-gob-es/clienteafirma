@@ -47,10 +47,9 @@ public final class MiniTestDNI {
     public void testCAdESDNIe() throws Exception {
 
         final Constructor<?> sunPKCS11Contructor = Class.forName("sun.security.pkcs11.SunPKCS11").getConstructor(InputStream.class); //$NON-NLS-1$
-
-		final Provider p = (Provider) sunPKCS11Contructor.newInstance(new ByteArrayInputStream(DNIE_DRIVER_PATH.getBytes()));
-
+        final Provider p = (Provider) sunPKCS11Contructor.newInstance(new ByteArrayInputStream(DNIE_DRIVER_PATH.getBytes()));
         Security.addProvider(p);
+
         final KeyStore ks = KeyStore.getInstance("PKCS11", p); //$NON-NLS-1$
         ks.load(null, DNI_PIN);
 
