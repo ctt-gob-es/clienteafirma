@@ -108,12 +108,6 @@ SetCompress auto
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 Section "Programa" sPrograma
-
-	;Se cierran los navegadores abiertos
-
-	${nsProcess::FindProcess} "firefox.exe" $R3
-	StrCmp $R3 0 0 +1
-	${nsProcess::KillProcess} "firefox.exe" $R0
 	
 	; Hacemos esta seccion de solo lectura para que no la desactiven
 	SectionIn RO
@@ -240,6 +234,7 @@ Section "Programa" sPrograma
 	${nsProcess::FindProcess} "chrome.exe" $R3
 	StrCmp $R3 0 0 +1
 	${nsProcess::KillProcess} "chrome.exe" $R0
+	Sleep 2000
 	
 	; Configuramos la aplicacion (generacion de certificados) e importacion en Firefox
 	ExecWait '"$INSTDIR\AutoFirma\AutoFirmaConfigurador.exe" /passive'

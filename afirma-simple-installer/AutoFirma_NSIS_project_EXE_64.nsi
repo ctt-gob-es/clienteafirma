@@ -276,6 +276,7 @@ Section "Programa" sPrograma
 	${nsProcess::FindProcess} "chrome.exe" $R3
 	StrCmp $R3 0 0 +1
 	${nsProcess::KillProcess} "chrome.exe" $R0
+	Sleep 2000
 	
 	; Configuramos la aplicacion (generacion de certificados) e importacion en Firefox
 	ExecWait '"$INSTDIR\AutoFirma\AutoFirmaConfigurador.exe" /passive'
@@ -606,6 +607,7 @@ Section "uninstall"
 	${nsProcess::FindProcess} "chrome.exe" $R3
 	StrCmp $R3 0 0 +1
 	${nsProcess::KillProcess} "chrome.exe" $R0
+	Sleep 2000
 	
 	;Eliminamos los certificados del sistema
 	Call un.DeleteCertificate
