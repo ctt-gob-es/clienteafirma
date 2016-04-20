@@ -289,7 +289,7 @@ public final class CheckHashDialog extends JDialog implements KeyListener {
 
 	}
 
-	static boolean checkHash(final String fileNameHash, final String fileNameData) throws IOException {
+static boolean checkHash(final String fileNameHash, final String fileNameData) throws IOException {
 		if (fileNameHash == null || fileNameHash.isEmpty() || fileNameData == null || fileNameData.isEmpty()) {
 			throw new IllegalArgumentException();
 		}
@@ -307,8 +307,11 @@ public final class CheckHashDialog extends JDialog implements KeyListener {
 		try {
 			return arrayEquals(
 				hashBytes,
+
 				MessageDigest.getInstance(
 					getHashAlgorithm(hashBytes)
+
+
 				).digest(dataBytes)
 			);
 		}

@@ -9,15 +9,11 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -55,7 +51,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import es.gob.afirma.core.AOCancelledOperationException;
-import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.ui.AOUIFactory;
@@ -537,11 +532,13 @@ public final class CreateHashFiles extends JDialog {
 					final Iterator<Path> it = paths.iterator();
 					while (it.hasNext()) {
 						final Path path = it.next();
-						if (!Files.isDirectory(path)) {
-							if (!path.getFileName().toString().contains("~$") && //$NON-NLS-1$
-									!FILES_TO_AVOID.contains(path.getFileName().toString())) {
-								directoryHash.put(path.getFileName().toString(), generateHash(path, algorithm));
-							}
+						if (!Files.isDirectory(path) &&
+							!path.getFileName().toString().contains("~$") && //$NON-NLS-1$
+							!FILES_TO_AVOID.contains(path.getFileName().toString())) {
+								directoryHash.put(
+									path.getFileName().toString(),
+									HashUtil.getFileHash(algorithm, path)
+								);
 						}
 					}
 				}
@@ -590,31 +587,17 @@ public final class CreateHashFiles extends JDialog {
 			}
 			else {
 				if (!relativePath.contains("~$") && !FILES_TO_AVOID.contains(path.getFileName().toString())) { //$NON-NLS-1$
-					directoryHash.put(relativePath, generateHash(path, algorithm));
+					directoryHash.put(
+						relativePath,
+						HashUtil.getFileHash(algorithm, path)
+					);
 				}
 			}
 		}
 		return directoryHash;
 	}
 
-	/** Genera la huella digital de un fichero.
-	 * @param path Nombre (con ruta) del fichero.
-	 * @param algorithm Algoritmo de huella.
-	 * @return Valor de la huella.
-	 * @throws IOException Si hay errores en el tratamiento del fichero.
-	 * @throws FileNotFoundException Si el fichero indicado no existe.
-	 * @throws NoSuchAlgorithmException Si no se encuentra el algoritmo de huella. */
-	public static byte[] generateHash(final Path path, final String algorithm) throws FileNotFoundException,
-	                                                                                  IOException,
-	                                                                                  NoSuchAlgorithmException {
-		try (
-			final InputStream is = new FileInputStream(path.toFile());
-		) {
-			final byte[] data = AOUtil.getDataFromInputStream(is);
-			final byte[] hash = MessageDigest.getInstance(algorithm).digest(data);
-			return hash;
-		}
-	}
+
 	// ------- Fin.
 
 	// ---------------- Metodos get.

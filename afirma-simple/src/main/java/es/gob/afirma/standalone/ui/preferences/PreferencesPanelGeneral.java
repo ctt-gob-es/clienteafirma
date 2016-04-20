@@ -153,7 +153,7 @@ final class PreferencesPanelGeneral extends JPanel {
 		signConstraint.fill = GridBagConstraints.HORIZONTAL;
 		signConstraint.weightx = 1.0;
 		signConstraint.gridy = 0;
-		signConstraint.insets = new Insets(5, 7, 5, 7);
+		signConstraint.insets = new Insets(0, 0, 0, 0);
 
 		final JButton importConfigFromFileButton = new JButton(
 			SimpleAfirmaMessages.getString("PreferencesPanel.107") //$NON-NLS-1$
@@ -224,6 +224,24 @@ final class PreferencesPanelGeneral extends JPanel {
 		);
 		importConfigFromFileButton.setEnabled(unprotected);
 
+		final JButton restoreConfigFromFileButton = new JButton(
+			SimpleAfirmaMessages.getString("PreferencesPanel.135") //$NON-NLS-1$
+		);
+
+		restoreConfigFromFileButton.setMnemonic('R');
+		restoreConfigFromFileButton.addActionListener(
+			new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent ae) {
+					//Por hacer
+				}
+			}
+		);
+		restoreConfigFromFileButton.getAccessibleContext().setAccessibleDescription(
+			SimpleAfirmaMessages.getString("PreferencesPanel.136") //$NON-NLS-1$
+		);
+		restoreConfigFromFileButton.setEnabled(unprotected);
+
 		this.showIconInit.getAccessibleContext().setAccessibleDescription(
 				SimpleAfirmaMessages.getString("PreferencesPanel.114") //$NON-NLS-1$
 		);
@@ -231,9 +249,16 @@ final class PreferencesPanelGeneral extends JPanel {
 		this.showIconInit.addItemListener(modificationListener);
 		this.showIconInit.addKeyListener(keyListener);
 
-		// TODO: Descomentar una vez se entregue
-		signConfigPanel.add(importConfigFromFileButton, signConstraint);
+		final JPanel panel = new JPanel();
+		panel.setLayout(new FlowLayout(FlowLayout.LEFT));
 
+		panel.add(importConfigFromFileButton);
+		panel.add(restoreConfigFromFileButton);
+
+		// TODO: Descomentar una vez se entregue
+		signConfigPanel.add(panel, signConstraint);
+
+		signConstraint.insets = new Insets(5, 7, 3, 7);
 		signConstraint.anchor = GridBagConstraints.LINE_START;
 
 		// TODO: Descomentar una vez se entregue
@@ -297,7 +322,7 @@ final class PreferencesPanelGeneral extends JPanel {
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.weightx = 1.0;
 		c.gridy = 0;
-		c.insets = new Insets(5, 7, 5, 7);
+		c.insets = new Insets(0, 7, 0, 7);
 
 		final JPanel signatureAgorithmPanel = new JPanel(fLayout);
 		signatureAgorithmPanel.setBorder(

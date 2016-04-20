@@ -393,21 +393,20 @@ public final class CheckHashFiles extends JDialog {
 	 * @param expectedFileHash Fichero con el XML que almacena todas las huellas
 	 *        digitales
 	 *        del directorio.
-	 * @param alg Algoritmo con el que fue generado el xml.
+	 * @param alg Algoritmo de huella con el que fueron generadas las huellas del XML.
 	 * @return Si se ha podido realizar la comprobaci&oacute;n entre el fichero
 	 *         seleccionado y la huella digital.
 	 * @throws IOException Error al abrir o cerrar el fichero seleccionado.
-	 * @throws NoSuchAlgorithmException Error al construir la implementacion de
-	 *         un algoritmo.
-	 * @throws FileNotFoundException Error si el fichero seleccionado no
-	 *         existe. */
+	 * @throws NoSuchAlgorithmException Si no se soporta el algoritmo de huella.
+	 * @throws FileNotFoundException Si el fichero seleccionado no
+	 *                               existe. */
 	static boolean checkFileHash(final Path file,
 			                     final byte[] expectedFileHash,
 			                     final String alg) throws FileNotFoundException,
 			                                              NoSuchAlgorithmException,
 			                                              IOException {
 
-		final byte[] newHash = CreateHashFiles.generateHash(file, alg);
+		final byte[] newHash = HashUtil.getFileHash(alg, file);
 		return Arrays.equals(newHash, expectedFileHash);
 	}
 

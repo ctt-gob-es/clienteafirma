@@ -40,7 +40,7 @@ final class ProxyPanel extends JPanel{
 
 	private static final long serialVersionUID = -5919574790093890970L;
 	private static final int PREFERRED_WIDTH = 420;
-	private static final int PREFERRED_HEIGHT = 240;
+	private static final int PREFERRED_HEIGHT = 210;
 
 	static final String URL_CHECK_CONNECTION = "http://www.google.com"; //$NON-NLS-1$
 	static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$

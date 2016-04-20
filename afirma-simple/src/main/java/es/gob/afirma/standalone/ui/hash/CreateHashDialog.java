@@ -14,7 +14,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.security.MessageDigest;
 import java.util.logging.Logger;
 
 import javax.swing.JButton;
@@ -28,7 +27,6 @@ import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
 import es.gob.afirma.core.AOCancelledOperationException;
-import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.ui.AOUIFactory;
@@ -279,7 +277,6 @@ public final class CreateHashDialog extends JDialog implements KeyListener{
 		setSize(600, 280);
 		setResizable(false);
 		setLocationRelativeTo(parent);
-
 	}
 
 	static void doHashProcess(final Frame parent,
@@ -294,10 +291,7 @@ public final class CreateHashDialog extends JDialog implements KeyListener{
 				currentFrame.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 			}
 
-			final byte[] data = AOUtil.getDataFromInputStream(is);
-			final byte[] hash = MessageDigest.getInstance(
-				hashAlgorithm
-			).digest(data);
+			final byte[] hash = HashUtil.getFileHash(hashAlgorithm, file);
 
 			final String ext = base64 ? ".hashb64" : ".hash"; //$NON-NLS-1$ //$NON-NLS-2$
 
