@@ -5,4 +5,4 @@ issuerCertFile=/validation/dnie/ACDNIE003-SHA1.crt
 signOcspRequest=false
 
 # URL del responder OCSP
-responderUrl=http://ocsp.dnielectronico.es/	
+responderUrl=http://ocsp.dnielectronico.es/
