@@ -15,11 +15,11 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.StringTokenizer;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Platform;
+import es.gob.afirma.keystores.KeyStoreUtilities;
 
 /** Clase para la obtenci&oacute;n de los m&oacute;dulos PKCS#11 instalados en la
  * base de datos <i>secmod.db</i> de Mozilla / Firefox. */
@@ -86,7 +86,7 @@ public final class AOSecMod {
         final String libName = new String(secmoddb, namesRunningOffset + 2, len);
 
         if (isWindowsLib(libName) || isUnixLib(libName)) {
-            final String trueLibName = searchPathForFile(
+            final String trueLibName = KeyStoreUtilities.searchPathForFile(
         		new String[] {
     				libName
         		}
@@ -214,39 +214,6 @@ public final class AOSecMod {
      * @return N&uacute;mero entero de 16 bits (sin signo) */
     private static int getShort(final byte[] src, final int offset) {
         return src[offset + 0] << 8 | src[offset + 1];
-    }
-
-    /** Busca un fichero (o una serie de ficheros) en el PATH del sistema. Deja
-     * de buscar en la primera ocurrencia
-     * @param files
-     *        Ficheros a buscar en el PATH
-     * @return Ruta completa del fichero encontrado en el PATH o <code>null</code> si no se encontr&oacute; nada */
-    private static String searchPathForFile(final String[] files) {
-        if (files == null || files.length < 1) {
-            return null;
-        }
-
-        // Si existe el primero con el PATH completo lo devolvemos sin mas
-        if (new File(files[0]).exists()) {
-            return files[0];
-        }
-
-        final StringTokenizer st = new StringTokenizer(Platform.getJavaLibraryPath(), File.pathSeparator);
-        String libPath;
-        while (st.hasMoreTokens()) {
-            libPath = st.nextToken();
-            if (!libPath.endsWith(File.separator)) {
-                libPath = libPath + File.separator;
-            }
-            File tmpFile;
-            for (final String f : files) {
-                tmpFile = new File(libPath, f);
-                if (tmpFile.exists() && !tmpFile.isDirectory()) {
-                    return libPath + f;
-                }
-            }
-        }
-        return null;
     }
 
 }

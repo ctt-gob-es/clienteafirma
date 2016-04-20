@@ -18,6 +18,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.reflect.InvocationTargetException;
 import java.security.Provider;
 import java.security.Security;
 import java.util.HashSet;
@@ -480,7 +481,14 @@ public final class MozillaKeyStoreUtilities {
 	}
 
 	static Provider loadNSS(final boolean useSharedNss) throws IOException,
-	                                                           AOException {
+	                                                           AOException,
+	                                                           InstantiationException,
+	                                                           IllegalAccessException,
+	                                                           IllegalArgumentException,
+	                                                           InvocationTargetException,
+	                                                           NoSuchMethodException,
+	                                                           SecurityException,
+	                                                           ClassNotFoundException {
 
 		final String nssDirectory = MozillaKeyStoreUtilities.getSystemNSSLibDir();
 		final String p11NSSConfigFile = MozillaKeyStoreUtilities.createPKCS11NSSConfigFile(
@@ -495,7 +503,9 @@ public final class MozillaKeyStoreUtilities {
 
 		Provider p = null;
 		try {
-			p = new sun.security.pkcs11.SunPKCS11(new ByteArrayInputStream(p11NSSConfigFile.getBytes()));
+			p = (Provider) Class.forName("sun.security.pkcs11.SunPKCS11") //$NON-NLS-1$
+				.getConstructor(InputStream.class)
+					.newInstance(new ByteArrayInputStream(p11NSSConfigFile.getBytes()));
 		}
 		catch (final Exception e) {
 			// No se ha podido cargar el proveedor sin precargar las dependencias
@@ -509,12 +519,16 @@ public final class MozillaKeyStoreUtilities {
 			}
 
 			try {
-				p = new sun.security.pkcs11.SunPKCS11(new ByteArrayInputStream(p11NSSConfigFile.getBytes()));
+				p = (Provider) Class.forName("sun.security.pkcs11.SunPKCS11") //$NON-NLS-1$
+					.getConstructor(InputStream.class)
+						.newInstance(new ByteArrayInputStream(p11NSSConfigFile.getBytes()));
 			}
 			catch (final Exception e2) {
 				// Un ultimo intento de cargar el proveedor valiendonos de que es posible que
 				// las bibliotecas necesarias se hayan cargado tras el ultimo intento
-				p = new sun.security.pkcs11.SunPKCS11(new ByteArrayInputStream(p11NSSConfigFile.getBytes()));
+				p = (Provider) Class.forName("sun.security.pkcs11.SunPKCS11") //$NON-NLS-1$
+					.getConstructor(InputStream.class)
+					.newInstance(new ByteArrayInputStream(p11NSSConfigFile.getBytes()));
 			}
 		}
 

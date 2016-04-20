@@ -154,7 +154,7 @@ public class MozillaUnifiedKeyStoreManager extends AggregatedKeyStoreManager {
 			AOKeyStore.PKCS11,
 			null,
 			new UIPasswordCallback(
-				FirefoxKeyStoreMessages.getString("MozillaUnifiedKeyStoreManager.1") + " " + MozillaKeyStoreUtilities.getMozModuleName(descr.toString()), //$NON-NLS-1$ //$NON-NLS-2$
+				FirefoxKeyStoreMessages.getString("MozillaUnifiedKeyStoreManager.1") + " " + descr, //$NON-NLS-1$ //$NON-NLS-2$
 				parentComponent
 			),
 			new String[] {
