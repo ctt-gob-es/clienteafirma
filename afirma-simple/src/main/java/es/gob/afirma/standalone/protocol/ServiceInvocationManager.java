@@ -8,6 +8,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.BindException;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
@@ -311,15 +312,15 @@ final class ServiceInvocationManager {
 
 	/** Intenta realizar una conexi&oacute; por socket en los puertos que se pasan por par&aacute;metro.
 	 * @param ports Puertos a probar.
-	 * @param socket Socket que se intenta conectar.
+	 * @param ssFactory Factoria para la creaci&oacute;n de la conexi&oacute;n por socket.
 	 * @throws IOException Si ocurren errores durante el intento. */
-	private static void tryPorts(final int[] ports, final SSLServerSocketFactory  socket) throws IOException {
+	private static void tryPorts(final int[] ports, final SSLServerSocketFactory  ssFactory) throws IOException {
 
 		checkNullParameter(ports, "La lista de puertos no puede ser nula"); //$NON-NLS-1$
-		checkNullParameter(socket, "El socket servidor no puede ser nulo"); //$NON-NLS-1$
+		checkNullParameter(ssFactory, "El socket servidor no puede ser nulo"); //$NON-NLS-1$
 		for (final int port : ports) {
 			try {
-				ssocket = (SSLServerSocket) socket.createServerSocket(port);
+				ssocket = (SSLServerSocket) ssFactory.createServerSocket(port, 0, InetAddress.getByName(null));
 				LOGGER.info("Establecido el puerto " + port + " para el servicio Cliente @firma"); //$NON-NLS-1$ //$NON-NLS-2$
 				return;
 			}
