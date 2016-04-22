@@ -1,7 +1,6 @@
 package es.gob.afirma.standalone.ui.envelopes;
 
 import java.awt.Component;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,6 +20,10 @@ import es.gob.afirma.keystores.AOKeyStore;
 import es.gob.afirma.keystores.KeyStoreConfiguration;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 
+/**
+ * Uitilidades para sobres digitales.
+ * @author Mariano Mart&iacute;nez
+ */
 public class EnvelopesUtils {
 
 	private EnvelopesUtils() {
@@ -50,7 +53,9 @@ public class EnvelopesUtils {
 
     /** Recupera los almacenes compatibles con el sistema y preparados
      * para contener certificados para envoltura de datos.
-     * @return Listado de almacenes. */
+     * @param enableLDAPMDEF <code>true</code> para habilitar el directorio del Ministerio de Defensa.
+     * @return Listado de almacenes.
+     * */
     public static KeyStoreConfiguration[] getKeyStoresToWrap() {
 
         final List<KeyStoreConfiguration> stores = new ArrayList<>();
@@ -68,18 +73,17 @@ public class EnvelopesUtils {
 
     /**
      * Obtiene el fichero elegido por el usuario dependiendo de la extension que haya elegido en el combobox.
-     * @return El nombre del fichero seleccionado.
+     * @return El fichero seleccionado.
      */
     static File addFileSelected(final String[] extension,
     					 final JComboBox<KeyStoreConfiguration> comboDestinatarios,
-    					 final BufferedImage icon,
     					 final Component parent) {
 
 		final File file;
 		try {
 			if (extension[0] != null) {
 				Logger.getLogger("es.gob.afirma").info( //$NON-NLS-1$
-					"Boton de anadir -> " + extension[0] //$NON-NLS-1$
+					"Anadir fichero de tipo: " + extension[0] //$NON-NLS-1$
 				);
 			}
 			file = AOUIFactory.getLoadFiles(
@@ -90,18 +94,19 @@ public class EnvelopesUtils {
 				comboDestinatarios.getSelectedItem().toString(),
 				false,
 				false,
-				icon,
+				null,
 				parent
 			)[0];
 		}
 		catch (final AOCancelledOperationException e) {
 			Logger.getLogger("es.gob.afirma").info( //$NON-NLS-1$
-				"Accion cancelada por el usuario" + e //$NON-NLS-1$
+				"Accion cancelada por el usuario: " + e //$NON-NLS-1$
 			);
 			return null;
 		}
 		if (!file.canRead()) {
-			AOUIFactory.showErrorMessage(icon,
+			AOUIFactory.showErrorMessage(
+				parent,
 				SimpleAfirmaMessages.getString("MenuValidation.6"), //$NON-NLS-1$
 				SimpleAfirmaMessages.getString("MenuValidation.5"), //$NON-NLS-1$
 				JOptionPane.ERROR_MESSAGE
@@ -111,10 +116,11 @@ public class EnvelopesUtils {
     }
 
     /** Lectura de fichero.
-     * @param filepath
-     * @return
-     * @throws java.io.FileNotFoundException
-     * @throws IOException */
+     * @param filepath Ruta del fichero a leer.
+     * @return Array de bytes del contenido del fichero.
+     * @throws java.io.FileNotFoundException Excepci&oacute; si no encuentra el fichero.
+     * @throws IOException Excepci&oacute; si falla la lectura del fichero.
+     * */
     static byte[] readFile(final String filepath) throws IOException {
         try ( final InputStream fileIn = AOUtil.loadFile(AOUtil.createURI(filepath)); ) {
             return AOUtil.getDataFromInputStream(fileIn);

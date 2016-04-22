@@ -8,7 +8,6 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.image.BufferedImage;
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
@@ -24,30 +23,26 @@ public final class DigitalEnvelopeEnd extends JDialog {
 
 	private static final long serialVersionUID = 4673856930142046569L;
 	static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
-	final JDialog dialog;
-	JDialog getDialog() {
+	final DigitalEnvelopePresentation dialog;
+	DigitalEnvelopePresentation getDialog() {
 		return this.dialog;
 	}
-	static BufferedImage icon;
+
 	final JPanel panel = new JPanel();
 	final JButton endButton = new JButton(SimpleAfirmaMessages.getString("DigitalEnvelopeEnd.11") ); //$NON-NLS-1$
 
 	/** Crea el di&aacute;logo de finalizaci&oacute;n de los sobres digitales.
 	 * @param parent Componente padre para la modalidad. */
-	public DigitalEnvelopeEnd(final JDialog parent) {
+	public DigitalEnvelopeEnd(final DigitalEnvelopePresentation parent) {
 		this.dialog = parent;
 		createUI();
 	}
 
 	void createUI() {
 
-        final GridBagConstraints c = new GridBagConstraints();
-		c.fill = GridBagConstraints.BOTH;
-		c.gridwidth = GridBagConstraints.REMAINDER;
-		c.insets = new Insets(20, 10, 0, 20);
-		c.weightx = 1.0;
-        c.gridx = 0;
-        c.gridy = 0;
+		getAccessibleContext().setAccessibleDescription(
+			SimpleAfirmaMessages.getString("DigitalEnvelopeEnd.12") //$NON-NLS-1$
+		);
 
         // Panel con el contenido
         final JPanel panelCentral = new JPanel();
@@ -55,9 +50,6 @@ public final class DigitalEnvelopeEnd extends JDialog {
         panelCentral.setBackground(Color.WHITE);
         panelCentral.setLayout(gbLayout);
         panelCentral.setBorder(BorderFactory.createEmptyBorder());
-        panelCentral.getAccessibleContext().setAccessibleDescription(
-    		SimpleAfirmaMessages.getString("DigitalEnvelopeSender.0") //$NON-NLS-1$
-    	);
 
      // Etiqueta con el texto "Felicidades!..."
 
@@ -92,13 +84,21 @@ public final class DigitalEnvelopeEnd extends JDialog {
  				}
  			}
  		);
- 		this.endButton.setEnabled(true);
+ 		this.endButton.addKeyListener(this.dialog);
 
  		this.panel.setLayout(new FlowLayout(FlowLayout.RIGHT));
 		this.panel.add(this.endButton);
 
 		final JPanel emptyPanel = new JPanel();
 		emptyPanel.setBackground(Color.WHITE);
+
+		 final GridBagConstraints c = new GridBagConstraints();
+		c.fill = GridBagConstraints.BOTH;
+		c.gridwidth = GridBagConstraints.REMAINDER;
+		c.insets = new Insets(20, 10, 0, 20);
+		c.weightx = 1.0;
+        c.gridx = 0;
+        c.gridy = 0;
 
 		c.gridwidth = GridBagConstraints.REMAINDER;
         panelCentral.add(labelsb1, c);
@@ -117,19 +117,5 @@ public final class DigitalEnvelopeEnd extends JDialog {
 		this.dialog.getContentPane().add(this.panel, BorderLayout.PAGE_END);
 		this.dialog.revalidate();
         this.dialog.repaint();
-	}
-
-	/**
-	 * @return the icon
-	 */
-	public static BufferedImage getIcon() {
-		return icon;
-	}
-
-	/**
-	 * @param iconBI the icon to set
-	 */
-	public static void setIcon(final BufferedImage iconBI) {
-		icon = iconBI;
 	}
 }

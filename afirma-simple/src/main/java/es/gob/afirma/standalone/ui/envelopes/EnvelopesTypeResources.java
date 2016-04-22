@@ -4,9 +4,9 @@ import es.gob.afirma.standalone.SimpleAfirmaMessages;
 
 enum EnvelopesTypeResources {
 
-		AUTHENTICATED(	SimpleAfirmaMessages.getString("MenuDigitalEnvelope.16"), 	0), //$NON-NLS-1$
-		SIGNED(			SimpleAfirmaMessages.getString("MenuDigitalEnvelope.17"), 	1), //$NON-NLS-1$
-		SIMPLE(			SimpleAfirmaMessages.getString("MenuDigitalEnvelope.18"), 	2); //$NON-NLS-1$
+		AUTHENTICATED(	SimpleAfirmaMessages.getString("MenuDigitalEnvelope.5"), 	0), //$NON-NLS-1$
+		SIGNED(			SimpleAfirmaMessages.getString("MenuDigitalEnvelope.6"), 	1), //$NON-NLS-1$
+		SIMPLE(			SimpleAfirmaMessages.getString("MenuDigitalEnvelope.7"), 	2); //$NON-NLS-1$
 
 		private final String envTypeName;
 		private final int envTypeIndex;

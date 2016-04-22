@@ -6,19 +6,15 @@ import java.awt.FlowLayout;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.Image;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.io.IOException;
 import java.util.logging.Logger;
 
-import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -28,16 +24,22 @@ import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
+import es.gob.afirma.standalone.ui.preferences.PreferencesManager;
 
 /**
  * @author Mariano Mart&iacute;nez
- *
  * Panel para seleccionar un fichero para ensobrar y el tipo de sobre a realizar.
  */
 public class DigitalEnvelopeSelectFile extends JPanel {
 
 	private static final long serialVersionUID = -5430415718507253691L;
 	static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+	private static final String[] SIGN_ALGORITHM = {
+			"SHA1withRSA", //$NON-NLS-1$
+			"SHA512withRSA", //$NON-NLS-1$
+			"SHA384withRSA", //$NON-NLS-1$
+			"SHA256withRSA"//$NON-NLS-1$
+	};
 
 	private final JComboBox<EnvelopesTypeResources> envelopeTypes = new JComboBox<>(
 		EnvelopesTypeResources.getAllEnvelopesTypeResources()
@@ -54,17 +56,17 @@ public class DigitalEnvelopeSelectFile extends JPanel {
 		return this.selectedFile.getText();
 	}
 
-	private final JButton nextButton = new JButton(SimpleAfirmaMessages.getString("MenuDigitalEnvelope.21")); //$NON-NLS-1$
-	private final JButton cancelButton = new JButton(SimpleAfirmaMessages.getString("DigitalEnvelopePresentation.15")); //$NON-NLS-1$
-	private final JButton backButton = new JButton(SimpleAfirmaMessages.getString("DigitalEnvelopePresentation.16") ); //$NON-NLS-1$
-	private final JButton examineButton = new JButton(SimpleAfirmaMessages.getString("MenuDigitalEnvelope.20")); //$NON-NLS-1$
+	private final JButton nextButton = new JButton(SimpleAfirmaMessages.getString("DigitalEnvelopePresentation.3")); //$NON-NLS-1$
+	private final JButton cancelButton = new JButton(SimpleAfirmaMessages.getString("DigitalEnvelopePresentation.4")); //$NON-NLS-1$
+	private final JButton backButton = new JButton(SimpleAfirmaMessages.getString("DigitalEnvelopePresentation.5") ); //$NON-NLS-1$
+	private final JButton examineButton = new JButton(SimpleAfirmaMessages.getString("DigitalEnvelopePresentation.9")); //$NON-NLS-1$
 
 	JButton getNextButton() {
 		return this.nextButton;
 	}
 
-	private final JDialog dialog;
-	JDialog getDialog() {
+	private final DigitalEnvelopePresentation dialog;
+	DigitalEnvelopePresentation getDialog() {
 		return this.dialog;
 	}
 
@@ -78,30 +80,40 @@ public class DigitalEnvelopeSelectFile extends JPanel {
 		return this.panel;
 	}
 
-	DigitalEnvelopeSelectFile(final JDialog dl) {
+	/**
+	 * Crea el panel para seleccionar el fichero a ensobrar, el tipo de sobre y el algoritmo a utilizar.
+	 * @param dl
+	 */
+	DigitalEnvelopeSelectFile(final DigitalEnvelopePresentation dl) {
 		this.dialog = dl;
 		createUI();
 	}
 
+	private final JComboBox<String> singAlgorithm = new JComboBox<>(SIGN_ALGORITHM);
+	String getSignAlgorithm() {
+		return this.singAlgorithm.getSelectedItem().toString();
+	}
+
 	/** Crea una ventana con opciones de ensobrado. */
 	void createUI() {
+
+		getAccessibleContext().setAccessibleDescription(
+			SimpleAfirmaMessages.getString("DigitalEnvelopeFile.0") //$NON-NLS-1$
+		);
 
 		// Panel con el contenido
         final GridBagLayout gbLayout = new GridBagLayout();
         this.panelCentral.setBackground(Color.WHITE);
         this.panelCentral.setLayout(gbLayout);
         this.panelCentral.setBorder(BorderFactory.createEmptyBorder());
-        this.panelCentral.getAccessibleContext().setAccessibleDescription(
-    		SimpleAfirmaMessages.getString("MenuDigitalEnvelope.23") //$NON-NLS-1$
-    	);
 
     	final JLabel infoLabel = new JLabel(
-			SimpleAfirmaMessages.getString("MenuDigitalEnvelope.27") //$NON-NLS-1$
+			SimpleAfirmaMessages.getString("DigitalEnvelopeFile.1") //$NON-NLS-1$
 		);
 
 		// Eleccion fichero a ensobrar
 		final JLabel envelopeFilesLabel = new JLabel(
-			SimpleAfirmaMessages.getString("MenuDigitalEnvelope.14") //$NON-NLS-1$
+			SimpleAfirmaMessages.getString("DigitalEnvelopeFile.2") //$NON-NLS-1$
 		);
 		envelopeFilesLabel.setLabelFor(this.selectedFile);
 		this.selectedFile.setEditable(false);
@@ -110,35 +122,24 @@ public class DigitalEnvelopeSelectFile extends JPanel {
 		// Boton de examinar
 		this.examineButton.setMnemonic('X');
 		this.examineButton.getAccessibleContext().setAccessibleDescription(
-			SimpleAfirmaMessages.getString("MenuDigitalEnvelope.20") //$NON-NLS-1$
+			SimpleAfirmaMessages.getString("DigitalEnvelopeFile.3") //$NON-NLS-1$
 		);
 		this.examineButton.addActionListener(
 			new ActionListener() {
 				/** {@inheritDoc} */
 				@Override
 				public void actionPerformed(final ActionEvent ae) {
-					Image certificateIcon = null;
-					try {
-						certificateIcon = ImageIO.read(
-							MenuDigitalEnvelope.class.getResource("/resources/certificate_16.png") //$NON-NLS-1$
-						);
-					}
-					catch (final IOException e) {
-						LOGGER.warning(
-							"No ha podido cargarse el icono del dialogo: " + e //$NON-NLS-1$
-						);
-					}
 					final File file;
 					try {
 						file = AOUIFactory.getLoadFiles(
-							SimpleAfirmaMessages.getString("MenuDigitalEnvelope.14"), //$NON-NLS-1$
+							SimpleAfirmaMessages.getString("DigitalEnvelopeFile.2"), //$NON-NLS-1$
 							null,
 							null,
 							new String[] { },
-							SimpleAfirmaMessages.getString("MenuDigitalEnvelope.22"), //$NON-NLS-1$
+							SimpleAfirmaMessages.getString("DigitalEnvelopeFile.4"), //$NON-NLS-1$
 							false,
 							false,
-							certificateIcon,
+							null,
 							getDialog()
 						)[0];
 					}
@@ -154,47 +155,72 @@ public class DigitalEnvelopeSelectFile extends JPanel {
 						);
 						AOUIFactory.showErrorMessage(
 							getDialog(),
-							SimpleAfirmaMessages.getString("MenuValidation.6"), //$NON-NLS-1$
-							SimpleAfirmaMessages.getString("MenuValidation.5"), //$NON-NLS-1$
+							SimpleAfirmaMessages.getString("DigitalEnvelopeFile.6"), //$NON-NLS-1$
+							SimpleAfirmaMessages.getString("DigitalEnvelopeFile.5"), //$NON-NLS-1$
 							JOptionPane.ERROR_MESSAGE
 						);
 						return;
 					}
 					setSelectedFile(file.getAbsolutePath());
 					getNextButton().setEnabled(true);
+					getNextButton().setFocusable(true);
+					getNextButton().requestFocusInWindow();
 				}
 			}
 		);
-		this.examineButton.setEnabled(true);
+		this.examineButton.addKeyListener(this.dialog);
 
 		// Label con los tipos de ensobrado
 		final JLabel typeFilesLabel = new JLabel(
-			SimpleAfirmaMessages.getString("MenuDigitalEnvelope.15") //$NON-NLS-1$
+			SimpleAfirmaMessages.getString("DigitalEnvelopeFile.7") //$NON-NLS-1$
 		);
 		typeFilesLabel.setLabelFor(this.envelopeTypes);
+
+		this.envelopeTypes.addKeyListener(this.dialog);
+
+		// Label con los algoritmos de cifrado
+		final JLabel signAlgorithmLabel = new JLabel(
+			SimpleAfirmaMessages.getString("DigitalEnvelopeFile.8") //$NON-NLS-1$
+		);
+		signAlgorithmLabel.setLabelFor(this.singAlgorithm);
+
+
+		this.singAlgorithm.addKeyListener(this.dialog);
 
 		// Botono de siguiente
 		this.nextButton.setMnemonic('S');
 		this.nextButton.getAccessibleContext().setAccessibleDescription(
- 			SimpleAfirmaMessages.getString("DigitalEnvelopePresentation.17") //$NON-NLS-1$
+ 			SimpleAfirmaMessages.getString("DigitalEnvelopePresentation.6") //$NON-NLS-1$
 		);
 		this.nextButton.addActionListener(
 			new ActionListener() {
 			/** {@inheritDoc} */
 			@Override
 			public void actionPerformed(final ActionEvent ae) {
+				saveConfiguration();
 				getDialog().remove(getPanelCentral());
 				getDialog().remove(getPanel());
-				new DigitalEnvelopeRecipients(getDialog(), getSelectedFile(), getSelectedType());
+				getDialog().remove(getDialog().getFilePanel());
+				getDialog().setRecipientsPanel(
+					new DigitalEnvelopeRecipients(
+						getDialog(),
+						getSelectedFile(),
+						getSelectedType(),
+						getSignAlgorithm()
+					)
+				);
+				getDialog().add(getDialog().getRecipientsPanel());
 			}
 		}
 		);
 		this.nextButton.setEnabled(false);
+		this.nextButton.setFocusable(false);
+		this.nextButton.addKeyListener(this.dialog);
 
 		// Boton cancelar
 		this.cancelButton.setMnemonic('C');
 		this.cancelButton.getAccessibleContext().setAccessibleDescription(
- 			SimpleAfirmaMessages.getString("DigitalEnvelopePresentation.18") //$NON-NLS-1$
+ 			SimpleAfirmaMessages.getString("DigitalEnvelopePresentation.7") //$NON-NLS-1$
 		);
 		this.cancelButton.addActionListener(
 			new ActionListener() {
@@ -206,17 +232,16 @@ public class DigitalEnvelopeSelectFile extends JPanel {
 				}
 			}
 		);
+		this.cancelButton.addKeyListener(this.dialog);
 
 		// Boton de volver
 		this.backButton.setMnemonic('A');
 		this.backButton.getAccessibleContext().setAccessibleDescription(
- 			SimpleAfirmaMessages.getString("DigitalEnvelopePresentation.19") //$NON-NLS-1$
+ 			SimpleAfirmaMessages.getString("DigitalEnvelopePresentation.8") //$NON-NLS-1$
 		);
 		this.backButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
-				getDialog().remove(getPanelCentral());
-				getDialog().remove(getPanel());
 				DigitalEnvelopePresentation.startDigitalEnvelopePresentation(
 					(Frame)  getDialog().getParent()
 				);
@@ -224,8 +249,7 @@ public class DigitalEnvelopeSelectFile extends JPanel {
 				getDialog().dispose();
 			}
 		});
-		this.cancelButton.setEnabled(true);
-		this.backButton.setEnabled(true);
+		this.backButton.addKeyListener(this.dialog);
 
 		this.panel.setLayout(new FlowLayout(FlowLayout.RIGHT));
 
@@ -244,6 +268,7 @@ public class DigitalEnvelopeSelectFile extends JPanel {
 		final JPanel emptyPanel = new JPanel();
 		emptyPanel.setBackground(Color.WHITE);
 
+		loadConfiguration();
 		final GridBagConstraints c = new GridBagConstraints();
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.weightx = 1.0;
@@ -269,6 +294,12 @@ public class DigitalEnvelopeSelectFile extends JPanel {
 		c.fill = GridBagConstraints.NONE;
 		c.anchor = GridBagConstraints.LINE_START;
 		this.panelCentral.add(this.envelopeTypes, c);
+		c.gridy++;
+		c.insets = new Insets(20, 20, 0, 20);
+		this.panelCentral.add(signAlgorithmLabel, c);
+		c.gridy++;
+		c.insets = new Insets(5, 20, 0, 10);
+		this.panelCentral.add(this.singAlgorithm, c);
 		c.weighty = 1.0;
 		c.gridy++;
 		this.panelCentral.add(emptyPanel, c);
@@ -276,6 +307,36 @@ public class DigitalEnvelopeSelectFile extends JPanel {
 		this.dialog.getContentPane().add(this.panel, BorderLayout.PAGE_END);
         this.dialog.revalidate();
         this.dialog.repaint();
+        this.examineButton.requestFocusInWindow();
 	}
+
+	void loadConfiguration() {
+		this.envelopeTypes.setSelectedItem(
+				EnvelopesTypeResources.getName(
+				Integer.parseInt(
+					PreferencesManager.get(
+						PreferencesManager.PREFERENCE_ENVELOPE_TYPE,
+						"0" //$NON-NLS-1$
+					)
+				)
+			)
+		);
+
+		this.singAlgorithm.setSelectedItem(
+			PreferencesManager.get(
+				PreferencesManager.PREFERENCE_ENVELOPE_CIPHER_ALGORITHM,
+				"SHA1withRSA" //$NON-NLS-1$
+			)
+		);
+	}
+
+	void saveConfiguration() {
+		PreferencesManager.put(
+			PreferencesManager.PREFERENCE_ENVELOPE_TYPE,
+			Integer.toString(getSelectedType().getIndex())
+		);
+		PreferencesManager.put(PreferencesManager.PREFERENCE_ENVELOPE_CIPHER_ALGORITHM, getSignAlgorithm());
+	}
+
 }
 

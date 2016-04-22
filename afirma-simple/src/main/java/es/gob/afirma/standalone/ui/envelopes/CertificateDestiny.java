@@ -5,17 +5,20 @@ import java.security.cert.Certificate;
 import java.util.logging.Logger;
 
 import javax.swing.JDialog;
+import javax.swing.JOptionPane;
 
 import es.gob.afirma.core.AOCancelledOperationException;
+import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.keystores.AOCertificatesNotFoundException;
 import es.gob.afirma.keystores.AOKeyStoreDialog;
 import es.gob.afirma.keystores.AOKeyStoreManager;
+import es.gob.afirma.standalone.SimpleAfirmaMessages;
 
 /** Certificado destinatario de un sobre digital. */
 public class CertificateDestiny extends JDialog {
 
-	private static final long serialVersionUID = 1L;
-	private static Logger logger = Logger.getLogger(CertificateDestiny.class.getName());
+	private static final long serialVersionUID = 7115908528433416650L;
+	private final static Logger LOGGER = Logger.getLogger(CertificateDestiny.class.getName());
     private String selectedAlias = null;
     private String alias = null;
 
@@ -33,7 +36,7 @@ public class CertificateDestiny extends JDialog {
             this.alias = getSelectedAlias();
         }
         catch (final AOCancelledOperationException e) {
-            logger.severe("Operacion cancelada por el usuario"); //$NON-NLS-1$
+            LOGGER.info("Operacion cancelada por el usuario: " + e); //$NON-NLS-1$
         }
         catch (final java.security.ProviderException e) {
         	// Comprobacion especifica para el proveedor Java de DNIe
@@ -43,10 +46,22 @@ public class CertificateDestiny extends JDialog {
             return;
         }
         catch (final AOCertificatesNotFoundException e) {
-            logger.severe("No se han encontrado certificados validos en el almacen: " + e); //$NON-NLS-1$
+            LOGGER.severe("No se han encontrado certificados validos en el almacen: " + e); //$NON-NLS-1$
+            AOUIFactory.showMessageDialog(
+ 				this,
+ 				SimpleAfirmaMessages.getString("DigitalEnvelopeRecipients.33"), //$NON-NLS-1$
+ 				SimpleAfirmaMessages.getString("DigitalEnvelopeRecipients.20"), //$NON-NLS-1$
+ 				JOptionPane.ERROR_MESSAGE
+ 			);
         }
         catch (final Exception e) {
-            logger.severe("No se ha podido recuperar el certificado seleccionado: " + e); //$NON-NLS-1$
+            LOGGER.severe("No se ha podido recuperar el certificado seleccionado: " + e); //$NON-NLS-1$
+            AOUIFactory.showMessageDialog(
+ 				this,
+ 				SimpleAfirmaMessages.getString("DigitalEnvelopeRecipients.34"), //$NON-NLS-1$
+ 				SimpleAfirmaMessages.getString("DigitalEnvelopeRecipients.20"), //$NON-NLS-1$
+ 				JOptionPane.ERROR_MESSAGE
+ 			);
         }
     }
 

@@ -137,6 +137,12 @@ public final class PreferencesManager {
 	/** Almacen de claves prioritario. */
 	public static final String PREFERENCE_KEYSTORE_PRIORITARY_STORE = "prioritaryStore"; //$NON-NLS-1$
 
+	/** Cerrar almacen de claves prioritario. */
+	public static final String PREFERENCE_KEYSTORE_CLOSE_KEYSTORE = "closeKeyStore"; //$NON-NLS-1$
+
+	/** Tiempo de espera para cerrar el almacen. */
+	public static final String PREFERENCE_KEYSTORE_CLOSE_KEYSTORE_TIMEOUT = "closeKeyStoreTimeout"; //$NON-NLS-1$
+
 	//**************** FIN PREFERENCIAS DE ALMACENES DE CLAVES *****************************************************************
 	//**************************************************************************************************************************
 
@@ -205,6 +211,9 @@ public final class PreferencesManager {
 
 	/** Nivel de certificaci&oacute;n de firma para PAdES. */
 	public static final String PREFERENCE_PADES_CERTIFICATION_LEVEL = "padesCertificationLevel"; //$NON-NLS-1$
+
+	/** Imagen de r&uacute;brica para firma visible. */
+	public static final String PREFERENCE_PADES_RUBRIC_IMAGE = "padesRubricImage"; //$NON-NLS-1$
 
 	//**************** PREFERENCIAS DE SELLOS DE TIEMPO PADES*****************************************************************
 
@@ -341,6 +350,60 @@ public final class PreferencesManager {
 
 	//**************** FIN PREFERENCIAS DE FACTURAS ELECTRONICAS ***************************************************************
 	//**************************************************************************************************************************
+
+	//**************************************************************************************************************************
+	//**************** PREFERENCIAS SOBRBES DIGITALES **********************************************************************************
+
+	/** Agoritmo de cifrado. */
+	public static final String PREFERENCE_ENVELOPE_CIPHER_ALGORITHM = "envelopeCipherAlgorithms"; //$NON-NLS-1$
+
+	/** Tipo de sobre. */
+	public static final String PREFERENCE_ENVELOPE_TYPE = "envelopeType"; //$NON-NLS-1$
+
+	//**************************************************************************************************************************
+	//**************** PREFERENCIAS SOBRBES DIGITALES **********************************************************************************
+
+
+	//**************** PREFERENCIAS DE CIFRADO*****************************************************************
+
+	/**KeyUsage  . */
+	public static final String PREFERENCE_CIPHERMENT_DIGITALSIGNATURE = "keyUsageDigitalSignature"; //$NON-NLS-1$
+
+	/**KeyUsage  . */
+	public static final String PREFERENCE_CIPHERMENT_NONREPUDIATION = "keyUsageNonRepudiation"; //$NON-NLS-1$
+
+	/**KeyUsage  . */
+	public static final String PREFERENCE_CIPHERMENT_KEYENCHIPERMENT = "keyUsageKeyEncipherment"; //$NON-NLS-1$
+
+	/**KeyUsage  . */
+	public static final String PREFERENCE_CIPHERMENT_DATAENCIPHERMENT = "keyUsageDataEncipherment"; //$NON-NLS-1$
+
+	/**KeyUsage  . */
+	public static final String PREFERENCE_CIPHERMENT_KEYAGREEMENT = "keyUsageKeyAgreement"; //$NON-NLS-1$
+
+	/**KeyUsage  . */
+	public static final String PREFERENCE_CIPHERMENT_KEYCERTSIGN = "keyUsageKeyCertsign"; //$NON-NLS-1$
+
+	/**KeyUsage  . */
+	public static final String PREFERENCE_CIPHERMENT_CRLSIGN = "keyUsageCrlsign"; //$NON-NLS-1$
+
+	/**KeyUsage  . */
+	public static final String PREFERENCE_CIPHERMENT_ENCIPHERONLY = "keyUsageEncipherOnly"; //$NON-NLS-1$
+
+	/**KeyUsage  . */
+	public static final String PREFERENCE_CIPHERMENT_DECIPHERONLY = "keyUsageDecipherOnly"; //$NON-NLS-1$
+
+	/** Agoritmo de cifrado. */
+	public static final String PREFERENCE_CIPHERMENT_ALGORITHM = "ciphermentAlgorithm"; //$NON-NLS-1$
+
+	/** M&eacute;todo de acceso repositorio. */
+	public static final String PREFERENCE_CIPHERMENT_METHOD = "repositoryAccessMethod"; //$NON-NLS-1$
+
+	/** URI de acceso repositorio. */
+	public static final String PREFERENCE_CIPHERMENT_URI = "repositoryURI"; //$NON-NLS-1$
+
+	//**************** PREFERENCIAS DE CIFRADO*****************************************************************
+
 
 	/** Agoritmo de cifrado. */
 	public static final String PREFERENCE_CIPHER_ALGORITHM = "cipherAlgorithms"; //$NON-NLS-1$

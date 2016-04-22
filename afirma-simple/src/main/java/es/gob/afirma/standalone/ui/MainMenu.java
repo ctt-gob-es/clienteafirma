@@ -40,6 +40,7 @@ import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.standalone.AutoFirmaUtil;
 import es.gob.afirma.standalone.SimpleAfirma;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
+import es.gob.afirma.standalone.ui.envelopes.MenuDigitalEnvelope;
 import es.gob.afirma.standalone.ui.hash.CheckHashDialog;
 import es.gob.afirma.standalone.ui.hash.CheckHashFiles;
 import es.gob.afirma.standalone.ui.hash.CreateHashDialog;
@@ -301,7 +302,7 @@ public final class MainMenu extends JMenuBar {
         this.add(menuArchivo);
         // TODO: Descomentar una vez se entregue
         toolsMenu.add(new MenuValidation(this.parent));
-        //toolsMenu.add(new MenuDigitalEnvelope(this.parent));
+        toolsMenu.add(new MenuDigitalEnvelope(this.parent, this.saf));
         toolsMenu.add(huellaMenu);
         this.add(toolsMenu);
 
