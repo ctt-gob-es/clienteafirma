@@ -61,8 +61,6 @@ public final class AutoFirmaTrayIcon {
 	private static final String TRAY_ICON_13 = "TrayIcon.13"; //$NON-NLS-1$
 	private static final String TRAY_ICON_16 = "TrayIcon.16"; //$NON-NLS-1$
 	private static final String TRAY_ICON_17 = "TrayIcon.17"; //$NON-NLS-1$
-	private static final String TRAY_ICON_18 = "TrayIcon.18"; //$NON-NLS-1$
-	private static final String TRAY_ICON_19 = "TrayIcon.19"; //$NON-NLS-1$
 	private static final String MAINMENU_14 = "MainMenu.14"; //$NON-NLS-1$
 	private static final String MAINMENU_15 = "MainMenu.15"; //$NON-NLS-1$
 
@@ -257,23 +255,11 @@ public final class AutoFirmaTrayIcon {
 		});
 		showCertificates.getAccessibleContext().setAccessibleDescription(SimpleAfirmaMessages.getString(TRAY_ICON_13));
 
-		final MenuItem closeCertificates = new MenuItem(
-			SimpleAfirmaMessages.getString(TRAY_ICON_18));
-			showCertificates.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					// TODO;
-				}
-			}
-		);
-		showCertificates.getAccessibleContext().setAccessibleDescription(SimpleAfirmaMessages.getString(TRAY_ICON_19));
-
 		// add menu items to menu
 		menu.add(displayMenu);
 		displayMenu.add(selecPriotityCertificate);
 		displayMenu.add(selecDefaultCertificate);
 		displayMenu.add(showCertificates);
-		displayMenu.add(closeCertificates);
 		menu.addSeparator();
 		menu.add(messageItem);
 		menu.addSeparator();
@@ -354,7 +340,7 @@ public final class AutoFirmaTrayIcon {
             return true;
         }
         catch (final Exception e) {
-        	LOGGER.warning("No se ha podido comprobar el bloqueo de instancia"); //$NON-NLS-1$
+        	LOGGER.warning("No se ha podido comprobar el bloqueo de instancia: " + e); //$NON-NLS-1$
             return false;
         }
     }
