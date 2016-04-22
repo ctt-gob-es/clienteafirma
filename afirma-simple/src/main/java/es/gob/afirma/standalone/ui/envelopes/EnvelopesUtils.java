@@ -53,9 +53,7 @@ public class EnvelopesUtils {
 
     /** Recupera los almacenes compatibles con el sistema y preparados
      * para contener certificados para envoltura de datos.
-     * @param enableLDAPMDEF <code>true</code> para habilitar el directorio del Ministerio de Defensa.
-     * @return Listado de almacenes.
-     * */
+     * @return Listado de almacenes. */
     public static KeyStoreConfiguration[] getKeyStoresToWrap() {
 
         final List<KeyStoreConfiguration> stores = new ArrayList<>();
@@ -71,14 +69,14 @@ public class EnvelopesUtils {
         return stores.toArray(new KeyStoreConfiguration[0]);
     }
 
-    /**
-     * Obtiene el fichero elegido por el usuario dependiendo de la extension que haya elegido en el combobox.
-     * @return El fichero seleccionado.
-     */
+    /** Obtiene el fichero elegido por el usuario dependiendo de la extensi&oacute;n que haya elegido en el desplegable.
+     * @param extension Extensiones de fichero aceptadas.
+     * @param comboDestinatarios Men&uacute; desplegable con las opciones de destinatarios.
+     * @param parent Componente padre para la modalidad.
+     * @return El fichero seleccionado. */
     static File addFileSelected(final String[] extension,
-    					 final JComboBox<KeyStoreConfiguration> comboDestinatarios,
-    					 final Component parent) {
-
+    					        final JComboBox<KeyStoreConfiguration> comboDestinatarios,
+    					        final Component parent) {
 		final File file;
 		try {
 			if (extension[0] != null) {

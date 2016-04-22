@@ -151,9 +151,8 @@ public final class PdfSignResult implements Serializable {
 
 	/** M&eacute;todo necesario para la deserializaci&oacute;n de un objeto.
 	 * @param in Datos de entrada (en formato XML).
-	 * @throws IOException Cuando no se puede deserializar.
-	 * @throws ClassNotFoundException Cuando no existe la clase. */
-	private void readObject(final ObjectInputStream in) throws IOException, ClassNotFoundException {
+	 * @throws IOException Cuando no se puede deserializar. */
+	private void readObject(final ObjectInputStream in) throws IOException {
     	final Document xmlSign;
     	try {
     		xmlSign = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(in);

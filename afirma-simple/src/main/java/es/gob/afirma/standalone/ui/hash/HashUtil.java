@@ -23,7 +23,7 @@ final class HashUtil {
 	}
 
 	/** Genera la huella digital de un fichero.
-	 * @param fileName Ruta completa del fichero.
+	 * @param filePath Ruta completa del fichero.
 	 * @param algorithm Algoritmo de huella.
 	 * @return Valor de la huella.
 	 * @throws IOException Si hay errores en el tratamiento del fichero.
@@ -45,7 +45,7 @@ final class HashUtil {
 	}
 
 	/** Genera la huella digital de un fichero.
-	 * @param fileName Fichero del cual queremos calcular la huella.
+	 * @param file Fichero del cual queremos calcular la huella.
 	 * @param algorithm Algoritmo de huella.
 	 * @return Valor de la huella.
 	 * @throws IOException Si hay errores en el tratamiento del fichero.

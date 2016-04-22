@@ -10,7 +10,6 @@
 
 package es.gob.afirma.standalone.crypto;
 
-import java.awt.Component;
 import java.security.cert.X509Certificate;
 
 /** Analizador de certificados para visualizaci&oacute;n de detalles en pantalla. */
@@ -19,10 +18,8 @@ public abstract class CertAnalyzer {
     /** Recupera la informaci&oacute;n necesaria para la visualizaci&oacute;n y
      * el tratamiento del certificado.
      * @param cert Certificado.
-     * @param c Se habilitar&aacute; este componente cuando termina la inicializaci&oacute;n de los
-	 *          par&aacute;metros PKIX OCSP desde LDAP si el certificado es de DNIe
      * @return Informaci&oacute;n del certificado. */
-    public static CertificateInfo getCertInformation(final X509Certificate cert, final Component c) {
+    public static CertificateInfo getCertInformation(final X509Certificate cert) {
     	if (cert.getIssuerX500Principal().toString().contains("AC DNIE")) { //$NON-NLS-1$
     		return new DnieCertAnalyzer().analyzeCert(cert);
     	}

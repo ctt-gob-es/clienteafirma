@@ -23,7 +23,6 @@ import java.util.logging.Logger;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 
-import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.keystores.KeyStoreManager;
 import es.gob.afirma.core.keystores.NameCertificateBean;
 import es.gob.afirma.core.ui.KeyStoreDialogManager;
@@ -104,9 +103,8 @@ public final class CertificateSelectionDialog extends MouseAdapter {
 
 	/** Muestra el di&aacute;logo de selecci&oacute;n de certificados.
 	 * @return Alias del certificado seleccionado o {@code null} si el usuario
-	 * cancela el di&aacute;logo o cierra sin seleccionar.
-	 * @throws AOException Cuando ocurre cualquier error durante el proceso. */
-	public String showDialog() throws AOException {
+	 * cancela el di&aacute;logo o cierra sin seleccionar. */
+	public String showDialog() {
 
 		final JDialog certDialog = this.optionPane.createDialog(
 			this.parent,
