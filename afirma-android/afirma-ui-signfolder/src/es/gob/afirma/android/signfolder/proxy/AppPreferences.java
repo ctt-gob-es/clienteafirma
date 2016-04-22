@@ -1,6 +1,10 @@
 package es.gob.afirma.android.signfolder.proxy;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 import android.app.Activity;
 import android.content.Context;
@@ -79,19 +83,59 @@ public final class AppPreferences {
 	static void setPreference(final String key, final String value) {
 		final SharedPreferences.Editor editor = sharedPref.edit();
 		editor.putString(key, value);
-		//editor.putString(SFConstants.PREFERENCES_KEY_URL_PROXY, proxyUrl);
+		editor.commit();
+	}
+	
+	static void removePreference(final String key) {
+		final SharedPreferences.Editor editor = sharedPref.edit();
+		editor.remove(key);
 		editor.commit();
 	}
 
 	/** Establece la URL del proxy para la conexi&oacute;n con el Portafirmas.
 	 * @param urlProxy URL del proxy. */
-	public static void setUrlProxy(final String urlProxy) {
+	public static void setUrlProxy(final String alias, final String urlProxy) {
+		setPreference(SFConstants.PREFERENCES_KEY_ALIAS_SERVER, alias);
 		setPreference(SFConstants.PREFERENCES_KEY_URL_PROXY, urlProxy);
 	}
 
 	/** Recupera la direcci&oacute;n del servidor proxy para la conexi&oacute;n con el Portafirmas.
 	 * @return URL del Portafirmas. */
 	public static String getUrlProxy() {
-		return getPreference(SFConstants.PREFERENCES_KEY_URL_PROXY);
+		//TODO quitar url 
+		return getPreference(SFConstants.PREFERENCES_KEY_URL_PROXY, "");
+	}
+	
+	public static String getAliasProxy() {
+		return getPreference(SFConstants.PREFERENCES_KEY_ALIAS_SERVER, "");
+	}
+	
+	public static void setServer(final String alias, final String url) {
+		setPreference(SFConstants.PREFERENCES_KEY_PREFIX_SERVER + alias, url);
+	}
+	
+	public static String getServerUrl(final String alias) {
+		return getPreference(SFConstants.PREFERENCES_KEY_PREFIX_SERVER + alias, "");
+	}
+	
+	public static void removeServer(final String alias) {
+		removePreference(SFConstants.PREFERENCES_KEY_PREFIX_SERVER + alias);
+	}
+	
+	public static void removeProxyConfig() {
+		removePreference(SFConstants.PREFERENCES_KEY_ALIAS_SERVER);
+		removePreference(SFConstants.PREFERENCES_KEY_URL_PROXY);
+	}
+	
+	public static List<String> getServersList() {
+		ArrayList<String> servers = new ArrayList<String>();
+		Map<String, ?> allPrefs = sharedPref.getAll();
+	    Set<String> set = allPrefs.keySet();
+	    for(String s : set){
+	    	if (s.startsWith(SFConstants.PREFERENCES_KEY_PREFIX_SERVER)) {
+	    		servers.add(s.replaceFirst("^" + SFConstants.PREFERENCES_KEY_PREFIX_SERVER,""));
+	    	}
+	    }
+	    return servers;
 	}
 }

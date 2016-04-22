@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.view.View;
+import android.widget.EditText;
 
 /** Di&aacute;logo modal con el que mostrar al usuario un mensaje y un bot&oacute;n para ocultar el
  * di&aacute;logo y, opcionalmente, realizar una acci&oacute;n. */
@@ -17,6 +18,8 @@ final class CustomAlertDialog extends DialogFragment {
 	private static final String BUNDLE_ID_MESSAGE = "message"; //$NON-NLS-1$
 	private static final String BUNDLE_ID_POSITIVE_BUTTON = "pb"; //$NON-NLS-1$
 	private static final String BUNDLE_ID_NEGATIVE_BUTTON = "nb"; //$NON-NLS-1$
+	/** Di&aacute;logo para confirmar el rechazo de peticiones. */
+	private final static int DIALOG_CONFIRM_REJECT = 13;
 
 	private static View vista = null;
 	static DialogFragmentListener fragmentListener = null;
@@ -43,6 +46,7 @@ final class CustomAlertDialog extends DialogFragment {
         if (negativeButton != null) {
         	args.putString(BUNDLE_ID_NEGATIVE_BUTTON, negativeButton);
         }
+        
 
         frag.setArguments(args);
         return frag;
@@ -92,13 +96,18 @@ final class CustomAlertDialog extends DialogFragment {
         	dialogBuilder.setView(vista);
         }
 
+	    final EditText input = new EditText(getActivity());
+	    if (dialogId == DIALOG_CONFIRM_REJECT) {
+		    dialogBuilder.setView(input);
+	    }
+	    
         final String positiveButton = getArguments().getString(BUNDLE_ID_POSITIVE_BUTTON);
         if (positiveButton != null) {
         	dialogBuilder.setPositiveButton(positiveButton,
                     new DialogInterface.OnClickListener() {
                         @Override
 						public void onClick(final DialogInterface dialog, final int whichButton) {
-                        	fragmentListener.onDialogPositiveClick(dialogId);
+                        	fragmentListener.onDialogPositiveClick(dialogId, input.getText().toString());
                         }
                     }
                 );

@@ -3,6 +3,7 @@ package es.gob.afirma.android.signfolder;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.annotation.TargetApi;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -48,6 +49,7 @@ import es.gob.afirma.android.signfolder.proxy.SignRequest.RequestType;
  *
  * @author Carlos Gamuci
  */
+@TargetApi(14)
 public final class PetitionListActivity extends FragmentActivity implements
 		OperationRequestListener, LoadSignRequestListener, OnItemClickListener,
 		DialogFragmentListener {
@@ -244,7 +246,7 @@ public final class PetitionListActivity extends FragmentActivity implements
 				DIALOG_CONFIRM_REJECT,
 				getString(R.string.dialog_title_confirm_reject),
 				reqs.length > 1 ? getString(
-						R.string.dialog_msg_reject_requests,
+						R.string.dialog_msg_reject_request,
 						Integer.valueOf(reqs.length))
 						: getString(R.string.dialog_msg_reject_request),
 				getString(android.R.string.ok),
@@ -427,9 +429,9 @@ public final class PetitionListActivity extends FragmentActivity implements
 		return requests.toArray(new SignRequest[requests.size()]);
 	}
 
-	protected RejectRequestsTask rejectRequests(final SignRequest... signRequests) {
+	protected RejectRequestsTask rejectRequests(final String reason, final SignRequest... signRequests) {
 		final RejectRequestsTask rrt = new RejectRequestsTask(signRequests,
-				this.certB64, CommManager.getInstance(), this);
+				this.certB64, CommManager.getInstance(), this, reason);
 		rrt.execute();
 		return rrt;
 	}
@@ -1109,7 +1111,8 @@ public final class PetitionListActivity extends FragmentActivity implements
 	}
 
 	@Override
-	public void onDialogPositiveClick(final int dialogId) {
+	public void onDialogPositiveClick(final int dialogId, final String reason) {
+		
 		// Dialogo de confirmacion de cierre de sesion
 		if (dialogId == DIALOG_CONFIRM_EXIT) {
 			CryptoConfiguration.setCertificateAlias(null);
@@ -1128,7 +1131,7 @@ public final class PetitionListActivity extends FragmentActivity implements
 			}
 
 			this.numRequestToRejectPending = selectedRequests.length;
-			setVisibilityLoadingMessage(true, rejectRequests(selectedRequests),
+			setVisibilityLoadingMessage(true, rejectRequests(reason, selectedRequests),
 					null);
 
 		}

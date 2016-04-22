@@ -48,7 +48,6 @@ import es.gob.afirma.android.signfolder.proxy.RequestResult;
 import es.gob.afirma.android.signfolder.proxy.SignRequest;
 import es.gob.afirma.android.signfolder.proxy.SignRequest.RequestType;
 import es.gob.afirma.android.signfolder.proxy.SignRequestDocument;
-import es.gob.afirma.core.signers.AOSignConstants;
 
 /** @author Carlos Gamuci */
 public final class PetitionDetailsActivity extends FragmentActivity implements LoadSignRequestDetailsListener,
@@ -87,7 +86,13 @@ public final class PetitionDetailsActivity extends FragmentActivity implements L
 
 	/** Tag para la presentaci&oacute;n de di&aacute;logos */
 	private final static String DIALOG_TAG = "dialog"; //$NON-NLS-1$
+	
+	/** Identificador de la firma PAdES. */
+	public static final String SIGN_FORMAT_PADES = "PAdES"; //$NON-NLS-1$
 
+	/** Identificador de la firma XAdES por defecto. */
+	public static final String SIGN_FORMAT_XADES = "XAdES"; //$NON-NLS-1$
+	
 	private String certB64 = null;
 	private String certAlias = null;
 
@@ -294,10 +299,10 @@ public final class PetitionDetailsActivity extends FragmentActivity implements L
      */
     private static String getSignatureExtension(final String signFormat) {
     	String ext;
-    	if (AOSignConstants.SIGN_FORMAT_PADES.equalsIgnoreCase(signFormat)) {
+    	if (SIGN_FORMAT_PADES.equalsIgnoreCase(signFormat)) {
     		ext = PADES_EXTENSION;
     	}
-    	else if (AOSignConstants.SIGN_FORMAT_XADES.equalsIgnoreCase(signFormat)) {
+    	else if (SIGN_FORMAT_XADES.equalsIgnoreCase(signFormat)) {
     		ext = XADES_EXTENSION;
     	}
     	else {
@@ -851,9 +856,9 @@ public final class PetitionDetailsActivity extends FragmentActivity implements L
 				this.reqDetails, pk, certChain, CommManager.getInstance(), this).execute();
 	}
 
-    private void rejectRequest() {
+    private void rejectRequest(final String reason) {
     	new RejectRequestsTask(
-    			this.reqDetails.getId(), this.certB64, CommManager.getInstance(), this).execute();
+    			this.reqDetails.getId(), this.certB64, CommManager.getInstance(), this, reason).execute();
     }
 
     private void approveRequest() {
@@ -986,7 +991,7 @@ public final class PetitionDetailsActivity extends FragmentActivity implements L
 	}
 
 	@Override
-	public void onDialogPositiveClick(final int dialogId) {
+	public void onDialogPositiveClick(final int dialogId, final String reason) {
 		if(dialogId == DIALOG_CONFIRM_OPERATION) {
 			processRequest(this.reqDetails.getType());
 		}
@@ -994,7 +999,7 @@ public final class PetitionDetailsActivity extends FragmentActivity implements L
 		else  if (dialogId == DIALOG_CONFIRM_REJECT) {
 			getCustomAlertDialog().dismiss();
 			showProgressDialog(getString(R.string.dialog_msg_rejecting_1), null);
-			rejectRequest();
+			rejectRequest(reason);
 		}
 	}
 

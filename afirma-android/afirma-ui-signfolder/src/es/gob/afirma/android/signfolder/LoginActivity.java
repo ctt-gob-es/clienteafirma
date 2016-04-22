@@ -33,7 +33,7 @@ import es.gob.afirma.android.signfolder.LoginOptionsDialogBuilder.LoginOptionsLi
 import es.gob.afirma.android.signfolder.proxy.AppPreferences;
 import es.gob.afirma.android.signfolder.proxy.CommManager;
 import es.gob.afirma.android.signfolder.proxy.RequestAppConfiguration;
-import es.gob.afirma.core.misc.Base64;
+import es.gob.afirma.android.util.Base64;
 
 /** Actividad para entrada con usuario y contrase&ntilde;a al servicio de Portafirmas. */
 public final class LoginActivity extends FragmentActivity implements KeystoreManagerListener,
@@ -345,7 +345,7 @@ public final class LoginActivity extends FragmentActivity implements KeystoreMan
 	@Override
 	public void onErrorLoginOptions(final String url) {
 		try {
-			Toast.makeText(this, getString(R.string.invalid_url), Toast.LENGTH_LONG).show();
+			Toast.makeText(this, url, Toast.LENGTH_LONG).show();
 		} catch (final Exception e) {
 			Log.e(SFConstants.LOG_TAG, "No se ha podido mostrar el mensaje de error por configuracion incorrecta: " + e); //$NON-NLS-1$
 			e.printStackTrace();

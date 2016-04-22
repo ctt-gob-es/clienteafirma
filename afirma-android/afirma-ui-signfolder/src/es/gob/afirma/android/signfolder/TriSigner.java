@@ -15,8 +15,8 @@ import es.gob.afirma.android.signfolder.proxy.SignRequest;
 import es.gob.afirma.android.signfolder.proxy.TriphaseRequest;
 import es.gob.afirma.android.signfolder.proxy.TriphaseSignDocumentRequest;
 import es.gob.afirma.android.signfolder.proxy.TriphaseSignDocumentRequest.TriphaseConfigData;
-import es.gob.afirma.core.AOException;
-import es.gob.afirma.core.signers.AOPkcs1Signer;
+import es.gob.afirma.android.util.AOException;
+import es.gob.afirma.android.crypto.AOPkcs1Signer;
 
 /** Firmador trif&aacute;sico.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */

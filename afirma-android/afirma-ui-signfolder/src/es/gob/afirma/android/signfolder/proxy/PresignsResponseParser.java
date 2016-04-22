@@ -12,7 +12,7 @@ import org.w3c.dom.NodeList;
 import android.util.Log;
 import es.gob.afirma.android.signfolder.SFConstants;
 import es.gob.afirma.android.signfolder.proxy.TriphaseSignDocumentRequest.TriphaseConfigData;
-import es.gob.afirma.core.misc.Base64;
+import es.gob.afirma.android.util.Base64;
 
 /** Analizador de XML para la generaci&oacute;n de un listado de objetos
  * de tipo {@link es.gob.afirma.android.signfolder.proxy.TriphaseRequest} a partir

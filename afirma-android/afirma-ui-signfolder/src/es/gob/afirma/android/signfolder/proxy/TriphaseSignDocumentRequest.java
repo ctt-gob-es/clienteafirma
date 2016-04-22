@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 
-import es.gob.afirma.core.misc.Base64;
+import es.gob.afirma.android.util.Base64;
 
 /** Datos temporales de un documento para su firma en tres fases
  * @author Carlos Gamuci Mill&aacute;n */

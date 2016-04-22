@@ -16,6 +16,7 @@ final class RejectRequestsTask extends AsyncTask<Void, Void, RequestResult[]> {
 	private final String certB64;
 	private final CommManager commManager;
 	private final OperationRequestListener listener;
+	private String reason = null;
 	private Throwable t;
 
 	/**
@@ -25,11 +26,16 @@ final class RejectRequestsTask extends AsyncTask<Void, Void, RequestResult[]> {
 	 * @param commManager Manejador de las comunicaciones para el rechazo de las peticiones.
 	 * @param listener Manejador que gestiona el comportamiento de la operaci&oacute;n al finalizar.
 	 */
-	 RejectRequestsTask(final SignRequest[] requests, final String certB64, final CommManager commManager, final OperationRequestListener listener) {
+	 RejectRequestsTask(final SignRequest[] requests, 
+			 final String certB64, 
+			 final CommManager commManager, 
+			 final OperationRequestListener listener,
+			 final String reason) {
 		this.requestIds = new String[requests.length];
 		this.certB64 = certB64;
 		this.commManager = commManager;
 		this.listener = listener;
+		this.reason = reason;
 		this.t = null;
 
 		for (int i = 0; i < requests.length; i++) {
@@ -44,11 +50,16 @@ final class RejectRequestsTask extends AsyncTask<Void, Void, RequestResult[]> {
 	 * @param commManager Manejador de las comunicaciones para el rechazo de las peticiones.
 	 * @param listener Manejador que gestiona el comportamiento de la operaci&oacute;n al finalizar.
 	 */
-	RejectRequestsTask(final RequestDetail[] requests, final String certB64, final CommManager commManager, final OperationRequestListener listener) {
+	RejectRequestsTask(final RequestDetail[] requests, 
+						final String certB64, 
+						final CommManager commManager, 
+						final OperationRequestListener listener,
+						final String reason) {
 		this.requestIds = new String[requests.length];
 		this.certB64 = certB64;
 		this.commManager = commManager;
 		this.listener = listener;
+		this.reason = reason;
 		this.t = null;
 
 		for (int i = 0; i < requests.length; i++) {
@@ -63,11 +74,16 @@ final class RejectRequestsTask extends AsyncTask<Void, Void, RequestResult[]> {
 	 * @param commManager Manejador de las comunicaciones para el rechazo de las peticiones.
 	 * @param listener Manejador que gestiona el comportamiento de la operaci&oacute;n al finalizar.
 	 */
-	RejectRequestsTask(final String requestId, final String certB64, final CommManager commManager, final OperationRequestListener listener) {
+	RejectRequestsTask(final String requestId, 
+			final String certB64, 
+			final CommManager commManager, 
+			final OperationRequestListener listener,
+			final String reason) {
 		this.requestIds = new String[] { requestId };
 		this.certB64 = certB64;
 		this.commManager = commManager;
 		this.listener = listener;
+		this.reason = reason;
 		this.t = null;
 	}
 
@@ -77,7 +93,7 @@ final class RejectRequestsTask extends AsyncTask<Void, Void, RequestResult[]> {
         	// Enviamos la peticion de rechazo
     	RequestResult[] result = null;
         try {
-			result = this.commManager.rejectRequests(this.requestIds, this.certB64);
+			result = this.commManager.rejectRequests(this.requestIds, this.certB64, this.reason);
 		} catch (final Exception e) {
 			Log.w(SFConstants.LOG_TAG, "Ocurrio un error en el rechazo de las solicitudes de firma: " + e); //$NON-NLS-1$
 			this.t = e;

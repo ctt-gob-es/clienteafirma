@@ -16,7 +16,7 @@ import org.xml.sax.SAXException;
 import android.util.Log;
 import es.gob.afirma.android.network.AndroidUrlHttpManager;
 import es.gob.afirma.android.signfolder.SFConstants;
-import es.gob.afirma.core.misc.Base64;
+import es.gob.afirma.android.util.Base64;
 
 /** Gestor de comunicaciones con el servidor de portafirmas m&oacute;vil.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
@@ -267,10 +267,10 @@ public final class CommManager {
 	 *             Si no se puede obtener la codificaci&oacute;n del certificado
 	 */
 	public RequestResult[] rejectRequests(final String[] requestIds,
-			final String certB64) throws SAXException, IOException {
+			final String certB64, final String reason) throws SAXException, IOException {
 
 		final String dataB64UrlSafe = prepareParam(XmlRequestsFactory
-				.createRejectRequest(requestIds, certB64));
+				.createRejectRequest(requestIds, certB64, reason));
 
 		return RejectsResponseParser.parse(getRemoteDocument(prepareUrl(
 				OPERATION_REJECT, dataB64UrlSafe)));

@@ -3,6 +3,7 @@ package es.gob.afirma.android.signfolder.proxy;
 import java.io.IOException;
 
 import android.util.Log;
+import es.gob.afirma.android.util.Base64;
 
 /** Factor&iacute;a para la creaci&oacute;n de solitidudes XML hacia el servidor de firmas multi-fase.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
@@ -30,6 +31,9 @@ final class XmlRequestsFactory {
 
 	private static final String XML_RESULT_OPEN = "<result>"; //$NON-NLS-1$
 	private static final String XML_RESULT_CLOSE = "</result>"; //$NON-NLS-1$
+	
+	private static final String XML_RSN_OPEN ="<rsn>"; //$NON-NLS-1$
+	private static final String XML_RSN_CLOSE ="</rsn>"; //$NON-NLS-1$
 
 
 	private XmlRequestsFactory() {
@@ -222,7 +226,7 @@ final class XmlRequestsFactory {
 		return sb.toString();
 	}
 
-	static String createRejectRequest(final String[] requestIds, final String certB64) {
+	static String createRejectRequest(final String[] requestIds, final String certB64, final String reason) {
 		if (requestIds == null || requestIds.length == 0) {
 			throw new IllegalArgumentException("La lista de peticiones no puede ser nula"); //$NON-NLS-1$
 		}
@@ -232,6 +236,11 @@ final class XmlRequestsFactory {
 		sb.append(XML_CERT_OPEN);
 		sb.append(certB64);
 		sb.append(XML_CERT_CLOSE);
+	    if (reason != null && !reason.trim().isEmpty()) {
+		    sb.append(XML_RSN_OPEN);
+		    sb.append(Base64.encode(reason.getBytes()));
+		    sb.append(XML_RSN_CLOSE);
+	    }
 		sb.append("<rjcts>"); //$NON-NLS-1$
 		// Peticiones que se rechazan
 	    for (final String requestId : requestIds) {

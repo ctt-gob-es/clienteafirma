@@ -14,7 +14,7 @@ import es.gob.afirma.android.crypto.MobileKeyStoreManager.PrivateKeySelectionLis
 import es.gob.afirma.android.signfolder.proxy.CommManager;
 import es.gob.afirma.android.signfolder.proxy.RequestResult;
 import es.gob.afirma.android.signfolder.proxy.SignRequest;
-import es.gob.afirma.core.AOException;
+import es.gob.afirma.android.util.AOException;
 
 /** Clase para la firma de peticiones. El resultado del proceso, se gestiona, a nivel individual para
  * cada petici&oacute;n desde un listener.
@@ -50,7 +50,6 @@ final class RequestSigner implements PrivateKeySelectionListener {
 		new LoadSelectedPrivateKeyTask(this.certAlias, this, this.c).execute();
 	}
 
-	@SuppressWarnings("null")
 	@Override
 	public synchronized void keySelected(final KeySelectedEvent kse) {
 

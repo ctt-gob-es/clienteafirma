@@ -13,7 +13,7 @@ import android.util.Log;
 import es.gob.afirma.android.signfolder.proxy.CommManager;
 import es.gob.afirma.android.signfolder.proxy.RequestResult;
 import es.gob.afirma.android.signfolder.proxy.SignRequest;
-import es.gob.afirma.core.AOException;
+import es.gob.afirma.android.util.AOException;
 
 /** Tarea que ejecuta una firma electr&oacute;nica a trav&eacute;s de un AOSigner.
  * La operaci&oacute;n puede ser firma simple, cofirma o contrafirma (de nodos hoja

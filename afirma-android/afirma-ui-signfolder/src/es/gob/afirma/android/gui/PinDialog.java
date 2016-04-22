@@ -21,7 +21,7 @@ import es.gob.afirma.android.crypto.LoadKeyStoreManagerTask;
 import es.gob.afirma.android.crypto.LoadKeyStoreManagerTask.KeystoreManagerListener;
 import es.gob.afirma.android.signfolder.R;
 import es.gob.afirma.android.signfolder.SFConstants;
-import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.android.util.AOUtil;
 
 /** Di&acute;logo para introducir el PIN.
  * Se usa en almacenes distintos al del propio sistema operativo Android.

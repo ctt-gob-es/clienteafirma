@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Port@firma</string>
+    <string name="app_version">1.2</string>
+    <string name="app_name">Port@firmas v1.2</string>
     <string name="close">Cerrar</string>
     <string name="error">Error</string>
-	<string name="configuration">Configuraci\u00F3n</string>
+	<string name="server_select">Servidores Portafirmas</string>
     <string name="aviso">Aviso</string>
     <string name="see_details">Ver detalle</string>
     <string name="sign_vb">Firmar/V\u00BAB\u00BA</string>
@@ -138,8 +139,7 @@
     <string name="dialog_msg_loading_configuration">Cargando su configuraci\u00F3n\u002E\u002E\u002E</string>
     <string name="dialog_msg_no_selected_requests">No se han seleccionado peticiones de firma.</string>
     <string name="dialog_title_confirm_reject">Rechazo de peticiones</string>
-    <string name="dialog_msg_reject_request">¿Esta seguro que desea rechazar la petici\u00F3n seleccionada?</string>
-    <string name="dialog_msg_reject_requests">¿Esta seguro que desea rechazar las %d peticiones seleccionadas?</string>
+    <string name="dialog_msg_reject_request">Motivo de rechazo</string>
     <string name="dialog_title_close_session">Cierre de sesi\u00F3n</string>
     <string name="dialog_msg_close_session">Se va a cerrar su sesi\u00F3n. \u00BFDesea continuar?</string>
     <string name="dialog_msg_confirm_save_sign_title">\u00BFDesea descargar la firma?</string>
@@ -158,6 +158,17 @@
    	<string name="dialog_msg_confirm_sign">Se va a proceder a firmar esta petici\u00F3n. \u00BFDesea continuar?</string>
    	<string name="dialog_msg_confirm_approve">Se va a proceder a aprobar esta petici\u00F3n. \u00BFDesea continuar? </string>
 
+   	<string name="dialog_server_new_button">Nuevo servidor</string>
+   	<string name="dialog_server_edit_button">Editar servidor</string>
+   	<string name="dialog_server_delete_button">Eliminar</string>
+   	<string name="dialog_server_empty_fields">No puede haber campos vac\u00EDos</string>
+   	
+   	<string name="dialog_add_server_aliasLabel">Alias</string>
+   	<string name="dialog_add_server_urlLabel">URL</string>
+   	<string name="dialog_add_server_title">Nuevo servidor de Portafirmas</string>
+   	<string name="dialog_edit_server_title">Editar servidor Portafirmas</string>
+   	<string name="dialog_server_new_subtitle">Seleccione el servidor del Portafimas</string>
+   	
     <string name="security_code">C\u00F3digo de seguridad</string>
 	<string name="security_code_hint">C\u00F3digo de seguridad. </string>
 	
@@ -182,8 +193,7 @@
     <string name="order_rule_title_app">Aplicaci\u00F3n</string>
     <string name="filter_app_all_request">TODAS</string>
     
-    <string name="dialog_title_login_options">Configuraci\u00F3n del Portafirmas</string>
-    <string name="title_url_portafirmas">Servicio de Portafirmas:</string>
+    <string name="title_url_portafirmas">URL del nuevo servicio de Portafirmas:</string>
     <string name="hint_url_portafirmas">URL Portafirmas</string>
     <string name="invalid_url">La URL del Portafirmas no es v\u00E1lida</string>
     
