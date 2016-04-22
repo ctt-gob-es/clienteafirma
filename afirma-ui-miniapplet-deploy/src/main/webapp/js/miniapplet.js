@@ -28,6 +28,12 @@ var MiniApplet = ( function ( window, undefined ) {
 
 		var retrieverServletAddress = null;
 
+		var jnlpServiceAddress = null;
+
+		var setJnlpService = function (jnlp){
+			jnlpServiceAddress = jnlp;
+		}
+
 		var clientType = null;
 
 		var severeTimeDelay = false;
@@ -42,7 +48,7 @@ var MiniApplet = ( function ( window, undefined ) {
 				checktime_server_time: "Hora del servidor"
 		};
 		LOCALIZED_STRINGS["gl_ES"] = {
-				checktime_warn: "Destectouse un desfase horario entre o seu sistema e o servidor. Recoméndase corrixilo antes de pulsar Aceptar para continuar.",
+				checktime_warn: "Destectouse un desfase horario entre o seu sistema e o servidor. RecomÃ©ndase corrixilo antes de pulsar Aceptar para continuar.",
 				checktime_err: "Destectouse un desfase horario entre o seu sistema e o servidor. Debe corrixir a hora do seu sistema antes de continuar.",
 				checktime_local_time: "Hora do seu sistema",
 				checktime_server_time: "Hora do servidor"
@@ -112,7 +118,7 @@ var MiniApplet = ( function ( window, undefined ) {
 		var AUTOFIRMA_CONNECTION_RETRIES = 10;
 
 		// Variable que se puede configurar para forzar el uso del modo de comunicacion por servidor intermedio
-		// entre la página web y AutoFirma
+		// entre la pÃ¡gina web y AutoFirma
 		var forceWSMode = false;
 
 		// Variable que se puede configurar para forzar el uso del modo o afirma://
@@ -282,7 +288,7 @@ var MiniApplet = ( function ( window, undefined ) {
 			forceWSMode = force;
 		}
 
-		/** Permite establecer que la invocación con AutoFirma sea a traves
+		/** Permite establecer que la invocaciÃ³n con AutoFirma sea a traves
 		 * del protocolo afirma:// */
 		var setForceAFirma = function (force) {
 			forceAFirma = force;
@@ -1191,7 +1197,7 @@ var MiniApplet = ( function ( window, undefined ) {
 				  //console.log("Probamos afirma://");
 				  //window.protocolCheck("afirma://service?ports=" + portsLine + "&v=" + PROTOCOL_VERSION + "&idsession=" + idSession, function(){
 					  console.log("Probamos jnlp://");
-					  //alert("No dispone de AutoFirma instalado. Se va a probar la versión online");
+					  //alert("No dispone de AutoFirma instalado. Se va a probar la versiÃ³n online");
 					  //setTimeout(window.focus,0);
 					  window.protocolCheck(jnlpServiceAddress+'?cadenaFirma='+encodeURIComponent("afirma://service?ports=" + portsLine + "&v=" + PROTOCOL_VERSION + "&idsession=" + idSession),
 					           function () {
@@ -1201,9 +1207,9 @@ var MiniApplet = ( function ( window, undefined ) {
 					           });
 				  //});
 				}else{
-					//openUrl(jnlpServiceAddress+'?cadenaFirma='+encodeURIComponent("afirma://service?ports=" + portsLine + "&v=" + _VERSION + "&idsession=" + idSession));
+					//openUrl(jnlpServiceAddress+'?cadenaFirma='+encodeURIComponent("afirma://service?ports=" + portsLine + "&v=" + PROTOCOL_VERSION + "&idsession=" + idSession));
 					bJNLP = false;
-					openUrl("afirma://service?ports=" + portsLine + "&v=" + _VERSION + "&idsession=" + idSession);
+					openUrl("afirma://service?ports=" + portsLine + "&v=" + PROTOCOL_VERSION + "&idsession=" + idSession);
 				}
 
 			}
@@ -1302,9 +1308,9 @@ var MiniApplet = ( function ( window, undefined ) {
 			}
 
 			/**
-			* Intenta conectar con la aplicación nativa mandando una peticion echo al puerto.
-			* Si la aplicación responde lanzamos la ejecucion del servicio.
-			* Si la aplicación no responde volvemos a lanzar cada 2 segundos otra peticion echo hasta que una
+			* Intenta conectar con la aplicaciÃ³n nativa mandando una peticion echo al puerto.
+			* Si la aplicaciÃ³n responde lanzamos la ejecucion del servicio.
+			* Si la aplicaciÃ³n no responde volvemos a lanzar cada 2 segundos otra peticion echo hasta que una
 			* peticion sea aceptada.
 			*/
 			function executeEchoByService (currentPort, url, timeoutResetCounter, semaphore) {
@@ -1379,11 +1385,11 @@ var MiniApplet = ( function ( window, undefined ) {
 				var httpRequest = getHttpRequest();
 				httpRequest.open("POST", urlHttpRequest, true);
 				httpRequest.setRequestHeader("Content-type","application/x-www-form-urlencoded");
-				// Como internet explorer añade basura hacemos las peticiones muy pequeñas para que funcionen correctamente.
+				// Como internet explorer aÃ±ade basura hacemos las peticiones muy pequeÃ±as para que funcionen correctamente.
 				if (isInternetExplorer()){
 					URL_MAX_SIZE = 12000;
 				}
-				// Si el envio se debe fragmentar, llamamos a una función que se encarga de mandar la peticion recursivamente
+				// Si el envio se debe fragmentar, llamamos a una funciÃ³n que se encarga de mandar la peticion recursivamente
 				if (url.length > URL_MAX_SIZE) {
 					executeOperationRecursive(url, 1, Math.ceil(url.length/URL_MAX_SIZE));
 				}
@@ -1420,7 +1426,7 @@ var MiniApplet = ( function ( window, undefined ) {
 					httpRequest.onerror = function(e) {
 						// status error 0 es que no se ha podido comunicar con la aplicacion
 						if (e.target.status == 0) {
-							errorServiceResponseFunction("java.lang.IOException", "Se ha perdido la conexión con la aplicación @firma "+e.target.statusText);
+							errorServiceResponseFunction("java.lang.IOException", "Se ha perdido la conexiÃ³n con la aplicaciÃ³n @firma "+e.target.statusText);
 						}
 						// error desconocido
 						else {
@@ -1433,8 +1439,8 @@ var MiniApplet = ( function ( window, undefined ) {
 			}
 
 			/**
-			* Manda los datos a la aplicación nativa en varios fragmentos porque ha habido que dividir los datos.
-			* Se va mandando cada petición cuando se reciba la anterior.
+			* Manda los datos a la aplicaciÃ³n nativa en varios fragmentos porque ha habido que dividir los datos.
+			* Se va mandando cada peticiÃ³n cuando se reciba la anterior.
 			*/
 			function executeOperationRecursive (url, i, iFinal) {
 
@@ -1478,7 +1484,7 @@ var MiniApplet = ( function ( window, undefined ) {
 				httpRequest.onerror = function(e) {
 					// Status error 0 es que no se ha podido comunicar con la aplicacion
 					if (e.target.status == 0){
-						errorServiceResponseFunction("java.lang.IOException", "Se ha perdido la conexión con la aplicación @firma "+e.target.statusText);
+						errorServiceResponseFunction("java.lang.IOException", "Se ha perdido la conexiÃ³n con la aplicaciÃ³n @firma "+e.target.statusText);
 					}
 					// Error desconocido
 					else{
@@ -1531,7 +1537,7 @@ var MiniApplet = ( function ( window, undefined ) {
 				httpRequest.onerror = function(e) {
 					// status error 0 es que no se ha podido comunicar con la aplicacion
 					if (e.target.status == 0){
-						errorServiceResponseFunction("java.lang.IOException", "Se ha perdido la conexión con la aplicación @firma "+e.target.statusText);
+						errorServiceResponseFunction("java.lang.IOException", "Se ha perdido la conexiÃ³n con la aplicaciÃ³n @firma "+e.target.statusText);
 					}
 					// error desconocido
 					else{
@@ -1587,7 +1593,7 @@ var MiniApplet = ( function ( window, undefined ) {
 				httpRequest.onerror = function(e) {
 					// status error 0 es que no se ha podido comunicar con la aplicacion
 					if (e.target.status == 0){
-						errorServiceResponseFunction("java.lang.IOException", "Se ha perdido la conexión con la aplicación @firma "+e.target.statusText);
+						errorServiceResponseFunction("java.lang.IOException", "Se ha perdido la conexiÃ³n con la aplicaciÃ³n @firma "+e.target.statusText);
 					}
 					// error desconocido
 					else{
