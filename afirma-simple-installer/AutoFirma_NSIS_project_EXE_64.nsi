@@ -156,11 +156,6 @@ Section "Programa" sPrograma
 	  ExecWait '"$R0" /S _?=$INSTDIR'
 	Install:
 	
-	;Se cierran los navegadores abiertos
-	${nsProcess::FindProcess} "firefox.exe" $R3
-	StrCmp $R3 0 0 +1
-	${nsProcess::KillProcess} "firefox.exe" $R0
-	
 	SetOutPath $INSTDIR\$PATH
 
 	;Incluimos todos los ficheros que componen nuestra aplicacion
@@ -300,7 +295,7 @@ Section "Programa" sPrograma
 	StrCmp $1 "" done1
 	StrCpy $chromePath "C:\Users\$1\AppData\Local\Google\Chrome\User Data"
 	${If} ${FileExists} "$chromePath\Local State"
-	
+
 	;Se incluye AutoFirma como aplicación de confianza en Google Chrome
 	Push '"afirma":false,' #text to be replaced
 	Push '' #replace with
@@ -343,7 +338,6 @@ Section "Programa" sPrograma
 	EndChrome:
 	${nsProcess::Unload}
 SectionEnd
-
 
 !define CERT_STORE_CERTIFICATE_CONTEXT  1
 !define CERT_NAME_ISSUER_FLAG           1
@@ -635,7 +629,6 @@ Section "uninstall"
 	done2:
 	FindClose $0
 	
-	ExecWait '"$INSTDIR\AutoFirma\AutoFirmaConfigurador.exe" -uninstall /passive'
 	RMDir /r $INSTDIR\$PATH
 	;Borrar directorio de instalacion si es un directorio valido (contiene "AutoFirma" o es una subcarpeta de Program Files)
 	${StrContains} $0 "Program Files (x86)\" $INSTDIR
@@ -653,7 +646,7 @@ Section "uninstall"
 	
 	DeleteRegKey HKLM "SOFTWARE\$PATH"
     DeleteRegKey HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH" 
-			
+
 	DeleteRegKey HKEY_CLASSES_ROOT "*\shell\afirma.sign"
 	DeleteRegKey HKEY_CLASSES_ROOT "*\shell\afirma.hashFile"
 	DeleteRegKey HKEY_CLASSES_ROOT "Directory\shell\afirma.hashDirectory"
@@ -738,7 +731,7 @@ Function un.StrContains
    Exch $STR_RETURN_VAR  
 FunctionEnd
 
-Function AdvReplaceInFile
+Function un.AdvReplaceInFile
 Exch $0 ;file to replace in
 Exch
 Exch $1 ;number to replace after
@@ -771,7 +764,6 @@ Push $R6 ;temp file name
    StrLen $R3 $4
    StrCpy $R4 -1
    StrCpy $R5 -1
- 
 loop_read:
  ClearErrors
  FileRead $R1 $R2 ;read line
@@ -846,7 +838,7 @@ Pop $3
 Pop $4
 FunctionEnd
 
-Function un.AdvReplaceInFile
+Function AdvReplaceInFile
 Exch $0 ;file to replace in
 Exch
 Exch $1 ;number to replace after
@@ -879,6 +871,7 @@ Push $R6 ;temp file name
    StrLen $R3 $4
    StrCpy $R4 -1
    StrCpy $R5 -1
+
 loop_read:
  ClearErrors
  FileRead $R1 $R2 ;read line

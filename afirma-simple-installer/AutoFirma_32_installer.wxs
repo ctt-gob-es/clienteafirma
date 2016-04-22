@@ -10,7 +10,7 @@
 	  
    <Product Codepage="1252" Id="*" Name="$(var.ProjectName)" Language="1033" Version="$(var.VersionNumber)" Manufacturer="$(var.ManufacturerName)" UpgradeCode="$(var.UpgradeCode)" >
  
-		<Package Id="*" Compressed="yes" Description="$(var.ProjectName)" InstallerVersion="200" Languages="1033" Manufacturer="$(var.ManufacturerName)" Platform="x86" />
+		<Package Id="*" Compressed="yes" Description="$(var.ProjectName)" InstallerVersion="200" Languages="1033" Manufacturer="$(var.ManufacturerName)" Platform="$(var.Platform)" />
        
 	   	<!-- Detecta versiones anteriores ya instaladas en el equipo -->
 	    <MajorUpgrade DowngradeErrorMessage="Ya existe una versión posterior en el equipo." />
@@ -18,7 +18,7 @@
 	   <!-- Ejeuta el AutoFirmaGenerator.exe al instalar -->
 		<CustomAction Id="Exec_Cmd"
                       Property="ExecProperty"
-                      Value="&quot;[#$(var.ProjectName)Generator.exe]&quot; /S"
+                      Value='"[#$(var.ProjectName)Generator.exe]" /S'
                       Execute="immediate"/>
 		<CustomAction Id="ExecProperty"
                       BinaryKey="WixCA"
@@ -29,7 +29,7 @@
 		<!-- Ejecuta el uninstall$(var.Platform).exe al desinstalar -->
 		<CustomAction Id="Exec_Cmd2"
                       Property="ExecProperty2"
-                      Value="&quot;[#uninstall$(var.Platform).exe]&quot; /S"
+                      Value='"[#uninstall$(var.Platform).exe]" /S'
                       Execute="immediate"/>
 		<CustomAction Id="ExecProperty2"
                       BinaryKey="WixCA"

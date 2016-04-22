@@ -65,8 +65,9 @@
 				MiniApplet.sign(dataB64, "SHA1withRSA", format, params, successCallback, errorCallback);
 			}
 			catch (excep) {
+				errorCallback(MiniApplet.getErrorType(), MiniApplet.getErrorMessage());
 				//Se puede recuperar el mensaje de error y pintarlo en la pantalla
-				var msg = getErrorMessage();
+				var msg = MiniApplet.getErrorMessage();
 				if (msg==undefined || msg==null) msg = excep.message;
 				if (msg==undefined || msg==null) msg = '';
 				divMensaje.innerHTML='<br><div class="iconErrorFirma">Error al firmar</div><br>' + msg + '<br>';
