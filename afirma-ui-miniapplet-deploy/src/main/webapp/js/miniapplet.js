@@ -58,18 +58,6 @@ var MiniApplet = ( function ( window, undefined ) {
 		/* Constantes para la operacion interna del Cliente */
 		/* ------------------------------------------------ */
 
-		/* Longitud maxima de una URL en Android para la invocacion de una aplicacion nativa. */
-		var MAX_LONG_ANDROID_URL = 2000;
-		
-		/* Longitud maxima de una URL en iOS para la invocacion de una aplicacion nativa. */
-		var MAX_LONG_IOS_URL = 80000;
-		
-		/* Longitud maxima de una URL en Windows 8 para la invocacion de una aplicacion nativa. */
-		var MAX_LONG_WINDOWS8_URL = 2000;
-		
-		/* Longitud maxima que generalmente se permite a una URL. */
-		var MAX_LONG_GENERAL_URL = 2000;
-
 		/* Tamano del buffer con el que se pasa informacion al applet */
 		var BUFFER_SIZE = 2 * 1024 * 1024;
 
@@ -204,19 +192,6 @@ var MiniApplet = ( function ( window, undefined ) {
         function isEdge() {
         	return !!navigator.userAgent.match(/Edge\/\d+/);
         }
-
-		function isURLTooLong(url) {
-			if (isAndroid()) {
-				return url.length > MAX_LONG_ANDROID_URL;
-			}
-			else if (isIOS()) {
-				return url.length > MAX_LONG_IOS_URL;
-			}
-			else if (isWindows8()) {
-				return url.length > MAX_LONG_WINDOWS8_URL;
-			}
-			return url.length > MAX_LONG_GENERAL_URL;
-		}
 
 		/** Indica si el navegador detecta Java. Este valor no es completamente fiable, ya que
 		 * Internet Explorer siempre indica que si esta activado. */
@@ -1800,6 +1775,19 @@ var MiniApplet = ( function ( window, undefined ) {
 
 			var UnsupportedOperationException = "java.lang.UnsupportedOperationException";
 
+
+			/* Longitud maxima de una URL en Android para la invocacion de una aplicacion nativa. */
+			var MAX_LONG_ANDROID_URL = 2000;
+			
+			/* Longitud maxima de una URL en iOS para la invocacion de una aplicacion nativa. */
+			var MAX_LONG_IOS_URL = 80000;
+			
+			/* Longitud maxima de una URL en Windows 8 para la invocacion de una aplicacion nativa. */
+			var MAX_LONG_WINDOWS8_URL = 2000;
+			
+			/* Longitud maxima que generalmente se permite a una URL. */
+			var MAX_LONG_GENERAL_URL = 2000;
+			
 			/**
 			 *  Atributos para la configuracion del objeto sustituto del applet Java de firma
 			 */
@@ -1858,7 +1846,7 @@ var MiniApplet = ( function ( window, undefined ) {
 			function counterSign (signB64, algorithm, format, extraParams, successCallback, errorCallback) {
 				signOperation("countersign", signB64, algorithm, format, extraParams, successCallback, errorCallback);
 			}
-
+			
 			/**
 			 * Realiza una operacion de firma/multifirma.
 			 * @param signId Identificador de la operacion a realizar (sign, cosign y countersign).
@@ -1906,21 +1894,16 @@ var MiniApplet = ( function ( window, undefined ) {
 						return;
 					}
 
-					var fileId = preProccessData(cipherKey, storageServletAddress, signId, params);
-					if (!fileId) {
-						throwException("java.net.UnknownHostException", "No se han podido enviar los datos a la aplicacion de firma");
-						return;
-					}
-
-					url = buildUrlWithoutData(signId, fileId, retrieverServletAddress, cipherKey);
-					if (isURLTooLong(url)) {
-						throwException("java.lang.IllegalArgumentException", "La URL de invocacion al servicio de firma es demasiado larga.");
-						return;
-					}
+					sendDataAndExecAppIntent(idSession, cipherKey, storageServletAddress, retrieverServletAddress, signId, params, successCallback, errorCallback)
 				}
-				execAppIntent(url, idSession, cipherKey, successCallback, errorCallback);
+				else {
+					execAppIntent(url, idSession, cipherKey, successCallback, errorCallback);
+				}
 			}
 
+			/**
+			 * Ejecuta una operacion de firma de lote.
+			 */
 			function signBatch (batchB64, batchPreSignerUrl, batchPostSignerUrl, extraParams, successCallback, errorCallback) {
 				
 				if (batchB64 == undefined || batchB64 == "") {
@@ -1962,19 +1945,11 @@ var MiniApplet = ( function ( window, undefined ) {
 						return;
 					}
 
-					var fileId = preProccessData(cipherKey, storageServletAddress, "batch", params);
-					if (!fileId) {
-						throwException("java.net.UnknownHostException", "No se han podido enviar los datos a la aplicacion de firma");
-						return;
-					}
-
-					url = buildUrlWithoutData("batch", fileId, retrieverServletAddress, cipherKey);
-					if (isURLTooLong(url)) {
-						throwException("java.lang.IllegalArgumentException", "La URL de invocacion al servicio de firma es demasiado larga.");
-						return;
-					}
+					sendDataAndExecAppIntent(idSession, cipherKey, storageServletAddress, retrieverServletAddress, opId, params, successCallback, errorCallback)
 				}
-				execAppIntent(url, idSession, cipherKey, successCallback, errorCallback);
+				else {
+					execAppIntent(url, idSession, cipherKey, successCallback, errorCallback);
+				}
 			}
 			
 			/**
@@ -2006,8 +1981,9 @@ var MiniApplet = ( function ( window, undefined ) {
 				var cipherKey = generateCipherKey();
 
 				var i = 0;
+				var opId = "save";
 				var params = new Array();
-				params[i++] = {key:"op", value:"save"};
+				params[i++] = {key:"op", value:opId};
 				if (idSession != null && idSession != undefined) {		params[i++] = {key:"id", value:idSession}; }
 				if (cipherKey != null && cipherKey != undefined) {		params[i++] = {key:"key", value:cipherKey}; }
 				if (storageServletAddress != null &&
@@ -2018,7 +1994,7 @@ var MiniApplet = ( function ( window, undefined ) {
 				if (description != null && description != undefined) {	params[i++] = {key:"description", value:description}; }
 				if (dataB64 != null && dataB64 != undefined && dataB64 != "") {			params[i++] = {key:"dat", value:dataB64}; }
 
-				var url = buildUrl("save", params);
+				var url = buildUrl(opId, params);
 
 				// Si la URL es muy larga, realizamos un preproceso para que los datos se suban al
 				// servidor y la aplicacion nativa los descargue, en lugar de pasarlos directamente 
@@ -2028,19 +2004,11 @@ var MiniApplet = ( function ( window, undefined ) {
 						return;
 					}
 
-					var fileId = preProccessData(cipherKey, storageServletAddress, "save", params);
-					if (!fileId) {
-						throwException("java.net.UnknownHostException", "No se han podido enviar los datos a la aplicacion de firma");
-						return;
-					}
-
-					url = buildUrlWithoutData("save", fileId, retrieverServletAddress, cipherKey);
-					if (isURLTooLong(url)) {
-						throwException("java.lang.IllegalArgumentException", "La URL de invocacion al servicio de firma es demasiado larga.");
-						return;
-					}
+					sendDataAndExecAppIntent(idSession, cipherKey, storageServletAddress, retrieverServletAddress, opId, params, successCallback, errorCallback)
 				}
-				execAppIntent(url, idSession, cipherKey, successCallback, errorCallback);
+				else {
+					execAppIntent(url, idSession, cipherKey, successCallback, errorCallback);
+				}
 			}
 
 			/**
@@ -2123,6 +2091,24 @@ var MiniApplet = ( function ( window, undefined ) {
 				throw new Error();
 			}
 
+
+			/**
+			 * Comprueba si una URL es demasiado larga para ser usada en una llamada
+			 * GET en un Sistema/Navegador concreto.
+			 */
+			function isURLTooLong(url) {
+				if (isAndroid()) {
+					return url.length > MAX_LONG_ANDROID_URL;
+				}
+				else if (isIOS()) {
+					return url.length > MAX_LONG_IOS_URL;
+				}
+				else if (isWindows8()) {
+					return url.length > MAX_LONG_WINDOWS8_URL;
+				}
+				return url.length > MAX_LONG_GENERAL_URL;
+			}
+			
 			/* Mayor entero. */
 			var MAX_NUMBER = 2147483648;
 
@@ -2190,16 +2176,75 @@ var MiniApplet = ( function ( window, undefined ) {
 			}
 
 			/**
+			 * Envia los datos al servidor intermedio y luego invoca a la
+			 * aplicacion nativa para que los descargue y opere con ellos.
+			 * @param idSession Identificador de la operacion con el que se espera recuperar el resultado.
+			 * @param cipherKey Clave de cifrado. Si no se indica, no se cifra.
+			 * @param storageServletAddress URL del servlet que almacena.
+			 * @param retrieverServletAddress URL del servlet que recupera.
+			 * @param op Identificador del tipo de operacion (firma, cofirma, guardado,...).
+			 * @param params Parametros de configuracion de la operacion.
+			 * @param successCallback Funcion callback que debe ejecutarse en caso de exito.
+			 * @param errorCallback Funcion callback que debe ejecutarse en caso de error.
+			 */
+			function sendDataAndExecAppIntent(idSession, cipherKey, storageServletAddress, retrieverServletAddress, op, params, successCallback, errorCallback) {
+
+				// Identificador del fichero (equivalente a un id de sesion) del que deben recuperarse los datos
+				var fileId = generateNewIdSession(); 
+
+				// Subimos los datos al servidor intermedio
+				var httpRequest = getHttpRequest();
+				if (!httpRequest) {
+					throwException("java.lang.Exception", "Su navegador no permite preprocesar los datos que desea tratar");
+				}
+				httpRequest.open("POST", storageServletAddress, true);
+				httpRequest.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+
+				httpRequest.onreadystatechange = function () {
+					if (httpRequest.readyState == 4) {
+						 if (httpRequest.status == 200) {
+	
+							url = buildUrlWithoutData(op, fileId, retrieverServletAddress, cipherKey);
+							if (isURLTooLong(url)) {
+								errorCallback("java.lang.IllegalArgumentException", "La URL de invocacion al servicio de firma es demasiado larga.");
+								return;
+							}
+							execAppIntent(url, idSession, cipherKey, successCallback, errorCallback);
+						}
+						else {
+							errorCallback("java.lang.IOException", "Ocurrio un error al enviar los datos a la aplicacion nativa");
+						}
+					}
+				}
+				
+				httpRequest.onerror = function(e) {
+					errorCallback("java.lang.IOException", "Ocurrio un error al enviar los datos al servicio intermedio para la comunicacion con la aplicacion nativa");
+				}
+
+				var requestData =
+					"op=put&v=1_0&id=" + fileId + "&dat=" + 
+					cipher(buildXML(op, params), cipherKey);
+
+				try {
+					httpRequest.send(requestData);
+				}
+				catch(e) {
+					errorMessage = "No se pudo conectar con el servidor remoto";
+					errorType = "java.io.IOException";
+				}
+			}
+			
+			/**
 			 * Invoca un Intent con la operacion seleccionada, la configuraci\u00F3n establecida y las campos del
 			 * formulario pasado como parametro. Si se define un callback para tratar el caso de exito o error de
 			 * la operacion, se intentara descargar el resultado devuelto por la app del servidor intermedio de
 			 * comunicacion. 
 			 *
-			 * intentURL: URL para la invocacion del Cliente JavaScript
-			 * idSession: Identificador de la sesi\u00F3n para la recuperaci\u00F3n del resultado.
-			 * cipherKey: Clave de cifrado para la respuesta del servidor.
-			 * successCallback: Actuaci\u00F3n a realizar cuando se recupera el resultado de la operaci&oacute;n.
-			 * errorCallback: Actuaci\u00F3n a realizar cuando ocurre un error al recuperar el resultado.
+			 * @param intentURL URL para la invocacion del Cliente JavaScript
+			 * @param idSession Identificador de la sesi\u00F3n para la recuperaci\u00F3n del resultado.
+			 * @param cipherKey Clave de cifrado para la respuesta del servidor.
+			 * @param successCallback Actuaci\u00F3n a realizar cuando se recupera el resultado de la operaci&oacute;n.
+			 * @param errorCallback Actuaci\u00F3n a realizar cuando ocurre un error al recuperar el resultado.
 			 */
 			function execAppIntent (intentURL, idSession, cipherKey, successCallback, errorCallback) {
 
@@ -2246,48 +2291,6 @@ var MiniApplet = ( function ( window, undefined ) {
 					url = 'afirma://' + op + '?' + urlParams;
 				}
 				return url;
-			}
-
-			/**
-			 * Generan un XML con los datos de configuracion de la operacion indicada,
-			 * los cifra y lo envia a un servidor para su descarga.
-			 * @param cipherKey Clave de cifrado. Si no se indica, no se cifra.
-			 * @param storageServletAddress URL del servlet que almacena.
-			 * @param op Operacion que se configura.
-			 * @param params Parametros de configuracion de la operacion 
-			 * @returns El identificador con el que se ha guardado el fichero en servidor o false
-			 * si se produjo algun error.  
-			 */
-			function preProccessData (cipherKey, storageServletAddress, op, params) {
-
-				// Identificador del fichero (equivalente a un id de sesion) del que deben recuperarse los datos
-				var fileId = generateNewIdSession(); 
-
-				// Subimos los datos al servidor intermedio
-				var httpRequest = getHttpRequest();
-				if (!httpRequest) {
-					throwException("java.lang.Exception", "Su navegador no permite preprocesar los datos que desea tratar");
-				}
-
-				var requestData =
-					"op=put&v=1_0&id=" + fileId + "&dat=" + 
-					cipher(buildXML(op, params), cipherKey);
-
-				httpRequest.open("POST", storageServletAddress, false);
-				httpRequest.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-				try {
-					httpRequest.send(requestData);
-				}
-				catch(e) {
-					errorMessage = "No se pudo conectar con el servidor remoto";
-					errorType = "java.io.IOException";
-				}
-				
-				if (httpRequest.readyState == 4 && httpRequest.status == 200) {
-					return fileId;	
-				}
-
-				return false;
 			}
 
 			/**
@@ -2360,7 +2363,7 @@ var MiniApplet = ( function ( window, undefined ) {
 					}
 
 					// En el caso de ser una version de internet Explorer que soportase la deteccion de aplicacion
-					// capaces de manejar el protocolo, aprovechamos esta caracteristica
+					// capaces de manejar el protocolo, aprovechamos esta caracteristica (Internet Explorer para Windows 8 Modern UI)
 					if (navigator.msLaunchUri) {
 						navigator.msLaunchUri(
 								url,
@@ -2537,7 +2540,7 @@ var MiniApplet = ( function ( window, undefined ) {
 				httpRequest.onerror = function() {
 					errorResponseFunction("java.lang.Exception", "No se pudo conectar con el servidor intermedio para la recuperacion del resultado de la operacion", errorCallback);
 				}
-				
+
 				httpRequest.open("POST", url, true);
 				httpRequest.setRequestHeader("Content-type","application/x-www-form-urlencoded");
 				
