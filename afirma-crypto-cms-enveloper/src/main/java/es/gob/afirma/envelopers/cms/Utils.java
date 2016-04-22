@@ -413,13 +413,11 @@ final class Utils {
      * @throws java.security.NoSuchAlgorithmException Cuando el JRE no soporta alg&uacute;n algoritmo necesario.
      * @throws javax.crypto.NoSuchPaddingException Cuando el JRE no soporta alg&uacute;n tipo de relleno necesario.
      * @throws java.security.InvalidKeyException Cuando hay problemas de adecuaci&oacute;n de la clave.
-     * @throws java.security.InvalidAlgorithmParameterException Si no se soporta un par&aacute;metro necesario para un algoritmo.
      * @throws javax.crypto.IllegalBlockSizeException Cuando hay problemas internos con los tama&ntilde;os de bloque de cifrado. */
     private static byte[] cipherKey(final PublicKey pKey,
     		                        final SecretKey cipherKey) throws NoSuchAlgorithmException,
                                                                       NoSuchPaddingException,
                                                                       InvalidKeyException,
-                                                                      InvalidAlgorithmParameterException,
                                                                       IllegalBlockSizeException {
         final Cipher cipher = createCipher(pKey.getAlgorithm());
         cipher.init(Cipher.WRAP_MODE, pKey);

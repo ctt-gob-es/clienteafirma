@@ -93,7 +93,7 @@ public final class AOFacturaESigner implements AOSigner {
                          final String algorithm,
                          final PrivateKey key,
                          final Certificate[] certChain,
-                         final Properties extraParams) throws AOException {
+                         final Properties extraParams) {
     	throw new UnsupportedOperationException("No se soporta la cofirma de facturas"); //$NON-NLS-1$
     }
 
@@ -103,7 +103,7 @@ public final class AOFacturaESigner implements AOSigner {
                          final String algorithm,
                          final PrivateKey key,
                          final Certificate[] certChain,
-                         final Properties extraParams) throws AOException {
+                         final Properties extraParams) {
     	throw new UnsupportedOperationException("No se soporta la cofirma de facturas"); //$NON-NLS-1$
     }
 
@@ -115,7 +115,7 @@ public final class AOFacturaESigner implements AOSigner {
                               final Object[] targets,
                               final PrivateKey key,
                               final Certificate[] certChain,
-                              final Properties extraParams) throws AOException {
+                              final Properties extraParams) {
         throw new UnsupportedOperationException("No se soporta la contrafirma de facturas"); //$NON-NLS-1$
     }
 
@@ -303,7 +303,7 @@ public final class AOFacturaESigner implements AOSigner {
 
     /** {@inheritDoc} */
     @Override
-	public AOSignInfo getSignInfo(final byte[] signData) throws AOException, IOException {
+	public AOSignInfo getSignInfo(final byte[] signData) {
     	final AOSignInfo facturaeSignInfo = new AOSignInfo(AOSignConstants.SIGN_FORMAT_FACTURAE);
     	facturaeSignInfo.setVariant(null);
     	return facturaeSignInfo;

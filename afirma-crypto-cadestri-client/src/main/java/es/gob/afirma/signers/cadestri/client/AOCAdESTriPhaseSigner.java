@@ -21,7 +21,6 @@ import java.util.Properties;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.AOException;
-import es.gob.afirma.core.AOInvalidFormatException;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.http.UrlHttpManager;
 import es.gob.afirma.core.misc.http.UrlHttpManagerFactory;
@@ -63,8 +62,7 @@ public class AOCAdESTriPhaseSigner implements AOSigner {
 			           final String algorithm,
 			           final PrivateKey key,
 			           final Certificate[] certChain,
-			           final Properties extraParams) throws AOException,
-			                                                IOException {
+			           final Properties extraParams) throws AOException {
 		return triPhaseOperation(
 			AOSignConstants.SIGN_FORMAT_CADES,
 			CRYPTO_OPERATION_SIGN,
@@ -82,7 +80,7 @@ public class AOCAdESTriPhaseSigner implements AOSigner {
 			final String algorithm,
 			final PrivateKey key,
 			final Certificate[] certChain,
-			final Properties extraParams) throws AOException, IOException {
+			final Properties extraParams) throws AOException {
 		return cosign(sign, algorithm, key, certChain, extraParams);
 	}
 
@@ -91,8 +89,7 @@ public class AOCAdESTriPhaseSigner implements AOSigner {
 			             final String algorithm,
 			             final PrivateKey key,
 			             final Certificate[] certChain,
-			             final Properties extraParams) throws AOException,
-			                                                  IOException {
+			             final Properties extraParams) throws AOException {
 		return triPhaseOperation(
 			AOSignConstants.SIGN_FORMAT_CADES,
 			CRYPTO_OPERATION_COSIGN,
@@ -111,7 +108,7 @@ public class AOCAdESTriPhaseSigner implements AOSigner {
 			final Object[] targets,
 			final PrivateKey key,
 			final Certificate[] certChain,
-			final Properties extraParams) throws AOException, IOException {
+			final Properties extraParams) throws AOException {
 
 		// Si no se ha definido nodos objeto de la contrafirma se definen los nodos hijo
 		if (targetType == null) {
@@ -138,7 +135,7 @@ public class AOCAdESTriPhaseSigner implements AOSigner {
 
 	/** {@inheritDoc} */
 	@Override
-	public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo) throws AOInvalidFormatException {
+	public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo) {
 		throw new UnsupportedOperationException("No se soporta la obtencion de estructura de firmas en firma trifasica"); //$NON-NLS-1$
 	}
 
@@ -166,13 +163,13 @@ public class AOCAdESTriPhaseSigner implements AOSigner {
 
 	/** {@inheritDoc} */
 	@Override
-	public byte[] getData(final byte[] signData) throws AOException, IOException {
+	public byte[] getData(final byte[] signData) {
 		throw new UnsupportedOperationException("No se soporta ela obtencion de datos en firma trifasica"); //$NON-NLS-1$
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	public AOSignInfo getSignInfo(final byte[] sign) throws AOException {
+	public AOSignInfo getSignInfo(final byte[] sign) {
 		throw new UnsupportedOperationException("No se soporta la obtencion de informacion de la firma en modo trifasico"); //$NON-NLS-1$
 	}
 

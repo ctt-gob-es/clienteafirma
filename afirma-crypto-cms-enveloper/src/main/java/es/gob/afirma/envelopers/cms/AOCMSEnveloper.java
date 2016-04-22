@@ -101,11 +101,10 @@ public class AOCMSEnveloper implements AOEnveloper {
      * @param digestAlgorithm Algoritmo a usar para la envoltura (SHA1withRSA, MD5withRSA,...)
      * @param type Tipo de envoltura que se quiere hacer.
      * @param keyEntry Clave privada a usar para firmar.
-     * @param certDest Certificados de los usuarios a los que va destinado el sobre digital
-     * @param cipherAlgorithm Algoritmo utilizado para cifrar
-     * @param extraParams Par&aacute;metros adicionales
-     * @return Envoltorio CADES
-     * @throws AOException Cuando ocurre cualquier problema en el proceso */
+     * @param certDest Certificados de los usuarios a los que va destinado el sobre digital.
+     * @param cipherAlgorithm Algoritmo utilizado para cifrar.
+     * @param extraParams Par&aacute;metros adicionales.
+     * @return Envoltorio CADES. */
     @Override
 	public byte[] envelop(final byte[] data,
                           final String digestAlgorithm,
@@ -114,7 +113,7 @@ public class AOCMSEnveloper implements AOEnveloper {
                           final X509Certificate[] certDest,
                           final AOCipherAlgorithm cipherAlgorithm,
                           final String dataType,
-                          final Properties extraParams) throws AOException {
+                          final Properties extraParams) {
 
 
 
@@ -137,18 +136,15 @@ public class AOCMSEnveloper implements AOEnveloper {
      * @param key
      *        Puede ser una clave codificada o una contrase&ntilde;a usada
      *        para cifrar el contenido.
-     * @param cipherAlgorithm
-     *        Algoritmo a usar para los cifrados
-     * @param dataType OID del tipo de datos a encriptar
-     * @return Contenido firmado
-     * @throws AOException
-     *         Cuando ocurre cualquier problema durante el proceso */
+     * @param cipherAlgorithm Algoritmo a usar para los cifrados.
+     * @param dataType OID del tipo de datos a encriptar.
+     * @return Contenido firmado. */
     @Override
 	public byte[] encrypt(final byte[] data,
 			              final String digestAlgorithm,
 			              final String key,
 			              final AOCipherAlgorithm cipherAlgorithm,
-			              final String dataType) throws AOException {
+			              final String dataType) {
 
         // Comprobamos que el archivo a cifrar no sea nulo.
         if (data == null) {
@@ -262,7 +258,6 @@ public class AOCMSEnveloper implements AOEnveloper {
      *         Error en la escritura de datos.
      * @throws CertificateEncodingException
      *         Cuando el certificado del remitente no es v&aacute;lido.
-     * @throws AOException Cuando ocurre un error al generar el n&uacute;cleo del envoltorio.
      * @throws BadPaddingException Si hay problemas estableciendo el relleno de los datos
      * @throws IllegalBlockSizeException Si no cuadran los tama&ntilde;os de bloque de los algoritmos usados
      * @throws InvalidAlgorithmParameterException Si no se soporta alg&uacute;n par&aacute;metro necesario
@@ -277,7 +272,6 @@ public class AOCMSEnveloper implements AOEnveloper {
                                          final Integer keySize) throws NoSuchAlgorithmException,
                                                                        CertificateEncodingException,
                                                                        IOException,
-                                                                       AOException,
                                                                        InvalidKeyException,
                                                                        NoSuchPaddingException,
                                                                        InvalidAlgorithmParameterException,
@@ -319,7 +313,6 @@ public class AOCMSEnveloper implements AOEnveloper {
      * @throws NoSuchAlgorithmException Cuando el algoritmo de cifrado indicado no est&aacute; soportado.
      * @throws IOException Cuando se produce un error en la escritura de datos.
      * @throws CertificateEncodingException Cuando el certificado del remitente no es v&aacute;lido.
-     * @throws AOException Cuando ocurre un error al generar el n&uacute;cleo del envoltorio.
      * @throws SignatureException CUando ocuren problemas firmando el sobre digital
      * @throws BadPaddingException Si hay problemas estableciendo el relleno de los datos
      * @throws IllegalBlockSizeException Si no cuadran los tama&ntilde;os de bloque de los algoritmos usados
@@ -334,7 +327,6 @@ public class AOCMSEnveloper implements AOEnveloper {
                                                   final Integer keySize) throws CertificateEncodingException,
                                                                                 NoSuchAlgorithmException,
                                                                                 IOException,
-                                                                                AOException,
                                                                                 InvalidKeyException,
                                                                                 NoSuchPaddingException,
                                                                                 InvalidAlgorithmParameterException,
@@ -366,7 +358,6 @@ public class AOCMSEnveloper implements AOEnveloper {
      *         soportado.
      * @throws IOException Cuando ocurre un error en la escritura de datos.
      * @throws CertificateEncodingException Cuando el certificado del remitente no es v&aacute;lido.
-     * @throws AOException Cuando ocurre un error al generar el n&uacute;cleo del envoltorio.
      * @throws InvalidKeyException Si la clave proporcionada no es v&aacute;lida
      * @throws BadPaddingException Si hay problemas estableciendo el relleno de los datos
      * @throws IllegalBlockSizeException Si no cuadran los tama&ntilde;os de bloque de los algoritmos usados
@@ -380,7 +371,6 @@ public class AOCMSEnveloper implements AOEnveloper {
     		                          final Integer keySize) throws CertificateEncodingException,
                                                                     NoSuchAlgorithmException,
                                                                     IOException,
-                                                                    AOException,
                                                                     InvalidKeyException,
                                                                     NoSuchPaddingException,
                                                                     InvalidAlgorithmParameterException,
@@ -418,8 +408,6 @@ public class AOCMSEnveloper implements AOEnveloper {
      *         Error en la escritura de datos.
      * @throws CertificateEncodingException
      *         Cuando el certificado del remitente no es v&aacute;lido.
-     * @throws AOException
-     *         Cuando ocurre un error al generar el n&uacute;cleo del envoltorio.
      * @throws InvalidKeyException Si la clave proporcionada no es v&aacute;lida
      * @throws BadPaddingException Si hay problemas estableciendo el relleno de los datos
      * @throws IllegalBlockSizeException Si no cuadran los tama&ntilde;os de bloque de los algoritmos usados
@@ -433,7 +421,6 @@ public class AOCMSEnveloper implements AOEnveloper {
                                                       final Integer keySize) throws CertificateEncodingException,
                                                                                     NoSuchAlgorithmException,
                                                                                     IOException,
-                                                                                    AOException,
                                                                                     InvalidKeyException,
                                                                                     NoSuchPaddingException,
                                                                                     InvalidAlgorithmParameterException,

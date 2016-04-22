@@ -41,7 +41,6 @@ import org.xml.sax.SAXException;
 
 import es.gob.afirma.core.misc.AOUtil;
 
-@SuppressWarnings("resource")
 final class OOXMLZipHelper {
 
 	private OOXMLZipHelper() {
@@ -235,7 +234,7 @@ final class OOXMLZipHelper {
         }
 
         @Override
-        public void close() throws IOException {
+        public void close() {
             // Nunca cerramos
         }
     }

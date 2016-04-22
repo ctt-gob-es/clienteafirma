@@ -29,7 +29,6 @@ import es.gob.afirma.signers.cades.CAdESExtraParams;
 import es.gob.afirma.signers.cades.CAdESSignerMetadataHelper;
 import es.gob.afirma.signers.cades.CommitmentTypeIndicationsHelper;
 import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
-import es.gob.afirma.signers.pkcs7.ReadNodesTree;
 
 /** Contrafirmador CAdES. */
 public class AOCAdESCounterSigner implements AOCounterSigner {
@@ -119,15 +118,11 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
         try {
             // CASO DE FIRMA DE ARBOL
             if (targetType == CounterSignTarget.TREE) {
-                final int[] nodes = {
-                    0
-                };
 
                 dataSigned = cadesCountersigner.counterSign(
                 	   csp,
                        sign,
                        CounterSignTarget.TREE,
-                       nodes,
                        key,
                        certChain,
                        AdESPolicy.buildAdESPolicy(extraParams),
@@ -145,14 +140,10 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
             }
             // CASO DE FIRMA DE HOJAS
             else if (targetType == CounterSignTarget.LEAFS) {
-                final int[] nodes = {
-                    0
-                };
                 dataSigned = cadesCountersigner.counterSign(
             		csp,
                     sign,
                     CounterSignTarget.LEAFS,
-                    nodes,
                     key,
                     certChain,
                     AdESPolicy.buildAdESPolicy(extraParams),
@@ -170,52 +161,11 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
             }
             // CASO DE FIRMA DE NODOS
             else if (targetType == CounterSignTarget.NODES) {
-                int[] nodesID = new int[targets.length];
-                for (int i = 0; i < targets.length; i++) {
-                    nodesID[i] = ((Integer) targets[i]).intValue();
-                }
-				nodesID = ReadNodesTree.simplyArray(nodesID);
-                dataSigned = cadesCountersigner.counterSign(
-            		csp,
-                    sign,
-                    CounterSignTarget.NODES,
-                    nodesID,
-                    key,
-                    certChain,
-                    AdESPolicy.buildAdESPolicy(extraParams),
-					signingCertificateV2,
-                    CommitmentTypeIndicationsHelper.getCommitmentTypeIndications(extraParams),
-                    Boolean.parseBoolean(extraParams.getProperty(CAdESExtraParams.INCLUDE_SIGNING_TIME_ATTRIBUTE, Boolean.FALSE.toString())),
-                    CAdESSignerMetadataHelper.getCAdESSignerMetadata(extraParams),
-                    doNotIncludePolicyOnSigningCertificate
-                );
+                throw new AOException("No se soporta la firma de nodos individuales"); //$NON-NLS-1$
             }
             // CASO DE FIRMA DE NODOS DE UNO O VARIOS FIRMANTES
             else if (targetType == CounterSignTarget.SIGNERS) {
-
-                // clase que lee los nodos de un fichero firmado (p7s, csig,
-                // sig)
-                final String[] signers = new String[targets.length];
-                for (int i = 0; i < targets.length; i++) {
-                    signers[i] = (String) targets[i];
-                }
-                final int[] nodes2 = new ReadNodesTree().readNodesFromSigners(signers, sign);
-                dataSigned =
-                		cadesCountersigner.counterSign(
-                    		csp,
-                            sign,
-                            CounterSignTarget.SIGNERS,
-                            nodes2,
-                            key,
-                            certChain,
-                            AdESPolicy.buildAdESPolicy(extraParams),
-                            signingCertificateV2,
-                            CommitmentTypeIndicationsHelper.getCommitmentTypeIndications(extraParams),
-                            Boolean.parseBoolean(extraParams.getProperty(CAdESExtraParams.INCLUDE_SIGNING_TIME_ATTRIBUTE, Boolean.FALSE.toString())),
-                            CAdESSignerMetadataHelper.getCAdESSignerMetadata(extraParams),
-                            doNotIncludePolicyOnSigningCertificate
-                		);
-
+            	throw new AOException("No se soporta la firma de nodos individuales"); //$NON-NLS-1$
             }
 
             return dataSigned;

@@ -43,9 +43,8 @@ public final class TestGetShort {
 	}
 
 	/** Main para pruebas.
-	 * @param args No se usa.
-	 * @throws Exception En cualquier error. */
-	public static void main(final String[] args) throws Exception {
+	 * @param args No se usa. */
+	public static void main(final String[] args) {
 		final String path = "c:\\Program Files (x86)\\Microsoft Silverlight\\5.1.41212.0\\agcore.debug.dll"; //$NON-NLS-1$
 		System.out.println("Nombre largo: " + path); //$NON-NLS-1$
 		System.out.println("Nombre corto: " + getShort(path)); //$NON-NLS-1$

@@ -28,7 +28,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import es.gob.afirma.core.AOException;
-import es.gob.afirma.core.AOInvalidFormatException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.http.UrlHttpManager;
@@ -152,7 +151,7 @@ public class AOXAdESTriPhaseSigner implements AOSigner {
 
 	/** {@inheritDoc} */
 	@Override
-	public final byte[] getData(final byte[] sign) throws AOInvalidFormatException {
+	public final byte[] getData(final byte[] sign) {
 		throw new UnsupportedOperationException("No se soporta en firma trifasica"); //$NON-NLS-1$
 	}
 
@@ -220,7 +219,7 @@ public class AOXAdESTriPhaseSigner implements AOSigner {
 	/** {@inheritDoc} */
 	@Override
 	public final AOTreeModel getSignersStructure(final byte[] sign,
-			                                     final boolean asSimpleSignInfo) throws AOInvalidFormatException {
+			                                     final boolean asSimpleSignInfo) {
 		throw new UnsupportedOperationException("No se soporta en firma trifasica"); //$NON-NLS-1$
 	}
 
@@ -283,7 +282,7 @@ public class AOXAdESTriPhaseSigner implements AOSigner {
 
 	/** {@inheritDoc} */
 	@Override
-	public AOSignInfo getSignInfo(final byte[] sign) throws AOException {
+	public AOSignInfo getSignInfo(final byte[] sign) {
 		throw new UnsupportedOperationException("No se soporta en firma trifasica"); //$NON-NLS-1$
 	}
 

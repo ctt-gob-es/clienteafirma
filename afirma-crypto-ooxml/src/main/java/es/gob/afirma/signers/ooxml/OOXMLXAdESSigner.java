@@ -30,19 +30,10 @@ import java.util.logging.Logger;
 import javax.xml.crypto.MarshalException;
 import javax.xml.crypto.dsig.DigestMethod;
 import javax.xml.crypto.dsig.Reference;
-import javax.xml.crypto.dsig.TransformException;
 import javax.xml.crypto.dsig.XMLSignatureException;
 import javax.xml.crypto.dsig.XMLSignatureFactory;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
-
-import net.java.xades.security.xml.XAdES.SignatureProductionPlace;
-import net.java.xades.security.xml.XAdES.SignatureProductionPlaceImpl;
-import net.java.xades.security.xml.XAdES.SignerRole;
-import net.java.xades.security.xml.XAdES.SignerRoleImpl;
-import net.java.xades.security.xml.XAdES.XAdES;
-import net.java.xades.security.xml.XAdES.XAdES_BES;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -51,6 +42,12 @@ import org.w3c.dom.ls.LSSerializer;
 import org.xml.sax.SAXException;
 
 import es.gob.afirma.signers.xml.XMLConstants;
+import net.java.xades.security.xml.XAdES.SignatureProductionPlace;
+import net.java.xades.security.xml.XAdES.SignatureProductionPlaceImpl;
+import net.java.xades.security.xml.XAdES.SignerRole;
+import net.java.xades.security.xml.XAdES.SignerRoleImpl;
+import net.java.xades.security.xml.XAdES.XAdES;
+import net.java.xades.security.xml.XAdES.XAdES_BES;
 
 /** Firmador XAdES OOXML.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
@@ -80,10 +77,8 @@ final class OOXMLXAdESSigner {
      * @return XML de firma.
      * @throws ParserConfigurationException Si hay problemas con el analizador XML por defecto.
      * @throws GeneralSecurityException Si ocurre alg&uacute;n problema de seguridad.
-     * @throws TransformerException Si hay problemas con los motores de transformadas.
      * @throws SAXException Si hay problemas en XML SAX.
      * @throws IOException Si hay problemas gen&eacute;ricos en el tratamiento de datos.
-     * @throws TransformException Si no se puede aplicar alguna transformaci&oacute;n necesaria.
      * @throws XMLSignatureException Si hay problemas con la firma XML.
      * @throws MarshalException Si hay problemas con la envoltura de la firma XML. */
     static byte[] getSignedXML(final byte[] ooXmlDocument,
@@ -94,10 +89,8 @@ final class OOXMLXAdESSigner {
     								                            GeneralSecurityException,
     								                            IOException,
     								                            SAXException,
-    								                            TransformerException,
     								                            MarshalException,
-    								                            XMLSignatureException,
-    								                            TransformException  {
+    								                            XMLSignatureException {
 
 		final String algoUri = XMLConstants.SIGN_ALGOS_URI.get(algorithm);
 		if (algoUri == null) {

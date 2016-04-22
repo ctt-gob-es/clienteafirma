@@ -13,7 +13,6 @@ package es.gob.afirma.ciphers.jce;
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.KeyException;
-import java.security.NoSuchAlgorithmException;
 import java.security.spec.AlgorithmParameterSpec;
 
 import javax.crypto.BadPaddingException;
@@ -243,7 +242,7 @@ public final class AOSunJCECipher implements AOCipher {
 
     /** {@inheritDoc} */
     @Override
-	public Key generateKey(final AOCipherConfig algorithmConfig) throws NoSuchAlgorithmException, AOException {
+	public Key generateKey(final AOCipherConfig algorithmConfig) throws AOException {
         try {
             return KeyGenerator.getInstance(algorithmConfig.getAlgorithm().getName(), PROVIDER).generateKey();
         }

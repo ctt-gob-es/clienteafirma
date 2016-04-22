@@ -241,9 +241,6 @@ final class CoSignerEnveloped {
      * @throws java.io.IOException
      *         Si ocurre alg&uacute;n problema leyendo o escribiendo los
      *         datos
-     * @throws java.security.NoSuchAlgorithmException
-     *         Si no se soporta alguno de los algoritmos de firma o huella
-     *         digital
      * @throws java.security.cert.CertificateException
      *         Si se produce alguna excepci&oacute;n con los certificados de
      *         firma. */
@@ -254,7 +251,7 @@ final class CoSignerEnveloped {
                            final PrivateKeyEntry keyEntry,
                            final Map<String, byte[]> atrib,
                            final Map<String, byte[]> uatrib,
-                           final byte[] messageDigest) throws IOException, NoSuchAlgorithmException, CertificateException {
+                           final byte[] messageDigest) throws IOException, CertificateException {
 
     	final ASN1Sequence dsq;
     	try (

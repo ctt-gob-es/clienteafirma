@@ -12,9 +12,7 @@ package es.gob.afirma.keystores;
 
 import java.security.KeyStore;
 import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
-import java.security.UnrecoverableEntryException;
 
 /** Gestor de claves del llavero de Apple OS X.
  * OS X necesita su propio gestor por la peculiaridades en la recuperaci&oacute;n de claves privadas
@@ -26,9 +24,7 @@ final class AppleKeyStoreManager extends AOKeyStoreManager {
 	}
 
 	@Override
-	public KeyStore.PrivateKeyEntry getKeyEntry(final String alias) throws KeyStoreException,
-			                                    										   NoSuchAlgorithmException,
-			                                    										   UnrecoverableEntryException {
+	public KeyStore.PrivateKeyEntry getKeyEntry(final String alias) throws KeyStoreException {
 		if (getKeyStore() == null) {
 			throw new IllegalStateException(
 				"Se han pedido claves a un almacen no inicializado" //$NON-NLS-1$

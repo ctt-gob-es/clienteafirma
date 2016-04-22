@@ -42,13 +42,11 @@ public final class ObtainContentSignedData {
 
 	/** M&eacute;todo que obtiene el contenido firmado de un tipo Signed Data
 	 * tanto en CADES como en CMS. Si la firma no contiene los datos, devuelve <code>null</code>.
-	 * @param data
-	 *        datos que contienen la firma.
+	 * @param data Datos que contienen la firma.
 	 * @return El contenido firmado o {@code null} si no es una firma con contenido..
-	 * @throws IOException Si no se pueden leer los datos
 	 * @throws AOInvalidFormatException Cuando los datos proporcionados no tienen la estructura
-	 * basica de firma ASN.1. */
-	public static byte[] obtainData(final byte[] data) throws IOException, AOInvalidFormatException {
+	 *                                  b&aacute;sica de firma ASN.1. */
+	public static byte[] obtainData(final byte[] data) throws AOInvalidFormatException {
 		byte[] contenido = null;
 
 		// LEEMOS EL FICHERO QUE NOS INTRODUCEN

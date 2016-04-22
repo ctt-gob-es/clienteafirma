@@ -20,7 +20,6 @@ import javax.security.auth.callback.PasswordCallback;
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.keystores.AOKeyStore;
 import es.gob.afirma.keystores.AOKeyStoreManager;
-import es.gob.afirma.keystores.AOKeyStoreManagerException;
 import es.gob.afirma.keystores.callbacks.UIPasswordCallback;
 
 /** Almac&eacute;n de claves y certificados basado en NSS.
@@ -44,15 +43,13 @@ public final class NssKeyStoreManager extends AOKeyStoreManager {
 		this.useSharedNss = sharedNss;
 	}
 
-	/** Inicializa la clase gestora de almacenes de claves.
-	 * @throws AOKeyStoreManagerException
-	 *         Si no puede inicializarse el almac&eacute;n NSS interno */
+	/** Inicializa la clase gestora de almacenes de claves. */
 	@Override
 	public void init(final AOKeyStore type,
 			         final InputStream store,
 			         final PasswordCallback pssCallBack,
 			         final Object[] params,
-			         final boolean forceReset) throws AOKeyStoreManagerException {
+			         final boolean forceReset) {
 
 		// Se ha detectado que en algunas versiones de Java/OpenJDK, al solicitar un proveedor
 		// de seguridad comprobar su existencia, puede afectar negativamente a que este proveedor

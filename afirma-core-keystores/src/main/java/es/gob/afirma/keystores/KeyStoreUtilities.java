@@ -349,7 +349,7 @@ public final class KeyStoreUtilities {
     	final KeyStore.CallbackHandlerProtection chp = new KeyStore.CallbackHandlerProtection(
 			new CallbackHandler() {
 				@Override
-				public void handle(final Callback[] cbs) throws IOException, UnsupportedCallbackException {
+				public void handle(final Callback[] cbs) throws UnsupportedCallbackException {
 					for (final Callback callback : cbs) {
 						if (callback instanceof PasswordCallback) {
 							((PasswordCallback) callback).setPassword(pssCallBack.getPassword());

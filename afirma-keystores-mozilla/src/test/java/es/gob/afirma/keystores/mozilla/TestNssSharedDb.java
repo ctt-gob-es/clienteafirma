@@ -34,6 +34,7 @@ public final class TestNssSharedDb {
 	    while ((line = br.readLine()) != null) {
 	       System.out.println(AOUtil.getRDNvalueFromLdapName("library", line.replace(" ", ","))); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	    }
+	    br.close();
 	}
 
 

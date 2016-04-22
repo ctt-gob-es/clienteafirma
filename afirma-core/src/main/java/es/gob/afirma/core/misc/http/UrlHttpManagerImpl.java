@@ -26,7 +26,6 @@ import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -248,15 +247,13 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 	 * @throws KeyStoreException Si no se puede cargar el KeyStore SSL.
 	 * @throws IOException Si hay errores en la carga del fichero KeyStore SSL.
 	 * @throws CertificateException Si los certificados del KeyStore SSL son inv&aacute;lidos.
-	 * @throws UnrecoverableKeyException Si una clave del KeyStore SSL es inv&aacute;lida.
-	 * @throws NoSuchProviderException Si ocurre un error al recuperar la instancia del Keystore.*/
+	 * @throws UnrecoverableKeyException Si una clave del KeyStore SSL es inv&aacute;lida. */
 	public static void disableSslChecks() throws KeyManagementException,
 	                                             NoSuchAlgorithmException,
 	                                             KeyStoreException,
 	                                             UnrecoverableKeyException,
 	                                             CertificateException,
-	                                             IOException,
-	                                             NoSuchProviderException {
+	                                             IOException {
 		final SSLContext sc = SSLContext.getInstance(SSL_CONTEXT);
 		sc.init(getKeyManager(), DUMMY_TRUST_MANAGER, new java.security.SecureRandom());
 		HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
@@ -278,15 +275,13 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 	 * @throws NoSuchAlgorithmException Si el JRE no soporta alg&uacute;n algoritmo necesario.
 	 * @throws CertificateException Si los certificados del KeyStore SSL son inv&aacute;lidos.
 	 * @throws IOException Si hay errores en la carga del fichero KeyStore SSL.
-	 * @throws UnrecoverableKeyException Si una clave del KeyStore SSL es inv&aacute;lida.
-	 * @throws NoSuchProviderException Si ocurre un error al recuperar la instancia del KeyStore. */
+	 * @throws UnrecoverableKeyException Si una clave del KeyStore SSL es inv&aacute;lida. */
 
 	private static KeyManager[] getKeyManager() throws KeyStoreException,
 	                                                   NoSuchAlgorithmException,
 	                                                   CertificateException,
 	                                                   IOException,
-	                                                   UnrecoverableKeyException,
-	                                                   NoSuchProviderException {
+	                                                   UnrecoverableKeyException {
 		final String keyStore = System.getProperty(KEYSTORE);
 		final String keyStorePassword = System.getProperty(KEYSTORE_PASS);
 		final String keyStoreType = System.getProperty(KEYSTORE_TYPE);

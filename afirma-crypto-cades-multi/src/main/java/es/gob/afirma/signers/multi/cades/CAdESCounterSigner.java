@@ -114,7 +114,6 @@ final class CAdESCounterSigner {
      * @param data Archivo que contiene las firmas.
      * @param targetType Lo que se quiere firmar. Puede ser el &aacute;rbol completo,
      *                   las hojas, un nodo determinado o unos determinados firmantes.
-     * @param targets Nodos objetivos a firmar.
      * @param key Clave privada a usar para firmar.
      * @param certChain Cadena de certificados del firmante.
      * @param policy Pol&iacute;tica de firma
@@ -139,7 +138,6 @@ final class CAdESCounterSigner {
     byte[] counterSign(final P7ContentSignerParameters parameters,
                        final byte[] data,
                        final CounterSignTarget targetType,
-                       final int[] targets,
                        final PrivateKey key,
                        final java.security.cert.Certificate[] certChain,
                        final AdESPolicy policy,

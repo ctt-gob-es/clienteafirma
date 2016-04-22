@@ -23,7 +23,6 @@ import java.net.URLConnection;
 import java.security.KeyStore;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -469,10 +468,10 @@ public final class CMSTimestamper {
     		trustManagers = new TrustManager[] {
     			new X509TrustManager() {
 					@Override
-					public void checkClientTrusted(final X509Certificate[] arg0, final String arg1) throws CertificateException { /* No hacemos nada. */ }
+					public void checkClientTrusted(final X509Certificate[] arg0, final String arg1) { /* No hacemos nada. */ }
 
 					@Override
-					public void checkServerTrusted(final X509Certificate[] arg0, final String arg1) throws CertificateException { /* No hacemos nada. */ }
+					public void checkServerTrusted(final X509Certificate[] arg0, final String arg1) { /* No hacemos nada. */ }
 
 					@Override
 					public X509Certificate[] getAcceptedIssuers() {

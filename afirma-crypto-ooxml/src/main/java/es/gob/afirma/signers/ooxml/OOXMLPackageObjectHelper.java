@@ -140,7 +140,6 @@ final class OOXMLPackageObjectHelper {
     	throw new IllegalStateException("El documento OOXML es invalido ya que no contiene el fichero [Content_Types].xml"); //$NON-NLS-1$
 	}
 
-	@SuppressWarnings("resource")
 	private static Document loadDocumentNoClose(final InputStream documentInputStream) throws ParserConfigurationException, SAXException, IOException {
         final NoCloseInputStream noCloseInputStream = new NoCloseInputStream(documentInputStream);
         final InputSource inputSource = new InputSource(noCloseInputStream);

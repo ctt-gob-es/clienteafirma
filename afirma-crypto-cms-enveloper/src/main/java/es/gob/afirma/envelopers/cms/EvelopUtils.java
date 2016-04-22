@@ -10,7 +10,6 @@
 
 package es.gob.afirma.envelopers.cms;
 
-import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -37,12 +36,10 @@ final class EvelopUtils {
     }
 
     /** M&eacute;todo que devuelve el Identificador del algoritmo.
-     * @param oid
-     *        OID del algoritmo a idenfiticar
-     * @return El identificador del algoritmo formateado y listo para introducir
-     *         en el cms.
-     * @throws java.io.IOException Cuando hay problemas de entrada / salida. */
-    static AlgorithmIdentifier makeAlgId(final String oid) throws IOException {
+     * @param oid OID del algoritmo a idenfiticar
+     * @return Identificador del algoritmo formateado y listo para introducir
+     *         en el cms. */
+    static AlgorithmIdentifier makeAlgId(final String oid) {
         return new AlgorithmIdentifier(new ASN1ObjectIdentifier(oid), DERNull.INSTANCE);
     }
 

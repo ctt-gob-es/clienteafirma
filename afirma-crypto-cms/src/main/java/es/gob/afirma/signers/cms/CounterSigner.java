@@ -83,7 +83,6 @@ final class CounterSigner {
      * @param targets Nodos objetivos a firmar.
      * @param key Clave privada a usar para firmar.
      * @param certChain Cadena de certificados del firmante.
-     * @param dataType Identifica el tipo del contenido a firmar.
      * @param atri Atributo firmado que agregar a la firma.
      * @param uatri Atributo no firmado que agregar a la firma.
      * @return El archivo de firmas con la nueva firma.
@@ -101,7 +100,6 @@ final class CounterSigner {
                                 final int[] targets,
                                 final PrivateKey key,
                                 final java.security.cert.Certificate[] certChain,
-                                final String dataType,
                                 final Map<String, byte[]> atri,
                                 final Map<String, byte[]> uatri) throws IOException, NoSuchAlgorithmException, CertificateException, AOException {
 

@@ -11,7 +11,6 @@
 package es.gob.afirma.core.signers;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.Locale;
 import java.util.Properties;
@@ -201,12 +200,7 @@ public final class ExtraParamsProcessor {
 						normalizedFormat = AdESPolicyPropertiesManager.FORMAT_PADES;
 					}
 				}
-				try {
-					AdESPolicyPropertiesManager.setProperties(p, policy, normalizedFormat);
-				}
-				catch (final IOException e) {
-					Logger.getLogger("es.gob.afirma").warning("No se han encontrado podido cargar el fichero de propiedades: " + e); //$NON-NLS-1$ //$NON-NLS-2$
-				}
+				AdESPolicyPropertiesManager.setProperties(p, policy, normalizedFormat);
 			}
 			p.remove(EXPANDIBLE_POLICY_KEY);
 		}

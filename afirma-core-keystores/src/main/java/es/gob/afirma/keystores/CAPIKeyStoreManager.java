@@ -10,7 +10,6 @@
 
 package es.gob.afirma.keystores;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.security.KeyStore;
@@ -66,7 +65,7 @@ public final class CAPIKeyStoreManager extends AOKeyStoreManager {
 			                   final InputStream store,
 			                   final PasswordCallback pssCallBack,
 			                   final Object[] params,
-			                   final boolean forceReset) throws AOKeyStoreManagerException, IOException {
+			                   final boolean forceReset) throws AOKeyStoreManagerException {
 		resetCachedAliases();
 		if (AOKeyStore.WINDOWS.equals(type)) {
 			if (forceReset) {
@@ -185,9 +184,8 @@ public final class CAPIKeyStoreManager extends AOKeyStoreManager {
 	 *  }
 	 * </pre>
 	 * @return Almac&eacute; inicializado.
-	 * @throws AOKeyStoreManagerException Si hay problemas durante la creaci&oacute;n o inicializaci&oacute;n del almac&eacute;n.
-	 * @throws IOException Si hay problemas de tratamiento de datos. */
-    private static KeyStore initCapi() throws AOKeyStoreManagerException, IOException {
+	 * @throws AOKeyStoreManagerException Si hay problemas durante la creaci&oacute;n o inicializaci&oacute;n del almac&eacute;n. */
+    private static KeyStore initCapi() throws AOKeyStoreManagerException {
 
     	if (capiKsMy == null) {
 

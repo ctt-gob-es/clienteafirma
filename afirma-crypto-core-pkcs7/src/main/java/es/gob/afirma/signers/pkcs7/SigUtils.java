@@ -10,7 +10,6 @@
 
 package es.gob.afirma.signers.pkcs7;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -37,9 +36,8 @@ public final class SigUtils {
     /** M&eacute;todo que devuelve el Identificador del algoritmo.
      * @param oid OID del algoritmo a idenfiticar
      * @return El identificador del algoritmo formateado y listo para introducir
-     *         en el cms.
-     * @throws java.io.IOException Cuando hay errores de entrada / salida */
-    public static AlgorithmIdentifier makeAlgId(final String oid) throws IOException {
+     *         en el cms. */
+    public static AlgorithmIdentifier makeAlgId(final String oid) {
         return new AlgorithmIdentifier(new ASN1ObjectIdentifier(oid), DERNull.INSTANCE);
     }
 

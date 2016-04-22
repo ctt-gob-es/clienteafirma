@@ -10,7 +10,6 @@
 
 package es.gob.afirma.core.signers;
 
-import java.io.IOException;
 import java.util.Locale;
 import java.util.Properties;
 import java.util.ResourceBundle;
@@ -70,9 +69,8 @@ final class AdESPolicyPropertiesManager {
 	 * @param policyId Identificador de la pol&iacute;tica. Si no se indica, se usar&aacute;n los valores
 	 * 			gen&eacute;ricos configurados.
 	 * @param format Formato de firma particular al que deben corresponder los valores. Si no se indica se
-	 * 			usar&aacute;n los gen&eacute;ricos de la pol&iacute;tica.
-	 * @throws IOException Cuando no se encuentra o no puede leerse el fichero de propiedades. */
-	static void setProperties(final Properties prop, final String policyId, final String format) throws IOException {
+	 * 			usar&aacute;n los gen&eacute;ricos de la pol&iacute;tica. */
+	static void setProperties(final Properties prop, final String policyId, final String format) {
 
 		String value = getProperty(policyId, PROPERTY_POLICY_IDENTIFIER, format);
 		if (value != null) {

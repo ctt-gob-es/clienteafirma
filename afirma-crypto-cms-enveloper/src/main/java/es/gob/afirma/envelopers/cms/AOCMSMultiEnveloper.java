@@ -214,7 +214,6 @@ public class AOCMSMultiEnveloper {
      *                                  soportado.
      * @throws IOException Cuando ocurre un error en la escritura de datos.
      * @throws CertificateEncodingException Cuando el certificado del remitente no es v&aacute;lido.
-     * @throws AOException Cuando ocurre un error al generar el n&uacute;cleo del envoltorio.
      * @throws BadPaddingException Si hay problemas estableciendo el relleno de los datos
      * @throws IllegalBlockSizeException Si no cuadran los tama&ntilde;os de bloque de los algoritmos usados
      * @throws InvalidAlgorithmParameterException Si no se soporta alg&uacute;n par&aacute;metro necesario
@@ -228,7 +227,6 @@ public class AOCMSMultiEnveloper {
                                          final Integer keySize) throws NoSuchAlgorithmException,
                                                                        CertificateEncodingException,
                                                                        IOException,
-                                                                       AOException,
                                                                        InvalidKeyException,
                                                                        NoSuchPaddingException,
                                                                        InvalidAlgorithmParameterException,
@@ -270,7 +268,6 @@ public class AOCMSMultiEnveloper {
      *                                  soportado.
      * @throws IOException Error en la escritura de datos.
      * @throws CertificateEncodingException Cuando el certificado del remitente no es v&aacute;lido.
-     * @throws AOException Cuando ocurre un error al generar el n&uacute;cleo del envoltorio.
      * @throws SignatureException Cuando ocurren problemas en la firma PKCS#1.
      * @throws BadPaddingException Si hay problemas estableciendo el relleno de los datos
      * @throws IllegalBlockSizeException Si no cuadran los tama&ntilde;os de bloque de los algoritmos usados
@@ -286,7 +283,6 @@ public class AOCMSMultiEnveloper {
                                                   final Integer keySize) throws CertificateEncodingException,
                                                                                 NoSuchAlgorithmException,
                                                                                 IOException,
-                                                                                AOException,
                                                                                 InvalidKeyException,
                                                                                 NoSuchPaddingException,
                                                                                 InvalidAlgorithmParameterException,
@@ -320,8 +316,6 @@ public class AOCMSMultiEnveloper {
      *         Error en la escritura de datos.
      * @throws CertificateEncodingException
      *         Cuando el certificado del remitente no es v&aacute;lido.
-     * @throws AOException
-     *         Cuando ocurre un error al generar el n&uacute;cleo del envoltorio.
      * @throws InvalidKeyException Si la clave proporcionada no es v&aacute;lida
      * @throws BadPaddingException Si hay problemas estableciendo el relleno de los datos
      * @throws IllegalBlockSizeException Si no cuadran los tama&ntilde;os de bloque de los algoritmos usados
@@ -335,7 +329,6 @@ public class AOCMSMultiEnveloper {
     								  final Integer keySize) throws CertificateEncodingException,
     																NoSuchAlgorithmException,
     																IOException,
-    																AOException,
     																InvalidKeyException,
     																NoSuchPaddingException,
     																InvalidAlgorithmParameterException,
@@ -366,7 +359,6 @@ public class AOCMSMultiEnveloper {
      *                                  soportado.
      * @throws IOException Error en la escritura de datos.
      * @throws CertificateEncodingException Cuando el certificado del remitente no es v&aacute;lido.
-     * @throws AOException Cuando ocurre un error al generar el n&uacute;cleo del envoltorio.
      * @throws InvalidKeyException Si la clave proporcionada no es v&aacute;lida
      * @throws BadPaddingException Si hay problemas estableciendo el relleno de los datos
      * @throws IllegalBlockSizeException Si no cuadran los tama&ntilde;os de bloque de los algoritmos usados
@@ -380,7 +372,6 @@ public class AOCMSMultiEnveloper {
                                                       final Integer keySize) throws CertificateEncodingException,
                                                                                     NoSuchAlgorithmException,
                                                                                     IOException,
-                                                                                    AOException,
                                                                                     InvalidKeyException,
                                                                                     NoSuchPaddingException,
                                                                                     InvalidAlgorithmParameterException,
