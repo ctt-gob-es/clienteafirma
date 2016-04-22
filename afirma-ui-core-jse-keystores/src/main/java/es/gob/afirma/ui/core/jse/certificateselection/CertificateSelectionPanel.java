@@ -248,7 +248,7 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 		this.selectedIndex = 0;
 
 		sPane.setBorder(null);
-		sPane.setPreferredSize(new Dimension(435, CERT_LIST_ELEMENT_HEIGHT * this.certList.getVisibleRowCount() + 3));
+		sPane.setPreferredSize(new Dimension(500, CERT_LIST_ELEMENT_HEIGHT * this.certList.getVisibleRowCount() + 3));
 
 		this.add(sPane, c);
 	}
