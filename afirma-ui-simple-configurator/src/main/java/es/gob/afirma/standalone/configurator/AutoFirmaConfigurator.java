@@ -16,9 +16,6 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.logging.Logger;
 
-import javax.jnlp.ServiceManager;
-import javax.jnlp.UnavailableServiceException;
-
 import es.gob.afirma.core.LogManager;
 import es.gob.afirma.core.LogManager.App;
 import es.gob.afirma.core.misc.Platform;

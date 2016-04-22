@@ -5,14 +5,16 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.URISyntaxException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.logging.Logger;
-import javax.jnlp.*; 
+
+import javax.jnlp.ExtendedService;
+import javax.jnlp.ServiceManager;
+import javax.jnlp.UnavailableServiceException;
 
 final class ConfiguratorUtil {
 
@@ -44,7 +46,9 @@ final class ConfiguratorUtil {
 			}
 			final BufferedOutputStream bos = new BufferedOutputStream(configScriptOs);
 			bos.write(data);
-		}catch(Exception e){
+			bos.flush();
+			bos.close();
+		}catch(IOException e){
 			throw e;
 		}
 	}
