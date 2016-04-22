@@ -14,6 +14,9 @@ import java.net.URISyntaxException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.jnlp.ServiceManager;
+import javax.jnlp.UnavailableServiceException;
+
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.standalone.ui.hash.CheckHashDialog;
@@ -117,6 +120,15 @@ public final class AutoFirmaUtil {
 	 * @return Directorio de ejecuci&oacute;n. */
 	public static File getApplicationDirectory() {
 		File appDir;
+
+		try{
+			ServiceManager.lookup("javax.jnlp.ExtendedService");
+			appDir = new File(System.getProperty("java.io.tmpdir"));
+			return appDir;
+		} catch (UnavailableServiceException e) {
+
+		}
+				
 		try {
 			appDir = new File(
 				AutoFirmaUtil.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()
