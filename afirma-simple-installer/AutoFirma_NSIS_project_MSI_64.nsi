@@ -258,7 +258,7 @@ Section "Programa" sPrograma
 	StrCmp $1 "" done1
 	StrCpy $chromePath "C:\Users\$1\AppData\Local\Google\Chrome\User Data"
 	${If} ${FileExists} "$chromePath\Local State"
-	
+
 	;Se incluye AutoFirma como aplicación de confianza en Google Chrome
 	Push '"afirma":false,' #text to be replaced
 	Push '' #replace with
@@ -464,7 +464,7 @@ Push $R6 ;temp file name
    StrLen $R3 $4
    StrCpy $R4 -1
    StrCpy $R5 -1
- 
+
 loop_read:
  ClearErrors
  FileRead $R1 $R2 ;read line

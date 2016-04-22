@@ -287,7 +287,6 @@ Section "Programa" sPrograma
 	  ;MessageBox MB_OK "Error en la importación: $0"
 	${EndIf}
 	
-	
 	; Obtenemos la ruta de los ficheros de GoogleChrome para cada usuario
 	; System::Call "advapi32::GetUserName(t .r0, *i ${NSIS_MAX_STRLEN} r1) i.r2"
 	
@@ -296,6 +295,7 @@ Section "Programa" sPrograma
 	StrCmp $1 "" done1
 	StrCpy $chromePath "C:\Users\$1\AppData\Local\Google\Chrome\User Data"
 	${If} ${FileExists} "$chromePath\Local State"
+
 	;Se incluye AutoFirma como aplicación de confianza en Google Chrome
 	Push '"afirma":false,' #text to be replaced
 	Push '' #replace with
@@ -316,7 +316,6 @@ Section "Programa" sPrograma
 	Goto loop1
 	done1:
 	FindClose $0
-	
 	
 	;Se restauran los navegadores cerrados
 	${If} $R2 == 0
@@ -617,7 +616,6 @@ Section "uninstall"
 	StrCmp $1 "" done2
 	StrCpy $chromePath "C:\Users\$1\AppData\Local\Google\Chrome\User Data"
 	${If} ${FileExists} "$chromePath\Local State"
-	
 	;Se elimina AutoFirma como aplicación de confianza en Google Chrome
 	Push '"afirma":false,' #text to be replaced
 	Push '' #replace with
@@ -649,7 +647,7 @@ Section "uninstall"
 	
 	DeleteRegKey HKLM "SOFTWARE\$PATH"
     DeleteRegKey HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH" 
-	
+
 	DeleteRegKey HKEY_CLASSES_ROOT "*\shell\afirma.sign"
 	DeleteRegKey HKEY_CLASSES_ROOT "*\shell\afirma.hashFile"
 	DeleteRegKey HKEY_CLASSES_ROOT "Directory\shell\afirma.hashDirectory"
@@ -668,7 +666,7 @@ Section "uninstall"
 	DeleteRegKey /ifempty HKCU "SOFTWARE\JavaSoft\Prefs\es\gob\afirma"
 	DeleteRegKey /ifempty HKCU "SOFTWARE\JavaSoft\Prefs\es\gob"
 	DeleteRegKey /ifempty HKCU "SOFTWARE\JavaSoft\Prefs\es"
-	
+
 	;Se restauran los navegadores cerrados
 	
 	${If} $R2 == 0
@@ -767,6 +765,7 @@ Push $R6 ;temp file name
    StrLen $R3 $4
    StrCpy $R4 -1
    StrCpy $R5 -1
+
 loop_read:
  ClearErrors
  FileRead $R1 $R2 ;read line

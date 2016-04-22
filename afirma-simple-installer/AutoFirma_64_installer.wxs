@@ -18,7 +18,7 @@
 	   <!-- Ejeuta el AutoFirmaGenerator.exe al instalar -->
 		<CustomAction Id="Exec_Cmd"
                       Property="ExecProperty"
-                      Value="&quot;[#$(var.ProjectName)Generator.exe]&quot; /S"
+                      Value='"[#$(var.ProjectName)Generator.exe]" /S'
                       Execute="immediate"/>
 		<CustomAction Id="ExecProperty"
                       BinaryKey="WixCA"
@@ -29,7 +29,7 @@
 		<!-- Ejecuta el uninstall$(var.Platform).exe al desinstalar -->
 		<CustomAction Id="Exec_Cmd2"
                       Property="ExecProperty2"
-                      Value="&quot;[#uninstall$(var.Platform).exe]&quot; /S"
+                      Value='"[#uninstall$(var.Platform).exe]" /S'
                       Execute="immediate"/>
 		<CustomAction Id="ExecProperty2"
                       BinaryKey="WixCA"
