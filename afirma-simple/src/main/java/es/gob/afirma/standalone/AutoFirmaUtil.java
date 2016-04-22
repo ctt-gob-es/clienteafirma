@@ -146,8 +146,10 @@ public final class AutoFirmaUtil {
     					new Authenticator() {
 	    			        @Override
 	    					public PasswordAuthentication getPasswordAuthentication() {
-	    			            return new PasswordAuthentication(proxyUsername,
-	    			            		proxyPassword.toCharArray());
+	    			            return new PasswordAuthentication(
+    			            		proxyUsername,
+    			            		proxyPassword.toCharArray()
+			            		);
 	    			        }
 	    			    }
 					);

@@ -14,7 +14,6 @@ import java.awt.event.KeyListener;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.logging.Logger;
 
@@ -300,19 +299,13 @@ static boolean checkHash(final String fileNameHash, final String fileNameData) t
 		if (Base64.isBase64(hashBytes)) {
 			hashBytes = Base64.decode(hashBytes, 0, hashBytes.length, false);
 		}
-		final byte[] dataBytes;
-		try (InputStream fis = new FileInputStream(fileNameData)) {
-			dataBytes = AOUtil.getDataFromInputStream(fis);
-		}
 		try {
 			return arrayEquals(
 				hashBytes,
-
-				MessageDigest.getInstance(
-					getHashAlgorithm(hashBytes)
-
-
-				).digest(dataBytes)
+				HashUtil.getFileHash(
+					getHashAlgorithm(hashBytes),
+					fileNameData
+				)
 			);
 		}
 		catch (final NoSuchAlgorithmException e) {
