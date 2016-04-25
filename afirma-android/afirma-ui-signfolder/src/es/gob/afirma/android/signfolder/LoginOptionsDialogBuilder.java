@@ -1,6 +1,7 @@
 package es.gob.afirma.android.signfolder;
 
 import java.net.URL;
+import java.util.Collections;
 import java.util.List;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -37,6 +38,7 @@ final class LoginOptionsDialogBuilder {
 
 		this.v = inflater.inflate(R.layout.dialog_server_new, null);
 		final List<String> servers = AppPreferences.getServersList();
+		Collections.sort(servers);
 		if (servers.size() > 0 ) {
 			this.items = servers.toArray(new CharSequence[servers.size()]);
 			if (servers.indexOf(AppPreferences.getAliasProxy()) != -1) {
