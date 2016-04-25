@@ -560,6 +560,31 @@ var MiniApplet = ( function ( window, undefined ) {
 			}
 		}
 
+		var signAndSaveToFile = function (operationId, dataB64, algorithm, format, params, outputFileName, successCallback, errorCallback) {
+			
+			forceLoad();
+			
+			if (clientType == TYPE_APPLET) {
+				try {
+					setData(dataB64);
+					var certSignaturePair = buildData(clienteFirma.signAndSaveToFile(operationId, algorithm, format, params, outputFileName));
+					var sepPos = certSignaturePair.indexOf('|');
+					if (successCallback == undefined || successCallback == null) {
+						return certSignaturePair.substring(sepPos + 1);
+					}
+					successCallback(certSignaturePair.substring(sepPos + 1), certSignaturePair.substring(0, sepPos));
+				} catch(e) {
+					if (errorCallback == undefined || errorCallback == null) {
+						throw e;
+					}
+					errorCallback(clienteFirma.getErrorType(), clienteFirma.getErrorMessage());
+				}
+			}
+			else {
+				clienteFirma.signAndSaveToFile(operationId, dataB64, algorithm, format, params, outputFileName, successCallback, errorCallback);
+			}
+		}
+
 		var signBatch = function (batchB64, batchPreSignerUrl, batchPostSignerUrl, params, successCallback, errorCallback) {
 
 			forceLoad();
@@ -861,6 +886,9 @@ var MiniApplet = ( function ( window, undefined ) {
 			/* Variable de control para la operacion guardar */
 			var isSaveOperation = false;
 			
+			/* Variable de control para la operacion de ejecutar operacion criptografica y guardar */
+			var isOpAndSaveOperation = false;
+			
 			/* Variable de control para la operacion batch */
 			var isBatchOperation = false;
 			
@@ -957,7 +985,7 @@ var MiniApplet = ( function ( window, undefined ) {
 			function sign (dataB64, algorithm, format, extraParams, successCallbackFunction, errorCallbackFunction) {
 				successCallback = successCallbackFunction;
 				errorCallback = errorCallbackFunction;
-				signOperation("sign", dataB64, algorithm, format, extraParams);
+				signByService("sign", dataB64, algorithm, format, extraParams);
 			}
 
 			/**
@@ -967,7 +995,7 @@ var MiniApplet = ( function ( window, undefined ) {
 			function coSign (signB64, dataB64, algorithm, format, extraParams, successCallbackFunction, errorCallbackFunction) {
 				successCallback = successCallbackFunction;
 				errorCallback = errorCallbackFunction;
-				signOperation("cosign", signB64, algorithm, format, extraParams);
+				signByService("cosign", signB64, algorithm, format, extraParams);
 			}
 
 			/**
@@ -977,31 +1005,75 @@ var MiniApplet = ( function ( window, undefined ) {
 			function counterSign (signB64, algorithm, format, extraParams, successCallbackFunction, errorCallbackFunction) {
 				successCallback = successCallbackFunction;
 				errorCallback = errorCallbackFunction;
-				signOperation("countersign", signB64, algorithm, format, extraParams);
+				signByService("countersign", signB64, algorithm, format, extraParams);
 			}
-			
+
 			/**
-			 * Inicia el proceso de firma por lotes.
-			 */
-			function signBatch (batchB64, batchPreSignerUrl, batchPostSignerUrl, extraParams, successCallBackFunction, errorCallBackFunction) {
-				successCallback = successCallBackFunction;
-				errorCallback = errorCallBackFunction;
-				signByBatch(batchB64, batchPreSignerUrl, batchPostSignerUrl, extraParams);
-			}
-			
-			/**
-			 * Realiza una operacion de firma/multifirma abriendo un popUp.
+			 * Realiza una operacion de firma/multifirma comunicandose con la aplicacion nativa por socket.
 			 * @param signId Identificador de la operacion a realizar (sign, cosign y countersign).
 			 * @param dataB64 Datos o firma en base 64.
 			 * @param algorithm Algoritmo de firma.
 			 * @param format Formato de firma.
 			 * @param extraParams Par&aacute;metros para la configuraci&oacute;n de la operaci&oacute;n.
 			 */
-			function signOperation (signId, dataB64, algorithm, format, extraParams) {
-				signByService(signId, dataB64, algorithm, format, extraParams);
+			function signByService (signId, dataB64, algorithm, format, extraParams) {
+
+				if (dataB64 == undefined || dataB64 == "") {
+					dataB64 = null;
+				}
+
+				if (dataB64 != null && !isValidUrl(dataB64)) {
+					dataB64 = dataB64.replace(/\+/g, "-").replace(/\//g, "_");
+				}
+
+				var data = generateDataToSign(signId, algorithm, format, extraParams, dataB64, defaultKeyStore);
+				
+				execAppIntent(buildUrl(data));
 			}
 
-			function signByBatch (batchB64, batchPreSignerUrl, batchPostSignerUrl, extraParams) {
+			/**
+			 * Inicia el proceso de firma por lotes.
+			 */
+			function signAndSaveToFile (opId, dataB64, algorithm, format, extraParams, outputFileName, successCallbackFunction, errorCallbackFunction) {
+				successCallback = successCallbackFunction;
+				errorCallback = errorCallbackFunction;
+				signAndSaveFileByService(opId, dataB64, algorithm, format, extraParams, outputFileName);
+			}
+
+			/**
+			 * Realiza una operacion de firma/multifirma seguida del guardado del resultado comunicandose
+			 * con la aplicacion nativa por socket.
+			 * @param signId Identificador de la operacion a realizar (sign, cosign y countersign).
+			 * @param dataB64 Datos o firma en base 64.
+			 * @param algorithm Algoritmo de firma.
+			 * @param format Formato de firma.
+			 * @param extraParams Parametros para la configuraci&oacute;n de la operaci&oacute;n.
+			 */
+			function signAndSaveFileByService (signId, dataB64, algorithm, format, extraParams, outputFileName) {
+
+				if (dataB64 == undefined || dataB64 == "") {
+					dataB64 = null;
+				}
+
+				if (dataB64 != null && !isValidUrl(dataB64)) {
+					dataB64 = dataB64.replace(/\+/g, "-").replace(/\//g, "_");
+				}
+
+				var data = generateDataToSignAndSave(signId, algorithm, format, extraParams, outputFileName, dataB64, defaultKeyStore);
+				
+				execAppIntent(buildUrl(data));
+			}
+
+			/**
+			 * Inicia el proceso de firma por lotes.
+			 */
+			function signBatch (batchB64, batchPreSignerUrl, batchPostSignerUrl, extraParams, successCallbackFunction, errorCallbackFunction) {
+				successCallback = successCallbackFunction;
+				errorCallback = errorCallbackFunction;
+				signBatchByService(batchB64, batchPreSignerUrl, batchPostSignerUrl, extraParams);
+			}
+			
+			function signBatchByService (batchB64, batchPreSignerUrl, batchPostSignerUrl, extraParams) {
 				
 				if (batchB64 == undefined || batchB64 == "") {
 					batchB64 = null;
@@ -1029,30 +1101,7 @@ var MiniApplet = ( function ( window, undefined ) {
 
 				return data;
 			}
-			
-			/**
-			 * Funcion de firma medante invocacion a un servicio.
-			 * @param signId Identificador de la operacion a realizar (sign, cosign y countersign).
-			 * @param dataB64 Datos o firma en base 64.
-			 * @param algorithm Algoritmo de firma.
-			 * @param format Formato de firma.
-			 * @param extraParams Par&aacute;metros para la configuraci&oacute;n de la operaci&oacute;n.
-			 */
-			function signByService (signId, dataB64, algorithm, format, extraParams) {
 
-				if (dataB64 == undefined || dataB64 == "") {
-					dataB64 = null;
-				}
-
-				if (dataB64 != null && !isValidUrl(dataB64)) {
-					dataB64 = dataB64.replace(/\+/g, "-").replace(/\//g, "_");
-				}
-
-				var data = generateDataToSign(signId, algorithm, format, extraParams, dataB64, defaultKeyStore);
-				
-				execAppIntent(buildUrl(data));
-			}
-			
 			/**
 			 * Construye una URL para la invocaci&oacute;n del Cliente @firma nativo.
 			 * params: Par\u00E1metros para la configuraci\u00F3n de la operaci\u00F3n.
@@ -1175,7 +1224,8 @@ var MiniApplet = ( function ( window, undefined ) {
 			}
 
 			/**
-			 * Genera el objeto con los datos de la transaccion para la firma
+			 * Genera el objeto con los datos de la transaccion para la operacion
+			 * de firma/multifirma
 			 */
 			function generateDataToSign(signId, algorithm, format, extraParams, dataB64, keystore) {
 				var data = new Object();
@@ -1188,6 +1238,23 @@ var MiniApplet = ( function ( window, undefined ) {
 				return data;
 			}
 
+			/**
+			 * Genera el objeto con los datos de la transaccion para la operacion
+			 * de firma/multifirma seguida del guardado del resultado
+			 */
+			function generateDataToSignAndSave(signId, algorithm, format, extraParams, outputFileName, dataB64, keystore) {
+				var data = new Object();
+				data.op = generateDataKeyValue("op", "signandsave");
+				data.cryptoOp = generateDataKeyValue("cop", signId);
+				data.keystore = generateDataKeyValue ("keystore", keystore);
+				data.algorithm = generateDataKeyValue ("algorithm", algorithm);
+				data.format = generateDataKeyValue ("format", format); 
+				data.properties = generateDataKeyValue ("properties", extraParams != null ? Base64.encode(extraParams) : null);
+				data.filename = generateDataKeyValue ("filename", outputFileName);
+				data.dat = generateDataKeyValue ("dat", dataB64 == "" ? null : dataB64);
+				return data;
+			}
+			
 			function executeEchoByServiceByPort (ports, url) {
 				connection = false;
 				var semaphore = new Object();
@@ -1216,12 +1283,14 @@ var MiniApplet = ( function ( window, undefined ) {
 						if (semaphore) {
 							semaphore.locked = true;
 						}
-						// Comprobamos que sea una operacion de seleccion de certificado
+						// Comprobamos si es una operacion de seleccion de certificado
 						isSelectCertOperation = url.indexOf("afirma://selectcert") > -1;
-						// Comprobamos que sea una operacion de guardado.
+						// Comprobamos si es una operacion de guardado.
 						isSaveOperation = url.indexOf("afirma://save") > -1;
-						// Comprobamos que sea una operacion de firma por lotes
+						// Comprobamos si es una operacion de firma por lotes
 						isBatchOperation = url.indexOf("afirma://batch") > -1;
+						// Comprobamos si es una operacion criptografica mas guardado del resultado
+						isOpAndSaveOperation = url.indexOf("afirma://signandsave") > -1;
 						executeOperationByService(url);
 					}
 					else if ((!semaphore || !semaphore.locked) && !connection && httpRequest.readyState != 2 && httpRequest.readyState != 3) {
@@ -1522,7 +1591,7 @@ var MiniApplet = ( function ( window, undefined ) {
 
 				successCallback(data.replace(/\-/g, "+").replace(/\_/g, "/"));
 			}
-			
+
 			/**
 			 * Lee el resultado devuelto por el servicio, 'CANCEL' o empieza por 'SAF-', ejecutara el metodo
 			 * de error, si es 'OK' o cualquier otra cosa (que se intepretara como el resultado en base 64)
@@ -1754,6 +1823,7 @@ var MiniApplet = ( function ( window, undefined ) {
 				signBatch : signBatch,
 				selectCertificate : selectCertificate,
 				saveDataToFile : saveDataToFile,
+				signAndSaveToFile : signAndSaveToFile,
 				getFileNameContentBase64: getFileNameContentBase64,
 				getMultiFileNameContentBase64 : getMultiFileNameContentBase64,
 				getBase64FromText : getBase64FromText,
@@ -1901,6 +1971,66 @@ var MiniApplet = ( function ( window, undefined ) {
 				}
 			}
 
+			/**
+			 * Realiza una operacion de firma/multifirma y permite guardar el fichero a disco.
+			 * @param signId Identificador de la operacion a realizar (sign, cosign y countersign).
+			 * @param dataB64 Datos o firma en base 64.
+			 * @param algorithm Algoritmo de firma.
+			 * @param format Formato de firma.
+			 * @param extraParams Par&aacute;metros para la configuraci&oacute;n de la operaci&oacute;n.
+			 * @param outputFileName Nombre propuesto para el fichero a guardar.
+			 * @param successCallback M&eacute;todo a ejecutar en caso de &eacute;xito.
+			 * @param errorCallback M&eacute;todo a ejecutar en caso de error.
+			 */
+			function signAndSaveToFile (signId, dataB64, algorithm, format, extraParams, outputFileName, successCallback, errorCallback) {
+
+				if (dataB64 == undefined || dataB64 == "") {
+					dataB64 = null;
+				}
+
+				if (dataB64 != null && !isValidUrl(dataB64)) {
+					dataB64 = dataB64.replace(/\+/g, "-").replace(/\//g, "_");
+				}
+
+				var idSession = generateNewIdSession();
+				var cipherKey = generateCipherKey();
+
+				var i = 0;
+				var opId = "signandsave";
+				var params = new Array();
+				
+				params[i++] = {key:"op", value:opId};
+				if (signId != null && signId != undefined) {			params[i++] = {key:"cop", value:signId}; }
+				if (idSession != null && idSession != undefined) {		params[i++] = {key:"id", value:idSession}; }
+				if (cipherKey != null && cipherKey != undefined) {		params[i++] = {key:"key", value:cipherKey}; }
+				if (defaultKeyStore != null &&
+						defaultKeyStore != undefined) {					params[i++] = {key:"keystore", value:defaultKeyStore}; }
+				if (storageServletAddress != null &&
+						storageServletAddress != undefined) {			params[i++] = {key:"stservlet", value:storageServletAddress}; }
+				if (format != null && format != undefined) {			params[i++] = {key:"format", value:format}; }
+				if (algorithm != null && algorithm != undefined) {		params[i++] = {key:"algorithm", value:algorithm}; }
+				if (extraParams != null && extraParams != undefined) { 	params[i++] = {key:"properties", value:Base64.encode(extraParams)}; }
+				if (outputFileName != null &&
+						outputFileName != undefined) {					params[i++] = {key:"filename", value:outputFileName}; }
+				if (dataB64 != null) {									params[i++] = {key:"dat", value:dataB64}; }
+			
+				var url = buildUrl(opId, params);
+
+				// Si la URL es muy larga, realizamos un preproceso para que los datos se suban al
+				// servidor y la aplicacion nativa los descargue, en lugar de pasarlos directamente 
+				if (isURLTooLong(url)) {
+					if (storageServletAddress == null || storageServletAddress == undefined) {
+						throwException("java.lang.IllegalArgumentException", "No se ha indicado la direccion del servlet para el guardado de datos");
+						return;
+					}
+
+					sendDataAndExecAppIntent(idSession, cipherKey, storageServletAddress, retrieverServletAddress, opId, params, successCallback, errorCallback)
+				}
+				else {
+					execAppIntent(url, idSession, cipherKey, successCallback, errorCallback);
+				}
+			}
+			
 			/**
 			 * Ejecuta una operacion de firma de lote.
 			 */
@@ -2608,6 +2738,7 @@ var MiniApplet = ( function ( window, undefined ) {
 				signBatch : signBatch,
 				selectCertificate : selectCertificate,
 				saveDataToFile : saveDataToFile,
+				signAndSaveToFile : signAndSaveToFile,
 				getFileNameContentBase64: getFileNameContentBase64,
 				getMultiFileNameContentBase64 : getMultiFileNameContentBase64,
 				getBase64FromText : getBase64FromText,
@@ -2665,6 +2796,7 @@ var MiniApplet = ( function ( window, undefined ) {
 			signBatch : signBatch,
 			selectCertificate : selectCertificate,
 			saveDataToFile : saveDataToFile,
+			signAndSaveToFile : signAndSaveToFile,
 			getFileNameContentBase64: getFileNameContentBase64,
 			getMultiFileNameContentBase64 : getMultiFileNameContentBase64,
 			getBase64FromText : getBase64FromText,
