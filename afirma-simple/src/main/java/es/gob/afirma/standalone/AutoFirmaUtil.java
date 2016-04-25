@@ -118,7 +118,7 @@ public final class AutoFirmaUtil {
 			).getParentFile();
 		}
 		catch (final URISyntaxException e) {
-			LOGGER.warning("No se pudo localizar el directorio del fichero en ejecucion"); //$NON-NLS-1$
+			LOGGER.warning("No se pudo localizar el directorio del fichero en ejecucion: " + e); //$NON-NLS-1$
 			appDir = null;
 		}
 		return appDir;

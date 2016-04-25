@@ -73,14 +73,7 @@ final class PreferencesPanelPades extends JPanel {
 	private static final String SIGN_FORMAT_PADES = "PAdES"; //$NON-NLS-1$
 
 	public PreferencesPanelPades(final KeyListener keyListener, final ModificationListener modificationListener) {
-    	SwingUtilities.invokeLater(
-			new Runnable() {
-				@Override
-				public void run() {
-					createUI(keyListener, modificationListener);
-				}
-			}
-		);
+    	SwingUtilities.invokeLater(() -> createUI(keyListener, modificationListener));
 	}
 
 	void createUI(final KeyListener keyListener, final ModificationListener modificationListener) {

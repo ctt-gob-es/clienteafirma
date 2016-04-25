@@ -90,14 +90,7 @@ public final class CipherDialog extends JDialog implements KeyListener{
 		super(parent);
 		setTitle(SimpleAfirmaMessages.getString("CipherDialog.0")); //$NON-NLS-1$
 		setModalityType(ModalityType.APPLICATION_MODAL);
-		SwingUtilities.invokeLater(
-			new Runnable() {
-				@Override
-				public void run() {
-					createUI(parent);
-				}
-			}
-		);
+		SwingUtilities.invokeLater(() -> createUI(parent));
 	}
 
 	void createUI(final Frame parent) {

@@ -487,23 +487,19 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 			!Boolean.getBoolean("es.gob.afirma.doNotSendAnalytics") && //$NON-NLS-1$
 			!Boolean.parseBoolean(System.getenv("es.gob.afirma.doNotSendAnalytics")) //$NON-NLS-1$
 		) {
-	    	new Thread(
-				new Runnable() {
-					@Override
-					public void run() {
-				    	try {
-							final AnalyticsConfigData config = new AnalyticsConfigData(GOOGLE_ANALYTICS_TRACKING_CODE);
-							final JGoogleAnalyticsTracker tracker = new JGoogleAnalyticsTracker(config, GoogleAnalyticsVersion.V_4_7_2);
-							tracker.trackPageView(
-								"AutoFirma", //$NON-NLS-1$
-								"AutoFirma", //$NON-NLS-1$
-								getIp()
-							);
-				    	}
-				    	catch(final Exception e) {
-				    		LOGGER.warning("Error registrando datos en Google Analytics: " + e); //$NON-NLS-1$
-				    	}
-					}
+	    	new Thread(() ->  {
+			    	try {
+						final AnalyticsConfigData config = new AnalyticsConfigData(GOOGLE_ANALYTICS_TRACKING_CODE);
+						final JGoogleAnalyticsTracker tracker = new JGoogleAnalyticsTracker(config, GoogleAnalyticsVersion.V_4_7_2);
+						tracker.trackPageView(
+							"AutoFirma", //$NON-NLS-1$
+							"AutoFirma", //$NON-NLS-1$
+							getIp()
+						);
+			    	}
+			    	catch(final Exception e) {
+			    		LOGGER.warning("Error registrando datos en Google Analytics: " + e); //$NON-NLS-1$
+			    	}
 				}
 			).start();
 		}

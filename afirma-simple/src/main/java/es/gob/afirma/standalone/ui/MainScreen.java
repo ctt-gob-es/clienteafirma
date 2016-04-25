@@ -37,26 +37,19 @@ public final class MainScreen extends JFrame {
     		                   final int width,
     		                   final int height) {
 
-    	SwingUtilities.invokeLater(
-			new Runnable() {
-	    		@Override
-	    		public void run() {
-	    			createUI(wlist, firstPanel, width, height);
-	    		}
-	    	}
-		);
+    	SwingUtilities.invokeLater(() -> createUI(wlist, firstPanel, width, height));
     }
 
     void createUI(final WindowListener wlist, final JPanel firstPanel, final int width, final int height) {
         if (!LookAndFeelManager.HIGH_CONTRAST) {
-            this.setBackground(LookAndFeelManager.WINDOW_COLOR);
+            setBackground(LookAndFeelManager.WINDOW_COLOR);
         }
         this.setSize(width, height);
-        this.setLayout(new BorderLayout());
-        this.setLocationRelativeTo(null);
-        this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+        setLayout(new BorderLayout());
+        setLocationRelativeTo(null);
+        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         if (wlist != null) {
-            this.addWindowListener(wlist);
+            addWindowListener(wlist);
         }
 
         this.add(firstPanel, BorderLayout.CENTER);
@@ -72,6 +65,6 @@ public final class MainScreen extends JFrame {
     		);
         }
 
-        this.setVisible(true);
+        setVisible(true);
     }
 }

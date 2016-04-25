@@ -113,14 +113,7 @@ public final class CreateHashFiles extends JDialog {
 		setTitle(SimpleAfirmaMessages.getString("CreateHashFiles.0")); //$NON-NLS-1$
 		setModalityType(ModalityType.APPLICATION_MODAL);
 		setResizable(false);
-		SwingUtilities.invokeLater(
-			new Runnable() {
-				@Override
-				public void run() {
-					createUI(parent);
-				}
-			}
-		);
+		SwingUtilities.invokeLater(() -> createUI(parent));
 	}
 
 	/** Crea todos los elementos necesarios para generar una huella digital de

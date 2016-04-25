@@ -60,19 +60,12 @@ final class SignPanelFilePanel extends JPanel {
         // Puede arrastrarse un fichero a cualquiera de estos componentes para cargarlo
         setDropTarget(dropTarget);
 
-        SwingUtilities.invokeLater(
-    		new Runnable() {
-                @Override
-                public void run() {
-                    createUI(
-                		fileType,
-                		fileSize,
-                		file,
-                		fileLastModified
-            		);
-                }
-            }
-		);
+        SwingUtilities.invokeLater(() -> createUI(
+    		fileType,
+    		fileSize,
+    		file,
+    		fileLastModified
+		));
     }
 
     void createUI(final SignPanelFileType fileType,

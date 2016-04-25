@@ -147,36 +147,32 @@ public final class Updater {
 			);
 		}
 		if (Platform.OS.WINDOWS.equals(Platform.getOS()) && !omitCheck) {
-			new Thread(
-				new Runnable() {
-					@Override
-					public void run() {
-						if (isNewVersionAvailable()) {
-							if (JOptionPane.YES_OPTION == AOUIFactory.showConfirmDialog(
-								parent,
-								UpdaterMessages.getString("Updater.1"), //$NON-NLS-1$
-								UpdaterMessages.getString("Updater.2"), //$NON-NLS-1$
-								JOptionPane.YES_NO_OPTION,
-								JOptionPane.INFORMATION_MESSAGE
-							)) {
-								try {
-									Desktop.getDesktop().browse(new URI(getUpdateSite()));
-								}
-								catch (final Exception e) {
-									LOGGER.severe("No se ha podido abrir el sitio Web de actualizaciones del Cliente @firma: " + e); //$NON-NLS-1$
-									AOUIFactory.showErrorMessage(
-										parent,
-										UpdaterMessages.getString("Updater.3"), //$NON-NLS-1$
-										UpdaterMessages.getString("Updater.4"), //$NON-NLS-1$
-										JOptionPane.ERROR_MESSAGE
-									);
-									e.printStackTrace();
-								}
+			new Thread(() ->  {
+					if (isNewVersionAvailable()) {
+						if (JOptionPane.YES_OPTION == AOUIFactory.showConfirmDialog(
+							parent,
+							UpdaterMessages.getString("Updater.1"), //$NON-NLS-1$
+							UpdaterMessages.getString("Updater.2"), //$NON-NLS-1$
+							JOptionPane.YES_NO_OPTION,
+							JOptionPane.INFORMATION_MESSAGE
+						)) {
+							try {
+								Desktop.getDesktop().browse(new URI(getUpdateSite()));
+							}
+							catch (final Exception e) {
+								LOGGER.severe("No se ha podido abrir el sitio Web de actualizaciones del Cliente @firma: " + e); //$NON-NLS-1$
+								AOUIFactory.showErrorMessage(
+									parent,
+									UpdaterMessages.getString("Updater.3"), //$NON-NLS-1$
+									UpdaterMessages.getString("Updater.4"), //$NON-NLS-1$
+									JOptionPane.ERROR_MESSAGE
+								);
+								e.printStackTrace();
 							}
 						}
-						else {
-							LOGGER.info("Se ha encontrado instalada la ultima version disponible de AutoFirma"); //$NON-NLS-1$
-						}
+					}
+					else {
+						LOGGER.info("Se ha encontrado instalada la ultima version disponible de AutoFirma"); //$NON-NLS-1$
 					}
 				}
 			).start();

@@ -79,14 +79,7 @@ public final class CreateHashDialog extends JDialog implements KeyListener{
 		super(parent);
 		setTitle(SimpleAfirmaMessages.getString("CreateHashDialog.15")); //$NON-NLS-1$
 		setModalityType(ModalityType.APPLICATION_MODAL);
-		SwingUtilities.invokeLater(
-			new Runnable() {
-				@Override
-				public void run() {
-					createUI(parent);
-				}
-			}
-		);
+		SwingUtilities.invokeLater(() -> createUI(parent));
 	}
 
 	void createUI(final Frame parent) {

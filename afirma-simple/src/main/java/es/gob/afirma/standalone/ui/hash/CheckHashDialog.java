@@ -64,14 +64,7 @@ public final class CheckHashDialog extends JDialog implements KeyListener {
 	private CheckHashDialog(final Frame parent) {
 		super(parent);
 		setModalityType(ModalityType.APPLICATION_MODAL);
-		SwingUtilities.invokeLater(
-			new Runnable() {
-				@Override
-				public void run() {
-					createUI(parent);
-				}
-			}
-		);
+		SwingUtilities.invokeLater(() -> createUI(parent));
 	}
 
 	void createUI(final Frame parent) {

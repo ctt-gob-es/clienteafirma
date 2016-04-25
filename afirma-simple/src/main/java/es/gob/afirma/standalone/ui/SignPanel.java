@@ -553,14 +553,7 @@ public final class SignPanel extends JPanel {
 
         LowerPanel() {
             super(true);
-            SwingUtilities.invokeLater(
-        		new Runnable() {
-	                @Override
-	                public void run() {
-	                    createUI();
-	                }
-	            }
-    		);
+            SwingUtilities.invokeLater(() -> createUI());
         }
 
         void createUI() {
