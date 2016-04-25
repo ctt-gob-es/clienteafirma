@@ -605,7 +605,6 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
     	}
     }
 
-	@SuppressWarnings("resource")
 	private static boolean isSimpleAfirmaAlreadyRunning() {
     	final File appDir = new File(APPLICATION_HOME);
         if (!appDir.exists()) {

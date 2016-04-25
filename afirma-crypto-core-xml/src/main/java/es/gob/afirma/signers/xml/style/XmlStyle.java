@@ -20,7 +20,6 @@ import java.util.Properties;
 import java.util.logging.Logger;
 
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.TransformerConfigurationException;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -55,14 +54,12 @@ public final class XmlStyle {
 	 * @param data XML en formato binario
 	 * @param headless Indica si deben omitirse las interacciones con el usuario mediante interfaz gr&aacute;fico
 	 * @throws IOException Cuando hay errores de entrada / salida
-	 * @throws TransformerConfigurationException Si hay problemas en la configuraci&oacute;n de alguna transformaci&oacute;n
 	 * @throws CannotDereferenceException Si no se puede obtener el estilo referenciado
 	 * @throws IsInnerlException Si la referencia apunta a un elemento dentro del propio XML
 	 * @throws ReferenceIsNotXmlException Cuando el estilo referenciado no est&aacute; en formato XML
 	 * @throws javax.xml.transform.TransformerFactoryConfigurationError Cuando hay errores de configuraci&oacute; en la
 	 *                                                                  factor&iacute;a de transformaciones */
 	public XmlStyle(final byte[] data, final boolean headless) throws IOException,
-	                                                                  TransformerConfigurationException,
 	                                                                  CannotDereferenceException,
 	                                                                  IsInnerlException,
 	                                                                  ReferenceIsNotXmlException {

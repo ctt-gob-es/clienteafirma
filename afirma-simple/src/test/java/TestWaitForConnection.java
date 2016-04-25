@@ -18,7 +18,7 @@ public final class TestWaitForConnection {
 	/** Main para pruebas.
 	 * @param args No se usa.
 	 * @throws Exception En cualquier error no controlado. */
-	public static void main(final String[] args) throws Exception {
+	public static void main(final String[] args) {
 		new Thread(
 			new Runnable() {
 				@Override

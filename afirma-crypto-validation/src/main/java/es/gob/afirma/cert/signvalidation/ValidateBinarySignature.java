@@ -96,10 +96,6 @@ public final class ValidateBinarySignature {
     	try {
     		verifySignatures(sign, data != null ? data : new AOCAdESSigner().getData(sign));
 	    }
-    	catch (final CertStoreException e) {
-    	    // Error al recuperar los certificados o estos no son validos
-            return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.CERTIFICATE_PROBLEM);
-        }
     	catch (final CertificateExpiredException e) {
     		// Certificado caducado
             return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.CERTIFICATE_EXPIRED);
@@ -107,18 +103,6 @@ public final class ValidateBinarySignature {
     	catch (final CertificateNotYetValidException e) {
     		// Certificado aun no valido
             return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.CERTIFICATE_NOT_VALID_YET);
-        }
-    	catch (final NoSuchAlgorithmException e) {
-         // Algoritmo no reconocido
-            return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.ALGORITHM_NOT_SUPPORTED);
-        }
-    	catch (final NoMatchDataException e) {
-         // Los datos indicados no coinciden con los datos de firma
-            return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.NO_MATCH_DATA);
-        }
-    	catch (final CRLException e) {
-         // Problema en la validacion de las CRLs de la firma
-            return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.CRL_PROBLEM);
         }
     	catch (final CMSSignerDigestMismatchException e) {
     		// La firma no es una firma binaria valida
@@ -149,11 +133,6 @@ public final class ValidateBinarySignature {
      * @throws IOException Cuando no se puede crear un certificado desde la firma para validarlo
      * @throws OperatorCreationException Cuando no se puede crear el validado de contenido de firma*/
     private static void verifySignatures(final byte[] sign, final byte[] data) throws CMSException,
-                                                                                      CertStoreException,
-                                                                                      NoSuchAlgorithmException,
-                                                                                      NoMatchDataException,
-                                                                                      CRLException,
-                                                                                      NoSuchProviderException,
                                                                                       CertificateException,
                                                                                       IOException,
                                                                                       OperatorCreationException {

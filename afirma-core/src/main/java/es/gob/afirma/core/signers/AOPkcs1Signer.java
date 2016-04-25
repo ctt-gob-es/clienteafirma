@@ -10,7 +10,6 @@
 
 package es.gob.afirma.core.signers;
 
-import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
@@ -21,7 +20,6 @@ import java.util.Locale;
 import java.util.Properties;
 
 import es.gob.afirma.core.AOException;
-import es.gob.afirma.core.AOInvalidFormatException;
 import es.gob.afirma.core.util.tree.AOTreeModel;
 
 /** Firmador simple en formato PKCS#1.
@@ -96,32 +94,32 @@ public final class AOPkcs1Signer implements AOSigner {
 	}
 
 	@Override
-	public byte[] cosign(final byte[] data, final byte[] sign, final String algorithm, final PrivateKey key, final Certificate[] certChain, final Properties extraParams) throws AOException, IOException {
+	public byte[] cosign(final byte[] data, final byte[] sign, final String algorithm, final PrivateKey key, final Certificate[] certChain, final Properties extraParams) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public byte[] cosign(final byte[] sign, final String algorithm, final PrivateKey key, final Certificate[] certChain, final Properties extraParams) throws AOException, IOException {
+	public byte[] cosign(final byte[] sign, final String algorithm, final PrivateKey key, final Certificate[] certChain, final Properties extraParams) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public byte[] countersign(final byte[] sign, final String algorithm, final CounterSignTarget targetType, final Object[] targets, final PrivateKey key, final Certificate[] certChain, final Properties extraParams) throws AOException, IOException {
+	public byte[] countersign(final byte[] sign, final String algorithm, final CounterSignTarget targetType, final Object[] targets, final PrivateKey key, final Certificate[] certChain, final Properties extraParams) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo) throws AOInvalidFormatException, IOException {
+	public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public boolean isSign(final byte[] is) throws IOException {
+	public boolean isSign(final byte[] is) {
 		return false;
 	}
 
 	@Override
-	public boolean isValidDataFile(final byte[] is) throws IOException {
+	public boolean isValidDataFile(final byte[] is) {
 		if (is != null && is.length > 0) {
 			return true;
 		}
@@ -141,12 +139,12 @@ public final class AOPkcs1Signer implements AOSigner {
 	}
 
 	@Override
-	public byte[] getData(final byte[] signData) throws AOException, IOException {
+	public byte[] getData(final byte[] signData) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public AOSignInfo getSignInfo(final byte[] signData) throws AOException, IOException {
+	public AOSignInfo getSignInfo(final byte[] signData) {
 		throw new UnsupportedOperationException();
 	}
 }

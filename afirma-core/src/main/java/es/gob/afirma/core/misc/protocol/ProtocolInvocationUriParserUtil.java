@@ -45,10 +45,8 @@ final class ProtocolInvocationUriParserUtil {
 	 * es err&oacute;neo se lanzar&aacute; una excepci&oacute;n.
 	 * @param params Par&aacute;metros de con la configuraci&oacute;n de la operaci&oacute;n.
 	 * @return Par&aacute;metros
-	 * @throws ParameterException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto
-	 * @throws UnsupportedEncodingException Si no se soporta UTF-8 en URL (no debe ocurrir nunca) */
-	static UrlParametersToSave getParametersToSave(final Map<String, String> params) throws ParameterException,
-	                                                                                        UnsupportedEncodingException {
+	 * @throws ParameterException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto. */
+	static UrlParametersToSave getParametersToSave(final Map<String, String> params) throws ParameterException {
 		final UrlParametersToSave ret = new UrlParametersToSave();
 
 		ret.setCommonParameters(params);

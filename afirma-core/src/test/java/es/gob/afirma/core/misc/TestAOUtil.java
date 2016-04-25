@@ -37,7 +37,7 @@ public final class TestAOUtil {
      * @throws Exception En cualquier error. */
     @SuppressWarnings("static-method")
 	@Test
-    public void testGetCN() throws Exception {
+    public void testGetCN() {
         final String principals[][] = {
                 {"CN=\"fulanito Menganito\", C=ES", "fulanito Menganito"}, //$NON-NLS-1$ //$NON-NLS-2$
                 {" CN=\"fulanito Menganito\", C=ES", "fulanito Menganito"}, //$NON-NLS-1$ //$NON-NLS-2$

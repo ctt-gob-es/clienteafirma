@@ -65,7 +65,7 @@ public final class AOXAdESASiCSTriPhaseSigner extends AOXAdESTriPhaseSigner {
 			             final String algorithm,
 			             final PrivateKey key,
 			             final Certificate[] certChain,
-			             final Properties xParams) throws AOException {
+			             final Properties xParams) {
 		throw new UnsupportedOperationException("No se soportan cofirmas trifasicas XAdES-ASiC-S"); //$NON-NLS-1$
 	}
 
@@ -74,7 +74,7 @@ public final class AOXAdESASiCSTriPhaseSigner extends AOXAdESTriPhaseSigner {
 			             final String algorithm,
 			             final PrivateKey key,
 			             final Certificate[] certChain,
-			             final Properties xParams) throws AOException {
+			             final Properties xParams) {
 		throw new UnsupportedOperationException("No se soportan cofirmas trifasicas XAdES-ASiC-S"); //$NON-NLS-1$
 	}
 
@@ -85,7 +85,7 @@ public final class AOXAdESASiCSTriPhaseSigner extends AOXAdESTriPhaseSigner {
 			                  final Object[] targets,
 			                  final PrivateKey key,
 			                  final Certificate[] certChain,
-			                  final Properties xParams) throws AOException {
+			                  final Properties xParams) {
 
 		throw new UnsupportedOperationException("No se soportan contrafirmas trifasicas XAdES-ASiC-S"); //$NON-NLS-1$
 	}

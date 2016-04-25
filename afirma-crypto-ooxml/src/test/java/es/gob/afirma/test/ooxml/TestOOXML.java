@@ -75,11 +75,10 @@ public final class TestOOXML {
     	}
     }
 
-    /** Prueba de firma convencional.
-     * @throws Exception en cualquier error */
+    /** Prueba de firma convencional. */
     @SuppressWarnings("static-method")
 	@Test
-    public void testGetSignersStructure() throws Exception {
+    public void testGetSignersStructure() {
     	new AOOOXMLSigner().getSignersStructure(DATAS[0], false);
     }
 

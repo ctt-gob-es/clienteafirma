@@ -10,7 +10,6 @@
 
 package es.gob.afirma.signers.cadestri.client.asic;
 
-import java.io.IOException;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
 import java.util.Properties;
@@ -32,8 +31,7 @@ public final class AOCAdESASiCSTriPhaseSigner extends AOCAdESTriPhaseSigner {
 			           final String algorithm,
 			           final PrivateKey key,
 			           final Certificate[] certChain,
-			           final Properties extraParams) throws AOException,
-			                                                IOException {
+			           final Properties extraParams) throws AOException {
 		return triPhaseOperation(
 			AOSignConstants.SIGN_FORMAT_CADES_ASIC_S,
 			CRYPTO_OPERATION_SIGN,
@@ -51,8 +49,7 @@ public final class AOCAdESASiCSTriPhaseSigner extends AOCAdESTriPhaseSigner {
 			             final String algorithm,
 			             final PrivateKey key,
 			             final Certificate[] certChain,
-			             final Properties extraParams) throws AOException,
-			                                                  IOException {
+			             final Properties extraParams) {
 		throw new UnsupportedOperationException(
 			"No se soporta cofirma trifasica CAdES-ASiC-S" //$NON-NLS-1$
 		);
@@ -63,8 +60,7 @@ public final class AOCAdESASiCSTriPhaseSigner extends AOCAdESTriPhaseSigner {
 			             final String algorithm,
 			             final PrivateKey key,
 			             final Certificate[] certChain,
-			             final Properties extraParams) throws AOException,
-			                                                  IOException {
+			             final Properties extraParams) {
 		throw new UnsupportedOperationException(
 			"No se soporta cofirma trifasica CAdES-ASiC-S" //$NON-NLS-1$
 		);
@@ -77,8 +73,7 @@ public final class AOCAdESASiCSTriPhaseSigner extends AOCAdESTriPhaseSigner {
 			final Object[] targets,
 			final PrivateKey key,
 			final Certificate[] certChain,
-			final Properties extraParams) throws AOException,
-			                                     IOException {
+			final Properties extraParams) {
 		throw new UnsupportedOperationException(
 			"No se soporta contrafirma trifasica CAdES-ASiC-S" //$NON-NLS-1$
 		);

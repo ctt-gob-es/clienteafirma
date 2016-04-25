@@ -69,12 +69,11 @@ public final class CypherDataManager {
 	 * @return Cadena con el numero de caracteres agregados manualmente para cumplir la longitud requerida,
 	 * el caracter separador y los datos cifrados y en base 64.
 	 * @throws InvalidKeyException Cuando la clave no es v&aacute;lida.
-	 * @throws GeneralSecurityException Cuando falla el proceso de cifrado.
-	 * @throws IOException En caso de errores en el tratamiento de datos. */
-	public static String cipherData(final byte[] data, final byte[] cipherKey) throws InvalidKeyException, GeneralSecurityException, IOException {
-		return new StringBuilder((int)(data.length * 1.2)).
-				append(Integer.toString((DesCipher.getPaddingLength() - data.length % DesCipher.getPaddingLength()) % DesCipher.getPaddingLength())).
-				append(PADDING_CHAR_SEPARATOR).
-				append(Base64.encode(DesCipher.cipher(data, cipherKey), true)).toString();
+	 * @throws GeneralSecurityException Cuando falla el proceso de cifrado. */
+	public static String cipherData(final byte[] data, final byte[] cipherKey) throws InvalidKeyException, GeneralSecurityException {
+		return new StringBuilder((int)(data.length * 1.2))
+			.append(Integer.toString((DesCipher.getPaddingLength() - data.length % DesCipher.getPaddingLength()) % DesCipher.getPaddingLength()))
+			.append(PADDING_CHAR_SEPARATOR)
+			.append(Base64.encode(DesCipher.cipher(data, cipherKey), true)).toString();
 	}
 }

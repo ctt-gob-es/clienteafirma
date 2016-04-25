@@ -80,10 +80,8 @@ public class DigitalEnvelopeSelectFile extends JPanel {
 		return this.panel;
 	}
 
-	/**
-	 * Crea el panel para seleccionar el fichero a ensobrar, el tipo de sobre y el algoritmo a utilizar.
-	 * @param dl
-	 */
+	/** Crea el panel para seleccionar el fichero a ensobrar, el tipo de sobre y el algoritmo a utilizar.
+	 * @param dl Di&aacute;logo del asistente de ensobrado. */
 	DigitalEnvelopeSelectFile(final DigitalEnvelopePresentation dl) {
 		this.dialog = dl;
 		createUI();

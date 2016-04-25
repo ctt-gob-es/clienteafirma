@@ -30,7 +30,7 @@ public class Xmlwise
 	 */
 	public static Document loadDocument(final File file) throws IOException, XmlParseException
 	{
-		return loadDocument(file, false, false);
+		return loadDocument(file, false);
 	}
 
 	/**
@@ -38,12 +38,11 @@ public class Xmlwise
 	 *
 	 * @param file the file to read from.
 	 * @param validate if we should validate the document or not.
-	 * @param loadExternalDTD true to allow loading of external dtds.
 	 * @return an XML document.
 	 * @throws IOException if we fail to load the file.
 	 * @throws XmlParseException if there is a problem parsing the xml in the file.
 	 */
-	public static Document loadDocument(final File file, final boolean validate, final boolean loadExternalDTD) throws IOException, XmlParseException
+	public static Document loadDocument(final File file, final boolean validate) throws IOException, XmlParseException
 	{
 		try
 		{
@@ -69,11 +68,10 @@ public class Xmlwise
 	 *
 	 * @param xml a valid XML document, ie the String can't be null or empty
 	 * @param validate if we should validate the document or not.
-	 * @param loadExternalDTD true to allow loading of external dtds.
 	 * @return the <code>Document</code> object for the specified string.
 	 * @throws XmlParseException if we fail to parse the XML.
 	 */
-	public static Document createDocument(final String xml, final boolean validate, final boolean loadExternalDTD) throws XmlParseException
+	public static Document createDocument(final String xml, final boolean validate) throws XmlParseException
 	{
 		try
 		{
@@ -99,7 +97,7 @@ public class Xmlwise
 	 */
 	public static Document createDocument(final String xml) throws XmlParseException
 	{
-		return createDocument(xml, false, false);
+		return createDocument(xml, false);
 	}
 
 	/**

@@ -26,7 +26,7 @@ final class DefaultLogHandler extends LogHandler {
 	}
 
 	@Override
-	public void addLog(final int level, final String msg, final String inputData, final String outputSign) throws IOException {
+	public void addLog(final int level, final String msg, final String inputData, final String outputSign) {
 		try {
 			this.os.write(("\r\n" + getLevel(level) + ": " + msg + " - " + (outputSign != null ? outputSign : inputData != null ? inputData : "")).getBytes()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		}

@@ -23,7 +23,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.CounterSignTarget;
 
@@ -42,7 +41,7 @@ public final class AOFacturaETriPhaseSigner extends AOXAdESTriPhaseSigner {
 			             final String algorithm,
 			             final PrivateKey key,
 			             final Certificate[] certChain,
-			             final Properties xParams) throws AOException {
+			             final Properties xParams) {
 		throw new UnsupportedOperationException(
 			"FacturaE no soporta cofirmas" //$NON-NLS-1$
 		);
@@ -55,7 +54,7 @@ public final class AOFacturaETriPhaseSigner extends AOXAdESTriPhaseSigner {
 			final Object[] targets,
 			final PrivateKey key,
 			final Certificate[] certChain,
-			final Properties xParams) throws AOException {
+			final Properties xParams) {
 		throw new UnsupportedOperationException(
 			"FacturaE no soporta contrafirmas" //$NON-NLS-1$
 		);

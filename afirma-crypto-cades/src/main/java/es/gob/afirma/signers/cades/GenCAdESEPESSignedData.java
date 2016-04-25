@@ -10,11 +10,8 @@
 
 package es.gob.afirma.signers.cades;
 
-import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
-import java.security.cert.CertificateException;
 import java.util.Date;
 import java.util.List;
 
@@ -91,9 +88,6 @@ public final class GenCAdESEPESSignedData {
      *                                               si se establece a <code>false</code> se incluye siempre que el certificado
      *                                               la declare.
      * @return La firma generada codificada en ASN.1 binario.
-     * @throws NoSuchAlgorithmException Si no se soporta alguno de los algoritmos de firma o huella digital indicados
-     * @throws CertificateException En caso de cualquier problema con los certificados de firma.
-     * @throws IOException En caso de cualquier problema leyendo o escribiendo los datos
      * @throws AOException Cuando ocurre alg&uacute;n error durante el proceso de codificaci&oacute;n ASN.1 */
     public static byte[] generateSignedData(final P7ContentSignerParameters parameters,
                                             final boolean omitContent,
@@ -109,10 +103,7 @@ public final class GenCAdESEPESSignedData {
                                             final String contentDescription,
                                             final List<CommitmentTypeIndicationBean> ctis,
                                             final CAdESSignerMetadata csm,
-                                            final boolean doNotIncludePolicyOnSigningCertificate) throws NoSuchAlgorithmException,
-                                                                                                         CertificateException,
-                                                                                                         IOException,
-                                                                                                         AOException {
+                                            final boolean doNotIncludePolicyOnSigningCertificate) throws AOException {
         if (parameters == null) {
             throw new IllegalArgumentException("Los parametros no pueden ser nulos"); //$NON-NLS-1$
         }

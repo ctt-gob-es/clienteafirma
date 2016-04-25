@@ -1,7 +1,6 @@
 package es.gob.afirma.signers.ooxml;
 
 import java.io.FilterInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 
 final class NoCloseInputStream extends FilterInputStream {
@@ -11,7 +10,7 @@ final class NoCloseInputStream extends FilterInputStream {
     }
 
     @Override
-    public void close() throws IOException {
+    public void close() {
         // Se ignoran los errores al cerrar
     }
 }

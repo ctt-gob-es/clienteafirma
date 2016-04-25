@@ -18,12 +18,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.security.Key;
-import java.security.KeyStoreException;
 import java.security.KeyStoreSpi;
-import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.Certificate;
-import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.Collection;
@@ -67,7 +64,7 @@ public final class SingleCertKeyStore extends KeyStoreSpi {
     }
 
     @Override
-    public void engineDeleteEntry(final String alias) throws KeyStoreException {
+    public void engineDeleteEntry(final String alias) {
         if (alias == null) {
             return;
         }
@@ -113,7 +110,7 @@ public final class SingleCertKeyStore extends KeyStoreSpi {
     }
 
     @Override
-    public Key engineGetKey(final String alias, final char[] arg1) throws NoSuchAlgorithmException, UnrecoverableKeyException {
+    public Key engineGetKey(final String alias, final char[] arg1) throws UnrecoverableKeyException {
         if (!engineContainsAlias(alias)) {
             throw new UnrecoverableKeyException("No hay ningun certificado con el alias '" + alias + "'"); //$NON-NLS-1$ //$NON-NLS-2$
         }
@@ -131,7 +128,7 @@ public final class SingleCertKeyStore extends KeyStoreSpi {
     }
 
     @Override
-    public void engineLoad(final InputStream is, final char[] pwd) throws IOException, NoSuchAlgorithmException, CertificateException {
+    public void engineLoad(final InputStream is, final char[] pwd) throws IOException {
         if (is == null) {
             throw new IOException("Se necesitan certificados"); //$NON-NLS-1$
         }
@@ -175,17 +172,17 @@ public final class SingleCertKeyStore extends KeyStoreSpi {
     }
 
     @Override
-    public void engineSetCertificateEntry(final String arg0, final Certificate arg1) throws KeyStoreException {
+    public void engineSetCertificateEntry(final String arg0, final Certificate arg1) {
         // No soportado, se ignora la llamada
     }
 
     @Override
-    public void engineSetKeyEntry(final String arg0, final byte[] arg1, final Certificate[] arg2) throws KeyStoreException {
+    public void engineSetKeyEntry(final String arg0, final byte[] arg1, final Certificate[] arg2) {
      // No soportado, se ignora la llamada
     }
 
     @Override
-    public void engineSetKeyEntry(final String arg0, final Key arg1, final char[] arg2, final Certificate[] arg3) throws KeyStoreException {
+    public void engineSetKeyEntry(final String arg0, final Key arg1, final char[] arg2, final Certificate[] arg3) {
      // No soportado, se ignora la llamada
     }
 
@@ -195,7 +192,7 @@ public final class SingleCertKeyStore extends KeyStoreSpi {
     }
 
     @Override
-    public void engineStore(final OutputStream arg0, final char[] arg1) throws IOException, NoSuchAlgorithmException, CertificateException {
+    public void engineStore(final OutputStream arg0, final char[] arg1) {
         // No soportado, se ignora la llamada
     }
 

@@ -100,7 +100,7 @@ public final class AOCAdESASiCSSigner implements AOSigner {
 	}
 
 	@Override
-	public boolean isValidDataFile(final byte[] data) throws IOException {
+	public boolean isValidDataFile(final byte[] data) {
 		if (data == null) {
 			LOGGER.warning("Se han introducido datos nulos para su comprobacion"); //$NON-NLS-1$
             return false;
@@ -114,7 +114,7 @@ public final class AOCAdESASiCSSigner implements AOSigner {
 	}
 
 	@Override
-	public byte[] getData(final byte[] signData) throws AOException, IOException {
+	public byte[] getData(final byte[] signData) throws IOException {
 		return ASiCUtil.getASiCSData(signData);
 	}
 

@@ -27,6 +27,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
+
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.ui.AOUIFactory;
@@ -102,10 +103,9 @@ public class DigitalEnvelopeRecipients extends JPanel {
 	/**
 	 * Genera un panel de destinatarios de sobres digitales.
 	 * @param parent Di&aacute;logo del asistente de ensobrado.
-	 * @param Ruta del fichero a ensobrar.
+	 * @param file Ruta del fichero a ensobrar.
 	 * @param type Tipo de sobre a realizar.
-	 * @param algorithm Tipo de algortimo de cifrado.
-	 */
+	 * @param algorithm Tipo de algortimo de cifrado. */
 	public DigitalEnvelopeRecipients(final DigitalEnvelopePresentation parent,
 									 final String file,
 									 final EnvelopesTypeResources type,
@@ -391,7 +391,7 @@ public class DigitalEnvelopeRecipients extends JPanel {
 	    }
         final CertificateDestiny certDest = new CertificateDestiny(keyStoreManager, this.dialog);
 	    // Comprobamos que el certificado es correcto
-	    if (certDest != null && certDest.getAlias() != null && !certDest.equals("")) { //$NON-NLS-1$
+	    if (certDest.getAlias() != null) {
 	        boolean copiar = true;
 	        for (int i = 0; i < modelList.getSize(); i++) {
 	            if (certDest.getAlias().equals(modelList.getElementAt(i))) {

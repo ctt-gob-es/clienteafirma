@@ -50,19 +50,13 @@ public class MozillaUnifiedKeyStoreManager extends AggregatedKeyStoreManager {
 		return new NssKeyStoreManager(getParentComponent(), false);
 	}
 
-	/** Inicializa la clase gestora de almacenes de claves.
-	 * @throws AOKeyStoreManagerException
-	 *         Si no puede inicializarse ning&uacute;n almac&eacute;n de
-	 *         claves, ni el NSS interno, ni ning&uacute;n PKCS#11 externo
-	 *         definido en SecMod
-	 * @throws IOException Cuando hay errores de entrada / salida */
+	/** Inicializa la clase gestora de almacenes de claves. */
 	@Override
 	public final void init(final AOKeyStore type,
 			               final InputStream store,
 			               final PasswordCallback pssCallBack,
 			               final Object[] params,
-			               final boolean forceReset) throws AOKeyStoreManagerException,
-			                                                IOException {
+			               final boolean forceReset) {
 
 		final Object parentComponent = params != null && params.length > 0 ? params[0] : null;
 

@@ -491,16 +491,15 @@ public final class AOODFSigner implements AOSigner {
      *    OpenOffice.org 3.1 no son compatibles ni con versiones anteriores ni con posteriores, incluyendo LibreOffice.
      *   </dd>
      * </dl>
-     * @return Documento ODF con la nueva firma a&ntilde;adida
-     * @throws AOException Cuando ocurre cualquier problema durante el proceso
-     * @throws IOException Cuando hay errores de entrada / salida */
+     * @return Documento ODF con la nueva firma a&ntilde;adida.
+     * @throws AOException Cuando ocurre cualquier problema durante el proceso. */
     @Override
 	public byte[] cosign(final byte[] data,
                          final byte[] sign,
                          final String algorithm,
                          final PrivateKey key,
                          final java.security.cert.Certificate[] certChain,
-                         final Properties extraParams) throws AOException, IOException {
+                         final Properties extraParams) throws AOException {
         return sign(sign, algorithm, key, certChain, extraParams);
     }
 
@@ -519,15 +518,14 @@ public final class AOODFSigner implements AOSigner {
      *    OpenOffice.org 3.1 no son compatibles ni con versiones anteriores ni con posteriores, incluyendo LibreOffice.
      *   </dd>
      * </dl>
-     * @return Documento ODF con la nueva firma a&ntilde;adida
-     * @throws AOException Cuando ocurre cualquier problema durante el proceso
-     * @throws IOException Cuando hay errores de entrada / salida */
+     * @return Documento ODF con la nueva firma a&ntilde;adida.
+     * @throws AOException Cuando ocurre cualquier problema durante el proceso. */
     @Override
 	public byte[] cosign(final byte[] sign,
                          final String algorithm,
                          final PrivateKey key,
                          final java.security.cert.Certificate[] certChain,
-                         final Properties extraParams) throws AOException, IOException {
+                         final Properties extraParams) throws AOException {
         return sign(sign, algorithm, key, certChain, extraParams);
     }
 
@@ -540,7 +538,7 @@ public final class AOODFSigner implements AOSigner {
                               final Object[] targets,
                               final PrivateKey key,
                               final java.security.cert.Certificate[] certChain,
-                              final Properties extraParams) throws AOException {
+                              final Properties extraParams) {
         throw new UnsupportedOperationException("No es posible realizar contrafirmas de ficheros ODF"); //$NON-NLS-1$
     }
 

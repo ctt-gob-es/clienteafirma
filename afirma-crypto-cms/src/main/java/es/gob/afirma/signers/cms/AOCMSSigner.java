@@ -29,10 +29,10 @@ import es.gob.afirma.core.signers.AOSignInfo;
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.util.tree.AOTreeModel;
-import es.gob.afirma.signers.pkcs7.SCChecker;
 import es.gob.afirma.signers.pkcs7.ObtainContentSignedData;
 import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
 import es.gob.afirma.signers.pkcs7.ReadNodesTree;
+import es.gob.afirma.signers.pkcs7.SCChecker;
 
 /** Manejador de firmas binarias CMS. Par&aacute;metros adicionales aceptados
  * para las operaciones de firma:<br>
@@ -215,7 +215,6 @@ public final class AOCMSSigner implements AOSigner {
                 		nodes,
                 		key,
                 		certChain,
-                		this.dataType,
                 		this.atrib,
                 		this.uatrib
             		);
@@ -232,7 +231,6 @@ public final class AOCMSSigner implements AOSigner {
                 		nodes,
                 		key,
                 		certChain,
-                		this.dataType,
                 		this.atrib,
                 		this.uatrib
             		);
@@ -251,7 +249,6 @@ public final class AOCMSSigner implements AOSigner {
                 		nodesID,
                 		key,
                 		certChain,
-                		this.dataType,
                 		this.atrib,
                 		this.uatrib
             		);
@@ -273,7 +270,6 @@ public final class AOCMSSigner implements AOSigner {
                 		nodes2,
                 		key,
                 		certChain,
-                		this.dataType,
                 		this.atrib,
                 		this.uatrib
             		);

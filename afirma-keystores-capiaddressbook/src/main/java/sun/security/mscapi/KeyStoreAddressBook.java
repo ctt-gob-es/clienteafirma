@@ -31,11 +31,8 @@ import java.io.OutputStream;
 import java.lang.reflect.Method;
 import java.security.KeyStoreException;
 import java.security.KeyStoreSpi;
-import java.security.NoSuchAlgorithmException;
 import java.security.SecurityPermission;
-import java.security.UnrecoverableKeyException;
 import java.security.cert.Certificate;
-import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -154,14 +151,9 @@ public abstract class KeyStoreAddressBook extends KeyStoreSpi {
      * @param password
      *        the password, which should be <code>null</code>
      * @return the requested key, or null if the given alias does not exist or
-     *         does not identify a <i>key entry</i>.
-     * @exception NoSuchAlgorithmException
-     *            if the algorithm for recovering the key cannot be found,
-     *            or if compatibility mode is disabled and <code>password</code> is non-null.
-     * @exception UnrecoverableKeyException
-     *            if the key cannot be recovered. */
+     *         does not identify a <i>key entry</i>. */
     @Override
-    public final java.security.Key engineGetKey(final String alias, final char[] password) throws NoSuchAlgorithmException, UnrecoverableKeyException {
+    public final java.security.Key engineGetKey(final String alias, final char[] password) {
         throw new UnsupportedOperationException();
     }
 
@@ -273,13 +265,9 @@ public abstract class KeyStoreAddressBook extends KeyStoreSpi {
      *        the password, which should be <code>null</code>
      * @param chain
      *        the certificate chain for the corresponding public key (only
-     *        required if the given key is of type <code>java.security.PrivateKey</code>).
-     * @exception KeyStoreException
-     *            if the given key is not a private key, cannot be
-     *            protected, or if compatibility mode is disabled and <code>password</code> is non-null, or if this operation
-     *            fails for some other reason. */
+     *        required if the given key is of type <code>java.security.PrivateKey</code>). */
     @Override
-    public final void engineSetKeyEntry(final String alias, final java.security.Key key, final char[] password, final Certificate[] chain) throws KeyStoreException {
+    public final void engineSetKeyEntry(final String alias, final java.security.Key key, final char[] password, final Certificate[] chain) {
         throw new UnsupportedOperationException();
     }
 
@@ -297,11 +285,9 @@ public abstract class KeyStoreAddressBook extends KeyStoreSpi {
      *        the key (in protected format) to be associated with the alias
      * @param chain
      *        the certificate chain for the corresponding public key (only
-     *        useful if the protected key is of type <code>java.security.PrivateKey</code>).
-     * @exception KeyStoreException
-     *            if this operation fails. */
+     *        useful if the protected key is of type <code>java.security.PrivateKey</code>). */
     @Override
-    public final void engineSetKeyEntry(final String alias, final byte[] key, final Certificate[] chain) throws KeyStoreException {
+    public final void engineSetKeyEntry(final String alias, final byte[] key, final Certificate[] chain) {
         throw new UnsupportedOperationException("Cannot assign the encoded key to the given alias."); //$NON-NLS-1$
     }
 
@@ -312,23 +298,17 @@ public abstract class KeyStoreAddressBook extends KeyStoreSpi {
      * @param alias
      *        the alias name
      * @param cert
-     *        the certificate
-     * @exception KeyStoreException
-     *            if the given alias already exists and does not identify a
-     *            <i>trusted certificate entry</i>, or this operation fails
-     *            for some other reason. */
+     *        the certificate. */
     @Override
-    public final void engineSetCertificateEntry(final String alias, final Certificate cert) throws KeyStoreException {
+    public final void engineSetCertificateEntry(final String alias, final Certificate cert) {
         throw new UnsupportedOperationException();
     }
 
     /** Deletes the entry identified by the given alias from this keystore.
      * @param alias
-     *        the alias name
-     * @exception KeyStoreException
-     *            if the entry cannot be removed. */
+     *        the alias name. */
     @Override
-    public final void engineDeleteEntry(final String alias) throws KeyStoreException {
+    public final void engineDeleteEntry(final String alias) {
         throw new UnsupportedOperationException();
     }
 
@@ -433,14 +413,9 @@ public abstract class KeyStoreAddressBook extends KeyStoreSpi {
      * @param stream
      *        the output stream, which should be <code>null</code>
      * @param password
-     *        the password, which should be <code>null</code>
-     * @exception IOException
-     *            if compatibility mode is disabled and either parameter is
-     *            non-null. */
+     *        the password, which should be <code>null</code>. */
     @Override
-    public final void engineStore(final OutputStream stream, final char[] password) throws IOException,
-                                                                                   NoSuchAlgorithmException,
-                                                                                   CertificateException {
+    public final void engineStore(final OutputStream stream, final char[] password) {
         // No es necesario hacer nada, se almacena en engineSetEntry()
     }
 
@@ -458,18 +433,12 @@ public abstract class KeyStoreAddressBook extends KeyStoreSpi {
      *            if there is an I/O or format problem with the keystore
      *            data. Or if compatibility mode is disabled and either
      *            parameter is non-null.
-     * @exception NoSuchAlgorithmException
-     *            if the algorithm used to check the integrity of the
-     *            keystore cannot be found
-     * @exception CertificateException
-     *            if any of the certificates in the keystore could not be
-     *            loaded
      * @exception SecurityException
      *            if the security check for <code>SecurityPermission("authProvider.<i>name</i>")</code> does not pass, where <i>name</i> is the value
      *            returned by
      *            this provider's <code>getName</code> method. */
     @Override
-    public final void engineLoad(final InputStream stream, final char[] password) throws IOException, NoSuchAlgorithmException, CertificateException {
+    public final void engineLoad(final InputStream stream, final char[] password) throws IOException {
 
         /*
          * Use the same security check as AuthProvider.login

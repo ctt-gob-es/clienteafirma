@@ -30,7 +30,7 @@ public final class HashFromCommandLineTest {
 	/** Main para pruebas.
 	 * @param args No se usa.
 	 * @throws Exception En cualquier error. */
-	public static void main(final String[] args) throws Exception {
+	public static void main(final String[] args) {
 		SimpleAfirma.main(
 			new String[] {
 				"createdigest", "-i", "/Users/user/Desktop/"  //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$

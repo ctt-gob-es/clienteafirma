@@ -74,7 +74,7 @@ public class TestProtocolInvocation {
 	/** Prueba de apertura de firma con el visor.
 	 * @param args No se usa.
 	 * @throws Exception Error al cargar el recurso de prueba. */
-	public static void main(final String[] args) throws Exception {
+	public static void main(final String[] args) {
 
 		new Thread(
 				new Runnable() {

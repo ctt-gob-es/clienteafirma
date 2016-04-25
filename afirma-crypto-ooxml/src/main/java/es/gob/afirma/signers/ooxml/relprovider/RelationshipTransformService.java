@@ -52,7 +52,6 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import javax.xml.crypto.Data;
-import javax.xml.crypto.MarshalException;
 import javax.xml.crypto.OctetStreamData;
 import javax.xml.crypto.XMLCryptoContext;
 import javax.xml.crypto.XMLStructure;
@@ -149,7 +148,7 @@ public final class RelationshipTransformService extends TransformService {
 
     /** {@inheritDoc} */
     @Override
-    public void marshalParams(final XMLStructure parent, final XMLCryptoContext context) throws MarshalException {
+    public void marshalParams(final XMLStructure parent, final XMLCryptoContext context) {
         final DOMStructure domParent = (DOMStructure) parent;
         final Node parentNode = domParent.getNode();
         final Element parentElement = (Element) parentNode;
@@ -279,7 +278,7 @@ public final class RelationshipTransformService extends TransformService {
 
     /** {@inheritDoc} */
     @Override
-	public Data transform(final Data data, final XMLCryptoContext context, final OutputStream os) throws TransformException {
+	public Data transform(final Data data, final XMLCryptoContext context, final OutputStream os) {
         return null;
     }
 

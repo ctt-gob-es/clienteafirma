@@ -70,7 +70,7 @@ public final class TriphaseDataSigner {
 				throw new AOException("Error decodificando la prefirma: " + e, e); //$NON-NLS-1$
 			}
 
-			final byte[] pkcs1sign = new AOPkcs1Signer().sign(
+			final byte[] pkcs1sign = signer.sign(
 				preSign,
 				algorithm,
 				key,

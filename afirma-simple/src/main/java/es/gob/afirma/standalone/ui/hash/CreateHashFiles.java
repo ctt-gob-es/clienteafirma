@@ -148,10 +148,10 @@ public final class CreateHashFiles extends JDialog {
 
 		// Label con el nombre del fichero
 		final JLabel label = new JLabel(SimpleAfirmaMessages.getString("CreateHashFiles.11")); //$NON-NLS-1$
-		this.examineButton.getAccessibleContext().setAccessibleDescription(SimpleAfirmaMessages.getString("MenuDigitalEnvelope.20")); //$NON-NLS-1$
+		this.examineButton.getAccessibleContext().setAccessibleDescription(SimpleAfirmaMessages.getString("CreateHashFiles.10")); //$NON-NLS-1$
 
 		// Boton examinar
-		this.examineButton.setText(SimpleAfirmaMessages.getString("MenuDigitalEnvelope.20")); //$NON-NLS-1$
+		this.examineButton.setText(SimpleAfirmaMessages.getString("CreateHashFiles.10")); //$NON-NLS-1$
 		this.examineButton.setMnemonic('X');
 
 		this.examineButton.addActionListener(
@@ -329,7 +329,7 @@ public final class CreateHashFiles extends JDialog {
 			);
 		}
 		catch (final AOCancelledOperationException e) {
-			Logger.getLogger("es.gob.afirma").info("Operacion cancelada"); //$NON-NLS-1$//$NON-NLS-2$
+			// Operacion cancelada
 		}
 		catch (final Exception e) {
 			if (e.getCause() instanceof java.lang.OutOfMemoryError) {

@@ -52,7 +52,6 @@ import org.spongycastle.cms.CMSProcessable;
 import org.spongycastle.cms.CMSProcessableByteArray;
 
 import es.gob.afirma.core.AOException;
-import es.gob.afirma.core.AOFormatFileException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.signers.AOPkcs1Signer;
 import es.gob.afirma.core.signers.AOSignConstants;
@@ -169,8 +168,7 @@ final class CAdESCoSigner {
 	 * @throws NoSuchAlgorithmException Si no se soporta alguno de los algoritmos de firma o huella
 	 *                                  digital
 	 * @throws CertificateException Si se produce alguna excepci&oacute;n con los certificados de
-	 *                              firma.
-	 * @throws AOFormatFileException Si se proporciona una firma con sellos de tiempo. */
+	 *                              firma. */
 	byte[] coSigner(final P7ContentSignerParameters parameters,
 			        final byte[] signature,
 			        final boolean omitContent,
@@ -186,8 +184,7 @@ final class CAdESCoSigner {
 			        final CAdESSignerMetadata csm,
                     final boolean doNotIncludePolicyOnSigningCertificate) throws IOException,
 			                                                                     NoSuchAlgorithmException,
-			                                                                     CertificateException,
-			                                                                     AOFormatFileException {
+			                                                                     CertificateException {
 		final SignedData sd = readData(signature);
 
 		// 3. CONTENTINFO

@@ -180,13 +180,11 @@ public final class CAdESUtils {
      *                                               la declare.
      * @return Estructura <i>SigningCertificateV2</i> seg&uacute;n RFC 5035.
      * @throws CertificateEncodingException Si el certificado proporcionado no es v&aacute;lido.
-     * @throws NoSuchAlgorithmException Si no se soporta el algoritmo de huella indicado.
-     * @throws IOException Si hay errores en el tratamiento de datos. */
+     * @throws NoSuchAlgorithmException Si no se soporta el algoritmo de huella indicado. */
     private static Attribute getSigningCertificateV2(final X509Certificate cert,
     		                                         final String digestAlgorithmName,
                                                      final boolean doNotIncludePolicyOnSigningCertificate) throws CertificateEncodingException,
-    		                                                                                                      NoSuchAlgorithmException,
-    		                                                                                                      IOException {
+    		                                                                                                      NoSuchAlgorithmException {
 
     	// ALGORITMO DE HUELLA DIGITAL
         final AlgorithmIdentifier digestAlgorithmOID = SigUtils.makeAlgId(AOAlgorithmID.getOID(digestAlgorithmName));

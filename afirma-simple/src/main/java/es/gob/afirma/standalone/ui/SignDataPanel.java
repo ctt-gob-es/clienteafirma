@@ -204,7 +204,7 @@ final class SignDataPanel extends JPanel {
 
         // Panel con los datos del certificado
         if (cert != null) {
-            final CertificateInfo certInfo = CertAnalyzer.getCertInformation(cert, this.validateCertButton);
+            final CertificateInfo certInfo = CertAnalyzer.getCertInformation(cert);
 
             if (certInfo != null) {
 
