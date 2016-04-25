@@ -77,6 +77,10 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 
 	private static final String SIGNATURE_FORMAT_AUTO = "AUTO"; //$NON-NLS-1$
 
+	private static final String CRYPTO_OPERATION_SIGN = "sign"; //$NON-NLS-1$
+	private static final String CRYPTO_OPERATION_COSIGN = "cosign"; //$NON-NLS-1$
+	private static final String CRYPTO_OPERATION_COUNTERSIGN = "countersign"; //$NON-NLS-1$
+
 	/** N&uacute;mero m&aacute;ximo de caracteres que se devuelven en cualquiera de los
 	 * m&eacute;todos del Applet. */
 	private static final int BUFFER_SIZE = 1024 * 1024;	// 1 Mb
@@ -593,6 +597,44 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 		finally {
 			this.dataStore.setLength(0);
 		}
+	}
+
+	@Override
+	public String signAndSaveToFile(final String op, final String algorithm, final String format,
+			final String extraParams, final String fileName)
+			throws PrivilegedActionException, IOException, AOException,
+			CertificateEncodingException, IncompatiblePolicyException {
+
+		String result;
+		String saveDialogtitle;
+		if (op == null || CRYPTO_OPERATION_SIGN.equalsIgnoreCase(op)) {
+			result = sign(algorithm, format, extraParams);
+			saveDialogtitle = MiniAppletMessages.getString("MiniAfirmaApplet.3"); //$NON-NLS-1$
+		}
+		else if (CRYPTO_OPERATION_COSIGN.equalsIgnoreCase(op)) {
+			result = coSign(null, algorithm, format, extraParams);
+			saveDialogtitle = MiniAppletMessages.getString("MiniAfirmaApplet.4"); //$NON-NLS-1$
+		}
+		else if (CRYPTO_OPERATION_COUNTERSIGN.equalsIgnoreCase(op)) {
+			result = counterSign(algorithm, format, extraParams);
+			saveDialogtitle = MiniAppletMessages.getString("MiniAfirmaApplet.5"); //$NON-NLS-1$
+		}
+		else {
+			throw new UnsupportedOperationException("La operacion criptografica no soportada: " + op); //$NON-NLS-1$
+		}
+
+		// Establecemos los datos que se deben guardar
+		this.dataStore.append(result.substring(result.indexOf('|') + 1));
+
+		// Solicitamos el guardado
+		try {
+			saveDataToFile(saveDialogtitle, fileName, null, MiniAppletMessages.getString("MiniAfirmaApplet.1")); //$NON-NLS-1$
+		}
+		catch (final Exception e) {
+			LOGGER.warning("No se pudo completar el guardado de la firma: " + e); //$NON-NLS-1$
+		}
+
+		return result;
 	}
 
 	/** {@inheritDoc} */

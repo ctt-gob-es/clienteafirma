@@ -73,19 +73,6 @@ interface MiniAfirma {
                                                                             CertificateEncodingException,
                                                                             IncompatiblePolicyException;
 
-	/** Fija el firmante que se establezca para ser reutilizado (sin intervenci&oacute;n del usuario) en todas
-	 * las operaciones posteriores hasta que se desactive esta opci&oacute;n.
-	 * En las operaciones de firmante fijado por un filtro, en las que no se muestra ning&uacute;n di&aacute;logo de
-	 * selecci&oacute;n de certificado, controla la aparcici&oacute;n del di&aacute;logo de solicitud de confirmaci&oacute;n de
-	 * firma.
-	 * @param sticky Si se establece a <code>true</code>, el firmante que se seleccione tras este establecimiento se
-	 *               reutilizar&aacute; para todas las operaciones posteriores, hasta que se restablezca a <code>false</code>.
-	 *               Si se establece al <code>false</code> se borra el firmante fijado si lo hubiese, por lo que se preguntar&aacute;
-	 *               al usuario de nuevo con un di&aacute;logo de selecci&oacute;n de certificado la pr&oacute;xima vez que se
-	 *               necesite (o un di&aacute;logo de confirmaci&oacute;n de firma si el certificado se establece un&iacute;vocamente
-	 *               mediante un filtro. */
-    void setStickySignatory(boolean sticky);
-
     /** Realiza la firma paralela (cofirma) de unos datos. La cofirma de una firma requiere
      * que los datos est&eacute;n contenidos en la firma original o que se indiquen como
      * par&aacute;metro de esta funci&oacute;n. Si no se proporcionasen los datos,
@@ -161,6 +148,40 @@ interface MiniAfirma {
                                                                                    AOException,
                                                                                    CertificateEncodingException,
                                                                                    IncompatiblePolicyException;
+
+    /** Firma/multifirma unos datos seg&uacute;n la configuracion proporcionada y
+     * guarda el resultado en disco.
+     * Los datos se deber&aacute;n haber establecido previamente mediante el uso
+     * reiterado del m&eacute;todo {@code addData(String)}.
+     * La configuraci&oacute;n que se puede proporcionar es el algoritmo,
+     * el formato de firma y par&aacute;metros adicionales del formato particular.
+     * Estos par&aacute;metros extra se indicar&aacute;n como una cadena de
+     * m&uacute;ltiples l&iacute;neas con la forma {@code CLAVE=VALOR}, en donde
+     * {@code CLAVE} es el nombre de la propiedad y {@code VALOR} el valor asignado
+     * a esta. Para utilizar el valor por defecto de una propiedad se dejar&aacute;
+     * de indicar esta en el listado de par&aacute;metros.
+     * @param op Operaci&oacute;n criptogr&aacute;fica a realizar (sign, cosign, countersign)
+     * @param algorithm Algoritmo de firma.
+     * @param format Formato de firma.
+     * @param extraParams Par&aacute;metros adicionales para configurar la operac&oacute;n.
+     * @param fileName Nombre propuesto para el fichero de salida.
+     * @return Firma electr&oacute;nica resultante en Base64. Si el tama&ntilde;o del resultado es demasiado grande ser&aacute;
+     *         necesario realizar llamadas adicionales a <code>getRemainingData()</code> y concatenar las respuestas hasta
+     *         que este &uacute;ltimo m&eacute;todo devuelva '%%EOF%%'
+     * @throws IOException Cuando se produce un error durante la firma electr&oacute;nica.
+     * @throws es.gob.afirma.core.AOFormatFileException Cuando se indica un formato de firma no soportado.
+     * @throws es.gob.afirma.core.InvalidLibraryException Cuando se detecta una versi&oacute;n no v&aacute;lida de una biblioteca.
+     * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
+     * @throws es.gob.afirma.core.MissingLibraryException Cuando no se encuentra una biblioteca necesaria para la operaci&oacute;n.
+     * @throws AOException Cuando se produce un error desconocido.
+     * @throws CertificateEncodingException Cuando no se puede codificar el certificado usado para la firma.
+     * @throws IncompatiblePolicyException Si se pide una pol&iacute;tica de firma concreta (por nombre, no indicando los par&aacute;metros
+     *                                     individualmente) incompatible con el formato de firma indicado. */
+    String signAndSaveToFile(String op, String algorithm, String format, String extraParams, String fileName) throws PrivilegedActionException,
+																									    IOException,
+																									    AOException,
+																									    CertificateEncodingException,
+																									    IncompatiblePolicyException;
 
     /** Muestra un di&aacute;logo modal que permite al usuario seleccionar
      * el directorio y el nombre de fichero para el guardado de datos.
@@ -460,6 +481,19 @@ interface MiniAfirma {
 	 * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
 	 */
 	String selectCertificate(final String extraParams) throws AOException, CertificateEncodingException, PrivilegedActionException;
+
+	/** Fija el firmante que se establezca para ser reutilizado (sin intervenci&oacute;n del usuario) en todas
+	 * las operaciones posteriores hasta que se desactive esta opci&oacute;n.
+	 * En las operaciones de firmante fijado por un filtro, en las que no se muestra ning&uacute;n di&aacute;logo de
+	 * selecci&oacute;n de certificado, controla la aparcici&oacute;n del di&aacute;logo de solicitud de confirmaci&oacute;n de
+	 * firma.
+	 * @param sticky Si se establece a <code>true</code>, el firmante que se seleccione tras este establecimiento se
+	 *               reutilizar&aacute; para todas las operaciones posteriores, hasta que se restablezca a <code>false</code>.
+	 *               Si se establece al <code>false</code> se borra el firmante fijado si lo hubiese, por lo que se preguntar&aacute;
+	 *               al usuario de nuevo con un di&aacute;logo de selecci&oacute;n de certificado la pr&oacute;xima vez que se
+	 *               necesite (o un di&aacute;logo de confirmaci&oacute;n de firma si el certificado se establece un&iacute;vocamente
+	 *               mediante un filtro. */
+    void setStickySignatory(boolean sticky);
 
 	/**
 	 * Establece el almac&eacute;n de certificados que se debe utilizar en las subsiguientes

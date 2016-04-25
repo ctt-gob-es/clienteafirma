@@ -57,6 +57,7 @@ public abstract class UrlParameters {
 	private String id = null;
 	private String defaultKeyStore = null;
 	private Properties extraParams = null;
+	private String filename = null;
 
 	/** Obtiene los par&aacute;metros adicionales de la firma.
 	 * @return Par&aacute;metros adicionales de la firma */
@@ -71,6 +72,18 @@ public abstract class UrlParameters {
 	 */
 	void setExtraParams(final Properties properties) {
 		this.extraParams = properties != null ? properties : new Properties();
+	}
+
+	/** Obtiene el nombre de fichero propuesto para guardar los datos.
+	 * @return Nombre de fichero propuesto para guardar los datos */
+	public String getFileName() {
+		return this.filename;
+	}
+
+	/** Establece el nombre de fichero propuesto para guardar los datos.
+	 * @param filename Nombre de fichero propuesto para guardar los datos */
+	void setFilename(final String filename) {
+		this.filename = filename;
 	}
 
 	/** Obtiene el nombre del almac&eacute;n de claves a usar por defecto.
