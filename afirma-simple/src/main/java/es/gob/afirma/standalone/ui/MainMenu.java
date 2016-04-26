@@ -18,6 +18,7 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 
 import javax.swing.Box;
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -450,7 +451,7 @@ public final class MainMenu extends JMenuBar {
     		parentComponent,
 			SimpleAfirmaMessages.getString("MainMenu.14", SimpleAfirma.getVersion(), System.getProperty("java.version")), //$NON-NLS-1$ //$NON-NLS-2$,
             SimpleAfirmaMessages.getString("MainMenu.15"), //$NON-NLS-1$
-            JOptionPane.INFORMATION_MESSAGE
+            JOptionPane.PLAIN_MESSAGE
         );
     }
 

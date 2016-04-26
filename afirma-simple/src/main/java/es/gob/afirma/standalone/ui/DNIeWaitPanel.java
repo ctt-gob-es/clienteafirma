@@ -180,6 +180,7 @@ public final class DNIeWaitPanel extends JPanel implements KeyListener {
 				}
 			}
     	);
+        hideDniWaitScreen.setBackground(Color.WHITE);
         this.add(hideDniWaitScreen, c);
     }
 

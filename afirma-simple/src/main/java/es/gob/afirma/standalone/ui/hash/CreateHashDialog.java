@@ -12,8 +12,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.swing.JButton;
@@ -25,6 +29,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
+import javax.swing.SwingWorker;
 
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.Base64;
@@ -32,6 +37,7 @@ import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.standalone.AutoFirmaUtil;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
+import es.gob.afirma.standalone.ui.CommonWaitDialog;
 import es.gob.afirma.standalone.ui.preferences.PreferencesManager;
 
 /** Di&aacute;logo para la creaci&oacute;n de huellas digitales.
@@ -42,6 +48,7 @@ public final class CreateHashDialog extends JDialog implements KeyListener{
 
 	private static final String PREFERENCE_BASE64 = "createHashAsBase64"; //$NON-NLS-1$
 	private static final String PREFERENCE_ALGORITHM = "createHashAlgorithm"; //$NON-NLS-1$
+	private static final int SIZE_WAIT = 50000000; //Tamano en bytes
 
 	private static final String[] HASH_ALGOS = new String[] {
 		"SHA-1", //$NON-NLS-1$
@@ -70,7 +77,11 @@ public final class CreateHashDialog extends JDialog implements KeyListener{
 	/** Inicia el proceso de creaci&oacute;n de huella digital.
 	 * @param parent Componente padre para la modalidad. */
 	public static void startHashCreation(final Frame parent) {
-		new CreateHashDialog(parent).setVisible(true);
+		CreateHashDialog chd = new CreateHashDialog(parent);
+		chd.setSize(600, 280);
+		chd.setResizable(false);
+		chd.setLocationRelativeTo(parent);
+		chd.setVisible(true);
 	}
 
 	/** Crea un di&aacute;logo para la creaci&oacute;n de huellas digitales.
@@ -79,14 +90,7 @@ public final class CreateHashDialog extends JDialog implements KeyListener{
 		super(parent);
 		setTitle(SimpleAfirmaMessages.getString("CreateHashDialog.15")); //$NON-NLS-1$
 		setModalityType(ModalityType.APPLICATION_MODAL);
-		SwingUtilities.invokeLater(
-			new Runnable() {
-				@Override
-				public void run() {
-					createUI(parent);
-				}
-			}
-		);
+		createUI(parent);
 	}
 
 	void createUI(final Frame parent) {
@@ -273,10 +277,6 @@ public final class CreateHashDialog extends JDialog implements KeyListener{
 		gbc.gridy++;
 		gbc.gridwidth = GridBagConstraints.REMAINDER;
 		c.add(panel, gbc);
-		pack();
-		setSize(600, 280);
-		setResizable(false);
-		setLocationRelativeTo(parent);
 	}
 
 	static void doHashProcess(final Frame parent,
@@ -285,60 +285,87 @@ public final class CreateHashDialog extends JDialog implements KeyListener{
                               final boolean base64,
                               final Window currentFrame) {
 
-		try ( final InputStream is = new FileInputStream(file); ) {
+		final CommonWaitDialog dialog = new CommonWaitDialog(
+			null,
+			SimpleAfirmaMessages.getString("CreateHashFiles.18"), //$NON-NLS-1$
+			SimpleAfirmaMessages.getString("CreateHashFiles.20") //$NON-NLS-1$
+		);
+			
+		// Arrancamos el proceso en un hilo aparte
+		final SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
+			@Override
+			protected Void doInBackground() throws Exception {
+				try ( final InputStream is = new FileInputStream(file); ) {
+					
+					if (currentFrame != null) {
+						currentFrame.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+					}
 
-			if (currentFrame != null) {
-				currentFrame.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+					final byte[] hash = HashUtil.getFileHash(hashAlgorithm, file);
+
+					final String ext = base64 ? ".hashb64" : ".hash"; //$NON-NLS-1$ //$NON-NLS-2$
+					
+					dialog.dispose();
+					AOUIFactory.getSaveDataToFile(
+							base64 ? Base64.encode(hash).getBytes() :
+								hash,
+						SimpleAfirmaMessages.getString("CreateHashDialog.8"), //$NON-NLS-1$,,,
+						null,
+						new java.io.File(file).getName() + ext,
+						new String[] { ext },
+						SimpleAfirmaMessages.getString("CreateHashDialog.9") + " (*" + ext + ")",  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
+						parent
+					);
+				}
+				catch(final OutOfMemoryError ooe) {
+					AOUIFactory.showErrorMessage(
+						parent,
+						SimpleAfirmaMessages.getString("CreateHashDialog.18"), //$NON-NLS-1$
+						SimpleAfirmaMessages.getString("CreateHashDialog.14"), //$NON-NLS-1$
+						JOptionPane.ERROR_MESSAGE
+					);
+					Logger.getLogger("es.gob.afirma").severe( //$NON-NLS-1$
+						"Fichero demasiado grande: " + ooe //$NON-NLS-1$
+					);
+					return null;
+				}
+				catch(final AOCancelledOperationException aocoe) {
+					return null;
+				}
+				catch (final Exception ioe) {
+					AOUIFactory.showErrorMessage(
+						parent,
+						SimpleAfirmaMessages.getString("CreateHashDialog.13"), //$NON-NLS-1$
+						SimpleAfirmaMessages.getString("CreateHashDialog.14"), //$NON-NLS-1$
+						JOptionPane.ERROR_MESSAGE
+					);
+					Logger.getLogger("es.gob.afirma").severe( //$NON-NLS-1$
+						"Error generando o guardando la huella digital: " + ioe //$NON-NLS-1$
+					);
+					return null;
+				}
+				finally {
+					if (currentFrame != null) {
+						currentFrame.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+					}
+				}
+				
+				return null;
 			}
-
-			final byte[] hash = HashUtil.getFileHash(hashAlgorithm, file);
-
-			final String ext = base64 ? ".hashb64" : ".hash"; //$NON-NLS-1$ //$NON-NLS-2$
-
-			AOUIFactory.getSaveDataToFile(
-					base64 ? Base64.encode(hash).getBytes() :
-						hash,
-				SimpleAfirmaMessages.getString("CreateHashDialog.8"), //$NON-NLS-1$,,,
-				null,
-				new java.io.File(file).getName() + ext,
-				new String[] { ext },
-				SimpleAfirmaMessages.getString("CreateHashDialog.9") + " (*" + ext + ")",  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
-				parent
-			);
-		}
-		catch(final OutOfMemoryError ooe) {
-			AOUIFactory.showErrorMessage(
-				parent,
-				SimpleAfirmaMessages.getString("CreateHashDialog.18"), //$NON-NLS-1$
-				SimpleAfirmaMessages.getString("CreateHashDialog.14"), //$NON-NLS-1$
-				JOptionPane.ERROR_MESSAGE
-			);
-			Logger.getLogger("es.gob.afirma").severe( //$NON-NLS-1$
-				"Fichero demasiado grande: " + ooe //$NON-NLS-1$
-			);
-			return;
-		}
-		catch(final AOCancelledOperationException aocoe) {
-			return;
-		}
-		catch (final Exception ioe) {
-			AOUIFactory.showErrorMessage(
-				parent,
-				SimpleAfirmaMessages.getString("CreateHashDialog.13"), //$NON-NLS-1$
-				SimpleAfirmaMessages.getString("CreateHashDialog.14"), //$NON-NLS-1$
-				JOptionPane.ERROR_MESSAGE
-			);
-			Logger.getLogger("es.gob.afirma").severe( //$NON-NLS-1$
-				"Error generando o guardando la huella digital: " + ioe //$NON-NLS-1$
-			);
-			return;
-		}
-		finally {
-			if (currentFrame != null) {
-				currentFrame.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+			@Override
+			protected void done() {
+				super.done();
+				if (dialog != null) {
+					dialog.dispose();
+				}
 			}
-		}
+		};
+		worker.execute();
 
+		if (new File(file).length() > SIZE_WAIT) {
+			// Se muestra la ventana de espera
+			dialog.setVisible(true);
+		}		
 	}
 
 	/** {@inheritDoc} */

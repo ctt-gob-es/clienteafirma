@@ -5,10 +5,13 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.JOptionPane;
+import javax.swing.SwingWorker;
 
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.AOUtil;
@@ -16,6 +19,7 @@ import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.standalone.AutoFirmaUtil;
 import es.gob.afirma.standalone.DataAnalizerUtil;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
+import es.gob.afirma.standalone.ui.CommonWaitDialog;
 
 /** Funciones para el acceso a las capacidades de creaci&oacute;n y verificaci&oacute;n de
  * huellas digitales.
@@ -27,6 +31,7 @@ public final class HashHelper {
 	private static final String DEFAULT_HASH_ALGORITHM = "SHA-512"; //$NON-NLS-1$
 	private static final boolean DEFAULT_RECURSIVE = true;
 	private static final boolean DEFAULT_USE_BASE64 = true;
+	private static final int SIZE_WAIT = 50000000; //Tamano en bytes
 
 	/** Comprueba las huellas digitales del fichero de huella proporcionados mediante un
 	 * interfaz gr&aacute;fico.
@@ -60,6 +65,7 @@ public final class HashHelper {
 			);
 			return;
 		}
+
 		// Leemos el fichero
 		final byte[] inputBytes;
 		try (
@@ -99,11 +105,41 @@ public final class HashHelper {
 				return;
 			}
 			try {
-				CheckHashFiles.checkHashXML(
-					Paths.get(dataDir.toURI()),
-					file.getAbsolutePath()
+				// Se crea la ventana de espera.
+				final CommonWaitDialog dialog = new CommonWaitDialog(
+					null,
+					SimpleAfirmaMessages.getString("CreateHashFiles.21"), //$NON-NLS-1$
+					SimpleAfirmaMessages.getString("CreateHashFiles.22") //$NON-NLS-1$
 				);
+				
+				// Arrancamos el proceso en un hilo aparte
+				final SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
+					@Override
+					protected Void doInBackground() throws Exception {
+						CheckHashFiles.setReportXML(new HashMap<String, List<String>>());
+						CheckHashFiles.checkHashXML(
+							Paths.get(dataDir.toURI()),
+							file.getAbsolutePath()
+						);
+						return null;
+					}
+					
+					@Override
+					protected void done() {
+						super.done();
+						if (dialog != null) {
+							dialog.dispose();
+						}
+					}
+				};
+				worker.execute();
 
+				if (CreateHashFiles.getSize(dataDir) > SIZE_WAIT) {
+					// Se muestra la ventana de espera
+					dialog.setVisible(true);
+				}
+				
+				worker.get();
 				if (!(CheckHashFiles.getReportXML().containsKey("CheckHashDialog.5") || //$NON-NLS-1$
 					CheckHashFiles.getReportXML().containsKey("CheckHashFiles.1") || //$NON-NLS-1$
 					CheckHashFiles.getReportXML().containsKey("CheckHashFiles.10"))) { //$NON-NLS-1$

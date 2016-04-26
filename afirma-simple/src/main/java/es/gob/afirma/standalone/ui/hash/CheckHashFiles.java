@@ -78,6 +78,8 @@ public final class CheckHashFiles extends JDialog {
 	private static Map<String, List<String>> reportXML;
 	private static String algorithm = null;
 	private static Boolean isRecursive = null;
+	private static final int SIZE_WAIT = 50000000; //Tamano en bytes
+	
 
 	/** Fichero a evitar. */
 	private final static Set<String> FILES_TO_AVOID	= new HashSet<>(
@@ -97,7 +99,11 @@ public final class CheckHashFiles extends JDialog {
 	 * directorios.
 	 * @param parent Componente padre para la modalidad. */
 	public static void startHashCheck(final Frame parent) {
-		new CheckHashFiles(parent).setVisible(true);
+		CheckHashFiles chfd = new CheckHashFiles(parent);
+		chfd.setResizable(false);
+		chfd.setSize(600, 250);
+		chfd.setLocationRelativeTo(parent);
+		chfd.setVisible(true);
 	}
 
 	/** Crea un di&aacute;logo para la comprobaci&oacute;n de huellas digitales
@@ -107,15 +113,7 @@ public final class CheckHashFiles extends JDialog {
 		super(parent);
 		setTitle(SimpleAfirmaMessages.getString("CheckHashFiles.0")); //$NON-NLS-1$
 		setModalityType(ModalityType.APPLICATION_MODAL);
-		setResizable(false);
-		SwingUtilities.invokeLater(
-			new Runnable() {
-				@Override
-				public void run() {
-					createUI(parent);
-				}
-			}
-		);
+		createUI(parent);
 	}
 
 	/** Crea todos los elementos necesarios para generar una huella digital de
@@ -146,12 +144,11 @@ public final class CheckHashFiles extends JDialog {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					try {
-
 						// Se crea la ventana de espera.
 						final CommonWaitDialog dialog = new CommonWaitDialog(
 							parent,
-							SimpleAfirmaMessages.getString("CreateHashFiles.18"), //$NON-NLS-1$
-							SimpleAfirmaMessages.getString("CreateHashFiles.20") //$NON-NLS-1$
+							SimpleAfirmaMessages.getString("CreateHashFiles.21"), //$NON-NLS-1$
+							SimpleAfirmaMessages.getString("CreateHashFiles.22") //$NON-NLS-1$
 						);
 
 						// Arrancamos el proceso en un hilo aparte
@@ -159,7 +156,6 @@ public final class CheckHashFiles extends JDialog {
 
 							@Override
 							protected Void doInBackground() throws Exception {
-								//
 								setReportXML(new HashMap<String, List<String>>());
 								checkHashXML(Paths.get(getDirectorioText()), getXMLText());
 								return null;
@@ -172,9 +168,11 @@ public final class CheckHashFiles extends JDialog {
 						};
 						worker.execute();
 
-						// Se muestra la ventana de espera
-						dialog.setVisible(true);
-
+						if (CreateHashFiles.getSize(new File(getDirectorioText().toString())) > SIZE_WAIT) {
+							// Se muestra la ventana de espera
+							dialog.setVisible(true);
+						}	
+						
 						worker.get();
 						if (!(getReportXML().containsKey("CheckHashDialog.5") || //$NON-NLS-1$
 							  getReportXML().containsKey("CheckHashFiles.1") || //$NON-NLS-1$
@@ -381,10 +379,6 @@ public final class CheckHashFiles extends JDialog {
 		gbc.gridy++;
 		gbc.gridwidth = GridBagConstraints.REMAINDER;
 		c.add(panel, gbc);
-		setResizable(false);
-		pack();
-		setSize(600, 250);
-		setLocationRelativeTo(parent);
 	}
 
 	/** Comprueba que las huellas digitales generadas para el directorio sean
