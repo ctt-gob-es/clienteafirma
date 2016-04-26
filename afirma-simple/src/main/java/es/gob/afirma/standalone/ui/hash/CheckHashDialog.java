@@ -16,7 +16,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.NoSuchAlgorithmException;
-import java.util.concurrent.ExecutionException;
 import java.util.logging.Logger;
 
 import javax.swing.JButton;
@@ -44,11 +43,11 @@ public final class CheckHashDialog extends JDialog implements KeyListener {
 	/** Inicia el proceso de compobaci&oacute;n de huella digital.
 	 * @param parent Componente padre para la modalidad. */
 	public static void startHashCheck(final Frame parent) {
-		CheckHashDialog chkd = new CheckHashDialog(parent);
+		final CheckHashDialog chkd = new CheckHashDialog(parent);
 		chkd.setSize(600, 250);
 		chkd.setResizable(false);
 		chkd.setLocationRelativeTo(parent);
-		chkd.setVisible(true);;
+		chkd.setVisible(true);
 	}
 
 	private static final long serialVersionUID = 8075570205961862205L;
@@ -286,18 +285,18 @@ public final class CheckHashDialog extends JDialog implements KeyListener {
 
 	}
 
-	static boolean checkHash(final String fileNameHash, final String fileNameData) throws IOException {
+	static boolean checkHash(final String fileNameHash, final String fileNameData) {
 		if (fileNameHash == null || fileNameHash.isEmpty() || fileNameData == null || fileNameData.isEmpty()) {
 			throw new IllegalArgumentException();
 		}
-		
+
 		// Se crea la ventana de espera.
 		final CommonWaitDialog dialog = new CommonWaitDialog(
 			null,
 			SimpleAfirmaMessages.getString("CreateHashFiles.21"), //$NON-NLS-1$
 			SimpleAfirmaMessages.getString("CreateHashFiles.22") //$NON-NLS-1$
 		);
-		
+
 		// Arrancamos el proceso en un hilo aparte
 		final SwingWorker<Boolean, Void> worker = new SwingWorker<Boolean, Void>() {
 
@@ -311,11 +310,13 @@ public final class CheckHashDialog extends JDialog implements KeyListener {
 					hashBytes = Base64.decode(hashBytes, 0, hashBytes.length, false);
 				}
 				try {
-					return arrayEquals(
-						hashBytes,
-						HashUtil.getFileHash(
-							getHashAlgorithm(hashBytes),
-							fileNameData
+					return Boolean.valueOf(
+						arrayEquals(
+							hashBytes,
+							HashUtil.getFileHash(
+								getHashAlgorithm(hashBytes),
+								fileNameData
+							)
 						)
 					);
 				}
@@ -326,27 +327,29 @@ public final class CheckHashDialog extends JDialog implements KeyListener {
 			@Override
 			protected void done() {
 				super.done();
-				if (dialog != null) {
-					dialog.dispose();
-				}
+				dialog.dispose();
 			}
 		};
 		worker.execute();
-		
-		
+
+
 		if (new File(fileNameData).length() > SIZE_WAIT) {
 			// Se muestra la ventana de espera
 			dialog.setVisible(true);
 		}
-		
+
 		try {
 			return worker.get().booleanValue();
-		} catch (Exception e) {
+		}
+		catch (final Exception e) {
+			Logger.getLogger("es.gob.afirma").severe( //$NON-NLS-1$
+				"Error en el proceso en segundo plano de comparacion de huellas: " + e //$NON-NLS-1$
+			);
 			return false;
 		}
 	}
 
-	private static String getHashAlgorithm(final byte[] hash) {
+	static String getHashAlgorithm(final byte[] hash) {
 		if (hash == null || hash.length < 1) {
 			throw new IllegalArgumentException("La huella no puede ser nula ni vacia"); //$NON-NLS-1$
 		}
@@ -360,7 +363,7 @@ public final class CheckHashDialog extends JDialog implements KeyListener {
      * @param v Primer array de octetos
      * @param w Segundo array de octetos
      * @return <code>true</code> si los arrays son iguales, <code>false</code> en caso contrario */
-    private static boolean arrayEquals(final byte[] v, final byte[] w) {
+    static boolean arrayEquals(final byte[] v, final byte[] w) {
         return arrayEquals(v, 0, v.length, w, 0, w.length);
     }
 

@@ -38,7 +38,7 @@ import es.gob.afirma.standalone.SimpleAfirmaMessages;
 /** Panel con detalles de una firma electr&oacute;nica. */
 public final class SignDetailPanel extends JPanel {
 
-    /** Serial ID */
+    /** Serial ID. */
     private static final long serialVersionUID = 7567869419737753210L;
 
     /** Referencia a la aplicaci&oacute;n de firma. */

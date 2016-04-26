@@ -102,6 +102,7 @@ public final class HashHelper {
 				)[0];
 			}
 			catch(final AOCancelledOperationException e) {
+				// Operacion cancelada
 				return;
 			}
 			try {
@@ -111,7 +112,7 @@ public final class HashHelper {
 					SimpleAfirmaMessages.getString("CreateHashFiles.21"), //$NON-NLS-1$
 					SimpleAfirmaMessages.getString("CreateHashFiles.22") //$NON-NLS-1$
 				);
-				
+
 				// Arrancamos el proceso en un hilo aparte
 				final SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
 					@Override
@@ -123,13 +124,11 @@ public final class HashHelper {
 						);
 						return null;
 					}
-					
+
 					@Override
 					protected void done() {
 						super.done();
-						if (dialog != null) {
-							dialog.dispose();
-						}
+						dialog.dispose();
 					}
 				};
 				worker.execute();
@@ -138,7 +137,7 @@ public final class HashHelper {
 					// Se muestra la ventana de espera
 					dialog.setVisible(true);
 				}
-				
+
 				worker.get();
 				if (!(CheckHashFiles.getReportXML().containsKey("CheckHashDialog.5") || //$NON-NLS-1$
 					CheckHashFiles.getReportXML().containsKey("CheckHashFiles.1") || //$NON-NLS-1$
@@ -188,7 +187,6 @@ public final class HashHelper {
 			}
 			catch (final AOCancelledOperationException ex) {
 				// Operacion cancelada por el usuario
-				Logger.getLogger("es.gob.afirma").info("Operacion cancelada"); //$NON-NLS-1$//$NON-NLS-2$
 				return;
 			}
 			catch (final Exception ex) {
@@ -225,6 +223,7 @@ public final class HashHelper {
 				)[0];
 			}
 			catch(final AOCancelledOperationException e) {
+				// Operacion cancelada
 				return;
 			}
 			try {

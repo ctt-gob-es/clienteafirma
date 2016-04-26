@@ -83,7 +83,7 @@ final class SignDataPanel extends JPanel {
     private final JEditorPane certDescription = new JEditorPane();
     private JButton validateCertButton = null;
 
-    private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+    static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
     SignDataPanel(final File signFile, final byte[] sign, final JComponent fileTypeIcon, final X509Certificate cert, final KeyListener extKeyListener) {
         SwingUtilities.invokeLater(() -> createUI(signFile, sign, fileTypeIcon, cert, extKeyListener));
@@ -173,6 +173,9 @@ final class SignDataPanel extends JPanel {
                         Desktop.getDesktop().open(signFile);
                     }
                     catch (final Exception e) {
+                    	LOGGER.warning(
+                			"Error abriendo el fichero con el visor por defecto: " + e //$NON-NLS-1$
+            			);
                     	AOUIFactory.showErrorMessage(
                             SignDataPanel.this,
                             SimpleAfirmaMessages.getString("SignDataPanel.7"), //$NON-NLS-1$
@@ -387,6 +390,9 @@ final class SignDataPanel extends JPanel {
             Desktop.getDesktop().open(tmp);
         }
         catch(final Exception e) {
+        	LOGGER.warning(
+    			"Error abriendo el fichero con el visor por defecto: " + e //$NON-NLS-1$
+			);
         	AOUIFactory.showErrorMessage(
                 parent,
                 SimpleAfirmaMessages.getString("SignDataPanel.23"), //$NON-NLS-1$

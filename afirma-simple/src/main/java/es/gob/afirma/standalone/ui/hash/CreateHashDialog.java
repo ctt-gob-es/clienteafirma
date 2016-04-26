@@ -15,9 +15,6 @@ import java.awt.event.KeyListener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.List;
 import java.util.logging.Logger;
 
 import javax.swing.JButton;
@@ -77,7 +74,7 @@ public final class CreateHashDialog extends JDialog implements KeyListener{
 	/** Inicia el proceso de creaci&oacute;n de huella digital.
 	 * @param parent Componente padre para la modalidad. */
 	public static void startHashCreation(final Frame parent) {
-		CreateHashDialog chd = new CreateHashDialog(parent);
+		final CreateHashDialog chd = new CreateHashDialog(parent);
 		chd.setSize(600, 280);
 		chd.setResizable(false);
 		chd.setLocationRelativeTo(parent);
@@ -290,13 +287,13 @@ public final class CreateHashDialog extends JDialog implements KeyListener{
 			SimpleAfirmaMessages.getString("CreateHashFiles.18"), //$NON-NLS-1$
 			SimpleAfirmaMessages.getString("CreateHashFiles.20") //$NON-NLS-1$
 		);
-			
+
 		// Arrancamos el proceso en un hilo aparte
 		final SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
 			@Override
-			protected Void doInBackground() throws Exception {
+			protected Void doInBackground() {
 				try ( final InputStream is = new FileInputStream(file); ) {
-					
+
 					if (currentFrame != null) {
 						currentFrame.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 					}
@@ -304,7 +301,7 @@ public final class CreateHashDialog extends JDialog implements KeyListener{
 					final byte[] hash = HashUtil.getFileHash(hashAlgorithm, file);
 
 					final String ext = base64 ? ".hashb64" : ".hash"; //$NON-NLS-1$ //$NON-NLS-2$
-					
+
 					dialog.dispose();
 					AOUIFactory.getSaveDataToFile(
 							base64 ? Base64.encode(hash).getBytes() :
@@ -330,6 +327,7 @@ public final class CreateHashDialog extends JDialog implements KeyListener{
 					return null;
 				}
 				catch(final AOCancelledOperationException aocoe) {
+					// Operacion cancelada
 					return null;
 				}
 				catch (final Exception ioe) {
@@ -349,15 +347,13 @@ public final class CreateHashDialog extends JDialog implements KeyListener{
 						currentFrame.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 					}
 				}
-				
+
 				return null;
 			}
 			@Override
 			protected void done() {
 				super.done();
-				if (dialog != null) {
-					dialog.dispose();
-				}
+				dialog.dispose();
 			}
 		};
 		worker.execute();
@@ -365,7 +361,7 @@ public final class CreateHashDialog extends JDialog implements KeyListener{
 		if (new File(file).length() > SIZE_WAIT) {
 			// Se muestra la ventana de espera
 			dialog.setVisible(true);
-		}		
+		}
 	}
 
 	/** {@inheritDoc} */

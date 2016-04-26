@@ -79,7 +79,7 @@ public final class CheckHashFiles extends JDialog {
 	private static String algorithm = null;
 	private static Boolean isRecursive = null;
 	private static final int SIZE_WAIT = 50000000; //Tamano en bytes
-	
+
 
 	/** Fichero a evitar. */
 	private final static Set<String> FILES_TO_AVOID	= new HashSet<>(
@@ -99,7 +99,7 @@ public final class CheckHashFiles extends JDialog {
 	 * directorios.
 	 * @param parent Componente padre para la modalidad. */
 	public static void startHashCheck(final Frame parent) {
-		CheckHashFiles chfd = new CheckHashFiles(parent);
+		final CheckHashFiles chfd = new CheckHashFiles(parent);
 		chfd.setResizable(false);
 		chfd.setSize(600, 250);
 		chfd.setLocationRelativeTo(parent);
@@ -171,8 +171,8 @@ public final class CheckHashFiles extends JDialog {
 						if (CreateHashFiles.getSize(new File(getDirectorioText().toString())) > SIZE_WAIT) {
 							// Se muestra la ventana de espera
 							dialog.setVisible(true);
-						}	
-						
+						}
+
 						worker.get();
 						if (!(getReportXML().containsKey("CheckHashDialog.5") || //$NON-NLS-1$
 							  getReportXML().containsKey("CheckHashFiles.1") || //$NON-NLS-1$
@@ -222,7 +222,6 @@ public final class CheckHashFiles extends JDialog {
 					}
 					catch (final AOCancelledOperationException ex) {
 						// Operacion cancelada por el usuario
-						Logger.getLogger("es.gob.afirma").info("Operacion cancelada"); //$NON-NLS-1$//$NON-NLS-2$
 					}
 					catch (final Exception ex) {
 						Logger.getLogger("es.gob.afirma").severe( //$NON-NLS-1$

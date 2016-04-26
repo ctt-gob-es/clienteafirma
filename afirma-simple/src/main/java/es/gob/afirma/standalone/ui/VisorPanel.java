@@ -82,10 +82,10 @@ public final class VisorPanel extends JPanel implements KeyListener {
 
     private void createUI(final File signFile, final byte[] sign, final boolean addReloadButton) {
         if (!LookAndFeelManager.HIGH_CONTRAST) {
-            this.setBackground(LookAndFeelManager.WINDOW_COLOR);
+            setBackground(LookAndFeelManager.WINDOW_COLOR);
         }
-        this.setLayout(new GridBagLayout());
-        this.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
+        setLayout(new GridBagLayout());
+        setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 
         openSign(signFile, sign, addReloadButton);
     }
@@ -114,6 +114,9 @@ public final class VisorPanel extends JPanel implements KeyListener {
                 validity = validateSign(sign);
             }
             catch (final Exception e) {
+            	Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
+        			"No se ha podido comprobar la validez de la firma: " + e //$NON-NLS-1$
+    			);
                 validity = new SignValidity(SIGN_DETAIL_TYPE.KO, null);
             }
         }
