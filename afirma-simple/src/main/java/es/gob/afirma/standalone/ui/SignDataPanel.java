@@ -86,14 +86,7 @@ final class SignDataPanel extends JPanel {
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
     SignDataPanel(final File signFile, final byte[] sign, final JComponent fileTypeIcon, final X509Certificate cert, final KeyListener extKeyListener) {
-        SwingUtilities.invokeLater(
-    		new Runnable() {
-	            @Override
-	            public void run() {
-	                createUI(signFile, sign, fileTypeIcon, cert, extKeyListener);
-	            }
-	        }
-		);
+        SwingUtilities.invokeLater(() -> createUI(signFile, sign, fileTypeIcon, cert, extKeyListener));
     }
 
     void createUI(final File signFile, final byte[] sign, final JComponent fileTypeIcon, final X509Certificate cert, final KeyListener extKeyListener) {

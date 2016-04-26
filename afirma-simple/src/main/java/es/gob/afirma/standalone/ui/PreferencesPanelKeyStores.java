@@ -35,14 +35,7 @@ final class PreferencesPanelKeyStores extends JPanel {
 	);
 
 	public PreferencesPanelKeyStores(final KeyListener keyListener, final ModificationListener modificationListener) {
-    	SwingUtilities.invokeLater(
-			new Runnable() {
-				@Override
-				public void run() {
-					createUI(keyListener, modificationListener);
-				}
-			}
-		);
+    	SwingUtilities.invokeLater(() ->  createUI(keyListener, modificationListener));
 	}
 
 	void createUI(final KeyListener keyListener, final ModificationListener modificationListener) {

@@ -186,14 +186,7 @@ final class CertPoliciesDialog extends JDialog {
 		super(parentFrame);
 		setTitle(SimpleAfirmaMessages.getString("PreferencesPanelTrustedSites.0")); //$NON-NLS-1$
 		setModalityType(ModalityType.APPLICATION_MODAL);
-		SwingUtilities.invokeLater(
-			new Runnable() {
-				@Override
-				public void run() {
-					createUI();
-				}
-			}
-		);
+		SwingUtilities.invokeLater(() -> createUI());
 	}
 
 	void createUI() {

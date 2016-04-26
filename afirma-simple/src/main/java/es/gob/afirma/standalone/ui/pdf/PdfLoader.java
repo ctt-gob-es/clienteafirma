@@ -35,24 +35,19 @@ final class PdfLoader {
 	}
 
 	static void loadPdf(final boolean isSign, final byte[] inPdf, final PdfLoaderListener pll) {
-		new Thread(
-			new Runnable() {
-				@Override
-				public void run() {
-					try {
-						pll.pdfLoaded(
-							isSign,
-							Pdf2ImagesConverter.pdf2Images(inPdf),
-							getPageSizes(inPdf)
-						);
-					}
-					catch(final OutOfMemoryError e) {
-						pll.pdfLoadedFailed(e);
-					}
-					catch (final IOException e) {
-						pll.pdfLoadedFailed(e);
-					}
-
+		new Thread(() ->  {
+				try {
+					pll.pdfLoaded(
+						isSign,
+						Pdf2ImagesConverter.pdf2Images(inPdf),
+						getPageSizes(inPdf)
+					);
+				}
+				catch(final OutOfMemoryError e) {
+					pll.pdfLoadedFailed(e);
+				}
+				catch (final IOException e) {
+					pll.pdfLoadedFailed(e);
 				}
 			}
 		).start();
@@ -92,22 +87,18 @@ final class PdfLoader {
 			SignPdfUiMessages.getString("PdfLoader.1")  // Titulo //$NON-NLS-1$
 		);
 
-		new Thread(
-			new Runnable() {
-				@Override
-				public void run() {
-					try {
-						final List<BufferedImage> pages = Pdf2ImagesConverter.pdf2Images(inPdf);
-						dialog.setVisible(false);
-						pll.pdfLoaded(isSign, pages, getPageSizes(inPdf));
-					}
-					catch (final IOException e) {
-						dialog.setVisible(false);
-						pll.pdfLoadedFailed(e);
-					}
-					finally {
-						dialog.dispose();
-					}
+		new Thread(() -> {
+				try {
+					final List<BufferedImage> pages = Pdf2ImagesConverter.pdf2Images(inPdf);
+					dialog.setVisible(false);
+					pll.pdfLoaded(isSign, pages, getPageSizes(inPdf));
+				}
+				catch (final IOException e) {
+					dialog.setVisible(false);
+					pll.pdfLoadedFailed(e);
+				}
+				finally {
+					dialog.dispose();
 				}
 			}
 		).start();

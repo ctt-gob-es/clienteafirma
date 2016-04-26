@@ -60,14 +60,7 @@ final class PreferencesPanelGeneral extends JPanel {
 	);
 
 	PreferencesPanelGeneral(final KeyListener keyListener, final ItemListener modificationListener) {
-    	SwingUtilities.invokeLater(
-			new Runnable() {
-				@Override
-				public void run() {
-					createUI(keyListener, modificationListener);
-				}
-			}
-		);
+    	SwingUtilities.invokeLater(() -> createUI(keyListener, modificationListener));
 	}
 
 	void savePreferences() {

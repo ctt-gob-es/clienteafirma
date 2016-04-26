@@ -1011,23 +1011,19 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 				this.strikethroughButton.doClick();
 			}
 			else if (ke.getKeyCode() == KeyEvent.VK_P && ke.isControlDown()) {
-				SwingUtilities.invokeLater(
-					new Runnable() {
-			            @Override
-			            public void run() {
-			                getViewLabel().dispatchEvent(
-		                		new MouseEvent(
-			                		 SignPdfUiPanelPreview.this,
-				                     MouseEvent.MOUSE_CLICKED,
-				                     1,
-				                     MouseEvent.BUTTON1,
-				                     0, 0,
-				                     1,
-				                     false
-				                )
-	                		);
-			            }
-			        }
+				SwingUtilities.invokeLater(() ->  {
+		                getViewLabel().dispatchEvent(
+	                		new MouseEvent(
+		                		 SignPdfUiPanelPreview.this,
+			                     MouseEvent.MOUSE_CLICKED,
+			                     1,
+			                     MouseEvent.BUTTON1,
+			                     0, 0,
+			                     1,
+			                     false
+			                )
+                		);
+		            }
 				);
 			}
 		}
@@ -1203,23 +1199,19 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
     			new ActionListener() {
     				@Override
     				public void actionPerformed(final ActionEvent e) {
-    					SwingUtilities.invokeLater(
-							new Runnable() {
-					            @Override
-					            public void run() {
-					                getViewLabel().dispatchEvent(
-				                		new MouseEvent(
-					                		 SignPdfUiPanelPreview.this,
-						                     MouseEvent.MOUSE_CLICKED,
-						                     1,
-						                     MouseEvent.BUTTON1,
-						                     0, 0,
-						                     1,
-						                     false
-						                )
-			                		);
-					            }
-					        }
+    					SwingUtilities.invokeLater(() ->  {
+				                getViewLabel().dispatchEvent(
+			                		new MouseEvent(
+				                		 SignPdfUiPanelPreview.this,
+					                     MouseEvent.MOUSE_CLICKED,
+					                     1,
+					                     MouseEvent.BUTTON1,
+					                     0, 0,
+					                     1,
+					                     false
+					                )
+		                		);
+				            }
 						);
     				}
     			}

@@ -13,6 +13,7 @@ import es.gob.afirma.core.misc.protocol.UrlParametersForBatch;
 import es.gob.afirma.core.misc.protocol.UrlParametersToSave;
 import es.gob.afirma.core.misc.protocol.UrlParametersToSelectCert;
 import es.gob.afirma.core.misc.protocol.UrlParametersToSign;
+import es.gob.afirma.core.misc.protocol.UrlParametersToSignAndSave;
 import es.gob.afirma.standalone.protocol.ProtocolInvocationLauncherUtil.DecryptionException;
 import es.gob.afirma.standalone.protocol.ProtocolInvocationLauncherUtil.InvalidEncryptedDataLengthException;
 import es.gob.afirma.standalone.ui.MainMenu;
@@ -198,6 +199,55 @@ public final class ProtocolInvocationLauncher {
                 return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_03);
             }
         }
+
+        // Se solicita una operacion de firma/multifirma seguida del guardado del resultado
+        else if (urlString.startsWith("afirma://signandsave?") || urlString.startsWith("afirma://signandsave/?")) { //$NON-NLS-1$ //$NON-NLS-2$
+            LOGGER.info("Se invoca a la aplicacion para la firma/multifirma y el guardado del resultado"); //$NON-NLS-1$
+
+            try {
+                UrlParametersToSignAndSave params = ProtocolInvocationUriParser.getParametersToSignAndSave(urlString);
+                LOGGER.info("Parametros de la llamada = " + urlString); //$NON-NLS-1$
+
+                // Si se indica un identificador de fichero, es que la configuracion se tiene que
+                // descargar desde el servidor intermedio
+                if (params.getFileId() != null) {
+
+                    final byte[] xmlData;
+                    try {
+                        xmlData = ProtocolInvocationLauncherUtil.getDataFromRetrieveServlet(params);
+                    }
+                    catch(final InvalidEncryptedDataLengthException e) {
+                        LOGGER.severe("No se pueden recuperar los datos del servidor: " + e); //$NON-NLS-1$
+                        ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_16);
+                        return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_16);
+                    }
+                    catch(final DecryptionException e) {
+                        LOGGER.severe("Error al descifrar: " + e); //$NON-NLS-1$
+                        ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_15);
+                        return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_15);
+                    }
+
+                    params = ProtocolInvocationUriParser.getParametersToSignAndSave(xmlData);
+                }
+                return  ProtocolInvocationLauncherSignAndSave.process(params, bySocket);
+            }
+            catch(final ParameterNeedsUpdatedVersionException e) {
+                LOGGER.severe("Se necesita una version mas moderna de AutoFirma para procesar la peticion: " + e); //$NON-NLS-1$
+                ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_14);
+                return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_14);
+            }
+            catch(final ParameterLocalAccessRequestedException e) {
+                LOGGER.severe("Se ha pedido un acceso a una direccion local (localhost o 127.0.0.1): " + e); //$NON-NLS-1$
+                ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_13);
+                return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_13);
+            }
+            catch (final Exception e) {
+                LOGGER.severe("Error en los parametros de la peticion: " + e); //$NON-NLS-1$
+                ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_03);
+                return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_03);
+            }
+        }
+
         // Se solicita una operacion de firma/cofirma/contrafirma
         else if (urlString.startsWith("afirma://sign?")        || urlString.startsWith("afirma://sign/?") || //$NON-NLS-1$ //$NON-NLS-2$
                  urlString.startsWith("afirma://cosign?")      || urlString.startsWith("afirma://cosign/?") || //$NON-NLS-1$ //$NON-NLS-2$

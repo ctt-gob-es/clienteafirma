@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="es.gob.afirma.android.signfolder"
-    android:versionCode="3"
+    android:versionCode="4"
     android:versionName="@string/app_version" >
 
     <uses-sdk
@@ -20,7 +20,7 @@
         
         <activity
             android:name=".LoginActivity"
-            android:label="@string/app_name"
+            android:label="@string/app_title"
 			android:configChanges="keyboardHidden|orientation|screenSize" >
             
             <intent-filter>

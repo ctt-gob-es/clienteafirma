@@ -245,19 +245,12 @@ final class PreferencesPanelKeyStores extends JPanel {
 				@Override
 				public void itemStateChanged(final ItemEvent e) {
 					if (e.getStateChange() == ItemEvent.SELECTED) {
-						SwingUtilities.invokeLater(
-							new Runnable() {
-								@Override
-								public void run() {
-									AOUIFactory.showMessageDialog(
-										PreferencesPanelKeyStores.this,
-										SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.16"), //$NON-NLS-1$
-										SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.17"), //$NON-NLS-1$
-										JOptionPane.WARNING_MESSAGE
-									);
-								}
-							}
-						);
+						SwingUtilities.invokeLater(() -> AOUIFactory.showMessageDialog(
+							PreferencesPanelKeyStores.this,
+							SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.16"), //$NON-NLS-1$
+							SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.17"), //$NON-NLS-1$
+							JOptionPane.WARNING_MESSAGE
+						));
 					}
 				}
 			}

@@ -113,7 +113,7 @@ public final class CheckHashFiles extends JDialog {
 		super(parent);
 		setTitle(SimpleAfirmaMessages.getString("CheckHashFiles.0")); //$NON-NLS-1$
 		setModalityType(ModalityType.APPLICATION_MODAL);
-		createUI(parent);
+		SwingUtilities.invokeLater(() -> createUI(parent));
 	}
 
 	/** Crea todos los elementos necesarios para generar una huella digital de

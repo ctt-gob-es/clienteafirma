@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_version">1.2</string>
-    <string name="app_name">Port@firmas v1.2</string>
+    <string name="app_version">1.3</string>
+    <string name="app_name">Port@firmas</string>
+    <string name="app_title">Port@firmas v1.3</string>
     <string name="close">Cerrar</string>
     <string name="error">Error</string>
 	<string name="server_select">Servidores Portafirmas</string>
@@ -162,6 +163,7 @@
    	<string name="dialog_server_edit_button">Editar servidor</string>
    	<string name="dialog_server_delete_button">Eliminar</string>
    	<string name="dialog_server_empty_fields">No puede haber campos vac\u00EDos</string>
+   	<string name="dialog_server_new_info"><html>No hay servidores almacenados, pulse el bot\u00F3n Nuevo servidor para crear uno.</html></string>
    	
    	<string name="dialog_add_server_aliasLabel">Alias</string>
    	<string name="dialog_add_server_urlLabel">URL</string>

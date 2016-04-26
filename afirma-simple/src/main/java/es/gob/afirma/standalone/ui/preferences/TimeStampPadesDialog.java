@@ -360,14 +360,7 @@ final class TimeStampPadesDialog extends JDialog  {
 		super(parentFrame);
 		setTitle(SimpleAfirmaMessages.getString("PreferencesPanelTimeStamps.0")); //$NON-NLS-1$
 		setModalityType(ModalityType.APPLICATION_MODAL);
-		SwingUtilities.invokeLater(
-			new Runnable() {
-				@Override
-				public void run() {
-					createUI();
-				}
-			}
-		);
+		SwingUtilities.invokeLater(() -> createUI());
 	}
 
 	void createUI() {

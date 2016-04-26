@@ -33,10 +33,10 @@ final class LoginOptionsDialogBuilder {
 		this.builder = new AlertDialog.Builder(activity);
 		this.selectedServer = 0;
 
+		boolean empty = false;
 		// Establecemos el layout del dialogo
 		final LayoutInflater inflater = activity.getLayoutInflater();
 
-		this.v = inflater.inflate(R.layout.dialog_server_new, null);
 		final List<String> servers = AppPreferences.getServersList();
 		Collections.sort(servers);
 		if (servers.size() > 0 ) {
@@ -50,6 +50,11 @@ final class LoginOptionsDialogBuilder {
 					AppPreferences.getServerUrl(items[this.selectedServer].toString())
 				);
 			}
+			this.v = inflater.inflate(R.layout.dialog_server_new, null);
+		}
+		else {
+			this.v = inflater.inflate(R.layout.dialog_server_new_empty, null);
+			empty = true;
 		}
 		
 		this.builder.setSingleChoiceItems(items, selectedServer, new OnClickListener() {
@@ -70,20 +75,22 @@ final class LoginOptionsDialogBuilder {
 			}
 		);
 		
-		final Button editButton = (Button) this.v.findViewById(R.id.dialog_server_edit_button);
-		editButton.setOnClickListener(
-			new View.OnClickListener() {
-				@Override
-				public void onClick(final View v) {
-					editServer(
-						activity, 
-						inflater, 
-						items[selectedServer].toString(), 
-						AppPreferences.getServerUrl(items[selectedServer].toString())
-					);
+		if (!empty) {
+			final Button editButton = (Button) this.v.findViewById(R.id.dialog_server_edit_button);
+			editButton.setOnClickListener(
+				new View.OnClickListener() {
+					@Override
+					public void onClick(final View v) {
+						editServer(
+							activity, 
+							inflater, 
+							items[selectedServer].toString(), 
+							AppPreferences.getServerUrl(items[selectedServer].toString())
+						);
+					}
 				}
-			}
-		);
+			);
+		}
 
 		if (servers.size() < 2) {
 			((View) this.v.findViewById(R.id.dialog_server_line)).setVisibility(View.GONE);

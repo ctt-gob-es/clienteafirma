@@ -92,14 +92,7 @@ public final class DecipherDialog extends JDialog implements KeyListener{
 		super(parent);
 		setTitle("DecipherDialog.0"); //$NON-NLS-1$
 		setModalityType(ModalityType.APPLICATION_MODAL);
-		SwingUtilities.invokeLater(
-			new Runnable() {
-				@Override
-				public void run() {
-					createUI(parent);
-				}
-			}
-		);
+		SwingUtilities.invokeLater(() -> createUI(parent));
 	}
 
 	void createUI(final Frame parent) {
