@@ -33,8 +33,6 @@ import es.gob.afirma.standalone.ui.preferences.PreferencesManager;
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
 public final class SimpleKeyStoreManager {
 
-	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
-
     private SimpleKeyStoreManager() { /* No permitimos la instanciacion */ }
 
     /** Obtiene un <code>KeyStore</code>.
@@ -111,24 +109,8 @@ public final class SimpleKeyStoreManager {
             }
         }
 
-        // Obtenemos el prioritario antes si existe, si no, el por defecto
-        AOKeyStore aoks = getPrioritaryKeyStore();
-        if (aoks != null) {
-            try {
-    			return getKeyStoreManager(
-    				aoks,
-    				parent
-    			);
-    		}
-            catch (final Exception e) {
-                LOGGER.warning(
-            		"No se ha podido incializar el almacen prioritario '" +  aoks  + "', se parasa al por defecto: " + e //$NON-NLS-1$ //$NON-NLS-2$
-        		);
-    		}
-        }
-
         // El por defecto
-        aoks = getDefaultKeyStoreType();
+        final AOKeyStore aoks = getDefaultKeyStoreType();
         try {
 			return getKeyStoreManager(
 				aoks,
@@ -179,15 +161,6 @@ public final class SimpleKeyStoreManager {
     		return AOKeyStore.APPLE;
     	}
     	return AOKeyStore.SHARED_NSS;
-    }
-
-    private static AOKeyStore getPrioritaryKeyStore() {
-    	return AOKeyStore.getKeyStore(
-			PreferencesManager.get(
-				PreferencesManager.PREFERENCE_KEYSTORE_PRIORITARY_STORE,
-				null
-			)
-		);
     }
 
     /** Obtiene el almac&eacute;n de claves por defecto de la aplicaci&oacute;n.

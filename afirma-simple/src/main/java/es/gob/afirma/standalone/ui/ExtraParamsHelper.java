@@ -1,15 +1,10 @@
 package es.gob.afirma.standalone.ui;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Properties;
 
-import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.signers.pades.AOPDFSigner;
-import es.gob.afirma.signers.tsp.pkcs7.TsaParams;
-import es.gob.afirma.signers.tsp.pkcs7.TsaRequestExtension;
 import es.gob.afirma.signers.xades.AOFacturaESigner;
 import es.gob.afirma.signers.xades.AOXAdESSigner;
 import es.gob.afirma.standalone.ui.preferences.PreferencesManager;
@@ -219,66 +214,6 @@ final class ExtraParamsHelper {
     			PreferencesManager.get(PreferencesManager.PREFERENCE_PADES_FORMAT, AOSignConstants.PADES_SUBFILTER_BASIC)
 			);
         }
-
-        // Nivel de certificacion
-        if (PreferencesManager.get(PreferencesManager.PREFERENCE_PADES_CERTIFICATION_LEVEL, null) != null) {
-        	p.put("certificationLevel", PreferencesManager.get(PreferencesManager.PREFERENCE_PADES_CERTIFICATION_LEVEL, null)); //$NON-NLS-1$
-        }
-
-        // Sellos de tiempo
-        if (PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_PADES_TIMESTAMP_CONFIGURE, false)) {
-
-        	TsaRequestExtension req;
-        	if (
-    			PreferencesManager.get(PreferencesManager.PREFERENCE_PADES_TIMESTAMP_EXTENSION_OID, null) != null &&
-    			PreferencesManager.get(PreferencesManager.PREFERENCE_PADES_TIMESTAMP_EXTENSION_VALUE, null) != null &&
-    			Base64.isBase64(PreferencesManager.get(PreferencesManager.PREFERENCE_PADES_TIMESTAMP_EXTENSION_VALUE, null))
-			) {
-        		try {
-					req = new TsaRequestExtension(
-						PreferencesManager.get(PreferencesManager.PREFERENCE_PADES_TIMESTAMP_EXTENSION_OID, null),
-						PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_PADES_TIMESTAMP_OID_CRITICAL, false),
-						Base64.decode(PreferencesManager.get(PreferencesManager.PREFERENCE_PADES_TIMESTAMP_EXTENSION_VALUE, null))
-					);
-				}
-        		catch (final Exception e) {
-					req = null;
-				}
-        	}
-        	else {
-        		req = null;
-        	}
-
-        	URI uri;
-        	try {
-				uri = new URI(PreferencesManager.get(PreferencesManager.PREFERENCE_PADES_TIMESTAMP_TSA_URL, null));
-			}
-        	catch (final URISyntaxException e) {
-				uri = null;
-			}
-
-        	if (uri != null) {
-	        	final Properties timestampExtraParams = new TsaParams(
-	    			PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_PADES_TIMESTAMP_CERT_REQUIRED, true),
-	    			PreferencesManager.get(PreferencesManager.PREFERENCE_PADES_TIMESTAMP_STAMP_POLICY, null),
-	    			uri,
-	    			PreferencesManager.get(PreferencesManager.PREFERENCE_PADES_TIMESTAMP_TSA_USR, null),
-	    			PreferencesManager.get(PreferencesManager.PREFERENCE_PADES_TIMESTAMP_TSA_PWD, null),
-	    			req == null ? null : new TsaRequestExtension[] { req },
-					PreferencesManager.get(PreferencesManager.PREFERENCE_PADES_TIMESTAMP_HASHALGORITHM, null),
-	    			null, // sslKeyStoreFile
-	    			null, // sslKeyStorePassword
-	    			null, // sslKeyStoreType
-	    			null, // sslTrustStore
-	    			null, // sslTrustStorePassword
-	    			null, // sslTrustStoreType
-	    			true
-				).getExtraParams();
-	        	p.putAll(timestampExtraParams);
-	        	p.put("tsType", PreferencesManager.get(PreferencesManager.PREFERENCE_PADES_TIMESTAMP_STAMP_TYPE, "2"));  //$NON-NLS-1$//$NON-NLS-2$
-        	}
-        }
-
 		return p;
 	}
 
@@ -319,59 +254,6 @@ final class ExtraParamsHelper {
 				"implicit" : //$NON-NLS-1$
 					"explicit" //$NON-NLS-1$
 		);
-
-        if (PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_CADES_TIMESTAMP_CONFIGURE, false)) {
-
-        	TsaRequestExtension req;
-        	if (
-    			PreferencesManager.get(PreferencesManager.PREFERENCE_CADES_TIMESTAMP_EXTENSION_OID, null) != null &&
-    			PreferencesManager.get(PreferencesManager.PREFERENCE_CADES_TIMESTAMP_EXTENSION_VALUE, null) != null &&
-    			Base64.isBase64(PreferencesManager.get(PreferencesManager.PREFERENCE_CADES_TIMESTAMP_EXTENSION_VALUE, null))
-			) {
-        		try {
-					req = new TsaRequestExtension(
-						PreferencesManager.get(PreferencesManager.PREFERENCE_CADES_TIMESTAMP_EXTENSION_OID, null),
-						PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_CADES_TIMESTAMP_OID_CRITICAL, false),
-						Base64.decode(PreferencesManager.get(PreferencesManager.PREFERENCE_CADES_TIMESTAMP_EXTENSION_VALUE, null))
-					);
-				}
-        		catch (final Exception e) {
-					req = null;
-				}
-        	}
-        	else {
-        		req = null;
-        	}
-
-        	URI uri;
-        	try {
-				uri = new URI(PreferencesManager.get(PreferencesManager.PREFERENCE_CADES_TIMESTAMP_TSA_URL, null));
-			}
-        	catch (final URISyntaxException e) {
-				uri = null;
-			}
-
-        	if (uri != null) {
-	        	final Properties timestampExtraParams = new TsaParams(
-	    			PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_CADES_TIMESTAMP_CERT_REQUIRED, true),
-	    			PreferencesManager.get(PreferencesManager.PREFERENCE_CADES_TIMESTAMP_STAMP_POLICY, null),
-	    			uri,
-	    			PreferencesManager.get(PreferencesManager.PREFERENCE_CADES_TIMESTAMP_TSA_USR, null),
-	    			PreferencesManager.get(PreferencesManager.PREFERENCE_CADES_TIMESTAMP_TSA_PWD, null),
-	    			req == null ? null : new TsaRequestExtension[] { req },
-					PreferencesManager.get(PreferencesManager.PREFERENCE_CADES_TIMESTAMP_HASHALGORITHM, null),
-	    			null, // sslKeyStoreFile
-	    			null, // sslKeyStorePassword
-	    			null, // sslKeyStoreType
-	    			null, // sslTrustStore
-	    			null, // sslTrustStorePassword
-	    			null, // sslTrustStoreType
-	    			true
-				).getExtraParams();
-	        	p.putAll(timestampExtraParams);
-        	}
-        }
-
         return p;
 	}
 }

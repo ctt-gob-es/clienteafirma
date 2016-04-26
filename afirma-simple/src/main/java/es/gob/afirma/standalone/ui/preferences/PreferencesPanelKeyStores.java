@@ -1,10 +1,7 @@
 package es.gob.afirma.standalone.ui.preferences;
 
-import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_KEYSTORE_ACCEPTED_POLICIES_ONLY_CERTS;
 import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_KEYSTORE_ALIAS_ONLY_CERTS;
-import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_KEYSTORE_CYPH_ONLY_CERTS;
 import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_KEYSTORE_DEFAULT_STORE;
-import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_KEYSTORE_PRIORITARY_STORE;
 import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_KEYSTORE_SIGN_ONLY_CERTS;
 
 import java.awt.FlowLayout;
@@ -24,8 +21,6 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
@@ -48,7 +43,7 @@ final class PreferencesPanelKeyStores extends JPanel {
 		SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.0"), //$NON-NLS-1$
 		PreferencesManager.getBoolean(PREFERENCE_KEYSTORE_SIGN_ONLY_CERTS, false)
 	);
-	
+
 	private final JCheckBox onlyAlias = new JCheckBox(
 		SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.4"), //$NON-NLS-1$
 		PreferencesManager.getBoolean(PREFERENCE_KEYSTORE_ALIAS_ONLY_CERTS, false)

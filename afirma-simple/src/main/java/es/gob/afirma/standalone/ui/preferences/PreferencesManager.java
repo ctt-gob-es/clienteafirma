@@ -107,9 +107,6 @@ public final class PreferencesManager {
 	/** Formato de firma por defecto para ficheros binarios que no se adec&uacute;en a ninguna otra categor&iacute;a. */
 	public static final String PREFERENCE_GENERAL_DEFAULT_FORMAT_BIN = "defaultSignatureFormatBin"; //$NON-NLS-1$
 
-	/** Mostrar icono. */
-	public static final String PREFERENCE_GENERAL_SHOW_ICON_INIT = "showIcon"; //$NON-NLS-1$
-
 	//**************** FIN PREFERENCIAS GENERALES ******************************************************************************
 	//**************************************************************************************************************************
 
@@ -125,23 +122,12 @@ public final class PreferencesManager {
 	/** En firma, restringir que &uacute;nicamente se puedan usar certificados de seud&oacute;nimo cuando estos est&eacute;n disponibles. */
 	public static final String PREFERENCE_KEYSTORE_ALIAS_ONLY_CERTS = "useOnlyAliasCertificates"; //$NON-NLS-1$
 
-	/** En firma, restringir que &uacute;nicamente se puedan usar certificados con ciertas pol&iacute;ticas. */
-	public static final String PREFERENCE_KEYSTORE_ACCEPTED_POLICIES_ONLY_CERTS = "useOnlyAcceptedPoliciesCertificate"; //$NON-NLS-1$
-
-	/** Lista de OID de las pol&iacute;ticas de certificados aceptados para firma. */
-	public static final String PREFERENCE_KEYSTORE_ACCEPTED_POLICIES_LIST = "acceptedCertPoliciesList"; //$NON-NLS-1$
-
 	/** Almacen de claves por defecto. */
 	public static final String PREFERENCE_KEYSTORE_DEFAULT_STORE = "defaultStore"; //$NON-NLS-1$
 
-	/** Almacen de claves prioritario. */
-	public static final String PREFERENCE_KEYSTORE_PRIORITARY_STORE = "prioritaryStore"; //$NON-NLS-1$
 
 	/** Cerrar almacen de claves prioritario. */
 	public static final String PREFERENCE_KEYSTORE_CLOSE_KEYSTORE = "closeKeyStore"; //$NON-NLS-1$
-
-	/** Tiempo de espera para cerrar el almacen. */
-	public static final String PREFERENCE_KEYSTORE_CLOSE_KEYSTORE_TIMEOUT = "closeKeyStoreTimeout"; //$NON-NLS-1$
 
 	//**************** FIN PREFERENCIAS DE ALMACENES DE CLAVES *****************************************************************
 	//**************************************************************************************************************************
@@ -209,56 +195,8 @@ public final class PreferencesManager {
 	/** Calificador de la pol&iacute;tica de firma para PAdES. */
 	public static final String PREFERENCE_PADES_POLICY_QUALIFIER = "padesPolicyQualifier"; //$NON-NLS-1$
 
-	/** Nivel de certificaci&oacute;n de firma para PAdES. */
-	public static final String PREFERENCE_PADES_CERTIFICATION_LEVEL = "padesCertificationLevel"; //$NON-NLS-1$
-
 	/** Imagen de r&uacute;brica para firma visible. */
 	public static final String PREFERENCE_PADES_RUBRIC_IMAGE = "padesRubricImage"; //$NON-NLS-1$
-
-	//**************** PREFERENCIAS DE SELLOS DE TIEMPO PADES*****************************************************************
-
-	/** Indica si la configuraci&oacute;n de sello de tiempo est&aacute; activada. */
-	public static final String PREFERENCE_PADES_TIMESTAMP_CONFIGURE = "isTimeStampConfiguredPades"; //$NON-NLS-1$
-
-	/** Tipo de sello de tiempo a aplicar en las firmas PAdES.
-	 * Debe contener un valor nu&eacute;rico entre uno y tres:
-	 * <ul>
-	 *  <li>1 = Solo sello a nivel de firma.</li>
-     *  <li>2 = Solo sello a nivel de documento.</li>
-     *  <li>3 = Dos sellos, uno a nivel de firma y otro a nivel de documento.</li>
-     * </ul> */
-	public static final String PREFERENCE_PADES_TIMESTAMP_STAMP_TYPE = "tsType"; //$NON-NLS-1$
-
-	/** Algoritmo de huella digital a utilizar en sellos de tiempo para las firmas PAdES. */
-	public static final String PREFERENCE_PADES_TIMESTAMP_HASHALGORITHM = "tsaHashAlgorithmsPades"; //$NON-NLS-1$
-
-	/** URL de la autoridad de sello de tiempo para las firmas PAdES. */
-	public static final String PREFERENCE_PADES_TIMESTAMP_TSA_URL = "tsaUrlPades"; //$NON-NLS-1$
-
-	/** Pol&iacute;tica de sellado de tiempo para las firmas PAdES. */
-	public static final String PREFERENCE_PADES_TIMESTAMP_STAMP_POLICY = "tsaPolicyPades"; //$NON-NLS-1$
-
-	/** Nombre de usuario de la TSA para las firmas PAdES. */
-	public static final String PREFERENCE_PADES_TIMESTAMP_TSA_USR = "tsaUsrPades"; //$NON-NLS-1$
-
-	/** Contrase&ntilde;a del usuario de la TSA para las firmas PAdES. */
-	public static final String PREFERENCE_PADES_TIMESTAMP_TSA_PWD = "tsaPwdPades"; //$NON-NLS-1$
-
-	/** OID de la extensi&oacute;n a a&ntilde;adir a la petici&oacute;n al servidor de sello de tiempo (para las firmas PAdES). */
-	public static final String PREFERENCE_PADES_TIMESTAMP_EXTENSION_OID = "tsaExtensionOidPades"; //$NON-NLS-1$
-
-	/** Valor, en binario convertido a Base64, de la extensi&oacute;n a a&ntilde;adir a la petici&oacute;n al
-	 * servidor de sello de tiempo (para las firmas PAdES). */
-	public static final String PREFERENCE_PADES_TIMESTAMP_EXTENSION_VALUE = "tsaExtensionValueBase64Pades"; //$NON-NLS-1$
-
-	/** Indica si se requiere el certificado de la TSA (para las firmas PAdES). */
-	public static final String PREFERENCE_PADES_TIMESTAMP_CERT_REQUIRED = "isCertRequiredPades"; //$NON-NLS-1$
-
-	/** Indica si la extensi&oacute;n indicada en <code>tsaExtensionOid</code> es cr&iacute;tica (para las firmas PAdES). */
-	public static final String PREFERENCE_PADES_TIMESTAMP_OID_CRITICAL = "isExtensionCriticalPades"; //$NON-NLS-1$
-
-	//**************** FIN PREFERENCIAS DE SELLOS DE TIEMPO PADES*****************************************************************
-
 
 	//************************* FIN PREFERENCIAS DE FIRMAS PAdES ***************************************************************
 	//**************************************************************************************************************************
@@ -280,40 +218,6 @@ public final class PreferencesManager {
 
 	/** Indica si la firma CAdES debe realizarse en modo impl&iacute;cito (<i>attached</i>) o no (<i>detached</i>). */
 	public static final String PREFERENCE_CADES_IMPLICIT = "cadesImplicitMode"; //$NON-NLS-1$
-
-	//**************** PREFERENCIAS DE SELLOS DE TIEMPO CADES*****************************************************************
-
-	/** Indica si la configuraci&oacute;n de sello de tiempo est&aacute; activada. */
-	public static final String PREFERENCE_CADES_TIMESTAMP_CONFIGURE = "isTimeStampConfiguredCades"; //$NON-NLS-1$
-
-	/** Algoritmo de huella digital a utilizar en sellos de tiempo. */
-	public static final String PREFERENCE_CADES_TIMESTAMP_HASHALGORITHM = "tsaHashAlgorithmsCades"; //$NON-NLS-1$
-
-	/** URL de la autoridad de sello de tiempo. */
-	public static final String PREFERENCE_CADES_TIMESTAMP_TSA_URL = "tsaUrlCades"; //$NON-NLS-1$
-
-	/** Pol&iacute;tica de sellado de tiempo. */
-	public static final String PREFERENCE_CADES_TIMESTAMP_STAMP_POLICY = "tsaPolicyCades"; //$NON-NLS-1$
-
-	/** Nombre de usuario de la TSA. */
-	public static final String PREFERENCE_CADES_TIMESTAMP_TSA_USR = "tsaUsrCades"; //$NON-NLS-1$
-
-	/** Contrase&ntilde;a del usuario de la TSA. */
-	public static final String PREFERENCE_CADES_TIMESTAMP_TSA_PWD = "tsaPwdCades"; //$NON-NLS-1$
-
-	/** OID de la extensi&oacute;n a a&ntilde;adir a la petici&oacute;n al servidor de sello de tiempo. */
-	public static final String PREFERENCE_CADES_TIMESTAMP_EXTENSION_OID = "tsaExtensionOidCades"; //$NON-NLS-1$
-
-	/** Valor, en binario convertido a Base64, de la extensi&oacute;n a a&ntilde;adir a la petici&oacute;n al servidor de sello de tiempo. */
-	public static final String PREFERENCE_CADES_TIMESTAMP_EXTENSION_VALUE = "tsaExtensionValueBase64Cades"; //$NON-NLS-1$
-
-	/** Indica si se requiere el certificado de la TSA. */
-	public static final String PREFERENCE_CADES_TIMESTAMP_CERT_REQUIRED = "isCertRequiredCades"; //$NON-NLS-1$
-
-	/** Indica si la extensi&oacute;n indicada en tsaExtensionOid es cr&iacute;tica. */
-	public static final String PREFERENCE_CADES_TIMESTAMP_OID_CRITICAL = "isExtensionCriticalCades"; //$NON-NLS-1$
-
-	//**************** FIN PREFERENCIAS DE SELLOS DE TIEMPO CADES*****************************************************************
 
 	//************************* FIN PREFERENCIAS DE FIRMAS CAdES ***************************************************************
 	//**************************************************************************************************************************
@@ -350,59 +254,6 @@ public final class PreferencesManager {
 
 	//**************** FIN PREFERENCIAS DE FACTURAS ELECTRONICAS ***************************************************************
 	//**************************************************************************************************************************
-
-	//**************************************************************************************************************************
-	//**************** PREFERENCIAS SOBRBES DIGITALES **********************************************************************************
-
-	/** Agoritmo de cifrado. */
-	public static final String PREFERENCE_ENVELOPE_CIPHER_ALGORITHM = "envelopeCipherAlgorithms"; //$NON-NLS-1$
-
-	/** Tipo de sobre. */
-	public static final String PREFERENCE_ENVELOPE_TYPE = "envelopeType"; //$NON-NLS-1$
-
-	//**************************************************************************************************************************
-	//**************** PREFERENCIAS SOBRBES DIGITALES **********************************************************************************
-
-
-	//**************** PREFERENCIAS DE CIFRADO*****************************************************************
-
-	/**KeyUsage  . */
-	public static final String PREFERENCE_CIPHERMENT_DIGITALSIGNATURE = "keyUsageDigitalSignature"; //$NON-NLS-1$
-
-	/**KeyUsage  . */
-	public static final String PREFERENCE_CIPHERMENT_NONREPUDIATION = "keyUsageNonRepudiation"; //$NON-NLS-1$
-
-	/**KeyUsage  . */
-	public static final String PREFERENCE_CIPHERMENT_KEYENCHIPERMENT = "keyUsageKeyEncipherment"; //$NON-NLS-1$
-
-	/**KeyUsage  . */
-	public static final String PREFERENCE_CIPHERMENT_DATAENCIPHERMENT = "keyUsageDataEncipherment"; //$NON-NLS-1$
-
-	/**KeyUsage  . */
-	public static final String PREFERENCE_CIPHERMENT_KEYAGREEMENT = "keyUsageKeyAgreement"; //$NON-NLS-1$
-
-	/**KeyUsage  . */
-	public static final String PREFERENCE_CIPHERMENT_KEYCERTSIGN = "keyUsageKeyCertsign"; //$NON-NLS-1$
-
-	/**KeyUsage  . */
-	public static final String PREFERENCE_CIPHERMENT_CRLSIGN = "keyUsageCrlsign"; //$NON-NLS-1$
-
-	/**KeyUsage  . */
-	public static final String PREFERENCE_CIPHERMENT_ENCIPHERONLY = "keyUsageEncipherOnly"; //$NON-NLS-1$
-
-	/**KeyUsage  . */
-	public static final String PREFERENCE_CIPHERMENT_DECIPHERONLY = "keyUsageDecipherOnly"; //$NON-NLS-1$
-
-	/** Agoritmo de cifrado. */
-	public static final String PREFERENCE_CIPHERMENT_ALGORITHM = "ciphermentAlgorithm"; //$NON-NLS-1$
-
-	/** M&eacute;todo de acceso repositorio. */
-	public static final String PREFERENCE_CIPHERMENT_METHOD = "repositoryAccessMethod"; //$NON-NLS-1$
-
-	/** URI de acceso repositorio. */
-	public static final String PREFERENCE_CIPHERMENT_URI = "repositoryURI"; //$NON-NLS-1$
-
-	//**************** PREFERENCIAS DE CIFRADO*****************************************************************
 
 
 	/** Agoritmo de cifrado. */

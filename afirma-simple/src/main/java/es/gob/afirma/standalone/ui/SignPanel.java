@@ -63,7 +63,6 @@ import es.gob.afirma.core.signers.AOSignerFactory;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.keystores.filters.CertificateFilter;
 import es.gob.afirma.keystores.filters.MultipleCertificateFilter;
-import es.gob.afirma.keystores.filters.PolicyIdFilter;
 import es.gob.afirma.keystores.filters.PseudonymFilter;
 import es.gob.afirma.keystores.filters.rfc.KeyUsageFilter;
 import es.gob.afirma.signers.xades.AOFacturaESigner;
@@ -644,15 +643,6 @@ public final class SignPanel extends JPanel {
     	}
     	if (PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_KEYSTORE_ALIAS_ONLY_CERTS, false)) {
     		filters.add(new PseudonymFilter());
-    	}
-    	if (PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_KEYSTORE_ACCEPTED_POLICIES_ONLY_CERTS, false)) {
-    		final String oidString = PreferencesManager.get(
-				PreferencesManager.PREFERENCE_KEYSTORE_ACCEPTED_POLICIES_LIST,
-				"" //$NON-NLS-1$
-			);
-    		if (oidString != null && !oidString.trim().isEmpty()) {
-    			filters.add(new PolicyIdFilter(oidString));
-    		}
     	}
     	if (filters.size() > 1) {
     		return Arrays.asList(

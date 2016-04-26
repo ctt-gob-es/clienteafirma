@@ -18,7 +18,6 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 
 import javax.swing.Box;
-import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;

@@ -8,7 +8,6 @@ import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERE
 import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_GENERAL_DEFAULT_FORMAT_XML;
 import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_GENERAL_HIDE_DNIE_START_SCREEN;
 import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_GENERAL_OMIT_ASKONCLOSE;
-import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_GENERAL_SHOW_ICON_INIT;
 import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_GENERAL_SIGNATURE_ALGORITHM;
 import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_GENERAL_UPDATECHECK;
 import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_GENERAL_USEANALYTICS;
@@ -39,7 +38,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import es.gob.afirma.core.AOCancelledOperationException;
-import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.standalone.AutoFirmaUtil;
