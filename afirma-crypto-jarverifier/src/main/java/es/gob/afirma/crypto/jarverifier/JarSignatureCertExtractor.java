@@ -10,6 +10,7 @@
 
 package es.gob.afirma.crypto.jarverifier;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -28,13 +29,20 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.PKIXParameters;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
+import java.util.Iterator;
+import java.util.List;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import sun.security.pkcs.PKCS7;
+import org.spongycastle.cert.X509CertificateHolder;
+import org.spongycastle.cms.CMSException;
+import org.spongycastle.cms.CMSSignedData;
+import org.spongycastle.util.Store;
+
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.ui.AOUIFactory;
 
@@ -67,12 +75,37 @@ public final class JarSignatureCertExtractor {
 		// No permitimos la instanciacion
 	}
 
-	static X509Certificate[] getJarSignatureCertChain(final byte[] signature) throws IOException {
+	static X509Certificate[] getJarSignatureCertChain(final byte[] signature) throws IOException, CertificateException {
 
 		if (signature == null) {
 			return null;
 		}
-		return new PKCS7(signature).getCertificates();
+
+		final CMSSignedData signedData;
+		try {
+			signedData = new CMSSignedData(signature);
+		}
+		catch (final CMSException e) {
+			LOGGER.severe(
+				"La firma proporcionada no es un SignedData compatible CMS, se devolvera una lista de certificados vacia: " + e //$NON-NLS-1$
+			);
+			return new X509Certificate[0];
+		}
+		final Store<X509CertificateHolder> store = signedData.getCertificates();
+		final CertificateFactory certFactory = CertificateFactory.getInstance("X.509"); //$NON-NLS-1$
+		final List<X509Certificate> ret = new ArrayList<X509Certificate>();
+
+		final Iterator<X509CertificateHolder> certIt = store.getMatches(null).iterator();
+		while (certIt.hasNext()) {
+            final X509Certificate cert = (X509Certificate) certFactory.generateCertificate(
+        		new ByteArrayInputStream(
+    				certIt.next().getEncoded()
+				)
+    		);
+            ret.add(cert);
+		}
+
+		return ret.toArray(new X509Certificate[0]);
 	}
 
 	static byte[] getJarSignature(final InputStream jarIs) throws IOException {

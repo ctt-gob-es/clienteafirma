@@ -6,6 +6,8 @@ import java.security.cert.X509Certificate;
 import org.junit.Assert;
 import org.junit.Test;
 
+import es.gob.afirma.core.misc.AOUtil;
+
 /**
  * Prueba las funciones de extracci&oacute;n de firmas y certificados de la firma de un JAR,
  * as&iacute; como su importaci&oacute;n en el almac&eacute;n de confianza de Java.
@@ -46,6 +48,8 @@ public class TestSignatureExtractor {
 
 		Assert.assertTrue("La cadena de certificados extraida esta vacia", certChain.length > 0); //$NON-NLS-1$
 
-		//System.out.println(certChain[0].toString());
+		for (final X509Certificate cert : certChain) {
+			System.out.println(AOUtil.getCN(cert));
+		}
 	}
 }
