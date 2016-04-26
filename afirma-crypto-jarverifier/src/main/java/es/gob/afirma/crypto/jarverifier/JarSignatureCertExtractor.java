@@ -15,6 +15,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.security.CodeSource;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.KeyStore;
@@ -66,25 +67,21 @@ public final class JarSignatureCertExtractor {
 		// No permitimos la instanciacion
 	}
 
-	private static X509Certificate[] getJarSignatureCertChain() throws IOException {
-		final byte[] signature = getJarSignature();
+	static X509Certificate[] getJarSignatureCertChain(final byte[] signature) throws IOException {
+
 		if (signature == null) {
 			return null;
 		}
 		return new PKCS7(signature).getCertificates();
 	}
 
-	private static byte[] getJarSignature() throws IOException {
-		final CodeSource src = JarSignatureCertExtractor.class.getProtectionDomain().getCodeSource();
-		if (src == null) {
-			throw new IOException("No se ha podido acceder a los recursos del JAR"); //$NON-NLS-1$
-		}
+	static byte[] getJarSignature(final InputStream jarIs) throws IOException {
 
 		int n = 0;
 		ZipEntry e;
 		ByteArrayOutputStream baos = null;
 		final byte[] buffer = new byte[BUFFER_SIZE];
-		final ZipInputStream zip = new ZipInputStream(src.getLocation().openStream());
+		final ZipInputStream zip = new ZipInputStream(jarIs);
 		while((e = zip.getNextEntry()) != null) {
 			final String name = e.getName();
 			if (name.startsWith(SIGNATURE_DIR_PATH) && (name.endsWith(SIGNATURE_EXT_RSA) || name.endsWith(SIGNATURE_EXT_DSA))) {
@@ -97,6 +94,15 @@ public final class JarSignatureCertExtractor {
 		}
 
 		return baos == null ? null : baos.toByteArray();
+	}
+
+	private static InputStream getJarInputStream() throws IOException {
+		final CodeSource src = JarSignatureCertExtractor.class.getProtectionDomain().getCodeSource();
+		if (src == null) {
+			throw new IOException("No se ha podido acceder a los recursos del JAR"); //$NON-NLS-1$
+		}
+
+		return src.getLocation().openStream();
 	}
 
 	/**
@@ -219,7 +225,11 @@ public final class JarSignatureCertExtractor {
 	                                                                              InvalidAlgorithmParameterException {
 
 		// Primero, obtenemos los certificados con los que se ha firmado la aplicacion
-		final X509Certificate[] certs = getJarSignatureCertChain();
+		final InputStream jarIs = getJarInputStream();
+		final byte[] signature = getJarSignature(jarIs);
+		try { jarIs.close(); } catch (final Exception ex) { /* No hacemos nada */ }
+
+		final X509Certificate[] certs = getJarSignatureCertChain(signature);
 		if (certs == null || certs.length < 1) {
 			LOGGER.warning("La aplicacion no esta firmada"); //$NON-NLS-1$
 			return;
