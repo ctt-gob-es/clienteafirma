@@ -67,6 +67,7 @@ public final class LoginActivity extends FragmentActivity implements KeystoreMan
 	protected void onCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_login);
+		setTitle(R.string.app_title);
 
 		//Comprobamos si la conectividad a la red es correcta
 		final ConnectivityManager conMgr = (ConnectivityManager) getSystemService (Context.CONNECTIVITY_SERVICE);

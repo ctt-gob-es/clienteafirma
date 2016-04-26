@@ -33,10 +33,8 @@ final class LoginOptionsDialogBuilder {
 		this.builder = new AlertDialog.Builder(activity);
 		this.selectedServer = 0;
 
-		boolean empty = false;
-		// Establecemos el layout del dialogo
-		final LayoutInflater inflater = activity.getLayoutInflater();
-
+		boolean empty = true;
+		
 		final List<String> servers = AppPreferences.getServersList();
 		Collections.sort(servers);
 		if (servers.size() > 0 ) {
@@ -50,32 +48,45 @@ final class LoginOptionsDialogBuilder {
 					AppPreferences.getServerUrl(items[this.selectedServer].toString())
 				);
 			}
-			this.v = inflater.inflate(R.layout.dialog_server_new, null);
+			empty = false;
+		}
+		
+		// Establecemos el layout del dialogo
+		final LayoutInflater inflater = activity.getLayoutInflater();
+		this.v = inflater.inflate(R.layout.dialog_server_new, null);
+		
+		if (empty) {
+			this.builder.setTitle(R.string.server_select);
+			this.builder.setMessage(R.string.dialog_server_new_info);
+			this.builder.setPositiveButton(R.string.dialog_server_new_button,
+				new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(final DialogInterface dialog, final int which) {						
+						addServer(activity, inflater);
+					}
+				}
+			);
+
+			this.builder.setNegativeButton(R.string.cancel, null);
 		}
 		else {
-			this.v = inflater.inflate(R.layout.dialog_server_new_empty, null);
-			empty = true;
-		}
-		
-		this.builder.setSingleChoiceItems(items, selectedServer, new OnClickListener() {
-	        @Override
-	        public void onClick(DialogInterface d, int n) {
-	        	selectedServer = n;
-	        }
-		});
-		
-		final Button newButton = (Button) this.v.findViewById(R.id.dialog_server_new_button);
-		newButton.setOnClickListener(
-			new View.OnClickListener() {
-				@Override
-				public void onClick(final View v) {
-					addServer(activity, inflater);
-					
+			this.builder.setSingleChoiceItems(items, selectedServer, new OnClickListener() {
+		        @Override
+		        public void onClick(DialogInterface d, int n) {
+		        	selectedServer = n;
+		        }
+			});
+			
+			final Button newButton = (Button) this.v.findViewById(R.id.dialog_server_new_button);
+			newButton.setOnClickListener(
+				new View.OnClickListener() {
+					@Override
+					public void onClick(final View v) {
+						addServer(activity, inflater);
+					}
 				}
-			}
-		);
-		
-		if (!empty) {
+			);
+			
 			final Button editButton = (Button) this.v.findViewById(R.id.dialog_server_edit_button);
 			editButton.setOnClickListener(
 				new View.OnClickListener() {
@@ -90,28 +101,28 @@ final class LoginOptionsDialogBuilder {
 					}
 				}
 			);
-		}
-
-		if (servers.size() < 2) {
-			((View) this.v.findViewById(R.id.dialog_server_line)).setVisibility(View.GONE);
-		}
-		
-		this.builder.setView(this.v);
-		this.builder.setCustomTitle((View) inflater.inflate(R.layout.dialog_server_title, null));
-		
-		this.builder.setPositiveButton(R.string.ok,
-			new DialogInterface.OnClickListener() {
-				@Override
-				public void onClick(final DialogInterface dialog, final int which) {						
-					saveProxyConfig(
-						items[selectedServer].toString(), 
-						AppPreferences.getServerUrl(items[selectedServer].toString())
-					);
-				}
+	
+			if (servers.size() < 2) {
+				((View) this.v.findViewById(R.id.dialog_server_line)).setVisibility(View.GONE);
 			}
-		);
-
-		this.builder.setNegativeButton(R.string.cancel, null);
+			
+			this.builder.setView(this.v);
+			this.builder.setCustomTitle((View) inflater.inflate(R.layout.dialog_server_title, null));
+			
+			this.builder.setPositiveButton(R.string.ok,
+				new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(final DialogInterface dialog, final int which) {						
+						saveProxyConfig(
+							items[selectedServer].toString(), 
+							AppPreferences.getServerUrl(items[selectedServer].toString())
+						);
+					}
+				}
+			);
+	
+			this.builder.setNegativeButton(R.string.cancel, null);
+		}
 	}
 
 	private void addServer(final Activity act, final LayoutInflater inflater) {
