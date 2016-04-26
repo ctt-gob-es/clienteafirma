@@ -31,7 +31,7 @@ final class ProtocolInvocationLauncherSelectCert {
 
 	static String processSelectCert(final UrlParametersToSelectCert options) throws SocketOperationException {
 
-		final AOKeyStore aoks = AOKeyStore.valueOf(options.getDefaultKeyStore());
+		final AOKeyStore aoks = AOKeyStore.getKeyStore(options.getDefaultKeyStore());
 		if (aoks == null) {
 			LOGGER.severe("No hay un KeyStore con el nombre: " + options.getDefaultKeyStore()); //$NON-NLS-1$
 			ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_07);
