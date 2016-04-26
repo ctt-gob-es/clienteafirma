@@ -13,6 +13,7 @@ package es.gob.afirma.signers.tsp.pkcs7;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Properties;
+import java.util.logging.Logger;
 
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.signers.AOSignConstants;
@@ -22,7 +23,16 @@ import es.gob.afirma.core.signers.AOSignConstants;
 public final class TsaParams {
 
 	private static final String DEFAULT_DIGEST_ALGO = "SHA-512"; //$NON-NLS-1$
-	private static final String POLICY = "0.4.0.2023.1.1"; //$NON-NLS-1$
+	private static final String DEFAULT_POLICY = "0.4.0.2023.1.1"; //$NON-NLS-1$
+
+	/** Sello de tiempo a nivel de firma. */
+	public static final String TS_SIGN = "1";  //$NON-NLS-1$
+
+	/** Sello de tiempo a nivel de documento. */
+	public static final String TS_DOC = "2";  //$NON-NLS-1$
+
+	/** Sello de tiempo doble, a nivel de firma y a nivel de documento. */
+	public static final String TS_SIGN_DOC = "3";  //$NON-NLS-1$
 
 	private final boolean tsaRequireCert;
 	private final String tsaPolicy;
@@ -39,85 +49,7 @@ public final class TsaParams {
 	private final String sslTrustStoreType;
 	private final boolean verifyHostname;
 
-
-	/** Sello de tiempo a nivel de firma. */
-	public static final String TS_SIGN = "1";  //$NON-NLS-1$
-
-	/** Sello de tiempo a nivel de documento. */
-	public static final String TS_DOC = "2";  //$NON-NLS-1$
-
-	/** Sello de tiempo doble, a nivel de firma y a nivel de documento. */
-	public static final String TS_SIGN_DOC = "3";  //$NON-NLS-1$
-
-	@Override
-	public String toString() {
-
-		// Extensiones
-		final StringBuilder exts = new StringBuilder("["); //$NON-NLS-1$
-		if (this.extensions != null) {
-			for(final TsaRequestExtension ex : this.extensions) {
-				exts.append(ex);
-				exts.append("; "); //$NON-NLS-1$
-			}
-		}
-		exts.append("]"); //$NON-NLS-1$
-
-		final String ret = "Parametros TSA [" + //$NON-NLS-1$
-					"URL=" + getTsaUrl() + "; " + //$NON-NLS-1$ //$NON-NLS-2$
-					"User=" + getTsaUsr() + ": " + //$NON-NLS-1$ //$NON-NLS-2$
-					"Policy=" + getTsaPolicy() + "; " + //$NON-NLS-1$ //$NON-NLS-2$
-					"Extensions" + exts.toString() + "; " + //$NON-NLS-1$ //$NON-NLS-2$
-					"Digest=" + getTsaHashAlgorithm() + "; " + //$NON-NLS-1$ //$NON-NLS-2$
-					"SSLKeyStore=" + (getSslKeyStore() != null ? "Yes" : "No") + "; " + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-					"SSLKeyStorePwd=" + getSslKeyStorePassword() + //$NON-NLS-1$
-					"SSLKeyStoreType=" + getSslKeyStoreType() + //$NON-NLS-1$
-					"SSLTrustStore=" + (getSslTrustStore() != null ? "Yes" : "No") + "; " + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-					"SSLTrustStorePwd=" + getSslTrustStorePassword() + //$NON-NLS-1$
-					"SSLTrustStoreType=" + getSslTrustStoreType() + //$NON-NLS-1$
-					"VerifyHostname=" + isVerifyHostname() + //$NON-NLS-1$
-			"]"; //$NON-NLS-1$
-
-		// Quitamos el punto y coma de la ultima extension
-		return ret.replace("]; ]", "]]"); //$NON-NLS-1$ //$NON-NLS-2$
-	}
-
-	/** Obtiene los par&aacute;metros adicionales de la configuraci&oacute;n de una Autoridad de Sellado de Tiempo.
-	 * @return Par&aacute;metros adicionales de la configuraci&oacute;n de una Autoridad de Sellado de Tiempo. */
-	public Properties getExtraParams() {
-		final Properties p = new Properties();
-		if (getTsaUrl() != null) {
-			p.put("tsaURL", getTsaUrl().toString()); //$NON-NLS-1$
-		}
-		if (getTsaUsr() != null && !getTsaUsr().isEmpty()) {
-			p.put("tsaUsr", getTsaUsr().toString()); //$NON-NLS-1$
-		}
-		if (getTsaPwd() != null && !getTsaPwd().isEmpty()) {
-			p.put("tsaPwd", getTsaPwd().toString()); //$NON-NLS-1$
-		}
-		if (getTsaPolicy() != null && !getTsaPolicy().isEmpty()) {
-			p.put("tsaPwd", getTsaPolicy().toString()); //$NON-NLS-1$
-		}
-		if (getExtensions() != null && getExtensions().length > 0) {
-			p.put("tsaExtensionOid", getExtensions()[0].getOid()); //$NON-NLS-1$
-			p.put("tsaExtensionValueBase64", Base64.encode(getExtensions()[0].getValue())); //$NON-NLS-1$
-			p.put("tsaExtensionCritical", Boolean.toString(getExtensions()[0].isCritical())); //$NON-NLS-1$
-		}
-		if (getTsaHashAlgorithm() != null && !getTsaHashAlgorithm().isEmpty()) {
-			p.put("tsaHashAlgorithm", getTsaHashAlgorithm()); //$NON-NLS-1$
-		}
-		if (getSslKeyStore() != null && getSslKeyStore().length > 0) {
-			p.put("tsaSslKeyStore", Base64.encode(getSslKeyStore())); //$NON-NLS-1$
-			p.put("tsaSslKeyStorePassword", getSslKeyStorePassword()); //$NON-NLS-1$
-			p.put("tsaSslKeyStoreType", getSslKeyStoreType()); //$NON-NLS-1$
-		}
-		if (getSslTrustStore() != null && getSslTrustStore().length > 0) {
-			p.put("tsaSslTrustStore", Base64.encode(getSslTrustStore())); //$NON-NLS-1$
-			p.put("tsaSslTrustStorePassword", getSslTrustStorePassword()); //$NON-NLS-1$
-			p.put("tsaSslTrustStoreType", getSslTrustStoreType()); //$NON-NLS-1$
-		}
-		p.put("verifyHostname", Boolean.toString(isVerifyHostname())); //$NON-NLS-1$
-		return p;
-	}
+	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	/** Construye los par&aacute;metros de configuraci&oacute;n de una Autoridad de Sellado de Tiempo.
 	 * @param requireCert Indicar <code>true</code>Si es necesario incluir el certificado de la TSA,
@@ -161,7 +93,7 @@ public final class TsaParams {
 			);
         }
         this.tsaURL = url;
-        this.tsaPolicy = policy != null ? policy : POLICY;
+        this.tsaPolicy = policy != null ? policy : DEFAULT_POLICY;
         this.tsaUsr = usr;
         this.tsaPwd = pwd;
         this.extensions = exts != null ? exts.clone() : null;
@@ -199,10 +131,10 @@ public final class TsaParams {
 				"Se ha indicado una URL de TSA invalida (" + tsa + "): " + e, e //$NON-NLS-1$ //$NON-NLS-2$
 			);
     	}
-        this.tsaPolicy = extraParams.getProperty("tsaPolicy") != null ? //$NON-NLS-1$
+        this.tsaPolicy = extraParams.containsKey("tsaPolicy") ? //$NON-NLS-1$
     		extraParams.getProperty("tsaPolicy") : //$NON-NLS-1$
-    			POLICY;
-        this.tsaHashAlgorithm = extraParams.getProperty("tsaHashAlgorithm") != null ? //$NON-NLS-1$
+    			DEFAULT_POLICY;
+        this.tsaHashAlgorithm = extraParams.containsKey("tsaHashAlgorithm") ? //$NON-NLS-1$
         		AOSignConstants.getDigestAlgorithmName(extraParams.getProperty("tsaHashAlgorithm")) : //$NON-NLS-1$
         			DEFAULT_DIGEST_ALGO;
         this.tsaRequireCert = !Boolean.FALSE.toString().equalsIgnoreCase(extraParams.getProperty("tsaRequireCert")); //$NON-NLS-1$
@@ -246,14 +178,7 @@ public final class TsaParams {
         this.sslTrustStoreType = extraParams.getProperty("tsaSslTrustStoreType", "PKCS12"); //$NON-NLS-1$ //$NON-NLS-2$
 
         try {
-	        this.extensions = extraParams.getProperty("tsaExtensionOid") != null && extraParams.getProperty("tsaExtensionValueBase64") != null ? //$NON-NLS-1$ //$NON-NLS-2$
-				new TsaRequestExtension[] {
-					new TsaRequestExtension(
-						extraParams.getProperty("tsaExtensionOid"), //$NON-NLS-1$
-						Boolean.parseBoolean(extraParams.getProperty("tsaExtensionCritical", "false")), //$NON-NLS-1$ //$NON-NLS-2$
-						Base64.decode(extraParams.getProperty("tsaExtensionValueBase64")) //$NON-NLS-1$
-					)
-				} : null;
+	        this.extensions = getExtensions(extraParams);
         }
         catch(final IOException e) {
         	throw new IllegalArgumentException("Las extensiones del sello de tiempo no estan adecuadamente codificadas: " + e, e); //$NON-NLS-1$
@@ -287,6 +212,39 @@ public final class TsaParams {
 	TsaRequestExtension[] getExtensions() {
 		return this.extensions;
 	}
+
+	/**
+	 * Obtiene el listado de extensiones configuradas.
+	 * @param config Configuraci&oacute;n en la que se pueden haber declarado las extensiones.
+	 * @return Listado de extensiones.
+	 * @throws IOException Cuando ocurre un error al decodificar las extensiones.
+	 */
+	private static TsaRequestExtension[] getExtensions(final Properties config) throws IOException {
+
+		final String extensionOid = config.getProperty("tsaExtensionOid"); //$NON-NLS-1$
+		final String extensionValueBase64 = config.getProperty("tsaExtensionValueBase64"); //$NON-NLS-1$
+		final boolean extensionCritical = Boolean.parseBoolean(config.getProperty("tsaExtensionCritical", Boolean.FALSE.toString())); //$NON-NLS-1$
+
+		if (extensionOid == null && extensionValueBase64 == null) {
+			return null;
+		}
+		else if (extensionOid != null && extensionValueBase64 == null) {
+			LOGGER.warning("Se ignorara el parametro 'tsaExtensionOid' ya que no se configuro el parametro 'tsaExtensionValueBase64'"); //$NON-NLS-1$
+			return null;
+		}
+		else if (extensionOid == null && extensionValueBase64 != null) {
+			LOGGER.warning("Se ignorara el parametro 'tsaExtensionValueBase64' ya que no se configuro el parametro 'tsaExtensionOid'"); //$NON-NLS-1$
+			return null;
+		}
+
+		return new TsaRequestExtension[] {
+				new TsaRequestExtension(
+						extensionOid,
+						extensionCritical,
+						Base64.decode(extensionValueBase64)
+						)
+				};
+		}
 
 	/** Obtiene el algoritmo de huella digital a usar en el sellado de tiempo.
 	 * @return Algoritmo de huella digital a usar en el sellado de tiempo. */
@@ -340,5 +298,75 @@ public final class TsaParams {
 	 *         <code>false</code> en caso contrario. */
 	public boolean isVerifyHostname() {
 		return this.verifyHostname;
+	}
+
+	/** Obtiene los par&aacute;metros adicionales de la configuraci&oacute;n de una Autoridad de Sellado de Tiempo.
+	 * @return Par&aacute;metros adicionales de la configuraci&oacute;n de una Autoridad de Sellado de Tiempo. */
+	public Properties getExtraParams() {
+		final Properties p = new Properties();
+		if (getTsaUrl() != null) {
+			p.put("tsaURL", getTsaUrl().toString()); //$NON-NLS-1$
+		}
+		if (getTsaUsr() != null && !getTsaUsr().isEmpty()) {
+			p.put("tsaUsr", getTsaUsr().toString()); //$NON-NLS-1$
+		}
+		if (getTsaPwd() != null && !getTsaPwd().isEmpty()) {
+			p.put("tsaPwd", getTsaPwd().toString()); //$NON-NLS-1$
+		}
+		if (getTsaPolicy() != null && !getTsaPolicy().isEmpty()) {
+			p.put("tsaPwd", getTsaPolicy().toString()); //$NON-NLS-1$
+		}
+		if (getExtensions() != null && getExtensions().length > 0) {
+			p.put("tsaExtensionOid", getExtensions()[0].getOid()); //$NON-NLS-1$
+			p.put("tsaExtensionValueBase64", Base64.encode(getExtensions()[0].getValue())); //$NON-NLS-1$
+			p.put("tsaExtensionCritical", Boolean.toString(getExtensions()[0].isCritical())); //$NON-NLS-1$
+		}
+		if (getTsaHashAlgorithm() != null && !getTsaHashAlgorithm().isEmpty()) {
+			p.put("tsaHashAlgorithm", getTsaHashAlgorithm()); //$NON-NLS-1$
+		}
+		if (getSslKeyStore() != null && getSslKeyStore().length > 0) {
+			p.put("tsaSslKeyStore", Base64.encode(getSslKeyStore())); //$NON-NLS-1$
+			p.put("tsaSslKeyStorePassword", getSslKeyStorePassword()); //$NON-NLS-1$
+			p.put("tsaSslKeyStoreType", getSslKeyStoreType()); //$NON-NLS-1$
+		}
+		if (getSslTrustStore() != null && getSslTrustStore().length > 0) {
+			p.put("tsaSslTrustStore", Base64.encode(getSslTrustStore())); //$NON-NLS-1$
+			p.put("tsaSslTrustStorePassword", getSslTrustStorePassword()); //$NON-NLS-1$
+			p.put("tsaSslTrustStoreType", getSslTrustStoreType()); //$NON-NLS-1$
+		}
+		p.put("verifyHostname", Boolean.toString(isVerifyHostname())); //$NON-NLS-1$
+		return p;
+	}
+
+	@Override
+	public String toString() {
+
+		// Extensiones
+		final StringBuilder exts = new StringBuilder("["); //$NON-NLS-1$
+		if (this.extensions != null) {
+			for(final TsaRequestExtension ex : this.extensions) {
+				exts.append(ex);
+				exts.append("; "); //$NON-NLS-1$
+			}
+		}
+		exts.append("]"); //$NON-NLS-1$
+
+		final String ret = "Parametros TSA [" + //$NON-NLS-1$
+					"URL=" + getTsaUrl() + "; " + //$NON-NLS-1$ //$NON-NLS-2$
+					"User=" + getTsaUsr() + ": " + //$NON-NLS-1$ //$NON-NLS-2$
+					"Policy=" + getTsaPolicy() + "; " + //$NON-NLS-1$ //$NON-NLS-2$
+					"Extensions" + exts.toString() + "; " + //$NON-NLS-1$ //$NON-NLS-2$
+					"Digest=" + getTsaHashAlgorithm() + "; " + //$NON-NLS-1$ //$NON-NLS-2$
+					"SSLKeyStore=" + (getSslKeyStore() != null ? "Yes" : "No") + "; " + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+					"SSLKeyStorePwd=" + getSslKeyStorePassword() + //$NON-NLS-1$
+					"SSLKeyStoreType=" + getSslKeyStoreType() + //$NON-NLS-1$
+					"SSLTrustStore=" + (getSslTrustStore() != null ? "Yes" : "No") + "; " + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+					"SSLTrustStorePwd=" + getSslTrustStorePassword() + //$NON-NLS-1$
+					"SSLTrustStoreType=" + getSslTrustStoreType() + //$NON-NLS-1$
+					"VerifyHostname=" + isVerifyHostname() + //$NON-NLS-1$
+			"]"; //$NON-NLS-1$
+
+		// Quitamos el punto y coma de la ultima extension
+		return ret.replace("]; ]", "]]"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 }

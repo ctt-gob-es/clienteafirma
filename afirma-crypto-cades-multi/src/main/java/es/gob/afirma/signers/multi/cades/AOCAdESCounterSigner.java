@@ -33,9 +33,11 @@ import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
 /** Contrafirmador CAdES. */
 public class AOCAdESCounterSigner implements AOCounterSigner {
 
-    private static final String ALGORITHM = "SHA1"; //$NON-NLS-1$
+    private static final String SHA1_ALGORITHM = "SHA1"; //$NON-NLS-1$
 	private final AOSimpleSigner ss;
 	private final Date date;
+
+	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	/** Crea un contrafirmador CAdES con el firmador PKCS#1 por defecto. */
 	public AOCAdESCounterSigner() {
@@ -51,7 +53,7 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
 			throw new IllegalArgumentException("El firmador PKCS#1 no puede ser nulo"); //$NON-NLS-1$
 		}
     	if (d == null) {
-    		Logger.getLogger("es.gob.afirma").warning("Se ha establecido una fecha nula, se usara la actual"); //$NON-NLS-1$ //$NON-NLS-2$
+    		LOGGER.warning("Se ha establecido una fecha nula, se usara la actual"); //$NON-NLS-1$
     	}
 		this.ss = sSigner;
 		this.date = d;
@@ -81,6 +83,10 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
         boolean signingCertificateV2;
         if (AOSignConstants.isSHA2SignatureAlgorithm(algorithm)) {
         	signingCertificateV2 = true;
+        	if (extraParams.containsKey(CAdESExtraParams.SIGNING_CERTIFICATE_V2)) {
+        		LOGGER.warning("Se ignorara la propiedad '" + CAdESExtraParams.SIGNING_CERTIFICATE_V2 + //$NON-NLS-1$
+        				"' porque las firmas SHA2 siempre usan SigningCertificateV2"); //$NON-NLS-1$
+        	}
         }
         else if (extraParams.containsKey(CAdESExtraParams.SIGNING_CERTIFICATE_V2)) {
         	signingCertificateV2 = Boolean.parseBoolean(
@@ -90,12 +96,12 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
 			);
         }
         else {
-        	signingCertificateV2 = !ALGORITHM.equals(AOSignConstants.getDigestAlgorithmName(algorithm));
+        	signingCertificateV2 = !SHA1_ALGORITHM.equals(AOSignConstants.getDigestAlgorithmName(algorithm));
         }
 
         final boolean doNotIncludePolicyOnSigningCertificate = Boolean.parseBoolean(
     		extraParams.getProperty(
-				CAdESExtraParams.DO_NOT_INCLUDE_POLICY_ON_SIGNING_CERTIFICATE, "false" //$NON-NLS-1$
+				CAdESExtraParams.DO_NOT_INCLUDE_POLICY_ON_SIGNING_CERTIFICATE, Boolean.FALSE.toString()
 			)
 		);
 

@@ -96,7 +96,7 @@ public final class CommitmentTypeIndicationsHelper {
 		String identifier;
 		List<String> commitmentTypeQualifiers;
 
-		for(int i=0;i<=nCtis;i++) {
+		for(int i = 0; i <= nCtis; i++) {
 
 			// Identifier
 			tmpStr = xParams.getProperty(CAdESExtraParams.COMMITMENT_TYPE_INDICATIONS + Integer.toString(i) + CAdESExtraParams.IDENTIFIER);

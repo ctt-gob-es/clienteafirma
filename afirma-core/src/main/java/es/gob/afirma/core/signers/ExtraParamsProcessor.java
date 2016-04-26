@@ -28,6 +28,9 @@ public final class ExtraParamsProcessor {
 	/** Clave expansible para pol&iacute;ticas de firma. */
 	private static final String EXPANDIBLE_POLICY_KEY = "expPolicy"; //$NON-NLS-1$
 
+	/** Manejador del log. */
+	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+
 	private ExtraParamsProcessor() {
 		/* Constructor no publico */
 	}
@@ -171,6 +174,9 @@ public final class ExtraParamsProcessor {
 						// La firma XAdES conforme a la politica de firma de la AGE debe ser Detached o Enveloped
 						if (!AOSignConstants.SIGN_FORMAT_XADES_DETACHED.equalsIgnoreCase(p.getProperty("format")) && //$NON-NLS-1$
 								!AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED.equalsIgnoreCase(p.getProperty("format"))) { //$NON-NLS-1$
+							if (p.containsKey("format")) { //$NON-NLS-1$
+								LOGGER.warning("La siguiente propiedad se ignora en favor del valor derivado de la politica establecida: format"); //$NON-NLS-1$
+							}
 							p.setProperty("format", AOSignConstants.SIGN_FORMAT_XADES_DETACHED); //$NON-NLS-1$
 						}
 					}

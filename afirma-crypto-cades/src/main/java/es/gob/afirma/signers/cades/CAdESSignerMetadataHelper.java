@@ -38,9 +38,9 @@ public final class CAdESSignerMetadataHelper {
 		}
 		// signerLocationPostalAddress
 		final String postalAddressOneLine = extraParams.getProperty(CAdESExtraParams.SIGNATURE_PRODUCTION_POSTAL_CODE);
-		final String[] postalAddress = postalAddressOneLine == null ?
+		final List<String> postalAddress = postalAddressOneLine == null ?
 			null :
-				postalAddressOneLine.split("\n"); //$NON-NLS-1$
+				Arrays.asList(postalAddressOneLine.split("\n")); //$NON-NLS-1$
 
 		// signerLocationCountryName
 		final String country = extraParams.getProperty(CAdESExtraParams.SIGNATURE_PRODUCTION_COUNTRY);
@@ -51,9 +51,7 @@ public final class CAdESSignerMetadataHelper {
 			return new CAdESSignerMetadata(
 				country,
 				locality,
-				postalAddress != null ?
-					Arrays.asList(postalAddress) :
-						null
+				postalAddress
 			);
 		}
 		return null;
