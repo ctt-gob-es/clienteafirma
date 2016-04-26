@@ -45,6 +45,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.BitSet;
 import java.util.Locale;
+import java.util.logging.Logger;
 
 /** The name of a URL. This class represents a URL name and also provides the
  * basic parsing functionality to parse most internet standard URL schemes.
@@ -57,6 +58,8 @@ import java.util.Locale;
  * @author Bill Shannon */
 
 final class URLName {
+
+	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	/** The full version of the URL. */
 	protected String fullURL;
@@ -97,6 +100,7 @@ final class URLName {
 			doEncode = !Boolean.getBoolean("mail.URLName.dontencode"); //$NON-NLS-1$
 		}
 		catch (final Exception ex) {
+			LOGGER.warning("No se ha podido leer la variable 'mail.URLName.dontencode': " + ex); //$NON-NLS-1$
 			// ignore any errors
 		}
 	}
@@ -238,6 +242,7 @@ final class URLName {
 						this.port = Integer.parseInt(portstring);
 					}
 					catch (final NumberFormatException nfex) {
+						LOGGER.warning("El numero de puerto establecido '" + portstring + "' no es valido: " + nfex); //$NON-NLS-1$ //$NON-NLS-2$
 						this.port = -1;
 					}
 				}
@@ -431,6 +436,7 @@ final class URLName {
 			this.hostAddress = InetAddress.getByName(this.host);
 		}
 		catch (final UnknownHostException ex) {
+			LOGGER.warning("El host establecido no se puede resolver: " + ex); //$NON-NLS-1$
 			this.hostAddress = null;
 		}
 		this.hostAddressKnown = true;
@@ -528,7 +534,7 @@ final class URLName {
 						);
 					}
 					catch (final NumberFormatException e) {
-						throw new IllegalArgumentException();
+						throw new IllegalArgumentException(e);
 					}
 					i += 2;
 					break;
@@ -544,6 +550,7 @@ final class URLName {
 			result = new String(inputBytes);
 		}
 		catch (final UnsupportedEncodingException e) {
+			LOGGER.warning("El sistema no soporta la codificacion ISO 8859-1: " + e); //$NON-NLS-1$
 			// The system should always have 8859_1
 		}
 		return result;

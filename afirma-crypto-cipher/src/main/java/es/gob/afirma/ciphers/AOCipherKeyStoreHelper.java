@@ -17,6 +17,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.security.Key;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -72,13 +73,10 @@ public final class AOCipherKeyStoreHelper {
     }
 
     /** Almacena una clave en el almac&eacute;n privado de AFirma.
-     * @param alias
-     *        Alias con el que se almacenar&aacute; la clave
-     * @param key
-     *        Clave a almacenar
-     * @throws AOException
-     *         Cuando ocurre cualquier problema durante el proceso de
-     *         almacenado */
+     * @param alias Alias con el que se almacenar&aacute; la clave.
+     * @param key Clave a almacenar.
+     * @throws AOException Cuando ocurre cualquier problema durante el proceso de
+     *                     almacenado */
     public void storeKey(final String alias, final Key key) throws AOException {
         if (this.ks == null) {
             throw new AOException("No se puede almacenar una clave en un almacen no inicializado"); //$NON-NLS-1$
@@ -89,8 +87,11 @@ public final class AOCipherKeyStoreHelper {
         catch (final Exception e) {
             throw new AOException("Error almacenando la clave en el almacen", e); //$NON-NLS-1$
         }
-        try {
-            this.ks.store(new BufferedOutputStream(new FileOutputStream(getCipherKeystore())), this.pss);
+        try (
+    		OutputStream fos = new FileOutputStream(getCipherKeystore());
+    		OutputStream bos = new BufferedOutputStream(fos);
+		) {
+            this.ks.store(bos, this.pss);
         }
         catch (final Exception e) {
             throw new AOException("Error guardando el almacen de claves", e); //$NON-NLS-1$
@@ -138,8 +139,11 @@ public final class AOCipherKeyStoreHelper {
         catch (final Exception e) {
             throw new AOException("Error creando un KeyStore vacio", e); //$NON-NLS-1$
         }
-        try {
-            this.ks.store(new FileOutputStream(getCipherKeystore()), this.pss);
+        try (
+    		OutputStream fos = new FileOutputStream(getCipherKeystore());
+    		OutputStream bos = new BufferedOutputStream(fos);
+		) {
+            this.ks.store(bos, this.pss);
         }
         catch (final Exception e) {
             throw new AOException("Error guardando en disco el KeyStore vacio", e); //$NON-NLS-1$

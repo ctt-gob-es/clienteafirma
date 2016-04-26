@@ -198,8 +198,11 @@ public enum AOKeyStore {
      * @param name Nombre del repositorio que se desea recuperar.
      * @return KeyStore Repositorio de certificados. */
     public static AOKeyStore getKeyStore(final String name) {
+    	if (name == null) {
+    		return null;
+    	}
         for (final AOKeyStore tempKs : AOKeyStore.values()) {
-            if (tempKs.getName().equals(name)) {
+            if (tempKs.getName().equalsIgnoreCase(name.trim())) {
                 return tempKs;
             }
         }
