@@ -67,11 +67,6 @@ final class PreferencesPanelGeneral extends JPanel {
 	private final JComboBox<String> binFilesCombo = new JComboBox<>(new String[] { CADES, XADES });
 	private final JComboBox<String> odfFilesCombo = new JComboBox<>(new String[] { ODF, CADES, XADES });
 
-	private final JCheckBox showIconInit = new JCheckBox(
-		SimpleAfirmaMessages.getString("PreferencesPanel.113"), //$NON-NLS-1$
-		PreferencesManager.getBoolean(PREFERENCE_GENERAL_SHOW_ICON_INIT, false)
-	);
-
 	private final JCheckBox avoidAskForClose = new JCheckBox(
 		SimpleAfirmaMessages.getString("PreferencesPanel.36"), //$NON-NLS-1$
 		PreferencesManager.getBoolean(PREFERENCE_GENERAL_OMIT_ASKONCLOSE, false)
@@ -111,7 +106,6 @@ final class PreferencesPanelGeneral extends JPanel {
 		PreferencesManager.put(PREFERENCE_GENERAL_SIGNATURE_ALGORITHM, this.signarureAlgorithms.getSelectedItem().toString());
 		PreferencesManager.putBoolean(PREFERENCE_GENERAL_OMIT_ASKONCLOSE, this.avoidAskForClose.isSelected());
 		PreferencesManager.putBoolean(PREFERENCE_GENERAL_HIDE_DNIE_START_SCREEN, this.hideDniStartScreen.isSelected());
-		PreferencesManager.putBoolean(PREFERENCE_GENERAL_SHOW_ICON_INIT, this.showIconInit.isSelected());
 		PreferencesManager.putBoolean(PREFERENCE_GENERAL_UPDATECHECK, this.checkForUpdates.isSelected());
 		PreferencesManager.putBoolean(PREFERENCE_GENERAL_USEANALYTICS, this.sendAnalytics.isSelected());
 
@@ -122,9 +116,6 @@ final class PreferencesPanelGeneral extends JPanel {
 		PreferencesManager.put(PREFERENCE_GENERAL_DEFAULT_FORMAT_PDF, this.pdfFilesCombo.getSelectedItem().toString());
 		PreferencesManager.put(PREFERENCE_GENERAL_DEFAULT_FORMAT_XML, this.xmlFilesCombo.getSelectedItem().toString());
 		PreferencesManager.put(PREFERENCE_GENERAL_DEFAULT_FORMAT_ODF, this.odfFilesCombo.getSelectedItem().toString());
-
-		//Seleccion tryIcon
-		checkIconInit();
 	}
 
 	void createUI(final KeyListener keyListener,
@@ -242,13 +233,6 @@ final class PreferencesPanelGeneral extends JPanel {
 		);
 		restoreConfigFromFileButton.setEnabled(unprotected);
 
-		this.showIconInit.getAccessibleContext().setAccessibleDescription(
-				SimpleAfirmaMessages.getString("PreferencesPanel.114") //$NON-NLS-1$
-		);
-		this.showIconInit.setMnemonic('M');
-		this.showIconInit.addItemListener(modificationListener);
-		this.showIconInit.addKeyListener(keyListener);
-
 		final JPanel panel = new JPanel();
 		panel.setLayout(new FlowLayout(FlowLayout.LEFT));
 
@@ -260,12 +244,6 @@ final class PreferencesPanelGeneral extends JPanel {
 
 		signConstraint.insets = new Insets(5, 7, 3, 7);
 		signConstraint.anchor = GridBagConstraints.LINE_START;
-
-		// TODO: Descomentar una vez se entregue
-		if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
-			signConstraint.gridy++;
-			signConfigPanel.add(this.showIconInit, signConstraint);
-		}
 
 		signConstraint.gridy++;
 
@@ -602,29 +580,4 @@ final class PreferencesPanelGeneral extends JPanel {
 		}
 		return true;
 	}
-
-    private void checkIconInit() {
-		if (this.showIconInit.isSelected()) {
-			if (!TryIconBuilder.tryIcon(TryIconBuilder.TRY_ICON_INSTALL)) {
-				LOGGER.log(	Level.SEVERE, "Error instalando try icon"); //$NON-NLS-1$
-				AOUIFactory.showErrorMessage(
-					null,
-					SimpleAfirmaMessages.getString("PreferencesPanel.130"), //$NON-NLS-1$
-					SimpleAfirmaMessages.getString("PreferencesPanel.129"), //$NON-NLS-1$
-					JOptionPane.ERROR_MESSAGE
-				);
-			}
-		}
-		else {
-			if (!TryIconBuilder.tryIcon(TryIconBuilder.TRY_ICON_UNINSTALL)) {
-				LOGGER.log(	Level.SEVERE, "Error desinstalando comando try icon"); //$NON-NLS-1$
-				AOUIFactory.showErrorMessage(
-					null,
-					SimpleAfirmaMessages.getString("PreferencesPanel.131"), //$NON-NLS-1$
-					SimpleAfirmaMessages.getString("PreferencesPanel.129"), //$NON-NLS-1$
-					JOptionPane.ERROR_MESSAGE
-				);
-			}
-		}
-    }
 }

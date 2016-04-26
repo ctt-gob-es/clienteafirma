@@ -77,13 +77,6 @@ final class PreferencesPanelPades extends JPanel {
 		Boolean.parseBoolean(PreferencesManager.get(PREFERENCE_PADES_VISIBLE, "false")) //$NON-NLS-1$
 	);
 
-	private final JComboBox<CertificationLevelResources> certificationLevel = new JComboBox<>(
-		CertificationLevelResources.getAllCertificationLevelResources()
-	);
-	JComboBox<CertificationLevelResources> getCertificationLevel() {
-		return this.certificationLevel;
-	}
-
 	private static final String PADES_FORMAT_BASIC_TEXT = SimpleAfirmaMessages.getString("PreferencesPanel.71"); //$NON-NLS-1$
 	private static final String PADES_FORMAT_BES_TEXT = SimpleAfirmaMessages.getString("PreferencesPanel.72"); //$NON-NLS-1$
 
@@ -244,98 +237,11 @@ final class PreferencesPanelPades extends JPanel {
 		fc.weightx = 1.0;
 		fc.anchor = GridBagConstraints.LINE_START;
 
-
-
-	    final JPanel certificationPanel = new JPanel();
-	    certificationPanel.setLayout(new GridBagLayout());
-
-        final GridBagConstraints cl = new GridBagConstraints();
-        cl.gridy = 0;
-        cl.weightx = 1.0;
-        cl.anchor = GridBagConstraints.LINE_START;
-
-		final JLabel certificationLevelLabel = new JLabel(
-				SimpleAfirmaMessages.getString("PreferencesPanel.123") //$NON-NLS-1$
-		);
-		certificationLevelLabel.addKeyListener(keyListener);
-		certificationLevelLabel.setLabelFor(this.certificationLevel);
-
-		this.certificationLevel.setEnabled(unprotected);
-		this.certificationLevel.addItemListener(modificationListener);
-		this.certificationLevel.addKeyListener(keyListener);
-
-		this.certificationLevel.addActionListener(
-			new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					PreferencesManager.put(
-						PreferencesManager.PREFERENCE_PADES_CERTIFICATION_LEVEL,
-						Integer.toString(
-							((CertificationLevelResources)getCertificationLevel().getSelectedItem()).getIndex()
-						)
-					);
-				}
-			}
-		);
-		this.certificationLevel.setSelectedItem(
-				CertificationLevelResources.getName(
-					Integer.parseInt(
-						PreferencesManager.get(
-								PreferencesManager.PREFERENCE_PADES_CERTIFICATION_LEVEL,
-								Integer.toString(CertificationLevelResources.ORDINARY.getIndex())
-						)
-				)
-			)
-		);
-
-		certificationPanel.add(certificationLevelLabel, cl);
-		cl.gridy++;
-		certificationPanel.add(this.certificationLevel, cl);
-
-		final JPanel timeStampPanel = new JPanel();
-	    timeStampPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
-	    timeStampPanel.setBorder(BorderFactory.createTitledBorder(
-				BorderFactory.createTitledBorder(
-				SimpleAfirmaMessages.getString("PreferencesPanel.124")) //$NON-NLS-1$
-			)
-		);
-
-	    final JButton configureTimeStampOptionsButton = new JButton(SimpleAfirmaMessages.getString("PreferencesPanel.119")); //$NON-NLS-1$
-	    configureTimeStampOptionsButton.setEnabled(PreferencesManager.getBoolean(PREFERENCE_PADES_TIMESTAMP_CONFIGURE, false));
-		configureTimeStampOptionsButton.setMnemonic('F');
-		configureTimeStampOptionsButton.getAccessibleContext().setAccessibleDescription(
-				SimpleAfirmaMessages.getString("PreferencesPanel.120") //$NON-NLS-1$
-		);
-		configureTimeStampOptionsButton.addActionListener(
-			new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					TimeStampPadesDialog.startTimeStampPadesDialog(
-						(JFrame) SwingUtilities.getAncestorOfClass(JFrame.class, getParent())
-					);
-				}
-			}
-		);
-		configureTimeStampOptionsButton.addKeyListener(keyListener);
-		configureTimeStampOptionsButton.setEnabled(unprotected);
-
-		final JLabel timeStampLabel = new JLabel(
-				SimpleAfirmaMessages.getString("PreferencesPanel.122") //$NON-NLS-1$
-		);
-		timeStampLabel.addKeyListener(keyListener);
-		timeStampLabel.setLabelFor(configureTimeStampOptionsButton);
-
-	    timeStampPanel.add(timeStampLabel);
-	    timeStampPanel.add(configureTimeStampOptionsButton);
-
 		padesPreferencesPanel.add(panelFirm, fc);
 		padesPreferencesPanel.add(createVisiblePdfPanel(keyListener, modificationListener), fc);
-		padesPreferencesPanel.add(certificationPanel, fc);
 
 		gbc.gridy++;
 		add(padesPreferencesPanel, gbc);
-		gbc.gridy++;
-		add(timeStampPanel, gbc);
 
 	    gbc.gridy++;
 	    gbc.weighty = 1.0;

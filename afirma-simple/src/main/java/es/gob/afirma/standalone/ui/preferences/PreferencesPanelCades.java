@@ -107,47 +107,8 @@ final class PreferencesPanelCades extends JPanel {
 	    this.cadesImplicit.setEnabled(unprotected);
 	    signatureMode.add(this.cadesImplicit);
 
-	    final JPanel timeStampPanel = new JPanel();
-	    timeStampPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
-	    timeStampPanel.setBorder(BorderFactory.createTitledBorder(
-				BorderFactory.createTitledBorder(
-				SimpleAfirmaMessages.getString("PreferencesPanel.124")) //$NON-NLS-1$
-			)
-		);
-
-	    final JButton configureTimeStampOptionsButton = new JButton(SimpleAfirmaMessages.getString("PreferencesPanel.119")); //$NON-NLS-1$
-	    configureTimeStampOptionsButton.setEnabled(PreferencesManager.getBoolean(PREFERENCE_CADES_TIMESTAMP_CONFIGURE, false));
-		configureTimeStampOptionsButton.setMnemonic('F');
-		configureTimeStampOptionsButton.getAccessibleContext().setAccessibleDescription(
-				SimpleAfirmaMessages.getString("PreferencesPanel.120") //$NON-NLS-1$
-		);
-		configureTimeStampOptionsButton.addActionListener(
-			new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					TimeStampCadesDialog.startTimeStampCadesDialog(
-						(JFrame) SwingUtilities.getAncestorOfClass(JFrame.class, getParent())
-					);
-				}
-			}
-		);
-		configureTimeStampOptionsButton.addKeyListener(keyListener);
-		configureTimeStampOptionsButton.setEnabled(unprotected);
-
-		final JLabel timeStampLabel = new JLabel(
-				SimpleAfirmaMessages.getString("PreferencesPanel.118") //$NON-NLS-1$
-		);
-		timeStampLabel.addKeyListener(keyListener);
-		timeStampLabel.setLabelFor(configureTimeStampOptionsButton);
-
-	    timeStampPanel.add(timeStampLabel);
-	    timeStampPanel.add(configureTimeStampOptionsButton);
-
 	    c.gridy++;
 	    add(signatureMode, c);
-	    c.gridy++;
-	    c.insets = new Insets(0,3,0,0);
-	    add(timeStampPanel, c);
 
 	    c.gridy++;
 	    c.weighty = 1.0;

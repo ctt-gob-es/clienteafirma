@@ -48,23 +48,10 @@ final class PreferencesPanelKeyStores extends JPanel {
 		SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.0"), //$NON-NLS-1$
 		PreferencesManager.getBoolean(PREFERENCE_KEYSTORE_SIGN_ONLY_CERTS, false)
 	);
-
-	private final JCheckBox onlyEncipherment = new JCheckBox(
-		SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.1"), //$NON-NLS-1$
-		PreferencesManager.getBoolean(PREFERENCE_KEYSTORE_CYPH_ONLY_CERTS, false)
-	);
-
+	
 	private final JCheckBox onlyAlias = new JCheckBox(
 		SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.4"), //$NON-NLS-1$
 		PreferencesManager.getBoolean(PREFERENCE_KEYSTORE_ALIAS_ONLY_CERTS, false)
-	);
-
-	private final JComboBox<String> prioritaryKeyStoreComboBox = new JComboBox<>(
-		new String[] {
-			SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.20"), // Ninguno //$NON-NLS-1$
-			AOKeyStore.DNIEJAVA.toString(),
-			AOKeyStore.CERES.toString()
-		}
 	);
 
 	private static AOKeyStore[] DEFAULT_STORES;
@@ -141,19 +128,6 @@ final class PreferencesPanelKeyStores extends JPanel {
 
         kfc.gridy++;
 
-	    this.onlyEncipherment.getAccessibleContext().setAccessibleDescription(
-    		SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.3") //$NON-NLS-1$
-		);
-	    this.onlyEncipherment.setMnemonic('r');
-	    this.onlyEncipherment.addItemListener(modificationListener);
-	    this.onlyEncipherment.addKeyListener(keyListener);
-	    this.onlyEncipherment.setEnabled(unprotected);
-
-        //TODO: Descomentar una vez se entregue
-	    //keysFilerPanel.add(this.onlyEncipherment, kfc);
-
-        kfc.gridy++;
-
 	    this.onlyAlias.getAccessibleContext().setAccessibleDescription(
     		SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.5") //$NON-NLS-1$
 		);
@@ -166,64 +140,9 @@ final class PreferencesPanelKeyStores extends JPanel {
 	    final JPanel trustPanel = new JPanel();
 	    trustPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
 
-	    final JButton configureCertPoliciesButton = new JButton(SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.13")); //$NON-NLS-1$
-	    configureCertPoliciesButton.setEnabled(PreferencesManager.getBoolean(PREFERENCE_KEYSTORE_ACCEPTED_POLICIES_ONLY_CERTS, false));
-		configureCertPoliciesButton.setMnemonic('F');
-		configureCertPoliciesButton.getAccessibleContext().setAccessibleDescription(
-				SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.14") //$NON-NLS-1$
-		);
-		configureCertPoliciesButton.addActionListener(
-			new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					CertPoliciesDialog.startCertPoliciesDialog((JFrame) SwingUtilities.getAncestorOfClass(JFrame.class, getParent()));
-				}
-			}
-		);
-		configureCertPoliciesButton.addKeyListener(keyListener);
-		configureCertPoliciesButton.setEnabled(unprotected);
-
-		final JLabel certPoliciesLabel = new JLabel(
-				SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.12") //$NON-NLS-1$
-		);
-		certPoliciesLabel.addKeyListener(keyListener);
-		certPoliciesLabel.setLabelFor(configureCertPoliciesButton);
-
-		trustPanel.add(certPoliciesLabel);
-	    trustPanel.add(configureCertPoliciesButton);
-
-	    kfc.gridy++;
 	    kfc.insets = new Insets(0,2,0,0);
 	    keysFilerPanel.add(trustPanel, kfc);
 	    kfc.insets = new Insets(5, 7, 5, 7);
-
-        final JPanel priorityKeysStorePanel = new JPanel(new GridBagLayout());
-        priorityKeysStorePanel.setBorder(
-			BorderFactory.createTitledBorder(
-				BorderFactory.createTitledBorder(SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.18")) //$NON-NLS-1$
-			)
-		);
-
-		final GridBagConstraints pksc = new GridBagConstraints();
-		pksc.anchor = GridBagConstraints.LINE_START;
-		pksc.weightx = 1.0;
-		pksc.gridy = 0;
-		pksc.fill = GridBagConstraints.HORIZONTAL;
-		pksc.insets = new Insets(5, 7, 5, 7);
-
-		final JLabel cpriorityKeysStoreLabel = new JLabel(
-				SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.19") //$NON-NLS-1$
-		);
-		cpriorityKeysStoreLabel.addKeyListener(keyListener);
-		cpriorityKeysStoreLabel.setLabelFor(this.prioritaryKeyStoreComboBox);
-
-		this.prioritaryKeyStoreComboBox.addItemListener(modificationListener);
-		this.prioritaryKeyStoreComboBox.addKeyListener(keyListener);
-
-		priorityKeysStorePanel.add(cpriorityKeysStoreLabel, pksc);
-		pksc.gridy++;
-		pksc.fill = GridBagConstraints.NONE;
-		priorityKeysStorePanel.add(this.prioritaryKeyStoreComboBox, pksc);
 
         final JPanel keysStorePanel = new JPanel(new GridBagLayout());
         keysStorePanel.setBorder(
@@ -325,8 +244,6 @@ final class PreferencesPanelKeyStores extends JPanel {
 
 	    add(keysFilerPanel, c);
 	    c.gridy++;
-	    add(priorityKeysStorePanel, c);
-	    c.gridy++;
 
 	  //TODO: Descomentar una vez se entregue
 	    add(keysStorePanel, c);
@@ -338,15 +255,10 @@ final class PreferencesPanelKeyStores extends JPanel {
 
 	void savePreferences() {
 		PreferencesManager.putBoolean(PREFERENCE_KEYSTORE_SIGN_ONLY_CERTS, this.onlySignature.isSelected());
-		PreferencesManager.putBoolean(PREFERENCE_KEYSTORE_CYPH_ONLY_CERTS, this.onlyEncipherment.isSelected());
 		PreferencesManager.putBoolean(PREFERENCE_KEYSTORE_ALIAS_ONLY_CERTS, this.onlyAlias.isSelected());
 		PreferencesManager.put(
 			PREFERENCE_KEYSTORE_DEFAULT_STORE,
 			getDefaultStore().toString()
-		);
-		PreferencesManager.put(
-			PREFERENCE_KEYSTORE_PRIORITARY_STORE,
-			this.prioritaryKeyStoreComboBox.getSelectedItem().toString()
 		);
 	}
 }
