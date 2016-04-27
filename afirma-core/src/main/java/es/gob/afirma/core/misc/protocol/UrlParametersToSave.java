@@ -48,6 +48,7 @@ public final class UrlParametersToSave extends UrlParameters {
 
 	/** Establece el nombre de fichero propuesto para guardar los datos.
 	 * @param filename Nombre de fichero propuesto para guardar los datos */
+	@Override
 	void setFilename(final String filename) {
 		this.filename = filename;
 	}
@@ -73,6 +74,7 @@ public final class UrlParametersToSave extends UrlParameters {
 
 	/** Obtiene el nombre de fichero propuesto para guardar los datos.
 	 * @return Nombre de fichero propuesto para guardar los datos */
+	@Override
 	public String getFileName() {
 		return this.filename;
 	}
