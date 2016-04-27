@@ -249,15 +249,13 @@ public final class CMSTimestamper {
     	if (this.tsaURL.getScheme().equals("socket")) { //$NON-NLS-1$
 			return getTSAResponseSocket(request);
     	}
-    	else if (this.tsaURL.getScheme().equals("http")) { //$NON-NLS-1$
+    	if (this.tsaURL.getScheme().equals("http")) { //$NON-NLS-1$
     		return getTSAResponseHttp(request);
     	}
-    	else if (this.tsaURL.getScheme().equals("https")) { //$NON-NLS-1$
+    	if (this.tsaURL.getScheme().equals("https")) { //$NON-NLS-1$
     		return getTSAResponseHttps(request);
     	}
-    	else {
-			throw new UnsupportedOperationException("Protocolo de conexion con TSA no soportado: " + this.tsaURL.getScheme()); //$NON-NLS-1$
-		}
+    	throw new UnsupportedOperationException("Protocolo de conexion con TSA no soportado: " + this.tsaURL.getScheme()); //$NON-NLS-1$
     }
 
     private byte[] getTSAResponseSocket(final byte[] request) throws IOException {
@@ -385,43 +383,9 @@ public final class CMSTimestamper {
 				);
 	    	}
 	    	else {
-	    		Class<?> sunHttpsURLConnectionClass;
-	    		try {
-	    			sunHttpsURLConnectionClass = Class.forName("com.sun.net.ssl.HttpsURLConnection"); //$NON-NLS-1$
-	    		}
-	    		catch (final Exception e) {
-	    			sunHttpsURLConnectionClass = null;
-	    		}
-
-	    		if (sunHttpsURLConnectionClass != null && sunHttpsURLConnectionClass.isInstance(conn)) {
-
-	    			try {
-	    				// Este caso es problematico porque se deshabilita globalmente (metodo estatico) la comprobacion de
-	    				// nombre de host, y no solo para la conexion en curso.
-	    				// No obstante, la JVM no deberia darnos nunca este tipo de conexiones, porque estan ya deprecadas
-	    				// y obsoletas.
-	    				final Method setDefaultHostnameVerifierMethod = sunHttpsURLConnectionClass.getDeclaredMethod("setDefaultHostnameVerifier"); //$NON-NLS-1$
-	    				setDefaultHostnameVerifierMethod.invoke(
-	    						null,
-	    						new com.sun.net.ssl.HostnameVerifier() {
-	    							@Override
-	    							public boolean verify(final String arg0, final String arg1) {
-	    								return true;
-	    							}
-	    						}
-						);
-	    			}
-	    			catch (final Exception e) {
-	    				LOGGER.warning(
-	    						"Ocurrio un error al intentar instanciar una conexion de tipo 'com.sun.net.ssl.HttpsURLConnection' para sobreescribir la conexion el host, se continuara la operacion" //$NON-NLS-1$
-	    						);
-	    			}
-	    		}
-	    		else {
-	    			LOGGER.warning(
-	    				"No se ha podido deshabilitar la comprobacion de nombre de host, tipo desconocido de conexion: " + conn.getClass().getName() //$NON-NLS-1$
-	    			);
-	    		}
+	    		LOGGER.warning(
+    				"No se ha podido deshabilitar la comprobacion de nombre de host, tipo desconocido de conexion: " + conn.getClass().getName() //$NON-NLS-1$
+    			);
 	    	}
     	}
 

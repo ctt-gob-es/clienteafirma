@@ -17,11 +17,14 @@ import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Iterator;
 import java.util.UUID;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
+import javax.xml.XMLConstants;
+import javax.xml.namespace.NamespaceContext;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
@@ -32,6 +35,11 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -55,7 +63,8 @@ final class OOXMLZipHelper {
     		                                        final byte[] xmlSignatureFile) throws IOException,
                                                                                           ParserConfigurationException,
                                                                                           SAXException,
-                                                                                          TransformerException {
+                                                                                          TransformerException,
+                                                                                          XPathExpressionException {
         final ByteArrayOutputStream signedOOXMLOutputStream = new ByteArrayOutputStream();
 
         final String signatureZipEntryName = "_xmlsignatures/sig-" + UUID.randomUUID().toString() + ".xml"; //$NON-NLS-1$ //$NON-NLS-2$
@@ -83,7 +92,8 @@ final class OOXMLZipHelper {
     		                                        final OutputStream signedOOXMLOutputStream) throws IOException,
                                                                                                        ParserConfigurationException,
                                                                                                        SAXException,
-                                                                                                       TransformerException {
+                                                                                                       TransformerException,
+                                                                                                       XPathExpressionException {
         final ZipOutputStream zipOutputStream = new ZipOutputStream(signedOOXMLOutputStream);
         final ZipInputStream zipInputStream = new ZipInputStream(
     		new ByteArrayInputStream(
@@ -99,23 +109,58 @@ final class OOXMLZipHelper {
                 final Element typesElement = contentTypesDocument.getDocumentElement();
 
                 // We need to add an Override element.
-                final Element overrideElement =
-                        contentTypesDocument.createElementNS("http://schemas.openxmlformats.org/package/2006/content-types", "Override"); //$NON-NLS-1$ //$NON-NLS-2$
+                final Element overrideElement = contentTypesDocument.createElementNS(
+            		"http://schemas.openxmlformats.org/package/2006/content-types", //$NON-NLS-1$
+            		"Override" //$NON-NLS-1$
+        		);
                 overrideElement.setAttribute("PartName", "/" + signatureZipEntryName); //$NON-NLS-1$ //$NON-NLS-2$
                 overrideElement.setAttribute("ContentType", "application/vnd.openxmlformats-package.digital-signature-xmlsignature+xml"); //$NON-NLS-1$ //$NON-NLS-2$
                 typesElement.appendChild(overrideElement);
 
-                final Element nsElement = contentTypesDocument.createElement("ns"); //$NON-NLS-1$
-                nsElement.setAttributeNS(NAMESPACE_SPEC_NS, "xmlns:tns", "http://schemas.openxmlformats.org/package/2006/content-types"); //$NON-NLS-1$ //$NON-NLS-2$
-                final NodeList nodeList = com.sun.org.apache.xpath.internal.XPathAPI.selectNodeList(
-            		contentTypesDocument,
-            		"/tns:Types/tns:Default[@Extension='sigs']", //$NON-NLS-1$
-            		nsElement
-        		);
+				final XPath xpath = XPathFactory.newInstance().newXPath();
+				xpath.setNamespaceContext(
+					new NamespaceContext() {
+
+						@Override
+						public Iterator<?> getPrefixes(final String namespaceURI) {
+							throw new UnsupportedOperationException();
+						}
+
+						@Override
+						public String getPrefix(final String namespaceURI) {
+							throw new UnsupportedOperationException();
+						}
+
+						@Override
+						public String getNamespaceURI(final String prefix) {
+							if (prefix == null) {
+								throw new IllegalArgumentException("El prefijo no puede ser nulo"); //$NON-NLS-1$
+							}
+							if ("xml".equals(prefix)) { //$NON-NLS-1$
+								return XMLConstants.XML_NS_URI;
+							}
+							if ("tns".equals(prefix)) { //$NON-NLS-1$
+								return "http://schemas.openxmlformats.org/package/2006/content-types"; //$NON-NLS-1$
+							}
+							return XMLConstants.NULL_NS_URI;
+						}
+					}
+				);
+
+				final XPathExpression exp = xpath.compile(
+					"/tns:Types/tns:Default[@Extension='sigs']" //$NON-NLS-1$
+				);
+				final NodeList nodeList = (NodeList) exp.evaluate(
+					contentTypesDocument,
+					XPathConstants.NODESET
+				);
+
                 if (0 == nodeList.getLength()) {
                     // Add Default element for 'sigs' extension.
-                    final Element defaultElement =
-                            contentTypesDocument.createElementNS("http://schemas.openxmlformats.org/package/2006/content-types", "Default"); //$NON-NLS-1$ //$NON-NLS-2$
+                    final Element defaultElement = contentTypesDocument.createElementNS(
+                		"http://schemas.openxmlformats.org/package/2006/content-types", //$NON-NLS-1$
+                		"Default" //$NON-NLS-1$
+            		);
                     defaultElement.setAttribute("Extension", "sigs"); //$NON-NLS-1$ //$NON-NLS-2$
                     defaultElement.setAttribute("ContentType", "application/vnd.openxmlformats-package.digital-signature-origin"); //$NON-NLS-1$ //$NON-NLS-2$
                     typesElement.appendChild(defaultElement);
@@ -126,16 +171,45 @@ final class OOXMLZipHelper {
             else if ("_rels/.rels".equals(zipEntry.getName())) { //$NON-NLS-1$
                 final Document relsDocument = loadDocumentNoClose(zipInputStream);
 
-                final Element nsElement = relsDocument.createElement("ns"); //$NON-NLS-1$
-                nsElement.setAttributeNS(NAMESPACE_SPEC_NS, "xmlns:tns", RELATIONSHIPS_SCHEMA); //$NON-NLS-1$
-				final NodeList nodeList = com.sun.org.apache.xpath.internal.XPathAPI.selectNodeList(
-            		relsDocument,
-                    "/tns:Relationships/tns:Relationship[@Type='http://schemas.openxmlformats.org/package/2006/relationships/digital-signature/origin']", //$NON-NLS-1$
-                    nsElement
-                );
+				final XPath xpath = XPathFactory.newInstance().newXPath();
+				xpath.setNamespaceContext(
+					new NamespaceContext() {
+
+						@Override
+						public Iterator<?> getPrefixes(final String namespaceURI) {
+							throw new UnsupportedOperationException();
+						}
+
+						@Override
+						public String getPrefix(final String namespaceURI) {
+							throw new UnsupportedOperationException();
+						}
+
+						@Override
+						public String getNamespaceURI(final String prefix) {
+							if (prefix == null) {
+								throw new IllegalArgumentException("El prefijo no puede ser nulo"); //$NON-NLS-1$
+							}
+							if ("xml".equals(prefix)) { //$NON-NLS-1$
+								return XMLConstants.XML_NS_URI;
+							}
+							if ("tns".equals(prefix)) { //$NON-NLS-1$
+								return RELATIONSHIPS_SCHEMA;
+							}
+							return XMLConstants.NULL_NS_URI;
+						}
+					}
+				);
+				final XPathExpression exp = xpath.compile(
+					"/tns:Relationships/tns:Relationship[@Type='http://schemas.openxmlformats.org/package/2006/relationships/digital-signature/origin']" //$NON-NLS-1$
+				);
+				final NodeList nodeList = (NodeList) exp.evaluate(
+					relsDocument,
+					XPathConstants.NODESET
+				);
+
                 if (0 == nodeList.getLength()) {
-                    final Element relationshipElement =
-                            relsDocument.createElementNS(RELATIONSHIPS_SCHEMA, "Relationship"); //$NON-NLS-1$
+                    final Element relationshipElement = relsDocument.createElementNS(RELATIONSHIPS_SCHEMA, "Relationship"); //$NON-NLS-1$
                     relationshipElement.setAttribute("Id", "rel-id-" + UUID.randomUUID().toString()); //$NON-NLS-1$ //$NON-NLS-2$
                     relationshipElement.setAttribute("Type", "http://schemas.openxmlformats.org/package/2006/relationships/digital-signature/origin"); //$NON-NLS-1$ //$NON-NLS-2$
                     relationshipElement.setAttribute("Target", "_xmlsignatures/origin.sigs"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -150,8 +224,7 @@ final class OOXMLZipHelper {
                 hasOriginSigsRels = true;
                 final Document originSignRelsDocument = loadDocumentNoClose(zipInputStream);
 
-                final Element relationshipElement =
-                        originSignRelsDocument.createElementNS(RELATIONSHIPS_SCHEMA, "Relationship"); //$NON-NLS-1$
+                final Element relationshipElement = originSignRelsDocument.createElementNS(RELATIONSHIPS_SCHEMA, "Relationship"); //$NON-NLS-1$
                 relationshipElement.setAttribute("Id", "rel-" + UUID.randomUUID().toString()); //$NON-NLS-1$ //$NON-NLS-2$
                 relationshipElement.setAttribute("Type", "http://schemas.openxmlformats.org/package/2006/relationships/digital-signature/signature"); //$NON-NLS-1$ //$NON-NLS-2$
                 relationshipElement.setAttribute("Target", new File(signatureZipEntryName).getName()); //$NON-NLS-1$
@@ -188,13 +261,11 @@ final class OOXMLZipHelper {
 
         final Document originSignRelsDocument = documentBuilderFactory.newDocumentBuilder().newDocument();
 
-        final Element relationshipsElement =
-                originSignRelsDocument.createElementNS(RELATIONSHIPS_SCHEMA, "Relationships"); //$NON-NLS-1$
+        final Element relationshipsElement = originSignRelsDocument.createElementNS(RELATIONSHIPS_SCHEMA, "Relationships"); //$NON-NLS-1$
         relationshipsElement.setAttributeNS(NAMESPACE_SPEC_NS, "xmlns", RELATIONSHIPS_SCHEMA); //$NON-NLS-1$
         originSignRelsDocument.appendChild(relationshipsElement);
 
-        final Element relationshipElement =
-                originSignRelsDocument.createElementNS(RELATIONSHIPS_SCHEMA, "Relationship"); //$NON-NLS-1$
+        final Element relationshipElement = originSignRelsDocument.createElementNS(RELATIONSHIPS_SCHEMA, "Relationship"); //$NON-NLS-1$
         final String relationshipId = "rel-" + UUID.randomUUID().toString(); //$NON-NLS-1$
         relationshipElement.setAttribute("Id", relationshipId); //$NON-NLS-1$
         relationshipElement.setAttribute("Type", "http://schemas.openxmlformats.org/package/2006/relationships/digital-signature/signature"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -238,6 +309,5 @@ final class OOXMLZipHelper {
             // Nunca cerramos
         }
     }
-
 
 }

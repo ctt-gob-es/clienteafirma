@@ -47,10 +47,12 @@ import java.io.StringWriter;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.spec.AlgorithmParameterSpec;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import javax.xml.XMLConstants;
 import javax.xml.crypto.Data;
 import javax.xml.crypto.OctetStreamData;
 import javax.xml.crypto.XMLCryptoContext;
@@ -59,6 +61,7 @@ import javax.xml.crypto.dom.DOMStructure;
 import javax.xml.crypto.dsig.TransformException;
 import javax.xml.crypto.dsig.TransformService;
 import javax.xml.crypto.dsig.spec.TransformParameterSpec;
+import javax.xml.namespace.NamespaceContext;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
@@ -69,6 +72,10 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathFactory;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -122,18 +129,52 @@ public final class RelationshipTransformService extends TransformService {
         catch (final TransformerException e) {
             throw new InvalidAlgorithmParameterException(e);
         }
-        final Element nsElement = parentNode.getOwnerDocument().createElement("ns"); //$NON-NLS-1$
-        nsElement.setAttributeNS(NAMESPACE_SPEC_NS, "xmlns:ds", SIGNATURE_SPEC_NS); //$NON-NLS-1$
-        nsElement.setAttributeNS(NAMESPACE_SPEC_NS, "xmlns:mdssi", "http://schemas.openxmlformats.org/package/2006/digital-signature"); //$NON-NLS-1$ //$NON-NLS-2$
+
         NodeList nodeList;
         try {
-            nodeList = com.sun.org.apache.xpath.internal.XPathAPI.selectNodeList(
-        		parentNode, "mdssi:RelationshipReference/@SourceId", //$NON-NLS-1$
-        		nsElement
-    		);
+			final XPath xpath = XPathFactory.newInstance().newXPath();
+			xpath.setNamespaceContext(
+				new NamespaceContext() {
+
+					@Override
+					public Iterator<?> getPrefixes(final String namespaceURI) {
+						throw new UnsupportedOperationException();
+					}
+
+					@Override
+					public String getPrefix(final String namespaceURI) {
+						throw new UnsupportedOperationException();
+					}
+
+					@Override
+					public String getNamespaceURI(final String prefix) {
+						if (prefix == null) {
+							throw new IllegalArgumentException("El prefijo no puede ser nulo"); //$NON-NLS-1$
+						}
+						if ("xml".equals(prefix)) { //$NON-NLS-1$
+							return XMLConstants.XML_NS_URI;
+						}
+						if ("ds".equals(prefix)) { //$NON-NLS-1$
+							return SIGNATURE_SPEC_NS;
+						}
+						if ("mdssi".equals(prefix)) { //$NON-NLS-1$
+							return "http://schemas.openxmlformats.org/package/2006/digital-signature"; //$NON-NLS-1$
+						}
+						return XMLConstants.NULL_NS_URI;
+					}
+				}
+			);
+			final XPathExpression exp = xpath.compile(
+				"mdssi:RelationshipReference/@SourceId" //$NON-NLS-1$
+			);
+			nodeList = (NodeList) exp.evaluate(
+				parentNode,
+				XPathConstants.NODESET
+			);
+
         }
-        catch (final TransformerException e) {
-            LOGGER.severe("transformer exception: " + e.getMessage()); //$NON-NLS-1$
+        catch (final Exception e) {
+            LOGGER.severe("Error en la transformacion XPath: " + e); //$NON-NLS-1$
             throw new InvalidAlgorithmParameterException(e);
         }
         if (0 == nodeList.getLength()) {
