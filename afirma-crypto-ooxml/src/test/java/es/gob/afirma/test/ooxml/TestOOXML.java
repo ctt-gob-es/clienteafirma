@@ -31,9 +31,9 @@ import es.gob.afirma.signers.ooxml.AOOOXMLSigner;
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public final class TestOOXML {
 
-    private static final String CERT_PATH3 = "CAMERFIRMA_PF_SW_Clave_usuario_Activo.p12"; //$NON-NLS-1$
-    private static final String CERT_PASS3 = "1111"; //$NON-NLS-1$
-    private static final String CERT_ALIAS3 = "1"; //$NON-NLS-1$
+    private static final String CERT_PATH3 = "PFActivoFirSHA1.pfx"; //$NON-NLS-1$
+    private static final String CERT_PASS3 = "12341234"; //$NON-NLS-1$
+    private static final String CERT_ALIAS3 = "fisico activo prueba"; //$NON-NLS-1$
 
     private static final String[] DATA_PATHS = new String[] { "entrada_w2013.docx", "Entrada.docx" };  //$NON-NLS-1$ //$NON-NLS-2$
     private static byte[][] DATAS = new byte[2][];
