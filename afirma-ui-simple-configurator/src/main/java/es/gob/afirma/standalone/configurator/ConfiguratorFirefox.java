@@ -43,7 +43,7 @@ final class ConfiguratorFirefox {
 
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
-    private static final String FILE_AUTOFIRMA_CERTIFICATE = "autofirma.cer"; //$NON-NLS-1$
+    private static final String FILE_AUTOFIRMA_CERTIFICATE = "AutoFirma_ROOT.cer"; //$NON-NLS-1$
     static final String DIR_CERTUTIL = "certutil"; //$NON-NLS-1$
     private static final String LINUX_UNINSTALLSCRIPT_NAME = "uninstall.sh"; //$NON-NLS-1$
     private static final String LINUX_SCRIPT_NAME = "script.sh"; //$NON-NLS-1$
