@@ -258,8 +258,8 @@ Section "Programa" sPrograma
 	File /r "jre32b"
 
 	; Eliminamos los certificados generados en caso de que existan por una instalacion previa
-	IfFileExists "$INSTDIR\AutoFirma\autofirma.cer" 0 +1
-	Delete "$INSTDIR\AutoFirma\autofirma.cer"
+	IfFileExists "$INSTDIR\AutoFirma\AutoFirma_ROOT.cer" 0 +1
+	Delete "$INSTDIR\AutoFirma\AutoFirma_ROOT.cer"
 	IfFileExists "$INSTDIR\AutoFirma\autofirma.pfx" 0 +1
 	Delete "$INSTDIR\AutoFirma\autofirma.pfx"
 	
@@ -279,7 +279,7 @@ Section "Programa" sPrograma
 	Call DeleteCertificateOnInstall
 	
 	; Importamos el certificado en el sistema
-	Push "$INSTDIR\AutoFirma\autofirma.cer"
+	Push "$INSTDIR\AutoFirma\AutoFirma_ROOT.cer"
 	Sleep 2000
 	Call AddCertificateToStore
 	Pop $0
