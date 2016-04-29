@@ -29,6 +29,9 @@ public final class MimeHelper {
 
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
+    /** Valor que devuelve JMimeMagic por defecto cuando no sabe identificar la extension o el mimetype de unos datos. */
+    public static final String UNKNOWN_JMIMEMAGIC_VALUE = "???"; //$NON-NLS-1$
+
     /** MimeType por defecto. */
     public static final String DEFAULT_MIMETYPE = "application/octet-stream"; //$NON-NLS-1$
 
@@ -73,9 +76,21 @@ public final class MimeHelper {
             final Object magicMatchObject = getMagicMatchMethod.invoke(null, this.data);
 
             final Class<?> magicMatchClass = Class.forName("net.sf.jmimemagic.MagicMatch"); //$NON-NLS-1$
-            this.mimeInfo.setMimeType((String) magicMatchClass.getMethod("getMimeType", (Class[]) null).invoke(magicMatchObject, (Object[]) null)); //$NON-NLS-1$
-            this.mimeInfo.setExtension((String)magicMatchClass.getMethod("getExtension", (Class[]) null).invoke(magicMatchObject, (Object[]) null)); //$NON-NLS-1$
-            this.mimeInfo.setDescription((String) magicMatchClass.getMethod("getDescription", (Class[]) null).invoke(magicMatchObject, (Object[]) null)); //$NON-NLS-1$
+            String mt = (String) magicMatchClass.getMethod("getMimeType", (Class[]) null).invoke(magicMatchObject, (Object[]) null); //$NON-NLS-1$
+            if (mt != null && UNKNOWN_JMIMEMAGIC_VALUE.equals(mt)) {
+            	mt = null;
+            }
+            this.mimeInfo.setMimeType(mt);
+            String ext = (String)magicMatchClass.getMethod("getExtension", (Class[]) null).invoke(magicMatchObject, (Object[]) null); //$NON-NLS-1$
+            if (ext != null && UNKNOWN_JMIMEMAGIC_VALUE.equals(ext)) {
+            	ext = null;
+            }
+            this.mimeInfo.setExtension(ext);
+            String desc = (String) magicMatchClass.getMethod("getDescription", (Class[]) null).invoke(magicMatchObject, (Object[]) null); //$NON-NLS-1$
+            if (desc != null && UNKNOWN_JMIMEMAGIC_VALUE.equals(desc)) {
+            	desc = null;
+            }
+            this.mimeInfo.setDescription(desc);
         }
         catch (final ClassNotFoundException e) {
             LOGGER.warning("No se encontro la biblioteca JMimeMagic para la deteccion del tipo de dato"); //$NON-NLS-1$
