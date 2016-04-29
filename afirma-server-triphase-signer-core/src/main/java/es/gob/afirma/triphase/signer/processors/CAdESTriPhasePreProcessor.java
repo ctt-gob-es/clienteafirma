@@ -50,13 +50,15 @@ public class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 	public byte[] preProcessPreSign(final byte[] data,
 			                        final String algorithm,
 			                        final X509Certificate[] cert,
-			                        final Properties extraParams) throws IOException, AOException {
+			                        final Properties params) throws IOException, AOException {
 
 		LOGGER.info("Prefirma CAdES - Firma - INICIO"); //$NON-NLS-1$
 
 		if (data == null || data.length < 1) {
 			throw new IllegalArgumentException("Los datos no pueden ser nulos"); //$NON-NLS-1$
 		}
+
+		final Properties extraParams = params != null ? params : new Properties();
 
 		boolean signingCertificateV2;
 		if (AOSignConstants.isSHA2SignatureAlgorithm(algorithm)) {
@@ -165,7 +167,7 @@ public class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 	public byte[] preProcessPostSign(final byte[] data,
 			                         final String algorithm,
 			                         final X509Certificate[] cert,
-			                         final Properties extraParams,
+			                         final Properties params,
 			                         final TriphaseData triphaseData) throws NoSuchAlgorithmException,
 			                                                                 IOException,
 			                                                                 AOException {
@@ -174,6 +176,8 @@ public class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 		if (triphaseData == null) {
 			throw new IllegalArgumentException("Los datos de prefirma no pueden ser nulos"); //$NON-NLS-1$
 		}
+
+		final Properties extraParams = params != null ? params : new Properties();
 
 		boolean omitContent = true;
 		if (extraParams.containsKey("mode")) { //$NON-NLS-1$
@@ -214,13 +218,15 @@ public class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 	public byte[] preProcessPreCoSign(final byte[] sign,
 			final String algorithm,
 			final X509Certificate[] cert,
-			final Properties extraParams) throws IOException, AOException {
+			final Properties params) throws IOException, AOException {
 
 		LOGGER.info("Prefirma CAdES - Cofirma - INICIO"); //$NON-NLS-1$
 
 		if (sign == null || sign.length < 1) {
 			throw new IllegalArgumentException("Las firma no puede ser nula ni vacia"); //$NON-NLS-1$
 		}
+
+		final Properties extraParams = params != null ? params : new Properties();
 
 		boolean signingCertificateV2;
 		if (AOSignConstants.isSHA2SignatureAlgorithm(algorithm)) {
