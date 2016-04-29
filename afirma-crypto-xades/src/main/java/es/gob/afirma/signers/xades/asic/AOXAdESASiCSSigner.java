@@ -211,10 +211,10 @@ public final class AOXAdESASiCSSigner implements AOSigner {
 					ASiCUtil.getASiCSDefaultDataFilename(data);
 
 		// Siempre con MANIFEST
-		extraParams.put(XAdESExtraParams.USE_MANIFEST, "true"); //$NON-NLS-1$
+		extraParams.put(XAdESExtraParams.USE_MANIFEST, Boolean.TRUE.toString());
 
 		// Aprovechamos para anadir atributos utiles
-		extraParams.put(XAdESExtraParams.ADD_KEY_INFO_KEY_NAME, "true"); //$NON-NLS-1$
+		extraParams.put(XAdESExtraParams.ADD_KEY_INFO_KEY_NAME, Boolean.TRUE.toString());
 
 		// La URI de referencia es el nombre de fichero dentro del ASiC
 		extraParams.put(XAdESExtraParams.URI, dataFilename);
