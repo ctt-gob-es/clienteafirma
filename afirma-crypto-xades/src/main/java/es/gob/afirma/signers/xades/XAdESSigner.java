@@ -78,6 +78,9 @@ public final class XAdESSigner {
     /** Identificador de identificadores en los nodos XML. */
     static final String ID_IDENTIFIER = "Id"; //$NON-NLS-1$
 
+	private XAdESSigner() {
+		// No permitimos la instanciacion
+	}
 
     /** Firma datos en formato XAdES.
      * <p>
@@ -273,7 +276,7 @@ public final class XAdESSigner {
 		        XAdESExtraParams.OUTPUT_XML_ENCODING);
 
 		String mimeType = extraParams.getProperty(
-		        XAdESExtraParams.XMLDSIG_OBJECT_MIME_TYPE, XMLConstants.DEFAULT_MIMETYPE);
+		        XAdESExtraParams.XMLDSIG_OBJECT_MIME_TYPE);
 
 		String encoding = extraParams.getProperty(
 		        XAdESExtraParams.XMLDSIG_OBJECT_ENCODING);
@@ -482,12 +485,10 @@ public final class XAdESSigner {
 					final Document docFile = dbf.newDocumentBuilder().newDocument();
 					dataElement = docFile.createElement(AOXAdESSigner.DETACHED_CONTENT_ELEMENT_NAME);
 					uri = null;
-					if (mimeType == null) {
-						mimeType = XMLConstants.DEFAULT_MIMETYPE;
-					}
 
 					dataElement.setAttributeNS(null, ID_IDENTIFIER, contentId);
-					dataElement.setAttributeNS(null, AOXAdESSigner.XMLDSIG_ATTR_MIMETYPE_STR, mimeType);
+					dataElement.setAttributeNS(null, AOXAdESSigner.XMLDSIG_ATTR_MIMETYPE_STR,
+							mimeType != null ? mimeType : XMLConstants.DEFAULT_MIMETYPE);
 
 					// Si es Base64, lo firmamos indicando como contenido el dato pero, ya que puede
 					// poseer un formato particular o caracteres valido pero extranos para el XML,
@@ -501,10 +502,14 @@ public final class XAdESSigner {
 						// Adicionalmente, si es un base 64 intentamos obtener el tipo del contenido
 						// decodificado para asi reestablecer el MimeType.
 						final byte[] decodedData = Base64.decode(new String(data));
-						final MimeHelper mimeTypeHelper = new MimeHelper(decodedData);
-						final String tempMimeType = mimeTypeHelper.getMimeType();
-						mimeType = tempMimeType != null ? tempMimeType : XMLConstants.DEFAULT_MIMETYPE;
-						dataElement.setAttributeNS(null, AOXAdESSigner.XMLDSIG_ATTR_MIMETYPE_STR, mimeType);
+						if (mimeType == null) {
+							final MimeHelper mimeTypeHelper = new MimeHelper(decodedData);
+							final String tempMimeType = mimeTypeHelper.getMimeType();
+							if (tempMimeType != null) {
+								mimeType = tempMimeType;
+								dataElement.setAttributeNS(null, AOXAdESSigner.XMLDSIG_ATTR_MIMETYPE_STR, mimeType);
+							}
+						}
 						dataElement.setTextContent(Base64.encode(decodedData));
 					}
 					else {
@@ -519,11 +524,13 @@ public final class XAdESSigner {
 							);
 						}
 
-						if (mimeType == XMLConstants.DEFAULT_MIMETYPE) {
+						if (mimeType == null) {
 							final MimeHelper mimeTypeHelper = new MimeHelper(data);
 							final String tempMimeType = mimeTypeHelper.getMimeType();
-							mimeType = tempMimeType != null ? tempMimeType : XMLConstants.DEFAULT_MIMETYPE;
-							dataElement.setAttributeNS(null, AOXAdESSigner.XMLDSIG_ATTR_MIMETYPE_STR, mimeType);
+							if (tempMimeType != null) {
+								mimeType = tempMimeType;
+								dataElement.setAttributeNS(null, AOXAdESSigner.XMLDSIG_ATTR_MIMETYPE_STR, mimeType);
+							}
 						}
 
 						dataElement.setTextContent(Base64.encode(data));
@@ -670,7 +677,11 @@ public final class XAdESSigner {
 				);
 
 				final String objectId = "Object-" + UUID.randomUUID().toString(); //$NON-NLS-1$
-				envelopingObject = fac.newXMLObject(structures, objectId, mimeType, encoding);
+				envelopingObject = fac.newXMLObject(
+						structures,
+						objectId,
+						mimeType != null ? mimeType : XMLConstants.DEFAULT_MIMETYPE,
+						encoding);
 
 				// Crea la referencia al nuevo elemento Object o al nodo especifico a firmar
 				// si asi se hubiese indicado
@@ -1098,7 +1109,7 @@ public final class XAdESSigner {
 		final DataObjectFormat objectFormat = new DataObjectFormatImpl(
 			null,
 			objectIdentifier,
-			mimeType,
+			mimeType != null ? mimeType : XMLConstants.DEFAULT_MIMETYPE,
 			encoding,
 			"#" + referenceId //$NON-NLS-1$
 		);
@@ -1249,9 +1260,4 @@ public final class XAdESSigner {
 		);
 
 	}
-
-	private XAdESSigner() {
-		// No permitimos la instanciacion
-	}
-
 }
