@@ -50,6 +50,8 @@ public final class PdfTimestamper {
     private static final int PDF_MAX_VERSION = 7;
     private static final int PDF_MIN_VERSION = 2;
 
+    private static final int PDF_MIN_COMPRESABLE_VERSION = 5;
+
 	private PdfTimestamper() {
 		// No instanciable
 	}
@@ -127,12 +129,11 @@ public final class PdfTimestamper {
         		// Aplicamos todos los atributos de firma
         		final PdfSignatureAppearance sap = stp.getSignatureAppearance();
 
-        		// La compresion solo para versiones superiores a la 4
+        		// La compresion solo para versiones 5 y superiores
         		// Hacemos la comprobacion a "false", porque es el valor que deshabilita esta opcion
-        		if (pdfVersion > PDF_MIN_VERSION && !"false".equalsIgnoreCase(extraParams.getProperty(PdfExtraParams.COMPRESS_PDF))) { //$NON-NLS-1$
+        		if (pdfVersion >= PDF_MIN_COMPRESABLE_VERSION && !"false".equalsIgnoreCase(extraParams.getProperty(PdfExtraParams.COMPRESS_PDF))) { //$NON-NLS-1$
         			stp.setFullCompression();
         		}
-        		stp.setFullCompression();
 
         		PdfUtil.enableLtv(stp);
 
