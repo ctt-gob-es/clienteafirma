@@ -17,6 +17,7 @@ import java.security.cert.Certificate;
 import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 
@@ -86,6 +87,58 @@ public final class AOFacturaESigner implements AOSigner {
         EXTRA_PARAMS.setProperty(XAdESExtraParams.FACTURAE_SIGN, "true"); //$NON-NLS-1$
     }
 
+    private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+
+    /** Firma Facturas en formato XAdES Factura-E.
+     * @param data Factura electr&oacute;nica.
+     * @param algorithm Algoritmo a usar para la firma.
+     * <p>Se aceptan los siguientes algoritmos en el par&aacute;metro <code>algorithm</code>:</p>
+     * <ul>
+     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA1withRSA</i></li>
+     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA256withRSA</i></li>
+     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA384withRSA</i></li>
+     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA512withRSA</i></li>
+     * </ul>
+     * @param key Clave privada a usar para firmar.
+     * @param certChain Cadena de certificados del firmante
+     * @param extraParams Par&aacute;metros adicionales para la firma.
+     * <p>Se aceptan los siguientes valores en el par&aacute;metro <code>xParams</code>:</p>
+     * <dl>
+     *  <dt><b><i>signatureProductionCity</i></b></dt>
+     *   <dd>Ciudad en la que se realiza la firma</dd>
+     *  <dt><b><i>signatureProductionProvince</i></b></dt>
+     *   <dd>Provincia en la que se realiza la firma</dd>
+     *  <dt><b><i>signatureProductionPostalCode</i></b></dt>
+     *   <dd>C&oacute;digo postal en el que se realiza la firma</dd>
+     *  <dt><b><i>signatureProductionCountry</i></b></dt>
+     *   <dd>Pa&iacute;s en el que se realiza la firma</dd>
+     * </dl>
+     * @return Factura electr&oacute;nica firmada.
+     * @throws InvalidEFacturaDataException Cuando se proporcionan datos que no son una factura electr&oacute;nica
+     * @throws EFacturaAlreadySignedException Cuando se proporciona un factura ya firmada
+     * @throws AOException Cuando ocurre cualquier problema durante el proceso
+     * @throws IOException Cuando ocurren problemas relacionados con la lectura de los datos */
+    @Override
+	public byte[] sign(final byte[] data,
+                       final String algorithm,
+                       final PrivateKey key,
+                       final Certificate[] certChain,
+                       final Properties extraParams) throws AOException, IOException {
+        if (!isValidDataFile(data)) {
+            throw new InvalidEFacturaDataException();
+        }
+        if (isSign(data)) {
+        	throw new EFacturaAlreadySignedException();
+        }
+        return XADES_SIGNER.sign(
+    		data,
+    		algorithm,
+    		key,
+    		certChain,
+    		getFacturaEExtraParams(extraParams)
+		);
+    }
+
     /** Operaci&oacute;n no soportada. */
     @Override
 	public byte[] cosign(final byte[] data,
@@ -117,56 +170,6 @@ public final class AOFacturaESigner implements AOSigner {
                               final Certificate[] certChain,
                               final Properties extraParams) {
         throw new UnsupportedOperationException("No se soporta la contrafirma de facturas"); //$NON-NLS-1$
-    }
-
-    /** Firma Facturas en formato XAdES Factura-E.
-     * @param data Factura electr&oacute;nica.
-     * @param algorithm Algoritmo a usar para la firma.
-     * <p>Se aceptan los siguientes algoritmos en el par&aacute;metro <code>algorithm</code>:</p>
-     * <ul>
-     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA1withRSA</i></li>
-     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA256withRSA</i></li>
-     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA384withRSA</i></li>
-     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA512withRSA</i></li>
-     * </ul>
-     * @param key Clave privada a usar para firmar.
-     * @param certChain Cadena de certificados del firmante
-     * @param extraParams Par&aacute;metros adicionales para la firma.
-     * <p>Se aceptan los siguientes valores en el par&aacute;metro <code>xParams</code>:</p>
-     * <dl>
-     *  <dt><b><i>signatureProductionCity</i></b></dt>
-     *   <dd>Ciudad en la que se realiza la firma</dd>
-     *  <dt><b><i>signatureProductionProvince</i></b></dt>
-     *   <dd>Provincia en la que se realiza la firma</dd>
-     *  <dt><b><i>signatureProductionPostalCode</i></b></dt>
-     *   <dd>C&oacute;digo postal en el que se realiza la firma</dd>
-     *  <dt><b><i>signatureProductionCountry</i></b></dt>
-     *   <dd>Pa&iacute;s en el que se realiza la firma</dd>
-     * </dl>
-     * @return Cofirma en formato XAdES
-     * @throws InvalidEFacturaDataException Cuando se proporcionan datos que no son una factura electr&oacute;nica
-     * @throws EFacturaAlreadySignedException Cuando se proporciona un factura ya firmada
-     * @throws AOException Cuando ocurre cualquier problema durante el proceso
-     * @throws IOException Cuando ocurren problemas relacionados con la lectura de los datos */
-    @Override
-	public byte[] sign(final byte[] data,
-                       final String algorithm,
-                       final PrivateKey key,
-                       final Certificate[] certChain,
-                       final Properties extraParams) throws AOException, IOException {
-        if (!isValidDataFile(data)) {
-            throw new InvalidEFacturaDataException();
-        }
-        if (isSign(data)) {
-        	throw new EFacturaAlreadySignedException();
-        }
-        return XADES_SIGNER.sign(
-    		data,
-    		algorithm,
-    		key,
-    		certChain,
-    		getFacturaEExtraParams(extraParams)
-		);
     }
 
     /** Obtiene los par&aacute;metros adicionales necesarios para generar una firma XAdES compatible con FacturaE,
@@ -225,6 +228,9 @@ public final class AOFacturaESigner implements AOSigner {
             for (final Object k : originalExtraParams.keySet()) {
                 if (ALLOWED_PARAMS.contains(k)) {
                     xParams.put(k, originalExtraParams.get(k));
+                }
+                else {
+                	LOGGER.warning("Se ignorara el siguiente parametro por no estar soportado para la firma de FacturaE: " + k); //$NON-NLS-1$
                 }
             }
         }
