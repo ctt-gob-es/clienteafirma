@@ -45,7 +45,7 @@ public final class SimpleKeyStoreManager {
 
         if (dnie) {
             try {
-            	getKeyStoreManager(AOKeyStore.DNIEJAVA, parent);
+            	return getKeyStoreManager(AOKeyStore.DNIEJAVA, parent);
             }
             catch(final SmartCardLockedException e) {
             	AOUIFactory.showErrorMessage(
