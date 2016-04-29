@@ -374,10 +374,20 @@ public final class Utils {
             if (format.equals(AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED) && mode.equals(AOSignConstants.SIGN_MODE_EXPLICIT)) {
                 throw new UnsupportedOperationException("El formato Enveloped es incompatible con el modo de firma explicito"); //$NON-NLS-1$
             }
-            if (format.equals(AOSignConstants.SIGN_FORMAT_XADES_EXTERNALLY_DETACHED) && uri == null && externallyDetachedHashAlgorithm == null) {
-                throw new UnsupportedOperationException(
-            		"La firma XML Externally Detached necesita un Message Digest precalculado o una URI accesible" //$NON-NLS-1$
-                );
+            if (format.equals(AOSignConstants.SIGN_FORMAT_XADES_EXTERNALLY_DETACHED)) {
+            	if ( uri == null && externallyDetachedHashAlgorithm == null) {
+            		throw new UnsupportedOperationException(
+            				"La firma XML Externally Detached necesita un Message Digest precalculado o una URI accesible" //$NON-NLS-1$
+            				);
+            	}
+            }
+            else {
+            	if (uri != null) {
+            		LOGGER.warning("Se ignorara el parametro 'uri' ya que este solo se utiliza con el formato " + AOSignConstants.SIGN_FORMAT_XADES_EXTERNALLY_DETACHED); //$NON-NLS-1$
+            	}
+            	if (externallyDetachedHashAlgorithm != null) {
+            		LOGGER.warning("Se ignorara el parametro 'precalculatedHashAlgorithm' ya que este solo se utiliza con el formato " + AOSignConstants.SIGN_FORMAT_XADES_EXTERNALLY_DETACHED); //$NON-NLS-1$
+            	}
             }
             if (!format.equals(AOSignConstants.SIGN_FORMAT_XADES_DETACHED) && !format.equals(AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED)
                 && !format.equals(AOSignConstants.SIGN_FORMAT_XADES_ENVELOPING)
