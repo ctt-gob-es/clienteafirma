@@ -47,12 +47,13 @@ import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.Platform;
 
 /** Clase para la lectura y env&iacute;o de datos a URL remotas.
- * @author Carlos Gamuci. */
+ * @author Carlos Gamuci.
+ * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
 public class UrlHttpManagerImpl implements UrlHttpManager {
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
-	private static final String JAVA_PARAM_ENABLE_SSL_CHECKS = "enableSslChecks"; //$NON-NLS-1$
+	private static final String JAVA_PARAM_DISABLE_SSL_CHECKS = "disableSslChecks"; //$NON-NLS-1$
 
 	/** Tiempo de espera por defecto para descartar una conexi&oacute;n HTTP. */
 	public static final int DEFAULT_TIMEOUT = -1;
@@ -108,7 +109,7 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 			return InetAddress.getByName(url.getHost()).isLoopbackAddress();
 		}
 		catch (final Exception e) {
-			// La direccion local siempre es conocida
+			LOGGER.warning("Error comprobando si una URL es el bucle local: " + e); //$NON-NLS-1$
 			return false;
 		}
 	}
@@ -157,9 +158,9 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 
 		final URL uri = new URL(request != null ? request : url);
 
-		final boolean enableSSLChecks = Boolean.getBoolean(JAVA_PARAM_ENABLE_SSL_CHECKS);
+		final boolean disableSSLChecks = Boolean.getBoolean(JAVA_PARAM_DISABLE_SSL_CHECKS);
 
-		if (!enableSSLChecks && uri.getProtocol().equals(HTTPS)) {
+		if (disableSSLChecks && uri.getProtocol().equals(HTTPS)) {
 			try {
 				disableSslChecks();
 			}
@@ -225,7 +226,7 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 		final byte[] data = AOUtil.getDataFromInputStream(is);
 		is.close();
 
-		if (!enableSSLChecks && uri.getProtocol().equals(HTTPS)) {
+		if (disableSSLChecks && uri.getProtocol().equals(HTTPS)) {
 			enableSslChecks();
 		}
 
@@ -266,8 +267,6 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 			}
 		);
 	}
-
-
 
 	/** Devuelve un KeyManager a utilizar cuando se desea deshabilitar las comprobaciones de certificados en las conexiones SSL.
 	 * @return KeyManager[] Se genera un KeyManager[] utilizando el keystore almacenado en las propiedades del sistema.
