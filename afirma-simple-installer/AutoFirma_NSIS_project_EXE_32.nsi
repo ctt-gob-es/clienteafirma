@@ -76,7 +76,6 @@ XPStyle on
 
 /*
 	Declaracion de variables a usar
-	
 */
 # tambien comprobamos los distintos
 ; tipos de comentarios que nos permite este lenguaje de script
