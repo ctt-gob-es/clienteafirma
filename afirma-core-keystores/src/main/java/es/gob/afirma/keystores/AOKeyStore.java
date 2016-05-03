@@ -10,6 +10,8 @@
 
 package es.gob.afirma.keystores;
 
+import java.util.logging.Logger;
+
 import javax.security.auth.callback.PasswordCallback;
 
 import es.gob.afirma.keystores.callbacks.CachePasswordCallback;
@@ -198,13 +200,11 @@ public enum AOKeyStore {
      * @param name Nombre del repositorio que se desea recuperar.
      * @return KeyStore Repositorio de certificados. */
     public static AOKeyStore getKeyStore(final String name) {
-    	if (name == null) {
-    		return null;
+    	try {
+    		return AOKeyStore.valueOf(name.trim());
     	}
-        for (final AOKeyStore tempKs : AOKeyStore.values()) {
-            if (tempKs.getName().equalsIgnoreCase(name.trim())) {
-                return tempKs;
-            }
+    	catch (final Exception e) {
+    		Logger.getLogger("es.gob.afirma").warning("Almacen de claves no reconocido: " + name); //$NON-NLS-1$ //$NON-NLS-2$
         }
         return null;
     }
