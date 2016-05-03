@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
+import java.util.logging.Logger;
 
 import es.gob.afirma.keystores.filters.rfc.KeyUsageFilter;
 import es.gob.afirma.keystores.filters.rfc.RFC2254CertificateFilter;
@@ -73,6 +74,8 @@ public final class CertFilterManager {
 		FILTER_TYPE_KEYUSAGE_DECIPHER_ONLY
 	};
 
+	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+	
 	private boolean mandatoryCertificate = false;
 
 	private final List<CertificateFilter> filters = new ArrayList<CertificateFilter>();
@@ -185,6 +188,9 @@ public final class CertFilterManager {
 			}
 			else if (filter.toLowerCase().startsWith(FILTER_TYPE_PSEUDONYM)) {
 				filtersList.add(new PseudonymFilter());
+			}
+			else {
+				LOGGER.warning("Se omitira el filtro '" + filter + "' por no estar reconocido"); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		}
 
