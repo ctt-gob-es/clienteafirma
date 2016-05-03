@@ -508,9 +508,13 @@ public final class MozillaKeyStoreUtilities {
 					.newInstance(new ByteArrayInputStream(p11NSSConfigFile.getBytes()));
 		}
 		catch (final Exception e) {
+
 			// No se ha podido cargar el proveedor sin precargar las dependencias
 			// Cargamos las dependencias necesarias para la correcta carga
 			// del almacen (en Mac se crean enlaces simbolicos)
+
+			LOGGER.info("NSS necesita una precarga o tratamiento de sus dependencias: " + e); //$NON-NLS-1$
+
 			if (Platform.OS.MACOSX.equals(Platform.getOS())) {
 				MozillaKeyStoreUtilitiesOsX.configureMacNSS(nssDirectory);
 			}
