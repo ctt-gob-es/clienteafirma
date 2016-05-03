@@ -10,10 +10,21 @@
 
 package es.gob.afirma.core.misc;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.logging.Logger;
 import java.util.zip.ZipFile;
+
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+
+import org.xml.sax.ErrorHandler;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
+import org.xml.sax.XMLReader;
 
 /** Clase con m&eacute;todos para el trabajo con ficheros. */
 public final class AOFileUtils {
@@ -94,4 +105,43 @@ public final class AOFileUtils {
 		return new String(shortPathArray);
 	}
 
+	/**
+	 * Comprueba si los datos proporcionados son un XML v&aacute;lido.
+	 * @param data Datos a evaluar.
+	 * @return {@code true} cuando los datos son un XML bien formado. {@code false}
+	 * en caso contrario.
+	 */
+    public static boolean isXML(final byte[] data) {
+
+    	final SAXParserFactory factory = SAXParserFactory.newInstance();
+    	factory.setValidating(false);
+    	factory.setNamespaceAware(true);
+
+    	try {
+    		final SAXParser parser = factory.newSAXParser();
+    		final XMLReader reader = parser.getXMLReader();
+    		reader.setErrorHandler(new ErrorHandler() {
+				@Override
+				public void warning(final SAXParseException e) throws SAXException {
+					log(e);
+				}
+				@Override
+				public void fatalError(final SAXParseException e) throws SAXException {
+					log(e);
+				}
+				@Override
+				public void error(final SAXParseException e) throws SAXException {
+					log(e);
+				}
+				private void log(final Exception e) {
+					Logger.getLogger("es.gob.afirma").warning("El documento no es un XML: " + e); //$NON-NLS-1$ //$NON-NLS-2$
+				}
+			});
+    		reader.parse(new InputSource(new ByteArrayInputStream(data)));
+    	}
+    	catch (final Exception e) {
+    		return false;
+    	}
+    	return true;
+    }
 }

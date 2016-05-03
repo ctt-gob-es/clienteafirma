@@ -41,7 +41,6 @@ import javax.xml.crypto.dsig.spec.XPathFilter2ParameterSpec;
 import javax.xml.crypto.dsig.spec.XPathFilterParameterSpec;
 import javax.xml.crypto.dsig.spec.XPathType;
 import javax.xml.crypto.dsig.spec.XPathType.Filter;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.OutputKeys;
 
 import org.w3c.dom.Document;
@@ -52,6 +51,7 @@ import org.w3c.dom.ls.DOMImplementationLS;
 import org.w3c.dom.ls.LSOutput;
 import org.w3c.dom.ls.LSSerializer;
 
+import es.gob.afirma.core.misc.AOFileUtils;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.signers.AOSignConstants;
@@ -545,14 +545,11 @@ public final class Utils {
         // Ahora escribimos el XML usando XALAN
         writeXMLwithXALAN(writer, node, xmlEncoding);
 
-        try {
-            DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
-        }
-        catch (final Exception e) {
+        if (!AOFileUtils.isXML(baos.toByteArray())) {
             LOGGER.severe(
-        		"No se ha podido recargar el XML para insertar los atributos de la cabecera, quizas la codificacion se vea afectada: " + e //$NON-NLS-1$
+        		"No se ha podido recargar el XML para insertar los atributos de la cabecera, quizas la codificacion se vea afectada." //$NON-NLS-1$
     		);
-            return baos.toByteArray();
+        	return baos.toByteArray();
         }
 
         // Y devolvemos el resultado como array de bytes, insertando antes la

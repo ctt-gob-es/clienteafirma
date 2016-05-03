@@ -10,17 +10,11 @@
 
 package es.gob.afirma.core.misc;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.util.Properties;
 import java.util.logging.Logger;
-
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.xml.sax.SAXException;
 
 
 /** M&eacute;todos de utilidad para la gesti&oacute;n de MimeType y OID
@@ -184,16 +178,9 @@ public final class MimeHelper {
         	// Si no hubo analisis inicial o este indico que los datos son XML, comprobamos
             // si los datos son XML en realidad
             if (this.mimeInfo == null || "text/xml".equals(this.mimeType)) { //$NON-NLS-1$
-            	try {
-            		DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new ByteArrayInputStream(this.data));
+            	if (AOFileUtils.isXML(this.data)) {
             		this.mimeType = "text/xml"; //$NON-NLS-1$
             	}
-            	catch (final ParserConfigurationException e) {
-            		LOGGER.severe("No se ha podido crear un DocumentBuilder XML, no se comprobara si es XML: " + e); //$NON-NLS-1$
-            	}
-            	catch (final SAXException e) {
-            		// Ignoramos, es porque no es XML
-				}
             }
 
             // Cuando el MimeType sea el de un fichero ZIP o el de Microsoft Word, comprobamos si es en
@@ -217,17 +204,11 @@ public final class MimeHelper {
 
         String extension = null;
 
-        // Probamos a pasear los datos como si fuesen un XML, si no lanzan
-        // una excepcion, entonces son datos XML.
-        try {
-            DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new ByteArrayInputStream(this.data));
+        // Comprobamossi los datos son XML, si no, los parseamos
+        if (AOFileUtils.isXML(this.data)) {
             extension = "xml"; //$NON-NLS-1$
         }
-        catch (final Exception e) {
-         // Ignoramos, es porque no es XML
-        }
-
-        if (extension == null && this.mimeInfo != null) {
+        else if (this.mimeInfo != null) {
             extension = this.mimeInfo.getExtension();
         }
 
@@ -295,5 +276,4 @@ public final class MimeHelper {
         /** Descripci&oacute;n del tipo de datos. */
         private String description = null;
     }
-
 }

@@ -1,14 +1,12 @@
 package es.gob.afirma.triphase.signer.processors;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
 import java.util.Properties;
 
-import javax.xml.parsers.DocumentBuilderFactory;
-
 import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.misc.AOFileUtils;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.signers.TriphaseData;
@@ -194,7 +192,7 @@ public final class AutoTriPhasePreProcessor implements TriPhasePreProcessor {
 			return AOSignConstants.SIGN_FORMAT_FACTURAE;
 		}
 		// Otro XML siempre con XAdES
-		if (isXML(data)) {
+		if (AOFileUtils.isXML(data)) {
 			return AOSignConstants.SIGN_FORMAT_XADES;
 		}
 		// En cualquier otro caso, CAdES
@@ -225,18 +223,4 @@ public final class AutoTriPhasePreProcessor implements TriPhasePreProcessor {
             return false;
         }
     }
-
-    /** Comprueba si los datos introducidos se corresponden a un fichero XML.
-     * @param data Datos a analizar.
-     * @return Devuelve {@code true} si los datos son XML. */
-    private static boolean isXML(final byte[] data) {
-        try {
-            DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new ByteArrayInputStream(data));
-        }
-        catch(final Exception e) {
-            return false;
-        }
-        return true;
-    }
-
 }

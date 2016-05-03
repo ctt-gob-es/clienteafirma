@@ -10,10 +10,7 @@
 
 package es.gob.afirma.miniapplet;
 
-import java.io.ByteArrayInputStream;
-
-import javax.xml.parsers.DocumentBuilderFactory;
-
+import es.gob.afirma.core.misc.AOFileUtils;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.AOSignerFactory;
@@ -30,13 +27,7 @@ final class DataAnalizerUtil {
      * @param data Datos a analizar.
      * @return Devuelve {@code true} si los datos son XML. */
     public static boolean isXML(final byte[] data) {
-        try {
-            DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new ByteArrayInputStream(data));
-        }
-        catch(final Exception e) {
-            return false;
-        }
-        return true;
+    	return AOFileUtils.isXML(data);
     }
 
     /** Comprueba si los datos introducidos se corresponden a un fichero PDF.
