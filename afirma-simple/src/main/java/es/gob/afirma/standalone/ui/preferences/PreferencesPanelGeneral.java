@@ -23,8 +23,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyListener;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -528,12 +526,11 @@ final class PreferencesPanelGeneral extends JPanel {
 				JOptionPane.DEFAULT_OPTION
 		) == JOptionPane.OK_OPTION) {
 
-
 			if (proxyDlg.isProxySelected()) {
 				final String host = proxyDlg.getHost();
 				final String port = proxyDlg.getPort();
 
-				if(host == null || host == "" || !isValidHost(host)) { //$NON-NLS-1$
+				if(host == null || host == "") { //$NON-NLS-1$
 					AOUIFactory.showErrorMessage(
 						null,
 						SimpleAfirmaMessages.getString("ProxyDialog.1"), //$NON-NLS-1$
@@ -568,14 +565,4 @@ final class PreferencesPanelGeneral extends JPanel {
 			);
     	}
     }
-
-    @SuppressWarnings("unused")
-	private static boolean isValidHost(final String host) {
-    	try {
-			new URL(host);
-		} catch (final MalformedURLException e) {
-			return false;
-		}
-		return true;
-	}
 }

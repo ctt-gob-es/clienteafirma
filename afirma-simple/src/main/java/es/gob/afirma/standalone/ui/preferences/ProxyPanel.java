@@ -23,6 +23,7 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.text.AbstractDocument;
 import javax.swing.text.AttributeSet;
@@ -66,9 +67,9 @@ final class ProxyPanel extends JPanel{
 		return this.usernameProxy.getText();
 	}
 
-	private final JTextField passwordProxy = new JTextField();
+	private final JPasswordField passwordProxy = new JPasswordField();
 	String getPassword() {
-		return this.passwordProxy.getText();
+		return this.passwordProxy.getPassword().toString();
 	}
 
 	private final JCheckBox proxyCheckBox = new JCheckBox(
