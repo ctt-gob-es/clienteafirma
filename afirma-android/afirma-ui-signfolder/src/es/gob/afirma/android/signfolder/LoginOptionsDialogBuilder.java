@@ -3,14 +3,18 @@ package es.gob.afirma.android.signfolder;
 import java.net.URL;
 import java.util.Collections;
 import java.util.List;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
+import android.content.DialogInterface.OnShowListener;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.Button;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.EditText;
+import android.widget.ListView;
 import es.gob.afirma.android.signfolder.proxy.AppPreferences;
 
 final class LoginOptionsDialogBuilder {
@@ -18,128 +22,122 @@ final class LoginOptionsDialogBuilder {
 	private final LoginOptionsListener listener;
 
 	private final AlertDialog.Builder builder;
-	
-	private AlertDialog alertDialog;
 
-	private final View v;
-		
+	private final AlertDialog alertDialog;
+	AlertDialog getAlertDialog() {
+		return this.alertDialog;
+	}
+
 	private CharSequence[] items;
-	
+	CharSequence[] getItems() {
+		return this.items;
+	}
+
 	private int selectedServer;
+	int getSelectedServer() {
+		return this.selectedServer;
+	}
+	void setSelectedServer(final int s) {
+		this.selectedServer = s;
+	}
 
 	LoginOptionsDialogBuilder(final Activity activity, final LoginOptionsListener listener) {
-		
+
 		this.listener = listener;
 		this.builder = new AlertDialog.Builder(activity);
 		this.selectedServer = 0;
+		final LayoutInflater inflater = activity.getLayoutInflater();
 
-		boolean empty = true;
-		
 		final List<String> servers = AppPreferences.getServersList();
 		Collections.sort(servers);
-		if (servers.size() > 0 ) {
+		if (!servers.isEmpty()) {
 			this.items = servers.toArray(new CharSequence[servers.size()]);
 			if (servers.indexOf(AppPreferences.getAliasProxy()) != -1) {
 				this.selectedServer = servers.indexOf(AppPreferences.getAliasProxy());
 			}
 			else {
 				saveProxyConfig(
-					items[this.selectedServer].toString(), 
-					AppPreferences.getServerUrl(items[this.selectedServer].toString())
+					this.items[this.selectedServer].toString(),
+					AppPreferences.getServerUrl(this.items[this.selectedServer].toString())
 				);
 			}
-			empty = false;
-		}
-		
-		// Establecemos el layout del dialogo
-		final LayoutInflater inflater = activity.getLayoutInflater();
-		this.v = inflater.inflate(R.layout.dialog_server_new, null);
-		
-		if (empty) {
-			this.builder.setTitle(R.string.server_select);
-			this.builder.setMessage(R.string.dialog_server_new_info);
-			this.builder.setPositiveButton(R.string.dialog_server_new_button,
-				new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(final DialogInterface dialog, final int which) {						
-						addServer(activity, inflater);
-					}
-				}
-			);
-
-			this.builder.setNegativeButton(R.string.cancel, null);
-		}
-		else {
-			this.builder.setSingleChoiceItems(items, selectedServer, new OnClickListener() {
+			this.builder.setCustomTitle(inflater.inflate(R.layout.dialog_server_title, null));
+			this.builder.setSingleChoiceItems(this.items, this.selectedServer, new OnClickListener() {
 		        @Override
-		        public void onClick(DialogInterface d, int n) {
-		        	selectedServer = n;
+		        public void onClick(final DialogInterface d, final int n) {
+		        	setSelectedServer(n);
 		        }
 			});
-			
-			final Button newButton = (Button) this.v.findViewById(R.id.dialog_server_new_button);
-			newButton.setOnClickListener(
-				new View.OnClickListener() {
-					@Override
-					public void onClick(final View v) {
-						addServer(activity, inflater);
-					}
+		}
+		else {
+			this.builder.setTitle(R.string.server_select);
+			this.builder.setMessage(R.string.dialog_server_new_info);
+		}
+
+		this.builder.setPositiveButton(R.string.ok,
+			new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(final DialogInterface dialog, final int which) {
+					saveProxyConfig(
+							getItems()[getSelectedServer()].toString(),
+						AppPreferences.getServerUrl(getItems()[getSelectedServer()].toString())
+					);
 				}
-			);
-			
-			final Button editButton = (Button) this.v.findViewById(R.id.dialog_server_edit_button);
-			editButton.setOnClickListener(
-				new View.OnClickListener() {
-					@Override
-					public void onClick(final View v) {
-						editServer(
-							activity, 
-							inflater, 
-							items[selectedServer].toString(), 
-							AppPreferences.getServerUrl(items[selectedServer].toString())
-						);
-					}
-				}
-			);
-	
-			if (servers.size() < 2) {
-				((View) this.v.findViewById(R.id.dialog_server_line)).setVisibility(View.GONE);
 			}
-			
-			this.builder.setView(this.v);
-			this.builder.setCustomTitle((View) inflater.inflate(R.layout.dialog_server_title, null));
-			
-			this.builder.setPositiveButton(R.string.ok,
+		);
+
+		this.builder.setNeutralButton(R.string.dialog_server_new_button,
 				new DialogInterface.OnClickListener() {
 					@Override
-					public void onClick(final DialogInterface dialog, final int which) {						
-						saveProxyConfig(
-							items[selectedServer].toString(), 
-							AppPreferences.getServerUrl(items[selectedServer].toString())
-						);
+					public void onClick(final DialogInterface dialog, final int which) {
+						addServer(activity, inflater);
 					}
-				}
-			);
-	
-			this.builder.setNegativeButton(R.string.cancel, null);
+			}
+		);
+		this.builder.setNegativeButton(R.string.cancel, null);
+		this.alertDialog = this.builder.create();
+
+		if (!servers.isEmpty()) {
+			this.alertDialog.setOnShowListener(new OnShowListener()
+			{
+			    @Override
+			public void onShow(final DialogInterface dialog)
+			{
+			        final ListView lv = getAlertDialog().getListView();
+			        lv.setOnItemLongClickListener(new OnItemLongClickListener()
+			    {
+			    @Override
+			    public boolean onItemLongClick(final AdapterView<?> parent, final View view, final int position, final long id)
+			    {
+			    	editServer(
+		    			activity,
+		    			inflater,
+		    			getItems()[position].toString(),
+		    			AppPreferences.getServerUrl(getItems()[position].toString())
+			    	);
+					return true;
+			    }
+			    });
+			}
+			});
 		}
 	}
 
-	private void addServer(final Activity act, final LayoutInflater inflater) {
+	void addServer(final Activity act, final LayoutInflater inflater) {
 		final AlertDialog.Builder builder = new AlertDialog.Builder(act);
 		final View view = inflater.inflate(R.layout.dialog_add_server, null);
-		
+
 		final EditText alias = (EditText) view.findViewById(R.id.alias);
 		final EditText url = (EditText) view.findViewById(R.id.url);
 		alias.requestFocus();
-		
+
 		builder.setView(view);
 		builder.setTitle(R.string.dialog_add_server_title);
 		builder.setPositiveButton(R.string.ok,
 			new DialogInterface.OnClickListener() {
 				@Override
 				public void onClick(final DialogInterface dialog, final int which) {
-					if (alias != null && !alias.getText().toString().trim().isEmpty()
+					if (!alias.getText().toString().trim().isEmpty()
 						&& url != null && !url.getEditableText().toString().trim().isEmpty()) {
 						try {
 							new URL(url.getEditableText().toString()).toString();
@@ -149,14 +147,14 @@ final class LoginOptionsDialogBuilder {
 							return;
 						}
 						AppPreferences.setServer(alias.getText().toString(), url.getEditableText().toString());
-						alertDialog.dismiss();
-						final LoginOptionsDialogBuilder dialogBuilder = new LoginOptionsDialogBuilder(act, listener);
+						getAlertDialog().dismiss();
+						final LoginOptionsDialogBuilder dialogBuilder = new LoginOptionsDialogBuilder(act, getListener());
 						dialogBuilder.show();
 					}
 					else{
 						getListener().onErrorLoginOptions(act.getString(R.string.dialog_server_empty_fields));
 					}
-					
+
 				}
 			}
 		);
@@ -164,25 +162,25 @@ final class LoginOptionsDialogBuilder {
 		builder.setNegativeButton(R.string.cancel, null);
 		builder.show();
 	}
-	
-	private void editServer(final Activity act, final LayoutInflater inflater, final String alias, final String url) {
+
+	void editServer(final Activity act, final LayoutInflater inflater, final String alias, final String url) {
 		final AlertDialog.Builder builder = new AlertDialog.Builder(act);
 		final View view = inflater.inflate(R.layout.dialog_add_server, null);
-		
+
 		final EditText newAlias = (EditText) view.findViewById(R.id.alias);
 		final EditText newUrl = (EditText) view.findViewById(R.id.url);
 		newAlias.setText(alias);
 		newAlias.requestFocus();
 		newUrl.setText(url);
-		
+
 		builder.setView(view);
 		builder.setTitle(R.string.dialog_edit_server_title);
 		builder.setPositiveButton(R.string.ok,
 			new DialogInterface.OnClickListener() {
 				@Override
 				public void onClick(final DialogInterface dialog, final int which) {
-					if (newAlias != null && !newAlias.getText().toString().trim().isEmpty()
-						&& newUrl != null && !newUrl.getEditableText().toString().trim().isEmpty()) {
+					if (!newAlias.getText().toString().trim().isEmpty()
+						&& !newUrl.getEditableText().toString().trim().isEmpty()) {
 						try {
 							new URL(newUrl.getEditableText().toString()).toString();
 						}
@@ -193,15 +191,15 @@ final class LoginOptionsDialogBuilder {
 						AppPreferences.setServer(newAlias.getText().toString(), newUrl.getEditableText().toString());
 						if (AppPreferences.getAliasProxy().equals(alias)) {
 							saveProxyConfig(
-								newAlias.getText().toString(), 
+								newAlias.getText().toString(),
 								newUrl.getText().toString()
 							);
 						}
 						if (!newAlias.getText().toString().equals(alias)) {
 							AppPreferences.removeServer(alias);
 						}
-						alertDialog.dismiss();
-						final LoginOptionsDialogBuilder dialogBuilder = new LoginOptionsDialogBuilder(act, listener);
+						getAlertDialog().dismiss();
+						final LoginOptionsDialogBuilder dialogBuilder = new LoginOptionsDialogBuilder(act, getListener());
 						dialogBuilder.show();
 					}
 					else {
@@ -218,16 +216,16 @@ final class LoginOptionsDialogBuilder {
 				if (AppPreferences.getAliasProxy().equals(alias)) {
 					AppPreferences.removeProxyConfig();
 				}
-				
+
 				AppPreferences.removeServer(alias);
-				alertDialog.dismiss();
-				final LoginOptionsDialogBuilder dialogBuilder = new LoginOptionsDialogBuilder(act, listener);
+				getAlertDialog().dismiss();
+				final LoginOptionsDialogBuilder dialogBuilder = new LoginOptionsDialogBuilder(act, getListener());
 				dialogBuilder.show();
 			}
 		});
 		builder.show();
 	}
-	
+
 	LoginOptionsListener getListener() {
 		return this.listener;
 	}
@@ -241,7 +239,7 @@ final class LoginOptionsDialogBuilder {
 	}
 
 	public void show() {
-		this.alertDialog = this.builder.show();
+		this.alertDialog.show();
 	}
 
 	/**

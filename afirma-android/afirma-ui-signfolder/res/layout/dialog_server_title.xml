@@ -10,6 +10,7 @@
         android:layout_height="wrap_content"
         android:paddingBottom="20dp"
         android:paddingLeft="20dp"
+        android:paddingRight="20dp"
         android:paddingTop="20dp"
         android:text="@string/server_select"
         android:textAppearance="?android:attr/textAppearanceLarge"
@@ -22,6 +23,7 @@
         android:layout_height="wrap_content"
         android:paddingBottom="20dp"
         android:paddingLeft="20dp"
+        android:paddingRight="20dp"
         android:text="@string/dialog_server_new_subtitle"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 

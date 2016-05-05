@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="es.gob.afirma.android.signfolder"
     android:versionCode="4"
-    android:versionName="1.3" >
+    android:versionName="1.2.2" >
 
     <uses-sdk
         android:minSdkVersion="14"

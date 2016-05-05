@@ -2,7 +2,7 @@
 <resources>
 
     <string name="app_name">Port@firmas</string>
-    <string name="app_title">Port@firmas v1.3</string>
+    <string name="app_title">Port@firmas v1.2.2</string>
     <string name="close">Cerrar</string>
     <string name="error">Error</string>
 	<string name="server_select">Servidores Portafirmas</string>
@@ -125,6 +125,7 @@
     <string name="ok">Aceptar</string>
     <string name="cancel">Cancelar</string>
     <string name="allow">Permitir</string>
+    <string name="select">Seleccionar</string>
     
     <string name="dialog_msg_accessing_keystore">Accediendo al almac\u00E9n\u002E\u002E\u002E</string>
     <string name="dialog_msg_authenticating">Autenticando usuario\u002E\u002E\u002E</string>
@@ -159,7 +160,6 @@
    	<string name="dialog_msg_confirm_approve">Se va a proceder a aprobar esta petici\u00F3n. \u00BFDesea continuar? </string>
 
    	<string name="dialog_server_new_button">Nuevo servidor</string>
-   	<string name="dialog_server_edit_button">Editar servidor</string>
    	<string name="dialog_server_delete_button">Eliminar</string>
    	<string name="dialog_server_empty_fields">No puede haber campos vac\u00EDos</string>
    	<string name="dialog_server_new_info"><html>No hay servidores almacenados, pulse el bot\u00F3n <i>Nuevo servidor </i> para crear uno.</html></string>
@@ -168,7 +168,7 @@
    	<string name="dialog_add_server_urlLabel">URL</string>
    	<string name="dialog_add_server_title">Nuevo servidor de Portafirmas</string>
    	<string name="dialog_edit_server_title">Editar servidor Portafirmas</string>
-   	<string name="dialog_server_new_subtitle">Seleccione el servidor del Portafimas</string>
+   	<string name="dialog_server_new_subtitle">Seleccione el servidor del Portafimas. Mantenga pulsado para editar el servidor.</string>
    	
     <string name="security_code">C\u00F3digo de seguridad</string>
 	<string name="security_code_hint">C\u00F3digo de seguridad. </string>
