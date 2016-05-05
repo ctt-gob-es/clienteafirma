@@ -175,8 +175,11 @@ final class ProxyPanel extends JPanel{
 				public void actionPerformed(final ActionEvent e) {
 					LOGGER.info("verificar"); //$NON-NLS-1$
 					ProxyPanel.this.setCursor(new Cursor(Cursor.WAIT_CURSOR));
-
-					if(testConnection(ProxyPanel.this.getHost(), ProxyPanel.this.getPort())){
+					String host = ProxyPanel.this.getHost();
+					if (!host.startsWith("http")) { //$NON-NLS-1$
+						host = "http://" + host; //$NON-NLS-1$
+					}
+					if(testConnection(host, ProxyPanel.this.getPort())){
 						LOGGER.info("Conexion proxy correcta"); //$NON-NLS-1$
 						AOUIFactory.showMessageDialog(
 							getParent(),
