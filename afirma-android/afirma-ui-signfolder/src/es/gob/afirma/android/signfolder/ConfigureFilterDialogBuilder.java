@@ -126,7 +126,7 @@ final class ConfigureFilterDialogBuilder {
 					value = null;
 				}
 				try {
-					FilterConfig.class.getMethod(methodName, String.class)
+					 getFilterConfig().getClass().getDeclaredMethod(methodName, String.class)
 					.invoke(getFilterConfig(), value);
 				} catch (final Exception e) {
 					Log.w(SFConstants.LOG_TAG, "No se ha podido configurar el valor del filtro con el metodo: " + methodName); //$NON-NLS-1$
@@ -159,7 +159,7 @@ final class ConfigureFilterDialogBuilder {
 						final StringBuilder dateText = new StringBuilder();
 						dateText.append(dayOfMonth).append("/").append(monthOfYear + 1).append("/").append(year); //$NON-NLS-1$ //$NON-NLS-2$
 						try {
-							FilterConfig.class.getMethod(methodName, String.class)
+							getFilterConfig().getClass().getDeclaredMethod(methodName, String.class)
 							.invoke(getFilterConfig(), dateText.toString());
 						} catch (final Exception e) {
 							Log.w(SFConstants.LOG_TAG, "No se ha podido configurar el valor del filtro con el metodo: " + methodName); //$NON-NLS-1$
@@ -186,7 +186,7 @@ final class ConfigureFilterDialogBuilder {
 
 				textView.setText(""); //$NON-NLS-1$
 				try {
-					FilterConfig.class.getMethod(methodName, String.class)
+					getFilterConfig().getClass().getDeclaredMethod(methodName, String.class)
 					.invoke(getFilterConfig(), (String) null);
 				} catch (final Exception e) {
 					Log.w(SFConstants.LOG_TAG, "No se ha podido configurar el comportamiento del boton de borrado con el metodo: " + methodName); //$NON-NLS-1$
@@ -204,7 +204,7 @@ final class ConfigureFilterDialogBuilder {
 			public void onItemSelected(final AdapterView<?> spnr, final View arg1, final int position, final long arg3) {
 
 				try {
-					FilterConfig.class.getMethod(methodName, String.class)
+					getFilterConfig().getClass().getDeclaredMethod(methodName, String.class)
 					.invoke(getFilterConfig(), ((KeyValuePair) spnr.getItemAtPosition(position)).getKey());
 				}
 				catch (final Exception e) {
@@ -405,7 +405,7 @@ final class ConfigureFilterDialogBuilder {
 	    	}
 
     		try {
-				FilterConfig.class.getMethod("setEnabled", Boolean.TYPE) //$NON-NLS-1$
+    			getFilterConfig().getClass().getDeclaredMethod("setEnabled", Boolean.TYPE) //$NON-NLS-1$
 				.invoke(getFilterConfig(), Boolean.valueOf(checked));
 			} catch (final Exception e) {
 				Log.w(SFConstants.LOG_TAG, "No se ha podido configurar el valor de la propiedad de activacion de filtros"); //$NON-NLS-1$
