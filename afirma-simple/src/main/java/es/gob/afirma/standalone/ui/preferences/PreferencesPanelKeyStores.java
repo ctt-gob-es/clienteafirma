@@ -253,7 +253,7 @@ final class PreferencesPanelKeyStores extends JPanel {
 		PreferencesManager.putBoolean(PREFERENCE_KEYSTORE_ALIAS_ONLY_CERTS, this.onlyAlias.isSelected());
 		PreferencesManager.put(
 			PREFERENCE_KEYSTORE_DEFAULT_STORE,
-			getDefaultStore().toString()
+			getDefaultStore().name()
 		);
 	}
 }
