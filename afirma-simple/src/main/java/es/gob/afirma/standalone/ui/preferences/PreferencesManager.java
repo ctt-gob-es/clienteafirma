@@ -10,6 +10,7 @@
 
 package es.gob.afirma.standalone.ui.preferences;
 
+import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
@@ -307,6 +308,17 @@ public final class PreferencesManager {
 	 * @param key Clave que eliminar. */
 	public static void remove(final String key) {
 		preferences.remove(key);
+	}
+
+	/**
+	 * Elimina todas las preferencias de la aplicaci&oacute;n.
+	 */
+	public static void clearAll() {
+		try {
+			preferences.clear();
+		} catch (final BackingStoreException e) {
+			Logger.getLogger("es.gob.afirma").severe("Error eliminando las preferencias de la aplicacion"); //$NON-NLS-1$ //$NON-NLS-2$
+		}
 	}
 
 	/** Almacena en las preferencias de la aplicaci&oacute;n todos los valores

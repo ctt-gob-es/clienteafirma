@@ -220,7 +220,7 @@ final class PreferencesPanelGeneral extends JPanel {
 			new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent ae) {
-					//Por hacer
+					PreferencesManager.clearAll();
 				}
 			}
 		);
