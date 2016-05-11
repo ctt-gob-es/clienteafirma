@@ -33,7 +33,7 @@ public final class MozillaKeyStoreUtilitiesOsX {
 		// No dejamos instanciar
 	}
 
-	static void configureMacNSS(final String binDir) throws AOException {
+	public static void configureMacNSS(final String binDir) throws AOException {
 
 		if (!Platform.OS.MACOSX.equals(Platform.getOS())) {
 			return;
@@ -84,6 +84,7 @@ public final class MozillaKeyStoreUtilitiesOsX {
 			}
 		}
 		try {
+			
 			final ScriptEngine se = getAppleScriptEngine();
 			if (se != null) {
 				se.eval("do shell script \"" + sb.toString() + "\" with administrator privileges"); //$NON-NLS-1$ //$NON-NLS-2$
