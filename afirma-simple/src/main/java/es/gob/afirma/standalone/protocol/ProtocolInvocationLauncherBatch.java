@@ -79,6 +79,7 @@ final class ProtocolInvocationLauncherBatch {
 		final boolean mandatoryCertificate = filterManager.isMandatoryCertificate();
 		final PrivateKeyEntry pke;
 		try {
+			ServiceInvocationManager.focusApplication();
 			final AOKeyStoreDialog dialog = new AOKeyStoreDialog(
 				ksm,
 				null,

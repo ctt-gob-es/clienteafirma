@@ -19,6 +19,7 @@ final class ProtocolInvocationLauncherSave {
 
 	static String processSave(final UrlParametersToSave  options) {
 		try {
+			ServiceInvocationManager.focusApplication();
 			AOUIFactory.getSaveDataToFile(
 				options.getData(),
 				options.getTitle(),

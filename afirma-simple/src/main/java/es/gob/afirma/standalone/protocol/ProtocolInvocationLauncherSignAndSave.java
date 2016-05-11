@@ -97,6 +97,7 @@ final class ProtocolInvocationLauncherSignAndSave {
 
 			final File selectedDataFile;
 			try {
+				ServiceInvocationManager.focusApplication();
 				selectedDataFile = AOUIFactory.getLoadFiles(
 					dialogTilte,
 					new JFileChooser().getFileSystemView().getDefaultDirectory().toString(),
@@ -243,6 +244,7 @@ final class ProtocolInvocationLauncherSignAndSave {
 		LOGGER.info("Cargando dialogo de seleccion de certificados..."); //$NON-NLS-1$
 
 		try {
+			ServiceInvocationManager.focusApplication();
 			final AOKeyStoreDialog dialog = new AOKeyStoreDialog(
 				ksm,
 				null,

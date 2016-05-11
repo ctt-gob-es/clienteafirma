@@ -1,14 +1,11 @@
 package es.gob.afirma.standalone.protocol;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.BindException;
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
@@ -30,12 +27,14 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLServerSocketFactory;
 import javax.net.ssl.SSLSocket;
+import javax.script.ScriptEngine;
 import javax.swing.Timer;
 
 import es.gob.afirma.core.misc.Base64;
+import es.gob.afirma.keystores.mozilla.MozillaKeyStoreUtilitiesOsX;
 import es.gob.afirma.standalone.AutoFirmaUtil;
 
-final class ServiceInvocationManager {
+public final class ServiceInvocationManager {
 
 	static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
@@ -96,13 +95,44 @@ final class ServiceInvocationManager {
 	private static final String KEY_MANAGER_TYPE = "SunX509"; //$NON-NLS-1$
 	private static final String SSLCONTEXT = "TLS"; //$NON-NLS-1$
 	// timer para cerrar la aplicacion cuando pase un tiempo de inactividad.
-	private final static Timer timer = new Timer(SOCKET_TIMEOUT, new ActionListener(){
-		@Override
-		public void actionPerformed(final ActionEvent evt){
-			LOGGER.warning("Se ha caducado la conexion. Se deja de escuchar en el puerto..."); //$NON-NLS-1$
-			System.exit(-4);
-		}
+	private final static Timer timer = new Timer(SOCKET_TIMEOUT, evt -> {
+		LOGGER.warning("Se ha caducado la conexion. Se deja de escuchar en el puerto..."); //$NON-NLS-1$
+		closeMacService();
+		System.exit(-4);
 	});
+
+	/**
+	 * Mata el proceso de AutoFirma cuando estamos en OS X. En el resto de sistemas
+	 * no hace nada.
+	 */
+	public static void closeMacService() {
+		LOGGER.warning("Ejecuto kill"); //$NON-NLS-1$
+		final String script =
+			"do shell script \""  //$NON-NLS-1$
+			+ "kill -9 $(ps -ef | grep " + idSession + " | awk '{print $2}')"  //$NON-NLS-1$ //$NON-NLS-2$
+			+ "\" " //$NON-NLS-1$
+		;
+		final ScriptEngine se = MozillaKeyStoreUtilitiesOsX.getAppleScriptEngine();
+		try {
+			se.eval(script);
+		} catch (final Exception e) {
+			LOGGER.warning("Fallo kill: " + e); //$NON-NLS-1$
+		}
+	}
+
+	/**
+	 * Coge el foco del sistema en OS X. En el resto del sistemas no hace nada.
+	 */
+	public static void focusApplication() {
+		LOGGER.warning("Cojo el foco de la aplicacion en mac"); //$NON-NLS-1$
+		final String script = "tell me to activate"; //$NON-NLS-1$
+		final ScriptEngine se = MozillaKeyStoreUtilitiesOsX.getAppleScriptEngine();
+		try {
+			se.eval(script);
+		} catch (final Exception e) {
+			LOGGER.warning("Fallo cogiendo el foco en mac: " + e); //$NON-NLS-1$
+		}
+	}
 
 	private final static List<String> request = new ArrayList<>();
 	private final static List<String> toSend = new ArrayList<>();
@@ -312,15 +342,15 @@ final class ServiceInvocationManager {
 
 	/** Intenta realizar una conexi&oacute; por socket en los puertos que se pasan por par&aacute;metro.
 	 * @param ports Puertos a probar.
-	 * @param ssFactory Factoria para la creaci&oacute;n de la conexi&oacute;n por socket.
+	 * @param socket Socket que se intenta conectar.
 	 * @throws IOException Si ocurren errores durante el intento. */
-	private static void tryPorts(final int[] ports, final SSLServerSocketFactory  ssFactory) throws IOException {
+	private static void tryPorts(final int[] ports, final SSLServerSocketFactory  socket) throws IOException {
 
 		checkNullParameter(ports, "La lista de puertos no puede ser nula"); //$NON-NLS-1$
-		checkNullParameter(ssFactory, "El socket servidor no puede ser nulo"); //$NON-NLS-1$
+		checkNullParameter(socket, "El socket servidor no puede ser nulo"); //$NON-NLS-1$
 		for (final int port : ports) {
 			try {
-				ssocket = (SSLServerSocket) ssFactory.createServerSocket(port, 0, InetAddress.getByName(null));
+				ssocket = (SSLServerSocket) socket.createServerSocket(port);
 				LOGGER.info("Establecido el puerto " + port + " para el servicio Cliente @firma"); //$NON-NLS-1$ //$NON-NLS-2$
 				return;
 			}

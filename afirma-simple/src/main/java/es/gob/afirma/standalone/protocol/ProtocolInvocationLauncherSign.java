@@ -80,7 +80,7 @@ final class ProtocolInvocationLauncherSign {
 			}
 		}
 
-		final AOKeyStore aoks = AOKeyStore.getKeyStore(options.getDefaultKeyStore());
+		final AOKeyStore aoks = AOKeyStore.valueOf(options.getDefaultKeyStore());
 		if (aoks == null) {
 			LOGGER.severe("No hay un KeyStore con el nombre: " + options.getDefaultKeyStore()); //$NON-NLS-1$
 			ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_07);
@@ -96,6 +96,7 @@ final class ProtocolInvocationLauncherSign {
 
 			final File selectedDataFile;
 			try {
+				ServiceInvocationManager.focusApplication();
 				selectedDataFile = AOUIFactory.getLoadFiles(
 					dialogTilte,
 					new JFileChooser().getFileSystemView().getDefaultDirectory().toString(),
@@ -240,6 +241,7 @@ final class ProtocolInvocationLauncherSign {
 		LOGGER.info("Cargando dialogo de seleccion de certificados..."); //$NON-NLS-1$
 
 		try {
+			ServiceInvocationManager.focusApplication();
 			final AOKeyStoreDialog dialog = new AOKeyStoreDialog(
 				ksm,
 				null,
