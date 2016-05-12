@@ -8,7 +8,6 @@ import java.io.InputStream;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.MessageDigest;
-import java.security.cert.Certificate;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.logging.Logger;
@@ -106,7 +105,7 @@ final class ConfiguratorMacOSX implements Configurator {
 					new String[] { OSX_GET_USERS_COMMAND }
 				);
 				// Tambien hay que instalar el certificado en el almacen de Apple
-				importCARootOnMacOSXKeyStore(certPack.getCaCertificate());
+				importCARootOnMacOSXKeyStore();
 				ConfiguratorFirefox.addExexPermissionsToFile(new File(mac_script_path));
 				ConfiguratorFirefox.executeScriptMacOsx(mac_script_path, true, true);
 				LOGGER.info("Configuracion de NSS"); //$NON-NLS-1$
@@ -145,13 +144,10 @@ final class ConfiguratorMacOSX implements Configurator {
 		return new File(appConfigDir, KS_FILENAME).exists();
 	}
 
-	/**
-	 * Genera el comando de instalaci&oacute;n del certificado en el almac&eacute;n de apple en el script de instalaci&oacute;n.
-	 * @param cert Certificado a instalar.
+	/** Genera el comando de instalaci&oacute;n del certificado en el almac&eacute;n de apple en el script de instalaci&oacute;n.
 	 * @throws GeneralSecurityException Se produce si hay un problema de seguridad durante el proceso.
-	 * @throws IOException Se produce cuando hay un error en la creaci&oacute;n del fichero.
-	 */
-	static void importCARootOnMacOSXKeyStore(final Certificate cert) throws GeneralSecurityException, IOException {
+	 * @throws IOException Se produce cuando hay un error en la creaci&oacute;n del fichero. */
+	static void importCARootOnMacOSXKeyStore() throws GeneralSecurityException, IOException {
 		final File f = new File(ConfiguratorUtil.getApplicationDirectory() + MACOSX_CERTIFICATE);
 		final String cmd = OSX_SEC_COMMAND.replace(
 			"%KEYCHAIN%", //$NON-NLS-1$
@@ -198,9 +194,11 @@ final class ConfiguratorMacOSX implements Configurator {
 		final byte[] buf = certPfx.getEncoded();
 
 		ksFile = new File(ConfiguratorUtil.getApplicationDirectory() + KS_CER_FILENAME);
-		final FileOutputStream os = new FileOutputStream(ksFile);
-		os.write(buf);
-		os.close();
+		try (
+				final FileOutputStream os = new FileOutputStream(ksFile);
+		) {
+			os.write(buf);
+		}
 
 		final String cmdKs = OSX_SEC_KS_CERT_COMMAND.replace(
 			"%KEYCHAIN%", //$NON-NLS-1$
