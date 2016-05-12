@@ -16,10 +16,17 @@ import java.security.KeyStore;
 import java.security.NoSuchAlgorithmException;
 import java.security.Provider;
 import java.security.Security;
+import java.security.KeyStore.LoadStoreParameter;
+import java.security.KeyStore.ProtectionParameter;
 import java.security.cert.CertificateException;
 import java.util.logging.Logger;
 
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.callback.ConfirmationCallback;
 import javax.security.auth.callback.PasswordCallback;
+
+import es.gob.jmulticard.ui.passwordcallback.gui.DnieCallbackHandler;
 
 final class AOKeyStoreManagerHelperFullJava {
 
@@ -105,18 +112,26 @@ final class AOKeyStoreManagerHelperFullJava {
         }
 
         LOGGER.info("Cargando KeyStore 100% Java para " + store.toString()); //$NON-NLS-1$
-        try {
-			ks.load(null, pssCallBack == null ? null : pssCallBack.getPassword());
-		}
-        catch (final NoSuchAlgorithmException e) {
-        	throw new AOKeyStoreManagerException(
-    			"Error de algoritmo al obtener el almacen 100% Java para " + store.toString() + ": " + e, e  //$NON-NLS-1$ //$NON-NLS-2$
-			);
-		}
-        catch (final CertificateException e) {
+        // La clase DnieCallbackHandler gestiona la peticion para pedir al usuario la informacion necesaria
+		try {
+			ks.load(
+					new LoadStoreParameter() {
+						@Override
+						public ProtectionParameter getProtectionParameter() {
+							return new KeyStore.CallbackHandlerProtection(
+								new DnieCallbackHandler()
+							);
+						}
+					}
+				);
+		} catch (NoSuchAlgorithmException e) {
 			throw new AOKeyStoreManagerException(
-				"Error de certificado al obtener el almacen 100% Java para " + store.toString() + ": " + e, e  //$NON-NLS-1$ //$NON-NLS-2$
-			);
+	    			"Error de algoritmo al obtener el almacen 100% Java para " + store.toString() + ": " + e, e  //$NON-NLS-1$ //$NON-NLS-2$
+				);
+		} catch (CertificateException e) {
+			throw new AOKeyStoreManagerException(
+					"Error de certificado al obtener el almacen 100% Java para " + store.toString() + ": " + e, e  //$NON-NLS-1$ //$NON-NLS-2$
+				);
 		}
 
         return ks;
