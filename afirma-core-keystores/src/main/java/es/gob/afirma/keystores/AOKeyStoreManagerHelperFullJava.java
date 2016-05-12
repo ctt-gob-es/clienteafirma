@@ -13,17 +13,14 @@ package es.gob.afirma.keystores;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.security.KeyStore;
+import java.security.KeyStore.LoadStoreParameter;
+import java.security.KeyStore.ProtectionParameter;
 import java.security.NoSuchAlgorithmException;
 import java.security.Provider;
 import java.security.Security;
-import java.security.KeyStore.LoadStoreParameter;
-import java.security.KeyStore.ProtectionParameter;
 import java.security.cert.CertificateException;
 import java.util.logging.Logger;
 
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.callback.ConfirmationCallback;
 import javax.security.auth.callback.PasswordCallback;
 
 import es.gob.jmulticard.ui.passwordcallback.gui.DnieCallbackHandler;
@@ -49,7 +46,6 @@ final class AOKeyStoreManagerHelperFullJava {
                                                                        IOException {
 		return init(
 			AOKeyStore.CERES,
-			null,
 			parentComponent,
 			PROVIDER_CERES
 		);
@@ -67,7 +63,6 @@ final class AOKeyStoreManagerHelperFullJava {
     		                                                                 IOException {
     	return init(
 			AOKeyStore.DNIEJAVA,
-			pssCallBack,
 			parentComponent,
 			PROVIDER_DNIE
 		);
@@ -75,7 +70,6 @@ final class AOKeyStoreManagerHelperFullJava {
 
 
     private static KeyStore init(final AOKeyStore store,
-    		                     final PasswordCallback pssCallBack,
     		                     final Object parentComponent,
     		                     final String providerClassName) throws AOKeyStoreManagerException,
     		                                                            IOException {
@@ -124,11 +118,11 @@ final class AOKeyStoreManagerHelperFullJava {
 						}
 					}
 				);
-		} catch (NoSuchAlgorithmException e) {
+		} catch (final NoSuchAlgorithmException e) {
 			throw new AOKeyStoreManagerException(
 	    			"Error de algoritmo al obtener el almacen 100% Java para " + store.toString() + ": " + e, e  //$NON-NLS-1$ //$NON-NLS-2$
 				);
-		} catch (CertificateException e) {
+		} catch (final CertificateException e) {
 			throw new AOKeyStoreManagerException(
 					"Error de certificado al obtener el almacen 100% Java para " + store.toString() + ": " + e, e  //$NON-NLS-1$ //$NON-NLS-2$
 				);
