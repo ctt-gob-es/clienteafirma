@@ -13,6 +13,7 @@ package es.gob.afirma.keystores.filters.rfc;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.naming.directory.Attributes;
@@ -122,8 +123,10 @@ public final class RFC2254CertificateFilter extends CertificateFilter {
             return filterRFC2254(f, new LdapName(name));
         }
         catch (final Exception e) {
-            LOGGER.warning(
-        		"No ha sido posible filtrar el certificado (filtro: '" + f + "', nombre: '" + name + "'), no se eliminara del listado: "  + e //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            LOGGER.log(
+            	Level.WARNING,
+        		"No ha sido posible filtrar el certificado (filtro: '" + f + "', nombre: '" + name + "'), no se eliminara del listado: "  + e, //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        		e
     		);
             return true;
         }
@@ -151,11 +154,13 @@ public final class RFC2254CertificateFilter extends CertificateFilter {
             for (final Rdn rdn : rdns) {
                 attrs.put(rdn.getType(), rdn.getValue());
             }
-            return new com.sun.jndi.toolkit.dir.SearchFilter(f).check(attrs);
+            return new SearchFilter(f).check(attrs);
         }
         catch (final Exception e) {
-            LOGGER.warning(
-        		"No ha sido posible filtrar el certificado (filtro: '" + f + "', nombre: '" + name + "'), no se eliminara del listado: " + e //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            LOGGER.log(
+        		Level.WARNING,
+        		"No ha sido posible filtrar el certificado (filtro: '" + f + "', nombre: '" + name + "'), no se eliminara del listado: " + e, //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        		e
     		);
             return true;
         }

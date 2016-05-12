@@ -1,4 +1,4 @@
-package es.gob.afirma.keystores.filters.rfc;
+package es.gob.afirma.keystores.filters;
 
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
@@ -9,6 +9,7 @@ import org.junit.Test;
 import es.gob.afirma.keystores.AOKeyStore;
 import es.gob.afirma.keystores.AOKeyStoreManager;
 import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
+import es.gob.afirma.keystores.filters.rfc.RFC2254CertificateFilter;
 
 /** Pruebas de filtros RFC 2254.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */

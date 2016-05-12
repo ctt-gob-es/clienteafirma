@@ -1,4 +1,4 @@
-package es.gob.afirma.keystores.filters.rfc;
+package es.gob.afirma.keystores.filters;
 
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
