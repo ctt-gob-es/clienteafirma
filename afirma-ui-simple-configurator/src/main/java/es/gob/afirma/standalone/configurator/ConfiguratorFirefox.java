@@ -678,8 +678,8 @@ final class ConfiguratorFirefox {
 			}
 		}
 		LOGGER.severe(
-				"No se ha podido instanciar el motor AppleScript" //$NON-NLS-1$
-				);
+			"No se ha podido instanciar el motor AppleScript" //$NON-NLS-1$
+		);
 		return null;
 	}
 

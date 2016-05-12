@@ -11,6 +11,7 @@
 package es.gob.afirma.standalone.configurator;
 
 import java.awt.Component;
+import java.io.File;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.logging.Logger;
@@ -34,7 +35,13 @@ public class AutoFirmaConfigurator implements ConsoleListener {
 	static {
 		// Instalamos el registro a disco
 		try {
-			LogManager.install(App.AUTOFIRMA_CONFIGURATOR);
+			if (Platform.getOS().equals(Platform.OS.MACOSX)) {
+				final File parentFile = File.createTempFile("/temp", "").getParentFile(); //$NON-NLS-1$ //$NON-NLS-2$
+				LogManager.install(App.AUTOFIRMA_CONFIGURATOR, parentFile.getAbsolutePath());
+			}
+			else {
+				LogManager.install(App.AUTOFIRMA_CONFIGURATOR);
+			}
 		}
 		catch(final Exception e) {
 			LOGGER.severe("No ha sido posible instalar el gestor de registro: " + e); //$NON-NLS-1$
