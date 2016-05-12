@@ -195,7 +195,6 @@ public class AOKeyStoreManager implements KeyStoreManager {
                 // [0] -parent: Componente padre para la modalidad
         		setParentComponent(params != null && params.length > 0 ? params[0] : null);
             	this.ks = AOKeyStoreManagerHelperFullJava.initDnieJava(
-        			pssCallBack,
         			getParentComponent()
     			);
             	break;

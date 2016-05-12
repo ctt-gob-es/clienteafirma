@@ -21,8 +21,6 @@ import java.security.Security;
 import java.security.cert.CertificateException;
 import java.util.logging.Logger;
 
-import javax.security.auth.callback.PasswordCallback;
-
 import es.gob.jmulticard.ui.passwordcallback.gui.DnieCallbackHandler;
 
 final class AOKeyStoreManagerHelperFullJava {
@@ -52,14 +50,12 @@ final class AOKeyStoreManagerHelperFullJava {
 	}
 
 	/** Inicializa el almac&eacute;n 100% Java para DNIe.
-	 * @param pssCallBack <code>PasswordCallback</code> para la obtenci&oacute;n del PIN.
 	 * @param parentComponent Componente padre para la modalidad del di&aacute;logo de solicitud
 	 *                        de PIN.
 	 * @return <code>KeyStore</code> inicializado.
 	 * @throws AOKeyStoreManagerException Si no se puede inicializar el almac&eacute;n.
 	 * @throws IOException Si hay problemas en la lectura de datos. */
-    static KeyStore initDnieJava(final PasswordCallback pssCallBack,
-    		                     final Object parentComponent) throws AOKeyStoreManagerException,
+    static KeyStore initDnieJava(final Object parentComponent) throws AOKeyStoreManagerException,
     		                                                                 IOException {
     	return init(
 			AOKeyStore.DNIEJAVA,
