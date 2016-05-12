@@ -18,5 +18,11 @@
 			<artifactId>afirma-lib-jmimemagic</artifactId>
 			<version>0.0.3-SNAPSHOT</version>
 		</dependency>
+		
+		<dependency>
+			<groupId>es.gob</groupId>
+			<artifactId>jmulticard-jse</artifactId>
+			<version>1.4</version>
+		</dependency>
 	</dependencies>
 </project>
