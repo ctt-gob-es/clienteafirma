@@ -24,7 +24,6 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
 import es.gob.afirma.core.AOCancelledOperationException;
@@ -72,7 +71,7 @@ public final class CheckHashDialog extends JDialog implements KeyListener {
 	private CheckHashDialog(final Frame parent) {
 		super(parent);
 		setModalityType(ModalityType.APPLICATION_MODAL);
-		SwingUtilities.invokeLater(() -> createUI(parent));
+		createUI(parent);
 	}
 
 	void createUI(final Frame parent) {

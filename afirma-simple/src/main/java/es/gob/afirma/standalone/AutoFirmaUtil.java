@@ -124,6 +124,20 @@ public final class AutoFirmaUtil {
 		return appDir;
 	}
 
+	/** Devuelve el fichero en su forma can&oacute;nica.
+	 * @param file Fichero del cual obtener su forma can&oacute;nica.
+	 * @return Fichero en su forma can&oacute;nica o el fichero de entrada si hay error.*/
+	public static File sfn2lfn(final File file) {
+		try {
+			return file.getCanonicalFile();
+		}
+		catch(final IOException e) {
+			LOGGER.severe(
+				"No se ha podido obtener el fichero canonico: " + e //$NON-NLS-1$
+			);
+			return file;
+		}
+	}
     /** Establece la configuraci&oacute;n para el servidot <i>Proxy</i> seg&uacute;n los valores
      * de configuraci&oacute;n encontrados. */
     public static void setProxySettings() {

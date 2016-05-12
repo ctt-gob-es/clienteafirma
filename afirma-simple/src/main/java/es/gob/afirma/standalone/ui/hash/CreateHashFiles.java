@@ -34,7 +34,6 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -113,7 +112,7 @@ public final class CreateHashFiles extends JDialog {
 		super(parent);
 		setTitle(SimpleAfirmaMessages.getString("CreateHashFiles.0")); //$NON-NLS-1$
 		setModalityType(ModalityType.APPLICATION_MODAL);
-		SwingUtilities.invokeLater(() -> createUI(parent));
+		createUI(parent);
 	}
 
 	/** Crea todos los elementos necesarios para generar una huella digital de
@@ -294,7 +293,7 @@ public final class CreateHashFiles extends JDialog {
 			}
 		};
 		worker.execute();
-        
+
 		if (getSize(new File(dir)) > SIZE_WAIT) {
 			// Se muestra la ventana de espera
 			dialog.setVisible(true);
@@ -315,7 +314,7 @@ public final class CreateHashFiles extends JDialog {
 				xml.getBytes(),
 				SimpleAfirmaMessages.getString("CreateHashFiles.19"), //$NON-NLS-1$ ,,,
 				null,
-				new java.io.File(dir).getName() + ext,
+				AutoFirmaUtil.sfn2lfn(new File(dir)).getName() + ext,
 				new String[] { ext },
 				SimpleAfirmaMessages.getString("CreateHashDialog.9") + " (*" + ext + ")", //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
 				parent
@@ -589,12 +588,12 @@ public final class CreateHashFiles extends JDialog {
 		}
 		return directoryHash;
 	}
-	
-	static long getSize(File file) {
+
+	static long getSize(final File file) {
 	    long size;
 	    if (file.isDirectory()) {
 	        size = 0;
-	        for (File child : file.listFiles()) {
+	        for (final File child : file.listFiles()) {
 	            size += getSize(child);
 	        }
 	    } else {

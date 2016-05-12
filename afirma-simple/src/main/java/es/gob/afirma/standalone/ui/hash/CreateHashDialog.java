@@ -25,7 +25,6 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
 import es.gob.afirma.core.AOCancelledOperationException;
@@ -87,7 +86,7 @@ public final class CreateHashDialog extends JDialog implements KeyListener{
 		super(parent);
 		setTitle(SimpleAfirmaMessages.getString("CreateHashDialog.15")); //$NON-NLS-1$
 		setModalityType(ModalityType.APPLICATION_MODAL);
-		SwingUtilities.invokeLater(() -> createUI(parent));
+		createUI(parent);
 	}
 
 	void createUI(final Frame parent) {
@@ -308,7 +307,7 @@ public final class CreateHashDialog extends JDialog implements KeyListener{
 								hash,
 						SimpleAfirmaMessages.getString("CreateHashDialog.8"), //$NON-NLS-1$,,,
 						null,
-						new java.io.File(file).getName() + ext,
+						AutoFirmaUtil.sfn2lfn(new File(file)).getName() + ext,
 						new String[] { ext },
 						SimpleAfirmaMessages.getString("CreateHashDialog.9") + " (*" + ext + ")",  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
 						parent
