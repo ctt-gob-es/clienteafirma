@@ -134,7 +134,7 @@ public final class AOFileUtils {
 					log(e);
 				}
 				private void log(final Exception e) {
-					Logger.getLogger("es.gob.afirma").warning("El documento no es un XML: " + e); //$NON-NLS-1$ //$NON-NLS-2$
+					Logger.getLogger("es.gob.afirma").fine("El documento no es un XML: " + e); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 			});
     		reader.parse(new InputSource(new ByteArrayInputStream(data)));
