@@ -21,14 +21,12 @@ public class TestSignatureValidation {
 	@SuppressWarnings("static-method")
 	@Test
 	public void testCadesImplicitValidation() throws Exception {
-
-		final InputStream is = ClassLoader.getSystemResourceAsStream(CADES_IMPLICIT_FILE);
-
-		final byte[] cades = AOUtil.getDataFromInputStream(is);
-
-		System.out.println(ValidateBinarySignature.validate(cades, null));
-
-		is.close();
+		try (
+			final InputStream is = ClassLoader.getSystemResourceAsStream(CADES_IMPLICIT_FILE);
+		) {
+			final byte[] cades = AOUtil.getDataFromInputStream(is);
+			System.out.println(ValidateBinarySignature.validate(cades, null));
+		}
 	}
 
 	/** Prueba de validaci&oacute;n de firma CAdES explicita sin datos.
@@ -36,14 +34,12 @@ public class TestSignatureValidation {
 	@SuppressWarnings("static-method")
 	@Test
 	public void testCadesExplicitValidation() throws Exception {
-
-		final InputStream is = ClassLoader.getSystemResourceAsStream(CADES_EXPLICIT_FILE);
-
-		final byte[] cades = AOUtil.getDataFromInputStream(is);
-
-		System.out.println(ValidateBinarySignature.validate(cades, null));
-
-		is.close();
+		try (
+			final InputStream is = ClassLoader.getSystemResourceAsStream(CADES_EXPLICIT_FILE);
+		) {
+			final byte[] cades = AOUtil.getDataFromInputStream(is);
+			System.out.println(ValidateBinarySignature.validate(cades, null));
+		}
 	}
 
 	/** Prueba de validaci&oacute;n de firma CAdES expl&iacute;cita con datos erroneos.
@@ -51,20 +47,14 @@ public class TestSignatureValidation {
 	@SuppressWarnings("static-method")
 	@Test
 	public void testCadesExplicitValidationWrongData() throws Exception {
-
-		final InputStream is = ClassLoader.getSystemResourceAsStream(CADES_EXPLICIT_FILE);
-
-		final byte[] cades = AOUtil.getDataFromInputStream(is);
-
-		is.close();
-
-		final InputStream dataIs = ClassLoader.getSystemResourceAsStream(DATA_TXT_FILE);
-
-		final byte[] data = AOUtil.getDataFromInputStream(dataIs);
-
-		dataIs.close();
-
-		System.out.println(ValidateBinarySignature.validate(cades, data));
+		try (
+			final InputStream is = ClassLoader.getSystemResourceAsStream(CADES_EXPLICIT_FILE);
+			final InputStream dataIs = ClassLoader.getSystemResourceAsStream(DATA_TXT_FILE);
+		) {
+			final byte[] cades = AOUtil.getDataFromInputStream(is);
+			final byte[] data = AOUtil.getDataFromInputStream(dataIs);
+			System.out.println(ValidateBinarySignature.validate(cades, data));
+		}
 	}
 
 	/** Prueba de validaci&oacute;n de firma PAdES.
@@ -72,14 +62,12 @@ public class TestSignatureValidation {
 	@SuppressWarnings("static-method")
 	@Test
 	public void testPadesValidation() throws Exception {
-
-		final InputStream is = ClassLoader.getSystemResourceAsStream(PADES_FILE);
-
-		final byte[] pades = AOUtil.getDataFromInputStream(is);
-
-		is.close();
-
-		System.out.println(ValidatePdfSignature.validate(pades));
+		try (
+			final InputStream is = ClassLoader.getSystemResourceAsStream(PADES_FILE);
+		) {
+			final byte[] pades = AOUtil.getDataFromInputStream(is);
+			System.out.println(ValidatePdfSignature.validate(pades));
+		}
 	}
 
 	/** Prueba de validaci&oacute;n de firma PAdES-EPES.
@@ -87,13 +75,11 @@ public class TestSignatureValidation {
 	@SuppressWarnings("static-method")
 	@Test
 	public void testPadesEpesValidation() throws Exception {
-
-		final InputStream is = ClassLoader.getSystemResourceAsStream(PADES_EPES_FILE);
-
-		final byte[] pades = AOUtil.getDataFromInputStream(is);
-
-		is.close();
-
-		System.out.println(ValidatePdfSignature.validate(pades));
+		try (
+			final InputStream is = ClassLoader.getSystemResourceAsStream(PADES_EPES_FILE);
+		) {
+			final byte[] pades = AOUtil.getDataFromInputStream(is);
+			System.out.println(ValidatePdfSignature.validate(pades));
+		}
 	}
 }

@@ -170,7 +170,7 @@ final class CrlHelper {
 	}
 
 	private static byte[] downloadCRLFromLDAP(final String ldapURL) throws NamingException {
-	 	final Hashtable<String , String> env = new Hashtable<String , String>();
+	 	final Hashtable<String , String> env = new Hashtable<>();
 	 	env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory"); //$NON-NLS-1$
 	 	env.put(Context.PROVIDER_URL, ldapURL);
 
@@ -189,32 +189,36 @@ final class CrlHelper {
 	private static List<String> getCrlDistributionPoints(final X509Certificate cert) throws IOException {
 		final byte[] crldpExt = cert.getExtensionValue(Extension.cRLDistributionPoints.getId());
 		if (crldpExt == null) {
-			return new ArrayList<String>(0);
+			return new ArrayList<>(0);
 		}
-		final ASN1Primitive derObjCrlDP;
-		final ASN1InputStream oAsnInStream = new ASN1InputStream(new ByteArrayInputStream(crldpExt));
-		derObjCrlDP = oAsnInStream.readObject();
-		final byte[] crldpExtOctets = ((DEROctetString) derObjCrlDP).getOctets();
-		final ASN1Primitive derObj2;
-		final ASN1InputStream oAsnInStream2 = new ASN1InputStream(new ByteArrayInputStream(crldpExtOctets));
-		derObj2 = oAsnInStream2.readObject();
-		final CRLDistPoint distPoint = CRLDistPoint.getInstance(derObj2);
-		final List<String> crlUrls = new ArrayList<String>();
-		for (final DistributionPoint dp : distPoint.getDistributionPoints()) {
-			final DistributionPointName dpn = dp.getDistributionPoint();
-		 	// Buscamos URIs en el fullName
-		 	if (dpn != null && dpn.getType() == DistributionPointName.FULL_NAME) {
-	 			final GeneralName[] genNames = GeneralNames.getInstance(dpn.getName()).getNames();
-	 			// Buscamos la URI
-	 			for (final GeneralName genName : genNames) {
-	 				if (genName.getTagNo() == GeneralName.uniformResourceIdentifier) {
-	 					crlUrls.add(DERIA5String.getInstance(genName.getName()).getString());
-	 				}
-	 			}
+
+		try (
+			final ASN1InputStream oAsnInStream = new ASN1InputStream(new ByteArrayInputStream(crldpExt));
+		) {
+			final ASN1Primitive derObjCrlDP = oAsnInStream.readObject();
+			final byte[] crldpExtOctets = ((DEROctetString) derObjCrlDP).getOctets();
+			final ASN1Primitive derObj2;
+			try (
+				final ASN1InputStream oAsnInStream2 = new ASN1InputStream(new ByteArrayInputStream(crldpExtOctets));
+			) {
+				derObj2 = oAsnInStream2.readObject();
+				final CRLDistPoint distPoint = CRLDistPoint.getInstance(derObj2);
+				final List<String> crlUrls = new ArrayList<>();
+				for (final DistributionPoint dp : distPoint.getDistributionPoints()) {
+					final DistributionPointName dpn = dp.getDistributionPoint();
+				 	// Buscamos URIs en el fullName
+				 	if (dpn != null && dpn.getType() == DistributionPointName.FULL_NAME) {
+			 			final GeneralName[] genNames = GeneralNames.getInstance(dpn.getName()).getNames();
+			 			// Buscamos la URI
+			 			for (final GeneralName genName : genNames) {
+			 				if (genName.getTagNo() == GeneralName.uniformResourceIdentifier) {
+			 					crlUrls.add(DERIA5String.getInstance(genName.getName()).getString());
+			 				}
+			 			}
+					}
+				}
+				return crlUrls;
 			}
 		}
-		oAsnInStream.close();
-		oAsnInStream2.close();
-		return crlUrls;
 	}
 }

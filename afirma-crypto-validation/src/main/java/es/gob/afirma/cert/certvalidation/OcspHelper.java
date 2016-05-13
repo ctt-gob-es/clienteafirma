@@ -154,19 +154,20 @@ final class OcspHelper {
 		conn.setRequestMethod("POST"); //$NON-NLS-1$
 		conn.setRequestProperty("Content-Type", "application/ocsp-request");  //$NON-NLS-1$//$NON-NLS-2$
 		conn.setRequestProperty("Accept", "application/ocsp-response");  //$NON-NLS-1$//$NON-NLS-2$
-		final OutputStream out = conn.getOutputStream();
-		final DataOutputStream dataOut = new DataOutputStream(new BufferedOutputStream(out));
-		dataOut.write(ocspRequest);
-		dataOut.flush();
-		dataOut.close();
+		try (
+			final OutputStream out = conn.getOutputStream();
+			final DataOutputStream dataOut = new DataOutputStream(new BufferedOutputStream(out));
+		) {
+			dataOut.write(ocspRequest);
+		}
 		if (conn.getResponseCode() / 100 != 2) {
 			throw new IOException("El servidor OCSP ha devuelto un codigo de error " + conn.getResponseCode()); //$NON-NLS-1$
 		}
-		final byte[] res;
-		final InputStream in = (InputStream) conn.getContent();
-		res = AOUtil.getDataFromInputStream(in);
-		in.close();
-		return res;
+		try (
+			final InputStream in = (InputStream) conn.getContent();
+		) {
+			return AOUtil.getDataFromInputStream(in);
+		}
 	}
 
 	/** Crea una solicitud OCSP.
@@ -291,32 +292,34 @@ final class OcspHelper {
     static List<String> getAIALocations(final X509Certificate cert) throws IOException {
         final byte[] aiaExtensionValue = cert.getExtensionValue(Extension.authorityInfoAccess.getId());
         if (aiaExtensionValue == null) {
-            return new ArrayList<String>(0);
+            return new ArrayList<>(0);
         }
-        final ASN1InputStream asn1In = new ASN1InputStream(aiaExtensionValue);
-        AuthorityInformationAccess authorityInformationAccess;
 
-        final DEROctetString aiaDEROctetString = (DEROctetString) asn1In.readObject();
-        final ASN1InputStream asn1InOctets = new ASN1InputStream(aiaDEROctetString.getOctets());
-        final ASN1Sequence aiaASN1Sequence = (ASN1Sequence) asn1InOctets.readObject();
-        authorityInformationAccess = AuthorityInformationAccess.getInstance(aiaASN1Sequence);
-        asn1InOctets.close();
-        asn1In.close();
-
-        final List<String> ocspUrlList = new ArrayList<String>();
-        final AccessDescription[] accessDescriptions = authorityInformationAccess.getAccessDescriptions();
-        for (final AccessDescription accessDescription : accessDescriptions) {
-            final GeneralName gn = accessDescription.getAccessLocation();
-            if (gn.getTagNo() == GeneralName.uniformResourceIdentifier) {
-                final DERIA5String str = DERIA5String.getInstance(gn.getName());
-                final String accessLocation = str.getString();
-                ocspUrlList.add(accessLocation);
-            }
+        try (
+    		final ASN1InputStream asn1In = new ASN1InputStream(aiaExtensionValue);
+		) {
+        	final DEROctetString aiaDEROctetString = (DEROctetString) asn1In.readObject();
+        	try (
+    			final ASN1InputStream asn1InOctets = new ASN1InputStream(aiaDEROctetString.getOctets());
+			) {
+        		final ASN1Sequence aiaASN1Sequence = (ASN1Sequence) asn1InOctets.readObject();
+        		final AuthorityInformationAccess authorityInformationAccess = AuthorityInformationAccess.getInstance(aiaASN1Sequence);
+                final List<String> ocspUrlList = new ArrayList<>();
+                final AccessDescription[] accessDescriptions = authorityInformationAccess.getAccessDescriptions();
+                for (final AccessDescription accessDescription : accessDescriptions) {
+                    final GeneralName gn = accessDescription.getAccessLocation();
+                    if (gn.getTagNo() == GeneralName.uniformResourceIdentifier) {
+                        final DERIA5String str = DERIA5String.getInstance(gn.getName());
+                        final String accessLocation = str.getString();
+                        ocspUrlList.add(accessLocation);
+                    }
+                }
+                if (ocspUrlList.isEmpty()) {
+                	return new ArrayList<>(0);
+                }
+                return ocspUrlList;
+        	}
         }
-        if (ocspUrlList.isEmpty()) {
-        	return new ArrayList<String>(0);
-        }
-        return ocspUrlList;
     }
 
 }
