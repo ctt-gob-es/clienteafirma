@@ -20,12 +20,12 @@ import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.Vector;
 
-import es.gob.afirma.standalone.configurator.jre.security.tools.keytool.CertAndKeyGen;
-import es.gob.afirma.standalone.configurator.jre.security.x509.CertificateExtensions;
-import es.gob.afirma.standalone.configurator.jre.security.x509.ExtendedKeyUsageExtension;
-import es.gob.afirma.standalone.configurator.jre.security.x509.GeneralName;
-import es.gob.afirma.standalone.configurator.jre.security.x509.KeyUsageExtension;
-import es.gob.afirma.standalone.configurator.jre.security.x509.X500Name;
+import sun.security.tools.keytool.CertAndKeyGen;
+import sun.security.x509.CertificateExtensions;
+import sun.security.x509.ExtendedKeyUsageExtension;
+import sun.security.x509.GeneralName;
+import sun.security.x509.KeyUsageExtension;
+import sun.security.x509.X500Name;
 
 /** Utilidades para la creaci&oacute;n de certificados X.509.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
@@ -120,7 +120,6 @@ final class CertUtil {
     		(long)10*365*24*3600
 		);
 
-        //Definicion de propiedades del certificado
         return new PrivateKeyEntry(
 			rootPrivateKey,
 			new Certificate[] {
@@ -156,25 +155,25 @@ final class CertUtil {
 			)
 		);
 
-        final Vector<es.gob.afirma.standalone.configurator.jre.security.util.ObjectIdentifier> keyUsages = new Vector<>(1);
-        keyUsages.add(new es.gob.afirma.standalone.configurator.jre.security.util.ObjectIdentifier("1.3.6.1.5.5.7.3.1")); //$NON-NLS-1$
-        keyUsages.add(new es.gob.afirma.standalone.configurator.jre.security.util.ObjectIdentifier("1.3.6.1.5.5.7.3.2")); //$NON-NLS-1$
-        final es.gob.afirma.standalone.configurator.jre.security.x509.Extension extendedKeyUsageExtension = new ExtendedKeyUsageExtension(keyUsages);
+        final Vector<sun.security.util.ObjectIdentifier> keyUsages = new Vector<>(1);
+        keyUsages.add(new sun.security.util.ObjectIdentifier("1.3.6.1.5.5.7.3.1")); //$NON-NLS-1$
+        keyUsages.add(new sun.security.util.ObjectIdentifier("1.3.6.1.5.5.7.3.2")); //$NON-NLS-1$
+        final sun.security.x509.Extension extendedKeyUsageExtension = new ExtendedKeyUsageExtension(keyUsages);
         certExts.set(
     		ExtendedKeyUsageExtension.NAME,
     		extendedKeyUsageExtension
 		);
 
-        final es.gob.afirma.standalone.configurator.jre.security.x509.GeneralNames generalNames = new es.gob.afirma.standalone.configurator.jre.security.x509.GeneralNames();
+        final sun.security.x509.GeneralNames generalNames = new sun.security.x509.GeneralNames();
         generalNames.add(
     		new GeneralName(
-        		new es.gob.afirma.standalone.configurator.jre.security.x509.DNSName(dnsname)
+        		new sun.security.x509.DNSName(dnsname)
     		)
 		);
         if (ipaddress != null && !ipaddress.isEmpty()) {
 	        generalNames.add(
 	    		new GeneralName(
-	        		new es.gob.afirma.standalone.configurator.jre.security.x509.IPAddressName(ipaddress)
+	        		new sun.security.x509.IPAddressName(ipaddress)
 	    		)
 			);
         }
@@ -206,10 +205,10 @@ final class CertUtil {
                                        final boolean isCA) throws CertificateException, IOException, InvalidKeyException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException {
 
         final byte[] inCertBytes = certificateToBeSigned.getTBSCertificate();
-        final es.gob.afirma.standalone.configurator.jre.security.x509.X509CertInfo info = new es.gob.afirma.standalone.configurator.jre.security.x509.X509CertInfo(inCertBytes);
+        final sun.security.x509.X509CertInfo info = new sun.security.x509.X509CertInfo(inCertBytes);
 
         info.set(
-    		es.gob.afirma.standalone.configurator.jre.security.x509.X509CertInfo.ISSUER,
+    		sun.security.x509.X509CertInfo.ISSUER,
     		issuerCertificate.getSubjectDN()
 		);
 
@@ -225,32 +224,32 @@ final class CertUtil {
         			)
         		);
 
-            final es.gob.afirma.standalone.configurator.jre.security.x509.BasicConstraintsExtension bce = new es.gob.afirma.standalone.configurator.jre.security.x509.BasicConstraintsExtension(true, -1);
+            final sun.security.x509.BasicConstraintsExtension bce = new sun.security.x509.BasicConstraintsExtension(true, -1);
 
-            ext.set(es.gob.afirma.standalone.configurator.jre.security.x509.BasicConstraintsExtension.NAME,
-            		new es.gob.afirma.standalone.configurator.jre.security.x509.BasicConstraintsExtension(
+            ext.set(sun.security.x509.BasicConstraintsExtension.NAME,
+            		new sun.security.x509.BasicConstraintsExtension(
             		Boolean.FALSE,
             		bce.getExtensionValue()
             		)
             );
 
-           ext.set(es.gob.afirma.standalone.configurator.jre.security.x509.SubjectKeyIdentifierExtension.NAME,
-                    new es.gob.afirma.standalone.configurator.jre.security.x509.SubjectKeyIdentifierExtension(
-                    new es.gob.afirma.standalone.configurator.jre.security.x509.KeyIdentifier(certificateToBeSigned.getPublicKey()).getIdentifier()
+           ext.set(sun.security.x509.SubjectKeyIdentifierExtension.NAME,
+                    new sun.security.x509.SubjectKeyIdentifierExtension(
+                    new sun.security.x509.KeyIdentifier(certificateToBeSigned.getPublicKey()).getIdentifier()
                     )
         	);
             //Resto de atributos para la CA
-            info.set(es.gob.afirma.standalone.configurator.jre.security.x509.X509CertInfo.VERSION,
-                    new es.gob.afirma.standalone.configurator.jre.security.x509.CertificateVersion(es.gob.afirma.standalone.configurator.jre.security.x509.CertificateVersion.V3));
-            info.set(es.gob.afirma.standalone.configurator.jre.security.x509.X509CertInfo.SERIAL_NUMBER,
-                    new es.gob.afirma.standalone.configurator.jre.security.x509.CertificateSerialNumber((int) (new Date().getTime() / 1000)));
-            final es.gob.afirma.standalone.configurator.jre.security.x509.AlgorithmId algID = new es.gob.afirma.standalone.configurator.jre.security.x509.AlgorithmId(es.gob.afirma.standalone.configurator.jre.security.x509.AlgorithmId.sha256WithRSAEncryption_oid);
-            info.set(es.gob.afirma.standalone.configurator.jre.security.x509.X509CertInfo.ALGORITHM_ID,
-                    new es.gob.afirma.standalone.configurator.jre.security.x509.CertificateAlgorithmId(algID));
-            info.set(es.gob.afirma.standalone.configurator.jre.security.x509.X509CertInfo.KEY, new es.gob.afirma.standalone.configurator.jre.security.x509.CertificateX509Key(certificateToBeSigned.getPublicKey()));
-            info.set(es.gob.afirma.standalone.configurator.jre.security.x509.X509CertInfo.EXTENSIONS, ext);
+            info.set(sun.security.x509.X509CertInfo.VERSION,
+                    new sun.security.x509.CertificateVersion(sun.security.x509.CertificateVersion.V3));
+            info.set(sun.security.x509.X509CertInfo.SERIAL_NUMBER,
+                    new sun.security.x509.CertificateSerialNumber((int) (new Date().getTime() / 1000)));
+            final sun.security.x509.AlgorithmId algID = new sun.security.x509.AlgorithmId(sun.security.x509.AlgorithmId.sha256WithRSAEncryption_oid);
+            info.set(sun.security.x509.X509CertInfo.ALGORITHM_ID,
+                    new sun.security.x509.CertificateAlgorithmId(algID));
+            info.set(sun.security.x509.X509CertInfo.KEY, new sun.security.x509.CertificateX509Key(certificateToBeSigned.getPublicKey()));
+            info.set(sun.security.x509.X509CertInfo.EXTENSIONS, ext);
         }
-        final es.gob.afirma.standalone.configurator.jre.security.x509.X509CertImpl outCert = new es.gob.afirma.standalone.configurator.jre.security.x509.X509CertImpl(info);
+        final sun.security.x509.X509CertImpl outCert = new sun.security.x509.X509CertImpl(info);
         outCert.sign(
     		issuerPrivateKey,
     		issuerCertificate.getSigAlgName()
