@@ -21,7 +21,7 @@ import java.security.Security;
 import java.security.cert.CertificateException;
 import java.util.logging.Logger;
 
-import es.gob.jmulticard.ui.passwordcallback.gui.DnieCallbackHandler;
+import javax.security.auth.callback.CallbackHandler;
 
 final class AOKeyStoreManagerHelperFullJava {
 
@@ -42,8 +42,18 @@ final class AOKeyStoreManagerHelperFullJava {
 	 * @throws IOException Si hay problemas en la lectura de datos. */
 	static KeyStore initCeresJava(final Object parentComponent) throws AOKeyStoreManagerException,
                                                                        IOException {
+
+    	CallbackHandler callbackHandler;
+    	try {
+    		callbackHandler = (CallbackHandler) Class.forName("es.gob.jmulticard.ui.passwordcallback.gui.CeresCallbackHandler").newInstance(); //$NON-NLS-1$
+    	}
+    	catch (final Exception e) {
+    		throw new AOKeyStoreManagerException("No se han encontrado el gestor de contrasenas para CERES", e); //$NON-NLS-1$
+    	}
+
 		return init(
 			AOKeyStore.CERES,
+			buildLoadStoreParameter(callbackHandler),
 			parentComponent,
 			PROVIDER_CERES
 		);
@@ -57,8 +67,18 @@ final class AOKeyStoreManagerHelperFullJava {
 	 * @throws IOException Si hay problemas en la lectura de datos. */
     static KeyStore initDnieJava(final Object parentComponent) throws AOKeyStoreManagerException,
     		                                                                 IOException {
+
+    	CallbackHandler callbackHandler;
+    	try {
+    		callbackHandler = (CallbackHandler) Class.forName("es.gob.jmulticard.ui.passwordcallback.gui.DnieCallbackHandler").newInstance(); //$NON-NLS-1$
+    	}
+    	catch (final Exception e) {
+    		throw new AOKeyStoreManagerException("No se han encontrado el gestor de contrasenas para DNIe", e); //$NON-NLS-1$
+    	}
+
     	return init(
 			AOKeyStore.DNIEJAVA,
+			buildLoadStoreParameter(callbackHandler),
 			parentComponent,
 			PROVIDER_DNIE
 		);
@@ -66,11 +86,12 @@ final class AOKeyStoreManagerHelperFullJava {
 
 
     private static KeyStore init(final AOKeyStore store,
+    							 final LoadStoreParameter loadStoreParameter,
     		                     final Object parentComponent,
     		                     final String providerClassName) throws AOKeyStoreManagerException,
     		                                                            IOException {
     	final Provider p;
-    	if (Security.getProvider(AOKeyStore.CERES.getProviderName()) == null) {
+    	if (Security.getProvider(store.getProviderName()) == null) {
     		try {
     			p = (Provider) Class.forName(providerClassName).newInstance();
     			Security.addProvider(p);
@@ -92,8 +113,8 @@ final class AOKeyStoreManagerHelperFullJava {
     		LOGGER.warning("No se ha podido establecer el componente padre para los dialogos del almacen: " + e); //$NON-NLS-1$
     	}
 
-    	final KeyStore ks;
         // Inicializamos
+    	final KeyStore ks;
         try {
             ks = KeyStore.getInstance(store.getProviderName());
         }
@@ -102,18 +123,8 @@ final class AOKeyStoreManagerHelperFullJava {
         }
 
         LOGGER.info("Cargando KeyStore 100% Java para " + store.toString()); //$NON-NLS-1$
-        // La clase DnieCallbackHandler gestiona la peticion para pedir al usuario la informacion necesaria
 		try {
-			ks.load(
-					new LoadStoreParameter() {
-						@Override
-						public ProtectionParameter getProtectionParameter() {
-							return new KeyStore.CallbackHandlerProtection(
-								new DnieCallbackHandler()
-							);
-						}
-					}
-				);
+			ks.load(loadStoreParameter);
 		} catch (final NoSuchAlgorithmException e) {
 			throw new AOKeyStoreManagerException(
 	    			"Error de algoritmo al obtener el almacen 100% Java para " + store.toString() + ": " + e, e  //$NON-NLS-1$ //$NON-NLS-2$
@@ -127,4 +138,19 @@ final class AOKeyStoreManagerHelperFullJava {
         return ks;
     }
 
+    /**
+     * Construye un {@code LoadStoreParameter} en el que se hace uso de un {@code CallbackHandler} para controlar
+     * el paso de mensajes  con el almac&eacute;n.
+     * @param callbackHandler Manejador de mensajes para el almac&eacute;n.
+     * @return Controlador seguro para el paso de mensajes.
+     */
+    private static LoadStoreParameter buildLoadStoreParameter(final CallbackHandler callbackHandler) {
+
+		return new LoadStoreParameter() {
+			@Override
+			public ProtectionParameter getProtectionParameter() {
+				return new KeyStore.CallbackHandlerProtection(callbackHandler);
+			}
+		};
+    }
 }
