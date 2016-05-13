@@ -545,15 +545,12 @@ public final class Utils {
         // Ahora escribimos el XML usando XALAN
         writeXMLwithXALAN(writer, node, xmlEncoding);
 
+        // Si no se trata de un XML completo y bien formado, devolvemos ya el resultado
         if (!AOFileUtils.isXML(baos.toByteArray())) {
-            LOGGER.severe(
-        		"No se ha podido recargar el XML para insertar los atributos de la cabecera, quizas la codificacion se vea afectada." //$NON-NLS-1$
-    		);
         	return baos.toByteArray();
         }
 
-        // Y devolvemos el resultado como array de bytes, insertando antes la
-        // cabecera de hoja de estilo
+        // Si se trata de un XML completo, insertamos la cabecera de hoja de estilo
         try {
             return Utils.addStyleSheetHeader(new String(baos.toByteArray(), xmlEncoding), styleType, styleHref).getBytes(xmlEncoding);
         }
