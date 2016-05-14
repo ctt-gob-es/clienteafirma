@@ -35,6 +35,14 @@ import javax.xml.crypto.dsig.XMLSignatureFactory;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import net.java.xades.security.xml.XAdES.SignatureProductionPlace;
+import net.java.xades.security.xml.XAdES.SignatureProductionPlaceImpl;
+import net.java.xades.security.xml.XAdES.SignerRole;
+import net.java.xades.security.xml.XAdES.SignerRoleImpl;
+import net.java.xades.security.xml.XAdES.XAdES;
+import net.java.xades.security.xml.XAdES.XAdES_BES;
+import net.java.xades.util.DOMOutputImpl;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.ls.DOMImplementationLS;
@@ -42,12 +50,6 @@ import org.w3c.dom.ls.LSSerializer;
 import org.xml.sax.SAXException;
 
 import es.gob.afirma.signers.xml.XMLConstants;
-import net.java.xades.security.xml.XAdES.SignatureProductionPlace;
-import net.java.xades.security.xml.XAdES.SignatureProductionPlaceImpl;
-import net.java.xades.security.xml.XAdES.SignerRole;
-import net.java.xades.security.xml.XAdES.SignerRoleImpl;
-import net.java.xades.security.xml.XAdES.XAdES;
-import net.java.xades.security.xml.XAdES.XAdES_BES;
 
 /** Firmador XAdES OOXML.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
@@ -288,7 +290,7 @@ final class OOXMLXAdESSigner {
 	private static void writeXMLwithXALAN(final Writer writer, final Node node, final String xmlEncoding) {
         final LSSerializer serializer = ((DOMImplementationLS) node.getOwnerDocument().getImplementation()).createLSSerializer();
         serializer.getDomConfig().setParameter("namespaces", Boolean.FALSE); //$NON-NLS-1$
-        final com.sun.org.apache.xerces.internal.dom.DOMOutputImpl output = new com.sun.org.apache.xerces.internal.dom.DOMOutputImpl();
+        final DOMOutputImpl output = new DOMOutputImpl();
         output.setCharacterStream(writer);
         if (xmlEncoding != null) {
             output.setEncoding(xmlEncoding);

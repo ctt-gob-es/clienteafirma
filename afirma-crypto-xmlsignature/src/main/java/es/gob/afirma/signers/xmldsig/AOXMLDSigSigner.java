@@ -53,6 +53,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
 
+import net.java.xades.util.DOMOutputImpl;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.DocumentType;
 import org.w3c.dom.Element;
@@ -2427,7 +2429,7 @@ public final class AOXMLDSigSigner implements AOSigner {
         final DOMImplementationLS domImplLS = (DOMImplementationLS) document.getImplementation();
         final LSSerializer serializer = domImplLS.createLSSerializer();
         serializer.getDomConfig().setParameter("namespaces", Boolean.FALSE); //$NON-NLS-1$
-        final com.sun.org.apache.xerces.internal.dom.DOMOutputImpl output = new com.sun.org.apache.xerces.internal.dom.DOMOutputImpl();
+        final DOMOutputImpl output = new DOMOutputImpl();
         output.setCharacterStream(writer);
         serializer.write(node, output);
     }
