@@ -361,7 +361,6 @@ public final class CMSTimestamper {
     /** Configura la conexi&oacute;n con los datos necesarios para realizarse sobre HTTPS.
      * @param conn Conexi&oacute;n SSL.
      * @throws IOException Cuando el entorno no permite la configuraci&oacute;n. */
-    @SuppressWarnings("deprecation")
 	private void configureHttpsConnection(final URLConnection conn) throws IOException {
 
     	if (conn == null) {
@@ -369,6 +368,8 @@ public final class CMSTimestamper {
     	}
 
     	if (!this.verifyHostname) {
+
+    		LOGGER.warning("No se comprobaran los nombres de host en la conexion SSL del sello de tiempo"); //$NON-NLS-1$
 
     		// Podrian encontrarse varios tipos de conexion HTTPS
 
