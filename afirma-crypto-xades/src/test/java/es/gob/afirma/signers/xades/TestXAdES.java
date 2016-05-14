@@ -40,13 +40,8 @@ import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.core.util.tree.AOTreeNode;
 import es.gob.afirma.signers.xml.Utils;
 
-
-
-/**
- * Pruebas del m&oacute;dulo XAdES de Afirma.
- * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s
- *
- */
+/** Pruebas del m&oacute;dulo XAdES de Afirma.
+ * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
 public final class TestXAdES {
 
     private static final String CERT_PATH = "PFActivoFirSHA256.pfx"; //$NON-NLS-1$
@@ -141,7 +136,12 @@ public final class TestXAdES {
     public void testNodeTbs() throws Exception {
 
     	Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$
-    	Logger.getLogger("com.sun.org.apache.xml.internal.security.utils.CachedXPathFuncHereAPI").setLevel(Level.WARNING); //$NON-NLS-1$
+    	try {
+    		Logger.getLogger("com.sun.org.apache.xml.internal.security.utils.CachedXPathFuncHereAPI").setLevel(Level.WARNING); //$NON-NLS-1$
+    	}
+    	catch(final Exception e) {
+    		// Vacio
+    	}
 
         final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
         ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH), CERT_PASS.toCharArray());
@@ -185,7 +185,12 @@ public final class TestXAdES {
     public void testNodeTbsWithNamespace() throws Exception {
 
     	Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$
-    	Logger.getLogger("com.sun.org.apache.xml.internal.security.utils.CachedXPathFuncHereAPI").setLevel(Level.WARNING); //$NON-NLS-1$
+    	try {
+    		Logger.getLogger("com.sun.org.apache.xml.internal.security.utils.CachedXPathFuncHereAPI").setLevel(Level.WARNING); //$NON-NLS-1$
+    	}
+    	catch(final Exception e) {
+    		// Vacio
+    	}
 
         final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
         ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH), CERT_PASS.toCharArray());
@@ -230,7 +235,12 @@ public final class TestXAdES {
     public void testNodeTbsWithMimeType() throws Exception {
 
     	Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$
-    	Logger.getLogger("com.sun.org.apache.xml.internal.security.utils.CachedXPathFuncHereAPI").setLevel(Level.WARNING); //$NON-NLS-1$
+    	try {
+    		Logger.getLogger("com.sun.org.apache.xml.internal.security.utils.CachedXPathFuncHereAPI").setLevel(Level.WARNING); //$NON-NLS-1$
+    	}
+    	catch(final Exception e) {
+    		// Vacio
+    	}
 
         final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
         ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH), CERT_PASS.toCharArray());
