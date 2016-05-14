@@ -509,9 +509,14 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 
         // Propiedades especificas para Mac OS X
         if (Platform.OS.MACOSX.equals(Platform.getOS())) {
-            com.apple.eawt.Application.getApplication().setDockIconImage(
-        		Toolkit.getDefaultToolkit().getImage(SimpleAfirma.class.getResource("/resources/logo_cliente_256.png")) //$NON-NLS-1$);
-    		);
+        	try {
+	            com.apple.eawt.Application.getApplication().setDockIconImage(
+	        		Toolkit.getDefaultToolkit().getImage(SimpleAfirma.class.getResource("/resources/logo_cliente_256.png")) //$NON-NLS-1$);
+	    		);
+        	}
+        	catch(final Exception | Error e) {
+        		LOGGER.warning("No ha sido posible establecer el icono del Dock de OS X: " + e); //$NON-NLS-1$
+        	}
         }
 
     	// Comprobamos actualizaciones

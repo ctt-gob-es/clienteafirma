@@ -20,8 +20,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
 
-import com.sun.awt.AWTUtilities;
-
 final class PageLabel extends JLabel {
 
 	static interface PageLabelListener extends EventListener {
@@ -32,14 +30,17 @@ final class PageLabel extends JLabel {
 
 	private static final long serialVersionUID = 4917110251831788580L;
 
-	private static final boolean TRANSLUCENCY_CAPABLE;
+	private static boolean TRANSLUCENCY_CAPABLE;
 	static {
 		final GraphicsConfiguration config = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
-		if (AWTUtilities.isTranslucencyCapable(config)) {
-			TRANSLUCENCY_CAPABLE = true;
+		try {
+			TRANSLUCENCY_CAPABLE = com.sun.awt.AWTUtilities.isTranslucencyCapable(config);
 		}
-		else {
-			TRANSLUCENCY_CAPABLE = false;
+		catch(final Exception | Error e) {
+			Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
+				"No ha sido posible determinar si el sistema sorporta superficies translucidas, se asume que si: " + e //$NON-NLS-1$
+			);
+			TRANSLUCENCY_CAPABLE = true;
 		}
 	}
 

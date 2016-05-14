@@ -32,8 +32,6 @@ import java.awt.dnd.DropTargetDragEvent;
 import java.awt.dnd.DropTargetDropEvent;
 import java.awt.dnd.DropTargetEvent;
 import java.awt.dnd.DropTargetListener;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -465,44 +463,41 @@ public final class SignPanel extends JPanel {
         		SimpleAfirmaMessages.getString("SignPanel.34") //$NON-NLS-1$
             );
             getSelectButton().requestFocusInWindow();
-            getSelectButton().addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(final ActionEvent arg0) {
-                	final File file;
-                	try {
-	                    file = AOUIFactory.getLoadFiles(
-	                		SimpleAfirmaMessages.getString("SignPanel.35"), //$NON-NLS-1$
-	                		getSimpleAfirma().getCurrentDir() != null ? getSimpleAfirma().getCurrentDir().getAbsolutePath() : null,
-	                		null,
-	                		null,
-	                		null,
-	                		false,
-	                		false,
-	                		AutoFirmaUtil.getDefaultDialogsIcon(),
-	                		UpperPanel.this
-	            		)[0];
-                	}
-                	catch(final AOCancelledOperationException e) {
-                		return;
-                	}
+            getSelectButton().addActionListener(arg0 -> {
+				final File file;
+				try {
+			        file = AOUIFactory.getLoadFiles(
+			    		SimpleAfirmaMessages.getString("SignPanel.35"), //$NON-NLS-1$
+			    		getSimpleAfirma().getCurrentDir() != null ? getSimpleAfirma().getCurrentDir().getAbsolutePath() : null,
+			    		null,
+			    		null,
+			    		null,
+			    		false,
+			    		false,
+			    		AutoFirmaUtil.getDefaultDialogsIcon(),
+			    		UpperPanel.this
+					)[0];
+				}
+				catch(final AOCancelledOperationException e1) {
+					return;
+				}
 
-                    try {
-                        loadFile(file);
-                    }
-                    catch (final Exception e) {
-                    	LOGGER.severe("Error en la carga de fichero " + file.getAbsolutePath() + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$
-                    	AOUIFactory.showErrorMessage(
-                            UpperPanel.this,
-                            SimpleAfirmaMessages.getString("SignPanel.36"), //$NON-NLS-1$
-                            SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
-                            JOptionPane.ERROR_MESSAGE
-                        );
-                        // La carga habra dejado el cursor en reloj de arena
-                        SignPanel.this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-                    }
+			    try {
+			        loadFile(file);
+			    }
+			    catch (final Exception e2) {
+			    	LOGGER.severe("Error en la carga de fichero " + file.getAbsolutePath() + ": " + e2); //$NON-NLS-1$ //$NON-NLS-2$
+			    	AOUIFactory.showErrorMessage(
+			            UpperPanel.this,
+			            SimpleAfirmaMessages.getString("SignPanel.36"), //$NON-NLS-1$
+			            SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
+			            JOptionPane.ERROR_MESSAGE
+			        );
+			        // La carga habra dejado el cursor en reloj de arena
+			        SignPanel.this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+			    }
 
-                }
-            });
+			});
 
             final JLabel welcomeLabel = new JLabel(SimpleAfirmaMessages.getString("SignPanel.14")); //$NON-NLS-1$
             welcomeLabel.setFocusable(false);
@@ -521,7 +516,11 @@ public final class SignPanel extends JPanel {
                     intro = intro + SimpleAfirmaMessages.getString("SignPanel.4"); //$NON-NLS-1$
                 }
             }
-            catch(final Exception e) { /* Ignoramos los errores */ }
+            catch(final Exception | Error e) {
+            	LOGGER.warning(
+        			"No ha sido posible obtener la lista de lectores de tarjetas del sistema: " + e //$NON-NLS-1$
+    			);
+            }
 
             final JLabel introText = new JLabel(intro);
             introText.setLabelFor(getSelectButton());
@@ -580,12 +579,7 @@ public final class SignPanel extends JPanel {
             getSignButton().setEnabled(false);
             buttonPanel.add(getSignButton());
             getSignButton().addActionListener(
-        		new ActionListener() {
-	                @Override
-	                public void actionPerformed(final ActionEvent ae) {
-	                    sign();
-	                }
-	            }
+        		ae -> sign()
     		);
 
             // Establecemos la configuracion de color

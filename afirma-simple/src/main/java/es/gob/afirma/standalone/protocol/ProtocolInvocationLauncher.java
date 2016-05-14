@@ -49,14 +49,14 @@ public final class ProtocolInvocationLauncher {
         // En OS X sobrecargamos el "Acerca de..." del sistema operativo, que tambien
         // aparece en la invocacion por protocolo
         if (Platform.OS.MACOSX.equals(Platform.getOS())) {
-            com.apple.eawt.Application.getApplication().setAboutHandler(
-                 new com.apple.eawt.AboutHandler() {
-                     @Override
-                     public void handleAbout(final com.apple.eawt.AppEvent.AboutEvent ae) {
-                         MainMenu.showAbout(null);
-                     }
-                 }
-            );
+        	try {
+	            com.apple.eawt.Application.getApplication().setAboutHandler(
+	                 ae -> MainMenu.showAbout(null)
+	            );
+        	}
+        	catch(final Exception | Error e) {
+        		LOGGER.warning("No ha sido posible establecer el menu 'Acerca de...' de OS X: " + e); //$NON-NLS-1$
+        	}
         }
 
         if (urlString == null) {
