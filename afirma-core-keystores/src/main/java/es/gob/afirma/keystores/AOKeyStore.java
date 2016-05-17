@@ -133,7 +133,7 @@ public enum AOKeyStore {
 		"Tarjeta FNMT-RCM CERES", //$NON-NLS-1$
 		13,
 		"CERES", //$NON-NLS-1$
-		new UIPasswordCallback(KeyStoreMessages.getString("AOKeyStore.11")), //$NON-NLS-1$
+		null, // Al igual que en el DNIe el PIN se pide al firmar
 		null // Sin password para el almacen en si
 	),
     /** DNIe con controlador nativo Java. */
