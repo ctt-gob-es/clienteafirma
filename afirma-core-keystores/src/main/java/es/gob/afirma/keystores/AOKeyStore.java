@@ -217,7 +217,7 @@ public enum AOKeyStore {
         return null;
     }
 
-	/** Obtiene el <i>PasswordCallback</i> necesario para usar una cave del almac&eacute;n despu&eacute;s
+	/** Obtiene el <i>PasswordCallback</i> necesario para usar una clave del almac&eacute;n despu&eacute;s
 	 * de haberlo abierto.
 	 * @param parent Componente padre para la modalidad
 	 * @return <i>PasswordCallback</i> necesario para usar una cave del almac&eacute;n */
