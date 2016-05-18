@@ -32,6 +32,17 @@
 			<version>4.8.2</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+		    <groupId>com.madgag.spongycastle</groupId>
+		    <artifactId>core</artifactId>
+		    <version>1.54.0.0</version>
+		</dependency>
+		
+		<dependency>
+		    <groupId>com.madgag.spongycastle</groupId>
+		    <artifactId>pkix</artifactId>
+		    <version>1.54.0.0</version>
+		</dependency>
 	</dependencies>
 	
 	<scm>
@@ -66,6 +77,16 @@
 							<goal>shade</goal>
 						</goals>
 						<configuration>
+							<filters>
+						        <filter>
+						            <artifact>*:*</artifact>
+						            <excludes>
+						                <exclude>META-INF/*.SF</exclude>
+						                <exclude>META-INF/*.DSA</exclude>
+						                <exclude>META-INF/*.RSA</exclude>
+						            </excludes>
+						        </filter>
+						    </filters>
 							<transformers>
 								<transformer
 									implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">

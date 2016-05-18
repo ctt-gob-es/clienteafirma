@@ -139,11 +139,11 @@ final class CertUtil {
                                                                                                SignatureException,
                                                                                                IOException {
 		// Generamos el par de claves...
-		
 		KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
 		keyPairGenerator.initialize(KEY_SIZE, new SecureRandom());
 		KeyPair keyPair = keyPairGenerator.generateKeyPair();
 
+		//Creamos el generador de certificados
 		Date expirationDate = new Date();
 		expirationDate.setTime(new Date().getTime()+(long)10*365*24*3600*1000);
 		X509v3CertificateBuilder generator = new JcaX509v3CertificateBuilder(
@@ -155,6 +155,7 @@ final class CertUtil {
     		keyPair.getPublic()
 		);
 
+		//Se incluyen los atributos del certificado CA
 		DigestCalculator digCalc = null;
 		try {
 			digCalc = new BcDigestCalculatorProvider()
@@ -183,9 +184,16 @@ final class CertUtil {
 	    generator.addExtension(Extension.extendedKeyUsage, false,
 	            new DERSequence(purposes));
 
+	    //Firma del CA con su propia clave privada (autofirmado)
 	    X509Certificate cert = null;
 		try {
-			cert = new JcaX509CertificateConverter().setProvider(PROVIDER).getCertificate(generator.build(new JcaContentSignerBuilder(SIGNATURE_ALGORITHM).setProvider(PROVIDER).build(keyPair.getPrivate())));
+			cert = new JcaX509CertificateConverter().setProvider(PROVIDER).getCertificate(
+					generator.build(
+							new JcaContentSignerBuilder(SIGNATURE_ALGORITHM).setProvider(PROVIDER).build(
+									keyPair.getPrivate()
+									)
+							)
+					);
 		} catch (OperatorCreationException e) {
 			new CertificateException("Error durante la construccion del certificado CA");
 		}
@@ -211,7 +219,7 @@ final class CertUtil {
 			keyPairGenerator.initialize(KEY_SIZE, new SecureRandom());
 			pair = keyPairGenerator.generateKeyPair();
 
-			
+			//Generamos el generador de certificados
 			Date expirationDate = new Date();
 			expirationDate.setTime(new Date().getTime()+(long)10*365*24*3600*1000);
 			X500Name issuerDN = new JcaX509CertificateHolder((X509Certificate) issuerKeyEntry.getCertificate()).getSubject();
@@ -224,13 +232,12 @@ final class CertUtil {
 		    		new X500Name("CN="+cn),
 					pair.getPublic());
 			
+			//Incluimos los atributos del certifiado
 			JcaX509ExtensionUtils extUtils = new JcaX509ExtensionUtils();
 			certBuilder.addExtension(Extension.subjectKeyIdentifier, false, extUtils.createSubjectKeyIdentifier(pair.getPublic()));
 			certBuilder.addExtension(Extension.basicConstraints, false, new BasicConstraints(false));
 			certBuilder.addExtension(Extension.authorityKeyIdentifier, false, extUtils.createAuthorityKeyIdentifier(issuerKeyEntry.getCertificate().getPublicKey()));
 
-			
-			// support alternateSubjectNames for SSL certificates
 			List<GeneralName> altNames = new ArrayList<GeneralName>();
 			altNames.add(new GeneralName(GeneralName.iPAddress, cn));				
 			if (altNames.size() > 0) {
@@ -238,13 +245,14 @@ final class CertUtil {
 				certBuilder.addExtension(Extension.subjectAlternativeName, false, subjectAltName);
 			}
 
+			//Firma del certificado SSL con la clave privada del CA
 			ContentSigner caSigner = new JcaContentSignerBuilder(SIGNATURE_ALGORITHM).setProvider(PROVIDER).build(
 									issuerKeyEntry.getPrivateKey()
 								);
 			cert = new JcaX509CertificateConverter().setProvider(PROVIDER)
 					.getCertificate(certBuilder.build(caSigner));
 		} catch (Throwable t) {
-			throw new RuntimeException("Failed to generate SSL certificate!", t);
+			throw new RuntimeException("Error al generar el certificado SSL", t);
 		}
         return new PrivateKeyEntry(
         		pair.getPrivate(),
