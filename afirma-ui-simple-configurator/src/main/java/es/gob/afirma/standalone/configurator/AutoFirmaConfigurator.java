@@ -27,6 +27,8 @@ public class AutoFirmaConfigurator implements ConsoleListener {
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	private static final String PARAMETER_UNISTALL = "-uninstall"; //$NON-NLS-1$
+	private static final File TMP = new File("/var/tmp"); //$NON-NLS-1$
+	private static final File TEMP = new File("/var/temp"); //$NON-NLS-1$
 
 	private Configurator configurator;
 
@@ -35,9 +37,16 @@ public class AutoFirmaConfigurator implements ConsoleListener {
 	static {
 		// Instalamos el registro a disco
 		try {
-			if (Platform.getOS().equals(Platform.OS.MACOSX)) {
-				final File parentFile = File.createTempFile("/temp", "").getParentFile(); //$NON-NLS-1$ //$NON-NLS-2$
-				LogManager.install(App.AUTOFIRMA_CONFIGURATOR, parentFile.getAbsolutePath());
+			if (Platform.getOS().equals(Platform.OS.MACOSX) || Platform.getOS().equals(Platform.OS.LINUX)) {
+				if (TMP.exists() && TMP.isDirectory() && TMP.canWrite()) {
+					LogManager.install(App.AUTOFIRMA_CONFIGURATOR, TMP.getAbsolutePath());
+				}
+				else if (TEMP.exists() && TEMP.isDirectory() && TEMP.canWrite()) {
+					LogManager.install(App.AUTOFIRMA_CONFIGURATOR, TEMP.getAbsolutePath());
+				}
+				else {
+					LogManager.install(App.AUTOFIRMA_CONFIGURATOR, System.getProperty("java.io.tmpdir")); //$NON-NLS-1$
+				}
 			}
 			else {
 				LogManager.install(App.AUTOFIRMA_CONFIGURATOR);

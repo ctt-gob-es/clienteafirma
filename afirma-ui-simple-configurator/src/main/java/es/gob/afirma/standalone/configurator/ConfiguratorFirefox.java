@@ -814,8 +814,12 @@ final class ConfiguratorFirefox {
 		ConfiguratorUtil.deleteDir(new File(appConfigDir, DIR_CERTUTIL));
 	}
 
-	private static void copyConfigurationFiles(final File appConfigDir) throws IOException {
-		uncompressResource(RESOURCE_BASE + FILE_CERTUTIL, appConfigDir);
+	static void copyConfigurationFiles(final File appConfigDir) throws IOException {
+		final File certutil = new File(ConfiguratorUtil.getApplicationDirectory() + File.separator + DIR_CERTUTIL);
+		if (!certutil.exists()) {
+			uncompressResource(RESOURCE_BASE + FILE_CERTUTIL, appConfigDir);
+			addExexPermissionsToAllFilesOnDirectory(certutil);
+		}
 	}
 
 	/** Descomprime un fichero ZIP de recurso al disco.

@@ -96,10 +96,12 @@ final class ConfiguratorMacOSX implements Configurator {
 			// damos permisos al script
 			ConfiguratorFirefox.addExexPermissionsToAllFilesOnDirectory(ConfiguratorUtil.getApplicationDirectory());
 			try {
+				ConfiguratorFirefox.copyConfigurationFiles(appDir);
 				uninstall();
 
 				window.print(Messages.getString("ConfiguratorMacOSX.13")); //$NON-NLS-1$
 				// Generamos el script para instalar el certificado en Mozilla
+
 				ConfiguratorFirefox.installRootCAMozillaKeyStore(
 					appDir,
 					certPack.getCaCertificate(),
@@ -171,18 +173,6 @@ final class ConfiguratorMacOSX implements Configurator {
 
 		final String snRoot = AOUtil.hexify(root.getSerialNumber().toByteArray(), false);
 		final String sha1Root = AOUtil.hexify(MessageDigest.getInstance("SHA1").digest(root.getEncoded()), false); //$NON-NLS-1$
-
-		//Instalamos key .pfx
-		final File fpfx = new File(ConfiguratorUtil.getApplicationDirectory() + KS_FILENAME);
-		final String cmd2 = OSX_SEC_KS_COMMAND.replace(
-			"%KEYCHAIN%", //$NON-NLS-1$
-			KEYCHAIN_PATH
-			).replace(
-				"%CERT%", //$NON-NLS-1$
-				fpfx.getAbsolutePath().replace(" ", "\\ ") //$NON-NLS-1$ //$NON-NLS-2$
-		);
-		LOGGER.info("comando de instalacion del certificado en el almacen de apple: " + cmd2); //$NON-NLS-1$
-		ConfiguratorFirefox.writeScriptFile(mac_script_path, new StringBuilder(cmd2), true);
 
 		//Instalamos pfx sacando el .cer
 		final File pfx = new File(ConfiguratorUtil.getApplicationDirectory() + KS_FILENAME);
