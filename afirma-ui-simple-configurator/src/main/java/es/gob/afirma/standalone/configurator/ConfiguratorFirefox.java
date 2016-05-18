@@ -917,7 +917,6 @@ final class ConfiguratorFirefox {
 								2048 // Maximo 2048 caracteres por linea
 								);
 						) {
-					LOGGER.info("Linea: " + resReader.readLine()); //$NON-NLS-1$
 					while ((line = resReader.readLine()) != null) {
 						usersDir.add(line);
 					}
