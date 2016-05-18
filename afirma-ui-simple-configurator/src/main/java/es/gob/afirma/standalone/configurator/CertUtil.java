@@ -6,26 +6,52 @@ package es.gob.afirma.standalone.configurator;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.security.InvalidKeyException;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
 import java.security.KeyStore;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
+import java.security.SecureRandom;
+import java.security.Security;
 import java.security.SignatureException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.Vector;
+import java.util.List;
+import java.util.Random;
 
-import sun.security.tools.keytool.CertAndKeyGen;
-import sun.security.x509.CertificateExtensions;
-import sun.security.x509.ExtendedKeyUsageExtension;
-import sun.security.x509.GeneralName;
-import sun.security.x509.KeyUsageExtension;
-import sun.security.x509.X500Name;
+import org.spongycastle.asn1.ASN1EncodableVector;
+import org.spongycastle.asn1.ASN1Sequence;
+import org.spongycastle.asn1.DERSequence;
+import org.spongycastle.asn1.oiw.OIWObjectIdentifiers;
+import org.spongycastle.asn1.x500.X500Name;
+import org.spongycastle.asn1.x509.AlgorithmIdentifier;
+import org.spongycastle.asn1.x509.BasicConstraints;
+import org.spongycastle.asn1.x509.Extension;
+import org.spongycastle.asn1.x509.GeneralName;
+import org.spongycastle.asn1.x509.GeneralNames;
+import org.spongycastle.asn1.x509.KeyPurposeId;
+import org.spongycastle.asn1.x509.KeyUsage;
+import org.spongycastle.asn1.x509.SubjectPublicKeyInfo;
+import org.spongycastle.cert.X509ExtensionUtils;
+import org.spongycastle.cert.X509v3CertificateBuilder;
+import org.spongycastle.cert.jcajce.JcaX509CertificateConverter;
+import org.spongycastle.cert.jcajce.JcaX509CertificateHolder;
+import org.spongycastle.cert.jcajce.JcaX509ExtensionUtils;
+import org.spongycastle.cert.jcajce.JcaX509v3CertificateBuilder;
+import org.spongycastle.jce.provider.BouncyCastleProvider;
+import org.spongycastle.operator.ContentSigner;
+import org.spongycastle.operator.DigestCalculator;
+import org.spongycastle.operator.OperatorCreationException;
+import org.spongycastle.operator.bc.BcDigestCalculatorProvider;
+import org.spongycastle.operator.jcajce.JcaContentSignerBuilder;
 
 /** Utilidades para la creaci&oacute;n de certificados X.509.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
@@ -34,6 +60,9 @@ final class CertUtil {
 	private static final String AF_ROOT_SUBJECT_PRINCIPAL = "CN=AutoFirma ROOT"; //$NON-NLS-1$
 
 	private static final int KEY_SIZE = 2048;
+	
+	private static final String PROVIDER = "SC";
+	
 	private static final String SIGNATURE_ALGORITHM = "SHA256withRSA"; //$NON-NLS-1$
 
 	static class CertPack {
@@ -85,11 +114,11 @@ final class CertUtil {
 
 	static CertPack getCertPackForLocalhostSsl(final String sslCertificateAlias, final String storePassword) throws InvalidKeyException, NoSuchAlgorithmException, NoSuchProviderException, CertificateException, SignatureException, IOException {
 
+		Security.addProvider(new BouncyCastleProvider());
 		final PrivateKeyEntry caCertificatePrivateKeyEntry = generateCaCertificate(
 			AF_ROOT_SUBJECT_PRINCIPAL
 		);
 		final PrivateKeyEntry sslCertificatePrivateKeyEntry = generateSslCertificate(
-			"127.0.0.1", //$NON-NLS-1$
 			"127.0.0.1", //$NON-NLS-1$
 			"localhost", //$NON-NLS-1$
 			caCertificatePrivateKeyEntry
@@ -110,152 +139,119 @@ final class CertUtil {
                                                                                                SignatureException,
                                                                                                IOException {
 		// Generamos el par de claves...
-        final CertAndKeyGen keyGen = new CertAndKeyGen("RSA", SIGNATURE_ALGORITHM, null); //$NON-NLS-1$
-        keyGen.generate(KEY_SIZE);
-        final PrivateKey rootPrivateKey = keyGen.getPrivateKey();
+		
+		KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
+		keyPairGenerator.initialize(KEY_SIZE, new SecureRandom());
+		KeyPair keyPair = keyPairGenerator.generateKeyPair();
 
-        final X509Certificate rootCertificate = keyGen.getSelfCertificate(
-    		new X500Name(subjectPrincipal),
+		Date expirationDate = new Date();
+		expirationDate.setTime(new Date().getTime()+(long)10*365*24*3600*1000);
+		X509v3CertificateBuilder generator = new JcaX509v3CertificateBuilder(
+			new X500Name(subjectPrincipal),
+			BigInteger.valueOf(new Random().nextInt()),
     		new Date(),
-    		(long)10*365*24*3600
+    		expirationDate,
+    		new X500Name(subjectPrincipal),
+    		keyPair.getPublic()
 		);
 
+		DigestCalculator digCalc = null;
+		try {
+			digCalc = new BcDigestCalculatorProvider()
+			        .get(new AlgorithmIdentifier(OIWObjectIdentifiers.idSHA1));
+		} catch (OperatorCreationException e) {
+			throw new IOException("No se ha podido inicializar el operador de cifrado");
+		}
+        X509ExtensionUtils x509ExtensionUtils = new X509ExtensionUtils(digCalc);
+        
+        byte[] encoded = keyPair.getPublic().getEncoded();
+        SubjectPublicKeyInfo subjectPublicKeyInfo = SubjectPublicKeyInfo.getInstance(ASN1Sequence.getInstance(encoded));
+		generator.addExtension(Extension.subjectKeyIdentifier, false,
+				x509ExtensionUtils.createSubjectKeyIdentifier(subjectPublicKeyInfo));
+	    generator.addExtension(Extension.basicConstraints, true,
+	            new BasicConstraints(true));
+
+	    KeyUsage usage = new KeyUsage(KeyUsage.keyCertSign
+	            | KeyUsage.digitalSignature | KeyUsage.keyEncipherment
+	            | KeyUsage.dataEncipherment | KeyUsage.cRLSign);
+	    generator.addExtension(Extension.keyUsage, false, usage);
+
+	    ASN1EncodableVector purposes = new ASN1EncodableVector();
+	    purposes.add(KeyPurposeId.id_kp_serverAuth);
+	    purposes.add(KeyPurposeId.id_kp_clientAuth);
+	    purposes.add(KeyPurposeId.anyExtendedKeyUsage);
+	    generator.addExtension(Extension.extendedKeyUsage, false,
+	            new DERSequence(purposes));
+
+	    X509Certificate cert = null;
+		try {
+			cert = new JcaX509CertificateConverter().setProvider(PROVIDER).getCertificate(generator.build(new JcaContentSignerBuilder(SIGNATURE_ALGORITHM).setProvider(PROVIDER).build(keyPair.getPrivate())));
+		} catch (OperatorCreationException e) {
+			new CertificateException("Error durante la construccion del certificado CA");
+		}
+	    		
+        //Definicion de propiedades del certificado
         return new PrivateKeyEntry(
-			rootPrivateKey,
+        		keyPair.getPrivate(),
 			new Certificate[] {
-				signCertificate(
-					rootCertificate,
-					rootCertificate,
-					rootPrivateKey,
-					true
-				)
+				cert
 			}
 		);
 	}
 
 	private static PrivateKeyEntry generateSslCertificate(final String cn,
 			                                              final String ipaddress,
-			                                              final String dnsname,
 			                                              final PrivateKeyEntry issuerKeyEntry) throws NoSuchAlgorithmException, InvalidKeyException, IOException, CertificateException, SignatureException, NoSuchProviderException {
 
 		// Generamos las claves...
-		final CertAndKeyGen keyGen2 = new CertAndKeyGen("RSA", SIGNATURE_ALGORITHM); //$NON-NLS-1$
-        keyGen2.generate(KEY_SIZE);
+		X509Certificate cert;
+		KeyPair pair;
+		try {
+			KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
+			keyPairGenerator.initialize(KEY_SIZE, new SecureRandom());
+			pair = keyPairGenerator.generateKeyPair();
 
-        //Definicion de propiedades del certificado
-        final CertificateExtensions certExts = new CertificateExtensions();
+			
+			Date expirationDate = new Date();
+			expirationDate.setTime(new Date().getTime()+(long)10*365*24*3600*1000);
+			X500Name issuerDN = new JcaX509CertificateHolder((X509Certificate) issuerKeyEntry.getCertificate()).getSubject();
+			
+			X509v3CertificateBuilder certBuilder = new JcaX509v3CertificateBuilder(
+					issuerDN,
+					BigInteger.valueOf(new Random().nextInt()),
+					new Date(),
+		    		expirationDate,
+		    		new X500Name("CN="+cn),
+					pair.getPublic());
+			
+			JcaX509ExtensionUtils extUtils = new JcaX509ExtensionUtils();
+			certBuilder.addExtension(Extension.subjectKeyIdentifier, false, extUtils.createSubjectKeyIdentifier(pair.getPublic()));
+			certBuilder.addExtension(Extension.basicConstraints, false, new BasicConstraints(false));
+			certBuilder.addExtension(Extension.authorityKeyIdentifier, false, extUtils.createAuthorityKeyIdentifier(issuerKeyEntry.getCertificate().getPublicKey()));
 
-        //Marcamos todos los usos posibles para el certificado ssl
-        certExts.set(
-    		KeyUsageExtension.NAME,
-    		new KeyUsageExtension(
-    			new boolean[] {
-        			true, true, true, true, true, true, true, true, true
-				}
-			)
-		);
+			
+			// support alternateSubjectNames for SSL certificates
+			List<GeneralName> altNames = new ArrayList<GeneralName>();
+			altNames.add(new GeneralName(GeneralName.iPAddress, cn));				
+			if (altNames.size() > 0) {
+				GeneralNames subjectAltName = new GeneralNames(altNames.toArray(new GeneralName [altNames.size()]));
+				certBuilder.addExtension(Extension.subjectAlternativeName, false, subjectAltName);
+			}
 
-        final Vector<sun.security.util.ObjectIdentifier> keyUsages = new Vector<>(1);
-        keyUsages.add(new sun.security.util.ObjectIdentifier("1.3.6.1.5.5.7.3.1")); //$NON-NLS-1$
-        keyUsages.add(new sun.security.util.ObjectIdentifier("1.3.6.1.5.5.7.3.2")); //$NON-NLS-1$
-        final sun.security.x509.Extension extendedKeyUsageExtension = new ExtendedKeyUsageExtension(keyUsages);
-        certExts.set(
-    		ExtendedKeyUsageExtension.NAME,
-    		extendedKeyUsageExtension
-		);
-
-        final sun.security.x509.GeneralNames generalNames = new sun.security.x509.GeneralNames();
-        generalNames.add(
-    		new GeneralName(
-        		new sun.security.x509.DNSName(dnsname)
-    		)
-		);
-        if (ipaddress != null && !ipaddress.isEmpty()) {
-	        generalNames.add(
-	    		new GeneralName(
-	        		new sun.security.x509.IPAddressName(ipaddress)
-	    		)
-			);
-        }
-
-        final X509Certificate sslCertificate = keyGen2.getSelfCertificate(
-    		new X500Name("CN=" + cn), //$NON-NLS-1$
-    		new Date(),
-    		(long)10*365*24*3600,
-    		certExts
-	    );
-
+			ContentSigner caSigner = new JcaContentSignerBuilder(SIGNATURE_ALGORITHM).setProvider(PROVIDER).build(
+									issuerKeyEntry.getPrivateKey()
+								);
+			cert = new JcaX509CertificateConverter().setProvider(PROVIDER)
+					.getCertificate(certBuilder.build(caSigner));
+		} catch (Throwable t) {
+			throw new RuntimeException("Failed to generate SSL certificate!", t);
+		}
         return new PrivateKeyEntry(
-    		keyGen2.getPrivateKey(),
+        		pair.getPrivate(),
     		new Certificate[] {
-				signCertificate(
-		    		sslCertificate,
-		    		(X509Certificate) issuerKeyEntry.getCertificate(),
-		    		issuerKeyEntry.getPrivateKey(),
-		    		false
-	    		)
+				cert
     		}
 		);
 
 	}
-
-	private static Certificate signCertificate(final X509Certificate certificateToBeSigned,
-                                       final X509Certificate issuerCertificate,
-                                       final PrivateKey issuerPrivateKey,
-                                       final boolean isCA) throws CertificateException, IOException, InvalidKeyException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException {
-
-        final byte[] inCertBytes = certificateToBeSigned.getTBSCertificate();
-        final sun.security.x509.X509CertInfo info = new sun.security.x509.X509CertInfo(inCertBytes);
-
-        info.set(
-    		sun.security.x509.X509CertInfo.ISSUER,
-    		issuerCertificate.getSubjectDN()
-		);
-
-        if(isCA) {
-            //Extensiones del certificado
-            final CertificateExtensions ext = new CertificateExtensions();
-            ext.set(
-            		KeyUsageExtension.NAME,
-            		new KeyUsageExtension(
-        				new boolean[] {
-        					true, true, true, true, true, true, true, true, true
-        				}
-        			)
-        		);
-
-            final sun.security.x509.BasicConstraintsExtension bce = new sun.security.x509.BasicConstraintsExtension(true, -1);
-
-            ext.set(sun.security.x509.BasicConstraintsExtension.NAME,
-            		new sun.security.x509.BasicConstraintsExtension(
-            		Boolean.FALSE,
-            		bce.getExtensionValue()
-            		)
-            );
-
-           ext.set(sun.security.x509.SubjectKeyIdentifierExtension.NAME,
-                    new sun.security.x509.SubjectKeyIdentifierExtension(
-                    new sun.security.x509.KeyIdentifier(certificateToBeSigned.getPublicKey()).getIdentifier()
-                    )
-        	);
-            //Resto de atributos para la CA
-            info.set(sun.security.x509.X509CertInfo.VERSION,
-                    new sun.security.x509.CertificateVersion(sun.security.x509.CertificateVersion.V3));
-            info.set(sun.security.x509.X509CertInfo.SERIAL_NUMBER,
-                    new sun.security.x509.CertificateSerialNumber((int) (new Date().getTime() / 1000)));
-            final sun.security.x509.AlgorithmId algID = new sun.security.x509.AlgorithmId(sun.security.x509.AlgorithmId.sha256WithRSAEncryption_oid);
-            info.set(sun.security.x509.X509CertInfo.ALGORITHM_ID,
-                    new sun.security.x509.CertificateAlgorithmId(algID));
-            info.set(sun.security.x509.X509CertInfo.KEY, new sun.security.x509.CertificateX509Key(certificateToBeSigned.getPublicKey()));
-            info.set(sun.security.x509.X509CertInfo.EXTENSIONS, ext);
-        }
-        final sun.security.x509.X509CertImpl outCert = new sun.security.x509.X509CertImpl(info);
-        outCert.sign(
-    		issuerPrivateKey,
-    		issuerCertificate.getSigAlgName()
-		);
-
-        return outCert;
-	}
-
 }
