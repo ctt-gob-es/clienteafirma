@@ -28,7 +28,8 @@ public final class SimpleTest {
      * @throws Exception En cualquier error. */
     public static void main(final String[] args) throws Exception {
     	System.out.println(MozillaKeyStoreUtilities.getMozillaUserProfileDirectory());
-		SimpleTest.testDirectNssUsage();
+		//SimpleTest.testDirectNssUsage();
+    	new SimpleTest().testKeyStoreManagerCreation();
     }
 
     /** Prueba de la obtenci&oacute;n de almac&eacute;n y alias con Mozilla NSS.
