@@ -69,7 +69,6 @@ public final class CommonWaitDialog extends JDialog {
 		this.labelProgress.setLabelFor(jpb);
 		c.gridy++;
 		c.gridy++;
-		c.weightx = 0;
 		panel.add(jpb, c);
 
 		setContentPane(panel);
