@@ -21,6 +21,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.security.Provider;
 import java.security.Security;
 import java.util.HashSet;
@@ -491,7 +492,8 @@ public final class MozillaKeyStoreUtilities {
 		fos.close();
 		Provider ret;
 		try {
-			ret = p.configure(f.getAbsolutePath());
+			final Method configureMethod = Provider.class.getMethod("configure", String.class); //$NON-NLS-1$
+			ret = (Provider) configureMethod.invoke(p, f.getAbsolutePath());
 		}
 		catch (final Exception e) {
 			// No se ha podido cargar el proveedor sin precargar las dependencias
@@ -503,7 +505,13 @@ public final class MozillaKeyStoreUtilities {
 			else {
 				MozillaKeyStoreUtilities.loadNSSDependencies(nssDirectory);
 			}
-			ret = p.configure(f.getAbsolutePath());
+			try {
+				final Method configureMethod = Provider.class.getMethod("configure", String.class); //$NON-NLS-1$
+				ret = (Provider) configureMethod.invoke(p, f.getAbsolutePath());
+			}
+			catch (final Exception ex) {
+				throw new AOException("Ocurrio un error al configurar el proveedor de acceso a NSS", ex); //$NON-NLS-1$
+			}
 		}
 		f.delete();
 		return ret;
