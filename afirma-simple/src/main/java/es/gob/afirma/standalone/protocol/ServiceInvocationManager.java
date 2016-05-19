@@ -34,7 +34,6 @@ import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.keystores.mozilla.MozillaKeyStoreUtilitiesOsX;
 import es.gob.afirma.standalone.AutoFirmaUtil;
 
-/** Gestor general de la invocaci&oacute;n por protocolo y comunicaci&oacute;n por servicio (<i>socket</i> local). */
 public final class ServiceInvocationManager {
 
 	static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
@@ -116,20 +115,18 @@ public final class ServiceInvocationManager {
 		final ScriptEngine se = MozillaKeyStoreUtilitiesOsX.getAppleScriptEngine();
 		try {
 			se.eval(script);
-		}
-		catch (final Exception e) {
+		} catch (final Exception e) {
 			LOGGER.warning("Fallo kill: " + e); //$NON-NLS-1$
 		}
 	}
 
 	/** Coge el foco del sistema en OS X. En el resto del sistemas no hace nada. */
 	public static void focusApplication() {
-		LOGGER.warning("Cojo el foco de la aplicacion en mac"); //$NON-NLS-1$
 		final String script = "tell me to activate"; //$NON-NLS-1$
 		final ScriptEngine se = MozillaKeyStoreUtilitiesOsX.getAppleScriptEngine();
 		try {
 			se.eval(script);
-		}
+		} 
 		catch (final Exception e) {
 			LOGGER.warning("Fallo cogiendo el foco en mac: " + e); //$NON-NLS-1$
 		}
@@ -140,7 +137,6 @@ public final class ServiceInvocationManager {
 	private static int parts = 0;
 	private static SSLServerSocket  ssocket;
 	private static String idSession ;
-
 	/** Constructor vac&iacute;o privado para que no se pueda instanciar la clase ya que es est&aacute;tico. */
 	private ServiceInvocationManager(){
 		// No instanciable
@@ -289,8 +285,8 @@ public final class ServiceInvocationManager {
 		}
 		catch (final IOException e) {
 			throw new IllegalArgumentException(
-				"Los parametros de la URI de invocacion no estan el el formato correcto: " + url, e //$NON-NLS-1$
-			);
+				"Los parametros de la URI de invocacion no estan el el formato correcto: " + url //$NON-NLS-1$
+			, e);
 		}
 		final String ps = p.getProperty("ports"); //$NON-NLS-1$
 		checkNullParameter(ps, "La URI de invocacion no contiene el parametro 'ports': " + url); //$NON-NLS-1$
@@ -302,15 +298,14 @@ public final class ServiceInvocationManager {
 			}
 			catch(final Exception e) {
 				throw new IllegalArgumentException(
-					"El parametro 'ports' de la URI de invocacion contiene valores no numericos: " + e, e //$NON-NLS-1$
-				);
+					"El parametro 'ports' de la URI de invocacion contiene valores no numericos: " + e //$NON-NLS-1$
+				, e);
 			}
 		}
 		idSession = p.getProperty(IDSESSION);
 		if(idSession != null ){
 		    LOGGER.info("Se ha recibido un idSesion para la transaccion"); //$NON-NLS-1$
-		}
-		else {
+		} else {
             LOGGER.info("No se utilizara idSesion durante la transaccion"); //$NON-NLS-1$
         }
 		return ret;
@@ -337,8 +332,8 @@ public final class ServiceInvocationManager {
 		}
 		catch (final IOException e) {
 			throw new IllegalArgumentException(
-				"Los parametros de la URI de invocacion no estan el el formato correcto: " + url, e //$NON-NLS-1$
-			);
+				"Los parametros de la URI de invocacion no estan el el formato correcto: " + url //$NON-NLS-1$
+			, e);
 		}
 		return p.getProperty(PROTOCOL_VERSION_PARAM);
 	}
@@ -476,9 +471,11 @@ public final class ServiceInvocationManager {
 		return data.toString();
 	}
 
-	/** Comprueba que la direcci&oacute;n que intenta conectarse es local.
+	/**
+	 * Comprueba que la direcci&oacute;n que intenta conectarse es local.
 	 * @param a Direcci&oacute;n a probar.
-	 * @return true si es direcci&oacute;n local, false en caso contrario. */
+	 * @return true si es direcci&oacute;n local, false en caso contrario.
+	 */
 	private static boolean isLocalAddress(final InetSocketAddress a) {
 		final String hostString = a.getHostString();
 		if (LOOP_DIR_2.equals(hostString) ||
@@ -538,8 +535,8 @@ public final class ServiceInvocationManager {
         }
 		catch(final Exception e) {
 			throw new IllegalArgumentException(
-				"Error al procesar el comando de tipo '" + uriType + "': " + e, e //$NON-NLS-1$ //$NON-NLS-2$
-			);
+				"Error al procesar el comando de tipo '" + uriType + "': " + e //$NON-NLS-1$ //$NON-NLS-2$
+			, e);
 		}
 
 	}
@@ -562,8 +559,8 @@ public final class ServiceInvocationManager {
 		}
 		if (uriType == null) {
 			throw new IllegalArgumentException(
-				"Los datos recibidos por HTTP no contienen comando reconocido: "+httpRequest //$NON-NLS-1$
-			);
+					"Los datos recibidos por HTTP no contienen comando reconocido: "+httpRequest //$NON-NLS-1$
+					);
 		}
 		return uriType;
 	}
@@ -658,8 +655,8 @@ public final class ServiceInvocationManager {
                 }
 				else {
 					throw new IllegalArgumentException(
-						"Error al realizar la operacion save" //$NON-NLS-1$
-					);
+							"Error al realizar la operacion save" //$NON-NLS-1$
+						);
 				}
 			}
 			else {
@@ -673,8 +670,8 @@ public final class ServiceInvocationManager {
 		}
 		else{
 			throw new IllegalArgumentException(
-				"Los datos recibidos en el parametro 'cmd' por HTTP no son una URI del tipo 'afirma://': " + cmdUri //$NON-NLS-1$
-			);
+					"Los datos recibidos en el parametro 'cmd' por HTTP no son una URI del tipo 'afirma://': " + cmdUri //$NON-NLS-1$
+				);
 		}
 	}
 
@@ -725,8 +722,8 @@ public final class ServiceInvocationManager {
 		final int partTotal = Integer.parseInt(petition [2]);
 		if (part < 1 || part > partTotal) {
 			throw new IllegalArgumentException(
-				"Se ha solicitado enviar un fragmento invalido: " + part + "de " + partTotal //$NON-NLS-1$ //$NON-NLS-2$
-			);
+					"Se ha solicitado enviar un fragmento invalido: " + part + "de " + partTotal //$NON-NLS-1$ //$NON-NLS-2$
+					);
 		}
 		sendData(createHttpResponse(true, toSend.get(part-1)), socketChannel, "Mandada la parte " + part + " de " + partTotal); //$NON-NLS-1$ //$NON-NLS-2$
 	}
@@ -765,7 +762,8 @@ public final class ServiceInvocationManager {
 		parts = 0;
 	}
 
-	/** Comprueba que el idSession de la petici&oacute;n recibida coincida con el idSession generado al abrir la aplicaci&oacute;n por socket.
+	/**
+	 * Comprueba que el idSession de la petici&oacute;n recibida coincida con el idSession generado al abrir la aplicaci&oacute;n por socket.
 	 * @param requestSessionId Identificador de sesi&oacute;n enviado en la petici&oacute;n. */
 	private static void checkIdSession (final String requestSessionId) {
 		// se esperaba un idSession y no se ha recibido
