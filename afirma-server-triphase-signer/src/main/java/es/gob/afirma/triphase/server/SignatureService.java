@@ -481,7 +481,9 @@ public final class SignatureService extends HttpServlet {
 			}
 
 			// Establecemos parametros adicionales que se pueden utilizar para guardar el documento
-			extraParams.setProperty(PARAM_NAME_FORMAT, format);
+			if (!extraParams.containsKey(PARAM_NAME_FORMAT)) {
+				extraParams.setProperty(PARAM_NAME_FORMAT, format);
+			}
 
 			LOGGER.info(" Se ha calculado el resultado de la postfirma y se devuelve. Numero de bytes: " + signedDoc.length); //$NON-NLS-1$
 

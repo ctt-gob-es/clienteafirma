@@ -9,6 +9,7 @@ import javax.security.auth.callback.PasswordCallback;
 
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.Base64;
+import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.misc.protocol.UrlParametersToSelectCert;
 import es.gob.afirma.keystores.AOCertificatesNotFoundException;
 import es.gob.afirma.keystores.AOKeyStore;
@@ -66,8 +67,10 @@ final class ProtocolInvocationLauncherSelectCert {
 
 		LOGGER.info("Cargando dialogo de seleccion de certificados..."); //$NON-NLS-1$
 
-		try {
+		if (Platform.OS.MACOSX.equals(Platform.getOS())) {
 			ServiceInvocationManager.focusApplication();
+		}
+		try {
 			final AOKeyStoreDialog dialog = new AOKeyStoreDialog(
 				ksm,
 				null,

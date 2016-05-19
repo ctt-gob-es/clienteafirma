@@ -109,10 +109,10 @@ public final class FileSystemDocumentManager implements DocumentManager {
 		}
 
 		final String format = prop.getProperty(FORMAT_PROPERTY);
-		if (AOSignConstants.SIGN_FORMAT_CADES.equalsIgnoreCase(format)) {
+		if (format != null && AOSignConstants.SIGN_FORMAT_CADES.equalsIgnoreCase(format)) {
 			newId += ".csig";  //$NON-NLS-1$
 		}
-		else if (AOSignConstants.SIGN_FORMAT_XADES.equalsIgnoreCase(format)) {
+		else if (format != null && format.toLowerCase().startsWith(AOSignConstants.SIGN_FORMAT_XADES.toLowerCase())) {
 			newId += ".xsig"; //$NON-NLS-1$
 		}
 		else if (lastDotPos < initialId.length() - 1) {
