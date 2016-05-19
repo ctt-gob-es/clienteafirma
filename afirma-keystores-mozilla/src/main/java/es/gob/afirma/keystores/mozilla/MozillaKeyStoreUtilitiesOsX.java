@@ -33,6 +33,9 @@ public final class MozillaKeyStoreUtilitiesOsX {
 		// No dejamos instanciar
 	}
 
+	/** Configura adecuadamente el acceso (mediante enlaces simb&oacute;licos) de NSS en OS X.
+	 * @param binDir Directorio original de las bibliotecas NSS.
+	 * @throws AOException Si ocurre cualquier error durante el proceso. */
 	public static void configureMacNSS(final String binDir) throws AOException {
 
 		if (!Platform.OS.MACOSX.equals(Platform.getOS())) {
@@ -84,7 +87,7 @@ public final class MozillaKeyStoreUtilitiesOsX {
 			}
 		}
 		try {
-			
+
 			final ScriptEngine se = getAppleScriptEngine();
 			if (se != null) {
 				se.eval("do shell script \"" + sb.toString() + "\" with administrator privileges"); //$NON-NLS-1$ //$NON-NLS-2$

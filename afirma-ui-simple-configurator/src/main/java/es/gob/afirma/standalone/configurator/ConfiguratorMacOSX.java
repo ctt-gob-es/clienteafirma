@@ -8,7 +8,6 @@ import java.io.InputStream;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.MessageDigest;
-import java.security.cert.Certificate;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.logging.Logger;
@@ -49,7 +48,6 @@ final class ConfiguratorMacOSX implements Configurator {
 	private static final String KEYCHAIN_PATH = "/Library/Keychains/System.keychain"; //$NON-NLS-1$
 	private static final String OSX_SEC_COMMAND = "security add-trusted-cert -d -r trustRoot -k %KEYCHAIN% %CERT%"; //$NON-NLS-1$
 	private static final String OSX_SEC_KS_CERT_COMMAND = "security add-trusted-cert -d -r trustAsRoot -k %KEYCHAIN% %CERT%"; //$NON-NLS-1$
-	private static final String OSX_SEC_KS_COMMAND = "security import %CERT% -k %KEYCHAIN% -P " + KS_PASSWORD; //$NON-NLS-1$
 	static final String OSX_GET_USERS_COMMAND = "dscacheutil -q user"; //$NON-NLS-1$
 	static final String MAC_SCRIPT_NAME = "/installCerScript"; //$NON-NLS-1$
 	static final String MAC_SCRIPT_EXT = ".sh"; //$NON-NLS-1$
@@ -88,8 +86,10 @@ final class ConfiguratorMacOSX implements Configurator {
 
 			window.print(Messages.getString("ConfiguratorMacOSX.11")); //$NON-NLS-1$
 
-			ConfiguratorUtil.installFile(certPack.getPkcs12(),
-					new File(ConfiguratorUtil.getApplicationDirectory(), KS_FILENAME));
+			ConfiguratorUtil.installFile(
+				certPack.getPkcs12(),
+				new File(ConfiguratorUtil.getApplicationDirectory(), KS_FILENAME)
+			);
 
 			window.print(Messages.getString("ConfiguratorMacOSX.6")); //$NON-NLS-1$
 
@@ -108,7 +108,7 @@ final class ConfiguratorMacOSX implements Configurator {
 					new String[] { OSX_GET_USERS_COMMAND }
 				);
 				// Tambien hay que instalar el certificado en el almacen de Apple
-				importCARootOnMacOSXKeyStore(certPack.getCaCertificate());
+				importCARootOnMacOSXKeyStore();
 				ConfiguratorFirefox.addExexPermissionsToFile(new File(mac_script_path));
 				ConfiguratorFirefox.executeScriptMacOsx(mac_script_path, true, true);
 				LOGGER.info("Configuracion de NSS"); //$NON-NLS-1$
@@ -116,7 +116,8 @@ final class ConfiguratorMacOSX implements Configurator {
 			}
 			catch (final MozillaProfileNotFoundException e) {
 				window.print(Messages.getString("ConfiguratorMacOSX.12")); //$NON-NLS-1$
-			} catch (final AOException e1) {
+			}
+			catch (final AOException e1) {
 				LOGGER.info("La configuracion de NSS para Mac OS X ha fallado: " + e1); //$NON-NLS-1$
 			}
 			finally {
@@ -135,25 +136,18 @@ final class ConfiguratorMacOSX implements Configurator {
 
 	}
 
-	/**
-	 * Comprueba si ya existe un almac&eacute;n de certificados generado.
-	 *
-	 * @param appConfigDir
-	 *            Directorio de configuraci&oacute;n de la aplicaci&oacute;n.
+	/** Comprueba si ya existe un almac&eacute;n de certificados generado.
+	 * @param appConfigDir Directorio de configuraci&oacute;n de la aplicaci&oacute;n.
 	 * @return {@code true} si ya existe un almacen de certificados SSL,
-	 *         {@code false} en caso contrario.
-	 */
+	 *         {@code false} en caso contrario. */
 	private static boolean checkSSLKeyStoreGenerated(final File appConfigDir) {
 		return new File(appConfigDir, KS_FILENAME).exists();
 	}
 
-	/**
-	 * Genera el comando de instalaci&oacute;n del certificado en el almac&eacute;n de apple en el script de instalaci&oacute;n.
-	 * @param cert Certificado a instalar.
+	/** Genera el comando de instalaci&oacute;n del certificado en el almac&eacute;n de apple en el script de instalaci&oacute;n.
 	 * @throws GeneralSecurityException Se produce si hay un problema de seguridad durante el proceso.
-	 * @throws IOException Se produce cuando hay un error en la creaci&oacute;n del fichero.
-	 */
-	static void importCARootOnMacOSXKeyStore(final Certificate cert) throws GeneralSecurityException, IOException {
+	 * @throws IOException Se produce cuando hay un error en la creaci&oacute;n del fichero. */
+	static void importCARootOnMacOSXKeyStore() throws GeneralSecurityException, IOException {
 		final File f = new File(ConfiguratorUtil.getApplicationDirectory() + MACOSX_CERTIFICATE);
 		final String cmd = OSX_SEC_COMMAND.replace(
 			"%KEYCHAIN%", //$NON-NLS-1$
@@ -188,9 +182,11 @@ final class ConfiguratorMacOSX implements Configurator {
 		final byte[] buf = certPfx.getEncoded();
 
 		ksFile = new File(ConfiguratorUtil.getApplicationDirectory() + KS_CER_FILENAME);
-		final FileOutputStream os = new FileOutputStream(ksFile);
-		os.write(buf);
-		os.close();
+		try (
+			final FileOutputStream os = new FileOutputStream(ksFile);
+		) {
+			os.write(buf);
+		}
 
 		final String cmdKs = OSX_SEC_KS_CERT_COMMAND.replace(
 			"%KEYCHAIN%", //$NON-NLS-1$
@@ -215,7 +211,8 @@ final class ConfiguratorMacOSX implements Configurator {
 
 	@Override
 	public void uninstall() {
-		LOGGER.info("Desinstalamos el certificado raiz del almacen de MacOSX"); //$NON-NLS-1$
+
+		LOGGER.info("Desinstalacion del certificado raiz del almacen de MacOSX"); //$NON-NLS-1$
 
 		try {
 			// generamos script para borrar almacen de certificados de apple
@@ -227,7 +224,7 @@ final class ConfiguratorMacOSX implements Configurator {
 			);
 		}
 		catch (MozillaProfileNotFoundException | IOException e) {
-			LOGGER.severe("Se ha producido un error durante la desinstalacion :" + e); //$NON-NLS-1$
+			LOGGER.severe("Se ha producido un error durante la desinstalacion: " + e); //$NON-NLS-1$
 		}
 	}
 
@@ -312,8 +309,9 @@ final class ConfiguratorMacOSX implements Configurator {
 				)
 			);
 			transformer.transform(domSource, streamResult);
-		} catch (final Exception e) {
-			LOGGER.severe("Error parsing plist:" + e); //$NON-NLS-1$
+		}
+		catch (final Exception e) {
+			LOGGER.severe("Error analizando el PList: " + e); //$NON-NLS-1$
 		}
 	}
 

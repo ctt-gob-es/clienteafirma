@@ -1,4 +1,4 @@
-package es.gob.afirma.keystores.mozilla;
+package es.gob.afirma.keystores.mozilla.shared;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -17,7 +17,7 @@ public final class TestNssSharedDb {
 	 * @throws Exception En cualquier error. */
 	@SuppressWarnings("static-method")
 	@Test
-	public void testPkcs11Txt() throws Exception {
+	public void testRawPkcs11Txt() throws Exception {
 
 		final byte[] pkcs11Txt = AOUtil.getDataFromInputStream(
 			TestNssSharedDb.class.getResourceAsStream("/pkcs11.txt") //$NON-NLS-1$
@@ -33,6 +33,15 @@ public final class TestNssSharedDb {
 	    String line;
 	    while ((line = br.readLine()) != null) {
 	       System.out.println(AOUtil.getRDNvalueFromLdapName("library", line.replace(" ", ","))); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+	       System.out.println(
+    		   line.substring(
+				   line.indexOf("name=\"") + "name=\"".length(),  //$NON-NLS-1$ //$NON-NLS-2$
+				   line.indexOf(
+					   '"', 
+					   line.indexOf("name=\"") + "name=\"".length() //$NON-NLS-1$ //$NON-NLS-2$
+				   )
+			   )
+		   );
 	    }
 	    br.close();
 	}
