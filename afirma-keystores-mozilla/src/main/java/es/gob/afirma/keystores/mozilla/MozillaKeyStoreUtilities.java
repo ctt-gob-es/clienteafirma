@@ -489,8 +489,9 @@ public final class MozillaKeyStoreUtilities {
 		final OutputStream fos = new FileOutputStream(f);
 		fos.write(p11NSSConfigFile.getBytes());
 		fos.close();
+		Provider ret;
 		try {
-			return p.configure(f.getAbsolutePath());
+			ret = p.configure(f.getAbsolutePath());
 		}
 		catch (final Exception e) {
 			// No se ha podido cargar el proveedor sin precargar las dependencias
@@ -502,8 +503,10 @@ public final class MozillaKeyStoreUtilities {
 			else {
 				MozillaKeyStoreUtilities.loadNSSDependencies(nssDirectory);
 			}
-			return p.configure(f.getAbsolutePath());
+			ret = p.configure(f.getAbsolutePath());
 		}
+		f.delete();
+		return ret;
 	}
 
 	private static Provider loadNssJava8(final String nssDirectory, final String p11NSSConfigFile) throws AOException,
@@ -593,7 +596,7 @@ public final class MozillaKeyStoreUtilities {
 
 		Security.addProvider(p);
 
-		LOGGER.info("Proveedor PKCS#11 para Firefox anadido"); //$NON-NLS-1$
+		LOGGER.info("Proveedor PKCS#11 para Firefox anadido: " + p.getName()); //$NON-NLS-1$
 
 		return p;
 	}
