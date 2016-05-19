@@ -7,18 +7,15 @@ package es.gob.afirma.standalone.configurator;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigInteger;
-import java.security.InvalidKeyException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.KeyStore;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.SecureRandom;
 import java.security.Security;
-import java.security.SignatureException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -60,9 +57,9 @@ final class CertUtil {
 	private static final String AF_ROOT_SUBJECT_PRINCIPAL = "CN=AutoFirma ROOT"; //$NON-NLS-1$
 
 	private static final int KEY_SIZE = 2048;
-	
-	private static final String PROVIDER = "SC";
-	
+
+	private static final String PROVIDER = "SC"; //$NON-NLS-1$
+
 	private static final String SIGNATURE_ALGORITHM = "SHA256withRSA"; //$NON-NLS-1$
 
 	static class CertPack {
@@ -112,14 +109,13 @@ final class CertUtil {
 		}
 	}
 
-	static CertPack getCertPackForLocalhostSsl(final String sslCertificateAlias, final String storePassword) throws InvalidKeyException, NoSuchAlgorithmException, NoSuchProviderException, CertificateException, SignatureException, IOException {
+	static CertPack getCertPackForLocalhostSsl(final String sslCertificateAlias, final String storePassword) throws NoSuchAlgorithmException, CertificateException, IOException {
 
 		Security.addProvider(new BouncyCastleProvider());
 		final PrivateKeyEntry caCertificatePrivateKeyEntry = generateCaCertificate(
 			AF_ROOT_SUBJECT_PRINCIPAL
 		);
 		final PrivateKeyEntry sslCertificatePrivateKeyEntry = generateSslCertificate(
-			"127.0.0.1", //$NON-NLS-1$
 			"localhost", //$NON-NLS-1$
 			caCertificatePrivateKeyEntry
 		);
@@ -133,20 +129,17 @@ final class CertUtil {
 	}
 
 	private static PrivateKeyEntry generateCaCertificate(final String subjectPrincipal) throws NoSuchAlgorithmException,
-                                                                                               NoSuchProviderException,
-                                                                                               InvalidKeyException,
                                                                                                CertificateException,
-                                                                                               SignatureException,
                                                                                                IOException {
 		// Generamos el par de claves...
-		KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
+		final KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA"); //$NON-NLS-1$
 		keyPairGenerator.initialize(KEY_SIZE, new SecureRandom());
-		KeyPair keyPair = keyPairGenerator.generateKeyPair();
+		final KeyPair keyPair = keyPairGenerator.generateKeyPair();
 
 		//Creamos el generador de certificados
-		Date expirationDate = new Date();
+		final Date expirationDate = new Date();
 		expirationDate.setTime(new Date().getTime()+(long)10*365*24*3600*1000);
-		X509v3CertificateBuilder generator = new JcaX509v3CertificateBuilder(
+		final X509v3CertificateBuilder generator = new JcaX509v3CertificateBuilder(
 			new X500Name(subjectPrincipal),
 			BigInteger.valueOf(new Random().nextInt()),
     		new Date(),
@@ -160,24 +153,25 @@ final class CertUtil {
 		try {
 			digCalc = new BcDigestCalculatorProvider()
 			        .get(new AlgorithmIdentifier(OIWObjectIdentifiers.idSHA1));
-		} catch (OperatorCreationException e) {
-			throw new IOException("No se ha podido inicializar el operador de cifrado");
 		}
-        X509ExtensionUtils x509ExtensionUtils = new X509ExtensionUtils(digCalc);
-        
-        byte[] encoded = keyPair.getPublic().getEncoded();
-        SubjectPublicKeyInfo subjectPublicKeyInfo = SubjectPublicKeyInfo.getInstance(ASN1Sequence.getInstance(encoded));
+		catch (final OperatorCreationException e) {
+			throw new IOException("No se ha podido inicializar el operador de cifrado: " + e, e); //$NON-NLS-1$
+		}
+        final X509ExtensionUtils x509ExtensionUtils = new X509ExtensionUtils(digCalc);
+
+        final byte[] encoded = keyPair.getPublic().getEncoded();
+        final SubjectPublicKeyInfo subjectPublicKeyInfo = SubjectPublicKeyInfo.getInstance(ASN1Sequence.getInstance(encoded));
 		generator.addExtension(Extension.subjectKeyIdentifier, false,
 				x509ExtensionUtils.createSubjectKeyIdentifier(subjectPublicKeyInfo));
 	    generator.addExtension(Extension.basicConstraints, true,
 	            new BasicConstraints(true));
 
-	    KeyUsage usage = new KeyUsage(KeyUsage.keyCertSign
+	    final KeyUsage usage = new KeyUsage(KeyUsage.keyCertSign
 	            | KeyUsage.digitalSignature | KeyUsage.keyEncipherment
 	            | KeyUsage.dataEncipherment | KeyUsage.cRLSign);
 	    generator.addExtension(Extension.keyUsage, false, usage);
 
-	    ASN1EncodableVector purposes = new ASN1EncodableVector();
+	    final ASN1EncodableVector purposes = new ASN1EncodableVector();
 	    purposes.add(KeyPurposeId.id_kp_serverAuth);
 	    purposes.add(KeyPurposeId.id_kp_clientAuth);
 	    purposes.add(KeyPurposeId.anyExtendedKeyUsage);
@@ -188,16 +182,17 @@ final class CertUtil {
 	    X509Certificate cert = null;
 		try {
 			cert = new JcaX509CertificateConverter().setProvider(PROVIDER).getCertificate(
-					generator.build(
-							new JcaContentSignerBuilder(SIGNATURE_ALGORITHM).setProvider(PROVIDER).build(
-									keyPair.getPrivate()
-									)
-							)
-					);
-		} catch (OperatorCreationException e) {
-			new CertificateException("Error durante la construccion del certificado CA");
+				generator.build(
+					new JcaContentSignerBuilder(SIGNATURE_ALGORITHM).setProvider(PROVIDER).build(
+						keyPair.getPrivate()
+					)
+				)
+			);
 		}
-	    		
+		catch (final OperatorCreationException e) {
+			throw new CertificateException("Error durante la construccion del certificado CA: " + e, e); //$NON-NLS-1$
+		}
+
         //Definicion de propiedades del certificado
         return new PrivateKeyEntry(
         		keyPair.getPrivate(),
@@ -208,54 +203,55 @@ final class CertUtil {
 	}
 
 	private static PrivateKeyEntry generateSslCertificate(final String cn,
-			                                              final String ipaddress,
-			                                              final PrivateKeyEntry issuerKeyEntry) throws NoSuchAlgorithmException, InvalidKeyException, IOException, CertificateException, SignatureException, NoSuchProviderException {
+			                                              final PrivateKeyEntry issuerKeyEntry) {
 
 		// Generamos las claves...
 		X509Certificate cert;
 		KeyPair pair;
 		try {
-			KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
+			final KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA"); //$NON-NLS-1$
 			keyPairGenerator.initialize(KEY_SIZE, new SecureRandom());
 			pair = keyPairGenerator.generateKeyPair();
 
 			//Generamos el generador de certificados
-			Date expirationDate = new Date();
+			final Date expirationDate = new Date();
 			expirationDate.setTime(new Date().getTime()+(long)10*365*24*3600*1000);
-			X500Name issuerDN = new JcaX509CertificateHolder((X509Certificate) issuerKeyEntry.getCertificate()).getSubject();
-			
-			X509v3CertificateBuilder certBuilder = new JcaX509v3CertificateBuilder(
-					issuerDN,
-					BigInteger.valueOf(new Random().nextInt()),
-					new Date(),
-		    		expirationDate,
-		    		new X500Name("CN="+cn),
-					pair.getPublic());
-			
+			final X500Name issuerDN = new JcaX509CertificateHolder((X509Certificate) issuerKeyEntry.getCertificate()).getSubject();
+
+			final X509v3CertificateBuilder certBuilder = new JcaX509v3CertificateBuilder(
+				issuerDN,
+				BigInteger.valueOf(new Random().nextInt()),
+				new Date(),
+	    		expirationDate,
+	    		new X500Name("CN="+cn), //$NON-NLS-1$
+				pair.getPublic()
+			);
+
 			//Incluimos los atributos del certifiado
-			JcaX509ExtensionUtils extUtils = new JcaX509ExtensionUtils();
+			final JcaX509ExtensionUtils extUtils = new JcaX509ExtensionUtils();
 			certBuilder.addExtension(Extension.subjectKeyIdentifier, false, extUtils.createSubjectKeyIdentifier(pair.getPublic()));
 			certBuilder.addExtension(Extension.basicConstraints, false, new BasicConstraints(false));
 			certBuilder.addExtension(Extension.authorityKeyIdentifier, false, extUtils.createAuthorityKeyIdentifier(issuerKeyEntry.getCertificate().getPublicKey()));
 
-			List<GeneralName> altNames = new ArrayList<GeneralName>();
-			altNames.add(new GeneralName(GeneralName.iPAddress, cn));				
+			final List<GeneralName> altNames = new ArrayList<>();
+			altNames.add(new GeneralName(GeneralName.iPAddress, cn));
 			if (altNames.size() > 0) {
-				GeneralNames subjectAltName = new GeneralNames(altNames.toArray(new GeneralName [altNames.size()]));
+				final GeneralNames subjectAltName = new GeneralNames(altNames.toArray(new GeneralName [altNames.size()]));
 				certBuilder.addExtension(Extension.subjectAlternativeName, false, subjectAltName);
 			}
 
 			//Firma del certificado SSL con la clave privada del CA
-			ContentSigner caSigner = new JcaContentSignerBuilder(SIGNATURE_ALGORITHM).setProvider(PROVIDER).build(
-									issuerKeyEntry.getPrivateKey()
-								);
+			final ContentSigner caSigner = new JcaContentSignerBuilder(SIGNATURE_ALGORITHM).setProvider(PROVIDER).build(
+				issuerKeyEntry.getPrivateKey()
+			);
 			cert = new JcaX509CertificateConverter().setProvider(PROVIDER)
 					.getCertificate(certBuilder.build(caSigner));
-		} catch (Throwable t) {
-			throw new RuntimeException("Error al generar el certificado SSL", t);
+		}
+		catch (final Exception | Error t) {
+			throw new RuntimeException("Error al generar el certificado SSL: " + t, t); //$NON-NLS-1$
 		}
         return new PrivateKeyEntry(
-        		pair.getPrivate(),
+    		pair.getPrivate(),
     		new Certificate[] {
 				cert
     		}
