@@ -14,6 +14,7 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
+import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
 
 import es.gob.afirma.core.misc.Platform;
@@ -43,8 +44,11 @@ public final class CommonWaitDialog extends JDialog {
 		final JPanel panel = new JPanel();
 		panel.setLayout(new GridBagLayout());
 		final GridBagConstraints c = new GridBagConstraints();
-		c.anchor = GridBagConstraints.LINE_START;
+		c.anchor = GridBagConstraints.CENTER;
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.weightx = 1;
 		panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+		this.labelProgress.setHorizontalAlignment(SwingConstants.CENTER);
 		this.labelProgress.setText(message);
 		panel.add(this.labelProgress, c);
 
@@ -65,7 +69,7 @@ public final class CommonWaitDialog extends JDialog {
 		this.labelProgress.setLabelFor(jpb);
 		c.gridy++;
 		c.gridy++;
-		c.anchor = GridBagConstraints.CENTER;
+		c.weightx = 0;
 		panel.add(jpb, c);
 
 		setContentPane(panel);
