@@ -120,7 +120,7 @@ public class TestCountersignNode {
 				sign,
 				AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA,
 				CounterSignTarget.NODES,
-				new Integer[] { new Integer(1) },
+				new Integer[] { Integer.valueOf(1) },
 				pke.getPrivateKey(),
 				pke.getCertificateChain(),
 				config);
@@ -153,7 +153,7 @@ public class TestCountersignNode {
 				sign,
 				AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA,
 				CounterSignTarget.NODES,
-				new Integer[] { new Integer(2) },
+				new Integer[] { Integer.valueOf(2) },
 				pke.getPrivateKey(),
 				pke.getCertificateChain(),
 				config);
@@ -186,7 +186,7 @@ public class TestCountersignNode {
 				sign,
 				AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA,
 				CounterSignTarget.NODES,
-				new Integer[] { new Integer(3) },
+				new Integer[] { Integer.valueOf(3) },
 				pke.getPrivateKey(),
 				pke.getCertificateChain(),
 				config);
