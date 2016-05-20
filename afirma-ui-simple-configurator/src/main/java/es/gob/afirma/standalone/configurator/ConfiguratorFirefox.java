@@ -394,13 +394,13 @@ final class ConfiguratorFirefox {
 		perms.add(PosixFilePermission.OTHERS_WRITE);
 		try {
 			Files.setPosixFilePermissions(
-					Paths.get(f.getAbsolutePath()),
-					perms
-					);
+				Paths.get(f.getAbsolutePath()),
+				perms
+			);
 		}
 		catch (final Exception e) {
 			LOGGER.warning(
-				"No se ha podido dar permiso de ejecucion a " + f.getAbsolutePath() //$NON-NLS-1$
+				"No se ha podido dar permiso de ejecucion a '" + f.getAbsolutePath() + "': " + e//$NON-NLS-1$ //$NON-NLS-2$
 			);
 		}
 	}
