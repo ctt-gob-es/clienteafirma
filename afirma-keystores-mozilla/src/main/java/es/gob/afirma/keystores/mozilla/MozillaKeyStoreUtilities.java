@@ -32,6 +32,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.BoundedBufferedReader;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.keystores.mozilla.AOSecMod.ModuleName;
@@ -40,6 +41,8 @@ import es.gob.afirma.keystores.mozilla.shared.SharedNssUtil;
 /** Clase con m&eacute;toos de utilidad para la gesti&oacute;n del almac&eacute;n
  * de certificados de Mozilla. */
 public final class MozillaKeyStoreUtilities {
+
+	private static final String SUN_PKCS11_PROVIDER_CLASSNAME = "sun.security.pkcs11.SunPKCS11"; //$NON-NLS-1$
 
 	private static final String LIB_NSPR4_SO = "/lib/libnspr4.so"; //$NON-NLS-1$
 
@@ -483,12 +486,12 @@ public final class MozillaKeyStoreUtilities {
 		return dir;
 	}
 
-	private static Provider loadNssJava9(final String nssDirectory, final String p11NSSConfigFile) throws IOException,
-	                                                                                                      AOException {
+	private static Provider loadNssJava9(final String nssDirectory, final String p11NSSConfigFileContents) throws IOException,
+	                                                                                                              AOException {
 		final Provider p = Security.getProvider("SunPKCS11"); //$NON-NLS-1$
-		final File f = File.createTempFile("pkcs11_", ".cfg");  //$NON-NLS-1$//$NON-NLS-2$
+		final File f = File.createTempFile("pkcs11_nss_", ".cfg");  //$NON-NLS-1$//$NON-NLS-2$
 		final OutputStream fos = new FileOutputStream(f);
-		fos.write(p11NSSConfigFile.getBytes());
+		fos.write(p11NSSConfigFileContents.getBytes());
 		fos.close();
 		Provider ret;
 		try {
@@ -517,18 +520,18 @@ public final class MozillaKeyStoreUtilities {
 		return ret;
 	}
 
-	private static Provider loadNssJava8(final String nssDirectory, final String p11NSSConfigFile) throws AOException,
-	                                                                                                      InstantiationException,
-	                                                                                                      IllegalAccessException,
-	                                                                                                      IllegalArgumentException,
-	                                                                                                      InvocationTargetException,
-	                                                                                                      NoSuchMethodException,
-	                                                                                                      SecurityException,
-	                                                                                                      ClassNotFoundException {
+	private static Provider loadNssJava8(final String nssDirectory, final String p11NSSConfigFileContents) throws AOException,
+	                                                                                                              InstantiationException,
+	                                                                                                              IllegalAccessException,
+	                                                                                                              IllegalArgumentException,
+	                                                                                                              InvocationTargetException,
+	                                                                                                              NoSuchMethodException,
+	                                                                                                              SecurityException,
+	                                                                                                              ClassNotFoundException {
 		try {
-			return (Provider) Class.forName("sun.security.pkcs11.SunPKCS11") //$NON-NLS-1$
+			return (Provider) Class.forName(SUN_PKCS11_PROVIDER_CLASSNAME)
 				.getConstructor(InputStream.class)
-					.newInstance(new ByteArrayInputStream(p11NSSConfigFile.getBytes()));
+					.newInstance(new ByteArrayInputStream(p11NSSConfigFileContents.getBytes()));
 		}
 		catch (final Exception e) {
 
@@ -546,35 +549,18 @@ public final class MozillaKeyStoreUtilities {
 			}
 
 			try {
-				return (Provider) Class.forName("sun.security.pkcs11.SunPKCS11") //$NON-NLS-1$
+				return (Provider) Class.forName(SUN_PKCS11_PROVIDER_CLASSNAME)
 					.getConstructor(InputStream.class)
-						.newInstance(new ByteArrayInputStream(p11NSSConfigFile.getBytes()));
+						.newInstance(new ByteArrayInputStream(p11NSSConfigFileContents.getBytes()));
 			}
 			catch (final Exception e2) {
 				// Un ultimo intento de cargar el proveedor valiendonos de que es posible que
 				// las bibliotecas necesarias se hayan cargado tras el ultimo intento
-				return (Provider) Class.forName("sun.security.pkcs11.SunPKCS11") //$NON-NLS-1$
+				return (Provider) Class.forName(SUN_PKCS11_PROVIDER_CLASSNAME)
 					.getConstructor(InputStream.class)
-					.newInstance(new ByteArrayInputStream(p11NSSConfigFile.getBytes()));
+					.newInstance(new ByteArrayInputStream(p11NSSConfigFileContents.getBytes()));
 			}
 		}
-	}
-
-	private static boolean isJava9orNewer() {
-		final String ver = System.getProperty("java.version");  //$NON-NLS-1$
-		if (ver == null || ver.isEmpty()) {
-			LOGGER.warning("No se ha podido determinar la version de Java"); //$NON-NLS-1$
-			return false;
-		}
-		try {
-			if (Integer.parseInt(ver.substring(0, 1)) > 8) {
-				return true;
-			}
-		}
-		catch(final Exception e) {
-			LOGGER.warning("No se ha podido determinar la version de Java: " + ver); //$NON-NLS-1$
-		}
-		return false;
 	}
 
 	static Provider loadNSS(final boolean useSharedNss) throws IOException,
@@ -598,7 +584,7 @@ public final class MozillaKeyStoreUtilities {
 		// Quitamos el directorio del usuario del registro, para evitar que contenga datos personales
 		LOGGER.info("Configuracion de NSS para SunPKCS11:\n" + p11NSSConfigFile.replace(Platform.getUserHome(), "USERHOME")); //$NON-NLS-1$ //$NON-NLS-2$
 
-		final Provider p = isJava9orNewer() ?
+		final Provider p = AOUtil.isJava9orNewer() ?
 			loadNssJava9(nssDirectory, p11NSSConfigFile) :
 				loadNssJava8(nssDirectory, p11NSSConfigFile);
 

@@ -470,5 +470,25 @@ public final class AOUtil {
     	return p;
     }
 
+    /** Indica si el JRE actual es Java 9 o superior.
+     * @return <code>true</code> si el JRE actual es Java 9 o superior,
+     *         <code>false</code> si es Java 8 o inferior. */
+	public static boolean isJava9orNewer() {
+		final String ver = System.getProperty("java.version");  //$NON-NLS-1$
+		if (ver == null || ver.isEmpty()) {
+			LOGGER.warning("No se ha podido determinar la version de Java"); //$NON-NLS-1$
+			return false;
+		}
+		try {
+			if (Integer.parseInt(ver.substring(0, 1)) > 8) {
+				return true;
+			}
+		}
+		catch(final Exception e) {
+			LOGGER.warning("No se ha podido determinar la version de Java: " + ver); //$NON-NLS-1$
+		}
+		return false;
+	}
+
 }
 

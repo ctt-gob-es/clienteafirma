@@ -12,9 +12,12 @@ package es.gob.afirma.keystores;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Constructor;
+import java.io.OutputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.security.KeyStore;
 import java.security.NoSuchAlgorithmException;
 import java.security.Provider;
@@ -23,6 +26,8 @@ import java.security.cert.CertificateException;
 import java.util.logging.Logger;
 
 import javax.security.auth.callback.PasswordCallback;
+
+import es.gob.afirma.core.misc.AOUtil;
 
 final class AOKeyStoreManagerHelperPkcs11 {
 
@@ -84,23 +89,15 @@ final class AOKeyStoreManagerHelperPkcs11 {
 
         if (p11Provider == null) {
 
-            Constructor<?> sunPKCS11Contructor;
-            try {
-                sunPKCS11Contructor = Class.forName("sun.security.pkcs11.SunPKCS11").getConstructor(InputStream.class); //$NON-NLS-1$
-            }
-            catch (final Exception e) {
-                throw new MissingSunPKCS11Exception(e);
-            }
-
             final byte[] config = KeyStoreUtilities.createPKCS11ConfigFile(p11lib, p11ProviderName, slot).getBytes();
             try {
-                p11Provider = (Provider) sunPKCS11Contructor.newInstance(new ByteArrayInputStream(config));
+                p11Provider = getP11Provider(config);
             }
             catch (final Exception e) {
                 // El PKCS#11 del DNIe a veces falla a la primera pero va
                 // correctamente a la segunda asi que reintentamos una vez mas
                 try {
-                    p11Provider = (Provider) sunPKCS11Contructor.newInstance(new ByteArrayInputStream(config));
+                    p11Provider = getP11Provider(config);
                 }
                 catch (final Exception ex) {
                     throw new AOKeyStoreManagerException(
@@ -108,8 +105,6 @@ final class AOKeyStoreManagerHelperPkcs11 {
             		);
                 }
             }
-            Security.addProvider(p11Provider);
-
         }
         else {
             LOGGER.info(
@@ -167,5 +162,49 @@ final class AOKeyStoreManagerHelperPkcs11 {
 		}
         return ks;
     }
+
+    private static Provider getP11Provider(final byte[] p11NSSConfigFileContents) throws NoSuchMethodException,
+                                                                                         SecurityException,
+                                                                                         IllegalAccessException,
+                                                                                         IllegalArgumentException,
+                                                                                         InvocationTargetException,
+                                                                                         InstantiationException,
+                                                                                         ClassNotFoundException,
+                                                                                         IOException {
+    	return AOUtil.isJava9orNewer() ?
+			getP11ProviderJava9(p11NSSConfigFileContents) :
+				getP11ProviderJava8(p11NSSConfigFileContents);
+    }
+
+	private static Provider getP11ProviderJava9(final byte[] p11NSSConfigFileContents) throws IOException,
+	                                                                                          NoSuchMethodException,
+	                                                                                          SecurityException,
+	                                                                                          IllegalAccessException,
+	                                                                                          IllegalArgumentException,
+	                                                                                          InvocationTargetException {
+		final Provider p = Security.getProvider("SunPKCS11"); //$NON-NLS-1$
+		final File f = File.createTempFile("pkcs11_", ".cfg");  //$NON-NLS-1$//$NON-NLS-2$
+		final OutputStream fos = new FileOutputStream(f);
+		fos.write(p11NSSConfigFileContents);
+		fos.close();
+		final Method configureMethod = Provider.class.getMethod("configure", String.class); //$NON-NLS-1$
+		final Provider ret = (Provider) configureMethod.invoke(p, f.getAbsolutePath());
+		f.delete();
+		return ret;
+	}
+
+	private static Provider getP11ProviderJava8(final byte[] p11NSSConfigFileContents) throws InstantiationException,
+	                                                                                          IllegalAccessException,
+	                                                                                          IllegalArgumentException,
+	                                                                                          InvocationTargetException,
+	                                                                                          NoSuchMethodException,
+	                                                                                          SecurityException,
+	                                                                                          ClassNotFoundException {
+		final Provider p = (Provider) Class.forName("sun.security.pkcs11.SunPKCS11") //$NON-NLS-1$
+				.getConstructor(InputStream.class)
+					.newInstance(new ByteArrayInputStream(p11NSSConfigFileContents));
+        Security.addProvider(p);
+        return p;
+	}
 
 }
