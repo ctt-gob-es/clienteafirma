@@ -198,7 +198,7 @@ public final class CAPIKeyStoreManager extends AOKeyStoreManager {
 	        Provider capiProvider = Security.getProvider("SunMSCAPI"); //$NON-NLS-1$
 	        if (capiProvider == null) {
 	            try {
-	            	capiProvider = (Provider) Class.forName("sun.security.mscapi.SunMSCAPI").newInstance(); //$NON-NLS-1$
+	            	capiProvider = (Provider) Class.forName("sun.security.mscapi.SunMSCAPI").getConstructor().newInstance(); //$NON-NLS-1$
 	                Security.addProvider(capiProvider);
 	            }
 	            catch(final Exception e) {

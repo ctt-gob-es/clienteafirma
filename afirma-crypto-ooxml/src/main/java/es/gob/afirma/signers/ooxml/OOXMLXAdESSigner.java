@@ -35,14 +35,6 @@ import javax.xml.crypto.dsig.XMLSignatureFactory;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import net.java.xades.security.xml.XAdES.SignatureProductionPlace;
-import net.java.xades.security.xml.XAdES.SignatureProductionPlaceImpl;
-import net.java.xades.security.xml.XAdES.SignerRole;
-import net.java.xades.security.xml.XAdES.SignerRoleImpl;
-import net.java.xades.security.xml.XAdES.XAdES;
-import net.java.xades.security.xml.XAdES.XAdES_BES;
-import net.java.xades.util.DOMOutputImpl;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.ls.DOMImplementationLS;
@@ -50,6 +42,13 @@ import org.w3c.dom.ls.LSSerializer;
 import org.xml.sax.SAXException;
 
 import es.gob.afirma.signers.xml.XMLConstants;
+import net.java.xades.security.xml.XAdES.SignatureProductionPlace;
+import net.java.xades.security.xml.XAdES.SignatureProductionPlaceImpl;
+import net.java.xades.security.xml.XAdES.SignerRole;
+import net.java.xades.security.xml.XAdES.SignerRoleImpl;
+import net.java.xades.security.xml.XAdES.XAdES;
+import net.java.xades.security.xml.XAdES.XAdES_BES;
+import net.java.xades.util.DOMOutputImpl;
 
 /** Firmador XAdES OOXML.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
@@ -178,7 +177,7 @@ final class OOXMLXAdESSigner {
 			// provocar un error el no usarla. Normalmente, ClassCastException al recuperar la factoria.
 			fac =  XMLSignatureFactory.getInstance(
 				"DOM", //$NON-NLS-1$
-				(Provider) Class.forName("org.apache.jcp.xml.dsig.internal.dom.XMLDSigRI").newInstance() //$NON-NLS-1$
+				(Provider) Class.forName("org.apache.jcp.xml.dsig.internal.dom.XMLDSigRI").getConstructor().newInstance() //$NON-NLS-1$
 			);
 			LOGGER.info("Se usara la factoria XML del XMLSec instalado"); //$NON-NLS-1$
 		}

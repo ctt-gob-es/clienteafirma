@@ -432,7 +432,7 @@ public final class AOKeyStoreManagerFactory {
                                                                                                         IOException {
     	final AggregatedKeyStoreManager ksmUni;
     	try {
-    		ksmUni = (AggregatedKeyStoreManager) Class.forName(KsmClassName).newInstance();
+    		ksmUni = (AggregatedKeyStoreManager) Class.forName(KsmClassName).getConstructor().newInstance();
     	}
     	catch(final Exception e) {
     		throw new AOKeystoreAlternativeException(

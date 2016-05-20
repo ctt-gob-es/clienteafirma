@@ -41,7 +41,7 @@ final class AOKeyStoreManagerHelperSingle {
 		final Provider pkcs7Provider;
 		try {
 			pkcs7Provider = (Provider) Class.forName(
-				"es.gob.afirma.keystores.single.SingleCertKeyStoreProvider").newInstance(); //$NON-NLS-1$
+				"es.gob.afirma.keystores.single.SingleCertKeyStoreProvider").getConstructor().newInstance(); //$NON-NLS-1$
 		}
 		catch (final Exception e) {
 			throw new MissingLibraryException(

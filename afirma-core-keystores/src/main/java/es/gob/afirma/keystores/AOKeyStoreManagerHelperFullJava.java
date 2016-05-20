@@ -45,7 +45,7 @@ final class AOKeyStoreManagerHelperFullJava {
 
     	CallbackHandler callbackHandler;
     	try {
-    		callbackHandler = (CallbackHandler) Class.forName("es.gob.jmulticard.ui.passwordcallback.gui.CeresCallbackHandler").newInstance(); //$NON-NLS-1$
+    		callbackHandler = (CallbackHandler) Class.forName("es.gob.jmulticard.ui.passwordcallback.gui.CeresCallbackHandler").getConstructor().newInstance(); //$NON-NLS-1$
     	}
     	catch (final Exception e) {
     		throw new AOKeyStoreManagerException("No se han encontrado el gestor de contrasenas para CERES", e); //$NON-NLS-1$
@@ -70,7 +70,7 @@ final class AOKeyStoreManagerHelperFullJava {
 
     	CallbackHandler callbackHandler;
     	try {
-    		callbackHandler = (CallbackHandler) Class.forName("es.gob.jmulticard.ui.passwordcallback.gui.DnieCallbackHandler").newInstance(); //$NON-NLS-1$
+    		callbackHandler = (CallbackHandler) Class.forName("es.gob.jmulticard.ui.passwordcallback.gui.DnieCallbackHandler").getConstructor().newInstance(); //$NON-NLS-1$
     	}
     	catch (final Exception e) {
     		throw new AOKeyStoreManagerException("No se han encontrado el gestor de contrasenas para DNIe", e); //$NON-NLS-1$
@@ -93,7 +93,7 @@ final class AOKeyStoreManagerHelperFullJava {
     	final Provider p;
     	if (Security.getProvider(store.getProviderName()) == null) {
     		try {
-    			p = (Provider) Class.forName(providerClassName).newInstance();
+    			p = (Provider) Class.forName(providerClassName).getConstructor().newInstance();
     			Security.addProvider(p);
     		}
     		catch (final Exception e) {

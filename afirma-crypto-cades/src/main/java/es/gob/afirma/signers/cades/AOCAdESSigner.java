@@ -11,6 +11,7 @@
 package es.gob.afirma.signers.cades;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
@@ -286,7 +287,7 @@ public final class AOCAdESSigner implements AOSigner {
     	new SCChecker().checkSpongyCastle();
 
         try {
-			return ((AOCoSigner)Class.forName("es.gob.afirma.signers.multi.cades.AOCAdESCoSigner").newInstance()).cosign( //$NON-NLS-1$
+			return ((AOCoSigner)Class.forName("es.gob.afirma.signers.multi.cades.AOCAdESCoSigner").getConstructor().newInstance()).cosign( //$NON-NLS-1$
 				data,
 				sign,
 				algorithm,
@@ -299,10 +300,22 @@ public final class AOCAdESSigner implements AOSigner {
         	throw new AOException("No se ha podido instanciar la clase de cofirmas CAdES: " + e, e); //$NON-NLS-1$
 		}
         catch (final IllegalAccessException e) {
-        	throw new AOException("No se ha podido instanciar la clase de cofirmas CAdES: " + e, e); //$NON-NLS-1$
+        	throw new AOException("No se ha podido instanciar la clase de cofirmas CAdES por acceso ilegal: " + e, e); //$NON-NLS-1$
 		}
         catch (final ClassNotFoundException e) {
         	throw new AOException("No se ha encontrado la clase de cofirmas CAdES: " + e, e); //$NON-NLS-1$
+		}
+        catch (final IllegalArgumentException e) {
+        	throw new AOException("No se ha podido instanciar la clase de cofirmas CAdES: " + e, e); //$NON-NLS-1$
+		}
+        catch (final InvocationTargetException e) {
+        	throw new AOException("No se ha podido instanciar la clase de cofirmas CAdES por error en la invocacion al constructor: " + e, e); //$NON-NLS-1$
+		}
+        catch (final NoSuchMethodException e) {
+        	throw new AOException("No se ha podido instanciar la clase de cofirmas CAdES por falta de un constructor por defecto sin parametros: " + e, e); //$NON-NLS-1$
+		}
+        catch (final SecurityException e) {
+        	throw new AOException("No se ha podido instanciar la clase de cofirmas CAdES por falta de permisos: " + e, e); //$NON-NLS-1$
 		}
 
     }
@@ -352,7 +365,7 @@ public final class AOCAdESSigner implements AOSigner {
     	new SCChecker().checkSpongyCastle();
 
         try {
-			return ((AOCoSigner)Class.forName("es.gob.afirma.signers.multi.cades.AOCAdESCoSigner").newInstance()).cosign( //$NON-NLS-1$
+			return ((AOCoSigner)Class.forName("es.gob.afirma.signers.multi.cades.AOCAdESCoSigner").getConstructor().newInstance()).cosign( //$NON-NLS-1$
 				sign, algorithm, key, certChain, extraParams
 			);
 		}
@@ -367,6 +380,18 @@ public final class AOCAdESSigner implements AOSigner {
 		}
         catch (final ClassNotFoundException e) {
         	throw new AOException("No se ha encontrado el cofirmador: " + e, e); //$NON-NLS-1$
+		}
+        catch (final IllegalArgumentException e) {
+        	throw new AOException("No se ha podido instanciar el cofirmador: " + e, e); //$NON-NLS-1$
+		}
+        catch (final InvocationTargetException e) {
+        	throw new AOException("No se ha podido instanciar el cofirmador: " + e, e); //$NON-NLS-1$
+		}
+        catch (final NoSuchMethodException e) {
+        	throw new AOException("No se ha podido instanciar el cofirmador por falta de un constructor por defecto sin parametros: " + e, e); //$NON-NLS-1$
+		}
+        catch (final SecurityException e) {
+        	throw new AOException("No se ha podido instanciar el cofirmador por motivos de seguridad: " + e, e); //$NON-NLS-1$
 		}
     }
 
@@ -409,7 +434,7 @@ public final class AOCAdESSigner implements AOSigner {
     	new SCChecker().checkSpongyCastle();
 
         try {
-			return ((AOCounterSigner)Class.forName("es.gob.afirma.signers.multi.cades.AOCAdESCounterSigner").newInstance()).countersign( //$NON-NLS-1$
+			return ((AOCounterSigner)Class.forName("es.gob.afirma.signers.multi.cades.AOCAdESCounterSigner").getConstructor().newInstance()).countersign( //$NON-NLS-1$
 				sign, algorithm, targetType, targets, key, certChain, extraParams
 			);
 		}
@@ -424,6 +449,18 @@ public final class AOCAdESSigner implements AOSigner {
 		}
         catch (final ClassNotFoundException e) {
 			throw new AOException("No se ha encontrado el contrafirmador: " + e, e); //$NON-NLS-1$
+		}
+        catch (final IllegalArgumentException e) {
+        	throw new AOException("No se ha podido instanciar el contrafirmador: " + e, e); //$NON-NLS-1$
+		}
+        catch (final InvocationTargetException e) {
+        	throw new AOException("No se ha podido instanciar el contrafirmador: " + e, e); //$NON-NLS-1$
+		}
+        catch (final NoSuchMethodException e) {
+        	throw new AOException("No se ha podido instanciar el contrafirmador por falta de un constructor por defecto sin parametros: " + e, e); //$NON-NLS-1$
+		}
+        catch (final SecurityException e) {
+        	throw new AOException("No se ha podido instanciar el contrafirmador por motivos de seguridad: " + e, e); //$NON-NLS-1$
 		}
 
     }
