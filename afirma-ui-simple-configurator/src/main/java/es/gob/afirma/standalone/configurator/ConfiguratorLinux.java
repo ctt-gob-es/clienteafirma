@@ -19,7 +19,7 @@ final class ConfiguratorLinux implements Configurator {
     static final String EXPORT_LD_LIBRARY ="export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:"; //$NON-NLS-1$
 
     @Override
-    public void configure(final Console window) throws IOException, ConfigurationException, GeneralSecurityException {
+    public void configure(final Console window) throws IOException, GeneralSecurityException {
 
         LOGGER.info(Messages.getString("ConfiguratorLinux.2")); //$NON-NLS-1$
 
