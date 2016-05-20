@@ -96,11 +96,11 @@ final class PreferencesPanel extends JPanel implements KeyListener {
 	private final JTextField xadesSignerClaimedRole = new JTextField(
 		PreferencesManager.get(PREFERENCE_XADES_SIGNER_CLAIMED_ROLE, "") //$NON-NLS-1$
 	);
-	private final JComboBox xadesSignFormat = new JComboBox(
-		new String[] {
-	      AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED,
-		  AOSignConstants.SIGN_FORMAT_XADES_ENVELOPING,
-	      AOSignConstants.SIGN_FORMAT_XADES_DETACHED
+	private final JComboBox<ValueTextPair> xadesSignFormat = new JComboBox<>(
+		new ValueTextPair[] {
+			new ValueTextPair(AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED, AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED),
+			new ValueTextPair(AOSignConstants.SIGN_FORMAT_XADES_ENVELOPING, AOSignConstants.SIGN_FORMAT_XADES_ENVELOPING),
+			new ValueTextPair(AOSignConstants.SIGN_FORMAT_XADES_DETACHED, AOSignConstants.SIGN_FORMAT_XADES_DETACHED)
 		}
 	);
 

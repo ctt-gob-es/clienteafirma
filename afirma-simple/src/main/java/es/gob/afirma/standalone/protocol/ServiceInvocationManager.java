@@ -34,6 +34,7 @@ import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.keystores.mozilla.MozillaKeyStoreUtilitiesOsX;
 import es.gob.afirma.standalone.AutoFirmaUtil;
 
+/** Gestor de la invocaci&oacute;n por <i>socket</i>. */
 public final class ServiceInvocationManager {
 
 	static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
@@ -126,7 +127,7 @@ public final class ServiceInvocationManager {
 		final ScriptEngine se = MozillaKeyStoreUtilitiesOsX.getAppleScriptEngine();
 		try {
 			se.eval(script);
-		} 
+		}
 		catch (final Exception e) {
 			LOGGER.warning("Fallo cogiendo el foco en mac: " + e); //$NON-NLS-1$
 		}

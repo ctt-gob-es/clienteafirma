@@ -108,7 +108,7 @@ public final class TimestampsAnalyzer {
 				        final CMSSignedData sd = new CMSSignedData(dob.toASN1Primitive().getEncoded());
 				        tst = new TimeStampToken(sd);
 
-						final Collection col = sd.getCertificates().getMatches(null);
+						final Collection<?> col = sd.getCertificates().getMatches(null);
 						if (!col.isEmpty()) {
 								final org.spongycastle.asn1.x509.Certificate c = ((X509CertificateHolder)col.toArray()[0]).toASN1Structure();
 								cert = (X509Certificate) CertificateFactory.getInstance("X.509").generateCertificate( //$NON-NLS-1$
