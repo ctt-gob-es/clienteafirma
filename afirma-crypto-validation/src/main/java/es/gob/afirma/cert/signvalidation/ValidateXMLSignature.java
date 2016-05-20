@@ -147,7 +147,7 @@ public final class ValidateXMLSignature {
                 // Si no hay KeyValue intentamos sacar la clave publica del primer Certificado
                 // que encontramos en X509Data
                 else if (xmlStructure instanceof X509Data) {
-                	final List<Object> x509DataObjects = ((X509Data)xmlStructure).getContent();
+                	final List<?> x509DataObjects = ((X509Data)xmlStructure).getContent();
                 	for (final Object o : x509DataObjects) {
                 		if (o instanceof Certificate) {
                             return new SimpleKeySelectorResult(((Certificate)o).getPublicKey());
