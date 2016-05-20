@@ -53,8 +53,6 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
 
-import net.java.xades.util.DOMOutputImpl;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.DocumentType;
 import org.w3c.dom.Element;
@@ -84,6 +82,7 @@ import es.gob.afirma.signers.xml.style.CannotDereferenceException;
 import es.gob.afirma.signers.xml.style.IsInnerlException;
 import es.gob.afirma.signers.xml.style.ReferenceIsNotXmlException;
 import es.gob.afirma.signers.xml.style.XmlStyle;
+import net.java.xades.util.DOMOutputImpl;
 
 /** Manejador de firmas XML en formato XMLDSig.
  * @version 0.2 */
@@ -1039,7 +1038,7 @@ public final class AOXMLDSigSigner implements AOSigner {
 
             // KeyInfo
             final KeyInfoFactory kif = fac.getKeyInfoFactory();
-            final List<Object> content = new ArrayList<Object>();
+            final List<XMLStructure> content = new ArrayList<XMLStructure>();
             final X509Certificate cert = (X509Certificate) certChain[0];
             content.add(kif.newKeyValue(cert.getPublicKey()));
 
@@ -1528,7 +1527,7 @@ public final class AOXMLDSigSigner implements AOSigner {
             final KeyInfoFactory kif = fac.getKeyInfoFactory();
             final X509Certificate cert = (X509Certificate) certChain[0];
 
-            final List<Object> content = new ArrayList<Object>();
+            final List<XMLStructure> content = new ArrayList<XMLStructure>();
             content.add(kif.newKeyValue(cert.getPublicKey()));
 
             // Si se nos ha pedido expresamente que no insertemos la cadena de certificacion,
@@ -1566,16 +1565,18 @@ public final class AOXMLDSigSigner implements AOSigner {
 
             // en el caso de formato enveloping se inserta el elemento Object
             // con el documento a firmar
-            final List<Object> objectList = new ArrayList<Object>();
+            final List<XMLObject> objectList = new ArrayList<XMLObject>();
             if (isEnveloping(rootSig) && envelopingObject != null) {
                 objectList.add(envelopingObject);
             }
 
-            fac.newXMLSignature(fac.newSignedInfo(cm, sm, referenceList), // SignedInfo
-                                kif.newKeyInfo(content, keyInfoId), // KeyInfo
-                                objectList,
-                                signatureId,
-                                signatureValueId).sign(signContext);
+            fac.newXMLSignature(
+        		fac.newSignedInfo(cm, sm, referenceList), // SignedInfo
+                kif.newKeyInfo(content, keyInfoId), // KeyInfo
+                objectList,
+                signatureId,
+                signatureValueId
+            ).sign(signContext);
 
         }
         catch (final NoSuchAlgorithmException e) {
@@ -2145,7 +2146,7 @@ public final class AOXMLDSigSigner implements AOSigner {
             final KeyInfoFactory kif = fac.getKeyInfoFactory();
             final X509Certificate cert = (X509Certificate) certChain[0];
 
-            final List<Object> content = new ArrayList<Object>();
+            final List<XMLStructure> content = new ArrayList<XMLStructure>();
             content.add(kif.newKeyValue(cert.getPublicKey()));
 
             // Si se nos ha pedido expresamente que no insertemos la cadena de certificacion,
@@ -2162,10 +2163,17 @@ public final class AOXMLDSigSigner implements AOSigner {
             }
             content.add(kif.newX509Data(Arrays.asList(certs)));
 
-            final XMLSignature sign =
-                    fac.newXMLSignature(fac.newSignedInfo(fac.newCanonicalizationMethod(canonicalizationAlgorithm, (C14NMethodParameterSpec) null),
-                                                          fac.newSignatureMethod(XMLConstants.SIGN_ALGOS_URI.get(this.algo), null),
-                                                          referenceList), kif.newKeyInfo(content, keyInfoId), null, signatureId, signatureValueId);
+            final XMLSignature sign = fac.newXMLSignature(
+        		fac.newSignedInfo(
+    				fac.newCanonicalizationMethod(canonicalizationAlgorithm, (C14NMethodParameterSpec) null),
+    				fac.newSignatureMethod(XMLConstants.SIGN_ALGOS_URI.get(this.algo), null),
+    				referenceList
+				),
+        		kif.newKeyInfo(content, keyInfoId),
+        		null,
+        		signatureId,
+        		signatureValueId
+    		);
 
             final DOMSignContext signContext = new DOMSignContext(
         		key,
