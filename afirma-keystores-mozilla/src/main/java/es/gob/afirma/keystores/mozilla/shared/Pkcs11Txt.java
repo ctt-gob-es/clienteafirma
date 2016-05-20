@@ -27,8 +27,8 @@ import es.gob.afirma.keystores.mozilla.AOSecMod.ModuleName;
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
 final class Pkcs11Txt {
 
-	private static final String NAME_SEARCH_TOKEN = "name=\"";
-	
+	private static final String NAME_SEARCH_TOKEN = "name=\""; //$NON-NLS-1$
+
 	private static final String PKCS11TXT_FILENAME = "pkcs11.txt"; //$NON-NLS-1$
 
 	private Pkcs11Txt() {
@@ -61,9 +61,9 @@ final class Pkcs11Txt {
     				new ModuleName(
 						lib.trim(),
 						line.substring(
-								   line.indexOf(NAME_SEARCH_TOKEN) + NAME_SEARCH_TOKEN.length(), 
+								   line.indexOf(NAME_SEARCH_TOKEN) + NAME_SEARCH_TOKEN.length(),
 								   line.indexOf(
-									   '"', 
+									   '"',
 									   line.indexOf(NAME_SEARCH_TOKEN) + NAME_SEARCH_TOKEN.length()
 								   )
 							   )
