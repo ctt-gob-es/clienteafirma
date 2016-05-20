@@ -9,6 +9,8 @@ import javax.script.ScriptEngineManager;
 import org.junit.Assert;
 import org.junit.Test;
 
+import es.gob.afirma.core.misc.Platform;
+
 
 /** Pruebas de AppleScript.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
@@ -18,8 +20,10 @@ public final class TestAppleScriptEngine {
 	@SuppressWarnings("static-method")
 	@Test
 	public void testEngineInit() {
-		final ScriptEngine se = MozillaKeyStoreUtilitiesOsX.getAppleScriptEngine();
-		Assert.assertNotNull(se);
+		if (Platform.OS.MACOSX.equals(Platform.getOS())) {
+			final ScriptEngine se = MozillaKeyStoreUtilitiesOsX.getAppleScriptEngine();
+			Assert.assertNotNull(se);
+		}
 	}
 
 	/** Main para listar los motores del JRE actual.
