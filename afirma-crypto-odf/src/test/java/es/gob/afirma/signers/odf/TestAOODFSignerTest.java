@@ -72,6 +72,13 @@ public final class TestAOODFSignerTest {
         };
     }
 
+    /** Main para pruebas sin JUnit.
+     * @param argc No se usa.
+     * @throws Exception En cualquier error. */
+    public static void main(final String[] argc) throws Exception {
+    	new TestAOODFSignerTest().firmaODF();
+    }
+
 	/**
 	 * Firma documentos ODF.
 	 * @throws Exception Cuando se produce un error en el proceso de firma.
