@@ -59,7 +59,7 @@ final class ConfiguratorMacOSX implements Configurator {
 	private static File ksFile;
 
 	@Override
-	public void configure(final Console window) throws IOException, ConfigurationException, GeneralSecurityException {
+	public void configure(final Console window) throws IOException, GeneralSecurityException {
 
 
 		window.print(Messages.getString("ConfiguratorMacOSX.2")); //$NON-NLS-1$

@@ -17,7 +17,7 @@ final class ConfiguratorWindows implements Configurator {
 	private static final String KS_PASSWORD = "654321"; //$NON-NLS-1$
 
 	@Override
-	public void configure(final Console window) throws IOException, ConfigurationException, GeneralSecurityException {
+	public void configure(final Console window) throws IOException, GeneralSecurityException {
 
 		window.print(Messages.getString("ConfiguratorWindows.2")); //$NON-NLS-1$
 

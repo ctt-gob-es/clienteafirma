@@ -22,7 +22,6 @@ import javax.xml.parsers.SAXParserFactory;
 
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.XMLReader;
 
@@ -122,15 +121,15 @@ public final class AOFileUtils {
     		final XMLReader reader = parser.getXMLReader();
     		reader.setErrorHandler(new ErrorHandler() {
 				@Override
-				public void warning(final SAXParseException e) throws SAXException {
+				public void warning(final SAXParseException e) {
 					log(e);
 				}
 				@Override
-				public void fatalError(final SAXParseException e) throws SAXException {
+				public void fatalError(final SAXParseException e) {
 					log(e);
 				}
 				@Override
-				public void error(final SAXParseException e) throws SAXException {
+				public void error(final SAXParseException e) {
 					log(e);
 				}
 				private void log(final Exception e) {

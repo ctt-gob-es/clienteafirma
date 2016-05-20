@@ -1056,7 +1056,7 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 	        this.images = new ImageIcon[this.colorStrings.length];
 	        final Integer[] intArray = new Integer[this.colorStrings.length];
 	        for (int i = 0; i < this.colorStrings.length; i++) {
-	            intArray[i] = new Integer(i);
+	            intArray[i] = Integer.valueOf(i);
 	            this.images[i] = new ImageIcon(this.colorStrings[i].getImage());
 	            if (this.images[i] != null) {
 	                this.images[i].setDescription(this.colorStrings[i].toString());
@@ -1140,7 +1140,7 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 		}
 
 		@Override
-        public Component getListCellRendererComponent(final JList list,
+        public Component getListCellRendererComponent(final JList<?> list,
         		                                      final Object value,
         		                                      final int index,
         		                                      final boolean isSelected,

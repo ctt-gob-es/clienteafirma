@@ -14,16 +14,14 @@ import org.apache.pdfbox.pdmodel.PDPage;
 final class Pdf2ImagesConverter {
 
 	static List<BufferedImage> pdf2Images(final byte[] inPdf) throws IOException {
-		try (
-			final PDDocument document = PDDocument.load(new ByteArrayInputStream(inPdf));
-		) {
-			final List<?> pdfPages = document.getDocumentCatalog().getAllPages();
-			final List<BufferedImage> pagesAsImages = new ArrayList<>(pdfPages.size());
-			for (final Object page : pdfPages) {
-	           pagesAsImages.add(((PDPage) page).convertToImage());
-	        }
-	        return pagesAsImages;
-		}
+		final PDDocument document = PDDocument.load(new ByteArrayInputStream(inPdf));
+		final List<?> pdfPages = document.getDocumentCatalog().getAllPages();
+		final List<BufferedImage> pagesAsImages = new ArrayList<>(pdfPages.size());
+		for (final Object page : pdfPages) {
+           pagesAsImages.add(((PDPage) page).convertToImage());
+        }
+		document.close();
+        return pagesAsImages;
 	}
 
 }

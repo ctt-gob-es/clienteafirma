@@ -10,6 +10,7 @@ import java.security.UnrecoverableEntryException;
 import java.security.cert.X509Certificate;
 import java.util.List;
 import java.util.Properties;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.JOptionPane;
@@ -190,7 +191,7 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
             return;
         }
         catch(final Exception e) {
-            LOGGER.severe("Error durante el proceso de firma: " + e); //$NON-NLS-1$
+            LOGGER.log(Level.SEVERE, "Error durante el proceso de firma: " + e, e); //$NON-NLS-1$
             AOUIFactory.showErrorMessage(
                 this.signPanel,
                 SimpleAfirmaMessages.getString("SignPanel.65"), //$NON-NLS-1$

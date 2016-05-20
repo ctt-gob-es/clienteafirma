@@ -102,19 +102,16 @@ final class ConfiguratorFirefox {
 				);
 
 	}
-	/**
-	 * Genera el script que elimina el warning al ejecutar AutoFirma desde Chrome para LINUX.
+
+	/** Genera el script que elimina el warning al ejecutar AutoFirma desde Chrome para LINUX.
 	 * En linux genera el script que hay que ejecutar para realizar la instalaci&oacute;n pero no lo ejecuta, de eso se encarga el instalador Debian.
 	 * @param targetDir Directorio de instalaci&oacute;n del sistema
 	 * @param userDir Directorio de usuario dentro del sistema operativo.
 	 * @param browserPath Directorio de configuraci&oacute;n de Chromium o Google Chrome.
 	 *  <ul>
-	 * <li>En LINUX contiene el contenido del script a ejecutar.</li>
-	 * </ul>
-	 * @throws IOException Cuando ocurre un error en el tratamiento de datos.
-	 */
-	private static void createScriptsRemoveExecutionWarningInChrome(final File targetDir, final String userDir, final String browserPath)
-			throws IOException {
+	 *   <li>En LINUX contiene el contenido del script a ejecutar.</li>
+	 * </ul> */
+	private static void createScriptsRemoveExecutionWarningInChrome(final File targetDir, final String userDir, final String browserPath) {
 		final String[] commandInstall = new String[] {
 				"sed", //$NON-NLS-1$
 				"s/\\\"protocol_handler\\\":{\\\"excluded_schemes\\\":{/\\\"protocol_handler\\\":{\\\"excluded_schemes\\\":{\\\"afirma\\\":false,/g", //$NON-NLS-1$
@@ -193,18 +190,16 @@ final class ConfiguratorFirefox {
 		}
 
 	}
-	/**
-	 * Genera el script que elimina el warning al ejecutar AutoFirma desde Chrome para LINUX.
+
+	/** Genera el script que elimina el warning al ejecutar AutoFirma desde Chrome para LINUX.
 	 * En linux genera el script que hay que ejecutar para realizar la instalaci&oacute;n pero no lo ejecuta, de eso se encarga el instalador Debian.
 	 * @param targetDir Directorio de instalaci&oacute;n del sistema
 	 * @param command Usado para sacar los directorios de usuario dentro del sistema operativo.
 	 *  <ul>
 	 * <li>En LINUX contiene el contenido del script a ejecutar.</li>
 	 * </ul>
-	 * @throws IOException Cuando ocurre un error en el tratamiento de datos.
 	 */
-	static void removeAppExecutionWarningInChrome(final File targetDir, final String[] command)
-			throws IOException {
+	static void removeAppExecutionWarningInChrome(final File targetDir, final String[] command) {
 
 		// sacamos el listado de usuarios de la aplicacion
 		final List<String> usersDirs = getSystemUsersHomes(command);
