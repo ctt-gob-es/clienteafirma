@@ -23,8 +23,6 @@ import java.awt.dnd.DropTargetDragEvent;
 import java.awt.dnd.DropTargetDropEvent;
 import java.awt.dnd.DropTargetEvent;
 import java.awt.dnd.DropTargetListener;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
@@ -65,11 +63,8 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import javax.swing.event.HyperlinkEvent;
 import javax.swing.plaf.basic.BasicComboBoxRenderer;
 import javax.swing.text.DefaultFormatter;
 import javax.swing.text.SimpleAttributeSet;
@@ -82,7 +77,6 @@ import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.ui.EditorFocusManager;
-import es.gob.afirma.standalone.ui.EditorFocusManagerAction;
 import es.gob.afirma.standalone.ui.pdf.SignPdfUiPanel.SignPdfUiPanelListener;
 
 final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
@@ -454,12 +448,9 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 	    final DefaultFormatter formatter = (DefaultFormatter) field.getFormatter();
 	    formatter.setAllowsInvalid(false);
 		this.sizeSpinner.addChangeListener(
-			new ChangeListener() {
-				@Override
-				public void stateChanged(final ChangeEvent e) {
-					setViewFont(getViewFont().deriveFont(getStyle(), getSelectedSize()));
-					showPreview();
-				}
+			e -> {
+				setViewFont(getViewFont().deriveFont(getStyle(), getSelectedSize()));
+				showPreview();
 			}
 		);
 		this.sizeSpinner.getEditor().getComponent(0).addKeyListener(this);
@@ -470,25 +461,22 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 			SignPdfUiMessages.getString("SignPdfUiPreview.10") //$NON-NLS-1$
 		);
 		this.boldButton.addActionListener(
-			new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					if (getBoldButton().isSelected()) {
-						if(getUnderlineButton().isSelected()) {
-							getUnderlineButton().doClick();
-						}
-						if(getStrikethroughButton().isSelected()) {
-							getStrikethroughButton().doClick();
-						}
-						addStyle(Font.BOLD);
-						setViewFont(getViewFont().deriveFont(getStyle()));
-						showPreview();
+			e -> {
+				if (getBoldButton().isSelected()) {
+					if(getUnderlineButton().isSelected()) {
+						getUnderlineButton().doClick();
 					}
-					else {
-						deleteStyle(Font.BOLD);
-						setViewFont(getViewFont().deriveFont(getStyle()));
-						showPreview();
+					if(getStrikethroughButton().isSelected()) {
+						getStrikethroughButton().doClick();
 					}
+					addStyle(Font.BOLD);
+					setViewFont(getViewFont().deriveFont(getStyle()));
+					showPreview();
+				}
+				else {
+					deleteStyle(Font.BOLD);
+					setViewFont(getViewFont().deriveFont(getStyle()));
+					showPreview();
 				}
 			}
 		);
@@ -499,25 +487,22 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 			SignPdfUiMessages.getString("SignPdfUiPreview.11") //$NON-NLS-1$
 		);
 		this.italicButton.addActionListener(
-			new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					if (getItalicButton().isSelected()) {
-						if(getUnderlineButton().isSelected()) {
-							getUnderlineButton().doClick();
-						}
-						if(getStrikethroughButton().isSelected()) {
-							getStrikethroughButton().doClick();
-						}
-						addStyle(Font.ITALIC);
-						setViewFont(getViewFont().deriveFont(getStyle()));
-						showPreview();
+			e -> {
+				if (getItalicButton().isSelected()) {
+					if(getUnderlineButton().isSelected()) {
+						getUnderlineButton().doClick();
 					}
-					else {
-						deleteStyle(Font.ITALIC);
-						setViewFont(getViewFont().deriveFont(getStyle()));
-						showPreview();
+					if(getStrikethroughButton().isSelected()) {
+						getStrikethroughButton().doClick();
 					}
+					addStyle(Font.ITALIC);
+					setViewFont(getViewFont().deriveFont(getStyle()));
+					showPreview();
+				}
+				else {
+					deleteStyle(Font.ITALIC);
+					setViewFont(getViewFont().deriveFont(getStyle()));
+					showPreview();
 				}
 			}
 		);
@@ -528,28 +513,25 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 			SignPdfUiMessages.getString("SignPdfUiPreview.12") //$NON-NLS-1$
 		);
 		this.underlineButton.addActionListener(
-			new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					if (getUnderlineButton().isSelected()) {
-						if(getBoldButton().isSelected()) {
-							getBoldButton().doClick();
-						}
-						if(getItalicButton().isSelected()) {
-							getItalicButton().doClick();
-						}
-						if(getStrikethroughButton().isSelected()) {
-							getStrikethroughButton().doClick();
-						}
-						final Map<TextAttribute, Integer> atr = new HashMap<>();
-						atr.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON);
-						setViewFont(getViewFont().deriveFont(atr));
-						showPreview();
+			e -> {
+				if (getUnderlineButton().isSelected()) {
+					if(getBoldButton().isSelected()) {
+						getBoldButton().doClick();
 					}
-					else {
-						setViewFont(new Font(getViewFont().getFontName(), getStyle(), getSelectedSize()));
-						showPreview();
+					if(getItalicButton().isSelected()) {
+						getItalicButton().doClick();
 					}
+					if(getStrikethroughButton().isSelected()) {
+						getStrikethroughButton().doClick();
+					}
+					final Map<TextAttribute, Integer> atr = new HashMap<>();
+					atr.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON);
+					setViewFont(getViewFont().deriveFont(atr));
+					showPreview();
+				}
+				else {
+					setViewFont(new Font(getViewFont().getFontName(), getStyle(), getSelectedSize()));
+					showPreview();
 				}
 			}
 		);
@@ -560,28 +542,25 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 			SignPdfUiMessages.getString("SignPdfUiPreview.13") //$NON-NLS-1$
 		);
 		this.strikethroughButton.addActionListener(
-			new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					if (getStrikethroughButton().isSelected()) {
-						if(getBoldButton().isSelected()) {
-							getBoldButton().doClick();
-						}
-						if(getItalicButton().isSelected()) {
-							getItalicButton().doClick();
-						}
-						if(getUnderlineButton().isSelected()) {
-							getUnderlineButton().doClick();
-						}
-						final Map<TextAttribute, Boolean> atr = new HashMap<>();
-						atr.put(TextAttribute.STRIKETHROUGH, TextAttribute.STRIKETHROUGH_ON);
-						setViewFont(getViewFont().deriveFont(atr));
-						showPreview();
+			e -> {
+				if (getStrikethroughButton().isSelected()) {
+					if(getBoldButton().isSelected()) {
+						getBoldButton().doClick();
 					}
-					else {
-						setViewFont(new Font(getViewFont().getFontName(), getStyle(), getSelectedSize()));
-						showPreview();
+					if(getItalicButton().isSelected()) {
+						getItalicButton().doClick();
 					}
+					if(getUnderlineButton().isSelected()) {
+						getUnderlineButton().doClick();
+					}
+					final Map<TextAttribute, Boolean> atr = new HashMap<>();
+					atr.put(TextAttribute.STRIKETHROUGH, TextAttribute.STRIKETHROUGH_ON);
+					setViewFont(getViewFont().deriveFont(atr));
+					showPreview();
+				}
+				else {
+					setViewFont(new Font(getViewFont().getFontName(), getStyle(), getSelectedSize()));
+					showPreview();
 				}
 			}
 		);
@@ -597,24 +576,21 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 
         final EditorFocusManager editorFocusManager = new EditorFocusManager (
     		helpLabel,
-    		new EditorFocusManagerAction() {
-	            @Override
-	            public void openHyperLink(final HyperlinkEvent he, final int linkIndex) {
-	                try {
-	                    if (he.getURL() != null) {
-	                        Desktop.getDesktop().browse(he.getURL().toURI());
-	                    }
-	                }
-	                catch (final Exception e) {
-	                	AOUIFactory.showErrorMessage(
-	            			SignPdfUiPanelPreview.this,
-	                        SimpleAfirmaMessages.getString("SignResultPanel.0") + he.getURL(), //$NON-NLS-1$
-	                        SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
-	                        JOptionPane.ERROR_MESSAGE
-	                    );
-	                }
-	            }
-	        }
+    		(he, linkIndex) -> {
+			    try {
+			        if (he.getURL() != null) {
+			            Desktop.getDesktop().browse(he.getURL().toURI());
+			        }
+			    }
+			    catch (final Exception e) {
+			    	AOUIFactory.showErrorMessage(
+						SignPdfUiPanelPreview.this,
+			            SimpleAfirmaMessages.getString("SignResultPanel.0") + he.getURL(), //$NON-NLS-1$
+			            SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
+			            JOptionPane.ERROR_MESSAGE
+			        );
+			    }
+			}
 		);
 
         helpLabel.addHyperlinkListener(editorFocusManager);
@@ -709,41 +685,38 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 			SignPdfUiMessages.getString("SignPdfUiPanel.2") //$NON-NLS-1$
 		);
 		this.okButton.addActionListener(
-			new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					if (!getTextArea().getText().trim().isEmpty()) {
-						getProp().put("layer2Text", getTextArea().getText().toString()); //$NON-NLS-1$
-						getProp().put("layer2FontFamily", ((FontResource)getLetterType().getSelectedItem()).getPdfFontIndex()); //$NON-NLS-1$
-						getProp().put("layer2FontSize", Integer.toString(getSelectedSize())); //$NON-NLS-1$
-						getProp().put("layer2FontStyle", Integer.toString(getStyleIndex())); //$NON-NLS-1$
-						getProp().put("layer2FontColor", getColorCombobox().getSelectedItem().getPdfColorKey()); //$NON-NLS-1$*/
-					}
-					if (getSignImage() != null ) {
-						getProp().put("signatureRubricImage", getInsertImageBase64()); //$NON-NLS-1$
-						getProp().put(
-							"imagePositionOnPageLowerLeftX", //$NON-NLS-1$
-							getProp().getProperty("signaturePositionOnPageLowerLeftX") //$NON-NLS-1$
-						);
-						getProp().put(
-							"imagePositionOnPageLowerLeftY", //$NON-NLS-1$
-							getProp().getProperty("signaturePositionOnPageLowerLeftY") //$NON-NLS-1$
-						);
-						getProp().put(
-							"imagePositionOnPageUpperRightX", //$NON-NLS-1$
-							getProp().getProperty("signaturePositionOnPageUpperRightX") //$NON-NLS-1$
-						);
-						getProp().put(
-							"imagePositionOnPageUpperRightY", //$NON-NLS-1$
-							getProp().getProperty("signaturePositionOnPageUpperRightY") //$NON-NLS-1$
-						);
-						getProp().put(
-							"imagePage", //$NON-NLS-1$
-							getProp().getProperty("signaturePage") //$NON-NLS-1$
-						);
-					}
-					getListener().positionSelected(getProp());
+			e -> {
+				if (!getTextArea().getText().trim().isEmpty()) {
+					getProp().put("layer2Text", getTextArea().getText().toString()); //$NON-NLS-1$
+					getProp().put("layer2FontFamily", ((FontResource)getLetterType().getSelectedItem()).getPdfFontIndex()); //$NON-NLS-1$
+					getProp().put("layer2FontSize", Integer.toString(getSelectedSize())); //$NON-NLS-1$
+					getProp().put("layer2FontStyle", Integer.toString(getStyleIndex())); //$NON-NLS-1$
+					getProp().put("layer2FontColor", getColorCombobox().getSelectedItem().getPdfColorKey()); //$NON-NLS-1$*/
 				}
+				if (getSignImage() != null ) {
+					getProp().put("signatureRubricImage", getInsertImageBase64()); //$NON-NLS-1$
+					getProp().put(
+						"imagePositionOnPageLowerLeftX", //$NON-NLS-1$
+						getProp().getProperty("signaturePositionOnPageLowerLeftX") //$NON-NLS-1$
+					);
+					getProp().put(
+						"imagePositionOnPageLowerLeftY", //$NON-NLS-1$
+						getProp().getProperty("signaturePositionOnPageLowerLeftY") //$NON-NLS-1$
+					);
+					getProp().put(
+						"imagePositionOnPageUpperRightX", //$NON-NLS-1$
+						getProp().getProperty("signaturePositionOnPageUpperRightX") //$NON-NLS-1$
+					);
+					getProp().put(
+						"imagePositionOnPageUpperRightY", //$NON-NLS-1$
+						getProp().getProperty("signaturePositionOnPageUpperRightY") //$NON-NLS-1$
+					);
+					getProp().put(
+						"imagePage", //$NON-NLS-1$
+						getProp().getProperty("signaturePage") //$NON-NLS-1$
+					);
+				}
+				getListener().positionSelected(getProp());
 			}
 		);
 		this.okButton.addKeyListener(this);
@@ -755,12 +728,7 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 			SignPdfUiMessages.getString("SignPdfUiPreview.7") //$NON-NLS-1$
 		);
 		cancelButton.addActionListener(
-			new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					getListener().positionCancelled();
-				}
-			}
+			e -> getListener().positionCancelled()
 		);
 		cancelButton.addKeyListener(this);
 
@@ -1140,7 +1108,7 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 		}
 
 		@Override
-        public Component getListCellRendererComponent(final JList<?> list,
+        public Component getListCellRendererComponent(final JList list,
         		                                      final Object value,
         		                                      final int index,
         		                                      final boolean isSelected,
@@ -1176,13 +1144,10 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 		public RemoveImPopUpMenu(){
 	        this.removeImageItem = new JMenuItem(SignPdfUiMessages.getString("SignPdfUiPreview.27")); //$NON-NLS-1$
 	        this.removeImageItem.addActionListener(
-    			new ActionListener() {
-    				@Override
-    				public void actionPerformed(final ActionEvent e) {
-    					setSignImage(null);
-    					showPreview();
-    				}
-    			}
+    			e -> {
+					setSignImage(null);
+					showPreview();
+				}
     		);
 	        add(this.removeImageItem);
 	    }
@@ -1196,25 +1161,20 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 		public AddImPopUpMenu(){
 	        this.addImageItem = new JMenuItem(SignPdfUiMessages.getString("SignPdfUiPreview.28")); //$NON-NLS-1$
 	        this.addImageItem.addActionListener(
-    			new ActionListener() {
-    				@Override
-    				public void actionPerformed(final ActionEvent e) {
-    					SwingUtilities.invokeLater(() ->  {
-				                getViewLabel().dispatchEvent(
-			                		new MouseEvent(
-				                		 SignPdfUiPanelPreview.this,
-					                     MouseEvent.MOUSE_CLICKED,
-					                     1,
-					                     MouseEvent.BUTTON1,
-					                     0, 0,
-					                     1,
-					                     false
-					                )
-		                		);
-				            }
+    			e -> SwingUtilities.invokeLater(() ->  {
+				        getViewLabel().dispatchEvent(
+				    		new MouseEvent(
+				        		 SignPdfUiPanelPreview.this,
+				                 MouseEvent.MOUSE_CLICKED,
+				                 1,
+				                 MouseEvent.BUTTON1,
+				                 0, 0,
+				                 1,
+				                 false
+				            )
 						);
-    				}
-    			}
+				    }
+				)
     		);
 	        add(this.addImageItem);
 	    }
