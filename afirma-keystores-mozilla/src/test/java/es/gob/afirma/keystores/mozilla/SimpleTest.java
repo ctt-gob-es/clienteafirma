@@ -86,7 +86,11 @@ public final class SimpleTest {
     	System.out.println(AOUtil.hexify(sig.sign(), false));
     }
 
-    private static void testDirectNssUsage() throws Exception {
+    /** Prueba de uso directo de NSS.
+     * @throws Exception En cualquier error. */
+    @SuppressWarnings("static-method")
+	@Test
+    public void testDirectNssUsage() throws Exception {
     	final KeyStore keyStore = KeyStore.getInstance(
 			"PKCS11", //$NON-NLS-1$
 			loadNSS(
