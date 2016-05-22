@@ -84,6 +84,13 @@ public class TestPAdES {
             AOSignConstants.SIGN_ALGORITHM_SHA384WITHRSA,
     };
 
+    /** Main para pruebas sin JUNit.
+     * @param args No se usa.
+     * @throws Exception EN cualquier error. */
+    public static void main(final String args[]) throws Exception {
+    	new TestPAdES().testSignature();
+    }
+
     /** Prueba de identificaci&oacute;n de un PDF sin ninguna firma.
      * @throws Exception En cualquier error. */
     @SuppressWarnings("static-method")
