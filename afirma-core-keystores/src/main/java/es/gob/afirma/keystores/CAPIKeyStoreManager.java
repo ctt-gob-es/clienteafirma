@@ -26,6 +26,7 @@ import java.util.Collections;
 import javax.security.auth.callback.PasswordCallback;
 
 import es.gob.afirma.core.InvalidOSException;
+import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.keystores.callbacks.FirstEmptyThenPinUiPasswordCallback;
 
@@ -328,6 +329,10 @@ public final class CAPIKeyStoreManager extends AOKeyStoreManager {
 
     private static void cleanCAPIDuplicateAliases(final KeyStore keyStore) throws NoSuchFieldException,
                                                                                   IllegalAccessException {
+    	// Java 9 no sufre el problema de Alias duplicados
+    	if (AOUtil.isJava9orNewer()) {
+    		return;
+    	}
 
     	Field field = keyStore.getClass().getDeclaredField("keyStoreSpi"); //$NON-NLS-1$
     	field.setAccessible(true);
