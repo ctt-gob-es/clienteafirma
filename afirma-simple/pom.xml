@@ -223,9 +223,9 @@
 		</dependency>
 		
 		<dependency>
-			<groupId>de.rosstauscher.proxy_vole</groupId>
-			<artifactId>proxy_vole</artifactId>
-			<version>1.0.1-SNAPSHOT</version>
+			<groupId>com.github.markusbernhardt</groupId>
+			<artifactId>proxy-vole</artifactId>
+			<version>1.0.1</version>
 		</dependency>
 		
 	</dependencies>
