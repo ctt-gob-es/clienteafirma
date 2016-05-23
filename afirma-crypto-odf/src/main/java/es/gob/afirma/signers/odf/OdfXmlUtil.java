@@ -27,9 +27,7 @@ final class OdfXmlUtil {
 		final ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		final Canonicalizer canonicalizer = new Canonicalizer(baos, algorithm);
 		canonicalizer.write(xomElement);
-		final byte[] ret = baos.toByteArray();
-		System.out.println(new String(ret));
-		return ret;
+		return baos.toByteArray();
 	}
 
 }
