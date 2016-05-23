@@ -226,18 +226,18 @@ var MiniApplet = ( function ( window, undefined ) {
 					if (downloadSuccessFunction) {
 						downloadSuccessFunction(Base64.encode(httpRequest.responseText));
 					}
-					else {
-						console.log("Se termino la descarga de los datos. No se invoca a ninguna funcion.");
-					}
+//					else {
+//						console.log("Se termino la descarga de los datos. No se invoca a ninguna funcion.");
+//					}
 				}	
 			}
 			httpRequest.onerror = function(e) {
 				if (downloadErrorFunction) {
 					downloadErrorFunction(e);
 				}
-				else {
-					console.log("Error en la descarga de los datos. No se invoca a ninguna funcion.");
-				}
+//				else {
+//					console.log("Error en la descarga de los datos. No se invoca a ninguna funcion.");
+//				}
 			}
 			httpRequest.send();
 		}
@@ -328,7 +328,7 @@ var MiniApplet = ( function ( window, undefined ) {
 			}
 			catch (e) {
 				// No hacemos nada si estamos en local 
-				console.log("Error en la obtencion de la hora del servidor: " + e);
+				//console.log("Error en la obtencion de la hora del servidor: " + e);
 				return;
 			}
 		}
@@ -1463,14 +1463,14 @@ var MiniApplet = ( function ( window, undefined ) {
 				httpRequest.setRequestHeader("Content-type","application/x-www-form-urlencoded");
 				httpRequest.onreadystatechange = function() {
 
-					if (httpRequest.status == 404){
+					if (httpRequest.status == 404) {
 						errorServiceResponseFunction("java.lang.Exception", httpRequest.responseText);
 					}
 
 					// Se ha realizado la operacion save, no controlamos reintentos ni el exito de la peticion
 					// porque no requiere respuesta
-					if (isSaveOperation){
-						if(httpRequest.readyState == 4 && Base64.decode(httpRequest.responseText) != ""){
+					if (isSaveOperation) {
+						if (httpRequest.readyState == 4 && Base64.decode(httpRequest.responseText) != "") {
 							successServiceResponseFunction(Base64.decode(httpRequest.responseText));
 						}
 						return;
@@ -1485,7 +1485,7 @@ var MiniApplet = ( function ( window, undefined ) {
 						}
 						// No recibimos la respuesta, volvemos a llamar.
 						else {
-							if (httpRequest.status == 0 && httpRequest.readyState == 0 ){
+							if (httpRequest.status == 0 && httpRequest.readyState == 0 ) {
 								setTimeout(doFirm, WAITING_TIME);	
 							}
 						}
