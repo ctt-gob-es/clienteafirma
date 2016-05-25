@@ -35,7 +35,7 @@ public final class AutoFirmaConfiguratorSilent implements ConsoleListener {
 	static {
 		// Instalamos el registro a disco
 		try {
-			LogManager.install(App.AUTOFIRMA_CONFIGURATOR);
+			LogManager.install(App.AUTOFIRMA_CONFIGURATOR, System.getProperty("java.io.tmpdir")); //$NON-NLS-1$
 		}
 		catch(final Exception e) {
 			LOGGER.severe("No ha sido posible instalar el gestor de registro: " + e); //$NON-NLS-1$
@@ -74,24 +74,21 @@ public final class AutoFirmaConfiguratorSilent implements ConsoleListener {
 		}
 
 		this.mainScreen = ConsoleManager.getConsole(this);
-
+		
 		// Creamos el almacen para la configuracion del SSL
 		try {
 			this.configurator.configure(this.mainScreen);
 		}
 		catch (final IOException e) {
 			LOGGER.severe("Error al copiar o leer alguno de los ficheros de configuracion. El configurador se detendra: " + e); //$NON-NLS-1$
-			this.mainScreen.print(Messages.getString("AutoFirmaConfiguratorSilent.3")); //$NON-NLS-1$
 			throw e;
 		}
 		catch (final ConfigurationException e) {
 			LOGGER.severe("Error al generar las claves de cifrado SSL. El configurador se detendra: " + e); //$NON-NLS-1$
-			this.mainScreen.print(Messages.getString("AutoFirmaConfiguratorSilent.4")); //$NON-NLS-1$
 			throw e;
 		}
 		catch (final GeneralSecurityException e) {
 			LOGGER.severe("Error en la importacion de la CA de confianza o la limpieza del almacen: " + e); //$NON-NLS-1$
-			this.mainScreen.print(Messages.getString("AutoFirmaConfiguratorSilent.5")); //$NON-NLS-1$
 			throw e;
 		}
 	}
@@ -146,7 +143,7 @@ public final class AutoFirmaConfiguratorSilent implements ConsoleListener {
 			LOGGER.info("Error en la configuracion de AutoFirma: " + e); //$NON-NLS-1$
 			ConsoleManager.showErrorMessage(
 				configurator.getParentComponent(),
-				Messages.getString("AutoFirmaConfiguratorSilent.0") //$NON-NLS-1$
+				Messages.getString("AutoFirmaConfigurator.0") //$NON-NLS-1$
 			);
 			configurator.closeApplication(-1);
 		}
@@ -155,7 +152,7 @@ public final class AutoFirmaConfiguratorSilent implements ConsoleListener {
 			e.printStackTrace();
 			ConsoleManager.showErrorMessage(
 				configurator.getParentComponent(),
-				Messages.getString("AutoFirmaConfiguratorSilent.1") //$NON-NLS-1$
+				Messages.getString("AutoFirmaConfigurator.1") //$NON-NLS-1$
 			);
 			configurator.closeApplication(-2);
 		}
