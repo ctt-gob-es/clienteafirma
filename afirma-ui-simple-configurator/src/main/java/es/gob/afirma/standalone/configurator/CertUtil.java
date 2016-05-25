@@ -116,7 +116,7 @@ final class CertUtil {
 			AF_ROOT_SUBJECT_PRINCIPAL
 		);
 		final PrivateKeyEntry sslCertificatePrivateKeyEntry = generateSslCertificate(
-			"localhost", //$NON-NLS-1$
+			"127.0.0.1", //$NON-NLS-1$
 			caCertificatePrivateKeyEntry
 		);
 		return new CertPack(
