@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-   <?define VersionNumber="1.4.7" ?>
+   <?define VersionNumber="1.5" ?>
    <?define Platform="x86" ?>
    <?define ProjectDir ="" ?>
    <?define ProjectName ="AutoFirma" ?>
@@ -68,7 +68,8 @@
 		<!-- Exits successfully in the case newer version are already installed -->
 		<CustomActionRef Id="WixExitEarlyWithSuccess"/>
         <Property Id="ALLUSERS" Value="1" />
-        <Property Id="ARPNOMODIFY" Value="1" />
+        <Property Id="ARPNOREPAIR" Value="yes" Secure="yes" /> 
+		<Property Id="ARPNOMODIFY" Value="yes" Secure="yes" />
 		<InstallExecuteSequence>
 			<!--  Ejeuta el $(var.ProjectName)Generator.exe al instalar -->
 		    <Custom Action="Exec_Cmd" Before="InstallFinalize">
