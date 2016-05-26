@@ -25,6 +25,7 @@ import java.awt.event.ItemListener;
 import java.awt.event.KeyListener;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.prefs.BackingStoreException;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
@@ -220,7 +221,25 @@ final class PreferencesPanelGeneral extends JPanel {
 			new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent ae) {
-					PreferencesManager.clearAll();
+					if (AOUIFactory.showConfirmDialog(
+						getParent(),
+						SimpleAfirmaMessages.getString("PreferencesPanel.140"), //$NON-NLS-1$
+						SimpleAfirmaMessages.getString("PreferencesPanel.139"), //$NON-NLS-1$
+						JOptionPane.YES_NO_OPTION,
+			            JOptionPane.WARNING_MESSAGE
+					) == JOptionPane.YES_OPTION) {
+						try {
+							PreferencesManager.clearAll();
+						} catch (final BackingStoreException e) {
+							LOGGER.severe("Error eliminando las preferencias de la aplicacion: " + e); //$NON-NLS-1$
+							AOUIFactory.showErrorMessage(
+								getParent(),
+								SimpleAfirmaMessages.getString("PreferencesPanel.141"), //$NON-NLS-1$
+								SimpleAfirmaMessages.getString("PreferencesPanel.117"), //$NON-NLS-1$
+								JOptionPane.ERROR_MESSAGE
+							);
+						}
+					}
 				}
 			}
 		);
@@ -236,7 +255,7 @@ final class PreferencesPanelGeneral extends JPanel {
 		panel.add(restoreConfigFromFileButton);
 
 		// TODO: Descomentar una vez se entregue
-		signConfigPanel.add(panel, signConstraint);
+		//signConfigPanel.add(panel, signConstraint);
 
 		signConstraint.insets = new Insets(5, 7, 3, 7);
 		signConstraint.anchor = GridBagConstraints.LINE_START;
@@ -368,8 +387,8 @@ final class PreferencesPanelGeneral extends JPanel {
 		signGeneralPanel.add(signatureDefaultsFormats, c);
 		gbc.gridy++;
 		add(signGeneralPanel, gbc);
-		gbc.gridy++;
-		add(netConfigPanel, gbc);
+//		gbc.gridy++;
+//		add(netConfigPanel, gbc);
 		gbc.weighty = 1.0;
 		gbc.gridy++;
 		add(new JPanel(), gbc);
