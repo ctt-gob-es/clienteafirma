@@ -5,6 +5,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -52,7 +53,7 @@ final class ConfiguratorFirefox {
 	private static final String LINUX_CHROMIUM_PREFS_PATH = "/.config/chromium/Local State";//$NON-NLS-1$
 	private static final String LINUX_CHROME_PREFS_PATH = "/.config/google-chrome/Local State";//$NON-NLS-1$
 	private static final String MACOSX_MOZILLA_PATH = "/Library/Application Support/firefox/profiles.ini";//$NON-NLS-1$
-
+	private static final String WINDOWS_MOZILLA_PATH = "\\AppData\\Roaming\\Mozilla\\Firefox\\profiles.ini"; //$NON-NLS-1$
 	static final String CERTUTIL_EXE;
 	private static final String FILE_CERTUTIL;
 	private static final String RESOURCE_BASE;
@@ -88,18 +89,20 @@ final class ConfiguratorFirefox {
 	static void installRootCAMozillaKeyStore(final File targetDir,
 			final Certificate cert) throws MozillaProfileNotFoundException,
 	IOException {
-		final File firefoxProfilesDir = getFirefoxProfilesDir();
-		if (firefoxProfilesDir == null) {
+		final ArrayList<File> firefoxProfilesDir = getFirefoxProfilesDir();
+		if (firefoxProfilesDir == null || firefoxProfilesDir.isEmpty()) {
 			throw new MozillaProfileNotFoundException();
 		}
 		if(!Platform.getOS().equals(Platform.OS.LINUX)) {
 			copyConfigurationFiles(targetDir);
 		}
-		ConfiguratorFirefox.importCARootOnFirefoxKeyStore(
-				cert,
-				targetDir,
-				firefoxProfilesDir
-				);
+		for (File firefoxDir : firefoxProfilesDir) {
+			ConfiguratorFirefox.importCARootOnFirefoxKeyStore(
+					cert,
+					targetDir,
+					firefoxDir
+					);
+		}
 
 	}
 
@@ -876,16 +879,31 @@ final class ConfiguratorFirefox {
 		}
 	}
 
-	private static File getFirefoxProfilesDir() {
+	private static ArrayList<File> getFirefoxProfilesDir() {
+		ArrayList<File> fileList = new ArrayList<>();
+		
+		//Se obtienen todos los usuarios para los que se va a instalar el certificado en Firefox
+		File file = new File("C:\\Users"); //$NON-NLS-1$
+		String[] directories = file.list(new FilenameFilter() {
+		  @Override
+		  public boolean accept(File current, String name) {
+		    return new File(current, name).isDirectory();
+		  }
+		});
+		
 		try {
-			return new File(
-					MozillaKeyStoreUtilities.getMozillaUserProfileDirectory()
-					).getParentFile();
+			for(String profile : directories) {
+				if(new File("C:\\Users\\" + profile + WINDOWS_MOZILLA_PATH).exists()) { //$NON-NLS-1$
+				fileList.add(new File(
+						MozillaKeyStoreUtilities.getMozillaUserProfileDirectoryWindows("C:\\Users\\" + profile + WINDOWS_MOZILLA_PATH) //$NON-NLS-1$
+						).getParentFile());
+				}
+			}
 		}
 		catch (final Exception e) {
 			LOGGER.warning("No se encontro el directorio de perfiles de Mozilla Firefox: " + e); //$NON-NLS-1$
 		}
-		return null;
+		return fileList;
 	}
 
 	/** Devuelve un listado con todos directorios personales de los usuarios del sistema ejecutando un script.
@@ -958,7 +976,6 @@ final class ConfiguratorFirefox {
 				return null;
 			}
 		}
-
 		else {
 			throw new IllegalArgumentException("Sistema operativo no soportado: " + Platform.getOS()); //$NON-NLS-1$
 		}
