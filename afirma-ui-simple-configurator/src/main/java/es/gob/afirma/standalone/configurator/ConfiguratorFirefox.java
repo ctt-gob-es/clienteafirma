@@ -58,7 +58,7 @@ final class ConfiguratorFirefox {
 	private static final String FILE_CERTUTIL;
 	private static final String RESOURCE_BASE;
 
-	private static final String USERS_WINDOWS_PATH = "C:\\Users\\";
+	private static final String USERS_WINDOWS_PATH = "C:\\Users\\"; //$NON-NLS-1$
 
 	static {
 		switch(Platform.getOS()) {
