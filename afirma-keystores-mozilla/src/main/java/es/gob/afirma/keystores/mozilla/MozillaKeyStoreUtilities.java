@@ -480,10 +480,18 @@ public final class MozillaKeyStoreUtilities {
 		final String dir = NSPreferences.getFireFoxUserProfileDirectory(
 			new File(getProfilesIniPath())
 		);
-		if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
-			return MozillaKeyStoreUtilitiesWindows.cleanMozillaUserProfileDirectoryWindows(dir);
-		}
 		return dir;
+	}
+	
+	/** Obtiene el directorio del perfil de usuario de Mozilla / Firefox.
+	 * @param iniPath Ruta al fichero de perfiles de Firefox
+	 * @return Ruta completa del directorio del perfil de usuario de Mozilla / Firefox
+	 * @throws IOException Cuando hay errores de entrada / salida */
+	public static String getMozillaUserProfileDirectoryWindows(String iniPath) throws IOException {
+		final String dir = NSPreferences.getFireFoxUserProfileDirectory(
+			new File(iniPath)
+		);
+		return MozillaKeyStoreUtilitiesWindows.cleanMozillaUserProfileDirectoryWindows(dir);
 	}
 
 	private static Provider loadNssJava9(final String nssDirectory, final String p11NSSConfigFileContents) throws IOException,
