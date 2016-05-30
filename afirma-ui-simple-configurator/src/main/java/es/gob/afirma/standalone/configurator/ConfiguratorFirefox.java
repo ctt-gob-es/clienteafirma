@@ -789,6 +789,7 @@ final class ConfiguratorFirefox {
 		
 					final Process process = new ProcessBuilder(certutilCommands).start();
 		
+					LOGGER.info("Comando certutil ejecutado: " + Arrays.toString(certutilCommands)); //$NON-NLS-1$
 					// Cuando se instala correctamente no hay salida de ningun tipo, asi que se interpreta
 					// cualquier salida como un error
 					String line;
@@ -914,11 +915,12 @@ final class ConfiguratorFirefox {
 		try {
 			for(String profile : directories) {
 				if(new File(USERS_WINDOWS_PATH + profile + WINDOWS_MOZILLA_PATH).exists()) { 
-				fileList.add(
-						new File(
-								MozillaKeyStoreUtilities.getMozillaUserProfileDirectoryWindows(
-										USERS_WINDOWS_PATH + profile + WINDOWS_MOZILLA_PATH) 
-						).getParentFile());
+					fileList.add(
+							new File(
+									MozillaKeyStoreUtilities.getMozillaUserProfileDirectoryWindows(
+											USERS_WINDOWS_PATH + profile + WINDOWS_MOZILLA_PATH) 
+							).getParentFile());
+					LOGGER.info("Se usa el perfil de Firefox: " + USERS_WINDOWS_PATH + profile + WINDOWS_MOZILLA_PATH); //$NON-NLS-1$
 				}
 			}
 		}
