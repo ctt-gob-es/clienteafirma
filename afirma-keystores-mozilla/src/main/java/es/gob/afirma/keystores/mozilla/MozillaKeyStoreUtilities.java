@@ -480,6 +480,9 @@ public final class MozillaKeyStoreUtilities {
 		final String dir = NSPreferences.getFireFoxUserProfileDirectory(
 			new File(getProfilesIniPath())
 		);
+		if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
+			return MozillaKeyStoreUtilitiesWindows.cleanMozillaUserProfileDirectoryWindows(dir);
+		}
 		return dir;
 	}
 	
