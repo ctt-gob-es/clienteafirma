@@ -22,8 +22,8 @@ public class TestINC309356 {
 
 	private static final String DATA = "data"; //$NON-NLS-1$
 	private static final String SIGNATURE_WITH_CONTENT_TYPE = "firma_contentType_TIFF.csig"; //$NON-NLS-1$
-	private static final String PKCS12_KEYSTORE = "PFActivoFirSHA1.pfx"; //$NON-NLS-1$
-	private static final String PASSWORD = "12341234"; //$NON-NLS-1$
+	private static final String PKCS12_KEYSTORE = "ANCERTCCP_FIRMA.p12"; //$NON-NLS-1$
+	private static final String PASSWORD = "1111"; //$NON-NLS-1$
 
 	private static InputStream ksIs;
 	private static KeyStore ks;
