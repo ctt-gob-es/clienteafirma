@@ -5,6 +5,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -52,10 +53,12 @@ final class ConfiguratorFirefox {
 	private static final String LINUX_CHROMIUM_PREFS_PATH = "/.config/chromium/Local State";//$NON-NLS-1$
 	private static final String LINUX_CHROME_PREFS_PATH = "/.config/google-chrome/Local State";//$NON-NLS-1$
 	private static final String MACOSX_MOZILLA_PATH = "/Library/Application Support/firefox/profiles.ini";//$NON-NLS-1$
-
+	private static final String WINDOWS_MOZILLA_PATH = "\\AppData\\Roaming\\Mozilla\\Firefox\\profiles.ini"; //$NON-NLS-1$
 	static final String CERTUTIL_EXE;
 	private static final String FILE_CERTUTIL;
 	private static final String RESOURCE_BASE;
+
+	private static final String USERS_WINDOWS_PATH = "C:\\Users\\"; //$NON-NLS-1$
 
 	static {
 		switch(Platform.getOS()) {
@@ -88,18 +91,20 @@ final class ConfiguratorFirefox {
 	static void installRootCAMozillaKeyStore(final File targetDir,
 			final Certificate cert) throws MozillaProfileNotFoundException,
 	IOException {
-		final File firefoxProfilesDir = getFirefoxProfilesDir();
-		if (firefoxProfilesDir == null) {
+		final ArrayList<File> firefoxProfilesDir = getFirefoxProfilesDir();
+		if (firefoxProfilesDir == null || firefoxProfilesDir.isEmpty()) {
 			throw new MozillaProfileNotFoundException();
 		}
 		if(!Platform.getOS().equals(Platform.OS.LINUX)) {
 			copyConfigurationFiles(targetDir);
 		}
-		ConfiguratorFirefox.importCARootOnFirefoxKeyStore(
-				cert,
-				targetDir,
-				firefoxProfilesDir
-				);
+		for (File firefoxDir : firefoxProfilesDir) {
+			ConfiguratorFirefox.importCARootOnFirefoxKeyStore(
+					cert,
+					targetDir,
+					firefoxDir
+					);
+		}
 
 	}
 
@@ -749,53 +754,72 @@ final class ConfiguratorFirefox {
 			certutilExe = CERTUTIL_EXE;
 		}
 
+		//Se obtienen todos los usuarios para los que se va a desinstalar el certificado en Firefox
+		File file = new File(USERS_WINDOWS_PATH); 
+		String[] directories = file.list(new FilenameFilter() {
+		  @Override
+		  public boolean accept(File current, String name) {
+		    return new File(current, name).isDirectory();
+		  }
+		});
+		
 		// Obtenemos todos los directorios de perfil de Firefox del usuario
+		
 		boolean error = false;
-		final File profilesDir = new File(MozillaKeyStoreUtilities.getMozillaUserProfileDirectory()).getParentFile();
-		for (final File profileDir : profilesDir.listFiles()) {
-			if (!profileDir.isDirectory()) {
-				continue;
-			}
-
-			final String[] certutilCommands = new String[] {
-					certutilExe,
-					"-D", //$NON-NLS-1$
-					"-d", //$NON-NLS-1$
-					profileDir.getAbsolutePath(),
-					"-n", //$NON-NLS-1$
-					"\"" + ConfiguratorUtil.CERT_ALIAS + "\"", //$NON-NLS-1$ //$NON-NLS-2$
-			};
-
-			final Process process = new ProcessBuilder(certutilCommands).start();
-
-			// Cuando se instala correctamente no hay salida de ningun tipo, asi que se interpreta
-			// cualquier salida como un error
-			String line;
-			try (
-					final InputStream resIs = process.getInputStream();
-					final BufferedReader resReader = new BoundedBufferedReader(
-							new InputStreamReader(resIs),
-							256, // Maximo 256 lineas de salida
-							1024 // Maximo 1024 caracteres por linea
-							);
-					) {
-				while ((line = resReader.readLine()) != null) {
-					error = true;
-					LOGGER.severe(line);
-				}
-			}
-
-			try (
-					final InputStream errIs = process.getErrorStream();
-					final BufferedReader errReader = new BoundedBufferedReader(
-							new InputStreamReader(errIs),
-							256, // Maximo 256 lineas de salida
-							1024 // Maximo 1024 caracteres por linea
-							);
-					) {
-				while ((line = errReader.readLine()) != null) {
-					error = true;
-					LOGGER.severe(line);
+		for(String profile : directories) {
+			if(new File(USERS_WINDOWS_PATH + profile + WINDOWS_MOZILLA_PATH).exists()) { 
+				final File profilesDir = new File(
+						MozillaKeyStoreUtilities.getMozillaUserProfileDirectoryWindows(
+								USERS_WINDOWS_PATH + profile + WINDOWS_MOZILLA_PATH
+								)
+						).getParentFile();
+				for (final File profileDir : profilesDir.listFiles()) {
+					if (!profileDir.isDirectory()) {
+						continue;
+					}
+		
+					final String[] certutilCommands = new String[] {
+							certutilExe,
+							"-D", //$NON-NLS-1$
+							"-d", //$NON-NLS-1$
+							profileDir.getAbsolutePath(),
+							"-n", //$NON-NLS-1$
+							"\"" + ConfiguratorUtil.CERT_ALIAS + "\"", //$NON-NLS-1$ //$NON-NLS-2$
+					};
+		
+					final Process process = new ProcessBuilder(certutilCommands).start();
+		
+					LOGGER.info("Comando certutil ejecutado: " + Arrays.toString(certutilCommands)); //$NON-NLS-1$
+					// Cuando se instala correctamente no hay salida de ningun tipo, asi que se interpreta
+					// cualquier salida como un error
+					String line;
+					try (
+							final InputStream resIs = process.getInputStream();
+							final BufferedReader resReader = new BoundedBufferedReader(
+									new InputStreamReader(resIs),
+									256, // Maximo 256 lineas de salida
+									1024 // Maximo 1024 caracteres por linea
+									);
+							) {
+						while ((line = resReader.readLine()) != null) {
+							error = true;
+							LOGGER.severe(line);
+						}
+					}
+		
+					try (
+							final InputStream errIs = process.getErrorStream();
+							final BufferedReader errReader = new BoundedBufferedReader(
+									new InputStreamReader(errIs),
+									256, // Maximo 256 lineas de salida
+									1024 // Maximo 1024 caracteres por linea
+									);
+							) {
+						while ((line = errReader.readLine()) != null) {
+							error = true;
+							LOGGER.severe(line);
+						}
+					}
 				}
 			}
 		}
@@ -876,16 +900,34 @@ final class ConfiguratorFirefox {
 		}
 	}
 
-	private static File getFirefoxProfilesDir() {
+	private static ArrayList<File> getFirefoxProfilesDir() {
+		ArrayList<File> fileList = new ArrayList<>();
+		
+		//Se obtienen todos los usuarios para los que se va a instalar el certificado en Firefox
+		File file = new File(USERS_WINDOWS_PATH);
+		String[] directories = file.list(new FilenameFilter() {
+		  @Override
+		  public boolean accept(File current, String name) {
+		    return new File(current, name).isDirectory();
+		  }
+		});
+		
 		try {
-			return new File(
-					MozillaKeyStoreUtilities.getMozillaUserProfileDirectory()
-					).getParentFile();
+			for(String profile : directories) {
+				if(new File(USERS_WINDOWS_PATH + profile + WINDOWS_MOZILLA_PATH).exists()) { 
+					fileList.add(
+							new File(
+									MozillaKeyStoreUtilities.getMozillaUserProfileDirectoryWindows(
+											USERS_WINDOWS_PATH + profile + WINDOWS_MOZILLA_PATH) 
+							).getParentFile());
+					LOGGER.info("Se usa el perfil de Firefox: " + USERS_WINDOWS_PATH + profile + WINDOWS_MOZILLA_PATH); //$NON-NLS-1$
+				}
+			}
 		}
 		catch (final Exception e) {
 			LOGGER.warning("No se encontro el directorio de perfiles de Mozilla Firefox: " + e); //$NON-NLS-1$
 		}
-		return null;
+		return fileList;
 	}
 
 	/** Devuelve un listado con todos directorios personales de los usuarios del sistema ejecutando un script.
@@ -958,7 +1000,6 @@ final class ConfiguratorFirefox {
 				return null;
 			}
 		}
-
 		else {
 			throw new IllegalArgumentException("Sistema operativo no soportado: " + Platform.getOS()); //$NON-NLS-1$
 		}
