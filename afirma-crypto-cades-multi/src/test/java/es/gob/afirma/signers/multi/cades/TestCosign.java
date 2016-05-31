@@ -27,9 +27,9 @@ import es.gob.afirma.signers.cades.AOCAdESSigner;
  */
 public class TestCosign {
 
-	private static final String PKCS12_KEYSTORE = "PFActivoFirSHA1.pfx"; //$NON-NLS-1$
+	private static final String PKCS12_KEYSTORE = "ANCERTCCP_FIRMA.p12"; //$NON-NLS-1$
 
-	private static final String PASSWORD = "12341234"; //$NON-NLS-1$
+	private static final String PASSWORD = "1111"; //$NON-NLS-1$
 
 	private static final String IMPLICIT_SHA1_SIGN_FILE = "firma_implicita.csig"; //$NON-NLS-1$
 	private static final String EXPLICIT_SHA1_SIGN_FILE = "firma_explicita.csig"; //$NON-NLS-1$

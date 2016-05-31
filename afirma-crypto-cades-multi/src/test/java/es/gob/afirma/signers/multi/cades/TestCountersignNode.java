@@ -22,9 +22,9 @@ import es.gob.afirma.signers.cades.AOCAdESSigner;
  * @author Carlos Gamuci */
 public class TestCountersignNode {
 
-	private static final String PKCS12_KEYSTORE = "PFActivoFirSHA1.pfx"; //$NON-NLS-1$
-	private static final String PASSWORD = "12341234"; //$NON-NLS-1$
-	private static final String PKCS12_KEYSTORE2 = "CAMERFIRMA_PF_SW_Clave_usuario_Activo.p12"; //$NON-NLS-1$
+	private static final String PKCS12_KEYSTORE = "ANCERTCCP_FIRMA.p12"; //$NON-NLS-1$
+	private static final String PASSWORD = "1111"; //$NON-NLS-1$
+	private static final String PKCS12_KEYSTORE2 = "ANCERTCE_FIRMA.p12"; //$NON-NLS-1$
 	private static final String PASSWORD2 = "1111"; //$NON-NLS-1$
 	private static final String SIGN_FILE = "cades_3nodos.csig"; //$NON-NLS-1$
 

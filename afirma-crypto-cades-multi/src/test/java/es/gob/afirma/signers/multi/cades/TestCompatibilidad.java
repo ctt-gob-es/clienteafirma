@@ -17,9 +17,8 @@ public class TestCompatibilidad {
 
 	private static final String CMS_SIGN_FILENAME = "cms_implicit.csig"; //$NON-NLS-1$
 
-	private static final String CERT_PATH = "PFActivoFirSHA1.pfx"; //$NON-NLS-1$
-	private static final String CERT_PASS = "12341234"; //$NON-NLS-1$
-	private static final String CERT_ALIAS = "anf usuario activo"; //$NON-NLS-1$
+	private static final String CERT_PATH = "ANCERTCCP_FIRMA.p12"; //$NON-NLS-1$
+	private static final String CERT_PASS = "1111"; //$NON-NLS-1$
 
 
 	/** Prueba de cofirma CAdES sobre firma CMS.
@@ -32,7 +31,7 @@ public class TestCompatibilidad {
 
 		final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
 		ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH), CERT_PASS.toCharArray());
-		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
+		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
 
 		final Properties extraParams = new Properties();
 		extraParams.setProperty("mode", AOSignConstants.SIGN_MODE_IMPLICIT); //$NON-NLS-1$
