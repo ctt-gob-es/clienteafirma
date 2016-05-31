@@ -245,7 +245,7 @@ Section "Programa" sPrograma
 	WriteRegStr HKEY_CLASSES_ROOT "afirma" "" "URL:Afirma Protocol"
 	WriteRegStr HKEY_CLASSES_ROOT "afirma\DefaultIcon" "" "$INSTDIR\AutoFirma\ic_firmar.ico"
 	WriteRegStr HKEY_CLASSES_ROOT "afirma" "URL Protocol" ""
-	WriteRegStr HKEY_CLASSES_ROOT "afirma\shell\open\command" "" "$INSTDIR\AutoFirma\AutoFirma.exe %1"	
+	WriteRegStr HKEY_CLASSES_ROOT "afirma\shell\open\command" "" "\""$INSTDIR\AutoFirma\AutoFirma.exe\" \"%1\""	
 	
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Instalacion de la JRE
