@@ -14,6 +14,7 @@ final class ConfiguratorWindows implements Configurator {
 	static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	private static final String KS_FILENAME = "autofirma.pfx"; //$NON-NLS-1$
+	private static final String FILE_AUTOFIRMA_CERTIFICATE = "AutoFirma_ROOT.cer"; //$NON-NLS-1$
 	private static final String KS_PASSWORD = "654321"; //$NON-NLS-1$
 
 	@Override
@@ -34,10 +35,16 @@ final class ConfiguratorWindows implements Configurator {
 
 			window.print(Messages.getString("ConfiguratorWindows.11")); //$NON-NLS-1$
 
+			//Generacion del certificado pfx
 			ConfiguratorUtil.installFile(
 				certPack.getPkcs12(),
 				new File(appDir, KS_FILENAME)
 			);
+			
+			//Generacion del certificado raiz .cer
+			ConfiguratorUtil.installFile(
+					certPack.getCaCertificate().getEncoded(), 
+					new File(appDir, FILE_AUTOFIRMA_CERTIFICATE));
 
 			try {
 				window.print(Messages.getString("ConfiguratorWindows.13")); //$NON-NLS-1$
@@ -48,7 +55,7 @@ final class ConfiguratorWindows implements Configurator {
 				window.print(Messages.getString("ConfiguratorWindows.7")); //$NON-NLS-1$
 			}
 			catch(final MozillaProfileNotFoundException e) {
-				window.print(Messages.getString("ConfiguratorWindows.12")); //$NON-NLS-1$
+				window.print(Messages.getString("ConfiguratorWindows.12") + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		}
 		else {

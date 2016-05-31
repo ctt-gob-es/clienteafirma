@@ -443,8 +443,6 @@ final class ConfiguratorFirefox {
 			final Certificate cert,
 			final File targetDir) throws CertificateEncodingException, IOException {
 
-		ConfiguratorUtil.installFile(cert.getEncoded(), new File(targetDir, FILE_AUTOFIRMA_CERTIFICATE));
-
 		//En linux se trabaja con la dependencia del certutil
 		if (!Platform.OS.LINUX.equals(Platform.getOS()) ) {
 			final File certutilFile = new File(certUtilAbsolutePath);
