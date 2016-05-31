@@ -94,7 +94,7 @@ public class AOKeyStoreManager implements KeyStoreManager {
 	public void refresh() throws IOException {
     	resetCachedAliases();
     	try {
-			this.init(this.ksType, this.storeIs, this.storePasswordCallBack, this.storeParams, true);
+			init(this.ksType, this.storeIs, this.storePasswordCallBack, this.storeParams, true);
 		}
     	catch (final AOKeyStoreManagerException e) {
 			throw new IOException("Error al refrescar el almacen: " + e, e); //$NON-NLS-1$
@@ -221,9 +221,6 @@ public class AOKeyStoreManager implements KeyStoreManager {
         		}
                 this.ks = AOKeyStoreManagerHelperPkcs11.initPKCS11(pssCallBack, newParams);
                 break;
-        	case APPLE:
-        		this.ks = AOKeyStoreManagerHelperApple.initApple(store);
-        		break;
             default:
             	throw new UnsupportedOperationException("Tipo de almacen no soportado: " + store); //$NON-NLS-1$
         }
