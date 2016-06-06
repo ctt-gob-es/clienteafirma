@@ -62,7 +62,56 @@ import es.gob.afirma.signers.pkcs7.SigUtils;
 /** Contrafirma digital CADES SignedData.
  * La implementaci&oacute;n del c&oacute;digo ha seguido los pasos necesarios para
  * crear un mensaje SignedData de SpongyCastle pero con la
- * peculiaridad de que es una Contrafirma. */
+ * peculiaridad de que es una Contrafirma.
+ * <pre>
+ *  SignedData ::= SEQUENCE {
+ *       version CMSVersion,
+ *       digestAlgorithms DigestAlgorithmIdentifiers,
+ *       encapContentInfo EncapsulatedContentInfo,
+ *       certificates [0] IMPLICIT CertificateSet OPTIONAL,
+ *       crls [1] IMPLICIT RevocationInfoChoices OPTIONAL,
+ *       signerInfos SignerInfos
+ *  }
+ *
+ *  DigestAlgorithmIdentifiers ::= SET OF DigestAlgorithmIdentifier
+ *
+ *  SignerInfos ::= SET OF SignerInfo
+ *
+ *  EncapsulatedContentInfo ::= SEQUENCE {
+ *       eContentType ContentType,
+ *       eContent [0] EXPLICIT OCTET STRING OPTIONAL
+ *  }
+ *
+ *  SignerInfo ::= SEQUENCE {
+ *       version CMSVersion,
+ *       sid SignerIdentifier,
+ *       digestAlgorithm DigestAlgorithmIdentifier,
+ *       signedAttrs [0] IMPLICIT SignedAttributes OPTIONAL,
+ *       signatureAlgorithm SignatureAlgorithmIdentifier,
+ *       signature SignatureValue,
+ *       unsignedAttrs [1] IMPLICIT UnsignedAttributes OPTIONAL
+ *  }
+ *
+ *  SignerIdentifier ::= CHOICE {
+ *       issuerAndSerialNumber IssuerAndSerialNumber,
+ *       subjectKeyIdentifier [0] SubjectKeyIdentifier
+ *   }
+ *
+ *  SignedAttributes ::= SET SIZE (1..MAX) OF Attribute
+ *
+ *  UnsignedAttributes ::= SET SIZE (1..MAX) OF Attribute
+ *
+ *  Attribute ::= SEQUENCE {
+ *       attrType OBJECT IDENTIFIER,
+ *       attrValues SET OF AttributeValue
+ *  }
+ *
+ *  AttributeValue ::= ANY
+ *
+ *  SignatureValue ::= OCTET STRING
+ *
+ *  ContentType ::= OBJECT IDENTIFIER
+ * </pre> */
 final class CAdESCounterSigner {
 
     private AOSimpleSigner ss = new AOPkcs1Signer();
@@ -149,23 +198,23 @@ final class CAdESCounterSigner {
                                                                                     NoSuchAlgorithmException,
                                                                                     CertificateException,
                                                                                     AOException {
-        // Leemos los datos originales
+        // Leemos los datos originales (la firma que nos llega)
     	final ASN1InputStream is = new ASN1InputStream(data);
         final ASN1Sequence dsq = (ASN1Sequence) is.readObject();
         is.close();
-        final Enumeration<?> e = dsq.getObjects();
+        final Enumeration<?> pkcs7RootSequenceElements = dsq.getObjects();
 
         // Pasamos el primer elemento de la secuencia original, que es el OID de SignedData
-        final Object o = e.nextElement();
+        final Object o = pkcs7RootSequenceElements.nextElement();
         if (!(o instanceof ASN1ObjectIdentifier) && ((ASN1ObjectIdentifier)o).equals(PKCSObjectIdentifiers.signedData)) {
 			throw new AOFormatFileException("No se ha encontrado un SignedData en los datos a contrafirmar"); //$NON-NLS-1$
 		}
 
         // Obtenemos el Context-Specific
-        final ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
+        final ASN1TaggedObject pkcs7RootContextSpecificZero = (ASN1TaggedObject) pkcs7RootSequenceElements.nextElement();
 
-        // Sacamos la secuencia de dentro Context-Specific, que es ya el SignedData
-        final SignedData signedData = SignedData.getInstance(doj.getObject());
+        // Sacamos la secuencia de dentro Context-Specific, que es ya el SignedData ASN.1
+        final SignedData signedData = SignedData.getInstance(pkcs7RootContextSpecificZero.getObject());
 
         // Obtenemos el SignerInfos (conjunto de SignerInfo) del SignedData
         final ASN1Set originalSignerInfosFromSignedData = signedData.getSignerInfos();
@@ -321,7 +370,7 @@ final class CAdESCounterSigner {
 
                 // Los sellos de tiempo no se contrafirman, pero si el resto de los SignedData encontrados
                 if (CAdESMultiUtil.isSignatureTimestamp(unauthenticatedAttribute.getAttrType())) {
-                	return signerInfo;
+                	continue;
                 }
 
                 // Las firmas con atributos longevos no se contrafirman

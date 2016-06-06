@@ -39,6 +39,7 @@ public class TestCountersign {
 		ksIs = getClass().getClassLoader().getResourceAsStream(PKCS12_KEYSTORE);
 		ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
 		ks.load(ksIs, PASSWORD.toCharArray());
+		ksIs.close();
 	}
 
 	/**
@@ -176,6 +177,15 @@ public class TestCountersign {
 		final FileOutputStream fos = new FileOutputStream(tempFile);
 		fos.write(countersign);
 		fos.close();
+	}
+
+	/** Main para pruebas sin JUnit.
+	 * @param args No se usa.
+	 * @throws Exception En cualquier error. */
+	public static void main(final String[] args) throws Exception {
+		final TestCountersign cs = new TestCountersign();
+		cs.cargaAlmacen();
+		cs.prueba_contrafirma_cades_T();
 	}
 
 	/** Prueba de contrafirma de los nodos hoja de una firma CAdES-A.

@@ -62,13 +62,13 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
 	/** {@inheritDoc} */
 	@Override
 	public final byte[] countersign(final byte[] sign,
-                              final String algorithm,
-                              final CounterSignTarget targetType,
-                              final Object[] targets,
-                              final PrivateKey key,
-                              final java.security.cert.Certificate[] cChain,
-                              final Properties xParams) throws AOException,
-                                                               IOException {
+                                    final String algorithm,
+                                    final CounterSignTarget targetType,
+                                    final Object[] targets,
+                                    final PrivateKey key,
+                                    final java.security.cert.Certificate[] cChain,
+                                    final Properties xParams) throws AOException,
+                                                                     IOException {
 
         final Properties extraParams = xParams != null ? xParams : new Properties();
 
