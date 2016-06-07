@@ -21,6 +21,7 @@ import org.spongycastle.asn1.ASN1EncodableVector;
 import org.spongycastle.asn1.ASN1ObjectIdentifier;
 import org.spongycastle.asn1.ASN1Primitive;
 import org.spongycastle.asn1.ASN1Set;
+import org.spongycastle.asn1.BERSet;
 import org.spongycastle.asn1.cms.AttributeTable;
 import org.spongycastle.asn1.cms.SignedData;
 import org.spongycastle.asn1.pkcs.PKCSObjectIdentifiers;
@@ -30,7 +31,6 @@ import org.spongycastle.cms.CMSSignedData;
 import org.spongycastle.cms.SignerInformation;
 
 import es.gob.afirma.core.AOFormatFileException;
-import es.gob.afirma.signers.pkcs7.SigUtils;
 
 final class CAdESMultiUtil {
 
@@ -56,26 +56,22 @@ final class CAdESMultiUtil {
 	static ASN1Set addCertificates(final SignedData sd,
 			                       final java.security.cert.Certificate[] certChain) throws CertificateEncodingException,
 			                                                                                IOException {
-		ASN1Set certificates = null;
-
 		final ASN1Set certificatesSigned = sd.getCertificates();
 		final ASN1EncodableVector vCertsSig = new ASN1EncodableVector();
 		final Enumeration<?> certs = certificatesSigned.getObjects();
 
-		// COJEMOS LOS CERTIFICADOS EXISTENTES EN EL FICHERO
+		// COGEMOS LOS CERTIFICADOS EXISTENTES EN EL FICHERO
 		while (certs.hasMoreElements()) {
 			vCertsSig.add((ASN1Encodable) certs.nextElement());
 		}
 
 		// Y ANADIMOS LOS DE LA NUEVA CADENA
 		if (certChain.length != 0) {
-			final List<ASN1Encodable> ce = new ArrayList<ASN1Encodable>();
 			for (final java.security.cert.Certificate element : certChain) {
-				ce.add(Certificate.getInstance(ASN1Primitive.fromByteArray(element.getEncoded())));
+				vCertsSig.add(Certificate.getInstance(ASN1Primitive.fromByteArray(element.getEncoded())));
 			}
-			certificates = SigUtils.fillRestCerts(ce, vCertsSig);
 		}
-		return certificates;
+		return new BERSet(vCertsSig);
 	}
 
 	static void checkUnsupportedAttributes(final byte[] signedDataBytes) throws AOFormatFileException, IOException {
@@ -114,7 +110,7 @@ final class CAdESMultiUtil {
     	for (final ASN1ObjectIdentifier unsupOid : UNSUPPORTED_ATTRIBUTES) {
     		if (unsupOid.equals(oid)) {
     			throw new AOFormatFileException(
-					"No se soportan multifirmas de firmas con sellos de tiempo o atributos longevos (encontrado OID=" + oid + ")" //$NON-NLS-1$ //$NON-NLS-2$
+					"No se soportan multifirmas de firmas con atributos longevos (encontrado OID=" + oid + ")" //$NON-NLS-1$ //$NON-NLS-2$
 				);
     		}
     	}
