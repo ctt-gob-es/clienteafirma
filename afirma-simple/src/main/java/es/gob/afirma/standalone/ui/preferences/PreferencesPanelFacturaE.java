@@ -131,6 +131,20 @@ final class PreferencesPanelFacturaE extends JPanel {
         c.gridy++;
         metadata.add(this.facturaeSignatureProductionCity, c);
 
+        final JLabel facturaeSignatureProductionProvinceLabel = new JLabel(
+    		SimpleAfirmaMessages.getString("PreferencesPanel.14") //$NON-NLS-1$
+		);
+        facturaeSignatureProductionProvinceLabel.setLabelFor(this.facturaeSignatureProductionProvince);
+        c.gridy++;
+        metadata.add(facturaeSignatureProductionProvinceLabel, c);
+        this.facturaeSignatureProductionProvince.getAccessibleContext().setAccessibleDescription(
+    		SimpleAfirmaMessages.getString("PreferencesPanel.68") //$NON-NLS-1$
+		);
+        this.facturaeSignatureProductionProvince.addKeyListener(modificationListener);
+        this.facturaeSignatureProductionProvince.addKeyListener(keyListener);
+        c.gridy++;
+        metadata.add(this.facturaeSignatureProductionProvince, c);
+
         final JLabel facturaeSignatureProductionPostalCodeLabel = new JLabel(
     		SimpleAfirmaMessages.getString("PreferencesPanel.102") //$NON-NLS-1$
 		);
@@ -155,20 +169,6 @@ final class PreferencesPanelFacturaE extends JPanel {
         this.facturaeSignatureProductionCountry.addKeyListener(keyListener);
         c.gridy++;
         metadata.add(this.facturaeSignatureProductionCountry, c);
-
-        final JLabel facturaeSignatureProductionProvinceLabel = new JLabel(
-    		SimpleAfirmaMessages.getString("PreferencesPanel.14") //$NON-NLS-1$
-		);
-        facturaeSignatureProductionProvinceLabel.setLabelFor(this.facturaeSignatureProductionProvince);
-        c.gridy++;
-        metadata.add(facturaeSignatureProductionProvinceLabel, c);
-        this.facturaeSignatureProductionProvince.getAccessibleContext().setAccessibleDescription(
-    		SimpleAfirmaMessages.getString("PreferencesPanel.68") //$NON-NLS-1$
-		);
-        this.facturaeSignatureProductionProvince.addKeyListener(modificationListener);
-        this.facturaeSignatureProductionProvince.addKeyListener(keyListener);
-        c.gridy++;
-        metadata.add(this.facturaeSignatureProductionProvince, c);
 
         final FlowLayout fLayout = new FlowLayout(FlowLayout.LEADING);
 	    final JPanel signOptions = new JPanel(fLayout);
