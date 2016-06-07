@@ -116,10 +116,7 @@ final class CAdESMultiUtil {
     	}
     }
 
-    static boolean isSignatureTimestamp(final ASN1ObjectIdentifier oid) {
-    	if (PKCSObjectIdentifiers.id_aa_signatureTimeStampToken.equals(oid)) {
-    		return true;
-    	}
-    	return false;
+    static boolean isCounterSignature(final ASN1ObjectIdentifier oid) {
+    	return PKCSObjectIdentifiers.pkcs_9_at_counterSignature.equals(oid);
     }
 }

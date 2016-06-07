@@ -16,11 +16,13 @@ import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.logging.Logger;
 
+import org.spongycastle.asn1.ASN1Encodable;
 import org.spongycastle.asn1.ASN1EncodableVector;
 import org.spongycastle.asn1.ASN1Encoding;
 import org.spongycastle.asn1.ASN1InputStream;
@@ -56,7 +58,6 @@ import es.gob.afirma.signers.cades.CAdESSignerMetadata;
 import es.gob.afirma.signers.cades.CAdESUtils;
 import es.gob.afirma.signers.cades.CommitmentTypeIndicationBean;
 import es.gob.afirma.signers.pkcs7.AOAlgorithmID;
-import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
 import es.gob.afirma.signers.pkcs7.SigUtils;
 
 /** Contrafirma digital CADES SignedData.
@@ -117,6 +118,18 @@ final class CAdESCounterSigner {
     private AOSimpleSigner ss = new AOPkcs1Signer();
     private Date date = null;
 
+
+    void setPkcs1Signer(final AOSimpleSigner p1Signer, final Date d) {
+    	if (p1Signer == null) {
+    		throw new IllegalArgumentException("El firmador PKCS#1 no puede ser nulo"); //$NON-NLS-1$
+    	}
+    	if (d == null) {
+    		Logger.getLogger("es.gob.afirma").warning("Se ha establecido una fecha nula, se usara la actual"); //$NON-NLS-1$ //$NON-NLS-2$
+    	}
+    	this.ss = p1Signer;
+    	this.date = d;
+    }
+
     /** Crea una contrafirma a partir de los datos del firmante, el archivo que se firma y
      * del archivo que contiene las firmas.
      * <p>El fichero de firmas tiene esta estructura:</p>
@@ -158,9 +171,8 @@ final class CAdESCounterSigner {
      *
      * EncryptedDigest ::= OCTET STRING
      * </pre>
-     * @param parameters Par&aacute;metros necesarios que contienen tanto la firma del
-     *                   archivo a firmar como los datos del firmante.
-     * @param data Archivo que contiene las firmas.
+     * @param algorithm Algoritmo de firma.
+     * @param signature Archivo que contiene las firmas.
      * @param targetType Lo que se quiere firmar. Puede ser el &aacute;rbol completo,
      *                   las hojas, un nodo determinado o unos determinados firmantes.
      * @param key Clave privada a usar para firmar.
@@ -184,8 +196,8 @@ final class CAdESCounterSigner {
      *                              firma.
      * @throws AOException Cuando ocurre alg&uacute;n error no contemplado por las otras
      *                     excepciones declaradas */
-    byte[] counterSign(final P7ContentSignerParameters parameters,
-                       final byte[] data,
+    byte[] counterSign(final String algorithm,
+                       final byte[] signature,
                        final CounterSignTarget targetType,
                        final PrivateKey key,
                        final java.security.cert.Certificate[] certChain,
@@ -199,7 +211,7 @@ final class CAdESCounterSigner {
                                                                                     CertificateException,
                                                                                     AOException {
         // Leemos los datos originales (la firma que nos llega)
-    	final ASN1InputStream is = new ASN1InputStream(data);
+    	final ASN1InputStream is = new ASN1InputStream(signature);
         final ASN1Sequence dsq = (ASN1Sequence) is.readObject();
         is.close();
         final Enumeration<?> pkcs7RootSequenceElements = dsq.getObjects();
@@ -223,11 +235,11 @@ final class CAdESCounterSigner {
         // en un SET para anadirlo al SignedData final
         final ASN1Set certificates = CAdESMultiUtil.addCertificates(signedData, certChain);
 
-        // Nuevo conjunto de SignerInfo, que es la base para un el nuevo SignerInfos (SET de muchos SignerInfo),
-        // los antiguos mas los nuevos
+        // Creamos el que sera el nuevo conjunto SignerInfos (SET de muchos SignerInfo), para lo que agregamos
+        // a los actuales los nuevos
         final ASN1EncodableVector newSignerInfos = counterSignSignerInfos(
     		originalSignerInfosFromSignedData,
-    		parameters,
+    		algorithm,
     		key,
     		certChain,
             policy,
@@ -239,7 +251,9 @@ final class CAdESCounterSigner {
             doNotIncludePolicyOnSigningCertificate
         );
 
-        // Construimos el Signed Data y lo devolvemos
+        // Construimos y devolvemos la nueva firma (atributo identificador del signedData mas el propio signedData).
+        // Esta firma sera igual a la anterior pero con el conjunto de certificados actualizados con los nuevos y la
+        // nueva estructura de SignerInfos. Tambien eliminamos las CRL ya que no estarian completas.
         return new ContentInfo(
     		PKCSObjectIdentifiers.signedData,
     		new SignedData(
@@ -255,7 +269,7 @@ final class CAdESCounterSigner {
 
     /** Contrafirma el &aacute;rbol completo de forma recursiva (todos los nodos).
      * @param signerInfosRaiz <i>SignerInfos</i> con los <i>SignerInfo</i> que se deben firmar.
-     * @param parameters Par&aacute;metros necesarios para los <i>SignerInfo</i>.
+     * @param algorithm Algoritmo de firma.
      * @param key Clave privada a usar para firmar.
      * @param signingCertificateV2 <code>true</code> si se desea usar <i>SigningCertificateV2</i>, <code>false</code>
      *                             para usar <i>SigningCertificateV1</i>.
@@ -265,8 +279,7 @@ final class CAdESCounterSigner {
      * @param includeSigningTimeAttribute <code>true</code> para incluir el atributo <i>SigningTime</i> de PKCS#9 (OID:1.2.840.113549.1.9.5),
      *                                    <code>false</code> para no incluirlo.
      * @param csm Metadatos sobre el firmante.
-     * @param targetType Lo que se quiere firmar. Puede ser el &aacute;rbol completo,
-     *                   las hojas, un nodo determinado o unos determinados firmantes.
+     * @param targetType Lo que se quiere firmar. Puede ser el &aacute;rbol completo y s&oacute;lo los nodos hoja.
      * @param doNotIncludePolicyOnSigningCertificate Si se establece a <code>true</code> omite la inclusi&oacute;n de la
      *                                               pol&iacute;tica de certificaci&oacute;n en el <i>SigningCertificate</i>,
      *                                               si se establece a <code>false</code> se incluye siempre que el certificado
@@ -277,7 +290,7 @@ final class CAdESCounterSigner {
      * @throws CertificateException Cuando hay problemas con los certificados proporcionados.
      * @throws AOException En caso de cualquier otro tipo de error */
     private ASN1EncodableVector counterSignSignerInfos(final ASN1Set signerInfosRaiz,
-                                                       final P7ContentSignerParameters parameters,
+                                                       final String algorithm,
                                                        final PrivateKey key,
                                                        final java.security.cert.Certificate[] certChain,
                                                        final AdESPolicy policy,
@@ -290,7 +303,7 @@ final class CAdESCounterSigner {
                                                                                                                     IOException,
                                                                                                                     CertificateException,
                                                                                                                     AOException {
-        // Nuevo vector para los SignerInfo
+        // Vector donde almacenaremos la nueva estructura de SignerInfo
     	final ASN1EncodableVector counterSigners = new ASN1EncodableVector();
 
     	// Recorremos todos los SignerInfo y llamamos a un metodo que los recorrera recursivamente cada uno
@@ -301,7 +314,7 @@ final class CAdESCounterSigner {
             counterSigners.add(
         		counterSignSignerInfo(
         			si,
-        			parameters,
+        			algorithm,
         			key,
         			certChain,
                     policy,
@@ -317,9 +330,13 @@ final class CAdESCounterSigner {
         return counterSigners;
     }
 
-    /** Contrafirma <i>SignerInfo</i> de forma recursiva.
+    /** Contrafirma una rama de <i>SignerInfo</i>. Como resultado se devuelve un SignerInfo igual
+     * al procesado, con los mismos atributos no firmados mas el nuevo atributo de contrafirma si
+     * tocaba firmar este SignerInfo. Cada nodo de contrafirma que ya existiese habra sido tambien
+     * procesado para agregar contrafirmas. Si se encontrase un atributo no firmado no soportado,
+     * se suspenderia todo el proceso de firma.
      * @param signerInfo <i>SignedInfo</i> ra&iacute;z.
-     * @param parameters Par&aacute;metros necesarios para firmar los <i>SignerInfo</i>.
+     * @param algorithm Algoritmo de firma.
      * @param key Clave privada a usar para firmar.
      * @param certChain Cadena de certificados del firmante.
      * @param policy Pol&iacute;tica de firma.
@@ -342,7 +359,7 @@ final class CAdESCounterSigner {
      * @throws CertificateException Cuando hay problemas con los certificados proporcionados.
      * @throws AOException En caso de cualquier otro tipo de error */
     private SignerInfo counterSignSignerInfo(final SignerInfo signerInfo,
-                                             final P7ContentSignerParameters parameters,
+                                             final String algorithm,
                                              final PrivateKey key,
                                              final java.security.cert.Certificate[] certChain,
                                              final AdESPolicy policy,
@@ -356,49 +373,34 @@ final class CAdESCounterSigner {
                                                                                                           CertificateException,
                                                                                                           AOException {
     	// Base para el nuevo SET de SignerInfos
+    	final List<Attribute> newUnauthenticatedAttributesList = new ArrayList<Attribute>();
         final ASN1EncodableVector signerInfosU = new ASN1EncodableVector();
 
         // Es hoja?
         boolean isLeaf = true;
 
-        // Recorremos los atributos no firmados buscando si es contrafirma
+        // Comprobamos si tiene atributos no firmados y los recorremos
         if (signerInfo.getUnauthenticatedAttributes() != null) {
             final Enumeration<?> unauthenticatedAttributes = signerInfo.getUnauthenticatedAttributes().getObjects();
             while (unauthenticatedAttributes.hasMoreElements()) {
 
-                final Attribute unauthenticatedAttribute = Attribute.getInstance(unauthenticatedAttributes.nextElement());
+            	final Attribute unauthenticatedAttribute = Attribute.getInstance(unauthenticatedAttributes.nextElement());
 
-                // Los sellos de tiempo no se contrafirman, pero si el resto de los SignedData encontrados
-                if (CAdESMultiUtil.isSignatureTimestamp(unauthenticatedAttribute.getAttrType())) {
-                	continue;
-                }
-
-                // Las firmas con atributos longevos no se contrafirman
+                // Si es un atributo no soportado, no podremos realizar la firma y se lanzara una excepcion
                 CAdESMultiUtil.checkUnsupported(unauthenticatedAttribute.getAttrType());
 
-                // Si es una contrafirma hacemos la llamada recursiva
-                if (PKCSObjectIdentifiers.pkcs_9_at_counterSignature.equals(unauthenticatedAttribute.getAttrType())) {
+                // Si es una contrafirma, la analizamos para saber si procesar su contenido y agregar nuevas contrafirmas
+                if (CAdESMultiUtil.isCounterSignature(unauthenticatedAttribute.getAttrType())) {
 
                 	isLeaf = false;
 
-                	// El atributo tiene dentro un SignerInfos, que es un SET de SignerInfo
-                    final ASN1Set signerInfos = unauthenticatedAttribute.getAttrValues();
-
-                    // Recorremos los SignerInfo del SignerInfos de forma recursiva
-                    final Enumeration<?> eAtributesData = signerInfos.getObjects();
-                    while (eAtributesData.hasMoreElements()) {
-                    	final SignerInfo si;
-                    	try {
-                    		si = SignerInfo.getInstance(eAtributesData.nextElement());
-                    	}
-                    	catch(final Exception e) {
-                    		// Podemos encontrar objetos que no sean un SignerInfo
-                    		continue;
-                    	}
+                	// Obtenemos el listado de SignerInfos y los procesamos recursivamente
+                	final List<SignerInfo> signerInfos = getSignerInfoFromUnauthenticatedAttributes(unauthenticatedAttribute);
+                    for (final SignerInfo si : signerInfos) {
                         signerInfosU.add(
                     		counterSignSignerInfo(
                 				si,
-                				parameters,
+                				algorithm,
                 				key,
                 				certChain,
                 				policy,
@@ -412,17 +414,22 @@ final class CAdESCounterSigner {
                 		);
                     }
                 }
+                // Si es cualquier otro atributo no firmado soportado, lo agregamos al listado de salida
+                else {
+                	newUnauthenticatedAttributesList.add(unauthenticatedAttribute);
+                }
 
             }
 
         }
 
-        // Vuelta de la recursividad, anadimos la contrafirma
+        // Vuelta de la recursividad, si toca firmar este nodo, creamos la contrafirma
+        // del nodo y la agregamos a la estructura
         if (CounterSignTarget.TREE.equals(targetType) || CounterSignTarget.LEAFS.equals(targetType) && isLeaf) {
 			signerInfosU.add(
 				signSignerInfo(
-					parameters.getSignatureAlgorithm(),
 					signerInfo,
+					algorithm,
 					key,
 					certChain,
 					policy,
@@ -435,6 +442,12 @@ final class CAdESCounterSigner {
 			);
         }
 
+        // Agregamos la contrafirma encontrada (que incluira sus nodos internos)
+        newUnauthenticatedAttributesList.add(
+        		new Attribute(CMSAttributes.counterSignature, new DERSet(signerInfosU)) // Se marca como contrafirma en sus atributos no firmados
+        		);
+
+        // Creamos el signer info con los nodos encontrados
 		return new SignerInfo(
 			signerInfo.getSID(),
 		    signerInfo.getDigestAlgorithm(),
@@ -442,15 +455,15 @@ final class CAdESCounterSigner {
 		    signerInfo.getDigestEncryptionAlgorithm(),
 		    signerInfo.getEncryptedDigest(),
 		    new DERSet(
-	    		new Attribute(CMSAttributes.counterSignature, new DERSet(signerInfosU)) // Se marca como contrafirma en sus atributos no firmados
-    		)
+		    	newUnauthenticatedAttributesList.toArray(new ASN1Encodable[newUnauthenticatedAttributesList.size()])
+		    )
 		);
 
     }
 
     /** Realiza realmente la operaci&oacute;n criptogr&aacute;fica de firma para generar finalmente el <i>SignerInfo</i>.
-     * @param signatureAlgorithm Algoritmo de firma a usar.
      * @param si SignerInfo a firmar (se obtiene la huella digital almacenada en &eacute;l y se firma).
+     * @param signatureAlgorithm Algoritmo de firma.
      * @param key Clave privada a usar para firmar.
      * @param certChain Cadena de certificados del firmante.
      * @param policy Pol&iacute;tica de firma.
@@ -468,8 +481,8 @@ final class CAdESCounterSigner {
      * @throws NoSuchAlgorithmException Si no se soporta alguno de los algoritmos necesarios.
      * @throws java.io.IOException Cuando hay errores de entrada / salida
      * @throws CertificateException Cuando hay problemas con los certificados proporcionados. */
-    private SignerInfo signSignerInfo(final String signatureAlgorithm,
-                                      final SignerInfo si,
+    private SignerInfo signSignerInfo(final SignerInfo si,
+    								  final String signatureAlgorithm,
                                       final PrivateKey key,
                                       final java.security.cert.Certificate[] certChain,
                                       final AdESPolicy policy,
@@ -543,20 +556,32 @@ final class CAdESCounterSigner {
 
     }
 
-    void setPkcs1Signer(final AOSimpleSigner p1Signer, final Date d) {
-    	if (p1Signer == null) {
-    		throw new IllegalArgumentException("El firmador PKCS#1 no puede ser nulo"); //$NON-NLS-1$
-    	}
-    	if (d == null) {
-    		Logger.getLogger("es.gob.afirma").warning("Se ha establecido una fecha nula, se usara la actual"); //$NON-NLS-1$ //$NON-NLS-2$
-    	}
-    	this.ss = p1Signer;
-    	this.date = d;
+    private static List<SignerInfo> getSignerInfoFromUnauthenticatedAttributes(final Attribute unauthenticatedAttribute) {
+
+    	final ArrayList<SignerInfo> signerInfos = new ArrayList<SignerInfo>();
+
+    	// El atributo tiene dentro un SignerInfos, que es un SET de SignerInfo
+        final ASN1Set values = unauthenticatedAttribute.getAttrValues();
+
+        // Recorremos los SignerInfo del SignerInfos de forma recursiva
+        final Enumeration<?> eAtributesData = values.getObjects();
+        while (eAtributesData.hasMoreElements()) {
+        	try {
+        		signerInfos.add(SignerInfo.getInstance(eAtributesData.nextElement()));
+        	}
+        	catch(final Exception e) {
+        		Logger.getLogger("es.gob.afirma").warning("No es un SignerInfo");
+        		// Ignoramos los objetos que no sea SignedInfo
+        		continue;
+        	}
+        }
+
+        return signerInfos;
     }
 
     /** Realiza la firma usando los atributos del firmante.
      * @param data Datos a firmar.
-     * @param signatureAlgorithm Algoritmo para la firma
+     * @param signatureAlgorithm Algoritmo de firma
      * @param key Clave para firmar.
      * @param certChain Cadena de certificados del firmante.
      * @return Firma de los atributos.

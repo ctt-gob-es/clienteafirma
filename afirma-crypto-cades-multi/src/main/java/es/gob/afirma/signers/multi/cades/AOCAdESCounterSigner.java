@@ -28,7 +28,6 @@ import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.signers.cades.CAdESExtraParams;
 import es.gob.afirma.signers.cades.CAdESSignerMetadataHelper;
 import es.gob.afirma.signers.cades.CommitmentTypeIndicationsHelper;
-import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
 
 /** Contrafirmador CAdES. */
 public class AOCAdESCounterSigner implements AOCounterSigner {
@@ -105,11 +104,6 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
 			)
 		);
 
-        final P7ContentSignerParameters csp = new P7ContentSignerParameters(
-    		sign,
-    		algorithm
-		);
-
         // Creamos el contrafirmador
         final CAdESCounterSigner cadesCountersigner = new CAdESCounterSigner();
 
@@ -127,7 +121,7 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
         byte[] dataSigned = null;
         try {
         	dataSigned = cadesCountersigner.counterSign(
-        			csp,
+        			algorithm,
         			sign,
         			targetType != null ? targetType : CounterSignTarget.LEAFS,
 					key,
