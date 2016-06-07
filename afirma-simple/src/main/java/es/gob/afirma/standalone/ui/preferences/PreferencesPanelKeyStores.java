@@ -39,15 +39,9 @@ final class PreferencesPanelKeyStores extends JPanel {
 
 	private static final long serialVersionUID = 3255071607793273334L;
 
-	private final JCheckBox onlySignature = new JCheckBox(
-		SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.0"), //$NON-NLS-1$
-		PreferencesManager.getBoolean(PREFERENCE_KEYSTORE_SIGN_ONLY_CERTS, false)
-	);
+	private final JCheckBox onlySignature = new JCheckBox(SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.0")); //$NON-NLS-1$
 
-	private final JCheckBox onlyAlias = new JCheckBox(
-		SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.4"), //$NON-NLS-1$
-		PreferencesManager.getBoolean(PREFERENCE_KEYSTORE_ALIAS_ONLY_CERTS, false)
-	);
+	private final JCheckBox onlyAlias = new JCheckBox(SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.4")); //$NON-NLS-1$
 
 	private static AOKeyStore[] DEFAULT_STORES;
 	static {
@@ -99,6 +93,7 @@ final class PreferencesPanelKeyStores extends JPanel {
         c.weightx = 1.0;
         c.gridy = 0;
 
+        loadPreferences();
         final JPanel keysFilerPanel = new JPanel(new GridBagLayout());
         keysFilerPanel.setBorder(
 			BorderFactory.createTitledBorder(
@@ -151,9 +146,6 @@ final class PreferencesPanelKeyStores extends JPanel {
 		ksc.gridy = 0;
 		ksc.insets = new Insets(5, 7, 5, 7);
 
-		this.defaultStore.setSelectedItem(
-			SimpleKeyStoreManager.getDefaultKeyStoreType()
-		);
 		this.defaultStore.addItemListener(
 			new ItemListener() {
 				@Override
@@ -254,6 +246,14 @@ final class PreferencesPanelKeyStores extends JPanel {
 		PreferencesManager.put(
 			PREFERENCE_KEYSTORE_DEFAULT_STORE,
 			getDefaultStore().name()
+		);
+	}
+
+	void loadPreferences() {
+		this.onlySignature.setSelected(PreferencesManager.getBoolean(PREFERENCE_KEYSTORE_SIGN_ONLY_CERTS, false));
+		this.onlyAlias.setSelected(PreferencesManager.getBoolean(PREFERENCE_KEYSTORE_ALIAS_ONLY_CERTS, false));
+		this.defaultStore.setSelectedItem(
+			SimpleKeyStoreManager.getDefaultKeyStoreType()
 		);
 	}
 }

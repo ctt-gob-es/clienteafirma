@@ -56,7 +56,7 @@ final class PreferencesPanel extends JPanel implements KeyListener, DisposableIn
 
 		final boolean unprotected = PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_UNPROTECTED, true);
 
-		this.preferencesPanelGeneral = new PreferencesPanelGeneral(this, this.modificationListener, this, unprotected);
+		this.preferencesPanelGeneral = new PreferencesPanelGeneral(this, this.modificationListener, this, this, unprotected);
 		this.preferencesPanelCades = new PreferencesPanelCades(this, this.modificationListener, unprotected);
 		this.preferencesPanelPades = new PreferencesPanelPades(this, this.modificationListener, unprotected);
 		this.preferencesPanelKeyStores = new PreferencesPanelKeyStores(this, this.modificationListener, unprotected);
@@ -183,6 +183,38 @@ final class PreferencesPanel extends JPanel implements KeyListener, DisposableIn
 	    return true;
 
 	}
+
+    void loadPreferences() {
+    	//****************************************************************************
+    			//**** PREFERENCIAS ALMACENES ************************************************
+    			//****************************************************************************
+    			this.preferencesPanelKeyStores.loadPreferences();
+
+    			//****************************************************************************
+    			//**** PREFERENCIAS FACTURAE ************************************************
+    			//****************************************************************************
+    			this.preferencesPanelFacturaE.loadPreferences();
+
+    			//****************************************************************************
+    			//**** PREFERENCIAS GENERALES ************************************************
+    			//****************************************************************************
+    			this.preferencesPanelGeneral.loadPreferences();
+
+    			//****************************************************************************
+    			//**** PREFERENCIAS CADES ****************************************************
+    			//****************************************************************************
+    			this.preferencesPanelCades.loadPreferences();
+
+    			//****************************************************************************
+    			//**** PREFERENCIAS PADES ****************************************************
+    			//****************************************************************************
+    			this.preferencesPanelPades.loadPreferences();
+
+    			//****************************************************************************
+    			//**** PREFERENCIAS XADES ****************************************************
+    			//****************************************************************************
+    			this.preferencesPanelXades.loadPreferences();
+    }
 
 	/** Comprueba que los datos configurados sean v&aacute;lidos.
 	 * @return {@code true} cuando los datos son v&aacute;lidos, {@code false} en caso

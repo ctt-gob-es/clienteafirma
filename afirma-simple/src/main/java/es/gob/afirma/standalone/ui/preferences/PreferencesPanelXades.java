@@ -46,21 +46,12 @@ final class PreferencesPanelXades extends JPanel {
 		"https://sede.060.gob.es/politica_de_firma_anexo_1.pdf" //$NON-NLS-1$
 	);
 
-	private final JTextField xadesSignatureProductionCity = new JTextField(
-		PreferencesManager.get(PREFERENCE_XADES_SIGNATURE_PRODUCTION_CITY, "") //$NON-NLS-1$
-	);
-	private final JTextField xadesSignatureProductionProvince = new JTextField(
-		PreferencesManager.get(PREFERENCE_XADES_SIGNATURE_PRODUCTION_PROVINCE, "") //$NON-NLS-1$
-	);
-	private final JTextField xadesSignatureProductionPostalCode = new JTextField(
-		PreferencesManager.get(PREFERENCE_XADES_SIGNATURE_PRODUCTION_POSTAL_CODE, "") //$NON-NLS-1$
-	);
-	private final JTextField xadesSignatureProductionCountry = new JTextField(
-		PreferencesManager.get(PREFERENCE_XADES_SIGNATURE_PRODUCTION_COUNTRY, "") //$NON-NLS-1$
-	);
-	private final JTextField xadesSignerClaimedRole = new JTextField(
-		PreferencesManager.get(PREFERENCE_XADES_SIGNER_CLAIMED_ROLE, "") //$NON-NLS-1$
-	);
+	private boolean unprotected = true;
+	private final JTextField xadesSignatureProductionCity = new JTextField();
+	private final JTextField xadesSignatureProductionProvince = new JTextField();
+	private final JTextField xadesSignatureProductionPostalCode = new JTextField();
+	private final JTextField xadesSignatureProductionCountry = new JTextField();
+	private final JTextField xadesSignerClaimedRole = new JTextField();
 	private final JComboBox<Object> xadesSignFormat = new JComboBox<>(
 		new Object[] {
 			AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED,
@@ -69,12 +60,14 @@ final class PreferencesPanelXades extends JPanel {
 		}
 	);
 
+	private final JPanel panelPolicies = new JPanel();
 	private PolicyPanel xadesPolicyPanel;
 
 	PreferencesPanelXades(final KeyListener keyListener,
 						  final ModificationListener modificationListener,
 						  final boolean unprotected) {
 
+		this.unprotected = unprotected;
 		createUI(keyListener, modificationListener, unprotected);
 	}
 
@@ -89,24 +82,13 @@ final class PreferencesPanelXades extends JPanel {
         gbc.weightx = 1.0;
         gbc.gridy = 0;
 
-        final List<PolicyPanel.PolicyItem> xadesPolicies = new ArrayList<>();
-        xadesPolicies.add(
-    		new PolicyItem(
-        		SimpleAfirmaMessages.getString("PreferencesPanel.73"), //$NON-NLS-1$
-        		POLICY_XADES_AGE_1_9
-    		)
-		);
+        loadPreferences();
 
-        this.xadesPolicyPanel = new PolicyPanel(
-    		SIGN_FORMAT_XADES,
-    		xadesPolicies,
-    		getXadesPreferedPolicy(),
-    		this.xadesSignFormat,
-    		unprotected
-		);
         this.xadesPolicyPanel.setModificationListener(modificationListener);
         this.xadesPolicyPanel.setKeyListener(keyListener);
-        add(this.xadesPolicyPanel, gbc);
+        this.panelPolicies.setLayout(new GridBagLayout());
+        this.panelPolicies.add(this.xadesPolicyPanel, gbc);
+        add(this.panelPolicies, gbc);
 
         final JPanel metadata = new JPanel();
         metadata.setBorder(BorderFactory.createTitledBorder(SimpleAfirmaMessages.getString("PreferencesPanel.8"))); //$NON-NLS-1$
@@ -190,12 +172,6 @@ final class PreferencesPanelXades extends JPanel {
         cf.fill = GridBagConstraints.HORIZONTAL;
         cf.weightx = 1.0;
 
-        this.xadesSignFormat.setSelectedItem(
-    		PreferencesManager.get(
-				PREFERENCE_XADES_SIGN_FORMAT,
-				AOSignConstants.SIGN_FORMAT_XADES_DETACHED
-			)
-		);
         this.xadesSignFormat.getAccessibleContext().setAccessibleDescription(SimpleAfirmaMessages.getString("PreferencesPanel.53")); //$NON-NLS-1$
         this.xadesSignFormat.addItemListener(modificationListener);
         this.xadesSignFormat.addKeyListener(keyListener);
@@ -286,6 +262,53 @@ final class PreferencesPanelXades extends JPanel {
 		this.xadesPolicyPanel.saveCurrentPolicy();
 
 	}
+
+	void loadPreferences() {
+		this.xadesSignatureProductionCity.setText(PreferencesManager.get(PREFERENCE_XADES_SIGNATURE_PRODUCTION_CITY, "")); //$NON-NLS-1$
+		this.xadesSignatureProductionProvince.setText(
+			PreferencesManager.get(PREFERENCE_XADES_SIGNATURE_PRODUCTION_PROVINCE, "") //$NON-NLS-1$
+		);
+		this.xadesSignatureProductionPostalCode.setText(
+			PreferencesManager.get(PREFERENCE_XADES_SIGNATURE_PRODUCTION_POSTAL_CODE, "") //$NON-NLS-1$
+		);
+		this.xadesSignatureProductionCountry.setText(
+			PreferencesManager.get(PREFERENCE_XADES_SIGNATURE_PRODUCTION_COUNTRY, "") //$NON-NLS-1$
+		);
+		this.xadesSignerClaimedRole.setText(PreferencesManager.get(PREFERENCE_XADES_SIGNER_CLAIMED_ROLE, "")); //$NON-NLS-1$
+
+		this.xadesSignFormat.setSelectedItem(
+    		PreferencesManager.get(
+				PREFERENCE_XADES_SIGN_FORMAT,
+				AOSignConstants.SIGN_FORMAT_XADES_DETACHED
+			)
+		);
+
+		final List<PolicyPanel.PolicyItem> xadesPolicies = new ArrayList<>();
+        xadesPolicies.add(
+    		new PolicyItem(
+        		SimpleAfirmaMessages.getString("PreferencesPanel.73"), //$NON-NLS-1$
+        		POLICY_XADES_AGE_1_9
+    		)
+		);
+
+        this.panelPolicies.removeAll();
+        this.xadesPolicyPanel = new PolicyPanel(
+    		SIGN_FORMAT_XADES,
+    		xadesPolicies,
+    		getXadesPreferedPolicy(),
+    		this.xadesSignFormat,
+    		this.unprotected
+		);
+
+        final GridBagConstraints c = new GridBagConstraints();
+        c.fill = GridBagConstraints.BOTH;
+        c.weightx = 1.0;
+        c.gridy = 0;
+        this.panelPolicies.add(this.xadesPolicyPanel, c);
+        revalidate();
+        repaint();
+	}
+
 
 	/** Obtiene la configuraci&oacute;n de politica de firma XAdES establecida actualmente.
 	 * @return Pol&iacute;tica de firma configurada. */

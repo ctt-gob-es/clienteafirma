@@ -15,6 +15,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.Insets;
+import java.awt.RenderingHints;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.dnd.DnDConstants;
@@ -82,7 +83,7 @@ import es.gob.afirma.standalone.ui.pdf.SignPdfUiPanel.SignPdfUiPanelListener;
 final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 
 	private static final long serialVersionUID = 1848879900511003335L;
-	private static final int PREFERRED_WIDTH = 600;
+	private static final int PREFERRED_WIDTH = 475;
 	private static final int PREFERRED_HEIGHT = 140;
 	private static final int MAX_TEXT_SIZE = 50;
 	private static final int MIN_TEXT_SIZE = 1;
@@ -221,7 +222,7 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 		final GridBagConstraints gbc = new GridBagConstraints();
 
 		gbc.fill = GridBagConstraints.BOTH;
-		gbc.insets = new Insets(10, 10, 0, 10);
+		gbc.insets = new Insets(10, 5, 0, 5);
 		gbc.weightx = 1.0;
 		gbc.weighty = 1.0;
 		gbc.gridy = 0;
@@ -864,6 +865,7 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 	        this.image.getType()
         );
 	    final Graphics2D g = bi.createGraphics();
+		g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 	    if (this.signImage != null) {
 		    g.drawImage(this.signImage, 0, 0, null);
 	    }

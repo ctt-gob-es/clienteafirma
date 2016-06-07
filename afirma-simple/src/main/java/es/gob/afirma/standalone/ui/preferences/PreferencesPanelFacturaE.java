@@ -16,6 +16,7 @@ import java.awt.GridBagLayout;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
 import javax.swing.JComboBox;
@@ -58,18 +59,10 @@ final class PreferencesPanelFacturaE extends JPanel {
 		null
 	);
 
-	private final JTextField facturaeSignatureProductionCity = new JTextField(
-		PreferencesManager.get(PREFERENCE_FACTURAE_SIGNATURE_PRODUCTION_CITY, "") //$NON-NLS-1$
-	);
-	private final JTextField facturaeSignatureProductionProvince = new JTextField(
-		PreferencesManager.get(PREFERENCE_FACTURAE_SIGNATURE_PRODUCTION_PROVINCE, "") //$NON-NLS-1$
-	);
-	private final JTextField facturaeSignatureProductionPostalCode = new JTextField(
-		PreferencesManager.get(PREFERENCE_FACTURAE_SIGNATURE_PRODUCTION_POSTAL_CODE, "") //$NON-NLS-1$
-	);
-	private final JTextField facturaeSignatureProductionCountry = new JTextField(
-		PreferencesManager.get(PREFERENCE_FACTURAE_SIGNATURE_PRODUCTION_COUNTRY, "") //$NON-NLS-1$
-	);
+	private final JTextField facturaeSignatureProductionCity = new JTextField();
+	private final JTextField facturaeSignatureProductionProvince = new JTextField();
+	private final JTextField facturaeSignatureProductionPostalCode = new JTextField();
+	private final JTextField facturaeSignatureProductionCountry = new JTextField();
 
 	private final JComboBox<Object> facturaeRol = new JComboBox<>(
 		new Object[] {
@@ -80,6 +73,7 @@ final class PreferencesPanelFacturaE extends JPanel {
 	);
 
 	private PolicyPanel facturaePolicyPanel;
+	private boolean unprotected = true;
 
 	PreferencesPanelFacturaE(final KeyListener keyListener,
 							 final ModificationListener modificationListener,
@@ -92,6 +86,7 @@ final class PreferencesPanelFacturaE extends JPanel {
 				  final ModificationListener modificationListener,
 				  final boolean unprotected) {
 
+		this.unprotected = unprotected;
         setLayout(new GridBagLayout());
 
         final GridBagConstraints gbc = new GridBagConstraints();
@@ -99,32 +94,9 @@ final class PreferencesPanelFacturaE extends JPanel {
         gbc.weightx = 1.0;
         gbc.gridy = 0;
 
-        final List<PolicyPanel.PolicyItem> facturaePolicies = new ArrayList<>();
-        facturaePolicies.add(
-    		new PolicyItem(
-				SimpleAfirmaMessages.getString("PreferencesPanelFacturaE.1"), //$NON-NLS-1$
-        		POLICY_FACTURAE_30
-    		)
-		);
+        loadPreferences();
 
-        facturaePolicies.add(
-    		new PolicyItem(
-				SimpleAfirmaMessages.getString("PreferencesPanelFacturaE.2"), //$NON-NLS-1$
-        		POLICY_FACTURAE_31
-    		)
-		);
-
-        this.facturaePolicyPanel = new PolicyPanel(
-    		SIGN_FORMAT_FACTURAE,
-    		facturaePolicies,
-    		POLICY_FACTURAE_31,
-    		null,
-    		false,
-    		false,
-    		false,
-    		unprotected
-		);
-        this.facturaePolicyPanel.setModificationListener(modificationListener);
+         this.facturaePolicyPanel.setModificationListener(modificationListener);
         this.facturaePolicyPanel.setKeyListener(keyListener);
         add(this.facturaePolicyPanel, gbc);
 
@@ -213,12 +185,6 @@ final class PreferencesPanelFacturaE extends JPanel {
         cf.fill = GridBagConstraints.HORIZONTAL;
         cf.weightx = 1.0;
 
-        this.facturaeRol.setSelectedItem(
-    		PreferencesManager.get(
-				PREFERENCE_FACTURAE_SIGNER_ROLE,
-				FACTURAE_ROL_EMISOR
-			)
-		);
         this.facturaeRol.getAccessibleContext().setAccessibleDescription(
     		SimpleAfirmaMessages.getString("PreferencesPanel.53") //$NON-NLS-1$
 		);
@@ -299,7 +265,89 @@ final class PreferencesPanelFacturaE extends JPanel {
 			PreferencesManager.remove(PREFERENCE_FACTURAE_POLICY_QUALIFIER);
 		}
 		this.facturaePolicyPanel.saveCurrentPolicy();
+	}
 
+	void loadPreferences() {
+		this.facturaeRol.setSelectedItem(
+			PreferencesManager.get(
+				PREFERENCE_FACTURAE_SIGNER_ROLE,
+				FACTURAE_ROL_EMISOR
+			)
+		);
+
+		this.facturaeSignatureProductionCity.setText(
+			PreferencesManager.get(
+				PREFERENCE_FACTURAE_SIGNATURE_PRODUCTION_CITY,
+				"" //$NON-NLS-1$
+			)
+		);
+
+		this.facturaeSignatureProductionProvince.setText(
+			PreferencesManager.get(
+				PREFERENCE_FACTURAE_SIGNATURE_PRODUCTION_PROVINCE,
+				"" //$NON-NLS-1$
+			)
+		);
+
+		this.facturaeSignatureProductionPostalCode.setText(
+			PreferencesManager.get(
+				PREFERENCE_FACTURAE_SIGNATURE_PRODUCTION_POSTAL_CODE,
+				"" //$NON-NLS-1$
+			)
+		);
+
+		this.facturaeSignatureProductionCountry.setText(
+			PreferencesManager.get(
+				PREFERENCE_FACTURAE_SIGNATURE_PRODUCTION_COUNTRY,
+				"" //$NON-NLS-1$
+			)
+		);
+		final List<PolicyPanel.PolicyItem> facturaePolicies = new ArrayList<>();
+        facturaePolicies.add(
+    		new PolicyItem(
+				SimpleAfirmaMessages.getString("PreferencesPanelFacturaE.1"), //$NON-NLS-1$
+        		POLICY_FACTURAE_30
+    		)
+		);
+
+		facturaePolicies.add(
+    		new PolicyItem(
+				SimpleAfirmaMessages.getString("PreferencesPanelFacturaE.2"), //$NON-NLS-1$
+        		POLICY_FACTURAE_31
+    		)
+		);
+
+        this.facturaePolicyPanel = new PolicyPanel(
+    		SIGN_FORMAT_FACTURAE,
+    		facturaePolicies,
+    		getFacturaEPreferedPolicy(),
+    		null,
+    		false,
+    		false,
+    		false,
+    		this.unprotected
+		);
+	}
+
+	/** Obtiene la configuraci&oacute;n de politica de firma FacturaE establecida actualmente.
+	 * @return Pol&iacute;tica de firma configurada. */
+	private static AdESPolicy getFacturaEPreferedPolicy() {
+
+		if (PreferencesManager.get(PREFERENCE_FACTURAE_POLICY_IDENTIFIER, null) == null) {
+			return null;
+		}
+		try {
+			return new AdESPolicy(
+					PreferencesManager.get(PREFERENCE_FACTURAE_POLICY_IDENTIFIER, null),
+					PreferencesManager.get(PREFERENCE_FACTURAE_POLICY_IDENTIFIER_HASH, null),
+					PreferencesManager.get(PREFERENCE_FACTURAE_POLICY_IDENTIFIER_HASH_ALGORITHM, null),
+					PreferencesManager.get(PREFERENCE_FACTURAE_POLICY_QUALIFIER, null)
+					);
+		}
+		catch (final Exception e) {
+			Logger.getLogger("es.gob.afirma").severe("Error al recuperar la politica FacturaE guardada en preferencias: " + e); //$NON-NLS-1$ //$NON-NLS-2$
+			return null;
+		}
 	}
 
 	@SuppressWarnings("unused")
