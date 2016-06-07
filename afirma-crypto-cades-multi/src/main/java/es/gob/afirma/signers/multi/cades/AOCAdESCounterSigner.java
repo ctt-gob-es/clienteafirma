@@ -118,64 +118,32 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
         	cadesCountersigner.setPkcs1Signer(this.ss, this.date);
         }
 
-        // Datos firmados.
+        // Ya no se soportan la contrafirma de nodos y de firmantes
+        if (targetType == CounterSignTarget.NODES || targetType == CounterSignTarget.SIGNERS) {
+            throw new AOException("No se soporta la firma de nodos individuales"); //$NON-NLS-1$
+        }
+
+     // CASO DE CONTRAFIRMA DE ARBOL U HOJAS (Por defecto)
         byte[] dataSigned = null;
-
         try {
-            // CASO DE FIRMA DE ARBOL
-            if (targetType == CounterSignTarget.TREE) {
-
-                dataSigned = cadesCountersigner.counterSign(
-                	   csp,
-                       sign,
-                       CounterSignTarget.TREE,
-                       key,
-                       certChain,
-                       AdESPolicy.buildAdESPolicy(extraParams),
-                       signingCertificateV2,
-                       CommitmentTypeIndicationsHelper.getCommitmentTypeIndications(extraParams),
-                       Boolean.parseBoolean(
-                		   extraParams.getProperty(
-            				   CAdESExtraParams.INCLUDE_SIGNING_TIME_ATTRIBUTE,
-            				   Boolean.FALSE.toString()
-        				   )
-            		   ),
-                       CAdESSignerMetadataHelper.getCAdESSignerMetadata(extraParams),
-                       doNotIncludePolicyOnSigningCertificate
-                );
-            }
-            // CASO DE FIRMA DE HOJAS
-            else if (targetType == CounterSignTarget.LEAFS) {
-                dataSigned = cadesCountersigner.counterSign(
-            		csp,
-                    sign,
-                    CounterSignTarget.LEAFS,
-                    key,
-                    certChain,
-                    AdESPolicy.buildAdESPolicy(extraParams),
+        	dataSigned = cadesCountersigner.counterSign(
+        			csp,
+        			sign,
+        			targetType != null ? targetType : CounterSignTarget.LEAFS,
+					key,
+					certChain,
+					AdESPolicy.buildAdESPolicy(extraParams),
 					signingCertificateV2,
-                    CommitmentTypeIndicationsHelper.getCommitmentTypeIndications(extraParams),
-                    Boolean.parseBoolean(
-                		extraParams.getProperty(
-            				CAdESExtraParams.INCLUDE_SIGNING_TIME_ATTRIBUTE,
-            				Boolean.FALSE.toString()
-        				)
-            		),
-                    CAdESSignerMetadataHelper.getCAdESSignerMetadata(extraParams),
-                    doNotIncludePolicyOnSigningCertificate
-        		);
-            }
-            // CASO DE FIRMA DE NODOS
-            else if (targetType == CounterSignTarget.NODES) {
-                throw new AOException("No se soporta la firma de nodos individuales"); //$NON-NLS-1$
-            }
-            // CASO DE FIRMA DE NODOS DE UNO O VARIOS FIRMANTES
-            else if (targetType == CounterSignTarget.SIGNERS) {
-            	throw new AOException("No se soporta la firma de nodos individuales"); //$NON-NLS-1$
-            }
-
-            return dataSigned;
-
+					CommitmentTypeIndicationsHelper.getCommitmentTypeIndications(extraParams),
+					Boolean.parseBoolean(
+							extraParams.getProperty(
+									CAdESExtraParams.INCLUDE_SIGNING_TIME_ATTRIBUTE,
+									Boolean.FALSE.toString()
+									)
+							),
+					CAdESSignerMetadataHelper.getCAdESSignerMetadata(extraParams),
+					doNotIncludePolicyOnSigningCertificate
+        	);
         }
         catch (final NoSuchAlgorithmException e) {
         	throw new AOException("Error generando la Contrafirma CAdES: " + e, e); //$NON-NLS-1$
@@ -184,6 +152,7 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
         	throw new AOException("Error generando la Contrafirma CAdES: " + e, e); //$NON-NLS-1$
 		}
 
+    	return dataSigned;
     }
 
 }
