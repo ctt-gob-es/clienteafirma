@@ -287,7 +287,7 @@ public class AOXAdESTriPhaseSigner implements AOSigner {
 	}
 
 	/** Ejecuta una operaci&oacute;n de firma/multifirma en 3 fases.<br>
-	 * <b>TODO (Para desarrolladores):</b> Hay que optimizar la transferencia de datos entre servidor
+	 * <b>IMPORTANTE:</b> Hay que optimizar la transferencia de datos entre servidor
 	 * y cliente, detectando despu&eacute;s de la prefirma las propiedades {@code nd} y {@code np}
 	 * enviadas por el servidor trif&aacute;sico. Si se env&iacute;a {@code nd} y es {@code true} se
 	 * tienen que volver a remitir los datos en la postfirma y si se env&iacute;a {@code np} y es
