@@ -260,12 +260,6 @@ public final class MainMenu extends JMenuBar {
 
 
         if (!isMac) {
-            final JMenu optionsMenu = new JMenu(SimpleAfirmaMessages.getString("MainMenu.18")); //$NON-NLS-1$
-            optionsMenu.setMnemonic(KeyEvent.VK_O);
-            optionsMenu.getAccessibleContext().setAccessibleDescription(
-        		SimpleAfirmaMessages.getString("MainMenu.19") //$NON-NLS-1$
-            );
-
             final JMenuItem preferencesMenuItem = new JMenuItem(SimpleAfirmaMessages.getString("MainMenu.12")); //$NON-NLS-1$
             preferencesMenuItem.setAccelerator(
         		KeyStroke.getKeyStroke(KeyEvent.VK_P, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask())
@@ -277,9 +271,9 @@ public final class MainMenu extends JMenuBar {
             preferencesMenuItem.addActionListener(
         		ae -> showPreferences()
     		);
-            optionsMenu.add(preferencesMenuItem);
 
-            this.add(optionsMenu);
+            toolsMenu.addSeparator();
+            toolsMenu.add(preferencesMenuItem);
         }
         // En Mac OS X el menu es "Preferencias" dentro de la opcion principal
         else {
