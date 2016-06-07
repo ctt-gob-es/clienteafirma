@@ -72,6 +72,7 @@ final class PreferencesPanelFacturaE extends JPanel {
 		}
 	);
 
+	private final JPanel panelPolicies = new JPanel();
 	private PolicyPanel facturaePolicyPanel;
 	private boolean unprotected = true;
 
@@ -96,9 +97,12 @@ final class PreferencesPanelFacturaE extends JPanel {
 
         loadPreferences();
 
-         this.facturaePolicyPanel.setModificationListener(modificationListener);
+        this.panelPolicies.setLayout(new GridBagLayout());
+        this.panelPolicies.add(this.facturaePolicyPanel, gbc);
+        add(this.panelPolicies, gbc);
+
+        this.facturaePolicyPanel.setModificationListener(modificationListener);
         this.facturaePolicyPanel.setKeyListener(keyListener);
-        add(this.facturaePolicyPanel, gbc);
 
         final JPanel metadata = new JPanel();
         metadata.setBorder(
@@ -303,12 +307,6 @@ final class PreferencesPanelFacturaE extends JPanel {
 			)
 		);
 		final List<PolicyPanel.PolicyItem> facturaePolicies = new ArrayList<>();
-        facturaePolicies.add(
-    		new PolicyItem(
-				SimpleAfirmaMessages.getString("PreferencesPanelFacturaE.1"), //$NON-NLS-1$
-        		POLICY_FACTURAE_30
-    		)
-		);
 
 		facturaePolicies.add(
     		new PolicyItem(
@@ -317,6 +315,14 @@ final class PreferencesPanelFacturaE extends JPanel {
     		)
 		);
 
+		facturaePolicies.add(
+    		new PolicyItem(
+				SimpleAfirmaMessages.getString("PreferencesPanelFacturaE.1"), //$NON-NLS-1$
+        		POLICY_FACTURAE_30
+    		)
+		);
+
+        this.panelPolicies.removeAll();
         this.facturaePolicyPanel = new PolicyPanel(
     		SIGN_FORMAT_FACTURAE,
     		facturaePolicies,
@@ -327,6 +333,15 @@ final class PreferencesPanelFacturaE extends JPanel {
     		false,
     		this.unprotected
 		);
+
+        final GridBagConstraints c = new GridBagConstraints();
+        c.fill = GridBagConstraints.BOTH;
+        c.weightx = 1.0;
+        c.gridy = 0;
+        this.panelPolicies.add(this.facturaePolicyPanel, c);
+        revalidate();
+        repaint();
+
 	}
 
 	/** Obtiene la configuraci&oacute;n de politica de firma FacturaE establecida actualmente.
