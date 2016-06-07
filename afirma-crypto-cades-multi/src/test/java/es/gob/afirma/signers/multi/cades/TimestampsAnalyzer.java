@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.spongycastle.asn1.ASN1Encodable;
@@ -36,8 +37,9 @@ final class TimestampsAnalyzer {
 			signedData = new CMSSignedData(sign);
 		}
 		catch (final CMSException e) {
-			LOGGER.severe(
-				"La firma proporcionada no es un SignedData compatible CMS, se devolvera una lista de sellos vacia: " + e //$NON-NLS-1$
+			LOGGER.log(Level.SEVERE,
+				"La firma proporcionada no es un SignedData compatible CMS, se devolvera una lista de sellos vacia: " + e, //$NON-NLS-1$
+				e
 			);
 			return new ArrayList<AOTimestampInfo>(0);
 		}
@@ -88,8 +90,10 @@ final class TimestampsAnalyzer {
 
 					}
 					catch (final Exception e) {
-						LOGGER.severe(
-							"Error extrayendo los sellos de tiempo de la firma CMS, se continuara con la siguiente: " + e //$NON-NLS-1$
+						LOGGER.log(
+							Level.SEVERE,
+							"Error extrayendo los sellos de tiempo de la firma CMS, se continuara con la siguiente: " + e, //$NON-NLS-1$
+							e
 						);
 						continue;
 					}
