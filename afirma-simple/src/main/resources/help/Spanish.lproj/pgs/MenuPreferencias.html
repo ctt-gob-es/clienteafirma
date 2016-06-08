@@ -24,29 +24,40 @@
   	<img src="../gfx/menugeneral_mini.png" alt="Pantalla para la configuraci&oacute;n del comportamniento general de la aplicaci&oacute;n">
   </p>
   <ul>
-   <li><b>Algoritmo de firma:</b> Algoritmo de firma por defecto que utiliza la aplicaci&oacute;n para generar las firmas electr&oacute;nicas.</li>
-   <li><b>Preferencias generales:</b>
+   <li><b>Opciones generales:</b>
     <ul>
-     <li>No pedir confirmaci&oacute;n al cerrar la aplicaci&oacute;n: Permite salir de la aplicaci&oacute;n sin confirmaci&oacute;n del usuario.</li>
+     <li><b>Importar configuraci&oacute;n general de la aplicaci&oacute;n:</b> Opci&oacute;n para importar un fichero de la configuraci&oacute;n proporcionado por un administrador.</li>
+     <li><b>Restaurar configuraci&oacute;n general de la aplicaci&oacute;n:</b> Opci&oacute;n para restaurar la configuraci&oacute;n por defecto de la aplicaci&oacute;n.</li>
+     <li><b>No pedir confirmaci&oacute;n al cerrar la aplicaci&oacute;n:</b> Permite salir de la aplicaci&oacute;n sin confirmaci&oacute;n del usuario.</li>
+     <li><b>No mostrar la pantalla inicial de DNIe y trabajar siempre con cualquier certificado:</b> Opci&oacute;n para omitir la pantalla inicial de detecci&oacute;n de DNIe y
+     permitir al usuario seleccionar el certificado de firma de entre los disponibles en el almacén del sistema.</li>
+     <li><b>Buscar actualizaciones al inicio:</b> Permite configurar si se deben b&uacute;scar si hay actualizaciones disponibles al iniciar la aplicacion.</li>
+     <li><b>Enviar estad&iacute;sticas de uso de forma an&oacute;nima para ayudar a mejorar la aplicaci&oacute;n:</b> Permite configurar si se desea permitir el env&iacute;o de estad&iacute;sticas de uso.</li>
     </ul>
    </li>
-   <li><b>Formatos de firma por defecto:</b> Configura que formato de firma debe aplicarse cuando se proporciona determinado tipo de documento. Los tipos de documento son:
+   <li><b>Opciones de firma:</b>
     <ul>
-     <li>Documentos PDF</li>
-     <li>Documentos OOXML de Microsoft Office</li>
-     <li>Facturas electrónicas</li>
-     <li>Ficheros XML genéricos</li>
-     <li>Ficheros ODF de LibreOffice u OpenOffice</li>
-     <li>Ficheros binarios gen&eacute;ricos</li>
+     <li><b>Algoritmo de firma:</b> Algoritmo de firma por defecto que utiliza la aplicaci&oacute;n para generar las firmas electr&oacute;nicas.</li>
+     <li><b>Formatos de firma por defecto:</b> Configura que formato de firma debe aplicarse cuando se proporciona determinado tipo de documento. Los tipos de documento son:
+      <ul>
+       <li>Documentos PDF</li>
+       <li>Documentos OOXML de Microsoft Office</li>
+       <li>Facturas electrónicas</li>
+       <li>Ficheros XML genéricos</li>
+       <li>Ficheros ODF de LibreOffice u OpenOffice</li>
+       <li>Ficheros binarios gen&eacute;ricos</li>
+      </ul>
+      <p>Cualquiera de estos tipos de fichero pueden firmarse con los formatos CAdES y XAdES (acordes a la
+      configuraci&oacute;n establecida en las pesta&ntilde;as correspondientes) y algunos de ellos pueden ser
+      firmados en formatos espec&iacute;ficos.<br>
+      El tipo de documento "Ficheros binarios gen&eacute;ricos" hace referencia a cualquier documento que no
+      est&eacute; en cualquiera de las categor&iacute;as anteriores.
+	  </p>
+	  <p><b><u>ADVERTENCIA:</u></b> No se recomienda que se modifique que las facturas electr&oacute;nicas se
+      firmen en un formato distinto al de factura electr&oacute;nica.
+      </p>
+     </li>
     </ul>
-    <p>Cualquiera de estos tipos de fichero pueden firmarse con los formatos CAdES y XAdES (acordes a la
-    configuraci&oacute;n establecida en las pesta&ntilde;as correspondientes) y algunos de ellos pueden ser
-    firmados en formatos espec&iacute;ficos.<br>
-    El tipo de documento "Ficheros binarios gen&eacute;ricos" hace referencia a cualquier documento que no
-    est&eacute; en cualquiera de las categor&iacute;as anteriores.<br>
-    <b><u>ADVERTENCIA:</u></b> No se recomienda que se modifique que las facturas electr&oacute;nicas se
-    firmen en un formato distinto al de factura electr&oacute;nica.
-    </p>
    </li>
   </ul>
   <h3>Men&uacute; "Firmas PAdES (PDF)"</h3>
@@ -131,19 +142,15 @@
     </ul>
    </li>
   </ul>
-  <p><b><u>ADVERTENCIA:</u></b> La firma de facturas electr&oacute;nicas implica el uso de su propia pol&iacute;tica de firma
-  (v3.1), por lo que <b>no es necesario configurar la pol&iacute;tica de factura electr&oacute;nica</b> en este apartado.
-  La firma de factura electr&oacute;nica se realiza mediante una firma XAdES especialmente configurada para tal fin.
-  No es posible emular una firma de factura electr&oacute;nica sobre un XML cualquiera configurando &uacute;nicamente la
-  pol&iacute;tica de firma.</p>
   <ul>
     <li><b>Metadatos de las firmas XAdES:</b>
      <ul>
       <li>Ciudad en la que se realiza la firma: Ciudad en la que se localiza el firmante en el momento de la firma.</li>
+      <li>Provincia en la que se realiza la firma: Provincia en la que se localiza el firmante en el momento de la firma.</li>
+      <li>C&oacute;digo postal en la que se realiza la firma: C&oacute;digo postal en la que se localiza el firmante en el momento de la firma.</li>
       <li>Pa&iacute;s en el que se realiza la firma: Pa&iacute;s la que se localiza el firmante en el momento de la firma.</li>
       <li>Cargo del firmante: Cargo de quien realiza la firma.</li>
      </ul>
-     <p>Los campos Ciudad y Pa&iacute;s aplican tambi&eacute;n a las firmas de factura electr&oacute;nica.</p>
     </li>
     <li><b>Formato de las firmas XAdES:</b>
      <ul>
@@ -154,6 +161,26 @@
      <p><b><u>ADVERTENCIA:</u></b> La pol&iacute;tica de firma de la AGE, sólo permite la realización de firmas
      en formatos Enveloped e Internally Detached (aquí referida como Detached). Así pues, sólo se podrán configurar
      estos formatos de firma cuando se declare la política de firma de la AGE.</p>
+    </li>
+   </ul>
+   <h3>Men&uacute; "Factura Electr&oacute;nica"</h3>
+   <p align="center">
+  	<img src="../gfx/menufirmasfacturae_mini.png" alt="Pantalla para la configuraci&oacute;n de las firmas de facturas electr&oacute;nicas">
+   </p>
+   <ul>
+    <li><b>Pol&iacute;tica de firma:</b> Permite declarar la versi&oacute;n de la pol&iacute;tica de firma de Factura electr&oacute;nica que debe utilizarse.</li>
+    <li><b>Metadatos de las facturas electr&oacute;nicas:</b>
+     <ul>
+      <li>Ciudad en la que se realiza la firma: Ciudad en la que se localiza el firmante en el momento de la firma.</li>
+      <li>Provincia en la que se realiza la firma: Provincia en la que se localiza el firmante en el momento de la firma.</li>
+      <li>C&oacute;digo postal en la que se realiza la firma: C&oacute;digo postal en la que se localiza el firmante en el momento de la firma.</li>
+      <li>Pa&iacute;s en el que se realiza la firma: Pa&iacute;s la que se localiza el firmante en el momento de la firma.</li>
+     </ul>
+    </li>
+    <li><b>Opciones de firma:</b>
+     <ul>
+      <li>Papel del firmante de la factura electr&oacute;nica: Permite configurar el rol que desempeña el firmante en el ciclo de vida de la factura.</li>
+     </ul>
     </li>
    </ul>
  </body>

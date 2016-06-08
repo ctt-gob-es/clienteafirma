@@ -1,18 +1,17 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
  <head>
-  <title>Firmas visibles PDF</title>
+  <title>Propiedades de las firmas visibles PDF</title>
   <meta name="AppleTitle" content="Ayuda de AutoFirma">
   <meta name="AppleIcon" content="AutoFirmaHelpIcon.png">
   <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
  </head>
  <body>
-  <h2>Firmas visibles PDF</h2>
-  <p>Al habilitar la creaci&oacute;n de firmas visibles PDF en el <a href="MenuPreferencias.html">Men&uacute;n de
-  preferencias</a> de la aplicaci&oacute;n, se dar&aacute; al usuario la posibilidad de seleccionar un &aacute;rea
-  de firma cada vez que se realice una firma PDF.</p>
+  <h2>Propiedades de las firmas visibles PDF</h2>
+  <p>Al habilitar la creaci&oacute;n de firmas visibles PDF, se dar&aacute; al usuario la posibilidad de seleccionar
+  un &aacute;rea cuando de firma sobre el PDF que vaya a firmar en formato PAdES.</p>
   <p align="center">
-   <img src="../gfx/menufirmaspadesvisible_mini.png" alt="Ventana de selecci&oacute;n de posici&oacute;n de firma">
+   <img src="../gfx/menufirmaspadesvisible1_mini.png" alt="Ventana de selecci&oacute;n de posici&oacute;n de firma">
   </p>
   <p>
   Este menu permite utilizar el rat&oacute;n para seleccionar un área rectanguar de una de las p&aacute;ginas del
@@ -29,16 +28,53 @@
   	<li>&lt;: Bot&oacute;n para desplazar la visualizaci&oacute;n a la p&aacute;gina anterior del PDF. Puede
   	reproducirse este comportamiento pulsando la tecla "cursor izquierdo" de su teclado.</li>
   	<li>&gt;: Bot&oacute;n para desplazar la visualizaci&oacute;n a la siguiente p&aacute;gina del PDF. Puede
-  	reproducirse este comportamiento pulsando la tecla "cursor derecho" de su teclado.</li>
+  	reproducirse este comportamiento pulsando la tecla "cursor derecho" de su teclado. Si nos encontramos en la
+  	&uacute;ltima p&aacute;gina del PDF esta opci&opacute; nos permitir&aacute; crear una p&aacute;gina en blanco
+  	al final del documento en la que se podr&aacute; insertar la firma.</li>
   	<li>&gt;&gt;: Bot&oacute;n para desplazar la visualizaci&oacute;n a la &uacute;ltima p&aacute;gina del PDF.</li>
   </ul>
   <p>
   El &aacute;rea de firma desaparecera al cambiar de pantalla del PDF. Seleccione el &aacute;re para la firma visible
-  del PDF y a continuaci&oacute;n, pulse el bot&oacute;n "Aceptar". 
+  del PDF y a continuaci&oacute;n, pulse el bot&oacute;n "Siguiente". 
   </p>
   <p>
-  Si no se desea agregar una firma visible al PDF en cuesti&oacute;n, pulse el bot&oacute;n "Cancelar" o cierre
-  la ventana para continuar con el proceso normal y firmar el PDF sin agregar un &aacute;rea visible de firma. 
+  A continuaci&oacute;n, se mostrar&aacute; una nueva ventana en la que el usuario podr&aacute; configurar el aspecto
+  de la firma. 
+  </p>
+  <p align="center">
+   <img src="../gfx/menufirmaspadesvisible2_mini.png" alt="Ventana de configuraci&oacute;n del aspecto de firma">
+  </p>
+  <p>
+  Este interfaz permite configurar las siguientes propiedades para la firma visible:
+  </p>
+	<ul>
+	<li>Imagen de r&uacute;brica a insertar. Puede configurarse el fichero de imagen pulsando sobre
+	la previsualizaci&oacute;n de la firma. No se permiten im&aacute;genes con transparencias.</li>
+	<li>
+	Formato del texto con el que se pueden configurar los siguientes atributos a todo el texto:
+		<ul>
+			<li>Fuente de letra.</li>
+			<li>Tamaño de letra.</li>
+			<li>Color del texto.</li>
+			<li>Estilo de fuente (Negrita, Cursiva, Subrayado o Tachado).</li>
+		</ul>
+	</li>
+	<li>Texto a incluir en la firma.</li>
+	</ul>
+  <p>
+  Para la configuraci&oacute;n del texto que se desea mostrar en la firma es posible utilizar serie de
+  palabras clave que serán sustituidas por los textos apropiados del titular o emisor del certificado de
+  firma en el momento de firmar. Estos son:
+  </p>
+  <ul>
+  	<li><b>$$SUBJECTCN$$</b><p>Nombre com&uacute;n (CN, Common Name) dentro del X.500 Principal del titular del certificado de firma.</p></li>
+  	<li><b>$$ISSUERCN$$</b><p>Nombre com&uacute;n (CN, Common Name) dentro del X.500 Principal del emisor del certificado de firma.</p></li>
+  	<li><b>$$CERTSERIAL$$</b><p>N&uacute;mero de serie del certificado de firma.</p></li>
+  	<li><b>$$SIGNDATE=PATR&Oacute;N$$</b><p>Fecha de la firma, donde PATR&Oacute;N debe indicar el formato en el que debe mostrarse la fecha, siguiendo el esquema definido por Oracle para la clase SimpleDateFormat.</p></li>
+  </ul>
+  <p>
+  Si no se desea agregar una firma visible al PDF, antes de pulsar el botón firmar en la pantalla de firma, asegúrese
+  de que no se encuentra seleccionada la casilla "Hacer la firma visible dentro del PDF". 
   </p>
  </body>
 </html>

@@ -78,7 +78,7 @@ public class AOCMSEnveloper implements AOEnveloper {
     /** Envoltorio binario por defecto. */
     public static final String DEFAULT_CMS_CONTENTTYPE = CMS_CONTENTTYPE_ENVELOPEDDATA;
 
-  //TODO
+
     /** M&eacute;todo para la generaci&oacute;n de envolturas de datos. Los tipos de
      * envoltura definidos para CMS son: <br>
      * <ul>

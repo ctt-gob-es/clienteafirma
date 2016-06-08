@@ -211,7 +211,7 @@ public final class PAdESTriPhaseSigner {
                 signingCertificateV2, // signingCertificateV2
                 md, // Valor de la huella digital del contenido
                 signTime.getTime(), // Fecha de la firma (debe establecerse externamente para evitar desincronismos en la firma trifasica)
-                Boolean.parseBoolean(extraParams.getProperty(PdfExtraParams.INCLUDE_ONLY_SIGNNING_CERTIFICATE, "false")), //$NON-NLS-1$ //TODO: Poner esto siempre a false!!!!!
+                false, // En PAdES nunca se incluye el SigningTime en la CAdES contenida
                 true, // Modo PAdES
                 PDF_OID,
                 PDF_DESC,
