@@ -202,7 +202,7 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 		}
 
 		if (urlParameters != null) {
-			conn.setRequestProperty("Content-Length", String.valueOf(urlParameters.length())); //$NON-NLS-1$
+			conn.setRequestProperty("Content-Length", String.valueOf(urlParameters.getBytes("UTF-8").length)); //$NON-NLS-1$ //$NON-NLS-2$
 			conn.setDoOutput(true);
 
 			final OutputStream os = conn.getOutputStream();
