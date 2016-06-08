@@ -108,6 +108,11 @@ public final class PdfEmptySignatureFieldsChooserDialog extends JDialog implemen
 		try {
 			final Properties p = new Properties();
 			p.put("signatureField", getField().getName()); //$NON-NLS-1$
+			p.put("signaturePage", Integer.toString(getField().getPage())); //$NON-NLS-1$
+			p.put("signaturePositionOnPageLowerLeftX", Integer.toString(getField().getSignaturePositionOnPageLowerLeftX())); //$NON-NLS-1$
+			p.put("signaturePositionOnPageLowerLeftY", Integer.toString(getField().getSignaturePositionOnPageLowerLeftY())); //$NON-NLS-1$
+			p.put("signaturePositionOnPageUpperRightX", Integer.toString(getField().getSignaturePositionOnPageUpperRightX())); //$NON-NLS-1$
+			p.put("signaturePositionOnPageUpperRightY", Integer.toString(getField().getSignaturePositionOnPageUpperRightY())); //$NON-NLS-1$
 			nextPanel(p, getFragmentImage(getField()));
 		}
 		catch (final Exception e1) {
