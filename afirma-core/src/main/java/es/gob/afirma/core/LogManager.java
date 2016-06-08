@@ -25,7 +25,7 @@ import es.gob.afirma.core.misc.Platform;
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public final class LogManager {
 
-	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+	private static final Logger LOGGER = Logger.getLogger("es.gob"); //$NON-NLS-1$
 
 	private LogManager() {
 		// No permito la instanciacion
