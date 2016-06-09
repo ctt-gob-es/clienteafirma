@@ -31,10 +31,10 @@ public final class PreferencesManager {
 	//**************************************************************************************************************************
 	//**************** PREFERENCIAS GENERALES **********************************************************************************
 
-	/** Evitar la pregunta al cerrar la aplicaci&oacute;n o no. */
+	/** Si esta establecido a <code>true</code> se evita la pregunta al cerrar la aplicaci&oacute;n. */
 	public static final String PREFERENCE_GENERAL_OMIT_ASKONCLOSE = "omitAskOnClose"; //$NON-NLS-1$
 
-	/** No mostrar la pantalla inicial de uso de DNIe. */
+	/** Si esta establecido a <code>true</code> no se mostrar&aacute; la pantalla inicial de uso de DNIe. */
 	public static final String PREFERENCE_GENERAL_HIDE_DNIE_START_SCREEN = "hideDnieStartScreen"; //$NON-NLS-1$
 
 	/** Algoritmo de firma. */
@@ -65,13 +65,13 @@ public final class PreferencesManager {
 	//**************************************************************************************************************************
 	//**************** PREFERENCIAS DE ALMACENES DE CLAVES *********************************************************************
 
-	/** En firma, restringir que &uacute;nicamente se puedan usar certificados de firma. */
+	/** Si esta establecido a <code>true</code>, en firma, se restringe que &uacute;nicamente se puedan usar certificados de firma. */
 	public static final String PREFERENCE_KEYSTORE_SIGN_ONLY_CERTS = "useOnlySignatureCertificates"; //$NON-NLS-1$
 
-	/** En el cifrado de sobres digitales, restringir que &uacute;nicamente se puedan usar certificados de cifrado. */
+	/** Si esta establecido a <code>true</code>, en el cifrado de sobres digitales, se restringe que &uacute;nicamente se puedan usar certificados de cifrado. */
 	public static final String PREFERENCE_KEYSTORE_CYPH_ONLY_CERTS = "useOnlyEnciphermentCertificates"; //$NON-NLS-1$
 
-	/** En firma, restringir que &uacute;nicamente se puedan usar certificados de seud&oacute;nimo cuando estos est&eacute;n disponibles. */
+	/** Si esta establecido a <code>true</code>, en firma, se restringe que &uacute;nicamente se puedan usar certificados de seud&oacute;nimo cuando estos est&eacute;n disponibles. */
 	public static final String PREFERENCE_KEYSTORE_ALIAS_ONLY_CERTS = "useOnlyAliasCertificates"; //$NON-NLS-1$
 
 	//**************** FIN PREFERENCIAS DE ALMACENES DE CLAVES *****************************************************************
