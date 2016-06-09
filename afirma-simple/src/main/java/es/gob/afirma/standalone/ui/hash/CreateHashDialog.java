@@ -42,8 +42,6 @@ public final class CreateHashDialog extends JDialog implements KeyListener{
 
 	private static final long serialVersionUID = 3581001930027153381L;
 
-	private static final String PREFERENCE_BASE64 = "createHashAsBase64"; //$NON-NLS-1$
-	private static final String PREFERENCE_ALGORITHM = "createHashAlgorithm"; //$NON-NLS-1$
 	private static final int SIZE_WAIT = 50000000; //Tamano en bytes
 
 	private static final String[] HASH_ALGOS = new String[] {
@@ -117,7 +115,7 @@ public final class CreateHashDialog extends JDialog implements KeyListener{
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					PreferencesManager.put(
-						PREFERENCE_ALGORITHM,
+						PreferencesManager.PREFERENCE_CREATE_HASH_ALGORITHM,
 						getSelectedHashAlgorithm()
 					);
 				}
@@ -125,7 +123,7 @@ public final class CreateHashDialog extends JDialog implements KeyListener{
 		);
 		this.hashAlgorithms.setSelectedItem(
 			PreferencesManager.get(
-				PREFERENCE_ALGORITHM,
+				PreferencesManager.PREFERENCE_CREATE_HASH_ALGORITHM,
 				"SHA-512" //$NON-NLS-1$
 			)
 		);
@@ -136,7 +134,7 @@ public final class CreateHashDialog extends JDialog implements KeyListener{
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					PreferencesManager.putBoolean(
-						PREFERENCE_BASE64,
+						PreferencesManager.PREFERENCE_CREATE_HASH_BASE64,
 						isBase64Checked()
 					);
 				}
@@ -144,7 +142,7 @@ public final class CreateHashDialog extends JDialog implements KeyListener{
 		);
 		this.base64ChechBox.setSelected(
 			PreferencesManager.getBoolean(
-				PREFERENCE_BASE64,
+				PreferencesManager.PREFERENCE_CREATE_HASH_BASE64,
 				false
 			)
 		);
