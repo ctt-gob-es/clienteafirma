@@ -112,7 +112,7 @@ final class PreferencesPanelGeneral extends JPanel {
 
 	void loadPreferences() {
 		this.signarureAlgorithms.setSelectedItem(
-			PreferencesManager.get(PREFERENCE_GENERAL_SIGNATURE_ALGORITHM, "SHA1withRSA") //$NON-NLS-1$
+			PreferencesManager.get(PREFERENCE_GENERAL_SIGNATURE_ALGORITHM, "SHA256withRSA") //$NON-NLS-1$
 		);
 		this.avoidAskForClose.setSelected(PreferencesManager.getBoolean(PREFERENCE_GENERAL_OMIT_ASKONCLOSE, false));
 		this.hideDniStartScreen.setSelected(PreferencesManager.getBoolean(PREFERENCE_GENERAL_HIDE_DNIE_START_SCREEN, false));
