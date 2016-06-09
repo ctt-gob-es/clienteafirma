@@ -152,8 +152,8 @@ public final class PreferencesManager {
 	 * para firma en las firmas electr&oacute;nicas. */
 	public static final String PREFERENCE_KEYSTORE_SIGN_ONLY_CERTS = "useOnlySignatureCertificates"; //$NON-NLS-1$
 
-	/** En firma, restringir que &uacute;nicamente se puedan usar certificados de seud&oacute;nimo cuando estos est&eacute;n 
-	 * disponibles. Un valor de <code>true</code> en esta preferencia permitir&aacute; usar solo  certificados de 
+	/** En firma, restringir que &uacute;nicamente se puedan usar certificados de seud&oacute;nimo cuando estos est&eacute;n
+	 * disponibles. Un valor de <code>true</code> en esta preferencia permitir&aacute; usar solo  certificados de
 	 * seud&oacute;nimo cuando estos est&eacute;n disponibles.*/
 	public static final String PREFERENCE_KEYSTORE_ALIAS_ONLY_CERTS = "useOnlyAliasCertificates"; //$NON-NLS-1$
 
@@ -328,7 +328,16 @@ public final class PreferencesManager {
 	//**************** FIN PREFERENCIAS DE FACTURAS ELECTRONICAS ***************************************************************
 	//**************************************************************************************************************************
 
-	/** Si esta establecido a <code>true</code> se pide al usuario que determine mediante di&aacute;logos
+	/** Algoritmo de la huella digital para la creaci&oacute;n de huellas digitales de ficheros.*/
+	public static final String PREFERENCE_CREATE_HASH_ALGORITHM = "createHashAlgorithm"; //$NON-NLS-1$
+
+	/** Si est&aacute; establecido a <code>true</code> se genera la huella digital de fichero en base64.*/
+	public static final String PREFERENCE_CREATE_HASH_BASE64 = "createHashAsBase64"; //$NON-NLS-1$
+
+	/** Algoritmo de la huella digital para la creaci&oacute;n de huellas digitales de directorio. */
+	public static final String PREFERENCE_CREATE_HASH_DIRECTORY_ALGORITHM = "createHashDirectoryAlgorithm"; //$NON-NLS-1$
+
+	/** Si est&aacute; establecido a <code>true</code> se pide al usuario que determine mediante di&aacute;logos
 	 * gr&aacute;ficos los par&aacute;metros de una firma visible PDF y se inserta como tal en el
 	 * documento. */
 	public static final String PREFERENCE_PADES_VISIBLE = "padesVisibleSignature"; //$NON-NLS-1$
