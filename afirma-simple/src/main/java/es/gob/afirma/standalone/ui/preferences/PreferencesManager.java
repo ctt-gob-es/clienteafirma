@@ -102,8 +102,8 @@ public final class PreferencesManager {
 	 * Esta preferencia debe tener uno de estos valores:
 	 * <ul>
 	 *  <li>OOXML (Office Open XML)</li>
-	 *  <li>CAdes</li>
-	 *  <li>XAdes</li>
+	 *  <li>CAdES</li>
+	 *  <li>XAdES</li>
 	 * </ul> */
 	public static final String PREFERENCE_GENERAL_DEFAULT_FORMAT_OOXML = "defaultSignatureFormatOoxml"; //$NON-NLS-1$
 
@@ -111,8 +111,8 @@ public final class PreferencesManager {
 	 * Esta preferencia debe tener uno de estos valores:
 	 * <ul>
 	 *  <li>FacturaE</li>
-	 *  <li>CAdes</li>
-	 *  <li>XAdes</li>
+	 *  <li>CAdES</li>
+	 *  <li>XAdES</li>
 	 * </ul> */
 	public static final String PREFERENCE_GENERAL_DEFAULT_FORMAT_FACTURAE = "defaultSignatureFormatFacturae"; //$NON-NLS-1$
 
@@ -120,24 +120,24 @@ public final class PreferencesManager {
 	 * Esta preferencia debe tener uno de estos valores:
 	 * <ul>
 	 *  <li>ODF (Open Document Format)</li>
-	 *  <li>CAdes</li>
-	 *  <li>XAdes</li>
+	 *  <li>CAdES</li>
+	 *  <li>XAdES</li>
 	 * </ul> */
 	public static final String PREFERENCE_GENERAL_DEFAULT_FORMAT_ODF = "defaultSignatureFormatOdf"; //$NON-NLS-1$
 
 	/** Formato de firma por defecto para documentos XML.
 	 * Esta preferencia debe tener uno de estos valores:
 	 * <ul>
-	 *  <li>CAdes</li>
-	 *  <li>XAdes</li>
+	 *  <li>CAdES</li>
+	 *  <li>XAdES</li>
 	 * </ul> */
 	public static final String PREFERENCE_GENERAL_DEFAULT_FORMAT_XML = "defaultSignatureFormatXml"; //$NON-NLS-1$
 
 	/** Formato de firma por defecto para ficheros binarios que no se adec&uacute;en a ninguna otra categor&iacute;a.
 	 * Esta preferencia debe tener uno de estos valores:
 	 * <ul>
-	 *  <li>CAdes</li>
-	 *  <li>XAdes</li>
+	 *  <li>CAdES</li>
+	 *  <li>XAdES</li>
 	 * </ul> */
 	public static final String PREFERENCE_GENERAL_DEFAULT_FORMAT_BIN = "defaultSignatureFormatBin"; //$NON-NLS-1$
 
@@ -203,9 +203,9 @@ public final class PreferencesManager {
 	/** Formato de las firmas XAdES.
 	 * Esta preferencia debe tener uno de estos valores:
 	 * <ul>
-	 *  <li>XAdes Detached</li>
-	 *  <li>XAdes Enveloping</li>
-	 *  <li>XAdes Enveloped</li>
+	 *  <li>XAdES Detached</li>
+	 *  <li>XAdES Enveloping</li>
+	 *  <li>XAdES Enveloped</li>
 	 * </ul> */
 	public static final String PREFERENCE_XADES_SIGN_FORMAT = "xadesSignFormat"; //$NON-NLS-1$
 
