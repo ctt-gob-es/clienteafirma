@@ -33,7 +33,7 @@ public final class PreferencesManager {
 
 	/** Configuraci&oacute;n de <i>proxy</i> seleccionada.
 	 * Un valor de <code>true</code> en esta preferencia indica que debe usarse el <i>proxy</i> configurado,
-	 * y un valor de <code>false</code> que no usar&aacute;a <i>proxy</i> en las conexiones de red. */
+	 * y un valor de <code>false</code> que no usar&aacute; <i>proxy</i> en las conexiones de red. */
 	public static final String PREFERENCE_GENERAL_PROXY_SELECTED = "proxySelected"; //$NON-NLS-1$
 
 	/** Host del servidor <i>proxy</i> configurado. */
@@ -157,7 +157,7 @@ public final class PreferencesManager {
 	 * seud&oacute;nimo cuando estos est&eacute;n disponibles.*/
 	public static final String PREFERENCE_KEYSTORE_ALIAS_ONLY_CERTS = "useOnlyAliasCertificates"; //$NON-NLS-1$
 
-	/** Almacen de claves por defecto. */
+	/** Almac&eacute;n de claves por defecto. */
 	public static final String PREFERENCE_KEYSTORE_DEFAULT_STORE = "defaultStore"; //$NON-NLS-1$
 
 	//**************** FIN PREFERENCIAS DE ALMACENES DE CLAVES *****************************************************************
