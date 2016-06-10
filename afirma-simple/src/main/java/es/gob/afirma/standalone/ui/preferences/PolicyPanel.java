@@ -215,7 +215,6 @@ final class PolicyPanel extends JPanel implements ItemListener {
 			final boolean editableTextFields = this.policiesCombo.getSelectedIndex() == getCustomPolicyIndex();
 
 			this.identifierField.setEnabled(enableTextFields);
-			this.identifierField.setEnabled(unprotected);
 			this.identifierField.setEditable(editableTextFields);
 			this.identifierField.getAccessibleContext().setAccessibleDescription(
 				SimpleAfirmaMessages.getString("PreferencesPanel.54") //$NON-NLS-1$
@@ -262,7 +261,6 @@ final class PolicyPanel extends JPanel implements ItemListener {
 			add(this.identifierField, c);
 
 			this.hashField.setEnabled(enableTextFields);
-			this.hashField.setEnabled(unprotected);
 			this.hashField.setEditable(editableTextFields);
 			this.hashField.getAccessibleContext().setAccessibleDescription(
 				SimpleAfirmaMessages.getString("PreferencesPanel.55") //$NON-NLS-1$
@@ -278,7 +276,6 @@ final class PolicyPanel extends JPanel implements ItemListener {
 			add(this.hashField, c);
 
 			this.hashAlgorithmField.setEnabled(editableTextFields);
-			this.hashAlgorithmField.setEnabled(unprotected);
 			this.hashAlgorithmField.getAccessibleContext().setAccessibleDescription(
 				SimpleAfirmaMessages.getString("PreferencesPanel.50") //$NON-NLS-1$
 			);
@@ -293,11 +290,17 @@ final class PolicyPanel extends JPanel implements ItemListener {
 			add(this.hashAlgorithmField, c);
 
 			this.qualifierField.setEnabled(enableTextFields);
-			this.qualifierField.setEnabled(unprotected);
 			this.qualifierField.setEditable(editableTextFields);
 			this.qualifierField.getAccessibleContext().setAccessibleDescription(
 				SimpleAfirmaMessages.getString("PreferencesPanel.56") //$NON-NLS-1$
 			);
+
+			if (enableTextFields && !unprotected) {
+				this.identifierField.setEnabled(unprotected);
+				this.hashField.setEnabled(unprotected);
+				this.hashAlgorithmField.setEnabled(unprotected);
+				this.qualifierField.setEnabled(unprotected);
+			}
 
 			final JLabel policyQualifierLabel = new JLabel(
 				SimpleAfirmaMessages.getString("PreferencesPanel.30") //$NON-NLS-1$
