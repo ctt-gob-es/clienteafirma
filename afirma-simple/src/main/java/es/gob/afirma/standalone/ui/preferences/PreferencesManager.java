@@ -166,7 +166,7 @@ public final class PreferencesManager {
 	//**************************************************************************************************************************
 	//************************* PREFERENCIAS DE FIRMAS XAdES *******************************************************************
 
-	/** Identificador de la pol&iacute;tica de firma para XAdES. */
+	/** Identificador de la pol&iacute;tica de firma para XAdES. Debe ser un OID.*/
 	public static final String PREFERENCE_XADES_POLICY_IDENTIFIER = "xadesPolicyIdentifier"; //$NON-NLS-1$
 
 	/** Huella digital del identificador de la pol&iacute;tica de firma para XAdES. Debe estar en base64.*/
@@ -232,7 +232,7 @@ public final class PreferencesManager {
 	 * </ul>*/
 	public static final String PREFERENCE_PADES_FORMAT = "padesBasicFormat"; //$NON-NLS-1$
 
-	/** Identificador de la pol&iacute;tica de firma para PAdES. */
+	/** Identificador de la pol&iacute;tica de firma para PAdES. Debe ser un OID.*/
 	public static final String PREFERENCE_PADES_POLICY_IDENTIFIER = "padesPolicyIdentifier"; //$NON-NLS-1$
 
 	/** Huella digital del identificador de la pol&iacute;tica de firma para PAdES. Debe estar en base64.*/
@@ -257,7 +257,7 @@ public final class PreferencesManager {
 	//**************************************************************************************************************************
 	//************************* PREFERENCIAS DE FIRMAS CAdES *******************************************************************
 
-	/** Identificador de la pol&iacute;tica de firma para CAdES. */
+	/** Identificador de la pol&iacute;tica de firma para CAdES. Debe ser un OID.*/
 	public static final String PREFERENCE_CADES_POLICY_IDENTIFIER = "cadesPolicyIdentifier"; //$NON-NLS-1$
 
 	/** Huella digital del identificador de la pol&iacute;tica de firma para CAdES. */
@@ -316,7 +316,7 @@ public final class PreferencesManager {
 	 * </ul> */
 	public static final String PREFERENCE_FACTURAE_SIGNER_ROLE = "facturaeSignerRole"; //$NON-NLS-1$
 
-	/** Identificador de la pol&iacute;tica de firma para FacturaE. */
+	/** Identificador de la pol&iacute;tica de firma para FacturaE. Debe ser un OID.*/
 	public static final String PREFERENCE_FACTURAE_POLICY_IDENTIFIER = "facturaePolicyIdentifier"; //$NON-NLS-1$
 
 	/** Huella digital del identificador de la pol&iacute;tica de firma para FacturaE. Debe estar en base64.*/
