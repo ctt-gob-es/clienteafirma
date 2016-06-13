@@ -113,7 +113,7 @@ final class PreferencesPanelCades extends JPanel {
 	}
 
 	void savePreferences() {
-		PreferencesManager.put(PREFERENCE_CADES_IMPLICIT, Boolean.valueOf(this.cadesImplicit.isSelected()).toString());
+		PreferencesManager.putBoolean(PREFERENCE_CADES_IMPLICIT, this.cadesImplicit.isSelected());
 		final AdESPolicy cadesPolicy = this.cadesPolicyPanel.getCurrentPolicy();
 		if (cadesPolicy != null) {
 			PreferencesManager.put(PREFERENCE_CADES_POLICY_IDENTIFIER, cadesPolicy.getPolicyIdentifier());
@@ -136,7 +136,7 @@ final class PreferencesPanelCades extends JPanel {
 	}
 
 	void loadPreferences() {
-		this.cadesImplicit.setSelected(Boolean.parseBoolean(PreferencesManager.get(PREFERENCE_CADES_IMPLICIT, "true"))); //$NON-NLS-1$)
+		this.cadesImplicit.setSelected(PreferencesManager.getBoolean(PREFERENCE_CADES_IMPLICIT, true));
 
         final List<PolicyPanel.PolicyItem> cadesPolicies = new ArrayList<>();
         cadesPolicies.add(

@@ -14,8 +14,6 @@ import java.util.logging.Logger;
 
 import javax.swing.JOptionPane;
 
-import xmlwise.Plist;
-import xmlwise.XmlParseException;
 import es.gob.afirma.cert.signvalidation.SignValidity;
 import es.gob.afirma.cert.signvalidation.SignValidity.SIGN_DETAIL_TYPE;
 import es.gob.afirma.cert.signvalidation.ValidateXMLSignature;
@@ -29,6 +27,8 @@ import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.core.util.tree.AOTreeNode;
 import es.gob.afirma.signers.xades.AOXAdESSigner;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
+import xmlwise.Plist;
+import xmlwise.XmlParseException;
 
 /** Carga las preferencias de la aplicaci&oacute;n desde un fichero PList. */
 final class PreferencesPlistHandler {

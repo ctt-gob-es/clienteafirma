@@ -164,6 +164,7 @@ final class PreferencesPanelKeyStores extends JPanel {
 
 		this.defaultStore.addItemListener(modificationListener);
 		this.defaultStore.addKeyListener(keyListener);
+		this.defaultStore.setEnabled(unprotected);
 
 		//TODO: Descomentar una vez se entregue
 		keysStorePanel.add(this.defaultStore, ksc);
@@ -222,6 +223,7 @@ final class PreferencesPanelKeyStores extends JPanel {
 			SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.8") //$NON-NLS-1$
 		);
 		this.contentButton.addKeyListener(keyListener);
+		this.contentButton.setEnabled(unprotected);
 
 		//TODO: Descomentar una vez se entregue
 		keysStorePanel.add(this.contentButton, ksc);

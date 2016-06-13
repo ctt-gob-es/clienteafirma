@@ -42,6 +42,9 @@ final class PolicyPanel extends JPanel implements ItemListener {
 	};
 
 	private JComboBox<PolicyItem> policiesCombo;
+	public PolicyItem getCurrentPolicyItem() {
+		return (PolicyItem) this.policiesCombo.getSelectedItem();
+	}
 
 	private final JTextField identifierField = new JTextField();
 	JTextField getIdentifierField() {

@@ -16,7 +16,6 @@ import java.awt.GridBagLayout;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
 import javax.swing.JComboBox;
@@ -45,6 +44,7 @@ final class PreferencesPanelFacturaE extends JPanel {
 
 	private static final String SIGN_FORMAT_FACTURAE = AOSignConstants.SIGN_FORMAT_FACTURAE;
 
+	private static final String POLICY_FACTURAE_31_NAME = SimpleAfirmaMessages.getString("PreferencesPanelFacturaE.2"); //$NON-NLS-1$
 	private static final AdESPolicy POLICY_FACTURAE_31 = new AdESPolicy(
 		"http://www.facturae.es/politica_de_firma_formato_facturae/politica_de_firma_formato_facturae_v3_1.pdf", //$NON-NLS-1$
 		"Ohixl6upD6av8N7pEvDABhEL6hM=", //$NON-NLS-1$
@@ -52,6 +52,7 @@ final class PreferencesPanelFacturaE extends JPanel {
 		null
 	);
 
+	private static final String POLICY_FACTURAE_30_NAME = SimpleAfirmaMessages.getString("PreferencesPanelFacturaE.1"); //$NON-NLS-1$
 	private static final AdESPolicy POLICY_FACTURAE_30 = new AdESPolicy(
 		"http://www.facturae.es/politica de firma formato facturae/politica de firma formato facturae v3_0.pdf", //$NON-NLS-1$
 		"xmfh8D/Ec/hHeE1IB4zPd61zHIY=", //$NON-NLS-1$
@@ -252,6 +253,7 @@ final class PreferencesPanelFacturaE extends JPanel {
 
 		final AdESPolicy facturaePolicy = this.facturaePolicyPanel.getCurrentPolicy();
 		if (facturaePolicy != null) {
+			PreferencesManager.put(PreferencesManager.PREFERENCE_FACTURAE_POLICY, this.facturaePolicyPanel.getCurrentPolicyItem().toString());
 			PreferencesManager.put(PREFERENCE_FACTURAE_POLICY_IDENTIFIER, facturaePolicy.getPolicyIdentifier());
 			PreferencesManager.put(PREFERENCE_FACTURAE_POLICY_IDENTIFIER_HASH, facturaePolicy.getPolicyIdentifierHash());
 			PreferencesManager.put(PREFERENCE_FACTURAE_POLICY_IDENTIFIER_HASH_ALGORITHM, facturaePolicy.getPolicyIdentifierHashAlgorithm());
@@ -310,14 +312,14 @@ final class PreferencesPanelFacturaE extends JPanel {
 
 		facturaePolicies.add(
     		new PolicyItem(
-				SimpleAfirmaMessages.getString("PreferencesPanelFacturaE.2"), //$NON-NLS-1$
+    			POLICY_FACTURAE_31_NAME,
         		POLICY_FACTURAE_31
     		)
 		);
 
 		facturaePolicies.add(
     		new PolicyItem(
-				SimpleAfirmaMessages.getString("PreferencesPanelFacturaE.1"), //$NON-NLS-1$
+    			POLICY_FACTURAE_30_NAME,
         		POLICY_FACTURAE_30
     		)
 		);
@@ -348,19 +350,13 @@ final class PreferencesPanelFacturaE extends JPanel {
 	 * @return Pol&iacute;tica de firma configurada. */
 	private static AdESPolicy getFacturaEPreferedPolicy() {
 
-		if (PreferencesManager.get(PREFERENCE_FACTURAE_POLICY_IDENTIFIER, null) == null) {
-			return null;
+		if (PreferencesManager.get(PreferencesManager.PREFERENCE_FACTURAE_POLICY, "").equals(POLICY_FACTURAE_30_NAME)) { //$NON-NLS-1$
+			return POLICY_FACTURAE_30;
 		}
-		try {
-			return new AdESPolicy(
-					PreferencesManager.get(PREFERENCE_FACTURAE_POLICY_IDENTIFIER, null),
-					PreferencesManager.get(PREFERENCE_FACTURAE_POLICY_IDENTIFIER_HASH, null),
-					PreferencesManager.get(PREFERENCE_FACTURAE_POLICY_IDENTIFIER_HASH_ALGORITHM, null),
-					PreferencesManager.get(PREFERENCE_FACTURAE_POLICY_QUALIFIER, null)
-					);
+		else if (PreferencesManager.get(PreferencesManager.PREFERENCE_FACTURAE_POLICY, "").equals(POLICY_FACTURAE_31_NAME)) { //$NON-NLS-1$
+			return POLICY_FACTURAE_31;
 		}
-		catch (final Exception e) {
-			Logger.getLogger("es.gob.afirma").severe("Error al recuperar la politica FacturaE guardada en preferencias: " + e); //$NON-NLS-1$ //$NON-NLS-2$
+		else {
 			return null;
 		}
 	}

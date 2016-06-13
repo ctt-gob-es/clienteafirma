@@ -169,7 +169,7 @@ public final class PreferencesManager {
 	/** Identificador de la pol&iacute;tica de firma para XAdES. */
 	public static final String PREFERENCE_XADES_POLICY_IDENTIFIER = "xadesPolicyIdentifier"; //$NON-NLS-1$
 
-	/** Huella digital del identificador de la pol&iacute;tica de firma para XAdES. */
+	/** Huella digital del identificador de la pol&iacute;tica de firma para XAdES. Debe estar en base64.*/
 	public static final String PREFERENCE_XADES_POLICY_IDENTIFIER_HASH = "xadesPolicyIdentifierHash"; //$NON-NLS-1$
 
 	/** Algoritmo de la huella digital del identificador de la pol&iacute;tica de firma para XAdES.
@@ -182,7 +182,7 @@ public final class PreferencesManager {
 	 * </ul> */
 	public static final String PREFERENCE_XADES_POLICY_IDENTIFIER_HASH_ALGORITHM = "xadesPolicyIdentifierHashAlgorithm"; //$NON-NLS-1$
 
-	/** Calificador de la pol&iacute;tica de firma para XAdES. */
+	/** Calificador de la pol&iacute;tica de firma para XAdES. Debe ser una URL.*/
 	public static final String PREFERENCE_XADES_POLICY_QUALIFIER = "xadesPolicyQualifier"; //$NON-NLS-1$
 
 	/** Ciudad de firma para firmas XAdES. */
@@ -235,7 +235,7 @@ public final class PreferencesManager {
 	/** Identificador de la pol&iacute;tica de firma para PAdES. */
 	public static final String PREFERENCE_PADES_POLICY_IDENTIFIER = "padesPolicyIdentifier"; //$NON-NLS-1$
 
-	/** Huella digital, en Base64, del identificador de la pol&iacute;tica de firma para PAdES. */
+	/** Huella digital del identificador de la pol&iacute;tica de firma para PAdES. Debe estar en base64.*/
 	public static final String PREFERENCE_PADES_POLICY_IDENTIFIER_HASH = "padesPolicyIdentifierHash"; //$NON-NLS-1$
 
 	/** Algoritmo de la huella digital del identificador de la pol&iacute;tica de firma para PAdES.
@@ -248,7 +248,7 @@ public final class PreferencesManager {
 	 * </ul> */
 	public static final String PREFERENCE_PADES_POLICY_IDENTIFIER_HASH_ALGORITHM = "padesPolicyIdentifierHashAlgorithm"; //$NON-NLS-1$
 
-	/** Calificador de la pol&iacute;tica de firma para PAdES. */
+	/** Calificador de la pol&iacute;tica de firma para PAdES. Debe ser una URL.*/
 	public static final String PREFERENCE_PADES_POLICY_QUALIFIER = "padesPolicyQualifier"; //$NON-NLS-1$
 
 	//************************* FIN PREFERENCIAS DE FIRMAS PAdES ***************************************************************
@@ -273,10 +273,11 @@ public final class PreferencesManager {
 	 * </ul> */
 	public static final String PREFERENCE_CADES_POLICY_HASH_ALGORITHM = "cadesPolicyIdentifierHashAlgorithm"; //$NON-NLS-1$
 
-	/** Calificador de la pol&iacute;tica de firma para CAdES. */
+	/** Calificador de la pol&iacute;tica de firma para CAdES. Debe ser una URL.*/
 	public static final String PREFERENCE_CADES_POLICY_QUALIFIER = "cadesPolicyQualifier"; //$NON-NLS-1$
 
-	/** Indica si la firma CAdES debe realizarse en modo impl&iacute;cito (<i>attached</i>) o no (<i>detached</i>). */
+	/** Si est&aacute; establecido a <code>true</code> la firma CAdES se realizar&aacute; en modo impl&iacute;cito (<i>attached</i>),
+	 *  si est&aacute; establecido a <code>false</code> se realizar&aacute; en modo (<i>detached</i>). */
 	public static final String PREFERENCE_CADES_IMPLICIT = "cadesImplicitMode"; //$NON-NLS-1$
 
 	//************************* FIN PREFERENCIAS DE FIRMAS CAdES ***************************************************************
@@ -284,6 +285,15 @@ public final class PreferencesManager {
 
 	//**************************************************************************************************************************
 	//**************** PREFERENCIAS DE FACTURAS ELECTRONICAS *******************************************************************
+
+
+	/** Nombre de la pol&iacute;tica de FacturaE.
+	 *  Esta preferencia debe tener uno de estos valores:
+	 * <ul>
+	 *  <li>Pol&iacute;tica de Factura Electr&oacute;nica 3.0</li>
+	 *  <li>Pol&iacute;tica de Factura Electr&oacute;nica 3.1</li>
+	 * </ul> */
+	public static final String PREFERENCE_FACTURAE_POLICY = "facturaEPolicy"; //$NON-NLS-1$
 
 	/** Ciudad de firma para firmas FacturaE. */
 	public static final String PREFERENCE_FACTURAE_SIGNATURE_PRODUCTION_CITY = "facturaeSignatureProductionCity"; //$NON-NLS-1$
@@ -309,7 +319,7 @@ public final class PreferencesManager {
 	/** Identificador de la pol&iacute;tica de firma para FacturaE. */
 	public static final String PREFERENCE_FACTURAE_POLICY_IDENTIFIER = "facturaePolicyIdentifier"; //$NON-NLS-1$
 
-	/** Huella digital del identificador de la pol&iacute;tica de firma para FacturaE. */
+	/** Huella digital del identificador de la pol&iacute;tica de firma para FacturaE. Debe estar en base64.*/
 	public static final String PREFERENCE_FACTURAE_POLICY_IDENTIFIER_HASH = "facturaePolicyIdentifierHash"; //$NON-NLS-1$
 
 	/** Algoritmo de la huella digital del identificador de la pol&iacute;tica de firma para FacturaE.
@@ -322,7 +332,7 @@ public final class PreferencesManager {
 	 * </ul> */
 	public static final String PREFERENCE_FACTURAE_POLICY_IDENTIFIER_HASH_ALGORITHM = "facturaePolicyIdentifierHashAlgorithm"; //$NON-NLS-1$
 
-	/** Calificador de la pol&iacute;tica de firma para FacturaE. */
+	/** Calificador de la pol&iacute;tica de firma para FacturaE. Debe ser una URL. */
 	public static final String PREFERENCE_FACTURAE_POLICY_QUALIFIER = "facturaePolicyQualifier"; //$NON-NLS-1$
 
 	//**************** FIN PREFERENCIAS DE FACTURAS ELECTRONICAS ***************************************************************
