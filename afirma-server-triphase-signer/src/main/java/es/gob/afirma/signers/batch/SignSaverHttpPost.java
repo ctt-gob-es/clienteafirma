@@ -45,7 +45,7 @@ public final class SignSaverHttpPost implements SignSaver {
 	@Override
 	public void saveSign(final SingleSign sign, final byte[] dataToSave) throws IOException {
 		UrlHttpManagerFactory.getInstalledManager().readUrl(
-			this.url + "?" + this.param + "=" + Base64.encode(dataToSave), //$NON-NLS-1$ //$NON-NLS-2$
+			this.url + "?" + this.param + "=" + Base64.encode(dataToSave, true), //$NON-NLS-1$ //$NON-NLS-2$
 			UrlHttpMethod.POST
 		);
 	}
