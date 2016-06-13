@@ -53,6 +53,7 @@ final class PreferencesPanelFacturaE extends JPanel {
 	);
 
 	private static final String POLICY_FACTURAE_30_NAME = SimpleAfirmaMessages.getString("PreferencesPanelFacturaE.1"); //$NON-NLS-1$
+
 	private static final AdESPolicy POLICY_FACTURAE_30 = new AdESPolicy(
 		"http://www.facturae.es/politica de firma formato facturae/politica de firma formato facturae v3_0.pdf", //$NON-NLS-1$
 		"xmfh8D/Ec/hHeE1IB4zPd61zHIY=", //$NON-NLS-1$

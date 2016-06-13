@@ -31,6 +31,7 @@ import javax.script.ScriptEngine;
 import javax.swing.Timer;
 
 import es.gob.afirma.core.misc.Base64;
+import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.keystores.mozilla.MozillaKeyStoreUtilitiesOsX;
 import es.gob.afirma.standalone.AutoFirmaUtil;
 
@@ -98,7 +99,9 @@ public final class ServiceInvocationManager {
 	// timer para cerrar la aplicacion cuando pase un tiempo de inactividad.
 	private final static Timer timer = new Timer(SOCKET_TIMEOUT, evt -> {
 		LOGGER.warning("Se ha caducado la conexion. Se deja de escuchar en el puerto..."); //$NON-NLS-1$
-		closeMacService();
+		if (Platform.OS.MACOSX.equals(Platform.getOS())) {
+			closeMacService();
+		}
 		System.exit(-4);
 	});
 

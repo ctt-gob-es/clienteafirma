@@ -10,6 +10,7 @@ import javax.security.auth.callback.PasswordCallback;
 
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.Base64;
+import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.misc.http.UrlHttpManagerFactory;
 import es.gob.afirma.core.misc.http.UrlHttpMethod;
 import es.gob.afirma.core.misc.protocol.UrlParametersForBatch;
@@ -79,7 +80,9 @@ final class ProtocolInvocationLauncherBatch {
 		final boolean mandatoryCertificate = filterManager.isMandatoryCertificate();
 		final PrivateKeyEntry pke;
 		try {
-			ServiceInvocationManager.focusApplication();
+			if (Platform.OS.MACOSX.equals(Platform.getOS())) {
+				ServiceInvocationManager.focusApplication();
+			}
 			final AOKeyStoreDialog dialog = new AOKeyStoreDialog(
 				ksm,
 				null,

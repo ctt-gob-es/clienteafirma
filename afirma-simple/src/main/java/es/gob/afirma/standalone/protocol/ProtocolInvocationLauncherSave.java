@@ -3,6 +3,7 @@ package es.gob.afirma.standalone.protocol;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.AOCancelledOperationException;
+import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.misc.protocol.UrlParametersToSave;
 import es.gob.afirma.core.ui.AOUIFactory;
 
@@ -19,7 +20,9 @@ final class ProtocolInvocationLauncherSave {
 
 	static String processSave(final UrlParametersToSave  options) {
 		try {
-			ServiceInvocationManager.focusApplication();
+			if (Platform.OS.MACOSX.equals(Platform.getOS())) {
+				ServiceInvocationManager.focusApplication();
+			}
 			AOUIFactory.getSaveDataToFile(
 				options.getData(),
 				options.getTitle(),
