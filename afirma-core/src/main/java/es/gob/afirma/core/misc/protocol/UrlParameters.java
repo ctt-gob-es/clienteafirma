@@ -238,7 +238,7 @@ public abstract class UrlParameters {
 				);
 				
 				// UAL - para firma de multiples documentos
-				String [] sDatosAfirmar = params.get(DATA_PARAM).split(":");
+				String [] sDatosAfirmar = URLDecoder.decode(params.get(DATA_PARAM), DEFAULT_ENCODING).split(":");
 				byte [][] bDatosAfirmar = new byte [sDatosAfirmar.length][];
 				String [] operaciones =  new String [sDatosAfirmar.length];
 				for (int i = 0; i < sDatosAfirmar.length; i++)
