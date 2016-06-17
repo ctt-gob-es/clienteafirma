@@ -115,7 +115,7 @@ var MiniApplet = ( function ( window, undefined ) {
 		var AUTOFIRMA_LAUNCHING_TIME = 2000;
 
 		// Reintentos de conexion totales para detectar que esta instalado AutoFirma
-		var AUTOFIRMA_CONNECTION_RETRIES = 10;
+		var AUTOFIRMA_CONNECTION_RETRIES = 20;
 
 		// Variable que se puede configurar para forzar el uso del modo de comunicacion por servidor intermedio
 		// entre la pÃ¡gina web y AutoFirma
@@ -153,6 +153,11 @@ var MiniApplet = ( function ( window, undefined ) {
 			return (navigator.userAgent.toUpperCase().indexOf("IPAD") != -1) ||
 			(navigator.userAgent.toUpperCase().indexOf("IPOD") != -1) ||
 			(navigator.userAgent.toUpperCase().indexOf("IPHONE") != -1);
+		}
+		
+		/** Determina con un boolean si nos encontramos en Windows 7 */
+		function isWindows7() {
+			return navigator.userAgent.indexOf("Windows NT 6.1") != -1;		/* Windows 7 */
 		}
 
 		/** Determina con un boolean si nos encontramos en Windows 8/8.1 */
@@ -863,7 +868,7 @@ var MiniApplet = ( function ( window, undefined ) {
 		 * En caso contrario, la comunicacion se realizara mediante un servidor intermedio.
 		 */
 		function cargarAppAfirma(clientAddress, keystore) {
-			if (!isIOS() && !isAndroid() && !isOldInternetExplorer() && !forceWSMode){
+			if (!isIOS() && !isAndroid() && !isOldInternetExplorer() && !isWindows7() && !forceWSMode){
 				clienteFirma = new AppAfirmaJSSocket(clientAddress, window, undefined);
 				clienteFirma.setKeyStore(keystore);
 				clientType = TYPE_JAVASCRIPT_SOCKET;
@@ -1118,6 +1123,7 @@ var MiniApplet = ( function ( window, undefined ) {
 				var data = new Object();
 				data.op = generateDataKeyValue("op","batch");
 				data.keystore = generateDataKeyValue("keystore", defaultKeyStore);
+				data.stservlet = generateDataKeyValue("stservlet", storageServletAddress);
 				data.batchpresignerurl = generateDataKeyValue("batchpresignerurl", batchPreSignerUrl);
 				data.batchpostsignerurl = generateDataKeyValue("batchpostsignerurl", batchPostSignerUrl);
 				data.properties = generateDataKeyValue ("properties", extraParams != null ? Base64.encode(extraParams) : null);
@@ -1203,7 +1209,7 @@ var MiniApplet = ( function ( window, undefined ) {
 					           function () {
 						  		   console.log("Probamos http://");
 						  		   bJNLP = false;
-					               openUrl(jnlpServiceAddress.replace("jnlp","http")+'?cadenaFirma='+encodeURIComponent("afirma://service?ports=" + portsLine + "&v=" + PROTOCOL_VERSION + "&idsession=" + idSession));
+					               openUrl(jnlpServiceAddress.replace("jnlp","https")+'?cadenaFirma='+encodeURIComponent("afirma://service?ports=" + portsLine + "&v=" + PROTOCOL_VERSION + "&idsession=" + idSession));
 					           });
 				  //});
 				}else{
@@ -2431,7 +2437,7 @@ var MiniApplet = ( function ( window, undefined ) {
 							  function () {
 							  	console.log("Probamos http://");
 							  	bJNLP = false;
-						        openUrl(jnlpServiceAddress.replace("jnlp","http")+'?cadenaFirma='+encodeURIComponent(intentURL), errorCallback);
+						        openUrl(jnlpServiceAddress.replace("jnlp","https")+'?cadenaFirma='+encodeURIComponent(intentURL), errorCallback);
 						      });
 		//			  });
 				}else{
@@ -2671,7 +2677,7 @@ var MiniApplet = ( function ( window, undefined ) {
 				else {
 					if(multiSepPos == -1){
 						if (cipherKey != undefined && cipherKey != null) {
-							certificate = decipher(html.substring(0, sepPos), cipherKey);
+							certificate = decipher(html.substring(0, sepPos), cipherKey, true);
 							signature = decipher(html.substring(sepPos + 1), cipherKey);
 							certificate = certificate.replace(/\-/g, "+").replace(/\_/g, "/");
 							signature = signature.replace(/\-/g, "+").replace(/\_/g, "/");
@@ -2693,7 +2699,7 @@ var MiniApplet = ( function ( window, undefined ) {
 						}
 					}else{
 						if (cipherKey != undefined && cipherKey != null) {
-							certificate = decipher(html.substring(0, sepPos), cipherKey);
+							certificate = decipher(html.substring(0, sepPos), cipherKey, true);
 							var signatures = html.substring(sepPos + 1).split(":");
 							signature = "";
 							for(var i = 0; i<signatures.length; i++){
@@ -2790,15 +2796,19 @@ var MiniApplet = ( function ( window, undefined ) {
 			 * para descifrar.
 			 * Como resultado devuelve la cadena de texto descifrada en base 64.
 			 */
-			function decipher(cipheredData, key) {
-
+			function decipher(cipheredData, key, notlast) {
+								
 				var dotPos = cipheredData.indexOf('.');
 				var padding = cipheredData.substr(0, dotPos);
-
+				
 				var deciphered = Cipher.des(key, Cipher.base64ToString(fromBase64UrlSaveToBase64(cipheredData.substr(dotPos + 1))), 0, 0, null);
-				return Cipher.stringToBase64(deciphered.substr(0, deciphered.length - (padding == 0 ? 8 : padding) - 8));
-			}
+				/*if(padding==0)
+					notlast = true;*/
+				return Cipher.stringToBase64(deciphered.substr(0, deciphered.length - padding - (notlast?0:8)));
 
+//				return Cipher.stringToBase64(deciphered.substr(0, deciphered.length - (padding == 0 ? 8 : padding) - (notlast?0:8)));
+			}
+			
 			/**
 			 * Realiza un cifrado DES compatible con Java (Algoritmo DES, modo CBC, sin Padding).
 			 * @param dataB64 Cadena de texto base 64.
