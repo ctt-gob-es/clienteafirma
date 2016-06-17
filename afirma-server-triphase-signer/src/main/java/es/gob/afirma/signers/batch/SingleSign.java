@@ -62,20 +62,31 @@ public final class SingleSign {
 	private static final String XML_ELEMENT_EXTRAPARAMS = "extraparams"; //$NON-NLS-1$
 
 	private final Properties extraParams;
-	Properties getExtraParams() {
+
+	/**
+	 * Recupera los par&aacute;metros de configuraci&oacute;n del formato de firma.
+	 * @return Configuraci&oacute;n del formato de firma.
+	 */
+	public Properties getExtraParams() {
 		return this.extraParams;
 	}
 
 	private final String dataSource;
 
 	private final SignFormat format;
-	SignFormat getSignFormat() {
+
+	/**
+	 * Recupera el formato de firma.
+	 * @return Formato de firma.
+	 */
+	public SignFormat getSignFormat() {
 		return this.format;
 	}
 
 	private final String id;
 
 	private final SignSubOperation subOperation;
+
 	SignSubOperation getSubOperation() {
 		return this.subOperation;
 	}
@@ -412,11 +423,20 @@ public final class SingleSign {
 		};
 	}
 
-	String getId() {
+	/**
+	 * Recupera el identificador asignado en el lote a la firma.
+	 * @return Identificador.
+	 */
+	public String getId() {
 		return this.id;
 	}
 
-	byte[] getData() throws IOException {
+	/**
+	 * Recupera los datos que se deben procesar.
+	 * @return Datos.
+	 * @throws IOException Cuando no se pueden obtener los datos en caso de que estos sean remotos.
+	 */
+	public byte[] getData() throws IOException {
 		checkDataSource(this.dataSource);
 		return DataDownloader.downloadData(this.dataSource);
 	}
