@@ -29,6 +29,8 @@ public class AutoFirmaConfigurator implements ConsoleListener {
 	private static final String PARAMETER_UNISTALL = "-uninstall"; //$NON-NLS-1$
 	private static final File TMP = new File("/var/tmp"); //$NON-NLS-1$
 	private static final File TEMP = new File("/var/temp"); //$NON-NLS-1$
+	
+	private static final String PARAMETER_KEEP_OPEN = "-keep_open"; //$NON-NLS-1$
 
 	private Configurator configurator;
 
@@ -135,10 +137,19 @@ public class AutoFirmaConfigurator implements ConsoleListener {
      * @param exitCode C&oacute;digo de cierre de la aplicaci&oacute;n (negativo
      *                 indica error y cero indica salida normal. */
     public void closeApplication(final int exitCode) {
+    	this.closeApplication(exitCode, false);
+    }
+    
+    /** Cierra la aplicaci&oacute;n.
+     * @param exitCode C&oacute;digo de cierre de la aplicaci&oacute;n (negativo
+     *                 indica error y cero indica salida normal. 
+     * @param keepOpen Indica si hay que salir de la aplicaci&oacute;n. */
+    public void closeApplication(final int exitCode, final boolean keepOpen) {
         if (this.mainScreen != null) {
             this.mainScreen.dispose();
         }
-        System.exit(exitCode);
+        if(!keepOpen)
+        	System.exit(exitCode);
     }
 
     /** Inicia el proceso de configuraci&oacute;n.
@@ -175,7 +186,11 @@ public class AutoFirmaConfigurator implements ConsoleListener {
 			);
 			configurator.closeApplication(-2);
 		}
-
+		
+		if (args != null && args.length > 0 && PARAMETER_KEEP_OPEN.equalsIgnoreCase(args[0])) {
+			configurator.closeApplication(0,true);
+			return;
+		}
 		configurator.closeApplication(0);
 	}
 

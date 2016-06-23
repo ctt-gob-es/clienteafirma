@@ -9,18 +9,18 @@
 	<version>3.3.2-SNAPSHOT</version>
 
 	<properties>
-        <project.build.sourceEncoding>utf-8</project.build.sourceEncoding>
+		<project.build.sourceEncoding>utf-8</project.build.sourceEncoding>
 		<afirma.keytool.keystore>${basedir}/afirma.keystore</afirma.keytool.keystore>
-        <afirma.keytool.alias>codesign</afirma.keytool.alias>
-        <afirma.keytool.password>afirma</afirma.keytool.password>
+		<afirma.keytool.alias>codesign</afirma.keytool.alias>
+		<afirma.keytool.password>afirma</afirma.keytool.password>
 	</properties>
 
 	<dependencies>
-	    
-	    <dependency>
+
+		<dependency>
 			<groupId>com.dmurph</groupId>
-  			<artifactId>JGoogleAnalyticsTracker</artifactId>
-  			<version>1.1.0</version>
+			<artifactId>JGoogleAnalyticsTracker</artifactId>
+			<version>1.1.0</version>
 		</dependency>
 
 		<dependency>
@@ -70,7 +70,7 @@
 			<artifactId>afirma-keystores-mozilla</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>es.gob.afirma</groupId>
 			<artifactId>afirma-crypto-core-pkcs7</artifactId>
@@ -82,7 +82,7 @@
 			<artifactId>afirma-crypto-cms</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>es.gob.afirma</groupId>
 			<artifactId>afirma-crypto-cms-enveloper</artifactId>
@@ -130,25 +130,25 @@
 			<artifactId>afirma-crypto-ooxml</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>es.gob.afirma</groupId>
 			<artifactId>afirma-crypto-cadestri-client</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>es.gob.afirma</groupId>
 			<artifactId>afirma-crypto-xadestri-client</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>es.gob.afirma</groupId>
 			<artifactId>afirma-crypto-padestri-client</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>es.gob.afirma</groupId>
 			<artifactId>afirma-crypto-xmlsignature</artifactId>
@@ -166,7 +166,7 @@
 			<artifactId>afirma-core-massive</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>es.gob.afirma</groupId>
 			<artifactId>afirma-crypto-batch-client</artifactId>
@@ -184,19 +184,19 @@
 			<artifactId>prov</artifactId>
 			<version>1.54.0.0</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>com.madgag.spongycastle</groupId>
 			<artifactId>pkix</artifactId>
 			<version>1.54.0.0</version>
 		</dependency>
-				
+
 		<dependency>
 			<groupId>es.gob</groupId>
 			<artifactId>jmulticard-jse</artifactId>
 			<version>1.4</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>es.gob</groupId>
 			<artifactId>jmulticard-ui</artifactId>
@@ -221,10 +221,10 @@
 			<version>4.8.2</version>
 			<scope>test</scope>
 		</dependency>
-		
+
 		<dependency>
-  			<groupId>org.apache.pdfbox</groupId>
-  			<artifactId>pdfbox</artifactId>
+			<groupId>org.apache.pdfbox</groupId>
+			<artifactId>pdfbox</artifactId>
   			<version>1.8.11</version>
   			<exclusions>
   				<exclusion>
@@ -241,15 +241,21 @@
   				</exclusion>
         	</exclusions>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>com.github.markusbernhardt</groupId>
 			<artifactId>proxy-vole</artifactId>
 			<version>1.0.1</version>
 		</dependency>
-		
+
+		<dependency>
+			<groupId>es.gob.afirma</groupId>
+			<artifactId>afirma-ui-simpleafirma-configurator</artifactId>
+			<version>3.3.2-SNAPSHOT</version>
+		</dependency>
+
 	</dependencies>
-	
+
 	<scm>
 		<connection>scm:svn:http://svn-ctt.administracionelectronica.gob.es/svn/clienteafirma/project/afirma-desktop/afirma-simple/trunk</connection>
 		<url>http://svn-ctt.administracionelectronica.gob.es/svn/clienteafirma/project/afirma-desktop/afirma-simple/trunk</url>
@@ -268,7 +274,7 @@
 					<compilerArgument>-XDignore.symbol.file</compilerArgument>
 				</configuration>
 			</plugin>
-<!-- 			<plugin>
+			<!-- plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
 				<version>2.4</version>
@@ -289,8 +295,8 @@
 						<addMavenDescriptor>false</addMavenDescriptor>
 					</archive>
 				</configuration>
-			</plugin> -->
-			
+			</plugin-->
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-shade-plugin</artifactId>
@@ -305,7 +311,10 @@
 							<transformers>
 								<transformer
 									implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-									<mainClass>es.gob.afirma.standalone.SimpleAfirma</mainClass>
+									<manifestEntries>
+										<Main-Class>es.gob.afirma.standalone.SimpleAfirma</Main-Class>
+										<Permissions>all-permissions</Permissions>
+									</manifestEntries>
 								</transformer>
 							</transformers>
 						</configuration>
@@ -335,7 +344,6 @@
 					</filters>
 				</configuration>
 			</plugin>
-			
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>

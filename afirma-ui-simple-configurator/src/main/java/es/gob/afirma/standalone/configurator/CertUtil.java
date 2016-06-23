@@ -54,7 +54,7 @@ import org.spongycastle.operator.jcajce.JcaContentSignerBuilder;
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 final class CertUtil {
 
-	private static final String AF_ROOT_SUBJECT_PRINCIPAL = "CN=AutoFirma ROOT"; //$NON-NLS-1$
+	public static final String AF_ROOT_SUBJECT_PRINCIPAL = "CN=AutoFirma ROOT"; //$NON-NLS-1$
 
 	private static final int KEY_SIZE = 2048;
 

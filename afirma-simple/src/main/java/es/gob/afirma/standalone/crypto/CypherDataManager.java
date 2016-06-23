@@ -1,5 +1,6 @@
 package es.gob.afirma.standalone.crypto;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.InvalidKeyException;
@@ -75,5 +76,31 @@ public final class CypherDataManager {
 			.append(Integer.toString((DesCipher.getPaddingLength() - data.length % DesCipher.getPaddingLength()) % DesCipher.getPaddingLength()))
 			.append(PADDING_CHAR_SEPARATOR)
 			.append(Base64.encode(DesCipher.cipher(data, cipherKey), true)).toString();
+	}
+	
+	/** Genera una cadena con datos cifrados y codificados en base 64 antecedidos por el n&uacute;mero de
+	 * caracteres que se han tenido que agregar como padding y separados por un car&aacute;cter separador.
+	 * Usado para multiples firmas
+	 * @param data Datos a cifrar.
+	 * @param cipherKey Clave de cifrado.
+	 * @return Cadena con el numero de caracteres agregados manualmente para cumplir la longitud requerida,
+	 * el caracter separador y los datos cifrados y en base 64.
+	 * @throws InvalidKeyException Cuando la clave no es v&aacute;lida.
+	 * @throws GeneralSecurityException Cuando falla el proceso de cifrado.
+	 * @throws IOException En caso de errores en el tratamiento de datos. */
+	public static String cipherDatas(final byte[][] data, final byte[] cipherKey) throws InvalidKeyException, GeneralSecurityException, IOException 
+	{
+		StringBuilder cadenaFinal = new StringBuilder ();
+		
+		for (int i = 0; i < data.length; i++)
+		{
+			System.out.println (Base64.encode(data[i]));
+			if(i>0){
+				cadenaFinal.append(":");
+			}
+			cadenaFinal.append(cipherData(data[i],cipherKey));
+		}
+				
+		return cadenaFinal.toString();
 	}
 }

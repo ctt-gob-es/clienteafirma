@@ -308,13 +308,17 @@ final class ProtocolInvocationLauncherSign {
 					+ "se realizara una firma XAdES corriente: " + e); //$NON-NLS-1$
 			}
 		}
-
-		final byte[] sign;
-		switch(options.getOperation()) {
+		
+		int nFirmas = options.getDatas().length;
+		final byte[][] sign = new byte [nFirmas][];
+		String [] operaciones = options.getOperaciones();
+		for (int i = 0; i < nFirmas; i++)
+		{
+			switch(UrlParametersToSign.Operation.getOperation(operaciones[i])) {
 			case SIGN:
 				try {
-					sign = signer.sign(
-						options.getData(),
+					sign[i] = signer.sign(
+						options.getDatas()[i],
 						options.getSignatureAlgorithm(),
 						pke.getPrivateKey(),
 						pke.getCertificateChain(),
@@ -338,8 +342,8 @@ final class ProtocolInvocationLauncherSign {
 				break;
 			case COSIGN:
 				try {
-					sign = signer.cosign(
-						options.getData(),
+					sign[i] = signer.cosign(
+						options.getDatas()[i],
 						options.getSignatureAlgorithm(),
 						pke.getPrivateKey(),
 						pke.getCertificateChain(),
@@ -363,8 +367,8 @@ final class ProtocolInvocationLauncherSign {
 				break;
 			case COUNTERSIGN:
 				try {
-					sign = signer.countersign(
-						options.getData(),
+					sign[i] = signer.countersign(
+						options.getDatas()[i],
 						options.getSignatureAlgorithm(),
 						"tree".equalsIgnoreCase(options.getExtraParams().getProperty("target")) ? //$NON-NLS-1$ //$NON-NLS-2$
 							CounterSignTarget.TREE :
@@ -390,19 +394,20 @@ final class ProtocolInvocationLauncherSign {
 					);
 				}
 				break;
-			default:
-				LOGGER.severe("Error al realizar la operacion firma"); //$NON-NLS-1$
-				ProtocolInvocationLauncherErrorManager.showError(
-					ProtocolInvocationLauncherErrorManager.SAF_04
-				);
-				if (!bySocket){
-					throw new SocketOperationException(
+				default:
+					LOGGER.severe("Error al realizar la operacion firma"); //$NON-NLS-1$
+					ProtocolInvocationLauncherErrorManager.showError(
 						ProtocolInvocationLauncherErrorManager.SAF_04
 					);
-				}
-				return ProtocolInvocationLauncherErrorManager.getErrorMessage(
-					ProtocolInvocationLauncherErrorManager.SAF_04
-				);
+					if (!bySocket){
+						throw new SocketOperationException(
+							ProtocolInvocationLauncherErrorManager.SAF_04
+						);
+					}
+					return ProtocolInvocationLauncherErrorManager.getErrorMessage(
+						ProtocolInvocationLauncherErrorManager.SAF_04
+					);
+			}
 		}
 
 		// Concatenamos el certificado utilizado para firmar y la firma con un separador
@@ -432,7 +437,8 @@ final class ProtocolInvocationLauncherSign {
 				// El CipherData devuelve los datos directamente en Base64
 				dataToSend.append(CypherDataManager.cipherData(certEncoded, options.getDesKey()));
 				dataToSend.append(CERT_SIGNATURE_SEPARATOR);
-				dataToSend.append(CypherDataManager.cipherData(sign, options.getDesKey()));
+				//dataToSend.append(CypherDataManager.cipherData(sign, options.getDesKey()));
+				dataToSend.append(CypherDataManager.cipherDatas(sign, options.getDesKey()));
 			}
 			catch (final Exception e) {
 				LOGGER.severe("Error en el cifrado de los datos a enviar: " + e); //$NON-NLS-1$
@@ -453,11 +459,15 @@ final class ProtocolInvocationLauncherSign {
 			);
 			dataToSend.append(Base64.encode(certEncoded, true));
 			dataToSend.append(CERT_SIGNATURE_SEPARATOR);
-			// Se hace una doble codigicacion Base64, una de los datos y otras del cifrado, que si bien este ultimo
-			// no se realiza, si se mantiene la codificacion
-			dataToSend.append(Base64.encode(sign, true));
+			for (int i = 0; i < sign.length; i++)
+			{
+				// Se hace una doble codigicacion Base64, una de los datos y otras del cifrado, que si bien este ultimo
+				// no se realiza, si se mantiene la codificacion
+				dataToSend.append(Base64.encode(sign[i], true));
+				if (i < sign.length-1)
+					dataToSend.append(":");
+			}
 		}
-
 		if (!bySocket) {
 			// Enviamos la firma cifrada al servicio remoto de intercambio
 			try {
@@ -476,7 +486,6 @@ final class ProtocolInvocationLauncherSign {
 				"Se omite el envio por red de los datos resultantes por no haberse proporcionado una URL de destino" //$NON-NLS-1$
 			);
 		}
-
 		return dataToSend.toString();
 	}
 
