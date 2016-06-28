@@ -10,12 +10,15 @@
 
 package es.gob.afirma.core.misc.protocol;
 
+import java.io.IOException;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Properties;
 
+import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.misc.http.DataDownloader;
 
@@ -56,6 +59,7 @@ public abstract class UrlParameters {
 	private URL storageServer = null;
 	private String id = null;
 	private String defaultKeyStore = null;
+	private String defaultKeyStoreLib = null;
 	private Properties extraParams = null;
 	private String filename = null;
 
@@ -96,6 +100,18 @@ public abstract class UrlParameters {
 	 * @param storeName Nombre del almac&eacute;n de claves a usar por defecto */
 	void setDefaultKeyStore(final String storeName) {
 		this.defaultKeyStore = storeName;
+	}
+
+	/** Obtiene la ruta de la biblioteca del almac&eacute;n de claves a usar por defecto.
+	 * @return Ruta de la biblioteca del almac&eacute;n de claves a usar por defecto */
+	public String getDefaultKeyStoreLib() {
+		return this.defaultKeyStoreLib;
+	}
+
+	/** Establece la biblioteca del almac&eacute;n de claves a usar por defecto.
+	 * @param storeLib Ruta de la biblioteca del almac&eacute;n de claves a usar por defecto */
+	void setDefaultKeyStoreLib(final String storeLib) {
+		this.defaultKeyStoreLib = storeLib;
 	}
 
 	/** Establece los datos.
@@ -283,11 +299,29 @@ public abstract class UrlParameters {
 		return servletUrl;
 	}
 
-	protected static String verifyDefaultKeyStoreName(final Map<String, String> params) {
+	protected static String getDefaultKeyStoreName(final Map<String, String> params) {
 
 		// Si se ha especificado un almacen, se usara ese
-		if (params.containsKey(KEYSTORE)) {
-			return params.get(KEYSTORE);
+		if (params.get(KEYSTORE) != null) {
+
+			String ksValue = params.get(KEYSTORE);
+			if (Base64.isBase64(ksValue)) {
+				try {
+					ksValue = new String(Base64.decode(ksValue));
+				} catch (final IOException e) {
+					// Interpretamos que no era Base64
+				}
+			}
+
+			String defaultKeyStoreName = null;
+			final int separatorPos = ksValue.indexOf(':');
+			if (separatorPos == -1) {
+				defaultKeyStoreName = ksValue;
+			}
+			else if (ksValue.length() > 1) {
+				defaultKeyStoreName = ksValue.substring(0, separatorPos).trim();
+			}
+			return defaultKeyStoreName;
 		}
 
 		// Si no se ha especificado almacen, se usara el del sistema operativo
@@ -307,4 +341,27 @@ public abstract class UrlParameters {
 		return null;
 	}
 
+	protected static String getDefaultKeyStoreLib(final Map<String, String> params) {
+
+		// Si se ha especificado un almacen, se usara ese
+		if (params.get(KEYSTORE) == null) {
+			return null;
+		}
+
+		String ksValue = params.get(KEYSTORE);
+		if (Base64.isBase64(ksValue)) {
+			try {
+				ksValue = new String(Base64.decode(ksValue), Charset.forName("utf-8")); //$NON-NLS-1$
+			} catch (final IOException e) {
+				// Interpretamos que no era Base64
+			}
+		}
+
+		String lib = null;
+		final int separatorPos = ksValue.indexOf(':');
+		if (separatorPos != -1 && separatorPos < ksValue.length() - 1) {
+			lib = ksValue.substring(separatorPos + 1).trim();
+		}
+		return lib;
+	}
 }

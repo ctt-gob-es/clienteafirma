@@ -255,7 +255,8 @@ public final class UrlParametersToSignAndSave extends UrlParameters {
 			setExtraParams(new Properties());
 		}
 
-		setDefaultKeyStore(verifyDefaultKeyStoreName(params));
+		setDefaultKeyStore(getDefaultKeyStoreName(params));
+		setDefaultKeyStoreLib(getDefaultKeyStoreLib(params));
 
 		// Comprobamos si se ha proporcionado un nombre de fichero por defecto
 		if (params.containsKey(FILENAME_PARAM)) {

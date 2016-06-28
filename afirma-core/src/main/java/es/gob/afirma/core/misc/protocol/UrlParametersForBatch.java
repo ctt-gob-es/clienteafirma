@@ -104,7 +104,8 @@ public final class UrlParametersForBatch extends UrlParameters {
 			);
 		}
 
-		setDefaultKeyStore(verifyDefaultKeyStoreName(params));
+		setDefaultKeyStore(getDefaultKeyStoreName(params));
+		setDefaultKeyStoreLib(getDefaultKeyStoreLib(params));
 
 		setBatchPostsignerUrl(
 			validateURL(
@@ -152,7 +153,7 @@ public final class UrlParametersForBatch extends UrlParameters {
 			setExtraParams(new Properties());
 		}
 
-		setDefaultKeyStore(verifyDefaultKeyStoreName(params));
+		setDefaultKeyStore(getDefaultKeyStoreName(params));
 	}
 
 	/** Obtiene la versi&oacute;n m&iacute;nima requerida del aplicativo.

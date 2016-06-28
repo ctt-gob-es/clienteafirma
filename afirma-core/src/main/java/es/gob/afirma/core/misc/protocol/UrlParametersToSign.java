@@ -244,7 +244,8 @@ public final class UrlParametersToSign extends UrlParameters {
 			setExtraParams(new Properties());
 		}
 
-		setDefaultKeyStore(verifyDefaultKeyStoreName(params));
+		setDefaultKeyStore(getDefaultKeyStoreName(params));
+		setDefaultKeyStoreLib(getDefaultKeyStoreLib(params));
 
 	}
 }

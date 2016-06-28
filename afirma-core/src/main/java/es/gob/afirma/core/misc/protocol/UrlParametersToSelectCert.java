@@ -122,6 +122,7 @@ public final class UrlParametersToSelectCert extends UrlParameters {
 			setExtraParams(new Properties());
 		}
 
-		setDefaultKeyStore(verifyDefaultKeyStoreName(params));
+		setDefaultKeyStore(getDefaultKeyStoreName(params));
+		setDefaultKeyStoreLib(getDefaultKeyStoreLib(params));
 	}
 }

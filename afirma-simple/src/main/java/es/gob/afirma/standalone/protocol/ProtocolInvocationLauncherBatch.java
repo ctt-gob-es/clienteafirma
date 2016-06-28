@@ -49,12 +49,14 @@ final class ProtocolInvocationLauncherBatch {
 			return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_07);
 		}
 
+		final String aoksLib = options.getDefaultKeyStoreLib();
+
 		final PasswordCallback pwc = aoks.getStorePasswordCallback(null);
 		final AOKeyStoreManager ksm;
 		try {
 			ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
 				aoks, // Store
-				null, // Lib
+				aoksLib, // Lib
 				null, // Description
 				pwc,  // PasswordCallback
 				null  // Parent
