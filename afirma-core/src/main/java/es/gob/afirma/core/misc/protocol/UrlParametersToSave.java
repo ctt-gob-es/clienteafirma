@@ -10,6 +10,8 @@
 
 package es.gob.afirma.core.misc.protocol;
 
+import java.net.URL;
+import java.util.Locale;
 import java.util.Map;
 
 
@@ -27,6 +29,12 @@ public final class UrlParametersToSave extends UrlParameters {
 
 	/** Par&aacute;metro de entrada con las extensiones recomendadas para el fichero de salida. */
 	private static final String FILENAME_EXTS = "exts"; //$NON-NLS-1$
+
+	/** Par&aacute;metro de entrada con el identificador del documento. */
+	private static final String ID_PARAM = "id"; //$NON-NLS-1$
+
+	/** N&uacute;mero m&aacute;ximo de caracteres permitidos para el identificador de sesi&oacute;n de la operaci&oacute;n. */
+	private static final int MAX_ID_LENGTH = 20;
 
 	private String title = null;
 	private String filename = null;
@@ -96,6 +104,47 @@ public final class UrlParametersToSave extends UrlParameters {
 				"Error al validar la URL del servlet de recuperacion: " + //$NON-NLS-1$
 					"La URI debe contener o un identificador de fichero o los datos a guardar" //$NON-NLS-1$
 			);
+		}
+
+		// Comprobamos que el identificador de sesion de la firma no sea mayor de un cierto numero de caracteres
+		String signatureSessionId = null;
+		if (params.containsKey(ID_PARAM)) {
+			signatureSessionId = params.get(ID_PARAM);
+		}
+		else if (params.containsKey(FILE_ID_PARAM)) {
+			 signatureSessionId = params.get(FILE_ID_PARAM);
+		}
+
+		if (signatureSessionId != null) {
+			if (signatureSessionId.length() > MAX_ID_LENGTH) {
+				throw new ParameterException("La longitud del identificador para la firma es mayor de " + MAX_ID_LENGTH + " caracteres."); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+
+			// Comprobamos que el identificador de sesion de la firma sea alfanumerico (se usara como nombre de fichero)
+			for (final char c : signatureSessionId.toLowerCase(Locale.ENGLISH).toCharArray()) {
+				if ((c < 'a' || c > 'z') && (c < '0' || c > '9')) {
+					throw new ParameterException("El identificador de la firma debe ser alfanumerico."); //$NON-NLS-1$
+				}
+			}
+
+			setSessionId(signatureSessionId);
+		}
+
+		// Comprobamos la validez de la URL del servlet de guardado en caso de indicarse
+		if (params.containsKey(STORAGE_SERVLET_PARAM)) {
+
+			// Comprobamos que la URL sea valida
+			URL storageServletUrl;
+			try {
+				storageServletUrl = validateURL(params.get(STORAGE_SERVLET_PARAM));
+			}
+			catch (final ParameterLocalAccessRequestedException e) {
+				throw new ParameterLocalAccessRequestedException("La URL del servicio de guardado no puede ser local", e); //$NON-NLS-1$
+			}
+			catch (final ParameterException e) {
+				throw new ParameterException("Error al validar la URL del servicio de guardado: " + e, e); //$NON-NLS-1$
+			}
+			setStorageServletUrl(storageServletUrl);
 		}
 
 		setTitle(verifyTitle(params));
