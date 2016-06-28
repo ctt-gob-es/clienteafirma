@@ -12,9 +12,9 @@ if (document.all && !window.setTimeout.isPolyfill) {
 
 var MiniApplet = ( function ( window, undefined ) {
 
-		var VERSION = "1.4";
+		var VERSION = "1.5";
 
-		var JAR_NAME = 'miniapplet-full_1_4.jar';
+		var JAR_NAME = 'miniapplet-full_1_5.jar';
 
 		var JAVA_ARGUMENTS = '-Xms512M -Xmx512M ';
 
@@ -245,7 +245,11 @@ var MiniApplet = ( function ( window, undefined ) {
 		function getHttpRequest() {
             var xmlHttp = null;
             if (typeof XMLHttpRequest != "undefined") {	// Navegadores actuales
-                xmlHttp = new XMLHttpRequest();
+                if (typeof Sarissa !== 'undefined' && Sarissa.originalXMLHttpRequest) {
+                	xmlHttp = new Sarissa.originalXMLHttpRequest();
+                } else {
+                	xmlHttp = new XMLHttpRequest();
+                }
             } else if (typeof window.ActiveXObject != "undefined") {	// Internet Explorer antiguos
                 try {
                     xmlHttp = new ActiveXObject("Msxml2.XMLHTTP.4.0");
@@ -2359,8 +2363,7 @@ var MiniApplet = ( function ( window, undefined ) {
 					httpRequest.send(requestData);
 				}
 				catch(e) {
-					errorMessage = "No se pudo conectar con el servidor remoto";
-					errorType = "java.io.IOException";
+					errorCallback("java.lang.IOException", "No se pudo conectar con el servidor remoto");
 				}
 			}
 			
