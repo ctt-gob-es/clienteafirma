@@ -967,16 +967,30 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 
 		this.clearError();
 
-		final AOKeyStore ks;
-		try {
-			ks = AOKeyStore.valueOf(ksType);
+		if (ksType == null || ksType.length() == 0) {
+			this.keystoreType = null;
+			this.keystoreLib = null;
 		}
-		catch (final Exception e) {
-			LOGGER.severe("El almacen indicado (" + ksType + ") no existe: " + e); //$NON-NLS-1$ //$NON-NLS-2$
-			setError(e, "El almacen indicado no existe: " + ksType); //$NON-NLS-1$
-			throw new AOException("El almacen indicado no existe: " + ksType, e); //$NON-NLS-1$
+		else {
+			final int separatorPos = ksType.indexOf(':');
+			try {
+				if (separatorPos == -1) {
+					this.keystoreType = AOKeyStore.valueOf(ksType);
+				}
+				else if (ksType.length() > 1) {
+					this.keystoreType = AOKeyStore.valueOf(ksType.substring(0, separatorPos).trim());
+					if (separatorPos < ksType.length() -1 &&
+							ksType.substring(separatorPos + 1).trim().length() > 0) {
+						this.keystoreLib = ksType.substring(separatorPos + 1).trim();
+					}
+				}
+			}
+			catch (final Exception e) {
+				LOGGER.severe("El tipo de almacen indicado (" + ksType + ") no existe: " + e); //$NON-NLS-1$ //$NON-NLS-2$
+				setError(e, "El tipo de almacen indicado no existe: " + ksType); //$NON-NLS-1$
+				throw new AOException("El tipo de almacen indicado no existe: " + ksType, e); //$NON-NLS-1$
+			}
 		}
-		this.keystoreType = ks;
 	}
 
 	/** Permite que el usuario seleccione un certificado del almac&eacute;n configurado, o
