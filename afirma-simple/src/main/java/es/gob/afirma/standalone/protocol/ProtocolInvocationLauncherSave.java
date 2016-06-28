@@ -18,7 +18,7 @@ final class ProtocolInvocationLauncherSave {
 		// No instanciable
 	}
 
-	static String processSave(final UrlParametersToSave  options) {
+	static String processSave(final UrlParametersToSave  options, final boolean bySocket) throws SocketOperationException {
 		try {
 			if (Platform.OS.MACOSX.equals(Platform.getOS())) {
 				ServiceInvocationManager.focusApplication();
@@ -35,13 +35,39 @@ final class ProtocolInvocationLauncherSave {
 		}
 		catch(final AOCancelledOperationException e) {
 			LOGGER.severe("Operacion cancelada por el usuario" + e); //$NON-NLS-1$
+			if (!bySocket){
+				throw new SocketOperationException(RESULT_CANCEL);
+			}
 			return RESULT_CANCEL;
 		}
 		catch (final Exception e) {
 			LOGGER.severe("Error en el guardado de datos: " + e); //$NON-NLS-1$
 			ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_05);
+			if (!bySocket){
+				throw new SocketOperationException(
+					ProtocolInvocationLauncherErrorManager.SAF_09
+				);
+			}
 			return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_05);
 		}
+
+		if (options.getStorageServletUrl() != null) {
+			// Enviamos la firma cifrada al servicio remoto de intercambio
+			try {
+				IntermediateServerUtil.sendData(RESULT_OK, options.getStorageServletUrl().toString(), options.getId());
+			}
+			catch (final Exception e) {
+				LOGGER.severe("Error al enviar los datos al servidor: " + e); //$NON-NLS-1$
+				ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_11);
+				return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_11);
+			}
+		}
+		else {
+			LOGGER.info(
+				"Se omite el envio por red del resultado por no haberse proporcionado una URL de destino" //$NON-NLS-1$
+			);
+		}
+
 		return RESULT_OK;
 	}
 

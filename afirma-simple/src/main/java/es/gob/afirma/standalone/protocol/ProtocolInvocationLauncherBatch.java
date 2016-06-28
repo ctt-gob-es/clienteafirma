@@ -1,6 +1,5 @@
 package es.gob.afirma.standalone.protocol;
 
-import java.io.IOException;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.util.List;
 import java.util.logging.Level;
@@ -11,8 +10,6 @@ import javax.security.auth.callback.PasswordCallback;
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.Platform;
-import es.gob.afirma.core.misc.http.UrlHttpManagerFactory;
-import es.gob.afirma.core.misc.http.UrlHttpMethod;
 import es.gob.afirma.core.misc.protocol.UrlParametersForBatch;
 import es.gob.afirma.keystores.AOCertificatesNotFoundException;
 import es.gob.afirma.keystores.AOKeyStore;
@@ -30,9 +27,6 @@ final class ProtocolInvocationLauncherBatch {
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	private static final String RESULT_CANCEL = "CANCEL"; //$NON-NLS-1$
-
-	private static final String METHOD_OP_PUT = "put"; //$NON-NLS-1$
-	private static final String SYNTAX_VERSION = "1_0"; //$NON-NLS-1$
 
 	private ProtocolInvocationLauncherBatch() {
 		// No instanciable
@@ -174,7 +168,7 @@ final class ProtocolInvocationLauncherBatch {
 		if (options.getStorageServletUrl() != null) {
 			// Enviamos la firma cifrada al servicio remoto de intercambio
 			try {
-				sendData(batchResult, options);
+				IntermediateServerUtil.sendData(batchResult, options.getStorageServletUrl().toString(), options.getId());
 			}
 			catch (final Exception e) {
 				LOGGER.severe("Error al enviar los datos al servidor: " + e); //$NON-NLS-1$
@@ -192,30 +186,6 @@ final class ProtocolInvocationLauncherBatch {
 		}
 
 		return batchResult;
-	}
-
-	public static void sendErrorToServer(final String data, final UrlParametersForBatch options){
-		try {
-			sendData(data, options);
-		} catch (final IOException e1) {
-			LOGGER.severe("Error al enviar los datos del error en la operacion firma por lotes al servidor" + e1); //$NON-NLS-1$
-		}
-	}
-
-	private static void sendData(final String data, final UrlParametersForBatch options) throws IOException {
-
-		final StringBuffer url = new StringBuffer(options.getStorageServletUrl().toString());
-		url.append("?op=").append(METHOD_OP_PUT); //$NON-NLS-1$
-		url.append("&v=").append(SYNTAX_VERSION); //$NON-NLS-1$
-		url.append("&id=").append(options.getId()); //$NON-NLS-1$
-		url.append("&dat=").append(data); //$NON-NLS-1$
-
-		// Llamamos al servicio para guardar los datos
-		final byte[] result = UrlHttpManagerFactory.getInstalledManager().readUrl(url.toString(), UrlHttpMethod.POST);
-
-		LOGGER.info(
-			"Resultado del envio de datos de lote al servidor intermedio: " + new String(result) //$NON-NLS-1$
-		);
 	}
 
 	public static String getResultCancel() {

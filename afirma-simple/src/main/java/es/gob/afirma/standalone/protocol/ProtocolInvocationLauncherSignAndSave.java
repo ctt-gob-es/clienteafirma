@@ -20,8 +20,6 @@ import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.Platform;
-import es.gob.afirma.core.misc.http.UrlHttpManagerFactory;
-import es.gob.afirma.core.misc.http.UrlHttpMethod;
 import es.gob.afirma.core.misc.protocol.UrlParametersToSignAndSave;
 import es.gob.afirma.core.misc.protocol.UrlParametersToSignAndSave.Operation;
 import es.gob.afirma.core.signers.AOSignConstants;
@@ -43,8 +41,6 @@ import es.gob.afirma.standalone.crypto.CypherDataManager;
 final class ProtocolInvocationLauncherSignAndSave {
 
 	private static final char CERT_SIGNATURE_SEPARATOR = '|';
-	private static final String METHOD_OP_PUT = "put"; //$NON-NLS-1$
-	private static final String SYNTAX_VERSION = "1_0"; //$NON-NLS-1$
 
 	private static final String RESULT_CANCEL = "CANCEL"; //$NON-NLS-1$
 
@@ -480,7 +476,7 @@ final class ProtocolInvocationLauncherSignAndSave {
 		if (!bySocket) {
 			// Enviamos la firma cifrada al servicio remoto de intercambio
 			try {
-				sendData(dataToSend, options);
+				IntermediateServerUtil.sendData(dataToSend, options.getStorageServletUrl().toString(), options.getId());
 			}
 			catch (final Exception e) {
 				LOGGER.severe("Error al enviar los datos al servidor: " + e); //$NON-NLS-1$
@@ -527,28 +523,6 @@ final class ProtocolInvocationLauncherSignAndSave {
 		}
 
 		return signer.getSignedName(name, null);
-	}
-
-	public static void sendErrorToServer(final String data, final UrlParametersToSignAndSave options){
-		try {
-			sendData(new StringBuilder().append(data), options);
-		} catch (final IOException e1) {
-			LOGGER.severe("Error al enviar los datos del error en la operacion firma al servidor" + e1); //$NON-NLS-1$
-		}
-	}
-
-	private static void sendData(final StringBuilder data, final UrlParametersToSignAndSave options) throws IOException {
-
-		final StringBuffer url = new StringBuffer(options.getStorageServletUrl().toString());
-		url.append("?op=").append(METHOD_OP_PUT); //$NON-NLS-1$
-		url.append("&v=").append(SYNTAX_VERSION); //$NON-NLS-1$
-		url.append("&id=").append(options.getId()); //$NON-NLS-1$
-		url.append("&dat=").append(data.toString()); //$NON-NLS-1$
-
-		// Llamamos al servicio para guardar los datos
-		final byte[] result = UrlHttpManagerFactory.getInstalledManager().readUrl(url.toString(), UrlHttpMethod.POST);
-
-		LOGGER.info("Resultado: " + new String(result)); //$NON-NLS-1$
 	}
 
 	public static String getResultCancel() {

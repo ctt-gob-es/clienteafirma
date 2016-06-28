@@ -118,10 +118,10 @@ public final class ProtocolInvocationLauncher {
                 catch(final SocketOperationException e) {
                     LOGGER.severe("Error durante la operacion de firma por lotes: " + e); //$NON-NLS-1$
                     if (e.getErrorCode() == ProtocolInvocationLauncherBatch.getResultCancel()){
-                        ProtocolInvocationLauncherBatch.sendErrorToServer(e.getErrorCode(), params);
+                        sendErrorToServer(e.getErrorCode(), params.getStorageServletUrl().toString(), params.getId());
                     }
                     else {
-                        ProtocolInvocationLauncherBatch.sendErrorToServer(ProtocolInvocationLauncherErrorManager.getErrorMessage(e.getErrorCode()), params);
+                        sendErrorToServer(ProtocolInvocationLauncherErrorManager.getErrorMessage(e.getErrorCode()), params.getStorageServletUrl().toString(), params.getId());
                     }
                 }
             }
@@ -181,7 +181,19 @@ public final class ProtocolInvocationLauncher {
 
                     params = ProtocolInvocationUriParser.getParametersToSave(xmlData);
                 }
-                return  ProtocolInvocationLauncherSave.processSave(params);
+                try {
+                	return  ProtocolInvocationLauncherSave.processSave(params, bySocket);
+                }
+                // solo entra en la excepcion en el caso de que haya que devolver errores a traves del servidor intermedio
+                catch (final SocketOperationException e) {
+                    LOGGER.severe("Error en la operacion de guardado: " + e); //$NON-NLS-1$
+                    if (e.getErrorCode() == ProtocolInvocationLauncherSign.getResultCancel()){
+                        sendErrorToServer(e.getErrorCode(), params.getStorageServletUrl().toString(), params.getId());
+                    }
+                    else {
+                        sendErrorToServer(ProtocolInvocationLauncherErrorManager.getErrorMessage(e.getErrorCode()), params.getStorageServletUrl().toString(), params.getId());
+                    }
+                }
             }
             catch(final ParameterNeedsUpdatedVersionException e) {
                 LOGGER.severe("Se necesita una version mas moderna de AutoFirma para procesar la peticion: " + e); //$NON-NLS-1$
@@ -229,7 +241,19 @@ public final class ProtocolInvocationLauncher {
 
                     params = ProtocolInvocationUriParser.getParametersToSignAndSave(xmlData);
                 }
-                return  ProtocolInvocationLauncherSignAndSave.process(params, bySocket);
+
+                try {
+                	return  ProtocolInvocationLauncherSignAndSave.process(params, bySocket);
+                }
+                // solo entra en la excepcion en el caso de que haya que devolver errores a traves del servidor intermedio
+                catch(final SocketOperationException e) {
+                    if (e.getErrorCode() == ProtocolInvocationLauncherSign.getResultCancel()){
+                        sendErrorToServer(e.getErrorCode(), params.getStorageServletUrl().toString(), params.getId());
+                    }
+                    else {
+                       sendErrorToServer(ProtocolInvocationLauncherErrorManager.getErrorMessage(e.getErrorCode()), params.getStorageServletUrl().toString(), params.getId());
+                    }
+                }
             }
             catch(final ParameterNeedsUpdatedVersionException e) {
                 LOGGER.severe("Se necesita una version mas moderna de AutoFirma para procesar la peticion: " + e); //$NON-NLS-1$
@@ -290,18 +314,16 @@ public final class ProtocolInvocationLauncher {
                 try {
                     return ProtocolInvocationLauncherSign.processSign(params, bySocket);
                 }
-                // solo entra en la excepcion en el caso de que haya que devolver errores en el servidor en el envio por servicio web
-                catch(final SocketOperationException e){
+                // solo entra en la excepcion en el caso de que haya que devolver errores a traves del servidor intermedio
+                catch(final SocketOperationException e) {
                     LOGGER.severe("La operacion indicada no esta soportada: " + e); //$NON-NLS-1$
                     if (e.getErrorCode() == ProtocolInvocationLauncherSign.getResultCancel()){
-                        ProtocolInvocationLauncherSign.sendErrorToServer(e.getErrorCode(), params);
+                        sendErrorToServer(e.getErrorCode(), params.getStorageServletUrl().toString(), params.getId());
                     }
                     else {
-                        ProtocolInvocationLauncherSign.sendErrorToServer(ProtocolInvocationLauncherErrorManager.getErrorMessage(e.getErrorCode()), params);
+                       sendErrorToServer(ProtocolInvocationLauncherErrorManager.getErrorMessage(e.getErrorCode()), params.getStorageServletUrl().toString(), params.getId());
                     }
-
                 }
-
             }
             catch(final ParameterNeedsUpdatedVersionException e) {
                 LOGGER.severe("Se necesita una version mas moderna de AutoFirma para procesar la peticion: " + e); //$NON-NLS-1$
@@ -329,4 +351,19 @@ public final class ProtocolInvocationLauncher {
         }
         throw new IllegalStateException("Estado no permitido"); //$NON-NLS-1$
     }
+
+    /**
+     * Envia una cadena de texto al servidor intermedio.
+     * @param data Cadena de texto.
+     * @param serviceUrl URL del servicio de env&iacute;o de datos.
+     * @param id Identificador del mensaje en el servidor.
+     */
+	public static void sendErrorToServer(final String data, final String serviceUrl, final String id) {
+
+		try {
+			IntermediateServerUtil.sendData(data, serviceUrl, id);
+		} catch (final IOException e) {
+			LOGGER.severe("Error al enviar los datos del error al servidor intermedio: " + e); //$NON-NLS-1$
+		}
+	}
 }
