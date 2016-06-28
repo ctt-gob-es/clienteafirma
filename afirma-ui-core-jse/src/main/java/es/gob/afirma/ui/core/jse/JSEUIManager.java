@@ -555,7 +555,7 @@ public class JSEUIManager implements AOUIManager {
 
             	case JFileChooser.APPROVE_OPTION:
 
-	                file = fileChooser.getSelectedFile();
+            		file = fileChooser.getSelectedFile();
 
 	                // El dialogo no anade una extension por defecto aunque haya filtro, asi que lo hacemos a mano
 	                // si el usuario no ha puesto extension
@@ -607,6 +607,7 @@ public class JSEUIManager implements AOUIManager {
                         );
                         // Volvemos a intentar guardar
                         tryAgain = true;
+                        continue;
                     }
                     put(PREFERENCE_DIRECTORY, fileChooser.getCurrentDirectory().getPath());
                     return file;
