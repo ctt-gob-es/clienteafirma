@@ -81,6 +81,9 @@ final class ProtocolInvocationLauncherSignAndSave {
 		if (aoks == null) {
 			LOGGER.severe("No hay un KeyStore con el nombre: " + options.getDefaultKeyStore()); //$NON-NLS-1$
 			ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_07);
+			if (!bySocket){
+				throw new SocketOperationException(ProtocolInvocationLauncherErrorManager.SAF_07);
+			}
 			return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_07);
 		}
 
@@ -416,8 +419,22 @@ final class ProtocolInvocationLauncherSignAndSave {
 					null
 					);
 		}
+		catch(final AOCancelledOperationException e) {
+			LOGGER.severe("Operacion cancelada por el usuario" + e); //$NON-NLS-1$
+			if (!bySocket){
+				throw new SocketOperationException(RESULT_CANCEL);
+			}
+			return RESULT_CANCEL;
+		}
 		catch (final Exception e) {
-			LOGGER.warning("Error en el guardado de datos. Devolvemos la firma: " + e); //$NON-NLS-1$
+			LOGGER.severe("Error en el guardado de datos: " + e); //$NON-NLS-1$
+			ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_05);
+			if (!bySocket){
+				throw new SocketOperationException(
+						ProtocolInvocationLauncherErrorManager.SAF_09
+						);
+			}
+			return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_05);
 		}
 
 		// Concatenamos el certificado utilizado para firmar y la firma con un separador
