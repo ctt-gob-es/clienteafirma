@@ -102,35 +102,53 @@ public final class LookAndFeelManager {
             System.setProperty("apple.awt.graphics.EnableDeferredUpdates", "true"); //$NON-NLS-1$ //$NON-NLS-2$
             System.setProperty("apple.laf.useScreenMenuBar", "true"); //$NON-NLS-1$ //$NON-NLS-2$
         }
-        else {
-            try {
-                if (!defaultLookAndFeel) {
-                    for (final LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
-                        if ("Nimbus".equals(info.getName())) { //$NON-NLS-1$
-                            UIManager.setLookAndFeel(info.getClassName());
-                            return;
-                        }
-                    }
-                }
+        else if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
+        	boolean hdpiDevice = HDPIManager.isHDPIDevice();
+        	if(!hdpiDevice) {
+	        	if (!defaultLookAndFeel) {
+	            	setLookAndFeel("Nimbus"); //$NON-NLS-1$
+	            }
+        	}
+        	else {
+            	setLookAndFeel("Metal"); //$NON-NLS-1$
             }
-            catch (final Exception e) {
-                LOGGER.warning(
-                       "No se ha podido establecer el 'Look&Feel' Nimbus: " + e //$NON-NLS-1$
-                );
-            }
+        }
+        else if(!defaultLookAndFeel){
+        	setLookAndFeel("Nimbus"); //$NON-NLS-1$
         }
 
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
             LOGGER.info(
-                 "Establecido 'Look&Feel' " + UIManager.getLookAndFeel().getName() //$NON-NLS-1$
+                 "Establecido 'Look and Feel' " + UIManager.getLookAndFeel().getName() //$NON-NLS-1$
             );
         }
         catch (final Exception e2) {
             LOGGER.warning(
-                "No se ha podido establecer ningun 'Look&Feel': " + e2 //$NON-NLS-1$
+                "No se ha podido establecer ningun 'Look and Feel': " + e2 //$NON-NLS-1$
             );
         }
 
+    }
+    
+    //Define el look and feel
+    private static void setLookAndFeel(String lookandfeelName) {
+    	try {
+            for (final LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+                if (lookandfeelName.equals(info.getName())) {
+                    UIManager.setLookAndFeel(info.getClassName());
+                    LOGGER.info(
+                            "Establecido 'Look and Feel' " + lookandfeelName //$NON-NLS-1$
+                       );
+                	return;
+             	}
+             }
+            
+    	}
+    	 catch (final Exception e) {
+             LOGGER.warning(
+                    "No se ha podido establecer el 'Look&Feel' " + lookandfeelName + ": " + e //$NON-NLS-1$ //$NON-NLS-2$
+             );
+         }
     }
 }
