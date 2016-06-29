@@ -53,12 +53,12 @@ final class ConfiguratorFirefox {
 	private static final String LINUX_CHROMIUM_PREFS_PATH = "/.config/chromium/Local State";//$NON-NLS-1$
 	private static final String LINUX_CHROME_PREFS_PATH = "/.config/google-chrome/Local State";//$NON-NLS-1$
 	private static final String MACOSX_MOZILLA_PATH = "/Library/Application Support/firefox/profiles.ini";//$NON-NLS-1$
-	private static final String WINDOWS_MOZILLA_PATH = "\\AppData\\Roaming\\Mozilla\\Firefox\\profiles.ini"; //$NON-NLS-1$
+	private static String WINDOWS_MOZILLA_PATH = "\\AppData\\Roaming\\Mozilla\\Firefox\\profiles.ini"; //$NON-NLS-1$
 	static final String CERTUTIL_EXE;
 	private static final String FILE_CERTUTIL;
 	private static final String RESOURCE_BASE;
 
-	private static final String USERS_WINDOWS_PATH = "C:\\Users\\"; //$NON-NLS-1$
+	private static String USERS_WINDOWS_PATH = "C:\\Users\\"; //$NON-NLS-1$
 
 	static {
 		switch(Platform.getOS()) {
@@ -761,10 +761,17 @@ final class ConfiguratorFirefox {
 		  }
 		});
 		
+		//Para Windows XP la ruta de los perfiles de Firefox y de los usuarios es diferente
+		if(System.getProperty("os.name") != null && System.getProperty("os.name").contains("XP")) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			WINDOWS_MOZILLA_PATH = "\\Application Data\\Mozilla\\Firefox\\profiles.ini"; //$NON-NLS-1$
+			USERS_WINDOWS_PATH = "C:\\Documents and Settings\\"; //$NON-NLS-1$
+		}
 		// Obtenemos todos los directorios de perfil de Firefox del usuario
 		
 		boolean error = false;
+		
 		for(String profile : directories) {
+			LOGGER.info("Se comprueba la existencia del perfil de Firefox: " + USERS_WINDOWS_PATH + profile + WINDOWS_MOZILLA_PATH); //$NON-NLS-1$
 			if(new File(USERS_WINDOWS_PATH + profile + WINDOWS_MOZILLA_PATH).exists()) { 
 				final File profilesDir = new File(
 						MozillaKeyStoreUtilities.getMozillaUserProfileDirectoryWindows(
@@ -900,6 +907,13 @@ final class ConfiguratorFirefox {
 
 	private static ArrayList<File> getFirefoxProfilesDir() {
 		ArrayList<File> fileList = new ArrayList<>();
+		
+		//Para Windows XP la ruta de los perfiles de Firefox y de los usuarios es diferente
+		LOGGER.info("Version de Windows detectada: " + System.getProperty("os.name")); //$NON-NLS-1$ //$NON-NLS-2$
+		if(System.getProperty("os.name") != null && System.getProperty("os.name").contains("XP")) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			WINDOWS_MOZILLA_PATH = "\\Application Data\\Mozilla\\Firefox\\profiles.ini"; //$NON-NLS-1$
+			USERS_WINDOWS_PATH = "C:\\Documents and Settings\\"; //$NON-NLS-1$
+		}
 		
 		//Se obtienen todos los usuarios para los que se va a instalar el certificado en Firefox
 		File file = new File(USERS_WINDOWS_PATH);

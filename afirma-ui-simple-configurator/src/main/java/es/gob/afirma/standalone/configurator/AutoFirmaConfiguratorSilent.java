@@ -11,6 +11,7 @@
 package es.gob.afirma.standalone.configurator;
 
 import java.awt.Component;
+import java.io.File;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.logging.Logger;
@@ -27,6 +28,8 @@ public final class AutoFirmaConfiguratorSilent implements ConsoleListener {
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	private static final String PARAMETER_UNISTALL = "-uninstall"; //$NON-NLS-1$
+	private static final File TMP = new File("/var/tmp"); //$NON-NLS-1$
+	private static final File TEMP = new File("/var/temp"); //$NON-NLS-1$
 
 	private Configurator configurator;
 
@@ -35,7 +38,20 @@ public final class AutoFirmaConfiguratorSilent implements ConsoleListener {
 	static {
 		// Instalamos el registro a disco
 		try {
-			LogManager.install(App.AUTOFIRMA_CONFIGURATOR, System.getProperty("java.io.tmpdir")); //$NON-NLS-1$
+			if (Platform.getOS().equals(Platform.OS.MACOSX) || Platform.getOS().equals(Platform.OS.LINUX)) {
+				if (TMP.exists() && TMP.isDirectory() && TMP.canWrite()) {
+					LogManager.install(App.AUTOFIRMA_CONFIGURATOR, TMP.getAbsolutePath());
+				}
+				else if (TEMP.exists() && TEMP.isDirectory() && TEMP.canWrite()) {
+					LogManager.install(App.AUTOFIRMA_CONFIGURATOR, TEMP.getAbsolutePath());
+				}
+				else {
+					LogManager.install(App.AUTOFIRMA_CONFIGURATOR, System.getProperty("java.io.tmpdir")); //$NON-NLS-1$
+				}
+			}
+			else {
+				LogManager.install(App.AUTOFIRMA_CONFIGURATOR);
+			}
 		}
 		catch(final Exception e) {
 			LOGGER.severe("No ha sido posible instalar el gestor de registro: " + e); //$NON-NLS-1$
