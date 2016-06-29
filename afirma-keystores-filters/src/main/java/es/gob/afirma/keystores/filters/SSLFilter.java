@@ -62,7 +62,7 @@ public final class SSLFilter extends CertificateFilter {
 					if (this.isAuthenticationDnieCert(cert)) {
 						final String alias = getAssociatedCertAlias(ksm, cert, aliases, i);
 						if (alias != null) {
-							filteredCerts.add(aliases[i]);
+							filteredCerts.add(alias);
 						}
 					}
 					else {
