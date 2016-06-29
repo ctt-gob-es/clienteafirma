@@ -123,12 +123,6 @@ public final class SaveDataActivity extends ListActivity implements DownloadData
 				closeActivity();
 				return;
 			}
-			catch (final UnsupportedEncodingException e) {
-				showMessage(getString(R.string.error_bad_params));
-				Log.e(ES_GOB_AFIRMA, "Error de codificacion: " + e.toString()); //$NON-NLS-1$
-				closeActivity();
-				return;
-			}
 		}
 
 		UrlHttpManagerFactory.install(new AndroidUrlHttpManager());
@@ -345,12 +339,6 @@ public final class SaveDataActivity extends ListActivity implements DownloadData
 		catch (final ParameterException e) {
 			showMessage(getString(R.string.error_bad_params));
 			Log.e(ES_GOB_AFIRMA, "Error en los parametros XML de configuracion de guardado: " + e); //$NON-NLS-1$
-			closeActivity();
-			return;
-		}
-		catch (final UnsupportedEncodingException e) {
-			showMessage(getString(R.string.error_bad_params));
-			Log.e(ES_GOB_AFIRMA, "Error de codificacion en el XML de configuracion de guardado: " + e); //$NON-NLS-1$
 			closeActivity();
 			return;
 		}

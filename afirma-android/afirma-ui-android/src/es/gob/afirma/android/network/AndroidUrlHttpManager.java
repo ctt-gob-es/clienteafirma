@@ -32,6 +32,7 @@ import javax.net.ssl.X509TrustManager;
 
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.http.UrlHttpManager;
+import es.gob.afirma.core.misc.http.UrlHttpMethod;
 
 /** Implementacion de ua clase para la lectura del contenido de una URL.
  * @author Carlos Gamuci */
@@ -60,27 +61,11 @@ public final class AndroidUrlHttpManager implements UrlHttpManager {
 		}
 	};
 
-	/** Lee una URL HTTP o HTTPS por POST si se indican par&aacute;metros en la URL y por GET en caso contrario.
-	 * En HTTPS no se hacen comprobaciones del certificado servidor.
-	 * @param url URL a leer
-	 * @return Contenido de la URL
-	 * @throws IOException Si no se puede leer la URL */
-	@Override
-	public byte[] readUrlByPost(final String url) throws IOException {
+	private static byte[] readUrlByPost(final String url) throws IOException {
 		return readUrlByPost(url, DEFAULT_TIMEOUT, "application/x-www-form-urlencoded"); //$NON-NLS-1$
 	}
 
-	/** Lee una URL HTTP o HTTPS por POST si se indican par&aacute;metros en la URL y por GET en caso contrario.
-	 * En HTTPS no se hacen comprobaciones del certificado servidor.
-	 * @param url URL a leer
-	 * @param timeout Tiempo m&aacute;ximo en milisegundos que se debe esperar por la respuesta.
-	 *                Un timeout de 0 se interpreta como un timeout infinito.
-	 *                Si se indica -1, se usar&aacute; el por defecto de Java.
-	 * @param contentType Se ignora este par&aacute;metro.
-	 * @return Contenido de la URL
-	 * @throws IOException Si no se puede leer la URL */
-	@Override
-	public byte[] readUrlByPost(final String url, final int timeout, final String contentType) throws IOException {
+	private static byte[] readUrlByPost(final String url, final int timeout, final String contentType) throws IOException {
 		if (url == null) {
 			throw new IllegalArgumentException("La URL a leer no puede ser nula"); //$NON-NLS-1$
 		}
@@ -132,12 +117,7 @@ public final class AndroidUrlHttpManager implements UrlHttpManager {
 		return data;
 	}
 
-	/** Lee una URL HTTP o HTTPS por GET. En HTTPS no se hacen comprobaciones del certificado servidor.
-	 * @param url URL a leer
-	 * @return Contenido de la URL
-	 * @throws IOException Si no se puede leer la URL */
-	@Override
-	public byte[] readUrlByGet(final String url) throws IOException {
+	private static byte[] readUrlByGet(final String url) throws IOException {
 		final URL uri = new URL(url);
 		if (uri.getProtocol().equals("https")) { //$NON-NLS-1$
 			try {
@@ -177,5 +157,22 @@ public final class AndroidUrlHttpManager implements UrlHttpManager {
 				return true;
 			}
 		});
+	}
+
+	@Override
+	public byte[] readUrl(String url, int timeout, String contentType, String accept, UrlHttpMethod method)
+			throws IOException {
+		if(method.compareTo(UrlHttpMethod.GET) == 1) {
+			return readUrlByGet(url);
+		}
+		return readUrlByPost(url, timeout, contentType);
+	}
+
+	@Override
+	public byte[] readUrl(String url, UrlHttpMethod method) throws IOException {
+		if(method.compareTo(UrlHttpMethod.GET) == 1) {
+			return readUrlByGet(url);
+		}
+		return readUrlByPost(url);
 	}
 }
