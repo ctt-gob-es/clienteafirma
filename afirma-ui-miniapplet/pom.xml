@@ -250,6 +250,12 @@
 							</excludes>
 						</filter>
 						<filter>
+							<artifact>es.gob.afirma:afirma-keystores-mozilla</artifact>
+							<excludes>
+								<exclude>nss/**</exclude>
+							</excludes>
+						</filter>
+						<filter>
 							<artifact>net.java.xades:jxades</artifact>
 							<excludes>
 								<exclude>TrustRootCACertificates/**</exclude>
@@ -259,7 +265,7 @@
 					</filters>
 				</configuration>
 			</plugin>
-
+ 
 			<plugin>
 				<groupId>com.github.wvengen</groupId>
 				<artifactId>proguard-maven-plugin</artifactId>
@@ -311,6 +317,9 @@
 					<archive>
 						<manifestFile>src/main/resources/META-INF/MANIFEST.MF</manifestFile>
 					</archive>
+					<excludes>
+						<exclude>**/nss/**</exclude>
+					</excludes>
 				</configuration>
 			</plugin>
 		</plugins>
