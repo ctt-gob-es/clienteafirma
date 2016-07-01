@@ -57,7 +57,7 @@ public final class DesCipher {
 		return desCipher.doFinal(data);
 	}
 
-	/** Rellena un array de bytes para que sea m&uacute;ltiplo de la cantidad indicada.
+	/** Rellena un array de bytes, si es necesario, para que sea m&uacute;ltiplo de la cantidad indicada.
 	 * @param data Datos de entrada
 	 * @param padding M&acute;ltiplo
 	 * @return Datos con el relleno a&ntilde;adido */
