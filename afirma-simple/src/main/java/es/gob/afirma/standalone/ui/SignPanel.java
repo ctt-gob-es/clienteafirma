@@ -468,7 +468,7 @@ public final class SignPanel extends JPanel {
 				try {
 			        file = AOUIFactory.getLoadFiles(
 			    		SimpleAfirmaMessages.getString("SignPanel.35"), //$NON-NLS-1$
-			    		getSimpleAfirma().getCurrentDir() != null ? getSimpleAfirma().getCurrentDir().getAbsolutePath() : null,
+			    		null,
 			    		null,
 			    		null,
 			    		null,

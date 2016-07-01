@@ -116,8 +116,6 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
     private Container container;
     private JPanel currentPanel;
 
-    private File currentDir;
-
     private AOKeyStoreManager ksManager;
     private final MainMenu mainMenu;
 
@@ -391,18 +389,6 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
         if (this.mainMenu != null) {
             this.mainMenu.setEnabledSignCommand(e);
         }
-    }
-
-    /** Establece el directorio actual para la lectura y guardado de ficheros.
-     * @param dir Directorio actual, incluyendo su ruta completa */
-    public void setCurrentDir(final File dir) {
-        this.currentDir = dir;
-    }
-
-    /** Obtiene el directorio actual para la lectura y guardado de ficheros.
-     * @return Directorio actual para la lectura y guardado de ficheros. */
-    public File getCurrentDir() {
-        return this.currentDir;
     }
 
     /** Firma el fichero actualmente cargado. Este m&eacute;todo se situa

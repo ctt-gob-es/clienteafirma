@@ -35,21 +35,9 @@ import es.gob.afirma.standalone.AutoFirmaUtil;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.ui.CommonWaitDialog;
 
-/** Di&aacute;logo para la comprobaci&oacute;n de huellas digitales.
- * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
+/** Di&aacute;logo para la comprobaci&oacute;n de huellas digitales. */
 public final class CheckHashDialog extends JDialog implements KeyListener {
 
-	/** Inicia el proceso de compobaci&oacute;n de huella digital.
-	 * @param parent Componente padre para la modalidad. */
-	public static void startHashCheck(final Frame parent) {
-		final CheckHashDialog chkd = new CheckHashDialog(parent);
-		chkd.setSize(600, 250);
-		chkd.setResizable(false);
-		chkd.setLocationRelativeTo(parent);
-		chkd.setVisible(true);
-	}
-
-	private static final long serialVersionUID = 8075570205961862205L;
 	private static final int SIZE_WAIT = 50000000; //Tamano en bytes
 
 	private final JTextField textFieldHash = new JTextField();
@@ -402,4 +390,13 @@ public final class CheckHashDialog extends JDialog implements KeyListener {
 		}
 	}
 
+	/** Inicia el proceso de comprobaci&oacute;n de huella digital.
+	 * @param parent Componente padre para la modalidad. */
+	public static void launch(final Frame parent) {
+		final CheckHashDialog chkd = new CheckHashDialog(parent);
+		chkd.setSize(600, 250);
+		chkd.setResizable(false);
+		chkd.setLocationRelativeTo(parent);
+		chkd.setVisible(true);
+	}
 }

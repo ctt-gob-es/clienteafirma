@@ -18,7 +18,6 @@ import javax.swing.SwingWorker;
 
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOFormatFileException;
-import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.keystores.AOCertificatesNotFoundException;
@@ -309,18 +308,13 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
         final String fDescription = filterDescription;
         final String[] fExtensions = filterExtensions;
 
-        if (this.signPanel.getSimpleAfirma().getCurrentDir() == null) {
-            this.signPanel.getSimpleAfirma().setCurrentDir(new File(Platform.getUserHome()));
-        }
-
         final File fd;
         try {
+        	final File currentDataFile = this.signPanel.getCurrentFile();
 	    	fd = AOUIFactory.getSaveDataToFile(
     			signResult,
     			SimpleAfirmaMessages.getString("SignPanel.81"), //$NON-NLS-1$
-    			this.signPanel.getSimpleAfirma().getCurrentDir() != null ?
-					this.signPanel.getSimpleAfirma().getCurrentDir().getAbsolutePath() :
-						null,
+    			currentDataFile != null ? currentDataFile.getParent() : null,
     			newFileName,
     			fExtensions,
     			fDescription,
@@ -345,8 +339,6 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
         finally {
         	this.signPanel.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
         }
-
-        this.signPanel.getSimpleAfirma().setCurrentDir(fd);
 
         this.signPanel.getSimpleAfirma().loadResultsPanel(
     		signResult,

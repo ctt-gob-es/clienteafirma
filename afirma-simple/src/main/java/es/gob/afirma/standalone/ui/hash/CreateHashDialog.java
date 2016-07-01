@@ -305,7 +305,7 @@ public final class CreateHashDialog extends JDialog implements KeyListener{
 								hash,
 						SimpleAfirmaMessages.getString("CreateHashDialog.8"), //$NON-NLS-1$,,,
 						null,
-						AutoFirmaUtil.sfn2lfn(new File(file)).getName() + ext,
+						AutoFirmaUtil.getCanonicalFile(new File(file)).getName() + ext,
 						new String[] { ext },
 						SimpleAfirmaMessages.getString("CreateHashDialog.9") + " (*" + ext + ")",  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
 						parent

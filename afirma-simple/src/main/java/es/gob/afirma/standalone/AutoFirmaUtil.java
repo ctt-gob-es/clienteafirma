@@ -170,7 +170,7 @@ public final class AutoFirmaUtil {
 	/** Devuelve el fichero en su forma can&oacute;nica.
 	 * @param file Fichero del cual obtener su forma can&oacute;nica.
 	 * @return Fichero en su forma can&oacute;nica o el fichero de entrada si hay error.*/
-	public static File sfn2lfn(final File file) {
+	public static File getCanonicalFile(final File file) {
 		try {
 			return file.getCanonicalFile();
 		}

@@ -316,7 +316,7 @@ public final class CreateHashFiles extends JDialog {
 				xml.getBytes(),
 				SimpleAfirmaMessages.getString("CreateHashFiles.19"), //$NON-NLS-1$ ,,,
 				null,
-				AutoFirmaUtil.sfn2lfn(new File(dir)).getName() + ext,
+				AutoFirmaUtil.getCanonicalFile(new File(dir)).getName() + ext,
 				new String[] { ext },
 				SimpleAfirmaMessages.getString("CreateHashDialog.9") + " (*" + ext + ")", //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
 				parent
@@ -362,7 +362,7 @@ public final class CreateHashFiles extends JDialog {
 				SimpleAfirmaMessages.getString("CreateHashFiles.11"), //$NON-NLS-1$
 				null,
 				null,
-				new String[] {},
+				null,
 				SimpleAfirmaMessages.getString("CreateHashDialog.7"), //$NON-NLS-1$
 				true,
 				false,
