@@ -784,10 +784,10 @@ final class ConfiguratorFirefox {
 					}
 		
 					final String[] certutilCommands = new String[] {
-							certutilExe,
+							"\"" + certutilExe + "\"", //$NON-NLS-1$ //$NON-NLS-2$
 							"-D", //$NON-NLS-1$
 							"-d", //$NON-NLS-1$
-							profileDir.getAbsolutePath(),
+							"\"" + profileDir.getAbsolutePath() + "\"", //$NON-NLS-1$ //$NON-NLS-2$
 							"-n", //$NON-NLS-1$
 							"\"" + ConfiguratorUtil.CERT_ALIAS + "\"", //$NON-NLS-1$ //$NON-NLS-2$
 					};
