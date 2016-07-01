@@ -32,7 +32,7 @@ public final class CypherDataManager {
 		if (cypherKey != null) {
 			return decipherData(recoveredData, cypherKey);
 		}
-		return Base64.decode(recoveredData, true);
+		return Base64.decode(recoveredData);
 	}
 
 	/** Descifra una cadena de datos. Esta cadena viene precedida por el n&uacute;mero de caracteres de padding que
@@ -56,7 +56,7 @@ public final class CypherDataManager {
 		}
 
 		final byte[] decipheredData = DesCipher.decipher(
-				Base64.decode(data.substring(dotPos + 1).replace('+', '-').replace('/', '_'), true),
+				Base64.decode(data.substring(dotPos + 1).replace('-', '+').replace('_', '/')),
 				cipherKey);
 
 		return padding == 0 ? decipheredData : Arrays.copyOf(decipheredData, decipheredData.length - padding);
