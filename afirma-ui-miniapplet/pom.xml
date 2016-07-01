@@ -14,7 +14,7 @@
 		<afirma.keytool.alias>codesign</afirma.keytool.alias>
 		<afirma.keytool.password>afirma</afirma.keytool.password>
 		<afirma.jar.name>miniapplet-full</afirma.jar.name>
-		<afirma.legible.version>1_4</afirma.legible.version>
+		<afirma.legible.version>1_5</afirma.legible.version>
 	</properties>
 
 	<profiles>
