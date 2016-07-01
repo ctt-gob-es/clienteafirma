@@ -477,6 +477,10 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
      * @param args Par&aacute;metros en l&iacute;nea de comandos */
     public static void main(final String[] args) {
 
+    	// Configuramos el log de la aplicacion
+    	configureLog();
+    	
+    	// Se define el look and feel
     	LookAndFeelManager.applyLookAndFeel();
 
        	AutoFirmaUtil.setProxySettings();
@@ -503,9 +507,6 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 				}
 			).start();
 		}
-
-    	// Configuramos el log de la aplicacion
-    	configureLog();
 
         // Propiedades especificas para Mac OS X
         if (Platform.OS.MACOSX.equals(Platform.getOS())) {

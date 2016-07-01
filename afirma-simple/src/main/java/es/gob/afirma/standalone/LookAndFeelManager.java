@@ -119,9 +119,6 @@ public final class LookAndFeelManager {
 
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-            LOGGER.info(
-                 "Establecido 'Look and Feel' " + UIManager.getLookAndFeel().getName() //$NON-NLS-1$
-            );
         }
         catch (final Exception e2) {
             LOGGER.warning(
@@ -137,9 +134,6 @@ public final class LookAndFeelManager {
             for (final LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
                 if (lookandfeelName.equals(info.getName())) {
                     UIManager.setLookAndFeel(info.getClassName());
-                    LOGGER.info(
-                            "Establecido 'Look and Feel' " + lookandfeelName //$NON-NLS-1$
-                       );
                 	return;
              	}
              }

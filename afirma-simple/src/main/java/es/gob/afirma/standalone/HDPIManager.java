@@ -42,7 +42,6 @@ public class HDPIManager {
 	 */
 	public static boolean isHDPIDevice() {
 		String modelName = executeWmicCommand();
-		LOGGER.info("Modelo de PC detectado: " + modelName); //$NON-NLS-1$
 		// En caso de ser una surface con HDPI se utiliza el Look&Feel Metal. 
     	// En caso contrario se utiliza Nimbus.
     	boolean hdpiDevice = false;
@@ -62,12 +61,6 @@ public class HDPIManager {
 	                      "No se ha podido abrir el fichero de dispositivos HDPI: " + e //$NON-NLS-1$
 	               );
 	         }
-    	if(hdpiDevice) {
-    		LOGGER.info("El modelo " + modelName + " tiene resolucion HDPI"); //$NON-NLS-1$ //$NON-NLS-2$
-    	}
-    	else {
-    		LOGGER.info("El modelo " + modelName + " no tiene resolucion HDPI"); //$NON-NLS-1$ //$NON-NLS-2$
-    	}
     	return hdpiDevice;
 	}
     

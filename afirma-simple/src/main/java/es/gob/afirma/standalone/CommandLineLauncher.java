@@ -29,6 +29,8 @@ import java.security.UnrecoverableEntryException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.Properties;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -84,10 +86,15 @@ final class CommandLineLauncher {
 
 	static void processCommandLine(final String[] args) {
 
-		// Desactivamos el Logger para que no interfiera con la consola
+		// Desactivamos el Logger de consola para que no interfiera con los comandos
 		//TODO: Descomentar para poner en produccion
-		Logger.getLogger("es.gob.afirma").setLevel(Level.OFF); //$NON-NLS-1$
-
+		Handler[] handlers = Logger.getLogger("es.gob.afirma").getHandlers(); //$NON-NLS-1$
+		for(Handler handler : handlers) {
+			if(handler instanceof ConsoleHandler) {
+				handler.setLevel(Level.OFF);
+			}
+		}
+		
 		final Console console = System.console();
 
 		try (
