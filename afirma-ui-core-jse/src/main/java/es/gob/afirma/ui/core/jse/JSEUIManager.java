@@ -443,20 +443,9 @@ public class JSEUIManager implements AOUIManager {
         if (selectDirectory) {
         	jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         }
-        if (currentDir == null) {
-        	final String newDir = get(PREFERENCE_DIRECTORY, currentDir);
-        	if (newDir != null) {
-        		jfc.setCurrentDirectory(new File(newDir));
-        	}
-        }
-        if (filename != null) {
-        	if (currentDir != null) {
-        		jfc.setSelectedFile(new File(currentDir, filename));
-        	}
-        	else {
-        		jfc.setSelectedFile(new File(filename));
-        	}
-        }
+
+        // Configuramos el directorio y fichero por defecto
+        configureDefaultDir(jfc, currentDir, filename);
 
         jfc.setMultiSelectionEnabled(multiSelect);
         if (dialogTitle != null && dialogTitle.length() > 0) {
@@ -516,24 +505,8 @@ public class JSEUIManager implements AOUIManager {
             	fileChooser.setDialogTitle(dialogTitle);
             }
 
-            // El metodo setSelectedFile determina tambien el directorio actual, asi que lo usamos cuando
-            // se indica el nombre de fichero
-            if (selectedFile != null && currentDir != null) {
-            	fileChooser.setSelectedFile(
-        			new File(currentDir, selectedFile)
-    			);
-            }
-            else if (selectedFile != null) {
-            	fileChooser.setSelectedFile(
-        			new File(selectedFile)
-    			);
-            }
-            else if (currentDir == null) {
-            	final String newDir = get(PREFERENCE_DIRECTORY, currentDir);
-            	if (newDir != null) {
-            		fileChooser.setCurrentDirectory(new File(newDir));
-            	}
-            }
+            // Configuramos el directorio y fichero por defecto
+            configureDefaultDir(fileChooser, currentDir, selectedFile);
 
             // Solo aplicamos el filtro cuando este definido para evitar que el
             // desplegable de la ventana de guardado nos aparecezca vacio
@@ -619,6 +592,39 @@ public class JSEUIManager implements AOUIManager {
 
         // Devolvemos el path del fichero en el que se han guardado los datos
         return resultFile;
+    }
+
+    /**
+     * Configura un {@code JFileChooser} para que muestre por defecto un directorio y nombre de fichero.
+     * Si no se proporciona el directorio, se leer&aacute; de las preferencias de la aplicaci&oacute;n.
+     * En caso de no haber directorio por defecto (es nulo y no est&aacute; en preferencias, se mostrar&aacute;
+     * el por defecto de Java (directorio del usuario) y, en caso de no haber nombre de fichero, se dejar&aacute;
+     * sin configurar.
+     * @param jfc Selector de fichero.
+     * @param defaultDir Directorio por defecto.
+     * @param filename Nombre de fichero.
+     */
+    private void configureDefaultDir(final JFileChooser jfc, final String defaultDir, final String filename) {
+
+    	// El metodo setSelectedFile determina tambien el directorio actual, asi que lo usamos cuando
+        // se indica el nombre de fichero
+        if (filename != null && defaultDir != null) {
+        	jfc.setSelectedFile(new File(defaultDir, filename));
+        }
+        else {
+        	final String newDir = defaultDir != null ? defaultDir : get(PREFERENCE_DIRECTORY, null);
+        	if (filename != null) {
+        		if (newDir != null) {
+        			jfc.setSelectedFile(new File(newDir, filename));
+        		}
+        		else {
+        			jfc.setSelectedFile(new File(filename));
+        		}
+        	}
+        	else if (newDir != null) {
+        		jfc.setCurrentDirectory(new File(newDir));
+        	}
+        }
     }
 
     /** Filtra los ficheros por extensi&oacute;n para los di&aacute;logos de
