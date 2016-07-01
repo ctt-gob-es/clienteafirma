@@ -100,7 +100,7 @@ final class MozillaKeyStoreUtilitiesWindows {
 		);
 
 		if (dir == null) {
-			throw new FileNotFoundException("No se encuentra el dierctorio de NSS en Windows"); //$NON-NLS-1$
+			throw new FileNotFoundException("No se encuentra el directorio de NSS en Windows"); //$NON-NLS-1$
 		}
 
 		// Tenemos la ruta del NSS, comprobamos adecuacion por bugs de Java
