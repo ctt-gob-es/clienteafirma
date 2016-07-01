@@ -129,7 +129,7 @@ public final class MainMenu extends JMenuBar {
 				try {
 					fileToLoad = AOUIFactory.getLoadFiles(
 						SimpleAfirmaMessages.getString("MainMenu.4"), //$NON-NLS-1$
-						MainMenu.this.getSimpleAfirma().getCurrentDir() != null ? MainMenu.this.getSimpleAfirma().getCurrentDir().getAbsolutePath() : null,
+						null,
 						null,
 						null,
 						null,
@@ -201,7 +201,7 @@ public final class MainMenu extends JMenuBar {
 		checkHashFileMenuItem.setAccelerator(KeyStroke.getKeyStroke(
 				KeyEvent.VK_U, Toolkit.getDefaultToolkit()
 						.getMenuShortcutKeyMask()));
-		checkHashFileMenuItem.addActionListener(e -> CheckHashDialog.startHashCheck(getParentComponent())
+		checkHashFileMenuItem.addActionListener(e -> CheckHashDialog.launch(getParentComponent())
 		);
 
 		final JMenuItem createHashDirMenuItem = new JMenuItem(
