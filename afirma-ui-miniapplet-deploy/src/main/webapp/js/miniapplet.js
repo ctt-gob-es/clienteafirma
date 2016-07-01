@@ -207,6 +207,7 @@ var MiniApplet = ( function ( window, undefined ) {
 
 		var downloadSuccessFunction = null;
 		var downloadErrorFunction = null;
+		var downloadTypeData = null;
 		
 		/**
 		 * Realiza la descarga de datos de una URL y, una vez termina, llama al metodo
@@ -220,16 +221,61 @@ var MiniApplet = ( function ( window, undefined ) {
 			
 			var httpRequest = getHttpRequest();
 			httpRequest.open("GET", url, true);
-			httpRequest.overrideMimeType('text\/plain; charset=x-user-defined');
-			httpRequest.onreadystatechange = function (evt) {
+			
+			// new browsers (XMLHttpRequest2-compliant)
+			if ('responseType' in httpRequest && !!Uint8Array) {
+				httpRequest.responseType = 'arraybuffer';
+				downloadTypeData = 'arraybuffer';
+			}
+			// old browsers (XMLHttpRequest-compliant)
+			else
+				if ('overrideMimeType' in httpRequest) {
+				httpRequest.overrideMimeType('text\/plain; charset=x-user-defined');
+				downloadTypeData = 'string';
+			}
+			// IE9 (Microsoft.XMLHTTP-compliant)
+			else {
+				httpRequest.setRequestHeader('Accept-Charset', 'x-user-defined');
+				downloadTypeData = 'bytearray';
+			}
+			
+			// shim for onload for old IE
+			if (!('onload' in httpRequest)) {
+				httpRequest.onreadystatechange = function () {
+					if (this.readyState === 4) {
+						this.onload();
+					}
+				};
+			}
+
+			httpRequest.onload = function (evt) {
 				if (httpRequest.readyState == 4 && httpRequest.status == 200) {
 					if (downloadSuccessFunction) {
-						downloadSuccessFunction(Base64.encode(httpRequest.responseText));
+
+						// emulating response field for IE9
+						if (!('response' in this)) {
+							this.response = new VBArray(this.responseBody).toArray();
+						}
+
+						var b64;
+						if (downloadTypeData == 'arraybuffer') {
+							b64 = Base64.encodeArrayBuffer(this.response);
+						}
+						else if (downloadTypeData == 'bytearray') { 
+							b64 = Base64.encodeByteArray(this.response);
+						}
+						else if (downloadTypeData == 'string') {
+							b64 = Base64.encode(this.response);
+						}
+						else {
+							this.onerror(new Error("No se conoce el modo usado para la descarga de los datos"));
+						}
+						downloadSuccessFunction(b64);
 					}
 //					else {
 //						console.log("Se termino la descarga de los datos. No se invoca a ninguna funcion.");
 //					}
-				}	
+				}
 			}
 			httpRequest.onerror = function(e) {
 				if (downloadErrorFunction) {
@@ -350,11 +396,14 @@ var MiniApplet = ( function ( window, undefined ) {
 			JAVA_ARGUMENTS = MiniApplet.JAVA_ARGUMENTS;
 			SYSTEM_PROPERTIES = MiniApplet.SYSTEM_PROPERTIES;
 
-			// Establecemos cual sera el keystore por defecto
+			// Establecemos cual sera el keystore por defecto 
 			defaultKeyStore = keystore;
 			if (!defaultKeyStore) {
 				defaultKeyStore = getDefaultKeystore();
 			}
+
+			// Configuramos los argumentos para la seleccion de almacen
+			configureKeyStore();
 
 			// Si estamos claramente en un sistema movil o que no permite la ejecucion de Java,
 			// cargamos directamente el Cliente JavaScript
@@ -370,18 +419,10 @@ var MiniApplet = ( function ( window, undefined ) {
 				return;
 			}
 
-			// Configuramos los argumentos para la seleccion de almacen
-			configureKeyStore();
-
 			// Incluso si el navegador informa que hay Java, puede no haberlo (Internet Explorer
 			// siempre dice que hay), asi que cargamos el applet, pero tenemos en cuenta que en
 			// caso de error debemos cargar el cliente JavaScript
 			codeBase = (base != undefined && base != null) ? base : './';
-
-			var keystoreConfig = keystore;
-			if (keystoreConfig == undefined) {
-				keystoreConfig = null;
-			}
 
 			var attributes = {
 					'id': 'miniApplet',
@@ -395,7 +436,7 @@ var MiniApplet = ( function ( window, undefined ) {
 			// asi que (salvo los argumentos de carga) vamos a pasarlos como un parametro mas al
 			// applet para luego establecerlos internamente.
 			var parameters = {
-					'keystore': keystoreConfig,
+					'keystore': defaultKeyStore,
 					'userAgent': window.navigator.userAgent,
 					'archive': codeBase + '/' + JAR_NAME,
 					'code': 'es.gob.afirma.miniapplet.MiniAfirmaApplet',
@@ -439,7 +480,9 @@ var MiniApplet = ( function ( window, undefined ) {
 			}
 		}
 
-		function getDefaultKeystore(){
+		/** Obtiene el nombre del almacen que corresponde al presente navegador o, si se debe acceder
+		 * al almacen del sistema, se devuelve null. */
+		function getDefaultKeystore() {
 			if(isFirefox()){
 				return KEYSTORE_MOZILLA;
 			}
@@ -843,6 +886,11 @@ var MiniApplet = ( function ( window, undefined ) {
 		 * En caso contrario, la comunicacion se realizara mediante un servidor intermedio.
 		 */
 		function cargarAppAfirma(clientAddress, keystore) {
+			
+			if (!keystore) {
+				keystore = getDefaultKeystore();
+			}
+			
 			if (!isIOS() && !isAndroid() && !isOldInternetExplorer() && !forceWSMode){
 				clienteFirma = new AppAfirmaJSSocket(clientAddress, window, undefined);
 				clienteFirma.setKeyStore(keystore);
@@ -962,6 +1010,7 @@ var MiniApplet = ( function ( window, undefined ) {
 			 */
 			function setKeyStore (keystore) {
 				defaultKeyStore = keystore;
+				port = "";
 			}
 			
 			/**
@@ -1087,17 +1136,17 @@ var MiniApplet = ( function ( window, undefined ) {
 					batchB64 = batchB64.replace(/\+/g, "-").replace(/\//g, "_");
 				}
 				
-				var data = generateDataToBatch(defaultKeyStore, storageServletAddress, batchPreSignerUrl, batchPostSignerUrl, extraParams, batchB64);
+				var data = generateDataToBatch(defaultKeyStore, batchPreSignerUrl, batchPostSignerUrl, extraParams, batchB64);
 				execAppIntent(buildUrl(data));
 			}
 			
 			/**
 			 * Genera el objeto con los datos de la transaccion para la firma
 			 */
-			function generateDataToBatch(defaultKeyStore, storageServletAddress, batchPreSignerUrl, batchPostSignerUrl, extraParams, batchB64) {
+			function generateDataToBatch(keystore, batchPreSignerUrl, batchPostSignerUrl, extraParams, batchB64) {
 				var data = new Object();
 				data.op = generateDataKeyValue("op","batch");
-				data.keystore = generateDataKeyValue("keystore", defaultKeyStore);
+				data.keystore = generateDataKeyValue("keystore", keystore != null ? Base64.encode(keystore) : null);
 				data.batchpresignerurl = generateDataKeyValue("batchpresignerurl", batchPreSignerUrl);
 				data.batchpostsignerurl = generateDataKeyValue("batchpostsignerurl", batchPostSignerUrl);
 				data.properties = generateDataKeyValue ("properties", extraParams != null ? Base64.encode(extraParams) : null);
@@ -1234,7 +1283,7 @@ var MiniApplet = ( function ( window, undefined ) {
 			function generateDataToSign(signId, algorithm, format, extraParams, dataB64, keystore) {
 				var data = new Object();
 				data.op = generateDataKeyValue("op", signId);
-				data.keystore = generateDataKeyValue ("keystore", keystore);
+				data.keystore = generateDataKeyValue ("keystore", keystore != null ? Base64.encode(keystore) : null);
 				data.algorithm = generateDataKeyValue ("algorithm", algorithm);
 				data.format = generateDataKeyValue ("format", format); 
 				data.properties = generateDataKeyValue ("properties", extraParams != null ? Base64.encode(extraParams) : null);
@@ -1250,9 +1299,9 @@ var MiniApplet = ( function ( window, undefined ) {
 				var data = new Object();
 				data.op = generateDataKeyValue("op", "signandsave");
 				data.cryptoOp = generateDataKeyValue("cop", signId);
-				data.keystore = generateDataKeyValue ("keystore", keystore);
+				data.keystore = generateDataKeyValue ("keystore", keystore != null ? Base64.encode(keystore) : null);
 				data.algorithm = generateDataKeyValue ("algorithm", algorithm);
-				data.format = generateDataKeyValue ("format", format); 
+				data.format = generateDataKeyValue ("format", format);
 				data.properties = generateDataKeyValue ("properties", extraParams != null ? Base64.encode(extraParams) : null);
 				data.filename = generateDataKeyValue ("filename", outputFileName);
 				data.dat = generateDataKeyValue ("dat", dataB64 == "" ? null : dataB64);
@@ -1849,7 +1898,6 @@ var MiniApplet = ( function ( window, undefined ) {
 
 			var UnsupportedOperationException = "java.lang.UnsupportedOperationException";
 
-
 			/* Longitud maxima de una URL en Android para la invocacion de una aplicacion nativa. */
 			var MAX_LONG_ANDROID_URL = 2000;
 			
@@ -1950,7 +1998,7 @@ var MiniApplet = ( function ( window, undefined ) {
 				if (idSession != null && idSession != undefined) {		params[i++] = {key:"id", value:idSession}; }
 				if (cipherKey != null && cipherKey != undefined) {		params[i++] = {key:"key", value:cipherKey}; }
 				if (defaultKeyStore != null &&
-						defaultKeyStore != undefined) {					params[i++] = {key:"keystore", value:defaultKeyStore}; }
+						defaultKeyStore != undefined) {					params[i++] = {key:"keystore", value:Base64.encode(defaultKeyStore)}; }
 				if (storageServletAddress != null &&
 						storageServletAddress != undefined) {			params[i++] = {key:"stservlet", value:storageServletAddress}; }
 				if (format != null && format != undefined) {			params[i++] = {key:"format", value:format}; }
@@ -2570,9 +2618,15 @@ var MiniApplet = ( function ( window, undefined ) {
 				}
 
 				// Se ha cancelado la operacion
-				if (html.indexOf("CANCEL")!= -1) {
+				if (html == "CANCEL" || html == "CANCEL\r\n") {
 					errorCallback("es.gob.afirma.core.AOCancelledOperationException", "Operacion cancelada por el usuario");
 					return false;
+				}
+				
+				// La operacion ha finalizado correctamene (Funcion de guardado)
+				if (html == "OK" || html == "OK\r\n") {
+					successCallback();
+					return true;
 				}
 
 				// Se ha producido un error
@@ -2868,6 +2922,68 @@ var Base64 = {
 			return output;
 		},
 
+		/**
+		 * Codifica los datos binarios obtenidos en un ArrayBuffer.
+		 */
+		encodeArrayBuffer : function(input, URL_SAFE) {
+			
+			var uInt8Array = new Uint8Array(input);
+		    var i = uInt8Array.length;
+		    var binaryString = new Array(i);
+		    while (i--)
+		    {
+		      binaryString[i] = String.fromCharCode(uInt8Array[i]);
+		    }
+
+		    return URL_SAFE ?
+		    		window.btoa(binaryString.join('')).replace('+', '-').replace('/', '_') :
+		    			window.btoa(binaryString.join(''));
+		},
+		
+		/**
+		 * Codifica un array de bytes a Base64.
+		 *
+		 * @param {Array.<number>|Uint8Array} input An array of bytes (numbers with
+		 *     value in [0, 255]) to encode.
+		 * @param {boolean=} opt_webSafe Boolean indicating we should use the
+		 *     alternative alphabet.
+		 * @return {string} The base64 encoded string.
+		 */
+		encodeByteArray : function(input, URL_SAFE) {
+
+		  var keyStr = (URL_SAFE == true) ? this._keyStr_URL_SAFE : this._keyStr;
+
+		  var output = [];
+
+		  for (var i = 0; i < input.length; i += 3) {
+		    var byte1 = input[i];
+		    var haveByte2 = i + 1 < input.length;
+		    var byte2 = haveByte2 ? input[i + 1] : 0;
+		    var haveByte3 = i + 2 < input.length;
+		    var byte3 = haveByte3 ? input[i + 2] : 0;
+
+		    var outByte1 = byte1 >> 2;
+		    var outByte2 = ((byte1 & 0x03) << 4) | (byte2 >> 4);
+		    var outByte3 = ((byte2 & 0x0F) << 2) | (byte3 >> 6);
+		    var outByte4 = byte3 & 0x3F;
+
+		    if (!haveByte3) {
+		      outByte4 = 64;
+
+		      if (!haveByte2) {
+		        outByte3 = 64;
+		      }
+		    }
+
+		    output.push(keyStr.charAt(outByte1),
+		    			keyStr.charAt(outByte2),
+		    			keyStr.charAt(outByte3),
+		    			keyStr.charAt(outByte4));
+		  }
+
+		  return output.join('');
+		},
+		
 		// public method for decoding
 		decode : function (input, URL_SAFE) {
 			
