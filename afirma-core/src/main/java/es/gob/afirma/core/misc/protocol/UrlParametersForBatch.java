@@ -79,12 +79,12 @@ public final class UrlParametersForBatch extends UrlParameters {
 			setSessionId(signatureSessionId);
 		}
 
-		// Version minima requerida del aplicativo
+		// Version minima requerida del protocolo que se debe soportar
 		if (params.containsKey(VER_PARAM)) {
 			setMinimumVersion(params.get(VER_PARAM));
 		}
 		else {
-			setMinimumVersion("0"); //$NON-NLS-1$
+			setMinimumVersion(Integer.toString(ProtocolVersion.VERSION_0.getVersion()));
 		}
 
 		// Si hemos recibido el identificador para la descarga de la configuracion,

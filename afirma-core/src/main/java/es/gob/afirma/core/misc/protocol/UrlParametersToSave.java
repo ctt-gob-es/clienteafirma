@@ -22,16 +22,19 @@ public final class UrlParametersToSave extends UrlParameters {
 	private static final String TITLE_PARAM = "title"; //$NON-NLS-1$
 
 	/** Par&aacute;metro de entrada con la descripci&oacute;n del tipo de fichero de salida. */
-	private static final String FILETYPE_DESCRIPTION = "desc"; //$NON-NLS-1$
+	private static final String FILETYPE_DESCRIPTION_PARAM = "desc"; //$NON-NLS-1$
 
 	/** Par&aacute;metro de entrada con el nombre propuesto para un fichero. */
 	private static final String FILENAME_PARAM = "filename"; //$NON-NLS-1$
 
 	/** Par&aacute;metro de entrada con las extensiones recomendadas para el fichero de salida. */
-	private static final String FILENAME_EXTS = "exts"; //$NON-NLS-1$
+	private static final String FILENAME_EXTS_PARAM = "exts"; //$NON-NLS-1$
 
 	/** Par&aacute;metro de entrada con el identificador del documento. */
 	private static final String ID_PARAM = "id"; //$NON-NLS-1$
+
+	/** Par&aacute;metro de entrada con la m&iacute;nima versi&oacute;n requerida del aplicativo a usar en la invocaci&oacute;n por protocolo. */
+	private static final String VER_PARAM = "ver"; //$NON-NLS-1$
 
 	/** N&uacute;mero m&aacute;ximo de caracteres permitidos para el identificador de sesi&oacute;n de la operaci&oacute;n. */
 	private static final int MAX_ID_LENGTH = 20;
@@ -40,6 +43,7 @@ public final class UrlParametersToSave extends UrlParameters {
 	private String filename = null;
 	private String extensions = null;
 	private String fileTypeDescription = null;
+	private String minimumVersion = null;
 
 	/** Establece la descripci&oacute;n del tipo de fichero a guardar.
 	 * @param desc Descripci&oacute;n del tipo de fichero a guardar */
@@ -67,6 +71,12 @@ public final class UrlParametersToSave extends UrlParameters {
 		this.title = title;
 	}
 
+	/** Establece la versi&oacute;n m&iacute;nima exigida del protocolo de comunicaci&oacute;n.
+	 * @param minVer Versi&oacute;n m&iacute;nima del protocolo. */
+	void setMinimumVersion(final String minVer) {
+		this.minimumVersion = minVer;
+	}
+
 	/** Obtiene la descripci&oacute;n del tipo de fichero a guardar.
 	 * @return Descripci&oacute;n del tipo de fichero a guardar */
 	public String getFileTypeDescription() {
@@ -91,6 +101,12 @@ public final class UrlParametersToSave extends UrlParameters {
 	 * @return T&iacute;tulo del di&aacute;logo de guardado de datos */
 	public String getTitle() {
 		return this.title;
+	}
+
+	/** Obtiene la versi&oacute;n m&iacute;nima requerida del aplicativo.
+	 * @return Versi&oacute;n m&iacute;nima requerida del aplicativo. */
+	public String getMinimumVersion() {
+		return this.minimumVersion;
 	}
 
 	void setSaveParameters(final Map<String, String> params) throws ParameterException {
@@ -128,6 +144,14 @@ public final class UrlParametersToSave extends UrlParameters {
 			}
 
 			setSessionId(signatureSessionId);
+		}
+
+		// Version minima requerida del protocolo que se debe soportar
+		if (params.containsKey(VER_PARAM)) {
+			setMinimumVersion(params.get(VER_PARAM));
+		}
+		else {
+			setMinimumVersion(Integer.toString(ProtocolVersion.VERSION_0.getVersion()));
 		}
 
 		// Comprobamos la validez de la URL del servlet de guardado en caso de indicarse
@@ -169,8 +193,8 @@ public final class UrlParametersToSave extends UrlParameters {
 
 	private static String verifyExtensions(final Map<String, String> params) throws ParameterException {
 		String extensions = null;
-		if (params.containsKey(FILENAME_EXTS)) {
-			extensions = params.get(FILENAME_EXTS);
+		if (params.containsKey(FILENAME_EXTS_PARAM)) {
+			extensions = params.get(FILENAME_EXTS_PARAM);
 			// Determinamos si el nombre tiene algun caracter que no consideremos valido para un nombre de fichero
 			for (final char invalidChar : "\\/:*?\"<>|; ".toCharArray()) { //$NON-NLS-1$
 				if (extensions.indexOf(invalidChar) != -1) {
@@ -190,12 +214,12 @@ public final class UrlParametersToSave extends UrlParameters {
 
 	private static String verifyFileTypeDescription(final Map<String, String> params) {
 		String desc = null;
-		if (params.containsKey(FILETYPE_DESCRIPTION)) {
-			desc = params.get(FILETYPE_DESCRIPTION);
+		if (params.containsKey(FILETYPE_DESCRIPTION_PARAM)) {
+			desc = params.get(FILETYPE_DESCRIPTION_PARAM);
 			// Anadimos las extensiones si fuese preciso
-			if (params.containsKey(FILENAME_EXTS) && !desc.endsWith(")")) { //$NON-NLS-1$
+			if (params.containsKey(FILENAME_EXTS_PARAM) && !desc.endsWith(")")) { //$NON-NLS-1$
 				final StringBuilder sb = new StringBuilder(desc).append(" ("); //$NON-NLS-1$
-				for (final String ext : params.get(FILENAME_EXTS).split(",")) { //$NON-NLS-1$
+				for (final String ext : params.get(FILENAME_EXTS_PARAM).split(",")) { //$NON-NLS-1$
 					sb.append("*."); //$NON-NLS-1$
 					sb.append(ext);
 				}
