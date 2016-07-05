@@ -125,6 +125,7 @@ public final class ValidateBinarySignature {
      * firma o estos no pueden recuperarse.
      * @throws CertificateExpiredException Cuando el certificado est&aacute;a caducado.
      * @throws CertificateNotYetValidException Cuando el certificado aun no es v&aacute;lido.
+     * @throws CertificateException Cuando no se puede componer el certificado.
      * @throws NoSuchAlgorithmException Cuando no se reconoce o soporta alguno de los
      * algoritmos utilizados en la firma.
      * @throws NoMatchDataException Cuando los datos introducidos no coinciden con los firmados.
@@ -133,7 +134,9 @@ public final class ValidateBinarySignature {
      * @throws IOException Cuando no se puede crear un certificado desde la firma para validarlo
      * @throws OperatorCreationException Cuando no se puede crear el validado de contenido de firma*/
     private static void verifySignatures(final byte[] sign, final byte[] data) throws CMSException,
-                                                                                      CertificateException,
+    																				  CertificateExpiredException,
+    																				  CertificateNotYetValidException,
+    																				  CertificateException,
                                                                                       IOException,
                                                                                       OperatorCreationException {
 
@@ -158,6 +161,8 @@ public final class ValidateBinarySignature {
 				)
     		);
 
+            cert.checkValidity();
+
             if (!signer.verify(new SignerInformationVerifier(
             	new	DefaultCMSSignatureAlgorithmNameGenerator(),
             	new DefaultSignatureAlgorithmIdentifierFinder(),
@@ -166,9 +171,6 @@ public final class ValidateBinarySignature {
     		))) {
             	throw new CMSException("Firma no valida"); //$NON-NLS-1$
             }
-
         }
-
     }
-
 }
