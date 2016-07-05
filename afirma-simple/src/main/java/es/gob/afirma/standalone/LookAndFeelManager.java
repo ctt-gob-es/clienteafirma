@@ -74,9 +74,11 @@ public final class LookAndFeelManager {
     /** Establece el decorado de la aplicaci&oacute;n. */
     public static void applyLookAndFeel() {
 
-        final boolean defaultLookAndFeel = HIGH_CONTRAST || LARGE_FONT;
+    	// Comprobamos si esta activado algun modo de accesibilidad. Si es asi,
+    	// usaremos el LookAndFeel del sistema
+        final boolean useSystemLookAndFeel = HIGH_CONTRAST || LARGE_FONT;
 
-        if (!defaultLookAndFeel) {
+        if (!useSystemLookAndFeel) {
             UIManager.put("Button.defaultButtonFollowsFocus", Boolean.TRUE); //$NON-NLS-1$
             UIManager.put("RootPane.background", WINDOW_COLOR); //$NON-NLS-1$
             UIManager.put("TextPane.background", WINDOW_COLOR); //$NON-NLS-1$
@@ -102,13 +104,12 @@ public final class LookAndFeelManager {
             System.setProperty("apple.awt.graphics.EnableDeferredUpdates", "true"); //$NON-NLS-1$ //$NON-NLS-2$
             System.setProperty("apple.laf.useScreenMenuBar", "true"); //$NON-NLS-1$ //$NON-NLS-2$
         }
+        // Configuracion necesaria para que la aplicacion se muestre correctamente en pantallas HDPI
         else if (Platform.OS.WINDOWS.equals(Platform.getOS()) && HDPIManager.isHDPIDevice()) {
            	setLookAndFeel("Metal"); //$NON-NLS-1$
         }
-        else if(!defaultLookAndFeel){
-        	setLookAndFeel("Nimbus"); //$NON-NLS-1$
-        }
-        else {
+        // Configuramos el Look&Feel del sistema si se considero necesario por los modos de accesibilidad
+        else if(useSystemLookAndFeel){
         	try {
         		UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         	}
@@ -117,6 +118,9 @@ public final class LookAndFeelManager {
         				"No se ha podido establecer ningun 'Look&Feel': " + e2 //$NON-NLS-1$
         				);
         	}
+        }
+        else {
+        	setLookAndFeel("Nimbus"); //$NON-NLS-1$
         }
     }
 
