@@ -102,34 +102,26 @@ public final class LookAndFeelManager {
             System.setProperty("apple.awt.graphics.EnableDeferredUpdates", "true"); //$NON-NLS-1$ //$NON-NLS-2$
             System.setProperty("apple.laf.useScreenMenuBar", "true"); //$NON-NLS-1$ //$NON-NLS-2$
         }
-        else if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
-        	boolean hdpiDevice = HDPIManager.isHDPIDevice();
-        	if(!hdpiDevice) {
-	        	if (!defaultLookAndFeel) {
-	            	setLookAndFeel("Nimbus"); //$NON-NLS-1$
-	            }
-        	}
-        	else {
-            	setLookAndFeel("Metal"); //$NON-NLS-1$
-            }
+        else if (Platform.OS.WINDOWS.equals(Platform.getOS()) && HDPIManager.isHDPIDevice()) {
+           	setLookAndFeel("Metal"); //$NON-NLS-1$
         }
         else if(!defaultLookAndFeel){
         	setLookAndFeel("Nimbus"); //$NON-NLS-1$
         }
-
-        try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        else {
+        	try {
+        		UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        	}
+        	catch (final Exception e2) {
+        		LOGGER.warning(
+        				"No se ha podido establecer ningun 'Look&Feel': " + e2 //$NON-NLS-1$
+        				);
+        	}
         }
-        catch (final Exception e2) {
-            LOGGER.warning(
-                "No se ha podido establecer ningun 'Look and Feel': " + e2 //$NON-NLS-1$
-            );
-        }
-
     }
-    
+
     //Define el look and feel
-    private static void setLookAndFeel(String lookandfeelName) {
+    private static void setLookAndFeel(final String lookandfeelName) {
     	try {
             for (final LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
                 if (lookandfeelName.equals(info.getName())) {
@@ -137,7 +129,7 @@ public final class LookAndFeelManager {
                 	return;
              	}
              }
-            
+
     	}
     	 catch (final Exception e) {
              LOGGER.warning(
