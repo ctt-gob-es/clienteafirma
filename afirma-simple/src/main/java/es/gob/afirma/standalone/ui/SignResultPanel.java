@@ -108,6 +108,7 @@ final class SignResultPanel extends JPanel {
                     case ALGORITHM_NOT_SUPPORTED: errorMessage = SimpleAfirmaMessages.getString("SignResultPanel.22"); break; //$NON-NLS-1$
                     default:
                         errorMessage = SimpleAfirmaMessages.getString("SignResultPanel.6"); //$NON-NLS-1$
+                        Logger.getLogger("es.gob.afirma").warning("No se ha identificado el motivo por el que la firma no es valida: " + validity.getError()); //$NON-NLS-1$ //$NON-NLS-2$
                     }
                 }
                 else {
