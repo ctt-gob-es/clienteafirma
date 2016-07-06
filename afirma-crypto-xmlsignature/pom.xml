@@ -29,7 +29,7 @@
 		<dependency>
 			<groupId>net.java.xades</groupId>
 			<artifactId>jxades</artifactId>
-			<version>0.1.5-SNAPSHOT</version>
+			<version>0.1.5</version>
 		</dependency>
 		
 	</dependencies>
