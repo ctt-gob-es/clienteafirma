@@ -9,6 +9,7 @@ import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.misc.protocol.ParameterLocalAccessRequestedException;
 import es.gob.afirma.core.misc.protocol.ParameterNeedsUpdatedVersionException;
 import es.gob.afirma.core.misc.protocol.ProtocolInvocationUriParser;
+import es.gob.afirma.core.misc.protocol.ProtocolVersion;
 import es.gob.afirma.core.misc.protocol.UrlParametersForBatch;
 import es.gob.afirma.core.misc.protocol.UrlParametersToSave;
 import es.gob.afirma.core.misc.protocol.UrlParametersToSelectCert;
@@ -26,8 +27,11 @@ public final class ProtocolInvocationLauncher {
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
     private static final String RESULT_OK = "OK"; //$NON-NLS-1$
+
+    static final ProtocolVersion MAX_PROTOCOL_VERSION_SUPPORTED = ProtocolVersion.VERSION_1;
+
     /** Constructor vac&iacute;o privado para que no se pueda instanciar la clase ya que es est&aacute;tico. */
-    private ProtocolInvocationLauncher(){
+    private ProtocolInvocationLauncher() {
         // No instanciable
     }
 

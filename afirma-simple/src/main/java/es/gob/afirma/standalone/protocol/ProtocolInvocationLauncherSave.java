@@ -19,6 +19,13 @@ final class ProtocolInvocationLauncherSave {
 	}
 
 	static String processSave(final UrlParametersToSave  options, final boolean bySocket) throws SocketOperationException {
+
+		if (!ProtocolInvocationLauncher.MAX_PROTOCOL_VERSION_SUPPORTED.support(options.getMinimumVersion())) {
+			LOGGER.severe(String.format("Version de protocolo no soportada (%1s). Version actual: %s2. Hay que actualizar la aplicacion.", options.getMinimumVersion(), ProtocolInvocationLauncher.MAX_PROTOCOL_VERSION_SUPPORTED)); //$NON-NLS-1$
+			ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_21);
+			return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_21);
+		}
+
 		try {
 			if (Platform.OS.MACOSX.equals(Platform.getOS())) {
 				ServiceInvocationManager.focusApplication();
