@@ -1113,7 +1113,7 @@ var MiniApplet = ( function ( window, undefined ) {
 				}
 
 				var data = generateDataToSignAndSave(signId, algorithm, format, extraParams, outputFileName, dataB64, defaultKeyStore);
-				
+
 				execAppIntent(buildUrl(data));
 			}
 
@@ -1910,6 +1910,9 @@ var MiniApplet = ( function ( window, undefined ) {
 			/* Longitud maxima que generalmente se permite a una URL. */
 			var MAX_LONG_GENERAL_URL = 2000;
 			
+			/** Version del protocolo utilizada. */
+			var PROTOCOL_VERSION = 1;
+			
 			/**
 			 *  Atributos para la configuracion del objeto sustituto del applet Java de firma
 			 */
@@ -1994,6 +1997,7 @@ var MiniApplet = ( function ( window, undefined ) {
 
 				var i = 0;
 				var params = new Array();
+				params[i++] = {key:"ver", value:PROTOCOL_VERSION};
 				if (signId != null && signId != undefined) {			params[i++] = {key:"op", value:signId}; }
 				if (idSession != null && idSession != undefined) {		params[i++] = {key:"id", value:idSession}; }
 				if (cipherKey != null && cipherKey != undefined) {		params[i++] = {key:"key", value:cipherKey}; }
@@ -2051,6 +2055,7 @@ var MiniApplet = ( function ( window, undefined ) {
 				var opId = "signandsave";
 				var params = new Array();
 				
+				params[i++] = {key:"ver", value:PROTOCOL_VERSION};
 				params[i++] = {key:"op", value:opId};
 				if (signId != null && signId != undefined) {			params[i++] = {key:"cop", value:signId}; }
 				if (idSession != null && idSession != undefined) {		params[i++] = {key:"id", value:idSession}; }
@@ -2103,6 +2108,7 @@ var MiniApplet = ( function ( window, undefined ) {
 
 				var i = 0;
 				var params = new Array();
+				params[i++] = {key:"ver", value:PROTOCOL_VERSION};
 				params[i++] = {key:"op", value:opId};
 				if (idSession != null && idSession != undefined) {		params[i++] = {key:"id", value:idSession}; }
 				if (cipherKey != null && cipherKey != undefined) {		params[i++] = {key:"key", value:cipherKey}; }
@@ -2165,6 +2171,7 @@ var MiniApplet = ( function ( window, undefined ) {
 				var i = 0;
 				var opId = "save";
 				var params = new Array();
+				params[i++] = {key:"ver", value:PROTOCOL_VERSION};
 				params[i++] = {key:"op", value:opId};
 				if (idSession != null && idSession != undefined) {		params[i++] = {key:"id", value:idSession}; }
 				if (cipherKey != null && cipherKey != undefined) {		params[i++] = {key:"key", value:cipherKey}; }
@@ -2653,17 +2660,6 @@ var MiniApplet = ( function ( window, undefined ) {
 					if (cipherKey != undefined && cipherKey != null) {
 						certificate = decipher(html.substring(0, sepPos), cipherKey);
 						signature = decipher(html.substring(sepPos + 1), cipherKey);
-						
-						//XXX: Solucion provisional derivada de un error de compatibilidad entre
-						// las funciones de cifrado de Java y la clase de cifrado utilizada.
-						
-						// Cuando se aprecia que el resultado es una firma XML, nos aseguramos de
-						// que no haya basura al final buscando el ultimo cierre de etiqueta entre
-						// los ultimos caracteres. Si este existe y no es el ultimo, cortamos ahi.
-						var i = signature.substring(signature.length - 10).lastIndexOf(">");
-						if (i != -1 && i != 9) {	
-							signature = signature.substring(0, signature.length - 10 + i + 1);
-						}
 					}
 					else {
 						certificate = fromBase64UrlSaveToBase64(html.substring(0, sepPos));
@@ -2755,7 +2751,7 @@ var MiniApplet = ( function ( window, undefined ) {
 				var padding = cipheredData.substr(0, dotPos);
 				
 				var deciphered = Cipher.des(key, Cipher.base64ToString(fromBase64UrlSaveToBase64(cipheredData.substr(dotPos + 1))), 0, 0, null);
-				return Cipher.stringToBase64(deciphered.substr(0, deciphered.length - (padding == 0 ? 8 : padding) - 8));
+				return Cipher.stringToBase64(deciphered.substr(0, deciphered.length - parseInt(padding) - 8));
 			}
 			
 			/**
