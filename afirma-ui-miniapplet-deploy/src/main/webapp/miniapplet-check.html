@@ -5,11 +5,10 @@
         <meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
 	<script type="text/javascript" src="js_test/deployJava.js"></script>
 	<script type="text/javascript" src="js_test/TestEnvironment.js"></script>
+	<script type="text/javascript" src="js/constantes.js"></script>
 	<script type="text/javascript" src="js/miniapplet.js"></script>
 	
 	<script type="text/javascript">
-
-		var HOST = "172.24.30.232:8080";
 
 		function checkOperatingSystem() {
 			printOs();
@@ -153,7 +152,7 @@
   </head>
 	<body>
 		<script type="text/javascript">
-			MiniApplet.cargarMiniApplet('http://' + HOST + '/afirma-ui-miniapplet-deploy');
+			MiniApplet.cargarMiniApplet(Constants.URL_BASE_APPLET);
 		</script>
 
 		<table>

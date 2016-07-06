@@ -4,22 +4,27 @@
 	<title>Ejemplo de despliegue del MiniApplet @firma</title>
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
 	<script type="text/javascript" src="js/miniapplet.js"></script>
+	<script type="text/javascript" src="js/constantes.js"></script>
 	<script type="text/javascript">
 
 		// IMPORTANTE: PARA PRUEBAS, USAR SIEMPRE UNA IP O NOMBRE DE DOMINIO, NUNCA 'LOCALHOST' O '127.0.0.1'
 		// SI NO SE HACE ASI, AUTOFIRMA BLOQUEARA LA FIRMA POR SEGURIDAD
-		var HOST = "http://prevalide.redsara.es/firmaMovil";
-
 		function saveSignature() {
 			MiniApplet.saveDataToFile(
 					document.getElementById('result').value,
 					"Guardar firma electr\u00F3nica",
 					null,
 					null,
-					null);
+					null,
+					showSaveOkCallback,
+					showErrorCallback);
 		}
 
-		function showResultCallback(signatureB64, certificateB64) {
+		function showSaveOkCallback() {
+			showLog("Guardado OK");
+		}
+		
+		function showSignResultCallback(signatureB64, certificateB64) {
 			showLog("Firma OK");
 			document.getElementById('result').value = signatureB64;
 		}
@@ -42,7 +47,7 @@
 					document.getElementById("algorithm").value,
 					document.getElementById("format").value,
 					document.getElementById("params").value,
-					showResultCallback,
+					showSignResultCallback,
 					showErrorCallback);
 				
 			} catch(e) {
@@ -67,24 +72,37 @@
 		}
 		
 		function downloadedSuccessCallback(data) {
-			document.getElementById("data").value = data;
-			doSign();
+			try {
+				MiniApplet.sign(
+					(data != undefined && data != null && data != "") ? data : null,
+					document.getElementById("algorithm").value,
+					document.getElementById("format").value,
+					document.getElementById("params").value,
+					showSignResultCallback,
+					showErrorCallback);
+			} catch(e) {
+				try {
+					showLog("Type: " + MiniApplet.getErrorType() + "\nMessage: " + MiniApplet.getErrorMessage());
+				} catch(ex) {
+					showLog("Error: " + e);
+				}
+			}
 		}
 		
 		function downloadedErrorCallback(e) {
 			showLog("Error en la descarga de los datos: " + e);
 		}
-		
+
 		function doSignBatch() {
 			try {
 				var batch = createBatchConfiguration();
 
 				MiniApplet.signBatch(
 					MiniApplet.getBase64FromText(batch),
-					HOST + '/afirma-server-triphase-signer/BatchPresigner', //$NON-NLS-1$
-					HOST + '/afirma-server-triphase-signer/BatchPostsigner', //$NON-NLS-1$
+					Constants.URL_BASE_SERVICES + '/afirma-server-triphase-signer/BatchPresigner', //$NON-NLS-1$
+					Constants.URL_BASE_SERVICES + '/afirma-server-triphase-signer/BatchPostsigner', //$NON-NLS-1$
 					document.getElementById("params").value,
-					showResultCallback,
+					showSignResultCallback,
 					showErrorCallback);
 
 			} catch(e) {
@@ -118,7 +136,6 @@
 			"  <format>CAdES</format>\r\n" + //$NON-NLS-1$
 			"  <suboperation>sign</suboperation>\r\n" + //$NON-NLS-1$
 			"  <extraparams>cG9saWN5SWRlbnRpZmllcj11cm46b2lkOjIuMTYuNzI0LjEuMy4xLjEuMi4xLjlcbnBvbGljeVF1YWxpZmllcj1odHRwczovL3NlZGUuMDYwLmdvYi5lcy9wb2xpdGljYV9kZV9maXJtYV9hbmV4b18xLnBkZlxucG9saWN5SWRlbnRpZmllckhhc2hBbGdvcml0aG09aHR0cDovL3d3dy53My5vcmcvMjAwMC8wOS94bWxkc2lnI3NoYTFcbnBvbGljeUlkZW50aWZpZXJIYXNoPUc3cm91Y2Y2MDArZjAzci9vMGJBT1E2V0FzMD0=</extraparams>\r\n" + //$NON-NLS-1$
-			// cG9saWN5SWRlbnRpZmllcj11cm46b2lkOjIuMTYuNzI0LjEuMy4xLjEuMi4xLjlcbnBvbGljeVF1YWxpZmllcj1odHRwczovL3NlZGUuMDYwLmdvYi5lcy9wb2xpdGljYV9kZV9maXJtYV9hbmV4b18xLnBkZlxucG9saWN5SWRlbnRpZmllckhhc2hBbGdvcml0aG09aHR0cDovL3d3dy53My5vcmcvMjAwMC8wOS94bWxkc2lnI3NoYTFcbnBvbGljeUlkZW50aWZpZXJIYXNoPUc3cm91Y2Y2MDArZjAzci9vMGJBT1E2V0FzMD0=
 			"  <signsaver>\r\n" + //$NON-NLS-1$
 			"   <class>es.gob.afirma.signers.batch.SignSaverFile</class>\r\n" + //$NON-NLS-1$
 			"   <config>" + config2 + "</config>\r\n" + //$NON-NLS-1$
@@ -138,7 +155,7 @@
 					document.getElementById("algorithm").value,
 					document.getElementById("format").value,
 					document.getElementById("params").value,
-					showResultCallback,
+					showSignResultCallback,
 					showErrorCallback);
 
 			} catch(e) {
@@ -155,7 +172,7 @@
 					document.getElementById("algorithm").value,
 					document.getElementById("format").value,
 					document.getElementById("params").value,
-					showResultCallback,
+					showSignResultCallback,
 					showErrorCallback);
 			} catch(e) {
 				showLog("Type: " + MiniApplet.getErrorType() + "\nMessage: " + MiniApplet.getErrorMessage());
@@ -173,6 +190,30 @@
 			}
 		}
 
+		function doSignAndSave(cryptoOp) {
+			
+			try {				
+				var data = document.getElementById("data").value;
+
+				MiniApplet.signAndSaveToFile(
+					cryptoOp,
+					(data != undefined && data != null && data != "") ? data : null,
+					document.getElementById("algorithm").value,
+					document.getElementById("format").value,
+					document.getElementById("params").value,
+					null,
+					showSignResultCallback,
+					showErrorCallback);
+
+			} catch(e) {
+				try {
+					showLog("Type: " + MiniApplet.getErrorType() + "\nMessage: " + MiniApplet.getErrorMessage());
+				} catch(ex) {
+					showLog("Error: " + e);
+				}
+			}
+		}
+		
 		function showAppletLog() {
 			try {
 				showLog(MiniApplet.getCurrentLog());
@@ -231,10 +272,10 @@
   </head>
 	<body>
 		<script type="text/javascript">
-			MiniApplet.setForceWSMode(true);
-			MiniApplet.cargarMiniApplet(HOST + '/afirma-ui-miniapplet-deploy');
-			//MiniApplet.cargarMiniApplet(HOST + '/afirma-ui-miniapplet-deploy');
-			MiniApplet.setServlets(HOST + "/afirma-signature-storage/StorageService", HOST + "/afirma-signature-retriever/RetrieveService");
+			MiniApplet.cargarMiniApplet(Constants.URL_BASE_APPLET);
+			//MiniApplet.setForceWSMode(true); 
+			//MiniApplet.cargarAppAfirma(Constants.URL_BASE_APPLET);
+			MiniApplet.setServlets(Constants.URL_BASE_SERVICES + "/afirma-signature-storage/StorageService", Constants.URL_BASE_SERVICES + "/afirma-signature-retriever/RetrieveService");
 		</script>
 
 		<fieldset><legend>Entrada de datos (Opcional)</legend>
@@ -251,7 +292,7 @@
 		</div>
 		</fieldset>
 		<br/>
-		
+
 		<fieldset><legend>Configuraci&oacute;n de la firma</legend>
 		<div>
 		 <label for="format">Formato</label>
@@ -285,9 +326,7 @@
 		 <input type="button" value="Limpiar" onclick="cleanExtraParams();">&nbsp;
 		 <span>(Insertar las propiedades de una en una)</span>
 		 <br>
-<!--		 <textarea id="params" cols="50" rows="5" readonly>serverUrl=http://prevalide.redsara.es/firmaMovil/afirma-server-triphase-signer/SignatureService -->
-		<textarea id="params" cols="50" rows="5" readonly>serverUrl=http://10.1.51.27:8080/firmaMovil/afirma-server-triphase-signer/SignatureService
-</textarea>
+		<textarea id="params" cols="50" rows="5" readonly></textarea>
 		</div>
 		</fieldset>
 		<br/>
@@ -297,6 +336,9 @@
 		<input type="button" value="Cofirmar" onclick="doCoSign();">&nbsp;
 		<input type="button" value="Contrafirmar" onclick="doCounterSign();">
 		<input type="button" value="Seleccionar certificado" onclick="doSelectCert();">
+		<input type="button" value="Firmar y guardar" onclick="doSignAndSave('sign');">
+		<input type="button" value="Cofirmar y guardar" onclick="doSignAndSave('cosign');">
+		<input type="button" value="Contrafirmar y guardar" onclick="doSignAndSave('countersign');">
 		<input type="button" value="Mostrar Log" onclick="showAppletLog();">
 		<input type="button" value="Descargar y firmar" onclick="downloadAndSign();">
 		<br/>
@@ -317,4 +359,9 @@
 		</div>
 		<input type="button" value="Guardar" onclick="saveSignature();">
 	</body>
+	
+	<script type="text/javascript">
+		var paramsElement = document.getElementById("params");
+		paramsElement.innerHTML = "serverUrl=" + Constants.URL_BASE_SERVICES + "/afirma-server-triphase-signer/SignatureService\n";
+	</script>
 </html>	

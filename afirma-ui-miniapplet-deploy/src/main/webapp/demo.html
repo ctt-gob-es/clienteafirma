@@ -21,6 +21,7 @@
 		APPLET   { width:1px; height:1px; position:absolute; top:50%; left:50%; }
 	</style>
 	<script type="text/javascript" src="js/miniapplet.js"></script>
+	<script type="text/javascript" src="js/constantes.js"></script>
 	<script type="text/javascript" defer="defer">
 	<!--
 		/* Indica si debe firmarse un fichero (true) o el formulario de la pagina (false) */ 
@@ -37,8 +38,7 @@
 			mostrarDialogoEspera();
 			
 			var params = 	"mode=explicit\n" +
-							"serverUrl=https://valide.redsara.es/firmaMovil/afirma-server-triphase-signer/SignatureService";
-							//"serverUrl=http://prevalide.redsara.es/firmaMovil/afirma-server-triphase-signer/SignatureService";
+							"serverUrl=" + Constants.URL_BASE_SERVICES + "/afirma-server-triphase-signer/SignatureService";
 
 			var dataB64 = null;
 
@@ -221,7 +221,7 @@
 
 	<div class="lblAnchoMaxMB">
 			<span>1. <a id="afirmaStoreLink" href="http://firmaelectronica.gob.es/Home/Descargas.html">Descargue Autofirma</a></span>
-			<span id="faq_link" style="display: block; padding-left: 50px; padding-top: 10px">Si tiene dudas o alg&uacute;n problema durante la instalaci&oacute;n, consulte la <a target="_blank" href="http://incidencias-ctt.administracionelectronica.gob.es/wiki/doku.php?id=instalacion_de_autofirma">Wiki del proyecto</a></span>
+			<span id="faq_link" style="display: block; padding-left: 50px; padding-top: 10px">Si tiene dudas o alg&uacute;n problema durante la instalaci&oacute;n, consulte la <a target="_blank" href="https://github.com/ctt-gob-es/clienteafirma/wiki/Instalaci%C3%B3n-AutoFirma:-Problemas-conocidos">Wiki del proyecto</a></span>
 	</div><br/>
 	<div class="lb2AnchoMaxMB">
 			<span>2. Seleccione el formato de firma que desea utilizar</span>
@@ -303,10 +303,9 @@ la Administración Electrónica por su seguridad.
 	</div> <!-- FIN DE CONTENEDOR -->
 	
 	<script type="text/javascript">
-		MiniApplet.cargarMiniApplet('https://valide.redsara.es/firmaMovil');
-		MiniApplet.setServlets("https://valide.redsara.es/firmaMovil/afirma-signature-storage/StorageService", "https://valide.redsara.es/firmaMovil/afirma-signature-retriever/RetrieveService");
-		//MiniApplet.cargarMiniApplet('http://prevalide.redsara.es/firmaMovil');
-		//MiniApplet.setServlets("http://prevalide.redsara.es/firmaMovil/afirma-signature-storage/StorageService", "http://prevalide.redsara.es/miniapplet/afirma-signature-retriever/RetrieveService");
+	
+		MiniApplet.cargarMiniApplet(Constants.URL_BASE_APPLET);
+		MiniApplet.setServlets(Constants.URL_BASE_SERVICES + "/afirma-signature-storage/StorageService", Constants.URL_BASE_SERVICES + "/afirma-signature-retriever/RetrieveService");
 	</script>
 	
 </body></html>

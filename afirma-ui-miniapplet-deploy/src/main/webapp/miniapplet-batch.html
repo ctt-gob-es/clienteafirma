@@ -4,6 +4,7 @@
 	<title>Ejemplo de firma por lotes del MiniApplet @firma</title>
         <meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
 	<script type="text/javascript" src="js/miniapplet.js"></script>
+	<script type="text/javascript" src="js/constantes.js"></script>
 	<script type="text/javascript">
 
 		var singleSigns = new Array();
@@ -25,12 +26,8 @@
 				
 				MiniApplet.signBatch(
 					MiniApplet.getBase64FromText(batch),
-//					"http://prevalide.redsara.es/firmaMovil/afirma-server-triphase-signer/BatchPresigner", //$NON-NLS-1$
-//					"http://prevalide.redsara.es/firmaMovil/afirma-server-triphase-signer/BatchPostsigner", //$NON-NLS-1$
-					"http://10.1.51.27:8080/afirma-server-triphase-signer/BatchPresigner", //$NON-NLS-1$
-					"http://10.1.51.27:8080/afirma-server-triphase-signer/BatchPostsigner", //$NON-NLS-1$
-//					"http://172.24.31.241:8080/afirma-server-triphase-signer/BatchPresigner", //$NON-NLS-1$
-//					"http://172.24.31.241:8080/afirma-server-triphase-signer/BatchPostsigner", //$NON-NLS-1$
+					Constants.URL_BASE_SERVICES + "/afirma-server-triphase-signer/BatchPresigner", //$NON-NLS-1$
+					Constants.URL_BASE_SERVICES + "/afirma-server-triphase-signer/BatchPostsigner", //$NON-NLS-1$
 					document.getElementById("filters").value,
 					showResultCallback,
 					showLogCallback);
@@ -165,14 +162,8 @@
   </head>
 	<body>
 		<script type="text/javascript">
-			// IMPORTANTE: PARA PRUEBAS, USAR SIEMPRE UNA IP O NOMBRE DE DOMINIO, NUNCA 'LOCALHOST' O '127.0.0.1'
-			// SI NO SE HACE ASI, FIRMAFACIL BLOQUEARA LA FIRMA POR SEGURIDAD
-			//var HOST = "http://prevalide.redsara.es/firmaMovil";
-			var HOST = "http://10.1.51.27:8080";
-
-			//MiniApplet.SYSTEM_PROPERTIES = "-Des.gob.afirma.keystores.mozilla.UseEnvironmentVariables=true";
-			MiniApplet.cargarMiniApplet(HOST + '/afirma-ui-miniapplet-deploy');
-			MiniApplet.setServlets(HOST + "/afirma-signature-storage/StorageService", HOST + "/afirma-signature-retriever/RetrieveService");
+			MiniApplet.cargarMiniApplet(Constants.URL_BASE_APPLET);
+			MiniApplet.setServlets(Constants.URL_BASE_SERVICES + "/afirma-signature-storage/StorageService", Constants.URL_BASE_SERVICES + "/afirma-signature-retriever/RetrieveService");
 		</script>
 		
 		<fieldset><legend>Configuraci&oacute;n general</legend>

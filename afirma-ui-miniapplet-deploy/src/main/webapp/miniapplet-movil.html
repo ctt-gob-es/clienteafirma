@@ -4,6 +4,7 @@
 	<title>Ejemplo de despliegue del MiniApplet @firma</title>
 	<meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
 	<script type="text/javascript" src="js/miniapplet.js"></script>
+	<script type="text/javascript" src="js/constantes.js"></script>
 	<script type="text/javascript">
 	
 		var showResultCallback = function(b64Signature) {
@@ -107,14 +108,8 @@
   </head>
   <body>
 		<script type="text/javascript">
-		
-		//var URL_BASE = "http://prevalide.redsara.es/miniapplet";
-		var IP = "192.168.177.68";	//TODO: Configurar IP
-		
-		//MiniApplet.cargarMiniApplet(URL_BASE);
-		MiniApplet.cargarAppAfirma('http://'+ IP + ':8080/afirma-ui-miniapplet-deploy');
-		//MiniApplet.setServlets(URL_BASE + '/afirma-signature-storage/StorageService', URL_BASE + '/afirma-signature-retriever/RetrieveService');
-		MiniApplet.setServlets('http://'+ IP + ':8080/afirma-signature-storage/StorageService', 'http://'+ IP + ':8080/afirma-signature-retriever/RetrieveService');
+			MiniApplet.cargarAppAfirma(Constants.URL_BASE_APPLET);
+			MiniApplet.setServlets(Constants.URL_BASE_SERVICES + '/afirma-signature-storage/StorageService', Constants.URL_BASE_SERVICES + '/afirma-signature-retriever/RetrieveService');
 		</script>
 		<p>Cargamos el MiniApplet</p>
 		<div>
@@ -147,10 +142,7 @@
 		 <input id="newParam" type="text"><input type="button" value="Agregar" onclick="addExtraParam(document.getElementById('newParam').value);">
 		 <span>&nbsp;(Insertar las propiedades de una en una)</span>
 		 <br>
-		 <!-- <textarea id="params" cols="50" rows="5" readonly>serverUrl=https://valide.redsara.es/firmaMovil/TriPhaseSignerServer/SignatureService -->
-		 <!-- TODO: Configurar IP -->
-		 <textarea id="params" cols="50" rows="5" readonly>serverUrl=http://192.168.177.68:8080/afirma-server-triphase-signer/SignatureService
-		 </textarea>
+		 <textarea id="params" cols="50" rows="5" readonly></textarea>
 		</div>
 		
 		<input type="button" value="Firmar" onclick="doSign();">  <!-- onclick="this.disabled = true; doSign();">  -->
@@ -171,4 +163,8 @@
 		</div>
 		<input type="button" value="Guardar" onclick="saveData();">
 	</body>
+	<script type="text/javascript">
+		var paramsElement = document.getElementById("params");
+		paramsElement.innerHTML = "serverUrl=" + Constants.URL_BASE_SERVICES + "/afirma-server-triphase-signer/SignatureService\n";
+	</script>
 </html>	

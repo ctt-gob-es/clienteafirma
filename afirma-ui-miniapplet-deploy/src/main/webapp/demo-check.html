@@ -23,6 +23,7 @@
 	<script type="text/javascript" src="js_test/deployJava.js"></script>
 	<script type="text/javascript" src="js_test/TestEnvironment.js"></script>
 	<script type="text/javascript" src="js/miniapplet.js"></script>
+	<script type="text/javascript" src="js/constantes.js"></script>
 	<script type="text/javascript" defer="defer">
 	<!--
 
@@ -308,9 +309,7 @@ la Administración Electrónica por su seguridad.
 	</div> <!-- FIN DE CONTENEDOR -->
 	
 	<script type="text/javascript">
-		//MiniApplet.cargarMiniApplet('https://valide.redsara.es/firmaMovil');
-		//MiniApplet.cargarMiniApplet('http://prevalide.redsara.es/firmaMovil');
-		MiniApplet.cargarMiniApplet('http://10.1.51.27:8080/afirma-ui-miniapplet-deploy');
+		MiniApplet.cargarMiniApplet(Constants.URL_BASE_APPLET);
 
 		mostrarDialogoEspera();
 		
