@@ -10,6 +10,8 @@ if (document.all && !window.setTimeout.isPolyfill) {
 	window.setTimeout.isPolyfill = true;
 }
 
+var originalXMLHttpRequest = window.XMLHttpRequest;
+
 var MiniApplet = ( function ( window, undefined ) {
 
 		var VERSION = "1.5";
@@ -49,7 +51,7 @@ var MiniApplet = ( function ( window, undefined ) {
 		};
 
 		var DEFAULT_LOCALE = LOCALIZED_STRINGS["es_ES"];
-		
+
 		var currentLocale = DEFAULT_LOCALE;
 
 		var defaultKeyStore = null;
@@ -63,10 +65,10 @@ var MiniApplet = ( function ( window, undefined ) {
 
 		/* Cadena que determina el fin de una respuesta */
 		var EOF = "%%EOF%%";
-		
+
 		/* Identifica que se utilizara el MiniApplet. */
 		var TYPE_APPLET = "APPLET";
-		
+
 		/* Identifica que se utilizara una aplicacion nativa de firma. */
 		var TYPE_JAVASCRIPT_WEB_SERVICE = "JAVASCRIPT_WEB_SERVICE";
 		var TYPE_JAVASCRIPT_SOCKET = "JAVASCRIPT_SOCKET";
@@ -80,21 +82,21 @@ var MiniApplet = ( function ( window, undefined ) {
 		var KEYSTORE_WINDOWS = "WINDOWS";
 
 		var KEYSTORE_APPLE = "APPLE";
-		
+
 		var KEYSTORE_PKCS12 = "PKCS12";
 
 		var KEYSTORE_PKCS11 = "PKCS11";
 
 		var KEYSTORE_MOZILLA = "MOZ_UNI";
-		
+
 		var KEYSTORE_SHARED_NSS = "SHARED_NSS";
-		
+
 		var KEYSTORE_JAVA = "JAVA";
-		
+
 		var KEYSTORE_JCEKS = "JCEKS";
-		
+
 		var KEYSTORE_JAVACE = "JAVACE";
-		
+
 		var KEYSTORE_DNIE = "DNIEJAVA";
 
 		/* Valores para la configuracion de la comprobacion de tiempo */
@@ -110,11 +112,11 @@ var MiniApplet = ( function ( window, undefined ) {
 		
 		// Reintentos de conexion totales para detectar que esta instalado AutoFirma
 		var AUTOFIRMA_CONNECTION_RETRIES = 10;
-		
+
 		// Variable que se puede configurar para forzar el uso del modo de comunicacion por servidor intermedio
-		// entre la página web y AutoFirma
+		// entre la pagina web y AutoFirma
 		var forceWSMode = false;
-		
+
 		/* ------------------------------------ */
 		/* Funciones de comprobacion de entorno */
 		/* ------------------------------------ */
@@ -290,11 +292,17 @@ var MiniApplet = ( function ( window, undefined ) {
 
 		function getHttpRequest() {
             var xmlHttp = null;
+            
+        	/* Si se cargo Ajax, puede haber modificado el funcionamiento de la clase XMLHttpRequest,
+        	 * asi que vemos si el propio Ajax (Sarissa) guarda la implementacion original; si no,
+        	 * usamos la implementacion por defecto que la habremos guardado al principio del script
+        	 * en la variable originalXMLHttpRequest. Es importante que se haya cargado este script
+        	 * antes que el de Ajax o esta opcion no tendra resultado */
             if (typeof XMLHttpRequest != "undefined") {	// Navegadores actuales
                 if (typeof Sarissa !== 'undefined' && Sarissa.originalXMLHttpRequest) {
                 	xmlHttp = new Sarissa.originalXMLHttpRequest();
                 } else {
-                	xmlHttp = new XMLHttpRequest();
+                	xmlHttp = new originalXMLHttpRequest();
                 }
             } else if (typeof window.ActiveXObject != "undefined") {	// Internet Explorer antiguos
                 try {
