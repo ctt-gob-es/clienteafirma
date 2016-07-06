@@ -1,5 +1,7 @@
 package es.gob.afirma.signers.batch.server;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
@@ -14,7 +16,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import es.gob.afirma.core.signers.TriphaseData;
 import es.gob.afirma.signers.batch.SignBatch;
-import es.gob.afirma.triphase.server.SignatureService;
 
 /** Realiza la tercera (y &uacute;ltima) fase de un proceso de firma por lote.
  * Servlet implementation class BatchPostsigner
@@ -26,6 +27,9 @@ public final class BatchPostsigner extends HttpServlet {
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	private static final String CONFIG_FILE = "config.properties"; //$NON-NLS-1$
+
+	/** Variable de entorno que determina el directorio en el que buscar el fichero de configuraci&oacute;n. */
+	private static final String ENVIRONMENT_VAR_CONFIG_DIR = "clienteafirma.config.path"; //$NON-NLS-1$
 
 	private static final String BATCH_XML_PARAM = "xml"; //$NON-NLS-1$
 	private static final String BATCH_CRT_PARAM = "certs"; //$NON-NLS-1$
@@ -40,9 +44,36 @@ public final class BatchPostsigner extends HttpServlet {
 
 	static {
 		try {
-			final InputStream configIs = SignatureService.class.getClassLoader().getResourceAsStream(CONFIG_FILE);
+			InputStream configIs = null;
+			String configDir;
+			try {
+				configDir = System.getProperty(ENVIRONMENT_VAR_CONFIG_DIR);
+			}
+			catch (final Exception e) {
+				LOGGER.warning(
+						"No se pudo acceder a la variable de entorno '" + ENVIRONMENT_VAR_CONFIG_DIR + //$NON-NLS-1$
+						"' que configura el directorio del fichero de configuracion: " + e);//$NON-NLS-1$
+				configDir = null;
+			}
+			if (configDir != null) {
+				final File configFile = new File(configDir, CONFIG_FILE).getCanonicalFile();
+				if (!configFile.isFile() || !configFile.canRead()) {
+					LOGGER.warning(
+							"No se encontro el fichero " + CONFIG_FILE + " en el directorio configurado en la variable " + //$NON-NLS-1$ //$NON-NLS-2$
+									ENVIRONMENT_VAR_CONFIG_DIR + ": " + configFile.getAbsolutePath() + //$NON-NLS-1$
+									"\nSe buscara en el CLASSPATH."); //$NON-NLS-1$
+				}
+				else {
+					configIs = new FileInputStream(configFile);
+				}
+			}
+
 			if (configIs == null) {
-				throw new RuntimeException("No se encuentra el fichero de configuracion del servicio: " + CONFIG_FILE); //$NON-NLS-1$
+				configIs = BatchPostsigner.class.getClassLoader().getResourceAsStream(CONFIG_FILE);
+			}
+
+			if (configIs == null) {
+				throw new IOException("No se encuentra el fichero de configuracion del servicio: " + CONFIG_FILE); //$NON-NLS-1$
 			}
 			config = new Properties();
 			config.load(configIs);
