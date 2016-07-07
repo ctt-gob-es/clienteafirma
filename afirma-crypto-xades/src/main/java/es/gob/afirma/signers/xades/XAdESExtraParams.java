@@ -277,7 +277,7 @@ public final class XAdESExtraParams {
     static final String COMMITMENT_TYPE_INDICATIONS = "commitmentTypeIndications";//$NON-NLS-1$
 
     /**
-     * commitmentTypeIndicationnIdentifier Tipo de
+     * commitmentTypeIndication</i>n<i>Identifier Tipo de
      * <i>CommitmentTypeIndication</i> (atributo obligatorio, se debe usar el
      * ordinal, nunca el OID directamente):
      * <ul>
@@ -288,9 +288,9 @@ public final class XAdESExtraParams {
      * <li><i>5</i> = Prueba de aprobaci&oacute;n</li>
      * <li><i>6</i> = Prueba de creaci&oacute;n</li>
      * </ul>
-     * commitmentTypeIndicationnDescription Descripci&oacute;n textual del
+     * commitmentTypeIndication</i>n<i>Description Descripci&oacute;n textual del
      * CommitmentTypeIndication n&uacute;mero n (atributo opcional). <br>
-     * commitmentTypeIndicationnDocumentationReferences Lista de URL separadas
+     * commitmentTypeIndication</i>n<i>DocumentationReferences Lista de URL separadas
      * por el car&aacute;cter '<i>|</i>' que se aportan como referencias
      * documentales del <i>CommitmentTypeIndication</i> n&uacute;mero <i>n</i>
      * (atributo opcional).<br>
@@ -308,7 +308,7 @@ public final class XAdESExtraParams {
      */
     static final String COMMITMENT_TYPE_INDICATION = "commitmentTypeIndication"; //$NON-NLS-1$
     /**
-     * commitmentTypeIndicationnIdentifier Tipo de
+     * commitmentTypeIndication</i>n<i>Identifier Tipo de
      * <i>CommitmentTypeIndication</i> (atributo obligatorio, se debe usar el
      * ordinal, nunca el OID directamente):
      * <ul>
@@ -319,9 +319,9 @@ public final class XAdESExtraParams {
      * <li><i>5</i> = Prueba de aprobaci&oacute;n</li>
      * <li><i>6</i> = Prueba de creaci&oacute;n</li>
      * </ul>
-     * commitmentTypeIndicationnDescription Descripci&oacute;n textual del
+     * commitmentTypeIndication</i>n<i>Description Descripci&oacute;n textual del
      * CommitmentTypeIndication n&uacute;mero n (atributo opcional). <br>
-     * commitmentTypeIndicationnDocumentationReferences Lista de URL separadas
+     * commitmentTypeIndication</i>n<i>DocumentationReferences Lista de URL separadas
      * por el car&aacute;cter '<i>|</i>' que se aportan como referencias
      * documentales del <i>CommitmentTypeIndication</i> n&uacute;mero <i>n</i>
      * (atributo opcional).<br>
@@ -340,7 +340,7 @@ public final class XAdESExtraParams {
     static final String DESCRIPTION = "Description";//$NON-NLS-1$
 
     /**
-     * commitmentTypeIndicationnIdentifier Tipo de
+     * commitmentTypeIndication</i>n<i>Identifier Tipo de
      * <i>CommitmentTypeIndication</i> (atributo obligatorio, se debe usar el
      * ordinal, nunca el OID directamente):
      * <ul>
@@ -351,9 +351,9 @@ public final class XAdESExtraParams {
      * <li><i>5</i> = Prueba de aprobaci&oacute;n</li>
      * <li><i>6</i> = Prueba de creaci&oacute;n</li>
      * </ul>
-     * commitmentTypeIndicationnDescription Descripci&oacute;n textual del
+     * commitmentTypeIndication</i>n<i>Description Descripci&oacute;n textual del
      * CommitmentTypeIndication n&uacute;mero n (atributo opcional). <br>
-     * commitmentTypeIndicationnDocumentationReferences Lista de URL separadas
+     * commitmentTypeIndication</i>n<i>DocumentationReferences Lista de URL separadas
      * por el car&aacute;cter '<i>|</i>' que se aportan como referencias
      * documentales del <i>CommitmentTypeIndication</i> n&uacute;mero <i>n</i>
      * (atributo opcional).<br>
@@ -372,7 +372,7 @@ public final class XAdESExtraParams {
     static final String IDENTIFIER = "Identifier";//$NON-NLS-1$
 
     /**
-     * commitmentTypeIndicationnIdentifier Tipo de
+     * commitmentTypeIndication</i>n<i>Identifier Tipo de
      * <i>CommitmentTypeIndication</i> (atributo obligatorio, se debe usar el
      * ordinal, nunca el OID directamente):
      * <ul>
@@ -383,9 +383,9 @@ public final class XAdESExtraParams {
      * <li><i>5</i> = Prueba de aprobaci&oacute;n</li>
      * <li><i>6</i> = Prueba de creaci&oacute;n</li>
      * </ul>
-     * commitmentTypeIndicationnDescription Descripci&oacute;n textual del
+     * commitmentTypeIndication</i>n<i>Description Descripci&oacute;n textual del
      * CommitmentTypeIndication n&uacute;mero n (atributo opcional). <br>
-     * commitmentTypeIndicationnDocumentationReferences Lista de URL separadas
+     * commitmentTypeIndication</i>n<i>DocumentationReferences Lista de URL separadas
      * por el car&aacute;cter '<i>|</i>' que se aportan como referencias
      * documentales del <i>CommitmentTypeIndication</i> n&uacute;mero <i>n</i>
      * (atributo opcional).<br>
@@ -404,7 +404,7 @@ public final class XAdESExtraParams {
     static final String DOCUMENTATION_REFERENCES = "DocumentationReferences";//$NON-NLS-1$
 
     /**
-     * commitmentTypeIndicationnIdentifier Tipo de
+     * commitmentTypeIndication</i>n<i>Identifier Tipo de
      * <i>CommitmentTypeIndication</i> (atributo obligatorio, se debe usar el
      * ordinal, nunca el OID directamente):
      * <ul>
@@ -415,9 +415,9 @@ public final class XAdESExtraParams {
      * <li><i>5</i> = Prueba de aprobaci&oacute;n</li>
      * <li><i>6</i> = Prueba de creaci&oacute;n</li>
      * </ul>
-     * commitmentTypeIndicationnDescription Descripci&oacute;n textual del
+     * commitmentTypeIndication</i>n<i>Description Descripci&oacute;n textual del
      * CommitmentTypeIndication n&uacute;mero n (atributo opcional). <br>
-     * commitmentTypeIndicationnDocumentationReferences Lista de URL separadas
+     * commitmentTypeIndication</i>n<i>DocumentationReferences Lista de URL separadas
      * por el car&aacute;cter '<i>|</i>' que se aportan como referencias
      * documentales del <i>CommitmentTypeIndication</i> n&uacute;mero <i>n</i>
      * (atributo opcional).<br>
