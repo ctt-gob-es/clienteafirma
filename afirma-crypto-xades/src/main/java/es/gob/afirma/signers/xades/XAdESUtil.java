@@ -15,7 +15,6 @@ import java.net.URL;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
@@ -51,25 +50,7 @@ import es.gob.afirma.core.signers.AOSignConstants;
 
 final class XAdESUtil {
 
-	private static final String COMMITMENT_TYPE_INDICATOR_PROPERTY_PREFIX = "commitmentTypeIndication"; //$NON-NLS-1$
-
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma");	//$NON-NLS-1$
-
-	private static final String COMMITMENT_TYPE_IDENTIFIER_PROOF_OF_ORIGIN = "urn:oid:1.2.840.113549.1.9.16.6.1"; //$NON-NLS-1$
-	private static final String COMMITMENT_TYPE_IDENTIFIER_PROOF_OF_RECEIPT = "urn:oid:1.2.840.113549.1.9.16.6.2"; //$NON-NLS-1$
-	private static final String COMMITMENT_TYPE_IDENTIFIER_PROOF_OF_DELIVERY = "urn:oid:1.2.840.113549.1.9.16.6.3"; //$NON-NLS-1$
-	private static final String COMMITMENT_TYPE_IDENTIFIER_PROOF_OF_SENDER = "urn:oid:1.2.840.113549.1.9.16.6.4"; //$NON-NLS-1$
-	private static final String COMMITMENT_TYPE_IDENTIFIER_PROOF_OF_APPROVAL = "urn:oid:1.2.840.113549.1.9.16.6.5"; //$NON-NLS-1$
-	private static final String COMMITMENT_TYPE_IDENTIFIER_PROOF_OF_CREATION = "urn:oid:1.2.840.113549.1.9.16.6.6"; //$NON-NLS-1$
-	private static final Map<String, String> COMMITMENT_TYPE_IDENTIFIERS = new HashMap<String, String>(6);
-	static {
-		COMMITMENT_TYPE_IDENTIFIERS.put("1", COMMITMENT_TYPE_IDENTIFIER_PROOF_OF_ORIGIN); //$NON-NLS-1$
-		COMMITMENT_TYPE_IDENTIFIERS.put("2", COMMITMENT_TYPE_IDENTIFIER_PROOF_OF_RECEIPT); //$NON-NLS-1$
-		COMMITMENT_TYPE_IDENTIFIERS.put("3", COMMITMENT_TYPE_IDENTIFIER_PROOF_OF_DELIVERY); //$NON-NLS-1$
-		COMMITMENT_TYPE_IDENTIFIERS.put("4", COMMITMENT_TYPE_IDENTIFIER_PROOF_OF_SENDER); //$NON-NLS-1$
-		COMMITMENT_TYPE_IDENTIFIERS.put("5", COMMITMENT_TYPE_IDENTIFIER_PROOF_OF_APPROVAL); //$NON-NLS-1$
-		COMMITMENT_TYPE_IDENTIFIERS.put("6", COMMITMENT_TYPE_IDENTIFIER_PROOF_OF_CREATION); //$NON-NLS-1$
-	}
 
 	private static final String[] SUPPORTED_XADES_NAMESPACE_URIS = new String[] {
 		"http://uri.etsi.org/01903#", //$NON-NLS-1$
@@ -186,11 +167,11 @@ final class XAdESUtil {
 		for(int i=0;i<=nCtis;i++) {
 
 			// Identifier
-			tmpStr = xParams.getProperty(COMMITMENT_TYPE_INDICATOR_PROPERTY_PREFIX + Integer.toString(i) + "Identifier"); //$NON-NLS-1$
+			tmpStr = xParams.getProperty(XAdESExtraParams.COMMITMENT_TYPE_INDICATION_PREFIX + Integer.toString(i) + XAdESExtraParams.COMMITMENT_TYPE_INDICATION_IDENTIFIER);
 			if (tmpStr == null) {
 				continue;
 			}
-			identifier = COMMITMENT_TYPE_IDENTIFIERS.get(tmpStr);
+			identifier = XAdESExtraParams.COMMITMENT_TYPE_IDENTIFIERS.get(tmpStr);
 			if (identifier == null)  {
 				LOGGER.severe(
 					"El identificador del CommitmentTypeIndication " + i + " no es un tipo soportado (" + tmpStr + "), se omitira y se continuara con el siguiente" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -199,10 +180,10 @@ final class XAdESUtil {
 			}
 
 			// Description
-			description = xParams.getProperty(COMMITMENT_TYPE_INDICATOR_PROPERTY_PREFIX + Integer.toString(i) + "Description"); //$NON-NLS-1$
+			description = xParams.getProperty(XAdESExtraParams.COMMITMENT_TYPE_INDICATION_PREFIX + Integer.toString(i) + XAdESExtraParams.COMMITMENT_TYPE_INDICATION_DESCRIPTION);
 
 			// DocumentationReferences
-			tmpStr = xParams.getProperty(COMMITMENT_TYPE_INDICATOR_PROPERTY_PREFIX + Integer.toString(i) + "DocumentationReferences"); //$NON-NLS-1$
+			tmpStr = xParams.getProperty(XAdESExtraParams.COMMITMENT_TYPE_INDICATION_PREFIX + Integer.toString(i) + XAdESExtraParams.COMMITMENT_TYPE_INDICATION_DOCUMENTATION_REFERENCE);
 			if (tmpStr == null) {
 				documentationReferences = new ArrayList<String>(0);
 			}
@@ -223,7 +204,7 @@ final class XAdESUtil {
 			}
 
 			// CommitmentTypeQualifiers
-			tmpStr = xParams.getProperty(COMMITMENT_TYPE_INDICATOR_PROPERTY_PREFIX + Integer.toString(i) + "CommitmentTypeQualifiers"); //$NON-NLS-1$
+			tmpStr = xParams.getProperty(XAdESExtraParams.COMMITMENT_TYPE_INDICATION_PREFIX + Integer.toString(i) + XAdESExtraParams.COMMITMENT_TYPE_INDICATION_QUALIFIERS);
 			if (tmpStr == null) {
 				commitmentTypeQualifiers = new ArrayList<String>(0);
 			}

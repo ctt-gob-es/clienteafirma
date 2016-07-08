@@ -10,6 +10,9 @@
 
 package es.gob.afirma.signers.xades;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /** Clase con los par&aacute;metros extra que pueden configurarse para el formato de firma XAdES. */
 public final class XAdESExtraParams {
 
@@ -277,71 +280,21 @@ public final class XAdESExtraParams {
     static final String COMMITMENT_TYPE_INDICATIONS = "commitmentTypeIndications";//$NON-NLS-1$
 
     /**
-     * commitmentTypeIndication</i>n<i>Identifier Tipo de
-     * <i>CommitmentTypeIndication</i> (atributo obligatorio, se debe usar el
-     * ordinal, nunca el OID directamente):
+     * Prefijo de las claves con las que se indican las propiedades de los <i>Commitment
+     * Type Indications</i>. Se utilizar&aacute; este prefijo, seguido el n&uacute;mero del
+     * commitmentTypeIndication al que queramos referirnos y la clave de la propiedad en
+     * cuesti&oacute;n. As&iacute; pues, los par&aacute;metros son:
      * <ul>
-     * <li><i>1</i> = Prueba de origen</li>
-     * <li><i>2</i> = Prueba de recepci&oacute;n</li>
-     * <li><i>3</i> = Prueba de entrega</li>
-     * <li><i>4</i> = Prueba de env&iacute;o</li>
-     * <li><i>5</i> = Prueba de aprobaci&oacute;n</li>
-     * <li><i>6</i> = Prueba de creaci&oacute;n</li>
+     *  <li>commitmentTypeIndication<i>n</i>Identifier</li>
+     *  <li>commitmentTypeIndication<i>n</i>Description</li>
+     *  <li>commitmentTypeIndication<i>n</i>CommitmentTypeQualifiers</li>
+     *  <li>commitmentTypeIndication<i>n</i>DocumentationReferences</li>
      * </ul>
-     * commitmentTypeIndication</i>n<i>Description Descripci&oacute;n textual del
-     * CommitmentTypeIndication n&uacute;mero n (atributo opcional). <br>
-     * commitmentTypeIndication</i>n<i>DocumentationReferences Lista de URL separadas
-     * por el car&aacute;cter '<i>|</i>' que se aportan como referencias
-     * documentales del <i>CommitmentTypeIndication</i> n&uacute;mero <i>n</i>
-     * (atributo opcional).<br>
-     * Las URL de la lista no pueden contener el car&aacute;cter '<i>|</i>' (ya
-     * que este se usa como separador) <br>
-     * Lista de indicadores textuales separados por el car&aacute;cter
-     * '<i>|</i>' que se aportan como calificadores adicionales del
-     * <i>CommitmentTypeIndication</i> n&uacute;mero <i>n</i> (atributo
-     * opcional). Normalmente son OID.<br>
-     * Los elementos de la lista no pueden contener el car&aacute;cter
-     * '<i>|</i>' (ya que este se usa como separador).
-     *
-     * <br>
-     * Propiedad compartida con CAdES.
      */
-    static final String COMMITMENT_TYPE_INDICATION = "commitmentTypeIndication"; //$NON-NLS-1$
-    /**
-     * commitmentTypeIndication</i>n<i>Identifier Tipo de
-     * <i>CommitmentTypeIndication</i> (atributo obligatorio, se debe usar el
-     * ordinal, nunca el OID directamente):
-     * <ul>
-     * <li><i>1</i> = Prueba de origen</li>
-     * <li><i>2</i> = Prueba de recepci&oacute;n</li>
-     * <li><i>3</i> = Prueba de entrega</li>
-     * <li><i>4</i> = Prueba de env&iacute;o</li>
-     * <li><i>5</i> = Prueba de aprobaci&oacute;n</li>
-     * <li><i>6</i> = Prueba de creaci&oacute;n</li>
-     * </ul>
-     * commitmentTypeIndication</i>n<i>Description Descripci&oacute;n textual del
-     * CommitmentTypeIndication n&uacute;mero n (atributo opcional). <br>
-     * commitmentTypeIndication</i>n<i>DocumentationReferences Lista de URL separadas
-     * por el car&aacute;cter '<i>|</i>' que se aportan como referencias
-     * documentales del <i>CommitmentTypeIndication</i> n&uacute;mero <i>n</i>
-     * (atributo opcional).<br>
-     * Las URL de la lista no pueden contener el car&aacute;cter '<i>|</i>' (ya
-     * que este se usa como separador) <br>
-     * Lista de indicadores textuales separados por el car&aacute;cter
-     * '<i>|</i>' que se aportan como calificadores adicionales del
-     * <i>CommitmentTypeIndication</i> n&uacute;mero <i>n</i> (atributo
-     * opcional). Normalmente son OID.<br>
-     * Los elementos de la lista no pueden contener el car&aacute;cter
-     * '<i>|</i>' (ya que este se usa como separador).
-     *
-     * <br>
-     * Propiedad compartida con CAdES.
-     */
-    static final String DESCRIPTION = "Description";//$NON-NLS-1$
+    static final String COMMITMENT_TYPE_INDICATION_PREFIX = "commitmentTypeIndication"; //$NON-NLS-1$
 
     /**
-     * commitmentTypeIndication</i>n<i>Identifier Tipo de
-     * <i>CommitmentTypeIndication</i> (atributo obligatorio, se debe usar el
+     * Tipo de <i>CommitmentTypeIndication</i> (atributo obligatorio, se debe usar el
      * ordinal, nunca el OID directamente):
      * <ul>
      * <li><i>1</i> = Prueba de origen</li>
@@ -351,89 +304,49 @@ public final class XAdESExtraParams {
      * <li><i>5</i> = Prueba de aprobaci&oacute;n</li>
      * <li><i>6</i> = Prueba de creaci&oacute;n</li>
      * </ul>
-     * commitmentTypeIndication</i>n<i>Description Descripci&oacute;n textual del
-     * CommitmentTypeIndication n&uacute;mero n (atributo opcional). <br>
-     * commitmentTypeIndication</i>n<i>DocumentationReferences Lista de URL separadas
-     * por el car&aacute;cter '<i>|</i>' que se aportan como referencias
-     * documentales del <i>CommitmentTypeIndication</i> n&uacute;mero <i>n</i>
-     * (atributo opcional).<br>
-     * Las URL de la lista no pueden contener el car&aacute;cter '<i>|</i>' (ya
-     * que este se usa como separador) <br>
-     * Lista de indicadores textuales separados por el car&aacute;cter
-     * '<i>|</i>' que se aportan como calificadores adicionales del
-     * <i>CommitmentTypeIndication</i> n&uacute;mero <i>n</i> (atributo
-     * opcional). Normalmente son OID.<br>
-     * Los elementos de la lista no pueden contener el car&aacute;cter
-     * '<i>|</i>' (ya que este se usa como separador).
-     *
      * <br>
      * Propiedad compartida con CAdES.
      */
-    static final String IDENTIFIER = "Identifier";//$NON-NLS-1$
+    static final String COMMITMENT_TYPE_INDICATION_IDENTIFIER = "Identifier";//$NON-NLS-1$
 
     /**
-     * commitmentTypeIndication</i>n<i>Identifier Tipo de
-     * <i>CommitmentTypeIndication</i> (atributo obligatorio, se debe usar el
-     * ordinal, nunca el OID directamente):
-     * <ul>
-     * <li><i>1</i> = Prueba de origen</li>
-     * <li><i>2</i> = Prueba de recepci&oacute;n</li>
-     * <li><i>3</i> = Prueba de entrega</li>
-     * <li><i>4</i> = Prueba de env&iacute;o</li>
-     * <li><i>5</i> = Prueba de aprobaci&oacute;n</li>
-     * <li><i>6</i> = Prueba de creaci&oacute;n</li>
-     * </ul>
-     * commitmentTypeIndication</i>n<i>Description Descripci&oacute;n textual del
-     * CommitmentTypeIndication n&uacute;mero n (atributo opcional). <br>
-     * commitmentTypeIndication</i>n<i>DocumentationReferences Lista de URL separadas
-     * por el car&aacute;cter '<i>|</i>' que se aportan como referencias
-     * documentales del <i>CommitmentTypeIndication</i> n&uacute;mero <i>n</i>
-     * (atributo opcional).<br>
-     * Las URL de la lista no pueden contener el car&aacute;cter '<i>|</i>' (ya
-     * que este se usa como separador) <br>
-     * Lista de indicadores textuales separados por el car&aacute;cter
-     * '<i>|</i>' que se aportan como calificadores adicionales del
-     * <i>CommitmentTypeIndication</i> n&uacute;mero <i>n</i> (atributo
-     * opcional). Normalmente son OID.<br>
-     * Los elementos de la lista no pueden contener el car&aacute;cter
-     * '<i>|</i>' (ya que este se usa como separador).
-     *
-     * <br>
-     * Propiedad compartida con CAdES.
+     * Descripci&oacute;n textual del CommitmentTypeIndication n&uacute;mero n (atributo opcional).
      */
-    static final String DOCUMENTATION_REFERENCES = "DocumentationReferences";//$NON-NLS-1$
+    static final String COMMITMENT_TYPE_INDICATION_DESCRIPTION = "Description";//$NON-NLS-1$
 
     /**
-     * commitmentTypeIndication</i>n<i>Identifier Tipo de
-     * <i>CommitmentTypeIndication</i> (atributo obligatorio, se debe usar el
-     * ordinal, nunca el OID directamente):
-     * <ul>
-     * <li><i>1</i> = Prueba de origen</li>
-     * <li><i>2</i> = Prueba de recepci&oacute;n</li>
-     * <li><i>3</i> = Prueba de entrega</li>
-     * <li><i>4</i> = Prueba de env&iacute;o</li>
-     * <li><i>5</i> = Prueba de aprobaci&oacute;n</li>
-     * <li><i>6</i> = Prueba de creaci&oacute;n</li>
-     * </ul>
-     * commitmentTypeIndication</i>n<i>Description Descripci&oacute;n textual del
-     * CommitmentTypeIndication n&uacute;mero n (atributo opcional). <br>
-     * commitmentTypeIndication</i>n<i>DocumentationReferences Lista de URL separadas
-     * por el car&aacute;cter '<i>|</i>' que se aportan como referencias
+     * Lista de URL separadas por el car&aacute;cter '<i>|</i>' que se aportan como referencias
      * documentales del <i>CommitmentTypeIndication</i> n&uacute;mero <i>n</i>
      * (atributo opcional).<br>
      * Las URL de la lista no pueden contener el car&aacute;cter '<i>|</i>' (ya
-     * que este se usa como separador) <br>
-     * Lista de indicadores textuales separados por el car&aacute;cter
-     * '<i>|</i>' que se aportan como calificadores adicionales del
-     * <i>CommitmentTypeIndication</i> n&uacute;mero <i>n</i> (atributo
-     * opcional). Normalmente son OID.<br>
-     * Los elementos de la lista no pueden contener el car&aacute;cter
-     * '<i>|</i>' (ya que este se usa como separador).
-     *
+     * que este se usa como separador)
+     */
+    static final String COMMITMENT_TYPE_INDICATION_DOCUMENTATION_REFERENCE = "DocumentationReferences"; //$NON-NLS-1$
+
+    /**
+     * Lista de indicadores textuales separados por el carácter '|' que se aportan como calificadores
+     * adicionales del CommitmentTypeIndication número n (atributo opcional). Normalmente son OID.
+     * Los elementos de la lista no pueden contener el carácter '|' (ya que este se usa como separador).
      * <br>
      * Propiedad compartida con CAdES.
      */
-    static final String COMMITMENT_TYPE_QUALIFIERS = "CommitmentTypeQualifiers";//$NON-NLS-1$
+    static final String COMMITMENT_TYPE_INDICATION_QUALIFIERS = "CommitmentTypeQualifiers"; //$NON-NLS-1$
+
+	private static final String COMMITMENT_TYPE_IDENTIFIER_PROOF_OF_ORIGIN = "urn:oid:1.2.840.113549.1.9.16.6.1"; //$NON-NLS-1$
+	private static final String COMMITMENT_TYPE_IDENTIFIER_PROOF_OF_RECEIPT = "urn:oid:1.2.840.113549.1.9.16.6.2"; //$NON-NLS-1$
+	private static final String COMMITMENT_TYPE_IDENTIFIER_PROOF_OF_DELIVERY = "urn:oid:1.2.840.113549.1.9.16.6.3"; //$NON-NLS-1$
+	private static final String COMMITMENT_TYPE_IDENTIFIER_PROOF_OF_SENDER = "urn:oid:1.2.840.113549.1.9.16.6.4"; //$NON-NLS-1$
+	private static final String COMMITMENT_TYPE_IDENTIFIER_PROOF_OF_APPROVAL = "urn:oid:1.2.840.113549.1.9.16.6.5"; //$NON-NLS-1$
+	private static final String COMMITMENT_TYPE_IDENTIFIER_PROOF_OF_CREATION = "urn:oid:1.2.840.113549.1.9.16.6.6"; //$NON-NLS-1$
+	static final Map<String, String> COMMITMENT_TYPE_IDENTIFIERS = new HashMap<String, String>(6);
+	static {
+		COMMITMENT_TYPE_IDENTIFIERS.put("1", COMMITMENT_TYPE_IDENTIFIER_PROOF_OF_ORIGIN); //$NON-NLS-1$
+		COMMITMENT_TYPE_IDENTIFIERS.put("2", COMMITMENT_TYPE_IDENTIFIER_PROOF_OF_RECEIPT); //$NON-NLS-1$
+		COMMITMENT_TYPE_IDENTIFIERS.put("3", COMMITMENT_TYPE_IDENTIFIER_PROOF_OF_DELIVERY); //$NON-NLS-1$
+		COMMITMENT_TYPE_IDENTIFIERS.put("4", COMMITMENT_TYPE_IDENTIFIER_PROOF_OF_SENDER); //$NON-NLS-1$
+		COMMITMENT_TYPE_IDENTIFIERS.put("5", COMMITMENT_TYPE_IDENTIFIER_PROOF_OF_APPROVAL); //$NON-NLS-1$
+		COMMITMENT_TYPE_IDENTIFIERS.put("6", COMMITMENT_TYPE_IDENTIFIER_PROOF_OF_CREATION); //$NON-NLS-1$
+	}
 
     /**
      * Modo de firma a usar. El valor explicit indica que no se incluyen los
