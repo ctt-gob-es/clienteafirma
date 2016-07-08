@@ -125,41 +125,24 @@ public final class CAdESExtraParams {
     static final String COMMITMENT_TYPE_INDICATIONS = "commitmentTypeIndications";//$NON-NLS-1$
 
     /**
-     *  Variables para comprobar los siguientes parametros compuestos:
-     *  commitmentTypeIndicationnIdentifier (propiedad compartida con XAdES):
-     *  Tipo de <i>CommitmentTypeIndication</i> para el <i>CommitmentTypeIndication</i> n&uacute;mero <i>n</i> (contando desde cero). Atributo obligatorio:
-     *  <ul>
-     *  <li><i>1</i> = Prueba de origen</li>
-     *  <li><i>2</i> = Prueba de recepci&oacute;n</li>
-     *  <li><i>3</i> = Prueba de entrega</li>
-     *  <li><i>4</i> = Prueba de env&iacute;o</li>
-     *  <li><i>5</i> = Prueba de aprobaci&oacute;n</li>
-     *  <li><i>6</i> = Prueba de creaci&oacute;n</li>
-     *  </ul>
-     * Lista de OID separados por el caracter '<i>|</i>' que se aportan como calificadores adicionales del
-     * <i>CommitmentTypeIndication</i> n&uacute;mero <i>n</i> (contando desde cero). Atributo opcional.
+     * Prefijo de las claves con las que se indican las propiedades de los <i>Commitment
+     * Type Indications</i>. Se utilizar&aacute; este prefijo, seguido el n&uacute;mero del
+     * commitmentTypeIndication al que queramos referirnos y la clave de la propiedad en
+     * cuesti&oacute;n. As&iacute; pues, los par&aacute;metros son:
+     * <ul>
+     *  <li>commitmentTypeIndication<i>n</i>Identifier</li>
+     *  <li>commitmentTypeIndication<i>n</i>CommitmentTypeQualifiers</li>
+     * </ul>
      */
     static final String COMMITMENT_TYPE_INDICATION_PREFIX = "commitmentTypeIndication";//$NON-NLS-1$
     /**
-     *  Variables para comprobar los siguientes parametros compuestos:
-     *  commitmentTypeIndicationnIdentifier (propiedad compartida con XAdES):
-     *  Tipo de <i>CommitmentTypeIndication</i> para el <i>CommitmentTypeIndication</i> n&uacute;mero <i>n</i> (contando desde cero). Atributo obligatorio:
-     *  <ul>
-     *  <li><i>1</i> = Prueba de origen</li>
-     *  <li><i>2</i> = Prueba de recepci&oacute;n</li>
-     *  <li><i>3</i> = Prueba de entrega</li>
-     *  <li><i>4</i> = Prueba de env&iacute;o</li>
-     *  <li><i>5</i> = Prueba de aprobaci&oacute;n</li>
-     *  <li><i>6</i> = Prueba de creaci&oacute;n</li>
-     *  </ul>
      * Lista de OID separados por el caracter '<i>|</i>' que se aportan como calificadores adicionales del
      * <i>CommitmentTypeIndication</i> n&uacute;mero <i>n</i> (contando desde cero). Atributo opcional.
      */
     static final String COMMITMENT_TYPE_INDICATION_QUALIFIERS = "CommitmentTypeQualifiers";//$NON-NLS-1$
     /**
-     *  Variables para comprobar los siguientes parametros compuestos:
-     *  commitmentTypeIndicationnIdentifier (propiedad compartida con XAdES):
-     *  Tipo de <i>CommitmentTypeIndication</i> para el <i>CommitmentTypeIndication</i> n&uacute;mero <i>n</i> (contando desde cero). Atributo obligatorio:
+     *  Tipo de <i>CommitmentTypeIndication</i> para el <i>CommitmentTypeIndication</i> n&uacute;mero <i>n</i>
+     *  (contando desde cero). Atributo obligatorio. Valores:
      *  <ul>
      *  <li><i>1</i> = Prueba de origen</li>
      *  <li><i>2</i> = Prueba de recepci&oacute;n</li>
@@ -168,8 +151,6 @@ public final class CAdESExtraParams {
      *  <li><i>5</i> = Prueba de aprobaci&oacute;n</li>
      *  <li><i>6</i> = Prueba de creaci&oacute;n</li>
      *  </ul>
-     * Lista de OID separados por el caracter '<i>|</i>' que se aportan como calificadores adicionales del
-     * <i>CommitmentTypeIndication</i> n&uacute;mero <i>n</i> (contando desde cero). Atributo opcional.
      */
     static final String COMMITMENT_TYPE_INDICATION_IDENTIFIER = "Identifier";//$NON-NLS-1$
 
