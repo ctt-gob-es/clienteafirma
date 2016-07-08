@@ -99,7 +99,7 @@ public final class CommitmentTypeIndicationsHelper {
 		for(int i = 0; i <= nCtis; i++) {
 
 			// Identifier
-			tmpStr = xParams.getProperty(CAdESExtraParams.COMMITMENT_TYPE_INDICATIONS + Integer.toString(i) + CAdESExtraParams.IDENTIFIER);
+			tmpStr = xParams.getProperty(CAdESExtraParams.COMMITMENT_TYPE_INDICATION_PREFIX + Integer.toString(i) + CAdESExtraParams.COMMITMENT_TYPE_INDICATION_IDENTIFIER);
 			if (tmpStr == null) {
 				continue;
 			}
@@ -113,7 +113,7 @@ public final class CommitmentTypeIndicationsHelper {
 			identifier = ident.toString();
 
 			// Qualifiers
-			tmpStr = xParams.getProperty(CAdESExtraParams.COMMITMENT_TYPE_INDICATIONS + Integer.toString(i) + CAdESExtraParams.COMMITMENT_TYPE_QUALIFIERS);
+			tmpStr = xParams.getProperty(CAdESExtraParams.COMMITMENT_TYPE_INDICATION_PREFIX + Integer.toString(i) + CAdESExtraParams.COMMITMENT_TYPE_INDICATION_QUALIFIERS);
 			if (tmpStr == null) {
 				commitmentTypeQualifiers = null;
 			}

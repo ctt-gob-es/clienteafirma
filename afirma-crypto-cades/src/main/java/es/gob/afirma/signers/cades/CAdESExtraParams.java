@@ -139,7 +139,7 @@ public final class CAdESExtraParams {
      * Lista de OID separados por el caracter '<i>|</i>' que se aportan como calificadores adicionales del
      * <i>CommitmentTypeIndication</i> n&uacute;mero <i>n</i> (contando desde cero). Atributo opcional.
      */
-    static final String COMMITMENT_TYPE_INDICATIONN = "commitmentTypeIndication";//$NON-NLS-1$
+    static final String COMMITMENT_TYPE_INDICATION_PREFIX = "commitmentTypeIndication";//$NON-NLS-1$
     /**
      *  Variables para comprobar los siguientes parametros compuestos:
      *  commitmentTypeIndicationnIdentifier (propiedad compartida con XAdES):
@@ -155,7 +155,7 @@ public final class CAdESExtraParams {
      * Lista de OID separados por el caracter '<i>|</i>' que se aportan como calificadores adicionales del
      * <i>CommitmentTypeIndication</i> n&uacute;mero <i>n</i> (contando desde cero). Atributo opcional.
      */
-    static final String COMMITMENT_TYPE_QUALIFIERS = "CommitmentTypeQualifiers";//$NON-NLS-1$
+    static final String COMMITMENT_TYPE_INDICATION_QUALIFIERS = "CommitmentTypeQualifiers";//$NON-NLS-1$
     /**
      *  Variables para comprobar los siguientes parametros compuestos:
      *  commitmentTypeIndicationnIdentifier (propiedad compartida con XAdES):
@@ -171,7 +171,7 @@ public final class CAdESExtraParams {
      * Lista de OID separados por el caracter '<i>|</i>' que se aportan como calificadores adicionales del
      * <i>CommitmentTypeIndication</i> n&uacute;mero <i>n</i> (contando desde cero). Atributo opcional.
      */
-    static final String IDENTIFIER = "Identifier";//$NON-NLS-1$
+    static final String COMMITMENT_TYPE_INDICATION_IDENTIFIER = "Identifier";//$NON-NLS-1$
 
     /**
      *  URL de la autoridad de sello de tiempo (si no se indica no se a&ntilde;ade sello de tiempo).
