@@ -324,9 +324,9 @@ public final class XAdESExtraParams {
     static final String COMMITMENT_TYPE_INDICATION_DOCUMENTATION_REFERENCE = "DocumentationReferences"; //$NON-NLS-1$
 
     /**
-     * Lista de indicadores textuales separados por el carácter '|' que se aportan como calificadores
-     * adicionales del CommitmentTypeIndication número n (atributo opcional). Normalmente son OID.
-     * Los elementos de la lista no pueden contener el carácter '|' (ya que este se usa como separador).
+     * Lista de indicadores textuales separados por el car&aacute;cter '|' que se aportan como calificadores
+     * adicionales del CommitmentTypeIndication n&uacute;mero n (atributo opcional). Normalmente son OID.
+     * Los elementos de la lista no pueden contener el car&aacute;cter '|' (ya que este se usa como separador).
      * <br>
      * Propiedad compartida con CAdES.
      */
