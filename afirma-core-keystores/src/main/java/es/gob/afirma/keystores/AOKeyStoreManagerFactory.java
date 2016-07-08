@@ -471,12 +471,6 @@ public final class AOKeyStoreManagerFactory {
     		                                                                  final boolean forceReset,
                                                                               final Object parentComponent) throws AOKeystoreAlternativeException,
     		                                                                                                       IOException {
-    	if (Platform.OS.LINUX.equals(Platform.getOS()) && "sql".equals(System.getenv("NSS_DEFAULT_DB_TYPE"))) {  //$NON-NLS-1$//$NON-NLS-2$
-    		LOGGER.info(
-				"Se usara NSS compartido al haberse encontrado la variable de entorno 'NSS_DEFAULT_DB_TYPE' establecida a 'sql'" //$NON-NLS-1$
-			);
-    		return getSharedNssKeyStoreManager(pssCallback, forceReset, parentComponent);
-    	}
         return getNssKeyStoreManager(
     		"es.gob.afirma.keystores.mozilla.MozillaUnifiedKeyStoreManager",  //$NON-NLS-1$
     		pssCallback,

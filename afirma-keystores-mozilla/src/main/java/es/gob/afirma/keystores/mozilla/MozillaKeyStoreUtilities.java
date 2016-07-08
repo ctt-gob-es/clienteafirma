@@ -485,12 +485,12 @@ public final class MozillaKeyStoreUtilities {
 		}
 		return dir;
 	}
-	
+
 	/** Obtiene el directorio del perfil de usuario de Mozilla / Firefox.
 	 * @param iniPath Ruta al fichero de perfiles de Firefox
 	 * @return Ruta completa del directorio del perfil de usuario de Mozilla / Firefox
 	 * @throws IOException Cuando hay errores de entrada / salida */
-	public static String getMozillaUserProfileDirectoryWindows(String iniPath) throws IOException {
+	public static String getMozillaUserProfileDirectoryWindows(final String iniPath) throws IOException {
 		final String dir = NSPreferences.getFireFoxUserProfileDirectory(
 			new File(iniPath)
 		);
@@ -583,12 +583,14 @@ public final class MozillaKeyStoreUtilities {
 	                                                           NoSuchMethodException,
 	                                                           SecurityException,
 	                                                           ClassNotFoundException {
-
 		final String nssDirectory = MozillaKeyStoreUtilities.getSystemNSSLibDir();
 		final String p11NSSConfigFile = MozillaKeyStoreUtilities.createPKCS11NSSConfigFile(
-			useSharedNss ?
-				"sql:/" + SharedNssUtil.getSharedUserProfileDirectory() : //$NON-NLS-1$
-					MozillaKeyStoreUtilities.getMozillaUserProfileDirectory(),
+			("sql".equals(System.getenv("NSS_DEFAULT_DB_TYPE")) ? //$NON-NLS-1$ //$NON-NLS-2$
+				"sql:/" : //$NON-NLS-1$
+					"") + //$NON-NLS-1$
+						(useSharedNss ?
+							SharedNssUtil.getSharedUserProfileDirectory() :
+								MozillaKeyStoreUtilities.getMozillaUserProfileDirectory()),
 			nssDirectory
 		);
 
