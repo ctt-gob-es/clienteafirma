@@ -139,7 +139,10 @@ public final class Updater {
 
 		boolean omitCheck = Boolean.parseBoolean(updaterProperties.getProperty("avoidUpdateCheck")); //$NON-NLS-1$
 		try {
-			omitCheck = Boolean.TRUE.toString().equalsIgnoreCase(System.getenv(AUTOFIRMA_AVOID_UPDATE_CHECK));
+			final String avoidCheckProperty = System.getenv(AUTOFIRMA_AVOID_UPDATE_CHECK);
+			if (avoidCheckProperty != null) {
+				omitCheck = Boolean.TRUE.toString().equalsIgnoreCase(avoidCheckProperty);
+			}
 		}
 		catch(final Exception e) {
 			LOGGER.warning(
