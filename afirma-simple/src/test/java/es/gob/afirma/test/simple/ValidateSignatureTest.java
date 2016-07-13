@@ -6,10 +6,10 @@ import java.io.InputStream;
 import org.junit.Assert;
 import org.junit.Test;
 
+import es.gob.afirma.cert.signvalidation.SignValider;
+import es.gob.afirma.cert.signvalidation.SignValiderFactory;
 import es.gob.afirma.cert.signvalidation.SignValidity;
 import es.gob.afirma.cert.signvalidation.SignValidity.SIGN_DETAIL_TYPE;
-import es.gob.afirma.cert.signvalidation.ValidateBinarySignature;
-import es.gob.afirma.cert.signvalidation.ValidateXMLSignature;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.standalone.SimpleAfirma;
 
@@ -53,7 +53,13 @@ public class ValidateSignatureTest {
 			try ( final InputStream is = ClassLoader.getSystemResourceAsStream(signaturePath); ) {
 				signature = AOUtil.getDataFromInputStream(is);
 			}
-			final SignValidity validity = ValidateXMLSignature.validate(signature);
+			final SignValider valider = SignValiderFactory.getSignValider(signature);
+			if (valider == null) {
+				throw new IOException(
+					"La firma del fichero no se puede comprobar" //$NON-NLS-1$
+				);
+			}
+			final SignValidity validity = valider.validate(signature);
 			System.out.println(signaturePath + ":\n\t" + validity + "\n====================");  //$NON-NLS-1$//$NON-NLS-2$
 			Assert.assertEquals("No es valida la firma " + signaturePath, SIGN_DETAIL_TYPE.OK, validity.getValidity()); //$NON-NLS-1$
 	}
@@ -69,7 +75,13 @@ public class ValidateSignatureTest {
 			try ( final InputStream is = ClassLoader.getSystemResourceAsStream(signaturePath); ) {
 				signature = AOUtil.getDataFromInputStream(is);
 			}
-			final SignValidity validity = ValidateBinarySignature.validate(signature, null);
+			final SignValider valider = SignValiderFactory.getSignValider(signature);
+			if (valider == null) {
+				throw new IOException(
+					"La firma del fichero no se puede comprobar" //$NON-NLS-1$
+				);
+			}
+			final SignValidity validity = valider.validate(signature);
 			System.out.println(signaturePath + ":\n\t" + validity + "\n===================="); //$NON-NLS-1$ //$NON-NLS-2$
 			Assert.assertEquals("No es valida la firma " + signaturePath, SIGN_DETAIL_TYPE.UNKNOWN, validity.getValidity()); //$NON-NLS-1$
 	}
