@@ -66,7 +66,7 @@ public class TestSignatureValidation {
 			final InputStream is = ClassLoader.getSystemResourceAsStream(PADES_FILE);
 		) {
 			final byte[] pades = AOUtil.getDataFromInputStream(is);
-			System.out.println(ValidatePdfSignature.validate(pades));
+			System.out.println(SignValiderFactory.getSignValider(pades).validate(pades));
 		}
 	}
 
@@ -79,7 +79,8 @@ public class TestSignatureValidation {
 			final InputStream is = ClassLoader.getSystemResourceAsStream(PADES_EPES_FILE);
 		) {
 			final byte[] pades = AOUtil.getDataFromInputStream(is);
-			System.out.println(ValidatePdfSignature.validate(pades));
+			System.out.println(SignValiderFactory.getSignValider(pades).validate(pades));
 		}
 	}
 }
+

@@ -46,7 +46,7 @@ public final class CertificateVerifierFactory {
 	 * @return Validador para el certificado proporcionado
 	 * @throws CertificateVerifierFactoryException Si o se conocen mecanismos de validacion
 	 *                                             para los certificados del emisor indicado.*/
-	public static CertificateVerifier getCertificateVerifier(final X509Certificate cert) throws CertificateVerifierFactoryException {
+	public static CertificateVerificable getCertificateVerifier(final X509Certificate cert) throws CertificateVerifierFactoryException {
 		if (cert == null) {
 			throw new IllegalArgumentException("El certificado no puede ser nulo"); //$NON-NLS-1$
 		}
@@ -63,31 +63,31 @@ public final class CertificateVerifierFactory {
 			}
 		}
 
-		final String crc = getIssuerIdentifier(cert);
+		String crc = getIssuerIdentifier(cert);
 		LOGGER.info("Identificador del emisor del certificado: " + crc); //$NON-NLS-1$
 
+		if (p.getProperty(crc + ".validation.properties") == null) { //$NON-NLS-1$
+			crc = "default"; //$NON-NLS-1$
+		}
+
 		final String validationProperties = p.getProperty(crc + ".validation.properties"); //$NON-NLS-1$
-		final String validationMethod     = p.getProperty(crc + ".validation.type"); //$NON-NLS-1$
-		if (validationMethod == null) {
-			try {
-				return new CrlCertificateVerifier(cert);
-			}
-			catch(final Exception e) {
-				throw new CertificateVerifierFactoryException(
-					"No se conocen mecanismos de validacion para los certificados de este emisor: " + cert.getIssuerX500Principal(), e //$NON-NLS-1$
-				);
-			}
+		final String validationClass = p.getProperty(crc + ".validation.type"); //$NON-NLS-1$
+
+		try {
+			final Class<?> certVerifierClass = Class.forName(validationClass);
+			CertificateVerificable certVerif = (CertificateVerificable) certVerifierClass.getConstructor().newInstance();
+			certVerif.setValidationProperties(validationProperties);
+			return certVerif;
 		}
-		else if ("ocsp".equalsIgnoreCase(validationMethod)) { //$NON-NLS-1$
-			LOGGER.info("Se usara OCSP para la validacion"); //$NON-NLS-1$
-			return new OcspCertificateVerifier(validationProperties, cert);
+		catch (final ClassNotFoundException e) {
+			LOGGER.warning("No se encuentran la clase validadora: " + e.toString()); //$NON-NLS-1$
 		}
-		else if ("crl".equalsIgnoreCase(validationMethod)) { //$NON-NLS-1$"
-			LOGGER.info("Se usaran listas de revocacion para la validacion"); //$NON-NLS-1$
-			return new CrlCertificateVerifier(validationProperties, cert);
+		catch (final Exception e) {
+			LOGGER.warning("No se ha podido instanciar el verificador del certificado: " + e); //$NON-NLS-1$
 		}
+
 		throw new IllegalStateException(
-			"No se soporta el medio de validacion: " + validationMethod //$NON-NLS-1$
+			"No se soporta el medio de validacion: " + validationClass //$NON-NLS-1$
 		);
 	}
 

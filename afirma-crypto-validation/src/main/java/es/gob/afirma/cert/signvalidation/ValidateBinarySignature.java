@@ -49,16 +49,18 @@ import es.gob.afirma.signers.cms.AOCMSSigner;
 /** Validador de firmas binarias.
  * @author Carlos Gamuci
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
-public final class ValidateBinarySignature {
+public final class ValidateBinarySignature implements SignValider{
 
-	private ValidateBinarySignature() {
-		// No permitimos la instanciacion
+	@Override
+	public SignValidity validate(final byte[] sign) throws IOException {
+		return validate(sign, null);
 	}
 
     /** Valida una firma binaria (CMS/CAdES). Si se especifican los datos que se firmaron
      * se comprobar&aacute; que efectivamente fueron estos, mientras que si no se indican
      * se extraer&aacute;n de la propia firma. Si la firma no contiene los datos no se realizara
      * esta comprobaci&oacute;n.
+     * Se validan los certificados en local revisando las fechas de validez de los certificados.
      * @param sign Firma binaria
      * @param data Datos firmados o {@code null} si se desea comprobar contra los datos incrustados
      *             en la firma.
@@ -96,13 +98,29 @@ public final class ValidateBinarySignature {
     	try {
     		verifySignatures(sign, data != null ? data : new AOCAdESSigner().getData(sign));
 	    }
+    	catch (final CertStoreException e) {
+    	    // Error al recuperar los certificados o estos no son validos
+            return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.CERTIFICATE_PROBLEM);
+        }
     	catch (final CertificateExpiredException e) {
     		// Certificado caducado
-            return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.CERTIFICATE_EXPIRED);
+    		return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.CERTIFICATE_EXPIRED);
         }
     	catch (final CertificateNotYetValidException e) {
     		// Certificado aun no valido
-            return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.CERTIFICATE_NOT_VALID_YET);
+    		return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.CERTIFICATE_NOT_VALID_YET);
+        }
+    	catch (final NoSuchAlgorithmException e) {
+         // Algoritmo no reconocido
+            return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.ALGORITHM_NOT_SUPPORTED);
+        }
+    	catch (final NoMatchDataException e) {
+         // Los datos indicados no coinciden con los datos de firma
+            return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.NO_MATCH_DATA);
+        }
+    	catch (final CRLException e) {
+         // Problema en la validacion de las CRLs de la firma
+            return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.CRL_PROBLEM);
         }
     	catch (final CMSSignerDigestMismatchException e) {
     		// La firma no es una firma binaria valida
@@ -125,7 +143,6 @@ public final class ValidateBinarySignature {
      * firma o estos no pueden recuperarse.
      * @throws CertificateExpiredException Cuando el certificado est&aacute;a caducado.
      * @throws CertificateNotYetValidException Cuando el certificado aun no es v&aacute;lido.
-     * @throws CertificateException Cuando no se puede componer el certificado.
      * @throws NoSuchAlgorithmException Cuando no se reconoce o soporta alguno de los
      * algoritmos utilizados en la firma.
      * @throws NoMatchDataException Cuando los datos introducidos no coinciden con los firmados.
@@ -134,9 +151,12 @@ public final class ValidateBinarySignature {
      * @throws IOException Cuando no se puede crear un certificado desde la firma para validarlo
      * @throws OperatorCreationException Cuando no se puede crear el validado de contenido de firma*/
     private static void verifySignatures(final byte[] sign, final byte[] data) throws CMSException,
-    																				  CertificateExpiredException,
-    																				  CertificateNotYetValidException,
-    																				  CertificateException,
+                                                                                      CertStoreException,
+                                                                                      NoSuchAlgorithmException,
+                                                                                      NoMatchDataException,
+                                                                                      CRLException,
+                                                                                      NoSuchProviderException,
+                                                                                      CertificateException,
                                                                                       IOException,
                                                                                       OperatorCreationException {
 
@@ -160,7 +180,7 @@ public final class ValidateBinarySignature {
     				certIt.next().getEncoded()
 				)
     		);
-
+            
             cert.checkValidity();
 
             if (!signer.verify(new SignerInformationVerifier(
@@ -171,6 +191,9 @@ public final class ValidateBinarySignature {
     		))) {
             	throw new CMSException("Firma no valida"); //$NON-NLS-1$
             }
+
         }
+
     }
+
 }

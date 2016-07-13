@@ -15,7 +15,9 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.SignatureException;
 import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.util.Properties;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.misc.AOUtil;
@@ -24,17 +26,60 @@ import es.gob.afirma.core.misc.AOUtil;
  * periodo de validez contra el reloj del sistema y la firma por parte de la CA.
  * Clase cedida por <a href="http://www.yohago.com/">YoHago</a>.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
-public abstract class CertificateVerifier {
+public abstract class CertificateVerifier implements CertificateVerificable {
 
 	protected static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	private X509Certificate certificate = null;
-	protected void setSubjectCert(final X509Certificate c) {
+	private Properties conf = new Properties();
+	
+	@Override
+	public void setSubjectCert(final X509Certificate c) {
 		this.certificate = c;
 	}
 
+	protected X509Certificate getCertificate() {
+		return this.certificate;
+	}
+	
+	protected Properties getValidationProperties() {
+		return this.conf;
+	}
+	
+	@Override
+	public void setValidationProperties(String confFile) {
+		try {
+			this.conf.load(CertificateVerifier.class.getResourceAsStream(confFile));
+		}
+		catch (final Exception e) {
+			throw new IllegalArgumentException(
+				"No se ha podido cargar la configuracion del servidor (" + confFile + ": " + e, e //$NON-NLS-1$ //$NON-NLS-2$
+			);
+		}
+		
+		final String issuerCertFile = this.conf.getProperty("issuerCertFile"); //$NON-NLS-1$
+		if (issuerCertFile != null) {
+			try {
+				setIssuerCert(
+					(X509Certificate) CertificateFactory.getInstance(
+						"X.509" //$NON-NLS-1$
+					).generateCertificate(
+						CertificateVerifier.class.getResourceAsStream(issuerCertFile)
+					)
+				);
+			}
+			catch (final CertificateException e) {
+				throw new IllegalArgumentException(
+					"No se ha podido cargar el certificado raiz del emisor (" + issuerCertFile + "): " + e, e //$NON-NLS-1$ //$NON-NLS-2$
+				);
+			}
+		}
+	}
+	
 	private X509Certificate issuerCert;
-	protected void setIssuerCert(final X509Certificate cert) {
+	
+	@Override
+	public void setIssuerCert(final X509Certificate cert) {
 		this.issuerCert = cert;
 	}
 	protected X509Certificate getIssuerCert() {
@@ -43,13 +88,16 @@ public abstract class CertificateVerifier {
 
 	/** Valida el certificado X.509v3 que se ha proporcionado en el constructor.
 	 * @return Resultado de la validaci&oacute;n */
+	@Override
 	public ValidationResult validateCertificate() {
 		return validateCertificate(this.certificate);
 	}
 
-	protected abstract ValidationResult verifyRevocation(final X509Certificate cert);
+	@Override
+	public abstract ValidationResult verifyRevocation(final X509Certificate cert);
 
-	protected void verifyIssuer(final X509Certificate cert) throws CertificateException, SignatureException {
+	@Override
+	public void verifyIssuer(final X509Certificate cert) throws CertificateException, SignatureException {
 
 		if (cert == null) {
 			throw new CertificateException("Se ha proporcionado un certificado nulo"); //$NON-NLS-1$
@@ -84,6 +132,7 @@ public abstract class CertificateVerifier {
 	/** Valida un certificado X.509v3.
 	 * @param cert Certificado a validar
 	 * @return Resultado de la validaci&oacute;n */
+	@Override
 	public ValidationResult validateCertificate(final X509Certificate cert) {
 
 		if (cert == null) {

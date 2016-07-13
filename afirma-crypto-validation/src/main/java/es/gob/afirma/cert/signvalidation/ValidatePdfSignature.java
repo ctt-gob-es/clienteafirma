@@ -27,23 +27,22 @@ import es.gob.afirma.cert.signvalidation.SignValidity.SIGN_DETAIL_TYPE;
 import es.gob.afirma.cert.signvalidation.SignValidity.VALIDITY_ERROR;
 
 /** Validador de firmas PDF.
+ * Se validan los certificados en local revisando las fechas de validez de los certificados.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
-public final class ValidatePdfSignature {
+public final class ValidatePdfSignature implements SignValider{
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	private static final PdfName PDFNAME_ETSI_RFC3161 = new PdfName("ETSI.RFC3161"); //$NON-NLS-1$
 	private static final PdfName PDFNAME_DOCTIMESTAMP = new PdfName("DocTimeStamp"); //$NON-NLS-1$
 
-	private ValidatePdfSignature() {
-		// No instanciable
-	}
-
-	/** Valida una firma PDF (PKCS#7/PAdES).
+	/** Valida una firma PDF (PKCS#7/PAdES). 
+	 * Se validan los certificados en local revisando las fechas de validez de los certificados.
      * @param sign PDF firmado.
      * @return Validez de la firma.
      * @throws IOException Si ocurren problemas relacionados con la lectura de la firma. */
-	public static SignValidity validate(final byte[] sign) throws IOException {
+	@Override
+	public SignValidity validate(final byte[] sign) throws IOException {
 		final PdfReader reader = new PdfReader(sign);
 		final AcroFields af = reader.getAcroFields();
 		final List<String> sigNames = af.getSignatureNames();
@@ -71,10 +70,12 @@ public final class ValidatePdfSignature {
 			}
 			catch (final CertificateExpiredException e) {
 				// Certificado caducado
+				LOGGER.info("El certificado usado ha expirado: " + e); //$NON-NLS-1$
 	            return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.CERTIFICATE_EXPIRED);
 			}
 			catch (final CertificateNotYetValidException e) {
 				// Certificado aun no valido
+				LOGGER.info("El certificado usado todavia no es valido: " + e); //$NON-NLS-1$
 	            return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.CERTIFICATE_NOT_VALID_YET);
 			}
 		}

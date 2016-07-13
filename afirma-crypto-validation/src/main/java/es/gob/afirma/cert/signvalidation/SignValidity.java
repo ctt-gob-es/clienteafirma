@@ -46,6 +46,8 @@ public final class SignValidity {
 				return ret + ": existe un certificado de firma que aun no es valido"; //$NON-NLS-1$
 			case ALGORITHM_NOT_SUPPORTED:
 				return ret + ": la firma contiene un algoritmo no reconocido o no soportado"; //$NON-NLS-1$
+			case CA_NOT_SUPPORTED:
+				return ret + ": no se soporta la CA de expedición."; //$NON-NLS-1$
 			case CRL_PROBLEM:
 				return ret + ": existe algun problema con las CRLs incrustadas en la firma"; //$NON-NLS-1$
 			case PDF_UNKOWN_VALIDITY:
@@ -93,6 +95,8 @@ public final class SignValidity {
         CERTIFICATE_NOT_VALID_YET,
         /** Cuando la firma contiene un algoritmo no reconocido o no soportado. */
         ALGORITHM_NOT_SUPPORTED,
+        /** Cuando el emisor del certificado no es v&aacute;lido. */
+        CA_NOT_SUPPORTED,
         /** Cuando existe alg&uacute;n problema con las CRLs incrustadas en la firma. */
         CRL_PROBLEM,
         /** Cuando se trata de una firma PDF. */
