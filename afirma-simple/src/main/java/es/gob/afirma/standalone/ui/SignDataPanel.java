@@ -51,7 +51,7 @@ import javax.swing.event.HyperlinkEvent;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeSelectionModel;
 
-import es.gob.afirma.cert.certvalidation.CertificateVerifier;
+import es.gob.afirma.cert.certvalidation.CertificateVerificable;
 import es.gob.afirma.cert.certvalidation.CertificateVerifierFactory;
 import es.gob.afirma.cert.certvalidation.ValidationResult;
 import es.gob.afirma.core.misc.Platform;
@@ -229,7 +229,7 @@ final class SignDataPanel extends JPanel {
                 this.certDescription.addKeyListener(editorFocusManager);
 	            this.certDescription.addHyperlinkListener(editorFocusManager);
 
-	            CertificateVerifier cfv = null;
+	            CertificateVerificable cfv = null;
 	            try {
 	            	cfv = CertificateVerifierFactory.getCertificateVerifier(cert);
 	            }
@@ -238,7 +238,7 @@ final class SignDataPanel extends JPanel {
 	            }
 
 	            if (cfv != null) {
-	            	final CertificateVerifier cf = cfv;
+	            	final CertificateVerificable cf = cfv;
 	            	this.validateCertButton = new JButton();
 	                this.validateCertButton.setPreferredSize(new Dimension(150, 24));
 	                this.validateCertButton.setText(SimpleAfirmaMessages.getString("SignDataPanel.15")); //$NON-NLS-1$
