@@ -77,6 +77,7 @@ public final class CertificateVerifierFactory {
 			final Class<?> certVerifierClass = Class.forName(validationClass);
 			CertificateVerificable certVerif = (CertificateVerificable) certVerifierClass.getConstructor().newInstance();
 			certVerif.setValidationProperties(validationProperties);
+			certVerif.setSubjectCert(cert);
 			return certVerif;
 		}
 		catch (final ClassNotFoundException e) {
