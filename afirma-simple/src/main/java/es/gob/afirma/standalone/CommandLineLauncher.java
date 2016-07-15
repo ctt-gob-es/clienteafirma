@@ -45,6 +45,7 @@ import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.keystores.AOKeyStore;
 import es.gob.afirma.keystores.AOKeyStoreManager;
+import es.gob.afirma.keystores.AOKeyStoreManagerException;
 import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
 import es.gob.afirma.keystores.AOKeystoreAlternativeException;
 import es.gob.afirma.keystores.callbacks.CachePasswordCallback;
@@ -640,7 +641,7 @@ final class CommandLineLauncher {
 		return resBytes;
 	}
 
-	private static String listAliasesByCommandLine(final CommandLineParameters params) throws IOException, CommandLineException, AOKeystoreAlternativeException {
+	private static String listAliasesByCommandLine(final CommandLineParameters params) throws IOException, CommandLineException, AOKeystoreAlternativeException, AOKeyStoreManagerException {
 
 		final String[] aliases = getKsm(params.getStore(), params.getPassword()).getAliases();
 		final StringBuilder sb = new StringBuilder();
@@ -661,7 +662,7 @@ final class CommandLineLauncher {
 		return sb.toString();
 	}
 
-	private static AOKeyStoreManager getKsm(final String storeType, final String pwd) throws IOException, CommandLineException, AOKeystoreAlternativeException {
+	private static AOKeyStoreManager getKsm(final String storeType, final String pwd) throws IOException, CommandLineException, AOKeystoreAlternativeException, AOKeyStoreManagerException {
 		final AOKeyStore store;
 		String lib = null;
 		if (STORE_AUTO.equals(storeType) || storeType == null) {
