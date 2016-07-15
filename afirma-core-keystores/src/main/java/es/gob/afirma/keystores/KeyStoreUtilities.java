@@ -322,7 +322,7 @@ public final class KeyStoreUtilities {
 		}
 	}
 
-	private static AOKeyStoreManager getCeres(final Object parentComponent) throws AOKeystoreAlternativeException, IOException {
+	private static AOKeyStoreManager getCeres(final Object parentComponent) throws AOKeystoreAlternativeException, IOException, AOKeyStoreManagerException {
 		final AOKeyStoreManager tmpKsm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
 			AOKeyStore.CERES, // Store
 			null,             // Lib (null)

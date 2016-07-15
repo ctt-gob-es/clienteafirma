@@ -10,6 +10,7 @@ import org.junit.Test;
 
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
+import es.gob.afirma.core.signers.AOSignConstants;
 
 /** Pruebas de firmas XAdES con MANIFEST. */
 public final class TestXAdESWithManifest {
@@ -20,6 +21,39 @@ public final class TestXAdESWithManifest {
 
     private static final String ALGORITHM = "SHA1withRSA"; //$NON-NLS-1$
 
+    /** Prueba de firma XAdES Externally Detached con Manifest y URI no dereferenciable (URN).
+     * @throws Exception En cualquier error. */
+    @SuppressWarnings("static-method")
+	@Test
+    public void testXadesExternallyDetachedUseManifest() throws Exception {
+		final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
+        ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH), CERT_PASS.toCharArray());
+        final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
+
+        // Los datos son la huella de los datos
+        final byte[] data = MessageDigest.getInstance("SHA-512").digest( //$NON-NLS-1$
+    		AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream("ANF_con cadena_certificacion.jks")) //$NON-NLS-1$
+		);
+        System.out.println("Huella de los datos: " + Base64.encode(data)); //$NON-NLS-1$
+
+        final AOXAdESSigner signer = new AOXAdESSigner();
+
+        final Properties p = new Properties();
+        p.setProperty("useManifest", "true"); //$NON-NLS-1$ //$NON-NLS-2$
+        p.setProperty("precalculatedHashAlgorithm", "SHA-512"); //$NON-NLS-1$ //$NON-NLS-2$
+        p.setProperty("format", AOSignConstants.SIGN_FORMAT_XADES_EXTERNALLY_DETACHED); //$NON-NLS-1$
+        p.setProperty("uri", "urn:id:001"); //$NON-NLS-1$ //$NON-NLS-2$
+
+        final byte[] signature = signer.sign(data, ALGORITHM, pke.getPrivateKey(), pke.getCertificateChain(), p);
+
+        final File f = File.createTempFile("xadesExternallyDetachedManifest-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$
+		final java.io.FileOutputStream fos = new java.io.FileOutputStream(f);
+		fos.write(signature);
+		fos.flush(); fos.close();
+		System.out.println("Firma para comprobacion manual: " + f.getAbsolutePath()); //$NON-NLS-1$
+
+    }
+    
 	/** Pruebas de firmas XAdES Enveloping de binario con MANIFEST.
 	 * @throws Exception en cualquier error. */
 	@SuppressWarnings("static-method")

@@ -23,6 +23,7 @@ import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.keystores.callbacks.NullPasswordCallback;
+import es.gob.afirma.keystores.temd.TemdKeyStoreManager;
 
 /** Obtiene clases de tipo AOKeyStoreManager seg&uacute;n se necesiten,
  * proporcionando adem&aacute;s ciertos m&eacute;todos de utilidad. Contiene
@@ -52,6 +53,7 @@ public final class AOKeyStoreManagerFactory {
      * @throws AOCancelledOperationException Cuando el usuario cancela el proceso (por ejemplo, al introducir la contrase&ntilde;a)
      * @throws AOKeystoreAlternativeException Cuando ocurre cualquier otro problema durante el proceso
      * @throws IOException Cuando la contrase&ntilde;a del almac&eacute;n es incorrecta.
+     * @throws AOKeyStoreManagerException
      * @throws es.gob.afirma.core.InvalidOSException Cuando se pide un almac&eacute;n &uacute;nicamente disponible para
      *                                               un sistema operativo distinto del actual
      * @throws es.gob.afirma.core.MissingLibraryException Cuando no se localice una biblioteca necesaria para el
@@ -61,7 +63,8 @@ public final class AOKeyStoreManagerFactory {
                                                                  final String description,
                                                                  final PasswordCallback pssCallback,
                                                                  final Object parentComponent) throws AOKeystoreAlternativeException,
-                                                                                                      IOException {
+                                                                                                      IOException,
+                                                                                                      AOKeyStoreManagerException {
     	boolean forceReset;
     	// Se usa try-catch para capturar errores de permisos de lectura de variables
     	try {
@@ -138,6 +141,11 @@ public final class AOKeyStoreManagerFactory {
     	// Driver Java para CERES
         if (AOKeyStore.CERES.equals(store)) {
         	return new AggregatedKeyStoreManager(getCeresJavaKeyStoreManager(pssCallback, forceReset, parentComponent));
+        }
+
+     // Driver Java para TEMD
+        if (Platform.getOS().equals(Platform.OS.WINDOWS) && AOKeyStore.TEMD.equals(store)) {
+        	return new TemdKeyStoreManager(parentComponent);
         }
 
         throw new AOKeystoreAlternativeException(
