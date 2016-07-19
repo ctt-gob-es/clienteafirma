@@ -88,15 +88,12 @@ final class PolicyPanel extends JPanel implements ItemListener {
 	 *  En el caso de XAdES, si la pol&iacute;tica de firma es la de la AGE, hay que
 	 *  restringir al tipo <i>Enveloped</i>, dej&aacute;ndolo libre en caso de pol&iacute;tica
 	 *  a medida o sin pol&iacute;tica.
-	 * </p>
-	 * @param unprotected <code>true</code> para permitir al usuario realizar cualquier modificaci&oacute;n en las preferencias,
-	 *                    <code>false</code> para limitar las preferencias que puede modificar. */
+	 * </p> */
 	PolicyPanel(final String signFormat,
 			    final List<PolicyItem> policies,
 			    final AdESPolicy currentPolicy,
-			    final JComboBox<Object> adesSubFormat,
-			    final boolean unprotected) {
-		this(signFormat, policies, currentPolicy, adesSubFormat, true, true, true, unprotected);
+			    final JComboBox<Object> adesSubFormat) {
+		this(signFormat, policies, currentPolicy, adesSubFormat, true, true, true);
 	}
 
 	final boolean allowNoPolicy;
@@ -121,17 +118,14 @@ final class PolicyPanel extends JPanel implements ItemListener {
 	 * @param noPolicyOp Indica si debe permitirse seleccionar ninguna pol&iacute;tica.
 	 * @param customPolicyOp Indica si debe permitirse seleccionar una pol&iacute;tica a medida.
 	 * @param showFields Indica si han de mostrarse o no los campos con los datos de la
-	 *                   pol&iacute;tica.
-	 * @param unprotected <code>true</code> para permitir al usuario realizar cualquier modificaci&oacute;n en las preferencias,
-	 *                    <code>false</code> para limitar las preferencias que puede modificar. */
+	 *                   pol&iacute;tica. */
 	PolicyPanel(final String signFormat,
 			    final List<PolicyItem> policies,
 			    final AdESPolicy currentPolicy,
 			    final JComboBox<Object> adesSubFormat,
 			    final boolean noPolicyOp,
 			    final boolean customPolicyOp,
-			    final boolean showFields,
-			    final boolean unprotected) {
+			    final boolean showFields) {
 
 		this.subFormatCombo = adesSubFormat;
 		this.signatureFormat = signFormat;
@@ -176,16 +170,14 @@ final class PolicyPanel extends JPanel implements ItemListener {
 		}
 		this.currentPolicy = currentPolicy;
 
-		createUI(signFormat, showFields, unprotected);
+		createUI(signFormat, showFields);
 	}
 
 	/** Crea la interfaz gr&aacute;fica del panel.
 	 * @param signFormat Formato de firma.
 	 * @param showFields Indica si han de mostrarse o no los campos con los datos de la
-	 *                   pol&iacute;tica.
-	 * @param unprotected <code>true</code> para permitir al usuario realizar cualquier modificaci&oacute;n en las preferencias,
-	 *                    <code>false</code> para limitar las preferencias que puede modificar. */
-	private void createUI(final String signFormat, final boolean showFields, final boolean unprotected) {
+	 *                   pol&iacute;tica. */
+	private void createUI(final String signFormat, final boolean showFields) {
 		setBorder(
 			BorderFactory.createTitledBorder(
 				SimpleAfirmaMessages.getString("PreferencesPanel.23") //$NON-NLS-1$
@@ -205,7 +197,6 @@ final class PolicyPanel extends JPanel implements ItemListener {
 				this.policies.toArray(new PolicyItem[this.policies.size()])
 			)
 		);
-		this.policiesCombo.setEnabled(unprotected);
 
 		add(this.policiesCombo, c);
 		this.policiesCombo.getAccessibleContext().setAccessibleDescription(
@@ -297,13 +288,6 @@ final class PolicyPanel extends JPanel implements ItemListener {
 			this.qualifierField.getAccessibleContext().setAccessibleDescription(
 				SimpleAfirmaMessages.getString("PreferencesPanel.56") //$NON-NLS-1$
 			);
-
-			if (enableTextFields && !unprotected) {
-				this.identifierField.setEnabled(unprotected);
-				this.hashField.setEnabled(unprotected);
-				this.hashAlgorithmField.setEnabled(unprotected);
-				this.qualifierField.setEnabled(unprotected);
-			}
 
 			final JLabel policyQualifierLabel = new JLabel(
 				SimpleAfirmaMessages.getString("PreferencesPanel.30") //$NON-NLS-1$

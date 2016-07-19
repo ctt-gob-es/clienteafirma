@@ -54,14 +54,13 @@ final class PreferencesPanel extends JPanel implements KeyListener, DisposableIn
 
 	void createUI(final int selectedTabIndex) {
 
-		final boolean unprotected = PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_UNPROTECTED, true);
 
-		this.preferencesPanelGeneral = new PreferencesPanelGeneral(this, this.modificationListener, this, this, unprotected);
-		this.preferencesPanelCades = new PreferencesPanelCades(this, this.modificationListener, unprotected);
-		this.preferencesPanelPades = new PreferencesPanelPades(this, this.modificationListener, unprotected);
-		this.preferencesPanelKeyStores = new PreferencesPanelKeyStores(this, this.modificationListener, unprotected);
-		this.preferencesPanelFacturaE = new PreferencesPanelFacturaE(this, this.modificationListener, unprotected);
-		this.preferencesPanelXades = new PreferencesPanelXades(this, this.modificationListener, unprotected);
+		this.preferencesPanelGeneral = new PreferencesPanelGeneral(this, this.modificationListener, this, this);
+		this.preferencesPanelCades = new PreferencesPanelCades(this, this.modificationListener);
+		this.preferencesPanelPades = new PreferencesPanelPades(this, this.modificationListener);
+		this.preferencesPanelKeyStores = new PreferencesPanelKeyStores(this, this.modificationListener);
+		this.preferencesPanelFacturaE = new PreferencesPanelFacturaE(this, this.modificationListener);
+		this.preferencesPanelXades = new PreferencesPanelXades(this, this.modificationListener);
 
 		this.tabbedPane.addKeyListener(this);
 

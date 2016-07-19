@@ -46,7 +46,6 @@ final class PreferencesPanelXades extends JPanel {
 		"https://sede.060.gob.es/politica_de_firma_anexo_1.pdf" //$NON-NLS-1$
 	);
 
-	private boolean unprotected = true;
 	private final JTextField xadesSignatureProductionCity = new JTextField();
 	private final JTextField xadesSignatureProductionProvince = new JTextField();
 	private final JTextField xadesSignatureProductionPostalCode = new JTextField();
@@ -64,16 +63,13 @@ final class PreferencesPanelXades extends JPanel {
 	private PolicyPanel xadesPolicyPanel;
 
 	PreferencesPanelXades(final KeyListener keyListener,
-						  final ModificationListener modificationListener,
-						  final boolean unprotected) {
+						  final ModificationListener modificationListener) {
 
-		this.unprotected = unprotected;
-		createUI(keyListener, modificationListener, unprotected);
+		createUI(keyListener, modificationListener);
 	}
 
 	void createUI(final KeyListener keyListener,
-				  final ModificationListener modificationListener,
-				  final boolean unprotected) {
+				  final ModificationListener modificationListener) {
 
         setLayout(new GridBagLayout());
 
@@ -175,7 +171,6 @@ final class PreferencesPanelXades extends JPanel {
         this.xadesSignFormat.getAccessibleContext().setAccessibleDescription(SimpleAfirmaMessages.getString("PreferencesPanel.53")); //$NON-NLS-1$
         this.xadesSignFormat.addItemListener(modificationListener);
         this.xadesSignFormat.addKeyListener(keyListener);
-        this.xadesSignFormat.setEnabled(unprotected);
 
         final JLabel xadesFormatLabel = new JLabel(
 				SimpleAfirmaMessages.getString("PreferencesPanel.15") //$NON-NLS-1$
@@ -296,8 +291,7 @@ final class PreferencesPanelXades extends JPanel {
     		SIGN_FORMAT_XADES,
     		xadesPolicies,
     		getXadesPreferedPolicy(),
-    		this.xadesSignFormat,
-    		this.unprotected
+    		this.xadesSignFormat
 		);
 
         final GridBagConstraints c = new GridBagConstraints();

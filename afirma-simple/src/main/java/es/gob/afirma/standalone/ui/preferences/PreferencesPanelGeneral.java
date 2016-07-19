@@ -85,12 +85,11 @@ final class PreferencesPanelGeneral extends JPanel {
 	PreferencesPanelGeneral(final KeyListener keyListener,
 			                final ItemListener modificationListener,
 			                final DisposableInterface di,
-			                final PreferencesPanel prefPanel,
-			                final boolean unprotected) {
+			                final PreferencesPanel prefPanel) {
 		this.disposableInterface = di;
 		this.preferencesPanel = prefPanel;
 
-		createUI(keyListener, modificationListener, unprotected);
+		createUI(keyListener, modificationListener);
 	}
 
 	void savePreferences() {
@@ -129,8 +128,7 @@ final class PreferencesPanelGeneral extends JPanel {
 	}
 
 	void createUI(final KeyListener keyListener,
-				  final ItemListener modificationListener,
-				  final boolean unprotected) {
+				  final ItemListener modificationListener) {
 
 
 		setLayout(new GridBagLayout());
@@ -224,7 +222,6 @@ final class PreferencesPanelGeneral extends JPanel {
 		importConfigFromFileButton.getAccessibleContext().setAccessibleDescription(
 			SimpleAfirmaMessages.getString("PreferencesPanel.112") //$NON-NLS-1$
 		);
-		importConfigFromFileButton.setEnabled(unprotected);
 
 		final JButton restoreConfigFromFileButton = new JButton(
 			SimpleAfirmaMessages.getString("PreferencesPanel.135") //$NON-NLS-1$
@@ -261,7 +258,6 @@ final class PreferencesPanelGeneral extends JPanel {
 		restoreConfigFromFileButton.getAccessibleContext().setAccessibleDescription(
 			SimpleAfirmaMessages.getString("PreferencesPanel.136") //$NON-NLS-1$
 		);
-		restoreConfigFromFileButton.setEnabled(unprotected);
 
 		final JPanel panel = new JPanel();
 		panel.setLayout(new FlowLayout(FlowLayout.LEFT));
@@ -353,15 +349,13 @@ final class PreferencesPanelGeneral extends JPanel {
 				}
 			)
 		);
-		this.signarureAlgorithms.setEnabled(unprotected);
 		signatureAgorithmPanel.add(this.signarureAlgorithms);
 
 		signGeneralPanel.add(signatureAgorithmPanel, c);
 
 		final JPanel signatureDefaultsFormats = createSignatureFormatPanel(
 			modificationListener,
-			keyListener,
-			unprotected
+			keyListener
 		);
 
 		final JPanel netConfigPanel = new JPanel(new FlowLayout(FlowLayout.LEADING));
@@ -387,7 +381,6 @@ final class PreferencesPanelGeneral extends JPanel {
 		proxyConfigButton.getAccessibleContext().setAccessibleDescription(
 			SimpleAfirmaMessages.getString("PreferencesPanel.127") //$NON-NLS-1$
 		);
-		proxyConfigButton.setEnabled(unprotected);
 
 		final JLabel proxyLabel = new JLabel(SimpleAfirmaMessages.getString("PreferencesPanel.128")); //$NON-NLS-1$
 		proxyLabel.setLabelFor(proxyConfigButton);
@@ -410,13 +403,10 @@ final class PreferencesPanelGeneral extends JPanel {
 	/** Crea el panel con la configuraci&oacute;n de los formatos de firma a utilizar con cada tipo de fichero.
 	 * @param modificationListener Listener para la detecci&oacute;n de cambio de configuraci&oacute;n.
 	 * @param keyListener Listener para la deteccion del uso de teclas para el cierre de la pantalla.
-	 * @param unprotected <code>true</code> para permitir al usuario realizar cualquier modificaci&oacute;n en las preferencias,
-	 *                    <code>false</code> para limitar las preferencias que puede modificar.
 	 * @return Panel con los componentes de configuraci&oacute;n. */
 	private JPanel createSignatureFormatPanel(
 			final ItemListener modificationListener,
-			final KeyListener keyListener,
-			final boolean unprotected) {
+			final KeyListener keyListener) {
 
 		final JPanel signatureDefaultsFormats = new JPanel(new GridBagLayout());
 		signatureDefaultsFormats.setBorder(
@@ -437,7 +427,6 @@ final class PreferencesPanelGeneral extends JPanel {
 		pdfFilesLabel.setLabelFor(this.pdfFilesCombo);
 		this.pdfFilesCombo.addItemListener(modificationListener);
 		this.pdfFilesCombo.addKeyListener(keyListener);
-		this.pdfFilesCombo.setEnabled(unprotected);
 		c.gridx = 0;
 		c.weightx = 0;
 		signatureDefaultsFormats.add(pdfFilesLabel, c);
@@ -451,7 +440,6 @@ final class PreferencesPanelGeneral extends JPanel {
 		ooxmlFilesLabel.setLabelFor(this.ooxmlFilesCombo);
 		this.ooxmlFilesCombo.addItemListener(modificationListener);
 		this.ooxmlFilesCombo.addKeyListener(keyListener);
-		this.ooxmlFilesCombo.setEnabled(unprotected);
 		c.gridx = 0;
 		c.weightx = 0;
 		signatureDefaultsFormats.add(ooxmlFilesLabel, c);
@@ -465,7 +453,6 @@ final class PreferencesPanelGeneral extends JPanel {
 		facturaeFilesLabel.setLabelFor(this.facturaeFilesCombo);
 		this.facturaeFilesCombo.addItemListener(modificationListener);
 		this.facturaeFilesCombo.addKeyListener(keyListener);
-		this.facturaeFilesCombo.setEnabled(unprotected);
 		c.gridx = 0;
 		c.weightx = 0;
 		signatureDefaultsFormats.add(facturaeFilesLabel, c);
@@ -479,7 +466,6 @@ final class PreferencesPanelGeneral extends JPanel {
 		xmlFilesLabel.setLabelFor(this.xmlFilesCombo);
 		this.xmlFilesCombo.addItemListener(modificationListener);
 		this.xmlFilesCombo.addKeyListener(keyListener);
-		this.xmlFilesCombo.setEnabled(unprotected);
 		c.gridx = 0;
 		c.weightx = 0;
 		signatureDefaultsFormats.add(xmlFilesLabel, c);
@@ -493,7 +479,6 @@ final class PreferencesPanelGeneral extends JPanel {
 		odfFilesLabel.setLabelFor(this.odfFilesCombo);
 		this.odfFilesCombo.addItemListener(modificationListener);
 		this.odfFilesCombo.addKeyListener(keyListener);
-		this.odfFilesCombo.setEnabled(unprotected);
 		c.gridx = 0;
 		c.weightx = 0;
 		signatureDefaultsFormats.add(odfFilesLabel, c);
@@ -507,7 +492,6 @@ final class PreferencesPanelGeneral extends JPanel {
 		binFilesLabel.setLabelFor(this.binFilesCombo);
 		this.binFilesCombo.addItemListener(modificationListener);
 		this.binFilesCombo.addKeyListener(keyListener);
-		this.binFilesCombo.setEnabled(unprotected);
 		c.gridx = 0;
 		c.weightx = 0;
 		signatureDefaultsFormats.add(binFilesLabel, c);

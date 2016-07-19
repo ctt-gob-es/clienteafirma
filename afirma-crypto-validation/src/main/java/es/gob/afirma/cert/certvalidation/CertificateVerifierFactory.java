@@ -75,21 +75,19 @@ public final class CertificateVerifierFactory {
 
 		try {
 			final Class<?> certVerifierClass = Class.forName(validationClass);
-			CertificateVerificable certVerif = (CertificateVerificable) certVerifierClass.getConstructor().newInstance();
+			final CertificateVerificable certVerif = (CertificateVerificable) certVerifierClass.getConstructor().newInstance();
 			certVerif.setValidationProperties(validationProperties);
 			certVerif.setSubjectCert(cert);
 			return certVerif;
 		}
 		catch (final ClassNotFoundException e) {
-			LOGGER.warning("No se encuentran la clase validadora: " + e.toString()); //$NON-NLS-1$
+			LOGGER.warning("No se encuentran la clase validadora: " + e); //$NON-NLS-1$
+			throw new CertificateVerifierFactoryException("No se encuentran la clase validadora: " + e, e); //$NON-NLS-1$
 		}
 		catch (final Exception e) {
 			LOGGER.warning("No se ha podido instanciar el verificador del certificado: " + e); //$NON-NLS-1$
+			throw new CertificateVerifierFactoryException("No se ha podido instanciar el verificador del certificado: " + e, e); //$NON-NLS-1$
 		}
-
-		throw new IllegalStateException(
-			"No se soporta el medio de validacion: " + validationClass //$NON-NLS-1$
-		);
 	}
 
 }

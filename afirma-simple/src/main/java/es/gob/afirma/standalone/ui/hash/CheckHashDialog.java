@@ -38,6 +38,8 @@ import es.gob.afirma.standalone.ui.CommonWaitDialog;
 /** Di&aacute;logo para la comprobaci&oacute;n de huellas digitales. */
 public final class CheckHashDialog extends JDialog implements KeyListener {
 
+	private static final long serialVersionUID = 2431770911918905439L;
+
 	private static final int SIZE_WAIT = 50000000; //Tamano en bytes
 
 	private final JTextField textFieldHash = new JTextField();

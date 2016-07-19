@@ -75,20 +75,16 @@ final class PreferencesPanelFacturaE extends JPanel {
 
 	private final JPanel panelPolicies = new JPanel();
 	private PolicyPanel facturaePolicyPanel;
-	private boolean unprotected = true;
 
 	PreferencesPanelFacturaE(final KeyListener keyListener,
-							 final ModificationListener modificationListener,
-							 final boolean unprotected) {
+							 final ModificationListener modificationListener) {
 
-		createUI(keyListener, modificationListener, unprotected);
+		createUI(keyListener, modificationListener);
 	}
 
 	void createUI(final KeyListener keyListener,
-				  final ModificationListener modificationListener,
-				  final boolean unprotected) {
+				  final ModificationListener modificationListener) {
 
-		this.unprotected = unprotected;
         setLayout(new GridBagLayout());
 
         final GridBagConstraints gbc = new GridBagConstraints();
@@ -337,8 +333,7 @@ final class PreferencesPanelFacturaE extends JPanel {
     		null,
     		false,
     		false,
-    		false,
-    		this.unprotected
+    		false
 		);
 
         final GridBagConstraints c = new GridBagConstraints();

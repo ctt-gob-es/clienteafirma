@@ -570,7 +570,6 @@ final class CAdESCounterSigner {
         		signerInfos.add(SignerInfo.getInstance(eAtributesData.nextElement()));
         	}
         	catch(final Exception e) {
-        		Logger.getLogger("es.gob.afirma").warning("No es un SignerInfo");
         		// Ignoramos los objetos que no sea SignedInfo
         		continue;
         	}

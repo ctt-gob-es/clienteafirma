@@ -76,15 +76,13 @@ final class PreferencesPanelKeyStores extends JPanel {
 	}
 
 	PreferencesPanelKeyStores(final KeyListener keyListener,
-							  final ModificationListener modificationListener,
-							  final boolean unprotected) {
+							  final ModificationListener modificationListener) {
 
-		createUI(keyListener, modificationListener, unprotected);
+		createUI(keyListener, modificationListener);
 	}
 
 	void createUI(final KeyListener keyListener,
-				  final ModificationListener modificationListener,
-				  final boolean unprotected) {
+				  final ModificationListener modificationListener) {
 
         setLayout(new GridBagLayout());
 
@@ -113,7 +111,6 @@ final class PreferencesPanelKeyStores extends JPanel {
 	    this.onlySignature.setMnemonic('i');
 	    this.onlySignature.addItemListener(modificationListener);
 	    this.onlySignature.addKeyListener(keyListener);
-	    this.onlySignature.setEnabled(unprotected);
 	    keysFilerPanel.add(this.onlySignature, kfc);
 
         kfc.gridy++;
@@ -124,7 +121,6 @@ final class PreferencesPanelKeyStores extends JPanel {
 	    this.onlyAlias.setMnemonic('s');
 	    this.onlyAlias.addItemListener(modificationListener);
 	    this.onlyAlias.addKeyListener(keyListener);
-	    this.onlyAlias.setEnabled(unprotected);
 	    keysFilerPanel.add(this.onlyAlias, kfc);
 
 	    final JPanel trustPanel = new JPanel();
@@ -164,7 +160,6 @@ final class PreferencesPanelKeyStores extends JPanel {
 
 		this.defaultStore.addItemListener(modificationListener);
 		this.defaultStore.addKeyListener(keyListener);
-		this.defaultStore.setEnabled(unprotected);
 
 		//TODO: Descomentar una vez se entregue
 		keysStorePanel.add(this.defaultStore, ksc);
@@ -223,7 +218,6 @@ final class PreferencesPanelKeyStores extends JPanel {
 			SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.8") //$NON-NLS-1$
 		);
 		this.contentButton.addKeyListener(keyListener);
-		this.contentButton.setEnabled(unprotected);
 
 		//TODO: Descomentar una vez se entregue
 		keysStorePanel.add(this.contentButton, ksc);

@@ -48,13 +48,6 @@ public final class PreferencesManager {
 	/** Contraseña del servidor <i>proxy</i> configurado. */
 	public static final String PREFERENCE_GENERAL_PROXY_PASSWORD = "proxyPassword"; //$NON-NLS-1$
 
-	/** Proteger cambios en preferencias.
-	 * Un valor de <code>true</code> en esta preferencia indica que deben limitarse las opciones de configuraci&oacute;n
-	 * mediante interfaz gr&aacute;fico, apareciendo de forma deshabilitada (solo para consulta).
-	 * Un valor de <code>false</code> habilitar&aacute; que cualquier opci&oacute;n de configuraci&oacute;n pueda ser
-	 * alterada por parte del usuario mediante el interfaz gr&aacute;fico. */
-	public static final String PREFERENCE_GENERAL_UNPROTECTED = "preferencesUnprotected"; //$NON-NLS-1$
-
 	/** Evitar la confirmaci&oacute;n al cerrar la aplicaci&oacute;n o no.
 	 * Un valor de <code>true</code> en esta preferencia permitir&aacute; cerrar la aplicaci&oacute;n sin ning&uacute;n di&aacute;logo
 	 * de advertencia. Un valor de <code>false</code> har&aacute; que se muestre un di&aacute;logo para que el usuario confirme que

@@ -56,8 +56,6 @@ final class PreferencesPanelPades extends JPanel {
 		return this.padesBasicFormat;
 	}
 
-	private boolean unprotected = true;
-
 	private final JTextField padesSignReason = new JTextField();
 
 	private final JTextField padesSignProductionCity = new JTextField();
@@ -72,16 +70,13 @@ final class PreferencesPanelPades extends JPanel {
 	private static final String SIGN_FORMAT_PADES = "PAdES"; //$NON-NLS-1$
 
 	PreferencesPanelPades(final KeyListener keyListener,
-						  final ModificationListener modificationListener,
-						  final boolean unprotected) {
+						  final ModificationListener modificationListener) {
 
-		this.unprotected = unprotected;
-		createUI(keyListener, modificationListener, unprotected);
+		createUI(keyListener, modificationListener);
 	}
 
 	void createUI(final KeyListener keyListener,
-				  final ModificationListener modificationListener,
-				  final boolean unprotected) {
+				  final ModificationListener modificationListener) {
 
 		setLayout(new GridBagLayout());
 
@@ -102,10 +97,8 @@ final class PreferencesPanelPades extends JPanel {
 		);
 
 		this.padesBasicFormat.setModel(padesFormatModel);
-		this.padesBasicFormat.setEnabled(unprotected);
 		this.padesBasicFormat.addItemListener(modificationListener);
 		this.padesBasicFormat.addKeyListener(keyListener);
-        this.padesBasicFormat.setEnabled(unprotected);
 
         loadPreferences();
 
@@ -335,8 +328,7 @@ final class PreferencesPanelPades extends JPanel {
     		SIGN_FORMAT_PADES,
     		padesPolicies,
     		getPadesPreferedPolicy(),
-    		this.padesBasicFormat,
-    		this.unprotected
+    		this.padesBasicFormat
 		);
 
         final GridBagConstraints c = new GridBagConstraints();
