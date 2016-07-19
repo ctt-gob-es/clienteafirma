@@ -27,7 +27,7 @@ final class AOKeyStoreManagerHelperApple {
 
 	static KeyStore initApple(final InputStream store) throws AOKeyStoreManagerException, IOException {
 		if (!Platform.OS.MACOSX.equals(Platform.getOS())) {
-			throw new InvalidOSException("Apple Mac OS X"); //$NON-NLS-1$
+			throw new InvalidOSException("Apple macOS"); //$NON-NLS-1$
 		}
 
 		final KeyStore ks;

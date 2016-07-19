@@ -23,7 +23,6 @@ import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.keystores.callbacks.NullPasswordCallback;
-import es.gob.afirma.keystores.temd.TemdKeyStoreManager;
 
 /** Obtiene clases de tipo AOKeyStoreManager seg&uacute;n se necesiten,
  * proporcionando adem&aacute;s ciertos m&eacute;todos de utilidad. Contiene
@@ -143,9 +142,22 @@ public final class AOKeyStoreManagerFactory {
         	return new AggregatedKeyStoreManager(getCeresJavaKeyStoreManager(pssCallback, forceReset, parentComponent));
         }
 
-     // Driver Java para TEMD
+        // Controlador basado en PKCS#11 para TEMD
         if (Platform.getOS().equals(Platform.OS.WINDOWS) && AOKeyStore.TEMD.equals(store)) {
-        	return new TemdKeyStoreManager(parentComponent);
+        	final AggregatedKeyStoreManager temdKsm;
+        	try {
+        		temdKsm = (AggregatedKeyStoreManager) Class.forName(
+    				"es.gob.afirma.keystores.temd.TemdKeyStoreManager" //$NON-NLS-1$
+				).getConstructor().newInstance();
+        	}
+        	catch(final Exception e) {
+        		throw new AOKeyStoreManagerException(
+    				"No se ha podido instanciar el gestor de almacenes TEMD: " + e, //$NON-NLS-1$
+    				e
+				);
+        	}
+        	temdKsm.setParentComponent(parentComponent);
+        	return temdKsm;
         }
 
         throw new AOKeystoreAlternativeException(
