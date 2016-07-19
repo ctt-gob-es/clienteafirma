@@ -104,7 +104,6 @@ final class ConfiguratorMacOSX implements Configurator {
 
 				ConfiguratorFirefox.installRootCAMozillaKeyStore(
 					appDir,
-					certPack.getCaCertificate(),
 					new String[] { OSX_GET_USERS_COMMAND }
 				);
 				// Tambien hay que instalar el certificado en el almacen de Apple

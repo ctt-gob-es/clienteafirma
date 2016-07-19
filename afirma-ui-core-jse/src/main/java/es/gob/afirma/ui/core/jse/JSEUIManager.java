@@ -594,17 +594,17 @@ public class JSEUIManager implements AOUIManager {
         return resultFile;
     }
 
-    /**
-     * Configura un {@code JFileChooser} para que muestre por defecto un directorio y nombre de fichero.
+    /** Configura un {@code JFileChooser} para que muestre por defecto un directorio y nombre de fichero.
      * Si no se proporciona el directorio, se leer&aacute; de las preferencias de la aplicaci&oacute;n.
      * En caso de no haber directorio por defecto (es nulo y no est&aacute; en preferencias, se mostrar&aacute;
      * el por defecto de Java (directorio del usuario) y, en caso de no haber nombre de fichero, se dejar&aacute;
      * sin configurar.
      * @param jfc Selector de fichero.
      * @param defaultDir Directorio por defecto.
-     * @param filename Nombre de fichero.
-     */
-    private void configureDefaultDir(final JFileChooser jfc, final String defaultDir, final String filename) {
+     * @param filename Nombre de fichero. */
+    private static void configureDefaultDir(final JFileChooser jfc,
+    		                                final String defaultDir,
+    		                                final String filename) {
 
     	// El metodo setSelectedFile determina tambien el directorio actual, asi que lo usamos cuando
         // se indica el nombre de fichero

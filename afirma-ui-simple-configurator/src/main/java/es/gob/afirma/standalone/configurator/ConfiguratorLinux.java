@@ -52,7 +52,7 @@ final class ConfiguratorLinux implements Configurator {
                 LOGGER.warning(Messages.getString("ConfiguratorLinux.13")); //$NON-NLS-1$
                 ConfiguratorFirefox.removeAppExecutionWarningInChrome(appDir, command);
                 ConfiguratorFirefox.installRootCAChromeKeyStore(appDir, command);
-                ConfiguratorFirefox.installRootCAMozillaKeyStore(appDir, certPack.getCaCertificate(), command);
+                ConfiguratorFirefox.installRootCAMozillaKeyStore(appDir, command);
               }
             catch(final MozillaProfileNotFoundException e) {
                 LOGGER.warning(Messages.getString("ConfiguratorLinux.12")); //$NON-NLS-1$

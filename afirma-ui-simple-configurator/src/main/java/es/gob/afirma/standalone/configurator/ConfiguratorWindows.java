@@ -40,15 +40,15 @@ final class ConfiguratorWindows implements Configurator {
 				certPack.getPkcs12(),
 				new File(appDir, KS_FILENAME)
 			);
-			
+
 			//Generacion del certificado raiz .cer
 			ConfiguratorUtil.installFile(
-					certPack.getCaCertificate().getEncoded(), 
+					certPack.getCaCertificate().getEncoded(),
 					new File(appDir, FILE_AUTOFIRMA_CERTIFICATE));
 
 			try {
 				window.print(Messages.getString("ConfiguratorWindows.13")); //$NON-NLS-1$
-				ConfiguratorFirefox.installRootCAMozillaKeyStore(appDir, certPack.getCaCertificate());
+				ConfiguratorFirefox.installRootCAMozillaKeyStore(appDir);
 				ConfiguratorFirefox.removeConfigurationFiles(appDir);
 				window.print(Messages.getString("ConfiguratorWindows.4")); //$NON-NLS-1$
 				window.print(Messages.getString("ConfiguratorWindows.9")); //$NON-NLS-1$
