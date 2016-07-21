@@ -106,12 +106,10 @@ public abstract class KeyStoreAddressBook extends KeyStoreSpi {
 
     }
 
-    /* The keystore entries. */
-    private final Collection<KeyEntry> entries = new ArrayList<KeyEntry>();
+    /** The keystore entries. */
+    private final Collection<KeyEntry> entries = new ArrayList<>();
 
-    /*
-     * The keystore name. Case is not significant.
-     */
+    /** The keystore name. Case is not significant. */
     private final String storeName;
 
     private java.lang.reflect.Method loadKeysOrCertificateChains;
@@ -135,7 +133,7 @@ public abstract class KeyStoreAddressBook extends KeyStoreSpi {
             }
         }
         catch (final Exception e) {
-            Logger.getLogger("es.atosorigin").severe("No se han podido obtener los metodos de acceso a sunmscapi.dll: " + e); //$NON-NLS-1$ //$NON-NLS-2$
+            Logger.getLogger("es.gob.afirma").severe("No se han podido obtener los metodos de acceso a sunmscapi.dll: " + e); //$NON-NLS-1$ //$NON-NLS-2$
         }
 
         this.storeName = storeName;
@@ -338,7 +336,7 @@ public abstract class KeyStoreAddressBook extends KeyStoreSpi {
                             return m.invoke(o, new Object[0]).toString();
                         }
                         catch (final Exception e) {
-                            Logger.getLogger("es.atosorigin").severe("No se ha podido invocar a sunmscapi.dll para obtener los alias: " + e); //$NON-NLS-1$//$NON-NLS-2$
+                            Logger.getLogger("es.gob.afirma").severe("No se ha podido invocar a sunmscapi.dll para obtener los alias: " + e); //$NON-NLS-1$//$NON-NLS-2$
                             return null;
                         }
                     }
