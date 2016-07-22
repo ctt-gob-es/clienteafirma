@@ -162,8 +162,7 @@ public final class AutoFirmaUtil {
 
 	/** Recupera el n&uacute;mero de pantallas que tiene habilitadas el usuario.
 	 * @return N&uacute;mero de pantallas.
-	 * @throws HeadlessException
-	 */
+	 * @throws HeadlessException Si el equipo no tiene pantalla. */
 	public static int getDisplaysNumber() throws HeadlessException {
 		return GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices().length;
 	}

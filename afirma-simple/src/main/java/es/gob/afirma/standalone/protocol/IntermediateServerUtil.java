@@ -16,13 +16,11 @@ public class IntermediateServerUtil {
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
-	/**
-	 * Env&iacute;a datos al servidor intermedio.
+	/** Env&iacute;a datos al servidor intermedio.
 	 * @param data Buffer con los datos a enviar.
 	 * @param storageServiceUrl URL del servicio de guardado.
 	 * @param id Identificador a asignar a los datos a subir al servidor.
-	 * @throws IOException
-	 */
+	 * @throws IOException Si hay problemas enviando los datos. */
 	public static void sendData(final StringBuilder data, final String storageServiceUrl, final String id) throws IOException {
 
 		final StringBuilder url = new StringBuilder(storageServiceUrl)
@@ -34,13 +32,11 @@ public class IntermediateServerUtil {
 		send(url);
 	}
 
-	/**
-	 * Env&iacute;a datos al servidor intermedio.
+	/** Env&iacute;a datos al servidor intermedio.
 	 * @param data Buffer con los datos a enviar.
 	 * @param storageServiceUrl URL del servicio de guardado.
 	 * @param id Identificador a asignar a los datos a subir al servidor.
-	 * @throws IOException
-	 */
+	 * @throws IOException Si hay problemas enviando los datos. */
 	public static void sendData(final String data, final String storageServiceUrl, final String id) throws IOException {
 
 		final StringBuilder url = new StringBuilder(storageServiceUrl)
