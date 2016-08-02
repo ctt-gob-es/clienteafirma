@@ -26,7 +26,7 @@ public abstract class CertificateFilter {
     /** Comprueba si un certificado se adec&uacute;a al filtro.
      * @param cert Certificado a comprobar.
      * @return <code>true</code> si el certificado se adec&uacute;a al filtro, <code>false</code> en caso contrario. */
-    protected abstract boolean matches(final X509Certificate cert);
+    public abstract boolean matches(final X509Certificate cert);
 
     /** Obtiene del listado proporcionado los alias de certificados que cumplen con un determinado criterio.
      * Por defecto, el establecido en el m&eacute;todo {@link #matches(X509Certificate)}.
