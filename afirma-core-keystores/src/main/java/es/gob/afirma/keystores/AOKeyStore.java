@@ -143,14 +143,6 @@ public enum AOKeyStore {
 		"DNI", //$NON-NLS-1$
 		null,
 		null
-	),
-	/** Directorio Ministerio de Defensa. */
-	LDAPMDEF(
-		"Directorio del Ministerio de Defensa", //$NON-NLS-1$
-		15,
-		"LDAPMDEF", //$NON-NLS-1$
-		null,
-		null
 	);
 
     private final String name;
