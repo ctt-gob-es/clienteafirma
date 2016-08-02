@@ -18,11 +18,6 @@
 			<artifactId>afirma-core</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>es.gob.afirma</groupId>
-			<artifactId>afirma-keystores-temd</artifactId>
-			<version>${project.version}</version>
-		</dependency>
 	</dependencies>
 	
 	<build>
