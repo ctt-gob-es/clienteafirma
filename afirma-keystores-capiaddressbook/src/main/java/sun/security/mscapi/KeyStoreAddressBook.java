@@ -107,7 +107,7 @@ public abstract class KeyStoreAddressBook extends KeyStoreSpi {
     }
 
     /** The keystore entries. */
-    private final Collection<KeyEntry> entries = new ArrayList<>();
+    private final Collection<KeyEntry> entries = new ArrayList<KeyEntry>();
 
     /** The keystore name. Case is not significant. */
     private final String storeName;
