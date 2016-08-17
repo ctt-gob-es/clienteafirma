@@ -140,6 +140,7 @@ Section "Programa" sPrograma
 	;Incluimos todos los ficheros que componen nuestra aplicacion
 	File  AutoFirma.exe
 	File  AutoFirmaConfigurador.exe
+	File  AutoFirmaCommandLine.exe
 	File  licencia.txt
 	File  ic_firmar.ico
 
