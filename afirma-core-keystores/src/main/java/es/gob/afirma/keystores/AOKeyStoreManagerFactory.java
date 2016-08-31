@@ -142,24 +142,6 @@ public final class AOKeyStoreManagerFactory {
         	return new AggregatedKeyStoreManager(getCeresJavaKeyStoreManager(pssCallback, forceReset, parentComponent));
         }
 
-        // Controlador basado en PKCS#11 para TEMD
-        if (Platform.getOS().equals(Platform.OS.WINDOWS) && AOKeyStore.TEMD.equals(store)) {
-        	final AggregatedKeyStoreManager temdKsm;
-        	try {
-        		temdKsm = (AggregatedKeyStoreManager) Class.forName(
-    				"es.gob.afirma.keystores.temd.TemdKeyStoreManager" //$NON-NLS-1$
-				).getConstructor().newInstance();
-        	}
-        	catch(final Exception e) {
-        		throw new AOKeyStoreManagerException(
-    				"No se ha podido instanciar el gestor de almacenes TEMD: " + e, //$NON-NLS-1$
-    				e
-				);
-        	}
-        	temdKsm.setParentComponent(parentComponent);
-        	return temdKsm;
-        }
-
         throw new AOKeystoreAlternativeException(
              getAlternateKeyStoreType(store),
              "La plataforma de navegador '"  //$NON-NLS-1$
