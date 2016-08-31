@@ -595,7 +595,8 @@ public class AOCMSMultiEnveloper {
             return new CMSDecipherAuthenticatedData().decipherAuthenticatedData(cmsEnvelop, this.configuredKe);
         }
         if (doi.equals(org.spongycastle.asn1.cms.CMSObjectIdentifiers.signedAndEnvelopedData)) {
-        	return CMSDecipherSignedAndEnvelopedData.dechiperSignedAndEnvelopData(cmsEnvelop, this.configuredKe);
+        	final CMSDecipherSignedAndEnvelopedData enveloper = new CMSDecipherSignedAndEnvelopedData(cmsEnvelop);
+        	return enveloper.decipher(this.configuredKe);
         }
         throw new AOInvalidFormatException("Los datos introducidos no se corresponden con un tipo de objeto CMS soportado"); //$NON-NLS-1$
 

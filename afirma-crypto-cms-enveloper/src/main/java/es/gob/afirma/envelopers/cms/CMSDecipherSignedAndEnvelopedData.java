@@ -24,6 +24,7 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
 import org.spongycastle.asn1.ASN1Sequence;
+import org.spongycastle.asn1.ASN1Set;
 import org.spongycastle.asn1.cms.EncryptedContentInfo;
 import org.spongycastle.asn1.x509.AlgorithmIdentifier;
 
@@ -35,8 +36,16 @@ import es.gob.afirma.signers.pkcs7.SignedAndEnvelopedData;
  * SignedAndEnvelopedData. de CMS. */
 public final class CMSDecipherSignedAndEnvelopedData {
 
-	private CMSDecipherSignedAndEnvelopedData() {
-		// No permitimos la instanciacion
+	private final byte[] cmsData;
+
+	private byte[][] encodedCerts;
+
+	/**
+	 * Crear un objeto para el descifrado de sobre firmados.
+	 * @param cmsData Sobre.
+	 */
+	public CMSDecipherSignedAndEnvelopedData(final byte[] cmsData) {
+		this.cmsData = cmsData;
 	}
 
     /** &Eacute;ste m&eacute;todo descifra el contenido de un CMS
@@ -67,8 +76,7 @@ public final class CMSDecipherSignedAndEnvelopedData {
      * @throws BadPaddingException Cuando hay problemas con un relleno de datos.
      * @throws IllegalBlockSizeException Cuando hay problemas internos con los tama&ntilde;os de bloque de cifrado.
      * @throws InvalidAlgorithmParameterException Si no se soporta un par&aacute;metro necesario para un algoritmo. */
-    public static byte[] dechiperSignedAndEnvelopData(final byte[] cmsData,
-    		                                          final PrivateKeyEntry keyEntry) throws IOException,
+    public byte[] decipher(final PrivateKeyEntry keyEntry) throws IOException,
                                                                                              CertificateEncodingException,
                                                                                              AOException,
                                                                                              InvalidKeyException,
@@ -82,12 +90,16 @@ public final class CMSDecipherSignedAndEnvelopedData {
         SignedAndEnvelopedData sigAndEnveloped = null;
 
         Enumeration<?> elementRecipient;
-
         try {
-            final ASN1Sequence contentSignedAndEnvelopedData = Utils.fetchWrappedData(cmsData);
+            final ASN1Sequence contentSignedAndEnvelopedData = Utils.fetchWrappedData(this.cmsData);
 
             sigAndEnveloped = SignedAndEnvelopedData.getInstance(contentSignedAndEnvelopedData);
             elementRecipient = sigAndEnveloped.getRecipientInfos().getObjects();
+            final ASN1Set certsAsn1 = sigAndEnveloped.getCertificates();
+            this.encodedCerts = new byte[certsAsn1.size()][];
+            for (int i = 0; i < certsAsn1.size(); i++) {
+            	this.encodedCerts[i] = certsAsn1.getObjectAt(i).toASN1Primitive().getEncoded();
+            }
         }
         catch (final Exception ex) {
             throw new AOException("El fichero no contiene un tipo SignedAndEnvelopedData", ex); //$NON-NLS-1$
@@ -111,4 +123,12 @@ public final class CMSDecipherSignedAndEnvelopedData {
                  keyAsigned.getCipherKey()
         );
     }
+
+    /**
+     * Recupera el listrado de certificados codificados contenidos en el envoltorio.
+     * @return Listado de certificados codificados.
+     */
+    public byte[][] getEncodedCerts() {
+		return this.encodedCerts;
+	}
 }

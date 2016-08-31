@@ -78,6 +78,11 @@ public class AOCMSEnveloper implements AOEnveloper {
     /** Envoltorio binario por defecto. */
     public static final String DEFAULT_CMS_CONTENTTYPE = CMS_CONTENTTYPE_ENVELOPEDDATA;
 
+    /** Tipo de envoltorio. */
+    private String envelopType = null;
+
+    /** Certificado firmante. */
+    private byte[] signerCert = null;
 
     /** M&eacute;todo para la generaci&oacute;n de envolturas de datos. Los tipos de
      * envoltura definidos para CMS son: <br>
@@ -564,7 +569,7 @@ public class AOCMSEnveloper implements AOEnveloper {
      * @param addresseePke Clave privada del destinatario que desea desensobrar.
      * @return Contenido del envoltorio.
      * @throws InvalidKeyException Cuando la clave de descifrado configurada no sea v&aacute;lida o pertenezca a un destinatario.
-     * @throws AOException Cuando se produce un error durante al desenvolver los datos.
+     * @throws AOException Cuando se produce un error al desenvolver los datos.
      * @throws InvalidKeySpecException Cuando ocurren problemas relacionados con la estructura interna de las claves
      * @throws DataFormatException Si hay errores en el formato de datos esperados. */
     @Override
@@ -589,30 +594,45 @@ public class AOCMSEnveloper implements AOEnveloper {
 
     	try {
     		if (doi.equals(org.spongycastle.asn1.pkcs.PKCSObjectIdentifiers.data)) {
+    			this.envelopType = CMS_CONTENTTYPE_DATA;
     			Logger.getLogger("es.gob.afirma").warning("La extraccion de datos de los envoltorios CMS Data no esta implementada"); //$NON-NLS-1$ //$NON-NLS-2$
     			return null;
     		}
     		if (doi.equals(org.spongycastle.asn1.pkcs.PKCSObjectIdentifiers.digestedData)) {
+    			this.envelopType = CMS_CONTENTTYPE_DIGESTEDDATA;
     			Logger.getLogger("es.gob.afirma").warning("La extraccion de datos de los envoltorios CMS DigestedData no esta implementada"); //$NON-NLS-1$ //$NON-NLS-2$
     			return null;
     		}
     		if (doi.equals(org.spongycastle.asn1.cms.CMSObjectIdentifiers.compressedData)) {
+    			this.envelopType = CMS_CONTENTTYPE_COMPRESSEDDATA;
     			return CMSCompressedData.getContentCompressedData(cmsEnvelop);
     		}
     		if (doi.equals(org.spongycastle.asn1.pkcs.PKCSObjectIdentifiers.encryptedData)) {
+    			this.envelopType = CMS_CONTENTTYPE_ENCRYPTEDDATA;
     			return new CMSDecipherEncryptedData().dechiperEncryptedData(cmsEnvelop, this.cipherKey);
     		}
     		if (doi.equals(org.spongycastle.asn1.pkcs.PKCSObjectIdentifiers.envelopedData)) {
+    			this.envelopType = CMS_CONTENTTYPE_ENVELOPEDDATA;
     			return CMSDecipherEnvelopData.dechiperEnvelopData(cmsEnvelop, addresseePke);
     		}
     		if (doi.equals(org.spongycastle.asn1.cms.CMSObjectIdentifiers.authEnvelopedData)) {
+    			this.envelopType = CMS_CONTENTTYPE_AUTHENVELOPEDDATA;
     			return CMSDecipherAuthenticatedEnvelopedData.dechiperAuthenticatedEnvelopedData(cmsEnvelop, addresseePke);
     		}
     		if (doi.equals(org.spongycastle.asn1.cms.CMSObjectIdentifiers.authenticatedData)) {
+    			this.envelopType = CMS_CONTENTTYPE_AUTHENTICATEDDATA;
     			return new CMSDecipherAuthenticatedData().decipherAuthenticatedData(cmsEnvelop, addresseePke);
     		}
     		if (doi.equals(org.spongycastle.asn1.cms.CMSObjectIdentifiers.signedAndEnvelopedData)) {
-    			return CMSDecipherSignedAndEnvelopedData.dechiperSignedAndEnvelopData(cmsEnvelop, addresseePke);
+    			this.envelopType = CMS_CONTENTTYPE_SIGNEDANDENVELOPEDDATA;
+
+    			final CMSDecipherSignedAndEnvelopedData envelop = new CMSDecipherSignedAndEnvelopedData(cmsEnvelop);
+    			final byte[] data = envelop.decipher(addresseePke);
+    			final byte[][] signerEncodedCerts = envelop.getEncodedCerts();
+    			if (signerEncodedCerts != null && signerEncodedCerts.length > 0) {
+    				this.signerCert = signerEncodedCerts[0];
+    			}
+    			return data;
     		}
     		throw new AOInvalidFormatException("Los datos introducidos no se corresponden con un tipo de objeto CMS soportado"); //$NON-NLS-1$
     	}
@@ -639,4 +659,19 @@ public class AOCMSEnveloper implements AOEnveloper {
 		}
     }
 
+    /**
+     * Recupera el tipo de envoltorio CMS identificado durante la operaci&oacute;n de desensobrado.
+     * @return Tipo de envoltorio.
+     */
+    public String getProcessedEnvelopType() {
+    	return this.envelopType;
+    }
+
+    /**
+     * Recupera el certificado del firmante del envoltorio. S&oacute;lo soporta un firmante.
+     * @return Certificado del firmante codificado.
+     */
+    public byte[] getSignerCert() {
+		return this.signerCert;
+	}
 }
