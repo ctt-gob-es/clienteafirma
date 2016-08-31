@@ -126,13 +126,15 @@ public final class ServiceInvocationManager {
 
 	/** Coge el foco del sistema en OS X. En el resto del sistemas no hace nada. */
 	public static void focusApplication() {
-		final String script = "tell me to activate"; //$NON-NLS-1$
-		final ScriptEngine se = MozillaKeyStoreUtilitiesOsX.getAppleScriptEngine();
-		try {
-			se.eval(script);
-		}
-		catch (final Exception e) {
-			LOGGER.warning("Fallo cogiendo el foco en mac: " + e); //$NON-NLS-1$
+		if (Platform.OS.MACOSX.equals(Platform.getOS())) {
+			final String script = "tell me to activate"; //$NON-NLS-1$
+			final ScriptEngine se = MozillaKeyStoreUtilitiesOsX.getAppleScriptEngine();
+			try {
+				se.eval(script);
+			}
+			catch (final Exception e) {
+				LOGGER.warning("Fallo cogiendo el foco en mac: " + e); //$NON-NLS-1$
+			}
 		}
 	}
 
