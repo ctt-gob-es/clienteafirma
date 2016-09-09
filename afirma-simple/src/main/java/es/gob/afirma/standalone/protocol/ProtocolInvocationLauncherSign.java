@@ -101,18 +101,27 @@ final class ProtocolInvocationLauncherSign {
 			final String dialogTilte = Operation.SIGN.equals(options.getOperation()) ?
 					ProtocolMessages.getString("ProtocolLauncher.25") : //$NON-NLS-1$
 						ProtocolMessages.getString("ProtocolLauncher.26"); //$NON-NLS-1$
+			final String fileExts = options.getExtraParams() != null ?
+					options.getExtraParams().getProperty("filenameExts", null) : //$NON-NLS-1$
+						null;
+			final String fileDesc = fileExts == null ?
+					ProtocolMessages.getString("ProtocolLauncher.27") : //$NON-NLS-1$
+						String.format(
+								ProtocolMessages.getString("ProtocolLauncher.32"), //$NON-NLS-1$
+								fileExts.replace(",", ",*.")); //$NON-NLS-1$ //$NON-NLS-2$
 
 			final File selectedDataFile;
 			try {
 				if (Platform.OS.MACOSX.equals(Platform.getOS())) {
 					ServiceInvocationManager.focusApplication();
 				}
+
 				selectedDataFile = AOUIFactory.getLoadFiles(
 					dialogTilte,
 					new JFileChooser().getFileSystemView().getDefaultDirectory().toString(),
 					null,
-					null,
-					ProtocolMessages.getString("ProtocolLauncher.27"), //$NON-NLS-1$
+					fileExts != null ? fileExts.split(",") : null, //$NON-NLS-1$
+					fileDesc,
 					false,
 					false,
 					AutoFirmaUtil.getDefaultDialogsIcon(),

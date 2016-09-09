@@ -181,7 +181,7 @@ public final class AutoFirmaUtil {
 			return file;
 		}
 	}
-    /** Establece la configuraci&oacute;n para el servidot <i>Proxy</i> seg&uacute;n los valores
+    /** Establece la configuraci&oacute;n para el servidor <i>Proxy</i> seg&uacute;n los valores
      * de configuraci&oacute;n encontrados. */
     public static void setProxySettings() {
     	if (PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_PROXY_SELECTED, false)) {

@@ -465,10 +465,11 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 
     	// Configuramos el log de la aplicacion
     	configureLog();
-    	
+
     	// Se define el look and feel
     	LookAndFeelManager.applyLookAndFeel();
 
+    	// Se establece la configuracion del proxy
        	AutoFirmaUtil.setProxySettings();
 
 		// Google Analytics

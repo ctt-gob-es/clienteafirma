@@ -100,7 +100,6 @@ final class PreferencesPanel extends JPanel implements KeyListener, DisposableIn
 		);
 		this.tabbedPane.setMnemonicAt(count, KeyEvent.VK_X);
 
-		//TODO: Descomentar una vez se entregue
 		count = this.tabbedPane.getTabCount();
 		this.tabbedPane.addTab(
 			SimpleAfirmaMessages.getString("PreferencesPanel.100"), //$NON-NLS-1$
@@ -111,14 +110,14 @@ final class PreferencesPanel extends JPanel implements KeyListener, DisposableIn
 		this.tabbedPane.setMnemonicAt(count, KeyEvent.VK_L);
 
 		//TODO: Descomentar una vez se entregue
-		count = this.tabbedPane.getTabCount();
-		this.tabbedPane.addTab(
-			SimpleAfirmaMessages.getString("PreferencesPanel.84"), //$NON-NLS-1$
-			null,
-			this.preferencesPanelKeyStores,
-			SimpleAfirmaMessages.getString("PreferencesPanel.85") //$NON-NLS-1$
-		);
-		this.tabbedPane.setMnemonicAt(count, KeyEvent.VK_V);
+//		count = this.tabbedPane.getTabCount();
+//		this.tabbedPane.addTab(
+//			SimpleAfirmaMessages.getString("PreferencesPanel.84"), //$NON-NLS-1$
+//			null,
+//			this.preferencesPanelKeyStores,
+//			SimpleAfirmaMessages.getString("PreferencesPanel.85") //$NON-NLS-1$
+//		);
+//		this.tabbedPane.setMnemonicAt(count, KeyEvent.VK_V);
 
 		this.tabbedPane.setSelectedIndex(selectedTabIndex);
 
