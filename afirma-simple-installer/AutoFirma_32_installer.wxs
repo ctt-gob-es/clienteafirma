@@ -15,7 +15,7 @@
 	   	<!-- Detecta versiones anteriores ya instaladas en el equipo -->
 	    <MajorUpgrade DowngradeErrorMessage="Ya existe una versión posterior en el equipo." />
 	   
-	   <!-- Ejeuta el AutoFirmaGenerator.exe al instalar -->
+	   <!-- Ejecuta el AutoFirmaGenerator.exe al instalar -->
 		<CustomAction Id="Exec_Cmd"
                       Property="ExecProperty"
                       Value='"[#$(var.ProjectName)Generator.exe]" /S'
