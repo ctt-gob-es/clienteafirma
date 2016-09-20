@@ -15,7 +15,7 @@
   <manifest></manifest>
   <icon>ic_launcher.ico</icon>
   <jre>
-    <path>./jre64b</path>
+    <path>./jre</path>
     <bundledJre64Bit>true</bundledJre64Bit>
     <bundledJreAsFallback>false</bundledJreAsFallback>
     <minVersion>1.7.0</minVersion>

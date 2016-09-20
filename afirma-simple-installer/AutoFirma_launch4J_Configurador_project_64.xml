@@ -18,7 +18,7 @@
     <mainClass>es.gob.afirma.standalone.configurator.AutoFirmaConfiguratorSilent</mainClass>
   </classPath>
   <jre>
-    <path>./jre64b</path>
+    <path>./jre</path>
     <bundledJre64Bit>true</bundledJre64Bit>
     <bundledJreAsFallback>false</bundledJreAsFallback>
     <minVersion>1.7.0</minVersion>
