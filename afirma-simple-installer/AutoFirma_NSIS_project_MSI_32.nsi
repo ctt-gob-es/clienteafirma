@@ -241,6 +241,7 @@ Section "Programa" sPrograma
 
 	StrCpy $PATH "AutoFirma\JRE"
 	File /r "jre32b"
+	Rename "$INSTDIR\AutoFirma\jre32b" "$INSTDIR\AutoFirma\jre"
 
 	; Eliminamos los certificados generados en caso de que existan por una instalacion previa
 	IfFileExists "$INSTDIR\AutoFirma\AutoFirma_ROOT.cer" 0 +1
