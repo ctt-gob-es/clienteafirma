@@ -19,7 +19,7 @@ final class FileBasedKeyStoreManagerFactory {
 		// No permitimos la instanciacion
 	}
 
-	static AOKeyStoreManager getKeyStoreManager(final File ksFile, final Object parent) throws IOException, AOKeystoreAlternativeException, AOKeyStoreManagerException {
+	static AOKeyStoreManager getKeyStoreManager(final File ksFile, final Object parent) throws IOException, AOKeystoreAlternativeException {
 		if (ksFile == null) {
 			throw new IllegalArgumentException("El fichero de almacen no puede ser nulo"); //$NON-NLS-1$
 		}
