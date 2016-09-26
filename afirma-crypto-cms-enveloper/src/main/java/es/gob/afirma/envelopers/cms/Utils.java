@@ -715,12 +715,15 @@ final class Utils {
      * @return Objeto con la configuracion y la clave de cifrado
      * @throws NoSuchPaddingException Cuando el JRE no soporta alg&uacute;n tipo de relleno necesario.
      * @throws NoSuchAlgorithmException Cuando el JRE no soporta alg&uacute;n algoritmo necesario.
-     * @throws InvalidKeyException Cuando la clave proporcionada no es v&aacute;lida. */
+     * @throws InvalidKeyException Cuando la clave proporcionada no es v&aacute;lida.
+     * @throws Pkcs11WrapOperationException Cuando se produce un error derivado del uso del PKCS#11
+     * 			de un dispositivo criptogr&aacute;fico. */
     static KeyAsigned assignKey(final byte[] passCiphered,
     		                    final PrivateKeyEntry keyEntry,
     		                    final AlgorithmIdentifier algClave) throws NoSuchAlgorithmException,
     		                                                               NoSuchPaddingException,
-    		                                                               InvalidKeyException {
+    		                                                               InvalidKeyException,
+    		                                                               Pkcs11WrapOperationException {
 
         final KeyAsigned keyAsigned = new KeyAsigned();
 
@@ -745,8 +748,18 @@ final class Utils {
         // Desembolvemos la clave usada para cifrar el contenido
         // a partir de la clave privada del certificado del usuario.
         final Cipher cipher2 = Cipher.getInstance("RSA/ECB/PKCS1Padding"); //$NON-NLS-1$
-        cipher2.init(Cipher.UNWRAP_MODE, keyEntry.getPrivateKey());
-        keyAsigned.setCipherKey((SecretKey) cipher2.unwrap(passCiphered, algorithm.getName(), Cipher.SECRET_KEY));
+
+		cipher2.init(Cipher.UNWRAP_MODE, keyEntry.getPrivateKey());
+
+		try {
+			keyAsigned.setCipherKey((SecretKey) cipher2.unwrap(passCiphered, algorithm.getName(), Cipher.SECRET_KEY));
+		}
+		catch (final InvalidKeyException e) {
+			if (e.getCause() != null && e.getCause().getClass().getName().equals("sun.security.pkcs11.wrapper.PKCS11Exception")) { //$NON-NLS-1$
+				throw new Pkcs11WrapOperationException(e.getCause().getMessage(), e);
+			}
+			throw e;
+		}
         return keyAsigned;
     }
 

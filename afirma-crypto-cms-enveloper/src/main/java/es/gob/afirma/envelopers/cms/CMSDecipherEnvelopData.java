@@ -65,7 +65,9 @@ public final class CMSDecipherEnvelopData {
      * @throws NoSuchAlgorithmException Si el JRE no soporta alg&uacute;n algoritmo necesario
      * @throws BadPaddingException Cuando hay problemas con un relleno de datos.
      * @throws IllegalBlockSizeException Cuando hay problemas internos con los tama&ntilde;os de bloque de cifrado.
-     * @throws InvalidAlgorithmParameterException Si no se soporta un par&aacute;metro necesario para un algoritmo. */
+     * @throws InvalidAlgorithmParameterException Si no se soporta un par&aacute;metro necesario para un algoritmo.
+     * @throws Pkcs11WrapOperationException Cuando se produce un error derivado del uso del PKCS#11
+     * 			de un dispositivo criptogr&aacute;fico.  */
     public static byte[] dechiperEnvelopData(final byte[] cmsData,
     		                                 final PrivateKeyEntry keyEntry) throws IOException,
                                                                                     CertificateEncodingException,
@@ -75,7 +77,8 @@ public final class CMSDecipherEnvelopData {
                                                                                     NoSuchPaddingException,
                                                                                     InvalidAlgorithmParameterException,
                                                                                     IllegalBlockSizeException,
-                                                                                    BadPaddingException {
+                                                                                    BadPaddingException,
+                                                                                    Pkcs11WrapOperationException {
 
         // Contendra el contenido a tratar.
         EnvelopedData enveloped = null;

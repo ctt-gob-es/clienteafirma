@@ -571,14 +571,17 @@ public class AOCMSEnveloper implements AOEnveloper {
      * @throws InvalidKeyException Cuando la clave de descifrado configurada no sea v&aacute;lida o pertenezca a un destinatario.
      * @throws AOException Cuando se produce un error al desenvolver los datos.
      * @throws InvalidKeySpecException Cuando ocurren problemas relacionados con la estructura interna de las claves
-     * @throws DataFormatException Si hay errores en el formato de datos esperados. */
+     * @throws DataFormatException Si hay errores en el formato de datos esperados.
+     * @throws Pkcs11WrapOperationException Cuando se produce un error derivado del uso del PKCS#11
+     * 			de un dispositivo criptogr&aacute;fico.  */
     @Override
 	public byte[] recoverData(final byte[] cmsEnvelop,
 			                  final PrivateKeyEntry addresseePke) throws InvalidKeyException,
 			                                                             AOException,
 			                                                             IOException,
 			                                                             InvalidKeySpecException,
-			                                                             DataFormatException {
+			                                                             DataFormatException,
+			                                                             Pkcs11WrapOperationException {
     	final org.spongycastle.asn1.ASN1Sequence dsq;
     	try (
     			final org.spongycastle.asn1.ASN1InputStream is = new org.spongycastle.asn1.ASN1InputStream(cmsEnvelop);

@@ -546,7 +546,9 @@ public class AOCMSMultiEnveloper {
      *                                            para alg&uacute;n algoritmo
      * @throws NoSuchPaddingException Si no se soporta alg&uacute;n m&eacute;todo de relleno
      * @throws InvalidKeySpecException Cuando ocurren problemas relacionados con la estructura interna de las claves
-     * @throws DataFormatException Si hay problemas en el formado de datos esperado. */
+     * @throws DataFormatException Si hay problemas en el formado de datos esperado.
+     * @throws Pkcs11WrapOperationException Cuando se produce un error derivado del uso del PKCS#11
+     * 			de un dispositivo criptogr&aacute;fico.  */
     byte[] recoverData(final byte[] cmsEnvelop) throws InvalidKeyException,
                                                        CertificateEncodingException,
                                                        IOException,
@@ -555,7 +557,10 @@ public class AOCMSMultiEnveloper {
                                                        NoSuchPaddingException,
                                                        InvalidAlgorithmParameterException,
                                                        IllegalBlockSizeException,
-                                                       BadPaddingException, InvalidKeySpecException, DataFormatException {
+                                                       BadPaddingException,
+                                                       InvalidKeySpecException,
+                                                       DataFormatException,
+                                                       Pkcs11WrapOperationException {
     	final org.spongycastle.asn1.ASN1Sequence dsq;
     	try (
     			final org.spongycastle.asn1.ASN1InputStream is = new org.spongycastle.asn1.ASN1InputStream(cmsEnvelop);
