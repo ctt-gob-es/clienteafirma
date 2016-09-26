@@ -12,15 +12,13 @@ package es.gob.afirma.keystores.filters;
 
 import java.io.File;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 import es.gob.afirma.keystores.AOKeyStore;
 import es.gob.afirma.keystores.AOKeyStoreManager;
 import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
 import es.gob.afirma.keystores.callbacks.CachePasswordCallback;
-import es.gob.afirma.keystores.filters.QualifiedCertificatesFilter;
 
 
 /* NOTA: No funciona este test porque ninguno de los certificados del almacen tiene

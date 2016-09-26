@@ -270,6 +270,7 @@ final class ProtocolInvocationLauncherSign {
 				filters,
 				mandatoryCertificate
 			);
+			dialog.allowOpenExternalStores(filterManager.isExternalStoresOpeningAllowed());
 			dialog.show();
 			pke = ksm.getKeyEntry(
 				dialog.getSelectedAlias()

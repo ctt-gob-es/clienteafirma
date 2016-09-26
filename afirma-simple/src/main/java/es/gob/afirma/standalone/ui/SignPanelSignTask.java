@@ -52,7 +52,11 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
 		return this.waitDialog;
 	}
 
-	private PrivateKeyEntry getPrivateKeyEntry() throws AOCertificatesNotFoundException, KeyStoreException, NoSuchAlgorithmException, UnrecoverableEntryException {
+	private PrivateKeyEntry getPrivateKeyEntry() throws AOCertificatesNotFoundException,
+	                                                    KeyStoreException,
+	                                                    NoSuchAlgorithmException,
+	                                                    UnrecoverableEntryException {
+
 		final AOKeyStoreManager ksm = this.signPanel.getSimpleAfirma().getAOKeyStoreManager();
     	final AOKeyStoreDialog dialog = new AOKeyStoreDialog(
 			ksm,

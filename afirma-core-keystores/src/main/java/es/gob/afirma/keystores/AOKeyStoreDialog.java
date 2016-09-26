@@ -42,6 +42,8 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 
 	private String selectedAlias = null;
 
+	private boolean allowExternalStores = true;
+
     /** Crea un di&aacute;logo para la selecci&oacute;n de un certificado.
      * @param ksm Gestor de los almac&eacute;nes de certificados a los que pertenecen los alias.
      *            Debe ser {@code null} si se quiere usar el m&eacute;todo para seleccionar
@@ -209,7 +211,9 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 		// certificados y mostrara el boton de actualizar por si el usuario quiere cargar
 		// certificados en tarjeta
 		if (namedCertificates == null || namedCertificates.length < 1) {
-			throw new AOCertificatesNotFoundException("No se han encontrado certificados en el almacen acordes a los filtros establecidos"); //$NON-NLS-1$
+			throw new AOCertificatesNotFoundException(
+				"No se han encontrado certificados en el almacen acordes a los filtros establecidos" //$NON-NLS-1$
+			);
 		}
 
 		this.selectedAlias = AOUIFactory.showCertificateSelectionDialog(this.parentComponent, this);
@@ -228,5 +232,15 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 	@Override
 	public void refresh() throws IOException {
 		this.ksm.refresh();
+	}
+
+	@Override
+	public void allowOpenExternalStores(final boolean showButton) {
+		this.allowExternalStores = showButton;
+	}
+
+	@Override
+	public boolean isExternalStoresOpeningAllowed() {
+		return this.allowExternalStores;
 	}
 }

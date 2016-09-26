@@ -81,7 +81,8 @@ public final class CertificateSelectionDialog extends MouseAdapter {
     		this,
     		dialogHeadline,
     		dialogSubHeadline,
-    		showControlButons
+    		showControlButons,
+    		ksdm.isExternalStoresOpeningAllowed()
 		);
 		this.optionPane = certs.length > 1 ?
 			new CertOptionPane(this.csd) :

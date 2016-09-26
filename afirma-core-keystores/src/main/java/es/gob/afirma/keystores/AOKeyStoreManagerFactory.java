@@ -62,8 +62,7 @@ public final class AOKeyStoreManagerFactory {
                                                                  final String description,
                                                                  final PasswordCallback pssCallback,
                                                                  final Object parentComponent) throws AOKeystoreAlternativeException,
-                                                                                                      IOException,
-                                                                                                      AOKeyStoreManagerException {
+                                                                                                      IOException {
     	boolean forceReset;
     	// Se usa try-catch para capturar errores de permisos de lectura de variables
     	try {

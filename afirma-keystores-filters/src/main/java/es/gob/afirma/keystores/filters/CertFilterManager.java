@@ -20,12 +20,9 @@ import es.gob.afirma.keystores.filters.rfc.KeyUsageFilter;
 import es.gob.afirma.keystores.filters.rfc.RFC2254CertificateFilter;
 import es.gob.afirma.keystores.filters.rfc.SscdFilter;
 
-/**
- * Identifica y obtiene los filtros de certificados definidos en las propiedades
- * de una operaci&oacute;n de firma/multifirma electr&oacute;nica.
- *
- * @author Carlos Gamuci Mill&aacute;n
- */
+/** Identifica y obtiene los filtros de certificados definidos en las propiedades
+ * de una operaci&oacute;n de firma/multifirma electr&oacute;nica. *
+ * @author Carlos Gamuci Mill&aacute;n. */
 public final class CertFilterManager {
 
 	private static final String HEADLESS_PREFIX_KEY = "headless"; //$NON-NLS-1$
@@ -34,6 +31,10 @@ public final class CertFilterManager {
 	private static final String FILTERS_PREFIX_KEY = "filters"; //$NON-NLS-1$
 	private static final String FILTERS_ENUM_SEPARATOR = "."; //$NON-NLS-1$
 	private static final String FILTERS_SEPARATOR = ";"; //$NON-NLS-1$
+
+	/** Filtro especial que indica que no debe permitirse la apertura por parte del usuario de almacenes
+	 * de claves distintos al por defecto. */
+	private static final String FILTER_TYPE_DISABLE_EXTERNAL_STORES = "disableopeningexternalstores"; //$NON-NLS-1$
 
 	private static final String FILTER_TYPE_DNIE = "dnie:"; //$NON-NLS-1$
 	private static final String FILTER_TYPE_SSL = "ssl:"; //$NON-NLS-1$
@@ -75,17 +76,17 @@ public final class CertFilterManager {
 	};
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
-	
+
 	private boolean mandatoryCertificate = false;
 
 	private final List<CertificateFilter> filters = new ArrayList<CertificateFilter>();
 
-	/**
-	 * Identifica los filtros que deben aplicarse sobre una serie de certificados para
+	private boolean allowExternalStores = true;
+
+	/** Identifica los filtros que deben aplicarse sobre una serie de certificados para
 	 * comprobar cuales de ellos se ajustan a nuestra necesidades.
 	 * @param propertyFilters Listado de propiedades entre las que identificar las que
-	 * establecen los criterios de filtrado.
-	 */
+	 * establecen los criterios de filtrado. */
 	public CertFilterManager(final Properties propertyFilters) {
 
 		this.mandatoryCertificate = Boolean.parseBoolean(
@@ -103,11 +104,17 @@ public final class CertFilterManager {
 		}
 	}
 
-	/**
-	 * Recoge los distintos filtros declarados en el par&aacute;metro de configuraci&oacute;n.
+	/** Indica si la apertura de almacenes externos al principal desde el UI del di&aacute;logo est&aacute;
+	 * permitida o prohibida.
+	 * @return <code>true</code> si se permite la apertura de almacenes externos,
+	 *         <code>false</code> en caso contrario. */
+	public boolean isExternalStoresOpeningAllowed() {
+		return this.allowExternalStores;
+	}
+
+	/** Recoge los distintos filtros declarados en el par&aacute;metro de configuraci&oacute;n.
 	 * @param config Configuraci&oacute;n de la operaci&oacute;n.
-	 * @return Listado de filtros disyuntivos para aplicar al listado decertificados.
-	 */
+	 * @return Listado de filtros disyuntivos para aplicar al listado decertificados. */
 	private static List<String> getFilterValues(final Properties config) {
 		final List<String> filterValues = new ArrayList<String>();
 		if (config.containsKey(FILTER_PREFIX_KEY)) {
@@ -126,16 +133,20 @@ public final class CertFilterManager {
 		return filterValues;
 	}
 
-	private static CertificateFilter parseFilter(final String filterValue) {
+	private CertificateFilter parseFilter(final String filterValue) {
 
 		final List<CertificateFilter> filtersList = new ArrayList<CertificateFilter>();
 		final String[] sortedFilterValues = filterValue.split(FILTERS_SEPARATOR);
+
 		// Se ordena para que los KeyUsage esten consecutivos
 		Arrays.sort(sortedFilterValues);
 		for (int i = 0; i < sortedFilterValues.length; i++) {
 			final String filter = sortedFilterValues[i];
 			if (filter.toLowerCase().startsWith(FILTER_TYPE_DNIE)) {
 				filtersList.add(new SignatureDNIeFilter());
+			}
+			else if (filter.toLowerCase().equals(FILTER_TYPE_DISABLE_EXTERNAL_STORES)) {
+				this.allowExternalStores = false;
 			}
 			else if (filter.toLowerCase().startsWith(FILTER_TYPE_SSL)) {
 				filtersList.add(new SSLFilter(filter.substring(FILTER_TYPE_SSL.length())));
@@ -195,18 +206,16 @@ public final class CertFilterManager {
 		}
 
 		return filtersList.size() == 1 ?
-				filtersList.get(0) :
-					new MultipleCertificateFilter(filtersList.toArray(new CertificateFilter[filtersList.size()]));
+			filtersList.get(0) :
+				new MultipleCertificateFilter(filtersList.toArray(new CertificateFilter[filtersList.size()]));
 	}
 
-	/**
-	 * Obtiene el patr&oacute;n que define el filtro por <i>KeyUsage</i>, que de
+	/** Obtiene el patr&oacute;n que define el filtro por <i>KeyUsage</i>, que de
 	 * cara al exterior era un conjunto de filtros distintos.
 	 * @param sortedFilterValues Listado de filtros definidos ordenados
 	 * alfab&eacute;ticamente.
 	 * @param pos Posici&oacute;n del primer identificador de filtro de <i>KeyUsage</i>.
-	 * @return Patr&oacute;n para definir el filtro de <i>KeyUsages</i>.
-	 */
+	 * @return Patr&oacute;n para definir el filtro de <i>KeyUsages</i>. */
 	private static Boolean[] generateKeyUsageFiltersPattern(final String[] sortedFilterValues, final int pos) {
 
 		int i = pos;
@@ -242,20 +251,16 @@ public final class CertFilterManager {
 		}
 	}
 
-	/**
-	 * Devuelve la lista de certificados definidos.
-	 * @return Listado de certificados.
-	 */
+	/** Devuelve la lista de certificados definidos.
+	 * @return Listado de certificados. */
 	public List<CertificateFilter> getFilters() {
 		return this.filters != null ? new ArrayList<CertificateFilter>(this.filters) : null;
 	}
 
-	/**
-	 * Indica si se debe seleccionar autom&aacute;ticamente un certificado si es el &uacute;nico que
+	/** Indica si se debe seleccionar autom&aacute;ticamente un certificado si es el &uacute;nico que
 	 * cumple los filtros.
 	 * @return {@code true} si debe seleccionarse autom&aacute;ticamente el &uacute;nico certificado
-	 * que supera el filtrado, {@code false} en caso contrario.
-	 */
+	 * que supera el filtrado, {@code false} en caso contrario. */
 	public boolean isMandatoryCertificate() {
 		return this.mandatoryCertificate;
 	}

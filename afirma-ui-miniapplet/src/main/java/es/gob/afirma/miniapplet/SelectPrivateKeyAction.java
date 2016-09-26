@@ -12,7 +12,6 @@ package es.gob.afirma.miniapplet;
 
 import java.awt.Component;
 import java.io.IOException;
-import java.security.KeyException;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -97,8 +96,7 @@ final class SelectPrivateKeyAction implements PrivilegedExceptionAction<PrivateK
 
 	/** {@inheritDoc} */
 	@Override
-	public PrivateKeyEntry run() throws KeyException,
-	                                    AOKeystoreAlternativeException,
+	public PrivateKeyEntry run() throws AOKeystoreAlternativeException,
 	                                    AOException,
 	                                    UnrecoverableEntryException,
 	                                    NoSuchAlgorithmException,
@@ -120,14 +118,17 @@ final class SelectPrivateKeyAction implements PrivilegedExceptionAction<PrivateK
 		}
 
 		final AOKeyStoreDialog dialog = new AOKeyStoreDialog(
-				ksm,
-				this,
-				true,
-				true, // showExpiredCertificates
-				true, // checkValidity
-				filters,
-				mandatoryCertificate
-				);
+			ksm,
+			this,
+			true,
+			true, // showExpiredCertificates
+			true, // checkValidity
+			filters,
+			mandatoryCertificate
+		);
+		dialog.allowOpenExternalStores(
+			this.filterManager.isExternalStoresOpeningAllowed()
+		);
 		dialog.show();
 
 		ksm.setParentComponent(this.parent);

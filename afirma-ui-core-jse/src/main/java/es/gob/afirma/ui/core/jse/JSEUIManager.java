@@ -213,7 +213,7 @@ public class JSEUIManager implements AOUIManager {
     			throw (RuntimeException) e.getCause();
     		}
     		throw new IllegalStateException(
-				"Ocurrio un error durante la extraccion del certificado seleccionado: " + e, e.getCause() //$NON-NLS-1$
+				"Error durante la extraccion del certificado seleccionado: " + e, e.getCause() //$NON-NLS-1$
 			);
     	}
     	catch (final Exception e) {

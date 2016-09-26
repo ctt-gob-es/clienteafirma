@@ -19,32 +19,24 @@ import es.gob.afirma.core.keystores.NameCertificateBean;
 /** Interfaz que implementan los di&aacute;logos de selecci&oacute;n de certificados. */
 public interface KeyStoreDialogManager {
 
-	/**
-	 * Manda recargar al almac&eacute;n asociado actualmente al di&aacute;logo de
+	/** Manda recargar al almac&eacute;n asociado actualmente al di&aacute;logo de
 	 * selecci&oacute;n.
-	 * @throws IOException En caso de errores de entrada / salida
-	 */
+	 * @throws IOException En caso de errores de entrada / salida. */
 	void refresh() throws IOException;
 
-	/**
-	 * Obtiene el listado de certificados con alias que deben mostrarse en el
+	/** Obtiene el listado de certificados con alias que deben mostrarse en el
 	 * di&aacute;logo de selecci&oacute;n.
-	 * @return Listado de certificados con alias.
-	 */
+	 * @return Listado de certificados con alias. */
 	NameCertificateBean[] getNameCertificates();
 
-	/**
-	 * Cambia el almacen que gestiona internamente el di&aacute;logo.
-	 * @param ksm Almac&eacute;n de certificados.
-	 */
+	/** Cambia el almacen que gestiona internamente el di&aacute;logo.
+	 * @param ksm Almac&eacute;n de certificados. */
 	void setKeyStoreManager(KeyStoreManager ksm);
 
-	/**
-	 * Devuelve la clave asociada a un alias.
+	/** Devuelve la clave asociada a un alias.
 	 * @param alias Alias de la clave que se desea recuperar.
 	 * @throws AOException Cuando no se puede extraer la clave del almac&eacute;n.
-	 * @return Clave.
-	 */
+	 * @return Clave. */
 	Object getKeyEntry(String alias) throws AOException;
 
 	/** Muestra el di&aacute;logo con el listado de certificados que se ajusta a los criterios establecidos
@@ -55,9 +47,18 @@ public interface KeyStoreDialogManager {
 	 * @throws AOException Cuando no hay certificados en el almac&eacute;n acordes a los criterios establecidos. */
 	String show() throws AOException;
 
-	/**
-	 * Recupera el alias del certificado seleccionado;
-	 * @return Alias de certificado.
-	 */
+	/** Recupera el alias del certificado seleccionado;
+	 * @return Alias de certificado. */
 	String getSelectedAlias();
+
+	/** Permite o prohibe la apertura de almacenes externos al principal desde el UI del di&aacute;logo.
+	 * @param showButton <code>true</code> para mostrar el bot&oacute;n de apertura de almacenes externos,
+	 *                   <code>false</code> para ocultarlo. */
+	void allowOpenExternalStores(boolean showButton);
+
+	/** Indica si la apertura de almacenes externos al principal desde el UI del di&aacute;logo est&aacute;
+	 * permitida o prohibida.
+	 * @return <code>true</code> si se permite la apertura de almacenes externos,
+	 *         <code>false</code> en caso contrario. */
+	boolean isExternalStoresOpeningAllowed();
 }
