@@ -45,7 +45,6 @@ import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.keystores.AOKeyStore;
 import es.gob.afirma.keystores.AOKeyStoreManager;
-import es.gob.afirma.keystores.AOKeyStoreManagerException;
 import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
 import es.gob.afirma.keystores.AOKeystoreAlternativeException;
 import es.gob.afirma.keystores.callbacks.CachePasswordCallback;
@@ -89,13 +88,13 @@ final class CommandLineLauncher {
 
 		// Desactivamos el Logger de consola para que no interfiera con los comandos
 		//TODO: Descomentar para poner en produccion
-		Handler[] handlers = Logger.getLogger("es.gob.afirma").getHandlers(); //$NON-NLS-1$
-		for(Handler handler : handlers) {
+		final Handler[] handlers = Logger.getLogger("es.gob.afirma").getHandlers(); //$NON-NLS-1$
+		for(final Handler handler : handlers) {
 			if(handler instanceof ConsoleHandler) {
 				handler.setLevel(Level.OFF);
 			}
 		}
-		
+
 		final Console console = System.console();
 
 		try (
@@ -641,7 +640,7 @@ final class CommandLineLauncher {
 		return resBytes;
 	}
 
-	private static String listAliasesByCommandLine(final CommandLineParameters params) throws IOException, CommandLineException, AOKeystoreAlternativeException, AOKeyStoreManagerException {
+	private static String listAliasesByCommandLine(final CommandLineParameters params) throws IOException, CommandLineException, AOKeystoreAlternativeException {
 
 		final String[] aliases = getKsm(params.getStore(), params.getPassword()).getAliases();
 		final StringBuilder sb = new StringBuilder();
@@ -662,7 +661,10 @@ final class CommandLineLauncher {
 		return sb.toString();
 	}
 
-	private static AOKeyStoreManager getKsm(final String storeType, final String pwd) throws IOException, CommandLineException, AOKeystoreAlternativeException, AOKeyStoreManagerException {
+	private static AOKeyStoreManager getKsm(final String storeType,
+			                                final String pwd) throws IOException,
+	                                                                 CommandLineException,
+	                                                                 AOKeystoreAlternativeException {
 		final AOKeyStore store;
 		String lib = null;
 		if (STORE_AUTO.equals(storeType) || storeType == null) {

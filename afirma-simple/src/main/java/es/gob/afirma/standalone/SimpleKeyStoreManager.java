@@ -124,7 +124,7 @@ public final class SimpleKeyStoreManager {
 		}
     }
 
-    private static AOKeyStoreManager getKeyStoreManager(final AOKeyStore aoks, final Component parent) throws IOException, AOKeystoreAlternativeException, AOKeyStoreManagerException {
+    private static AOKeyStoreManager getKeyStoreManager(final AOKeyStore aoks, final Component parent) throws IOException, AOKeystoreAlternativeException {
     	return AOKeyStoreManagerFactory.getAOKeyStoreManager(
     		aoks,
     		null,

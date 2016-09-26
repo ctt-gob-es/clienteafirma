@@ -12,10 +12,6 @@ package es.gob.afirma.cert.signvalidation;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.cert.CRLException;
-import java.security.cert.CertStoreException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateFactory;
@@ -98,10 +94,6 @@ public final class ValidateBinarySignature implements SignValider{
     	try {
     		verifySignatures(sign, data != null ? data : new AOCAdESSigner().getData(sign));
 	    }
-    	catch (final CertStoreException e) {
-    	    // Error al recuperar los certificados o estos no son validos
-            return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.CERTIFICATE_PROBLEM);
-        }
     	catch (final CertificateExpiredException e) {
     		// Certificado caducado
     		return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.CERTIFICATE_EXPIRED);
@@ -109,18 +101,6 @@ public final class ValidateBinarySignature implements SignValider{
     	catch (final CertificateNotYetValidException e) {
     		// Certificado aun no valido
     		return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.CERTIFICATE_NOT_VALID_YET);
-        }
-    	catch (final NoSuchAlgorithmException e) {
-         // Algoritmo no reconocido
-            return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.ALGORITHM_NOT_SUPPORTED);
-        }
-    	catch (final NoMatchDataException e) {
-         // Los datos indicados no coinciden con los datos de firma
-            return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.NO_MATCH_DATA);
-        }
-    	catch (final CRLException e) {
-         // Problema en la validacion de las CRLs de la firma
-            return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.CRL_PROBLEM);
         }
     	catch (final CMSSignerDigestMismatchException e) {
     		// La firma no es una firma binaria valida
@@ -139,23 +119,11 @@ public final class ValidateBinarySignature implements SignValider{
      * @param sign Firma que se desea validar.
      * @param data Datos para la comprobaci&oacute;n.
      * @throws CMSException Cuando la firma no tenga una estructura v&aacute;lida.
-     * @throws CertStoreException Cuando se encuentra un error en los certificados de
-     * firma o estos no pueden recuperarse.
      * @throws CertificateExpiredException Cuando el certificado est&aacute;a caducado.
      * @throws CertificateNotYetValidException Cuando el certificado aun no es v&aacute;lido.
-     * @throws NoSuchAlgorithmException Cuando no se reconoce o soporta alguno de los
-     * algoritmos utilizados en la firma.
-     * @throws NoMatchDataException Cuando los datos introducidos no coinciden con los firmados.
-     * @throws CRLException Cuando ocurre un error con las CRL de la firma.
-     * @throws NoSuchProviderException Cuando no se encuentran los proveedores de seguridad necesarios para validar la firma
      * @throws IOException Cuando no se puede crear un certificado desde la firma para validarlo
      * @throws OperatorCreationException Cuando no se puede crear el validado de contenido de firma*/
     private static void verifySignatures(final byte[] sign, final byte[] data) throws CMSException,
-                                                                                      CertStoreException,
-                                                                                      NoSuchAlgorithmException,
-                                                                                      NoMatchDataException,
-                                                                                      CRLException,
-                                                                                      NoSuchProviderException,
                                                                                       CertificateException,
                                                                                       IOException,
                                                                                       OperatorCreationException {
@@ -180,7 +148,7 @@ public final class ValidateBinarySignature implements SignValider{
     				certIt.next().getEncoded()
 				)
     		);
-            
+
             cert.checkValidity();
 
             if (!signer.verify(new SignerInformationVerifier(

@@ -735,8 +735,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 	public String[] getMultiFileNameContentBase64(final String title,
 			                                      final String extensions,
 			                                      final String description,
-			                                      final String filePath) throws IOException,
-			                                                                       PrivilegedActionException {
+			                                      final String filePath) throws PrivilegedActionException {
 		return this.getMultiFileNameContent(title, extensions, description, filePath,true);
 	}
 
@@ -1062,13 +1061,11 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 	 * @param sign Firma electr&oacute;nica.
 	 * @return Manejador de firma.
 	 * @throws AOFormatFileException Cuando el formato o la firma no estan soportados
-	 * @throws PrivilegedActionException Cuando se produce un error durante la lectura de los datos.
-	 * @throws IOException Cuando no se indica ni formato ni firma como par&aacute;nmetro.
-	 */
+	 * @throws PrivilegedActionException Cuando se produce un error durante la lectura de los datos. */
 	private static AOSigner selectSigner(final String format,
 			 							 final byte[] data,
 			                             final byte[] sign) throws AOFormatFileException,
-			                                                       PrivilegedActionException, IOException {
+			                                                       PrivilegedActionException {
 
 		if (format == null) {
 			throw new IllegalArgumentException(
