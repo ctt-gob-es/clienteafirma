@@ -44,10 +44,18 @@ public final class CAdESValidator {
     }
 
     private static Enumeration<?> getCAdESObjects(final byte[] data) throws IOException {
-    	final ASN1InputStream is = new ASN1InputStream(data);
-        final ASN1Sequence dsq = (ASN1Sequence) is.readObject();
-        is.close();
-        return dsq.getObjects();
+    	try {
+    		final ASN1InputStream is = new ASN1InputStream(data);
+    		final ASN1Sequence dsq = (ASN1Sequence) is.readObject();
+    		is.close();
+    		return dsq.getObjects();
+    	}
+    	catch (final IOException e) {
+    		throw e;
+    	}
+    	catch (final Exception e) {
+    		throw new IOException("Los datos no tienen no estructura ASN.1 valida", e); //$NON-NLS-1$
+    	}
     }
 
     /** Verifica si los datos proporcionados se corresponden con una estructura de tipo <i>Data</i>.
