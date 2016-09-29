@@ -1394,8 +1394,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 	public String signBatch(final String batchB64,
 			                final String batchPreSignerUrl,
 			                final String batchPostSignerUrl,
-			                final String extraParams) throws IOException,
-			                                                 AOException,
+			                final String extraParams) throws AOException,
 			                                                 PrivilegedActionException {
 		final Properties params = ExtraParamsProcessor.convertToProperties(extraParams);
 		final PrivateKeyEntry pke;
