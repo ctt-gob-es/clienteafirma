@@ -7,7 +7,10 @@ import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.Toolkit;
 import java.awt.Window;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -61,18 +64,25 @@ public final class CreateHashDialog extends JDialog implements KeyListener{
 		return this.fileTextField;
 	}
 
-	private final JCheckBox base64ChechBox = new JCheckBox(
+	private final JCheckBox base64CheckBox = new JCheckBox(
 		SimpleAfirmaMessages.getString("CreateHashDialog.0") //$NON-NLS-1$
 	);
 	boolean isBase64Checked() {
-		return this.base64ChechBox.isSelected();
+		return this.base64CheckBox.isSelected();
+	}
+
+	final JCheckBox copyToClipBoardCheckBox = new JCheckBox(
+			SimpleAfirmaMessages.getString("CreateHashDialog.19") //$NON-NLS-1$
+		);
+	boolean isCopyToClipBoardChecked() {
+		return this.copyToClipBoardCheckBox.isSelected();
 	}
 
 	/** Inicia el proceso de creaci&oacute;n de huella digital.
 	 * @param parent Componente padre para la modalidad. */
 	public static void startHashCreation(final Frame parent) {
 		final CreateHashDialog chd = new CreateHashDialog(parent);
-		chd.setSize(600, 280);
+		chd.setSize(600, 290);
 		chd.setResizable(false);
 		chd.setLocationRelativeTo(parent);
 		chd.setVisible(true);
@@ -129,24 +139,45 @@ public final class CreateHashDialog extends JDialog implements KeyListener{
 		);
 		this.hashAlgorithms.addKeyListener(this);
 
-		this.base64ChechBox.addActionListener(
+		this.base64CheckBox.addActionListener(
 			new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
+
+					final boolean checked = isBase64Checked();
 					PreferencesManager.putBoolean(
 						PreferencesManager.PREFERENCE_CREATE_HASH_BASE64,
-						isBase64Checked()
+						checked
 					);
 				}
 			}
 		);
-		this.base64ChechBox.setSelected(
+		this.base64CheckBox.setSelected(
 			PreferencesManager.getBoolean(
 				PreferencesManager.PREFERENCE_CREATE_HASH_BASE64,
-				false
+				true
 			)
 		);
-		this.base64ChechBox.addKeyListener(this);
+		this.base64CheckBox.addKeyListener(this);
+
+		this.copyToClipBoardCheckBox.addActionListener(
+				new ActionListener() {
+					@Override
+					public void actionPerformed(final ActionEvent e) {
+						PreferencesManager.putBoolean(
+								PreferencesManager.PREFERENCE_CREATE_HASH_CLIPBOARD,
+								isCopyToClipBoardChecked()
+						);
+					}
+				}
+		);
+		this.copyToClipBoardCheckBox.setSelected(
+			PreferencesManager.getBoolean(
+				PreferencesManager.PREFERENCE_CREATE_HASH_CLIPBOARD,
+				true
+			)
+		);
+		this.copyToClipBoardCheckBox.addKeyListener(this);
 
 		final JLabel fileTextFieldLabel = new JLabel(
 			SimpleAfirmaMessages.getString("CreateHashDialog.3") //$NON-NLS-1$
@@ -210,6 +241,7 @@ public final class CreateHashDialog extends JDialog implements KeyListener{
 						getFileTextField().getText(),
 						getSelectedHashAlgorithm(),
 						isBase64Checked(),
+						isCopyToClipBoardChecked(),
 						CreateHashDialog.this
 					);
 					CreateHashDialog.this.setVisible(false);
@@ -266,7 +298,10 @@ public final class CreateHashDialog extends JDialog implements KeyListener{
 		c.add(this.hashAlgorithms, gbc);
 		gbc.insets = new Insets(25,10,0,10);
 		gbc.gridy++;
-		c.add(this.base64ChechBox, gbc);
+		c.add(this.base64CheckBox, gbc);
+		gbc.insets = new Insets(10,10,0,10);
+		gbc.gridy++;
+		c.add(this.copyToClipBoardCheckBox, gbc);
 		gbc.insets = new Insets(20,10,0,10);
 		gbc.gridy++;
 		gbc.gridwidth = GridBagConstraints.REMAINDER;
@@ -277,6 +312,7 @@ public final class CreateHashDialog extends JDialog implements KeyListener{
                               final String file,
                               final String hashAlgorithm,
                               final boolean base64,
+                              final boolean copyToClipboard,
                               final Window currentFrame) {
 
 		final CommonWaitDialog dialog = new CommonWaitDialog(
@@ -310,6 +346,10 @@ public final class CreateHashDialog extends JDialog implements KeyListener{
 						SimpleAfirmaMessages.getString("CreateHashDialog.9") + " (*" + ext + ")",  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
 						parent
 					);
+
+					if (copyToClipboard) {
+						copyToClipBoard(Base64.encode(hash));
+					}
 				}
 				catch(final OutOfMemoryError ooe) {
 					AOUIFactory.showErrorMessage(
@@ -379,4 +419,13 @@ public final class CreateHashDialog extends JDialog implements KeyListener{
 		}
 	}
 
+	/**
+	 * Copia un texto al portapapeles del sistema.
+	 * @param text Contenido a copiar.
+	 */
+	static void copyToClipBoard(final String text) {
+		final StringSelection stringSelection = new StringSelection(text);
+		final Clipboard clpbrd = Toolkit.getDefaultToolkit().getSystemClipboard();
+		clpbrd.setContents(stringSelection, null);
+	}
 }

@@ -31,6 +31,7 @@ public final class HashHelper {
 	private static final String DEFAULT_HASH_ALGORITHM = "SHA-512"; //$NON-NLS-1$
 	private static final boolean DEFAULT_RECURSIVE = true;
 	private static final boolean DEFAULT_USE_BASE64 = true;
+	private static final boolean DEFAULT_COPY_TO_CLIPBOARD = true;
 	private static final int SIZE_WAIT = 50000000; //Tamano en bytes
 
 	/** Comprueba las huellas digitales del fichero de huella proporcionados mediante un
@@ -309,6 +310,7 @@ public final class HashHelper {
 				file.getAbsolutePath(),
 				DEFAULT_HASH_ALGORITHM,
 				DEFAULT_USE_BASE64,
+				DEFAULT_COPY_TO_CLIPBOARD,
 				null
 			);
 		}
