@@ -21,12 +21,12 @@
 		APPLET   { width:1px; height:1px; position:absolute; top:50%; left:50%; }
 	</style>
 	<script type="text/javascript" src="js/miniapplet.js"></script>
+	<script type="text/javascript" src="js/constantes.js"></script>
 	<script type="text/javascript" defer="defer">
 	<!--
 		/* Indica si debe firmarse un fichero (true) o el formulario de la pagina (false) */ 
 		var firmarFichero = true;
 
-	
 		function firmar() {
 			var divMensaje = document.getElementById('divmensaje');
 			divMensaje.innerHTML='';
@@ -36,15 +36,12 @@
 			mostrarDialogoEspera();
 			
 			var params = 	"mode=explicit\n" +
-							"serverUrl=https://valide.redsara.es/firmaMovil/TriPhaseSignerServer/SignatureService" +
-							"\nfilter=qualified:051a58c1e1afca40"+
-							"\nheadless=true";
+							"serverUrl=" + Constantes.URL_BASE_SERVICES + "/afirma-server-triphase-signer/SignatureService";
 
 			var batchB64 = "PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiID8+DQo8c2lnbmJhdGNoIHN0b3BvbmVycm9yPSJmYWxzZSIgYWxnb3JpdGhtPSJTSEEyNTZ3aXRoUlNBIj4NCiA8c2luZ2xlc2lnbiBJZD0iNzcyNTM3NGUtNzI4ZC00YTMzLTlkYjktM2E0ZWZlYTRjZWFkIj4NCjxkYXRhc291cmNlPmh0dHA6Ly9nb29nbGUuY29tPC9kYXRhc291cmNlPg0KPGZvcm1hdD5YQWRFUzwvZm9ybWF0Pg0KPHN1Ym9wZXJhdGlvbj5zaWduPC9zdWJvcGVyYXRpb24+DQo8ZXh0cmFwYXJhbXM+SXcwS0kxUm9kU0JCZFdjZ01UTWdNVFk2TWprNk1EVWdRMFZUVkNBeU1ERTFEUXBUYVdkdVlYUjFjbVZKWkQwM056STFNemMwWlMwM01qaGtMVFJoTXpNdE9XUmlPUzB6WVRSbFptVmhOR05sWVdRTkNnPT08L2V4dHJhcGFyYW1zPg0KPHNpZ25zYXZlcj4NCjxjbGFzcz5lcy5nb2IuYWZpcm1hLnNpZ25lcnMuYmF0Y2guU2lnblNhdmVyRmlsZTwvY2xhc3M+DQo8Y29uZmlnPlJtbHNaVTVoYldVOVExdzZYRnhWYzJWeWMxeGNiV0Z5YVc5Y1hFUnZZM1Z0Wlc1MGMxeGNSa2xTVFVFeExuaHRiQT09PC9jb25maWc+DQo8L3NpZ25zYXZlcj4NCjwvc2luZ2xlc2lnbj4NCjxzaW5nbGVzaWduIElkPSI5M2QxNTMxYy1jZDMyLTRjOGUtOGNjOC0xZjFjZmU2NmY2NGEiPg0KPGRhdGFzb3VyY2U+U0c5c1lTQk5kVzVrYnc9PTwvZGF0YXNvdXJjZT4NCjxmb3JtYXQ+Q0FkRVM8L2Zvcm1hdD4NCjxzdWJvcGVyYXRpb24+c2lnbjwvc3Vib3BlcmF0aW9uPg0KPGV4dHJhcGFyYW1zPkl3MEtJMVJvZFNCQmRXY2dNVE1nTVRZNk1qazZNRFVnUTBWVFZDQXlNREUxRFFwVGFXZHVZWFIxY21WSlpEMDVNMlF4TlRNeFl5MWpaRE15TFRSak9HVXRPR05qT0MweFpqRmpabVUyTm1ZMk5HRU5DZz09PC9leHRyYXBhcmFtcz4NCjxzaWduc2F2ZXI+DQo8Y2xhc3M+ZXMuZ29iLmFmaXJtYS5zaWduZXJzLmJhdGNoLlNpZ25TYXZlckZpbGU8L2NsYXNzPg0KPGNvbmZpZz5SbWxzWlU1aGJXVTlRMXc2WEZ4VmMyVnljMXhjYldGeWFXOWNYRVJ2WTNWdFpXNTBjMXhjUmtsU1RVRXlMbmh0YkE9PTwvY29uZmlnPg0KPC9zaWduc2F2ZXI+DQo8L3NpbmdsZXNpZ24+DQo8L3NpZ25iYXRjaD4=";
-			
 
 			try {
-				MiniApplet.signBatch(batchB64, "http://demo.com:8080/afirma-server-triphase-signer/BatchPresigner", "http://demo.com:8080/afirma-server-triphase-signer/BatchPostsigner", params, successCallback, errorCallback)
+				MiniApplet.signBatch(batchB64, Constantes.URL_BASE_SERVICES + "/afirma-server-triphase-signer/BatchPresigner", Constantes.URL_BASE_SERVICES + "/afirma-server-triphase-signer/BatchPostsigner", params, successCallback, errorCallback)
 			}
 			catch (excep) {
 				//Se puede recuperar el mensaje de error y pintarlo en la pantalla
@@ -230,11 +227,8 @@ la Administración Electrónica por su seguridad.
 	</div> <!-- FIN DE CONTENEDOR -->
 	
 	<script type="text/javascript">
-		MiniApplet.cargarMiniApplet('http://demo.com:8080/afirma-ui-miniapplet-deploy');
-		MiniApplet.setServlets("http://demo.com:8080/afirma-signature-storage/StorageService", "http://demo.com:8080/afirma-signature-retriever/RetrieveService");
-		//MiniApplet.cargarMiniApplet('http://192.168.178.237:8080/afirma-ui-miniapplet-deploy');
-		//MiniApplet.setServlets("http://192.168.178.237:8080/afirma-signature-storage/StorageService", "http://192.168.178.237:8080/afirma-signature-retriever/RetrieveService");
-		
+		MiniApplet.cargarMiniApplet(Constantes.URL_BASE_APPLET);
+		MiniApplet.setServlets(Constantes.URL_BASE_SERVICES + "/afirma-signature-storage/StorageService", Constantes.URL_BASE_SERVICES + "/afirma-signature-retriever/RetrieveService");
 	</script>
 	
 </body></html>
