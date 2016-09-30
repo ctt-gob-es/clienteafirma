@@ -79,7 +79,7 @@ public class RetrieveConfig {
 	 * del sistema.
 	 */
 	public File getTempDir() {
-		File tmpDir = new File(this.config.getProperty(TMP_DIR_KEY, DEFAULT_TMP_DIR));
+		File tmpDir = new File(this.config.getProperty(TMP_DIR_KEY, DEFAULT_TMP_DIR).trim());
 		if (!tmpDir.exists() ||!tmpDir.canRead()) {
 			Logger.getLogger("es.gob.afirma").warning("El directorio temporal indicado en el fichero de propiedades no existe, se usara el por defecto"); //$NON-NLS-1$ //$NON-NLS-2$
 			tmpDir = new File(DEFAULT_TMP_DIR);
