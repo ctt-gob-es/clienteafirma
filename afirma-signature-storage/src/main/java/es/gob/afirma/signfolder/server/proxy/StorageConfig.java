@@ -73,7 +73,7 @@ final class StorageConfig {
 	 * @throws NullPointerException Cuando no se indicala ruta del directorio temporal ni se puede obtener
 	 * del sistema. */
 	File getTempDir() {
-		return new File(this.config.getProperty(TMP_DIR_KEY, DEFAULT_TMP_DIR));
+		return new File(this.config.getProperty(TMP_DIR_KEY, DEFAULT_TMP_DIR).trim());
 	}
 
 	/** Recupera el tiempo en milisegundos que puede almacenarse un fichero antes de considerarse caducado.
