@@ -657,11 +657,10 @@ public class JSEUIManager implements AOUIManager {
             if (f.isDirectory()) {
                 return true;
             }
-            // getExtension() pasa la extension a minusculas, no hace falta
-            // el "ignoreCase"
-            final String extension = getExtension(f);
-            for (final String extension2 : this.extensions) {
-                if (extension2.equalsIgnoreCase(extension)) {
+
+            final String fileExtension = getExtension(f);
+            for (final String aceptedExtension : this.extensions) {
+                if (aceptedExtension.equalsIgnoreCase(fileExtension)) {
                     return true;
                 }
             }
@@ -682,7 +681,7 @@ public class JSEUIManager implements AOUIManager {
             final String s = f.getName();
             final int i = s.lastIndexOf('.');
             if (i > 0 && i < s.length() - 1) {
-                return s.substring(i + 1).toLowerCase();
+                return s.substring(i + 1);
             }
             return ""; //$NON-NLS-1$
         }
