@@ -29,6 +29,7 @@ final class RequestDetailResponseParser {
 	private static final String SIGN_LINES_NODE = "sgnlines"; //$NON-NLS-1$
 	private static final String SIGN_LINE_NODE = "sgnline"; //$NON-NLS-1$
 	private static final String RECEIVER_NODE = "rcvr"; //$NON-NLS-1$
+	private static final String SIGN_STATE_ATTRIBUTE = "st";
 	private static final String DOCUMENTS_NODE = "docs"; //$NON-NLS-1$
 
 	private static final int DEFAULT_REQUEST_PRIORITY_VALUE = 1;
@@ -230,9 +231,9 @@ final class RequestDetailResponseParser {
 	 * @param signLinesNode Nodos con la informaci&oacute;n de los documentos..
 	 * @return Listado de documentos.
 	 */
-	private static Vector<String>[] getSignLines(final NodeList signLinesNode) {
+	private static Vector<SignLine>[] getSignLines(final NodeList signLinesNode) {
 
-		final Vector<Vector<String>> signLinesList = new Vector<Vector<String>>();
+		final Vector<Vector<SignLine>> signLinesList = new Vector<Vector<SignLine>>();
 		for (int i = 0; i < signLinesNode.getLength(); i++) {
 			// Nos aseguramos de procesar solo nodos de tipo Element
 			i = XmlUtils.nextNodeElementIndex(signLinesNode, i);
@@ -243,7 +244,7 @@ final class RequestDetailResponseParser {
 				throw new IllegalArgumentException("Se ha encontrado el nodo " + //$NON-NLS-1$
 						signLinesNode.item(i).getNodeName()  + " en el listado de lineas de firma"); //$NON-NLS-1$
 			}
-			final Vector<String> receiverList = new Vector<String>();
+			final Vector<SignLine> receiverList = new Vector<SignLine>();
 			final NodeList recivers = signLinesNode.item(i).getChildNodes();
 			for (int j = 0; j < recivers.getLength(); j++) {
 				j = XmlUtils.nextNodeElementIndex(recivers, j);
@@ -254,7 +255,22 @@ final class RequestDetailResponseParser {
 					throw new IllegalArgumentException("Se ha encontrado el nodo " + //$NON-NLS-1$
 							recivers.item(j).getNodeName()  + " en el listado de lineas de firma"); //$NON-NLS-1$
 				}
-				receiverList.addElement(normalizeValue(XmlUtils.getTextContent(recivers.item(j))));
+
+				// Comprobamos si se indica el estado de la firma en cuestion
+				boolean done = false;
+				if (recivers.item(j).hasAttributes()) {
+					final NamedNodeMap attrs = recivers.item(j).getAttributes();
+					if (attrs.getNamedItem(SIGN_STATE_ATTRIBUTE) != null) {
+						done = Boolean.parseBoolean(attrs.getNamedItem(SIGN_STATE_ATTRIBUTE).getNodeValue());
+					}
+				}
+
+				receiverList.addElement(
+						new SignLine(
+								normalizeValue(XmlUtils.getTextContent(recivers.item(j))),
+								done
+						)
+				);
 			}
 			signLinesList.addElement(receiverList);
 		}

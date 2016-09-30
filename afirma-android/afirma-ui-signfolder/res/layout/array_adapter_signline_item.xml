@@ -7,6 +7,7 @@
     android:minHeight="45dp" >
     
     <ImageView
+        android:id="@+id/signerIcon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:paddingLeft="12dp"

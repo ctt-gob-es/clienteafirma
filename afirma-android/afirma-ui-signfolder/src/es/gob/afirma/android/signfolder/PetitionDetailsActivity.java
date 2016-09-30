@@ -45,6 +45,7 @@ import es.gob.afirma.android.signfolder.LoadPetitionDetailsTask.LoadSignRequestD
 import es.gob.afirma.android.signfolder.proxy.CommManager;
 import es.gob.afirma.android.signfolder.proxy.RequestDetail;
 import es.gob.afirma.android.signfolder.proxy.RequestResult;
+import es.gob.afirma.android.signfolder.proxy.SignLine;
 import es.gob.afirma.android.signfolder.proxy.SignRequest;
 import es.gob.afirma.android.signfolder.proxy.SignRequest.RequestType;
 import es.gob.afirma.android.signfolder.proxy.SignRequestDocument;
@@ -86,13 +87,13 @@ public final class PetitionDetailsActivity extends FragmentActivity implements L
 
 	/** Tag para la presentaci&oacute;n de di&aacute;logos */
 	private final static String DIALOG_TAG = "dialog"; //$NON-NLS-1$
-	
+
 	/** Identificador de la firma PAdES. */
 	public static final String SIGN_FORMAT_PADES = "PAdES"; //$NON-NLS-1$
 
 	/** Identificador de la firma XAdES por defecto. */
 	public static final String SIGN_FORMAT_XADES = "XAdES"; //$NON-NLS-1$
-	
+
 	private String certB64 = null;
 	private String certAlias = null;
 
@@ -311,13 +312,13 @@ public final class PetitionDetailsActivity extends FragmentActivity implements L
     	return ext;
     }
 
-    private List<RequestDetailAdapterItem> prepareSignLineItems(final Vector<String>[] signLines) {
+    private List<RequestDetailAdapterItem> prepareSignLineItems(final Vector<SignLine>[] signLines) {
 
     	final List<RequestDetailAdapterItem> list = new ArrayList<PetitionDetailsActivity.RequestDetailAdapterItem>();
     	for (int i = 0; i < signLines.length; i++) {
-    		final Vector<String> signLine = signLines[i];
+    		final Vector<SignLine> signLine = signLines[i];
     		list.add(new SignLineHeader(getString(R.string.signline_header, Integer.valueOf(i + 1))));
-    		for (final String signer : signLine) {
+    		for (final SignLine signer : signLine) {
     			list.add(new SignLineItem(signer));
     		}
     	}
@@ -419,10 +420,11 @@ public final class PetitionDetailsActivity extends FragmentActivity implements L
     }
 
     final class SignLineItem implements RequestDetailAdapterItem {
-        private final String signer;
+        private final SignLine signer;
 
-        SignLineItem(final String signer) {
+        SignLineItem(final SignLine signer) {
             this.signer = signer;
+
         }
 
         @Override
@@ -440,8 +442,10 @@ public final class PetitionDetailsActivity extends FragmentActivity implements L
                 view = convertView;
             }
 
-            ((TextView) view.findViewById(R.id.signer)).setText(this.signer);
-
+            ((TextView) view.findViewById(R.id.signer)).setText(this.signer.getSigner());
+            if (this.signer.isDone()) {
+            	((ImageView) view.findViewById(R.id.signerIcon)).setImageResource(R.drawable.icon_signline_done);
+            }
             return view;
         }
     }

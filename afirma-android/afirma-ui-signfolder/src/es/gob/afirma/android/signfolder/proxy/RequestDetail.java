@@ -9,7 +9,7 @@ public final class RequestDetail extends SignRequest {
 
 	private String ref = null;
 
-	private Vector<String>[] signLines;
+	private Vector<SignLine>[] signLines;
 
 	RequestDetail(final String id) {
 		super(id);
@@ -42,14 +42,14 @@ public final class RequestDetail extends SignRequest {
 	/** Recupera el listado de l&iacute;neas de firma de la petici&oacute;n. Las l&iacute;neas de firma
 	 * se componen de un listado de nombre de usuarios por los que debe pasar o ha pasado la firma.
 	 * @return Listado de l&iacute;neas de firma. */
-	public Vector<String>[] getSignLines() {
+	public Vector<SignLine>[] getSignLines() {
 		return this.signLines;
 	}
 
 	/** Establece el listado de l&iacute;neas de firma de la petici&oacute;n. Las l&iacute;neas de firma
 	 * se componen de un listado de nombre de usuarios por los que debe pasar o ha pasado la firma.
 	 * @param signLines Listado de l&iacute;neas de firma. */
-	public void setSignLines(final Vector<String>[] signLines) {
+	public void setSignLines(final Vector<SignLine>[] signLines) {
 		this.signLines = signLines;
 	}
 }
