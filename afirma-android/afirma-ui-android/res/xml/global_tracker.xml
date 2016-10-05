@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources xmlns:tools="http://schemas.android.com/tools">
-	<string name="ga_logLevel">verbose</string>
-	<integer name="ga_dispatchPeriod">30</integer>
-	<bool name="ga_dryRun">false</bool>
-</resources>
