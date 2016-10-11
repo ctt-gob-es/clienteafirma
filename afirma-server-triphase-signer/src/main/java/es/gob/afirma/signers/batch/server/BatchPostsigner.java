@@ -188,6 +188,7 @@ public final class BatchPostsigner extends HttpServlet {
 		response.setContentType("text/xml;charset=UTF-8"); //$NON-NLS-1$
 		final PrintWriter writer = response.getWriter();
 		writer.write(ret);
+		writer.flush();
 	}
 
 }
