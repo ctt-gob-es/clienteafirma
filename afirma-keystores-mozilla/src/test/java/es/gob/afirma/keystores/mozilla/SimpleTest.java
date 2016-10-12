@@ -1,6 +1,7 @@
 package es.gob.afirma.keystores.mozilla;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.security.KeyStore;
@@ -10,6 +11,7 @@ import java.security.Signature;
 import java.util.Enumeration;
 import java.util.logging.Logger;
 
+import org.junit.Assume;
 import org.junit.Test;
 
 import es.gob.afirma.core.AOException;
@@ -91,6 +93,7 @@ public final class SimpleTest {
     @SuppressWarnings("static-method")
 	@Test
     public void testDirectNssUsage() throws Exception {
+    	Assume.assumeTrue(new File("C:\\Users\\tomas\\AppData\\Local\\Temp\\nss").exists()); //$NON-NLS-1$
     	final KeyStore keyStore = KeyStore.getInstance(
 			"PKCS11", //$NON-NLS-1$
 			loadNSS(

@@ -29,7 +29,7 @@ public class TestSignHash {
 	PrivateKeyEntry pke = null;
 
 	@Before
-	private void loadResources() throws Exception {
+	public void loadResources() throws Exception {
 
 		Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$
 

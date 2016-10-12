@@ -16,7 +16,7 @@ public final class TestHttpConnection {
 		Assert.assertNotNull(
 			new es.gob.afirma.core.misc.http.UrlHttpManagerImpl().readUrl(
 				"https://valide.redsara.es/valide/",  //$NON-NLS-1$
-				UrlHttpMethod.POST
+				UrlHttpMethod.GET
 			)
 		);
 	}

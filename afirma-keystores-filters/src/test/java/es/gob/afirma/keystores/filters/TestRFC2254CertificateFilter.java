@@ -4,8 +4,10 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 
 import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.Test;
 
+import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.keystores.AOKeyStore;
 import es.gob.afirma.keystores.AOKeyStoreManager;
 import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
@@ -41,6 +43,7 @@ public final class TestRFC2254CertificateFilter {
 	@Test
 	@SuppressWarnings("static-method")
 	public void TestRFC2254CertificateRecursiveFilter() throws Exception {
+		Assume.assumeTrue(Platform.OS.WINDOWS == Platform.getOS());
 		final RFC2254CertificateFilter filter = new RFC2254CertificateFilter(null, "cn=ANF Global Root CA", true);  //$NON-NLS-1$
 		final AOKeyStoreManager ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(AOKeyStore.WINDOWS, null, "CAPI", null, null); //$NON-NLS-1$
 		final String[] aceptados = filter.matches(ksm.getAliases(), ksm);

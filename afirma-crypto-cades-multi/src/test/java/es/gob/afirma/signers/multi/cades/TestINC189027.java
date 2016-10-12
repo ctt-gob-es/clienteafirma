@@ -41,7 +41,7 @@ public class TestINC189027 {
 
 	/** Prueba de contrafirma de una firma CAdES-T.
 	 * @throws Exception Cuando ocurre un error. */
-	@Test
+	@Test(expected=AOFormatFileException.class)
 	public void testContrafirmaCAdEST() throws Exception {
 
 		final InputStream is = getClass().getClassLoader().getResourceAsStream(FILE_CADES_T);
@@ -54,22 +54,17 @@ public class TestINC189027 {
 		final AOCAdESSigner signer = new AOCAdESSigner();
 
 		final byte[] countersign;
-		try {
-			countersign = signer.countersign(
-				signature,
-				AOSignConstants.SIGN_ALGORITHM_SHA512WITHRSA,
-				CounterSignTarget.TREE,
-				null,
-				pke.getPrivateKey(),
-				pke.getCertificateChain(),
-				config
-			);
-		}
-		catch(final AOFormatFileException e) {
-			return;
-		}
 
-		Assert.fail("Deberia haber saltado un AOFormatFileException"); //$NON-NLS-1$
+		countersign = signer.countersign(
+			signature,
+			AOSignConstants.SIGN_ALGORITHM_SHA512WITHRSA,
+			CounterSignTarget.TREE,
+			null,
+			pke.getPrivateKey(),
+			pke.getCertificateChain(),
+			config
+		);
+
 
 //		final File tempFile = File.createTempFile("CAdES-T-Countersign", ".csig"); //$NON-NLS-1$ //$NON-NLS-2$
 //		System.out.println("El resultado de la contrafirma de CAdES-T se almacena en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
@@ -80,7 +75,7 @@ public class TestINC189027 {
 
 	/** Prueba de cofirma de una firma CAdES-T.
 	 * @throws Exception Cuando ocurre un error. */
-	@Test
+	@Test(expected=AOFormatFileException.class)
 	public void testCofirmaCAdEST() throws Exception {
 
 		final InputStream is = getClass().getClassLoader().getResourceAsStream(FILE_CADES_T);
@@ -93,21 +88,16 @@ public class TestINC189027 {
 		final AOCAdESSigner signer = new AOCAdESSigner();
 
 		final byte[] countersign;
-		try {
-			countersign = signer.cosign(
-				AOUtil.getDataFromInputStream(TestINC189027.class.getResourceAsStream("/Original.pdf")), //$NON-NLS-1$
-				signature,
-				AOSignConstants.SIGN_ALGORITHM_SHA512WITHRSA,
-				pke.getPrivateKey(),
-				pke.getCertificateChain(),
-				config
-			);
-		}
-		catch(final AOFormatFileException e) {
-			return;
-		}
 
-		Assert.fail("Deberia haber saltado un AOFormatFileException"); //$NON-NLS-1$
+		countersign = signer.cosign(
+			AOUtil.getDataFromInputStream(TestINC189027.class.getResourceAsStream("/Original.pdf")), //$NON-NLS-1$
+			signature,
+			AOSignConstants.SIGN_ALGORITHM_SHA512WITHRSA,
+			pke.getPrivateKey(),
+			pke.getCertificateChain(),
+			config
+		);
+
 
 //		final File tempFile = File.createTempFile("CAdES-T-Cosign", ".csig"); //$NON-NLS-1$ //$NON-NLS-2$
 //		System.out.println("El resultado de la cofirma de CAdES-T se almacena en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$

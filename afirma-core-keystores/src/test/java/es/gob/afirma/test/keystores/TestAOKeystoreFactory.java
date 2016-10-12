@@ -22,6 +22,7 @@ import java.util.logging.Logger;
 import javax.security.auth.callback.PasswordCallback;
 
 import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.Test;
 
 import es.gob.afirma.core.misc.AOUtil;
@@ -49,6 +50,7 @@ public class TestAOKeystoreFactory {
 	@Test
 //	@Ignore // Solo para Windows
     public void testAOKeystoreFactoryCAPI() throws Exception {
+    	Assume.assumeTrue(Platform.OS.WINDOWS == Platform.getOS());
     	Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$
     	final AOKeyStoreManager ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
 			AOKeyStore.WINDOWS, // Store

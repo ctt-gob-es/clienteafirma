@@ -10,8 +10,10 @@ import java.security.Security;
 import java.security.Signature;
 import java.util.Enumeration;
 
+import org.junit.Assume;
 import org.junit.Test;
 
+import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.keystores.AOKeyStore;
 import es.gob.afirma.keystores.AOKeyStoreManager;
 import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
@@ -60,7 +62,7 @@ public final class TestPkcs11 {
 	@Test
 	//@Ignore // Dependiente del PKCS#11
 	public void testRawPkcs11() throws Exception {
-
+		Assume.assumeTrue(Platform.OS.WINDOWS == Platform.getOS());
         final Constructor<?> sunPKCS11Contructor = Class.forName("sun.security.pkcs11.SunPKCS11").getConstructor(InputStream.class); //$NON-NLS-1$
         final Provider p = (Provider) sunPKCS11Contructor.newInstance(
     		new ByteArrayInputStream((

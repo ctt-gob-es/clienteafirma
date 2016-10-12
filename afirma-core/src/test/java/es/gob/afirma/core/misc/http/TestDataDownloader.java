@@ -8,6 +8,8 @@ import java.net.URL;
 import org.junit.Test;
 
 import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.core.misc.Platform;
+import es.gob.afirma.core.misc.Platform.OS;
 
 /** Prueba de descarga de datos.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
@@ -77,16 +79,19 @@ public final class TestDataDownloader {
 	@SuppressWarnings("static-method")
 	@Test
 	public void testDataDownloaderFile() throws Exception {
-		final byte[] data = DataDownloader.downloadData(
-			"file://c:/Windows/WindowsUpdate.log" //$NON-NLS-1$
-		);
+		OS os = Platform.getOS();
+		String fileName = "file://c:/Windows/WindowsUpdate.log"; //$NON-NLS-1$
+		if (Platform.OS.LINUX == os || Platform.OS.SOLARIS == os) {
+			fileName = "file:///etc/timezone"; //$NON-NLS-1$
+		}
+		final byte[] data = DataDownloader.downloadData(fileName);
 		System.out.println(new String(data));
 	}
 
 	/** Prueba de lectura de URL inexistente.
 	 * @throws Exception En cualquier error. */
 	@SuppressWarnings("static-method")
-	@Test
+	@Test(expected=java.net.UnknownHostException.class)
 	public void testDataDownloaderInvalidUrl() throws Exception {
 		final byte[] data = UrlHttpManagerFactory.getInstalledManager().readUrl(
 			"http://dasdasdasd.asd?kaka=caca", //$NON-NLS-1$
