@@ -112,60 +112,66 @@ public final class OfficeAnalizer {
      * @throws IOException Si no se puede leer el fichero */
     static String getMimeType(final byte[] data) throws IOException {
 
-        final ZipFile zipFile;
+        ZipFile zipFile = null;
         try {
             zipFile = AOFileUtils.createTempZipFile(data);
+            String mimetype = ZIP_MIMETYPE;
+            String tempMimetype = null;
+            if (isODFFile(zipFile)) {
+                tempMimetype = getODFMimeType(zipFile.getInputStream(zipFile.getEntry("mimetype"))); //$NON-NLS-1$
+            }
+            else if (isOOXMLFile(zipFile)) {
+                tempMimetype = getOOXMLMimeType(zipFile.getInputStream(zipFile.getEntry("[Content_Types].xml"))); //$NON-NLS-1$
+            }
+            else {
+            	tempMimetype = getMimeTypeOffice97(data);
+            }
+            if (tempMimetype != null) {
+                mimetype = tempMimetype;
+            }
+            return mimetype;
         }
         catch (final ZipException e1) {
             LOGGER.warning("El fichero indicado no es un ZIP"); //$NON-NLS-1$
-            return null;
         }
-
-        String mimetype = ZIP_MIMETYPE;
-
-        String tempMimetype = null;
-        if (isODFFile(zipFile)) {
-            tempMimetype = getODFMimeType(zipFile.getInputStream(zipFile.getEntry("mimetype"))); //$NON-NLS-1$
-        }
-        else if (isOOXMLFile(zipFile)) {
-            tempMimetype = getOOXMLMimeType(zipFile.getInputStream(zipFile.getEntry("[Content_Types].xml"))); //$NON-NLS-1$
-        }
-        else {
-        	// Comprobamos si se trata de un documento de Office 97-2003 con una estructura zip interna
-        	try {
-        		final String testString = new String(data);
-
-        		if (testString.contains("Microsoft Excel")) { //$NON-NLS-1$
-        			return "application/vnd.ms-excel"; //$NON-NLS-1$
-        		}
-        		if (testString.contains("Microsoft Office Word")) { //$NON-NLS-1$
-        			return "application/msword"; //$NON-NLS-1$
-        		}
-        		if (testString.contains("Microsoft Office PowerPoint")) { //$NON-NLS-1$
-        			return "application/vnd.ms-powerpoint"; //$NON-NLS-1$
-        		}
-        		if (testString.contains("Microsoft Project")) { //$NON-NLS-1$
-        			return "application/vnd.ms-project"; //$NON-NLS-1$
-        		}
-        		if (testString.contains("Microsoft Visio")) { //$NON-NLS-1$
-        			return "application/vnd.visio"; //$NON-NLS-1$
-        		}
-        	}
-        	catch (final Error e) {
-        		LOGGER.warning(
-        				"No se ha podido completar el analisis del documento, se considerara ZIP: " + e //$NON-NLS-1$
-        		);
+        finally {
+        	if (zipFile != null) {
+        		zipFile.close();
         	}
         }
+        
 
-        if (tempMimetype != null) {
-            mimetype = tempMimetype;
-        }
+    	String retVal = getMimeTypeOffice97(data);
 
-        zipFile.close();
+    	if (retVal != null) {
+    		return retVal;
+    	}
+    	return "application/octect-stream"; //$NON-NLS-1$
 
-        return mimetype;
     }
+
+	private static String getMimeTypeOffice97(final byte[] data) {
+		
+		// Comprobamos si se trata de un documento de Office 97-2003 con una estructura zip interna
+		final String testString = new String(data);
+
+		if (testString.contains("Microsoft Excel")) { //$NON-NLS-1$
+			return "application/vnd.ms-excel"; //$NON-NLS-1$
+		}
+		if (testString.contains("Microsoft Office Word")) { //$NON-NLS-1$
+			return "application/msword"; //$NON-NLS-1$
+		}
+		if (testString.contains("Microsoft Office PowerPoint")) { //$NON-NLS-1$
+			return "application/vnd.ms-powerpoint"; //$NON-NLS-1$
+		}
+		if (testString.contains("Microsoft Project")) { //$NON-NLS-1$
+			return "application/vnd.ms-project"; //$NON-NLS-1$
+		}
+		if (testString.contains("Microsoft Visio")) { //$NON-NLS-1$
+			return "application/vnd.visio"; //$NON-NLS-1$
+		}
+		return null;
+	}
 
     /** Devuelve la extensi&oacute;n correspondiente al documento ofim&aacute;tico
      * proporcionado (ODF u OOXML). Si el fichero no se corresponde con ninguno
