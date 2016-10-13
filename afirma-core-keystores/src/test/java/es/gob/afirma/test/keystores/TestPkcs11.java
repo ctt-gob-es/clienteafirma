@@ -36,6 +36,7 @@ public final class TestPkcs11 {
 	@Test
 	//@Ignore //Dependiente del PKCS#11
 	public void testPkcs11() throws Exception {
+		Assume.assumeTrue(Platform.OS.WINDOWS == Platform.getOS());
 		final AOKeyStoreManager ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
     		AOKeyStore.PKCS11,
     		LIB_NAME,
