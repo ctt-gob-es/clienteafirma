@@ -163,7 +163,7 @@ public final class AOPDFSigner implements AOSigner {
         	if ("es.gob.jmulticard.ui.passwordcallback.CancelledOperationException".equals(e.getClass().getName())) { //$NON-NLS-1$
         		throw new AOCancelledOperationException();
         	}
-            throw new AOException("Error durante la firma OOXML: " + e, e); //$NON-NLS-1$
+            throw new AOException("Error durante la firma PAdES: " + e, e); //$NON-NLS-1$
         }
 
         // Postfirma
