@@ -22,12 +22,13 @@ final class MozillaKeyStoreUtilitiesUnix {
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
-	private static final String LIB_NSPR4_SO = "/lib/libnspr4.so"; //$NON-NLS-1$
+
 
 	private static final String SOFTOKN3_SO = "libsoftokn3.so"; //$NON-NLS-1$
 
 	private static final String[] NSS_PATHS = new String[] {
 		"/usr/lib/x86_64-linux-gnu/nss", // Debian 64 //$NON-NLS-1$
+		"/usr/lib/x86_64-linux-gnu/",  //$NON-NLS-1$
 		"/usr/lib/firefox", //$NON-NLS-1$
 		"/usr/lib/firefox-" + searchLastFirefoxVersion("/usr/lib/"), //$NON-NLS-1$ //$NON-NLS-2$
 		"/opt/firefox", //$NON-NLS-1$
@@ -42,6 +43,12 @@ final class MozillaKeyStoreUtilitiesUnix {
 		"/usr/lib64", /* NSS cuando solo hay Firefox de 64 en el sistema */ //$NON-NLS-1$
 	};
 
+	private static final String[] SQLITE_LIBS = {
+		"mozsqlite3.so",  //$NON-NLS-1$
+		"libmozsqlite3.so", //$NON-NLS-1$
+		"libsqlite3.so.0", //$NON-NLS-1$
+		"libnspr4.so"	 //$NON-NLS-1$
+	};
 	private MozillaKeyStoreUtilitiesUnix() {
 		// No instanciable
 	}
@@ -50,62 +57,33 @@ final class MozillaKeyStoreUtilitiesUnix {
 
 		String nssLibDir = null;
 
-		// *********************************************************************
-		// *********************************************************************
-		// Compobamos antes el caso especifico de NSS partido entre /usr/lib y
-		// /lib, que se da en Fedora
-		if (new File("/usr/lib/" + SOFTOKN3_SO).exists() && new File(LIB_NSPR4_SO).exists()) { //$NON-NLS-1$
-			try {
-				System.load(LIB_NSPR4_SO);
-				nssLibDir = "/usr/lib"; //$NON-NLS-1$
-			}
-			catch (final Exception e) {
-				nssLibDir = null;
-				LOGGER.warning(
-					"Descartamos el NSS situado entre /lib y /usr/lib porque no puede cargarse adecuadamente: " + e //$NON-NLS-1$
-				);
-			}
-			if (nssLibDir != null) {
-				return nssLibDir;
+		for (final String path : NSS_PATHS) {
+			if (new File(path + "/" + SOFTOKN3_SO).exists()){
+				nssLibDir = path;
 			}
 		}
-		// *********************************************************************
-		// *********************************************************************
+		if (nssLibDir == null) {
+			throw new FileNotFoundException("No se ha podido determinar la localizacion de NSS en UNIX"); //$NON-NLS-1$
+		}
 
 		for (final String path : NSS_PATHS) {
-
-			String tailingLib = "/libnspr4.so"; //$NON-NLS-1$
-
-			// Si esta SQLite lo ponemos como extremo de la carga
-			if (new File(path + "/mozsqlite3.so").exists()) { //$NON-NLS-1$
-				tailingLib = "/mozsqlite3.so"; //$NON-NLS-1$
-			}
-			else if (new File(path + "/libmozsqlite3.so").exists()) { //$NON-NLS-1$
-				tailingLib = "/libmozsqlite3.so"; //$NON-NLS-1$
-			}
-			// En Debian Sid
-			else if (new File(path + "/libsqlite3.so.0").exists()) { //$NON-NLS-1$
-				tailingLib = "/libsqlite3.so.0"; //$NON-NLS-1$
-			}
-
-			if (new File(path + "/" + SOFTOKN3_SO).exists() && new File(path + tailingLib).exists()) { //$NON-NLS-1$
-				try {
-					System.load(path + tailingLib);
-					nssLibDir = path;
-				}
-				catch (final Exception e) {
-					nssLibDir = null;
-					LOGGER.warning(
-						"Descartamos el NSS situado en '" + path + "' porque no puede cargarse adecuadamente: " + e //$NON-NLS-1$ //$NON-NLS-2$
-					);
-				}
-				if (nssLibDir != null) {
-					return nssLibDir;
+			File dir = new File(path);
+			for (final String tailingLib: SQLITE_LIBS) {
+				File library = new File(dir, tailingLib);
+				if (library.exists()) {
+					try {
+						System.load(library.getAbsolutePath());
+						return nssLibDir;
+					}
+					catch (final Exception e) {
+						LOGGER.warning(
+								"Descartamos el NSS situado en '" + path + "' porque no puede cargarse adecuadamente: " + e //$NON-NLS-1$ //$NON-NLS-2$
+							);
+					}
 				}
 			}
 		}
-
-		throw new FileNotFoundException("No se ha podido determinar la localizacion de NSS en UNIX"); //$NON-NLS-1$
+			throw new FileNotFoundException("No se ha podido determinar la localizacion de NSS en UNIX (sqlite)"); //$NON-NLS-1$
 	}
 
 	/** Busca la &uacute;ltima versi&oacute;n de Firefox instalada en un sistema
