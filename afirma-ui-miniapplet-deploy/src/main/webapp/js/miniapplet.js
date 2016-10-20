@@ -2759,7 +2759,7 @@ var MiniApplet = ( function ( window, undefined ) {
 				var padding = cipheredData.substr(0, dotPos);
 				
 				var deciphered = Cipher.des(key, Cipher.base64ToString(fromBase64UrlSaveToBase64(cipheredData.substr(dotPos + 1))), 0, 0, null);
-				return Cipher.stringToBase64(deciphered.substr(0, deciphered.length - parseInt(padding) - 8));
+				return Cipher.stringToBase64(deciphered.substr(0, deciphered.length - parseInt(padding)));
 			}
 			
 			/**
