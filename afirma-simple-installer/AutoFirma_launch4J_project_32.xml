@@ -22,7 +22,7 @@
     <maxVersion>1.8.0</maxVersion>
     <jdkPreference>preferJre</jdkPreference>
     <runtimeBits>64/32</runtimeBits>
-    <opt>-Xms512m -Xmx1g</opt>
+    <opt>-Xms512m -Xmx1g -DdisableSslChecks=true</opt>
   </jre>
   <splash>
     <file>splash.bmp</file>
