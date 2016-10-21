@@ -37,7 +37,7 @@ final class MozillaKeyStoreUtilitiesUnix {
 		"/usr/lib", //$NON-NLS-1$
 		"/usr/lib/nss", //$NON-NLS-1$
 		"/usr/lib/i386-linux-gnu/nss", /* En algunos Ubuntu y Debian 32 */ //$NON-NLS-1$
-		"/usr/lib/i386-linux-gnu/",  //$NON-NLS-1$
+		"/usr/lib/i386-linux-gnu",  //$NON-NLS-1$
 		"/opt/fedora-ds/clients/lib", //$NON-NLS-1$
 		"/opt/google/chrome", /* NSS de Chrome cuando no hay NSS de Mozilla de la misma arquitectura */ //$NON-NLS-1$
 		"/usr/lib/thunderbird", /* Si hay Thunderbird pero no Firefox */ //$NON-NLS-1$
