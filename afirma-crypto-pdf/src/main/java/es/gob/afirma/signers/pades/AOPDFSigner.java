@@ -575,7 +575,7 @@ public final class AOPDFSigner implements AOSigner {
      * @param config Configuraci&oacute;n establecida. */
     public static void configureRespectfulProperties(final byte[] data, final Properties config) {
 
-    	if (config != null && !config.containsKey("signatureSubFilter")) { //$NON-NLS-1$
+    	if (config != null && !config.containsKey(PdfExtraParams.SIGNATURE_SUBFILTER)) {
     		String filter;
     		try {
     			filter = PdfUtil.getFirstSupportedSignSubFilter(data, config);
