@@ -459,23 +459,13 @@ var MiniApplet = ( function ( window, undefined ) {
 			loadMiniApplet(attributes, parameters);
 
 			if (isFirefox()) {
-				window.setTimeout(function() {
-					clienteFirma = document.getElementById("miniApplet");
+				clienteFirma = document.getElementById("miniApplet");
 
-					// Si no esta definido el cliente es porque se ha intentado cargar el applet
-					// y no se ha podido, asi que se usara la aplicacion nativa
-					if (clienteFirma == null) {
-						cargarAppAfirma(codeBase, defaultKeyStore);
-					}
-					else {
-						try {
-							clienteFirma.echo();
-						}
-						catch(e) {
-							cargarAppAfirma(codeBase, defaultKeyStore);
-						}
-					}
-				}, 2000);
+				// Si no esta definido el cliente es porque se ha intentado cargar el applet
+				// y no se ha podido, asi que se usara la aplicacion nativa
+				if (clienteFirma == null) {
+					cargarAppAfirma(codeBase, defaultKeyStore);
+				}
 			}
 			else {
 				clienteFirma = document.getElementById("miniApplet");
@@ -825,6 +815,7 @@ var MiniApplet = ( function ( window, undefined ) {
 				return;
 			}
 			if (clientType == null || clientType == TYPE_JAVASCRIPT_WEB_SERVICE || clientType == TYPE_JAVASCRIPT_SOCKET ) {
+				
 				var tempCliente = document.getElementById("miniApplet");
 				var appletLoaded;
 				try {
