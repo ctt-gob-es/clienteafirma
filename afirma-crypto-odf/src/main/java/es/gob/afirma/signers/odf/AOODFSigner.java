@@ -107,7 +107,7 @@ public final class AOODFSigner implements AOSigner {
     private static final String CANONICAL_XML_ALGORITHM = "http://www.w3.org/TR/2001/REC-xml-c14n-20010315"; //$NON-NLS-1$
 
     /** Algoritmo de huella digital por defecto para las referencias XML. */
-    private static final String DIGEST_METHOD = DigestMethod.SHA1;
+    private static final String DEFAULT_DIGEST_METHOD = DigestMethod.SHA1;
 
     private static final String DIGEST_METHOD_ALGORITHM_NAME = "SHA1"; //$NON-NLS-1$
 
@@ -153,8 +153,8 @@ public final class AOODFSigner implements AOSigner {
 
         final Properties extraParams = xParams != null ? xParams : new Properties();
 
-        final String digestMethodAlgorithm = extraParams.getProperty(AOODFExtraParams.REFERENCES_DIGEST_METHOD, DIGEST_METHOD);
-        final boolean useOpenOffice31Mode = "true".equalsIgnoreCase(extraParams.getProperty(AOODFExtraParams.USE_OPEN_OFFICE_31_MODE)); //$NON-NLS-1$
+        final String digestMethodAlgorithm = extraParams.getProperty(AOODFExtraParams.REFERENCES_DIGEST_METHOD, DEFAULT_DIGEST_METHOD);
+        final boolean useOpenOffice31Mode = Boolean.parseBoolean(extraParams.getProperty(AOODFExtraParams.USE_OPEN_OFFICE_31_MODE));
 
         if (!isValidDataFile(data)) {
             throw new AOFormatFileException("Los datos introducidos no se corresponden con un documento ODF"); //$NON-NLS-1$
