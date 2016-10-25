@@ -196,7 +196,7 @@ Section "Programa" sPrograma
 	;Menu items
 	CreateDirectory "$SMPROGRAMS\AutoFirma"
 	CreateShortCut "$SMPROGRAMS\AutoFirma\AutoFirma.lnk" "$INSTDIR\AutoFirma\AutoFirma.exe"
-	;CreateShortCut "$SMPROGRAMS\AutoFirma\Desinstalar AutoFirma.lnk" "$INSTDIR\uninstall.exe"
+	CreateShortCut "$SMPROGRAMS\AutoFirma\Desinstalar.lnk" "$INSTDIR\uninstall.exe"
 
 	
 	;Anade una entrada en la lista de "Program and Features"
@@ -215,13 +215,13 @@ Section "Programa" sPrograma
 	WriteRegStr HKLM SOFTWARE\$PATH "Version" "${VERSION}"
 
 	;Exec "explorer $SMPROGRAMS\$PATH_ACCESO_DIRECTO\"
-	
+
 	;Registro
 	;CascadeAfirma.reg
 	WriteRegStr HKEY_CLASSES_ROOT "*\shell\afirma.sign" "" "Firmar con AutoFirma"
 	WriteRegStr HKEY_CLASSES_ROOT "*\shell\afirma.sign" "Icon" "$INSTDIR\AutoFirma\AutoFirma.exe"
 	WriteRegStr HKEY_CLASSES_ROOT "*\shell\afirma.sign\command" "" "$INSTDIR\AutoFirma\AutoFirma.exe sign -gui -i %1" 
-	
+
 	;Generar huella archivos
  	WriteRegStr HKEY_CLASSES_ROOT "*\shell\afirma.hashFile" "" "Generar huella digital con AutoFirma"
 	WriteRegStr HKEY_CLASSES_ROOT "*\shell\afirma.hashFile" "Icon" "$INSTDIR\AutoFirma\AutoFirma.exe"
@@ -286,28 +286,41 @@ Section "Programa" sPrograma
 	Delete "$INSTDIR\AutoFirma\autofirma.pfx"
 	
 	;Se cierra Firefox y Chrome si están abiertos
+	
+	${nsProcess::FindProcess} "firefox.exe" $R4
+	
+	loopFirefox:
 	${nsProcess::FindProcess} "firefox.exe" $R2
-	StrCmp $R2 0 0 +1
+	StrCmp $R2 0 0 +3
+	MessageBox MB_YESNO|MB_DEFBUTTON2|MB_ICONEXCLAMATION 'Debe cerrarse el navegador Mozilla Firefox para continuar con la instalacion de AutoFirma. ¿Desea que se fuerce el cierre del navegador?.' IDYES closeFirefox IDNO loopFirefox
+	closeFirefox:
 	${nsProcess::KillProcess} "firefox.exe" $R0
 	
-	${nsProcess::FindProcess} "chrome.exe" $R3
-	StrCmp $R3 0 0 +1
-	${nsProcess::KillProcess} "chrome.exe" $R0
-	Sleep 2000
 	
+	${nsProcess::FindProcess} "chrome.exe" $R5
+	
+	loopChrome:
+	${nsProcess::FindProcess} "chrome.exe" $R3
+	StrCmp $R3 0 0 +3
+	MessageBox MB_YESNO|MB_DEFBUTTON2|MB_ICONEXCLAMATION 'Debe cerrarse el navegador Google Chrome para continuar con la instalacion de AutoFirma. ¿Desea que se fuerce el cierre del navegador?.' IDYES closeChrome IDNO loopChrome
+	closeChrome:
+	${nsProcess::CloseProcess} "chrome.exe" $R0
+	
+	Sleep 2000
+
 	; Configuramos la aplicacion (generacion de certificados) e importacion en Firefox
 	ExecWait '"$INSTDIR\AutoFirma\AutoFirmaConfigurador.exe" /passive'
 	; Eliminamos los certificados de versiones previas del sistema
 	Call DeleteCertificateOnInstall
-	
+
 	; Importamos el certificado en el sistema
 	Push "$INSTDIR\AutoFirma\AutoFirma_ROOT.cer"
 	Sleep 2000
 	Call AddCertificateToStore
 	Pop $0
-	${If} $0 != success
+	;${If} $0 != success
 	  ;MessageBox MB_OK "Error en la importación: $0"
-	${EndIf}
+	;${EndIf}
 	
 	; Obtenemos la ruta de los ficheros de GoogleChrome para cada usuario
 	; System::Call "advapi32::GetUserName(t .r0, *i ${NSIS_MAX_STRLEN} r1) i.r2"
@@ -342,7 +355,7 @@ Section "Programa" sPrograma
 	${EnvVarUpdate} $0 "PATH" "A" "HKLM" "$PROGRAMFILES\AutoFirma\AutoFirma" ; Append  
 	
 	;Se restauran los navegadores cerrados
-	${If} $R2 == 0
+	${If} $R4 == 0
 		ClearErrors
 		ReadRegStr $R0 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\firefox.exe\" ""
 		${If} ${Errors} 
@@ -351,13 +364,13 @@ Section "Programa" sPrograma
 		exec "$R0 --restore-last-session"
 	${EndIf}
 	EndFirefox:
-	${If} $R3 == 0
+	${If} $R5 == 0
 		ClearErrors
 		ReadRegStr $R0 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\chrome.exe\" ""
 		${If} ${Errors} 
 			Goto EndChrome
 		${EndIf}
-		exec "$R0"
+		exec "$R0 --restore-last-session"
 	${EndIf}
 	EndChrome:
 	${nsProcess::Unload}
@@ -618,14 +631,25 @@ Section "uninstall"
 	SetShellVarContext all
 	
 	;Se cierra Firefox y Chrome si están abiertos
+	${nsProcess::FindProcess} "firefox.exe" $R4
+	
+	loopFirefox:
 	${nsProcess::FindProcess} "firefox.exe" $R2
-	StrCmp $R2 0 0 +1
+	StrCmp $R2 0 0 +3
+	MessageBox MB_YESNO|MB_DEFBUTTON2|MB_ICONEXCLAMATION 'Debe cerrarse el navegador Mozilla Firefox para continuar con la desinstalacion de AutoFirma. ¿Desea que se fuerce el cierre del navegador?.' IDYES closeFirefox IDNO loopFirefox
+	closeFirefox:
 	${nsProcess::KillProcess} "firefox.exe" $R0
 	
-	;Se cierra Firefox si está abierto
+	
+	${nsProcess::FindProcess} "chrome.exe" $R5
+	
+	loopChrome:
 	${nsProcess::FindProcess} "chrome.exe" $R3
-	StrCmp $R3 0 0 +1
-	${nsProcess::KillProcess} "chrome.exe" $R0
+	StrCmp $R3 0 0 +3
+	MessageBox MB_YESNO|MB_DEFBUTTON2|MB_ICONEXCLAMATION 'Debe cerrarse el navegador Google Chrome para continuar con la desinstalacion de AutoFirma. ¿Desea que se fuerce el cierre del navegador?.' IDYES closeChrome IDNO loopChrome
+	closeChrome:
+	${nsProcess::CloseProcess} "chrome.exe" $R0
+	
 	Sleep 2000
 	
 	;Eliminamos los certificados del sistema
@@ -696,7 +720,7 @@ Section "uninstall"
 	
 	;Se restauran los navegadores cerrados
 	
-	${If} $R2 == 0
+	${If} $R4 == 0
 		ClearErrors
 		ReadRegStr $R0 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\firefox.exe\" ""
 		${If} ${Errors} 
@@ -705,13 +729,13 @@ Section "uninstall"
 		exec "$R0 --restore-last-session"
 	${EndIf}
 	EndFirefox1:
-	${If} $R3 == 0
+	${If} $R5 == 0
 		ClearErrors
 		ReadRegStr $R0 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\chrome.exe\" ""
 		${If} ${Errors} 
 			Goto EndChrome1
 		${EndIf}
-		exec "$R0"
+		exec "$R0 --restore-last-session"
 	${EndIf}
 	EndChrome1:
 	${nsProcess::Unload}
