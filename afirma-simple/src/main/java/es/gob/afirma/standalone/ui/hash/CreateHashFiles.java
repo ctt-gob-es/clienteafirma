@@ -65,10 +65,11 @@ public final class CreateHashFiles extends JDialog {
 	private static final long serialVersionUID = -7224732001218823361L;
 	private static final int SIZE_WAIT = 50000000; //Tamano en bytes
 
-	private static final String[] HASH_ALGOS = new String[] { "SHA-512", //$NON-NLS-1$
-		"SHA-384", //$NON-NLS-1$
+	private static final String[] HASH_ALGOS = new String[] {
 		"SHA-256", //$NON-NLS-1$
 		"SHA-1", //$NON-NLS-1$
+		"SHA-384", //$NON-NLS-1$
+		"SHA-512" //$NON-NLS-1$
 	};
 	private final JComboBox<String> hashAlgorithms = new JComboBox<>(HASH_ALGOS);
 	private final JTextField selectedFile = new JTextField();
@@ -238,14 +239,14 @@ public final class CreateHashFiles extends JDialog {
 
 		// En Mac OS X el orden de los botones es distinto
 		if (Platform.OS.MACOSX.equals(Platform.getOS())) {
-			panel.add(this.generateButton);
 			panel.add(exitButton);
+			panel.add(this.generateButton);
 		}
 		else {
-			panel.add(exitButton);
 			panel.add(this.generateButton);
+			panel.add(exitButton);
 		}
-
+		
 		add(label, gbc);
 		gbc.gridy++;
 		add(this.selectedFile, gbc);
@@ -362,7 +363,7 @@ public final class CreateHashFiles extends JDialog {
 				SimpleAfirmaMessages.getString("CreateHashFiles.11"), //$NON-NLS-1$
 				null,
 				null,
-				null,
+				new String[] {},
 				SimpleAfirmaMessages.getString("CreateHashDialog.7"), //$NON-NLS-1$
 				true,
 				false,

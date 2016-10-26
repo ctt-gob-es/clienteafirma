@@ -48,8 +48,8 @@ public final class CreateHashDialog extends JDialog implements KeyListener{
 	private static final int SIZE_WAIT = 50000000; //Tamano en bytes
 
 	private static final String[] HASH_ALGOS = new String[] {
-		"SHA-1", //$NON-NLS-1$
 		"SHA-256", //$NON-NLS-1$
+		"SHA-1", //$NON-NLS-1$
 		"SHA-384", //$NON-NLS-1$
 		"SHA-512" //$NON-NLS-1$
 	};
@@ -143,11 +143,9 @@ public final class CreateHashDialog extends JDialog implements KeyListener{
 			new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-
-					final boolean checked = isBase64Checked();
 					PreferencesManager.putBoolean(
 						PreferencesManager.PREFERENCE_CREATE_HASH_BASE64,
-						checked
+						isBase64Checked()
 					);
 				}
 			}
@@ -155,7 +153,7 @@ public final class CreateHashDialog extends JDialog implements KeyListener{
 		this.base64CheckBox.setSelected(
 			PreferencesManager.getBoolean(
 				PreferencesManager.PREFERENCE_CREATE_HASH_BASE64,
-				true
+				false
 			)
 		);
 		this.base64CheckBox.addKeyListener(this);
@@ -275,12 +273,12 @@ public final class CreateHashDialog extends JDialog implements KeyListener{
 
 		// En Mac OS X el orden de los botones es distinto
 		if (Platform.OS.MACOSX.equals(Platform.getOS())) {
-			panel.add(generateButton);
 			panel.add(exitButton);
+			panel.add(generateButton);
 		}
 		else {
-			panel.add(exitButton);
 			panel.add(generateButton);
+			panel.add(exitButton);
 		}
 
 		c.add(fileTextFieldLabel, gbc);
@@ -346,7 +344,6 @@ public final class CreateHashDialog extends JDialog implements KeyListener{
 						SimpleAfirmaMessages.getString("CreateHashDialog.9") + " (*" + ext + ")",  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
 						parent
 					);
-
 					if (copyToClipboard) {
 						copyToClipBoard(Base64.encode(hash));
 					}
@@ -419,10 +416,8 @@ public final class CreateHashDialog extends JDialog implements KeyListener{
 		}
 	}
 
-	/**
-	 * Copia un texto al portapapeles del sistema.
-	 * @param text Contenido a copiar.
-	 */
+	/** Copia un texto al portapapeles del sistema.
+	 * @param text Contenido a copiar. */
 	static void copyToClipBoard(final String text) {
 		final StringSelection stringSelection = new StringSelection(text);
 		final Clipboard clpbrd = Toolkit.getDefaultToolkit().getSystemClipboard();

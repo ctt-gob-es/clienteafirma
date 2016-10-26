@@ -15,6 +15,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.core.misc.BoundedBufferedReader;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.standalone.ui.hash.CheckHashDialog;
 import es.gob.afirma.standalone.ui.preferences.PreferencesManager;
@@ -138,7 +139,7 @@ public final class AutoFirmaUtil {
 			final Process process = builder.start();
 			process.waitFor();
 			try (
-					final BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+				final BufferedReader bufferedReader = new BoundedBufferedReader(new InputStreamReader(process.getInputStream()));
 			) {
 				String line;
 				int dpi = 0;
@@ -181,6 +182,7 @@ public final class AutoFirmaUtil {
 			return file;
 		}
 	}
+
     /** Establece la configuraci&oacute;n para el servidor <i>Proxy</i> seg&uacute;n los valores
      * de configuraci&oacute;n encontrados. */
     public static void setProxySettings() {

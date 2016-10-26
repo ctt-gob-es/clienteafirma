@@ -392,12 +392,11 @@ final class PreferencesPanelGeneral extends JPanel {
 		signGeneralPanel.add(signatureDefaultsFormats, c);
 		gbc.gridy++;
 		add(signGeneralPanel, gbc);
-//		gbc.gridy++;
-//		add(netConfigPanel, gbc);
+		gbc.gridy++;
+		add(netConfigPanel, gbc);
 		gbc.weighty = 1.0;
 		gbc.gridy++;
 		add(new JPanel(), gbc);
-
 	}
 
 	/** Crea el panel con la configuraci&oacute;n de los formatos de firma a utilizar con cada tipo de fichero.

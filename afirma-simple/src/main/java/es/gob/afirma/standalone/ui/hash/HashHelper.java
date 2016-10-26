@@ -28,9 +28,9 @@ public final class HashHelper {
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
-	private static final String DEFAULT_HASH_ALGORITHM = "SHA-512"; //$NON-NLS-1$
+	private static final String DEFAULT_HASH_ALGORITHM = "SHA-256"; //$NON-NLS-1$
 	private static final boolean DEFAULT_RECURSIVE = true;
-	private static final boolean DEFAULT_USE_BASE64 = true;
+	private static final boolean DEFAULT_USE_BASE64 = false;
 	private static final boolean DEFAULT_COPY_TO_CLIPBOARD = true;
 	private static final int SIZE_WAIT = 50000000; //Tamano en bytes
 
