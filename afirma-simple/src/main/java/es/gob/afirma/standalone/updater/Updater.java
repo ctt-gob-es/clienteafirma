@@ -95,16 +95,17 @@ public final class Updater {
 
 	/** Comprueba si hay disponible una versi&oacute;n m&aacute;s actualizada del aplicativo.
 	 * @return <code>true</code> si hay disponible una versi&oacute;n m&aacute;s actualizada del aplicativo,
-	 *         <code>false</code> en caso contrario. */
+	 *         <code>false</code> en caso contrario.
+	 * @throws RuntimeException Cuando no se ha podido comprobar la versi&oacute;n actual con la versi&oacute;n remota configurada. */
 	static boolean isNewVersionAvailable() {
 		final String newVersion = getLatestVersion();
 		if (newVersion == null) {
 			LOGGER.severe("No se puede comprobar si hay versiones nuevas del aplicativo"); //$NON-NLS-1$
-			return false;
+			throw new RuntimeException();
 		}
 		if (getCurrentVersion() == null) {
 			LOGGER.severe("No ha podido comprobar la version actual del aplicativo"); //$NON-NLS-1$
-			return false;
+			throw new RuntimeException();
 		}
 		try {
 			return Integer.parseInt(newVersion) > Integer.parseInt(getCurrentVersion());
@@ -113,7 +114,7 @@ public final class Updater {
 			LOGGER.warning(
 				"No ha podido comparar la version actual del aplicativo con la ultima disponible: " + e //$NON-NLS-1$
 			);
-			return false;
+			throw new RuntimeException();
 		}
 	}
 
@@ -151,34 +152,41 @@ public final class Updater {
 		}
 		if (Platform.OS.WINDOWS.equals(Platform.getOS()) && !omitCheck) {
 			new Thread(() ->  {
-					if (isNewVersionAvailable()) {
-						if (JOptionPane.YES_OPTION == AOUIFactory.showConfirmDialog(
+
+				boolean newVersionAvailable;
+				try {
+					newVersionAvailable = isNewVersionAvailable();
+				}
+				catch (final Exception e) {
+					return;
+				}
+				if (newVersionAvailable) {
+					if (JOptionPane.YES_OPTION == AOUIFactory.showConfirmDialog(
 							parent,
 							UpdaterMessages.getString("Updater.1"), //$NON-NLS-1$
 							UpdaterMessages.getString("Updater.2"), //$NON-NLS-1$
 							JOptionPane.YES_NO_OPTION,
 							JOptionPane.INFORMATION_MESSAGE
-						)) {
-							try {
-								Desktop.getDesktop().browse(new URI(getUpdateSite()));
-							}
-							catch (final Exception e) {
-								LOGGER.severe("No se ha podido abrir el sitio Web de actualizaciones del Cliente @firma: " + e); //$NON-NLS-1$
-								AOUIFactory.showErrorMessage(
+							)) {
+						try {
+							Desktop.getDesktop().browse(new URI(getUpdateSite()));
+						}
+						catch (final Exception e) {
+							LOGGER.severe("No se ha podido abrir el sitio Web de actualizaciones del Cliente @firma: " + e); //$NON-NLS-1$
+							AOUIFactory.showErrorMessage(
 									parent,
 									UpdaterMessages.getString("Updater.3"), //$NON-NLS-1$
 									UpdaterMessages.getString("Updater.4"), //$NON-NLS-1$
 									JOptionPane.ERROR_MESSAGE
-								);
-								e.printStackTrace();
-							}
+									);
+							e.printStackTrace();
 						}
 					}
-					else {
-						LOGGER.info("Se ha encontrado instalada la ultima version disponible de AutoFirma"); //$NON-NLS-1$
-					}
 				}
-			).start();
+				else {
+					LOGGER.info("Se ha encontrado instalada la ultima version disponible de AutoFirma"); //$NON-NLS-1$
+				}
+			}).start();
 		}
 	}
 
