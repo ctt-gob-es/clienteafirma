@@ -60,7 +60,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 
 	private static final long serialVersionUID = -4364574240099120486L;
 
-	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+	static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	private static final String GOOGLE_ANALYTICS_TRACKING_CODE = "UA-41615516-2"; //$NON-NLS-1$
 
@@ -140,7 +140,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 
 		LOGGER.info("Solicitada firma con algoritmo " + algorithm + " y formato " + format); //$NON-NLS-1$ //$NON-NLS-2$
 
-		this.clearError();
+		clearError();
 
 		final Properties params = ExtraParamsProcessor.convertToProperties(extraParams);
 
@@ -237,7 +237,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 				}
 			}
 
-			final PrivateKeyEntry pke = this.selectPrivateKey(params);
+			final PrivateKeyEntry pke = selectPrivateKey(params);
 			final byte[] signature = AccessController.doPrivileged(
 					new SignAction(
 						signer,
@@ -303,7 +303,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 				                                          AOException,
 				                                          CertificateEncodingException,
 				                                          IncompatiblePolicyException {
-		this.clearError();
+		clearError();
 
 		final Properties params = ExtraParamsProcessor.convertToProperties(extraParams);
 
@@ -388,7 +388,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 				ExtraParamsProcessor.configAutoFormat(signer, signature, params);
 			}
 
-			final PrivateKeyEntry pke = this.selectPrivateKey(params);
+			final PrivateKeyEntry pke = selectPrivateKey(params);
 			final byte[] cosignature = AccessController.doPrivileged(
 				new CoSignAction(
 					signer,
@@ -453,7 +453,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 					                                           AOException,
 					                                           CertificateEncodingException,
 					                                           IncompatiblePolicyException {
-		this.clearError();
+		clearError();
 
 		final Properties params = ExtraParamsProcessor.convertToProperties(extraParams);
 
@@ -517,7 +517,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 				ExtraParamsProcessor.configAutoFormat(signer, signature, params);
 			}
 
-			final PrivateKeyEntry pke = this.selectPrivateKey(params);
+			final PrivateKeyEntry pke = selectPrivateKey(params);
 			final byte[] countersignature = AccessController.doPrivileged(
 				new CounterSignAction(
 						signer,
@@ -577,7 +577,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 			                      final String extension,
 			                      final String description) throws PrivilegedActionException,
 			                                                       IOException {
-		this.clearError();
+		clearError();
 
 		if (this.dataStore.length() < 1) {
 			LOGGER.warning(
@@ -673,9 +673,9 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 			                               final String extensions,
 			                               final String description,
 			                               final String filePath) throws PrivilegedActionException, IOException {
-		this.clearError();
+		clearError();
 		// Se llama a setError() desde getFileNameContent, si es preciso, por lo qye no es necesario repetirlo aqui
-		return chunkReturn(this.getFileNameContent(title, extensions, description, filePath, true));
+		return chunkReturn(getFileNameContent(title, extensions, description, filePath, true));
 	}
 
 	/** Permite seleccionar al usuario un fichero y devuelve la tupla con el
@@ -695,7 +695,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 		                              final String filePath,
 			                          final boolean asBase64) throws PrivilegedActionException {
 
-		this.clearError();
+		clearError();
 
 		final String titleDialog = MiniAfirmaApplet.cleanParam(title);
 		final String cleanExts = MiniAfirmaApplet.cleanParam(extensions);
@@ -736,7 +736,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 			                                      final String extensions,
 			                                      final String description,
 			                                      final String filePath) throws PrivilegedActionException {
-		return this.getMultiFileNameContent(title, extensions, description, filePath,true);
+		return getMultiFileNameContent(title, extensions, description, filePath,true);
 	}
 
 	/** Permite seleccionar al usuario un conjunto de ficheros y devuelve las tuplas con cada
@@ -755,7 +755,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 			                                 final String description,
 			                                 final String filePath,
 			                                 final boolean asBase64) throws PrivilegedActionException {
-		this.clearError();
+		clearError();
 
 		final String titleDialog = MiniAfirmaApplet.cleanParam(title);
 		final String cleanExts = MiniAfirmaApplet.cleanParam(extensions);
@@ -793,7 +793,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 	/** {@inheritDoc} */
 	@Override
 	public String getTextFromBase64(final String base64Data, final String charset) throws IOException {
-		this.clearError();
+		clearError();
 		if (base64Data == null) {
 			return null;
 		}
@@ -810,7 +810,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 	/** {@inheritDoc} */
 	@Override
 	public String getBase64FromText(final String plainText, final String charset) throws UnsupportedEncodingException {
-		this.clearError();
+		clearError();
 		if (plainText == null) {
 			return null;
 		}
@@ -855,16 +855,16 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 	public void init() {
 
 		// Establecemos propiedades del sistema en base a argumentos de Java
-		setSystemProperties(this.getParameter(APPLET_PARAM_SYSTEM_PROPERTIES));
+		setSystemProperties(getParameter(APPLET_PARAM_SYSTEM_PROPERTIES));
 
 		// Establecemos la localizacion
-		setLocale(this.getParameter(APPLET_PARAM_LOCALE));
+		setLocale(getParameter(APPLET_PARAM_LOCALE));
 
 		// Configuramos el almacen en base al navegador
-		this.userAgent = this.getParameter(APPLET_PARAM_USER_AGENT);
+		this.userAgent = getParameter(APPLET_PARAM_USER_AGENT);
 
 		final String keystoreParam = MiniAfirmaApplet.cleanParam(
-			this.getParameter(APPLET_PARAM_USER_KEYSTORE)
+			getParameter(APPLET_PARAM_USER_KEYSTORE)
 		);
 		if (keystoreParam != null && !keystoreParam.equals("null")) { //$NON-NLS-1$
 			final int separatorPos = keystoreParam.indexOf(':');
@@ -894,13 +894,24 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 				!Boolean.getBoolean("es.gob.afirma.doNotSendAnalytics") && //$NON-NLS-1$
 				!Boolean.parseBoolean(System.getenv("es.gob.afirma.doNotSendAnalytics")) //$NON-NLS-1$
 			) {
-				final AnalyticsConfigData config = new AnalyticsConfigData(GOOGLE_ANALYTICS_TRACKING_CODE);
-				final JGoogleAnalyticsTracker tracker = new JGoogleAnalyticsTracker(config, GoogleAnalyticsVersion.V_4_7_2);
-				tracker.trackPageView(
-					getCodeBase().toString(),
-					"MiniApplet Cliente @firma " + getVersion(), //$NON-NLS-1$
-					getCodeBase().getHost().toString()
-				);
+			new Thread(new Runnable() {
+
+				@Override
+				public void run() {
+					try {
+						final AnalyticsConfigData config = new AnalyticsConfigData(GOOGLE_ANALYTICS_TRACKING_CODE);
+						final JGoogleAnalyticsTracker tracker = new JGoogleAnalyticsTracker(config, GoogleAnalyticsVersion.V_4_7_2);
+						tracker.trackPageView(
+								getCodeBase().toString(),
+								"MiniApplet Cliente @firma " + getVersion(), //$NON-NLS-1$
+								getCodeBase().getHost().toString()
+								);
+					}
+					catch(final Exception e) {
+						LOGGER.warning("Error registrando datos en Google Analytics: " + e); //$NON-NLS-1$
+					}
+				}
+			}).start();
 		}
 
 		LOGGER.info("Miniapplet Afirma " + getVersion()); //$NON-NLS-1$
@@ -994,7 +1005,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 
 		LOGGER.info("Se configura el almacen de certificados " + ksType); //$NON-NLS-1$
 
-		this.clearError();
+		clearError();
 
 		if (ksType == null || ksType.length() == 0) {
 			this.keystoreType = null;
@@ -1051,6 +1062,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 		if (this.stickySignatory) {
 			this.stickyKeyEntry = keyEntry;
 		}
+
 		return keyEntry;
 	}
 
@@ -1297,7 +1309,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 
 	/** Recupera el identificador del numero de version del MiniApplet a partir de su Manifest.
 	 * @return Identificador de la versi&oacute;n. */
-	private static String getVersion() {
+	static String getVersion() {
 		try {
 			final InputStream manifestIs = MiniAfirmaApplet.class.getClassLoader().getResourceAsStream("miniapplet.version"); //$NON-NLS-1$
 			final Properties metadata = new Properties();
@@ -1399,7 +1411,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 		final Properties params = ExtraParamsProcessor.convertToProperties(extraParams);
 		final PrivateKeyEntry pke;
 		try {
-			pke = this.selectPrivateKey(params);
+			pke = selectPrivateKey(params);
 		}
 		catch (final PrivilegedActionException e) {
 			LOGGER.severe("error al seleccionar certificado: " + e); //$NON-NLS-1$
@@ -1460,7 +1472,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 
 		LOGGER.info("Solicitada la seleccion de un certificado"); //$NON-NLS-1$
 
-		this.clearError();
+		clearError();
 
 		final Properties params = ExtraParamsProcessor.convertToProperties(extraParams);
 
@@ -1471,7 +1483,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 		LOGGER.info("Recibidos los siguientes parametros adicionales:\n" + baos.toString()); //$NON-NLS-1$
 
 		try {
-			final PrivateKeyEntry pke = this.selectPrivateKey(params);
+			final PrivateKeyEntry pke = selectPrivateKey(params);
 
 			return Base64.encode(pke.getCertificate().getEncoded());
 		}
