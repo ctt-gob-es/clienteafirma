@@ -50,6 +50,10 @@ public class MozillaUnifiedKeyStoreManager extends AggregatedKeyStoreManager {
 		return new NssKeyStoreManager(getParentComponent(), false);
 	}
 
+	private PasswordCallback passwordCallback = null;
+	private Object[] configParams = null;
+
+
 	/** Inicializa la clase gestora de almacenes de claves. */
 	@Override
 	public final void init(final AOKeyStore type,
@@ -57,6 +61,12 @@ public class MozillaUnifiedKeyStoreManager extends AggregatedKeyStoreManager {
 			               final PasswordCallback pssCallBack,
 			               final Object[] params,
 			               final boolean forceReset) {
+
+		this.passwordCallback = pssCallBack;
+		this.configParams = params;
+
+		// Vaciamos el listado de almacenes agregados
+		removeAll();
 
 		final Object parentComponent = params != null && params.length > 0 ? params[0] : null;
 
@@ -74,67 +84,72 @@ public class MozillaUnifiedKeyStoreManager extends AggregatedKeyStoreManager {
 			addKeyStoreManager(ksm);
 		}
 
-		// Vamos ahora con los almacenes externos, que se limpian antes de usarse quitando DNIe (porque se usa
-		// el controlador Java) y anadiendo modulos conocidos si se encuentran en el sistema.
-		final Map<String, String> externalStores = getExternalStores();
+		// Intentamos ahora agregar los almacenes externos preferentes ajenos a los
+		// dispositivos de seguridad configurados en Firefox
+		final boolean preferredKsAdded = KeyStoreUtilities.addPreferredKeyStoreManagers(this, parentComponent);
+		//final boolean preferredKsAdded = false;
 
-		if (externalStores.size() > 0) {
-			final StringBuilder logStr = new StringBuilder(
-				"Encontrados los siguientes modulos PKCS#11 externos instalados en Mozilla / Firefox: " //$NON-NLS-1$
-			);
-			for (final String key : externalStores.keySet()) {
-				logStr.append("'"); //$NON-NLS-1$
-				logStr.append(externalStores.get(key));
-				logStr.append("' "); //$NON-NLS-1$
-			}
-			LOGGER.info(logStr.toString());
-		}
-		else {
-			LOGGER.info("No se han encontrado modulos PKCS#11 externos instalados en Firefox"); //$NON-NLS-1$
-		}
+		// Si se pudo agregar algun almacen preferente entendemos que se desean usar y no cargamos
+		// configurados en Firefox. Si no, iniciamos los almacenes externos ignorando aquellos que
+		// ya se comprobaron por ser almacenes preferentes (DNIe y CERES inicialmente) y anadiendo
+		// modulos conocidos si se encuentran en el sistema.
+		if (!preferredKsAdded) {
+			final Map<String, String> externalStores = getExternalStores();
 
-		for (final String descr : externalStores.keySet()) {
-			final AOKeyStoreManager tmpKsm = new AOKeyStoreManager();
-			try {
-				internalInitStore(tmpKsm, descr, parentComponent, forceReset, externalStores.get(descr));
-			}
-			catch (final AOCancelledOperationException ex) {
-				LOGGER.warning(
-					"Se cancelo el acceso al almacen externo  '" + descr + "', se continuara con el siguiente: " + ex //$NON-NLS-1$ //$NON-NLS-2$
-				);
-				continue;
-			}
-			catch (final Exception ex) {
-				// En ciertos sistemas Linux fallan las inicializaciones la primera vez por culpa de PC/SC, reintentamos
-				if (Platform.OS.LINUX.equals(Platform.getOS())) {
-					try {
-						internalInitStore(tmpKsm, descr, parentComponent, forceReset, externalStores.get(descr));
-					}
-					catch (final AOCancelledOperationException exc) {
-						LOGGER.warning(
-							"Se cancelo el acceso al almacen externo  '" + descr + "', se continuara con el siguiente: " + exc //$NON-NLS-1$ //$NON-NLS-2$
+			if (externalStores.size() > 0) {
+				final StringBuilder logStr = new StringBuilder(
+						"Encontrados los siguientes modulos PKCS#11 externos instalados en Mozilla / Firefox: " //$NON-NLS-1$
 						);
-						continue;
-					}
-					catch(final Exception e) {
-						LOGGER.severe("No se ha podido inicializar el PKCS#11 '" + descr + "' tras haberlo intentado dos veces: " + ex); //$NON-NLS-1$ //$NON-NLS-2$
-						continue;
-					}
+				for (final String key : externalStores.keySet()) {
+					logStr.append("'"); //$NON-NLS-1$
+					logStr.append(externalStores.get(key));
+					logStr.append("' "); //$NON-NLS-1$
 				}
-				else {
-					LOGGER.severe("No se ha podido inicializar el PKCS#11 '" + descr + "': " + ex); //$NON-NLS-1$ //$NON-NLS-2$
+				LOGGER.info(logStr.toString());
+			}
+			else {
+				LOGGER.info("No se han encontrado modulos PKCS#11 externos instalados en Firefox"); //$NON-NLS-1$
+			}
+
+			for (final String descr : externalStores.keySet()) {
+				final AOKeyStoreManager tmpKsm = new AOKeyStoreManager();
+				try {
+					internalInitStore(tmpKsm, descr, parentComponent, forceReset, externalStores.get(descr));
+				}
+				catch (final AOCancelledOperationException ex) {
+					LOGGER.warning(
+							"Se cancelo el acceso al almacen externo  '" + descr + "', se continuara con el siguiente: " + ex //$NON-NLS-1$ //$NON-NLS-2$
+							);
 					continue;
 				}
-			}
-			addKeyStoreManager(tmpKsm);
+				catch (final Exception ex) {
+					// En ciertos sistemas Linux fallan las inicializaciones la primera vez por culpa de PC/SC, reintentamos
+					if (Platform.OS.LINUX.equals(Platform.getOS())) {
+						try {
+							internalInitStore(tmpKsm, descr, parentComponent, forceReset, externalStores.get(descr));
+						}
+						catch (final AOCancelledOperationException exc) {
+							LOGGER.warning("Se cancelo el acceso al almacen externo  '" + descr + "', se continuara con el siguiente: " + exc); //$NON-NLS-1$ //$NON-NLS-2$
+							continue;
+						}
+						catch(final Exception e) {
+							LOGGER.warning("No se ha podido inicializar el PKCS#11 '" + descr + "' tras haberlo intentado dos veces: " + ex); //$NON-NLS-1$ //$NON-NLS-2$
+							continue;
+						}
+					}
+					else {
+						LOGGER.warning("No se ha podido inicializar el PKCS#11 '" + descr + "': " + ex); //$NON-NLS-1$ //$NON-NLS-2$
+						continue;
+					}
+				}
+				addKeyStoreManager(tmpKsm);
 
-			LOGGER.info("El almacen externo '" + descr + "' ha podido inicializarse, se anadiran sus entradas"); //$NON-NLS-1$ //$NON-NLS-2$
+				LOGGER.info("El almacen externo '" + descr + "' ha podido inicializarse, se anadiran sus entradas"); //$NON-NLS-1$ //$NON-NLS-2$
+			}
 		}
 
-		KeyStoreUtilities.addPreferredKeyStoreManagers(this, parentComponent);
-
 		if (lacksKeyStores()) {
-			LOGGER.warning("No se ha podido inicializar ningun almacen, interno o externo, de Firefox"); //$NON-NLS-1$
+			LOGGER.warning("No se ha podido inicializar ningun almacen, interno o externo, de Firefox, ni los almacenes preferentes"); //$NON-NLS-1$
 		}
 
 	}
@@ -156,6 +171,11 @@ public class MozillaUnifiedKeyStoreManager extends AggregatedKeyStoreManager {
 			},
 			forceReset
 		);
+	}
+
+	@Override
+	public void refresh() throws IOException {
+		init(AOKeyStore.MOZ_UNI, null, this.passwordCallback, this.configParams, true);
 	}
 
 }
