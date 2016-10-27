@@ -68,9 +68,6 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.plaf.basic.BasicComboBoxRenderer;
 import javax.swing.text.DefaultFormatter;
-import javax.swing.text.SimpleAttributeSet;
-import javax.swing.text.StyleConstants;
-import javax.swing.text.StyledDocument;
 
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.Base64;
@@ -229,12 +226,23 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 		add(createPreviewPanel(), gbc);
 		gbc.gridy++;
 		gbc.fill = GridBagConstraints.HORIZONTAL;
+		gbc.weighty = 0.0;
+		gbc.insets = new Insets(0, 5, 0, 5);
+		add(createPreviewHelpPanel(), gbc);
+		gbc.gridy++;
+		gbc.insets = new Insets(10, 5, 0, 5);
 		add(createFontPanel(), gbc);
 		gbc.gridy++;
 		gbc.fill = GridBagConstraints.BOTH;
+		gbc.weighty = 1.0;
 		add(createTextAreaPanel(), gbc);
 		gbc.gridy++;
+		gbc.fill = GridBagConstraints.HORIZONTAL;
 		gbc.weighty = 0.0;
+		gbc.insets = new Insets(0, 5, 0, 5);
+		add(createTextAreaHelpPanel(), gbc);
+		gbc.gridy++;
+		gbc.insets = new Insets(10, 5, 0, 5);
 		add(createButtonsPanel(), gbc);
 		showPreview();
 		this.letterType.requestFocusInWindow();
@@ -416,6 +424,18 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 
 	}
 
+	private static Component createPreviewHelpPanel() {
+		final JEditorPane helpLabel = new JEditorPane();
+		helpLabel.setContentType("text/html"); //$NON-NLS-1$
+		helpLabel.setText(SignPdfUiMessages.getString("SignPdfUiPreview.29")); //$NON-NLS-1$
+        helpLabel.setEditable(false);
+        helpLabel.setHighlighter(null);
+        helpLabel.setFocusable(false);
+        helpLabel.setBackground(new Color(0,0,0,0));
+
+        return helpLabel;
+	}
+
 	private JPanel createFontPanel() {
 
 		final JPanel panel = new JPanel();
@@ -571,39 +591,7 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 		this.colorCombobox.getColorList().addKeyListener(this);
 		this.colorCombobox.getColorList().setToolTipText(SignPdfUiMessages.getString("SignPdfUiPreview.19")); //$NON-NLS-1$
 
-		final JEditorPane helpLabel = new JEditorPane();
-		helpLabel.setContentType("text/html"); //$NON-NLS-1$
-		helpLabel.setText(SignPdfUiMessages.getString("SignPdfUiPreview.4")); //$NON-NLS-1$
 
-        final EditorFocusManager editorFocusManager = new EditorFocusManager (
-    		helpLabel,
-    		(he, linkIndex) -> {
-			    try {
-			        if (he.getURL() != null) {
-			            Desktop.getDesktop().browse(he.getURL().toURI());
-			        }
-			    }
-			    catch (final Exception e) {
-			    	AOUIFactory.showErrorMessage(
-						SignPdfUiPanelPreview.this,
-			            SimpleAfirmaMessages.getString("SignResultPanel.0") + he.getURL(), //$NON-NLS-1$
-			            SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
-			            JOptionPane.ERROR_MESSAGE
-			        );
-			    }
-			}
-		);
-
-        helpLabel.addHyperlinkListener(editorFocusManager);
-        helpLabel.addKeyListener(editorFocusManager);
-        helpLabel.setEditable(false);
-        helpLabel.setHighlighter(null);
-        helpLabel.setFocusable(false);
-        final SimpleAttributeSet background = new SimpleAttributeSet();
-        StyleConstants.setBackground(background, panel.getBackground());
-        final StyledDocument sd = (StyledDocument) helpLabel.getDocument();
-        sd.setParagraphAttributes(0, sd.getLength(), background, false);
-        helpLabel.setBackground(new Color(0,0,0,0));
 
 		c.gridwidth = 4;
 		c.fill = GridBagConstraints.HORIZONTAL;
@@ -618,10 +606,6 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 		panel.add(this.underlineButton, c);
 		panel.add(this.strikethroughButton, c);
 		panel.add(this.colorCombobox, c);
-		c.gridy++;
-		c.gridwidth = 5;
-		c.insets = new Insets(10, 10, 10, 10);
-		panel.add(helpLabel, c);
 
 		return panel;
 	}
@@ -673,6 +657,44 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 
 		return panel;
 	}
+
+	/** Crea el panel con los botones de aceptar y cancelar.
+	 * @return Panel de botones. */
+	private Component createTextAreaHelpPanel() {
+
+		final JEditorPane helpLabel = new JEditorPane();
+		helpLabel.setContentType("text/html"); //$NON-NLS-1$
+		helpLabel.setText(SignPdfUiMessages.getString("SignPdfUiPreview.4")); //$NON-NLS-1$
+
+        final EditorFocusManager editorFocusManager = new EditorFocusManager (
+    		helpLabel,
+    		(he, linkIndex) -> {
+			    try {
+			        if (he.getURL() != null) {
+			            Desktop.getDesktop().browse(he.getURL().toURI());
+			        }
+			    }
+			    catch (final Exception e) {
+			    	AOUIFactory.showErrorMessage(
+						SignPdfUiPanelPreview.this,
+			            SimpleAfirmaMessages.getString("SignResultPanel.0") + he.getURL(), //$NON-NLS-1$
+			            SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
+			            JOptionPane.ERROR_MESSAGE
+			        );
+			    }
+			}
+		);
+
+        helpLabel.addHyperlinkListener(editorFocusManager);
+        helpLabel.addKeyListener(editorFocusManager);
+        helpLabel.setEditable(false);
+        helpLabel.setHighlighter(null);
+        helpLabel.setFocusable(false);
+        helpLabel.setBackground(new Color(0,0,0,0));
+
+        return helpLabel;
+	}
+
 
 	/** Crea el panel con los botones de aceptar y cancelar.
 	 * @return Panel de botones. */
