@@ -69,7 +69,7 @@ public final class SimpleKeyStoreManager {
             	}
             	switch(exClassName) {
             		case "es.gob.jmulticard.apdu.connection.CardNotPresentException": //$NON-NLS-1$
-                		if (0 == AOUIFactory.showConfirmDialog(
+                		if (JOptionPane.YES_OPTION == AOUIFactory.showConfirmDialog(
             				parent,
             				SimpleAfirmaMessages.getString("SimpleKeyStoreManager.1"),  //$NON-NLS-1$
             				SimpleAfirmaMessages.getString("SimpleKeyStoreManager.2"),  //$NON-NLS-1$
@@ -80,13 +80,17 @@ public final class SimpleKeyStoreManager {
                 		}
                 		break;
             		case "es.gob.jmulticard.card.InvalidCardException": //$NON-NLS-1$
-                		AOUIFactory.showErrorMessage(
-            				parent,
-            				SimpleAfirmaMessages.getString("SimpleKeyStoreManager.3"), //$NON-NLS-1$
-            				SimpleAfirmaMessages.getString("SimpleKeyStoreManager.4"), //$NON-NLS-1$
-            				JOptionPane.WARNING_MESSAGE
-        				);
-            			return getKeyStore(true, parent);
+            			if (JOptionPane.YES_OPTION == AOUIFactory.showConfirmDialog(
+                				parent,
+                				SimpleAfirmaMessages.getString("SimpleKeyStoreManager.3"),  //$NON-NLS-1$
+                				SimpleAfirmaMessages.getString("SimpleKeyStoreManager.4"),  //$NON-NLS-1$
+                				JOptionPane.YES_NO_OPTION,
+                				JOptionPane.WARNING_MESSAGE
+            				)) {
+                    			return getKeyStore(true, parent);
+                    		}
+                    		break;
+
             		case "es.gob.jmulticard.card.dnie.BurnedDnieCardException": //$NON-NLS-1$
 	            		AOUIFactory.showErrorMessage(
             				parent,
