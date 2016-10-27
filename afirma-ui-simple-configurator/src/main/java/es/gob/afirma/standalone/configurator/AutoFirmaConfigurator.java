@@ -159,7 +159,7 @@ public class AutoFirmaConfigurator implements ConsoleListener {
 			configurator.configureAutoFirma();
 		}
 		catch (final Exception e) {
-			LOGGER.info("Error en la configuracion de AutoFirma: " + e); //$NON-NLS-1$
+			LOGGER.warning("Error en la configuracion de AutoFirma: " + e); //$NON-NLS-1$
 			ConsoleManager.showErrorMessage(
 				configurator.getParentComponent(),
 				Messages.getString("AutoFirmaConfigurator.0") //$NON-NLS-1$
@@ -167,7 +167,7 @@ public class AutoFirmaConfigurator implements ConsoleListener {
 			configurator.closeApplication(-1);
 		}
 		catch (final Error e) {
-			LOGGER.info("Capturado error no controlado: " + e); //$NON-NLS-1$
+			LOGGER.warning("Capturado error no controlado: " + e); //$NON-NLS-1$
 			e.printStackTrace();
 			ConsoleManager.showErrorMessage(
 				configurator.getParentComponent(),
@@ -176,8 +176,31 @@ public class AutoFirmaConfigurator implements ConsoleListener {
 			configurator.closeApplication(-2);
 		}
 
+//		// Ejecutamos una operacion de red para que al usuario le aparezca
+//		// la opcion de dar permisos a la maquina virtual de Java
+//		try {
+//			AutoFirmaConfigurator.checkNetworkPermissions();
+//		} catch (final Exception e) {
+//			LOGGER.warning("Capturado error no controlado: " + e); //$NON-NLS-1$
+//			e.printStackTrace();
+//			ConsoleManager.showErrorMessage(
+//				configurator.getParentComponent(),
+//				Messages.getString("AutoFirmaConfigurator.6") //$NON-NLS-1$
+//			);
+//			configurator.closeApplication(-3);
+//		}
+
 		configurator.closeApplication(0);
 	}
+
+//	/**
+//	 * Comprueba la conectividad de red.
+//	 * @throws IOException Cuando no puede descargar datos de la red.
+//	 */
+//	private static void checkNetworkPermissions() throws IOException {
+//		UrlHttpManagerFactory.getInstalledManager()
+//		.readUrl("http://estaticos.redsara.es/comunes/autofirma/autofirma.version", UrlHttpMethod.GET);
+//	}
 
 	@Override
 	public void close() {
