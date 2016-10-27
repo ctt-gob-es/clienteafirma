@@ -68,6 +68,8 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 
 	private JList/*<CertificateLine>*/ certList;
 
+	JScrollPane sPane;
+
 	private int selectedIndex;
 
 	private NameCertificateBean[] certificateBeans;
@@ -79,7 +81,7 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 				              final boolean showControlButons,
 				              final boolean allowExternalStores) {
 		this.certificateBeans = el == null ? new NameCertificateBean[0] : el.clone();
-		this.createUI(
+		createUI(
 			selectionDialog,
 			dialogHeadline,
 			dialogSubHeadline,
@@ -94,10 +96,10 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 			              final boolean showControlButons,
 			              final boolean allowExternalStores) {
 
-		this.setLayout(new GridBagLayout());
+		setLayout(new GridBagLayout());
 
-		this.setBackground(Color.WHITE);
-		this.setBorder(BorderFactory.createLineBorder(Color.GRAY, 1));
+		setBackground(Color.WHITE);
+		setBorder(BorderFactory.createLineBorder(Color.GRAY, 1));
 
 		final GridBagConstraints c = new GridBagConstraints();
 		c.fill = GridBagConstraints.BOTH;
@@ -243,24 +245,24 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 			this.certList.setSelectedIndex(0);
 		}
 
-		final JScrollPane sPane = new JScrollPane(
+		this.sPane = new JScrollPane(
 				this.certList,
 				ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
 				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER
 		);
 
 		this.certList.addListSelectionListener(this);
-		final CertLinkMouseListener listener = new CertLinkMouseListener();
-		this.certList.addMouseMotionListener(listener);
-		this.certList.addMouseListener(listener);
+		final CertLinkMouseListener mouseListener = new CertLinkMouseListener();
+		this.certList.addMouseMotionListener(mouseListener);
+		this.certList.addMouseListener(mouseListener);
 
 		this.certList.setSelectedIndex(0);
 		this.selectedIndex = 0;
 
-		sPane.setBorder(null);
-		sPane.setPreferredSize(new Dimension(500, CERT_LIST_ELEMENT_HEIGHT * this.certList.getVisibleRowCount() + 3));
+		this.sPane.setBorder(null);
+		this.sPane.setPreferredSize(new Dimension(500, CERT_LIST_ELEMENT_HEIGHT * this.certList.getVisibleRowCount() + 3));
 
-		this.add(sPane, c);
+		this.add(this.sPane, c);
 	}
 
 	/** Recarga el di&aacute;logo para mostrar un grupo distinto de certificados.
@@ -286,6 +288,7 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 		this.certList.setVisibleRowCount(Math.max(Math.min(4, certLines.size()), 1));
 		if (certLines.size() > 0) {
 			this.certList.setSelectedIndex(0);
+			this.sPane.getVerticalScrollBar().setValue(0);
 		}
 	}
 
@@ -368,7 +371,7 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 
 			final ImageIcon imageIcon = getIcon(this.cert);
 			final JLabel icon = new JLabel(imageIcon);
-			this.setToolTipText(imageIcon.getDescription());
+			setToolTipText(imageIcon.getDescription());
 
 			c.insets = new Insets(2, 2, 2, 5);
 			add(icon, c);
@@ -488,6 +491,7 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 			final CertificateLine tmpLine = (CertificateLine) tmpList.getSelectedValue();
 			if (tmpLine != null &&
 				me.getClickCount() == 1 &&
+						me.getY() < CERT_LIST_ELEMENT_HEIGHT * tmpList.getModel().getSize() &&
 					tmpLine.getCertificateLinkBounds().contains(me.getX(), me.getY() % CERT_LIST_ELEMENT_HEIGHT)) {
 						try {
 							CertificateUtils.openCert(
@@ -506,7 +510,8 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 			final JList/*<?>*/ tmpList = (JList/*<?>*/) me.getSource();
 			final CertificateLine tmpLine = (CertificateLine) tmpList.getSelectedValue();
 			if (tmpLine != null) {
-				if (tmpLine.getCertificateLinkBounds().contains(me.getX(), me.getY() % CERT_LIST_ELEMENT_HEIGHT)) {
+				if (me.getY() < CERT_LIST_ELEMENT_HEIGHT * tmpList.getModel().getSize() &&
+						tmpLine.getCertificateLinkBounds().contains(me.getX(), me.getY() % CERT_LIST_ELEMENT_HEIGHT)) {
 					if (!this.entered) {
 						tmpList.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 						this.entered = true;

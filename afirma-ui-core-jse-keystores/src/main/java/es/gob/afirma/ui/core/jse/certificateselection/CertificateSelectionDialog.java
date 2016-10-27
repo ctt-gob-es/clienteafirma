@@ -18,6 +18,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.JDialog;
@@ -99,7 +100,6 @@ public final class CertificateSelectionDialog extends MouseAdapter {
 		);
 
 		this.disableSelection = disableCertificateSelection;
-
 	}
 
 	/** Muestra el di&aacute;logo de selecci&oacute;n de certificados.
@@ -170,7 +170,7 @@ public final class CertificateSelectionDialog extends MouseAdapter {
 			this.ksdm.refresh();
 		}
 		catch (final Exception e) {
-			LOGGER.warning("Error en la orden de actualizacion del almacen: " + e); //$NON-NLS-1$
+			LOGGER.log(Level.WARNING, "Error en la orden de actualizacion del almacen: " + e, e); //$NON-NLS-1$
 			return;
 		}
 
