@@ -39,6 +39,8 @@ final class MozillaKeyStoreUtilitiesWindows {
 	private static final String MSVCP100_DLL = "msvcp100.dll"; //$NON-NLS-1$
 	private static final String MSVCR120_DLL = "msvcr120.dll"; //$NON-NLS-1$
 	private static final String MSVCP120_DLL = "msvcp120.dll"; //$NON-NLS-1$
+	private static final String MSVCR140_DLL = "VCRUNTIME140.DLL"; //$NON-NLS-1$
+	private static final String MSVCP140_DLL = "msvcp140.dll"; //$NON-NLS-1$
 	private static final String PLC4_DLL = "plc4.dll"; //$NON-NLS-1$
 	private static final String PLDS4_DLL = "plds4.dll"; //$NON-NLS-1$
 	private static final String NSPR4_DLL = "nspr4.dll"; //$NON-NLS-1$
@@ -204,10 +206,29 @@ final class MozillaKeyStoreUtilitiesWindows {
 	 * @return Listado con los nombres de las bibliotecas. */
 	static String[] getSoftkn3DependenciesWindows(final String nssPath) {
 		return new String[] {
+//				nssPath + "API-MS-WIN-CRT-RUNTIME-L1-1-0.DLL",
+//				nssPath + "API-MS-WIN-CRT-STRING-L1-1-0.DLL",
+//				nssPath + "API-MS-WIN-CRT-HEAP-L1-1-0.DLL",
+//				nssPath + "API-MS-WIN-CRT-STDIO-L1-1-0.DLL",
+//				nssPath + "API-MS-WIN-CRT-CONVERT-L1-1-0.DLL",
+//
+//				nssPath + "API-MS-WIN-CRT-LOCALE-L1-1-0.DLL",
+//				nssPath + "API-MS-WIN-CRT-MULTIBYTE-L1-1-0.DLL",
+//				nssPath + "API-MS-WIN-CRT-UTILITY-L1-1-0.DLL",
+//
+//				nssPath + "API-MS-WIN-CRT-ENVIRONMENT-L1-1-0.DLL",
+//				nssPath + "API-MS-WIN-CRT-FILESYSTEM-L1-1-0.DLL",
+//				nssPath + "API-MS-WIN-CRT-MATH-L1-1-0.DLL",
+//				nssPath + "API-MS-WIN-CRT-TIME-L1-1-0.DLL",
+
+
+
 			nssPath + MSVCR100_DLL,	  // Ciertas versiones, Visual C 10
 			nssPath + MSVCP100_DLL,	  // Ciertas versiones, Visual C 10
 			nssPath + MSVCR120_DLL,	  // Ciertas versiones, Visual C 12
 			nssPath + MSVCP120_DLL,	  // Ciertas versiones, Visual C 12
+			nssPath + MSVCR140_DLL,	  // Ciertas versiones, Visual C 14 (Firefox 49 y superior)
+			nssPath + MSVCP140_DLL,	  // Ciertas versiones, Visual C 14 (Firefox 49 y superior)
 			nssPath + MOZGLUE_DLL,    // Firefox 11
 			nssPath + NSS3_DLL,       // Firefox 24
 			nssPath + MOZUTILS_DLL,   // Firefox 9 y 10
@@ -277,5 +298,4 @@ final class MozillaKeyStoreUtilitiesWindows {
 			}
 		}
 	}
-
 }
