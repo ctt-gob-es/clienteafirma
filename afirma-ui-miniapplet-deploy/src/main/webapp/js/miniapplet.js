@@ -1009,7 +1009,6 @@ var MiniApplet = ( function ( window, undefined ) {
 			 */
 			function setKeyStore (keystore) {
 				defaultKeyStore = keystore;
-				port = "";
 			}
 			
 			/**
@@ -1026,6 +1025,7 @@ var MiniApplet = ( function ( window, undefined ) {
 				var data = new Object();
 				data.op = generateDataKeyValue ("op", "selectcert");
 				data.properties = generateDataKeyValue ("properties", extraParams != null ? Base64.encode(extraParams) : null);
+				data.keystore = generateDataKeyValue ("keystore", defaultKeyStore != null ? Base64.encode(defaultKeyStore) : null);
 				
 				execAppIntent(buildUrl(data));
 			}
@@ -2632,7 +2632,7 @@ var MiniApplet = ( function ( window, undefined ) {
 				// La operacion ha finalizado correctamene (Funcion de guardado)
 				if (html == "OK" || html == "OK\r\n") {
 					successCallback();
-					return true;
+					return false;
 				}
 
 				// Se ha producido un error
