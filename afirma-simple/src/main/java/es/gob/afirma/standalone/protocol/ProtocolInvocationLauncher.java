@@ -309,7 +309,6 @@ public final class ProtocolInvocationLauncher {
                         ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_16);
                         return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_16);
                     }
-
                     params = ProtocolInvocationUriParser.getParametersToSign(xmlData);
                 }
 

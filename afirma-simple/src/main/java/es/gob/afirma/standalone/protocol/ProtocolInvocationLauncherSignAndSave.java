@@ -14,7 +14,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.security.auth.callback.PasswordCallback;
-import javax.swing.JFileChooser;
 
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.AOUtil;
@@ -26,6 +25,7 @@ import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.AOSignerFactory;
 import es.gob.afirma.core.signers.CounterSignTarget;
+import es.gob.afirma.core.signers.ExtraParamsProcessor.IncompatiblePolicyException;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.keystores.AOCertificatesNotFoundException;
 import es.gob.afirma.keystores.AOKeyStore;
@@ -119,7 +119,7 @@ final class ProtocolInvocationLauncherSignAndSave {
 
 				selectedDataFile = AOUIFactory.getLoadFiles(
 					dialogTilte,
-					new JFileChooser().getFileSystemView().getDefaultDirectory().toString(),
+					null,
 					null,
 					fileExts != null ? fileExts.split(",") : null, //$NON-NLS-1$
 					fileDesc,
@@ -227,6 +227,36 @@ final class ProtocolInvocationLauncherSignAndSave {
 			}
 		}
 
+		// XXX: Codigo de soporte de firmas XAdES explicitas (Eliminar cuando se abandone el soporte de XAdES explicitas)
+		if (isXadesExplicitConfigurated(options.getSignatureFormat(), options.getExtraParams())) {
+			LOGGER.warning(
+				"Se ha pedido una firma XAdES explicita, este formato dejara de soportarse en proximas versiones" //$NON-NLS-1$
+			);
+			try {
+				options.setData(MessageDigest.getInstance("SHA1").digest(options.getData())); //$NON-NLS-1$
+				options.getExtraParams().setProperty("mimeType", "hash/sha1"); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+			catch (final Exception e) {
+				LOGGER.warning("Error al generar la huella digital de los datos para firmar como 'XAdES explicit', " //$NON-NLS-1$
+					+ "se realizara una firma XAdES corriente: " + e); //$NON-NLS-1$
+			}
+		}
+
+		// Una vez se tienen todos los parametros necesarios expandimos los extraParams
+		// de la operacion para obtener la configuracion final
+		try {
+			options.expandExtraParams();
+		} catch (final IncompatiblePolicyException e1) {
+			if (!bySocket){
+				throw new SocketOperationException(
+					ProtocolInvocationLauncherErrorManager.SAF_23
+				);
+			}
+			return ProtocolInvocationLauncherErrorManager.getErrorMessage(
+				ProtocolInvocationLauncherErrorManager.SAF_23
+			);
+		}
+
 		final PasswordCallback pwc = aoks.getStorePasswordCallback(null);
 		final AOKeyStoreManager ksm;
 		try {
@@ -313,21 +343,6 @@ final class ProtocolInvocationLauncherSignAndSave {
 
 		LOGGER.info("Iniciando operacion de firma..."); //$NON-NLS-1$
 
-
-		// XXX: Codigo de soporte de firmas XAdES explicitas (Eliminar cuando se abandone el soporte de XAdES explicitas)
-		if (isXadesExplicitConfigurated(options.getSignatureFormat(), options.getExtraParams())) {
-			LOGGER.warning(
-				"Se ha pedido una firma XAdES explicita, este formato dejara de soportarse en proximas versiones" //$NON-NLS-1$
-			);
-			try {
-				options.setData(MessageDigest.getInstance("SHA1").digest(options.getData())); //$NON-NLS-1$
-				options.getExtraParams().setProperty("mimeType", "hash/sha1"); //$NON-NLS-1$ //$NON-NLS-2$
-			}
-			catch (final Exception e) {
-				LOGGER.warning("Error al generar la huella digital de los datos para firmar como 'XAdES explicit', " //$NON-NLS-1$
-					+ "se realizara una firma XAdES corriente: " + e); //$NON-NLS-1$
-			}
-		}
 
 		final byte[] sign;
 		switch(options.getOperation()) {
