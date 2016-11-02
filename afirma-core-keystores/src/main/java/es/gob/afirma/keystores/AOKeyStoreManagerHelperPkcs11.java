@@ -124,6 +124,8 @@ final class AOKeyStoreManagerHelperPkcs11 {
 			);
 		}
         catch (final Exception e) {
+        	// En caso de no poder instanciar la tarjeta en cuestion, se retira el proveedor
+        	Security.removeProvider("SunPKCS11-" + p11ProviderName); //$NON-NLS-1$
 			throw new AOKeyStoreManagerException(
 				"Error construyendo el KeyStore PKCS#11 para la biblioteca '" + p11lib + "': " + e, e //$NON-NLS-1$ //$NON-NLS-2$
 			);

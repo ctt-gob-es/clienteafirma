@@ -105,7 +105,15 @@ public final class AOKeyStoreManagerFactory {
         // Almacen de certificados de Windows
         if (Platform.getOS().equals(Platform.OS.WINDOWS) && AOKeyStore.WINDOWS.equals(store)) {
         	final AggregatedKeyStoreManager aksm = new AggregatedKeyStoreManager(getWindowsMyCapiKeyStoreManager(forceReset));
-    		KeyStoreUtilities.addPreferredKeyStoreManagers(aksm, parentComponent);
+        	final boolean ksPresent = KeyStoreUtilities.addPreferredKeyStoreManagers(aksm, parentComponent);
+
+			// Al comprobar si estaba disponibles alguno de los almacenes preferentes (tarjetas)
+			// se habra perdido la conexion con cualquier otra tarjeta configurada en el almacen
+			// de Windows. Asi que, cuando no se encuentran los preferentes, se reinicia el almacen
+			// para recuperar la conexion con cualquier tarjeta conectada y que posiblemente desee usarse
+        	if (!ksPresent) {
+				aksm.refresh();
+			}
     		return aksm;
         }
 
@@ -120,9 +128,9 @@ public final class AOKeyStoreManagerFactory {
         	return getMozillaUnifiedKeyStoreManager(pssCallback, forceReset, parentComponent);
         }
 
-        // Almacen NSS compartido (de sistema) que muestra tanto los certificados del almacemo los de
-        // los dispositivos externos configuramos.
-        if (AOKeyStore.SHARED_NSS.equals(store)) {
+        // Almacen NSS compartido (de sistema) que muestra tanto los certificados del almacen
+        // como los de los dispositivos externos configuramos.
+        if (Platform.getOS().equals(Platform.OS.LINUX) && AOKeyStore.SHARED_NSS.equals(store)) {
         	return getSharedNssKeyStoreManager(pssCallback, forceReset, parentComponent);
         }
 
@@ -486,7 +494,7 @@ public final class AOKeyStoreManagerFactory {
     		                                                          final Object parentComponent) throws IOException,
                                                                                                            AOKeystoreAlternativeException {
     	final AOKeyStoreManager ksm = new AppleKeyStoreManager();
-        // En Mac OS X podemos inicializar un KeyChain en un fichero particular o el "defecto del sistema"
+        // En Mac OS X podemos inicializar un KeyChain en un fichero particular o el por defecto del sistema
         try {
             ksm.init(
                  store,
@@ -500,7 +508,6 @@ public final class AOKeyStoreManagerFactory {
             throw new AOKeystoreAlternativeException(getAlternateKeyStoreType(store), "Error al inicializar el Llavero de Mac OS X", e); //$NON-NLS-1$
         }
         final AggregatedKeyStoreManager aksm = new AggregatedKeyStoreManager(ksm);
-
         KeyStoreUtilities.addPreferredKeyStoreManagers(aksm, parentComponent);
 
         return aksm;

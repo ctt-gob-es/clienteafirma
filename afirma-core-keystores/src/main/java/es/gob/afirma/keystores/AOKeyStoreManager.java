@@ -81,9 +81,6 @@ public class AOKeyStoreManager implements KeyStoreManager {
     /** Almacenes de claves. */
     private KeyStore ks;
     protected void setKeyStore(final KeyStore k) {
-    	if (k == null) {
-    		throw new IllegalArgumentException("El almacen no puede ser nulo"); //$NON-NLS-1$
-    	}
     	this.ks = k;
     }
     protected KeyStore getKeyStore() {
@@ -97,7 +94,8 @@ public class AOKeyStoreManager implements KeyStoreManager {
 			init(this.ksType, this.storeIs, this.storePasswordCallBack, this.storeParams, true);
 		}
     	catch (final AOKeyStoreManagerException e) {
-			throw new IOException("Error al refrescar el almacen: " + e, e); //$NON-NLS-1$
+    		this.ks = null;
+			throw new IOException("Error al refrescar el almacen, se ocultaran sus entradas " + e, e); //$NON-NLS-1$
 		}
     }
 
@@ -222,7 +220,7 @@ public class AOKeyStoreManager implements KeyStoreManager {
                 this.ks = AOKeyStoreManagerHelperPkcs11.initPKCS11(pssCallBack, newParams);
                 break;
             default:
-            	throw new UnsupportedOperationException("Tipo de almacen no soportado: " + store); //$NON-NLS-1$
+            	throw new UnsupportedOperationException("Tipo de almacen no soportado: " + this.ksType); //$NON-NLS-1$
         }
 
     }

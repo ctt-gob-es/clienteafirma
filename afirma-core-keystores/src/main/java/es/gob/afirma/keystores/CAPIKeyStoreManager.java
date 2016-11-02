@@ -344,24 +344,26 @@ public final class CAPIKeyStoreManager extends AOKeyStoreManager {
 
     		field = keyStoreVeritable.getClass().getEnclosingClass().getDeclaredField("entries"); //$NON-NLS-1$
     		field.setAccessible(true);
-    		final Collection<?> entries = (Collection<?>) field.get(keyStoreVeritable);
 
-    		for (final Object entry : entries) {
-    			field = entry.getClass().getDeclaredField("certChain"); //$NON-NLS-1$
-    			field.setAccessible(true);
-    			certificates = (X509Certificate[]) field.get(entry);
+    		final Object entriesCollection = field.get(keyStoreVeritable);
+    		if (entriesCollection instanceof Collection<?>) {
+    			final Collection<?> entries = (Collection<?>) field.get(keyStoreVeritable);
+        		for (final Object entry : entries) {
+        			field = entry.getClass().getDeclaredField("certChain"); //$NON-NLS-1$
+        			field.setAccessible(true);
+        			certificates = (X509Certificate[]) field.get(entry);
 
-    			hashCode = Integer.toString(certificates[0].hashCode());
+        			hashCode = Integer.toString(certificates[0].hashCode());
 
-    			field = entry.getClass().getDeclaredField("alias"); //$NON-NLS-1$
-    			field.setAccessible(true);
-    			alias = (String) field.get(entry);
+        			field = entry.getClass().getDeclaredField("alias"); //$NON-NLS-1$
+        			field.setAccessible(true);
+        			alias = (String) field.get(entry);
 
-    			if (!alias.equals(hashCode)) {
-    				field.set(entry, alias.concat(" - ").concat(hashCode)); //$NON-NLS-1$
-    			}
-    		} // for
+        			if (!alias.equals(hashCode)) {
+        				field.set(entry, alias.concat(" - ").concat(hashCode)); //$NON-NLS-1$
+        			}
+        		} // for
+    		}
     	} // if
     }
-
 }

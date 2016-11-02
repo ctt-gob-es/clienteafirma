@@ -108,7 +108,12 @@ public class AggregatedKeyStoreManager extends AOKeyStoreManager {
 	public String[] getAliases() {
 		final List<String> aliases = new ArrayList<String>();
 		for (final AOKeyStoreManager ksm : this.ksms) {
-			aliases.addAll(Arrays.asList(ksm.getAliases()));
+			try {
+				aliases.addAll(Arrays.asList(ksm.getAliases()));
+			}
+			catch (final Exception e) {
+				LOGGER.warning("No se pudieron obtener los alias del almacen " + ksm.getType() + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$
+			}
 		}
 		return aliases.toArray(new String[0]);
 	}
@@ -116,7 +121,15 @@ public class AggregatedKeyStoreManager extends AOKeyStoreManager {
 	@Override
 	public X509Certificate getCertificate(final String alias) {
 		for (final AOKeyStoreManager ksm : this.ksms) {
-			if (Arrays.asList(ksm.getAliases()).contains(alias)) {
+			List<String> listAlias;
+			try {
+				listAlias = Arrays.asList(ksm.getAliases());
+			}
+			catch (final Exception e) {
+				LOGGER.warning("No se pudieron obtener los alias del almacen " + ksm.getType() + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$
+				continue;
+			}
+			if (listAlias.contains(alias)) {
 				return ksm.getCertificate(alias);
 			}
 		}
@@ -131,7 +144,15 @@ public class AggregatedKeyStoreManager extends AOKeyStoreManager {
                                                                            NoSuchAlgorithmException,
                                                                            UnrecoverableEntryException {
 		for (final AOKeyStoreManager ksm : this.ksms) {
-			if (Arrays.asList(ksm.getAliases()).contains(alias)) {
+			List<String> listAlias;
+			try {
+				listAlias = Arrays.asList(ksm.getAliases());
+			}
+			catch (final Exception e) {
+				LOGGER.warning("No se pudieron obtener los alias del almacen " + ksm.getType() + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$
+				continue;
+			}
+			if (listAlias.contains(alias)) {
 				return ksm.getKeyEntry(alias);
 			}
 		}
@@ -144,7 +165,15 @@ public class AggregatedKeyStoreManager extends AOKeyStoreManager {
 	@Override
 	public X509Certificate[] getCertificateChain(final String alias) {
 		for (final AOKeyStoreManager ksm : this.ksms) {
-			if (Arrays.asList(ksm.getAliases()).contains(alias)) {
+			List<String> listAlias;
+			try {
+				listAlias = Arrays.asList(ksm.getAliases());
+			}
+			catch (final Exception e) {
+				LOGGER.warning("No se pudieron obtener los alias del almacen " + ksm.getType() + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$
+				continue;
+			}
+			if (listAlias.contains(alias)) {
 				return ksm.getCertificateChain(alias);
 			}
 		}
@@ -157,7 +186,13 @@ public class AggregatedKeyStoreManager extends AOKeyStoreManager {
 	@Override
 	public void refresh() throws IOException {
 		for (final AOKeyStoreManager ksm : this.ksms) {
-			ksm.refresh();
+			try {
+				ksm.refresh();
+			}
+			catch (final Exception e) {
+				ksm.setKeyStore(null);
+				LOGGER.warning("Error al actualizar el almacen de tipo " + ksm.getType() + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$
+			}
 		}
 	}
 
@@ -169,7 +204,15 @@ public class AggregatedKeyStoreManager extends AOKeyStoreManager {
 	@Override
 	public boolean isKeyEntry(final String alias) throws KeyStoreException {
 		for (final AOKeyStoreManager ksm : this.ksms) {
-			if (Arrays.asList(ksm.getAliases()).contains(alias)) {
+			List<String> listAlias;
+			try {
+				listAlias = Arrays.asList(ksm.getAliases());
+			}
+			catch (final Exception e) {
+				LOGGER.warning("No se pudieron obtener los alias del almacen " + ksm.getType() + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$
+				continue;
+			}
+			if (listAlias.contains(alias)) {
 				return ksm.isKeyEntry(alias);
 			}
 		}

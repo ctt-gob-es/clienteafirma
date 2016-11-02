@@ -30,7 +30,6 @@ import javax.security.auth.callback.TextOutputCallback;
 import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.swing.JOptionPane;
 
-import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.keystores.KeyStoreManager;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Platform;
@@ -281,27 +280,16 @@ public final class KeyStoreUtilities {
 	/** A&ntilde;ade los almacenes preferentes (por ahora DNIe 100% Java y CERES 100% Java a un almac&eacute;n agredado.
 	 * @param aksm Almac&eacute;n agredado al que se desea a&ntilde;adir los almacenes preferentes.
 	 * @param parentComponent Componente padre para los di&aacute;logos de los almacenes preferentes
-	 *                        (solicitud de PIN, confirmaci&oacute;n de firma, etc.). */
-	public static void addPreferredKeyStoreManagers(final AggregatedKeyStoreManager aksm, final Object parentComponent) {
+	 *                        (solicitud de PIN, confirmaci&oacute;n de firma, etc.).
+	 * @return Devuelve {@code true} cuando se ha detectado alguno de los almacenes preferentes,
+	 *         {@code false} en caso contrario. */
+	public static boolean addPreferredKeyStoreManagers(final AggregatedKeyStoreManager aksm, final Object parentComponent) {
 		// Anadimos el controlador Java del DNIe SIEMPRE excepto:
-		// -Si el almacen principal es MSCAPI
 		// -Que se indique "es.gob.afirma.keystores.mozilla.disableDnieNativeDriver=true"
-		if (!Boolean.getBoolean("es.gob.afirma.keystores.mozilla.disableDnieNativeDriver") && !AOKeyStore.WINDOWS.equals(aksm.getType())) { //$NON-NLS-1$
+		if (!Boolean.getBoolean("es.gob.afirma.keystores.mozilla.disableDnieNativeDriver")) { //$NON-NLS-1$
 			try {
-				final AOKeyStoreManager tmpKsm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
-					AOKeyStore.DNIEJAVA,
-					null,
-					null,
-					null,
-					parentComponent
-				);
-				LOGGER.info("El DNIe 100% Java ha podido inicializarse, se anadiran sus entradas"); //$NON-NLS-1$
-				tmpKsm.setPreferred(true);
-				aksm.addKeyStoreManager(tmpKsm);
-				return; // Si instancia DNIe no pruebo otras tarjetas, no deberia haber varias tarjetas instaladas
-			}
-			catch (final AOCancelledOperationException ex) {
-				LOGGER.warning("Se cancelo el acceso al almacen DNIe 100% Java: " + ex); //$NON-NLS-1$
+				aksm.addKeyStoreManager(getDnieKeyStoreManager(parentComponent));
+				return true; // Si instancia DNIe no pruebo otras tarjetas, no deberia haber varias tarjetas instaladas
 			}
 			catch (final Exception ex) {
 				LOGGER.warning("No se ha podido inicializar el controlador DNIe 100% Java: " + ex); //$NON-NLS-1$
@@ -313,16 +301,31 @@ public final class KeyStoreUtilities {
 		// -El sistema sea Linux
 		if (!Boolean.getBoolean("es.gob.afirma.keystores.mozilla.disableCeresNativeDriver") && !Platform.OS.LINUX.equals(Platform.getOS())) { //$NON-NLS-1$
 			try {
-				aksm.addKeyStoreManager(getCeres(parentComponent));
-				return; // Si instancia CERES no pruebo otras tarjetas, no deberia haber varias tarjetas instaladas
+				aksm.addKeyStoreManager(getCeresKeyStoreManager(parentComponent));
+				return true; // Si instancia CERES no pruebo otras tarjetas, no deberia haber varias tarjetas instaladas
 			}
 			catch (final Exception ex) {
 				LOGGER.warning("No se ha podido inicializar la tarjeta CERES: " + ex); //$NON-NLS-1$
 			}
 		}
+		return false;
 	}
 
-	private static AOKeyStoreManager getCeres(final Object parentComponent) throws AOKeystoreAlternativeException, IOException {
+	private static AOKeyStoreManager getDnieKeyStoreManager(final Object parentComponent) throws AOKeystoreAlternativeException, IOException {
+		final AOKeyStoreManager tmpKsm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
+				AOKeyStore.DNIEJAVA,
+				null,
+				null,
+				null,
+				parentComponent
+			);
+			LOGGER.info("El DNIe 100% Java ha podido inicializarse, se anadiran sus entradas"); //$NON-NLS-1$
+			tmpKsm.setPreferred(true);
+
+			return tmpKsm;
+	}
+
+	private static AOKeyStoreManager getCeresKeyStoreManager(final Object parentComponent) throws AOKeystoreAlternativeException, IOException {
 		final AOKeyStoreManager tmpKsm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
 			AOKeyStore.CERES, // Store
 			null,             // Lib (null)

@@ -22,7 +22,7 @@ import javax.security.auth.callback.PasswordCallback;
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public interface KeyStoreManager {
 
-	/** Desactiva una entrada del almace&eacute;n. A partir de su desactivaci&oacute;n no se incluir&aacute; su alias en
+	/** Desactiva una entrada del almac&eacute;n. A partir de su desactivaci&oacute;n no se incluir&aacute; su alias en
 	 * <code>getAliases()</code>.
 	 * @param certificateThumbprint Huella digital SHA1 del certificado cuya entrada se desea deactivar. */
 	void deactivateEntry(final String certificateThumbprint);
