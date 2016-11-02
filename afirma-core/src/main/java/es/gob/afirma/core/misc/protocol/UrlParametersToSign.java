@@ -19,6 +19,7 @@ import java.util.Set;
 
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.signers.ExtraParamsProcessor;
+import es.gob.afirma.core.signers.ExtraParamsProcessor.IncompatiblePolicyException;
 
 /** Par&aacute;metros de la URL de llamada a la aplicaci&oacute;n. */
 public final class UrlParametersToSign extends UrlParameters {
@@ -225,16 +226,9 @@ public final class UrlParametersToSign extends UrlParameters {
 		if (params.containsKey(PROPERTIES_PARAM)) {
 			props = params.get(PROPERTIES_PARAM);
 		}
-
 		if (props != null) {
 			try {
-				setExtraParams(
-					ExtraParamsProcessor.expandProperties(
-						AOUtil.base642Properties(props),
-						null,
-						format
-					)
-				);
+				setExtraParams(AOUtil.base642Properties(props));
 			}
 			catch (final Exception e) {
 				setExtraParams(new Properties());
@@ -247,5 +241,22 @@ public final class UrlParametersToSign extends UrlParameters {
 		setDefaultKeyStore(getDefaultKeyStoreName(params));
 		setDefaultKeyStoreLib(getDefaultKeyStoreLib(params));
 
+	}
+
+	/**
+	 * Expande los extraParams configurados en la URL que lo permitran. Por ejemplo,
+	 * la politica de firma establecida mediante "expPolicy" se expandir&aacute; a los
+	 * valores correspondientes de la pol&iacute;tica.
+	 * @throws IncompatiblePolicyException Cuando se hayan proporcionado par&aacute;metros
+	 * incompatibles con la pol&iacute;tica de firma configurada.
+	 */
+	public void expandExtraParams() throws IncompatiblePolicyException {
+		setExtraParams(
+				ExtraParamsProcessor.expandProperties(
+				getExtraParams(),
+				getData(),
+				getSignatureFormat()
+			)
+		);
 	}
 }

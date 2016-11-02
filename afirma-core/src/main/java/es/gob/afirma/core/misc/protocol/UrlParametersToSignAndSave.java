@@ -19,6 +19,7 @@ import java.util.Set;
 
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.signers.ExtraParamsProcessor;
+import es.gob.afirma.core.signers.ExtraParamsProcessor.IncompatiblePolicyException;
 
 /** Par&aacute;metros de la URL de llamada a la aplicaci&oacute;n. */
 public final class UrlParametersToSignAndSave extends UrlParameters {
@@ -239,13 +240,7 @@ public final class UrlParametersToSignAndSave extends UrlParameters {
 
 		if (props != null) {
 			try {
-				setExtraParams(
-					ExtraParamsProcessor.expandProperties(
-						AOUtil.base642Properties(props),
-						null,
-						format
-					)
-				);
+				setExtraParams(AOUtil.base642Properties(props));
 			}
 			catch (final Exception e) {
 				setExtraParams(new Properties());
@@ -269,5 +264,22 @@ public final class UrlParametersToSignAndSave extends UrlParameters {
 			}
 			setFilename(params.get(FILENAME_PARAM));
 		}
+	}
+
+	/**
+	 * Expande los extraParams configurados en la URL que lo permitran. Por ejemplo,
+	 * la politica de firma establecida mediante "expPolicy" se expandir&aacute; a los
+	 * valores correspondientes de la pol&iacute;tica.
+	 * @throws IncompatiblePolicyException Cuando se hayan proporcionado par&aacute;metros
+	 * incompatibles con la pol&iacute;tica de firma configurada.
+	 */
+	public void expandExtraParams() throws IncompatiblePolicyException {
+		setExtraParams(
+				ExtraParamsProcessor.expandProperties(
+				getExtraParams(),
+				getData(),
+				getSignatureFormat()
+			)
+		);
 	}
 }
