@@ -90,7 +90,11 @@ final class ConfiguratorMacOSX implements Configurator {
 				certPack.getPkcs12(),
 				new File(ConfiguratorUtil.getApplicationDirectory(), KS_FILENAME)
 			);
-
+	          //Generacion del certificado raiz .cer
+            ConfiguratorUtil.installFile(
+            		certPack.getCaCertificate().getEncoded(), 
+            		new File(ConfiguratorUtil.getApplicationDirectory(), MACOSX_CERTIFICATE));
+            
 			window.print(Messages.getString("ConfiguratorMacOSX.6")); //$NON-NLS-1$
 
 			// damos permisos al script
