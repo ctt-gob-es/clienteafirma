@@ -25,7 +25,7 @@
     <maxVersion>1.8.0</maxVersion>
     <jdkPreference>preferJre</jdkPreference>
     <runtimeBits>64/32</runtimeBits>
-    <opt>-Xms512m -Xmx1g</opt>
+    <opt>-Xms512m -Xmx2g</opt>
   </jre>
   <versionInfo>
     <fileVersion>1.1.0.0</fileVersion>
