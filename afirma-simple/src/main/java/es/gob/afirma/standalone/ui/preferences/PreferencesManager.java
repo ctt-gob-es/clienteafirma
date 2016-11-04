@@ -244,6 +244,11 @@ public final class PreferencesManager {
 	/** Calificador de la pol&iacute;tica de firma para PAdES. Debe ser una URL.*/
 	public static final String PREFERENCE_PADES_POLICY_QUALIFIER = "padesPolicyQualifier"; //$NON-NLS-1$
 
+	/** Si est&aacute; establecido a <code>true</code> se pide al usuario que determine mediante di&aacute;logos
+	 * gr&aacute;ficos los par&aacute;metros de una firma visible PDF y se inserta como tal en el
+	 * documento. */
+	public static final String PREFERENCE_PADES_VISIBLE = "padesVisibleSignature"; //$NON-NLS-1$
+
 	//************************* FIN PREFERENCIAS DE FIRMAS PAdES ***************************************************************
 	//**************************************************************************************************************************
 
@@ -278,7 +283,6 @@ public final class PreferencesManager {
 
 	//**************************************************************************************************************************
 	//**************** PREFERENCIAS DE FACTURAS ELECTRONICAS *******************************************************************
-
 
 	/** Nombre de la pol&iacute;tica de FacturaE.
 	 *  Esta preferencia debe tener uno de estos valores:
@@ -331,6 +335,9 @@ public final class PreferencesManager {
 	//**************** FIN PREFERENCIAS DE FACTURAS ELECTRONICAS ***************************************************************
 	//**************************************************************************************************************************
 
+	//**************************************************************************************************************************
+	//**************** PREFERENCIAS DE HUELLAS DIGITALES ***********************************************************************
+
 	/** Algoritmo de la huella digital para la creaci&oacute;n de huellas digitales de ficheros.*/
 	public static final String PREFERENCE_CREATE_HASH_ALGORITHM = "createHashAlgorithm"; //$NON-NLS-1$
 
@@ -343,10 +350,21 @@ public final class PreferencesManager {
 	/** Algoritmo de la huella digital para la creaci&oacute;n de huellas digitales de directorio. */
 	public static final String PREFERENCE_CREATE_HASH_DIRECTORY_ALGORITHM = "createHashDirectoryAlgorithm"; //$NON-NLS-1$
 
-	/** Si est&aacute; establecido a <code>true</code> se pide al usuario que determine mediante di&aacute;logos
-	 * gr&aacute;ficos los par&aacute;metros de una firma visible PDF y se inserta como tal en el
-	 * documento. */
-	public static final String PREFERENCE_PADES_VISIBLE = "padesVisibleSignature"; //$NON-NLS-1$
+	//**************** FIN PREFERENCIAS DE HUELLAS DIGITALES *******************************************************************
+	//**************************************************************************************************************************
+
+
+	//******************************************************************************************************************
+	//**************** PREFERENCIAS DE ACTUALIZACION *******************************************************************
+
+	/** Preferencia que designa la URL del fichero remoto con el n&uacute;mero de la versi&oacute;n m&aacute;s reciente de AutoFirma. */
+	public static final String PREFERENCE_UPDATE_URL_VERSION = "updater.url.version"; //$NON-NLS-1$
+
+	/** Preferencia que designa la URL de la web para la actualizaci&oacute;n de AutoFirma. */
+	public static final String PREFERENCE_UPDATE_URL_SITE = "updater.url.site"; //$NON-NLS-1$
+
+	//**************** FIN PREFERENCIAS DE ACTUALIZACION ***************************************************************
+	//******************************************************************************************************************
 
 	/** Recupera el valor de una cadena de texto almacenada entre las preferencias de la
 	 * aplicaci&oacute;n.

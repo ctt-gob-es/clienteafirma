@@ -11,6 +11,7 @@ import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.misc.http.UrlHttpManagerFactory;
 import es.gob.afirma.core.misc.http.UrlHttpMethod;
 import es.gob.afirma.core.ui.AOUIFactory;
+import es.gob.afirma.standalone.ui.preferences.PreferencesManager;
 
 /** Utilidad para la gesti&oacute;n de actualizaciones de la aplicaci&oacute;n.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
@@ -72,9 +73,15 @@ public final class Updater {
 			return null;
 		}
 
-		final String url = updaterProperties.getProperty("url"); //$NON-NLS-1$
+		// Configuramos la URL del fichero de version a partir del fichero interno o,
+		// si esta configurada, preferentemente de la variable de registro
+		String url = updaterProperties.getProperty("url"); //$NON-NLS-1$
+		url = PreferencesManager.get(PreferencesManager.PREFERENCE_UPDATE_URL_VERSION, url);
 
+		// Configuramos la URL del sitio de actualizacion a partir del fichero interno o,
+		// si esta configurada, preferentemente de la variable de registro
 		updateSite = updaterProperties.getProperty("updateSite"); //$NON-NLS-1$
+		updateSite = PreferencesManager.get(PreferencesManager.PREFERENCE_UPDATE_URL_SITE, updateSite);
 
 		if (url == null) {
 			LOGGER.warning(
