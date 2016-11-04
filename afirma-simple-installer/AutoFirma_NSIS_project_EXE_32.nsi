@@ -120,27 +120,6 @@ UninstallText "Desinstalador de AutoFirma."
   Pop `${OUT}`
 !macroend
 
-; ---------------------------------- Macro Definitions ----------------------------------------
-!macro _EnvVarUpdateConstructor ResultVar EnvVarName Action Regloc PathString
-  Push "${EnvVarName}"
-  Push "${Action}"
-  Push "${RegLoc}"
-  Push "${PathString}"
-    Call EnvVarUpdate
-  Pop "${ResultVar}"
-!macroend
-!define EnvVarUpdate '!insertmacro "_EnvVarUpdateConstructor"'
- 
-!macro _unEnvVarUpdateConstructor ResultVar EnvVarName Action Regloc PathString
-  Push "${EnvVarName}"
-  Push "${Action}"
-  Push "${RegLoc}"
-  Push "${PathString}"
-    Call un.EnvVarUpdate
-  Pop "${ResultVar}"
-!macroend
-!define un.EnvVarUpdate '!insertmacro "_unEnvVarUpdateConstructor"'
-; ---------------------------------- Macro Definitions end-------------------------------------
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Instalacion de la aplicacion y configuracion de la misma            ;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -292,7 +271,7 @@ Section "Programa" sPrograma
 	loopFirefox:
 	${nsProcess::FindProcess} "firefox.exe" $R2
 	StrCmp $R2 0 0 +3
-	MessageBox MB_YESNO|MB_DEFBUTTON2|MB_ICONEXCLAMATION 'Debe cerrarse el navegador Mozilla Firefox para continuar con la instalacion de AutoFirma. ¿Desea que se fuerce el cierre del navegador?.' IDYES closeFirefox IDNO loopFirefox
+	MessageBox MB_YESNO|MB_DEFBUTTON2|MB_ICONEXCLAMATION 'Debe cerrarse el navegador Mozilla Firefox para continuar con la instalacion de AutoFirma. ¿Desea que se fuerce el cierre del navegador?' IDYES closeFirefox IDNO loopFirefox
 	closeFirefox:
 	${nsProcess::KillProcess} "firefox.exe" $R0
 	
@@ -302,7 +281,7 @@ Section "Programa" sPrograma
 	loopChrome:
 	${nsProcess::FindProcess} "chrome.exe" $R3
 	StrCmp $R3 0 0 +3
-	MessageBox MB_YESNO|MB_DEFBUTTON2|MB_ICONEXCLAMATION 'Debe cerrarse el navegador Google Chrome para continuar con la instalacion de AutoFirma. ¿Desea que se fuerce el cierre del navegador?.' IDYES closeChrome IDNO loopChrome
+	MessageBox MB_YESNO|MB_DEFBUTTON2|MB_ICONEXCLAMATION 'Debe cerrarse el navegador Google Chrome para continuar con la instalacion de AutoFirma. ¿Desea que se fuerce el cierre del navegador?' IDYES closeChrome IDNO loopChrome
 	closeChrome:
 	${nsProcess::CloseProcess} "chrome.exe" $R0
 	
@@ -352,7 +331,9 @@ Section "Programa" sPrograma
 	done1:
 	FindClose $0
 	
-	${EnvVarUpdate} $0 "PATH" "A" "HKLM" "$PROGRAMFILES\AutoFirma\AutoFirma" ; Append  
+	;Se actualiza la variable PATH con la ruta de instalacion
+	Push "$PROGRAMFILES\AutoFirma\AutoFirma"
+	Call AddToPath
 	
 	;Se restauran los navegadores cerrados
 	${If} $R4 == 0
@@ -636,7 +617,7 @@ Section "uninstall"
 	loopFirefox:
 	${nsProcess::FindProcess} "firefox.exe" $R2
 	StrCmp $R2 0 0 +3
-	MessageBox MB_YESNO|MB_DEFBUTTON2|MB_ICONEXCLAMATION 'Debe cerrarse el navegador Mozilla Firefox para continuar con la desinstalacion de AutoFirma. ¿Desea que se fuerce el cierre del navegador?.' IDYES closeFirefox IDNO loopFirefox
+	MessageBox MB_YESNO|MB_DEFBUTTON2|MB_ICONEXCLAMATION 'Debe cerrarse el navegador Mozilla Firefox para continuar con la desinstalacion de AutoFirma. ¿Desea que se fuerce el cierre del navegador?' IDYES closeFirefox IDNO loopFirefox
 	closeFirefox:
 	${nsProcess::KillProcess} "firefox.exe" $R0
 	
@@ -646,7 +627,7 @@ Section "uninstall"
 	loopChrome:
 	${nsProcess::FindProcess} "chrome.exe" $R3
 	StrCmp $R3 0 0 +3
-	MessageBox MB_YESNO|MB_DEFBUTTON2|MB_ICONEXCLAMATION 'Debe cerrarse el navegador Google Chrome para continuar con la desinstalacion de AutoFirma. ¿Desea que se fuerce el cierre del navegador?.' IDYES closeChrome IDNO loopChrome
+	MessageBox MB_YESNO|MB_DEFBUTTON2|MB_ICONEXCLAMATION 'Debe cerrarse el navegador Google Chrome para continuar con la desinstalacion de AutoFirma. ¿Desea que se fuerce el cierre del navegador?' IDYES closeChrome IDNO loopChrome
 	closeChrome:
 	${nsProcess::CloseProcess} "chrome.exe" $R0
 	
@@ -716,7 +697,8 @@ Section "uninstall"
 	DeleteRegKey /ifempty HKCU "SOFTWARE\JavaSoft\Prefs\es"
 
 	;Se elimina la ruta de la variable de entorno Path
-	${un.EnvVarUpdate} $0 "PATH" "R" "HKLM" "$PROGRAMFILES\AutoFirma\AutoFirma"
+	Push "$PROGRAMFILES\AutoFirma\AutoFirma"
+	Call un.RemoveFromPath
 	
 	;Se restauran los navegadores cerrados
 	
@@ -997,280 +979,162 @@ Pop $2
 Pop $3
 Pop $4
 FunctionEnd
-!ifndef ENVVARUPDATE_FUNCTION
-!define ENVVARUPDATE_FUNCTION
-!verbose push
-!verbose 3
-!include "LogicLib.nsh"
-!include "WinMessages.NSH"
-!include "StrFunc.nsh"
- 
-; ---- Fix for conflict if StrFunc.nsh is already includes in main file -----------------------
-!macro _IncludeStrFunction StrFuncName
-  !ifndef ${StrFuncName}_INCLUDED
-    ${${StrFuncName}}
-  !endif
-  !ifndef Un${StrFuncName}_INCLUDED
-    ${Un${StrFuncName}}
-  !endif
-  !define un.${StrFuncName} "${Un${StrFuncName}}"
-!macroend
- 
-!insertmacro _IncludeStrFunction StrTok
-!insertmacro _IncludeStrFunction StrStr
-!insertmacro _IncludeStrFunction StrRep
- 
- 
-;----------------------------------- EnvVarUpdate start----------------------------------------
-!define hklm_all_users     'HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment"'
-!define hkcu_current_user  'HKCU "Environment"'
- 
-!macro EnvVarUpdate UN
- 
-Function ${UN}EnvVarUpdate
- 
-  Push $0
-  Exch 4
-  Exch $1
-  Exch 3
-  Exch $2
-  Exch 2
-  Exch $3
-  Exch
-  Exch $4
+
+
+;--------------------------------------------------------------------
+; Path functions
+;
+; Based on example from:
+; http://nsis.sourceforge.net/Path_Manipulation
+;
+!include "WinMessages.nsh"
+; Registry Entry for environment (NT4,2000,XP)
+; All users:
+!define Environ 'HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment"'
+; Current user only:
+;!define Environ 'HKCU "Environment"'
+; AddToPath - Appends dir to PATH
+;   (does not work on Win9x/ME)
+;
+; Usage:
+;   Push "dir"
+;   Call AddToPath
+Function AddToPath
+  Exch $0
+  Push $1
+  Push $2
+  Push $3
+  Push $4
+  ; NSIS ReadRegStr returns empty string on string overflow
+  ; Native calls are used here to check actual length of PATH
+  ; $4 = RegOpenKey(HKEY_CURRENT_USER, "Environment", &$3)
+  ;System::Call "advapi32::RegOpenKey(i 0x80000001, t'Environment', *i.r3) i.r4"
+  System::Call "advapi32::RegOpenKey(i 0x80000002, t'SYSTEM\CurrentControlSet\Control\Session Manager\Environment', *i.r3) i.r4"
+  
+    IntCmp $4 0 0 done done
+  ; $4 = RegQueryValueEx($3, "PATH", (DWORD*)0, (DWORD*)0, &$1, ($2=NSIS_MAX_STRLEN, &$2))
+  ; RegCloseKey($3)
+  System::Call "advapi32::RegQueryValueEx(i $3, t'PATH', i 0, i 0, t.r1, *i ${NSIS_MAX_STRLEN} r2) i.r4"
+  System::Call "advapi32::RegCloseKey(i $3)"
+  IntCmp $4 234 0 +3 +3 ; $4 == ERROR_MORE_DATA
+    DetailPrint "El PATH es demasiado largo. No se le agregará la ruta de AutoAfirma."
+    Goto done
+  IntCmp $4 0 +5 ; $4 != NO_ERROR
+    IntCmp $4 2 +3 ; $4 != ERROR_FILE_NOT_FOUND
+      DetailPrint "Error inesperado al agregar la ruta al PATH: $4"
+      Goto done
+    StrCpy $1 ""
+  ; Check if already in PATH
+  Push "$1;"
+  Push "$0;"
+  Call StrStr
+  Pop $2
+  StrCmp $2 "" 0 done
+  Push "$1;"
+  Push "$0\;"
+  Call StrStr
+  Pop $2
+  StrCmp $2 "" 0 done
+  ; Prevent NSIS string overflow
+  StrLen $2 $0
+  StrLen $3 $1
+  IntOp $2 $2 + $3
+  IntOp $2 $2 + 2 ; $2 = strlen(dir) + strlen(PATH) + sizeof(";")
+  IntCmp $2 ${NSIS_MAX_STRLEN} +3 +3 0
+    DetailPrint "La ruta de AutoFirma hace que el PATH sea demasiado largo. No se agregará"
+    Goto done
+  ; Append dir to PATH
+  DetailPrint "Agregamos al PATH: $0"
+  StrCpy $2 $1 1 -1
+  StrCmp $2 ";" 0 +2
+    StrCpy $1 $1 -1 ; remove trailing ';'
+  StrCmp $1 "" +2   ; no leading ';'
+    StrCpy $0 "$1;$0"
+  WriteRegExpandStr ${Environ} "PATH" $0
+  SendMessage ${HWND_BROADCAST} ${WM_WININICHANGE} 0 "STR:Environment" /TIMEOUT=5000
+done:
+  Pop $4
+  Pop $3
+  Pop $2
+  Pop $1
+  Pop $0
+FunctionEnd
+; RemoveFromPath - Removes dir from PATH
+;
+; Usage:
+;   Push "dir"
+;   Call RemoveFromPath
+Function un.RemoveFromPath
+  Exch $0
+  Push $1
+  Push $2
+  Push $3
+  Push $4
   Push $5
   Push $6
-  Push $7
-  Push $8
-  Push $9
-  Push $R0
- 
-  /* After this point:
-  -------------------------
-     $0 = ResultVar     (returned)
-     $1 = EnvVarName    (input)
-     $2 = Action        (input)
-     $3 = RegLoc        (input)
-     $4 = PathString    (input)
-     $5 = Orig EnvVar   (read from registry)
-     $6 = Len of $0     (temp)
-     $7 = tempstr1      (temp)
-     $8 = Entry counter (temp)
-     $9 = tempstr2      (temp)
-     $R0 = tempChar     (temp)  */
- 
-  ; Step 1:  Read contents of EnvVarName from RegLoc
-  ;
-  ; Check for empty EnvVarName
-  ${If} $1 == ""
-    SetErrors
-    DetailPrint "ERROR: EnvVarName is blank"
-    Goto EnvVarUpdate_Restore_Vars
-  ${EndIf}
- 
-  ; Check for valid Action
-  ${If}    $2 != "A"
-  ${AndIf} $2 != "P"
-  ${AndIf} $2 != "R"
-    SetErrors
-    DetailPrint "ERROR: Invalid Action - must be A, P, or R"
-    Goto EnvVarUpdate_Restore_Vars
-  ${EndIf}
- 
-  ${If} $3 == HKLM
-    ReadRegStr $5 ${hklm_all_users} $1     ; Get EnvVarName from all users into $5
-  ${ElseIf} $3 == HKCU
-    ReadRegStr $5 ${hkcu_current_user} $1  ; Read EnvVarName from current user into $5
-  ${Else}
-    SetErrors
-    DetailPrint 'ERROR: Action is [$3] but must be "HKLM" or HKCU"'
-    Goto EnvVarUpdate_Restore_Vars
-  ${EndIf}
- 
-  ; Check for empty PathString
-  ${If} $4 == ""
-    SetErrors
-    DetailPrint "ERROR: PathString is blank"
-    Goto EnvVarUpdate_Restore_Vars
-  ${EndIf}
- 
-  ; Make sure we've got some work to do
-  ${If} $5 == ""
-  ${AndIf} $2 == "R"
-    SetErrors
-    DetailPrint "$1 is empty - Nothing to remove"
-    Goto EnvVarUpdate_Restore_Vars
-  ${EndIf}
- 
-  ; Step 2: Scrub EnvVar
-  ;
-  StrCpy $0 $5                             ; Copy the contents to $0
-  ; Remove spaces around semicolons (NOTE: spaces before the 1st entry or
-  ; after the last one are not removed here but instead in Step 3)
-  ${If} $0 != ""                           ; If EnvVar is not empty ...
-    ${Do}
-      ${${UN}StrStr} $7 $0 " ;"
-      ${If} $7 == ""
-        ${ExitDo}
-      ${EndIf}
-      ${${UN}StrRep} $0  $0 " ;" ";"         ; Remove '<space>;'
-    ${Loop}
-    ${Do}
-      ${${UN}StrStr} $7 $0 "; "
-      ${If} $7 == ""
-        ${ExitDo}
-      ${EndIf}
-      ${${UN}StrRep} $0  $0 "; " ";"         ; Remove ';<space>'
-    ${Loop}
-    ${Do}
-      ${${UN}StrStr} $7 $0 ";;" 
-      ${If} $7 == ""
-        ${ExitDo}
-      ${EndIf}
-      ${${UN}StrRep} $0  $0 ";;" ";"
-    ${Loop}
- 
-    ; Remove a leading or trailing semicolon from EnvVar
-    StrCpy  $7  $0 1 0
-    ${If} $7 == ";"
-      StrCpy $0  $0 "" 1                   ; Change ';<EnvVar>' to '<EnvVar>'
-    ${EndIf}
-    StrLen $6 $0
-    IntOp $6 $6 - 1
-    StrCpy $7  $0 1 $6
-    ${If} $7 == ";"
-     StrCpy $0  $0 $6                      ; Change ';<EnvVar>' to '<EnvVar>'
-    ${EndIf}
-    ; DetailPrint "Scrubbed $1: [$0]"      ; Uncomment to debug
-  ${EndIf}
- 
-  /* Step 3. Remove all instances of the target path/string (even if "A" or "P")
-     $6 = bool flag (1 = found and removed PathString)
-     $7 = a string (e.g. path) delimited by semicolon(s)
-     $8 = entry counter starting at 0
-     $9 = copy of $0
-     $R0 = tempChar      */
- 
-  ${If} $5 != ""                           ; If EnvVar is not empty ...
-    StrCpy $9 $0
-    StrCpy $0 ""
-    StrCpy $8 0
-    StrCpy $6 0
- 
-    ${Do}
-      ${${UN}StrTok} $7 $9 ";" $8 "0"      ; $7 = next entry, $8 = entry counter
- 
-      ${If} $7 == ""                       ; If we've run out of entries,
-        ${ExitDo}                          ;    were done
-      ${EndIf}                             ;
- 
-      ; Remove leading and trailing spaces from this entry (critical step for Action=Remove)
-      ${Do}
-        StrCpy $R0  $7 1
-        ${If} $R0 != " "
-          ${ExitDo}
-        ${EndIf}
-        StrCpy $7   $7 "" 1                ;  Remove leading space
-      ${Loop}
-      ${Do}
-        StrCpy $R0  $7 1 -1
-        ${If} $R0 != " "
-          ${ExitDo}
-        ${EndIf}
-        StrCpy $7   $7 -1                  ;  Remove trailing space
-      ${Loop}
-      ${If} $7 == $4                       ; If string matches, remove it by not appending it
-        StrCpy $6 1                        ; Set 'found' flag
-      ${ElseIf} $7 != $4                   ; If string does NOT match
-      ${AndIf}  $0 == ""                   ;    and the 1st string being added to $0,
-        StrCpy $0 $7                       ;    copy it to $0 without a prepended semicolon
-      ${ElseIf} $7 != $4                   ; If string does NOT match
-      ${AndIf}  $0 != ""                   ;    and this is NOT the 1st string to be added to $0,
-        StrCpy $0 $0;$7                    ;    append path to $0 with a prepended semicolon
-      ${EndIf}                             ;
- 
-      IntOp $8 $8 + 1                      ; Bump counter
-    ${Loop}                                ; Check for duplicates until we run out of paths
-  ${EndIf}
- 
-  ; Step 4:  Perform the requested Action
-  ;
-  ${If} $2 != "R"                          ; If Append or Prepend
-    ${If} $6 == 1                          ; And if we found the target
-      DetailPrint "Target is already present in $1. It will be removed and"
-    ${EndIf}
-    ${If} $0 == ""                         ; If EnvVar is (now) empty
-      StrCpy $0 $4                         ;   just copy PathString to EnvVar
-      ${If} $6 == 0                        ; If found flag is either 0
-      ${OrIf} $6 == ""                     ; or blank (if EnvVarName is empty)
-        DetailPrint "$1 was empty and has been updated with the target"
-      ${EndIf}
-    ${ElseIf} $2 == "A"                    ;  If Append (and EnvVar is not empty),
-      StrCpy $0 $0;$4                      ;     append PathString
-      ${If} $6 == 1
-        DetailPrint "appended to $1"
-      ${Else}
-        DetailPrint "Target was appended to $1"
-      ${EndIf}
-    ${Else}                                ;  If Prepend (and EnvVar is not empty),
-      StrCpy $0 $4;$0                      ;     prepend PathString
-      ${If} $6 == 1
-        DetailPrint "prepended to $1"
-      ${Else}
-        DetailPrint "Target was prepended to $1"
-      ${EndIf}
-    ${EndIf}
-  ${Else}                                  ; If Action = Remove
-    ${If} $6 == 1                          ;   and we found the target
-      DetailPrint "Target was found and removed from $1"
-    ${Else}
-      DetailPrint "Target was NOT found in $1 (nothing to remove)"
-    ${EndIf}
-    ${If} $0 == ""
-      DetailPrint "$1 is now empty"
-    ${EndIf}
-  ${EndIf}
- 
-  ; Step 5:  Update the registry at RegLoc with the updated EnvVar and announce the change
-  ;
-  ClearErrors
-  ${If} $3  == HKLM
-    WriteRegExpandStr ${hklm_all_users} $1 $0     ; Write it in all users section
-  ${ElseIf} $3 == HKCU
-    WriteRegExpandStr ${hkcu_current_user} $1 $0  ; Write it to current user section
-  ${EndIf}
- 
-  IfErrors 0 +4
-    MessageBox MB_OK|MB_ICONEXCLAMATION "Could not write updated $1 to $3"
-    DetailPrint "Could not write updated $1 to $3"
-    Goto EnvVarUpdate_Restore_Vars
- 
-  ; "Export" our change
+  ReadRegStr $1 ${Environ} "PATH"
+  StrCpy $5 $1 1 -1
+  StrCmp $5 ";" +2
+    StrCpy $1 "$1;" ; ensure trailing ';'
+  Push $1
+  Push "$0;"
+  Call un.StrStr
+  Pop $2 ; pos of our dir
+  StrCmp $2 "" done
+  DetailPrint "Eliminamos del PATH: $0"
+  StrLen $3 "$0;"
+  StrLen $4 $2
+  StrCpy $5 $1 -$4 ; $5 is now the part before the path to remove
+  StrCpy $6 $2 "" $3 ; $6 is now the part after the path to remove
+  StrCpy $3 "$5$6"
+  StrCpy $5 $3 1 -1
+  StrCmp $5 ";" 0 +2
+    StrCpy $3 $3 -1 ; remove trailing ';'
+  WriteRegExpandStr ${Environ} "PATH" $3
   SendMessage ${HWND_BROADCAST} ${WM_WININICHANGE} 0 "STR:Environment" /TIMEOUT=5000
- 
-  EnvVarUpdate_Restore_Vars:
-  ;
-  ; Restore the user's variables and return ResultVar
-  Pop $R0
-  Pop $9
-  Pop $8
-  Pop $7
+done:
   Pop $6
   Pop $5
   Pop $4
   Pop $3
   Pop $2
   Pop $1
-  Push $0  ; Push my $0 (ResultVar)
-  Exch
-  Pop $0   ; Restore his $0
- 
+  Pop $0
 FunctionEnd
  
-!macroend   ; EnvVarUpdate UN
-!insertmacro EnvVarUpdate ""
-!insertmacro EnvVarUpdate "un."
-;----------------------------------- EnvVarUpdate end----------------------------------------
- 
-!verbose pop
-!endif
+; StrStr - find substring in a string
+;
+; Usage:
+;   Push "this is some string"
+;   Push "some"
+;   Call StrStr
+;   Pop $0 ; "some string"
+!macro StrStr un
+Function ${un}StrStr
+  Exch $R1 ; $R1=substring, stack=[old$R1,string,...]
+  Exch     ;                stack=[string,old$R1,...]
+  Exch $R2 ; $R2=string,    stack=[old$R2,old$R1,...]
+  Push $R3
+  Push $R4
+  Push $R5
+  StrLen $R3 $R1
+  StrCpy $R4 0
+  ; $R1=substring, $R2=string, $R3=strlen(substring)
+  ; $R4=count, $R5=tmp
+  loop:
+    StrCpy $R5 $R2 $R3 $R4
+    StrCmp $R5 $R1 done
+    StrCmp $R5 "" done
+    IntOp $R4 $R4 + 1
+    Goto loop
+done:
+  StrCpy $R1 $R2 "" $R4
+  Pop $R5
+  Pop $R4
+  Pop $R3
+  Pop $R2
+  Exch $R1 ; $R1=old$R1, stack=[result,...]
+FunctionEnd
+!macroend
+!insertmacro StrStr ""
+!insertmacro StrStr "un."
