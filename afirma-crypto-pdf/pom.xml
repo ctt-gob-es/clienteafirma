@@ -43,10 +43,5 @@
 			<version>${project.version}</version>
 		</dependency>
 
-		<dependency>
-			<groupId>es.gob.afirma</groupId>
-			<artifactId>afirma-lib-itext</artifactId>
-			<version>${project.version}</version>
-		</dependency>
 	</dependencies>
 </project>
