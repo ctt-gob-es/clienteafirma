@@ -14,6 +14,7 @@ final class ConfiguratorLinux implements Configurator {
     static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
     private static final String KS_FILENAME = "autofirma.pfx"; //$NON-NLS-1$
+    private static final String FILE_AUTOFIRMA_CERTIFICATE = "AutoFirma_ROOT.cer"; //$NON-NLS-1$
     private static final String KS_PASSWORD = "654321"; //$NON-NLS-1$
     static final String EXPORT_PATH = "export PATH=$PATH:"; //$NON-NLS-1$
     static final String EXPORT_LD_LIBRARY ="export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:"; //$NON-NLS-1$
@@ -36,10 +37,16 @@ final class ConfiguratorLinux implements Configurator {
             );
 
             LOGGER.info(Messages.getString("ConfiguratorLinux.11")); //$NON-NLS-1$
-
+            
+           //Generacion del certificado pfx
             ConfiguratorUtil.installFile(certPack.getPkcs12(), new File(
             		ConfiguratorUtil.getApplicationDirectory(), KS_FILENAME));
 
+          //Generacion del certificado raiz .cer
+            ConfiguratorUtil.installFile(
+            		certPack.getCaCertificate().getEncoded(), 
+            		new File(ConfiguratorUtil.getApplicationDirectory(), FILE_AUTOFIRMA_CERTIFICATE));
+            
             // comando para sacar los usuarios del sistema
             final String[] command = new String[] {
     				"cut", //$NON-NLS-1$
