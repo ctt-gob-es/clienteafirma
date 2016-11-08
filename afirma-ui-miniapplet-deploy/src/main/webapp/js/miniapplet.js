@@ -949,6 +949,7 @@ var MiniApplet = ( function ( window, undefined ) {
 			/* Maxima longitud permitida para una URL, si la url se excede se divide la peticion en fragmentos */
 			var URL_MAX_SIZE = 1048576;
 
+			/* Indica si se ha establecido la conexion o no */
 			var connection = false;
 		
 			/* Dominio desde el que se realiza la llamada al servicio */
@@ -1180,6 +1181,7 @@ var MiniApplet = ( function ( window, undefined ) {
 			}
 			
 			function execAppIntent (url) {
+				
 				// Primera ejecucion, no hay puerto definido
 				if (port == "") {
 					// Calculamos los puertos
@@ -1912,6 +1914,9 @@ var MiniApplet = ( function ( window, undefined ) {
 			/** Version del protocolo utilizada. */
 			var PROTOCOL_VERSION = 1;
 			
+			/* Indica si ya se ha detectado que la aplicacion no esta instalada  */
+			var wrongInstallation = true;
+			
 			/**
 			 *  Atributos para la configuracion del objeto sustituto del applet Java de firma
 			 */
@@ -2435,6 +2440,8 @@ var MiniApplet = ( function ( window, undefined ) {
 			 */
 			function execAppIntent (intentURL, idSession, cipherKey, successCallback, errorCallback) {
 
+				wrongInstallation = false;
+			
 				// Invocamos al cliente de firma movil.
 				try {
 					openUrl(intentURL, errorCallback);
@@ -2551,17 +2558,14 @@ var MiniApplet = ( function ( window, undefined ) {
 
 					// En el caso de ser una version de internet Explorer que soportase la deteccion de aplicacion
 					// capaces de manejar el protocolo, aprovechamos esta caracteristica (Internet Explorer para Windows 8 Modern UI)
+
 					if (navigator.msLaunchUri) {
 						navigator.msLaunchUri(
 								url,
+								null,
 								function() {
-									openUrlWithIframe(url);
-								},
-								function() {
-									if (errorCallback != null && errorCallback != undefined) {
-										errorCallback("es.gob.afirma.standalone.ApplicationNotFoundException", "No se ha podido conectar con AutoFirma.");
-										throw new Error();
-									}
+									// Bloqueamos la conexion para evitar que se sigan haciendo comprobaciones
+									wrongInstallation = true;
 								}
 						);
 					}
@@ -2609,7 +2613,7 @@ var MiniApplet = ( function ( window, undefined ) {
 			 * error determinante o exito.
 			 */
 			function successResponseFunction (html, cipherKey, successCallback, errorCallback) {
-
+				
 				// Si se obtiene el mensaje de  error de que el identificador no existe, seguimos intentandolo
 				if (html.substr(0, 6).toLowerCase() == "err-06") {
 					return true;
@@ -2622,7 +2626,7 @@ var MiniApplet = ( function ( window, undefined ) {
 					errorCallback(errorType, errorMessage);
 					return false;
 				}
-
+				
 				// Se ha cancelado la operacion
 				if (html == "CANCEL" || html == "CANCEL\r\n") {
 					errorCallback("es.gob.afirma.core.AOCancelledOperationException", "Operacion cancelada por el usuario");
@@ -2634,13 +2638,13 @@ var MiniApplet = ( function ( window, undefined ) {
 					successCallback();
 					return false;
 				}
-
+				
 				// Se ha producido un error
 				if (html.length > 4 && html.substr(0, 4) == "SAF_") {
 					errorCallback("java.lang.Exception", html);
 					return false;
 				}
-
+				
 				// Si no se obtuvo un error, habremos recibido la firma y posiblemente el certificado (que antecederia a la
 				// firma y se separaria de ella con '|'). Si se definio una clave de cifrado, consideramos que la firma
 				// y el certificado (en caso de estar) llegan cifrados. El cifrado de ambos elementos es independiente
@@ -2698,6 +2702,11 @@ var MiniApplet = ( function ( window, undefined ) {
 
 			function retrieveRequest(httpRequest, url, params, cipherKey, successCallback, errorCallback) {
 
+				if (wrongInstallation) {
+					errorResponseFunction("es.gob.afirma.standalone.ApplicationNotFoundException", "AutoFirma no se encuentra instalado en el sistema.", errorCallback);
+					return;
+				}
+			
 				// Contamos la nueva llamada al servidor
 				if (iterations > NUM_MAX_ITERATIONS) {
 					errorResponseFunction("java.util.concurrent.TimeoutException", "El tiempo para la recepcion de la firma por la pagina web ha expirado", errorCallback);
@@ -2763,7 +2772,7 @@ var MiniApplet = ( function ( window, undefined ) {
 
 				var data = Cipher.base64ToString(fromBase64UrlSaveToBase64(dataB64));
 				var padding = (8 - (data.length % 8)) % 8;
-				
+
 				// Los datos cifrados los pasamos a base 64 y, antes de devolverlos le anteponemos el padding que
 				// le habra agregado el metodo de cifrado separados por un punto ('.').
 				return padding  + "." + Cipher.stringToBase64(Cipher.des(key, data, 1, 0, null)).replace(/\+/g, "-").replace(/\//g, "_");
@@ -3277,7 +3286,31 @@ var Cipher = {
 	//Convierte una cadena a Base 64. Debido a un error en el algoritmo original, pasaremos
 	// de cadena a hexadecimal y de hexadecimal a Base64
 	stringToBase64 : function  (s) {
-		return Cipher.hexToBase64(Cipher.stringToHex(s));
+
+		// Para realizar la transformacion, primero debemos convertir a hexadecimal y luego a cadena
+		
+		// A hexadecimal
+		var str = "";
+		var hexes = new Array ("0","1","2","3","4","5","6","7","8","9","a","b","c","d","e","f");
+		for (var i=0; i<s.length; i++) {str += hexes [s.charCodeAt(i) >> 4] + hexes [s.charCodeAt(i) & 0xf];}
+		
+		// A cadena
+		var byteString;
+		var byteArray = str.replace(/\r|\n/g, "").replace(/([\da-fA-F]{2}) ?/g, "0x$1 ").replace(/ +$/, "").split(" ");
+		
+		// Vaciamos la cadena por liberar recursos
+		str = "";
+		
+		try {
+			byteString = String.fromCharCode.apply(null, byteArray);
+		} catch (e) {
+			var byteString = "";
+			for (var i = 0, len = byteArray.length; i < len; i++) {
+				byteString += String.fromCharCode(byteArray[i]);
+			}
+		}
+
+		return Cipher.btoa(byteString, null);
 	},
 
 	//Convert a base64 string into a normal string
@@ -3302,13 +3335,6 @@ var Cipher = {
 		return r;
 	},
 
-	stringToHex : function (s) {
-		var r = "";
-		var hexes = new Array ("0","1","2","3","4","5","6","7","8","9","a","b","c","d","e","f");
-		for (var i=0; i<s.length; i++) {r += hexes [s.charCodeAt(i) >> 4] + hexes [s.charCodeAt(i) & 0xf];}
-		return r;
-	},
-
 	// --- Funciones para pasar de Hexadecimal a base64
 
 	btoa : function  (bin, urlSafe) {
@@ -3322,21 +3348,5 @@ var Cipher = {
 			(isNaN(b + c) ? "=" : table[c & 63]);
 		}
 		return base64.join("");
-	},
-
-	hexToBase64 : function(str, urlSafe) {
-		var byteString;
-		var byteArray = str.replace(/\r|\n/g, "").replace(/([\da-fA-F]{2}) ?/g, "0x$1 ").replace(/ +$/, "").split(" ");
-		try {
-			byteString = String.fromCharCode.apply(null, byteArray);
-		} catch (e) {
-			var strTemp = "";
-			for (var i = 0, len = byteArray.length; i < len; i++) {
-				strTemp += String.fromCharCode(byteArray[i]);
-			}
-			byteString = strTemp;
-		}
-			
-		return Cipher.btoa(byteString, urlSafe);
 	}
 };
