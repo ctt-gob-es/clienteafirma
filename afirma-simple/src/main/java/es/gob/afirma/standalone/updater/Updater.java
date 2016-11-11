@@ -94,7 +94,7 @@ public final class Updater {
 		}
 		catch (final Exception e) {
 			LOGGER.severe(
-				"No se ha podido obtener la ultima version disponible desde " + url //$NON-NLS-1$
+				"No se ha podido obtener la ultima version disponible desde " + url + ": " + e //$NON-NLS-1$ //$NON-NLS-2$
 			);
 		}
 		return version;
@@ -196,5 +196,4 @@ public final class Updater {
 			}).start();
 		}
 	}
-
 }
