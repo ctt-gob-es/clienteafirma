@@ -1,10 +1,14 @@
 package es.gob.afirma.standalone.configurator;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.util.logging.Logger;
 
+import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.standalone.configurator.CertUtil.CertPack;
 import es.gob.afirma.standalone.configurator.ConfiguratorFirefox.MozillaProfileNotFoundException;
 
@@ -16,6 +20,8 @@ final class ConfiguratorWindows implements Configurator {
 	private static final String KS_FILENAME = "autofirma.pfx"; //$NON-NLS-1$
 	private static final String FILE_AUTOFIRMA_CERTIFICATE = "AutoFirma_ROOT.cer"; //$NON-NLS-1$
 	private static final String KS_PASSWORD = "654321"; //$NON-NLS-1$
+
+	private static final String CHROME_CONFIG_FILE = "AppData/Local/Google/Chrome/User Data/Local State"; //$NON-NLS-1$
 
 	@Override
 	public void configure(final Console window) throws IOException, GeneralSecurityException {
@@ -62,8 +68,10 @@ final class ConfiguratorWindows implements Configurator {
 			window.print(Messages.getString("ConfiguratorWindows.14")); //$NON-NLS-1$
 		}
 
-		window.print(Messages.getString("ConfiguratorWindows.8")); //$NON-NLS-1$
+		// Insertamos el protocolo afirma en el fichero de configuracion de Google Chrome
+		configureChrome(window, true);
 
+		window.print(Messages.getString("ConfiguratorWindows.8")); //$NON-NLS-1$
 	}
 
 	/** Comprueba si ya existe un almac&eacute;n de certificados generado.
@@ -79,8 +87,50 @@ final class ConfiguratorWindows implements Configurator {
 		LOGGER.info("Desinstalamos el certificado raiz del almacen de Firefox"); //$NON-NLS-1$
 		ConfiguratorFirefox.uninstallRootCAMozillaKeyStore(ConfiguratorUtil.getApplicationDirectory());
 
+		// Insertamos el protocolo afirma en el fichero de configuracion de Google Chrome
+		configureChrome(null, false);
+
 		// No es necesario eliminar nada mas porque el verdadero proceso de desinstalacion
         // eliminara el directorio de aplicacion con todo su contenido
 	}
 
+	/**
+	 * Configura el protocolo "afirma" en Chrome para todos los usuarios de Windows.
+	 * @param window Consola de salida.
+	 * @param installing Indica si se debe configurar ({@code true}) o desconfigurar
+	 * ({@code false}) el protocolo "afirma" en Chrome.
+	 */
+	private static void configureChrome(final Console window, boolean installing) {
+
+		final File usersDir = new File(System.getProperty("user.home")).getParentFile(); //$NON-NLS-1$
+		for (final File userDir : usersDir.listFiles()) {
+			if (userDir.isDirectory()) {
+				try {
+					final File chromeConfigFile = new File(userDir, CHROME_CONFIG_FILE);
+					if (chromeConfigFile.isFile() && chromeConfigFile.canWrite()) {
+						String config;
+						try (final FileInputStream fis = new FileInputStream(chromeConfigFile)) {
+							config = new String(AOUtil.getDataFromInputStream(fis), StandardCharsets.UTF_8);
+						}
+
+						config = config.replace("\"afirma\":false,", ""); //$NON-NLS-1$ //$NON-NLS-2$
+						if (installing) {
+							config = config.replace("\"protocol_handler\":{\"excluded_schemes\":{", //$NON-NLS-1$
+									"\"protocol_handler\":{\"excluded_schemes\":{\"afirma\":false,"); //$NON-NLS-1$
+						}
+						try (final FileOutputStream fos = new FileOutputStream(chromeConfigFile)) {
+							fos.write(config.getBytes(StandardCharsets.UTF_8));
+						}
+					}
+
+				}
+				catch (final Exception e) {
+					if (window != null) {
+						window.print(String.format(Messages.getString("ConfiguratorWindows.15"), userDir.getName())); //$NON-NLS-1$
+					}
+					LOGGER.warning("No se pudo configurar Chrome para el usuario " + userDir + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$
+				}
+			}
+		}
+	}
 }
