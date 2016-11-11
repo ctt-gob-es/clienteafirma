@@ -9,7 +9,6 @@ import javax.security.auth.callback.PasswordCallback;
 
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.Base64;
-import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.misc.protocol.UrlParametersToSelectCert;
 import es.gob.afirma.keystores.AOCertificatesNotFoundException;
 import es.gob.afirma.keystores.AOKeyStore;
@@ -30,7 +29,16 @@ final class ProtocolInvocationLauncherSelectCert {
 		// No instanciable
 	}
 
-	static String processSelectCert(final UrlParametersToSelectCert options) throws SocketOperationException {
+	static String processSelectCert(final UrlParametersToSelectCert options, final boolean bySocket) throws SocketOperationException {
+
+		if (options == null) {
+			LOGGER.severe("Las opciones de firma son nulas"); //$NON-NLS-1$
+			ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_01);
+			if (!bySocket){
+				throw new SocketOperationException(ProtocolInvocationLauncherErrorManager.SAF_01);
+			}
+			return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_01);
+		}
 
 		if (!ProtocolInvocationLauncher.MAX_PROTOCOL_VERSION_SUPPORTED.support(options.getMinimumVersion())) {
 			LOGGER.severe(String.format("Version de protocolo no soportada (%1s). Version actual: %s2. Hay que actualizar la aplicacion.", options.getMinimumVersion(), ProtocolInvocationLauncher.MAX_PROTOCOL_VERSION_SUPPORTED)); //$NON-NLS-1$
@@ -42,7 +50,10 @@ final class ProtocolInvocationLauncherSelectCert {
 		if (aoks == null) {
 			LOGGER.severe("No hay un KeyStore con el nombre: " + options.getDefaultKeyStore()); //$NON-NLS-1$
 			ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_07);
-			throw new SocketOperationException(ProtocolInvocationLauncherErrorManager.SAF_07);
+			if (!bySocket){
+				throw new SocketOperationException(ProtocolInvocationLauncherErrorManager.SAF_07);
+			}
+			return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_07);
 		}
 
 		final String aoksLib = options.getDefaultKeyStoreLib();
@@ -63,7 +74,14 @@ final class ProtocolInvocationLauncherSelectCert {
 			ProtocolInvocationLauncherErrorManager.showError(
 				ProtocolInvocationLauncherErrorManager.SAF_08
 			);
-			throw new SocketOperationException(ProtocolInvocationLauncherErrorManager.SAF_08);
+			if (!bySocket){
+				throw new SocketOperationException(
+					ProtocolInvocationLauncherErrorManager.SAF_08
+				);
+			}
+			return ProtocolInvocationLauncherErrorManager.getErrorMessage(
+					ProtocolInvocationLauncherErrorManager.SAF_08
+				);
 		}
 
 		LOGGER.info("Obtenido gestor de almacenes de claves: " + ksm); //$NON-NLS-1$
@@ -75,10 +93,8 @@ final class ProtocolInvocationLauncherSelectCert {
 
 		LOGGER.info("Cargando dialogo de seleccion de certificados..."); //$NON-NLS-1$
 
-		if (Platform.OS.MACOSX.equals(Platform.getOS())) {
-			ServiceInvocationManager.focusApplication();
-		}
 		try {
+			ServiceInvocationManager.focusApplication();
 			final AOKeyStoreDialog dialog = new AOKeyStoreDialog(
 				ksm,
 				null,
@@ -96,17 +112,34 @@ final class ProtocolInvocationLauncherSelectCert {
 		}
 		catch (final AOCancelledOperationException e) {
 			LOGGER.severe("Operacion cancelada por el usuario" + e); //$NON-NLS-1$
-			throw e;
+			if (!bySocket){
+				throw new SocketOperationException(getResultCancel());
+			}
+			return getResultCancel();
 		}
 		catch(final AOCertificatesNotFoundException e) {
 			LOGGER.severe("No hay certificados validos en el almacen: " + e); //$NON-NLS-1$
 			ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_19);
-			throw new SocketOperationException(ProtocolInvocationLauncherErrorManager.SAF_19);
+			if (!bySocket){
+				throw new SocketOperationException(
+					ProtocolInvocationLauncherErrorManager.SAF_19
+				);
+			}
+			return ProtocolInvocationLauncherErrorManager.getErrorMessage(
+					ProtocolInvocationLauncherErrorManager.SAF_19
+				);
 		}
 		catch (final Exception e) {
 			LOGGER.severe("Error al mostrar el dialogo de seleccion de certificados: " + e); //$NON-NLS-1$
 			ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_08);
-			throw new SocketOperationException(ProtocolInvocationLauncherErrorManager.SAF_08);
+			if (!bySocket){
+				throw new SocketOperationException(
+					ProtocolInvocationLauncherErrorManager.SAF_08
+				);
+			}
+			return ProtocolInvocationLauncherErrorManager.getErrorMessage(
+				ProtocolInvocationLauncherErrorManager.SAF_08
+			);
 		}
 
 		// Concatenamos el certificado utilizado para firmar y la firma con un separador
@@ -118,7 +151,14 @@ final class ProtocolInvocationLauncherSelectCert {
 		catch (final CertificateEncodingException e) {
 			LOGGER.severe("Error en la decodificacion del certificado de firma: " + e); //$NON-NLS-1$
 			ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_18);
-			throw new SocketOperationException(ProtocolInvocationLauncherErrorManager.SAF_18);
+			if (!bySocket){
+				throw new SocketOperationException(
+					ProtocolInvocationLauncherErrorManager.SAF_18
+				);
+			}
+			return ProtocolInvocationLauncherErrorManager.getErrorMessage(
+				ProtocolInvocationLauncherErrorManager.SAF_18
+			);
 		}
 
 		String dataToSend;
@@ -130,7 +170,14 @@ final class ProtocolInvocationLauncherSelectCert {
 			catch (final Exception e) {
 				LOGGER.severe("Error en el cifrado de los datos a enviar: " + e); //$NON-NLS-1$
 				ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_12);
-				throw new SocketOperationException(ProtocolInvocationLauncherErrorManager.SAF_12);
+				if (!bySocket){
+					throw new SocketOperationException(
+						ProtocolInvocationLauncherErrorManager.SAF_12
+					);
+				}
+				return ProtocolInvocationLauncherErrorManager.getErrorMessage(
+					ProtocolInvocationLauncherErrorManager.SAF_12
+				);
 			}
 		}
 		else {

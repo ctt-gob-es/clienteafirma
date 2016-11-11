@@ -140,7 +140,7 @@ public final class ProtocolInvocationLauncher {
             try {
                 final UrlParametersToSelectCert params = ProtocolInvocationUriParser.getParametersToSelectCert(urlString);
                 try {
-                    return ProtocolInvocationLauncherSelectCert.processSelectCert(params);
+                    return ProtocolInvocationLauncherSelectCert.processSelectCert(params, bySocket);
                 }
                 catch (final AOCancelledOperationException e) {
                 	return ProtocolInvocationLauncherSelectCert.getResultCancel();
