@@ -22,7 +22,9 @@
     <maxVersion>1.8.0</maxVersion>
     <jdkPreference>preferJre</jdkPreference>
     <runtimeBits>64/32</runtimeBits>
-    <opt>-Xms512m -Xmx1g -DdisableSslChecks=true</opt>
+    <initialHeapSize>512</initialHeapSize>
+    <maxHeapSize>2048</maxHeapSize>
+    <opt>-DdisableSslChecks=true</opt>
   </jre>
   <versionInfo>
     <fileVersion>1.4.2.2</fileVersion>
@@ -35,6 +37,8 @@
     <companyName>Gobierno de España</companyName>
     <internalName>AutoFirma</internalName>
     <originalFilename>AutoFirma.exe</originalFilename>
+    <trademarks></trademarks>
+    <language>ENGLISH_US</language>
   </versionInfo>
   <messages>
     <startupErr>Ocurrió un error mientras arrancaba la aplicación.</startupErr>
