@@ -17,6 +17,7 @@ import java.net.SocketAddress;
 import java.net.URI;
 import java.net.URL;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.JButton;
@@ -175,10 +176,7 @@ final class ProxyPanel extends JPanel{
 				public void actionPerformed(final ActionEvent e) {
 					LOGGER.info("verificar"); //$NON-NLS-1$
 					ProxyPanel.this.setCursor(new Cursor(Cursor.WAIT_CURSOR));
-					String host = ProxyPanel.this.getHost();
-					if (!host.startsWith("http")) { //$NON-NLS-1$
-						host = "http://" + host; //$NON-NLS-1$
-					}
+					final String host = ProxyPanel.this.getHost();
 					if(testConnection(host, ProxyPanel.this.getPort())){
 						LOGGER.info("Conexion proxy correcta"); //$NON-NLS-1$
 						AOUIFactory.showMessageDialog(
@@ -334,12 +332,13 @@ final class ProxyPanel extends JPanel{
 		try {
 			final Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(addr,Integer.parseInt(port)));
 			final URL url = new URL("http://www.yahoo.com"); //$NON-NLS-1$
+
 			final HttpURLConnection uc = (HttpURLConnection)url.openConnection(proxy);
 			uc.connect();
 			connectionStatus = true;
 		}
 		catch (final Exception e) {
-		    LOGGER.warning("Error conectando con el proxy: " + e); //$NON-NLS-1$
+		    LOGGER.log(Level.WARNING, "Error conectando con el proxy: " + e, e); //$NON-NLS-1$
 		    connectionStatus = false;
 		}
 
