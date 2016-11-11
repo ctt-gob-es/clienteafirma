@@ -48,6 +48,9 @@ public final class ServiceInvocationManager {
 	 * su valor. */
 	private static final int BUFFERED_SECURITY_RANGE = 36;
 
+	/** N&uacte;mero m&aacute;ximo de intentos de lectura consecutivos en el buffer sin que se encuentren datos. */
+	private static final int MAX_READING_BUFFER_TRIES = 10;
+
 	/** Tiempo de espera de cada socket en milisegundos. */
 	private static int SOCKET_TIMEOUT = 60000;
 
@@ -193,12 +196,12 @@ public final class ServiceInvocationManager {
 						final String httpRequest = read(socketChannel.getInputStream());
 
 						// comprobamos que la peticion no es vacia
-						if (httpRequest.trim().length() != 0 ) {
-							LOGGER.fine("Peticion HTTP recibida:\n" + httpRequest); //$NON-NLS-1$
-							getCommandUri(httpRequest, socketChannel);
+						if (httpRequest == null) {
+							LOGGER.warning("Se ha recibido una peticion vacia"); //$NON-NLS-1$
 						}
 						else {
-						    LOGGER.warning("Se ha recibido una peticion vacia"); //$NON-NLS-1$
+							LOGGER.fine("Peticion HTTP recibida:\n" + httpRequest); //$NON-NLS-1$
+							getCommandUri(httpRequest, socketChannel);
 						}
 					}
 					catch (final IllegalArgumentException e) {
@@ -215,7 +218,7 @@ public final class ServiceInvocationManager {
 
 		// Con las excepciones no hacemos nada ya que no tenemos forma de transmitir el error de vuelta y no debemos mostrar dialogos graficos
 		catch (final IOException e) {
-			LOGGER.severe("Error en la comunicacion a traves del socket:" + e); //$NON-NLS-1$
+			LOGGER.severe("Error en la comunicacion a traves del socket: " + e); //$NON-NLS-1$
 		}
 		catch(final KeyStoreException e){
             LOGGER.severe("Error con el keyStore: " + e); //$NON-NLS-1$
@@ -372,26 +375,39 @@ public final class ServiceInvocationManager {
 		throw new IOException("No se ha podido ligar el socket servidor a ningun puerto"); //$NON-NLS-1$
 	}
 
-	/** Lee los datos recibidos en el socket.
-	 * Si el certificado no es correcto, al leer los datos del socket se reciben cadenas de texto en blanco.
+	/** Lee los datos recibidos en el socket. Si se recibe una peticion sin datos o compuesto de
+	 * caracteres blancos (como ocurre cuando el certificado SSL no es correcto) se devuelve nulo.
 	 * @param socketIs Flujo de entrada de datos del socket..
-	 * @return Los datos recibidos.
+	 * @return Los datos recibidos o {@code null} si se recibe una peticion vac&iacute;a.
 	 * @throws IOException Si ocurren errores durante la lectura. */
 	private static String read(final InputStream socketIs) throws IOException {
 		// Buffer en el que se ira almacenando toda la entrada
 		final StringBuilder data = new StringBuilder();
 		// Cadena que se ira actualizando para contener siempre la union de los
-		// 2 ultimos fragmentos con un tamano de 50 caracteres (suficiente para
-		// contener el fragmento de fin y el identificador de sesion)
+		// 2 ultimos fragmentos con un tamano suficiente para contener el
+		// fragmento de fin y el identificador de sesion
 		String subFragment = ""; //$NON-NLS-1$
 		final byte[] reqBuffer = new byte[READ_BUFFER_SIZE];
 		boolean readed = true;
 		String insert;
-		// Limite de lecturas vacias de una peticion.
-		int limit = 10;
+		// Limite alcanzado de lecturas vacias del socket
+		int readingTries;
 		while (readed) {
-			socketIs.read(reqBuffer);
-			insert = new String(reqBuffer, StandardCharsets.UTF_8);
+
+			// Leemos del socket hasta obtener algo mas que caracteres vacios
+			readingTries = 0;
+			do {
+				readingTries++;
+				socketIs.read(reqBuffer);
+				insert = new String(reqBuffer, StandardCharsets.UTF_8);
+			} while (insert.trim().isEmpty() && readingTries <= MAX_READING_BUFFER_TRIES);
+
+			// Para evitar un error de memoria, si llegamos al maximo numero de intentos en el
+			// que solo hemos leido caracteres vacios, entendemos que era una peticion invalida
+			// y develvemos nulo para que se ignore
+			if (readingTries > MAX_READING_BUFFER_TRIES) {
+				return null;
+			}
 
 			subFragment += insert.substring(0, Math.min(BUFFERED_SECURITY_RANGE, insert.length()));
 
@@ -458,21 +474,10 @@ public final class ServiceInvocationManager {
 				}
 			}
 			else {
-				// Es posible que se lean caracteres en blanco si el certificado es erroneo y/o la
-				// conexion SSL no segura. Hay que asegurarse de no agregarlos al buffer.
-				if (!insert.trim().isEmpty()) {
-					data.append(insert);
-					subFragment = insert.substring(Math.max(0, insert.length() - BUFFERED_SECURITY_RANGE));
-				}
-				// Para evitar un error de memoria si llegamos la maximo numero de caracteres vacios devolvemos una cadena vacia que sera ignorada
-				else {
-					limit--;
-					if (limit < 0) {
-						return ""; //$NON-NLS-1$
-					}
-				}
+				// Agregamos los datos al total, ya que no se ha encontrado la cadena de fin de lectura
+				data.append(insert);
+				subFragment = insert.substring(Math.max(0, insert.length() - BUFFERED_SECURITY_RANGE));
 			}
-
 		}
 		return data.toString();
 	}
