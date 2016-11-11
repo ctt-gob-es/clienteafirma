@@ -42,12 +42,14 @@ final class AOKeyStoreManagerHelperPkcs11 {
      *        contrase&ntilde;a del almac&eacute;n.
      * @param params Parametros adicionales para la configuraci&oacute;n del
      *        almac&eacute;n.
+     * @param forceReset Indica si se debe forzar el reinicio del almac&eacute;n.
      * @return Almac&eacute;n configurado.
      * @throws AOKeyStoreManagerException Cuando ocurre un error durante la inicializaci&oacute;n.
      * @throws IOException Cuando se indique una contrase&ntilde;a incorrecta para la
      *         apertura del almac&eacute;n. */
     static KeyStore initPKCS11(final PasswordCallback pssCallBack,
-    		                   final Object[] params) throws AOKeyStoreManagerException,
+    		                   final Object[] params,
+    		                   final boolean forceReset) throws AOKeyStoreManagerException,
     		                                                 IOException {
         // En el "params" debemos traer los parametros:
         // [0] -p11lib: Biblioteca PKCS#11, debe estar en el Path (Windows) o en el LD_LIBRARY_PATH (UNIX, Linux, Mac OS X)
@@ -81,7 +83,7 @@ final class AOKeyStoreManagerHelperPkcs11 {
         final String p11ProviderName = new File(p11lib).getName().replace('.', '_').replace(' ', '_');
         Provider p11Provider = Security.getProvider("SunPKCS11-" + p11ProviderName); //$NON-NLS-1$
 
-        if (p11Provider != null && Boolean.getBoolean("es.gob.afirma.keystores.DoNotReusePkcs11Provider")) { //$NON-NLS-1$
+        if (p11Provider != null && (forceReset || Boolean.getBoolean("es.gob.afirma.keystores.DoNotReusePkcs11Provider"))) { //$NON-NLS-1$
         	LOGGER.info("Se retira el proveedor " + p11Provider); //$NON-NLS-1$
         	Security.removeProvider(p11Provider.getName());
         	p11Provider = null;

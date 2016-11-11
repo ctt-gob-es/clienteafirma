@@ -53,6 +53,9 @@ public class MozillaUnifiedKeyStoreManager extends AggregatedKeyStoreManager {
 	private PasswordCallback passwordCallback = null;
 	private Object[] configParams = null;
 
+	/** Indica si el almacen se cargo previamente. */
+	private boolean initialized = false;
+	private boolean preferredKsAdded = false;
 
 	/** Inicializa la clase gestora de almacenes de claves. */
 	@Override
@@ -86,14 +89,17 @@ public class MozillaUnifiedKeyStoreManager extends AggregatedKeyStoreManager {
 
 		// Intentamos ahora agregar los almacenes externos preferentes ajenos a los
 		// dispositivos de seguridad configurados en Firefox
-		final boolean preferredKsAdded = KeyStoreUtilities.addPreferredKeyStoreManagers(this, parentComponent);
-		//final boolean preferredKsAdded = false;
+
+		if (forceReset || !this.initialized) {
+			LOGGER.info(" == Agregamos los almacenes preferentes: forceReset=" + forceReset + " initialized=" + this.initialized);
+			this.preferredKsAdded = KeyStoreUtilities.addPreferredKeyStoreManagers(this, parentComponent);
+		}
 
 		// Si se pudo agregar algun almacen preferente entendemos que se desean usar y no cargamos
 		// configurados en Firefox. Si no, iniciamos los almacenes externos ignorando aquellos que
 		// ya se comprobaron por ser almacenes preferentes (DNIe y CERES inicialmente) y anadiendo
 		// modulos conocidos si se encuentran en el sistema.
-		if (!preferredKsAdded) {
+		if (!this.preferredKsAdded) {
 			final Map<String, String> externalStores = getExternalStores();
 
 			if (externalStores.size() > 0) {
@@ -152,7 +158,10 @@ public class MozillaUnifiedKeyStoreManager extends AggregatedKeyStoreManager {
 			LOGGER.warning("No se ha podido inicializar ningun almacen, interno o externo, de Firefox, ni los almacenes preferentes"); //$NON-NLS-1$
 		}
 
+		this.initialized = true;
 	}
+
+
 
 	private static void internalInitStore(final AOKeyStoreManager tmpKsm,
 			                              final String descr,

@@ -476,16 +476,33 @@ public final class AOKeyStoreManagerFactory {
 		);
     }
 
+    private static AggregatedKeyStoreManager mozillaKeyStoreManager = null;
     private static AggregatedKeyStoreManager getMozillaUnifiedKeyStoreManager(final PasswordCallback pssCallback,
     		                                                                  final boolean forceReset,
                                                                               final Object parentComponent) throws AOKeystoreAlternativeException,
     		                                                                                                       IOException {
-        return getNssKeyStoreManager(
-    		"es.gob.afirma.keystores.mozilla.MozillaUnifiedKeyStoreManager",  //$NON-NLS-1$
-    		pssCallback,
-    		forceReset,
-    		parentComponent
-		);
+    	if (mozillaKeyStoreManager == null) {
+    		mozillaKeyStoreManager = getNssKeyStoreManager(
+    	    		"es.gob.afirma.keystores.mozilla.MozillaUnifiedKeyStoreManager",  //$NON-NLS-1$
+    	    		pssCallback,
+    	    		forceReset,
+    	    		parentComponent
+    			);
+    	}
+    	else {
+    		try {
+    			mozillaKeyStoreManager.init(AOKeyStore.MOZ_UNI, null, pssCallback, new Object[] { parentComponent }, forceReset);
+    		}
+    		catch (final AOException e) {
+    			throw new AOKeystoreAlternativeException(
+    					getAlternateKeyStoreType(AOKeyStore.MOZ_UNI),
+    					"Error al inicializar el almacen NSS: " + e, //$NON-NLS-1$
+    					e
+    					);
+    		}
+    	}
+
+        return mozillaKeyStoreManager;
     }
 
     private static AggregatedKeyStoreManager getMacOSXKeyStoreManager(final AOKeyStore store,

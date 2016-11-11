@@ -217,7 +217,7 @@ public class AOKeyStoreManager implements KeyStoreManager {
         			newParams = new Object[params.length];
         			System.arraycopy(params, 0, newParams, 0, params.length);
         		}
-                this.ks = AOKeyStoreManagerHelperPkcs11.initPKCS11(pssCallBack, newParams);
+                this.ks = AOKeyStoreManagerHelperPkcs11.initPKCS11(pssCallBack, newParams, forceReset);
                 break;
             default:
             	throw new UnsupportedOperationException("Tipo de almacen no soportado: " + this.ksType); //$NON-NLS-1$
