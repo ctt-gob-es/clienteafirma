@@ -256,7 +256,7 @@
 		
 		function addExtraParam(extraParam) {
 			var paramsList = document.getElementById("params");
-			paramsList.value = paramsList.value + extraParam + "\n";
+			paramsList.value = paramsList.value + "\n" + extraParam;
 			document.getElementById('newParam').value = "";
 		}
 		
@@ -272,8 +272,8 @@
   </head>
 	<body>
 		<script type="text/javascript">
+			//MiniApplet.setForceWSMode(true);
 			MiniApplet.cargarMiniApplet(Constants.URL_BASE_APPLET);
-			//MiniApplet.setForceWSMode(true); 
 			//MiniApplet.cargarAppAfirma(Constants.URL_BASE_APPLET);
 			MiniApplet.setServlets(Constants.URL_BASE_SERVICES + "/afirma-signature-storage/StorageService", Constants.URL_BASE_SERVICES + "/afirma-signature-retriever/RetrieveService");
 		</script>
@@ -362,6 +362,6 @@
 	
 	<script type="text/javascript">
 		var paramsElement = document.getElementById("params");
-		paramsElement.innerHTML = "serverUrl=" + Constants.URL_BASE_SERVICES + "/afirma-server-triphase-signer/SignatureService\n";
+		paramsElement.innerHTML = "serverUrl=" + Constants.URL_BASE_SERVICES + "/afirma-server-triphase-signer/SignatureService";
 	</script>
 </html>	
