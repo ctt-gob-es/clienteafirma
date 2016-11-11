@@ -1,12 +1,10 @@
 package es.gob.afirma.signers.batch;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Properties;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -19,7 +17,6 @@ import es.gob.afirma.signers.batch.SingleSign.CallableResult;
 import es.gob.afirma.signers.batch.SingleSign.ProcessResult;
 import es.gob.afirma.signers.batch.SingleSign.ProcessResult.Result;
 import es.gob.afirma.signers.batch.SingleSignConstants.SignAlgorithm;
-import es.gob.afirma.triphase.server.SignatureService;
 
 /** Lote de firmas electr&oacute;nicas que se ejecuta en paralelo.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
@@ -44,42 +41,10 @@ public final class SignBatchConcurrent extends SignBatch {
 		super(signs, algo, soe);
 	}
 
-	private static final String CONFIG_FILE = "signbatch.properties"; //$NON-NLS-1$
-	private static final int MAX_CONCURRENT_SIGNS;
-	private static final int MAX_CONCURRENT_SIGNS_DEFAULT = 10;
-	static {
-		final Properties config = new Properties();
-		try {
-			final InputStream configIs = SignatureService.class.getClassLoader().getResourceAsStream(CONFIG_FILE);
-			if (configIs == null) {
-				throw new RuntimeException("No se encuentra el fichero de configuracion del servicio: " + CONFIG_FILE); //$NON-NLS-1$
-			}
-			config.load(configIs);
-			configIs.close();
-		}
-		catch(final Exception e) {
-			LOGGER.severe(
-				"No se ha podido cargar el fichero de configuracion (" + CONFIG_FILE + "), se usaran los valores por defecto: " + e //$NON-NLS-1$ //$NON-NLS-2$
-			);
-		}
-		int tmp = 0;
-		try {
-			tmp = Integer.parseInt(
-					config.getProperty("maxcurrentsigns", Integer.toString(MAX_CONCURRENT_SIGNS_DEFAULT)) //$NON-NLS-1$
-			);
-		}
-		catch(final Exception e) {
-			LOGGER.severe(
-				"El valor de firmas simultaneas del fichero de configuracion es invalido, se usara el valor por defecto (" + MAX_CONCURRENT_SIGNS_DEFAULT + "): " + e //$NON-NLS-1$ //$NON-NLS-2$
-			);
-		}
-		MAX_CONCURRENT_SIGNS = tmp > 0 ? tmp : MAX_CONCURRENT_SIGNS_DEFAULT;
-	}
-
 	@Override
 	public String doPreBatch(final X509Certificate[] certChain) throws BatchException {
 
-		final ExecutorService executorService = Executors.newFixedThreadPool(MAX_CONCURRENT_SIGNS);
+		final ExecutorService executorService = Executors.newFixedThreadPool(BatchConfigManager.getMaxCurrentSigns());
 		final Collection<Callable<String>> callables = new ArrayList<Callable<String>>(this.signs.size());
 
 		for (final SingleSign ss : this.signs) {
@@ -137,7 +102,7 @@ public final class SignBatchConcurrent extends SignBatch {
 			);
 		}
 
-		final ExecutorService executorService = Executors.newFixedThreadPool(MAX_CONCURRENT_SIGNS);
+		final ExecutorService executorService = Executors.newFixedThreadPool(BatchConfigManager.getMaxCurrentSigns());
 		final Collection<Callable<CallableResult>> callables = new ArrayList<Callable<CallableResult>>(this.signs.size());
 
 		for (final SingleSign ss : this.signs) {
@@ -193,9 +158,9 @@ public final class SignBatchConcurrent extends SignBatch {
 						ignoreRemaining = true;
 					}
 					else {
-						LOGGER.warning(
+						LOGGER.log(Level.WARNING,
 								"Error en una de las firmas del lote (" + tmp.getSignatureId() + "), se continua con el siguiente elemento: " + tmp.getError() //$NON-NLS-1$ //$NON-NLS-2$
-								);
+								, tmp.getError());
 					}
 				}
 				// Si todo fue bien
@@ -303,6 +268,4 @@ public final class SignBatchConcurrent extends SignBatch {
 		}
 		return null;
 	}
-
-
 }

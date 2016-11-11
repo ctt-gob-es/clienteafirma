@@ -15,7 +15,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import es.gob.afirma.signers.batch.BatchConfigManager;
 import es.gob.afirma.signers.batch.SignBatch;
+import es.gob.afirma.signers.batch.SignBatchConcurrent;
+import es.gob.afirma.signers.batch.SignBatchSerial;
 
 /** Realiza la primera fase de un proceso de firma por lote.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
@@ -105,7 +108,10 @@ public final class BatchPresigner extends HttpServlet {
 
 		final SignBatch batch;
 		try {
-			batch = BatchServerUtil.getSignBatch(xml);
+			final byte[] batchConfig = BatchServerUtil.getSignBatchConfig(xml);
+			batch = BatchConfigManager.isConcurrentMode() ?
+					new SignBatchConcurrent(batchConfig) :
+						new SignBatchSerial(batchConfig);
 		}
 		catch(final Exception e) {
 			LOGGER.severe("La definicion de lote es invalida: " + e); //$NON-NLS-1$

@@ -4,8 +4,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Properties;
 import java.util.UUID;
 import java.util.concurrent.Callable;
@@ -28,26 +26,6 @@ import es.gob.afirma.signers.batch.SingleSignConstants.SignSubOperation;
 /** Firma electr&oacute;nica &uacute;nica dentro de un lote.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
 public final class SingleSign {
-
-	private static final List<String> ALLOWED_DATASOURCES;
-	static {
-		final Properties p = new Properties();
-		try {
-			p.load(SingleSign.class.getResourceAsStream("/signbatch.properties")); //$NON-NLS-1$
-		}
-		catch(final Exception e) {
-			throw new IllegalStateException(
-				"No se ha podido cargar la configuracion con los permisos para la carga de datos: " + e //$NON-NLS-1$
-			);
-		}
-		final String sources = p.getProperty("allowedsources"); //$NON-NLS-1$
-		if (sources == null || sources.isEmpty()) {
-			throw new IllegalStateException(
-				"No se ha definido ningun permiso para la carga de datos" //$NON-NLS-1$
-			);
-		}
-		ALLOWED_DATASOURCES = Arrays.asList(sources.split(";")); //$NON-NLS-1$
-	}
 
 	private static final String PROP_ID = "SignatureId"; //$NON-NLS-1$
 
@@ -99,7 +77,7 @@ public final class SingleSign {
 				"El origen de los datos no puede ser nulo" //$NON-NLS-1$
 			);
 		}
-		for (final String allowed : ALLOWED_DATASOURCES) {
+		for (final String allowed : BatchConfigManager.getAllowedSources()) {
 			if ("base64".equalsIgnoreCase(allowed) && Base64.isBase64(dataSource)) { //$NON-NLS-1$
 				return;
 			}
