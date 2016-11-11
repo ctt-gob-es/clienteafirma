@@ -836,7 +836,9 @@ var MiniApplet = ( function ( window, undefined ) {
 		}
 
 		/**
-		 * Establece los datos que debera procesar el applet MiniApplet. 
+		 * Establece los datos que debera procesar el applet MiniApplet. Los datos se le
+		 * pasan al applet en fragmentos porque el JavaPlugin no permite recibir o enviar
+		 * mas de 4Mb de datos de una sola vez desde JavaScript.
 		 */
 		function setData(dataB64) {
 
