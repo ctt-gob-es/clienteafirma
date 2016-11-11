@@ -109,7 +109,7 @@ final class PreferencesPanel extends JPanel implements KeyListener, DisposableIn
 		);
 		this.tabbedPane.setMnemonicAt(count, KeyEvent.VK_L);
 
-		//TODO: Descomentar una vez se entregue
+//		// Pestana de configuracion de almacen
 //		count = this.tabbedPane.getTabCount();
 //		this.tabbedPane.addTab(
 //			SimpleAfirmaMessages.getString("PreferencesPanel.84"), //$NON-NLS-1$
