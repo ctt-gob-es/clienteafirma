@@ -507,8 +507,8 @@ final class CAdESCounterSigner {
              this.date != null ? this.date : new Date(), // Usamos fecha y hora actual nueva si no se nos ha indicado otra distinta
     		 includeSigningTimeAttribute,
              false,
-             null, // En contrafirma el ContentType no se pone
-             null, // En contrafirma el ContentDescription no se pone
+             PKCSObjectIdentifiers.data.toString(), // El ContentType de las contrafirmas siempre sera id-data
+			 null,	// No agregamos content-description
              ctis,
              csm,
              true,  // Es contrafirma
