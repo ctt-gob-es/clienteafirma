@@ -153,7 +153,9 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 		if (UrlHttpMethod.POST.equals(method) || UrlHttpMethod.PUT.equals(method)) {
 			final StringTokenizer st = new StringTokenizer(url, "?"); //$NON-NLS-1$
 			request = st.nextToken();
-			urlParameters = st.nextToken();
+			if (url.contains("?")) { //$NON-NLS-1$
+				urlParameters = st.nextToken();
+			}
 		}
 
 		final URL uri = new URL(request != null ? request : url);
