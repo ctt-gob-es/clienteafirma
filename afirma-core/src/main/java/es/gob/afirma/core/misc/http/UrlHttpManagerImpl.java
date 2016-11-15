@@ -204,7 +204,9 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 		}
 
 		if (urlParameters != null) {
-			conn.setRequestProperty("Content-Length", String.valueOf(urlParameters.getBytes("UTF-8").length)); //$NON-NLS-1$ //$NON-NLS-2$
+			conn.setRequestProperty(
+				"Content-Length", String.valueOf(urlParameters.getBytes("UTF-8").length) //$NON-NLS-1$ //$NON-NLS-2$
+			);
 			conn.setDoOutput(true);
 
 			final OutputStream os = conn.getOutputStream();
@@ -217,6 +219,9 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 		conn.connect();
 		final int resCode = conn.getResponseCode();
 		final String statusCode = Integer.toString(resCode);
+		LOGGER.info(
+			"Recibido: " + resCode + ": " +  conn.getResponseMessage() //$NON-NLS-1$ //$NON-NLS-2$
+		);
 		if (statusCode.startsWith("4") || statusCode.startsWith("5")) { //$NON-NLS-1$ //$NON-NLS-2$
 			if (uri.getProtocol().equals(HTTPS)) {
 				enableSslChecks();
