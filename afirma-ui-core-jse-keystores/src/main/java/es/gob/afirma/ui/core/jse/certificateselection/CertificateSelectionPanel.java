@@ -232,9 +232,11 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 		CertificateLine certLine;
 		final List<CertificateLine> certLines = new ArrayList<CertificateSelectionPanel.CertificateLine>();
 		for (final NameCertificateBean nameCert : this.certificateBeans) {
-	    	certLine = createCertLine(nameCert.getName(), nameCert.getCertificate() );
-			certLine.setPreferredSize(new Dimension(0, CERT_LIST_ELEMENT_HEIGHT));
-			certLines.add(certLine);
+			if (nameCert.getCertificate() != null) {
+				certLine = createCertLine(nameCert.getName(), nameCert.getCertificate() );
+				certLine.setPreferredSize(new Dimension(0, CERT_LIST_ELEMENT_HEIGHT));
+				certLines.add(certLine);
+			}
 		}
 
 		this.certList = new JList/*<CertificateLine>*/();

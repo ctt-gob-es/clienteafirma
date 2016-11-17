@@ -46,7 +46,8 @@ public class NameCertificateBean {
 	/** Devuelve el certificado.
 	 * @return Certificado. */
 	public X509Certificate getCertificate() {
-		return this.certificateChain[0];
+		return this.certificateChain != null && this.certificateChain.length > 0 ?
+				this.certificateChain[0] : null;
 	}
 
 	/** Devuelve la cadena de certificaci&oacute;n del certificado.

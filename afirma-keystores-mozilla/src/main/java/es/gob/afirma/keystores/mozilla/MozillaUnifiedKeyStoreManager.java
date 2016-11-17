@@ -46,6 +46,11 @@ public class MozillaUnifiedKeyStoreManager extends AggregatedKeyStoreManager {
 		);
 	}
 
+	@SuppressWarnings("static-method")
+	protected Map<String, String> getExternalStores(boolean excludeDnie) {
+		return MozillaKeyStoreUtilities.getMozillaPKCS11Modules(excludeDnie, true);
+	}
+
 	protected AOKeyStoreManager getNssKeyStoreManager() {
 		return new NssKeyStoreManager(getParentComponent(), false);
 	}
@@ -88,19 +93,18 @@ public class MozillaUnifiedKeyStoreManager extends AggregatedKeyStoreManager {
 		}
 
 		// Intentamos ahora agregar los almacenes externos preferentes ajenos a los
-		// dispositivos de seguridad configurados en Firefox
+		// dispositivos de seguridad configurados en Firefox haciendo usao del controlador Java
 
 		if (forceReset || !this.initialized) {
-			LOGGER.info(" == Agregamos los almacenes preferentes: forceReset=" + forceReset + " initialized=" + this.initialized);
 			this.preferredKsAdded = KeyStoreUtilities.addPreferredKeyStoreManagers(this, parentComponent);
 		}
 
 		// Si se pudo agregar algun almacen preferente entendemos que se desean usar y no cargamos
-		// configurados en Firefox. Si no, iniciamos los almacenes externos ignorando aquellos que
-		// ya se comprobaron por ser almacenes preferentes (DNIe y CERES inicialmente) y anadiendo
-		// modulos conocidos si se encuentran en el sistema.
+		// configurados en Firefox. Si no, iniciamos los almacenes externos. Indicamos que no queremos
+		// ignorar los almacenes externos de DNIe y CERES ya que es posible que el motivo por el que no
+		// se cargaron como almacenes preferentes sea el controlador Java fallo al intentar cargarlos
 		if (!this.preferredKsAdded) {
-			final Map<String, String> externalStores = getExternalStores();
+			final Map<String, String> externalStores = getExternalStores(false);
 
 			if (externalStores.size() > 0) {
 				final StringBuilder logStr = new StringBuilder(

@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
+import java.security.cert.X509Certificate;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -120,10 +121,16 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
     	final NameCertificateBean[] namedCerts =
     			new NameCertificateBean[aliassesByFriendlyName.size()];
     	for (final String certAlias : aliassesByFriendlyName.keySet().toArray(new String[aliassesByFriendlyName.size()])) {
-    		namedCerts[i++] = new NameCertificateBean(
-    				certAlias,
-    				aliassesByFriendlyName.get(certAlias),
-    				this.ksm.getCertificateChain(certAlias));
+    		final X509Certificate[] certChain = this.ksm.getCertificateChain(certAlias);
+    		if (certChain != null) {
+	    		namedCerts[i++] = new NameCertificateBean(
+	    				certAlias,
+	    				aliassesByFriendlyName.get(certAlias),
+	    				certChain);
+    		}
+    		else {
+    			LOGGER.warning("Se ha encontrado un certificado nulo en el almacen");
+    		}
     	}
 
 		return namedCerts;
@@ -198,7 +205,7 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 	@Override
 	public String show() throws AOCertificatesNotFoundException {
 
-		final NameCertificateBean[] namedCertificates = this.getNameCertificates();
+		final NameCertificateBean[] namedCertificates = getNameCertificates();
 
 		// No mostramos el dialogo de seleccion si se ha indicado que se autoseleccione
 		// un certificado en caso de ser el unico
