@@ -1382,7 +1382,8 @@ var MiniApplet = ( function ( window, undefined ) {
 				
 				if (!connection) {
 					// Mandamos un echo con - por lo que las variables de control se resetearan
-					// Se anade EOF para que cuando el socket SSL lea la peticion del buffer sepa que ha llegado al final y no se quede en espera
+					// Se anade EOF para que cuando el socket SSL lea la peticion del buffer sepa
+					// que ha llegado al final y no se quede en espera
 					httpRequest.send("echo=-idsession=" + idSession + "@EOF");
 					//console.log("probamos puerto " +currentPort)
 				}
@@ -1395,60 +1396,63 @@ var MiniApplet = ( function ( window, undefined ) {
 			*/
 			function executeOperationByService (url) {
 
-				var httpRequest = getHttpRequest();
-				httpRequest.open("POST", urlHttpRequest, true);
-				httpRequest.setRequestHeader("Content-type","application/x-www-form-urlencoded");
-				// Como internet explorer añade basura hacemos las peticiones muy pequeñas para que funcionen correctamente.
+				// Como internet explorer anade basura reducimos drasticamente el 
+				// tamano maximo de las peticiones para que funcione correctamente
 				if (isInternetExplorer()){
 					URL_MAX_SIZE = 12000;
 				}
-				// Si el envio se debe fragmentar, llamamos a una función que se encarga de mandar la peticion recursivamente
+				// Si el envio se debe fragmentar, llamamos a una función que se encarga
+				// de mandar la peticion recursivamente
 				if (url.length > URL_MAX_SIZE) {
 					executeOperationRecursive(url, 1, Math.ceil(url.length/URL_MAX_SIZE));
+					return;
 				}
+				
+				var httpRequest = getHttpRequest();
+				httpRequest.open("POST", urlHttpRequest, true);
+				httpRequest.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+				
 				// El envio no se fragmenta
-				else {
-					httpRequest.onreadystatechange = function() {
-						if (httpRequest.status == 404) {
-							errorServiceResponseFunction("java.lang.IOException", httpRequest.responseText);
+				httpRequest.onreadystatechange = function() {
+					if (httpRequest.status == 404) {
+						errorServiceResponseFunction("java.lang.IOException", httpRequest.responseText);
+					}
+					// Las operaciones que no requieren respuesta, llaman directamente a la funcion de exito 
+					if (isSaveOperation) {
+						if (httpRequest.readyState == 4 && Base64.decode(httpRequest.responseText) != "") {
+							successServiceResponseFunction(Base64.decode(httpRequest.responseText));
 						}
-						// Las operaciones que no requieren respuesta, llaman directamente a la funcion de exito 
-						if (isSaveOperation) {
-							if (httpRequest.readyState == 4 && Base64.decode(httpRequest.responseText) != "") {
-								successServiceResponseFunction(Base64.decode(httpRequest.responseText));
+						return;
+					}
+					// El resto de operaciones deben componer el resultado
+					else {
+						if (httpRequest.readyState == 4 && httpRequest.status == 200 && httpRequest.responseText != "") {
+							if (Base64.decode(httpRequest.responseText) == "MEMORY_ERROR"){
+								errorServiceResponseFunction("java.lang.OutOfMemoryError", "Problema de memoria en servidor");
+								return;
 							}
-							return;
+							// Juntamos los fragmentos
+							totalResponseRequest = "";
+							addFragmentRequest (1, Base64.decode(httpRequest.responseText, true));
 						}
-						// El resto de operaciones deben componer el resultado
-						else {
-							if (httpRequest.readyState == 4 && httpRequest.status == 200 && httpRequest.responseText != "") {
-								if (Base64.decode(httpRequest.responseText) == "MEMORY_ERROR"){
-									errorServiceResponseFunction("java.lang.OutOfMemoryError", "Problema de memoria en servidor");
-									return;
-								}
-								// Juntamos los fragmentos
-								totalResponseRequest = "";
-								addFragmentRequest (1, Base64.decode(httpRequest.responseText, true));
-							}
-							// Volvemos a mandar la peticion si no manda texto en la respuesta y la peticion esta en estado ready
-							else if (httpRequest.responseText == "" && httpRequest.status == 0 && httpRequest.readyState == 0) {
-								setTimeout(executeOperationByService, WAITING_TIME, url);
-							}
+						// Volvemos a mandar la peticion si no manda texto en la respuesta y la peticion esta en estado ready
+						else if (httpRequest.responseText == "" && httpRequest.status == 0 && httpRequest.readyState == 0) {
+							setTimeout(executeOperationByService, WAITING_TIME, url);
 						}
 					}
-					httpRequest.onerror = function(e) {
-						// status error 0 es que no se ha podido comunicar con la aplicacion
-						if (e.target.status == 0) {
-							errorServiceResponseFunction("java.lang.IOException", "Se ha perdido la conexión con la aplicación @firma "+e.target.statusText);
-						}
-						// error desconocido 
-						else {
-							errorServiceResponseFunction("java.lang.IOException", "Ocurrio un error de red en la llamada al servicio de firma "+e.target.statusText);
-						}
-					}
-					// se anade EOF para que cuando el socket SSL lea la peticion del buffer sepa que ha llegado al final y no se quede en espera
-					httpRequest.send("cmd=" + Base64.encode(url, true) + "idsession=" + idSession + "@EOF");
 				}
+				httpRequest.onerror = function(e) {
+					// status error 0 es que no se ha podido comunicar con la aplicacion
+					if (e.target.status == 0) {
+						errorServiceResponseFunction("java.lang.IOException", "Se ha perdido la conexión con la aplicación @firma "+e.target.statusText);
+					}
+					// error desconocido 
+					else {
+						errorServiceResponseFunction("java.lang.IOException", "Ocurrio un error de red en la llamada al servicio de firma "+e.target.statusText);
+					}
+				}
+				// se anade EOF para que cuando el socket SSL lea la peticion del buffer sepa que ha llegado al final y no se quede en espera
+				httpRequest.send("cmd=" + Base64.encode(url, true) + "idsession=" + idSession + "@EOF");
 			}
 			
 			/**
