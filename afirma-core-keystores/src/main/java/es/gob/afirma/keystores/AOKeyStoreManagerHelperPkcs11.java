@@ -83,6 +83,7 @@ final class AOKeyStoreManagerHelperPkcs11 {
         final String p11ProviderName = new File(p11lib).getName().replace('.', '_').replace(' ', '_');
         Provider p11Provider = Security.getProvider("SunPKCS11-" + p11ProviderName); //$NON-NLS-1$
 
+
         if (p11Provider != null && (forceReset || Boolean.getBoolean("es.gob.afirma.keystores.DoNotReusePkcs11Provider"))) { //$NON-NLS-1$
         	LOGGER.info("Se retira el proveedor " + p11Provider); //$NON-NLS-1$
         	Security.removeProvider(p11Provider.getName());

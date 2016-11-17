@@ -277,7 +277,7 @@ public final class KeyStoreUtilities {
 		return originalPath;
 	}
 
-	/** A&ntilde;ade los almacenes preferentes (por ahora DNIe 100% Java y CERES 100% Java a un almac&eacute;n agredado.
+	/** A&ntilde;ade los almacenes preferentes (por ahora DNIe 100% Java y CERES 100% Java) a un almac&eacute;n agredado.
 	 * @param aksm Almac&eacute;n agredado al que se desea a&ntilde;adir los almacenes preferentes.
 	 * @param parentComponent Componente padre para los di&aacute;logos de los almacenes preferentes
 	 *                        (solicitud de PIN, confirmaci&oacute;n de firma, etc.).

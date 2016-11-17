@@ -107,7 +107,7 @@ public final class AOKeyStoreManagerFactory {
         	final AggregatedKeyStoreManager aksm = new AggregatedKeyStoreManager(getWindowsMyCapiKeyStoreManager(forceReset));
         	final boolean ksPresent = KeyStoreUtilities.addPreferredKeyStoreManagers(aksm, parentComponent);
 
-			// Al comprobar si estaba disponibles alguno de los almacenes preferentes (tarjetas)
+			// Al comprobar si estaba disponible alguno de los almacenes preferentes (tarjetas)
 			// se habra perdido la conexion con cualquier otra tarjeta configurada en el almacen
 			// de Windows. Asi que, cuando no se encuentran los preferentes, se reinicia el almacen
 			// para recuperar la conexion con cualquier tarjeta conectada y que posiblemente desee usarse
