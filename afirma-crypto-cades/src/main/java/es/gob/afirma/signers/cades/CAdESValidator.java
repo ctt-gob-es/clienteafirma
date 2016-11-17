@@ -86,7 +86,7 @@ public final class CAdESValidator {
 
         }
         catch (final Exception ex) {
-        	LOGGER.info("Los datos proporcionados no son de tipo Data: " + ex); //$NON-NLS-1$
+        	LOGGER.fine("Los datos proporcionados no son de tipo Data: " + ex); //$NON-NLS-1$
             return false;
         }
 
@@ -108,7 +108,7 @@ public final class CAdESValidator {
             // Elementos que contienen los elementos OID Data
             final ASN1ObjectIdentifier doi = (ASN1ObjectIdentifier) e.nextElement();
             if (!doi.equals(PKCSObjectIdentifiers.signedData)) {
-            	LOGGER.info(
+            	LOGGER.fine(
     				"Los datos proporcionados no son de tipo SignedData de CAdES (no esta declarado el OID de SignedData)" //$NON-NLS-1$
 				);
         		return false;
@@ -124,7 +124,7 @@ public final class CAdESValidator {
             if (enforceCAdES) {
 	            for (int i = 0; i < signerInfosSd.size(); i++) {
 	            	if (!verifySignerInfo(SignerInfo.getInstance(signerInfosSd.getObjectAt(i)))) {
-	            		LOGGER.info(
+	            		LOGGER.fine(
 	        				"Los datos proporcionados no son de tipo SignedData de CAdES (al menos un SignerInfo no se ha declarado de tipo CAdES)" //$NON-NLS-1$
 	    				);
 	            		return false;
@@ -134,7 +134,7 @@ public final class CAdESValidator {
 
         }
         catch (final Exception ex) {
-        	LOGGER.info("Los datos proporcionados no son de tipo SignedData de CAdES: " + ex); //$NON-NLS-1$
+        	LOGGER.fine("Los datos proporcionados no son de tipo SignedData de CAdES: " + ex); //$NON-NLS-1$
             return false;
         }
 
@@ -195,7 +195,7 @@ public final class CAdESValidator {
 
         }
         catch (final Exception ex) {
-        	LOGGER.info("Los datos proporcionados no son de tipo DigestedData: " + ex); //$NON-NLS-1$
+        	LOGGER.fine("Los datos proporcionados no son de tipo DigestedData: " + ex); //$NON-NLS-1$
             return false;
         }
 
@@ -238,7 +238,7 @@ public final class CAdESValidator {
 
         }
         catch (final Exception ex) {
-        	LOGGER.info("Los datos proporcionados no son de tipo EncryptedData: " + ex); //$NON-NLS-1$
+        	LOGGER.fine("Los datos proporcionados no son de tipo EncryptedData: " + ex); //$NON-NLS-1$
             return false;
         }
 
@@ -271,7 +271,7 @@ public final class CAdESValidator {
             EnvelopedData.getInstance(doj.getObject());
         }
         catch (final Exception ex) {
-        	LOGGER.info("Los datos proporcionados no son de tipo EnvelopedData: " + ex); //$NON-NLS-1$
+        	LOGGER.fine("Los datos proporcionados no son de tipo EnvelopedData: " + ex); //$NON-NLS-1$
             return false;
         }
 
@@ -303,7 +303,7 @@ public final class CAdESValidator {
         	sd = new SignedAndEnvelopedData(datos);
         }
         catch(final Exception ex) {
-        	LOGGER.info("Los datos proporcionados no son de tipo SignedAndEnvelopedData: " + ex); //$NON-NLS-1$
+        	LOGGER.fine("Los datos proporcionados no son de tipo SignedAndEnvelopedData: " + ex); //$NON-NLS-1$
         	return false;
         }
 
@@ -363,7 +363,7 @@ public final class CAdESValidator {
         else if (type.equals(AOSignConstants.CMS_CONTENTTYPE_SIGNEDANDENVELOPEDDATA)) {
 			return CAdESValidator.isCAdESSignedAndEnvelopedData(signData);
         }
-        LOGGER.warning("Tipo de contenido CADES no reconocido"); //$NON-NLS-1$
+        LOGGER.fine("Tipo de contenido CADES no reconocido"); //$NON-NLS-1$
         return false;
     }
 
@@ -417,7 +417,4 @@ public final class CAdESValidator {
         }
         return valido;
     }
-
-
-
 }
