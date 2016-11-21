@@ -1875,7 +1875,11 @@ var MiniApplet = ( function ( window, undefined ) {
 			
 			/**
 			 * Inicia el proceso de carga de un fichero.
-			 * Implementada en el applet Java de firma
+			 * Implementada también en el applet Java de firma
+			 * @param title Título de la ventana de dialogo
+			 * @param extensions Extensiones permitidas
+			 * @param description Descripción del tipo de archivo a cargar
+			 * @param filePath Ruta del archivo por defecto
 			 * @param successCallbackFunction Función de callback tras éxito
 			 * @param errorCallbackFunction Función de callback tras error
 			 */
@@ -1887,7 +1891,11 @@ var MiniApplet = ( function ( window, undefined ) {
 			
 			/**
 			 * Inicia el proceso de carga de uno o varios ficheros.
-			 * Implementada en el applet Java de firma
+			 * Implementada también en el applet Java de firma
+			 * @param title Título de la ventana de dialogo
+			 * @param extensions Extensiones permitidas
+			 * @param description Descripción del tipo de archivo a cargar
+			 * @param filePath Ruta del archivo por defecto
 			 * @param successCallbackFunction Función de callback tras éxito
 			 * @param errorCallbackFunction Función de callback tras error
 			 */
@@ -1898,9 +1906,13 @@ var MiniApplet = ( function ( window, undefined ) {
 			}	
 			
 			/**
-			 * Realiza una operacion de carga de fichero comunicandose con la
+			 * Realiza una operacion de carga de fichero comunicándose con la
 			 * aplicacion nativa por socket.
 			 * @param loadId Identificador de la operacion a realizar (load).
+			 * @param title Título de la ventana de dialogo
+			 * @param extensions Extensiones permitidas
+			 * @param description Descripción del tipo de archivo a cargar
+			 * @param filePath Ruta del archivo por defecto
 			 * @param multiload true si permite la selección de varios ficheros,
 			 * false si sólo se permite seleccionar un fichero.
 			 */
