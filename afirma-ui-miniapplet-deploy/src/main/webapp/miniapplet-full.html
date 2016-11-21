@@ -230,43 +230,112 @@
 		 */
 		function browse(title, dataField, textDiv) {
 			try {
-				var filenameDataB64 = MiniApplet.getFileNameContentBase64(title, null, null, null);
-				if (filenameDataB64 == null) {
-					return;
-				}
-
-				var dataB64;
-				var separatorIdx = filenameDataB64.indexOf("|");
-				if ((separatorIdx + 1) < filenameDataB64.length) {
-					textDiv.innerHTML = filenameDataB64.substring(0, separatorIdx);
-					dataField.value = filenameDataB64.substring(separatorIdx + 1);
-				} else {
-					// El fichero no contenia datos
-					return;
-				}
+				
+				MiniApplet.getFileNameContentBase64(title, "xsig,pdf,xml,doc", "Fichero para prueba de función load", "C:%5CUsers%5Cjose.rodriguez.gomez%5CDocuments", showLoadResultCallback, showErrorCallback);
+				
 			} catch(e) {
 				showLog("Type: " + MiniApplet.getErrorType() + "\nMessage: " + MiniApplet.getErrorMessage());
 			}
 		}
 		
+		/**
+		 * Funcion para la carga de un fichero. Almacena el contenido del fichero en un campo oculto y muestra su nombre.
+		 * LA CARGA INDEPENDIENTE DE FICHEROS DEBE EVITARSE EN LA MEDIDA DE LO POSIBLE. Si deseas firmar, cofirmar o contrafirmar
+		 * un fichero, llama al metodo correspondiente (sign(), coSign() o counterSign()) sin indicar los datos.
+		 * El uso del metodo de carga no sera compatible con el Cliente movil.
+		 */
+		function multiBrowse(title, dataField, textDiv) {
+			try {
+								
+				MiniApplet.getMultiFileNameContentBase64(title, "xsig,pdf,xml,doc", "Fichero para prueba de función load", "C:%5CUsers%5Cjose.rodriguez.gomez%5CDocuments", showLoadResultCallback, showErrorCallback);
+				
+			} catch(e) {
+				showLog("Type: " + MiniApplet.getErrorType() + "\nMessage: " + MiniApplet.getErrorMessage());
+			}
+		}
+		
+		function showLoadResultCallback_(dataB64, filename) {
+			
+			showLog("Carga de fichero OK");
+			
+			if (dataB64 == null || filename == null) {
+				return;
+			}
+					
+			dataFilename.innerHTML = filename;
+			data.value = dataB64;
+
+		}
+		
+		function showLoadResultCallback(fileNamesDataBase64) {
+			
+			var fileName = "";
+			var dataB64 = "";
+			
+			if (fileNamesDataBase64.length == 1) {
+								
+				var sepPos = fileNamesDataBase64[0].indexOf("|");
+				var fileNameDataBase64 = fileNamesDataBase64[0];
+				
+				if (sepPos == -1) {
+					fileName = Base64.decode(fileNameDataBase64, true);
+				}
+				else {
+					fileName = fileNameDataBase64.substring(0, sepPos);
+					dataB64 = fileNameDataBase64.substring(sepPos + 1).replace(/\-/g, "+").replace(/\_/g, "/");
+				}
+				
+				dataFilename.innerHTML = fileName;
+				data.value = dataB64;
+				
+			} else if (fileNamesDataBase64.length > 1) {
+							
+				for (i = 0; i < fileNamesDataBase64.length; i++) {
+					
+					var sepPos = fileNamesDataBase64[i].indexOf("|");
+				
+					if (sepPos == -1) {
+						filename += Base64.decode(fileNamesDataBase64[i], true);
+					}
+					else {
+						fileName += fileNamesDataBase64[i].substring(0, sepPos);
+						//dataB64 = fileNameDataBase64[i].substring(sepPos + 1).replace(/\-/g, "+").replace(/\_/g, "/");
+					}
+					
+					if (i < fileNamesDataBase64.length - 1) {
+						fileName += ", ";
+					}
+				
+				}
+				
+				multiFileNames.innerHTML = fileName;
+				data.value = dataB64;
+				
+			}
+			
+		}
+
 		function cleanDataField(dataField, textDiv) {
+			
 			textDiv.innerHTML = "";
 			dataField.value = null;
 		}
-		
+
 		function addExtraParam(extraParam) {
 			var paramsList = document.getElementById("params");
 			paramsList.value = paramsList.value + "\n" + extraParam;
 			document.getElementById('newParam').value = "";
 		}
-		
+
 		function cleanExtraParams() {
 			document.getElementById("params").value = "";
 			document.getElementById('newParam').value = "";
 		}
-		
+
 		function showLog(newLog) {
-			document.getElementById('console').value = document.getElementById('console').value + "\n" + newLog;
+			document.getElementById('console').value = document
+					.getElementById('console').value
+					+ "\n" + newLog;
 		}
 	</script>
   </head>
@@ -282,13 +351,18 @@
 		<div>
 		 <input id="data" type="hidden">
 		 <div><span>Fichero de datos: </span><span id="dataFilename"></span></div>
-		 <input type="button" value="Examinar" onclick="browse('Cargar datos a firmar', document.getElementById('data'), document.getElementById('dataFilename'));">&nbsp;
+		 <input type="button" value="Examinar" onclick="browse('Cargar datos a firmar JJRG', document.getElementById('data'), document.getElementById('dataFilename'));">&nbsp;
 		 <input type="button" value="Limpiar" onclick="cleanDataField(document.getElementById('data'), document.getElementById('dataFilename'));"><br/><br/>
 
 		 <input id="signature" type="hidden">
 		 <div><span>Fichero de firma: </span><span id="signatureFilename"></span></div>
 		 <input type="button" value="Examinar" onclick="browse('Cargar datos a firmar', document.getElementById('signature'), document.getElementById('signatureFilename'));">&nbsp;
-		 <input type="button" value="Limpiar" onclick="cleanDataField(document.getElementById('signature'), document.getElementById('signatureFilename'));">
+		 <input type="button" value="Limpiar" onclick="cleanDataField(document.getElementById('signature'), document.getElementById('signatureFilename'));"><br/><br/>
+		 
+		 <input id="datos" type="hidden">
+		 <div><span>Ficheros cargados: </span><span id="multiFileNames"></span></div>
+		 <input type="button" value="Examinar" onclick="multiBrowse('Cargar datos a firmar', document.getElementById('signature'), document.getElementById('signatureFilename'));">&nbsp;
+		 <input type="button" value="Limpiar" onclick="cleanDataField(document.getElementById('datos'), document.getElementById('multiFileNames'));">
 		</div>
 		</fieldset>
 		<br/>

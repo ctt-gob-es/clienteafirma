@@ -674,15 +674,62 @@ var MiniApplet = ( function ( window, undefined ) {
 				clienteFirma.saveDataToFile(dataB64, title, fileName, extension, description, successCallback, errorCallback);
 			}
 		}
-
-		var getFileNameContentBase64 = function (title, extensions, description, filePath) {
+		
+		/**
+		 * 
+		 */
+		var getFileNameContentBase64 = function (title, extensions, description, filePath, successCallback, errorCallback) {
 			forceLoad();
-			return buildData(clienteFirma.getFileNameContentBase64(title, extensions, description, filePath));
+			
+			if (clientType == TYPE_APPLET) {
+				try {
+					
+					var filenameDataBase64Pair = buildData(clienteFirma.getFileNameContentBase64(title, extensions, description, filePath));
+					var sepPos = filenameDataBase64Pair.indexOf('|');
+					if (successCallback == undefined || successCallback == null) {
+						return filenameDataBase64Pair.substring(sepPos + 1);
+					}
+					var singlePair = [filenameDataBase64Pair];
+					successCallback(singlePair);
+				} catch(e) {
+					if (errorCallback == undefined || errorCallback == null) {
+						throw e;
+					}
+					errorCallback(clienteFirma.getErrorType(), clienteFirma.getErrorMessage());
+				}
+			}
+			else {
+				clienteFirma.getFileNameContentBase64(title, extensions, description, filePath, successCallback, errorCallback)
+			}
+			
 		}
 
-		var getMultiFileNameContentBase64 = function (title, extensions, description, filePath) {
+		/**
+		 * 
+		 */
+		var getMultiFileNameContentBase64 = function (title, extensions, description, filePath, successCallback, errorCallback) {
 			forceLoad();
-			return buildData(clienteFirma.getMultiFileNameContentBase64(title, extensions, description, filePath));
+			
+			if (clientType == TYPE_APPLET) {
+				
+				try {
+					
+					var filenameDataBase64Pairs = buildData(clienteFirma.getMultiFileNameContentBase64(title, extensions, description, filePath));
+					
+					//var filenameDataBase64Array = filenameDataBase64Pairs.split(":");
+					
+					successCallback(filenameDataBase64Pairs)
+					
+				} catch(e) {
+					if (errorCallback == undefined || errorCallback == null) {
+						throw e;
+					}
+					errorCallback(clienteFirma.getErrorType(), clienteFirma.getErrorMessage());
+				}
+			}
+			else {
+				clienteFirma.getMultiFileNameContentBase64(title, extensions, description, filePath, successCallback, errorCallback)
+			}
 		}
 
 		var echo = function () {
@@ -1156,7 +1203,7 @@ var MiniApplet = ( function ( window, undefined ) {
 
 				return data;
 			}
-
+			
 			/**
 			 * Construye una URL para la invocaci&oacute;n del Cliente @firma nativo.
 			 * params: Par\u00E1metros para la configuraci\u00F3n de la operaci\u00F3n.
@@ -1311,6 +1358,21 @@ var MiniApplet = ( function ( window, undefined ) {
 				return data;
 			}
 			
+			/**
+			 * Genera el objeto con los datos de la transaccion para la operacion
+			 * de carga/multicarga
+			 */
+			function generateDataToLoad(loadId, title, extensions, description, filePath, multiload) {
+				var data = new Object();
+				data.op = generateDataKeyValue("op", loadId);
+				data.title = generateDataKeyValue("title", title);
+				data.extensions = generateDataKeyValue("extensions", extensions);
+				data.description = generateDataKeyValue("description", description);
+				data.filePath = generateDataKeyValue("filePath", filePath);
+				data.multiload = generateDataKeyValue("multiload", multiload);
+				return data;
+			}
+			
 			function executeEchoByServiceByPort (ports, url) {
 				connection = false;
 				var semaphore = new Object();
@@ -1382,8 +1444,7 @@ var MiniApplet = ( function ( window, undefined ) {
 				
 				if (!connection) {
 					// Mandamos un echo con - por lo que las variables de control se resetearan
-					// Se anade EOF para que cuando el socket SSL lea la peticion del buffer sepa
-					// que ha llegado al final y no se quede en espera
+					// Se anade EOF para que cuando el socket SSL lea la peticion del buffer sepa que ha llegado al final y no se quede en espera
 					httpRequest.send("echo=-idsession=" + idSession + "@EOF");
 					//console.log("probamos puerto " +currentPort)
 				}
@@ -1396,63 +1457,60 @@ var MiniApplet = ( function ( window, undefined ) {
 			*/
 			function executeOperationByService (url) {
 
-				// Como internet explorer anade basura reducimos drasticamente el 
-				// tamano maximo de las peticiones para que funcione correctamente
-				if (isInternetExplorer()){
-					URL_MAX_SIZE = 12000;
-				}
-				// Si el envio se debe fragmentar, llamamos a una función que se encarga
-				// de mandar la peticion recursivamente
-				if (url.length > URL_MAX_SIZE) {
-					executeOperationRecursive(url, 1, Math.ceil(url.length/URL_MAX_SIZE));
-					return;
-				}
-				
 				var httpRequest = getHttpRequest();
 				httpRequest.open("POST", urlHttpRequest, true);
 				httpRequest.setRequestHeader("Content-type","application/x-www-form-urlencoded");
-				
+				// Como internet explorer añade basura hacemos las peticiones muy pequeñas para que funcionen correctamente.
+				if (isInternetExplorer()){
+					URL_MAX_SIZE = 12000;
+				}
+				// Si el envio se debe fragmentar, llamamos a una función que se encarga de mandar la peticion recursivamente
+				if (url.length > URL_MAX_SIZE) {
+					executeOperationRecursive(url, 1, Math.ceil(url.length/URL_MAX_SIZE));
+				}
 				// El envio no se fragmenta
-				httpRequest.onreadystatechange = function() {
-					if (httpRequest.status == 404) {
-						errorServiceResponseFunction("java.lang.IOException", httpRequest.responseText);
-					}
-					// Las operaciones que no requieren respuesta, llaman directamente a la funcion de exito 
-					if (isSaveOperation) {
-						if (httpRequest.readyState == 4 && Base64.decode(httpRequest.responseText) != "") {
-							successServiceResponseFunction(Base64.decode(httpRequest.responseText));
+				else {
+					httpRequest.onreadystatechange = function() {
+						if (httpRequest.status == 404) {
+							errorServiceResponseFunction("java.lang.IOException", httpRequest.responseText);
 						}
-						return;
-					}
-					// El resto de operaciones deben componer el resultado
-					else {
-						if (httpRequest.readyState == 4 && httpRequest.status == 200 && httpRequest.responseText != "") {
-							if (Base64.decode(httpRequest.responseText) == "MEMORY_ERROR"){
-								errorServiceResponseFunction("java.lang.OutOfMemoryError", "Problema de memoria en servidor");
-								return;
+						// Las operaciones que no requieren respuesta, llaman directamente a la funcion de exito 
+						if (isSaveOperation) {
+							if (httpRequest.readyState == 4 && Base64.decode(httpRequest.responseText) != "") {
+								successServiceResponseFunction(Base64.decode(httpRequest.responseText));
 							}
-							// Juntamos los fragmentos
-							totalResponseRequest = "";
-							addFragmentRequest (1, Base64.decode(httpRequest.responseText, true));
+							return;
 						}
-						// Volvemos a mandar la peticion si no manda texto en la respuesta y la peticion esta en estado ready
-						else if (httpRequest.responseText == "" && httpRequest.status == 0 && httpRequest.readyState == 0) {
-							setTimeout(executeOperationByService, WAITING_TIME, url);
+						// El resto de operaciones deben componer el resultado
+						else {
+							if (httpRequest.readyState == 4 && httpRequest.status == 200 && httpRequest.responseText != "") {
+								if (Base64.decode(httpRequest.responseText) == "MEMORY_ERROR"){
+									errorServiceResponseFunction("java.lang.OutOfMemoryError", "Problema de memoria en servidor");
+									return;
+								}
+								// Juntamos los fragmentos
+								totalResponseRequest = "";
+								addFragmentRequest (1, Base64.decode(httpRequest.responseText, true));
+							}
+							// Volvemos a mandar la peticion si no manda texto en la respuesta y la peticion esta en estado ready
+							else if (httpRequest.responseText == "" && httpRequest.status == 0 && httpRequest.readyState == 0) {
+								setTimeout(executeOperationByService, WAITING_TIME, url);
+							}
 						}
 					}
-				}
-				httpRequest.onerror = function(e) {
-					// status error 0 es que no se ha podido comunicar con la aplicacion
-					if (e.target.status == 0) {
-						errorServiceResponseFunction("java.lang.IOException", "Se ha perdido la conexión con la aplicación @firma "+e.target.statusText);
+					httpRequest.onerror = function(e) {
+						// status error 0 es que no se ha podido comunicar con la aplicacion
+						if (e.target.status == 0) {
+							errorServiceResponseFunction("java.lang.IOException", "Se ha perdido la conexión con la aplicación @firma "+e.target.statusText);
+						}
+						// error desconocido 
+						else {
+							errorServiceResponseFunction("java.lang.IOException", "Ocurrio un error de red en la llamada al servicio de firma "+e.target.statusText);
+						}
 					}
-					// error desconocido 
-					else {
-						errorServiceResponseFunction("java.lang.IOException", "Ocurrio un error de red en la llamada al servicio de firma "+e.target.statusText);
-					}
+					// se anade EOF para que cuando el socket SSL lea la peticion del buffer sepa que ha llegado al final y no se quede en espera
+					httpRequest.send("cmd=" + Base64.encode(url, true) + "idsession=" + idSession + "@EOF");
 				}
-				// se anade EOF para que cuando el socket SSL lea la peticion del buffer sepa que ha llegado al final y no se quede en espera
-				httpRequest.send("cmd=" + Base64.encode(url, true) + "idsession=" + idSession + "@EOF");
 			}
 			
 			/**
@@ -1696,7 +1754,23 @@ var MiniApplet = ( function ( window, undefined ) {
 					}
 					return;
 				}
-
+				
+				// Compruebo si se trata de una operación de carga/multicarga (load).
+				// El separador ":"  distingue los pares "filename-1|dataBase64-1:filename-2|dataBase64-2...", uno por cada archivo cargado.
+				// Devolveremos un array en el que cada posición será uno de estos pares: "filename-n|dataBase64-n".
+				// La función de callback realizará el tratamiento deseado,
+				// pudiendo obtener cada dato del par teniendo en cuenta el
+				// separador "|"
+				if (data.indexOf(":")) {
+					
+					var fileNamesDataBase64 = data.split(":");
+					
+					successCallback(fileNamesDataBase64);
+					
+					return;
+					
+				}
+								
 				// Interpretamos el resultado como un base 64 y el certificado y los datos cifrados
 				var signature;
 				var certificate = null;
@@ -1798,24 +1872,46 @@ var MiniApplet = ( function ( window, undefined ) {
 			function getTextFromBase64 (base64Text, charset) {
 				return base64Text != null ? Base64.decode(base64Text) : null;
 			}
-
 			
 			/**
-			 * Carga de un fichero. Operacion no soportada. 
-			 * Implementada en el applet Java de firma.
+			 * Inicia el proceso de carga de un fichero.
+			 * Implementada en el applet Java de firma
+			 * @param successCallbackFunction Función de callback tras éxito
+			 * @param errorCallbackFunction Función de callback tras error
 			 */
-			function getFileNameContentBase64 (title, extensions, description) {
-				throwException(UnsupportedOperationException, "La operacion de carga de ficheros no esta soportada");
+			function getFileNameContentBase64 (title, extensions, description, filePath, successCallbackFunction, errorCallbackFunction) {
+				successCallback = successCallbackFunction;
+				errorCallback = errorCallbackFunction;
+				getLoadContentBase64ByService("load", title, extensions, description, filePath, false);
 			}
-
+			
 			/**
-			 * Carga de multiples ficheros. Operacion no soportada.
-			 * Implementada en el applet Java de firma.
+			 * Inicia el proceso de carga de uno o varios ficheros.
+			 * Implementada en el applet Java de firma
+			 * @param successCallbackFunction Función de callback tras éxito
+			 * @param errorCallbackFunction Función de callback tras error
 			 */
-			function getMultiFileNameContentBase64 (title, extensions, description) {
-				throwException(UnsupportedOperationException, "La operacion de carga de multiples ficheros no esta soportada");
+			function getMultiFileNameContentBase64 (title, extensions, description, filePath, successCallbackFunction, errorCallbackFunction) {
+				successCallback = successCallbackFunction;
+				errorCallback = errorCallbackFunction;
+				getLoadContentBase64ByService("load", title, extensions, description, filePath, true);
+			}	
+			
+			/**
+			 * Realiza una operacion de carga de fichero comunicandose con la
+			 * aplicacion nativa por socket.
+			 * @param loadId Identificador de la operacion a realizar (load).
+			 * @param multiload true si permite la selección de varios ficheros,
+			 * false si sólo se permite seleccionar un fichero.
+			 */
+			function getLoadContentBase64ByService (loadId, title, extensions, description, filePath, multiload) {
+				
+				var data = generateDataToLoad(loadId, title, extensions, description, filePath, multiload);
+				
+				execAppIntent(buildUrl(data));
 			}
-
+								
+			
 			/** 
 			 * Funcion para la comprobacion de existencia del objeto. No hace nada.
 			 * Implementada en el applet Java de firma.
