@@ -35,6 +35,8 @@ var MiniApplet = ( function ( window, undefined ) {
 		var severeTimeDelay = false;
 
 		var selectedLocale = null;
+		
+		var stickySignatore = false;
 
 		var LOCALIZED_STRINGS = new Array();
 		LOCALIZED_STRINGS["es_ES"] = {
@@ -504,6 +506,9 @@ var MiniApplet = ( function ( window, undefined ) {
 			forceLoad();
 			
 			clienteFirma.setKeyStore(ksType != null ? ksType : defaultKeyStore);
+			
+			// Al haber cambiado el almacén, no tiene sentido que la variable sticky esté a true
+			setStickySignatore(false);
 		}
 		
 		var selectCertificate = function (params, successCallback, errorCallback) {
@@ -737,9 +742,29 @@ var MiniApplet = ( function ( window, undefined ) {
 			return clienteFirma.echo();
 		}
 
-		var setStickySignatory = function (sticky) {
+		var setStickySignatory = function (sticky, successCallback, errorCallback) {
 			forceLoad();
-			return clienteFirma.setStickySignatory(sticky);
+			
+			if (clientType == TYPE_APPLET) {
+				
+				try {
+					
+					var result = buildData(clienteFirma.setStickySignatory(sticky));
+														
+					successCallback(result)
+					
+				} catch(e) {
+					if (errorCallback == undefined || errorCallback == null) {
+						throw e;
+					}
+					errorCallback(clienteFirma.getErrorType(), clienteFirma.getErrorMessage());
+				}
+			}
+			else {
+				// Establecemos la variable con el valor seleccionado para su posterior uso
+				stickySignatore = sticky;
+			}
+			
 		}
 
 		var setLocale = function (locale) {
@@ -1076,6 +1101,7 @@ var MiniApplet = ( function ( window, undefined ) {
 				data.op = generateDataKeyValue ("op", "selectcert");
 				data.properties = generateDataKeyValue ("properties", extraParams != null ? Base64.encode(extraParams) : null);
 				data.keystore = generateDataKeyValue ("keystore", defaultKeyStore != null ? Base64.encode(defaultKeyStore) : null);
+				data.sticky = generateDataKeyValue ("sticky", stickySignatore);
 				
 				execAppIntent(buildUrl(data));
 			}
@@ -1200,6 +1226,7 @@ var MiniApplet = ( function ( window, undefined ) {
 				data.batchpostsignerurl = generateDataKeyValue("batchpostsignerurl", batchPostSignerUrl);
 				data.properties = generateDataKeyValue ("properties", extraParams != null ? Base64.encode(extraParams) : null);
 				data.dat = generateDataKeyValue ("dat",  batchB64 == "" ? null : batchB64);
+				data.sticky = generateDataKeyValue ("sticky", stickySignatore);
 
 				return data;
 			}
@@ -1338,6 +1365,7 @@ var MiniApplet = ( function ( window, undefined ) {
 				data.format = generateDataKeyValue ("format", format); 
 				data.properties = generateDataKeyValue ("properties", extraParams != null ? Base64.encode(extraParams) : null);
 				data.dat = generateDataKeyValue ("dat", dataB64 == "" ? null : dataB64);
+				data.sticky = generateDataKeyValue ("sticky", stickySignatore);
 				return data;
 			}
 
@@ -1355,6 +1383,7 @@ var MiniApplet = ( function ( window, undefined ) {
 				data.properties = generateDataKeyValue ("properties", extraParams != null ? Base64.encode(extraParams) : null);
 				data.filename = generateDataKeyValue ("filename", outputFileName);
 				data.dat = generateDataKeyValue ("dat", dataB64 == "" ? null : dataB64);
+				data.sticky = generateDataKeyValue ("sticky", stickySignatore);
 				return data;
 			}
 			
@@ -1370,6 +1399,19 @@ var MiniApplet = ( function ( window, undefined ) {
 				data.description = generateDataKeyValue("description", description);
 				data.filePath = generateDataKeyValue("filePath", filePath);
 				data.multiload = generateDataKeyValue("multiload", multiload);
+				return data;
+			}
+			
+			/**
+			 * Genera el objeto con los datos de la transaccion para la operacion
+			 * de establecer la propiedad sticky
+			 */
+			function generateDataToSetSticky(sticky) {
+				
+				var data = new Object();
+				data.op = generateDataKeyValue("op", "setSticky");
+				data.title = generateDataKeyValue("sticky", sticky);
+				
 				return data;
 			}
 			
@@ -1936,8 +1978,13 @@ var MiniApplet = ( function ( window, undefined ) {
 			 * No hace nada.
 			 * Implementada en el applet Java de firma.
 			 */
-			function setStickySignatory (sticky) {
-				// No hace nada
+			function setStickySignatory (sticky, successCallbackFunction, errorCallbackFunction) {
+								
+				successCallback = successCallbackFunction;
+				errorCallback = errorCallbackFunction;
+				var data = generateDataToSetSticky(sticky);
+				
+				execAppIntent(buildUrl(data));
 			}
 
 			/**

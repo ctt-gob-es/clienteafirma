@@ -38,6 +38,9 @@ public final class UrlParametersToSign extends UrlParameters {
 
 	/** Par&aacute;metro de entrada con la m&iacute;nima versi&oacute;n requerida del aplicativo a usar en la invocaci&oacute;n por protocolo. */
 	private static final String VER_PARAM = "ver"; //$NON-NLS-1$
+	
+	/** Par&aacute;metro de entrada que nos dice si tenemos que usar un provatekeyentry fijado o fijar uno nuevo. */
+	private static final String STICKY_PARAM = "sticky"; //$NON-NLS-1$
 
 	/** Tipo de operaci&oacute;n de firma. */
 	public enum Operation {
@@ -82,6 +85,12 @@ public final class UrlParametersToSign extends UrlParameters {
 	private String signFormat;
 	private String signAlgorithm;
 	private String minimumVersion;
+	
+	/**
+	 * Attribute that represents the value to configure sticky signature you get
+	 * from the protocol invocation URL
+	 */
+	private Boolean sticky;
 
 	/** Obtiene la versi&oacute;n m&iacute;nima requerida del aplicativo.
 	 * @return Versi&oacute;n m&iacute;nima requerida del aplicativo. */
@@ -131,6 +140,22 @@ public final class UrlParametersToSign extends UrlParameters {
 
 	void setMinimumVersion(final String minVer) {
 		this.minimumVersion = minVer;
+	}
+	
+	/**
+	 * Getter method for the sticky attribute
+	 * @return the sticky parameter (true or false)
+	 */
+	public Boolean getSticky() {
+		return sticky;
+	}
+
+	/**
+	 * Setter parameter for the sticky attribute
+	 * @param sticky the value for the sticky attribute to set
+	 */
+	public void setSticky(final Boolean sticky) {
+		this.sticky = sticky;
 	}
 
 	void setSignParameters(final Map<String, String> params) throws ParameterException {
@@ -236,6 +261,14 @@ public final class UrlParametersToSign extends UrlParameters {
 		}
 		else {
 			setExtraParams(new Properties());
+		}
+		
+		// Valor de parámetro sticky
+		if (params.containsKey(STICKY_PARAM)) {
+			setSticky(new Boolean(params.get(STICKY_PARAM)));
+		}
+		else {
+			setSticky(Boolean.FALSE);
 		}
 
 		setDefaultKeyStore(getDefaultKeyStoreName(params));

@@ -231,7 +231,7 @@
 		function browse(title, dataField, textDiv) {
 			try {
 				
-				MiniApplet.getFileNameContentBase64(title, "xsig,pdf,xml,doc", "Fichero para prueba de función load", "C:%5CUsers%5Cjose.rodriguez.gomez%5CDocuments", showLoadResultCallback, showErrorCallback);
+				MiniApplet.getFileNameContentBase64(title, "xsig,pdf,xml,doc", "Fichero para prueba de función load", "C://Users//jose.rodriguez.gomez//Documents", showLoadResultCallback, showErrorCallback);
 				
 			} catch(e) {
 				showLog("Type: " + MiniApplet.getErrorType() + "\nMessage: " + MiniApplet.getErrorMessage());
@@ -247,7 +247,7 @@
 		function multiBrowse(title, dataField, textDiv) {
 			try {
 								
-				MiniApplet.getMultiFileNameContentBase64(title, "xsig,pdf,xml,doc", "Fichero para prueba de función load", "C:%5CUsers%5Cjose.rodriguez.gomez%5CDocuments", showLoadResultCallback, showErrorCallback);
+				MiniApplet.getMultiFileNameContentBase64(title, "xsig,pdf,xml,doc", "Fichero para prueba de función load", "C://Users//jose.rodriguez.gomez//Documents", showLoadResultCallback, showErrorCallback);
 				
 			} catch(e) {
 				showLog("Type: " + MiniApplet.getErrorType() + "\nMessage: " + MiniApplet.getErrorMessage());
@@ -265,6 +265,11 @@
 			dataFilename.innerHTML = filename;
 			data.value = dataB64;
 
+		}
+		
+		function showStickyResultCallback(result) {
+			
+			showLog(result);
 		}
 		
 		function showLoadResultCallback(fileNamesDataBase64) {
@@ -313,6 +318,19 @@
 				
 			}
 			
+		}
+		
+		function setStickySignature() {
+			
+			var isSticky = document.getElementById("sticky").checked;
+			
+			try {
+				
+				MiniApplet.setStickySignatory(isSticky, showStickyResultCallback, showErrorCallback);
+				
+			} catch(e) {
+				showLog("Type: " + MiniApplet.getErrorType() + "\nMessage: " + MiniApplet.getErrorMessage());
+			}
 		}
 
 		function cleanDataField(dataField, textDiv) {
@@ -401,6 +419,9 @@
 		 <span>(Insertar las propiedades de una en una)</span>
 		 <br>
 		<textarea id="params" cols="50" rows="5" readonly></textarea>
+		<br>
+		<br>
+		<input id="sticky" type="checkbox" onclick="setStickySignature();">Sticky Signature
 		</div>
 		</fieldset>
 		<br/>

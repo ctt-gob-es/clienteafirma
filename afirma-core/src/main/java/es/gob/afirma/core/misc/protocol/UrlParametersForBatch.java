@@ -33,11 +33,21 @@ public final class UrlParametersForBatch extends UrlParameters {
 
 	/** Par&aacute;metro de entrada con la m&iacute;nima versi&oacute;n requerida del aplicativo a usar en la invocaci&oacute;n por protocolo. */
 	private static final String VER_PARAM = "ver"; //$NON-NLS-1$
+	
+	/** Par&aacute;metro de entrada que nos dice si tenemos que usar un provatekeyentry fijado o fijar uno nuevo. */
+	private static final String STICKY_PARAM = "sticky"; //$NON-NLS-1$
 
 	private String batchPreSignerUrl = null;
 	private String batchPostSignerUrl = null;
 
 	private String minimumVersion;
+	
+	
+	/**
+	 * Attribute that represents the value to configure sticky signature you get
+	 * from the protocol invocation URL
+	 */
+	private Boolean sticky;
 
 	/** Obtiene la URL del servicio de preprocesado de lotes de firma.
 	 * @return URL del servicio de preprocesado de lotes de firma. */
@@ -57,6 +67,22 @@ public final class UrlParametersForBatch extends UrlParameters {
 
 	void setBatchPostsignerUrl(final String url) {
 		this.batchPostSignerUrl = url;
+	}
+	
+	/**
+	 * Getter method for the sticky attribute
+	 * @return the sticky parameter (true or false)
+	 */
+	public Boolean getSticky() {
+		return sticky;
+	}
+
+	/**
+	 * Setter parameter for the sticky attribute
+	 * @param sticky the value for the sticky attribute to set
+	 */
+	public void setSticky(final Boolean sticky) {
+		this.sticky = sticky;
 	}
 
 	void setBatchParameters(final Map<String, String> params) throws ParameterException {
@@ -151,6 +177,14 @@ public final class UrlParametersForBatch extends UrlParameters {
 		}
 		else {
 			setExtraParams(new Properties());
+		}
+		
+		// Valor de parámetro sticky
+		if (params.containsKey(STICKY_PARAM)) {
+			setSticky(new Boolean(params.get(STICKY_PARAM)));
+		}
+		else {
+			setSticky(Boolean.FALSE);
 		}
 
 		setDefaultKeyStore(getDefaultKeyStoreName(params));

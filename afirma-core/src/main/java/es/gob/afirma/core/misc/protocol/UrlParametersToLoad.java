@@ -104,7 +104,7 @@ public final class UrlParametersToLoad extends UrlParameters {
 	 * Setter method for the title param
 	 * @param title The new title to set
 	 */
-	public void setTitle(String title) {
+	public void setTitle(final String title) {
 		this.title = title;
 	}
 
@@ -120,7 +120,7 @@ public final class UrlParametersToLoad extends UrlParameters {
 	 * Setter method for the extensions param
 	 * @param extensions The new extensions to set
 	 */
-	public void setExtensions(String extensions) {
+	public void setExtensions(final String extensions) {
 		this.extensions = extensions;
 	}
 
@@ -136,7 +136,7 @@ public final class UrlParametersToLoad extends UrlParameters {
 	 * Setter method for the description para,
 	 * @param description The new description to set
 	 */
-	public void setDescription(String description) {
+	public void setDescription(final String description) {
 		this.description = description;
 	}
 
@@ -152,7 +152,7 @@ public final class UrlParametersToLoad extends UrlParameters {
 	 * Setter method for the filepath param
 	 * @param filepath The new filepath to set
 	 */
-	public void setFilepath(String filepath) {
+	public void setFilepath(final String filepath) {
 		this.filepath = filepath;
 	}
 
