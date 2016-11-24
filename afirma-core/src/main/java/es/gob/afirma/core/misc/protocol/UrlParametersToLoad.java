@@ -36,6 +36,9 @@ public final class UrlParametersToLoad extends UrlParameters {
 				
 	private String minimumVersion;
 		
+	/**
+	 * Attribute that represents the configuration for the load/multiload option.
+	 */
 	private Boolean multiload;
 	
 	/**
