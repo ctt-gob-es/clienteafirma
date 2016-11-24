@@ -100,8 +100,6 @@ final class ProtocolInvocationLauncherSign {
 					.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_07);
 		}
 
-		final String aoksLib = options.getDefaultKeyStoreLib();
-
 		// Si no hay datos a firmar se los pedimos al usuario
 		if (options.getData() == null) {
 
@@ -239,6 +237,7 @@ final class ProtocolInvocationLauncherSign {
 
 		} else {
 			final PasswordCallback pwc = aoks.getStorePasswordCallback(null);
+			final String aoksLib = options.getDefaultKeyStoreLib();
 			final AOKeyStoreManager ksm;
 			try {
 				ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(aoks, // Store
