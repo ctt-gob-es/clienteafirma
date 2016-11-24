@@ -12,7 +12,13 @@ if (document.all && !window.setTimeout.isPolyfill) {
 
 var originalXMLHttpRequest = window.XMLHttpRequest;
 
-var MiniApplet = ( function ( window, undefined ) {
+var /**
+ * 
+ */
+/**
+ * 
+ */
+MiniApplet = ( function ( window, undefined ) {
 
 		var VERSION = "1.5";
 
@@ -742,6 +748,12 @@ var MiniApplet = ( function ( window, undefined ) {
 			return clienteFirma.echo();
 		}
 
+		/**
+		 * Establece el valor de la variable "stickySignatore" que permite fijar
+		 * un certicado seleccionado para futuras invocaciones, de modo que no
+		 * sea necesario volver a seleccionarlo mientras el valor sea true o
+		 * caduque la conexión en caso de invocación por protocolo/socket
+		 */
 		var setStickySignatory = function (sticky, successCallback, errorCallback) {
 			forceLoad();
 			
@@ -761,7 +773,9 @@ var MiniApplet = ( function ( window, undefined ) {
 				}
 			}
 			else {
-				// Establecemos la variable con el valor seleccionado para su posterior uso
+				// En caso de no cargar el applet y utilizar autofirma, se
+				// establecerá la variable con el valor seleccionado para su
+				// posterior uso en cada invocación por protocolo
 				stickySignatore = sticky;
 			}
 			
@@ -1401,20 +1415,7 @@ var MiniApplet = ( function ( window, undefined ) {
 				data.multiload = generateDataKeyValue("multiload", multiload);
 				return data;
 			}
-			
-			/**
-			 * Genera el objeto con los datos de la transaccion para la operacion
-			 * de establecer la propiedad sticky
-			 */
-			function generateDataToSetSticky(sticky) {
-				
-				var data = new Object();
-				data.op = generateDataKeyValue("op", "setSticky");
-				data.title = generateDataKeyValue("sticky", sticky);
-				
-				return data;
-			}
-			
+						
 			function executeEchoByServiceByPort (ports, url) {
 				connection = false;
 				var semaphore = new Object();
@@ -1974,19 +1975,7 @@ var MiniApplet = ( function ( window, undefined ) {
 				return "Cliente JavaScript";
 			}
 
-			/** 
-			 * No hace nada.
-			 * Implementada en el applet Java de firma.
-			 */
-			function setStickySignatory (sticky, successCallbackFunction, errorCallbackFunction) {
-								
-				successCallback = successCallbackFunction;
-				errorCallback = errorCallbackFunction;
-				var data = generateDataToSetSticky(sticky);
-				
-				execAppIntent(buildUrl(data));
-			}
-
+			
 			/**
 			 * Recupera el mensaje de error asociado al ultimo error capturado.
 			 * Implementada en el applet Java de firma.
@@ -2389,14 +2378,7 @@ var MiniApplet = ( function ( window, undefined ) {
 				return "Cliente JavaScript";
 			}
 
-			/** 
-			 * No hace nada.
-			 * Implementada en el applet Java de firma.
-			 */
-			function setStickySignatory (sticky) {
-				// No hace nada
-			}
-
+			
 			/**
 			 * Recupera el mensaje de error asociado al ultimo error capturado.
 			 * Implementada en el applet Java de firma.
