@@ -133,32 +133,35 @@ public final class AutoFirmaUtil {
 	/** Recupera el DPI de la pantalla principal.
 	 * @return DPI de la pantalla principal. */
 	public static int getDPI() {
-		final String[] cmd = {"wmic", "desktopmonitor", "get", "PixelsPerXLogicalInch"}; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-		final ProcessBuilder builder = new ProcessBuilder(cmd);
-		try {
-			final Process process = builder.start();
-			process.waitFor();
-			try (
-				final BufferedReader bufferedReader = new BoundedBufferedReader(new InputStreamReader(process.getInputStream()));
-			) {
-				String line;
-				int dpi = 0;
-				while ((line = bufferedReader.readLine()) != null) {
-					try {
-						dpi = Integer.parseInt(line.trim());
-						break;
-					}
-					catch (final Exception e) {
-						continue;
-					}
-	            }
-	            return dpi;
+		if (Platform.getOS() == Platform.OS.WINDOWS) {
+			final String[] cmd = {"wmic", "desktopmonitor", "get", "PixelsPerXLogicalInch"}; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			final ProcessBuilder builder = new ProcessBuilder(cmd);
+			try {
+				final Process process = builder.start();
+				process.waitFor();
+				try (
+					final BufferedReader bufferedReader = new BoundedBufferedReader(new InputStreamReader(process.getInputStream()));
+				) {
+					String line;
+					int dpi = 0;
+					while ((line = bufferedReader.readLine()) != null) {
+						try {
+							dpi = Integer.parseInt(line.trim());
+							break;
+						}
+						catch (final Exception e) {
+							continue;
+						}
+		            }
+		            return dpi;
+				}
+			}
+			catch (final Exception e) {
+				LOGGER.log(	Level.SEVERE, "Error obteniendo DPI: " + e); //$NON-NLS-1$
+				return 0;
 			}
 		}
-		catch (final Exception e) {
-			LOGGER.log(	Level.SEVERE, "Error obteniendo DPI: " + e); //$NON-NLS-1$
-			return 0;
-		}
+		return 0;
 	}
 
 	/** Recupera el n&uacute;mero de pantallas que tiene habilitadas el usuario.
