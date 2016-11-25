@@ -15,6 +15,13 @@
         <afirma.keytool.password>afirma</afirma.keytool.password>
 	</properties>
 
+
+	<repositories>
+		<repository>
+			<id>uji</id>
+			<url>http://devel.uji.es/nexus/content/groups/public/</url>
+		</repository>
+	</repositories>
 	<dependencies>
 	    
 	    <dependency>
@@ -205,7 +212,7 @@
 
 		<dependency>
 			<groupId>com.apple</groupId>
-			<artifactId>AppleJavaExtensions</artifactId>
+			<artifactId>applejavaextensions</artifactId>
 			<version>1.5.4</version>
 		</dependency>
 
