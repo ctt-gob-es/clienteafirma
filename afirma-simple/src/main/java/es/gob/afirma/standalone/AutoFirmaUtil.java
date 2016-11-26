@@ -133,7 +133,7 @@ public final class AutoFirmaUtil {
 	/** Recupera el DPI de la pantalla principal.
 	 * @return DPI de la pantalla principal. */
 	public static int getDPI() {
-		if (Platform.getOS() == Platform.OS.WINDOWS) {
+		if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
 			final String[] cmd = {"wmic", "desktopmonitor", "get", "PixelsPerXLogicalInch"}; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			final ProcessBuilder builder = new ProcessBuilder(cmd);
 			try {
