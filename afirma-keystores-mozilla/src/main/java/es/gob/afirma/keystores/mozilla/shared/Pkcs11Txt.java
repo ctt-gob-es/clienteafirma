@@ -51,7 +51,7 @@ final class Pkcs11Txt {
 	}
 
 	static List<ModuleName> getModules(final File f)	throws  IOException {
-		
+
 		Reader fr = null;
 		try {
 			fr = new FileReader(f);
@@ -62,13 +62,13 @@ final class Pkcs11Txt {
 			if (fr != null) {
 				fr.close();
 			}
-		}		
+		}
 	}
 
   static List<ModuleName> getModules(final Reader fr)
 			throws IOException {
 		final List<ModuleName> ret = new ArrayList<ModuleName>();
-		BufferedReader br = null;		
+		BufferedReader br = null;
 		try {
 			br = new BoundedBufferedReader(
 				fr,
@@ -80,7 +80,7 @@ final class Pkcs11Txt {
 		    String foundName = null;
 		    while ((line = br.readLine()) != null) {
 		    	if (line.trim().isEmpty()) {
-		    		// Una linea en blanco es una nueva sección
+		    		// Una linea en blanco es una nueva seccion
 		    		foundLib = null;
 		    		foundName = null;
 		    		continue;
@@ -107,8 +107,8 @@ final class Pkcs11Txt {
 		    			foundLib = lib.trim();
 		    		}
 		    	}
-		    	else if (line.startsWith("name=")){
-		    		foundName = line.substring("name=".length()).trim();
+		    	else if (line.startsWith("name=")){ //$NON-NLS-1$
+		    		foundName = line.substring("name=".length()).trim(); //$NON-NLS-1$
 		    	}
 		    	if (foundLib != null && foundName != null && !foundLib.isEmpty() && !foundName.isEmpty()){
 		    		ret.add(new ModuleName(foundLib, foundName));
