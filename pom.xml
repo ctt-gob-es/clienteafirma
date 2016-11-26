@@ -46,6 +46,8 @@
 		<module>afirma-crypto-pdf</module>
 		<module>afirma-core-massive</module>
 		<module>afirma-server-triphase-signer-core</module>
+		<module>afirma-simple</module>
+		<module>afirma-ui-simple-configurator</module>
 	</modules>
 	
 	<repositories>
