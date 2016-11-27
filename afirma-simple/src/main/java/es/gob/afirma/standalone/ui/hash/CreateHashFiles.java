@@ -164,7 +164,7 @@ public final class CreateHashFiles extends JDialog {
 
 		// ComboBox con los algoritmos de generacion
 		this.hashAlgorithms.setSelectedItem(
-			PreferencesManager.get(PreferencesManager.PREFERENCE_CREATE_HASH_DIRECTORY_ALGORITHM, "SHA-512") //$NON-NLS-1$
+			PreferencesManager.get(PreferencesManager.PREFERENCE_CREATE_HASH_DIRECTORY_ALGORITHM, "SHA-256") //$NON-NLS-1$
 		);
 		this.hashAlgorithms.addActionListener(
 			new ActionListener() {
@@ -246,7 +246,7 @@ public final class CreateHashFiles extends JDialog {
 			panel.add(this.generateButton);
 			panel.add(exitButton);
 		}
-		
+
 		add(label, gbc);
 		gbc.gridy++;
 		add(this.selectedFile, gbc);

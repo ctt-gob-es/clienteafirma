@@ -134,7 +134,7 @@ public final class CreateHashDialog extends JDialog implements KeyListener{
 		this.hashAlgorithms.setSelectedItem(
 			PreferencesManager.get(
 				PreferencesManager.PREFERENCE_CREATE_HASH_ALGORITHM,
-				"SHA-512" //$NON-NLS-1$
+				"SHA-256" //$NON-NLS-1$
 			)
 		);
 		this.hashAlgorithms.addKeyListener(this);
