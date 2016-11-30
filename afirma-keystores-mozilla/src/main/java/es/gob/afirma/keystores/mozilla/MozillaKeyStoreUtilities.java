@@ -91,6 +91,18 @@ public final class MozillaKeyStoreUtilities {
 	 *         PKCS#11 de Sun para acceder al KeyStore de Mozilla v&iacute;a NSS. */
 	static String createPKCS11NSSConfigFile(final String userProfileDirectory, final String libDir) {
 
+		boolean useSqlPrefix = false;
+		
+		if ("sql".equals(System.getenv("NSS_DEFAULT_DB_TYPE"))) {//$NON-NLS-1$ //$NON-NLS-2$
+			useSqlPrefix = true;
+		}
+		else {
+			File sqliteFile = new File(userProfileDirectory, "cert9.db"); //$NON-NLS-1$ 
+			useSqlPrefix = sqliteFile.exists();			
+		}
+		
+		String configuredUserProfileDirectory = (useSqlPrefix ? "sql:/" : "") + userProfileDirectory; //$NON-NLS-1$ //$NON-NLS-2$
+		
 		final String softoknLib;
 		if (Platform.getOS().equals(Platform.OS.WINDOWS)) {
 			softoknLib = SOFTOKN3_DLL;
@@ -118,7 +130,7 @@ public final class MozillaKeyStoreUtilities {
 			.append("allowSingleThreadedModules=true\n") //$NON-NLS-1$
 			.append("nssArgs=\"") //$NON-NLS-1$
 			.append("configdir='") //$NON-NLS-1$
-			.append(userProfileDirectory)
+			.append(configuredUserProfileDirectory)
 			.append("' ") //$NON-NLS-1$
 			.append("certPrefix='' ") //$NON-NLS-1$
 			.append("keyPrefix='' ") //$NON-NLS-1$
@@ -585,12 +597,9 @@ public final class MozillaKeyStoreUtilities {
 	                                                           ClassNotFoundException {
 		final String nssDirectory = MozillaKeyStoreUtilities.getSystemNSSLibDir();
 		final String p11NSSConfigFile = MozillaKeyStoreUtilities.createPKCS11NSSConfigFile(
-			("sql".equals(System.getenv("NSS_DEFAULT_DB_TYPE")) ? //$NON-NLS-1$ //$NON-NLS-2$
-				"sql:/" : //$NON-NLS-1$
-					"") + //$NON-NLS-1$
-						(useSharedNss ?
+			useSharedNss ?
 							SharedNssUtil.getSharedUserProfileDirectory() :
-								MozillaKeyStoreUtilities.getMozillaUserProfileDirectory()),
+							MozillaKeyStoreUtilities.getMozillaUserProfileDirectory(),
 			nssDirectory
 		);
 
