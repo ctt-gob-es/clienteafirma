@@ -415,20 +415,9 @@ public final class CheckHashDialog extends JDialog implements KeyListener {
 	}
 
 	static boolean isHexa(final byte[] data) {
-
-        final String hexAlphabet = "0123456789ABCDEF"; //$NON-NLS-1$
-
-        // Comprobamos que todos los caracteres de la cadena pertenezcan al
-        // alfabeto base 64
-
-        for (final byte element : data) {
-        	final char b = (char) element;
-        	if (hexAlphabet.indexOf(b) == -1) {
-        		return false;
-        	}
-        }
-
-        // Comprobamos que la cadena tenga una longitud multiplo de 2 caracteres
-        return data.length % 2 == 0;
+		if (data == null || data.length == 0) {
+			return false;
+		}
+		return new String(data).matches("^[0-9a-fA-F]+$") && data.length % 2 == 0; //$NON-NLS-1$
     }
 }
