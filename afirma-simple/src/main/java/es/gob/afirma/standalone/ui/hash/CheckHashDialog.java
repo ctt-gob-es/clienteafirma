@@ -158,7 +158,7 @@ public final class CheckHashDialog extends JDialog implements KeyListener {
 								SimpleAfirmaMessages.getString("CheckHashDialog.10"), //$NON-NLS-1$
 								null,
 								null,
-								new String[] { "hash", "hashb64" }, //$NON-NLS-1$ //$NON-NLS-2$
+								new String[] { "hash", "hashb64", "hexhash" }, //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 								SimpleAfirmaMessages.getString("CheckHashDialog.14"), //$NON-NLS-1$
 								false,
 								false,
@@ -298,6 +298,9 @@ public final class CheckHashDialog extends JDialog implements KeyListener {
 				if (Base64.isBase64(hashBytes)) {
 					hashBytes = Base64.decode(hashBytes, 0, hashBytes.length, false);
 				}
+				else if(isHexa(hashBytes)) {
+					hashBytes = hexStringToByteArray(new String(hashBytes));
+				}
 				try {
 					return Boolean.valueOf(
 						arrayEquals(
@@ -401,4 +404,31 @@ public final class CheckHashDialog extends JDialog implements KeyListener {
 		chkd.setLocationRelativeTo(parent);
 		chkd.setVisible(true);
 	}
+
+	static byte[] hexStringToByteArray(final String s) {
+	    final int len = s.length();
+	    final byte[] data = new byte[len / 2];
+	    for (int i = 0; i < len; i += 2) {
+	        data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4) + Character.digit(s.charAt(i+1), 16));
+	    }
+	    return data;
+	}
+
+	static boolean isHexa(final byte[] data) {
+
+        final String hexAlphabet = "0123456789ABCDEF"; //$NON-NLS-1$
+
+        // Comprobamos que todos los caracteres de la cadena pertenezcan al
+        // alfabeto base 64
+
+        for (final byte element : data) {
+        	final char b = (char) element;
+        	if (hexAlphabet.indexOf(b) == -1) {
+        		return false;
+        	}
+        }
+
+        // Comprobamos que la cadena tenga una longitud multiplo de 2 caracteres
+        return data.length % 2 == 0;
+    }
 }

@@ -341,10 +341,10 @@ public final class PreferencesManager {
 	/** Algoritmo de la huella digital para la creaci&oacute;n de huellas digitales de ficheros.*/
 	public static final String PREFERENCE_CREATE_HASH_ALGORITHM = "createHashAlgorithm"; //$NON-NLS-1$
 
-	/** Si est&aacute; establecido a <code>true</code> se genera la huella digital de fichero en base64.*/
-	public static final String PREFERENCE_CREATE_HASH_BASE64 = "createHashAsBase64"; //$NON-NLS-1$
+	/** Formato de la huella digital para la creaci&oacute;n de huellas digitales de ficheros.*/
+	public static final String PREFERENCE_CREATE_HASH_FORMAT = "createHashFormat"; //$NON-NLS-1$
 
-	/** Si est&aacute; establecido a <code>true</code> se copiara la huella digital de fichero en base64 al portapapeles.*/
+	/** Si est&aacute; establecido a <code>true</code> se copiara la huella digital de fichero al portapapeles.*/
 	public static final String PREFERENCE_CREATE_HASH_CLIPBOARD = "createHashCopyToClipBoard"; //$NON-NLS-1$
 
 	/** Algoritmo de la huella digital para la creaci&oacute;n de huellas digitales de directorio. */

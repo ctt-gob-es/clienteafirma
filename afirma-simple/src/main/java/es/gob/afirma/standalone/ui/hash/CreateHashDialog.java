@@ -31,6 +31,7 @@ import javax.swing.JTextField;
 import javax.swing.SwingWorker;
 
 import es.gob.afirma.core.AOCancelledOperationException;
+import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.ui.AOUIFactory;
@@ -41,7 +42,7 @@ import es.gob.afirma.standalone.ui.preferences.PreferencesManager;
 
 /** Di&aacute;logo para la creaci&oacute;n de huellas digitales.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
-public final class CreateHashDialog extends JDialog implements KeyListener{
+public final class CreateHashDialog extends JDialog implements KeyListener {
 
 	private static final long serialVersionUID = 3581001930027153381L;
 
@@ -54,9 +55,58 @@ public final class CreateHashDialog extends JDialog implements KeyListener{
 		"SHA-512" //$NON-NLS-1$
 	};
 
+	enum HashFormat {
+
+		HEX(SimpleAfirmaMessages.getString("CreateHashDialog.21")), //$NON-NLS-1$
+		BASE64(SimpleAfirmaMessages.getString("CreateHashDialog.22")), //$NON-NLS-1$
+		BINARY(SimpleAfirmaMessages.getString("CreateHashDialog.23")); //$NON-NLS-1$
+
+		private final String name;
+
+		private HashFormat(final String n) {
+			this.name = n;
+		}
+
+		@Override
+		public String toString() {
+			return this.name;
+		}
+
+		static HashFormat[] getHashFormats() {
+			return new HashFormat[] {
+				HEX, BASE64, BINARY
+			};
+		}
+
+		static HashFormat getDefaultFormat() {
+			return HEX;
+		}
+
+		static HashFormat fromString(final String name) {
+			if (HEX.toString().equals(name)) {
+				return HEX;
+			}
+			if (BASE64.toString().equals(name)) {
+				return BASE64;
+			}
+			if (BINARY.toString().equals(name)) {
+				return BINARY;
+			}
+			Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
+				"Formato de huella desconocido, se usara el por defecto: " + name //$NON-NLS-1$
+			);
+			return getDefaultFormat();
+		}
+	}
+
 	private final JComboBox<String> hashAlgorithms = new JComboBox<>(HASH_ALGOS);
 	String getSelectedHashAlgorithm() {
 		return this.hashAlgorithms.getSelectedItem().toString();
+	}
+
+	private final JComboBox<HashFormat> hashFormats = new JComboBox<>(HashFormat.getHashFormats());
+	HashFormat getSelectedHashFormat() {
+		return (HashFormat) this.hashFormats.getSelectedItem();
 	}
 
 	private final JTextField fileTextField = new JTextField();
@@ -64,16 +114,9 @@ public final class CreateHashDialog extends JDialog implements KeyListener{
 		return this.fileTextField;
 	}
 
-	private final JCheckBox base64CheckBox = new JCheckBox(
-		SimpleAfirmaMessages.getString("CreateHashDialog.0") //$NON-NLS-1$
-	);
-	boolean isBase64Checked() {
-		return this.base64CheckBox.isSelected();
-	}
-
 	final JCheckBox copyToClipBoardCheckBox = new JCheckBox(
-			SimpleAfirmaMessages.getString("CreateHashDialog.19") //$NON-NLS-1$
-		);
+		SimpleAfirmaMessages.getString("CreateHashDialog.19") //$NON-NLS-1$
+	);
 	boolean isCopyToClipBoardChecked() {
 		return this.copyToClipBoardCheckBox.isSelected();
 	}
@@ -82,7 +125,7 @@ public final class CreateHashDialog extends JDialog implements KeyListener{
 	 * @param parent Componente padre para la modalidad. */
 	public static void startHashCreation(final Frame parent) {
 		final CreateHashDialog chd = new CreateHashDialog(parent);
-		chd.setSize(600, 290);
+		chd.setSize(600, 350);
 		chd.setResizable(false);
 		chd.setLocationRelativeTo(parent);
 		chd.setVisible(true);
@@ -114,11 +157,10 @@ public final class CreateHashDialog extends JDialog implements KeyListener{
 			SimpleAfirmaMessages.getString("CreateHashDialog.1") //$NON-NLS-1$
 		);
 
-		final JLabel hashAlgorithmsLabels = new JLabel(
+		final JLabel hashAlgorithmsLabel = new JLabel(
 			SimpleAfirmaMessages.getString("CreateHashDialog.2") //$NON-NLS-1$
 		);
-		hashAlgorithmsLabels.addKeyListener(this);
-		hashAlgorithmsLabels.setLabelFor(this.hashAlgorithms);
+		hashAlgorithmsLabel.setLabelFor(this.hashAlgorithms);
 
 		this.hashAlgorithms.addActionListener(
 			new ActionListener() {
@@ -139,24 +181,31 @@ public final class CreateHashDialog extends JDialog implements KeyListener{
 		);
 		this.hashAlgorithms.addKeyListener(this);
 
-		this.base64CheckBox.addActionListener(
+		final JLabel hashFormatLabel = new JLabel(
+			SimpleAfirmaMessages.getString("CreateHashDialog.0") //$NON-NLS-1$
+		);
+		hashFormatLabel.setLabelFor(this.hashFormats);
+
+		this.hashFormats.addActionListener(
 			new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					PreferencesManager.putBoolean(
-						PreferencesManager.PREFERENCE_CREATE_HASH_BASE64,
-						isBase64Checked()
+					PreferencesManager.put(
+						PreferencesManager.PREFERENCE_CREATE_HASH_FORMAT,
+						getSelectedHashFormat().toString()
 					);
 				}
 			}
 		);
-		this.base64CheckBox.setSelected(
-			PreferencesManager.getBoolean(
-				PreferencesManager.PREFERENCE_CREATE_HASH_BASE64,
-				false
+		this.hashFormats.setSelectedItem(
+			HashFormat.fromString(
+				PreferencesManager.get(
+					PreferencesManager.PREFERENCE_CREATE_HASH_FORMAT,
+					HashFormat.getDefaultFormat().toString()
+				)
 			)
 		);
-		this.base64CheckBox.addKeyListener(this);
+		this.hashFormats.addKeyListener(this);
 
 		this.copyToClipBoardCheckBox.addActionListener(
 				new ActionListener() {
@@ -238,7 +287,7 @@ public final class CreateHashDialog extends JDialog implements KeyListener{
 						parent,
 						getFileTextField().getText(),
 						getSelectedHashAlgorithm(),
-						isBase64Checked(),
+						getSelectedHashFormat(),
 						isCopyToClipBoardChecked(),
 						CreateHashDialog.this
 					);
@@ -256,13 +305,15 @@ public final class CreateHashDialog extends JDialog implements KeyListener{
 		);
 
 		exitButton.setMnemonic('C');
-		exitButton.addActionListener( new ActionListener () {
-			@Override
-			public void actionPerformed( final ActionEvent e ) {
-				CreateHashDialog.this.setVisible(false);
-				CreateHashDialog.this.dispose();
+		exitButton.addActionListener(
+			new ActionListener () {
+				@Override
+				public void actionPerformed( final ActionEvent e ) {
+					CreateHashDialog.this.setVisible(false);
+					CreateHashDialog.this.dispose();
+				}
 			}
-		});
+		);
 		exitButton.getAccessibleContext().setAccessibleDescription(
 			SimpleAfirmaMessages.getString("CreateHashDialog.17") //$NON-NLS-1$
 		);
@@ -282,24 +333,35 @@ public final class CreateHashDialog extends JDialog implements KeyListener{
 		}
 
 		c.add(fileTextFieldLabel, gbc);
+
 		gbc.insets = new Insets(5,10,0,10);
 		gbc.gridy++;
 		c.add(this.fileTextField, gbc);
+
 		gbc.weightx = 0;
 		c.add(fileButton, gbc);
-		gbc.insets = new Insets(25,15,0,10);
+
+		gbc.insets = new Insets(20,15,0,10);
 		gbc.weightx = 1.0;
 		gbc.gridy++;
-		c.add(hashAlgorithmsLabels, gbc);
+		c.add(hashAlgorithmsLabel, gbc);
+
 		gbc.insets = new Insets(5,10,0,10);
 		gbc.gridy++;
 		c.add(this.hashAlgorithms, gbc);
-		gbc.insets = new Insets(25,10,0,10);
+
+		gbc.insets = new Insets(20,10,0,10);
 		gbc.gridy++;
-		c.add(this.base64CheckBox, gbc);
-		gbc.insets = new Insets(10,10,0,10);
+		c.add(hashFormatLabel, gbc);
+
+		gbc.insets = new Insets(5,10,0,10);
+		gbc.gridy++;
+		c.add(this.hashFormats, gbc);
+
+		gbc.insets = new Insets(20,10,0,10);
 		gbc.gridy++;
 		c.add(this.copyToClipBoardCheckBox, gbc);
+
 		gbc.insets = new Insets(20,10,0,10);
 		gbc.gridy++;
 		gbc.gridwidth = GridBagConstraints.REMAINDER;
@@ -309,7 +371,7 @@ public final class CreateHashDialog extends JDialog implements KeyListener{
 	static void doHashProcess(final Frame parent,
                               final String file,
                               final String hashAlgorithm,
-                              final boolean base64,
+                              final HashFormat format,
                               final boolean copyToClipboard,
                               final Window currentFrame) {
 
@@ -331,21 +393,42 @@ public final class CreateHashDialog extends JDialog implements KeyListener{
 
 					final byte[] hash = HashUtil.getFileHash(hashAlgorithm, file);
 
-					final String ext = base64 ? ".hashb64" : ".hash"; //$NON-NLS-1$ //$NON-NLS-2$
+					final String ext;
+					final byte[] dataToSave;
+					switch(format) {
+						case HEX:
+							ext = ".hexhash"; //$NON-NLS-1$
+							dataToSave = AOUtil.hexify(hash, false).getBytes();
+							break;
+						case BASE64:
+							ext = ".hashb64"; //$NON-NLS-1$
+							dataToSave = Base64.encode(hash).getBytes();
+							break;
+						case BINARY:
+							dataToSave = hash;
+							ext = ".hash"; //$NON-NLS-1$
+							break;
+						default:
+							throw new IllegalStateException(
+								"Formato de huella no contemplado: " + format //$NON-NLS-1$
+							);
+					}
 
 					dialog.dispose();
 					AOUIFactory.getSaveDataToFile(
-							base64 ? Base64.encode(hash).getBytes() :
-								hash,
-						SimpleAfirmaMessages.getString("CreateHashDialog.8"), //$NON-NLS-1$,,,
+						dataToSave,
+						SimpleAfirmaMessages.getString("CreateHashDialog.8"), //$NON-NLS-1$
 						null,
 						AutoFirmaUtil.getCanonicalFile(new File(file)).getName() + ext,
 						new String[] { ext },
 						SimpleAfirmaMessages.getString("CreateHashDialog.9") + " (*" + ext + ")",  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
 						parent
 					);
+					// Si se selecciona Base64 se usa Base64 en portapapeles, en cualquier otro caso, HEX pasado a ASCII.
 					if (copyToClipboard) {
-						copyToClipBoard(Base64.encode(hash));
+						copyToClipBoard(
+							HashFormat.BASE64.equals(format) ? new String(dataToSave) : AOUtil.hexify(hash, false)
+						);
 					}
 				}
 				catch(final OutOfMemoryError ooe) {

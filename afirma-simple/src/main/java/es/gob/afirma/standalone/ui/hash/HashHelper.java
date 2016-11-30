@@ -20,6 +20,7 @@ import es.gob.afirma.standalone.AutoFirmaUtil;
 import es.gob.afirma.standalone.DataAnalizerUtil;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.ui.CommonWaitDialog;
+import es.gob.afirma.standalone.ui.hash.CreateHashDialog.HashFormat;
 
 /** Funciones para el acceso a las capacidades de creaci&oacute;n y verificaci&oacute;n de
  * huellas digitales.
@@ -30,7 +31,7 @@ public final class HashHelper {
 
 	private static final String DEFAULT_HASH_ALGORITHM = "SHA-256"; //$NON-NLS-1$
 	private static final boolean DEFAULT_RECURSIVE = true;
-	private static final boolean DEFAULT_USE_BASE64 = false;
+	private static final HashFormat DEFAULT_HASH_FORMAT = HashFormat.HEX;
 	private static final boolean DEFAULT_COPY_TO_CLIPBOARD = true;
 	private static final int SIZE_WAIT = 50000000; //Tamano en bytes
 
@@ -309,7 +310,7 @@ public final class HashHelper {
 				null,
 				file.getAbsolutePath(),
 				DEFAULT_HASH_ALGORITHM,
-				DEFAULT_USE_BASE64,
+				DEFAULT_HASH_FORMAT,
 				DEFAULT_COPY_TO_CLIPBOARD,
 				null
 			);
