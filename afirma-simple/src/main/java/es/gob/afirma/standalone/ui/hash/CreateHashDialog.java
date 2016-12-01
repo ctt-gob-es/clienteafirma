@@ -398,7 +398,7 @@ public final class CreateHashDialog extends JDialog implements KeyListener {
 					switch(format) {
 						case HEX:
 							ext = ".hexhash"; //$NON-NLS-1$
-							dataToSave = AOUtil.hexify(hash, false).getBytes();
+							dataToSave = (AOUtil.hexify(hash, false) + "h").getBytes(); //$NON-NLS-1$
 							break;
 						case BASE64:
 							ext = ".hashb64"; //$NON-NLS-1$

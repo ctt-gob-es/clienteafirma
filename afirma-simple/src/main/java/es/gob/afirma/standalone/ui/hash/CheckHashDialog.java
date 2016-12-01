@@ -299,7 +299,9 @@ public final class CheckHashDialog extends JDialog implements KeyListener {
 					hashBytes = Base64.decode(hashBytes, 0, hashBytes.length, false);
 				}
 				else if(isHexa(hashBytes)) {
-					hashBytes = hexStringToByteArray(new String(hashBytes));
+					hashBytes = hexStringToByteArray(
+						new String(hashBytes).substring(0, hashBytes.length -1)
+					);
 				}
 				try {
 					return Boolean.valueOf(
@@ -418,6 +420,10 @@ public final class CheckHashDialog extends JDialog implements KeyListener {
 		if (data == null || data.length == 0) {
 			return false;
 		}
-		return new String(data).matches("^[0-9a-fA-F]+$") && data.length % 2 == 0; //$NON-NLS-1$
+		final String strData = new String(data);
+
+		return strData.endsWith("h") && //$NON-NLS-1$
+			strData.substring(0, strData.length() - 1).matches("^[0-9a-fA-F]+$") && //$NON-NLS-1$
+				(data.length - 1) % 2 == 0;
     }
 }
