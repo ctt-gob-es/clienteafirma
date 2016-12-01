@@ -489,19 +489,6 @@ public final class AOKeyStoreManagerFactory {
     	    		parentComponent
     			);
     	}
-    	else {
-    		try {
-    			mozillaKeyStoreManager.init(AOKeyStore.MOZ_UNI, null, pssCallback, new Object[] { parentComponent }, forceReset);
-    		}
-    		catch (final AOException e) {
-    			throw new AOKeystoreAlternativeException(
-    					getAlternateKeyStoreType(AOKeyStore.MOZ_UNI),
-    					"Error al inicializar el almacen NSS: " + e, //$NON-NLS-1$
-    					e
-    					);
-    		}
-    	}
-
         return mozillaKeyStoreManager;
     }
 
