@@ -12,12 +12,6 @@ if (document.all && !window.setTimeout.isPolyfill) {
 
 var originalXMLHttpRequest = window.XMLHttpRequest;
 
-var /**
- * 
- */
-/**
- * 
- */
 MiniApplet = ( function ( window, undefined ) {
 
 		var VERSION = "1.5";
@@ -513,7 +507,7 @@ MiniApplet = ( function ( window, undefined ) {
 			
 			clienteFirma.setKeyStore(ksType != null ? ksType : defaultKeyStore);
 			
-			// Al haber cambiado el almacén, no tiene sentido que la variable sticky esté a true
+			// Al haber cambiado el almacen, no tiene sentido que la variable sticky este a true
 			setStickySignatore(false);
 		}
 		
@@ -727,8 +721,6 @@ MiniApplet = ( function ( window, undefined ) {
 					
 					var filenameDataBase64Pairs = buildData(clienteFirma.getMultiFileNameContentBase64(title, extensions, description, filePath));
 					
-					//var filenameDataBase64Array = filenameDataBase64Pairs.split(":");
-					
 					successCallback(filenameDataBase64Pairs)
 					
 				} catch(e) {
@@ -752,33 +744,22 @@ MiniApplet = ( function ( window, undefined ) {
 		 * Establece el valor de la variable "stickySignatore" que permite fijar
 		 * un certicado seleccionado para futuras invocaciones, de modo que no
 		 * sea necesario volver a seleccionarlo mientras el valor sea true o
-		 * caduque la conexión en caso de invocación por protocolo/socket
+		 * caduque la conexi&oacute;n en caso de invocaci&oacute;n por protocolo/socket
 		 */
-		var setStickySignatory = function (sticky, successCallback, errorCallback) {
+		var setStickySignatory = function(sticky) {
 			forceLoad();
-			
+	
 			if (clientType == TYPE_APPLET) {
-				
-				try {
-					
-					var result = buildData(clienteFirma.setStickySignatory(sticky));
-														
-					successCallback(result)
-					
-				} catch(e) {
-					if (errorCallback == undefined || errorCallback == null) {
-						throw e;
-					}
-					errorCallback(clienteFirma.getErrorType(), clienteFirma.getErrorMessage());
-				}
-			}
-			else {
+
+				clienteFirma.setStickySignatory(sticky);
+	
+			} else {
 				// En caso de no cargar el applet y utilizar autofirma, se
-				// establecerá la variable con el valor seleccionado para su
-				// posterior uso en cada invocación por protocolo
+				// establecera la variable con el valor seleccionado para su
+				// posterior uso en cada invocaci&oacute;n por protocolo
 				stickySignatore = sticky;
 			}
-			
+
 		}
 
 		var setLocale = function (locale) {
@@ -1466,7 +1447,7 @@ MiniApplet = ( function ( window, undefined ) {
 								semaphore.locked = true;
 							}
 							timeoutResetCounter = MiniApplet.AUTOFIRMA_CONNECTION_RETRIES;
-							execAppIntent(url);							
+							execAppIntent(url);
 						}
 						// Si hemos agotado todos los reintentos consideramos que la aplicacion no esta instalada
 						else if (timeoutResetCounter == 0) {
@@ -1507,7 +1488,7 @@ MiniApplet = ( function ( window, undefined ) {
 				if (isInternetExplorer()){
 					URL_MAX_SIZE = 12000;
 				}
-				// Si el envio se debe fragmentar, llamamos a una función que se encarga de mandar la peticion recursivamente
+				// Si el envio se debe fragmentar, llamamos a una funci&oacute;n que se encarga de mandar la peticion recursivamente
 				if (url.length > URL_MAX_SIZE) {
 					executeOperationRecursive(url, 1, Math.ceil(url.length/URL_MAX_SIZE));
 				}
@@ -1798,13 +1779,13 @@ MiniApplet = ( function ( window, undefined ) {
 					return;
 				}
 				
-				// Compruebo si se trata de una operación de carga/multicarga (load).
+				// Compruebo si se trata de una operacin de carga/multicarga (load).
 				// El separador ":"  distingue los pares "filename-1|dataBase64-1:filename-2|dataBase64-2...", uno por cada archivo cargado.
-				// Devolveremos un array en el que cada posición será uno de estos pares: "filename-n|dataBase64-n".
-				// La función de callback realizará el tratamiento deseado,
+				// Devolveremos un array en el que cada posici&oacute;n sera uno de estos pares: "filename-n|dataBase64-n".
+				// La funcion de callback realizara el tratamiento deseado,
 				// pudiendo obtener cada dato del par teniendo en cuenta el
 				// separador "|"
-				if (data.indexOf(":")) {
+				if (data.indexOf(":") > 0) {
 					
 					var fileNamesDataBase64 = data.split(":");
 					
@@ -1918,13 +1899,13 @@ MiniApplet = ( function ( window, undefined ) {
 			
 			/**
 			 * Inicia el proceso de carga de un fichero.
-			 * Implementada también en el applet Java de firma
-			 * @param title Título de la ventana de dialogo
+			 * Implementada tambi&eacute;n en el applet Java de firma
+			 * @param title T&iacute;tulo de la ventana de dialogo
 			 * @param extensions Extensiones permitidas
-			 * @param description Descripción del tipo de archivo a cargar
+			 * @param description Descripci&oacute;n del tipo de archivo a cargar
 			 * @param filePath Ruta del archivo por defecto
-			 * @param successCallbackFunction Función de callback tras éxito
-			 * @param errorCallbackFunction Función de callback tras error
+			 * @param successCallbackFunction Funci&oacute;n de callback tras &eacute;xito
+			 * @param errorCallbackFunction Funci&oacute;n de callback tras error
 			 */
 			function getFileNameContentBase64 (title, extensions, description, filePath, successCallbackFunction, errorCallbackFunction) {
 				successCallback = successCallbackFunction;
@@ -1934,13 +1915,13 @@ MiniApplet = ( function ( window, undefined ) {
 			
 			/**
 			 * Inicia el proceso de carga de uno o varios ficheros.
-			 * Implementada también en el applet Java de firma
-			 * @param title Título de la ventana de dialogo
+			 * Implementada tambi&eacute;n en el applet Java de firma
+			 * @param title T&iacute;tulo de la ventana de dialogo
 			 * @param extensions Extensiones permitidas
-			 * @param description Descripción del tipo de archivo a cargar
+			 * @param description Descripci&oacute;n del tipo de archivo a cargar
 			 * @param filePath Ruta del archivo por defecto
-			 * @param successCallbackFunction Función de callback tras éxito
-			 * @param errorCallbackFunction Función de callback tras error
+			 * @param successCallbackFunction Funci&oacute;n de callback tras &eacute;xito
+			 * @param errorCallbackFunction Funci&oacute;n de callback tras error
 			 */
 			function getMultiFileNameContentBase64 (title, extensions, description, filePath, successCallbackFunction, errorCallbackFunction) {
 				successCallback = successCallbackFunction;
@@ -1949,15 +1930,15 @@ MiniApplet = ( function ( window, undefined ) {
 			}	
 			
 			/**
-			 * Realiza una operacion de carga de fichero comunicándose con la
+			 * Realiza una operacion de carga de fichero comunic&aacute;ndose con la
 			 * aplicacion nativa por socket.
 			 * @param loadId Identificador de la operacion a realizar (load).
-			 * @param title Título de la ventana de dialogo
+			 * @param title T&iacute;tulo de la ventana de dialogo
 			 * @param extensions Extensiones permitidas
-			 * @param description Descripción del tipo de archivo a cargar
+			 * @param description Descripci&oacute;n del tipo de archivo a cargar
 			 * @param filePath Ruta del archivo por defecto
-			 * @param multiload true si permite la selección de varios ficheros,
-			 * false si sólo se permite seleccionar un fichero.
+			 * @param multiload true si permite la selecci&oacute;n de varios ficheros,
+			 * false si s&oacute;lo se permite seleccionar un fichero.
 			 */
 			function getLoadContentBase64ByService (loadId, title, extensions, description, filePath, multiload) {
 				
