@@ -12,7 +12,7 @@ if (document.all && !window.setTimeout.isPolyfill) {
 
 var originalXMLHttpRequest = window.XMLHttpRequest;
 
-MiniApplet = ( function ( window, undefined ) {
+var MiniApplet = ( function ( window, undefined ) {
 
 		var VERSION = "1.5";
 
@@ -744,7 +744,7 @@ MiniApplet = ( function ( window, undefined ) {
 		 * Establece el valor de la variable "stickySignatore" que permite fijar
 		 * un certicado seleccionado para futuras invocaciones, de modo que no
 		 * sea necesario volver a seleccionarlo mientras el valor sea true o
-		 * caduque la conexi&oacute;n en caso de invocaci&oacute;n por protocolo/socket
+		 * caduque la conexion en caso de invocacion por protocolo/socket
 		 */
 		var setStickySignatory = function(sticky) {
 			forceLoad();
@@ -756,7 +756,7 @@ MiniApplet = ( function ( window, undefined ) {
 			} else {
 				// En caso de no cargar el applet y utilizar autofirma, se
 				// establecera la variable con el valor seleccionado para su
-				// posterior uso en cada invocaci&oacute;n por protocolo
+				// posterior uso en cada invocacion por protocolo
 				stickySignatore = sticky;
 			}
 
@@ -1112,7 +1112,7 @@ MiniApplet = ( function ( window, undefined ) {
 			}
 
 			/**
-			 * Inicia el proceso de cofirma de una firma electr&oacute;nica. 
+			 * Inicia el proceso de cofirma de una firma electronica. 
 			 * Implementada en el applet Java de firma.
 			 */
 			function coSign (signB64, dataB64, algorithm, format, extraParams, successCallbackFunction, errorCallbackFunction) {
@@ -1122,7 +1122,7 @@ MiniApplet = ( function ( window, undefined ) {
 			}
 
 			/**
-			 * Inicia el proceso de contrafirma de una firma electr&oacute;nica.
+			 * Inicia el proceso de contrafirma de una firma electronica.
 			 * Implementada en el applet Java de firma. 
 			 */
 			function counterSign (signB64, algorithm, format, extraParams, successCallbackFunction, errorCallbackFunction) {
@@ -1137,7 +1137,7 @@ MiniApplet = ( function ( window, undefined ) {
 			 * @param dataB64 Datos o firma en base 64.
 			 * @param algorithm Algoritmo de firma.
 			 * @param format Formato de firma.
-			 * @param extraParams Par&aacute;metros para la configuraci&oacute;n de la operaci&oacute;n.
+			 * @param extraParams Parametros para la configuracion de la operacion.
 			 */
 			function signByService (signId, dataB64, algorithm, format, extraParams) {
 
@@ -1170,7 +1170,7 @@ MiniApplet = ( function ( window, undefined ) {
 			 * @param dataB64 Datos o firma en base 64.
 			 * @param algorithm Algoritmo de firma.
 			 * @param format Formato de firma.
-			 * @param extraParams Parametros para la configuraci&oacute;n de la operaci&oacute;n.
+			 * @param extraParams Parametros para la configuracion de la operacion.
 			 */
 			function signAndSaveFileByService (signId, dataB64, algorithm, format, extraParams, outputFileName) {
 
@@ -1227,8 +1227,8 @@ MiniApplet = ( function ( window, undefined ) {
 			}
 			
 			/**
-			 * Construye una URL para la invocaci&oacute;n del Cliente @firma nativo.
-			 * params: Par\u00E1metros para la configuraci\u00F3n de la operaci\u00F3n.
+			 * Construye una URL para la invocacion del Cliente @firma nativo.
+			 * params: Parametros para la configuracion de la operaci\u00F3n.
 			 */
 			function buildUrl (arr) {
 
@@ -1488,7 +1488,7 @@ MiniApplet = ( function ( window, undefined ) {
 				if (isInternetExplorer()){
 					URL_MAX_SIZE = 12000;
 				}
-				// Si el envio se debe fragmentar, llamamos a una funci&oacute;n que se encarga de mandar la peticion recursivamente
+				// Si el envio se debe fragmentar, llamamos a una funcion que se encarga de mandar la peticion recursivamente
 				if (url.length > URL_MAX_SIZE) {
 					executeOperationRecursive(url, 1, Math.ceil(url.length/URL_MAX_SIZE));
 				}
@@ -1780,14 +1780,14 @@ MiniApplet = ( function ( window, undefined ) {
 				}
 				
 				// Compruebo si se trata de una operacin de carga/multicarga (load).
-				// El separador ":"  distingue los pares "filename-1|dataBase64-1:filename-2|dataBase64-2...", uno por cada archivo cargado.
-				// Devolveremos un array en el que cada posici&oacute;n sera uno de estos pares: "filename-n|dataBase64-n".
+				// El separador "|"  distingue los pares "filename-1:dataBase64-1|filename-2:dataBase64-2...", uno por cada archivo cargado.
+				// Devolveremos un array en el que cada posicion sera uno de estos pares: "filename-n:dataBase64-n".
 				// La funcion de callback realizara el tratamiento deseado,
 				// pudiendo obtener cada dato del par teniendo en cuenta el
-				// separador "|"
+				// separador ":"
 				if (data.indexOf(":") > 0) {
 					
-					var fileNamesDataBase64 = data.split(":");
+					var fileNamesDataBase64 = data.split("|");
 					
 					successCallback(fileNamesDataBase64);
 					
@@ -1899,13 +1899,13 @@ MiniApplet = ( function ( window, undefined ) {
 			
 			/**
 			 * Inicia el proceso de carga de un fichero.
-			 * Implementada tambi&eacute;n en el applet Java de firma
-			 * @param title T&iacute;tulo de la ventana de dialogo
+			 * Implementada tambien en el applet Java de firma
+			 * @param title Titulo de la ventana de dialogo
 			 * @param extensions Extensiones permitidas
-			 * @param description Descripci&oacute;n del tipo de archivo a cargar
+			 * @param description Descripcion del tipo de archivo a cargar
 			 * @param filePath Ruta del archivo por defecto
-			 * @param successCallbackFunction Funci&oacute;n de callback tras &eacute;xito
-			 * @param errorCallbackFunction Funci&oacute;n de callback tras error
+			 * @param successCallbackFunction Funcion de callback tras exito
+			 * @param errorCallbackFunction Funcion de callback tras error
 			 */
 			function getFileNameContentBase64 (title, extensions, description, filePath, successCallbackFunction, errorCallbackFunction) {
 				successCallback = successCallbackFunction;
@@ -1915,13 +1915,13 @@ MiniApplet = ( function ( window, undefined ) {
 			
 			/**
 			 * Inicia el proceso de carga de uno o varios ficheros.
-			 * Implementada tambi&eacute;n en el applet Java de firma
-			 * @param title T&iacute;tulo de la ventana de dialogo
+			 * Implementada tambien en el applet Java de firma
+			 * @param title Titulo de la ventana de dialogo
 			 * @param extensions Extensiones permitidas
-			 * @param description Descripci&oacute;n del tipo de archivo a cargar
+			 * @param description Descripcion del tipo de archivo a cargar
 			 * @param filePath Ruta del archivo por defecto
-			 * @param successCallbackFunction Funci&oacute;n de callback tras &eacute;xito
-			 * @param errorCallbackFunction Funci&oacute;n de callback tras error
+			 * @param successCallbackFunction Funcion de callback tras exito
+			 * @param errorCallbackFunction Funcion de callback tras error
 			 */
 			function getMultiFileNameContentBase64 (title, extensions, description, filePath, successCallbackFunction, errorCallbackFunction) {
 				successCallback = successCallbackFunction;
@@ -1930,15 +1930,15 @@ MiniApplet = ( function ( window, undefined ) {
 			}	
 			
 			/**
-			 * Realiza una operacion de carga de fichero comunic&aacute;ndose con la
+			 * Realiza una operacion de carga de fichero comunicandose con la
 			 * aplicacion nativa por socket.
 			 * @param loadId Identificador de la operacion a realizar (load).
-			 * @param title T&iacute;tulo de la ventana de dialogo
+			 * @param title Titulo de la ventana de dialogo
 			 * @param extensions Extensiones permitidas
-			 * @param description Descripci&oacute;n del tipo de archivo a cargar
+			 * @param description Descripcion del tipo de archivo a cargar
 			 * @param filePath Ruta del archivo por defecto
-			 * @param multiload true si permite la selecci&oacute;n de varios ficheros,
-			 * false si s&oacute;lo se permite seleccionar un fichero.
+			 * @param multiload true si permite la seleccion de varios ficheros,
+			 * false si solo se permite seleccionar un fichero.
 			 */
 			function getLoadContentBase64ByService (loadId, title, extensions, description, filePath, multiload) {
 				
@@ -2092,7 +2092,7 @@ MiniApplet = ( function ( window, undefined ) {
 			}
 
 			/**
-			 * Inicia el proceso de cofirma de una firma electr&oacute;nica. 
+			 * Inicia el proceso de cofirma de una firma electronica. 
 			 * Implementada en el applet Java de firma.
 			 */
 			function coSign (signB64, dataB64, algorithm, format, extraParams, successCallback, errorCallback) {
@@ -2100,7 +2100,7 @@ MiniApplet = ( function ( window, undefined ) {
 			}
 
 			/**
-			 * Inicia el proceso de contrafirma de una firma electr&oacute;nica.
+			 * Inicia el proceso de contrafirma de una firma electronica.
 			 * Implementada en el applet Java de firma. 
 			 */
 			function counterSign (signB64, algorithm, format, extraParams, successCallback, errorCallback) {
@@ -2113,9 +2113,9 @@ MiniApplet = ( function ( window, undefined ) {
 			 * @param dataB64 Datos o firma en base 64.
 			 * @param algorithm Algoritmo de firma.
 			 * @param format Formato de firma.
-			 * @param extraParams Par&aacute;metros para la configuraci&oacute;n de la operaci&oacute;n.
-			 * @param successCallback M&eacute;todo a ejecutar en caso de &eacute;xito.
-			 * @param errorCallback M&eacute;todo a ejecutar en caso de error.
+			 * @param extraParams Parametros para la configuracion de la operacion.
+			 * @param successCallback Metodo a ejecutar en caso de exito.
+			 * @param errorCallback Metodo a ejecutar en caso de error.
 			 */
 			function signOperation (signId, dataB64, algorithm, format, extraParams, successCallback, errorCallback) {
 
@@ -2168,10 +2168,10 @@ MiniApplet = ( function ( window, undefined ) {
 			 * @param dataB64 Datos o firma en base 64.
 			 * @param algorithm Algoritmo de firma.
 			 * @param format Formato de firma.
-			 * @param extraParams Par&aacute;metros para la configuraci&oacute;n de la operaci&oacute;n.
+			 * @param extraParams Parametros para la configuracion de la operacion.
 			 * @param outputFileName Nombre propuesto para el fichero a guardar.
-			 * @param successCallback M&eacute;todo a ejecutar en caso de &eacute;xito.
-			 * @param errorCallback M&eacute;todo a ejecutar en caso de error.
+			 * @param successCallback Metodo a ejecutar en caso de exito.
+			 * @param errorCallback Metodo a ejecutar en caso de error.
 			 */
 			function signAndSaveToFile (signId, dataB64, algorithm, format, extraParams, outputFileName, successCallback, errorCallback) {
 
@@ -2551,16 +2551,16 @@ MiniApplet = ( function ( window, undefined ) {
 			}
 			
 			/**
-			 * Invoca un Intent con la operacion seleccionada, la configuraci\u00F3n establecida y las campos del
+			 * Invoca un Intent con la operacion seleccionada, la configuracion establecida y las campos del
 			 * formulario pasado como parametro. Si se define un callback para tratar el caso de exito o error de
 			 * la operacion, se intentara descargar el resultado devuelto por la app del servidor intermedio de
 			 * comunicacion. 
 			 *
 			 * @param intentURL URL para la invocacion del Cliente JavaScript
-			 * @param idSession Identificador de la sesi\u00F3n para la recuperaci\u00F3n del resultado.
+			 * @param idSession Identificador de la sesion para la recuperaci\u00F3n del resultado.
 			 * @param cipherKey Clave de cifrado para la respuesta del servidor.
-			 * @param successCallback Actuaci\u00F3n a realizar cuando se recupera el resultado de la operaci&oacute;n.
-			 * @param errorCallback Actuaci\u00F3n a realizar cuando ocurre un error al recuperar el resultado.
+			 * @param successCallback Actuacion a realizar cuando se recupera el resultado de la operacion.
+			 * @param errorCallback Actuacion a realizar cuando ocurre un error al recuperar el resultado.
 			 */
 			function execAppIntent (intentURL, idSession, cipherKey, successCallback, errorCallback) {
 
@@ -2629,14 +2629,14 @@ MiniApplet = ( function ( window, undefined ) {
 			}
 
 			/**
-			 * Crea una URL a partir de los parametros introducidos para la invocaci&oacute;n de
-			 * una app nativa para que descargue la configuracion de la operaci&oacute;n a realizar.
+			 * Crea una URL a partir de los parametros introducidos para la invocacion de
+			 * una app nativa para que descargue la configuracion de la operacion a realizar.
 			 * @param op Codigo de la operacion a la que tiene que invocar la URL.
 			 * @param id Identificador para la descarga.
-			 * @param rtServlet Servlet para la descarga de la configuraci&oacute;n.
+			 * @param rtServlet Servlet para la descarga de la configuracion.
 			 * @param cipherKey Clave para el descifrado.
 			 * @returns URL para la llamada a la app con los datos necesarios para que descargue
-			 * la configuraci&oacute;n de la operaci&oacute;n a realizar.
+			 * la configuracion de la operacion a realizar.
 			 */
 			function buildUrlWithoutData (op, id, rtServlet, cipherKey) {
 				var j = 0;

@@ -6,7 +6,7 @@
 	<script type="text/javascript" src="js/miniapplet.js"></script>
 	<script type="text/javascript" src="js/constantes.js"></script>
 	<script type="text/javascript">
-
+	
 		// IMPORTANTE: PARA PRUEBAS, USAR SIEMPRE UNA IP O NOMBRE DE DOMINIO, NUNCA 'LOCALHOST' O '127.0.0.1'
 		// SI NO SE HACE ASI, AUTOFIRMA BLOQUEARA LA FIRMA POR SEGURIDAD
 		function saveSignature() {
@@ -228,10 +228,10 @@
 		 * un fichero, llama al metodo correspondiente (sign(), coSign() o counterSign()) sin indicar los datos.
 		 * El uso del metodo de carga no sera compatible con el Cliente movil.
 		 */
-		function browse(title, dataField, textDiv) {
+		function browseDatos(title, dataField, textDiv) {
 			try {
 				
-				MiniApplet.getFileNameContentBase64(title, "xsig,pdf,xml,doc", "Fichero para prueba de función load", "C://Users//jose.rodriguez.gomez//Documents", showLoadResultCallback, showErrorCallback);
+				MiniApplet.getFileNameContentBase64(title, "xsig,pdf,xml,doc", "Fichero para prueba de función load", "C://Users//jose.rodriguez.gomez//Documents", showLoadDataResultCallback, showErrorCallback);
 				
 			} catch(e) {
 				showLog("Type: " + MiniApplet.getErrorType() + "\nMessage: " + MiniApplet.getErrorMessage());
@@ -244,42 +244,29 @@
 		 * un fichero, llama al metodo correspondiente (sign(), coSign() o counterSign()) sin indicar los datos.
 		 * El uso del metodo de carga no sera compatible con el Cliente movil.
 		 */
-		function multiBrowse(title, dataField, textDiv) {
+		function browseFirma(title, dataField, textDiv) {
 			try {
-								
-				MiniApplet.getMultiFileNameContentBase64(title, "xsig,pdf,xml,doc", "Fichero para prueba de función load", "C://Users//jose.rodriguez.gomez//Documents", showLoadResultCallback, showErrorCallback);
 				
+				MiniApplet.getFileNameContentBase64(title, "xsig,pdf,xml,doc", "Fichero para prueba de función load", "C://Users//jose.rodriguez.gomez//Documents", showLoadFirmaResultCallback, showErrorCallback);
+			
 			} catch(e) {
 				showLog("Type: " + MiniApplet.getErrorType() + "\nMessage: " + MiniApplet.getErrorMessage());
 			}
 		}
-		
-		function showLoadResultCallback_(dataB64, filename) {
-			
-			showLog("Carga de fichero OK");
-			
-			if (dataB64 == null || filename == null) {
-				return;
-			}
-					
-			dataFilename.innerHTML = filename;
-			data.value = dataB64;
-
-		}
-		
+				
 		function showStickyResultCallback(result) {
 			
 			showLog(result);
 		}
 		
-		function showLoadResultCallback(fileNamesDataBase64) {
+		function showLoadDataResultCallback(fileNamesDataBase64) {
 			
 			var fileName = "";
 			var dataB64 = "";
 			
 			if (fileNamesDataBase64.length == 1) {
 								
-				var sepPos = fileNamesDataBase64[0].indexOf("|");
+				var sepPos = fileNamesDataBase64[0].indexOf(":");
 				var fileNameDataBase64 = fileNamesDataBase64[0];
 				
 				if (sepPos == -1) {
@@ -290,33 +277,35 @@
 					dataB64 = fileNameDataBase64.substring(sepPos + 1).replace(/\-/g, "+").replace(/\_/g, "/");
 				}
 				
-				dataFilename.innerHTML = fileName;
-				data.value = dataB64;
+			} 
+			
+			dataFilename.innerHTML = fileName;
+			data.value = dataB64;
+			
+		}
+		
+		function showLoadFirmaResultCallback(fileNamesDataBase64) {
+			
+			var fileName = "";
+			var dataB64 = "";
+			
+			if (fileNamesDataBase64.length == 1) {
+								
+				var sepPos = fileNamesDataBase64[0].indexOf(":");
+				var fileNameDataBase64 = fileNamesDataBase64[0];
 				
-			} else if (fileNamesDataBase64.length > 1) {
-							
-				for (i = 0; i < fileNamesDataBase64.length; i++) {
-					
-					var sepPos = fileNamesDataBase64[i].indexOf("|");
-				
-					if (sepPos == -1) {
-						filename += Base64.decode(fileNamesDataBase64[i], true);
-					}
-					else {
-						fileName += fileNamesDataBase64[i].substring(0, sepPos);
-						//dataB64 = fileNameDataBase64[i].substring(sepPos + 1).replace(/\-/g, "+").replace(/\_/g, "/");
-					}
-					
-					if (i < fileNamesDataBase64.length - 1) {
-						fileName += ", ";
-					}
-				
+				if (sepPos == -1) {
+					fileName = Base64.decode(fileNameDataBase64, true);
+				}
+				else {
+					fileName = fileNameDataBase64.substring(0, sepPos);
+					dataB64 = fileNameDataBase64.substring(sepPos + 1).replace(/\-/g, "+").replace(/\_/g, "/");
 				}
 				
-				multiFileNames.innerHTML = fileName;
-				data.value = dataB64;
-				
-			}
+			} 
+			
+			signatureFilename.innerHTML = fileName;
+			signature.value = dataB64;
 			
 		}
 		
@@ -369,18 +358,14 @@
 		<div>
 		 <input id="data" type="hidden">
 		 <div><span>Fichero de datos: </span><span id="dataFilename"></span></div>
-		 <input type="button" value="Examinar" onclick="browse('Cargar datos a firmar JJRG', document.getElementById('data'), document.getElementById('dataFilename'));">&nbsp;
+		 <input type="button" value="Examinar" onclick="browseDatos('', document.getElementById('data'), document.getElementById('dataFilename'));">&nbsp;
 		 <input type="button" value="Limpiar" onclick="cleanDataField(document.getElementById('data'), document.getElementById('dataFilename'));"><br/><br/>
 
 		 <input id="signature" type="hidden">
 		 <div><span>Fichero de firma: </span><span id="signatureFilename"></span></div>
-		 <input type="button" value="Examinar" onclick="browse('Cargar datos a firmar', document.getElementById('signature'), document.getElementById('signatureFilename'));">&nbsp;
+		 <input type="button" value="Examinar" onclick="browseFirma('', document.getElementById('signature'), document.getElementById('signatureFilename'));">&nbsp;
 		 <input type="button" value="Limpiar" onclick="cleanDataField(document.getElementById('signature'), document.getElementById('signatureFilename'));"><br/><br/>
 		 
-		 <input id="datos" type="hidden">
-		 <div><span>Ficheros cargados: </span><span id="multiFileNames"></span></div>
-		 <input type="button" value="Examinar" onclick="multiBrowse('Cargar datos a firmar', document.getElementById('signature'), document.getElementById('signatureFilename'));">&nbsp;
-		 <input type="button" value="Limpiar" onclick="cleanDataField(document.getElementById('datos'), document.getElementById('multiFileNames'));">
 		</div>
 		</fieldset>
 		<br/>

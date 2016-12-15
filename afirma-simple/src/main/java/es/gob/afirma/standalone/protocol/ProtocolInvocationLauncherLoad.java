@@ -14,15 +14,16 @@ import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.misc.protocol.UrlParametersToLoad;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.standalone.AutoFirmaUtil;
+import es.gob.afirma.standalone.ui.preferences.PreferencesManager;
 
 final class ProtocolInvocationLauncherLoad {
 	
 	/**
 	 * Character separator between file name and file data: filename|filedata64
 	 */
-	private static final char LOAD_SEPARATOR = '|';
+	private static final char LOAD_SEPARATOR = ':';
 	
-	private static final char MULTILOAD_SEPARATOR = ':';
+	private static final char MULTILOAD_SEPARATOR = '|';
 	
 	private static final String RESULT_CANCEL = "CANCEL"; //$NON-NLS-1$
 
@@ -44,8 +45,25 @@ final class ProtocolInvocationLauncherLoad {
 						
 		final File[] selectedDataFiles;
 		
-		// Invocamos la factoría de elementos de interfaz para para cargar el
-		// diálogo de selección de fichero
+		// Gestionamos el titulo del dialogo a traves de las preferencias Java:
+		// Cada vez que se indique un titulo, este se guardara en las preferencias como "ultimo titulo usado".
+		// Si no se indica titulo, se obtendra de las preferencias el "ultimo titulo usado" si es distinto de vacio.
+		final String ultimoTitulo = PreferencesManager.get(PreferencesManager.PREFERENCE_LAST_DIALOG_TITLE, "");
+		if (!"".equals(options.getTitle()) && 
+				options.getTitle() != null) {
+			PreferencesManager.put(PreferencesManager.PREFERENCE_LAST_DIALOG_TITLE, options.getTitle());
+			
+		} else {
+			
+			if (!"".equals(ultimoTitulo) &&
+					ultimoTitulo != null) {
+								
+				options.setTitle(ultimoTitulo);
+			}
+		}
+		
+		// Invocamos la factoria de elementos de interfaz para para cargar el
+		// dialogo de seleccion de fichero
 		try {
 			if (Platform.OS.MACOSX.equals(Platform.getOS())) {
 				ServiceInvocationManager.focusApplication();
@@ -72,7 +90,7 @@ final class ProtocolInvocationLauncherLoad {
 		// Preparamos el buffer para enviar el resultado
 		final StringBuilder dataToSend = new StringBuilder();
 		
-		// Intentamos extraer la información de cada objecto File obtenidos en el
+		// Intentamos extraer la informacion de cada objecto File obtenidos en el
 		// paso anterior
 		try {
 			
