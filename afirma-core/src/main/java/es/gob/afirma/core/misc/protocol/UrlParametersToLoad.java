@@ -27,7 +27,7 @@ public final class UrlParametersToLoad extends UrlParameters {
 	/** Par&aacute;metro de entrada que indica las extensiones de ficheros permitidos. */
 	private static final String EXTENSIONS_PARAM = "extensions"; //$NON-NLS-1$
 	
-	/** Par&aacute;metro de entrada que indica la descripción del tipo de fichero. */
+	/** Par&aacute;metro de entrada que indica la descripcion del tipo de fichero. */
 	private static final String DESCRIPTION_PARAM = "description"; //$NON-NLS-1$
 	
 	/** Par&aacute;metro de entrada que indica la ruta por defecto. */
@@ -37,24 +37,24 @@ public final class UrlParametersToLoad extends UrlParameters {
 	private String minimumVersion;
 		
 	/**
-	 * Attribute that represents the configuration for the load/multiload option.
+	 * Atributo que representa si se trata de una operaci&oacute;n de carga ({@code false}}) o multicarga ({@code true}})
 	 */
 	private Boolean multiload;
 	
 	/**
-	 * The title param from invocation URL
+	 * Atributo que representa el t&iacute;tulo de la ventana de di&aacute;logo de selecci&oacute;n de fichero
 	 */
 	private String title;
 	/**
-	 * The extensions param from invocation URL
+	 * Atributo que representa las extensiones de fichero permitidas
 	 */
 	private String extensions;
 	/**
-	 * The description param from invocation URL
+	 * Atributo que representa la descripci&oacute;n de los tipos de ficheros que se pueden cargar
 	 */
 	private String description;
 	/**
-	 * The filepath param from invocation URL
+	 * Atributo que representa la ruta por defecto de ficheros para cargar
 	 */
 	private String filepath;
 	
@@ -65,6 +65,9 @@ public final class UrlParametersToLoad extends UrlParameters {
 		return this.minimumVersion;
 	}
 	
+	/**
+	 * Constructor sin argumentos
+	 */
 	UrlParametersToLoad() {
 		setMinimumVersion(null);
 		setMultiload(null);
@@ -74,91 +77,100 @@ public final class UrlParametersToLoad extends UrlParameters {
 		setFilepath(null);
 	}
 	
+	/** Establece la versi&oacute;n m&iacute;nima exigida del protocolo de comunicaci&oacute;n.
+	 * @param minVer Versi&oacute;n m&iacute;nima del protocolo.
+	 */
 	void setMinimumVersion(final String minVer) {
 		this.minimumVersion = minVer;
 	}
 				
+	
 	/**
-	 * Setter method for the multiload param
-	 * @param multiload The new multiload to set
+	 * Establece el tipo de operaci&oacute;n de la operaci&oacute;n de carga/multicarga.
+	 * @param multiload Valor del tipo de &oacute;n: ({@code false}}) para carga o
+	 *            ({@code true}}) para multicarga
 	 */
 	public void setMultiload(final Boolean multiload) {
 		this.multiload = multiload;
 	}
 	
 	/**
-	 * Getter method for the multiload attribute
-	 * @return The multiload param
+	 * Obtiene la opci&oacute;n de configuraci&oacute;n de la operaci&oacute;n de carga/multicarga.
+	 * 
+	 * return multiload
+	 *            Valor del tipo de &oacute;n: ({@code false}}) para carga o
+	 *            ({@code true}}) para multicarga
 	 */
 	public Boolean getMultiload() {
 		return this.multiload;
 	}
 	
 		
-	/**
-	 * Getter method for the title attribute
-	 * @return The title param
+	/** Obtiene el t&iacute;tulo del di&aacute;logo de carga de datos.
+	 * @return T&iacute;tulo del di&aacute;logo de carga de datos.
 	 */
 	public String getTitle() {
 		return title;
 	}
 
-	/**
-	 * Setter method for the title param
-	 * @param title The new title to set
+	/** Establece el t&iacute;tulo del di&aacute;logo de carga de datos.
+	 * @param title T&iacute;tulo del di&aacute;logo de carga de datos.
 	 */
 	public void setTitle(final String title) {
 		this.title = title;
 	}
 
-	/**
-	 * Getter method for the extensions param
-	 * @return The extensions param
+	/** Obtiene, como una lista separada por comas, las extensiones permitidas para el
+	 * fichero(s) a cargar.
+	 * @return Lista separada por comas con las extensiones para el fichero(s) a cargar.
 	 */
 	public String getExtensions() {
 		return extensions;
 	}
 
-	/**
-	 * Setter method for the extensions param
-	 * @param extensions The new extensions to set
+	/** Establece las extensiones permitidas para el fichero(s) a cargar.
+	 * Deben indicarse como una lista separada por comas
+	 * @param exts Extensiones permitidas, indicadas como una lista separada por comas.
 	 */
 	public void setExtensions(final String extensions) {
 		this.extensions = extensions;
 	}
 
-	/**
-	 * Getter method for the description param
-	 * @return The description param
+	/** Obtiene la descripci&oacute;n del tipo de fichero a cargar.
+	 * @return Descripci&oacute;n del tipo de fichero a cargar.
 	 */
 	public String getDescription() {
 		return description;
 	}
 
-	/**
-	 * Setter method for the description para,
-	 * @param description The new description to set
+	/** Establece la descripci&oacute;n del tipo de fichero a cargar.
+	 * @param desc Descripci&oacute;n del tipo de fichero a cargar.
 	 */
 	public void setDescription(final String description) {
 		this.description = description;
 	}
 
 	/**
-	 * Getter method for the filepath param
-	 * @return The filepath param
+	 * Obtiene la ruta por defecto para cargar ficheros
+	 * @return Ruta por defecto para cargar ficheros
 	 */
 	public String getFilepath() {
 		return filepath;
 	}
 
 	/**
-	 * Setter method for the filepath param
-	 * @param filepath The new filepath to set
+	 * Establece la ruta por defecto para cargar ficheros
+	 * @param filepath Ruta por defecto para cargar ficheros
 	 */
 	public void setFilepath(final String filepath) {
 		this.filepath = filepath;
 	}
 
+	/**
+	 * M&eacute;todo que establece los par&aacute;metros propios de la operaci&oacute;n de carga/multicarga
+	 * @param params Mapa de valores obtenidos de la URL de invocaci&oacute;n de la operaci&oacute;n
+	 * @throws ParameterException
+	 */
 	void setLoadParameters(final Map<String, String> params) throws ParameterException {
 		
 		// Version minima requerida del protocolo que se debe soportar
@@ -169,8 +181,8 @@ public final class UrlParametersToLoad extends UrlParameters {
 			setMinimumVersion(Integer.toString(ProtocolVersion.VERSION_0.getVersion()));
 		}
 		
-		// Parámetro que indica si se debe utilizar el diálogo de selección
-		// simple o múltiple de ficheros
+		// Parametro que indica si se debe utilizar el dialogo de seleccion
+		// simple o multiple de ficheros
 		if (params.containsKey(MULTILOAD_PARAM)) {
 			setMultiload(Boolean.valueOf(params.get(MULTILOAD_PARAM)));
 		}

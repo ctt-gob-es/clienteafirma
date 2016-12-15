@@ -93,8 +93,8 @@ public final class UrlParametersToSignAndSave extends UrlParameters {
 	private String minimumVersion;
 	
 	/**
-	 * Attribute that represents the value to configure sticky signature you get
-	 * from the protocol invocation URL
+	 * Opci&oacute;n de configuraci&oacute;n que determina si se debe mantener
+	 * el primer certificado seleccionado para todas las operaciones. 
 	 */
 	private Boolean sticky;
 
@@ -149,16 +149,21 @@ public final class UrlParametersToSignAndSave extends UrlParameters {
 	}
 	
 	/**
-	 * Getter method for the sticky attribute
-	 * @return the sticky parameter (true or false)
+	 * Obtiene la opci&oacute;n de configuraci&oacute;n sticky
+	 * 
+	 * @return Opci&oacute;n de configuraci&oacute;n que determina si se debe
+	 *         mantener el primer certificado seleccionado ({@code true}) o se
+	 *         debe pedir siempre que el usuario elija uno ({@code false})
 	 */
 	public Boolean getSticky() {
 		return sticky;
 	}
 
 	/**
-	 * Setter parameter for the sticky attribute
-	 * @param sticky the value for the sticky attribute to set
+	 * Establece la opci&oacute;n de configuraci&oacute;n sticky
+	 * @param sticky Opci&oacute;n de configuraci&oacute;n que determina si se debe
+	 *         mantener el primer certificado seleccionado ({@code true}) o se
+	 *         debe pedir siempre que el usuario elija uno ({@code false})
 	 */
 	public void setSticky(final Boolean sticky) {
 		this.sticky = sticky;
@@ -275,7 +280,7 @@ public final class UrlParametersToSignAndSave extends UrlParameters {
 			setExtraParams(new Properties());
 		}
 		
-		// Valor de parámetro sticky
+		// Valor de parametro sticky
 		if (params.containsKey(STICKY_PARAM)) {
 			setSticky(new Boolean(params.get(STICKY_PARAM)));
 		} else {
