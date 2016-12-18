@@ -50,6 +50,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import es.gob.afirma.core.AOCancelledOperationException;
+import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.ui.AOUIFactory;
@@ -397,6 +398,7 @@ public final class CreateHashFiles extends JDialog {
 	 *         					&lt;xs:extension base="xs:string"&gt;
 	 *           					&lt;xs:attribute type="xs:string" name="hash" use="required"/&gt;
 	 *           					&lt;xs:attribute type="xs:string" name="name" use="required"/&gt;
+	 *           					&lt;xs:attribute type="xs:string" name="hexhash"/&gt;
 	 *         					&lt;\xs:extension&gt;
 	 *       				&lt;\xs:simpleContent&gt;
 	 *				     &lt;\xs:complexType&gt;
@@ -459,6 +461,11 @@ public final class CreateHashFiles extends JDialog {
 			final Attr hashAttribute = doc.createAttribute("hash"); //$NON-NLS-1$
 			hashAttribute.setValue(Base64.encode(hash, true));
 			entry.setAttributeNode(hashAttribute);
+
+			// Se inicializa el atributo hexhash
+			final Attr hexHashAttribute = doc.createAttribute("hexhash"); //$NON-NLS-1$
+			hexHashAttribute.setValue(AOUtil.hexify(hash, false) + "h"); //$NON-NLS-1$
+			entry.setAttributeNode(hexHashAttribute);
 		}
 		final StringWriter sw = new StringWriter();
 		final TransformerFactory tf = TransformerFactory.newInstance();
