@@ -209,9 +209,10 @@ public final class UrlParametersToLoad extends UrlParameters {
 			setDescription(null);
 		}
 		
-		if (params.containsKey(FILEPATH_PARAM)) {
+		if (params.containsKey(FILEPATH_PARAM) && !"".equals(params.get(FILEPATH_PARAM))) {
 			setFilepath(params.get(FILEPATH_PARAM));
 		} else {
+			
 			setFilepath(null);
 		}
 	}	
