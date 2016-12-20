@@ -1,14 +1,13 @@
 package xmlwise;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.StringReader;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.w3c.dom.Document;
-import org.xml.sax.InputSource;
 
 /**
  * Xmlwise convenience methods for loading xml documents and render them into
@@ -47,9 +46,6 @@ public class Xmlwise
 		try
 		{
 			final DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
-//			documentBuilderFactory.setAttribute("http://apache.org/xml/features/nonvalidating/load-external-dtd",
-//			                                    loadExternalDTD);
-			documentBuilderFactory.setValidating(validate);
 			final DocumentBuilder builder = documentBuilderFactory.newDocumentBuilder();
 			return builder.parse(file);
 		}
@@ -76,11 +72,8 @@ public class Xmlwise
 		try
 		{
 			final DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
-//			documentBuilderFactory.setAttribute("http://apache.org/xml/features/nonvalidating/load-external-dtd",
-//			                                    loadExternalDTD);
-			documentBuilderFactory.setValidating(validate);
 			final DocumentBuilder builder = documentBuilderFactory.newDocumentBuilder();
-			return builder.parse(new InputSource(new StringReader(xml)));
+			return builder.parse(new ByteArrayInputStream(xml.getBytes()));
 		}
 		catch (final Exception e)
 		{
