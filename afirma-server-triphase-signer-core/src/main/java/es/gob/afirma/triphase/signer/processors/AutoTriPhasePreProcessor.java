@@ -25,38 +25,34 @@ public final class AutoTriPhasePreProcessor implements TriPhasePreProcessor {
 		this.installXmlDSig = installXmlDSigProvider;
 	}
 
-	private static byte[] getFormattedPreSign(final byte[] preSign, final String format) throws IOException {
-		final TriphaseData td = TriphaseData.parser(preSign);
-		td.setFormat(format);
-		return td.toString().getBytes();
-	}
-
 	@Override
-	public byte[] preProcessPreSign(final byte[] data,
+	public TriphaseData preProcessPreSign(final byte[] data,
 			                        final String algorithm,
 			                        final X509Certificate[] cert,
 			                        final Properties extraParams) throws IOException,
 			                                                             AOException {
 		final String format = getSignFormat(data);
 		final TriPhasePreProcessor prep = getPreProcessor(format);
-		final byte[] preSign = prep.preProcessPreSign(data, algorithm, cert, extraParams);
-		return getFormattedPreSign(preSign, format);
+		final TriphaseData preSign = prep.preProcessPreSign(data, algorithm, cert, extraParams);
+		preSign.setFormat(format);
+		return preSign;
 	}
 
 	@Override
-	public byte[] preProcessPreCoSign(final byte[] data,
+	public TriphaseData preProcessPreCoSign(final byte[] data,
 			                          final String algorithm,
 			                          final X509Certificate[] cert,
 			                          final Properties extraParams) throws IOException,
 			                                                               AOException {
 		final String format = getSignFormat(data);
 		final TriPhasePreProcessor prep = getPreProcessor(format);
-		final byte[] preSign = prep.preProcessPreCoSign(data, algorithm, cert, extraParams);
-		return getFormattedPreSign(preSign, format);
+		final TriphaseData preSign = prep.preProcessPreCoSign(data, algorithm, cert, extraParams);
+		preSign.setFormat(format);
+		return preSign;
 	}
 
 	@Override
-	public byte[] preProcessPreCounterSign(final byte[] sign,
+	public TriphaseData preProcessPreCounterSign(final byte[] sign,
 			                               final String algorithm,
 			                               final X509Certificate[] cert,
 			                               final Properties extraParams,
@@ -64,8 +60,9 @@ public final class AutoTriPhasePreProcessor implements TriPhasePreProcessor {
 			                                                                       AOException {
 		final String format = getSignFormat(sign);
 		final TriPhasePreProcessor prep = getPreProcessor(format);
-		final byte[] preSign = prep.preProcessPreCounterSign(sign, algorithm, cert, extraParams, targets);
-		return getFormattedPreSign(preSign, format);
+		final TriphaseData preSign = prep.preProcessPreCounterSign(sign, algorithm, cert, extraParams, targets);
+		preSign.setFormat(format);
+		return preSign;
 	}
 
 	@Override

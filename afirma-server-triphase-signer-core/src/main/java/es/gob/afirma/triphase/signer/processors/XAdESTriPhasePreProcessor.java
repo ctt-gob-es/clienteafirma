@@ -66,7 +66,7 @@ public class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 	}
 
 	@Override
-	public byte[] preProcessPreSign(final byte[] data,
+	public TriphaseData preProcessPreSign(final byte[] data,
 			                        final String algorithm,
 			                        final X509Certificate[] cert,
 			                        final Properties extraParams) throws IOException, AOException {
@@ -83,7 +83,7 @@ public class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 		// Si es FacturaE modificamos los parametros adicionales
 		final Properties xParams = this.facturae ? AOFacturaESigner.getFacturaEExtraParams(extraParams) : extraParams;
 
-		final byte[] presign = preProcessPre(data, algorithm, cert, xParams, Op.SIGN);
+		final TriphaseData presign = preProcessPre(data, algorithm, cert, xParams, Op.SIGN);
 
 		LOGGER.info("Prefirma XAdES - Firma - FIN"); //$NON-NLS-1$
 
@@ -91,14 +91,14 @@ public class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 	}
 
 	@Override
-	public byte[] preProcessPreCoSign(final byte[] data,
+	public TriphaseData preProcessPreCoSign(final byte[] data,
 			                          final String algorithm,
 			                          final X509Certificate[] cert,
 			                          final Properties extraParams) throws IOException, AOException {
 
 		LOGGER.info("Prefirma XAdES - Cofirma - INICIO"); //$NON-NLS-1$
 
-		final byte[] presign = preProcessPre(data, algorithm, cert, extraParams, Op.COSIGN);
+		final TriphaseData presign = preProcessPre(data, algorithm, cert, extraParams, Op.COSIGN);
 
 		LOGGER.info("Prefirma XAdES - Cofirma - FIN"); //$NON-NLS-1$
 
@@ -107,7 +107,7 @@ public class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 
 
 	@Override
-	public byte[] preProcessPreCounterSign(final byte[] sign,
+	public TriphaseData preProcessPreCounterSign(final byte[] sign,
 			                               final String algorithm,
 			                               final X509Certificate[] cert,
 			                               final Properties extraParams,
@@ -117,14 +117,14 @@ public class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 
 		extraParams.setProperty(EXTRAPARAM_NAME_TARGET, targets.name());
 
-		final byte[] presign = preProcessPre(sign, algorithm, cert, extraParams, Op.COUNTERSIGN);
+		final TriphaseData presign = preProcessPre(sign, algorithm, cert, extraParams, Op.COUNTERSIGN);
 
 		LOGGER.info("Prefirma XAdES - Contrafirma - FIN"); //$NON-NLS-1$
 
 		return presign;
 	}
 
-	private static byte[] preProcessPre(final byte[] data,
+	private static TriphaseData preProcessPre(final byte[] data,
 			                            final String algorithm,
 			                            final X509Certificate[] cert,
 			                            final Properties extraParams,
@@ -178,8 +178,6 @@ public class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 		// Recuperamos el identificador asociado a la firma u obtenemos uno si no lo tenia
 		final String signatureId = TriPhaseUtil.getSignatureId(extraParams);
 
-		LOGGER.info(" ============= Identificador comun para todas las firmas: " + signatureId);
-
 		// Preparamos los datos de prefirma para devolverselos al cliente
 		final TriphaseData triphaseData = new TriphaseData();
 
@@ -214,7 +212,7 @@ public class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 			);
 		}
 
-		return triphaseData.toString().getBytes();
+		return triphaseData;
 	}
 
 	@Override

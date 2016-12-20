@@ -43,7 +43,7 @@ public final class PAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	@Override
-	public byte[] preProcessPreSign(final byte[] data,
+	public TriphaseData preProcessPreSign(final byte[] data,
 			                        final String algorithm,
 			                        final X509Certificate[] cert,
 			                        final Properties extraParams) throws IOException,
@@ -93,7 +93,7 @@ public final class PAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 
 		LOGGER.info("Prefirma PAdES - Firma - FIN"); //$NON-NLS-1$
 
-		return triphaseData.toString().getBytes();
+		return triphaseData;
 	}
 
 	@Override
@@ -163,7 +163,7 @@ public final class PAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 	}
 
 	@Override
-	public byte[] preProcessPreCoSign(final byte[] data,
+	public TriphaseData preProcessPreCoSign(final byte[] data,
 			                          final String algorithm,
 			                          final X509Certificate[] cert,
 			                          final Properties extraParams) throws IOException,
@@ -194,7 +194,7 @@ public final class PAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 	}
 
 	@Override
-	public byte[] preProcessPreCounterSign(final byte[] sign,
+	public TriphaseData preProcessPreCounterSign(final byte[] sign,
 			                               final String algorithm,
 			                               final X509Certificate[] cert,
 			                               final Properties extraParams,

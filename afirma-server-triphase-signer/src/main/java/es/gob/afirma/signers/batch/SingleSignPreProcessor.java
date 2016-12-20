@@ -52,11 +52,11 @@ final class SingleSignPreProcessor {
 		// Instanciamos el preprocesador adecuado
 		final TriPhasePreProcessor prep = SingleSignConstants.getTriPhasePreProcessor(sSign);
 
-		final byte[] docBytes = sSign.getData();
+		final byte[] docBytes = sSign.getData(false);
 
 		Properties extraParams;
 		try {
-			extraParams = ExtraParamsProcessor.expandProperties(sSign.getExtraParams(), null, sSign.getSignFormat().name());
+			extraParams = ExtraParamsProcessor.expandProperties(sSign.getExtraParams(), docBytes, sSign.getSignFormat().name());
 		}
 		catch (final IncompatiblePolicyException e) {
 			Logger.getLogger("es.gob.afirma").log( //$NON-NLS-1$
@@ -66,23 +66,19 @@ final class SingleSignPreProcessor {
 
 		switch(sSign.getSubOperation()) {
 			case SIGN:
-				return TriphaseData.parser(
-					prep.preProcessPreSign(
+				return prep.preProcessPreSign(
 						docBytes,
 						algorithm.toString(),
 						certChain,
 						extraParams
-					)
-				);
+					);
 			case COSIGN:
-				return TriphaseData.parser(
-						prep.preProcessPreCoSign(
+				return prep.preProcessPreCoSign(
 						docBytes,
 						algorithm.toString(),
 						certChain,
 						extraParams
-					)
-				);
+					);
 			case COUNTERSIGN:
 				final CounterSignTarget target = CounterSignTarget.getTarget(
 					extraParams.getProperty("target", CounterSignTarget.LEAFS.name()) //$NON-NLS-1$
@@ -92,15 +88,13 @@ final class SingleSignPreProcessor {
 						"Objetivo de contrafirma no soportado en proceso por lotes: " + target //$NON-NLS-1$
 					);
 				}
-				return TriphaseData.parser(
-					prep.preProcessPreCounterSign(
+				return prep.preProcessPreCounterSign(
 						docBytes,
 						algorithm.toString(),
 						certChain,
 						extraParams,
 						target
-					)
-				);
+					);
 			default:
 				throw new UnsupportedOperationException(
 					"Operacion no soportada: " + sSign.getSubOperation() //$NON-NLS-1$

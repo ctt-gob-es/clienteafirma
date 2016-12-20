@@ -61,17 +61,17 @@ final class SingleSignPostProcessor {
 		// Instanciamos el preprocesador adecuado
 		final TriPhasePreProcessor prep = SingleSignConstants.getTriPhasePreProcessor(sSign);
 
+		final byte[] docBytes = sSign.getData(true);
+
 		Properties extraParams;
 		try {
-			extraParams = ExtraParamsProcessor.expandProperties(sSign.getExtraParams(), null, sSign.getSignFormat().name());
+			extraParams = ExtraParamsProcessor.expandProperties(sSign.getExtraParams(), docBytes, sSign.getSignFormat().name());
 		}
 		catch (final IncompatiblePolicyException e) {
 			Logger.getLogger("es.gob.afirma").log( //$NON-NLS-1$
 					Level.WARNING, "No se ha podido expandir la politica de firma. Se realizara una firma basica: " + e, e); //$NON-NLS-1$
 			extraParams = sSign.getExtraParams();
 		}
-
-		final byte[] docBytes = sSign.getData();
 
 		final byte[] signedDoc;
 		switch(sSign.getSubOperation()) {

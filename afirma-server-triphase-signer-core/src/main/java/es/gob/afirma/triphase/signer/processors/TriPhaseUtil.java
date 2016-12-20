@@ -3,6 +3,10 @@ package es.gob.afirma.triphase.signer.processors;
 import java.util.Properties;
 import java.util.UUID;
 
+/**
+ * Funciones de utilidad en el proceso de firma en 3 fases.
+ * @author Carlos Gamuci
+ */
 public final class TriPhaseUtil {
 
 	private static final String PROP_ID = "SignatureId"; //$NON-NLS-1$

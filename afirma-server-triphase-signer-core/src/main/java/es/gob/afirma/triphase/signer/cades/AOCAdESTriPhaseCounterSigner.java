@@ -52,7 +52,7 @@ public final class AOCAdESTriPhaseCounterSigner {
      * @return Prefirma en formato XML.
      * @throws AOException Cuando ocurre cualquier problema durante el proceso.
      * @throws IOException Si ocurren problemas relacionados con la lectura de la firma. */
-	public static byte[] preCountersign(final byte[] sign,
+	public static TriphaseData preCountersign(final byte[] sign,
                                         final String algorithm,
                                         final CounterSignTarget targetType,
                                         final Object[] targets,
@@ -86,7 +86,7 @@ public final class AOCAdESTriPhaseCounterSigner {
 			triphaseData.getSign(i).addProperty(PARAM_DATE, Long.toString(date.getTime()));
 		}
 
-		return triphaseData.toString().getBytes();
+		return triphaseData;
     }
 
 	/** Realiza la post-contrafirma trif&aacute;sica.

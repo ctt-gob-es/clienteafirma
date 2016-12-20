@@ -15,6 +15,11 @@ import es.gob.afirma.core.misc.AOUtil;
 
 final class TempStoreFileSystem implements TempStore {
 
+	/** N&uacute;mero de recuperaciones de fichero que realizaremos antes de iniciar un
+	 * proceso de limpieza de temporales caducados.
+	 */
+	private static final int RETRIEVES_BEFORE_CLEANING = 100;
+
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 	private static final MessageDigest MD;
 	static {
@@ -28,12 +33,22 @@ final class TempStoreFileSystem implements TempStore {
 		}
 	}
 
+	private static int currentRetrievesBeforeCleaning = 0;
+
+
+
 	@Override
 	public void store(final byte[] dataToSave, final SingleSign ss, final String batchId) throws IOException {
+		store(dataToSave, getFilename(ss, batchId));
+		LOGGER.info("Firma '" + ss.getId() + "' almacenada temporalmente en " + getFilename(ss, batchId)); //$NON-NLS-1$ //$NON-NLS-2$
+	}
+
+	@Override
+	public void store(final byte[] dataToSave, final String filename) throws IOException {
 		final OutputStream fos = new FileOutputStream(
 			new File(
 				BatchConfigManager.getTempDir(),
-				getFilename(ss, batchId)
+				filename
 			)
 		);
 		final BufferedOutputStream bos = new BufferedOutputStream(
@@ -43,15 +58,30 @@ final class TempStoreFileSystem implements TempStore {
 		bos.write(dataToSave);
 		bos.flush();
 		bos.close();
-		LOGGER.info("Firma '" + ss.getId() + "' almacenada temporalmente en " + getFilename(ss, batchId)); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	@Override
 	public byte[] retrieve(final SingleSign ss, final String batchId) throws IOException {
+		return retrieve(getFilename(ss, batchId));
+	}
+
+	@Override
+	public byte[] retrieve(final String filename) throws IOException {
+
+		if (!TempStoreFileSystemCleaner.isRunningCleaning()) {
+			if (currentRetrievesBeforeCleaning >= RETRIEVES_BEFORE_CLEANING) {
+				currentRetrievesBeforeCleaning = 0;
+				new Thread(new TempStoreFileSystemCleaner()).start();
+			}
+			else {
+				currentRetrievesBeforeCleaning++;
+			}
+		}
+
 		final InputStream fis = new FileInputStream(
 				new File(
 						BatchConfigManager.getTempDir(),
-						getFilename(ss, batchId)
+						filename
 						)
 				);
 		final InputStream bis = new BufferedInputStream(fis);
@@ -63,9 +93,14 @@ final class TempStoreFileSystem implements TempStore {
 
 	@Override
 	public void delete(final SingleSign ss, final String batchId) {
+		delete(getFilename(ss, batchId));
+	}
+
+	@Override
+	public void delete(final String filename) {
 		final File f = new File(
 				BatchConfigManager.getTempDir(),
-				getFilename(ss, batchId)
+				filename
 				);
 		if (f.exists()) {
 			f.delete();

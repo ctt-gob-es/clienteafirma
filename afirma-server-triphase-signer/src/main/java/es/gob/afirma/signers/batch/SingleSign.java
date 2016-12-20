@@ -2,6 +2,7 @@ package es.gob.afirma.signers.batch;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
 import java.util.Properties;
@@ -39,7 +40,25 @@ public final class SingleSign {
 	private static final String XML_ELEMENT_SIGNSAVER_CONFIG = "config"; //$NON-NLS-1$
 	private static final String XML_ELEMENT_EXTRAPARAMS = "extraparams"; //$NON-NLS-1$
 
+	private static final String HTTP_SCHEME = "http://"; //$NON-NLS-1$
+	private static final String HTTPS_SCHEME = "https://"; //$NON-NLS-1$
+	private static final String FTP_SCHEME = "ftp://"; //$NON-NLS-1$
+
+	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+
 	private final Properties extraParams;
+
+	private final String dataSource;
+
+	private final SignFormat format;
+
+	private final String id;
+
+	private final SignSubOperation subOperation;
+
+	private final SignSaver signSaver;
+
+	private ProcessResult processResult = new ProcessResult(Result.NOT_STARTED, null);
 
 	/**
 	 * Recupera los par&aacute;metros de configuraci&oacute;n del formato de firma.
@@ -49,10 +68,6 @@ public final class SingleSign {
 		return this.extraParams;
 	}
 
-	private final String dataSource;
-
-	private final SignFormat format;
-
 	/**
 	 * Recupera el formato de firma.
 	 * @return Formato de firma.
@@ -61,15 +76,9 @@ public final class SingleSign {
 		return this.format;
 	}
 
-	private final String id;
-
-	private final SignSubOperation subOperation;
-
 	SignSubOperation getSubOperation() {
 		return this.subOperation;
 	}
-
-	private final SignSaver signSaver;
 
 	private static void checkDataSource(final String dataSource) {
 		if (dataSource == null) {
@@ -216,34 +225,6 @@ public final class SingleSign {
 		SingleSignPostProcessor.doPostProcess(
 			this, certChain, td, algorithm, batchId
 		);
-	}
-
-	static class CallableResult {
-
-		private final String signId;
-		private final Exception exception;
-
-		CallableResult(final String id) {
-			this.signId = id;
-			this.exception = null;
-		}
-
-		CallableResult(final String id, final Exception e) {
-			this.signId = id;
-			this.exception = e;
-		}
-
-		boolean isOk() {
-			return this.exception == null;
-		}
-
-		Exception getError() {
-			return this.exception;
-		}
-
-		String getSignatureId() {
-			return this.signId;
-		}
 	}
 
 	/** Obtiene la tarea de postproceso de firma para ser ejecutada en paralelo.
@@ -411,12 +392,99 @@ public final class SingleSign {
 
 	/**
 	 * Recupera los datos que se deben procesar.
+	 * @param stored {@code} true, indica que en caso de tratarse de datos remotos, estos ya
+	 * se estar&aacute;n cargados en un temporal y deben tomarse de este; {@code false} indica
+	 * que se deber&aacute;n cargar los datos desde la fuente y, en caso de ser remotos, se
+	 * crear&aacute; un temporal para ellos.
 	 * @return Datos.
 	 * @throws IOException Cuando no se pueden obtener los datos en caso de que estos sean remotos.
 	 */
-	public byte[] getData() throws IOException {
-		checkDataSource(this.dataSource);
-		return DataDownloader.downloadData(this.dataSource);
+	public byte[] getData(final boolean stored) throws IOException {
+		// Si se nos solicita un fichero remoto, calculamos cual seria el fichero
+		// temporal que le corresponderia
+		String tempResource = null;
+		if (this.dataSource.startsWith(HTTP_SCHEME) || this.dataSource.startsWith(HTTPS_SCHEME) || this.dataSource.startsWith(FTP_SCHEME)) {
+			try {
+				tempResource = getTempFileName(this.dataSource, this.id);
+			}
+			catch (final Exception e) {
+				LOGGER.warning("No se puede calcular el nombre de un temporal para un recurso remoto: " + e); //$NON-NLS-1$
+				tempResource = null;
+			}
+		}
+
+		// Si se indica que este fichero ya se almaceno
+		// y deberia haber un recurso local, lo cargamos
+		byte[] data = null;
+		if (stored && tempResource != null) {
+			try {
+				final TempStore tempStore = TempStoreFactory.getTempStore();
+				data = tempStore.retrieve(tempResource);
+				tempStore.delete(tempResource);
+			}
+			catch (final Exception e) {
+				LOGGER.warning(String.format("No se puede recuperar el recurso temporal %0s, se cargara de la fuente original: " + e, tempResource)); //$NON-NLS-1$
+			}
+		}
+
+		// Si no, lo descargamos de la fuente original
+		if (data == null) {
+			checkDataSource(this.dataSource);
+			data = DataDownloader.downloadData(this.dataSource);
+		}
+
+		// Finalmente, si se habia indicado que no habia recurso temporal
+		// pero deberia haberlo, lo creamos
+		if (!stored && tempResource != null) {
+			TempStoreFactory.getTempStore().store(data, tempResource);
+		}
+
+		return data;
+	}
+
+	private static String getTempFileName(String source, String signId) throws NoSuchAlgorithmException {
+		return Base64.encode(MessageDigest.getInstance("SHA-1").digest((source + signId).getBytes()), true); //$NON-NLS-1$
+	}
+
+	void setProcessResult(final ProcessResult pResult) {
+		this.processResult = pResult;
+	}
+
+	ProcessResult getProcessResult() {
+		this.processResult.setId(getId());
+		return this.processResult;
+	}
+
+	void rollbackSave() {
+		this.signSaver.rollback(this);
+	}
+
+	static class CallableResult {
+
+		private final String signId;
+		private final Exception exception;
+
+		CallableResult(final String id) {
+			this.signId = id;
+			this.exception = null;
+		}
+
+		CallableResult(final String id, final Exception e) {
+			this.signId = id;
+			this.exception = e;
+		}
+
+		boolean isOk() {
+			return this.exception == null;
+		}
+
+		Exception getError() {
+			return this.exception;
+		}
+
+		String getSignatureId() {
+			return this.signId;
+		}
 	}
 
 	static final class ProcessResult {
@@ -465,21 +533,6 @@ public final class SingleSign {
 			this.signId = id;
 		}
 
-	}
-
-	private ProcessResult processResult = new ProcessResult(Result.NOT_STARTED, null);
-
-	void setProcessResult(final ProcessResult pResult) {
-		this.processResult = pResult;
-	}
-
-	ProcessResult getProcessResult() {
-		this.processResult.setId(getId());
-		return this.processResult;
-	}
-
-	void rollbackSave() {
-		this.signSaver.rollback(this);
 	}
 
 }

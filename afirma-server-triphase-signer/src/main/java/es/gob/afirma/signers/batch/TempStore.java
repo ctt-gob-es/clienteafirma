@@ -15,4 +15,10 @@ interface TempStore {
 	 * @param batchId Identificador del lote al que pertenece la firma. */
 	void delete(final SingleSign ss, final String batchId);
 
+	void store(byte[] dataToSave, String filename) throws IOException;
+
+	byte[] retrieve(String filename) throws IOException;
+
+	void delete(String filename);
+
 }

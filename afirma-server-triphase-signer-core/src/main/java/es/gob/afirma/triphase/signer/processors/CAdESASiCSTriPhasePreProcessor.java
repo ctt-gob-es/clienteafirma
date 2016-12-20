@@ -15,7 +15,7 @@ import es.gob.afirma.core.signers.asic.ASiCUtil;
 public final class CAdESASiCSTriPhasePreProcessor extends CAdESTriPhasePreProcessor {
 
 	@Override
-	public byte[] preProcessPreSign(final byte[] data,
+	public TriphaseData preProcessPreSign(final byte[] data,
 			                        final String algorithm,
 			                        final X509Certificate[] cert,
 			                        final Properties xParams) throws IOException,
@@ -61,7 +61,7 @@ public final class CAdESASiCSTriPhasePreProcessor extends CAdESTriPhasePreProces
 	}
 
 	@Override
-	public byte[] preProcessPreCoSign(final byte[] data,
+	public TriphaseData preProcessPreCoSign(final byte[] data,
 			                          final String algorithm,
 			                          final X509Certificate[] cert,
 			                          final Properties xParams) throws IOException, AOException {
@@ -87,7 +87,7 @@ public final class CAdESASiCSTriPhasePreProcessor extends CAdESTriPhasePreProces
 	}
 
 	@Override
-	public byte[] preProcessPreCounterSign(final byte[] sign,
+	public TriphaseData preProcessPreCounterSign(final byte[] sign,
 			                               final String algorithm,
 			                               final X509Certificate[] cert,
 			                               final Properties extraParams,

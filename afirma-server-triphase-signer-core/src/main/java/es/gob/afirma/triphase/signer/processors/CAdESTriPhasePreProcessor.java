@@ -47,7 +47,7 @@ public class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 
 
 	@Override
-	public byte[] preProcessPreSign(final byte[] data,
+	public TriphaseData preProcessPreSign(final byte[] data,
 			                        final String algorithm,
 			                        final X509Certificate[] cert,
 			                        final Properties params) throws IOException, AOException {
@@ -144,7 +144,7 @@ public class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 
 		LOGGER.info("Prefirma CAdES - Firma - FIN"); //$NON-NLS-1$
 
-		return triphaseData.toString().getBytes();
+		return triphaseData;
 	}
 
 	@Override
@@ -215,7 +215,7 @@ public class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 	}
 
 	@Override
-	public byte[] preProcessPreCoSign(final byte[] sign,
+	public TriphaseData preProcessPreCoSign(final byte[] sign,
 			final String algorithm,
 			final X509Certificate[] cert,
 			final Properties params) throws IOException, AOException {
@@ -309,7 +309,7 @@ public class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 
 		LOGGER.info("Prefirma CAdES - Cofirma - FIN"); //$NON-NLS-1$
 
-		return triphaseData.toString().getBytes();
+		return triphaseData;
 	}
 
 	@Override
@@ -384,7 +384,7 @@ public class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 	}
 
 	@Override
-	public byte[] preProcessPreCounterSign(final byte[] sign,
+	public TriphaseData preProcessPreCounterSign(final byte[] sign,
 			                               final String algorithm,
 			                               final X509Certificate[] cert,
 			                               final Properties extraParams,

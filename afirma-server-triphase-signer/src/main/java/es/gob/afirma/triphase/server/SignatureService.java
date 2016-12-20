@@ -26,6 +26,7 @@ import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.CounterSignTarget;
+import es.gob.afirma.core.signers.TriphaseData;
 import es.gob.afirma.triphase.server.document.DocumentManager;
 import es.gob.afirma.triphase.signer.processors.AutoTriPhasePreProcessor;
 import es.gob.afirma.triphase.signer.processors.CAdESASiCSTriPhasePreProcessor;
@@ -398,7 +399,7 @@ public final class SignatureService extends HttpServlet {
 
 			LOGGER.info(" == PREFIRMA en servidor"); //$NON-NLS-1$
 
-			final byte[] preRes;
+			final TriphaseData preRes;
 			try {
 				if (PARAM_VALUE_SUB_OPERATION_SIGN.equalsIgnoreCase(subOperation)) {
 					preRes = prep.preProcessPreSign(
@@ -438,7 +439,7 @@ public final class SignatureService extends HttpServlet {
 					throw new AOException("No se reconoce el codigo de sub-operacion: " + subOperation); //$NON-NLS-1$
 				}
 
-				LOGGER.info("Se ha calculado el resultado de la prefirma y se devuelve. Numero de bytes: " + preRes.length); //$NON-NLS-1$
+				LOGGER.info("Se ha calculado el resultado de la prefirma y se devuelve"); //$NON-NLS-1$
 			}
 			catch (final Exception e) {
 				LOGGER.log(Level.SEVERE, "Error en la prefirma: " + e, e); //$NON-NLS-1$
@@ -449,7 +450,7 @@ public final class SignatureService extends HttpServlet {
 
 			out.print(
 				Base64.encode(
-					preRes,
+					preRes.toString().getBytes(),
 					true
 				)
 			);

@@ -7,5 +7,4 @@ final class TempStoreFactory {
 	static TempStore getTempStore() {
 		return TS;
 	}
-
 }
