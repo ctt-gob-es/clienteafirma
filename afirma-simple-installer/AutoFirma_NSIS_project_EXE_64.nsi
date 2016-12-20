@@ -57,7 +57,7 @@ SetCompressor lzma
 ; Configuration General ;
 ;;;;;;;;;;;;;;;;;;;;;;;;;
 ;Nuestro instalador se llamara si la version fuera la 1.0: Ejemplo-1.0.exe
-OutFile AutoFirma_64_installer.exe
+OutFile AutoFirma_64_v1_5_0_installer.exe
 
 ;Aqui comprobamos que en la version Inglesa se muestra correctamente el mensaje:
 ;Welcome to the $Name Setup Wizard
@@ -129,6 +129,15 @@ Section "Programa" sPrograma
 
 	; Hacemos esta seccion de solo lectura para que no la desactiven
 	SectionIn RO
+	
+	;Comprobamos que el sistema sea de 64bits y salimos en caso contrario
+	System::Call 'kernel32::GetCurrentProcess()i.r0'
+	System::Call 'kernel32::IsWow64Process(ir0,*i.r1)i.r2?e'
+	pop $3
+	IntCmp $1 1 +3 0 0
+		MessageBox MB_OK "No se puede instalar AutoFirma 64 bits en un entorno 32 bits." 
+		Quit
+		
 	StrCpy $PATH "AutoFirma"
 	StrCpy $PATH_ACCESO_DIRECTO "AutoFirma"
 	; Comprueba que no este ya instalada
@@ -158,7 +167,10 @@ Section "Programa" sPrograma
 	
 	SetOutPath $INSTDIR\$PATH
 
-	;Incluimos todos los ficheros que componen nuestra aplicacion
+	;Copiamos la JRE en el directorio de instalacion
+	File /r java64\jre
+	
+	;Copiamos todos los ficheros que componen nuestra aplicacion
 	File  AutoFirma.exe
 	File  AutoFirmaConfigurador.exe
 	File  AutoFirmaCommandLine.exe
@@ -168,17 +180,17 @@ Section "Programa" sPrograma
 	;Hacemos que la instalacion se realice para todos los usuarios del sistema
    SetShellVarContext all
    
-	;Se pide que se cierre Firefox y Chrome si están abiertos
+	;Se pide que se cierre Firefox y Chrome si estan abiertos
 	
 	loopFirefox:
 	${nsProcess::FindProcess} "firefox.exe" $R2
 	StrCmp $R2 0 0 +2
-	MessageBox MB_OK|MB_DEFBUTTON1|MB_ICONEXCLAMATION 'Cierre el navegador Mozilla Firefox para continuar con la instalacion de AutoFirma.' IDOK loopFirefox
+		MessageBox MB_OK|MB_DEFBUTTON1|MB_ICONEXCLAMATION 'Cierre el navegador Mozilla Firefox para continuar con la instalación de AutoFirma.' IDOK loopFirefox
 
 	loopChrome:
 	${nsProcess::FindProcess} "chrome.exe" $R3
 	StrCmp $R3 0 0 +2
-	MessageBox MB_OK|MB_DEFBUTTON1|MB_ICONEXCLAMATION 'Cierre el navegador Google Chrome para continuar con la instalacion de AutoFirma.' IDOK loopChrome
+		MessageBox MB_OK|MB_DEFBUTTON1|MB_ICONEXCLAMATION 'Cierre el navegador Google Chrome para continuar con la instalación de AutoFirma.' IDOK loopChrome
 	
 	${nsProcess::Unload}
 	
@@ -261,17 +273,6 @@ Section "Programa" sPrograma
 	WriteRegStr HKEY_CLASSES_ROOT "afirma\DefaultIcon" "" "$INSTDIR\AutoFirma\ic_firmar.ico"
 	WriteRegStr HKEY_CLASSES_ROOT "afirma" "URL Protocol" ""
 	WriteRegStr HKEY_CLASSES_ROOT "afirma\shell\open\command" "" "$INSTDIR\AutoFirma\AutoFirma.exe %1"	
-	
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; Instalacion de la JRE
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-	; Hacemos esta seccion de solo lectura para que no la desactiven
-	SectionIn RO
-
-	StrCpy $PATH "AutoFirma\JRE"
-	File /r "jre64b"
-	Rename "$INSTDIR\AutoFirma\jre64b" "$INSTDIR\AutoFirma\jre"
 
 	; Eliminamos los certificados generados en caso de que existan por una instalacion previa
 	IfFileExists "$INSTDIR\AutoFirma\AutoFirma_ROOT.cer" 0 +1
@@ -295,7 +296,7 @@ Section "Programa" sPrograma
 	
 	
 	;Se actualiza la variable PATH con la ruta de instalacion
-	Push "$PROGRAMFILES\AutoFirma\AutoFirma"
+	Push "$PROGRAMFILES64\AutoFirma\AutoFirma"
 	Call AddToPath
 
 SectionEnd
@@ -554,19 +555,18 @@ Section "uninstall"
 	StrCpy $PATH_ACCESO_DIRECTO "AutoFirma"
 	SetShellVarContext all
 
-	;Se pide que se cierre Firefox y Chrome si están abiertos
+	;Se pide que se cierre Firefox y Chrome si estan abiertos
 	
 	loopFirefox:
 	${nsProcess::FindProcess} "firefox.exe" $R2
 	StrCmp $R2 0 0 +2
-	MessageBox MB_OK|MB_DEFBUTTON1|MB_ICONEXCLAMATION 'Cierre el navegador Mozilla Firefox para continuar con la desinstalacion de AutoFirma.' IDOK loopFirefox
-	
+		MessageBox MB_OK|MB_DEFBUTTON1|MB_ICONEXCLAMATION 'Cierre el navegador Mozilla Firefox para continuar con la desinstalación de AutoFirma.' IDOK loopFirefox
 	
 	loopChrome:
 	${nsProcess::FindProcess} "chrome.exe" $R3
 	StrCmp $R3 0 0 +2
-	MessageBox MB_OK|MB_DEFBUTTON1|MB_ICONEXCLAMATION 'Cierre el navegador Google Chrome para continuar con la desinstalacion de AutoFirma.' IDOK loopChrome
-	
+		MessageBox MB_OK|MB_DEFBUTTON1|MB_ICONEXCLAMATION 'Cierre el navegador Google Chrome para continuar con la desinstalación de AutoFirma.' IDOK loopChrome
+
 	${nsProcess::Unload}
 	
 	Sleep 2000
@@ -614,7 +614,7 @@ Section "uninstall"
 	DeleteRegKey /ifempty HKCU "SOFTWARE\JavaSoft\Prefs\es"
 
 	;Se elimina la ruta de la variable de entorno Path
-	Push "$PROGRAMFILES\AutoFirma\AutoFirma"
+	Push "$PROGRAMFILES64\AutoFirma\AutoFirma"
 	Call un.RemoveFromPath
 
 SectionEnd

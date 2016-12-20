@@ -117,6 +117,9 @@ Section "Programa" sPrograma
 	
 	SetOutPath $INSTDIR\$PATH
 
+	;Copiamos la JRE en el directorio de instalacion
+	File /r java32\jre
+	
 	;Incluimos todos los ficheros que componen nuestra aplicacion
 	File  AutoFirma.exe
 	File  AutoFirmaConfigurador.exe
@@ -135,20 +138,6 @@ Section "Programa" sPrograma
 	;Menu items
 	CreateDirectory "$SMPROGRAMS\AutoFirma"
 	CreateShortCut "$SMPROGRAMS\AutoFirma\AutoFirma.lnk" "$INSTDIR\AutoFirma\AutoFirma.exe"
-	;CreateShortCut "$SMPROGRAMS\AutoFirma\Desinstalar AutoFirma.lnk" "$INSTDIR\uninstallx86.exe"
-
-	
-	;Anade una entrada en la lista de "Program and Features"
-		;WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH_ID\" "DisplayName" "AutoFirma"
-		;WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH_ID\" "UninstallString" "$INSTDIR\uninstallx86.exe"
-		;WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH_ID\" "DisplayIcon" "$INSTDIR\AutoFirma\AutoFirma.exe"
-		;WriteRegDWORD HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH_ID\" "NoModify" "1"
-		;WriteRegDWORD HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH_ID\" "NoRepair" "1"
-		;WriteRegDWORD HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH_ID\" "EstimatedSize" "100000"
-		;WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH_ID\" "Publisher" "Gobierno de España"
-		;WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH_ID\" "DisplayVersion" "${VERSION}"
-
-	;WriteUninstaller "$INSTDIR\uninstallx86.exe"
 
 	WriteRegStr HKLM SOFTWARE\$PATH "InstallDir" $INSTDIR
 	WriteRegStr HKLM SOFTWARE\$PATH "Version" "${VERSION}"
@@ -212,17 +201,6 @@ Section "Programa" sPrograma
 	WriteRegStr HKEY_CLASSES_ROOT "afirma" "URL Protocol" ""
 	WriteRegStr HKEY_CLASSES_ROOT "afirma\shell\open\command" "" "$INSTDIR\AutoFirma\AutoFirma.exe %1"	
 	
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; Instalacion de la JRE y de los certificados
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-	; Hacemos esta seccion de solo lectura para que no la desactiven
-	SectionIn RO
-
-	StrCpy $PATH "AutoFirma\JRE"
-	File /r "jre32b"
-	Rename "$INSTDIR\AutoFirma\jre32b" "$INSTDIR\AutoFirma\jre"
-
 	; Eliminamos los certificados generados en caso de que existan por una instalacion previa
 	IfFileExists "$INSTDIR\AutoFirma\AutoFirma_ROOT.cer" 0 +1
 	Delete "$INSTDIR\AutoFirma\AutoFirma_ROOT.cer"

@@ -6,7 +6,8 @@ for /f "delims=" %%i in ('reg query "HKLM\Software\Classes\Installer\Products" /
 	)
 ) 
 
-"C:\Program Files (x86)\AutoFirma\uninstallx86.exe"
-"C:\Program Files\AutoFirma\uninstallx64.exe"
+"C:\Program Files (x86)\AutoFirma\no_ejecutar_x86.exe"
+"C:\Program Files\AutoFirma\no_ejecutar_x64.exe"
+"C:\Program Files\AutoFirma\no_ejecutar_x86.exe"
 
 @pause

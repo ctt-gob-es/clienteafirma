@@ -18,23 +18,25 @@
     <path>./jre</path>
     <bundledJre64Bit>true</bundledJre64Bit>
     <bundledJreAsFallback>false</bundledJreAsFallback>
-    <minVersion>1.7.0</minVersion>
-    <maxVersion>1.8.0</maxVersion>
+    <minVersion>1.8.0</minVersion>
+    <maxVersion></maxVersion>
     <jdkPreference>preferJre</jdkPreference>
     <runtimeBits>64/32</runtimeBits>
     <opt>-Xms512m -Xmx8g -DdisableSslChecks=true</opt>
   </jre>
   <versionInfo>
-    <fileVersion>1.4.2.2</fileVersion>
-    <txtFileVersion>1.4.2</txtFileVersion>
+    <fileVersion>1.5.0.3</fileVersion>
+    <txtFileVersion>1.5.0</txtFileVersion>
     <fileDescription>AutoFirma</fileDescription>
     <copyright>Gobierno de España</copyright>
-    <productVersion>1.4.2.2</productVersion>
-    <txtProductVersion>1.4.2</txtProductVersion>
+    <productVersion>1.5.0.3</productVersion>
+    <txtProductVersion>1.5.0</txtProductVersion>
     <productName>AutoFirma</productName>
     <companyName>Gobierno de España</companyName>
     <internalName>AutoFirma</internalName>
     <originalFilename>AutoFirma.exe</originalFilename>
+    <trademarks></trademarks>
+    <language>ENGLISH_US</language>
   </versionInfo>
   <messages>
     <startupErr>Ocurrió un error mientras arrancaba la aplicación.</startupErr>

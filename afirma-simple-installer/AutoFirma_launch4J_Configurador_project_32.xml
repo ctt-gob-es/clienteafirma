@@ -21,19 +21,19 @@
     <path>./jre</path>
     <bundledJre64Bit>false</bundledJre64Bit>
     <bundledJreAsFallback>false</bundledJreAsFallback>
-    <minVersion>1.7.0</minVersion>
-    <maxVersion>1.8.0</maxVersion>
+    <minVersion>1.8.0</minVersion>
+    <maxVersion></maxVersion>
     <jdkPreference>preferJre</jdkPreference>
     <runtimeBits>64/32</runtimeBits>
     <opt>-Xms512m -Xmx1g -DdisableSslChecks=true</opt>
   </jre>
   <versionInfo>
-    <fileVersion>1.1.0.0</fileVersion>
-    <txtFileVersion>1.1</txtFileVersion>
+    <fileVersion>1.2.0.0</fileVersion>
+    <txtFileVersion>1.2</txtFileVersion>
     <fileDescription>Configurador AutoFirma</fileDescription>
     <copyright>Gobierno de España</copyright>
-    <productVersion>1.1.0.0</productVersion>
-    <txtProductVersion>1.1</txtProductVersion>
+    <productVersion>1.2.0.0</productVersion>
+    <txtProductVersion>1.2</txtProductVersion>
     <productName>Configurador AutoFirma</productName>
     <companyName>Gobierno de España</companyName>
     <internalName>Configurador AutoFirma</internalName>

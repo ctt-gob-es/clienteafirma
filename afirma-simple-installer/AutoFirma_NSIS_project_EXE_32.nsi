@@ -57,7 +57,7 @@ SetCompressor lzma
 ; Configuration General ;
 ;;;;;;;;;;;;;;;;;;;;;;;;;
 ;Nuestro instalador se llamara si la version fuera la 1.0: Ejemplo-1.0.exe
-OutFile AutoFirma_32_installer.exe
+OutFile AutoFirma_32_v1_5_0_installer.exe
 
 ;Aqui comprobamos que en la version Inglesa se muestra correctamente el mensaje:
 ;Welcome to the $Name Setup Wizard
@@ -157,6 +157,9 @@ Section "Programa" sPrograma
 	
 	SetOutPath $INSTDIR\$PATH
 
+	;Copiamos la JRE en el directorio de instalacion
+	File /r java32\jre
+	
 	;Incluimos todos los ficheros que componen nuestra aplicacion
 	File  AutoFirma.exe
 	File  AutoFirmaConfigurador.exe
@@ -261,17 +264,6 @@ Section "Programa" sPrograma
 	WriteRegStr HKEY_CLASSES_ROOT "afirma\DefaultIcon" "" "$INSTDIR\AutoFirma\ic_firmar.ico"
 	WriteRegStr HKEY_CLASSES_ROOT "afirma" "URL Protocol" ""
 	WriteRegStr HKEY_CLASSES_ROOT "afirma\shell\open\command" "" "$INSTDIR\AutoFirma\AutoFirma.exe %1"	
-	
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; Instalacion de la JRE
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-	; Hacemos esta seccion de solo lectura para que no la desactiven
-	SectionIn RO
-
-	StrCpy $PATH "AutoFirma\JRE"
-	File /r "jre32b"
-	Rename "$INSTDIR\AutoFirma\jre32b" "$INSTDIR\AutoFirma\jre"
 
 	; Eliminamos los certificados generados en caso de que existan por una instalacion previa
 	IfFileExists "$INSTDIR\AutoFirma\AutoFirma_ROOT.cer" 0 +1

@@ -15,31 +15,25 @@
 	   	<!-- Detecta versiones anteriores ya instaladas en el equipo -->
 	    <MajorUpgrade DowngradeErrorMessage="Ya existe una versión posterior en el equipo." />
 	   
-	   <!-- Ejecuta el AutoFirmaGenerator.exe al instalar -->
-		<CustomAction Id="Exec_Cmd"
-                      Property="ExecProperty"
-                      Value='"[#$(var.ProjectName)Generator.exe]" /S'
-                      Execute="immediate"/>
-		<CustomAction Id="ExecProperty"
-                      BinaryKey="WixCA"
-                      DllEntry="CAQuietExec"
+		<!-- Ejecucion del instalador -->
+		<CustomAction Id='QtExecInstall'
+					  FileKey='$(var.ProjectName)Generator.exe'
+					  ExeCommand='/S'
                       Execute="deferred"
                       Return="check"
-                      Impersonate="no"/>
-		<!-- Ejecuta el uninstall$(var.Platform).exe al desinstalar -->
-		<CustomAction Id="Exec_Cmd2"
-                      Property="ExecProperty2"
-                      Value='"[#uninstall$(var.Platform).exe]" /S'
-                      Execute="immediate"/>
-		<CustomAction Id="ExecProperty2"
-                      BinaryKey="WixCA"
-                      DllEntry="CAQuietExec"
+					  Impersonate="no" />
+
+		<!-- Ejecucion del desinstalador -->
+		<CustomAction Id='QtExecUninstall'
+					  FileKey='no_ejecutar_$(var.Platform).exe'
+					  ExeCommand='/S'
                       Execute="deferred"
                       Return="check"
-                      Impersonate="no"/>
+					  Impersonate="no" />
+
         <!-- Paso 1: Definición de estructura del directorio -->
         <Directory Id="TARGETDIR" Name="SourceDir">
-            <Directory Id="ProgramFilesFolder">
+            <Directory Id="$(var.PlatformProgramFilesFolder)">
                 <Directory Id="$(var.ProjectName)" Name="$(var.ProjectName)"/>
             </Directory>
         </Directory>
@@ -51,18 +45,19 @@
 		   Cabinet="media1.cab"
 		   EmbedCab="yes" />
 		<DirectoryRef Id="$(var.ProjectName)">
-            <Component Id="$(var.ProjectName)Generator.exe" Guid="{C6D90EBF-E089-4281-9269-AE5D20BA74C1}">
+            <Component Id="$(var.ProjectName)Generator.exe" Guid="*">
                 <File Id="$(var.ProjectName)Generator.exe" Source="$(var.ProjectName)Generator.exe" KeyPath="yes" Checksum="yes"/>
             </Component>
-			<Component Id="uninstall$(var.Platform).exe" Guid="{C6D90EBF-E089-4281-9269-AE5D20BA74C0}">
-				<File Id="uninstall$(var.Platform).exe" Source="uninstall$(var.Platform).exe" KeyPath="yes" Checksum="yes"/>
+			<!-- no_ejecutar es el desinstalador. Se le asigna ese nombre para que los usuarios no lo ejecuten manualmente. -->
+			<Component Id="no_ejecutar_$(var.Platform).exe" Guid="*" Win64="no" Permanent="yes">
+				<File Id="no_ejecutar_$(var.Platform).exe" Source="no_ejecutar_$(var.Platform).exe" KeyPath="yes" Checksum="yes"/>
             </Component>
         </DirectoryRef>
 		
         <!--Paso 3: Componentes a ejecutar -->
         <Feature Id="MainApplication" Title="Main Application" Level="1">
             <ComponentRef Id="$(var.ProjectName)Generator.exe" />	
-			<ComponentRef Id="uninstall$(var.Platform).exe" />	
+			<ComponentRef Id="no_ejecutar_$(var.Platform).exe" />	
         </Feature>
 
 		<!-- Exits successfully in the case newer version are already installed -->
@@ -71,17 +66,17 @@
         <Property Id="ARPNOREPAIR" Value="yes" Secure="yes" /> 
 		<Property Id="ARPNOMODIFY" Value="yes" Secure="yes" />
 		<InstallExecuteSequence>
-			<!--  Ejeuta el $(var.ProjectName)Generator.exe al instalar -->
-		    <Custom Action="Exec_Cmd" Before="InstallFinalize">
-			NOT Installed AND NOT REMOVE</Custom>
-            <Custom Action="ExecProperty" Before="InstallFinalize">
-			NOT Installed AND NOT REMOVE</Custom>
-			
-			<!-- Ejecuta el uninstall$(var.Platform).exe al desinstalar -->
-			<Custom Action="Exec_Cmd2" Before='InstallFinalize'>
-			(NOT UPGRADINGPRODUCTCODE) AND (REMOVE="ALL")</Custom>
-			<Custom Action="ExecProperty2" Before='InstallFinalize'>
-			(NOT UPGRADINGPRODUCTCODE) AND (REMOVE="ALL")</Custom>
+	
+			<!--  Ejecuta el $(var.ProjectName)Generator.exe al instalar -->
+		    <Custom Action="QtExecInstall" Before="InstallFinalize">
+				NOT Installed AND NOT REMOVE
+			</Custom>
+
+			<!-- Ejecuta el no_ejecutar_$(var.Platform).exe al desinstalar -->
+			<Custom Action="QtExecUninstall" After='InstallFiles'>
+				(NOT UPGRADINGPRODUCTCODE) AND (REMOVE="ALL")
+			</Custom>
+
 		</InstallExecuteSequence>
     </Product>
 </Wix>
