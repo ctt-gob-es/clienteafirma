@@ -93,16 +93,15 @@ public class MozillaUnifiedKeyStoreManager extends AggregatedKeyStoreManager {
 		}
 
 		// Intentamos ahora agregar los almacenes externos preferentes ajenos a los
-		// dispositivos de seguridad configurados en Firefox haciendo usao del controlador Java
-
+		// dispositivos de seguridad configurados en Firefox haciendo uso del controlador Java
 		if (forceReset || !this.initialized) {
 			this.preferredKsAdded = KeyStoreUtilities.addPreferredKeyStoreManagers(this, parentComponent);
 		}
 
-		// Si se pudo agregar algun almacen preferente entendemos que se desean usar y no cargamos
+		// Si se pudo agregar algun almacen preferente entendemos que se desean usar y no cargamos los
 		// configurados en Firefox. Si no, iniciamos los almacenes externos. Indicamos que no queremos
 		// ignorar los almacenes externos de DNIe y CERES ya que es posible que el motivo por el que no
-		// se cargaron como almacenes preferentes sea el controlador Java fallo al intentar cargarlos
+		// se cargaron como almacenes preferentes sea porque el controlador Java fallo al intentar cargarlos
 		if (!this.preferredKsAdded) {
 			final Map<String, String> externalStores = getExternalStores(false);
 
