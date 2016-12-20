@@ -68,9 +68,42 @@ public final class MozillaKeyStoreUtilities {
 		"TIF_P11.dll"//$NON-NLS-1$
 	};
 
-	private static final String[][] KNOWN_MODULES = new String[][] {
-		new String[] { "Atos CardOS (preinstalado)", "siecap11.dll"    }  //$NON-NLS-1$ //$NON-NLS-2$
-	};
+	/**
+	 * M&oacute;dulos de los que se conoce el nombre de su biblioteca para que se agregue
+	 * junto al listado de m&oacute;dulos configurados en Mozilla Firefox para intentar
+	 * cargarlos. Las propiedades establecidas para cada uno de ellos son:
+	 * - Nombre descriptivo de la biblioteca
+	 * - Nombre del fichero de la biblioteca
+	 * - Si se desea o no que se intente su carga aunque no se encuentre su blioteca en
+	 *   el sistema.
+	 * Este &uacute;ltimo par&aacute;metro es necesario para la carga de las bibliotecas de la FNMT
+	 * ya que Java nos oculta el nombre de fichero en el directorio de 64 bits, pero lo necesita para
+	 * la carga.
+	 */
+	private enum KnownModule {
+		ATOS_CARDOS("Atos CardOS (preinstalado)", "siecap11.dll", false), //$NON-NLS-1$ //$NON-NLS-2$
+		FNMT_64("FNMT-RCM Modulo PKCS#11 64bits", "FNMT_P11_x64.dll", true), //$NON-NLS-1$ //$NON-NLS-2$
+		FNMT_32("FNMT-RCM Modulo PKCS#11 32bits", "FNMT_P11.dll", true); //$NON-NLS-1$ //$NON-NLS-2$
+
+		private String description;
+		private String lib;
+		private boolean forcedLoad;
+		private KnownModule(String description, String lib, boolean forcedLoad) {
+			this.description = description;
+			this.lib = lib;
+			this.forcedLoad = forcedLoad;
+		}
+
+		String getDescription() {
+			return this.description;
+		}
+		String getLib() {
+			return this.lib;
+		}
+		boolean isForcedLoad() {
+			return this.forcedLoad;
+		}
+	}
 
 	private MozillaKeyStoreUtilities() {
 		// No permitimos la instanciacion
@@ -134,6 +167,7 @@ public final class MozillaKeyStoreUtilities {
 			getMozillaUserProfileDirectory(),
 			"compatibility.ini"  //$NON-NLS-1$
 		);
+		String dir = null;
 		if (compatibility.exists() && compatibility.canRead()) {
 			final InputStream fis = new FileInputStream(compatibility);
 			// Cargamos el fichero con la codificacion por defecto (que es la que con mas probabilidad tiene el fichero)
@@ -143,21 +177,20 @@ public final class MozillaKeyStoreUtilities {
 				4096 // Maximo 4KB por linea
 			);
 			String line;
-			String dir = null;
-			while ((line = br.readLine()) != null) {
+			while ((line = br.readLine()) != null && dir == null) {
 			    if (line.startsWith("LastPlatformDir=")) { //$NON-NLS-1$
 			    	dir = line.replace("LastPlatformDir=", "").trim(); //$NON-NLS-1$ //$NON-NLS-2$
-					break;
 			    }
 			}
 			br.close();
-			if (dir != null) {
-				return dir;
-			}
 		}
-		throw new FileNotFoundException(
-			"No se ha podido determinar el directorio de NSS en Windows a partir de 'compatibility.ini' de Firefox" //$NON-NLS-1$
-		);
+
+		if (dir == null) {
+			throw new FileNotFoundException(
+					"No se ha podido determinar el directorio de NSS en Windows a partir de 'compatibility.ini' de Firefox" //$NON-NLS-1$
+					);
+		}
+		return dir;
 	}
 
 	/** Obtiene el directorio de las bibliotecas NSS (<i>Netscape Security
@@ -294,17 +327,17 @@ public final class MozillaKeyStoreUtilities {
 		}
 
 		// Creamos una copia de modsByDesc para evitar problemas de concurrencia
-		// (nunca soltara exceciones por usar ConcurrentHashMap, pero no significa
+		// (nunca soltara excepciones por usar ConcurrentHashMap, pero no significa
 		// que los problemas no ocurran si no se toman medidas).
 		final ConcurrentHashMap<String, String> modsByDescCopy = new ConcurrentHashMap<String, String>(modsByDesc.size());
 		modsByDescCopy.putAll(modsByDesc);
 
 		if (includeKnownModules) {
-			for (final String[] knownModules : KNOWN_MODULES) {
-				if (!isModuleIncluded(modsByDescCopy, knownModules[1])) {
-					final String modulePath = getWindowsSystemDirWithFinalSlash() + knownModules[1];
-					if (new File(modulePath).exists()) {
-						modsByDesc.put(knownModules[0], knownModules[1]);
+			for (final KnownModule knownModule : KnownModule.values()) {
+				if (!isModuleIncluded(modsByDescCopy, knownModule.getLib())) {
+					final String modulePath = getWindowsSystemDirWithFinalSlash() + knownModule.getLib();
+					if (knownModule.isForcedLoad() || new File(modulePath).exists()) {
+						modsByDesc.put(knownModule.getDescription(), modulePath);
 					}
 				}
 			}
