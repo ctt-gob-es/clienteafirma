@@ -892,7 +892,7 @@ var MiniApplet = ( function ( window, undefined ) {
 				keystore = getDefaultKeystore();
 			}
 			
-			if (!isIOS() && !isAndroid() && !isOldInternetExplorer() && !forceWSMode){
+			if (!isIOS() && !isAndroid() && !isOldInternetExplorer() && !isEdge() && !forceWSMode){
 				clienteFirma = new AppAfirmaJSSocket(clientAddress, window, undefined);
 				clienteFirma.setKeyStore(keystore);
 				clientType = TYPE_JAVASCRIPT_SOCKET;
