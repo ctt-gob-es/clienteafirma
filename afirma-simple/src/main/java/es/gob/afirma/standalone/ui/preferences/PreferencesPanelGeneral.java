@@ -110,6 +110,7 @@ final class PreferencesPanelGeneral extends JPanel {
 	}
 
 	void loadPreferences() {
+
 		this.signarureAlgorithms.setSelectedItem(
 			PreferencesManager.get(PREFERENCE_GENERAL_SIGNATURE_ALGORITHM, "SHA256withRSA") //$NON-NLS-1$
 		);
@@ -154,7 +155,6 @@ final class PreferencesPanelGeneral extends JPanel {
 		signConstraint.gridy = 0;
 		signConstraint.insets = new Insets(0, 0, 0, 0);
 
-		loadPreferences();
 		final JButton importConfigFromFileButton = new JButton(
 			SimpleAfirmaMessages.getString("PreferencesPanel.107") //$NON-NLS-1$
 		);
@@ -397,6 +397,8 @@ final class PreferencesPanelGeneral extends JPanel {
 		gbc.weighty = 1.0;
 		gbc.gridy++;
 		add(new JPanel(), gbc);
+
+		loadPreferences();
 	}
 
 	/** Crea el panel con la configuraci&oacute;n de los formatos de firma a utilizar con cada tipo de fichero.
