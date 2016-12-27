@@ -2,6 +2,7 @@ package es.gob.afirma.triphase.signer.processors;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -80,8 +81,13 @@ final class XAdESTriPhaseSignerUtil {
 			);
 		}
 
-		String base = new String(xmlBase, docBase.getInputEncoding());
-		final String source = new String(xmlSource, docSource.getInputEncoding());
+		String base = new String(xmlBase, docBase.getXmlEncoding());
+
+
+		final String source = new String(xmlSource, docSource.getXmlEncoding());
+
+
+
 
 		for (int i=0; i<elDeliBase.size(); i++) {
 			base = base.replace(
@@ -92,9 +98,7 @@ final class XAdESTriPhaseSignerUtil {
 							)
 					);
 		}
-
-		return base.getBytes(docBase.getInputEncoding());
-
+		return base.getBytes(docBase.getXmlEncoding());
 	}
 
 	/**
@@ -102,24 +106,25 @@ final class XAdESTriPhaseSignerUtil {
 	 * En caso de tratarse una firma de Manifest, no hace nada.<br>
 	 * @param xml XML de firma sin los nodos referenciados. En el caso de firma de manifest,
 	 * devuelve la propia entrada.
+	 * @param xmlEncoding Encoding del XML.
 	 * @param extraParams Par&aacute;metros de configuraci&oacute;n de la firma.
 	 * @return Cadena de texto con la firma con el contenido de los nodos referenciados
 	 * sustituidos por cadenas predefinidas con
 	 */
-	static String removeCommonParts(final byte[] xml, final Properties extraParams) {
+	static byte[] removeCommonParts(final byte[] xml, final String xmlEncoding, final Properties extraParams) {
 
 		if (xml == null || xml.length < 1) {
 			throw new IllegalArgumentException("El XML de entrada no puede ser nulo ni vacio"); //$NON-NLS-1$
 		}
 
-		String ret = new String(xml);
-
+		// No se eliminara nada si se trata de una firma enveloped
 		if (extraParams != null && (Boolean.parseBoolean(extraParams.getProperty(USE_MANIFEST))
 				|| AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED.equalsIgnoreCase(
 						extraParams.getProperty(EXTRA_PARAM_FORMAT)))) {
-			return ret;
+			return xml;
 		}
 
+		// Cargamos el XML para identificar su codificacion
 		final org.w3c.dom.Document doc;
 		try {
 			doc = XAdESTriPhaseSignerUtil.getDocumentFromBytes(xml);
@@ -128,13 +133,25 @@ final class XAdESTriPhaseSignerUtil {
 			LOGGER.warning(
 				"No ha podido tratarse la entrada como XML, no se eliminaran las partes comunes: " + e //$NON-NLS-1$
 			);
-			return ret;
+			return xml;
 		}
+
+		String ret = null;
+		if (doc.getXmlEncoding() != null) {
+			try {
+				ret = new String(xml, doc.getXmlEncoding());
+			} catch (final UnsupportedEncodingException e) {
+				LOGGER.warning("Error en la codificacion declarada por el XML: " + doc.getXmlEncoding()); //$NON-NLS-1$
+			}
+		}
+		if (ret == null) {
+			ret = new String(xml);
+		}
+
 		final List<List<String>> delits = XAdESTriPhaseSignerUtil.getCommonContentDelimiters(
 			XAdESTriPhaseSignerUtil.getInmutableReferences(doc),
 			doc
 		);
-
 
 		for (int i = 0; i < delits.size(); i++) {
 			final List<String> delPair = delits.get(i);
@@ -147,7 +164,15 @@ final class XAdESTriPhaseSignerUtil {
 			);
 		}
 
-		return ret;
+		if (doc.getXmlEncoding() != null) {
+			try {
+				return ret.getBytes(doc.getXmlEncoding());
+			} catch (final UnsupportedEncodingException e) {
+				LOGGER.warning("Error en la codificacion declarada por el XML: " + doc.getXmlEncoding()); //$NON-NLS-1$
+			}
+		}
+
+		return ret.getBytes();
 	}
 
 	/**
@@ -157,19 +182,43 @@ final class XAdESTriPhaseSignerUtil {
 	 * @return Listado de
 	 */
 	private static List<List<String>> getCommonContentDelimiters(final List<String> uris, final Document doc) {
+		final String encoding = doc.getInputEncoding();
 		final List<List<String>> ret = new ArrayList<List<String>>();
 		for (final String uriValue : uris) {
 			final Node node = CustomUriDereferencer.getNodeByInternalUriReference(uriValue, doc);
 			if (node != null) {
-				ret.add(
-					getFirstTagPair(
-						removeXmlHeader(
-							new String(
-								Utils.writeXML(node, null, null, null)
-							)
-						)
-					)
-				);
+				if (encoding != null) {
+					try {
+						ret.add(
+								getFirstTagPair(
+										removeXmlHeader(
+												new String(
+														Utils.writeXML(node, null, null, null),
+														encoding
+														)
+												)
+										)
+								);
+					}
+					catch (final UnsupportedEncodingException e) {
+						ret.add(
+								getFirstTagPair(
+										removeXmlHeader(
+												new String(Utils.writeXML(node, null, null, null))
+												)
+										)
+								);
+					}
+				}
+				else {
+					ret.add(
+							getFirstTagPair(
+									removeXmlHeader(
+											new String(Utils.writeXML(node, null, null, null))
+											)
+									)
+							);
+				}
 			}
 		}
 		return ret;

@@ -18,10 +18,18 @@ public final class XmlPreSignResult {
 
 	private final byte[] xmlSign;
 	private final List<byte[]> signedInfos;
+	private final String encoding;
 
 	XmlPreSignResult(final byte[] xmlSign, final List<byte[]> signedInfos) {
 		this.xmlSign = xmlSign.clone();
 		this.signedInfos = signedInfos;
+		this.encoding = null;
+	}
+
+	XmlPreSignResult(final byte[] xmlSign, final List<byte[]> signedInfos, String encoding) {
+		this.xmlSign = xmlSign.clone();
+		this.signedInfos = signedInfos;
+		this.encoding = encoding;
 	}
 
 	/** Recupera el PKCS#1 de la firma.
@@ -36,5 +44,11 @@ public final class XmlPreSignResult {
 		return this.signedInfos;
 	}
 
-
+	/**
+	 * Recupera la codificaci&oacute;n de la firma XML.
+	 * @return Nombre de la codificaci&oacute;n.
+	 */
+	public String getEncoding() {
+		return this.encoding;
+	}
 }

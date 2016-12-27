@@ -44,7 +44,6 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -145,7 +144,15 @@ public final class XAdESTriPhaseSignerServerSide {
 		Document xml = null;
 		String xmlEncoding = XML_DEFAULT_ENCODING;
 		try {
-			xml = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new ByteArrayInputStream(data));
+			//xml = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new ByteArrayInputStream(data));
+
+			// Si los datos eran XML, comprobamos y almacenamos las firmas previas
+			final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+			dbf.setNamespaceAware(true);
+			xml = dbf.newDocumentBuilder().parse(
+					new ByteArrayInputStream(data)
+					);
+
 			if (xml.getXmlEncoding() != null) {
 				xmlEncoding = xml.getXmlEncoding();
 			}
@@ -154,44 +161,71 @@ public final class XAdESTriPhaseSignerServerSide {
 			LOGGER.info("El documento a firmar no es XML, por lo que no contiene firmas previas");  //$NON-NLS-1$
 		}
 
+
+
+
+
+
 		if (xml == null && (op == Op.COSIGN || op == Op.COUNTERSIGN)) {
 			LOGGER.severe("Solo se pueden cofirmar y contrafirmar firmas XML");  //$NON-NLS-1$
 			throw new AOException("Los datos introducidos no se corresponden con una firma XML"); //$NON-NLS-1$
 		}
 
-		// Si los datos eran XML, comprobamos y almacenamos las firmas previas
 		if (xml != null) {
-			final Element rootElement = xml.getDocumentElement();
-			if (rootElement.getNodeName().endsWith(":" + AOXAdESSigner.SIGNATURE_TAG)) { //$NON-NLS-1$
-				final NamedNodeMap nnm = rootElement.getAttributes();
-				if (nnm != null) {
-					final Node node = nnm.getNamedItem(XML_NODE_ID);
-					if (node != null) {
-						final String id = node.getNodeValue();
-						if (id != null) {
-							previousSignaturesIds.add(id);
-						}
-					}
-				}
-			}
-			else {
-				final NodeList mainChildNodes = xml.getDocumentElement().getChildNodes();
-				for (int i = 0; i < mainChildNodes.getLength(); i++) {
-					final Node currentNode = mainChildNodes.item(i);
-					if (currentNode.getNodeType() == Node.ELEMENT_NODE && currentNode.getNodeName().endsWith(":" + AOXAdESSigner.SIGNATURE_TAG)) { //$NON-NLS-1$
-						final NamedNodeMap nnm = currentNode.getAttributes();
-						if (nnm != null) {
-							final Node node = nnm.getNamedItem(XML_NODE_ID);
-							if (node != null) {
-								final String id = node.getNodeValue();
-								if (id != null) {
-									previousSignaturesIds.add(id);
-								}
+
+			final NodeList signatureNodeList = xml.getElementsByTagNameNS(
+					XMLSignature.XMLNS,
+					AOXAdESSigner.SIGNATURE_TAG
+					);
+
+			for (int i = 0; i < signatureNodeList.getLength(); i++) {
+
+				final Node currentNode = signatureNodeList.item(i);
+				if (currentNode.getNodeType() == Node.ELEMENT_NODE) {
+					final NamedNodeMap nnm = currentNode.getAttributes();
+					if (nnm != null) {
+						final Node node = nnm.getNamedItem(XML_NODE_ID);
+						if (node != null) {
+							final String id = node.getNodeValue();
+							if (id != null) {
+								previousSignaturesIds.add(id);
 							}
 						}
 					}
 				}
 			}
+
+//			final Element rootElement = xml.getDocumentElement();
+//			if (rootElement.getNodeName().endsWith(":" + AOXAdESSigner.SIGNATURE_TAG)) { //$NON-NLS-1$
+//				final NamedNodeMap nnm = rootElement.getAttributes();
+//				if (nnm != null) {
+//					final Node node = nnm.getNamedItem(XML_NODE_ID);
+//					if (node != null) {
+//						final String id = node.getNodeValue();
+//						if (id != null) {
+//							previousSignaturesIds.add(id);
+//						}
+//					}
+//				}
+//			}
+//			else {
+//				final NodeList mainChildNodes = xml.getDocumentElement().getChildNodes();
+//				for (int i = 0; i < mainChildNodes.getLength(); i++) {
+//					final Node currentNode = mainChildNodes.item(i);
+//					if (currentNode.getNodeType() == Node.ELEMENT_NODE && currentNode.getNodeName().endsWith(":" + AOXAdESSigner.SIGNATURE_TAG)) { //$NON-NLS-1$
+//						final NamedNodeMap nnm = currentNode.getAttributes();
+//						if (nnm != null) {
+//							final Node node = nnm.getNamedItem(XML_NODE_ID);
+//							if (node != null) {
+//								final String id = node.getNodeValue();
+//								if (id != null) {
+//									previousSignaturesIds.add(id);
+//								}
+//							}
+//						}
+//					}
+//				}
+//			}
 		}
 
 		// Generamos un par de claves para hacer la firma temporal, que despues sustituiremos por la real
@@ -276,7 +310,7 @@ public final class XAdESTriPhaseSignerServerSide {
 				);
 			}
 		}
-		return new XmlPreSignResult(xmlResult.getBytes(xmlEncoding), signedInfos);
+		return new XmlPreSignResult(xmlResult.getBytes(xmlEncoding), signedInfos, xmlEncoding);
 	}
 
 	private static String cleanBase64(final String base64) {
@@ -286,7 +320,7 @@ public final class XAdESTriPhaseSignerServerSide {
 	/** Recupera los <code>SignedInfo</code> de una firma XML, excluyendo los de las firmas indicadas a trav&eacute;s
 	 * de su Id.
 	 * @param xmlSign XML del que se desea recuperar los <code>SignedInfo</code>.
-	 * @param pk Clave publicada usada en las firmas de las que se desea obtener los signedInfo.
+	 * @param pk Clave publica usada en las firmas de las que se desea obtener los signedInfo.
 	 * @param excludedIds Identificadores de las firmas excluidas.
 	 * @return Listado de signedInfos.
 	 * @throws SAXException Si hay problemas durante el an&aacute;lisis XML.
@@ -339,6 +373,7 @@ public final class XAdESTriPhaseSignerServerSide {
 			valContext.setProperty("javax.xml.crypto.dsig.cacheReference", Boolean.TRUE); //$NON-NLS-1$
 			final XMLSignature signature = Utils.getDOMFactory().unmarshalXMLSignature(valContext);
 			signature.validate(valContext);
+
 			signedInfos.add(
 				AOUtil.getDataFromInputStream(
 					signature.getSignedInfo().getCanonicalizedData()

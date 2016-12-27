@@ -46,6 +46,9 @@ public class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 	 * de la firma trif&aacute;sica. */
 	private static final String PROPERTY_NAME_SCHEMA_BASE = "BASE"; //$NON-NLS-1$
 
+	/** Nombre de la propiedad que guarda la codificaci&oacute;n del XML de firma. */
+	private static final String PROPERTY_NAME_XML_ENCODING = "ENCODING"; //$NON-NLS-1$
+
 	/** Nombre de la propiedad que de configuraci&oacute;n que indica qu&eacute; nodos deben
 	 * contrafirmarse. */
 	private static final String EXTRAPARAM_NAME_TARGET = "target"; //$NON-NLS-1$
@@ -198,10 +201,17 @@ public class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 					Base64.encode(
 						XAdESTriPhaseSignerUtil.removeCommonParts(
 							preSignature.getXmlSign(),
+							preSignature.getEncoding(),
 							extraParams
-						).getBytes()
+						)
 					)
 				);
+				if (preSignature.getEncoding() != null) {
+					signConfig.put(
+							PROPERTY_NAME_XML_ENCODING,
+							preSignature.getEncoding()
+							);
+				}
 			}
 
 			triphaseData.addSignOperation(
@@ -317,7 +327,14 @@ public class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 		}
 
 		// El XML base se incluye como datos de sesion de la primera firma y solo de la primera
-		String xmlBase = new String(Base64.decode(triphaseData.getSign(0).getProperty(PROPERTY_NAME_SCHEMA_BASE)));
+		String xmlBase;
+		if (triphaseData.getSign(0).getProperty(PROPERTY_NAME_XML_ENCODING) != null) {
+			xmlBase = new String(
+					Base64.decode(triphaseData.getSign(0).getProperty(PROPERTY_NAME_SCHEMA_BASE)),
+					triphaseData.getSign(0).getProperty(PROPERTY_NAME_XML_ENCODING));
+		} else {
+			xmlBase = new String(Base64.decode(triphaseData.getSign(0).getProperty(PROPERTY_NAME_SCHEMA_BASE)));
+		}
 
 		// Sustituimos los valores dummy de la firma por los reales
 		for (int i = 0; i < triphaseData.getSignsCount(); i++) {
@@ -356,7 +373,7 @@ public class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 		byte[] counterSignature;
 		try {
 			counterSignature = XAdESTriPhaseSignerUtil.insertCommonParts(
-					xmlBase.getBytes(),
+					xmlBase.getBytes(preSignature.getEncoding()),
 					preSignature.getXmlSign(),
 					extraParams
 				);
@@ -366,7 +383,6 @@ public class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 				"Error insertando los datos a firmar y la cadena de certificados: " + e, e //$NON-NLS-1$
 			);
 		}
-
 		return counterSignature;
 	}
 
