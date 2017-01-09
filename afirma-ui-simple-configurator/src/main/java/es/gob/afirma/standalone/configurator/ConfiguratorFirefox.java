@@ -172,8 +172,6 @@ final class ConfiguratorFirefox {
 			final File installScript = new File(path);
 			final File uninstallScript = new File(uninstallPath);
 
-
-
 			try (
 					final FileOutputStream fout = new FileOutputStream(installScript, true);
 					final FileOutputStream foutUninstall = new FileOutputStream(
@@ -189,7 +187,6 @@ final class ConfiguratorFirefox {
 					"Excepcion en la creacion del script linux para la modificacion del fichero de protocolos de Google Chrome: " + e //$NON-NLS-1$
 					);
 		}
-
 	}
 
 	/** Genera el script que elimina el warning al ejecutar AutoFirma desde Chrome para LINUX.
