@@ -1028,7 +1028,8 @@ var MiniApplet = ( function ( window, undefined ) {
 				var data = new Object();
 				data.op = generateDataKeyValue ("op", "selectcert");
 				data.properties = generateDataKeyValue ("properties", extraParams != null ? Base64.encode(extraParams) : null);
-				data.keystore = generateDataKeyValue ("keystore", defaultKeyStore != null ? Base64.encode(defaultKeyStore) : null);
+				data.keystore = generateDataKeyValue ("keystore", defaultKeyStore != null ? defaultKeyStore : null);
+				data.ksb64 = generateDataKeyValue ("ksb64", defaultKeyStore != null ? Base64.encode(defaultKeyStore) : null);
 				
 				execAppIntent(buildUrl(data));
 			}
@@ -1148,7 +1149,8 @@ var MiniApplet = ( function ( window, undefined ) {
 			function generateDataToBatch(keystore, batchPreSignerUrl, batchPostSignerUrl, extraParams, batchB64) {
 				var data = new Object();
 				data.op = generateDataKeyValue("op","batch");
-				data.keystore = generateDataKeyValue("keystore", keystore != null ? Base64.encode(keystore) : null);
+				data.keystore = generateDataKeyValue("keystore", keystore != null ? keystore : null);
+				data.ksb64 = generateDataKeyValue ("ksb64", keystore != null ? Base64.encode(keystore) : null);
 				data.batchpresignerurl = generateDataKeyValue("batchpresignerurl", batchPreSignerUrl);
 				data.batchpostsignerurl = generateDataKeyValue("batchpostsignerurl", batchPostSignerUrl);
 				data.properties = generateDataKeyValue ("properties", extraParams != null ? Base64.encode(extraParams) : null);
@@ -1286,7 +1288,8 @@ var MiniApplet = ( function ( window, undefined ) {
 			function generateDataToSign(signId, algorithm, format, extraParams, dataB64, keystore) {
 				var data = new Object();
 				data.op = generateDataKeyValue("op", signId);
-				data.keystore = generateDataKeyValue ("keystore", keystore != null ? Base64.encode(keystore) : null);
+				data.keystore = generateDataKeyValue ("keystore", keystore != null ? keystore : null);
+				data.ksb64 = generateDataKeyValue ("ksb64", keystore != null ? Base64.encode(keystore) : null);
 				data.algorithm = generateDataKeyValue ("algorithm", algorithm);
 				data.format = generateDataKeyValue ("format", format); 
 				data.properties = generateDataKeyValue ("properties", extraParams != null ? Base64.encode(extraParams) : null);
@@ -1302,7 +1305,8 @@ var MiniApplet = ( function ( window, undefined ) {
 				var data = new Object();
 				data.op = generateDataKeyValue("op", "signandsave");
 				data.cryptoOp = generateDataKeyValue("cop", signId);
-				data.keystore = generateDataKeyValue ("keystore", keystore != null ? Base64.encode(keystore) : null);
+				data.keystore = generateDataKeyValue ("keystore", keystore != null ? keystore : null);
+				data.ksb64 = generateDataKeyValue ("ksb64", keystore != null ? Base64.encode(keystore) : null);
 				data.algorithm = generateDataKeyValue ("algorithm", algorithm);
 				data.format = generateDataKeyValue ("format", format);
 				data.properties = generateDataKeyValue ("properties", extraParams != null ? Base64.encode(extraParams) : null);
@@ -2012,7 +2016,8 @@ var MiniApplet = ( function ( window, undefined ) {
 				if (idSession != null && idSession != undefined) {		params[i++] = {key:"id", value:idSession}; }
 				if (cipherKey != null && cipherKey != undefined) {		params[i++] = {key:"key", value:cipherKey}; }
 				if (defaultKeyStore != null &&
-						defaultKeyStore != undefined) {					params[i++] = {key:"keystore", value:Base64.encode(defaultKeyStore)}; }
+						defaultKeyStore != undefined) {					params[i++] = {key:"keystore", value:defaultKeyStore};
+																		params[i++] = {key:"ksb64", value:Base64.encode(defaultKeyStore)}; }
 				if (storageServletAddress != null &&
 						storageServletAddress != undefined) {			params[i++] = {key:"stservlet", value:storageServletAddress}; }
 				if (format != null && format != undefined) {			params[i++] = {key:"format", value:format}; }
@@ -2071,7 +2076,8 @@ var MiniApplet = ( function ( window, undefined ) {
 				if (idSession != null && idSession != undefined) {		params[i++] = {key:"id", value:idSession}; }
 				if (cipherKey != null && cipherKey != undefined) {		params[i++] = {key:"key", value:cipherKey}; }
 				if (defaultKeyStore != null &&
-						defaultKeyStore != undefined) {					params[i++] = {key:"keystore", value:defaultKeyStore}; }
+						defaultKeyStore != undefined) {					params[i++] = {key:"keystore", value:defaultKeyStore};
+																		params[i++] = {key:"ksb64", value:Base64.encode(defaultKeyStore)}; }
 				if (storageServletAddress != null &&
 						storageServletAddress != undefined) {			params[i++] = {key:"stservlet", value:storageServletAddress}; }
 				if (format != null && format != undefined) {			params[i++] = {key:"format", value:format}; }
@@ -2123,7 +2129,8 @@ var MiniApplet = ( function ( window, undefined ) {
 				if (idSession != null && idSession != undefined) {		params[i++] = {key:"id", value:idSession}; }
 				if (cipherKey != null && cipherKey != undefined) {		params[i++] = {key:"key", value:cipherKey}; }
 				if (defaultKeyStore != null &&
-						defaultKeyStore != undefined) {					params[i++] = {key:"keystore", value:defaultKeyStore}; }
+						defaultKeyStore != undefined) {					params[i++] = {key:"keystore", value:defaultKeyStore};
+																		params[i++] = {key:"ksb64", value:Base64.encode(defaultKeyStore)}; }
 				if (storageServletAddress != null &&
 						storageServletAddress != undefined) {			params[i++] = {key:"stservlet", value:storageServletAddress}; }
 				if (batchPreSignerUrl != null &&
