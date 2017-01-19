@@ -30,6 +30,9 @@ public final class UrlParametersToSelectCert extends UrlParameters {
 	/** Par&aacute;metro de entrada con la m&iacute;nima versi&oacute;n requerida del aplicativo a usar en la invocaci&oacute;n por protocolo. */
 	private static final String VER_PARAM = "ver"; //$NON-NLS-1$
 
+	/** Par&aacute;metro que identifica el almac&acute;n de claves por defecto. */
+	private static final String KEYSTORE_PARAM ="keystore"; //$NON-NLS-1$
+
 	private String minimumVerstion;
 
 	/** Obtiene la versi&oacute;n m&iacute;nima requerida del aplicativo.

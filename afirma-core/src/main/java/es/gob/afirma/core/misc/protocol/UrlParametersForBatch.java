@@ -104,8 +104,8 @@ public final class UrlParametersForBatch extends UrlParameters {
 			);
 		}
 
-		setDefaultKeyStore(getDefaultKeyStoreName(params));
-		setDefaultKeyStoreLib(getDefaultKeyStoreLib(params));
+		setDefaultKeyStore(UrlParameters.getDefaultKeyStoreName(params));
+		setDefaultKeyStoreLib(UrlParameters.getDefaultKeyStoreLib(params));
 
 		setBatchPostsignerUrl(
 			validateURL(
@@ -154,6 +154,7 @@ public final class UrlParametersForBatch extends UrlParameters {
 		}
 
 		setDefaultKeyStore(getDefaultKeyStoreName(params));
+		setDefaultKeyStoreLib(getDefaultKeyStoreLib(params));
 	}
 
 	/** Obtiene la versi&oacute;n m&iacute;nima requerida del aplicativo.

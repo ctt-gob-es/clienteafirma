@@ -238,8 +238,8 @@ public final class UrlParametersToSign extends UrlParameters {
 			setExtraParams(new Properties());
 		}
 
-		setDefaultKeyStore(getDefaultKeyStoreName(params));
-		setDefaultKeyStoreLib(getDefaultKeyStoreLib(params));
+		setDefaultKeyStore(UrlParameters.getDefaultKeyStoreName(params));
+		setDefaultKeyStoreLib(UrlParameters.getDefaultKeyStoreLib(params));
 
 	}
 
