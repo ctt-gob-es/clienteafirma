@@ -30,6 +30,7 @@ import javax.security.auth.callback.TextOutputCallback;
 import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.swing.JOptionPane;
 
+import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.keystores.KeyStoreManager;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Platform;
@@ -51,6 +52,7 @@ public final class KeyStoreUtilities {
     	"DNIe_P11_priv.dll", //$NON-NLS-1$
     	"DNIe_P11_pub.dll", //$NON-NLS-1$
     	"FNMT_P11.dll", //$NON-NLS-1$
+    	"FNMT_P11_x64.dll", //$NON-NLS-1$
     	"UsrPkcs11.dll", //$NON-NLS-1$
     	"UsrPubPkcs11.dll", //$NON-NLS-1$
     	"TIF_P11.dll" //$NON-NLS-1$
@@ -147,6 +149,9 @@ public final class KeyStoreUtilities {
 
                 try {
                     tmpCert = ksm.getCertificate(al);
+                }
+                catch (final AOCancelledOperationException e) {
+                	throw e;
                 }
                 catch (final RuntimeException e) {
 
@@ -282,7 +287,8 @@ public final class KeyStoreUtilities {
 	 * @param parentComponent Componente padre para los di&aacute;logos de los almacenes preferentes
 	 *                        (solicitud de PIN, confirmaci&oacute;n de firma, etc.).
 	 * @return Devuelve {@code true} cuando se ha detectado alguno de los almacenes preferentes,
-	 *         {@code false} en caso contrario. */
+	 *         {@code false} en caso contrario.
+	 * @throws AOCancelledOperationException Cuando se cancela la carga del almac&eacute;n. */
 	public static boolean addPreferredKeyStoreManagers(final AggregatedKeyStoreManager aksm, final Object parentComponent) {
 		// Anadimos el controlador Java del DNIe SIEMPRE excepto:
 		// -Que se indique "es.gob.afirma.keystores.mozilla.disableDnieNativeDriver=true"
@@ -291,8 +297,11 @@ public final class KeyStoreUtilities {
 				aksm.addKeyStoreManager(getDnieKeyStoreManager(parentComponent));
 				return true; // Si instancia DNIe no pruebo otras tarjetas, no deberia haber varias tarjetas instaladas
 			}
-			catch (final Exception ex) {
-				LOGGER.warning("No se ha podido inicializar el controlador DNIe 100% Java: " + ex); //$NON-NLS-1$
+			catch (final AOCancelledOperationException e) {
+				throw e;
+			}
+			catch (final Exception e) {
+				LOGGER.warning("No se ha podido inicializar el controlador DNIe 100% Java: " + e); //$NON-NLS-1$
 			}
 		}
 
@@ -303,6 +312,9 @@ public final class KeyStoreUtilities {
 			try {
 				aksm.addKeyStoreManager(getCeresKeyStoreManager(parentComponent));
 				return true; // Si instancia CERES no pruebo otras tarjetas, no deberia haber varias tarjetas instaladas
+			}
+			catch (final AOCancelledOperationException e) {
+				throw e;
 			}
 			catch (final Exception ex) {
 				LOGGER.warning("No se ha podido inicializar la tarjeta CERES: " + ex); //$NON-NLS-1$

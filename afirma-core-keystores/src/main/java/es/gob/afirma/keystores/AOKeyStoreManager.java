@@ -30,6 +30,7 @@ import java.util.logging.Logger;
 
 import javax.security.auth.callback.PasswordCallback;
 
+import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.keystores.KeyStoreManager;
 import es.gob.afirma.core.misc.AOUtil;
 
@@ -276,8 +277,13 @@ public class AOKeyStoreManager implements KeyStoreManager {
     	catch(final Exception e) {
 
     		if ("es.gob.jmulticard.card.AuthenticationModeLockedException".equals(e.getClass().getName())) { //$NON-NLS-1$
-    			LOGGER.severe("Tarjeta bloqueada: " + e); //$NON-NLS-1$
+    			LOGGER.warning("Tarjeta bloqueada: " + e); //$NON-NLS-1$
     			throw new SmartCardLockedException("Tarjeta inteligente bloqueada", e); //$NON-NLS-1$
+    		}
+
+    		if ("es.gob.jmulticard.ui.passwordcallback.CancelledOperationException".equals(e.getClass().getName())) { //$NON-NLS-1$
+    			LOGGER.info("Se cancelo uso de la tarjeta a traves del driver Java: " + e); //$NON-NLS-1$
+    			throw new AOCancelledOperationException("Se cancelo uso de la tarjeta a traves del driver Java", e); //$NON-NLS-1$
     		}
 
     		LOGGER.severe(
