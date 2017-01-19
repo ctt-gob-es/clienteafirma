@@ -32,35 +32,17 @@ public class MozillaUnifiedKeyStoreManager extends AggregatedKeyStoreManager {
     private static final String ONLY_PKCS11 = "es.gob.afirma.keystores.mozilla.LoadSscdOnly"; //$NON-NLS-1$
     protected static final String INCLUDE_NATIVE_DNIE_P11 = "es.gob.afirma.keystores.mozilla.IncludeNativeDniePkcs11"; //$NON-NLS-1$
 
-	/** Crea un <i>AOKeyStoreManager</i> para acceso a almacenes de claves de Firefox. */
-	public MozillaUnifiedKeyStoreManager() {
-		setKeyStoreType(AOKeyStore.MOZ_UNI);
-	}
-
-	@SuppressWarnings("static-method")
-	protected Map<String, String> getExternalStores() {
-		return MozillaKeyStoreUtilities.getMozillaPKCS11Modules(
-			// Si no es Linux o NO nos han incidado que incluyamos controlador nativo DNIe, lo excluimos
-			!Platform.OS.LINUX.equals(Platform.OS.LINUX) || !(Boolean.getBoolean(INCLUDE_NATIVE_DNIE_P11) || Boolean.parseBoolean(System.getenv(INCLUDE_NATIVE_DNIE_P11))), // Excluir modulos nativos DNIe
-			true  // Incluir los PKCS#11 que esten instalados en el sistema pero no en Mozilla
-		);
-	}
-
-	@SuppressWarnings("static-method")
-	protected Map<String, String> getExternalStores(boolean excludeDnie) {
-		return MozillaKeyStoreUtilities.getMozillaPKCS11Modules(excludeDnie, true);
-	}
-
-	protected AOKeyStoreManager getNssKeyStoreManager() {
-		return new NssKeyStoreManager(getParentComponent(), false);
-	}
-
 	private PasswordCallback passwordCallback = null;
 	private Object[] configParams = null;
 
 	/** Indica si el almacen se cargo previamente. */
 	private boolean initialized = false;
 	private boolean preferredKsAdded = false;
+
+	/** Crea un <i>AOKeyStoreManager</i> para acceso a almacenes de claves de Firefox. */
+	public MozillaUnifiedKeyStoreManager() {
+		setKeyStoreType(AOKeyStore.MOZ_UNI);
+	}
 
 	/** Inicializa la clase gestora de almacenes de claves. */
 	@Override
@@ -78,7 +60,7 @@ public class MozillaUnifiedKeyStoreManager extends AggregatedKeyStoreManager {
 
 		final Object parentComponent = params != null && params.length > 0 ? params[0] : null;
 
-		if (!(Boolean.getBoolean(ONLY_PKCS11) || Boolean.parseBoolean(System.getenv(ONLY_PKCS11)))) {
+		if (!Boolean.getBoolean(ONLY_PKCS11) && !Boolean.parseBoolean(System.getenv(ONLY_PKCS11))) {
 			// Primero anadimos el almacen principal NSS
 			final AOKeyStoreManager ksm = getNssKeyStoreManager();
 			try {
@@ -94,16 +76,26 @@ public class MozillaUnifiedKeyStoreManager extends AggregatedKeyStoreManager {
 
 		// Intentamos ahora agregar los almacenes externos preferentes ajenos a los
 		// dispositivos de seguridad configurados en Firefox haciendo uso del controlador Java
+		boolean excludePreferredKeyStores = false;
 		if (forceReset || !this.initialized) {
-			this.preferredKsAdded = KeyStoreUtilities.addPreferredKeyStoreManagers(this, parentComponent);
+			try {
+				this.preferredKsAdded = KeyStoreUtilities.addPreferredKeyStoreManagers(this, parentComponent);
+			}
+			catch (final AOCancelledOperationException e) {
+				LOGGER.info("Se cancelo el uso del driver Java"); //$NON-NLS-1$
+				// En caso de haber detectado una tarjeta preferida pero haberse cancelado su uso,
+				// permitiremos utilizar el resto de modulos a excepcion de las preferidas
+				this.preferredKsAdded = false;
+				excludePreferredKeyStores = true;
+			}
 		}
 
 		// Si se pudo agregar algun almacen preferente entendemos que se desean usar y no cargamos los
-		// configurados en Firefox. Si no, iniciamos los almacenes externos. Indicamos que no queremos
-		// ignorar los almacenes externos de DNIe y CERES ya que es posible que el motivo por el que no
-		// se cargaron como almacenes preferentes sea porque el controlador Java fallo al intentar cargarlos
+		// configurados en Firefox. Si no, iniciamos los almacenes externos. DNIe nunca se cargara como
+		// almacen externo. En el caso de las tarjetas CERES, si no se pudo cargar a traves del
+		// controlador JAVA, se intentara cargar a traves del PKCS#11 si estaba configurado en Firefox
 		if (!this.preferredKsAdded) {
-			final Map<String, String> externalStores = getExternalStores(false);
+			final Map<String, String> externalStores = getExternalStores(excludePreferredKeyStores);
 
 			if (externalStores.size() > 0) {
 				final StringBuilder logStr = new StringBuilder(
@@ -190,4 +182,21 @@ public class MozillaUnifiedKeyStoreManager extends AggregatedKeyStoreManager {
 		init(AOKeyStore.MOZ_UNI, null, this.passwordCallback, this.configParams, true);
 	}
 
+	@SuppressWarnings("static-method")
+	protected Map<String, String> getExternalStores() {
+		return MozillaKeyStoreUtilities.getMozillaPKCS11Modules(
+			// Si no es Linux o NO nos han indicado que incluyamos controlador nativo DNIe, lo excluimos
+			!Platform.OS.LINUX.equals(Platform.OS.LINUX) || !(Boolean.getBoolean(INCLUDE_NATIVE_DNIE_P11) || Boolean.parseBoolean(System.getenv(INCLUDE_NATIVE_DNIE_P11))), // Excluir modulos nativos DNIe
+			true  // Incluir los PKCS#11 que esten instalados en el sistema pero no en Mozilla
+		);
+	}
+
+	@SuppressWarnings("static-method")
+	protected Map<String, String> getExternalStores(boolean excludePreferredKeyStores) {
+		return MozillaKeyStoreUtilities.getMozillaPKCS11Modules(excludePreferredKeyStores, true);
+	}
+
+	protected AOKeyStoreManager getNssKeyStoreManager() {
+		return new NssKeyStoreManager(getParentComponent(), false);
+	}
 }

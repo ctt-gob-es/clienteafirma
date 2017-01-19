@@ -64,7 +64,7 @@ public final class MozillaKeyStoreUtilities {
 		"dnie_p11_priv.dll", //$NON-NLS-1$
 		"dnie_p11_pub.dll", //$NON-NLS-1$
 		"opensc-pkcs11.dll", //$NON-NLS-1$
-		"FNMT_P11.dll", //$NON-NLS-1$
+		"DNIE_P11.dll", //$NON-NLS-1$
 		"TIF_P11.dll"//$NON-NLS-1$
 	};
 
@@ -243,20 +243,21 @@ public final class MozillaKeyStoreUtilities {
 			nssLibDir = MozillaKeyStoreUtilitiesOsX.getSystemNSSLibDirMacOsX();
 		}
 
-		if (nssLibDir != null) {
-			return nssLibDir;
+		if (nssLibDir == null) {
+			throw new FileNotFoundException(
+					"No se han encontrado bibliotecas NSS instaladas en su sistema operativo" //$NON-NLS-1$
+				);
 		}
 
-		throw new FileNotFoundException(
-			"No se han encontrado bibliotecas NSS instaladas en su sistema operativo" //$NON-NLS-1$
-		);
+		return nssLibDir;
 	}
 
 	/** Obtiene las rutas completas hacia las bibliotecas (.dll o .so) de los
 	 * m&oacute;dulos de seguridad externos (PKCS#11) instalados en Mozilla /
 	 * Firefox, indexados por su descripci&oacute;n dentro de un <code>ConcurrentHashMap</code>.
-	 * @param excludeDnie Si se establece a <code>true</code> excluye los m&oacute;dulos PKCS#11
-	 *                    del DNIe, si se establece a <code>false</code> deja estos m&oacute;dulos en
+	 * <b>ADVERTENCIA:</b> Los PKCS#11 de DNIe se excluyen siempre de este listado.
+	 * @param excludePreferredModules Si se establece a <code>true</code> excluye los m&oacute;dulos PKCS#11
+	 *                    del DNIe y CERES, si se establece a <code>false</code> deja estos m&oacute;dulos en
 	 *                    caso de que se encontrasen.
 	 * @param includeKnownModules Si se establece a <code>true</code> se incluyen m&oacute;dulos PKCS#11 que
 	 *                            est&eacute;n en el directorio de bibliotecas del sistema pero no en la
@@ -264,13 +265,13 @@ public final class MozillaKeyStoreUtilities {
 	 *                            establece a <code>false</code> se devuelven &uacute;nicamente los
 	 *                            m&oacute;dulos PKCS#11 de la base de datos.
 	 * @return Nombres de las bibliotecas de los m&oacute;dulos de seguridad de Mozilla / Firefox */
-	static Map<String, String> getMozillaPKCS11Modules(final boolean excludeDnie,
+	static Map<String, String> getMozillaPKCS11Modules(final boolean excludePreferredModules,
 			                                           final boolean includeKnownModules) {
-		if (!excludeDnie) {
-			LOGGER.info("Se incluiran los modulos nativos de DNIe si se encuentran configurados"); //$NON-NLS-1$
+		if (!excludePreferredModules) {
+			LOGGER.info("Se incluiran los modulos nativos de DNIe/CERES si se encuentran configurados"); //$NON-NLS-1$
 		}
 		else {
-			LOGGER.info("Se excluiran los modulos nativos de DNIe en favor del controlador 100% Java"); //$NON-NLS-1$
+			LOGGER.info("Se excluiran los modulos nativos de DNIe/CERES en favor del controlador 100% Java"); //$NON-NLS-1$
 		}
 
 		final String profileDir;
@@ -297,7 +298,7 @@ public final class MozillaKeyStoreUtilities {
 
 		LOGGER.info("Obtenidos los modulos externos de Mozilla desde 'secmod.db'"); //$NON-NLS-1$
 
-		return getPkcs11ModulesFromModuleNames(modules, includeKnownModules, excludeDnie);
+		return getPkcs11ModulesFromModuleNames(modules, includeKnownModules, excludePreferredModules);
 	}
 
 	/** Obtiene los m&oacute;dulos PKCS#11 a partir de sus descripciones.
@@ -305,12 +306,13 @@ public final class MozillaKeyStoreUtilities {
 	 * @param includeKnownModules <code>true</code> si se desea incluir m&oacute;dulos PKCS#11 que comunmente est&aacute;n
 	 *                            instalados en un sistema (y solo si realmente lo est&aacute;s) aunque no est&eacute;n
 	 *                            en la lista de descripciones proporcionada, <code>false</code> en caso contrario.
-	 * @param excludeDnie <code>true</code> si se desea excluir los m&oacute;dulos PKCS#11 de DNIe aunque est&eacute;n
-	 *                    en la lista de descripciones proporcionada, <code>false</code> en caso contrario.
+	 * @param excludePreferredModules <code>true</code> si se desea excluir los m&oacute;dulos PKCS#11 de DNIe y
+	 *								CERES aunque est&eacute;n en la lista de descripciones proporcionada,
+	 *								<code>false</code> en caso contrario.
 	 * @return M&oacute;dulos PKCS#11. */
 	public static Map<String, String> getPkcs11ModulesFromModuleNames(final List<ModuleName> modules,
 			                                                          final boolean includeKnownModules,
-			                                                          final boolean excludeDnie) {
+			                                                          final boolean excludePreferredModules) {
 
 		if (modules == null) {
 			return new ConcurrentHashMap<String, String>(0);
@@ -320,7 +322,7 @@ public final class MozillaKeyStoreUtilities {
 
 		for (final AOSecMod.ModuleName module : modules) {
 			final String moduleLib =  module.getLib();
-			if (excludeDnie && isDniePkcs11Library(moduleLib)) {
+			if (excludePreferredModules && isDniePkcs11Library(moduleLib)) {
 				continue;
 			}
 			modsByDesc.put(module.getDescription(), moduleLib);
@@ -332,8 +334,14 @@ public final class MozillaKeyStoreUtilities {
 		final ConcurrentHashMap<String, String> modsByDescCopy = new ConcurrentHashMap<String, String>(modsByDesc.size());
 		modsByDescCopy.putAll(modsByDesc);
 
+		// Incluimos si aplica los modulos conocidos (aquellos de los que sin estar configurados sabemos
+		// el nombre) y los agregamos. No lo hacemos cuando se trate de una biblioteca preferida y se haya
+		// indicado que se excluyan
 		if (includeKnownModules) {
 			for (final KnownModule knownModule : KnownModule.values()) {
+				if (excludePreferredModules && isDniePkcs11Library(knownModule.getLib())) {
+					continue;
+				}
 				if (!isModuleIncluded(modsByDescCopy, knownModule.getLib())) {
 					final String modulePath = getWindowsSystemDirWithFinalSlash() + knownModule.getLib();
 					if (knownModule.isForcedLoad() || new File(modulePath).exists()) {
