@@ -143,7 +143,7 @@ public final class TriphaseData {
 	}
 
 	/** Devuelve un listado de firmas con el identificador dado o <code>null</code> si no hay ninguna
-	 * firma con ese identificador.
+	 * firma con ese identificador. El listado de firmas obtenidas no es mutable.
 	 * @param signId Identificador de la firma.
 	 * @return Listado de firmas con el identificador dado. */
 	public List<TriSign> getTriSigns(final String signId) {
