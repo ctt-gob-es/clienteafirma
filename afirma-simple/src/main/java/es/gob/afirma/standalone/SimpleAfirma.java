@@ -470,11 +470,15 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
     	LookAndFeelManager.applyLookAndFeel();
 
     	// Se establece la configuracion del proxy
+    	if (isUsingCommnadLine(args)) {
+    		CommandLineLauncher.main(args);
+    		return;
+    	}
+
        	AutoFirmaUtil.setProxySettings();
 
 		// Google Analytics
-		if (
-			PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_USEANALYTICS, true) &&
+		if (PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_USEANALYTICS, true) &&
 			!Boolean.getBoolean("es.gob.afirma.doNotSendAnalytics") && //$NON-NLS-1$
 			!Boolean.parseBoolean(System.getenv("es.gob.afirma.doNotSendAnalytics")) //$NON-NLS-1$
 		) {
@@ -495,7 +499,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 			).start();
 		}
 
-        // Propiedades especificas para Mac OS X
+       	// Propiedades especificas para Mac OS X
         if (Platform.OS.MACOSX.equals(Platform.getOS())) {
         	try {
 	            com.apple.eawt.Application.getApplication().setDockIconImage(
@@ -508,7 +512,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
         }
 
     	// Comprobamos actualizaciones
-		if (PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_UPDATECHECK, true)) {
+        if (PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_UPDATECHECK, true)) {
 			Updater.checkForUpdates(null);
 		}
 		else {
@@ -517,7 +521,15 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 
     	try {
     		// Invocacion normal modo grafico
-    		if (args == null || args.length == 0) {
+    		if (args != null && args.length > 0 && args[0].toLowerCase().startsWith(PROTOCOL_URL_START_LOWER_CASE)) {
+
+    			printSystemInfo();
+
+    			LOGGER.info("Invocacion por protocolo con URL:\n" + args[0]); //$NON-NLS-1$
+    			ProtocolInvocationLauncher.launch(args[0]);
+    			System.exit(0);
+    		}
+    		else {
 
     			if (!isSimpleAfirmaAlreadyRunning()) {
 
@@ -573,17 +585,6 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 						JOptionPane.WARNING_MESSAGE
 					);
     			}
-    		}
-    		else if (args[0].toLowerCase().startsWith(PROTOCOL_URL_START_LOWER_CASE)) {
-
-    			printSystemInfo();
-
-    			LOGGER.info("Invocacion por protocolo con URL:\n" + args[0]); //$NON-NLS-1$
-    			ProtocolInvocationLauncher.launch(args[0]);
-    			System.exit(0);
-    		}
-    		else {
-    			CommandLineLauncher.main(args);
     		}
     	}
     	catch (final HeadlessException he) {
@@ -749,5 +750,14 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 		LOGGER.info("Tamano actual en memoria: " + Runtime.getRuntime().totalMemory()/(1024*1024) + "MB"); //$NON-NLS-1$ //$NON-NLS-2$
 		LOGGER.info("Tamano maximo de memoria: " + Runtime.getRuntime().maxMemory()/(1024*1024) + "MB"); //$NON-NLS-1$ //$NON-NLS-2$
 		LOGGER.info("Memoria actualmente libre: " + Runtime.getRuntime().freeMemory()/(1024*1024) + "MB"); //$NON-NLS-1$ //$NON-NLS-2$
+	}
+
+	/**
+	 * Indica si la llamada a AutoFirma se considera llamada por l&iacute;nea de comandos.
+	 * @param args Argumentos recibidos en la llamada a la aplicaci&oacute;n.
+	 * @return {@code true} si la llamada se debe procesar como si se hubiese recibido por linea de comandos.
+	 */
+	private static boolean isUsingCommnadLine(String[] args) {
+		return args != null && args.length > 0 && !args[0].toLowerCase().startsWith(PROTOCOL_URL_START_LOWER_CASE);
 	}
 }
