@@ -192,6 +192,7 @@ final class PreferencesPanelGeneral extends JPanel {
 								SimpleAfirmaMessages.getString("PreferencesPanel.117"), //$NON-NLS-1$
 								JOptionPane.ERROR_MESSAGE
 							);
+							return;
 						}
 					}
 					else {
@@ -215,6 +216,12 @@ final class PreferencesPanelGeneral extends JPanel {
 						}
 						PreferencesPlistHandler.importPreferences(configFilePath, getParent());
 					}
+					AOUIFactory.showMessageDialog(
+							getParent(),
+							SimpleAfirmaMessages.getString("PreferencesPanel.142"), //$NON-NLS-1$
+							SimpleAfirmaMessages.getString("PreferencesPanel.143<"), //$NON-NLS-1$
+							JOptionPane.INFORMATION_MESSAGE
+						);
 					getDisposableInterface().disposeInterface();
 				}
 			}
