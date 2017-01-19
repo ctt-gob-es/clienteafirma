@@ -151,7 +151,7 @@ public final class ProtocolInvocationLauncher {
                 }
             }
             catch (final Exception e) {
-                LOGGER.severe("Error en los parametros de seleccion de certificados: " + e); //$NON-NLS-1$
+                LOGGER.log(Level.SEVERE, "Error en los parametros de seleccion de certificados: " + e, e); //$NON-NLS-1$
                 ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_03);
                 return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_03);
             }
@@ -210,7 +210,7 @@ public final class ProtocolInvocationLauncher {
                 return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_13);
             }
             catch (final Exception e) {
-                LOGGER.severe("Error en los parametros de guardado: " + e); //$NON-NLS-1$
+            	LOGGER.log(Level.SEVERE, "Error en los parametros de guardado: " + e, e); //$NON-NLS-1$
                 ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_03);
                 return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_03);
             }
@@ -270,7 +270,7 @@ public final class ProtocolInvocationLauncher {
                 return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_13);
             }
             catch (final Exception e) {
-                LOGGER.severe("Error en los parametros de la peticion: " + e); //$NON-NLS-1$
+            	LOGGER.log(Level.SEVERE, "Error en los parametros de firma y guardado: " + e, e); //$NON-NLS-1$
                 ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_03);
                 return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_03);
             }
@@ -339,7 +339,7 @@ public final class ProtocolInvocationLauncher {
                 return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_13);
             }
             catch (final Exception e) {
-                LOGGER.severe("Error en los parametros de firma: " + e); //$NON-NLS-1$
+                LOGGER.log(Level.SEVERE, "Error en los parametros de firma: " + e, e); //$NON-NLS-1$
                 ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_03);
                 return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_03);
             }

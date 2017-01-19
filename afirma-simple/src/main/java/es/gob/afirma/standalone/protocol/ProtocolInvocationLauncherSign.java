@@ -63,7 +63,7 @@ final class ProtocolInvocationLauncherSign {
 		}
 
 		if (!ProtocolInvocationLauncher.MAX_PROTOCOL_VERSION_SUPPORTED.support(options.getMinimumVersion())) {
-			LOGGER.severe(String.format("Version de protocolo no soportada (%1s). Version actual: %s2. Hay que actualizar la aplicacion.", options.getMinimumVersion(), ProtocolInvocationLauncher.MAX_PROTOCOL_VERSION_SUPPORTED)); //$NON-NLS-1$
+			LOGGER.severe(String.format("Version de protocolo no soportada (%1s). Version actual: %2d. Hay que actualizar la aplicacion.", options.getMinimumVersion(), Integer.valueOf(ProtocolInvocationLauncher.MAX_PROTOCOL_VERSION_SUPPORTED.getVersion()))); //$NON-NLS-1$
 			ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_21);
 			return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_21);
 		}
@@ -83,9 +83,9 @@ final class ProtocolInvocationLauncherSign {
 			}
 		}
 
-		final AOKeyStore aoks = AOKeyStore.valueOf(options.getDefaultKeyStore());
+		final AOKeyStore aoks = AOKeyStore.getKeyStore(options.getDefaultKeyStore());
 		if (aoks == null) {
-			LOGGER.severe("No hay un KeyStore con el nombre: " + options.getDefaultKeyStore()); //$NON-NLS-1$
+			LOGGER.severe("No hay un KeyStore para el parametro: " + options.getDefaultKeyStore()); //$NON-NLS-1$
 			ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_07);
 			if (!bySocket){
 				throw new SocketOperationException(ProtocolInvocationLauncherErrorManager.SAF_07);
@@ -226,7 +226,6 @@ final class ProtocolInvocationLauncherSign {
 						);
 			}
 		}
-
 
 		// XXX: Codigo de soporte de firmas XAdES explicitas (Eliminar cuando se abandone el soporte de XAdES explicitas)
 		if (isXadesExplicitConfigurated(options.getSignatureFormat(), options.getExtraParams())) {
