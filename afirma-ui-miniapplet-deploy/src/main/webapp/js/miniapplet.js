@@ -2004,6 +2004,7 @@ var MiniApplet = ( function ( window, undefined ) {
 
 				if (dataB64 != null && !isValidUrl(dataB64)) {
 					dataB64 = dataB64.replace(/\+/g, "-").replace(/\//g, "_");
+					dataB64 = dataB64.replace(/\n/g, "").replace(/\r/g, ""); //eliminamos saltos de carro para que no generen espacios 0x20 al parsear los atributos del XML enviado/recibido (storageServletAddress y retrieverServletAddress) que impiden la firma en AutoFirma
 				}
 
 				var idSession = generateNewIdSession();
@@ -2061,6 +2062,7 @@ var MiniApplet = ( function ( window, undefined ) {
 
 				if (dataB64 != null && !isValidUrl(dataB64)) {
 					dataB64 = dataB64.replace(/\+/g, "-").replace(/\//g, "_");
+					dataB64 = dataB64.replace(/\n/g, "").replace(/\r/g, ""); //eliminamos saltos de carro para que no generen espacios 0x20 al parsear los atributos del XML enviado/recibido (storageServletAddress y retrieverServletAddress) que impiden la firma en AutoFirma
 				}
 
 				var idSession = generateNewIdSession();
@@ -2115,6 +2117,7 @@ var MiniApplet = ( function ( window, undefined ) {
 
 				if (batchB64 != null && !isValidUrl(batchB64)) {
 					batchB64 = batchB64.replace(/\+/g, "-").replace(/\//g, "_");
+					batchB64 = batchB64.replace(/\n/g, "").replace(/\r/g, ""); //eliminamos saltos de carro para que no generen espacios 0x20 al parsear los atributos del XML enviado/recibido (storageServletAddress y retrieverServletAddress) que impiden la firma en AutoFirma
 				}
 
 				var idSession = generateNewIdSession();
