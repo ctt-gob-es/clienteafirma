@@ -1405,6 +1405,10 @@ var MiniApplet = ( function ( window, undefined ) {
 				if (isInternetExplorer()){
 					URL_MAX_SIZE = 12000;
 				}
+				else if (isFirefox()){
+					URL_MAX_SIZE = 524288;
+				}
+				
 				// Si el envio se debe fragmentar, llamamos a una función que se encarga
 				// de mandar la peticion recursivamente
 				if (url.length > URL_MAX_SIZE) {
