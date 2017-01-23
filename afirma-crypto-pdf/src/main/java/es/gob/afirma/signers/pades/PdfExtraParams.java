@@ -11,7 +11,7 @@
 package es.gob.afirma.signers.pades;
 
 /** Par&aacute;metros adicionales para las firmas PAdES. */
-final class PdfExtraParams {
+public final class PdfExtraParams {
 
     /** Si se establece a <code>true</code> omite la inclusi&oacute;n de la
      * pol&iacute;tica de certificaci&oacute;n en el <i>SigningCertificate</i>,
@@ -138,7 +138,7 @@ final class PdfExtraParams {
      * Si el documento PDF tiene ya un campo de firma pre-creado es posible utilizarlo para insertar la firma generada, referenci&aacute;ndolo
      * por su nombre.<br>
      * Si se indica un nombre de campo de firma que no exista en el documento PDF proporcionado, se generar&aacute; una excepci&oacute;n. */
-    static final String SIGNATURE_FIELD = "signatureField";//$NON-NLS-1$
+    public static final String SIGNATURE_FIELD = "signatureField";//$NON-NLS-1$
 
     /** P&aacute;gina del documento PDF donde insertar la firma. Si no se establece o es -1 se
      * usar&aacute; la &uacute;ltima p&aacute;gina del documento PDF.<br>
@@ -147,35 +147,35 @@ final class PdfExtraParams {
      * <code>signatureField</code>, y necesita que se establezcan valores v&aacute;lidos a los
      * par&aacute;metros <code>signaturePositionOnPageLowerLeftX</code>, <code>signaturePositionOnPageLowerLeftY</code>,
      * <code>signaturePositionOnPageUpperRightX</code> y <code>signaturePositionOnPageUpperRightY</code>. */
-    static final String SIGNATURE_PAGE = "signaturePage";//$NON-NLS-1$
+    public static final String SIGNATURE_PAGE = "signaturePage";//$NON-NLS-1$
 
     /** Coordenada horizontal inferior izquierda de la posici&oacute;n del recuadro visible de la firma dentro de la p&aacute;gina.<br>
      * Es necesario indicar el resto de coordenadas del recuadro mediante los par&aacute;metros <code>signaturePositionOnPageLowerLeftY</code>,
      * <code>signaturePositionOnPageUpperRightX</code> y <code>signaturePositionOnPageUpperRightY</code>.<br>
      * Si no se indica una p&aacute;gina en el par&aacute;metro <code>signaturePage</code> la firma se inserta en la &uacute;ltima p&aacute;gina
      * del documento. */
-    static final String SIGNATURE_POSITION_ON_PAGE_LOWER_LEFTX = "signaturePositionOnPageLowerLeftX";//$NON-NLS-1$
+    public static final String SIGNATURE_POSITION_ON_PAGE_LOWER_LEFTX = "signaturePositionOnPageLowerLeftX";//$NON-NLS-1$
 
     /** Coordenada vertical inferior izquierda de la posici&oacute;n del recuadro visible de la firma dentro de la p&aacute;gina.<br>
      * Es necesario indicar el resto de coordenadas del recuadro mediante los par&aacute;metros <code>signaturePositionOnPageLowerLeftX</code>,
      * <code>signaturePositionOnPageUpperRightX</code> y <code>signaturePositionOnPageUpperRightY</code>.<br>
      * Si no se indica una p&aacute;gina en el par&aacute;metro <code>signaturePage</code> la firma se inserta en la &uacute;ltima p&aacute;gina
      * del documento. */
-    static final String SIGNATURE_POSITION_ON_PAGE_LOWER_LEFTY = "signaturePositionOnPageLowerLeftY";//$NON-NLS-1$
+    public static final String SIGNATURE_POSITION_ON_PAGE_LOWER_LEFTY = "signaturePositionOnPageLowerLeftY";//$NON-NLS-1$
 
     /** Coordenada horizontal superior derecha de la posici&oacute;n del recuadro visible de la firma dentro de la p&aacute;gina.<br>
      * Es necesario indicar el resto de coordenadas del recuadro mediante los par&aacute;metros <code>signaturePositionOnPageLowerLeftX</code>,
      * <code>signaturePositionOnPageLowerLeftY</code> y <code>signaturePositionOnPageUpperRightY</code>.<br>
      * Si no se indica una p&aacute;gina en el par&aacute;metro <code>signaturePage</code> la firma se inserta en la &uacute;ltima p&aacute;gina
      * del documento. */
-    static final String SIGNATURE_POSITION_ON_PAGE_UPPER_RIGHTX = "signaturePositionOnPageUpperRightX";//$NON-NLS-1$
+    public static final String SIGNATURE_POSITION_ON_PAGE_UPPER_RIGHTX = "signaturePositionOnPageUpperRightX";//$NON-NLS-1$
 
     /** Coordenada vertical superior derecha de la posici&oacute;n del recuadro visible de la firma dentro de la p&aacute;gina.<br>
      * Es necesario indicar el resto de coordenadas del recuadro mediante los par&aacute;metros <code>signaturePositionOnPageLowerLeftX</code>,
      * <code>signaturePositionOnPageLowerLeftY</code> y <code>signaturePositionOnPageUpperRightX</code>.<br>
      * Si no se indica una p&aacute;gina en el par&aacute;metro <code>signaturePage</code> la firma se inserta en la &uacute;ltima p&aacute;gina
      * del documento. */
-    static final String SIGNATURE_POSITION_ON_PAGE_UPPER_RIGHTY = "signaturePositionOnPageUpperRightY";//$NON-NLS-1$
+    public static final String SIGNATURE_POSITION_ON_PAGE_UPPER_RIGHTY = "signaturePositionOnPageUpperRightY";//$NON-NLS-1$
 
     /** Imagen JPEG codificada en Base64 de la r&uacute;brica de la firma manuscrita que se desea aparezca como firma visible en el PDF. */
     static final String SIGNATURE_RUBRIC_IMAGE = "signatureRubricImage";//$NON-NLS-1$

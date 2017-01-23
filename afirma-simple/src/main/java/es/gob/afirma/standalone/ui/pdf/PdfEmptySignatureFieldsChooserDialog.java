@@ -17,6 +17,7 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
 import es.gob.afirma.core.ui.AOUIFactory;
+import es.gob.afirma.signers.pades.PdfExtraParams;
 import es.gob.afirma.signers.pades.PdfUtil.SignatureField;
 import es.gob.afirma.standalone.AutoFirmaUtil;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
@@ -107,12 +108,12 @@ public final class PdfEmptySignatureFieldsChooserDialog extends JDialog implemen
 
 		try {
 			final Properties p = new Properties();
-			p.put("signatureField", getField().getName()); //$NON-NLS-1$
-			p.put("signaturePage", Integer.toString(getField().getPage())); //$NON-NLS-1$
-			p.put("signaturePositionOnPageLowerLeftX", Integer.toString(getField().getSignaturePositionOnPageLowerLeftX())); //$NON-NLS-1$
-			p.put("signaturePositionOnPageLowerLeftY", Integer.toString(getField().getSignaturePositionOnPageLowerLeftY())); //$NON-NLS-1$
-			p.put("signaturePositionOnPageUpperRightX", Integer.toString(getField().getSignaturePositionOnPageUpperRightX())); //$NON-NLS-1$
-			p.put("signaturePositionOnPageUpperRightY", Integer.toString(getField().getSignaturePositionOnPageUpperRightY())); //$NON-NLS-1$
+			p.put(PdfExtraParams.SIGNATURE_FIELD, getField().getName());
+			p.put(PdfExtraParams.SIGNATURE_PAGE, Integer.toString(getField().getPage()));
+			p.put(PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_LOWER_LEFTX, Integer.toString(getField().getSignaturePositionOnPageLowerLeftX()));
+			p.put(PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_LOWER_LEFTY, Integer.toString(getField().getSignaturePositionOnPageLowerLeftY()));
+			p.put(PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_UPPER_RIGHTX, Integer.toString(getField().getSignaturePositionOnPageUpperRightX()));
+			p.put(PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_UPPER_RIGHTY, Integer.toString(getField().getSignaturePositionOnPageUpperRightY()));
 			nextPanel(p, getFragmentImage(getField()));
 		}
 		catch (final Exception e1) {
