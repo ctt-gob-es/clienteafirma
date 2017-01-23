@@ -948,9 +948,12 @@ var MiniApplet = ( function ( window, undefined ) {
 			/* URL de la peticion HTTPS */
 			var urlHttpRequest = "";
 			
-			/* Maxima longitud permitida para una URL, si la url se excede se divide la peticion en fragmentos */
-			var URL_MAX_SIZE = 1048576;
-
+			/* Maxima longitud permitida para una URL. Si la url se excede se divide
+			 * la peticion en fragmentos. Con Internet Explorer y Firefox a partir de
+			 * la version 49 se producen corrupciones de datos con el valor original
+			 * de 1Mb, asi que se reduce este a un valor seguro para ese navegador. */
+			var URL_MAX_SIZE = isInternetExplorer() ? 12000 : isFirefox() ? 458752 : 1048576;
+			
 			/* Indica si se ha establecido la conexion o no */
 			var connection = false;
 		
@@ -1399,15 +1402,6 @@ var MiniApplet = ( function ( window, undefined ) {
 			* Si cabe en un solo envio se manda directamente.
 			*/
 			function executeOperationByService (url) {
-
-				// Como internet explorer anade basura reducimos drasticamente el 
-				// tamano maximo de las peticiones para que funcione correctamente
-				if (isInternetExplorer()){
-					URL_MAX_SIZE = 12000;
-				}
-				else if (isFirefox()){
-					URL_MAX_SIZE = 524288;
-				}
 				
 				// Si el envio se debe fragmentar, llamamos a una función que se encarga
 				// de mandar la peticion recursivamente
