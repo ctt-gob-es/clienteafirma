@@ -219,7 +219,7 @@ final class PreferencesPanelGeneral extends JPanel {
 					AOUIFactory.showMessageDialog(
 							getParent(),
 							SimpleAfirmaMessages.getString("PreferencesPanel.142"), //$NON-NLS-1$
-							SimpleAfirmaMessages.getString("PreferencesPanel.143<"), //$NON-NLS-1$
+							SimpleAfirmaMessages.getString("PreferencesPanel.143"), //$NON-NLS-1$
 							JOptionPane.INFORMATION_MESSAGE
 						);
 					getDisposableInterface().disposeInterface();
