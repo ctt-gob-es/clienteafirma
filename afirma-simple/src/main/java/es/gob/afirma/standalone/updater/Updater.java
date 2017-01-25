@@ -146,10 +146,15 @@ public final class Updater {
 	public static void checkForUpdates(final Object parent) {
 
 		boolean omitCheck = Boolean.parseBoolean(updaterProperties.getProperty("avoidUpdateCheck")); //$NON-NLS-1$
+		if (omitCheck) {
+			LOGGER.info("La configuracion interna de la aplicacion solicita que no se busquen actualizaciones"); //$NON-NLS-1$
+		}
+
 		try {
 			final String avoidCheckProperty = System.getenv(AUTOFIRMA_AVOID_UPDATE_CHECK);
 			if (avoidCheckProperty != null) {
 				omitCheck = Boolean.TRUE.toString().equalsIgnoreCase(avoidCheckProperty);
+				LOGGER.info("Se ha configurado en el sistema que se omita la busqueda de actualizaciones de AutoFirma"); //$NON-NLS-1$
 			}
 		}
 		catch(final Exception e) {
@@ -157,7 +162,9 @@ public final class Updater {
 				"No se ha podido comprobar el valor de la variable de entorno " + AUTOFIRMA_AVOID_UPDATE_CHECK + ": " + e //$NON-NLS-1$ //$NON-NLS-2$
 			);
 		}
+
 		if (Platform.OS.WINDOWS.equals(Platform.getOS()) && !omitCheck) {
+
 			new Thread(() ->  {
 
 				boolean newVersionAvailable;
