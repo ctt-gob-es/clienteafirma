@@ -401,17 +401,17 @@ public final class AOXMLDSigSigner implements AOSigner {
                 	}
 					catch (final IsInnerlException ex) {
 						LOGGER.info(
-							"La hoja de estilo esta referenciada internamente, por lo que no se necesita dereferenciar" //$NON-NLS-1$
+							"La hoja de estilo esta referenciada internamente, por lo que no se necesita dereferenciar: " + ex//$NON-NLS-1$
 						);
 					}
 					catch (final ReferenceIsNotXmlException ex) {
 						LOGGER.warning(
-							"La hoja de estilo referenciada no es XML o no se ha dereferenciado apropiadamente" //$NON-NLS-1$
+							"La hoja de estilo referenciada no es XML o no se ha dereferenciado apropiadamente: " + ex //$NON-NLS-1$
 						);
 					}
 					catch (final CannotDereferenceException ex) {
 						LOGGER.warning(
-							"La hoja de estilo no ha podido dereferenciar, probablemente sea un enlace relativo local" //$NON-NLS-1$
+							"La hoja de estilo no ha podido dereferenciar, probablemente sea un enlace relativo local: " + ex //$NON-NLS-1$
 						);
 					}
 					catch (final Exception ex) {
@@ -1818,16 +1818,16 @@ public final class AOXMLDSigSigner implements AOSigner {
             }
 
             if (targetType == CounterSignTarget.TREE) {
-                this.countersignTree(root, key, certChain, onlySignningCert, digestMethodAlgorithm, canonicalizationAlgorithm, xmlSignaturePrefix);
+                countersignTree(root, key, certChain, onlySignningCert, digestMethodAlgorithm, canonicalizationAlgorithm, xmlSignaturePrefix);
             }
             else if (targetType == CounterSignTarget.LEAFS) {
-                this.countersignLeafs(root, key, certChain, onlySignningCert, digestMethodAlgorithm, canonicalizationAlgorithm, xmlSignaturePrefix);
+                countersignLeafs(root, key, certChain, onlySignningCert, digestMethodAlgorithm, canonicalizationAlgorithm, xmlSignaturePrefix);
             }
             else if (targetType == CounterSignTarget.NODES) {
-                this.countersignNodes(root, targets, key, certChain, onlySignningCert, digestMethodAlgorithm, canonicalizationAlgorithm, xmlSignaturePrefix);
+                countersignNodes(root, targets, key, certChain, onlySignningCert, digestMethodAlgorithm, canonicalizationAlgorithm, xmlSignaturePrefix);
             }
             else if (targetType == CounterSignTarget.SIGNERS) {
-                this.countersignSigners(root, targets, key, certChain, onlySignningCert, digestMethodAlgorithm, canonicalizationAlgorithm, xmlSignaturePrefix);
+                countersignSigners(root, targets, key, certChain, onlySignningCert, digestMethodAlgorithm, canonicalizationAlgorithm, xmlSignaturePrefix);
             }
 
         }
@@ -1868,7 +1868,7 @@ public final class AOXMLDSigSigner implements AOSigner {
         // y crea sus contrafirmas
         for (final Element node : nodes) {
 	        try {
-	                this.cs(node, key, certChain, onlySignningCert, refsDigestMethod, canonicalizationAlgorithm, xmlSignaturePrefix);
+	                cs(node, key, certChain, onlySignningCert, refsDigestMethod, canonicalizationAlgorithm, xmlSignaturePrefix);
 	        }
 	        catch (final Exception e) {
 	            throw new AOException("No se ha podido realizar la contrafirma del nodo '" + (node != null ? node.getNodeName() : "nulo") + "': " + e, e); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -1920,7 +1920,7 @@ public final class AOXMLDSigSigner implements AOSigner {
 
                 // y crea sus contrafirmas
                 if (isLeaf) {
-                    this.cs(
+                    cs(
                 		(Element) signatures.item(i),
                 		key,
                 		certChain,
@@ -1998,7 +1998,7 @@ public final class AOXMLDSigSigner implements AOSigner {
         final List<Object> targetsList = Arrays.asList(tgts);
     	for (int i = 0; i < sortedSignatures.size(); i++) {
     		if (targetsList.contains(Integer.valueOf(i))) {
-    			this.cs(sortedSignatures.get(i), key, certChain, onlySignningCert, refsDigestMethod, canonicalizationAlgorithm, xmlSignaturePrefix);
+    			cs(sortedSignatures.get(i), key, certChain, onlySignningCert, refsDigestMethod, canonicalizationAlgorithm, xmlSignaturePrefix);
     		}
     	}
     }
@@ -2075,7 +2075,7 @@ public final class AOXMLDSigSigner implements AOSigner {
         // y crea sus contrafirmas
         final Iterator<Element> i = nodes.iterator();
         while (i.hasNext()) {
-            this.cs(i.next(), key, certChain, onlySignningCert, refsDigestMethod, canonicalizationAlgorithm, xmlSignaturePrefix);
+            cs(i.next(), key, certChain, onlySignningCert, refsDigestMethod, canonicalizationAlgorithm, xmlSignaturePrefix);
         }
     }
 
