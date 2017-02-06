@@ -40,13 +40,6 @@ import javax.xml.crypto.dsig.spec.TransformParameterSpec;
 import javax.xml.crypto.dsig.spec.XPathFilterParameterSpec;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import net.java.xades.security.xml.XAdES.CommitmentTypeIndication;
-import net.java.xades.security.xml.XAdES.DataObjectFormat;
-import net.java.xades.security.xml.XAdES.DataObjectFormatImpl;
-import net.java.xades.security.xml.XAdES.ObjectIdentifierImpl;
-import net.java.xades.security.xml.XAdES.XAdES;
-import net.java.xades.security.xml.XAdES.XAdES_EPES;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -65,6 +58,12 @@ import es.gob.afirma.signers.xml.style.CannotDereferenceException;
 import es.gob.afirma.signers.xml.style.IsInnerlException;
 import es.gob.afirma.signers.xml.style.ReferenceIsNotXmlException;
 import es.gob.afirma.signers.xml.style.XmlStyle;
+import net.java.xades.security.xml.XAdES.CommitmentTypeIndication;
+import net.java.xades.security.xml.XAdES.DataObjectFormat;
+import net.java.xades.security.xml.XAdES.DataObjectFormatImpl;
+import net.java.xades.security.xml.XAdES.ObjectIdentifierImpl;
+import net.java.xades.security.xml.XAdES.XAdES;
+import net.java.xades.security.xml.XAdES.XAdES_EPES;
 
 /** Firmador simple XAdES.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
@@ -379,17 +378,17 @@ public final class XAdESSigner {
 				}
 				catch (final IsInnerlException ex) {
 					LOGGER.info(
-						"La hoja de estilo esta referenciada internamente, por lo que no se necesita dereferenciar" //$NON-NLS-1$
+						"La hoja de estilo esta referenciada internamente, por lo que no se necesita dereferenciar: " + ex //$NON-NLS-1$
 					);
 				}
 				catch (final ReferenceIsNotXmlException ex) {
 					LOGGER.warning(
-						"La hoja de estilo referenciada no es XML o no se ha dereferenciado apropiadamente" //$NON-NLS-1$
+						"La hoja de estilo referenciada no es XML o no se ha dereferenciado apropiadamente: " + ex //$NON-NLS-1$
 					);
 				}
 				catch (final CannotDereferenceException ex) {
 					LOGGER.warning(
-						"La hoja de estilo no ha podido dereferenciar, probablemente sea un enlace relativo local" //$NON-NLS-1$
+						"La hoja de estilo no ha podido dereferenciar, probablemente sea un enlace relativo local: " + ex//$NON-NLS-1$
 					);
 				}
 				catch (final Exception ex) {
