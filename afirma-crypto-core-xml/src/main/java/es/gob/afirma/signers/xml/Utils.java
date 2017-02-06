@@ -617,7 +617,7 @@ public final class Utils {
             pkcs1 = Base64.decode(((Element) signature.getElementsByTagNameNS(XMLConstants.DSIGNNS, "SignatureValue").item(0)).getTextContent()); //$NON-NLS-1$
         }
         catch (final Exception e) {
-            LOGGER.warning("No se pudo extraer el PKCS#1 de una firma"); //$NON-NLS-1$
+            LOGGER.warning("No se pudo extraer el PKCS#1 de una firma: " + e); //$NON-NLS-1$
             pkcs1 = null;
         }
         ssi.setPkcs1(pkcs1);
