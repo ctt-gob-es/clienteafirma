@@ -87,7 +87,7 @@ public final class MimeHelper {
             this.mimeInfo.setDescription(desc);
         }
         catch (final ClassNotFoundException e) {
-            LOGGER.warning("No se encontro la biblioteca JMimeMagic para la deteccion del tipo de dato"); //$NON-NLS-1$
+            LOGGER.warning("No se encontro la biblioteca JMimeMagic para la deteccion del tipo de dato: " + e); //$NON-NLS-1$
         }
         catch (final Exception e) {
             try {

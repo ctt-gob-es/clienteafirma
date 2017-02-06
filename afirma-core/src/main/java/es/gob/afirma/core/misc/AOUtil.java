@@ -485,7 +485,7 @@ public final class AOUtil {
 			}
 		}
 		catch(final Exception e) {
-			LOGGER.warning("No se ha podido determinar la version de Java: " + ver); //$NON-NLS-1$
+			LOGGER.warning("No se ha podido determinar la version de Java (" + ver + "):" + e); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		return false;
 	}

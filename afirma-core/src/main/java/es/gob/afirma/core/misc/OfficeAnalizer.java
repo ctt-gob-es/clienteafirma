@@ -132,16 +132,16 @@ public final class OfficeAnalizer {
             return mimetype;
         }
         catch (final ZipException e1) {
-            LOGGER.warning("El fichero indicado no es un ZIP"); //$NON-NLS-1$
+            LOGGER.warning("El fichero indicado no es un ZIP: " + e1); //$NON-NLS-1$
         }
         finally {
         	if (zipFile != null) {
         		zipFile.close();
         	}
         }
-        
 
-    	String retVal = getMimeTypeOffice97(data);
+
+    	final String retVal = getMimeTypeOffice97(data);
 
     	if (retVal != null) {
     		return retVal;
@@ -151,7 +151,7 @@ public final class OfficeAnalizer {
     }
 
 	private static String getMimeTypeOffice97(final byte[] data) {
-		
+
 		// Comprobamos si se trata de un documento de Office 97-2003 con una estructura zip interna
 		final String testString = new String(data);
 
