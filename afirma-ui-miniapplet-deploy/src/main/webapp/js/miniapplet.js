@@ -107,10 +107,10 @@ var MiniApplet = ( function ( window, undefined ) {
 
 		var CHECKTIME_OBLIGATORY = "CT_OBLIGATORY";
 
-		// Tiempo de espera entre los intentos de conexion con autofirma.
+		// Tiempo de espera entre los intentos de conexion con autofirma por socket
 		var AUTOFIRMA_LAUNCHING_TIME = 2000;
 		
-		// Reintentos de conexion totales para detectar que esta instalado AutoFirma
+		// Reintentos de conexion totales para detectar que esta instalado AutoFirma por socket
 		var AUTOFIRMA_CONNECTION_RETRIES = 10;
 
 		// Variable que se puede configurar para forzar el uso del modo de comunicacion por servidor intermedio
@@ -184,7 +184,7 @@ var MiniApplet = ( function ( window, undefined ) {
 		 * Determina con un boolean si se accede a la web con Chrome
 		 */
 		function isChrome() {
-			return navigator.userAgent.toUpperCase().indexOf("CHROME") != -1 ||
+			return navigator.userAgent.toUpperCase().indexOf("CHROME/") != -1 ||
 				navigator.userAgent.toUpperCase().indexOf("CHROMIUM") != -1;
 		}
 
