@@ -37,6 +37,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import es.gob.afirma.core.AOCancelledOperationException;
+import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.standalone.AutoFirmaUtil;
@@ -300,15 +301,18 @@ final class PreferencesPanelGeneral extends JPanel {
 
 		signConstraint.gridy++;
 
-		this.checkForUpdates.getAccessibleContext().setAccessibleDescription(
-			SimpleAfirmaMessages.getString("PreferencesPanel.88") //$NON-NLS-1$
-		);
-		this.checkForUpdates.setMnemonic('B');
-		this.checkForUpdates.addItemListener(modificationListener);
-		this.checkForUpdates.addKeyListener(keyListener);
-		signConfigPanel.add(this.checkForUpdates, signConstraint);
+		// Solo se buscaran actualizaciones automaticamente en Windows
+		if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
+			this.checkForUpdates.getAccessibleContext().setAccessibleDescription(
+					SimpleAfirmaMessages.getString("PreferencesPanel.88") //$NON-NLS-1$
+					);
+			this.checkForUpdates.setMnemonic('B');
+			this.checkForUpdates.addItemListener(modificationListener);
+			this.checkForUpdates.addKeyListener(keyListener);
+			signConfigPanel.add(this.checkForUpdates, signConstraint);
 
-		signConstraint.gridy++;
+			signConstraint.gridy++;
+		}
 
 		this.sendAnalytics.getAccessibleContext().setAccessibleDescription(
 			SimpleAfirmaMessages.getString("PreferencesPanel.90") //$NON-NLS-1$
