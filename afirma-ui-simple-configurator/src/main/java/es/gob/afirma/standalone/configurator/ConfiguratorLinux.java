@@ -37,16 +37,16 @@ final class ConfiguratorLinux implements Configurator {
             );
 
             LOGGER.info(Messages.getString("ConfiguratorLinux.11")); //$NON-NLS-1$
-            
+
            //Generacion del certificado pfx
             ConfiguratorUtil.installFile(certPack.getPkcs12(), new File(
             		ConfiguratorUtil.getApplicationDirectory(), KS_FILENAME));
 
           //Generacion del certificado raiz .cer
             ConfiguratorUtil.installFile(
-            		certPack.getCaCertificate().getEncoded(), 
+            		certPack.getCaCertificate().getEncoded(),
             		new File(ConfiguratorUtil.getApplicationDirectory(), FILE_AUTOFIRMA_CERTIFICATE));
-            
+
             // comando para sacar los usuarios del sistema
             final String[] command = new String[] {
     				"cut", //$NON-NLS-1$
@@ -56,7 +56,7 @@ final class ConfiguratorLinux implements Configurator {
     				};
 
             try {
-                LOGGER.warning(Messages.getString("ConfiguratorLinux.13")); //$NON-NLS-1$
+                LOGGER.info(Messages.getString("ConfiguratorLinux.13")); //$NON-NLS-1$
                 ConfiguratorFirefox.removeAppExecutionWarningInChrome(appDir, command);
                 ConfiguratorFirefox.installRootCAChromeKeyStore(appDir, command);
                 ConfiguratorFirefox.installRootCAMozillaKeyStore(appDir, command);
