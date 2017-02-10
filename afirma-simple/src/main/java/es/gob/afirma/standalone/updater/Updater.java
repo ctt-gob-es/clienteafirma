@@ -59,7 +59,7 @@ public final class Updater {
 	 * @return Versi&oacute;n actual del aplicativo. */
 	private static String getCurrentVersion() {
 		if (currentVersion == null) {
-			currentVersion = updaterProperties.getProperty("currentVersion", "0"); //$NON-NLS-1$ //$NON-NLS-2$
+			currentVersion = updaterProperties.getProperty("currentVersion." + Platform.getOS(), "0"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		return currentVersion;
 	}
@@ -163,8 +163,7 @@ public final class Updater {
 			);
 		}
 
-		if (Platform.OS.WINDOWS.equals(Platform.getOS()) && !omitCheck) {
-
+		if (!omitCheck) {
 			new Thread(() ->  {
 
 				boolean newVersionAvailable;

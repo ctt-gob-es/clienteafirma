@@ -511,8 +511,9 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
         	}
         }
 
-    	// Comprobamos actualizaciones
-        if (PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_UPDATECHECK, true)) {
+    	// Comprobamos actualizaciones si estan habilitadas y estamos en Windows
+        if (Platform.OS.WINDOWS.equals(Platform.getOS()) &&
+        		PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_UPDATECHECK, true)) {
 			Updater.checkForUpdates(null);
 		}
 		else {
@@ -726,7 +727,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 		) {
 			final Properties metadata = new Properties();
 			metadata.load(manifestIs);
-			version = metadata.getProperty("currentVersionText", ""); //$NON-NLS-1$ //$NON-NLS-2$
+			version = metadata.getProperty("currentVersionText." + Platform.getOS(), ""); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		catch (final Exception e) {
 			LOGGER.warning("No se ha podido identificar el numero de version de AutoFirma a partir del Manifest: " + e); //$NON-NLS-1$
