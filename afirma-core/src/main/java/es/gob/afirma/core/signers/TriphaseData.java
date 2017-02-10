@@ -56,7 +56,7 @@ public final class TriphaseData {
 
 		/** Crea los datos de una firma trif&aacute;sica individual.
 		 * @param d Propiedades de la firma.
-		 * @param i Identificador de la firma. */
+		 * @param i Identificador de la firma. Si es {@code null} se genera uno aleatorio. */
 		public TriSign(final Map<String, String> d, final String i) {
 			if (d == null) {
 				throw new IllegalArgumentException(
