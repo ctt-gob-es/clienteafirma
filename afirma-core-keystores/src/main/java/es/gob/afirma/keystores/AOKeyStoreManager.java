@@ -357,20 +357,13 @@ public class AOKeyStoreManager implements KeyStoreManager {
 
     @Override
     public String toString() {
-        final StringBuilder ret = new StringBuilder("Gestor de almacenes de claves"); //$NON-NLS-1$
+        final StringBuilder ret = new StringBuilder("Gestor de almacenes de claves "); //$NON-NLS-1$
+        ret.append(this.ksType);
         if (this.ksType != null) {
-            String tmpStr = this.ksType.getName();
-            if (tmpStr != null) {
-                ret.append(" de tipo "); //$NON-NLS-1$
-                ret.append(tmpStr);
-            }
-            tmpStr = this.ksType.getName();
-            if (tmpStr != null) {
+            if (this.ksType.getName() != null) {
                 ret.append(" con nombre "); //$NON-NLS-1$
-                ret.append(tmpStr);
+                ret.append(this.ksType.getName());
             }
-            ret.append(" de clase "); //$NON-NLS-1$
-            ret.append(this.ksType.toString());
         }
         return ret.toString();
     }
