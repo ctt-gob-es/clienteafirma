@@ -51,6 +51,9 @@ public final class MozillaKeyStoreUtilities {
 	/** Nombre del PKCS#11 NSS en Windows. */
 	private static final String SOFTOKN3_DLL = "softokn3.dll"; //$NON-NLS-1$
 
+	/** Nombre del fichero que declara los m&oacute;dulos de NSS en sustituci&oacute;n a secmod.db */
+	private static final String PKCS11TXT_FILENAME = "pkcs11.txt"; //$NON-NLS-1$
+
 	private static final String AFIRMA_NSS_HOME = "AFIRMA_NSS_HOME"; //$NON-NLS-1$
 
 	private static final String AFIRMA_PROFILES_INI = "AFIRMA_PROFILES_INI"; //$NON-NLS-1$
@@ -81,17 +84,19 @@ public final class MozillaKeyStoreUtilities {
 	 * la carga.
 	 */
 	private enum KnownModule {
-		ATOS_CARDOS("Atos CardOS (preinstalado)", "siecap11.dll", false), //$NON-NLS-1$ //$NON-NLS-2$
-		FNMT_64("FNMT-RCM Modulo PKCS#11 64bits", "FNMT_P11_x64.dll", true), //$NON-NLS-1$ //$NON-NLS-2$
-		FNMT_32("FNMT-RCM Modulo PKCS#11 32bits", "FNMT_P11.dll", true); //$NON-NLS-1$ //$NON-NLS-2$
+		ATOS_CARDOS("Atos CardOS (preinstalado)", "siecap11.dll", Platform.OS.WINDOWS, false), //$NON-NLS-1$ //$NON-NLS-2$
+		FNMT_64("FNMT-RCM Modulo PKCS#11 64bits", "FNMT_P11_x64.dll", Platform.OS.WINDOWS, true), //$NON-NLS-1$ //$NON-NLS-2$
+		FNMT_32("FNMT-RCM Modulo PKCS#11 32bits", "FNMT_P11.dll", Platform.OS.WINDOWS, true); //$NON-NLS-1$ //$NON-NLS-2$
 
 		private String description;
 		private String lib;
+		private Platform.OS os;
 		private boolean forcedLoad;
-		private KnownModule(String description, String lib, boolean forcedLoad) {
+		private KnownModule(String description, String lib, Platform.OS os, boolean forcedLoad) {
 			this.description = description;
 			this.lib = lib;
 			this.forcedLoad = forcedLoad;
+			this.os = os;
 		}
 
 		String getDescription() {
@@ -102,6 +107,9 @@ public final class MozillaKeyStoreUtilities {
 		}
 		boolean isForcedLoad() {
 			return this.forcedLoad;
+		}
+		public Platform.OS getOs() {
+			return this.os;
 		}
 	}
 
@@ -339,6 +347,10 @@ public final class MozillaKeyStoreUtilities {
 		// indicado que se excluyan
 		if (includeKnownModules) {
 			for (final KnownModule knownModule : KnownModule.values()) {
+				// Si el modulo no se corresponde con el sistema actual, se omite
+				if (!Platform.getOS().equals(knownModule.getOs())) {
+					continue;
+				}
 				if (excludePreferredModules && isDniePkcs11Library(knownModule.getLib())) {
 					continue;
 				}
@@ -624,16 +636,28 @@ public final class MozillaKeyStoreUtilities {
 	                                                           NoSuchMethodException,
 	                                                           SecurityException,
 	                                                           ClassNotFoundException {
+
 		final String nssDirectory = MozillaKeyStoreUtilities.getSystemNSSLibDir();
+
+		String profileDir = useSharedNss ?
+				SharedNssUtil.getSharedUserProfileDirectory() :
+					MozillaKeyStoreUtilities.getMozillaUserProfileDirectory();
+
+		// Consideramos que se debe cargar el fichero de modulos de NSS en modo de base de datos
+		// cuando se encuentra la variable de sistema NSS_DEFAULT_DB_TYPE o se encuentra el fichero pkcs11.txt
+		try {
+			if ("sql".equals(System.getenv("NSS_DEFAULT_DB_TYPE")) || new File(profileDir, PKCS11TXT_FILENAME).exists()) { //$NON-NLS-1$ //$NON-NLS-2$
+				profileDir = "sql:/" + profileDir; //$NON-NLS-1$
+			}
+		}
+		catch (final Exception e) {
+			LOGGER.warning("No se pudo comprobar si el almacen de claves debia cargase como base de datos: " + e); //$NON-NLS-1$
+		}
+
 		final String p11NSSConfigFile = MozillaKeyStoreUtilities.createPKCS11NSSConfigFile(
-			("sql".equals(System.getenv("NSS_DEFAULT_DB_TYPE")) ? //$NON-NLS-1$ //$NON-NLS-2$
-				"sql:/" : //$NON-NLS-1$
-					"") + //$NON-NLS-1$
-						(useSharedNss ?
-							SharedNssUtil.getSharedUserProfileDirectory() :
-								MozillaKeyStoreUtilities.getMozillaUserProfileDirectory()),
-			nssDirectory
-		);
+				profileDir,
+				nssDirectory
+				);
 
 		// Quitamos el directorio del usuario del registro, para evitar que contenga datos personales
 		LOGGER.info("Configuracion de NSS para SunPKCS11:\n" + p11NSSConfigFile.replace(Platform.getUserHome(), "USERHOME")); //$NON-NLS-1$ //$NON-NLS-2$
