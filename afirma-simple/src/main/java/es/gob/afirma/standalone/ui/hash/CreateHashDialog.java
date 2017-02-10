@@ -493,7 +493,7 @@ public final class CreateHashDialog extends JDialog implements KeyListener {
 	@Override
 	public void keyReleased(final KeyEvent ke) {
 		// En Mac no cerramos los dialogos con Escape
-		if (ke != null && ke.getKeyCode() == KeyEvent.VK_ESCAPE) {
+		if (ke != null && ke.getKeyCode() == KeyEvent.VK_ESCAPE && !Platform.OS.MACOSX.equals(Platform.getOS())) {
 			CreateHashDialog.this.setVisible(false);
 			CreateHashDialog.this.dispose();
 		}

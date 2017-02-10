@@ -244,12 +244,12 @@ public final class CheckHashDialog extends JDialog implements KeyListener {
 
 		// En Mac OS X el orden de los botones es distinto
 		if (Platform.OS.MACOSX.equals(Platform.getOS())) {
-			panel.add(checkButton);
 			panel.add(exitButton);
+			panel.add(checkButton);
 		}
 		else {
-			panel.add(exitButton);
 			panel.add(checkButton);
+			panel.add(exitButton);
 		}
 
 		c.add(textFieldDataLabel, gbc);
@@ -391,7 +391,7 @@ public final class CheckHashDialog extends JDialog implements KeyListener {
 	@Override
 	public void keyReleased(final KeyEvent ke) {
 		// En Mac no cerramos los dialogos con Escape
-		if (ke != null && ke.getKeyCode() == KeyEvent.VK_ESCAPE) {
+		if (ke != null && ke.getKeyCode() == KeyEvent.VK_ESCAPE && !Platform.OS.MACOSX.equals(Platform.getOS())) {
 			CheckHashDialog.this.setVisible(false);
 			CheckHashDialog.this.dispose();
 		}
