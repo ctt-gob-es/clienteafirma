@@ -188,6 +188,29 @@ var MiniApplet = ( function ( window, undefined ) {
 				navigator.userAgent.toUpperCase().indexOf("CHROMIUM") != -1;
 		}
 
+		/**
+		 * Determina con un boolean si se accede a la web con Safari 10. Esta version no
+		 * funciona bien con la comunicacion con sockets de AutoFirma.
+		 */
+		function isSafari10() {
+			navigator.sayswho= (function(){
+			    var ua= navigator.userAgent, tem, 
+			    M= ua.match(/(opera|chrome|safari|firefox|msie|trident(?=\/))\/?\s*(\d+)/i) || [];
+			    if(/trident/i.test(M[1])){
+			        tem=  /\brv[ :]+(\d+)/g.exec(ua) || [];
+			        return 'IE '+(tem[1] || '');
+			    }
+			    if(M[1]=== 'Chrome'){
+			        tem= ua.match(/\b(OPR|Edge)\/(\d+)/);
+			        if(tem!= null) return tem.slice(1).join(' ').replace('OPR', 'Opera');
+			    }
+			    M= M[2]? [M[1], M[2]]: [navigator.appName, navigator.appVersion, '-?'];
+			    if((tem= ua.match(/version\/(\d+)/i))!= null) M.splice(1, 1, tem[1]);
+			    return M.join(' ');
+			})();
+			return navigator.sayswho == 'Safari 10';
+		}
+		
         /**
          * Determina con un boolean si el navegador es Microsoft Edge
          */
@@ -530,7 +553,7 @@ var MiniApplet = ( function ( window, undefined ) {
 		}
 			
 		var sign = function (dataB64, algorithm, format, params, successCallback, errorCallback) {
-			
+
 			forceLoad();
 			
 			if (clientType == TYPE_APPLET) {
@@ -892,7 +915,7 @@ var MiniApplet = ( function ( window, undefined ) {
 				keystore = getDefaultKeystore();
 			}
 			
-			if (!isIOS() && !isAndroid() && !isOldInternetExplorer() && !isEdge() && !forceWSMode){
+			if (!forceWSMode && !isIOS() && !isAndroid() && !isOldInternetExplorer() && !isEdge() && !isSafari10()){
 				clienteFirma = new AppAfirmaJSSocket(clientAddress, window, undefined);
 				clienteFirma.setKeyStore(keystore);
 				clientType = TYPE_JAVASCRIPT_SOCKET;
@@ -902,7 +925,6 @@ var MiniApplet = ( function ( window, undefined ) {
 				clienteFirma.setKeyStore(keystore);
 				clientType = TYPE_JAVASCRIPT_WEB_SERVICE;
 			}
-
 		}
 
 		var AppAfirmaJSSocket = ( function (clientAddress, window, undefined) {
