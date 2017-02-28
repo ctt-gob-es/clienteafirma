@@ -9,9 +9,6 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.attribute.PosixFilePermission;
 import java.security.GeneralSecurityException;
 import java.security.KeyStoreException;
 import java.util.ArrayList;
@@ -19,18 +16,16 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import javax.script.ScriptEngine;
-import javax.script.ScriptException;
 import javax.swing.JOptionPane;
 
 import es.gob.afirma.core.misc.BoundedBufferedReader;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.keystores.mozilla.MozillaKeyStoreUtilities;
-import es.gob.afirma.keystores.mozilla.MozillaKeyStoreUtilitiesOsX;
 
 /** Configurador para instalar un certificado SSL de confianza en Mozilla NSS.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
@@ -52,6 +47,8 @@ final class ConfiguratorFirefox {
 	private static final String LINUX_CHROME_PREFS_PATH = "/.config/google-chrome/Local State";//$NON-NLS-1$
 	private static final String MACOSX_MOZILLA_PATH = "/Library/Application Support/firefox/profiles.ini";//$NON-NLS-1$
 	private static String WINDOWS_MOZILLA_PATH = "\\AppData\\Roaming\\Mozilla\\Firefox\\profiles.ini"; //$NON-NLS-1$
+	private static final String GET_USER_SCRIPT = "scriptGetUsers";//$NON-NLS-1$
+	private static final String SCRIPT_EXT = ".sh";//$NON-NLS-1$
 	static final String CERTUTIL_EXE;
 	private static final String FILE_CERTUTIL;
 	private static final String RESOURCE_BASE;
@@ -258,7 +255,7 @@ final class ConfiguratorFirefox {
 	}
 
 	/**
-	 * Genera el script de instalaci&oacute; del certificado en firefox para MacOSX y LINUX.
+	 * Genera el script de instalaci&oacute;n del certificado en firefox para MacOSX y LINUX.
 	 * En linux genera el script que hay que ejecutar para realizar la instalaci&oacute;n pero no lo ejecuta, de eso se encarga el instalador Debian.
 	 * En MacOSX el script se ejecuta a la vuelta de este m&eacute;todo.
 	 * @param targetDir Directorio de instalaci&oacute;n del sistema
@@ -278,6 +275,12 @@ final class ConfiguratorFirefox {
 
 		// dados los usuarios sacamos el directorio de perfiles de mozilla en caso de que lo tengan
 		final List <File> mozillaUsersProfilesPath = getMozillaUsersProfilesPath(usersDirs);
+		// Si no se encuentra el fichero de perfiles de firefox, abortamos la operacion
+		if (mozillaUsersProfilesPath == null) {
+			LOGGER.info("No se encuentra el fichero de perfiles de Firefox, por lo que no se instalaran certificados"); //$NON-NLS-1$
+			return;
+		}
+
 		// para cada usuario tenemos sus distintos directorios de perfiles
 		final Set <File> profiles = getProfiles(mozillaUsersProfilesPath);
 		if (profiles.isEmpty()){
@@ -301,7 +304,7 @@ final class ConfiguratorFirefox {
 		}
 		catch (final Exception e) {
 			LOGGER.warning(
-					"No se pudo descomprimir certutil para la desinstalacion del certificado SSL raiz del almacen de Mozilla Firefox. Se aborta la operacion: " + e //$NON-NLS-1$
+					"No se pudo descomprimir certutil para la desinstalacion del certificado SSL raiz del almacen de Mozilla Firefox: " + e //$NON-NLS-1$
 					);
 		}
 
@@ -316,24 +319,36 @@ final class ConfiguratorFirefox {
 	}
 
 
-	static void generateUninstallScriptMac(final File targetDir) throws MozillaProfileNotFoundException, IOException {
+	static void generateUninstallScriptMac(final File targetDir) throws IOException {
 
 		final StringBuilder sb = new StringBuilder(ConfiguratorMacOSX.OSX_GET_USERS_COMMAND);
-		final String path = targetDir + ConfiguratorMacOSX.GET_USER_SCRIPT;
+		final File scriptFile = File.createTempFile(GET_USER_SCRIPT, SCRIPT_EXT);
+
 		try {
-			ConfiguratorFirefox.writeScriptFile(path, sb, true);
+			ConfiguratorMacOSX.writeScriptFile(scriptFile.getAbsolutePath(), sb, true);
 		} catch (final IOException e) {
-			LOGGER.severe(" Ha ocurrido un error : " + e); //$NON-NLS-1$
+			LOGGER.log(Level.WARNING, " Ha ocurrido un error al generar el script de desinstalacion: " + e, e); //$NON-NLS-1$
 		}
-		addExexPermissionsToAllFilesOnDirectory(ConfiguratorUtil.getApplicationDirectory());
+		ConfiguratorMacOSX.addExexPermissionsToFile(scriptFile);
+
 		// sacamos el listado de usuarios de la aplicacion
-		final List<String> usersDirs = getSystemUsersHomes(new String[]{path});
+		final List<String> usersDirs = getSystemUsersHomes(new String[]{scriptFile.getAbsolutePath()});
+
+		scriptFile.delete();
+
 		// dados los usuarios sacamos el directorio de perfiles de mozilla en caso de que lo tengan
 		final List <File> mozillaUsersProfilesPath = getMozillaUsersProfilesPath(usersDirs);
+		// Si no se encuentra el fichero de perfiles de firefox, abortamos la operacion
+		if (mozillaUsersProfilesPath == null) {
+			LOGGER.info("No se encuentra el fichero de perfiles de Firefox, por lo que no se desinstalaran certificados"); //$NON-NLS-1$
+			return;
+		}
+
 		// para cada usuario tenemos sus distintos directorios de perfiles
 		final Set <File> profiles = getProfiles(mozillaUsersProfilesPath);
-		if (profiles.isEmpty()){
-			throw new MozillaProfileNotFoundException();
+		if (profiles.isEmpty()) {
+			LOGGER.info("No se han encontrado perfiles de Mozilla de los que desinstalar los certificados"); //$NON-NLS-1$
+			return;
 		}
 
 		final File certutilFile = new File(targetDir, DIR_CERTUTIL + File.separator + CERTUTIL_EXE);
@@ -373,42 +388,6 @@ final class ConfiguratorFirefox {
 		ConfiguratorFirefox.deleteConfigDir(targetDir);
 	}
 
-	static void addExexPermissionsToFile(final File f) {
-		final Set<PosixFilePermission> perms = new HashSet<>();
-		perms.add(PosixFilePermission.OWNER_EXECUTE);
-		perms.add(PosixFilePermission.GROUP_EXECUTE);
-		perms.add(PosixFilePermission.OTHERS_EXECUTE);
-		perms.add(PosixFilePermission.OWNER_READ);
-		perms.add(PosixFilePermission.GROUP_READ);
-		perms.add(PosixFilePermission.OTHERS_READ);
-		perms.add(PosixFilePermission.OWNER_WRITE);
-		perms.add(PosixFilePermission.GROUP_WRITE);
-		perms.add(PosixFilePermission.OTHERS_WRITE);
-		try {
-			Files.setPosixFilePermissions(
-				Paths.get(f.getAbsolutePath()),
-				perms
-			);
-		}
-		catch (final Exception e) {
-			LOGGER.warning(
-				"No se ha podido dar permiso de ejecucion a '" + f.getAbsolutePath() + "': " + e//$NON-NLS-1$ //$NON-NLS-2$
-			);
-		}
-	}
-
-	/**
-	 * Da permisos de ejecuci&oacute;n a todos los ficheros de un directorio dado.
-	 * @param dir Directorio al que dar permiso.
-	 */
-	public static void addExexPermissionsToAllFilesOnDirectory(final File dir) {
-		if (!Platform.OS.WINDOWS.equals(Platform.getOS())) {
-			for (final File fileEntry : dir.listFiles()) {
-				addExexPermissionsToFile(fileEntry);
-			}
-		}
-	}
-
 	private static String escapePath(final String path) {
 		if (path == null) {
 			throw new IllegalArgumentException(
@@ -439,8 +418,8 @@ final class ConfiguratorFirefox {
 						);
 			}
 
-			if (!certutilFile.canExecute()) {
-				addExexPermissionsToAllFilesOnDirectory(certutilFile.getParentFile());
+			if (!certutilFile.canExecute() && Platform.OS.MACOSX.equals(Platform.getOS())) {
+				ConfiguratorMacOSX.addExexPermissionsToAllFilesOnDirectory(certutilFile.getParentFile());
 			}
 
 			if (!certutilFile.canExecute()) {
@@ -477,8 +456,8 @@ final class ConfiguratorFirefox {
 			certUtilExec = escapePath(certutilFile.getAbsolutePath());
 
 			if ( Platform.OS.MACOSX.equals(Platform.getOS()) ) {
-				writeScriptFile(ConfiguratorMacOSX.mac_script_path, new StringBuilder(ConfiguratorMacOSX.EXPORT_PATH + certutilFile.getAbsolutePath().substring(0,certutilFile.getAbsolutePath().lastIndexOf(File.separator) )), true);
-				writeScriptFile(ConfiguratorMacOSX.mac_script_path, new StringBuilder(ConfiguratorMacOSX.EXPORT_LIBRARY_LD + certutilFile.getAbsolutePath().substring(0,certutilFile.getAbsolutePath().lastIndexOf(File.separator) )), true);
+				ConfiguratorMacOSX.writeScriptFile(ConfiguratorMacOSX.mac_script_path, new StringBuilder(ConfiguratorMacOSX.EXPORT_PATH + certutilFile.getAbsolutePath().substring(0,certutilFile.getAbsolutePath().lastIndexOf(File.separator) )), true);
+				ConfiguratorMacOSX.writeScriptFile(ConfiguratorMacOSX.mac_script_path, new StringBuilder(ConfiguratorMacOSX.EXPORT_LIBRARY_LD + certutilFile.getAbsolutePath().substring(0,certutilFile.getAbsolutePath().lastIndexOf(File.separator) )), true);
 			}
 		}
 		for (final File profileDir : profilesDir) {
@@ -525,7 +504,7 @@ final class ConfiguratorFirefox {
 		}
 
 		if (Platform.OS.MACOSX.equals(Platform.getOS())) {
-			writeScriptFile(ConfiguratorMacOSX.mac_script_path, sb, true);
+			ConfiguratorMacOSX.writeScriptFile(ConfiguratorMacOSX.mac_script_path, sb, true);
 			return false;
 		}
 		else if (Platform.OS.LINUX.equals(Platform.getOS())) {
@@ -628,43 +607,6 @@ final class ConfiguratorFirefox {
 		return false;
 	}
 
-	/** Ejecuta un script en OS X.
-	 * @param path Ruta donde se encuentra el <i>script</i>.
-	 * @param administratorMode <code>true</code> el <i>script</i> se ejecuta como permisos de adminsitrador, <code>false</code> en caso contrario.
-	 * @param delete <code>true</code> se borra el fichero despu&eacute;s de haberse ejecutado.
-	 * @return El objeto que da como resultado el <i>script</i>, o <code>null</code> en caso contrario.
-	 * @throws IOException Excepci&oacute;n lanzada en caso de ocurrir alg&uacute;n error en la ejecuci&oacute;n del <i>script</i>. */
-	public static Object executeScriptMacOsx(final String path, final boolean administratorMode, final boolean delete) throws IOException {
-
-		final ScriptEngine se = MozillaKeyStoreUtilitiesOsX.getAppleScriptEngine();
-		if (se != null) {
-			LOGGER.info("Path del script: " + path); //$NON-NLS-1$
-			try {
-				Object o;
-				if (administratorMode){
-					o = se.eval("do shell script \"" + path + "\" with administrator privileges"); //$NON-NLS-1$ //$NON-NLS-2$
-				}
-				else {
-					o = se.eval("do shell script \"" + path + "\" "); //$NON-NLS-1$ //$NON-NLS-2$
-				}
-				if (delete){
-					final File scriptInstall = new File(path);
-					if (scriptInstall.exists()){
-						scriptInstall.delete();
-					}
-				}
-				return o;
-			}
-			catch (final ScriptException e) {
-				throw new IOException("Error en la ejecucion del script via AppleScript: " + e, e); //$NON-NLS-1$
-			}
-		}
-		LOGGER.severe(
-			"No se ha podido instanciar el motor AppleScript" //$NON-NLS-1$
-		);
-		return null;
-	}
-
 	private static void importCARootOnFirefoxKeyStore (final File appConfigDir,
 			                                           final Set<File> profilesDir) {
 		boolean installed = false;
@@ -672,8 +614,7 @@ final class ConfiguratorFirefox {
 		do {
 			try {
 				// Usamos CertUtil para instalar el certificado en Firefox.
-				String certutilExe = null;
-				certutilExe = appConfigDir.getAbsolutePath() + File.separator + DIR_CERTUTIL + File.separator + CERTUTIL_EXE;
+				final String certutilExe = appConfigDir.getAbsolutePath() + File.separator + DIR_CERTUTIL + File.separator + CERTUTIL_EXE;
 
 				executeCertUtilToImport(
 					certutilExe,
@@ -695,7 +636,7 @@ final class ConfiguratorFirefox {
 						);
 				if (result == JOptionPane.CANCEL_OPTION) {
 					cancelled = true;
-					LOGGER.severe(
+					LOGGER.warning(
 							"El usuario cancelo la instalacion del certificado SSL para el socket en Firefox: " + e //$NON-NLS-1$
 							);
 				}
@@ -820,10 +761,12 @@ final class ConfiguratorFirefox {
 	}
 
 	static void copyConfigurationFiles(final File appConfigDir) throws IOException {
-		final File certutil = new File(ConfiguratorUtil.getApplicationDirectory() + File.separator + DIR_CERTUTIL);
+		final File certutil = new File(appConfigDir, DIR_CERTUTIL);
 		if (!certutil.exists()) {
 			uncompressResource(RESOURCE_BASE + FILE_CERTUTIL, appConfigDir);
-			addExexPermissionsToAllFilesOnDirectory(certutil);
+			if (Platform.OS.MACOSX.equals(Platform.getOS())) {
+				ConfiguratorMacOSX.addExexPermissionsToAllFilesOnDirectory(certutil);
+			}
 		}
 	}
 
@@ -955,14 +898,14 @@ final class ConfiguratorFirefox {
 				return usersDir;
 			}
 			catch (final Exception e) {
-				LOGGER.info("Error al generar el listado de directorios de usuarios del sistema." + e); //$NON-NLS-1$
+				LOGGER.severe("Error al generar el listado de directorios de usuarios del sistema." + e); //$NON-NLS-1$
 				return null;
 			}
 		}
 		// MAC
 		else if (Platform.OS.MACOSX.equals(Platform.getOS())) {
 			try {
-				final Object o = ConfiguratorFirefox.executeScriptMacOsx(command[0],false,false);
+				final Object o = ConfiguratorMacOSX.executeScript(command[0],false,false);
 				final List<String> usersDir = new ArrayList<>();
 				String line;
 				final String initLine = "dir: "; //$NON-NLS-1$
@@ -989,7 +932,7 @@ final class ConfiguratorFirefox {
 
 			}
 			catch (final IOException e) {
-				LOGGER.info("Error al generar el listado perfiles de Firefox del sistema: " + e); //$NON-NLS-1$
+				LOGGER.severe("Error al generar el listado perfiles de Firefox del sistema: " + e); //$NON-NLS-1$
 				return null;
 			}
 		}
@@ -1055,23 +998,9 @@ final class ConfiguratorFirefox {
 				}
 			}
 			catch (final Exception e) {
-				LOGGER.severe("Error al buscar los directorios de perfiles de Firefox: " + e); //$NON-NLS-1$
+				LOGGER.warning("Error al buscar los directorios de perfiles de Firefox: " + e); //$NON-NLS-1$
 			}
 		}
 		return profile;
-	}
-
-	/** Escribe un <i>script</i> en un fichero dado.
-	 * @param path Ruta donde se escribir&aacute; el <i>script</i>.
-	 * @param data Datos a escribir.
-	 * @param append <code>true</code> permite contatenar el contenido del fichero con lo que se va a escribir. <code>false</code> el fichero se sobrescribe.
-	 * @throws IOException Se produce cuando hay un error en la creaci&oacute;n del fichero. */
-	public static void writeScriptFile(final String path, final StringBuilder data, final boolean append ) throws IOException{
-		LOGGER.info("Se escribira en fichero el siguiente comando:\n" + data.toString()); //$NON-NLS-1$
-		final File macScript = new File(path);
-		data.append("\n"); //$NON-NLS-1$
-		try (final FileOutputStream fout = new FileOutputStream(macScript, append);) {
-			fout.write(data.toString().getBytes());
-		}
 	}
 }

@@ -14,6 +14,7 @@ import java.awt.Component;
 import java.io.File;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.LogManager;
@@ -159,7 +160,7 @@ public class AutoFirmaConfigurator implements ConsoleListener {
 			configurator.configureAutoFirma();
 		}
 		catch (final Exception e) {
-			LOGGER.warning("Error en la configuracion de AutoFirma: " + e); //$NON-NLS-1$
+			LOGGER.log(Level.WARNING, "Error en la configuracion de AutoFirma: " + e, e); //$NON-NLS-1$
 			ConsoleManager.showErrorMessage(
 				configurator.getParentComponent(),
 				Messages.getString("AutoFirmaConfigurator.0") //$NON-NLS-1$

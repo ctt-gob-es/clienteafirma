@@ -109,6 +109,16 @@ final class CertUtil {
 		}
 	}
 
+	/**
+	 * Genera una tupla con un certificado de CA y un certificado SSL emitido por el para la comunicaci&oacute;n con el
+	 * equipo local.
+	 * @param sslCertificateAlias Alias con el que identificar el certificado SSL
+	 * @param storePassword
+	 * @return
+	 * @throws NoSuchAlgorithmException
+	 * @throws CertificateException
+	 * @throws IOException
+	 */
 	static CertPack getCertPackForLocalhostSsl(final String sslCertificateAlias, final String storePassword) throws NoSuchAlgorithmException, CertificateException, IOException {
 
 		Security.addProvider(new BouncyCastleProvider());
@@ -128,6 +138,14 @@ final class CertUtil {
 
 	}
 
+	/**
+	 * Genera un certificado de CA apto para la emisi&oacute;n de un certificado SSL.
+	 * @param subjectPrincipal Principal del subject del certificado.
+	 * @return Entrada con el certificado y su conjunto de claves.
+	 * @throws NoSuchAlgorithmException Cuando no se reconoce el algoritmo de generaci&oacute;n de claves.
+	 * @throws CertificateException Cuando ocurre un error en la codificacion del certificado.
+	 * @throws IOException Cuando ocurre un error al generar el certificado.
+	 */
 	private static PrivateKeyEntry generateCaCertificate(final String subjectPrincipal) throws NoSuchAlgorithmException,
                                                                                                CertificateException,
                                                                                                IOException {
@@ -167,8 +185,9 @@ final class CertUtil {
 	            new BasicConstraints(true));
 
 	    final KeyUsage usage = new KeyUsage(KeyUsage.keyCertSign
-	            | KeyUsage.digitalSignature | KeyUsage.keyEncipherment
-	            | KeyUsage.dataEncipherment | KeyUsage.cRLSign);
+	    		| KeyUsage.digitalSignature | KeyUsage.keyEncipherment
+	    		| KeyUsage.dataEncipherment | KeyUsage.cRLSign);
+
 	    generator.addExtension(Extension.keyUsage, false, usage);
 
 	    final ASN1EncodableVector purposes = new ASN1EncodableVector();
@@ -176,7 +195,7 @@ final class CertUtil {
 	    purposes.add(KeyPurposeId.id_kp_clientAuth);
 	    purposes.add(KeyPurposeId.anyExtendedKeyUsage);
 	    generator.addExtension(Extension.extendedKeyUsage, false,
-	            new DERSequence(purposes));
+	    		new DERSequence(purposes));
 
 	    //Firma del CA con su propia clave privada (autofirmado)
 	    X509Certificate cert = null;
