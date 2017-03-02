@@ -63,6 +63,7 @@ public final class MozillaKeyStoreUtilities {
 	/** Nombres del controlador nativo de DNIe en sistemas no-Linux (Windows, OS X, etc.). */
 	private static final String[] DNI_P11_NAMES = new String[] {
 		"libopensc-dnie.dylib", //$NON-NLS-1$
+		"libpkcs11-dnie.so", //$NON-NLS-1$
 		"usrpkcs11.dll", //$NON-NLS-1$
 		"dnie_p11_priv.dll", //$NON-NLS-1$
 		"dnie_p11_pub.dll", //$NON-NLS-1$
