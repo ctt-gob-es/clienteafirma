@@ -84,7 +84,8 @@ public class MozillaUnifiedKeyStoreManager extends AggregatedKeyStoreManager {
 			catch (final AOCancelledOperationException e) {
 				LOGGER.info("Se cancelo el uso del driver Java"); //$NON-NLS-1$
 				// En caso de haber detectado una tarjeta preferida pero haberse cancelado su uso,
-				// permitiremos utilizar el resto de modulos a excepcion de las preferidas
+				// permitiremos utilizar el resto de modulos a excepcion de los PKCS#11 que tambien
+				// controlen las tarjetas preferidas, ya que se supone que no se desean utilizar
 				this.preferredKsAdded = false;
 				excludePreferredKeyStores = true;
 			}
@@ -157,7 +158,19 @@ public class MozillaUnifiedKeyStoreManager extends AggregatedKeyStoreManager {
 	}
 
 
-
+	/**
+	 * Inicializa un almacen externo PKCS#11, mostrando un di&aacute;logo de inserci&oacute;n de PIN al usuario
+	 * si es necesario.
+	 * @param tmpKsm Gestor del almac&eacute;n.
+	 * @param descr Nombre descriptivo del almac&eacute;n.
+	 * @param parentComponent Componente padre sobre el que mostrar componentes gr&aacute;ficos.
+	 * @param forceReset Indica si se debe forzar al reinicio del almac&eacute;n si ya estaba iniciado.
+	 * @param libName Nombre del m&oacute;dulo PKCS#11 del almac&eacute;n.
+     * @throws AOKeyStoreManagerException Cuando ocurre cualquier problema durante la inicializaci&oacute;n
+     * @throws IOException Se ha insertado una contrase&ntilde;a incorrecta para la apertura del
+     *         almac&eacute;n de certificados.
+     * @throws AOCancelledOperationException Cuando se cancela el di&aacute;logo de inserci&oacute;n de PIN.
+	 */
 	private static void internalInitStore(final AOKeyStoreManager tmpKsm,
 			                              final String descr,
 			                              final Object parentComponent,
