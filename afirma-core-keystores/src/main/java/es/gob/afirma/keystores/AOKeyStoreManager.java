@@ -150,7 +150,8 @@ public class AOKeyStoreManager implements KeyStoreManager {
      *         almac&eacute;n de certificados.
      * @throws es.gob.afirma.core.MissingLibraryException Cuando faltan bibliotecas necesarias para la inicializaci&oacute;n
      * @throws es.gob.afirma.core.InvalidOSException Cuando se pide un almac&eacute;n disponible solo en un sistema operativo
-     *                            distinto al actual */
+     *                            distinto al actual
+     * @throws es.gob.afirma.core.AOCancelledOperationException Cuando se cancela algun di&aacute;logo de PIN. */
     public void init(final AOKeyStore type,
     		         final InputStream store,
     		         final PasswordCallback pssCallBack,

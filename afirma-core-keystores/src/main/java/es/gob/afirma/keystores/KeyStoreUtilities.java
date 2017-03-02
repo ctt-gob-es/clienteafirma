@@ -361,84 +361,26 @@ public final class KeyStoreUtilities {
     		                                                      final PasswordCallback pssCallBack,
                                                                   final Provider provider,
                                                                   final Object parentComponent) throws KeyStoreException {
-    	final KeyStore.CallbackHandlerProtection chp = new KeyStore.CallbackHandlerProtection(
-			new CallbackHandler() {
-				@Override
-				public void handle(final Callback[] cbs) throws UnsupportedCallbackException {
-					for (final Callback callback : cbs) {
-						if (callback instanceof PasswordCallback) {
-							((PasswordCallback) callback).setPassword(pssCallBack.getPassword());
-						}
-						else if (callback instanceof TextOutputCallback) {
-							final TextOutputCallback toc = (TextOutputCallback)callback;
-							switch (toc.getMessageType()) {
-								case TextOutputCallback.INFORMATION:
-									LOGGER.info("Informacion del dispositivo criptografico: " + toc.getMessage()); //$NON-NLS-1$
-									AOUIFactory.showMessageDialog(
-										parentComponent,
-										toc.getMessage(),
-										KeyStoreMessages.getString("KeyStoreUtilities.0"), //$NON-NLS-1$
-										JOptionPane.INFORMATION_MESSAGE
-									);
-									break;
-								case TextOutputCallback.ERROR:
-									LOGGER.severe("Informacion del dispositivo criptografico: " + toc.getMessage()); //$NON-NLS-1$
-									AOUIFactory.showMessageDialog(
-										parentComponent,
-										toc.getMessage(),
-										KeyStoreMessages.getString("KeyStoreUtilities.1"), //$NON-NLS-1$
-										JOptionPane.ERROR_MESSAGE
-									);
-									break;
-								case TextOutputCallback.WARNING:
-									LOGGER.warning("Informacion del dispositivo criptografico: " + toc.getMessage()); //$NON-NLS-1$
-									AOUIFactory.showMessageDialog(
-										parentComponent,
-										toc.getMessage(),
-										KeyStoreMessages.getString("KeyStoreUtilities.2"), //$NON-NLS-1$
-										JOptionPane.WARNING_MESSAGE
-									);
-									break;
-								default:
-									LOGGER.warning(
-										"Recibida informacion del dispositivo criptografico en un formato desconocido: " + toc.getMessageType() //$NON-NLS-1$
-									);
-							}
-						}
-						else if (callback instanceof NameCallback) {
-							final Object name = AOUIFactory.showInputDialog(
-								parentComponent,
-								KeyStoreMessages.getString("KeyStoreUtilities.3"), //$NON-NLS-1$
-								KeyStoreMessages.getString("KeyStoreUtilities.4"), //$NON-NLS-1$
-								JOptionPane.WARNING_MESSAGE,
-								null,
-								null,
-								null
-							);
-							if (name != null) {
-								((NameCallback)callback).setName(name.toString());
-							}
-							throw new UnsupportedCallbackException(
-								callback,
-								"No se soporta la solicitud de nombre de usuario para dispositivos criptograficos" //$NON-NLS-1$
-							);
-						}
-						else {
-							throw new UnsupportedCallbackException(
-								callback,
-								"Recibido tipo de callback desconocido: " + callback.getClass().getName() //$NON-NLS-1$
-							);
-						}
-					}
-				}
-			}
-		);
+
+    	final PasswordCallbackHandler handler = new PasswordCallbackHandler(parentComponent, pssCallBack);
+    	final KeyStore.CallbackHandlerProtection chp = new KeyStore.CallbackHandlerProtection(handler);
+
     	final KeyStore.Builder builder = KeyStore.Builder.newInstance(
 			ks.getProviderName(),
 			provider,
 			chp
 		);
-    	return builder.getKeyStore();
+
+    	try {
+    		return builder.getKeyStore();
+    	}
+    	catch(final KeyStoreException e) {
+    		if (handler.isCancelled()) {
+    			LOGGER.warning("Se ha detectado la cancelacion del dialogo de PIN"); //$NON-NLS-1$
+    			throw new AOCancelledOperationException("Se cancelo el dialogo de insercion de PIN"); //$NON-NLS-1$
+    		}
+    		throw e;
+    	}
     }
 
     /** Busca un fichero (o una serie de ficheros) en el <i>LIBRARY PATH</i> del sistema. Deja
@@ -473,4 +415,106 @@ public final class KeyStoreUtilities {
         return null;
     }
 
+    /**
+     * Manejador para la gestion de la contrase&ntilde;a (y otros di&aacute;logos)
+     * de un almacen de claves.
+     */
+    private static class PasswordCallbackHandler implements CallbackHandler {
+
+    	private final Object parentComponent;
+    	private final PasswordCallback pssCallBack;
+    	private boolean cancelled = false;
+
+    	public PasswordCallbackHandler(final Object parentComponent, final PasswordCallback pssCallBack) {
+    		this.parentComponent = parentComponent;
+    		this.pssCallBack = pssCallBack;
+		}
+
+    	@Override
+    	public void handle(final Callback[] cbs) throws UnsupportedCallbackException {
+    		for (final Callback callback : cbs) {
+    			if (callback instanceof PasswordCallback) {
+    				try {
+    					((PasswordCallback) callback).setPassword(this.pssCallBack.getPassword());
+    				}
+    				catch (final AOCancelledOperationException e) {
+    					// Al no establecer una contrasena, la carga del almacen lanzara
+    					// un error generico. Cuando lo capturemos, comprobaremos si esta
+    					// marcado que se cancelo el dialogo para distinguir si este es
+    					// el motivo de ese error.
+    					this.cancelled = true;
+    				}
+    			}
+    			else if (callback instanceof TextOutputCallback) {
+    				final TextOutputCallback toc = (TextOutputCallback)callback;
+    				switch (toc.getMessageType()) {
+    				case TextOutputCallback.INFORMATION:
+    					LOGGER.info("Informacion del dispositivo criptografico: " + toc.getMessage()); //$NON-NLS-1$
+    					AOUIFactory.showMessageDialog(
+    							this.parentComponent,
+    							toc.getMessage(),
+    							KeyStoreMessages.getString("KeyStoreUtilities.0"), //$NON-NLS-1$
+    							JOptionPane.INFORMATION_MESSAGE
+    							);
+    					break;
+    				case TextOutputCallback.ERROR:
+    					LOGGER.severe("Informacion del dispositivo criptografico: " + toc.getMessage()); //$NON-NLS-1$
+    					AOUIFactory.showMessageDialog(
+    							this.parentComponent,
+    							toc.getMessage(),
+    							KeyStoreMessages.getString("KeyStoreUtilities.1"), //$NON-NLS-1$
+    							JOptionPane.ERROR_MESSAGE
+    							);
+    					break;
+    				case TextOutputCallback.WARNING:
+    					LOGGER.warning("Informacion del dispositivo criptografico: " + toc.getMessage()); //$NON-NLS-1$
+    					AOUIFactory.showMessageDialog(
+    							this.parentComponent,
+    							toc.getMessage(),
+    							KeyStoreMessages.getString("KeyStoreUtilities.2"), //$NON-NLS-1$
+    							JOptionPane.WARNING_MESSAGE
+    							);
+    					break;
+    				default:
+    					LOGGER.warning(
+    							"Recibida informacion del dispositivo criptografico en un formato desconocido: " + toc.getMessageType() //$NON-NLS-1$
+    							);
+    				}
+    			}
+    			else if (callback instanceof NameCallback) {
+    				final Object name = AOUIFactory.showInputDialog(
+    						this.parentComponent,
+    						KeyStoreMessages.getString("KeyStoreUtilities.3"), //$NON-NLS-1$
+    						KeyStoreMessages.getString("KeyStoreUtilities.4"), //$NON-NLS-1$
+    						JOptionPane.WARNING_MESSAGE,
+    						null,
+    						null,
+    						null
+    						);
+    				if (name != null) {
+    					((NameCallback)callback).setName(name.toString());
+    				}
+    				throw new UnsupportedCallbackException(
+    						callback,
+    						"No se soporta la solicitud de nombre de usuario para dispositivos criptograficos" //$NON-NLS-1$
+    						);
+    			}
+    			else {
+    				throw new UnsupportedCallbackException(
+    						callback,
+    						"Recibido tipo de callback desconocido: " + callback.getClass().getName() //$NON-NLS-1$
+    						);
+    			}
+    		}
+    	}
+
+    	/**
+    	 * Indica si se cancelo el di&aacute;logo de inserci&oacute;n de PIN.
+    	 * @return {@code true} si se cancel&oacute; el di&aacute;logo de
+    	 * inserci&oacute;n de PIN, {@code false} en caso contrario.
+    	 */
+		public boolean isCancelled() {
+			return this.cancelled;
+		}
+    }
 }

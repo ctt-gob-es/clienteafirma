@@ -25,6 +25,7 @@ import java.util.Collections;
 
 import javax.security.auth.callback.PasswordCallback;
 
+import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.InvalidOSException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Platform;
@@ -218,6 +219,9 @@ public final class CAPIKeyStoreManager extends AOKeyStoreManager {
 					capiProvider,
 					null
 				);
+			}
+	        catch (final AOCancelledOperationException e) {
+	        	throw e;
 			}
 	        catch (final Exception e) {
 	        	throw new AOKeyStoreManagerException("No se ha podido obtener el almacen Windows.MY: " + e, e); //$NON-NLS-1$
