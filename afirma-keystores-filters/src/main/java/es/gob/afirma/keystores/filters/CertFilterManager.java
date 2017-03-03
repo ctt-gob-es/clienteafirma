@@ -51,6 +51,7 @@ public final class CertFilterManager {
 	private static final String FILTER_TYPE_THUMBPRINT = "thumbprint:"; //$NON-NLS-1$
 	private static final String FILTER_TYPE_POLICY_ID = "policyid:"; //$NON-NLS-1$
 	private static final String FILTER_TYPE_PSEUDONYM = "pseudonym:"; //$NON-NLS-1$
+	private static final String FILTER_TYPE_ENCODED_CERT = "encodedcert:"; //$NON-NLS-1$
 
 	private static final String FILTER_PREFIX_KEYUSAGE = "keyusage.";  //$NON-NLS-1$
 	private static final String FILTER_TYPE_KEYUSAGE_DIGITAL_SIGNATURE = FILTER_PREFIX_KEYUSAGE + "digitalsignature:"; //$NON-NLS-1$
@@ -199,6 +200,9 @@ public final class CertFilterManager {
 			}
 			else if (filter.toLowerCase().startsWith(FILTER_TYPE_PSEUDONYM)) {
 				filtersList.add(new PseudonymFilter());
+			}
+			else if (filter.toLowerCase().startsWith(FILTER_TYPE_ENCODED_CERT)) {
+				filtersList.add(new EncodedCertificateFilter(filter.substring(FILTER_TYPE_ENCODED_CERT.length())));
 			}
 			else {
 				LOGGER.warning("Se omitira el filtro '" + filter + "' por no estar reconocido"); //$NON-NLS-1$ //$NON-NLS-2$
