@@ -146,7 +146,8 @@ public class MozillaUnifiedKeyStoreManager extends AggregatedKeyStoreManager {
 				}
 				addKeyStoreManager(tmpKsm);
 
-				LOGGER.info("El almacen externo '" + descr + "' ha podido inicializarse, se anadiran sus entradas"); //$NON-NLS-1$ //$NON-NLS-2$
+				LOGGER.info("El almacen externo '" + descr + "' ha podido inicializarse, se anadiran sus entradas y se detiene la carga del resto de almacenes"); //$NON-NLS-1$ //$NON-NLS-2$
+				break;
 			}
 		}
 
