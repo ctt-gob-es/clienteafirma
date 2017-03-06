@@ -2,6 +2,7 @@ package es.gob.afirma.signers.batch;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
@@ -264,7 +265,14 @@ public final class SingleSign {
 
 	}
 
-	SingleSign(final Node singleSignNode) throws DOMException, IOException {
+	/**
+	 * Construye la operaci&oacute;n simple de firma.
+	 * @param singleSignNode
+	 * @param xmlEncoding Codificaci&oacute;n declarada en el XML. Si no se conoce, ser&aacute; {@code null}.
+	 * @throws DOMException
+	 * @throws IOException
+	 */
+	SingleSign(final Node singleSignNode, final Charset charset) throws DOMException, IOException {
 		if (!(singleSignNode instanceof Element)) {
 			throw new IllegalArgumentException(
 				"El nodo de definicion de la firma debe ser un Elemento DOM" //$NON-NLS-1$
@@ -277,10 +285,7 @@ public final class SingleSign {
 		this.extraParams = new Properties();
 		final NodeList tmpNl = el.getElementsByTagName(XML_ELEMENT_EXTRAPARAMS);
 		if (tmpNl != null && tmpNl.getLength() > 0) {
-			final String extraParamsText = new String(
-						Base64.decode(tmpNl.item(0).getTextContent())
-					).replace("\\n", "\n"); //$NON-NLS-1$ //$NON-NLS-2$
-			this.extraParams.load(new ByteArrayInputStream(extraParamsText.getBytes()));
+			loadProperties(this.extraParams, Base64.decode(tmpNl.item(0).getTextContent()), charset);
 		}
 
 		this.format = SignFormat.getFormat(
@@ -318,6 +323,21 @@ public final class SingleSign {
 		);
 
 		this.signSaver = ssaver;
+	}
+
+	/**
+	 * Carga propiedades de una cadena cuidando de si hay saltos de
+	 * l&iacute;nea protegidos como parte de una propiedad.
+	 * @param properties Objeto en el que cargar las propiedades.
+	 * @param params Propiedades que se deben cargar.
+	 * @param charset Juego de caracteres para hacer la interpretaci&oacute;n de bytes.
+	 * @throws IOException Cuando ocurre un error durante la carga de las propiedades.
+	 */
+	private static void loadProperties(Properties properties, byte[] params, Charset charset) throws IOException {
+		properties.load(new ByteArrayInputStream(
+				new String(params, charset)
+					.replace("\\\\n", "*$bn$*").replace("\\n", "\n").replace("*$bn$*", "\\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
+					.getBytes(charset)));
 	}
 
 	/** Crea una definici&oacute;n de tarea de firma electr&oacute;nica &uacute;nica.

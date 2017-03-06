@@ -3,6 +3,7 @@ package es.gob.afirma.signers.batch;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
@@ -170,7 +171,7 @@ public abstract class SignBatch {
 
 		// ****************************************************
 		// ****** Analisis firmas individuales del XML ********
-		this.signs = parseSignBatchNode(signBatchNode);
+		this.signs = parseSignBatchNode(signBatchNode, doc.getXmlEncoding());
 		// ****** Fin analisis firmas individuales del XML ****
 		// ****************************************************
 
@@ -196,12 +197,21 @@ public abstract class SignBatch {
 		this.id = UUID.randomUUID().toString();
 	}
 
-	private static List<SingleSign> parseSignBatchNode(final Node n) throws DOMException, IOException {
+	private static List<SingleSign> parseSignBatchNode(final Node n, final String xmlEncoding) throws DOMException, IOException {
+
+		Charset charset;
+		try {
+			charset = xmlEncoding != null ? Charset.forName(xmlEncoding) : Charset.defaultCharset();
+		}
+		catch (final Exception e) {
+			charset = Charset.defaultCharset();
+		}
+
 		final NodeList childNodes = n.getChildNodes();
 		final List<SingleSign> ret = new ArrayList<SingleSign>();
 		int idx = nextNodeElementIndex(childNodes, 0);
 		while (idx != -1) {
-			ret.add(new SingleSign(childNodes.item(idx)));
+			ret.add(new SingleSign(childNodes.item(idx), charset));
 			idx = nextNodeElementIndex(childNodes, idx + 1);
 		}
 		return ret;
