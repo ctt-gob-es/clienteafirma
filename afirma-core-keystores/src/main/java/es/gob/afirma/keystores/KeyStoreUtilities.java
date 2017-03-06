@@ -10,6 +10,7 @@
 
 package es.gob.afirma.keystores;
 
+import java.awt.Component;
 import java.io.File;
 import java.io.IOException;
 import java.security.KeyStore;
@@ -28,6 +29,7 @@ import javax.security.auth.callback.NameCallback;
 import javax.security.auth.callback.PasswordCallback;
 import javax.security.auth.callback.TextOutputCallback;
 import javax.security.auth.callback.UnsupportedCallbackException;
+import javax.security.auth.login.LoginException;
 import javax.swing.JOptionPane;
 
 import es.gob.afirma.core.AOCancelledOperationException;
@@ -378,6 +380,17 @@ public final class KeyStoreUtilities {
     		if (handler.isCancelled()) {
     			LOGGER.warning("Se ha detectado la cancelacion del dialogo de PIN"); //$NON-NLS-1$
     			throw new AOCancelledOperationException("Se cancelo el dialogo de insercion de PIN"); //$NON-NLS-1$
+    		}
+    		// Si identificamos un PIN incorrecto, lo notificamos al usuario y volvemos a
+    		// intentar cargar el almacen
+    		if (e.getCause() != null && e.getCause().getCause() != null &&
+    				e.getCause().getCause() instanceof LoginException) {
+    			JOptionPane.showMessageDialog(
+    					(Component) parentComponent,
+    					KeyStoreMessages.getString("KeyStoreUtilities.5"), //$NON-NLS-1$
+    					KeyStoreMessages.getString("KeyStoreUtilities.6"), //$NON-NLS-1$
+    					JOptionPane.ERROR_MESSAGE);
+    			return getKeyStoreWithPasswordCallbackHandler(ks, pssCallBack, provider, parentComponent);
     		}
     		throw e;
     	}
