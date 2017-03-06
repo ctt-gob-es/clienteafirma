@@ -53,7 +53,20 @@ final class ConfiguratorFirefox {
 	private static final String FILE_CERTUTIL;
 	private static final String RESOURCE_BASE;
 
-	private static String USERS_WINDOWS_PATH = "C:\\Users\\"; //$NON-NLS-1$
+	private static String USERS_WINDOWS_PATH;
+	static {
+		try {
+			USERS_WINDOWS_PATH = new File(System.getProperty("user.home")).getParentFile().getAbsolutePath(); //$NON-NLS-1$;
+		}
+		catch (final Exception e) {
+			LOGGER.warning("No se ha podido identificar el directorio de usuarios: " + e); //$NON-NLS-1$
+			USERS_WINDOWS_PATH = "C:/Users"; //$NON-NLS-1$
+		}
+	}
+
+	/** Nombre del usuario por defecto en Windows. Este usuario es el que se usa como base para
+	 * crear nuevos usuarios y no se deber&iacute;a tocar. */
+	private static String DEFAULT_WINDOWS_USER_NAME = "Default"; //$NON-NLS-1$
 
 	static {
 		switch(Platform.getOS()) {
@@ -674,16 +687,16 @@ final class ConfiguratorFirefox {
 			certutilExe = CERTUTIL_EXE;
 		}
 
-		//Se obtienen todos los usuarios para los que se va a desinstalar el certificado en Firefox
-		final File file = new File(USERS_WINDOWS_PATH);
-		final String[] directories = file.list(new FilenameFilter() {
+		// Se obtienen todos los usuarios para los que se va a desinstalar el certificado en Firefox
+		final File usersBaseDir = new File(USERS_WINDOWS_PATH);
+		final String[] userDirNames = usersBaseDir.list(new FilenameFilter() {
 		  @Override
 		  public boolean accept(final File current, final String name) {
 		    return new File(current, name).isDirectory();
 		  }
 		});
 
-		//Para Windows XP la ruta de los perfiles de Firefox y de los usuarios es diferente
+		// Para Windows XP la ruta de los perfiles de Firefox y de los usuarios es diferente
 		if(System.getProperty("os.name") != null && System.getProperty("os.name").contains("XP")) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			WINDOWS_MOZILLA_PATH = "\\Application Data\\Mozilla\\Firefox\\profiles.ini"; //$NON-NLS-1$
 			USERS_WINDOWS_PATH = "C:\\Documents and Settings\\"; //$NON-NLS-1$
@@ -692,12 +705,18 @@ final class ConfiguratorFirefox {
 
 		boolean error = false;
 
-		for(final String profile : directories) {
-			LOGGER.info("Se comprueba la existencia del perfil de Firefox: " + USERS_WINDOWS_PATH + profile + WINDOWS_MOZILLA_PATH); //$NON-NLS-1$
-			if(new File(USERS_WINDOWS_PATH + profile + WINDOWS_MOZILLA_PATH).exists()) {
+		for(final String userDirName : userDirNames) {
+
+			// Nos saltamos siempre el usuario por defecto del sistema para evitar corromperlo
+			if (DEFAULT_WINDOWS_USER_NAME.equalsIgnoreCase(userDirName)) {
+				continue;
+			}
+
+			LOGGER.info("Se comprueba la existencia del perfil de Firefox: " + USERS_WINDOWS_PATH + userDirName + WINDOWS_MOZILLA_PATH); //$NON-NLS-1$
+			if(new File(USERS_WINDOWS_PATH + userDirName + WINDOWS_MOZILLA_PATH).exists()) {
 				final File profilesDir = new File(
 						MozillaKeyStoreUtilities.getMozillaUserProfileDirectoryWindows(
-								USERS_WINDOWS_PATH + profile + WINDOWS_MOZILLA_PATH
+								USERS_WINDOWS_PATH + userDirName + WINDOWS_MOZILLA_PATH
 								)
 						).getParentFile();
 				for (final File profileDir : profilesDir.listFiles()) {
@@ -840,8 +859,8 @@ final class ConfiguratorFirefox {
 		}
 
 		//Se obtienen todos los usuarios para los que se va a instalar el certificado en Firefox
-		final File file = new File(USERS_WINDOWS_PATH);
-		final String[] directories = file.list(new FilenameFilter() {
+		final File usersBaseDir = new File(USERS_WINDOWS_PATH);
+		final String[] userDirNames = usersBaseDir.list(new FilenameFilter() {
 		  @Override
 		  public boolean accept(final File current, final String name) {
 		    return new File(current, name).isDirectory();
@@ -849,14 +868,19 @@ final class ConfiguratorFirefox {
 		});
 
 		try {
-			for(final String profile : directories) {
-				if(new File(USERS_WINDOWS_PATH + profile + WINDOWS_MOZILLA_PATH).exists()) {
+			for (final String userDirName : userDirNames) {
+				// Nos saltamos siempre el usuario por defecto del sistema para evitar corromperlo
+				if (DEFAULT_WINDOWS_USER_NAME.equalsIgnoreCase(userDirName)) {
+					continue;
+				}
+
+				if (new File(USERS_WINDOWS_PATH + userDirName + WINDOWS_MOZILLA_PATH).exists()) {
 					fileList.add(
 							new File(
 									MozillaKeyStoreUtilities.getMozillaUserProfileDirectoryWindows(
-											USERS_WINDOWS_PATH + profile + WINDOWS_MOZILLA_PATH)
+											USERS_WINDOWS_PATH + userDirName + WINDOWS_MOZILLA_PATH)
 							).getParentFile());
-					LOGGER.info("Se usa el perfil de Firefox: " + USERS_WINDOWS_PATH + profile + WINDOWS_MOZILLA_PATH); //$NON-NLS-1$
+					LOGGER.info("Se usa el perfil de Firefox: " + USERS_WINDOWS_PATH + userDirName + WINDOWS_MOZILLA_PATH); //$NON-NLS-1$
 				}
 			}
 		}

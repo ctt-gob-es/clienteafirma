@@ -21,6 +21,10 @@ final class ConfiguratorWindows implements Configurator {
 	private static final String FILE_AUTOFIRMA_CERTIFICATE = "AutoFirma_ROOT.cer"; //$NON-NLS-1$
 	private static final String KS_PASSWORD = "654321"; //$NON-NLS-1$
 
+	/** Nombre del usuario por defecto en Windows. Este usuario es el que se usa como base para
+	 * crear nuevos usuarios y no se deber&iacute;a tocar. */
+	private static String DEFAULT_WINDOWS_USER_NAME = "Default"; //$NON-NLS-1$
+
 	private static final String CHROME_CONFIG_FILE = "AppData/Local/Google/Chrome/User Data/Local State"; //$NON-NLS-1$
 
 	@Override
@@ -104,7 +108,7 @@ final class ConfiguratorWindows implements Configurator {
 
 		final File usersDir = new File(System.getProperty("user.home")).getParentFile(); //$NON-NLS-1$
 		for (final File userDir : usersDir.listFiles()) {
-			if (userDir.isDirectory()) {
+			if (userDir.isDirectory() && !DEFAULT_WINDOWS_USER_NAME.equalsIgnoreCase(userDir.getName())) {
 				try {
 					final File chromeConfigFile = new File(userDir, CHROME_CONFIG_FILE);
 					if (chromeConfigFile.isFile() && chromeConfigFile.canWrite()) {
