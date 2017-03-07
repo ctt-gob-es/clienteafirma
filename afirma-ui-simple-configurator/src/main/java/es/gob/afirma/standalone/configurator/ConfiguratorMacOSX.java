@@ -7,6 +7,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.attribute.PosixFilePermission;
@@ -66,6 +67,7 @@ final class ConfiguratorMacOSX implements Configurator {
 	static final String EXPORT_LIBRARY_LD = "export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:";//$NON-NLS-1$
 	private static final String TRUST_SETTINGS_COMMAND = "security trust-settings-import -d "; //$NON-NLS-1$
 	private static final String TRUST_SETTINGS_FILE = "/trust_settings.plist"; //$NON-NLS-1$
+	private static final String OSX_RESOURCES = "/osx"; //$NON-NLS-1$
 	static String mac_script_path;
 	private static File sslCerFile;
 
@@ -152,6 +154,9 @@ final class ConfiguratorMacOSX implements Configurator {
 		catch (final IOException e) {
 			LOGGER.log(Level.SEVERE, "Se ha producido un error durante la busqueda y desinstalacion de versiones anteriores del certificado SSL en el llavero de macOS: " + e, e); //$NON-NLS-1$
 		}
+		
+		// Copiamos en disco certUtil para la configuracion de los certificados en el almacen de Firefox
+		ConfiguratorFirefox.copyConfigurationFiles(appDir);
 
 		LOGGER.info("Desinstalacion de versiones anteriores del certificado raiz del almacen de Firefox"); //$NON-NLS-1$
 		try {
@@ -186,7 +191,7 @@ final class ConfiguratorMacOSX implements Configurator {
 		}
 
 		// Se instalan los certificados en el almacen de Apple
-		console.print(Messages.getString("ConfiguratorMacOSX.16")); //$NON-NLS-1$
+		console.print(Messages.getString("ConfiguratorMacOSX.6")); //$NON-NLS-1$
 		try {
 			createScriptToImportCARootOnMacOSXKeyStore(appDir);
 			addExexPermissionsToFile(new File(mac_script_path));
@@ -206,7 +211,6 @@ final class ConfiguratorMacOSX implements Configurator {
 	 * @throws GeneralSecurityException Se produce si hay un problema de seguridad durante el proceso.
 	 * @throws IOException Se produce cuando hay un error en la creaci&oacute;n del fichero. */
 	static void createScriptToImportCARootOnMacOSXKeyStore(final File appDir) throws GeneralSecurityException, IOException {
-
 
 		// Creamos el script para la instalacion del certificado SSL en el almacen de confianza de Apple
 		final File certFile = new File(appDir, MACOSX_CERTIFICATE);
@@ -318,6 +322,19 @@ final class ConfiguratorMacOSX implements Configurator {
 	}
 
 	private static void editTrusFile(final String sha1Root, final String sha1Cer, final String snRoot, final String snCer) {
+		
+		final File appDir = ConfiguratorUtil.getApplicationDirectory(); 
+		
+		// Copia del archivo de plantilla para configurar
+		// la confianza de los certificados que se van a
+		// instalar.
+		try {
+			deleteTrustTemplate(appDir);
+			exportResource(OSX_RESOURCES,TRUST_SETTINGS_FILE, appDir.getAbsolutePath());
+		} catch (Exception e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 
 		final String sha1RootOrig = "%CA_SHA1%"; //$NON-NLS-1$
 		final String sha1CerOrig = "%SSL_SHA1%"; //$NON-NLS-1$
@@ -533,6 +550,69 @@ final class ConfiguratorMacOSX implements Configurator {
 
 		return false;
 	}
+	
+	/** Comprueba si ya existe una plantilla de confianzas instalada en el
+	 * directorio de la aplicaci&oacute;n.
+	 * @param appDir Directorio de la aplicaci&oacute;n.
+	 * @return {@code true} si ya existe una plantilla de confianza, {@code false} en caso contrario. */
+	private static boolean checkTrutsTemplateInstalled(final File appDir) {
+		return new File(appDir, TRUST_SETTINGS_FILE).exists();
+	}
+	
+	/**
+	 * Elimina los ficheros de certificado ra&iacutez y almac&eacute;n SSL del disco
+	 * como paso previo a volver a generarlos
+	 * @param appDir Ruta del directorio de la aplicaci&oacute;n
+	 * @throws IOException
+	 */
+	private static void deleteTrustTemplate(File appDir) throws IOException {
+
+		if (checkTrutsTemplateInstalled(appDir)) {
+			
+			File sslKey = new File(appDir, TRUST_SETTINGS_FILE);
+			
+			if (!sslKey.delete()) {
+				throw new IOException("No puedo eliminar " + TRUST_SETTINGS_FILE);
+			}
+			
+		}
+		
+	}
+	
+	/**
+     * Copia un recurso desde dentro del jar hacia una ruta externa
+     *
+     * @param pathToResource Carpeta del recurso dentro del jar
+     * @param resourceName Nombre del recurso a copiar
+     * @param destinationPath Ruta externa destino
+     * @return Ruta completa del recurso copiado
+     * @throws Exception
+     */
+    static public String exportResource(String pathToResource, String resourceName, String destinationPath) throws Exception {
+        InputStream stream = null;
+        OutputStream resStreamOut = null;
+ 
+        try {
+            stream = ConfiguratorMacOSX.class.getResourceAsStream(pathToResource + resourceName);
+            if(stream == null) {
+                throw new Exception("No ha podido obtenerse el recurso \"" + resourceName + "\" del jar.");
+            }
+
+            int readBytes;
+            byte[] buffer = new byte[4096];
+            resStreamOut = new FileOutputStream(destinationPath + resourceName);
+            while ((readBytes = stream.read(buffer)) > 0) {
+                resStreamOut.write(buffer, 0, readBytes);
+            }
+        } catch (Exception ex) {
+            throw ex;
+        } finally {
+            stream.close();
+            resStreamOut.close();
+        }
+
+        return destinationPath + resourceName;
+    }
 
 	public static void main(final String[] args) throws Exception {
 
