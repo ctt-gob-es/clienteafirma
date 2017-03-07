@@ -48,7 +48,7 @@ public final class TriphaseUtil {
 			);
 		}
 		if (extraParams == null || Boolean.parseBoolean(extraParams.getProperty(INCLUDE_ONLY_SIGNNING_CERTIFICATE, Boolean.FALSE.toString()))) {
-			return Base64.encode(certChain[0].getEncoded());
+			return Base64.encode(certChain[0].getEncoded(), true);
 		}
 		final StringBuilder sb = new StringBuilder();
 		for (final Certificate cert : certChain) {
