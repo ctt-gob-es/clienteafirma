@@ -22,6 +22,7 @@ import org.junit.Test;
 
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
+import es.gob.afirma.core.signers.AOSignConstants;
 
 /** Pruebas del MiniApplet.  */
 public final class MiniAfirmaAppletTest {
@@ -107,7 +108,7 @@ public final class MiniAfirmaAppletTest {
 
 		final StringBuilder sb = new StringBuilder(
 			mini.sign(
-				"SHA1withRSA", "PAdES", null //$NON-NLS-1$ //$NON-NLS-2$
+				"SHA1withRSA", AOSignConstants.SIGN_FORMAT_PDF, null //$NON-NLS-1$
 			)
 		);
 		String ret = mini.getRemainingData();
@@ -115,10 +116,15 @@ public final class MiniAfirmaAppletTest {
 			sb.append(ret);
 			ret = mini.getRemainingData();
 		}
-		final String b64ret = sb.toString();
+
+		// El resultado de la operacion es la concatenacion del
+		// certificado utilizado y la firma resultante separados por '|'
+		// String certB64 = sb.substring(0, sb.indexOf("|"));
+		final String signatureB64 = sb.substring(sb.indexOf("|") + 1); //$NON-NLS-1$
+
 		final File o = File.createTempFile("LARGE", ".pdf"); //$NON-NLS-1$ //$NON-NLS-2$
 		final OutputStream fos = new FileOutputStream(o);
-		fos.write(Base64.decode(b64ret));
+		fos.write(Base64.decode(signatureB64));
 		fos.flush();
 		fos.close();
 	}
