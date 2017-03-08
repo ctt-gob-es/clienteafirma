@@ -55,10 +55,10 @@ public final class MozillaKeyStoreUtilitiesOsX {
 			return; // Si funciona salimos sin hacer nada
 		}
 		catch (final Exception e) {
-			LOGGER.info("No se puede realizar una carga directa de NSS, se crearan enlaces simbolicos: " + e); //$NON-NLS-1$
+			LOGGER.warning("No se puede realizar una carga directa de NSS, se crearan enlaces simbolicos"); //$NON-NLS-1$
 		}
 		catch(final UnsatisfiedLinkError e) {
-			LOGGER.info("No se puede realizar una carga directa de NSS, se crearan enlaces simbolicos: " + e); //$NON-NLS-1$
+			LOGGER.warning("No se puede realizar una carga directa de NSS, se crearan enlaces simbolicos"); //$NON-NLS-1$
 		}
 
 		final String[] libs = new String[] {
