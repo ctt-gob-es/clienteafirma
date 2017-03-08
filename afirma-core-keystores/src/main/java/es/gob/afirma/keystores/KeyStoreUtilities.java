@@ -60,6 +60,10 @@ public final class KeyStoreUtilities {
     	"TIF_P11.dll" //$NON-NLS-1$
     };
 
+	private static final String PIN_ERROR_LOCKED = "CKR_PIN_LOCKED"; //$NON-NLS-1$
+	private static final String PIN_ERROR_WRONG_LENGTH = "CKR_PIN_LEN_RANGE"; //$NON-NLS-1$
+	private static final String PIN_ERROR_INCORRECT = "CKR_PIN_INCORRECT"; //$NON-NLS-1$
+
     /** Crea las l&iacute;neas de configuraci&oacute;n para el proveedor PKCS#11
      * de Sun.
      * @param lib Nombre (con o sin ruta) de la biblioteca PKCS#11
@@ -381,16 +385,36 @@ public final class KeyStoreUtilities {
     			LOGGER.warning("Se ha detectado la cancelacion del dialogo de PIN"); //$NON-NLS-1$
     			throw new AOCancelledOperationException("Se cancelo el dialogo de insercion de PIN"); //$NON-NLS-1$
     		}
+
     		// Si identificamos un PIN incorrecto, lo notificamos al usuario y volvemos a
     		// intentar cargar el almacen
     		if (e.getCause() != null && e.getCause().getCause() != null &&
     				e.getCause().getCause() instanceof LoginException) {
+    			final Throwable pkcs11Exception = e.getCause().getCause().getCause();
+    			boolean ksLocked = false;
+    			String msg = KeyStoreMessages.getString("KeyStoreUtilities.5"); //$NON-NLS-1$
+    			if (pkcs11Exception != null) {
+        			if (PIN_ERROR_LOCKED.equals(pkcs11Exception.getMessage())) {
+        				msg = KeyStoreMessages.getString("KeyStoreUtilities.7"); //$NON-NLS-1$
+        				ksLocked = true;
+        			}
+        			else if (PIN_ERROR_WRONG_LENGTH.equals(pkcs11Exception.getMessage())) {
+        				msg = KeyStoreMessages.getString("KeyStoreUtilities.8"); //$NON-NLS-1$
+        			}
+        			else if (PIN_ERROR_INCORRECT.equals(pkcs11Exception.getMessage())) {
+        				msg = KeyStoreMessages.getString("KeyStoreUtilities.5"); //$NON-NLS-1$
+        			}
+    			}
     			JOptionPane.showMessageDialog(
     					(Component) parentComponent,
-    					KeyStoreMessages.getString("KeyStoreUtilities.5"), //$NON-NLS-1$
+    					msg,
     					KeyStoreMessages.getString("KeyStoreUtilities.6"), //$NON-NLS-1$
     					JOptionPane.ERROR_MESSAGE);
-    			return getKeyStoreWithPasswordCallbackHandler(ks, pssCallBack, provider, parentComponent);
+
+    			// Si el almacen no se encuentra bloqueado, lo seguimos intentando
+    			if (!ksLocked) {
+					return getKeyStoreWithPasswordCallbackHandler(ks, pssCallBack, provider, parentComponent);
+    			}
     		}
     		throw e;
     	}
