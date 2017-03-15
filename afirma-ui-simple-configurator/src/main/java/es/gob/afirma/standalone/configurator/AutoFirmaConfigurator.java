@@ -97,17 +97,17 @@ public class AutoFirmaConfigurator implements ConsoleListener {
 			this.configurator.configure(this.mainScreen);
 		}
 		catch (final IOException e) {
-			LOGGER.severe("Error al copiar o leer alguno de los ficheros de configuracion. El configurador se detendra: " + e); //$NON-NLS-1$
+			LOGGER.log(Level.SEVERE, "Error al copiar o leer alguno de los ficheros de configuracion. El configurador se detendra", e); //$NON-NLS-1$
 			this.mainScreen.print(Messages.getString("AutoFirmaConfigurator.3")); //$NON-NLS-1$
 			throw e;
 		}
 		catch (final ConfigurationException e) {
-			LOGGER.severe("Error al generar las claves de cifrado SSL. El configurador se detendra: " + e); //$NON-NLS-1$
+			LOGGER.log(Level.SEVERE, "Error al generar las claves de cifrado SSL. El configurador se detendra", e); //$NON-NLS-1$
 			this.mainScreen.print(Messages.getString("AutoFirmaConfigurator.4")); //$NON-NLS-1$
 			throw e;
 		}
 		catch (final GeneralSecurityException e) {
-			LOGGER.severe("Error en la importacion de la CA de confianza o la limpieza del almacen: " + e); //$NON-NLS-1$
+			LOGGER.log(Level.SEVERE, "Error en la importacion de la CA de confianza o la limpieza del almacen", e); //$NON-NLS-1$
 			this.mainScreen.print(Messages.getString("AutoFirmaConfigurator.5")); //$NON-NLS-1$
 			throw e;
 		}

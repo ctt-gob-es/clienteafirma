@@ -24,6 +24,8 @@ final class GraphicConfiguratorConsole extends JFrame implements Console {
 	/** Serial Id. */
 	private static final long serialVersionUID = 398187262022150395L;
 
+	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+
 	private final JTextArea console;
 
 	private final ConsoleListener listener;
@@ -73,15 +75,15 @@ final class GraphicConfiguratorConsole extends JFrame implements Console {
 
     void createUI(final WindowListener wlist, final int width, final int height) {
         if (!LookAndFeelManager.HIGH_CONTRAST) {
-            this.setBackground(LookAndFeelManager.WINDOW_COLOR);
+            setBackground(LookAndFeelManager.WINDOW_COLOR);
         }
-        this.setTitle(Messages.getString("ConfiguratorConsole.0")); //$NON-NLS-1$
+        setTitle(Messages.getString("ConfiguratorConsole.0")); //$NON-NLS-1$
         this.setSize(width, height);
-        this.setLayout(new GridBagLayout());
-        this.setLocationRelativeTo(null);
-        this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+        setLayout(new GridBagLayout());
+        setLocationRelativeTo(null);
+        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         if (wlist != null) {
-            this.addWindowListener(wlist);
+            addWindowListener(wlist);
         }
 
         this.console.setMargin(new Insets(5,  5,  5,  5));
@@ -103,10 +105,10 @@ final class GraphicConfiguratorConsole extends JFrame implements Console {
             );
         }
         catch (final Exception e) {
-            Logger.getLogger("es.gob.afirma").warning("No se ha podido cargar el icono de la aplicacion: " + e);  //$NON-NLS-1$//$NON-NLS-2$
+        	LOGGER.warning("No se ha podido cargar el icono de la aplicacion: " + e);  //$NON-NLS-1$
         }
 
-        this.setVisible(true);
+        setVisible(true);
     }
 
     /** Muestra un texto por consola.
@@ -116,9 +118,10 @@ final class GraphicConfiguratorConsole extends JFrame implements Console {
     	try {
     		this.console.append(text);
     		this.console.append("\n"); //$NON-NLS-1$
+    		LOGGER.info("Mensaje de consola: " + text); //$NON-NLS-1$
     	}
     	catch (final Exception e) {
-    		Logger.getLogger("es.gob.afirma").warning("No se pudo mostrar por consola el mensaje:\n" + text);  //$NON-NLS-1$//$NON-NLS-2$
+    		LOGGER.warning("No se pudo mostrar por consola el mensaje:\n" + text);  //$NON-NLS-1$
     	}
     }
 

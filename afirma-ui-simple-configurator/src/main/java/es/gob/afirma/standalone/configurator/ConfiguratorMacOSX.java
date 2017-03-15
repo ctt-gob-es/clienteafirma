@@ -1,6 +1,7 @@
 package es.gob.afirma.standalone.configurator;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -8,16 +9,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.attribute.PosixFilePermission;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.MessageDigest;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -43,13 +41,12 @@ import es.gob.afirma.core.misc.BoundedBufferedReader;
 import es.gob.afirma.keystores.mozilla.MozillaKeyStoreUtilities;
 import es.gob.afirma.keystores.mozilla.MozillaKeyStoreUtilitiesOsX;
 import es.gob.afirma.standalone.configurator.CertUtil.CertPack;
-import es.gob.afirma.standalone.configurator.ConfiguratorFirefox.MozillaProfileNotFoundException;
 
-/** Configura la instalaci&oacute;n en Linux para la correcta ejecuci&oacute;n de
+/** Configura la instalaci&oacute;n en Mac para la correcta ejecuci&oacute;n de
  * AutoFirma. */
 final class ConfiguratorMacOSX implements Configurator {
 
-	static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	private static final String KS_FILENAME = "/autofirma.pfx"; //$NON-NLS-1$
 	private static final String SSL_CER_FILENAME = "/autofirma.cer"; //$NON-NLS-1$
@@ -60,16 +57,20 @@ final class ConfiguratorMacOSX implements Configurator {
 	private static final String KEYCHAIN_PATH = "/Library/Keychains/System.keychain"; //$NON-NLS-1$
 	private static final String OSX_SEC_COMMAND = "security add-trusted-cert -d -r trustRoot -k %KEYCHAIN% %CERT%"; //$NON-NLS-1$
 	private static final String OSX_SEC_KS_CERT_COMMAND = "security add-trusted-cert -d -r trustAsRoot -k %KEYCHAIN% %CERT%"; //$NON-NLS-1$
-	static final String OSX_GET_USERS_COMMAND = "dscacheutil -q user"; //$NON-NLS-1$
+	static final String GET_USERS_COMMAND = "dscacheutil -q user"; //$NON-NLS-1$
+	private static final String GET_USER_SCRIPTS_NAME = "scriptGetUsers";//$NON-NLS-1$
+	private static final String SCRIPT_EXT = ".sh";//$NON-NLS-1$
 	static final String MAC_SCRIPT_NAME = "installCerScript"; //$NON-NLS-1$
 	static final String MAC_SCRIPT_EXT = ".sh"; //$NON-NLS-1$
-	static final String EXPORT_PATH = "export PATH=$PATH:";//$NON-NLS-1$
-	static final String EXPORT_LIBRARY_LD = "export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:";//$NON-NLS-1$
 	private static final String TRUST_SETTINGS_COMMAND = "security trust-settings-import -d "; //$NON-NLS-1$
 	private static final String TRUST_SETTINGS_FILE = "/trust_settings.plist"; //$NON-NLS-1$
 	private static final String OSX_RESOURCES = "/osx"; //$NON-NLS-1$
 	static String mac_script_path;
 	private static File sslCerFile;
+
+    /** Directorios de los usuarios del sistema. */
+    private static String[] userDirs = null;
+
 
 	@Override
 	public void configure(final Console console) throws IOException, GeneralSecurityException {
@@ -81,26 +82,13 @@ final class ConfiguratorMacOSX implements Configurator {
 
 		console.print(Messages.getString("ConfiguratorMacOSX.3") + appDir.getAbsolutePath()); //$NON-NLS-1$
 
-		if (!checkSSLKeyStoreGenerated(appDir)) {
-			configureSSL(appDir, console);
-
-		}
-		else {
-			LOGGER.info("Los certificados SSL existen y no se crearan ni instalaran" ); //$NON-NLS-1$
-			console.print(Messages.getString("ConfiguratorMacOSX.14")); //$NON-NLS-1$
-		}
+		// Creamos los nuevos certificados SSL y los instalamos en los almacenes de confianza,
+		// eliminando versiones anteriores si es necesario
+		configureSSL(appDir, console);
 
 		console.print(Messages.getString("ConfiguratorMacOSX.8")); //$NON-NLS-1$
 		LOGGER.info("Finalizado"); //$NON-NLS-1$
 
-	}
-
-	/** Comprueba si ya existe un almac&eacute;n de certificados generado.
-	 * @param appConfigDir Directorio de configuraci&oacute;n de la aplicaci&oacute;n.
-	 * @return {@code true} si ya existe un almacen de certificados SSL,
-	 *         {@code false} en caso contrario. */
-	private static boolean checkSSLKeyStoreGenerated(final File appConfigDir) {
-		return new File(appConfigDir, KS_FILENAME).exists();
 	}
 
 	/**
@@ -123,7 +111,7 @@ final class ConfiguratorMacOSX implements Configurator {
 		}
 
 		// Damos permisos al script
-		addExexPermissionsToAllFilesOnDirectory(appDir);
+		ConfiguratorMacUtils.addExexPermissionsToAllFilesOnDirectory(appDir);
 
 		// Generamos los certificados de CA y SSL
 		final CertPack certPack = CertUtil.getCertPackForLocalhostSsl(
@@ -147,38 +135,16 @@ final class ConfiguratorMacOSX implements Configurator {
 		closeFirefox();
 
 		// Desinstalamos de los almacenes cualquier certificado anterior generado para este proposito
-		LOGGER.info("Desinstalacion de versiones anteriores del certificado raiz del almacen de MacOSX"); //$NON-NLS-1$
-		try {
-			uninstallRootCAMacOSXKeyStore();
-		}
-		catch (final IOException e) {
-			LOGGER.log(Level.SEVERE, "Se ha producido un error durante la busqueda y desinstalacion de versiones anteriores del certificado SSL en el llavero de macOS: " + e, e); //$NON-NLS-1$
-		}
-		
-		// Copiamos en disco certUtil para la configuracion de los certificados en el almacen de Firefox
-		ConfiguratorFirefox.copyConfigurationFiles(appDir);
-
-		LOGGER.info("Desinstalacion de versiones anteriores del certificado raiz del almacen de Firefox"); //$NON-NLS-1$
-		try {
-			uninstallRootCAFirefoxKeyStore();
-		}
-		catch (final IOException e) {
-			LOGGER.log(Level.SEVERE, "Se ha producido un error durante la busqueda y desinstalacion de versiones anteriores del certificado SSL en Firefox: " + e, e); //$NON-NLS-1$
-		}
-
+		console.print(Messages.getString("ConfiguratorMacOSX.15")); //$NON-NLS-1$
+		uninstallProcess();
 
 		// Se instalan los certificados en el almacen de Mozilla
+		final String[] userHomes = getSystemUsersHomes();
 		try {
-			// Copiamos en disco certUtil para la configuracion de los certificados en el almacen de Firefox
-			ConfiguratorFirefox.copyConfigurationFiles(appDir);
-
 			console.print(Messages.getString("ConfiguratorMacOSX.13")); //$NON-NLS-1$
 
 			// Instalar el certificado en Mozilla
-			ConfiguratorFirefox.installRootCAMozillaKeyStore(
-				appDir,
-				new String[] { OSX_GET_USERS_COMMAND }
-			);
+			ConfiguratorFirefoxMac.createScriptToInstallOnMozillaKeyStore(appDir, userHomes, new File(mac_script_path));
 
 			LOGGER.info("Configuracion de NSS"); //$NON-NLS-1$
 			MozillaKeyStoreUtilitiesOsX.configureMacNSS(MozillaKeyStoreUtilities.getSystemNSSLibDir());
@@ -194,8 +160,8 @@ final class ConfiguratorMacOSX implements Configurator {
 		console.print(Messages.getString("ConfiguratorMacOSX.6")); //$NON-NLS-1$
 		try {
 			createScriptToImportCARootOnMacOSXKeyStore(appDir);
-			addExexPermissionsToFile(new File(mac_script_path));
-			executeScript(mac_script_path, true, true);
+			ConfiguratorMacUtils.addExexPermissionsToFile(new File(mac_script_path));
+			executeScriptFile(mac_script_path, true, true);
 		}
 		catch (final Exception e1) {
 			LOGGER.log(Level.WARNING, "Error en la importacion del certificado de confianza en el llavero del sistema operativo: " + e1, e1); //$NON-NLS-1$
@@ -222,7 +188,7 @@ final class ConfiguratorMacOSX implements Configurator {
 				certFile.getAbsolutePath().replace(" ", "\\ ") //$NON-NLS-1$ //$NON-NLS-2$
 		);
 		LOGGER.info("Comando de instalacion del certificado de CA en el almacen de confianza de Apple: " + cmd); //$NON-NLS-1$
-		writeScriptFile(mac_script_path, new StringBuilder(cmd), true);
+		ConfiguratorMacUtils.writeScriptFile(new StringBuilder(cmd), mac_script_path, true);
 
 
 		// Creamos el script para la instalacion del certificado SSL en el almacen de confianza de Apple
@@ -250,7 +216,7 @@ final class ConfiguratorMacOSX implements Configurator {
 				sslCerFile.getAbsolutePath().replace(" ", "\\ ") //$NON-NLS-1$ //$NON-NLS-2$
 		);
 		LOGGER.info("Comando de instalacion del certificado SSL en el almacen de confianza de Apple: " + cmd); //$NON-NLS-1$
-		writeScriptFile(mac_script_path, new StringBuilder(cmdKs), true);
+		ConfiguratorMacUtils.writeScriptFile(new StringBuilder(cmdKs), mac_script_path, true);
 
 		// Creamos el fichero de perfil y el script necesario para que se confie automaticamente en los nuevos certificados
 		final X509Certificate root;
@@ -270,7 +236,7 @@ final class ConfiguratorMacOSX implements Configurator {
 			+ TRUST_SETTINGS_FILE
 		;
 		LOGGER.info("Comando de instalacion de ajustes de confianza: " + trustCmd); //$NON-NLS-1$
-		writeScriptFile(mac_script_path, new StringBuilder(trustCmd), true);
+		ConfiguratorMacUtils.writeScriptFile(new StringBuilder(trustCmd), mac_script_path, true);
 
 	}
 
@@ -279,26 +245,27 @@ final class ConfiguratorMacOSX implements Configurator {
 
 		LOGGER.info("Desinstalacion del certificado raiz de los almacenes de MacOSX"); //$NON-NLS-1$
 
+		uninstallProcess();
+	}
+
+	/**
+	 * Ejecuta el proceso de desinstalaci&oacute;n. Durante el mismo se desinstalan los certificados
+	 * de confianza SSL de los almacenes del sistema.
+	 */
+	private static void uninstallProcess() {
 		try {
 			uninstallRootCAMacOSXKeyStore();
 
-			uninstallRootCAFirefoxKeyStore();
+			final File appDir = ConfiguratorUtil.getApplicationDirectory();
+			final String[] usersHomes = getSystemUsersHomes();
+			ConfiguratorFirefoxMac.createScriptToUnistallFromMozillaKeyStore(appDir, usersHomes, new File(mac_script_path));
+		}
+		catch (final MozillaProfileNotFoundException e) {
+			LOGGER.info("No se han encontrado perfiles de Mozilla de los que desinstalar: " + e); //$NON-NLS-1$
 		}
 		catch (final IOException e) {
 			LOGGER.log(Level.SEVERE, "Se ha producido un error durante la desinstalacion: " + e, e); //$NON-NLS-1$
 		}
-	}
-
-	/**
-	 * Desinstala el certificado de CA del almacen de autoridades de confianza de Mozilla Firefox.
-	 * @throws IOException Se produce cuando hay un error en la creaci&oacute;n del fichero.
-	 */
-	private static void uninstallRootCAFirefoxKeyStore() throws IOException {
-
-		// Generamos script para borrar el almacen certificados firefox
-		ConfiguratorFirefox.generateUninstallScriptMac(ConfiguratorUtil.getApplicationDirectory());
-		// Le damos permisos para poder ejecutarlo
-		addExexPermissionsToAllFilesOnDirectory(ConfiguratorUtil.getApplicationDirectory());
 	}
 
 	/**
@@ -318,22 +285,21 @@ final class ConfiguratorMacOSX implements Configurator {
 		sb.append(deleteCaCerts);
 		sb.append(";"); //$NON-NLS-1$
 		sb.append(deleteKsCerts);
-		writeScriptFile(mac_script_path, sb, true);
+		ConfiguratorMacUtils.writeScriptFile(sb, mac_script_path, true);
 	}
 
 	private static void editTrusFile(final String sha1Root, final String sha1Cer, final String snRoot, final String snCer) {
-		
-		final File appDir = ConfiguratorUtil.getApplicationDirectory(); 
-		
-		// Copia del archivo de plantilla para configurar
-		// la confianza de los certificados que se van a
-		// instalar.
+
+		final File appDir = ConfiguratorUtil.getApplicationDirectory();
+
+		// Copia a disco la plantilla que rellenaremos para usarla como fichero de perfil
+		// que instalar para configurar la confianza en los certificados SSL. Si existiese
+		// una version anterior, la eliminariamos previamente
 		try {
 			deleteTrustTemplate(appDir);
 			exportResource(OSX_RESOURCES,TRUST_SETTINGS_FILE, appDir.getAbsolutePath());
-		} catch (Exception e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+		} catch (final Exception e) {
+			LOGGER.log(Level.SEVERE, "No ha sido posible exportar la plantilla de confianza para la instalacion de los certificados SSL. Quizas no se confie en los certificados.", e); //$NON-NLS-1$
 		}
 
 		final String sha1RootOrig = "%CA_SHA1%"; //$NON-NLS-1$
@@ -342,7 +308,7 @@ final class ConfiguratorMacOSX implements Configurator {
 		final String snCerOrig = "%SSL_SERIALNUMBER%"; //$NON-NLS-1$
 
 		try(final InputStream in = new FileInputStream(
-			ConfiguratorUtil.getApplicationDirectory().getAbsolutePath()
+				appDir.getAbsolutePath()
 			+ TRUST_SETTINGS_FILE
 		);
 				) {
@@ -416,27 +382,13 @@ final class ConfiguratorMacOSX implements Configurator {
 	    return data;
 	}
 
-	/** Escribe un <i>script</i> en un fichero dado.
-	 * @param path Ruta donde se escribir&aacute; el <i>script</i>.
-	 * @param data Datos a escribir.
-	 * @param append <code>true</code> permite contatenar el contenido del fichero con lo que se va a escribir. <code>false</code> el fichero se sobrescribe.
-	 * @throws IOException Se produce cuando hay un error en la creaci&oacute;n del fichero. */
-	static void writeScriptFile(final String path, final StringBuilder data, final boolean append ) throws IOException{
-		LOGGER.info("Se escribira en fichero el siguiente comando:\n" + data.toString()); //$NON-NLS-1$
-		final File macScript = new File(path);
-		data.append("\n"); //$NON-NLS-1$
-		try (final FileOutputStream fout = new FileOutputStream(macScript, append);) {
-			fout.write(data.toString().getBytes());
-		}
-	}
-
-	/** Ejecuta un script en OS X.
+	/** Ejecuta un fichero de scripts.
 	 * @param path Ruta donde se encuentra el <i>script</i>.
-	 * @param administratorMode <code>true</code> el <i>script</i> se ejecuta como permisos de adminsitrador, <code>false</code> en caso contrario.
+	 * @param administratorMode <code>true</code> el <i>script</i> se ejecuta con permisos de adminsitrador, <code>false</code> en caso contrario.
 	 * @param delete <code>true</code> se borra el fichero despu&eacute;s de haberse ejecutado.
 	 * @return El objeto que da como resultado el <i>script</i>.
 	 * @throws IOException Excepci&oacute;n lanzada en caso de ocurrir alg&uacute;n error en la ejecuci&oacute;n del <i>script</i>. */
-	public static Object executeScript(final String path, final boolean administratorMode, final boolean delete) throws IOException {
+	public static Object executeScriptFile(final String path, final boolean administratorMode, final boolean delete) throws IOException {
 
 		final ScriptEngine se = MozillaKeyStoreUtilitiesOsX.getAppleScriptEngine();
 		if (se == null) {
@@ -463,41 +415,6 @@ final class ConfiguratorMacOSX implements Configurator {
 		}
 		catch (final ScriptException e) {
 			throw new IOException("Error en la ejecucion del script via AppleScript: " + e, e); //$NON-NLS-1$
-		}
-	}
-
-	/**
-	 * Da permisos de ejecuci&oacute;n a todos los ficheros de un directorio dado.
-	 * @param dir Directorio al que dar permiso.
-	 */
-	public static void addExexPermissionsToAllFilesOnDirectory(final File dir) {
-
-		for (final File fileEntry : dir.listFiles()) {
-			addExexPermissionsToFile(fileEntry);
-		}
-	}
-
-	static void addExexPermissionsToFile(final File f) {
-		final Set<PosixFilePermission> perms = new HashSet<>();
-		perms.add(PosixFilePermission.OWNER_EXECUTE);
-		perms.add(PosixFilePermission.GROUP_EXECUTE);
-		perms.add(PosixFilePermission.OTHERS_EXECUTE);
-		perms.add(PosixFilePermission.OWNER_READ);
-		perms.add(PosixFilePermission.GROUP_READ);
-		perms.add(PosixFilePermission.OTHERS_READ);
-		perms.add(PosixFilePermission.OWNER_WRITE);
-		perms.add(PosixFilePermission.GROUP_WRITE);
-		perms.add(PosixFilePermission.OTHERS_WRITE);
-		try {
-			Files.setPosixFilePermissions(
-				Paths.get(f.getAbsolutePath()),
-				perms
-			);
-		}
-		catch (final Exception e) {
-			LOGGER.warning(
-				"No se ha podido dar permiso de ejecucion a '" + f.getAbsolutePath() + "': " + e//$NON-NLS-1$ //$NON-NLS-2$
-			);
 		}
 	}
 
@@ -550,7 +467,7 @@ final class ConfiguratorMacOSX implements Configurator {
 
 		return false;
 	}
-	
+
 	/** Comprueba si ya existe una plantilla de confianzas instalada en el
 	 * directorio de la aplicaci&oacute;n.
 	 * @param appDir Directorio de la aplicaci&oacute;n.
@@ -558,7 +475,7 @@ final class ConfiguratorMacOSX implements Configurator {
 	private static boolean checkTrutsTemplateInstalled(final File appDir) {
 		return new File(appDir, TRUST_SETTINGS_FILE).exists();
 	}
-	
+
 	/**
 	 * Elimina los ficheros de certificado ra&iacutez y almac&eacute;n SSL del disco
 	 * como paso previo a volver a generarlos
@@ -568,17 +485,17 @@ final class ConfiguratorMacOSX implements Configurator {
 	private static void deleteTrustTemplate(File appDir) throws IOException {
 
 		if (checkTrutsTemplateInstalled(appDir)) {
-			
-			File sslKey = new File(appDir, TRUST_SETTINGS_FILE);
-			
+
+			final File sslKey = new File(appDir, TRUST_SETTINGS_FILE);
+
 			if (!sslKey.delete()) {
-				throw new IOException("No puedo eliminar " + TRUST_SETTINGS_FILE);
+				throw new IOException("No puedo eliminar " + TRUST_SETTINGS_FILE); //$NON-NLS-1$
 			}
-			
+
 		}
-		
+
 	}
-	
+
 	/**
      * Copia un recurso desde dentro del jar hacia una ruta externa
      *
@@ -589,36 +506,84 @@ final class ConfiguratorMacOSX implements Configurator {
      * @throws Exception
      */
     static public String exportResource(String pathToResource, String resourceName, String destinationPath) throws Exception {
-        InputStream stream = null;
-        OutputStream resStreamOut = null;
- 
-        try {
-            stream = ConfiguratorMacOSX.class.getResourceAsStream(pathToResource + resourceName);
-            if(stream == null) {
-                throw new Exception("No ha podido obtenerse el recurso \"" + resourceName + "\" del jar.");
+
+        try (final InputStream stream = ConfiguratorMacOSX.class.getResourceAsStream(pathToResource + resourceName);) {
+
+            if (stream == null) {
+                throw new IOException("No ha podido obtenerse el recurso \"" + resourceName + "\" del jar."); //$NON-NLS-1$ //$NON-NLS-2$
             }
 
             int readBytes;
-            byte[] buffer = new byte[4096];
-            resStreamOut = new FileOutputStream(destinationPath + resourceName);
-            while ((readBytes = stream.read(buffer)) > 0) {
-                resStreamOut.write(buffer, 0, readBytes);
+            final byte[] buffer = new byte[4096];
+            try (OutputStream resStreamOut = new FileOutputStream(destinationPath + resourceName);) {
+            	while ((readBytes = stream.read(buffer)) > 0) {
+            		resStreamOut.write(buffer, 0, readBytes);
+            	}
             }
-        } catch (Exception ex) {
+        } catch (final Exception ex) {
             throw ex;
-        } finally {
-            stream.close();
-            resStreamOut.close();
         }
 
         return destinationPath + resourceName;
     }
 
-	public static void main(final String[] args) throws Exception {
+    /** Devuelve un listado con todos los directorios de usuario del sistema.
+	 * @return Listado de directorios. */
+	private static String[] getSystemUsersHomes() {
 
-		final ConfiguratorMacOSX configurator = new ConfiguratorMacOSX();
-		configurator.configure(ConsoleManager.getConsole(null));
+		if (userDirs != null) {
+			return userDirs;
+		}
 
-		//System.out.println("Firefox abierto: " + ConfiguratorMacOSX.isFirefoxOpen());
+		try {
+			final File getUsersScriptFile = createGetUsersScript();
+			final Object o = executeScriptFile(getUsersScriptFile.getAbsolutePath(), false, true);
+			final List<String> dirs = new ArrayList<>();
+			String line;
+			final String initLine = "dir: "; //$NON-NLS-1$
+			try (
+					final InputStream resIs = new ByteArrayInputStream(o.toString().getBytes());
+					final BufferedReader resReader = new BoundedBufferedReader(
+							new InputStreamReader(resIs),
+							2048, // Maximo 2048 lineas de salida (256 perfiles)
+							2048 // Maximo 2048 caracteres por linea
+							);
+					) {
+				while ((line = resReader.readLine()) != null) {
+					if (line.startsWith(initLine)){
+						dirs.add(
+								line.substring(
+										line.indexOf(initLine) + initLine.length()
+										)
+								);
+					}
+				}
+			}
+			userDirs = dirs.toArray(new String[dirs.size()]);
+		}
+		catch (final IOException e) {
+			LOGGER.severe("Error al generar el listado perfiles de Firefox del sistema: " + e); //$NON-NLS-1$
+			userDirs = null;
+		}
+
+		return userDirs;
 	}
+
+	/**
+	 * Crea un fichero de script para la obtenci&oacute;n de los usuarios del sistema.
+	 * @throws IOException Cuando no se pueda crear el fichero de script.
+	 */
+	private static File createGetUsersScript() throws IOException {
+		final StringBuilder script = new StringBuilder(ConfiguratorMacOSX.GET_USERS_COMMAND);
+		final File scriptFile = File.createTempFile(GET_USER_SCRIPTS_NAME, SCRIPT_EXT);
+		try {
+			ConfiguratorMacUtils.writeScriptFile(script, scriptFile.getAbsolutePath(), true);
+		} catch (final IOException e) {
+			LOGGER.log(Level.WARNING, "Ha ocurrido un error al generar el script de obtencion de usuarios: " + e, e); //$NON-NLS-1$
+		}
+		ConfiguratorMacUtils.addExexPermissionsToFile(scriptFile);
+
+		return scriptFile;
+	}
+
 }

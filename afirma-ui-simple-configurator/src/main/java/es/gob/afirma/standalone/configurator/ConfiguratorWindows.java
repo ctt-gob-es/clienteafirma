@@ -10,8 +10,6 @@ import java.util.logging.Logger;
 
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.standalone.configurator.CertUtil.CertPack;
-import es.gob.afirma.standalone.configurator.ConfiguratorFirefox.MozillaProfileNotFoundException;
-
 /** Configura la instalaci&oacute;n en Windows para la correcta ejecuci&oacute;n de AutoFirma. */
 final class ConfiguratorWindows implements Configurator {
 
@@ -57,12 +55,7 @@ final class ConfiguratorWindows implements Configurator {
 					new File(appDir, FILE_AUTOFIRMA_CERTIFICATE));
 
 			try {
-				window.print(Messages.getString("ConfiguratorWindows.13")); //$NON-NLS-1$
-				ConfiguratorFirefox.installRootCAMozillaKeyStore(appDir);
-				ConfiguratorFirefox.removeConfigurationFiles(appDir);
-				window.print(Messages.getString("ConfiguratorWindows.4")); //$NON-NLS-1$
-				window.print(Messages.getString("ConfiguratorWindows.9")); //$NON-NLS-1$
-				window.print(Messages.getString("ConfiguratorWindows.7")); //$NON-NLS-1$
+				ConfiguratorFirefoxWindows.installCACertOnMozillaKeyStores(appDir, window);
 			}
 			catch(final MozillaProfileNotFoundException e) {
 				window.print(Messages.getString("ConfiguratorWindows.12") + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$
@@ -73,6 +66,7 @@ final class ConfiguratorWindows implements Configurator {
 		}
 
 		// Insertamos el protocolo afirma en el fichero de configuracion de Google Chrome
+
 		configureChrome(window, true);
 
 		window.print(Messages.getString("ConfiguratorWindows.8")); //$NON-NLS-1$
@@ -89,13 +83,13 @@ final class ConfiguratorWindows implements Configurator {
 	public void uninstall() {
 
 		LOGGER.info("Desinstalamos el certificado raiz del almacen de Firefox"); //$NON-NLS-1$
-		ConfiguratorFirefox.uninstallRootCAMozillaKeyStore(ConfiguratorUtil.getApplicationDirectory());
+		ConfiguratorFirefoxWindows.uninstallRootCAMozillaKeyStore(ConfiguratorUtil.getApplicationDirectory());
 
 		// Insertamos el protocolo afirma en el fichero de configuracion de Google Chrome
 		configureChrome(null, false);
 
-		// No es necesario eliminar nada mas porque el verdadero proceso de desinstalacion
-        // eliminara el directorio de aplicacion con todo su contenido
+		// No es necesario eliminar nada mas porque el proceso de desinstalacion de Windows
+		// eliminara el directorio de aplicacion con todo su contenido
 	}
 
 	/**
@@ -105,6 +99,10 @@ final class ConfiguratorWindows implements Configurator {
 	 * ({@code false}) el protocolo "afirma" en Chrome.
 	 */
 	private static void configureChrome(final Console window, boolean installing) {
+
+		if (window != null && installing) {
+			window.print(Messages.getString("ConfiguratorWindows.16")); //$NON-NLS-1$
+		}
 
 		final File usersDir = new File(System.getProperty("user.home")).getParentFile(); //$NON-NLS-1$
 		for (final File userDir : usersDir.listFiles()) {
