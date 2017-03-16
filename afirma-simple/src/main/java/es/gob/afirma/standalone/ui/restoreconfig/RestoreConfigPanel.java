@@ -94,15 +94,8 @@ public final class RestoreConfigPanel extends JPanel implements KeyListener, Dis
 					restoreConfig.configureAutoFirma(taskOutput);
 					restoreButton.setEnabled(true);
 					
-				} catch (GeneralSecurityException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (ConfigurationException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+				} catch (GeneralSecurityException | ConfigurationException | IOException e ) {
+					LOGGER.severe("Ha ocurrido un error al ejecutar la tarea de restauracion: " + e.getMessage());
 				}
 			}
 		});

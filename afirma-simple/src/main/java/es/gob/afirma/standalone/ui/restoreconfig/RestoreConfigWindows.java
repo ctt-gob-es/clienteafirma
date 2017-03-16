@@ -51,7 +51,7 @@ final class RestoreConfigWindows implements RestoreConfig {
 	/**
      * Caracter de salto de l&iacute;nea para los mensajes de la consola de restauraci&oacute;n
      */
-	private String newline = System.getProperty("line.separator");
+	private String newline = System.getProperty("line.separator"); //$NON-NLS-1$
 	
 	/**
 	 * Ruta de operaci&oacute;n de la aplicaci&oacute;n
@@ -64,12 +64,12 @@ final class RestoreConfigWindows implements RestoreConfig {
 	@Override
 	public void restore(JTextArea taskOutput) throws IOException, GeneralSecurityException {
 
-		appendMessage(taskOutput, SimpleAfirmaMessages.getString("RestoreConfigWindows.2"));
+		appendMessage(taskOutput, SimpleAfirmaMessages.getString("RestoreConfigWindows.2")); //$NON-NLS-1$
 
-		LOGGER.info("Ruta de appDir: " + appDir.getAbsolutePath());
+		LOGGER.info("Ruta de appDir: " + appDir.getAbsolutePath()); //$NON-NLS-1$
 		
 		appendMessage(taskOutput,
-				SimpleAfirmaMessages.getString("RestoreConfigWindows.3") + appDir.getAbsolutePath());
+				SimpleAfirmaMessages.getString("RestoreConfigWindows.3") + appDir.getAbsolutePath()); //$NON-NLS-1$
 
 		// Realizamos las comprobaciones para generar si es necesario,
 		// los certificados .pfx y/o .cer
@@ -112,14 +112,14 @@ final class RestoreConfigWindows implements RestoreConfig {
 
 				// Sobreescribimos los valores del protocolo afirma en el
 				// registro de Windows con los valores correctos
-				appendMessage(taskOutput, SimpleAfirmaMessages.getString("RestoreConfigWindows.24")); //$NON-NLS-1$ //$NON-NLS-2$
+				appendMessage(taskOutput, SimpleAfirmaMessages.getString("RestoreConfigWindows.24")); //$NON-NLS-1$
 				restoreProtocolRegistry(taskOutput);
 
 			} catch (final MozillaProfileNotFoundException e) {
-				appendMessage(taskOutput, SimpleAfirmaMessages.getString("RestoreConfigWindows.12")); //$NON-NLS-1$ //$NON-NLS-2$
+				appendMessage(taskOutput, SimpleAfirmaMessages.getString("RestoreConfigWindows.12")); //$NON-NLS-1$
 			}
 		} else {
-			appendMessage(taskOutput, SimpleAfirmaMessages.getString("RestoreConfigWindows.28")); //$NON-NLS-1$ //$NON-NLS-2$
+			appendMessage(taskOutput, SimpleAfirmaMessages.getString("RestoreConfigWindows.28")); //$NON-NLS-1$
 		}
 		
 		closeChrome();
@@ -194,7 +194,7 @@ final class RestoreConfigWindows implements RestoreConfig {
 				try {
 					final File chromeConfigFile = new File(userDir, CHROME_CONFIG_FILE);
 					if (chromeConfigFile.isFile() && chromeConfigFile.canWrite()) {
-						appendMessage(taskOutput, SimpleAfirmaMessages.getString("RestoreConfigWindows.23"));
+						appendMessage(taskOutput, SimpleAfirmaMessages.getString("RestoreConfigWindows.23")); //$NON-NLS-1$
 						String config;
 						try (final FileInputStream fis = new FileInputStream(chromeConfigFile)) {
 							config = new String(AOUtil.getDataFromInputStream(fis), StandardCharsets.UTF_8);
@@ -212,9 +212,6 @@ final class RestoreConfigWindows implements RestoreConfig {
 
 				} catch (final Exception e) {
 
-					// window.print(String.format(SimpleAfirmaMessages.getString("RestoreConfigWindows.15"),
-					// userDir.getName())); //$NON-NLS-1$
-
 					LOGGER.warning("No se pudo configurar Chrome para el usuario " + userDir + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 			}
@@ -229,14 +226,14 @@ final class RestoreConfigWindows implements RestoreConfig {
 	private static Boolean isProcessRunningWindows(final String process) {
 
 		String line;
-		String pidInfo = "";
+		String pidInfo = ""; //$NON-NLS-1$
 		Boolean isRunning = Boolean.FALSE;
 
 		Process p;
 		try {
 			
-			ProcessBuilder pb = new ProcessBuilder(System.getenv("windir") + "\\system32\\" + "tasklist.exe");
-			
+			ProcessBuilder pb = new ProcessBuilder(System.getenv("windir") + "\\system32\\" + "tasklist.exe"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+						
 			p = pb.start();
 
 			BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()));
@@ -248,8 +245,7 @@ final class RestoreConfigWindows implements RestoreConfig {
 			input.close();
 
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOGGER.severe("Ha ocurrido un error al ejecutar el comando " + process + " en Windows"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
 		if (pidInfo.contains(process)) {
@@ -264,7 +260,7 @@ final class RestoreConfigWindows implements RestoreConfig {
 	 */
 	private static void closeFirefox() {
 
-		while (isProcessRunningWindows("firefox.exe")) {
+		while (isProcessRunningWindows("firefox.exe")) { //$NON-NLS-1$
 			JOptionPane.showMessageDialog(
 					null,
 					SimpleAfirmaMessages.getString("RestoreAutoFirma.7"), //$NON-NLS-1$
@@ -278,7 +274,7 @@ final class RestoreConfigWindows implements RestoreConfig {
 	 */
 	private static void closeChrome() {
 
-		while (isProcessRunningWindows("chrome.exe")) {
+		while (isProcessRunningWindows("chrome.exe")) { //$NON-NLS-1$
 			JOptionPane.showMessageDialog(
 					null,
 					SimpleAfirmaMessages.getString("RestoreAutoFirma.8"), //$NON-NLS-1$
@@ -310,11 +306,11 @@ final class RestoreConfigWindows implements RestoreConfig {
 		KeyStore ks;
 		
 		try {
-			ks = KeyStore.getInstance("Windows-ROOT");
+			ks = KeyStore.getInstance("Windows-ROOT"); //$NON-NLS-1$
 			ks.load(null, null);
 									
 			appendMessage(taskOutput,
-					SimpleAfirmaMessages.getString("RestoreConfigWindows.18"));
+					SimpleAfirmaMessages.getString("RestoreConfigWindows.18")); //$NON-NLS-1$
 			
 			// Importar el certificado solo si no esta instalado ya o si estaba instalado
 			// pero se ha debido volver a generar el cer
@@ -330,9 +326,9 @@ final class RestoreConfigWindows implements RestoreConfig {
 						
 					} catch (IOException e) {
 						
-						LOGGER.severe("No ha podido cargarse el certificado .cer desde el archivo");
+						LOGGER.severe("No ha podido cargarse el certificado .cer desde el archivo"); //$NON-NLS-1$
 						appendMessage(taskOutput,
-								SimpleAfirmaMessages.getString("RestoreConfigWindows.27",  e.getMessage()));
+								SimpleAfirmaMessages.getString("RestoreConfigWindows.27",  e.getMessage())); //$NON-NLS-1$
 						exito = Boolean.FALSE;
 					}
 				} else {
@@ -344,25 +340,25 @@ final class RestoreConfigWindows implements RestoreConfig {
 						}
 					} catch (KeyStoreException ke) {
 						appendMessage(taskOutput,
-								"No ha podido eliminarse alguna importacion previa del certificado raiz del almacen de Windows");
-						LOGGER.info("No ha podido eliminarse alguna importacion previa del certificado raiz del almacen de Windows");
+								"No ha podido eliminarse alguna importacion previa del certificado raiz del almacen de Windows"); //$NON-NLS-1$
+						LOGGER.info("No ha podido eliminarse alguna importacion previa del certificado raiz del almacen de Windows"); //$NON-NLS-1$
 					}
 				}
 				
 				ks.setCertificateEntry(RestoreConfigUtil.CERT_ALIAS_BROWSER, cer);
 				appendMessage(taskOutput,
-						SimpleAfirmaMessages.getString("RestoreConfigWindows.19"));
+						SimpleAfirmaMessages.getString("RestoreConfigWindows.19")); //$NON-NLS-1$
 			} else {
 				appendMessage(taskOutput,
-						SimpleAfirmaMessages.getString("RestoreConfigWindows.26"));
+						SimpleAfirmaMessages.getString("RestoreConfigWindows.26")); //$NON-NLS-1$
 			}
 				
 		} catch (KeyStoreException | NoSuchAlgorithmException | CertificateException | IOException e) {
 			
 			LOGGER.severe(e.getStackTrace().toString());
 			appendMessage(taskOutput,
-					SimpleAfirmaMessages.getString("RestoreConfigWindows.20",  e.getMessage()));
-			exito = Boolean.FALSE;
+					SimpleAfirmaMessages.getString("RestoreConfigWindows.20",  e.getMessage())); //$NON-NLS-1$
+			exito = Boolean.FALSE; 
 			
 		}
 		
@@ -381,32 +377,32 @@ final class RestoreConfigWindows implements RestoreConfig {
 		try {
 						
 			// Crear la key "afirma" si no existe
-			if (!Advapi32Util.registryKeyExists(WinReg.HKEY_CLASSES_ROOT, "afirma")) {
-				Advapi32Util.registryCreateKey(WinReg.HKEY_CLASSES_ROOT, "afirma");
+			if (!Advapi32Util.registryKeyExists(WinReg.HKEY_CLASSES_ROOT, "afirma")) { //$NON-NLS-1$
+				Advapi32Util.registryCreateKey(WinReg.HKEY_CLASSES_ROOT, "afirma"); //$NON-NLS-1$
 			}
 			// Sobreescribir los valores correctos
-			Advapi32Util.registrySetStringValue(WinReg.HKEY_CLASSES_ROOT, "afirma", "", "URL:Afirma Protocol");
-			Advapi32Util.registrySetStringValue(WinReg.HKEY_CLASSES_ROOT, "afirma", "URL Protocol", "");
+			Advapi32Util.registrySetStringValue(WinReg.HKEY_CLASSES_ROOT, "afirma", "", "URL:Afirma Protocol"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			Advapi32Util.registrySetStringValue(WinReg.HKEY_CLASSES_ROOT, "afirma", "URL Protocol", ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			 			 
 			// Crear la key "afirma\\DefaultIcon"
-			if (!Advapi32Util.registryKeyExists(WinReg.HKEY_CLASSES_ROOT, "afirma\\DefaultIcon")) {
-				Advapi32Util.registryCreateKey(WinReg.HKEY_CLASSES_ROOT, "afirma\\DefaultIcon");
+			if (!Advapi32Util.registryKeyExists(WinReg.HKEY_CLASSES_ROOT, "afirma\\DefaultIcon")) { //$NON-NLS-1$
+				Advapi32Util.registryCreateKey(WinReg.HKEY_CLASSES_ROOT, "afirma\\DefaultIcon"); //$NON-NLS-1$
 			}			
 			// Sobreescribir los valores correctos
-			Advapi32Util.registrySetStringValue(WinReg.HKEY_CLASSES_ROOT, "afirma\\DefaultIcon", "", appDir + "\\AutoFirma\\ic_firmar.ico");
+			Advapi32Util.registrySetStringValue(WinReg.HKEY_CLASSES_ROOT, "afirma\\DefaultIcon", "", appDir + "\\AutoFirma\\ic_firmar.ico"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			 
 			// Crear la key "afirma\\shell\\open\\command" si no existe
-			if (!Advapi32Util.registryKeyExists(WinReg.HKEY_CLASSES_ROOT, "afirma\\shell\\open\\command")) {
-				Advapi32Util.registryCreateKey(WinReg.HKEY_CLASSES_ROOT, "afirma\\shell\\open\\command");
+			if (!Advapi32Util.registryKeyExists(WinReg.HKEY_CLASSES_ROOT, "afirma\\shell\\open\\command")) { //$NON-NLS-1$
+				Advapi32Util.registryCreateKey(WinReg.HKEY_CLASSES_ROOT, "afirma\\shell\\open\\command"); //$NON-NLS-1$
 			}
 			// Sobreescribir los valores correctos
-			Advapi32Util.registrySetStringValue(WinReg.HKEY_CLASSES_ROOT, "afirma\\shell\\open\\command", "", appDir + "\\AutoFirma\\AutoFirma.exe %1");
+			Advapi32Util.registrySetStringValue(WinReg.HKEY_CLASSES_ROOT, "afirma\\shell\\open\\command", "", appDir + "\\AutoFirma\\AutoFirma.exe %1"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			 			 
-			LOGGER.info("Configurado afirma en registro Windows");
+			LOGGER.info("Configurado afirma en registro Windows"); //$NON-NLS-1$
 		} catch (Exception e) {
-			LOGGER.severe("Error al escribir en el registro de Windows: " + e.getMessage());
+			LOGGER.severe("Error al escribir en el registro de Windows: " + e.getMessage()); //$NON-NLS-1$
 			appendMessage(taskOutput,
-					SimpleAfirmaMessages.getString("RestoreConfigWindows.25",  e.getMessage()));
+					SimpleAfirmaMessages.getString("RestoreConfigWindows.25",  e.getMessage())); //$NON-NLS-1$
 		}
 		
 	}
@@ -428,7 +424,7 @@ final class RestoreConfigWindows implements RestoreConfig {
 
 			// Cargo el pfx
 			final File sslKeyStoreFile = new File(appDir, KS_FILENAME);
-			final KeyStore ks = KeyStore.getInstance("PKCS12");
+			final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
 			final char ksPass[] = KS_PASSWORD.toCharArray();
 			ks.load(new FileInputStream(sslKeyStoreFile), ksPass);
 			
@@ -444,24 +440,24 @@ final class RestoreConfigWindows implements RestoreConfig {
 
 			final CertPack certPack = CertUtil.getCertPackForLocalhostSsl(RestoreConfigUtil.CERT_ALIAS, KS_PASSWORD);
 
-			appendMessage(taskOutput, SimpleAfirmaMessages.getString("RestoreConfigWindows.16"));
+			appendMessage(taskOutput, SimpleAfirmaMessages.getString("RestoreConfigWindows.16")); //$NON-NLS-1$
 
 			try {
 				
 				deleteInstalledCertificates(appDir);
 
-				appendMessage(taskOutput, SimpleAfirmaMessages.getString("RestoreConfigWindows.5"));
+				appendMessage(taskOutput, SimpleAfirmaMessages.getString("RestoreConfigWindows.5")); //$NON-NLS-1$
 				// Instalacion del certificado pfx
 				RestoreConfigUtil.installFile(certPack.getPkcs12(), new File(appDir, KS_FILENAME));
 
 				sslRoot = certPack.getCaCertificate();
 
-				appendMessage(taskOutput, SimpleAfirmaMessages.getString("RestoreConfigWindows.11"));
+				appendMessage(taskOutput, SimpleAfirmaMessages.getString("RestoreConfigWindows.11")); //$NON-NLS-1$
 				// Instalacion del certificado raiz .cer si no existe
 				RestoreConfigUtil.installFile(sslRoot.getEncoded(), new File(appDir, FILE_AUTOFIRMA_CERTIFICATE));
 
 			} catch (IOException e) {
-				appendMessage(taskOutput, SimpleAfirmaMessages.getString("RestoreConfigWindows.17"));
+				appendMessage(taskOutput, SimpleAfirmaMessages.getString("RestoreConfigWindows.17")); //$NON-NLS-1$
 				LOGGER.log(Level.SEVERE, e.getMessage());
 			}
 
@@ -482,7 +478,7 @@ final class RestoreConfigWindows implements RestoreConfig {
 
 		BufferedInputStream bis = new BufferedInputStream(fis);
 
-		CertificateFactory cf = CertificateFactory.getInstance("X.509");
+		CertificateFactory cf = CertificateFactory.getInstance("X.509"); //$NON-NLS-1$
 
 		while (bis.available() > 0) {
 			cert = cf.generateCertificate(bis);
@@ -501,7 +497,7 @@ final class RestoreConfigWindows implements RestoreConfig {
 		Boolean isAdmin = Boolean.FALSE;
 		
 		try {
-			String command = "reg query \"HKU\\S-1-5-19\"";
+			String command = "reg query \"HKU\\S-1-5-19\""; //$NON-NLS-1$
 			Process p = Runtime.getRuntime().exec(command);
 			p.waitFor();
 			int exitValue = p.exitValue();
@@ -511,7 +507,7 @@ final class RestoreConfigWindows implements RestoreConfig {
 			} 
 
 		} catch (Exception e) {
-			e.printStackTrace();
+			LOGGER.severe("Ha ocurrido un error al determinar si AutoFirma se ejecuta como administrador"); //$NON-NLS-1$
 		}
 		
 		return isAdmin;

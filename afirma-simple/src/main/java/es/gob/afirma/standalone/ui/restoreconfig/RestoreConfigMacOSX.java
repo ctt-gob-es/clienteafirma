@@ -77,7 +77,7 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 	/**
      * Caracter de salto de l&iacute;nea para los mensajes de la consola de restauraci&oacute;n
      */
-	private static String newline  = System.getProperty("line.separator");
+	private static String newline  = System.getProperty("line.separator"); //$NON-NLS-1$
 
 	@Override
 	public void restore(JTextArea taskOutput) throws IOException, GeneralSecurityException {
@@ -402,8 +402,7 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 			deleteTrustTemplate(appDir);
 			exportResource(OSX_RESOURCES,TRUST_SETTINGS_FILE, appDir.getAbsolutePath());
 		} catch (Exception e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			LOGGER.severe("No ha podido copiarse la plantilla de configuracion de confianza."); //$NON-NLS-1$
 		}
 
 		final String sha1RootOrig = "%CA_SHA1%"; //$NON-NLS-1$
@@ -499,7 +498,7 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 			File sslKey = new File(appDir, KS_FILENAME);
 			
 			if (!sslKey.delete()) {
-				throw new IOException("No puedo eliminar autofirma.pfx");
+				throw new IOException("No puedo eliminar autofirma.pfx"); //$NON-NLS-1$
 			}
 			
 		}
@@ -509,7 +508,7 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 			File sslRoot = new File(appDir, MACOSX_CERTIFICATE);
 			
 			if (!sslRoot.delete()) {
-				throw new IOException("No puedo eliminar AutoFirma_ROOT.cer");
+				throw new IOException("No puedo eliminar AutoFirma_ROOT.cer"); //$NON-NLS-1$
 			}
 
 		}
@@ -528,7 +527,7 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 			File sslKey = new File(appDir, TRUST_SETTINGS_FILE);
 			
 			if (!sslKey.delete()) {
-				throw new IOException("No puedo eliminar " + TRUST_SETTINGS_FILE);
+				throw new IOException("No puedo eliminar " + TRUST_SETTINGS_FILE); //$NON-NLS-1$
 			}
 			
 		}
@@ -636,7 +635,7 @@ final class RestoreConfigMacOSX implements RestoreConfig {
         try {
             stream = RestoreConfigMacOSX.class.getResourceAsStream(pathToResource + resourceName);
             if(stream == null) {
-                throw new Exception("No ha podido obtenerse el recurso \"" + resourceName + "\" del jar.");
+                throw new Exception("No ha podido obtenerse el recurso \"" + resourceName + "\" del jar."); //$NON-NLS-1$ //$NON-NLS-2$
             }
 
             int readBytes;

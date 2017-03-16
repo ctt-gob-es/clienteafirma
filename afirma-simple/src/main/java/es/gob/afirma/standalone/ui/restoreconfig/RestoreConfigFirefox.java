@@ -9,6 +9,9 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.attribute.PosixFilePermission;
 import java.security.GeneralSecurityException;
 import java.security.KeyStoreException;
 import java.util.ArrayList;
@@ -26,6 +29,7 @@ import javax.swing.JOptionPane;
 import es.gob.afirma.core.misc.BoundedBufferedReader;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.keystores.mozilla.MozillaKeyStoreUtilities;
+import es.gob.afirma.standalone.SimpleAfirmaMessages;
 
 /** Configurador para instalar un certificado SSL de confianza en Mozilla NSS.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
@@ -40,7 +44,7 @@ final class RestoreConfigFirefox {
 	private static final String FILE_AUTOFIRMA_CERTIFICATE = "AutoFirma_ROOT.cer"; //$NON-NLS-1$
 	static final String DIR_CERTUTIL = "certutil"; //$NON-NLS-1$
 	private static final String LINUX_UNINSTALLSCRIPT_NAME = "uninstall.sh"; //$NON-NLS-1$
-	private static final String LINUX_SCRIPT_NAME = "script.sh"; //$NON-NLS-1$
+	private static final String LINUX_SCRIPT_NAME = "install.sh"; //$NON-NLS-1$
 	private static final String LINUX_MOZILLA_PATH = "/.mozilla/firefox/profiles.ini";//$NON-NLS-1$
 	private static final String LINUX_CHROME_PATH = "/.pki/nssdb";//$NON-NLS-1$
 	private static final String LINUX_CHROMIUM_PREFS_PATH = "/.config/chromium/Local State";//$NON-NLS-1$
@@ -259,8 +263,8 @@ final class RestoreConfigFirefox {
 							"-t", //$NON-NLS-1$ // 8
 							"\"TCP,TCP,TCP\"" //$NON-NLS-1$ // 9
 					};
-					//execCommandLineCertUtil(certutilCommands, true);
-					execCommand(certutilCommands);
+					execCommandLineCertUtil(certutilCommands, true);
+					
 				}
 			}
 		}
@@ -382,29 +386,29 @@ final class RestoreConfigFirefox {
 		RestoreConfigFirefox.deleteConfigDir(targetDir);
 	}
 
-//	static void addExexPermissionsToFile(final File f) {
-//		final Set<PosixFilePermission> perms = new HashSet<>();
-//		perms.add(PosixFilePermission.OWNER_EXECUTE);
-//		perms.add(PosixFilePermission.GROUP_EXECUTE);
-//		perms.add(PosixFilePermission.OTHERS_EXECUTE);
-//		perms.add(PosixFilePermission.OWNER_READ);
-//		perms.add(PosixFilePermission.GROUP_READ);
-//		perms.add(PosixFilePermission.OTHERS_READ);
-//		perms.add(PosixFilePermission.OWNER_WRITE);
-//		perms.add(PosixFilePermission.GROUP_WRITE);
-//		perms.add(PosixFilePermission.OTHERS_WRITE);
-//		try {
-//			Files.setPosixFilePermissions(
-//				Paths.get(f.getAbsolutePath()),
-//				perms
-//			);
-//		}
-//		catch (final Exception e) {
-//			LOGGER.warning(
-//				"No se ha podido dar permiso de ejecucion a '" + f.getAbsolutePath() + "': " + e//$NON-NLS-1$ //$NON-NLS-2$
-//			);
-//		}
-//	}
+	static void addExexPermissionsToFile(final File f) {
+		final Set<PosixFilePermission> perms = new HashSet<>();
+		perms.add(PosixFilePermission.OWNER_EXECUTE);
+		perms.add(PosixFilePermission.GROUP_EXECUTE);
+		perms.add(PosixFilePermission.OTHERS_EXECUTE);
+		perms.add(PosixFilePermission.OWNER_READ);
+		perms.add(PosixFilePermission.GROUP_READ);
+		perms.add(PosixFilePermission.OTHERS_READ);
+		perms.add(PosixFilePermission.OWNER_WRITE);
+		perms.add(PosixFilePermission.GROUP_WRITE);
+		perms.add(PosixFilePermission.OTHERS_WRITE);
+		try {
+			Files.setPosixFilePermissions(
+				Paths.get(f.getAbsolutePath()),
+				perms
+			);
+		}
+		catch (final Exception e) {
+			LOGGER.warning(
+				"No se ha podido dar permiso de ejecucion a '" + f.getAbsolutePath() + "': " + e//$NON-NLS-1$ //$NON-NLS-2$
+			);
+		}
+	}
 
 
 	private static String escapePath(final String path) {
@@ -467,7 +471,7 @@ final class RestoreConfigFirefox {
 		// Obtenemos todos los directorios de perfil de Firefox del usuario
 		boolean error = false;
 
-		// exportamos el PATH y LD_LIBRARY_PATH en MACOSX
+		// Exportamos el PATH y LD_LIBRARY_PATH en MACOSX
 		if ( Platform.OS.LINUX.equals(Platform.getOS()) ) {
 			certUtilExec = CERTUTIL_EXE;
 		}
@@ -489,8 +493,10 @@ final class RestoreConfigFirefox {
 					certUtilExec,
 					"-A", //$NON-NLS-1$
 					"-d", //$NON-NLS-1$
-					escapePath(profileDir.getAbsolutePath()), "-i", //$NON-NLS-1$
-					escapePath(new File(targetDir, FILE_AUTOFIRMA_CERTIFICATE).getAbsolutePath()), "-n", //$NON-NLS-1$
+					escapePath(profileDir.getAbsolutePath()),
+					"-i", //$NON-NLS-1$
+					escapePath(new File(targetDir, FILE_AUTOFIRMA_CERTIFICATE).getAbsolutePath()),
+					"-n", //$NON-NLS-1$
 					"\"" + RestoreConfigUtil.CERT_ALIAS + "\"", //$NON-NLS-1$ //$NON-NLS-2$
 					"-t", //$NON-NLS-1$
 					"\"C,,\"" //$NON-NLS-1$
@@ -517,13 +523,14 @@ final class RestoreConfigFirefox {
 	 * @throws IOException Si no se pudo realizar la propia ejecuci&oacute;n. */
 	private static boolean execCommandLineCertUtil(final String[] command, final boolean chromeImport)
 			throws IOException {
-
+		
+		Boolean error = Boolean.FALSE;
 		final StringBuilder sb = new StringBuilder();
+		
 		for (final String s : command) {
 			sb.append(s);
 			sb.append(' ');
 		}
-		
 
 		if (Platform.OS.MACOSX.equals(Platform.getOS())) {		
 			RestoreConfigMacOSX.writeScriptFile(RestoreConfigMacOSX.mac_script_path, sb, true);
@@ -531,12 +538,88 @@ final class RestoreConfigFirefox {
 		}
 		else if (Platform.OS.LINUX.equals(Platform.getOS())) {
 			// Ejecutamos el comando certutil en Linux
+			final StringBuilder uninstall = new StringBuilder();
+			String path = null;
+			String uninstallPath = null;
 			try {
-				return execCommand(command);
+				
+				if(chromeImport) {
+					//En Linux tambien se instala para todos los perfiles de
+					// ususario del almacen de Chrome
+					// tenemos en command[7] la ruta del fichero .crt, sacamos de
+					// ahi la ruta del directorio de instalacion
+					
+					uninstall.append(command[0] + ' ');
+					uninstall.append("-D" + ' '); //$NON-NLS-1$
+					uninstall.append("-d" + ' ');//$NON-NLS-1$
+					uninstall.append(command[2] + ' ');
+					uninstall.append("-n" + ' ');//$NON-NLS-1$
+					uninstall.append(command[5] + ' ');
+										
+					path = command[7].substring(0, command[7].lastIndexOf("/") + 1) + LINUX_SCRIPT_NAME; //$NON-NLS-1$
+					uninstallPath = command[7].substring(0, command[7].lastIndexOf("/") + 1) + LINUX_UNINSTALLSCRIPT_NAME; //$NON-NLS-1$
+					
+				}
+				else {
+					
+					// tenemos en command[5] la ruta del fichero .cer, sacamos de
+					// ahi la ruta del directorio de instalacion
+					
+					uninstall.append(command[0] + ' ');
+					uninstall.append("-D" + ' '); //$NON-NLS-1$
+					uninstall.append("-d" + ' ');//$NON-NLS-1$
+					uninstall.append(command[3] + ' ');
+					uninstall.append("-n" + ' ');//$NON-NLS-1$
+					uninstall.append(command[7] + ' ');
+										
+					path = command[5].substring(0, command[5].lastIndexOf("/") + 1) + LINUX_SCRIPT_NAME; //$NON-NLS-1$
+					uninstallPath = command[5].substring(0, command[5].lastIndexOf("/") + 1) + LINUX_UNINSTALLSCRIPT_NAME; //$NON-NLS-1$
+					
+				}
+				
+				final File installScript = new File(path);
+				final File uninstallScript = new File(uninstallPath);
+							
+				try (
+						final FileOutputStream fout = new FileOutputStream(installScript, true);
+						final FileOutputStream foutUninstall = new FileOutputStream(
+								uninstallScript, true
+								);
+						) {
+					fout.write(sb.toString().getBytes());
+					foutUninstall.write(uninstall.toString().getBytes());
+					
+				}
+
+				//Permisos de ejecucion del fichero de script certutil
+//				Set<PosixFilePermission> perms = new HashSet<PosixFilePermission>();
+//				perms.add(PosixFilePermission.OWNER_READ);
+//				perms.add(PosixFilePermission.OWNER_WRITE);
+//				perms.add(PosixFilePermission.OWNER_EXECUTE);
+//								
+//				Path FilePathObject = Paths.get(installScript.getAbsolutePath());
+//				Files.setPosixFilePermissions(FilePathObject, perms);
+				addExexPermissionsToFile(uninstallScript);
+				addExexPermissionsToFile(installScript);
+								
+				// Primero desinstalamos las posibles versiones previas del certificado
+				error = execCommand(new String[] {uninstallPath});
+				error = execCommand(new String[] {path});
+				
+				if (!uninstallScript.delete()) {
+					LOGGER.warning("No puedo eliminar el fichero de script: " + LINUX_UNINSTALLSCRIPT_NAME); //$NON-NLS-1$
+				}
+																				
+				if (!installScript.delete()) {
+					LOGGER.warning("No puedo eliminar el fichero de script: " + LINUX_SCRIPT_NAME); //$NON-NLS-1$
+				}
+				
+				return error;
+								
 			}
 			catch (final Exception e) {
 				LOGGER.severe(
-						"Excepcion en la creacion del script linux para la instalacion del certificado en el almacen de Firefox: " + e //$NON-NLS-1$
+						"Excepcion en la ejecucion del script linux para la instalacion del certificado en el almacen de Firefox: " + e //$NON-NLS-1$
 						);
 				return true;
 			}
@@ -580,42 +663,6 @@ final class RestoreConfigFirefox {
 		return false;
 	}
 
-//	/** Ejecuta un script en OS X.
-//	 * @param path Ruta donde se encuentra el <i>script</i>.
-//	 * @param administratorMode <code>true</code> el <i>script</i> se ejecuta como permisos de adminsitrador, <code>false</code> en caso contrario.
-//	 * @param delete <code>true</code> se borra el fichero despu&eacute;s de haberse ejecutado.
-//	 * @return El objeto que da como resultado el <i>script</i>, o <code>null</code> en caso contrario.
-//	 * @throws IOException Excepci&oacute;n lanzada en caso de ocurrir alg&uacute;n error en la ejecuci&oacute;n del <i>script</i>. */
-//	public static Object executeScriptMacOsx(final String path, final boolean administratorMode, final boolean delete) throws IOException {
-//
-//		final ScriptEngine se = MozillaKeyStoreUtilitiesOsX.getAppleScriptEngine();
-//		if (se != null) {
-//			LOGGER.info("Path del script: " + path); //$NON-NLS-1$
-//			try {
-//				Object o;
-//				if (administratorMode){
-//					o = se.eval("do shell script \"" + path + "\" with administrator privileges"); //$NON-NLS-1$ //$NON-NLS-2$
-//				}
-//				else {
-//					o = se.eval("do shell script \"" + path + "\" "); //$NON-NLS-1$ //$NON-NLS-2$
-//				}
-//				if (delete){
-//					final File scriptInstall = new File(path);
-//					if (scriptInstall.exists()){
-//						scriptInstall.delete();
-//					}
-//				}
-//				return o;
-//			}
-//			catch (final ScriptException e) {
-//				throw new IOException("Error en la ejecucion del script via AppleScript: " + e, e); //$NON-NLS-1$
-//			}
-//		}
-//		LOGGER.severe(
-//			"No se ha podido instanciar el motor AppleScript" //$NON-NLS-1$
-//		);
-//		return null;
-//	}
 
 	private static void importCARootOnFirefoxKeyStore (final File appConfigDir,
 			                                           final Set<File> profilesDir) {
@@ -640,8 +687,8 @@ final class RestoreConfigFirefox {
 						);
 				final int result = JOptionPane.showConfirmDialog(
 						null,
-						Messages.getString("RestoreConfigWindows.10"), //$NON-NLS-1$
-						Messages.getString("RestoreConfigWindows.1"), //$NON-NLS-1$
+						SimpleAfirmaMessages.getString("RestoreConfigWindows.10"), //$NON-NLS-1$
+						SimpleAfirmaMessages.getString("RestoreConfigWindows.1"), //$NON-NLS-1$
 						JOptionPane.OK_CANCEL_OPTION,
 						JOptionPane.WARNING_MESSAGE
 						);
@@ -776,6 +823,7 @@ final class RestoreConfigFirefox {
 
 	private static void deleteConfigDir(final File appConfigDir) {
 		RestoreConfigUtil.deleteDir(new File(appConfigDir, DIR_CERTUTIL));
+	
 	}
 
 	static void copyConfigurationFiles(final File appConfigDir) throws IOException {
@@ -1034,28 +1082,43 @@ final class RestoreConfigFirefox {
 	 * @param commands Nombre del comando y argumentos
 	 * @return {@code true} si la ejecuci&oacute;n devolvioacute; alg&uacute;n error {@code false} en caso contrario
 	 */
-	private static Boolean execCommand(final String[] command) {
+	private static Boolean execCommand(final String[] command) throws IOException {
 				
 		Boolean error = Boolean.FALSE;
-		Process p;
 		
-		try {
-			
-			p = Runtime.getRuntime().exec(command);
-			
-			p.waitFor();
-					
-			LOGGER.info("Ejecutado " + Arrays.toString(command));
-		
-		} catch (IOException e) {
-			
-			e.printStackTrace();
-			LOGGER.severe("Error al ejecutar " + Arrays.toString(command));
-			error = Boolean.TRUE;
-		} catch (InterruptedException ie) {
-			
+		LOGGER.info("Se ejecutara el siguiente comando:\n" + Arrays.toString(command)); //$NON-NLS-1$
+		final Process process = new ProcessBuilder(command).start();
+		// Cuando se instala correctamente no hay salida de ningun tipo, asi que se interpreta
+		// cualquier salida como un error
+		String line;
+		try (
+				final InputStream resIs = process.getInputStream();
+				final BufferedReader resReader = new BoundedBufferedReader(
+						new InputStreamReader(resIs),
+						256, // Maximo 256 lineas de salida
+						1024 // Maximo 1024 caracteres por linea
+						);
+				) {
+			while ((line = resReader.readLine()) != null) {
+				LOGGER.severe(line);
+				return true;
+			}
 		}
-				
+
+		try (
+				final InputStream errIs = process.getErrorStream();
+				final BufferedReader errReader = new BoundedBufferedReader(
+						new InputStreamReader(errIs),
+						256, // Maximo 256 lineas de salida
+						1024 // Maximo 1024 caracteres por linea
+						);
+				) {
+			while ((line = errReader.readLine()) != null) {
+				LOGGER.severe(line);
+				return true;
+			}
+		}
+								
 		return error;
 	}
 }

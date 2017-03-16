@@ -30,7 +30,7 @@ final class RestoreConfigLinux implements RestoreConfig {
     /**
      * Caracter de salto de l&iacute;nea para los mensajes de la consola de restauraci&oacute;n
      */
-    private String newline = System.getProperty("line.separator");
+    private String newline = System.getProperty("line.separator"); //$NON-NLS-1$
 
 	/* (non-Javadoc)
 	 * @see es.gob.afirma.standalone.ui.restoreconfig.RestoreConfig#restore(javax.swing.JTextArea)
@@ -38,7 +38,7 @@ final class RestoreConfigLinux implements RestoreConfig {
 	@Override
 	public void restore(JTextArea taskOutput) throws IOException, GeneralSecurityException {
 		
-		appendMessage(taskOutput, SimpleAfirmaMessages.getString("RestoreConfigLinux.2"));
+		appendMessage(taskOutput, SimpleAfirmaMessages.getString("RestoreConfigLinux.2")); //$NON-NLS-1$
 
 		final File appDir = RestoreConfigUtil.getApplicationDirectory();
 
@@ -81,6 +81,7 @@ final class RestoreConfigLinux implements RestoreConfig {
 
 			closeChrome();
 
+			RestoreConfigFirefox.uninstallRootCAMozillaKeyStore(appDir);
 			RestoreConfigFirefox.installRootCAChromeKeyStore(appDir, command);
 
 			// Cerramos el almacen de firefox si esta abierto
@@ -93,8 +94,16 @@ final class RestoreConfigLinux implements RestoreConfig {
 			// //$NON-NLS-1$
 		}
 		
+		appendMessage(taskOutput, SimpleAfirmaMessages.getString("RestoreConfigLinux.15")); //$NON-NLS-1$
 		// Restauracion del fichero de configuracion de protocolo afirma en Linux
-		restoreProtocolHandler();
+		try {
+			restoreProtocolHandler();
+		} catch (IOException e) {
+			appendMessage(taskOutput, SimpleAfirmaMessages.getString("RestoreConfigLinux.16")); //$NON-NLS-1$
+			LOGGER.severe("Excepcion en la creacion del script linux para la configuracion del protocolo afirma: " + e //$NON-NLS-1$
+			);
+			
+		}
 
 		appendMessage(taskOutput, SimpleAfirmaMessages.getString("RestoreConfigLinux.8")); //$NON-NLS-1$
 
@@ -137,7 +146,7 @@ final class RestoreConfigLinux implements RestoreConfig {
 			File sslKey = new File(appDir, KS_FILENAME);
 			
 			if (!sslKey.delete()) {
-				throw new IOException("No puedo eliminar autofirma.pfx");
+				throw new IOException("No puedo eliminar autofirma.pfx"); //$NON-NLS-1$
 			}
 			
 		}
@@ -147,7 +156,7 @@ final class RestoreConfigLinux implements RestoreConfig {
 			File sslRoot = new File(appDir, FILE_AUTOFIRMA_CERTIFICATE);
 			
 			if (!sslRoot.delete()) {
-				throw new IOException("No puedo eliminar AutoFirma_ROOT.cer");
+				throw new IOException("No puedo eliminar AutoFirma_ROOT.cer"); //$NON-NLS-1$
 			}
 
 		}
@@ -159,7 +168,7 @@ final class RestoreConfigLinux implements RestoreConfig {
 	 */
 	private static void closeFirefox() {
 
-		while (isProcessRunningLinux("/usr/lib/firefox/firefox")) {
+		while (isProcessRunningLinux("/usr/lib/firefox/firefox")) { //$NON-NLS-1$
 			JOptionPane.showMessageDialog(
 					null,
 					SimpleAfirmaMessages.getString("RestoreAutoFirma.7"), //$NON-NLS-1$
@@ -173,7 +182,7 @@ final class RestoreConfigLinux implements RestoreConfig {
 	 */
 	private static void closeChrome() {
 
-		while (isProcessRunningLinux("/opt/google/chrome/chrome")) {
+		while (isProcessRunningLinux("/opt/google/chrome/chrome")) { //$NON-NLS-1$
 			JOptionPane.showMessageDialog(
 					null,
 					SimpleAfirmaMessages.getString("RestoreAutoFirma.8"), //$NON-NLS-1$
@@ -190,17 +199,16 @@ final class RestoreConfigLinux implements RestoreConfig {
 	private static Boolean isProcessRunningLinux(final String process) {
 		
 		String line;
-		String pidInfo ="";
+		String pidInfo =""; //$NON-NLS-1$
 		Boolean isRunning = Boolean.FALSE;
 		
 		Process p;
 		try {
 															
-			String[] commands = { "/bin/bash", "-c", "ps -aux"};
-			p = Runtime.getRuntime().exec(commands);
+			String[] commands = { "/bin/bash", "-c", "ps -aux"}; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			
-			p.waitFor();
-					
+			p = new ProcessBuilder(commands).start();
+											
 			BufferedReader input =  new BufferedReader(new InputStreamReader(p.getInputStream()));
 
 			while ((line = input.readLine()) != null) {
@@ -210,12 +218,8 @@ final class RestoreConfigLinux implements RestoreConfig {
 			input.close();
 			
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			LOGGER.severe("Error al detectar si el proceso " + process + " esta activo");
-		} catch (InterruptedException ie) {
-			
-		}
+			LOGGER.severe("Error al detectar si el proceso " + process + " esta activo"); //$NON-NLS-1$ //$NON-NLS-2$
+		} 
 
 		if(pidInfo.contains(process))
 		{
@@ -234,37 +238,29 @@ final class RestoreConfigLinux implements RestoreConfig {
 		
 		final StringBuilder sb = new StringBuilder();
 
-		sb.append("pref(\"network.protocol-handler.app.afirma\",\"/usr/bin/AutoFirma\");");
-		sb.append(" ");
-		sb.append("pref(\"network.protocol-handler.warn-external.afirma\",false);");
-		sb.append(" ");
-		sb.append("pref(\"network.protocol-handler.external.afirma\",true);");
+		sb.append("pref(\"network.protocol-handler.app.afirma\",\"/usr/bin/AutoFirma\");"); //$NON-NLS-1$
+		sb.append(" "); //$NON-NLS-1$
+		sb.append("pref(\"network.protocol-handler.warn-external.afirma\",false);"); //$NON-NLS-1$
+		sb.append(" "); //$NON-NLS-1$
+		sb.append("pref(\"network.protocol-handler.external.afirma\",true);"); //$NON-NLS-1$
 		sb.append("\n"); //$NON-NLS-1$
 
 		// Obtenemos la ruta de los scripts
-		String path = new File(new File("/etc/firefox/pref"), LINUX_PROTOCOL_SCRIPT_NAME).getAbsolutePath();
+		String path = new File(new File("/etc/firefox/pref"), LINUX_PROTOCOL_SCRIPT_NAME).getAbsolutePath(); //$NON-NLS-1$
 		final File protocolScript = new File(path);
 
-		try {
+		if (new File(new File("/etc/firefox/pref"), LINUX_PROTOCOL_SCRIPT_NAME).exists()) { //$NON-NLS-1$
 
-			if (new File(new File("/etc/firefox/pref"), LINUX_PROTOCOL_SCRIPT_NAME).exists()) {
+			File afirmaProtocol = new File(new File("/etc/firefox/pref"), LINUX_PROTOCOL_SCRIPT_NAME); //$NON-NLS-1$
 
-				File afirmaProtocol = new File(new File("/etc/firefox/pref"), LINUX_PROTOCOL_SCRIPT_NAME);
-
-				if (!afirmaProtocol.delete()) {
-					throw new IOException("No puedo eliminar AutoFirma.js");
-				}
+			if (!afirmaProtocol.delete()) {
+				throw new IOException("No puedo eliminar AutoFirma.js"); //$NON-NLS-1$
 			}
-
-			final FileOutputStream fout = new FileOutputStream(protocolScript, true);
-			fout.write(sb.toString().getBytes());
-			fout.close();
-
-		} catch (IOException e) {
-			LOGGER.severe("Excepcion en la creacion del script linux para la configuracion del protocolo afirma: " + e //$NON-NLS-1$
-			);
-			return true;
 		}
+
+		final FileOutputStream fout = new FileOutputStream(protocolScript, true);
+		fout.write(sb.toString().getBytes());
+		fout.close();
 
 		return false;
 	}
