@@ -276,8 +276,8 @@ public final class UrlParametersToSign extends UrlParameters {
 			setSticky(Boolean.FALSE);
 		}
 
-		setDefaultKeyStore(getDefaultKeyStoreName(params));
-		setDefaultKeyStoreLib(getDefaultKeyStoreLib(params));
+		setDefaultKeyStore(UrlParameters.getDefaultKeyStoreName(params));
+		setDefaultKeyStoreLib(UrlParameters.getDefaultKeyStoreLib(params));
 
 	}
 
