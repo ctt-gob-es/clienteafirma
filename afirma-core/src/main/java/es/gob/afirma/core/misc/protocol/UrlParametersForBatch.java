@@ -42,7 +42,6 @@ public final class UrlParametersForBatch extends UrlParameters {
 
 	private String minimumVersion;
 	
-	
 	/**
 	 * Opci&oacute;n de configuraci&oacute;n que determina si se debe mantener
 	 * el primer certificado seleccionado para todas las operaciones. 
@@ -57,16 +56,6 @@ public final class UrlParametersForBatch extends UrlParameters {
 
 	void setBatchPresignerUrl(final String url) {
 		this.batchPreSignerUrl = url;
-	}
-
-	/** Obtiene la URL del servicio de preprocesado de lotes de firma.
-	 * @return URL del servicio de preprocesado de lotes de firma. */
-	public String getBatchPostSignerUrl() {
-		return this.batchPostSignerUrl;
-	}
-
-	void setBatchPostsignerUrl(final String url) {
-		this.batchPostSignerUrl = url;
 	}
 	
 	/**
@@ -88,6 +77,16 @@ public final class UrlParametersForBatch extends UrlParameters {
 	 */
 	public void setSticky(final Boolean sticky) {
 		this.sticky = sticky;
+	}
+
+	/** Obtiene la URL del servicio de preprocesado de lotes de firma.
+	 * @return URL del servicio de preprocesado de lotes de firma. */
+	public String getBatchPostSignerUrl() {
+		return this.batchPostSignerUrl;
+	}
+
+	void setBatchPostsignerUrl(final String url) {
+		this.batchPostSignerUrl = url;
 	}
 
 	void setBatchParameters(final Map<String, String> params) throws ParameterException {
@@ -135,9 +134,9 @@ public final class UrlParametersForBatch extends UrlParameters {
 			);
 		}
 
-		setDefaultKeyStore(getDefaultKeyStoreName(params));
-		setDefaultKeyStoreLib(getDefaultKeyStoreLib(params));
-
+		setDefaultKeyStore(UrlParameters.getDefaultKeyStoreName(params));
+		setDefaultKeyStoreLib(UrlParameters.getDefaultKeyStoreLib(params));
+				
 		setBatchPostsignerUrl(
 			validateURL(
 				params.get(PARAM_BATCH_POSTSIGNER)
@@ -187,12 +186,12 @@ public final class UrlParametersForBatch extends UrlParameters {
 		// Valor de parametro sticky
 		if (params.containsKey(STICKY_PARAM)) {
 			setSticky(new Boolean(params.get(STICKY_PARAM)));
-		}
-		else {
+		} else {
 			setSticky(Boolean.FALSE);
 		}
 
 		setDefaultKeyStore(getDefaultKeyStoreName(params));
+		setDefaultKeyStoreLib(getDefaultKeyStoreLib(params));
 	}
 
 	/** Obtiene la versi&oacute;n m&iacute;nima requerida del aplicativo.
