@@ -46,34 +46,83 @@ final class Pkcs11Txt {
 			);
 			return new ArrayList<ModuleName>(0);
 		}
-		final List<ModuleName> ret = new ArrayList<ModuleName>();
-		final Reader fr = new FileReader(f);
-		final BufferedReader br = new BoundedBufferedReader(
-			fr,
-			512, // Maximo 512 lineas
-			4096 // Maximo 4KB por linea
-		);
-	    String line;
-	    while ((line = br.readLine()) != null) {
-	    	final String lib = AOUtil.getRDNvalueFromLdapName("library", line.replace(" ", ",")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-	    	if (lib != null && !lib.trim().isEmpty()) {
-	    		ret.add(
-    				new ModuleName(
-						lib.trim(),
-						line.substring(
-								   line.indexOf(NAME_SEARCH_TOKEN) + NAME_SEARCH_TOKEN.length(),
-								   line.indexOf(
-									   '"',
-									   line.indexOf(NAME_SEARCH_TOKEN) + NAME_SEARCH_TOKEN.length()
-								   )
-							   )
-					)
-				);
-	    	}
-	    }
-	    br.close();
-	    fr.close();
+		final List<ModuleName> ret = getModules(f);
 	    return ret;
+	}
+
+	static List<ModuleName> getModules(final File f)	throws  IOException {
+
+		Reader fr = null;
+		try {
+			fr = new FileReader(f);
+			final List<ModuleName> ret = getModules(fr);
+			return ret;
+		}
+		finally {
+			if (fr != null) {
+				fr.close();
+			}
+		}
+	}
+
+  static List<ModuleName> getModules(final Reader fr)
+			throws IOException {
+		final List<ModuleName> ret = new ArrayList<ModuleName>();
+		BufferedReader br = null;
+		try {
+			br = new BoundedBufferedReader(
+				fr,
+				512, // Maximo 512 lineas
+				4096 // Maximo 4KB por linea
+			);
+		    String line;
+		    String foundLib = null;
+		    String foundName = null;
+		    while ((line = br.readLine()) != null) {
+		    	if (line.trim().isEmpty()) {
+		    		// Una linea en blanco es una nueva seccion
+		    		foundLib = null;
+		    		foundName = null;
+		    		continue;
+		    	}
+		    	final String lib = AOUtil.getRDNvalueFromLdapName("library", line.replace(" ", ",")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		    	if (lib != null && !lib.trim().isEmpty()) {
+		    		if (line.contains(NAME_SEARCH_TOKEN)) {
+			    		ret.add(
+		    				new ModuleName(
+								lib.trim(),
+								line.substring(
+										   line.indexOf(NAME_SEARCH_TOKEN) + NAME_SEARCH_TOKEN.length(),
+										   line.indexOf(
+											   '"',
+											   line.indexOf(NAME_SEARCH_TOKEN) + NAME_SEARCH_TOKEN.length()
+										   )
+									   )
+							)
+						);
+			    		foundLib = null;
+			    		foundName = null;
+		    		}
+		    		else {
+		    			foundLib = lib.trim();
+		    		}
+		    	}
+		    	else if (line.startsWith("name=")){ //$NON-NLS-1$
+		    		foundName = line.substring("name=".length()).trim(); //$NON-NLS-1$
+		    	}
+		    	if (foundLib != null && foundName != null && !foundLib.isEmpty() && !foundName.isEmpty()){
+		    		ret.add(new ModuleName(foundLib, foundName));
+		    		foundLib = null;
+		    		foundName = null;
+		    	}
+		    }
+		}
+		finally {
+			if (br != null) {
+				br.close();
+			}
+		}
+		return ret;
 	}
 
 }

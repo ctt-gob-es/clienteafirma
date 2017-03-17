@@ -72,8 +72,14 @@ public final class MozillaKeyStoreUtilitiesOsX {
 				"libnss3.dylib" // Detectado en Firefox 30, quizas se introdujo en versiones anteriores //$NON-NLS-1$
 		};
 
-		// Creamos enlaces simbolicos via AppleScript
+		// Creamos via AppleScript enlaces simbolicos en un directorio de bibliotecas para que
+		// se tomen de ahi las dependencias
 		final StringBuilder sb = new StringBuilder();
+
+		if (!new File(LIBRARY_FOLDER).exists()) {
+			sb.append("mkdir ").append(LIBRARY_FOLDER).append("; "); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+
 		for (final String lib : libs) {
 			if (new File(nssBinDir + lib).exists()) {
 				sb.append("ln -s "); //$NON-NLS-1$
@@ -94,8 +100,8 @@ public final class MozillaKeyStoreUtilitiesOsX {
 			}
 			else {
 				LOGGER.severe(
-					"No se ha podido instanciar el motor AppleScript para crear los enlaces simbolicos para NSS" //$NON-NLS-1$
-				);
+						"No se ha podido instanciar el motor AppleScript para crear los enlaces simbolicos para NSS" //$NON-NLS-1$
+						);
 			}
 		}
 		catch(final Exception e) {
@@ -146,6 +152,7 @@ public final class MozillaKeyStoreUtilitiesOsX {
 		for (final String path : paths) {
 			if (new File(path + "/libsoftokn3.dylib").exists()) { //$NON-NLS-1$
 				nssLibDir = path;
+				break;
 			}
 		}
 

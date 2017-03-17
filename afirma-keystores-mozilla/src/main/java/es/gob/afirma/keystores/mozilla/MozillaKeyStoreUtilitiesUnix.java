@@ -22,8 +22,6 @@ final class MozillaKeyStoreUtilitiesUnix {
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
-
-
 	private static final String SOFTOKN3_SO = "libsoftokn3.so"; //$NON-NLS-1$
 
 	private static final String[] NSS_PATHS = new String[] {
@@ -59,7 +57,7 @@ final class MozillaKeyStoreUtilitiesUnix {
 		String nssLibDir = null;
 
 		for (final String path : NSS_PATHS) {
-			if (new File(path + "/" + SOFTOKN3_SO).exists()){
+			if (new File(path, SOFTOKN3_SO).exists()){
 				nssLibDir = path;
 			}
 		}
@@ -68,9 +66,9 @@ final class MozillaKeyStoreUtilitiesUnix {
 		}
 
 		for (final String path : NSS_PATHS) {
-			File dir = new File(path);
+			final File dir = new File(path);
 			for (final String tailingLib: SQLITE_LIBS) {
-				File library = new File(dir, tailingLib);
+				final File library = new File(dir, tailingLib);
 				if (library.exists()) {
 					try {
 						System.load(library.getAbsolutePath());

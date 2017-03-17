@@ -43,7 +43,7 @@ public final class SharedNssUtil {
 		if (!f.isDirectory()) {
 			f = new File(NSSDB_PATH_UNIX_GLOBAL);
 			if (!f.isDirectory()) {
-				throw new FileNotFoundException();
+				throw new FileNotFoundException("No se ha encontrado el directorio del almacen del sistema"); //$NON-NLS-1$
 			}
 		}
 		if (f.listFiles(

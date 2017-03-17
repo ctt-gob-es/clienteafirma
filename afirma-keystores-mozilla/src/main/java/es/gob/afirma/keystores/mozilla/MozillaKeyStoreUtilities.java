@@ -51,6 +51,9 @@ public final class MozillaKeyStoreUtilities {
 	/** Nombre del PKCS#11 NSS en Windows. */
 	private static final String SOFTOKN3_DLL = "softokn3.dll"; //$NON-NLS-1$
 
+	/** Nombre del fichero que declara los m&oacute;dulos de NSS en sustituci&oacute;n a secmod.db */
+	private static final String PKCS11TXT_FILENAME = "pkcs11.txt"; //$NON-NLS-1$
+
 	private static final String AFIRMA_NSS_HOME = "AFIRMA_NSS_HOME"; //$NON-NLS-1$
 
 	private static final String AFIRMA_PROFILES_INI = "AFIRMA_PROFILES_INI"; //$NON-NLS-1$
@@ -60,17 +63,56 @@ public final class MozillaKeyStoreUtilities {
 	/** Nombres del controlador nativo de DNIe en sistemas no-Linux (Windows, OS X, etc.). */
 	private static final String[] DNI_P11_NAMES = new String[] {
 		"libopensc-dnie.dylib", //$NON-NLS-1$
+		"libpkcs11-dnie.so", //$NON-NLS-1$
 		"usrpkcs11.dll", //$NON-NLS-1$
 		"dnie_p11_priv.dll", //$NON-NLS-1$
 		"dnie_p11_pub.dll", //$NON-NLS-1$
 		"opensc-pkcs11.dll", //$NON-NLS-1$
-		"FNMT_P11.dll", //$NON-NLS-1$
+		"DNIE_P11.dll", //$NON-NLS-1$
 		"TIF_P11.dll"//$NON-NLS-1$
 	};
 
-	private static final String[][] KNOWN_MODULES = new String[][] {
-		new String[] { "Atos CardOS (preinstalado)", "siecap11.dll"    }  //$NON-NLS-1$ //$NON-NLS-2$
-	};
+	/**
+	 * M&oacute;dulos de los que se conoce el nombre de su biblioteca para que se agregue
+	 * junto al listado de m&oacute;dulos configurados en Mozilla Firefox para intentar
+	 * cargarlos. Las propiedades establecidas para cada uno de ellos son:
+	 * - Nombre descriptivo de la biblioteca
+	 * - Nombre del fichero de la biblioteca
+	 * - Si se desea o no que se intente su carga aunque no se encuentre su blioteca en
+	 *   el sistema.
+	 * Este &uacute;ltimo par&aacute;metro es necesario para la carga de las bibliotecas de la FNMT
+	 * ya que Java nos oculta el nombre de fichero en el directorio de 64 bits, pero lo necesita para
+	 * la carga.
+	 */
+	private enum KnownModule {
+		ATOS_CARDOS("Atos CardOS (preinstalado)", "siecap11.dll", Platform.OS.WINDOWS, false), //$NON-NLS-1$ //$NON-NLS-2$
+		FNMT_64("FNMT-RCM Modulo PKCS#11 64bits", "FNMT_P11_x64.dll", Platform.OS.WINDOWS, true), //$NON-NLS-1$ //$NON-NLS-2$
+		FNMT_32("FNMT-RCM Modulo PKCS#11 32bits", "FNMT_P11.dll", Platform.OS.WINDOWS, true); //$NON-NLS-1$ //$NON-NLS-2$
+
+		private String description;
+		private String lib;
+		private Platform.OS os;
+		private boolean forcedLoad;
+		private KnownModule(String description, String lib, Platform.OS os, boolean forcedLoad) {
+			this.description = description;
+			this.lib = lib;
+			this.forcedLoad = forcedLoad;
+			this.os = os;
+		}
+
+		String getDescription() {
+			return this.description;
+		}
+		String getLib() {
+			return this.lib;
+		}
+		boolean isForcedLoad() {
+			return this.forcedLoad;
+		}
+		public Platform.OS getOs() {
+			return this.os;
+		}
+	}
 
 	private MozillaKeyStoreUtilities() {
 		// No permitimos la instanciacion
@@ -134,6 +176,7 @@ public final class MozillaKeyStoreUtilities {
 			getMozillaUserProfileDirectory(),
 			"compatibility.ini"  //$NON-NLS-1$
 		);
+		String dir = null;
 		if (compatibility.exists() && compatibility.canRead()) {
 			final InputStream fis = new FileInputStream(compatibility);
 			// Cargamos el fichero con la codificacion por defecto (que es la que con mas probabilidad tiene el fichero)
@@ -143,21 +186,20 @@ public final class MozillaKeyStoreUtilities {
 				4096 // Maximo 4KB por linea
 			);
 			String line;
-			String dir = null;
-			while ((line = br.readLine()) != null) {
+			while ((line = br.readLine()) != null && dir == null) {
 			    if (line.startsWith("LastPlatformDir=")) { //$NON-NLS-1$
 			    	dir = line.replace("LastPlatformDir=", "").trim(); //$NON-NLS-1$ //$NON-NLS-2$
-					break;
 			    }
 			}
 			br.close();
-			if (dir != null) {
-				return dir;
-			}
 		}
-		throw new FileNotFoundException(
-			"No se ha podido determinar el directorio de NSS en Windows a partir de 'compatibility.ini' de Firefox" //$NON-NLS-1$
-		);
+
+		if (dir == null) {
+			throw new FileNotFoundException(
+					"No se ha podido determinar el directorio de NSS en Windows a partir de 'compatibility.ini' de Firefox" //$NON-NLS-1$
+					);
+		}
+		return dir;
 	}
 
 	/** Obtiene el directorio de las bibliotecas NSS (<i>Netscape Security
@@ -210,20 +252,21 @@ public final class MozillaKeyStoreUtilities {
 			nssLibDir = MozillaKeyStoreUtilitiesOsX.getSystemNSSLibDirMacOsX();
 		}
 
-		if (nssLibDir != null) {
-			return nssLibDir;
+		if (nssLibDir == null) {
+			throw new FileNotFoundException(
+					"No se han encontrado bibliotecas NSS instaladas en su sistema operativo" //$NON-NLS-1$
+				);
 		}
 
-		throw new FileNotFoundException(
-			"No se han encontrado bibliotecas NSS instaladas en su sistema operativo" //$NON-NLS-1$
-		);
+		return nssLibDir;
 	}
 
 	/** Obtiene las rutas completas hacia las bibliotecas (.dll o .so) de los
 	 * m&oacute;dulos de seguridad externos (PKCS#11) instalados en Mozilla /
 	 * Firefox, indexados por su descripci&oacute;n dentro de un <code>ConcurrentHashMap</code>.
-	 * @param excludeDnie Si se establece a <code>true</code> excluye los m&oacute;dulos PKCS#11
-	 *                    del DNIe, si se establece a <code>false</code> deja estos m&oacute;dulos en
+	 * <b>ADVERTENCIA:</b> Los PKCS#11 de DNIe se excluyen siempre de este listado.
+	 * @param excludePreferredModules Si se establece a <code>true</code> excluye los m&oacute;dulos PKCS#11
+	 *                    del DNIe y CERES, si se establece a <code>false</code> deja estos m&oacute;dulos en
 	 *                    caso de que se encontrasen.
 	 * @param includeKnownModules Si se establece a <code>true</code> se incluyen m&oacute;dulos PKCS#11 que
 	 *                            est&eacute;n en el directorio de bibliotecas del sistema pero no en la
@@ -231,13 +274,13 @@ public final class MozillaKeyStoreUtilities {
 	 *                            establece a <code>false</code> se devuelven &uacute;nicamente los
 	 *                            m&oacute;dulos PKCS#11 de la base de datos.
 	 * @return Nombres de las bibliotecas de los m&oacute;dulos de seguridad de Mozilla / Firefox */
-	static Map<String, String> getMozillaPKCS11Modules(final boolean excludeDnie,
+	static Map<String, String> getMozillaPKCS11Modules(final boolean excludePreferredModules,
 			                                           final boolean includeKnownModules) {
-		if (!excludeDnie) {
-			LOGGER.info("Se incluiran los modulos nativos de DNIe si se encuentran configurados"); //$NON-NLS-1$
+		if (!excludePreferredModules) {
+			LOGGER.info("Se incluiran los modulos nativos de DNIe/CERES si se encuentran configurados"); //$NON-NLS-1$
 		}
 		else {
-			LOGGER.info("Se excluiran los modulos nativos de DNIe en favor del controlador 100% Java"); //$NON-NLS-1$
+			LOGGER.info("Se excluiran los modulos nativos de DNIe/CERES en favor del controlador 100% Java"); //$NON-NLS-1$
 		}
 
 		final String profileDir;
@@ -264,7 +307,7 @@ public final class MozillaKeyStoreUtilities {
 
 		LOGGER.info("Obtenidos los modulos externos de Mozilla desde 'secmod.db'"); //$NON-NLS-1$
 
-		return getPkcs11ModulesFromModuleNames(modules, includeKnownModules, excludeDnie);
+		return getPkcs11ModulesFromModuleNames(modules, includeKnownModules, excludePreferredModules);
 	}
 
 	/** Obtiene los m&oacute;dulos PKCS#11 a partir de sus descripciones.
@@ -272,12 +315,13 @@ public final class MozillaKeyStoreUtilities {
 	 * @param includeKnownModules <code>true</code> si se desea incluir m&oacute;dulos PKCS#11 que comunmente est&aacute;n
 	 *                            instalados en un sistema (y solo si realmente lo est&aacute;s) aunque no est&eacute;n
 	 *                            en la lista de descripciones proporcionada, <code>false</code> en caso contrario.
-	 * @param excludeDnie <code>true</code> si se desea excluir los m&oacute;dulos PKCS#11 de DNIe aunque est&eacute;n
-	 *                    en la lista de descripciones proporcionada, <code>false</code> en caso contrario.
+	 * @param excludePreferredModules <code>true</code> si se desea excluir los m&oacute;dulos PKCS#11 de DNIe y
+	 *								CERES aunque est&eacute;n en la lista de descripciones proporcionada,
+	 *								<code>false</code> en caso contrario.
 	 * @return M&oacute;dulos PKCS#11. */
 	public static Map<String, String> getPkcs11ModulesFromModuleNames(final List<ModuleName> modules,
 			                                                          final boolean includeKnownModules,
-			                                                          final boolean excludeDnie) {
+			                                                          final boolean excludePreferredModules) {
 
 		if (modules == null) {
 			return new ConcurrentHashMap<String, String>(0);
@@ -287,24 +331,34 @@ public final class MozillaKeyStoreUtilities {
 
 		for (final AOSecMod.ModuleName module : modules) {
 			final String moduleLib =  module.getLib();
-			if (excludeDnie && isDniePkcs11Library(moduleLib)) {
+			if (excludePreferredModules && isDniePkcs11Library(moduleLib)) {
 				continue;
 			}
 			modsByDesc.put(module.getDescription(), moduleLib);
 		}
 
 		// Creamos una copia de modsByDesc para evitar problemas de concurrencia
-		// (nunca soltara exceciones por usar ConcurrentHashMap, pero no significa
+		// (nunca soltara excepciones por usar ConcurrentHashMap, pero no significa
 		// que los problemas no ocurran si no se toman medidas).
 		final ConcurrentHashMap<String, String> modsByDescCopy = new ConcurrentHashMap<String, String>(modsByDesc.size());
 		modsByDescCopy.putAll(modsByDesc);
 
+		// Incluimos si aplica los modulos conocidos (aquellos de los que sin estar configurados sabemos
+		// el nombre) y los agregamos. No lo hacemos cuando se trate de una biblioteca preferida y se haya
+		// indicado que se excluyan
 		if (includeKnownModules) {
-			for (final String[] knownModules : KNOWN_MODULES) {
-				if (!isModuleIncluded(modsByDescCopy, knownModules[1])) {
-					final String modulePath = getWindowsSystemDirWithFinalSlash() + knownModules[1];
-					if (new File(modulePath).exists()) {
-						modsByDesc.put(knownModules[0], knownModules[1]);
+			for (final KnownModule knownModule : KnownModule.values()) {
+				// Si el modulo no se corresponde con el sistema actual, se omite
+				if (!Platform.getOS().equals(knownModule.getOs())) {
+					continue;
+				}
+				if (excludePreferredModules && isDniePkcs11Library(knownModule.getLib())) {
+					continue;
+				}
+				if (!isModuleIncluded(modsByDescCopy, knownModule.getLib())) {
+					final String modulePath = getWindowsSystemDirWithFinalSlash() + knownModule.getLib();
+					if (knownModule.isForcedLoad() || new File(modulePath).exists()) {
+						modsByDesc.put(knownModule.getDescription(), modulePath);
 					}
 				}
 			}
@@ -583,16 +637,28 @@ public final class MozillaKeyStoreUtilities {
 	                                                           NoSuchMethodException,
 	                                                           SecurityException,
 	                                                           ClassNotFoundException {
+
 		final String nssDirectory = MozillaKeyStoreUtilities.getSystemNSSLibDir();
+
+		String profileDir = useSharedNss ?
+				SharedNssUtil.getSharedUserProfileDirectory() :
+					MozillaKeyStoreUtilities.getMozillaUserProfileDirectory();
+
+		// Consideramos que se debe cargar el fichero de modulos de NSS en modo de base de datos
+		// cuando se encuentra la variable de sistema NSS_DEFAULT_DB_TYPE o se encuentra el fichero pkcs11.txt
+		try {
+			if ("sql".equals(System.getenv("NSS_DEFAULT_DB_TYPE")) || new File(profileDir, PKCS11TXT_FILENAME).exists()) { //$NON-NLS-1$ //$NON-NLS-2$
+				profileDir = "sql:/" + profileDir; //$NON-NLS-1$
+			}
+		}
+		catch (final Exception e) {
+			LOGGER.warning("No se pudo comprobar si el almacen de claves debia cargase como base de datos: " + e); //$NON-NLS-1$
+		}
+
 		final String p11NSSConfigFile = MozillaKeyStoreUtilities.createPKCS11NSSConfigFile(
-			("sql".equals(System.getenv("NSS_DEFAULT_DB_TYPE")) ? //$NON-NLS-1$ //$NON-NLS-2$
-				"sql:/" : //$NON-NLS-1$
-					"") + //$NON-NLS-1$
-						(useSharedNss ?
-							SharedNssUtil.getSharedUserProfileDirectory() :
-								MozillaKeyStoreUtilities.getMozillaUserProfileDirectory()),
-			nssDirectory
-		);
+				profileDir,
+				nssDirectory
+				);
 
 		// Quitamos el directorio del usuario del registro, para evitar que contenga datos personales
 		LOGGER.info("Configuracion de NSS para SunPKCS11:\n" + p11NSSConfigFile.replace(Platform.getUserHome(), "USERHOME")); //$NON-NLS-1$ //$NON-NLS-2$
