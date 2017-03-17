@@ -10,10 +10,8 @@
 
 package es.gob.afirma.core.misc.protocol;
 
-import java.io.IOException;
 import java.net.URL;
 import java.net.URLDecoder;
-import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Properties;
@@ -46,8 +44,12 @@ public abstract class UrlParameters {
 	/** Par&aacute;metro de entrada con el identificador del fichero remoto de datos. */
 	protected static final String FILE_ID_PARAM = "fileid"; //$NON-NLS-1$
 
-	/** Par&aacute;metro que identifica el <i>User Agent</i> del navegador Web usado. */
-	private static final String KEYSTORE ="keystore"; //$NON-NLS-1$
+	//TODO: Eliminar para terminar la compatibilidad con AutoFirma 1.4.X
+	/** Viejo par&aacute;metro de entrada con la configuraci&oacute;n del almac&eacute;n de claves. */
+	protected static final String KEYSTORE_OLD_PARAM = "keystore"; //$NON-NLS-1$
+
+	/** Par&aacute;metro de entrada con la configuraci&oacute;n del almac&eacute;n de claves en base64. */
+	protected static final String KEYSTORE_PARAM = "ksb64"; //$NON-NLS-1$
 
 	/** Codificaci&oacute;n por defecto. */
 	private static final String DEFAULT_ENCODING = "utf-8"; //$NON-NLS-1$
@@ -58,6 +60,7 @@ public abstract class UrlParameters {
 	private URL retrieveServletUrl = null;
 	private URL storageServer = null;
 	private String id = null;
+	//private String keyStoreConfig = null;
 	private String defaultKeyStore = null;
 	private String defaultKeyStoreLib = null;
 	private Properties extraParams = null;
@@ -302,16 +305,20 @@ public abstract class UrlParameters {
 	protected static String getDefaultKeyStoreName(final Map<String, String> params) {
 
 		// Si se ha especificado un almacen, se usara ese
-		if (params.get(KEYSTORE) != null) {
-
-			String ksValue = params.get(KEYSTORE);
-			if (Base64.isBase64(ksValue)) {
-				try {
-					ksValue = new String(Base64.decode(ksValue));
-				} catch (final IOException e) {
-					// Interpretamos que no era Base64
-				}
+		String ksValue = null;
+		if (params.get(KEYSTORE_OLD_PARAM) != null) {
+			ksValue = params.get(KEYSTORE_OLD_PARAM);
+		}
+		else if (params.get(KEYSTORE_PARAM) != null) {
+			try {
+				ksValue = new String(Base64.decode(params.get(KEYSTORE_PARAM)));
 			}
+			catch (final Exception e) {
+				// Interpretamos que no era Base64 y no se ha pasado un almacen valido
+			}
+		}
+
+		if (ksValue != null) {
 
 			String defaultKeyStoreName = null;
 			final int separatorPos = ksValue.indexOf(':');
@@ -344,17 +351,21 @@ public abstract class UrlParameters {
 	protected static String getDefaultKeyStoreLib(final Map<String, String> params) {
 
 		// Si se ha especificado un almacen, se usara ese
-		if (params.get(KEYSTORE) == null) {
-			return null;
+		String ksValue = null;
+		if (params.get(KEYSTORE_OLD_PARAM) != null) {
+			ksValue = params.get(KEYSTORE_OLD_PARAM);
+		}
+		else if (params.get(KEYSTORE_PARAM) != null) {
+			try {
+				ksValue = new String(Base64.decode(params.get(KEYSTORE_PARAM)));
+			}
+			catch (final Exception e) {
+				// Interpretamos que no era Base64 y no se ha pasado un almacen valido
+			}
 		}
 
-		String ksValue = params.get(KEYSTORE);
-		if (Base64.isBase64(ksValue)) {
-			try {
-				ksValue = new String(Base64.decode(ksValue), Charset.forName("utf-8")); //$NON-NLS-1$
-			} catch (final IOException e) {
-				// Interpretamos que no era Base64
-			}
+		if (ksValue == null) {
+			return null;
 		}
 
 		String lib = null;
