@@ -205,7 +205,7 @@ public final class Platform {
             return System.getProperty("java.home"); //$NON-NLS-1$
         }
         catch (final Exception e) {
-            LOGGER.warning("No se ha podido identificar el directorio de java"); //$NON-NLS-1$
+            LOGGER.warning("No se ha podido identificar el directorio de Java: " + e); //$NON-NLS-1$
         }
 
         return null;
