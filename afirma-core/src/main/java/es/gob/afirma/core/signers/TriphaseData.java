@@ -56,7 +56,7 @@ public final class TriphaseData {
 
 		/** Crea los datos de una firma trif&aacute;sica individual.
 		 * @param d Propiedades de la firma.
-		 * @param i Identificador de la firma. */
+		 * @param i Identificador de la firma. Si es {@code null} se genera uno aleatorio. */
 		public TriSign(final Map<String, String> d, final String i) {
 			if (d == null) {
 				throw new IllegalArgumentException(
@@ -143,7 +143,7 @@ public final class TriphaseData {
 	}
 
 	/** Devuelve un listado de firmas con el identificador dado o <code>null</code> si no hay ninguna
-	 * firma con ese identificador.
+	 * firma con ese identificador. El listado de firmas obtenidas no es mutable.
 	 * @param signId Identificador de la firma.
 	 * @return Listado de firmas con el identificador dado. */
 	public List<TriSign> getTriSigns(final String signId) {
