@@ -247,7 +247,12 @@
 			<artifactId>proxy-vole</artifactId>
 			<version>1.0.1</version>
 		</dependency>
-		
+		<!-- Libreria "Java Native Access" -->
+		<dependency>
+			<groupId>net.java.dev.jna</groupId>
+			<artifactId>jna</artifactId>
+			<version>4.2.2</version>
+		</dependency>
 	</dependencies>
 	
 	<scm>
