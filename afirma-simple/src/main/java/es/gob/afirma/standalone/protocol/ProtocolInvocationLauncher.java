@@ -172,7 +172,7 @@ public final class ProtocolInvocationLauncher {
                 }
             }
             catch (final Exception e) {
-                LOGGER.severe("Error en los parametros de seleccion de certificados: " + e); //$NON-NLS-1$
+                LOGGER.log(Level.SEVERE, "Error en los parametros de seleccion de certificados: " + e, e); //$NON-NLS-1$
                 ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_03);
                 return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_03);
             }
@@ -231,7 +231,7 @@ public final class ProtocolInvocationLauncher {
                 return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_13);
             }
             catch (final Exception e) {
-                LOGGER.severe("Error en los parametros de guardado: " + e); //$NON-NLS-1$
+            	LOGGER.log(Level.SEVERE, "Error en los parametros de guardado: " + e, e); //$NON-NLS-1$
                 ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_03);
                 return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_03);
             }
@@ -245,7 +245,7 @@ public final class ProtocolInvocationLauncher {
                 UrlParametersToSignAndSave params = ProtocolInvocationUriParser.getParametersToSignAndSave(urlString);
                 LOGGER.info("Parametros de la llamada = " + urlString); //$NON-NLS-1$
                 
-                LOGGER.info("El valor de la variable sticky en Sign&Save es: " + params.getSticky());
+                LOGGER.info("El valor de la variable sticky en Sign&Save es: " + params.getSticky()); //$NON-NLS-1$
 
                 // Si se indica un identificador de fichero, es que la configuracion se tiene que
                 // descargar desde el servidor intermedio
@@ -293,7 +293,7 @@ public final class ProtocolInvocationLauncher {
                 return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_13);
             }
             catch (final Exception e) {
-                LOGGER.severe("Error en los parametros de la peticion: " + e); //$NON-NLS-1$
+                LOGGER.log(Level.SEVERE, "Error en los parametros de firma y guardado: " + e, e); //$NON-NLS-1$
                 ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_03);
                 return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_03);
             }
@@ -309,7 +309,7 @@ public final class ProtocolInvocationLauncher {
             try {
                 UrlParametersToSign params = ProtocolInvocationUriParser.getParametersToSign(urlString);
                 
-                LOGGER.info("El valor de la variable sticky en Sign es: " + params.getSticky());
+                LOGGER.info("El valor de la variable sticky en Sign es: " + params.getSticky()); //$NON-NLS-1$
 
                 // Si se indica un identificador de fichero, es que la configuracion se tiene que
                 // descargar desde el servidor intermedio
@@ -364,7 +364,7 @@ public final class ProtocolInvocationLauncher {
                 return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_13);
             }
             catch (final Exception e) {
-                LOGGER.severe("Error en los parametros de firma: " + e); //$NON-NLS-1$
+            	LOGGER.log(Level.SEVERE, "Error en los parametros de firma: " + e, e); //$NON-NLS-1$
                 ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_03);
                 return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_03);
             }
@@ -377,7 +377,7 @@ public final class ProtocolInvocationLauncher {
 
             try {
             	
-            	LOGGER.info("URL DE INVOCACION: " + urlString);
+            	LOGGER.info("URL DE INVOCACION: " + urlString); //$NON-NLS-1$
             	
                 UrlParametersToLoad params = ProtocolInvocationUriParser.getParametersToLoad(urlString);
                
