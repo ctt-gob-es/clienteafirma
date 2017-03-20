@@ -20,6 +20,8 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
 
+import es.gob.afirma.signers.pades.PdfExtraParams;
+
 final class PageLabel extends JLabel {
 
 	static interface PageLabelListener extends EventListener {
@@ -60,36 +62,34 @@ final class PageLabel extends JLabel {
 
 		final Properties extraParams = new Properties();
 		extraParams.put(
-			"signaturePositionOnPageLowerLeftX", //$NON-NLS-1$
+			PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_LOWER_LEFTX,
 			Integer.toString(
 				Math.round(
-					//original.x * (1/this.scale)
-						original.x * this.scale
+					original.x * this.scale
 				)
 			)
 		);
 		extraParams.put(
-			"signaturePositionOnPageLowerLeftY",  //$NON-NLS-1$
+			PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_LOWER_LEFTY,
 			Integer.toString(
 				Math.round(
-					//(getHeight() - original.y - height) * (1/this.scale)
-						(getHeight() - original.y - height) * this.scale
+					(getHeight() - original.y - height) * this.scale
 				)
 			)
 		);
 		extraParams.put(
-			"signaturePositionOnPageUpperRightX", //$NON-NLS-1$
+			PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_UPPER_RIGHTX,
 			Integer.toString(
 				Math.round(
-						(original.x + width) * this.scale
+					(original.x + width) * this.scale
 				)
 			)
 		);
 		extraParams.put(
-			"signaturePositionOnPageUpperRightY",  //$NON-NLS-1$
+			PdfExtraParams.SIGNATURE_POSITION_ON_PAGE_UPPER_RIGHTY,
 			Integer.toString(
 				Math.round(
-						(getHeight() - original.y) * this.scale
+					(getHeight() - original.y) * this.scale
 				)
 			)
 		);
