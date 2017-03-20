@@ -87,13 +87,8 @@ final class CommandLineLauncher {
 	static void processCommandLine(final String[] args) {
 
 		// Desactivamos el Logger de consola para que no interfiera con los comandos
-		//TODO: Descomentar para poner en produccion
-		final Handler[] handlers = Logger.getLogger("es.gob.afirma").getHandlers(); //$NON-NLS-1$
-		for(final Handler handler : handlers) {
-			if(handler instanceof ConsoleHandler) {
-				handler.setLevel(Level.OFF);
-			}
-		}
+		deactivateConsoleLog("es.gob.afirma"); //$NON-NLS-1$
+		deactivateConsoleLog("es.gob.jmulticard"); //$NON-NLS-1$
 
 		final Console console = System.console();
 
@@ -197,6 +192,19 @@ final class CommandLineLauncher {
 				return;
 			}
 
+		}
+	}
+
+	/**
+	 * Desactiva el log por consola.
+	 * @param handlerName Nombre del manejador.
+	 */
+	private static void deactivateConsoleLog(final String handlerName) {
+		final Handler[] handlers = Logger.getLogger(handlerName).getHandlers();
+		for(final Handler handler : handlers) {
+			if(handler instanceof ConsoleHandler) {
+				handler.setLevel(Level.OFF);
+			}
 		}
 	}
 
