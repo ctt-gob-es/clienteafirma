@@ -72,7 +72,6 @@ import org.spongycastle.asn1.cms.KeyTransRecipientInfo;
 import org.spongycastle.asn1.cms.OriginatorInfo;
 import org.spongycastle.asn1.cms.RecipientIdentifier;
 import org.spongycastle.asn1.cms.RecipientInfo;
-import org.spongycastle.asn1.cms.SignerInfo;
 import org.spongycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.spongycastle.asn1.x500.X500Name;
 import org.spongycastle.asn1.x509.AlgorithmIdentifier;
@@ -562,24 +561,6 @@ final class Utils {
             }
         }
         return origInfo;
-    }
-
-    /** Obtiene la informacion de los firmantes.
-     * @param elementRecipient Listado de firmantes.
-     * @return Informacion de los firmantes.
-     * @throws IOException */
-    static void fetchSignerInfo(final Enumeration<?> elementSigners) throws IOException  {
-
-        SignerInfo signerInfo = null;
-        while (elementSigners.hasMoreElements()) {
-
-        	final ASN1Sequence intermedio = (ASN1Sequence) elementSigners.nextElement();
-        	signerInfo = SignerInfo.getInstance(intermedio);
-
-        	System.out.println("\n\n\n\n========================================================\n========================================================\n========================================================\n========================================================\n\n\n");
-        	//System.out.println(new String(signerInfo.getSID().getEncoded()));
-        	System.out.println(new String(signerInfo.getEncoded()));
-        }
     }
 
     /** Obtiene los par&aacute;metros de los certificados.
