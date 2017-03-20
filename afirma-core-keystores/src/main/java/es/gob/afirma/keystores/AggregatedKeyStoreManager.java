@@ -221,6 +221,14 @@ public class AggregatedKeyStoreManager extends AOKeyStoreManager {
 		);
 	}
 
+	/**
+	 * Recupera la lista (no mutable) de almacenes del almac&eacute;n agregado.
+	 * @return Lista de almacenes.
+	 */
+	List<AOKeyStoreManager> getKeyStoreManagers() {
+		return (List<AOKeyStoreManager>) ((ArrayList<AOKeyStoreManager>)this.ksms).clone();
+	}
+
 	/** Elimina todos los almacenes del de claves del almac&eacute;n agregado. */
 	public void removeAll() {
 		this.ksms.clear();
