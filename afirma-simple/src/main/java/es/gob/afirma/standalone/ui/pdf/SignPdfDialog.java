@@ -104,12 +104,12 @@ public final class SignPdfDialog extends JDialog implements PdfLoaderListener, S
 	@Override
 	public void pdfLoaded(final boolean isSign, final List<BufferedImage> pages, final List<Dimension> pageSizes) {
 		this.areaPanel = new SignPdfUiPanel(
-				isSign,
-				pages,
-				pageSizes,
-				this,
-				SignPdfDialog.this
-			);
+			isSign,
+			pages,
+			pageSizes,
+			this,
+			SignPdfDialog.this
+		);
 		add(this.areaPanel);
 		pack();
 		setVisible(true);
@@ -127,11 +127,11 @@ public final class SignPdfDialog extends JDialog implements PdfLoaderListener, S
 		LOGGER.severe("Error creando la previsualizacion del PDF: " + cause); //$NON-NLS-1$
 		if (cause instanceof OutOfMemoryError) {
 			AOUIFactory.showErrorMessage(
-					this.parent,
-					SignPdfUiMessages.getString("SignPdfDialog.4"), //$NON-NLS-1$
-					SignPdfUiMessages.getString("SignPdfDialog.1"), //$NON-NLS-1$
-					JOptionPane.ERROR_MESSAGE
-				);
+				this.parent,
+				SignPdfUiMessages.getString("SignPdfDialog.4"), //$NON-NLS-1$
+				SignPdfUiMessages.getString("SignPdfDialog.1"), //$NON-NLS-1$
+				JOptionPane.ERROR_MESSAGE
+			);
 		}
 		else {
 			AOUIFactory.showErrorMessage(
