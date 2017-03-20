@@ -8,6 +8,8 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -69,7 +71,7 @@ import es.gob.afirma.standalone.ui.CommonWaitDialog;
 /** Di&aacute;logo para la comprobaci&oacute;n de huellas digitales en
  * directorios.
  * @author Juliana Marulanda. */
-public final class CheckHashFiles extends JDialog {
+public final class CheckHashFiles extends JDialog implements KeyListener {
 
 	private static final long serialVersionUID = 5969239673119761747L;
 	private final JTextField xml = new JTextField();
@@ -137,7 +139,7 @@ public final class CheckHashFiles extends JDialog {
 		final JButton checkButton = new JButton(SimpleAfirmaMessages.getString("CheckHashDialog.1")); //$NON-NLS-1$
 		checkButton.setMnemonic('R');
 		checkButton.setEnabled(false);
-
+		checkButton.addKeyListener(this);
 		checkButton.addActionListener(
 			new ActionListener() {
 				@Override
@@ -241,12 +243,14 @@ public final class CheckHashFiles extends JDialog {
 		this.xml.setEditable(false);
 		this.xml.setFocusable(false);
 		this.xml.setColumns(10);
+		this.xml.addKeyListener(this);
 
 		final JButton xmlExamineButton = new JButton(
 			SimpleAfirmaMessages.getString("CreateHashDialog.5") //$NON-NLS-1$
 		);
 		xmlExamineButton.setMnemonic('E');
 		xmlExamineButton.setEnabled(true);
+		xmlExamineButton.addKeyListener(this);
 		xmlExamineButton.addActionListener(new ActionListener() {
 
 			@Override
@@ -281,12 +285,14 @@ public final class CheckHashFiles extends JDialog {
 		this.directory.setEditable(false);
 		this.directory.setFocusable(false);
 		this.directory.setColumns(10);
+		this.directory.addKeyListener(this);
 
 		final JButton directoryExamineButton = new JButton(
 			SimpleAfirmaMessages.getString("CreateHashDialog.5") //$NON-NLS-1$
 		);
 		directoryExamineButton.setMnemonic('X');
 		directoryExamineButton.setEnabled(true);
+		directoryExamineButton.addKeyListener(this);
 		directoryExamineButton.addActionListener(new ActionListener() {
 
 			@Override
@@ -325,6 +331,7 @@ public final class CheckHashFiles extends JDialog {
 			checkButton.setEnabled(true);
 		}
 		exitButton.setMnemonic('C');
+		exitButton.addKeyListener(this);
 		exitButton.addActionListener(
 			new ActionListener() {
 				@Override
@@ -343,12 +350,12 @@ public final class CheckHashFiles extends JDialog {
 
 		// En Mac OS X el orden de los botones es distinto
 		if (Platform.OS.MACOSX.equals(Platform.getOS())) {
-			panel.add(checkButton);
 			panel.add(exitButton);
+			panel.add(checkButton);
 		}
 		else {
-			panel.add(exitButton);
 			panel.add(checkButton);
+			panel.add(exitButton);
 		}
 
 		final JLabel directoryLabel = new JLabel(
@@ -807,4 +814,18 @@ public final class CheckHashFiles extends JDialog {
 		CheckHashFiles.algorithm = algorithm;
 	}
 
+	@Override
+	public void keyTyped(final KeyEvent e) { /* Vacio */ }
+
+	@Override
+	public void keyPressed(final KeyEvent e) { /* Vacio */ }
+
+	@Override
+	public void keyReleased(final KeyEvent ke) {
+		// En Mac no cerramos los dialogos con Escape
+		if (ke != null && ke.getKeyCode() == KeyEvent.VK_ESCAPE && !Platform.OS.MACOSX.equals(Platform.getOS())) {
+			setVisible(false);
+			dispose();
+		}
+	}
 }
