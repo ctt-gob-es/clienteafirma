@@ -147,7 +147,7 @@ public final class AOODFSigner implements AOSigner {
 
     	if (!AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA.equals(algorithm)) {
     		LOGGER.warning(
-				"Se ha indicado '" + algorithm + "' como algoritmo de firma, pero se usara 'SHA1withRSA' nor necesidades del formato ODF" //$NON-NLS-1$ //$NON-NLS-2$
+				"Se ha indicado '" + algorithm + "' como algoritmo de firma, pero se usara 'SHA1withRSA' por necesidades del formato ODF" //$NON-NLS-1$ //$NON-NLS-2$
 			);
     	}
 
