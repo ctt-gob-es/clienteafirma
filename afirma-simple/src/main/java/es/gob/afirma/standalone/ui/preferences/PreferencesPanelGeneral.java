@@ -37,6 +37,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import es.gob.afirma.core.AOCancelledOperationException;
+import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.standalone.AutoFirmaUtil;
@@ -110,6 +111,7 @@ final class PreferencesPanelGeneral extends JPanel {
 	}
 
 	void loadPreferences() {
+
 		this.signarureAlgorithms.setSelectedItem(
 			PreferencesManager.get(PREFERENCE_GENERAL_SIGNATURE_ALGORITHM, "SHA256withRSA") //$NON-NLS-1$
 		);
@@ -154,7 +156,6 @@ final class PreferencesPanelGeneral extends JPanel {
 		signConstraint.gridy = 0;
 		signConstraint.insets = new Insets(0, 0, 0, 0);
 
-		loadPreferences();
 		final JButton importConfigFromFileButton = new JButton(
 			SimpleAfirmaMessages.getString("PreferencesPanel.107") //$NON-NLS-1$
 		);
@@ -192,6 +193,7 @@ final class PreferencesPanelGeneral extends JPanel {
 								SimpleAfirmaMessages.getString("PreferencesPanel.117"), //$NON-NLS-1$
 								JOptionPane.ERROR_MESSAGE
 							);
+							return;
 						}
 					}
 					else {
@@ -215,6 +217,12 @@ final class PreferencesPanelGeneral extends JPanel {
 						}
 						PreferencesPlistHandler.importPreferences(configFilePath, getParent());
 					}
+					AOUIFactory.showMessageDialog(
+							getParent(),
+							SimpleAfirmaMessages.getString("PreferencesPanel.142"), //$NON-NLS-1$
+							SimpleAfirmaMessages.getString("PreferencesPanel.143"), //$NON-NLS-1$
+							JOptionPane.INFORMATION_MESSAGE
+						);
 					getDisposableInterface().disposeInterface();
 				}
 			}
@@ -293,15 +301,18 @@ final class PreferencesPanelGeneral extends JPanel {
 
 		signConstraint.gridy++;
 
-		this.checkForUpdates.getAccessibleContext().setAccessibleDescription(
-			SimpleAfirmaMessages.getString("PreferencesPanel.88") //$NON-NLS-1$
-		);
-		this.checkForUpdates.setMnemonic('B');
-		this.checkForUpdates.addItemListener(modificationListener);
-		this.checkForUpdates.addKeyListener(keyListener);
-		signConfigPanel.add(this.checkForUpdates, signConstraint);
+		// Solo se buscaran actualizaciones automaticamente en Windows
+		if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
+			this.checkForUpdates.getAccessibleContext().setAccessibleDescription(
+					SimpleAfirmaMessages.getString("PreferencesPanel.88") //$NON-NLS-1$
+					);
+			this.checkForUpdates.setMnemonic('B');
+			this.checkForUpdates.addItemListener(modificationListener);
+			this.checkForUpdates.addKeyListener(keyListener);
+			signConfigPanel.add(this.checkForUpdates, signConstraint);
 
-		signConstraint.gridy++;
+			signConstraint.gridy++;
+		}
 
 		this.sendAnalytics.getAccessibleContext().setAccessibleDescription(
 			SimpleAfirmaMessages.getString("PreferencesPanel.90") //$NON-NLS-1$
@@ -397,6 +408,8 @@ final class PreferencesPanelGeneral extends JPanel {
 		gbc.weighty = 1.0;
 		gbc.gridy++;
 		add(new JPanel(), gbc);
+
+		loadPreferences();
 	}
 
 	/** Crea el panel con la configuraci&oacute;n de los formatos de firma a utilizar con cada tipo de fichero.
