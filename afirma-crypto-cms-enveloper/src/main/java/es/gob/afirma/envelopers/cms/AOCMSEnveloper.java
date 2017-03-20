@@ -42,10 +42,8 @@ import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.signers.cms.AOCMSSigner;
 import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
 
-
 /** Funcionalidad de sobres digitales con CAdES. */
 public class AOCMSEnveloper implements AOEnveloper {
-
 
     /** Envoltorio binario de tipo Data (datos envueltos en un envoltorio
      * PKCS#7). */
@@ -134,13 +132,10 @@ public class AOCMSEnveloper implements AOEnveloper {
      * se usar&aacute; un algoritmo de tipo PBE.
      * Nota: El digestAlgorithm no es el agoritmo de cifrado, es el algoritmo de
      * huella digital usado en los "Unsigned Attributes".
-     * @param data
-     *        Datos a envolver.
-     * @param digestAlgorithm
-     *        Algoritmo a usar para la envoltura (SHA1withRSA, MD5withRSA,...)
-     * @param key
-     *        Puede ser una clave codificada o una contrase&ntilde;a usada
-     *        para cifrar el contenido.
+     * @param data Datos a envolver.
+     * @param digestAlgorithm Algoritmo a usar para la envoltura (SHA1withRSA, MD5withRSA,...)
+     * @param key Puede ser una clave codificada o una contrase&ntilde;a usada
+     *            para cifrar el contenido.
      * @param cipherAlgorithm Algoritmo a usar para los cifrados.
      * @param dataType OID del tipo de datos a encriptar.
      * @return Contenido firmado. */
@@ -179,19 +174,15 @@ public class AOCMSEnveloper implements AOEnveloper {
     private String cipherKey = null;
 
     /** Configura un atributo firmado para agregarlo a un envoltorio.
-     * @param oid
-     *        Object Identifier. Identificador del objeto a introducir.
-     * @param value
-     *        Valor asignado */
+     * @param oid Object Identifier. Identificador del objeto a introducir.
+     * @param value Valor asignado */
     public void addSignedAttribute(final String oid, final byte[] value) {
         this.attrib.put(oid, value);
     }
 
     /** Configura un atributo no firmado para agregarlo a un envoltorio.
-     * @param oid
-     *        Object Identifier. Identificador del atributo a introducir.
-     * @param value
-     *        Valor asignado */
+     * @param oid Object Identifier. Identificador del atributo a introducir.
+     * @param value Valor asignado */
     public void addUnsignedAttribute(final String oid, final byte[] value) {
         this.uattrib.put(oid, value);
     }
@@ -204,22 +195,18 @@ public class AOCMSEnveloper implements AOEnveloper {
 		return CMSData.genData(content);
     }
 
-    /** Crea un envoltorio CMS de tipo DigestedData.
-     * @param content
-     *        Datos que se desean envolver.
+    /** Crea un envoltorio CMS de tipo <i>DigestedData</i>.
+     * @param content Datos que se desean envolver.
      * @return Envoltorio DigestedData.
-     * @throws IOException
-     *         Error en la lectura de datos.
-     * @throws NoSuchAlgorithmException
-     *         Cuando el algoritmo de cifrado indicado no est&aacute;
-     *         soportado. */
+     * @throws IOException Error en la lectura de datos.
+     * @throws NoSuchAlgorithmException Cuando el algoritmo de cifrado indicado no est&aacute;
+     *                                  soportado. */
     byte[] createCMSDigestedData(final byte[] content) throws IOException, NoSuchAlgorithmException {
 		return CMSDigestedData.genDigestedData(content, this.signatureAlgorithm, DATA_TYPE_OID);
     }
 
-    /** Crea un envoltorio CMS de tipo CompressedData.
-     * @param content
-     *        Datos que se desean envolver.
+    /** Crea un envoltorio CMS de tipo <i>CompressedData</i>.
+     * @param content Datos que se desean envolver.
      * @return Envoltorio Compressed Data.
      * @throws IOException En caso de error en la lectura o tratamiento de datos */
     static byte[] createCMSCompressedData(final byte[] content) throws IOException {
@@ -227,42 +214,29 @@ public class AOCMSEnveloper implements AOEnveloper {
     }
 
     /** Crea un envoltorio CMS de tipo EncryptedData.
-     * @param content
-     *        Contenido a envolver
-     * @param cipherConfig
-     *        Configuraci&oacute;n del cifrado del envoltorio
-     * @param key
-     *        Clave de envoltura
+     * @param content Contenido a envolver
+     * @param cipherConfig Configuraci&oacute;n del cifrado del envoltorio
+     * @param key Clave de envoltura
      * @return Envoltorio EncryptedData.
-     * @throws NoSuchAlgorithmException
-     *         Cuando el algoritmo de cifrado indicado no est&aacute;
-     *         soportado.
-     * @throws IOException
-     * 		   Cuando se produce algun error al codificar los datos.
-     */
+     * @throws NoSuchAlgorithmException Cuando el algoritmo de cifrado indicado no est&aacute;
+     *                                  soportado.
+     * @throws IOException Cuando se produce algun error al codificar los datos. */
     public byte[] createCMSEncryptedData(final byte[] content, final AOCipherConfig cipherConfig, final Key key) throws NoSuchAlgorithmException, IOException {
 		return CMSEncryptedData.genEncryptedData(content, this.signatureAlgorithm, cipherConfig, key, DATA_TYPE_OID, this.uattrib);
     }
 
     /** Crea un envoltorio CMS de tipo EnvelopedData.
-     * @param content
-     *        Contenido que se desea ensobrar.
-     * @param ke
-     *        Clave privada del remitente (s&oacute;lo si se quiere indicar
-     *        remitente).
-     * @param cipherConfig
-     *        Configuraci&oacute;n para el cifrado de datos.
-     * @param recipientsCerts
-     *        Destinatarios del sobre electr&oacute;nico.
+     * @param content Contenido que se desea ensobrar.
+     * @param ke Clave privada del remitente (s&oacute;lo si se quiere indicar
+     *           remitente).
+     * @param cipherConfig Configuraci&oacute;n para el cifrado de datos.
+     * @param recipientsCerts Destinatarios del sobre electr&oacute;nico.
      * @param keySize Tama&ntilde;o de la clave AES de cifrado
      * @return Envoltorio EnvelopedData.
-     * @throws NoSuchAlgorithmException
-     *         Cuando el algoritmo de cifrado indicado no est&aacute;
-     *         soportado.
-     * @throws IOException
-     *         Error en la escritura de datos.
-     * @throws CertificateEncodingException
-     *         Cuando el certificado del remitente no es v&aacute;lido.
+     * @throws NoSuchAlgorithmException Cuando el algoritmo de cifrado indicado no est&aacute;
+     *                                  soportado.
+     * @throws IOException Error en la escritura de datos.
+     * @throws CertificateEncodingException Cuando el certificado del remitente no es v&aacute;lido.
      * @throws BadPaddingException Si hay problemas estableciendo el relleno de los datos
      * @throws IllegalBlockSizeException Si no cuadran los tama&ntilde;os de bloque de los algoritmos usados
      * @throws InvalidAlgorithmParameterException Si no se soporta alg&uacute;n par&aacute;metro necesario
@@ -358,9 +332,8 @@ public class AOCMSEnveloper implements AOEnveloper {
      * @param recipientsCerts Destinatarios del sobre electr&oacute;nico.
      * @param keySize Tama&ntilde;o de la clave AES.
      * @return Envoltorio <code>AuthenticatedData</code>.
-     * @throws NoSuchAlgorithmException
-     *         Cuando el algoritmo de cifrado indicado no est&aacute;
-     *         soportado.
+     * @throws NoSuchAlgorithmException Cuando el algoritmo de cifrado indicado no est&aacute;
+     *                                  soportado.
      * @throws IOException Cuando ocurre un error en la escritura de datos.
      * @throws CertificateEncodingException Cuando el certificado del remitente no es v&aacute;lido.
      * @throws InvalidKeyException Si la clave proporcionada no es v&aacute;lida
@@ -396,23 +369,16 @@ public class AOCMSEnveloper implements AOEnveloper {
     }
 
     /** Crea un envoltorio CMS de tipo AuthenticatedEnvelopedData.
-     * @param content
-     *        Contenido que se desea ensobrar.
-     * @param ke
-     *        Clave privada del remitente.
-     * @param cipherConfig
-     *        Configuraci&oacute;n para el cifrado de datos.
-     * @param recipientsCerts
-     *        Destinatarios del sobre electr&oacute;nico.
+     * @param content Contenido que se desea ensobrar.
+     * @param ke Clave privada del remitente.
+     * @param cipherConfig Configuraci&oacute;n para el cifrado de datos.
+     * @param recipientsCerts Destinatarios del sobre electr&oacute;nico.
      * @param keySize Tama&ntilde;o de la clave AES de cifrado
      * @return Envoltorio AuthenticatedEnvelopedData.
-     * @throws NoSuchAlgorithmException
-     *         Cuando el algoritmo de cifrado indicado no est&aacute;
-     *         soportado.
-     * @throws IOException
-     *         Error en la escritura de datos.
-     * @throws CertificateEncodingException
-     *         Cuando el certificado del remitente no es v&aacute;lido.
+     * @throws NoSuchAlgorithmException Cuando el algoritmo de cifrado indicado no est&aacute;
+     *                                  soportado.
+     * @throws IOException Error en la escritura de datos.
+     * @throws CertificateEncodingException Cuando el certificado del remitente no es v&aacute;lido.
      * @throws InvalidKeyException Si la clave proporcionada no es v&aacute;lida
      * @throws BadPaddingException Si hay problemas estableciendo el relleno de los datos
      * @throws IllegalBlockSizeException Si no cuadran los tama&ntilde;os de bloque de los algoritmos usados
@@ -445,30 +411,27 @@ public class AOCMSEnveloper implements AOEnveloper {
         );
     }
 
-    /** Genera el bloque de datos con la informaci&oacute;n del remitente de un
-     * mensaje.
-     * @param content
-     *        Mensaje.
-     * @param digestAlgorithm
-     *        Algoritmo de huella digital.
+    /** Genera el bloque de datos con la informaci&oacute;n del remitente de un mensaje.
+     * @param content Mensaje.
+     * @param digestAlgorithm Algoritmo de huella digital.
      * @return Bloque de datos con la informaci&oacute;n del remitente. */
-    private static P7ContentSignerParameters createContentSignerParementers(final byte[] content, final String digestAlgorithm) {
+    private static P7ContentSignerParameters createContentSignerParementers(final byte[] content,
+    		                                                                final String digestAlgorithm) {
         return new P7ContentSignerParameters(content, digestAlgorithm);
     }
 
     /** Agrega un nuevo remitente a un envoltorio CMS compatible.
-     * @param envelop
-     *        Envoltorio original.
-     * @param ke
-     *        Referencia a la clave privada del certificado del remitente.
+     * @param envelop Envoltorio original.
+     * @param ke Referencia a la clave privada del certificado del remitente.
      * @return Envoltorio con el nuevo remitente.
-     * @throws AOException
-     *         Cuando se produce un error al agregar el nuevo remitente.
+     * @throws AOException Cuando se produce un error al agregar el nuevo remitente.
      * @throws IOException Cuando ocurre alg&uacute;n error en la lectura de los datos.
      * @throws CertificateEncodingException Cuando el certificado del remitente es inv&aacute;lido
-     * @throws AOInvalidFormatException
-     *         Tipo de envoltorio no soportado. */
-    public static byte[] addOriginator(final byte[] envelop, final PrivateKeyEntry ke) throws AOException, IOException, CertificateEncodingException {
+     * @throws AOInvalidFormatException Tipo de envoltorio no soportado. */
+    public static byte[] addOriginator(final byte[] envelop,
+    		                           final PrivateKeyEntry ke) throws AOException,
+                                                                        IOException,
+                                                                        CertificateEncodingException {
         final String contentInfo;
         if (ValidateCMS.isCMSEnvelopedData(envelop)) {
             contentInfo = CMS_CONTENTTYPE_ENVELOPEDDATA;
@@ -480,7 +443,9 @@ public class AOCMSEnveloper implements AOEnveloper {
             contentInfo = CMS_CONTENTTYPE_AUTHENVELOPEDDATA;
         }
         else {
-            throw new AOInvalidFormatException("Los datos proporcionado no son un envoltorio que soporte multiples remitentes"); //$NON-NLS-1$
+            throw new AOInvalidFormatException(
+        		"Los datos proporcionado no son un envoltorio que soporte multiples remitentes" //$NON-NLS-1$
+    		);
         }
         return addOriginator(envelop, contentInfo, ke);
     }
@@ -503,8 +468,11 @@ public class AOCMSEnveloper implements AOEnveloper {
      * @throws CertificateEncodingException Si el certificado del remitente es inv&aacute;lido
      * @throws IllegalArgumentException Cuando se indica un contentInfo no compatible con
      *                                  m&uacute;tiples remitentes. */
-    private static byte[] addOriginator(final byte[] envelop, final String contentInfo, final PrivateKeyEntry ke) throws AOException, IOException, CertificateEncodingException {
-
+    private static byte[] addOriginator(final byte[] envelop,
+    		                            final String contentInfo,
+    		                            final PrivateKeyEntry ke) throws AOException,
+                                                                         IOException,
+                                                                         CertificateEncodingException {
         byte[] newEnvelop;
 
         if (contentInfo.equals(CMS_CONTENTTYPE_ENVELOPEDDATA)) {
@@ -521,7 +489,6 @@ public class AOCMSEnveloper implements AOEnveloper {
         }
         else if (contentInfo.equals(CMS_CONTENTTYPE_AUTHENVELOPEDDATA)) {
             newEnvelop = CMSAuthenticatedEnvelopedData.addOriginatorInfo(envelop, (X509Certificate[]) ke.getCertificateChain());
-
         }
         else {
             throw new IllegalArgumentException("La estructura para el ContentInfo indicado no esta soportada o no admite multiples remitentes"); //$NON-NLS-1$
@@ -536,16 +503,14 @@ public class AOCMSEnveloper implements AOEnveloper {
 
     /** Algoritmo de firma que se utilizar&aacute; internamente en el sobre. El
      * algoritmo de huella digital se tomar&aacute; de este.
-     * @param algorithm
-     *        Algoritmo de firma. */
+     * @param algorithm Algoritmo de firma. */
     public void setSignatureAlgorithm(final String algorithm) {
         this.signatureAlgorithm = algorithm == null ? AOSignConstants.DEFAULT_SIGN_ALGO : algorithm;
     }
 
     /** Establece la contrase&ntilde;a o clave para la encriptaci&oacute;n de los
      * datos.
-     * @param keyPass
-     *        Clave en base 64 o contrase&ntilde;a de cifrado. */
+     * @param keyPass Clave en Base64 o contrase&ntilde;a de cifrado. */
     public void setCipherKey(final String keyPass) {
         this.cipherKey = keyPass;
     }
@@ -637,43 +602,55 @@ public class AOCMSEnveloper implements AOEnveloper {
     			}
     			return data;
     		}
-    		throw new AOInvalidFormatException("Los datos introducidos no se corresponden con un tipo de objeto CMS soportado"); //$NON-NLS-1$
+    		throw new AOInvalidFormatException(
+				"Los datos introducidos no se corresponden con un tipo de objeto CMS soportado" //$NON-NLS-1$
+			);
     	}
     	catch (final AOInvalidRecipientException e) {
-    		throw new InvalidKeyException("La clave indicada no pertenece a ninguno de los destinatarios del envoltorio", e); //$NON-NLS-1$
+    		throw new InvalidKeyException(
+				"La clave indicada no pertenece a ninguno de los destinatarios del envoltorio: " + e, e //$NON-NLS-1$
+			);
     	}
     	catch (final CertificateEncodingException e) {
-    		throw new AOException("Error al descodificar los certificados del envoltorio", e); //$NON-NLS-1$
+    		throw new AOException(
+				"Error al descodificar los certificados del envoltorio: " + e, e //$NON-NLS-1$
+			);
     	}
     	catch (final NoSuchAlgorithmException e) {
-    		throw new AOException("No se reconoce el algoritmo indicado", e); //$NON-NLS-1$
+    		throw new AOException(
+				"No se reconoce el algoritmo indicado: " + e, e //$NON-NLS-1$
+			);
     	}
     	catch (final NoSuchPaddingException e) {
-    		throw new AOException("No se reconoce el tipo de relleno indicado", e); //$NON-NLS-1$
+    		throw new AOException(
+				"No se reconoce el tipo de relleno indicado: " + e, e //$NON-NLS-1$
+			);
 		}
     	catch (final InvalidAlgorithmParameterException e) {
-    		throw new AOException("No se reconoce la configuracion del algoritmo indicado", e); //$NON-NLS-1$
+    		throw new AOException(
+				"No se reconoce la configuracion del algoritmo indicado: " + e, e //$NON-NLS-1$
+			);
 		}
     	catch (final IllegalBlockSizeException e) {
-    		throw new AOException("Tamano de bloque invalido: " + e, e); //$NON-NLS-1$
+    		throw new AOException(
+				"Tamano de bloque invalido: " + e, e //$NON-NLS-1$
+			);
 		}
     	catch (final BadPaddingException e) {
-    		throw new AOException("relleno invalido: " + e, e); //$NON-NLS-1$
+    		throw new AOException(
+				"Relleno invalido: " + e, e //$NON-NLS-1$
+			);
 		}
     }
 
-    /**
-     * Recupera el tipo de envoltorio CMS identificado durante la operaci&oacute;n de desensobrado.
-     * @return Tipo de envoltorio.
-     */
+    /** Recupera el tipo de envoltorio CMS identificado durante la operaci&oacute;n de desensobrado.
+     * @return Tipo de envoltorio. */
     public String getProcessedEnvelopType() {
     	return this.envelopType;
     }
 
-    /**
-     * Recupera el certificado del firmante del envoltorio. S&oacute;lo soporta un firmante.
-     * @return Certificado del firmante codificado.
-     */
+    /** Recupera el certificado del firmante del envoltorio. S&oacute;lo soporta un firmante.
+     * @return Certificado del firmante codificado. */
     public byte[] getSignerCert() {
 		return this.signerCert;
 	}
