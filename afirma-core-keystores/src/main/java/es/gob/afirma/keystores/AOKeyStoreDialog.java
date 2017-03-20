@@ -129,7 +129,7 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 	    				certChain);
     		}
     		else {
-    			LOGGER.warning("Se ha encontrado un certificado nulo en el almacen");
+    			LOGGER.warning("Se ha encontrado un certificado nulo en el almacen"); //$NON-NLS-1$
     		}
     	}
 
@@ -166,8 +166,10 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 
     		String errorMessage = null;
 
+    		final X509Certificate cert = this.ksm.getCertificate(this.selectedAlias);
+
 			try {
-				this.ksm.getCertificate(this.selectedAlias).checkValidity();
+				cert.checkValidity();
 			}
 			catch (final CertificateExpiredException e) {
 				errorMessage = KeyStoreMessages.getString("AOKeyStoreDialog.2"); //$NON-NLS-1$
