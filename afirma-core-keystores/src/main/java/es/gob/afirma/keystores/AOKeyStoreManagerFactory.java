@@ -104,17 +104,7 @@ public final class AOKeyStoreManagerFactory {
 
         // Almacen de certificados de Windows
         if (Platform.getOS().equals(Platform.OS.WINDOWS) && AOKeyStore.WINDOWS.equals(store)) {
-        	final AggregatedKeyStoreManager aksm = new AggregatedKeyStoreManager(getWindowsMyCapiKeyStoreManager(forceReset));
-        	final boolean ksPresent = KeyStoreUtilities.addPreferredKeyStoreManagers(aksm, parentComponent);
-
-			// Al comprobar si estaba disponible alguno de los almacenes preferentes (tarjetas)
-			// se habra perdido la conexion con cualquier otra tarjeta configurada en el almacen
-			// de Windows. Asi que, cuando no se encuentran los preferentes, se reinicia el almacen
-			// para recuperar la conexion con cualquier tarjeta conectada y que posiblemente desee usarse
-        	if (!ksPresent) {
-				aksm.refresh();
-			}
-    		return aksm;
+        	return new AggregatedKeyStoreManager(getWindowsMyCapiKeyStoreManager(forceReset));
         }
 
         // Libreta de direcciones de Windows
@@ -419,7 +409,7 @@ public final class AOKeyStoreManagerFactory {
 
     private static AOKeyStoreManager getWindowsMyCapiKeyStoreManager(final boolean forceReset) throws AOKeystoreAlternativeException,
     		                                                                                          IOException {
-    	final AOKeyStoreManager ksmCapi = new CAPIKeyStoreManager();
+    	final AggregatedKeyStoreManager ksmCapi = new CAPIUnifiedKeyStoreManager();
 		try {
 			ksmCapi.init(AOKeyStore.WINDOWS, null, null, null, forceReset);
 		}
@@ -481,28 +471,31 @@ public final class AOKeyStoreManagerFactory {
     		                                                                  final boolean forceReset,
                                                                               final Object parentComponent) throws AOKeystoreAlternativeException,
     		                                                                                                       IOException {
-    	if (mozillaKeyStoreManager == null) {
-    		mozillaKeyStoreManager = getNssKeyStoreManager(
+    	AggregatedKeyStoreManager ksm = mozillaKeyStoreManager;
+    	if (ksm == null) {
+    		ksm = getNssKeyStoreManager(
     	    		"es.gob.afirma.keystores.mozilla.MozillaUnifiedKeyStoreManager",  //$NON-NLS-1$
     	    		pssCallback,
     	    		forceReset,
     	    		parentComponent
     			);
-    	}
-    	else {
-    		try {
-    			mozillaKeyStoreManager.init(AOKeyStore.MOZ_UNI, null, pssCallback, new Object[] { parentComponent }, forceReset);
-    		}
-    		catch (final AOException e) {
-    			throw new AOKeystoreAlternativeException(
-    					getAlternateKeyStoreType(AOKeyStore.MOZ_UNI),
-    					"Error al inicializar el almacen NSS: " + e, //$NON-NLS-1$
-    					e
-    					);
-    		}
-    	}
 
-        return mozillaKeyStoreManager;
+    		if (!containsDnieJavaKeyStoreManager(ksm)) {
+    			mozillaKeyStoreManager = ksm;
+    		}
+    	}
+        return ksm;
+    }
+
+    private static boolean containsDnieJavaKeyStoreManager(AggregatedKeyStoreManager aggregatedKsm) {
+
+    	for (final AOKeyStoreManager ksm : aggregatedKsm.getKeyStoreManagers()) {
+    		if (ksm.getType() == AOKeyStore.DNIEJAVA ||
+    				ksm instanceof AggregatedKeyStoreManager && containsDnieJavaKeyStoreManager((AggregatedKeyStoreManager) ksm)) {
+    			return true;
+    		}
+    	}
+    	return false;
     }
 
     private static AggregatedKeyStoreManager getMacOSXKeyStoreManager(final AOKeyStore store,
@@ -525,7 +518,12 @@ public final class AOKeyStoreManagerFactory {
             throw new AOKeystoreAlternativeException(getAlternateKeyStoreType(store), "Error al inicializar el Llavero de Mac OS X", e); //$NON-NLS-1$
         }
         final AggregatedKeyStoreManager aksm = new AggregatedKeyStoreManager(ksm);
-        KeyStoreUtilities.addPreferredKeyStoreManagers(aksm, parentComponent);
+        try {
+    		KeyStoreUtilities.addPreferredKeyStoreManagers(aksm, parentComponent);
+    	}
+    	catch (final AOCancelledOperationException e) {
+    		LOGGER.info("Se cancelo el uso del driver Java"); //$NON-NLS-1$
+    	}
 
         return aksm;
     }
@@ -546,5 +544,4 @@ public final class AOKeyStoreManagerFactory {
         }
         return AOKeyStore.PKCS12;
     }
-
 }
