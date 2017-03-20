@@ -158,7 +158,7 @@ public final class CheckHashDialog extends JDialog implements KeyListener {
 								SimpleAfirmaMessages.getString("CheckHashDialog.10"), //$NON-NLS-1$
 								null,
 								null,
-								new String[] { "hash", "hashb64" }, //$NON-NLS-1$ //$NON-NLS-2$
+								new String[] { "hash", "hashb64", "hexhash" }, //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 								SimpleAfirmaMessages.getString("CheckHashDialog.14"), //$NON-NLS-1$
 								false,
 								false,
@@ -244,12 +244,12 @@ public final class CheckHashDialog extends JDialog implements KeyListener {
 
 		// En Mac OS X el orden de los botones es distinto
 		if (Platform.OS.MACOSX.equals(Platform.getOS())) {
-			panel.add(checkButton);
 			panel.add(exitButton);
+			panel.add(checkButton);
 		}
 		else {
-			panel.add(exitButton);
 			panel.add(checkButton);
+			panel.add(exitButton);
 		}
 
 		c.add(textFieldDataLabel, gbc);
@@ -297,6 +297,11 @@ public final class CheckHashDialog extends JDialog implements KeyListener {
 				}
 				if (Base64.isBase64(hashBytes)) {
 					hashBytes = Base64.decode(hashBytes, 0, hashBytes.length, false);
+				}
+				else if(isHexa(hashBytes)) {
+					hashBytes = hexStringToByteArray(
+						new String(hashBytes).substring(0, hashBytes.length -1)
+					);
 				}
 				try {
 					return Boolean.valueOf(
@@ -386,7 +391,7 @@ public final class CheckHashDialog extends JDialog implements KeyListener {
 	@Override
 	public void keyReleased(final KeyEvent ke) {
 		// En Mac no cerramos los dialogos con Escape
-		if (ke != null && ke.getKeyCode() == KeyEvent.VK_ESCAPE) {
+		if (ke != null && ke.getKeyCode() == KeyEvent.VK_ESCAPE && !Platform.OS.MACOSX.equals(Platform.getOS())) {
 			CheckHashDialog.this.setVisible(false);
 			CheckHashDialog.this.dispose();
 		}
@@ -401,4 +406,24 @@ public final class CheckHashDialog extends JDialog implements KeyListener {
 		chkd.setLocationRelativeTo(parent);
 		chkd.setVisible(true);
 	}
+
+	static byte[] hexStringToByteArray(final String s) {
+	    final int len = s.length();
+	    final byte[] data = new byte[len / 2];
+	    for (int i = 0; i < len; i += 2) {
+	        data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4) + Character.digit(s.charAt(i+1), 16));
+	    }
+	    return data;
+	}
+
+	static boolean isHexa(final byte[] data) {
+		if (data == null || data.length == 0) {
+			return false;
+		}
+		final String strData = new String(data);
+
+		return strData.endsWith("h") && //$NON-NLS-1$
+			strData.substring(0, strData.length() - 1).matches("^[0-9a-fA-F]+$") && //$NON-NLS-1$
+				(data.length - 1) % 2 == 0;
+    }
 }
