@@ -64,9 +64,8 @@ final class ProtocolInvocationLauncherSign {
 		}
 
 		if (!ProtocolInvocationLauncher.MAX_PROTOCOL_VERSION_SUPPORTED.support(options.getMinimumVersion())) {
-			LOGGER.severe(String.format(
-					"Version de protocolo no soportada (%1s). Version actual: %s2. Hay que actualizar la aplicacion.", //$NON-NLS-1$
-					options.getMinimumVersion(), ProtocolInvocationLauncher.MAX_PROTOCOL_VERSION_SUPPORTED));
+			LOGGER.severe(String.format("Version de protocolo no soportada (%1s). Version actual: %2d. Hay que actualizar la aplicacion.", //$NON-NLS-1$
+					options.getMinimumVersion(), Integer.valueOf(ProtocolInvocationLauncher.MAX_PROTOCOL_VERSION_SUPPORTED.getVersion()))); 
 			ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_21);
 			return ProtocolInvocationLauncherErrorManager
 					.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_21);
@@ -88,8 +87,8 @@ final class ProtocolInvocationLauncherSign {
 						.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_06);
 			}
 		}
-
-		final AOKeyStore aoks = AOKeyStore.valueOf(options.getDefaultKeyStore());
+		
+		final AOKeyStore aoks = AOKeyStore.getKeyStore(options.getDefaultKeyStore());
 		if (aoks == null) {
 			LOGGER.severe("No hay un KeyStore con el nombre: " + options.getDefaultKeyStore()); //$NON-NLS-1$
 			ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_07);
@@ -234,7 +233,7 @@ final class ProtocolInvocationLauncherSign {
 
 		if (options.getSticky() && ProtocolInvocationLauncher.getStickyKeyEntry() != null) {
 
-			LOGGER.info("Se usa Sticky Signature y tenemos valor de clave privada");
+			LOGGER.info("Se usa Sticky Signature y tenemos valor de clave privada"); //$NON-NLS-1$
 			pke = ProtocolInvocationLauncher.getStickyKeyEntry();
 
 		} else {
@@ -273,7 +272,7 @@ final class ProtocolInvocationLauncherSign {
 
 				if (options.getSticky()) {
 
-					LOGGER.info("Se usa Sticky Signature para Sign y establecemos valor de clave privada desde la selección");
+					LOGGER.info("Se usa Sticky Signature para Sign y establecemos valor de clave privada desde la selección"); //$NON-NLS-1$
 
 					ProtocolInvocationLauncher.setStickyKeyEntry(pke);
 				}
