@@ -704,7 +704,14 @@ var MiniApplet = ( function ( window, undefined ) {
 		}
 
 		/**
-		 * 
+		 * Inicia el proceso de carga de un fichero.
+		 * Implementada tambien en el applet Java de firma
+		 * @param title Titulo de la ventana de dialogo
+		 * @param extensions Extensiones permitidas
+		 * @param description Descripcion del tipo de archivo a cargar
+		 * @param filePath Ruta del archivo por defecto
+		 * @param successCallback Funcion de callback tras exito
+		 * @param errorCallback Funcion de callback tras error
 		 */
 		var getFileNameContentBase64 = function (title, extensions, description, filePath, successCallback, errorCallback) {
 			forceLoad();
@@ -733,7 +740,14 @@ var MiniApplet = ( function ( window, undefined ) {
 		}
 
 		/**
-		 * 
+		 * Inicia el proceso de carga de uno o varios ficheros.
+		 * Implementada tambien en el applet Java de firma
+		 * @param title Titulo de la ventana de dialogo
+		 * @param extensions Extensiones permitidas
+		 * @param description Descripcion del tipo de archivo a cargar
+		 * @param filePath Ruta del archivo por defecto
+		 * @param successCallbackFunction Funcion de callback tras exito
+		 * @param errorCallbackFunction Funcion de callback tras error
 		 */
 		var getMultiFileNameContentBase64 = function (title, extensions, description, filePath, successCallback, errorCallback) {
 			forceLoad();
@@ -2368,22 +2382,6 @@ var MiniApplet = ( function ( window, undefined ) {
 				else {
 					execAppIntent(url, idSession, cipherKey, successCallback, errorCallback);
 				}
-			}
-
-			/**
-			 * Carga de un fichero. Operacion no soportada. 
-			 * Implementada en el applet Java de firma.
-			 */
-			function getFileNameContentBase64 (title, extensions, description) {
-				throwException(UnsupportedOperationException, "La operacion de carga de ficheros no esta soportada");
-			}
-
-			/**
-			 * Carga de multiples ficheros. Operacion no soportada.
-			 * Implementada en el applet Java de firma.
-			 */
-			function getMultiFileNameContentBase64 (title, extensions, description) {
-				throwException(UnsupportedOperationException, "La operacion de carga de multiples ficheros no esta soportada");
 			}
 
 			/** 
