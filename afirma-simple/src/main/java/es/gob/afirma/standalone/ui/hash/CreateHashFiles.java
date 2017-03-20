@@ -8,6 +8,8 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
@@ -50,6 +52,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import es.gob.afirma.core.AOCancelledOperationException;
+import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.ui.AOUIFactory;
@@ -60,7 +63,7 @@ import es.gob.afirma.standalone.ui.preferences.PreferencesManager;
 
 /** Genera huellas digitales de directorios (conjunto de ficheros).
  * @author Juliana Marulanda. */
-public final class CreateHashFiles extends JDialog {
+public final class CreateHashFiles extends JDialog implements KeyListener {
 
 	private static final long serialVersionUID = -7224732001218823361L;
 	private static final int SIZE_WAIT = 50000000; //Tamano en bytes
@@ -145,7 +148,7 @@ public final class CreateHashFiles extends JDialog {
 		// Boton examinar
 		this.examineButton.setText(SimpleAfirmaMessages.getString("CreateHashFiles.10")); //$NON-NLS-1$
 		this.examineButton.setMnemonic('X');
-
+		this.examineButton.addKeyListener(this);
 		this.examineButton.addActionListener(
 			new ActionListener() {
 				/** {@inheritDoc} */
@@ -158,14 +161,16 @@ public final class CreateHashFiles extends JDialog {
 		this.examineButton.setEnabled(true);
 		this.selectedFile.setEditable(false);
 		this.selectedFile.setFocusable(false);
+		this.selectedFile.addKeyListener(this);
 
 		// Label con el algoritmo
 		final JLabel labelAlg = new JLabel(SimpleAfirmaMessages.getString("CreateHashDialog.2")); //$NON-NLS-1$
 
 		// ComboBox con los algoritmos de generacion
 		this.hashAlgorithms.setSelectedItem(
-			PreferencesManager.get(PreferencesManager.PREFERENCE_CREATE_HASH_DIRECTORY_ALGORITHM, "SHA-512") //$NON-NLS-1$
+			PreferencesManager.get(PreferencesManager.PREFERENCE_CREATE_HASH_DIRECTORY_ALGORITHM, "SHA-256") //$NON-NLS-1$
 		);
+		this.hashAlgorithms.addKeyListener(this);
 		this.hashAlgorithms.addActionListener(
 			new ActionListener() {
 				@Override
@@ -178,6 +183,7 @@ public final class CreateHashFiles extends JDialog {
 			}
 		);
 
+		this.recursive.addKeyListener(this);
 		this.recursive.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(
@@ -192,7 +198,7 @@ public final class CreateHashFiles extends JDialog {
 		// Boton de generacion de la huella
 		this.generateButton.setText(SimpleAfirmaMessages.getString("CreateHashDialog.4")); //$NON-NLS-1$
 		this.generateButton.setMnemonic('G');
-
+		this.generateButton.addKeyListener(this);
 		this.generateButton.addActionListener(new ActionListener() {
 
 			/** {@inheritDoc} */
@@ -224,6 +230,7 @@ public final class CreateHashFiles extends JDialog {
 			SimpleAfirmaMessages.getString("CreateHashDialog.16") //$NON-NLS-1$
 		);
 		exitButton.setMnemonic('C');
+		exitButton.addKeyListener(this);
 		exitButton.addActionListener(
 			new ActionListener() {
 				@Override
@@ -246,7 +253,7 @@ public final class CreateHashFiles extends JDialog {
 			panel.add(this.generateButton);
 			panel.add(exitButton);
 		}
-		
+
 		add(label, gbc);
 		gbc.gridy++;
 		add(this.selectedFile, gbc);
@@ -397,6 +404,7 @@ public final class CreateHashFiles extends JDialog {
 	 *         					&lt;xs:extension base="xs:string"&gt;
 	 *           					&lt;xs:attribute type="xs:string" name="hash" use="required"/&gt;
 	 *           					&lt;xs:attribute type="xs:string" name="name" use="required"/&gt;
+	 *           					&lt;xs:attribute type="xs:string" name="hexhash"/&gt;
 	 *         					&lt;\xs:extension&gt;
 	 *       				&lt;\xs:simpleContent&gt;
 	 *				     &lt;\xs:complexType&gt;
@@ -459,6 +467,11 @@ public final class CreateHashFiles extends JDialog {
 			final Attr hashAttribute = doc.createAttribute("hash"); //$NON-NLS-1$
 			hashAttribute.setValue(Base64.encode(hash, true));
 			entry.setAttributeNode(hashAttribute);
+
+			// Se inicializa el atributo hexhash
+			final Attr hexHashAttribute = doc.createAttribute("hexhash"); //$NON-NLS-1$
+			hexHashAttribute.setValue(AOUtil.hexify(hash, false) + "h"); //$NON-NLS-1$
+			entry.setAttributeNode(hexHashAttribute);
 		}
 		final StringWriter sw = new StringWriter();
 		final TransformerFactory tf = TransformerFactory.newInstance();
@@ -625,4 +638,19 @@ public final class CreateHashFiles extends JDialog {
 		return this.selectedFile;
 	}
 	// ------- Fin metodos get.
+
+	@Override
+	public void keyTyped(final KeyEvent e) { /* Vacio */ }
+
+	@Override
+	public void keyPressed(final KeyEvent e) { /* Vacio */ }
+
+	@Override
+	public void keyReleased(final KeyEvent ke) {
+		// En Mac no cerramos los dialogos con Escape
+		if (ke != null && ke.getKeyCode() == KeyEvent.VK_ESCAPE && !Platform.OS.MACOSX.equals(Platform.getOS())) {
+			setVisible(false);
+			dispose();
+		}
+	}
 }
