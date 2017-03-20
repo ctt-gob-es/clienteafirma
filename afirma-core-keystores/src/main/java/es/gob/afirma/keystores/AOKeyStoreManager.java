@@ -30,6 +30,7 @@ import java.util.logging.Logger;
 
 import javax.security.auth.callback.PasswordCallback;
 
+import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.keystores.KeyStoreManager;
 import es.gob.afirma.core.misc.AOUtil;
 
@@ -149,7 +150,8 @@ public class AOKeyStoreManager implements KeyStoreManager {
      *         almac&eacute;n de certificados.
      * @throws es.gob.afirma.core.MissingLibraryException Cuando faltan bibliotecas necesarias para la inicializaci&oacute;n
      * @throws es.gob.afirma.core.InvalidOSException Cuando se pide un almac&eacute;n disponible solo en un sistema operativo
-     *                            distinto al actual */
+     *                            distinto al actual
+     * @throws es.gob.afirma.core.AOCancelledOperationException Cuando se cancela algun di&aacute;logo de PIN. */
     public void init(final AOKeyStore type,
     		         final InputStream store,
     		         final PasswordCallback pssCallBack,
@@ -276,8 +278,13 @@ public class AOKeyStoreManager implements KeyStoreManager {
     	catch(final Exception e) {
 
     		if ("es.gob.jmulticard.card.AuthenticationModeLockedException".equals(e.getClass().getName())) { //$NON-NLS-1$
-    			LOGGER.severe("Tarjeta bloqueada: " + e); //$NON-NLS-1$
+    			LOGGER.warning("Tarjeta bloqueada: " + e); //$NON-NLS-1$
     			throw new SmartCardLockedException("Tarjeta inteligente bloqueada", e); //$NON-NLS-1$
+    		}
+
+    		if ("es.gob.jmulticard.ui.passwordcallback.CancelledOperationException".equals(e.getClass().getName())) { //$NON-NLS-1$
+    			LOGGER.info("Se cancelo uso de la tarjeta a traves del driver Java: " + e); //$NON-NLS-1$
+    			throw new AOCancelledOperationException("Se cancelo uso de la tarjeta a traves del driver Java", e); //$NON-NLS-1$
     		}
 
     		LOGGER.severe(
@@ -351,20 +358,13 @@ public class AOKeyStoreManager implements KeyStoreManager {
 
     @Override
     public String toString() {
-        final StringBuilder ret = new StringBuilder("Gestor de almacenes de claves"); //$NON-NLS-1$
+        final StringBuilder ret = new StringBuilder("Gestor de almacenes de claves "); //$NON-NLS-1$
+        ret.append(this.ksType);
         if (this.ksType != null) {
-            String tmpStr = this.ksType.getName();
-            if (tmpStr != null) {
-                ret.append(" de tipo "); //$NON-NLS-1$
-                ret.append(tmpStr);
-            }
-            tmpStr = this.ksType.getName();
-            if (tmpStr != null) {
+            if (this.ksType.getName() != null) {
                 ret.append(" con nombre "); //$NON-NLS-1$
-                ret.append(tmpStr);
+                ret.append(this.ksType.getName());
             }
-            ret.append(" de clase "); //$NON-NLS-1$
-            ret.append(this.ksType.toString());
         }
         return ret.toString();
     }
