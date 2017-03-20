@@ -256,7 +256,7 @@ public final class MainMenu extends JMenuBar {
 
         this.add(menuArchivo);
         // TODO: Descomentar una vez se entregue
-        toolsMenu.add(huellaMenu);   
+        toolsMenu.add(huellaMenu);
         
 		// Preparamos la opcion de menú para "restaurar la configuracion de los
 		// navegadores" en el menú de herramientas
@@ -270,7 +270,7 @@ public final class MainMenu extends JMenuBar {
 		);
 		restoreConfigMenuItem.addActionListener(ae -> showRestoreConfig());
 
-		//toolsMenu.addSeparator();
+		// toolsMenu.addSeparator();
 		toolsMenu.add(restoreConfigMenuItem);
 		this.add(toolsMenu);
 
@@ -303,8 +303,6 @@ public final class MainMenu extends JMenuBar {
 				);
         	}
         }
-        
-        
 
         // Separador para que la ayuda quede a la derecha, se ignora en Mac OS X
         this.add(Box.createHorizontalGlue());
@@ -388,15 +386,14 @@ public final class MainMenu extends JMenuBar {
     void showPreferences() {
         PreferencesDialog.show(MainMenu.this.getParentComponent(), true);
     }
-    
-    
+
     /**
      * Method that show the restore dialog panel.
      */
     void showRestoreConfig() {
     	RestoreConfigDialog.show(MainMenu.this.getParentComponent(), true);
     }
-
+    
     /** Muestra en OS X el men&uacute; "Acerca de...".
      * @param parentComponent Componente padre para la modalidad. */
     public static void showAbout(final Component parentComponent) {
