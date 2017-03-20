@@ -10,6 +10,7 @@
 
 package es.gob.afirma.keystores;
 
+import java.awt.Component;
 import java.io.File;
 import java.io.IOException;
 import java.security.KeyStore;
@@ -28,8 +29,10 @@ import javax.security.auth.callback.NameCallback;
 import javax.security.auth.callback.PasswordCallback;
 import javax.security.auth.callback.TextOutputCallback;
 import javax.security.auth.callback.UnsupportedCallbackException;
+import javax.security.auth.login.LoginException;
 import javax.swing.JOptionPane;
 
+import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.keystores.KeyStoreManager;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Platform;
@@ -51,10 +54,15 @@ public final class KeyStoreUtilities {
     	"DNIe_P11_priv.dll", //$NON-NLS-1$
     	"DNIe_P11_pub.dll", //$NON-NLS-1$
     	"FNMT_P11.dll", //$NON-NLS-1$
+    	"FNMT_P11_x64.dll", //$NON-NLS-1$
     	"UsrPkcs11.dll", //$NON-NLS-1$
     	"UsrPubPkcs11.dll", //$NON-NLS-1$
     	"TIF_P11.dll" //$NON-NLS-1$
     };
+
+	private static final String PIN_ERROR_LOCKED = "CKR_PIN_LOCKED"; //$NON-NLS-1$
+	private static final String PIN_ERROR_WRONG_LENGTH = "CKR_PIN_LEN_RANGE"; //$NON-NLS-1$
+	private static final String PIN_ERROR_INCORRECT = "CKR_PIN_INCORRECT"; //$NON-NLS-1$
 
     /** Crea las l&iacute;neas de configuraci&oacute;n para el proveedor PKCS#11
      * de Sun.
@@ -147,6 +155,9 @@ public final class KeyStoreUtilities {
 
                 try {
                     tmpCert = ksm.getCertificate(al);
+                }
+                catch (final AOCancelledOperationException e) {
+                	throw e;
                 }
                 catch (final RuntimeException e) {
 
@@ -282,7 +293,8 @@ public final class KeyStoreUtilities {
 	 * @param parentComponent Componente padre para los di&aacute;logos de los almacenes preferentes
 	 *                        (solicitud de PIN, confirmaci&oacute;n de firma, etc.).
 	 * @return Devuelve {@code true} cuando se ha detectado alguno de los almacenes preferentes,
-	 *         {@code false} en caso contrario. */
+	 *         {@code false} en caso contrario.
+	 * @throws AOCancelledOperationException Cuando se cancela la carga del almac&eacute;n. */
 	public static boolean addPreferredKeyStoreManagers(final AggregatedKeyStoreManager aksm, final Object parentComponent) {
 		// Anadimos el controlador Java del DNIe SIEMPRE excepto:
 		// -Que se indique "es.gob.afirma.keystores.mozilla.disableDnieNativeDriver=true"
@@ -291,8 +303,11 @@ public final class KeyStoreUtilities {
 				aksm.addKeyStoreManager(getDnieKeyStoreManager(parentComponent));
 				return true; // Si instancia DNIe no pruebo otras tarjetas, no deberia haber varias tarjetas instaladas
 			}
-			catch (final Exception ex) {
-				LOGGER.warning("No se ha podido inicializar el controlador DNIe 100% Java: " + ex); //$NON-NLS-1$
+			catch (final AOCancelledOperationException e) {
+				throw e;
+			}
+			catch (final Exception e) {
+				LOGGER.warning("No se ha podido inicializar el controlador DNIe 100% Java: " + e); //$NON-NLS-1$
 			}
 		}
 
@@ -303,6 +318,9 @@ public final class KeyStoreUtilities {
 			try {
 				aksm.addKeyStoreManager(getCeresKeyStoreManager(parentComponent));
 				return true; // Si instancia CERES no pruebo otras tarjetas, no deberia haber varias tarjetas instaladas
+			}
+			catch (final AOCancelledOperationException e) {
+				throw e;
 			}
 			catch (final Exception ex) {
 				LOGGER.warning("No se ha podido inicializar la tarjeta CERES: " + ex); //$NON-NLS-1$
@@ -349,84 +367,57 @@ public final class KeyStoreUtilities {
     		                                                      final PasswordCallback pssCallBack,
                                                                   final Provider provider,
                                                                   final Object parentComponent) throws KeyStoreException {
-    	final KeyStore.CallbackHandlerProtection chp = new KeyStore.CallbackHandlerProtection(
-			new CallbackHandler() {
-				@Override
-				public void handle(final Callback[] cbs) throws UnsupportedCallbackException {
-					for (final Callback callback : cbs) {
-						if (callback instanceof PasswordCallback) {
-							((PasswordCallback) callback).setPassword(pssCallBack.getPassword());
-						}
-						else if (callback instanceof TextOutputCallback) {
-							final TextOutputCallback toc = (TextOutputCallback)callback;
-							switch (toc.getMessageType()) {
-								case TextOutputCallback.INFORMATION:
-									LOGGER.info("Informacion del dispositivo criptografico: " + toc.getMessage()); //$NON-NLS-1$
-									AOUIFactory.showMessageDialog(
-										parentComponent,
-										toc.getMessage(),
-										KeyStoreMessages.getString("KeyStoreUtilities.0"), //$NON-NLS-1$
-										JOptionPane.INFORMATION_MESSAGE
-									);
-									break;
-								case TextOutputCallback.ERROR:
-									LOGGER.severe("Informacion del dispositivo criptografico: " + toc.getMessage()); //$NON-NLS-1$
-									AOUIFactory.showMessageDialog(
-										parentComponent,
-										toc.getMessage(),
-										KeyStoreMessages.getString("KeyStoreUtilities.1"), //$NON-NLS-1$
-										JOptionPane.ERROR_MESSAGE
-									);
-									break;
-								case TextOutputCallback.WARNING:
-									LOGGER.warning("Informacion del dispositivo criptografico: " + toc.getMessage()); //$NON-NLS-1$
-									AOUIFactory.showMessageDialog(
-										parentComponent,
-										toc.getMessage(),
-										KeyStoreMessages.getString("KeyStoreUtilities.2"), //$NON-NLS-1$
-										JOptionPane.WARNING_MESSAGE
-									);
-									break;
-								default:
-									LOGGER.warning(
-										"Recibida informacion del dispositivo criptografico en un formato desconocido: " + toc.getMessageType() //$NON-NLS-1$
-									);
-							}
-						}
-						else if (callback instanceof NameCallback) {
-							final Object name = AOUIFactory.showInputDialog(
-								parentComponent,
-								KeyStoreMessages.getString("KeyStoreUtilities.3"), //$NON-NLS-1$
-								KeyStoreMessages.getString("KeyStoreUtilities.4"), //$NON-NLS-1$
-								JOptionPane.WARNING_MESSAGE,
-								null,
-								null,
-								null
-							);
-							if (name != null) {
-								((NameCallback)callback).setName(name.toString());
-							}
-							throw new UnsupportedCallbackException(
-								callback,
-								"No se soporta la solicitud de nombre de usuario para dispositivos criptograficos" //$NON-NLS-1$
-							);
-						}
-						else {
-							throw new UnsupportedCallbackException(
-								callback,
-								"Recibido tipo de callback desconocido: " + callback.getClass().getName() //$NON-NLS-1$
-							);
-						}
-					}
-				}
-			}
-		);
+
+    	final PasswordCallbackHandler handler = new PasswordCallbackHandler(parentComponent, pssCallBack);
+    	final KeyStore.CallbackHandlerProtection chp = new KeyStore.CallbackHandlerProtection(handler);
+
     	final KeyStore.Builder builder = KeyStore.Builder.newInstance(
 			ks.getProviderName(),
 			provider,
 			chp
 		);
-    	return builder.getKeyStore();
+
+    	try {
+    		return builder.getKeyStore();
+    	}
+    	catch(final KeyStoreException e) {
+    		if (handler.isCancelled()) {
+    			LOGGER.warning("Se ha detectado la cancelacion del dialogo de PIN"); //$NON-NLS-1$
+    			throw new AOCancelledOperationException("Se cancelo el dialogo de insercion de PIN"); //$NON-NLS-1$
+    		}
+
+    		// Si identificamos un PIN incorrecto, lo notificamos al usuario y volvemos a
+    		// intentar cargar el almacen
+    		if (e.getCause() != null && e.getCause().getCause() != null &&
+    				e.getCause().getCause() instanceof LoginException) {
+    			final Throwable pkcs11Exception = e.getCause().getCause().getCause();
+    			boolean ksLocked = false;
+    			String msg = KeyStoreMessages.getString("KeyStoreUtilities.5"); //$NON-NLS-1$
+    			if (pkcs11Exception != null) {
+        			if (PIN_ERROR_LOCKED.equals(pkcs11Exception.getMessage())) {
+        				msg = KeyStoreMessages.getString("KeyStoreUtilities.7"); //$NON-NLS-1$
+        				ksLocked = true;
+        			}
+        			else if (PIN_ERROR_WRONG_LENGTH.equals(pkcs11Exception.getMessage())) {
+        				msg = KeyStoreMessages.getString("KeyStoreUtilities.8"); //$NON-NLS-1$
+        			}
+        			else if (PIN_ERROR_INCORRECT.equals(pkcs11Exception.getMessage())) {
+        				msg = KeyStoreMessages.getString("KeyStoreUtilities.5"); //$NON-NLS-1$
+        			}
+    			}
+    			JOptionPane.showMessageDialog(
+    					(Component) parentComponent,
+    					msg,
+    					KeyStoreMessages.getString("KeyStoreUtilities.6"), //$NON-NLS-1$
+    					JOptionPane.ERROR_MESSAGE);
+
+    			// Si el almacen no se encuentra bloqueado, lo seguimos intentando
+    			if (!ksLocked) {
+					return getKeyStoreWithPasswordCallbackHandler(ks, pssCallBack, provider, parentComponent);
+    			}
+    		}
+    		throw e;
+    	}
     }
 
     /** Busca un fichero (o una serie de ficheros) en el <i>LIBRARY PATH</i> del sistema. Deja
@@ -461,4 +452,106 @@ public final class KeyStoreUtilities {
         return null;
     }
 
+    /**
+     * Manejador para la gestion de la contrase&ntilde;a (y otros di&aacute;logos)
+     * de un almacen de claves.
+     */
+    private static class PasswordCallbackHandler implements CallbackHandler {
+
+    	private final Object parentComponent;
+    	private final PasswordCallback pssCallBack;
+    	private boolean cancelled = false;
+
+    	public PasswordCallbackHandler(final Object parentComponent, final PasswordCallback pssCallBack) {
+    		this.parentComponent = parentComponent;
+    		this.pssCallBack = pssCallBack;
+		}
+
+    	@Override
+    	public void handle(final Callback[] cbs) throws UnsupportedCallbackException {
+    		for (final Callback callback : cbs) {
+    			if (callback instanceof PasswordCallback) {
+    				try {
+    					((PasswordCallback) callback).setPassword(this.pssCallBack.getPassword());
+    				}
+    				catch (final AOCancelledOperationException e) {
+    					// Al no establecer una contrasena, la carga del almacen lanzara
+    					// un error generico. Cuando lo capturemos, comprobaremos si esta
+    					// marcado que se cancelo el dialogo para distinguir si este es
+    					// el motivo de ese error.
+    					this.cancelled = true;
+    				}
+    			}
+    			else if (callback instanceof TextOutputCallback) {
+    				final TextOutputCallback toc = (TextOutputCallback)callback;
+    				switch (toc.getMessageType()) {
+    				case TextOutputCallback.INFORMATION:
+    					LOGGER.info("Informacion del dispositivo criptografico: " + toc.getMessage()); //$NON-NLS-1$
+    					AOUIFactory.showMessageDialog(
+    							this.parentComponent,
+    							toc.getMessage(),
+    							KeyStoreMessages.getString("KeyStoreUtilities.0"), //$NON-NLS-1$
+    							JOptionPane.INFORMATION_MESSAGE
+    							);
+    					break;
+    				case TextOutputCallback.ERROR:
+    					LOGGER.severe("Informacion del dispositivo criptografico: " + toc.getMessage()); //$NON-NLS-1$
+    					AOUIFactory.showMessageDialog(
+    							this.parentComponent,
+    							toc.getMessage(),
+    							KeyStoreMessages.getString("KeyStoreUtilities.1"), //$NON-NLS-1$
+    							JOptionPane.ERROR_MESSAGE
+    							);
+    					break;
+    				case TextOutputCallback.WARNING:
+    					LOGGER.warning("Informacion del dispositivo criptografico: " + toc.getMessage()); //$NON-NLS-1$
+    					AOUIFactory.showMessageDialog(
+    							this.parentComponent,
+    							toc.getMessage(),
+    							KeyStoreMessages.getString("KeyStoreUtilities.2"), //$NON-NLS-1$
+    							JOptionPane.WARNING_MESSAGE
+    							);
+    					break;
+    				default:
+    					LOGGER.warning(
+    							"Recibida informacion del dispositivo criptografico en un formato desconocido: " + toc.getMessageType() //$NON-NLS-1$
+    							);
+    				}
+    			}
+    			else if (callback instanceof NameCallback) {
+    				final Object name = AOUIFactory.showInputDialog(
+    						this.parentComponent,
+    						KeyStoreMessages.getString("KeyStoreUtilities.3"), //$NON-NLS-1$
+    						KeyStoreMessages.getString("KeyStoreUtilities.4"), //$NON-NLS-1$
+    						JOptionPane.WARNING_MESSAGE,
+    						null,
+    						null,
+    						null
+    						);
+    				if (name != null) {
+    					((NameCallback)callback).setName(name.toString());
+    				}
+    				throw new UnsupportedCallbackException(
+    						callback,
+    						"No se soporta la solicitud de nombre de usuario para dispositivos criptograficos" //$NON-NLS-1$
+    						);
+    			}
+    			else {
+    				throw new UnsupportedCallbackException(
+    						callback,
+    						"Recibido tipo de callback desconocido: " + callback.getClass().getName() //$NON-NLS-1$
+    						);
+    			}
+    		}
+    	}
+
+    	/**
+    	 * Indica si se cancelo el di&aacute;logo de inserci&oacute;n de PIN.
+    	 * @return {@code true} si se cancel&oacute; el di&aacute;logo de
+    	 * inserci&oacute;n de PIN, {@code false} en caso contrario.
+    	 */
+		public boolean isCancelled() {
+			return this.cancelled;
+		}
+    }
 }
