@@ -151,9 +151,11 @@ final class ProtocolInvocationLauncherSign {
 			}
 		}
 
-		// En caso de haber programado el formato "AUTO", se selecciona el
-		// firmador a partir
-		// de los datos (firma) proporcionados
+		// En caso de haber programado el formato "AUTO", se selecciona el firmador a partir
+		// de los datos proporcionados. En caso de configurarse la operacion de firma,
+		// habremos recibido simples datos y seleccionaremos segun su formato. En caso contrario
+		// (cofirma o contrafirma) habremos recibido una firma y usaremos el mismo formato que
+		// tenga esta.
 		if (signer == null) {
 			if (Operation.SIGN == options.getOperation()) {
 				if (DataAnalizerUtil.isPDF(options.getData())) {
