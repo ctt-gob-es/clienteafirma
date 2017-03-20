@@ -143,7 +143,14 @@ public enum AOKeyStore {
 		"DNI", //$NON-NLS-1$
 		null,
 		null
-	);
+	),
+    /** Conjunto de tarjetas conocidas. */
+    KNOWN_SMARTCARDS(
+    	"Tarjetas inteligentes conocidas", //$NON-NLS-1$
+    	15,
+    	"SMARTCARDS", //$NON-NLS-1$
+    	null,
+    	null);
 
     private final String name;
     private final int ordinal;
