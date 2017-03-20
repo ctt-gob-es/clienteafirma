@@ -27,6 +27,7 @@ import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.core.util.tree.AOTreeNode;
 import es.gob.afirma.signers.xades.AOXAdESSigner;
+import es.gob.afirma.standalone.DataAnalizerUtil;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import xmlwise.Plist;
 import xmlwise.XmlParseException;
@@ -129,6 +130,15 @@ final class PreferencesPlistHandler {
 			return;
 		}
 
+		if (!DataAnalizerUtil.isXML(configData)) {
+			AOUIFactory.showErrorMessage(
+					parent,
+					SimpleAfirmaMessages.getString("PreferencesPlistHandler.9"), //$NON-NLS-1$
+					SimpleAfirmaMessages.getString("PreferencesPlistHandler.1"), //$NON-NLS-1$
+					JOptionPane.ERROR_MESSAGE
+				);
+			return;
+		}
 
 		SignValidity sv = new SignValidity(SIGN_DETAIL_TYPE.UNKNOWN, null);
 		try {
