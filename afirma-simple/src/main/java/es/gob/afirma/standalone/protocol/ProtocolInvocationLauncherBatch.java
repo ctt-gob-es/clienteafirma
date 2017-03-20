@@ -50,7 +50,7 @@ final class ProtocolInvocationLauncherBatch {
 
 		final AOKeyStore aoks = AOKeyStore.getKeyStore(options.getDefaultKeyStore());
 		if (aoks == null) {
-			LOGGER.severe("No hay un KeyStore con el nombre: " + options.getDefaultKeyStore()); //$NON-NLS-1$
+			LOGGER.severe("No hay un KeyStore asociado al valor: " + options.getDefaultKeyStore()); //$NON-NLS-1$
 			ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_07);
 			return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_07);
 		}
@@ -62,7 +62,7 @@ final class ProtocolInvocationLauncherBatch {
 
 		if (options.getSticky() && ProtocolInvocationLauncher.getStickyKeyEntry() != null) {
 
-			LOGGER.info("Se usa Sticky Signature y tenemos valor de clave privada");
+			LOGGER.info("Se usa Sticky Signature y tenemos valor de clave privada"); //$NON-NLS-1$
 			pke = ProtocolInvocationLauncher.getStickyKeyEntry();
 
 		} else {
@@ -109,7 +109,7 @@ final class ProtocolInvocationLauncherBatch {
 				
 				if (options.getSticky()) {
 
-					LOGGER.info("Se usa Sticky Signature y establecemos valor de clave privada desde la selección");
+					LOGGER.info("Se usa Sticky Signature y establecemos valor de clave privada desde la selección"); //$NON-NLS-1$
 
 					ProtocolInvocationLauncher.setStickyKeyEntry(pke);
 				}
