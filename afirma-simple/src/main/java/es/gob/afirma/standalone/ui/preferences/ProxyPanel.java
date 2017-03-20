@@ -96,7 +96,7 @@ final class ProxyPanel extends JPanel{
 		c.gridx = 0;
 		c.gridy = 0;
 
-		setPreferredSize(new Dimension(PREFERRED_WIDTH, PREFERRED_HEIGHT));
+		setMinimumSize(new Dimension(PREFERRED_WIDTH, PREFERRED_HEIGHT));
 
 		getAccessibleContext().setAccessibleDescription(
     		SimpleAfirmaMessages.getString("ProxyDialog.12") //$NON-NLS-1$
