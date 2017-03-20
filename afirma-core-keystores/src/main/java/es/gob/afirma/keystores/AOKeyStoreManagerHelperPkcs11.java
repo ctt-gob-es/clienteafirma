@@ -27,6 +27,7 @@ import java.util.logging.Logger;
 
 import javax.security.auth.callback.PasswordCallback;
 
+import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.AOUtil;
 
 final class AOKeyStoreManagerHelperPkcs11 {
@@ -46,7 +47,8 @@ final class AOKeyStoreManagerHelperPkcs11 {
      * @return Almac&eacute;n configurado.
      * @throws AOKeyStoreManagerException Cuando ocurre un error durante la inicializaci&oacute;n.
      * @throws IOException Cuando se indique una contrase&ntilde;a incorrecta para la
-     *         apertura del almac&eacute;n. */
+     *         apertura del almac&eacute;n.
+     * @throws es.gob.afirma.core.AOCancelledOperationException Cuando se cancela algun di&aacute;logo de PIN. */
     static KeyStore initPKCS11(final PasswordCallback pssCallBack,
     		                   final Object[] params,
     		                   final boolean forceReset) throws AOKeyStoreManagerException,
@@ -126,6 +128,11 @@ final class AOKeyStoreManagerHelperPkcs11 {
 				null
 			);
 		}
+        catch (final AOCancelledOperationException e) {
+        	// Se retira el proveedor si el usuario cancela el uso de la tarjeta
+        	Security.removeProvider("SunPKCS11-" + p11ProviderName); //$NON-NLS-1$
+			throw e;
+        }
         catch (final Exception e) {
         	// En caso de no poder instanciar la tarjeta en cuestion, se retira el proveedor
         	Security.removeProvider("SunPKCS11-" + p11ProviderName); //$NON-NLS-1$
