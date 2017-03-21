@@ -29,11 +29,20 @@ public final class UrlParametersToSelectCert extends UrlParameters {
 
 	/** Par&aacute;metro de entrada con la m&iacute;nima versi&oacute;n requerida del aplicativo a usar en la invocaci&oacute;n por protocolo. */
 	private static final String VER_PARAM = "ver"; //$NON-NLS-1$
-
+	
 	/** Par&aacute;metro que identifica el almac&acute;n de claves por defecto. */
 	private static final String KEYSTORE_PARAM ="keystore"; //$NON-NLS-1$
+	
+	/** Par&aacute;metro de entrada que nos dice si tenemos que usar un provatekeyentry fijado o fijar uno nuevo. */
+	private static final String STICKY_PARAM = "sticky"; //$NON-NLS-1$
 
 	private String minimumVerstion;
+	
+	/**
+	 * Opci&oacute;n de configuraci&oacute;n que determina si se debe mantener
+	 * el primer certificado seleccionado para todas las operaciones. 
+	 */
+	private Boolean sticky;
 
 	/** Obtiene la versi&oacute;n m&iacute;nima requerida del aplicativo.
 	 * @return Versi&oacute;n m&iacute;nima requerida del aplicativo. */
@@ -49,6 +58,27 @@ public final class UrlParametersToSelectCert extends UrlParameters {
 
 	void setMinimumVersion(final String minVer) {
 		this.minimumVerstion = minVer;
+	}
+	
+	/**
+	 * Obtiene la opci&oacute;n de configuraci&oacute;n sticky
+	 * 
+	 * @return Opci&oacute;n de configuraci&oacute;n que determina si se debe
+	 *         mantener el primer certificado seleccionado ({@code true}) o se
+	 *         debe pedir siempre que el usuario elija uno ({@code false})
+	 */
+	public Boolean getSticky() {
+		return sticky;
+	}
+
+	/**
+	 * Establece la opci&oacute;n de configuraci&oacute;n sticky
+	 * @param sticky Opci&oacute;n de configuraci&oacute;n que determina si se debe
+	 *         mantener el primer certificado seleccionado ({@code true}) o se
+	 *         debe pedir siempre que el usuario elija uno ({@code false})
+	 */
+	public void setSticky(final Boolean sticky) {
+		this.sticky = sticky;
 	}
 
 	void setSelectCertParameters(final Map<String, String> params) throws ParameterException {
@@ -123,6 +153,13 @@ public final class UrlParametersToSelectCert extends UrlParameters {
 		}
 		else {
 			setExtraParams(new Properties());
+		}
+		
+		// Valor de parametro sticky
+		if (params.containsKey(STICKY_PARAM)) {
+			setSticky(new Boolean(params.get(STICKY_PARAM)));
+		} else {
+			setSticky(Boolean.FALSE);
 		}
 
 		setDefaultKeyStore(getDefaultKeyStoreName(params));

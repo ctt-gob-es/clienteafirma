@@ -28,7 +28,7 @@ import es.gob.afirma.core.misc.protocol.UrlParametersToSign.Operation;
 final class ProtocolInvocationUriParserUtil {
 
 	static final String DEFAULT_URL_ENCODING = "UTF-8"; //$NON-NLS-1$
-
+		
 	private ProtocolInvocationUriParserUtil() {
 		// No instanciable
 	}
@@ -52,6 +52,20 @@ final class ProtocolInvocationUriParserUtil {
 		ret.setCommonParameters(params);
 		ret.setSaveParameters(params);
 
+		return ret;
+	}
+	
+	/** Recupera los par&aacute;metros necesarios para la configuraci&oacute;n de una
+	 * operaci&oacute;n de carga de datos. Si falta alg&uacute;n par&aacute;metro o
+	 * es err&oacute;neo se lanzar&aacute; una excepci&oacute;n.
+	 * @param params Par&aacute;metros de con la configuraci&oacute;n de la operaci&oacute;n.
+	 * @return Par&aacute;metros
+	 * @throws ParameterException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto. */
+	static UrlParametersToLoad getParametersToLoad(final Map<String, String> params) throws ParameterException {
+		final UrlParametersToLoad ret = new UrlParametersToLoad();
+
+		ret.setLoadParameters(params);
+		
 		return ret;
 	}
 
