@@ -9,6 +9,11 @@ import javax.swing.JTextArea;
 
 import es.gob.afirma.core.misc.Platform;
 
+/**
+ * Clase que contiene la l&oacute;gica para iniciar el proceso de restauraci&oacute;n decidiendo
+ * el sistema operativo objetivo.
+ *
+ */
 public class RestoreConfigManager {
 	
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
@@ -23,10 +28,10 @@ public class RestoreConfigManager {
 
 		if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
 			this.configurator = new RestoreConfigWindows();
-			LOGGER.info("Detectado OS Windows");
+			
 		}
 		else if (Platform.OS.LINUX == Platform.getOS()){
-			LOGGER.info("Detectado OS Linux");
+			
 		    this.configurator = new RestoreConfigLinux();
 		}
 		else if (Platform.OS.MACOSX == Platform.getOS()){
@@ -40,11 +45,11 @@ public class RestoreConfigManager {
 		}
 	}
 
-	/** Configura el entorno para permitir la correcta ejecuci&oacute;n de AutoFirma.
+	/** Repara la configuraci&oacute;n de navegadores para permitir la correcta ejecuci&oacute;n de AutoFirma.
 	 * @throws GeneralSecurityException Cuando se produce un error al manipular los almacenes de certificados.
 	 * @throws ConfigurationException Cuando falla la generacion del certificados SSL.
 	 * @throws IOException Cuando no es posible cargar o manipular alg&uacute;n fichero de configuraci&oacute;n o recursos. */
-	public void configureAutoFirma(JTextArea taskOutput) throws GeneralSecurityException, ConfigurationException, IOException {
+	public void restoreConfigAutoFirma(JTextArea taskOutput) throws GeneralSecurityException, ConfigurationException, IOException {
 
 		if (this.configurator == null) {
 			LOGGER.warning("No se realizara ninguna accion"); //$NON-NLS-1$
