@@ -95,12 +95,13 @@ final class RestoreConfigLinux implements RestoreConfig {
 		}
 		
 		appendMessage(taskOutput, SimpleAfirmaMessages.getString("RestoreConfigLinux.15")); //$NON-NLS-1$
-		// Restauracion del fichero de configuracion de protocolo afirma en Linux
+		// Restauracion del fichero de configuracion de protocolo afirma en Linux.
+		// Es necesario tener permisos de administrador para modificar el directorio.
 		try {
 			restoreProtocolHandler();
 		} catch (IOException e) {
 			appendMessage(taskOutput, SimpleAfirmaMessages.getString("RestoreConfigLinux.16")); //$NON-NLS-1$
-			LOGGER.severe("Excepcion en la creacion del script linux para la configuracion del protocolo afirma: " + e //$NON-NLS-1$
+			LOGGER.warning("Error en la creacion del script linux para la configuracion del protocolo afirma. Probablemente AutoFirma no tenga permisos de administrador: " + e //$NON-NLS-1$
 			);
 			
 		}

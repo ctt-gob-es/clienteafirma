@@ -119,6 +119,10 @@ final class RestoreConfigWindows implements RestoreConfig {
 				appendMessage(taskOutput, SimpleAfirmaMessages.getString("RestoreConfigWindows.12")); //$NON-NLS-1$
 			}
 		} else {
+			
+			JOptionPane.showMessageDialog(null, SimpleAfirmaMessages.getString("RestoreConfigWindows.28"), //$NON-NLS-1$
+					SimpleAfirmaMessages.getString("RestoreAutoFirma.9"), //$NON-NLS-1$
+					JOptionPane.WARNING_MESSAGE);
 			appendMessage(taskOutput, SimpleAfirmaMessages.getString("RestoreConfigWindows.28")); //$NON-NLS-1$
 		}
 		
