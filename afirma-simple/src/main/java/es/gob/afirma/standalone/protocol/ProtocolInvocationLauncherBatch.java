@@ -21,7 +21,6 @@ import es.gob.afirma.keystores.filters.CertificateFilter;
 import es.gob.afirma.signers.batch.client.BatchSigner;
 import es.gob.afirma.standalone.crypto.CypherDataManager;
 
-
 final class ProtocolInvocationLauncherBatch {
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
@@ -56,74 +55,90 @@ final class ProtocolInvocationLauncherBatch {
 			return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_07);
 		}
 
-		final String aoksLib = options.getDefaultKeyStoreLib();
-
-		final PasswordCallback pwc = aoks.getStorePasswordCallback(null);
-		final AOKeyStoreManager ksm;
-		try {
-			ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
-				aoks, // Store
-				aoksLib, // Lib
-				null, // Description
-				pwc,  // PasswordCallback
-				null  // Parent
-			);
-		}
-		catch (final Exception e3) {
-			LOGGER.severe("Error obteniendo el AOKeyStoreManager: " + e3); //$NON-NLS-1$
-			ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_08);
-			if (!bySocket){
-				throw new SocketOperationException(ProtocolInvocationLauncherErrorManager.SAF_08);
-			}
-			return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_08);
-		}
-
 		final CertFilterManager filterManager = new CertFilterManager(options.getExtraParams());
 		final List<CertificateFilter> filters = filterManager.getFilters();
 		final boolean mandatoryCertificate = filterManager.isMandatoryCertificate();
 		final PrivateKeyEntry pke;
-		try {
-			if (Platform.OS.MACOSX.equals(Platform.getOS())) {
-				ServiceInvocationManager.focusApplication();
+
+		if (options.getSticky() && ProtocolInvocationLauncher.getStickyKeyEntry() != null) {
+
+			LOGGER.info("Se usa Sticky Signature y tenemos valor de clave privada"); //$NON-NLS-1$
+			pke = ProtocolInvocationLauncher.getStickyKeyEntry();
+
+		} else {
+		
+			final String aoksLib = options.getDefaultKeyStoreLib();
+	
+			final PasswordCallback pwc = aoks.getStorePasswordCallback(null);
+			final AOKeyStoreManager ksm;
+			try {
+				ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
+					aoks, // Store
+					aoksLib, // Lib
+					null, // Description
+					pwc,  // PasswordCallback
+					null  // Parent
+				);
 			}
-			final AOKeyStoreDialog dialog = new AOKeyStoreDialog(
-				ksm,
-				null,
-				true,
-				true, // showExpiredCertificates
-				true, // checkValidity
-				filters,
-				mandatoryCertificate
-			);
-			dialog.allowOpenExternalStores(filterManager.isExternalStoresOpeningAllowed());
-			dialog.show();
-			pke = ksm.getKeyEntry(
-				dialog.getSelectedAlias()
-			);
-		}
-		catch (final AOCancelledOperationException e) {
-			LOGGER.severe("Operacion cancelada por el usuario " + e); //$NON-NLS-1$
-			if (!bySocket){
-				throw new SocketOperationException(RESULT_CANCEL);
+			catch (final Exception e3) {
+				LOGGER.severe("Error obteniendo el AOKeyStoreManager: " + e3); //$NON-NLS-1$
+				ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_08);
+				if (!bySocket){
+					throw new SocketOperationException(ProtocolInvocationLauncherErrorManager.SAF_08);
+				}
+				return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_08);
 			}
-			return RESULT_CANCEL;
-		}
-		catch(final AOCertificatesNotFoundException e) {
-			LOGGER.severe("No hay certificados validos en el almacen: " + e); //$NON-NLS-1$
-			ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_19);
-			if (!bySocket){
-				throw new SocketOperationException(ProtocolInvocationLauncherErrorManager.SAF_19);
+				
+			try {
+				if (Platform.OS.MACOSX.equals(Platform.getOS())) {
+					ServiceInvocationManager.focusApplication();
+				}
+				final AOKeyStoreDialog dialog = new AOKeyStoreDialog(
+					ksm,
+					null,
+					true,
+					true, // showExpiredCertificates
+					true, // checkValidity
+					filters,
+					mandatoryCertificate
+				);
+				dialog.allowOpenExternalStores(filterManager.isExternalStoresOpeningAllowed());
+				dialog.show();
+				pke = ksm.getKeyEntry(
+					dialog.getSelectedAlias());
+				
+				if (options.getSticky()) {
+
+					LOGGER.info("Se usa Sticky Signature y establecemos valor de clave privada desde la selección"); //$NON-NLS-1$
+
+					ProtocolInvocationLauncher.setStickyKeyEntry(pke);
+				}
 			}
-			return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_19);
-		}
-		catch (final Exception e) {
-			LOGGER.severe("Error al mostrar el dialogo de seleccion de certificados: " + e); //$NON-NLS-1$
-			ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_08);
-			if (!bySocket){
-				throw new SocketOperationException(ProtocolInvocationLauncherErrorManager.SAF_08);
+			catch (final AOCancelledOperationException e) {
+				LOGGER.severe("Operacion cancelada por el usuario " + e); //$NON-NLS-1$
+				if (!bySocket){
+					throw new SocketOperationException(RESULT_CANCEL);
+				}
+				return RESULT_CANCEL;
 			}
-			return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_08);
-		}
+			catch(final AOCertificatesNotFoundException e) {
+				LOGGER.severe("No hay certificados validos en el almacen: " + e); //$NON-NLS-1$
+				ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_19);
+				if (!bySocket){
+					throw new SocketOperationException(ProtocolInvocationLauncherErrorManager.SAF_19);
+				}
+				return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_19);
+			}
+			catch (final Exception e) {
+				LOGGER.severe("Error al mostrar el dialogo de seleccion de certificados: " + e); //$NON-NLS-1$
+				ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_08);
+				if (!bySocket){
+					throw new SocketOperationException(ProtocolInvocationLauncherErrorManager.SAF_08);
+				}
+				return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_08);
+			}
+			
+		}	
 
 		String batchResult;
 		try {
