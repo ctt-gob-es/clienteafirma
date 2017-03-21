@@ -31,8 +31,9 @@ import es.gob.afirma.standalone.ui.restoreconfig.CertUtil.CertPack;
 import es.gob.afirma.standalone.ui.restoreconfig.RestoreConfigFirefox.MozillaProfileNotFoundException;
 
 /**
- * Configura la instalaci&oacute;n en Windows para la correcta ejecuci&oacute;n
- * de AutoFirma.
+ * Clase que contiene la l&oacute;gica para realizar las tareas de restauraci&oacute;n
+ * de la configuraci&oacute;n de navegadores para el sistema operativo Windows. 
+ * 
  */
 final class RestoreConfigWindows implements RestoreConfig {
 
@@ -42,6 +43,9 @@ final class RestoreConfigWindows implements RestoreConfig {
 	private static final String FILE_AUTOFIRMA_CERTIFICATE = "AutoFirma_ROOT.cer"; //$NON-NLS-1$
 	private static final String KS_PASSWORD = "654321"; //$NON-NLS-1$
 
+	/**
+	 * Ruta de configuraci&oacute;n de Chorme en Windows
+	 */
 	private static final String CHROME_CONFIG_FILE = "AppData/Local/Google/Chrome/User Data/Local State"; //$NON-NLS-1$
 	
 	/** Nombre del usuario por defecto en Windows. Este usuario es el que se usa como base para
@@ -75,9 +79,10 @@ final class RestoreConfigWindows implements RestoreConfig {
 		// los certificados .pfx y/o .cer
 		Certificate sslRoot = restoreCertificateWindows(taskOutput);
 
-		// Para completar el proceso de restauración, es necesario
-		// permisos de administrador para eliminar/importar el certificado raiz
+		// Para completar el proceso de restauración, es necesario permisos de administrador para 
+		// eliminar/importar el certificado raiz.
 		// Por este motivo, no se realizará esta tarea si AutoFirma no se ejecuta en modo administrador
+		// ya que el sistema podria quedar inconsistente. 
 		if (isAdmin()) {
 
 			// Instalacion del certificado raiz en Windows.
@@ -496,14 +501,18 @@ final class RestoreConfigWindows implements RestoreConfig {
 	 * Comprueba si el proceso se est&acute; ejecutando en modo administrador de Windows.
 	 * @return ({@code true}}) Si es modo administrador, ({@code false}}) en caso contrario
 	 */
-	private static boolean isAdmin() {
-		
+	private static Boolean isAdmin() {
+
 		Boolean isAdmin = Boolean.FALSE;
-		
+
+		Process p;
 		try {
-			String command = "reg query \"HKU\\S-1-5-19\""; //$NON-NLS-1$
-			Process p = Runtime.getRuntime().exec(command);
+			
+			ProcessBuilder pb = new ProcessBuilder("reg query \"HKU\\S-1-5-19\""); //$NON-NLS-1$ 
+						
+			p = pb.start();
 			p.waitFor();
+			
 			int exitValue = p.exitValue();
 
 			if (0 == exitValue) {
