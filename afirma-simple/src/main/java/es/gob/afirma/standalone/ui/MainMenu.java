@@ -36,6 +36,7 @@ import es.gob.afirma.standalone.ui.hash.CheckHashFiles;
 import es.gob.afirma.standalone.ui.hash.CreateHashDialog;
 import es.gob.afirma.standalone.ui.hash.CreateHashFiles;
 import es.gob.afirma.standalone.ui.preferences.PreferencesDialog;
+import es.gob.afirma.standalone.ui.restoreconfig.RestoreConfigDialog;
 
 /** Barra de men&uacute; para toda la aplicaci&oacute;n.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
@@ -256,8 +257,22 @@ public final class MainMenu extends JMenuBar {
         this.add(menuArchivo);
         // TODO: Descomentar una vez se entregue
         toolsMenu.add(huellaMenu);
-        this.add(toolsMenu);
+        
+		// Preparamos la opcion de menú para "restaurar la configuracion de los
+		// navegadores" en el menú de herramientas
 
+		final JMenuItem restoreConfigMenuItem = new JMenuItem(SimpleAfirmaMessages.getString("MainMenu.20")); //$NON-NLS-1$
+		restoreConfigMenuItem.setAccelerator(
+				KeyStroke.getKeyStroke(KeyEvent.VK_R, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+		restoreConfigMenuItem.setMnemonic(KeyEvent.VK_R);
+		restoreConfigMenuItem.getAccessibleContext()
+				.setAccessibleDescription(SimpleAfirmaMessages.getString("MainMenu.20") //$NON-NLS-1$
+		);
+		restoreConfigMenuItem.addActionListener(ae -> showRestoreConfig());
+
+		// toolsMenu.addSeparator();
+		toolsMenu.add(restoreConfigMenuItem);
+		this.add(toolsMenu);
 
         if (!isMac) {
             final JMenuItem preferencesMenuItem = new JMenuItem(SimpleAfirmaMessages.getString("MainMenu.12")); //$NON-NLS-1$
@@ -372,6 +387,13 @@ public final class MainMenu extends JMenuBar {
         PreferencesDialog.show(MainMenu.this.getParentComponent(), true);
     }
 
+    /**
+     * Method that show the restore dialog panel.
+     */
+    void showRestoreConfig() {
+    	RestoreConfigDialog.show(MainMenu.this.getParentComponent(), true);
+    }
+    
     /** Muestra en OS X el men&uacute; "Acerca de...".
      * @param parentComponent Componente padre para la modalidad. */
     public static void showAbout(final Component parentComponent) {
