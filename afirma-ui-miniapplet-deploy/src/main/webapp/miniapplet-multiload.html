@@ -1,0 +1,138 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html> <!-- Ejemplo basico de lanzador de la aplicacion -->
+  <head>
+	<title>Ejemplo de despliegue del MiniApplet @firma</title>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
+	<script type="text/javascript" src="js/miniapplet.js"></script>
+	<script type="text/javascript" src="js/constantes.js"></script>
+	<script type="text/javascript">
+
+		
+		
+		function showErrorCallback(errorType, errorMessage) {
+			showLog("Type: " + errorType + "\nMessage: " + errorMessage);
+		}
+
+						
+		/**
+		 * Funcion para la carga de un fichero. Almacena el contenido del fichero en un campo oculto y muestra su nombre.
+		 * LA CARGA INDEPENDIENTE DE FICHEROS DEBE EVITARSE EN LA MEDIDA DE LO POSIBLE. Si deseas firmar, cofirmar o contrafirmar
+		 * un fichero, llama al metodo correspondiente (sign(), coSign() o counterSign()) sin indicar los datos.
+		 * El uso del metodo de carga no sera compatible con el Cliente movil.
+		 */
+		function multiBrowse(title, dataField, textDiv) {
+			try {
+								
+				MiniApplet.getMultiFileNameContentBase64(title, "xsig,pdf,xml,doc", "Ficheros para pruebas de función multiload", "C://Users//jose.rodriguez.gomez//Documents", showLoadResultCallback, showErrorCallback);
+				
+			} catch(e) {
+				showLog("Type: " + MiniApplet.getErrorType() + "\nMessage: " + MiniApplet.getErrorMessage());
+			}
+		}
+		
+				
+		function showLoadResultCallback(fileNamesDataBase64) {
+			
+			var fileName = "";
+			var dataB64 = "";
+			var htmlfilename = "";
+			var htmldatabase64 = "";
+			var htmltotal = ""; 
+						
+			if (fileNamesDataBase64.length > 0) {
+								
+				for (i = 0; i < fileNamesDataBase64.length; i++) {
+					
+					var sepPos = fileNamesDataBase64[i].indexOf(":");
+									
+					if (sepPos == -1) {
+						filename = fileNamesDataBase64[i];
+					}
+					else {
+						fileName = fileNamesDataBase64[i].substring(0, sepPos);
+						dataB64 = fileNamesDataBase64[i].substring(sepPos + 1).replace(/\-/g, "+").replace(/\_/g, "/");
+						
+						// Creamos un nuevo elemento textarea para los datos en base 64
+						htmldatabase64 = document.createElement("textarea");
+						htmldatabase64.setAttribute("id","data64_" + i);
+						htmldatabase64.setAttribute("cols","150");
+						htmldatabase64.setAttribute("rows","10");
+						htmldatabase64.innerHTML = dataB64;
+							
+					}
+					
+					// Creamos un nuevo elemento span para el nombre del fichero
+					htmlfilename = document.createElement("span");
+					htmlfilename.setAttribute("id","multiFileName_" + i);
+					htmlfilename.innerHTML = "Fichero cargado: " + fileName;
+								
+					// Vamos añadiendo al div los elementos creados separados por saltos de línea
+					loaded_files.appendChild(htmlfilename);
+					loaded_files.appendChild(document.createElement("br"));
+					loaded_files.appendChild(htmldatabase64);
+					loaded_files.appendChild(document.createElement("br"));
+					loaded_files.appendChild(document.createElement("br"));
+				
+				}
+				
+			}
+			
+		}
+
+		function cleanDataField(dataField, textDiv) {
+			
+			loaded_files.innerHTML = "";
+			
+		}
+
+		function addExtraParam(extraParam) {
+			var paramsList = document.getElementById("params");
+			paramsList.value = paramsList.value + "\n" + extraParam;
+			document.getElementById('newParam').value = "";
+		}
+
+		function cleanExtraParams() {
+			document.getElementById("params").value = "";
+			document.getElementById('newParam').value = "";
+		}
+
+		function showLog(newLog) {
+			document.getElementById('console').value = document
+					.getElementById('console').value
+					+ "\n" + newLog;
+		}
+	</script>
+  </head>
+	<body>
+		<script type="text/javascript">
+			//MiniApplet.setForceWSMode(true);
+			MiniApplet.cargarMiniApplet(Constants.URL_BASE_APPLET);
+			//MiniApplet.cargarAppAfirma(Constants.URL_BASE_APPLET);
+			MiniApplet.setServlets(Constants.URL_BASE_SERVICES + "/afirma-signature-storage/StorageService", Constants.URL_BASE_SERVICES + "/afirma-signature-retriever/RetrieveService");
+		</script>
+
+		<fieldset><legend>Entrada de datos de carga múltiple</legend>
+		<div>
+		  <div><span>Seleccionar ficheros a cargar: </span></div>
+		 <input type="button" value="Examinar" onclick="multiBrowse('Cargar datos a firmar', document.getElementById('signature'), document.getElementById('signatureFilename'));">&nbsp;
+		 <input type="button" value="Limpiar" onclick="cleanDataField(document.getElementById('datos'), document.getElementById('multiFileNames'));">
+		</div>
+		</fieldset>
+		<br/>
+		
+		<br/>
+		
+		<div>
+		 <span>Consola</span>
+		 <br>
+		 <textarea id="console" cols="150" rows="10">
+		 </textarea>
+		</div>
+		<br/>
+		<br/>
+		
+		<div id="loaded_files">
+		
+		</div>
+	</body>
+</html>	

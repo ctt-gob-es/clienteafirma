@@ -35,6 +35,8 @@ var MiniApplet = ( function ( window, undefined ) {
 		var severeTimeDelay = false;
 
 		var selectedLocale = null;
+		
+		var stickySignatore = false;
 
 		var LOCALIZED_STRINGS = new Array();
 		LOCALIZED_STRINGS["es_ES"] = {
@@ -527,6 +529,9 @@ var MiniApplet = ( function ( window, undefined ) {
 			forceLoad();
 			
 			clienteFirma.setKeyStore(ksType != null ? ksType : defaultKeyStore);
+			
+			// Al haber cambiado el almacen, no tiene sentido que la variable sticky este a true
+			setStickySignatore(false);
 		}
 		
 		var selectCertificate = function (params, successCallback, errorCallback) {
@@ -698,14 +703,73 @@ var MiniApplet = ( function ( window, undefined ) {
 			}
 		}
 
-		var getFileNameContentBase64 = function (title, extensions, description, filePath) {
+		/**
+		 * Inicia el proceso de carga de un fichero.
+		 * Implementada tambien en el applet Java de firma
+		 * @param title Titulo de la ventana de dialogo
+		 * @param extensions Extensiones permitidas
+		 * @param description Descripcion del tipo de archivo a cargar
+		 * @param filePath Ruta del archivo por defecto
+		 * @param successCallback Funcion de callback tras exito
+		 * @param errorCallback Funcion de callback tras error
+		 */
+		var getFileNameContentBase64 = function (title, extensions, description, filePath, successCallback, errorCallback) {
 			forceLoad();
-			return buildData(clienteFirma.getFileNameContentBase64(title, extensions, description, filePath));
+			
+			if (clientType == TYPE_APPLET) {
+				try {
+					
+					var filenameDataBase64Pair = buildData(clienteFirma.getFileNameContentBase64(title, extensions, description, filePath));
+					var sepPos = filenameDataBase64Pair.indexOf('|');
+					if (successCallback == undefined || successCallback == null) {
+						return filenameDataBase64Pair.substring(sepPos + 1);
+					}
+					var singlePair = [filenameDataBase64Pair];
+					successCallback(singlePair);
+				} catch(e) {
+					if (errorCallback == undefined || errorCallback == null) {
+						throw e;
+					}
+					errorCallback(clienteFirma.getErrorType(), clienteFirma.getErrorMessage());
+				}
+			}
+			else {
+				clienteFirma.getFileNameContentBase64(title, extensions, description, filePath, successCallback, errorCallback)
+			}
+			
 		}
 
-		var getMultiFileNameContentBase64 = function (title, extensions, description, filePath) {
+		/**
+		 * Inicia el proceso de carga de uno o varios ficheros.
+		 * Implementada tambien en el applet Java de firma
+		 * @param title Titulo de la ventana de dialogo
+		 * @param extensions Extensiones permitidas
+		 * @param description Descripcion del tipo de archivo a cargar
+		 * @param filePath Ruta del archivo por defecto
+		 * @param successCallbackFunction Funcion de callback tras exito
+		 * @param errorCallbackFunction Funcion de callback tras error
+		 */
+		var getMultiFileNameContentBase64 = function (title, extensions, description, filePath, successCallback, errorCallback) {
 			forceLoad();
-			return buildData(clienteFirma.getMultiFileNameContentBase64(title, extensions, description, filePath));
+			
+			if (clientType == TYPE_APPLET) {
+				
+				try {
+					
+					var filenameDataBase64Pairs = buildData(clienteFirma.getMultiFileNameContentBase64(title, extensions, description, filePath));
+					
+					successCallback(filenameDataBase64Pairs)
+					
+				} catch(e) {
+					if (errorCallback == undefined || errorCallback == null) {
+						throw e;
+					}
+					errorCallback(clienteFirma.getErrorType(), clienteFirma.getErrorMessage());
+				}
+			}
+			else {
+				clienteFirma.getMultiFileNameContentBase64(title, extensions, description, filePath, successCallback, errorCallback)
+			}
 		}
 
 		var echo = function () {
@@ -713,9 +777,26 @@ var MiniApplet = ( function ( window, undefined ) {
 			return clienteFirma.echo();
 		}
 
-		var setStickySignatory = function (sticky) {
+		/**
+		 * Establece el valor de la variable "stickySignatore" que permite fijar
+		 * un certicado seleccionado para futuras invocaciones, de modo que no
+		 * sea necesario volver a seleccionarlo mientras el valor sea true o
+		 * caduque la conexion en caso de invocacion por protocolo/socket
+		 */
+		var setStickySignatory = function(sticky) {
 			forceLoad();
-			return clienteFirma.setStickySignatory(sticky);
+	
+			if (clientType == TYPE_APPLET) {
+
+				clienteFirma.setStickySignatory(sticky);
+	
+			} else {
+				// En caso de no cargar el applet y utilizar autofirma, se
+				// establecera la variable con el valor seleccionado para su
+				// posterior uso en cada invocacion por protocolo
+				stickySignatore = sticky;
+			}
+
 		}
 
 		var setLocale = function (locale) {
@@ -1055,6 +1136,7 @@ var MiniApplet = ( function ( window, undefined ) {
 				data.properties = generateDataKeyValue ("properties", extraParams != null ? Base64.encode(extraParams) : null);
 				data.keystore = generateDataKeyValue ("keystore", defaultKeyStore != null ? defaultKeyStore : null);
 				data.ksb64 = generateDataKeyValue ("ksb64", defaultKeyStore != null ? Base64.encode(defaultKeyStore) : null);
+				data.sticky = generateDataKeyValue ("sticky", stickySignatore);
 				
 				execAppIntent(buildUrl(data));
 			}
@@ -1180,6 +1262,7 @@ var MiniApplet = ( function ( window, undefined ) {
 				data.batchpostsignerurl = generateDataKeyValue("batchpostsignerurl", batchPostSignerUrl);
 				data.properties = generateDataKeyValue ("properties", extraParams != null ? Base64.encode(extraParams) : null);
 				data.dat = generateDataKeyValue ("dat",  batchB64 == "" ? null : batchB64);
+				data.sticky = generateDataKeyValue ("sticky", stickySignatore);
 
 				return data;
 			}
@@ -1319,6 +1402,8 @@ var MiniApplet = ( function ( window, undefined ) {
 				data.format = generateDataKeyValue ("format", format); 
 				data.properties = generateDataKeyValue ("properties", extraParams != null ? Base64.encode(extraParams) : null);
 				data.dat = generateDataKeyValue ("dat", dataB64 == "" ? null : dataB64);
+				data.sticky = generateDataKeyValue ("sticky", stickySignatore);
+				
 				return data;
 			}
 
@@ -1337,6 +1422,23 @@ var MiniApplet = ( function ( window, undefined ) {
 				data.properties = generateDataKeyValue ("properties", extraParams != null ? Base64.encode(extraParams) : null);
 				data.filename = generateDataKeyValue ("filename", outputFileName);
 				data.dat = generateDataKeyValue ("dat", dataB64 == "" ? null : dataB64);
+				data.sticky = generateDataKeyValue ("sticky", stickySignatore);
+				
+				return data;
+			}
+			
+			/**
+			 * Genera el objeto con los datos de la transaccion para la operacion
+			 * de carga/multicarga
+			 */
+			function generateDataToLoad(loadId, title, extensions, description, filePath, multiload) {
+				var data = new Object();
+				data.op = generateDataKeyValue("op", loadId);
+				data.title = generateDataKeyValue("title", title);
+				data.extensions = generateDataKeyValue("extensions", extensions);
+				data.description = generateDataKeyValue("description", description);
+				data.filePath = generateDataKeyValue("filePath", filePath);
+				data.multiload = generateDataKeyValue("multiload", multiload);
 				return data;
 			}
 			
@@ -1720,6 +1822,22 @@ var MiniApplet = ( function ( window, undefined ) {
 					}
 					return;
 				}
+				
+				// Compruebo si se trata de una operacin de carga/multicarga (load).
+				// El separador "|"  distingue los pares "filename-1:dataBase64-1|filename-2:dataBase64-2...", uno por cada archivo cargado.
+				// Devolveremos un array en el que cada posicion sera uno de estos pares: "filename-n:dataBase64-n".
+				// La funcion de callback realizara el tratamiento deseado,
+				// pudiendo obtener cada dato del par teniendo en cuenta el
+				// separador ":"
+				if (data.indexOf(":") > 0) {
+					
+					var fileNamesDataBase64 = data.split("|");
+					
+					successCallback(fileNamesDataBase64);
+					
+					return;
+					
+				}
 
 				// Interpretamos el resultado como un base 64 y el certificado y los datos cifrados
 				var signature;
@@ -1825,19 +1943,53 @@ var MiniApplet = ( function ( window, undefined ) {
 
 			
 			/**
-			 * Carga de un fichero. Operacion no soportada. 
-			 * Implementada en el applet Java de firma.
+			 * Inicia el proceso de carga de un fichero.
+			 * Implementada tambien en el applet Java de firma
+			 * @param title Titulo de la ventana de dialogo
+			 * @param extensions Extensiones permitidas
+			 * @param description Descripcion del tipo de archivo a cargar
+			 * @param filePath Ruta del archivo por defecto
+			 * @param successCallbackFunction Funcion de callback tras exito
+			 * @param errorCallbackFunction Funcion de callback tras error
 			 */
-			function getFileNameContentBase64 (title, extensions, description) {
-				throwException(UnsupportedOperationException, "La operacion de carga de ficheros no esta soportada");
+			function getFileNameContentBase64 (title, extensions, description, filePath, successCallbackFunction, errorCallbackFunction) {
+				successCallback = successCallbackFunction;
+				errorCallback = errorCallbackFunction;
+				getLoadContentBase64ByService("load", title, extensions, description, filePath, false);
 			}
 
 			/**
-			 * Carga de multiples ficheros. Operacion no soportada.
-			 * Implementada en el applet Java de firma.
+			 * Inicia el proceso de carga de uno o varios ficheros.
+			 * Implementada tambien en el applet Java de firma
+			 * @param title Titulo de la ventana de dialogo
+			 * @param extensions Extensiones permitidas
+			 * @param description Descripcion del tipo de archivo a cargar
+			 * @param filePath Ruta del archivo por defecto
+			 * @param successCallbackFunction Funcion de callback tras exito
+			 * @param errorCallbackFunction Funcion de callback tras error
 			 */
-			function getMultiFileNameContentBase64 (title, extensions, description) {
-				throwException(UnsupportedOperationException, "La operacion de carga de multiples ficheros no esta soportada");
+			function getMultiFileNameContentBase64 (title, extensions, description, filePath, successCallbackFunction, errorCallbackFunction) {
+				successCallback = successCallbackFunction;
+				errorCallback = errorCallbackFunction;
+				getLoadContentBase64ByService("load", title, extensions, description, filePath, true);
+			}
+			
+			/**
+			 * Realiza una operacion de carga de fichero comunicandose con la
+			 * aplicacion nativa por socket.
+			 * @param loadId Identificador de la operacion a realizar (load).
+			 * @param title Titulo de la ventana de dialogo
+			 * @param extensions Extensiones permitidas
+			 * @param description Descripcion del tipo de archivo a cargar
+			 * @param filePath Ruta del archivo por defecto
+			 * @param multiload true si permite la seleccion de varios ficheros,
+			 * false si solo se permite seleccionar un fichero.
+			 */
+			function getLoadContentBase64ByService (loadId, title, extensions, description, filePath, multiload) {
+				
+				var data = generateDataToLoad(loadId, title, extensions, description, filePath, multiload);
+				
+				execAppIntent(buildUrl(data));
 			}
 
 			/** 
@@ -1847,15 +1999,7 @@ var MiniApplet = ( function ( window, undefined ) {
 			function echo () {
 				return "Cliente JavaScript";
 			}
-
-			/** 
-			 * No hace nada.
-			 * Implementada en el applet Java de firma.
-			 */
-			function setStickySignatory (sticky) {
-				// No hace nada
-			}
-
+			
 			/**
 			 * Recupera el mensaje de error asociado al ultimo error capturado.
 			 * Implementada en el applet Java de firma.
@@ -2240,36 +2384,12 @@ var MiniApplet = ( function ( window, undefined ) {
 				}
 			}
 
-			/**
-			 * Carga de un fichero. Operacion no soportada. 
-			 * Implementada en el applet Java de firma.
-			 */
-			function getFileNameContentBase64 (title, extensions, description) {
-				throwException(UnsupportedOperationException, "La operacion de carga de ficheros no esta soportada");
-			}
-
-			/**
-			 * Carga de multiples ficheros. Operacion no soportada.
-			 * Implementada en el applet Java de firma.
-			 */
-			function getMultiFileNameContentBase64 (title, extensions, description) {
-				throwException(UnsupportedOperationException, "La operacion de carga de multiples ficheros no esta soportada");
-			}
-
 			/** 
 			 * Funcion para la comprobacion de existencia del objeto. No hace nada.
 			 * Implementada en el applet Java de firma.
 			 */
 			function echo () {
 				return "Cliente JavaScript";
-			}
-
-			/** 
-			 * No hace nada.
-			 * Implementada en el applet Java de firma.
-			 */
-			function setStickySignatory (sticky) {
-				// No hace nada
 			}
 
 			/**
