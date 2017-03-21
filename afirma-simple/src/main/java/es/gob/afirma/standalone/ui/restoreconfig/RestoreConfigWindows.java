@@ -92,9 +92,7 @@ final class RestoreConfigWindows implements RestoreConfig {
 			try {
 
 				appendMessage(taskOutput, SimpleAfirmaMessages.getString("RestoreConfigWindows.13")); //$NON-NLS-1$
-				// appendMessage(taskOutput,
-				// SimpleAfirmaMessages.getString("RestoreConfigWindows.4"));
-				// //$NON-NLS-1$
+				
 				appendMessage(taskOutput, SimpleAfirmaMessages.getString("RestoreConfigWindows.9")); //$NON-NLS-1$
 
 				// Obligamos a que se cierre Firefox antes de manipular el
@@ -439,6 +437,7 @@ final class RestoreConfigWindows implements RestoreConfig {
 			
 			Certificate[] chain = ks.getCertificateChain(RestoreConfigUtil.CERT_ALIAS);
 
+			// En esta posicion esta en certificado raiz.
 			sslRoot = chain[1];
 
 			// Instalo el .cer a partir del .pfx
