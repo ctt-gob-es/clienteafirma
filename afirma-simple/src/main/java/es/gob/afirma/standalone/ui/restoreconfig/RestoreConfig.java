@@ -10,7 +10,7 @@ import javax.swing.JTextArea;
  **/
 interface RestoreConfig {
 
-	/** Configura el entorno para la ejecuci&oacute;n de AutoFirma.
+	/** Repara la configuraci&oacute;n del entorno para la ejecuci&oacute;n de AutoFirma.
 	 * @param taskOutput Objeto que representa el &aacute;rea de texto de la consola de mensajes de proceso
 	 * de restauraci&oacute;n.
 	 * @throws IOException Cuando no es posible cargar o manipular alg&uacute;n fichero de configuraci&oacute;n o recursos.
