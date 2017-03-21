@@ -15,7 +15,11 @@ import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.ui.restoreconfig.CertUtil.CertPack;
 import es.gob.afirma.standalone.ui.restoreconfig.RestoreConfigFirefox.MozillaProfileNotFoundException;
 
-/** Configura la instalaci&oacute;n en Linux para la correcta ejecuci&oacute;n de AutoFirma. */
+/**
+ * Clase que contiene la l&oacute;gica para realizar las tareas de restauraci&oacute;n
+ * de la configuraci&oacute;n de navegadores para el sistema operativo Linux. 
+ * 
+ */
 final class RestoreConfigLinux implements RestoreConfig {
 
     static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
@@ -30,7 +34,7 @@ final class RestoreConfigLinux implements RestoreConfig {
     /**
      * Caracter de salto de l&iacute;nea para los mensajes de la consola de restauraci&oacute;n
      */
-    private String newline = System.getProperty("line.separator"); //$NON-NLS-1$
+    private static String newline = System.getProperty("line.separator"); //$NON-NLS-1$
 
 	/* (non-Javadoc)
 	 * @see es.gob.afirma.standalone.ui.restoreconfig.RestoreConfig#restore(javax.swing.JTextArea)
@@ -240,12 +244,11 @@ final class RestoreConfigLinux implements RestoreConfig {
 		final StringBuilder sb = new StringBuilder();
 
 		sb.append("pref(\"network.protocol-handler.app.afirma\",\"/usr/bin/AutoFirma\");"); //$NON-NLS-1$
-		sb.append(" "); //$NON-NLS-1$
+		sb.append(newline);
 		sb.append("pref(\"network.protocol-handler.warn-external.afirma\",false);"); //$NON-NLS-1$
-		sb.append(" "); //$NON-NLS-1$
+		sb.append(newline);
 		sb.append("pref(\"network.protocol-handler.external.afirma\",true);"); //$NON-NLS-1$
-		sb.append("\n"); //$NON-NLS-1$
-
+		
 		// Obtenemos la ruta de los scripts
 		String path = new File(new File("/etc/firefox/pref"), LINUX_PROTOCOL_SCRIPT_NAME).getAbsolutePath(); //$NON-NLS-1$
 		final File protocolScript = new File(path);

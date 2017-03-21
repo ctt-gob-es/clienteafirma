@@ -12,6 +12,11 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.logging.Logger;
 
+/**
+ * Clase con diversas utilidades necesarias para llevar a cabo la tarea de restauraci&oacute;n de
+ * la configuraci&oacute;n de navegadores.
+ *
+ */
 final class RestoreConfigUtil {
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$

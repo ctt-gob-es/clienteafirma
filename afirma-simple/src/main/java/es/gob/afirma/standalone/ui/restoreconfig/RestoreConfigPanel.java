@@ -23,6 +23,11 @@ import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.standalone.LookAndFeelManager;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 
+/**
+ * Clase que gestiona los componentes gr&aacute;ficos de las ventanas de restauraci&oacute;n de la
+ * configuraci&oacute;n de navegadores de AutoFirma.
+ *
+ */
 public final class RestoreConfigPanel extends JPanel implements KeyListener, DisposableInterface {
 
 	/**
@@ -44,12 +49,20 @@ public final class RestoreConfigPanel extends JPanel implements KeyListener, Dis
 	private JTextArea taskOutput;
 		
 	
+	/**Constructor con par&aacute;metro de la clase
+	 * @param w Objeto Window para inicializar la instancia de la clase
+	 */
 	RestoreConfigPanel(final Window w) {
 		
 		this.window = w;
 		createUI();
 	}
 	
+	/**
+	 * Clase que construye el objeto gr&aacute;fico que representa el panel
+	 * donde se ubican los botones de la ventana de restauraci&oacute;n
+	 * @return
+	 */
 	private JPanel createButtonsPanel() {
 
 		final JPanel panel = new JPanel();
@@ -95,7 +108,7 @@ public final class RestoreConfigPanel extends JPanel implements KeyListener, Dis
 					restoreButton.setEnabled(true);
 					
 				} catch (GeneralSecurityException | ConfigurationException | IOException e ) {
-					LOGGER.severe("Ha ocurrido un error al ejecutar la tarea de restauracion: " + e.getMessage());
+					LOGGER.severe("Ha ocurrido un error al ejecutar la tarea de restauracion: " + e.getMessage()); //$NON-NLS-1$
 				}
 			}
 		});
@@ -113,9 +126,12 @@ public final class RestoreConfigPanel extends JPanel implements KeyListener, Dis
 		return panel;
 	}
 
+	/**
+	 * Dibuja la ventana con las opciones de restauraci&oacute;n
+	 */
 	private void createUI() {
 		
-		restorePanel.setName("RestoreConfigPanel");
+		restorePanel.setName("RestoreConfigPanel"); //$NON-NLS-1$
 						
 		setLayout(new BorderLayout(5, 5));
         setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
@@ -130,8 +146,6 @@ public final class RestoreConfigPanel extends JPanel implements KeyListener, Dis
         this.add(introPanel, BorderLayout.NORTH);
         
         // Creamos un panel para el boton de restauracion
-       // JPanel buttonPanel =  new JPanel(new FlowLayout(FlowLayout.CENTER), true);
-        //buttonPanel.add(createButtonsPanel());
         JPanel buttonPanel = createButtonsPanel();
     	this.add(buttonPanel, BorderLayout.CENTER);
     	    	
@@ -154,6 +168,10 @@ public final class RestoreConfigPanel extends JPanel implements KeyListener, Dis
        
 	}	
 
+	/**
+	 * Devuelve la ventana desde donde se abri&oacute; la ventana actual
+	 * @return
+	 */
 	Window getParentWindow() {
 		return this.window;
 	}

@@ -7,6 +7,11 @@ import javax.swing.WindowConstants;
 
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 
+/**
+ * Clase que dibuja la ventana de restauraci&oacute;n de configuraci&oacute;n
+ * de navegadores
+ *
+ */
 public final class RestoreConfigDialog extends JDialog {
 	
 	/**
@@ -28,7 +33,7 @@ public final class RestoreConfigDialog extends JDialog {
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 	}
 	
-	/** Muestra el di&aacute;logo de restauracion de configuracion.
+	/** Muestra el di&aacute;logo de restauraci&oacute;n de configuraci&oacute;n.
 	 * @param parent Componente padre del panel de preferencias.
 	 * @param modal Modalidad del panel de preferencias.
 	 * @param selectedPreferencesTabIndex &Iacute;dice de la pesta&ntilde;a de configuraci&oacute;n seleccionada por defecto. */
@@ -36,8 +41,8 @@ public final class RestoreConfigDialog extends JDialog {
 		new RestoreConfigDialog(parent, modal).setVisible(true);
 	}
 
-	/** Muestra el di&aacute;logo de restauracion de configuracion.
-	 * @param parent Componente padre del panel de restauracion de configuracion.
+	/** Muestra el di&aacute;logo de restauraci&oacute;n de configuraci&oacute;n.
+	 * @param parent Componente padre del panel de restauracion de configuraci&oacute;n.
 	 * @param modal Modalidad del panel de restauracion de configuracion. */
 	public static void show(final Frame parent, final boolean modal) {
 		new RestoreConfigDialog(parent, modal).setVisible(true);

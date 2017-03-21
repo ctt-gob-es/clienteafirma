@@ -31,12 +31,21 @@ import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.keystores.mozilla.MozillaKeyStoreUtilities;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 
-/** Configurador para instalar un certificado SSL de confianza en Mozilla NSS.
- * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
+
+/**
+ * Clase que contiene la l&oacute;gica para realizar las tareas de restauraci&oacute;n
+ * asociadas al navegador Firefox para Windows, Linux y MacOsX
+ * 
+ */
 final class RestoreConfigFirefox {
 
 	static final class MozillaProfileNotFoundException extends Exception {
-		private static final long serialVersionUID = -2329746920496661591L;
+	
+		/**
+		 * Versi&oacute;n de serializaci&oacute;n
+		 */
+		private static final long serialVersionUID = 5429606644925911457L;
+		
 	}
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
@@ -58,6 +67,7 @@ final class RestoreConfigFirefox {
 	private static final String RESOURCE_BASE;
 	
 	private static String USERS_WINDOWS_PATH;
+	
 	static {
 		try {
 			USERS_WINDOWS_PATH = new File(System.getProperty("user.home")).getParentFile().getAbsolutePath(); //$NON-NLS-1$;

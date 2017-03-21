@@ -47,8 +47,11 @@ import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.ui.restoreconfig.CertUtil.CertPack;
 import es.gob.afirma.standalone.ui.restoreconfig.RestoreConfigFirefox.MozillaProfileNotFoundException;
 
-/** M&eacute;todos necesarios para ejectuar la tarea de restauraci&oacute;n de navegadores
- **/
+/**
+ * Clase que contiene la l&oacute;gica para realizar las tareas de restauraci&oacute;n
+ * de la configuraci&oacute;n de navegadores para el sistema operativo MacOsX. 
+ * 
+ */
 final class RestoreConfigMacOSX implements RestoreConfig {
 
 	static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
@@ -74,11 +77,15 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 	static String mac_script_path;
 			
 	private static File sslCerFile;
+	
 	/**
      * Caracter de salto de l&iacute;nea para los mensajes de la consola de restauraci&oacute;n
      */
 	private static String newline  = System.getProperty("line.separator"); //$NON-NLS-1$
 
+	/* (non-Javadoc)
+	 * @see es.gob.afirma.standalone.ui.restoreconfig.RestoreConfig#restore(javax.swing.JTextArea)
+	 */
 	@Override
 	public void restore(JTextArea taskOutput) throws IOException, GeneralSecurityException {
 
@@ -169,6 +176,12 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 		);
 	}
 	
+	/**
+	 * Instala los certificados de comunicaci&oacute;n en el almac&eacute;n de Mozilla y Apple
+	 * @param appDir Directorio de instalaci&oacute;n de la aplicaci&oacute;n 
+	 * @param taskOutput Objeto que representa el &aacute;rea de texto de la consola
+	 * @throws IOException Si ocurre alg&uacute;n problema durante el proceso
+	 */
 	private static void installRootCA(final File appDir, final JTextArea taskOutput) throws IOException {
 		
 		// Cerramos el almacen de firefox si esta abierto
@@ -348,6 +361,10 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 		}
 	}
 
+	/**
+	 * Cambia los permisos de un fichero para permitir su ejecuci&oacute;n
+	 * @param f Fichero sobre el cual se cambian los permisos
+	 */
 	static void addExexPermissionsToFile(final File f) {
 		final Set<PosixFilePermission> perms = new HashSet<>();
 		perms.add(PosixFilePermission.OWNER_EXECUTE);
@@ -393,7 +410,7 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 		writeScriptFile(mac_script_path, sb, true);
 
 	}
-
+	
 	private static void editTrusFile(final String sha1Root, final String sha1Cer, final String snRoot, final String snCer) {
 		
 		final File appDir = RestoreConfigUtil.getApplicationDirectory(); 
