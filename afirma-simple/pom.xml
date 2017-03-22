@@ -280,29 +280,7 @@
 					<compilerArgument>-XDignore.symbol.file</compilerArgument>
 				</configuration>
 			</plugin>
-<!-- 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>
-				<version>2.4</version>
-				<executions>
-					<execution>
-						<goals>
-							<goal>sign</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-					<keystore>${afirma.keytool.keystore}</keystore>
-					<alias>${afirma.keytool.alias}</alias>
-					<storepass>${afirma.keytool.password}</storepass>
-					<signedjar>${project.build.directory}/${project.build.finalName}-signed.jar</signedjar>
-					<verify>true</verify>
-					<archive>
-						<addMavenDescriptor>false</addMavenDescriptor>
-					</archive>
-				</configuration>
-			</plugin> -->
-			
+		
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-shade-plugin</artifactId>
@@ -358,6 +336,61 @@
 					</archive>
 				</configuration>
 			</plugin>
+<!--
+			<plugin>
+				<groupId>com.github.wvengen</groupId>
+				<artifactId>proguard-maven-plugin</artifactId>
+				<version>2.0.13</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>proguard</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<proguardVersion>5.2</proguardVersion>
+					<injar>${project.build.finalName}.jar</injar>
+					<outputDirectory>${project.build.directory}</outputDirectory>
+					<proguardInclude>${basedir}/proguard.conf</proguardInclude>
+					<libs>
+						<lib>${java.home}/lib/rt.jar</lib>
+						<lib>${java.home}/lib/jsse.jar</lib>
+						<lib>${java.home}/lib/jce.jar</lib>
+					</libs>
+				</configuration>
+				<dependencies>
+					<dependency>
+						<groupId>net.sf.proguard</groupId>
+						<artifactId>proguard-base</artifactId>
+						<version>5.2</version>
+					</dependency>
+				</dependencies>
+			</plugin>
+	
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>2.4</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>sign</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<keystore>${afirma.keytool.keystore}</keystore>
+					<alias>${afirma.keytool.alias}</alias>
+					<storepass>${afirma.keytool.password}</storepass>
+					<signedjar>${project.build.directory}/${project.build.finalName}-signed.jar</signedjar>
+					<verify>true</verify>
+					<archive>
+						<addMavenDescriptor>false</addMavenDescriptor>
+					</archive>
+				</configuration>
+			</plugin>
+-->
 		</plugins>
 	</build>
 </project>
