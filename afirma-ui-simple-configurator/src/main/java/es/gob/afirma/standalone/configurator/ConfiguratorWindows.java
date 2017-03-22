@@ -23,7 +23,9 @@ final class ConfiguratorWindows implements Configurator {
 	 * crear nuevos usuarios y no se deber&iacute;a tocar. */
 	private static String DEFAULT_WINDOWS_USER_NAME = "Default"; //$NON-NLS-1$
 
-	private static final String CHROME_CONFIG_FILE = "AppData/Local/Google/Chrome/User Data/Local State"; //$NON-NLS-1$
+	// A partir de la version 57 de Chrome cambia el fichero en el que se guardan los protocol handler
+	private static final String CHROME_V56_OR_LOWER_CONFIG_FILE = "AppData/Local/Google/Chrome/User Data/Local State"; //$NON-NLS-1$
+	private static final String CHROME_V57_OR_HIGHER_CONFIG_FILE = "AppData/Local/Google/Chrome/User Data/Default/Preferences"; //$NON-NLS-1$
 
 	@Override
 	public void configure(final Console window) throws IOException, GeneralSecurityException {
@@ -98,7 +100,7 @@ final class ConfiguratorWindows implements Configurator {
 	 * @param installing Indica si se debe configurar ({@code true}) o desconfigurar
 	 * ({@code false}) el protocolo "afirma" en Chrome.
 	 */
-	private static void configureChrome(final Console window, boolean installing) {
+	private static void configureChrome(final Console window, final boolean installing) {
 
 		if (window != null && installing) {
 			window.print(Messages.getString("ConfiguratorWindows.16")); //$NON-NLS-1$
@@ -108,23 +110,56 @@ final class ConfiguratorWindows implements Configurator {
 		for (final File userDir : usersDir.listFiles()) {
 			if (userDir.isDirectory() && !DEFAULT_WINDOWS_USER_NAME.equalsIgnoreCase(userDir.getName())) {
 				try {
-					final File chromeConfigFile = new File(userDir, CHROME_CONFIG_FILE);
-					if (chromeConfigFile.isFile() && chromeConfigFile.canWrite()) {
+					final File chromeConfigFileV56OrLower = new File(userDir, CHROME_V56_OR_LOWER_CONFIG_FILE);
+					if (chromeConfigFileV56OrLower.isFile() && chromeConfigFileV56OrLower.canWrite()) {
 						String config;
-						try (final FileInputStream fis = new FileInputStream(chromeConfigFile)) {
+						try (final FileInputStream fis = new FileInputStream(chromeConfigFileV56OrLower)) {
 							config = new String(AOUtil.getDataFromInputStream(fis), StandardCharsets.UTF_8);
 						}
-
 						config = config.replace("\"afirma\":false,", ""); //$NON-NLS-1$ //$NON-NLS-2$
+						config = config.replace("\"afirma\":false", ""); //$NON-NLS-1$ //$NON-NLS-2$
+
 						if (installing) {
 							config = config.replace("\"protocol_handler\":{\"excluded_schemes\":{", //$NON-NLS-1$
 									"\"protocol_handler\":{\"excluded_schemes\":{\"afirma\":false,"); //$NON-NLS-1$
+							config = config.replace("\"protocol_handler\":{\"excluded_schemes\":{\"afirma\":false,}", //$NON-NLS-1$
+									"\"protocol_handler\":{\"excluded_schemes\":{\"afirma\":false}"); //$NON-NLS-1$
+							// En caso de que Google Chrome este recien instalado no encontrara cadena a reemplazar,
+							// por lo que directamente insertaremos la cadena nosotros en el lugar correspondiente
+							if(!config.contains("excluded_schemes")) { //$NON-NLS-1$
+								config = config.replaceAll("last_active_profiles([^,]*),", //$NON-NLS-1$
+										"last_active_profiles$1,\"protocol_handler\":{\"excluded_schemes\":{\"afirma\":false}},"); //$NON-NLS-1$
+							}
 						}
-						try (final FileOutputStream fos = new FileOutputStream(chromeConfigFile)) {
+						else {
+							// Elimina la sintaxis que define los protocolos de confianza si no existe ninguno.
+							config = config.replace("\"protocol_handler\":{\"excluded_schemes\":{}},", ""); //$NON-NLS-1$ //$NON-NLS-2$
+						}
+						try (final FileOutputStream fos = new FileOutputStream(chromeConfigFileV56OrLower)) {
 							fos.write(config.getBytes(StandardCharsets.UTF_8));
 						}
 					}
-
+					final File chromeConfigFileV57OrHigher = new File(userDir, CHROME_V57_OR_HIGHER_CONFIG_FILE);
+					if (chromeConfigFileV57OrHigher.isFile() && chromeConfigFileV57OrHigher.canWrite()) {
+						String config;
+						try (final FileInputStream fis = new FileInputStream(chromeConfigFileV57OrHigher)) {
+							config = new String(AOUtil.getDataFromInputStream(fis), StandardCharsets.UTF_8);
+						}
+						config = config.replace("\"afirma\":false,", ""); //$NON-NLS-1$ //$NON-NLS-2$
+						config = config.replace("\"afirma\":false", ""); //$NON-NLS-1$ //$NON-NLS-2$
+						if (installing) {
+							config = config.replace("\"protocol_handler\":{\"excluded_schemes\":{", //$NON-NLS-1$
+									"\"protocol_handler\":{\"excluded_schemes\":{\"afirma\":false,"); //$NON-NLS-1$
+							config = config.replace("\"protocol_handler\":{\"excluded_schemes\":{\"afirma\":false,}", //$NON-NLS-1$
+									"\"protocol_handler\":{\"excluded_schemes\":{\"afirma\":false}"); //$NON-NLS-1$
+							// En caso de que Google Chrome este recien instalado no encontrara cadena a reemplazar,
+							// pero si se ha insertado en el fichero Local State del paso anterior se configurara automaticamente
+							// en el Default/Preferences cuando se invoque el protocolo afirma
+						}
+						try (final FileOutputStream fos = new FileOutputStream(chromeConfigFileV57OrHigher)) {
+							fos.write(config.getBytes(StandardCharsets.UTF_8));
+						}
+					}
 				}
 				catch (final Exception e) {
 					if (window != null) {
