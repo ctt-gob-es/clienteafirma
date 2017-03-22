@@ -114,13 +114,17 @@ public final class PdfExtraParams {
     /** Descripci&oacute;n del contenido binario indicado mediante <code>attach</code>. */
     static final String ATTACH_DESCRIPTION = "attachDescription";//$NON-NLS-1$
 
-    /** Nivel de certificaci&oacute;n de la firma PDF.<br>Los valores admitidos son num&eacute;ricos, correspondiendo:
-    <ul>
-     <li><i>0</i> = Firma ordinaria no certificada (por defecto)</li>
-     <li><i>1</i> = Firma de autor. No se permite ning&uacute;n cambio posterior en el documento</li>
-     <li><i>2</i> = Firma de autor certificada para formularios. Se permite &uacute;nicamente el relleno posterior de los campos del formulario</li>
-     <li><i>3</i> = Firma certificada. Se permite &uacute;nicamente el relleno posterior de los campos del formulario o el a&ntilde;adido de firmas de aprobaci&oacute;n</li>
-    </ul> */
+    /** <p>Configura si debe realizarse una firma de aprobaci&oacute;n (por defecto) o certificada.</p>
+     * <p>Una firma de aprobaci&oacute;n o de formulario se realiza sobre un campo de firma de formulario del documento (preexistente o creado autom&aacute;ticamente en el momento de la firma). Un documento puede contener tantas firmas de aprobaci&oacute;n como necesite. Esta es la opci&oacute;n com&uacute;n de firma.</p>
+	 * <p>Una firma certificada o de documento se aplica sobre un campo de firma identificado como de documento (preexistente o creado autom&aacute;ticamente en el momento de la firma). Un documento puede contener un &uacute;nico campo de este tipo y por tanto una &uacute;nica firma certificada. En caso de agregarse una firma certificada al documento, esta debe ser la primera que se agregue. Si hubiese alguna firma previa el resultado no ser&iacute;a v&aacute;lido.</p>
+	 * <p>Independientemente de sus nombres, ambos tipos de firma aplican a todo el documento (lo firman por completo), s&oacute;lo cambia la designaci&oacute;n del campo en el que se almacenan.</p>
+	 * <p>Una firma certificada restringe modificaciones posteriores sobre el documento. Seg&uacute;n el nivel de certificaci&oacute;n de esta firma se podr&aacute;n hacer unos cambios u otros. El Cliente @firma permite configurar el nivel de certificaci&oacute;n de una firma por medio del par&aacute;metro certificationLevel y un valor num&eacute;rico:</p>
+     * <ul>
+     *  <li><i>0</i> = Firma sin certificar. Esta ser&iacute;a una firma de aprobaci&oacute;n. Es el valor por defecto.</li>
+     *  <li><i>1</i> = Firma certificada de autor. Tras este tipo de firma certificada, no se permite ning&uacute;n cambio posterior en el documento (no se pueden agregar firmas, ni rellenar formularios).</li>
+     *  <li><i>2</i> = Firma certificada de autor para formularios. Tras este tipo de firma certificada, s&oacute;lo se permite el relleno de los campos del formulario (no se pueden agregar firmas).</li>
+     *  <li><i>3</i> = Firma certificada com&uacute;n. Tras este tipo de firma certificada, s&oacute;lo se permite el relleno de los campos del formulario y la creaci&oacute;n de firmas de aprobaci&oacute;n.</li>
+     * </ul> */
     static final String CERTIFICATION_LEVEL = "certificationLevel";//$NON-NLS-1$
 
     /** Versi&oacute;n del PDF de salida:
