@@ -7,3 +7,4 @@ Implementation-Title: es.gob.afirma
 Implementation-Version: build01
 Implementation-Vendor: Gobierno de España
 Application-Name: AutoFirma
+Permissions: all-permissions
