@@ -507,7 +507,11 @@ final class RestoreConfigWindows implements RestoreConfig {
 		Process p;
 		try {
 			
-			ProcessBuilder pb = new ProcessBuilder("reg query \"HKU\\S-1-5-19\""); //$NON-NLS-1$ 
+			final String[] command = new String[] { "reg", //$NON-NLS-1$
+					"query", //$NON-NLS-1$
+					"\"HKU\\S-1-5-19\"", //$NON-NLS-1$
+			};
+			ProcessBuilder pb = new ProcessBuilder(command);
 						
 			p = pb.start();
 			p.waitFor();
