@@ -43,7 +43,7 @@ public final class SingleCertKeyStore extends KeyStoreSpi {
     private static final String PEM_FOOTER = "-----END CERTIFICATE-----"; //$NON-NLS-1$
     private static final String PEM_HEADER = "-----BEGIN CERTIFICATE-----"; //$NON-NLS-1$
 
-    private final Map<String, X509Certificate> certificates = new Hashtable<String, X509Certificate>();
+    private final Map<String, X509Certificate> certificates = new Hashtable<>();
 
     @Override
     public Enumeration<String> engineAliases() {
