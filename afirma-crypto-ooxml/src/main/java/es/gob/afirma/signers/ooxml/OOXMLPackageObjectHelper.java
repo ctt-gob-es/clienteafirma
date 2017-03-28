@@ -55,6 +55,8 @@ final class OOXMLPackageObjectHelper {
 	private static final String NAMESPACE_SPEC_NS = "http://www.w3.org/2000/xmlns/"; //$NON-NLS-1$
     private static final String DIGITAL_SIGNATURE_SCHEMA = "http://schemas.openxmlformats.org/package/2006/digital-signature"; //$NON-NLS-1$
 
+	private static final String PACKAGE_REL_CONTENT_TYPE = "application/vnd.openxmlformats-package.relationships+xml"; //$NON-NLS-1$
+
     private static final String[] CONTENT_DIRS = new String[] {
     	"word", //$NON-NLS-1$
     	"excel", //$NON-NLS-1$
@@ -102,6 +104,18 @@ final class OOXMLPackageObjectHelper {
 		return false;
 	}
 
+	private static boolean alreadyContains(final List<Reference> references, final Reference reference) {
+		if (reference == null || references == null) {
+			return true;
+		}
+		for (final Reference r : references) {
+			if (r.getURI().equals(reference.getURI())) {
+				return true;
+			}
+		}
+		return false;
+	}
+
     private static void addParts(final XMLSignatureFactory fac,
     		                     final ContentTypeManager contentTypeManager,
     		                     final List<Reference> references,
@@ -109,9 +123,10 @@ final class OOXMLPackageObjectHelper {
     		                     final String[] applications,
     		                     final DigestMethod digestMethod) throws IOException {
     	final ZipInputStream zipInputStream = new ZipInputStream(
-    			new ByteArrayInputStream(
-    					ooXmlDocument)
-    			);
+			new ByteArrayInputStream(
+				ooXmlDocument
+			)
+		);
 
     	ZipEntry zipEntry;
     	while (null != (zipEntry = zipInputStream.getNextEntry())) {
@@ -123,8 +138,14 @@ final class OOXMLPackageObjectHelper {
 
     		// Solo se anade la referencia si existe contentType
     		if (contentType != null) {
-    			final Reference reference = fac.newReference("/" + zipEntry.getName() + "?ContentType=" + contentType, digestMethod); //$NON-NLS-1$ //$NON-NLS-2$
-    			references.add(reference);
+    			final Reference reference = fac.newReference(
+					"/" + zipEntry.getName() + "?ContentType=" + contentType,  //$NON-NLS-1$//$NON-NLS-2$
+					digestMethod
+				);
+    			if (!alreadyContains(references, reference)) {
+    				references.add(reference);
+    			}
+
     		}
     	}
 	}
@@ -206,13 +227,12 @@ final class OOXMLPackageObjectHelper {
     			continue;
     		}
     		final Document relsDocument = loadDocumentNoClose(zipInputStream);
-    		final String contentType = "application/vnd.openxmlformats-package.relationships+xml"; //$NON-NLS-1$
     		addRelationshipsReference(
 				fac,
 				zipEntry.getName(),
 				relsDocument,
 				manifestReferences,
-				contentType,
+				PACKAGE_REL_CONTENT_TYPE,
 				digestMethod
 			);
     	}
@@ -224,7 +244,7 @@ final class OOXMLPackageObjectHelper {
                                                                                  IOException,
                                                                                  ParserConfigurationException,
                                                                                  SAXException {
-    	final DigestMethod digestMethod = fac.newDigestMethod(DigestMethod.SHA512, null);
+    	final DigestMethod digestMethod = fac.newDigestMethod(DigestMethod.SHA256, null);
 
     	final List<Reference> manifestReferences = new LinkedList<Reference>();
     	addRelationshipsReferences(fac, manifestReferences, ooXmlDocument, digestMethod);

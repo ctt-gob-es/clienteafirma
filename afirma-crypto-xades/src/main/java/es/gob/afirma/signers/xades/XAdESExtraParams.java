@@ -332,12 +332,15 @@ public final class XAdESExtraParams {
      */
     static final String COMMITMENT_TYPE_INDICATION_QUALIFIERS = "CommitmentTypeQualifiers"; //$NON-NLS-1$
 
-	private static final String COMMITMENT_TYPE_IDENTIFIER_PROOF_OF_ORIGIN = "urn:oid:1.2.840.113549.1.9.16.6.1"; //$NON-NLS-1$
-	private static final String COMMITMENT_TYPE_IDENTIFIER_PROOF_OF_RECEIPT = "urn:oid:1.2.840.113549.1.9.16.6.2"; //$NON-NLS-1$
-	private static final String COMMITMENT_TYPE_IDENTIFIER_PROOF_OF_DELIVERY = "urn:oid:1.2.840.113549.1.9.16.6.3"; //$NON-NLS-1$
-	private static final String COMMITMENT_TYPE_IDENTIFIER_PROOF_OF_SENDER = "urn:oid:1.2.840.113549.1.9.16.6.4"; //$NON-NLS-1$
-	private static final String COMMITMENT_TYPE_IDENTIFIER_PROOF_OF_APPROVAL = "urn:oid:1.2.840.113549.1.9.16.6.5"; //$NON-NLS-1$
-	private static final String COMMITMENT_TYPE_IDENTIFIER_PROOF_OF_CREATION = "urn:oid:1.2.840.113549.1.9.16.6.6"; //$NON-NLS-1$
+    // Definicion de las URI para los Commitment Type Identifiers:
+    // http://uri.etsi.org/01903/v1.2.2/ts_101903v010202p.pdf
+
+	private static final String COMMITMENT_TYPE_IDENTIFIER_PROOF_OF_ORIGIN   = "http://uri.etsi.org/01903/v1.2.2#ProofOfOrigin"; //$NON-NLS-1$
+	private static final String COMMITMENT_TYPE_IDENTIFIER_PROOF_OF_RECEIPT  = "http://uri.etsi.org/01903/v1.2.2#ProofOfReceipt"; //$NON-NLS-1$
+	private static final String COMMITMENT_TYPE_IDENTIFIER_PROOF_OF_DELIVERY = "http://uri.etsi.org/01903/v1.2.2#ProofOfDelivery"; //$NON-NLS-1$
+	private static final String COMMITMENT_TYPE_IDENTIFIER_PROOF_OF_SENDER   = "http://uri.etsi.org/01903/v1.2.2#ProofOfSender"; //$NON-NLS-1$
+	private static final String COMMITMENT_TYPE_IDENTIFIER_PROOF_OF_APPROVAL = "http://uri.etsi.org/01903/v1.2.2#ProofOfApproval"; //$NON-NLS-1$
+	private static final String COMMITMENT_TYPE_IDENTIFIER_PROOF_OF_CREATION = "http://uri.etsi.org/01903/v1.2.2#ProofOfCreation"; //$NON-NLS-1$
 	static final Map<String, String> COMMITMENT_TYPE_IDENTIFIERS = new HashMap<String, String>(6);
 	static {
 		COMMITMENT_TYPE_IDENTIFIERS.put("1", COMMITMENT_TYPE_IDENTIFIER_PROOF_OF_ORIGIN); //$NON-NLS-1$

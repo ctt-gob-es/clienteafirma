@@ -47,6 +47,33 @@
    <dd>Primera l&iacute;nea de la direcci&oacute;n en la que se ha realizado la firma.</dd>
   <dt><b><i>signatureAddress2</i></b></dt>
    <dd>Segunda l&iacute;nea de la direcci&oacute;n en la que se ha realizado la firma.</dd>
+  <dt><b><i>commitmentTypeIndications</i></b> (propiedad compartida con CAdES)</dt>
+   <dd>
+    N&uacute;mero de <i>CommitmentTypeIndications</i> a a&ntilde;adir a la firma XAdES.<br>
+    En los par&aacute;metros siguientes, los <i>CommitmentTypeIndications</i> se numeran a partir de 0 (cero).
+   </dd>
+  <dt><b><i>commitmentTypeIndication</i>n<i>Identifier</i></b> (propiedad compartida con CAdES)</dt>  
+    <dd>
+    Tipo de <i>CommitmentTypeIndication</i> (atributo obligatorio, se debe usar el ordinal, nunca el OID directamente):
+    <ul>
+     <li><i>1</i> = Prueba de origen</li>
+     <li><i>2</i> = Prueba de recepci&oacute;n</li>
+     <li><i>3</i> = Prueba de entrega</li>
+     <li><i>4</i> = Prueba de env&iacute;o</li>
+     <li><i>5</i> = Prueba de aprobaci&oacute;n</li>
+     <li><i>6</i> = Prueba de creaci&oacute;n</li>
+    </ul> 
+   </dd>
+  <dt><b><i>commitmentTypeIndication</i>n<i>Description</i></b></dt>
+   <dd>
+    Descripci&oacute;n textual del <i>CommitmentTypeIndication</i> n&uacute;mero <i>n</i> (atributo opcional). 
+   </dd>
+     <dt><b><i>commitmentTypeIndication</i>n<i>CommitmentTypeQualifiers</i></b></dt>
+   <dd>
+    Lista de indicadores textuales separados por el car&aacute;cter '<i>|</i>' que se aportan como calificadores adicionales del 
+    <i>CommitmentTypeIndication</i> n&uacute;mero <i>n</i> (atributo opcional). Normalmente son OID.<br>
+    Los elementos de la lista no pueden contener el car&aacute;cter '<i>|</i>' (ya que este se usa como separador). 
+   </dd>
  </dl>
  </body>
 </html>

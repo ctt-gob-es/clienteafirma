@@ -41,13 +41,15 @@ import org.w3c.dom.ls.DOMImplementationLS;
 import org.w3c.dom.ls.LSSerializer;
 import org.xml.sax.SAXException;
 
+import es.gob.afirma.signers.xades.XAdESUtil;
 import es.gob.afirma.signers.xml.XMLConstants;
+import net.java.xades.security.xml.XAdES.CommitmentTypeIndication;
 import net.java.xades.security.xml.XAdES.SignatureProductionPlace;
 import net.java.xades.security.xml.XAdES.SignatureProductionPlaceImpl;
 import net.java.xades.security.xml.XAdES.SignerRole;
 import net.java.xades.security.xml.XAdES.SignerRoleImpl;
 import net.java.xades.security.xml.XAdES.XAdES;
-import net.java.xades.security.xml.XAdES.XAdES_BES;
+import net.java.xades.security.xml.XAdES.XAdES_EPES;
 import net.java.xades.util.DOMOutputImpl;
 
 /** Firmador XAdES OOXML.
@@ -107,13 +109,13 @@ final class OOXMLXAdESSigner {
 		final Document docSignature = dbf.newDocumentBuilder().newDocument();
 
 		// Instancia XADES_EPES
-		final XAdES_BES xades = XAdES.newInstance(
-			XAdES.BES, // XAdES
-			XADESNS, // XAdES NameSpace
-			XADES_SIGNATURE_PREFIX, // XAdES Prefix
-			XML_SIGNATURE_PREFIX, // XMLDSig Prefix
-			DigestMethod.SHA512, // DigestMethod
-			docSignature, // Document
+		final XAdES_EPES xades = (XAdES_EPES) XAdES.newInstance(
+			XAdES.EPES,                       // XAdES-EPES
+			XADESNS,                          // XAdES NameSpace
+			XADES_SIGNATURE_PREFIX,           // XAdES Prefix
+			XML_SIGNATURE_PREFIX,             // XMLDSig Prefix
+			DigestMethod.SHA512,              // DigestMethod
+			docSignature,                     // Document
 			docSignature.getDocumentElement() // Element
 		);
 
@@ -132,6 +134,14 @@ final class OOXMLXAdESSigner {
 		);
 		if (spp != null) {
 			xades.setSignatureProductionPlace(spp);
+		}
+
+		// CommitmentTypeIndications:
+		//  - http://www.w3.org/TR/XAdES/#Syntax_for_XAdES_The_CommitmentTypeIndication_element
+		//  - http://uri.etsi.org/01903/v1.2.2/ts_101903v010202p.pdf
+		final List<CommitmentTypeIndication> ctis = XAdESUtil.parseCommitmentTypeIndications(extraParams, null);
+		if (ctis != null && ctis.size() > 0) {
+			xades.setCommitmentTypeIndications(ctis);
 		}
 
 		// SignerRole
@@ -171,7 +181,6 @@ final class OOXMLXAdESSigner {
 
 		// Creamos la factoria de firma XML
 	    XMLSignatureFactory fac;
-
 		try {
 			// Primero comprobamos si hay una version nueva de XMLSec accesible, en cuyo caso, podria
 			// provocar un error el no usarla. Normalmente, ClassCastException al recuperar la factoria.
@@ -179,7 +188,7 @@ final class OOXMLXAdESSigner {
 				"DOM", //$NON-NLS-1$
 				(Provider) Class.forName("org.apache.jcp.xml.dsig.internal.dom.XMLDSigRI").getConstructor().newInstance() //$NON-NLS-1$
 			);
-			LOGGER.info("Se usara la factoria XML del XMLSec instalado"); //$NON-NLS-1$
+			LOGGER.info("Se usara la factoria XML de Apache"); //$NON-NLS-1$
 		}
 		catch (final Exception e) {
 			fac = XMLSignatureFactory.getInstance("DOM"); //$NON-NLS-1$

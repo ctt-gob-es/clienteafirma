@@ -1115,7 +1115,9 @@ public final class XAdESSigner {
 		objectFormats.add(objectFormat);
 		xades.setDataObjectFormats(objectFormats);
 
-		// CommitmentTypeIndications (http://www.w3.org/TR/XAdES/#Syntax_for_XAdES_The_CommitmentTypeIndication_element)
+		// CommitmentTypeIndications:
+		//  - http://www.w3.org/TR/XAdES/#Syntax_for_XAdES_The_CommitmentTypeIndication_element
+		//  - http://uri.etsi.org/01903/v1.2.2/ts_101903v010202p.pdf
 		final List<CommitmentTypeIndication> ctis = XAdESUtil.parseCommitmentTypeIndications(extraParams, referenceId);
 		if (ctis != null && ctis.size() > 0) {
 			xades.setCommitmentTypeIndications(ctis);

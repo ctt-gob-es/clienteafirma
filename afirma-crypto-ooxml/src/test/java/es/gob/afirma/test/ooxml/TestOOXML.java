@@ -15,6 +15,7 @@ import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.security.KeyStore;
 import java.security.KeyStore.PrivateKeyEntry;
+import java.util.Enumeration;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -31,12 +32,12 @@ import es.gob.afirma.signers.ooxml.AOOOXMLSigner;
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public final class TestOOXML {
 
-    private static final String CERT_PATH3 = "PFActivoFirSHA1.pfx"; //$NON-NLS-1$
+    private static final String CERT_PATH3 = "GARCIA_MERAS_CAPOTE_TOMAS___11830960J.p12"; //$NON-NLS-1$
     private static final String CERT_PASS3 = "12341234"; //$NON-NLS-1$
-    private static final String CERT_ALIAS3 = "fisico activo prueba"; //$NON-NLS-1$
+    private static final String CERT_ALIAS3 = "garcia_meras_capote_tomas___11830960j"; //$NON-NLS-1$
 
-    private static final String[] DATA_PATHS = new String[] { "entrada_w2013.docx", "Entrada.docx" };  //$NON-NLS-1$ //$NON-NLS-2$
-    private static byte[][] DATAS = new byte[2][];
+    private static final String[] DATA_PATHS = new String[] { "entrada_w2013.docx" /*, "Entrada.docx"*/ };  //$NON-NLS-1$
+    private static byte[][] DATAS = new byte[1][];
 
     private static final Properties[] OOXML_MODES;
 
@@ -44,17 +45,21 @@ public final class TestOOXML {
 
     	try {
 			DATAS[0] = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(DATA_PATHS[0]));
-			DATAS[1] = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(DATA_PATHS[1]));
+			//DATAS[1] = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(DATA_PATHS[1]));
 		}
     	catch (final Exception e) {
-			System.err.println("No se pudo cargar el documento de pruebas"); //$NON-NLS-1$
+			System.err.println("No se pudo cargar el documento de pruebas: " + e); //$NON-NLS-1$
 			DATAS[0] = "Error0".getBytes(); //$NON-NLS-1$
-			DATAS[1] = "Error1".getBytes(); //$NON-NLS-1$
+			//DATAS[1] = "Error1".getBytes(); //$NON-NLS-1$
 		}
 
         final Properties p1 = new Properties();
         p1.setProperty("format", AOSignConstants.SIGN_FORMAT_OOXML); //$NON-NLS-1$
         p1.setProperty("signatureReason", "Comentario : Razon de firma"); //$NON-NLS-1$ //$NON-NLS-2$
+	    p1.setProperty("commitmentTypeIndications", "1"); //$NON-NLS-1$ //$NON-NLS-2$
+	    p1.setProperty("commitmentTypeIndication0Identifier", "1"); //$NON-NLS-1$ //$NON-NLS-2$
+	    p1.setProperty("commitmentTypeIndication0Description", "Cre\u00F3 y aprob\u00F3 este documento"); //$NON-NLS-1$ //$NON-NLS-2$
+	    p1.setProperty("commitmentTypeIndication0CommitmentTypeQualifiers", "RAZON-PRUEBA"); //$NON-NLS-1$ //$NON-NLS-2$
 
         OOXML_MODES = new Properties[] {
             p1
@@ -93,6 +98,12 @@ public final class TestOOXML {
 
         final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
         ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH3), CERT_PASS3.toCharArray());
+
+        final Enumeration<String> a = ks.aliases();
+        while (a.hasMoreElements()) {
+        	System.out.println(a.nextElement());
+        }
+
         pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS3, new KeyStore.PasswordProtection(CERT_PASS3.toCharArray()));
 
         final AOSigner signer = new AOOOXMLSigner();
@@ -123,7 +134,7 @@ public final class TestOOXML {
 	                os.write(result);
 	                os.flush();
 	                os.close();
-	                System.out.println("Temporal para comprobacion manual: " + saveFile.getAbsolutePath()); //$NON-NLS-1$
+	                //System.out.println("Temporal para comprobacion manual: " + saveFile.getAbsolutePath()); //$NON-NLS-1$
 
 	                Assert.assertNotNull(prueba, result);
 	                Assert.assertTrue(signer.isSign(result));

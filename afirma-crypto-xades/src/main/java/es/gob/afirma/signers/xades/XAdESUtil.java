@@ -34,11 +34,6 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
-import net.java.xades.security.xml.XAdES.CommitmentTypeIdImpl;
-import net.java.xades.security.xml.XAdES.CommitmentTypeIndication;
-import net.java.xades.security.xml.XAdES.CommitmentTypeIndicationImpl;
-import net.java.xades.security.xml.XAdES.XAdES_EPES;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.DocumentType;
 import org.w3c.dom.Element;
@@ -47,8 +42,14 @@ import org.w3c.dom.NodeList;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.signers.AOSignConstants;
+import net.java.xades.security.xml.XAdES.CommitmentTypeIdImpl;
+import net.java.xades.security.xml.XAdES.CommitmentTypeIndication;
+import net.java.xades.security.xml.XAdES.CommitmentTypeIndicationImpl;
+import net.java.xades.security.xml.XAdES.XAdES_EPES;
 
-final class XAdESUtil {
+/** Utilidades varias para firmas XAdES.
+ * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
+public final class XAdESUtil {
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma");	//$NON-NLS-1$
 
@@ -134,7 +135,13 @@ final class XAdESUtil {
 		return (Element) nodeList.item(0);
 	}
 
-	static List<CommitmentTypeIndication> parseCommitmentTypeIndications(final Properties xParams, final String signedDataId) {
+	/** Obtiene la lista de <i>CommitmentTypeIndication</i> declarados en el fichero de
+	 * propiedades de par&aacute;metros adicionales.
+	 * @param xParams Par&aacute;metros adicionales para la firma.
+	 * @param signedDataId Identificador del nodo a firmar (<i>Data Object</i>).
+	 * @return Lista de <i>CommitmentTypeIndication</i> a incluir en la firma XAdES. */
+	public static List<CommitmentTypeIndication> parseCommitmentTypeIndications(final Properties xParams,
+			                                                                    final String signedDataId) {
 
 		final List<CommitmentTypeIndication> ret = new ArrayList<CommitmentTypeIndication>();
 
@@ -219,12 +226,16 @@ final class XAdESUtil {
 			ret.add(
 				new CommitmentTypeIndicationImpl(
 					new CommitmentTypeIdImpl(
-						"OIDAsURN",				// OID como URI u OID como URN //$NON-NLS-1$
-						identifier,				// Un OID
-						description,			// Descripcion textual (opcional)
+						identifier.startsWith("urn:oid:") ? // OID como URN si el Id es OID, null en otro caso //$NON-NLS-1$
+							"OIDAsURN" : //$NON-NLS-1$
+								null,
+						identifier, // Un OID o una URL
+						description, // Descripcion textual (opcional)
 						documentationReferences	// Lista de URL (opcional)
 					),
-					"#" + signedDataId,			// Una URI //$NON-NLS-1$
+					signedDataId != null ?      // Una URI, pero se acepta null
+						"#" + signedDataId : //$NON-NLS-1$
+							null,
 					commitmentTypeQualifiers	// Lista de elementos textuales (opcional)
 				)
 			);

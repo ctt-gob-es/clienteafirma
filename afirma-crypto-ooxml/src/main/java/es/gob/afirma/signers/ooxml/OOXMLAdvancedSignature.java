@@ -15,6 +15,7 @@ import java.security.KeyException;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.xml.crypto.MarshalException;
@@ -28,22 +29,26 @@ import javax.xml.crypto.dsig.dom.DOMSignContext;
 import javax.xml.crypto.dsig.keyinfo.KeyInfo;
 import javax.xml.crypto.dsig.keyinfo.KeyInfoFactory;
 import javax.xml.crypto.dsig.spec.C14NMethodParameterSpec;
+import javax.xml.crypto.dsig.spec.TransformParameterSpec;
 
+import es.gob.afirma.signers.xml.Utils;
 import net.java.xades.security.xml.WrappedKeyStorePlace;
 import net.java.xades.security.xml.XmlWrappedKeyInfo;
-import net.java.xades.security.xml.XAdES.XAdES_BES;
+import net.java.xades.security.xml.XAdES.SignaturePolicyIdentifierImpl;
+import net.java.xades.security.xml.XAdES.XAdES_EPES;
 import net.java.xades.security.xml.XAdES.XMLAdvancedSignature;
 
 final class OOXMLAdvancedSignature extends XMLAdvancedSignature {
 
 	private final byte[] ooXmlDocument;
 
-    private OOXMLAdvancedSignature(final XAdES_BES xades, final byte[] ooXmlPackage) {
+    private OOXMLAdvancedSignature(final XAdES_EPES xades, final byte[] ooXmlPackage) {
 		super(xades);
 		this.ooXmlDocument = ooXmlPackage.clone();
 	}
 
-    static OOXMLAdvancedSignature newInstance(final XAdES_BES xades, final byte[] ooXmlPackage) throws GeneralSecurityException {
+    static OOXMLAdvancedSignature newInstance(final XAdES_EPES xades, final byte[] ooXmlPackage) throws GeneralSecurityException {
+    	xades.setSignaturePolicyIdentifier(new SignaturePolicyIdentifierImpl(true));
         final OOXMLAdvancedSignature result = new OOXMLAdvancedSignature(xades, ooXmlPackage);
         result.setDigestMethod(xades.getDigestMethod());
         result.setXadesNamespace(xades.getXadesNamespace());
@@ -66,12 +71,18 @@ final class OOXMLAdvancedSignature extends XMLAdvancedSignature {
 
       addXMLObject(
   		marshalXMLSignature(
-				this.xadesNamespace,
-				this.signedPropertiesTypeUrl,
-				signatureIdPrefix,
-				referencesIdList
+			this.xadesNamespace,
+			this.signedPropertiesTypeUrl,
+			signatureIdPrefix,
+			referencesIdList,
+			Arrays.asList( // En OOXML las SignedProperties se canonicalizan
+	    		Utils.getDOMFactory().newTransform(
+					"http://www.w3.org/TR/2001/REC-xml-c14n-20010315", //$NON-NLS-1$
+					(TransformParameterSpec) null
+				)
 			)
-		);
+		)
+	  );
 
       final XMLSignatureFactory fac = getXMLSignatureFactory();
 
@@ -79,24 +90,24 @@ final class OOXMLAdvancedSignature extends XMLAdvancedSignature {
       final String keyInfoId = getKeyInfoId(signatureIdPrefix);
       documentReferences.add(fac.newReference("#" + keyInfoId, getDigestMethod())); //$NON-NLS-1$
 
-      this.signature =fac.newXMLSignature(
-      		fac.newSignedInfo(
-  				fac.newCanonicalizationMethod(
-  						CanonicalizationMethod.INCLUSIVE,
-						(C14NMethodParameterSpec) null
-					),
-                  fac.newSignatureMethod(signatureMethod, null),
-                  documentReferences
-              ),
-              newKeyInfo(certChain, keyInfoId),
-              getXMLObjects(),
-              getSignatureId(signatureIdPrefix),
-              getSignatureValueId(signatureIdPrefix)
+      this.signature = fac.newXMLSignature(
+		  fac.newSignedInfo(
+				fac.newCanonicalizationMethod(
+					CanonicalizationMethod.INCLUSIVE,
+					(C14NMethodParameterSpec) null
+				),
+	            fac.newSignatureMethod(signatureMethod, null),
+	            documentReferences
+		  ),
+          newKeyInfo(certChain, keyInfoId),
+          getXMLObjects(),
+          getSignatureId(signatureIdPrefix),
+          getSignatureValueId(signatureIdPrefix)
       );
 
       this.signContext = new DOMSignContext(
 		  privateKey,
-		  this.baseElement != null ? this.baseElement : this.getBaseDocument()
+		  this.baseElement != null ? this.baseElement : getBaseDocument()
 	  );
       this.signContext.putNamespacePrefix(XMLSignature.XMLNS, this.xades.getXmlSignaturePrefix());
       this.signContext.putNamespacePrefix(this.xadesNamespace, this.xades.getXadesPrefix());

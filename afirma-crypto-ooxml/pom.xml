@@ -11,6 +11,14 @@
 		<artifactId>afirma-client</artifactId>
 		<version>3.3.2-SNAPSHOT</version>
 	</parent>
+	
+	<dependencies>
+	
+	<dependency>
+		<groupId>es.gob.afirma</groupId>
+		<artifactId>afirma-crypto-xades</artifactId>
+		<version>${project.version}</version>
+	</dependency>
 
 	<dependencies>
 		<dependency>

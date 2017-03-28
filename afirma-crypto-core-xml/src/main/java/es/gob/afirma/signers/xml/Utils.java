@@ -702,7 +702,7 @@ public final class Utils {
 				"DOM", //$NON-NLS-1$
 				(Provider) Class.forName("org.apache.jcp.xml.dsig.internal.dom.XMLDSigRI").newInstance() //$NON-NLS-1$
 			);
-			LOGGER.info("Se usara la factoria XML del XMLSec instalado"); //$NON-NLS-1$
+			LOGGER.info("Se usara la factoria XML de Apache"); //$NON-NLS-1$
 		}
 		catch (final Exception e) {
 			return XMLSignatureFactory.getInstance("DOM"); //$NON-NLS-1$
