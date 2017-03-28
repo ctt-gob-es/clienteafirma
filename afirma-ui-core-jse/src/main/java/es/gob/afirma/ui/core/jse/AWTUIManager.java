@@ -117,7 +117,7 @@ public final class AWTUIManager extends JSEUIManager {
         		setMultipleModeMethod.invoke(fd, Boolean.valueOf(multiSelect));
         	}
         	catch (final Exception e) {
-        		LOGGER.warning("No es posible utilizar la seleccion multiple de ficheros con los dialogos del sistema con versiones anteriores de Java 7, se utilizara Swing"); //$NON-NLS-1$
+        		LOGGER.warning("No es posible utilizar la seleccion multiple de ficheros con los dialogos del sistema con versiones anteriores de Java 7, se utilizara Swing: " + e); //$NON-NLS-1$
         		return super.getLoadFiles(dialogTitle, currentDir, filename, extensions, description, selectDirectory, multiSelect, icon, parent);
         	}
         }
