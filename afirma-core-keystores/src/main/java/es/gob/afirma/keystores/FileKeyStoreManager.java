@@ -109,7 +109,7 @@ abstract class FileKeyStoreManager extends AOKeyStoreManager {
 			);
         }
         catch(final Exception e) {
-        	LOGGER.warning("La contrasena del certificado no coincide con la del almacen"); //$NON-NLS-1$
+        	LOGGER.warning("La contrasena del certificado no coincide con la del almacen: " + e); //$NON-NLS-1$
         }
 
         // Luego probamos con null
@@ -120,7 +120,7 @@ abstract class FileKeyStoreManager extends AOKeyStoreManager {
 			);
         }
         catch(final Exception e) {
-        	LOGGER.warning("La contrasena del certificado no es nula"); //$NON-NLS-1$
+        	LOGGER.warning("La contrasena del certificado no es nula: " + e); //$NON-NLS-1$
         }
 
         // Finalmente pedimos la contrasena

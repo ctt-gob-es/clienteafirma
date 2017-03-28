@@ -114,7 +114,7 @@ public class CAPIUnifiedKeyStoreManager extends AggregatedKeyStoreManager {
 			try {
 				capiKsm.refresh();
 			} catch (final IOException e) {
-				LOGGER.warning("Error al refrescar el almacen de claves de Windows"); //$NON-NLS-1$
+				LOGGER.warning("Error al refrescar el almacen de claves de Windows: " + e); //$NON-NLS-1$
 			}
 		}
 
