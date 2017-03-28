@@ -35,29 +35,27 @@ import es.gob.afirma.standalone.SimpleAfirmaMessages;
 /**
  * Clase que contiene la l&oacute;gica para realizar las tareas de restauraci&oacute;n
  * asociadas al navegador Firefox para Windows, Linux y MacOsX
- * 
+ *
  */
 final class RestoreConfigFirefox {
 
 	static final class MozillaProfileNotFoundException extends Exception {
-	
+
 		/**
 		 * Versi&oacute;n de serializaci&oacute;n
 		 */
 		private static final long serialVersionUID = 5429606644925911457L;
-		
+
 	}
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	private static final String FILE_AUTOFIRMA_CERTIFICATE = "AutoFirma_ROOT.cer"; //$NON-NLS-1$
 	static final String DIR_CERTUTIL = "certutil"; //$NON-NLS-1$
-	private static final String LINUX_UNINSTALLSCRIPT_NAME = "uninstall.sh"; //$NON-NLS-1$
-	private static final String LINUX_SCRIPT_NAME = "install.sh"; //$NON-NLS-1$
+	private static final String LINUX_UNINSTALLSCRIPT_NAME = "uninstallRestore.sh"; //$NON-NLS-1$
+	private static final String LINUX_SCRIPT_NAME = "installRestore.sh"; //$NON-NLS-1$
 	private static final String LINUX_MOZILLA_PATH = "/.mozilla/firefox/profiles.ini";//$NON-NLS-1$
 	private static final String LINUX_CHROME_PATH = "/.pki/nssdb";//$NON-NLS-1$
-	private static final String LINUX_CHROMIUM_PREFS_PATH = "/.config/chromium/Local State";//$NON-NLS-1$
-	private static final String LINUX_CHROME_PREFS_PATH = "/.config/google-chrome/Local State";//$NON-NLS-1$
 	private static final String MACOSX_MOZILLA_PATH = "/Library/Application Support/firefox/profiles.ini";//$NON-NLS-1$
 	private static String WINDOWS_MOZILLA_PATH = "\\AppData\\Roaming\\Mozilla\\Firefox\\profiles.ini"; //$NON-NLS-1$
 	private static final String GET_USER_SCRIPT = "scriptGetUsers";//$NON-NLS-1$
@@ -65,9 +63,9 @@ final class RestoreConfigFirefox {
 	static final String CERTUTIL_EXE;
 	private static final String FILE_CERTUTIL;
 	private static final String RESOURCE_BASE;
-	
+
 	private static String USERS_WINDOWS_PATH;
-	
+
 	static {
 		try {
 			USERS_WINDOWS_PATH = new File(System.getProperty("user.home")).getParentFile().getAbsolutePath(); //$NON-NLS-1$;
@@ -77,7 +75,7 @@ final class RestoreConfigFirefox {
 			USERS_WINDOWS_PATH = "C:/Users"; //$NON-NLS-1$
 		}
 	}
-	
+
 	/** Nombre del usuario por defecto en Windows. Este usuario es el que se usa como base para
 	 * crear nuevos usuarios y no se deber&iacute;a tocar. */
 	private static String DEFAULT_WINDOWS_USER_NAME = "Default"; //$NON-NLS-1$
@@ -108,121 +106,6 @@ final class RestoreConfigFirefox {
 
 	private RestoreConfigFirefox() {
 		// No instanciable
-	}
-
-	/** Genera el script que elimina el warning al ejecutar AutoFirma desde Chrome para LINUX.
-	 * En linux genera el script que hay que ejecutar para realizar la instalaci&oacute;n pero no lo ejecuta, de eso se encarga el instalador Debian.
-	 * @param targetDir Directorio de instalaci&oacute;n del sistema
-	 * @param userDir Directorio de usuario dentro del sistema operativo.
-	 * @param browserPath Directorio de configuraci&oacute;n de Chromium o Google Chrome.
-	 *  <ul>
-	 *   <li>En LINUX contiene el contenido del script a ejecutar.</li>
-	 * </ul> */
-	private static void createScriptsRemoveExecutionWarningInChrome(final File targetDir, final String userDir, final String browserPath) {
-		final String[] commandInstall = new String[] {
-				"sed", //$NON-NLS-1$
-				"s/\\\"protocol_handler\\\":{\\\"excluded_schemes\\\":{/\\\"protocol_handler\\\":{\\\"excluded_schemes\\\":{\\\"afirma\\\":false,/g", //$NON-NLS-1$
-				escapePath(userDir + browserPath),
-				">", //$NON-NLS-1$
-				escapePath(userDir + browserPath) + "1", //$NON-NLS-1$
-		};
-
-		final String[] commandUninstall = new String[] {
-				"sed", //$NON-NLS-1$
-				"s/\\\"afirma\\\":false,//g", //$NON-NLS-1$
-				escapePath(userDir + browserPath),
-				">", //$NON-NLS-1$
-				escapePath(userDir + browserPath) + "1", //$NON-NLS-1$
-		};
-
-		//Se reemplaza el fichero generado por el original
-		final String[] commandCopy = new String[] {
-				"\\cp", //$NON-NLS-1$
-				escapePath(userDir + browserPath) + "1", //$NON-NLS-1$
-				escapePath(userDir + browserPath),
-		};
-
-		// Generamos el script de instalacion y desistalacion
-		try {
-
-			final StringBuilder sb = new StringBuilder();
-			for (final String s : commandInstall) {
-				sb.append(s);
-				sb.append(' ');
-			}
-
-			final StringBuilder uninstall = new StringBuilder();
-			for (final String s : commandUninstall) {
-				uninstall.append(s);
-				uninstall.append(' ');
-			}
-			uninstall.append("\n"); //$NON-NLS-1$
-			sb.append("\n"); //$NON-NLS-1$
-
-			for (final String s : commandCopy) {
-				sb.append(s);
-				sb.append(' ');
-			}
-			for (final String s : commandCopy) {
-				uninstall.append(s);
-				uninstall.append(' ');
-			}
-			String path = null;
-			String uninstallPath = null;
-			sb.append("\n"); //$NON-NLS-1$
-			uninstall.append("\n"); //$NON-NLS-1$
-
-			// Obtenemos la ruta de los scripts
-			path = new File(targetDir, LINUX_SCRIPT_NAME).getAbsolutePath();
-			uninstallPath = new File(targetDir, LINUX_UNINSTALLSCRIPT_NAME).getAbsolutePath();
-			final File installScript = new File(path);
-			final File uninstallScript = new File(uninstallPath);
-
-			try (
-					final FileOutputStream fout = new FileOutputStream(installScript, true);
-					final FileOutputStream foutUninstall = new FileOutputStream(
-							uninstallScript, true
-							);
-					) {
-				fout.write(sb.toString().getBytes());
-				foutUninstall.write(uninstall.toString().getBytes());
-			}
-		}
-		catch (final Exception e) {
-			LOGGER.severe(
-					"Excepcion en la creacion del script linux para la modificacion del fichero de protocolos de Google Chrome: " + e //$NON-NLS-1$
-					);
-		}
-
-	}
-
-	/** Genera el script que elimina el warning al ejecutar AutoFirma desde Chrome para LINUX.
-	 * En linux genera el script que hay que ejecutar para realizar la instalaci&oacute;n pero no lo ejecuta, de eso se encarga el instalador Debian.
-	 * @param targetDir Directorio de instalaci&oacute;n del sistema
-	 * @param command Usado para sacar los directorios de usuario dentro del sistema operativo.
-	 *  <ul>
-	 * <li>En LINUX contiene el contenido del script a ejecutar.</li>
-	 * </ul>
-	 */
-	static void removeAppExecutionWarningInChrome(final File targetDir, final String[] command) {
-
-		// sacamos el listado de usuarios de la aplicacion
-		final List<String> usersDirs = getSystemUsersHomes(command);
-
-		for ( final String userDir : usersDirs) {
-			// Montamos el script de instalacion y desinstalacion que
-			// incluya el protocolo "afirma" en el fichero Local State
-			if ( Platform.OS.LINUX.equals(Platform.getOS()) ) {
-				final File fileChrome = new File(escapePath(userDir) + LINUX_CHROME_PREFS_PATH);
-				final File fileChromium = new File(escapePath(userDir) + LINUX_CHROMIUM_PREFS_PATH);
-				if( fileChrome.isFile() ) {
-					createScriptsRemoveExecutionWarningInChrome(targetDir, userDir, LINUX_CHROME_PREFS_PATH);
-				}
-				if ( fileChromium.isFile() ) {
-					createScriptsRemoveExecutionWarningInChrome(targetDir, userDir, LINUX_CHROMIUM_PREFS_PATH);
-				}
-			}
-		}
 	}
 
 	/**
@@ -258,12 +141,12 @@ final class RestoreConfigFirefox {
 							"\"TCP,TCP,TCP\"" //$NON-NLS-1$ // 9
 					};
 					execCommandLineCertUtil(certutilCommands, true);
-					
+
 				}
 			}
 		}
 	}
-	
+
 	/**
 	 * Inicia la restauraci&oacute;n del certificado para la comunicaci&oacute;n entre Firefox y Autofirma en Windows
 	 * @param targetDir Directorio de la aplicaci&oacute;n
@@ -277,7 +160,7 @@ final class RestoreConfigFirefox {
 		}
 
 		Set<File> profile = null;
-		
+
 		for (final File firefoxDir : firefoxProfilesDir) {
 			// En Windows recibimos un unico directorio de perfil, lo convertimos a una estructura Set<File>
 			profile = new HashSet<>(Arrays.asList(firefoxDir.listFiles()));
@@ -323,14 +206,14 @@ final class RestoreConfigFirefox {
 	 * @param targetDir Directorio de instalaci&oacute;n del sistema
 	 */
 	public static void uninstallRootCAMozillaKeyStore(final File targetDir) {
-	
+
 		try {
 			executeCertUtilToDelete(targetDir);
 		}
 		catch (final Exception e) {
 			LOGGER.warning("No se pudo desinstalar el certificado SSL raiz del almacen de Mozilla Firefox: " + e); //$NON-NLS-1$
 		}
-		
+
 	}
 
 
@@ -506,7 +389,7 @@ final class RestoreConfigFirefox {
 			certUtilExec = escapePath(certutilFile.getAbsolutePath());
 
 			if ( Platform.OS.MACOSX.equals(Platform.getOS()) ) {
-				
+
 				RestoreConfigMacOSX.writeScriptFile(RestoreConfigMacOSX.mac_script_path, new StringBuilder(RestoreConfigMacOSX.EXPORT_PATH + certutilFile.getAbsolutePath().substring(0,certutilFile.getAbsolutePath().lastIndexOf(File.separator) )), true);
 				RestoreConfigMacOSX.writeScriptFile(RestoreConfigMacOSX.mac_script_path, new StringBuilder(RestoreConfigMacOSX.EXPORT_LIBRARY_LD + certutilFile.getAbsolutePath().substring(0,certutilFile.getAbsolutePath().lastIndexOf(File.separator) )), true);
 			}
@@ -530,7 +413,7 @@ final class RestoreConfigFirefox {
 			};
 
 			error = execCommandLineCertUtil(certutilCommands, false);
-			
+
 		}
 
 		if (error) {
@@ -553,16 +436,16 @@ final class RestoreConfigFirefox {
 	 **/
 	private static boolean execCommandLineCertUtil(final String[] command, final boolean chromeImport)
 			throws IOException {
-		
+
 		Boolean error = Boolean.FALSE;
 		final StringBuilder sb = new StringBuilder();
-		
+
 		for (final String s : command) {
 			sb.append(s);
 			sb.append(' ');
 		}
 
-		if (Platform.OS.MACOSX.equals(Platform.getOS())) {		
+		if (Platform.OS.MACOSX.equals(Platform.getOS())) {
 			RestoreConfigMacOSX.writeScriptFile(RestoreConfigMacOSX.mac_script_path, sb, true);
 			return false;
 		}
@@ -572,44 +455,44 @@ final class RestoreConfigFirefox {
 			String path = null;
 			String uninstallPath = null;
 			try {
-				
+
 				if(chromeImport) {
 					//En Linux tambien se instala para todos los perfiles de
 					// ususario del almacen de Chrome
 					// tenemos en command[7] la ruta del fichero .crt, sacamos de
 					// ahi la ruta del directorio de instalacion
-					
+
 					uninstall.append(command[0] + ' ');
 					uninstall.append("-D" + ' '); //$NON-NLS-1$
 					uninstall.append("-d" + ' ');//$NON-NLS-1$
 					uninstall.append(command[2] + ' ');
 					uninstall.append("-n" + ' ');//$NON-NLS-1$
 					uninstall.append(command[5] + ' ');
-										
+
 					path = command[7].substring(0, command[7].lastIndexOf("/") + 1) + LINUX_SCRIPT_NAME; //$NON-NLS-1$
 					uninstallPath = command[7].substring(0, command[7].lastIndexOf("/") + 1) + LINUX_UNINSTALLSCRIPT_NAME; //$NON-NLS-1$
-					
+
 				}
 				else {
-					
+
 					// tenemos en command[5] la ruta del fichero .cer, sacamos de
 					// ahi la ruta del directorio de instalacion
-					
+
 					uninstall.append(command[0] + ' ');
 					uninstall.append("-D" + ' '); //$NON-NLS-1$
 					uninstall.append("-d" + ' ');//$NON-NLS-1$
 					uninstall.append(command[3] + ' ');
 					uninstall.append("-n" + ' ');//$NON-NLS-1$
 					uninstall.append(command[7] + ' ');
-										
+
 					path = command[5].substring(0, command[5].lastIndexOf("/") + 1) + LINUX_SCRIPT_NAME; //$NON-NLS-1$
 					uninstallPath = command[5].substring(0, command[5].lastIndexOf("/") + 1) + LINUX_UNINSTALLSCRIPT_NAME; //$NON-NLS-1$
-					
+
 				}
-				
+
 				final File installScript = new File(path);
 				final File uninstallScript = new File(uninstallPath);
-							
+
 				try (
 						final FileOutputStream fout = new FileOutputStream(installScript, true);
 						final FileOutputStream foutUninstall = new FileOutputStream(
@@ -618,26 +501,26 @@ final class RestoreConfigFirefox {
 						) {
 					fout.write(sb.toString().getBytes());
 					foutUninstall.write(uninstall.toString().getBytes());
-					
+
 				}
 
 				addExexPermissionsToFile(uninstallScript);
 				addExexPermissionsToFile(installScript);
-								
+
 				// Primero desinstalamos las posibles versiones previas del certificado
 				error = execCommand(new String[] {uninstallPath});
 				error = execCommand(new String[] {path});
-				
+
 				if (!uninstallScript.delete()) {
 					LOGGER.warning("No puedo eliminar el fichero de script: " + LINUX_UNINSTALLSCRIPT_NAME); //$NON-NLS-1$
 				}
-																				
+
 				if (!installScript.delete()) {
 					LOGGER.warning("No puedo eliminar el fichero de script: " + LINUX_SCRIPT_NAME); //$NON-NLS-1$
 				}
-				
-				return error;
-								
+
+				return error.booleanValue();
+
 			}
 			catch (final Exception e) {
 				LOGGER.severe(
@@ -688,7 +571,7 @@ final class RestoreConfigFirefox {
 
 	private static void importCARootOnFirefoxKeyStore (final File appConfigDir,
 			                                           final Set<File> profilesDir) {
-		
+
 		try {
 			// Usamos CertUtil para instalar el certificado en Firefox.
 			final String certutilExe = appConfigDir.getAbsolutePath() + File.separator + DIR_CERTUTIL + File.separator
@@ -708,7 +591,7 @@ final class RestoreConfigFirefox {
 
 	}
 
-	
+
 	/** Ejecuta la aplicacion Mozilla CertUtil para eliminar el certificado de confianza ra&iacute;z
 	 * SSL de Firefox.
 	 * @param targetDir Directorio padre en el que se encuentra el directorio de certUtil.
@@ -749,13 +632,13 @@ final class RestoreConfigFirefox {
 		boolean error = false;
 
 		for(final String userDirName : userDirNames) {
-			
+
 			// Nos saltamos siempre el usuario por defecto del sistema para
 			// evitar corromperlo
 			if (DEFAULT_WINDOWS_USER_NAME.equalsIgnoreCase(userDirName)) {
 				continue;
 			}
-			
+
 			LOGGER.info("Se comprueba la existencia del perfil de Firefox: " + USERS_WINDOWS_PATH + userDirName + WINDOWS_MOZILLA_PATH); //$NON-NLS-1$
 			if(new File(USERS_WINDOWS_PATH + userDirName + WINDOWS_MOZILLA_PATH).exists()) {
 				final File profilesDir = new File(
@@ -902,7 +785,7 @@ final class RestoreConfigFirefox {
 	}
 
 	/**
-	 * Obtiene los perfiles de usuarios de Firefox en Windows 
+	 * Obtiene los perfiles de usuarios de Firefox en Windows
 	 * @return Array de Files con los perfiles de usuarios de Firefox
 	 */
 	private static ArrayList<File> getFirefoxProfilesDir() {
@@ -931,7 +814,7 @@ final class RestoreConfigFirefox {
 				if (DEFAULT_WINDOWS_USER_NAME.equalsIgnoreCase(userDirName)) {
 					continue;
 				}
-				
+
 				if(new File(USERS_WINDOWS_PATH + userDirName + WINDOWS_MOZILLA_PATH).exists()) {
 					fileList.add(
 							new File(
@@ -1086,16 +969,16 @@ final class RestoreConfigFirefox {
 		return profile;
 	}
 
-		
+
 	/**
 	 * Ejecuta un comando de consola
 	 * @param commands Nombre del comando y argumentos
 	 * @return {@code true} si la ejecuci&oacute;n devolvioacute; alg&uacute;n error {@code false} en caso contrario
 	 */
 	private static Boolean execCommand(final String[] command) throws IOException {
-				
-		Boolean error = Boolean.FALSE;
-		
+
+		final Boolean error = Boolean.FALSE;
+
 		LOGGER.info("Se ejecutara el siguiente comando:\n" + Arrays.toString(command)); //$NON-NLS-1$
 		final Process process = new ProcessBuilder(command).start();
 		// Cuando se instala correctamente no hay salida de ningun tipo, asi que se interpreta
@@ -1111,7 +994,7 @@ final class RestoreConfigFirefox {
 				) {
 			while ((line = resReader.readLine()) != null) {
 				LOGGER.severe(line);
-				return true;
+				return new Boolean(true);
 			}
 		}
 
@@ -1125,10 +1008,10 @@ final class RestoreConfigFirefox {
 				) {
 			while ((line = errReader.readLine()) != null) {
 				LOGGER.severe(line);
-				return true;
+				return new Boolean(true);
 			}
 		}
-								
+
 		return error;
 	}
 }
