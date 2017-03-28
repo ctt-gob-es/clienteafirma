@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -119,10 +120,11 @@ final class ConfiguratorLinux implements Configurator {
 							);
 					) {
 				while ((line = resReader.readLine()) != null) {
-					usersDir.add(line);
+					if(line.toLowerCase().contains("home/") && !usersDir.contains(line)) { //$NON-NLS-1$
+						usersDir.add(line);
+					}
 				}
 			}
-
 			return usersDir.toArray(new String[usersDir.size()]);
 		}
 		catch (final Exception e) {
@@ -139,39 +141,150 @@ final class ConfiguratorLinux implements Configurator {
 	 * </ul>
 	 */
 	private static void createScriptsRemoveChromeWarnings(final File targetDir, final String[] usersDirs) {
-
 		for (final String userDir : usersDirs) {
+
+			// Generamos el script de instalacion
+			final StringBuilder installationScript = new StringBuilder();
+			// Generamos el script de desistalacion
+			final StringBuilder uninstallationScript = new StringBuilder();
+
 			// Montamos el script de instalacion y desinstalacion que
 			// incluya el protocolo "afirma" en el fichero Local State o Preferences (segun la version)
 			// para Google Chrome o Chromium
 			try {
-				createScriptsRemoveChromeAndChromiumWarnings(targetDir, userDir);
+				// Se escriben los comandos en el script de instalacion
+				final ArrayList<String[]> installCommands = getCommandsToRemoveChromeAndChromiumWarningsOnInstall(targetDir, userDir);
+				final Iterator<String[]> list = installCommands.iterator();
+				while(list.hasNext()) {
+					ConfiguratorUtil.printScript(list.next(), installationScript);
+				}
+
+				// Se almacenan los script de instalación
+				try {
+					ConfiguratorUtil.writeScript(installationScript, new File(targetDir, INSTALL_SCRIPT_NAME));
+				}
+				catch (final Exception e) {
+					throw new IOException("Error al crear el script para agregar la confianza del esquema 'afirma'", e); //$NON-NLS-1$
+				}
+
+				// Se escriben los comandos en el script de desinstalacion
+				final ArrayList<String[]> uninstallCommands = getCommandsToRemoveChromeAndChromiumWarningsOnUninstall(targetDir, userDir);
+				final Iterator<String[]> list2 = uninstallCommands.iterator();
+				// Se escriben los comandos en el script de instalacion
+				while(list2.hasNext()) {
+					ConfiguratorUtil.printScript(list2.next(), uninstallationScript);
+				}
+
+				try {
+					ConfiguratorUtil.writeScript(uninstallationScript, new File(targetDir, UNINSTALL_SCRIPT_NAME));
+				}
+				catch (final Exception e) {
+					LOGGER.severe(
+							"Excepcion en la creacion del script linux para la modificacion del fichero de protocolos de Google Chrome: " + e //$NON-NLS-1$
+							);
+				}
 			} catch (final IOException e) {
 				LOGGER.warning("No se pudieron crear los scripts para registrar el esquema 'afirma' en Chrome: " + e); //$NON-NLS-1$
 			}
 		}
 	}
 
-	/** Genera los scripts que registran/desregistran el esquema "afirma" como un
+	/** Genera los comandos que desregistran el esquema "afirma" como un
 	 * protocolo de confiable en Chrome.
 	 * @param appDir Directorio de instalaci&oacute;n del sistema
 	 * @param userDir Directorio de usuario dentro del sistema operativo.
 	 * @param browserPath Directorio de configuraci&oacute;n de Chromium o Google Chrome.
 	 * @throws IOException */
-	private static void createScriptsRemoveChromeAndChromiumWarnings(final File appDir, final String userDir) throws IOException {
+	private static ArrayList<String[]> getCommandsToRemoveChromeAndChromiumWarningsOnUninstall(final File appDir, final String userDir) throws IOException {
 
-		// Generamos el script de instalacion
-		final StringBuilder installationScript = new StringBuilder();
-		// Generamos el script de desistalacion
-		final StringBuilder uninstallationScript = new StringBuilder();
+		final ArrayList<String[]> commandList = new ArrayList<>();
 
 		// Final del if
 		final String[] endIfStatement = new String[] {
 				"fi", //$NON-NLS-1$
 		};
 
+		// Generacion de comandos de desinstalacion
 		/////////////////////////////////////////////////////////////////////////////
-		////// Chrome/Chromium v56 o inferior
+		////// Chromium v56 o inferior
+		/////////////////////////////////////////////////////////////////////////////
+
+		final String[] ifFileFound1 =
+				getIfFileFoundCommand(userDir, LINUX_CHROMIUM_V56_OR_LOWER_PREFS_PATH);
+		// Generacion de comandos de desinstalacion
+		commandList.add(ifFileFound1);
+		removeProtocolInPreferencesFile1(userDir, LINUX_CHROMIUM_V56_OR_LOWER_PREFS_PATH, commandList);
+		removeProtocolInPreferencesFile2(userDir, LINUX_CHROMIUM_V56_OR_LOWER_PREFS_PATH, commandList);
+		removeProtocolInPreferencesFile3(userDir, LINUX_CHROMIUM_V56_OR_LOWER_PREFS_PATH, commandList);
+		commandList.add(
+				copyConfigurationFile(userDir, LINUX_CHROMIUM_V56_OR_LOWER_PREFS_PATH));
+		commandList.add(endIfStatement);
+
+		/////////////////////////////////////////////////////////////////////////////
+		////// Chrome v56 o inferior
+		/////////////////////////////////////////////////////////////////////////////
+
+		final String[] ifFileFound2 =
+				getIfFileFoundCommand(userDir, LINUX_CHROME_V56_OR_LOWER_PREFS_PATH);
+		// Generacion de comandos de desinstalacion
+		commandList.add(ifFileFound2);
+		removeProtocolInPreferencesFile1(userDir, LINUX_CHROME_V56_OR_LOWER_PREFS_PATH, commandList);
+		removeProtocolInPreferencesFile2(userDir, LINUX_CHROME_V56_OR_LOWER_PREFS_PATH, commandList);
+		removeProtocolInPreferencesFile3(userDir, LINUX_CHROME_V56_OR_LOWER_PREFS_PATH, commandList);
+		commandList.add(
+				copyConfigurationFile(userDir, LINUX_CHROME_V56_OR_LOWER_PREFS_PATH));
+		commandList.add(endIfStatement);
+
+		/////////////////////////////////////////////////////////////////////////////
+		////// Chromium v57 o superior
+		/////////////////////////////////////////////////////////////////////////////
+
+		final String[] ifFileFound3 =
+				getIfFileFoundCommand(userDir, LINUX_CHROMIUM_V57_OR_HIGHER_PREFS_PATH);
+
+		// Generacion de comandos de desinstalacion
+		commandList.add(ifFileFound3);
+		removeProtocolInPreferencesFile1(userDir, LINUX_CHROMIUM_V57_OR_HIGHER_PREFS_PATH, commandList);
+		removeProtocolInPreferencesFile2(userDir, LINUX_CHROMIUM_V57_OR_HIGHER_PREFS_PATH, commandList);
+		removeProtocolInPreferencesFile3(userDir, LINUX_CHROMIUM_V57_OR_HIGHER_PREFS_PATH, commandList);
+		commandList.add(
+				copyConfigurationFile(userDir, LINUX_CHROMIUM_V57_OR_HIGHER_PREFS_PATH));
+		commandList.add(endIfStatement);
+
+		/////////////////////////////////////////////////////////////////////////////
+		////// Chrome v57 o superior
+		/////////////////////////////////////////////////////////////////////////////
+		final String[] ifFileFound4 =
+				getIfFileFoundCommand(userDir, LINUX_CHROME_V57_OR_HIGHER_PREFS_PATH);
+
+		// Generacion de comandos de desinstalacion
+		commandList.add(ifFileFound4);
+		removeProtocolInPreferencesFile1(userDir, LINUX_CHROME_V57_OR_HIGHER_PREFS_PATH, commandList);
+		removeProtocolInPreferencesFile2(userDir, LINUX_CHROME_V57_OR_HIGHER_PREFS_PATH, commandList);
+		removeProtocolInPreferencesFile3(userDir, LINUX_CHROME_V57_OR_HIGHER_PREFS_PATH, commandList);
+		commandList.add(
+				copyConfigurationFile(userDir, LINUX_CHROME_V57_OR_HIGHER_PREFS_PATH));
+		commandList.add(endIfStatement);
+
+		return commandList;
+
+	}
+
+	/** Genera los scripts que registran el esquema "afirma" como un
+	 * protocolo de confiable en Chrome.
+	 * @param appDir Directorio de instalaci&oacute;n del sistema
+	 * @param userDir Directorio de usuario dentro del sistema operativo.
+	 * @throws IOException Cuando se produce un error de entrada/salida. */
+	private static ArrayList<String[]> getCommandsToRemoveChromeAndChromiumWarningsOnInstall(final File appDir, final String userDir) throws IOException {
+
+		final ArrayList<String[]> commandList = new ArrayList<>();
+		// Final del if
+		final String[] endIfStatement = new String[] {
+				"fi", //$NON-NLS-1$
+		};
+
+		/////////////////////////////////////////////////////////////////////////////
+		////// Chromium v56 o inferior
 		/////////////////////////////////////////////////////////////////////////////
 		if( new File(userDir, LINUX_CHROMIUM_V56_OR_LOWER_PREFS_PATH).isFile() ) {
 			//Se incluye afirma como protocolo de confianza en Chromium v56 o inferior
@@ -181,7 +294,7 @@ final class ConfiguratorLinux implements Configurator {
 					correctProtocolInPreferencesFile(userDir, LINUX_CHROMIUM_V56_OR_LOWER_PREFS_PATH);
 
 			// Comandos para agregar la confianza del esquema 'afirma' en caso de tener Chromium v56 o inferior recien instalado
-			final String[] commandInstallChromium56OrLower3 = getIfCommand(userDir, LINUX_CHROMIUM_V56_OR_LOWER_PREFS_PATH);
+			final String[] ifContainsString1 = getIfNotCointainsStringCommand(userDir, LINUX_CHROMIUM_V56_OR_LOWER_PREFS_PATH);
 			final String[] commandInstallChromium56OrLower4 = new String[] {
 					"sed -i", //$NON-NLS-1$ -i para reemplazar en el propio fichero
 					"'s/last_active_profiles\\([^,]*\\),/" //$NON-NLS-1$
@@ -189,24 +302,20 @@ final class ConfiguratorLinux implements Configurator {
 					escapePath(userDir + LINUX_CHROMIUM_V56_OR_LOWER_PREFS_PATH) + "1", //$NON-NLS-1$
 			};
 
-			// Generacion de script de instalacion
-			ConfiguratorUtil.printScript(commandInstallChromium56OrLower1, installationScript);
-			ConfiguratorUtil.printScript(commandInstallChromium56OrLower2, installationScript);
-			ConfiguratorUtil.printScript(commandInstallChromium56OrLower3, installationScript);
-			ConfiguratorUtil.printScript(commandInstallChromium56OrLower4, installationScript);
-			ConfiguratorUtil.printScript(endIfStatement, installationScript);
-			ConfiguratorUtil.printScript(
-					copyConfigurationFile(userDir, LINUX_CHROMIUM_V56_OR_LOWER_PREFS_PATH), installationScript);
-
-			// Generacion de script de desinstalacion
-			removeProtocolInPreferencesFile1(userDir, LINUX_CHROMIUM_V56_OR_LOWER_PREFS_PATH, uninstallationScript);
-			removeProtocolInPreferencesFile2(userDir, LINUX_CHROMIUM_V56_OR_LOWER_PREFS_PATH, uninstallationScript);
-			removeProtocolInPreferencesFile3(userDir, LINUX_CHROMIUM_V56_OR_LOWER_PREFS_PATH, uninstallationScript);
-
-			ConfiguratorUtil.printScript(
-					copyConfigurationFile(userDir, LINUX_CHROMIUM_V56_OR_LOWER_PREFS_PATH), uninstallationScript);
+			// Generacion de comandos de instalacion
+			commandList.add(commandInstallChromium56OrLower1);
+			commandList.add(commandInstallChromium56OrLower2);
+			commandList.add(ifContainsString1);
+			commandList.add(commandInstallChromium56OrLower4);
+			commandList.add(endIfStatement);
+			commandList.add(
+					copyConfigurationFile(userDir, LINUX_CHROMIUM_V56_OR_LOWER_PREFS_PATH));
 		}
 
+
+		/////////////////////////////////////////////////////////////////////////////
+		////// Chrome v56 o inferior
+		/////////////////////////////////////////////////////////////////////////////
 		if( new File(userDir, LINUX_CHROME_V56_OR_LOWER_PREFS_PATH).isFile() ) {
 			//Se incluye afirma como protocolo de confianza en Chrome v56 o inferior
 			final String[] commandInstallChrome56OrLower1 =
@@ -215,7 +324,7 @@ final class ConfiguratorLinux implements Configurator {
 			final String[] commandInstallChrome56OrLower2 =
 					correctProtocolInPreferencesFile(userDir, LINUX_CHROME_V56_OR_LOWER_PREFS_PATH);
 
-			final String[] commandInstallChrome56OrLower3 = getIfCommand(userDir, LINUX_CHROME_V56_OR_LOWER_PREFS_PATH);
+			final String[] ifContainsString2 = getIfNotCointainsStringCommand(userDir, LINUX_CHROME_V56_OR_LOWER_PREFS_PATH);
 			// Comando para agregar la confianza del esquema 'afirma' en caso de tener Chrome v56 o inferior recien instalado
 			final String[] commandInstallChrome56OrLower4 = new String[] {
 					"sed -i", //$NON-NLS-1$ -i para reemplazar en el propio fichero
@@ -224,26 +333,18 @@ final class ConfiguratorLinux implements Configurator {
 					escapePath(userDir + LINUX_CHROME_V56_OR_LOWER_PREFS_PATH) + "1", //$NON-NLS-1$
 			};
 
-			// Generacion de script de instalacion
-			ConfiguratorUtil.printScript(commandInstallChrome56OrLower1, installationScript);
-			ConfiguratorUtil.printScript(commandInstallChrome56OrLower2, installationScript);
-			ConfiguratorUtil.printScript(commandInstallChrome56OrLower3, installationScript);
-			ConfiguratorUtil.printScript(commandInstallChrome56OrLower4, installationScript);
-			ConfiguratorUtil.printScript(endIfStatement, installationScript);
-			ConfiguratorUtil.printScript(
-					copyConfigurationFile(userDir, LINUX_CHROME_V56_OR_LOWER_PREFS_PATH), installationScript);
-
-			// Generacion de script de desinstalacion
-			removeProtocolInPreferencesFile1(userDir, LINUX_CHROME_V56_OR_LOWER_PREFS_PATH, uninstallationScript);
-			removeProtocolInPreferencesFile2(userDir, LINUX_CHROME_V56_OR_LOWER_PREFS_PATH, uninstallationScript);
-			removeProtocolInPreferencesFile3(userDir, LINUX_CHROME_V56_OR_LOWER_PREFS_PATH, uninstallationScript);
-
-			ConfiguratorUtil.printScript(
-					copyConfigurationFile(userDir, LINUX_CHROME_V56_OR_LOWER_PREFS_PATH), uninstallationScript);
+			// Generacion de comandos de instalacion
+			commandList.add(commandInstallChrome56OrLower1);
+			commandList.add(commandInstallChrome56OrLower2);
+			commandList.add(ifContainsString2);
+			commandList.add(commandInstallChrome56OrLower4);
+			commandList.add(endIfStatement);
+			commandList.add(
+					copyConfigurationFile(userDir, LINUX_CHROME_V56_OR_LOWER_PREFS_PATH));
 		}
 
 		/////////////////////////////////////////////////////////////////////////////
-		////// Chrome/Chromium v57 o superior
+		////// Chromium v57 o superior
 		/////////////////////////////////////////////////////////////////////////////
 
 		if( new File(userDir, LINUX_CHROMIUM_V57_OR_HIGHER_PREFS_PATH).isFile() ) {
@@ -253,20 +354,16 @@ final class ConfiguratorLinux implements Configurator {
 			final String[] commandInstallChromium57OrHigher2 =
 					correctProtocolInPreferencesFile(userDir, LINUX_CHROMIUM_V57_OR_HIGHER_PREFS_PATH);
 
-			// Generacion de script de instalacion
-			ConfiguratorUtil.printScript(commandInstallChromium57OrHigher1, installationScript);
-			ConfiguratorUtil.printScript(commandInstallChromium57OrHigher2, installationScript);
-			ConfiguratorUtil.printScript(
-					copyConfigurationFile(userDir, LINUX_CHROMIUM_V57_OR_HIGHER_PREFS_PATH), installationScript);
-
-			// Generacion de script de desinstalacion
-			removeProtocolInPreferencesFile1(userDir, LINUX_CHROMIUM_V57_OR_HIGHER_PREFS_PATH, uninstallationScript);
-			removeProtocolInPreferencesFile2(userDir, LINUX_CHROMIUM_V57_OR_HIGHER_PREFS_PATH, uninstallationScript);
-			removeProtocolInPreferencesFile3(userDir, LINUX_CHROMIUM_V57_OR_HIGHER_PREFS_PATH, uninstallationScript);
-
-			ConfiguratorUtil.printScript(
-					copyConfigurationFile(userDir, LINUX_CHROMIUM_V57_OR_HIGHER_PREFS_PATH), uninstallationScript);
+			// Generacion de comandos de instalacion
+			commandList.add(commandInstallChromium57OrHigher1);
+			commandList.add(commandInstallChromium57OrHigher2);
+			commandList.add(
+					copyConfigurationFile(userDir, LINUX_CHROMIUM_V57_OR_HIGHER_PREFS_PATH));
 		}
+
+		/////////////////////////////////////////////////////////////////////////////
+		////// Chrome v57 o superior
+		/////////////////////////////////////////////////////////////////////////////
 		if( new File(userDir, LINUX_CHROME_V57_OR_HIGHER_PREFS_PATH).isFile() ) {
 			//Se incluye afirma como protocolo de confianza en Chrome v57 o superior
 			final String[] commandInstallChrome57OrHigher1 =
@@ -274,44 +371,20 @@ final class ConfiguratorLinux implements Configurator {
 			final String[] commandInstallChrome57OrHigher2 =
 					correctProtocolInPreferencesFile(userDir, LINUX_CHROME_V57_OR_HIGHER_PREFS_PATH);
 
-			// Generacion de script de instalacion
-			ConfiguratorUtil.printScript(commandInstallChrome57OrHigher1, installationScript);
-			ConfiguratorUtil.printScript(commandInstallChrome57OrHigher2, installationScript);
-			ConfiguratorUtil.printScript(
-					copyConfigurationFile(userDir, LINUX_CHROME_V57_OR_HIGHER_PREFS_PATH), installationScript);
+			// Generacion de comandos de instalacion
+			commandList.add(commandInstallChrome57OrHigher1);
+			commandList.add(commandInstallChrome57OrHigher2);
+			commandList.add(
+					copyConfigurationFile(userDir, LINUX_CHROME_V57_OR_HIGHER_PREFS_PATH));
 
-			// Generacion de script de desinstalacion
-			removeProtocolInPreferencesFile1(userDir, LINUX_CHROME_V57_OR_HIGHER_PREFS_PATH, uninstallationScript);
-			removeProtocolInPreferencesFile2(userDir, LINUX_CHROME_V57_OR_HIGHER_PREFS_PATH, uninstallationScript);
-			removeProtocolInPreferencesFile3(userDir, LINUX_CHROME_V57_OR_HIGHER_PREFS_PATH, uninstallationScript);
-
-			ConfiguratorUtil.printScript(
-					copyConfigurationFile(userDir, LINUX_CHROME_V57_OR_HIGHER_PREFS_PATH), uninstallationScript);
 		}
-
-
-		// Se almacenan los script de instalación y desinstalación
-		try {
-			ConfiguratorUtil.writeScript(installationScript, new File(appDir, INSTALL_SCRIPT_NAME));
-		}
-		catch (final Exception e) {
-			throw new IOException("Error al crear el script para agregar la confianza del esquema 'afirma'", e); //$NON-NLS-1$
-		}
-
-		try {
-			ConfiguratorUtil.writeScript(uninstallationScript, new File(appDir, UNINSTALL_SCRIPT_NAME));
-		}
-		catch (final Exception e) {
-			LOGGER.severe(
-					"Excepcion en la creacion del script linux para la modificacion del fichero de protocolos de Google Chrome: " + e //$NON-NLS-1$
-					);
-		}
+		return commandList;
 	}
 
 	/** Genera los scripts para confirmar si existen protocolos definidos en el fichero.
 	 * @param userDir Directorio de usuario dentro del sistema operativo.
 	 * @param browserPath Directorio de configuraci&oacute;n de Chromium o Google Chrome. */
-	private static String[] getIfCommand(final String userDir, final String browserPath) {
+	private static String[] getIfNotCointainsStringCommand(final String userDir, final String browserPath) {
 		// If para comprobar si es necesario incluir la sintaxis entera de definicion de protocolos o si,
 		// por el contrario, ya estaba
 		final String[] ifStatement = new String[] {
@@ -319,6 +392,20 @@ final class ConfiguratorLinux implements Configurator {
 				"grep -q \"excluded_schemes\" " +  //$NON-NLS-1$
 				escapePath(userDir + browserPath),
 				"; then", //$NON-NLS-1$
+		};
+		return ifStatement;
+	}
+
+	/** Genera los scripts para confirmar si existe el fichero con el que se va a trabajar.
+	 * @param userDir Directorio de usuario dentro del sistema operativo.
+	 * @param browserPath Directorio de configuraci&oacute;n de Chromium o Google Chrome. */
+	private static String[] getIfFileFoundCommand(final String userDir, final String browserPath) {
+		// If para comprobar si es necesario incluir la sintaxis entera de definicion de protocolos o si,
+		// por el contrario, ya estaba
+		final String[] ifStatement = new String[] {
+				"if [ -f ", //$NON-NLS-1$
+				escapePath(userDir + browserPath),
+				" ]; then", //$NON-NLS-1$
 		};
 		return ifStatement;
 	}
@@ -374,7 +461,7 @@ final class ConfiguratorLinux implements Configurator {
 	 * @param userDir Directorio de usuario dentro del sistema operativo.
 	 * @param browserPath Directorio de configuraci&oacute;n de Chromium o Google Chrome.
 	 * @param sb Objeto para escribir en fichero. */
-	private static void removeProtocolInPreferencesFile1(final String userDir, final String browserPath, final StringBuilder sb) {
+	private static void removeProtocolInPreferencesFile1(final String userDir, final String browserPath, final ArrayList<String[]> commandList) {
 
 		// Comando para retirar la confianza del esquema 'afirma'
 		final String[] commandUninstall1 = new String[] {
@@ -385,7 +472,7 @@ final class ConfiguratorLinux implements Configurator {
 				escapePath(userDir + browserPath) + "1", //$NON-NLS-1$
 		};
 
-		ConfiguratorUtil.printScript(commandUninstall1, sb);
+		commandList.add(commandUninstall1);
 
 	}
 
@@ -393,16 +480,16 @@ final class ConfiguratorLinux implements Configurator {
 	 * @param userDir Directorio de usuario dentro del sistema operativo.
 	 * @param browserPath Directorio de configuraci&oacute;n de Chromium o Google Chrome.
 	 * @param sb Objeto para escribir en fichero. */
-	private static void removeProtocolInPreferencesFile2(final String userDir, final String browserPath, final StringBuilder sb) {
+	private static void removeProtocolInPreferencesFile2(final String userDir, final String browserPath, final ArrayList<String[]> commandList) {
 
 		// Comando para retirar la confianza del esquema 'afirma'
-		final String[] commandUninstall1 = new String[] {
+		final String[] commandUninstall2 = new String[] {
 				"sed -i", //$NON-NLS-1$ -i para reemplazar en el propio fichero
 				"'s/\\\"afirma\\\":false//g'", //$NON-NLS-1$
 				escapePath(userDir + browserPath) + "1", //$NON-NLS-1$
 		};
 
-		ConfiguratorUtil.printScript(commandUninstall1, sb);
+		commandList.add(commandUninstall2);
 
 	}
 
@@ -410,16 +497,16 @@ final class ConfiguratorLinux implements Configurator {
 	 * @param userDir Directorio de usuario dentro del sistema operativo.
 	 * @param browserPath Directorio de configuraci&oacute;n de Chromium o Google Chrome.
 	 * @param sb Objeto para escribir en fichero. */
-	private static void removeProtocolInPreferencesFile3(final String userDir, final String browserPath, final StringBuilder sb) {
+	private static void removeProtocolInPreferencesFile3(final String userDir, final String browserPath, final ArrayList<String[]> commandList) {
 
 		// Comando para retirar la confianza del esquema 'afirma'
-		final String[] commandUninstall1 = new String[] {
+		final String[] commandUninstall3 = new String[] {
 				"sed -i", //$NON-NLS-1$ -i para reemplazar en el propio fichero
 				"'s/\\\"protocol_handler\\\":{\\\"excluded_schemes\\\":{}},//g'", //$NON-NLS-1$ Se elimina la lista vacia de protocolos
 				escapePath(userDir + browserPath) + "1", //$NON-NLS-1$
 		};
 
-		ConfiguratorUtil.printScript(commandUninstall1, sb);
+		commandList.add(commandUninstall3);
 
 	}
 
