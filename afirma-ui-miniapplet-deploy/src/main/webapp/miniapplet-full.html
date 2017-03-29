@@ -214,14 +214,23 @@
 			}
 		}
 		
+		
 		function showAppletLog() {
 			try {
-				showLog(MiniApplet.getCurrentLog());
-			} catch(e) {
-				showLog("Type: " + MiniApplet.getErrorType() + "\nMessage: " + MiniApplet.getErrorMessage());
+				MiniApplet.getCurrentLog(showGetCurrentLogResultCallback,
+						showErrorCallback);
+			} catch (e) {
+				showLog("Type: " + MiniApplet.getErrorType() + "\nMessage: "
+						+ MiniApplet.getErrorMessage());
 			}
+
 		}
 
+		function showGetCurrentLogResultCallback(log) {
+			showLog(log)
+		}
+
+		
 		/**
 		 * Funcion para la carga de un fichero. Almacena el contenido del fichero en un campo oculto y muestra su nombre.
 		 * LA CARGA INDEPENDIENTE DE FICHEROS DEBE EVITARSE EN LA MEDIDA DE LO POSIBLE. Si deseas firmar, cofirmar o contrafirmar
@@ -230,14 +239,18 @@
 		 */
 		function browseDatos(title, dataField, textDiv) {
 			try {
-				
-				MiniApplet.getFileNameContentBase64(title, "xsig,pdf,xml,doc", "Fichero para prueba de función load", "C://Users//jose.rodriguez.gomez//Documents", showLoadDataResultCallback, showErrorCallback);
-				
-			} catch(e) {
-				showLog("Type: " + MiniApplet.getErrorType() + "\nMessage: " + MiniApplet.getErrorMessage());
+
+				MiniApplet.getFileNameContentBase64(title, "xsig,pdf,xml,doc",
+						"Fichero para prueba de función load",
+						"C://Users//jose.rodriguez.gomez//Documents",
+						showLoadDataResultCallback, showErrorCallback);
+
+			} catch (e) {
+				showLog("Type: " + MiniApplet.getErrorType() + "\nMessage: "
+						+ MiniApplet.getErrorMessage());
 			}
 		}
-		
+
 		/**
 		 * Funcion para la carga de un fichero. Almacena el contenido del fichero en un campo oculto y muestra su nombre.
 		 * LA CARGA INDEPENDIENTE DE FICHEROS DEBE EVITARSE EN LA MEDIDA DE LO POSIBLE. Si deseas firmar, cofirmar o contrafirmar
@@ -246,84 +259,41 @@
 		 */
 		function browseFirma(title, dataField, textDiv) {
 			try {
-				
-				MiniApplet.getFileNameContentBase64(title, "xsig,pdf,xml,doc", "Fichero para prueba de función load", "C://Users//jose.rodriguez.gomez//Documents", showLoadFirmaResultCallback, showErrorCallback);
-			
-			} catch(e) {
-				showLog("Type: " + MiniApplet.getErrorType() + "\nMessage: " + MiniApplet.getErrorMessage());
-			}
-		}
-				
-		function showStickyResultCallback(result) {
-			
-			showLog(result);
-		}
-		
-		function showLoadDataResultCallback(fileNamesDataBase64) {
-			
-			var fileName = "";
-			var dataB64 = "";
-			
-			if (fileNamesDataBase64.length == 1) {
-								
-				var sepPos = fileNamesDataBase64[0].indexOf(":");
-				var fileNameDataBase64 = fileNamesDataBase64[0];
-				
-				if (sepPos == -1) {
-					fileName = Base64.decode(fileNameDataBase64, true);
-				}
-				else {
-					fileName = fileNameDataBase64.substring(0, sepPos);
-					dataB64 = fileNameDataBase64.substring(sepPos + 1).replace(/\-/g, "+").replace(/\_/g, "/");
-				}
-				
-			} 
-			
-			dataFilename.innerHTML = fileName;
-			data.value = dataB64;
-			
-		}
-		
-		function showLoadFirmaResultCallback(fileNamesDataBase64) {
-			
-			var fileName = "";
-			var dataB64 = "";
-			
-			if (fileNamesDataBase64.length == 1) {
-								
-				var sepPos = fileNamesDataBase64[0].indexOf(":");
-				var fileNameDataBase64 = fileNamesDataBase64[0];
-				
-				if (sepPos == -1) {
-					fileName = Base64.decode(fileNameDataBase64, true);
-				}
-				else {
-					fileName = fileNameDataBase64.substring(0, sepPos);
-					dataB64 = fileNameDataBase64.substring(sepPos + 1).replace(/\-/g, "+").replace(/\_/g, "/");
-				}
-				
-			} 
-			
-			signatureFilename.innerHTML = fileName;
-			signature.value = dataB64;
-			
-		}
-		
-		function setStickySignature() {
-			
-			var isSticky = document.getElementById("sticky").checked;
-			
-			try {
-				
-				MiniApplet.setStickySignatory(isSticky, showStickyResultCallback, showErrorCallback);
-				
-			} catch(e) {
-				showLog("Type: " + MiniApplet.getErrorType() + "\nMessage: " + MiniApplet.getErrorMessage());
+
+				MiniApplet.getFileNameContentBase64(title, "xsig,pdf,xml,doc",
+						"Fichero para prueba de función load",
+						"C://Users//jose.rodriguez.gomez//Documents",
+						showLoadFirmaResultCallback, showErrorCallback);
+
+			} catch (e) {
+				showLog("Type: " + MiniApplet.getErrorType() + "\nMessage: "
+						+ MiniApplet.getErrorMessage());
 			}
 		}
 
+		function showLoadDataResultCallback(fileName, dataB64) {
+
+			dataFilename.innerHTML = fileName;
+			data.value = dataB64;
+		}
+
+		function showLoadFirmaResultCallback(fileName, dataB64) {
+
+			signatureFilename.innerHTML = fileName;
+			signature.value = dataB64;
+
+		}
+
+		function setStickySignature() {
+
+			var isSticky = document.getElementById("sticky").checked;
+
+			MiniApplet.setStickySignatory(isSticky);
+
+		}
+
 		function cleanDataField(dataField, textDiv) {
-			
+
 			textDiv.innerHTML = "";
 			dataField.value = null;
 		}
