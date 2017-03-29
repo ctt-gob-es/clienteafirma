@@ -1879,6 +1879,8 @@ var MiniApplet = ( function ( window, undefined ) {
 						
 						successCallback(fileName,dataB64);
 						
+						return;
+						
 					} else if (fileNamesDataBase64.length > 1 ) {
 						
 						var fileNameArray = new Array();
