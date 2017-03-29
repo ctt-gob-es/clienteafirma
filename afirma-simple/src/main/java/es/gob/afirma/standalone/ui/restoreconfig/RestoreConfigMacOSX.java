@@ -1,6 +1,7 @@
 package es.gob.afirma.standalone.ui.restoreconfig;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -16,7 +17,9 @@ import java.security.KeyStore;
 import java.security.MessageDigest;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -74,8 +77,15 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 	private static final String TRUST_SETTINGS_COMMAND = "security trust-settings-import -d "; //$NON-NLS-1$
 	private static final String TRUST_SETTINGS_FILE = "/trust_settings.plist"; //$NON-NLS-1$
 	private static final String OSX_RESOURCES = "/osx"; //$NON-NLS-1$
+	
+	static final String GET_USERS_COMMAND = "dscacheutil -q user"; //$NON-NLS-1$
+	private static final String GET_USER_SCRIPTS_NAME = "scriptGetUsers";//$NON-NLS-1$
+	private static final String SCRIPT_EXT = ".sh";//$NON-NLS-1$
+	
 	static String mac_script_path;
 			
+	private static String[] userDirs = null;
+	
 	private static File sslCerFile;
 	
 	/**
@@ -89,6 +99,8 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 	@Override
 	public void restore(JTextArea taskOutput) throws IOException, GeneralSecurityException {
 
+		userDirs = getSystemUsersHomes();
+		
 		appendMessage(taskOutput, SimpleAfirmaMessages.getString("RestoreConfigMacOSX.2")); //$NON-NLS-1$
 		
 		final File appDir = RestoreConfigUtil.getApplicationDirectory(); 
@@ -115,9 +127,61 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 		
 		installRootCA(appDir, taskOutput);
 
+		closeChrome();
+
+		appendMessage(taskOutput, SimpleAfirmaMessages.getString("RestoreConfigMacOSX.16")); //$NON-NLS-1$
+		RestoreRemoveChromeWarning.removeChromeWarningsMac(appDir, userDirs);
+		
 		appendMessage(taskOutput, SimpleAfirmaMessages.getString("RestoreConfigMacOSX.8")); //$NON-NLS-1$
 		LOGGER.info("Finalizado" ); //$NON-NLS-1$
 
+	}
+	
+	/**
+	 * Pide al usuario que cierre el navegador Google Chrome y no permite continuar hasta que lo hace.
+	 */
+	private static void closeChrome() {
+		while (isChromeOpen()) {
+			JOptionPane.showMessageDialog(
+					null,
+					SimpleAfirmaMessages.getString("RestoreAutoFirma.8"), //$NON-NLS-1$
+					SimpleAfirmaMessages.getString("RestoreAutoFirma.9"), //$NON-NLS-1$
+					JOptionPane.WARNING_MESSAGE);
+		}
+	}
+	
+	/**
+	 * Detecta si el proceso de Firefox est&aacute; abierto.
+	 * @return
+	 */
+	private static boolean isChromeOpen() {
+
+		// Listamos los procesos abiertos y buscamos uno que contenga una cadena identificativa de Firefox
+		try {
+			final ProcessBuilder psProcessBuilder = new ProcessBuilder("ps", "aux"); //$NON-NLS-1$ //$NON-NLS-2$
+			final Process ps = psProcessBuilder.start();
+
+			String line;
+			try (
+					final InputStream resIs = ps.getInputStream();
+					final BufferedReader resReader = new BoundedBufferedReader(
+							new InputStreamReader(resIs),
+							256, // Maximo 256 lineas de salida
+							1024 // Maximo 1024 caracteres por linea
+							);
+					) {
+				while ((line = resReader.readLine()) != null) {
+					if (line.contains("Google Chrome.app")) { //$NON-NLS-1$
+						return true;
+					}
+				}
+			}
+		}
+		catch (final IOException e) {
+			LOGGER.warning("No se pudo completar la deteccion del proceso de Firefox. Se considerara que no esta en ejecucion: " + e); //$NON-NLS-1$
+		}
+
+		return false;
 	}
 
 	/** Comprueba si ya existe un almac&eacute;n de certificados generado.
@@ -174,6 +238,66 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 			certPack.getPkcs12(),
 			new File(appDir, KS_FILENAME)
 		);
+	}
+	
+    /** Devuelve un listado con todos los directorios de usuario del sistema.
+	 * @return Listado de directorios. */
+	private static String[] getSystemUsersHomes() {
+
+		if (userDirs != null) {
+			return userDirs;
+		}
+
+		try {
+			final File getUsersScriptFile = createGetUsersScript();
+			final Object o = executeScriptFile(getUsersScriptFile.getAbsolutePath(), false, true);
+			final List<String> dirs = new ArrayList<>();
+			String line;
+			final String initLine = "dir: "; //$NON-NLS-1$
+			try (
+					final InputStream resIs = new ByteArrayInputStream(o.toString().getBytes());
+					final BufferedReader resReader = new BoundedBufferedReader(
+							new InputStreamReader(resIs),
+							2048, // Maximo 2048 lineas de salida (256 perfiles)
+							2048 // Maximo 2048 caracteres por linea
+							);
+					) {
+				while ((line = resReader.readLine()) != null) {
+					if (line.startsWith(initLine)){
+						dirs.add(
+								line.substring(
+										line.indexOf(initLine) + initLine.length()
+										)
+								);
+					}
+				}
+			}
+			userDirs = dirs.toArray(new String[dirs.size()]);
+		}
+		catch (final IOException e) {
+			LOGGER.severe("Error al generar el listado perfiles de Firefox del sistema: " + e); //$NON-NLS-1$
+			userDirs = null;
+		}
+
+		return userDirs;
+	}
+	
+	
+	/**
+	 * Crea un fichero de script para la obtenci&oacute;n de los usuarios del sistema.
+	 * @throws IOException Cuando no se pueda crear el fichero de script.
+	 */
+	private static File createGetUsersScript() throws IOException {
+		final StringBuilder script = new StringBuilder(GET_USERS_COMMAND);
+		final File scriptFile = File.createTempFile(GET_USER_SCRIPTS_NAME, SCRIPT_EXT);
+		try {
+			ConfiguratorMacUtils.writeScriptFile(script, scriptFile.getAbsolutePath(), true);
+		} catch (final IOException e) {
+			LOGGER.log(Level.WARNING, "Ha ocurrido un error al generar el script de obtencion de usuarios: " + e, e); //$NON-NLS-1$
+		}
+		ConfiguratorMacUtils.addExexPermissionsToFile(scriptFile);
+
+		return scriptFile;
 	}
 	
 	/**
@@ -419,7 +543,7 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 			deleteTrustTemplate(appDir);
 			exportResource(OSX_RESOURCES,TRUST_SETTINGS_FILE, appDir.getAbsolutePath());
 		} catch (Exception e1) {
-			LOGGER.severe("No ha podido copiarse la plantilla de configuracion de confianza."); //$NON-NLS-1$
+			LOGGER.severe("No ha podido copiarse la plantilla de configuracion de confianza: " + e1); //$NON-NLS-1$
 		}
 
 		final String sha1RootOrig = "%CA_SHA1%"; //$NON-NLS-1$
@@ -670,4 +794,40 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 
         return destinationPath + resourceName;
     }
+    
+    /** Ejecuta un fichero de scripts.
+	 * @param path Ruta donde se encuentra el <i>script</i>.
+	 * @param administratorMode <code>true</code> el <i>script</i> se ejecuta con permisos de adminsitrador, <code>false</code> en caso contrario.
+	 * @param delete <code>true</code> se borra el fichero despu&eacute;s de haberse ejecutado.
+	 * @return El objeto que da como resultado el <i>script</i>.
+	 * @throws IOException Excepci&oacute;n lanzada en caso de ocurrir alg&uacute;n error en la ejecuci&oacute;n del <i>script</i>. */
+	public static Object executeScriptFile(final String path, final boolean administratorMode, final boolean delete) throws IOException {
+
+		final ScriptEngine se = MozillaKeyStoreUtilitiesOsX.getAppleScriptEngine();
+		if (se == null) {
+			LOGGER.severe("No se ha podido instanciar el motor AppleScript"); //$NON-NLS-1$
+			throw new IOException("No se ha podido instanciar el motor AppleScript"); //$NON-NLS-1$
+		}
+
+		LOGGER.info("Path del script: " + path); //$NON-NLS-1$
+		try {
+			Object o;
+			if (administratorMode) {
+				o = se.eval("do shell script \"" + path + "\" with administrator privileges"); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+			else {
+				o = se.eval("do shell script \"" + path + "\" "); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+			if (delete){
+				final File scriptInstall = new File(path);
+				if (scriptInstall.exists()){
+					scriptInstall.delete();
+				}
+			}
+			return o;
+		}
+		catch (final ScriptException e) {
+			throw new IOException("Error en la ejecucion del script via AppleScript: " + e, e); //$NON-NLS-1$
+		}
+	}
 }

@@ -122,7 +122,6 @@ final class RestoreConfigFirefox {
 
 		// sacamos el listado de usuarios de la aplicacion
 		final List<String> usersDirs = getSystemUsersHomes(command);
-
 		for ( final String userDir : usersDirs) {
 			final File file = new File(escapePath(userDir) + LINUX_CHROME_PATH);
 			if( file.isDirectory()) {

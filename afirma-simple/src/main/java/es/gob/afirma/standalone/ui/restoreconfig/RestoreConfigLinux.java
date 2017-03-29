@@ -4,13 +4,17 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.security.GeneralSecurityException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 
+import es.gob.afirma.core.misc.BoundedBufferedReader;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.ui.restoreconfig.CertUtil.CertPack;
 import es.gob.afirma.standalone.ui.restoreconfig.RestoreConfigFirefox.MozillaProfileNotFoundException;
@@ -81,8 +85,9 @@ final class RestoreConfigLinux implements RestoreConfig {
 		try {
 
 			closeChrome();
+			String[] usersDir = getSystemUsersHomes();
 
-			RestoreRemoveChromeWarning.removeChromeWarningsLinux();
+			RestoreRemoveChromeWarning.removeChromeWarningsLinux(appDir, usersDir);
 
 			LOGGER.info("Se va a instalar el certificado CA raiz en Mozilla y Google Chrome"); //$NON-NLS-1$
 			appendMessage(taskOutput, SimpleAfirmaMessages.getString("RestoreConfigLinux.13")); //$NON-NLS-1$
@@ -116,6 +121,47 @@ final class RestoreConfigLinux implements RestoreConfig {
 
 	}
 
+	/** Obtiene los directorios de usuarios del sistema.
+	 * @return Listado con todos directorios de los usuarios del sistema.
+     * @throws IOException Cuando no se puede obtener el listado de directorios. */
+	private static String[] getSystemUsersHomes() throws IOException {
+
+        // Comando para sacar los usuarios del sistema
+        final String[] command = new String[] {
+				"cut", //$NON-NLS-1$
+				"-d:", //$NON-NLS-1$
+				"-f6", //$NON-NLS-1$
+				"/etc/passwd" //$NON-NLS-1$
+				};
+
+		try {
+			final Process process = new ProcessBuilder(command).start();
+
+			String line;
+			// arraylist con todos los directorios de usuario
+			final List<String> usersDir = new ArrayList<>();
+			try (
+					final InputStream resIs = process.getInputStream();
+					final BufferedReader resReader = new BoundedBufferedReader(
+							new InputStreamReader(resIs),
+							2048, // Maximo 256 lineas de salida (256 perfiles)
+							2048 // Maximo 2048 caracteres por linea
+							);
+					) {
+				while ((line = resReader.readLine()) != null) {
+					if(line.toLowerCase().contains("home/") && !usersDir.contains(line)) { //$NON-NLS-1$
+						usersDir.add(line);
+					}
+				}
+			}
+			return usersDir.toArray(new String[usersDir.size()]);
+		}
+		catch (final Exception e) {
+			LOGGER.severe("Error al obtener el listado de directorios de usuarios del sistema: " + e); //$NON-NLS-1$
+			throw new IOException("No se pudo obtener el listado de directorios de usuarios del sistema", e); //$NON-NLS-1$
+		}
+	}
+	
     /** Comprueba si ya existe un almac&eacute;n de certificados generado.
      * @param appConfigDir Directorio de configuraci&oacute;n de la aplicaci&oacute;n.
      * @return {@code true} si ya existe un almac&eacute;n de certificados SSL, {@code false} en caso contrario. */
@@ -185,7 +231,7 @@ final class RestoreConfigLinux implements RestoreConfig {
 	}
 
 	/**
-	 * Pide al usuario que cierre el navegador Mozilla Firefox y no permite continuar hasta que lo hace.
+	 * Pide al usuario que cierre el navegador Google Chrome y no permite continuar hasta que lo hace.
 	 */
 	private static void closeChrome() {
 

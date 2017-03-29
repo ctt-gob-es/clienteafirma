@@ -1,21 +1,15 @@
 package es.gob.afirma.standalone.ui.restoreconfig;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.misc.AOUtil;
-import es.gob.afirma.core.misc.BoundedBufferedReader;
 
 /**
  * Clase que contiene la l&oacute;gica para realizar las tareas de restauraci&oacute;n
@@ -37,36 +31,68 @@ final public class RestoreRemoveChromeWarning {
 	private static final String CHROME_V56_OR_LOWER_CONFIG_FILE = "AppData/Local/Google/Chrome/User Data/Local State"; //$NON-NLS-1$
 	private static final String CHROME_V57_OR_HIGHER_CONFIG_FILE = "AppData/Local/Google/Chrome/User Data/Default/Preferences"; //$NON-NLS-1$
 
+	private static final String MAC_CHROME_V56_OR_LOWER_PREFS_PATH = "/Library/Application Support/Google/Chrome/Local State"; //$NON-NLS-1$
+	private static final String MAC_CHROME_V57_OR_HIGHER_PREFS_PATH = "/Library/Application Support/Google/Chrome/Default/Preferences"; //$NON-NLS-1$
+	
 	/** Nombre del usuario por defecto en Windows. Este usuario es el que se usa como base para
 	 * crear nuevos usuarios y no se deber&iacute;a tocar. */
 	private static String DEFAULT_WINDOWS_USER_NAME = "Default"; //$NON-NLS-1$
 
 	private static final String RECONFIG_SCRIPT_NAME = "reconfig.sh"; //$NON-NLS-1$
 
+	
 	/** Genera los comandos que elimina el warning al ejecutar AutoFirma desde Chrome.
 	 * En linux genera el script que hay que ejecutar para realizar la instalaci&oacute;n pero no lo ejecuta, de eso se encarga el instalador Debian.
 	 *  <ul>
 	 * <li>En LINUX contiene el contenido del script a ejecutar.</li>
 	 * </ul>
 	 */
-	public static void removeChromeWarningsLinux() {
-		File appDir;
+	public static void removeChromeWarningsMac(File appDir, final String[] usersDirs) {
 		try {
-			appDir = new File(
-					RestoreRemoveChromeWarning.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()).getParentFile();
-		} catch (final URISyntaxException e2) {
-			LOGGER.warning("No se pudo obtener el directorio actual: " + e2); //$NON-NLS-1$
-			return;
-		}
+			for (final String userDir : usersDirs) {
+				// Montamos los comandos de instalacion y desinstalacion que
+				// incluya el protocolo "afirma" en el fichero Local State o Preferences (segun la version)
+				// para Google Chrome o Chromium
 
-		String[] usersDirs;
-		try {
-			// Obtenemos los directorios de los usuarios
-			usersDirs = getSystemUsersHomes();
+				// Se escriben los comandos de reconfiguracion
+				final StringBuilder reconfigScript = new StringBuilder();
+
+				final ArrayList<String[]> installCommands = getCommandsToRemoveChromeAndChromiumWarningsOnInstallMac(appDir, userDir);
+				final Iterator<String[]> list = installCommands.iterator();
+				while(list.hasNext()) {
+					ConfiguratorUtil.printScript(list.next(), reconfigScript);
+				}
+
+				// Se almacenan los script de reconfiguracion en un fichero
+				try {
+					ConfiguratorUtil.writeScript(reconfigScript, new File(appDir, RECONFIG_SCRIPT_NAME));
+				}
+				catch (final Exception e) {
+					throw new IOException("Error al crear el script para agregar la confianza del esquema 'afirma'", e); //$NON-NLS-1$
+				}
+			}
+
+			// Se ejecuta el script creado
+			new ProcessBuilder("chmod", "u+x", appDir + "/" + RECONFIG_SCRIPT_NAME).start(); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+
+			// Se ejecuta el script creado
+			new ProcessBuilder("sh", appDir + "/" + RECONFIG_SCRIPT_NAME).start(); //$NON-NLS-1$ //$NON-NLS-2$
+			
+			// Se elimina el script tras ejecutarlo
+			new ProcessBuilder("rm", appDir + "/" + RECONFIG_SCRIPT_NAME).start(); //$NON-NLS-1$ //$NON-NLS-2$
 		} catch (final IOException e) {
-			LOGGER.warning("No se han podido obtener los usuarios del sistema: " + e); //$NON-NLS-1$
-			return;
+			LOGGER.warning("No se pudieron crear los scripts para registrar el esquema 'afirma' en Chrome: " + e); //$NON-NLS-1$
 		}
+	}
+	
+	/** Genera los comandos que elimina el warning al ejecutar AutoFirma desde Chrome.
+	 * En linux genera el script que hay que ejecutar para realizar la instalaci&oacute;n pero no lo ejecuta, de eso se encarga el instalador Debian.
+	 *  <ul>
+	 * <li>En LINUX contiene el contenido del script a ejecutar.</li>
+	 * </ul>
+	 */
+	public static void removeChromeWarningsLinux(final File appDir, final String[] usersDirs) {
+		
 
 		try {
 			for (final String userDir : usersDirs) {
@@ -85,7 +111,7 @@ final public class RestoreRemoveChromeWarning {
 				}
 
 				// Comandos de instalacion
-				final ArrayList<String[]> installCommands = getCommandsToRemoveChromeAndChromiumWarningsOnInstall(appDir, userDir);
+				final ArrayList<String[]> installCommands = getCommandsToRemoveChromeAndChromiumWarningsOnInstallLinux(appDir, userDir);
 				final Iterator<String[]> list = installCommands.iterator();
 				while(list.hasNext()) {
 					ConfiguratorUtil.printScript(list.next(), reconfigScript);
@@ -111,7 +137,7 @@ final public class RestoreRemoveChromeWarning {
 
 	/**
 	 * Configura el protocolo "afirma" en Chrome para todos los usuarios de Windows.
-	 * (Repetido en Configuratos Windows)
+	 * (Repetido en ConfiguradorWindows)
 	 * @param window Consola de salida.
 	 * @param installing Indica si se debe configurar ({@code true}) o desconfigurar
 	 * ({@code false}) el protocolo "afirma" en Chrome.
@@ -184,47 +210,6 @@ final public class RestoreRemoveChromeWarning {
 					LOGGER.warning("No se pudo configurar Chrome para el usuario " + userDir + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 			}
-		}
-	}
-
-	/** Obtiene los directorios de usuarios del sistema.
-	 * @return Listado con todos directorios de los usuarios del sistema.
-     * @throws IOException Cuando no se puede obtener el listado de directorios. */
-	private static String[] getSystemUsersHomes() throws IOException {
-
-        // Comando para sacar los usuarios del sistema
-        final String[] command = new String[] {
-				"cut", //$NON-NLS-1$
-				"-d:", //$NON-NLS-1$
-				"-f6", //$NON-NLS-1$
-				"/etc/passwd" //$NON-NLS-1$
-				};
-
-		try {
-			final Process process = new ProcessBuilder(command).start();
-
-			String line;
-			// arraylist con todos los directorios de usuario
-			final List<String> usersDir = new ArrayList<>();
-			try (
-					final InputStream resIs = process.getInputStream();
-					final BufferedReader resReader = new BoundedBufferedReader(
-							new InputStreamReader(resIs),
-							2048, // Maximo 256 lineas de salida (256 perfiles)
-							2048 // Maximo 2048 caracteres por linea
-							);
-					) {
-				while ((line = resReader.readLine()) != null) {
-					if(line.toLowerCase().contains("home/") && !usersDir.contains(line)) { //$NON-NLS-1$
-						usersDir.add(line);
-					}
-				}
-			}
-			return usersDir.toArray(new String[usersDir.size()]);
-		}
-		catch (final Exception e) {
-			LOGGER.severe("Error al obtener el listado de directorios de usuarios del sistema: " + e); //$NON-NLS-1$
-			throw new IOException("No se pudo obtener el listado de directorios de usuarios del sistema", e); //$NON-NLS-1$
 		}
 	}
 
@@ -315,7 +300,7 @@ final public class RestoreRemoveChromeWarning {
 	 * @param userDir Directorio de usuario dentro del sistema operativo.
 	 * @param browserPath Directorio de configuraci&oacute;n de Chromium o Google Chrome.
 	 * @throws IOException */
-	private static ArrayList<String[]> getCommandsToRemoveChromeAndChromiumWarningsOnInstall(final File appDir, final String userDir) throws IOException {
+	private static ArrayList<String[]> getCommandsToRemoveChromeAndChromiumWarningsOnInstallLinux(final File appDir, final String userDir) throws IOException {
 
 		final ArrayList<String[]> commandList = new ArrayList<>();
 		// Final del if
@@ -421,6 +406,98 @@ final public class RestoreRemoveChromeWarning {
 		return commandList;
 	}
 
+	/** Genera los scripts que registran el esquema "afirma" como un
+	 * protocolo de confiable en Chrome. (Repetido en ConfiguratorMacOSX)
+	 * @param appDir Directorio de instalaci&oacute;n del sistema
+	 * @param userDir Directorio de usuario dentro del sistema operativo.
+	 * @throws IOException */
+	private static ArrayList<String[]> getCommandsToRemoveChromeAndChromiumWarningsOnInstallMac(final File appDir, final String userDir) throws IOException {
+
+		final ArrayList<String[]> commandList = new ArrayList<>();
+		// Final del if
+		final String[] endIfStatement = new String[] {
+				"fi", //$NON-NLS-1$
+		};
+
+		/////////////////////////////////////////////////////////////////////////////
+		////// Chrome v56 o inferior
+		/////////////////////////////////////////////////////////////////////////////
+		if( new File(userDir, MAC_CHROME_V56_OR_LOWER_PREFS_PATH).isFile() ) {
+			//Se incluye afirma como protocolo de confianza en Chrome v56 o inferior
+			
+			final String[] commandInstallChrome56OrLower01 =
+					deleteProtocolInPreferencesFile1(userDir, MAC_CHROME_V56_OR_LOWER_PREFS_PATH);
+			final String[] commandInstallChrome56OrLower02 =
+					deleteProtocolInPreferencesFile2(userDir, MAC_CHROME_V56_OR_LOWER_PREFS_PATH);
+			
+			final String[] commandInstallChrome56OrLower1 =
+					addProtocolInPreferencesFileMac(userDir, MAC_CHROME_V56_OR_LOWER_PREFS_PATH);
+
+			final String[] commandInstallChrome56OrLower2 =
+					correctProtocolInPreferencesFileMac(userDir, MAC_CHROME_V56_OR_LOWER_PREFS_PATH);
+
+			final String[] ifContainsString2 = getIfNotCointainsStringCommand(userDir, MAC_CHROME_V56_OR_LOWER_PREFS_PATH);
+			// Comando para agregar la confianza del esquema 'afirma' en caso de tener Chrome v56 o inferior recien instalado
+			final String[] commandInstallChrome56OrLower4 = new String[] {
+					"sed -i ''", //$NON-NLS-1$ -i para reemplazar en el propio fichero
+					"'s/last_active_profiles\\([^,]*\\),/" //$NON-NLS-1$
+					+ "last_active_profiles\\1,\\\"protocol_handler\\\":{\\\"excluded_schemes\\\":{\\\"afirma\\\":false}},/'", //$NON-NLS-1$
+					escapePath(userDir + MAC_CHROME_V56_OR_LOWER_PREFS_PATH) + "1", //$NON-NLS-1$
+			};
+
+			// Generacion de comandos de instalacion
+			commandList.add(commandInstallChrome56OrLower01);
+			commandList.add(commandInstallChrome56OrLower02);
+			commandList.add(commandInstallChrome56OrLower1);
+			commandList.add(commandInstallChrome56OrLower2);
+			commandList.add(ifContainsString2);
+			commandList.add(commandInstallChrome56OrLower4);
+			commandList.add(endIfStatement);
+			commandList.add(
+					copyConfigurationFile(userDir, MAC_CHROME_V56_OR_LOWER_PREFS_PATH));
+		}
+
+		/////////////////////////////////////////////////////////////////////////////
+		////// Chrome v57 o superior
+		/////////////////////////////////////////////////////////////////////////////
+		if( new File(userDir, MAC_CHROME_V57_OR_HIGHER_PREFS_PATH).isFile() ) {
+			//Se incluye afirma como protocolo de confianza en Chrome v57 o superior
+			final String[] commandInstallChrome57OrHigher01 =
+					deleteProtocolInPreferencesFile1(userDir, MAC_CHROME_V57_OR_HIGHER_PREFS_PATH);
+			final String[] commandInstallChrome57OrHigher02 =
+					deleteProtocolInPreferencesFile2(userDir, MAC_CHROME_V57_OR_HIGHER_PREFS_PATH);
+			final String[] commandInstallChrome57OrHigher1 =
+					addProtocolInPreferencesFileMac(userDir, MAC_CHROME_V57_OR_HIGHER_PREFS_PATH);
+			final String[] commandInstallChrome57OrHigher2 =
+					correctProtocolInPreferencesFileMac(userDir, MAC_CHROME_V57_OR_HIGHER_PREFS_PATH);
+
+			// Generacion de comandos de instalacion
+			commandList.add(commandInstallChrome57OrHigher01);
+			commandList.add(commandInstallChrome57OrHigher02);
+			commandList.add(commandInstallChrome57OrHigher1);
+			commandList.add(commandInstallChrome57OrHigher2);
+			commandList.add(
+					copyConfigurationFile(userDir, MAC_CHROME_V57_OR_HIGHER_PREFS_PATH));
+
+		}
+		return commandList;
+	}
+	
+	/** Genera los scripts para confirmar si existen protocolos definidos en el fichero.
+	 * @param userDir Directorio de usuario dentro del sistema operativo.
+	 * @param browserPath Directorio de configuraci&oacute;n de Chromium o Google Chrome. */
+	private static String[] getIfNotCointainsStringCommand(final String userDir, final String browserPath) {
+		// If para comprobar si es necesario incluir la sintaxis entera de definicion de protocolos o si,
+		// por el contrario, ya estaba
+		final String[] ifStatement = new String[] {
+				"if ! ", //$NON-NLS-1$
+				"grep -q \"excluded_schemes\" " +  //$NON-NLS-1$
+				escapePath(userDir + browserPath),
+				"; then", //$NON-NLS-1$
+		};
+		return ifStatement;
+	}
+	
 	/** Genera los scripts para confirmar si existen protocolos definidos en el fichero. (Repetido en
 	 * @param userDir Directorio de usuario dentro del sistema operativo.
 	 * @param browserPath Directorio de configuraci&oacute;n de Chromium o Google Chrome. */
@@ -463,8 +540,68 @@ final public class RestoreRemoveChromeWarning {
 
 		return commandCopy;
 	}
+	
+	/** Genera los scripts para eliminar el protocolo afirma.
+	 * @param userDir Directorio de usuario dentro del sistema operativo.
+	 * @param browserPath Directorio de configuraci&oacute;n de Chromium o Google Chrome. */
+	private static String[] deleteProtocolInPreferencesFile1(final String userDir, final String browserPath) {
+
+		// Comando para agregar la confianza del esquema 'afirma' en Chrome
+		final String[] commandInstall1 = new String[] {
+				"sed", //$NON-NLS-1$
+				"'s/\\\"afirma\\\":false,//g'", //$NON-NLS-1$
+				escapePath(userDir + browserPath),
+				">", //$NON-NLS-1$
+				escapePath(userDir + browserPath) + "1", //$NON-NLS-1$
+		};
+		return commandInstall1;
+	}
 
 	/** Genera los scripts para eliminar el protocolo afirma.
+	 * @param userDir Directorio de usuario dentro del sistema operativo.
+	 * @param browserPath Directorio de configuraci&oacute;n de Chromium o Google Chrome. */
+	private static String[] deleteProtocolInPreferencesFile2(final String userDir, final String browserPath) {
+
+		// Comando para agregar la confianza del esquema 'afirma' en Chrome
+		final String[] commandInstall1 = new String[] {
+				"sed -i ''", //$NON-NLS-1$
+				"'s/\\\"afirma\\\":false//g'", //$NON-NLS-1$
+				escapePath(userDir + browserPath) + "1", //$NON-NLS-1$
+		};
+		return commandInstall1;
+	}
+	
+	/** Genera los scripts para incluir el protocolo afirma.
+	 * @param userDir Directorio de usuario dentro del sistema operativo.
+	 * @param browserPath Directorio de configuraci&oacute;n de Chromium o Google Chrome. */
+	private static String[] addProtocolInPreferencesFileMac(final String userDir, final String browserPath) {
+
+		// Comando para agregar la confianza del esquema 'afirma' en Chrome
+		final String[] commandInstall1 = new String[] {
+				"sed -i ''", //$NON-NLS-1$
+				"'s/\\\"protocol_handler\\\":{\\\"excluded_schemes\\\":{/" //$NON-NLS-1$
+				+ "\\\"protocol_handler\\\":{\\\"excluded_schemes\\\":{\\\"afirma\\\":false,/g'", //$NON-NLS-1$
+				escapePath(userDir + browserPath) + "1", //$NON-NLS-1$
+		};
+		return commandInstall1;
+	}
+
+	/** Genera los scripts para eliminar la coma en caso de que sea el unico protocolo definido en el fichero.
+	 * @param userDir Directorio de usuario dentro del sistema operativo.
+	 * @param browserPath Directorio de configuraci&oacute;n de Chromium o Google Chrome. */
+	private static String[] correctProtocolInPreferencesFileMac(final String userDir, final String browserPath) {
+
+		// Comando para eliminar la coma en caso de ser el unico protocolo de confianza
+		final String[] commandInstall2 = new String[] {
+				"sed -i ''", //$NON-NLS-1$ -i para reemplazar en el propio fichero
+				"'s/\\\"protocol_handler\\\":{\\\"excluded_schemes\\\":{\\\"afirma\\\":false,}/" //$NON-NLS-1$
+				+ "\\\"protocol_handler\\\":{\\\"excluded_schemes\\\":{\\\"afirma\\\":false}/g'", //$NON-NLS-1$
+				escapePath(userDir + browserPath) + "1", //$NON-NLS-1$
+		};
+		return commandInstall2;
+	}
+	
+	/** Genera los scripts para incluir el protocolo afirma.
 	 * @param userDir Directorio de usuario dentro del sistema operativo.
 	 * @param browserPath Directorio de configuraci&oacute;n de Chromium o Google Chrome. */
 	private static String[] addProtocolInPreferencesFile(final String userDir, final String browserPath) {
