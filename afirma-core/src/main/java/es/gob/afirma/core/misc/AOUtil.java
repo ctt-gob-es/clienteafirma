@@ -158,7 +158,7 @@ public final class AOUtil {
         if (input == null) {
             return new byte[0];
         }
-        int nBytes = 0;
+        int nBytes;
         final byte[] buffer = new byte[BUFFER_SIZE];
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
         while ((nBytes = input.read(buffer)) != -1) {
