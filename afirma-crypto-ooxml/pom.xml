@@ -13,14 +13,7 @@
 	</parent>
 	
 	<dependencies>
-	
-	<dependency>
-		<groupId>es.gob.afirma</groupId>
-		<artifactId>afirma-crypto-xades</artifactId>
-		<version>${project.version}</version>
-	</dependency>
 
-	<dependencies>
 		<dependency>
 			<groupId>es.gob.afirma</groupId>
 			<artifactId>afirma-core</artifactId>
@@ -42,7 +35,7 @@
 		<dependency>
 			<groupId>net.java.xades</groupId>
 			<artifactId>jxades</artifactId>
-			<version>0.1.5</version>
+			<version>0.1.6-SNAPSHOT</version>
 		</dependency>
 		
 	</dependencies>
