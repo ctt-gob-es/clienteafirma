@@ -59,56 +59,55 @@ final class RestoreConfigWindows implements RestoreConfig {
 		appendMessage(taskOutput, SimpleAfirmaMessages.getString("RestoreConfigWindows.2")); //$NON-NLS-1$
 
 		LOGGER.info("Ruta de appDir: " + appDir.getAbsolutePath()); //$NON-NLS-1$
-		
-		appendMessage(taskOutput,
-				SimpleAfirmaMessages.getString("RestoreConfigWindows.3") + appDir.getAbsolutePath()); //$NON-NLS-1$
+
+		appendMessage(taskOutput, SimpleAfirmaMessages.getString("RestoreConfigWindows.3") + appDir.getAbsolutePath()); //$NON-NLS-1$
 
 		// Realizamos las comprobaciones para generar si es necesario,
 		// los certificados .pfx y/o .cer
 		final Certificate sslRoot = restoreCertificateWindows(taskOutput);
 
-		// Para completar el proceso de restauración, es necesario permisos de administrador para
-		// eliminar/importar el certificado raiz.
-		// Por este motivo, no se realizará esta tarea si AutoFirma no se ejecuta en modo administrador
-		// ya que el sistema podria quedar inconsistente.
+		// Instalacion del certificado raiz en Windows.
+		installRootCAWindowsKeystore(taskOutput, sslRoot);
+
+		// Instalacion del certificado raiz en Firefox
+		try {
+
+			appendMessage(taskOutput, SimpleAfirmaMessages.getString("RestoreConfigWindows.13")); //$NON-NLS-1$
+
+			appendMessage(taskOutput, SimpleAfirmaMessages.getString("RestoreConfigWindows.9")); //$NON-NLS-1$
+
+			// Obligamos a que se cierre Firefox antes de manipular el
+			// certificado en su almacen
+			closeFirefox();
+			// El SO es Windows, es necesario obtener certutil
+			RestoreConfigFirefox.copyConfigurationFiles(appDir);
+
+			// En Windows, certutil no necesita privilegios de administrador
+			// para eliminar certificados de Firefox, pero si para
+			// importarlo.
+			// Además, certutil no informa con algún error si hay algun
+			// problema.
+
+			// Desinstalamos versiones previas
+			LOGGER.info("Desinstalamos el certificado raiz del almacen de Firefox"); //$NON-NLS-1$
+			RestoreConfigFirefox.uninstallRootCAMozillaKeyStore(RestoreConfigUtil.getApplicationDirectory());
+			// Vuelvo a instalar lo que había o el nuevo cer generado
+			RestoreConfigFirefox.installRootCAMozillaKeyStore(appDir);
+			// Elimino certutil tras su uso
+			RestoreConfigFirefox.removeConfigurationFiles(appDir);
+
+		} catch (IOException e) { 
+			appendMessage(taskOutput, SimpleAfirmaMessages.getString("RestoreConfigWindows.3")); //$NON-NLS-1$
+			
+		} catch (final MozillaProfileNotFoundException e) {
+			appendMessage(taskOutput, SimpleAfirmaMessages.getString("RestoreConfigWindows.12")); //$NON-NLS-1$
+		}
+
 		if (isAdmin().booleanValue()) {
-
-			// Instalacion del certificado raiz en Windows.
-			installRootCAWindowsKeystore(taskOutput, sslRoot);
-
-			// Instalacion del certificado raiz en Firefox
-			try {
-
-				appendMessage(taskOutput, SimpleAfirmaMessages.getString("RestoreConfigWindows.13")); //$NON-NLS-1$
-
-				appendMessage(taskOutput, SimpleAfirmaMessages.getString("RestoreConfigWindows.9")); //$NON-NLS-1$
-
-				// Obligamos a que se cierre Firefox antes de manipular el
-				// certificado en su almacen
-				closeFirefox();
-				// El SO es Windows, es necesario obtener certutil
-				RestoreConfigFirefox.copyConfigurationFiles(appDir);
-				
-				// En Windows, certutil no necesita privilegios de administrador
-				// para eliminar certificados de Firefox, pero si para importarlo.
-				// Además, certutil no informa con algún error si hay algun problema.
-
-				// Desinstalamos versiones previas
-				LOGGER.info("Desinstalamos el certificado raiz del almacen de Firefox"); //$NON-NLS-1$
-				RestoreConfigFirefox.uninstallRootCAMozillaKeyStore(RestoreConfigUtil.getApplicationDirectory());
-				// Vuelvo a instalar lo que había o el nuevo cer generado
-				RestoreConfigFirefox.installRootCAMozillaKeyStore(appDir);
-				// Elimino certutil tras su uso
-				RestoreConfigFirefox.removeConfigurationFiles(appDir);
-
-				// Sobreescribimos los valores del protocolo afirma en el
-				// registro de Windows con los valores correctos
-				appendMessage(taskOutput, SimpleAfirmaMessages.getString("RestoreConfigWindows.24")); //$NON-NLS-1$
-				restoreProtocolRegistry(taskOutput);
-
-			} catch (final MozillaProfileNotFoundException e) {
-				appendMessage(taskOutput, SimpleAfirmaMessages.getString("RestoreConfigWindows.12")); //$NON-NLS-1$
-			}
+			// Sobreescribimos los valores del protocolo afirma en el
+			// registro de Windows con los valores correctos
+			appendMessage(taskOutput, SimpleAfirmaMessages.getString("RestoreConfigWindows.24")); //$NON-NLS-1$
+			restoreProtocolRegistry(taskOutput);
 		} else {
 
 			JOptionPane.showMessageDialog(null, SimpleAfirmaMessages.getString("RestoreConfigWindows.28"), //$NON-NLS-1$
@@ -315,9 +314,36 @@ final class RestoreConfigWindows implements RestoreConfig {
 					}
 				}
 
-				ks.setCertificateEntry(RestoreConfigUtil.CERT_ALIAS_BROWSER, cer);
+				boolean installed = false;
+				boolean cancelled = false;
+				do {
+					try {
+						ks.setCertificateEntry(RestoreConfigUtil.CERT_ALIAS_BROWSER, cer);
+						installed = true;
+					}
+					catch (final KeyStoreException e) {
+						LOGGER.warning(
+								"No se pudo instalar la CA del certificado SSL para el socket en el almacen de Windows: " + e //$NON-NLS-1$
+								);
+						final int result = JOptionPane.showConfirmDialog(
+								null,
+								SimpleAfirmaMessages.getString("RestoreConfigWindows.0"), //$NON-NLS-1$
+								SimpleAfirmaMessages.getString("RestoreConfigWindows.1"), //$NON-NLS-1$
+								JOptionPane.OK_CANCEL_OPTION,
+								JOptionPane.WARNING_MESSAGE
+								);
+						if (result == JOptionPane.CANCEL_OPTION) {
+							cancelled = true;
+							LOGGER.severe("El usuario cancelo la instalacion del certificado SSL para el socket: " + e); //$NON-NLS-1$
+						}
+					}
+				}
+				while (!installed && !cancelled);
+				
+				//ks.setCertificateEntry(RestoreConfigUtil.CERT_ALIAS_BROWSER, cer);
 				appendMessage(taskOutput,
-						SimpleAfirmaMessages.getString("RestoreConfigWindows.19")); //$NON-NLS-1$
+						SimpleAfirmaMessages.getString("RestoreConfigWindows.19")); //$NON-NLS-1$			
+				
 			} else {
 				appendMessage(taskOutput,
 						SimpleAfirmaMessages.getString("RestoreConfigWindows.26")); //$NON-NLS-1$
@@ -359,14 +385,14 @@ final class RestoreConfigWindows implements RestoreConfig {
 				Advapi32Util.registryCreateKey(WinReg.HKEY_CLASSES_ROOT, "afirma\\DefaultIcon"); //$NON-NLS-1$
 			}
 			// Sobreescribir los valores correctos
-			Advapi32Util.registrySetStringValue(WinReg.HKEY_CLASSES_ROOT, "afirma\\DefaultIcon", "", appDir1 + "\\AutoFirma\\ic_firmar.ico"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			Advapi32Util.registrySetStringValue(WinReg.HKEY_CLASSES_ROOT, "afirma\\DefaultIcon", "", appDir1 + "\\ic_firmar.ico"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
 			// Crear la key "afirma\\shell\\open\\command" si no existe
 			if (!Advapi32Util.registryKeyExists(WinReg.HKEY_CLASSES_ROOT, "afirma\\shell\\open\\command")) { //$NON-NLS-1$
 				Advapi32Util.registryCreateKey(WinReg.HKEY_CLASSES_ROOT, "afirma\\shell\\open\\command"); //$NON-NLS-1$
 			}
 			// Sobreescribir los valores correctos
-			Advapi32Util.registrySetStringValue(WinReg.HKEY_CLASSES_ROOT, "afirma\\shell\\open\\command", "", appDir1 + "\\AutoFirma\\AutoFirma.exe %1"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			Advapi32Util.registrySetStringValue(WinReg.HKEY_CLASSES_ROOT, "afirma\\shell\\open\\command", "", appDir1 + "\\AutoFirma.exe %1"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
 			LOGGER.info("Configurado afirma en registro Windows"); //$NON-NLS-1$
 		} catch (final Exception e) {
