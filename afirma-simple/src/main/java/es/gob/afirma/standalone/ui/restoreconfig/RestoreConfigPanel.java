@@ -66,7 +66,7 @@ public final class RestoreConfigPanel extends JPanel implements KeyListener, Dis
 	private JPanel createButtonsPanel() {
 
 		final JPanel panel = new JPanel();
-		panel.setLayout(new FlowLayout(FlowLayout.CENTER));
+		panel.setLayout(new FlowLayout(FlowLayout.RIGHT));
 
 		final JButton cancelButton = new JButton(SimpleAfirmaMessages.getString("PreferencesPanel.31")); //$NON-NLS-1$
 		cancelButton.setMnemonic('C');
@@ -144,18 +144,18 @@ public final class RestoreConfigPanel extends JPanel implements KeyListener, Dis
         final JPanel introPanel = new JPanel(new BorderLayout());
         introPanel.add(introText, BorderLayout.PAGE_START);
         this.add(introPanel, BorderLayout.NORTH);
-        
-        // Creamos un panel para el boton de restauracion
-        JPanel buttonPanel = createButtonsPanel();
-    	this.add(buttonPanel, BorderLayout.CENTER);
-    	    	
+          	    	
     	// Configuramos el area de texto para los mensajes de configuracion
-    	taskOutput = new JTextArea(20, 30);
+    	taskOutput = new JTextArea(20, 40);
     	taskOutput.setMargin(new Insets(5,5,5,5));
     	taskOutput.setEditable(false);
     	restorePanel.add(new JScrollPane(taskOutput), BorderLayout.CENTER);    	
 
-        this.add(restorePanel, BorderLayout.AFTER_LAST_LINE);
+        this.add(restorePanel, BorderLayout.CENTER);
+        
+        // Creamos un panel para el boton de restauracion
+        JPanel buttonPanel = createButtonsPanel();
+    	this.add(buttonPanel, BorderLayout.AFTER_LAST_LINE);
         
         // Configuramos el color
         if (!LookAndFeelManager.HIGH_CONTRAST) {
@@ -164,8 +164,6 @@ public final class RestoreConfigPanel extends JPanel implements KeyListener, Dis
             introPanel.setBackground(LookAndFeelManager.WINDOW_COLOR);
             restorePanel.setBackground(LookAndFeelManager.WINDOW_COLOR);
         }
-                                       	        
-       
 	}	
 
 	/**
@@ -200,6 +198,4 @@ public final class RestoreConfigPanel extends JPanel implements KeyListener, Dis
 	public void keyTyped(final KeyEvent e) {
 		/* Vacio */ }
 	
-	
-		
 }
