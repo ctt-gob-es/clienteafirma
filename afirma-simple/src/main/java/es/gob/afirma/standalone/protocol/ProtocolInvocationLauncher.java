@@ -12,6 +12,7 @@ import es.gob.afirma.core.misc.protocol.ParameterNeedsUpdatedVersionException;
 import es.gob.afirma.core.misc.protocol.ProtocolInvocationUriParser;
 import es.gob.afirma.core.misc.protocol.ProtocolVersion;
 import es.gob.afirma.core.misc.protocol.UrlParametersForBatch;
+import es.gob.afirma.core.misc.protocol.UrlParametersToGetCurrentLog;
 import es.gob.afirma.core.misc.protocol.UrlParametersToLoad;
 import es.gob.afirma.core.misc.protocol.UrlParametersToSave;
 import es.gob.afirma.core.misc.protocol.UrlParametersToSelectCert;
@@ -422,6 +423,64 @@ public final class ProtocolInvocationLauncher {
                        sendErrorToServer(ProtocolInvocationLauncherErrorManager.getErrorMessage(e.getErrorCode()), params.getStorageServletUrl().toString(), params.getId());
                     }
                 }
+            }
+            catch(final ParameterNeedsUpdatedVersionException e) {
+                LOGGER.severe("Se necesita una version mas moderna de AutoFirma para procesar la peticion: " + e); //$NON-NLS-1$
+                ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_14);
+                return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_14);
+            }
+            catch(final ParameterLocalAccessRequestedException e) {
+                LOGGER.severe("Se ha pedido un acceso a una direccion local (localhost o 127.0.0.1): " + e); //$NON-NLS-1$
+                ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_13);
+                return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_13);
+            }
+            catch (final Exception e) {
+                LOGGER.severe("Error en los parametros de carga: " + e); //$NON-NLS-1$
+                ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_03);
+                return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_03);
+            }
+        }
+        // Se solicita una operacion de carga/multicarga
+        else if (urlString.startsWith("afirma://getLog?") //$NON-NLS-1$
+        		) {
+            LOGGER.info("Se invoca a la aplicacion para realizar una operacion de obtencion del log actual de la aplicacion"); //$NON-NLS-1$
+
+            try {
+            	
+            	LOGGER.info("URL DE INVOCACION: " + urlString); //$NON-NLS-1$
+            	
+                UrlParametersToGetCurrentLog params = ProtocolInvocationUriParser.getParametersToGetCurrentLog(urlString);
+               
+                // Si se indica un identificador de fichero, es que la configuracion se tiene que
+                // descargar desde el servidor intermedio
+                if (params.getFileId() != null) {
+
+                    final byte[] xmlData;
+                    try {
+                        xmlData = ProtocolInvocationLauncherUtil.getDataFromRetrieveServlet(params);
+                    }
+                    catch(final InvalidEncryptedDataLengthException e) {
+                        LOGGER.severe("No se pueden recuperar los datos del servidor" + e); //$NON-NLS-1$
+                        ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_16);
+                        return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_16);
+                    }
+                    catch(final DecryptionException e) {
+                        LOGGER.severe("Error al descifrar" + e); //$NON-NLS-1$
+                        ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_15);
+                        return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_15);
+                    }
+                    catch (final IOException e) {
+                        LOGGER.severe("No se pueden recuperar los datos del servidor" + e); //$NON-NLS-1$
+                        ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_16);
+                        return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_16);
+                    }
+                    params = ProtocolInvocationUriParser.getParametersToGetCurrentLog(xmlData);
+                }
+
+                LOGGER.info("Se inicia la operacion de obtencion de log actual"); //$NON-NLS-1$
+                
+                return ProtocolInvocationLauncherGetCurrentLog.getCurrentLog();
+               
             }
             catch(final ParameterNeedsUpdatedVersionException e) {
                 LOGGER.severe("Se necesita una version mas moderna de AutoFirma para procesar la peticion: " + e); //$NON-NLS-1$

@@ -68,68 +68,76 @@ final class ProtocolInvocationLauncherSelectCert {
 		final boolean mandatoryCertificate = filterManager.isMandatoryCertificate();
 		final PrivateKeyEntry pke;
 
-		
-		final PasswordCallback pwc = aoks.getStorePasswordCallback(null);
-		final AOKeyStoreManager ksm;
-		try {
-			ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(aoks, // Store
-					aoksLib, // Lib
-					null, // Description
-					pwc, // PasswordCallback
-					null // Parent
-			);
-		} catch (final Exception e3) {
-			LOGGER.severe("Error obteniendo el AOKeyStoreManager: " + e3); //$NON-NLS-1$
-			ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_08);
-			if (!bySocket) {
-				throw new SocketOperationException(ProtocolInvocationLauncherErrorManager.SAF_08);
+		if (options.getSticky() && ProtocolInvocationLauncher.getStickyKeyEntry() != null) {
+
+			LOGGER.info("Se usa Sticky Signature y tenemos valor de clave privada"); //$NON-NLS-1$
+			pke = ProtocolInvocationLauncher.getStickyKeyEntry();
+
+		} else {
+
+			final PasswordCallback pwc = aoks.getStorePasswordCallback(null);
+			final AOKeyStoreManager ksm;
+			try {
+				ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(aoks, // Store
+						aoksLib, // Lib
+						null, // Description
+						pwc, // PasswordCallback
+						null // Parent
+				);
+			} catch (final Exception e3) {
+				LOGGER.severe("Error obteniendo el AOKeyStoreManager: " + e3); //$NON-NLS-1$
+				ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_08);
+				if (!bySocket) {
+					throw new SocketOperationException(ProtocolInvocationLauncherErrorManager.SAF_08);
+				}
+				return ProtocolInvocationLauncherErrorManager
+						.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_08);
 			}
-			return ProtocolInvocationLauncherErrorManager
-					.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_08);
-		}
 
-		LOGGER.info("Obtenido gestor de almacenes de claves: " + ksm); //$NON-NLS-1$
+			LOGGER.info("Obtenido gestor de almacenes de claves: " + ksm); //$NON-NLS-1$
 
-		LOGGER.info("Cargando dialogo de seleccion de certificados..."); //$NON-NLS-1$
+			LOGGER.info("Cargando dialogo de seleccion de certificados..."); //$NON-NLS-1$
 
-		try {
-			ServiceInvocationManager.focusApplication();
-			final AOKeyStoreDialog dialog = new AOKeyStoreDialog(ksm, null, true, true, // showExpiredCertificates
-					true, // checkValidity
-					filters, mandatoryCertificate);
-			dialog.allowOpenExternalStores(filterManager.isExternalStoresOpeningAllowed());
-			dialog.show();
-			pke = ksm.getKeyEntry(dialog.getSelectedAlias());
+			try {
+				ServiceInvocationManager.focusApplication();
+				final AOKeyStoreDialog dialog = new AOKeyStoreDialog(ksm, null, true, true, // showExpiredCertificates
+						true, // checkValidity
+						filters, mandatoryCertificate);
+				dialog.allowOpenExternalStores(filterManager.isExternalStoresOpeningAllowed());
+				dialog.show();
+				pke = ksm.getKeyEntry(dialog.getSelectedAlias());
 
-			if (options.getSticky()) {
+				if (options.getSticky()) {
 
-				LOGGER.info(
-						"Se usa Sticky Signature para selectCert: establecemos valor de clave privada desde la selección siempre"); //$NON-NLS-1$
+					LOGGER.info(
+							"Se usa Sticky Signature para selectCert: establecemos valor de clave privada desde la selección siempre"); //$NON-NLS-1$
 
-				ProtocolInvocationLauncher.setStickyKeyEntry(pke);
+					ProtocolInvocationLauncher.setStickyKeyEntry(pke);
+				}
+			} catch (final AOCancelledOperationException e) {
+				LOGGER.severe("Operacion cancelada por el usuario" + e); //$NON-NLS-1$
+				if (!bySocket) {
+					throw new SocketOperationException(getResultCancel());
+				}
+				return getResultCancel();
+			} catch (final AOCertificatesNotFoundException e) {
+				LOGGER.severe("No hay certificados validos en el almacen: " + e); //$NON-NLS-1$
+				ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_19);
+				if (!bySocket) {
+					throw new SocketOperationException(ProtocolInvocationLauncherErrorManager.SAF_19);
+				}
+				return ProtocolInvocationLauncherErrorManager
+						.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_19);
+			} catch (final Exception e) {
+				LOGGER.severe("Error al mostrar el dialogo de seleccion de certificados: " + e); //$NON-NLS-1$
+				ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_08);
+				if (!bySocket) {
+					throw new SocketOperationException(ProtocolInvocationLauncherErrorManager.SAF_08);
+				}
+				return ProtocolInvocationLauncherErrorManager
+						.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_08);
 			}
-		} catch (final AOCancelledOperationException e) {
-			LOGGER.severe("Operacion cancelada por el usuario" + e); //$NON-NLS-1$
-			if (!bySocket) {
-				throw new SocketOperationException(getResultCancel());
-			}
-			return getResultCancel();
-		} catch (final AOCertificatesNotFoundException e) {
-			LOGGER.severe("No hay certificados validos en el almacen: " + e); //$NON-NLS-1$
-			ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_19);
-			if (!bySocket) {
-				throw new SocketOperationException(ProtocolInvocationLauncherErrorManager.SAF_19);
-			}
-			return ProtocolInvocationLauncherErrorManager
-					.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_19);
-		} catch (final Exception e) {
-			LOGGER.severe("Error al mostrar el dialogo de seleccion de certificados: " + e); //$NON-NLS-1$
-			ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_08);
-			if (!bySocket) {
-				throw new SocketOperationException(ProtocolInvocationLauncherErrorManager.SAF_08);
-			}
-			return ProtocolInvocationLauncherErrorManager
-					.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_08);
+
 		}
 
 		// Concatenamos el certificado utilizado para firmar y la firma con un
