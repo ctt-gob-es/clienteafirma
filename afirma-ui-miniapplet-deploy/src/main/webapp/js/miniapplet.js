@@ -771,45 +771,6 @@ var MiniApplet = ( function ( window, undefined ) {
 				clienteFirma.getMultiFileNameContentBase64(title, extensions, description, filePath, successCallback, errorCallback)
 			}
 		}
-		
-		var getCurrentLog = function (successCallback, errorCallback) {
-			forceLoad();
-			
-			var error =	" === JAVASCRIPT INFORMATION === " +
-				"\nnavigator.appCodeName: " + navigator.appCodeName +
-				"\nnavigator.appName: " +  navigator.appName +
-				"\nnavigator.appVersion: " + navigator.appVersion +
-				"\nnavigator.platform: " + navigator.platform +
-				"\nnavigator.userAgent: " + navigator.userAgent+
-				"\nnavigator.javaEnabled(): " + navigator.javaEnabled() +
-				"\nscreen.width: " + (window.screen ? screen.width : 0) +
-				"\nscreen.height: " + (window.screen ? screen.height : 0) +
-				"\n\n   === CLIENTE LOG === \n" + 
-				clienteFirma.getCurrentLog();
-			
-			if (clientType == TYPE_APPLET) {
-				try {
-					
-					var log = buildData(clienteFirma.getCurrentLog());
-					
-					if (successCallback == undefined || successCallback == null) {
-						return filenameDataBase64Pair.substring(sepPos + 1);
-					}
-					
-					successCallback(log);
-					
-				} catch(e) {
-					if (errorCallback == undefined || errorCallback == null) {
-						throw e;
-					}
-					errorCallback(error);
-				}
-			}
-			else {
-				clienteFirma.getCurrentLog(successCallback, errorCallback)
-			}			
-		
-		}
 
 		var echo = function () {
 			forceLoad();
@@ -852,7 +813,21 @@ var MiniApplet = ( function ( window, undefined ) {
 			forceLoad();
 			return clienteFirma.getErrorType();
 		}
-		
+
+		var getCurrentLog = function () {
+			forceLoad();
+			return	" === JAVASCRIPT INFORMATION === " +
+					"\nnavigator.appCodeName: " + navigator.appCodeName +
+					"\nnavigator.appName: " +  navigator.appName +
+					"\nnavigator.appVersion: " + navigator.appVersion +
+					"\nnavigator.platform: " + navigator.platform +
+					"\nnavigator.userAgent: " + navigator.userAgent+
+					"\nnavigator.javaEnabled(): " + navigator.javaEnabled() +
+					"\nscreen.width: " + (window.screen ? screen.width : 0) +
+					"\nscreen.height: " + (window.screen ? screen.height : 0) +
+					"\n\n   === CLIENTE LOG === \n" + 
+					clienteFirma.getCurrentLog();
+		}
 
 		var setServlets = function (storageServlet,  retrieverServlet) {
 			
@@ -1848,12 +1823,6 @@ var MiniApplet = ( function ( window, undefined ) {
 					return;
 				}
 				
-				// Vengo de getCurrentLog
-				if (data.indexOf("<log>") > 0) {
-					successCallback(data);
-					return;
-				}
-				
 				// Compruebo si se trata de una operacin de carga/multicarga (load).
 				// El separador "|"  distingue los pares "filename-1:dataBase64-1|filename-2:dataBase64-2...", uno por cada archivo cargado.
 				// Devolveremos un array en el que cada posicion sera uno de estos pares: "filename-n:dataBase64-n".
@@ -1864,48 +1833,12 @@ var MiniApplet = ( function ( window, undefined ) {
 					
 					var fileNamesDataBase64 = data.split("|");
 					
-					if (fileNamesDataBase64.length == 1) {
-						
-						var sepPos = fileNamesDataBase64[0].indexOf(":");
-						var fileNameDataBase64 = fileNamesDataBase64[0];
-						
-						if (sepPos == -1) {
-							fileName = Base64.decode(fileNameDataBase64, true);
-						}
-						else {
-							fileName = fileNameDataBase64.substring(0, sepPos);
-							dataB64 = fileNameDataBase64.substring(sepPos + 1).replace(/\-/g, "+").replace(/\_/g, "/");
-						}
-						
-						successCallback(fileName,dataB64);
-						
-						return;
-						
-					} else if (fileNamesDataBase64.length > 1 ) {
-						
-						var fileNameArray = new Array();
-						var dataB64Array = new Array();
-						
-						for (i = 0; i < fileNamesDataBase64.length; i++) {
-							var sepPos = fileNamesDataBase64[i].indexOf(":");
-							
-							if (sepPos == -1) {
-								fileNameArray.push(fileNamesDataBase64[i]);
-								dataB64Array.push("");
-							}
-							else {
-								fileNameArray.push(fileNamesDataBase64[i].substring(0, sepPos));
-								dataB64Array.push(fileNamesDataBase64[i].substring(sepPos + 1).replace(/\-/g, "+").replace(/\_/g, "/"));
-							}
-						}
-										
-					}
-					
-					successCallback(fileNameArray,dataB64Array);
+					successCallback(fileNamesDataBase64);
 					
 					return;
+					
 				}
-				
+
 				// Interpretamos el resultado como un base 64 y el certificado y los datos cifrados
 				var signature;
 				var certificate = null;
@@ -2013,7 +1946,7 @@ var MiniApplet = ( function ( window, undefined ) {
 			 * Inicia el proceso de carga de un fichero.
 			 * Implementada tambien en el applet Java de firma
 			 * @param title Titulo de la ventana de dialogo
-			 * @param extensions Extensiones permitidasg
+			 * @param extensions Extensiones permitidas
 			 * @param description Descripcion del tipo de archivo a cargar
 			 * @param filePath Ruta del archivo por defecto
 			 * @param successCallbackFunction Funcion de callback tras exito
@@ -2042,18 +1975,6 @@ var MiniApplet = ( function ( window, undefined ) {
 			}
 			
 			/**
-			 * Inicia el proceso de obtencion del log actual de la aplicacion.
-			 * Implementada tambien en el applet Java de firma
-			 * @param successCallbackFunction Funcion de callback tras exito
-			 * @param errorCallbackFunction Funcion de callback tras error
-			 */
-			function getCurrentLog (successCallbackFunction, errorCallbackFunction) {
-				successCallback = successCallbackFunction;
-				errorCallback = errorCallbackFunction;
-				getCurrentLongByService("getLog");
-			}
-			
-			/**
 			 * Realiza una operacion de carga de fichero comunicandose con la
 			 * aplicacion nativa por socket.
 			 * @param loadId Identificador de la operacion a realizar (load).
@@ -2070,16 +1991,6 @@ var MiniApplet = ( function ( window, undefined ) {
 				
 				execAppIntent(buildUrl(data));
 			}
-			
-			/**
-			 * Realiza una operacion de obtencion de log actual de la aplicacion
-			 */
-			function getCurrentLongByService() {
-				
-				var data = generateDataToLoad("getLog");
-				
-				execAppIntent(buildUrl(data));
-			} 
 
 			/** 
 			 * Funcion para la comprobacion de existencia del objeto. No hace nada.
@@ -2109,9 +2020,9 @@ var MiniApplet = ( function ( window, undefined ) {
 			 * Recupera el log de la aplicacion. Actualmente, el log solo esta
 			 * disponible en el applet, no en las aplicacion moviles.
 			 */
-//			function getCurrentLog () {
-//				return "Applet no cargado";
-//			}
+			function getCurrentLog () {
+				return "Applet no cargado";
+			}
 
 			/**
 			 * Funcion para identificar el tipo de objeto del Cliente (javascript, applet,...).
@@ -2906,7 +2817,7 @@ var MiniApplet = ( function ( window, undefined ) {
 				}
 				else {
 					if (cipherKey != undefined && cipherKey != null) {
-						certificate = decipher(html.substring(0, sepPos), cipherKey);
+						certificate = decipher(html.substring(0, sepPos), cipherKey, true);
 						signature = decipher(html.substring(sepPos + 1), cipherKey);
 					}
 					else {
@@ -2995,16 +2906,17 @@ var MiniApplet = ( function ( window, undefined ) {
 			 * Realiza un descifrado DES compatible con Java (Algoritmo DES, modo CBC, sin Padding).
 			 * Recibe en base 64 la cadena de texto cifrado antecedido por el padding anadido manualmente
 			 * a los datos para permitir el cifrado DES (separado por un punto ('.')), ademas de la clave
-			 * para descifrar.
+			 * para descifrar y, opcionalmente, un booleano que indica si se trata de un cifrado intermedio
+			 * devuelto por la aplicacion, lo que permite reajustar el padding.
 			 * Como resultado devuelve la cadena de texto descifrada en base 64.
 			 */
-			function decipher(cipheredData, key) {
-								
+			function decipher(cipheredData, key, intermediate) {
+
 				var dotPos = cipheredData.indexOf('.');
 				var padding = cipheredData.substr(0, dotPos);
 				
 				var deciphered = Cipher.des(key, Cipher.base64ToString(fromBase64UrlSaveToBase64(cipheredData.substr(dotPos + 1))), 0, 0, null);
-				return Cipher.stringToBase64(deciphered.substr(0, deciphered.length - parseInt(padding) - 8));
+				return Cipher.stringToBase64(deciphered.substr(0, deciphered.length - parseInt(padding) - (intermediate ? 0 : 8)));
 			}
 			
 			/**
