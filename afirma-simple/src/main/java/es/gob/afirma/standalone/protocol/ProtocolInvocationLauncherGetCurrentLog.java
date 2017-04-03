@@ -1,10 +1,10 @@
 package es.gob.afirma.standalone.protocol;
 
-import java.security.AccessController;
+import java.io.IOException;
 import java.util.logging.Logger;
 
+import es.gob.afirma.core.LogManager;
 import es.gob.afirma.core.misc.protocol.UrlParametersToLoad;
-import es.gob.afirma.standalone.protocol.GetCurrentLog;
 
 final class ProtocolInvocationLauncherGetCurrentLog {
 			
@@ -47,8 +47,13 @@ final class ProtocolInvocationLauncherGetCurrentLog {
 		return dataToSend;
 	}
 	
-	public static String getCurrentLog() {
-		return AccessController.doPrivileged(new GetCurrentLog());
+	/**
+	 * Obtiene, en formato XML, el registro acumulado de la ejecuci&oacute;n actual.
+	 * @return String que contiene el registro de log acumulado hasta la ejecuci&oacute;n actual.
+	 * @throws IOException
+	 */
+	public static String getCurrentLog() throws IOException {
+		return LogManager.getLogFile();
 	}
 
 	public static String getResultCancel() {
