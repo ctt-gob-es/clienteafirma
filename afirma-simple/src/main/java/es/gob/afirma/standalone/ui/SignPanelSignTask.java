@@ -263,9 +263,9 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
                 };
                 filterDescription = SimpleAfirmaMessages.getString("SignPanel.92"); //$NON-NLS-1$
         	}
-        	else if (newFileName.toLowerCase().endsWith("xslx")) { //$NON-NLS-1$
+        	else if (newFileName.toLowerCase().endsWith("xlsx")) { //$NON-NLS-1$
                 filterExtensions = new String[] {
-                    "xslx" //$NON-NLS-1$
+                    "xlsx" //$NON-NLS-1$
                 };
                 filterDescription = SimpleAfirmaMessages.getString("SignPanel.93"); //$NON-NLS-1$
         	}
