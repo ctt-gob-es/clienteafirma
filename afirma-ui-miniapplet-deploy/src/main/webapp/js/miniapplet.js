@@ -30,6 +30,8 @@ var MiniApplet = ( function ( window, undefined ) {
 
 		var retrieverServletAddress = null;
 
+		var jnlpServiceAddress = "";
+
 		var clientType = null;
 
 		var severeTimeDelay = false;
@@ -46,7 +48,7 @@ var MiniApplet = ( function ( window, undefined ) {
 				checktime_server_time: "Hora del servidor"
 		};
 		LOCALIZED_STRINGS["gl_ES"] = {
-				checktime_warn: "Destectouse un desfase horario entre o seu sistema e o servidor. Recoméndase corrixilo antes de pulsar Aceptar para continuar.",
+				checktime_warn: "Destectouse un desfase horario entre o seu sistema e o servidor. Recom�ndase corrixilo antes de pulsar Aceptar para continuar.",
 				checktime_err: "Destectouse un desfase horario entre o seu sistema e o servidor. Debe corrixir a hora do seu sistema antes de continuar.",
 				checktime_local_time: "Hora do seu sistema",
 				checktime_server_time: "Hora do servidor"
@@ -111,14 +113,21 @@ var MiniApplet = ( function ( window, undefined ) {
 
 		// Tiempo de espera entre los intentos de conexion con autofirma por socket
 		var AUTOFIRMA_LAUNCHING_TIME = 2000;
-		
+
 		// Reintentos de conexion totales para detectar que esta instalado AutoFirma por socket
-		var AUTOFIRMA_CONNECTION_RETRIES = 10;
+		var AUTOFIRMA_CONNECTION_RETRIES = 15;
 
 		// Variable que se puede configurar para forzar el uso del modo de comunicacion por servidor intermedio
 		// entre la pagina web y AutoFirma
 		var forceWSMode = false;
 
+		// Variable que se puede configurar para forzar el uso de la aplicacion
+		// nativa instalada a traves del protocolo afirma://
+		var forceAFirma = false;
+
+		// Variable que devuelve si funciona el modo JNLP
+		var bJNLP = true;	
+																	 
 		/* ------------------------------------ */
 		/* Funciones de comprobacion de entorno */
 		/* ------------------------------------ */
@@ -157,6 +166,24 @@ var MiniApplet = ( function ( window, undefined ) {
 		/** Determina con un boolean si nos encontramos en Windows RT */
 		function isWindowsRT() {
 			return isWindows8() && navigator.userAgent.indexOf("ARM;") != -1;
+		}
+
+		/** Determina con un boolean si nos encontramos en un sistema Linux. */
+		function isLinux() {
+			return getOSName() == "linux";
+		}
+
+		/**
+		 * Identifica el sistema operativo del usuario para notificarselo al servicio
+		 * de generacion del fichero de despliegue JNLP.
+		 * @returns Codigo del sistema operativo o "unknown" si no se conoce.
+		 */
+		function getOSName() {
+			var osName="unknown";
+			if (navigator.appVersion.indexOf("Win")!=-1) osName="windows";
+			if (navigator.appVersion.indexOf("Mac")!=-1) osName="mac";
+			if (navigator.appVersion.indexOf("Linux")!=-1) osName="linux";
+			return osName;
 		}
 
 		/** Determina con un boolean si estamos en Internet Explorer */
@@ -218,6 +245,21 @@ var MiniApplet = ( function ( window, undefined ) {
          */
         function isEdge() {
         	return !!navigator.userAgent.match(/Edge\/\d+/);
+        }
+
+        /**
+         * Informa si el usuario necesitar&aacute; instalar AutoFirma para
+         * completar el proceso de firma.
+         */
+        function needNativeAppInstalled() {
+        	return forceAFirma || isLinux() || isFirefox() || isAndroid() || isIOS();
+        }
+
+        /**
+         * Determina con un boolean si se ejecuta mediante JNLP
+         */
+        function isJNLP() {
+        	return bJNLP;
         }
 
 		/** Indica si el navegador detecta Java. Este valor no es completamente fiable, ya que
@@ -353,6 +395,18 @@ var MiniApplet = ( function ( window, undefined ) {
 			forceWSMode = force;
 		}
 		
+		/** Permite establecer que la invocacion con AutoFirma sea a traves
+		 * del protocolo afirma:// */
+		var setForceAFirma = function (force) {
+			forceAFirma = force;
+		}
+
+		/** Establece la direccion servicio para la generacion del JNLP de
+		 * carga de AutoFirma. */
+		var setJnlpService = function (jnlp){
+			jnlpServiceAddress = jnlp;
+		}
+
 		/** Permite habilitar la comprobacion de la hora local contra la hora del servidor y
 		 * establecer un tiempo maximo permitido y el comportamiento si se supera.
 		 * Parametros:
@@ -996,6 +1050,82 @@ var MiniApplet = ( function ( window, undefined ) {
 			return buffer;
 		}
 
+		/**
+		 * Abre una URL en el navegador.
+		 * @param url URL que se desea abrir.
+		 */
+		function openUrl (url) {
+			
+			// Usamos el modo de invocacion mas apropiado segun el entorno
+			if (isChrome() || isIOS()) {
+				// Usamos document.location porque tiene mejor soporte por los navegadores que
+				// window.location que es el mecanismo estandar
+				document.location = url;
+			}
+			else {
+
+				// Si ya existe el iframe, lo eliminamos para despues volverlo a crear 
+				if (document.getElementById("iframeAfirma") != null) {
+					try {
+						var element = document.getElementById("iframeAfirma");
+						element.outerHTML = "";
+						delete element;
+					}
+					catch (e) {
+						// No hacemos nada
+					}
+				}
+
+				// En el caso de ser una version de internet Explorer que soportase la deteccion de aplicacion
+				// capaces de manejar el protocolo, aprovechamos esta caracteristica (Internet Explorer para Windows 8 Modern UI)
+
+				if (navigator.msLaunchUri) {
+					navigator.msLaunchUri(
+							url,
+							null,
+							function() {
+								// Bloqueamos la conexion para evitar que se sigan haciendo comprobaciones
+								wrongInstallation = true;
+							}
+					);
+				}
+				else {
+					// Abrimos la URL por medio de un iframe
+					openUrlWithIframe(url);
+				}
+			}
+		}
+
+		/**
+		 * Llama a la aplicacion de firma por medio de un iframe.
+		 * @param url URL de invocacion.
+		 */
+		function openUrlWithIframe (url) {
+			var iframeElem = document.createElement("iframe");
+
+			var idAttr = document.createAttribute("id");
+			idAttr.value = "iframeAfirma";
+			iframeElem.setAttributeNode(idAttr);
+
+			var srcAttr = document.createAttribute("src");
+			srcAttr.value = url;
+			iframeElem.setAttributeNode(srcAttr);
+
+			var heightAttr = document.createAttribute("height");
+			heightAttr.value = 1;
+			iframeElem.setAttributeNode(heightAttr);
+
+			var widthAttr = document.createAttribute("width");
+			widthAttr.value = 1;
+			iframeElem.setAttributeNode(widthAttr);
+			
+			var styleAttr = document.createAttribute("style");
+			styleAttr.value = "display: none;";
+			iframeElem.setAttributeNode(styleAttr);
+
+			document.body.appendChild(iframeElem);				
+		}
+		
 		/**************************************************************
 		 **************************************************************
 		 **************************************************************
@@ -1031,6 +1161,13 @@ var MiniApplet = ( function ( window, undefined ) {
 				clienteFirma.setKeyStore(keystore);
 				clientType = TYPE_JAVASCRIPT_WEB_SERVICE;
 			}
+
+			// Si se dan las condiciones que requieren el uso de la aplicacion nativa,
+			// por entorno o porque se haya configurado para su uso, se intenta cargar
+			// esta version
+			if (!needNativeAppInstalled() && jnlpServiceAddress) {
+				openUrl("jnlp" + jnlpServiceAddress.substring(4) + "?os=" + getOSName() + "&arg=" + encodeURIComponent("afirma://service?op=install"));
+			}
 		}
 
 		var AppAfirmaJSSocket = ( function (clientAddress, window, undefined) {
@@ -1043,7 +1180,7 @@ var MiniApplet = ( function ( window, undefined ) {
 			var errorMessage = '';
 			var errorType = '';
 
-			/** Puerto actual */
+			/** Puerto a traves del que se ha conectado con la aplicacion nativa. */
 			var port = "";
 			
 			var idSession;
@@ -1359,58 +1496,16 @@ var MiniApplet = ( function ( window, undefined ) {
 					}
 				}
 				idSession = generateNewIdSession();
-				openUrl("afirma://service?ports=" + portsLine + "&v=" + PROTOCOL_VERSION + "&idsession=" + idSession);
-			}
-			
-			/**
-			 * Llama a la aplicacion de firma a traves de la URL de invocacion sin que afecte
-			 * a la pagina que se esta mostrando.
-			 * @param url URL de invocacion.
-			 */
-			function openUrl (url) {
 				
-				// Usamos document.location porque tiene mejor soporte por los navegadores que
-				// window.location que es el mecanismo estandar
-				if (isChrome()) {
-					document.location = url;
+				// Si no se dan las condiciones que requieren el uso de la aplicacion nativa,
+				// por entorno y si se ha configurado la URL del servicio, cargamos la version JNLP
+				if (!needNativeAppInstalled() && jnlpServiceAddress) {
+					openUrl("jnlp" + jnlpServiceAddress.substring(4) + "?os=" + getOSName() + "&arg=" + encodeURIComponent("afirma://service?ports=" + portsLine + "&amp;v=" + PROTOCOL_VERSION + "&amp;idsession=" + idSession));
 				}
+				// En caso contrario, cargamos la version nativa
 				else {
-					
-					// Si ya existe el iframe, lo eliminamos para despues volverlo a crear 
-					if (document.getElementById("iframeAfirma") != null) {
-						try {
-							var element = document.getElementById("iframeAfirma");
-							element.outerHTML = "";
-							delete element;
-						}
-						catch (e) {
-							// No hacemos nada
-						}
-					}
-					
-					var iframeElem = document.createElement("iframe");
-
-					var idAttr = document.createAttribute("id");
-					idAttr.value = "iframeAfirma";
-					iframeElem.setAttributeNode(idAttr);
-
-					var srcAttr = document.createAttribute("src");
-					srcAttr.value = url;
-					iframeElem.setAttributeNode(srcAttr);
-
-					var heightAttr = document.createAttribute("height");
-					heightAttr.value = 1;
-					iframeElem.setAttributeNode(heightAttr);
-
-					var widthAttr = document.createAttribute("width");
-					widthAttr.value = 1;
-					iframeElem.setAttributeNode(widthAttr);
-
-					var styleAttr = document.createAttribute("style");
-					styleAttr.value = "display: none;";
-					iframeElem.setAttributeNode(styleAttr);
-
-					document.body.appendChild(iframeElem);
+					bJNLP = false;
+					openUrl("afirma://service?ports=" + portsLine + "&v=" + PROTOCOL_VERSION + "&idsession=" + idSession);
 				}
 			}
 
@@ -1428,7 +1523,7 @@ var MiniApplet = ( function ( window, undefined ) {
 				data.properties = generateDataKeyValue ("properties", extraParams != null ? Base64.encode(extraParams) : null);
 				data.dat = generateDataKeyValue ("dat", dataB64 == "" ? null : dataB64);
 				data.sticky = generateDataKeyValue ("sticky", stickySignatore);
-				
+
 				return data;
 			}
 
@@ -1448,7 +1543,7 @@ var MiniApplet = ( function ( window, undefined ) {
 				data.filename = generateDataKeyValue ("filename", outputFileName);
 				data.dat = generateDataKeyValue ("dat", dataB64 == "" ? null : dataB64);
 				data.sticky = generateDataKeyValue ("sticky", stickySignatore);
-				
+
 				return data;
 			}
 			
@@ -1477,9 +1572,9 @@ var MiniApplet = ( function ( window, undefined ) {
 			}
 
 			/**
-			* Intenta conectar con la aplicación nativa mandando una peticion echo al puerto.
-			* Si la aplicación responde lanzamos la ejecucion del servicio.
-			* Si la aplicación no responde volvemos a lanzar cada 2 segundos otra peticion echo hasta que una
+			* Intenta conectar con la aplicacion nativa mandando una peticion echo al puerto.
+			* Si la aplicacion responde lanzamos la ejecucion del servicio.
+			* Si la aplicacion no responde volvemos a lanzar cada 2 segundos otra peticion echo hasta que una
 			* peticion sea aceptada.
 			*/
 			function executeEchoByService (currentPort, url, timeoutResetCounter, semaphore) {
@@ -1552,7 +1647,7 @@ var MiniApplet = ( function ( window, undefined ) {
 			*/
 			function executeOperationByService (url) {
 				
-				// Si el envio se debe fragmentar, llamamos a una función que se encarga
+				// Si el envio se debe fragmentar, llamamos a una funcion que se encarga
 				// de mandar la peticion recursivamente
 				if (url.length > URL_MAX_SIZE) {
 					executeOperationRecursive(url, 1, Math.ceil(url.length/URL_MAX_SIZE));
@@ -1595,7 +1690,7 @@ var MiniApplet = ( function ( window, undefined ) {
 				httpRequest.onerror = function(e) {
 					// status error 0 es que no se ha podido comunicar con la aplicacion
 					if (e.target.status == 0) {
-						errorServiceResponseFunction("java.lang.IOException", "Se ha perdido la conexión con la aplicación @firma "+e.target.statusText);
+						errorServiceResponseFunction("java.lang.IOException", "Se ha perdido la conexion con la aplicacion @firma " + e.target.statusText);
 					}
 					// error desconocido 
 					else {
@@ -1607,8 +1702,8 @@ var MiniApplet = ( function ( window, undefined ) {
 			}
 			
 			/**
-			* Manda los datos a la aplicación nativa en varios fragmentos porque ha habido que dividir los datos.
-			* Se va mandando cada petición cuando se reciba la anterior.
+			* Manda los datos a la aplicacion nativa en varios fragmentos porque ha habido que dividir los datos.
+			* Se va mandando cada peticion cuando se reciba la anterior.
 			*/
 			function executeOperationRecursive (url, i, iFinal) {
 				
@@ -1652,7 +1747,7 @@ var MiniApplet = ( function ( window, undefined ) {
 				httpRequest.onerror = function(e) { 
 					// Status error 0 es que no se ha podido comunicar con la aplicacion
 					if (e.target.status == 0){
-						errorServiceResponseFunction("java.lang.IOException", "Se ha perdido la conexión con la aplicación @firma "+e.target.statusText);
+						errorServiceResponseFunction("java.lang.IOException", "Se ha perdido la conexion con la aplicacion @firma " + e.target.statusText);
 					}
 					// Error desconocido 
 					else{
@@ -1705,7 +1800,7 @@ var MiniApplet = ( function ( window, undefined ) {
 				httpRequest.onerror = function(e) { 
 					// status error 0 es que no se ha podido comunicar con la aplicacion
 					if (e.target.status == 0){
-						errorServiceResponseFunction("java.lang.IOException", "Se ha perdido la conexión con la aplicación @firma "+e.target.statusText);
+						errorServiceResponseFunction("java.lang.IOException", "Se ha perdido la conexion con la aplicacion @firma " + e.target.statusText);
 					}
 					// error desconocido 
 					else{
@@ -1761,7 +1856,7 @@ var MiniApplet = ( function ( window, undefined ) {
 				httpRequest.onerror = function(e) { 
 					// status error 0 es que no se ha podido comunicar con la aplicacion
 					if (e.target.status == 0){
-						errorServiceResponseFunction("java.lang.IOException", "Se ha perdido la conexión con la aplicación @firma "+e.target.statusText);
+						errorServiceResponseFunction("java.lang.IOException", "Se ha perdido la conexion con la aplicacion @firma " + e.target.statusText);
 					}
 					// error desconocido 
 					else{
@@ -2104,14 +2199,6 @@ var MiniApplet = ( function ( window, undefined ) {
 			function getErrorType () {
 				return errorType;
 			}
-
-			/**
-			 * Recupera el log de la aplicacion. Actualmente, el log solo esta
-			 * disponible en el applet, no en las aplicacion moviles.
-			 */
-//			function getCurrentLog () {
-//				return "Applet no cargado";
-//			}
 
 			/**
 			 * Funcion para identificar el tipo de objeto del Cliente (javascript, applet,...).
@@ -2687,15 +2774,21 @@ var MiniApplet = ( function ( window, undefined ) {
 
 				wrongInstallation = false;
 			
-				// Invocamos al cliente de firma movil.
-				try {
-					openUrl(intentURL, errorCallback);
+				// Invocamos al cliente de firma
+				
+				// Si no se pide cargar la aplicacion nativa, ni el entorno lo requiere y
+				// si se ha configurado el servicio JNLP, cargamos la aplicacion JNLP
+				if (!needNativeAppInstalled() && jnlpServiceAddress) {
+					// En las llamadas al JNLP sustituimos los ampersands para que no den problemas al formar el JNLP
+					openUrl("jnlp" + jnlpServiceAddress.substring(4) + '?arg=' + encodeURIComponent(intentURL));
 				}
-				catch (e) {
-					//console.log("Error al abrir la aplicacion nativa: " + e);
-					return;
+				// En caso contrario, desplegamos la version nativa
+				else {
+					bJNLP = false;
+					openUrl(intentURL);
 				}
 
+				// Preguntamos repetidamente por el resultado
 				if (successCallback != null || errorCallback != null) {
 					if (idSession != null && idSession != undefined && 
 							((successCallback != undefined && successCallback != null) ||
@@ -2773,81 +2866,6 @@ var MiniApplet = ( function ( window, undefined ) {
 			};
 
 			/**
-			 * Llama a la aplicacion de firma a traves de la URL de invocacion sin que afecte
-			 * a la pagina que se esta mostrando.
-			 * @param url URL de invocacion.
-			 * @param errorCallback Funcion de error que deberia lanzarse (ademas de una excepcion),
-			 * si no fuese posible abrir la URL. Puede ser nulo.
-			 */
-			function openUrl (url, errorCallback) {
-				
-				// Usamos el modo de invocacion mas apropiado segun el entorno
-				if (isChrome() || isIOS()) {
-					// Usamos document.location porque tiene mejor soporte por los navegadores que
-					// window.location que es el mecanismo estandar
-					document.location = url;
-				}
-				else {
-
-					// Si ya existe el iframe, lo eliminamos para despues volverlo a crear 
-					if (document.getElementById("iframeAfirma") != null) {
-						try {
-							var element = document.getElementById("iframeAfirma");
-							element.outerHTML = "";
-							delete element;
-						}
-						catch (e) {
-							// No hacemos nada
-						}
-					}
-
-					// En el caso de ser una version de internet Explorer que soportase la deteccion de aplicacion
-					// capaces de manejar el protocolo, aprovechamos esta caracteristica (Internet Explorer para Windows 8 Modern UI)
-
-					if (navigator.msLaunchUri) {
-						navigator.msLaunchUri(
-								url,
-								null,
-								function() {
-									// Bloqueamos la conexion para evitar que se sigan haciendo comprobaciones
-									wrongInstallation = true;
-								}
-						);
-					}
-					else {
-						// Abrimos la URL por medio de un iframe
-						openUrlWithIframe(url);
-					}
-				}
-			}
-
-			/**
-			 * Llama a la aplicacion de firma por medio de un iframe.
-			 * @param url URL de invocacion.
-			 */
-			function openUrlWithIframe (url) {
-				var iframeElem = document.createElement("iframe");
-
-				var idAttr = document.createAttribute("id");
-				idAttr.value = "iframeAfirma";
-				iframeElem.setAttributeNode(idAttr);
-
-				var srcAttr = document.createAttribute("src");
-				srcAttr.value = url;
-				iframeElem.setAttributeNode(srcAttr);
-
-				var heightAttr = document.createAttribute("height");
-				heightAttr.value = 1;
-				iframeElem.setAttributeNode(heightAttr);
-
-				var widthAttr = document.createAttribute("width");
-				widthAttr.value = 1;
-				iframeElem.setAttributeNode(widthAttr);
-
-				document.body.appendChild(iframeElem);				
-			}
-				
-			/**
 			 * Ejecuta el metodo de error si el html recuperado es tal o el metodo de exito si no lo es,
 			 * en cuyo caso previamente descifrara el resultado. 
 			 * @param html Resultado obtenido.
@@ -2906,7 +2924,7 @@ var MiniApplet = ( function ( window, undefined ) {
 				}
 				else {
 					if (cipherKey != undefined && cipherKey != null) {
-						certificate = decipher(html.substring(0, sepPos), cipherKey);
+						certificate = decipher(html.substring(0, sepPos), cipherKey, true);
 						signature = decipher(html.substring(sepPos + 1), cipherKey);
 					}
 					else {
@@ -2995,16 +3013,17 @@ var MiniApplet = ( function ( window, undefined ) {
 			 * Realiza un descifrado DES compatible con Java (Algoritmo DES, modo CBC, sin Padding).
 			 * Recibe en base 64 la cadena de texto cifrado antecedido por el padding anadido manualmente
 			 * a los datos para permitir el cifrado DES (separado por un punto ('.')), ademas de la clave
-			 * para descifrar.
+			 * para descifrar y, opcionalmente, un booleano que indica si se trata de un cifrado intermedio
+			 * devuelto por la aplicacion, lo que permite reajustar el padding.
 			 * Como resultado devuelve la cadena de texto descifrada en base 64.
 			 */
-			function decipher(cipheredData, key) {
+			function decipher(cipheredData, key, intermediate) {
 								
 				var dotPos = cipheredData.indexOf('.');
 				var padding = cipheredData.substr(0, dotPos);
 				
 				var deciphered = Cipher.des(key, Cipher.base64ToString(fromBase64UrlSaveToBase64(cipheredData.substr(dotPos + 1))), 0, 0, null);
-				return Cipher.stringToBase64(deciphered.substr(0, deciphered.length - parseInt(padding) - 8));
+				return Cipher.stringToBase64(deciphered.substr(0, deciphered.length - parseInt(padding) - (intermediate ? 0 : 8)));
 			}
 			
 			/**
@@ -3050,6 +3069,7 @@ var MiniApplet = ( function ( window, undefined ) {
 				getBase64FromText : getBase64FromText,
 				getTextFromBase64 : getTextFromBase64,
 				setServlets : setServlets,
+				setJnlpService: setJnlpService,
 				setStickySignatory : setStickySignatory,
 				setLocale : setLocale,
 				getErrorMessage : getErrorMessage,
@@ -3090,7 +3110,7 @@ var MiniApplet = ( function ( window, undefined ) {
 
 			/* Variable para forzar el uso del mecanismo de comunicacion por servidor intermedio */
 			setForceWSMode : setForceWSMode,
-
+			setForceAFirma : setForceAFirma,
 			/* Metodos visibles. */
 			cargarMiniApplet : cargarMiniApplet,
 			cargarAppAfirma : cargarAppAfirma,
@@ -3110,13 +3130,16 @@ var MiniApplet = ( function ( window, undefined ) {
 			downloadRemoteData : downloadRemoteData,
 			setKeyStore : setKeyStore,
 			setServlets : setServlets,
+			setJnlpService: setJnlpService,
 			setStickySignatory : setStickySignatory,
 			setLocale : setLocale,
 			getErrorMessage : getErrorMessage,
 			getErrorType : getErrorType,
 			getCurrentLog : getCurrentLog,
 			isAndroid : isAndroid,
-			isIOS : isIOS
+			isIOS : isIOS,
+			isJNLP : isJNLP,
+			needNativeAppInstalled : needNativeAppInstalled
 		};
 })(window, undefined);
 
