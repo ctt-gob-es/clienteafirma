@@ -32,9 +32,9 @@ import es.gob.afirma.signers.ooxml.AOOOXMLSigner;
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public final class TestOOXMLVersions {
 
-    private static final String CERT_PATH3 = "GARCIA_MERAS_CAPOTE_TOMAS___11830960J.p12"; //$NON-NLS-1$
-    private static final String CERT_PASS3 = "12341234"; //$NON-NLS-1$
-    private static final String CERT_ALIAS3 = "garcia_meras_capote_tomas___11830960j"; //$NON-NLS-1$
+    private static final String CERT_PATH3 = "CAMERFIRMA_PF_SW_Clave_usuario_Activo.p12"; //$NON-NLS-1$
+    private static final String CERT_PASS3 = "1111"; //$NON-NLS-1$
+    private static final String CERT_ALIAS3 = "1"; //$NON-NLS-1$
 
     private static final String[] DATA_PATHS = new String[] {
 		"Documento_nuevo_creado_en_Word_2010.docx", //$NON-NLS-1$
