@@ -111,9 +111,8 @@ final class AppleKeyStoreManager extends AOKeyStoreManager {
 	}
 
 	private void getAliasesWithoutDuplicates() throws AOKeyStoreManagerException {
-		final List<String> tmpAliases = new ArrayList<String>();
-		final List<String> tmpAliasesWithPrivateKey = new ArrayList<String>();
-		final Set<BigInteger> addedSerials = new HashSet<BigInteger>();
+
+		// Obtenemos los objetos del llavero
 		final Enumeration<String> aliases;
 		try {
 			aliases = getKeyStore().aliases();
@@ -121,6 +120,9 @@ final class AppleKeyStoreManager extends AOKeyStoreManager {
 		catch (final KeyStoreException e) {
 			throw new AOKeyStoreManagerException("Error obteniendo los alias: " + e, e); //$NON-NLS-1$
 		}
+
+		// Identificamos aquellos que son certificados con clave privada
+		final List<String> tmpAliasesWithPrivateKey = new ArrayList<String>();
 		while (aliases.hasMoreElements()) {
 			final String alias = aliases.nextElement();
 			try {
@@ -132,6 +134,9 @@ final class AppleKeyStoreManager extends AOKeyStoreManager {
 			}
 		}
 
+		// Filtramos para admitir solo un certificado por cada numero de serie
+		final List<String> tmpAliases = new ArrayList<String>();
+		final Set<BigInteger> addedSerials = new HashSet<BigInteger>();
 		for (final String al : tmpAliasesWithPrivateKey) {
 			final X509Certificate tmpCert = getCertificate(al);
 			if (!addedSerials.contains(tmpCert.getSerialNumber())) {
@@ -144,7 +149,7 @@ final class AppleKeyStoreManager extends AOKeyStoreManager {
 				);
 			}
 		}
-		setCachedAliases(tmpAliases.toArray(new String[0]));
+		setCachedAliases(tmpAliases.toArray(new String[tmpAliases.size()]));
 	}
 
 }
