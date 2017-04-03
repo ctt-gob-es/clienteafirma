@@ -72,7 +72,7 @@ public class AggregatedKeyStoreManager extends AOKeyStoreManager {
 					md = MessageDigest.getInstance("SHA1"); //$NON-NLS-1$
 				}
 				catch (final NoSuchAlgorithmException e) {
-					LOGGER.severe(
+					LOGGER.warning(
 						"No se ha podido instanciar el generador de huellas digitales SHA1, pueden aparecer duplicados en la lista de certificados: " + e //$NON-NLS-1$
 					);
 				}
@@ -87,7 +87,7 @@ public class AggregatedKeyStoreManager extends AOKeyStoreManager {
 						}
 						catch (final CertificateEncodingException e) {
 							LOGGER.severe(
-								"No se ha obtener la huela del certificado '" + alias + "', pueden aparecer duplicados en la lista de certificados: " + e //$NON-NLS-1$ //$NON-NLS-2$
+								"No se ha podido obtener la huella del certificado '" + alias + "', pueden aparecer duplicados en la lista de certificados: " + e //$NON-NLS-1$ //$NON-NLS-2$
 							);
 							continue;
 						}

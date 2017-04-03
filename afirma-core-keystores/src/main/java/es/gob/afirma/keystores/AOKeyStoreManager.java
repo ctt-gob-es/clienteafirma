@@ -385,7 +385,7 @@ public class AOKeyStoreManager implements KeyStoreManager {
 			md = MessageDigest.getInstance("SHA1"); //$NON-NLS-1$
 		}
 		catch (final NoSuchAlgorithmException e) {
-			LOGGER.severe(
+			LOGGER.warning(
 				"No se ha podido instanciar el generador de huellas digitales SHA1, pueden aparecer duplicados en la lista de certificados: " + e //$NON-NLS-1$
 			);
 			return currentAliases;
@@ -408,7 +408,7 @@ public class AOKeyStoreManager implements KeyStoreManager {
 				cleanedAliases.add(alias);
 			}
 		}
-		return cleanedAliases.toArray(new String[0]);
+		return cleanedAliases.toArray(new String[cleanedAliases.size()]);
 	}
 
 	@Override
