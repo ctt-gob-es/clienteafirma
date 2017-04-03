@@ -85,9 +85,11 @@ public class SmartCardUnifiedKeyStoreManager extends AggregatedKeyStoreManager {
 		// la carga mediante uno de ellos, se ignora el resto
 		if (!this.preferredKsAdded) {
 
+			boolean cardInitialized = false;
+
 			for (final KnownSmartCardsPkcs11 sc : KnownSmartCardsPkcs11.values()) {
 
-				LOGGER.warning("Intentamos cargar: " + sc.getDescription());
+				LOGGER.warning("Intentamos cargar: " + sc.getDescription()); //$NON-NLS-1$
 
 				// Si no se quieren cargar los PKCS#11 de los almacenes preferidos y
 				// estamos ante uno de ellos, nos lo saltamos
@@ -97,7 +99,7 @@ public class SmartCardUnifiedKeyStoreManager extends AggregatedKeyStoreManager {
 
 				for (final String pkcs11Library : sc.getPkcs11Names()) {
 
-					LOGGER.warning("Probamos con la biblioteca: " + pkcs11Library);
+					LOGGER.warning("Probamos con la biblioteca: " + pkcs11Library); //$NON-NLS-1$
 
 					AOKeyStoreManager ksm;
 					try {
@@ -123,9 +125,15 @@ public class SmartCardUnifiedKeyStoreManager extends AggregatedKeyStoreManager {
 						}
 						continue;
 					}
+					cardInitialized = true;
 					addKeyStoreManager(ksm);
 
 					LOGGER.info("El almacen externo '" + sc.getDescription() + "' ha podido inicializarse, se anadiran sus entradas"); //$NON-NLS-1$ //$NON-NLS-2$
+					break;
+				}
+
+				// Solo cargaremos una tarjeta
+				if (cardInitialized) {
 					break;
 				}
 			}
@@ -161,15 +169,29 @@ public class SmartCardUnifiedKeyStoreManager extends AggregatedKeyStoreManager {
 	 * Bibliotecas PKCS#11 de las tarjetas inteligentes conocidas.
 	 */
 	private enum KnownSmartCardsPkcs11 {
-		CERES("FNMT-CERES", new String[] {  "%SYSTEMROOT%/System32/FNMT_P11_x64.dll",  //$NON-NLS-1$ //$NON-NLS-2$
-											"%SYSTEMROOT%/System32/FNMT_P11.dll", //$NON-NLS-1$
-											"%SYSTEMROOT%/SysWOW64/FNMT_P11.dll"}, true), //$NON-NLS-1$
-		CARDOS("CardOS", new String[] { "%SYSTEMROOT%/SysWOW64/siecap11.dll",  //$NON-NLS-1$ //$NON-NLS-2$
-										"%SYSTEMROOT%/System32/siecap11.dll" }, false), //$NON-NLS-1$
-		TUI("TUI", new String[] { "%PROGRAMFILES%/Gemalto/IDGo 800 PKCS#11/IDPrimePKCS11.dll", //$NON-NLS-1$ //$NON-NLS-2$
-								  "%PROGRAMFILES(x86)%/Gemalto/IDGo 800 PKCS#11/IDPrimePKCS11.dll" }, false), //$NON-NLS-1$
-		SAFESIGN("SafeSign", new String[] { "%SYSTEMROOT%/SysWOW64/aetpkss1.dll",  //$NON-NLS-1$ //$NON-NLS-2$
-											"%SYSTEMROOT%/System32/aetpkss1.dll" }, false); //$NON-NLS-1$
+		CERES("FNMT-CERES", new String[] { //$NON-NLS-1$
+				"%SYSTEMROOT%/System32/FNMT_P11_x64.dll",  //$NON-NLS-1$
+				"%SYSTEMROOT%/System32/FNMT_P11.dll", //$NON-NLS-1$
+				"%SYSTEMROOT%/SysWOW64/FNMT_P11.dll" //$NON-NLS-1$
+		}, true),
+		CARDOS("CardOS", new String[] { //$NON-NLS-1$
+				"%SYSTEMROOT%/SysWOW64/siecap11.dll",  //$NON-NLS-1$
+				"%SYSTEMROOT%/System32/siecap11.dll" //$NON-NLS-1$
+		}, false),
+		TUI("TUI", new String[] { //$NON-NLS-1$
+				"%PROGRAMFILES%/umu/Third-Party/Gemalto/Classic Client/BIN/gclib.dll", //$NON-NLS-1$
+				"%PROGRAMFILES(x86)%/umu/Third-Party/Gemalto/Classic Client/BIN/gclib.dll", //$NON-NLS-1$
+				"%PROGRAMFILES%/umu/UMU-Crypto/lib/libumupkcs11.dll", //$NON-NLS-1$
+				"%PROGRAMFILES(x86)%/umu/UMU-Crypto/lib/libumupkcs11.dll", //$NON-NLS-1$
+				"%PROGRAMFILES%/Gemalto/IDGo 800 PKCS#11/IDPrimePKCS1164.dll", //$NON-NLS-1$
+				"%PROGRAMFILES%/Gemalto/IDGo 800 PKCS#11/IDPrimePKCS11.dll", //$NON-NLS-1$
+				"%PROGRAMFILES(x86)%/Gemalto/IDGo 800 PKCS#11/IDPrimePKCS1164.dll", //$NON-NLS-1$
+				"%PROGRAMFILES(x86)%/Gemalto/IDGo 800 PKCS#11/IDPrimePKCS11.dll" //$NON-NLS-1$
+		}, false),
+		SAFESIGN("SafeSign", new String[] { //$NON-NLS-1$
+				"%SYSTEMROOT%/SysWOW64/aetpkss1.dll",  //$NON-NLS-1$
+				"%SYSTEMROOT%/System32/aetpkss1.dll" //$NON-NLS-1$
+		}, false);
 
 		private static final String[] ENV_PROPERTIES = new String[] {
 				"%PROGRAMFILES%", "%PROGRAMFILES(x86)%", "%SYSTEMROOT%" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
