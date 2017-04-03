@@ -32,9 +32,9 @@ import es.gob.afirma.signers.ooxml.AOOOXMLSigner;
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public final class TestOOXML {
 
-    private static final String CERT_PATH3 = "GARCIA_MERAS_CAPOTE_TOMAS___11830960J.p12"; //$NON-NLS-1$
-    private static final String CERT_PASS3 = "12341234"; //$NON-NLS-1$
-    private static final String CERT_ALIAS3 = "garcia_meras_capote_tomas___11830960j"; //$NON-NLS-1$
+    private static final String CERT_PATH3 = "CAMERFIRMA_PF_SW_Clave_usuario_Activo.p12"; //$NON-NLS-1$
+    private static final String CERT_PASS3 = "1111"; //$NON-NLS-1$
+    private static final String CERT_ALIAS3 = "1"; //$NON-NLS-1$
 
     private static final String[] DATA_PATHS = new String[] { "entrada_w2013.docx" /*, "Entrada.docx"*/ };  //$NON-NLS-1$
     private static byte[][] DATAS = new byte[1][];
@@ -113,7 +113,7 @@ public final class TestOOXML {
 	        for (final Properties extraParams : OOXML_MODES) {
 	            for (final String algo : ALGOS) {
 
-	                prueba = "Firma OOXML con el algoritmo ': " + //$NON-NLS-1$
+	                prueba = "Firma OOXML con el algoritmo '" + //$NON-NLS-1$
 	                algo +
 	                "' y politica '" + //$NON-NLS-1$
 	                extraParams.getProperty("policyIdentifier") + //$NON-NLS-1$
@@ -134,11 +134,10 @@ public final class TestOOXML {
 	                os.write(result);
 	                os.flush();
 	                os.close();
-	                //System.out.println("Temporal para comprobacion manual: " + saveFile.getAbsolutePath()); //$NON-NLS-1$
+	                System.out.println("Temporal para comprobacion manual: " + saveFile.getAbsolutePath()); //$NON-NLS-1$
 
 	                Assert.assertNotNull(prueba, result);
 	                Assert.assertTrue(signer.isSign(result));
-
 	            }
 	        }
 
