@@ -34,14 +34,14 @@ final class ProtocolInvocationLauncherGetCurrentLog {
 			
 			dataToSend = getCurrentLog();
 			
-		} catch (final Exception e) {
-			LOGGER.severe("Error en la lectura de los datos a cargar: " + e); //$NON-NLS-1$
-			ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_00);
+		} catch (final IOException e) {
+			LOGGER.severe("Error al obtener el registro de log acumulado hasta la ejecucion actual: " + e); //$NON-NLS-1$
+			ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_24);
 			if (!bySocket) {
-				throw new SocketOperationException(ProtocolInvocationLauncherErrorManager.SAF_00);
+				throw new SocketOperationException(ProtocolInvocationLauncherErrorManager.SAF_24);
 			}
 			return ProtocolInvocationLauncherErrorManager
-					.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_00);
+					.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_24);
 		}
 		
 		return dataToSend;
