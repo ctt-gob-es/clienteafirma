@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?> 
+<jnlp spec="1.0+" codebase="%CODEBASE%">
+	<information> 
+		<title>AutoFirma</title> 
+		<vendor>Gobierno de Espana</vendor>
+		<description>Desplegable JNLP de AutoFirma</description> 
+		<description kind="short">AutoFirma</description>
+		<icon href="%CODEBASE%logo64.png" width="64" height="64"/>
+	</information> 
+	<security>
+	   <all-permissions/>
+	</security>
+	<update check="timeout" policy="always"/>
+	<resources>
+		<j2se version="1.8+"/> 
+		<jar href="%CODEBASE%AutoFirmaWS__V1.5.jar" size="29100616" />
+	</resources>
+	<application-desc main-class="es.gob.afirma.standalone.ws.AutoFirmaProtocolWebStart">
+		%ARGUMENT%
+	</application-desc>
+</jnlp>

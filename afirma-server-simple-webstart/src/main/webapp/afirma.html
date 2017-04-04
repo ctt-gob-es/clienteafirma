@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Pruebas AutoFirma</title>
+		<script type="text/javascript" src="miniapplet.js"></script>
+		
+		<script type="text/javascript">
+		
+			function doSign() {
+			
+				var dataB64 = MiniApplet.getBase64FromText("Hola Mundo!!");
+				MiniApplet.sign(dataB64, "SHA1withRSA", "CAdES", null, successCallback, errorCallback);
+			}
+		
+			function successCallback(signatureB64, certB64) {
+				alert("¡¡EXITO!!");
+			}
+			
+			function errorCallback(signatureB64, certB64) {
+				alert("¡¡ERROR!!");
+			}
+		
+		</script>
+    </head>
+
+    <body>
+	
+        <div>
+		
+			<input type="button" value="Firmar" onclick="doSign();">&nbsp;
+			
+        </div>
+		
+		<script type="text/javascript">
+		
+			//MiniApplet.setForceWSMode(true);
+			//MiniApplet.setForceAFirma(true);
+			var ip = "appprueba";
+			MiniApplet.setJnlpService("http://" + ip + ":8080/afirma-server-simpleafirma-webstart/jnlp");
+			MiniApplet.setServlets("http://" + ip + ":8080/afirma-signature-storage/StorageService",
+					"http://" + ip + ":8080/afirma-signature-retriever/RetrieveService");
+			MiniApplet.cargarAppAfirma("http://" + ip + ":8080/afirma-server-simpleafirma-webstart");
+		</script>
+    </body>
+
+</html>
