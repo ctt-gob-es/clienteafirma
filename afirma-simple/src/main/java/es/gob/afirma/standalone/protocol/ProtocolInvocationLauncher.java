@@ -236,8 +236,6 @@ public final class ProtocolInvocationLauncher {
             try {
                 UrlParametersToSignAndSave params = ProtocolInvocationUriParser.getParametersToSignAndSave(urlString);
                 LOGGER.info("Parametros de la llamada = " + urlString); //$NON-NLS-1$
-                
-                LOGGER.info("El valor de la variable sticky en Sign&Save es: " + params.getSticky()); //$NON-NLS-1$
 
                 // Si se indica un identificador de fichero, es que la configuracion se tiene que
                 // descargar desde el servidor intermedio
@@ -300,8 +298,6 @@ public final class ProtocolInvocationLauncher {
             
             try {
                 UrlParametersToSign params = ProtocolInvocationUriParser.getParametersToSign(urlString);
-                
-                LOGGER.info("El valor de la variable sticky en Sign es: " + params.getSticky()); //$NON-NLS-1$
 
                 // Si se indica un identificador de fichero, es que la configuracion se tiene que
                 // descargar desde el servidor intermedio
