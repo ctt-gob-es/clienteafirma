@@ -17,6 +17,10 @@ public class AutoFirmaWebStart {
 	/** Comando usado para la apertura de ficheros. */
 	private static final String PARAM_OPEN   = "-open"; //$NON-NLS-1$
 
+	/**
+	 * Inicia la carga JNLP de AutoFirma para su ejecuci&oacute;n como aplicaci&oacute;n de escritorio.
+	 * @param args Argumentos de la operaci&oacute;n que se debe ejecutar.
+	 */
 	public static void main(final String[] args) {
 
 		// Si detectamos que se ejecuta esta aplicacion como parte del proceso de instalacion,
