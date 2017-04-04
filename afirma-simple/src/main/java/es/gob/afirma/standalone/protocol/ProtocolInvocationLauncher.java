@@ -34,18 +34,8 @@ public final class ProtocolInvocationLauncher {
 
     static final ProtocolVersion MAX_PROTOCOL_VERSION_SUPPORTED = ProtocolVersion.VERSION_1;
     
-    private static boolean stickySignatory = false;
-    
     /** Clave privada fijada para reutilizarse en operaciones sucesivas. */
 	private static PrivateKeyEntry stickyKeyEntry = null;
-
-	public static boolean isStickySignatory() {
-		return stickySignatory;
-	}
-
-	public static void setStickySignatory(boolean stickySignatory) {
-		ProtocolInvocationLauncher.stickySignatory = stickySignatory;
-	}
 
 	public static PrivateKeyEntry getStickyKeyEntry() {
 		return stickyKeyEntry;
@@ -71,6 +61,7 @@ public final class ProtocolInvocationLauncher {
      *                 HTTP local (a <code>localhost</code>), si se establece a <code>false</code> se usa un servidor intermedio
      *                 para esta comunicaci&oacute;n de vuelta.
      * @return Resultado de la operaci&oacute;n. */
+    @SuppressWarnings("unused")
     public static String launch(final String urlString, final boolean bySocket)  {
         // En OS X sobrecargamos el "Acerca de..." del sistema operativo, que tambien
         // aparece en la invocacion por protocolo
