@@ -121,7 +121,13 @@ final class ConfiguratorFirefoxLinux {
 			certUtilPath = CERTUTIL_EXE;
 		}
 		catch (final Exception e) {
-			ConfiguratorUtil.uncompressResource(CERTUTIL_RESOURCE, appDir);
+			try {
+				ConfiguratorUtil.uncompressResource(CERTUTIL_RESOURCE, appDir);
+			}
+			catch (final Exception ex) {
+				LOGGER.warning("No se ha podido descomprimir CertUtil. Se omite la configuracion del certificado SSL en Mozilla Firefox: " + ex); //$NON-NLS-1$
+				return;
+			}
 			certUtilPath = new File(appDir, CERTUTIL_RELATIVE_PATH).getAbsolutePath();
 		}
 

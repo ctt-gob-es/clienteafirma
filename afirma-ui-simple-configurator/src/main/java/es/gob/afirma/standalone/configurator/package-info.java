@@ -5,7 +5,7 @@
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
- * You may contact the copyright holder at: soporte.afirma5@mpt.es
+ * You may contact the copyright holder at: soporte.afirma@seap.minhap.es
  */
 
 /** Configurador de sistema para el uso de AutoFirma por conexiones HTTPS locales. */

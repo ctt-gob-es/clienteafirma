@@ -111,17 +111,24 @@ final class ConfiguratorFirefoxMac {
 	/** Ejecuta la utilidad Mozilla CertUtil para la instalaci&oacute;n del certificado
 	 * ra&iacute;z de confianza en Firefox.
 	 * @param appDir Directorio de instalaci&oacute;n de la aplicaci&oacute;n.
-	 * @param profilesDir Listado de directorios de perfiles de usuario de Mozilla Firefox.
+	 * @param profileDirs Listado de directorios de perfiles de usuario de Mozilla Firefox.
 	 * @param scriptFile Fichero al que agregar al final el script de desinstalaci&oacute;n.
 	 * @throws IOException Cuando ocurre un error en la escritura de los ficheros.
 	 */
 	private static void generateInstallScript(final File appDir,
-			                                    final File[] profilesDir,
+			                                    final File[] profileDirs,
 			                                    final File scriptFile) throws IOException {
 
-		final File certutilFile = prepareCertUtil(appDir, scriptFile);
+		File certutilFile;
+		try {
+			certutilFile = prepareCertUtil(appDir, scriptFile);
+		}
+		catch (final Exception e) {
+			LOGGER.warning("Se omite la configuracion del certificado SSL en Mozilla Firefox: " + e); //$NON-NLS-1$
+			return;
+		}
 
-		for (final File profileDir : profilesDir) {
+		for (final File profileDir : profileDirs) {
 			if (!profileDir.isDirectory()) {
 				continue;
 			}
@@ -151,10 +158,18 @@ final class ConfiguratorFirefoxMac {
 	 * @param scriptFile Fichero al final del cual donde se almacenar&aacute; el script de desinstalaci&oacute;n.
 	 * @throws IOException Cuando se produce un error al generar el script.
 	 */
-	private static void generateUninstallScript(final File appDir, final File[] profileDirs, final File scriptFile)
-			throws IOException {
+	private static void generateUninstallScript(final File appDir,
+												final File[] profileDirs,
+												final File scriptFile) throws IOException {
 
-		final File certutilFile = prepareCertUtil(appDir, scriptFile);
+		File certutilFile;
+		try {
+			certutilFile = prepareCertUtil(appDir, scriptFile);
+		}
+		catch (final Exception e) {
+			LOGGER.warning("Se omite la configuracion del certificado SSL en Mozilla Firefox: " + e); //$NON-NLS-1$
+			return;
+		}
 
 		for (final File profileDir : profileDirs) {
 			if (!profileDir.isDirectory()) {
@@ -188,7 +203,6 @@ final class ConfiguratorFirefoxMac {
 	private static File prepareCertUtil(final File appDir, final File scriptFile) throws IOException {
 
 		final File certutilFile = new File(appDir, CERTUTIL_RELATIVE_PATH);
-
 		if (!certutilFile.isFile()) {
 			ConfiguratorUtil.uncompressResource(CERTUTIL_RESOURCE, appDir);
 		}

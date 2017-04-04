@@ -37,7 +37,7 @@ final class ConfiguratorLinux implements Configurator {
 
         LOGGER.info(Messages.getString("ConfiguratorLinux.2")); //$NON-NLS-1$
 
-        final File appDir = ConfiguratorUtil.getApplicationDirectory();
+        final File appDir = getApplicationDirectory();
 
         LOGGER.info(Messages.getString("ConfiguratorLinux.3") + appDir.getAbsolutePath()); //$NON-NLS-1$
 
@@ -52,13 +52,14 @@ final class ConfiguratorLinux implements Configurator {
             LOGGER.info(Messages.getString("ConfiguratorLinux.11")); //$NON-NLS-1$
 
            //Generacion del certificado pfx
-            ConfiguratorUtil.installFile(certPack.getPkcs12(), new File(
-            		ConfiguratorUtil.getApplicationDirectory(), KS_FILENAME));
+            ConfiguratorUtil.installFile(
+            		certPack.getPkcs12(),
+            		new File(appDir, KS_FILENAME));
 
           //Generacion del certificado raiz .cer
             ConfiguratorUtil.installFile(
             		certPack.getCaCertificate().getEncoded(),
-            		new File(ConfiguratorUtil.getApplicationDirectory(), FILE_AUTOFIRMA_CERTIFICATE));
+            		new File(appDir, FILE_AUTOFIRMA_CERTIFICATE));
 
             // Obtenemos los directorios de los usuarios
     		final String[] usersDirs = getSystemUsersHomes();
@@ -91,6 +92,17 @@ final class ConfiguratorLinux implements Configurator {
     private static boolean checkSSLKeyStoreGenerated(final File appConfigDir) {
         return new File(appConfigDir, KS_FILENAME).exists();
     }
+
+	private static File getApplicationDirectory() {
+
+		// TODO: Devolver un directorio que utilizar como directorio de instalacion cuando
+		// se realice un despliegue JNLP
+//		if (ConfiguratorUtil.isJNLPDeployment()) {
+//
+//		}
+
+		return ConfiguratorUtil.getApplicationDirectory();
+	}
 
     /** Obtiene los directorios de usuarios del sistema.
 	 * @return Listado con todos directorios de los usuarios del sistema.

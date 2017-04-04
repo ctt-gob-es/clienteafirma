@@ -26,13 +26,17 @@ final class ConfiguratorUtil {
 
 	/** Guarda datos en disco.
 	 * @param data Datos a guardar.
-	 * @param outDir Directorio local.
+	 * @param outFile Fichero de salida.
 	 * @throws IOException Cuando ocurre un error durante el guardado. */
-	static void installFile(final byte[] data, final File outDir) throws IOException {
-		try (
-			final OutputStream configScriptOs = new FileOutputStream(outDir);
-			final BufferedOutputStream bos = new BufferedOutputStream(configScriptOs);
-		) {
+	static void installFile(final byte[] data, final File outFile) throws IOException {
+		OutputStream os;
+		if (AutoFirmaConfiguratiorJNLPUtils.isJNLPDeployment()) {
+			os = AutoFirmaConfiguratiorJNLPUtils.selectFileToWrite(outFile);
+		}
+		else {
+			os = new FileOutputStream(outFile);
+		}
+		try (final BufferedOutputStream bos = new BufferedOutputStream(os)) {
 			bos.write(data);
 		}
 	}
@@ -44,7 +48,7 @@ final class ConfiguratorUtil {
 	 **/
 	static void uncompressResource(final String resource, final File outDir) throws IOException {
 		int n;
-
+		final boolean jnlpDeploy = AutoFirmaConfiguratiorJNLPUtils.isJNLPDeployment();
 		final byte[] buffer = new byte[1024];
 		try (final ZipInputStream zipIs = new ZipInputStream(ConfiguratorUtil.class.getResourceAsStream(resource));) {
 			ZipEntry entry;
@@ -54,7 +58,9 @@ final class ConfiguratorUtil {
 					outFile.mkdirs();
 				}
 				else {
-					try (final FileOutputStream outFis = new FileOutputStream(outFile);) {
+					try (final OutputStream outFis = jnlpDeploy ?
+							AutoFirmaConfiguratiorJNLPUtils.selectFileToWrite(outFile) :
+								new FileOutputStream(outFile);) {
 						while ((n = zipIs.read(buffer)) > 0) {
 							outFis.write(buffer, 0, n);
 						}
@@ -101,7 +107,7 @@ final class ConfiguratorUtil {
 	 * @param comands Listado de comandos que almacenar.
 	 * @param buffer Buffer de datos en el que se almacen el script.
 	 */
-	static void printScript(String[] comands, StringBuilder buffer) {
+	static void printScript(final String[] comands, final StringBuilder buffer) {
 		for (final String s : comands) {
 			buffer.append(s);
 			buffer.append(' ');
@@ -116,9 +122,16 @@ final class ConfiguratorUtil {
 	 * @param outFile Fichero en el que guardar el script.
 	 * @throws IOException Cuando el fichero no se puede crear o escribir.
 	 */
-	static void writeScript(StringBuilder buffer, File outFile) throws IOException {
-		try (final FileOutputStream fout = new FileOutputStream(outFile, true);) {
-			fout.write(buffer.toString().getBytes());
+	static void writeScript(final StringBuilder buffer, final File outFile) throws IOException {
+		if (AutoFirmaConfiguratiorJNLPUtils.isJNLPDeployment()) {
+			try (final OutputStream os = AutoFirmaConfiguratiorJNLPUtils.selectFileToWrite(outFile, true);) {
+				os.write(buffer.toString().getBytes());
+			}
+		}
+		else {
+			try (final FileOutputStream os = new FileOutputStream(outFile, true);) {
+				os.write(buffer.toString().getBytes());
+			}
 		}
 	}
 

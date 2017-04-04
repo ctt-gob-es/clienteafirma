@@ -54,13 +54,13 @@ import org.spongycastle.operator.jcajce.JcaContentSignerBuilder;
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 final class CertUtil {
 
-	private static final String AF_ROOT_SUBJECT_PRINCIPAL = "CN=AutoFirma ROOT"; //$NON-NLS-1$
-
 	private static final int KEY_SIZE = 2048;
 
 	private static final String PROVIDER = "SC"; //$NON-NLS-1$
 
 	private static final String SIGNATURE_ALGORITHM = "SHA256withRSA"; //$NON-NLS-1$
+
+	static final String ROOT_CERTIFICATE_PRINCIPAL = "CN=AutoFirma ROOT"; //$NON-NLS-1$
 
 	static class CertPack {
 
@@ -123,7 +123,7 @@ final class CertUtil {
 
 		Security.addProvider(new BouncyCastleProvider());
 		final PrivateKeyEntry caCertificatePrivateKeyEntry = generateCaCertificate(
-			AF_ROOT_SUBJECT_PRINCIPAL
+				ROOT_CERTIFICATE_PRINCIPAL
 		);
 		final PrivateKeyEntry sslCertificatePrivateKeyEntry = generateSslCertificate(
 			"127.0.0.1", //$NON-NLS-1$
@@ -185,9 +185,8 @@ final class CertUtil {
 	            new BasicConstraints(true));
 
 	    final KeyUsage usage = new KeyUsage(KeyUsage.keyCertSign
-	    		| KeyUsage.digitalSignature | KeyUsage.keyEncipherment
-	    		| KeyUsage.dataEncipherment | KeyUsage.cRLSign);
-
+	            | KeyUsage.digitalSignature | KeyUsage.keyEncipherment
+	            | KeyUsage.dataEncipherment | KeyUsage.cRLSign);
 	    generator.addExtension(Extension.keyUsage, false, usage);
 
 	    final ASN1EncodableVector purposes = new ASN1EncodableVector();
@@ -195,7 +194,7 @@ final class CertUtil {
 	    purposes.add(KeyPurposeId.id_kp_clientAuth);
 	    purposes.add(KeyPurposeId.anyExtendedKeyUsage);
 	    generator.addExtension(Extension.extendedKeyUsage, false,
-	    		new DERSequence(purposes));
+	            new DERSequence(purposes));
 
 	    //Firma del CA con su propia clave privada (autofirmado)
 	    X509Certificate cert = null;

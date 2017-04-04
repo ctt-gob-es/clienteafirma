@@ -5,7 +5,7 @@
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
- * You may contact the copyright holder at: soporte.afirma5@mpt.es
+ * You may contact the copyright holder at: soporte.afirma@seap.minhap.es
  */
 
 package es.gob.afirma.standalone.configurator;
@@ -62,7 +62,7 @@ public final class AutoFirmaConfiguratorSilent implements ConsoleListener {
 	public AutoFirmaConfiguratorSilent() {
 
 		if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
-			this.configurator = new ConfiguratorWindows();
+			this.configurator = new ConfiguratorWindows(true);
 		}
 		else if (Platform.OS.LINUX == Platform.getOS()){
 		    this.configurator = new ConfiguratorLinux();
@@ -90,7 +90,7 @@ public final class AutoFirmaConfiguratorSilent implements ConsoleListener {
 		}
 
 		this.mainScreen = ConsoleManager.getConsole(this);
-		
+
 		// Creamos el almacen para la configuracion del SSL
 		try {
 			this.configurator.configure(this.mainScreen);

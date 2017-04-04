@@ -5,12 +5,11 @@
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
- * You may contact the copyright holder at: soporte.afirma5@mpt.es
+ * You may contact the copyright holder at: soporte.afirma@seap.minhap.es
  */
 
 package es.gob.afirma.standalone.configurator;
 
-import java.awt.Component;
 import java.io.File;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -27,18 +26,51 @@ public class AutoFirmaConfigurator implements ConsoleListener {
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
-	private static final String PARAMETER_UNISTALL = "-uninstall"; //$NON-NLS-1$
 	private static final File TMP = new File("/var/tmp"); //$NON-NLS-1$
 	private static final File TEMP = new File("/var/temp"); //$NON-NLS-1$
 
+	/** Indica que la operacion que se debe realizar es la de instalaci&oacute;n. */
+	public static final String PARAMETER_INSTALL = "-install"; //$NON-NLS-1$
+
+	/** Indica que la operacion que se debe realizar es la de desinstalaci&oacute;n. */
+	public static final String PARAMETER_UNINSTALL = "-uninstall"; //$NON-NLS-1$
+
+	/** Indica que se debe mantener abierta la aplicaci&oacute;n despu&eacute;s de
+	 * finalizar la operaci&oacute;n. */
+	public static final String PARAMETER_KEEP_OPEN = "-keep_open"; //$NON-NLS-1$
+
+	/** Indica que no se debe mostrar el di&aacute;logo gr&aacute;fico con las trazas
+	 * del proceso de instalaci&oacute;n. */
+	public static final String PARAMETER_HEADLESS = "-headless"; //$NON-NLS-1$
+
+	/** Indica que se realiza una carga mediante JNLP. */
+	public static final String PARAMETER_JNLP_INSTANCE = "-jnlp"; //$NON-NLS-1$
+
 	private Configurator configurator;
+
+	private final  ConfigArgs config;
 
 	private Console mainScreen;
 
 	static {
 		// Instalamos el registro a disco
 		try {
-			if (Platform.getOS().equals(Platform.OS.MACOSX) || Platform.getOS().equals(Platform.OS.LINUX)) {
+			if (Platform.getOS().equals(Platform.OS.MACOSX)) {
+				final File appDir = new File (System.getenv("HOME"), "Library/Application Support/AutoFirma"); //$NON-NLS-1$ //$NON-NLS-2$
+				if (appDir.isDirectory() && appDir.canWrite() || appDir.mkdirs()) {
+					LogManager.install(App.AUTOFIRMA_CONFIGURATOR, appDir.getAbsolutePath());
+				}
+				else if (TMP.exists() && TMP.isDirectory() && TMP.canWrite()) {
+					LogManager.install(App.AUTOFIRMA_CONFIGURATOR, TMP.getAbsolutePath());
+				}
+				else if (TEMP.exists() && TEMP.isDirectory() && TEMP.canWrite()) {
+					LogManager.install(App.AUTOFIRMA_CONFIGURATOR, TEMP.getAbsolutePath());
+				}
+				else {
+					LogManager.install(App.AUTOFIRMA_CONFIGURATOR, System.getProperty("java.io.tmpdir")); //$NON-NLS-1$
+				}
+			}
+			else if (Platform.getOS().equals(Platform.OS.LINUX)) {
 				if (TMP.exists() && TMP.isDirectory() && TMP.canWrite()) {
 					LogManager.install(App.AUTOFIRMA_CONFIGURATOR, TMP.getAbsolutePath());
 				}
@@ -59,10 +91,17 @@ public class AutoFirmaConfigurator implements ConsoleListener {
 	}
 
 	/** Configurador de AutoFirma. */
-	public AutoFirmaConfigurator() {
+	public AutoFirmaConfigurator(final String[] args) {
+		this(new ConfigArgs(args));
+	}
+
+	/** Configurador de AutoFirma. */
+	public AutoFirmaConfigurator(final ConfigArgs config) {
+
+		this.config = config;
 
 		if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
-			this.configurator = new ConfiguratorWindows();
+			this.configurator = new ConfiguratorWindows(this.config.isJnlpInstance());
 		}
 		else if (Platform.OS.LINUX == Platform.getOS()){
 		    this.configurator = new ConfiguratorLinux();
@@ -82,15 +121,22 @@ public class AutoFirmaConfigurator implements ConsoleListener {
 	 * @throws GeneralSecurityException Cuando se produce un error al manipular los almacenes de certificados.
 	 * @throws ConfigurationException Cuando falla la generacion del certificados SSL.
 	 * @throws IOException Cuando no es posible cargar o manipular alg&uacute;n fichero de configuraci&oacute;n o recursos. */
-	public void configureAutoFirma() throws GeneralSecurityException, ConfigurationException, IOException {
+	public void configure() throws IOException, ConfigurationException, GeneralSecurityException {
 
 		if (this.configurator == null) {
 			LOGGER.warning("No se realizara ninguna accion"); //$NON-NLS-1$
 			return;
 		}
 
-		this.mainScreen = ConsoleManager.getConsole(this);
+		// Preparamos la consola para las trazas
+		this.mainScreen = ConsoleManager.getConsole(this.config.isHeadless() ? null : this);
 		this.mainScreen.showConsole();
+
+		// Si se indico por parametro que se trata de una desinstalacion, desinstalamos
+		if (this.config.isUninstallation()) {
+			uninstall();
+			return;
+		}
 
 		// Creamos el almacen para la configuracion del SSL
 		try {
@@ -113,20 +159,9 @@ public class AutoFirmaConfigurator implements ConsoleListener {
 		}
 	}
 
-	/** Devuelve la ventana padre del configurador.
-	 * @return Ventana padre del configurador. */
-	private Component getParentComponent() {
-		return this.mainScreen.getParentComponent();
-	}
-
 	/** Inicia la desinstalaci&oacute;n del certificado ra&iacute;z de confianza
 	 * del almac&eacute;n de claves. */
 	private void uninstall() {
-
-		if (this.configurator == null) {
-			LOGGER.warning("No se realizara ninguna accion"); //$NON-NLS-1$
-			return;
-		}
 
 		// Creamos el almacen para la configuracion del SSL
 		this.configurator.uninstall();
@@ -136,75 +171,94 @@ public class AutoFirmaConfigurator implements ConsoleListener {
      * @param exitCode C&oacute;digo de cierre de la aplicaci&oacute;n (negativo
      *                 indica error y cero indica salida normal. */
     public void closeApplication(final int exitCode) {
+    	this.closeApplication(exitCode, false);
+    }
+
+    /** Cierra la aplicaci&oacute;n.
+     * @param exitCode C&oacute;digo de cierre de la aplicaci&oacute;n (negativo
+     *                 indica error y cero indica salida normal.
+     * @param keepOpen Indica si hay que salir de la aplicaci&oacute;n. */
+    public void closeApplication(final int exitCode, final boolean keepOpen) {
         if (this.mainScreen != null) {
             this.mainScreen.dispose();
         }
-        System.exit(exitCode);
+
+        if (!keepOpen) {
+			System.exit(exitCode);
+		}
     }
-
-    /** Inicia el proceso de configuraci&oacute;n.
-	 * @param args No usa par&aacute;metros. */
-	public static void main(final String[] args) {
-
-		final AutoFirmaConfigurator configurator = new AutoFirmaConfigurator();
-
-		// Si se indico por parametro que se trata de una desinstalacion, desinstalamos
-		if (args != null && args.length > 0 && PARAMETER_UNISTALL.equalsIgnoreCase(args[0])) {
-			configurator.uninstall();
-			configurator.closeApplication(0);
-			return;
-		}
-
-		// Iniciamos la configuracion
-		try {
-			configurator.configureAutoFirma();
-		}
-		catch (final Exception e) {
-			LOGGER.log(Level.WARNING, "Error en la configuracion de AutoFirma: " + e, e); //$NON-NLS-1$
-			ConsoleManager.showErrorMessage(
-				configurator.getParentComponent(),
-				Messages.getString("AutoFirmaConfigurator.0") //$NON-NLS-1$
-			);
-			configurator.closeApplication(-1);
-		}
-		catch (final Error e) {
-			LOGGER.warning("Capturado error no controlado: " + e); //$NON-NLS-1$
-			e.printStackTrace();
-			ConsoleManager.showErrorMessage(
-				configurator.getParentComponent(),
-				Messages.getString("AutoFirmaConfigurator.1") //$NON-NLS-1$
-			);
-			configurator.closeApplication(-2);
-		}
-
-//		// Ejecutamos una operacion de red para que al usuario le aparezca
-//		// la opcion de dar permisos a la maquina virtual de Java
-//		try {
-//			AutoFirmaConfigurator.checkNetworkPermissions();
-//		} catch (final Exception e) {
-//			LOGGER.warning("Capturado error no controlado: " + e); //$NON-NLS-1$
-//			e.printStackTrace();
-//			ConsoleManager.showErrorMessage(
-//				configurator.getParentComponent(),
-//				Messages.getString("AutoFirmaConfigurator.6") //$NON-NLS-1$
-//			);
-//			configurator.closeApplication(-3);
-//		}
-
-		configurator.closeApplication(0);
-	}
-
-//	/**
-//	 * Comprueba la conectividad de red.
-//	 * @throws IOException Cuando no puede descargar datos de la red.
-//	 */
-//	private static void checkNetworkPermissions() throws IOException {
-//		UrlHttpManagerFactory.getInstalledManager()
-//		.readUrl("http://estaticos.redsara.es/comunes/autofirma/autofirma.version", UrlHttpMethod.GET);
-//	}
 
 	@Override
 	public void close() {
 		closeApplication(0);
 	}
+
+	/** Operaciones admitidas. */
+	private static enum Operation {
+		INSTALLATION,
+		UNINSTALLATION
+	}
+
+	/** Configuraci&oacute;n establecida para la ejecuci&oacute;n del configurador. */
+	private static class ConfigArgs {
+
+		private Operation op = Operation.INSTALLATION;
+		private boolean needKeep = false;
+		private boolean headless = false;
+		private boolean jnlpInstance = false;
+
+		public ConfigArgs(final String[] args) {
+			if (args != null) {
+				for (final String arg : args) {
+					if (PARAMETER_INSTALL.equalsIgnoreCase(arg)) {
+						this.op = Operation.INSTALLATION;
+					} else if (PARAMETER_UNINSTALL.equalsIgnoreCase(arg)) {
+						this.op = Operation.UNINSTALLATION;
+					} else if (PARAMETER_KEEP_OPEN.equalsIgnoreCase(arg)) {
+						this.needKeep = true;
+					} else if (PARAMETER_HEADLESS.equalsIgnoreCase(arg)) {
+						this.headless = true;
+					} else if (PARAMETER_JNLP_INSTANCE.equalsIgnoreCase(arg)) {
+						this.jnlpInstance = true;
+					}
+				}
+			}
+		}
+
+		public boolean isUninstallation() {
+			return this.op == Operation.UNINSTALLATION;
+		}
+
+		public boolean isNeedKeep() {
+			return this.needKeep;
+		}
+
+		public boolean isHeadless() {
+			return this.headless;
+		}
+
+		public boolean isJnlpInstance() {
+			return this.jnlpInstance;
+		}
+	}
+
+
+	/** Inicia el proceso de configuraci&oacute;n.
+	 * @param args No usa par&aacute;metros. */
+	public static void main(final String[] args) {
+
+		final ConfigArgs config = new ConfigArgs(args);
+		final AutoFirmaConfigurator configurator = new AutoFirmaConfigurator(config);
+
+		// Iniciamos la configuracion
+		try {
+			configurator.configure();
+		}
+		catch (final Exception e) {
+			configurator.closeApplication(-1, config.isNeedKeep());
+		}
+
+		configurator.closeApplication(0, config.isNeedKeep());
+	}
+
 }

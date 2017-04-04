@@ -88,7 +88,15 @@ final class ConfiguratorFirefoxWindows {
 			LOGGER.warning("No se pudo copiar certutil para la instalacion del certificado SSL raiz del almacen de Mozilla Firefox: " + e); //$NON-NLS-1$
 		}
 
-		checkCertUtil(appDir);
+		// Si no esta certUtil en el directorio o no puede usarse, se omite la instalacion
+		// del certificado SSL en Firefox
+		try {
+			checkCertUtil(appDir);
+		}
+		catch(final IOException e) {
+			LOGGER.warning("Se omite la configuracion del certificado SSL en Mozilla Firefox: " + e); //$NON-NLS-1$
+			return;
+		}
 
 		window.print(Messages.getString("ConfiguratorWindows.9")); //$NON-NLS-1$
 		for (final File profileDir : mozillaProfileDirs) {
@@ -414,7 +422,7 @@ final class ConfiguratorFirefoxWindows {
 	 * @param command Listado de part&iacute;culas que componen un comando.
 	 * @return Comando completo.
 	 */
-	private static String printCommand(String[] command) {
+	private static String printCommand(final String[] command) {
 		final StringBuilder sb = new StringBuilder();
 		for (final String s : command) {
 			sb.append(s);
