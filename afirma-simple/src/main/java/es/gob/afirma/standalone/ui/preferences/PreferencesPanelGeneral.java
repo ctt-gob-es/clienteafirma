@@ -41,6 +41,7 @@ import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.standalone.AutoFirmaUtil;
+import es.gob.afirma.standalone.SimpleAfirma;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 
 final class PreferencesPanelGeneral extends JPanel {
@@ -98,7 +99,9 @@ final class PreferencesPanelGeneral extends JPanel {
 		PreferencesManager.put(PREFERENCE_GENERAL_SIGNATURE_ALGORITHM, this.signarureAlgorithms.getSelectedItem().toString());
 		PreferencesManager.putBoolean(PREFERENCE_GENERAL_OMIT_ASKONCLOSE, this.avoidAskForClose.isSelected());
 		PreferencesManager.putBoolean(PREFERENCE_GENERAL_HIDE_DNIE_START_SCREEN, this.hideDniStartScreen.isSelected());
-		PreferencesManager.putBoolean(PREFERENCE_GENERAL_UPDATECHECK, this.checkForUpdates.isSelected());
+		if (SimpleAfirma.isUpdatesEnabled()) {
+			PreferencesManager.putBoolean(PREFERENCE_GENERAL_UPDATECHECK, this.checkForUpdates.isSelected());
+		}
 		PreferencesManager.putBoolean(PREFERENCE_GENERAL_USEANALYTICS, this.sendAnalytics.isSelected());
 
 		// Formatos por defecto
@@ -117,7 +120,9 @@ final class PreferencesPanelGeneral extends JPanel {
 		);
 		this.avoidAskForClose.setSelected(PreferencesManager.getBoolean(PREFERENCE_GENERAL_OMIT_ASKONCLOSE, false));
 		this.hideDniStartScreen.setSelected(PreferencesManager.getBoolean(PREFERENCE_GENERAL_HIDE_DNIE_START_SCREEN, false));
-		this.checkForUpdates.setSelected(PreferencesManager.getBoolean(PREFERENCE_GENERAL_UPDATECHECK, true));
+		if (SimpleAfirma.isUpdatesEnabled()) {
+			this.checkForUpdates.setSelected(PreferencesManager.getBoolean(PREFERENCE_GENERAL_UPDATECHECK, true));
+		}
 		this.sendAnalytics.setSelected(PreferencesManager.getBoolean(PREFERENCE_GENERAL_USEANALYTICS, true));
 
 		// Formatos por defecto
@@ -302,7 +307,7 @@ final class PreferencesPanelGeneral extends JPanel {
 		signConstraint.gridy++;
 
 		// Solo se buscaran actualizaciones automaticamente en Windows
-		if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
+		if (SimpleAfirma.isUpdatesEnabled() && Platform.OS.WINDOWS.equals(Platform.getOS())) {
 			this.checkForUpdates.getAccessibleContext().setAccessibleDescription(
 					SimpleAfirmaMessages.getString("PreferencesPanel.88") //$NON-NLS-1$
 					);
