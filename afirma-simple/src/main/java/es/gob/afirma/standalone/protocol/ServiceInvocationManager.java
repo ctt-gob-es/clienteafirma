@@ -160,7 +160,11 @@ public final class ServiceInvocationManager {
 
 		try {
 			// ruta de la que debe buscar el fichero
-			final File sslKeyStoreFile = new File(AutoFirmaUtil.getApplicationDirectory(), KEYSTORE_NAME);
+			final File sslKeyStoreFile = getKeyStoreFile();
+			if (sslKeyStoreFile == null) {
+				throw new KeyStoreException("No se encuentra el almacen para el cifrado de la comunicacion SSL"); //$NON-NLS-1$
+			}
+
 			// pass del fichero
 			final char ksPass[] = KSPASS.toCharArray();
 			final char ctPass[] = CTPASS.toCharArray();
@@ -170,7 +174,7 @@ public final class ServiceInvocationManager {
 			// key manager factory de tipo SunX509
 			final KeyManagerFactory kmf = KeyManagerFactory.getInstance(KEY_MANAGER_TYPE);
 			kmf.init(ks, ctPass);
-			// utilizamos istancia TLS
+
 			final SSLContext sc = SSLContext.getInstance(SSLCONTEXT);
 			sc.init(kmf.getKeyManagers(), null, null);
 			LOGGER.info("Iniciando servicio local de firma...: " + url); //$NON-NLS-1$
@@ -238,6 +242,44 @@ public final class ServiceInvocationManager {
 
 	}
 
+	/**
+	 * Obtiene el fichero del almac&eacute;n con la clave SSL de alguno de los directorios
+	 * del sistema en los que puede estar.
+	 * @return Almac&eacute;n de claves o {@code null} si no se encontr&oacute;.
+	 */
+	private static File getKeyStoreFile() {
+
+		final File appDir = AutoFirmaUtil.getApplicationDirectory();
+		if (appDir != null && new File(appDir, KEYSTORE_NAME).exists()) {
+			return new File(appDir, KEYSTORE_NAME);
+		}
+
+		if (Platform.getOS() == Platform.OS.WINDOWS) {
+			final String subPath = "AutoFirma" + File.separator + "AutoFirma"; //$NON-NLS-1$ //$NON-NLS-2$
+			String basePath = System.getenv("PROGRAMFILES"); //$NON-NLS-1$
+
+			if (basePath != null) {
+				if (new File(new File(basePath, subPath), KEYSTORE_NAME).exists()) {
+					return new File(new File(basePath, subPath), KEYSTORE_NAME);
+				}
+				basePath = basePath.endsWith(" (x86)") ? //$NON-NLS-1$
+						basePath.substring(0,  basePath.lastIndexOf(" (x86)")) : //$NON-NLS-1$
+							basePath + " (x86)"; //$NON-NLS-1$
+				if (new File(new File(basePath, subPath), KEYSTORE_NAME).exists()) {
+					return new File(new File(basePath, subPath), KEYSTORE_NAME);
+				}
+			}
+		}
+		else if (Platform.getOS() == Platform.OS.MACOSX) {
+			final File baseDir = new File("/Applications/AutoFirma.app/Contents/Resources/JAR"); //$NON-NLS-1$
+			if (new File(baseDir, KEYSTORE_NAME).exists()) {
+				return new File(baseDir, KEYSTORE_NAME);
+			}
+		}
+
+		return null;
+	}
+
 	/** Manda los datos de respuesta a la aplicaci&oacute;n.
 	 * @param response Respuesta al env&iacute;o.
 	 * @param socketChannel <code>SocketChannel</code> a donde mandar la respuesta.
@@ -294,8 +336,8 @@ public final class ServiceInvocationManager {
 		}
 		catch (final IOException e) {
 			throw new IllegalArgumentException(
-				"Los parametros de la URI de invocacion no estan el el formato correcto: " + url //$NON-NLS-1$
-			, e);
+				"Los parametros de la URI de invocacion no estan el el formato correcto: " + url, //$NON-NLS-1$
+				e);
 		}
 		final String ps = p.getProperty("ports"); //$NON-NLS-1$
 		checkNullParameter(ps, "La URI de invocacion no contiene el parametro 'ports': " + url); //$NON-NLS-1$
