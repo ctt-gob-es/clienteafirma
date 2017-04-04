@@ -99,12 +99,12 @@ final class ProtocolInvocationLauncherLoad {
 			}
 		} catch (final Exception e) {
 			LOGGER.severe("Error en la lectura de los datos a cargar: " + e); //$NON-NLS-1$
-			ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_00);
+			ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_25);
 			if (!bySocket) {
-				throw new SocketOperationException(ProtocolInvocationLauncherErrorManager.SAF_00);
+				throw new SocketOperationException(ProtocolInvocationLauncherErrorManager.SAF_25);
 			}
 			return ProtocolInvocationLauncherErrorManager
-					.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_00);
+					.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_25);
 		}
 		
 		return dataToSend.toString();
