@@ -234,8 +234,6 @@ final class ProtocolInvocationLauncherSignAndSave {
 		final PrivateKeyEntry pke;
 
 		if (options.getSticky() && ProtocolInvocationLauncher.getStickyKeyEntry() != null) {
-
-			LOGGER.info("Se usa Sticky Signature para Sign&Save y tenemos valor de clave privada");
 			pke = ProtocolInvocationLauncher.getStickyKeyEntry();
 
 		} else {
@@ -274,9 +272,6 @@ final class ProtocolInvocationLauncherSignAndSave {
 				pke = ksm.getKeyEntry(dialog.getSelectedAlias());
 
 				if (options.getSticky()) {
-
-					LOGGER.info("Se usa Sticky Signature para Sign&Save y establecemos valor de clave privada desde la selección");
-
 					ProtocolInvocationLauncher.setStickyKeyEntry(pke);
 				}
 			} catch (final AOCancelledOperationException e) {

@@ -271,9 +271,6 @@ final class ProtocolInvocationLauncherSign {
 				pke = ksm.getKeyEntry(dialog.getSelectedAlias());
 
 				if (options.getSticky()) {
-
-					LOGGER.info("Se usa Sticky Signature para Sign y establecemos valor de clave privada desde la selección"); //$NON-NLS-1$
-
 					ProtocolInvocationLauncher.setStickyKeyEntry(pke);
 				}
 			} catch (final AOCancelledOperationException e) {

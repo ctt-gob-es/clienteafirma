@@ -104,13 +104,9 @@ final class ProtocolInvocationLauncherBatch {
 				);
 				dialog.allowOpenExternalStores(filterManager.isExternalStoresOpeningAllowed());
 				dialog.show();
-				pke = ksm.getKeyEntry(
-					dialog.getSelectedAlias());
+				pke = ksm.getKeyEntry(dialog.getSelectedAlias());
 				
 				if (options.getSticky()) {
-
-					LOGGER.info("Se usa Sticky Signature y establecemos valor de clave privada desde la selección"); //$NON-NLS-1$
-
 					ProtocolInvocationLauncher.setStickyKeyEntry(pke);
 				}
 			}
@@ -137,7 +133,6 @@ final class ProtocolInvocationLauncherBatch {
 				}
 				return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_08);
 			}
-			
 		}	
 
 		String batchResult;

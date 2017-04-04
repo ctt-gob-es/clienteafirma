@@ -78,7 +78,8 @@ final class ProtocolInvocationLauncherSelectCert {
 			final PasswordCallback pwc = aoks.getStorePasswordCallback(null);
 			final AOKeyStoreManager ksm;
 			try {
-				ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(aoks, // Store
+				ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
+						aoks, // Store
 						aoksLib, // Lib
 						null, // Description
 						pwc, // PasswordCallback
@@ -96,31 +97,33 @@ final class ProtocolInvocationLauncherSelectCert {
 
 			LOGGER.info("Obtenido gestor de almacenes de claves: " + ksm); //$NON-NLS-1$
 
-			LOGGER.info("Cargando dialogo de seleccion de certificados..."); //$NON-NLS-1$
-
 			try {
 				ServiceInvocationManager.focusApplication();
-				final AOKeyStoreDialog dialog = new AOKeyStoreDialog(ksm, null, true, true, // showExpiredCertificates
-						true, // checkValidity
-						filters, mandatoryCertificate);
+				final AOKeyStoreDialog dialog = new AOKeyStoreDialog(
+					ksm,
+					null,
+					true,
+					true, // showExpiredCertificates
+					true, // checkValidity
+					filters,
+					mandatoryCertificate
+				);
 				dialog.allowOpenExternalStores(filterManager.isExternalStoresOpeningAllowed());
 				dialog.show();
 				pke = ksm.getKeyEntry(dialog.getSelectedAlias());
 
 				if (options.getSticky()) {
-
-					LOGGER.info(
-							"Se usa Sticky Signature para selectCert: establecemos valor de clave privada desde la selección siempre"); //$NON-NLS-1$
-
 					ProtocolInvocationLauncher.setStickyKeyEntry(pke);
 				}
-			} catch (final AOCancelledOperationException e) {
+			}
+			catch (final AOCancelledOperationException e) {
 				LOGGER.severe("Operacion cancelada por el usuario" + e); //$NON-NLS-1$
 				if (!bySocket) {
 					throw new SocketOperationException(getResultCancel());
 				}
 				return getResultCancel();
-			} catch (final AOCertificatesNotFoundException e) {
+			}
+			catch (final AOCertificatesNotFoundException e) {
 				LOGGER.severe("No hay certificados validos en el almacen: " + e); //$NON-NLS-1$
 				ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_19);
 				if (!bySocket) {
@@ -128,7 +131,8 @@ final class ProtocolInvocationLauncherSelectCert {
 				}
 				return ProtocolInvocationLauncherErrorManager
 						.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_19);
-			} catch (final Exception e) {
+			}
+			catch (final Exception e) {
 				LOGGER.severe("Error al mostrar el dialogo de seleccion de certificados: " + e); //$NON-NLS-1$
 				ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_08);
 				if (!bySocket) {
@@ -141,8 +145,7 @@ final class ProtocolInvocationLauncherSelectCert {
 		}
 
 		// Concatenamos el certificado utilizado para firmar y la firma con un
-		// separador
-		// para que la pagina pueda recuperar ambos
+		// separador para que la pagina pueda recuperar ambos
 		byte[] certEncoded;
 		try {
 			certEncoded = pke.getCertificateChain()[0].getEncoded();

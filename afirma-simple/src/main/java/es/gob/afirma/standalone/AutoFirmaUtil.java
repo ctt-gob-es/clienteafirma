@@ -117,17 +117,51 @@ public final class AutoFirmaUtil {
 	/** Recupera el directorio en el que se encuentra la aplicaci&oacute;n.
 	 * @return Directorio de ejecuci&oacute;n. */
 	public static File getApplicationDirectory() {
-		File appDir;
+
+		if (isJnlpDeployment()) {
+			if (Platform.getOS() == Platform.OS.WINDOWS) {
+				final String commonDir = System.getenv("ALLUSERSPROFILE"); //$NON-NLS-1$
+				final File appDir = new File (commonDir, "AutoFirma"); //$NON-NLS-1$
+				if (appDir.isDirectory() || appDir.mkdirs()) {
+					return appDir;
+				}
+			}
+			else if (Platform.getOS() == Platform.OS.MACOSX) {
+				final String userDir = System.getenv("HOME"); //$NON-NLS-1$
+				final File appDir = new File (userDir, "Library/Application Support/AutoFirma"); //$NON-NLS-1$
+				if (appDir.isDirectory() || appDir.mkdirs()) {
+					return appDir;
+				}
+			}
+			return new File(System.getProperty("java.io.tmpdir")); //$NON-NLS-1$
+		}
+
+		// Identificamos el directorio de instalacion
 		try {
-			appDir = new File(
+			return new File(
 				AutoFirmaUtil.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()
 			).getParentFile();
 		}
 		catch (final URISyntaxException e) {
 			LOGGER.warning("No se pudo localizar el directorio del fichero en ejecucion: " + e); //$NON-NLS-1$
-			appDir = null;
 		}
-		return appDir;
+
+		return null;
+	}
+
+	/**
+	 * Comprueba si estamos en un despliegue JNLP de la aplicaci&oacute;n.
+	 * @return {@code true} si estamos en un despliegue JNLP, {@code false}
+	 * en caso contrario.
+	 */
+	private static boolean isJnlpDeployment() {
+		try {
+			javax.jnlp.ServiceManager.lookup("javax.jnlp.ExtendedService"); //$NON-NLS-1$
+		}
+		catch (final Throwable e) {
+			return false;
+		}
+		return true;
 	}
 
 	/** Recupera el DPI de la pantalla principal.
