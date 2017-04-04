@@ -202,7 +202,7 @@ final class ProtocolInvocationLauncherSignAndSave {
 
 		// XXX: Codigo de soporte de firmas XAdES explicitas (Eliminar cuando se
 		// abandone el soporte de XAdES explicitas)
-		if (isXadesExplicitConfigurated(options.getSignatureFormat(), options.getExtraParams())) {
+		if (options.getOperation() == Operation.SIGN && isXadesExplicitConfigurated(options.getSignatureFormat(), options.getExtraParams())) {
 			LOGGER.warning(
 					"Se ha pedido una firma XAdES explicita, este formato dejara de soportarse en proximas versiones" //$NON-NLS-1$
 			);
@@ -234,8 +234,6 @@ final class ProtocolInvocationLauncherSignAndSave {
 		final PrivateKeyEntry pke;
 
 		if (options.getSticky() && ProtocolInvocationLauncher.getStickyKeyEntry() != null) {
-
-			LOGGER.info("Se usa Sticky Signature para Sign&Save y tenemos valor de clave privada");
 			pke = ProtocolInvocationLauncher.getStickyKeyEntry();
 
 		} else {
@@ -274,9 +272,6 @@ final class ProtocolInvocationLauncherSignAndSave {
 				pke = ksm.getKeyEntry(dialog.getSelectedAlias());
 
 				if (options.getSticky()) {
-
-					LOGGER.info("Se usa Sticky Signature para Sign&Save y establecemos valor de clave privada desde la selección");
-
 					ProtocolInvocationLauncher.setStickyKeyEntry(pke);
 				}
 			} catch (final AOCancelledOperationException e) {
