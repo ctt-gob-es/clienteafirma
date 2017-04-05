@@ -88,8 +88,7 @@ public final class UrlParametersForBatch extends UrlParameters {
 	void setBatchPostsignerUrl(final String url) {
 		this.batchPostSignerUrl = url;
 	}
-
-	@SuppressWarnings("unused")
+	
 	void setBatchParameters(final Map<String, String> params) throws ParameterException {
 
 		// idSession para el service Web. Con socket no se usa

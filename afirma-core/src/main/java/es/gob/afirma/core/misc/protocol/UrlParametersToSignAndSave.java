@@ -96,7 +96,7 @@ public final class UrlParametersToSignAndSave extends UrlParameters {
 	 * Opci&oacute;n de configuraci&oacute;n que determina si se debe mantener
 	 * el primer certificado seleccionado para todas las operaciones. 
 	 */
-	private Boolean sticky;
+	private boolean sticky;
 
 	/** Obtiene la versi&oacute;n m&iacute;nima requerida del aplicativo.
 	 * @return Versi&oacute;n m&iacute;nima requerida del aplicativo. */
@@ -155,8 +155,8 @@ public final class UrlParametersToSignAndSave extends UrlParameters {
 	 *         mantener el primer certificado seleccionado ({@code true}) o se
 	 *         debe pedir siempre que el usuario elija uno ({@code false})
 	 */
-	public Boolean getSticky() {
-		return sticky;
+	public boolean getSticky() {
+		return this.sticky;
 	}
 
 	/**
@@ -165,10 +165,10 @@ public final class UrlParametersToSignAndSave extends UrlParameters {
 	 *         mantener el primer certificado seleccionado ({@code true}) o se
 	 *         debe pedir siempre que el usuario elija uno ({@code false})
 	 */
-	public void setSticky(final Boolean sticky) {
+	public void setSticky(final boolean sticky) {
 		this.sticky = sticky;
 	}
-
+	
 	void setSignAndSaveParameters(final Map<String, String> params) throws ParameterException {
 
 		// Comprobamos que el identificador de sesion de la firma no sea mayor de un cierto numero de caracteres
@@ -282,9 +282,9 @@ public final class UrlParametersToSignAndSave extends UrlParameters {
 		
 		// Valor de parametro sticky
 		if (params.containsKey(STICKY_PARAM)) {
-			setSticky(new Boolean(params.get(STICKY_PARAM)));
+			setSticky(Boolean.parseBoolean(params.get(STICKY_PARAM)));
 		} else {
-			setSticky(Boolean.FALSE);
+			setSticky(false);
 		}
 
 		setDefaultKeyStore(UrlParameters.getDefaultKeyStoreName(params));
