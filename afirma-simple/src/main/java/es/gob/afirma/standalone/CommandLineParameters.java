@@ -46,7 +46,7 @@ final class CommandLineParameters {
 	public static final String MASSIVE_OP_COUNTERSIGN	= "countersign"; //$NON-NLS-1$
 	private static final String DEFAULT_MASSIVE_OP = MASSIVE_OP_SIGN;
 
-	private static final String DEFAULT_ALGORITHM = "SHA512withRSA"; //$NON-NLS-1$
+	private static final String DEFAULT_ALGORITHM = "SHA256withRSA"; //$NON-NLS-1$
 
 	private String store = null;
 	private String alias = null;
@@ -66,6 +66,16 @@ final class CommandLineParameters {
 
 	public CommandLineParameters(final String[] params) throws CommandLineException {
 
+		// Si solo hay un parametro y este es la ruta de un fichero, sera el de entrada
+		if (params.length == 1) {
+			if (new File(params[0]).isFile()) {
+				this.inputFile = new File(params[0]);
+				return;
+			}
+			throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.25", params[0])); //$NON-NLS-1$
+		}
+
+		// En caso de ser mas de 1, los parseamos entendiendo que el primero es la aplicacion
 		for (int i = 1; i < params.length; i++) {
 
 			if (PARAM_XML.equals(params[i])) {
