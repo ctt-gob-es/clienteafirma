@@ -100,6 +100,9 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
     /** Inicio (en min&uacute;sculas) de una ruta que invoca a la aplicaci&oacute;n por protocolo. */
     private static final String PROTOCOL_URL_START_LOWER_CASE = "afirma://"; //$NON-NLS-1$
 
+    /** Indica si esta permitida la b&uacute;squeda de actualizaciones de la aplicaci&oacute;n. */
+    private static boolean updatesEnabled = true;
+
     /** Modo de depuraci&oacute;n para toda la aplicaci&oacute;n. */
     public static final boolean DEBUG = false;
 
@@ -512,7 +515,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
         }
 
     	// Comprobamos actualizaciones si estan habilitadas y estamos en Windows
-        if (Platform.OS.WINDOWS.equals(Platform.getOS()) &&
+        if (updatesEnabled && Platform.OS.WINDOWS.equals(Platform.getOS()) &&
         		PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_UPDATECHECK, true)) {
 			Updater.checkForUpdates(null);
 		}
@@ -521,7 +524,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 		}
 
     	try {
-    		// Invocacion normal modo grafico
+    		// Invocacion por protocolo
     		if (args != null && args.length > 0 && args[0].toLowerCase().startsWith(PROTOCOL_URL_START_LOWER_CASE)) {
 
     			printSystemInfo();
@@ -530,6 +533,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
     			ProtocolInvocationLauncher.launch(args[0]);
     			System.exit(0);
     		}
+    		// Invocacion normal modo grafico
     		else {
 
     			if (!isSimpleAfirmaAlreadyRunning()) {
@@ -576,7 +580,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
     					}
     				}
 
-    				saf.initialize(null);
+   					saf.initialize(null);
     			}
     			else {
     				AOUIFactory.showErrorMessage(
@@ -619,9 +623,8 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
                         }
                     }
                 });
-                return false;
             }
-            return true;
+            return fileLock == null;
         }
         catch (final Exception e) {
         	LOGGER.warning("No se ha podido comprobar el bloqueo de instancia"); //$NON-NLS-1$
@@ -758,7 +761,25 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 	 * @param args Argumentos recibidos en la llamada a la aplicaci&oacute;n.
 	 * @return {@code true} si la llamada se debe procesar como si se hubiese recibido por linea de comandos.
 	 */
-	private static boolean isUsingCommnadLine(String[] args) {
+	private static boolean isUsingCommnadLine(final String[] args) {
 		return args != null && args.length > 0 && !args[0].toLowerCase().startsWith(PROTOCOL_URL_START_LOWER_CASE);
+	}
+
+	/**
+	 * Establece si las actualizaciones est&aacute;n permitidas.
+	 * @param enabled {@code true} si se permite la b&uacute;squeda y configuraci&oacute;n
+	 * de actualizaciones, {@code false} en caso contrario.
+	 */
+	public static void setUpdatesEnabled(final boolean enabled) {
+		updatesEnabled = enabled;
+	}
+
+	/**
+	 * Indica si las actualizaciones est&aacute;n permitidas.
+	 * @return {@code true} si se permite la b&uacute;squeda y configuraci&oacute;n
+	 * de actualizaciones, {@code false} en caso contrario.
+	 */
+	public static boolean isUpdatesEnabled() {
+		return updatesEnabled;
 	}
 }
