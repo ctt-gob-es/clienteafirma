@@ -54,7 +54,6 @@ final class RestoreConfigWindows implements RestoreConfig {
 	 * @see es.gob.afirma.standalone.ui.restoreconfig.RestoreConfig#restore(javax.swing.JTextArea)
 	 */
 	@Override
-	@SuppressWarnings("unused")
 	public void restore(final JTextArea taskOutput) throws IOException, GeneralSecurityException {
 
 		appendMessage(taskOutput, SimpleAfirmaMessages.getString("RestoreConfigWindows.2")); //$NON-NLS-1$
