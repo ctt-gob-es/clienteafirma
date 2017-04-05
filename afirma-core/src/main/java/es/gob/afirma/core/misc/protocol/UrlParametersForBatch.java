@@ -46,7 +46,7 @@ public final class UrlParametersForBatch extends UrlParameters {
 	 * Opci&oacute;n de configuraci&oacute;n que determina si se debe mantener
 	 * el primer certificado seleccionado para todas las operaciones. 
 	 */
-	private Boolean sticky;
+	private boolean sticky;
 
 	/** Obtiene la URL del servicio de preprocesado de lotes de firma.
 	 * @return URL del servicio de preprocesado de lotes de firma. */
@@ -65,8 +65,8 @@ public final class UrlParametersForBatch extends UrlParameters {
 	 *         mantener el primer certificado seleccionado ({@code true}) o se
 	 *         debe pedir siempre que el usuario elija uno ({@code false})
 	 */
-	public Boolean getSticky() {
-		return sticky;
+	public boolean getSticky() {
+		return this.sticky;
 	}
 
 	/**
@@ -75,7 +75,7 @@ public final class UrlParametersForBatch extends UrlParameters {
 	 *         mantener el primer certificado seleccionado ({@code true}) o se
 	 *         debe pedir siempre que el usuario elija uno ({@code false})
 	 */
-	public void setSticky(final Boolean sticky) {
+	public void setSticky(final boolean sticky) {
 		this.sticky = sticky;
 	}
 
@@ -89,6 +89,7 @@ public final class UrlParametersForBatch extends UrlParameters {
 		this.batchPostSignerUrl = url;
 	}
 
+	@SuppressWarnings("unused")
 	void setBatchParameters(final Map<String, String> params) throws ParameterException {
 
 		// idSession para el service Web. Con socket no se usa
@@ -175,7 +176,7 @@ public final class UrlParametersForBatch extends UrlParameters {
 			try {
 				setExtraParams(AOUtil.base642Properties(props));
 			}
-			catch (final Exception e) {
+			catch ( final Exception e) {
 				setExtraParams(new Properties());
 			}
 		}
@@ -185,9 +186,9 @@ public final class UrlParametersForBatch extends UrlParameters {
 		
 		// Valor de parametro sticky
 		if (params.containsKey(STICKY_PARAM)) {
-			setSticky(new Boolean(params.get(STICKY_PARAM)));
+			setSticky(Boolean.getBoolean(params.get(STICKY_PARAM)));
 		} else {
-			setSticky(Boolean.FALSE);
+			setSticky(false);
 		}
 
 		setDefaultKeyStore(getDefaultKeyStoreName(params));
