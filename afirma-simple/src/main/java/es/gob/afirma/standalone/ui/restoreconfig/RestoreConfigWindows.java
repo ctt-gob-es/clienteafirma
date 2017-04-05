@@ -54,13 +54,14 @@ final class RestoreConfigWindows implements RestoreConfig {
 	 * @see es.gob.afirma.standalone.ui.restoreconfig.RestoreConfig#restore(javax.swing.JTextArea)
 	 */
 	@Override
+	@SuppressWarnings("unused")
 	public void restore(final JTextArea taskOutput) throws IOException, GeneralSecurityException {
 
 		appendMessage(taskOutput, SimpleAfirmaMessages.getString("RestoreConfigWindows.2")); //$NON-NLS-1$
 
-		LOGGER.info("Ruta de appDir: " + appDir.getAbsolutePath()); //$NON-NLS-1$
+		LOGGER.info("Ruta de appDir: " + this.appDir.getAbsolutePath()); //$NON-NLS-1$
 
-		appendMessage(taskOutput, SimpleAfirmaMessages.getString("RestoreConfigWindows.3") + appDir.getAbsolutePath()); //$NON-NLS-1$
+		appendMessage(taskOutput, SimpleAfirmaMessages.getString("RestoreConfigWindows.3") + this.appDir.getAbsolutePath()); //$NON-NLS-1$
 
 		// Realizamos las comprobaciones para generar si es necesario,
 		// los certificados .pfx y/o .cer
@@ -80,7 +81,7 @@ final class RestoreConfigWindows implements RestoreConfig {
 			// certificado en su almacen
 			closeFirefox();
 			// El SO es Windows, es necesario obtener certutil
-			RestoreConfigFirefox.copyConfigurationFiles(appDir);
+			RestoreConfigFirefox.copyConfigurationFiles(this.appDir);
 
 			// En Windows, certutil no necesita privilegios de administrador
 			// para eliminar certificados de Firefox, pero si para
@@ -92,9 +93,9 @@ final class RestoreConfigWindows implements RestoreConfig {
 			LOGGER.info("Desinstalamos el certificado raiz del almacen de Firefox"); //$NON-NLS-1$
 			RestoreConfigFirefox.uninstallRootCAMozillaKeyStore(RestoreConfigUtil.getApplicationDirectory());
 			// Vuelvo a instalar lo que había o el nuevo cer generado
-			RestoreConfigFirefox.installRootCAMozillaKeyStore(appDir);
+			RestoreConfigFirefox.installRootCAMozillaKeyStore(this.appDir);
 			// Elimino certutil tras su uso
-			RestoreConfigFirefox.removeConfigurationFiles(appDir);
+			RestoreConfigFirefox.removeConfigurationFiles(this.appDir);
 
 		} catch (IOException e) { 
 			appendMessage(taskOutput, SimpleAfirmaMessages.getString("RestoreConfigWindows.3")); //$NON-NLS-1$
@@ -131,7 +132,7 @@ final class RestoreConfigWindows implements RestoreConfig {
 	 * @param appDir Ruta del directorio de la aplicaci&oacute;n
 	 * @throws IOException
 	 */
-	private void deleteInstalledCertificates(final File appDir) throws IOException {
+	private static void deleteInstalledCertificates(final File appDir) throws IOException {
 
 		if (checkSSLKeyStoreGenerated(appDir)) {
 
@@ -205,16 +206,15 @@ final class RestoreConfigWindows implements RestoreConfig {
 
 			p = pb.start();
 
-			final BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()));
+			try (final BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()))) {
 
-			while ((line = input.readLine()) != null) {
-				pidInfo += line;
+				while ((line = input.readLine()) != null) {
+					pidInfo += line;
+				}
 			}
-
-			input.close();
-
+			
 		} catch (final IOException e) {
-			LOGGER.severe("Ha ocurrido un error al ejecutar el comando " + process + " en Windows"); //$NON-NLS-1$ //$NON-NLS-2$
+			LOGGER.severe("Ha ocurrido un error al ejecutar el comando " + process + " en Windows. " + e.getMessage()); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
 		if (pidInfo.contains(process)) {
@@ -258,7 +258,7 @@ final class RestoreConfigWindows implements RestoreConfig {
 	 * @param message Texto a concatenar.
 	 */
 	private void appendMessage(final JTextArea taskOutput, final String message) {
-		taskOutput.append(message + newline);
+		taskOutput.append(message + this.newline);
 		taskOutput.setCaretPosition(taskOutput.getDocument().getLength());
 	}
 
@@ -310,7 +310,7 @@ final class RestoreConfigWindows implements RestoreConfig {
 					} catch (final KeyStoreException ke) {
 						appendMessage(taskOutput,
 								"No ha podido eliminarse alguna importacion previa del certificado raiz del almacen de Windows"); //$NON-NLS-1$
-						LOGGER.info("No ha podido eliminarse alguna importacion previa del certificado raiz del almacen de Windows"); //$NON-NLS-1$
+						LOGGER.info("No ha podido eliminarse alguna importacion previa del certificado raiz del almacen de Windows: " + ke.getMessage()); //$NON-NLS-1$
 					}
 				}
 
@@ -358,7 +358,7 @@ final class RestoreConfigWindows implements RestoreConfig {
 
 		}
 
-		return exito;
+		return exito.booleanValue();
 
 	}
 
@@ -416,10 +416,10 @@ final class RestoreConfigWindows implements RestoreConfig {
 		Certificate sslRoot = null;
 
 		// Si existe el .pfx, pero no el .cer, cargo el .pfx y extraigo el .cer
-		if (checkSSLKeyStoreGenerated(appDir) && !checkSSLRootCertificateGenerated(appDir)) {
+		if (checkSSLKeyStoreGenerated(this.appDir) && !checkSSLRootCertificateGenerated(this.appDir)) {
 
 			// Cargo el pfx
-			final File sslKeyStoreFile = new File(appDir, KS_FILENAME);
+			final File sslKeyStoreFile = new File(this.appDir, KS_FILENAME);
 			final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
 			final char ksPass[] = KS_PASSWORD.toCharArray();
 			ks.load(new FileInputStream(sslKeyStoreFile), ksPass);
@@ -430,10 +430,10 @@ final class RestoreConfigWindows implements RestoreConfig {
 			sslRoot = chain[1];
 
 			// Instalo el .cer a partir del .pfx
-			RestoreConfigUtil.installFile(sslRoot.getEncoded(), new File(appDir, FILE_AUTOFIRMA_CERTIFICATE));
+			RestoreConfigUtil.installFile(sslRoot.getEncoded(), new File(this.appDir, FILE_AUTOFIRMA_CERTIFICATE));
 
 			// Si no existe el pfx, debo generar ambos
-		} else if (!checkSSLKeyStoreGenerated(appDir)) {
+		} else if (!checkSSLKeyStoreGenerated(this.appDir)) {
 
 			final CertPack certPack = CertUtil.getCertPackForLocalhostSsl(RestoreConfigUtil.CERT_ALIAS, KS_PASSWORD);
 
@@ -441,17 +441,17 @@ final class RestoreConfigWindows implements RestoreConfig {
 
 			try {
 
-				deleteInstalledCertificates(appDir);
+				deleteInstalledCertificates(this.appDir);
 
 				appendMessage(taskOutput, SimpleAfirmaMessages.getString("RestoreConfigWindows.5")); //$NON-NLS-1$
 				// Instalacion del certificado pfx
-				RestoreConfigUtil.installFile(certPack.getPkcs12(), new File(appDir, KS_FILENAME));
+				RestoreConfigUtil.installFile(certPack.getPkcs12(), new File(this.appDir, KS_FILENAME));
 
 				sslRoot = certPack.getCaCertificate();
 
 				appendMessage(taskOutput, SimpleAfirmaMessages.getString("RestoreConfigWindows.11")); //$NON-NLS-1$
 				// Instalacion del certificado raiz .cer si no existe
-				RestoreConfigUtil.installFile(sslRoot.getEncoded(), new File(appDir, FILE_AUTOFIRMA_CERTIFICATE));
+				RestoreConfigUtil.installFile(sslRoot.getEncoded(), new File(this.appDir, FILE_AUTOFIRMA_CERTIFICATE));
 
 			} catch (final IOException e) {
 				appendMessage(taskOutput, SimpleAfirmaMessages.getString("RestoreConfigWindows.17")); //$NON-NLS-1$
@@ -471,7 +471,7 @@ final class RestoreConfigWindows implements RestoreConfig {
 		FileInputStream fis;
 		Certificate cert = null;
 
-		fis = new FileInputStream(new File(appDir, FILE_AUTOFIRMA_CERTIFICATE).getAbsolutePath());
+		fis = new FileInputStream(new File(this.appDir, FILE_AUTOFIRMA_CERTIFICATE).getAbsolutePath());
 
 		final BufferedInputStream bis = new BufferedInputStream(fis);
 
@@ -511,7 +511,7 @@ final class RestoreConfigWindows implements RestoreConfig {
 			}
 
 		} catch (final Exception e) {
-			LOGGER.severe("Ha ocurrido un error al determinar si AutoFirma se ejecuta como administrador"); //$NON-NLS-1$
+			LOGGER.severe("Ha ocurrido un error al determinar si AutoFirma se ejecuta como administrador: " + e.getMessage()); //$NON-NLS-1$
 		}
 
 		return isAdmin;

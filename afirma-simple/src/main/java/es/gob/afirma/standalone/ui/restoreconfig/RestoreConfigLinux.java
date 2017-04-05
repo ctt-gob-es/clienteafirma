@@ -101,8 +101,7 @@ final class RestoreConfigLinux implements RestoreConfig {
 			RestoreConfigFirefox.installRootCAMozillaKeyStore(appDir, command);
 		} catch (final MozillaProfileNotFoundException e) {
 			appendMessage(taskOutput, SimpleAfirmaMessages.getString("RestoreConfigLinux.12")); //$NON-NLS-1$
-			// LOGGER.warning(Messages.getString("RestoreConfigLinux.12"));
-			// //$NON-NLS-1$
+			LOGGER.warning("Error al obtener los perfiles de usuario de Mozilla Firefox: " + e.getMessage()); //$NON-NLS-1$
 		}
 
 		appendMessage(taskOutput, SimpleAfirmaMessages.getString("RestoreConfigLinux.15")); //$NON-NLS-1$
@@ -181,7 +180,7 @@ final class RestoreConfigLinux implements RestoreConfig {
 	 * @param taskOutput JTextArea donde el texto es concatenado
 	 * @param message Texto a concatenar.
 	 */
-	private void appendMessage(final JTextArea taskOutput, final String message) {
+	private static void appendMessage(final JTextArea taskOutput, final String message) {
 		taskOutput.append(message + newline);
 		taskOutput.setCaretPosition(taskOutput.getDocument().getLength());
 	}
@@ -192,7 +191,7 @@ final class RestoreConfigLinux implements RestoreConfig {
 	 * @param appDir Ruta del directorio de la aplicaci&oacute;n
 	 * @throws IOException
 	 */
-	private void deleteInstalledCertificates(final File appDir) throws IOException {
+	private static void deleteInstalledCertificates(final File appDir) throws IOException {
 
 		if (checkSSLKeyStoreGenerated(appDir)) {
 
@@ -262,16 +261,15 @@ final class RestoreConfigLinux implements RestoreConfig {
 
 			p = new ProcessBuilder(commands).start();
 
-			final BufferedReader input =  new BufferedReader(new InputStreamReader(p.getInputStream()));
+			try (final BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()))) {
 
-			while ((line = input.readLine()) != null) {
-			    pidInfo+=line;
+				while ((line = input.readLine()) != null) {
+					pidInfo += line;
+				}
 			}
-
-			input.close();
-
+			
 		} catch (final IOException e) {
-			LOGGER.severe("Error al detectar si el proceso " + process + " esta activo"); //$NON-NLS-1$ //$NON-NLS-2$
+			LOGGER.severe("Error al detectar si el proceso " + process + " esta activo: " + e.getMessage()); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
 		if(pidInfo.contains(process))
@@ -309,11 +307,11 @@ final class RestoreConfigLinux implements RestoreConfig {
 				throw new IOException("No puedo eliminar AutoFirma.js"); //$NON-NLS-1$
 			}
 		}
+		
+		try (final FileOutputStream fout = new FileOutputStream(protocolScript, true)) {
+			fout.write(sb.toString().getBytes());
+		}
 
-		final FileOutputStream fout = new FileOutputStream(protocolScript, true);
-		fout.write(sb.toString().getBytes());
-		fout.close();
-
-		return false;
+		return Boolean.FALSE;
 	}
 }
