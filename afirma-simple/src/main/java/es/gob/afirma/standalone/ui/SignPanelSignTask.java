@@ -137,7 +137,7 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
         p.putAll(System.getProperties());
 
         final String signatureAlgorithm = PreferencesManager.get(
-    		PreferencesManager.PREFERENCE_GENERAL_SIGNATURE_ALGORITHM, "SHA512withRSA" //$NON-NLS-1$
+    		PreferencesManager.PREFERENCE_GENERAL_SIGNATURE_ALGORITHM, "SHA256withRSA" //$NON-NLS-1$
 		);
 
         final byte[] signResult;
@@ -263,9 +263,9 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
                 };
                 filterDescription = SimpleAfirmaMessages.getString("SignPanel.92"); //$NON-NLS-1$
         	}
-        	else if (newFileName.toLowerCase().endsWith("xslx")) { //$NON-NLS-1$
+        	else if (newFileName.toLowerCase().endsWith("xlsx")) { //$NON-NLS-1$
                 filterExtensions = new String[] {
-                    "xslx" //$NON-NLS-1$
+                    "xlsx" //$NON-NLS-1$
                 };
                 filterDescription = SimpleAfirmaMessages.getString("SignPanel.93"); //$NON-NLS-1$
         	}
