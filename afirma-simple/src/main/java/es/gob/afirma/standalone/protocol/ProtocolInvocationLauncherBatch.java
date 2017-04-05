@@ -108,6 +108,8 @@ final class ProtocolInvocationLauncherBatch {
 				
 				if (options.getSticky()) {
 					ProtocolInvocationLauncher.setStickyKeyEntry(pke);
+				} else {
+					ProtocolInvocationLauncher.setStickyKeyEntry(null);
 				}
 			}
 			catch (final AOCancelledOperationException e) {

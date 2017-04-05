@@ -114,6 +114,8 @@ final class ProtocolInvocationLauncherSelectCert {
 
 				if (options.getSticky()) {
 					ProtocolInvocationLauncher.setStickyKeyEntry(pke);
+				} else {
+					ProtocolInvocationLauncher.setStickyKeyEntry(null);
 				}
 			}
 			catch (final AOCancelledOperationException e) {
