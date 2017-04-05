@@ -272,6 +272,8 @@ final class ProtocolInvocationLauncherSign {
 
 				if (options.getSticky()) {
 					ProtocolInvocationLauncher.setStickyKeyEntry(pke);
+				} else {
+					ProtocolInvocationLauncher.setStickyKeyEntry(null);
 				}
 			} catch (final AOCancelledOperationException e) {
 				LOGGER.severe("Operacion cancelada por el usuario" + e); //$NON-NLS-1$
