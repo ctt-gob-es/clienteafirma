@@ -428,6 +428,10 @@ public final class SignPanel extends JPanel {
             }
         }, true);
         setVisible(true);
+
+        if (getFilePanel() != null && getDropTgt() != null) {
+        	getFilePanel().setDropTarget(getDropTgt());
+        }
     }
 
     /** Construye el panel de firma, en el que se selecciona y se firma un fichero.
