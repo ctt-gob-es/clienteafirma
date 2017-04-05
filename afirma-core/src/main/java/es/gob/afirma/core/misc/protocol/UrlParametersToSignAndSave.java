@@ -283,7 +283,7 @@ public final class UrlParametersToSignAndSave extends UrlParameters {
 		
 		// Valor de parametro sticky
 		if (params.containsKey(STICKY_PARAM)) {
-			setSticky(Boolean.getBoolean(params.get(STICKY_PARAM)));
+			setSticky(Boolean.parseBoolean(params.get(STICKY_PARAM)));
 		} else {
 			setSticky(false);
 		}

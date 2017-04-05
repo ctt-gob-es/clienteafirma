@@ -184,7 +184,7 @@ public final class UrlParametersToLoad extends UrlParameters {
 		// Parametro que indica si se debe utilizar el dialogo de seleccion
 		// simple o multiple de ficheros
 		if (params.containsKey(MULTILOAD_PARAM)) {
-			setMultiload(Boolean.getBoolean(params.get(MULTILOAD_PARAM)));
+			setMultiload(Boolean.parseBoolean(params.get(MULTILOAD_PARAM)));
 		}
 		else {
 			setMultiload(false);
