@@ -39,7 +39,7 @@ public final class UrlParametersToLoad extends UrlParameters {
 	/**
 	 * Atributo que representa si se trata de una operaci&oacute;n de carga ({@code false}}) o multicarga ({@code true}})
 	 */
-	private Boolean multiload;
+	private boolean multiload;
 	
 	/**
 	 * Atributo que representa el t&iacute;tulo de la ventana de di&aacute;logo de selecci&oacute;n de fichero
@@ -70,7 +70,7 @@ public final class UrlParametersToLoad extends UrlParameters {
 	 */
 	UrlParametersToLoad() {
 		setMinimumVersion(null);
-		setMultiload(null);
+		setMultiload(false);
 		setTitle(null);
 		setExtensions(null);
 		setDescription(null);
@@ -90,7 +90,7 @@ public final class UrlParametersToLoad extends UrlParameters {
 	 * @param multiload Valor del tipo de &oacute;n: ({@code false}}) para carga o
 	 *            ({@code true}}) para multicarga
 	 */
-	public void setMultiload(final Boolean multiload) {
+	public void setMultiload(final boolean multiload) {
 		this.multiload = multiload;
 	}
 	
@@ -101,7 +101,7 @@ public final class UrlParametersToLoad extends UrlParameters {
 	 *            Valor del tipo de &oacute;n: ({@code false}}) para carga o
 	 *            ({@code true}}) para multicarga
 	 */
-	public Boolean getMultiload() {
+	public boolean getMultiload() {
 		return this.multiload;
 	}
 	
@@ -110,7 +110,7 @@ public final class UrlParametersToLoad extends UrlParameters {
 	 * @return T&iacute;tulo del di&aacute;logo de carga de datos.
 	 */
 	public String getTitle() {
-		return title;
+		return this.title;
 	}
 
 	/** Establece el t&iacute;tulo del di&aacute;logo de carga de datos.
@@ -125,7 +125,7 @@ public final class UrlParametersToLoad extends UrlParameters {
 	 * @return Lista separada por comas con las extensiones para el fichero(s) a cargar.
 	 */
 	public String getExtensions() {
-		return extensions;
+		return this.extensions;
 	}
 
 	/** Establece las extensiones permitidas para el fichero(s) a cargar.
@@ -140,7 +140,7 @@ public final class UrlParametersToLoad extends UrlParameters {
 	 * @return Descripci&oacute;n del tipo de fichero a cargar.
 	 */
 	public String getDescription() {
-		return description;
+		return this.description;
 	}
 
 	/** Establece la descripci&oacute;n del tipo de fichero a cargar.
@@ -155,7 +155,7 @@ public final class UrlParametersToLoad extends UrlParameters {
 	 * @return Ruta por defecto para cargar ficheros
 	 */
 	public String getFilepath() {
-		return filepath;
+		return this.filepath;
 	}
 
 	/**
@@ -184,10 +184,10 @@ public final class UrlParametersToLoad extends UrlParameters {
 		// Parametro que indica si se debe utilizar el dialogo de seleccion
 		// simple o multiple de ficheros
 		if (params.containsKey(MULTILOAD_PARAM)) {
-			setMultiload(Boolean.valueOf(params.get(MULTILOAD_PARAM)));
+			setMultiload(Boolean.getBoolean(params.get(MULTILOAD_PARAM)));
 		}
 		else {
-			setMultiload(Boolean.FALSE);
+			setMultiload(false);
 		}
 				
 		if (params.containsKey(TITLE_PARAM)) {
@@ -209,7 +209,7 @@ public final class UrlParametersToLoad extends UrlParameters {
 			setDescription(null);
 		}
 		
-		if (params.containsKey(FILEPATH_PARAM) && !"".equals(params.get(FILEPATH_PARAM))) {
+		if (params.containsKey(FILEPATH_PARAM) && !"".equals(params.get(FILEPATH_PARAM))) { //$NON-NLS-1$
 			setFilepath(params.get(FILEPATH_PARAM));
 		} else {
 			
