@@ -25,7 +25,6 @@ import java.awt.event.ItemListener;
 import java.awt.event.KeyListener;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.prefs.BackingStoreException;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
@@ -51,6 +50,7 @@ final class PreferencesPanelGeneral extends JPanel {
 	static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	private final PreferencesPanel preferencesPanel;
+
 	PreferencesPanel getPrefPanel() {
 		return this.preferencesPanel;
 	}
@@ -83,13 +83,21 @@ final class PreferencesPanelGeneral extends JPanel {
 	DisposableInterface getDisposableInterface() {
 		return this.disposableInterface;
 	}
+	
+	/**
+	 * Atributo para gestionar el bloqueo de propiedades.
+	 */
+	private boolean unprotected = true;
 
 	PreferencesPanelGeneral(final KeyListener keyListener,
 			                final ItemListener modificationListener,
 			                final DisposableInterface di,
-			                final PreferencesPanel prefPanel) {
+			                final PreferencesPanel prefPanel,
+			                final boolean unprotected) {
 		this.disposableInterface = di;
 		this.preferencesPanel = prefPanel;
+		
+		this.unprotected = unprotected;
 
 		createUI(keyListener, modificationListener);
 	}
@@ -132,6 +140,50 @@ final class PreferencesPanelGeneral extends JPanel {
 		this.odfFilesCombo.setSelectedItem(PreferencesManager.get(PREFERENCE_GENERAL_DEFAULT_FORMAT_ODF, ODF));
 		this.xmlFilesCombo.setSelectedItem(PreferencesManager.get(PREFERENCE_GENERAL_DEFAULT_FORMAT_XML, XADES));
 		this.binFilesCombo.setSelectedItem(PreferencesManager.get(PREFERENCE_GENERAL_DEFAULT_FORMAT_BIN, CADES));
+	}
+	
+	/**
+	 * Carga las opciones de configuraci&oacute;n por defecto del panel general
+	 * desde un fichero externo de preferencias.
+	 * 
+	 * @param unprotected
+	 *            {@code true} Si las opciones de configuraci&oacute;n sensibles
+	 *            a ello est&aacute;n protegidas y no pueden ser modificadas,
+	 *            {@code false} en caso contrario
+	 */
+	void loadDefaultPreferences() {
+
+		
+		this.avoidAskForClose.setSelected(PreferencesManager.getBooleanPreference(PREFERENCE_GENERAL_OMIT_ASKONCLOSE, false));
+		this.hideDniStartScreen.setSelected(PreferencesManager.getBooleanPreference(PREFERENCE_GENERAL_HIDE_DNIE_START_SCREEN, false));
+		this.checkForUpdates.setSelected(PreferencesManager.getBooleanPreference(PREFERENCE_GENERAL_UPDATECHECK, true));
+		this.sendAnalytics.setSelected(PreferencesManager.getBooleanPreference(PREFERENCE_GENERAL_USEANALYTICS, true));
+
+		// Para las preferencias susceptibles de ser protegidas, comprobamos la
+		// preferencia unprotected antes de cargar su valor por defecto.
+		// Un valor unprotected a false habilitará que cualquier opción de
+		// configuración pueda ser alterada por parte del usuario mediante el
+		// interfaz gráfico. Este comportamiento se generaliza para el boton de
+		// restaurar las preferencias por defecto.
+		if (!isUnprotected()) {
+			this.signarureAlgorithms
+					.setSelectedItem(PreferencesManager.getPreference(PREFERENCE_GENERAL_SIGNATURE_ALGORITHM, "SHA256withRSA") //$NON-NLS-1$
+			);
+
+			// Formatos por defecto
+			this.pdfFilesCombo
+					.setSelectedItem(PreferencesManager.getPreference(PREFERENCE_GENERAL_DEFAULT_FORMAT_PDF, PADES));
+			this.ooxmlFilesCombo
+					.setSelectedItem(PreferencesManager.getPreference(PREFERENCE_GENERAL_DEFAULT_FORMAT_OOXML, OOXML));
+			this.facturaeFilesCombo.setSelectedItem(
+					PreferencesManager.getPreference(PREFERENCE_GENERAL_DEFAULT_FORMAT_FACTURAE, FACTURAE));
+			this.odfFilesCombo
+					.setSelectedItem(PreferencesManager.getPreference(PREFERENCE_GENERAL_DEFAULT_FORMAT_ODF, ODF));
+			this.xmlFilesCombo
+					.setSelectedItem(PreferencesManager.getPreference(PREFERENCE_GENERAL_DEFAULT_FORMAT_XML, XADES));
+			this.binFilesCombo
+					.setSelectedItem(PreferencesManager.getPreference(PREFERENCE_GENERAL_DEFAULT_FORMAT_BIN, CADES));
+		}
 	}
 
 	void createUI(final KeyListener keyListener,
@@ -184,7 +236,7 @@ final class PreferencesPanelGeneral extends JPanel {
 							return;
 						}
 						try {
-							PreferencesPlistHandler.importPreferencesFromUrl(url);
+							PreferencesPlistHandler.importPreferencesFromUrl(url, isUnprotected());
 						}
 						catch(final Exception e) {
 							LOGGER.log(
@@ -220,7 +272,7 @@ final class PreferencesPanelGeneral extends JPanel {
 							// Operacion cancelada por el usuario
 							return;
 						}
-						PreferencesPlistHandler.importPreferences(configFilePath, getParent());
+						PreferencesPlistHandler.importPreferences(configFilePath, getParent(), isUnprotected());
 					}
 					AOUIFactory.showMessageDialog(
 							getParent(),
@@ -235,42 +287,31 @@ final class PreferencesPanelGeneral extends JPanel {
 		importConfigFromFileButton.getAccessibleContext().setAccessibleDescription(
 			SimpleAfirmaMessages.getString("PreferencesPanel.112") //$NON-NLS-1$
 		);
+		
+		//importConfigFromFileButton.setEnabled(unprotected);
 
 		final JButton restoreConfigFromFileButton = new JButton(
 			SimpleAfirmaMessages.getString("PreferencesPanel.135") //$NON-NLS-1$
 		);
 
 		restoreConfigFromFileButton.setMnemonic('R');
-		restoreConfigFromFileButton.addActionListener(
-			new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent ae) {
-					if (AOUIFactory.showConfirmDialog(
-						getParent(),
-						SimpleAfirmaMessages.getString("PreferencesPanel.140"), //$NON-NLS-1$
+		restoreConfigFromFileButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent ae) {
+				if (AOUIFactory.showConfirmDialog(getParent(), SimpleAfirmaMessages.getString("PreferencesPanel.140"), //$NON-NLS-1$
 						SimpleAfirmaMessages.getString("PreferencesPanel.139"), //$NON-NLS-1$
-						JOptionPane.YES_NO_OPTION,
-			            JOptionPane.WARNING_MESSAGE
-					) == JOptionPane.YES_OPTION) {
-						try {
-							PreferencesManager.clearAll();
-							getPrefPanel().loadPreferences();
-						} catch (final BackingStoreException e) {
-							LOGGER.severe("Error eliminando las preferencias de la aplicacion: " + e); //$NON-NLS-1$
-							AOUIFactory.showErrorMessage(
-								getParent(),
-								SimpleAfirmaMessages.getString("PreferencesPanel.141"), //$NON-NLS-1$
-								SimpleAfirmaMessages.getString("PreferencesPanel.117"), //$NON-NLS-1$
-								JOptionPane.ERROR_MESSAGE
-							);
-						}
-					}
+						JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) {
+
+					loadDefaultPreferences();
+
 				}
 			}
-		);
+		});
 		restoreConfigFromFileButton.getAccessibleContext().setAccessibleDescription(
 			SimpleAfirmaMessages.getString("PreferencesPanel.136") //$NON-NLS-1$
 		);
+		
+		//restoreConfigFromFileButton.setEnabled(unprotected);
 
 		final JPanel panel = new JPanel();
 		panel.setLayout(new FlowLayout(FlowLayout.LEFT));
@@ -365,6 +406,7 @@ final class PreferencesPanelGeneral extends JPanel {
 				}
 			)
 		);
+		this.signarureAlgorithms.setEnabled(!isUnprotected());
 		signatureAgorithmPanel.add(this.signarureAlgorithms);
 
 		signGeneralPanel.add(signatureAgorithmPanel, c);
@@ -397,6 +439,8 @@ final class PreferencesPanelGeneral extends JPanel {
 		proxyConfigButton.getAccessibleContext().setAccessibleDescription(
 			SimpleAfirmaMessages.getString("PreferencesPanel.127") //$NON-NLS-1$
 		);
+		
+		proxyConfigButton.setEnabled(!isUnprotected());
 
 		final JLabel proxyLabel = new JLabel(SimpleAfirmaMessages.getString("PreferencesPanel.128")); //$NON-NLS-1$
 		proxyLabel.setLabelFor(proxyConfigButton);
@@ -420,6 +464,8 @@ final class PreferencesPanelGeneral extends JPanel {
 	/** Crea el panel con la configuraci&oacute;n de los formatos de firma a utilizar con cada tipo de fichero.
 	 * @param modificationListener Listener para la detecci&oacute;n de cambio de configuraci&oacute;n.
 	 * @param keyListener Listener para la deteccion del uso de teclas para el cierre de la pantalla.
+	 * @param unprotected <code>true</code> para permitir al usuario realizar cualquier modificaci&oacute;n en las preferencias,
+	 *                    <code>false</code> para limitar las preferencias que puede modificar.
 	 * @return Panel con los componentes de configuraci&oacute;n. */
 	private JPanel createSignatureFormatPanel(
 			final ItemListener modificationListener,
@@ -444,6 +490,7 @@ final class PreferencesPanelGeneral extends JPanel {
 		pdfFilesLabel.setLabelFor(this.pdfFilesCombo);
 		this.pdfFilesCombo.addItemListener(modificationListener);
 		this.pdfFilesCombo.addKeyListener(keyListener);
+		this.pdfFilesCombo.setEnabled(!isUnprotected());
 		c.gridx = 0;
 		c.weightx = 0;
 		signatureDefaultsFormats.add(pdfFilesLabel, c);
@@ -457,6 +504,8 @@ final class PreferencesPanelGeneral extends JPanel {
 		ooxmlFilesLabel.setLabelFor(this.ooxmlFilesCombo);
 		this.ooxmlFilesCombo.addItemListener(modificationListener);
 		this.ooxmlFilesCombo.addKeyListener(keyListener);
+		this.ooxmlFilesCombo.setEnabled(!isUnprotected());
+		
 		c.gridx = 0;
 		c.weightx = 0;
 		signatureDefaultsFormats.add(ooxmlFilesLabel, c);
@@ -470,6 +519,8 @@ final class PreferencesPanelGeneral extends JPanel {
 		facturaeFilesLabel.setLabelFor(this.facturaeFilesCombo);
 		this.facturaeFilesCombo.addItemListener(modificationListener);
 		this.facturaeFilesCombo.addKeyListener(keyListener);
+		this.facturaeFilesCombo.setEnabled(!isUnprotected());
+		
 		c.gridx = 0;
 		c.weightx = 0;
 		signatureDefaultsFormats.add(facturaeFilesLabel, c);
@@ -483,6 +534,8 @@ final class PreferencesPanelGeneral extends JPanel {
 		xmlFilesLabel.setLabelFor(this.xmlFilesCombo);
 		this.xmlFilesCombo.addItemListener(modificationListener);
 		this.xmlFilesCombo.addKeyListener(keyListener);
+		this.xmlFilesCombo.setEnabled(!isUnprotected());
+		
 		c.gridx = 0;
 		c.weightx = 0;
 		signatureDefaultsFormats.add(xmlFilesLabel, c);
@@ -496,6 +549,8 @@ final class PreferencesPanelGeneral extends JPanel {
 		odfFilesLabel.setLabelFor(this.odfFilesCombo);
 		this.odfFilesCombo.addItemListener(modificationListener);
 		this.odfFilesCombo.addKeyListener(keyListener);
+		this.odfFilesCombo.setEnabled(!isUnprotected());
+		
 		c.gridx = 0;
 		c.weightx = 0;
 		signatureDefaultsFormats.add(odfFilesLabel, c);
@@ -509,6 +564,8 @@ final class PreferencesPanelGeneral extends JPanel {
 		binFilesLabel.setLabelFor(this.binFilesCombo);
 		this.binFilesCombo.addItemListener(modificationListener);
 		this.binFilesCombo.addKeyListener(keyListener);
+		this.binFilesCombo.setEnabled(!isUnprotected());
+		
 		c.gridx = 0;
 		c.weightx = 0;
 		signatureDefaultsFormats.add(binFilesLabel, c);
@@ -579,4 +636,20 @@ final class PreferencesPanelGeneral extends JPanel {
 			);
     	}
     }
+    
+    /**
+	 * M&eacute;todo getter del atributo unprotected
+	 * @return the unprotected
+	 */
+	public boolean isUnprotected() {
+		return this.unprotected;
+	}
+
+	/**
+	 * M&eacute;todo setter del atributo unprotected
+	 * @param unprotected the unprotected to set
+	 */
+	public void setUnprotected(boolean unprotected) {
+		this.unprotected = unprotected;
+	}
 }

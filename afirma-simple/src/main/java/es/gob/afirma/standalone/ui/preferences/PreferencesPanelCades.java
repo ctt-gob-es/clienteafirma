@@ -31,6 +31,11 @@ final class PreferencesPanelCades extends JPanel {
 	private static final long serialVersionUID = -2410844527428138817L;
 
 	private static final String SIGN_FORMAT_CADES = "CAdES"; //$NON-NLS-1$
+	
+	/**
+	 * Atributo que permite gestionar el bloqueo de preferencias.
+	 */
+	private boolean unprotected = true;
 
 	private static final AdESPolicy POLICY_CADES_PADES_AGE_1_9 = new AdESPolicy(
 		"2.16.724.1.3.1.1.2.1.9", //$NON-NLS-1$
@@ -45,8 +50,10 @@ final class PreferencesPanelCades extends JPanel {
 	private final JCheckBox cadesImplicit = new JCheckBox(SimpleAfirmaMessages.getString("PreferencesPanel.1")); //$NON-NLS-1$
 
 	PreferencesPanelCades(final KeyListener keyListener,
-						  final ModificationListener modificationListener) {
+						  final ModificationListener modificationListener,
+						  final boolean unprotected) {
 
+		this.unprotected = unprotected;
 		createUI(keyListener, modificationListener);
 	}
 
@@ -81,6 +88,7 @@ final class PreferencesPanelCades extends JPanel {
 	    this.cadesImplicit.setMnemonic('i');
 	    this.cadesImplicit.addItemListener(modificationListener);
 	    this.cadesImplicit.addKeyListener(keyListener);
+	    this.cadesImplicit.setEnabled(this.unprotected);
 	    signatureMode.add(this.cadesImplicit);
 
 	    c.gridy++;
@@ -130,7 +138,7 @@ final class PreferencesPanelCades extends JPanel {
 	}
 
 	void loadPreferences() {
-		this.cadesImplicit.setSelected(PreferencesManager.getBoolean(PREFERENCE_CADES_IMPLICIT, true));
+		this.cadesImplicit.setSelected(PreferencesManager.getBooleanPreference(PREFERENCE_CADES_IMPLICIT, true));
 
         final List<PolicyPanel.PolicyItem> cadesPolicies = new ArrayList<>();
         cadesPolicies.add(
@@ -145,7 +153,8 @@ final class PreferencesPanelCades extends JPanel {
     		SIGN_FORMAT_CADES,
     		cadesPolicies,
     		getCadesPreferedPolicy(),
-    		null
+    		null,
+    		unprotected
         );
 
         final GridBagConstraints c = new GridBagConstraints();

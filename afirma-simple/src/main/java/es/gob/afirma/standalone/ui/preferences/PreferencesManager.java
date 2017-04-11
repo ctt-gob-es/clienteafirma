@@ -10,18 +10,35 @@
 
 package es.gob.afirma.standalone.ui.preferences;
 
+import java.util.Properties;
+import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 /** Nombre de las preferencias de configuraci&oacute;n del programa.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public final class PreferencesManager {
+	
+	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	/** Objecto general de preferencias donde se guarda la configuraci&oacute;n de la
 	 * aplicaci&oacute;n. */
 	private static final Preferences preferences;
+	private static final Properties properties;
 	static {
 		preferences = Preferences.userNodeForPackage(PreferencesManager.class);
+
+		properties = new Properties();
+		try {
+						
+			properties.load(PreferencesManager.class.getResourceAsStream("/properties/preferences.properties" //$NON-NLS-1$
+			));
+		} catch (final Exception e) {
+			LOGGER.severe(
+					"No han podido cargarse los valores por defecto del fichero de configuracion de preferencias, se usaran los valores por defecto: " //$NON-NLS-1$
+							+ e);
+		}
+
 	}
 
 	private PreferencesManager() {
@@ -48,6 +65,13 @@ public final class PreferencesManager {
 	/** Contraseña del servidor <i>proxy</i> configurado. */
 	public static final String PREFERENCE_GENERAL_PROXY_PASSWORD = "proxyPassword"; //$NON-NLS-1$
 
+	/** Proteger cambios en preferencias.
+	 * Un valor de <code>true</code> en esta preferencia indica que deben limitarse las opciones de configuraci&oacute;n
+	 * mediante interfaz gr&aacute;fico, apareciendo de forma deshabilitada (solo para consulta).
+	 * Un valor de <code>false</code> habilitar&aacute; que cualquier opci&oacute;n de configuraci&oacute;n pueda ser
+	 * alterada por parte del usuario mediante el interfaz gr&aacute;fico. */
+	public static final String PREFERENCE_GENERAL_UNPROTECTED = "preferencesUnprotected"; //$NON-NLS-1$
+	
 	/** Evitar la confirmaci&oacute;n al cerrar la aplicaci&oacute;n o no.
 	 * Un valor de <code>true</code> en esta preferencia permitir&aacute; cerrar la aplicaci&oacute;n sin ning&uacute;n di&aacute;logo
 	 * de advertencia. Un valor de <code>false</code> har&aacute; que se muestre un di&aacute;logo para que el usuario confirme que
@@ -372,7 +396,17 @@ public final class PreferencesManager {
 	 * @param def Valor que se devolver&aacute;a si la preferencia no se encontraba almacenada.
 	 * @return La preferencia almacenada o {@code def} si no se encontr&oacute;. */
 	public static String get(final String key, final String def) {
+				
 		return preferences.get(key, def);
+	}
+	
+	/**
+	 * Recupera el valor de una cadena de texto almacenada en un fichero de propiedades.
+	 *  @param key Clave del valor que queremos recuperar.
+	 * @param def Valor que se devolver&aacute;a si la preferencia no se encontraba almacenada.
+	 * @return La preferencia almacenada o {@code def} si no se encontr&oacute;. */
+	public static String getPreference(final String key, final String def) {
+		return properties.getProperty(key, def);
 	}
 
 	/** Recupera el valor {@code true} o {@code false} almacenado entre las preferencias de la
@@ -382,6 +416,23 @@ public final class PreferencesManager {
 	 * @return La preferencia almacenada o {@code def} si no se encontr&oacute;. */
 	public static boolean getBoolean(final String key, final boolean def) {
 		return preferences.getBoolean(key, def);
+	}
+	
+	/**
+	 * Recupera el valor de una cadena de texto almacenada en un fichero de propiedades.
+	 *  @param key Clave del valor que queremos recuperar.
+	 * @param def Valor que se devolver&aacute;a si la preferencia no se encontraba almacenada.
+	 * @return La preferencia almacenada o {@code def} si no se encontr&oacute;. */
+	public static boolean getBooleanPreference(final String key, final boolean def) {
+		
+		boolean valor = def;
+						
+		if (properties.getProperty(key) != null) {
+
+			valor = Boolean.parseBoolean(properties.getProperty(key));
+		}
+		return valor;
+		
 	}
 
 	/** Establece una cadena de texto en la configuraci&oacute;n de la aplicaci&oacute;n
@@ -421,5 +472,35 @@ public final class PreferencesManager {
 	 * @throws BackingStoreException Cuando ocurre un error durante el guardado. */
 	public static void flush() throws BackingStoreException {
 		preferences.flush();
+	}
+	
+	/**
+	 * Comprueba si la preferencia se puede bloquear
+	 * @param key Clave de la preferencia
+	 * @return {@code true} Si es una preferencia bloqueable, {@code false} en caso contrario
+	 */
+	public static boolean isProtectedPreference(final String key) {
+		return (key.equals(PREFERENCE_GENERAL_SIGNATURE_ALGORITHM) || key.equals(PREFERENCE_GENERAL_DEFAULT_FORMAT_PDF)
+				|| key.equals(PREFERENCE_GENERAL_DEFAULT_FORMAT_OOXML)
+				|| key.equals(PREFERENCE_GENERAL_DEFAULT_FORMAT_FACTURAE)
+				|| key.equals(PREFERENCE_GENERAL_DEFAULT_FORMAT_ODF)
+				|| key.equals(PREFERENCE_GENERAL_DEFAULT_FORMAT_XML)
+				|| key.equals(PREFERENCE_GENERAL_DEFAULT_FORMAT_BIN)
+				|| key.equals(PREFERENCE_XADES_POLICY_IDENTIFIER)
+				|| key.equals(PREFERENCE_XADES_POLICY_IDENTIFIER_HASH)
+				|| key.equals(PREFERENCE_XADES_POLICY_IDENTIFIER_HASH_ALGORITHM)
+				|| key.equals(PREFERENCE_XADES_POLICY_QUALIFIER)
+				|| key.equals(PREFERENCE_XADES_SIGN_FORMAT)
+				|| key.equals(PREFERENCE_PADES_FORMAT)
+				|| key.equals(PREFERENCE_PADES_POLICY_IDENTIFIER)
+				|| key.equals(PREFERENCE_PADES_POLICY_IDENTIFIER_HASH)
+				|| key.equals(PREFERENCE_PADES_POLICY_IDENTIFIER_HASH_ALGORITHM)
+				|| key.equals(PREFERENCE_PADES_POLICY_QUALIFIER)
+				|| key.equals(PREFERENCE_CADES_POLICY_IDENTIFIER)
+				|| key.equals(PREFERENCE_CADES_POLICY_HASH)
+				|| key.equals(PREFERENCE_CADES_POLICY_HASH_ALGORITHM)
+				|| key.equals(PREFERENCE_CADES_POLICY_QUALIFIER)
+				|| key.equals(PREFERENCE_CADES_IMPLICIT)
+				|| key.equals(PREFERENCE_FACTURAE_POLICY));
 	}
 }

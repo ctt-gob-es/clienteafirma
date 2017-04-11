@@ -72,7 +72,7 @@ final class PolicyPanel extends JPanel implements ItemListener {
 	private AdESPolicy currentPolicy;
 
 	private final List<PolicyItem> policies;
-
+	
 	/** Crea el panel de configuracion de pol&iacute;ticas de firma.
 	 * @param signFormat Formato de firma.
 	 * @param policies Listado de pol&iacute;ticas prefijadas.
@@ -92,8 +92,9 @@ final class PolicyPanel extends JPanel implements ItemListener {
 	PolicyPanel(final String signFormat,
 			    final List<PolicyItem> policies,
 			    final AdESPolicy currentPolicy,
-			    final JComboBox<Object> adesSubFormat) {
-		this(signFormat, policies, currentPolicy, adesSubFormat, true, true, true);
+			    final JComboBox<Object> adesSubFormat,
+			    final boolean unprotected) {
+		this(signFormat, policies, currentPolicy, adesSubFormat, true, true, true, unprotected);
 	}
 
 	final boolean allowNoPolicy;
@@ -125,7 +126,8 @@ final class PolicyPanel extends JPanel implements ItemListener {
 			    final JComboBox<Object> adesSubFormat,
 			    final boolean noPolicyOp,
 			    final boolean customPolicyOp,
-			    final boolean showFields) {
+			    final boolean showFields,
+			    final boolean unprotected) {
 
 		this.subFormatCombo = adesSubFormat;
 		this.signatureFormat = signFormat;
@@ -169,15 +171,15 @@ final class PolicyPanel extends JPanel implements ItemListener {
 			);
 		}
 		this.currentPolicy = currentPolicy;
-
-		createUI(signFormat, showFields);
+						
+		createUI(signFormat, showFields, unprotected);
 	}
 
 	/** Crea la interfaz gr&aacute;fica del panel.
 	 * @param signFormat Formato de firma.
 	 * @param showFields Indica si han de mostrarse o no los campos con los datos de la
 	 *                   pol&iacute;tica. */
-	private void createUI(final String signFormat, final boolean showFields) {
+	private void createUI(final String signFormat, final boolean showFields, final boolean unprotected) {
 		setBorder(
 			BorderFactory.createTitledBorder(
 				SimpleAfirmaMessages.getString("PreferencesPanel.23") //$NON-NLS-1$
@@ -202,6 +204,8 @@ final class PolicyPanel extends JPanel implements ItemListener {
 		this.policiesCombo.getAccessibleContext().setAccessibleDescription(
 			SimpleAfirmaMessages.getString("PreferencesPanel.47") //$NON-NLS-1$
 		);
+		
+		this.policiesCombo.setEnabled(!unprotected);
 
 		if (showFields) {
 
@@ -218,7 +222,6 @@ final class PolicyPanel extends JPanel implements ItemListener {
 
 					/** Ajusta la introducci&oacute;n del prefijo "urn:oid" de forma autom&aacute;tica
 					 * para evitar confusiones por parte del usuario. */
-					@SuppressWarnings("unused")
 					@Override
 					public void focusLost(final FocusEvent e) {
 						if (!"XAdES".equals(signFormat)) { //$NON-NLS-1$

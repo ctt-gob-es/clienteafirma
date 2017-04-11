@@ -66,10 +66,13 @@ final class PreferencesPlistHandler {
 
 	/** Importa las preferencias de la aplicaci&oacute;n desde un fichero PList descargado desde una URL.
 	 * @param url URL para la descarga del fichero de importaci&oacute;n con las preferencias de la aplicaci&oacute;n.
+	 * @param unprotected
+	 *        {@code true} Si las preferencias no est&aacute;n protegidas,
+	 *        {@code false} en caso contrario
 	 * @throws IOException Si hay problemas con la descarga del fichero de preferencias.
 	 * @throws InvalidPreferencesFileException Si las preferencias no son v&aacute;lidas por cualquier motivo.
-	 * @throws AOInvalidFormatException Si no se puede obtener informaci6oacute;n sobre la firma de las preferencias. */
-	static void importPreferencesFromUrl(final String url) throws IOException, InvalidPreferencesFileException, AOInvalidFormatException {
+	 * @throws AOInvalidFormatException Si no se puede obtener informac&6oacute;n sobre la firma de las preferencias. */
+	static void importPreferencesFromUrl(final String url, final boolean unprotected) throws IOException, InvalidPreferencesFileException, AOInvalidFormatException {
 		if (url == null){
 			throw new IllegalStateException("La URL de descarga del fichero de configuracion no puede ser nula"); //$NON-NLS-1$
 		}
@@ -96,13 +99,16 @@ final class PreferencesPlistHandler {
 				);
 			}
 		}
-		importPreferencesFromXml(new String(configData));
+		importPreferencesFromXml(new String(configData), unprotected);
 	}
 
 	/** Importa las preferencias de la aplicaci&oacute;n desde un fichero PList.
 	 * @param configFile Fichero de importaci&oacute;n con las preferencias de la aplicaci&oacute;n.
-	 * @param parent Componente padre para la modalidad. */
-	static void importPreferences(final String configFile, final Component parent) {
+	 * @param parent Componente padre para la modalidad.
+	 * @param unprotected
+	 *        {@code true} Si las preferencias no est&aacute;n protegidas,
+	 *        {@code false} en caso contrario */
+	static void importPreferences(final String configFile, final Component parent, final boolean unprotected) {
 
 		if (configFile == null){
 			throw new IllegalStateException("El fichero de configuracion no puede ser nulo"); //$NON-NLS-1$
@@ -227,7 +233,7 @@ final class PreferencesPlistHandler {
 		}
 
 		try {
-			importPreferencesFromXml(new String(configData));
+			importPreferencesFromXml(new String(configData), unprotected);
 		}
 		catch (final Exception e) {
 			LOGGER.log(
@@ -245,7 +251,7 @@ final class PreferencesPlistHandler {
 
 	}
 
-	private static void importPreferencesFromXml(final String xml) throws InvalidPreferencesFileException {
+	private static void importPreferencesFromXml(final String xml, final boolean unprotected) throws InvalidPreferencesFileException {
 		final Map<String, Object> properties;
 		try {
 			properties = Plist.fromXml(xml);
@@ -255,7 +261,7 @@ final class PreferencesPlistHandler {
 		}
 
 		checkPreferences(properties);
-		storePreferences(properties);
+		storePreferences(properties, unprotected);
 	}
 
 	/** Comprueba que las preferencias pasadas sean <code>String</code> o <code>Boolean</code>.
@@ -278,17 +284,26 @@ final class PreferencesPlistHandler {
 		}
 	}
 
-	/** Almacena las preferencias en el registro del sistema de Windows.
-	 * @param prefs Preferencias que se guardar&aacute; en el registro de Windows. */
-	private static void storePreferences(final Map<String, Object> prefs){
+	/**
+	 * Almacena las preferencias en el registro del sistema de Windows.
+	 * @param prefs
+	 *            Preferencias que se guardar&aacute; en el registro de Windows.
+	 * @param unprotected
+	 *            {@code true} Si las preferencias no est&aacute;n protegidas,
+	 *            {@code false} en caso contrario
+	 */
+	private static void storePreferences(final Map<String, Object> prefs, final boolean unprotected){
 		final Set<String> keys = prefs.keySet();
 		for(final String key : keys) {
 			final Object o = prefs.get(key);
-			if (o instanceof Boolean) {
-				PreferencesManager.putBoolean(key, ((Boolean) o).booleanValue());
-			}
-			else {
-				PreferencesManager.put(key, o.toString());
+			// Si unprotected es false, se pueden modificar todas las preferencias
+			if (!PreferencesManager.isProtectedPreference(key) || !unprotected) {
+				if (o instanceof Boolean) {
+					PreferencesManager.putBoolean(key, ((Boolean) o).booleanValue());
+				}
+				else {
+					PreferencesManager.put(key, o.toString());
+				}
 			}
 		}
 	}
