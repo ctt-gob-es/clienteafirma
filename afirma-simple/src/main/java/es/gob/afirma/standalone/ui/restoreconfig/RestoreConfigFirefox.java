@@ -52,8 +52,8 @@ final class RestoreConfigFirefox {
 
 	private static final String FILE_AUTOFIRMA_CERTIFICATE = "AutoFirma_ROOT.cer"; //$NON-NLS-1$
 	static final String DIR_CERTUTIL = "certutil"; //$NON-NLS-1$
-	private static final String LINUX_UNINSTALLSCRIPT_NAME = "uninstall.sh"; //$NON-NLS-1$
-	private static final String LINUX_SCRIPT_NAME = "install.sh"; //$NON-NLS-1$
+	private static final String LINUX_UNINSTALLSCRIPT_NAME = "uninstallRestore.sh"; //$NON-NLS-1$
+	private static final String LINUX_SCRIPT_NAME = "installRestore.sh"; //$NON-NLS-1$
 	private static final String LINUX_MOZILLA_PATH = "/.mozilla/firefox/profiles.ini";//$NON-NLS-1$
 	private static final String LINUX_CHROME_PATH = "/.pki/nssdb";//$NON-NLS-1$
 	private static final String LINUX_CHROMIUM_PREFS_PATH = "/.config/chromium/Local State";//$NON-NLS-1$
@@ -635,9 +635,9 @@ final class RestoreConfigFirefox {
 				if (!installScript.delete()) {
 					LOGGER.warning("No puedo eliminar el fichero de script: " + LINUX_SCRIPT_NAME); //$NON-NLS-1$
 				}
-				
-				return error;
-								
+
+				return error.booleanValue();
+
 			}
 			catch (final Exception e) {
 				LOGGER.severe(
@@ -1093,9 +1093,9 @@ final class RestoreConfigFirefox {
 	 * @return {@code true} si la ejecuci&oacute;n devolvioacute; alg&uacute;n error {@code false} en caso contrario
 	 */
 	private static Boolean execCommand(final String[] command) throws IOException {
-				
-		Boolean error = Boolean.FALSE;
-		
+
+		final Boolean error = Boolean.FALSE;
+
 		LOGGER.info("Se ejecutara el siguiente comando:\n" + Arrays.toString(command)); //$NON-NLS-1$
 		final Process process = new ProcessBuilder(command).start();
 		// Cuando se instala correctamente no hay salida de ningun tipo, asi que se interpreta
@@ -1111,7 +1111,7 @@ final class RestoreConfigFirefox {
 				) {
 			while ((line = resReader.readLine()) != null) {
 				LOGGER.severe(line);
-				return true;
+				return new Boolean(true);
 			}
 		}
 
@@ -1125,7 +1125,7 @@ final class RestoreConfigFirefox {
 				) {
 			while ((line = errReader.readLine()) != null) {
 				LOGGER.severe(line);
-				return true;
+				return new Boolean(true);
 			}
 		}
 								
