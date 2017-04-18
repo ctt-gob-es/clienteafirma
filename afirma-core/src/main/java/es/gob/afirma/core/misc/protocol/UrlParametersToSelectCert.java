@@ -80,8 +80,7 @@ public final class UrlParametersToSelectCert extends UrlParameters {
 	public void setSticky(final boolean sticky) {
 		this.sticky = sticky;
 	}
-
-	@SuppressWarnings("unused")
+	
 	void setSelectCertParameters(final Map<String, String> params) throws ParameterException {
 
 		// Comprobamos que el identificador de sesion de la firma no sea mayor de un cierto numero de caracteres
