@@ -20,6 +20,7 @@ import java.security.cert.CertificateException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.net.ssl.KeyManagerFactory;
@@ -52,7 +53,7 @@ public final class ServiceInvocationManager {
 	private static final int MAX_READING_BUFFER_TRIES = 10;
 
 	/** Tiempo de espera de cada socket en milisegundos. */
-	private static int SOCKET_TIMEOUT = 60000;
+	private static int SOCKET_TIMEOUT = 90000;
 
 	/** Maximo numero de caracteres que podemos enviar en una respuesta. */
 	private static final int RESPONSE_MAX_SIZE = 1000000;
@@ -196,6 +197,7 @@ public final class ServiceInvocationManager {
 						);
 						continue;
 					}
+
 					try {
 						final String httpRequest = read(socketChannel.getInputStream());
 
@@ -222,7 +224,7 @@ public final class ServiceInvocationManager {
 
 		// Con las excepciones no hacemos nada ya que no tenemos forma de transmitir el error de vuelta y no debemos mostrar dialogos graficos
 		catch (final IOException e) {
-			LOGGER.severe("Error en la comunicacion a traves del socket: " + e); //$NON-NLS-1$
+			LOGGER.log(Level.SEVERE, "Error en la comunicacion a traves del socket", e); //$NON-NLS-1$
 		}
 		catch(final KeyStoreException e){
             LOGGER.severe("Error con el keyStore: " + e); //$NON-NLS-1$
