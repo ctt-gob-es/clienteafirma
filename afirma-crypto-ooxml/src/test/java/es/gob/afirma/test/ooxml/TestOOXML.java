@@ -67,7 +67,7 @@ public final class TestOOXML {
 	    p1.setProperty("commitmentTypeIndication0CommitmentTypeQualifiers", "RAZON-PRUEBA"); //$NON-NLS-1$ //$NON-NLS-2$
 
         OOXML_MODES = new Properties[] {
-        	p0,
+//        	p0,
             p1
         };
     }
@@ -167,9 +167,7 @@ public final class TestOOXML {
 	        for (final Properties extraParams : OOXML_MODES) {
 	            for (final String algo : ALGOS) {
 
-	                prueba = "Cofirma OOXML con el algoritmo ': " + //$NON-NLS-1$
-	                algo +
-	                "'"; //$NON-NLS-1$
+	                prueba = "Cofirma OOXML con el algoritmo " + algo; //$NON-NLS-1$
 
 	                System.out.println(prueba);
 
@@ -181,10 +179,13 @@ public final class TestOOXML {
 
 	                //checkSign(signer, sign2, prueba);
 
-	                final OutputStream fos = new FileOutputStream(File.createTempFile("OOXML_", ".docx")); //$NON-NLS-1$ //$NON-NLS-2$
+	                final File tempFile = File.createTempFile("OOXML_", ".docx");
+	                final OutputStream fos = new FileOutputStream(tempFile);
 	                fos.write(sign2);
 	                fos.flush();
 	                fos.close();
+
+	                System.out.println("Fichero de salida: " + tempFile.getAbsolutePath());
 
 	                // Cofirma indicando los datos
 	                final byte[] sign3 = cosign(signer, data, sign2, algo, pke3, extraParams);
@@ -192,14 +193,6 @@ public final class TestOOXML {
 
 	            }
 	        }
-
-	        signer.sign(
-	    		data,
-	    		"SHA1withRSA", //$NON-NLS-1$
-	    		pke3.getPrivateKey(),
-	    		pke3.getCertificateChain(),
-	    		null
-			);
         }
 
     }
