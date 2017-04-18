@@ -32,26 +32,31 @@ import es.gob.afirma.signers.ooxml.AOOOXMLSigner;
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public final class TestOOXML {
 
-    private static final String CERT_PATH3 = "CAMERFIRMA_PF_SW_Clave_usuario_Activo.p12"; //$NON-NLS-1$
+    private static final String CERT_PATH3 = "ANCERTCCP_FIRMA.p12"; //$NON-NLS-1$
     private static final String CERT_PASS3 = "1111"; //$NON-NLS-1$
-    private static final String CERT_ALIAS3 = "1"; //$NON-NLS-1$
+    private static final String CERT_ALIAS3 = "juan ejemplo espa\u00F1ol"; //$NON-NLS-1$
 
-    private static final String[] DATA_PATHS = new String[] { "entrada_w2013.docx" /*, "Entrada.docx"*/ };  //$NON-NLS-1$
-    private static byte[][] DATAS = new byte[1][];
+    private static final String[] DATA_PATHS = new String[] { "entrada_w2013.docx", "Entrada.docx" };  //$NON-NLS-1$ //$NON-NLS-2$
+    private static byte[][] DATAS;
 
     private static final Properties[] OOXML_MODES;
 
     static {
-
+    	DATAS = new byte[DATA_PATHS.length][];
     	try {
-			DATAS[0] = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(DATA_PATHS[0]));
-			//DATAS[1] = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(DATA_PATHS[1]));
+
+    		for (int i = 0; i < DATA_PATHS.length; i++) {
+    			DATAS[i] = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(DATA_PATHS[i]));
+    		}
 		}
     	catch (final Exception e) {
 			System.err.println("No se pudo cargar el documento de pruebas: " + e); //$NON-NLS-1$
-			DATAS[0] = "Error0".getBytes(); //$NON-NLS-1$
-			//DATAS[1] = "Error1".getBytes(); //$NON-NLS-1$
+    		for (int i = 0; i < DATA_PATHS.length; i++) {
+    			DATAS[i] = ("Error" + i).getBytes(); //$NON-NLS-1$
+    		}
 		}
+
+    	final Properties p0 = null;
 
         final Properties p1 = new Properties();
         p1.setProperty("format", AOSignConstants.SIGN_FORMAT_OOXML); //$NON-NLS-1$
@@ -62,13 +67,16 @@ public final class TestOOXML {
 	    p1.setProperty("commitmentTypeIndication0CommitmentTypeQualifiers", "RAZON-PRUEBA"); //$NON-NLS-1$ //$NON-NLS-2$
 
         OOXML_MODES = new Properties[] {
+        	p0,
             p1
         };
     }
 
     /** Algoritmos de firma a probar. */
     private final static String[] ALGOS = new String[] {
-        AOSignConstants.SIGN_ALGORITHM_SHA512WITHRSA
+    		AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA,
+    		AOSignConstants.SIGN_ALGORITHM_SHA256WITHRSA,
+    		AOSignConstants.SIGN_ALGORITHM_SHA512WITHRSA
     };
 
     /** Prueba de reconocimiento de formato. */
@@ -115,8 +123,6 @@ public final class TestOOXML {
 
 	                prueba = "Firma OOXML con el algoritmo '" + //$NON-NLS-1$
 	                algo +
-	                "' y politica '" + //$NON-NLS-1$
-	                extraParams.getProperty("policyIdentifier") + //$NON-NLS-1$
 	                "'"; //$NON-NLS-1$
 
 	                System.out.println(prueba);
@@ -140,14 +146,6 @@ public final class TestOOXML {
 	                Assert.assertTrue(signer.isSign(result));
 	            }
 	        }
-
-	        signer.sign(
-	    		data,
-	    		"SHA1withRSA", //$NON-NLS-1$
-	    		pke.getPrivateKey(),
-	    		pke.getCertificateChain(),
-	    		null
-			);
         }
 
     }
