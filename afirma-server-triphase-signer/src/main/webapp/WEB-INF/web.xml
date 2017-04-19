@@ -7,7 +7,7 @@
 	<display-name>TriPhaseSignerServer</display-name>
 	
 	<servlet>
-		<description>Servicio de firma electronica en 3 fases v2.5</description>
+		<description>Servicio de firma electronica en 3 fases v2.6</description>
 		<servlet-name>SignatureService</servlet-name>
 		<servlet-class>es.gob.afirma.triphase.server.SignatureService</servlet-class>
 	</servlet>
