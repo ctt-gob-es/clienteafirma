@@ -34,30 +34,28 @@ public final class RestoreConfigPanel extends JPanel implements KeyListener, Dis
 	 * Identificador de la versi&oacute;n de serializaci&oacute;n.
 	 */
 	private static final long serialVersionUID = 5353477830742383848L;
-	
-	public final static int ONE_SECOND = 1000;
 
 	static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	private final Window window;
-	
-	private JPanel restorePanel = new JPanel(new FlowLayout(FlowLayout.CENTER), true);
-		
+
+	private final JPanel restorePanel = new JPanel(new FlowLayout(FlowLayout.CENTER), true);
+
 	/**
-	 * &Aacute;rea de texto para mostrar los mensajes de progreso de la tarea de restauraci&oacute;n 
+	 * &Aacute;rea de texto para mostrar los mensajes de progreso de la tarea de restauraci&oacute;n
 	 */
-	private JTextArea taskOutput;
-		
-	
+	JTextArea taskOutput;
+
+
 	/**Constructor con par&aacute;metro de la clase
 	 * @param w Objeto Window para inicializar la instancia de la clase
 	 */
 	RestoreConfigPanel(final Window w) {
-		
+
 		this.window = w;
 		createUI();
 	}
-	
+
 	/**
 	 * Clase que construye el objeto gr&aacute;fico que representa el panel
 	 * donde se ubican los botones de la ventana de restauraci&oacute;n
@@ -83,7 +81,7 @@ public final class RestoreConfigPanel extends JPanel implements KeyListener, Dis
 	            }
 	        }
 		);
-		
+
 		final JButton restoreButton = new JButton(SimpleAfirmaMessages.getString("RestoreConfigPanel.1")); //$NON-NLS-1$
 		restoreButton.setMnemonic('R');
 		restoreButton.getAccessibleContext().setAccessibleDescription(
@@ -94,25 +92,25 @@ public final class RestoreConfigPanel extends JPanel implements KeyListener, Dis
 			/** {@inheritDoc} */
 			@Override
 			public void actionPerformed(final ActionEvent ae) {
-					
-			 	RestoreConfigManager restoreConfig = new RestoreConfigManager();
-						
+
+			 	final RestoreConfigManager restoreConfig = new RestoreConfigManager();
+
 				try {
-					
+
 					// Limpiamos el area de texto antes de comenzar con la restauracion
 					// para eliminar posibles mensajes de ejecuciones anteriores.
-					taskOutput.setText(null);
+					RestoreConfigPanel.this.taskOutput.setText(null);
 					// Deshabilito el boton mientras el proceso se esta ejecutando
 					restoreButton.setEnabled(false);
-					restoreConfig.restoreConfigAutoFirma(taskOutput);
+					restoreConfig.restoreConfigAutoFirma(RestoreConfigPanel.this.taskOutput);
 					restoreButton.setEnabled(true);
-					
+
 				} catch (GeneralSecurityException | ConfigurationException | IOException e ) {
 					LOGGER.severe("Ha ocurrido un error al ejecutar la tarea de restauracion: " + e.getMessage()); //$NON-NLS-1$
 				}
 			}
 		});
-		
+
 
 		// En Mac OS X el orden de los botones es distinto
 		if (Platform.OS.MACOSX.equals(Platform.getOS())) {
@@ -130,43 +128,43 @@ public final class RestoreConfigPanel extends JPanel implements KeyListener, Dis
 	 * Dibuja la ventana con las opciones de restauraci&oacute;n
 	 */
 	private void createUI() {
-		
-		restorePanel.setName("RestoreConfigPanel"); //$NON-NLS-1$
-						
+
+		this.restorePanel.setName("RestoreConfigPanel"); //$NON-NLS-1$
+
 		setLayout(new BorderLayout(5, 5));
         setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
-        
-        String intro = SimpleAfirmaMessages.getString("RestoreConfigPanel.4"); //$NON-NLS-1$
-        
+
+        final String intro = SimpleAfirmaMessages.getString("RestoreConfigPanel.4"); //$NON-NLS-1$
+
         final JLabel introText = new JLabel(intro);
 
         // Creamos un panel para el texto de introduccion
         final JPanel introPanel = new JPanel(new BorderLayout());
         introPanel.add(introText, BorderLayout.PAGE_START);
         this.add(introPanel, BorderLayout.NORTH);
-        
-        // Creamos un panel para el boton de restauracion
-        JPanel buttonPanel = createButtonsPanel();
-    	this.add(buttonPanel, BorderLayout.CENTER);
-    	    	
-    	// Configuramos el area de texto para los mensajes de configuracion
-    	taskOutput = new JTextArea(20, 30);
-    	taskOutput.setMargin(new Insets(5,5,5,5));
-    	taskOutput.setEditable(false);
-    	restorePanel.add(new JScrollPane(taskOutput), BorderLayout.CENTER);    	
 
-        this.add(restorePanel, BorderLayout.AFTER_LAST_LINE);
-        
+        // Creamos un panel para el boton de restauracion
+        final JPanel buttonPanel = createButtonsPanel();
+    	this.add(buttonPanel, BorderLayout.CENTER);
+
+    	// Configuramos el area de texto para los mensajes de configuracion
+    	this.taskOutput = new JTextArea(20, 30);
+    	this.taskOutput.setMargin(new Insets(5,5,5,5));
+    	this.taskOutput.setEditable(false);
+    	this.restorePanel.add(new JScrollPane(this.taskOutput), BorderLayout.CENTER);
+
+        this.add(this.restorePanel, BorderLayout.AFTER_LAST_LINE);
+
         // Configuramos el color
         if (!LookAndFeelManager.HIGH_CONTRAST) {
             setBackground(LookAndFeelManager.WINDOW_COLOR);
             buttonPanel.setBackground(LookAndFeelManager.WINDOW_COLOR);
             introPanel.setBackground(LookAndFeelManager.WINDOW_COLOR);
-            restorePanel.setBackground(LookAndFeelManager.WINDOW_COLOR);
+            this.restorePanel.setBackground(LookAndFeelManager.WINDOW_COLOR);
         }
-                                       	        
-       
-	}	
+
+
+	}
 
 	/**
 	 * Devuelve la ventana desde donde se abri&oacute; la ventana actual
@@ -199,7 +197,7 @@ public final class RestoreConfigPanel extends JPanel implements KeyListener, Dis
 	@Override
 	public void keyTyped(final KeyEvent e) {
 		/* Vacio */ }
-	
-	
-		
+
+
+
 }

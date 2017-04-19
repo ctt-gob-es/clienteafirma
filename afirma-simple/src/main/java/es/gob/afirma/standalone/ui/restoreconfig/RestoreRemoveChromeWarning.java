@@ -33,21 +33,23 @@ final public class RestoreRemoveChromeWarning {
 
 	private static final String MAC_CHROME_V56_OR_LOWER_PREFS_PATH = "/Library/Application Support/Google/Chrome/Local State"; //$NON-NLS-1$
 	private static final String MAC_CHROME_V57_OR_HIGHER_PREFS_PATH = "/Library/Application Support/Google/Chrome/Default/Preferences"; //$NON-NLS-1$
-	
+
 	/** Nombre del usuario por defecto en Windows. Este usuario es el que se usa como base para
 	 * crear nuevos usuarios y no se deber&iacute;a tocar. */
 	private static String DEFAULT_WINDOWS_USER_NAME = "Default"; //$NON-NLS-1$
 
 	private static final String RECONFIG_SCRIPT_NAME = "reconfig.sh"; //$NON-NLS-1$
 
-	
+
 	/** Genera los comandos que elimina el warning al ejecutar AutoFirma desde Chrome.
-	 * En linux genera el script que hay que ejecutar para realizar la instalaci&oacute;n pero no lo ejecuta, de eso se encarga el instalador Debian.
+	 * En MAC genera el script que hay que ejecutar para realizar la instalaci&oacute;n pero no lo ejecuta, de eso se encarga el instalador Debian.
 	 *  <ul>
-	 * <li>En LINUX contiene el contenido del script a ejecutar.</li>
+	 * <li>En MAC contiene el contenido del script a ejecutar.</li>
 	 * </ul>
+	 * @param appDir Directorio donde se crea el script.
+	 * @param usersDirs Directorio de los usuarios del sistema.
 	 */
-	public static void removeChromeWarningsMac(File appDir, final String[] usersDirs) {
+	public static void removeChromeWarningsMac(final File appDir, final String[] usersDirs) {
 		try {
 			for (final String userDir : usersDirs) {
 				// Montamos los comandos de instalacion y desinstalacion que
@@ -77,22 +79,24 @@ final public class RestoreRemoveChromeWarning {
 
 			// Se ejecuta el script creado
 			new ProcessBuilder("sh", appDir + "/" + RECONFIG_SCRIPT_NAME).start(); //$NON-NLS-1$ //$NON-NLS-2$
-			
+
 			// Se elimina el script tras ejecutarlo
 			new ProcessBuilder("rm", appDir + "/" + RECONFIG_SCRIPT_NAME).start(); //$NON-NLS-1$ //$NON-NLS-2$
 		} catch (final IOException e) {
 			LOGGER.warning("No se pudieron crear los scripts para registrar el esquema 'afirma' en Chrome: " + e); //$NON-NLS-1$
 		}
 	}
-	
+
 	/** Genera los comandos que elimina el warning al ejecutar AutoFirma desde Chrome.
 	 * En linux genera el script que hay que ejecutar para realizar la instalaci&oacute;n pero no lo ejecuta, de eso se encarga el instalador Debian.
 	 *  <ul>
 	 * <li>En LINUX contiene el contenido del script a ejecutar.</li>
 	 * </ul>
+	 * @param appDir Directorio donde se crea el script.
+	 * @param usersDirs Directorio de los usuarios del sistema.
 	 */
 	public static void removeChromeWarningsLinux(final File appDir, final String[] usersDirs) {
-		
+
 
 		try {
 			for (final String userDir : usersDirs) {
@@ -424,12 +428,12 @@ final public class RestoreRemoveChromeWarning {
 		/////////////////////////////////////////////////////////////////////////////
 		if( new File(userDir, MAC_CHROME_V56_OR_LOWER_PREFS_PATH).isFile() ) {
 			//Se incluye afirma como protocolo de confianza en Chrome v56 o inferior
-			
+
 			final String[] commandInstallChrome56OrLower01 =
 					deleteProtocolInPreferencesFile1(userDir, MAC_CHROME_V56_OR_LOWER_PREFS_PATH);
 			final String[] commandInstallChrome56OrLower02 =
 					deleteProtocolInPreferencesFile2(userDir, MAC_CHROME_V56_OR_LOWER_PREFS_PATH);
-			
+
 			final String[] commandInstallChrome56OrLower1 =
 					addProtocolInPreferencesFileMac(userDir, MAC_CHROME_V56_OR_LOWER_PREFS_PATH);
 
@@ -482,7 +486,7 @@ final public class RestoreRemoveChromeWarning {
 		}
 		return commandList;
 	}
-	
+
 	/** Genera los scripts para confirmar si existen protocolos definidos en el fichero.
 	 * @param userDir Directorio de usuario dentro del sistema operativo.
 	 * @param browserPath Directorio de configuraci&oacute;n de Chromium o Google Chrome. */
@@ -497,7 +501,7 @@ final public class RestoreRemoveChromeWarning {
 		};
 		return ifStatement;
 	}
-	
+
 	/** Genera los scripts para confirmar si existen protocolos definidos en el fichero. (Repetido en
 	 * @param userDir Directorio de usuario dentro del sistema operativo.
 	 * @param browserPath Directorio de configuraci&oacute;n de Chromium o Google Chrome. */
@@ -540,7 +544,7 @@ final public class RestoreRemoveChromeWarning {
 
 		return commandCopy;
 	}
-	
+
 	/** Genera los scripts para eliminar el protocolo afirma.
 	 * @param userDir Directorio de usuario dentro del sistema operativo.
 	 * @param browserPath Directorio de configuraci&oacute;n de Chromium o Google Chrome. */
@@ -570,7 +574,7 @@ final public class RestoreRemoveChromeWarning {
 		};
 		return commandInstall1;
 	}
-	
+
 	/** Genera los scripts para incluir el protocolo afirma.
 	 * @param userDir Directorio de usuario dentro del sistema operativo.
 	 * @param browserPath Directorio de configuraci&oacute;n de Chromium o Google Chrome. */
@@ -600,7 +604,7 @@ final public class RestoreRemoveChromeWarning {
 		};
 		return commandInstall2;
 	}
-	
+
 	/** Genera los scripts para incluir el protocolo afirma.
 	 * @param userDir Directorio de usuario dentro del sistema operativo.
 	 * @param browserPath Directorio de configuraci&oacute;n de Chromium o Google Chrome. */

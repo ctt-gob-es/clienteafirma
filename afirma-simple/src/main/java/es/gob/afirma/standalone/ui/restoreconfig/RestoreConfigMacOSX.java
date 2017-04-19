@@ -52,8 +52,8 @@ import es.gob.afirma.standalone.ui.restoreconfig.RestoreConfigFirefox.MozillaPro
 
 /**
  * Clase que contiene la l&oacute;gica para realizar las tareas de restauraci&oacute;n
- * de la configuraci&oacute;n de navegadores para el sistema operativo MacOsX. 
- * 
+ * de la configuraci&oacute;n de navegadores para el sistema operativo MacOsX.
+ *
  */
 final class RestoreConfigMacOSX implements RestoreConfig {
 
@@ -77,17 +77,17 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 	private static final String TRUST_SETTINGS_COMMAND = "security trust-settings-import -d "; //$NON-NLS-1$
 	private static final String TRUST_SETTINGS_FILE = "/trust_settings.plist"; //$NON-NLS-1$
 	private static final String OSX_RESOURCES = "/osx"; //$NON-NLS-1$
-	
+
 	static final String GET_USERS_COMMAND = "dscacheutil -q user"; //$NON-NLS-1$
 	private static final String GET_USER_SCRIPTS_NAME = "scriptGetUsers";//$NON-NLS-1$
 	private static final String SCRIPT_EXT = ".sh";//$NON-NLS-1$
-	
+
 	static String mac_script_path;
-			
+
 	private static String[] userDirs = null;
-	
+
 	private static File sslCerFile;
-	
+
 	/**
      * Caracter de salto de l&iacute;nea para los mensajes de la consola de restauraci&oacute;n
      */
@@ -97,16 +97,16 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 	 * @see es.gob.afirma.standalone.ui.restoreconfig.RestoreConfig#restore(javax.swing.JTextArea)
 	 */
 	@Override
-	public void restore(JTextArea taskOutput) throws IOException, GeneralSecurityException {
+	public void restore(final JTextArea taskOutput) throws IOException, GeneralSecurityException {
 
 		userDirs = getSystemUsersHomes();
-		
+
 		appendMessage(taskOutput, SimpleAfirmaMessages.getString("RestoreConfigMacOSX.2")); //$NON-NLS-1$
-		
-		final File appDir = RestoreConfigUtil.getApplicationDirectory(); 
-		
+
+		final File appDir = RestoreConfigUtil.getApplicationDirectory();
+
 		appendMessage(taskOutput, SimpleAfirmaMessages.getString("RestoreConfigMacOSX.3") + appDir.getAbsolutePath()); //$NON-NLS-1$
-		
+
 		// Generamos un fichero que utilizaremos para guardar y ejecutar
 		// AppleScripts
 		try {
@@ -123,20 +123,20 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 		else {
 			LOGGER.info("Los certificados SSL existen y no se crearan ni instalaran" ); //$NON-NLS-1$
 			appendMessage(taskOutput, SimpleAfirmaMessages.getString("RestoreConfigMacOSX.14")); //$NON-NLS-1$
-		} 
-		
+		}
+
 		installRootCA(appDir, taskOutput);
 
 		closeChrome();
 
 		appendMessage(taskOutput, SimpleAfirmaMessages.getString("RestoreConfigMacOSX.16")); //$NON-NLS-1$
 		RestoreRemoveChromeWarning.removeChromeWarningsMac(appDir, userDirs);
-		
+
 		appendMessage(taskOutput, SimpleAfirmaMessages.getString("RestoreConfigMacOSX.8")); //$NON-NLS-1$
 		LOGGER.info("Finalizado" ); //$NON-NLS-1$
 
 	}
-	
+
 	/**
 	 * Pide al usuario que cierre el navegador Google Chrome y no permite continuar hasta que lo hace.
 	 */
@@ -149,7 +149,7 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 					JOptionPane.WARNING_MESSAGE);
 		}
 	}
-	
+
 	/**
 	 * Detecta si el proceso de Firefox est&aacute; abierto.
 	 * @return
@@ -191,14 +191,14 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 	private static boolean checkSSLKeyStoreGenerated(final File appConfigDir) {
 		return new File(appConfigDir, KS_FILENAME).exists();
 	}
-	
+
 	/** Comprueba si ya existe un certificado ra&iacute;z generado.
 	 * @param appDir Directorio de la aplicaci&oacute;n.
 	 * @return {@code true} si ya existe un certificado ra&iacute;z .cer, {@code false} en caso contrario. */
 	private static boolean checkSSLRootCertificateGenerated(final File appDir) {
 		return new File(appDir, MACOSX_CERTIFICATE).exists();
 	}
-	
+
 	/** Comprueba si ya existe una plantilla de confianzas instalada en el
 	 * directorio de la aplicaci&oacute;n.
 	 * @param appDir Directorio de la aplicaci&oacute;n.
@@ -206,7 +206,7 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 	private static boolean checkTrutsTemplateInstalled(final File appDir) {
 		return new File(appDir, TRUST_SETTINGS_FILE).exists();
 	}
-	
+
 	/**
 	 * Genera e instala los certificados SSL para la comunicaci&oacute;n con la aplicaci&oacute;n.
 	 * @param appDir Directorio de instalaci&oacute;n de la aplicaci&oacute;n.
@@ -214,9 +214,9 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 	 * @throws GeneralSecurityException Cuando ocurre un error al generar el certificado SSL.
 	 */
 	private static void configureSSL(final File appDir, final JTextArea taskOutput) throws IOException, GeneralSecurityException {
-		
+
 		appendMessage(taskOutput, SimpleAfirmaMessages.getString("RestoreConfigMacOSX.5")); //$NON-NLS-1$
-		
+
 
 		// Damos permisos al script
 		addExexPermissionsToAllFilesOnDirectory(appDir);
@@ -226,7 +226,7 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 			RestoreConfigUtil.CERT_ALIAS,
 			KS_PASSWORD
 		);
-		
+
 		deleteInstalledCertificates(appDir);
 
 		// Copiamos los certificados CA y SSL a disco
@@ -239,7 +239,7 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 			new File(appDir, KS_FILENAME)
 		);
 	}
-	
+
     /** Devuelve un listado con todos los directorios de usuario del sistema.
 	 * @return Listado de directorios. */
 	private static String[] getSystemUsersHomes() {
@@ -281,8 +281,8 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 
 		return userDirs;
 	}
-	
-	
+
+
 	/**
 	 * Crea un fichero de script para la obtenci&oacute;n de los usuarios del sistema.
 	 * @throws IOException Cuando no se pueda crear el fichero de script.
@@ -299,15 +299,15 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 
 		return scriptFile;
 	}
-	
+
 	/**
 	 * Instala los certificados de comunicaci&oacute;n en el almac&eacute;n de Mozilla y Apple
-	 * @param appDir Directorio de instalaci&oacute;n de la aplicaci&oacute;n 
+	 * @param appDir Directorio de instalaci&oacute;n de la aplicaci&oacute;n
 	 * @param taskOutput Objeto que representa el &aacute;rea de texto de la consola
 	 * @throws IOException Si ocurre alg&uacute;n problema durante el proceso
 	 */
 	private static void installRootCA(final File appDir, final JTextArea taskOutput) throws IOException {
-		
+
 		// Cerramos el almacen de firefox si esta abierto
 		closeFirefox();
 
@@ -319,7 +319,7 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 		catch (final IOException e) {
 			LOGGER.log(Level.SEVERE, "Se ha producido un error durante la busqueda y desinstalacion de versiones anteriores del certificado SSL en el llavero de macOS: " + e, e); //$NON-NLS-1$
 		}
-		
+
 		// Copiamos en disco certUtil para la configuracion de los certificados en el almacen de Firefox
 		RestoreConfigFirefox.copyConfigurationFiles(appDir);
 
@@ -334,7 +334,7 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 
 		// Se instalan los certificados en el almacen de Mozilla
 		try {
-			
+
 			appendMessage(taskOutput, SimpleAfirmaMessages.getString("RestoreConfigMacOSX.13")); //$NON-NLS-1$
 
 			// Instalar el certificado en Mozilla
@@ -369,7 +369,7 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 			}
 		}
 	}
-	
+
 	/** Genera el comando de instalaci&oacute;n del certificado en el almac&eacute;n de apple en el script de instalaci&oacute;n.
 	 * @throws GeneralSecurityException Se produce si hay un problema de seguridad durante el proceso.
 	 * @throws IOException Se produce cuando hay un error en la creaci&oacute;n del fichero. */
@@ -437,7 +437,7 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 		writeScriptFile(mac_script_path, new StringBuilder(trustCmd), true);
 
 	}
-	
+
 	/** Ejecuta un script en OS X.
 	 * @param path Ruta donde se encuentra el <i>script</i>.
 	 * @param administratorMode <code>true</code> el <i>script</i> se ejecuta como permisos de adminsitrador, <code>false</code> en caso contrario.
@@ -473,7 +473,7 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 			throw new IOException("Error en la ejecucion del script via AppleScript: " + e, e); //$NON-NLS-1$
 		}
 	}
-	
+
 	/**
 	 * Da permisos de ejecuci&oacute;n a todos los ficheros de un directorio dado.
 	 * @param dir Directorio al que dar permiso.
@@ -534,15 +534,15 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 		writeScriptFile(mac_script_path, sb, true);
 
 	}
-	
+
 	private static void editTrusFile(final String sha1Root, final String sha1Cer, final String snRoot, final String snCer) {
-		
-		final File appDir = RestoreConfigUtil.getApplicationDirectory(); 
-		
+
+		final File appDir = RestoreConfigUtil.getApplicationDirectory();
+
 		try {
 			deleteTrustTemplate(appDir);
 			exportResource(OSX_RESOURCES,TRUST_SETTINGS_FILE, appDir.getAbsolutePath());
-		} catch (Exception e1) {
+		} catch (final Exception e1) {
 			LOGGER.severe("No ha podido copiarse la plantilla de configuracion de confianza: " + e1); //$NON-NLS-1$
 		}
 
@@ -625,56 +625,56 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 	    }
 	    return data;
 	}
-	
+
 	/**
 	 * Elimina los ficheros de certificado ra&iacutez y almac&eacute;n SSL del disco
 	 * como paso previo a volver a generarlos
 	 * @param appDir Ruta del directorio de la aplicaci&oacute;n
 	 * @throws IOException
 	 */
-	private static void deleteInstalledCertificates(File appDir) throws IOException {
+	private static void deleteInstalledCertificates(final File appDir) throws IOException {
 
 		if (checkSSLKeyStoreGenerated(appDir)) {
-			
-			File sslKey = new File(appDir, KS_FILENAME);
-			
+
+			final File sslKey = new File(appDir, KS_FILENAME);
+
 			if (!sslKey.delete()) {
 				throw new IOException("No puedo eliminar autofirma.pfx"); //$NON-NLS-1$
 			}
-			
+
 		}
 
 		if (checkSSLRootCertificateGenerated(appDir)) {
 
-			File sslRoot = new File(appDir, MACOSX_CERTIFICATE);
-			
+			final File sslRoot = new File(appDir, MACOSX_CERTIFICATE);
+
 			if (!sslRoot.delete()) {
 				throw new IOException("No puedo eliminar AutoFirma_ROOT.cer"); //$NON-NLS-1$
 			}
 
 		}
 	}
-	
+
 	/**
 	 * Elimina los ficheros de certificado ra&iacutez y almac&eacute;n SSL del disco
 	 * como paso previo a volver a generarlos
 	 * @param appDir Ruta del directorio de la aplicaci&oacute;n
 	 * @throws IOException
 	 */
-	private static void deleteTrustTemplate(File appDir) throws IOException {
+	private static void deleteTrustTemplate(final File appDir) throws IOException {
 
 		if (checkTrutsTemplateInstalled(appDir)) {
-			
-			File sslKey = new File(appDir, TRUST_SETTINGS_FILE);
-			
+
+			final File sslKey = new File(appDir, TRUST_SETTINGS_FILE);
+
 			if (!sslKey.delete()) {
 				throw new IOException("No puedo eliminar " + TRUST_SETTINGS_FILE); //$NON-NLS-1$
 			}
-			
+
 		}
-		
+
 	}
-	
+
 	/**
 	 * Desinstala el certificado de CA del almacen de autoridades de confianza de Mozilla Firefox.
 	 * @throws IOException Se produce cuando hay un error en la creaci&oacute;n del fichero.
@@ -686,7 +686,7 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 		// Le damos permisos para poder ejecutarlo
 		addExexPermissionsToAllFilesOnDirectory(RestoreConfigUtil.getApplicationDirectory());
 	}
-	
+
 	/** Escribe un <i>script</i> en un fichero dado.
 	 * @param path Ruta donde se escribir&aacute; el <i>script</i>.
 	 * @param data Datos a escribir.
@@ -700,13 +700,13 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 			fout.write(data.toString().getBytes());
 		}
 	}
-	
+
 	/**
 	 * Concatena un texto a una nueva l&iacute;nea al par&aacute;metro JTextArea
 	 * @param taskOutput JTextArea donde el texto es concatenado
 	 * @param message Texto a concatenar.
 	 */
-	private static void appendMessage(JTextArea taskOutput, String message) {
+	private static void appendMessage(final JTextArea taskOutput, final String message) {
 		taskOutput.append(message + newline);
 		taskOutput.setCaretPosition(taskOutput.getDocument().getLength());
 	}
@@ -759,7 +759,7 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 
 		return false;
 	}
-	
+
 	/**
      * Copia un recurso desde dentro del jar hacia una ruta externa
      *
@@ -769,32 +769,29 @@ final class RestoreConfigMacOSX implements RestoreConfig {
      * @return Ruta completa del recurso copiado
      * @throws Exception
      */
-    static public String exportResource(String pathToResource, String resourceName, String destinationPath) throws Exception {
-        InputStream stream = null;
-        OutputStream resStreamOut = null;
- 
-        try {
-            stream = RestoreConfigMacOSX.class.getResourceAsStream(pathToResource + resourceName);
+    static public String exportResource(final String pathToResource, final String resourceName, final String destinationPath) throws Exception {
+
+        try (OutputStream resStreamOut =
+        		new FileOutputStream(destinationPath + resourceName);
+        	InputStream stream =
+        		RestoreConfigMacOSX.class.getResourceAsStream(pathToResource + resourceName)) {
+
             if(stream == null) {
                 throw new Exception("No ha podido obtenerse el recurso \"" + resourceName + "\" del jar."); //$NON-NLS-1$ //$NON-NLS-2$
             }
 
             int readBytes;
-            byte[] buffer = new byte[4096];
-            resStreamOut = new FileOutputStream(destinationPath + resourceName);
+            final byte[] buffer = new byte[4096];
             while ((readBytes = stream.read(buffer)) > 0) {
                 resStreamOut.write(buffer, 0, readBytes);
             }
-        } catch (Exception ex) {
+        } catch (final Exception ex) {
             throw ex;
-        } finally {
-            stream.close();
-            resStreamOut.close();
         }
 
         return destinationPath + resourceName;
     }
-    
+
     /** Ejecuta un fichero de scripts.
 	 * @param path Ruta donde se encuentra el <i>script</i>.
 	 * @param administratorMode <code>true</code> el <i>script</i> se ejecuta con permisos de adminsitrador, <code>false</code> en caso contrario.

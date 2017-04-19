@@ -58,18 +58,18 @@ final class RestoreConfigWindows implements RestoreConfig {
 
 		appendMessage(taskOutput, SimpleAfirmaMessages.getString("RestoreConfigWindows.2")); //$NON-NLS-1$
 
-		LOGGER.info("Ruta de appDir: " + appDir.getAbsolutePath()); //$NON-NLS-1$
-		
+		LOGGER.info("Ruta de appDir: " + this.appDir.getAbsolutePath()); //$NON-NLS-1$
+
 		appendMessage(taskOutput,
-				SimpleAfirmaMessages.getString("RestoreConfigWindows.3") + appDir.getAbsolutePath()); //$NON-NLS-1$
+				SimpleAfirmaMessages.getString("RestoreConfigWindows.3") + this.appDir.getAbsolutePath()); //$NON-NLS-1$
 
 		// Realizamos las comprobaciones para generar si es necesario,
 		// los certificados .pfx y/o .cer
 		final Certificate sslRoot = restoreCertificateWindows(taskOutput);
 
-		// Para completar el proceso de restauración, es necesario permisos de administrador para
+		// Para completar el proceso de restauracion, es necesario permisos de administrador para
 		// eliminar/importar el certificado raiz.
-		// Por este motivo, no se realizará esta tarea si AutoFirma no se ejecuta en modo administrador
+		// Por este motivo, no se realizara esta tarea si AutoFirma no se ejecuta en modo administrador
 		// ya que el sistema podria quedar inconsistente.
 		if (isAdmin().booleanValue()) {
 
@@ -87,8 +87,8 @@ final class RestoreConfigWindows implements RestoreConfig {
 				// certificado en su almacen
 				closeFirefox();
 				// El SO es Windows, es necesario obtener certutil
-				RestoreConfigFirefox.copyConfigurationFiles(appDir);
-				
+				RestoreConfigFirefox.copyConfigurationFiles(this.appDir);
+
 				// En Windows, certutil no necesita privilegios de administrador
 				// para eliminar certificados de Firefox, pero si para importarlo.
 				// Ademas, certutil no informa con algun error si hay algun problema.
@@ -100,18 +100,18 @@ final class RestoreConfigWindows implements RestoreConfig {
 				RestoreConfigFirefox.installRootCAMozillaKeyStore(this.appDir);
 				// Elimino certutil tras su uso
 				RestoreConfigFirefox.removeConfigurationFiles(this.appDir);
-				
+
 				// Sobreescribimos los valores del protocolo afirma en el
 				// registro de Windows con los valores correctos
 				appendMessage(taskOutput, SimpleAfirmaMessages.getString("RestoreConfigWindows.24")); //$NON-NLS-1$
 				restoreProtocolRegistry(taskOutput);
-				
-			} catch (IOException e) { 
+
+			} catch (final IOException e) {
 				appendMessage(taskOutput, SimpleAfirmaMessages.getString("RestoreConfigWindows.3")); //$NON-NLS-1$
-				
+
 			} catch (final MozillaProfileNotFoundException e) {
 				appendMessage(taskOutput, SimpleAfirmaMessages.getString("RestoreConfigWindows.12")); //$NON-NLS-1$
-			}	
+			}
 		} else {
 
 			JOptionPane.showMessageDialog(null, SimpleAfirmaMessages.getString("RestoreConfigWindows.28"), //$NON-NLS-1$
@@ -215,7 +215,7 @@ final class RestoreConfigWindows implements RestoreConfig {
 					pidInfo += line;
 				}
 			}
-			
+
 		} catch (final IOException e) {
 			LOGGER.severe("Ha ocurrido un error al ejecutar el comando " + process + " en Windows. " + e.getMessage()); //$NON-NLS-1$ //$NON-NLS-2$
 		}
@@ -271,10 +271,10 @@ final class RestoreConfigWindows implements RestoreConfig {
 	 *  en el almac&eacute;n ra&iacute;z de Windows
 	 *  @param cer El certificado a instalar
 	 */
-	private boolean installRootCAWindowsKeystore(final JTextArea taskOutput, Certificate cer) {
+	private boolean installRootCAWindowsKeystore(final JTextArea taskOutput, final Certificate certificate) {
 
 		Boolean exito = Boolean.TRUE;
-
+		Certificate cer = certificate;
 		KeyStore ks;
 
 		try {
@@ -293,9 +293,7 @@ final class RestoreConfigWindows implements RestoreConfig {
 				if (cer == null) {
 
 					try {
-
 						cer = loadCertificateFromFile();
-
 					} catch (final IOException e) {
 
 						LOGGER.severe("No ha podido cargarse el certificado .cer desde el archivo"); //$NON-NLS-1$
@@ -342,11 +340,11 @@ final class RestoreConfigWindows implements RestoreConfig {
 					}
 				}
 				while (!installed && !cancelled);
-				
+
 				//ks.setCertificateEntry(RestoreConfigUtil.CERT_ALIAS_BROWSER, cer);
 				appendMessage(taskOutput,
-						SimpleAfirmaMessages.getString("RestoreConfigWindows.19")); //$NON-NLS-1$			
-				
+						SimpleAfirmaMessages.getString("RestoreConfigWindows.19")); //$NON-NLS-1$
+
 			} else {
 				appendMessage(taskOutput,
 						SimpleAfirmaMessages.getString("RestoreConfigWindows.26")); //$NON-NLS-1$
@@ -425,10 +423,15 @@ final class RestoreConfigWindows implements RestoreConfig {
 			final File sslKeyStoreFile = new File(this.appDir, KS_FILENAME);
 			final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
 			final char ksPass[] = KS_PASSWORD.toCharArray();
-			ks.load(new FileInputStream(sslKeyStoreFile), ksPass);
-
-			final Certificate[] chain = ks.getCertificateChain(RestoreConfigUtil.CERT_ALIAS);
-
+			final Certificate[] chain;
+			try (FileInputStream fis = new FileInputStream(sslKeyStoreFile)) {
+				ks.load(fis, ksPass);
+				chain = ks.getCertificateChain(RestoreConfigUtil.CERT_ALIAS);
+			}
+			catch(final IOException e) {
+				LOGGER.log(Level.SEVERE, e.getMessage());
+				throw new IOException(e);
+			}
 			// En esta posicion esta en certificado raiz.
 			sslRoot = chain[1];
 
@@ -471,17 +474,20 @@ final class RestoreConfigWindows implements RestoreConfig {
 
 	private Certificate loadCertificateFromFile() throws CertificateException, IOException {
 
-		FileInputStream fis;
 		Certificate cert = null;
+		try (final FileInputStream fis =
+				new FileInputStream(new File(this.appDir, FILE_AUTOFIRMA_CERTIFICATE).getAbsolutePath());
+			final BufferedInputStream bis =
+					new BufferedInputStream(fis)) {
 
-		fis = new FileInputStream(new File(this.appDir, FILE_AUTOFIRMA_CERTIFICATE).getAbsolutePath());
+			final CertificateFactory cf = CertificateFactory.getInstance("X.509"); //$NON-NLS-1$
 
-		final BufferedInputStream bis = new BufferedInputStream(fis);
-
-		final CertificateFactory cf = CertificateFactory.getInstance("X.509"); //$NON-NLS-1$
-
-		while (bis.available() > 0) {
-			cert = cf.generateCertificate(bis);
+			while (bis.available() > 0) {
+				cert = cf.generateCertificate(bis);
+			}
+		}
+		catch (final IOException e) {
+			throw new IOException(e);
 		}
 
 		return cert;
@@ -502,8 +508,8 @@ final class RestoreConfigWindows implements RestoreConfig {
 					"query", //$NON-NLS-1$
 					"\"HKU\\S-1-5-19\"", //$NON-NLS-1$
 			};
-			ProcessBuilder pb = new ProcessBuilder(command);
-						
+			final ProcessBuilder pb = new ProcessBuilder(command);
+
 			p = pb.start();
 			p.waitFor();
 
