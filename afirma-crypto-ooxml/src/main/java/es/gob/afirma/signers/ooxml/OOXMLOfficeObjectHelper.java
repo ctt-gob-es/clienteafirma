@@ -58,9 +58,28 @@ final class OOXMLOfficeObjectHelper {
     		MS_DIGITAL_SIGNATURE_SCHEMA
 		);
 
-        final Element manifestHashAlgorithmElement = document.createElementNS(MS_DIGITAL_SIGNATURE_SCHEMA, "ManifestHashAlgorithm"); //$NON-NLS-1$
-        manifestHashAlgorithmElement.setTextContent("http://www.w3.org/2000/09/xmldsig#sha1"); //$NON-NLS-1$
-        signatureInfoV1Element.appendChild(manifestHashAlgorithmElement);
+        // ******************************************************************************
+        // *********************** Metadatos vacios *************************************
+        signatureInfoV1Element.appendChild(
+    		document.createElementNS(
+        		MS_DIGITAL_SIGNATURE_SCHEMA,
+	    		"SetupID" //$NON-NLS-1$
+			)
+		);
+        signatureInfoV1Element.appendChild(
+    		document.createElementNS(
+        		MS_DIGITAL_SIGNATURE_SCHEMA,
+	    		"SignatureText" //$NON-NLS-1$
+			)
+		);
+        signatureInfoV1Element.appendChild(
+    		document.createElementNS(
+        		MS_DIGITAL_SIGNATURE_SCHEMA,
+	    		"SignatureImage" //$NON-NLS-1$
+			)
+		);
+        // ********************** Fin Metadatos vacios **********************************
+        // ******************************************************************************
 
         // ******************************************************************************
         // **************** Metadatos adicionales V1 ************************************
@@ -82,6 +101,20 @@ final class OOXMLOfficeObjectHelper {
         	windowsVersionElement.setTextContent(System.getProperty("os.version")); //$NON-NLS-1$
         	signatureInfoV1Element.appendChild(windowsVersionElement);
         }
+
+        // Indicamos firma generada con Office 16
+        final Element officeVersionElement = document.createElementNS(
+			MS_DIGITAL_SIGNATURE_SCHEMA,
+			"OfficeVersion" //$NON-NLS-1$
+		);
+    	officeVersionElement.setTextContent("16.0"); //$NON-NLS-1$
+    	signatureInfoV1Element.appendChild(officeVersionElement);
+    	final Element applicationVersionElement = document.createElementNS(
+			MS_DIGITAL_SIGNATURE_SCHEMA,
+			"ApplicationVersion" //$NON-NLS-1$
+		);
+    	applicationVersionElement.setTextContent("16.0"); //$NON-NLS-1$
+    	signatureInfoV1Element.appendChild(applicationVersionElement);
 
         final GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
 
@@ -123,6 +156,35 @@ final class OOXMLOfficeObjectHelper {
 		);
         signatureInfoV1Element.appendChild(colorDepthElement);
 
+        // Proveedor de firma por defecto
+
+        final Element signatureProviderId = document.createElementNS(
+			MS_DIGITAL_SIGNATURE_SCHEMA,
+			"SignatureProviderId" //$NON-NLS-1$
+		);
+        signatureProviderId.setTextContent("{00000000-0000-0000-0000-000000000000}"); //$NON-NLS-1$
+    	signatureInfoV1Element.appendChild(signatureProviderId);
+
+    	signatureInfoV1Element.appendChild(
+			document.createElementNS(
+				MS_DIGITAL_SIGNATURE_SCHEMA,
+				"SignatureProviderUrl" //$NON-NLS-1$
+			)
+		);
+
+    	final Element signatureProviderDetails = document.createElementNS(
+			MS_DIGITAL_SIGNATURE_SCHEMA,
+			"SignatureProviderDetails" //$NON-NLS-1$
+		);
+    	signatureProviderDetails.setTextContent("9"); //$NON-NLS-1$
+    	signatureInfoV1Element.appendChild(signatureProviderDetails);
+
+    	final Element signatureType = document.createElementNS(
+			MS_DIGITAL_SIGNATURE_SCHEMA,
+			"SignatureType" //$NON-NLS-1$
+		);
+    	signatureType.setTextContent("1"); //$NON-NLS-1$
+    	signatureInfoV1Element.appendChild(signatureType);
 
         // **************** Fin Metadatos adicionales V1 ********************************
         // ******************************************************************************
@@ -143,7 +205,7 @@ final class OOXMLOfficeObjectHelper {
         		MS_DIGITAL_SIGNATURE_SCHEMA,
 	    		"Address1" //$NON-NLS-1$
 			);
-	        address1Element.setTextContent(signatureComments);
+	        address1Element.setTextContent(address1);
 	        signatureInfoV2Element.appendChild(address1Element);
         }
 
@@ -152,7 +214,7 @@ final class OOXMLOfficeObjectHelper {
         		MS_DIGITAL_SIGNATURE_SCHEMA,
 	    		"Address2" //$NON-NLS-1$
 			);
-	        address2Element.setTextContent(signatureComments);
+	        address2Element.setTextContent(address2);
 	        signatureInfoV2Element.appendChild(address2Element);
         }
 
