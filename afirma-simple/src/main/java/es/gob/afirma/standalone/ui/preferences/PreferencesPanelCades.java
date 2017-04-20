@@ -5,10 +5,6 @@ import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERE
 import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_CADES_POLICY_HASH_ALGORITHM;
 import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_CADES_POLICY_IDENTIFIER;
 import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_CADES_POLICY_QUALIFIER;
-import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_PADES_POLICY_IDENTIFIER;
-import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_PADES_POLICY_IDENTIFIER_HASH;
-import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_PADES_POLICY_IDENTIFIER_HASH_ALGORITHM;
-import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_PADES_POLICY_QUALIFIER;
 
 import java.awt.Container;
 import java.awt.Cursor;
@@ -87,6 +83,42 @@ final class PreferencesPanelCades extends JPanel {
         c.fill = GridBagConstraints.BOTH;
         c.weightx = 1.0;
         c.gridy = 0;
+        
+		// Panel para el boton de restaurar la configuracion
+		final JPanel panelGeneral = new JPanel(new FlowLayout(FlowLayout.LEADING));
+		panelGeneral.setBorder(BorderFactory.createTitledBorder(SimpleAfirmaMessages.getString("PreferencesPanel.108")) //$NON-NLS-1$
+		);
+
+		final JButton restoreConfigButton = new JButton(SimpleAfirmaMessages.getString("PreferencesPanel.147") //$NON-NLS-1$
+		);
+
+		restoreConfigButton.setMnemonic('R');
+		restoreConfigButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent ae) {
+				if (AOUIFactory.showConfirmDialog(getParent(), SimpleAfirmaMessages.getString("PreferencesPanel.140"), //$NON-NLS-1$
+						SimpleAfirmaMessages.getString("PreferencesPanel.139"), //$NON-NLS-1$
+						JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) {
+
+					loadDefaultPreferences();
+
+				}
+			}
+		});
+		restoreConfigButton.getAccessibleContext()
+				.setAccessibleDescription(SimpleAfirmaMessages.getString("PreferencesPanel.136") //$NON-NLS-1$
+		);
+
+		final JLabel restoreConfigLabel = new JLabel(SimpleAfirmaMessages.getString("PreferencesPanel.154")); //$NON-NLS-1$
+		restoreConfigLabel.setLabelFor(restoreConfigButton);
+
+		final GridBagConstraints gbcGeneral = new GridBagConstraints();
+		gbcGeneral.fill = GridBagConstraints.HORIZONTAL;
+
+		panelGeneral.add(restoreConfigLabel);
+		panelGeneral.add(restoreConfigButton);
+
+		add(panelGeneral, gbcGeneral);
 
         loadPreferences();
         
@@ -237,6 +269,37 @@ final class PreferencesPanelCades extends JPanel {
         revalidate();
         repaint();
 	}
+		
+	void loadDefaultPreferences() {
+		
+		final List<PolicyPanel.PolicyItem> cadesPolicies = new ArrayList<>();
+        cadesPolicies.add(
+    		new PolicyItem(
+        		SimpleAfirmaMessages.getString("PreferencesPanel.73"), //$NON-NLS-1$
+        		POLICY_CADES_PADES_AGE_1_9
+    		)
+		);
+
+        this.panelPolicies.removeAll();
+        this.cadesPolicyDlg = new PolicyPanel(
+        		SIGN_FORMAT_CADES,
+        		cadesPolicies,
+        		getCadesDefaultPolicy(),
+        		null,
+        		this.unprotected
+    		);
+
+        final GridBagConstraints c = new GridBagConstraints();
+        c.fill = GridBagConstraints.BOTH;
+        c.weightx = 1.0;
+        c.gridy = 0;
+        this.panelPolicies.add(this.cadesPolicyDlg, c);
+        	
+		this.policyLabel.setText(this.cadesPolicyDlg.getSelectedPolicy());
+        
+        revalidate();
+        repaint();
+	}
 
 	/** Obtiene la configuraci&oacute;n de politica de firma CAdES establecida actualmente.
 	 * @return Pol&iacute;tica de firma configurada. */
@@ -257,6 +320,48 @@ final class PreferencesPanelCades extends JPanel {
 			Logger.getLogger("es.gob.afirma").severe("Error al recuperar la politica CAdES guardada en preferencias: " + e); //$NON-NLS-1$ //$NON-NLS-2$
 			return null;
 		}
+	}
+	
+	/** Obtiene la configuraci&oacute;n de politica de firma CAdES por defecto.
+	 * @return Pol&iacute;tica de firma configurada. */
+	private AdESPolicy getCadesDefaultPolicy() {
+
+		AdESPolicy adesPolicy = null;
+
+		if (this.unprotected) {
+
+			// unprotected = true, luego no pueden alterarse las
+			// propiedades:
+			// devolvemos las preferencias almacenadas actualmente
+
+			adesPolicy = this.cadesPolicyDlg.getCurrentPolicy();
+
+		} else {
+
+			// unprotected = false, luego se pueden alterar las propiedades:
+			// devolvemos las preferencias por defecto
+			try {
+
+				if (PreferencesManager.getPreference(PREFERENCE_CADES_POLICY_IDENTIFIER, null) == null
+						|| "".equals(PreferencesManager.getPreference(PREFERENCE_CADES_POLICY_IDENTIFIER, null))) { //$NON-NLS-1$
+					this.cadesPolicyDlg.loadPolicy(null);
+				} else {
+
+					this.cadesPolicyDlg
+							.loadPolicy(new AdESPolicy(PreferencesManager.get(PREFERENCE_CADES_POLICY_IDENTIFIER, null),
+									PreferencesManager.get(PREFERENCE_CADES_POLICY_HASH, null),
+									PreferencesManager.get(PREFERENCE_CADES_POLICY_HASH_ALGORITHM, null),
+									PreferencesManager.get(PREFERENCE_CADES_POLICY_QUALIFIER, null)));
+				}
+			} catch (final Exception e) {
+				Logger.getLogger("es.gob.afirma") //$NON-NLS-1$
+						.severe("Error al recuperar la politica CAdES guardada en preferencias: " + e); //$NON-NLS-1$
+
+			}
+		}
+
+		return adesPolicy;
+
 	}
 	
 	/** Di&aacute;logo para cambair la configuracion de la pol&iacute;tica
@@ -295,27 +400,27 @@ final class PreferencesPanelCades extends JPanel {
 				
 				try {
 					checkPreferences();
-
+					
 					this.policyLabel.setText(this.cadesPolicyDlg.getSelectedPolicy());
 
-					final AdESPolicy padesPolicy = this.cadesPolicyDlg.getCurrentPolicy();
-					if (padesPolicy != null) {
-						PreferencesManager.put(PREFERENCE_PADES_POLICY_IDENTIFIER, padesPolicy.getPolicyIdentifier());
-						PreferencesManager.put(PREFERENCE_PADES_POLICY_IDENTIFIER_HASH,
-								padesPolicy.getPolicyIdentifierHash());
-						PreferencesManager.put(PREFERENCE_PADES_POLICY_IDENTIFIER_HASH_ALGORITHM,
-								padesPolicy.getPolicyIdentifierHashAlgorithm());
-						if (padesPolicy.getPolicyQualifier() != null) {
-							PreferencesManager.put(PREFERENCE_PADES_POLICY_QUALIFIER,
-									padesPolicy.getPolicyQualifier().toString());
+					final AdESPolicy cadesPolicy = this.cadesPolicyDlg.getCurrentPolicy();
+					if (cadesPolicy != null) {
+						PreferencesManager.put(PREFERENCE_CADES_POLICY_IDENTIFIER, cadesPolicy.getPolicyIdentifier());
+						PreferencesManager.put(PREFERENCE_CADES_POLICY_HASH,
+								cadesPolicy.getPolicyIdentifierHash());
+						PreferencesManager.put(PREFERENCE_CADES_POLICY_HASH_ALGORITHM,
+								cadesPolicy.getPolicyIdentifierHashAlgorithm());
+						if (cadesPolicy.getPolicyQualifier() != null) {
+							PreferencesManager.put(PREFERENCE_CADES_POLICY_QUALIFIER,
+									cadesPolicy.getPolicyQualifier().toString());
 						} else {
-							PreferencesManager.remove(PREFERENCE_PADES_POLICY_QUALIFIER);
+							PreferencesManager.remove(PREFERENCE_CADES_POLICY_QUALIFIER);
 						}
 					} else {
-						PreferencesManager.remove(PREFERENCE_PADES_POLICY_IDENTIFIER);
-						PreferencesManager.remove(PREFERENCE_PADES_POLICY_IDENTIFIER_HASH);
-						PreferencesManager.remove(PREFERENCE_PADES_POLICY_IDENTIFIER_HASH_ALGORITHM);
-						PreferencesManager.remove(PREFERENCE_PADES_POLICY_QUALIFIER);
+						PreferencesManager.remove(PREFERENCE_CADES_POLICY_IDENTIFIER);
+						PreferencesManager.remove(PREFERENCE_CADES_POLICY_HASH);
+						PreferencesManager.remove(PREFERENCE_CADES_POLICY_HASH_ALGORITHM);
+						PreferencesManager.remove(PREFERENCE_CADES_POLICY_QUALIFIER);
 					}
 					
 					this.cadesPolicyDlg.saveCurrentPolicy();

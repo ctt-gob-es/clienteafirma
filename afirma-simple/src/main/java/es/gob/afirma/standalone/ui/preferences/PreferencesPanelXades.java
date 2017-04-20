@@ -1,9 +1,5 @@
 package es.gob.afirma.standalone.ui.preferences;
 
-import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_PADES_POLICY_IDENTIFIER;
-import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_PADES_POLICY_IDENTIFIER_HASH;
-import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_PADES_POLICY_IDENTIFIER_HASH_ALGORITHM;
-import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_PADES_POLICY_QUALIFIER;
 import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_XADES_POLICY_IDENTIFIER;
 import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_XADES_POLICY_IDENTIFIER_HASH;
 import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_XADES_POLICY_IDENTIFIER_HASH_ALGORITHM;
@@ -28,7 +24,6 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
-import java.util.prefs.BackingStoreException;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -122,16 +117,9 @@ final class PreferencesPanelXades extends JPanel {
 				if (AOUIFactory.showConfirmDialog(getParent(), SimpleAfirmaMessages.getString("PreferencesPanel.140"), //$NON-NLS-1$
 						SimpleAfirmaMessages.getString("PreferencesPanel.139"), //$NON-NLS-1$
 						JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) {
-					try {
-						PreferencesManager.clearAll();
-						loadDefaultPreferences();
-					} catch (final BackingStoreException e) {
-						LOGGER.severe("Error eliminando las preferencias de la aplicacion: " + e); //$NON-NLS-1$
-						AOUIFactory.showErrorMessage(getParent(),
-								SimpleAfirmaMessages.getString("PreferencesPanel.141"), //$NON-NLS-1$
-								SimpleAfirmaMessages.getString("PreferencesPanel.117"), //$NON-NLS-1$
-								JOptionPane.ERROR_MESSAGE);
-					}
+
+					loadDefaultPreferences();
+
 				}
 			}
 		});
@@ -614,24 +602,24 @@ final class PreferencesPanelXades extends JPanel {
 
 					this.policyLabel.setText(this.xadesPolicyDlg.getSelectedPolicy());
 
-					final AdESPolicy padesPolicy = this.xadesPolicyDlg.getCurrentPolicy();
-					if (padesPolicy != null) {
-						PreferencesManager.put(PREFERENCE_PADES_POLICY_IDENTIFIER, padesPolicy.getPolicyIdentifier());
-						PreferencesManager.put(PREFERENCE_PADES_POLICY_IDENTIFIER_HASH,
-								padesPolicy.getPolicyIdentifierHash());
-						PreferencesManager.put(PREFERENCE_PADES_POLICY_IDENTIFIER_HASH_ALGORITHM,
-								padesPolicy.getPolicyIdentifierHashAlgorithm());
-						if (padesPolicy.getPolicyQualifier() != null) {
-							PreferencesManager.put(PREFERENCE_PADES_POLICY_QUALIFIER,
-									padesPolicy.getPolicyQualifier().toString());
+					final AdESPolicy xadesPolicy = this.xadesPolicyDlg.getCurrentPolicy();
+					if (xadesPolicy != null) {
+						PreferencesManager.put(PREFERENCE_XADES_POLICY_IDENTIFIER, xadesPolicy.getPolicyIdentifier());
+						PreferencesManager.put(PREFERENCE_XADES_POLICY_IDENTIFIER_HASH,
+								xadesPolicy.getPolicyIdentifierHash());
+						PreferencesManager.put(PREFERENCE_XADES_POLICY_IDENTIFIER_HASH_ALGORITHM,
+								xadesPolicy.getPolicyIdentifierHashAlgorithm());
+						if (xadesPolicy.getPolicyQualifier() != null) {
+							PreferencesManager.put(PREFERENCE_XADES_POLICY_QUALIFIER,
+									xadesPolicy.getPolicyQualifier().toString());
 						} else {
-							PreferencesManager.remove(PREFERENCE_PADES_POLICY_QUALIFIER);
+							PreferencesManager.remove(PREFERENCE_XADES_POLICY_QUALIFIER);
 						}
 					} else {
-						PreferencesManager.remove(PREFERENCE_PADES_POLICY_IDENTIFIER);
-						PreferencesManager.remove(PREFERENCE_PADES_POLICY_IDENTIFIER_HASH);
-						PreferencesManager.remove(PREFERENCE_PADES_POLICY_IDENTIFIER_HASH_ALGORITHM);
-						PreferencesManager.remove(PREFERENCE_PADES_POLICY_QUALIFIER);
+						PreferencesManager.remove(PREFERENCE_XADES_POLICY_IDENTIFIER);
+						PreferencesManager.remove(PREFERENCE_XADES_POLICY_IDENTIFIER_HASH);
+						PreferencesManager.remove(PREFERENCE_XADES_POLICY_IDENTIFIER_HASH_ALGORITHM);
+						PreferencesManager.remove(PREFERENCE_XADES_POLICY_QUALIFIER);
 					}
 					
 					this.xadesPolicyDlg.saveCurrentPolicy();
