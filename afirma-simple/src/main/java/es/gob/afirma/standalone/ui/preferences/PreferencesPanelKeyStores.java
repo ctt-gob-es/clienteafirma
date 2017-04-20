@@ -42,6 +42,11 @@ final class PreferencesPanelKeyStores extends JPanel {
 	private final JCheckBox onlySignature = new JCheckBox(SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.0")); //$NON-NLS-1$
 
 	private final JCheckBox onlyAlias = new JCheckBox(SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.4")); //$NON-NLS-1$
+	
+	/**
+	 * Atributo que permite gestionar el bloqueo de preferencias.
+	 */
+	private boolean unprotected = true;
 
 	private static AOKeyStore[] DEFAULT_STORES;
 	static {
@@ -76,8 +81,10 @@ final class PreferencesPanelKeyStores extends JPanel {
 	}
 
 	PreferencesPanelKeyStores(final KeyListener keyListener,
-							  final ModificationListener modificationListener) {
+							  final ModificationListener modificationListener,
+							  final boolean unprotected) {
 
+		this.unprotected = unprotected;
 		createUI(keyListener, modificationListener);
 	}
 
@@ -246,8 +253,8 @@ final class PreferencesPanelKeyStores extends JPanel {
 	}
 
 	void loadPreferences() {
-		this.onlySignature.setSelected(PreferencesManager.getBoolean(PREFERENCE_KEYSTORE_SIGN_ONLY_CERTS, false));
-		this.onlyAlias.setSelected(PreferencesManager.getBoolean(PREFERENCE_KEYSTORE_ALIAS_ONLY_CERTS, false));
+		this.onlySignature.setSelected(PreferencesManager.getBooleanPreference(PREFERENCE_KEYSTORE_SIGN_ONLY_CERTS, false));
+		this.onlyAlias.setSelected(PreferencesManager.getBooleanPreference(PREFERENCE_KEYSTORE_ALIAS_ONLY_CERTS, false));
 		this.defaultStore.setSelectedItem(
 			SimpleKeyStoreManager.getDefaultKeyStoreType()
 		);

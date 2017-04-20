@@ -13,13 +13,18 @@ import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERE
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
+import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
@@ -29,12 +34,15 @@ import org.ietf.jgss.Oid;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AdESPolicy;
+import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.ui.preferences.PolicyPanel.PolicyItem;
 
 /** Pesta&ntilde;a de configuraci&oacute;n de las preferencias de facturaE.
  * @author Mariano Mart&iacute;nez. */
 final class PreferencesPanelFacturaE extends JPanel {
+	
+	static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	private static final long serialVersionUID = 4299378019540627483L;
 
@@ -75,10 +83,17 @@ final class PreferencesPanelFacturaE extends JPanel {
 
 	private final JPanel panelPolicies = new JPanel();
 	private PolicyPanel facturaePolicyPanel;
+	
+	/**
+	 * Atributo que permite gestionar el bloqueo de preferencias.
+	 */
+	private boolean unprotected = true;
 
 	PreferencesPanelFacturaE(final KeyListener keyListener,
-							 final ModificationListener modificationListener) {
+							 final ModificationListener modificationListener,
+							 final boolean unprotected) {
 
+		this.unprotected = unprotected;
 		createUI(keyListener, modificationListener);
 	}
 
@@ -91,11 +106,50 @@ final class PreferencesPanelFacturaE extends JPanel {
         gbc.fill = GridBagConstraints.BOTH;
         gbc.weightx = 1.0;
         gbc.gridy = 0;
+        
+		// Panel para el boton de restaurar la configuracion
+		final JPanel panelGeneral = new JPanel(new FlowLayout(FlowLayout.LEADING));
+		panelGeneral.setBorder(BorderFactory.createTitledBorder(SimpleAfirmaMessages.getString("PreferencesPanel.108")) //$NON-NLS-1$
+		);
+
+		final JButton restoreConfigButton = new JButton(SimpleAfirmaMessages.getString("PreferencesPanel.147") //$NON-NLS-1$
+		);
+
+		restoreConfigButton.setMnemonic('R');
+		restoreConfigButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent ae) {
+				if (AOUIFactory.showConfirmDialog(getParent(), SimpleAfirmaMessages.getString("PreferencesPanel.140"), //$NON-NLS-1$
+						SimpleAfirmaMessages.getString("PreferencesPanel.139"), //$NON-NLS-1$
+						JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) {
+
+					loadDefaultPreferences();
+
+				}
+			}
+		});
+		restoreConfigButton.getAccessibleContext()
+				.setAccessibleDescription(SimpleAfirmaMessages.getString("PreferencesPanel.136") //$NON-NLS-1$
+		);
+
+		final JLabel restoreConfigLabel = new JLabel(SimpleAfirmaMessages.getString("PreferencesPanel.149")); //$NON-NLS-1$
+		restoreConfigLabel.setLabelFor(restoreConfigButton);
+
+		final GridBagConstraints gbcGeneral = new GridBagConstraints();
+		gbcGeneral.fill = GridBagConstraints.HORIZONTAL;
+
+		panelGeneral.add(restoreConfigLabel);
+		panelGeneral.add(restoreConfigButton);
+
+		add(panelGeneral, gbcGeneral);
 
         loadPreferences();
 
         this.panelPolicies.setLayout(new GridBagLayout());
         this.panelPolicies.add(this.facturaePolicyPanel, gbc);
+        
+        gbc.gridy++;
+        
         add(this.panelPolicies, gbc);
 
         this.facturaePolicyPanel.setModificationListener(modificationListener);
@@ -333,7 +387,8 @@ final class PreferencesPanelFacturaE extends JPanel {
     		null,
     		false,
     		false,
-    		false
+    		false,
+    		this.unprotected
 		);
 
         final GridBagConstraints c = new GridBagConstraints();
@@ -341,6 +396,81 @@ final class PreferencesPanelFacturaE extends JPanel {
         c.weightx = 1.0;
         c.gridy = 0;
         this.panelPolicies.add(this.facturaePolicyPanel, c);
+        revalidate();
+        repaint();
+
+	}
+	
+	void loadDefaultPreferences() {
+		this.facturaeRol.setSelectedItem(
+			PreferencesManager.getPreference(
+				PREFERENCE_FACTURAE_SIGNER_ROLE,
+				FACTURAE_ROL_EMISOR
+			)
+		);
+
+		this.facturaeSignatureProductionCity.setText(
+			PreferencesManager.get(
+				PREFERENCE_FACTURAE_SIGNATURE_PRODUCTION_CITY,
+				"" //$NON-NLS-1$
+			)
+		);
+
+		this.facturaeSignatureProductionProvince.setText(
+			PreferencesManager.get(
+				PREFERENCE_FACTURAE_SIGNATURE_PRODUCTION_PROVINCE,
+				"" //$NON-NLS-1$
+			)
+		);
+
+		this.facturaeSignatureProductionPostalCode.setText(
+			PreferencesManager.get(
+				PREFERENCE_FACTURAE_SIGNATURE_PRODUCTION_POSTAL_CODE,
+				"" //$NON-NLS-1$
+			)
+		);
+
+		this.facturaeSignatureProductionCountry.setText(
+			PreferencesManager.get(
+				PREFERENCE_FACTURAE_SIGNATURE_PRODUCTION_COUNTRY,
+				"" //$NON-NLS-1$
+			)
+		);
+
+		final List<PolicyPanel.PolicyItem> facturaePolicies = new ArrayList<>();
+
+		facturaePolicies.add(
+    		new PolicyItem(
+    			SimpleAfirmaMessages.getString("PreferencesPanelFacturaE.2"), //$NON-NLS-1$
+        		POLICY_FACTURAE_31
+    		)
+		);
+
+		facturaePolicies.add(
+    		new PolicyItem(
+    			SimpleAfirmaMessages.getString("PreferencesPanelFacturaE.1"), //$NON-NLS-1$
+        		POLICY_FACTURAE_30
+    		)
+		);
+
+        this.panelPolicies.removeAll();
+        this.facturaePolicyPanel = new PolicyPanel(
+    		SIGN_FORMAT_FACTURAE,
+    		facturaePolicies,
+    		getFacturaEDefaultPolicy(),
+    		null,
+    		false,
+    		false,
+    		false,
+    		this.unprotected
+		);
+
+        final GridBagConstraints c = new GridBagConstraints();
+        c.fill = GridBagConstraints.BOTH;
+        c.weightx = 1.0;
+        c.gridy = 0;
+        this.panelPolicies.add(this.facturaePolicyPanel, c);
+              
         revalidate();
         repaint();
 
@@ -360,8 +490,39 @@ final class PreferencesPanelFacturaE extends JPanel {
 			return null;
 		}
 	}
+	
+	/** Obtiene la configuraci&oacute;n de politica de firma FacturaE establecida por defecto.
+	 * @return Pol&iacute;tica de firma configurada. */
+	private AdESPolicy getFacturaEDefaultPolicy() {
+		
+		AdESPolicy adesPolicy = null;
 
-	@SuppressWarnings("unused")
+		if (isUnprotected()) {
+
+			// unprotected = true, luego no pueden alterarse las
+			// propiedades:
+			// devolvemos las preferencias almacenadas actualmente
+
+			adesPolicy = this.facturaePolicyPanel.getCurrentPolicy();
+
+		} else {
+
+			// unprotected = false, luego se pueden alterar las propiedades:
+			// devolvemos las preferencias por defecto
+
+			if (PreferencesManager.getPreference(PreferencesManager.PREFERENCE_FACTURAE_POLICY, "") //$NON-NLS-1$
+					.equals(POLICY_FACTURAE_30_NAME)) {
+				adesPolicy = POLICY_FACTURAE_30;
+			} else if (PreferencesManager.getPreference(PreferencesManager.PREFERENCE_FACTURAE_POLICY, "") //$NON-NLS-1$
+					.equals(POLICY_FACTURAE_31_NAME)) {
+				adesPolicy = POLICY_FACTURAE_31;
+			}
+		}
+
+		return adesPolicy;
+		
+	}
+
 	void checkPreferences() throws AOException {
 		final AdESPolicy p = this.facturaePolicyPanel.getCurrentPolicy();
 		if (p != null) {
@@ -374,5 +535,21 @@ final class PreferencesPanelFacturaE extends JPanel {
 			}
 		}
 
+	}
+	
+	/**
+	 * M&eacute;todo getter del atributo unprotected
+	 * @return the unprotected
+	 */
+	public boolean isUnprotected() {
+		return this.unprotected;
+	}
+
+	/**
+	 * M&eacute;todo setter del atributo unprotected
+	 * @param unprotected the unprotected to set
+	 */
+	public void setUnprotected(boolean unprotected) {
+		this.unprotected = unprotected;
 	}
 }

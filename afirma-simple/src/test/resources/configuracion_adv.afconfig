@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plist version="1.0">
+<dict>
+	<!-- Preferencias protegidas -->
+	<key>signatureAlgorithm</key>
+	<string>SHA-512</string>
+	<key>defaultSignatureFormatPdf</key>
+	<string>CAdes</string>
+	<key>defaultSignatureFormatOoxml</key>
+	<string>OOXML (Office Open XML)</string>
+	<key>defaultSignatureFormatFacturae</key>
+	<string>defaultSignatureFormatFacturae</string>
+	<key>defaultSignatureFormatOdf</key>
+	<string>defaultSignatureFormatOdf</string>
+	<key>defaultSignatureFormatXml</key>
+	<string>XAdES</string>
+	<key>defaultSignatureFormatBin</key>
+	<string>CAdES</string>
+	<key>xadesPolicyIdentifier</key>
+	<string>1.4.23.98740</string>
+	<key>xadesPolicyIdentifierHash</key>
+	<string>UHJ1ZWJh</string>
+	<key>xadesPolicyIdentifierHashAlgorithm</key>
+	<string>SHA-384</string>
+	<key>xadesPolicyQualifier</key>
+	<string>https://sede.060.gob.es/politica_de_firma_anexo_2.pdf</string>
+	<key>xadesSignFormat</key>
+	<string>XAdES Detached</string>
+	<key>padesBasicFormat</key>
+	<string>PAdES-BES</string>
+	<key>padesPolicyIdentifier</key>
+	<string>1.4.23.98740</string>
+	<key>cadesPolicyIdentifier</key>
+	<string>1.4.23.98740</string>
+	<key>cadesPolicyIdentifierHash</key>
+	<string>UHJ1ZWJh</string>
+	<key>cadesPolicyIdentifierHashAlgorithm</key>
+	<string>SHA-256</string>
+	<key>cadesPolicyQualifier</key>
+	<string>https://sede.060.gob.es/politica_de_firma_anexo_3.pdf</string>
+	<key>cadesImplicitMode</key>
+	<string>true</string>
+	<key>facturaEPolicy</key>
+	<string>Política de Factura Electrónica 3.1</string>
+	
+	<!-- Preferencias no protegidas -->
+	<key>omitAskOnClose</key>
+	<false/>
+	<key>hideDnieStartScreen</key>
+	<false/>
+	<key>checkForUpdates</key>
+	<false/>
+	<key>xadesSignatureProductionCity</key>
+	<string>Madrid</string>
+	
+	
+</dict>
+</plist>

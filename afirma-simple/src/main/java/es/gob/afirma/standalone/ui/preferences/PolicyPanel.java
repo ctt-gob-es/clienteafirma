@@ -11,6 +11,7 @@ import java.awt.event.ItemListener;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
@@ -30,6 +31,8 @@ final class PolicyPanel extends JPanel implements ItemListener {
 
 	/** Serial Id. */
 	private static final long serialVersionUID = 4804298622744399269L;
+	
+	static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	private static final int POLICY_INDEX_NONE = 0;
 
@@ -72,7 +75,7 @@ final class PolicyPanel extends JPanel implements ItemListener {
 	private AdESPolicy currentPolicy;
 
 	private final List<PolicyItem> policies;
-
+	
 	/** Crea el panel de configuracion de pol&iacute;ticas de firma.
 	 * @param signFormat Formato de firma.
 	 * @param policies Listado de pol&iacute;ticas prefijadas.
@@ -92,8 +95,9 @@ final class PolicyPanel extends JPanel implements ItemListener {
 	PolicyPanel(final String signFormat,
 			    final List<PolicyItem> policies,
 			    final AdESPolicy currentPolicy,
-			    final JComboBox<Object> adesSubFormat) {
-		this(signFormat, policies, currentPolicy, adesSubFormat, true, true, true);
+			    final JComboBox<Object> adesSubFormat,
+			    final boolean unprotected) {
+		this(signFormat, policies, currentPolicy, adesSubFormat, true, true, true, unprotected);
 	}
 
 	final boolean allowNoPolicy;
@@ -125,7 +129,8 @@ final class PolicyPanel extends JPanel implements ItemListener {
 			    final JComboBox<Object> adesSubFormat,
 			    final boolean noPolicyOp,
 			    final boolean customPolicyOp,
-			    final boolean showFields) {
+			    final boolean showFields,
+			    final boolean unprotected) {
 
 		this.subFormatCombo = adesSubFormat;
 		this.signatureFormat = signFormat;
@@ -169,15 +174,15 @@ final class PolicyPanel extends JPanel implements ItemListener {
 			);
 		}
 		this.currentPolicy = currentPolicy;
-
-		createUI(signFormat, showFields);
+						
+		createUI(signFormat, showFields, unprotected);
 	}
 
 	/** Crea la interfaz gr&aacute;fica del panel.
 	 * @param signFormat Formato de firma.
 	 * @param showFields Indica si han de mostrarse o no los campos con los datos de la
 	 *                   pol&iacute;tica. */
-	private void createUI(final String signFormat, final boolean showFields) {
+	private void createUI(final String signFormat, final boolean showFields, final boolean unprotected) {
 		setBorder(
 			BorderFactory.createTitledBorder(
 				SimpleAfirmaMessages.getString("PreferencesPanel.23") //$NON-NLS-1$
@@ -202,6 +207,8 @@ final class PolicyPanel extends JPanel implements ItemListener {
 		this.policiesCombo.getAccessibleContext().setAccessibleDescription(
 			SimpleAfirmaMessages.getString("PreferencesPanel.47") //$NON-NLS-1$
 		);
+		
+		this.policiesCombo.setEnabled(!unprotected);
 
 		if (showFields) {
 
@@ -218,7 +225,6 @@ final class PolicyPanel extends JPanel implements ItemListener {
 
 					/** Ajusta la introducci&oacute;n del prefijo "urn:oid" de forma autom&aacute;tica
 					 * para evitar confusiones por parte del usuario. */
-					@SuppressWarnings("unused")
 					@Override
 					public void focusLost(final FocusEvent e) {
 						if (!"XAdES".equals(signFormat)) { //$NON-NLS-1$
@@ -402,7 +408,13 @@ final class PolicyPanel extends JPanel implements ItemListener {
 				this.subFormatCombo.setSelectedItem(
 					PreferencesManager.get(PREFERENCE_XADES_SIGN_FORMAT, AOSignConstants.SIGN_FORMAT_XADES_DETACHED)
 				);
-		        this.subFormatCombo.insertItemAt(AOSignConstants.SIGN_FORMAT_XADES_ENVELOPING, 1);
+				
+				// Antes de volver a añadir el formato XAdES Enveloping,
+				// compruebo si ya está en el combo.
+				if (AOSignConstants.SIGN_FORMAT_XADES.equals(this.signatureFormat) && !((String)this.subFormatCombo.getItemAt(1)).equals(AOSignConstants.SIGN_FORMAT_XADES_ENVELOPING)) {
+		        	this.subFormatCombo.insertItemAt(AOSignConstants.SIGN_FORMAT_XADES_ENVELOPING, 1);
+				}
+					        	
 				this.subFormatCombo.setEnabled(true);
 			}
 		}
@@ -411,7 +423,7 @@ final class PolicyPanel extends JPanel implements ItemListener {
 
 	/** Carga los datos de una pol&iacute;tica en el panel.
 	 * @param policy Pol&iacute;tica a cargar. */
-	private void loadPolicy(final AdESPolicy policy) {
+	void loadPolicy(final AdESPolicy policy) {
 		if (policy != null) {
 			this.identifierField.setText(policy.getPolicyIdentifier());
 			this.hashField.setText(policy.getPolicyIdentifierHash());
@@ -434,6 +446,7 @@ final class PolicyPanel extends JPanel implements ItemListener {
 	static final class PolicyItem {
 
 		private final String name;
+		
 		private AdESPolicy policy;
 
 		/** Construye el elemento con nombre y configuraci&oacute;n de pol&iacute;tica.
@@ -480,6 +493,10 @@ final class PolicyPanel extends JPanel implements ItemListener {
 		public int hashCode() {
 			return super.hashCode();
 		}
+		
+		public String getName() {
+			return this.name;
+		}
 	}
 
 	/** Guarda la configuraci&oacute;n actual dentro el contexto.
@@ -511,4 +528,16 @@ final class PolicyPanel extends JPanel implements ItemListener {
 			this.qualifierField.getText()
 		);
 	}
+	
+	
+	/**
+	 * Devuelve la política seleccionada en el combo de pol&iacute;ticas
+	 * @return La pol&iacute;tica seleccionada
+	 */
+	public String getSelectedPolicy() {
+		
+		return ((PolicyItem)this.policiesCombo.getSelectedItem()).getName();
+		
+	}
+	
 }

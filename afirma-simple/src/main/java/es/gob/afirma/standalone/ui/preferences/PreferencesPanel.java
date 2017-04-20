@@ -33,9 +33,8 @@ final class PreferencesPanel extends JPanel implements KeyListener, DisposableIn
 
 	private static final long serialVersionUID = -3168095095548385291L;
 
-
 	private final JButton applyButton = new JButton(SimpleAfirmaMessages.getString("PreferencesPanel.0")); //$NON-NLS-1$
-
+	
 	private final ModificationListener modificationListener;
 
     private final Window window;
@@ -53,14 +52,15 @@ final class PreferencesPanel extends JPanel implements KeyListener, DisposableIn
 	private final JTabbedPane tabbedPane = new JTabbedPane();
 
 	void createUI(final int selectedTabIndex) {
+		
+		final boolean unprotected = PreferencesManager.getBooleanPreference(PreferencesManager.PREFERENCE_GENERAL_UNPROTECTED, true);
 
-
-		this.preferencesPanelGeneral = new PreferencesPanelGeneral(this, this.modificationListener, this, this);
-		this.preferencesPanelCades = new PreferencesPanelCades(this, this.modificationListener);
-		this.preferencesPanelPades = new PreferencesPanelPades(this, this.modificationListener);
-		this.preferencesPanelKeyStores = new PreferencesPanelKeyStores(this, this.modificationListener);
-		this.preferencesPanelFacturaE = new PreferencesPanelFacturaE(this, this.modificationListener);
-		this.preferencesPanelXades = new PreferencesPanelXades(this, this.modificationListener);
+		this.preferencesPanelGeneral = new PreferencesPanelGeneral(this, this.modificationListener, this, this, unprotected);
+		this.preferencesPanelCades = new PreferencesPanelCades(this, this.modificationListener, unprotected);
+		this.preferencesPanelPades = new PreferencesPanelPades(this, this.modificationListener, unprotected);
+		this.preferencesPanelKeyStores = new PreferencesPanelKeyStores(this, this.modificationListener, unprotected);
+		this.preferencesPanelFacturaE = new PreferencesPanelFacturaE(this, this.modificationListener, unprotected);
+		this.preferencesPanelXades = new PreferencesPanelXades(this, this.modificationListener, unprotected);
 
 		this.tabbedPane.addKeyListener(this);
 
@@ -181,37 +181,16 @@ final class PreferencesPanel extends JPanel implements KeyListener, DisposableIn
 	    return true;
 
 	}
-
+    
+    
     void loadPreferences() {
-    	//****************************************************************************
-    			//**** PREFERENCIAS ALMACENES ************************************************
-    			//****************************************************************************
-    			this.preferencesPanelKeyStores.loadPreferences();
-
-    			//****************************************************************************
-    			//**** PREFERENCIAS FACTURAE ************************************************
-    			//****************************************************************************
-    			this.preferencesPanelFacturaE.loadPreferences();
-
-    			//****************************************************************************
-    			//**** PREFERENCIAS GENERALES ************************************************
-    			//****************************************************************************
-    			this.preferencesPanelGeneral.loadPreferences();
-
-    			//****************************************************************************
-    			//**** PREFERENCIAS CADES ****************************************************
-    			//****************************************************************************
-    			this.preferencesPanelCades.loadPreferences();
-
-    			//****************************************************************************
-    			//**** PREFERENCIAS PADES ****************************************************
-    			//****************************************************************************
-    			this.preferencesPanelPades.loadPreferences();
-
-    			//****************************************************************************
-    			//**** PREFERENCIAS XADES ****************************************************
-    			//****************************************************************************
-    			this.preferencesPanelXades.loadPreferences();
+		
+		// ****************************************************************************
+		// **** PREFERENCIAS GENERALES
+		// ************************************************
+		// ****************************************************************************
+		this.preferencesPanelGeneral.loadPreferences();
+		
     }
 
 	/** Comprueba que los datos configurados sean v&aacute;lidos.
@@ -315,18 +294,18 @@ final class PreferencesPanel extends JPanel implements KeyListener, DisposableIn
 			}
 		});
 		this.applyButton.setEnabled(false);
-
+		
 		// En Mac OS X el orden de los botones es distinto
 		if (Platform.OS.MACOSX.equals(Platform.getOS())) {
 			panel.add(cancelButton);
 			panel.add(this.applyButton);
 			panel.add(acceptButton);
-		}
-		else {
+		} else {
 			panel.add(this.applyButton);
 			panel.add(acceptButton);
 			panel.add(cancelButton);
 		}
+		
 		return panel;
 	}
 
