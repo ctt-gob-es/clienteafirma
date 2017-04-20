@@ -61,7 +61,6 @@ public final class ProtocolInvocationLauncher {
      *                 HTTP local (a <code>localhost</code>), si se establece a <code>false</code> se usa un servidor intermedio
      *                 para esta comunicaci&oacute;n de vuelta.
      * @return Resultado de la operaci&oacute;n. */
-    @SuppressWarnings("unused")
     public static String launch(final String urlString, final boolean bySocket)  {
         // En OS X sobrecargamos el "Acerca de..." del sistema operativo, que tambien
         // aparece en la invocacion por protocolo
