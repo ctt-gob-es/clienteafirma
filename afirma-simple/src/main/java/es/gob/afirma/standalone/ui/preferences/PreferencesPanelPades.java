@@ -10,6 +10,8 @@ import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERE
 import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_PADES_SIGN_REASON;
 import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_PADES_VISIBLE;
 
+import java.awt.Container;
+import java.awt.Cursor;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -49,7 +51,14 @@ final class PreferencesPanelPades extends JPanel {
 	private static final long serialVersionUID = 4299378019540627483L;
 
 	private final JPanel panelPolicies = new JPanel();
-	private PolicyPanel padesPolicyPanel;
+	
+	private PolicyPanel padesPolicyDlg;
+	
+	/**
+	 * Atributo que representa la etiqueta de la pol&iacute;tica seleccionada en
+	 * el di&aacute;logo.
+	 */
+	private JLabel policyLabel;
 
 	private static final AdESPolicy POLICY_CADES_PADES_AGE_1_9 = new AdESPolicy(
 		"2.16.724.1.3.1.1.2.1.9", //$NON-NLS-1$
@@ -75,6 +84,8 @@ final class PreferencesPanelPades extends JPanel {
 	private final JTextField padesSignerContact = new JTextField();
 
 	private final JCheckBox visiblePdfSignature = new JCheckBox(SimpleAfirmaMessages.getString("PreferencesPanel.79")); //$NON-NLS-1$
+	
+	
 
 	private static final String PADES_FORMAT_BASIC_TEXT = SimpleAfirmaMessages.getString("PreferencesPanel.71"); //$NON-NLS-1$
 	private static final String PADES_FORMAT_BES_TEXT = SimpleAfirmaMessages.getString("PreferencesPanel.72"); //$NON-NLS-1$
@@ -152,15 +163,64 @@ final class PreferencesPanelPades extends JPanel {
 		this.padesBasicFormat.setEnabled(!this.unprotected);
 
         loadPreferences();
+        
+        final List<PolicyPanel.PolicyItem> padesPolicies = new ArrayList<>();
+        padesPolicies.add(
+    		new PolicyItem(
+        		SimpleAfirmaMessages.getString("PreferencesPanel.73"), //$NON-NLS-1$
+        		POLICY_CADES_PADES_AGE_1_9
+    		)
+		);
+        
+        this.padesPolicyDlg = new PolicyPanel(
+        		SIGN_FORMAT_PADES,
+        		padesPolicies,
+        		getPadesPreferedPolicy(),
+        		this.padesBasicFormat,
+        		this.unprotected
+    		);
+    	
+    	this.padesPolicyDlg.setModificationListener(modificationListener);
+    	this.padesPolicyDlg.setKeyListener(keyListener);
+        
+        ///////////// Panel Policy ////////////////
+        
+        final JPanel policyConfigPanel = new JPanel(new FlowLayout(FlowLayout.LEADING));
+		policyConfigPanel.setBorder(
+			BorderFactory.createTitledBorder(
+				BorderFactory.createTitledBorder(SimpleAfirmaMessages.getString("PreferencesPanel.153")) //$NON-NLS-1$
+			)
+		);
 
-        this.padesPolicyPanel.setModificationListener(modificationListener);
-        this.padesPolicyPanel.setKeyListener(keyListener);
-        this.panelPolicies.setLayout(new GridBagLayout());
-        this.panelPolicies.add(this.padesPolicyPanel, gbc);
+		final JButton policyConfigButton = new JButton(
+			SimpleAfirmaMessages.getString("PreferencesPanel.150") //$NON-NLS-1$
+		);
+		
+		this.policyLabel = new JLabel(this.padesPolicyDlg.getSelectedPolicy());
+		this.policyLabel.setLabelFor(policyConfigButton);
+
+		policyConfigButton.setMnemonic('P');
+		policyConfigButton.addActionListener(
+			new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent ae) {
+					changePadesPolicyDlg(getParent());
+				}
+			}
+		);
+		policyConfigButton.getAccessibleContext().setAccessibleDescription(
+			SimpleAfirmaMessages.getString("PreferencesPanel.151") //$NON-NLS-1$
+		);
+		
+		policyConfigButton.setEnabled(!isUnprotected());
+		policyConfigPanel.add(this.policyLabel);
+		policyConfigPanel.add(policyConfigButton);
+        
+        ///////////// Fin Panel Policy ////////////////
 		
         gbc.gridy++;
-        
-        add(this.panelPolicies, gbc);
+              
+        add(policyConfigPanel, gbc);
         
 	    final JPanel metadataPanel = new JPanel();
         metadataPanel.setBorder(BorderFactory.createTitledBorder(
@@ -293,7 +353,7 @@ final class PreferencesPanelPades extends JPanel {
 	}
 
 	void checkPreferences() throws AOException {
-		final AdESPolicy p = this.padesPolicyPanel.getCurrentPolicy();
+		final AdESPolicy p = this.padesPolicyDlg.getCurrentPolicy();
 		if (p != null) {
 			// No nos interesa el resultado, solo si construye sin excepciones
 			try {
@@ -329,8 +389,8 @@ final class PreferencesPanelPades extends JPanel {
 		}
 
 		PreferencesManager.put(PREFERENCE_PADES_FORMAT, ((ValueTextPair) this.padesBasicFormat.getSelectedItem()).getValue());
-
-		final AdESPolicy padesPolicy = this.padesPolicyPanel.getCurrentPolicy();
+		
+		final AdESPolicy padesPolicy = this.padesPolicyDlg.getCurrentPolicy();
 		if (padesPolicy != null) {
 			PreferencesManager.put(PREFERENCE_PADES_POLICY_IDENTIFIER, padesPolicy.getPolicyIdentifier());
 			PreferencesManager.put(PREFERENCE_PADES_POLICY_IDENTIFIER_HASH, padesPolicy.getPolicyIdentifierHash());
@@ -348,7 +408,7 @@ final class PreferencesPanelPades extends JPanel {
 			PreferencesManager.remove(PREFERENCE_PADES_POLICY_IDENTIFIER_HASH_ALGORITHM);
 			PreferencesManager.remove(PREFERENCE_PADES_POLICY_QUALIFIER);
 		}
-		this.padesPolicyPanel.saveCurrentPolicy();
+		this.padesPolicyDlg.saveCurrentPolicy();
 	}
 
 	void loadPreferences() {
@@ -377,7 +437,7 @@ final class PreferencesPanelPades extends JPanel {
     		)
 		);
         this.panelPolicies.removeAll();
-        this.padesPolicyPanel = new PolicyPanel(
+        this.padesPolicyDlg = new PolicyPanel(
     		SIGN_FORMAT_PADES,
     		padesPolicies,
     		getPadesPreferedPolicy(),
@@ -389,7 +449,7 @@ final class PreferencesPanelPades extends JPanel {
         c.fill = GridBagConstraints.BOTH;
         c.weightx = 1.0;
         c.gridy = 0;
-        this.panelPolicies.add(this.padesPolicyPanel, c);
+        this.panelPolicies.add(this.padesPolicyDlg, c);
         revalidate();
         repaint();
 	}
@@ -434,7 +494,7 @@ final class PreferencesPanelPades extends JPanel {
 		);
         this.panelPolicies.removeAll();
         
-        this.padesPolicyPanel = new PolicyPanel(
+        this.padesPolicyDlg = new PolicyPanel(
     		SIGN_FORMAT_PADES,
     		padesPolicies,
     		getPadesDefaultPolicy(),
@@ -446,12 +506,14 @@ final class PreferencesPanelPades extends JPanel {
         c.fill = GridBagConstraints.BOTH;
         c.weightx = 1.0;
         c.gridy = 0;
-        this.panelPolicies.add(this.padesPolicyPanel, c);
+        this.panelPolicies.add(this.padesPolicyDlg, c);
         
         if (this.padesBasicFormat.getItemCount() > 0) {
 			this.padesBasicFormat.setSelectedIndex(0);
 		}
-		this.padesBasicFormat.setEnabled(!this.unprotected);        
+		this.padesBasicFormat.setEnabled(!this.unprotected);
+		
+		this.policyLabel.setText(this.padesPolicyDlg.getSelectedPolicy());
         
         revalidate();
         repaint();
@@ -497,16 +559,25 @@ final class PreferencesPanelPades extends JPanel {
 			// propiedades:
 			// devolvemos las preferencias almacenadas actualmente
 
-			adesPolicy = this.padesPolicyPanel.getCurrentPolicy();
+			adesPolicy = this.padesPolicyDlg.getCurrentPolicy();
 
 		} else {
 			try {
 				// unprotected = false, luego se pueden alterar las propiedades:
 				// devolvemos las preferencias por defecto
-				adesPolicy = new AdESPolicy(PreferencesManager.getPreference(PREFERENCE_PADES_POLICY_IDENTIFIER, null),
-						PreferencesManager.getPreference(PREFERENCE_PADES_POLICY_IDENTIFIER_HASH, null),
-						PreferencesManager.getPreference(PREFERENCE_PADES_POLICY_IDENTIFIER_HASH_ALGORITHM, null),
-						PreferencesManager.getPreference(PREFERENCE_PADES_POLICY_QUALIFIER, null));
+								
+				if (PreferencesManager.getPreference(PREFERENCE_PADES_POLICY_IDENTIFIER, null) == null
+						|| "".equals(PreferencesManager.getPreference(PREFERENCE_PADES_POLICY_IDENTIFIER, null))) { //$NON-NLS-1$
+					this.padesPolicyDlg.loadPolicy(null);
+				} else {
+					this.padesPolicyDlg.loadPolicy(
+							new AdESPolicy(PreferencesManager.getPreference(PREFERENCE_PADES_POLICY_IDENTIFIER, null),
+									PreferencesManager.getPreference(PREFERENCE_PADES_POLICY_IDENTIFIER_HASH, null),
+									PreferencesManager.getPreference(PREFERENCE_PADES_POLICY_IDENTIFIER_HASH_ALGORITHM,
+											null),
+									PreferencesManager.getPreference(PREFERENCE_PADES_POLICY_QUALIFIER, null)));
+				}	
+				
 			} catch (final Exception e) {
 				Logger.getLogger("es.gob.afirma") //$NON-NLS-1$
 						.severe("Error al recuperar la politica PAdES guardada en fichero de preferencias: " + e); //$NON-NLS-1$
@@ -532,6 +603,87 @@ final class PreferencesPanelPades extends JPanel {
 	public void setUnprotected(boolean unprotected) {
 		this.unprotected = unprotected;
 	}
+	
+	
+	
+	/** Di&aacute;logo para cambair la configuracion de la pol&iacute;tica
+	 * @param container Contenedor en el que se define el di&aacute;logo. 
+	 * */
+    public void changePadesPolicyDlg(final Container container) {
+
+		// Cursor en espera
+		container.setCursor(new Cursor(Cursor.WAIT_CURSOR));
+
+		// Cursor por defecto
+		container.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+
+		if (AOUIFactory.showConfirmDialog(container, this.padesPolicyDlg, SimpleAfirmaMessages.getString("PolicyDialog.0"), //$NON-NLS-1$
+				JOptionPane.OK_CANCEL_OPTION, JOptionPane.DEFAULT_OPTION) == JOptionPane.OK_OPTION) {
+
+			String policyId = null;
+			
+			try {
+				if (this.padesPolicyDlg.getCurrentPolicy() != null) {
+					policyId = this.padesPolicyDlg.getCurrentPolicy().getPolicyIdentifier();
+				}
+			} catch (IllegalArgumentException e) {
+				LOGGER.warning("El identificador de la politica no puede ser nulo o vacio"); //$NON-NLS-1$
+			}
+
+			if ((policyId == null || "".equals(policyId)) && SimpleAfirmaMessages.getString("PreferencesPanel.26").equals(this.padesPolicyDlg.getSelectedPolicy())) { //$NON-NLS-1$ //$NON-NLS-2$
+				AOUIFactory.showErrorMessage(null,
+						SimpleAfirmaMessages.getString("PolicyDialog.1"), //$NON-NLS-1$
+						SimpleAfirmaMessages.getString("PolicyDialog.2"), //$NON-NLS-1$
+						JOptionPane.ERROR_MESSAGE);
+				changePadesPolicyDlg(container);
+				LOGGER.warning("El identificador de la politica no puede ser nulo o vacio"); //$NON-NLS-1$
+			}
+
+			else {
+				
+				try {
+					checkPreferences();
+
+					this.policyLabel.setText(this.padesPolicyDlg.getSelectedPolicy());
+
+					final AdESPolicy padesPolicy = this.padesPolicyDlg.getCurrentPolicy();
+					if (padesPolicy != null) {
+						PreferencesManager.put(PREFERENCE_PADES_POLICY_IDENTIFIER, padesPolicy.getPolicyIdentifier());
+						PreferencesManager.put(PREFERENCE_PADES_POLICY_IDENTIFIER_HASH,
+								padesPolicy.getPolicyIdentifierHash());
+						PreferencesManager.put(PREFERENCE_PADES_POLICY_IDENTIFIER_HASH_ALGORITHM,
+								padesPolicy.getPolicyIdentifierHashAlgorithm());
+						if (padesPolicy.getPolicyQualifier() != null) {
+							PreferencesManager.put(PREFERENCE_PADES_POLICY_QUALIFIER,
+									padesPolicy.getPolicyQualifier().toString());
+						} else {
+							PreferencesManager.remove(PREFERENCE_PADES_POLICY_QUALIFIER);
+						}
+					} else {
+						PreferencesManager.remove(PREFERENCE_PADES_POLICY_IDENTIFIER);
+						PreferencesManager.remove(PREFERENCE_PADES_POLICY_IDENTIFIER_HASH);
+						PreferencesManager.remove(PREFERENCE_PADES_POLICY_IDENTIFIER_HASH_ALGORITHM);
+						PreferencesManager.remove(PREFERENCE_PADES_POLICY_QUALIFIER);
+					}
+					
+					this.padesPolicyDlg.saveCurrentPolicy();
+					
+				} catch (AOException e) {
+					
+					AOUIFactory.showErrorMessage(
+							null,
+							"<html><p>" + SimpleAfirmaMessages.getString("PreferencesPanel.7") + ":<br>" + e.getLocalizedMessage() + "</p></html>", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+							SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
+							JOptionPane.ERROR_MESSAGE
+						);
+					changePadesPolicyDlg(container);
+						
+				}
+				
+				
+			}
+		}
+    }
 
 
 }
