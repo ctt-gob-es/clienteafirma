@@ -56,8 +56,6 @@ public final class TestOOXML {
     		}
 		}
 
-    	final Properties p0 = null;
-
         final Properties p1 = new Properties();
         p1.setProperty("format", AOSignConstants.SIGN_FORMAT_OOXML); //$NON-NLS-1$
         p1.setProperty("signatureReason", "Comentario : Razon de firma"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -67,7 +65,6 @@ public final class TestOOXML {
 	    p1.setProperty("commitmentTypeIndication0CommitmentTypeQualifiers", "RAZON-PRUEBA"); //$NON-NLS-1$ //$NON-NLS-2$
 
         OOXML_MODES = new Properties[] {
-//        	p0,
             p1
         };
     }
@@ -177,15 +174,13 @@ public final class TestOOXML {
 	                // Cofirma sin indicar los datos
 	                final byte[] sign2 = cosign(signer, sign1, algo, pke3, extraParams);
 
-	                //checkSign(signer, sign2, prueba);
-
-	                final File tempFile = File.createTempFile("OOXML_", ".docx");
+	                final File tempFile = File.createTempFile("OOXML_", ".docx"); //$NON-NLS-1$ //$NON-NLS-2$
 	                final OutputStream fos = new FileOutputStream(tempFile);
 	                fos.write(sign2);
 	                fos.flush();
 	                fos.close();
 
-	                System.out.println("Fichero de salida: " + tempFile.getAbsolutePath());
+	                System.out.println("Fichero de salida: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
 
 	                // Cofirma indicando los datos
 	                final byte[] sign3 = cosign(signer, data, sign2, algo, pke3, extraParams);
