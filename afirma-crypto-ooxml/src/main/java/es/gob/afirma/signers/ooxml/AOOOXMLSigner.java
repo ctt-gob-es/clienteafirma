@@ -33,8 +33,8 @@ import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.core.util.tree.AOTreeNode;
 import es.gob.afirma.signers.ooxml.relprovider.OOXMLProvider;
+import es.gob.afirma.signers.xades.AOXAdESSigner;
 import es.gob.afirma.signers.xml.Utils;
-import es.gob.afirma.signers.xmldsig.AOXMLDSigSigner;
 
 /** Manejador de firmas electr&oacute;nicas XML de documentos OOXML de Microsoft Office. */
 public final class AOOOXMLSigner implements AOSigner {
@@ -170,20 +170,17 @@ public final class AOOOXMLSigner implements AOSigner {
         }
 
         // Las firmas contenidas en el documento OOXML son de tipo XMLdSig asi
-        // que utilizaremos el
-        // signer de este tipo para gestionar el arbol de firmas
-        final AOSigner xmldsigSigner = new AOXMLDSigSigner();
+        // que utilizaremos el signer de este tipo para gestionar el arbol de firmas
+        final AOSigner xmldsigSigner = new AOXAdESSigner();
 
         // Recuperamos las firmas individuales del documento y creamos el arbol
         final AOTreeNode tree = new AOTreeNode("Datos"); //$NON-NLS-1$
         try {
             for (final byte[] elementSign : OOXMLUtil.getOOXMLSignatures(sign)) {
                 // Recuperamos el arbol de firmas de la firma individual. Ya que
-                // esta sera una firma simple
-                // solo debe contener un nodo de firma. Ignoramos la raiz del
-                // arbol, que contiene
-                // el ejemplo representativo de los datos firmados y no de la
-                // propia firma.
+                // esta sera una firma simple solo debe contener un nodo de firma.
+            	// Ignoramos la raiz del arbol, que contiene el ejemplo
+            	// representativo de los datos firmados y no de la propia firma.
                 final AOTreeModel signTree = xmldsigSigner.getSignersStructure(elementSign, asSimpleSignInfo);
                 tree.add(((AOTreeNode) signTree.getRoot()).getChildAt(0));
             }
