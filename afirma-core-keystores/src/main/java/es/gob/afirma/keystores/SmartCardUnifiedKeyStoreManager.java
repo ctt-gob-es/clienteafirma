@@ -69,7 +69,7 @@ public class SmartCardUnifiedKeyStoreManager extends AggregatedKeyStoreManager {
 				this.preferredKsAdded = KeyStoreUtilities.addPreferredKeyStoreManagers(this, parentComponent);
 			}
 			catch (final AOCancelledOperationException e) {
-				LOGGER.info("Se cancelo el uso del driver Java"); //$NON-NLS-1$
+				LOGGER.info("Se cancelo el uso del driver Java: " + e); //$NON-NLS-1$
 				// En caso de haber detectado una tarjeta preferente pero haberse cancelado su uso,
 				// permitiremos utilizar el resto de modulos a excepcion de las preferentes
 				this.preferredKsAdded = false;
@@ -200,7 +200,7 @@ public class SmartCardUnifiedKeyStoreManager extends AggregatedKeyStoreManager {
 		private String[] pkcs11Names;
 		private boolean preferredKs;
 
-		private KnownSmartCardsPkcs11(String description, String[] pkcs11Names, boolean preferredKs) {
+		private KnownSmartCardsPkcs11(final String description, final String[] pkcs11Names, final boolean preferredKs) {
 			this.description = description;
 			this.pkcs11Names = pkcs11Names;
 			this.preferredKs = preferredKs;
@@ -218,7 +218,7 @@ public class SmartCardUnifiedKeyStoreManager extends AggregatedKeyStoreManager {
 			return paths;
 		}
 
-		private static String replaceEnvProperties(String absolutePath) {
+		private static String replaceEnvProperties(final String absolutePath) {
 			String path = absolutePath;
 			for (final String envProperty : ENV_PROPERTIES) {
 				if (path.contains(envProperty)) {

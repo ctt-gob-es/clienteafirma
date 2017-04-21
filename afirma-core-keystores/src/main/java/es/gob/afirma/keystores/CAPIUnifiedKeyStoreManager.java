@@ -84,7 +84,7 @@ public class CAPIUnifiedKeyStoreManager extends AggregatedKeyStoreManager {
 				preferredKsPresent = KeyStoreUtilities.addPreferredKeyStoreManagers(this, parentComponent);
 			}
 			catch (final AOCancelledOperationException e) {
-				LOGGER.info("Se cancelo el uso del driver Java"); //$NON-NLS-1$
+				LOGGER.info("Se cancelo el uso del driver Java: " + e); //$NON-NLS-1$
 				preferredKsPresent = true;
 			}
 		}

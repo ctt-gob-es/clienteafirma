@@ -195,7 +195,7 @@ public final class Platform {
             ret = System.getProperty("jnlpx.home"); //$NON-NLS-1$
         }
         catch (final Exception e) {
-            // Se ignora, puede que no haya permisos para leerla
+            LOGGER.warning("No se ha podido leer la variable 'jnlpx.home': " + e); //$NON-NLS-1$
         }
         if (ret != null) {
             return ret.substring(0, ret.lastIndexOf(File.separator));

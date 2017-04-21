@@ -487,7 +487,7 @@ public final class AOKeyStoreManagerFactory {
         return ksm;
     }
 
-    private static boolean containsDnieJavaKeyStoreManager(AggregatedKeyStoreManager aggregatedKsm) {
+    private static boolean containsDnieJavaKeyStoreManager(final AggregatedKeyStoreManager aggregatedKsm) {
 
     	for (final AOKeyStoreManager ksm : aggregatedKsm.getKeyStoreManagers()) {
     		if (ksm.getType() == AOKeyStore.DNIEJAVA ||
@@ -522,7 +522,7 @@ public final class AOKeyStoreManagerFactory {
     		KeyStoreUtilities.addPreferredKeyStoreManagers(aksm, parentComponent);
     	}
     	catch (final AOCancelledOperationException e) {
-    		LOGGER.info("Se cancelo el uso del driver Java"); //$NON-NLS-1$
+    		LOGGER.info("Se cancelo el uso del driver Java: " + e); //$NON-NLS-1$
     	}
 
         return aksm;

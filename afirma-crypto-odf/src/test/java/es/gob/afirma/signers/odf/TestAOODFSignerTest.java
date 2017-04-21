@@ -49,7 +49,7 @@ public final class TestAOODFSignerTest {
         	try {
     			DATA.add(AOUtil.getDataFromInputStream(TestAOODFSignerTest.class.getResourceAsStream("/" + dataFile))); //$NON-NLS-1$
     		} catch (final IOException e) {
-    			Logger.getLogger("es.gob.afirma").severe("No se ha podido cargar el fichero de pruebas: " + dataFile);  //$NON-NLS-1$//$NON-NLS-2$
+    			Logger.getLogger("es.gob.afirma").severe("No se ha podido cargar el fichero de pruebas'" + dataFile + "': " + e);  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
     			DATA.add(null);
     		}
     	}
@@ -63,9 +63,11 @@ public final class TestAOODFSignerTest {
         final Properties p2 = new Properties();
         try {
         p2.load(new ByteArrayInputStream(
-        		"useOpenOffice31Mode=true".getBytes())); //$NON-NLS-1$
-        } catch (final Exception e) {
-        	System.err.println("No se ha podido cargar una de las configuraciones de pruebas de ODF"); //$NON-NLS-1$
+    		"useOpenOffice31Mode=true".getBytes()) //$NON-NLS-1$
+		);
+        }
+        catch (final Exception e) {
+        	System.err.println("No se ha podido cargar una de las configuraciones de pruebas de ODF: " + e); //$NON-NLS-1$
 		}
         CONFIGS = new Properties[] {
                 p1, p2

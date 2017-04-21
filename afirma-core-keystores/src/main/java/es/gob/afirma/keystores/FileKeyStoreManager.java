@@ -68,16 +68,20 @@ abstract class FileKeyStoreManager extends AOKeyStoreManager {
             throw e;
         }
         catch (final CertificateException e) {
-            throw new AOKeyStoreManagerException("No se han podido cargar los certificados del almacen PKCS#12 / PFX solicitado.", e); //$NON-NLS-1$
+            throw new AOKeyStoreManagerException(
+        		"No se han podido cargar los certificados del almacen PKCS#12 / PFX solicitado: " + e, e //$NON-NLS-1$
+    		);
         }
         catch (final NoSuchAlgorithmException e) {
-            throw new AOKeyStoreManagerException("No se ha podido verificar la integridad del almacen PKCS#12 / PFX solicitado.", e); //$NON-NLS-1$
+            throw new AOKeyStoreManagerException(
+        		"No se ha podido verificar la integridad del almacen PKCS#12 / PFX solicitado: " + e, e //$NON-NLS-1$
+    		);
 		}
         try {
             store.close();
         }
         catch (final Exception e) {
-         // Ignoramos errores en el cierre
+        	LOGGER.warning("Error cerrando el almacen: " + e); //$NON-NLS-1$
         }
         return ks;
 
