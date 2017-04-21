@@ -60,7 +60,7 @@ public final class TestOOXMLVersions {
 
         P1 = new Properties();
         P1.setProperty("format", AOSignConstants.SIGN_FORMAT_OOXML); //$NON-NLS-1$
-        P1.setProperty("signatureReason", "Comentario : Razon de firma"); //$NON-NLS-1$ //$NON-NLS-2$
+        P1.setProperty("signatureReason", "Comentario: Razon de firma"); //$NON-NLS-1$ //$NON-NLS-2$
 	    P1.setProperty("commitmentTypeIndications", "1"); //$NON-NLS-1$ //$NON-NLS-2$
 	    P1.setProperty("commitmentTypeIndication0Identifier", "5"); //$NON-NLS-1$ //$NON-NLS-2$
 	    P1.setProperty("commitmentTypeIndication0Description", "Aprob\u00F3 este documento"); //$NON-NLS-1$ //$NON-NLS-2$

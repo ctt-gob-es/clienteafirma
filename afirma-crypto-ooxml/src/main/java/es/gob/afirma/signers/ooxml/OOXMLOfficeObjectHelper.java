@@ -43,7 +43,8 @@ final class OOXMLOfficeObjectHelper {
 			                         final String signatureId,
 			                         final String signatureComments,
 			                         final String address1,
-			                         final String address2) {
+			                         final String address2,
+			                         final String sigType) {
 
         final List<XMLStructure> objectContent = new LinkedList<XMLStructure>();
 
@@ -179,12 +180,14 @@ final class OOXMLOfficeObjectHelper {
     	signatureProviderDetails.setTextContent("9"); //$NON-NLS-1$
     	signatureInfoV1Element.appendChild(signatureProviderDetails);
 
-    	final Element signatureType = document.createElementNS(
-			MS_DIGITAL_SIGNATURE_SCHEMA,
-			"SignatureType" //$NON-NLS-1$
-		);
-    	signatureType.setTextContent("1"); //$NON-NLS-1$
-    	signatureInfoV1Element.appendChild(signatureType);
+    	if (sigType != null && !sigType.isEmpty()) {
+	    	final Element signatureType = document.createElementNS(
+				MS_DIGITAL_SIGNATURE_SCHEMA,
+				"SignatureType" //$NON-NLS-1$
+			);
+	    	signatureType.setTextContent(sigType);
+	    	signatureInfoV1Element.appendChild(signatureType);
+    	}
 
         // **************** Fin Metadatos adicionales V1 ********************************
         // ******************************************************************************

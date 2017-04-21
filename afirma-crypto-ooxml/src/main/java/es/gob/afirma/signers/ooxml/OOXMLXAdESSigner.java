@@ -228,7 +228,8 @@ final class OOXMLXAdESSigner {
 				signatureId,
 				extraParams.getProperty(OOXMLExtraParams.SIGNATURE_COMMENTS),
 				extraParams.getProperty(OOXMLExtraParams.SIGNATURE_ADDRESS1),
-				extraParams.getProperty(OOXMLExtraParams.SIGNATURE_ADDRESS2)
+				extraParams.getProperty(OOXMLExtraParams.SIGNATURE_ADDRESS2),
+				ctis != null && ctis.size() > 0 ? "1" : null //$NON-NLS-1$
 			)
 		);
 		referenceList.add(
