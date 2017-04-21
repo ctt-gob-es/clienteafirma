@@ -455,7 +455,7 @@ public final class AOODFSigner implements AOSigner {
                 zos.close();
             }
             catch (final Exception t) {
-                // Ignoramos los errores en el cierre
+                LOGGER.warning("Error cerrando el ZIP temporal: " + t); //$NON-NLS-1$
             }
             zf.close();
             return baos.toByteArray();
@@ -548,8 +548,7 @@ public final class AOODFSigner implements AOSigner {
     	}
 
         try {
-            // genera el archivo zip temporal a partir del InputStream de
-            // entrada
+            // genera el archivo zip temporal a partir del InputStream de entrada
             final File zipFile = File.createTempFile("sign", ".zip"); //$NON-NLS-1$ //$NON-NLS-2$
             final FileOutputStream fos = new FileOutputStream(zipFile);
             fos.write(sign);
@@ -626,7 +625,7 @@ public final class AOODFSigner implements AOSigner {
                 zipFile.delete();
             }
             catch (final Exception e) {
-                // Se ignoran los errores del borrado, es responsabilidad del usuario lipiar los temporales periodicamente
+                LOGGER.warning("Error borrando el ZIP temporal '" + zipFile.getAbsolutePath() + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
             }
 
             return new AOTreeModel(tree);
@@ -655,7 +654,7 @@ public final class AOODFSigner implements AOSigner {
     		odfFile.deleteOnExit();
     	}
     	catch (final Exception e) {
-    		LOGGER.warning("No se pudo crear una copia del fichero para su analisis, se devolvera false"); //$NON-NLS-1$
+    		LOGGER.warning("No se pudo crear una copia del fichero para su analisis, se devolvera false: " + e); //$NON-NLS-1$
 			return false;
 		}
 
@@ -687,15 +686,14 @@ public final class AOODFSigner implements AOSigner {
     	try {
     		odfFile = createTempFile(data);
     		odfFile.deleteOnExit();
-    	} catch (final Exception e) {
-    		LOGGER.warning("No se pudo crear una copia del fichero para su analisis, se devolvera false"); //$NON-NLS-1$
+    	}
+    	catch (final Exception e) {
+    		LOGGER.warning("No se pudo crear una copia del fichero para su analisis, se devolvera false: " + e); //$NON-NLS-1$
 			return false;
 		}
 
-        // Si el mimetype del fichero no se ajusta a alguno de los MimeTypes
-        // soportados
-        // para firma ODF se lanzara una excepcion, en ese caso deducimos que no
-        // es un
+        // Si el mimetype del fichero no se ajusta a alguno de los MimeTypes soportados
+        // para firma ODF se lanzara una excepcion, en ese caso deducimos que no es un
         // fichero valido
         String mimetype = null;
         try {
