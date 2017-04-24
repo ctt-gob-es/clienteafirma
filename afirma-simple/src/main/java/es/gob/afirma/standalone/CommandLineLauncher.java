@@ -549,11 +549,11 @@ final class CommandLineLauncher {
 				format = fmt;
 			}
 
+			extraParamsProperties = new Properties();
 			if (extraParams != null) {
 				try {
 					final String params = extraParams.trim();
-					extraParamsProperties = new Properties();
-
+					
 					// La division no funciona correctamente con split porque el caracter salto de linea se protege
 					// al insertarse por consola, asi que lo hacemos manualmente.
 					int beginIndex = 0;
