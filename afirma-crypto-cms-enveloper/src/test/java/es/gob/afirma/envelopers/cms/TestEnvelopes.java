@@ -2,10 +2,16 @@ package es.gob.afirma.envelopers.cms;
 
 import java.security.KeyStore;
 import java.security.KeyStore.PrivateKeyEntry;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
 
 import org.junit.Assert;
 import org.junit.Test;
 
+import es.gob.afirma.core.ciphers.AOCipherConfig;
+import es.gob.afirma.core.ciphers.CipherConstants.AOCipherAlgorithm;
+import es.gob.afirma.core.ciphers.CipherConstants.AOCipherBlockMode;
+import es.gob.afirma.core.ciphers.CipherConstants.AOCipherPadding;
 import es.gob.afirma.core.misc.AOUtil;
 
 /** Pruebas de sobre digitales.
@@ -37,6 +43,45 @@ public final class TestEnvelopes {
 		final byte[] recoveredData = new AOCMSEnveloper().recoverData(envelope, pke);
 
 		Assert.assertArrayEquals(originalData, recoveredData);
+	}
+
+	/** Prueba de creaci&oacute;n de sobre.
+	 * @throws Exception En cualquier error. */
+	@SuppressWarnings("static-method")
+	@Test
+	public void createEnvelope() throws Exception {
+
+		final byte[] content ="Hola mundo".getBytes(); //$NON-NLS-1$
+
+		// Destinatario del sobre
+		final X509Certificate recipientCert = (X509Certificate) CertificateFactory.getInstance("X.509").generateCertificate( //$NON-NLS-1$
+			TestEnvelopes.class.getResourceAsStream(
+				"/ANFCERT.cer" // <- DESTINATARIO EN DIRECTORIO DE RECURSOS DE PRUEBA //$NON-NLS-1$
+			)
+		);
+
+		final byte[] envelope = new AOCMSEnveloper().createCMSEnvelopedData(
+			content,
+			null,
+			new AOCipherConfig(
+				AOCipherAlgorithm.AES,
+				AOCipherBlockMode.ECB,
+				AOCipherPadding.PKCS5PADDING
+			),
+			new X509Certificate[] { recipientCert },
+			Integer.valueOf(128) // <- CAMBIAR A 256 SI SE TIENE DESACTIVADA LA RESTRICCION EN EL JRE
+		);
+
+		// Ahora abrimos el sobre para comprobar que todo esta bien
+
+		final KeyStore ksOpen = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
+		ksOpen.load(ClassLoader.getSystemResourceAsStream(CERT_PATH), CERT_PASS.toCharArray());
+		final PrivateKeyEntry pkeOpen = (PrivateKeyEntry) ksOpen.getEntry(
+			CERT_ALIAS,
+			new KeyStore.PasswordProtection(CERT_PASS.toCharArray())
+		);
+		final byte[] recoveredData = new AOCMSEnveloper().recoverData(envelope, pkeOpen);
+		Assert.assertArrayEquals(content, recoveredData);
 
 	}
 
