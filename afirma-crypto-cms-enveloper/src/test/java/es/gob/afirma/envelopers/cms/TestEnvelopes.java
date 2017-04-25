@@ -80,8 +80,21 @@ public final class TestEnvelopes {
 			CERT_ALIAS,
 			new KeyStore.PasswordProtection(CERT_PASS.toCharArray())
 		);
+
+		// Comprobacion de que se esta intentando usar el certificado bueno
+		Assert.assertEquals(
+			"Prueba mal concebida, se esta intentando abrir el sobre con un certificado que no es destinatario", //$NON-NLS-1$
+			recipientCert.getSerialNumber().toString(),
+			((X509Certificate)pkeOpen.getCertificate()).getSerialNumber().toString()
+		);
+
+		// Y comprobacion de que abre bien
 		final byte[] recoveredData = new AOCMSEnveloper().recoverData(envelope, pkeOpen);
-		Assert.assertArrayEquals(content, recoveredData);
+		Assert.assertArrayEquals(
+			"El contenido desensobrado no coincide con el ensobrado", //$NON-NLS-1$
+			content,
+			recoveredData
+		);
 
 	}
 
