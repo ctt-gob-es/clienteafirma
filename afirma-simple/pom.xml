@@ -21,6 +21,10 @@
 			<id>uji</id>
 			<url>http://devel.uji.es/nexus/content/groups/public/</url>
 		</repository>
+		<repository>
+			<id>uji</id>
+			<url>http://devel.uji.es/nexus/content/groups/public/</url>
+		</repository>
 	</repositories>
 	<dependencies>
 	    
@@ -183,19 +187,19 @@
 		<dependency>
 			<groupId>com.madgag.spongycastle</groupId>
 			<artifactId>core</artifactId>
-			<version>1.54.0.0</version>
+			<version>1.56.0.0</version>
 		</dependency>
 
 		<dependency>
 			<groupId>com.madgag.spongycastle</groupId>
 			<artifactId>prov</artifactId>
-			<version>1.54.0.0</version>
+			<version>1.56.0.0</version>
 		</dependency>
 		
 		<dependency>
 			<groupId>com.madgag.spongycastle</groupId>
-			<artifactId>pkix</artifactId>
-			<version>1.54.0.0</version>
+			<artifactId>bcpkix-jdk15on</artifactId>
+			<version>1.56.0.0</version>
 		</dependency>
 				
 		<dependency>
@@ -232,7 +236,7 @@
 		<dependency>
   			<groupId>org.apache.pdfbox</groupId>
   			<artifactId>pdfbox</artifactId>
-  			<version>2.0.4</version>
+  			<version>2.0.5</version>
   			<exclusions>
   				<exclusion>
             		<groupId>org.bouncycastle</groupId>
@@ -252,14 +256,14 @@
 		<dependency>
 			<groupId>com.github.markusbernhardt</groupId>
 			<artifactId>proxy-vole</artifactId>
-			<version>1.0.1</version>
+			<version>1.0.3</version>
 		</dependency>
 
 		<!-- Libreria "Java Native Access" -->
 		<dependency>
 			<groupId>net.java.dev.jna</groupId>
 			<artifactId>jna</artifactId>
-			<version>4.2.2</version>
+			<version>4.4.0</version>
 		</dependency>
 
 		<dependency>
