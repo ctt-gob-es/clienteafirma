@@ -26,6 +26,7 @@ import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.CounterSignTarget;
+import es.gob.afirma.core.signers.ExtraParamsProcessor;
 import es.gob.afirma.core.signers.TriphaseData;
 import es.gob.afirma.triphase.server.document.DocumentManager;
 import es.gob.afirma.triphase.signer.processors.AutoTriPhasePreProcessor;
@@ -231,8 +232,19 @@ public final class SignatureService extends HttpServlet {
 			return;
 		}
 
+
+		// Obtenemos el formato de firma
+		final String format = parameters.get(PARAM_NAME_FORMAT);
+		LOGGER.info("Formato de firma seleccionado: " + format); //$NON-NLS-1$
+		if (format == null) {
+			LOGGER.warning("No se ha indicado formato de firma"); //$NON-NLS-1$
+			out.print(ErrorManager.getErrorMessage(4));
+			out.flush();
+			return;
+		}
+
 		// Obtenemos los parametros adicionales para la firma
-		final Properties extraParams = new Properties();
+		Properties extraParams = new Properties();
 		try {
 			if (parameters.containsKey(PARAM_NAME_EXTRA_PARAM)) {
 				extraParams.load(
@@ -252,6 +264,18 @@ public final class SignatureService extends HttpServlet {
 		// Introducimos los parametros necesarios para que no se traten
 		// de mostrar dialogos en servidor
 		extraParams.setProperty(EXTRA_PARAM_HEADLESS, Boolean.TRUE.toString());
+
+		try {
+			extraParams = ExtraParamsProcessor.expandProperties(
+					extraParams,
+					null,
+					format
+					);
+		}
+		catch (final Exception e) {
+			LOGGER.severe("Se han indicado una politica de firma y un formato incompatibles: "  + e); //$NON-NLS-1$
+
+		}
 
 		// Obtenemos los parametros adicionales para la firma
 		byte[] sessionData = null;
@@ -324,16 +348,6 @@ public final class SignatureService extends HttpServlet {
 		if (algorithm == null) {
 			LOGGER.warning("No se ha indicado algoritmo de firma"); //$NON-NLS-1$
 			out.print(ErrorManager.getErrorMessage(3));
-			out.flush();
-			return;
-		}
-
-		// Obtenemos el formato de firma
-		final String format = parameters.get(PARAM_NAME_FORMAT);
-		LOGGER.info("Formato de firma seleccionado: " + format); //$NON-NLS-1$
-		if (format == null) {
-			LOGGER.warning("No se ha indicado formato de firma"); //$NON-NLS-1$
-			out.print(ErrorManager.getErrorMessage(4));
 			out.flush();
 			return;
 		}

@@ -87,10 +87,15 @@ public final class TestSignBatch {
 	private static SignBatch createSampleBatch(final boolean concurrent) throws InstantiationException,
 	                                                                            IllegalAccessException,
 	                                                                            ClassNotFoundException {
+
+		final String tempDir = System.getProperty("java.io.tmpdir"); //$NON-NLS-1$
+
+		System.out.println("Las firmas se almacenaran en " + tempDir); //$NON-NLS-1$
+
 		//**************************************************************************************
 		//************ CREACION DE LOTE ********************************************************
 		final Properties ssvp1 = new Properties();
-		ssvp1.put("FileName", "C:\\Users\\tomas\\AppData\\Local\\Temp\\FIRMA1.xml"); //$NON-NLS-1$ //$NON-NLS-2$
+		ssvp1.put("FileName", tempDir + "\\FIRMA1.xml"); //$NON-NLS-1$ //$NON-NLS-2$
 		final SignSaver ssv1 = (SignSaver) Class.forName("es.gob.afirma.signers.batch.SignSaverFile").newInstance(); //$NON-NLS-1$
 		ssv1.init(ssvp1);
 
@@ -104,7 +109,7 @@ public final class TestSignBatch {
 		);
 
 		final Properties ssvp2 = new Properties();
-		ssvp2.put("FileName", "C:\\Users\\tomas\\AppData\\Local\\Temp\\FIRMA2.xml"); //$NON-NLS-1$ //$NON-NLS-2$
+		ssvp2.put("FileName", tempDir + "\\FIRMA2.xml"); //$NON-NLS-1$ //$NON-NLS-2$
 		final SignSaver ssv2 = (SignSaver) Class.forName("es.gob.afirma.signers.batch.SignSaverFile").newInstance(); //$NON-NLS-1$
 		ssv2.init(ssvp2);
 
@@ -118,7 +123,7 @@ public final class TestSignBatch {
 		);
 
 		final Properties ssvp3 = new Properties();
-		ssvp3.put("FileName", "C:\\Users\\tomas\\AppData\\Local\\Temp\\FIRMA3.xml"); //$NON-NLS-1$ //$NON-NLS-2$
+		ssvp3.put("FileName", tempDir + "\\FIRMA3.xml"); //$NON-NLS-1$ //$NON-NLS-2$
 		final SignSaver ssv3 = (SignSaver) Class.forName("es.gob.afirma.signers.batch.SignSaverFile").newInstance(); //$NON-NLS-1$
 		ssv3.init(ssvp3);
 
@@ -132,16 +137,19 @@ public final class TestSignBatch {
 		);
 
 		final Properties ssvp4 = new Properties();
-		ssvp4.put("FileName", "C:\\Users\\tomas\\AppData\\Local\\Temp\\FIRMA4.xml"); //$NON-NLS-1$ //$NON-NLS-2$
+		ssvp4.put("FileName", tempDir + "\\FIRMA4.xml"); //$NON-NLS-1$ //$NON-NLS-2$
 		final SignSaver ssv4 = (SignSaver) Class.forName("es.gob.afirma.signers.batch.SignSaverFile").newInstance(); //$NON-NLS-1$
 		ssv4.init(ssvp4);
 
+		final Properties extraParams4 = new Properties();
+		extraParams4.setProperty("expPolicy", "FirmaAGE"); //$NON-NLS-1$ //$NON-NLS-2$
+
 		final SingleSign ss4 = new SingleSign(
-			"004-CAdES", //$NON-NLS-1$
+			"004-XAdES", //$NON-NLS-1$
 			"http://atos.net", //$NON-NLS-1$
-			SignFormat.CADES,
+			SignFormat.XADES,
 			SignSubOperation.SIGN,
-			null,
+			extraParams4,
 			ssv4
 		);
 
