@@ -21,10 +21,6 @@
 			<id>uji</id>
 			<url>http://devel.uji.es/nexus/content/groups/public/</url>
 		</repository>
-		<repository>
-			<id>uji</id>
-			<url>http://devel.uji.es/nexus/content/groups/public/</url>
-		</repository>
 	</repositories>
 	<dependencies>
 	    
@@ -66,12 +62,6 @@
 		
 		<dependency>
 			<groupId>es.gob.afirma</groupId>
-			<artifactId>afirma-keystores-capiaddressbook</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>es.gob.afirma</groupId>
 			<artifactId>afirma-keystores-filters</artifactId>
 			<version>${project.version}</version>
 		</dependency>
@@ -94,12 +84,6 @@
 			<version>${project.version}</version>
 		</dependency>
 		
-		<dependency>
-			<groupId>es.gob.afirma</groupId>
-			<artifactId>afirma-crypto-cms-enveloper</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-
 		<dependency>
 			<groupId>es.gob.afirma</groupId>
 			<artifactId>afirma-crypto-cades</artifactId>
@@ -239,18 +223,18 @@
   			<version>2.0.5</version>
   			<exclusions>
   				<exclusion>
-            		<groupId>org.bouncycastle</groupId>
-            		<artifactId>bcmail-jdk15</artifactId>
-            	</exclusion>
-            	<exclusion>
-            		<groupId>org.bouncycastle</groupId>
-            		<artifactId>bcprov-jdk15</artifactId>
+            				<groupId>org.bouncycastle</groupId>
+            				<artifactId>bcmail-jdk15</artifactId>
+            			</exclusion>
+            			<exclusion>
+            				<groupId>org.bouncycastle</groupId>
+            				<artifactId>bcprov-jdk15</artifactId>
   				</exclusion>
   				<exclusion>
   					<groupId>com.ibm.icu</groupId>
-            		<artifactId>icu4j</artifactId>
+            			<artifactId>icu4j</artifactId>
   				</exclusion>
-        	</exclusions>
+        		</exclusions>
 		</dependency>
 		
 		<dependency>
@@ -282,15 +266,15 @@
 
 	<profiles>
 	
-		<profile>
-	      <id>env-dev</id>
-	      <activation>
-			<activeByDefault>true</activeByDefault>
-	      </activation>
+	<profile>
+			<id>env-dev</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+	      		</activation>
 	      
-	      <build>
-       		<plugins>
-       			<plugin>
+	      		<build>
+       			<plugins>
+       				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-compiler-plugin</artifactId>
 					<version>3.6.1</version>
@@ -329,7 +313,7 @@
 	      <build>
 	      	<finalName>AutoFirma</finalName>
        		<plugins>
-       			<plugin>
+       				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-compiler-plugin</artifactId>
 					<version>3.6.1</version>
