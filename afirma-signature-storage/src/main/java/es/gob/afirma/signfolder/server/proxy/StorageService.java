@@ -116,12 +116,11 @@ public final class StorageService extends HttpServlet {
 		LOGGER.info("== FIN DEL GUARDADO =="); //$NON-NLS-1$
 	}
 
-	/**
-	 * Almacena una firma en servidor.
-	 * @param response Respuesta a la petici&oacute;n.
-	 * @param request Petici&oacute;n.
-	 * @throws IOException Cuando ocurre un error al general la respuesta.
-	 */
+	/** Almacena una firma en servidor.
+	 * @param out Respuesta a la petici&oacute;n.
+	 * @param params Par&aacute;metros de la psetici&oacute;n.
+	 * @param config Opciones de configuraci&oacute;n de la operaci&oacute;n.
+	 * @throws IOException Cuando ocurre un error al general la respuesta. */
 	private static void storeSign(final PrintWriter out, final Hashtable<String, String> params, final StorageConfig config) throws IOException {
 
 		final String id = params.get(PARAMETER_NAME_ID);

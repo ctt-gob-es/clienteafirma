@@ -27,6 +27,9 @@ final class StorageConfig {
 			DEFAULT_TMP_DIR = System.getProperty("java.io.tmpdir"); //$NON-NLS-1$
 		}
 		catch (final Exception e) {
+			Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
+				"El directorio temporal no ha podido determinarse por la variable de entorno 'java.io.tmpdir': " + e //$NON-NLS-1$
+			);
 			try {
 				DEFAULT_TMP_DIR = File.createTempFile("tmp", null).getParentFile().getAbsolutePath(); //$NON-NLS-1$
 			}
@@ -42,9 +45,7 @@ final class StorageConfig {
 
 	private final Properties config;
 
-
-	/** Crear el objeto de configuracion para el servicio de almacenamiento.
-	 * @param context Contexto del servlet. */
+	/** Crea el objeto de configuracion para el servicio de almacenamiento. */
 	StorageConfig() {
 		this.config = new Properties();
 	}
@@ -85,7 +86,9 @@ final class StorageConfig {
 					Long.parseLong(this.config.getProperty(EXPIRATION_TIME_KEY)) : DEFAULT_EXPIRATION_TIME;
 		}
 		catch (final Exception e) {
-			Logger.getLogger("es.gob.afirma").warning("Tiempo de expiracion invalido en el fichero de configuracion, se usara" + DEFAULT_EXPIRATION_TIME); //$NON-NLS-1$ //$NON-NLS-2$
+			Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
+				"Tiempo de expiracion invalido en el fichero de configuracion, se usara" + DEFAULT_EXPIRATION_TIME + ": " + e//$NON-NLS-1$ //$NON-NLS-2$
+			);
 			return DEFAULT_EXPIRATION_TIME;
 		}
 	}

@@ -16,7 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 
 /** Servicio de almacenamiento temporal de firmas. &Uacute;til para servir de intermediario en comunicaci&oacute;n
  * entre JavaScript y <i>Apps</i> m&oacute;viles nativas.
- * @author Tom&aacute;s Garc&iacute;a-;er&aacute;s */
+ * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public final class RetrieveService extends HttpServlet {
 
 	private static final long serialVersionUID = -3272368448371213403L;
@@ -91,10 +91,13 @@ public final class RetrieveService extends HttpServlet {
 	}
 
 	/** Recupera la firma del servidor.
-	 * @param response Respuesta a la petici&oacute;n.
+	 * @param out Respuesta a la petici&oacute;n.
 	 * @param request Petici&oacute;n.
+	 * @param config Opciones de configuraci&oacute;n de la operaci&oacute;n.
 	 * @throws IOException Cuando ocurre un error al general la respuesta. */
-	private static void retrieveSign(final PrintWriter out, final HttpServletRequest request, final RetrieveConfig config) throws IOException {
+	private static void retrieveSign(final PrintWriter out,
+			                         final HttpServletRequest request,
+			                         final RetrieveConfig config) throws IOException {
 
 		final String id = request.getParameter(PARAMETER_NAME_ID);
 		if (id == null) {
@@ -140,20 +143,17 @@ public final class RetrieveService extends HttpServlet {
 				LOGGER.info("Se recupera el fichero: " + inFile.getName()); //$NON-NLS-1$
 			}
 			catch (final IOException e) {
-				LOGGER.severe(ErrorManager.genError(ErrorManager.ERROR_INVALID_DATA));
+				LOGGER.severe("Error recupendo el fichero '" + inFile.getAbsolutePath() + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$
 				out.println(ErrorManager.genError(ErrorManager.ERROR_INVALID_DATA));
 				return;
 			}
-
 			inFile.delete();
 		}
 	}
 
-	/**
-	 * Elimina del directorio temporal todos los ficheros que hayan sobrepasado el tiempo m&aacute;ximo
+	/** Elimina del directorio temporal todos los ficheros que hayan sobrepasado el tiempo m&aacute;ximo
 	 * de vida configurado.
-	 * @param config Opciones de configuraci&oacute;n de la operaci&oacute;n.
-	 */
+	 * @param config Opciones de configuraci&oacute;n de la operaci&oacute;n. */
 	private static void removeExpiredFiles(final RetrieveConfig config) {
 		if (config != null && config.getTempDir() != null && config.getTempDir().exists()) {
 			for (final File file : config.getTempDir().listFiles()) {
@@ -164,7 +164,10 @@ public final class RetrieveService extends HttpServlet {
 					}
 				}
 				catch(final Exception e) {
-					// Ignoramos cualquier error suponiendo que el fichero ha sido eliminado por otro hilo
+					// Suponemos que el fichero ha sido eliminado por otro hilo
+					LOGGER.warning(
+						"No se ha podido eliminar el fichero '" + file.getAbsolutePath() + "', es probable que se elimine en otro hilo de ejecucion: " + e //$NON-NLS-1$ //$NON-NLS-2$
+					);
 				}
 			}
 		}
