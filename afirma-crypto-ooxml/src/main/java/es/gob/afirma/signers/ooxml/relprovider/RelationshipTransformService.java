@@ -102,7 +102,7 @@ public final class RelationshipTransformService extends TransformService {
     /** Crea el servicio de la transformaci&oacute;n RelationshipTransform. */
     public RelationshipTransformService() {
         super();
-        this.sourceIds = new LinkedList<String>();
+        this.sourceIds = new LinkedList<>();
     }
 
     /** {@inheritDoc} */
@@ -220,8 +220,9 @@ public final class RelationshipTransformService extends TransformService {
         final OctetStreamData octetStreamData = (OctetStreamData) data;
 
         final Document relationshipsDocument;
-        try {
-        	final InputStream octetStream = octetStreamData.getOctetStream();
+        try (
+    		final InputStream octetStream = octetStreamData.getOctetStream();
+		) {
             relationshipsDocument = loadDocument(octetStream);
             octetStream.close();
         }
@@ -270,7 +271,7 @@ public final class RelationshipTransformService extends TransformService {
     }
 
     private static void sortRelationshipElements(final Element relationshipsElement) {
-        final List<Element> relationshipElements = new LinkedList<Element>();
+        final List<Element> relationshipElements = new LinkedList<>();
         final NodeList relationshipNodes = relationshipsElement.getElementsByTagName("*"); //$NON-NLS-1$
         final int nodeCount = relationshipNodes.getLength();
         for (int nodeIdx = 0; nodeIdx < nodeCount; nodeIdx++) {

@@ -63,7 +63,7 @@ final class OOXMLAdvancedSignature extends XMLAdvancedSignature {
                                                      GeneralSecurityException,
                                                      XMLSignatureException {
 
-      final List<?> referencesIdList = new ArrayList<Object>(refsIdList);
+      final List<?> referencesIdList = new ArrayList<>(refsIdList);
 
       if (WrappedKeyStorePlace.SIGNING_CERTIFICATE_PROPERTY.equals(getWrappedKeyStorePlace()) && certChain != null && certChain.length > 0) {
           this.xades.setSigningCertificate(certChain[0]);
@@ -118,13 +118,13 @@ final class OOXMLAdvancedSignature extends XMLAdvancedSignature {
 
     private KeyInfo newKeyInfo(final X509Certificate[] certChain, final String keyInfoId) throws KeyException {
     	final KeyInfoFactory keyInfoFactory = getXMLSignatureFactory().getKeyInfoFactory();
-    	final List<X509Certificate> x509DataList = new ArrayList<X509Certificate>();
+    	final List<X509Certificate> x509DataList = new ArrayList<>();
     	if (!XmlWrappedKeyInfo.PUBLIC_KEY.equals(getXmlWrappedKeyInfo())) {
     		for (final X509Certificate cert : certChain) {
     			x509DataList.add(cert);
     		}
     	}
-    	final List<XMLStructure> newList = new ArrayList<XMLStructure>();
+    	final List<XMLStructure> newList = new ArrayList<>();
     	newList.add(keyInfoFactory.newKeyValue(certChain[0].getPublicKey()));
     	newList.add(keyInfoFactory.newX509Data(x509DataList));
     	return keyInfoFactory.newKeyInfo(newList, keyInfoId);

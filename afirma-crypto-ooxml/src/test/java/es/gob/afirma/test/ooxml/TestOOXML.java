@@ -133,10 +133,12 @@ public final class TestOOXML {
 	        		);
 
 	                final File saveFile = File.createTempFile(algo + "-", ".docx"); //$NON-NLS-1$ //$NON-NLS-2$
-	                final OutputStream os = new FileOutputStream(saveFile);
-	                os.write(result);
-	                os.flush();
-	                os.close();
+	                try (
+                		final OutputStream os = new FileOutputStream(saveFile);
+            		) {
+		                os.write(result);
+		                os.flush();
+	                }
 	                System.out.println("Temporal para comprobacion manual: " + saveFile.getAbsolutePath()); //$NON-NLS-1$
 
 	                Assert.assertNotNull(prueba, result);
@@ -175,10 +177,12 @@ public final class TestOOXML {
 	                final byte[] sign2 = cosign(signer, sign1, algo, pke3, extraParams);
 
 	                final File tempFile = File.createTempFile("OOXML_", ".docx"); //$NON-NLS-1$ //$NON-NLS-2$
-	                final OutputStream fos = new FileOutputStream(tempFile);
-	                fos.write(sign2);
-	                fos.flush();
-	                fos.close();
+	                try (
+                		final OutputStream fos = new FileOutputStream(tempFile);
+            		) {
+	                	fos.write(sign2);
+	                	fos.flush();
+	                }
 
 	                System.out.println("Fichero de salida: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
 

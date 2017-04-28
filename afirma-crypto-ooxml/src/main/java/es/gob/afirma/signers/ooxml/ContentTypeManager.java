@@ -32,8 +32,8 @@ import es.gob.afirma.core.AOException;
  * identificaci&oacute;n del content type de un fichero en base a ellos. */
 final class ContentTypeManager {
 
-	private final Map<String, String> defaultContentTypes = new HashMap<String, String>();
-	private final Map<String, String> overrideContentTypes = new HashMap<String, String>();
+	private final Map<String, String> defaultContentTypes = new HashMap<>();
+	private final Map<String, String> overrideContentTypes = new HashMap<>();
 
 	private static final DocumentBuilderFactory DOC_FACTORY = DocumentBuilderFactory.newInstance();
 	static {

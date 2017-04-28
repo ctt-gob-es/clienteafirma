@@ -15,8 +15,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
+
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.xml.sax.SAXException;
 
 import es.gob.afirma.core.misc.AOFileUtils;
 import es.gob.afirma.core.misc.AOUtil;
@@ -38,13 +41,13 @@ final class OOXMLUtil {
     private static final String OOXML_SIGNATURE_ORIGIN_RELATIONSHIP_TYPE =
             "http://schemas.openxmlformats.org/package/2006/relationships/digital-signature/origin"; //$NON-NLS-1$
 
-    /** Cuenta el n&uacute;mero de firmas del documento OOXML. Si se produce
-     * alg&uacute;n error durante el an&aacute;lisis del fichero, se
-     * devolver&aacute; 0.
+    /** Cuenta el n&uacute;mero de firmas del documento OOXML.
      * @param ooxmlFile Documento OOXML.
      * @return N&uacute;mero de firma del documento OOXML.
-     * @throws IOException SI hay problemas en el tratamiento de datos. */
-    static int countOOXMLSignatures(final byte[] ooxmlFile) throws IOException {
+     * @throws ParserConfigurationException Cuando hay problemas con el analizador SAX.
+     * @throws IOException Cuando hay incosistencias de formato OOXML en los XML internos del fichero.
+     * @throws SAXException Cuando alguno de los XML internos del fichero no est&aacute; bien formado. */
+    static int countOOXMLSignatures(final byte[] ooxmlFile) throws IOException, SAXException, ParserConfigurationException {
         final Relationship[] rels = getOOXMLSignaturesRelationships(ooxmlFile);
         return rels == null ? 0 : rels.length;
     }
@@ -54,48 +57,34 @@ final class OOXMLUtil {
      * devolver&aacute; 0.
      * @param ooxmlFile Documento OOXML.
      * @return N&uacute;mero de firma del documento OOXML.
-     * @throws IOException Si hay problemas en el tratamiento de los datos. */
-    private static Relationship[] getOOXMLSignaturesRelationships(final byte[] ooxmlFile) throws IOException {
+     * @throws ParserConfigurationException Cuando hay problemas con el analizador SAX.
+     * @throws IOException Cuando hay incosistencias de formato OOXML en los XML internos del fichero.
+     * @throws SAXException Cuando alguno de los XML internos del fichero no est&aacute; bien formado. */
+    private static Relationship[] getOOXMLSignaturesRelationships(final byte[] ooxmlFile) throws IOException, SAXException, ParserConfigurationException {
 
-        final ZipFile zipFile;
-        try {
-            zipFile = AOFileUtils.createTempZipFile(ooxmlFile);
-        }
-        catch (final ZipException e) {
-            LOGGER.severe("El documento indicado no es un documento OOXML: " + e); //$NON-NLS-1$
-            return new Relationship[0];
-        }
+        final List<Relationship> relations = new ArrayList<>();
+    	try (
+    			final ZipFile zipFile = AOFileUtils.createTempZipFile(ooxmlFile);
+		) {
 
-        // Comprobamos si existe la relacion de firmas del documento
-        final ZipEntry relsEntry = getSignaturesRelsEntry(zipFile);
+	        // Comprobamos si existe la relacion de firmas del documento
+	        final ZipEntry relsEntry = getSignaturesRelsEntry(zipFile);
 
-        // Si no existe el fichero, el documento no contiene firmas
-        if (relsEntry == null) {
-        	zipFile.close();
-            return new Relationship[0];
-        }
+	        // Si no existe el fichero, el documento no contiene firmas
+	        if (relsEntry == null) {
+	            return new Relationship[0];
+	        }
 
-        // Analizamos el fichero de relaciones
-        final RelationshipsParser parser;
-        try {
-            parser = new RelationshipsParser(zipFile.getInputStream(relsEntry));
-        }
-        catch (final Exception e) {
-            LOGGER.severe("Error en la lectura del OOXML: " + e); //$NON-NLS-1$
-            zipFile.close();
-            return new Relationship[0];
-        }
+	        // Analizamos el fichero de relaciones
+	        final RelationshipsParser parser = new RelationshipsParser(zipFile.getInputStream(relsEntry));
 
-        // ya podemos cerrar el documento
-        zipFile.close();
-
-        // Contamos las relaciones de firma
-        final List<Relationship> relations = new ArrayList<Relationship>();
-        for (final Relationship rel : parser.getRelationships()) {
-            if (OOXML_SIGNATURE_RELATIONSHIP_TYPE.equals(rel.getType())) {
-                relations.add(rel);
-            }
-        }
+	        // Contamos las relaciones de firma
+	        for (final Relationship rel : parser.getRelationships()) {
+	            if (OOXML_SIGNATURE_RELATIONSHIP_TYPE.equals(rel.getType())) {
+	                relations.add(rel);
+	            }
+	        }
+    	}
 
         return relations.toArray(new Relationship[0]);
     }
@@ -103,69 +92,54 @@ final class OOXMLUtil {
     /** Recupera las firmas XMLdSig empotradas en el documento OOXML.
      * @param ooxmlFile Documento OOXML.
      * @return Firmas empotradas en el documento.
-     * @throws IOException Si hay problemas en el tratamiento de los datos. */
-    static byte[][] getOOXMLSignatures(final byte[] ooxmlFile) throws IOException {
+     * @throws ParserConfigurationException Cuando hay problemas con el analizador SAX.
+     * @throws IOException Cuando hay incosistencias de formato OOXML en los XML internos del fichero.
+     * @throws SAXException Cuando alguno de los XML internos del fichero no est&aacute; bien formado. */
+    static byte[][] getOOXMLSignatures(final byte[] ooxmlFile) throws IOException, SAXException, ParserConfigurationException {
+    	final List<byte[]> relations = new ArrayList<>();
+        try (
+    		final ZipFile zipFile = AOFileUtils.createTempZipFile(ooxmlFile);
+        ) {
 
-        final ZipFile zipFile;
-        try {
-            zipFile = AOFileUtils.createTempZipFile(ooxmlFile);
+	        // Comprobamos si existe la relacion de firmas del documento
+	        final ZipEntry relsEntry = getSignaturesRelsEntry(zipFile);
+
+	        // Si no existe el fichero, el documento no contiene firmas
+	        if (relsEntry == null) {
+	            return new byte[0][];
+	        }
+
+	        // Analizamos el fichero de relaciones
+	        final RelationshipsParser parser = new RelationshipsParser(zipFile.getInputStream(relsEntry));
+
+	        // Contamos las relaciones de firma
+	        for (final Relationship rel : parser.getRelationships()) {
+	            if (OOXML_SIGNATURE_RELATIONSHIP_TYPE.equals(rel.getType())) {
+
+	                // Comprobamos que exista el firma referenciada
+	                final String target = rel.getTarget();
+	                ZipEntry signEntry = zipFile.getEntry("_xmlsignatures/" + target); //$NON-NLS-1$
+	                if (signEntry == null) {
+	                    signEntry = zipFile.getEntry("_xmlsignatures\\" + target); //$NON-NLS-1$
+	                }
+	                if (signEntry == null) {
+	                    LOGGER.severe("El documento OOXML no contiene las firmas declaradas"); //$NON-NLS-1$
+	                    zipFile.close();
+	                    return new byte[0][];
+	                }
+
+	                // Guardamos la firma
+	                try {
+	                    relations.add(AOUtil.getDataFromInputStream(zipFile.getInputStream(signEntry)));
+	                }
+	                catch (final Exception e) {
+	                    LOGGER.severe("No se pudo leer una de las firmas del documento OOXML: " + e); //$NON-NLS-1$
+	                    zipFile.close();
+	                    return new byte[0][];
+	                }
+	            }
+	        }
         }
-        catch (final ZipException e) {
-            LOGGER.severe("El documento indicado no es un documento OOXML: " + e); //$NON-NLS-1$
-            return new byte[0][];
-        }
-
-        // Comprobamos si existe la relacion de firmas del documento
-        final ZipEntry relsEntry = getSignaturesRelsEntry(zipFile);
-
-        // Si no existe el fichero, el documento no contiene firmas
-        if (relsEntry == null) {
-        	zipFile.close();
-            return new byte[0][];
-        }
-
-        // Analizamos el fichero de relaciones
-        final RelationshipsParser parser;
-        try {
-            parser = new RelationshipsParser(zipFile.getInputStream(relsEntry));
-        }
-        catch (final Exception e) {
-            LOGGER.severe("Error en la lectura del OOXML: " + e); //$NON-NLS-1$
-            zipFile.close();
-            return new byte[0][];
-        }
-
-        // Contamos las relaciones de firma
-        final List<byte[]> relations = new ArrayList<byte[]>();
-        for (final Relationship rel : parser.getRelationships()) {
-            if (OOXML_SIGNATURE_RELATIONSHIP_TYPE.equals(rel.getType())) {
-
-                // Comprobamos que exista el firma referenciada
-                final String target = rel.getTarget();
-                ZipEntry signEntry = zipFile.getEntry("_xmlsignatures/" + target); //$NON-NLS-1$
-                if (signEntry == null) {
-                    signEntry = zipFile.getEntry("_xmlsignatures\\" + target); //$NON-NLS-1$
-                }
-                if (signEntry == null) {
-                    LOGGER.severe("El documento OOXML no contiene las firmas declaradas"); //$NON-NLS-1$
-                    zipFile.close();
-                    return new byte[0][];
-                }
-
-                // Guardamos la firma
-                try {
-                    relations.add(AOUtil.getDataFromInputStream(zipFile.getInputStream(signEntry)));
-                }
-                catch (final Exception e) {
-                    LOGGER.severe("No se pudo leer una de las firmas del documento OOXML: " + e); //$NON-NLS-1$
-                    zipFile.close();
-                    return new byte[0][];
-                }
-            }
-        }
-
-        // Ya podemos cerrar el documento
-        zipFile.close();
 
         return relations.toArray(new byte[0][]);
     }

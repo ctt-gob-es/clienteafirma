@@ -87,8 +87,9 @@ public final class OOXMLURIDereferencer implements URIDereferencer {
             Logger.getLogger("es.gob.afirma").warning("No se puede decodificar la URI '" + uri + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         }
 
-        try {
+        try (
             final InputStream dataInputStream = findDataInputStream(uri);
+		) {
             if (null == dataInputStream) {
                 return this.baseUriDereferencer.dereference(uriReference, context);
             }

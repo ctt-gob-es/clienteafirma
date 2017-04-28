@@ -64,7 +64,7 @@ final class OOXMLPackageObjectHelper {
     	"powerpoint" //$NON-NLS-1$
     };
 
-    private static final Set<String> EXCLUDED_RELATIONSHIPS = new HashSet<String>(6);
+    private static final Set<String> EXCLUDED_RELATIONSHIPS = new HashSet<>(6);
     static {
     	EXCLUDED_RELATIONSHIPS.add("http://schemas.openxmlformats.org/officeDocument/2006/relationships/extended-properties"); //$NON-NLS-1$
     	EXCLUDED_RELATIONSHIPS.add("http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties"); //$NON-NLS-1$
@@ -87,7 +87,7 @@ final class OOXMLPackageObjectHelper {
 	                                                                   IOException,
 	                                                                   ParserConfigurationException,
 	                                                                   SAXException {
-		final List<XMLStructure> objectContent = new LinkedList<XMLStructure>();
+		final List<XMLStructure> objectContent = new LinkedList<>();
 		objectContent.add(constructManifest(fac, ooXmlDocument));
 
 		addSignatureTime(fac, document, signatureId, objectContent);
@@ -194,7 +194,7 @@ final class OOXMLPackageObjectHelper {
     		parameterSpec.addRelationshipReference(relationshipId);
     	}
 
-    	final List<Transform> transforms = new LinkedList<Transform>();
+    	final List<Transform> transforms = new LinkedList<>();
     	transforms.add(fac.newTransform(RelationshipTransformService.TRANSFORM_URI, parameterSpec));
     	transforms.add(fac.newTransform("http://www.w3.org/TR/2001/REC-xml-c14n-20010315", (TransformParameterSpec) null)); //$NON-NLS-1$
     	final Reference reference = fac.newReference(
@@ -246,16 +246,16 @@ final class OOXMLPackageObjectHelper {
                                                                                  SAXException {
     	final DigestMethod digestMethod = fac.newDigestMethod(DigestMethod.SHA256, null);
 
-    	final List<Reference> manifestReferences = new LinkedList<Reference>();
+    	final List<Reference> manifestReferences = new LinkedList<>();
     	addRelationshipsReferences(fac, manifestReferences, ooXmlDocument, digestMethod);
 
     	// Se obtiene el inputstream del fichero [Content_Types].xml para inicializar el ContentTypeManager
-    	final InputStream contentXml = getContentTypesXMLInputStream(ooXmlDocument);
-    	final ContentTypeManager contentTypeManager = new ContentTypeManager(contentXml);
-
-		addParts(fac, contentTypeManager, manifestReferences, ooXmlDocument, CONTENT_DIRS, digestMethod);
-
-		contentXml.close();
+    	try (
+			final InputStream contentXml = getContentTypesXMLInputStream(ooXmlDocument);
+		) {
+	    	final ContentTypeManager contentTypeManager = new ContentTypeManager(contentXml);
+			addParts(fac, contentTypeManager, manifestReferences, ooXmlDocument, CONTENT_DIRS, digestMethod);
+    	}
 		return fac.newManifest(manifestReferences);
 	}
 
@@ -280,14 +280,14 @@ final class OOXMLPackageObjectHelper {
     	valueElement.setTextContent(new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss'Z'").format(new Date())); //$NON-NLS-1$
     	signatureTimeElement.appendChild(valueElement);
 
-    	final List<XMLStructure> signatureTimeContent = new LinkedList<XMLStructure>();
+    	final List<XMLStructure> signatureTimeContent = new LinkedList<>();
     	signatureTimeContent.add(new DOMStructure(signatureTimeElement));
     	final SignatureProperty signatureTimeSignatureProperty = fac.newSignatureProperty(
 			signatureTimeContent,
 			"#" + signatureId, //$NON-NLS-1$
 			"idSignatureTime" //$NON-NLS-1$
 		);
-    	final List<SignatureProperty> signaturePropertyContent = new LinkedList<SignatureProperty>();
+    	final List<SignatureProperty> signaturePropertyContent = new LinkedList<>();
     	signaturePropertyContent.add(signatureTimeSignatureProperty);
     	final SignatureProperties signatureProperties = fac.newSignatureProperties(
 			signaturePropertyContent,

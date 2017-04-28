@@ -43,7 +43,7 @@ public final class TestAOODFSignerTest {
     	"odt", "ods", "odp" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
     };
 
-    private static final List<byte[]> DATA = new ArrayList<byte[]>(2);
+    private static final List<byte[]> DATA = new ArrayList<>(2);
     static {
     	for (final String dataFile : DATA_FILES) {
         	try {
@@ -103,20 +103,22 @@ public final class TestAOODFSignerTest {
 					}
 
 					final File tempFile = File.createTempFile("odfSign", "." + DATA_FILES[i]); //$NON-NLS-1$ //$NON-NLS-2$
-					final FileOutputStream fos = new FileOutputStream(tempFile);
+					try (
+						final FileOutputStream fos = new FileOutputStream(tempFile);
+					) {
 
-					final byte[] result = signer.sign(
-						DATA.get(i),
-						"SHA512withRSA", //$NON-NLS-1$
-						pke.getPrivateKey(),
-						pke.getCertificateChain(),
-						extraParams
-					);
-					Assert.assertNotNull(result);
+						final byte[] result = signer.sign(
+							DATA.get(i),
+							"SHA512withRSA", //$NON-NLS-1$
+							pke.getPrivateKey(),
+							pke.getCertificateChain(),
+							extraParams
+						);
+						Assert.assertNotNull(result);
 
-					fos.write(result);
-					fos.flush();
-					fos.close();
+						fos.write(result);
+						fos.flush();
+					}
 
 					System.out.println("Temporal para comprobacion manual: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
 				}
@@ -144,29 +146,31 @@ public final class TestAOODFSignerTest {
 					System.out.println("Se va a firma y cofirmar el documento " + DATA_FILES[i]); //$NON-NLS-1$
 
 					final File tempFile = File.createTempFile("odfCosign", "." + DATA_FILES[i]); //$NON-NLS-1$ //$NON-NLS-2$
-					final FileOutputStream fos = new FileOutputStream(tempFile);
+					try (
+						final FileOutputStream fos = new FileOutputStream(tempFile);
+					) {
 
-					final byte[] signature = signer.sign(
-						DATA.get(i),
-						"SHA1withRSA", //$NON-NLS-1$
-						pke.getPrivateKey(),
-						pke.getCertificateChain(),
-						extraParams
-					);
-					Assert.assertNotNull(signature);
+						final byte[] signature = signer.sign(
+							DATA.get(i),
+							"SHA1withRSA", //$NON-NLS-1$
+							pke.getPrivateKey(),
+							pke.getCertificateChain(),
+							extraParams
+						);
+						Assert.assertNotNull(signature);
 
-					final byte[] result = signer.cosign(
-						signature,
-						"SHA1withRSA", //$NON-NLS-1$
-						pke2.getPrivateKey(),
-						pke2.getCertificateChain(),
-						extraParams
-					);
-					Assert.assertNotNull(result);
+						final byte[] result = signer.cosign(
+							signature,
+							"SHA1withRSA", //$NON-NLS-1$
+							pke2.getPrivateKey(),
+							pke2.getCertificateChain(),
+							extraParams
+						);
+						Assert.assertNotNull(result);
 
-					fos.write(result);
-					fos.flush();
-					fos.close();
+						fos.write(result);
+						fos.flush();
+					}
 
 					System.out.println("Temporal para comprobacion manual: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
 				}

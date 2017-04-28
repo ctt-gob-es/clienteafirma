@@ -174,7 +174,7 @@ final class OOXMLXAdESSigner {
 		final OOXMLAdvancedSignature xmlSignature = OOXMLAdvancedSignature.newInstance(xades, ooXmlDocument);
 
 		// Lista de referencias a firmar
-		final List<Reference> referenceList = new ArrayList<Reference>();
+		final List<Reference> referenceList = new ArrayList<>();
 
 		// Identificador de primer nivel de la firma
 		final String signatureId = "xmldsig-" + UUID.randomUUID().toString(); //$NON-NLS-1$
@@ -191,6 +191,9 @@ final class OOXMLXAdESSigner {
 			LOGGER.info("Se usara la factoria XML de Apache"); //$NON-NLS-1$
 		}
 		catch (final Exception e) {
+			LOGGER.info(
+				"No se ha podido usar la factoria XML DOM Apache 'org.apache.jcp.xml.dsig.internal.dom.XMLDSigRI', se usara la por defecto del sistema: " + e //$NON-NLS-1$
+			);
 			fac = XMLSignatureFactory.getInstance("DOM"); //$NON-NLS-1$
 		}
 

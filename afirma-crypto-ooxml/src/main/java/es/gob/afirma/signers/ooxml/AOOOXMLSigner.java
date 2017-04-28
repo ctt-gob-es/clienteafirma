@@ -95,25 +95,23 @@ public final class AOOOXMLSigner implements AOSigner {
      *         contrario.
      * @throws IOException Cuando hay problemas en el tratamiento de los datos. */
     private static boolean isOOXMLFile(final byte[] data) throws IOException {
-        final ZipFile zipFile = AOFileUtils.createTempZipFile(data);
-        // Se separa en varios "if" para simplificar la condicional
-        if (zipFile.getEntry("[Content_Types].xml") == null) { //$NON-NLS-1$
-        	zipFile.close();
-        	return false;
-        }
-        if (zipFile.getEntry("_rels/.rels") == null && zipFile.getEntry("_rels\\.rels") == null) { //$NON-NLS-1$ //$NON-NLS-2$
-        	zipFile.close();
-        	return false;
-        }
-        if (zipFile.getEntry("docProps/app.xml") == null && zipFile.getEntry("docProps\\app.xml") == null) { //$NON-NLS-1$ //$NON-NLS-2$
-        	zipFile.close();
-        	return false;
-        }
-        if (zipFile.getEntry("docProps/core.xml") == null && zipFile.getEntry("docProps\\core.xml") == null) { //$NON-NLS-1$ //$NON-NLS-2$
-        	zipFile.close();
-        	return false;
-        }
-        zipFile.close();
+    	try (
+	        final ZipFile zipFile = AOFileUtils.createTempZipFile(data);
+		) {
+	        // Se separa en varios "if" para simplificar la condicional
+	        if (zipFile.getEntry("[Content_Types].xml") == null) { //$NON-NLS-1$
+	        	return false;
+	        }
+	        if (zipFile.getEntry("_rels/.rels") == null && zipFile.getEntry("_rels\\.rels") == null) { //$NON-NLS-1$ //$NON-NLS-2$
+	        	return false;
+	        }
+	        if (zipFile.getEntry("docProps/app.xml") == null && zipFile.getEntry("docProps\\app.xml") == null) { //$NON-NLS-1$ //$NON-NLS-2$
+	        	return false;
+	        }
+	        if (zipFile.getEntry("docProps/core.xml") == null && zipFile.getEntry("docProps\\core.xml") == null) { //$NON-NLS-1$ //$NON-NLS-2$
+	        	return false;
+	        }
+    	}
         return true;
     }
 

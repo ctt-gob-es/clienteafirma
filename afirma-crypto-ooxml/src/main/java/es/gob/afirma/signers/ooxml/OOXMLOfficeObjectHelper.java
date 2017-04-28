@@ -46,7 +46,7 @@ final class OOXMLOfficeObjectHelper {
 			                         final String address2,
 			                         final String sigType) {
 
-        final List<XMLStructure> objectContent = new LinkedList<XMLStructure>();
+        final List<XMLStructure> objectContent = new LinkedList<>();
 
         //************************************************************************************
         //************************************************************************************
@@ -227,7 +227,7 @@ final class OOXMLOfficeObjectHelper {
 
         // El nodo idOfficeV1Details agrupa tanto a SignatureInfoV1 como a SignatureInfoV2
 
-        final List<XMLStructure> signatureInfoContent = new LinkedList<XMLStructure>();
+        final List<XMLStructure> signatureInfoContent = new LinkedList<>();
         signatureInfoContent.add(new DOMStructure(signatureInfoV1Element));
         signatureInfoContent.add(new DOMStructure(signatureInfoV2Element));
 
@@ -236,7 +236,7 @@ final class OOXMLOfficeObjectHelper {
     		signatureInfoContent, "#" + signatureId, "idOfficeV1Details" //$NON-NLS-1$ //$NON-NLS-2$
 		);
 
-        final List<SignatureProperty> signaturePropertyContent = new LinkedList<SignatureProperty>();
+        final List<SignatureProperty> signaturePropertyContent = new LinkedList<>();
         signaturePropertyContent.add(signatureInfoSignatureProperty);
         final SignatureProperties signatureProperties = fac.newSignatureProperties(signaturePropertyContent, null);
         objectContent.add(signatureProperties);

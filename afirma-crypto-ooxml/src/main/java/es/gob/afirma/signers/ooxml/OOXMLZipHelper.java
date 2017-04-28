@@ -71,18 +71,19 @@ final class OOXMLZipHelper {
 
         // Copiamos el contenido del OOXML original al OOXML firmado
         // Durante el proceso es necesario modificar ciertos ficheros
-        final ZipOutputStream zipOutputStream = copyOOXMLContent(
-    		ooXmlDocument,
-    		signatureZipEntryName,
-    		signedOOXMLOutputStream
-		);
-
-        // Anadimos el fichero de firma XML al paquete OOXML
-        zipOutputStream.putNextEntry(new ZipEntry(signatureZipEntryName));
-        if (xmlSignatureFile != null) {
-        	zipOutputStream.write(xmlSignatureFile);
+        try (
+	        final ZipOutputStream zipOutputStream = copyOOXMLContent(
+	    		ooXmlDocument,
+	    		signatureZipEntryName,
+	    		signedOOXMLOutputStream
+			);
+		) {
+	        // Anadimos el fichero de firma XML al paquete OOXML
+	        zipOutputStream.putNextEntry(new ZipEntry(signatureZipEntryName));
+	        if (xmlSignatureFile != null) {
+	        	zipOutputStream.write(xmlSignatureFile);
+	        }
         }
-        zipOutputStream.close();
 
         return signedOOXMLOutputStream.toByteArray();
     }
@@ -95,157 +96,158 @@ final class OOXMLZipHelper {
                                                                                                        TransformerException,
                                                                                                        XPathExpressionException {
         final ZipOutputStream zipOutputStream = new ZipOutputStream(signedOOXMLOutputStream);
-        final ZipInputStream zipInputStream = new ZipInputStream(
-    		new ByteArrayInputStream(
-				ooXmlDocument
-			)
-		);
-        ZipEntry zipEntry;
-        boolean hasOriginSigsRels = false;
-        while (null != (zipEntry = zipInputStream.getNextEntry())) {
-            zipOutputStream.putNextEntry(new ZipEntry(zipEntry.getName()));
-            if ("[Content_Types].xml".equals(zipEntry.getName())) { //$NON-NLS-1$
-                final Document contentTypesDocument = loadDocumentNoClose(zipInputStream);
-                final Element typesElement = contentTypesDocument.getDocumentElement();
+        try (
+	        final ZipInputStream zipInputStream = new ZipInputStream(
+	    		new ByteArrayInputStream(
+					ooXmlDocument
+				)
+			);
+		) {
+	        ZipEntry zipEntry;
+	        boolean hasOriginSigsRels = false;
+	        while (null != (zipEntry = zipInputStream.getNextEntry())) {
+	            zipOutputStream.putNextEntry(new ZipEntry(zipEntry.getName()));
+	            if ("[Content_Types].xml".equals(zipEntry.getName())) { //$NON-NLS-1$
+	                final Document contentTypesDocument = loadDocumentNoClose(zipInputStream);
+	                final Element typesElement = contentTypesDocument.getDocumentElement();
 
-                // We need to add an Override element.
-                final Element overrideElement = contentTypesDocument.createElementNS(
-            		"http://schemas.openxmlformats.org/package/2006/content-types", //$NON-NLS-1$
-            		"Override" //$NON-NLS-1$
-        		);
-                overrideElement.setAttribute("PartName", "/" + signatureZipEntryName); //$NON-NLS-1$ //$NON-NLS-2$
-                overrideElement.setAttribute("ContentType", "application/vnd.openxmlformats-package.digital-signature-xmlsignature+xml"); //$NON-NLS-1$ //$NON-NLS-2$
-                typesElement.appendChild(overrideElement);
+	                // We need to add an Override element.
+	                final Element overrideElement = contentTypesDocument.createElementNS(
+	            		"http://schemas.openxmlformats.org/package/2006/content-types", //$NON-NLS-1$
+	            		"Override" //$NON-NLS-1$
+	        		);
+	                overrideElement.setAttribute("PartName", "/" + signatureZipEntryName); //$NON-NLS-1$ //$NON-NLS-2$
+	                overrideElement.setAttribute("ContentType", "application/vnd.openxmlformats-package.digital-signature-xmlsignature+xml"); //$NON-NLS-1$ //$NON-NLS-2$
+	                typesElement.appendChild(overrideElement);
 
-				final XPath xpath = XPathFactory.newInstance().newXPath();
-				xpath.setNamespaceContext(
-					new NamespaceContext() {
+					final XPath xpath = XPathFactory.newInstance().newXPath();
+					xpath.setNamespaceContext(
+						new NamespaceContext() {
 
-						@Override
-						public Iterator<?> getPrefixes(final String namespaceURI) {
-							throw new UnsupportedOperationException();
-						}
-
-						@Override
-						public String getPrefix(final String namespaceURI) {
-							throw new UnsupportedOperationException();
-						}
-
-						@Override
-						public String getNamespaceURI(final String prefix) {
-							if (prefix == null) {
-								throw new IllegalArgumentException("El prefijo no puede ser nulo"); //$NON-NLS-1$
+							@Override
+							public Iterator<?> getPrefixes(final String namespaceURI) {
+								throw new UnsupportedOperationException();
 							}
-							if ("xml".equals(prefix)) { //$NON-NLS-1$
-								return XMLConstants.XML_NS_URI;
+
+							@Override
+							public String getPrefix(final String namespaceURI) {
+								throw new UnsupportedOperationException();
 							}
-							if ("tns".equals(prefix)) { //$NON-NLS-1$
-								return "http://schemas.openxmlformats.org/package/2006/content-types"; //$NON-NLS-1$
+
+							@Override
+							public String getNamespaceURI(final String prefix) {
+								if (prefix == null) {
+									throw new IllegalArgumentException("El prefijo no puede ser nulo"); //$NON-NLS-1$
+								}
+								if ("xml".equals(prefix)) { //$NON-NLS-1$
+									return XMLConstants.XML_NS_URI;
+								}
+								if ("tns".equals(prefix)) { //$NON-NLS-1$
+									return "http://schemas.openxmlformats.org/package/2006/content-types"; //$NON-NLS-1$
+								}
+								return XMLConstants.NULL_NS_URI;
 							}
-							return XMLConstants.NULL_NS_URI;
 						}
-					}
-				);
+					);
 
-				final XPathExpression exp = xpath.compile(
-					"/tns:Types/tns:Default[@Extension='sigs']" //$NON-NLS-1$
-				);
-				final NodeList nodeList = (NodeList) exp.evaluate(
-					contentTypesDocument,
-					XPathConstants.NODESET
-				);
+					final XPathExpression exp = xpath.compile(
+						"/tns:Types/tns:Default[@Extension='sigs']" //$NON-NLS-1$
+					);
+					final NodeList nodeList = (NodeList) exp.evaluate(
+						contentTypesDocument,
+						XPathConstants.NODESET
+					);
 
-                if (0 == nodeList.getLength()) {
-                    // Add Default element for 'sigs' extension.
-                    final Element defaultElement = contentTypesDocument.createElementNS(
-                		"http://schemas.openxmlformats.org/package/2006/content-types", //$NON-NLS-1$
-                		"Default" //$NON-NLS-1$
-            		);
-                    defaultElement.setAttribute("Extension", "sigs"); //$NON-NLS-1$ //$NON-NLS-2$
-                    defaultElement.setAttribute("ContentType", "application/vnd.openxmlformats-package.digital-signature-origin"); //$NON-NLS-1$ //$NON-NLS-2$
-                    typesElement.appendChild(defaultElement);
-                }
+	                if (0 == nodeList.getLength()) {
+	                    // Add Default element for 'sigs' extension.
+	                    final Element defaultElement = contentTypesDocument.createElementNS(
+	                		"http://schemas.openxmlformats.org/package/2006/content-types", //$NON-NLS-1$
+	                		"Default" //$NON-NLS-1$
+	            		);
+	                    defaultElement.setAttribute("Extension", "sigs"); //$NON-NLS-1$ //$NON-NLS-2$
+	                    defaultElement.setAttribute("ContentType", "application/vnd.openxmlformats-package.digital-signature-origin"); //$NON-NLS-1$ //$NON-NLS-2$
+	                    typesElement.appendChild(defaultElement);
+	                }
 
-                writeDocumentNoClosing(contentTypesDocument, zipOutputStream, false);
-            }
-            else if ("_rels/.rels".equals(zipEntry.getName())) { //$NON-NLS-1$
-                final Document relsDocument = loadDocumentNoClose(zipInputStream);
+	                writeDocumentNoClosing(contentTypesDocument, zipOutputStream, false);
+	            }
+	            else if ("_rels/.rels".equals(zipEntry.getName())) { //$NON-NLS-1$
+	                final Document relsDocument = loadDocumentNoClose(zipInputStream);
 
-				final XPath xpath = XPathFactory.newInstance().newXPath();
-				xpath.setNamespaceContext(
-					new NamespaceContext() {
+					final XPath xpath = XPathFactory.newInstance().newXPath();
+					xpath.setNamespaceContext(
+						new NamespaceContext() {
 
-						@Override
-						public Iterator<?> getPrefixes(final String namespaceURI) {
-							throw new UnsupportedOperationException();
-						}
-
-						@Override
-						public String getPrefix(final String namespaceURI) {
-							throw new UnsupportedOperationException();
-						}
-
-						@Override
-						public String getNamespaceURI(final String prefix) {
-							if (prefix == null) {
-								throw new IllegalArgumentException("El prefijo no puede ser nulo"); //$NON-NLS-1$
+							@Override
+							public Iterator<?> getPrefixes(final String namespaceURI) {
+								throw new UnsupportedOperationException();
 							}
-							if ("xml".equals(prefix)) { //$NON-NLS-1$
-								return XMLConstants.XML_NS_URI;
+
+							@Override
+							public String getPrefix(final String namespaceURI) {
+								throw new UnsupportedOperationException();
 							}
-							if ("tns".equals(prefix)) { //$NON-NLS-1$
-								return RELATIONSHIPS_SCHEMA;
+
+							@Override
+							public String getNamespaceURI(final String prefix) {
+								if (prefix == null) {
+									throw new IllegalArgumentException("El prefijo no puede ser nulo"); //$NON-NLS-1$
+								}
+								if ("xml".equals(prefix)) { //$NON-NLS-1$
+									return XMLConstants.XML_NS_URI;
+								}
+								if ("tns".equals(prefix)) { //$NON-NLS-1$
+									return RELATIONSHIPS_SCHEMA;
+								}
+								return XMLConstants.NULL_NS_URI;
 							}
-							return XMLConstants.NULL_NS_URI;
 						}
-					}
-				);
-				final XPathExpression exp = xpath.compile(
-					"/tns:Relationships/tns:Relationship[@Type='http://schemas.openxmlformats.org/package/2006/relationships/digital-signature/origin']" //$NON-NLS-1$
-				);
-				final NodeList nodeList = (NodeList) exp.evaluate(
-					relsDocument,
-					XPathConstants.NODESET
-				);
+					);
+					final XPathExpression exp = xpath.compile(
+						"/tns:Relationships/tns:Relationship[@Type='http://schemas.openxmlformats.org/package/2006/relationships/digital-signature/origin']" //$NON-NLS-1$
+					);
+					final NodeList nodeList = (NodeList) exp.evaluate(
+						relsDocument,
+						XPathConstants.NODESET
+					);
 
-                if (0 == nodeList.getLength()) {
-                    final Element relationshipElement = relsDocument.createElementNS(RELATIONSHIPS_SCHEMA, "Relationship"); //$NON-NLS-1$
-                    relationshipElement.setAttribute("Id", "rel-id-" + UUID.randomUUID().toString()); //$NON-NLS-1$ //$NON-NLS-2$
-                    relationshipElement.setAttribute("Type", "http://schemas.openxmlformats.org/package/2006/relationships/digital-signature/origin"); //$NON-NLS-1$ //$NON-NLS-2$
-                    relationshipElement.setAttribute("Target", "_xmlsignatures/origin.sigs"); //$NON-NLS-1$ //$NON-NLS-2$
+	                if (0 == nodeList.getLength()) {
+	                    final Element relationshipElement = relsDocument.createElementNS(RELATIONSHIPS_SCHEMA, "Relationship"); //$NON-NLS-1$
+	                    relationshipElement.setAttribute("Id", "rel-id-" + UUID.randomUUID().toString()); //$NON-NLS-1$ //$NON-NLS-2$
+	                    relationshipElement.setAttribute("Type", "http://schemas.openxmlformats.org/package/2006/relationships/digital-signature/origin"); //$NON-NLS-1$ //$NON-NLS-2$
+	                    relationshipElement.setAttribute("Target", "_xmlsignatures/origin.sigs"); //$NON-NLS-1$ //$NON-NLS-2$
 
-                    relsDocument.getDocumentElement().appendChild(relationshipElement);
-                }
+	                    relsDocument.getDocumentElement().appendChild(relationshipElement);
+	                }
 
-                writeDocumentNoClosing(relsDocument, zipOutputStream, false);
-            }
-            else if (zipEntry.getName().startsWith("_xmlsignatures/_rels/") && zipEntry.getName().endsWith(".rels")) { //$NON-NLS-1$ //$NON-NLS-2$
+	                writeDocumentNoClosing(relsDocument, zipOutputStream, false);
+	            }
+	            else if (zipEntry.getName().startsWith("_xmlsignatures/_rels/") && zipEntry.getName().endsWith(".rels")) { //$NON-NLS-1$ //$NON-NLS-2$
 
-                hasOriginSigsRels = true;
-                final Document originSignRelsDocument = loadDocumentNoClose(zipInputStream);
+	                hasOriginSigsRels = true;
+	                final Document originSignRelsDocument = loadDocumentNoClose(zipInputStream);
 
-                final Element relationshipElement = originSignRelsDocument.createElementNS(RELATIONSHIPS_SCHEMA, "Relationship"); //$NON-NLS-1$
-                relationshipElement.setAttribute("Id", "rel-" + UUID.randomUUID().toString()); //$NON-NLS-1$ //$NON-NLS-2$
-                relationshipElement.setAttribute("Type", "http://schemas.openxmlformats.org/package/2006/relationships/digital-signature/signature"); //$NON-NLS-1$ //$NON-NLS-2$
-                relationshipElement.setAttribute("Target", new File(signatureZipEntryName).getName()); //$NON-NLS-1$
+	                final Element relationshipElement = originSignRelsDocument.createElementNS(RELATIONSHIPS_SCHEMA, "Relationship"); //$NON-NLS-1$
+	                relationshipElement.setAttribute("Id", "rel-" + UUID.randomUUID().toString()); //$NON-NLS-1$ //$NON-NLS-2$
+	                relationshipElement.setAttribute("Type", "http://schemas.openxmlformats.org/package/2006/relationships/digital-signature/signature"); //$NON-NLS-1$ //$NON-NLS-2$
+	                relationshipElement.setAttribute("Target", new File(signatureZipEntryName).getName()); //$NON-NLS-1$
 
-                originSignRelsDocument.getDocumentElement().appendChild(relationshipElement);
+	                originSignRelsDocument.getDocumentElement().appendChild(relationshipElement);
 
-                writeDocumentNoClosing(originSignRelsDocument, zipOutputStream, false);
-            }
-            else {
-            	zipOutputStream.write(AOUtil.getDataFromInputStream(zipInputStream));
-            }
+	                writeDocumentNoClosing(originSignRelsDocument, zipOutputStream, false);
+	            }
+	            else {
+	            	zipOutputStream.write(AOUtil.getDataFromInputStream(zipInputStream));
+	            }
+	        }
+
+	        if (!hasOriginSigsRels) {
+	            // Add signature relationships document.
+	            addOriginSigsRels(signatureZipEntryName, zipOutputStream);
+	            addOriginSigs(zipOutputStream);
+	        }
         }
 
-        if (!hasOriginSigsRels) {
-            // Add signature relationships document.
-            addOriginSigsRels(signatureZipEntryName, zipOutputStream);
-            addOriginSigs(zipOutputStream);
-        }
-
-        // Return.
-        zipInputStream.close();
         return zipOutputStream;
     }
 

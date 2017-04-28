@@ -50,7 +50,7 @@ public final class RelationshipTransformParameterSpec implements TransformParame
 
     /** Constructor. */
     public RelationshipTransformParameterSpec() {
-        this.sourceIds = new LinkedList<String>();
+        this.sourceIds = new LinkedList<>();
     }
 
     /** A&ntilde;ade una referencia de relaci&oacute;n para el identificados proporcionado.
