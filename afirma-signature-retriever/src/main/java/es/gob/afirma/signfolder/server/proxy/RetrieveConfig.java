@@ -51,12 +51,10 @@ public class RetrieveConfig {
 		this.config = new Properties();
 	}
 
-	/**
-	 * Carga del
+	/** Carga el fichero indicado.
 	 * @param path Ruta del fichero de configuraci&oacute;n (si existe).
 	 * @throws FileNotFoundException Cuando no se encuentra el fichero de configuraci&oacute;n.
-	 * @throws IOException Cuanto ocurre un error durante la lectura del fichero.
-	 */
+	 * @throws IOException Cuanto ocurre un error durante la lectura del fichero. */
 	public void load(final String path) throws FileNotFoundException, IOException {
 		if (path != null) {
  			try {
