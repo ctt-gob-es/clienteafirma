@@ -228,8 +228,8 @@ public final class AOOOXMLSigner implements AOSigner {
     }
 
     /** Agrega una firma electr&oacute;nica a un documento OOXML.
-     * @param data Documento OOXML
-     * @param algorithm Algoritmo de firma
+     * @param data Documento OOXML.
+     * @param algorithm Algoritmo de firma.
      * <p>Se aceptan los siguientes algoritmos en el par&aacute;metro <code>algorithm</code>:</p>
      * <ul>
      *  <li>&nbsp;&nbsp;&nbsp;<i>SHA1withRSA</i></li>
@@ -237,12 +237,12 @@ public final class AOOOXMLSigner implements AOSigner {
      *  <li>&nbsp;&nbsp;&nbsp;<i>SHA384withRSA</i></li>
      *  <li>&nbsp;&nbsp;&nbsp;<i>SHA512withRSA</i></li>
      * </ul>
-     * @param key Clave privada del firmante
-     * @param certChain Cadena de certificados del firmante
-     * @param extraParams Par&aacute;metros adicionales para la firma (<a href="doc-files/extraparams.html">detalle</a>)
-     * @return Documento OOXML firmado
-     * @throws AOException Cuando ocurre alg&uacute;n error durante el proceso de firma
-     * @throws IOException Cuando hay errores en la lectura de los datos */
+     * @param key Clave privada del firmante.
+     * @param certChain Cadena de certificados del firmante.
+     * @param extraParams Par&aacute;metros adicionales para la firma (<a href="doc-files/extraparams.html">detalle</a>).
+     * @return Documento OOXML firmado.
+     * @throws AOException Cuando ocurre alg&uacute;n error durante el proceso de firma.
+     * @throws IOException Cuando hay errores en la lectura de los datos. */
     @Override
 	public byte[] sign(final byte[] data,
                        final String algorithm,
@@ -265,7 +265,7 @@ public final class AOOOXMLSigner implements AOSigner {
     		data,
     		algorithm,
     		key,
-    		(X509Certificate[]) certChain,
+    		new X509Certificate[] { (X509Certificate) certChain[0] }, // Office 2016 no acepta cadenas, solo debe estar el cert del firmante
     		xParams
 		);
     }
