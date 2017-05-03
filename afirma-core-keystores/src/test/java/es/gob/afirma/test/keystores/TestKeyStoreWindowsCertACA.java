@@ -10,10 +10,7 @@
 
 package es.gob.afirma.test.keystores;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.security.KeyStore;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.cert.Certificate;
@@ -23,17 +20,16 @@ import java.util.logging.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 
-import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.keystores.AOKeyStore;
 import es.gob.afirma.keystores.AOKeyStoreManager;
 import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
 
-/** Pruebas espec&iacute;ficas para los almacenes de Mac OS X.
+/** Pruebas espec&iacute;ficas para los almacenes de Windows con certificado ACA.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public class TestKeyStoreWindowsCertACA {
 
-    /** Prueba de carga y uso de un <i>KeyChain</i> en fichero suelto.
+    /** Prueba de carga y uso de certificado ACA en CAPI con AOKeyStoreManager.
      * @throws Exception En cualquier error. */
     @SuppressWarnings("static-method")
 	@Test
@@ -44,15 +40,6 @@ public class TestKeyStoreWindowsCertACA {
         }
 
         Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$
-
-        // Copiamos el KeyChain a un fichero temporal
-
-        final File kc = File.createTempFile("test", ".keychain"); //$NON-NLS-1$ //$NON-NLS-2$
-        kc.deleteOnExit();
-        final OutputStream os = new FileOutputStream(kc);
-        os.write(AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream("test.keychain"))); //$NON-NLS-1$
-        os.flush();
-        os.close();
 
         final AOKeyStoreManager ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
     		AOKeyStore.WINDOWS,
