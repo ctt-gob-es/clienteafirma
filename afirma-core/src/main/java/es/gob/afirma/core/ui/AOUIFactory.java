@@ -69,7 +69,7 @@ public final class AOUIFactory {
             	uiManagerClassName = "es.gob.afirma.ui.core.jse.JSEUIManager"; //$NON-NLS-1$
             }
 			try {
-				uiManager = (AOUIManager) Class.forName(uiManagerClassName).newInstance();
+				uiManager = (AOUIManager) Class.forName(uiManagerClassName).getDeclaredConstructor().newInstance();
 			}
 			catch(final Exception e) {
 				Logger.getLogger("es.gob.afirma").severe( //$NON-NLS-1$

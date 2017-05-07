@@ -15,13 +15,13 @@ import java.security.Key;
 import java.security.KeyException;
 import java.security.PublicKey;
 import java.security.cert.Certificate;
+import java.security.cert.CertificateExpiredException;
+import java.security.cert.CertificateNotYetValidException;
+import java.security.cert.X509Certificate;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
 
-import java.security.cert.CertificateExpiredException;
-import java.security.cert.CertificateNotYetValidException;
-import java.security.cert.X509Certificate;
 import javax.xml.crypto.AlgorithmMethod;
 import javax.xml.crypto.KeySelector;
 import javax.xml.crypto.KeySelectorException;
@@ -45,7 +45,7 @@ import es.gob.afirma.cert.signvalidation.SignValidity.VALIDITY_ERROR;
 import es.gob.afirma.signers.xml.CustomUriDereferencer;
 import es.gob.afirma.signers.xml.Utils;
 
-/** Validador de firmas XML. Basado en la documentaci&oacute;n y los ejemplo de la JSR 105. 
+/** Validador de firmas XML. Basado en la documentaci&oacute;n y los ejemplo de la JSR 105.
  *  Se validan los certificados en local revisando las fechas de validez de los certificados. */
 public final class ValidateXMLSignature implements SignValider {
 
@@ -91,25 +91,25 @@ public final class ValidateXMLSignature implements SignValider {
             	return KO;
             }
             final XMLSignatureFactory certs = XMLSignatureFactory.getInstance("DOM"); //$NON-NLS-1$
-            XMLSignature signature2 = certs.unmarshalXMLSignature(valContext);
-            KeyInfo keyInfo = signature2.getKeyInfo();
+            final XMLSignature signature2 = certs.unmarshalXMLSignature(valContext);
+            final KeyInfo keyInfo = signature2.getKeyInfo();
             X509Certificate certImpl = null;
-            Iterator<?> iter = keyInfo.getContent().iterator();
+            final Iterator<?> iter = keyInfo.getContent().iterator();
             while (iter.hasNext()) {
-            	XMLStructure kiType = (XMLStructure) iter.next();
+            	final XMLStructure kiType = (XMLStructure) iter.next();
 		    	//Validamos la fecha de expiracion y emision de los certificados
 		    	 if (kiType instanceof X509Data) {
-		    	        X509Data xData = (X509Data) kiType;
-		    	        List<Object> x509DataContent = xData.getContent();
-		    	        for (int i1 = 0; ( i1 < x509DataContent.size()); i1++) {
+		    	        final X509Data xData = (X509Data) kiType;
+		    	        final List<?> x509DataContent = xData.getContent();
+		    	        for (int i1 = 0; i1 < x509DataContent.size(); i1++) {
 		    	        	if (x509DataContent.get(i1) instanceof X509Certificate) {
 		    	                certImpl = (X509Certificate) x509DataContent.get(i1);
 		    	                try {
 		    	                    certImpl.checkValidity();
-		    	                } catch (CertificateExpiredException expiredEx) {
+		    	                } catch (final CertificateExpiredException expiredEx) {
 		    	                	LOGGER.info("El certificado de la firma ha expirado: " + expiredEx); //$NON-NLS-1$
 		    	                	return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.CERTIFICATE_EXPIRED);
-		    	                } catch (CertificateNotYetValidException notYetValidEx) {
+		    	                } catch (final CertificateNotYetValidException notYetValidEx) {
 		    	                	LOGGER.info("El certificado de la firma no es valido todavia: " + notYetValidEx); //$NON-NLS-1$
 		    	                	return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.CERTIFICATE_NOT_VALID_YET);
 		    	                }
@@ -117,11 +117,11 @@ public final class ValidateXMLSignature implements SignValider {
 		    	        }
 		    	 }
 		    }
-            
+
             // Ahora miramos las referencias una a una
 		    final Iterator<?> i = signature.getSignedInfo().getReferences().iterator();
 		    for (int j=0; i.hasNext(); j++) {
-		    	Reference iNext = (Reference) i.next();
+		    	final Reference iNext = (Reference) i.next();
 		    	if (!iNext.validate(valContext)) {
 		    		LOGGER.info("La referencia " + j + " de la firma es invalida"); //$NON-NLS-1$ //$NON-NLS-2$
 		    		return KO;
@@ -176,7 +176,7 @@ public final class ValidateXMLSignature implements SignValider {
                 // Si no hay KeyValue intentamos sacar la clave publica del primer Certificado
                 // que encontramos en X509Data
                 else if (xmlStructure instanceof X509Data) {
-                	final List<Object> x509DataObjects = ((X509Data)xmlStructure).getContent();
+                	final List<?> x509DataObjects = ((X509Data)xmlStructure).getContent();
                 	for (final Object o : x509DataObjects) {
                 		if (o instanceof Certificate) {
                             return new SimpleKeySelectorResult(((Certificate)o).getPublicKey());

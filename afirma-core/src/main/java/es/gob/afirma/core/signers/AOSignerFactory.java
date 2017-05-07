@@ -94,7 +94,7 @@ public final class AOSignerFactory {
 
 			if (SIGNERS.get(format[0]) == null) {
 				try {
-					SIGNERS.put(format[0], (AOSigner) Class.forName(format[1]).newInstance());
+					SIGNERS.put(format[0], (AOSigner) Class.forName(format[1]).getDeclaredConstructor().newInstance());
 				}
 				catch(final Exception e) {
 					LOGGER.warning("No se ha podido instanciar un manejador para el formato de firma '" + format[0] + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
@@ -127,7 +127,7 @@ public final class AOSignerFactory {
 		}
 		if (SIGNERS.get(signFormat) == null) {
 			try {
-				SIGNERS.put(signFormat, (AOSigner) Class.forName(signerClass).newInstance());
+				SIGNERS.put(signFormat, (AOSigner) Class.forName(signerClass).getDeclaredConstructor().newInstance());
 			}
 			catch(final Exception e) {
 				LOGGER.severe("No se ha podido instanciar un manejador para el formato de firma '" + signFormat + "', se devolvera null: " + e); //$NON-NLS-1$ //$NON-NLS-2$

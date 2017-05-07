@@ -681,7 +681,7 @@ public final class Utils {
                 isCert.close();
             }
             catch (final Exception e) {
-                // Ignoramos los errores en el cierre
+                LOGGER.warning("Error cerrando el flujo de lectura del certificado: " + e); //$NON-NLS-1$
             }
         }
         catch (final Exception e) {
@@ -700,11 +700,12 @@ public final class Utils {
 			// provocar un error el no usarla. Normalmente, ClassCastException al recuperar la factoria.
 			fac =  XMLSignatureFactory.getInstance(
 				"DOM", //$NON-NLS-1$
-				(Provider) Class.forName("org.apache.jcp.xml.dsig.internal.dom.XMLDSigRI").newInstance() //$NON-NLS-1$
+				(Provider) Class.forName("org.apache.jcp.xml.dsig.internal.dom.XMLDSigRI").getDeclaredConstructor().newInstance() //$NON-NLS-1$
 			);
 			LOGGER.info("Se usara la factoria XML de Apache"); //$NON-NLS-1$
 		}
 		catch (final Exception e) {
+			LOGGER.info("Se usara la factoria XML popr defecto por no estar disponible la de Apache: " + e); //$NON-NLS-1$
 			return XMLSignatureFactory.getInstance("DOM"); //$NON-NLS-1$
 		}
 		return fac;
@@ -726,7 +727,7 @@ public final class Utils {
     			if (provider == null || !classProvider.isInstance(provider)) {
     				Security.removeProvider(XMLDSIG);
     				LOGGER.info("Instalamos el proveedor de firma XML de Apache"); //$NON-NLS-1$
-    				Security.addProvider((Provider) classProvider.newInstance());
+    				Security.addProvider((Provider) classProvider.getDeclaredConstructor().newInstance());
     			}
     		}
     		catch (final Exception e) {
@@ -735,7 +736,7 @@ public final class Utils {
     				if (provider == null || !classProvider.isInstance(provider)) {
     					Security.removeProvider(XMLDSIG);
     					LOGGER.info("No se encontro el proveedor de firma XML de Apache, se instalara el de Sun: " + e); //$NON-NLS-1$
-    					Security.addProvider((Provider) classProvider.newInstance());
+    					Security.addProvider((Provider) classProvider.getDeclaredConstructor().newInstance());
     				}
     			}
     			catch (final Exception e2) {
