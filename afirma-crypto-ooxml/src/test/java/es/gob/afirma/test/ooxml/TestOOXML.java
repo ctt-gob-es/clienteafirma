@@ -56,6 +56,10 @@ public final class TestOOXML {
     		}
 		}
 
+    	final Properties p2 = new Properties();
+        p2.setProperty("format", AOSignConstants.SIGN_FORMAT_OOXML); //$NON-NLS-1$
+        p2.setProperty("signerClaimedRoles", "Papel atribuido al firmante"); //$NON-NLS-1$ //$NON-NLS-2$
+
         final Properties p1 = new Properties();
         p1.setProperty("format", AOSignConstants.SIGN_FORMAT_OOXML); //$NON-NLS-1$
         p1.setProperty("signatureReason", "Comentario : Razon de firma"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -65,7 +69,7 @@ public final class TestOOXML {
 	    p1.setProperty("commitmentTypeIndication0CommitmentTypeQualifiers", "RAZON-PRUEBA"); //$NON-NLS-1$ //$NON-NLS-2$
 
         OOXML_MODES = new Properties[] {
-            p1
+            p1, p2
         };
     }
 

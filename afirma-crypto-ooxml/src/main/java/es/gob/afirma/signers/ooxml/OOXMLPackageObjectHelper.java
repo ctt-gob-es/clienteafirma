@@ -161,13 +161,18 @@ final class OOXMLPackageObjectHelper {
     	throw new IllegalStateException("El documento OOXML es invalido ya que no contiene el fichero [Content_Types].xml"); //$NON-NLS-1$
 	}
 
-	private static Document loadDocumentNoClose(final InputStream documentInputStream) throws ParserConfigurationException, SAXException, IOException {
-        final NoCloseInputStream noCloseInputStream = new NoCloseInputStream(documentInputStream);
-        final InputSource inputSource = new InputSource(noCloseInputStream);
-        final DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
-        documentBuilderFactory.setNamespaceAware(true);
-        final DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
-        return documentBuilder.parse(inputSource);
+	private static Document loadDocumentNoClose(final InputStream documentInputStream) throws ParserConfigurationException,
+	                                                                                          SAXException,
+	                                                                                          IOException {
+		try (
+			final InputStream noCloseInputStream = new NoCloseInputStream(documentInputStream);
+		) {
+	        final InputSource inputSource = new InputSource(noCloseInputStream);
+	        final DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+	        documentBuilderFactory.setNamespaceAware(true);
+	        final DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
+	        return documentBuilder.parse(inputSource);
+		}
     }
 
     private static void addRelationshipsReference(final XMLSignatureFactory fac,

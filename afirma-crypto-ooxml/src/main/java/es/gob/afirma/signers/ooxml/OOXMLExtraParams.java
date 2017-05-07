@@ -27,9 +27,6 @@ final class OOXMLExtraParams {
     /** Cargo atribuido para el firmante. */
     static final String SIGNER_CLAIMED_ROLES = "signerClaimedRoles";//$NON-NLS-1$
 
-    /** Cargo confirmado para el firmante. */
-    static final String SIGNER_CERTIFIED_ROLE = "signerCertifiedRole";//$NON-NLS-1$
-
     /** Comentarios sobre la firma (normalmente la raz&oacute;n de la firma). */
     static final String SIGNATURE_COMMENTS = "signatureComments";//$NON-NLS-1$
 

@@ -145,22 +145,10 @@ final class OOXMLXAdESSigner {
 		}
 
 		// SignerRole
-		SignerRole signerRole = null;
-		try {
-			final String claimedRole = extraParams.getProperty(OOXMLExtraParams.SIGNER_CLAIMED_ROLES);
-			final String certifiedRole = extraParams.getProperty(OOXMLExtraParams.SIGNER_CERTIFIED_ROLE);
-			signerRole = new SignerRoleImpl();
-			if (claimedRole != null) {
-				signerRole.addClaimedRole(claimedRole);
-			}
-			if (certifiedRole != null) {
-				signerRole.addCertifiedRole(certifiedRole);
-			}
-		}
-		catch (final Exception e) {
-			// Se ignoran los errores, el parametro es opcional
-		}
-		if (signerRole != null) {
+		final String signerRoleValue = extraParams.getProperty(OOXMLExtraParams.SIGNER_CLAIMED_ROLES);
+		if (signerRoleValue != null) {
+			final SignerRole signerRole = new SignerRoleImpl();
+			signerRole.addClaimedRole(signerRoleValue);
 			xades.setSignerRole(signerRole);
 		}
 

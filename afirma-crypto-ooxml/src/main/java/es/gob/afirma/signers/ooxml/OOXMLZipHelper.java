@@ -284,20 +284,27 @@ final class OOXMLZipHelper {
     																							IOException {
     	final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
     	dbf.setNamespaceAware(true);
-    	return dbf.newDocumentBuilder().parse(new InputSource(new NoCloseInputStream(documentInputStream)));
+    	try (
+			final InputStream is = new NoCloseInputStream(documentInputStream);
+		) {
+    		return dbf.newDocumentBuilder().parse(new InputSource(is));
+    	}
     }
 
     static void writeDocumentNoClosing(final Document document,
                                                  final OutputStream documentOutputStream,
                                                  final boolean omitXmlDeclaration) throws TransformerException {
-    	final NoCloseOutputStream outputStream = new NoCloseOutputStream(documentOutputStream);
-    	final Result result = new StreamResult(outputStream);
-    	final Transformer xformer = TransformerFactory.newInstance().newTransformer();
-    	if (omitXmlDeclaration) {
-    		xformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes"); //$NON-NLS-1$
+    	try (
+			final NoCloseOutputStream outputStream = new NoCloseOutputStream(documentOutputStream);
+		) {
+    		final Result result = new StreamResult(outputStream);
+	    	final Transformer xformer = TransformerFactory.newInstance().newTransformer();
+	    	if (omitXmlDeclaration) {
+	    		xformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes"); //$NON-NLS-1$
+	    	}
+	    	final Source source = new DOMSource(document);
+	    	xformer.transform(source, result);
     	}
-    	final Source source = new DOMSource(document);
-    	xformer.transform(source, result);
     }
 
     private static final class NoCloseOutputStream extends FilterOutputStream {
