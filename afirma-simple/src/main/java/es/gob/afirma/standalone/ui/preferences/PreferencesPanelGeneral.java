@@ -18,7 +18,7 @@ import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.InputEvent;
+import java.awt.event.ActionEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyListener;
 import java.util.logging.Level;
@@ -159,9 +159,9 @@ final class PreferencesPanelGeneral extends JPanel {
 
 		// Para las preferencias susceptibles de ser protegidas, comprobamos la
 		// preferencia unprotected antes de cargar su valor por defecto.
-		// Un valor unprotected a false habilitará que cualquier opción de
-		// configuración pueda ser alterada por parte del usuario mediante el
-		// interfaz gráfico. Este comportamiento se generaliza para el boton de
+		// Un valor unprotected a false habilitara que cualquier opcion de
+		// configuracion pueda ser alterada por parte del usuario mediante el
+		// interfaz grafico. Este comportamiento se generaliza para el boton de
 		// restaurar las preferencias por defecto.
 		if (!isUnprotected()) {
 			this.signarureAlgorithms
@@ -218,7 +218,7 @@ final class PreferencesPanelGeneral extends JPanel {
 		importConfigFromFileButton.setMnemonic('I');
 		importConfigFromFileButton.addActionListener(
 			ae -> {
-				if ((ae.getModifiers() & InputEvent.ALT_MASK) != 0) {
+				if ((ae.getModifiers() & ActionEvent.ALT_MASK) != 0) {
 					final String url = (String) AOUIFactory.showInputDialog(
 						getParent(),
 						SimpleAfirmaMessages.getString("PreferencesPanel.109"), //$NON-NLS-1$
