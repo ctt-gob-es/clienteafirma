@@ -1,43 +1,54 @@
 package es.gob.afirma.cert.signvalidation;
 
+import java.util.logging.Logger;
+
 /** Factoria para la creaci&oacute;n de los validadores de firma.
  * @author Sergio Mart&iacute;nez Rico. */
-public class SignValiderFactory {
+public final class SignValiderFactory {
 
 	/* Listado de los validadores de firma soportados y los identificadores de formato de firma asociados. */
 	private static final String SIGNER_VLIDER_CLASS_BINARY 	= "es.gob.afirma.cert.signvalidation.ValidateBinarySignature"; //$NON-NLS-1$
 	private static final String SIGNER_VALIDER_CLASS_PDF   	= "es.gob.afirma.cert.signvalidation.ValidatePdfSignature"; //$NON-NLS-1$
 	private static final String SIGNER_VALIDER_CLASS_XML	= "es.gob.afirma.cert.signvalidation.ValidateXMLSignature"; //$NON-NLS-1$
 
-
 	private SignValiderFactory() {
 		// No permitimos la instanciacion externa
 	}
 
-	/** Obtiene el resultado al validar la firma.
+	/** Obtiene un validador de firmas para el tipo de dato proporcionado.
 	 * @param data Firma a validar.
-	 * @return Resultado la validar la firma.
+	 * @return Validador adecuado o <code>null</code> si no hay ninguno para ese tipo de dato.
 	 * @throws IllegalArgumentException Fallo si la firma obtenida est&aacute; vac&iacute;a. */
-	public static SignValider getSignValider(byte[] data) throws IllegalArgumentException {
+	public static SignValider getSignValider(final byte[] data) throws IllegalArgumentException {
 		if (data == null) {
 			throw new IllegalArgumentException("No se han indicado datos de firma"); //$NON-NLS-1$
 		}
+		final String validerClassName;
+		if (DataAnalizerUtil.isPDF(data)) {
+			validerClassName = SIGNER_VALIDER_CLASS_PDF;
+        }
+        else if (DataAnalizerUtil.isFacturae(data)) { // Factura electronica
+        	validerClassName = SIGNER_VALIDER_CLASS_XML;
+        }
+        else if (DataAnalizerUtil.isXML(data)) {
+        	validerClassName = SIGNER_VALIDER_CLASS_XML;
+        }
+        else if(DataAnalizerUtil.isBinary(data)) {
+        	validerClassName = SIGNER_VLIDER_CLASS_BINARY;
+        }
+        else {
+        	Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
+    			"No hay un validador para el tipo de dato proporcionado" //$NON-NLS-1$
+			);
+        	return null;
+        }
 		try {
-			if (DataAnalizerUtil.isPDF(data)) {
-	        	return (SignValider) Class.forName(SIGNER_VALIDER_CLASS_PDF).newInstance();
-	        }
-	        else if (DataAnalizerUtil.isFacturae(data)) { // Factura electronica
-	        	return (SignValider) Class.forName(SIGNER_VALIDER_CLASS_XML).newInstance();
-	        }
-	        else if (DataAnalizerUtil.isXML(data)) {
-	        	return (SignValider) Class.forName(SIGNER_VALIDER_CLASS_XML).newInstance();
-	        }
-	        else if(DataAnalizerUtil.isBinary(data)) {
-	        	return (SignValider) Class.forName(SIGNER_VLIDER_CLASS_BINARY).newInstance();
-	        }
-	        return null;
+        	return (SignValider) Class.forName(validerClassName).getDeclaredConstructor().newInstance();
 		}
 		catch (final Exception e) {
+			Logger.getLogger("es.gob.afirma").severe( //$NON-NLS-1$
+				"No se ha podido instanciar el validador '" + validerClassName + "': " + e //$NON-NLS-1$ //$NON-NLS-2$
+			);
 			return null;
 		}
 	}
