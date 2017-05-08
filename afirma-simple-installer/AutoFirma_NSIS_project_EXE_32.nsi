@@ -130,10 +130,22 @@ Section "Programa" sPrograma
 	SectionIn RO
 	StrCpy $PATH "AutoFirma"
 	StrCpy $PATH_ACCESO_DIRECTO "AutoFirma"
+
 	; Comprueba que no este ya instalada
 	  ClearErrors
 	  ReadRegStr $R0 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH\" "UninstallString"
-	  ${If} ${Errors} 
+	  ${If} ${Errors}
+		; Comprobamos si esta la version 1.4.2 en ese directorio y la desinstalamos; despues instalamos
+		IfFileExists '$INSTDIR\unistall.exe' 0 +4
+		  MessageBox MB_YESNO "Existe una versión anterior de AutoFirma en el equipo. ¿Desea desinstalarla?" /SD IDYES IDNO Exit
+		  StrCpy $R0 "$INSTDIR\unistall.exe"
+		  Goto UninstallOlderVersion
+		; Comprobamos si esta la version 1.4.2 en su directorio por defecto y la desinstalamos en tal caso; despues instalamos
+		IfFileExists '$PROGRAMFILES\AutoFirma\unistall.exe' 0 +5
+		  MessageBox MB_YESNO "Existe una versión anterior de AutoFirma en el equipo. ¿Desea desinstalarla?" /SD IDYES IDNO Exit
+		  StrCpy $R0 "$PROGRAMFILES\AutoFirma\unistall.exe"
+		  ExecWait '"$R0" /S _?=$PROGRAMFILES\AutoFirma'
+		  RMDir /r /REBOOTOK '$PROGRAMFILES\AutoFirma'
 		Goto Install
 	  ${EndIf}
 	  ReadRegStr $R1 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH\" "DisplayVersion"
@@ -150,17 +162,18 @@ Section "Programa" sPrograma
       ${EndIf}
 	Exit:
 	  Quit
+
 	UninstallOlderVersion:
 	  ;Ejecuta el desinstalador cuya ruta ha sido obtenida del registro
 	  ExecWait '"$R0" /S _?=$INSTDIR'
+
 	Install:
-	
 	SetOutPath $INSTDIR\$PATH
 
 	;Copiamos la JRE en el directorio de instalacion
 	File /r java32\jre
 	
-	;Incluimos todos los ficheros que componen nuestra aplicacion
+	;Copiamos todos los ficheros que componen nuestra aplicacion
 	File  AutoFirma.exe
 	File  AutoFirmaConfigurador.exe
 	File  AutoFirmaCommandLine.exe
@@ -170,22 +183,21 @@ Section "Programa" sPrograma
 	;Hacemos que la instalacion se realice para todos los usuarios del sistema
    SetShellVarContext all
    
-   	;Se pide que se cierre Firefox y Chrome si están abiertos
+	;Se pide que se cierre Firefox y Chrome si estan abiertos
 	
 	loopFirefox:
 	${nsProcess::FindProcess} "firefox.exe" $R2
 	StrCmp $R2 0 0 +2
-	MessageBox MB_OK|MB_DEFBUTTON1|MB_ICONEXCLAMATION 'Cierre el navegador Mozilla Firefox para continuar con la instalacion de AutoFirma.' IDOK loopFirefox
+		MessageBox MB_OK|MB_DEFBUTTON1|MB_ICONEXCLAMATION 'Cierre el navegador Mozilla Firefox para continuar con la instalación de AutoFirma.' IDOK loopFirefox
 
 	loopChrome:
 	${nsProcess::FindProcess} "chrome.exe" $R3
 	StrCmp $R3 0 0 +2
-	MessageBox MB_OK|MB_DEFBUTTON1|MB_ICONEXCLAMATION 'Cierre el navegador Google Chrome para continuar con la instalacion de AutoFirma.' IDOK loopChrome
+		MessageBox MB_OK|MB_DEFBUTTON1|MB_ICONEXCLAMATION 'Cierre el navegador Google Chrome para continuar con la instalación de AutoFirma.' IDOK loopChrome
 	
 	${nsProcess::Unload}
 	
 	Sleep 2000
-   
 
 	;creamos un acceso directo en el escitorio
 	CreateShortCut "$DESKTOP\AutoFirma.lnk" "$INSTDIR\AutoFirma\AutoFirma.exe"
@@ -284,7 +296,7 @@ Section "Programa" sPrograma
 	;${If} $0 != success
 	  ;MessageBox MB_OK "Error en la importación: $0"
 	;${EndIf}
-		
+
 	;Se actualiza la variable PATH con la ruta de instalacion
 	Push "$PROGRAMFILES\AutoFirma\AutoFirma"
 	Call AddToPath
@@ -544,19 +556,19 @@ Section "uninstall"
 	StrCpy $PATH "AutoFirma"
 	StrCpy $PATH_ACCESO_DIRECTO "AutoFirma"
 	SetShellVarContext all
-	
-	;Se pide que se cierre Firefox y Chrome si están abiertos
-	
+
+	;Se pide que se cierre Firefox y Chrome si estan abiertos
+
 	loopFirefox:
 	${nsProcess::FindProcess} "firefox.exe" $R2
 	StrCmp $R2 0 0 +2
-	MessageBox MB_OK|MB_DEFBUTTON1|MB_ICONEXCLAMATION 'Cierre el navegador Mozilla Firefox para continuar con la desinstalacion de AutoFirma.' IDOK loopFirefox
+		MessageBox MB_OK|MB_DEFBUTTON1|MB_ICONEXCLAMATION 'Cierre el navegador Mozilla Firefox para continuar con la desinstalación de AutoFirma.' IDOK loopFirefox
 	
 	loopChrome:
 	${nsProcess::FindProcess} "chrome.exe" $R3
 	StrCmp $R3 0 0 +2
-	MessageBox MB_OK|MB_DEFBUTTON1|MB_ICONEXCLAMATION 'Cierre el navegador Google Chrome para continuar con la desinstalacion de AutoFirma.' IDOK loopChrome
-	
+		MessageBox MB_OK|MB_DEFBUTTON1|MB_ICONEXCLAMATION 'Cierre el navegador Google Chrome para continuar con la desinstalación de AutoFirma.' IDOK loopChrome
+
 	${nsProcess::Unload}
 	
 	Sleep 2000
@@ -564,7 +576,7 @@ Section "uninstall"
 	;Eliminamos los certificados del sistema
 	Call un.DeleteCertificate
 	ExecWait '"$INSTDIR\AutoFirma\AutoFirmaConfigurador.exe" -uninstall /passive'
-	
+
 	RMDir /r $INSTDIR\$PATH
 	;Borrar directorio de instalacion si es un directorio valido (contiene "AutoFirma" o es una subcarpeta de Program Files)
 	${StrContains} $0 "Program Files (x86)\" $INSTDIR
@@ -648,7 +660,6 @@ Function un.StrContains
    Pop $STR_NEEDLE ;Prevent "invalid opcode" errors and keep the
    Exch $STR_RETURN_VAR  
 FunctionEnd
-
 
 ;--------------------------------------------------------------------
 ; Path functions

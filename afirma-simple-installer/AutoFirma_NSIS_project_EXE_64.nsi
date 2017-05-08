@@ -120,7 +120,6 @@ UninstallText "Desinstalador de AutoFirma."
   Pop `${OUT}`
 !macroend
 
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Instalacion de la aplicacion y configuracion de la misma            ;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -137,13 +136,25 @@ Section "Programa" sPrograma
 	IntCmp $1 1 +3 0 0
 		MessageBox MB_OK "No se puede instalar AutoFirma 64 bits en un entorno 32 bits." 
 		Quit
-		
+
 	StrCpy $PATH "AutoFirma"
 	StrCpy $PATH_ACCESO_DIRECTO "AutoFirma"
+
 	; Comprueba que no este ya instalada
 	  ClearErrors
 	  ReadRegStr $R0 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH\" "UninstallString"
-	  ${If} ${Errors} 
+	  ${If} ${Errors}
+		; Comprobamos si esta la version 1.4.2 en ese directorio y la desinstalamos en tal caso; despues instalamos
+		IfFileExists '$INSTDIR\unistall.exe' 0 +4
+		  MessageBox MB_YESNO "Existe una versión anterior de AutoFirma en el equipo. ¿Desea desinstalarla?" /SD IDYES IDNO Exit
+		  StrCpy $R0 "$INSTDIR\unistall.exe"
+		  Goto UninstallOlderVersion
+		; Comprobamos si esta la version 1.4.2 en su directorio por defecto y la desinstalamos en tal caso; despues instalamos
+		IfFileExists '$PROGRAMFILES\AutoFirma\unistall.exe' 0 +5
+		  MessageBox MB_YESNO "Existe una versión anterior de AutoFirma en el equipo. ¿Desea desinstalarla?" /SD IDYES IDNO Exit
+		  StrCpy $R0 "$PROGRAMFILES\AutoFirma\unistall.exe"
+		  ExecWait '"$R0" /S _?=$PROGRAMFILES\AutoFirma'
+		  RMDir /r /REBOOTOK '$PROGRAMFILES\AutoFirma'
 		Goto Install
 	  ${EndIf}
 	  ReadRegStr $R1 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH\" "DisplayVersion"
@@ -160,11 +171,12 @@ Section "Programa" sPrograma
       ${EndIf}
 	Exit:
 	  Quit
+
 	UninstallOlderVersion:
 	  ;Ejecuta el desinstalador cuya ruta ha sido obtenida del registro
 	  ExecWait '"$R0" /S _?=$INSTDIR'
+
 	Install:
-	
 	SetOutPath $INSTDIR\$PATH
 
 	;Copiamos la JRE en el directorio de instalacion
@@ -206,14 +218,14 @@ Section "Programa" sPrograma
 
 	
 	;Anade una entrada en la lista de "Program and Features"
-		WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH\" "DisplayName" "AutoFirma"
-		WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH\" "UninstallString" "$INSTDIR\uninstall.exe"
-		WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH\" "DisplayIcon" "$INSTDIR\AutoFirma\AutoFirma.exe"
-		WriteRegDWORD HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH\" "NoModify" "1"
-		WriteRegDWORD HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH\" "NoRepair" "1"
-		WriteRegDWORD HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH\" "EstimatedSize" "100000"
-		WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH\" "Publisher" "Gobierno de España"
-		WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH\" "DisplayVersion" "${VERSION}"
+	WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH\" "DisplayName" "AutoFirma"
+	WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH\" "UninstallString" "$INSTDIR\uninstall.exe"
+	WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH\" "DisplayIcon" "$INSTDIR\AutoFirma\AutoFirma.exe"
+	WriteRegDWORD HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH\" "NoModify" "1"
+	WriteRegDWORD HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH\" "NoRepair" "1"
+	WriteRegDWORD HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH\" "EstimatedSize" "100000"
+	WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH\" "Publisher" "Gobierno de España"
+	WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH\" "DisplayVersion" "${VERSION}"
 
 	WriteUninstaller "$INSTDIR\uninstall.exe"
 
@@ -221,13 +233,13 @@ Section "Programa" sPrograma
 	WriteRegStr HKLM SOFTWARE\$PATH "Version" "${VERSION}"
 
 	;Exec "explorer $SMPROGRAMS\$PATH_ACCESO_DIRECTO\"
-	
+
 	;Registro
 	;CascadeAfirma.reg
 	WriteRegStr HKEY_CLASSES_ROOT "*\shell\afirma.sign" "" "Firmar con AutoFirma"
 	WriteRegStr HKEY_CLASSES_ROOT "*\shell\afirma.sign" "Icon" "$INSTDIR\AutoFirma\AutoFirma.exe"
 	WriteRegStr HKEY_CLASSES_ROOT "*\shell\afirma.sign\command" "" "$INSTDIR\AutoFirma\AutoFirma.exe sign -gui -i %1" 
-	
+
 	;Generar huella archivos
  	WriteRegStr HKEY_CLASSES_ROOT "*\shell\afirma.hashFile" "" "Generar huella digital con AutoFirma"
 	WriteRegStr HKEY_CLASSES_ROOT "*\shell\afirma.hashFile" "Icon" "$INSTDIR\AutoFirma\AutoFirma.exe"
@@ -279,12 +291,12 @@ Section "Programa" sPrograma
 	Delete "$INSTDIR\AutoFirma\AutoFirma_ROOT.cer"
 	IfFileExists "$INSTDIR\AutoFirma\autofirma.pfx" 0 +1
 	Delete "$INSTDIR\AutoFirma\autofirma.pfx"
-	
+
 	; Configuramos la aplicacion (generacion de certificados) e importacion en Firefox
 	ExecWait '"$INSTDIR\AutoFirma\AutoFirmaConfigurador.exe" /passive'
 	; Eliminamos los certificados de versiones previas del sistema
 	Call DeleteCertificateOnInstall
-	
+
 	; Importamos el certificado en el sistema
 	Push "$INSTDIR\AutoFirma\AutoFirma_ROOT.cer"
 	Sleep 2000
@@ -293,8 +305,7 @@ Section "Programa" sPrograma
 	;${If} $0 != success
 	  ;MessageBox MB_OK "Error en la importación: $0"
 	;${EndIf}
-	
-	
+
 	;Se actualiza la variable PATH con la ruta de instalacion
 	Push "$PROGRAMFILES64\AutoFirma\AutoFirma"
 	Call AddToPath
@@ -556,7 +567,7 @@ Section "uninstall"
 	SetShellVarContext all
 
 	;Se pide que se cierre Firefox y Chrome si estan abiertos
-	
+
 	loopFirefox:
 	${nsProcess::FindProcess} "firefox.exe" $R2
 	StrCmp $R2 0 0 +2
@@ -574,8 +585,7 @@ Section "uninstall"
 	;Eliminamos los certificados del sistema
 	Call un.DeleteCertificate
 	ExecWait '"$INSTDIR\AutoFirma\AutoFirmaConfigurador.exe" -uninstall /passive'
-	
-	
+
 	RMDir /r $INSTDIR\$PATH
 	;Borrar directorio de instalacion si es un directorio valido (contiene "AutoFirma" o es una subcarpeta de Program Files)
 	${StrContains} $0 "Program Files (x86)\" $INSTDIR
