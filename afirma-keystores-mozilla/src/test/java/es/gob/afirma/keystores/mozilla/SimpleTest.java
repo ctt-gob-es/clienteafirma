@@ -45,13 +45,13 @@ public final class SimpleTest {
 			null, // PasswordCallback
 			null // Parent
 		);
-    	System.out.println("Certificados:");
-    	System.out.println("-------------");
+    	System.out.println("Certificados:"); //$NON-NLS-1$
+    	System.out.println("-------------"); //$NON-NLS-1$
     	final String[] aliases = ksm.getAliases();
     	for (final String alias : aliases) {
     		System.out.println(AOUtil.getCN(ksm.getCertificate(alias)));
     	}
-    	System.out.println("=============");
+    	System.out.println("============="); //$NON-NLS-1$
 
     	final Signature sig = Signature.getInstance("SHA512withRSA"); //$NON-NLS-1$
     	sig.initSign(
@@ -60,7 +60,7 @@ public final class SimpleTest {
 			).getPrivateKey()
 		);
     	sig.update("Hola".getBytes()); //$NON-NLS-1$
-    	System.out.println("Firma: " + AOUtil.hexify(sig.sign(), false));
+    	System.out.println("Firma: " + AOUtil.hexify(sig.sign(), false)); //$NON-NLS-1$
     }
 
     /** Prueba de la obtenci&oacute;n de almac&eacute;n y alias con NSS de systema.

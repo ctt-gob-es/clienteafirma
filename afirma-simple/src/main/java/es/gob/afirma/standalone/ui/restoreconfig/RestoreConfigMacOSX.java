@@ -760,35 +760,28 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 		return false;
 	}
 
-	/**
-     * Copia un recurso desde dentro del jar hacia una ruta externa
-     *
-     * @param pathToResource Carpeta del recurso dentro del jar
-     * @param resourceName Nombre del recurso a copiar
-     * @param destinationPath Ruta externa destino
-     * @return Ruta completa del recurso copiado
-     * @throws Exception
-     */
-    static public String exportResource(final String pathToResource, final String resourceName, final String destinationPath) throws Exception {
-
-        try (OutputStream resStreamOut =
-        		new FileOutputStream(destinationPath + resourceName);
-        	InputStream stream =
-        		RestoreConfigMacOSX.class.getResourceAsStream(pathToResource + resourceName)) {
-
+	/** Copia un recurso desde dentro del JAR hacia una ruta externa.
+     * @param pathToResource Carpeta del recurso dentro del JAR.
+     * @param resourceName Nombre del recurso a copiar.
+     * @param destinationPath Ruta externa destino.
+     * @return Ruta completa del recurso copiado.
+	 * @throws IOException En cualquier error. */
+    static public String exportResource(final String pathToResource,
+    		                            final String resourceName,
+    		                            final String destinationPath) throws IOException {
+        try (
+    		final OutputStream resStreamOut = new FileOutputStream(destinationPath + resourceName);
+        	final InputStream stream = RestoreConfigMacOSX.class.getResourceAsStream(pathToResource + resourceName)
+		) {
             if(stream == null) {
-                throw new Exception("No ha podido obtenerse el recurso \"" + resourceName + "\" del jar."); //$NON-NLS-1$ //$NON-NLS-2$
+                throw new IOException("No ha podido obtenerse el recurso \"" + resourceName + "\" del JAR."); //$NON-NLS-1$ //$NON-NLS-2$
             }
-
             int readBytes;
             final byte[] buffer = new byte[4096];
             while ((readBytes = stream.read(buffer)) > 0) {
                 resStreamOut.write(buffer, 0, readBytes);
             }
-        } catch (final Exception ex) {
-            throw ex;
         }
-
         return destinationPath + resourceName;
     }
 

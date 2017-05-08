@@ -41,7 +41,7 @@ public final class TestNssSharedDb {
     		   line.substring(
 				   line.indexOf("name=\"") + "name=\"".length(),  //$NON-NLS-1$ //$NON-NLS-2$
 				   line.indexOf(
-					   '"', 
+					   '"',
 					   line.indexOf("name=\"") + "name=\"".length() //$NON-NLS-1$ //$NON-NLS-2$
 				   )
 			   )
@@ -49,8 +49,10 @@ public final class TestNssSharedDb {
 	    }
 	    br.close();
 	}
-	
-	
+
+	/** Prueba de lectura de <i>pkcs11.txt</i>.
+	 * @throws Exception En cualquier error. */
+	@SuppressWarnings("static-method")
 	@Test
 	public void testRawPkcs11txtFunction() throws Exception {
 		final byte[] pkcs11Txt = AOUtil
@@ -60,16 +62,16 @@ public final class TestNssSharedDb {
 		Reader reader = null;
 		try {
 			reader = new InputStreamReader(new ByteArrayInputStream(pkcs11Txt));
-			List<ModuleName> modules = Pkcs11Txt.getModules(reader);
+			final List<ModuleName> modules = Pkcs11Txt.getModules(reader);
 			Assert.assertEquals(3, modules.size());
 			Assert.assertEquals(
-					"DataKey SignaSURE 3600 (EXTERNAL, dkck32.dll, slot 0)",
+					"DataKey SignaSURE 3600 (EXTERNAL, dkck32.dll, slot 0)", //$NON-NLS-1$
 					modules.get(0).toString());
 			Assert.assertEquals(
-					"Netscape Software Fortezza (EXTERNAL, swft32.dll, slot 0)",
+					"Netscape Software Fortezza (EXTERNAL, swft32.dll, slot 0)", //$NON-NLS-1$
 					modules.get(1).toString());
 			Assert.assertEquals(
-					"Litronic Netsign (EXTERNAL, core32.dll, slot 0)", modules
+					"Litronic Netsign (EXTERNAL, core32.dll, slot 0)", modules //$NON-NLS-1$
 							.get(2).toString());
 
 		} finally {
@@ -78,7 +80,10 @@ public final class TestNssSharedDb {
 			}
 		}
 	}
-	
+
+	/** Prueba de lectura de <i>pkcs11.txt</i>.
+	 * @throws Exception En cualquier error. */
+	@SuppressWarnings("static-method")
 	@Test
 	public void testRawPkcs11txtTest2() throws Exception {
 		final byte[] pkcs11Txt = AOUtil
@@ -88,10 +93,10 @@ public final class TestNssSharedDb {
 		Reader reader = null;
 		try {
 			reader = new InputStreamReader(new ByteArrayInputStream(pkcs11Txt));
-			List<ModuleName> modules = Pkcs11Txt.getModules(reader);
+			final List<ModuleName> modules = Pkcs11Txt.getModules(reader);
 			Assert.assertEquals(1, modules.size());
 			Assert.assertEquals(
-					"Mozilla Root Certs (EXTERNAL, /usr/lib/x86_64-linux-gnu/nss/libnssckbi.so, slot 0)",
+					"Mozilla Root Certs (EXTERNAL, /usr/lib/x86_64-linux-gnu/nss/libnssckbi.so, slot 0)", //$NON-NLS-1$
 					modules.get(0).toString());
 
 		} finally {
