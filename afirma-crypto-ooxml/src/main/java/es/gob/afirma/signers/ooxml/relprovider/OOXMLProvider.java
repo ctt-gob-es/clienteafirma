@@ -50,7 +50,7 @@ public final class OOXMLProvider extends Provider {
 
     /** Crea el proveedor de transformadas de relaci&oacute;n OOXML. */
     public OOXMLProvider() {
-        super(RELATIONSHIP_TRANSFORM_PROVIDER_NAME, "1.0", "OOXML Security Provider"); //$NON-NLS-1$ //$NON-NLS-2$
+        super(RELATIONSHIP_TRANSFORM_PROVIDER_NAME, 1.0, "OOXML Security Provider"); //$NON-NLS-1$
         put("TransformService." + RelationshipTransformService.TRANSFORM_URI, RelationshipTransformService.class.getName()); //$NON-NLS-1$
         put("TransformService." + RelationshipTransformService.TRANSFORM_URI + " MechanismType", "DOM"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
     }
