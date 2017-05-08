@@ -24,8 +24,7 @@ import es.gob.afirma.standalone.ui.MainMenu;
 
 /** Gestiona la ejecuci&oacute;n del Cliente Afirma en una invocaci&oacute;n
  * por protocolo y bajo un entorno compatible <code>Swing</code>.
- * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;
- */
+ * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public final class ProtocolInvocationLauncher {
 
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
@@ -33,19 +32,22 @@ public final class ProtocolInvocationLauncher {
     private static final String RESULT_OK = "OK"; //$NON-NLS-1$
 
     static final ProtocolVersion MAX_PROTOCOL_VERSION_SUPPORTED = ProtocolVersion.VERSION_1;
-    
+
     /** Clave privada fijada para reutilizarse en operaciones sucesivas. */
 	private static PrivateKeyEntry stickyKeyEntry = null;
 
+	/** Obtiene la clave privada fijada para reutilizarse en operaciones sucesivas.
+	 * @return Clave privada fijada para reutilizarse en operaciones sucesivas. */
 	public static PrivateKeyEntry getStickyKeyEntry() {
 		return stickyKeyEntry;
 	}
 
-	public static void setStickyKeyEntry(PrivateKeyEntry stickyKeyEntry) {
+	/** Establece la clave privada fijada para reutilizarse en operaciones sucesivas.
+	 * @param stickyKeyEntry Clave privada a fijar para reutilizarse en operaciones sucesivas. */
+	public static void setStickyKeyEntry(final PrivateKeyEntry stickyKeyEntry) {
 		ProtocolInvocationLauncher.stickyKeyEntry = stickyKeyEntry;
 	}
-   
-   
+
     /** Lanza la aplicaci&oacute;n y realiza las acciones indicadas en la URL.
      * Este m&eacute;todo usa siempre comunicaci&oacute;n mediante servidor intermedio, nunca localmente.
      * @param urlString URL de invocaci&oacute;n por protocolo.
@@ -53,7 +55,6 @@ public final class ProtocolInvocationLauncher {
     public static String launch(final String urlString)  {
         return launch(urlString, false);
     }
-    
 
     /** Lanza la aplicaci&oacute;n y realiza las acciones indicadas en la URL.
      * @param urlString URL de invocaci&oacute;n por protocolo.
@@ -294,7 +295,7 @@ public final class ProtocolInvocationLauncher {
                  urlString.startsWith("afirma://countersign?") || urlString.startsWith("afirma://countersign/?") //$NON-NLS-1$ //$NON-NLS-2$
         ) {
             LOGGER.info("Se invoca a la aplicacion para realizar una operacion de firma/multifirma"); //$NON-NLS-1$
-            
+
             try {
                 UrlParametersToSign params = ProtocolInvocationUriParser.getParametersToSign(urlString);
 
@@ -356,18 +357,18 @@ public final class ProtocolInvocationLauncher {
                 return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_03);
             }
         }
-        
+
         // Se solicita una operacion de carga/multicarga
         else if (urlString.startsWith("afirma://load?") //$NON-NLS-1$
         		) {
             LOGGER.info("Se invoca a la aplicacion para realizar una operacion de carga/multicarga"); //$NON-NLS-1$
 
             try {
-            	
+
             	LOGGER.info("URL DE INVOCACION: " + urlString); //$NON-NLS-1$
-            	
+
                 UrlParametersToLoad params = ProtocolInvocationUriParser.getParametersToLoad(urlString);
-               
+
                 // Si se indica un identificador de fichero, es que la configuracion se tiene que
                 // descargar desde el servidor intermedio
                 if (params.getFileId() != null) {
@@ -432,11 +433,11 @@ public final class ProtocolInvocationLauncher {
             LOGGER.info("Se invoca a la aplicacion para realizar una operacion de obtencion del log actual de la aplicacion"); //$NON-NLS-1$
 
             try {
-            	
+
             	LOGGER.info("URL DE INVOCACION: " + urlString); //$NON-NLS-1$
-            	
+
                 UrlParametersToGetCurrentLog params = ProtocolInvocationUriParser.getParametersToGetCurrentLog(urlString);
-               
+
                 // Si se indica un identificador de fichero, es que la configuracion se tiene que
                 // descargar desde el servidor intermedio
                 if (params.getFileId() != null) {
@@ -464,9 +465,9 @@ public final class ProtocolInvocationLauncher {
                 }
 
                 LOGGER.info("Se inicia la operacion de obtencion de log actual"); //$NON-NLS-1$
-                
+
                 return ProtocolInvocationLauncherGetCurrentLog.getCurrentLog();
-               
+
             }
             catch(final ParameterNeedsUpdatedVersionException e) {
                 LOGGER.severe("Se necesita una version mas moderna de AutoFirma para procesar la peticion: " + e); //$NON-NLS-1$
@@ -483,7 +484,7 @@ public final class ProtocolInvocationLauncher {
                 ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_03);
                 return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_03);
             }
-        }        
+        }
         else {
         	LOGGER.severe(
         			"La operacion indicada en la URL no esta soportada: " +  //$NON-NLS-1$
@@ -494,19 +495,17 @@ public final class ProtocolInvocationLauncher {
         throw new IllegalStateException("Estado no permitido"); //$NON-NLS-1$
     }
 
-    /**
-     * Envia una cadena de texto al servidor intermedio.
+    /** Env&iacute;a una cadena de texto al servidor intermedio.
      * @param data Cadena de texto.
      * @param serviceUrl URL del servicio de env&iacute;o de datos.
-     * @param id Identificador del mensaje en el servidor.
-     */
+     * @param id Identificador del mensaje en el servidor. */
 	public static void sendErrorToServer(final String data, final String serviceUrl, final String id) {
-
 		try {
 			IntermediateServerUtil.sendData(data, serviceUrl, id);
-		} catch (final IOException e) {
+		}
+		catch (final IOException e) {
 			LOGGER.severe("Error al enviar los datos del error al servidor intermedio: " + e); //$NON-NLS-1$
 		}
 	}
-			
+
 }
