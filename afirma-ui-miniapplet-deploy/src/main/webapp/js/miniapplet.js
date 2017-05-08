@@ -48,7 +48,7 @@ var MiniApplet = ( function ( window, undefined ) {
 				checktime_server_time: "Hora del servidor"
 		};
 		LOCALIZED_STRINGS["gl_ES"] = {
-				checktime_warn: "Destectouse un desfase horario entre o seu sistema e o servidor. Recom�ndase corrixilo antes de pulsar Aceptar para continuar.",
+				checktime_warn: "Destectouse un desfase horario entre o seu sistema e o servidor. Recoméndase corrixilo antes de pulsar Aceptar para continuar.",
 				checktime_err: "Destectouse un desfase horario entre o seu sistema e o servidor. Debe corrixir a hora do seu sistema antes de continuar.",
 				checktime_local_time: "Hora do seu sistema",
 				checktime_server_time: "Hora do servidor"
@@ -197,7 +197,7 @@ var MiniApplet = ( function ( window, undefined ) {
 		function isOldInternetExplorer() {
 			return !!(navigator.userAgent.match(/MSIE/));
 		}
-		
+
 		function isFirefoxUAM() {
 		    return navigator.userAgent.indexOf("UAM") > 0;
 		}
@@ -239,7 +239,7 @@ var MiniApplet = ( function ( window, undefined ) {
 			})();
 			return navigator.sayswho == 'Safari 10';
 		}
-		
+
         /**
          * Determina con un boolean si el navegador es Microsoft Edge
          */
@@ -1165,7 +1165,7 @@ var MiniApplet = ( function ( window, undefined ) {
 			// Si se dan las condiciones que requieren el uso de la aplicacion nativa,
 			// por entorno o porque se haya configurado para su uso, se intenta cargar
 			// esta version
-			if (!needNativeAppInstalled() && jnlpServiceAddress) {
+			if (!needNativeAppInstalled() && !!jnlpServiceAddress) {
 				openUrl("jnlp" + jnlpServiceAddress.substring(4) + "?os=" + getOSName() + "&arg=" + encodeURIComponent("afirma://service?op=install"));
 			}
 		}
@@ -1499,7 +1499,7 @@ var MiniApplet = ( function ( window, undefined ) {
 				
 				// Si no se dan las condiciones que requieren el uso de la aplicacion nativa,
 				// por entorno y si se ha configurado la URL del servicio, cargamos la version JNLP
-				if (!needNativeAppInstalled() && jnlpServiceAddress) {
+				if (!needNativeAppInstalled() && !!jnlpServiceAddress) {
 					openUrl("jnlp" + jnlpServiceAddress.substring(4) + "?os=" + getOSName() + "&arg=" + encodeURIComponent("afirma://service?ports=" + portsLine + "&amp;v=" + PROTOCOL_VERSION + "&amp;idsession=" + idSession));
 				}
 				// En caso contrario, cargamos la version nativa
@@ -2622,6 +2622,13 @@ var MiniApplet = ( function ( window, undefined ) {
 			 * GET en un Sistema/Navegador concreto.
 			 */
 			function isURLTooLong(url) {
+
+				// En las llamadas al esquema JNLP, Java soporta una cantidad
+				// limitada de caracteres en la URL
+				if (bJNLP) {
+					return url.length > 500;
+				}
+
 				if (isAndroid()) {
 					return url.length > MAX_LONG_ANDROID_URL;
 				}
@@ -2778,9 +2785,9 @@ var MiniApplet = ( function ( window, undefined ) {
 				
 				// Si no se pide cargar la aplicacion nativa, ni el entorno lo requiere y
 				// si se ha configurado el servicio JNLP, cargamos la aplicacion JNLP
-				if (!needNativeAppInstalled() && jnlpServiceAddress) {
+				if (!needNativeAppInstalled() && !!jnlpServiceAddress) {
 					// En las llamadas al JNLP sustituimos los ampersands para que no den problemas al formar el JNLP
-					openUrl("jnlp" + jnlpServiceAddress.substring(4) + '?arg=' + encodeURIComponent(intentURL));
+					openUrl("jnlp" + jnlpServiceAddress.substring(4) + "?os=" + getOSName() + '?arg=' + encodeURIComponent(intentURL));
 				}
 				// En caso contrario, desplegamos la version nativa
 				else {
