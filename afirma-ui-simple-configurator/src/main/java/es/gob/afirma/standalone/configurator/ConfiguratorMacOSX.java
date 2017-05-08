@@ -146,7 +146,7 @@ final class ConfiguratorMacOSX implements Configurator {
 				while(list.hasNext()) {
 					ConfiguratorUtil.printScript(list.next(), installationScript);
 				}
-				// Se almacenan los script de instalación
+				// Se almacenan los script de instalacion
 				try {
 					ConfiguratorMacUtils.writeScriptFile(installationScript, new File(mac_script_path).getAbsolutePath(), true);
 				}
