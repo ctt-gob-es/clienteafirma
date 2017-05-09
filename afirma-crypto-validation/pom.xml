@@ -76,7 +76,7 @@
 		<dependency>
 			<groupId>es.gob.afirma</groupId>
 			<artifactId>afirma-lib-itext</artifactId>
-			<version>${project.version}</version>
+			<version>1.0-SNAPSHOT</version>
 		</dependency>
 		
 	</dependencies>
