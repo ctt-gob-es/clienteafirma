@@ -107,42 +107,6 @@ final class PreferencesPanelFacturaE extends JPanel {
         gbc.weightx = 1.0;
         gbc.gridy = 0;
         
-		// Panel para el boton de restaurar la configuracion
-		final JPanel panelGeneral = new JPanel(new FlowLayout(FlowLayout.LEADING));
-		panelGeneral.setBorder(BorderFactory.createTitledBorder(SimpleAfirmaMessages.getString("PreferencesPanel.108")) //$NON-NLS-1$
-		);
-
-		final JButton restoreConfigButton = new JButton(SimpleAfirmaMessages.getString("PreferencesPanel.147") //$NON-NLS-1$
-		);
-
-		restoreConfigButton.setMnemonic('R');
-		restoreConfigButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(final ActionEvent ae) {
-				if (AOUIFactory.showConfirmDialog(getParent(), SimpleAfirmaMessages.getString("PreferencesPanel.140"), //$NON-NLS-1$
-						SimpleAfirmaMessages.getString("PreferencesPanel.139"), //$NON-NLS-1$
-						JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) {
-
-					loadDefaultPreferences();
-
-				}
-			}
-		});
-		restoreConfigButton.getAccessibleContext()
-				.setAccessibleDescription(SimpleAfirmaMessages.getString("PreferencesPanel.136") //$NON-NLS-1$
-		);
-
-		final JLabel restoreConfigLabel = new JLabel(SimpleAfirmaMessages.getString("PreferencesPanel.149")); //$NON-NLS-1$
-		restoreConfigLabel.setLabelFor(restoreConfigButton);
-
-		final GridBagConstraints gbcGeneral = new GridBagConstraints();
-		gbcGeneral.fill = GridBagConstraints.HORIZONTAL;
-
-		panelGeneral.add(restoreConfigLabel);
-		panelGeneral.add(restoreConfigButton);
-
-		add(panelGeneral, gbcGeneral);
-
         loadPreferences();
 
         this.panelPolicies.setLayout(new GridBagLayout());
@@ -266,6 +230,35 @@ final class PreferencesPanelFacturaE extends JPanel {
         gbc.gridy++;
         gbc.weighty = 1.0;
         add(new JPanel(), gbc);
+        
+		// Panel para el boton de restaurar la configuracion
+		final JPanel panelGeneral = new JPanel(new FlowLayout(FlowLayout.TRAILING));
+		
+		final JButton restoreConfigButton = new JButton(SimpleAfirmaMessages.getString("PreferencesPanel.147") //$NON-NLS-1$
+		);
+
+		restoreConfigButton.setMnemonic('R');
+		restoreConfigButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent ae) {
+				if (AOUIFactory.showConfirmDialog(getParent(), SimpleAfirmaMessages.getString("PreferencesPanel.158"), //$NON-NLS-1$
+						SimpleAfirmaMessages.getString("PreferencesPanel.139"), //$NON-NLS-1$
+						JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) {
+
+					loadDefaultPreferences();
+
+				}
+			}
+		});
+		restoreConfigButton.getAccessibleContext()
+				.setAccessibleDescription(SimpleAfirmaMessages.getString("PreferencesPanel.136") //$NON-NLS-1$
+		);
+				
+		panelGeneral.add(restoreConfigButton);
+		
+		gbc.gridy++;
+
+		add(panelGeneral, gbc);
 	}
 
 	/** Guarda las preferencias de FacturaE. */

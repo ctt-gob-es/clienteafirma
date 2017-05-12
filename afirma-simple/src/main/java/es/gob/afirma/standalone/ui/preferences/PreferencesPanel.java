@@ -10,6 +10,7 @@
 
 package es.gob.afirma.standalone.ui.preferences;
 
+import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -132,10 +133,48 @@ final class PreferencesPanel extends JPanel implements KeyListener, DisposableIn
 		c.gridy++;
 		c.weighty = 0.0;
 		c.ipady = 11;
+		//add(createRestoreButtonPanel(), c);
+		c.gridy++;
 		add(createButtonsPanel(), c);
 	}
 
-    boolean savePreferences() {
+    private Component createRestoreButtonPanel() {
+    	
+    	final JPanel panel = new JPanel();
+    	panel.setLayout(new FlowLayout(FlowLayout.RIGHT));
+		
+		final JButton restoreConfigButton = new JButton(SimpleAfirmaMessages.getString("PreferencesPanel.147") //$NON-NLS-1$
+		);
+
+		restoreConfigButton.setMnemonic('R');
+		restoreConfigButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent ae) {
+				if (AOUIFactory.showConfirmDialog(getParent(), SimpleAfirmaMessages.getString("PreferencesPanel.140"), //$NON-NLS-1$
+						SimpleAfirmaMessages.getString("PreferencesPanel.139"), //$NON-NLS-1$
+						JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) {
+
+					loadDefaultPreferences();
+
+				}
+			}
+
+		});
+		restoreConfigButton.getAccessibleContext()
+				.setAccessibleDescription(SimpleAfirmaMessages.getString("PreferencesPanel.136") //$NON-NLS-1$
+		);
+
+		panel.add(restoreConfigButton);
+		
+		return panel;
+	}
+    
+    void loadDefaultPreferences() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	boolean savePreferences() {
 
 		if (!checkPreferences()) {
 			return false;
