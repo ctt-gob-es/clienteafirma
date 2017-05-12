@@ -255,11 +255,10 @@ public final class MainMenu extends JMenuBar {
         }
 
         this.add(menuArchivo);
-        // TODO: Descomentar una vez se entregue
         toolsMenu.add(huellaMenu);
-        
-		// Preparamos la opcion de menú para "restaurar la configuracion de los
-		// navegadores" en el menú de herramientas
+
+		// Preparamos la opcion de menu para "restaurar la configuracion de los
+		// navegadores" en el menu de herramientas
 
 		final JMenuItem restoreConfigMenuItem = new JMenuItem(SimpleAfirmaMessages.getString("MainMenu.20")); //$NON-NLS-1$
 		restoreConfigMenuItem.setAccelerator(
@@ -393,7 +392,7 @@ public final class MainMenu extends JMenuBar {
     void showRestoreConfig() {
     	RestoreConfigDialog.show(MainMenu.this.getParentComponent(), true);
     }
-    
+
     /** Muestra en OS X el men&uacute; "Acerca de...".
      * @param parentComponent Componente padre para la modalidad. */
     public static void showAbout(final Component parentComponent) {
