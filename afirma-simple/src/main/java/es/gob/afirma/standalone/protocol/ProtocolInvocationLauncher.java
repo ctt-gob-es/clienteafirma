@@ -36,17 +36,24 @@ public final class ProtocolInvocationLauncher {
     /** Clave privada fijada para reutilizarse en operaciones sucesivas. */
 	private static PrivateKeyEntry stickyKeyEntry = null;
 
-	/** Obtiene la clave privada fijada para reutilizarse en operaciones sucesivas.
-	 * @return Clave privada fijada para reutilizarse en operaciones sucesivas. */
+	/**
+	 * Recupera la entrada con la clave y certificado prefijados para las
+	 * operaciones con certificados.
+	 * @return Entrada con el certificado y la clave prefijados.
+	 */
 	public static PrivateKeyEntry getStickyKeyEntry() {
 		return stickyKeyEntry;
 	}
 
-	/** Establece la clave privada fijada para reutilizarse en operaciones sucesivas.
-	 * @param stickyKeyEntry Clave privada a fijar para reutilizarse en operaciones sucesivas. */
-	public static void setStickyKeyEntry(final PrivateKeyEntry stickyKeyEntry) {
+	/**
+	 * Establece una clave y certificado prefijados para las
+	 * operaciones con certificados.
+	 * @param stickyKeyEntry Entrada con el certificado y la clave prefijados.
+	 */
+	public static void setStickyKeyEntry(PrivateKeyEntry stickyKeyEntry) {
 		ProtocolInvocationLauncher.stickyKeyEntry = stickyKeyEntry;
 	}
+
 
     /** Lanza la aplicaci&oacute;n y realiza las acciones indicadas en la URL.
      * Este m&eacute;todo usa siempre comunicaci&oacute;n mediante servidor intermedio, nunca localmente.
@@ -495,15 +502,17 @@ public final class ProtocolInvocationLauncher {
         throw new IllegalStateException("Estado no permitido"); //$NON-NLS-1$
     }
 
-    /** Env&iacute;a una cadena de texto al servidor intermedio.
+    /**
+     * Env&iacute;a una cadena de texto al servidor intermedio.
      * @param data Cadena de texto.
      * @param serviceUrl URL del servicio de env&iacute;o de datos.
-     * @param id Identificador del mensaje en el servidor. */
+     * @param id Identificador del mensaje en el servidor.
+     */
 	public static void sendErrorToServer(final String data, final String serviceUrl, final String id) {
+
 		try {
 			IntermediateServerUtil.sendData(data, serviceUrl, id);
-		}
-		catch (final IOException e) {
+		} catch (final IOException e) {
 			LOGGER.severe("Error al enviar los datos del error al servidor intermedio: " + e); //$NON-NLS-1$
 		}
 	}

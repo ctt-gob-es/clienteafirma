@@ -120,15 +120,13 @@ public final class AutoFirmaUtil {
 
 		if (isJnlpDeployment()) {
 			if (Platform.getOS() == Platform.OS.WINDOWS) {
-				final String commonDir = System.getenv("ALLUSERSPROFILE"); //$NON-NLS-1$
-				final File appDir = new File (commonDir, "AutoFirma"); //$NON-NLS-1$
+				final File appDir = getWindowsAlternativeAppDir();
 				if (appDir.isDirectory() || appDir.mkdirs()) {
 					return appDir;
 				}
 			}
 			else if (Platform.getOS() == Platform.OS.MACOSX) {
-				final String userDir = System.getenv("HOME"); //$NON-NLS-1$
-				final File appDir = new File (userDir, "Library/Application Support/AutoFirma"); //$NON-NLS-1$
+				final File appDir = getMacOsXAlternativeAppDir();
 				if (appDir.isDirectory() || appDir.mkdirs()) {
 					return appDir;
 				}
@@ -147,6 +145,26 @@ public final class AutoFirmaUtil {
 		}
 
 		return null;
+	}
+
+	/**
+	 * Recupera el directorio de instalaci&oacute;n alternativo en los sistemas Windows.
+	 * @return Directorio de instalaci&oaucte;n.
+	 */
+	public static File getWindowsAlternativeAppDir() {
+		final String commonDir = System.getenv("ALLUSERSPROFILE"); //$NON-NLS-1$
+		final File appDir = new File (commonDir, "AutoFirma"); //$NON-NLS-1$
+		return appDir;
+	}
+
+	/**
+	 * Recupera el directorio de instalaci&oacute;n alternativo en los sistemas macOS.
+	 * @return Directorio de instalaci&oaucte;n.
+	 */
+	public static File getMacOsXAlternativeAppDir() {
+		final String userDir = System.getenv("HOME"); //$NON-NLS-1$
+		final File appDir = new File (userDir, "Library/Application Support/AutoFirma"); //$NON-NLS-1$
+		return appDir;
 	}
 
 	/**

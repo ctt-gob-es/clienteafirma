@@ -5,8 +5,12 @@
 package es.gob.afirma.standalone.ui.restoreconfig;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigInteger;
+import java.security.GeneralSecurityException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.KeyStore;
@@ -18,6 +22,7 @@ import java.security.SecureRandom;
 import java.security.Security;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Date;
@@ -37,6 +42,7 @@ import org.spongycastle.asn1.x509.GeneralNames;
 import org.spongycastle.asn1.x509.KeyPurposeId;
 import org.spongycastle.asn1.x509.KeyUsage;
 import org.spongycastle.asn1.x509.SubjectPublicKeyInfo;
+import org.spongycastle.cert.CertIOException;
 import org.spongycastle.cert.X509ExtensionUtils;
 import org.spongycastle.cert.X509v3CertificateBuilder;
 import org.spongycastle.cert.jcajce.JcaX509CertificateConverter;
@@ -109,7 +115,15 @@ final class CertUtil {
 		}
 	}
 
-	static CertPack getCertPackForLocalhostSsl(final String sslCertificateAlias, final String storePassword) throws NoSuchAlgorithmException, CertificateException, IOException {
+	/**
+	 * Genera un certificado ra&iacute;z y un certificado SSL a partir de &eacute;l.
+	 * @param sslCertificateAlias Alias del certificado SSL.
+	 * @param storePassword Contrase&ntilde;a del almac&eacute;n.
+	 * @return Conjunto con ambos certificados.
+	 * @throws IOException
+	 * @throws GeneralSecurityException
+	 */
+	static CertPack getCertPackForLocalhostSsl(final String sslCertificateAlias, final String storePassword) throws IOException, GeneralSecurityException {
 
 		Security.addProvider(new BouncyCastleProvider());
 		final PrivateKeyEntry caCertificatePrivateKeyEntry = generateCaCertificate(
@@ -125,7 +139,6 @@ final class CertUtil {
 			sslCertificateAlias,
 			storePassword.toCharArray()
 		);
-
 	}
 
 	private static PrivateKeyEntry generateCaCertificate(final String subjectPrincipal) throws NoSuchAlgorithmException,
@@ -202,13 +215,15 @@ final class CertUtil {
 		);
 	}
 
-	private static PrivateKeyEntry generateSslCertificate(final String cn,
-			                                              final PrivateKeyEntry issuerKeyEntry) {
+	private static PrivateKeyEntry generateSslCertificate(
+			final String cn,
+			final PrivateKeyEntry issuerKeyEntry)
+					throws CertIOException,
+					GeneralSecurityException {
 
 		// Generamos las claves...
 		X509Certificate cert;
 		KeyPair pair;
-		try {
 			final KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA"); //$NON-NLS-1$
 			keyPairGenerator.initialize(KEY_SIZE, new SecureRandom());
 			pair = keyPairGenerator.generateKeyPair();
@@ -240,16 +255,18 @@ final class CertUtil {
 				certBuilder.addExtension(Extension.subjectAlternativeName, false, subjectAltName);
 			}
 
-			//Firma del certificado SSL con la clave privada del CA
-			final ContentSigner caSigner = new JcaContentSignerBuilder(SIGNATURE_ALGORITHM).setProvider(PROVIDER).build(
-				issuerKeyEntry.getPrivateKey()
-			);
+			// Firma del certificado SSL con la clave privada del CA
+			final ContentSigner caSigner;
+			try {
+				caSigner = new JcaContentSignerBuilder(SIGNATURE_ALGORITHM).setProvider(PROVIDER).build(
+					issuerKeyEntry.getPrivateKey()
+				);
+			} catch (final OperatorCreationException e) {
+				throw new GeneralSecurityException("No ha sido posible firmar el certificado SSL", e); //$NON-NLS-1$
+			}
 			cert = new JcaX509CertificateConverter().setProvider(PROVIDER)
 					.getCertificate(certBuilder.build(caSigner));
-		}
-		catch (final Exception | Error t) {
-			throw new RuntimeException("Error al generar el certificado SSL: " + t, t); //$NON-NLS-1$
-		}
+
         return new PrivateKeyEntry(
     		pair.getPrivate(),
     		new Certificate[] {
@@ -257,5 +274,22 @@ final class CertUtil {
     		}
 		);
 
+	}
+
+	/**
+	 * Carga un certificado de disco.
+	 * @param certFile Fichero de certificado.
+	 * @return Certificado cargad0.
+	 * @throws IOException Cuando no se puede cargar el certificado.
+	 */
+	static X509Certificate loadCertificate(File certFile) throws IOException {
+		X509Certificate cert;
+		try (InputStream is = new FileInputStream(certFile)) {
+			cert = (X509Certificate) CertificateFactory.getInstance("X.509").generateCertificate(is); //$NON-NLS-1$
+		}
+		catch (final Exception e) {
+			throw new IOException("No se pudo cargar el certificado", e); //$NON-NLS-1$
+		}
+		return cert;
 	}
 }

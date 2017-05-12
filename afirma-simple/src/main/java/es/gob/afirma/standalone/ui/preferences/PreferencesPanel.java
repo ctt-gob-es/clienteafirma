@@ -34,7 +34,7 @@ final class PreferencesPanel extends JPanel implements KeyListener, DisposableIn
 	private static final long serialVersionUID = -3168095095548385291L;
 
 	private final JButton applyButton = new JButton(SimpleAfirmaMessages.getString("PreferencesPanel.0")); //$NON-NLS-1$
-	
+
 	private final ModificationListener modificationListener;
 
     private final Window window;
@@ -52,7 +52,7 @@ final class PreferencesPanel extends JPanel implements KeyListener, DisposableIn
 	private final JTabbedPane tabbedPane = new JTabbedPane();
 
 	void createUI(final int selectedTabIndex) {
-		
+
 		final boolean unprotected = PreferencesManager.getBooleanPreference(PreferencesManager.PREFERENCE_GENERAL_UNPROTECTED, true);
 
 		this.preferencesPanelGeneral = new PreferencesPanelGeneral(this, this.modificationListener, this, this, unprotected);
@@ -181,16 +181,16 @@ final class PreferencesPanel extends JPanel implements KeyListener, DisposableIn
 	    return true;
 
 	}
-    
-    
+
+
     void loadPreferences() {
-		
+
 		// ****************************************************************************
 		// **** PREFERENCIAS GENERALES
 		// ************************************************
 		// ****************************************************************************
 		this.preferencesPanelGeneral.loadPreferences();
-		
+
     }
 
 	/** Comprueba que los datos configurados sean v&aacute;lidos.
@@ -294,7 +294,7 @@ final class PreferencesPanel extends JPanel implements KeyListener, DisposableIn
 			}
 		});
 		this.applyButton.setEnabled(false);
-		
+
 		// En Mac OS X el orden de los botones es distinto
 		if (Platform.OS.MACOSX.equals(Platform.getOS())) {
 			panel.add(cancelButton);
@@ -305,7 +305,7 @@ final class PreferencesPanel extends JPanel implements KeyListener, DisposableIn
 			panel.add(acceptButton);
 			panel.add(cancelButton);
 		}
-		
+
 		return panel;
 	}
 

@@ -1,7 +1,8 @@
 package es.gob.afirma.standalone.ui.restoreconfig;
 
-import java.awt.BorderLayout;
 import java.awt.FlowLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
@@ -12,15 +13,14 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.logging.Logger;
 
-import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.ScrollPaneConstants;
 
 import es.gob.afirma.core.misc.Platform;
-import es.gob.afirma.standalone.LookAndFeelManager;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 
 /**
@@ -39,8 +39,6 @@ public final class RestoreConfigPanel extends JPanel implements KeyListener, Dis
 
 	private final Window window;
 
-	private final JPanel restorePanel = new JPanel(new FlowLayout(FlowLayout.CENTER), true);
-
 	/**
 	 * &Aacute;rea de texto para mostrar los mensajes de progreso de la tarea de restauraci&oacute;n
 	 */
@@ -57,6 +55,52 @@ public final class RestoreConfigPanel extends JPanel implements KeyListener, Dis
 	}
 
 	/**
+	 * Dibuja la ventana con las opciones de restauraci&oacute;n
+	 */
+	private void createUI() {
+
+		setLayout(new GridBagLayout());
+
+		final GridBagConstraints c = new GridBagConstraints();
+
+
+        // Creamos un panel para el texto de introduccion
+		final JLabel introText = new JLabel(SimpleAfirmaMessages.getString("RestoreConfigPanel.4")); //$NON-NLS-1$
+
+    	c.fill = GridBagConstraints.HORIZONTAL;
+    	c.insets = new Insets(15,  15,  11,  15);
+    	c.weightx = 1.0;
+    	c.gridy++;
+        this.add(introText, c);
+
+    	// Configuramos el area de texto para los mensajes de configuracion
+    	this.taskOutput = new JTextArea();
+    	this.taskOutput.setMargin(new Insets(5,5,5,5));
+    	this.taskOutput.setEditable(false);
+    	this.taskOutput.setLineWrap(true);
+    	final JScrollPane jsPanel = new JScrollPane(
+    			this.taskOutput,
+    			ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+    			ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+
+    	c.fill = GridBagConstraints.BOTH;
+    	c.insets = new Insets(0, 15,  0,  15);
+    	c.weighty = 1.0;
+    	c.gridy++;
+        this.add(jsPanel, c);
+
+        // Creamos un panel para el boton de restauracion
+        final JPanel buttonsPanel = createButtonsPanel();
+
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.insets = new Insets(11, 15,  15,  15);
+		c.gridy++;
+		c.weighty = 0.0;
+		c.ipady = 11;
+		add(buttonsPanel, c);
+	}
+
+	/**
 	 * Clase que construye el objeto gr&aacute;fico que representa el panel
 	 * donde se ubican los botones de la ventana de restauraci&oacute;n
 	 * @return
@@ -64,15 +108,15 @@ public final class RestoreConfigPanel extends JPanel implements KeyListener, Dis
 	private JPanel createButtonsPanel() {
 
 		final JPanel panel = new JPanel();
-		panel.setLayout(new FlowLayout(FlowLayout.CENTER));
+		panel.setLayout(new FlowLayout(FlowLayout.TRAILING));
 
-		final JButton cancelButton = new JButton(SimpleAfirmaMessages.getString("PreferencesPanel.31")); //$NON-NLS-1$
-		cancelButton.setMnemonic('C');
-		cancelButton.getAccessibleContext().setAccessibleDescription(
-			SimpleAfirmaMessages.getString("PreferencesPanel.32") //$NON-NLS-1$
+		final JButton closeButton = new JButton(SimpleAfirmaMessages.getString("RestoreConfigPanel.5")); //$NON-NLS-1$
+		closeButton.setMnemonic('C');
+		closeButton.getAccessibleContext().setAccessibleDescription(
+			SimpleAfirmaMessages.getString("RestoreConfigPanel.6") //$NON-NLS-1$
 		);
-		cancelButton.addKeyListener(this);
-		cancelButton.addActionListener(
+		closeButton.addKeyListener(this);
+		closeButton.addActionListener(
 			new ActionListener() {
 			    /** {@inheritDoc} */
 	            @Override
@@ -96,7 +140,6 @@ public final class RestoreConfigPanel extends JPanel implements KeyListener, Dis
 			 	final RestoreConfigManager restoreConfig = new RestoreConfigManager();
 
 				try {
-
 					// Limpiamos el area de texto antes de comenzar con la restauracion
 					// para eliminar posibles mensajes de ejecuciones anteriores.
 					RestoreConfigPanel.this.taskOutput.setText(null);
@@ -114,56 +157,14 @@ public final class RestoreConfigPanel extends JPanel implements KeyListener, Dis
 
 		// En Mac OS X el orden de los botones es distinto
 		if (Platform.OS.MACOSX.equals(Platform.getOS())) {
-			panel.add(cancelButton);
+			panel.add(closeButton);
 			panel.add(restoreButton);
 		}
 		else {
 			panel.add(restoreButton);
-			panel.add(cancelButton);
+			panel.add(closeButton);
 		}
 		return panel;
-	}
-
-	/**
-	 * Dibuja la ventana con las opciones de restauraci&oacute;n
-	 */
-	private void createUI() {
-
-		this.restorePanel.setName("RestoreConfigPanel"); //$NON-NLS-1$
-
-		setLayout(new BorderLayout(5, 5));
-        setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
-
-        final String intro = SimpleAfirmaMessages.getString("RestoreConfigPanel.4"); //$NON-NLS-1$
-
-        final JLabel introText = new JLabel(intro);
-
-        // Creamos un panel para el texto de introduccion
-        final JPanel introPanel = new JPanel(new BorderLayout());
-        introPanel.add(introText, BorderLayout.PAGE_START);
-        this.add(introPanel, BorderLayout.NORTH);
-
-        // Creamos un panel para el boton de restauracion
-        final JPanel buttonPanel = createButtonsPanel();
-    	this.add(buttonPanel, BorderLayout.CENTER);
-
-    	// Configuramos el area de texto para los mensajes de configuracion
-    	this.taskOutput = new JTextArea(20, 30);
-    	this.taskOutput.setMargin(new Insets(5,5,5,5));
-    	this.taskOutput.setEditable(false);
-    	this.restorePanel.add(new JScrollPane(this.taskOutput), BorderLayout.CENTER);
-
-        this.add(this.restorePanel, BorderLayout.AFTER_LAST_LINE);
-
-        // Configuramos el color
-        if (!LookAndFeelManager.HIGH_CONTRAST) {
-            setBackground(LookAndFeelManager.WINDOW_COLOR);
-            buttonPanel.setBackground(LookAndFeelManager.WINDOW_COLOR);
-            introPanel.setBackground(LookAndFeelManager.WINDOW_COLOR);
-            this.restorePanel.setBackground(LookAndFeelManager.WINDOW_COLOR);
-        }
-
-
 	}
 
 	/**

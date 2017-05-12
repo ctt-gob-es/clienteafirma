@@ -64,11 +64,11 @@ final class RestoreConfigFirefox {
 
 	static {
 		try {
-			USERS_WINDOWS_PATH = new File(System.getProperty("user.home")).getParentFile().getAbsolutePath(); //$NON-NLS-1$;
+			USERS_WINDOWS_PATH = new File(System.getProperty("user.home")).getParentFile().getAbsolutePath() + File.separator; //$NON-NLS-1$;
 		}
 		catch (final Exception e) {
 			LOGGER.warning("No se ha podido identificar el directorio de usuarios: " + e); //$NON-NLS-1$
-			USERS_WINDOWS_PATH = "C:/Users"; //$NON-NLS-1$
+			USERS_WINDOWS_PATH = "C:/Users/"; //$NON-NLS-1$
 		}
 	}
 
@@ -260,11 +260,22 @@ final class RestoreConfigFirefox {
 
 	/**
 	 * Inicia la restauraci&oacute;n del certificado para la comunicaci&oacute;n entre Firefox y Autofirma en Windows
-	 * @param targetDir Directorio de la aplicaci&oacute;n
+	 * @param targetDir Directorio de la aplicaci&oacute;n en el que ya se encuentra el certificado.
 	 * @throws MozillaProfileNotFoundException
 	 * @throws IOException
 	 */
 	static void installRootCAMozillaKeyStore(final File targetDir) throws MozillaProfileNotFoundException, IOException {
+		installRootCAMozillaKeyStore(targetDir, null);
+	}
+
+	/**
+	 * Inicia la restauraci&oacute;n del certificado para la comunicaci&oacute;n entre Firefox y Autofirma en Windows
+	 * @param targetDir Directorio de la aplicaci&oacute;n.
+	 * @param certFile Fichero con el certificado a instalar.
+	 * @throws MozillaProfileNotFoundException
+	 * @throws IOException
+	 */
+	static void installRootCAMozillaKeyStore(final File targetDir, final File certFile) throws MozillaProfileNotFoundException, IOException {
 		final ArrayList<File> firefoxProfilesDir = getFirefoxProfilesDir();
 		if (firefoxProfilesDir == null || firefoxProfilesDir.isEmpty()) {
 			throw new MozillaProfileNotFoundException();
@@ -275,9 +286,8 @@ final class RestoreConfigFirefox {
 		for (final File firefoxDir : firefoxProfilesDir) {
 			// En Windows recibimos un unico directorio de perfil, lo convertimos a una estructura Set<File>
 			profile = new HashSet<>(Arrays.asList(firefoxDir.listFiles()));
-			RestoreConfigFirefox.importCARootOnFirefoxKeyStore(targetDir,profile);
+			RestoreConfigFirefox.importCARootOnFirefoxKeyStore(targetDir, certFile, profile);
 		}
-
 	}
 
 	/**
@@ -285,6 +295,7 @@ final class RestoreConfigFirefox {
 	 * En ambos casos, es necesario crear un script intermedio con el comando certutil y sus argumentos
 	 * y posteriormente ejecutarlo como un comando de consola.
 	 * @param targetDir Directorio de instalaci&oacute;n del sistema
+	 * @param certFile Fichero del certificado que debemos instalar.
 	 * @param command Usado para sacar los directorios de usuario dentro del sistema operativo.
 	 *  <ul>
 	 * <li>En LINUX contiene el contenido del script a ejecutar.</li>
@@ -293,7 +304,7 @@ final class RestoreConfigFirefox {
 	 * @throws MozillaProfileNotFoundException No se ha encontrado el directorio de perfiles de Mozilla.
 	 * @throws IOException Cuando ocurre un error en el tratamiento de datos.
 	 */
-	static void installRootCAMozillaKeyStore(final File targetDir, final String[] command )
+	static void installRootCAMozillaKeyStore(final File targetDir, final File certFile, final String[] command )
 			throws MozillaProfileNotFoundException, IOException {
 
 		// sacamos el listado de usuarios de la aplicacion
@@ -307,8 +318,7 @@ final class RestoreConfigFirefox {
 			throw new MozillaProfileNotFoundException();
 		}
 
-		RestoreConfigFirefox.importCARootOnFirefoxKeyStore(targetDir, profiles);
-
+		RestoreConfigFirefox.importCARootOnFirefoxKeyStore(targetDir, certFile, profiles);
 	}
 
 
@@ -447,19 +457,23 @@ final class RestoreConfigFirefox {
 		return path.replace(" ", "\\ "); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
-	/** Copiamos el certificado en un directorio para que Mozilla CertUtil pueda usarlo.
+	/** Obtiene el path para la llamada a CertUtil.
 	 * @param certUtilAbsolutePath Ruta del ejecutable CertUtil.
-	 * @return certutilFile Fichero ejecutable CertUtil.
+	 * @return Referencia a CertUtil.
 	 * @throws IOException Se lanza cuando hay un problema con el fichero CertUtil. */
-	public static File InstallCerFile(final String certUtilAbsolutePath) throws IOException {
+	public static String getCertUtilPath(final String certUtilAbsolutePath) throws IOException {
+
+		String certUtilPath = null;
 
 		//En linux se trabaja con la dependencia del certutil
-		if (!Platform.OS.LINUX.equals(Platform.getOS()) ) {
+		if (Platform.OS.LINUX.equals(Platform.getOS())) {
+			certUtilPath = CERTUTIL_EXE;
+		}
+		else {
 			final File certutilFile = new File(certUtilAbsolutePath);
 
 			if (!certutilFile.exists() || !certutilFile.isFile()) {
-				throw new IOException("No se encuentra el ejecutable CertUtil para la instalacion en Firefox" //$NON-NLS-1$
-						);
+				throw new IOException("No se encuentra el ejecutable CertUtil para la instalacion en Firefox"); //$NON-NLS-1$
 			}
 
 			if (!certutilFile.canExecute() && Platform.OS.MACOSX.equals(Platform.getOS())) {
@@ -467,56 +481,53 @@ final class RestoreConfigFirefox {
 			}
 
 			if (!certutilFile.canExecute()) {
-				throw new IOException("No hay permisos de ejecucion para Mozilla CertUtil" //$NON-NLS-1$
-						);
+				throw new IOException("No hay permisos de ejecucion para Mozilla CertUtil"); //$NON-NLS-1$
 			}
 
-			return certutilFile;
+			certUtilPath = certutilFile.getAbsolutePath();
 		}
-		return null;
+
+		return certUtilPath;
 	}
 
 	/** Ejecuta la utilidad Mozilla CertUtil para la instalaci&oacute;n del certificado ra&iacute;z de  confianza en Firefox.
-	 * @param certUtilAbsolutePath Directorio en el que se encuentra certutil.
+	 * @param certUtilReference Ruta de certutil o null si ya se encuentra en el PATH.
 	 * @param targetDir Directorio en el que se encuentra el certificado a importar.
 	 * @param profilesDir Listado de directorios de perfiles de usuario de Mozilla Firefox.
 	 * @throws IOException Cuando ocurre un error en el tratamiento de datos.
 	 * @throws GeneralSecurityException Cuando ocurre un error en la inserci&oacute;n del certificado en el KeyStore.
 	 */
-	private static void executeCertUtilToImport(final String certUtilAbsolutePath,
-			                                    final File targetDir,
+	private static void executeCertUtilToImport(final String certUtilReference,
+			                                    final File certFile,
 			                                    final Set<File> profilesDir) throws IOException,
 	                                                                                GeneralSecurityException {
-		final File certutilFile = InstallCerFile(certUtilAbsolutePath);
-		String certUtilExec = null;
-		// Obtenemos todos los directorios de perfil de Firefox del usuario
+		final String certUtilPath = getCertUtilPath(certUtilReference);
 		boolean error = false;
 
-		// Exportamos el PATH y LD_LIBRARY_PATH en MACOSX
-		if ( Platform.OS.LINUX.equals(Platform.getOS()) ) {
-			certUtilExec = CERTUTIL_EXE;
+		if ( Platform.OS.MACOSX.equals(Platform.getOS()) && certUtilPath != null) {
+			RestoreConfigMacOSX.writeScriptFile(RestoreConfigMacOSX.mac_script_path, new StringBuilder(RestoreConfigMacOSX.EXPORT_PATH).append(certUtilPath.substring(0,certUtilPath.lastIndexOf(File.separator) )), true);
+			RestoreConfigMacOSX.writeScriptFile(RestoreConfigMacOSX.mac_script_path, new StringBuilder(RestoreConfigMacOSX.EXPORT_LIBRARY_LD).append(certUtilPath.substring(0,certUtilPath.lastIndexOf(File.separator) )), true);
 		}
-		else {
-			certUtilExec = escapePath(certutilFile.getAbsolutePath());
 
-			if ( Platform.OS.MACOSX.equals(Platform.getOS()) ) {
 
-				RestoreConfigMacOSX.writeScriptFile(RestoreConfigMacOSX.mac_script_path, new StringBuilder(RestoreConfigMacOSX.EXPORT_PATH + certutilFile.getAbsolutePath().substring(0,certutilFile.getAbsolutePath().lastIndexOf(File.separator) )), true);
-				RestoreConfigMacOSX.writeScriptFile(RestoreConfigMacOSX.mac_script_path, new StringBuilder(RestoreConfigMacOSX.EXPORT_LIBRARY_LD + certutilFile.getAbsolutePath().substring(0,certutilFile.getAbsolutePath().lastIndexOf(File.separator) )), true);
-			}
+		File certificateFile = certFile;
+		if (certFile == null && certUtilReference != null) {
+			certificateFile = new File(new File(certUtilReference).getParentFile(), FILE_AUTOFIRMA_CERTIFICATE);
 		}
+
+		// Obtenemos todos los directorios de perfil de Firefox del usuario
 		for (final File profileDir : profilesDir) {
 			if (!profileDir.isDirectory()) {
 				continue;
 			}
 
 			final String[] certutilCommands = new String[] {
-					certUtilExec,
+					escapePath(certUtilPath),
 					"-A", //$NON-NLS-1$
 					"-d", //$NON-NLS-1$
 					escapePath(profileDir.getAbsolutePath()),
 					"-i", //$NON-NLS-1$
-					escapePath(new File(targetDir, FILE_AUTOFIRMA_CERTIFICATE).getAbsolutePath()),
+					escapePath(certificateFile.getAbsolutePath()),
 					"-n", //$NON-NLS-1$
 					"\"" + RestoreConfigUtil.CERT_ALIAS + "\"", //$NON-NLS-1$ //$NON-NLS-2$
 					"-t", //$NON-NLS-1$
@@ -681,6 +692,7 @@ final class RestoreConfigFirefox {
 
 
 	private static void importCARootOnFirefoxKeyStore (final File appConfigDir,
+													   final File certFile,
 			                                           final Set<File> profilesDir) {
 
 		try {
@@ -688,7 +700,7 @@ final class RestoreConfigFirefox {
 			final String certutilExe = appConfigDir.getAbsolutePath() + File.separator + DIR_CERTUTIL + File.separator
 					+ CERTUTIL_EXE;
 
-			executeCertUtilToImport(certutilExe, appConfigDir, profilesDir);
+			executeCertUtilToImport(certutilExe, certFile, profilesDir);
 
 		} catch (final Exception e) {
 			LOGGER.warning("No se pudo instalar la CA del certificado SSL para el socket en el almacen de Firefox. Probablemente no se este ejecutando AutoFirma como administrador: " + e //$NON-NLS-1$

@@ -340,6 +340,7 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 			// Instalar el certificado en Mozilla
 			RestoreConfigFirefox.installRootCAMozillaKeyStore(
 				appDir,
+				null,
 				new String[] { OSX_GET_USERS_COMMAND }
 			);
 

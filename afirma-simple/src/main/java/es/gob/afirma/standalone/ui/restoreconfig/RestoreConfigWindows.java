@@ -1,10 +1,11 @@
 package es.gob.afirma.standalone.ui.restoreconfig;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.security.GeneralSecurityException;
@@ -13,16 +14,18 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
-import java.security.cert.CertificateFactory;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
+import javax.swing.SwingUtilities;
 
 import com.sun.jna.platform.win32.Advapi32Util;
 import com.sun.jna.platform.win32.WinReg;
 
+import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.standalone.AutoFirmaUtil;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.ui.restoreconfig.CertUtil.CertPack;
 import es.gob.afirma.standalone.ui.restoreconfig.RestoreConfigFirefox.MozillaProfileNotFoundException;
@@ -36,157 +39,106 @@ final class RestoreConfigWindows implements RestoreConfig {
 
 	static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
-	private static final String KS_FILENAME = "autofirma.pfx"; //$NON-NLS-1$
-	private static final String FILE_AUTOFIRMA_CERTIFICATE = "AutoFirma_ROOT.cer"; //$NON-NLS-1$
+	private static final String SSL_KEYSTORE_FILENAME = "autofirma.pfx"; //$NON-NLS-1$
+	private static final String CA_CERTIFICATE_FILENAME = "AutoFirma_ROOT.cer"; //$NON-NLS-1$
 	private static final String KS_PASSWORD = "654321"; //$NON-NLS-1$
+
+	private static final String RESTORE_PROTOCOL_EXE = "afirma_register.exe"; //$NON-NLS-1$
+	private static final String RESTORE_PROTOCOL_BAT = "afirma_register.bat"; //$NON-NLS-1$
+
+	private static final String REPLACE_PATH_EXE = "$$PATH_EXE$$"; //$NON-NLS-1$
+	private static final String REPLACE_INSTALL_DIR = "$$INSTALL_DIR$$"; //$NON-NLS-1$
 
 	/**
      * Caracter de salto de l&iacute;nea para los mensajes de la consola de restauraci&oacute;n
      */
-	private final String newline = System.getProperty("line.separator"); //$NON-NLS-1$
+	static final String NEWLINE = System.getProperty("line.separator"); //$NON-NLS-1$
 
 	/**
 	 * Ruta de operaci&oacute;n de la aplicaci&oacute;n
 	 */
-	final File appDir = RestoreConfigUtil.getApplicationDirectory();
+	private final static File appDir = RestoreConfigUtil.getApplicationDirectory();
 
-	/* (non-Javadoc)
-	 * @see es.gob.afirma.standalone.ui.restoreconfig.RestoreConfig#restore(javax.swing.JTextArea)
-	 */
 	@Override
-	public void restore(final JTextArea taskOutput) throws IOException, GeneralSecurityException {
+	public void restore(final JTextArea textArea) throws IOException, GeneralSecurityException {
 
-		appendMessage(taskOutput, SimpleAfirmaMessages.getString("RestoreConfigWindows.2")); //$NON-NLS-1$
+		// Identificamos el directorio de instalacion
+		LOGGER.info("Ruta de appDir: " + appDir.getAbsolutePath()); //$NON-NLS-1$
+		appendMessage(textArea, SimpleAfirmaMessages.getString("RestoreConfigWindows.3", appDir.getAbsolutePath())); //$NON-NLS-1$
 
-		LOGGER.info("Ruta de appDir: " + this.appDir.getAbsolutePath()); //$NON-NLS-1$
-
-		appendMessage(taskOutput,
-				SimpleAfirmaMessages.getString("RestoreConfigWindows.3") + this.appDir.getAbsolutePath()); //$NON-NLS-1$
-
-		// Realizamos las comprobaciones para generar si es necesario,
-		// los certificados .pfx y/o .cer
-		final Certificate sslRoot = restoreCertificateWindows(taskOutput);
-
-		// Para completar el proceso de restauracion, es necesario permisos de administrador para
-		// eliminar/importar el certificado raiz.
-		// Por este motivo, no se realizara esta tarea si AutoFirma no se ejecuta en modo administrador
-		// ya que el sistema podria quedar inconsistente.
-		if (isAdmin().booleanValue()) {
-
-			// Instalacion del certificado raiz en Windows.
-			installRootCAWindowsKeystore(taskOutput, sslRoot);
-
-			// Instalacion del certificado raiz en Firefox
-			try {
-
-				appendMessage(taskOutput, SimpleAfirmaMessages.getString("RestoreConfigWindows.13")); //$NON-NLS-1$
-
-				appendMessage(taskOutput, SimpleAfirmaMessages.getString("RestoreConfigWindows.9")); //$NON-NLS-1$
-
-				// Obligamos a que se cierre Firefox antes de manipular el
-				// certificado en su almacen
-				closeFirefox();
-				// El SO es Windows, es necesario obtener certutil
-				RestoreConfigFirefox.copyConfigurationFiles(this.appDir);
-
-				// En Windows, certutil no necesita privilegios de administrador
-				// para eliminar certificados de Firefox, pero si para importarlo.
-				// Ademas, certutil no informa con algun error si hay algun problema.
-
-				// Desinstalamos versiones previas
-				LOGGER.info("Desinstalamos el certificado raiz del almacen de Firefox"); //$NON-NLS-1$
-				RestoreConfigFirefox.uninstallRootCAMozillaKeyStore(RestoreConfigUtil.getApplicationDirectory());
-				// Vuelvo a instalar lo que habia o el nuevo cer generado
-				RestoreConfigFirefox.installRootCAMozillaKeyStore(this.appDir);
-				// Elimino certutil tras su uso
-				RestoreConfigFirefox.removeConfigurationFiles(this.appDir);
-
-				// Sobreescribimos los valores del protocolo afirma en el
-				// registro de Windows con los valores correctos
-				appendMessage(taskOutput, SimpleAfirmaMessages.getString("RestoreConfigWindows.24")); //$NON-NLS-1$
-				restoreProtocolRegistry(taskOutput);
-
-			} catch (final IOException e) {
-				appendMessage(taskOutput, SimpleAfirmaMessages.getString("RestoreConfigWindows.3")); //$NON-NLS-1$
-
-			} catch (final MozillaProfileNotFoundException e) {
-				appendMessage(taskOutput, SimpleAfirmaMessages.getString("RestoreConfigWindows.12")); //$NON-NLS-1$
-			}
-		} else {
-
-			JOptionPane.showMessageDialog(null, SimpleAfirmaMessages.getString("RestoreConfigWindows.28"), //$NON-NLS-1$
-					SimpleAfirmaMessages.getString("RestoreAutoFirma.9"), //$NON-NLS-1$
-					JOptionPane.WARNING_MESSAGE);
-			appendMessage(taskOutput, SimpleAfirmaMessages.getString("RestoreConfigWindows.28")); //$NON-NLS-1$
+		// Regeneramos los certificados que sean necesario (raiz y ssl) y los guardamos en disco
+		CertificateFile sslRoot;
+		try {
+			sslRoot = rebuildCertificates(textArea, appDir);
+		}
+		catch (final Exception e) {
+			LOGGER.severe("No se han podido regenerar los certificados necesarios. No se instalaran en los almacenes de confianza: " + e); //$NON-NLS-1$
+			appendMessage(textArea, SimpleAfirmaMessages.getString("RestoreConfigWindows.33")); //$NON-NLS-1$
+			sslRoot = null;
 		}
 
-		closeChrome();
-		// Insertamos el protocolo afirma en el fichero de configuracion de
-		// Google Chrome
-		configureChrome(taskOutput);
-
-		appendMessage(taskOutput, SimpleAfirmaMessages.getString("RestoreConfigWindows.8")); //$NON-NLS-1$
-
-	}
-
-	/**
-	 * Elimina los ficheros de certificado ra&iacutez y almac&eacute;n SSL del disco
-	 * como paso previo a volver a generarlos
-	 * @param appDir Ruta del directorio de la aplicaci&oacute;n
-	 * @throws IOException
-	 */
-	private static void deleteInstalledCertificates(final File appDir) throws IOException {
-
-		if (checkSSLKeyStoreGenerated(appDir)) {
-
-			Files.delete(new File(appDir, KS_FILENAME).toPath());
+		// Instalacion del certificado raiz en Windows
+		if (sslRoot != null) {
+			appendMessage(textArea, SimpleAfirmaMessages.getString("RestoreConfigWindows.18")); //$NON-NLS-1$
+			installRootCAWindowsKeystore(textArea, sslRoot);
 		}
 
-		if (checkSSLRootCertificateGenerated(appDir)) {
-
-			Files.delete(new File(appDir, FILE_AUTOFIRMA_CERTIFICATE).toPath());
+		// Instalacion del certificado raiz en Firefox
+		if (sslRoot != null) {
+			appendMessage(textArea, SimpleAfirmaMessages.getString("RestoreConfigWindows.13")); //$NON-NLS-1$
+			installRootCAMozillaKeystore(textArea, sslRoot, appDir);
 		}
 
+		// Registramos el protocolo afirma
+		appendMessage(textArea, SimpleAfirmaMessages.getString("RestoreConfigWindows.24")); //$NON-NLS-1$
+		try {
+			restoreProtocolRegistry(appDir);
+		}
+		catch (final Exception e) {
+			appendMessage(textArea, SimpleAfirmaMessages.getString("RestoreConfigWindows.25")); //$NON-NLS-1$
+		}
+
+		// Configuramos el protocolo afirma en Chrome para que no muestre advertencias al llamarlo
+		appendMessage(textArea, SimpleAfirmaMessages.getString("RestoreConfigWindows.23")); //$NON-NLS-1$
+		configureChrome();
+
+		appendMessage(textArea, SimpleAfirmaMessages.getString("RestoreConfigWindows.8")); //$NON-NLS-1$
 	}
 
 	/**
 	 * Comprueba si ya existe un almac&eacute;n de certificados generado.
 	 *
-	 * @param appDir
+	 * @param installDir
 	 *            Directorio de la aplicaci&oacute;n.
 	 * @return {@code true} si ya existe un almacen de certificados SSL,
 	 *         {@code false} en caso contrario.
 	 */
-	private static boolean checkSSLKeyStoreGenerated(final File appDir) {
-		return new File(appDir, KS_FILENAME).exists();
+	private static boolean checkSSLKeyStoreGenerated(final File installDir) {
+		return new File(installDir, SSL_KEYSTORE_FILENAME).exists();
 	}
 
 	/**
 	 * Comprueba si ya existe un certificado raiz generado.
 	 *
-	 * @param appDir
+	 * @param installDir
 	 *            Directorio de la aplicaci&oacute;n.
 	 * @return {@code true} si ya existe un certificado raiz .cer, {@code false}
 	 *         en caso contrario.
 	 */
-	private static boolean checkSSLRootCertificateGenerated(final File appDir) {
-		return new File(appDir, FILE_AUTOFIRMA_CERTIFICATE).exists();
+	private static boolean checkSSLRootCertificateGenerated(final File installDir) {
+		return new File(installDir, CA_CERTIFICATE_FILENAME).exists();
 	}
 
 
 	/**
 	 * Configura el protocolo "afirma" en Chrome para todos los usuarios de
 	 * Windows.
-	 *
-	 * @param window
-	 *            Consola de salida.
-	 * @param installing
-	 *            Indica si se debe configurar ({@code true}) o desconfigurar
-	 *            ({@code false}) el protocolo "afirma" en Chrome.
 	 */
-	private void configureChrome(final JTextArea taskOutput) {
+	private static void configureChrome() {
 
-		appendMessage(taskOutput, SimpleAfirmaMessages.getString("RestoreConfigWindows.23")); //$NON-NLS-1$
+		// Solicitamos el cierre del navegador Google Chrome
+		closeChrome();
+
 		RestoreRemoveChromeWarning.removeChromeWarningsWindows(null, true);
 
 	}
@@ -256,123 +208,119 @@ final class RestoreConfigWindows implements RestoreConfig {
 	}
 
 	/**
-	 * Concatena un texto a una nueva l&iacute;nea al par&aacute;metro JTextArea
-	 * @param taskOutput JTextArea donde el texto es concatenado
-	 * @param message Texto a concatenar.
-	 */
-	private void appendMessage(final JTextArea taskOutput, final String message) {
-		taskOutput.append(message + this.newline);
-		taskOutput.setCaretPosition(taskOutput.getDocument().getLength());
-	}
-
-
-	/**
 	 * Instala el certificado ra&iacute;z CA de AutoFirma
 	 *  en el almac&eacute;n ra&iacute;z de Windows
 	 *  @param cer El certificado a instalar
 	 */
-	private boolean installRootCAWindowsKeystore(final JTextArea taskOutput, final Certificate certificate) {
+	private static void installRootCAWindowsKeystore(final JTextArea textArea, final CertificateFile certFile) {
 
-		Boolean exito = Boolean.TRUE;
-		Certificate cer = certificate;
 		KeyStore ks;
-
 		try {
 			ks = KeyStore.getInstance("Windows-ROOT"); //$NON-NLS-1$
 			ks.load(null, null);
-
-			appendMessage(taskOutput,
-					SimpleAfirmaMessages.getString("RestoreConfigWindows.18")); //$NON-NLS-1$
-
-			// Importar el certificado solo si no esta instalado ya o si estaba instalado
-			// pero se ha debido volver a generar el cer
-			if (ks.getCertificate(RestoreConfigUtil.CERT_ALIAS_BROWSER) == null || cer != null) {
-
-				// El certificado no viene cargado porque ya existia el archivo .cer
-				// Lo cargo ahora.
-				if (cer == null) {
-
-					try {
-						cer = loadCertificateFromFile();
-					} catch (final IOException e) {
-
-						LOGGER.severe("No ha podido cargarse el certificado .cer desde el archivo"); //$NON-NLS-1$
-						appendMessage(taskOutput,
-								SimpleAfirmaMessages.getString("RestoreConfigWindows.27",  e.getMessage())); //$NON-NLS-1$
-						exito = Boolean.FALSE;
-					}
-				} else {
-
-					// Se intenta eliminar instalaciones previas del certificado raiz
-					try {
-						while (ks.getCertificate(RestoreConfigUtil.CERT_ALIAS_BROWSER) != null) {
-							ks.deleteEntry(RestoreConfigUtil.CERT_ALIAS_BROWSER);
-						}
-					} catch (final KeyStoreException ke) {
-						appendMessage(taskOutput,
-								"No ha podido eliminarse alguna importacion previa del certificado raiz del almacen de Windows"); //$NON-NLS-1$
-						LOGGER.info("No ha podido eliminarse alguna importacion previa del certificado raiz del almacen de Windows: " + ke.getMessage()); //$NON-NLS-1$
-					}
-				}
-
-				boolean installed = false;
-				boolean cancelled = false;
-				do {
-					try {
-						ks.setCertificateEntry(RestoreConfigUtil.CERT_ALIAS_BROWSER, cer);
-						installed = true;
-					}
-					catch (final KeyStoreException e) {
-						LOGGER.warning(
-								"No se pudo instalar la CA del certificado SSL para el socket en el almacen de Windows: " + e //$NON-NLS-1$
-								);
-						final int result = JOptionPane.showConfirmDialog(
-								null,
-								SimpleAfirmaMessages.getString("RestoreConfigWindows.0"), //$NON-NLS-1$
-								SimpleAfirmaMessages.getString("RestoreConfigWindows.1"), //$NON-NLS-1$
-								JOptionPane.OK_CANCEL_OPTION,
-								JOptionPane.WARNING_MESSAGE
-								);
-						if (result == JOptionPane.CANCEL_OPTION) {
-							cancelled = true;
-							LOGGER.severe("El usuario cancelo la instalacion del certificado SSL para el socket: " + e); //$NON-NLS-1$
-						}
-					}
-				}
-				while (!installed && !cancelled);
-
-				//ks.setCertificateEntry(RestoreConfigUtil.CERT_ALIAS_BROWSER, cer);
-				appendMessage(taskOutput,
-						SimpleAfirmaMessages.getString("RestoreConfigWindows.19")); //$NON-NLS-1$
-
-			} else {
-				appendMessage(taskOutput,
-						SimpleAfirmaMessages.getString("RestoreConfigWindows.26")); //$NON-NLS-1$
-			}
-
 		} catch (KeyStoreException | NoSuchAlgorithmException | CertificateException | IOException e) {
-
-			LOGGER.severe(e.getStackTrace().toString());
-			appendMessage(taskOutput,
-					SimpleAfirmaMessages.getString("RestoreConfigWindows.20",  e.getMessage())); //$NON-NLS-1$
-			exito = Boolean.FALSE;
-
+			LOGGER.severe("No se ha podido cargar el almacen de certificados de confianza de Windows: " + e); //$NON-NLS-1$
+			appendMessage(textArea, SimpleAfirmaMessages.getString("RestoreConfigWindows.20")); //$NON-NLS-1$
+			return;
 		}
 
-		return exito.booleanValue();
+			// Comprobamos si el certificado ya esta instalado en el almacen
+			try {
+				final Certificate currentCert = ks.getCertificate(RestoreConfigUtil.CERT_ALIAS_BROWSER);
+				if (currentCert != null && currentCert.equals(certFile.getCert())) {
+					LOGGER.info("El certificado raiz ya se encontraba instalado en el almacen del sistema"); //$NON-NLS-1$
+					appendMessage(textArea, SimpleAfirmaMessages.getString("RestoreConfigWindows.26")); //$NON-NLS-1$
+					return;
+				}
+			}
+			catch (final Exception e) {
+				LOGGER.warning("No se pudo comprobar si el certificado ya estaba en el almacen: " + e); //$NON-NLS-1$
+			}
 
+			// Antes de la instalacion, intentamos desinstalar cualquier otro certificado con el
+			// mismo alias que se encuentre en el almacen
+			appendMessage(textArea, SimpleAfirmaMessages.getString("RestoreConfigWindows.22")); //$NON-NLS-1$
+			try {
+				while (ks.getCertificate(RestoreConfigUtil.CERT_ALIAS_BROWSER) != null) {
+					ks.deleteEntry(RestoreConfigUtil.CERT_ALIAS_BROWSER);
+				}
+			} catch (final KeyStoreException ke) {
+				appendMessage(textArea, SimpleAfirmaMessages.getString("RestoreConfigWindows.34")); //$NON-NLS-1$
+				LOGGER.info("No se ha podido eliminar alguna importacion previa del certificado raiz del almacen de Windows: " + ke.getMessage()); //$NON-NLS-1$
+			}
+
+			// Instalamos el certificado
+			boolean installed = false;
+			do {
+				try {
+					ks.setCertificateEntry(RestoreConfigUtil.CERT_ALIAS_BROWSER, certFile.getCert());
+					installed = true;
+				}
+				catch (final KeyStoreException e) {
+					LOGGER.warning(
+							"No se pudo instalar la CA del certificado SSL para el socket en el almacen de Windows: " + e //$NON-NLS-1$
+							);
+					final int result = JOptionPane.showConfirmDialog(
+							null,
+							SimpleAfirmaMessages.getString("RestoreConfigWindows.0"), //$NON-NLS-1$
+							SimpleAfirmaMessages.getString("RestoreConfigWindows.1"), //$NON-NLS-1$
+							JOptionPane.OK_CANCEL_OPTION,
+							JOptionPane.WARNING_MESSAGE
+							);
+					if (result == JOptionPane.CANCEL_OPTION) {
+						LOGGER.severe("El usuario cancelo la instalacion del certificado SSL para el socket: " + e); //$NON-NLS-1$
+						appendMessage(textArea, SimpleAfirmaMessages.getString("RestoreConfigWindows.32")); //$NON-NLS-1$
+						return;
+					}
+				}
+			}
+			while (!installed);
+	}
+
+	/**
+	 * Instala el certificado ra&iacute;z CA de AutoFirma
+	 *  en el almac&eacute;n ra&iacute;z de Mozilla
+	 *  @param textArea &Aacute;rea de texto en el que imprimir las trazas para el usuario.
+	 *  @param certFile El certificado a instalar.
+	 */
+	private static void installRootCAMozillaKeystore(final JTextArea textArea, final CertificateFile certFile, final File installDir) {
+
+		try {
+			// Obligamos a que se cierre Firefox antes de manipular el
+			// certificado en su almacen
+			closeFirefox();
+
+			// Es necesario copiar a disco certutil
+			RestoreConfigFirefox.copyConfigurationFiles(installDir);
+
+			// certutil no lanza ningun error si hay algun problema a partir de Firefox 50
+
+			// Desinstalamos versiones previas
+			LOGGER.info("Desinstalamos el certificado raiz del almacen de Firefox"); //$NON-NLS-1$
+			RestoreConfigFirefox.uninstallRootCAMozillaKeyStore(installDir);
+			// Vuelvo a instalar lo que habia o el nuevo cer generado
+			RestoreConfigFirefox.installRootCAMozillaKeyStore(installDir, certFile.getFile());
+			// Elimino certutil tras su uso
+			RestoreConfigFirefox.removeConfigurationFiles(installDir);
+
+		} catch (final IOException e) {
+			appendMessage(textArea, SimpleAfirmaMessages.getString("RestoreConfigWindows.3")); //$NON-NLS-1$
+
+		} catch (final MozillaProfileNotFoundException e) {
+			appendMessage(textArea, SimpleAfirmaMessages.getString("RestoreConfigWindows.12")); //$NON-NLS-1$
+		}
 	}
 
 	/**
 	 * Restaura los valores del protocolo afirma en el registro de Windows.
 	 * Se sobreescriben las distintas subkeys con los valores adecuados.
+	 * @param workingDir Directorio de trabajo en el que copiar los ficheros que sean necesarios.
+	 * @throws GeneralSecurityException Cuando no se puede actualizar la entrada del protocolo
+	 * "afirma" en el registro.
 	 */
-	private void restoreProtocolRegistry(final JTextArea taskOutput) {
-
-		final File appDir1 = RestoreConfigUtil.getApplicationDirectory();
+	private static void restoreProtocolRegistry(final File workingDir) throws GeneralSecurityException {
 
 		try {
-
 			// Crear la key "afirma" si no existe
 			if (!Advapi32Util.registryKeyExists(WinReg.HKEY_CLASSES_ROOT, "afirma")) { //$NON-NLS-1$
 				Advapi32Util.registryCreateKey(WinReg.HKEY_CLASSES_ROOT, "afirma"); //$NON-NLS-1$
@@ -386,143 +334,266 @@ final class RestoreConfigWindows implements RestoreConfig {
 				Advapi32Util.registryCreateKey(WinReg.HKEY_CLASSES_ROOT, "afirma\\DefaultIcon"); //$NON-NLS-1$
 			}
 			// Sobreescribir los valores correctos
-			Advapi32Util.registrySetStringValue(WinReg.HKEY_CLASSES_ROOT, "afirma\\DefaultIcon", "", appDir1 + "\\ic_firmar.ico"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			Advapi32Util.registrySetStringValue(WinReg.HKEY_CLASSES_ROOT, "afirma\\DefaultIcon", "", appDir + "\\ic_firmar.ico"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
 			// Crear la key "afirma\\shell\\open\\command" si no existe
 			if (!Advapi32Util.registryKeyExists(WinReg.HKEY_CLASSES_ROOT, "afirma\\shell\\open\\command")) { //$NON-NLS-1$
 				Advapi32Util.registryCreateKey(WinReg.HKEY_CLASSES_ROOT, "afirma\\shell\\open\\command"); //$NON-NLS-1$
 			}
 			// Sobreescribir los valores correctos
-			Advapi32Util.registrySetStringValue(WinReg.HKEY_CLASSES_ROOT, "afirma\\shell\\open\\command", "", appDir1 + "\\AutoFirma.exe %1"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			Advapi32Util.registrySetStringValue(WinReg.HKEY_CLASSES_ROOT, "afirma\\shell\\open\\command", "", appDir + "\\AutoFirma.exe %1"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
-			LOGGER.info("Configurado afirma en registro Windows"); //$NON-NLS-1$
 		} catch (final Exception e) {
-			LOGGER.severe("Error al escribir en el registro de Windows: " + e.getMessage()); //$NON-NLS-1$
-			appendMessage(taskOutput,
-					SimpleAfirmaMessages.getString("RestoreConfigWindows.25",  e.getMessage())); //$NON-NLS-1$
+
+			LOGGER.warning("No se pudo actualizar el registro con los permisos del usuario, se solicita elevar privilegios: " + e); //$NON-NLS-1$
+
+			// No se pudo actualizar el registro con los permisos del usuario,
+			// se usara la biblioteca nativa
+			final int result = restoreProtocolRegistryByApp(workingDir.getAbsolutePath());
+
+			throw new GeneralSecurityException("No se pudo registrar el protocolo afirma. Codigo de error: " + result); //$NON-NLS-1$
 		}
 
+		LOGGER.info("Configurado afirma en registro Windows"); //$NON-NLS-1$
 	}
 
 	/**
 	 * Comprueba si es necesario volver a generar el almac&eacute;n de claves y/o el certificado para
-	 * comunicaci&oacute;n SSL y en caso afirmativo los genera
-	 * @param taskOutput Objeto que representa el &aacute;rea de texto de la consola del restaurador
-	 * @return El certificado SSL generado o null
-	 * @throws IOException
-	 * @throws GeneralSecurityException
+	 * comunicaci&oacute;n SSL y, en caso afirmativo, los genera.
+	 * @param textArea &Aacute;rea de texto de la consola del restaurador.
+	 * @param installDir Directorio de instalaci&oacute;n en el que se deben encontrar los certificados SSL.
+	 * @return El certificado ra&iacute;z.
+	 * @throws IOException Cuando ocurre un error al generar o copiar a disco los certificados.
 	 */
-	private Certificate restoreCertificateWindows(final JTextArea taskOutput) throws IOException, GeneralSecurityException {
+	private static CertificateFile rebuildCertificates(final JTextArea textArea, final File installDir) throws IOException {
 		// SSLKeystore --> pfx, SSLRoot --> cer
-		Certificate sslRoot = null;
+		CertificateFile sslRoot = null;
 
-		// Si existe el .pfx, pero no el .cer, cargo el .pfx y extraigo el .cer
-		if (checkSSLKeyStoreGenerated(this.appDir) && !checkSSLRootCertificateGenerated(this.appDir)) {
+		// Si no existe el pfx, debo generar el certificado raiz y el certificado SSL
+		if (!checkSSLKeyStoreGenerated(installDir)) {
 
-			// Cargo el pfx
-			final File sslKeyStoreFile = new File(this.appDir, KS_FILENAME);
-			final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
-			final char ksPass[] = KS_PASSWORD.toCharArray();
-			final Certificate[] chain;
-			try (FileInputStream fis = new FileInputStream(sslKeyStoreFile)) {
-				ks.load(fis, ksPass);
-				chain = ks.getCertificateChain(RestoreConfigUtil.CERT_ALIAS);
-			}
-			catch(final IOException e) {
-				LOGGER.log(Level.SEVERE, e.getMessage());
-				throw new IOException(e);
-			}
-			// En esta posicion esta en certificado raiz.
-			sslRoot = chain[1];
-
-			// Instalo el .cer a partir del .pfx
-			RestoreConfigUtil.installFile(sslRoot.getEncoded(), new File(this.appDir, FILE_AUTOFIRMA_CERTIFICATE));
-
-			// Si no existe el pfx, debo generar ambos
-		} else if (!checkSSLKeyStoreGenerated(this.appDir)) {
-
-			final CertPack certPack = CertUtil.getCertPackForLocalhostSsl(RestoreConfigUtil.CERT_ALIAS, KS_PASSWORD);
-
-			appendMessage(taskOutput, SimpleAfirmaMessages.getString("RestoreConfigWindows.16")); //$NON-NLS-1$
-
+			// Eliminando de disco las versiones previas de los certificados
+			appendMessage(textArea, SimpleAfirmaMessages.getString("RestoreConfigWindows.16")); //$NON-NLS-1$
 			try {
-
-				deleteInstalledCertificates(this.appDir);
-
-				appendMessage(taskOutput, SimpleAfirmaMessages.getString("RestoreConfigWindows.5")); //$NON-NLS-1$
-				// Instalacion del certificado pfx
-				RestoreConfigUtil.installFile(certPack.getPkcs12(), new File(this.appDir, KS_FILENAME));
-
-				sslRoot = certPack.getCaCertificate();
-
-				appendMessage(taskOutput, SimpleAfirmaMessages.getString("RestoreConfigWindows.11")); //$NON-NLS-1$
-				// Instalacion del certificado raiz .cer si no existe
-				RestoreConfigUtil.installFile(sslRoot.getEncoded(), new File(this.appDir, FILE_AUTOFIRMA_CERTIFICATE));
-
+				deleteCertificatesFromDisk(installDir);
 			} catch (final IOException e) {
-				appendMessage(taskOutput, SimpleAfirmaMessages.getString("RestoreConfigWindows.17")); //$NON-NLS-1$
-				LOGGER.log(Level.SEVERE, e.getMessage());
+				appendMessage(textArea, SimpleAfirmaMessages.getString("RestoreConfigWindows.17")); //$NON-NLS-1$
+				LOGGER.log(Level.SEVERE, "Error al eliminar los certificados SSL anteriores de disco: " + e); //$NON-NLS-1$
 			}
 
+			// Generamos los certificados
+			appendMessage(textArea, SimpleAfirmaMessages.getString("RestoreConfigWindows.5")); //$NON-NLS-1$
+			CertPack certPack;
+			try {
+				certPack = CertUtil.getCertPackForLocalhostSsl(RestoreConfigUtil.CERT_ALIAS, KS_PASSWORD);
+				sslRoot = new CertificateFile(certPack.getCaCertificate());
+			}
+			catch (final GeneralSecurityException e) {
+				LOGGER.severe("No se ha podido generar el certificado SSL: " + e); //$NON-NLS-1$
+				throw new IOException("No se ha podido generar el certificado SSL", e); //$NON-NLS-1$
+			}
+
+			// Copiamos los certificados a disco
+			appendMessage(textArea, SimpleAfirmaMessages.getString("RestoreConfigWindows.11")); //$NON-NLS-1$
+			File sslRootFile = new File(installDir, CA_CERTIFICATE_FILENAME);
+			try {
+				RestoreConfigUtil.installFile(certPack.getPkcs12(), new File(installDir, SSL_KEYSTORE_FILENAME));
+				RestoreConfigUtil.installFile(certPack.getCaCertificate().getEncoded(), sslRootFile);
+			}
+			catch (final Exception e) {
+				LOGGER.severe("No se ha podido guardar en disco los certificados SSL. Los almacenaresmos en un directorio alternativo:  " + e); //$NON-NLS-1$
+				final File alternativeDir = AutoFirmaUtil.getWindowsAlternativeAppDir();
+				if (!alternativeDir.isDirectory() && !alternativeDir.mkdirs()) {
+					throw new IOException("No se ha podido guardar en disco los certificados SSL. Error al crear el directorio alternativo"); //$NON-NLS-1$
+				}
+				try {
+					RestoreConfigUtil.installFile(sslRoot.getCert().getEncoded(), alternativeDir);
+					RestoreConfigUtil.installFile(certPack.getPkcs12(), new File(alternativeDir, SSL_KEYSTORE_FILENAME));
+					RestoreConfigUtil.installFile(certPack.getCaCertificate().getEncoded(), sslRoot.getFile());
+					sslRootFile = new File(alternativeDir, CA_CERTIFICATE_FILENAME);
+				}
+				catch (final Exception ex) {
+					LOGGER.severe("No se ha podido guardar en disco los certificados SSL: " + e); //$NON-NLS-1$
+					throw new IOException("Error guardando en disco los certificados SSL", e); //$NON-NLS-1$
+				}
+			}
+			sslRoot.setFile(sslRootFile);
+		}
+		// Si solo no existe el certificado raiz, lo extraigo del almacen del certificado SSL
+		else if (!checkSSLRootCertificateGenerated(installDir)) {
+
+			// Cargo el pfx y extraigo el certificado raiz
+			try (FileInputStream fis = new FileInputStream(new File(installDir, SSL_KEYSTORE_FILENAME))) {
+				final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
+				ks.load(fis, KS_PASSWORD.toCharArray());
+				final Certificate[] chain = ks.getCertificateChain(RestoreConfigUtil.CERT_ALIAS);
+				sslRoot = new CertificateFile(chain[chain.length - 1]);
+			}
+			catch(final Exception e) {
+				LOGGER.log(Level.SEVERE, "Error al extraer el certificado raiz del PKCS#12: " + e); //$NON-NLS-1$
+				throw new IOException("Error al generar el certificado SSL", e); //$NON-NLS-1$
+			}
+
+			// Copio a disco el certificado raiz
+			appendMessage(textArea, SimpleAfirmaMessages.getString("RestoreConfigWindows.11")); //$NON-NLS-1$
+			File sslRootFile = new File(installDir, CA_CERTIFICATE_FILENAME);
+			try {
+				RestoreConfigUtil.installFile(sslRoot.getCert().getEncoded(), sslRootFile);
+			}
+			catch (final Exception e) {
+				LOGGER.severe("No se ha podido guardar en disco el certificado raiz SSL. Lo extraemos a un directorio alternativo: " + e); //$NON-NLS-1$
+				final File alternativeDir = AutoFirmaUtil.getWindowsAlternativeAppDir();
+				if (!alternativeDir.isDirectory() && !alternativeDir.mkdirs()) {
+					throw new IOException("No se ha podido guardar en disco el certificado raiz SSL. Error al crear el directorio alternativo"); //$NON-NLS-1$
+				}
+				try {
+					RestoreConfigUtil.installFile(sslRoot.getCert().getEncoded(), alternativeDir);
+					sslRootFile = new File(alternativeDir, CA_CERTIFICATE_FILENAME);
+				}
+				catch (final Exception ex) {
+					LOGGER.severe("No se ha podido guardar en disco el certificado raiz SSL: " + e); //$NON-NLS-1$
+					throw new IOException("Error guardando en disco el certificado raiz SSL", e); //$NON-NLS-1$
+				}
+			}
+			sslRoot.setFile(sslRootFile);
+		}
 		// Si existen ambos no hago nada
-		} else {
-			appendMessage(taskOutput, SimpleAfirmaMessages.getString("RestoreConfigWindows.14")); //$NON-NLS-1$
+		else {
+			appendMessage(textArea, SimpleAfirmaMessages.getString("RestoreConfigWindows.14")); //$NON-NLS-1$
+			final File sslRootFile = new File(installDir, CA_CERTIFICATE_FILENAME);
+			sslRoot = new CertificateFile(CertUtil.loadCertificate(sslRootFile));
+			sslRoot.setFile(sslRootFile);
 		}
 
 		return sslRoot;
 	}
 
-	private Certificate loadCertificateFromFile() throws CertificateException, IOException {
-
-		Certificate cert = null;
-		try (final FileInputStream fis =
-				new FileInputStream(new File(this.appDir, FILE_AUTOFIRMA_CERTIFICATE).getAbsolutePath());
-			final BufferedInputStream bis =
-					new BufferedInputStream(fis)) {
-
-			final CertificateFactory cf = CertificateFactory.getInstance("X.509"); //$NON-NLS-1$
-
-			while (bis.available() > 0) {
-				cert = cf.generateCertificate(bis);
-			}
-		}
-		catch (final IOException e) {
-			throw new IOException(e);
-		}
-
-		return cert;
-	}
-
 
 	/**
-	 * Comprueba si el proceso se est&acute; ejecutando en modo administrador de Windows.
-	 * @return ({@code true}}) Si es modo administrador, ({@code false}}) en caso contrario
+	 * Elimina los ficheros de certificado ra&iacutez y almac&eacute;n SSL del disco
+	 * como paso previo a volver a generarlos
+	 * @param installDir Ruta del directorio de la aplicaci&oacute;n
+	 * @throws IOException
 	 */
-	private static Boolean isAdmin() {
-		Boolean isAdmin = Boolean.FALSE;
+	private static void deleteCertificatesFromDisk(final File installDir) throws IOException {
 
-		Process p;
-		try {
+		if (checkSSLKeyStoreGenerated(installDir)) {
 
-			final String[] command = new String[] { "reg", //$NON-NLS-1$
-					"query", //$NON-NLS-1$
-					"\"HKU\\S-1-5-19\"", //$NON-NLS-1$
-			};
-			final ProcessBuilder pb = new ProcessBuilder(command);
-
-			p = pb.start();
-			p.waitFor();
-
-			final int exitValue = p.exitValue();
-
-			if (0 == exitValue) {
-				isAdmin = Boolean.TRUE;
-			}
-
-		} catch (final Exception e) {
-			LOGGER.severe("Ha ocurrido un error al determinar si AutoFirma se ejecuta como administrador: " + e.getMessage()); //$NON-NLS-1$
+			Files.delete(new File(installDir, SSL_KEYSTORE_FILENAME).toPath());
 		}
 
-		return isAdmin;
+		if (checkSSLRootCertificateGenerated(installDir)) {
+
+			Files.delete(new File(installDir, CA_CERTIFICATE_FILENAME).toPath());
+		}
+	}
+
+	/**
+	 * Restaura la configuraci&oacute;n del protocolo "afirma" para que se invoque a la
+	 * aplicaci&oacute;n. Lo hace a trav&eacute;s de una aplicaci&oacute;n externa preparada
+	 * para tal fin.
+	 * @param workingDir Directorio de trabajo donde se puedan crear los ficheros
+	 * necesarios para ejecutar la operaci&oacute;n.
+	 * @return El valor cero en caso de &eacute;xito, -1 si no se proporciona un par&aacute;metro
+	 * o cualquier otro c&oacute;digo de error del sistema.
+	 * @see <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms681382(v=vs.85).aspx)">https://msdn.microsoft.com/en-us/library/windows/desktop/ms681382(v=vs.85).aspx)</a>
+	 */
+	private static int restoreProtocolRegistryByApp(String workingDir) {
+
+		// Copiamos al directorio de instalacion la aplicacion para restaurar el protocolo
+		final File exeFile = new File(workingDir, RESTORE_PROTOCOL_EXE);
+		try (final FileOutputStream os = new FileOutputStream(exeFile);
+				final InputStream is = RestoreConfigWindows.class.getResourceAsStream("/windows/" + RESTORE_PROTOCOL_EXE);) { //$NON-NLS-1$
+			os.write(AOUtil.getDataFromInputStream(is));
+			os.flush();
+		}
+		catch (final Exception e) {
+			LOGGER.warning("No se pudo copiar a disco la aplicacion de restauracion. Se abortara su ejecucion: " + e); //$NON-NLS-1$
+			return 2; // ERROR_FILE_NOT_FOUND
+		}
+
+		// Copiamos a disco y completamos el script para ejecutar la aplicacion con
+		// permisos de administrador
+		final File batFile = new File(workingDir, RESTORE_PROTOCOL_BAT);
+		try (final FileOutputStream os = new FileOutputStream(batFile);
+				final InputStream is = RestoreConfigWindows.class.getResourceAsStream("/windows/" + RESTORE_PROTOCOL_BAT);) { //$NON-NLS-1$
+			String batchScript = new String(AOUtil.getDataFromInputStream(is));
+			batchScript = batchScript
+					.replace(REPLACE_PATH_EXE, exeFile.getAbsolutePath().replace("\\", "\\\\")) //$NON-NLS-1$ //$NON-NLS-2$
+					.replace(REPLACE_INSTALL_DIR, appDir.getAbsolutePath().replace("\\", "\\\\")); //$NON-NLS-1$ //$NON-NLS-2$
+			os.write(batchScript.getBytes());
+			os.flush();
+		}
+		catch (final Exception e) {
+			LOGGER.warning("No se pudo copiar a disco la aplicacion de restauracion. Se abortara su ejecucion: " + e); //$NON-NLS-1$
+			return 2; // ERROR_FILE_NOT_FOUND
+		}
+
+		// Ejecumos el script
+		int result = -2;
+		try {
+			final Process process = Runtime.getRuntime().exec(new String[] {
+					batFile.getAbsolutePath()
+			});
+			result = process.waitFor();
+		} catch (final Exception e) {
+			LOGGER.log(Level.WARNING, "Error durante la ejecucion del proceso de restauracion del protocolo \"afirma\": " + e, e); //$NON-NLS-1$
+		}
+
+		// Esperamos 1 segundo para poder eliminar los ficheros
+		try {
+			Thread.sleep(1000);
+		} catch (final InterruptedException e) {
+			// No hacemos nada
+		}
+
+		// Eliminamos los ficheros
+		try {
+			Files.delete(exeFile.toPath());
+			Files.delete(batFile.toPath());
+		} catch (final IOException e) {
+			LOGGER.warning("No se pudo eliminar el ejecutable para el registro del protocolo \"afirma\": " + e); //$NON-NLS-1$
+		}
+
+		return result;
+	}
+
+	/**
+	 * Imprime una nueva l&iacute;nea en el panel de trazas.
+	 * @param textArea Area de texto en el que imprimir el mensaje.
+	 * @param message Mensaje de texto.
+	 */
+	private static void appendMessage(final JTextArea textArea, final String message) {
+
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				textArea.append(message + NEWLINE);
+				textArea.setCaretPosition(textArea.getDocument().getLength());
+			}
+		});
+
+	}
+
+	static class CertificateFile {
+
+		private final Certificate cert;
+		private File file;
+
+		public CertificateFile(Certificate cert) {
+			this.cert = cert;
+		}
+
+		public File getFile() {
+			return this.file;
+		}
+
+		public void setFile(File file) {
+			this.file = file;
+		}
+
+		public Certificate getCert() {
+			return this.cert;
+		}
 	}
 }

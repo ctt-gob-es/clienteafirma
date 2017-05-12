@@ -85,7 +85,7 @@ final class RestoreConfigLinux implements RestoreConfig {
 		try {
 
 			closeChrome();
-			String[] usersDir = getSystemUsersHomes();
+			final String[] usersDir = getSystemUsersHomes();
 
 			RestoreRemoveChromeWarning.removeChromeWarningsLinux(appDir, usersDir);
 
@@ -98,7 +98,7 @@ final class RestoreConfigLinux implements RestoreConfig {
 			// Cerramos el almacen de firefox si esta abierto
 			closeFirefox();
 
-			RestoreConfigFirefox.installRootCAMozillaKeyStore(appDir, command);
+			RestoreConfigFirefox.installRootCAMozillaKeyStore(appDir, null, command);
 		} catch (final MozillaProfileNotFoundException e) {
 			appendMessage(taskOutput, SimpleAfirmaMessages.getString("RestoreConfigLinux.12")); //$NON-NLS-1$
 			LOGGER.warning("Error al obtener los perfiles de usuario de Mozilla Firefox: " + e.getMessage()); //$NON-NLS-1$
@@ -160,7 +160,7 @@ final class RestoreConfigLinux implements RestoreConfig {
 			throw new IOException("No se pudo obtener el listado de directorios de usuarios del sistema", e); //$NON-NLS-1$
 		}
 	}
-	
+
     /** Comprueba si ya existe un almac&eacute;n de certificados generado.
      * @param appConfigDir Directorio de configuraci&oacute;n de la aplicaci&oacute;n.
      * @return {@code true} si ya existe un almac&eacute;n de certificados SSL, {@code false} en caso contrario. */
@@ -267,7 +267,7 @@ final class RestoreConfigLinux implements RestoreConfig {
 					pidInfo += line;
 				}
 			}
-			
+
 		} catch (final IOException e) {
 			LOGGER.severe("Error al detectar si el proceso " + process + " esta activo: " + e.getMessage()); //$NON-NLS-1$ //$NON-NLS-2$
 		}
@@ -307,7 +307,7 @@ final class RestoreConfigLinux implements RestoreConfig {
 				throw new IOException("No puedo eliminar AutoFirma.js"); //$NON-NLS-1$
 			}
 		}
-		
+
 		try (final FileOutputStream fout = new FileOutputStream(protocolScript, true)) {
 			fout.write(sb.toString().getBytes());
 		}
