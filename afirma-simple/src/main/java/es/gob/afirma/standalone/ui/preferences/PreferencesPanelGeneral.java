@@ -19,8 +19,6 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.InputEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyListener;
 import java.util.logging.Level;
@@ -83,7 +81,7 @@ final class PreferencesPanelGeneral extends JPanel {
 	DisposableInterface getDisposableInterface() {
 		return this.disposableInterface;
 	}
-	
+
 	/**
 	 * Atributo para gestionar el bloqueo de propiedades.
 	 */
@@ -96,7 +94,7 @@ final class PreferencesPanelGeneral extends JPanel {
 			                final boolean unprotected) {
 		this.disposableInterface = di;
 		this.preferencesPanel = prefPanel;
-		
+
 		this.unprotected = unprotected;
 
 		createUI(keyListener, modificationListener);
@@ -141,11 +139,11 @@ final class PreferencesPanelGeneral extends JPanel {
 		this.xmlFilesCombo.setSelectedItem(PreferencesManager.get(PREFERENCE_GENERAL_DEFAULT_FORMAT_XML, XADES));
 		this.binFilesCombo.setSelectedItem(PreferencesManager.get(PREFERENCE_GENERAL_DEFAULT_FORMAT_BIN, CADES));
 	}
-	
+
 	/**
 	 * Carga las opciones de configuraci&oacute;n por defecto del panel general
 	 * desde un fichero externo de preferencias.
-	 * 
+	 *
 	 * @param unprotected
 	 *            {@code true} Si las opciones de configuraci&oacute;n sensibles
 	 *            a ello est&aacute;n protegidas y no pueden ser modificadas,
@@ -153,7 +151,7 @@ final class PreferencesPanelGeneral extends JPanel {
 	 */
 	void loadDefaultPreferences() {
 
-		
+
 		this.avoidAskForClose.setSelected(PreferencesManager.getBooleanPreference(PREFERENCE_GENERAL_OMIT_ASKONCLOSE, false));
 		this.hideDniStartScreen.setSelected(PreferencesManager.getBooleanPreference(PREFERENCE_GENERAL_HIDE_DNIE_START_SCREEN, false));
 		this.checkForUpdates.setSelected(PreferencesManager.getBooleanPreference(PREFERENCE_GENERAL_UPDATECHECK, true));
@@ -161,9 +159,9 @@ final class PreferencesPanelGeneral extends JPanel {
 
 		// Para las preferencias susceptibles de ser protegidas, comprobamos la
 		// preferencia unprotected antes de cargar su valor por defecto.
-		// Un valor unprotected a false habilitará que cualquier opción de
-		// configuración pueda ser alterada por parte del usuario mediante el
-		// interfaz gráfico. Este comportamiento se generaliza para el boton de
+		// Un valor unprotected a false habilitara que cualquier opcion de
+		// configuracion pueda ser alterada por parte del usuario mediante el
+		// interfaz grafico. Este comportamiento se generaliza para el boton de
 		// restaurar las preferencias por defecto.
 		if (!isUnprotected()) {
 			this.signarureAlgorithms
@@ -219,75 +217,72 @@ final class PreferencesPanelGeneral extends JPanel {
 
 		importConfigFromFileButton.setMnemonic('I');
 		importConfigFromFileButton.addActionListener(
-			new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent ae) {
-					if ((ae.getModifiers() & InputEvent.ALT_MASK) != 0) {
-						final String url = (String) AOUIFactory.showInputDialog(
-							getParent(),
-							SimpleAfirmaMessages.getString("PreferencesPanel.109"), //$NON-NLS-1$
-							SimpleAfirmaMessages.getString("PreferencesPanel.110"), //$NON-NLS-1$
-							JOptionPane.QUESTION_MESSAGE,
-							null,
-							null,
-							null
-						);
-						if (url == null || url.trim().isEmpty()) {
-							return;
-						}
-						try {
-							PreferencesPlistHandler.importPreferencesFromUrl(url, isUnprotected());
-						}
-						catch(final Exception e) {
-							LOGGER.log(
-								Level.SEVERE,
-								"Error importando la configuracion desde red (" + url + "): " + e, //$NON-NLS-1$ //$NON-NLS-2$
-								e
-							);
-							AOUIFactory.showErrorMessage(
-								getParent(),
-								SimpleAfirmaMessages.getString("PreferencesPanel.116"), //$NON-NLS-1$
-								SimpleAfirmaMessages.getString("PreferencesPanel.117"), //$NON-NLS-1$
-								JOptionPane.ERROR_MESSAGE
-							);
-							return;
-						}
+			ae -> {
+				if ((ae.getModifiers() & ActionEvent.ALT_MASK) != 0) {
+					final String url = (String) AOUIFactory.showInputDialog(
+						getParent(),
+						SimpleAfirmaMessages.getString("PreferencesPanel.109"), //$NON-NLS-1$
+						SimpleAfirmaMessages.getString("PreferencesPanel.110"), //$NON-NLS-1$
+						JOptionPane.QUESTION_MESSAGE,
+						null,
+						null,
+						null
+					);
+					if (url == null || url.trim().isEmpty()) {
+						return;
 					}
-					else {
-						final String configFilePath;
-						try {
-							configFilePath = AOUIFactory.getLoadFiles(
-								SimpleAfirmaMessages.getString("PreferencesPanel.86"), //$NON-NLS-1$
-								null,
-								null,
-								new String[] { "afconfig" }, //$NON-NLS-1$
-								SimpleAfirmaMessages.getString("PreferencesPanel.111"), //$NON-NLS-1$
-								false,
-								false,
-								AutoFirmaUtil.getDefaultDialogsIcon(),
-								PreferencesPanelGeneral.this
-							)[0].getAbsolutePath();
-						}
-						catch(final AOCancelledOperationException ex) {
-							// Operacion cancelada por el usuario
-							return;
-						}
-						PreferencesPlistHandler.importPreferences(configFilePath, getParent(), isUnprotected());
+					try {
+						PreferencesPlistHandler.importPreferencesFromUrl(url, isUnprotected());
 					}
-					AOUIFactory.showMessageDialog(
-							getParent(),
-							SimpleAfirmaMessages.getString("PreferencesPanel.142"), //$NON-NLS-1$
-							SimpleAfirmaMessages.getString("PreferencesPanel.143"), //$NON-NLS-1$
-							JOptionPane.INFORMATION_MESSAGE
+					catch(final Exception e) {
+						LOGGER.log(
+							Level.SEVERE,
+							"Error importando la configuracion desde red (" + url + "): " + e, //$NON-NLS-1$ //$NON-NLS-2$
+							e
 						);
-					getDisposableInterface().disposeInterface();
+						AOUIFactory.showErrorMessage(
+							getParent(),
+							SimpleAfirmaMessages.getString("PreferencesPanel.116"), //$NON-NLS-1$
+							SimpleAfirmaMessages.getString("PreferencesPanel.117"), //$NON-NLS-1$
+							JOptionPane.ERROR_MESSAGE
+						);
+						return;
+					}
 				}
+				else {
+					final String configFilePath;
+					try {
+						configFilePath = AOUIFactory.getLoadFiles(
+							SimpleAfirmaMessages.getString("PreferencesPanel.86"), //$NON-NLS-1$
+							null,
+							null,
+							new String[] { "afconfig" }, //$NON-NLS-1$
+							SimpleAfirmaMessages.getString("PreferencesPanel.111"), //$NON-NLS-1$
+							false,
+							false,
+							AutoFirmaUtil.getDefaultDialogsIcon(),
+							PreferencesPanelGeneral.this
+						)[0].getAbsolutePath();
+					}
+					catch(final AOCancelledOperationException ex) {
+						// Operacion cancelada por el usuario
+						return;
+					}
+					PreferencesPlistHandler.importPreferences(configFilePath, getParent(), isUnprotected());
+				}
+				AOUIFactory.showMessageDialog(
+						getParent(),
+						SimpleAfirmaMessages.getString("PreferencesPanel.142"), //$NON-NLS-1$
+						SimpleAfirmaMessages.getString("PreferencesPanel.143"), //$NON-NLS-1$
+						JOptionPane.INFORMATION_MESSAGE
+					);
+				getDisposableInterface().disposeInterface();
 			}
 		);
 		importConfigFromFileButton.getAccessibleContext().setAccessibleDescription(
 			SimpleAfirmaMessages.getString("PreferencesPanel.112") //$NON-NLS-1$
 		);
-		
+
 		//importConfigFromFileButton.setEnabled(unprotected);
 
 		final JButton restoreConfigFromFileButton = new JButton(
@@ -295,22 +290,19 @@ final class PreferencesPanelGeneral extends JPanel {
 		);
 
 		restoreConfigFromFileButton.setMnemonic('R');
-		restoreConfigFromFileButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(final ActionEvent ae) {
-				if (AOUIFactory.showConfirmDialog(getParent(), SimpleAfirmaMessages.getString("PreferencesPanel.140"), //$NON-NLS-1$
-						SimpleAfirmaMessages.getString("PreferencesPanel.139"), //$NON-NLS-1$
-						JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) {
+		restoreConfigFromFileButton.addActionListener(ae -> {
+			if (AOUIFactory.showConfirmDialog(getParent(), SimpleAfirmaMessages.getString("PreferencesPanel.140"), //$NON-NLS-1$
+					SimpleAfirmaMessages.getString("PreferencesPanel.139"), //$NON-NLS-1$
+					JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) {
 
-					loadDefaultPreferences();
+				loadDefaultPreferences();
 
-				}
 			}
 		});
 		restoreConfigFromFileButton.getAccessibleContext().setAccessibleDescription(
 			SimpleAfirmaMessages.getString("PreferencesPanel.136") //$NON-NLS-1$
 		);
-		
+
 		//restoreConfigFromFileButton.setEnabled(unprotected);
 
 		final JPanel panel = new JPanel();
@@ -319,7 +311,6 @@ final class PreferencesPanelGeneral extends JPanel {
 		panel.add(importConfigFromFileButton);
 		panel.add(restoreConfigFromFileButton);
 
-		// TODO: Descomentar una vez se entregue
 		signConfigPanel.add(panel, signConstraint);
 
 		signConstraint.insets = new Insets(5, 7, 3, 7);
@@ -429,17 +420,12 @@ final class PreferencesPanelGeneral extends JPanel {
 
 		proxyConfigButton.setMnemonic('P');
 		proxyConfigButton.addActionListener(
-			new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent ae) {
-					changeProxyDlg(getParent());
-				}
-			}
+			ae -> changeProxyDlg(getParent())
 		);
 		proxyConfigButton.getAccessibleContext().setAccessibleDescription(
 			SimpleAfirmaMessages.getString("PreferencesPanel.127") //$NON-NLS-1$
 		);
-		
+
 		proxyConfigButton.setEnabled(!isUnprotected());
 
 		final JLabel proxyLabel = new JLabel(SimpleAfirmaMessages.getString("PreferencesPanel.128")); //$NON-NLS-1$
@@ -505,7 +491,7 @@ final class PreferencesPanelGeneral extends JPanel {
 		this.ooxmlFilesCombo.addItemListener(modificationListener);
 		this.ooxmlFilesCombo.addKeyListener(keyListener);
 		this.ooxmlFilesCombo.setEnabled(!isUnprotected());
-		
+
 		c.gridx = 0;
 		c.weightx = 0;
 		signatureDefaultsFormats.add(ooxmlFilesLabel, c);
@@ -520,7 +506,7 @@ final class PreferencesPanelGeneral extends JPanel {
 		this.facturaeFilesCombo.addItemListener(modificationListener);
 		this.facturaeFilesCombo.addKeyListener(keyListener);
 		this.facturaeFilesCombo.setEnabled(!isUnprotected());
-		
+
 		c.gridx = 0;
 		c.weightx = 0;
 		signatureDefaultsFormats.add(facturaeFilesLabel, c);
@@ -535,7 +521,7 @@ final class PreferencesPanelGeneral extends JPanel {
 		this.xmlFilesCombo.addItemListener(modificationListener);
 		this.xmlFilesCombo.addKeyListener(keyListener);
 		this.xmlFilesCombo.setEnabled(!isUnprotected());
-		
+
 		c.gridx = 0;
 		c.weightx = 0;
 		signatureDefaultsFormats.add(xmlFilesLabel, c);
@@ -550,7 +536,7 @@ final class PreferencesPanelGeneral extends JPanel {
 		this.odfFilesCombo.addItemListener(modificationListener);
 		this.odfFilesCombo.addKeyListener(keyListener);
 		this.odfFilesCombo.setEnabled(!isUnprotected());
-		
+
 		c.gridx = 0;
 		c.weightx = 0;
 		signatureDefaultsFormats.add(odfFilesLabel, c);
@@ -565,7 +551,7 @@ final class PreferencesPanelGeneral extends JPanel {
 		this.binFilesCombo.addItemListener(modificationListener);
 		this.binFilesCombo.addKeyListener(keyListener);
 		this.binFilesCombo.setEnabled(!isUnprotected());
-		
+
 		c.gridx = 0;
 		c.weightx = 0;
 		signatureDefaultsFormats.add(binFilesLabel, c);
@@ -636,7 +622,7 @@ final class PreferencesPanelGeneral extends JPanel {
 			);
     	}
     }
-    
+
     /**
 	 * M&eacute;todo getter del atributo unprotected
 	 * @return the unprotected
@@ -649,7 +635,7 @@ final class PreferencesPanelGeneral extends JPanel {
 	 * M&eacute;todo setter del atributo unprotected
 	 * @param unprotected the unprotected to set
 	 */
-	public void setUnprotected(boolean unprotected) {
+	public void setUnprotected(final boolean unprotected) {
 		this.unprotected = unprotected;
 	}
 }
