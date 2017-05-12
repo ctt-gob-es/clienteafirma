@@ -11,7 +11,6 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import java.util.List;
@@ -42,7 +41,7 @@ final class PreferencesPanelKeyStores extends JPanel {
 	private final JCheckBox onlySignature = new JCheckBox(SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.0")); //$NON-NLS-1$
 
 	private final JCheckBox onlyAlias = new JCheckBox(SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.4")); //$NON-NLS-1$
-	
+
 	/**
 	 * Atributo que permite gestionar el bloqueo de preferencias.
 	 */
@@ -150,17 +149,14 @@ final class PreferencesPanelKeyStores extends JPanel {
 		ksc.insets = new Insets(5, 7, 5, 7);
 
 		this.defaultStore.addItemListener(
-			new ItemListener() {
-				@Override
-				public void itemStateChanged(final ItemEvent e) {
-					if (e.getStateChange() == ItemEvent.SELECTED) {
-						SwingUtilities.invokeLater(() -> AOUIFactory.showMessageDialog(
-							PreferencesPanelKeyStores.this,
-							SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.16"), //$NON-NLS-1$
-							SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.17"), //$NON-NLS-1$
-							JOptionPane.WARNING_MESSAGE
-						));
-					}
+			e -> {
+				if (e.getStateChange() == ItemEvent.SELECTED) {
+					SwingUtilities.invokeLater(() -> AOUIFactory.showMessageDialog(
+						PreferencesPanelKeyStores.this,
+						SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.16"), //$NON-NLS-1$
+						SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.17"), //$NON-NLS-1$
+						JOptionPane.WARNING_MESSAGE
+					));
 				}
 			}
 		);
@@ -168,7 +164,6 @@ final class PreferencesPanelKeyStores extends JPanel {
 		this.defaultStore.addItemListener(modificationListener);
 		this.defaultStore.addKeyListener(keyListener);
 
-		//TODO: Descomentar una vez se entregue
 		keysStorePanel.add(this.defaultStore, ksc);
 
 		this.contentButton.setMnemonic('V');
@@ -226,7 +221,6 @@ final class PreferencesPanelKeyStores extends JPanel {
 		);
 		this.contentButton.addKeyListener(keyListener);
 
-		//TODO: Descomentar una vez se entregue
 		keysStorePanel.add(this.contentButton, ksc);
 
 		ksc.weightx = 1.0;
@@ -235,7 +229,6 @@ final class PreferencesPanelKeyStores extends JPanel {
 	    add(keysFilerPanel, c);
 	    c.gridy++;
 
-	  //TODO: Descomentar una vez se entregue
 	    add(keysStorePanel, c);
 
 	    c.weighty = 1.0;
