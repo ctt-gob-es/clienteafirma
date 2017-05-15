@@ -183,11 +183,14 @@ final class PolicyPanel extends JPanel implements ItemListener {
 	 * @param showFields Indica si han de mostrarse o no los campos con los datos de la
 	 *                   pol&iacute;tica. */
 	private void createUI(final String signFormat, final boolean showFields, final boolean unprotected) {
-		setBorder(
-			BorderFactory.createTitledBorder(
-				SimpleAfirmaMessages.getString("PreferencesPanel.23") //$NON-NLS-1$
-			)
-		);
+		
+		if (AOSignConstants.SIGN_FORMAT_FACTURAE.equals(this.signatureFormat)) {
+			setBorder(BorderFactory.createTitledBorder(SimpleAfirmaMessages.getString("PreferencesPanel.23") //$NON-NLS-1$
+			));
+		} else {
+			setBorder(BorderFactory.createEmptyBorder());
+		}
+		
 		setLayout(new GridBagLayout());
 
 		final GridBagConstraints c = new GridBagConstraints();
@@ -202,6 +205,15 @@ final class PolicyPanel extends JPanel implements ItemListener {
 				this.policies.toArray(new PolicyItem[this.policies.size()])
 			)
 		);
+				
+		final JLabel policyComboLabel = new JLabel(SimpleAfirmaMessages.getString("PreferencesPanel.23")); //$NON-NLS-1$
+		policyComboLabel.setLabelFor(this.policiesCombo);
+		c.gridy++;
+		add(policyComboLabel, c);
+		c.gridy++;
+		add(this.policiesCombo, c);	
+		
+		policyComboLabel.setLabelFor(this.policiesCombo);
 
 		add(this.policiesCombo, c);
 		this.policiesCombo.getAccessibleContext().setAccessibleDescription(
@@ -538,6 +550,18 @@ final class PolicyPanel extends JPanel implements ItemListener {
 		
 		return ((PolicyItem)this.policiesCombo.getSelectedItem()).getName();
 		
+	}
+	
+	/**
+	 * Recupera los valores del panel guardados en las preferencias del sistema
+	 */
+	public void setPreferredPolicy(final String identifierField, final String hashField, final String hashAlgorithmField, final String qualifierField) {
+		
+		this.policiesCombo.setSelectedIndex(0);
+		this.identifierField.setText(identifierField);
+		this.hashField.setText(hashField);
+		this.hashAlgorithmField.setSelectedItem(hashAlgorithmField);
+		this.qualifierField.setText(qualifierField);
 	}
 	
 }
