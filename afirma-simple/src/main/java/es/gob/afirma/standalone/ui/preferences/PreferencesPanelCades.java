@@ -34,14 +34,6 @@ import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.ui.preferences.PolicyPanel.PolicyItem;
 
-/**
- * @author jose.rodriguez.gomez
- *
- */
-/**
- * @author jose.rodriguez.gomez
- *
- */
 final class PreferencesPanelCades extends JPanel {
 	
 	static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
