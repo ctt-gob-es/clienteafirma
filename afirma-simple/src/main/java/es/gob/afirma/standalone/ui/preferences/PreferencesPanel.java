@@ -132,8 +132,7 @@ final class PreferencesPanel extends JPanel implements KeyListener, DisposableIn
 		c.gridy++;
 		c.weighty = 0.0;
 		c.ipady = 11;
-		
-		c.gridy++;
+				
 		add(createButtonsPanel(), c);
 	}
     
