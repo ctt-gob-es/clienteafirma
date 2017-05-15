@@ -137,11 +137,6 @@ final class PreferencesPanel extends JPanel implements KeyListener, DisposableIn
 		add(createButtonsPanel(), c);
 	}
     
-    void loadDefaultPreferences() {
-		// TODO Auto-generated method stub
-		
-	}
-
 	boolean savePreferences() {
 
 		if (!checkPreferences()) {
