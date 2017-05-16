@@ -251,31 +251,22 @@ public final class ServiceInvocationManager {
 	 */
 	private static File getKeyStoreFile() {
 
-		final File appDir = AutoFirmaUtil.getApplicationDirectory();
+		File appDir = AutoFirmaUtil.getApplicationDirectory();
 		if (appDir != null && new File(appDir, KEYSTORE_NAME).exists()) {
 			return new File(appDir, KEYSTORE_NAME);
 		}
 
 		if (Platform.getOS() == Platform.OS.WINDOWS) {
-			final String subPath = "AutoFirma" + File.separator + "AutoFirma"; //$NON-NLS-1$ //$NON-NLS-2$
-			String basePath = System.getenv("PROGRAMFILES"); //$NON-NLS-1$
-
-			if (basePath != null) {
-				if (new File(new File(basePath, subPath), KEYSTORE_NAME).exists()) {
-					return new File(new File(basePath, subPath), KEYSTORE_NAME);
-				}
-				basePath = basePath.endsWith(" (x86)") ? //$NON-NLS-1$
-						basePath.substring(0,  basePath.lastIndexOf(" (x86)")) : //$NON-NLS-1$
-							basePath + " (x86)"; //$NON-NLS-1$
-				if (new File(new File(basePath, subPath), KEYSTORE_NAME).exists()) {
-					return new File(new File(basePath, subPath), KEYSTORE_NAME);
-				}
+			appDir = AutoFirmaUtil.getWindowsAlternativeAppDir();
+			if (appDir != null && new File(appDir, KEYSTORE_NAME).exists()) {
+				return new File(appDir, KEYSTORE_NAME);
 			}
+
 		}
 		else if (Platform.getOS() == Platform.OS.MACOSX) {
-			final File baseDir = new File("/Applications/AutoFirma.app/Contents/Resources/JAR"); //$NON-NLS-1$
-			if (new File(baseDir, KEYSTORE_NAME).exists()) {
-				return new File(baseDir, KEYSTORE_NAME);
+			appDir = new File("/Applications/AutoFirma.app/Contents/Resources/JAR"); //$NON-NLS-1$
+			if (new File(appDir, KEYSTORE_NAME).exists()) {
+				return new File(appDir, KEYSTORE_NAME);
 			}
 		}
 
