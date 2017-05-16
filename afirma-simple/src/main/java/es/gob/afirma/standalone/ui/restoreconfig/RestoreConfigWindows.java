@@ -66,10 +66,19 @@ final class RestoreConfigWindows implements RestoreConfig {
 		LOGGER.info("Ruta de appDir: " + appDir.getAbsolutePath()); //$NON-NLS-1$
 		appendMessage(textArea, SimpleAfirmaMessages.getString("RestoreConfigWindows.3", appDir.getAbsolutePath())); //$NON-NLS-1$
 
+		// Verifica si se tiene permisos para escribir en el directorio de instalacion
+		File workingDirectory;
+		if(Files.isWritable(appDir.toPath())) {
+			workingDirectory = appDir;
+		} else {
+			workingDirectory = AutoFirmaUtil.getWindowsAlternativeAppDir();
+		}
+
+		LOGGER.info("Ruta de trabajo:  " + workingDirectory.getAbsolutePath()); //$NON-NLS-1$
 		// Regeneramos los certificados que sean necesario (raiz y ssl) y los guardamos en disco
 		CertificateFile sslRoot;
 		try {
-			sslRoot = rebuildCertificates(textArea, appDir);
+			sslRoot = rebuildCertificates(textArea, workingDirectory);
 		}
 		catch (final Exception e) {
 			LOGGER.severe("No se han podido regenerar los certificados necesarios. No se instalaran en los almacenes de confianza: " + e); //$NON-NLS-1$
@@ -86,13 +95,13 @@ final class RestoreConfigWindows implements RestoreConfig {
 		// Instalacion del certificado raiz en Firefox
 		if (sslRoot != null) {
 			appendMessage(textArea, SimpleAfirmaMessages.getString("RestoreConfigWindows.13")); //$NON-NLS-1$
-			installRootCAMozillaKeystore(textArea, sslRoot, appDir);
+			installRootCAMozillaKeystore(textArea, sslRoot, workingDirectory);
 		}
 
 		// Registramos el protocolo afirma
 		appendMessage(textArea, SimpleAfirmaMessages.getString("RestoreConfigWindows.24")); //$NON-NLS-1$
 		try {
-			restoreProtocolRegistry(appDir);
+			restoreProtocolRegistry(appDir.getAbsoluteFile(), workingDirectory.getAbsoluteFile());
 		}
 		catch (final Exception e) {
 			appendMessage(textArea, SimpleAfirmaMessages.getString("RestoreConfigWindows.25")); //$NON-NLS-1$
@@ -304,7 +313,7 @@ final class RestoreConfigWindows implements RestoreConfig {
 			RestoreConfigFirefox.removeConfigurationFiles(installDir);
 
 		} catch (final IOException e) {
-			appendMessage(textArea, SimpleAfirmaMessages.getString("RestoreConfigWindows.3")); //$NON-NLS-1$
+			appendMessage(textArea, SimpleAfirmaMessages.getString("RestoreConfigWindows.3", installDir.getAbsolutePath())); //$NON-NLS-1$
 
 		} catch (final MozillaProfileNotFoundException e) {
 			appendMessage(textArea, SimpleAfirmaMessages.getString("RestoreConfigWindows.12")); //$NON-NLS-1$
@@ -314,11 +323,13 @@ final class RestoreConfigWindows implements RestoreConfig {
 	/**
 	 * Restaura los valores del protocolo afirma en el registro de Windows.
 	 * Se sobreescriben las distintas subkeys con los valores adecuados.
-	 * @param workingDir Directorio de trabajo en el que copiar los ficheros que sean necesarios.
+	 * @param installDir Directorio de instalaci&oacute;n en el que copiar los ficheros que sean necesarios.
+	 * @param workingDir Directorio de trabajo dependiendo si se tienen permisos de escritura sobre
+	 * el directorio de instalaci&oacute;n.
 	 * @throws GeneralSecurityException Cuando no se puede actualizar la entrada del protocolo
 	 * "afirma" en el registro.
 	 */
-	private static void restoreProtocolRegistry(final File workingDir) throws GeneralSecurityException {
+	private static void restoreProtocolRegistry(final File installDir, final File workingDir) throws GeneralSecurityException {
 
 		try {
 			// Crear la key "afirma" si no existe
@@ -334,14 +345,14 @@ final class RestoreConfigWindows implements RestoreConfig {
 				Advapi32Util.registryCreateKey(WinReg.HKEY_CLASSES_ROOT, "afirma\\DefaultIcon"); //$NON-NLS-1$
 			}
 			// Sobreescribir los valores correctos
-			Advapi32Util.registrySetStringValue(WinReg.HKEY_CLASSES_ROOT, "afirma\\DefaultIcon", "", appDir + "\\ic_firmar.ico"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			Advapi32Util.registrySetStringValue(WinReg.HKEY_CLASSES_ROOT, "afirma\\DefaultIcon", "", installDir + "\\ic_firmar.ico"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
 			// Crear la key "afirma\\shell\\open\\command" si no existe
 			if (!Advapi32Util.registryKeyExists(WinReg.HKEY_CLASSES_ROOT, "afirma\\shell\\open\\command")) { //$NON-NLS-1$
 				Advapi32Util.registryCreateKey(WinReg.HKEY_CLASSES_ROOT, "afirma\\shell\\open\\command"); //$NON-NLS-1$
 			}
 			// Sobreescribir los valores correctos
-			Advapi32Util.registrySetStringValue(WinReg.HKEY_CLASSES_ROOT, "afirma\\shell\\open\\command", "", appDir + "\\AutoFirma.exe %1"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			Advapi32Util.registrySetStringValue(WinReg.HKEY_CLASSES_ROOT, "afirma\\shell\\open\\command", "", installDir + "\\AutoFirma.exe %1"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
 		} catch (final Exception e) {
 
@@ -349,9 +360,10 @@ final class RestoreConfigWindows implements RestoreConfig {
 
 			// No se pudo actualizar el registro con los permisos del usuario,
 			// se usara la biblioteca nativa
-			final int result = restoreProtocolRegistryByApp(workingDir.getAbsolutePath());
-
-			throw new GeneralSecurityException("No se pudo registrar el protocolo afirma. Codigo de error: " + result); //$NON-NLS-1$
+			final int result = restoreProtocolRegistryByApp(installDir, workingDir.getAbsolutePath());
+			if (result != 0) {
+				throw new GeneralSecurityException("No se pudo registrar el protocolo afirma. Codigo de error: " + result); //$NON-NLS-1$
+			}
 		}
 
 		LOGGER.info("Configurado afirma en registro Windows"); //$NON-NLS-1$
@@ -407,14 +419,13 @@ final class RestoreConfigWindows implements RestoreConfig {
 					throw new IOException("No se ha podido guardar en disco los certificados SSL. Error al crear el directorio alternativo"); //$NON-NLS-1$
 				}
 				try {
-					RestoreConfigUtil.installFile(sslRoot.getCert().getEncoded(), alternativeDir);
-					RestoreConfigUtil.installFile(certPack.getPkcs12(), new File(alternativeDir, SSL_KEYSTORE_FILENAME));
-					RestoreConfigUtil.installFile(certPack.getCaCertificate().getEncoded(), sslRoot.getFile());
 					sslRootFile = new File(alternativeDir, CA_CERTIFICATE_FILENAME);
+					RestoreConfigUtil.installFile(certPack.getPkcs12(), new File(alternativeDir, SSL_KEYSTORE_FILENAME));
+					RestoreConfigUtil.installFile(certPack.getCaCertificate().getEncoded(), sslRootFile);
 				}
 				catch (final Exception ex) {
-					LOGGER.severe("No se ha podido guardar en disco los certificados SSL: " + e); //$NON-NLS-1$
-					throw new IOException("Error guardando en disco los certificados SSL", e); //$NON-NLS-1$
+					LOGGER.severe("No se ha podido guardar en el directorio alternativo los certificados SSL: " + e); //$NON-NLS-1$
+					throw new IOException("Error guardando en el directorio alternativo los certificados SSL", e); //$NON-NLS-1$
 				}
 			}
 			sslRoot.setFile(sslRootFile);
@@ -492,13 +503,14 @@ final class RestoreConfigWindows implements RestoreConfig {
 	 * Restaura la configuraci&oacute;n del protocolo "afirma" para que se invoque a la
 	 * aplicaci&oacute;n. Lo hace a trav&eacute;s de una aplicaci&oacute;n externa preparada
 	 * para tal fin.
+	 * @param installDir Directorio de instalaci&oacute;n donde se puedan crear los ficheros
 	 * @param workingDir Directorio de trabajo donde se puedan crear los ficheros
 	 * necesarios para ejecutar la operaci&oacute;n.
 	 * @return El valor cero en caso de &eacute;xito, -1 si no se proporciona un par&aacute;metro
 	 * o cualquier otro c&oacute;digo de error del sistema.
 	 * @see <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms681382(v=vs.85).aspx)">https://msdn.microsoft.com/en-us/library/windows/desktop/ms681382(v=vs.85).aspx)</a>
 	 */
-	private static int restoreProtocolRegistryByApp(String workingDir) {
+	private static int restoreProtocolRegistryByApp(final File installDir, final String workingDir) {
 
 		// Copiamos al directorio de instalacion la aplicacion para restaurar el protocolo
 		final File exeFile = new File(workingDir, RESTORE_PROTOCOL_EXE);
@@ -520,7 +532,7 @@ final class RestoreConfigWindows implements RestoreConfig {
 			String batchScript = new String(AOUtil.getDataFromInputStream(is));
 			batchScript = batchScript
 					.replace(REPLACE_PATH_EXE, exeFile.getAbsolutePath().replace("\\", "\\\\")) //$NON-NLS-1$ //$NON-NLS-2$
-					.replace(REPLACE_INSTALL_DIR, appDir.getAbsolutePath().replace("\\", "\\\\")); //$NON-NLS-1$ //$NON-NLS-2$
+					.replace(REPLACE_INSTALL_DIR, installDir.getAbsolutePath().replace("\\", "\\\\")); //$NON-NLS-1$ //$NON-NLS-2$
 			os.write(batchScript.getBytes());
 			os.flush();
 		}
@@ -580,7 +592,7 @@ final class RestoreConfigWindows implements RestoreConfig {
 		private final Certificate cert;
 		private File file;
 
-		public CertificateFile(Certificate cert) {
+		public CertificateFile(final Certificate cert) {
 			this.cert = cert;
 		}
 
@@ -588,7 +600,7 @@ final class RestoreConfigWindows implements RestoreConfig {
 			return this.file;
 		}
 
-		public void setFile(File file) {
+		public void setFile(final File file) {
 			this.file = file;
 		}
 
