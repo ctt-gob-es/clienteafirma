@@ -5,9 +5,9 @@
     @goto :EOF
 )
 echo.Performing admin tasks...
-call "$$PATH_EXE$$" "$$INSTALL_DIR$$"
+call "$$PATH_EXE$$" "\"$$INSTALL_DIR$$\""
 @goto :EOF
 @end @ELSE
 ShA=new ActiveXObject("Shell.Application")
-ShA.ShellExecute("$$PATH_EXE$$","$$INSTALL_DIR$$","","runas",5);
+ShA.ShellExecute("$$PATH_EXE$$","\"$$INSTALL_DIR$$\"","","runas",5);
 @end
