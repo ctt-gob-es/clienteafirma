@@ -27,7 +27,6 @@ import java.util.logging.Logger;
 import javax.script.ScriptEngine;
 import javax.script.ScriptException;
 import javax.swing.JOptionPane;
-import javax.swing.JTextArea;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.Transformer;
@@ -88,51 +87,41 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 
 	private static File sslCerFile;
 
-	/**
-     * Caracter de salto de l&iacute;nea para los mensajes de la consola de restauraci&oacute;n
-     */
-	private static String newline  = System.getProperty("line.separator"); //$NON-NLS-1$
-
-	/* (non-Javadoc)
-	 * @see es.gob.afirma.standalone.ui.restoreconfig.RestoreConfig#restore(javax.swing.JTextArea)
-	 */
 	@Override
-	public void restore(final JTextArea taskOutput) throws IOException, GeneralSecurityException {
+	public void restore(RestoreConfigPanel configPanel) throws IOException, GeneralSecurityException {
 
 		userDirs = getSystemUsersHomes();
 
-		appendMessage(taskOutput, SimpleAfirmaMessages.getString("RestoreConfigMacOSX.2")); //$NON-NLS-1$
-
 		final File appDir = RestoreConfigUtil.getApplicationDirectory();
 
-		appendMessage(taskOutput, SimpleAfirmaMessages.getString("RestoreConfigMacOSX.3") + appDir.getAbsolutePath()); //$NON-NLS-1$
+		configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigMacOSX.3", appDir.getAbsolutePath())); //$NON-NLS-1$
 
 		// Generamos un fichero que utilizaremos para guardar y ejecutar
 		// AppleScripts
 		try {
 			mac_script_path = File.createTempFile(MAC_SCRIPT_NAME, MAC_SCRIPT_EXT).getAbsolutePath();
 		} catch (final Exception e) {
-			appendMessage(taskOutput, SimpleAfirmaMessages.getString("RestoreConfigMacOSX.15")); //$NON-NLS-1$
+			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigMacOSX.15")); //$NON-NLS-1$
 			LOGGER.severe("Error creando script temporal: " + e); //$NON-NLS-1$
 			throw new IOException("Error creando script temporal", e); //$NON-NLS-1$
 		}
 
 		if (!checkSSLKeyStoreGenerated(appDir) || !checkSSLRootCertificateGenerated(appDir)) {
-			configureSSL(appDir, taskOutput);
+			configureSSL(appDir, configPanel);
 		}
 		else {
 			LOGGER.info("Los certificados SSL existen y no se crearan ni instalaran" ); //$NON-NLS-1$
-			appendMessage(taskOutput, SimpleAfirmaMessages.getString("RestoreConfigMacOSX.14")); //$NON-NLS-1$
+			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigMacOSX.14")); //$NON-NLS-1$
 		}
 
-		installRootCA(appDir, taskOutput);
+		installRootCA(appDir, configPanel);
 
 		closeChrome();
 
-		appendMessage(taskOutput, SimpleAfirmaMessages.getString("RestoreConfigMacOSX.16")); //$NON-NLS-1$
+		configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigMacOSX.16")); //$NON-NLS-1$
 		RestoreRemoveChromeWarning.removeChromeWarningsMac(appDir, userDirs);
 
-		appendMessage(taskOutput, SimpleAfirmaMessages.getString("RestoreConfigMacOSX.8")); //$NON-NLS-1$
+		configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigMacOSX.8")); //$NON-NLS-1$
 		LOGGER.info("Finalizado" ); //$NON-NLS-1$
 
 	}
@@ -210,12 +199,13 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 	/**
 	 * Genera e instala los certificados SSL para la comunicaci&oacute;n con la aplicaci&oacute;n.
 	 * @param appDir Directorio de instalaci&oacute;n de la aplicaci&oacute;n.
+	 * @param configPanel Panel de configuraci&oacute;n con las trazas de ejecuci&oacute;n.
 	 * @throws IOException Cuando ocurre un error en el proceso de instalaci&oacute;n.
 	 * @throws GeneralSecurityException Cuando ocurre un error al generar el certificado SSL.
 	 */
-	private static void configureSSL(final File appDir, final JTextArea taskOutput) throws IOException, GeneralSecurityException {
+	private static void configureSSL(final File appDir, final RestoreConfigPanel configPanel) throws IOException, GeneralSecurityException {
 
-		appendMessage(taskOutput, SimpleAfirmaMessages.getString("RestoreConfigMacOSX.5")); //$NON-NLS-1$
+		configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigMacOSX.5")); //$NON-NLS-1$
 
 
 		// Damos permisos al script
@@ -301,12 +291,12 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 	}
 
 	/**
-	 * Instala los certificados de comunicaci&oacute;n en el almac&eacute;n de Mozilla y Apple
-	 * @param appDir Directorio de instalaci&oacute;n de la aplicaci&oacute;n
-	 * @param taskOutput Objeto que representa el &aacute;rea de texto de la consola
-	 * @throws IOException Si ocurre alg&uacute;n problema durante el proceso
+	 * Instala los certificados de comunicaci&oacute;n en el almac&eacute;n de Mozilla y Apple.
+	 * @param appDir Directorio de instalaci&oacute;n de la aplicaci&oacute;n.
+	 * @param configPanel Panel de configuraci&oacute;n con las trazas de ejecuci&oacute;n.
+	 * @throws IOException Si ocurre alg&uacute;n problema durante el proceso.
 	 */
-	private static void installRootCA(final File appDir, final JTextArea taskOutput) throws IOException {
+	private static void installRootCA(final File appDir, final RestoreConfigPanel configPanel) throws IOException {
 
 		// Cerramos el almacen de firefox si esta abierto
 		closeFirefox();
@@ -335,7 +325,7 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 		// Se instalan los certificados en el almacen de Mozilla
 		try {
 
-			appendMessage(taskOutput, SimpleAfirmaMessages.getString("RestoreConfigMacOSX.13")); //$NON-NLS-1$
+			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigMacOSX.13")); //$NON-NLS-1$
 
 			// Instalar el certificado en Mozilla
 			RestoreConfigFirefox.installRootCAMozillaKeyStore(
@@ -348,14 +338,14 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 			MozillaKeyStoreUtilitiesOsX.configureMacNSS(MozillaKeyStoreUtilities.getSystemNSSLibDir());
 		}
 		catch (final MozillaProfileNotFoundException e) {
-			appendMessage(taskOutput, SimpleAfirmaMessages.getString("RestoreConfigMacOSX.12")); //$NON-NLS-1$
+			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigMacOSX.12")); //$NON-NLS-1$
 		}
 		catch (final AOException e1) {
 			LOGGER.info("La configuracion de NSS para Mac OS X ha fallado: " + e1); //$NON-NLS-1$
 		}
 
 		// Se instalan los certificados en el almacen de Apple
-		appendMessage(taskOutput, SimpleAfirmaMessages.getString("RestoreConfigMacOSX.6")); //$NON-NLS-1$
+		configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigMacOSX.6")); //$NON-NLS-1$
 		try {
 			createScriptToImportCARootOnMacOSXKeyStore(appDir);
 			addExexPermissionsToFile(new File(mac_script_path));
@@ -702,15 +692,6 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 		}
 	}
 
-	/**
-	 * Concatena un texto a una nueva l&iacute;nea al par&aacute;metro JTextArea
-	 * @param taskOutput JTextArea donde el texto es concatenado
-	 * @param message Texto a concatenar.
-	 */
-	private static void appendMessage(final JTextArea taskOutput, final String message) {
-		taskOutput.append(message + newline);
-		taskOutput.setCaretPosition(taskOutput.getDocument().getLength());
-	}
 	/**
 	 * Pide al usuario que cierre el navegador Mozilla Firefox y no permite continuar hasta que lo hace.
 	 */

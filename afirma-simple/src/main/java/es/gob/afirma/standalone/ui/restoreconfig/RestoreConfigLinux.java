@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import javax.swing.JOptionPane;
-import javax.swing.JTextArea;
 
 import es.gob.afirma.core.misc.BoundedBufferedReader;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
@@ -22,7 +21,6 @@ import es.gob.afirma.standalone.ui.restoreconfig.RestoreConfigFirefox.MozillaPro
 /**
  * Clase que contiene la l&oacute;gica para realizar las tareas de restauraci&oacute;n
  * de la configuraci&oacute;n de navegadores para el sistema operativo Linux.
- *
  */
 final class RestoreConfigLinux implements RestoreConfig {
 
@@ -40,20 +38,15 @@ final class RestoreConfigLinux implements RestoreConfig {
      */
     private static String newline = System.getProperty("line.separator"); //$NON-NLS-1$
 
-	/* (non-Javadoc)
-	 * @see es.gob.afirma.standalone.ui.restoreconfig.RestoreConfig#restore(javax.swing.JTextArea)
-	 */
 	@Override
-	public void restore(final JTextArea taskOutput) throws IOException, GeneralSecurityException {
-
-		appendMessage(taskOutput, SimpleAfirmaMessages.getString("RestoreConfigLinux.2")); //$NON-NLS-1$
+	public void restore(RestoreConfigPanel configPanel) throws IOException, GeneralSecurityException {
 
 		final File appDir = RestoreConfigUtil.getApplicationDirectory();
 
-		appendMessage(taskOutput, SimpleAfirmaMessages.getString("RestoreConfigLinux.3") + appDir.getAbsolutePath()); //$NON-NLS-1$
+		configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigLinux.3", appDir.getAbsolutePath())); //$NON-NLS-1$
 
 		if (!checkSSLKeyStoreGenerated(appDir) || !checkSSLRootCertificateGenerated(appDir)) {
-			appendMessage(taskOutput, SimpleAfirmaMessages.getString("RestoreConfigLinux.5")); //$NON-NLS-1$
+			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigLinux.5")); //$NON-NLS-1$
 
 			// Si al menos nos falta uno de los certificados, elimino ambos para
 			// volver a generarlos
@@ -61,7 +54,7 @@ final class RestoreConfigLinux implements RestoreConfig {
 
 			final CertPack certPack = CertUtil.getCertPackForLocalhostSsl(RestoreConfigUtil.CERT_ALIAS, KS_PASSWORD);
 
-			appendMessage(taskOutput, SimpleAfirmaMessages.getString("RestoreConfigLinux.11")); //$NON-NLS-1$
+			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigLinux.11")); //$NON-NLS-1$
 
 			// Generacion del certificado pfx
 			RestoreConfigUtil.installFile(certPack.getPkcs12(),
@@ -72,7 +65,7 @@ final class RestoreConfigLinux implements RestoreConfig {
 					new File(RestoreConfigUtil.getApplicationDirectory(), FILE_AUTOFIRMA_CERTIFICATE));
 
 		} else {
-			appendMessage(taskOutput, SimpleAfirmaMessages.getString("RestoreConfigLinux.14")); //$NON-NLS-1$
+			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigLinux.14")); //$NON-NLS-1$
 		}
 
 		// comando para sacar los usuarios del sistema
@@ -90,7 +83,7 @@ final class RestoreConfigLinux implements RestoreConfig {
 			RestoreRemoveChromeWarning.removeChromeWarningsLinux(appDir, usersDir);
 
 			LOGGER.info("Se va a instalar el certificado CA raiz en Mozilla y Google Chrome"); //$NON-NLS-1$
-			appendMessage(taskOutput, SimpleAfirmaMessages.getString("RestoreConfigLinux.13")); //$NON-NLS-1$
+			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigLinux.13")); //$NON-NLS-1$
 
 			RestoreConfigFirefox.uninstallRootCAMozillaKeyStore(appDir);
 			RestoreConfigFirefox.installRootCAChromeKeyStore(appDir, command);
@@ -100,23 +93,23 @@ final class RestoreConfigLinux implements RestoreConfig {
 
 			RestoreConfigFirefox.installRootCAMozillaKeyStore(appDir, null, command);
 		} catch (final MozillaProfileNotFoundException e) {
-			appendMessage(taskOutput, SimpleAfirmaMessages.getString("RestoreConfigLinux.12")); //$NON-NLS-1$
+			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigLinux.12")); //$NON-NLS-1$
 			LOGGER.warning("Error al obtener los perfiles de usuario de Mozilla Firefox: " + e.getMessage()); //$NON-NLS-1$
 		}
 
-		appendMessage(taskOutput, SimpleAfirmaMessages.getString("RestoreConfigLinux.15")); //$NON-NLS-1$
+		configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigLinux.15")); //$NON-NLS-1$
 		// Restauracion del fichero de configuracion de protocolo afirma en Linux.
 		// Es necesario tener permisos de administrador para modificar el directorio.
 		try {
 			restoreProtocolHandler();
 		} catch (final IOException e) {
-			appendMessage(taskOutput, SimpleAfirmaMessages.getString("RestoreConfigLinux.16")); //$NON-NLS-1$
+			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigLinux.16")); //$NON-NLS-1$
 			LOGGER.warning("Error en la ejecucion de comandos linux para la configuracion del protocolo afirma. Probablemente AutoFirma no tenga permisos de administrador: " + e //$NON-NLS-1$
 			);
 
 		}
 
-		appendMessage(taskOutput, SimpleAfirmaMessages.getString("RestoreConfigLinux.8")); //$NON-NLS-1$
+		configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigLinux.8")); //$NON-NLS-1$
 
 	}
 
@@ -173,16 +166,6 @@ final class RestoreConfigLinux implements RestoreConfig {
 	 * @return {@code true} si ya existe un certificado ra&iacute;z .cer, {@code false} en caso contrario. */
 	private static boolean checkSSLRootCertificateGenerated(final File appDir) {
 		return new File(appDir, FILE_AUTOFIRMA_CERTIFICATE).exists();
-	}
-
-	/**
-	 * Concatena un texto a una nueva l&iacute;nea al par&aacute;metro JTextArea
-	 * @param taskOutput JTextArea donde el texto es concatenado
-	 * @param message Texto a concatenar.
-	 */
-	private static void appendMessage(final JTextArea taskOutput, final String message) {
-		taskOutput.append(message + newline);
-		taskOutput.setCaretPosition(taskOutput.getDocument().getLength());
 	}
 
 	/**

@@ -19,6 +19,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.SwingUtilities;
 
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
@@ -36,6 +37,11 @@ public final class RestoreConfigPanel extends JPanel implements KeyListener, Dis
 	private static final long serialVersionUID = 5353477830742383848L;
 
 	static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+
+	/**
+     * Caracter de salto de l&iacute;nea para los mensajes de la consola de restauraci&oacute;n
+     */
+	static String newline  = System.getProperty("line.separator"); //$NON-NLS-1$
 
 	private final Window window;
 
@@ -137,20 +143,25 @@ public final class RestoreConfigPanel extends JPanel implements KeyListener, Dis
 			@Override
 			public void actionPerformed(final ActionEvent ae) {
 
-			 	final RestoreConfigManager restoreConfig = new RestoreConfigManager();
+				// Limpiamos el area de texto antes de comenzar con la restauracion
+				// para eliminar posibles mensajes de ejecuciones anteriores.
+				RestoreConfigPanel.this.taskOutput.setText(null);
+				// Deshabilito el boton mientras el proceso se esta ejecutando
+				restoreButton.setEnabled(false);
+				new Thread(new Runnable() {
 
-				try {
-					// Limpiamos el area de texto antes de comenzar con la restauracion
-					// para eliminar posibles mensajes de ejecuciones anteriores.
-					RestoreConfigPanel.this.taskOutput.setText(null);
-					// Deshabilito el boton mientras el proceso se esta ejecutando
-					restoreButton.setEnabled(false);
-					restoreConfig.restoreConfigAutoFirma(RestoreConfigPanel.this.taskOutput);
-					restoreButton.setEnabled(true);
+					@Override
+					public void run() {
+						try {
+							new RestoreConfigManager().restoreConfigAutoFirma(RestoreConfigPanel.this);
+						} catch (GeneralSecurityException | ConfigurationException | IOException e ) {
+							LOGGER.severe("Ha ocurrido un error al ejecutar la tarea de restauracion: " + e.getMessage()); //$NON-NLS-1$
+						}
+					}
+				}).start();
 
-				} catch (GeneralSecurityException | ConfigurationException | IOException e ) {
-					LOGGER.severe("Ha ocurrido un error al ejecutar la tarea de restauracion: " + e.getMessage()); //$NON-NLS-1$
-				}
+				restoreButton.setEnabled(true);
+
 			}
 		});
 
@@ -199,6 +210,20 @@ public final class RestoreConfigPanel extends JPanel implements KeyListener, Dis
 	public void keyTyped(final KeyEvent e) {
 		/* Vacio */ }
 
+	/**
+	 * @param message
+	 */
+	public void appendMessage(final String message) {
 
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				RestoreConfigPanel.this.taskOutput.setText(
+						RestoreConfigPanel.this.taskOutput.getText() + message + newline);
+				RestoreConfigPanel.this.taskOutput.setCaretPosition(
+						RestoreConfigPanel.this.taskOutput.getDocument().getLength());
+			}
+		});
+	}
 
 }

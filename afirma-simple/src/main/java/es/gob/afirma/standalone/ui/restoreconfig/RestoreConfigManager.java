@@ -5,7 +5,6 @@ import java.security.GeneralSecurityException;
 import java.util.logging.Logger;
 
 import javax.swing.JOptionPane;
-import javax.swing.JTextArea;
 
 import es.gob.afirma.core.misc.Platform;
 
@@ -46,11 +45,11 @@ public class RestoreConfigManager {
 	}
 
 	/** Repara la configuraci&oacute;n de navegadores para permitir la correcta ejecuci&oacute;n de AutoFirma.
-	 * @param taskOutput Cuadro de texto done se informa de las operaciones ejecutadas.
+	 * @param configPanel Panel de configuraci&oacute;n con las trazas de ejecuci&oacute;n.
 	 * @throws GeneralSecurityException Cuando se produce un error al manipular los almacenes de certificados.
 	 * @throws ConfigurationException Cuando falla la generacion del certificados SSL.
 	 * @throws IOException Cuando no es posible cargar o manipular alg&uacute;n fichero de configuraci&oacute;n o recursos. */
-	public void restoreConfigAutoFirma(final JTextArea taskOutput) throws GeneralSecurityException, ConfigurationException, IOException {
+	public void restoreConfigAutoFirma(final RestoreConfigPanel configPanel) throws GeneralSecurityException, ConfigurationException, IOException {
 
 		if (this.configurator == null) {
 			LOGGER.warning("No se realizara ninguna accion"); //$NON-NLS-1$
@@ -59,7 +58,7 @@ public class RestoreConfigManager {
 
 		// Creamos el almacen para la configuracion del SSL
 		try {
-			this.configurator.restore(taskOutput);
+			this.configurator.restore(configPanel);
 		}
 		catch (final IOException e) {
 			LOGGER.severe("Error al copiar, leer o eliminar alguno de los ficheros de configuracion. El configurador se detendra: " + e); //$NON-NLS-1$
