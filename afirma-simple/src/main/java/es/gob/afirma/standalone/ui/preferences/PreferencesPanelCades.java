@@ -35,17 +35,17 @@ import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.ui.preferences.PolicyPanel.PolicyItem;
 
 final class PreferencesPanelCades extends JPanel {
-	
+
 	static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	private static final long serialVersionUID = -2410844527428138817L;
 
 	private static final String SIGN_FORMAT_CADES = "CAdES"; //$NON-NLS-1$
-	
+
 	/**
 	 * Atributo que permite gestionar el bloqueo de preferencias.
 	 */
-	private boolean unprotected = true;
+	private boolean blocked = true;
 
 	private static final AdESPolicy POLICY_CADES_PADES_AGE_1_9 = new AdESPolicy(
 		"2.16.724.1.3.1.1.2.1.9", //$NON-NLS-1$
@@ -53,9 +53,9 @@ final class PreferencesPanelCades extends JPanel {
 		"SHA1", //$NON-NLS-1$
 		"https://sede.060.gob.es/politica_de_firma_anexo_1.pdf" //$NON-NLS-1$
 	);
-			
+
 	private PolicyPanel cadesPolicyDlg;
-	
+
 	/**
 	 * Atributo que representa la etiqueta de la pol&iacute;tica seleccionada en
 	 * el di&aacute;logo
@@ -66,9 +66,9 @@ final class PreferencesPanelCades extends JPanel {
 
 	PreferencesPanelCades(final KeyListener keyListener,
 						  final ModificationListener modificationListener,
-						  final boolean unprotected) {
+						  final boolean blocked) {
 
-		this.unprotected = unprotected;
+		this.blocked = blocked;
 		createUI(keyListener, modificationListener);
 	}
 
@@ -81,16 +81,16 @@ final class PreferencesPanelCades extends JPanel {
         c.fill = GridBagConstraints.BOTH;
         c.weightx = 1.0;
         c.gridy = 0;
-        
+
         loadPreferences();
-        
+
         loadCadesPolicy();
-    	
+
     	this.cadesPolicyDlg.setModificationListener(modificationListener);
     	this.cadesPolicyDlg.setKeyListener(keyListener);
-        
+
         ///////////// Panel Policy ////////////////
-        
+
         final JPanel policyConfigPanel = new JPanel(new FlowLayout(FlowLayout.LEADING));
 		policyConfigPanel.setBorder(
 			BorderFactory.createTitledBorder(
@@ -101,8 +101,8 @@ final class PreferencesPanelCades extends JPanel {
 		final JButton policyConfigButton = new JButton(
 			SimpleAfirmaMessages.getString("PreferencesPanel.150") //$NON-NLS-1$
 		);
-		
-		this.policyLabel = new JLabel(this.cadesPolicyDlg.getSelectedPolicy());
+
+		this.policyLabel = new JLabel(this.cadesPolicyDlg.getSelectedPolicyName());
 		this.policyLabel.setLabelFor(policyConfigButton);
 
 		policyConfigButton.setMnemonic('P');
@@ -117,16 +117,16 @@ final class PreferencesPanelCades extends JPanel {
 		policyConfigButton.getAccessibleContext().setAccessibleDescription(
 			SimpleAfirmaMessages.getString("PreferencesPanel.151") //$NON-NLS-1$
 		);
-		
-		policyConfigButton.setEnabled(!this.unprotected);
+
+		policyConfigButton.setEnabled(!this.blocked);
 		policyConfigPanel.add(this.policyLabel);
 		policyConfigPanel.add(policyConfigButton);
-        
+
         ///////////// Fin Panel Policy ////////////////
 
 		c.gridy++;
-        
-        add(policyConfigPanel, c);		
+
+        add(policyConfigPanel, c);
 
 	    final FlowLayout fLayout = new FlowLayout(FlowLayout.LEADING);
 	    final JPanel signatureMode = new JPanel(fLayout);
@@ -141,7 +141,7 @@ final class PreferencesPanelCades extends JPanel {
 	    this.cadesImplicit.setMnemonic('i');
 	    this.cadesImplicit.addItemListener(modificationListener);
 	    this.cadesImplicit.addKeyListener(keyListener);
-	    this.cadesImplicit.setEnabled(this.unprotected);
+	    this.cadesImplicit.setEnabled(this.blocked);
 	    signatureMode.add(this.cadesImplicit);
 
 	    c.gridy++;
@@ -153,7 +153,7 @@ final class PreferencesPanelCades extends JPanel {
 
 		// Panel para el boton de restaurar la configuracion
 		final JPanel panelGeneral = new JPanel(new FlowLayout(FlowLayout.TRAILING));
-		
+
 		final JButton restoreConfigButton = new JButton(SimpleAfirmaMessages.getString("PreferencesPanel.147") //$NON-NLS-1$
 		);
 
@@ -173,20 +173,20 @@ final class PreferencesPanelCades extends JPanel {
 		restoreConfigButton.getAccessibleContext()
 				.setAccessibleDescription(SimpleAfirmaMessages.getString("PreferencesPanel.136") //$NON-NLS-1$
 		);
-				
+
 		panelGeneral.add(restoreConfigButton);
 
 		c.gridy++;
-		
+
 		add(panelGeneral, c);
-	    
+
 	}
-	
+
 	void checkPreferences() throws AOException {
-		
+
 		loadCadesPolicy();
-		
-		final AdESPolicy p = this.cadesPolicyDlg.getCurrentPolicy();
+
+		final AdESPolicy p = this.cadesPolicyDlg.getSelectedPolicy();
 		if (p != null) {
 			// No nos interesa el resultado, solo si construye sin excepciones
 			try {
@@ -200,7 +200,7 @@ final class PreferencesPanelCades extends JPanel {
 
 	void savePreferences() {
 		PreferencesManager.putBoolean(PREFERENCE_CADES_IMPLICIT, this.cadesImplicit.isSelected());
-		final AdESPolicy cadesPolicy = this.cadesPolicyDlg.getCurrentPolicy();
+		final AdESPolicy cadesPolicy = this.cadesPolicyDlg.getSelectedPolicy();
 		if (cadesPolicy != null) {
 			PreferencesManager.put(PREFERENCE_CADES_POLICY_IDENTIFIER, cadesPolicy.getPolicyIdentifier());
 			PreferencesManager.put(PREFERENCE_CADES_POLICY_HASH, cadesPolicy.getPolicyIdentifierHash());
@@ -231,21 +231,20 @@ final class PreferencesPanelCades extends JPanel {
 				POLICY_CADES_PADES_AGE_1_9
 			)
 		);
-       
+
         this.cadesPolicyDlg = new PolicyPanel(
     		SIGN_FORMAT_CADES,
     		cadesPolicies,
     		getCadesPreferedPolicy(),
-    		null,
-    		this.unprotected
+    		this.blocked
         );
-       
+
         revalidate();
         repaint();
 	}
-		
+
 	void loadDefaultPreferences() {
-		
+
 		final List<PolicyPanel.PolicyItem> cadesPolicies = new ArrayList<>();
         cadesPolicies.add(
     		new PolicyItem(
@@ -253,17 +252,16 @@ final class PreferencesPanelCades extends JPanel {
         		POLICY_CADES_PADES_AGE_1_9
     		)
 		);
-       
+
         this.cadesPolicyDlg = new PolicyPanel(
         		SIGN_FORMAT_CADES,
         		cadesPolicies,
         		getCadesDefaultPolicy(),
-        		null,
-        		this.unprotected
+        		this.blocked
     		);
-              	
-		this.policyLabel.setText(this.cadesPolicyDlg.getSelectedPolicy());
-        
+
+		this.policyLabel.setText(this.cadesPolicyDlg.getSelectedPolicyName());
+
         revalidate();
         repaint();
 	}
@@ -288,26 +286,25 @@ final class PreferencesPanelCades extends JPanel {
 			return null;
 		}
 	}
-	
+
 	/** Obtiene la configuraci&oacute;n de politica de firma CAdES por defecto.
 	 * @return Pol&iacute;tica de firma configurada. */
 	private AdESPolicy getCadesDefaultPolicy() {
 
 		AdESPolicy adesPolicy = null;
-		
+
 		loadCadesPolicy();
 
-		if (this.unprotected) {
+		if (this.blocked) {
 
-			// unprotected = true, luego no pueden alterarse las
-			// propiedades:
+			// blocked = true, luego no pueden alterarse las propiedades:
 			// devolvemos las preferencias almacenadas actualmente
 
-			adesPolicy = this.cadesPolicyDlg.getCurrentPolicy();
+			adesPolicy = this.cadesPolicyDlg.getSelectedPolicy();
 
 		} else {
 
-			// unprotected = false, luego se pueden alterar las propiedades:
+			// blocked = false, luego se pueden alterar las propiedades:
 			// devolvemos las preferencias por defecto
 			try {
 
@@ -332,8 +329,8 @@ final class PreferencesPanelCades extends JPanel {
 		return adesPolicy;
 
 	}
-	
-	
+
+
 	/**
 	 * Carga el panel de pol&iacute;tica con las preferencias guardadas
 	 */
@@ -344,14 +341,13 @@ final class PreferencesPanelCades extends JPanel {
 			cadesPolicies.add(new PolicyItem(SimpleAfirmaMessages.getString("PreferencesPanel.73"), //$NON-NLS-1$
 					POLICY_CADES_PADES_AGE_1_9));
 
-			this.cadesPolicyDlg = new PolicyPanel(SIGN_FORMAT_CADES, cadesPolicies, getCadesPreferedPolicy(), null,
-					this.unprotected);
+			this.cadesPolicyDlg = new PolicyPanel(SIGN_FORMAT_CADES, cadesPolicies, getCadesPreferedPolicy(), this.blocked);
 		}
 	}
-	
+
 	/**
 	 * Di&aacute;logo para cambair la configuracion de la pol&iacute;tica
-	 * 
+	 *
 	 * @param container
 	 *            Contenedor en el que se define el di&aacute;logo.
 	 */
@@ -362,7 +358,7 @@ final class PreferencesPanelCades extends JPanel {
 
 		// Cursor por defecto
 		container.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-		
+
 		loadCadesPolicy();
 
 		if (AOUIFactory.showConfirmDialog(container, this.cadesPolicyDlg,
@@ -372,9 +368,9 @@ final class PreferencesPanelCades extends JPanel {
 			try {
 				checkPreferences();
 
-				this.policyLabel.setText(this.cadesPolicyDlg.getSelectedPolicy());
+				this.policyLabel.setText(this.cadesPolicyDlg.getSelectedPolicyName());
 
-				final AdESPolicy cadesPolicy = this.cadesPolicyDlg.getCurrentPolicy();
+				final AdESPolicy cadesPolicy = this.cadesPolicyDlg.getSelectedPolicy();
 				if (cadesPolicy != null) {
 					PreferencesManager.put(PREFERENCE_CADES_POLICY_IDENTIFIER, cadesPolicy.getPolicyIdentifier());
 					PreferencesManager.put(PREFERENCE_CADES_POLICY_HASH, cadesPolicy.getPolicyIdentifierHash());
@@ -395,7 +391,7 @@ final class PreferencesPanelCades extends JPanel {
 
 				this.cadesPolicyDlg.saveCurrentPolicy();
 
-			} catch (Exception e) {
+			} catch (final Exception e) {
 
 				AOUIFactory.showErrorMessage(this,
 						"<html><p>" + SimpleAfirmaMessages.getString("PreferencesPanel.38") + ":<br>" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -407,7 +403,7 @@ final class PreferencesPanelCades extends JPanel {
 			}
 
 		}
-		
+
 		this.cadesPolicyDlg = null;
 
 	}

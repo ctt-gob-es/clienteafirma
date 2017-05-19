@@ -12,7 +12,6 @@ import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERE
 import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_XADES_SIGN_FORMAT;
 
 import java.awt.Container;
-import java.awt.Cursor;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -41,7 +40,7 @@ import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.ui.preferences.PolicyPanel.PolicyItem;
 
 final class PreferencesPanelXades extends JPanel {
-	
+
 	static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	private static final long serialVersionUID = 1424468022677956783L;
@@ -69,48 +68,48 @@ final class PreferencesPanelXades extends JPanel {
 	);
 
 	private final JPanel panelPolicies = new JPanel();
-		
+
 	private PolicyPanel xadesPolicyDlg;
-	
+
 	/**
 	 * Atributo que representa la etiqueta de la pol&iacute;tica seleccionada en
 	 * el di&aacute;logo
 	 */
 	private JLabel policyLabel;
-	
+
 	/**
 	 * Atributo que permite gestionar el bloqueo de preferencias.
 	 */
-	private boolean unprotected = true;
+	private boolean blocked = true;
 
 	PreferencesPanelXades(final KeyListener keyListener,
 						  final ModificationListener modificationListener,
-						  final boolean unprotected) {
+						  final boolean blocked) {
 
-		this.unprotected = unprotected;
+		this.blocked = blocked;
 		createUI(keyListener, modificationListener);
 	}
 
 	void createUI(final KeyListener keyListener,
 				  final ModificationListener modificationListener
 				  ) {
-		
+
         setLayout(new GridBagLayout());
 
         final GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.BOTH;
         gbc.weightx = 1.0;
         gbc.gridy = 0;
-        		
+
         loadPreferences();
-                
+
         loadXadesPolicy();
-    	
+
     	this.xadesPolicyDlg.setModificationListener(modificationListener);
     	this.xadesPolicyDlg.setKeyListener(keyListener);
-        
+
         ///////////// Panel Policy ////////////////
-        
+
         final JPanel policyConfigPanel = new JPanel(new FlowLayout(FlowLayout.LEADING));
 		policyConfigPanel.setBorder(
 			BorderFactory.createTitledBorder(
@@ -121,8 +120,8 @@ final class PreferencesPanelXades extends JPanel {
 		final JButton policyConfigButton = new JButton(
 			SimpleAfirmaMessages.getString("PreferencesPanel.150") //$NON-NLS-1$
 		);
-		
-		this.policyLabel = new JLabel(this.xadesPolicyDlg.getSelectedPolicy());
+
+		this.policyLabel = new JLabel(this.xadesPolicyDlg.getSelectedPolicyName());
 		this.policyLabel.setLabelFor(policyConfigButton);
 
 		policyConfigButton.setMnemonic('P');
@@ -137,15 +136,15 @@ final class PreferencesPanelXades extends JPanel {
 		policyConfigButton.getAccessibleContext().setAccessibleDescription(
 			SimpleAfirmaMessages.getString("PreferencesPanel.151") //$NON-NLS-1$
 		);
-		
-		policyConfigButton.setEnabled(!this.unprotected);
+
+		policyConfigButton.setEnabled(!this.blocked);
 		policyConfigPanel.add(this.policyLabel);
 		policyConfigPanel.add(policyConfigButton);
-        
-        ///////////// Fin Panel Policy ////////////////        
+
+        ///////////// Fin Panel Policy ////////////////
 
 		gbc.gridy++;
-        
+
         add(policyConfigPanel, gbc);
 
         final JPanel metadata = new JPanel();
@@ -233,7 +232,7 @@ final class PreferencesPanelXades extends JPanel {
         this.xadesSignFormat.getAccessibleContext().setAccessibleDescription(SimpleAfirmaMessages.getString("PreferencesPanel.53")); //$NON-NLS-1$
         this.xadesSignFormat.addItemListener(modificationListener);
         this.xadesSignFormat.addKeyListener(keyListener);
-        this.xadesSignFormat.setEnabled(!this.unprotected);
+        this.xadesSignFormat.setEnabled(!this.blocked);
 
         final JLabel xadesFormatLabel = new JLabel(
 				SimpleAfirmaMessages.getString("PreferencesPanel.15") //$NON-NLS-1$
@@ -256,7 +255,7 @@ final class PreferencesPanelXades extends JPanel {
         gbc.gridy++;
         gbc.weighty = 1.0;
         add(new JPanel(), gbc);
-        
+
 		// Panel para el boton de restaurar la configuracion
 		final JPanel panelGeneral = new JPanel(new FlowLayout(FlowLayout.TRAILING));
 
@@ -279,11 +278,11 @@ final class PreferencesPanelXades extends JPanel {
 		restoreConfigButton.getAccessibleContext()
 				.setAccessibleDescription(SimpleAfirmaMessages.getString("PreferencesPanel.136") //$NON-NLS-1$
 		);
-		
+
 		panelGeneral.add(restoreConfigButton);
-		
+
 		gbc.gridy++;
-		
+
 		add(panelGeneral, gbc);
 
 	}
@@ -328,7 +327,7 @@ final class PreferencesPanelXades extends JPanel {
 			PreferencesManager.put(PREFERENCE_XADES_SIGNER_CLAIMED_ROLE, this.xadesSignerClaimedRole.getText());
 		}
 
-		final AdESPolicy xadesPolicy = this.xadesPolicyDlg.getCurrentPolicy();
+		final AdESPolicy xadesPolicy = this.xadesPolicyDlg.getSelectedPolicy();
 		if (xadesPolicy != null) {
 			PreferencesManager.put(PREFERENCE_XADES_POLICY_IDENTIFIER, xadesPolicy.getPolicyIdentifier());
 			PreferencesManager.put(PREFERENCE_XADES_POLICY_IDENTIFIER_HASH, xadesPolicy.getPolicyIdentifierHash());
@@ -383,14 +382,13 @@ final class PreferencesPanelXades extends JPanel {
     		SIGN_FORMAT_XADES,
     		xadesPolicies,
     		getXadesPreferedPolicy(),
-    		this.xadesSignFormat,
     		isUnprotected()
 		);
 
         revalidate();
         repaint();
 	}
-	
+
 	void loadDefaultPreferences() {
 		this.xadesSignatureProductionCity.setText(PreferencesManager.getPreference(PREFERENCE_XADES_SIGNATURE_PRODUCTION_CITY, "")); //$NON-NLS-1$
 		this.xadesSignatureProductionProvince.setText(
@@ -417,20 +415,19 @@ final class PreferencesPanelXades extends JPanel {
         		POLICY_XADES_AGE_1_9
     		)
 		);
-        
+
         this.xadesPolicyDlg = new PolicyPanel(
     		SIGN_FORMAT_XADES,
     		xadesPolicies,
     		getXadesDefaultPolicy(),
-    		this.xadesSignFormat,
     		isUnprotected()
 		);
-               
+
         this.xadesSignFormat.setSelectedItem(AOSignConstants.SIGN_FORMAT_XADES_DETACHED);
-        this.xadesSignFormat.setEnabled(!this.unprotected);
-		
-		this.policyLabel.setText(this.xadesPolicyDlg.getSelectedPolicy());
-        
+        this.xadesSignFormat.setEnabled(!this.blocked);
+
+		this.policyLabel.setText(this.xadesPolicyDlg.getSelectedPolicyName());
+
         revalidate();
         repaint();
 	}
@@ -456,13 +453,13 @@ final class PreferencesPanelXades extends JPanel {
 			return null;
 		}
 	}
-	
+
 	/** Obtiene la configuraci&oacute;n de politica de firma XAdES establecida por defecto.
 	 * @return Pol&iacute;tica de firma configurada. */
 	private AdESPolicy getXadesDefaultPolicy() {
 
 		AdESPolicy adesPolicy = null;
-		
+
 		loadXadesPolicy();
 
 		if (isUnprotected()) {
@@ -471,7 +468,7 @@ final class PreferencesPanelXades extends JPanel {
 			// propiedades:
 			// devolvemos las preferencias almacenadas actualmente
 
-			adesPolicy = this.xadesPolicyDlg.getCurrentPolicy();
+			adesPolicy = this.xadesPolicyDlg.getSelectedPolicy();
 
 		} else {
 
@@ -501,10 +498,10 @@ final class PreferencesPanelXades extends JPanel {
 	}
 
 	void checkPreferences() throws AOException {
-		
+
 		loadXadesPolicy();
-		
-		final AdESPolicy p = this.xadesPolicyDlg.getCurrentPolicy();
+
+		final AdESPolicy p = this.xadesPolicyDlg.getSelectedPolicy();
 		if (p != null) {
 			// No nos interesa el resultado, solo si construye sin excepciones
 			try {
@@ -516,13 +513,13 @@ final class PreferencesPanelXades extends JPanel {
 		}
 
 	}
-	
+
 	/**
 	 * M&eacute;todo getter del atributo unprotected
 	 * @return the unprotected
 	 */
 	public boolean isUnprotected() {
-		return this.unprotected;
+		return this.blocked;
 	}
 
 	/**
@@ -530,50 +527,34 @@ final class PreferencesPanelXades extends JPanel {
 	 * @param unprotected the unprotected to set
 	 */
 	public void setUnprotected(boolean unprotected) {
-		this.unprotected = unprotected;
+		this.blocked = unprotected;
 	}
-	
-	
+
+
 	/**
 	 * Carga el panel de pol&iacute;tica con las preferencias guardadas
 	 */
 	private void loadXadesPolicy() {
-		// Si el panel no está cargado lo obtengo de las preferencias guardadas
+		// Si el panel no esta cargado lo obtengo de las preferencias guardadas
 		if (this.xadesPolicyDlg == null) {
 			final List<PolicyPanel.PolicyItem> xadesPolicies = new ArrayList<>();
 			xadesPolicies.add(new PolicyItem(SimpleAfirmaMessages.getString("PreferencesPanel.73"), //$NON-NLS-1$
 					POLICY_XADES_AGE_1_9));
 
-			this.xadesPolicyDlg = new PolicyPanel(SIGN_FORMAT_XADES, xadesPolicies, getXadesPreferedPolicy(),
-					this.xadesSignFormat, isUnprotected());
+			this.xadesPolicyDlg = new PolicyPanel(SIGN_FORMAT_XADES, xadesPolicies, getXadesPreferedPolicy(), isUnprotected());
 		}
 	}
-	
+
 	/**
 	 * Di&aacute;logo para cambair la configuracion de la pol&iacute;tica
-	 * 
+	 *
 	 * @param container
 	 *            Contenedor en el que se define el di&aacute;logo.
 	 */
 	public void changeXadesPolicyDlg(final Container container) {
 
-		// Cursor en espera
-		container.setCursor(new Cursor(Cursor.WAIT_CURSOR));
-
-		// Cursor por defecto
-		container.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-		
+		// Cargamos el dialogo
 		loadXadesPolicy();
-		
-		// Si el panel no está cargado lo obtengo de las preferencias guardadas
-		if (this.xadesPolicyDlg == null) {
-			final List<PolicyPanel.PolicyItem> xadesPolicies = new ArrayList<>();
-			xadesPolicies.add(new PolicyItem(SimpleAfirmaMessages.getString("PreferencesPanel.73"), //$NON-NLS-1$
-					POLICY_XADES_AGE_1_9));
-
-			this.xadesPolicyDlg = new PolicyPanel(SIGN_FORMAT_XADES, xadesPolicies, getXadesPreferedPolicy(),
-					this.xadesSignFormat, isUnprotected());
-		}
 
 		if (AOUIFactory.showConfirmDialog(container, this.xadesPolicyDlg,
 				SimpleAfirmaMessages.getString("PolicyDialog.0"), //$NON-NLS-1$
@@ -582,9 +563,9 @@ final class PreferencesPanelXades extends JPanel {
 			try {
 				checkPreferences();
 
-				this.policyLabel.setText(this.xadesPolicyDlg.getSelectedPolicy());
+				this.policyLabel.setText(this.xadesPolicyDlg.getSelectedPolicyName());
+				final AdESPolicy xadesPolicy = this.xadesPolicyDlg.getSelectedPolicy();
 
-				final AdESPolicy xadesPolicy = this.xadesPolicyDlg.getCurrentPolicy();
 				if (xadesPolicy != null) {
 					PreferencesManager.put(PREFERENCE_XADES_POLICY_IDENTIFIER, xadesPolicy.getPolicyIdentifier());
 					PreferencesManager.put(PREFERENCE_XADES_POLICY_IDENTIFIER_HASH,
@@ -597,16 +578,45 @@ final class PreferencesPanelXades extends JPanel {
 					} else {
 						PreferencesManager.remove(PREFERENCE_XADES_POLICY_QUALIFIER);
 					}
+
+					// Si se ha establecido alguna de las politicas de firmas de la AGE, se establece
+					// la el formato a DETACHED y se
+					if (AgePolicy.isAGEPolicy(xadesPolicy.getPolicyIdentifier(), AOSignConstants.SIGN_FORMAT_XADES)) {
+						final String previousSubFormat = (String) this.xadesSignFormat.getSelectedItem();
+						this.xadesSignFormat.removeAllItems();
+						this.xadesSignFormat.addItem(AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED);
+						this.xadesSignFormat.addItem(AOSignConstants.SIGN_FORMAT_XADES_DETACHED);
+						if (AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED.equals(previousSubFormat) ||
+								AOSignConstants.SIGN_FORMAT_XADES_DETACHED.equals(previousSubFormat)) {
+							this.xadesSignFormat.setSelectedItem(previousSubFormat);
+						}
+					}
+					else {
+						final String previousSubFormat = (String) this.xadesSignFormat.getSelectedItem();
+						this.xadesSignFormat.removeAllItems();
+						this.xadesSignFormat.addItem(AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED);
+						this.xadesSignFormat.addItem(AOSignConstants.SIGN_FORMAT_XADES_ENVELOPING);
+						this.xadesSignFormat.addItem(AOSignConstants.SIGN_FORMAT_XADES_DETACHED);
+						this.xadesSignFormat.setSelectedItem(previousSubFormat);
+					}
+
 				} else {
 					PreferencesManager.remove(PREFERENCE_XADES_POLICY_IDENTIFIER);
 					PreferencesManager.remove(PREFERENCE_XADES_POLICY_IDENTIFIER_HASH);
 					PreferencesManager.remove(PREFERENCE_XADES_POLICY_IDENTIFIER_HASH_ALGORITHM);
 					PreferencesManager.remove(PREFERENCE_XADES_POLICY_QUALIFIER);
+
+					final String previousSubFormat = (String) this.xadesSignFormat.getSelectedItem();
+					this.xadesSignFormat.removeAllItems();
+					this.xadesSignFormat.addItem(AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED);
+					this.xadesSignFormat.addItem(AOSignConstants.SIGN_FORMAT_XADES_ENVELOPING);
+					this.xadesSignFormat.addItem(AOSignConstants.SIGN_FORMAT_XADES_DETACHED);
+					this.xadesSignFormat.setSelectedItem(previousSubFormat);
 				}
 
 				this.xadesPolicyDlg.saveCurrentPolicy();
 
-			} catch (Exception e) {
+			} catch (final Exception e) {
 
 				AOUIFactory.showErrorMessage(this,
 						"<html><p>" + SimpleAfirmaMessages.getString("PreferencesPanel.6") + ":<br>" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -618,7 +628,7 @@ final class PreferencesPanelXades extends JPanel {
 			}
 
 		}
-		
+
 		// Siempre, tras cualquier operación limpio el panel
 		this.xadesPolicyDlg = null;
 	}

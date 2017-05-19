@@ -45,13 +45,13 @@ import es.gob.afirma.standalone.ui.preferences.PolicyPanel.PolicyItem;
 import es.gob.afirma.standalone.ui.preferences.PreferencesPanel.ValueTextPair;
 
 final class PreferencesPanelPades extends JPanel {
-	
+
 	static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	private static final long serialVersionUID = 4299378019540627483L;
-		
+
 	private PolicyPanel padesPolicyDlg;
-	
+
 	/**
 	 * Atributo que representa la etiqueta de la pol&iacute;tica seleccionada en
 	 * el di&aacute;logo.
@@ -64,7 +64,7 @@ final class PreferencesPanelPades extends JPanel {
 		"SHA1", //$NON-NLS-1$
 		"https://sede.060.gob.es/politica_de_firma_anexo_1.pdf" //$NON-NLS-1$
 	);
-	
+
 	/**
 	 * Atributo para gestionar el bloqueo de propiedades.
 	 */
@@ -81,7 +81,7 @@ final class PreferencesPanelPades extends JPanel {
 
 	private final JTextField padesSignerContact = new JTextField();
 
-	private final JCheckBox visiblePdfSignature = new JCheckBox(SimpleAfirmaMessages.getString("PreferencesPanel.79")); //$NON-NLS-1$	
+	private final JCheckBox visiblePdfSignature = new JCheckBox(SimpleAfirmaMessages.getString("PreferencesPanel.79")); //$NON-NLS-1$
 
 	private static final String PADES_FORMAT_BASIC_TEXT = SimpleAfirmaMessages.getString("PreferencesPanel.71"); //$NON-NLS-1$
 	private static final String PADES_FORMAT_BES_TEXT = SimpleAfirmaMessages.getString("PreferencesPanel.72"); //$NON-NLS-1$
@@ -105,7 +105,7 @@ final class PreferencesPanelPades extends JPanel {
         gbc.fill = GridBagConstraints.BOTH;
         gbc.weightx = 1.0;
         gbc.gridy = 0;
-       
+
 		this.padesBasicFormat.getAccessibleContext().setAccessibleDescription(
 			SimpleAfirmaMessages.getString("PreferencesPanel.70") //$NON-NLS-1$
 		);
@@ -115,21 +115,21 @@ final class PreferencesPanelPades extends JPanel {
 				new ValueTextPair(AOSignConstants.PADES_SUBFILTER_BASIC, PADES_FORMAT_BASIC_TEXT)
 			}
 		);
-				
+
 		this.padesBasicFormat.setModel(padesFormatModel);
 		this.padesBasicFormat.addItemListener(modificationListener);
 		this.padesBasicFormat.addKeyListener(keyListener);
 		this.padesBasicFormat.setEnabled(!this.unprotected);
 
         loadPreferences();
-        
+
         loadPadesPolicy();
-    	
+
     	this.padesPolicyDlg.setModificationListener(modificationListener);
     	this.padesPolicyDlg.setKeyListener(keyListener);
-    	    	        
+
         ///////////// Panel Policy ////////////////
-        
+
         final JPanel policyConfigPanel = new JPanel(new FlowLayout(FlowLayout.LEADING));
 		policyConfigPanel.setBorder(
 			BorderFactory.createTitledBorder(
@@ -140,7 +140,7 @@ final class PreferencesPanelPades extends JPanel {
 		final JButton policyConfigButton = new JButton(
 			SimpleAfirmaMessages.getString("PreferencesPanel.150") //$NON-NLS-1$
 		);
-		
+
 		policyConfigButton.setMnemonic('P');
 		policyConfigButton.addActionListener(
 			new ActionListener() {
@@ -153,20 +153,20 @@ final class PreferencesPanelPades extends JPanel {
 		policyConfigButton.getAccessibleContext().setAccessibleDescription(
 			SimpleAfirmaMessages.getString("PreferencesPanel.151") //$NON-NLS-1$
 		);
-		
-		this.policyLabel = new JLabel(this.padesPolicyDlg.getSelectedPolicy());
+
+		this.policyLabel = new JLabel(this.padesPolicyDlg.getSelectedPolicyName());
 		this.policyLabel.setLabelFor(policyConfigButton);
-		
+
 		policyConfigButton.setEnabled(!isUnprotected());
 		policyConfigPanel.add(this.policyLabel);
 		policyConfigPanel.add(policyConfigButton);
-        
+
         ///////////// Fin Panel Policy ////////////////
-		
+
         gbc.gridy++;
-              
+
         add(policyConfigPanel, gbc);
-        
+
 	    final JPanel metadataPanel = new JPanel();
         metadataPanel.setBorder(BorderFactory.createTitledBorder(
     		SimpleAfirmaMessages.getString("PreferencesPanel.19")) //$NON-NLS-1$
@@ -252,7 +252,7 @@ final class PreferencesPanelPades extends JPanel {
 		cf.gridy = 1;
 		panelFirm.add(this.padesBasicFormat, cf);
 		cf.gridy = 0;
-		
+
 		padesPreferencesPanel.setLayout(new GridBagLayout());
 		final GridBagConstraints fc = new GridBagConstraints();
 		fc.weightx = 1.0;
@@ -269,10 +269,10 @@ final class PreferencesPanelPades extends JPanel {
 	    gbc.gridy++;
 	    gbc.weighty = 1.0;
 	    add(new JPanel(), gbc); // Panel de relleno
-	    
+
 	    // Panel para el boton de restaurar la configuracion
 	 	final JPanel panelGeneral = new JPanel(new FlowLayout(FlowLayout.TRAILING));
-	    
+
 	    final JButton restoreConfigButton = new JButton(SimpleAfirmaMessages.getString("PreferencesPanel.147") //$NON-NLS-1$
 	    		);
 
@@ -292,11 +292,11 @@ final class PreferencesPanelPades extends JPanel {
 	    		restoreConfigButton.getAccessibleContext()
 	    				.setAccessibleDescription(SimpleAfirmaMessages.getString("PreferencesPanel.136") //$NON-NLS-1$
 	   	);
-   			    		
+
 	   	panelGeneral.add(restoreConfigButton);
-	   	
+
 	   	gbc.gridy++;
-	   	   
+
 		add(panelGeneral, gbc);
 	}
 
@@ -329,10 +329,10 @@ final class PreferencesPanelPades extends JPanel {
 	}
 
 	void checkPreferences() throws AOException {
-		
+
 		loadPadesPolicy();
-		
-		final AdESPolicy p = this.padesPolicyDlg.getCurrentPolicy();
+
+		final AdESPolicy p = this.padesPolicyDlg.getSelectedPolicy();
 		if (p != null) {
 			// No nos interesa el resultado, solo si construye sin excepciones
 			try {
@@ -368,8 +368,8 @@ final class PreferencesPanelPades extends JPanel {
 		}
 
 		PreferencesManager.put(PREFERENCE_PADES_FORMAT, ((ValueTextPair) this.padesBasicFormat.getSelectedItem()).getValue());
-		
-		final AdESPolicy padesPolicy = this.padesPolicyDlg.getCurrentPolicy();
+
+		final AdESPolicy padesPolicy = this.padesPolicyDlg.getSelectedPolicy();
 		if (padesPolicy != null) {
 			PreferencesManager.put(PREFERENCE_PADES_POLICY_IDENTIFIER, padesPolicy.getPolicyIdentifier());
 			PreferencesManager.put(PREFERENCE_PADES_POLICY_IDENTIFIER_HASH, padesPolicy.getPolicyIdentifierHash());
@@ -420,7 +420,6 @@ final class PreferencesPanelPades extends JPanel {
     		SIGN_FORMAT_PADES,
     		padesPolicies,
     		getPadesPreferedPolicy(),
-    		this.padesBasicFormat,
     		this.unprotected
 		);
 
@@ -432,38 +431,38 @@ final class PreferencesPanelPades extends JPanel {
         revalidate();
         repaint();
 	}
-	
+
 	/**
 	 * Carga las opciones de configuraci&oacute;n por defecto del panel de
 	 * firmas PAdES desde un fichero externo de preferencias.
-	 * 
+	 *
 	 * @param unprotected
 	 *            {@code true} Si las opciones de configuraci&oacute;n sensibles
 	 *            a ello est&aacute;n protegidas y no pueden ser modificadas,
 	 *            {@code false} en caso contrario
 	 */
 	void loadDefaultPreferences() {
-		
+
 		this.padesSignReason.setText(PreferencesManager.getPreference(PREFERENCE_PADES_SIGN_REASON, "")); //$NON-NLS-1$
 		this.padesSignProductionCity.setText(PreferencesManager.getPreference(PREFERENCE_PADES_SIGN_PRODUCTION_CITY, "")); //$NON-NLS-1$
 		this.padesSignerContact.setText(PreferencesManager.getPreference(PREFERENCE_PADES_SIGNER_CONTACT, "")); //$NON-NLS-1$
 		this.visiblePdfSignature.setSelected(PreferencesManager.getBooleanPreference(PREFERENCE_PADES_VISIBLE, false));
 
         final ComboBoxModel<Object> padesFormatModel = this.padesBasicFormat.getModel();
-        
+
         // unprotected: true -> no puedo modificarla, cargo la que estaba
 		if (isUnprotected()) {
 			final String selectedValue = PreferencesManager.get(PREFERENCE_PADES_FORMAT,
 					AOSignConstants.PADES_SUBFILTER_BASIC);
-			
+
 			for (int i = 0; i < padesFormatModel.getSize(); i++) {
 				if (padesFormatModel.getElementAt(i).equals(selectedValue)) {
 					this.padesBasicFormat.setSelectedIndex(i);
 					break;
 				}
 			}
-		}        
-		
+		}
+
 		final List<PolicyPanel.PolicyItem> padesPolicies = new ArrayList<>();
         padesPolicies.add(
     		new PolicyItem(
@@ -471,22 +470,21 @@ final class PreferencesPanelPades extends JPanel {
         		POLICY_CADES_PADES_AGE_1_9
     		)
 		);
-        
+
         this.padesPolicyDlg = new PolicyPanel(
     		SIGN_FORMAT_PADES,
     		padesPolicies,
     		getPadesDefaultPolicy(),
-    		this.padesBasicFormat,
     		this.unprotected
 		);
-        
+
         if (this.padesBasicFormat.getItemCount() > 0) {
 			this.padesBasicFormat.setSelectedIndex(0);
 		}
 		this.padesBasicFormat.setEnabled(!this.unprotected);
-		
-		this.policyLabel.setText(this.padesPolicyDlg.getSelectedPolicy());
-        
+
+		this.policyLabel.setText(this.padesPolicyDlg.getSelectedPolicyName());
+
         revalidate();
         repaint();
 	}
@@ -511,7 +509,7 @@ final class PreferencesPanelPades extends JPanel {
 			return null;
 		}
 	}
-	
+
 	/**
 	 * Obtiene la configuraci&oacute;n de pol&iacute;tica de firma PAdES por
 	 * defecto desde el fichero de preferencias.
@@ -524,7 +522,7 @@ final class PreferencesPanelPades extends JPanel {
 	private AdESPolicy getPadesDefaultPolicy() {
 
 		AdESPolicy adesPolicy = null;
-		
+
 		loadPadesPolicy();
 
 		if (isUnprotected()) {
@@ -533,13 +531,13 @@ final class PreferencesPanelPades extends JPanel {
 			// propiedades:
 			// devolvemos las preferencias almacenadas actualmente
 
-			adesPolicy = this.padesPolicyDlg.getCurrentPolicy();
+			adesPolicy = this.padesPolicyDlg.getSelectedPolicy();
 
 		} else {
 			try {
 				// unprotected = false, luego se pueden alterar las propiedades:
 				// devolvemos las preferencias por defecto
-								
+
 				if (PreferencesManager.getPreference(PREFERENCE_PADES_POLICY_IDENTIFIER, null) == null
 						|| "".equals(PreferencesManager.getPreference(PREFERENCE_PADES_POLICY_IDENTIFIER, null))) { //$NON-NLS-1$
 					this.padesPolicyDlg.loadPolicy(null);
@@ -550,8 +548,8 @@ final class PreferencesPanelPades extends JPanel {
 									PreferencesManager.getPreference(PREFERENCE_PADES_POLICY_IDENTIFIER_HASH_ALGORITHM,
 											null),
 									PreferencesManager.getPreference(PREFERENCE_PADES_POLICY_QUALIFIER, null)));
-				}	
-				
+				}
+
 			} catch (final Exception e) {
 				Logger.getLogger("es.gob.afirma") //$NON-NLS-1$
 						.severe("Error al recuperar la politica PAdES guardada en fichero de preferencias: " + e); //$NON-NLS-1$
@@ -577,7 +575,7 @@ final class PreferencesPanelPades extends JPanel {
 	public void setUnprotected(boolean unprotected) {
 		this.unprotected = unprotected;
 	}
-	
+
 	/**
 	 * Carga el panel de pol&iacute;tica con las preferencias guardadas
 	 */
@@ -588,14 +586,13 @@ final class PreferencesPanelPades extends JPanel {
 			padesPolicies.add(new PolicyItem(SimpleAfirmaMessages.getString("PreferencesPanel.73"), //$NON-NLS-1$
 					POLICY_CADES_PADES_AGE_1_9));
 
-			this.padesPolicyDlg = new PolicyPanel(SIGN_FORMAT_PADES, padesPolicies, getPadesPreferedPolicy(),
-					this.padesBasicFormat, this.unprotected);
+			this.padesPolicyDlg = new PolicyPanel(SIGN_FORMAT_PADES, padesPolicies, getPadesPreferedPolicy(), this.unprotected);
 		}
 	}
-		
+
 	/**
 	 * Di&aacute;logo para cambair la configuracion de la pol&iacute;tica
-	 * 
+	 *
 	 * @param container
 	 *            Contenedor en el que se define el di&aacute;logo.
 	 */
@@ -609,7 +606,7 @@ final class PreferencesPanelPades extends JPanel {
 
 		loadPadesPolicy();
 
-		int confirmDialog = AOUIFactory.showConfirmDialog(container, this.padesPolicyDlg,
+		final int confirmDialog = AOUIFactory.showConfirmDialog(container, this.padesPolicyDlg,
 				SimpleAfirmaMessages.getString("PolicyDialog.0"), //$NON-NLS-1$
 				JOptionPane.OK_CANCEL_OPTION, JOptionPane.DEFAULT_OPTION);
 
@@ -618,9 +615,9 @@ final class PreferencesPanelPades extends JPanel {
 			try {
 				checkPreferences();
 
-				this.policyLabel.setText(this.padesPolicyDlg.getSelectedPolicy());
+				this.policyLabel.setText(this.padesPolicyDlg.getSelectedPolicyName());
+				final AdESPolicy padesPolicy = this.padesPolicyDlg.getSelectedPolicy();
 
-				final AdESPolicy padesPolicy = this.padesPolicyDlg.getCurrentPolicy();
 				if (padesPolicy != null) {
 					PreferencesManager.put(PREFERENCE_PADES_POLICY_IDENTIFIER, padesPolicy.getPolicyIdentifier());
 					PreferencesManager.put(PREFERENCE_PADES_POLICY_IDENTIFIER_HASH,
@@ -633,16 +630,28 @@ final class PreferencesPanelPades extends JPanel {
 					} else {
 						PreferencesManager.remove(PREFERENCE_PADES_POLICY_QUALIFIER);
 					}
+
+					// Si se ha establecido alguna de las politicas de firmas de la AGE, se establece
+					// la el formato a DETACHED y se
+					if (AgePolicy.isAGEPolicy(padesPolicy.getPolicyIdentifier(), AOSignConstants.SIGN_FORMAT_PADES)) {
+						this.padesBasicFormat.setSelectedItem(PADES_FORMAT_BES_TEXT);
+						this.padesBasicFormat.setEnabled(false);
+					}
+					else {
+						this.padesBasicFormat.setEnabled(true);
+					}
 				} else {
 					PreferencesManager.remove(PREFERENCE_PADES_POLICY_IDENTIFIER);
 					PreferencesManager.remove(PREFERENCE_PADES_POLICY_IDENTIFIER_HASH);
 					PreferencesManager.remove(PREFERENCE_PADES_POLICY_IDENTIFIER_HASH_ALGORITHM);
 					PreferencesManager.remove(PREFERENCE_PADES_POLICY_QUALIFIER);
+
+					this.padesBasicFormat.setEnabled(true);
 				}
 
 				this.padesPolicyDlg.saveCurrentPolicy();
 
-			} catch (Exception e) {
+			} catch (final Exception e) {
 
 				AOUIFactory.showErrorMessage(null,
 						"<html><p>" + SimpleAfirmaMessages.getString("PreferencesPanel.7") + ":<br>" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$

@@ -41,7 +41,7 @@ import es.gob.afirma.standalone.ui.preferences.PolicyPanel.PolicyItem;
 /** Pesta&ntilde;a de configuraci&oacute;n de las preferencias de facturaE.
  * @author Mariano Mart&iacute;nez. */
 final class PreferencesPanelFacturaE extends JPanel {
-	
+
 	static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	private static final long serialVersionUID = 4299378019540627483L;
@@ -83,7 +83,7 @@ final class PreferencesPanelFacturaE extends JPanel {
 
 	private final JPanel panelPolicies = new JPanel();
 	private PolicyPanel facturaePolicyPanel;
-	
+
 	/**
 	 * Atributo que permite gestionar el bloqueo de preferencias.
 	 */
@@ -106,14 +106,14 @@ final class PreferencesPanelFacturaE extends JPanel {
         gbc.fill = GridBagConstraints.BOTH;
         gbc.weightx = 1.0;
         gbc.gridy = 0;
-        
+
         loadPreferences();
 
         this.panelPolicies.setLayout(new GridBagLayout());
         this.panelPolicies.add(this.facturaePolicyPanel, gbc);
-        
+
         gbc.gridy++;
-        
+
         add(this.panelPolicies, gbc);
 
         this.facturaePolicyPanel.setModificationListener(modificationListener);
@@ -230,10 +230,10 @@ final class PreferencesPanelFacturaE extends JPanel {
         gbc.gridy++;
         gbc.weighty = 1.0;
         add(new JPanel(), gbc);
-        
+
 		// Panel para el boton de restaurar la configuracion
 		final JPanel panelGeneral = new JPanel(new FlowLayout(FlowLayout.TRAILING));
-		
+
 		final JButton restoreConfigButton = new JButton(SimpleAfirmaMessages.getString("PreferencesPanel.147") //$NON-NLS-1$
 		);
 
@@ -253,9 +253,9 @@ final class PreferencesPanelFacturaE extends JPanel {
 		restoreConfigButton.getAccessibleContext()
 				.setAccessibleDescription(SimpleAfirmaMessages.getString("PreferencesPanel.136") //$NON-NLS-1$
 		);
-				
+
 		panelGeneral.add(restoreConfigButton);
-		
+
 		gbc.gridy++;
 
 		add(panelGeneral, gbc);
@@ -294,7 +294,7 @@ final class PreferencesPanelFacturaE extends JPanel {
 			PreferencesManager.put(PREFERENCE_FACTURAE_SIGNATURE_PRODUCTION_PROVINCE, this.facturaeSignatureProductionProvince.getText());
 		}
 
-		final AdESPolicy facturaePolicy = this.facturaePolicyPanel.getCurrentPolicy();
+		final AdESPolicy facturaePolicy = this.facturaePolicyPanel.getSelectedPolicy();
 		if (facturaePolicy != null) {
 			if (this.facturaePolicyPanel.getCurrentPolicyItem().toString().equals(SimpleAfirmaMessages.getString("PreferencesPanelFacturaE.1"))) { //$NON-NLS-1$
 					PreferencesManager.put(PreferencesManager.PREFERENCE_FACTURAE_POLICY, POLICY_FACTURAE_30_NAME);
@@ -377,7 +377,6 @@ final class PreferencesPanelFacturaE extends JPanel {
     		SIGN_FORMAT_FACTURAE,
     		facturaePolicies,
     		getFacturaEPreferedPolicy(),
-    		null,
     		false,
     		false,
     		false,
@@ -393,7 +392,7 @@ final class PreferencesPanelFacturaE extends JPanel {
         repaint();
 
 	}
-	
+
 	void loadDefaultPreferences() {
 		this.facturaeRol.setSelectedItem(
 			PreferencesManager.getPreference(
@@ -451,7 +450,6 @@ final class PreferencesPanelFacturaE extends JPanel {
     		SIGN_FORMAT_FACTURAE,
     		facturaePolicies,
     		getFacturaEDefaultPolicy(),
-    		null,
     		false,
     		false,
     		false,
@@ -463,7 +461,7 @@ final class PreferencesPanelFacturaE extends JPanel {
         c.weightx = 1.0;
         c.gridy = 0;
         this.panelPolicies.add(this.facturaePolicyPanel, c);
-              
+
         revalidate();
         repaint();
 
@@ -483,11 +481,11 @@ final class PreferencesPanelFacturaE extends JPanel {
 			return null;
 		}
 	}
-	
+
 	/** Obtiene la configuraci&oacute;n de politica de firma FacturaE establecida por defecto.
 	 * @return Pol&iacute;tica de firma configurada. */
 	private AdESPolicy getFacturaEDefaultPolicy() {
-		
+
 		AdESPolicy adesPolicy = null;
 
 		if (isUnprotected()) {
@@ -496,7 +494,7 @@ final class PreferencesPanelFacturaE extends JPanel {
 			// propiedades:
 			// devolvemos las preferencias almacenadas actualmente
 
-			adesPolicy = this.facturaePolicyPanel.getCurrentPolicy();
+			adesPolicy = this.facturaePolicyPanel.getSelectedPolicy();
 
 		} else {
 
@@ -513,11 +511,11 @@ final class PreferencesPanelFacturaE extends JPanel {
 		}
 
 		return adesPolicy;
-		
+
 	}
 
 	void checkPreferences() throws AOException {
-		final AdESPolicy p = this.facturaePolicyPanel.getCurrentPolicy();
+		final AdESPolicy p = this.facturaePolicyPanel.getSelectedPolicy();
 		if (p != null) {
 			// No nos interesa el resultado, solo si construye sin excepciones
 			try {
@@ -529,7 +527,7 @@ final class PreferencesPanelFacturaE extends JPanel {
 		}
 
 	}
-	
+
 	/**
 	 * M&eacute;todo getter del atributo unprotected
 	 * @return the unprotected

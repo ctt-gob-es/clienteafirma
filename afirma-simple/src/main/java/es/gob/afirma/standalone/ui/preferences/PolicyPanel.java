@@ -1,7 +1,5 @@
 package es.gob.afirma.standalone.ui.preferences;
 
-import static es.gob.afirma.standalone.ui.preferences.PreferencesManager.PREFERENCE_XADES_SIGN_FORMAT;
-
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.FocusEvent;
@@ -31,7 +29,7 @@ final class PolicyPanel extends JPanel implements ItemListener {
 
 	/** Serial Id. */
 	private static final long serialVersionUID = 4804298622744399269L;
-	
+
 	static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	private static final int POLICY_INDEX_NONE = 0;
@@ -45,59 +43,28 @@ final class PolicyPanel extends JPanel implements ItemListener {
 	};
 
 	private JComboBox<PolicyItem> policiesCombo;
-	public PolicyItem getCurrentPolicyItem() {
-		return (PolicyItem) this.policiesCombo.getSelectedItem();
-	}
-
 	private final JTextField identifierField = new JTextField();
-	JTextField getIdentifierField() {
-		return this.identifierField;
-	}
-
 	private final JTextField hashField = new JTextField();
 	private final JComboBox<String> hashAlgorithmField = new JComboBox<>(POLICY_HASH_ALGORITHMS);
 	private final JTextField qualifierField = new JTextField();
-
-	/** Men&uacute; desplegable con la selecci&oacute;n de sub-formato de firma.
-	 * <p>
-	 *  En el caso de PAdES, si hay una pol&iacute;tica establecida, sea la que sea,
-	 *  es necesario modificarlo para que refleje PAdES-BES y que no se pueda cambiar
-	 *  a PAdES-B&aacute;sico.
-	 * </p>
-	 * <p>
-	 *  En el caso de XAdES, si la pol&iacute;tica de firma es la de la AGE, hay que
-	 *  restringir al tipo <i>Enveloped</i>.
-	 * </p> */
-	private final JComboBox<Object> subFormatCombo;
 
 	private final String signatureFormat;
 
 	private AdESPolicy currentPolicy;
 
 	private final List<PolicyItem> policies;
-	
+
 	/** Crea el panel de configuracion de pol&iacute;ticas de firma.
 	 * @param signFormat Formato de firma.
 	 * @param policies Listado de pol&iacute;ticas prefijadas.
 	 * @param currentPolicy Pol&iacute;tica actualmente configurada.
-	 * @param adesSubFormat Men&uacute; desplegable con la selecci&oacute;n de
-	 *                      sub-formato de firma.
-	 * <p>
-	 *  En el caso de PAdES, si hay una pol&iacute;tica establecida, sea la que sea,
-	 *  es necesario modificarlo para que refleje PAdES-BES y que no se pueda cambiar
-	 *  a PAdES-B&aacute;sico.
-	 * </p>
-	 * <p>
-	 *  En el caso de XAdES, si la pol&iacute;tica de firma es la de la AGE, hay que
-	 *  restringir al tipo <i>Enveloped</i>, dej&aacute;ndolo libre en caso de pol&iacute;tica
-	 *  a medida o sin pol&iacute;tica.
-	 * </p> */
+	 * @param blocked Indica si debe bloquearse la configuraci&oacute;n del panel.
+	 */
 	PolicyPanel(final String signFormat,
 			    final List<PolicyItem> policies,
 			    final AdESPolicy currentPolicy,
-			    final JComboBox<Object> adesSubFormat,
-			    final boolean unprotected) {
-		this(signFormat, policies, currentPolicy, adesSubFormat, true, true, true, unprotected);
+			    final boolean blocked) {
+		this(signFormat, policies, currentPolicy, true, true, true, blocked);
 	}
 
 	final boolean allowNoPolicy;
@@ -107,32 +74,20 @@ final class PolicyPanel extends JPanel implements ItemListener {
 	 * @param signFormat Formato de firma.
 	 * @param policies Listado de pol&iacute;ticas prefijadas.
 	 * @param currentPolicy Pol&iacute;tica actualmente configurada.
-	 * @param adesSubFormat Men&uacute; desplegable con la selecci&oacute;n de
-	 *                      sub-formato de firma.
-	 * <p>
-	 *  En el caso de PAdES, si hay una pol&iacute;tica establecida, sea la que sea,
-	 *  es necesario modificarlo para que refleje PAdES-BES y que no se pueda cambiar
-	 *  a PAdES-B&aacute;sico.
-	 * </p>
-	 * <p>
-	 *  En el caso de XAdES, si la pol&iacute;tica de firma es la de la AGE, hay que
-	 *  restringir al tipo <i>Enveloped</i>, dej&aacute;ndolo libre en caso de pol&iacute;tica
-	 *  a medida o sin pol&iacute;tica.
-	 * </p>
 	 * @param noPolicyOp Indica si debe permitirse seleccionar ninguna pol&iacute;tica.
 	 * @param customPolicyOp Indica si debe permitirse seleccionar una pol&iacute;tica a medida.
 	 * @param showFields Indica si han de mostrarse o no los campos con los datos de la
-	 *                   pol&iacute;tica. */
+	 *                   pol&iacute;tica.
+	 * @param blocked Indica si debe bloquearse la configuraci&oacute;n del panel.
+	 */
 	PolicyPanel(final String signFormat,
 			    final List<PolicyItem> policies,
 			    final AdESPolicy currentPolicy,
-			    final JComboBox<Object> adesSubFormat,
 			    final boolean noPolicyOp,
 			    final boolean customPolicyOp,
 			    final boolean showFields,
-			    final boolean unprotected) {
+			    final boolean blocked) {
 
-		this.subFormatCombo = adesSubFormat;
 		this.signatureFormat = signFormat;
 
 		this.allowCustomPolicy = customPolicyOp;
@@ -174,23 +129,25 @@ final class PolicyPanel extends JPanel implements ItemListener {
 			);
 		}
 		this.currentPolicy = currentPolicy;
-						
-		createUI(signFormat, showFields, unprotected);
+
+		createUI(signFormat, showFields, blocked);
 	}
 
 	/** Crea la interfaz gr&aacute;fica del panel.
 	 * @param signFormat Formato de firma.
 	 * @param showFields Indica si han de mostrarse o no los campos con los datos de la
-	 *                   pol&iacute;tica. */
-	private void createUI(final String signFormat, final boolean showFields, final boolean unprotected) {
-		
+	 *                   pol&iacute;tica.
+	 * @param blocked Indica si debe bloquearse la configuraci&oacute;n del panel.
+	 */
+	private void createUI(final String signFormat, final boolean showFields, final boolean blocked) {
+
 		if (AOSignConstants.SIGN_FORMAT_FACTURAE.equals(this.signatureFormat)) {
 			setBorder(BorderFactory.createTitledBorder(SimpleAfirmaMessages.getString("PreferencesPanel.23") //$NON-NLS-1$
 			));
 		} else {
 			setBorder(BorderFactory.createEmptyBorder());
 		}
-		
+
 		setLayout(new GridBagLayout());
 
 		final GridBagConstraints c = new GridBagConstraints();
@@ -205,22 +162,22 @@ final class PolicyPanel extends JPanel implements ItemListener {
 				this.policies.toArray(new PolicyItem[this.policies.size()])
 			)
 		);
-				
+
 		final JLabel policyComboLabel = new JLabel(SimpleAfirmaMessages.getString("PreferencesPanel.23")); //$NON-NLS-1$
 		policyComboLabel.setLabelFor(this.policiesCombo);
 		c.gridy++;
 		add(policyComboLabel, c);
 		c.gridy++;
-		add(this.policiesCombo, c);	
-		
+		add(this.policiesCombo, c);
+
 		policyComboLabel.setLabelFor(this.policiesCombo);
 
 		add(this.policiesCombo, c);
 		this.policiesCombo.getAccessibleContext().setAccessibleDescription(
 			SimpleAfirmaMessages.getString("PreferencesPanel.47") //$NON-NLS-1$
 		);
-		
-		this.policiesCombo.setEnabled(!unprotected);
+
+		this.policiesCombo.setEnabled(!blocked);
 
 		if (showFields) {
 
@@ -400,37 +357,6 @@ final class PolicyPanel extends JPanel implements ItemListener {
 
 		// Mostramos la configuracion de politica que corresponde
 		loadPolicy(((PolicyItem) this.policiesCombo.getSelectedItem()).getPolicy());
-
-		// Si es PAdES hay que seleccionar PAdES-BES si hay politica, tanto si es AGE como
-		// si es a medida.
-		// Si es XAdES y la politica es AGE, hay que seleccionar Enveloped.
-		if (this.subFormatCombo != null) {
-			if (enabled && !editable && AOSignConstants.SIGN_FORMAT_XADES.equals(this.signatureFormat)) {
-				this.subFormatCombo.setSelectedItem(AOSignConstants.SIGN_FORMAT_XADES_DETACHED);
-		        this.subFormatCombo.removeItemAt(1);
-				this.subFormatCombo.setEnabled(true);
-			}
-			else if (enabled && !editable || editable && AOSignConstants.SIGN_FORMAT_PADES.equalsIgnoreCase(this.signatureFormat)) {
-				if (this.subFormatCombo.getItemCount() > 0) {
-					this.subFormatCombo.setSelectedIndex(0);
-				}
-				this.subFormatCombo.setEnabled(false);
-			}
-			else {
-				this.subFormatCombo.setSelectedItem(
-					PreferencesManager.get(PREFERENCE_XADES_SIGN_FORMAT, AOSignConstants.SIGN_FORMAT_XADES_DETACHED)
-				);
-				
-				// Antes de volver a añadir el formato XAdES Enveloping,
-				// compruebo si ya está en el combo.
-				if (AOSignConstants.SIGN_FORMAT_XADES.equals(this.signatureFormat) && !((String)this.subFormatCombo.getItemAt(1)).equals(AOSignConstants.SIGN_FORMAT_XADES_ENVELOPING)) {
-		        	this.subFormatCombo.insertItemAt(AOSignConstants.SIGN_FORMAT_XADES_ENVELOPING, 1);
-				}
-					        	
-				this.subFormatCombo.setEnabled(true);
-			}
-		}
-
 	}
 
 	/** Carga los datos de una pol&iacute;tica en el panel.
@@ -458,7 +384,7 @@ final class PolicyPanel extends JPanel implements ItemListener {
 	static final class PolicyItem {
 
 		private final String name;
-		
+
 		private AdESPolicy policy;
 
 		/** Construye el elemento con nombre y configuraci&oacute;n de pol&iacute;tica.
@@ -505,7 +431,7 @@ final class PolicyPanel extends JPanel implements ItemListener {
 		public int hashCode() {
 			return super.hashCode();
 		}
-		
+
 		public String getName() {
 			return this.name;
 		}
@@ -514,7 +440,7 @@ final class PolicyPanel extends JPanel implements ItemListener {
 	/** Guarda la configuraci&oacute;n actual dentro el contexto.
 	 * <b>No guarda en las preferencias</b>. */
 	void saveCurrentPolicy() {
-		final AdESPolicy policy = getCurrentPolicy();
+		final AdESPolicy policy = getSelectedPolicy();
 		if (this.policiesCombo.getSelectedIndex() == getCustomPolicyIndex()) {
 			((PolicyItem) this.policiesCombo.getSelectedItem()).setPolicy(policy);
 		}
@@ -529,7 +455,7 @@ final class PolicyPanel extends JPanel implements ItemListener {
 	 * {@code null} en caso de no especificarse ninguna.
 	 * @throws IllegalArgumentException Cuando la configuraci&oacute;n actual no
 	 * es v&aacute;lida para una pol&iacute;tica. */
-	AdESPolicy getCurrentPolicy() {
+	AdESPolicy getSelectedPolicy() {
 		if (this.policiesCombo.getSelectedIndex() <= getNoPolicyIndex()) {
 			return null;
 		}
@@ -540,28 +466,24 @@ final class PolicyPanel extends JPanel implements ItemListener {
 			this.qualifierField.getText()
 		);
 	}
-	
-	
+
+
 	/**
 	 * Devuelve la política seleccionada en el combo de pol&iacute;ticas
 	 * @return La pol&iacute;tica seleccionada
 	 */
-	public String getSelectedPolicy() {
-		
+	public String getSelectedPolicyName() {
+
 		return ((PolicyItem)this.policiesCombo.getSelectedItem()).getName();
-		
+
 	}
-	
-	/**
-	 * Recupera los valores del panel guardados en las preferencias del sistema
-	 */
-	public void setPreferredPolicy(final String identifierField, final String hashField, final String hashAlgorithmField, final String qualifierField) {
-		
-		this.policiesCombo.setSelectedIndex(0);
-		this.identifierField.setText(identifierField);
-		this.hashField.setText(hashField);
-		this.hashAlgorithmField.setSelectedItem(hashAlgorithmField);
-		this.qualifierField.setText(qualifierField);
+
+	public PolicyItem getCurrentPolicyItem() {
+		return (PolicyItem) this.policiesCombo.getSelectedItem();
 	}
-	
+
+	JTextField getIdentifierField() {
+		return this.identifierField;
+	}
+
 }
