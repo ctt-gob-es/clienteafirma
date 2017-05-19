@@ -279,7 +279,9 @@ final class PreferencesPanelXades extends JPanel {
 				.setAccessibleDescription(SimpleAfirmaMessages.getString("PreferencesPanel.136") //$NON-NLS-1$
 		);
 
-		panelGeneral.add(restoreConfigButton);
+		gbc.gridy++;
+		gbc.weighty = 0.0;
+		panelGeneral.add(restoreConfigButton, gbc);
 
 		gbc.gridy++;
 

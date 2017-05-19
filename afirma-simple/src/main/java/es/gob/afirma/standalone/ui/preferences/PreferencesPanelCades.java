@@ -174,7 +174,9 @@ final class PreferencesPanelCades extends JPanel {
 				.setAccessibleDescription(SimpleAfirmaMessages.getString("PreferencesPanel.136") //$NON-NLS-1$
 		);
 
-		panelGeneral.add(restoreConfigButton);
+	    c.gridy++;
+	    c.weighty = 0.0;
+		panelGeneral.add(restoreConfigButton, c);
 
 		c.gridy++;
 

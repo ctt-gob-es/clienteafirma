@@ -273,27 +273,27 @@ final class PreferencesPanelPades extends JPanel {
 	    // Panel para el boton de restaurar la configuracion
 	 	final JPanel panelGeneral = new JPanel(new FlowLayout(FlowLayout.TRAILING));
 
-	    final JButton restoreConfigButton = new JButton(SimpleAfirmaMessages.getString("PreferencesPanel.147") //$NON-NLS-1$
-	    		);
+	 	final JButton restoreConfigButton = new JButton(SimpleAfirmaMessages.getString("PreferencesPanel.147")); //$NON-NLS-1$
 
-	    		restoreConfigButton.setMnemonic('R');
-	    		restoreConfigButton.addActionListener(new ActionListener() {
-	    			@Override
-	    			public void actionPerformed(final ActionEvent ae) {
-	    				if (AOUIFactory.showConfirmDialog(getParent(), SimpleAfirmaMessages.getString("PreferencesPanel.155"), //$NON-NLS-1$
-	    						SimpleAfirmaMessages.getString("PreferencesPanel.139"), //$NON-NLS-1$
-	    						JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) {
+	 	restoreConfigButton.setMnemonic('R');
+	 	restoreConfigButton.addActionListener(new ActionListener() {
+	 		@Override
+	 		public void actionPerformed(final ActionEvent ae) {
+	 			if (AOUIFactory.showConfirmDialog(getParent(), SimpleAfirmaMessages.getString("PreferencesPanel.155"), //$NON-NLS-1$
+	 					SimpleAfirmaMessages.getString("PreferencesPanel.139"), //$NON-NLS-1$
+	 					JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) {
 
-	    					loadDefaultPreferences();
+	 				loadDefaultPreferences();
 
-	    				}
-	    			}
-	    		});
-	    		restoreConfigButton.getAccessibleContext()
-	    				.setAccessibleDescription(SimpleAfirmaMessages.getString("PreferencesPanel.136") //$NON-NLS-1$
-	   	);
+	 			}
+	 		}
+	 	});
+	 	restoreConfigButton.getAccessibleContext().setAccessibleDescription(
+	 			SimpleAfirmaMessages.getString("PreferencesPanel.136")); //$NON-NLS-1$
 
-	   	panelGeneral.add(restoreConfigButton);
+	 	gbc.gridy++;
+	 	gbc.weighty = 0.0;
+		panelGeneral.add(restoreConfigButton, gbc);
 
 	   	gbc.gridy++;
 
