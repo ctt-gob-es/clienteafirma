@@ -1,5 +1,8 @@
 package es.gob.afirma.test.pades;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.security.KeyStore;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.util.Properties;
@@ -80,11 +83,11 @@ public class TestAttachments {
 
         Assert.assertNotNull(result);
 
-//        final File tmpFile = File.createTempFile("AFIRMA", ".pdf"); //$NON-NLS-1$ //$NON-NLS-2$
-//        final OutputStream fos = new FileOutputStream(tmpFile);
-//        fos.write(result);
-//        fos.flush();
-//        fos.close();
-//        System.out.println("Resultado guardado en " + tmpFile.getAbsolutePath()); //$NON-NLS-1$
+        final File tmpFile = File.createTempFile("AFIRMA", ".pdf"); //$NON-NLS-1$ //$NON-NLS-2$
+        final OutputStream fos = new FileOutputStream(tmpFile);
+        fos.write(result);
+        fos.flush();
+        fos.close();
+        System.out.println("Resultado guardado en " + tmpFile.getAbsolutePath()); //$NON-NLS-1$
 	}
 }
