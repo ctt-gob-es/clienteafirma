@@ -9,8 +9,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.io.IOException;
-import java.security.GeneralSecurityException;
 import java.util.logging.Logger;
 
 import javax.swing.JButton;
@@ -152,11 +150,7 @@ public final class RestoreConfigPanel extends JPanel implements KeyListener, Dis
 
 					@Override
 					public void run() {
-						try {
-							new RestoreConfigManager().restoreConfigAutoFirma(RestoreConfigPanel.this);
-						} catch (GeneralSecurityException | ConfigurationException | IOException e ) {
-							LOGGER.severe("Ha ocurrido un error al ejecutar la tarea de restauracion: " + e.getMessage()); //$NON-NLS-1$
-						}
+						new RestoreConfigManager().restoreConfigAutoFirma(RestoreConfigPanel.this);
 					}
 				}).start();
 

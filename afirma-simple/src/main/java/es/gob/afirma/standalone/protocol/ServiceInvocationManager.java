@@ -261,7 +261,12 @@ public final class ServiceInvocationManager {
 			if (appDir != null && new File(appDir, KEYSTORE_NAME).exists()) {
 				return new File(appDir, KEYSTORE_NAME);
 			}
-
+		}
+		else if (Platform.getOS() == Platform.OS.LINUX) {
+			appDir = AutoFirmaUtil.getLinuxAlternativeAppDir();
+			if (appDir != null && new File(appDir, KEYSTORE_NAME).exists()) {
+				return new File(appDir, KEYSTORE_NAME);
+			}
 		}
 		else if (Platform.getOS() == Platform.OS.MACOSX) {
 			appDir = new File("/Applications/AutoFirma.app/Contents/Resources/JAR"); //$NON-NLS-1$

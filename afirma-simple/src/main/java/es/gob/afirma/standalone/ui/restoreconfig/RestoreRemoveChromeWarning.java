@@ -7,9 +7,11 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.standalone.SimpleAfirmaMessages;
 
 /**
  * Clase que contiene la l&oacute;gica para realizar las tareas de restauraci&oacute;n
@@ -49,7 +51,7 @@ final public class RestoreRemoveChromeWarning {
 	 * @param appDir Directorio donde se crea el script.
 	 * @param usersDirs Directorio de los usuarios del sistema.
 	 */
-	public static void removeChromeWarningsMac(final File appDir, final String[] usersDirs) {
+	public static void removeChromeWarningsMac(final File appDir, final List<String> usersDirs) {
 		try {
 			for (final String userDir : usersDirs) {
 				// Montamos los comandos de instalacion y desinstalacion que
@@ -92,10 +94,10 @@ final public class RestoreRemoveChromeWarning {
 	 *  <ul>
 	 * <li>En LINUX contiene el contenido del script a ejecutar.</li>
 	 * </ul>
-	 * @param appDir Directorio donde se crea el script.
+	 * @param workingDir Directorio donde se crea el script.
 	 * @param usersDirs Directorio de los usuarios del sistema.
 	 */
-	public static void removeChromeWarningsLinux(final File appDir, final String[] usersDirs) {
+	public static void removeChromeWarningsLinux(final File workingDir, final List<String> usersDirs) {
 
 
 		try {
@@ -107,7 +109,7 @@ final public class RestoreRemoveChromeWarning {
 				// Se escriben los comandos de reconfiguracion
 				final StringBuilder reconfigScript = new StringBuilder();
 				// Comandos de desinstalacion
-				final ArrayList<String[]> uninstallCommands = getCommandsToRemoveChromeAndChromiumWarningsOnUninstall(appDir, userDir);
+				final ArrayList<String[]> uninstallCommands = getCommandsToRemoveChromeAndChromiumWarningsOnUninstall(userDir);
 				final Iterator<String[]> list2 = uninstallCommands.iterator();
 
 				while(list2.hasNext()) {
@@ -115,7 +117,7 @@ final public class RestoreRemoveChromeWarning {
 				}
 
 				// Comandos de instalacion
-				final ArrayList<String[]> installCommands = getCommandsToRemoveChromeAndChromiumWarningsOnInstallLinux(appDir, userDir);
+				final ArrayList<String[]> installCommands = getCommandsToRemoveChromeAndChromiumWarningsOnInstallLinux(userDir);
 				final Iterator<String[]> list = installCommands.iterator();
 				while(list.hasNext()) {
 					ConfiguratorUtil.printScript(list.next(), reconfigScript);
@@ -123,7 +125,7 @@ final public class RestoreRemoveChromeWarning {
 
 				// Se almacenan los script de reconfiguracion en un fichero
 				try {
-					ConfiguratorUtil.writeScript(reconfigScript, new File(appDir, RECONFIG_SCRIPT_NAME));
+					ConfiguratorUtil.writeScript(reconfigScript, new File(workingDir, RECONFIG_SCRIPT_NAME));
 				}
 				catch (final Exception e) {
 					throw new IOException("Error al crear el script para agregar la confianza del esquema 'afirma'", e); //$NON-NLS-1$
@@ -131,9 +133,9 @@ final public class RestoreRemoveChromeWarning {
 			}
 
 			// Se ejecuta el script creado
-			new ProcessBuilder("sh", appDir + "/" + RECONFIG_SCRIPT_NAME).start(); //$NON-NLS-1$ //$NON-NLS-2$
+			new ProcessBuilder("sh", workingDir + "/" + RECONFIG_SCRIPT_NAME).start(); //$NON-NLS-1$ //$NON-NLS-2$
 			// Se elimina el script tras ejecutarlo
-			new ProcessBuilder("rm", appDir + "/" + RECONFIG_SCRIPT_NAME).start(); //$NON-NLS-1$ //$NON-NLS-2$
+			new ProcessBuilder("rm", workingDir + "/" + RECONFIG_SCRIPT_NAME).start(); //$NON-NLS-1$ //$NON-NLS-2$
 		} catch (final IOException e) {
 			LOGGER.warning("No se pudieron crear los scripts para registrar el esquema 'afirma' en Chrome: " + e); //$NON-NLS-1$
 		}
@@ -149,7 +151,7 @@ final public class RestoreRemoveChromeWarning {
 	public static void removeChromeWarningsWindows(final Console window, final boolean installing) {
 
 		if (window != null && installing) {
-			window.print(Messages.getString("ConfiguratorWindows.16")); //$NON-NLS-1$
+			window.print(SimpleAfirmaMessages.getString("ConfiguratorWindows.16")); //$NON-NLS-1$
 		}
 
 		final File usersDir = new File(System.getProperty("user.home")).getParentFile(); //$NON-NLS-1$
@@ -209,7 +211,7 @@ final public class RestoreRemoveChromeWarning {
 				}
 				catch (final Exception e) {
 					if (window != null) {
-						window.print(String.format(Messages.getString("ConfiguratorWindows.15"), userDir.getName())); //$NON-NLS-1$
+						window.print(String.format(SimpleAfirmaMessages.getString("ConfiguratorWindows.15"), userDir.getName())); //$NON-NLS-1$
 					}
 					LOGGER.warning("No se pudo configurar Chrome para el usuario " + userDir + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$
 				}
@@ -219,11 +221,10 @@ final public class RestoreRemoveChromeWarning {
 
 	/** Genera los comandos que desregistran el esquema "afirma" como un
 	 * protocolo de confiable en Chrome. (Repetido en ConfiguratorLinux)
-	 * @param appDir Directorio de instalaci&oacute;n del sistema
 	 * @param userDir Directorio de usuario dentro del sistema operativo.
 	 * @param browserPath Directorio de configuraci&oacute;n de Chromium o Google Chrome.
 	 * @throws IOException */
-	private static ArrayList<String[]> getCommandsToRemoveChromeAndChromiumWarningsOnUninstall(final File appDir, final String userDir) throws IOException {
+	private static ArrayList<String[]> getCommandsToRemoveChromeAndChromiumWarningsOnUninstall(final String userDir) throws IOException {
 
 		final ArrayList<String[]> commandList = new ArrayList<>();
 
@@ -300,11 +301,10 @@ final public class RestoreRemoveChromeWarning {
 
 	/** Genera los scripts que registran el esquema "afirma" como un
 	 * protocolo de confiable en Chrome. (Repetido en ConfiguratorLinux)
-	 * @param appDir Directorio de instalaci&oacute;n del sistema
 	 * @param userDir Directorio de usuario dentro del sistema operativo.
 	 * @param browserPath Directorio de configuraci&oacute;n de Chromium o Google Chrome.
 	 * @throws IOException */
-	private static ArrayList<String[]> getCommandsToRemoveChromeAndChromiumWarningsOnInstallLinux(final File appDir, final String userDir) throws IOException {
+	private static ArrayList<String[]> getCommandsToRemoveChromeAndChromiumWarningsOnInstallLinux(final String userDir) throws IOException {
 
 		final ArrayList<String[]> commandList = new ArrayList<>();
 		// Final del if

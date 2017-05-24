@@ -14,6 +14,7 @@ import java.nio.file.Paths;
 import java.nio.file.attribute.PosixFilePermission;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
+import java.security.KeyStoreException;
 import java.security.MessageDigest;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
@@ -69,6 +70,7 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 	private static final String OSX_SEC_COMMAND = "security add-trusted-cert -d -r trustRoot -k %KEYCHAIN% %CERT%"; //$NON-NLS-1$
 	private static final String OSX_SEC_KS_CERT_COMMAND = "security add-trusted-cert -d -r trustAsRoot -k %KEYCHAIN% %CERT%"; //$NON-NLS-1$
 	static final String OSX_GET_USERS_COMMAND = "dscacheutil -q user"; //$NON-NLS-1$
+	private final static String USER_DIR_LINE_PREFIX = "dir: "; //$NON-NLS-1$
 	static final String MAC_SCRIPT_NAME = "/installCerScript"; //$NON-NLS-1$
 	static final String MAC_SCRIPT_EXT = ".sh"; //$NON-NLS-1$
 	static final String EXPORT_PATH = "export PATH=$PATH:";//$NON-NLS-1$
@@ -77,18 +79,19 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 	private static final String TRUST_SETTINGS_FILE = "/trust_settings.plist"; //$NON-NLS-1$
 	private static final String OSX_RESOURCES = "/osx"; //$NON-NLS-1$
 
+
 	static final String GET_USERS_COMMAND = "dscacheutil -q user"; //$NON-NLS-1$
 	private static final String GET_USER_SCRIPTS_NAME = "scriptGetUsers";//$NON-NLS-1$
 	private static final String SCRIPT_EXT = ".sh";//$NON-NLS-1$
 
 	static String mac_script_path;
 
-	private static String[] userDirs = null;
+	private static List<String> userDirs = null;
 
 	private static File sslCerFile;
 
 	@Override
-	public void restore(RestoreConfigPanel configPanel) throws IOException, GeneralSecurityException {
+	public void restore(RestoreConfigPanel configPanel) {
 
 		userDirs = getSystemUsersHomes();
 
@@ -102,19 +105,38 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 			mac_script_path = File.createTempFile(MAC_SCRIPT_NAME, MAC_SCRIPT_EXT).getAbsolutePath();
 		} catch (final Exception e) {
 			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigMacOSX.15")); //$NON-NLS-1$
-			LOGGER.severe("Error creando script temporal: " + e); //$NON-NLS-1$
-			throw new IOException("Error creando script temporal", e); //$NON-NLS-1$
+			LOGGER.severe("Error creando script temporal. Se aborta la operacion: " + e); //$NON-NLS-1$
 		}
 
 		if (!checkSSLKeyStoreGenerated(appDir) || !checkSSLRootCertificateGenerated(appDir)) {
-			configureSSL(appDir, configPanel);
+			try {
+				configureSSL(appDir, configPanel);
+			} catch (final IOException e) {
+				configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigMacOSX.7")); //$NON-NLS-1$
+				LOGGER.severe("Error al copiar a disco los certificados SSL en el almacen de confianza. Se aborta la operacion: " + e); //$NON-NLS-1$
+				return;
+			} catch (final GeneralSecurityException e) {
+				configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigMacOSX.9")); //$NON-NLS-1$
+				LOGGER.severe("Error al generar los certificados SSL. Se aborta la operacion: " + e); //$NON-NLS-1$
+				return;
+			}
 		}
 		else {
 			LOGGER.info("Los certificados SSL existen y no se crearan ni instalaran" ); //$NON-NLS-1$
 			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigMacOSX.14")); //$NON-NLS-1$
 		}
 
-		installRootCA(appDir, configPanel);
+		try {
+			installRootCA(appDir, configPanel);
+		} catch (final SecurityException e) {
+			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigMacOSX.10")); //$NON-NLS-1$
+			LOGGER.severe("No se tienen permisos para realizar la instalacion de los certificados SSL. Se aborta la operacion: " + e); //$NON-NLS-1$
+			return;
+		} catch (final KeyStoreException | IOException e) {
+			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigMacOSX.11")); //$NON-NLS-1$
+			LOGGER.severe("Error al instalar los certificados SSL en el almacen de confianza del sistema. Se aborta la operacion: " + e); //$NON-NLS-1$
+			return;
+		}
 
 		closeChrome();
 
@@ -197,7 +219,7 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 	}
 
 	/**
-	 * Genera e instala los certificados SSL para la comunicaci&oacute;n con la aplicaci&oacute;n.
+	 * Genera y copia a disco los certificados SSL para la comunicaci&oacute;n con la aplicaci&oacute;n.
 	 * @param appDir Directorio de instalaci&oacute;n de la aplicaci&oacute;n.
 	 * @param configPanel Panel de configuraci&oacute;n con las trazas de ejecuci&oacute;n.
 	 * @throws IOException Cuando ocurre un error en el proceso de instalaci&oacute;n.
@@ -232,18 +254,15 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 
     /** Devuelve un listado con todos los directorios de usuario del sistema.
 	 * @return Listado de directorios. */
-	private static String[] getSystemUsersHomes() {
+	private static List<String> getSystemUsersHomes() {
 
 		if (userDirs != null) {
 			return userDirs;
 		}
-
 		try {
 			final File getUsersScriptFile = createGetUsersScript();
 			final Object o = executeScriptFile(getUsersScriptFile.getAbsolutePath(), false, true);
-			final List<String> dirs = new ArrayList<>();
-			String line;
-			final String initLine = "dir: "; //$NON-NLS-1$
+			userDirs = new ArrayList<>();
 			try (
 					final InputStream resIs = new ByteArrayInputStream(o.toString().getBytes());
 					final BufferedReader resReader = new BoundedBufferedReader(
@@ -252,17 +271,13 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 							2048 // Maximo 2048 caracteres por linea
 							);
 					) {
+				String line;
 				while ((line = resReader.readLine()) != null) {
-					if (line.startsWith(initLine)){
-						dirs.add(
-								line.substring(
-										line.indexOf(initLine) + initLine.length()
-										)
-								);
+					if (line.startsWith(USER_DIR_LINE_PREFIX)){
+						userDirs.add(line.substring(USER_DIR_LINE_PREFIX.length()));
 					}
 				}
 			}
-			userDirs = dirs.toArray(new String[dirs.size()]);
 		}
 		catch (final IOException e) {
 			LOGGER.severe("Error al generar el listado perfiles de Firefox del sistema: " + e); //$NON-NLS-1$
@@ -295,8 +310,11 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 	 * @param appDir Directorio de instalaci&oacute;n de la aplicaci&oacute;n.
 	 * @param configPanel Panel de configuraci&oacute;n con las trazas de ejecuci&oacute;n.
 	 * @throws IOException Si ocurre alg&uacute;n problema durante el proceso.
+	 * @throws SecurityException Cuando no se tengan permisos para realizar la instalaci&oacute;n.
+	 * @throws KeyStoreException Cuando ocurre un error durante la importaci&oacute;n.
 	 */
-	private static void installRootCA(final File appDir, final RestoreConfigPanel configPanel) throws IOException {
+	private static void installRootCA(final File appDir, final RestoreConfigPanel configPanel)
+			throws IOException, SecurityException, KeyStoreException {
 
 		// Cerramos el almacen de firefox si esta abierto
 		closeFirefox();
@@ -331,7 +349,7 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 			RestoreConfigFirefox.installRootCAMozillaKeyStore(
 				appDir,
 				null,
-				new String[] { OSX_GET_USERS_COMMAND }
+				userDirs
 			);
 
 			LOGGER.info("Configuracion de NSS"); //$NON-NLS-1$
@@ -673,7 +691,7 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 	private static void uninstallRootCAFirefoxKeyStore() throws IOException {
 
 		// Generamos script para borrar el almacen certificados firefox
-		RestoreConfigFirefox.generateUninstallScriptMac(RestoreConfigUtil.getApplicationDirectory());
+		RestoreConfigFirefox.generateUninstallScriptMac(RestoreConfigUtil.getApplicationDirectory(), userDirs);
 		// Le damos permisos para poder ejecutarlo
 		addExexPermissionsToAllFilesOnDirectory(RestoreConfigUtil.getApplicationDirectory());
 	}

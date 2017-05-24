@@ -25,6 +25,8 @@ final class ConfiguratorLinux implements Configurator {
 	private static final String LINUX_CHROMIUM_V57_OR_HIGHER_PREFS_PATH = "/.config/chromium/Default/Preferences";//$NON-NLS-1$
 	private static final String LINUX_CHROME_V57_OR_HIGHER_PREFS_PATH = "/.config/google-chrome/Default/Preferences";//$NON-NLS-1$
 
+	private static final String ALTERNATIVE_APP_SUBDIR = ".afirma/AutoFirma"; //$NON-NLS-1$
+
 	private static final String UNINSTALL_SCRIPT_NAME = "uninstall.sh"; //$NON-NLS-1$
 	private static final String INSTALL_SCRIPT_NAME = "script.sh"; //$NON-NLS-1$
 
@@ -40,6 +42,9 @@ final class ConfiguratorLinux implements Configurator {
         final File appDir = getApplicationDirectory();
 
         LOGGER.info(Messages.getString("ConfiguratorLinux.3") + appDir.getAbsolutePath()); //$NON-NLS-1$
+
+        // Obtenemos los directorios de los usuarios
+		final String[] usersDirs = getSystemUsersHomes();
 
         if (!checkSSLKeyStoreGenerated(appDir)) {
             LOGGER.info(Messages.getString("ConfiguratorLinux.5")); //$NON-NLS-1$
@@ -61,11 +66,6 @@ final class ConfiguratorLinux implements Configurator {
             		certPack.getCaCertificate().getEncoded(),
             		new File(appDir, FILE_AUTOFIRMA_CERTIFICATE));
 
-            // Obtenemos los directorios de los usuarios
-    		final String[] usersDirs = getSystemUsersHomes();
-
-            createScriptsRemoveChromeWarnings(appDir, usersDirs);
-
             try {
                 LOGGER.info(Messages.getString("ConfiguratorLinux.13")); //$NON-NLS-1$
                 ConfiguratorFirefoxLinux.createScriptsToSystemKeyStore(appDir, usersDirs,
@@ -83,6 +83,8 @@ final class ConfiguratorLinux implements Configurator {
             LOGGER.info(Messages.getString("ConfiguratorLinux.14")); //$NON-NLS-1$
         }
 
+        createScriptsRemoveChromeWarnings(appDir, usersDirs);
+
         LOGGER.info(Messages.getString("ConfiguratorLinux.8")); //$NON-NLS-1$
     }
 
@@ -95,13 +97,41 @@ final class ConfiguratorLinux implements Configurator {
 
 	private static File getApplicationDirectory() {
 
-		// TODO: Devolver un directorio que utilizar como directorio de instalacion cuando
+		// Devolver un directorio que utilizar como directorio de instalacion cuando
 		// se realice un despliegue JNLP
-//		if (ConfiguratorUtil.isJNLPDeployment()) {
-//
-//		}
+		if (AutoFirmaConfiguratiorJNLPUtils.isJNLPDeployment()) {
+			try {
+				return getIntApplicationDirectory();
+			} catch (final IOException e) {
+				LOGGER.severe("No se encuentra ni ha podido generarse el directorio de aplicacion: " + e); //$NON-NLS-1$
+			}
+		}
 
 		return ConfiguratorUtil.getApplicationDirectory();
+	}
+
+	/**
+	 * Obtiene un directorio en el que almacenar los ficheros de la aplicaci&oacute;n.
+	 * @return Directorio de aplicaci&oacute;n.
+	 * @throws IOException
+	 */
+	private static File getIntApplicationDirectory() throws IOException {
+		String userHome = null;
+		try {
+			userHome = System.getProperty("user.home"); //$NON-NLS-1$
+		}
+		catch (final Exception e) {
+			throw new IOException("No se ha podido identificar el directorio del usuario para almacenar los ficheros de instalacion", e); //$NON-NLS-1$
+		}
+		if (userHome == null) {
+			throw new IOException("No se encuentra definido el directorio del usuario"); //$NON-NLS-1$
+		}
+
+		final File appDir = new File(userHome, ALTERNATIVE_APP_SUBDIR);
+		if (!appDir.isDirectory() && !appDir.mkdirs()) {
+			throw new IOException("No ha podido crearse el directorio para los ficheros de aplicacion"); //$NON-NLS-1$
+		}
+		return appDir;
 	}
 
     /** Obtiene los directorios de usuarios del sistema.

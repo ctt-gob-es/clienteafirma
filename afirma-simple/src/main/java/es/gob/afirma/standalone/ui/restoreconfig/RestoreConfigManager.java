@@ -1,10 +1,6 @@
 package es.gob.afirma.standalone.ui.restoreconfig;
 
-import java.io.IOException;
-import java.security.GeneralSecurityException;
 import java.util.logging.Logger;
-
-import javax.swing.JOptionPane;
 
 import es.gob.afirma.core.misc.Platform;
 
@@ -45,36 +41,14 @@ public class RestoreConfigManager {
 	}
 
 	/** Repara la configuraci&oacute;n de navegadores para permitir la correcta ejecuci&oacute;n de AutoFirma.
-	 * @param configPanel Panel de configuraci&oacute;n con las trazas de ejecuci&oacute;n.
-	 * @throws GeneralSecurityException Cuando se produce un error al manipular los almacenes de certificados.
-	 * @throws ConfigurationException Cuando falla la generacion del certificados SSL.
-	 * @throws IOException Cuando no es posible cargar o manipular alg&uacute;n fichero de configuraci&oacute;n o recursos. */
-	public void restoreConfigAutoFirma(final RestoreConfigPanel configPanel) throws GeneralSecurityException, ConfigurationException, IOException {
+	 * @param configPanel Panel de configuraci&oacute;n con las trazas de ejecuci&oacute;n. */
+	public void restoreConfigAutoFirma(final RestoreConfigPanel configPanel) {
 
 		if (this.configurator == null) {
 			LOGGER.warning("No se realizara ninguna accion"); //$NON-NLS-1$
 			return;
 		}
-
-		// Creamos el almacen para la configuracion del SSL
-		try {
-			this.configurator.restore(configPanel);
-		}
-		catch (final IOException e) {
-			LOGGER.severe("Error al copiar, leer o eliminar alguno de los ficheros de configuracion. El configurador se detendra: " + e); //$NON-NLS-1$
-			JOptionPane.showMessageDialog(null, Messages.getString("RestoreAutoFirma.3")); //$NON-NLS-1$
-			throw e;
-		}
-		catch (final ConfigurationException e) {
-			LOGGER.severe("Error al generar las claves de cifrado SSL. El configurador se detendra: " + e); //$NON-NLS-1$
-			JOptionPane.showMessageDialog(null, Messages.getString("RestoreAutoFirma.4")); //$NON-NLS-1$
-			throw e;
-		}
-		catch (final GeneralSecurityException e) {
-			LOGGER.severe("Error en la importacion de la CA de confianza o la limpieza del almacen: " + e); //$NON-NLS-1$
-			JOptionPane.showMessageDialog(null, Messages.getString("RestoreAutoFirma.5")); //$NON-NLS-1$
-			throw e;
-		}
+		this.configurator.restore(configPanel);
 	}
 
 }

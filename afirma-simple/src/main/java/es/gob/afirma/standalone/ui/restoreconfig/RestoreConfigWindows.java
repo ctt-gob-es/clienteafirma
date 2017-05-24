@@ -58,7 +58,7 @@ final class RestoreConfigWindows implements RestoreConfig {
 	private final static File appDir = RestoreConfigUtil.getApplicationDirectory();
 
 	@Override
-	public void restore(final RestoreConfigPanel configPanel) throws IOException, GeneralSecurityException {
+	public void restore(final RestoreConfigPanel configPanel) {
 
 		// Identificamos el directorio de instalacion
 		LOGGER.info("Ruta de appDir: " + appDir.getAbsolutePath()); //$NON-NLS-1$
@@ -312,9 +312,8 @@ final class RestoreConfigWindows implements RestoreConfig {
 			// Elimino certutil tras su uso
 			RestoreConfigFirefox.removeConfigurationFiles(installDir);
 
-		} catch (final IOException e) {
-			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigWindows.3", installDir.getAbsolutePath())); //$NON-NLS-1$
-
+		} catch (final IOException | KeyStoreException e) {
+			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigWindows.31", installDir.getAbsolutePath())); //$NON-NLS-1$
 		} catch (final MozillaProfileNotFoundException e) {
 			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigWindows.12")); //$NON-NLS-1$
 		}

@@ -153,8 +153,16 @@ public final class AutoFirmaUtil {
 	 */
 	public static File getWindowsAlternativeAppDir() {
 		final String commonDir = System.getenv("ALLUSERSPROFILE"); //$NON-NLS-1$
-		final File appDir = new File (commonDir, "AutoFirma"); //$NON-NLS-1$
-		return appDir;
+		return new File (commonDir, "AutoFirma"); //$NON-NLS-1$
+	}
+
+	/**
+	 * Recupera el directorio de instalaci&oacute;n alternativo en los sistemas Linux.
+	 * @return Directorio de instalaci&oaucte;n.
+	 */
+	public static File getLinuxAlternativeAppDir() {
+		final String userHome = System.getProperty("user.home"); //$NON-NLS-1$
+		return new File(userHome, ".afirma/AutoFirma"); //$NON-NLS-1$
 	}
 
 	/**
@@ -163,8 +171,7 @@ public final class AutoFirmaUtil {
 	 */
 	public static File getMacOsXAlternativeAppDir() {
 		final String userDir = System.getenv("HOME"); //$NON-NLS-1$
-		final File appDir = new File (userDir, "Library/Application Support/AutoFirma"); //$NON-NLS-1$
-		return appDir;
+		return new File (userDir, "Library/Application Support/AutoFirma"); //$NON-NLS-1$
 	}
 
 	/**
