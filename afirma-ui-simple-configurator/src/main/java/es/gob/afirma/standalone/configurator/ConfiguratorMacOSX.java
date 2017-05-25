@@ -656,7 +656,7 @@ final class ConfiguratorMacOSX implements Configurator {
 	 * @throws IOException Cuando no se pueda crear el fichero de script.
 	 */
 	private static File createGetUsersScript() throws IOException {
-		final StringBuilder script = new StringBuilder(ConfiguratorMacOSX.GET_USERS_COMMAND);
+		final StringBuilder script = new StringBuilder(GET_USERS_COMMAND);
 		final File scriptFile = File.createTempFile(GET_USER_SCRIPTS_NAME, SCRIPT_EXT);
 		try {
 			ConfiguratorMacUtils.writeScriptFile(script, scriptFile.getAbsolutePath(), true);

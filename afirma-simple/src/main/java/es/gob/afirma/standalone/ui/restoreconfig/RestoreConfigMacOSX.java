@@ -16,6 +16,7 @@ import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.MessageDigest;
+import java.security.cert.Certificate;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -46,6 +47,7 @@ import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.BoundedBufferedReader;
 import es.gob.afirma.keystores.mozilla.MozillaKeyStoreUtilities;
 import es.gob.afirma.keystores.mozilla.MozillaKeyStoreUtilitiesOsX;
+import es.gob.afirma.standalone.AutoFirmaUtil;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.ui.restoreconfig.CertUtil.CertPack;
 import es.gob.afirma.standalone.ui.restoreconfig.RestoreConfigFirefox.MozillaProfileNotFoundException;
@@ -53,19 +55,18 @@ import es.gob.afirma.standalone.ui.restoreconfig.RestoreConfigFirefox.MozillaPro
 /**
  * Clase que contiene la l&oacute;gica para realizar las tareas de restauraci&oacute;n
  * de la configuraci&oacute;n de navegadores para el sistema operativo MacOsX.
- *
  */
 final class RestoreConfigMacOSX implements RestoreConfig {
 
 	static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	private static final String KS_FILENAME = "/autofirma.pfx"; //$NON-NLS-1$
+	private static final String SSL_CA_CER_FILENAME = "/AutoFirma_ROOT.cer";//$NON-NLS-1$
 	private static final String SSL_CER_FILENAME = "/autofirma.cer"; //$NON-NLS-1$
 	private static final String KS_PASSWORD = "654321"; //$NON-NLS-1$
 	private static final String CERT_CN = "127.0.0.1"; //$NON-NLS-1$
 	private static final String CERT_CN_ROOT = "'AutoFirma ROOT'"; //$NON-NLS-1$
 	static final String GET_USER_SCRIPT = "/getUsers.sh";//$NON-NLS-1$
-	private static final String MACOSX_CERTIFICATE = "/AutoFirma_ROOT.cer";//$NON-NLS-1$
 	private static final String KEYCHAIN_PATH = "/Library/Keychains/System.keychain"; //$NON-NLS-1$
 	private static final String OSX_SEC_COMMAND = "security add-trusted-cert -d -r trustRoot -k %KEYCHAIN% %CERT%"; //$NON-NLS-1$
 	private static final String OSX_SEC_KS_CERT_COMMAND = "security add-trusted-cert -d -r trustAsRoot -k %KEYCHAIN% %CERT%"; //$NON-NLS-1$
@@ -99,6 +100,19 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 
 		configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigMacOSX.3", appDir.getAbsolutePath())); //$NON-NLS-1$
 
+		// Verifica si se tiene permisos para escribir en el directorio de instalacion
+		// y establece como directorio de trabajo otro distinto en caso de no tenerlos
+		File workingDir;
+		if(Files.isWritable(appDir.toPath())) {
+			workingDir = appDir;
+		} else {
+			workingDir = AutoFirmaUtil.getMacOsXAlternativeAppDir();
+			if (!workingDir.isDirectory() && !workingDir.mkdirs()) {
+				configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigMacOSX.1")); //$NON-NLS-1$
+				LOGGER.severe("No se puede utilizar el directorio alternativo de trabajo por no ser un directorio y no poder crearse"); //$NON-NLS-1$
+			}
+		}
+
 		// Generamos un fichero que utilizaremos para guardar y ejecutar
 		// AppleScripts
 		try {
@@ -108,9 +122,37 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 			LOGGER.severe("Error creando script temporal. Se aborta la operacion: " + e); //$NON-NLS-1$
 		}
 
-		if (!checkSSLKeyStoreGenerated(appDir) || !checkSSLRootCertificateGenerated(appDir)) {
+		// Iniciamos la restauracion de los certificados SSL
+		restoreSslCertificates(appDir, workingDir, configPanel);
+
+		// Iniciamos la restauracion de la confianza de Chrome en el protocolo afirma
+		configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigMacOSX.16")); //$NON-NLS-1$
+		closeChrome();
+		RestoreRemoveChromeWarning.removeChromeWarningsMac(workingDir, userDirs);
+
+		configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigMacOSX.8")); //$NON-NLS-1$
+		LOGGER.info("Finalizado" ); //$NON-NLS-1$
+
+	}
+
+	/**
+	 * Restaura la configuracion de los certificados SSL para la comunicaci%&aocute;n
+	 * por sockets.
+	 * @param appDir Directorio de instalaci&oacute;n de la aplicaci&oacute;n.
+	 * @param workingDir Directorio en donde se crearan los ficheros necesarios para
+	 * llevar a cabo la restauraci&oacute;n.
+	 * @param configPanel Panel de configuraci&oacute;n sobre el que se ir&aacute;n
+	 * imprimiendo los mensajes con el estado de la operaci&oacute;n.
+	 */
+	private static void restoreSslCertificates(final File appDir, final File workingDir, final RestoreConfigPanel configPanel) {
+
+		File sslRootCertFile = null;
+		if (!checkSSLKeyStoreGenerated(appDir)) {
+			// Damos permisos al script
+			addExexPermissionsToAllFilesOnDirectory(appDir);
+
 			try {
-				configureSSL(appDir, configPanel);
+				configureSSL(workingDir, configPanel);
 			} catch (final IOException e) {
 				configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigMacOSX.7")); //$NON-NLS-1$
 				LOGGER.severe("Error al copiar a disco los certificados SSL en el almacen de confianza. Se aborta la operacion: " + e); //$NON-NLS-1$
@@ -120,32 +162,48 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 				LOGGER.severe("Error al generar los certificados SSL. Se aborta la operacion: " + e); //$NON-NLS-1$
 				return;
 			}
+			sslRootCertFile = new File(workingDir, SSL_CA_CER_FILENAME);
+		}
+		else if (!checkSSLRootCertificateGenerated(appDir)) {
+			// Damos permisos al script
+			addExexPermissionsToAllFilesOnDirectory(appDir);
+
+			sslRootCertFile = new File(workingDir, SSL_CA_CER_FILENAME);
+			try {
+				Certificate[] sslCertChain = null;
+				try (FileInputStream fis = new FileInputStream(new File(appDir, KS_FILENAME))) {
+					final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
+					ks.load(fis, KS_PASSWORD.toCharArray());
+					sslCertChain = ks.getCertificateChain(ks.aliases().nextElement());
+				}
+
+				// Generacion del certificado raiz .cer
+				RestoreConfigUtil.installFile(sslCertChain[sslCertChain.length - 1].getEncoded(),
+						sslRootCertFile);
+			}
+			catch (final Exception e) {
+				configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigLinux.4")); //$NON-NLS-1$
+				LOGGER.severe("Error al copiar los certificados SSL a disco: " + e); //$NON-NLS-1$
+				return;
+			}
 		}
 		else {
 			LOGGER.info("Los certificados SSL existen y no se crearan ni instalaran" ); //$NON-NLS-1$
 			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigMacOSX.14")); //$NON-NLS-1$
+			sslRootCertFile = new File(appDir, SSL_CA_CER_FILENAME);
 		}
 
 		try {
-			installRootCA(appDir, configPanel);
+			installRootCA(appDir, workingDir, sslRootCertFile, configPanel);
 		} catch (final SecurityException e) {
 			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigMacOSX.10")); //$NON-NLS-1$
 			LOGGER.severe("No se tienen permisos para realizar la instalacion de los certificados SSL. Se aborta la operacion: " + e); //$NON-NLS-1$
 			return;
 		} catch (final KeyStoreException | IOException e) {
 			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigMacOSX.11")); //$NON-NLS-1$
-			LOGGER.severe("Error al instalar los certificados SSL en el almacen de confianza del sistema. Se aborta la operacion: " + e); //$NON-NLS-1$
+			LOGGER.severe("Error al instalar los certificados SSL en los almacenes de confianza. Se aborta la operacion: " + e); //$NON-NLS-1$
 			return;
 		}
-
-		closeChrome();
-
-		configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigMacOSX.16")); //$NON-NLS-1$
-		RestoreRemoveChromeWarning.removeChromeWarningsMac(appDir, userDirs);
-
-		configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigMacOSX.8")); //$NON-NLS-1$
-		LOGGER.info("Finalizado" ); //$NON-NLS-1$
-
 	}
 
 	/**
@@ -207,7 +265,7 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 	 * @param appDir Directorio de la aplicaci&oacute;n.
 	 * @return {@code true} si ya existe un certificado ra&iacute;z .cer, {@code false} en caso contrario. */
 	private static boolean checkSSLRootCertificateGenerated(final File appDir) {
-		return new File(appDir, MACOSX_CERTIFICATE).exists();
+		return new File(appDir, SSL_CA_CER_FILENAME).exists();
 	}
 
 	/** Comprueba si ya existe una plantilla de confianzas instalada en el
@@ -220,18 +278,14 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 
 	/**
 	 * Genera y copia a disco los certificados SSL para la comunicaci&oacute;n con la aplicaci&oacute;n.
-	 * @param appDir Directorio de instalaci&oacute;n de la aplicaci&oacute;n.
+	 * @param workingDir Directorio en el que almacenar los ficheros de la aplicaci&oacute;n.
 	 * @param configPanel Panel de configuraci&oacute;n con las trazas de ejecuci&oacute;n.
 	 * @throws IOException Cuando ocurre un error en el proceso de instalaci&oacute;n.
 	 * @throws GeneralSecurityException Cuando ocurre un error al generar el certificado SSL.
 	 */
-	private static void configureSSL(final File appDir, final RestoreConfigPanel configPanel) throws IOException, GeneralSecurityException {
+	private static void configureSSL(final File workingDir, final RestoreConfigPanel configPanel) throws IOException, GeneralSecurityException {
 
 		configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigMacOSX.5")); //$NON-NLS-1$
-
-
-		// Damos permisos al script
-		addExexPermissionsToAllFilesOnDirectory(appDir);
 
 		// Generamos los certificados de CA y SSL
 		final CertPack certPack = CertUtil.getCertPackForLocalhostSsl(
@@ -239,16 +293,16 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 			KS_PASSWORD
 		);
 
-		deleteInstalledCertificates(appDir);
+		deleteInstalledCertificates(workingDir);
 
-		// Copiamos los certificados CA y SSL a disco
+		// Copiamos los certificados CA, SSL y el PKCS#12 a disco
 		RestoreConfigUtil.installFile(
         		certPack.getCaCertificate().getEncoded(),
-        		new File(appDir, MACOSX_CERTIFICATE));
+        		new File(workingDir, SSL_CA_CER_FILENAME));
 
 		RestoreConfigUtil.installFile(
 			certPack.getPkcs12(),
-			new File(appDir, KS_FILENAME)
+			new File(workingDir, KS_FILENAME)
 		);
 	}
 
@@ -307,13 +361,14 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 
 	/**
 	 * Instala los certificados de comunicaci&oacute;n en el almac&eacute;n de Mozilla y Apple.
-	 * @param appDir Directorio de instalaci&oacute;n de la aplicaci&oacute;n.
+	 * @param appDir Directorio de aplicaci&oacute;n.
+	 * @param workingDir Directorio en el que almacenar los ficheros de la aplicaci&oacute;n.
 	 * @param configPanel Panel de configuraci&oacute;n con las trazas de ejecuci&oacute;n.
 	 * @throws IOException Si ocurre alg&uacute;n problema durante el proceso.
 	 * @throws SecurityException Cuando no se tengan permisos para realizar la instalaci&oacute;n.
 	 * @throws KeyStoreException Cuando ocurre un error durante la importaci&oacute;n.
 	 */
-	private static void installRootCA(final File appDir, final RestoreConfigPanel configPanel)
+	private static void installRootCA(final File appDir, final File workingDir, final File rootCertFile, final RestoreConfigPanel configPanel)
 			throws IOException, SecurityException, KeyStoreException {
 
 		// Cerramos el almacen de firefox si esta abierto
@@ -329,11 +384,11 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 		}
 
 		// Copiamos en disco certUtil para la configuracion de los certificados en el almacen de Firefox
-		RestoreConfigFirefox.copyConfigurationFiles(appDir);
+		RestoreConfigFirefox.copyConfigurationFiles(workingDir);
 
 		LOGGER.info("Desinstalacion de versiones anteriores del certificado raiz del almacen de Firefox"); //$NON-NLS-1$
 		try {
-			uninstallRootCAFirefoxKeyStore();
+			uninstallRootCAFirefoxKeyStore(workingDir);
 		}
 		catch (final IOException e) {
 			LOGGER.log(Level.SEVERE, "Se ha producido un error durante la busqueda y desinstalacion de versiones anteriores del certificado SSL en Firefox: " + e, e); //$NON-NLS-1$
@@ -347,8 +402,8 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 
 			// Instalar el certificado en Mozilla
 			RestoreConfigFirefox.installRootCAMozillaKeyStore(
-				appDir,
-				null,
+				workingDir,
+				rootCertFile,
 				userDirs
 			);
 
@@ -365,7 +420,7 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 		// Se instalan los certificados en el almacen de Apple
 		configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigMacOSX.6")); //$NON-NLS-1$
 		try {
-			createScriptToImportCARootOnMacOSXKeyStore(appDir);
+			createScriptToImportCARootOnMacOSXKeyStore(appDir, workingDir);
 			addExexPermissionsToFile(new File(mac_script_path));
 			executeScript(mac_script_path, true, true);
 		}
@@ -382,11 +437,13 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 	/** Genera el comando de instalaci&oacute;n del certificado en el almac&eacute;n de apple en el script de instalaci&oacute;n.
 	 * @throws GeneralSecurityException Se produce si hay un problema de seguridad durante el proceso.
 	 * @throws IOException Se produce cuando hay un error en la creaci&oacute;n del fichero. */
-	static void createScriptToImportCARootOnMacOSXKeyStore(final File appDir) throws GeneralSecurityException, IOException {
-
+	static void createScriptToImportCARootOnMacOSXKeyStore(final File appDir, final File workingDir) throws GeneralSecurityException, IOException {
 
 		// Creamos el script para la instalacion del certificado SSL en el almacen de confianza de Apple
-		final File certFile = new File(appDir, MACOSX_CERTIFICATE);
+		File certFile = new File(appDir, SSL_CA_CER_FILENAME);
+		if (!certFile.exists()) {
+			certFile = new File(workingDir, SSL_CA_CER_FILENAME);
+		}
 		final String cmd = OSX_SEC_COMMAND.replace(
 			"%KEYCHAIN%", //$NON-NLS-1$
 			KEYCHAIN_PATH
@@ -399,7 +456,10 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 
 
 		// Creamos el script para la instalacion del certificado SSL en el almacen de confianza de Apple
-		final File pfx = new File(appDir, KS_FILENAME);
+		File pfx = new File(appDir, KS_FILENAME);
+		if (!pfx.exists()) {
+			pfx = new File(workingDir, KS_FILENAME);
+		}
 		final KeyStore ks;
 		try (final InputStream is = new FileInputStream(pfx)) {
 			ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
@@ -408,7 +468,7 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 		final X509Certificate certPfx = (X509Certificate) ks.getCertificate(RestoreConfigUtil.CERT_ALIAS);
 		final byte[] buf = certPfx.getEncoded();
 
-		sslCerFile = new File(appDir, SSL_CER_FILENAME);
+		sslCerFile = new File(workingDir, SSL_CER_FILENAME);
 		try (
 			final FileOutputStream os = new FileOutputStream(sslCerFile);
 		) {
@@ -436,10 +496,10 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 		final String snCer = AOUtil.hexify(certPfx.getSerialNumber().toByteArray(), false);
 		final String sha1Cer =  AOUtil.hexify(MessageDigest.getInstance("SHA1").digest(certPfx.getEncoded()), false); //$NON-NLS-1$
 
-		editTrusFile(sha1Root, sha1Cer, snRoot, snCer);
+		editTrustFile(appDir, workingDir, sha1Root, sha1Cer, snRoot, snCer);
 
 		final String trustCmd = TRUST_SETTINGS_COMMAND
-			+ appDir.getAbsolutePath().replace(" ", "\\ ") //$NON-NLS-1$ //$NON-NLS-2$
+			+ workingDir.getAbsolutePath().replace(" ", "\\ ") //$NON-NLS-1$ //$NON-NLS-2$
 			+ TRUST_SETTINGS_FILE
 		;
 		LOGGER.info("Comando de instalacion de ajustes de confianza: " + trustCmd); //$NON-NLS-1$
@@ -509,6 +569,7 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 		perms.add(PosixFilePermission.OWNER_WRITE);
 		perms.add(PosixFilePermission.GROUP_WRITE);
 		perms.add(PosixFilePermission.OTHERS_WRITE);
+
 		try {
 			Files.setPosixFilePermissions(
 				Paths.get(f.getAbsolutePath()),
@@ -529,7 +590,7 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 	 * @throws IOException Se produce cuando hay un error en la creaci&oacute;n del fichero.
 	 */
 	private static void uninstallRootCAMacOSXKeyStore() throws IOException {
-		LOGGER.severe("Desintalamos los certificados y eliminamos los enlaces simbolicos:"); //$NON-NLS-1$
+		LOGGER.info("Desinstalamos los certificados y eliminamos los enlaces simbolicos:"); //$NON-NLS-1$
 		// Creamos comandos para eliminar enlaces simbolicos de firfox y certificados del llavero
 		final String deleteLinks = "ls -ln /usr/local/lib | grep Firefox | awk '{print $9}' | xargs -I {} rm /usr/local/lib/{}"; //$NON-NLS-1$
 		final String deleteCaCerts = "security find-certificate -c " + CERT_CN + " -a -Z|grep SHA-1|awk '{ print $NF }' | xargs -I {} security delete-certificate -Z {}"; //$NON-NLS-1$ //$NON-NLS-2$
@@ -544,15 +605,17 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 
 	}
 
-	private static void editTrusFile(final String sha1Root, final String sha1Cer, final String snRoot, final String snCer) {
-
-		final File appDir = RestoreConfigUtil.getApplicationDirectory();
+	private static void editTrustFile(final File appDir, final File workingDir, final String sha1Root, final String sha1Cer, final String snRoot, final String snCer) {
 
 		try {
 			deleteTrustTemplate(appDir);
-			exportResource(OSX_RESOURCES,TRUST_SETTINGS_FILE, appDir.getAbsolutePath());
-		} catch (final Exception e1) {
-			LOGGER.severe("No ha podido copiarse la plantilla de configuracion de confianza: " + e1); //$NON-NLS-1$
+		} catch (final Exception e) {
+			LOGGER.warning("No ha podido eliminarse la anterior plantilla de configuracion de confianza: " + e); //$NON-NLS-1$
+		}
+		try {
+			exportResource(OSX_RESOURCES,TRUST_SETTINGS_FILE, workingDir.getAbsolutePath());
+		} catch (final Exception e) {
+			LOGGER.severe("No ha podido copiarse la plantilla de configuracion de confianza: " + e); //$NON-NLS-1$
 		}
 
 		final String sha1RootOrig = "%CA_SHA1%"; //$NON-NLS-1$
@@ -560,11 +623,7 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 		final String snRootOrig = "%CA_SERIALNUMBER%"; //$NON-NLS-1$
 		final String snCerOrig = "%SSL_SERIALNUMBER%"; //$NON-NLS-1$
 
-		try(final InputStream in = new FileInputStream(
-			RestoreConfigUtil.getApplicationDirectory().getAbsolutePath()
-			+ TRUST_SETTINGS_FILE
-		);
-				) {
+		try (final InputStream in = new FileInputStream(new File(workingDir, TRUST_SETTINGS_FILE));) {
 
 			final DocumentBuilderFactory docFactory =
 			DocumentBuilderFactory.newInstance();
@@ -610,10 +669,7 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 			final Transformer transformer = transformerFactory.newTransformer();
 			final DOMSource domSource = new DOMSource(doc);
 			final StreamResult streamResult = new StreamResult(
-				new File(
-					RestoreConfigUtil.getApplicationDirectory().getAbsolutePath()
-					+ TRUST_SETTINGS_FILE
-				)
+				new File(workingDir, TRUST_SETTINGS_FILE)
 			);
 			transformer.transform(domSource, streamResult);
 
@@ -621,8 +677,6 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 		catch (final Exception e) {
 			LOGGER.severe("Error analizando el PList: " + e); //$NON-NLS-1$
 		}
-
-
 	}
 
 	private static byte[] hexStringToByteArray(final String s) {
@@ -655,7 +709,7 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 
 		if (checkSSLRootCertificateGenerated(appDir)) {
 
-			final File sslRoot = new File(appDir, MACOSX_CERTIFICATE);
+			final File sslRoot = new File(appDir, SSL_CA_CER_FILENAME);
 
 			if (!sslRoot.delete()) {
 				throw new IOException("No puedo eliminar AutoFirma_ROOT.cer"); //$NON-NLS-1$
@@ -686,14 +740,16 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 
 	/**
 	 * Desinstala el certificado de CA del almacen de autoridades de confianza de Mozilla Firefox.
+	 * @param workingDir Directorio en el que almacenar los ficheros necesarios para la
+	 * ejecuci&oacute;n de la funci&oacute;n.
 	 * @throws IOException Se produce cuando hay un error en la creaci&oacute;n del fichero.
 	 */
-	private static void uninstallRootCAFirefoxKeyStore() throws IOException {
+	private static void uninstallRootCAFirefoxKeyStore(final File workingDir) throws IOException {
 
 		// Generamos script para borrar el almacen certificados firefox
-		RestoreConfigFirefox.generateUninstallScriptMac(RestoreConfigUtil.getApplicationDirectory(), userDirs);
+		RestoreConfigFirefox.generateUninstallScriptMac(workingDir, userDirs);
 		// Le damos permisos para poder ejecutarlo
-		addExexPermissionsToAllFilesOnDirectory(RestoreConfigUtil.getApplicationDirectory());
+		addExexPermissionsToAllFilesOnDirectory(workingDir);
 	}
 
 	/** Escribe un <i>script</i> en un fichero dado.

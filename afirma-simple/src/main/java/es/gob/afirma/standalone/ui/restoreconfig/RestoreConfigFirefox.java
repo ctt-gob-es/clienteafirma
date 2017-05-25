@@ -41,7 +41,7 @@ final class RestoreConfigFirefox {
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
-	private static final String FILE_AUTOFIRMA_CERTIFICATE = "AutoFirma_ROOT.cer"; //$NON-NLS-1$
+	private static final String SSL_ROOT_CERTIFICATE_FILENAME = "AutoFirma_ROOT.cer"; //$NON-NLS-1$
 	static final String DIR_CERTUTIL = "certutil"; //$NON-NLS-1$
 	private static final String LINUX_UNINSTALLSCRIPT_NAME = "uninstallRestore-"; //$NON-NLS-1$
 	private static final String LINUX_SCRIPT_NAME = "installRestore-"; //$NON-NLS-1$
@@ -504,7 +504,7 @@ final class RestoreConfigFirefox {
 
 		File certificateFile = certFile;
 		if (certificateFile == null) {
-			certificateFile = new File(new File(certutilExe).getParentFile(), FILE_AUTOFIRMA_CERTIFICATE);
+			certificateFile = new File(new File(certutilExe).getParentFile().getParentFile(), SSL_ROOT_CERTIFICATE_FILENAME);
 		}
 
 		// Obtenemos todos los directorios de perfil de Firefox del usuario
