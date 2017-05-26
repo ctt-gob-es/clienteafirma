@@ -29,8 +29,19 @@ public class AutoFirmaProtocolWebStart {
 			return;
 		}
 
-		// Ejecutamos la operacion con AutoFirma (desactivando las actualizaciones)
-		SimpleAfirma.setUpdatesEnabled(false);
-		SimpleAfirma.main(args);
+		// Si unicamente se solicita la instalacion, no hacemos nada
+		if (!isOnlyInstallOp(args)) {
+			// Ejecutamos la operacion con AutoFirma (desactivando las actualizaciones)
+			SimpleAfirma.setUpdatesEnabled(false);
+			SimpleAfirma.main(args);
+		}
 	}
+
+	private static boolean isOnlyInstallOp(String[] args) {
+		return args != null && args.length > 0 && (args[0].startsWith("afirma://") || //$NON-NLS-1$
+				args[0].startsWith("jnlp://") || args[0].startsWith("jnlps://")) && //$NON-NLS-1$ //$NON-NLS-2$
+				args[0].indexOf("op=install") != -1; //$NON-NLS-1$
+	}
+
+
 }
