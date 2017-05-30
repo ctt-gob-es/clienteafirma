@@ -49,7 +49,7 @@ public final class TestEnvelopes {
 	 * @throws Exception En cualquier error. */
 	@SuppressWarnings("static-method")
 	@Test
-	public void createEnvelope() throws Exception {
+	public void createAndOpenEnvelope() throws Exception {
 
 		final byte[] content ="Hola mundo".getBytes(); //$NON-NLS-1$
 
@@ -95,6 +95,8 @@ public final class TestEnvelopes {
 			content,
 			recoveredData
 		);
+
+		System.out.println(new String(recoveredData));
 
 	}
 

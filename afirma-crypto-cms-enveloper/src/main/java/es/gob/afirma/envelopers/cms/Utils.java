@@ -45,6 +45,7 @@ import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.PBEParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
 
 import org.spongycastle.asn1.ASN1Encodable;
 import org.spongycastle.asn1.ASN1EncodableVector;
@@ -679,14 +680,17 @@ final class Utils {
      * @throws NoSuchPaddingException Cuando el JRE no soporta alg&uacute;n tipo de relleno necesario.
      * @throws NoSuchAlgorithmException Cuando el JRE no soporta alg&uacute;n algoritmo necesario.
      * @throws InvalidKeyException Cuando la clave proporcionada no es v&aacute;lida.
-     * @throws Pkcs11WrapOperationException Cuando se produce un error derivado del uso del PKCS#11
-     * 			                            de un dispositivo criptogr&aacute;fico. */
+     * @throws BadPaddingException Si el relleno a usar en la desenvoltura es distinta a la que se us&oacute;
+     *                             en la envoltura.
+     * @throws IllegalBlockSizeException Si el tipo de bloque a usar en la desenvoltura es distinta a la que se us&oacute;
+     *                                   en la envoltura.*/
     static KeyAsigned assignKey(final byte[] passCiphered,
     		                    final PrivateKeyEntry keyEntry,
     		                    final AlgorithmIdentifier algClave) throws NoSuchAlgorithmException,
     		                                                               NoSuchPaddingException,
     		                                                               InvalidKeyException,
-    		                                                               Pkcs11WrapOperationException {
+    		                                                               IllegalBlockSizeException,
+    		                                                               BadPaddingException {
         final KeyAsigned keyAsigned = new KeyAsigned();
 
         AOCipherAlgorithm algorithm = null;
@@ -707,21 +711,18 @@ final class Utils {
         // del paquete despu&eacute;s,
         keyAsigned.setConfig(new AOCipherConfig(algorithm, null, null));
 
-        // Desembolvemos la clave usada para cifrar el contenido
+        // Desenvolvemos la clave usada para cifrar el contenido
         // a partir de la clave privada del certificado del usuario.
+        // Usamos un descifrado RSA en vez de una desenvoltura para evitar los
+        // problemas de UNWRAPPING de ciertos controladores PKCS#11 (FNMT)
         final Cipher cipher2 = Cipher.getInstance("RSA/ECB/PKCS1Padding"); //$NON-NLS-1$
-
-		cipher2.init(Cipher.UNWRAP_MODE, keyEntry.getPrivateKey());
-
-		try {
-			keyAsigned.setCipherKey((SecretKey) cipher2.unwrap(passCiphered, algorithm.getName(), Cipher.SECRET_KEY));
-		}
-		catch (final InvalidKeyException e) {
-			if (e.getCause() != null && e.getCause().getClass().getName().equals("sun.security.pkcs11.wrapper.PKCS11Exception")) { //$NON-NLS-1$
-				throw new Pkcs11WrapOperationException(e.getCause().getMessage(), e);
-			}
-			throw e;
-		}
+		cipher2.init(Cipher.DECRYPT_MODE, keyEntry.getPrivateKey());
+		keyAsigned.setCipherKey(
+			new SecretKeySpec(
+				cipher2.doFinal(passCiphered),
+				algorithm.getName()
+			)
+		);
         return keyAsigned;
     }
 
