@@ -23,7 +23,6 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
-import org.spongycastle.asn1.ASN1Sequence;
 import org.spongycastle.asn1.cms.EncryptedContentInfo;
 import org.spongycastle.asn1.cms.EnvelopedData;
 import org.spongycastle.asn1.x509.AlgorithmIdentifier;
@@ -65,9 +64,7 @@ public final class CMSDecipherEnvelopData {
      * @throws NoSuchAlgorithmException Si el JRE no soporta alg&uacute;n algoritmo necesario
      * @throws BadPaddingException Cuando hay problemas con un relleno de datos.
      * @throws IllegalBlockSizeException Cuando hay problemas internos con los tama&ntilde;os de bloque de cifrado.
-     * @throws InvalidAlgorithmParameterException Si no se soporta un par&aacute;metro necesario para un algoritmo.
-     * @throws Pkcs11WrapOperationException Cuando se produce un error derivado del uso del PKCS#11
-     * 			de un dispositivo criptogr&aacute;fico.  */
+     * @throws InvalidAlgorithmParameterException Si no se soporta un par&aacute;metro necesario para un algoritmo. */
     public static byte[] dechiperEnvelopData(final byte[] cmsData,
     		                                 final PrivateKeyEntry keyEntry) throws IOException,
                                                                                     CertificateEncodingException,
@@ -77,18 +74,14 @@ public final class CMSDecipherEnvelopData {
                                                                                     NoSuchPaddingException,
                                                                                     InvalidAlgorithmParameterException,
                                                                                     IllegalBlockSizeException,
-                                                                                    BadPaddingException,
-                                                                                    Pkcs11WrapOperationException {
-
+                                                                                    BadPaddingException {
         // Contendra el contenido a tratar.
-        EnvelopedData enveloped = null;
-        Enumeration<?> elementRecipient;
+        final EnvelopedData enveloped;
+        final Enumeration<?> elementRecipient;
 
         try {
             // Contenido de EnvelopedData
-            final ASN1Sequence contentEnvelopedData = Utils.fetchWrappedData(cmsData);
-
-            enveloped = EnvelopedData.getInstance(contentEnvelopedData);
+            enveloped = EnvelopedData.getInstance(Utils.fetchWrappedData(cmsData));
             elementRecipient = enveloped.getRecipientInfos().getObjects();
         }
         catch (final Exception ex) {

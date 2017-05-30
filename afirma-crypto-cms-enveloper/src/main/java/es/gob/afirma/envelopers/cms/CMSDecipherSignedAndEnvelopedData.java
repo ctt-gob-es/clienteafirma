@@ -23,7 +23,6 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
-import org.spongycastle.asn1.ASN1Sequence;
 import org.spongycastle.asn1.ASN1Set;
 import org.spongycastle.asn1.cms.EncryptedContentInfo;
 import org.spongycastle.asn1.x509.AlgorithmIdentifier;
@@ -31,9 +30,8 @@ import org.spongycastle.asn1.x509.AlgorithmIdentifier;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.signers.pkcs7.SignedAndEnvelopedData;
 
-
-/** Clase que descifra el contenido de un fichero en formato
- * SignedAndEnvelopedData. de CMS. */
+/** Descifra el contenido de un fichero en formato
+ * <code>SignedAndEnvelopedData</code> de CMS. */
 public final class CMSDecipherSignedAndEnvelopedData {
 
 	private final byte[] cmsData;
@@ -50,34 +48,25 @@ public final class CMSDecipherSignedAndEnvelopedData {
 
     /** &Eacute;ste m&eacute;todo descifra el contenido de un CMS
      * SignedAndEnvelopData.
-     * @param cmsData
-     *        Datos del tipo SignedAndEnvelopData para obtener los datos
-     *        cifrados.
-     * @param keyEntry
-     *        Clave privada del certificado usado para descifrar el
-     *        contenido.
+     * @param cmsData Datos del tipo SignedAndEnvelopData para obtener los datos
+     *                cifrados.
+     * @param keyEntry Clave privada del certificado usado para descifrar el
+     *                 contenido.
      * @return El contenido descifrado del SignedAndEnvelopData.
-     * @throws java.io.IOException
-     *         Si ocurre alg&uacute;n problema leyendo o escribiendo los
-     *         datos
-     * @throws java.security.cert.CertificateEncodingException
-     *         Si se produce alguna excepci&oacute;n con los certificados de
-     *         firma.
-     * @throws AOException
-     *         Cuando ocurre un error durante el proceso de descifrado
-     *         (formato o clave incorrecto,...)
-     * @throws AOInvalidRecipientException
-     *         Cuando se indica un certificado que no est&aacute; entre los
-     *         destinatarios del sobre.
-     * @throws InvalidKeyException
-     *         Cuando la clave almacenada en el sobre no es v&aacute;lida.
+     * @throws IOException Si ocurre alg&uacute;n problema leyendo o escribiendo los
+     *                     datos
+     * @throws CertificateEncodingException Si se produce alguna excepci&oacute;n con los certificados de
+     *                                      firma.
+     * @throws AOException Cuando ocurre un error durante el proceso de descifrado
+     *                     (formato o clave incorrecto...)
+     * @throws AOInvalidRecipientException Cuando se indica un certificado que no est&aacute; entre los
+     *                                     destinatarios del sobre.
+     * @throws InvalidKeyException Cuando la clave almacenada en el sobre no es v&aacute;lida.
      * @throws NoSuchPaddingException Cuando no se soporta un tipo de relleno necesario.
      * @throws NoSuchAlgorithmException Si el JRE no soporta alg&uacute;n algoritmo necesario
      * @throws BadPaddingException Cuando hay problemas con un relleno de datos.
      * @throws IllegalBlockSizeException Cuando hay problemas internos con los tama&ntilde;os de bloque de cifrado.
-     * @throws InvalidAlgorithmParameterException Si no se soporta un par&aacute;metro necesario para un algoritmo.
-     * @throws Pkcs11WrapOperationException Cuando se produce un error derivado del uso del PKCS#11
-     * 			de un dispositivo criptogr&aacute;fico. */
+     * @throws InvalidAlgorithmParameterException Si no se soporta un par&aacute;metro necesario para un algoritmo. */
     public byte[] decipher(final PrivateKeyEntry keyEntry) throws IOException,
                                                                                              CertificateEncodingException,
                                                                                              AOException,
@@ -86,17 +75,12 @@ public final class CMSDecipherSignedAndEnvelopedData {
                                                                                              NoSuchPaddingException,
                                                                                              InvalidAlgorithmParameterException,
                                                                                              IllegalBlockSizeException,
-                                                                                             BadPaddingException,
-                                                                                             Pkcs11WrapOperationException {
-
+                                                                                             BadPaddingException {
         // Contendra el contenido a tratar.
-        SignedAndEnvelopedData sigAndEnveloped = null;
-
-        Enumeration<?> elementRecipient;
+        final SignedAndEnvelopedData sigAndEnveloped;
+        final Enumeration<?> elementRecipient;
         try {
-            final ASN1Sequence contentSignedAndEnvelopedData = Utils.fetchWrappedData(this.cmsData);
-
-            sigAndEnveloped = SignedAndEnvelopedData.getInstance(contentSignedAndEnvelopedData);
+            sigAndEnveloped = SignedAndEnvelopedData.getInstance(Utils.fetchWrappedData(this.cmsData));
             elementRecipient = sigAndEnveloped.getRecipientInfos().getObjects();
             final ASN1Set certsAsn1 = sigAndEnveloped.getCertificates();
             this.encodedCerts = new byte[certsAsn1.size()][];
@@ -121,16 +105,14 @@ public final class CMSDecipherSignedAndEnvelopedData {
 
         // Desciframos el contenido.
         return Utils.deCipherContent(
-                 contenidoCifrado.getEncryptedContent().getOctets(),
-                 keyAsigned.getConfig(),
-                 keyAsigned.getCipherKey()
+             contenidoCifrado.getEncryptedContent().getOctets(),
+             keyAsigned.getConfig(),
+             keyAsigned.getCipherKey()
         );
     }
 
-    /**
-     * Recupera el listrado de certificados codificados contenidos en el envoltorio.
-     * @return Listado de certificados codificados.
-     */
+    /** Recupera el listrado de certificados codificados contenidos en el envoltorio.
+     * @return Listado de certificados codificados. */
     public byte[][] getEncodedCerts() {
 		return this.encodedCerts;
 	}

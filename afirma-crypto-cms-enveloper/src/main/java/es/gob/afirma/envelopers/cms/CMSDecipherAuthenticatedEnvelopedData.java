@@ -23,7 +23,6 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
-import org.spongycastle.asn1.ASN1Sequence;
 import org.spongycastle.asn1.cms.AuthEnvelopedData;
 import org.spongycastle.asn1.cms.EncryptedContentInfo;
 import org.spongycastle.asn1.x509.AlgorithmIdentifier;
@@ -40,23 +39,18 @@ public final class CMSDecipherAuthenticatedEnvelopedData {
 		// No permitimos la instanciacion
 	}
 
-    /** Descifra el contenido de un CMSAuthenticatedEnvelopedData.
-     * @param cmsData
-     *        Datos del tipo AuthenticatedEnvelopedData para obtener los
-     *        datos cifrados.
-     * @param keyEntry
-     *        Clave privada del certificado usado para descifrar el
-     *        contenido.
+    /** Descifra el contenido de un <code>CMSAuthenticatedEnvelopedData</code>.
+     * @param cmsData Datos del tipo AuthenticatedEnvelopedData para obtener los
+     *                datos cifrados.
+     * @param keyEntry Clave privada del certificado usado para descifrar el
+     *                 contenido.
      * @return El contenido descifrado del EnvelopedData.
-     * @throws java.io.IOException
-     *         Si ocurre alg&uacute;n problema leyendo o escribiendo los
-     *         datos
-     * @throws java.security.cert.CertificateEncodingException
-     *         Si se produce alguna excepci&oacute;n con los certificados de
-     *         firma.
-     * @throws AOException
-     *         Cuando ocurre un error durante el proceso de descifrado
-     *         (formato o clave incorrecto,...)
+     * @throws IOException Si ocurre alg&uacute;n problema leyendo o escribiendo los
+     *                     datos
+     * @throws CertificateEncodingException Si se produce alguna excepci&oacute;n con los certificados de
+     *                                      firma.
+     * @throws AOException Cuando ocurre un error durante el proceso de descifrado
+     *                     (formato o clave incorrecto,...)
      * @throws AOInvalidRecipientException Cuando se indica un certificado que no est&aacute; entre los
      *                                     destinatarios del sobre.
      * @throws InvalidKeyException Cuando la clave almacenada en el sobre no es v&aacute;lida.
@@ -64,9 +58,7 @@ public final class CMSDecipherAuthenticatedEnvelopedData {
      * @throws NoSuchAlgorithmException Si el JRE no soporta alg&uacute;n algoritmo necesario
      * @throws BadPaddingException Cuando hay problemas con un relleno de datos.
      * @throws IllegalBlockSizeException Cuando hay problemas internos con los tama&ntilde;os de bloque de cifrado.
-     * @throws InvalidAlgorithmParameterException Si no se soporta un par&aacute;metro necesario para un algoritmo.
-     * @throws Pkcs11WrapOperationException Cuando se produce un error derivado del uso del PKCS#11
-     * 			de un dispositivo criptogr&aacute;fico.  */
+     * @throws InvalidAlgorithmParameterException Si no se soporta un par&aacute;metro necesario para un algoritmo. */
     public static byte[] dechiperAuthenticatedEnvelopedData(final byte[] cmsData,
     		                                                final PrivateKeyEntry keyEntry) throws IOException,
                                                                                                    CertificateEncodingException,
@@ -76,24 +68,23 @@ public final class CMSDecipherAuthenticatedEnvelopedData {
                                                                                                    NoSuchPaddingException,
                                                                                                    InvalidAlgorithmParameterException,
                                                                                                    IllegalBlockSizeException,
-                                                                                                   BadPaddingException,
-                                                                                                   Pkcs11WrapOperationException {
-
+                                                                                                   BadPaddingException {
         // Contendra el contenido a tratar.
         final AuthEnvelopedData authEnvelopedData;
 
         final Enumeration<?> elementRecipient;
         try {
-            final ASN1Sequence contentAuthEnvelopedData = Utils.fetchWrappedData(cmsData);
-
-            authEnvelopedData = AuthEnvelopedData.getInstance(contentAuthEnvelopedData);
+            authEnvelopedData = AuthEnvelopedData.getInstance(Utils.fetchWrappedData(cmsData));
             elementRecipient = authEnvelopedData.getRecipientInfos().getObjects();
         }
         catch (final Exception ex) {
             throw new AOException("El fichero no contiene un tipo AuthenticatedEnvelopedData", ex); //$NON-NLS-1$
         }
 
-        final EncryptedKeyDatas encryptedKeyDatas = Utils.fetchEncryptedKeyDatas((X509Certificate) keyEntry.getCertificate(), elementRecipient);
+        final EncryptedKeyDatas encryptedKeyDatas = Utils.fetchEncryptedKeyDatas(
+    		(X509Certificate) keyEntry.getCertificate(),
+    		elementRecipient
+		);
 
         // Obtenemos el contenido cifrado
         final EncryptedContentInfo contenidoCifrado = authEnvelopedData.getAuthEncryptedContentInfo();

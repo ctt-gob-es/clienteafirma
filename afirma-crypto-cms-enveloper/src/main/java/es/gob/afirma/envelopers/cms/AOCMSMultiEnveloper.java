@@ -31,6 +31,10 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
+import org.spongycastle.asn1.ASN1InputStream;
+import org.spongycastle.asn1.ASN1ObjectIdentifier;
+import org.spongycastle.asn1.ASN1Sequence;
+import org.spongycastle.asn1.cms.CMSObjectIdentifiers;
 import org.spongycastle.asn1.pkcs.PKCSObjectIdentifiers;
 
 import es.gob.afirma.core.AOException;
@@ -546,9 +550,7 @@ public class AOCMSMultiEnveloper {
      *                                            para alg&uacute;n algoritmo
      * @throws NoSuchPaddingException Si no se soporta alg&uacute;n m&eacute;todo de relleno
      * @throws InvalidKeySpecException Cuando ocurren problemas relacionados con la estructura interna de las claves
-     * @throws DataFormatException Si hay problemas en el formado de datos esperado.
-     * @throws Pkcs11WrapOperationException Cuando se produce un error derivado del uso del PKCS#11
-     * 			de un dispositivo criptogr&aacute;fico.  */
+     * @throws DataFormatException Si hay problemas en el formado de datos esperado. */
     byte[] recoverData(final byte[] cmsEnvelop) throws InvalidKeyException,
                                                        CertificateEncodingException,
                                                        IOException,
@@ -559,47 +561,46 @@ public class AOCMSMultiEnveloper {
                                                        IllegalBlockSizeException,
                                                        BadPaddingException,
                                                        InvalidKeySpecException,
-                                                       DataFormatException,
-                                                       Pkcs11WrapOperationException {
-    	final org.spongycastle.asn1.ASN1Sequence dsq;
+                                                       DataFormatException {
+    	final ASN1Sequence dsq;
     	try (
-    			final org.spongycastle.asn1.ASN1InputStream is = new org.spongycastle.asn1.ASN1InputStream(cmsEnvelop);
+			final ASN1InputStream is = new ASN1InputStream(cmsEnvelop);
 		) {
 	        // Leemos los datos
-	        dsq = (org.spongycastle.asn1.ASN1Sequence) is.readObject();
+	        dsq = (ASN1Sequence) is.readObject();
     	}
 
         final Enumeration<?> objects = dsq.getObjects();
 
         // Elementos que contienen los elementos OID Data
-        final org.spongycastle.asn1.ASN1ObjectIdentifier doi = (org.spongycastle.asn1.ASN1ObjectIdentifier) objects.nextElement();
+        final ASN1ObjectIdentifier doi = (ASN1ObjectIdentifier) objects.nextElement();
 
         final Logger logger = Logger.getLogger("es.gob.afirma");  //$NON-NLS-1$
 
-        if (doi.equals(org.spongycastle.asn1.pkcs.PKCSObjectIdentifiers.data)) {
+        if (doi.equals(PKCSObjectIdentifiers.data)) {
             logger.warning("La extraccion de datos de los envoltorios CMS Data no esta implementada"); //$NON-NLS-1$
             return null;
         }
-        if (doi.equals(org.spongycastle.asn1.pkcs.PKCSObjectIdentifiers.digestedData)) {
+        if (doi.equals(PKCSObjectIdentifiers.digestedData)) {
             logger.warning("La extraccion de datos de los envoltorios CMS DigestedData no esta implementada");  //$NON-NLS-1$
             return null;
         }
-        if (doi.equals(org.spongycastle.asn1.cms.CMSObjectIdentifiers.compressedData)) {
+        if (doi.equals(CMSObjectIdentifiers.compressedData)) {
         	return CMSCompressedData.getContentCompressedData(cmsEnvelop);
         }
-        if (doi.equals(org.spongycastle.asn1.pkcs.PKCSObjectIdentifiers.encryptedData)) {
+        if (doi.equals(PKCSObjectIdentifiers.encryptedData)) {
         	return new CMSDecipherEncryptedData().dechiperEncryptedData(cmsEnvelop, this.cipherKey);
         }
-        if (doi.equals(org.spongycastle.asn1.pkcs.PKCSObjectIdentifiers.envelopedData)) {
+        if (doi.equals(PKCSObjectIdentifiers.envelopedData)) {
         	return CMSDecipherEnvelopData.dechiperEnvelopData(cmsEnvelop, this.configuredKe);
         }
-        if (doi.equals(org.spongycastle.asn1.cms.CMSObjectIdentifiers.authEnvelopedData)) {
+        if (doi.equals(CMSObjectIdentifiers.authEnvelopedData)) {
             return CMSDecipherAuthenticatedEnvelopedData.dechiperAuthenticatedEnvelopedData(cmsEnvelop, this.configuredKe);
         }
-        if (doi.equals(org.spongycastle.asn1.cms.CMSObjectIdentifiers.authenticatedData)) {
+        if (doi.equals(CMSObjectIdentifiers.authenticatedData)) {
             return new CMSDecipherAuthenticatedData().decipherAuthenticatedData(cmsEnvelop, this.configuredKe);
         }
-        if (doi.equals(org.spongycastle.asn1.cms.CMSObjectIdentifiers.signedAndEnvelopedData)) {
+        if (doi.equals(CMSObjectIdentifiers.signedAndEnvelopedData)) {
         	final CMSDecipherSignedAndEnvelopedData enveloper = new CMSDecipherSignedAndEnvelopedData(cmsEnvelop);
         	return enveloper.decipher(this.configuredKe);
         }
