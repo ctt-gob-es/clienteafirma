@@ -43,11 +43,12 @@ public final class TestTemd {
     		new ByteArrayInputStream((
 				"name=pkcs11-win_dll\n" + //$NON-NLS-1$
 				"library=" + f.getAbsolutePath() + "\n" + //$NON-NLS-1$ //$NON-NLS-2$
-				"showInfo=false" //$NON-NLS-1$
+				"disabledMechanisms={ CKM_SHA1_RSA_PKCS }\n" + //$NON-NLS-1$
+				"showInfo=true" //$NON-NLS-1$
 			).getBytes())
 		);
 		Security.addProvider(p);
-		final KeyStore ks = KeyStore.getInstance("PKCS11"); //$NON-NLS-1$
+		final KeyStore ks = KeyStore.getInstance("PKCS11", p); //$NON-NLS-1$
 		ks.load(null, "A111111a".toCharArray()); //$NON-NLS-1$
 
 		String selectedAlias = null;
