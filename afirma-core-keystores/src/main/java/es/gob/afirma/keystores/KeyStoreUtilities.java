@@ -298,7 +298,10 @@ public final class KeyStoreUtilities {
 	public static boolean addPreferredKeyStoreManagers(final AggregatedKeyStoreManager aksm, final Object parentComponent) {
 		// Anadimos el controlador Java del DNIe SIEMPRE excepto:
 		// -Que se indique "es.gob.afirma.keystores.mozilla.disableDnieNativeDriver=true"
-		if (!Boolean.getBoolean("es.gob.afirma.keystores.mozilla.disableDnieNativeDriver")) { //$NON-NLS-1$
+		if (
+			!Boolean.getBoolean("es.gob.afirma.keystores.mozilla.disableDnieNativeDriver") && //$NON-NLS-1$
+			!Boolean.parseBoolean(System.getenv("es.gob.afirma.keystores.mozilla.disableDnieNativeDriver")) //$NON-NLS-1$
+		) {
 			try {
 				aksm.addKeyStoreManager(getDnieKeyStoreManager(parentComponent));
 				return true; // Si instancia DNIe no pruebo otras tarjetas, no deberia haber varias tarjetas instaladas
@@ -314,7 +317,11 @@ public final class KeyStoreUtilities {
 		// Anadimos el controlador Java de CERES SIEMPRE a menos que:
 		// -Se indique "es.gob.afirma.keystores.mozilla.disableCeresNativeDriver=true"
 		// -El sistema sea Linux
-		if (!Boolean.getBoolean("es.gob.afirma.keystores.mozilla.disableCeresNativeDriver") && !Platform.OS.LINUX.equals(Platform.getOS())) { //$NON-NLS-1$
+		if (
+			!Boolean.getBoolean("es.gob.afirma.keystores.mozilla.disableCeresNativeDriver") && //$NON-NLS-1$
+			!Boolean.parseBoolean(System.getenv("es.gob.afirma.keystores.mozilla.disableCeresNativeDriver")) && //$NON-NLS-1$
+			!Platform.OS.LINUX.equals(Platform.getOS())
+		) {
 			try {
 				aksm.addKeyStoreManager(getCeresKeyStoreManager(parentComponent));
 				return true; // Si instancia CERES no pruebo otras tarjetas, no deberia haber varias tarjetas instaladas
