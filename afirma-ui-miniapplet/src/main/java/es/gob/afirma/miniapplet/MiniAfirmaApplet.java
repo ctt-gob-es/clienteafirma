@@ -933,19 +933,26 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 	@Override
 	public void start() {
 		super.start();
-
-		try {
-			AccessController.doPrivileged(new PrivilegedExceptionAction<Void>() {
-				@Override
-				public Void run() throws Exception {
-					JarSignatureCertExtractor.insertJarSignerOnCACerts(this);
-					return null;
-				}
-			});
-
-		} catch (final Exception e) {
-			LOGGER.warning(
-					"No se ha podido insertar la cadena de confianza del certificado de firma del applet en el almacen de confianza de Java: " + e); //$NON-NLS-1$
+		if (
+			!Boolean.getBoolean("es.gob.afirma.doNotModifyJreTrustStore") && //$NON-NLS-1$
+			!Boolean.parseBoolean(System.getenv("es.gob.afirma.doNotModifyJreTrustStore")) //$NON-NLS-1$
+		) {
+			try {
+				AccessController.doPrivileged(
+					new PrivilegedExceptionAction<Void>() {
+						@Override
+						public Void run() throws Exception {
+							JarSignatureCertExtractor.insertJarSignerOnCACerts(this);
+							return null;
+						}
+					}
+				);
+			}
+			catch (final Exception e) {
+				LOGGER.warning(
+					"No se ha podido insertar la cadena de confianza del certificado de firma del applet en el almacen de confianza de Java: " + e //$NON-NLS-1$
+				);
+			}
 		}
 	}
 
