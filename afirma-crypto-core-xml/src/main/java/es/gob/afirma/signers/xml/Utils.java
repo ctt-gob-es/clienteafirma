@@ -705,7 +705,7 @@ public final class Utils {
 			LOGGER.info("Se usara la factoria XML de Apache"); //$NON-NLS-1$
 		}
 		catch (final Exception e) {
-			LOGGER.info("Se usara la factoria XML popr defecto por no estar disponible la de Apache: " + e); //$NON-NLS-1$
+			LOGGER.info("Se usara la factoria XML por defecto por no estar disponible la de Apache: " + e); //$NON-NLS-1$
 			return XMLSignatureFactory.getInstance("DOM"); //$NON-NLS-1$
 		}
 		return fac;
