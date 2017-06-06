@@ -1166,7 +1166,8 @@ var MiniApplet = ( function ( window, undefined ) {
 			// por entorno o porque se haya configurado para su uso, se intenta cargar
 			// esta version
 			if (!needNativeAppInstalled() && !!jnlpServiceAddress) {
-				openUrl("jnlp" + jnlpServiceAddress.substring(4) + "?os=" + getOSName() + "&arg=" + encodeURIComponent("afirma://service?op=install"));
+				var jnlpUrl = "jnlp" + jnlpServiceAddress.substring(4) + "?os=" + getOSName() + "&arg=" + encodeURIComponent("afirma://service?op=install");
+				setTimeout(openUrl, 3000, jnlpUrl);
 			}
 		}
 
@@ -2145,7 +2146,7 @@ var MiniApplet = ( function ( window, undefined ) {
 			function getCurrentLog (successCallbackFunction, errorCallbackFunction) {
 				successCallback = successCallbackFunction;
 				errorCallback = errorCallbackFunction;
-				getCurrentLongByService("getLog");
+				getCurrentLogByService("getLog");
 			}
 			
 			/**
@@ -2169,7 +2170,7 @@ var MiniApplet = ( function ( window, undefined ) {
 			/**
 			 * Realiza una operacion de obtencion de log actual de la aplicacion
 			 */
-			function getCurrentLongByService() {
+			function getCurrentLogByService() {
 				
 				var data = generateDataToLoad("getLog");
 				
