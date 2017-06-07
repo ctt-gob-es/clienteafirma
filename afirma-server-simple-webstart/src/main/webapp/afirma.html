@@ -3,6 +3,7 @@
     <head>
         <meta charset="UTF-8" />
         <title>Pruebas AutoFirma</title>
+        <script type="text/javascript" src="constantes.js"></script>
 		<script type="text/javascript" src="miniapplet.js"></script>
 		
 		<script type="text/javascript">
@@ -36,11 +37,10 @@
 		
 			//MiniApplet.setForceWSMode(true);
 			//MiniApplet.setForceAFirma(true);
-			var ip = "appprueba";
-			MiniApplet.setJnlpService("http://" + ip + ":8080/afirma-server-simpleafirma-webstart/jnlp");
-			MiniApplet.setServlets("http://" + ip + ":8080/afirma-signature-storage/StorageService",
-					"http://" + ip + ":8080/afirma-signature-retriever/RetrieveService");
-			MiniApplet.cargarAppAfirma("http://" + ip + ":8080/afirma-server-simpleafirma-webstart");
+			MiniApplet.setJnlpService(Constants.URL_BASE_SERVICES + "/afirma-server-simpleafirma-webstart/autofirmajnlp");
+			MiniApplet.setServlets(Constants.URL_BASE_SERVICES + "/afirma-signature-storage/StorageService",
+					Constants.URL_BASE_SERVICES + "/afirma-signature-retriever/RetrieveService");
+			MiniApplet.cargarAppAfirma(Constants.URL_BASE_APPLET);
 		</script>
     </body>
 

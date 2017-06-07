@@ -8,6 +8,6 @@
   </servlet>
   <servlet-mapping>
     <servlet-name>JnlpService</servlet-name>
-    <url-pattern>/jnlp</url-pattern>
+    <url-pattern>/autofirmajnlp</url-pattern>
   </servlet-mapping>
 </web-app>

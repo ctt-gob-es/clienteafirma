@@ -20,8 +20,8 @@ var Constants = {
 
 		/* DESARROLLO */
 		
-		URL_BASE_APPLET : "http://10.148.90.78:8080/afirma-server-simpleafirma-webstart",
+		URL_BASE_APPLET : "http://appprueba:8080/afirma-server-simpleafirma-webstart",
 
-		URL_BASE_SERVICES : "http:/10.148.90.78:8080"
+		URL_BASE_SERVICES : "http://appprueba:8080"
 	
 };

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?> 
+<jnlp spec="1.0+" codebase="%CODEBASE%">
+	<information> 
+		<title>AutoFirma</title> 
+		<vendor>Gobierno de Espana</vendor>
+		<description>Desplegable JNLP de AutoFirma</description> 
+		<description kind="short">AutoFirma</description> 
+		<offline-allowed/> 
+		<icon href="logo64.png" width="64" height="64"/>
+		<icon kind="shortcut" href="logo16.png" width="16" height="16"/>
+		<icon kind="shortcut" href="logo32.png" width="32" height="32"/>
+		<icon kind="shortcut" href="logo64.png" width="64" height="64"/>
+		<icon kind="splash" href="splash.gif" width="506" height="289"/>
+		<shortcut>
+            <desktop/>
+            <menu submenu="AutoFirma"/>
+        </shortcut>
+        <association mime-type="application/cms" extensions="csig sig"/>
+        <association mime-type="application/xmlsignature" extensions="xsig"/>
+	</information>
+	<security>
+	   <all-permissions/>
+	</security>
+	<update check="timeout" policy="always"/>
+	<resources>
+		<j2se version="1.8+"/> 
+		<!--jar href="AutoFirma-splash.jar" version="1.0" download="progress"/-->
+		<jar href="AutoFirmaWS_Complete.jar" version="1.5" main="true"/>
+		<property name="jnlp.versionEnabled" value="true"/>
+	</resources> 
+	<application-desc main-class="es.gob.afirma.standalone.ws.AutoFirmaWebStart">
+<!--		progress-class="es.gob.afirma.standalone.LoadingSplahScreen" -->
+	</application-desc> 
+</jnlp>

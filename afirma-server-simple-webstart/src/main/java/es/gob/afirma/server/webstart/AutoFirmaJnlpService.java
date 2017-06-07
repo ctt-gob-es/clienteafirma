@@ -17,8 +17,10 @@ public class AutoFirmaJnlpService extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
 
-	private static final String TEMPLATE_FILE = "autofirma.jnlp"; //$NON-NLS-1$
+	private static final String COMPLETE_INSTALATION_TEMPLATE = "autofirma_complete.jnlp"; //$NON-NLS-1$
+	private static final String PROTOCOL_CONSUMER_TEMPLATE = "autofirma.jnlp"; //$NON-NLS-1$
 
+	private static final String PARAM_COMPLETE = "cp"; //$NON-NLS-1$
 	private static final String PARAM_ARGUMENT = "arg"; //$NON-NLS-1$
 	private static final String PARAM_OS_NAME = "os"; //$NON-NLS-1$
 
@@ -39,12 +41,13 @@ public class AutoFirmaJnlpService extends HttpServlet {
 	@Override
 	protected void service(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException {
 
+		final boolean complete = Boolean.parseBoolean(request.getParameter(PARAM_COMPLETE));
 		final String arg = request.getParameter(PARAM_ARGUMENT);
 		final String osName = request.getParameter(PARAM_OS_NAME);
 		final String codebase = ConfigManager.getCodeBase();
 
 		// Cargamos la plantilla del JNLP
-		String template = loadJnlpTemplate();
+		String template = loadJnlpTemplate(complete);
 
 		// Agregamos al JNLP los recursos propios del sistema operativo que nos hayan indicado
 		if (OS_WINDOWS.equalsIgnoreCase(osName) ||
@@ -72,9 +75,11 @@ public class AutoFirmaJnlpService extends HttpServlet {
 	 * @return Plantilla JNLP.
 	 * @throws IOException Cuando ocurre un error en la lectura.
 	 */
-	private static String loadJnlpTemplate() throws IOException {
+	private static String loadJnlpTemplate(boolean complete) throws IOException {
 
-		final InputStream templateIs = AutoFirmaJnlpService.class.getClassLoader().getResourceAsStream(TEMPLATE_FILE);
+		final String template = complete ? COMPLETE_INSTALATION_TEMPLATE : PROTOCOL_CONSUMER_TEMPLATE;
+
+		final InputStream templateIs = AutoFirmaJnlpService.class.getClassLoader().getResourceAsStream(template);
 		final byte[] content = readInputStream(templateIs);
 		templateIs.close();
 
