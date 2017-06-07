@@ -11,8 +11,6 @@
 package es.gob.afirma.standalone.ui;
 
 import java.awt.GridLayout;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
@@ -37,15 +35,15 @@ public final class ClosePanel extends JPanel {
 		setLayout(new GridLayout(0,1));
 		add(new JLabel(SimpleAfirmaMessages.getString("SimpleAfirma.47"))); //$NON-NLS-1$
 		this.ask.setSelected(PreferencesManager.getBoolean(
-				PreferencesManager.PREFERENCE_GENERAL_OMIT_ASKONCLOSE, false));
-		this.ask.addItemListener(new ItemListener() {
-			/** {@inheritDoc} */
-			@Override
-			public void itemStateChanged(final ItemEvent e) {
-				PreferencesManager.putBoolean(
-						PreferencesManager.PREFERENCE_GENERAL_OMIT_ASKONCLOSE, ClosePanel.this.getAskCheckBox().isSelected());
-			}
-		});
+			PreferencesManager.PREFERENCE_GENERAL_OMIT_ASKONCLOSE, false)
+		);
+		this.ask.addItemListener(
+			e -> PreferencesManager.putBoolean(
+				PreferencesManager.PREFERENCE_GENERAL_OMIT_ASKONCLOSE,
+				ClosePanel.this.getAskCheckBox().isSelected()
+			)
+		);
+		this.ask.setMnemonic('m');
 		add(this.ask);
 	}
 
