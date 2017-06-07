@@ -401,6 +401,12 @@ public final class XAdESSigner {
 			// ** Fin obtencion de la hoja de estilo del XML **
 			// ************************************************
 
+			// Si no hay asignado un MimeType o es el por defecto
+			// establecemos el de XML
+			if (mimeType == null || XMLConstants.DEFAULT_MIMETYPE.equals(mimeType)) {
+				mimeType = "text/xml"; //$NON-NLS-1$
+			}
+			
 			// Obtenemos las propiedades del documento original
 			originalXMLProperties = XAdESUtil.getOriginalXMLProperties(docum, outputXmlEncoding);
 
@@ -1104,7 +1110,7 @@ public final class XAdESSigner {
 			"" : //$NON-NLS-1$
 				"urn:oid:") + oid, null, new ArrayList<String>(0)) : null; //$NON-NLS-1$
 
-		final ArrayList<DataObjectFormat> objectFormats = new ArrayList<DataObjectFormat>();
+		final ArrayList<DataObjectFormat> objectFormats = new ArrayList<>();
 		final DataObjectFormat objectFormat = new DataObjectFormatImpl(
 			null,
 			objectIdentifier,
