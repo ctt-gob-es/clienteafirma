@@ -60,7 +60,7 @@ public enum PeMachineType {
 	private static final Hashtable<String, PeMachineType> machineTypes;
 
 	static {
-		machineTypes = new Hashtable<String, PeMachineType>(10);
+		machineTypes = new Hashtable<>(10);
 		machineTypes.put("00-00", UNKNOWN); //$NON-NLS-1$
 		machineTypes.put("01-D3", MATSUSHITA_AM33); //$NON-NLS-1$
 		machineTypes.put("86-64", X64); //$NON-NLS-1$

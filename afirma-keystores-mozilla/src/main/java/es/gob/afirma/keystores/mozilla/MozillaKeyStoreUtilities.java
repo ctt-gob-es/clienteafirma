@@ -93,7 +93,7 @@ public final class MozillaKeyStoreUtilities {
 		private String lib;
 		private Platform.OS os;
 		private boolean forcedLoad;
-		private KnownModule(String description, String lib, Platform.OS os, boolean forcedLoad) {
+		private KnownModule(final String description, final String lib, final Platform.OS os, final boolean forcedLoad) {
 			this.description = description;
 			this.lib = lib;
 			this.forcedLoad = forcedLoad;
@@ -178,22 +178,23 @@ public final class MozillaKeyStoreUtilities {
 		);
 		String dir = null;
 		if (compatibility.exists() && compatibility.canRead()) {
-			final InputStream fis = new FileInputStream(compatibility);
-			// Cargamos el fichero con la codificacion por defecto (que es la que con mas probabilidad tiene el fichero)
-			final BufferedReader br = new BoundedBufferedReader(
-				new InputStreamReader(fis),
-				512, // Maximo 512 lineas
-				4096 // Maximo 4KB por linea
-			);
-			String line;
-			while ((line = br.readLine()) != null && dir == null) {
-			    if (line.startsWith("LastPlatformDir=")) { //$NON-NLS-1$
-			    	dir = line.replace("LastPlatformDir=", "").trim(); //$NON-NLS-1$ //$NON-NLS-2$
-			    }
+			try (
+				final InputStream fis = new FileInputStream(compatibility);
+				// Cargamos el fichero con la codificacion por defecto (que es la que con mas probabilidad tiene el fichero)
+				final BufferedReader br = new BoundedBufferedReader(
+					new InputStreamReader(fis),
+					512, // Maximo 512 lineas
+					4096 // Maximo 4KB por linea
+				);
+			) {
+				String line;
+				while ((line = br.readLine()) != null && dir == null) {
+				    if (line.startsWith("LastPlatformDir=")) { //$NON-NLS-1$
+				    	dir = line.replace("LastPlatformDir=", "").trim(); //$NON-NLS-1$ //$NON-NLS-2$
+				    }
+				}
 			}
-			br.close();
 		}
-
 		if (dir == null) {
 			throw new FileNotFoundException(
 					"No se ha podido determinar el directorio de NSS en Windows a partir de 'compatibility.ini' de Firefox" //$NON-NLS-1$
@@ -291,7 +292,7 @@ public final class MozillaKeyStoreUtilities {
 			LOGGER.severe(
 				"No se ha podido obtener el directorio de perfil de Mozilla para leer la lista de modulos PKCS#11: " + e //$NON-NLS-1$
 			);
-			return new ConcurrentHashMap<String, String>(0);
+			return new ConcurrentHashMap<>(0);
 		}
 
 		final List<ModuleName> modules;
@@ -302,7 +303,7 @@ public final class MozillaKeyStoreUtilities {
 			LOGGER.severe(
 				"No se han podido obtener los modulos externos de Mozilla desde 'secmod.db': " + t //$NON-NLS-1$
 			);
-			return new ConcurrentHashMap<String, String>(0);
+			return new ConcurrentHashMap<>(0);
 		}
 
 		LOGGER.info("Obtenidos los modulos externos de Mozilla desde 'secmod.db'"); //$NON-NLS-1$
@@ -324,10 +325,10 @@ public final class MozillaKeyStoreUtilities {
 			                                                          final boolean excludePreferredModules) {
 
 		if (modules == null) {
-			return new ConcurrentHashMap<String, String>(0);
+			return new ConcurrentHashMap<>(0);
 		}
 
-		final Map<String, String> modsByDesc = new ConcurrentHashMap<String, String>();
+		final Map<String, String> modsByDesc = new ConcurrentHashMap<>();
 
 		for (final AOSecMod.ModuleName module : modules) {
 			final String moduleLib =  module.getLib();
@@ -340,7 +341,7 @@ public final class MozillaKeyStoreUtilities {
 		// Creamos una copia de modsByDesc para evitar problemas de concurrencia
 		// (nunca soltara excepciones por usar ConcurrentHashMap, pero no significa
 		// que los problemas no ocurran si no se toman medidas).
-		final ConcurrentHashMap<String, String> modsByDescCopy = new ConcurrentHashMap<String, String>(modsByDesc.size());
+		final ConcurrentHashMap<String, String> modsByDescCopy = new ConcurrentHashMap<>(modsByDesc.size());
 		modsByDescCopy.putAll(modsByDesc);
 
 		// Incluimos si aplica los modulos conocidos (aquellos de los que sin estar configurados sabemos
@@ -555,9 +556,11 @@ public final class MozillaKeyStoreUtilities {
 	                                                                                                              AOException {
 		final Provider p = Security.getProvider("SunPKCS11"); //$NON-NLS-1$
 		final File f = File.createTempFile("pkcs11_nss_", ".cfg");  //$NON-NLS-1$//$NON-NLS-2$
-		final OutputStream fos = new FileOutputStream(f);
-		fos.write(p11NSSConfigFileContents.getBytes());
-		fos.close();
+		try (
+			final OutputStream fos = new FileOutputStream(f);
+		) {
+			fos.write(p11NSSConfigFileContents.getBytes());
+		}
 		Provider ret;
 		try {
 			final Method configureMethod = Provider.class.getMethod("configure", String.class); //$NON-NLS-1$
@@ -727,11 +730,11 @@ public final class MozillaKeyStoreUtilities {
 	private static Map<String, String> purgeStoresTable(final Map<String, String> table) {
 
 		if (table == null) {
-			return new ConcurrentHashMap<String, String>(0);
+			return new ConcurrentHashMap<>(0);
 		}
 
-		final Map<String, String> purgedTable = new ConcurrentHashMap<String, String>();
-		final Set<String> revisedLibs = new HashSet<String>();
+		final Map<String, String> purgedTable = new ConcurrentHashMap<>();
+		final Set<String> revisedLibs = new HashSet<>();
 
 		// Creamos una copia de las claves para evitar problemas de concurrencia
 		// (nunca soltara exceciones por usar ConcurrentHashMap, pero no significa

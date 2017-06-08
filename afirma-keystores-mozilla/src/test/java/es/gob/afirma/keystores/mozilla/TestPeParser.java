@@ -16,12 +16,14 @@ public final class TestPeParser {
 	 * @param args No se usa.
 	 * @throws Exception En cualquier error. */
 	public static void main(final String[] args) throws Exception {
-		final InputStream fis = new FileInputStream(FILE);
-		final byte[] peBytes = AOUtil.getDataFromInputStream(fis);
-		fis.close();
+		final byte[] peBytes;
+		try (
+			final InputStream fis = new FileInputStream(FILE);
+		) {
+			peBytes = AOUtil.getDataFromInputStream(fis);
+		}
 		final MsPortableExecutable pe = new MsPortableExecutable(peBytes);
 		System.out.println(pe);
-
 	}
 
 }

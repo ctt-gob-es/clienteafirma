@@ -27,27 +27,29 @@ public final class TestNssSharedDb {
 			TestNssSharedDb.class.getResourceAsStream("/pkcs11.txt") //$NON-NLS-1$
 		);
 
-		final BufferedReader br = new BoundedBufferedReader(
-			new InputStreamReader(
-				new ByteArrayInputStream(pkcs11Txt)
-			),
-			512, // Maximo 512 lineas
-			4096 // Maximo 4KB por linea
-		);
-	    String line;
-	    while ((line = br.readLine()) != null) {
-	       System.out.println(AOUtil.getRDNvalueFromLdapName("library", line.replace(" ", ","))); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-	       System.out.println(
-    		   line.substring(
-				   line.indexOf("name=\"") + "name=\"".length(),  //$NON-NLS-1$ //$NON-NLS-2$
-				   line.indexOf(
-					   '"',
-					   line.indexOf("name=\"") + "name=\"".length() //$NON-NLS-1$ //$NON-NLS-2$
+		try (
+			final BufferedReader br = new BoundedBufferedReader(
+				new InputStreamReader(
+					new ByteArrayInputStream(pkcs11Txt)
+				),
+				512, // Maximo 512 lineas
+				4096 // Maximo 4KB por linea
+			);
+		) {
+		    String line;
+		    while ((line = br.readLine()) != null) {
+		       System.out.println(AOUtil.getRDNvalueFromLdapName("library", line.replace(" ", ","))); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		       System.out.println(
+	    		   line.substring(
+					   line.indexOf("name=\"") + "name=\"".length(),  //$NON-NLS-1$ //$NON-NLS-2$
+					   line.indexOf(
+						   '"',
+						   line.indexOf("name=\"") + "name=\"".length() //$NON-NLS-1$ //$NON-NLS-2$
+					   )
 				   )
-			   )
-		   );
-	    }
-	    br.close();
+			   );
+		    }
+		}
 	}
 
 	/** Prueba de lectura de <i>pkcs11.txt</i>.

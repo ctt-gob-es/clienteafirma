@@ -38,43 +38,36 @@ final class Pkcs11Txt {
 	static List<ModuleName> getModules() throws IOException {
 		final File f = new File(SharedNssUtil.getSharedUserProfileDirectory() + File.separator + PKCS11TXT_FILENAME);
 		if (!f.isFile()) {
-			return new ArrayList<ModuleName>(0);
+			return new ArrayList<>(0);
 		}
 		if (!f.canRead()) {
 			Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
 				"No hay permisos de lectura para 'pkcs11.txt' en " + f.getAbsolutePath() //$NON-NLS-1$
 			);
-			return new ArrayList<ModuleName>(0);
+			return new ArrayList<>(0);
 		}
 		final List<ModuleName> ret = getModules(f);
 	    return ret;
 	}
 
 	static List<ModuleName> getModules(final File f)	throws  IOException {
-
-		Reader fr = null;
-		try {
-			fr = new FileReader(f);
-			final List<ModuleName> ret = getModules(fr);
-			return ret;
-		}
-		finally {
-			if (fr != null) {
-				fr.close();
-			}
+		try (
+			Reader fr = new FileReader(f);
+		) {
+			return getModules(fr);
 		}
 	}
 
-  static List<ModuleName> getModules(final Reader fr)
-			throws IOException {
-		final List<ModuleName> ret = new ArrayList<ModuleName>();
-		BufferedReader br = null;
-		try {
-			br = new BoundedBufferedReader(
+  static List<ModuleName> getModules(final Reader fr) throws IOException {
+		final List<ModuleName> ret = new ArrayList<>();
+
+		try (
+			BufferedReader br = new BoundedBufferedReader(
 				fr,
 				512, // Maximo 512 lineas
 				4096 // Maximo 4KB por linea
 			);
+		) {
 		    String line;
 		    String foundLib = null;
 		    String foundName = null;
@@ -116,11 +109,6 @@ final class Pkcs11Txt {
 		    		foundName = null;
 		    	}
 		    }
-		}
-		finally {
-			if (br != null) {
-				br.close();
-			}
 		}
 		return ret;
 	}

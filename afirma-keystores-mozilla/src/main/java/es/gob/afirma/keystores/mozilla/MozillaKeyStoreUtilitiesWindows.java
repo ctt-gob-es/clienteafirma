@@ -168,12 +168,12 @@ final class MozillaKeyStoreUtilitiesWindows {
 					"No se ha encontrado un NSS en Windows para el directorio " + dir //$NON-NLS-1$
 				);
 			}
-			try {
+			try (
 				final InputStream fis = new FileInputStream(nssP11);
+			) {
 				final PeMachineType peArch = new MsPortableExecutable(
 					AOUtil.getDataFromInputStream(fis)
 				).getPeMachineType();
-				fis.close();
 				final String javaArch = Platform.getJavaArch();
 				if (peArch.equals(PeMachineType.INTEL_386) && "32".equals(javaArch) || //$NON-NLS-1$
 					peArch.equals(PeMachineType.X64) && "64".equals(javaArch)) { //$NON-NLS-1$

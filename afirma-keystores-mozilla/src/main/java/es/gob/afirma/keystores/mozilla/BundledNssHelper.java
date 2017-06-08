@@ -31,13 +31,11 @@ final class BundledNssHelper {
 				"nss" + File.separator + //$NON-NLS-1$
 					Platform.getJavaArch();
 
-	/**
-	 * Desempaqueta el NSS contenido dentro de la aplicacion y devuelve el directorio en el
+	/** Desempaqueta el NSS contenido dentro de la aplicacion y devuelve el directorio en el
 	 * que se puede encontrar, de tal forma que este puede ser utilizado directamente en la
 	 * configuraci&oacute;n de la carga del PKCS#11 de NSS.
 	 * @return Ruta del directorio de NSS.
-	 * @throws IOException Cuando no ha sido posible obtener la ruta del fichero.
-	 */
+	 * @throws IOException Cuando no ha sido posible obtener la ruta del fichero. */
 	static String getBundledNssDirectory() throws IOException {
 		final File bundledNssDir = getNssDirFile();
 		uncompressZip(getNssZipResourceName(), bundledNssDir);
@@ -80,44 +78,44 @@ final class BundledNssHelper {
      private static void uncompressZip(final String zipFileResourceName, final File outDir) throws IOException {
 
         final byte[] buffer = new byte[BUFFER_SIZE];
-        final InputStream fis = BundledNssHelper.class.getResourceAsStream(zipFileResourceName);
-        final ZipInputStream zipIs = new ZipInputStream(
-            fis
-        );
-        ZipEntry entry;
-        while ((entry = zipIs.getNextEntry()) != null) {
-            if (entry.isDirectory()) {
-                new File(outDir, entry.getName()).mkdirs();
-            }
-            else {
-            	try {
-            		final FileOutputStream outFis = new FileOutputStream(
+        try (
+	        final InputStream fis = BundledNssHelper.class.getResourceAsStream(zipFileResourceName);
+	        final ZipInputStream zipIs = new ZipInputStream(
+	            fis
+	        );
+		) {
+	        ZipEntry entry;
+	        while ((entry = zipIs.getNextEntry()) != null) {
+	            if (entry.isDirectory()) {
+	                new File(outDir, entry.getName()).mkdirs();
+	            }
+	            else {
+	            	try (
+                		final FileOutputStream outFis = new FileOutputStream(
             				new File(
-            						outDir,
-            						entry.getName()
-            						)
-            				);
-            		int n;
-            		while ((n = zipIs.read(buffer)) > 0) {
-            			outFis.write(buffer, 0, n);
-            		}
-            		outFis.close();
-            	}
-            	catch (final Exception e) {
-            		// Si el motivo del error por el que no se pudo descomprimir es que el fichero
-            		// esta bloqueado (caso de que exista y no se pueda sustituir), ignoramos el error
-            		if (!new File(outDir, entry.getName()).exists()) {
-            			zipIs.closeEntry();
-            	        zipIs.close();
-            	        fis.close();
-            			throw new IOException("No se pudo descomprimir una de las dependencias para la carga de NSS", e); //$NON-NLS-1$
-            		}
-				}
-            }
-            zipIs.closeEntry();
+        						outDir,
+        						entry.getName()
+    						)
+        				);
+        			) {
+	            		int n;
+	            		while ((n = zipIs.read(buffer)) > 0) {
+	            			outFis.write(buffer, 0, n);
+	            		}
+	            		outFis.flush();
+	            	}
+	            	catch (final Exception e) {
+	            		// Si el motivo del error por el que no se pudo descomprimir es que el fichero
+	            		// esta bloqueado (caso de que exista y no se pueda sustituir), ignoramos el error
+	            		if (!new File(outDir, entry.getName()).exists()) {
+	            			zipIs.closeEntry();
+	            			throw new IOException("No se pudo descomprimir una de las dependencias para la carga de NSS", e); //$NON-NLS-1$
+	            		}
+					}
+	            }
+	            zipIs.closeEntry();
+	        }
         }
-        zipIs.close();
-        fis.close();
     }
 
 }

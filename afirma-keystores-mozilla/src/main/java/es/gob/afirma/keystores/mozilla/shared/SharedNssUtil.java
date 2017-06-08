@@ -87,7 +87,7 @@ public final class SharedNssUtil {
 			LOGGER.severe(
 				"No se han podido obtener los modulos externos de Mozilla desde 'pkcs11.txt': " + e //$NON-NLS-1$
 			);
-			return new ConcurrentHashMap<String, String>(0);
+			return new ConcurrentHashMap<>(0);
 		}
 
 		return MozillaKeyStoreUtilities.getPkcs11ModulesFromModuleNames(modules, includeKnownModules, excludeDnie);

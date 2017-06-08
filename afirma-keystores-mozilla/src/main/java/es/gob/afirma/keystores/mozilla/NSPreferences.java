@@ -95,56 +95,58 @@ final class NSPreferences {
         final String isDefaultAtr = "default="; //$NON-NLS-1$
 
         String line = null;
-        final List<FirefoxProfile> profiles = new ArrayList<FirefoxProfile>();
-        final BufferedReader in = new BoundedBufferedReader(
-    		new FileReader(iniFile),
-			1024, // Maximo 1024 lineas
-			4096 // Maximo 4KB por linea
-		);
+        final List<FirefoxProfile> profiles = new ArrayList<>();
 
-        while ((line = in.readLine()) != null) {
+        try (
+	        final BufferedReader in = new BoundedBufferedReader(
+	    		new FileReader(iniFile),
+				1024, // Maximo 1024 lineas
+				4096 // Maximo 4KB por linea
+			);
+		) {
 
-            // Buscamos un nuevo bloque de perfil
-            if (!line.trim().toLowerCase().startsWith("[profile")) { //$NON-NLS-1$
-                continue;
-            }
+	        while ((line = in.readLine()) != null) {
 
-            final FirefoxProfile profile = new FirefoxProfile();
-            while ((line = in.readLine()) != null && line.trim().length() > 0 && !line.trim().toLowerCase().startsWith("[profile")) { //$NON-NLS-1$
-                if (line.trim().toLowerCase().startsWith(nameAtr)) {
-                    profile.setName(line.trim().substring(nameAtr.length()));
-                }
-                else if (line.trim().toLowerCase().startsWith(isRelativeAtr)) {
-                    profile.setRelative(
-                            line.trim().substring(isRelativeAtr.length()).equals("1") //$NON-NLS-1$
-                    );
-                }
-                else if (line.trim().toLowerCase().startsWith(pathProfilesAtr)) {
-                    profile.setPath(
-                            line.trim().substring(pathProfilesAtr.length())
-                    );
-                }
-                else if (line.trim().toLowerCase().startsWith(isDefaultAtr)) {
-                    profile.setDefault(
-                            line.trim().substring(isDefaultAtr.length()).equals("1") //$NON-NLS-1$
-                    );
-                }
-                else {
-                    break;
-                }
-            }
+	            // Buscamos un nuevo bloque de perfil
+	            if (!line.trim().toLowerCase().startsWith("[profile")) { //$NON-NLS-1$
+	                continue;
+	            }
 
-            // Debemos encontrar al menos el nombre y la ruta del perfil
-            if (profile.getName() != null || profile.getPath() != null) {
-                profile.setAbsolutePath(profile.isRelative() ?
-            		new File(iniFile.getParent(), profile.getPath()).toString() :
-            			profile.getPath());
+	            final FirefoxProfile profile = new FirefoxProfile();
+	            while ((line = in.readLine()) != null && line.trim().length() > 0 && !line.trim().toLowerCase().startsWith("[profile")) { //$NON-NLS-1$
+	                if (line.trim().toLowerCase().startsWith(nameAtr)) {
+	                    profile.setName(line.trim().substring(nameAtr.length()));
+	                }
+	                else if (line.trim().toLowerCase().startsWith(isRelativeAtr)) {
+	                    profile.setRelative(
+	                            line.trim().substring(isRelativeAtr.length()).equals("1") //$NON-NLS-1$
+	                    );
+	                }
+	                else if (line.trim().toLowerCase().startsWith(pathProfilesAtr)) {
+	                    profile.setPath(
+	                            line.trim().substring(pathProfilesAtr.length())
+	                    );
+	                }
+	                else if (line.trim().toLowerCase().startsWith(isDefaultAtr)) {
+	                    profile.setDefault(
+	                            line.trim().substring(isDefaultAtr.length()).equals("1") //$NON-NLS-1$
+	                    );
+	                }
+	                else {
+	                    break;
+	                }
+	            }
 
-                profiles.add(profile);
-            }
+	            // Debemos encontrar al menos el nombre y la ruta del perfil
+	            if (profile.getName() != null || profile.getPath() != null) {
+	                profile.setAbsolutePath(profile.isRelative() ?
+	            		new File(iniFile.getParent(), profile.getPath()).toString() :
+	            			profile.getPath());
+
+	                profiles.add(profile);
+	            }
+	        }
         }
-        in.close();
-
         return profiles.toArray(new FirefoxProfile[profiles.size()]);
     }
 

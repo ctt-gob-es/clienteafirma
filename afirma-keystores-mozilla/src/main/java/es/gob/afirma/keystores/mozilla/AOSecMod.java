@@ -151,8 +151,8 @@ public final class AOSecMod {
 
             // Obtenemos los modulos PKCS#11 asegurandonos de que no aparecen
             // mas de una vez
-            modules = new ArrayList<ModuleName>();
-            final Set<String> libs = new HashSet<String>();
+            modules = new ArrayList<>();
+            final Set<String> libs = new HashSet<>();
             for (int i = 0; i < secMod.length; i++) {
                 try {
                     final ModuleName module = processNames(secMod, i);
