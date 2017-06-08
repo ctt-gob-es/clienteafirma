@@ -223,10 +223,10 @@ public final class XmlStyle {
         					"No se ha podido dereferenciar la hoja de estilo: " + ex, e //$NON-NLS-1$
     					);
             		}
-            		try {
-            			final InputStream is = new FileInputStream(xmlStyleFile);
+            		try (
+        				final InputStream is = new FileInputStream(xmlStyleFile);
+    				) {
             			xml = AOUtil.getDataFromInputStream(is);
-        				is.close();
             		}
             		catch (final Exception ex) {
             			throw new CannotDereferenceException(

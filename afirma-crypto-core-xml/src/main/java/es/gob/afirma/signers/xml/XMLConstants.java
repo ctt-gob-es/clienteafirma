@@ -38,7 +38,7 @@ public final class XMLConstants {
     /** URIs de los algoritmos de firma */
     public static final Map<String, String> SIGN_ALGOS_URI;
     static {
-    	SIGN_ALGOS_URI = new HashMap<String, String>();
+    	SIGN_ALGOS_URI = new HashMap<>();
 
     	SIGN_ALGOS_URI.put(AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA, URL_SHA1_RSA);
     	// Introducimos variantes para hacerlo mas robusto
@@ -75,7 +75,7 @@ public final class XMLConstants {
      * min&uacute;sculas. */
     public static final Map<String, String> MESSAGEDIGEST_ALGOS_URI;
     static {
-    	MESSAGEDIGEST_ALGOS_URI = new HashMap<String, String>();
+    	MESSAGEDIGEST_ALGOS_URI = new HashMap<>();
 
     	// Introducimos variantes para hacerlo mas robusto
 

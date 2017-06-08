@@ -46,12 +46,6 @@ import javax.xml.crypto.dsig.XMLSignatureFactory;
 import javax.xml.crypto.dsig.spec.TransformParameterSpec;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import net.java.xades.security.xml.XAdES.DataObjectFormat;
-import net.java.xades.security.xml.XAdES.DataObjectFormatImpl;
-import net.java.xades.security.xml.XAdES.ObjectIdentifierImpl;
-import net.java.xades.security.xml.XAdES.XAdES;
-import net.java.xades.security.xml.XAdES.XAdES_EPES;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
@@ -63,6 +57,11 @@ import es.gob.afirma.core.AOUnsupportedSignFormatException;
 import es.gob.afirma.core.misc.MimeHelper;
 import es.gob.afirma.signers.xml.Utils;
 import es.gob.afirma.signers.xml.XMLConstants;
+import net.java.xades.security.xml.XAdES.DataObjectFormat;
+import net.java.xades.security.xml.XAdES.DataObjectFormatImpl;
+import net.java.xades.security.xml.XAdES.ObjectIdentifierImpl;
+import net.java.xades.security.xml.XAdES.XAdES;
+import net.java.xades.security.xml.XAdES.XAdES_EPES;
 
 /** Co-firmador XAdES.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
@@ -159,7 +158,6 @@ public final class XAdESCoSigner {
 			try {
 				// No se usa el objeto, solo se crea para ver si saltan excepciones
 				new URI(encoding);
-
 			}
 			catch(final Exception e) {
 				throw new AOException(
@@ -222,7 +220,7 @@ public final class XAdESCoSigner {
 		// Se considera que todos los objetos "Signature" del documento firman (referencian) los mismos
 		// objetos, por lo que podemos extraerlos de cualquiera de las firmas actuales.
 		// Buscamos dentro de ese Signature todas las referencias que apunten a datos para firmarlas
-		final List<Reference> referenceList = new ArrayList<Reference>();
+		final List<Reference> referenceList = new ArrayList<>();
 		Node currentElement;
 		final NodeList nl = ((Element) docSig.getElementsByTagNameNS(
 			XMLConstants.DSIGNNS, SIGNATURE_TAG).item(0)
@@ -366,7 +364,7 @@ public final class XAdESCoSigner {
 
 					if (isEnveloping && dataObjectElement != null) {
 						// crea el nuevo elemento Object que con el documento afirmar
-						final List<XMLStructure> structures = new ArrayList<XMLStructure>(1);
+						final List<XMLStructure> structures = new ArrayList<>(1);
 						structures.add(new DOMStructure(dataObjectElement.getFirstChild().cloneNode(true)));
 
 						final String objectId = "Object-" + UUID.randomUUID().toString(); //$NON-NLS-1$
@@ -437,7 +435,7 @@ public final class XAdESCoSigner {
 
 		// DataObjectFormat
 		if (objectIdentifier != null || mimeType != null || encoding != null) {
-			final ArrayList<DataObjectFormat> objectFormats = new ArrayList<DataObjectFormat>();
+			final ArrayList<DataObjectFormat> objectFormats = new ArrayList<>();
 			final DataObjectFormat objectFormat = new DataObjectFormatImpl(
 				null,
 				objectIdentifier,

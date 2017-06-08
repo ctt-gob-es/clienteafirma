@@ -31,7 +31,7 @@ final class XmlDSigUtil {
      * @return Nueva lista de referencias */
     static List<Reference> cleanReferencesList(final List<Reference> referenceList) {
 
-        final List<Reference> newList = new ArrayList<Reference>();
+        final List<Reference> newList = new ArrayList<>();
         if (referenceList == null) {
             return newList;
         }
@@ -52,7 +52,7 @@ final class XmlDSigUtil {
                             // Si el ID es nulo y hay una transformacion Base64
                             // reconstruimos la referencia pero quitando esa transformacion Base64
                             if (trans == null) {
-                                trans = new ArrayList<Transform>();
+                                trans = new ArrayList<>();
                             }
                             trans.add((Transform) t);
                         }

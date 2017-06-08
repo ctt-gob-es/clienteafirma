@@ -33,15 +33,14 @@ import javax.xml.crypto.dsig.keyinfo.KeyInfo;
 import javax.xml.crypto.dsig.keyinfo.KeyInfoFactory;
 import javax.xml.crypto.dsig.spec.C14NMethodParameterSpec;
 
-import net.java.xades.security.xml.WrappedKeyStorePlace;
-import net.java.xades.security.xml.XmlWrappedKeyInfo;
-import net.java.xades.security.xml.XAdES.XAdES_BES;
-import net.java.xades.security.xml.XAdES.XMLAdvancedSignature;
-
 import org.w3c.dom.Element;
 
 import es.gob.afirma.signers.xml.CustomUriDereferencer;
 import es.gob.afirma.signers.xml.style.XmlStyle;
+import net.java.xades.security.xml.WrappedKeyStorePlace;
+import net.java.xades.security.xml.XmlWrappedKeyInfo;
+import net.java.xades.security.xml.XAdES.XAdES_BES;
+import net.java.xades.security.xml.XAdES.XMLAdvancedSignature;
 
 /** Derivado de <code>net.java.xades.security.xml.XAdES.XMLAdvancedSignature</code> con los
  * siguientes cambios:
@@ -100,13 +99,13 @@ final class AOXMLAdvancedSignature extends XMLAdvancedSignature {
 
     	final List<Certificate> certificates = EscapeHelper.getEscapedCertificates(certs);
         final KeyInfoFactory keyInfoFactory = getXMLSignatureFactory().getKeyInfoFactory();
-        final List<Certificate> x509DataList = new ArrayList<Certificate>();
+        final List<Certificate> x509DataList = new ArrayList<>();
         if (!XmlWrappedKeyInfo.PUBLIC_KEY.equals(getXmlWrappedKeyInfo())) {
             for (final Certificate cert : certificates) {
                 x509DataList.add(cert);
             }
         }
-        final List<XMLStructure> newList = new ArrayList<XMLStructure>();
+        final List<XMLStructure> newList = new ArrayList<>();
         newList.add(keyInfoFactory.newX509Data(x509DataList));
         if (addKeyValue) {
 	        newList.add(keyInfoFactory.newKeyValue(
@@ -147,7 +146,7 @@ final class AOXMLAdvancedSignature extends XMLAdvancedSignature {
                                                         GeneralSecurityException,
                                                         XMLSignatureException {
 
-        final List<?> referencesIdList = new ArrayList<Object>(refsIdList);
+        final List<?> referencesIdList = new ArrayList<>(refsIdList);
 
         if (WrappedKeyStorePlace.SIGNING_CERTIFICATE_PROPERTY.equals(getWrappedKeyStorePlace()) && certificates != null && certificates.size() > 0) {
             this.xades.setSigningCertificate((X509Certificate) certificates.get(0));

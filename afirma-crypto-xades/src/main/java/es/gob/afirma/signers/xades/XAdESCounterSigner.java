@@ -32,13 +32,6 @@ import javax.xml.crypto.dsig.XMLSignatureFactory;
 import javax.xml.crypto.dsig.spec.TransformParameterSpec;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import net.java.xades.security.xml.XAdES.DataObjectFormat;
-import net.java.xades.security.xml.XAdES.DataObjectFormatImpl;
-import net.java.xades.security.xml.XAdES.ObjectIdentifier;
-import net.java.xades.security.xml.XAdES.ObjectIdentifierImpl;
-import net.java.xades.security.xml.XAdES.XAdES;
-import net.java.xades.security.xml.XAdES.XAdES_EPES;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -49,6 +42,12 @@ import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.signers.xml.Utils;
 import es.gob.afirma.signers.xml.XMLConstants;
+import net.java.xades.security.xml.XAdES.DataObjectFormat;
+import net.java.xades.security.xml.XAdES.DataObjectFormatImpl;
+import net.java.xades.security.xml.XAdES.ObjectIdentifier;
+import net.java.xades.security.xml.XAdES.ObjectIdentifierImpl;
+import net.java.xades.security.xml.XAdES.XAdES;
+import net.java.xades.security.xml.XAdES.XAdES_EPES;
 
 /** Contrafirmador XAdES. */
 public final class XAdESCounterSigner {
@@ -296,7 +295,7 @@ public final class XAdESCounterSigner {
 			                             final Document doc) throws AOException {
 
 		// descarta las posiciones que esten repetidas
-		final List<Integer> targetsList = new ArrayList<Integer>();
+		final List<Integer> targetsList = new ArrayList<>();
 		for (int i = 0; i < tgts.length; i++) {
 			if (!targetsList.contains(tgts[i])) {
 				targetsList.add((Integer) tgts[i]);
@@ -356,7 +355,7 @@ public final class XAdESCounterSigner {
 				XMLConstants.DSIGNNS, AOXAdESSigner.SIGNATURE_TAG);
 
 		final List<Object> signers = Arrays.asList(targets);
-		final List<Element> nodes = new ArrayList<Element>();
+		final List<Element> nodes = new ArrayList<>();
 
 		// obtiene los nodos de los firmantes indicados en targets
 		for (int i = 0; i < signatures.getLength(); i++) {
@@ -503,7 +502,7 @@ public final class XAdESCounterSigner {
 		).item(0);
 
 		// crea la referencia a la firma que se contrafirma
-		final List<Reference> referenceList = new ArrayList<Reference>();
+		final List<Reference> referenceList = new ArrayList<>();
 		final XMLSignatureFactory fac = Utils.getDOMFactory();
 
 		final DigestMethod digestMethod;
@@ -519,7 +518,7 @@ public final class XAdESCounterSigner {
 
 		try {
 			// Transformada para la canonicalizacion inclusiva con comentarios
-			final List<Transform> transformList = new ArrayList<Transform>();
+			final List<Transform> transformList = new ArrayList<>();
 			transformList.add(fac.newTransform(canonicalizationAlgorithm,
 					(TransformParameterSpec) null));
 
@@ -560,7 +559,7 @@ public final class XAdESCounterSigner {
 		// DataObjectFormats
 		final ObjectIdentifier objectIdentifier = new ObjectIdentifierImpl("OIDAsURN", "urn:oid:1.2.840.10003.5.109.10", null, new ArrayList<String>(0)); //$NON-NLS-1$ //$NON-NLS-2$
 		final DataObjectFormat dataObjectFormat = new DataObjectFormatImpl(null, objectIdentifier, "text/xml", doc.getInputEncoding(), "#" + referenceId); //$NON-NLS-1$ //$NON-NLS-2$
-		final List<DataObjectFormat> dataObjectFormats = new ArrayList<DataObjectFormat>();
+		final List<DataObjectFormat> dataObjectFormats = new ArrayList<>();
 		dataObjectFormats.add(dataObjectFormat);
 
 		xades.setDataObjectFormats(dataObjectFormats);

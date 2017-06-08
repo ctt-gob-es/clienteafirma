@@ -54,7 +54,7 @@ public final class AOFacturaESigner implements AOSigner {
 
     private static final AOSigner XADES_SIGNER = new AOXAdESSigner();
 
-    private static final Set<String> ALLOWED_PARAMS = new HashSet<String>(5);
+    private static final Set<String> ALLOWED_PARAMS = new HashSet<>(5);
     static {
         ALLOWED_PARAMS.add(XAdESExtraParams.SIGNATURE_PRODUCTION_CITY);
         ALLOWED_PARAMS.add(XAdESExtraParams.SIGNATURE_PRODUCTION_PROVINCE);
@@ -272,7 +272,7 @@ public final class AOFacturaESigner implements AOSigner {
                 return false;
             }
 
-            final Set<String> childs = new HashSet<String>(3);
+            final Set<String> childs = new HashSet<>(3);
             childs.add("FileHeader"); //$NON-NLS-1$
             childs.add("Parties"); //$NON-NLS-1$
             childs.add("Invoices"); //$NON-NLS-1$

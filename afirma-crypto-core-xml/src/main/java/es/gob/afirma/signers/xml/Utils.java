@@ -203,7 +203,7 @@ public final class Utils {
     public static List<Transform> getObjectReferenceTransforms(final Node referenceNode,
     		                                                   final String namespacePrefix) throws NoSuchAlgorithmException,
                                                                                                     InvalidAlgorithmParameterException {
-        final ArrayList<Transform> transformList = new ArrayList<Transform>();
+        final ArrayList<Transform> transformList = new ArrayList<>();
 
         // El nodo de referencia puede contener un nodo "Transforms" que a su
         // vez contiene
@@ -603,7 +603,7 @@ public final class Utils {
             }
         }
 
-        final List<X509Certificate> certChain = new ArrayList<X509Certificate>();
+        final List<X509Certificate> certChain = new ArrayList<>();
         final NodeList signatureNodes = signature.getElementsByTagNameNS(XMLConstants.DSIGNNS, "X509Certificate"); //$NON-NLS-1$
         for (int i = 0; i < signatureNodes.getLength(); i++) {
         	certChain.add(Utils.getCertificate(signatureNodes.item(i)));
@@ -674,8 +674,9 @@ public final class Utils {
             return null;
         }
         final X509Certificate cert;
-        try {
-            final InputStream isCert = new ByteArrayInputStream(Base64.decode(b64Cert));
+        try (
+    		final InputStream isCert = new ByteArrayInputStream(Base64.decode(b64Cert));
+		) {
             cert = (X509Certificate) CertificateFactory.getInstance("X.509").generateCertificate(isCert); //$NON-NLS-1$
             try {
                 isCert.close();

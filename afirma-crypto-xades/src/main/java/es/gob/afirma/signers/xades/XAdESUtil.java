@@ -143,7 +143,7 @@ public final class XAdESUtil {
 	public static List<CommitmentTypeIndication> parseCommitmentTypeIndications(final Properties xParams,
 			                                                                    final String signedDataId) {
 
-		final List<CommitmentTypeIndication> ret = new ArrayList<CommitmentTypeIndication>();
+		final List<CommitmentTypeIndication> ret = new ArrayList<>();
 
 		if (xParams == null) {
 			return ret;
@@ -192,10 +192,10 @@ public final class XAdESUtil {
 			// DocumentationReferences
 			tmpStr = xParams.getProperty(XAdESExtraParams.COMMITMENT_TYPE_INDICATION_PREFIX + Integer.toString(i) + XAdESExtraParams.COMMITMENT_TYPE_INDICATION_DOCUMENTATION_REFERENCE);
 			if (tmpStr == null) {
-				documentationReferences = new ArrayList<String>(0);
+				documentationReferences = new ArrayList<>(0);
 			}
 			else {
-				documentationReferences = new ArrayList<String>();
+				documentationReferences = new ArrayList<>();
 				final String[] docRefs = tmpStr.split(Pattern.quote("|")); //$NON-NLS-1$
 				for (final String docRef : docRefs) {
 					try {
@@ -213,10 +213,10 @@ public final class XAdESUtil {
 			// CommitmentTypeQualifiers
 			tmpStr = xParams.getProperty(XAdESExtraParams.COMMITMENT_TYPE_INDICATION_PREFIX + Integer.toString(i) + XAdESExtraParams.COMMITMENT_TYPE_INDICATION_QUALIFIERS);
 			if (tmpStr == null) {
-				commitmentTypeQualifiers = new ArrayList<String>(0);
+				commitmentTypeQualifiers = new ArrayList<>(0);
 			}
 			else {
-				commitmentTypeQualifiers = new ArrayList<String>();
+				commitmentTypeQualifiers = new ArrayList<>();
 				final String[] ctqs = tmpStr.split(Pattern.quote("|")); //$NON-NLS-1$
 				for (final String ctq : ctqs) {
 					commitmentTypeQualifiers.add(ctq);
@@ -295,12 +295,12 @@ public final class XAdESUtil {
 		// que contiene las referencias que de no usar Manifest estarian en "referencesList".
 
 		// Creamos un nodo padre donde insertar el Manifest
-		final List<XMLStructure> objectContent = new LinkedList<XMLStructure>();
+		final List<XMLStructure> objectContent = new LinkedList<>();
 
 		final String manifestId = "Manifest-" + UUID.randomUUID().toString(); //$NON-NLS-1$
 		objectContent.add(
 			fac.newManifest(
-				new ArrayList<Reference>(referenceList),
+				new ArrayList<>(referenceList),
 				manifestId
 			)
 		);
@@ -333,7 +333,7 @@ public final class XAdESUtil {
 	static Map<String, String> getOriginalXMLProperties(final Document docum,
 			                                            final String outputXmlEncoding) {
 
-		final Map<String, String> originalXMLProperties = new Hashtable<String, String>();
+		final Map<String, String> originalXMLProperties = new Hashtable<>();
 		if (docum != null) {
 
 			if (outputXmlEncoding != null) {

@@ -341,7 +341,7 @@ public final class XAdESExtraParams {
 	private static final String COMMITMENT_TYPE_IDENTIFIER_PROOF_OF_SENDER   = "http://uri.etsi.org/01903/v1.2.2#ProofOfSender"; //$NON-NLS-1$
 	private static final String COMMITMENT_TYPE_IDENTIFIER_PROOF_OF_APPROVAL = "http://uri.etsi.org/01903/v1.2.2#ProofOfApproval"; //$NON-NLS-1$
 	private static final String COMMITMENT_TYPE_IDENTIFIER_PROOF_OF_CREATION = "http://uri.etsi.org/01903/v1.2.2#ProofOfCreation"; //$NON-NLS-1$
-	static final Map<String, String> COMMITMENT_TYPE_IDENTIFIERS = new HashMap<String, String>(6);
+	static final Map<String, String> COMMITMENT_TYPE_IDENTIFIERS = new HashMap<>(6);
 	static {
 		COMMITMENT_TYPE_IDENTIFIERS.put("1", COMMITMENT_TYPE_IDENTIFIER_PROOF_OF_ORIGIN); //$NON-NLS-1$
 		COMMITMENT_TYPE_IDENTIFIERS.put("2", COMMITMENT_TYPE_IDENTIFIER_PROOF_OF_RECEIPT); //$NON-NLS-1$

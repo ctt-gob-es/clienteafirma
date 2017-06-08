@@ -338,7 +338,7 @@ public final class XAdESSigner {
 		}
 
 		// Propiedades del documento XML original
-		Map<String, String> originalXMLProperties = new Hashtable<String, String>();
+		Map<String, String> originalXMLProperties = new Hashtable<>();
 
 		// Factoria XML
 		final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -406,7 +406,7 @@ public final class XAdESSigner {
 			if (mimeType == null || XMLConstants.DEFAULT_MIMETYPE.equals(mimeType)) {
 				mimeType = "text/xml"; //$NON-NLS-1$
 			}
-			
+
 			// Obtenemos las propiedades del documento original
 			originalXMLProperties = XAdESUtil.getOriginalXMLProperties(docum, outputXmlEncoding);
 
@@ -588,7 +588,7 @@ public final class XAdESSigner {
 			}
 		}
 
-		final List<Reference> referenceList = new ArrayList<Reference>();
+		final List<Reference> referenceList = new ArrayList<>();
 		final XMLSignatureFactory fac = Utils.getDOMFactory();
 
 		final DigestMethod digestMethod;
@@ -603,7 +603,7 @@ public final class XAdESSigner {
 		final String referenceId = "Reference-" + UUID.randomUUID().toString(); //$NON-NLS-1$
 		final String referenceStyleId = AOXAdESSigner.STYLE_REFERENCE_PREFIX + UUID.randomUUID().toString();
 
-		final List<Transform> transformList = new ArrayList<Transform>();
+		final List<Transform> transformList = new ArrayList<>();
 
 		// Primero anadimos las transformaciones a medida
 		Utils.addCustomTransforms(transformList, extraParams, AOXAdESSigner.XML_SIGNATURE_PREFIX);
@@ -667,7 +667,7 @@ public final class XAdESSigner {
 		if (format.equals(AOSignConstants.SIGN_FORMAT_XADES_ENVELOPING)) {
 			try {
 				// crea el nuevo elemento Object que contiene el documento a firmar
-				final List<XMLStructure> structures = new ArrayList<XMLStructure>(1);
+				final List<XMLStructure> structures = new ArrayList<>(1);
 
 				// Comprobacion de costesia
 				if (dataElement == null) {

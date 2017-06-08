@@ -372,7 +372,7 @@ public final class AOXMLDSigSigner implements AOSigner {
         }
 
         // Propiedades del documento XML original
-        final Map<String, String> originalXMLProperties = new Hashtable<String, String>();
+        final Map<String, String> originalXMLProperties = new Hashtable<>();
 
         // carga el documento xml
         final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -649,7 +649,7 @@ public final class AOXMLDSigSigner implements AOSigner {
             throw new AOException("Error al crear la firma en formato " + format + ", modo " + mode, e); //$NON-NLS-1$ //$NON-NLS-2$
         }
 
-        final List<Reference> referenceList = new ArrayList<Reference>();
+        final List<Reference> referenceList = new ArrayList<>();
         final XMLSignatureFactory fac = Utils.getDOMFactory();
         final DigestMethod digestMethod;
         try {
@@ -661,7 +661,7 @@ public final class AOXMLDSigSigner implements AOSigner {
         final String referenceId = "Reference-" + UUID.randomUUID().toString(); //$NON-NLS-1$
         final String referenceStyleId = STYLE_REFERENCE_PREFIX + UUID.randomUUID().toString();
 
-        final List<Transform> transformList = new ArrayList<Transform>();
+        final List<Transform> transformList = new ArrayList<>();
 
         // Primero anadimos las transformaciones a medida
         Utils.addCustomTransforms(transformList, extraParams, xmlSignaturePrefix);
@@ -712,7 +712,7 @@ public final class AOXMLDSigSigner implements AOSigner {
             try {
                 // crea el nuevo elemento Object que contiene el documento a
                 // firmar
-                final List<XMLStructure> structures = new ArrayList<XMLStructure>(1);
+                final List<XMLStructure> structures = new ArrayList<>(1);
 
                 // Si los datos se han convertido a base64, bien por ser
                 // binarios o explicitos
@@ -1038,7 +1038,7 @@ public final class AOXMLDSigSigner implements AOSigner {
 
             // KeyInfo
             final KeyInfoFactory kif = fac.getKeyInfoFactory();
-            final List<XMLStructure> content = new ArrayList<XMLStructure>();
+            final List<XMLStructure> content = new ArrayList<>();
             final X509Certificate cert = (X509Certificate) certChain[0];
             content.add(kif.newKeyValue(cert.getPublicKey()));
 
@@ -1060,7 +1060,7 @@ public final class AOXMLDSigSigner implements AOSigner {
             content.add(kif.newX509Data(Arrays.asList(certs)));
 
             // Object
-            final List<XMLObject> objectList = new ArrayList<XMLObject>();
+            final List<XMLObject> objectList = new ArrayList<>();
 
             // en el caso de formato enveloping se inserta el elemento Object
             // con el documento a firmar
@@ -1356,7 +1356,7 @@ public final class AOXMLDSigSigner implements AOSigner {
         dbf.setNamespaceAware(true);
 
         // Propiedades del documento XML original
-        final Map<String, String> originalXMLProperties = new Hashtable<String, String>();
+        final Map<String, String> originalXMLProperties = new Hashtable<>();
 
         // carga el documento XML de firmas y su raiz
         Document docSig;
@@ -1388,7 +1388,7 @@ public final class AOXMLDSigSigner implements AOSigner {
             throw new AOException("No se ha podido leer el documento XML de firmas", e); //$NON-NLS-1$
         }
 
-        final List<Reference> referenceList = new ArrayList<Reference>();
+        final List<Reference> referenceList = new ArrayList<>();
         final XMLSignatureFactory fac = Utils.getDOMFactory();
         final DigestMethod digestMethod;
         try {
@@ -1406,7 +1406,7 @@ public final class AOXMLDSigSigner implements AOSigner {
         // actuales.
         // Buscamos dentro de ese Signature todas las referencias que apunten a
         // datos para firmarlas
-        final ArrayList<String> referencesIds = new ArrayList<String>();
+        final ArrayList<String> referencesIds = new ArrayList<>();
         Node currentReference;
         final NodeList nl = ((Element) docSig.getElementsByTagNameNS(XMLConstants.DSIGNNS, SIGNATURE_STR).item(0)).getElementsByTagNameNS(XMLConstants.DSIGNNS, REFERENCE_STR);
 
@@ -1469,7 +1469,7 @@ public final class AOXMLDSigSigner implements AOSigner {
                 	}
 
                 	// crea el nuevo elemento Object que con el documento afirmar
-					final List<XMLStructure> structures = new ArrayList<XMLStructure>(1);
+					final List<XMLStructure> structures = new ArrayList<>(1);
 					structures.add(new DOMStructure(dataNode.getFirstChild().cloneNode(true)));
 
 					final String mimeType = ((Element) dataNode).getAttribute(MIMETYPE_STR);
@@ -1515,7 +1515,7 @@ public final class AOXMLDSigSigner implements AOSigner {
             final CanonicalizationMethod cm = fac.newCanonicalizationMethod(canonicalizationAlgorithm, (C14NMethodParameterSpec) null);
 
             // se anade una referencia a KeyInfo
-            final List<Transform> transformList = new ArrayList<Transform>();
+            final List<Transform> transformList = new ArrayList<>();
             final Transform trCanonicalization = fac.newTransform(canonicalizationAlgorithm, (TransformParameterSpec) null);
             transformList.add(trCanonicalization);
             referenceList.add(fac.newReference("#" + keyInfoId, digestMethod, transformList, null, null)); //$NON-NLS-1$
@@ -1527,7 +1527,7 @@ public final class AOXMLDSigSigner implements AOSigner {
             final KeyInfoFactory kif = fac.getKeyInfoFactory();
             final X509Certificate cert = (X509Certificate) certChain[0];
 
-            final List<XMLStructure> content = new ArrayList<XMLStructure>();
+            final List<XMLStructure> content = new ArrayList<>();
             content.add(kif.newKeyValue(cert.getPublicKey()));
 
             // Si se nos ha pedido expresamente que no insertemos la cadena de certificacion,
@@ -1565,7 +1565,7 @@ public final class AOXMLDSigSigner implements AOSigner {
 
             // en el caso de formato enveloping se inserta el elemento Object
             // con el documento a firmar
-            final List<XMLObject> objectList = new ArrayList<XMLObject>();
+            final List<XMLObject> objectList = new ArrayList<>();
             if (isEnveloping(rootSig) && envelopingObject != null) {
                 objectList.add(envelopingObject);
             }
@@ -1780,7 +1780,7 @@ public final class AOXMLDSigSigner implements AOSigner {
         dbf.setNamespaceAware(true);
 
         // se carga el documento XML y su raiz
-        final Map<String, String> originalXMLProperties = new Hashtable<String, String>();
+        final Map<String, String> originalXMLProperties = new Hashtable<>();
         Element root;
         try {
             this.doc = dbf.newDocumentBuilder().parse(new ByteArrayInputStream(sign));
@@ -1974,7 +1974,7 @@ public final class AOXMLDSigSigner implements AOSigner {
         }
 
         // ordenamos los nodos de firma en preorden segun el arbol de firmas
-        final List<Element> sortedSignatures = new ArrayList<Element>(signatures.getLength());
+        final List<Element> sortedSignatures = new ArrayList<>(signatures.getLength());
         for (int i = 0; i < signatures.getLength(); i++) {
 
         	boolean isMainSignature = true;
@@ -2062,7 +2062,7 @@ public final class AOXMLDSigSigner implements AOSigner {
         final int numSignatures = signatures.getLength();
 
         final List<Object> signers = Arrays.asList(targets);
-        final List<Element> nodes = new ArrayList<Element>();
+        final List<Element> nodes = new ArrayList<>();
 
         // obtiene los nodos de los firmantes indicados en targets
         for (int i = 0; i < numSignatures; i++) {
@@ -2100,7 +2100,7 @@ public final class AOXMLDSigSigner implements AOSigner {
         final Element signatureValue = (Element) signature.getElementsByTagNameNS(XMLConstants.DSIGNNS, SIGNATURE_VALUE).item(0);
 
         // crea la referencia a la firma que se contrafirma
-        final List<Reference> referenceList = new ArrayList<Reference>();
+        final List<Reference> referenceList = new ArrayList<>();
         final XMLSignatureFactory fac = Utils.getDOMFactory();
         final DigestMethod digestMethod;
         try {
@@ -2115,7 +2115,7 @@ public final class AOXMLDSigSigner implements AOSigner {
 
         try {
             // Transformada para la canonicalizacion inclusiva con comentarios
-            final List<Transform> transformList = new ArrayList<Transform>();
+            final List<Transform> transformList = new ArrayList<>();
             transformList.add(fac.newTransform(canonicalizationAlgorithm, (TransformParameterSpec) null));
             referenceList.add(
         		fac.newReference(
@@ -2146,7 +2146,7 @@ public final class AOXMLDSigSigner implements AOSigner {
             final KeyInfoFactory kif = fac.getKeyInfoFactory();
             final X509Certificate cert = (X509Certificate) certChain[0];
 
-            final List<XMLStructure> content = new ArrayList<XMLStructure>();
+            final List<XMLStructure> content = new ArrayList<>();
             content.add(kif.newKeyValue(cert.getPublicKey()));
 
             // Si se nos ha pedido expresamente que no insertemos la cadena de certificacion,
@@ -2320,7 +2320,7 @@ public final class AOXMLDSigSigner implements AOSigner {
 
             final String xmlSignatureName = XML_SIGNATURE_PREFIX + ":" + SIGNATURE_STR; //$NON-NLS-1$
 
-            final ArrayList<Node> signNodes = new ArrayList<Node>();
+            final ArrayList<Node> signNodes = new ArrayList<>();
             if (rootNode.getNodeName().equals(xmlSignatureName)) {
                 signNodes.add(rootNode);
             }

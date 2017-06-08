@@ -25,8 +25,6 @@ import javax.xml.crypto.dsig.Transform;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import net.java.xades.util.XMLUtils;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -43,6 +41,7 @@ import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.core.util.tree.AOTreeNode;
 import es.gob.afirma.signers.xml.Utils;
 import es.gob.afirma.signers.xml.XMLConstants;
+import net.java.xades.util.XMLUtils;
 
 /** Manejador de firmas XML XAdES
  * <p>Soporta XAdES-BES y XAdES-EPES.</p>
@@ -765,14 +764,12 @@ public final class AOXAdESSigner implements AOSigner {
         // una de ellas
         final NodeList signatures = signDoc.getElementsByTagNameNS(XMLConstants.DSIGNNS, SIGNATURE_TAG);
 
-        // Mantendremos 3 listas: la de identificadores de firma, la de
-        // identificadores a las
-        // que referencia cada firma (cadena vacia salvo para las contrafirmas)
-        // y los objetos
+        // Mantendremos 3 listas: la de identificadores de firma, la de identificadores a las
+        // que referencia cada firma (cadena vacia salvo para las contrafirmas) y los objetos
         // con los que representaremos cada uno de los nodos de firma.
-        final List<String> arrayIds = new ArrayList<String>();
-        final List<String> arrayRef = new ArrayList<String>();
-        final List<AOTreeNode> arrayNodes = new ArrayList<AOTreeNode>();
+        final List<String> arrayIds = new ArrayList<>();
+        final List<String> arrayRef = new ArrayList<>();
+        final List<AOTreeNode> arrayNodes = new ArrayList<>();
 
         // Rellenamos cada las listas con los datos de las firmas del documento
         for (int i = 0; i < signatures.getLength(); i++) {
@@ -876,7 +873,7 @@ public final class AOXAdESSigner implements AOSigner {
             // para que lo detecte correctamente
             final Element rootNode = dbf.newDocumentBuilder().parse(new ByteArrayInputStream(sign)).getDocumentElement();
 
-            final List<Node> signNodes = new ArrayList<Node>();
+            final List<Node> signNodes = new ArrayList<>();
             if (rootNode.getNodeName().equals(SIGNATURE_NODE_NAME)) {
                 signNodes.add(rootNode);
             }

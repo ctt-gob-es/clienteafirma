@@ -44,9 +44,9 @@ final class EscapeHelper {
 
 	static List<Certificate> getEscapedCertificates(final List<Certificate> certs) {
 		if (certs == null) {
-			return new ArrayList<Certificate>(0);
+			return new ArrayList<>(0);
 		}
-		final List<Certificate> ret = new ArrayList<Certificate>(certs.size());
+		final List<Certificate> ret = new ArrayList<>(certs.size());
 		for (int i=0; i<certs.size(); i++) {
 			ret.add(i, new EscapedCertificate((X509Certificate) certs.get(i)));
 		}
