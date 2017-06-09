@@ -81,7 +81,7 @@ final class MozillaKeyStoreUtilitiesWindows {
 		}
 		try {
 			final Process p = new ProcessBuilder(
-					"cmd.exe", "/c", "for %f in (\"" + originalPath + "\") do @echo %~sf" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+				"cmd.exe", "/c", "for %f in (\"" + originalPath + "\") do @echo %~sf" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			).start();
 			return new String(AOUtil.getDataFromInputStream(p.getInputStream())).trim();
 		}
@@ -206,23 +206,6 @@ final class MozillaKeyStoreUtilitiesWindows {
 	 * @return Listado con los nombres de las bibliotecas. */
 	static String[] getSoftkn3DependenciesWindows(final String nssPath) {
 		return new String[] {
-//				nssPath + "API-MS-WIN-CRT-RUNTIME-L1-1-0.DLL",
-//				nssPath + "API-MS-WIN-CRT-STRING-L1-1-0.DLL",
-//				nssPath + "API-MS-WIN-CRT-HEAP-L1-1-0.DLL",
-//				nssPath + "API-MS-WIN-CRT-STDIO-L1-1-0.DLL",
-//				nssPath + "API-MS-WIN-CRT-CONVERT-L1-1-0.DLL",
-//
-//				nssPath + "API-MS-WIN-CRT-LOCALE-L1-1-0.DLL",
-//				nssPath + "API-MS-WIN-CRT-MULTIBYTE-L1-1-0.DLL",
-//				nssPath + "API-MS-WIN-CRT-UTILITY-L1-1-0.DLL",
-//
-//				nssPath + "API-MS-WIN-CRT-ENVIRONMENT-L1-1-0.DLL",
-//				nssPath + "API-MS-WIN-CRT-FILESYSTEM-L1-1-0.DLL",
-//				nssPath + "API-MS-WIN-CRT-MATH-L1-1-0.DLL",
-//				nssPath + "API-MS-WIN-CRT-TIME-L1-1-0.DLL",
-
-
-
 			nssPath + MSVCR100_DLL,	  // Ciertas versiones, Visual C 10
 			nssPath + MSVCP100_DLL,	  // Ciertas versiones, Visual C 10
 			nssPath + MSVCR120_DLL,	  // Ciertas versiones, Visual C 12
@@ -279,9 +262,9 @@ final class MozillaKeyStoreUtilitiesWindows {
 	}
 
 	/** Copia ficheros de un directorio a otro, ignorando los ficheros que no existan.
-	 * @param fileNames Nombres de los ficheros a copiar
-	 * @param sourceDir Directorio de origen, no debe tener la barra al final
-	 * @param destDir Directorio de destino, debe tener la barra al final */
+	 * @param fileNames Nombres de los ficheros a copiar.
+	 * @param sourceDir Directorio de origen, no debe tener la barra al final.
+	 * @param destDir Directorio de destino, debe tener la barra al final. */
 	private static void copyFile(final String[] fileNames, final String sourceDir, final String destDir) {
 		if (fileNames !=null) {
 			File tmpFile;

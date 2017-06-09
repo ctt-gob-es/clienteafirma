@@ -58,7 +58,7 @@ final class Pkcs11Txt {
 		}
 	}
 
-  static List<ModuleName> getModules(final Reader fr) throws IOException {
+	static List<ModuleName> getModules(final Reader fr) throws IOException {
 		final List<ModuleName> ret = new ArrayList<>();
 
 		try (
@@ -85,12 +85,12 @@ final class Pkcs11Txt {
 		    				new ModuleName(
 								lib.trim(),
 								line.substring(
-										   line.indexOf(NAME_SEARCH_TOKEN) + NAME_SEARCH_TOKEN.length(),
-										   line.indexOf(
-											   '"',
-											   line.indexOf(NAME_SEARCH_TOKEN) + NAME_SEARCH_TOKEN.length()
-										   )
+									   line.indexOf(NAME_SEARCH_TOKEN) + NAME_SEARCH_TOKEN.length(),
+									   line.indexOf(
+										   '"',
+										   line.indexOf(NAME_SEARCH_TOKEN) + NAME_SEARCH_TOKEN.length()
 									   )
+								)
 							)
 						);
 			    		foundLib = null;

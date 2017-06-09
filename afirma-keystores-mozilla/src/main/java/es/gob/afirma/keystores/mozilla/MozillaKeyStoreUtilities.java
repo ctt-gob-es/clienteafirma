@@ -644,8 +644,8 @@ public final class MozillaKeyStoreUtilities {
 		final String nssDirectory = MozillaKeyStoreUtilities.getSystemNSSLibDir();
 
 		String profileDir = useSharedNss ?
-				SharedNssUtil.getSharedUserProfileDirectory() :
-					MozillaKeyStoreUtilities.getMozillaUserProfileDirectory();
+			SharedNssUtil.getSharedUserProfileDirectory() :
+				MozillaKeyStoreUtilities.getMozillaUserProfileDirectory();
 
 		// Consideramos que se debe cargar el fichero de modulos de NSS en modo de base de datos
 		// cuando se encuentra la variable de sistema NSS_DEFAULT_DB_TYPE o se encuentra el fichero pkcs11.txt
@@ -659,9 +659,9 @@ public final class MozillaKeyStoreUtilities {
 		}
 
 		final String p11NSSConfigFile = MozillaKeyStoreUtilities.createPKCS11NSSConfigFile(
-				profileDir,
-				nssDirectory
-				);
+			profileDir,
+			nssDirectory
+		);
 
 		// Quitamos el directorio del usuario del registro, para evitar que contenga datos personales
 		LOGGER.info("Configuracion de NSS para SunPKCS11:\n" + p11NSSConfigFile.replace(Platform.getUserHome(), "USERHOME")); //$NON-NLS-1$ //$NON-NLS-2$

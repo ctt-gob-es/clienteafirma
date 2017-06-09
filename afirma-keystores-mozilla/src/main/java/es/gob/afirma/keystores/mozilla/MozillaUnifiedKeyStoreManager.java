@@ -100,8 +100,8 @@ public class MozillaUnifiedKeyStoreManager extends AggregatedKeyStoreManager {
 
 			if (externalStores.size() > 0) {
 				final StringBuilder logStr = new StringBuilder(
-						"Encontrados los siguientes modulos PKCS#11 externos instalados en Mozilla / Firefox: " //$NON-NLS-1$
-						);
+					"Encontrados los siguientes modulos PKCS#11 externos instalados en Mozilla / Firefox: " //$NON-NLS-1$
+				);
 				for (final String key : externalStores.keySet()) {
 					logStr.append("'"); //$NON-NLS-1$
 					logStr.append(externalStores.get(key));
@@ -120,8 +120,8 @@ public class MozillaUnifiedKeyStoreManager extends AggregatedKeyStoreManager {
 				}
 				catch (final AOCancelledOperationException ex) {
 					LOGGER.warning(
-							"Se cancelo el acceso al almacen externo  '" + descr + "', se continuara con el siguiente: " + ex //$NON-NLS-1$ //$NON-NLS-2$
-							);
+						"Se cancelo el acceso al almacen externo  '" + descr + "', se continuara con el siguiente: " + ex //$NON-NLS-1$ //$NON-NLS-2$
+					);
 					continue;
 				}
 				catch (final Exception ex) {
@@ -146,21 +146,24 @@ public class MozillaUnifiedKeyStoreManager extends AggregatedKeyStoreManager {
 				}
 				addKeyStoreManager(tmpKsm);
 
-				LOGGER.info("El almacen externo '" + descr + "' ha podido inicializarse, se anadiran sus entradas y se detiene la carga del resto de almacenes"); //$NON-NLS-1$ //$NON-NLS-2$
+				LOGGER.info(
+					"El almacen externo '" + descr + "' ha podido inicializarse, se anadiran sus entradas y se detiene la carga del resto de almacenes" //$NON-NLS-1$ //$NON-NLS-2$
+				);
 				break;
 			}
 		}
 
 		if (lacksKeyStores()) {
-			LOGGER.warning("No se ha podido inicializar ningun almacen, interno o externo, de Firefox, ni los almacenes preferentes"); //$NON-NLS-1$
+			LOGGER.warning(
+				"No se ha podido inicializar ningun almacen, interno o externo, de Firefox, ni los almacenes preferentes" //$NON-NLS-1$
+			);
 		}
 
 		this.initialized = true;
 	}
 
 
-	/**
-	 * Inicializa un almacen externo PKCS#11, mostrando un di&aacute;logo de inserci&oacute;n de PIN al usuario
+	/** Inicializa un almac&eacute;n externo PKCS#11, mostrando un di&aacute;logo de inserci&oacute;n de PIN al usuario
 	 * si es necesario.
 	 * @param tmpKsm Gestor del almac&eacute;n.
 	 * @param descr Nombre descriptivo del almac&eacute;n.
@@ -168,10 +171,9 @@ public class MozillaUnifiedKeyStoreManager extends AggregatedKeyStoreManager {
 	 * @param forceReset Indica si se debe forzar al reinicio del almac&eacute;n si ya estaba iniciado.
 	 * @param libName Nombre del m&oacute;dulo PKCS#11 del almac&eacute;n.
      * @throws AOKeyStoreManagerException Cuando ocurre cualquier problema durante la inicializaci&oacute;n
-     * @throws IOException Se ha insertado una contrase&ntilde;a incorrecta para la apertura del
-     *         almac&eacute;n de certificados.
-     * @throws AOCancelledOperationException Cuando se cancela el di&aacute;logo de inserci&oacute;n de PIN.
-	 */
+     * @throws IOException Si se ha insertado una contrase&ntilde;a incorrecta para la apertura del
+     *                     almac&eacute;n de certificados.
+     * @throws AOCancelledOperationException Cuando se cancela el di&aacute;logo de inserci&oacute;n de PIN. */
 	private static void internalInitStore(final AOKeyStoreManager tmpKsm,
 			                              final String descr,
 			                              final Object parentComponent,
@@ -206,7 +208,7 @@ public class MozillaUnifiedKeyStoreManager extends AggregatedKeyStoreManager {
 	}
 
 	@SuppressWarnings("static-method")
-	protected Map<String, String> getExternalStores(boolean excludePreferredKeyStores) {
+	protected Map<String, String> getExternalStores(final boolean excludePreferredKeyStores) {
 		return MozillaKeyStoreUtilities.getMozillaPKCS11Modules(excludePreferredKeyStores, true);
 	}
 

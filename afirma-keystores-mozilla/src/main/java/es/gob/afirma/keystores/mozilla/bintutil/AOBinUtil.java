@@ -34,7 +34,7 @@ final class AOBinUtil {
 		 int l = 0;
 		 for (int k = 0; k < 8; k++) {
 			l = l << 8 | data[offset++] & 0xFF;
-		}
+		 }
 		 return l;
 	 }
 

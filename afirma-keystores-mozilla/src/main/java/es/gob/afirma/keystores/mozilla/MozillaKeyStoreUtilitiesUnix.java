@@ -48,6 +48,7 @@ final class MozillaKeyStoreUtilitiesUnix {
 		"libsqlite3.so.0", //$NON-NLS-1$
 		"libnspr4.so"	 //$NON-NLS-1$
 	};
+
 	private MozillaKeyStoreUtilitiesUnix() {
 		// No instanciable
 	}
@@ -82,13 +83,15 @@ final class MozillaKeyStoreUtilitiesUnix {
 				}
 			}
 		}
-			throw new FileNotFoundException("No se ha podido determinar la localizacion de NSS en UNIX (sqlite)"); //$NON-NLS-1$
+		throw new FileNotFoundException(
+			"No se ha podido determinar la localizacion de NSS en UNIX (sqlite)" //$NON-NLS-1$
+		);
 	}
 
 	/** Busca la &uacute;ltima versi&oacute;n de Firefox instalada en un sistema
-	 * Linux o Solaris
-	 * @param startDir Directorio de inicio para la b&uacute;squeda
-	 * @return &Uacute;ltima versi&oacute;n instalada en el sistema */
+	 * Linux o Solaris.
+	 * @param startDir Directorio de inicio para la b&uacute;squeda.
+	 * @return &Uacute;ltima versi&oacute;n instalada en el sistema. */
 	private static String searchLastFirefoxVersion(final String startDir) {
 		final File directoryLib = new File(startDir);
 		if (directoryLib.isDirectory()) {

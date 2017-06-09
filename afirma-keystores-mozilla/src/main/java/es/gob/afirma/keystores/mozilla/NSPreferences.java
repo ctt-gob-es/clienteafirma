@@ -30,13 +30,11 @@ final class NSPreferences {
 
     /** Devuelve el directorio del perfil activo de Firefox. Si no hubiese perfil
      * activo, devolver&iacute;a el directorio del perfil por defecto y si
-     * tampoco lo hubiese el del primer perfil encontrado. Si no hubiese
+     * tampoco lo hubiese, el del primer perfil encontrado. Si no hubiese
      * perfiles configurados, devolver&iacute;a {@code null}.
-     * @param iniFile
-     *        Fichero con la informaci&oacute;n de los perfiles de Firefox.
+     * @param iniFile Fichero con la informaci&oacute;n de los perfiles de Firefox.
      * @return Directorio con la informaci&oacute;n del perfil.
-     * @throws IOException
-     *         Cuando ocurre un error abriendo o leyendo el fichero. */
+     * @throws IOException Cuando ocurre un error abriendo o leyendo el fichero. */
     static String getFireFoxUserProfileDirectory(final File iniFile) throws IOException {
 
         if (iniFile == null) {
@@ -77,16 +75,14 @@ final class NSPreferences {
         return currentProfilePath;
     }
 
-    /** Parsea la informacion de los perfiles declarada en el fichero
+    /** Analiza la informacion de los perfiles declarada en el fichero
      * "profiles.ini". Para identificar correctamente los perfiles es necesario
      * que haya al menos una l&iacute;nea de separaci&oacute;n entre los bloques
      * de informaci&oacute;n de cada perfil.
-     * @param iniFile
-     *        Fichero con lainformaci&oacute;n de los perfiles.
+     * @param iniFile Fichero con la informaci&oacute;n de los perfiles.
      * @return Listado de perfiles completos encontrados.
-     * @throws IOException
-     *         Cuando se produce un error durante la lectura de la
-     *         configuraci&oacute;n. */
+     * @throws IOException Cuando se produce un error durante la lectura de la
+     *                     configuraci&oacute;n. */
     private static FirefoxProfile[] readProfiles(final File iniFile) throws IOException {
 
         final String nameAtr = "name="; //$NON-NLS-1$
@@ -150,10 +146,9 @@ final class NSPreferences {
         return profiles.toArray(new FirefoxProfile[profiles.size()]);
     }
 
-    /** Comprueba que un perfil de Firefox est&eacute; bloqueado. Un perfil esta
+    /** Comprueba si un perfil de Firefox est&eacute; bloqueado. Un perfil esta
      * bloqueado cuando en su directorio se encuentra el fichero "parent.lock".
-     * @param profile
-     *        Informaci&oacute;n del perfil de Firefox.
+     * @param profile Informaci&oacute;n del perfil de Firefox.
      * @return Devuelve {@code true} si el perfil esta bloqueado, {@code false} en caso contrario. */
     private static boolean isProfileLocked(final FirefoxProfile profile) {
         return new File(profile.getAbsolutePath(), "parent.lock").exists() || // En Windows //$NON-NLS-1$

@@ -16,7 +16,7 @@ import es.gob.afirma.core.misc.AOUtil;
 
 /** Analizador de ficheros MS-PE.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s Capote. */
-public class MsPortableExecutable {
+public final class MsPortableExecutable {
 
 	private static final byte PE_SIGNATURE_OFFSET = (byte) 0x3c;
 
@@ -76,11 +76,15 @@ public class MsPortableExecutable {
 		//int timeDateStamp = AOBinUtil.getInt(peFile, coffOffset+4); // +4, +5, +6, +7
 
         if (AOBinUtil.getInt(peFile, coffOffset+8) != 0) { // +8, +9, +10, +11
-        	Logger.getLogger("es.gob.afirma").warning("El puntero a la informacion de depuracion del COFF no es cero (se implementa una caracteristica deprecada)"); //$NON-NLS-1$ //$NON-NLS-2$
+        	Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
+    			"El puntero a la informacion de depuracion del COFF no es cero (se implementa una caracteristica deprecada)" //$NON-NLS-1$
+			);
         }
 
         if (AOBinUtil.getInt(peFile, coffOffset+12) != 0) { // +12, +13, +14, +15
-        	Logger.getLogger("es.gob.afirma").warning("El numero de entradas de la tabla de simbolos no es cero (se implementa una caracteristica deprecada)"); //$NON-NLS-1$ //$NON-NLS-2$
+        	Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
+    			"El numero de entradas de la tabla de simbolos no es cero (se implementa una caracteristica deprecada)" //$NON-NLS-1$
+			);
         }
 
         final int sizeOfOptionalHeader = AOBinUtil.getU2(peFile, coffOffset+16); // +16, +17
@@ -105,13 +109,19 @@ public class MsPortableExecutable {
 			sb.append("\n Imagen valida"); //$NON-NLS-1$
 		}
         if (0 != (byte) (characteristics[1] & (byte) 0x04)) {
-			Logger.getLogger("es.gob.afirma").warning("Numeros de linea de la imagen COFF eliminados (se implementa una caracteristica deprecada"); //$NON-NLS-1$ //$NON-NLS-2$
+			Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
+				"Numeros de linea de la imagen COFF eliminados (se implementa una caracteristica deprecada" //$NON-NLS-1$
+			);
 		}
         if (0 != (byte) (characteristics[1] & (byte) 0x08)) {
-			Logger.getLogger("es.gob.afirma").warning("Entradas de la tabla de simbolos de la imagen COFF para simbolos locales eliminadas (se implementa una caracteristica deprecada)"); //$NON-NLS-1$ //$NON-NLS-2$
+			Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
+				"Entradas de la tabla de simbolos de la imagen COFF para simbolos locales eliminadas (se implementa una caracteristica deprecada)" //$NON-NLS-1$
+			);
 		}
         if (0 != (byte) (characteristics[1] & (byte) 0x10)) {
-			Logger.getLogger("es.gob.afirma").warning("Conjunto truncando agresivamente (se implementa una caracteristica deprecada para Windows 2000 y posteriores)"); //$NON-NLS-1$ //$NON-NLS-2$
+			Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
+				"Conjunto truncando agresivamente (se implementa una caracteristica deprecada para Windows 2000 y posteriores)" //$NON-NLS-1$
+			);
 		}
         if (0 != (byte) (characteristics[1] & (byte) 0x20)) {
 			sb.append("\n La aplicacion puede gestionar direccionamiento superior a 2GB"); //$NON-NLS-1$
@@ -164,7 +174,9 @@ public class MsPortableExecutable {
 					sb.append("\n La imagen es una ROM"); //$NON-NLS-1$
 				}
         		else {
-					Logger.getLogger("es.gob.afirma").warning("El fichero de imagen es de un tipo desconocido (Magic: " + AOUtil.hexify(new byte[] {peFile[coffOffset+21], peFile[coffOffset+20]}, true) + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+					Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
+						"El fichero de imagen es de un tipo desconocido (Magic: " + AOUtil.hexify(new byte[] {peFile[coffOffset+21], peFile[coffOffset+20]}, true) + ")" //$NON-NLS-1$ //$NON-NLS-2$
+					);
 				}
         	}
         	else if (peFile[coffOffset+optionalHeaderOffset+1] == (byte) 0x02 && peFile[coffOffset+20] == (byte) 0x0B) {

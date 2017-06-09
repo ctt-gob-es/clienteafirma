@@ -20,7 +20,7 @@ import java.util.logging.Logger;
 
 import es.gob.afirma.keystores.mozilla.MozillaKeyStoreUtilities;
 
-/** Utilidades para la gesti&oacute;n de almacenes SNN compartidos (de sistema).
+/** Utilidades para la gesti&oacute;n de almacenes NSS compartidos (de sistema).
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
 public final class SharedNssUtil {
 
@@ -74,7 +74,6 @@ public final class SharedNssUtil {
 	 * @return Nombres de las bibliotecas de los m&oacute;dulos de seguridad delNSS compartido de sistema. */
 	static Map<String, String> getSharedNssPKCS11Modules(final boolean excludeDnie,
 			                                             final boolean includeKnownModules) {
-
 		if (!excludeDnie) {
 			LOGGER.info("Se ha solicitado incluir los modulos nativos de DNIe"); //$NON-NLS-1$
 		}

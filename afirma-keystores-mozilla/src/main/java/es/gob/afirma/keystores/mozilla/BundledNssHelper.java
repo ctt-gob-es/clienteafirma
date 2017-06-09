@@ -31,7 +31,7 @@ final class BundledNssHelper {
 				"nss" + File.separator + //$NON-NLS-1$
 					Platform.getJavaArch();
 
-	/** Desempaqueta el NSS contenido dentro de la aplicacion y devuelve el directorio en el
+	/** Desempaqueta el NSS contenido dentro de la aplicaci&oacute;n y devuelve el directorio en el
 	 * que se puede encontrar, de tal forma que este puede ser utilizado directamente en la
 	 * configuraci&oacute;n de la carga del PKCS#11 de NSS.
 	 * @return Ruta del directorio de NSS.

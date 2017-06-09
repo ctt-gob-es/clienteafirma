@@ -93,15 +93,14 @@ public final class MozillaKeyStoreUtilitiesOsX {
 			}
 		}
 		try {
-
 			final ScriptEngine se = getAppleScriptEngine();
 			if (se != null) {
 				se.eval("do shell script \"" + sb.toString() + "\" with administrator privileges"); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 			else {
 				LOGGER.severe(
-						"No se ha podido instanciar el motor AppleScript para crear los enlaces simbolicos para NSS" //$NON-NLS-1$
-						);
+					"No se ha podido instanciar el motor AppleScript para crear los enlaces simbolicos para NSS" //$NON-NLS-1$
+				);
 			}
 		}
 		catch(final Exception e) {
@@ -138,13 +137,12 @@ public final class MozillaKeyStoreUtilitiesOsX {
 
 	static String getSystemNSSLibDirMacOsX() throws FileNotFoundException {
 
-		final String[] paths =
-			new String[] {
-				"/Applications/Firefox.app/Contents/MacOS", //$NON-NLS-1$
-				"/lib", //$NON-NLS-1$
-				"/usr/lib", //$NON-NLS-1$
-				"/usr/lib/nss", //$NON-NLS-1$
-				"/Applications/Minefield.app/Contents/MacOS" //$NON-NLS-1$
+		final String[] paths = new String[] {
+			"/Applications/Firefox.app/Contents/MacOS", //$NON-NLS-1$
+			"/lib", //$NON-NLS-1$
+			"/usr/lib", //$NON-NLS-1$
+			"/usr/lib/nss", //$NON-NLS-1$
+			"/Applications/Minefield.app/Contents/MacOS" //$NON-NLS-1$
 		};
 
 		String nssLibDir = null;
