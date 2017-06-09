@@ -36,21 +36,17 @@ public final class ProtocolInvocationLauncher {
     /** Clave privada fijada para reutilizarse en operaciones sucesivas. */
 	private static PrivateKeyEntry stickyKeyEntry = null;
 
-	/**
-	 * Recupera la entrada con la clave y certificado prefijados para las
+	/** Recupera la entrada con la clave y certificado prefijados para las
 	 * operaciones con certificados.
-	 * @return Entrada con el certificado y la clave prefijados.
-	 */
+	 * @return Entrada con el certificado y la clave prefijados. */
 	public static PrivateKeyEntry getStickyKeyEntry() {
 		return stickyKeyEntry;
 	}
 
-	/**
-	 * Establece una clave y certificado prefijados para las
+	/** Establece una clave y certificado prefijados para las
 	 * operaciones con certificados.
-	 * @param stickyKeyEntry Entrada con el certificado y la clave prefijados.
-	 */
-	public static void setStickyKeyEntry(PrivateKeyEntry stickyKeyEntry) {
+	 * @param stickyKeyEntry Entrada con el certificado y la clave prefijados. */
+	public static void setStickyKeyEntry(final PrivateKeyEntry stickyKeyEntry) {
 		ProtocolInvocationLauncher.stickyKeyEntry = stickyKeyEntry;
 	}
 
@@ -103,7 +99,8 @@ public final class ProtocolInvocationLauncher {
             catch(final UnsupportedProtocolException e) {
             	LOGGER.severe("La version del protocolo no esta soportada (" + e.getVersion() + "): " + e); //$NON-NLS-1$ //$NON-NLS-2$
             	final String errorCode = e.isNewVersionNeeded() ?
-            			ProtocolInvocationLauncherErrorManager.SAF_21 : ProtocolInvocationLauncherErrorManager.SAF_22;
+            			ProtocolInvocationLauncherErrorManager.SAF_21 :
+            				ProtocolInvocationLauncherErrorManager.SAF_22;
             	ProtocolInvocationLauncherErrorManager.showError(errorCode);
             	return ProtocolInvocationLauncherErrorManager.getErrorMessage(errorCode);
             }
@@ -145,7 +142,11 @@ public final class ProtocolInvocationLauncher {
                         sendErrorToServer(e.getErrorCode(), params.getStorageServletUrl().toString(), params.getId());
                     }
                     else {
-                        sendErrorToServer(ProtocolInvocationLauncherErrorManager.getErrorMessage(e.getErrorCode()), params.getStorageServletUrl().toString(), params.getId());
+                        sendErrorToServer(
+                    		ProtocolInvocationLauncherErrorManager.getErrorMessage(e.getErrorCode()),
+                    		params.getStorageServletUrl().toString(),
+                    		params.getId()
+                		);
                     }
                 }
             }

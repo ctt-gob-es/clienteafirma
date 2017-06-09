@@ -195,10 +195,8 @@ final class CommandLineLauncher {
 		}
 	}
 
-	/**
-	 * Desactiva el log por consola.
-	 * @param handlerName Nombre del manejador.
-	 */
+	/** Desactiva el log por consola.
+	 * @param handlerName Nombre del manejador. */
 	private static void deactivateConsoleLog(final String handlerName) {
 		final Handler[] handlers = Logger.getLogger(handlerName).getHandlers();
 		for(final Handler handler : handlers) {
@@ -265,7 +263,7 @@ final class CommandLineLauncher {
 
  		// Y si es certificado lo validamos como tal
  		else {
- 			Image icon = null;
+ 			Image icon;
  			try {
  				icon = ImageIO.read(
  					CommandLineLauncher.class.getResource(
@@ -274,7 +272,7 @@ final class CommandLineLauncher {
  				);
  			}
  			catch (final IOException e) {
- 				// Se ignora
+ 				icon = null;
  			}
  			CertValidationUi.validateCert(cert, null, null, icon);
  		}
@@ -501,17 +499,17 @@ final class CommandLineLauncher {
 			                   final AOKeyStoreManager ksm,
 			                   final String storePassword) throws CommandLineException, IOException, AOException {
 
-		final PrivateKeyEntry ke;
 		ksm.setEntryPasswordCallBack(
 			new CachePasswordCallback(
 				storePassword != null ? storePassword.toCharArray() : "dummy".toCharArray() //$NON-NLS-1$
 			)
 		);
+		final PrivateKeyEntry ke;
 		try {
 			ke = ksm.getKeyEntry(alias);
 		}
 		catch (final Exception e) {
-			throw new AOException("No se ha podido obtener la referencia a la clave privada", e); //$NON-NLS-1$
+			throw new AOException("No se ha podido obtener la referencia a la clave privada: " + e, e); //$NON-NLS-1$
 		}
 		if (ke == null) {
 			throw new AOException("No se hay ninguna entrada en el almacen con el alias indicado: " + alias); //$NON-NLS-1$
@@ -553,7 +551,7 @@ final class CommandLineLauncher {
 			if (extraParams != null) {
 				try {
 					final String params = extraParams.trim();
-					
+
 					// La division no funciona correctamente con split porque el caracter salto de linea se protege
 					// al insertarse por consola, asi que lo hacemos manualmente.
 					int beginIndex = 0;
