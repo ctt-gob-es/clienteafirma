@@ -60,7 +60,7 @@ public abstract class UrlParameters {
 	private URL retrieveServletUrl = null;
 	private URL storageServer = null;
 	private String id = null;
-	//private String keyStoreConfig = null;
+
 	private String defaultKeyStore = null;
 	private String defaultKeyStoreLib = null;
 	private Properties extraParams = null;
@@ -190,9 +190,8 @@ public abstract class UrlParameters {
 		setDesKey(verifyCipherKey(params));
 
 		// Comprobamos que se nos hayan indicado los datos o, en su defecto, el
-		// identificador de fichero remoto
-		// para descargar los datos y la ruta del servicio remoto para el
-		// fichero
+		// identificador de fichero remoto descargar los datos y la ruta del
+		// servicio remoto para el fichero
 		if (!params.containsKey(DATA_PARAM)) {
 
 			if (params.containsKey(FILE_ID_PARAM)) {
@@ -201,7 +200,8 @@ public abstract class UrlParameters {
 
 				if (!params.containsKey(RETRIEVE_SERVLET_PARAM)) {
 					throw new ParameterException(
-							"No se ha recibido la direccion del servlet para la recuperacion de los datos a firmar"); //$NON-NLS-1$
+						"No se ha recibido la direccion del servlet para la recuperacion de los datos a firmar" //$NON-NLS-1$
+					);
 				}
 
 				try {

@@ -24,7 +24,8 @@ import es.gob.afirma.core.signers.ExtraParamsProcessor.IncompatiblePolicyExcepti
 /** Par&aacute;metros de la URL de llamada a la aplicaci&oacute;n. */
 public final class UrlParametersToSignAndSave extends UrlParameters {
 
-	/** N&uacute;mero m&aacute;ximo de caracteres permitidos para el identificador de sesi&oacute;n de la firma. */
+	/** N&uacute;mero m&aacute;ximo de caracteres permitidos para el identificador
+	 * de sesi&oacute;n de la firma. */
 	private static final int MAX_ID_LENGTH = 20;
 
 	/** Par&aacute;metro de entrada con el formato de firma. */
@@ -42,9 +43,10 @@ public final class UrlParametersToSignAndSave extends UrlParameters {
 	/** Par&aacute;metro de entrada con el identificador del documento. */
 	private static final String ID_PARAM = "id"; //$NON-NLS-1$
 
-	/** Par&aacute;metro de entrada con la m&iacute;nima versi&oacute;n requerida del aplicativo a usar en la invocaci&oacute;n por protocolo. */
+	/** Par&aacute;metro de entrada con la m&iacute;nima versi&oacute;n requerida del aplicativo
+	 * a usar en la invocaci&oacute;n por protocolo. */
 	private static final String VER_PARAM = "ver"; //$NON-NLS-1$
-	
+
 	/** Par&aacute;metro de entrada que nos dice si tenemos que usar un provatekeyentry fijado o fijar uno nuevo. */
 	private static final String STICKY_PARAM = "sticky"; //$NON-NLS-1$
 
@@ -91,11 +93,9 @@ public final class UrlParametersToSignAndSave extends UrlParameters {
 	private String signFormat;
 	private String signAlgorithm;
 	private String minimumVersion;
-	
-	/**
-	 * Opci&oacute;n de configuraci&oacute;n que determina si se debe mantener
-	 * el primer certificado seleccionado para todas las operaciones. 
-	 */
+
+	/** Opci&oacute;n de configuraci&oacute;n que determina si se debe mantener
+	 * el primer certificado seleccionado para todas las operaciones. */
 	private boolean sticky;
 
 	/** Obtiene la versi&oacute;n m&iacute;nima requerida del aplicativo.
@@ -132,10 +132,8 @@ public final class UrlParametersToSignAndSave extends UrlParameters {
 		this.operation = operation;
 	}
 
-	/**
-	 * Establece el nombre del formato de firma que se debe utilizar.
-	 * @param format Formato de firma.
-	 */
+	/** Establece el nombre del formato de firma que se debe utilizar.
+	 * @param format Formato de firma. */
 	public void setSignFormat(final String format) {
 		this.signFormat = format;
 	}
@@ -147,28 +145,23 @@ public final class UrlParametersToSignAndSave extends UrlParameters {
 	void setMinimumVersion(final String minVer) {
 		this.minimumVersion = minVer;
 	}
-	
-	/**
-	 * Obtiene la opci&oacute;n de configuraci&oacute;n sticky
-	 * 
+
+	/** Obtiene la opci&oacute;n de configuraci&oacute;n <i>sticky</i>.
 	 * @return Opci&oacute;n de configuraci&oacute;n que determina si se debe
 	 *         mantener el primer certificado seleccionado ({@code true}) o se
-	 *         debe pedir siempre que el usuario elija uno ({@code false})
-	 */
+	 *         debe pedir siempre que el usuario elija uno ({@code false}). */
 	public boolean getSticky() {
 		return this.sticky;
 	}
 
-	/**
-	 * Establece la opci&oacute;n de configuraci&oacute;n sticky
+	/** Establece la opci&oacute;n de configuraci&oacute;n <i>sticky</i>.
 	 * @param sticky Opci&oacute;n de configuraci&oacute;n que determina si se debe
-	 *         mantener el primer certificado seleccionado ({@code true}) o se
-	 *         debe pedir siempre que el usuario elija uno ({@code false})
-	 */
+	 *               mantener el primer certificado seleccionado ({@code true}) o se
+	 *               debe pedir siempre que el usuario elija uno ({@code false}). */
 	public void setSticky(final boolean sticky) {
 		this.sticky = sticky;
 	}
-	
+
 	void setSignAndSaveParameters(final Map<String, String> params) throws ParameterException {
 
 		// Comprobamos que el identificador de sesion de la firma no sea mayor de un cierto numero de caracteres
@@ -182,7 +175,9 @@ public final class UrlParametersToSignAndSave extends UrlParameters {
 
 		if (signatureSessionId != null) {
 			if (signatureSessionId.length() > MAX_ID_LENGTH) {
-				throw new ParameterException("La longitud del identificador para la firma es mayor de " + MAX_ID_LENGTH + " caracteres."); //$NON-NLS-1$ //$NON-NLS-2$
+				throw new ParameterException(
+					"La longitud del identificador para la firma es mayor de " + MAX_ID_LENGTH + " caracteres." //$NON-NLS-1$ //$NON-NLS-2$
+				);
 			}
 
 			// Comprobamos que el identificador de sesion de la firma sea alfanumerico (se usara como nombre de fichero)
@@ -236,7 +231,9 @@ public final class UrlParametersToSignAndSave extends UrlParameters {
 				storageServletUrl = validateURL(params.get(STORAGE_SERVLET_PARAM));
 			}
 			catch (final ParameterLocalAccessRequestedException e) {
-				throw new ParameterLocalAccessRequestedException("La URL del servicio de guardado no puede ser local", e); //$NON-NLS-1$
+				throw new ParameterLocalAccessRequestedException(
+					"La URL del servicio de guardado no puede ser local: " + e, e //$NON-NLS-1$
+				);
 			}
 			catch (final ParameterException e) {
 				throw new ParameterException("Error al validar la URL del servicio de guardado: " + e, e); //$NON-NLS-1$
@@ -279,11 +276,12 @@ public final class UrlParametersToSignAndSave extends UrlParameters {
 		else {
 			setExtraParams(new Properties());
 		}
-		
+
 		// Valor de parametro sticky
 		if (params.containsKey(STICKY_PARAM)) {
 			setSticky(Boolean.parseBoolean(params.get(STICKY_PARAM)));
-		} else {
+		}
+		else {
 			setSticky(false);
 		}
 
@@ -296,20 +294,20 @@ public final class UrlParametersToSignAndSave extends UrlParameters {
 			// Determinamos si el nombre tiene algun caracter que no consideremos valido para un nombre de fichero
 			for (final char invalidChar : "\\/:*?\"<>|".toCharArray()) { //$NON-NLS-1$
 				if (filename.indexOf(invalidChar) != -1) {
-					throw new ParameterException("Se ha indicado un nombre de fichero con el caracter invalido: " + invalidChar); //$NON-NLS-1$
+					throw new ParameterException(
+						"Se ha indicado un nombre de fichero con el caracter invalido: " + invalidChar //$NON-NLS-1$
+					);
 				}
 			}
 			setFilename(params.get(FILENAME_PARAM));
 		}
 	}
 
-	/**
-	 * Expande los extraParams configurados en la URL que lo permitran. Por ejemplo,
-	 * la politica de firma establecida mediante "expPolicy" se expandir&aacute; a los
+	/** Expande los <code>extraParams</code> configurados en la URL que lo permitran. Por ejemplo,
+	 * la pol&iacute;tica de firma establecida mediante "expPolicy" se expandir&aacute; a los
 	 * valores correspondientes de la pol&iacute;tica.
 	 * @throws IncompatiblePolicyException Cuando se hayan proporcionado par&aacute;metros
-	 * incompatibles con la pol&iacute;tica de firma configurada.
-	 */
+	 *                                     incompatibles con la pol&iacute;tica de firma configurada. */
 	public void expandExtraParams() throws IncompatiblePolicyException {
 		setExtraParams(
 				ExtraParamsProcessor.expandProperties(
