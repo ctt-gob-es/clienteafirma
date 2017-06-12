@@ -18,6 +18,7 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.crypto.MarshalException;
@@ -214,7 +215,11 @@ final class AOXMLAdvancedSignature extends XMLAdvancedSignature {
 			);
         }
         catch (final Exception e) {
-        	LOGGER.warning("No se ha podido instalar un dereferenciador a medida, es posible que fallen las firmas de nodos concretos: " + e); //$NON-NLS-1$
+        	LOGGER.log(
+    			Level.WARNING,
+    			"No se ha podido instalar un dereferenciador a medida, es posible que fallen las firmas de nodos concretos: " + e, //$NON-NLS-1$
+    			e
+			);
         }
 
         this.signature.sign(this.signContext);

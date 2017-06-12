@@ -37,7 +37,7 @@ public class KeyUsagesPattern {
 	/** Configuraciones de KeyUsage de certificados de firma de CAs espec&iacute;ficas. */
 	private static final Map<String, Boolean[]> SIGNATURE_KEYUSAGES;
 	static {
-		SIGNATURE_KEYUSAGES = new HashMap<String, Boolean[]>();
+		SIGNATURE_KEYUSAGES = new HashMap<>();
 
 		// Certificado de fima de la CA de la Generalitat Valenciana
 		SIGNATURE_KEYUSAGES.put("C=ES, O=Generalitat Valenciana, OU=PKIGVA, CN=ACCV-CA2", //$NON-NLS-1$

@@ -79,9 +79,12 @@ public class TestContrafirmaIgae {
     				p);
 
     		final File f = File.createTempFile("Contrafirma-" + signFile, ".xml"); //$NON-NLS-1$ //$NON-NLS-2$
-    		final java.io.FileOutputStream fos = new java.io.FileOutputStream(f);
-    		fos.write(result);
-    		fos.flush(); fos.close();
+    		try (
+				final java.io.FileOutputStream fos = new java.io.FileOutputStream(f);
+			) {
+				fos.write(result);
+				fos.flush();
+			}
     		System.out.println("Temporal para comprobacion manual: " + f.getAbsolutePath()); //$NON-NLS-1$
 
     		Assert.assertTrue("El resultado no se reconoce como firma", signer.isSign(result)); //$NON-NLS-1$

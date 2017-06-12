@@ -21,6 +21,13 @@ public final class TestEnvelopedOnCusomNode {
     private static final String CERT_PASS = "12341234"; //$NON-NLS-1$
     private static final String CERT_ALIAS = "fisico activo prueba"; //$NON-NLS-1$
 
+    private static final Properties p5 = new Properties();
+    static {
+	    p5.setProperty("format", AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED); //$NON-NLS-1$
+	    p5.setProperty("includeOnlySignningCertificate", "true"); //$NON-NLS-1$ //$NON-NLS-2$
+	    p5.setProperty("insertEnvelopedSignatureOnNodeByXPath", "/bookstore/book[1]/title"); //$NON-NLS-1$ //$NON-NLS-2$
+    }
+
     private static final Properties p4 = new Properties();
     static {
 	    p4.setProperty("format", AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED); //$NON-NLS-1$
@@ -74,9 +81,12 @@ public final class TestEnvelopedOnCusomNode {
 		);
 
         final File f = File.createTempFile("xpathnodenveloped-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$
-        final java.io.FileOutputStream fos = new java.io.FileOutputStream(f);
-        fos.write(result);
-        fos.flush(); fos.close();
+        try (
+			final java.io.FileOutputStream fos = new java.io.FileOutputStream(f);
+		) {
+			fos.write(result);
+			fos.flush();
+		}
         System.out.println("Temporal para comprobacion manual: " + f.getAbsolutePath()); //$NON-NLS-1$
 	}
 
@@ -101,13 +111,16 @@ public final class TestEnvelopedOnCusomNode {
     		"SHA512withRSA", //$NON-NLS-1$
     		pke.getPrivateKey(),
     		pke.getCertificateChain(),
-    		p3
+    		p5
 		);
 
         final File f = File.createTempFile("xpathnodenveloped-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$
-        final java.io.FileOutputStream fos = new java.io.FileOutputStream(f);
-        fos.write(result);
-        fos.flush(); fos.close();
+        try (
+			final java.io.FileOutputStream fos = new java.io.FileOutputStream(f);
+		) {
+			fos.write(result);
+			fos.flush();
+		}
         System.out.println("Temporal para comprobacion manual: " + f.getAbsolutePath()); //$NON-NLS-1$
 
 	}
@@ -137,9 +150,12 @@ public final class TestEnvelopedOnCusomNode {
 		);
 
         final File f = File.createTempFile("xpathnodenvelopedwithns-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$
-        final java.io.FileOutputStream fos = new java.io.FileOutputStream(f);
-        fos.write(result);
-        fos.flush(); fos.close();
+        try (
+			final java.io.FileOutputStream fos = new java.io.FileOutputStream(f);
+		) {
+			fos.write(result);
+			fos.flush();
+		}
         System.out.println("Temporal para comprobacion manual: " + f.getAbsolutePath()); //$NON-NLS-1$
 
 	}
@@ -168,9 +184,12 @@ public final class TestEnvelopedOnCusomNode {
 		);
 
         final File f = File.createTempFile("xpathnodenveloped-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$
-        final java.io.FileOutputStream fos = new java.io.FileOutputStream(f);
-        fos.write(result);
-        fos.flush(); fos.close();
+        try (
+			final java.io.FileOutputStream fos = new java.io.FileOutputStream(f);
+		) {
+			fos.write(result);
+			fos.flush();
+		}
         System.out.println("Temporal para comprobacion manual: " + f.getAbsolutePath()); //$NON-NLS-1$
 	}
 

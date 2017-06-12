@@ -43,9 +43,12 @@ public class TestINC78353 {
 	@Test
 	public void testCofirmaXAdESADetached() throws Exception {
 
-		final InputStream is = getClass().getClassLoader().getResourceAsStream(FILE_XADES_A_DETACHED);
-		final byte[] signature = AOUtil.getDataFromInputStream(is);
-		is.close();
+		final byte[] signature;
+		try (
+			final InputStream is = getClass().getClassLoader().getResourceAsStream(FILE_XADES_A_DETACHED);
+		) {
+			signature = AOUtil.getDataFromInputStream(is);
+		}
 
 		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(PASSWORD.toCharArray()));
 
@@ -64,9 +67,11 @@ public class TestINC78353 {
 
 		System.out.println("El resultado de cofirma de firma XAdES-A Detached se almacena en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
 
-		final FileOutputStream fos = new FileOutputStream(tempFile);
-		fos.write(cosign);
-		fos.close();
+		try (
+			final FileOutputStream fos = new FileOutputStream(tempFile);
+		) {
+			fos.write(cosign);
+		}
 	}
 
 	/**
@@ -76,9 +81,12 @@ public class TestINC78353 {
 	@Test
 	public void testContrafirmaXAdESADetached() throws Exception {
 
-		final InputStream is = getClass().getClassLoader().getResourceAsStream(FILE_XADES_A_DETACHED);
-		final byte[] signature = AOUtil.getDataFromInputStream(is);
-		is.close();
+		final byte[] signature;
+		try (
+			final InputStream is = getClass().getClassLoader().getResourceAsStream(FILE_XADES_A_DETACHED);
+		) {
+			signature = AOUtil.getDataFromInputStream(is);
+		}
 
 		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(PASSWORD.toCharArray()));
 
@@ -99,9 +107,11 @@ public class TestINC78353 {
 
 		System.out.println("El resultado de contrafirma de firma XAdES-A Detached se almacena en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
 
-		final FileOutputStream fos = new FileOutputStream(tempFile);
-		fos.write(countersign);
-		fos.close();
+		try (
+			final FileOutputStream fos = new FileOutputStream(tempFile);
+		) {
+			fos.write(countersign);
+		}
 	}
 
 	/**
@@ -111,9 +121,12 @@ public class TestINC78353 {
 	@Test
 	public void testCofirmaXAdESAEnveloping() throws Exception {
 
-		final InputStream is = getClass().getClassLoader().getResourceAsStream(FILE_XADES_A_ENVELOPING);
-		final byte[] signature = AOUtil.getDataFromInputStream(is);
-		is.close();
+		final byte[] signature;
+		try (
+			final InputStream is = getClass().getClassLoader().getResourceAsStream(FILE_XADES_A_ENVELOPING);
+		) {
+			signature = AOUtil.getDataFromInputStream(is);
+		}
 
 		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(PASSWORD.toCharArray()));
 
@@ -132,21 +145,24 @@ public class TestINC78353 {
 
 		System.out.println("El resultado de cofirma de firma XAdES-A Enveloping se almacena en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
 
-		final FileOutputStream fos = new FileOutputStream(tempFile);
-		fos.write(cosign);
-		fos.close();
+		try (
+			final FileOutputStream fos = new FileOutputStream(tempFile);
+		) {
+			fos.write(cosign);
+		}
 	}
 
-	/**
-	 * Contrafirma de firma XAdES-A Enveloping.
-	 * @throws Exception Cuando ocurre un error.
-	 */
+	/** Contrafirma de firma XAdES-A Enveloping.
+	 * @throws Exception Cuando ocurre un error. */
 	@Test
 	public void testContrafirmaXAdESAEnveloping() throws Exception {
 
-		final InputStream is = getClass().getClassLoader().getResourceAsStream(FILE_XADES_A_ENVELOPING);
-		final byte[] signature = AOUtil.getDataFromInputStream(is);
-		is.close();
+		final byte[] signature;
+		try (
+			final InputStream is = getClass().getClassLoader().getResourceAsStream(FILE_XADES_A_ENVELOPING);
+		) {
+			signature = AOUtil.getDataFromInputStream(is);
+		}
 
 		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(PASSWORD.toCharArray()));
 
@@ -167,9 +183,11 @@ public class TestINC78353 {
 
 		System.out.println("El resultado de contrafirma de firma XAdES-A Enveloping se almacena en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
 
-		final FileOutputStream fos = new FileOutputStream(tempFile);
-		fos.write(countersign);
-		fos.close();
+		try (
+			final FileOutputStream fos = new FileOutputStream(tempFile);
+		) {
+			fos.write(countersign);
+		}
 	}
 
 	/** Cierra el flujo de lectura del almac&eacute;n de certificados.

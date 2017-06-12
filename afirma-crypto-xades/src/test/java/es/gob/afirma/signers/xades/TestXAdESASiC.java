@@ -41,9 +41,11 @@ public final class TestXAdESASiC {
         		null
 		);
 
-        final OutputStream os = new FileOutputStream(File.createTempFile("ASIC-XAdES-",  ".zip")); //$NON-NLS-1$ //$NON-NLS-2$
-        os.write(result);
-        os.close();
+        try (
+    		final OutputStream os = new FileOutputStream(File.createTempFile("ASIC-XAdES-",  ".zip")); //$NON-NLS-1$ //$NON-NLS-2$
+		) {
+        	os.write(result);
+        }
     }
 
 }

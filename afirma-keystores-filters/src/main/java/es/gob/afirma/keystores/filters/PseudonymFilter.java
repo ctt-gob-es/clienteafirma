@@ -41,8 +41,8 @@ public final class PseudonymFilter extends CertificateFilter {
 
 	@Override
 	public String[] matches(final String[] aliases, final KeyStoreManager ksm) {
-		final Map<String, X509Certificate> certsByAlias = new ConcurrentHashMap<String, X509Certificate>(aliases.length);
-		final Map<String, X509Certificate> psudoByAlias = new ConcurrentHashMap<String, X509Certificate>();
+		final Map<String, X509Certificate> certsByAlias = new ConcurrentHashMap<>(aliases.length);
+		final Map<String, X509Certificate> psudoByAlias = new ConcurrentHashMap<>();
 
 		// Creamos dos listas, una con los certificados normales y otros con los de alias
 		for (final String alias : aliases) {

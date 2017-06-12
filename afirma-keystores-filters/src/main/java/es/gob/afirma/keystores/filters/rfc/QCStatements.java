@@ -66,7 +66,7 @@ final class QCStatements extends ASN1Object {
     private final List<QCStatement> qCStatements;
 
     private QCStatements(final ASN1Sequence seq) {
-        this.qCStatements = new ArrayList<QCStatement>();
+        this.qCStatements = new ArrayList<>();
         for(int i =0;i<seq.size();i++){
             this.qCStatements.add(QCStatement.getInstance(seq.getObjectAt(i)));
         }

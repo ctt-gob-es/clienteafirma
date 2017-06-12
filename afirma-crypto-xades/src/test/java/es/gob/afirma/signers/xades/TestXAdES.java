@@ -171,9 +171,12 @@ public final class TestXAdES {
 				p
 			);
     		final File f = File.createTempFile("xades-NODESIGN-" + format + "-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-    		final java.io.FileOutputStream fos = new java.io.FileOutputStream(f);
-    		fos.write(signature);
-    		fos.flush(); fos.close();
+    		try (
+				final java.io.FileOutputStream fos = new java.io.FileOutputStream(f);
+			) {
+				fos.write(signature);
+				fos.flush();
+			}
     		System.out.println("Firma " + format + " para comprobacion manual: " + f.getAbsolutePath()); //$NON-NLS-1$ //$NON-NLS-2$
     	}
     }
@@ -220,9 +223,12 @@ public final class TestXAdES {
 				p
 			);
     		final File f = File.createTempFile("xades-NODESIGN-" + format + "-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-    		final java.io.FileOutputStream fos = new java.io.FileOutputStream(f);
-    		fos.write(signature);
-    		fos.flush(); fos.close();
+    		try (
+				final java.io.FileOutputStream fos = new java.io.FileOutputStream(f);
+			) {
+				fos.write(signature);
+				fos.flush();
+			}
     		System.out.println("Firma " + format + " para comprobacion manual: " + f.getAbsolutePath()); //$NON-NLS-1$ //$NON-NLS-2$
     	}
     }
@@ -273,9 +279,12 @@ public final class TestXAdES {
 				p
 			);
     		final File f = File.createTempFile("xades-NODESIGN-" + format + "-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-    		final java.io.FileOutputStream fos = new java.io.FileOutputStream(f);
-    		fos.write(signature);
-    		fos.flush(); fos.close();
+    		try (
+				final java.io.FileOutputStream fos = new java.io.FileOutputStream(f);
+			) {
+				fos.write(signature);
+				fos.flush();
+			}
     		System.out.println("Firma " + format + " para comprobacion manual: " + f.getAbsolutePath()); //$NON-NLS-1$ //$NON-NLS-2$
     	}
     }
@@ -328,9 +337,12 @@ public final class TestXAdES {
     		);
 
             final File f = File.createTempFile(algo + "-" + filename.replace(".xml", "") + "-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
-            final java.io.FileOutputStream fos = new java.io.FileOutputStream(f);
-            fos.write(result);
-            fos.flush(); fos.close();
+            try (
+				final java.io.FileOutputStream fos = new java.io.FileOutputStream(f);
+			) {
+				fos.write(result);
+				fos.flush();
+			}
             System.out.println("Temporal para comprobacion manual: " + f.getAbsolutePath()); //$NON-NLS-1$
 
             // Enviamos a validar a AFirma
@@ -388,9 +400,12 @@ public final class TestXAdES {
     		);
 
             final File f = File.createTempFile(algo + "-" + filename.replace(".xml", "") + "-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
-            final java.io.FileOutputStream fos = new java.io.FileOutputStream(f);
-            fos.write(result);
-            fos.flush(); fos.close();
+            try (
+				final java.io.FileOutputStream fos = new java.io.FileOutputStream(f);
+			) {
+				fos.write(result);
+				fos.flush();
+			}
             System.out.println("Temporal para comprobacion manual: " + f.getAbsolutePath()); //$NON-NLS-1$
 
             Assert.assertTrue("UnsignedProperties invalidas", isValidUnsignedProperties(new ByteArrayInputStream(result),null)); //$NON-NLS-1$
@@ -444,9 +459,12 @@ public final class TestXAdES {
     		);
 
             final File f = File.createTempFile(algo + "-" + filename.replace(".xml", "") + "-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
-            final java.io.FileOutputStream fos = new java.io.FileOutputStream(f);
-            fos.write(result);
-            fos.flush(); fos.close();
+            try (
+				final java.io.FileOutputStream fos = new java.io.FileOutputStream(f);
+			) {
+				fos.write(result);
+				fos.flush();
+			}
             System.out.println("Temporal para comprobacion manual: " + f.getAbsolutePath()); //$NON-NLS-1$
 
             Assert.assertTrue("UnsignedProperties invalidas", isValidUnsignedProperties(new ByteArrayInputStream(result),null)); //$NON-NLS-1$
@@ -501,9 +519,12 @@ public final class TestXAdES {
     		);
 
             final File f = File.createTempFile(algo + "-" + filename.replace(".xml", "") + "-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
-            final java.io.FileOutputStream fos = new java.io.FileOutputStream(f);
-            fos.write(result);
-            fos.flush(); fos.close();
+            try (
+				final java.io.FileOutputStream fos = new java.io.FileOutputStream(f);
+			) {
+				fos.write(result);
+				fos.flush();
+			}
             System.out.println("Temporal para comprobacion manual: " + f.getAbsolutePath()); //$NON-NLS-1$
 
             Assert.assertTrue("UnsignedProperties invalidas", isValidUnsignedProperties(new ByteArrayInputStream(result),null)); //$NON-NLS-1$
@@ -569,9 +590,12 @@ public final class TestXAdES {
     		);
 
             final File f = File.createTempFile(algo + "-" + p1.getProperty("mode") + "-" + filename.replace(".xml", "") + "-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$
-            final java.io.FileOutputStream fos = new java.io.FileOutputStream(f);
-            fos.write(result);
-            fos.flush(); fos.close();
+            try (
+				final java.io.FileOutputStream fos = new java.io.FileOutputStream(f);
+			) {
+				fos.write(result);
+				fos.flush();
+			}
             System.out.println("Temporal para comprobacion manual: " + f.getAbsolutePath()); //$NON-NLS-1$
 
 //                    // Enviamos a validar a AFirma
@@ -664,9 +688,12 @@ public final class TestXAdES {
                     Assert.assertFalse("El XML contiene '&#13;'", new String(result).contains("&#13;")); //$NON-NLS-1$ //$NON-NLS-2$
 
                     File f = File.createTempFile(algo + "-" + extraParams.getProperty("mode") + "-" + filename.replace(".xml", "") + "-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$
-                    java.io.FileOutputStream fos = new java.io.FileOutputStream(f);
-                    fos.write(result);
-                    fos.flush(); fos.close();
+                    try (
+        				final java.io.FileOutputStream fos = new java.io.FileOutputStream(f);
+        			) {
+        				fos.write(result);
+        				fos.flush();
+        			}
                     System.out.println("Temporal para comprobacion manual: " + f.getAbsolutePath()); //$NON-NLS-1$
 
 //                    // Enviamos a validar a AFirma
@@ -681,9 +708,12 @@ public final class TestXAdES {
 
                     if ("implicit".equals(extraParams.getProperty("mode")) && !filename.toLowerCase().endsWith(".xml") && !Arrays.equals(signer.getData(result), data)) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                         f = File.createTempFile(algo + "-" + extraParams.getProperty("mode") + "-" + filename.replace(".xml", "") + "-", "-" + filename); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$
-                        fos = new java.io.FileOutputStream(f);
-                        fos.write(signer.getData(result));
-                        fos.flush(); fos.close();
+                        try (
+            				final java.io.FileOutputStream fos = new java.io.FileOutputStream(f);
+            			) {
+            				fos.write(result);
+            				fos.flush();
+            			}
                         System.out.println("Temporal de los datos extraidos para comprobacion manual: " + f.getAbsolutePath()); //$NON-NLS-1$
                         Assert.fail("Los datos extraidos no coinciden con los originales: " + filename); //$NON-NLS-1$
                     }

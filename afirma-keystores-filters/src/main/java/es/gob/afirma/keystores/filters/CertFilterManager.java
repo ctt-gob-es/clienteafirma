@@ -80,7 +80,7 @@ public final class CertFilterManager {
 
 	private boolean mandatoryCertificate = false;
 
-	private final List<CertificateFilter> filters = new ArrayList<CertificateFilter>();
+	private final List<CertificateFilter> filters = new ArrayList<>();
 
 	private boolean allowExternalStores = true;
 
@@ -117,7 +117,7 @@ public final class CertFilterManager {
 	 * @param config Configuraci&oacute;n de la operaci&oacute;n.
 	 * @return Listado de filtros disyuntivos para aplicar al listado decertificados. */
 	private static List<String> getFilterValues(final Properties config) {
-		final List<String> filterValues = new ArrayList<String>();
+		final List<String> filterValues = new ArrayList<>();
 		if (config.containsKey(FILTER_PREFIX_KEY)) {
 			filterValues.add(config.getProperty(FILTER_PREFIX_KEY));
 		}
@@ -136,7 +136,7 @@ public final class CertFilterManager {
 
 	private CertificateFilter parseFilter(final String filterValue) {
 
-		final List<CertificateFilter> filtersList = new ArrayList<CertificateFilter>();
+		final List<CertificateFilter> filtersList = new ArrayList<>();
 		final String[] sortedFilterValues = filterValue.split(FILTERS_SEPARATOR);
 
 		// Se ordena para que los KeyUsage esten consecutivos
@@ -258,7 +258,7 @@ public final class CertFilterManager {
 	/** Devuelve la lista de certificados definidos.
 	 * @return Listado de certificados. */
 	public List<CertificateFilter> getFilters() {
-		return this.filters != null ? new ArrayList<CertificateFilter>(this.filters) : null;
+		return this.filters != null ? new ArrayList<>(this.filters) : null;
 	}
 
 	/** Indica si se debe seleccionar autom&aacute;ticamente un certificado si es el &uacute;nico que

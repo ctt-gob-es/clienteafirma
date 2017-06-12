@@ -47,13 +47,16 @@ public final class TestXAdESWithManifest {
         final byte[] signature = signer.sign(data, ALGORITHM, pke.getPrivateKey(), pke.getCertificateChain(), p);
 
         final File f = File.createTempFile("xadesExternallyDetachedManifest-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$
-		final java.io.FileOutputStream fos = new java.io.FileOutputStream(f);
-		fos.write(signature);
-		fos.flush(); fos.close();
+        try (
+    		final java.io.FileOutputStream fos = new java.io.FileOutputStream(f);
+		) {
+        	fos.write(signature);
+        	fos.flush();
+        }
 		System.out.println("Firma para comprobacion manual: " + f.getAbsolutePath()); //$NON-NLS-1$
 
     }
-    
+
 	/** Pruebas de firmas XAdES Enveloping de binario con MANIFEST.
 	 * @throws Exception en cualquier error. */
 	@SuppressWarnings("static-method")
@@ -79,9 +82,12 @@ public final class TestXAdESWithManifest {
         final byte[] signature = signer.sign(data, ALGORITHM, pke.getPrivateKey(), pke.getCertificateChain(), p);
 
         final File f = File.createTempFile("xadesEnveloping-useManifestBinary-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$
-		final java.io.FileOutputStream fos = new java.io.FileOutputStream(f);
-		fos.write(signature);
-		fos.flush(); fos.close();
+        try (
+    		final java.io.FileOutputStream fos = new java.io.FileOutputStream(f);
+		) {
+        	fos.write(signature);
+        	fos.flush();
+        }
 		System.out.println("Firma para comprobacion manual: " + f.getAbsolutePath()); //$NON-NLS-1$
 	}
 
@@ -110,9 +116,12 @@ public final class TestXAdESWithManifest {
         final byte[] signature = signer.sign(data, ALGORITHM, pke.getPrivateKey(), pke.getCertificateChain(), p);
 
         final File f = File.createTempFile("xadesEnveloping-useManifestXML-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$
-		final java.io.FileOutputStream fos = new java.io.FileOutputStream(f);
-		fos.write(signature);
-		fos.flush(); fos.close();
+        try (
+    		final java.io.FileOutputStream fos = new java.io.FileOutputStream(f);
+		) {
+        	fos.write(signature);
+        	fos.flush();
+        }
 		System.out.println("Firma para comprobacion manual: " + f.getAbsolutePath()); //$NON-NLS-1$
 	}
 
@@ -142,9 +151,12 @@ public final class TestXAdESWithManifest {
         final byte[] signature = signer.sign(data, ALGORITHM, pke.getPrivateKey(), pke.getCertificateChain(), p);
 
         final File f = File.createTempFile("xadesEnveloped-useManifestXML-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$
-		final java.io.FileOutputStream fos = new java.io.FileOutputStream(f);
-		fos.write(signature);
-		fos.flush(); fos.close();
+        try (
+    		final java.io.FileOutputStream fos = new java.io.FileOutputStream(f);
+		) {
+        	fos.write(signature);
+        	fos.flush();
+        }
 		System.out.println("Firma para comprobacion manual: " + f.getAbsolutePath()); //$NON-NLS-1$
 	}
 }

@@ -66,7 +66,7 @@ final class SearchFilter implements AttrFilter {
         this.filter = filter;
         this.pos = 0;
         normalizeFilter();
-        this.rootFilter = this.createNextFilter();
+        this.rootFilter = createNextFilter();
     }
 
     // Returns true if targetAttrs passes the filter
@@ -117,7 +117,7 @@ final class SearchFilter implements AttrFilter {
             }
 
             // skip past the "("
-            this.consumeChar();
+            consumeChar();
 
             skipWhiteSpace();
 
@@ -152,7 +152,7 @@ final class SearchFilter implements AttrFilter {
             }
 
             // skip past the ")"
-            this.consumeChar();
+            consumeChar();
         }
         catch (final InvalidSearchFilterException e) {
             throw e; // just rethrow these
@@ -201,15 +201,15 @@ final class SearchFilter implements AttrFilter {
         private final boolean polarity;
 
         CompoundFilter(final boolean polarity) {
-            this.subFilters = new Vector<StringFilter>();
+            this.subFilters = new Vector<>();
             this.polarity = polarity;
         }
 
         @Override
 		public void parse() throws InvalidSearchFilterException {
-            SearchFilter.this.consumeChar(); // consume the "&"
-            while(SearchFilter.this.getCurrentChar() != END_FILTER_TOKEN) {
-                this.subFilters.addElement(SearchFilter.this.createNextFilter());
+            consumeChar(); // consume the "&"
+            while(getCurrentChar() != END_FILTER_TOKEN) {
+                this.subFilters.addElement(createNextFilter());
                 skipWhiteSpace();
             }
         }
@@ -232,8 +232,8 @@ final class SearchFilter implements AttrFilter {
 
         @Override
 		public void parse() throws InvalidSearchFilterException {
-            SearchFilter.this.consumeChar(); // consume the "!"
-            this.fltr = SearchFilter.this.createNextFilter();
+            consumeChar(); // consume the "!"
+            this.fltr = createNextFilter();
         }
 
         @Override
@@ -263,28 +263,28 @@ final class SearchFilter implements AttrFilter {
 
             try {
                 // find the end
-                final int endPos = SearchFilter.this.relIndexOf(END_FILTER_TOKEN);
+                final int endPos = relIndexOf(END_FILTER_TOKEN);
 
                 //determine the match type
-                final int i = SearchFilter.this.relIndexOf(EQUAL_TOKEN);
-                final int qualifier = SearchFilter.this.relCharAt(i-1);
+                final int i = relIndexOf(EQUAL_TOKEN);
+                final int qualifier = relCharAt(i-1);
                 switch(qualifier) {
                 case APPROX_TOKEN:
                     this.matchType = APPROX_MATCH;
-                    this.attrID = SearchFilter.this.relSubstring(0, i-1);
-                    this.value = SearchFilter.this.relSubstring(i+1, endPos);
+                    this.attrID = relSubstring(0, i-1);
+                    this.value = relSubstring(i+1, endPos);
                     break;
 
                 case GREATER_TOKEN:
                     this.matchType = GREATER_MATCH;
-                    this.attrID = SearchFilter.this.relSubstring(0, i-1);
-                    this.value = SearchFilter.this.relSubstring(i+1, endPos);
+                    this.attrID = relSubstring(0, i-1);
+                    this.value = relSubstring(i+1, endPos);
                     break;
 
                 case LESS_TOKEN:
                     this.matchType = LESS_MATCH;
-                    this.attrID = SearchFilter.this.relSubstring(0, i-1);
-                    this.value = SearchFilter.this.relSubstring(i+1, endPos);
+                    this.attrID = relSubstring(0, i-1);
+                    this.value = relSubstring(i+1, endPos);
                     break;
 
                 case EXTEND_TOKEN:
@@ -292,8 +292,8 @@ final class SearchFilter implements AttrFilter {
 
                 default:
                     this.matchType = EQUAL_MATCH;
-                    this.attrID = SearchFilter.this.relSubstring(0,i);
-                    this.value = SearchFilter.this.relSubstring(i+1, endPos);
+                    this.attrID = relSubstring(0,i);
+                    this.value = relSubstring(i+1, endPos);
                     break;
                 }
 
@@ -301,7 +301,7 @@ final class SearchFilter implements AttrFilter {
                 this.value = this.value.trim();
 
                 //update our position
-                SearchFilter.this.consumeChars(endPos);
+                consumeChars(endPos);
 
             }
             catch (final Exception e) {
@@ -310,7 +310,7 @@ final class SearchFilter implements AttrFilter {
                     "character " + SearchFilter.this.pos + " in \""+ //$NON-NLS-1$ //$NON-NLS-2$
                     SearchFilter.this.filter + "\""); //$NON-NLS-1$
                 sfe.setRootCause(e);
-                throw(sfe);
+                throw sfe;
             }
         }
 
@@ -417,7 +417,7 @@ final class SearchFilter implements AttrFilter {
         Attribute attr;
         for (final NamingEnumeration<? extends Attribute> e = attrs.getAll(); e.hasMore(); ) {
             attr = e.next();
-            if (attr.size() == 0 || (attr.size() == 1 && attr.get() == null)) {
+            if (attr.size() == 0 || attr.size() == 1 && attr.get() == null) {
                 // only checking presence of attribute
                 answer += "(" + attr.getID() + "=" + "*)"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             } else {
@@ -441,9 +441,9 @@ final class SearchFilter implements AttrFilter {
     private static void hexDigit(final StringBuffer buf, final byte x) {
         char c;
 
-        c = (char) ((x >> 4) & 0xf);
+        c = (char) (x >> 4 & 0xf);
         if (c > 9) {
-			c = (char) ((c-10) + 'A');
+			c = (char) (c-10 + 'A');
 		} else {
 			c = (char)(c + '0');
 		}
@@ -451,7 +451,7 @@ final class SearchFilter implements AttrFilter {
         buf.append(c);
         c = (char) (x & 0xf);
         if (c > 9) {
-			c = (char)((c-10) + 'A');
+			c = (char)(c-10 + 'A');
 		} else {
 			c = (char)(c + '0');
 		}

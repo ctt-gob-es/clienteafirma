@@ -63,9 +63,12 @@ public final class TestCommitmentTypeIndications {
 		);
 
         final File f = File.createTempFile("xpathCommitmentTypeIndication-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$
-        final java.io.FileOutputStream fos = new java.io.FileOutputStream(f);
-        fos.write(result);
-        fos.flush(); fos.close();
+        try (
+			final java.io.FileOutputStream fos = new java.io.FileOutputStream(f);
+		) {
+			fos.write(result);
+			fos.flush();
+		}
         System.out.println("Temporal para comprobacion manual: " + f.getAbsolutePath()); //$NON-NLS-1$
 
 	}

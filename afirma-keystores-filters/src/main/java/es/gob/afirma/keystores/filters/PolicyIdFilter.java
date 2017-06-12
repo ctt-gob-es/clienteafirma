@@ -79,7 +79,7 @@ public final class PolicyIdFilter extends CertificateFilter {
   private static List<String> getCertificatePolicyIds(final X509Certificate cert) {
 		final byte[] certificatePoliciesBytes = cert.getExtensionValue("2.5.29.32"); //$NON-NLS-1$
 		if (certificatePoliciesBytes == null || certificatePoliciesBytes.length < 1) {
-			return new ArrayList<String>(0);
+			return new ArrayList<>(0);
 		}
 		final CertificatePolicies certificatePolicies = CertificatePolicies.getInstance(
 			ASN1Sequence.getInstance(
@@ -87,7 +87,7 @@ public final class PolicyIdFilter extends CertificateFilter {
 			)
 		);
 		final PolicyInformation[] pis = certificatePolicies.getPolicyInformation();
-		final List<String> policyOids = new ArrayList<String>(pis.length);
+		final List<String> policyOids = new ArrayList<>(pis.length);
 		for (final PolicyInformation pi : pis) {
 			policyOids.add(pi.getPolicyIdentifier().toString());
 		}

@@ -102,9 +102,12 @@ public final class TestContentIntenallyDetachedNodeSibling {
             		);
 
                     final File f = File.createTempFile(algo + "-" + extraParams.getProperty("mode") + "-" + filename.replace(".xml", "") + "-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$
-                    final java.io.FileOutputStream fos = new java.io.FileOutputStream(f);
-                    fos.write(result);
-                    fos.flush(); fos.close();
+                    try (
+            			final java.io.FileOutputStream fos = new java.io.FileOutputStream(f);
+            		) {
+            			fos.write(result);
+            			fos.flush();
+            		}
                     System.out.println("Temporal para comprobacion manual: " + f.getAbsolutePath()); //$NON-NLS-1$
 
                     Assert.assertNotNull(prueba, result);

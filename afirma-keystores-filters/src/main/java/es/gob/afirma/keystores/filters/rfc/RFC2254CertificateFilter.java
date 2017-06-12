@@ -66,7 +66,7 @@ public final class RFC2254CertificateFilter extends CertificateFilter {
     	if (!this.recurseIssuers) {
     		return super.matches(aliases, ksm);
     	}
-        final List<String> filteredAliases = new ArrayList<String>();
+        final List<String> filteredAliases = new ArrayList<>();
         for (final String alias : aliases) {
         	if (filterSubjectByRFC2254(this.rfc2254SubjectFilter, ksm.getCertificate(alias)) && matchesIssuersRecursivelly(ksm.getCertificateChain(alias))) {
                 filteredAliases.add(alias);

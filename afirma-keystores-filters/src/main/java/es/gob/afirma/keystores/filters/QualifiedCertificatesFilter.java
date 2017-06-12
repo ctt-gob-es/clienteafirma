@@ -58,7 +58,7 @@ public final class QualifiedCertificatesFilter extends CertificateFilter {
 	public String[] matches(final String[] aliases, final KeyStoreManager ksm) {
 
 		X509Certificate cert;
-		final List<String> filteredCerts = new ArrayList<String>();
+		final List<String> filteredCerts = new ArrayList<>();
 		for (final String aliase : aliases) {
 			cert = ksm.getCertificate(aliase);
 			if (cert == null) {

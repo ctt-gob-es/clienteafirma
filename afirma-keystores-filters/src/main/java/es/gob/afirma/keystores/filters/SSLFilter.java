@@ -54,12 +54,12 @@ public final class SSLFilter extends CertificateFilter {
 		}
 
 		X509Certificate cert;
-		final List<String> filteredCerts = new ArrayList<String>();
+		final List<String> filteredCerts = new ArrayList<>();
 		for (int i = 0; i < aliases.length; i++) {
 			cert = ksm.getCertificate(aliases[i]);
 			try {
 				if (this.matches(cert)) {
-					if (this.isAuthenticationDnieCert(cert)) {
+					if (isAuthenticationDnieCert(cert)) {
 						final String alias = getAssociatedCertAlias(ksm, cert, aliases, i);
 						if (alias != null) {
 							filteredCerts.add(alias);
@@ -104,7 +104,7 @@ public final class SSLFilter extends CertificateFilter {
 		for (int j = 0; j < aliases.length; j++) {
 			if (pos != j) {
 				tempCert = ksm.getCertificate(aliases[j]);
-				if (this.isSignatureDnieCert(tempCert) && FilterUtils.getSubjectSN(tempCert) != null &&
+				if (isSignatureDnieCert(tempCert) && FilterUtils.getSubjectSN(tempCert) != null &&
 					FilterUtils.getSubjectSN(tempCert).equalsIgnoreCase(FilterUtils.getSubjectSN(cert)) &&
 						SSLFilter.getExpiredDate(tempCert).equals(SSLFilter.getExpiredDate(cert))) {
 							return aliases[j];
