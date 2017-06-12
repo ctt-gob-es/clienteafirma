@@ -21,6 +21,13 @@ public final class TestEnvelopedOnCusomNode {
     private static final String CERT_PASS = "12341234"; //$NON-NLS-1$
     private static final String CERT_ALIAS = "fisico activo prueba"; //$NON-NLS-1$
 
+    private static final Properties p6 = new Properties();
+    static {
+	    p6.setProperty("format", AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED); //$NON-NLS-1$
+	    p6.setProperty("includeOnlySignningCertificate", "true"); //$NON-NLS-1$ //$NON-NLS-2$
+	    p6.setProperty("nodeToSign", "2"); //$NON-NLS-1$ //$NON-NLS-2$
+    }
+
     private static final Properties p5 = new Properties();
     static {
 	    p5.setProperty("format", AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED); //$NON-NLS-1$
@@ -77,7 +84,7 @@ public final class TestEnvelopedOnCusomNode {
     		"SHA512withRSA", //$NON-NLS-1$
     		pke.getPrivateKey(),
     		pke.getCertificateChain(),
-    		p2
+    		p6
 		);
 
         final File f = File.createTempFile("xpathnodenveloped-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$

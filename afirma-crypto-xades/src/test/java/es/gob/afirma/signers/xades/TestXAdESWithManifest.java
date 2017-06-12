@@ -128,7 +128,7 @@ public final class TestXAdESWithManifest {
 	/** Pruebas de firmas XAdES Enveloped con MANIFEST.
 	 * @throws Exception en cualquier error. */
 	@SuppressWarnings("static-method")
-	@Test
+	@Test(expected=es.gob.afirma.core.AOUnsupportedSignFormatException.class)
 	public void testXadesEnvelopedUseManifest() throws Exception {
 
 		System.out.println("Firma XAdES Enveloped con Manifest"); //$NON-NLS-1$
