@@ -87,9 +87,12 @@ public final class TestAdditionalTransforms {
 		);
 
 		final File f = File.createTempFile("xades-TRANS-BASE64-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$
-		final java.io.FileOutputStream fos = new java.io.FileOutputStream(f);
-		fos.write(signature);
-		fos.flush(); fos.close();
+		try (
+			final java.io.FileOutputStream fos = new java.io.FileOutputStream(f);
+		) {
+			fos.write(signature);
+			fos.flush();
+		}
 		System.out.println("Firma para comprobacion manual: " + f.getAbsolutePath()); //$NON-NLS-1$
     }
 
