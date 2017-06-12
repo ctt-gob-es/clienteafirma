@@ -11,6 +11,7 @@
 package es.gob.afirma.test.xmldsig;
 
 import java.io.File;
+import java.io.OutputStream;
 import java.security.KeyStore;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.cert.X509Certificate;
@@ -125,9 +126,12 @@ public final class TestXMLdSig {
 		);
 
         final File f = File.createTempFile("XmlDSig-EnvelopedWithoutXpath-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$
-        final java.io.FileOutputStream fos = new java.io.FileOutputStream(f);
-        fos.write(result);
-        fos.flush(); fos.close();
+        try (
+    		final java.io.FileOutputStream fos = new java.io.FileOutputStream(f);
+        ) {
+    		fos.write(result);
+    		fos.flush();
+        }
         System.out.println("Temporal para comprobacion manual: " + f.getAbsolutePath()); //$NON-NLS-1$
 	}
 
@@ -182,9 +186,12 @@ public final class TestXMLdSig {
             		);
 
                     File f = File.createTempFile("Sign-XMLdSig-" + algo + "-" + extraParams.getProperty("mode") + "-" + filename.replace(".xml", "") + "-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$
-                    java.io.FileOutputStream fos = new java.io.FileOutputStream(f);
-                    fos.write(result);
-                    fos.flush(); fos.close();
+                    try (
+                		java.io.FileOutputStream fos = new java.io.FileOutputStream(f);
+                    ) {
+                    	fos.write(result);
+                    	fos.flush();
+                    }
                     System.out.println("Temporal para comprobacion manual: " + f.getAbsolutePath()); //$NON-NLS-1$
 
                     Assert.assertNotNull(prueba, result);
@@ -202,9 +209,12 @@ public final class TestXMLdSig {
 
                     	if (extractionProblem) {
                     		f = File.createTempFile(algo + "-" + extraParams.getProperty("mode") + "-" + filename.replace(".xml", "") + "-", "-" + filename); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$
-                    		fos = new java.io.FileOutputStream(f);
-                    		fos.write(signer.getData(result));
-                    		fos.flush(); fos.close();
+                    		try (
+                				final OutputStream fos = new java.io.FileOutputStream(f);
+            				) {
+                    			fos.write(signer.getData(result));
+                    			fos.flush();
+                    		}
                     		System.out.println("Temporal de los datos extraidos para comprobacion manual: " + f.getAbsolutePath()); //$NON-NLS-1$
                     		Assert.fail("Los datos extraidos no coinciden con los originales: " + filename); //$NON-NLS-1$
                     	}
@@ -279,9 +289,12 @@ public final class TestXMLdSig {
 					);
 
         			final File f = File.createTempFile("Cosign-XMLdSig-" + algo + "-" + filename.replace(".xml", "") + "-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
-        			final java.io.FileOutputStream fos = new java.io.FileOutputStream(f);
-        			fos.write(result);
-        			fos.flush(); fos.close();
+        			try (
+    					final java.io.FileOutputStream fos = new java.io.FileOutputStream(f);
+        			) {
+        				fos.write(result);
+        				fos.flush();
+        			}
         			System.out.println("Temporal para comprobacion manual: " + f.getAbsolutePath()); //$NON-NLS-1$
 
         			Assert.assertNotNull(prueba, result);
@@ -356,9 +369,12 @@ public final class TestXMLdSig {
 					);
 
         			final File f = File.createTempFile("Countersign-XMLdSig-" + algo + "-" + filename.replace(".xml", "") + "-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
-        			final java.io.FileOutputStream fos = new java.io.FileOutputStream(f);
-        			fos.write(result);
-        			fos.flush(); fos.close();
+        			try (
+    					final java.io.FileOutputStream fos = new java.io.FileOutputStream(f);
+        			) {
+	        			fos.write(result);
+	        			fos.flush();
+        			}
         			System.out.println("Temporal para comprobacion manual: " + f.getAbsolutePath()); //$NON-NLS-1$
 
         			Assert.assertNotNull(prueba, result);
