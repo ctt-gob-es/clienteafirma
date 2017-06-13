@@ -36,7 +36,7 @@ import javax.xml.crypto.dsig.spec.C14NMethodParameterSpec;
 
 import org.w3c.dom.Element;
 
-import es.gob.afirma.signers.xml.CustomUriDereferencer;
+import es.gob.afirma.signers.xml.dereference.CustomUriDereferencer;
 import es.gob.afirma.signers.xml.style.XmlStyle;
 import net.java.xades.security.xml.WrappedKeyStorePlace;
 import net.java.xades.security.xml.XmlWrappedKeyInfo;
@@ -208,10 +208,9 @@ final class AOXMLAdvancedSignature extends XMLAdvancedSignature {
         this.signContext.putNamespacePrefix(this.xadesNamespace, this.xades.getXadesPrefix());
 
         try {
-        	// Obtenemos el dereferenciador por defecto por reflexion
-        	// e instalamos uno nuevo que solo actua cuando falla el por defecto
+        	// Instalamos un dereferenciador nuevo que solo actua cuando falla el por defecto
         	this.signContext.setURIDereferencer(
-    			new CustomUriDereferencer(CustomUriDereferencer.getDefaultDereferencer())
+    			new CustomUriDereferencer()
 			);
         }
         catch (final Exception e) {

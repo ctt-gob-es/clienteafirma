@@ -74,10 +74,10 @@ import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.core.util.tree.AOTreeNode;
-import es.gob.afirma.signers.xml.CustomUriDereferencer;
 import es.gob.afirma.signers.xml.InvalidXMLException;
 import es.gob.afirma.signers.xml.Utils;
 import es.gob.afirma.signers.xml.XMLConstants;
+import es.gob.afirma.signers.xml.dereference.CustomUriDereferencer;
 import es.gob.afirma.signers.xml.style.CannotDereferenceException;
 import es.gob.afirma.signers.xml.style.IsInnerlException;
 import es.gob.afirma.signers.xml.style.ReferenceIsNotXmlException;
@@ -1119,10 +1119,9 @@ public final class AOXMLDSigSigner implements AOSigner {
             signContext.putNamespacePrefix(XMLConstants.DSIGNNS, xmlSignaturePrefix);
 
             try {
-            	// Obtenemos el dereferenciador por defecto por reflexion
-            	// e instalamos uno nuevo que solo actua cuando falla el por defecto
+            	// Instalamos un dereferenciador nuevo que solo actua cuando falla el por defecto
             	signContext.setURIDereferencer(
-        			new CustomUriDereferencer(CustomUriDereferencer.getDefaultDereferencer())
+        			new CustomUriDereferencer()
     			);
             }
             catch (final Exception e) {
@@ -1553,10 +1552,9 @@ public final class AOXMLDSigSigner implements AOSigner {
             final DOMSignContext signContext = new DOMSignContext(key, rootSig);
             signContext.putNamespacePrefix(XMLConstants.DSIGNNS, xmlSignaturePrefix);
             try {
-            	// Obtenemos el dereferenciador por defecto por reflexion
-            	// e instalamos uno nuevo que solo actua cuando falla el por defecto
+            	// Instalamos un dereferenciador nuevo que solo actua cuando falla el por defecto
             	signContext.setURIDereferencer(
-        			new CustomUriDereferencer(CustomUriDereferencer.getDefaultDereferencer())
+        			new CustomUriDereferencer()
     			);
             }
             catch (final Exception e) {
@@ -2183,10 +2181,9 @@ public final class AOXMLDSigSigner implements AOSigner {
             signContext.putNamespacePrefix(XMLConstants.DSIGNNS, xmlSignaturePrefix);
 
             try {
-            	// Obtenemos el dereferenciador por defecto por reflexion
-            	// e instalamos uno nuevo que solo actua cuando falla el por defecto
+            	// Instalamos un dereferenciador nuevo que solo actua cuando falla el por defecto
             	signContext.setURIDereferencer(
-        			new CustomUriDereferencer(CustomUriDereferencer.getDefaultDereferencer())
+        			new CustomUriDereferencer()
     			);
             }
             catch (final Exception e) {

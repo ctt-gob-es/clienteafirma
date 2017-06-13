@@ -42,8 +42,8 @@ import org.w3c.dom.NodeList;
 
 import es.gob.afirma.cert.signvalidation.SignValidity.SIGN_DETAIL_TYPE;
 import es.gob.afirma.cert.signvalidation.SignValidity.VALIDITY_ERROR;
-import es.gob.afirma.signers.xml.CustomUriDereferencer;
 import es.gob.afirma.signers.xml.Utils;
+import es.gob.afirma.signers.xml.dereference.CustomUriDereferencer;
 
 /** Validador de firmas XML. Basado en la documentaci&oacute;n y los ejemplo de la JSR 105.
  *  Se validan los certificados en local revisando las fechas de validez de los certificados. */
@@ -148,10 +148,9 @@ public final class ValidateXMLSignature implements SignValider {
             final List<?> list = keyInfo.getContent();
 
             try {
-            	// Obtenemos el dereferenciador por defecto
-            	// e instalamos uno nuevo que solo actua cuando falla el por defecto
+            	// Instalamos un dereferenciador nuevo que solo actua cuando falla el por defecto
             	context.setURIDereferencer(
-        			new CustomUriDereferencer(CustomUriDereferencer.getDefaultDereferencer())
+        			new CustomUriDereferencer()
     			);
             }
             catch (final Exception e) {
