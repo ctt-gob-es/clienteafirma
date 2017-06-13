@@ -563,7 +563,7 @@ final class PreferencesPanelGeneral extends JPanel {
 		return signatureDefaultsFormats;
 	}
 
-	/** Di&aacute;logo para cambair la configuracion del proxy
+	/** Di&aacute;logo para cambiar la configuraci&oacute;n del <i>proxy</i>.
 	 * @param container Contenedor en el que se define el di&aacute;logo. */
     public static void changeProxyDlg(final Container container) {
 
@@ -623,10 +623,9 @@ final class PreferencesPanelGeneral extends JPanel {
     	}
     }
 
-    /**
-	 * M&eacute;todo getter del atributo unprotected
-	 * @return the unprotected
-	 */
+    /** Indica si hay campos protegidos o no.
+	 * @return <code>true</code> si no hay campos protegidos,
+	 *         <code>false</code> en caso contrario. */
 	public boolean isUnprotected() {
 		return this.unprotected;
 	}
