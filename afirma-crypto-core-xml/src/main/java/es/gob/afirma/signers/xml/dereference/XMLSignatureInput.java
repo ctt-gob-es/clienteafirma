@@ -32,10 +32,12 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
 import es.gob.afirma.core.misc.AOUtil;
+import nu.xom.converters.DOMConverter;
 
 
 /** Class XMLSignatureInput.
@@ -167,21 +169,23 @@ class XMLSignatureInput {
 
     /** Returns the byte array from input which was specified as the parameter of
      * {@link XMLSignatureInput} constructor.
-     *
-     * @return the byte[] from input which was specified as the parameter of
-     * {@link XMLSignatureInput} constructor.
-     *
-     * @throws IOException
-     */
+     * @return The byte[] from input which was specified as the parameter of
+     *         {@link XMLSignatureInput} constructor.
+     * @throws IOException On any error getting the bytes. */
     public byte[] getBytes() throws IOException  {
         final byte[] inputBytes = getBytesFromInputStream();
         if (inputBytes != null) {
             return inputBytes;
         }
-//        final Canonicalizer20010315OmitComments c14nizer = new Canonicalizer20010315OmitComments();
-//        this.bytes = c14nizer.engineCanonicalize(this);
-//        return this.bytes;
-        return null;
+        if (getSubNode() instanceof Element) {
+            return canonicalizeXml(
+        		(Element) getSubNode(),
+        		nu.xom.canonical.Canonicalizer.CANONICAL_XML
+    		);
+        }
+        throw new IOException(
+    		"Cannot get canonicalized bytes from non Element-type Node" //$NON-NLS-1$
+		);
     }
 
     /** Determines if the object has been set up with a Node set.
@@ -277,5 +281,13 @@ class XMLSignatureInput {
             this.bytes = null;
         }
     }
+
+	private static byte[] canonicalizeXml(final org.w3c.dom.Element element, final String algorithm) throws IOException {
+		final nu.xom.Element xomElement = DOMConverter.convert(element);
+		final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		final nu.xom.canonical.Canonicalizer canonicalizer = new nu.xom.canonical.Canonicalizer(baos, algorithm);
+		canonicalizer.write(xomElement);
+		return baos.toByteArray();
+	}
 
 }

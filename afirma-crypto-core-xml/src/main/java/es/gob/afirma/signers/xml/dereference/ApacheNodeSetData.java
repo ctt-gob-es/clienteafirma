@@ -36,7 +36,7 @@ import javax.xml.crypto.NodeSetData;
 import org.w3c.dom.Node;
 
 /** Implementaci&oacute;n Apache del <code>NodeSetData</code>. */
-public class ApacheNodeSetData implements NodeSetData {
+public class ApacheNodeSetData implements NodeSetData<Node> {
 
     private final XMLSignatureInput xi;
 
@@ -45,7 +45,7 @@ public class ApacheNodeSetData implements NodeSetData {
     }
 
     @Override
-	public Iterator<?> iterator() {
+	public Iterator<Node> iterator() {
         // If nodefilters are set, must execute them first to create node-set
         if (this.xi.getNodeFilters() != null && !this.xi.getNodeFilters().isEmpty()) {
             return Collections.unmodifiableSet

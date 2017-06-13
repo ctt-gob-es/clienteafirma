@@ -52,9 +52,9 @@ public final class TestXAdES {
 //    private static final String CERT_PASS2 = "1234"; //$NON-NLS-1$
 //    private static final String CERT_ALIAS2 = "{71e526c4-0f27-4f32-8be0-90df52dcbc53}"; //$NON-NLS-1$
 //
-//    private static final String CERT_PATH3 = "CAMERFIRMA_PF_SW_Clave_usuario_Activo.p12"; //$NON-NLS-1$
-//    private static final String CERT_PASS3 = "1111"; //$NON-NLS-1$
-//    private static final String CERT_ALIAS3 = "1"; //$NON-NLS-1$
+    private static final String CERT_PATH3 = "CAMERFIRMA_PF_SW_Clave_usuario_Activo.p12"; //$NON-NLS-1$
+    private static final String CERT_PASS3 = "1111"; //$NON-NLS-1$
+    private static final String CERT_ALIAS3 = "1"; //$NON-NLS-1$
 
     private static final Properties[] XADES_MODES;
 
@@ -144,9 +144,12 @@ public final class TestXAdES {
     	}
 
         final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
-        ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH), CERT_PASS.toCharArray());
+        ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH3), CERT_PASS3.toCharArray());
 
-        final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
+        final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(
+    		CERT_ALIAS3,
+    		new KeyStore.PasswordProtection(CERT_PASS3.toCharArray())
+		);
 
     	final byte[] data = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream("xml_with_ids.xml")); //$NON-NLS-1$
 
