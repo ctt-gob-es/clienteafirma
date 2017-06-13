@@ -41,7 +41,6 @@ import javax.swing.text.StyleContext;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
-import sun.swing.FilePane;
 import es.gob.afirma.core.misc.Platform;
 
 /**
@@ -100,21 +99,21 @@ final class ResizingAdaptor extends ComponentAdapter {
 	 */
 	public void componentResized(final ComponentEvent e) {
 			if (this.theWindow != null) {
-				this.adjustFontSize(this.theWindow.getComponents());
+				adjustFontSize(this.theWindow.getComponents());
 			} else if (this.theDialog != null){
-				this.adjustFontSize(this.theDialog.getComponents());
+				adjustFontSize(this.theDialog.getComponents());
 			} else if (this.theDialogWizard != null){
-				this.adjustFontSize(this.theDialogWizard.getComponents());
+				adjustFontSize(this.theDialogWizard.getComponents());
 			} else if (this.theDialogAdvisor != null){
-				this.adjustFontSize(this.theDialogAdvisor.getComponents());
+				adjustFontSize(this.theDialogAdvisor.getComponents());
 			} else if (this.theWindowAbout != null){
-				this.adjustFontSize(this.theWindowAbout.getComponents());
+				adjustFontSize(this.theWindowAbout.getComponents());
 			} else if (this.theCustomDialog != null) {
-				this.adjustFontSize(this.theCustomDialog.getComponents());
+				adjustFontSize(this.theCustomDialog.getComponents());
 			}else if (this.theFileChooser != null){
-				this.adjustFontSize(this.theFileChooser.getDialog().getComponents());
+				adjustFontSize(this.theFileChooser.getDialog().getComponents());
 			} else {
-				this.adjustFontSize(this.theFileChooserToSave.getDialog().getComponents());
+				adjustFontSize(this.theFileChooserToSave.getDialog().getComponents());
 			}
 	}
 
@@ -123,21 +122,21 @@ final class ResizingAdaptor extends ComponentAdapter {
 	 */
 	public void adjustWindowFonts() {
 		if (this.theWindow != null) {
-			this.adjustFontSize(this.theWindow.getComponents());
+			adjustFontSize(this.theWindow.getComponents());
 		} else if (this.theDialog != null){
-			this.adjustFontSize(this.theDialog.getComponents());
+			adjustFontSize(this.theDialog.getComponents());
 		} else if (this.theDialogWizard != null){
-			this.adjustFontSize(this.theDialogWizard.getComponents());
+			adjustFontSize(this.theDialogWizard.getComponents());
 		} else if (this.theDialogAdvisor != null){
-			this.adjustFontSize(this.theDialogAdvisor.getComponents());
+			adjustFontSize(this.theDialogAdvisor.getComponents());
 		} else if (this.theWindowAbout != null){
-			this.adjustFontSize(this.theWindowAbout.getComponents());
+			adjustFontSize(this.theWindowAbout.getComponents());
 		} else if (this.theCustomDialog != null) {
-			this.adjustFontSize(this.theCustomDialog.getComponents());
+			adjustFontSize(this.theCustomDialog.getComponents());
 		}else if (this.theFileChooser != null){
-			this.adjustFontSize(this.theFileChooser.getDialog().getComponents());
+			adjustFontSize(this.theFileChooser.getDialog().getComponents());
 		} else {
-			this.adjustFontSize(this.theFileChooserToSave.getDialog().getComponents());
+			adjustFontSize(this.theFileChooserToSave.getDialog().getComponents());
 		}
 	}
 
@@ -159,13 +158,13 @@ final class ResizingAdaptor extends ComponentAdapter {
 		else if (this.theDialog != null) {
 			if(GeneralConfig.isBigFontSize() || GeneralConfig.isFontBold()){
 				if (Platform.getOS().equals(Platform.OS.LINUX)){
-					relWidth = this.theDialog.getSize().getWidth() / (Constants.OPTION_FONT_INITIAL_WIDTH_LINUX);
-					relHeight = this.theDialog.getSize().getHeight() / (Constants.OPTION_FONT_INITIAL_HEIGHT_LINUX);
+					relWidth = this.theDialog.getSize().getWidth() / Constants.OPTION_FONT_INITIAL_WIDTH_LINUX;
+					relHeight = this.theDialog.getSize().getHeight() / Constants.OPTION_FONT_INITIAL_HEIGHT_LINUX;
 					relation = Math.round(relWidth * relHeight * this.theDialog.getMinimumRelation());
 				}
 				else {
-					relWidth = this.theDialog.getSize().getWidth() / (Constants.OPTION_FONT_INITIAL_WIDTH);
-					relHeight = this.theDialog.getSize().getHeight() / (Constants.OPTION_FONT_INITIAL_HEIGHT);
+					relWidth = this.theDialog.getSize().getWidth() / Constants.OPTION_FONT_INITIAL_WIDTH;
+					relHeight = this.theDialog.getSize().getHeight() / Constants.OPTION_FONT_INITIAL_HEIGHT;
 					relation = Math.round(relWidth * relHeight * this.theDialog.getMinimumRelation());
 				}
 			}
@@ -285,7 +284,7 @@ final class ResizingAdaptor extends ComponentAdapter {
 					else {
 						resizeFactor = Math.round(relation / getResizingFactorFileChooser());
 					}
-					actualComponent.setFont(actualComponent.getFont().deriveFont((getFontSize() + resizeFactor)));
+					actualComponent.setFont(actualComponent.getFont().deriveFont(getFontSize() + resizeFactor));
 				}
 				else {
 					if (actualComponent instanceof JComboBox){
@@ -302,13 +301,13 @@ final class ResizingAdaptor extends ComponentAdapter {
 					//Se comprueba si el panel tiene un nombre asignado
 					final String name = actualComponent.getName();
 					//Se hara el resize del titulo en el caso de que el componente no sea el panel de botones de accesibilidad de los alerts
-					if ((name==null) || (!name.equalsIgnoreCase("AccessibilityButtonsPanel"))) { //$NON-NLS-1$
+					if (name==null || !name.equalsIgnoreCase("AccessibilityButtonsPanel")) { //$NON-NLS-1$
 						final TitledBorder b = (TitledBorder) componentBorder;
 						final float resizeFactor = Math.round(relation / getResizingFactorFrame());
 						if (b.getTitleFont() != null) {
-						    b.setTitleFont(b.getTitleFont().deriveFont((getFontSize()-2 + resizeFactor)));
+						    b.setTitleFont(b.getTitleFont().deriveFont(getFontSize()-2 + resizeFactor));
 						} else {
-						    b.setTitleFont(actualComponent.getFont().deriveFont((getFontSize()-2 + resizeFactor)));
+						    b.setTitleFont(actualComponent.getFont().deriveFont(getFontSize()-2 + resizeFactor));
 						}
 					}
 				}
@@ -336,7 +335,7 @@ final class ResizingAdaptor extends ComponentAdapter {
 					Style link;
 					final StyleContext sc = new StyleContext();
 					link= sc.addStyle("link", sc.getStyle(StyleContext.DEFAULT_STYLE)); //$NON-NLS-1$
-			        StyleConstants.setFontSize(link, (7 + (int)resizeFactor));
+			        StyleConstants.setFontSize(link, 7 + (int)resizeFactor);
 					((HTMLDocument) editorPanel.getDocument()).setCharacterAttributes(221, 26, link, false);
 				} else if (!(actualComponent instanceof JComboBox)){
 					// Si nos encontramos con un contenedor, redimensionamos sus hijos
@@ -360,7 +359,7 @@ final class ResizingAdaptor extends ComponentAdapter {
 			}
 
 			//imagenes dentro de JButton
-			if ((actualComponent instanceof JButton) && (((JButton)actualComponent).getIcon() != null)) {
+			if (actualComponent instanceof JButton && ((JButton)actualComponent).getIcon() != null) {
 				float resizeFactor = 0;
 				if (this.theCustomDialog != null) {
 					resizeFactor = getImageResizeFactor(Constants.RESIZING_IMAGES_FACTOR + 0.0010);
@@ -442,7 +441,7 @@ final class ResizingAdaptor extends ComponentAdapter {
 	 * @param c Componente de tipo JButton en el que se encuentra la imagen */
 	private void resizeImageButton(final double factor, final Component c) {
 
-		if ((this.theFileChooser==null || (isAncestor(this.theFileChooser.getAccesibilityButtonsPanel(), c))) && (this.theFileChooserToSave==null || (isAncestor(this.theFileChooserToSave.getAccesibilityButtonsPanel(), c)))){
+		if ((this.theFileChooser==null || isAncestor(this.theFileChooser.getAccesibilityButtonsPanel(), c)) && (this.theFileChooserToSave==null || isAncestor(this.theFileChooserToSave.getAccesibilityButtonsPanel(), c))){
 
 		final JButton button = (JButton) c;
 		ImageIcon imageIcon = null;
@@ -451,10 +450,10 @@ final class ResizingAdaptor extends ComponentAdapter {
 		double factorAux = factor;
 
 		//Se comprueba si se trata del boton de ayuda
-		if ((button.getName() != null) && (button.getName().equalsIgnoreCase("helpButton"))) { //$NON-NLS-1$
+		if (button.getName() != null && button.getName().equalsIgnoreCase("helpButton")) { //$NON-NLS-1$
 			imageIcon = HelpUtils.IMAGEICONHELP; //Se carga la imagen original
 		}
-		else if ((button.getName() != null) && (button.getName().equalsIgnoreCase("maximizar"))) { //$NON-NLS-1$
+		else if (button.getName() != null && button.getName().equalsIgnoreCase("maximizar")) { //$NON-NLS-1$
 			if (this.theDialog!=null){
 				factorAux = factorAux - 0.4; //0.8999999761581421
 			}
@@ -463,7 +462,7 @@ final class ResizingAdaptor extends ComponentAdapter {
 			}
 			imageIcon = Constants.IMAGEICON_MAXIMIZE; //Se carga la imagen original
 		}
-		else if ((button.getName() != null) && (button.getName().equalsIgnoreCase("restaurar"))) { //$NON-NLS-1$
+		else if (button.getName() != null && button.getName().equalsIgnoreCase("restaurar")) { //$NON-NLS-1$
 			if (this.theDialog!=null){
 				factorAux = factorAux - 0.4; //0.8999999761581421
 			}
@@ -473,7 +472,7 @@ final class ResizingAdaptor extends ComponentAdapter {
 			imageIcon = Constants.IMAGEICONRESTORE; //Se carga la imagen original
 		}
 		else {
-			imageIcon = new ImageIcon(iconToImage((button.getIcon()))); //Se carga la imagen del componente actual
+			imageIcon = new ImageIcon(iconToImage(button.getIcon())); //Se carga la imagen del componente actual
 		}
 		//Se redimensionan las imagenes
 		final ImageIcon newImage = new ImageIcon(imageIcon.getImage().getScaledInstance((int) Math.round(25 * 2 * factorAux),
@@ -520,11 +519,11 @@ final class ResizingAdaptor extends ComponentAdapter {
 	 */
 	private static boolean isResizable(final Component a){
 
-		if ((a instanceof JButton) || (a instanceof JToggleButton) || (a instanceof JLabel) || (a instanceof JMenuItem)
-				|| (a instanceof JComboBox) || (a instanceof JTextField) || (a instanceof JPanel) || (a instanceof JTabbedPane)
-				|| (a instanceof JRadioButton) || (a instanceof JCheckBox) || (a instanceof JTextPane) || (a instanceof JEditorPane)
-				|| (a instanceof JTree) || (a instanceof JList) || (a instanceof JFileChooser) || (a instanceof JTable)
-				|| (a instanceof JTableHeader) || (a instanceof FilePane)){
+		if (a instanceof JButton || a instanceof JToggleButton || a instanceof JLabel || a instanceof JMenuItem
+				|| a instanceof JComboBox || a instanceof JTextField || a instanceof JPanel || a instanceof JTabbedPane
+				|| a instanceof JRadioButton || a instanceof JCheckBox || a instanceof JTextPane || a instanceof JEditorPane
+				|| a instanceof JTree || a instanceof JList || a instanceof JFileChooser || a instanceof JTable
+				|| a instanceof JTableHeader){
 			return true;
 		}
 		return false;

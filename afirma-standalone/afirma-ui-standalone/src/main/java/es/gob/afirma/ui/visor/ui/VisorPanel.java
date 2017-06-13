@@ -122,7 +122,7 @@ public final class VisorPanel extends JAccessibilityDialogWizard {
         if (signature != null) {
         	final byte[] data = dataFile == null ? null : loadFile(dataFile);
         	createUI();
-        	this.openSign(signFile, signature, dataFile, data);
+        	openSign(signFile, signature, dataFile, data);
         }
     }
 
@@ -425,13 +425,13 @@ public final class VisorPanel extends JAccessibilityDialogWizard {
      */
     private static SignValidity validateSign(final byte[] sign, final byte[] data) throws IOException {
         if (DataAnalizerUtil.isSignedPDF(sign)) {
-        	return ValidatePdfSignature.validate(sign);
+        	return new ValidatePdfSignature().validate(sign);
         }
         else if (DataAnalizerUtil.isSignedInvoice(sign)) { // Factura electronica
-            return ValidateXMLSignature.validate(sign);
+            return new ValidateXMLSignature().validate(sign);
         }
         else if (DataAnalizerUtil.isSignedXML(sign)) {
-            return ValidateXMLSignature.validate(sign);
+            return new ValidateXMLSignature().validate(sign);
         }
         else if(DataAnalizerUtil.isSignedBinary(sign)) {
             return ValidateBinarySignature.validate(sign, data);

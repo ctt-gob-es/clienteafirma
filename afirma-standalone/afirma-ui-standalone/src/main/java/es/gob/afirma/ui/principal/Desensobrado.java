@@ -22,6 +22,7 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.security.InvalidKeyException;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.util.logging.Logger;
@@ -126,8 +127,8 @@ final class Desensobrado extends JPanel {
                                            Messages.getString("Firma.msg.info"), Messages.getString("PrincipalGUI.TabConstraints.tabTitleDesensobrado"), JOptionPane.INFORMATION_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
 
             final byte[] envelopData;
-            try {
-                envelopData = AOUtil.getDataFromInputStream(new FileInputStream(new File(envelopPath)));
+            try (final InputStream is = new FileInputStream(new File(envelopPath));){
+                envelopData = AOUtil.getDataFromInputStream(is);
             }
             catch(final Exception e) {
                 LOGGER.severe("No se ha encontrado o no se ha podido leer el fichero: " + envelopPath); //$NON-NLS-1$
@@ -182,7 +183,7 @@ final class Desensobrado extends JPanel {
                     // SignedAndEnvelopedData
                 }
                 else if (CMSHelper.isCMSValid(envelopData, AOSignConstants.CMS_CONTENTTYPE_SIGNEDANDENVELOPEDDATA)) {
-					recoveredData = CMSDecipherSignedAndEnvelopedData.dechiperSignedAndEnvelopData(envelopData, privateKeyEntry);
+					recoveredData = new CMSDecipherSignedAndEnvelopedData(envelopData).decipher(privateKeyEntry);
                     // AuthenticatedAndEnvelopedData
                 }
                 else if (CMSHelper.isCMSValid(envelopData, AOSignConstants.CMS_CONTENTTYPE_AUTHENVELOPEDDATA)) {
