@@ -45,7 +45,7 @@ public class ApacheNodeSetData implements NodeSetData/*<Node>*/ {
     }
 
     @Override
-	public Iterator</*Node*/?> iterator() {
+	public Iterator/*<Node>*/ iterator() {
         // If nodefilters are set, must execute them first to create node-set
         if (this.xi.getNodeFilters() != null && !this.xi.getNodeFilters().isEmpty()) {
             return Collections.unmodifiableSet
