@@ -86,7 +86,7 @@ public final class CertificateVerifierFactory {
 				certVerif = (CertificateVerificable) certVerifierClass.getConstructor().newInstance();
 			}
 			catch (final ClassNotFoundException e) {
-				LOGGER.warning("No se encuentran la clase validadora: " + e); //$NON-NLS-1$
+				LOGGER.warning("No se encuentra la clase validadora: " + e); //$NON-NLS-1$
 				throw new CertificateVerifierFactoryException("No se encuentran la clase validadora: " + e, e); //$NON-NLS-1$
 			}
 			catch (final Exception e) {
