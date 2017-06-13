@@ -1,4 +1,4 @@
-package es.gob.afirma.keystores.mozilla.shared;
+package es.gob.afirma.keystores.mozilla;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -12,6 +12,7 @@ import org.junit.Test;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.BoundedBufferedReader;
 import es.gob.afirma.keystores.mozilla.AOSecMod.ModuleName;
+import es.gob.afirma.keystores.mozilla.Pkcs11Txt;
 
 /** Pruebas de la configuraci&oacute;n especial de NSS compartido.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */

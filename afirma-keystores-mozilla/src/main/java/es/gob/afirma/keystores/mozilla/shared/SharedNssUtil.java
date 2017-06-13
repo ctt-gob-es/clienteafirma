@@ -19,6 +19,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
 import es.gob.afirma.keystores.mozilla.MozillaKeyStoreUtilities;
+import es.gob.afirma.keystores.mozilla.Pkcs11Txt;
 
 /** Utilidades para la gesti&oacute;n de almacenes NSS compartidos (de sistema).
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */

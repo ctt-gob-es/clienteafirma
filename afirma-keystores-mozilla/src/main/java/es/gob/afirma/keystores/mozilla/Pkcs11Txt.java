@@ -8,7 +8,7 @@
  * You may contact the copyright holder at: soporte.afirma5@mpt.es
  */
 
-package es.gob.afirma.keystores.mozilla.shared;
+package es.gob.afirma.keystores.mozilla;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -22,10 +22,11 @@ import java.util.logging.Logger;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.BoundedBufferedReader;
 import es.gob.afirma.keystores.mozilla.AOSecMod.ModuleName;
+import es.gob.afirma.keystores.mozilla.shared.SharedNssUtil;
 
 /** Analizador del fichero "pkcs11.txt" para la configuraci&oacute;n especial de NSS compartido.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
-final class Pkcs11Txt {
+public final class Pkcs11Txt {
 
 	private static final String NAME_SEARCH_TOKEN = "name=\""; //$NON-NLS-1$
 
@@ -35,7 +36,11 @@ final class Pkcs11Txt {
 		// No instanciable
 	}
 
-	static List<ModuleName> getModules() throws IOException {
+	/** Obtiene los m&oacute;dulos PKCS#11 del fichero "pkcs11.txt" del perfil <b>global</b>
+	 * (de sistema) de NSS.
+	 * @return Lista de m&oacute;dulos PKCS#11 configurados en el fichero "pkcs11.txt".
+	 * @throws IOException Si no se puede leer o analizar el fichero "pkcs11.txt". */
+	public static List<ModuleName> getModules() throws IOException {
 		final File f = new File(SharedNssUtil.getSharedUserProfileDirectory() + File.separator + PKCS11TXT_FILENAME);
 		if (!f.isFile()) {
 			return new ArrayList<>(0);

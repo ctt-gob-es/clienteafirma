@@ -274,7 +274,7 @@ public final class MozillaKeyStoreUtilities {
 	 *                            base de datos de m&oacute;dulos de Mozilla (<i>secmod.db</i>), si se
 	 *                            establece a <code>false</code> se devuelven &uacute;nicamente los
 	 *                            m&oacute;dulos PKCS#11 de la base de datos.
-	 * @return Nombres de las bibliotecas de los m&oacute;dulos de seguridad de Mozilla / Firefox */
+	 * @return Nombres de las bibliotecas de los m&oacute;dulos de seguridad de Mozilla NSS / Firefox */
 	static Map<String, String> getMozillaPKCS11Modules(final boolean excludePreferredModules,
 			                                           final boolean includeKnownModules) {
 		if (!excludePreferredModules) {
@@ -296,17 +296,33 @@ public final class MozillaKeyStoreUtilities {
 		}
 
 		final List<ModuleName> modules;
-		try {
-			modules =  AOSecMod.getModules(profileDir);
-		}
-		catch (final Exception t) {
-			LOGGER.severe(
-				"No se han podido obtener los modulos externos de Mozilla desde 'secmod.db': " + t //$NON-NLS-1$
-			);
-			return new ConcurrentHashMap<>(0);
-		}
 
-		LOGGER.info("Obtenidos los modulos externos de Mozilla desde 'secmod.db'"); //$NON-NLS-1$
+		// Comprobamos si tenemos que usar pkcs11.txt o secmod.db
+		final File pkcs11Txt = new File(profileDir, PKCS11TXT_FILENAME);
+		if ("sql".equals(System.getenv("NSS_DEFAULT_DB_TYPE")) || pkcs11Txt.exists()) { //$NON-NLS-1$ //$NON-NLS-2$
+			try {
+				modules = Pkcs11Txt.getModules(pkcs11Txt);
+				LOGGER.info("Obtenidos los modulos externos de Mozilla desde 'pkcs11.txt'"); //$NON-NLS-1$
+			}
+			catch (final IOException e) {
+				LOGGER.severe(
+					"No se han podido obtener los modulos externos de Mozilla desde 'pkcs11.txt': " + e //$NON-NLS-1$
+				);
+				return new ConcurrentHashMap<>(0);
+			}
+		}
+		else {
+			try {
+				modules =  AOSecMod.getModules(profileDir);
+				LOGGER.info("Obtenidos los modulos externos de Mozilla desde 'secmod.db'"); //$NON-NLS-1$
+			}
+			catch (final Exception t) {
+				LOGGER.severe(
+					"No se han podido obtener los modulos externos de Mozilla desde 'secmod.db': " + t //$NON-NLS-1$
+				);
+				return new ConcurrentHashMap<>(0);
+			}
+		}
 
 		return getPkcs11ModulesFromModuleNames(modules, includeKnownModules, excludePreferredModules);
 	}
