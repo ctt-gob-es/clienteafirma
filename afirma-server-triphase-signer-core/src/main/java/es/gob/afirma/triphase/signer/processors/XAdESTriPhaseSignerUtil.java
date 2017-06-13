@@ -18,7 +18,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import es.gob.afirma.core.signers.AOSignConstants;
-import es.gob.afirma.signers.xml.CustomUriDereferencer;
+import es.gob.afirma.signers.xml.dereference.CustomUriDereferencer;
 import es.gob.afirma.signers.xml.Utils;
 
 final class XAdESTriPhaseSignerUtil {
