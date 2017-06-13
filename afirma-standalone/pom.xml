@@ -9,9 +9,9 @@
 
 	<parent>
 		<groupId>es.gob.afirma</groupId>
-		<artifactId>afirma-client-base</artifactId>
+		<artifactId>afirma-client</artifactId>
 		<version>3.3.2-SNAPSHOT</version>
-		<relativePath>../../../pom.xml</relativePath>
+		<relativePath>../pom.xml</relativePath>
 	</parent>
 
 	<description>Componentes escritorio (version full) de afirma</description>
