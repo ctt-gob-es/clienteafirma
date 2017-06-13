@@ -28,13 +28,16 @@ public final class OcspCertificateVerifier extends CertificateVerifier {
 		super.setSubjectCert(cert);
 		if(getValidationProperties() != null) {
 			try {
-				getValidationProperties().setProperty("responderUrl", getBestResponder(OcspHelper.getAIALocations(cert))); //$NON-NLS-1$
+				getValidationProperties().setProperty(
+					"responderUrl", //$NON-NLS-1$
+					getBestResponder(OcspHelper.getAIALocations(cert))
+				);
 			}
 			catch (final Exception e) {
 				throw new IllegalArgumentException(e);
 			}
 			getValidationProperties().setProperty("signOcspRequest", "false"); //$NON-NLS-1$ //$NON-NLS-2$
-		}	
+		}
 	}
 
 	@Override
@@ -62,7 +65,7 @@ public final class OcspCertificateVerifier extends CertificateVerifier {
 
 			// Creamos la peticion OCSP ASN.1 firmada
 			try {
-				ocspRequest = OcspHelper.createSignedOcspRequest(cert, this.getIssuerCert(), pke);
+				ocspRequest = OcspHelper.createSignedOcspRequest(cert, getIssuerCert(), pke);
 			}
 			catch (final Exception e) {
 				LOGGER.severe("Error creando la peticion OCSP firmada: " + e); //$NON-NLS-1$
@@ -71,7 +74,7 @@ public final class OcspCertificateVerifier extends CertificateVerifier {
 		}
 		else {
 			try {
-				ocspRequest = OcspHelper.createOcspRequest(cert, this.getIssuerCert());
+				ocspRequest = OcspHelper.createOcspRequest(cert, getIssuerCert());
 			}
 			catch (final Exception e) {
 				LOGGER.severe("Error creando la peticion OCSP: " + e); //$NON-NLS-1$

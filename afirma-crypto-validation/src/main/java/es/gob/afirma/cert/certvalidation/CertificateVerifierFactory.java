@@ -73,21 +73,30 @@ public final class CertificateVerifierFactory {
 		final String validationProperties = p.getProperty(crc + ".validation.properties"); //$NON-NLS-1$
 		final String validationClass = p.getProperty(crc + ".validation.type"); //$NON-NLS-1$
 
-		try {
-			final Class<?> certVerifierClass = Class.forName(validationClass);
-			final CertificateVerificable certVerif = (CertificateVerificable) certVerifierClass.getConstructor().newInstance();
-			certVerif.setValidationProperties(validationProperties);
-			certVerif.setSubjectCert(cert);
-			return certVerif;
+		final CertificateVerificable certVerif;
+		if ("ocsp".equalsIgnoreCase(validationClass)) { //$NON-NLS-1$
+			certVerif = new OcspCertificateVerifier();
 		}
-		catch (final ClassNotFoundException e) {
-			LOGGER.warning("No se encuentran la clase validadora: " + e); //$NON-NLS-1$
-			throw new CertificateVerifierFactoryException("No se encuentran la clase validadora: " + e, e); //$NON-NLS-1$
+		else if ("crl".equalsIgnoreCase(validationClass)) { //$NON-NLS-1$
+			certVerif = new CrlCertificateVerifier();
 		}
-		catch (final Exception e) {
-			LOGGER.warning("No se ha podido instanciar el verificador del certificado: " + e); //$NON-NLS-1$
-			throw new CertificateVerifierFactoryException("No se ha podido instanciar el verificador del certificado: " + e, e); //$NON-NLS-1$
+		else {
+			try {
+				final Class<?> certVerifierClass = Class.forName(validationClass);
+				certVerif = (CertificateVerificable) certVerifierClass.getConstructor().newInstance();
+			}
+			catch (final ClassNotFoundException e) {
+				LOGGER.warning("No se encuentran la clase validadora: " + e); //$NON-NLS-1$
+				throw new CertificateVerifierFactoryException("No se encuentran la clase validadora: " + e, e); //$NON-NLS-1$
+			}
+			catch (final Exception e) {
+				LOGGER.warning("No se ha podido instanciar el verificador del certificado: " + e); //$NON-NLS-1$
+				throw new CertificateVerifierFactoryException("No se ha podido instanciar el verificador del certificado: " + e, e); //$NON-NLS-1$
+			}
 		}
+		certVerif.setValidationProperties(validationProperties);
+		certVerif.setSubjectCert(cert);
+		return certVerif;
 	}
 
 }
