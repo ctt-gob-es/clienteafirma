@@ -10,6 +10,7 @@ import javax.security.auth.callback.PasswordCallback;
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.Platform;
+import es.gob.afirma.core.misc.http.HttpError;
 import es.gob.afirma.core.misc.protocol.UrlParametersForBatch;
 import es.gob.afirma.keystores.AOCertificatesNotFoundException;
 import es.gob.afirma.keystores.AOKeyStore;
@@ -66,9 +67,9 @@ final class ProtocolInvocationLauncherBatch {
 			pke = ProtocolInvocationLauncher.getStickyKeyEntry();
 
 		} else {
-		
+
 			final String aoksLib = options.getDefaultKeyStoreLib();
-	
+
 			final PasswordCallback pwc = aoks.getStorePasswordCallback(null);
 			final AOKeyStoreManager ksm;
 			try {
@@ -88,7 +89,7 @@ final class ProtocolInvocationLauncherBatch {
 				}
 				return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_08);
 			}
-				
+
 			try {
 				if (Platform.OS.MACOSX.equals(Platform.getOS())) {
 					ServiceInvocationManager.focusApplication();
@@ -105,7 +106,7 @@ final class ProtocolInvocationLauncherBatch {
 				dialog.allowOpenExternalStores(filterManager.isExternalStoresOpeningAllowed());
 				dialog.show();
 				pke = ksm.getKeyEntry(dialog.getSelectedAlias());
-				
+
 				if (options.getSticky()) {
 					ProtocolInvocationLauncher.setStickyKeyEntry(pke);
 				} else {
@@ -135,7 +136,7 @@ final class ProtocolInvocationLauncherBatch {
 				}
 				return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_08);
 			}
-		}	
+		}
 
 		String batchResult;
 		try {
@@ -150,6 +151,15 @@ final class ProtocolInvocationLauncherBatch {
 			if (bySocket){
 				batchResult = Base64.encode(batchResult.getBytes());
 			}
+		}
+		catch(final HttpError e) {
+			LOGGER.severe("Error en la comunicacion con el servicio de firma de lotes. StatusCode: " + //$NON-NLS-1$
+					e.getResponseCode() + ". Descripcion: " + e.getResponseDescription());  //$NON-NLS-1$
+			ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_26);
+			if (!bySocket){
+				throw new SocketOperationException(ProtocolInvocationLauncherErrorManager.SAF_26);
+			}
+			return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_26);
 		}
 		catch(final Exception e) {
 			LOGGER.log(
