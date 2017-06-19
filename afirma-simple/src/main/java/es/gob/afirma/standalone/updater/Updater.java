@@ -3,6 +3,7 @@ package es.gob.afirma.standalone.updater;
 import java.awt.Desktop;
 import java.net.URI;
 import java.util.Properties;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.JOptionPane;
@@ -145,28 +146,31 @@ public final class Updater {
 	 * @param parent Componente padre para la modalidad. */
 	public static void checkForUpdates(final Object parent) {
 
+		// Primero miramos si directamente la comprobacion de actualizaciones esta deshabilitada a nivel interno de
+		// aplicacion
 		boolean omitCheck = Boolean.parseBoolean(updaterProperties.getProperty("avoidUpdateCheck")); //$NON-NLS-1$
 		if (omitCheck) {
 			LOGGER.info("La configuracion interna de la aplicacion solicita que no se busquen actualizaciones"); //$NON-NLS-1$
 		}
 
-		try {
-			final String avoidCheckProperty = System.getenv(AUTOFIRMA_AVOID_UPDATE_CHECK);
-			if (avoidCheckProperty != null) {
-				omitCheck = Boolean.TRUE.toString().equalsIgnoreCase(avoidCheckProperty);
-				LOGGER.info("Se ha configurado en el sistema que se omita la busqueda de actualizaciones de AutoFirma"); //$NON-NLS-1$
+		// Despues, miramos en la configuracion de la aplicacion que el usuario ha establecido mediante el UI.
+		// Si se ha deshabilitado la comprobacion de actualizaciones en la aplicacion, no se buscan actualizaciones,
+		// pero si la aplicacion si permite la busqueda de actualizaciones, miramos antes de hacerlo si se ha
+		// pedido que no se haga mediante variables de entorno
+		if (!omitCheck) {
+			omitCheck = Boolean.getBoolean(AUTOFIRMA_AVOID_UPDATE_CHECK) ||
+	                    Boolean.parseBoolean(System.getenv(AUTOFIRMA_AVOID_UPDATE_CHECK));
+			if (omitCheck) {
+				LOGGER.info(
+					"Se ha configurado en el sistema que se omita la busqueda de actualizaciones de AutoFirma" //$NON-NLS-1$
+				);
 			}
-		}
-		catch(final Exception e) {
-			LOGGER.warning(
-				"No se ha podido comprobar el valor de la variable de entorno " + AUTOFIRMA_AVOID_UPDATE_CHECK + ": " + e //$NON-NLS-1$ //$NON-NLS-2$
-			);
 		}
 
 		if (!omitCheck) {
 			new Thread(() ->  {
 
-				boolean newVersionAvailable;
+				final boolean newVersionAvailable;
 				try {
 					newVersionAvailable = isNewVersionAvailable();
 				}
@@ -174,25 +178,30 @@ public final class Updater {
 					return;
 				}
 				if (newVersionAvailable) {
-					if (JOptionPane.YES_OPTION == AOUIFactory.showConfirmDialog(
+					if (
+						JOptionPane.YES_OPTION == AOUIFactory.showConfirmDialog(
 							parent,
 							UpdaterMessages.getString("Updater.1"), //$NON-NLS-1$
 							UpdaterMessages.getString("Updater.2"), //$NON-NLS-1$
 							JOptionPane.YES_NO_OPTION,
 							JOptionPane.INFORMATION_MESSAGE
-							)) {
+						)
+					) {
 						try {
 							Desktop.getDesktop().browse(new URI(getUpdateSite()));
 						}
 						catch (final Exception e) {
-							LOGGER.severe("No se ha podido abrir el sitio Web de actualizaciones del Cliente @firma: " + e); //$NON-NLS-1$
+							LOGGER.log(
+								Level.SEVERE,
+								"No se ha podido abrir el sitio Web de actualizaciones del Cliente @firma: " + e, //$NON-NLS-1$
+								e
+							);
 							AOUIFactory.showErrorMessage(
-									parent,
-									UpdaterMessages.getString("Updater.3"), //$NON-NLS-1$
-									UpdaterMessages.getString("Updater.4"), //$NON-NLS-1$
-									JOptionPane.ERROR_MESSAGE
-									);
-							e.printStackTrace();
+								parent,
+								UpdaterMessages.getString("Updater.3"), //$NON-NLS-1$
+								UpdaterMessages.getString("Updater.4"), //$NON-NLS-1$
+								JOptionPane.ERROR_MESSAGE
+							);
 						}
 					}
 				}
