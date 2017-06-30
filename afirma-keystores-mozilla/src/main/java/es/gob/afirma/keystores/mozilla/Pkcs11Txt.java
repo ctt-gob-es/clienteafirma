@@ -24,7 +24,7 @@ import es.gob.afirma.core.misc.BoundedBufferedReader;
 import es.gob.afirma.keystores.mozilla.AOSecMod.ModuleName;
 import es.gob.afirma.keystores.mozilla.shared.SharedNssUtil;
 
-/** Analizador del fichero "pkcs11.txt" para la configuraci&oacute;n especial de NSS compartido.
+/** Analizador del fichero "pkcs11.txt" para la configuraci&oacute;n de NSS en modo SQLite.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
 public final class Pkcs11Txt {
 
@@ -67,7 +67,7 @@ public final class Pkcs11Txt {
 		final List<ModuleName> ret = new ArrayList<>();
 
 		try (
-			BufferedReader br = new BoundedBufferedReader(
+			final BufferedReader br = new BoundedBufferedReader(
 				fr,
 				512, // Maximo 512 lineas
 				4096 // Maximo 4KB por linea
@@ -90,11 +90,11 @@ public final class Pkcs11Txt {
 		    				new ModuleName(
 								lib.trim(),
 								line.substring(
-									   line.indexOf(NAME_SEARCH_TOKEN) + NAME_SEARCH_TOKEN.length(),
-									   line.indexOf(
-										   '"',
-										   line.indexOf(NAME_SEARCH_TOKEN) + NAME_SEARCH_TOKEN.length()
-									   )
+								   line.indexOf(NAME_SEARCH_TOKEN) + NAME_SEARCH_TOKEN.length(),
+								   line.indexOf(
+									   '"',
+									   line.indexOf(NAME_SEARCH_TOKEN) + NAME_SEARCH_TOKEN.length()
+								   )
 								)
 							)
 						);

@@ -16,6 +16,7 @@ import java.io.FileNotFoundException;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import es.gob.afirma.keystores.mozilla.MozillaKeyStoreUtilities;
@@ -28,10 +29,37 @@ public final class SharedNssUtil {
 	private static final String NSSDB_PATH_UNIX_GLOBAL = "/etc/pki/nssdb"; //$NON-NLS-1$
 	private static final String NSSDB_PATH_UNIX_USER = System.getProperty("user.home") + "/.pki/nssdb"; //$NON-NLS-1$ //$NON-NLS-2$
 
+	/** Lista de rutas de posibles directorios de perfil de NSS.
+	 * Deben estar en el apropiado orden de b&uacute;squeda. */
+	private static final String[] NSSDB_PATHS = new String[] {
+		NSSDB_PATH_UNIX_USER,
+		NSSDB_PATH_UNIX_GLOBAL
+	};
+
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	private SharedNssUtil() {
 		// No instanciable
+	}
+
+	private static boolean isNssProfileDirectory(final String path) {
+		if (path == null) {
+			return false;
+		}
+		final File f = new File(path);
+		if (!f.isDirectory()) {
+			return false;
+		}
+		// Es un directorio de perfil de NSS si contiene al menos un fichero de claves (key*.db)
+		return f.listFiles(
+			new FileFilter() {
+				@Override
+				public boolean accept(final File fi) {
+					final String name = fi.getName();
+					return name.startsWith("key") && name.endsWith(".db"); //$NON-NLS-1$ //$NON-NLS-2$
+				}
+			}
+		).length > 0;
 	}
 
 	/** Obtiene el directorio de bases de datos de NSS compartido.
@@ -40,23 +68,13 @@ public final class SharedNssUtil {
 	 * @return Directorio de bases de datos de NSS compartido (<b>no</b> contiene el prefijo <i>sql:/</i>).
 	 * @throws FileNotFoundException Si no se encuentra el directorio de bases de datos de NSS compartido. */
 	public static String getSharedUserProfileDirectory() throws FileNotFoundException {
-		File f = new File(NSSDB_PATH_UNIX_USER);
-		if (!f.isDirectory()) {
-			f = new File(NSSDB_PATH_UNIX_GLOBAL);
-			if (!f.isDirectory()) {
-				throw new FileNotFoundException("No se ha encontrado el directorio del almacen del sistema"); //$NON-NLS-1$
+		for (final String path : NSSDB_PATHS) {
+			if (isNssProfileDirectory(path)) {
+				LOGGER.info(
+					"Detectado directorio de perfil de NSS: " + path.replace(System.getProperty("user.home"), "\u0334")  //$NON-NLS-1$ //$NON-NLS-2$//$NON-NLS-3$
+				);
+				return path;
 			}
-		}
-		if (f.listFiles(
-			new FileFilter() {
-				@Override
-				public boolean accept(final File fi) {
-					final String name = fi.getName();
-					return name.startsWith("key") && name.endsWith(".db"); //$NON-NLS-1$ //$NON-NLS-2$
-				}
-			}
-		).length > 0) {
-			return f.getAbsolutePath();
 		}
 		throw new FileNotFoundException();
 	}
@@ -72,7 +90,7 @@ public final class SharedNssUtil {
 	 *                            base de datos de m&oacute;dulos de Mozilla (<i>secmod.db</i>), si se
 	 *                            establece a <code>false</code> se devuelven &uacute;nicamente los
 	 *                            m&oacute;dulos PKCS#11 de la base de datos.
-	 * @return Nombres de las bibliotecas de los m&oacute;dulos de seguridad delNSS compartido de sistema. */
+	 * @return Nombres de las bibliotecas de los m&oacute;dulos de seguridad del NSS compartido de sistema. */
 	static Map<String, String> getSharedNssPKCS11Modules(final boolean excludeDnie,
 			                                             final boolean includeKnownModules) {
 		if (!excludeDnie) {
@@ -84,12 +102,13 @@ public final class SharedNssUtil {
 			modules = Pkcs11Txt.getModules();
 		}
 		catch (final Exception e) {
-			LOGGER.severe(
-				"No se han podido obtener los modulos externos de Mozilla desde 'pkcs11.txt': " + e //$NON-NLS-1$
+			LOGGER.log(
+				Level.SEVERE,
+				"No se han podido obtener los modulos externos de Mozilla desde 'pkcs11.txt': " + e, //$NON-NLS-1$
+				e
 			);
 			return new ConcurrentHashMap<>(0);
 		}
-
 		return MozillaKeyStoreUtilities.getPkcs11ModulesFromModuleNames(modules, includeKnownModules, excludeDnie);
 	}
 

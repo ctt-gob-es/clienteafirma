@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.AOException;
@@ -295,36 +296,43 @@ public final class MozillaKeyStoreUtilities {
 			return new ConcurrentHashMap<>(0);
 		}
 
-		final List<ModuleName> modules;
-
 		// Comprobamos si tenemos que usar pkcs11.txt o secmod.db
 		final File pkcs11Txt = new File(profileDir, PKCS11TXT_FILENAME);
 		if ("sql".equals(System.getenv("NSS_DEFAULT_DB_TYPE")) || pkcs11Txt.exists()) { //$NON-NLS-1$ //$NON-NLS-2$
 			try {
-				modules = Pkcs11Txt.getModules(pkcs11Txt);
+				final List<ModuleName> modules = Pkcs11Txt.getModules(pkcs11Txt);
 				LOGGER.info("Obtenidos los modulos externos de Mozilla desde 'pkcs11.txt'"); //$NON-NLS-1$
+				return getPkcs11ModulesFromModuleNames(
+					modules,
+					includeKnownModules,
+					excludePreferredModules
+				);
 			}
 			catch (final IOException e) {
 				LOGGER.severe(
 					"No se han podido obtener los modulos externos de Mozilla desde 'pkcs11.txt': " + e //$NON-NLS-1$
 				);
-				return new ConcurrentHashMap<>(0);
 			}
 		}
-		else {
-			try {
-				modules =  AOSecMod.getModules(profileDir);
-				LOGGER.info("Obtenidos los modulos externos de Mozilla desde 'secmod.db'"); //$NON-NLS-1$
-			}
-			catch (final Exception t) {
-				LOGGER.severe(
-					"No se han podido obtener los modulos externos de Mozilla desde 'secmod.db': " + t //$NON-NLS-1$
-				);
-				return new ConcurrentHashMap<>(0);
-			}
+		// Si NSS_DEFAULT_DB_TYPE != "sql", no existe 'pkcs11.txt' o ha fallado la obtencion de modulos
+		// desde 'pkcs11.txt', se usa 'secmod.db'.
+		try {
+			final List<ModuleName> modules =  AOSecMod.getModules(profileDir);
+			LOGGER.info("Obtenidos los modulos externos de Mozilla desde 'secmod.db'"); //$NON-NLS-1$
+			return getPkcs11ModulesFromModuleNames(
+				modules,
+				includeKnownModules,
+				excludePreferredModules
+			);
+		}
+		catch (final Exception t) {
+			LOGGER.severe(
+				"No se han podido obtener los modulos externos de Mozilla desde 'secmod.db': " + t //$NON-NLS-1$
+			);
+			return new ConcurrentHashMap<>(0);
 		}
 
-		return getPkcs11ModulesFromModuleNames(modules, includeKnownModules, excludePreferredModules);
+
 	}
 
 	/** Obtiene los m&oacute;dulos PKCS#11 a partir de sus descripciones.
@@ -383,29 +391,6 @@ public final class MozillaKeyStoreUtilities {
 
 		return purgeStoresTable(modsByDesc);
 
-	}
-
-	/** Obtiene el nombre (<i>commonName</i>) de un m&oacute;dulo externo de
-	 * Mozilla a partir de su representaci&oacute;n textual. Este m&eacute;todo
-	 * es dependiente de la implementaci&oacute;n de <code>toString()</code> de
-	 * la clase <code>sun.security.pkcs11.Secmod.Module</code>, ya que no
-	 * podemos acceder directamente al atributo <code>slot</code> por ser de
-	 * tipo <i>friend</i>:
-	 * <pre>
-	 *  public String toString() {
-	 *    return
-	 *    commonName + " (" + type + ", " + libraryName + ", slot " + slot + ")";
-	 *  }
-	 * </pre>
-	 * @param description
-	 *        Resultado de una llamada a <code>sun.security.pkcs11.Secmod.Module.toString()</code>
-	 * @return Nombre correspondiente al m&oacute;dulo de seguridad */
-	static String getMozModuleName(final String description) {
-		final int ini = description.indexOf('(');
-		if (ini > 0) {
-			return description.substring(0, ini).trim();
-		}
-		return description;
 	}
 
 	/** Carga las dependencias de la biblioteca "softokn3" necesaria para acceder
@@ -499,7 +484,8 @@ public final class MozillaKeyStoreUtilities {
 	private static String getProfilesIniPath() {
 		String profilesIniPath = null;
 		// Miramos primero la variable de entorno 'AFIRMA_PROFILES_INI'
-		if (Boolean.getBoolean(USE_ENV_VARS)) {
+		if (Boolean.getBoolean(USE_ENV_VARS) ||
+			Boolean.parseBoolean(System.getenv(USE_ENV_VARS))) {
 			try {
 				profilesIniPath = System.getenv(AFIRMA_PROFILES_INI);
 				if (profilesIniPath == null) {
@@ -543,18 +529,31 @@ public final class MozillaKeyStoreUtilities {
 		return Platform.getUserHome() + "/.mozilla/firefox/profiles.ini"; //$NON-NLS-1$
 	}
 
-
 	/** Obtiene el directorio del perfil de usuario de Mozilla / Firefox.
 	 * @return Ruta completa del directorio del perfil de usuario de Mozilla / Firefox
 	 * @throws IOException Cuando hay errores de entrada / salida */
 	public static String getMozillaUserProfileDirectory() throws IOException {
-		final String dir = NSPreferences.getFireFoxUserProfileDirectory(
-			new File(getProfilesIniPath())
-		);
 		if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
-			return MozillaKeyStoreUtilitiesWindows.cleanMozillaUserProfileDirectoryWindows(dir);
+			return getMozillaUserProfileDirectoryWindows(
+				getProfilesIniPath()
+			);
 		}
-		return dir;
+		// En otros sistemas operativos, cuando falla la obtencion de PROFILES.INI se intenta
+		// usar el directorio global de NSS (para tratar ciertas configuraciones de NSS en las
+		// que ni siquiera existe el directorio de perfil de Firefox)
+		try {
+			return NSPreferences.getFireFoxUserProfileDirectory(
+				new File(getProfilesIniPath())
+			);
+		}
+		catch(final Exception e) {
+			LOGGER.log(
+				Level.SEVERE,
+				"No ha podido determinarse el perfil de usuario de Mozilla, se intentara usar el global: " + e, //$NON-NLS-1$
+				e
+			);
+		}
+		return SharedNssUtil.getSharedUserProfileDirectory();
 	}
 
 	/** Obtiene el directorio del perfil de usuario de Mozilla / Firefox.
@@ -688,8 +687,9 @@ public final class MozillaKeyStoreUtilities {
 
 		Security.addProvider(p);
 
-		LOGGER.info("Proveedor PKCS#11 para Firefox anadido: " + p.getName()); //$NON-NLS-1$
-
+		LOGGER.info(
+			"Proveedor PKCS#11 para NSS anadido" + (useSharedNss ? " para perfil compartido" : "") + ": " + p.getName() //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		);
 		return p;
 	}
 

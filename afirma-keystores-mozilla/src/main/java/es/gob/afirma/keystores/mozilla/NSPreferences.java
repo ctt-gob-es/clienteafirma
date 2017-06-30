@@ -38,11 +38,15 @@ final class NSPreferences {
     static String getFireFoxUserProfileDirectory(final File iniFile) throws IOException {
 
         if (iniFile == null) {
-            throw new IllegalArgumentException("El fichero INI es nulo y no se podra determinar el directorio del usuario de firefox"); //$NON-NLS-1$
+            throw new IllegalArgumentException(
+        		"El fichero INI es nulo y no se podra determinar el directorio del usuario de Firefox" //$NON-NLS-1$
+    		);
         }
 
         if (!iniFile.exists() || !iniFile.isFile()) {
-            throw new IOException("No se ha encontrado el fichero con los perfiles de firefox"); //$NON-NLS-1$
+            throw new IOException(
+        		"No se ha encontrado el fichero con los perfiles de Firefox en: " + iniFile //$NON-NLS-1$
+    		);
         }
 
         String currentProfilePath = null;
@@ -75,7 +79,7 @@ final class NSPreferences {
         return currentProfilePath;
     }
 
-    /** Analiza la informacion de los perfiles declarada en el fichero
+    /** Analiza la informaci&oacute;n de los perfiles declarada en el fichero
      * "profiles.ini". Para identificar correctamente los perfiles es necesario
      * que haya al menos una l&iacute;nea de separaci&oacute;n entre los bloques
      * de informaci&oacute;n de cada perfil.
@@ -155,7 +159,7 @@ final class NSPreferences {
                new File(profile.getAbsolutePath(), "lock").exists(); // En UNIX //$NON-NLS-1$
     }
 
-    /** Clase que almacena la configuraci&oacute;n para la identificacion de un
+    /** Almacena la configuraci&oacute;n para la identificacion de un
      * perfil de Mozilla Firefox. */
     static final class FirefoxProfile {
         private String name = null;

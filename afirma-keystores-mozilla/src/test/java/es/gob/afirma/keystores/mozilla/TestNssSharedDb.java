@@ -12,7 +12,6 @@ import org.junit.Test;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.BoundedBufferedReader;
 import es.gob.afirma.keystores.mozilla.AOSecMod.ModuleName;
-import es.gob.afirma.keystores.mozilla.Pkcs11Txt;
 
 /** Pruebas de la configuraci&oacute;n especial de NSS compartido.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
@@ -58,26 +57,28 @@ public final class TestNssSharedDb {
 	@SuppressWarnings("static-method")
 	@Test
 	public void testRawPkcs11txtFunction() throws Exception {
-		final byte[] pkcs11Txt = AOUtil
-				.getDataFromInputStream(TestNssSharedDb.class
-						.getResourceAsStream("/pkcs11.txt") //$NON-NLS-1$
-				);
+		final byte[] pkcs11Txt = AOUtil.getDataFromInputStream(
+			TestNssSharedDb.class.getResourceAsStream("/pkcs11.txt") //$NON-NLS-1$
+		);
 		Reader reader = null;
 		try {
 			reader = new InputStreamReader(new ByteArrayInputStream(pkcs11Txt));
 			final List<ModuleName> modules = Pkcs11Txt.getModules(reader);
 			Assert.assertEquals(3, modules.size());
 			Assert.assertEquals(
-					"DataKey SignaSURE 3600 (EXTERNAL, dkck32.dll, slot 0)", //$NON-NLS-1$
-					modules.get(0).toString());
+				"DataKey SignaSURE 3600 (EXTERNAL, dkck32.dll, slot 0)", //$NON-NLS-1$
+				modules.get(0).toString()
+			);
 			Assert.assertEquals(
-					"Netscape Software Fortezza (EXTERNAL, swft32.dll, slot 0)", //$NON-NLS-1$
-					modules.get(1).toString());
+				"Netscape Software Fortezza (EXTERNAL, swft32.dll, slot 0)", //$NON-NLS-1$
+				modules.get(1).toString()
+			);
 			Assert.assertEquals(
-					"Litronic Netsign (EXTERNAL, core32.dll, slot 0)", modules //$NON-NLS-1$
-							.get(2).toString());
-
-		} finally {
+				"Litronic Netsign (EXTERNAL, core32.dll, slot 0)", //$NON-NLS-1$
+				modules.get(2).toString()
+			);
+		}
+		finally {
 			if (reader != null) {
 				reader.close();
 			}
@@ -89,25 +90,51 @@ public final class TestNssSharedDb {
 	@SuppressWarnings("static-method")
 	@Test
 	public void testRawPkcs11txtTest2() throws Exception {
-		final byte[] pkcs11Txt = AOUtil
-				.getDataFromInputStream(TestNssSharedDb.class
-						.getResourceAsStream("/pkcs11-test2.txt") //$NON-NLS-1$
-				);
+		final byte[] pkcs11Txt = AOUtil.getDataFromInputStream(
+			TestNssSharedDb.class.getResourceAsStream("/pkcs11-test2.txt") //$NON-NLS-1$
+		);
 		Reader reader = null;
 		try {
 			reader = new InputStreamReader(new ByteArrayInputStream(pkcs11Txt));
 			final List<ModuleName> modules = Pkcs11Txt.getModules(reader);
 			Assert.assertEquals(1, modules.size());
 			Assert.assertEquals(
-					"Mozilla Root Certs (EXTERNAL, /usr/lib/x86_64-linux-gnu/nss/libnssckbi.so, slot 0)", //$NON-NLS-1$
-					modules.get(0).toString());
-
-		} finally {
+				"Mozilla Root Certs (EXTERNAL, /usr/lib/x86_64-linux-gnu/nss/libnssckbi.so, slot 0)", //$NON-NLS-1$
+				modules.get(0).toString()
+			);
+		}
+		finally {
 			if (reader != null) {
 				reader.close();
 			}
 		}
 	}
 
+	/** Prueba de lectura de <i>pkcs11.txt</i>.
+	 * @throws Exception En cualquier error. */
+	@SuppressWarnings("static-method")
+	@Test
+	public void testRawPkcs11txtTest3() throws Exception {
+		final byte[] pkcs11Txt = AOUtil.getDataFromInputStream(
+			TestNssSharedDb.class.getResourceAsStream("/pkcs11-test3.txt") //$NON-NLS-1$
+		);
+		Reader reader = null;
+		try {
+			reader = new InputStreamReader(new ByteArrayInputStream(pkcs11Txt));
+			final List<ModuleName> modules = Pkcs11Txt.getModules(reader);
+			Assert.assertEquals(1, modules.size());
+			final ModuleName mn = modules.get(0);
+			System.out.println("Entrada: " + mn); //$NON-NLS-1$
+			Assert.assertEquals(
+				"/usr/lib/libpkcs11-fnmtdnie.so", //$NON-NLS-1$
+				mn.getLib()
+			);
+		}
+		finally {
+			if (reader != null) {
+				reader.close();
+			}
+		}
+	}
 
 }
