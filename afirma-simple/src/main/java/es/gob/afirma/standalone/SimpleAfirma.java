@@ -478,7 +478,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
     		return;
     	}
 
-       	AutoFirmaUtil.setProxySettings();
+       	ProxyUtil.setProxySettings();
 
 		// Google Analytics
 		if (PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_USEANALYTICS, true) &&

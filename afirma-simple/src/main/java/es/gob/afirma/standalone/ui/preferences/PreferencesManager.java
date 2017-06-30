@@ -62,7 +62,7 @@ public final class PreferencesManager {
 	/** Nombre de usuario del servidor <i>proxy</i> configurado. */
 	public static final String PREFERENCE_GENERAL_PROXY_USERNAME = "proxyUsername"; //$NON-NLS-1$
 
-	/** Contraseña del servidor <i>proxy</i> configurado. */
+	/** Contrase&ntilde;a del servidor <i>proxy</i> configurado. */
 	public static final String PREFERENCE_GENERAL_PROXY_PASSWORD = "proxyPassword"; //$NON-NLS-1$
 
 	/** Proteger cambios en preferencias.

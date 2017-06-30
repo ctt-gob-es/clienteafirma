@@ -38,6 +38,7 @@ import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.standalone.AutoFirmaUtil;
+import es.gob.afirma.standalone.ProxyUtil;
 import es.gob.afirma.standalone.SimpleAfirma;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 
@@ -425,8 +426,11 @@ final class PreferencesPanelGeneral extends JPanel {
 		proxyConfigButton.getAccessibleContext().setAccessibleDescription(
 			SimpleAfirmaMessages.getString("PreferencesPanel.127") //$NON-NLS-1$
 		);
-
-		proxyConfigButton.setEnabled(!isUnprotected());
+		proxyConfigButton.setEnabled(
+			// Si hay un proxy configurado a nivel de sistema no dejamos
+			// sobreescribirlo desde AutoFirma
+			!isUnprotected() && !ProxyUtil.isSystemProxySet()
+		);
 
 		final JLabel proxyLabel = new JLabel(SimpleAfirmaMessages.getString("PreferencesPanel.128")); //$NON-NLS-1$
 		proxyLabel.setLabelFor(proxyConfigButton);
@@ -612,7 +616,7 @@ final class PreferencesPanelGeneral extends JPanel {
 					PreferencesManager.put(PreferencesManager.PREFERENCE_GENERAL_PROXY_PORT, port);
 					PreferencesManager.put(PreferencesManager.PREFERENCE_GENERAL_PROXY_USERNAME, proxyDlg.getUsername());
 					PreferencesManager.put(PreferencesManager.PREFERENCE_GENERAL_PROXY_PASSWORD, proxyDlg.getPassword());
-					AutoFirmaUtil.setProxySettings();
+					ProxyUtil.setProxySettings();
 				}
 			}
 			LOGGER.warning("URL: "+  proxyDlg.getHost() + "\n Puerto: " + proxyDlg.getPort()); //$NON-NLS-1$ //$NON-NLS-2$

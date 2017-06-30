@@ -6,8 +6,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.Authenticator;
-import java.net.PasswordAuthentication;
 import java.net.URISyntaxException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -15,7 +13,6 @@ import java.util.logging.Logger;
 import es.gob.afirma.core.misc.BoundedBufferedReader;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.standalone.ui.hash.CheckHashDialog;
-import es.gob.afirma.standalone.ui.preferences.PreferencesManager;
 
 /** Utilidades generales y de control del autoarranque de AutoFirma en el inicio de Windows.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
@@ -156,72 +153,5 @@ public final class AutoFirmaUtil {
 			return file;
 		}
 	}
-
-    /** Establece la configuraci&oacute;n para el servidor <i>Proxy</i> seg&uacute;n los valores
-     * de configuraci&oacute;n encontrados. */
-    public static void setProxySettings() {
-    	if (PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_PROXY_SELECTED, false)) {
-    		final String proxyHost = PreferencesManager.get(PreferencesManager.PREFERENCE_GENERAL_PROXY_HOST, null);
-    		final String proxyPort = PreferencesManager.get(PreferencesManager.PREFERENCE_GENERAL_PROXY_PORT, null);
-    		final String proxyUsername = PreferencesManager.get(PreferencesManager.PREFERENCE_GENERAL_PROXY_USERNAME, null);
-    		final String proxyPassword = PreferencesManager.get(PreferencesManager.PREFERENCE_GENERAL_PROXY_PASSWORD, null);
-
-    		if (proxyHost != null && proxyPort != null) {
-
-    			LOGGER.info(
-					"Establecido Proxy de red: " + proxyHost + ":" + proxyPort //$NON-NLS-1$ //$NON-NLS-2$
-				);
-
-    			System.setProperty("http.proxyHost", proxyHost); //$NON-NLS-1$
-    			System.setProperty("http.proxyPort", proxyPort); //$NON-NLS-1$
-    			System.setProperty("https.proxyHost", proxyHost); //$NON-NLS-1$
-    			System.setProperty("https.proxyPort", proxyPort); //$NON-NLS-1$
-
-    			System.setProperty("ftp.proxHost", proxyHost); //$NON-NLS-1$
-    			System.setProperty("ftp.proxyPort", proxyPort); //$NON-NLS-1$
-
-    			System.setProperty("socksProxyHost", proxyHost); //$NON-NLS-1$
-    			System.setProperty("socksProxyPort", proxyPort); //$NON-NLS-1$
-
-        		if (proxyUsername != null && !proxyUsername.trim().isEmpty() && proxyPassword != null) {
-        			Authenticator.setDefault(
-    					new Authenticator() {
-	    			        @Override
-	    					public PasswordAuthentication getPasswordAuthentication() {
-	    			            return new PasswordAuthentication(
-    			            		proxyUsername,
-    			            		proxyPassword.toCharArray()
-			            		);
-	    			        }
-	    			    }
-					);
-        		}
-    		}
-    		else {
-    			LOGGER.info("No se usara Proxy para las conexiones de red"); //$NON-NLS-1$
-    			System.clearProperty("http.proxyHost"); //$NON-NLS-1$
-    			System.clearProperty("http.proxyPort"); //$NON-NLS-1$
-    			System.clearProperty("https.proxyHost"); //$NON-NLS-1$
-    			System.clearProperty("https.proxyPort"); //$NON-NLS-1$
-    			System.clearProperty("ftp.proxHost"); //$NON-NLS-1$
-    			System.clearProperty("ftp.proxyPort"); //$NON-NLS-1$
-    			System.clearProperty("socksProxyHost"); //$NON-NLS-1$
-    			System.clearProperty("socksProxyPort"); //$NON-NLS-1$
-    			Authenticator.setDefault(null);
-    		}
-    	}
-    	else {
-    		LOGGER.info("No se usara Proxy para las conexiones de red"); //$NON-NLS-1$
-    		System.clearProperty("http.proxyHost"); //$NON-NLS-1$
-			System.clearProperty("http.proxyPort"); //$NON-NLS-1$
-			System.clearProperty("https.proxyHost"); //$NON-NLS-1$
-			System.clearProperty("https.proxyPort"); //$NON-NLS-1$
-			System.clearProperty("ftp.proxHost"); //$NON-NLS-1$
-			System.clearProperty("ftp.proxyPort"); //$NON-NLS-1$
-			System.clearProperty("socksProxyHost"); //$NON-NLS-1$
-			System.clearProperty("socksProxyPort"); //$NON-NLS-1$
-			Authenticator.setDefault(null);
-    	}
-    }
 
 }
