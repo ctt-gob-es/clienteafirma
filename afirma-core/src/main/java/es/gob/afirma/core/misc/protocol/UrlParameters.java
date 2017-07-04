@@ -15,6 +15,7 @@ import java.net.URLDecoder;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Properties;
+import java.util.logging.Logger;
 
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.Platform;
@@ -22,6 +23,8 @@ import es.gob.afirma.core.misc.http.DataDownloader;
 
 /** Par&aacute;metros habitualmente comunes para todas las operaciones. */
 public abstract class UrlParameters {
+
+	protected static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	/** Par&aacute;metro de entrada con las opciones de configuraci&oacute;n de la firma. */
 	protected static final String PROPERTIES_PARAM = "properties"; //$NON-NLS-1$
@@ -72,11 +75,9 @@ public abstract class UrlParameters {
 		return this.extraParams != null ? this.extraParams : new Properties();
 	}
 
-	/**
-	 * Establece los par&aacute;metros adicionales para la configuraci&oacute;n
+	/** Establece los par&aacute;metros adicionales para la configuraci&oacute;n
 	 * de la operaci&oacute;n de firma.
-	 * @param properties Propiedades adicionales.
-	 */
+	 * @param properties Propiedades adicionales. */
 	void setExtraParams(final Properties properties) {
 		this.extraParams = properties != null ? properties : new Properties();
 	}
@@ -245,7 +246,7 @@ public abstract class UrlParameters {
 
 	/** Extrae y verifica la clave de cifrado de los par&aacute;metros de entrada.
 	 *  @param params Par&aacute;metros extra&iacute;dos de la URI.
-	 *  @return Clave de cifrado o null si no se declar&oacute; un valor en los par&aacute;metros.
+	 *  @return Clave de cifrado o <code>null</code> si no se declar&oacute; un valor en los par&aacute;metros.
 	 *  @throws ParameterException Cuando la clave de cifrado es err&oacute;nea. */
 	private static byte[] verifyCipherKey(final Map<String, String> params) throws ParameterException {
 
@@ -319,16 +320,16 @@ public abstract class UrlParameters {
 		}
 
 		if (ksValue != null) {
-
-			String defaultKeyStoreName = null;
 			final int separatorPos = ksValue.indexOf(':');
 			if (separatorPos == -1) {
-				defaultKeyStoreName = ksValue;
+				return ksValue;
 			}
-			else if (ksValue.length() > 1) {
-				defaultKeyStoreName = ksValue.substring(0, separatorPos).trim();
+			if (ksValue.length() > 1) {
+				return ksValue.substring(0, separatorPos).trim();
 			}
-			return defaultKeyStoreName;
+			LOGGER.info(
+				"El almacen indicado no es valido ('" + ksValue + "'), se usara el por defecto del sistema operativo" //$NON-NLS-1$ //$NON-NLS-2$
+			);
 		}
 
 		// Si no se ha especificado almacen, se usara el del sistema operativo
@@ -368,11 +369,10 @@ public abstract class UrlParameters {
 			return null;
 		}
 
-		String lib = null;
 		final int separatorPos = ksValue.indexOf(':');
 		if (separatorPos != -1 && separatorPos < ksValue.length() - 1) {
-			lib = ksValue.substring(separatorPos + 1).trim();
+			return ksValue.substring(separatorPos + 1).trim();
 		}
-		return lib;
+		return null;
 	}
 }
