@@ -6,6 +6,7 @@ import java.security.KeyStore.PrivateKeyEntry;
 import java.util.Properties;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import es.gob.afirma.core.signers.AOSignConstants;
@@ -15,28 +16,26 @@ import es.gob.afirma.keystores.AOKeyStoreManager;
 import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
 import es.gob.afirma.signers.xades.AOXAdESSigner;
 
-/**
- * Clase de prueba de firma con JMulticard a trav&eacute;s del almac&eacute;n de Firefox. Se incluye
- * en este proyecto por disponer de todas las bibliotecas necesarias.
- */
-public class TestJMulticardSignature {
+/** Clase de prueba de firma con JMulticard a trav&eacute;s del almac&eacute;n de Firefox. Se incluye
+ * en este proyecto por disponer de todas las bibliotecas necesarias. */
+public final class TestJMulticardSignature {
 
-	/**
-	 * Realiza una firma XAdES con el certificado del DNIe a travEacute;s del
+	/** Realiza una firma XAdES con el certificado del DNIe a trav&eacute;s del
 	 * almac&eacute;n de Mozilla Firefox.
-	 * @throws Exception Cuando ocurre cualquier error.
-	 */
+	 * @throws Exception Cuando ocurre cualquier error. */
 	@SuppressWarnings("static-method")
 	@Test
+	@Ignore // Necesita DNIe
 	public void testFirmaXAdESJMulticardSignature() throws Exception {
 
 		final AOKeyStore ks = AOKeyStore.MOZ_UNI;
 		final AOKeyStoreManager ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
-					ks,
-					null,
-					null,
-					ks.getStorePasswordCallback(null),
-					null);
+			ks,
+			null,
+			null,
+			ks.getStorePasswordCallback(null),
+			null
+		);
 
 		String selectedAlias = null;
 		for (final String alias : ksm.getAliases()) {
@@ -60,7 +59,8 @@ public class TestJMulticardSignature {
 				AOSignConstants.SIGN_ALGORITHM_SHA256WITHRSA,
 				pke.getPrivateKey(),
 				pke.getCertificateChain(),
-				config);
+				config
+		);
 
 		final File tempFile = File.createTempFile("test-xades-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$
 		try (final FileOutputStream fos = new FileOutputStream(tempFile)) {
