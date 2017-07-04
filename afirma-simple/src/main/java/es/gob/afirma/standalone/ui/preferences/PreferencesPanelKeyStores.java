@@ -56,7 +56,8 @@ final class PreferencesPanelKeyStores extends JPanel {
 	}
 
 	PreferencesPanelKeyStores(final KeyListener keyListener,
-							  final ModificationListener modificationListener) {
+							  final ModificationListener modificationListener,
+							  final boolean unprotected) {
 
 		// Obtenemos primero la lista de almacenes disponibles para asignarla al JComboBox
 		final AOKeyStore[] defaultStores;
