@@ -14,8 +14,6 @@ import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Window;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.logging.Logger;
@@ -45,7 +43,7 @@ final class PreferencesPanel extends JPanel implements KeyListener, DisposableIn
 	private PreferencesPanelGeneral preferencesPanelGeneral;
 	private PreferencesPanelCades preferencesPanelCades;
 	private PreferencesPanelPades preferencesPanelPades;
-	private PreferencesPanelKeyStores preferencesPanelKeyStores;
+	//private PreferencesPanelKeyStores preferencesPanelKeyStores;
 	private PreferencesPanelFacturaE preferencesPanelFacturaE;
 	private PreferencesPanelXades preferencesPanelXades;
 
@@ -58,7 +56,7 @@ final class PreferencesPanel extends JPanel implements KeyListener, DisposableIn
 		this.preferencesPanelGeneral = new PreferencesPanelGeneral(this, this.modificationListener, this, this, unprotected);
 		this.preferencesPanelCades = new PreferencesPanelCades(this, this.modificationListener, unprotected);
 		this.preferencesPanelPades = new PreferencesPanelPades(this, this.modificationListener, unprotected);
-		this.preferencesPanelKeyStores = new PreferencesPanelKeyStores(this, this.modificationListener, unprotected);
+		//this.preferencesPanelKeyStores = new PreferencesPanelKeyStores(this, this.modificationListener, unprotected);
 		this.preferencesPanelFacturaE = new PreferencesPanelFacturaE(this, this.modificationListener, unprotected);
 		this.preferencesPanelXades = new PreferencesPanelXades(this, this.modificationListener, unprotected);
 
@@ -144,7 +142,7 @@ final class PreferencesPanel extends JPanel implements KeyListener, DisposableIn
 		//****************************************************************************
 		//**** PREFERENCIAS ALMACENES ************************************************
 		//****************************************************************************
-		this.preferencesPanelKeyStores.savePreferences();
+		//this.preferencesPanelKeyStores.savePreferences();
 
 		//****************************************************************************
 		//**** PREFERENCIAS FACTURAE ************************************************
@@ -254,13 +252,7 @@ final class PreferencesPanel extends JPanel implements KeyListener, DisposableIn
 		);
 		cancelButton.addKeyListener(this);
 		cancelButton.addActionListener(
-			new ActionListener() {
-			    /** {@inheritDoc} */
-	            @Override
-	            public void actionPerformed(final ActionEvent ae) {
-	            	disposeInterface();
-	            }
-	        }
+			ae -> disposeInterface()
 		);
 
 		final JButton acceptButton = new JButton(SimpleAfirmaMessages.getString("PreferencesPanel.33")); //$NON-NLS-1$
@@ -269,13 +261,9 @@ final class PreferencesPanel extends JPanel implements KeyListener, DisposableIn
 			SimpleAfirmaMessages.getString("PreferencesPanel.34") //$NON-NLS-1$
 		);
 		acceptButton.addKeyListener(this);
-		acceptButton.addActionListener(new ActionListener() {
-			/** {@inheritDoc} */
-			@Override
-			public void actionPerformed(final ActionEvent ae) {
-				if (savePreferences()) {
-					disposeInterface();
-				}
+		acceptButton.addActionListener(ae -> {
+			if (savePreferences()) {
+				disposeInterface();
 			}
 		});
 
@@ -284,13 +272,9 @@ final class PreferencesPanel extends JPanel implements KeyListener, DisposableIn
 			SimpleAfirmaMessages.getString("PreferencesPanel.35") //$NON-NLS-1$
 		);
 		this.applyButton.addKeyListener(this);
-		this.applyButton.addActionListener(new ActionListener() {
-			/** {@inheritDoc} */
-			@Override
-			public void actionPerformed(final ActionEvent ae) {
-				if (savePreferences()) {
-				    setModified(false);
-				}
+		this.applyButton.addActionListener(ae -> {
+			if (savePreferences()) {
+			    setModified(false);
 			}
 		});
 		this.applyButton.setEnabled(false);
