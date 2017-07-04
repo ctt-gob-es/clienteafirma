@@ -42,13 +42,24 @@ final class PreferencesPanelKeyStores extends JPanel {
 
 	private final JCheckBox onlyAlias = new JCheckBox(SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.4")); //$NON-NLS-1$
 
-	/**
-	 * Atributo que permite gestionar el bloqueo de preferencias.
-	 */
-	private boolean unprotected = true;
+	private final JComboBox<AOKeyStore> defaultStore;
+	AOKeyStore getDefaultStore() {
+		return this.defaultStore.getItemAt(this.defaultStore.getSelectedIndex());
+	}
 
-	private static AOKeyStore[] DEFAULT_STORES;
-	static {
+	private final JButton contentButton = new JButton(
+		SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.9") //$NON-NLS-1$
+	);
+
+	JButton getContentButton() {
+		return this.contentButton;
+	}
+
+	PreferencesPanelKeyStores(final KeyListener keyListener,
+							  final ModificationListener modificationListener) {
+
+		// Obtenemos primero la lista de almacenes disponibles para asignarla al JComboBox
+		final AOKeyStore[] defaultStores;
 		final List<AOKeyStore> stores = new ArrayList<>();
 		final Platform.OS os = Platform.getOS();
 		if (Platform.OS.WINDOWS.equals(os)) {
@@ -63,27 +74,10 @@ final class PreferencesPanelKeyStores extends JPanel {
 		if (SimpleKeyStoreManager.isFirefoxAvailable()) {
 			stores.add(AOKeyStore.MOZ_UNI);
 		}
-		DEFAULT_STORES = stores.toArray(new AOKeyStore[0]);
-	}
+		defaultStores = stores.toArray(new AOKeyStore[0]);
+		this.defaultStore = new JComboBox<>(defaultStores);
 
-	private final JComboBox<AOKeyStore> defaultStore = new JComboBox<>(DEFAULT_STORES);
-	AOKeyStore getDefaultStore() {
-		return this.defaultStore.getItemAt(this.defaultStore.getSelectedIndex());
-	}
-
-	private final JButton contentButton = new JButton(
-		SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.9") //$NON-NLS-1$
-	);
-
-	JButton getContentButton() {
-		return this.contentButton;
-	}
-
-	PreferencesPanelKeyStores(final KeyListener keyListener,
-							  final ModificationListener modificationListener,
-							  final boolean unprotected) {
-
-		this.unprotected = unprotected;
+		// Creamos el UI
 		createUI(keyListener, modificationListener);
 	}
 
