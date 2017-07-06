@@ -30,7 +30,8 @@ public final class PolicyIdFilter extends CertificateFilter {
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
-	private static final String OID_SEPARATOR = ";"; //$NON-NLS-1$
+	/** Separador de OID en la lista de identificadores de pol&iacute;ticas. */
+	public static final String OID_SEPARATOR = ";"; //$NON-NLS-1$
 
 	final List<String> allowedOids;
 
