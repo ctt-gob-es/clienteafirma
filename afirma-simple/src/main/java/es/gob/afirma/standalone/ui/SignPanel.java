@@ -144,7 +144,9 @@ public final class SignPanel extends JPanel {
     private File currentFile = null;
 
     File getCurrentFile() {
-    	return this.currentFile;
+    	return this.currentFile != null ?
+			AutoFirmaUtil.getCanonicalFile(this.currentFile) :
+				null;
     }
 
     /** Carga el fichero a firmar.
@@ -606,7 +608,8 @@ public final class SignPanel extends JPanel {
 			SimpleAfirmaMessages.getString("SignPanel.50") //$NON-NLS-1$
 		);
     	new SignPanelSignTask(
-    		this, getCertFilters(),
+    		this, 
+    		getCertFilters(),
     		signWaitDialog
 		).execute();
     	signWaitDialog.setVisible(true);

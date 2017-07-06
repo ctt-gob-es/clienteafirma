@@ -105,14 +105,15 @@ final class ProtocolInvocationLauncherSignAndSave {
 		if (options.getData() == null) {
 
 			final String dialogTilte = Operation.SIGN.equals(options.getOperation())
-					? ProtocolMessages.getString("ProtocolLauncher.25") : //$NON-NLS-1$
+				? ProtocolMessages.getString("ProtocolLauncher.25") : //$NON-NLS-1$
 					ProtocolMessages.getString("ProtocolLauncher.26"); //$NON-NLS-1$
 			final String fileExts = options.getExtraParams() != null
-					? options.getExtraParams().getProperty("filenameExts", null) : //$NON-NLS-1$
+				? options.getExtraParams().getProperty("filenameExts", null) : //$NON-NLS-1$
 					null;
 			final String fileDesc = fileExts == null ? ProtocolMessages.getString("ProtocolLauncher.27") : //$NON-NLS-1$
-					String.format(ProtocolMessages.getString("ProtocolLauncher.32"), //$NON-NLS-1$
-							fileExts.replace(",", ",*.")); //$NON-NLS-1$ //$NON-NLS-2$
+				String.format(ProtocolMessages.getString("ProtocolLauncher.32"), //$NON-NLS-1$
+				fileExts.replace(",", ",*.") //$NON-NLS-1$ //$NON-NLS-2$
+			);
 
 			final File selectedDataFile;
 			try {
@@ -120,10 +121,19 @@ final class ProtocolInvocationLauncherSignAndSave {
 					ServiceInvocationManager.focusApplication();
 				}
 
-				selectedDataFile = AOUIFactory.getLoadFiles(dialogTilte, null, null,
-						fileExts != null ? fileExts.split(",") : null, //$NON-NLS-1$
-						fileDesc, false, false, AutoFirmaUtil.getDefaultDialogsIcon(), null)[0];
-			} catch (final AOCancelledOperationException e) {
+				selectedDataFile = AOUIFactory.getLoadFiles(
+					dialogTilte,
+					null,
+					null,
+					fileExts != null ? fileExts.split(",") : null, //$NON-NLS-1$
+					fileDesc,
+					false,
+					false,
+					AutoFirmaUtil.getDefaultDialogsIcon(),
+					null
+				)[0];
+			}
+			catch (final AOCancelledOperationException e) {
 				LOGGER.info("carga de datos de firma cancelada por el usuario: " + e); //$NON-NLS-1$
 				if (!bySocket) {
 					throw new SocketOperationException(getResultCancel());
@@ -131,72 +141,83 @@ final class ProtocolInvocationLauncherSignAndSave {
 				return getResultCancel();
 			}
 
-			selectedFilename = selectedDataFile.getName();
+			selectedFilename = AutoFirmaUtil.getCanonicalFile(selectedDataFile).getName();
 
 			try {
 				final byte[] data;
-				try (final InputStream fis = new FileInputStream(selectedDataFile);
-						final InputStream bis = new BufferedInputStream(fis);) {
+				try (
+					final InputStream fis = new FileInputStream(selectedDataFile);
+					final InputStream bis = new BufferedInputStream(fis);
+				) {
 					data = AOUtil.getDataFromInputStream(bis);
 				}
 				if (data == null) {
 					throw new IOException("La lectura de datos para firmar ha devuelto un nulo"); //$NON-NLS-1$
 				}
 				options.setData(data);
-			} catch (final Exception e) {
+			}
+			catch (final Exception e) {
 				LOGGER.severe("Error en la lectura de los datos a firmar: " + e); //$NON-NLS-1$
 				ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_00);
 				if (!bySocket) {
 					throw new SocketOperationException(ProtocolInvocationLauncherErrorManager.SAF_00);
 				}
 				return ProtocolInvocationLauncherErrorManager
-						.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_00);
+					.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_00);
 			}
 		}
 
 		// En caso de haber programado el formato "AUTO", se selecciona el
-		// firmador a partir
-		// de los datos (firma) proporcionados
+		// firmador a partir de los datos (firma) proporcionados
 		if (signer == null) {
 			if (Operation.SIGN == options.getOperation()) {
 				if (DataAnalizerUtil.isPDF(options.getData())) {
 					signer = AOSignerFactory.getSigner(AOSignConstants.SIGN_FORMAT_PADES);
 					options.setSignFormat(AOSignConstants.SIGN_FORMAT_PADES);
-				} else if (DataAnalizerUtil.isFacturae(options.getData())) {
+				}
+				else if (DataAnalizerUtil.isFacturae(options.getData())) {
 					signer = AOSignerFactory.getSigner(AOSignConstants.SIGN_FORMAT_FACTURAE);
 					options.setSignFormat(AOSignConstants.SIGN_FORMAT_FACTURAE);
-				} else if (DataAnalizerUtil.isXML(options.getData())) {
+				}
+				else if (DataAnalizerUtil.isXML(options.getData())) {
 					signer = AOSignerFactory.getSigner(AOSignConstants.SIGN_FORMAT_XADES);
 					options.setSignFormat(AOSignConstants.SIGN_FORMAT_XADES);
-				} else if (DataAnalizerUtil.isODF(options.getData())) {
+				}
+				else if (DataAnalizerUtil.isODF(options.getData())) {
 					signer = AOSignerFactory.getSigner(AOSignConstants.SIGN_FORMAT_ODF);
 					options.setSignFormat(AOSignConstants.SIGN_FORMAT_ODF);
-				} else if (DataAnalizerUtil.isOOXML(options.getData())) {
+				}
+				else if (DataAnalizerUtil.isOOXML(options.getData())) {
 					signer = AOSignerFactory.getSigner(AOSignConstants.SIGN_FORMAT_OOXML);
 					options.setSignFormat(AOSignConstants.SIGN_FORMAT_OOXML);
-				} else {
+				}
+				else {
 					signer = AOSignerFactory.getSigner(AOSignConstants.SIGN_FORMAT_CADES);
 					options.setSignFormat(AOSignConstants.SIGN_FORMAT_CADES);
 				}
-			} else {
+			}
+			else {
 				try {
 					signer = AOSignerFactory.getSigner(options.getData());
-				} catch (final IOException e) {
-					LOGGER.severe("No se han podido analizar los datos para determinar si son una firma: " + e //$NON-NLS-1$
+				}
+				catch (final IOException e) {
+					LOGGER.severe(
+						"No se han podido analizar los datos para determinar si son una firma: " + e //$NON-NLS-1$
 					);
 					// signer sera null
 				}
 			}
 
 			if (signer == null) {
-				LOGGER.severe("Los datos no se corresponden con una firma electronica o no se pudieron analizar" //$NON-NLS-1$
+				LOGGER.severe(
+					"Los datos no se corresponden con una firma electronica o no se pudieron analizar" //$NON-NLS-1$
 				);
 				ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_17);
 				if (!bySocket) {
 					throw new SocketOperationException(ProtocolInvocationLauncherErrorManager.SAF_17);
 				}
 				return ProtocolInvocationLauncherErrorManager
-						.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_17);
+					.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_17);
 			}
 		}
 
@@ -236,7 +257,8 @@ final class ProtocolInvocationLauncherSignAndSave {
 		if (options.getSticky() && ProtocolInvocationLauncher.getStickyKeyEntry() != null) {
 			pke = ProtocolInvocationLauncher.getStickyKeyEntry();
 
-		} else {
+		}
+		else {
 
 			final PasswordCallback pwc = aoks.getStorePasswordCallback(null);
 			final String aoksLib = options.getDefaultKeyStoreLib();
@@ -248,7 +270,8 @@ final class ProtocolInvocationLauncherSignAndSave {
 						pwc, // PasswordCallback
 						null // Parent
 				);
-			} catch (final Exception e3) {
+			}
+			catch (final Exception e3) {
 				LOGGER.severe("Error obteniendo el AOKeyStoreManager: " + e3); //$NON-NLS-1$
 				ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_08);
 				if (!bySocket) {
@@ -265,18 +288,22 @@ final class ProtocolInvocationLauncherSignAndSave {
 			try {
 				ServiceInvocationManager.focusApplication();
 				final AOKeyStoreDialog dialog = new AOKeyStoreDialog(ksm, null, true, true, // showExpiredCertificates
-						true, // checkValidity
-						filters, mandatoryCertificate);
+					true, // checkValidity
+					filters,
+					mandatoryCertificate
+				);
 				dialog.allowOpenExternalStores(filterManager.isExternalStoresOpeningAllowed());
 				dialog.show();
 				pke = ksm.getKeyEntry(dialog.getSelectedAlias());
 
 				if (options.getSticky()) {
 					ProtocolInvocationLauncher.setStickyKeyEntry(pke);
-				} else {
+				}
+				else {
 					ProtocolInvocationLauncher.setStickyKeyEntry(null);
 				}
-			} catch (final AOCancelledOperationException e) {
+			}
+			catch (final AOCancelledOperationException e) {
 				LOGGER.severe("Operacion cancelada por el usuario" + e); //$NON-NLS-1$
 				if (!bySocket) {
 					throw new SocketOperationException(getResultCancel());
@@ -361,9 +388,17 @@ final class ProtocolInvocationLauncherSignAndSave {
 
 		// Damos la opcion de guardar la firma generada
 		try {
-			AOUIFactory.getSaveDataToFile(sign, ProtocolMessages.getString("ProtocolLauncher.31"), //$NON-NLS-1$
-					null, getFilename(options, selectedFilename, signer), null, null, null);
-		} catch (final AOCancelledOperationException e) {
+			AOUIFactory.getSaveDataToFile(
+				sign,
+				ProtocolMessages.getString("ProtocolLauncher.31"), //$NON-NLS-1$
+				null,
+				getFilename(options, selectedFilename, signer),
+				null,
+				null,
+				null
+			);
+		}
+		catch (final AOCancelledOperationException e) {
 			LOGGER.severe("Operacion cancelada por el usuario" + e); //$NON-NLS-1$
 			if (!bySocket) {
 				throw new SocketOperationException(RESULT_CANCEL);
@@ -444,33 +479,30 @@ final class ProtocolInvocationLauncherSignAndSave {
 		return dataToSend.toString();
 	}
 
-	/**
-	 * Genera un nombre de fichero.
-	 * 
-	 * @param options
-	 *            Opciones proporcionadas en la operaci&oacute;n.
-	 * @param filename
-	 *            Nombre del fichero firmado ({@code null} si no es conocido).
-	 * @param signer
-	 *            Manejador utilizado para la firma-
-	 * @return Nombre de fichero por defecto.
-	 */
-	private static String getFilename(final UrlParametersToSignAndSave options, final String filename,
-			final AOSigner signer) {
+	/** Genera un nombre de fichero.
+	 * @param options Opciones proporcionadas en la operaci&oacute;n.
+	 * @param filename Nombre del fichero firmado ({@code null} si no es conocido).
+	 * @param signer Manejador utilizado para la firma-
+	 * @return Nombre de fichero por defecto. */
+	private static String getFilename(final UrlParametersToSignAndSave options,
+			                          final String filename,
+			                          final AOSigner signer) {
 
 		if (options.getFileName() != null) {
 			return options.getFileName();
 		}
 
-		String name;
+		final String name;
 		if (filename != null) {
 			final int dotPos = filename.lastIndexOf('.');
 			if (dotPos > 0) {
 				name = filename.substring(0, dotPos);
-			} else {
+			}
+			else {
 				name = filename;
 			}
-		} else {
+		}
+		else {
 			name = ProtocolMessages.getString("ProtocolLauncher.30"); //$NON-NLS-1$
 		}
 
@@ -486,7 +518,7 @@ final class ProtocolInvocationLauncherSignAndSave {
 	 * propiedad {@code mode} con el valor {@code explicit}. Esta no es una
 	 * firma correcta, pero por compatibilidad con los tipos de firmas del
 	 * Applet pesado se ha incluido aqu&iacute;.
-	 * 
+	 *
 	 * @param format
 	 *            Formato declarado para la firma.
 	 * @param config
