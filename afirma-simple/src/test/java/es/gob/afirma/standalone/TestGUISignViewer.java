@@ -7,7 +7,7 @@ import java.net.URISyntaxException;
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public final class TestGUISignViewer {
 
-	private static final String TEST_FILE_OOXML = "/samples/2_signed.docx"; //$NON-NLS-1$
+	//private static final String TEST_FILE_OOXML = "/samples/2_signed.docx"; //$NON-NLS-1$
 	private static final String TEST_FILE_ODF = "/samples/2_signed.odt"; //$NON-NLS-1$
 
 	private static void testFile(final String filePath) throws URISyntaxException {
