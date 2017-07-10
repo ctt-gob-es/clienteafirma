@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<AFIRMA Id="AFIRMA-Root-267a35fb-93c8-460e-98b9-7dd1cfb18908"><CONTENT Id="CONTENT-4e3e365b-95a0-4e23-b801-c7d449a6fdc9"><note>
+  <to>Tove</to>
+  <from>Jani</from>
+  <heading>Reminder</heading>
+  <body>Don't forget me this weekend!</body>
+</note></CONTENT><ds:Signature Id="Signature-0b4c0018-80e5-4b70-819a-8e4714dcf3ae-Signature" xmlns:ds="http://www.w3.org/2000/09/xmldsig#"><ds:SignedInfo><ds:CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/><ds:SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/><ds:Reference Id="Reference-362668b6-d43d-4925-905a-bd7184eca383" Type="http://www.w3.org/2000/09/xmldsig#Object" URI="#CONTENT-4e3e365b-95a0-4e23-b801-c7d449a6fdc9"><ds:Transforms><ds:Transform Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/></ds:Transforms><ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha512"/><ds:DigestValue>KIDBcSktQ4u6g/zmPGc8VCWcH3tuPqIUB+qZ+t2FT2heMXMRXtJBrS2Zlr9TUXFqqdfe4Rw1ADCw
+eUYw6vxd3Q==</ds:DigestValue></ds:Reference><ds:Reference Type="http://uri.etsi.org/01903#SignedProperties" URI="#Signature-0b4c0018-80e5-4b70-819a-8e4714dcf3ae-SignedProperties"><ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha512"/><ds:DigestValue>6Q3ij9QD2QBOG8qPDUlss1xJsKqPt8bDkRl+CKTtwD1CtQry9gbsUlN2p9QXWJykpxEdIlJT9O3A
+cwM7htdQlw==</ds:DigestValue></ds:Reference><ds:Reference URI="#Signature-0b4c0018-80e5-4b70-819a-8e4714dcf3ae-KeyInfo"><ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha512"/><ds:DigestValue>zPNrLHdpHPudLwBob6DmYhnfjnyGgmHSlqKiNkYOK1ZevLNttUnkTjLhRvfBv2NcEl7X0M5NUFnM
+0BvboxblVA==</ds:DigestValue></ds:Reference></ds:SignedInfo><ds:SignatureValue Id="Signature-0b4c0018-80e5-4b70-819a-8e4714dcf3ae-SignatureValue">bNYRMK6Qr9ohLSZ4ZD/tcUIYFsYnIHJM9smkVQbjDIMbr7KUcRkJXV6JnaPIBOMYpff2Sx1JnwEf
+7x7zU9a5KNi/MlqjTWc6inUUJi9nF+edEVQL1tNzsAmDNZ8P4WTsatZdcKjkSeD9UOV+s7TqKUSN
++u2JjyHQX/oXejn4BOMXTUfOzkdMA+lw1fAWdhYuucfPP1wfkQ5Hmw4QCFxWUywrkYCRCGD6PILv
+hOezrvZMW4qLX6Yjavl3pZuP2gG9bSWeNlGKxuQmc7oLAWkLAeoW7KxgZFfO78e+Wkl3vc4ZCSRb
+KAzfB0NgdLteyGJk5iwTgjIFfbbUxWku1EPyYA==</ds:SignatureValue><ds:KeyInfo Id="Signature-0b4c0018-80e5-4b70-819a-8e4714dcf3ae-KeyInfo"><ds:X509Data><ds:X509Certificate>MIIHWTCCBkGgAwIBAgIDCaSgMA0GCSqGSIb3DQEBBQUAMEQxCzAJBgNVBAYTAkVTMQ0wCwYDVQQK
+EwRNREVGMQwwCgYDVQQLEwNQS0kxGDAWBgNVBAMTD01JTklTREVGLUVDLVdQRzAeFw0xNjAzMDEx
+MTA3MzhaFw0xODAzMDExMTA3MzhaMFcxCzAJBgNVBAYTAkVTMQ0wCwYDVQQKDARNREVGMREwDwYD
+VQQLDAhQRVJTT05BUzEmMCQGA1UEAwwdQUxPTlNPIENBTFZPIE1BUklPIHwwNzUwNDQ4OUEwggEi
+MA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCL+Taaok3iB+pxTMM3qzoE6bBjSaZqPOghNtc8
+Uyq2jcD8ASlxtucEgceMgl84LllzcxYoA02OuMER8Q6OEpF7oRqbMtmHaHBHOfHHRB+x0MDRFb4q
+eZXemPlvmL3NRXfhe+uaW1iy50Lpl3mFcJ47R+cv8QdgtvOusWGZU5zYZ47Bj/vFVj5TLNEnxugM
+rdHkKE8A8ZdHV2mUnILnW8qc98bhKXPheziUJ7xjq5jYk1Vk9MM7ae6OGBORUnPsWIw9+aQEXSlj
++uqWjbvRtHo46ppE+cEtKpaKGgUkbgo5Xfkc4c9wDu8qaRuo2swc91jJR9N7beSnuNmEUjuoPYih
+AgMBAAGjggQ/MIIEOzAeBgNVHREEFzAVgRNtYWxvbnNvY0BleHQubWRlLmVzMIHEBgNVHRIEgbww
+gbmBD2FncG1kQG9jLm1kZS5lc6SBpTCBojELMAkGA1UEBhMCRVMxDTALBgNVBAoMBE1ERUYxDDAK
+BgNVBAsMA1BLSTEmMCQGA1UEBwwdQXJ0dXJvIFNvcmlhIDI4OSAyODA3MSBNYWRyaWQxEjAQBgNV
+BAUTCVMyODAwMjMxSTEpMCcGA1UECwwgTWluaXN0ZXJpbyBkZSBEZWZlbnNhIGRlIEVzcGHDsWEx
+DzANBgNVBAMMBlBLSURFRjAMBgNVHRMBAf8EAjAAMA4GA1UdDwEB/wQEAwIGQDAdBgNVHQ4EFgQU
+VLIfXTTYC9SSYlQCAOMy0oY4fFQwHwYDVR0jBBgwFoAUq+O5IYBb+nYPx0bbsJuIC1qxyrIwOAYI
+KwYBBQUHAQEELDAqMCgGCCsGAQUFBzABhhxodHRwOi8vZXYwMS13cGcubWRlZi5lczo5MzA4MC8G
+CCsGAQUFBwEDBCMwITAIBgYEAI5GAQEwCwYGBACORgEDAgEPMAgGBgQAjkYBBDCCAQIGA1UdIASB
++jCB9zCB9AYJYIVUAQEBAQMCMIHmMCoGCCsGAQUFBwIBFh5odHRwOi8vcGtpLm1kZWYuZXMvY3Bz
+L2Nwcy5odG0wgbcGCCsGAQUFBwICMIGqGoGnQ2VydGlmaWNhZG8gcmVjb25vY2lkbyBkZSBmaXJt
+YSBlbGVjdHJvbmljYSBwYXJhIHBlcnNvbmEgZmlzaWNhIGV4cGVkaWRvIHBvciBlbCBNaW5pc3Rl
+cmlvIGRlIERlZmVuc2EgZGUgRXNwYfFhIChQS0lERUYsIENJRiBTMjgwMDIzMUksIEFydHVybyBT
+b3JpYSAyODkgMjgwNzEgTWFkcmlkKS4wggGBBgNVHR8EggF4MIIBdDCCAXCgggFsoIIBaIaBtmxk
+YXA6Ly8vQ049TUlOSVNERUYtRUMtV1BHLENOPUVDLVdQRyxDTj1DRFAsQ049UHVibGljJTIwS2V5
+JTIwU2VydmljZXMsQ049U2VydmljZXMsQ049Q29uZmlndXJhdGlvbixEQz1ldCxEQz1tZGUsREM9
+ZXM/Y2VydGlmaWNhdGVSZXZvY2F0aW9uTGlzdD9iYXNlP29iamVjdGNsYXNzPWNSTERpc3RyaWJ1
+dGlvblBvaW50hn1sZGFwOi8vbGRhcC5tZGVmLmVzL2NuPU1JTklTREVGLUNSTC1FQy1XUEcsT1U9
+UEtJLE89TURFRixDPUVTP2NlcnRpZmljYXRlUmV2b2NhdGlvbkxpc3Q/YmFzZT9vYmplY3RjbGFz
+cz1jUkxEaXN0cmlidXRpb25Qb2ludIYuaHR0cDovL3BraS5tZGVmLmVzL2NybC9NSU5JU0RFRi1D
+UkwtRUMtV1BHLmNybDANBgkqhkiG9w0BAQUFAAOCAQEAJeLg5wy1Q9qww5Ze490kQafqaEZ1LGRL
+wtxZ5a45kojt32EMR79njVJCim0YDOeW7AKS63JvyLxSU4m1plHhPa4Hfzxa/f5J3SC8m8/YYWsi
+i6IEvI2SpVFiD9z4etOfitOCe2nlW3HkyUN1baF3HyPcX7x0G4+Lj3f7k+qeUBgHxBx+dcmFbFNQ
+YtkDpDuRu4Io8p4LVVgidQv5bKggFg2VAs/C3IKkqaMUdNfmfI1blIoXlb6Ah2h3PsvJyjZcEPvw
+4uIxEwbUL6wquyUMtBwVZmCipqT+01XOfv87v1fGHg8zdO90/JLnWAq1mLliilIen7Sb7vfcpY6i
+w55hxg==</ds:X509Certificate></ds:X509Data><ds:KeyValue><ds:RSAKeyValue><ds:Modulus>i/k2mqJN4gfqcUzDN6s6BOmwY0mmajzoITbXPFMqto3A/AEpcbbnBIHHjIJfOC5Zc3MWKANNjrjB
+EfEOjhKRe6EamzLZh2hwRznxx0QfsdDA0RW+KnmV3pj5b5i9zUV34XvrmltYsudC6Zd5hXCeO0fn
+L/EHYLbzrrFhmVOc2GeOwY/7xVY+UyzRJ8boDK3R5ChPAPGXR1dplJyC51vKnPfG4Slz4Xs4lCe8
+Y6uY2JNVZPTDO2nujhgTkVJz7FiMPfmkBF0pY/rqlo270bR6OOqaRPnBLSqWihoFJG4KOV35HOHP
+cA7vKmkbqNrMHPdYyUfTe23kp7jZhFI7qD2IoQ==</ds:Modulus><ds:Exponent>AQAB</ds:Exponent></ds:RSAKeyValue></ds:KeyValue></ds:KeyInfo><ds:Object><xades:QualifyingProperties Id="Signature-0b4c0018-80e5-4b70-819a-8e4714dcf3ae-QualifyingProperties" Target="#Signature-0b4c0018-80e5-4b70-819a-8e4714dcf3ae-Signature" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:xades="http://uri.etsi.org/01903/v1.3.2#"><xades:SignedProperties Id="Signature-0b4c0018-80e5-4b70-819a-8e4714dcf3ae-SignedProperties"><xades:SignedSignatureProperties><xades:SigningTime>2017-06-12T12:01:31+02:00</xades:SigningTime><xades:SigningCertificate><xades:Cert><xades:CertDigest><ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha512"/><ds:DigestValue>KeuUrgShMUmZSdH7gaaq+Lq/1Q2cVq+KA9bR1LBMFyXn7xxZNUfUaBxHRq4jhLNSyvD3TH05ykU2O60rM/ieMA==</ds:DigestValue></xades:CertDigest><xades:IssuerSerial><ds:X509IssuerName>CN=MINISDEF-EC-WPG, OU=PKI, O=MDEF, C=ES</ds:X509IssuerName><ds:X509SerialNumber>631968</ds:X509SerialNumber></xades:IssuerSerial></xades:Cert></xades:SigningCertificate><xades:SignaturePolicyIdentifier><xades:SignaturePolicyId><xades:SigPolicyId><xades:Identifier>urn:oid:2.16.724.1.3.1.1.2.1.9</xades:Identifier><xades:Description></xades:Description></xades:SigPolicyId><xades:SigPolicyHash><ds:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/><ds:DigestValue>G7roucf600+f03r/o0bAOQ6WAs0=</ds:DigestValue></xades:SigPolicyHash><xades:SigPolicyQualifiers><xades:SigPolicyQualifier><xades:SPURI>https://sede.060.gob.es/politica_de_firma_anexo_1.pdf</xades:SPURI></xades:SigPolicyQualifier></xades:SigPolicyQualifiers></xades:SignaturePolicyId></xades:SignaturePolicyIdentifier></xades:SignedSignatureProperties><xades:SignedDataObjectProperties><xades:DataObjectFormat ObjectReference="#Reference-362668b6-d43d-4925-905a-bd7184eca383"><xades:Description/><xades:MimeType>application/octet-stream</xades:MimeType><xades:Encoding/></xades:DataObjectFormat></xades:SignedDataObjectProperties></xades:SignedProperties></xades:QualifyingProperties></ds:Object></ds:Signature></AFIRMA>

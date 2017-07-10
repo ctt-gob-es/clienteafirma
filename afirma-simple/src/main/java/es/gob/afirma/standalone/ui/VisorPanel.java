@@ -14,8 +14,6 @@ import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.File;
@@ -71,8 +69,7 @@ public final class VisorPanel extends JPanel implements KeyListener {
      * @param sign Firma.
      * @param vf VisorFirma para las acciones de los botones
      * @param allowReload <code>true</code> si se desea dar a usuario la opci&oacute;n de ver otras firmas en el
-     *                    visor carg&aacute;ndolas mediante un bot&oacute;n, <code>false</code> en caso contrario
-     */
+     *                    visor carg&aacute;ndolas mediante un bot&oacute;n, <code>false</code> en caso contrario. */
     public VisorPanel(final File signFile, final byte[] sign, final VisorFirma vf, final boolean allowReload) {
         super(true);
         this.visorFirma = vf;
@@ -103,7 +100,9 @@ public final class VisorPanel extends JPanel implements KeyListener {
                 sign = AOUtil.getDataFromInputStream(fis);
             }
             catch (final Exception e) {
-                Logger.getLogger("es.gob.afirma").warning("No se ha podido cargar el fichero de firma: " + e); //$NON-NLS-1$ //$NON-NLS-2$
+                Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
+            		"No se ha podido cargar el fichero de firma: " + e //$NON-NLS-1$
+        		);
             }
         }
 
@@ -140,14 +139,11 @@ public final class VisorPanel extends JPanel implements KeyListener {
             bottonPanel.add(openSign);
             openSign.addKeyListener(this);
             openSign.addActionListener(
-        		new ActionListener() {
-	                @Override
-	                public void actionPerformed(final ActionEvent e) {
-	                    if (VisorPanel.this.getVisorFirma() != null) {
-	                        VisorPanel.this.getVisorFirma().loadNewSign();
-	                    }
-	                }
-	            }
+        		e -> {
+				    if (VisorPanel.this.getVisorFirma() != null) {
+				        VisorPanel.this.getVisorFirma().loadNewSign();
+				    }
+				}
     		);
         }
 
@@ -155,14 +151,11 @@ public final class VisorPanel extends JPanel implements KeyListener {
         closeVisor.setMnemonic('C');
         closeVisor.addKeyListener(this);
         closeVisor.addActionListener(
-    		new ActionListener() {
-	            @Override
-	            public void actionPerformed(final ActionEvent e) {
-	                if (VisorPanel.this.getVisorFirma() != null) {
-	                    VisorPanel.this.getVisorFirma().closeApplication(0);
-	                }
-	            }
-	        }
+    		e -> {
+			    if (VisorPanel.this.getVisorFirma() != null) {
+			        VisorPanel.this.getVisorFirma().closeApplication(0);
+			    }
+			}
 		);
         bottonPanel.add(closeVisor);
 
@@ -246,7 +239,6 @@ public final class VisorPanel extends JPanel implements KeyListener {
 		}
 		return certs[0];
 	}
-
 
 	/** Comprueba la validez de la firma.
      * @param sign Firma que se desea comprobar.

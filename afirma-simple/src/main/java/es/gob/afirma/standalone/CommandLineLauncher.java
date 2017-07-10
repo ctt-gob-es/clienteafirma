@@ -246,7 +246,7 @@ final class CommandLineLauncher {
  		// Comprobamos si lo que nos piden validar es un certificado...
  		X509Certificate cert;
  		try (
- 			InputStream bis = new BufferedInputStream(
+ 			final InputStream bis = new BufferedInputStream(
  				new FileInputStream(inputFile)
  			);
  		) {

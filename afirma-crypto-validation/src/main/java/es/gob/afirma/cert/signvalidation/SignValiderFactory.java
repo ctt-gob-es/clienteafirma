@@ -2,7 +2,7 @@ package es.gob.afirma.cert.signvalidation;
 
 import java.util.logging.Logger;
 
-/** Factoria para la creaci&oacute;n de los validadores de firma.
+/** Factor&iacute;a para la creaci&oacute;n de los validadores de firma.
  * @author Sergio Mart&iacute;nez Rico. */
 public final class SignValiderFactory {
 
@@ -18,9 +18,9 @@ public final class SignValiderFactory {
 	/** Obtiene un validador de firmas para el tipo de dato proporcionado.
 	 * @param data Firma a validar.
 	 * @return Validador adecuado o <code>null</code> si no hay ninguno para ese tipo de dato.
-	 * @throws IllegalArgumentException Fallo si la firma obtenida est&aacute; vac&iacute;a. */
+	 * @throws IllegalArgumentException Si la firma proporcionada es nula o vac&iacute;a. */
 	public static SignValider getSignValider(final byte[] data) throws IllegalArgumentException {
-		if (data == null) {
+		if (data == null || data.length < 1) {
 			throw new IllegalArgumentException("No se han indicado datos de firma"); //$NON-NLS-1$
 		}
 		final String validerClassName;
@@ -33,14 +33,20 @@ public final class SignValiderFactory {
         else if (DataAnalizerUtil.isXML(data)) {
         	validerClassName = SIGNER_VALIDER_CLASS_XML;
         }
-        else if(DataAnalizerUtil.isBinary(data)) {
-        	validerClassName = SIGNER_VLIDER_CLASS_BINARY;
-        }
-        else {
+        else if(DataAnalizerUtil.isOOXML(data)) {
         	Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
-    			"No hay un validador para el tipo de dato proporcionado" //$NON-NLS-1$
+    			"No hay un validador para OOXML" //$NON-NLS-1$
 			);
         	return null;
+        }
+        else if(DataAnalizerUtil.isODF(data)) {
+        	Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
+    			"No hay un validador para ODF" //$NON-NLS-1$
+			);
+        	return null;
+        }
+        else  {
+        	validerClassName = SIGNER_VLIDER_CLASS_BINARY;
         }
 		try {
         	return (SignValider) Class.forName(validerClassName).getDeclaredConstructor().newInstance();
