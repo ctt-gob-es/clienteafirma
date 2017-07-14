@@ -14,7 +14,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -47,7 +46,7 @@ public final class TriphaseData {
 		 * @param ts Firma trif&aacute;sica original. */
 		public TriSign(final TriSign ts) {
 			this.id = ts.getId();
-			this.dict = new ConcurrentHashMap<String, String>(ts.getDict().size());
+			this.dict = new ConcurrentHashMap<>(ts.getDict().size());
 			final Set<String> keys = ts.getDict().keySet();
 			for (final String key : keys) {
 				this.dict.put(key, ts.getProperty(key));
@@ -100,11 +99,11 @@ public final class TriphaseData {
 		}
 
 		/**
-		 * Recupera un mapa no mutable de los par&aacute;metros de la firma trif&aacute;sica.
-		 * @return Mapa no mutable.
+		 * Recupera una copia de los par&aacute;metros de la firma trif&aacute;sica.
+		 * @return Copia de los par&aacute;metros.
 		 */
 		public Map<String,String> getDict() {
-			return Collections.unmodifiableMap(this.dict);
+			return new ConcurrentHashMap<>(this.dict);
 		}
 	}
 
@@ -152,7 +151,7 @@ public final class TriphaseData {
 				"El ID de la firma no puede ser nulo" //$NON-NLS-1$
 			);
 		}
-		final List<TriSign> tsl = new ArrayList<TriphaseData.TriSign>();
+		final List<TriSign> tsl = new ArrayList<>();
 		for (final TriSign ts : this.signs) {
 			if (signId.equals(ts.getId())) {
 				tsl.add(new TriSign(ts));
@@ -174,7 +173,7 @@ public final class TriphaseData {
 
 	/** Construye unos datos de sesi&oacute;n trif&aacute;sica vac&iacute;os. */
 	public TriphaseData() {
-		this.signs = new ArrayList<TriSign>();
+		this.signs = new ArrayList<>();
 		this.format = null;
 	}
 
@@ -237,16 +236,14 @@ public final class TriphaseData {
 			throw new IllegalArgumentException("El XML de entrada no puede ser nulo"); //$NON-NLS-1$
 		}
 
-		final InputStream is = new ByteArrayInputStream(xml);
 		Document doc;
-		try {
+		try (final InputStream is = new ByteArrayInputStream(xml);) {
 			doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(is);
 		}
 		catch (final Exception e) {
 			Logger.getLogger("es.gob.afirma").severe("Error al cargar el fichero XML: " + e + "\n" + new String(xml)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			throw new IOException("Error al cargar el fichero XML: " + e, e); //$NON-NLS-1$
 		}
-		is.close();
 
 		final Element rootElement = doc.getDocumentElement();
 		final NodeList childNodes = rootElement.getChildNodes();
@@ -280,7 +277,7 @@ public final class TriphaseData {
 
 		final NodeList childNodes = signsNode.getChildNodes();
 
-		final List<TriSign> signs = new ArrayList<TriSign>();
+		final List<TriSign> signs = new ArrayList<>();
 		int idx = nextNodeElementIndex(childNodes, 0);
 		while (idx != -1) {
 			final Node currentNode = childNodes.item(idx);
@@ -313,7 +310,7 @@ public final class TriphaseData {
 
 		final NodeList childNodes = paramsNode.getChildNodes();
 
-		final Map<String, String> params = new ConcurrentHashMap<String, String>();
+		final Map<String, String> params = new ConcurrentHashMap<>();
 		int idx = nextNodeElementIndex(childNodes, 0);
 		while (idx != -1) {
 			final Node paramNode = childNodes.item(idx);
