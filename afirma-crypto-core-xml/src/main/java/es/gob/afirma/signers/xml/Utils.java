@@ -462,10 +462,25 @@ public final class Utils {
      * @return Prefijo del espacio de nombres */
     public static String guessXAdESNamespacePrefix(final Element el) {
         final String signatureText = new String(writeXML(el, null, null, null));
-        if (signatureText.contains("xmlns:etsi=\"http://uri.etsi.org/")) { //$NON-NLS-1$
-            return "etsi"; //$NON-NLS-1$
+
+        // Buscamos los espacios de nombres declarados en la firma y despues vemos
+        // si alguno es el de XAdES. En cuanto se detecta uno, se utiliza ese
+        int idx = 0;
+        String ns = null;
+        while (ns == null && (idx = signatureText.indexOf(" xmlns:", idx)) != -1) { //$NON-NLS-1$
+        	final int eqIdx = signatureText.indexOf("=", idx); //$NON-NLS-1$
+        	if (eqIdx != -1) {
+        		final String xadesNsPrefix = signatureText.substring(
+        				eqIdx,
+        				Math.min(eqIdx + "=\"http://uri.etsi.org/".length(), signatureText.length())); //$NON-NLS-1$
+        		if ("=\"http://uri.etsi.org/".equals(xadesNsPrefix)) { //$NON-NLS-1$
+        			ns = signatureText.substring(idx + " xmlns:".length(), eqIdx); //$NON-NLS-1$
+        		}
+        	}
+        	idx++;
         }
-        return "xades"; //$NON-NLS-1$
+
+        return ns != null ? ns : "xades"; //$NON-NLS-1$
     }
 
     /** Intenta determinar el prefijo del espacio de nombres de la firma XMLDSig.
