@@ -1,5 +1,6 @@
 package es.gob.afirma.standalone;
 
+import java.io.IOException;
 import java.net.Authenticator;
 import java.net.InetSocketAddress;
 import java.net.PasswordAuthentication;
@@ -7,9 +8,12 @@ import java.net.Proxy;
 import java.net.ProxySelector;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
+import java.security.GeneralSecurityException;
 import java.util.List;
 import java.util.logging.Logger;
 
+import es.gob.afirma.standalone.crypto.CypherDataManager;
 import es.gob.afirma.standalone.ui.preferences.PreferencesManager;
 
 /** Utilidades para el manejo y establecimiento del <i>Proxy</i> de red para las
@@ -77,8 +81,8 @@ public final class ProxyUtil {
 	public static boolean isSystemProxySet() {
     	final String systemProxyHost = System.getenv("http.proxyHost"); //$NON-NLS-1$
     	final String systemProxyPort = System.getenv("http.proxyPort"); //$NON-NLS-1$
-    	return systemProxyHost != null    &&
-    		   systemProxyPort != null    &&
+    	return systemProxyHost != null &&
+    		   systemProxyPort != null &&
     		   !systemProxyPort.isEmpty() &&
     		   systemProxyPort.matches("\\d+"); //$NON-NLS-1$
 	}
@@ -127,6 +131,10 @@ public final class ProxyUtil {
 				"Se usara el Proxy configurado en sistema para las conexiones de red HTTPS: " + systemHttpsProxyHost + ":" + systemHttpsProxyPort //$NON-NLS-1$ //$NON-NLS-2$
 			);
 			modified = true;
+		}
+		else {
+			System.setProperty("https.proxyHost", systemHttpProxyHost); //$NON-NLS-1$
+			System.setProperty("https.proxyPort", systemHttpProxyPort); //$NON-NLS-1$
 		}
 
 		if (systemFtpProxyHost != null && systemFtpProxyPort != null) {
@@ -191,11 +199,11 @@ public final class ProxyUtil {
     	}
     	// Si no hay configuracion de sistema operativo, se usa la configuracion del
     	// GUI de autofirma
-    	if (PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_PROXY_SELECTED, false)) {
+    	else if (PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_PROXY_SELECTED, false)) {
     		final String proxyHost = PreferencesManager.get(PreferencesManager.PREFERENCE_GENERAL_PROXY_HOST, null);
     		final String proxyPort = PreferencesManager.get(PreferencesManager.PREFERENCE_GENERAL_PROXY_PORT, null);
     		final String proxyUsername = PreferencesManager.get(PreferencesManager.PREFERENCE_GENERAL_PROXY_USERNAME, null);
-    		final String proxyPassword = PreferencesManager.get(PreferencesManager.PREFERENCE_GENERAL_PROXY_PASSWORD, null);
+    		final String cipheredProxyPassword = PreferencesManager.get(PreferencesManager.PREFERENCE_GENERAL_PROXY_PASSWORD, null);
 
     		if (proxyHost != null && proxyPort != null) {
 
@@ -215,14 +223,25 @@ public final class ProxyUtil {
     			System.setProperty("socksProxyHost", proxyHost); //$NON-NLS-1$
     			System.setProperty("socksProxyPort", proxyPort); //$NON-NLS-1$
 
-        		if (proxyUsername != null && !proxyUsername.trim().isEmpty() && proxyPassword != null) {
+        		if (proxyUsername != null && !proxyUsername.trim().isEmpty() &&
+        				cipheredProxyPassword != null && !cipheredProxyPassword.trim().isEmpty()) {
+
+        			char[] proxyPassword;
+					try {
+						proxyPassword = decipherPassword(cipheredProxyPassword);
+					} catch (final Exception e) {
+						LOGGER.warning("No se pudo descifrar la contrasena del proxy. No se configurara el usuario y contrasena: " + e); //$NON-NLS-1$
+						Authenticator.setDefault(null);
+						return;
+					}
+
         			Authenticator.setDefault(
     					new Authenticator() {
 	    			        @Override
 	    					public PasswordAuthentication getPasswordAuthentication() {
 	    			            return new PasswordAuthentication(
     			            		proxyUsername,
-    			            		proxyPassword.toCharArray()
+    			            		proxyPassword
 			            		);
 	    			        }
 	    			    }
@@ -246,7 +265,7 @@ public final class ProxyUtil {
 				);
     		}
     		else if (!setDefaultHttpProxy() && !setDefaultHttpsProxy()) {
-				LOGGER.info("No se usara Proxy para las conexiones de red"); //$NON-NLS-1$
+    			LOGGER.info("No se usara Proxy para las conexiones de red"); //$NON-NLS-1$
     		}
     	}
     }
@@ -268,4 +287,32 @@ public final class ProxyUtil {
 		Authenticator.setDefault(null);
     }
 
+
+    /**
+     * Cifra una contrase&mtilde;a.
+     * @param password Contrase&ntilde;a.
+     * @return Contrase&tilde;a cifrada en base 64.
+     * @throws GeneralSecurityException Cuando se produce un error durante el cifrado.
+     * @throws NullPointerException Si se introduce una contrase&ntilde;a vac&iacute;a.
+     */
+    public static String cipherPassword(final char[] password) throws GeneralSecurityException {
+    	return CypherDataManager.cipherData(
+    					String.valueOf(password).getBytes(StandardCharsets.UTF_8),
+    					String.valueOf(new char[] {'8', 'W', '{', 't', '2', 'r', ',', 'B'}).getBytes(StandardCharsets.UTF_8));
+    }
+
+    /**
+     * Descifra una contrase&ntilde;a
+     * @param cipheredPassword Contrase&ntilde;a cifrada en base 64.
+     * @return Contrase&ntilde;a.
+     * @throws GeneralSecurityException Cuando se produce un error durante el descifrado.
+     * @throws IOException Cuando los datos introducidos no son un base 64 v&aacute;lido.
+     * @throws NullPointerException Si se introduce una contrase&ntilde;a vac&iacute;a.
+     */
+    public static char[] decipherPassword(final String cipheredPassword) throws GeneralSecurityException, IOException {
+    	final byte[] p = CypherDataManager.decipherData(
+    			cipheredPassword.getBytes(StandardCharsets.UTF_8),
+    			String.valueOf(new char[] {'8', 'W', '{', 't', '2', 'r', ',', 'B'}).getBytes(StandardCharsets.UTF_8));
+    	return new String(p, StandardCharsets.UTF_8).toCharArray();
+    }
 }

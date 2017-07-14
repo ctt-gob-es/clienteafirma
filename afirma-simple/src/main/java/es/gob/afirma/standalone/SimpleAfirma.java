@@ -520,7 +520,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 			Updater.checkForUpdates(null);
 		}
 		else {
-			LOGGER.info("Se ha pedido no comprobar actualizaciones al inicio"); //$NON-NLS-1$
+			LOGGER.info("No se buscaran nuevas versiones de la aplicacion"); //$NON-NLS-1$
 		}
 
     	try {

@@ -23,6 +23,7 @@ import java.util.logging.Logger;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
@@ -35,6 +36,7 @@ import com.github.markusbernhardt.proxy.ProxySearch;
 import com.github.markusbernhardt.proxy.ProxySearch.Strategy;
 
 import es.gob.afirma.core.ui.AOUIFactory;
+import es.gob.afirma.standalone.ProxyUtil;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 
 /** Panel para el di&aacute;logo de configuraci&oacute; de proxy. */
@@ -69,8 +71,10 @@ final class ProxyPanel extends JPanel{
 	}
 
 	private final JPasswordField passwordProxy = new JPasswordField();
-	String getPassword() {
-		return this.passwordProxy.getPassword().toString();
+	char[] getPassword() {
+		final char[] p = this.passwordProxy.getPassword();
+		this.passwordProxy.setText(""); //$NON-NLS-1$
+		return p;
 	}
 
 	private final JCheckBox proxyCheckBox = new JCheckBox(
@@ -174,7 +178,7 @@ final class ProxyPanel extends JPanel{
 			new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					LOGGER.info("verificar"); //$NON-NLS-1$
+					LOGGER.info("Verificar"); //$NON-NLS-1$
 					ProxyPanel.this.setCursor(new Cursor(Cursor.WAIT_CURSOR));
 					final String host = ProxyPanel.this.getHost();
 					if(testConnection(host, ProxyPanel.this.getPort())){
@@ -208,7 +212,7 @@ final class ProxyPanel extends JPanel{
 			@Override
 			public void actionPerformed(
 				final ActionEvent e) {
-					LOGGER.info("verificar"); //$NON-NLS-1$
+					LOGGER.info("Autodetectar"); //$NON-NLS-1$
 					ProxyPanel.this.setCursor(new Cursor(Cursor.WAIT_CURSOR));
 					fillWithDefaultProxy();
 					ProxyPanel.this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
@@ -276,7 +280,31 @@ final class ProxyPanel extends JPanel{
 				"" //$NON-NLS-1$
 			)
 		);
+		this.usernameProxy.setText(PreferencesManager.get(
+				PreferencesManager.PREFERENCE_GENERAL_PROXY_USERNAME,
+				"" //$NON-NLS-1$
+			)
+		);
+
 		enableComponents(this.proxyCheckBox.isSelected());
+
+		final String cipheredPwd = PreferencesManager.get(
+				PreferencesManager.PREFERENCE_GENERAL_PROXY_PASSWORD,
+				"" //$NON-NLS-1$
+			);
+
+		char[] pwd;
+		try {
+			pwd = ProxyUtil.decipherPassword(cipheredPwd);
+		}
+		catch (final Exception e) {
+			pwd = null;
+			LOGGER.warning("No se pudo descifrar la contrasena del proxy. Se omitira la contrasena: " + e); //$NON-NLS-1$
+			JOptionPane.showMessageDialog(this, SimpleAfirmaMessages.getString("ProxyDialog.18")); //$NON-NLS-1$);
+		}
+
+		this.passwordProxy.setText(pwd == null ? "" : String.valueOf(pwd)); //$NON-NLS-1$
+
 	}
 
 	/** Detecci&oacute;n autom&aacute;tica de proxy. */

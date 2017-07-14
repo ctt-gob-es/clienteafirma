@@ -21,6 +21,7 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyListener;
+import java.security.GeneralSecurityException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -615,11 +616,18 @@ final class PreferencesPanelGeneral extends JPanel {
 					PreferencesManager.put(PreferencesManager.PREFERENCE_GENERAL_PROXY_HOST, host);
 					PreferencesManager.put(PreferencesManager.PREFERENCE_GENERAL_PROXY_PORT, port);
 					PreferencesManager.put(PreferencesManager.PREFERENCE_GENERAL_PROXY_USERNAME, proxyDlg.getUsername());
-					PreferencesManager.put(PreferencesManager.PREFERENCE_GENERAL_PROXY_PASSWORD, proxyDlg.getPassword());
+
+					String cipheredPwd;
+					try {
+						cipheredPwd = ProxyUtil.cipherPassword(proxyDlg.getPassword());
+						PreferencesManager.put(PreferencesManager.PREFERENCE_GENERAL_PROXY_PASSWORD, cipheredPwd);
+					} catch (final GeneralSecurityException e) {
+						JOptionPane.showMessageDialog(container, SimpleAfirmaMessages.getString("ProxyDialog.19")); //$NON-NLS-1$);
+						PreferencesManager.put(PreferencesManager.PREFERENCE_GENERAL_PROXY_PASSWORD, ""); //$NON-NLS-1$
+					}
 					ProxyUtil.setProxySettings();
 				}
 			}
-			LOGGER.warning("URL: "+  proxyDlg.getHost() + "\n Puerto: " + proxyDlg.getPort()); //$NON-NLS-1$ //$NON-NLS-2$
 			PreferencesManager.putBoolean(
 				PreferencesManager.PREFERENCE_GENERAL_PROXY_SELECTED,
 				proxyDlg.isProxySelected()

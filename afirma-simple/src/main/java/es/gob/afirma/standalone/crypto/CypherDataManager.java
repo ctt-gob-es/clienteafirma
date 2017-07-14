@@ -1,6 +1,7 @@
 package es.gob.afirma.standalone.crypto;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.security.InvalidKeyException;
 import java.util.Arrays;
@@ -14,9 +15,6 @@ public final class CypherDataManager {
 	 * cifrados en base64. */
 	private static final char PADDING_CHAR_SEPARATOR = '.';
 
-	/** Juego de carateres UTF-8. */
-	private static final String DEFAULT_URL_ENCODING = "UTF-8"; //$NON-NLS-1$
-
 	/** Descifra datos.
 	 * @param cypheredDataB64 Datos cifrados (en Base64)
 	 * @param cypherKey Clave de descifrado
@@ -28,7 +26,7 @@ public final class CypherDataManager {
 			                          final byte[] cypherKey) throws InvalidKeyException,
 			                                                         GeneralSecurityException,
 			                                                         IOException {
-		final String recoveredData = new String(cypheredDataB64, DEFAULT_URL_ENCODING).replace("_", "/").replace("-", "+"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		final String recoveredData = new String(cypheredDataB64, StandardCharsets.UTF_8).replace("_", "/").replace("-", "+"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		if (cypherKey != null) {
 			return decipherData(recoveredData, cypherKey);
 		}
