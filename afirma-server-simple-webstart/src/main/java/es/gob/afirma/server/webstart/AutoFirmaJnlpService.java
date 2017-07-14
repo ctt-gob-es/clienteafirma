@@ -65,7 +65,7 @@ public class AutoFirmaJnlpService extends HttpServlet {
 				template
 				.replace(TEMPLATE_REPLACE_CODEBASE, codebase)
 				.replace(TEMPLATE_REPLACE_ARGUMENT, arg != null && !arg.isEmpty() ?
-						"<argument>" + arg + "</argument>" : "")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+						"<argument>" + new String(Base64.decode(arg, true)) + "</argument>" : "")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		response.flushBuffer();
 	}
 
