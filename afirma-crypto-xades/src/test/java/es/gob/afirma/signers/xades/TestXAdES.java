@@ -31,6 +31,7 @@ import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 
+import es.gob.afirma.core.AOUnsupportedSignFormatException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSigner;
@@ -44,9 +45,9 @@ import es.gob.afirma.signers.xml.Utils;
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
 public final class TestXAdES {
 
-    private static final String CERT_PATH = "PFActivoFirSHA256.pfx"; //$NON-NLS-1$
-    private static final String CERT_PASS = "12341234"; //$NON-NLS-1$
-    private static final String CERT_ALIAS = "fisico activo prueba"; //$NON-NLS-1$
+    private static final String CERT_PATH = "ANCERTCCP_FIRMA.p12"; //$NON-NLS-1$
+    private static final String CERT_PASS = "1111"; //$NON-NLS-1$
+    private static final String CERT_ALIAS = "juan ejemplo espa\u00F1ol"; //$NON-NLS-1$
 
 //    private static final String CERT_PATH2 = "CATCERT GENCAT SAFP PF Identidad y Firma Reconocida de Clase 1 Caducado.pfx"; //$NON-NLS-1$
 //    private static final String CERT_PASS2 = "1234"; //$NON-NLS-1$
@@ -121,12 +122,12 @@ public final class TestXAdES {
 
     };
 
-    private static final String[] TEST_FILES_MULTISIGN = new String[] {
-            "XAdES-Detached-SHA1withRSA-B64.xml", //$NON-NLS-1$
-            "XAdES-Detached-SHA1withRSA-XML.xml", //$NON-NLS-1$
-            "XAdES-Enveloped-SHA1withRSA-XML.xml", //$NON-NLS-1$
-            "XAdES-Enveloping-SHA1withRSA-B64.xml", //$NON-NLS-1$
-            "XAdES-Enveloping-SHA1withRSA-XML.xml" //$NON-NLS-1$
+    private static final String[][] TEST_FILES_MULTISIGN = new String[][] {
+    	{"XAdES-Detached-SHA1withRSA-B64.xml", "false"}, //$NON-NLS-1$ //$NON-NLS-2$
+    	{"XAdES-Detached-SHA1withRSA-XML.xml", "false"}, //$NON-NLS-1$ //$NON-NLS-2$
+    	{"XAdES-Enveloped-SHA1withRSA-XML.xml", "true"}, //$NON-NLS-1$ //$NON-NLS-2$
+    	{"XAdES-Enveloping-SHA1withRSA-B64.xml", "false"}, //$NON-NLS-1$ //$NON-NLS-2$
+    	{"XAdES-Enveloping-SHA1withRSA-XML.xml", "false"} //$NON-NLS-1$ //$NON-NLS-2$
     };
 
     /** Prueba de firma de nodo indicado expl&iacute;citamente.
@@ -321,7 +322,9 @@ public final class TestXAdES {
 //        }
 
         for (final String algo : ALGOS) {
-          for(final String filename : TEST_FILES_MULTISIGN) {
+          for(final String[] signfile : TEST_FILES_MULTISIGN) {
+
+        	final String filename = signfile[0];
 
             prueba = "Cofirma XAdES con el algoritmo '" + //$NON-NLS-1$
             algo + "' y el fichero '" + filename + "'"; //$NON-NLS-1$ //$NON-NLS-2$
@@ -384,23 +387,39 @@ public final class TestXAdES {
         String prueba;
 
         for (final String algo : ALGOS) {
-          for(final String filename : TEST_FILES_MULTISIGN) {
+          for(final String[] signfile : TEST_FILES_MULTISIGN) {
 
-            prueba = "Cofirma XAdES con el algoritmo '" + //$NON-NLS-1$
+        	final String filename = signfile[0];
+        	final boolean isEnveloped = Boolean.parseBoolean(signfile[1]);
+
+            prueba = "Cofirma XAdES con manifest, algoritmo '" + //$NON-NLS-1$
             algo + "' y el fichero '" + filename + "'"; //$NON-NLS-1$ //$NON-NLS-2$
 
             System.out.println();
             System.out.println(prueba);
 
             final byte[] data = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(filename));
+            byte[] result;
+            try {
+	            result = signer.cosign(
+	        		data,
+	        		algo,
+	        		pke.getPrivateKey(),
+	        		pke.getCertificateChain(),
+	        		p
+	    		);
+            }
+            catch (final AOUnsupportedSignFormatException e) {
+            	if (isEnveloped) {
+            		System.out.println("Las firmas enveloped no se pueden firmar con manifest. Se pasa a la siguiente"); //$NON-NLS-1$
+            		continue;
+            	}
+				throw e;
+			}
 
-            final byte[] result = signer.cosign(
-        		data,
-        		algo,
-        		pke.getPrivateKey(),
-        		pke.getCertificateChain(),
-        		p
-    		);
+            if (isEnveloped) {
+            	Assert.fail("Las firmas enveloped con manifest no existen y deben lanzar un error"); //$NON-NLS-1$
+            }
 
             final File f = File.createTempFile(algo + "-" + filename.replace(".xml", "") + "-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
             try (
@@ -441,7 +460,9 @@ public final class TestXAdES {
         String prueba;
 
         for (final String algo : ALGOS) {
-          for(final String filename : TEST_FILES_MULTISIGN) {
+          for(final String[] signfile : TEST_FILES_MULTISIGN) {
+
+          	final String filename = signfile[0];
 
             prueba = "Contrafirma XAdES con el algoritmo '" + //$NON-NLS-1$
             algo + "' y el fichero '" + filename + "'"; //$NON-NLS-1$ //$NON-NLS-2$
@@ -501,7 +522,9 @@ public final class TestXAdES {
         String prueba;
 
         for (final String algo : ALGOS) {
-          for(final String filename : TEST_FILES_MULTISIGN) {
+          for(final String[] signfile : TEST_FILES_MULTISIGN) {
+
+            final String filename = signfile[0];
 
             prueba = "Contrafirma XAdES con el algoritmo '" + //$NON-NLS-1$
             algo + "' y el fichero '" + filename + "'"; //$NON-NLS-1$ //$NON-NLS-2$
