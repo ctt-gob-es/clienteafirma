@@ -2,9 +2,6 @@ package es.gob.afirma.standalone.ws;
 
 import java.io.File;
 
-import javax.jnlp.BasicService;
-import javax.jnlp.ServiceManager;
-
 import es.gob.afirma.standalone.SimpleAfirma;
 import es.gob.afirma.standalone.VisorFirma;
 
@@ -23,11 +20,6 @@ public class AutoFirmaWebStart {
 	 */
 	public static void main(final String[] args) {
 
-		// Si detectamos que se ejecuta esta aplicacion como parte del proceso de instalacion,
-		// no hacemos nada
-		if (isInstallationProcess(args)) {
-			System.exit(0);
-		}
 
 		// Se ha hecho doble-clic sobre un fichero asociado a AutoFirma
 		if (args != null && args.length == 2 && PARAM_OPEN.equalsIgnoreCase(args[0])) {
@@ -37,28 +29,6 @@ public class AutoFirmaWebStart {
 		else {
 			openApp(args);
 		}
-	}
-
-	/**
-	 * Indica si nos encontramos durante el proceso de instalacion JNLP de AutoFirma
-	 * o si se trata de una ejecuci&oacute;n corriente.
-	 * @return {@code true} si estamos en la instalaci&oacute;n de AutoFirma, {@code false}
-	 * en caso contrario.
-	 */
-	private static boolean isInstallationProcess(final String[] args) {
-
-		if (args != null && args.length > 0) {
-			return false;
-		}
-
-		try {
-			return !((BasicService) ServiceManager.lookup("javax.jnlp.BasicService")).isOffline(); //$NON-NLS-1$
-		} catch (final Throwable e) {
-			// No se ha podido cargar el servicio JNLP. Entendemos que estamos en
-			// una ejecucion corriente
-		}
-
-		return false;
 	}
 
 	/**
