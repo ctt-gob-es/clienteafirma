@@ -132,10 +132,6 @@ public final class ProxyUtil {
 			);
 			modified = true;
 		}
-		else {
-			System.setProperty("https.proxyHost", systemHttpProxyHost); //$NON-NLS-1$
-			System.setProperty("https.proxyPort", systemHttpProxyPort); //$NON-NLS-1$
-		}
 
 		if (systemFtpProxyHost != null && systemFtpProxyPort != null) {
 			System.setProperty("ftp.proxyHost", systemFtpProxyHost); //$NON-NLS-1$
