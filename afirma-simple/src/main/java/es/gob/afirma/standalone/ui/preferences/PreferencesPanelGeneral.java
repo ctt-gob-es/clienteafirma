@@ -600,7 +600,7 @@ final class PreferencesPanelGeneral extends JPanel {
 						JOptionPane.ERROR_MESSAGE
 					);
 					changeProxyDlg(container);
-					LOGGER.warning("El host no puede ser nulo o vacia"); //$NON-NLS-1$
+					LOGGER.warning("El host no puede ser nulo o vacio"); //$NON-NLS-1$
 				}
 				else if(port == null || port == "") { //$NON-NLS-1$
 					AOUIFactory.showErrorMessage(
@@ -620,18 +620,26 @@ final class PreferencesPanelGeneral extends JPanel {
 					String cipheredPwd;
 					try {
 						cipheredPwd = ProxyUtil.cipherPassword(proxyDlg.getPassword());
-						PreferencesManager.put(PreferencesManager.PREFERENCE_GENERAL_PROXY_PASSWORD, cipheredPwd);
-					} catch (final GeneralSecurityException e) {
+						if (cipheredPwd != null) {
+							PreferencesManager.put(PreferencesManager.PREFERENCE_GENERAL_PROXY_PASSWORD, cipheredPwd);
+						}
+					}
+					catch (final GeneralSecurityException e) {
 						JOptionPane.showMessageDialog(container, SimpleAfirmaMessages.getString("ProxyDialog.19")); //$NON-NLS-1$);
 						PreferencesManager.put(PreferencesManager.PREFERENCE_GENERAL_PROXY_PASSWORD, ""); //$NON-NLS-1$
 					}
-					ProxyUtil.setProxySettings();
 				}
+
 			}
+
 			PreferencesManager.putBoolean(
 				PreferencesManager.PREFERENCE_GENERAL_PROXY_SELECTED,
 				proxyDlg.isProxySelected()
 			);
+
+			// Aplicamos los valores tanto si el checkbox esta marcado o no, en un caso lo establecera y en en otro lo
+			// eliminara
+			ProxyUtil.setProxySettings();
     	}
     }
 

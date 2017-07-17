@@ -5,10 +5,7 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
@@ -89,7 +86,7 @@ final class ProxyPanel extends JPanel{
 
 	private final JButton autodetectProxyBtn = new JButton(SimpleAfirmaMessages.getString("ProxyDialog.11")); //$NON-NLS-1$
 
-	/** Constructor	 */
+	/** Constructor. */
 	ProxyPanel() {
 		setLayout(new GridBagLayout());
 		final GridBagConstraints c = new GridBagConstraints();
@@ -115,15 +112,12 @@ final class ProxyPanel extends JPanel{
 			)
 		);
 		this.proxyCheckBox.addItemListener(
-			new ItemListener() {
-				@Override
-				public void itemStateChanged(final ItemEvent e) {
-					if (e.getStateChange() == ItemEvent.SELECTED) {
-						enableComponents(true);
-					}
-					else {
-						enableComponents(false);
-					}
+			e -> {
+				if (e.getStateChange() == ItemEvent.SELECTED) {
+					enableComponents(true);
+				}
+				else {
+					enableComponents(false);
 				}
 			}
 		);
@@ -175,32 +169,29 @@ final class ProxyPanel extends JPanel{
     	);
 		this.checkConnectionBtn.setMnemonic('V');
 		this.checkConnectionBtn.addActionListener(
-			new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					LOGGER.info("Verificar"); //$NON-NLS-1$
-					ProxyPanel.this.setCursor(new Cursor(Cursor.WAIT_CURSOR));
-					final String host = ProxyPanel.this.getHost();
-					if(testConnection(host, ProxyPanel.this.getPort())){
-						LOGGER.info("Conexion proxy correcta"); //$NON-NLS-1$
-						AOUIFactory.showMessageDialog(
-							getParent(),
-							SimpleAfirmaMessages.getString("ProxyDialog.9"), //$NON-NLS-1$
-							SimpleAfirmaMessages.getString("ProxyDialog.8"), //$NON-NLS-1$
-							AOUIFactory.INFORMATION_MESSAGE
-						);
-					}
-					else {
-						LOGGER.info("Conexion proxy incorrecta"); //$NON-NLS-1$
-						AOUIFactory.showMessageDialog(
-							getParent(),
-							SimpleAfirmaMessages.getString("ProxyDialog.10"), //$NON-NLS-1$
-							SimpleAfirmaMessages.getString("ProxyDialog.8"), //$NON-NLS-1$
-							AOUIFactory.ERROR_MESSAGE
-						);
-					}
-					ProxyPanel.this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+			e -> {
+				LOGGER.info("Verificar"); //$NON-NLS-1$
+				ProxyPanel.this.setCursor(new Cursor(Cursor.WAIT_CURSOR));
+				final String host = ProxyPanel.this.getHost();
+				if(testConnection(host, ProxyPanel.this.getPort())){
+					LOGGER.info("Conexion proxy correcta"); //$NON-NLS-1$
+					AOUIFactory.showMessageDialog(
+						getParent(),
+						SimpleAfirmaMessages.getString("ProxyDialog.9"), //$NON-NLS-1$
+						SimpleAfirmaMessages.getString("ProxyDialog.8"), //$NON-NLS-1$
+						AOUIFactory.INFORMATION_MESSAGE
+					);
 				}
+				else {
+					LOGGER.info("Conexion proxy incorrecta"); //$NON-NLS-1$
+					AOUIFactory.showMessageDialog(
+						getParent(),
+						SimpleAfirmaMessages.getString("ProxyDialog.10"), //$NON-NLS-1$
+						SimpleAfirmaMessages.getString("ProxyDialog.8"), //$NON-NLS-1$
+						AOUIFactory.ERROR_MESSAGE
+					);
+				}
+				ProxyPanel.this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 			}
 		);
 
@@ -208,16 +199,12 @@ final class ProxyPanel extends JPanel{
     		SimpleAfirmaMessages.getString("ProxyDialog.13") //$NON-NLS-1$
     	);
 		this.autodetectProxyBtn.setMnemonic('A');
-		this.autodetectProxyBtn.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(
-				final ActionEvent e) {
-					LOGGER.info("Autodetectar"); //$NON-NLS-1$
-					ProxyPanel.this.setCursor(new Cursor(Cursor.WAIT_CURSOR));
-					fillWithDefaultProxy();
-					ProxyPanel.this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-				}
-			}
+		this.autodetectProxyBtn.addActionListener(e -> {
+			LOGGER.info("Autodetectar"); //$NON-NLS-1$
+			ProxyPanel.this.setCursor(new Cursor(Cursor.WAIT_CURSOR));
+			fillWithDefaultProxy();
+			ProxyPanel.this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+		}
 		);
 
 
@@ -289,9 +276,9 @@ final class ProxyPanel extends JPanel{
 		enableComponents(this.proxyCheckBox.isSelected());
 
 		final String cipheredPwd = PreferencesManager.get(
-				PreferencesManager.PREFERENCE_GENERAL_PROXY_PASSWORD,
-				"" //$NON-NLS-1$
-			);
+			PreferencesManager.PREFERENCE_GENERAL_PROXY_PASSWORD,
+			"" //$NON-NLS-1$
+		);
 
 		char[] pwd;
 		try {
@@ -301,6 +288,12 @@ final class ProxyPanel extends JPanel{
 			pwd = null;
 			LOGGER.warning("No se pudo descifrar la contrasena del proxy. Se omitira la contrasena: " + e); //$NON-NLS-1$
 			JOptionPane.showMessageDialog(this, SimpleAfirmaMessages.getString("ProxyDialog.18")); //$NON-NLS-1$);
+			// Eliminamos la contrasena mal cifrada de las preferencias
+			// Si no la eliminamos, el dialogo de error persistiria aunque tuviesemos sin marcar
+			// la casilla de "Usar proxy", obligandonos a establecer una solo para evitar el error
+			PreferencesManager.remove(
+				PreferencesManager.PREFERENCE_GENERAL_PROXY_PASSWORD
+			);
 		}
 
 		this.passwordProxy.setText(pwd == null ? "" : String.valueOf(pwd)); //$NON-NLS-1$
