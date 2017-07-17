@@ -14,9 +14,9 @@ var originalXMLHttpRequest = window.XMLHttpRequest;
 
 var MiniApplet = ( function ( window, undefined ) {
 
-		var VERSION = "1.5";
+		var VERSION = "1.6";
 
-		var JAR_NAME = 'miniapplet-full_1_5.jar';
+		var JAR_NAME = 'miniapplet-full_1_6.jar';
 
 		var JAVA_ARGUMENTS = '-Xms512M -Xmx512M ';
 
@@ -38,7 +38,7 @@ var MiniApplet = ( function ( window, undefined ) {
 
 		var selectedLocale = null;
 		
-		var stickySignatore = false;
+		var stickySignatory = false;
 
 		var LOCALIZED_STRINGS = new Array();
 		LOCALIZED_STRINGS["es_ES"] = {
@@ -537,23 +537,12 @@ var MiniApplet = ( function ( window, undefined ) {
 
 			loadMiniApplet(attributes, parameters);
 
-			if (isFirefox()) {
-				clienteFirma = document.getElementById("miniApplet");
+			clienteFirma = document.getElementById("miniApplet");
 
-				// Si no esta definido el cliente es porque se ha intentado cargar el applet
-				// y no se ha podido, asi que se usara la aplicacion nativa
-				if (clienteFirma == null) {
-					cargarAppAfirma(codeBase, defaultKeyStore);
-				}
-			}
-			else {
-				clienteFirma = document.getElementById("miniApplet");
-
-				// Si no esta definido el cliente es porque se ha intentado cargar el applet
-				// y no se ha podido, asi que se usara la aplicacion nativa
-				if (clienteFirma == null) {
-					cargarAppAfirma(codeBase, defaultKeyStore);
-				}
+			// Si no esta definido el cliente es porque se ha intentado cargar el applet
+			// y no se ha podido, asi que se usara la aplicacion nativa
+			if (clienteFirma == null) {
+				cargarAppAfirma(codeBase, defaultKeyStore);
 			}
 		}
 
@@ -585,7 +574,7 @@ var MiniApplet = ( function ( window, undefined ) {
 			clienteFirma.setKeyStore(ksType != null ? ksType : defaultKeyStore);
 			
 			// Al haber cambiado el almacen, no tiene sentido que la variable sticky este a true
-			setStickySignatore(false);
+			setStickySignatory(false);
 		}
 		
 		var selectCertificate = function (params, successCallback, errorCallback) {
@@ -871,7 +860,7 @@ var MiniApplet = ( function ( window, undefined ) {
 		}
 
 		/**
-		 * Establece el valor de la variable "stickySignatore" que permite fijar
+		 * Establece el valor de la variable "stickySignatory" que permite fijar
 		 * un certicado seleccionado para futuras invocaciones, de modo que no
 		 * sea necesario volver a seleccionarlo mientras el valor sea true o
 		 * caduque la conexion en caso de invocacion por protocolo/socket
@@ -887,7 +876,7 @@ var MiniApplet = ( function ( window, undefined ) {
 				// En caso de no cargar el applet y utilizar autofirma, se
 				// establecera la variable con el valor seleccionado para su
 				// posterior uso en cada invocacion por protocolo
-				stickySignatore = sticky;
+				stickySignatory = sticky;
 			}
 
 		}
@@ -1012,7 +1001,9 @@ var MiniApplet = ( function ( window, undefined ) {
 					clientType = TYPE_APPLET;
 				}
 				else if (clientType == null) {
-					cargarAppAfirma(codeBase, defaultKeyStore);	
+					// Inicializamos la carga de la aplicacion nativa, indicando que no se
+					// haga una precarga con JNLP, ya que ahora estamos en medio de una operacion
+					cargarAppAfirma(codeBase, defaultKeyStore, true);
 				}
 				setServlets(storageServletAddress, retrieverServletAddress);
 			}
@@ -1145,7 +1136,7 @@ var MiniApplet = ( function ( window, undefined ) {
 		 *  - No se fuerce el uso del servidor intermedio.
 		 * En caso contrario, la comunicacion se realizara mediante un servidor intermedio.
 		 */
-		function cargarAppAfirma(clientAddress, keystore) {
+		function cargarAppAfirma(clientAddress, keystore, avoidJnlpLoad) {
 			
 			if (!keystore) {
 				keystore = getDefaultKeystore();
@@ -1165,9 +1156,10 @@ var MiniApplet = ( function ( window, undefined ) {
 			// Si se dan las condiciones que requieren el uso de la aplicacion nativa,
 			// por entorno o porque se haya configurado para su uso, se intenta cargar
 			// esta version
-			if (!needNativeAppInstalled() && !!jnlpServiceAddress) {
+			if (!avoidJnlpLoad && !needNativeAppInstalled() && !!jnlpServiceAddress) {
+				// Aplicamos un retardo en la carga de la aplicacion WebStart para dar tiempo a cargar la pagina
 				var jnlpUrl = "jnlp" + jnlpServiceAddress.substring(4) + "?os=" + getOSName() + "&arg=" + encodeURIComponent("afirma://service?op=install");
-				setTimeout(openUrl, 3000, jnlpUrl);
+				setTimeout(openUrl, 2000, jnlpUrl);
 			}
 		}
 
@@ -1299,7 +1291,7 @@ var MiniApplet = ( function ( window, undefined ) {
 				data.properties = generateDataKeyValue ("properties", extraParams != null ? Base64.encode(extraParams) : null);
 				data.keystore = generateDataKeyValue ("keystore", defaultKeyStore != null ? defaultKeyStore : null);
 				data.ksb64 = generateDataKeyValue ("ksb64", defaultKeyStore != null ? Base64.encode(defaultKeyStore) : null);
-				data.sticky = generateDataKeyValue ("sticky", stickySignatore);
+				data.sticky = generateDataKeyValue ("sticky", stickySignatory);
 				
 				execAppIntent(buildUrl(data));
 			}
@@ -1425,7 +1417,7 @@ var MiniApplet = ( function ( window, undefined ) {
 				data.batchpostsignerurl = generateDataKeyValue("batchpostsignerurl", batchPostSignerUrl);
 				data.properties = generateDataKeyValue ("properties", extraParams != null ? Base64.encode(extraParams) : null);
 				data.dat = generateDataKeyValue ("dat",  batchB64 == "" ? null : batchB64);
-				data.sticky = generateDataKeyValue ("sticky", stickySignatore);
+				data.sticky = generateDataKeyValue ("sticky", stickySignatory);
 
 				return data;
 			}
@@ -1523,7 +1515,7 @@ var MiniApplet = ( function ( window, undefined ) {
 				data.format = generateDataKeyValue ("format", format); 
 				data.properties = generateDataKeyValue ("properties", extraParams != null ? Base64.encode(extraParams) : null);
 				data.dat = generateDataKeyValue ("dat", dataB64 == "" ? null : dataB64);
-				data.sticky = generateDataKeyValue ("sticky", stickySignatore);
+				data.sticky = generateDataKeyValue ("sticky", stickySignatory);
 
 				return data;
 			}
@@ -1543,7 +1535,7 @@ var MiniApplet = ( function ( window, undefined ) {
 				data.properties = generateDataKeyValue ("properties", extraParams != null ? Base64.encode(extraParams) : null);
 				data.filename = generateDataKeyValue ("filename", outputFileName);
 				data.dat = generateDataKeyValue ("dat", dataB64 == "" ? null : dataB64);
-				data.sticky = generateDataKeyValue ("sticky", stickySignatore);
+				data.sticky = generateDataKeyValue ("sticky", stickySignatory);
 
 				return data;
 			}
