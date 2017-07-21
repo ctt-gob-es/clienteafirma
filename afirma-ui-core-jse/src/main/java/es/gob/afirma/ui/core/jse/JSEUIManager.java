@@ -551,7 +551,7 @@ public class JSEUIManager implements AOUIManager {
                         );
 	                    if (selectedOption == JOptionPane.CANCEL_OPTION) {
 	                        LOGGER.info("Se ha cancelado la operacion de guardado."); //$NON-NLS-1$
-	                        return null;
+	                        throw new AOCancelledOperationException();
 	                    }
 	                    // Si se ha seleccionado la opcion YES (se desea
 	                    // sobreescribir) continuamos
