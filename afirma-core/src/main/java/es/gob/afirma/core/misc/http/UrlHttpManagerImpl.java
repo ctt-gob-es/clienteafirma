@@ -53,7 +53,10 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
-	private static final String JAVA_PARAM_DISABLE_SSL_CHECKS = "disableSslChecks"; //$NON-NLS-1$
+	/** Nombre de la propiedad a establecer a <code>true</code> para deshabilitar las comprobaciones
+	 * de confianza SSL en las peticiones. Si se establece a <code>false</code> o no se establece se
+	 * usa la confianza por defecto de la JVM. */
+	public static final String JAVA_PARAM_DISABLE_SSL_CHECKS = "disableSslChecks"; //$NON-NLS-1$
 
 	/** Tiempo de espera por defecto para descartar una conexi&oacute;n HTTP. */
 	public static final int DEFAULT_TIMEOUT = -1;
