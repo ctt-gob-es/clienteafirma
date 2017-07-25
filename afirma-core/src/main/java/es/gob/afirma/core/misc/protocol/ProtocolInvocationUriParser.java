@@ -116,7 +116,7 @@ public final class ProtocolInvocationUriParser {
 	public static UrlParametersForBatch getParametersForBatch(final byte[] xml) throws ParameterException {
 		return ProtocolInvocationUriParserUtil.getParametersForBatch(ProtocolInvocationUriParserUtil.parseXml(xml));
 	}
-	
+
 	/** Recupera de una URI todos los par&aacute;metros necesarios para la configuraci&oacute;n de una
 	 * operaci&oacute;n de carga de datos.Si falta alg&uacute;n par&aacute;metro o
 	 * es err&oacute;neo se lanzar&aacute; una excepci&oacute;n.
@@ -126,7 +126,7 @@ public final class ProtocolInvocationUriParser {
 	public static UrlParametersToLoad getParametersToLoad(final String uri) throws ParameterException {
 		return ProtocolInvocationUriParserUtil.getParametersToLoad(parserUri(uri));
 	}
-	
+
 	/** Recupera de una URI todos los par&aacute;metros necesarios para la configuraci&oacute;n de una
 	 * operaci&oacute;n de carga de datos.Si falta alg&uacute;n par&aacute;metro o
 	 * es err&oacute;neo se lanzar&aacute; una excepci&oacute;n.
@@ -136,7 +136,7 @@ public final class ProtocolInvocationUriParser {
 	public static UrlParametersToLoad getParametersToLoad(final byte[] xml) throws ParameterException {
 		return ProtocolInvocationUriParserUtil.getParametersToLoad(ProtocolInvocationUriParserUtil.parseXml(xml));
 	}
-	
+
 	/** Recupera de una URI todos los par&aacute;metros necesarios para la configuraci&oacute;n de una
 	 * operaci&oacute;n de carga de datos.Si falta alg&uacute;n par&aacute;metro o
 	 * es err&oacute;neo se lanzar&aacute; una excepci&oacute;n.
@@ -146,7 +146,7 @@ public final class ProtocolInvocationUriParser {
 	public static UrlParametersToGetCurrentLog getParametersToGetCurrentLog(final String uri) throws ParameterException {
 		return ProtocolInvocationUriParserUtil.getParametersToGetCurrentLog(parserUri(uri));
 	}
-	
+
 	/** Recupera de una URI todos los par&aacute;metros necesarios para la configuraci&oacute;n de una
 	 * operaci&oacute;n de carga de datos.Si falta alg&uacute;n par&aacute;metro o
 	 * es err&oacute;neo se lanzar&aacute; una excepci&oacute;n.
@@ -161,7 +161,7 @@ public final class ProtocolInvocationUriParser {
 	 * @param uri URL de llamada.
 	 * @return Devuelve una tabla <i>hash</i> con cada par&aacute;metro asociado a un valor. */
 	private static Map<String, String> parserUri(final String uri) {
-		final Map<String, String> params = new HashMap<String, String>();
+		final Map<String, String> params = new HashMap<>();
 		final String[] parameters = uri.substring(uri.indexOf('?') + 1).split("&"); //$NON-NLS-1$
 		for (final String param : parameters) {
 			if (param.indexOf('=') > 0) {

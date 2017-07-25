@@ -40,13 +40,13 @@ public final class OfficeAnalizer {
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
     /** MimeTypes reconocidos del formato OOXML. */
-    private static final Set<String> OOXML_MIMETYPES = new HashSet<String>(17);
+    private static final Set<String> OOXML_MIMETYPES = new HashSet<>(17);
 
     /** MimeTypes reconocidos del formato ODF. */
-    private static final Set<String> ODF_MIMETYPES = new HashSet<String>(15);
+    private static final Set<String> ODF_MIMETYPES = new HashSet<>(15);
 
     /** Extensiones de fichero asignadas a cada uno de los mimetypes. */
-    private static final Map<String, String> FILE_EXTENSIONS = new HashMap<String, String>();
+    private static final Map<String, String> FILE_EXTENSIONS = new HashMap<>();
 
     static {
         // MimeTypes reconocidos del formato OOXML
@@ -107,14 +107,14 @@ public final class OfficeAnalizer {
      * proporcionado (ODF u OOXML). Si el fichero no se corresponde con ninguno
      * de ellos pero es un Zip se devolver&aacute; el MimeType del Zip
      * (application/zip) y si no es Zip se devolver&aacute; {@code null}.
-     * @param data Fichero ODF, OOXML o Microsoft Office 97/2003
+     * @param data Fichero ODF, OOXML o Microsoft Office 97/2003.
      * @return MimeType.
-     * @throws IOException Si no se puede leer el fichero */
+     * @throws IOException Si no se puede leer el fichero, */
     static String getMimeType(final byte[] data) throws IOException {
 
-        ZipFile zipFile = null;
-        try {
-            zipFile = AOFileUtils.createTempZipFile(data);
+        try (
+    		final ZipFile zipFile = AOFileUtils.createTempZipFile(data);
+		) {
             String mimetype = ZIP_MIMETYPE;
             String tempMimetype = null;
             if (isODFFile(zipFile)) {
@@ -134,12 +134,6 @@ public final class OfficeAnalizer {
         catch (final ZipException e1) {
             LOGGER.warning("El fichero indicado no es un ZIP: " + e1); //$NON-NLS-1$
         }
-        finally {
-        	if (zipFile != null) {
-        		zipFile.close();
-        	}
-        }
-
 
     	final String retVal = getMimeTypeOffice97(data);
 
@@ -177,8 +171,7 @@ public final class OfficeAnalizer {
      * proporcionado (ODF u OOXML). Si el fichero no se corresponde con ninguno
      * de ellos pero es un Zip se devolver&aacute; la extensi&oacute;n "zip"
      * y si no es Zip se devolver&aacute; {@code null}.
-     * @param zipData
-     *        Fichero ODF u OOXML
+     * @param zipData Fichero ODF u OOXML.
      * @return Extensi&oacute;n.
      * @throws IOException Cuando ocurre alg&uacute;n error en la lectura de los datos. */
     static String getExtension(final byte[] zipData) throws IOException {
@@ -190,15 +183,15 @@ public final class OfficeAnalizer {
     }
 
     /** Indica si un fichero tiene la estructura de un documento OOXML.
-     * @param document
-     *        Fichero a analizar
+     * @param document Fichero a analizar.
      * @return Devuelve <code>true</code> si el fichero era un OOXML, <code>false</code> en caso contrario.
-     * @throws IOException SI ocurren problemas leyendo el fichero */
+     * @throws IOException Si ocurren problemas leyendo el fichero. */
     public static boolean isOOXMLDocument(final byte[] document) throws IOException {
-        final ZipFile zipFile = AOFileUtils.createTempZipFile(document);
-        final boolean ret = isOOXMLFile(zipFile);
-        zipFile.close();
-        return ret;
+    	try (
+			final ZipFile zipFile = AOFileUtils.createTempZipFile(document);
+		) {
+    		return isOOXMLFile(zipFile);
+    	}
     }
 
     /** Indica si un fichero Zip tiene la estructura de un documento OOXML
@@ -215,8 +208,7 @@ public final class OfficeAnalizer {
 
     /** Recupera el MimeType del XML "[Content_Type].xml" de un OOXML. Si el
      * documento no es correcto o no se reconoce el Mimetype se devuelve null.
-     * @param contentTypeIs
-     *        XML "[Content_Type].xml".
+     * @param contentTypeIs XML "[Content_Type].xml".
      * @return Devuelve el MimeType del OOXML o, si no es un OOXML reconocido,
      *         devuelve {@code null}. */
     public static String getOOXMLMimeType(final InputStream contentTypeIs) {
@@ -264,21 +256,20 @@ public final class OfficeAnalizer {
     }
 
     /** Indica si un fichero tiene la estructura de un documento ODF.
-     * @param document
-     *        Fichero a analizar
+     * @param document Fichero a analizar.
      * @return Devuelve <code>true</code> si el fichero era un ODF, <code>false</code> en caso contrario.
-     * @throws IOException Si ocurren problemas leyendo el fichero */
+     * @throws IOException Si ocurren problemas leyendo el fichero. */
     public static boolean isODFDocument(final byte[] document) throws IOException {
-        final ZipFile zipFile = AOFileUtils.createTempZipFile(document);
-        final boolean ret = isODFFile(zipFile);
-        zipFile.close();
-        return ret;
+    	try (
+			final ZipFile zipFile = AOFileUtils.createTempZipFile(document);
+		) {
+    		return isODFFile(zipFile);
+    	}
     }
 
     /** Indica si un fichero Zip tiene la estructura de un documento ODF
      * soportado.
-     * @param zipFile
-     *        Fichero zip que deseamos comprobar.
+     * @param zipFile Fichero Zip que deseamos comprobar.
      * @return Devuelve <code>true</code> si el fichero era un ODF soportado, <code>false</code> en caso contrario. */
     private static boolean isODFFile(final ZipFile zipFile) {
         // Comprobamos si estan todos los ficheros principales del documento
@@ -307,8 +298,7 @@ public final class OfficeAnalizer {
 
     /** Recupera la extensi&oacute;n apropiada para un documento ODF. Si el
      * fichero no era un documento ODF soportado, se devolver&aacute; <code>null</code>.
-     * @param contentTypeIs
-     *        Fichero del que deseamos obtener la extensi&oacute;n.
+     * @param contentTypeIs Fichero del que deseamos obtener la extensi&oacute;n.
      * @return Extensi&oacute;n del documento. */
     private static String getODFMimeType(final InputStream contentTypeIs) {
         final String contentTypeData;

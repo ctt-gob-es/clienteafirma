@@ -14,6 +14,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.logging.Logger;
 import java.util.zip.ZipFile;
 
@@ -40,15 +41,16 @@ public final class AOFileUtils {
 	 * @throws java.util.zip.ZipException Cuando los datos no eran realmente un Zip.
 	 * @throws IOException Cuando ocurre un error al leer los datos o crear el temporal
 	 *                     para abrir el Zip. */
-	public static ZipFile createTempZipFile(final byte[] zipFileData)
-			throws IOException {
+	public static ZipFile createTempZipFile(final byte[] zipFileData) throws IOException {
 
 		// Creamos un fichero temporal
 		final File tempFile = File.createTempFile("afirmazip", null); //$NON-NLS-1$
-		final FileOutputStream fos = new FileOutputStream(tempFile);
-		fos.write(zipFileData);
-		fos.flush();
-		fos.close();
+		try (
+			final OutputStream fos = new FileOutputStream(tempFile);
+		) {
+			fos.write(zipFileData);
+			fos.flush();
+		}
 		tempFile.deleteOnExit();
 		return new ZipFile(tempFile);
 	}

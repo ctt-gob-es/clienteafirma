@@ -52,26 +52,25 @@ public final class DataDownloader {
 		}
 
 		if (dataSource.startsWith("ftp://")) { //$NON-NLS-1$
-		 	final InputStream ftpStream = new URL(dataSource).openStream();
-			final byte[] data = AOUtil.getDataFromInputStream(ftpStream);
-			ftpStream.close();
-			return data;
+			try (
+				final InputStream ftpStream = new URL(dataSource).openStream();
+			) {
+				return AOUtil.getDataFromInputStream(ftpStream);
+			}
 		}
 
 		if (dataSource.startsWith("file:/")) { //$NON-NLS-1$
-				try {
-					final InputStream is = AOUtil.loadFile(new URI(dataSource));
-					final InputStream bis = new BufferedInputStream(is);
-					final byte[] ret = AOUtil.getDataFromInputStream(bis);
-					bis.close();
-					is.close();
-					return ret;
-				}
-				catch (final URISyntaxException e) {
-					throw new IOException(
-						"Error leyendo el fichero (" + dataSource + "): " + e, e //$NON-NLS-1$ //$NON-NLS-2$
-					);
-				}
+			try (
+				final InputStream is = AOUtil.loadFile(new URI(dataSource));
+				final InputStream bis = new BufferedInputStream(is);
+			) {
+				return AOUtil.getDataFromInputStream(bis);
+			}
+			catch (final URISyntaxException e) {
+				throw new IOException(
+					"Error leyendo el fichero (" + dataSource + "): " + e, e //$NON-NLS-1$ //$NON-NLS-2$
+				);
+			}
 		}
 
 		// No son URL, son los datos en si

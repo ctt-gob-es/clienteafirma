@@ -74,34 +74,35 @@ public final class ASiCUtil {
 		}
 
 		final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		final ZipOutputStream zos = new ZipOutputStream(baos);
-		zos.setComment("mimetype=" + ASIC_S_MIMETYPE); //$NON-NLS-1$
+		try (
+			final ZipOutputStream zos = new ZipOutputStream(baos);
+		) {
+			zos.setComment("mimetype=" + ASIC_S_MIMETYPE); //$NON-NLS-1$
 
-		// El MIME-Type
-		ZipEntry ze = new ZipEntry(ENTRY_NAME_MIMETYPE);
-		zos.putNextEntry(ze);
-		zos.write(ASIC_S_MIMETYPE.getBytes());
+			// El MIME-Type
+			ZipEntry ze = new ZipEntry(ENTRY_NAME_MIMETYPE);
+			zos.putNextEntry(ze);
+			zos.write(ASIC_S_MIMETYPE.getBytes());
 
-		// Los datos
-		final String entryName;
-		if (dataFilename != null) {
-			entryName = dataFilename;
+			// Los datos
+			final String entryName;
+			if (dataFilename != null) {
+				entryName = dataFilename;
+			}
+			else {
+				entryName = getASiCSDefaultDataFilename(data);
+			}
+			ze = new ZipEntry(
+				entryName
+			);
+			zos.putNextEntry(ze);
+			zos.write(data);
+
+			// La firma
+			ze = new ZipEntry(signatureFilename != null ? signatureFilename : ENTRY_NAME_BINARY_SIGNATURE);
+			zos.putNextEntry(ze);
+			zos.write(signature);
 		}
-		else {
-			entryName = getASiCSDefaultDataFilename(data);
-		}
-		ze = new ZipEntry(
-			entryName
-		);
-		zos.putNextEntry(ze);
-		zos.write(data);
-
-		// La firma
-		ze = new ZipEntry(signatureFilename != null ? signatureFilename : ENTRY_NAME_BINARY_SIGNATURE);
-		zos.putNextEntry(ze);
-		zos.write(signature);
-
-		zos.close();
 
 		return baos.toByteArray();
 	}
@@ -138,13 +139,14 @@ public final class ASiCUtil {
 				"La firma entrada de firma del ASiC no puede ser nula" //$NON-NLS-1$
 			);
 		}
-		final ZipInputStream zis = new ZipInputStream(new ByteArrayInputStream(asic));
-		ZipEntry entry;
-		while((entry = zis.getNextEntry()) != null) {
-			if (signatureFilename.equals(entry.getName())) {
-				final byte[] sig = AOUtil.getDataFromInputStream(zis);
-				zis.close();
-				return sig;
+		try (
+			final ZipInputStream zis = new ZipInputStream(new ByteArrayInputStream(asic));
+		) {
+			ZipEntry entry;
+			while((entry = zis.getNextEntry()) != null) {
+				if (signatureFilename.equals(entry.getName())) {
+					return AOUtil.getDataFromInputStream(zis);
+				}
 			}
 		}
 		throw new IOException(
@@ -162,16 +164,17 @@ public final class ASiCUtil {
 				"La firma ASiC proporcionada no puede ser nula ni vacia" //$NON-NLS-1$
 			);
 		}
-		final ZipInputStream zis = new ZipInputStream(new ByteArrayInputStream(asic));
-		ZipEntry entry;
-		while((entry = zis.getNextEntry()) != null) {
-			if (!ENTRY_NAME_BINARY_SIGNATURE.equals(entry.getName()) &&
-				!ENTRY_NAME_XML_SIGNATURE.equals(entry.getName()) &&
-				!ENTRY_NAME_MIMETYPE.equals(entry.getName())
-			) {
-				final byte[] data = AOUtil.getDataFromInputStream(zis);
-				zis.close();
-				return data;
+		try (
+			final ZipInputStream zis = new ZipInputStream(new ByteArrayInputStream(asic));
+		) {
+			ZipEntry entry;
+			while((entry = zis.getNextEntry()) != null) {
+				if (!ENTRY_NAME_BINARY_SIGNATURE.equals(entry.getName()) &&
+					!ENTRY_NAME_XML_SIGNATURE.equals(entry.getName()) &&
+					!ENTRY_NAME_MIMETYPE.equals(entry.getName())
+				) {
+					return AOUtil.getDataFromInputStream(zis);
+				}
 			}
 		}
 		throw new IOException("Los datos proporcionados no son una firma ASiC-S"); //$NON-NLS-1$

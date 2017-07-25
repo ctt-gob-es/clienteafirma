@@ -142,12 +142,14 @@ public final class MimeHelper {
      * @throws IOException Cuando hay errores en la carga del fichero de propiedades */
     private static void loadOidMimetypeProperties() throws IOException {
         oidMimetypeProp = new Properties();
-        final InputStream isProp = MimeHelper.class.getClassLoader().getResourceAsStream("resources/mimetypes_oids.properties"); //$NON-NLS-1$
-        if (isProp == null) {
-        	throw new IOException("No se ha encontrado el fichero de recursos para la relacion entre OIDs y MimeTypes"); //$NON-NLS-1$
+        try (
+    		final InputStream isProp = MimeHelper.class.getClassLoader().getResourceAsStream("resources/mimetypes_oids.properties"); //$NON-NLS-1$
+		) {
+	        if (isProp == null) {
+	        	throw new IOException("No se ha encontrado el fichero de recursos para la relacion entre OIDs y MimeTypes"); //$NON-NLS-1$
+	        }
+	        oidMimetypeProp.load(isProp);
         }
-        oidMimetypeProp.load(isProp);
-        isProp.close();
     }
 
     /** Carga la tabla de relacion de MimeTypes y OID.

@@ -212,11 +212,11 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 			);
 			conn.setDoOutput(true);
 
-			final OutputStream os = conn.getOutputStream();
-
-			os.write(urlParameters.getBytes("UTF-8")); //$NON-NLS-1$
-
-			os.close();
+			try (
+				final OutputStream os = conn.getOutputStream();
+			) {
+				os.write(urlParameters.getBytes("UTF-8")); //$NON-NLS-1$
+			}
 		}
 
 		conn.connect();
@@ -232,9 +232,12 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 			throw new HttpError(resCode, conn.getResponseMessage(), url);
 		}
 
-		final InputStream is = conn.getInputStream();
-		final byte[] data = AOUtil.getDataFromInputStream(is);
-		is.close();
+		final byte[] data;
+		try (
+			final InputStream is = conn.getInputStream();
+		) {
+			data = AOUtil.getDataFromInputStream(is);
+		}
 
 		if (disableSSLChecks && uri.getProtocol().equals(HTTPS)) {
 			enableSslChecks();
@@ -305,12 +308,14 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 		final KeyStore keystore = KeyStore.getInstance(
 			keyStoreType != null && !keyStoreType.isEmpty() ? keyStoreType : KEYSTORE_DEFAULT_TYPE
 		);
-		final InputStream fis = new FileInputStream(f);
-		keystore.load(
-			fis,
-			keyStorePassword != null ? keyStorePassword.toCharArray() : null
-		);
-		fis.close();
+		try (
+			final InputStream fis = new FileInputStream(f);
+		) {
+			keystore.load(
+				fis,
+				keyStorePassword != null ? keyStorePassword.toCharArray() : null
+			);
+		}
 		final KeyManagerFactory keyFac = KeyManagerFactory.getInstance(KEYMANAGER_INSTANCE);
 		keyFac.init(
 			keystore,

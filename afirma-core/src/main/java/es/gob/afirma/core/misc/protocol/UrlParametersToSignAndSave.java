@@ -81,7 +81,7 @@ public final class UrlParametersToSignAndSave extends UrlParameters {
 	}
 
 	/** Algoritmos de firma soportados. */
-	private static final Set<String> SUPPORTED_SIGNATURE_ALGORITHMS = new HashSet<String>();
+	private static final Set<String> SUPPORTED_SIGNATURE_ALGORITHMS = new HashSet<>();
 	static {
 		SUPPORTED_SIGNATURE_ALGORITHMS.add("SHA1withRSA"); //$NON-NLS-1$
 		SUPPORTED_SIGNATURE_ALGORITHMS.add("SHA256withRSA"); //$NON-NLS-1$

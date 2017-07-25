@@ -28,7 +28,7 @@ import es.gob.afirma.core.misc.protocol.UrlParametersToSign.Operation;
 final class ProtocolInvocationUriParserUtil {
 
 	static final String DEFAULT_URL_ENCODING = "UTF-8"; //$NON-NLS-1$
-		
+
 	private ProtocolInvocationUriParserUtil() {
 		// No instanciable
 	}
@@ -54,7 +54,7 @@ final class ProtocolInvocationUriParserUtil {
 
 		return ret;
 	}
-	
+
 	/** Recupera los par&aacute;metros necesarios para la configuraci&oacute;n de una
 	 * operaci&oacute;n de carga de datos. Si falta alg&uacute;n par&aacute;metro o
 	 * es err&oacute;neo se lanzar&aacute; una excepci&oacute;n.
@@ -65,10 +65,10 @@ final class ProtocolInvocationUriParserUtil {
 		final UrlParametersToLoad ret = new UrlParametersToLoad();
 
 		ret.setLoadParameters(params);
-		
+
 		return ret;
 	}
-	
+
 	/** Recupera los par&aacute;metros necesarios para la configuraci&oacute;n de una
 	 * operaci&oacute;n de obtenci&oacute;n del log actual de la aplicaci&oacute;n
 	 * @param params Par&aacute;metros de con la configuraci&oacute;n de la operaci&oacute;n.
@@ -76,9 +76,9 @@ final class ProtocolInvocationUriParserUtil {
 	 * @throws ParameterException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto. */
 	static UrlParametersToGetCurrentLog getParametersToGetCurrentLog(final Map<String, String> params) throws ParameterException {
 		final UrlParametersToGetCurrentLog ret = new UrlParametersToGetCurrentLog();
-		
+
 		ret.setGetCurrentLogParameters(params);
-		
+
 		return ret;
 	}
 
@@ -87,7 +87,7 @@ final class ProtocolInvocationUriParserUtil {
 	 * @return Devuelve una tabla <i>hash</i> con cada par&aacute;metro asociado a un valor
 	 * @throws ParameterException Cuando el XML de entrada no es v&acute;lido. */
 	static Map<String, String> parseXml(final byte[] xml) throws ParameterException {
-		final Map<String, String> params = new HashMap<String, String>();
+		final Map<String, String> params = new HashMap<>();
 		final NodeList elems;
 
 		try {

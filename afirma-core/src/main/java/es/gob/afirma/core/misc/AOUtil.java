@@ -385,19 +385,15 @@ public final class AOUtil {
         if (source == null || dest == null) {
             throw new IllegalArgumentException("Ni origen ni destino de la copia pueden ser nulos"); //$NON-NLS-1$
         }
-
-        final FileInputStream is = new FileInputStream(source);
-        final FileOutputStream os = new FileOutputStream(dest);
-        final FileChannel in = is.getChannel();
-        final FileChannel out = os.getChannel();
-        final MappedByteBuffer buf = in.map(FileChannel.MapMode.READ_ONLY, 0, in.size());
-        out.write(buf);
-
-        in.close();
-        out.close();
-        is.close();
-        os.close();
-
+        try (
+	        final FileInputStream is = new FileInputStream(source);
+	        final FileOutputStream os = new FileOutputStream(dest);
+	        final FileChannel in = is.getChannel();
+	        final FileChannel out = os.getChannel();
+    	) {
+        	final MappedByteBuffer buf = in.map(FileChannel.MapMode.READ_ONLY, 0, in.size());
+        	out.write(buf);
+        }
     }
 
     /** Genera una lista de cadenas compuesta por los fragmentos de texto
@@ -417,7 +413,7 @@ public final class AOUtil {
      *         Cuando alguno de los par&aacute;metros de entrada es {@code null}. */
     public static String[] split(final String text, final String sp) {
 
-        final ArrayList<String> parts = new ArrayList<String>();
+        final ArrayList<String> parts = new ArrayList<>();
         int i = 0;
         int j = 0;
         while (i != text.length() && (j = text.indexOf(sp, i)) != -1) {

@@ -144,13 +144,16 @@ public final class LogManager {
 			}
 		}
 
-		final InputStream is = new FileInputStream(
-			new File(
-				logFile.replace("%h", Platform.getUserHome())  //$NON-NLS-1$
-			)
-		);
-		final String log = new String(AOUtil.getDataFromInputStream(is));
-		is.close();
+		final String log;
+		try (
+			final InputStream is = new FileInputStream(
+				new File(
+					logFile.replace("%h", Platform.getUserHome())  //$NON-NLS-1$
+				)
+			);
+		) {
+			log = new String(AOUtil.getDataFromInputStream(is));
+		}
 
 		LOGGER.addHandler(createFileHandler(logFile));
 

@@ -72,7 +72,7 @@ public final class AOTreeNode {
         }
         newChild.setParent(this);
         if (this.children == null) {
-            this.children = new ArrayList<AOTreeNode>();
+            this.children = new ArrayList<>();
         }
         this.children.add(childIndex, newChild);
     }
