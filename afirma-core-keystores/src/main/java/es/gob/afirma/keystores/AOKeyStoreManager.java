@@ -51,7 +51,7 @@ public class AOKeyStoreManager implements KeyStoreManager {
 
     protected static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
-    private final Set<String> deactivatedCertificatesThumbprints = new HashSet<String>();
+    private final Set<String> deactivatedCertificatesThumbprints = new HashSet<>();
 
     private String[] cachedAliases = null;
     protected void resetCachedAliases() {
@@ -315,7 +315,7 @@ public class AOKeyStoreManager implements KeyStoreManager {
      	     if (certs == null) {
      	         return new X509Certificate[0];
      	     }
-     	     final List<X509Certificate> ret = new ArrayList<X509Certificate>();
+     	     final List<X509Certificate> ret = new ArrayList<>();
      	     for (final Certificate c : certs) {
      	         if (c instanceof X509Certificate) {
      	             ret.add((X509Certificate) c);
@@ -379,7 +379,7 @@ public class AOKeyStoreManager implements KeyStoreManager {
 		if (this.deactivatedCertificatesThumbprints.isEmpty()) {
 			return currentAliases;
 		}
-		final List<String> cleanedAliases = new ArrayList<String>();
+		final List<String> cleanedAliases = new ArrayList<>();
 		final MessageDigest md;
 		try {
 			md = MessageDigest.getInstance("SHA1"); //$NON-NLS-1$

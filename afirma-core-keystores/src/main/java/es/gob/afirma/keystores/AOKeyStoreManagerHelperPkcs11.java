@@ -196,9 +196,11 @@ final class AOKeyStoreManagerHelperPkcs11 {
 	                                                                                          InvocationTargetException {
 		final Provider p = Security.getProvider("SunPKCS11"); //$NON-NLS-1$
 		final File f = File.createTempFile("pkcs11_", ".cfg");  //$NON-NLS-1$//$NON-NLS-2$
-		final OutputStream fos = new FileOutputStream(f);
-		fos.write(p11NSSConfigFileContents);
-		fos.close();
+		try (
+			final OutputStream fos = new FileOutputStream(f);
+		) {
+			fos.write(p11NSSConfigFileContents);
+		}
 		final Method configureMethod = Provider.class.getMethod("configure", String.class); //$NON-NLS-1$
 		final Provider ret = (Provider) configureMethod.invoke(p, f.getAbsolutePath());
 		f.delete();

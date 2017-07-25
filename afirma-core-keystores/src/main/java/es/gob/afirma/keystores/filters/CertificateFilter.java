@@ -35,7 +35,7 @@ public abstract class CertificateFilter {
      *            alias se indican.
      * @return Alias de certificados que cumplen el criterio. */
     public String[] matches(final String[] aliases, final KeyStoreManager ksm) {
-        final List<String> filteredAliases = new ArrayList<String>();
+        final List<String> filteredAliases = new ArrayList<>();
         for (final String alias : aliases) {
             if(matches(ksm.getCertificate(alias))) {
                 filteredAliases.add(alias);

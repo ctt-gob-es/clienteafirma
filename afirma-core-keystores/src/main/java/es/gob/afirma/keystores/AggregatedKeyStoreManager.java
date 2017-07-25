@@ -29,7 +29,7 @@ import es.gob.afirma.core.misc.AOUtil;
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public class AggregatedKeyStoreManager extends AOKeyStoreManager {
 
-	private final List<AOKeyStoreManager> ksms = new ArrayList<AOKeyStoreManager>();
+	private final List<AOKeyStoreManager> ksms = new ArrayList<>();
 
 	AggregatedKeyStoreManager(final AOKeyStoreManager mainKsm) {
 		if (mainKsm == null) {
@@ -106,7 +106,7 @@ public class AggregatedKeyStoreManager extends AOKeyStoreManager {
 
 	@Override
 	public String[] getAliases() {
-		final List<String> aliases = new ArrayList<String>();
+		final List<String> aliases = new ArrayList<>();
 		for (final AOKeyStoreManager ksm : this.ksms) {
 			try {
 				aliases.addAll(Arrays.asList(ksm.getAliases()));
@@ -221,10 +221,8 @@ public class AggregatedKeyStoreManager extends AOKeyStoreManager {
 		);
 	}
 
-	/**
-	 * Recupera la lista (no mutable) de almacenes del almac&eacute;n agregado.
-	 * @return Lista de almacenes.
-	 */
+	/** Recupera la lista (no mutable) de almacenes del almac&eacute;n agregado.
+	 * @return Lista de almacenes. */
 	List<AOKeyStoreManager> getKeyStoreManagers() {
 		return (List<AOKeyStoreManager>) ((ArrayList<AOKeyStoreManager>)this.ksms).clone();
 	}

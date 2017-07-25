@@ -98,10 +98,12 @@ public class TestAOKeystoreFactory {
         Assert.assertTrue("No se ha podido leer el P12", p12file.length > 0); //$NON-NLS-1$
         final File tmpFile = File.createTempFile("temp", "afirma"); //$NON-NLS-1$ //$NON-NLS-2$
         tmpFile.deleteOnExit();
-        final OutputStream os = new FileOutputStream(tmpFile);
-        os.write(p12file);
-        os.flush();
-        os.close();
+        try (
+    		final OutputStream os = new FileOutputStream(tmpFile);
+		) {
+	        os.write(p12file);
+	        os.flush();
+        }
 
         final PasswordCallback pc = new PasswordCallback(">", false); //$NON-NLS-1$
         pc.setPassword("12341234".toCharArray()); //$NON-NLS-1$

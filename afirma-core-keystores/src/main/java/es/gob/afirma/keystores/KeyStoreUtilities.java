@@ -141,7 +141,7 @@ public final class KeyStoreUtilities {
         // Creamos un mapa con la relacion Alias-Nombre_a_mostrar de los
         // certificados
     	final String[] trimmedAliases = aliases.clone();
-        final Map<String, String> aliassesByFriendlyName = new Hashtable<String, String>(trimmedAliases.length);
+        final Map<String, String> aliassesByFriendlyName = new Hashtable<>(trimmedAliases.length);
         for (final String trimmedAlias : trimmedAliases) {
             aliassesByFriendlyName.put(trimmedAlias, trimmedAlias);
         }
@@ -211,7 +211,7 @@ public final class KeyStoreUtilities {
             // Aplicamos los filtros de certificados
             if (certFilters != null && certFilters.size() > 0) {
             	// Tabla para los certificados que si hay que mostrar
-            	final Map<String, String> filteredAliases = new Hashtable<String, String>();
+            	final Map<String, String> filteredAliases = new Hashtable<>();
                 for (final CertificateFilter cf : certFilters) {
                 	for (final String filteredAlias : cf.matches(aliassesByFriendlyName.keySet().toArray(new String[aliassesByFriendlyName.size()]), ksm)) {
                 		filteredAliases.put(filteredAlias, aliassesByFriendlyName.get(filteredAlias));

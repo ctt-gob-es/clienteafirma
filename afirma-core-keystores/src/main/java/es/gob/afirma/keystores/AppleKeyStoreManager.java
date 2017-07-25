@@ -122,7 +122,7 @@ final class AppleKeyStoreManager extends AOKeyStoreManager {
 		}
 
 		// Identificamos aquellos que son certificados con clave privada
-		final List<String> tmpAliasesWithPrivateKey = new ArrayList<String>();
+		final List<String> tmpAliasesWithPrivateKey = new ArrayList<>();
 		while (aliases.hasMoreElements()) {
 			final String alias = aliases.nextElement();
 			try {
@@ -135,8 +135,8 @@ final class AppleKeyStoreManager extends AOKeyStoreManager {
 		}
 
 		// Filtramos para admitir solo un certificado por cada numero de serie
-		final List<String> tmpAliases = new ArrayList<String>();
-		final Set<BigInteger> addedSerials = new HashSet<BigInteger>();
+		final List<String> tmpAliases = new ArrayList<>();
+		final Set<BigInteger> addedSerials = new HashSet<>();
 		for (final String al : tmpAliasesWithPrivateKey) {
 			final X509Certificate tmpCert = getCertificate(al);
 			if (!addedSerials.contains(tmpCert.getSerialNumber())) {

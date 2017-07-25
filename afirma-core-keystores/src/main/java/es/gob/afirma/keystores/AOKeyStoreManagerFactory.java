@@ -177,10 +177,10 @@ public final class AOKeyStoreManagerFactory {
             }
         }
 
-        try {
-        	final InputStream is = new FileInputStream(storeFilename);
+        try (
+    		final InputStream is = new FileInputStream(storeFilename);
+		) {
             ksm.init(null, is, pssCallback, null, forceReset);
-            is.close();
         }
         catch (final AOException e) {
             throw new AOKeystoreAlternativeException(
@@ -309,10 +309,10 @@ public final class AOKeyStoreManagerFactory {
             }
         }
 
-        try {
-        	final InputStream is = new FileInputStream(storeFilename);
+        try (
+    		final InputStream is = new FileInputStream(storeFilename);
+		) {
             ksm.init(store, is, pssCallback, null, forceReset);
-            is.close();
         }
         catch (final AOException e) {
             throw new AOKeystoreAlternativeException(
@@ -505,17 +505,21 @@ public final class AOKeyStoreManagerFactory {
                                                                                                            AOKeystoreAlternativeException {
     	final AOKeyStoreManager ksm = new AppleKeyStoreManager();
         // En Mac OS X podemos inicializar un KeyChain en un fichero particular o el por defecto del sistema
-        try {
+        try (
+    		final InputStream is = lib == null || lib.isEmpty() ? null : new FileInputStream(lib);
+		) {
             ksm.init(
                  store,
-                 lib == null || lib.isEmpty() ? null : new FileInputStream(lib),
+                 is,
         		 NullPasswordCallback.getInstance(),
                  null,
                  forceReset
             );
         }
         catch (final AOException e) {
-            throw new AOKeystoreAlternativeException(getAlternateKeyStoreType(store), "Error al inicializar el Llavero de Mac OS X", e); //$NON-NLS-1$
+            throw new AOKeystoreAlternativeException(
+        		getAlternateKeyStoreType(store), "Error al inicializar el Llavero de Mac OS X", e //$NON-NLS-1$
+    		);
         }
         final AggregatedKeyStoreManager aksm = new AggregatedKeyStoreManager(ksm);
         try {
