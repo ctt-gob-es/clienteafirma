@@ -30,6 +30,7 @@ import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.StringTokenizer;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.net.ssl.HostnameVerifier;
@@ -269,7 +270,26 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 	                                             CertificateException,
 	                                             IOException {
 		final SSLContext sc = SSLContext.getInstance(SSL_CONTEXT);
-		sc.init(getKeyManager(), DUMMY_TRUST_MANAGER, new java.security.SecureRandom());
+		KeyManager[] km;
+		try {
+			km = getKeyManager();
+		}
+		catch(final Exception e) {
+			// En ocasiones, los servidores de aplicaciones establecen configuraciones de KeyStore
+			// que no se pueden cargar aqui, y no es algo controlable por las aplicaciones
+			LOGGER.log(
+				Level.SEVERE,
+				"No ha sido posible obtener el KeyManager con el KeyStore '" + System.getProperty(KEYSTORE) + //$NON-NLS-1$
+					"', se usara null: " + e, //$NON-NLS-1$
+				e
+			);
+			km = null;
+		}
+		sc.init(
+			km,
+			DUMMY_TRUST_MANAGER,
+			new java.security.SecureRandom()
+		);
 		HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
 		HttpsURLConnection.setDefaultHostnameVerifier(
 			new HostnameVerifier() {
@@ -319,7 +339,7 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 		final KeyManagerFactory keyFac = KeyManagerFactory.getInstance(KEYMANAGER_INSTANCE);
 		keyFac.init(
 			keystore,
-			keyStorePassword != null ? keyStorePassword.toCharArray() : null
+			keyStorePassword != null ? keyStorePassword.toCharArray() : new char[0]
 		);
 		return keyFac.getKeyManagers();
 	}
