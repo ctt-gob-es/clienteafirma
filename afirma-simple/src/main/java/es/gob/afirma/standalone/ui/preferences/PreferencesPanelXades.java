@@ -101,9 +101,9 @@ final class PreferencesPanelXades extends JPanel {
         gbc.weightx = 1.0;
         gbc.gridy = 0;
 
-        loadPreferences();
-
         loadXadesPolicy();
+
+        loadPreferences();
 
     	this.xadesPolicyDlg.setModificationListener(modificationListener);
     	this.xadesPolicyDlg.setKeyListener(keyListener);
@@ -364,13 +364,6 @@ final class PreferencesPanelXades extends JPanel {
 		);
 		this.xadesSignerClaimedRole.setText(PreferencesManager.get(PREFERENCE_XADES_SIGNER_CLAIMED_ROLE, "")); //$NON-NLS-1$
 
-		this.xadesSignFormat.setSelectedItem(
-    		PreferencesManager.get(
-				PREFERENCE_XADES_SIGN_FORMAT,
-				AOSignConstants.SIGN_FORMAT_XADES_DETACHED
-			)
-		);
-
 		final List<PolicyPanel.PolicyItem> xadesPolicies = new ArrayList<>();
         xadesPolicies.add(
     		new PolicyItem(
@@ -380,12 +373,34 @@ final class PreferencesPanelXades extends JPanel {
 		);
 
         this.panelPolicies.removeAll();
+
+        final AdESPolicy currentPolicy = getXadesPreferedPolicy();
         this.xadesPolicyDlg = new PolicyPanel(
     		SIGN_FORMAT_XADES,
     		xadesPolicies,
-    		getXadesPreferedPolicy(),
+    		currentPolicy,
     		isUnprotected()
 		);
+
+		final String previousSubFormat = PreferencesManager.get(
+				PREFERENCE_XADES_SIGN_FORMAT,
+				AOSignConstants.SIGN_FORMAT_XADES_DETACHED
+			);
+
+		// Si la politica de firma es la de la AGE, eliminamos el formato Enveloping del listado,
+		// ya que no esta soportado, y evitamos que se establezca este si era el que estaba configurado
+        if (currentPolicy != null && AgePolicy.isAGEPolicy(currentPolicy.getPolicyIdentifier(), AOSignConstants.SIGN_FORMAT_XADES)) {
+			this.xadesSignFormat.removeAllItems();
+			this.xadesSignFormat.addItem(AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED);
+			this.xadesSignFormat.addItem(AOSignConstants.SIGN_FORMAT_XADES_DETACHED);
+			if (AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED.equals(previousSubFormat) ||
+					AOSignConstants.SIGN_FORMAT_XADES_DETACHED.equals(previousSubFormat)) {
+				this.xadesSignFormat.setSelectedItem(previousSubFormat);
+			}
+		}
+        else {
+        	this.xadesSignFormat.setSelectedItem(previousSubFormat);
+        }
 
         revalidate();
         repaint();
@@ -513,7 +528,6 @@ final class PreferencesPanelXades extends JPanel {
 				throw new AOException("El identificador debe ser una URI", e); //$NON-NLS-1$
 			}
 		}
-
 	}
 
 	/**
@@ -581,8 +595,8 @@ final class PreferencesPanelXades extends JPanel {
 						PreferencesManager.remove(PREFERENCE_XADES_POLICY_QUALIFIER);
 					}
 
-					// Si se ha establecido alguna de las politicas de firmas de la AGE, se establece
-					// la el formato a DETACHED y se
+					// Si se ha establecido alguna de las politicas de firmas de la AGE, se
+					// elimina el formato Enveloping del listado soportado
 					if (AgePolicy.isAGEPolicy(xadesPolicy.getPolicyIdentifier(), AOSignConstants.SIGN_FORMAT_XADES)) {
 						final String previousSubFormat = (String) this.xadesSignFormat.getSelectedItem();
 						this.xadesSignFormat.removeAllItems();
