@@ -504,18 +504,16 @@ public final class AOXAdESSigner implements AOSigner {
             if (AOXAdESSigner.isDetached(rootSig)) {
 
                 final Element firstChild = (Element) rootSig.getFirstChild();
-                // si el documento es un xml se extrae como tal
-                if (firstChild.getAttribute(XMLDSIG_ATTR_MIMETYPE_STR).equals("text/xml")) { //$NON-NLS-1$
-                    elementRes = (Element) firstChild.getFirstChild();
-                }
-                // si el documento es binario se deshace la codificacion en
-                // Base64 si y solo si esta declarada esta transformacion
-                else {
-                	//TODO: Deshacer solo el Base64 si existe la transformacion Base64 (COMPROBAR)
+
+                // Si el contenido firmado es un nodo de texto, lo extramos como tal
+                if (firstChild.getFirstChild().getNodeType() == Node.TEXT_NODE) {
+                	// Si existe una transformacion Base64, la deshacemos
                 	return isBase64TransformationDeclared(rootSig, firstChild.getAttribute(ID_IDENTIFIER)) ?
         				Base64.decode(firstChild.getTextContent()) :
         					firstChild.getTextContent().getBytes();
                 }
+                // Si no era un nodo de texto, se considera que es XML
+                elementRes = (Element) firstChild.getFirstChild();
             }
 
             // Si es enveloped
