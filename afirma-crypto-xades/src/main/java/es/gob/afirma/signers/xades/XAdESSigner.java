@@ -436,6 +436,10 @@ public final class XAdESSigner {
 				else {
 					dataElement = docum.createElement(AOXAdESSigner.DETACHED_CONTENT_ELEMENT_NAME);
 					dataElement.setAttributeNS(null, ID_IDENTIFIER, contentId);
+					dataElement.setAttributeNS(null, AOXAdESSigner.XMLDSIG_ATTR_MIMETYPE_STR, mimeType);
+					if (encoding != null && !"".equals(encoding)) { //$NON-NLS-1$
+						dataElement.setAttributeNS(null, AOXAdESSigner.XMLDSIG_ATTR_ENCODING_STR, encoding);
+					}
 					dataElement.appendChild(docum.getDocumentElement());
 				}
 
@@ -492,8 +496,7 @@ public final class XAdESSigner {
 					uri = null;
 
 					dataElement.setAttributeNS(null, ID_IDENTIFIER, contentId);
-					dataElement.setAttributeNS(null, AOXAdESSigner.XMLDSIG_ATTR_MIMETYPE_STR,
-							mimeType != null ? mimeType : XMLConstants.DEFAULT_MIMETYPE);
+
 
 					// Si es Base64, lo firmamos indicando como contenido el dato pero, ya que puede
 					// poseer un formato particular o caracteres valido pero extranos para el XML,
@@ -512,9 +515,12 @@ public final class XAdESSigner {
 							final String tempMimeType = mimeTypeHelper.getMimeType();
 							if (tempMimeType != null) {
 								mimeType = tempMimeType;
-								dataElement.setAttributeNS(null, AOXAdESSigner.XMLDSIG_ATTR_MIMETYPE_STR, mimeType);
 							}
 						}
+
+						dataElement.setAttributeNS(null, AOXAdESSigner.XMLDSIG_ATTR_MIMETYPE_STR,
+								mimeType != null ? mimeType : XMLConstants.DEFAULT_MIMETYPE);
+
 						dataElement.setTextContent(Base64.encode(decodedData));
 					}
 					else {
@@ -534,15 +540,18 @@ public final class XAdESSigner {
 							final String tempMimeType = mimeTypeHelper.getMimeType();
 							if (tempMimeType != null) {
 								mimeType = tempMimeType;
-								dataElement.setAttributeNS(null, AOXAdESSigner.XMLDSIG_ATTR_MIMETYPE_STR, mimeType);
 							}
 						}
+
+						dataElement.setAttributeNS(null, AOXAdESSigner.XMLDSIG_ATTR_MIMETYPE_STR,
+								mimeType != null ? mimeType : XMLConstants.DEFAULT_MIMETYPE);
 
 						dataElement.setTextContent(Base64.encode(data));
 						wasEncodedToBase64 = true;
 					}
 					isBase64 = true;
 					encoding = XMLConstants.BASE64_ENCODING;
+					dataElement.setAttributeNS(null, AOXAdESSigner.XMLDSIG_ATTR_ENCODING_STR, encoding);
 				}
 				catch (final Exception ex) {
 					throw new AOException("Error al convertir los datos a Base64", ex); //$NON-NLS-1$
