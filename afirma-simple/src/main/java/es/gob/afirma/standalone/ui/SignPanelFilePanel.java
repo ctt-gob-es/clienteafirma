@@ -27,7 +27,9 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
 import es.gob.afirma.core.misc.Platform;
+import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.ui.AOUIFactory;
+import es.gob.afirma.signers.pades.AOPDFSigner;
 import es.gob.afirma.standalone.LookAndFeelManager;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.VisorFirma;
@@ -50,6 +52,8 @@ final class SignPanelFilePanel extends JPanel {
     }
 
     SignPanelFilePanel(final SignPanelFileType fileType,
+    				   final AOSigner signer,
+            		   final String signatureName,
                        final String fileSize,
                        final File file,
                        final Date fileLastModified,
@@ -62,6 +66,8 @@ final class SignPanelFilePanel extends JPanel {
 
         SwingUtilities.invokeLater(() -> createUI(
     		fileType,
+    		signer,
+    		signatureName,
     		fileSize,
     		file,
     		fileLastModified
@@ -69,7 +75,9 @@ final class SignPanelFilePanel extends JPanel {
     }
 
     void createUI(final SignPanelFileType fileType,
-                  final String fileSize,
+    			  final AOSigner signer,
+    			  final String signatureName,
+    			  final String fileSize,
                   final File file,
                   final Date fileLastModified) {
 
@@ -79,6 +87,8 @@ final class SignPanelFilePanel extends JPanel {
         final JLabel pathLabel = new JLabel(file.getAbsolutePath());
         pathLabel.setFont(pathLabel.getFont().deriveFont(Font.BOLD, pathLabel.getFont().getSize() + 3f));
 
+
+        final JLabel signLabel = new JLabel(SimpleAfirmaMessages.getString("SignPanel.103") + signatureName); //$NON-NLS-1$
         final JLabel descLabel = new JLabel(SimpleAfirmaMessages.getString("SignPanel.46") + fileType.getFileDescription()); //$NON-NLS-1$
         final JLabel dateLabel = new JLabel(
     		SimpleAfirmaMessages.getString("SignPanel.47") + //$NON-NLS-1$
@@ -93,6 +103,8 @@ final class SignPanelFilePanel extends JPanel {
         detailPanel.setLayout(new BoxLayout(detailPanel, BoxLayout.Y_AXIS));
         detailPanel.add(pathLabel);
         detailPanel.add(Box.createRigidArea(new Dimension(0, 8)));
+        detailPanel.add(signLabel);
+        detailPanel.add(Box.createRigidArea(new Dimension(0, 8)));
         detailPanel.add(descLabel);
         detailPanel.add(dateLabel);
         detailPanel.add(Box.createRigidArea(new Dimension(0, 8)));
@@ -101,7 +113,7 @@ final class SignPanelFilePanel extends JPanel {
         // Definimos aqui el boton para poder crear una politica de foco si fuese necesario
         final JButton openFileButton = new JButton(SimpleAfirmaMessages.getString("SignPanel.51")); //$NON-NLS-1$
 
-        if (SignPanelFileType.PDF.equals(fileType)) {
+        if (signer instanceof AOPDFSigner) {
             this.pdfVisible.setMnemonic('H');
             detailPanel.add(Box.createRigidArea(new Dimension(0, 8)));
             detailPanel.add(this.pdfVisible);

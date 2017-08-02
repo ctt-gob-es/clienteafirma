@@ -80,6 +80,16 @@ public final class SignPanel extends JPanel {
 
     private static final long serialVersionUID = -4828575650695534417L;
 
+
+    private static String[][] signersTypeRelation = new String[][] {
+    	{"es.gob.afirma.signers.pades.AOPDFSigner", SimpleAfirmaMessages.getString("SignPanel.104")}, //$NON-NLS-1$ //$NON-NLS-2$
+    	{"es.gob.afirma.signers.xades.AOFacturaESigner", SimpleAfirmaMessages.getString("SignPanel.105")}, //$NON-NLS-1$ //$NON-NLS-2$
+    	{"es.gob.afirma.signers.xades.AOXAdESSigner", SimpleAfirmaMessages.getString("SignPanel.106")}, //$NON-NLS-1$ //$NON-NLS-2$
+    	{"es.gob.afirma.signers.cades.AOCAdESSigner", SimpleAfirmaMessages.getString("SignPanel.107")}, //$NON-NLS-1$ //$NON-NLS-2$
+    	{"es.gob.afirma.signers.odf.AOODFSigner", SimpleAfirmaMessages.getString("SignPanel.108")}, //$NON-NLS-1$ //$NON-NLS-2$
+    	{"es.gob.afirma.signers.ooxml.AOOOXMLSigner", SimpleAfirmaMessages.getString("SignPanel.109")} //$NON-NLS-1$ //$NON-NLS-2$
+    };
+
     private AOSigner signer;
 
     AOSigner getSigner() {
@@ -207,12 +217,12 @@ public final class SignPanel extends JPanel {
         this.dataToSign = data;
         this.cosign = false;
 
-        final SignPanelFileType signPanelFileType;
+        SignPanelFileType signPanelFileType;
 
         // Comprobamos si es un fichero PDF
         if (DataAnalizerUtil.isPDF(data)) {
         	signPanelFileType = SignPanelFileType.PDF;
-            this.signer = AOSignerFactory.getSigner(
+        	this.signer = AOSignerFactory.getSigner(
         		PreferencesManager.get(
     				PREFERENCE_GENERAL_DEFAULT_FORMAT_PDF,
     				AOSignConstants.SIGN_FORMAT_PADES
@@ -232,16 +242,16 @@ public final class SignPanel extends JPanel {
         	}
         	signPanelFileType = SignPanelFileType.FACTURAE;
         	this.signer = AOSignerFactory.getSigner(
-        		PreferencesManager.get(
-    				PREFERENCE_GENERAL_DEFAULT_FORMAT_FACTURAE,
-    				AOSignConstants.SIGN_FORMAT_FACTURAE
-				)
-    		);
+            		PreferencesManager.get(
+        				PREFERENCE_GENERAL_DEFAULT_FORMAT_FACTURAE,
+        				AOSignConstants.SIGN_FORMAT_FACTURAE
+    				)
+        		);
         }
         // Comprobamos si es un OOXML
         else if (DataAnalizerUtil.isOOXML(data)) {
         	signPanelFileType = SignPanelFileType.OOXML;
-            this.signer = AOSignerFactory.getSigner(
+        	this.signer = AOSignerFactory.getSigner(
 	    		PreferencesManager.get(
     				PREFERENCE_GENERAL_DEFAULT_FORMAT_OOXML,
     				AOSignConstants.SIGN_FORMAT_OOXML
@@ -251,7 +261,7 @@ public final class SignPanel extends JPanel {
         // Comprobamos si es un ODF
         else if (DataAnalizerUtil.isODF(data)) {
         	signPanelFileType = SignPanelFileType.ODF;
-            this.signer = AOSignerFactory.getSigner(
+        	this.signer = AOSignerFactory.getSigner(
 	    		PreferencesManager.get(
     				PREFERENCE_GENERAL_DEFAULT_FORMAT_ODF,
     				AOSignConstants.SIGN_FORMAT_ODF
@@ -271,7 +281,7 @@ public final class SignPanel extends JPanel {
         // Comprobamos si es un fichero XML
         else if (DataAnalizerUtil.isXML(data)) {
         	signPanelFileType = SignPanelFileType.XML;
-            this.signer = AOSignerFactory.getSigner(
+        	this.signer = AOSignerFactory.getSigner(
         		PreferencesManager.get(
     				PREFERENCE_GENERAL_DEFAULT_FORMAT_XML,
     				AOSignConstants.SIGN_FORMAT_XADES
@@ -280,7 +290,7 @@ public final class SignPanel extends JPanel {
         }
         // Cualquier otro tipo de fichero
         else {
-        	signPanelFileType = SignPanelFileType.BINARY;
+            signPanelFileType = SignPanelFileType.BINARY;
             this.signer = AOSignerFactory.getSigner(
 	    		PreferencesManager.get(
     				PREFERENCE_GENERAL_DEFAULT_FORMAT_BIN,
@@ -289,6 +299,8 @@ public final class SignPanel extends JPanel {
     		);
         }
 
+        final String signatureName = getSignatureName(this.signer);
+
         final double fileSize = file.length() / 1024;
         final long fileLastModified = file.lastModified();
 
@@ -296,6 +308,8 @@ public final class SignPanel extends JPanel {
 
         this.filePanel = new SignPanelFilePanel(
     		signPanelFileType,
+    		this.signer,
+    		signatureName,
             NumberFormat.getInstance().format(fileSize),
             file,
             new Date(fileLastModified),
@@ -325,7 +339,31 @@ public final class SignPanel extends JPanel {
         this.signButton.requestFocusInWindow();
     }
 
-    private void createUI() {
+    /**
+     * Identifica el tipo de firma asociado a un firmador. Si no identifica el firmado,
+     * devuelte el tipo por defecto.
+     * @param signer Firmardor.
+     * @param defaultType Tipo por defecto.
+     * @return Tipo de firma que se debe ejecutar.
+     */
+    private static String getSignatureName(AOSigner signer) {
+
+    	for (final String[] signatureType : signersTypeRelation) {
+    		Class<?> c;
+    		try {
+    			c = Class.forName(signatureType[0]);
+    		}
+    		catch (final Exception e) {
+    			continue;
+    		}
+    		if (c.isInstance(signer)) {
+    			return signatureType[1];
+    		}
+    	}
+		return SimpleAfirmaMessages.getString("SignPanel.110"); //$NON-NLS-1$
+	}
+
+	private void createUI() {
 
         if (!LookAndFeelManager.HIGH_CONTRAST) {
             setBackground(LookAndFeelManager.WINDOW_COLOR);
@@ -608,7 +646,7 @@ public final class SignPanel extends JPanel {
 			SimpleAfirmaMessages.getString("SignPanel.50") //$NON-NLS-1$
 		);
     	new SignPanelSignTask(
-    		this, 
+    		this,
     		getCertFilters(),
     		signWaitDialog
 		).execute();
