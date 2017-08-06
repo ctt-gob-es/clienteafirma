@@ -223,9 +223,6 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 		conn.connect();
 		final int resCode = conn.getResponseCode();
 		final String statusCode = Integer.toString(resCode);
-		LOGGER.info(
-			"Recibido: " + resCode + ": " +  conn.getResponseMessage() //$NON-NLS-1$ //$NON-NLS-2$
-		);
 		if (statusCode.startsWith("4") || statusCode.startsWith("5")) { //$NON-NLS-1$ //$NON-NLS-2$
 			if (uri.getProtocol().equals(HTTPS)) {
 				enableSslChecks();
