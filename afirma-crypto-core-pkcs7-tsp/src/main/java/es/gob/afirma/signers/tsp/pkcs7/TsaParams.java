@@ -197,7 +197,9 @@ public final class TsaParams {
 		return this.tsaPolicy;
 	}
 
-	URI getTsaUrl() {
+	/** Obtiene la URL de la TSA.
+	 * @return URL de la TSA. */
+	public URI getTsaUrl() {
 		return this.tsaURL;
 	}
 
@@ -213,12 +215,10 @@ public final class TsaParams {
 		return this.extensions;
 	}
 
-	/**
-	 * Obtiene el listado de extensiones configuradas.
+	/** Obtiene el listado de extensiones configuradas.
 	 * @param config Configuraci&oacute;n en la que se pueden haber declarado las extensiones.
 	 * @return Listado de extensiones.
-	 * @throws IOException Cuando ocurre un error al decodificar las extensiones.
-	 */
+	 * @throws IOException Cuando ocurre un error al decodificar las extensiones. */
 	private static TsaRequestExtension[] getExtensions(final Properties config) throws IOException {
 
 		final String extensionOid = config.getProperty("tsaExtensionOid"); //$NON-NLS-1$
@@ -273,7 +273,7 @@ public final class TsaParams {
 		return this.sslKeyStoreType;
 	}
 
-	/** Obtiene el TrustStore que contiene los certificados de CA que se permiten para la generacion del certificado SSL
+	/** Obtiene el TrustStore que contiene los certificados de CA que se permiten para la generaci&oacute;n del certificado SSL
 	 * de la TSA a trav&eacute;s de los que se puede establecer la coneci&oacute;s HTTPS.
 	 * @return Almac&eacute;n que contiene los certificados de CA para las conexiones HTTPS, o
 	 *         <code>null</code> si no se ha establecido ninguno. */
