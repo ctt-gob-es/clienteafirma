@@ -36,7 +36,7 @@ import javax.xml.crypto.NodeSetData;
 import org.w3c.dom.Node;
 
 /** Implementaci&oacute;n Apache del <code>NodeSetData</code>. */
-public class ApacheNodeSetData implements NodeSetData/*<Node>*/ {
+public final class ApacheNodeSetData implements NodeSetData/*<Node>*/ {
 
     private final XMLSignatureInput xi;
 
@@ -45,7 +45,7 @@ public class ApacheNodeSetData implements NodeSetData/*<Node>*/ {
     }
 
     @Override
-	public Iterator/*<Node>*/ iterator() {
+	public Iterator<Node> iterator() {
         // If nodefilters are set, must execute them first to create node-set
         if (this.xi.getNodeFilters() != null && !this.xi.getNodeFilters().isEmpty()) {
             return Collections.unmodifiableSet
@@ -56,7 +56,7 @@ public class ApacheNodeSetData implements NodeSetData/*<Node>*/ {
         }
         catch (final Exception e) {
             // should not occur
-            throw new RuntimeException("unrecoverable error retrieving nodeset", e); //$NON-NLS-1$
+            throw new RuntimeException("unrecoverable error retrieving nodeset: " + e, e); //$NON-NLS-1$
         }
     }
 

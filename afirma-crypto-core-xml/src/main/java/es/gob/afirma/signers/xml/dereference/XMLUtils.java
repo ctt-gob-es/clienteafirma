@@ -42,41 +42,42 @@ final class XMLUtils {
           return;
        }
        switch (rootNode.getNodeType()) {
-                case Node.ELEMENT_NODE:
-                                result.add(rootNode);
-                        final Element el=(Element)rootNode;
+            case Node.ELEMENT_NODE:
+                result.add(rootNode);
+                final Element el=(Element)rootNode;
                 if (el.hasAttributes()) {
-                        final NamedNodeMap nl = ((Element)rootNode).getAttributes();
-                        for (int i=0;i<nl.getLength();i++) {
-                                result.add(nl.item(i));
-                        }
+                    final NamedNodeMap nl = ((Element)rootNode).getAttributes();
+                    for (int i=0;i<nl.getLength();i++) {
+                            result.add(nl.item(i));
+                    }
                 }
-                //no return keep working
-                case Node.DOCUMENT_NODE:
-                        for (Node r=rootNode.getFirstChild();r!=null;r=r.getNextSibling()){
-                                if (r.getNodeType()==Node.TEXT_NODE) {
-                                        result.add(r);
-                                        while (r!=null && r.getNodeType()==Node.TEXT_NODE) {
-                                                r=r.getNextSibling();
-                                        }
-                                        if (r==null) {
-											return;
-										}
-                                }
-                                getSetRec(r,result,exclude,com);
-                        }
-                        return;
-                case Node.COMMENT_NODE:
-                        if (com) {
-                                result.add(rootNode);
-                        }
-                        return;
-                case Node.DOCUMENT_TYPE_NODE:
-                        return;
-                default:
-                        result.add(rootNode);
-           }
-           return;
+            //no return keep working
+            //$FALL-THROUGH$
+            case Node.DOCUMENT_NODE:
+                for (Node r=rootNode.getFirstChild();r!=null;r=r.getNextSibling()){
+                    if (r.getNodeType()==Node.TEXT_NODE) {
+                            result.add(r);
+                            while (r!=null && r.getNodeType()==Node.TEXT_NODE) {
+                                    r=r.getNextSibling();
+                            }
+                            if (r==null) {
+								return;
+							}
+                    }
+                    getSetRec(r,result,exclude,com);
+                }
+                return;
+            case Node.COMMENT_NODE:
+                if (com) {
+                    result.add(rootNode);
+                }
+                return;
+            case Node.DOCUMENT_TYPE_NODE:
+                return;
+            default:
+                result.add(rootNode);
+       }
+       return;
    }
 
    /** This method returns the owner document of a particular node.
@@ -157,12 +158,12 @@ final class XMLUtils {
 		                }
 		             }
 	             }
+        	   	//$FALL-THROUGH$
         	   	case Node.ENTITY_REFERENCE_NODE :
         	   	case Node.DOCUMENT_NODE :
                  parent=node;
                  sibling=node.getFirstChild();
                  break;
-
         	   }
 	    	   while (sibling==null && parent!=null) {
 	                         sibling=parent.getNextSibling();
