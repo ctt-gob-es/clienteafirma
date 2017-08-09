@@ -330,7 +330,7 @@ public final class CAdESTriPhaseSigner {
         }
 
         // Certificados
-        final List<ASN1Encodable> ce = new ArrayList<ASN1Encodable>();
+        final List<ASN1Encodable> ce = new ArrayList<>();
         for (final Certificate cert : signerCertificateChain) {
             try {
                 ce.add(

@@ -71,7 +71,7 @@ public final class CAdESSignerMetadataHelper {
 		final List<String> postalAddress = csl.getPostalAddress();
 		List<ASN1Encodable> postalAdressAsn1List = null;
 		if (postalAddress != null) {
-			postalAdressAsn1List = new ArrayList<ASN1Encodable>(postalAddress.size());
+			postalAdressAsn1List = new ArrayList<>(postalAddress.size());
 			for (final String addressLine : postalAddress) {
 				postalAdressAsn1List.add(new DERUTF8String(addressLine));
 			}

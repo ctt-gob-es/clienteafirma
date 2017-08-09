@@ -33,7 +33,7 @@ public final class CommitmentTypeIndicationsHelper {
 	private static final ASN1ObjectIdentifier COMMITMENT_TYPE_IDENTIFIER_PROOF_OF_SENDER = CommitmentTypeIdentifier.proofOfSender;
 	private static final ASN1ObjectIdentifier COMMITMENT_TYPE_IDENTIFIER_PROOF_OF_APPROVAL = CommitmentTypeIdentifier.proofOfApproval;
 	private static final ASN1ObjectIdentifier COMMITMENT_TYPE_IDENTIFIER_PROOF_OF_CREATION = CommitmentTypeIdentifier.proofOfCreation;
-	private static final Map<String, ASN1ObjectIdentifier> COMMITMENT_TYPE_IDENTIFIERS = new HashMap<String, ASN1ObjectIdentifier>(6);
+	private static final Map<String, ASN1ObjectIdentifier> COMMITMENT_TYPE_IDENTIFIERS = new HashMap<>(6);
 	static {
 		COMMITMENT_TYPE_IDENTIFIERS.put("1", COMMITMENT_TYPE_IDENTIFIER_PROOF_OF_ORIGIN); //$NON-NLS-1$
 		COMMITMENT_TYPE_IDENTIFIERS.put("2", COMMITMENT_TYPE_IDENTIFIER_PROOF_OF_RECEIPT); //$NON-NLS-1$
@@ -68,7 +68,7 @@ public final class CommitmentTypeIndicationsHelper {
      * @return Lista de <i>CommitmentTypeIndication</i> a incluir en la firma CAdES */
 	public static List<CommitmentTypeIndicationBean> getCommitmentTypeIndications(final Properties xParams) {
 
-    	final List<CommitmentTypeIndicationBean> ret = new ArrayList<CommitmentTypeIndicationBean>();
+    	final List<CommitmentTypeIndicationBean> ret = new ArrayList<>();
 
 		if (xParams == null) {
 			return ret;
@@ -118,7 +118,7 @@ public final class CommitmentTypeIndicationsHelper {
 				commitmentTypeQualifiers = null;
 			}
 			else {
-				commitmentTypeQualifiers = new ArrayList<String>();
+				commitmentTypeQualifiers = new ArrayList<>();
 				final String[] ctqs = tmpStr.split(Pattern.quote("|")); //$NON-NLS-1$
 				for (final String ctq : ctqs) {
 					commitmentTypeQualifiers.add(ctq);

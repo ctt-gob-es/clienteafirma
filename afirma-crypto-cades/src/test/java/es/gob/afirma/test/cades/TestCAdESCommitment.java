@@ -29,9 +29,7 @@ import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.signers.cades.AOCAdESSigner;
 
-
-/**
- * Pruebas del m&oacute;dulo CAdES de Afirma.
+/** Pruebas del m&oacute;dulo CAdES de Afirma.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public final class TestCAdESCommitment {
 
@@ -43,7 +41,7 @@ public final class TestCAdESCommitment {
 		"txt", //$NON-NLS-1$
 	};
 
-	private static final List<byte[]> DATA = new ArrayList<byte[]>(2);
+	private static final List<byte[]> DATA = new ArrayList<>(2);
 	static {
 		for (final String dataFile : DATA_FILES) {
 			try {
@@ -119,10 +117,12 @@ public final class TestCAdESCommitment {
 					);
 
 					final File saveFile = File.createTempFile(algo + "-", ".csig"); //$NON-NLS-1$ //$NON-NLS-2$
-					final OutputStream os = new FileOutputStream(saveFile);
-					os.write(result);
-					os.flush();
-					os.close();
+					try (
+						final OutputStream os = new FileOutputStream(saveFile);
+					) {
+						os.write(result);
+						os.flush();
+					}
 					System.out.println("Temporal para comprobacion manual: " + saveFile.getAbsolutePath()); //$NON-NLS-1$
 
 				}

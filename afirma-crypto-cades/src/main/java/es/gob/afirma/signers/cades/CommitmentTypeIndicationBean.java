@@ -28,7 +28,7 @@ import java.util.List;
  * }
  * </pre>
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
-public class CommitmentTypeIndicationBean {
+public final class CommitmentTypeIndicationBean {
 
 	private final String identifier;
 	private final List<String> qualifiers;
@@ -49,7 +49,7 @@ public class CommitmentTypeIndicationBean {
 
 	List<String> getQualifiers() {
 		if (this.qualifiers == null) {
-			return new ArrayList<String>(0);
+			return new ArrayList<>(0);
 		}
 		return this.qualifiers;
 	}

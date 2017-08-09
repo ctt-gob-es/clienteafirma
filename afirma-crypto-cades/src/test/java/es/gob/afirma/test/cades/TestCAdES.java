@@ -50,7 +50,7 @@ public final class TestCAdES {
 		"xml" //$NON-NLS-1$
 	};
 
-	private static final List<byte[]> DATA = new ArrayList<byte[]>(2);
+	private static final List<byte[]> DATA = new ArrayList<>(2);
 	static {
 		for (final String dataFile : DATA_FILES) {
 			try {
@@ -128,9 +128,11 @@ public final class TestCAdES {
 
 		final byte[] sign = signer.sign(data, "SHA1withRSA", pke.getPrivateKey(), pke.getCertificateChain(), p); //$NON-NLS-1$
 
-		final OutputStream fos = new FileOutputStream(File.createTempFile("JPG_", ".csig")); //$NON-NLS-1$ //$NON-NLS-2$
-		fos.write(sign);
-		fos.close();
+		try (
+			final OutputStream fos = new FileOutputStream(File.createTempFile("JPG_", ".csig")); //$NON-NLS-1$ //$NON-NLS-2$
+		) {
+			fos.write(sign);
+		}
 	}
 
 	/**
@@ -180,14 +182,16 @@ public final class TestCAdES {
 					System.out.println(prueba);
 
 					final byte[] result = signer.sign(
-							DATA.get(i), algo, pke.getPrivateKey(), pke.getCertificateChain(), extraParams
-							);
+						DATA.get(i), algo, pke.getPrivateKey(), pke.getCertificateChain(), extraParams
+					);
 
 					final File saveFile = File.createTempFile(algo + "-", ".csig"); //$NON-NLS-1$ //$NON-NLS-2$
-					final OutputStream os = new FileOutputStream(saveFile);
-					os.write(result);
-					os.flush();
-					os.close();
+					try (
+						final OutputStream os = new FileOutputStream(saveFile);
+					) {
+						os.write(result);
+						os.flush();
+					}
 					System.out.println("Temporal para comprobacion manual: " + saveFile.getAbsolutePath()); //$NON-NLS-1$
 
 					// Enviamos a validar a AFirma

@@ -24,9 +24,11 @@ public final class ASiCSTests {
 			null
 		);
 
-		final OutputStream fos = new FileOutputStream(File.createTempFile("ASIC-", ".zip")); //$NON-NLS-1$ //$NON-NLS-2$
-		fos.write(zipFile);
-		fos.close();
+		try (
+			final OutputStream fos = new FileOutputStream(File.createTempFile("ASIC-", ".zip")); //$NON-NLS-1$ //$NON-NLS-2$
+		) {
+			fos.write(zipFile);
+		}
 	}
 
 }

@@ -60,10 +60,11 @@ public class TestSignHash {
 				config);
 
 		final File outFile = File.createTempFile("signHash", ".csig"); //$NON-NLS-1$ //$NON-NLS-2$
-		final FileOutputStream fos = new FileOutputStream(outFile);
-		fos.write(signature);
-		fos.close();
-
+		try (
+			final FileOutputStream fos = new FileOutputStream(outFile);
+		) {
+			fos.write(signature);
+		}
 		System.out.println("La firma de hash " + HASH_ALGORITHM + " se ha guardado en el fichero: " + outFile.getAbsolutePath()); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
@@ -82,16 +83,19 @@ public class TestSignHash {
 
 		final AOSigner signer = new AOCAdESSigner();
 		final byte[] signature = signer.sign(
-				hash,
-				AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA,
-				this.pke.getPrivateKey(),
-				this.pke.getCertificateChain(),
-				config);
+			hash,
+			AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA,
+			this.pke.getPrivateKey(),
+			this.pke.getCertificateChain(),
+			config
+		);
 
 		final File outFile = File.createTempFile("signHash", ".csig"); //$NON-NLS-1$ //$NON-NLS-2$
-		final FileOutputStream fos = new FileOutputStream(outFile);
-		fos.write(signature);
-		fos.close();
+		try (
+			final FileOutputStream fos = new FileOutputStream(outFile);
+		) {
+			fos.write(signature);
+		}
 
 		System.out.println("La firma de hash " + HASH_ALGORITHM + " se ha guardado en el fichero: " + outFile.getAbsolutePath()); //$NON-NLS-1$ //$NON-NLS-2$
 	}
