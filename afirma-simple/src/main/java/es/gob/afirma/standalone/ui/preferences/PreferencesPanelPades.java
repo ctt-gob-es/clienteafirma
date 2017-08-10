@@ -448,6 +448,10 @@ final class PreferencesPanelPades extends JPanel {
 		this.padesSignerContact.setText(PreferencesManager.getPreference(PREFERENCE_PADES_SIGNER_CONTACT, "")); //$NON-NLS-1$
 		this.visiblePdfSignature.setSelected(PreferencesManager.getBooleanPreference(PREFERENCE_PADES_VISIBLE, false));
 
+        if (this.padesBasicFormat.getItemCount() > 0) {
+			this.padesBasicFormat.setSelectedIndex(0);
+		}
+
         final ComboBoxModel<Object> padesFormatModel = this.padesBasicFormat.getModel();
 
         // unprotected: true -> no puedo modificarla, cargo la que estaba
@@ -463,6 +467,8 @@ final class PreferencesPanelPades extends JPanel {
 			}
 		}
 
+		this.padesBasicFormat.setEnabled(!isUnprotected());
+
 		final List<PolicyPanel.PolicyItem> padesPolicies = new ArrayList<>();
         padesPolicies.add(
     		new PolicyItem(
@@ -477,11 +483,6 @@ final class PreferencesPanelPades extends JPanel {
     		getPadesDefaultPolicy(),
     		this.unprotected
 		);
-
-        if (this.padesBasicFormat.getItemCount() > 0) {
-			this.padesBasicFormat.setSelectedIndex(0);
-		}
-		this.padesBasicFormat.setEnabled(!this.unprotected);
 
 		this.policyLabel.setText(this.padesPolicyDlg.getSelectedPolicyName());
 
@@ -580,7 +581,7 @@ final class PreferencesPanelPades extends JPanel {
 	 * Carga el panel de pol&iacute;tica con las preferencias guardadas
 	 */
 	private void loadPadesPolicy() {
-		// Si el panel no está cargado lo obtengo de las preferencias guardadas
+		// Si el panel no esta cargado lo obtengo de las preferencias guardadas
 		if (this.padesPolicyDlg == null) {
 			final List<PolicyPanel.PolicyItem> padesPolicies = new ArrayList<>();
 			padesPolicies.add(new PolicyItem(SimpleAfirmaMessages.getString("PreferencesPanel.73"), //$NON-NLS-1$
@@ -591,7 +592,7 @@ final class PreferencesPanelPades extends JPanel {
 	}
 
 	/**
-	 * Di&aacute;logo para cambair la configuracion de la pol&iacute;tica
+	 * Di&aacute;logo para cambiar la configuraci&oacute;n de la pol&iacute;tica
 	 *
 	 * @param container
 	 *            Contenedor en el que se define el di&aacute;logo.
