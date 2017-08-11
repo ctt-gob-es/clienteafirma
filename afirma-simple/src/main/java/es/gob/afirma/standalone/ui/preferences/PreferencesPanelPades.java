@@ -124,7 +124,16 @@ final class PreferencesPanelPades extends JPanel {
         loadPreferences();
 
         loadPadesPolicy();
-
+        
+        // Si hay establecida una politica de firma el formato de firma estara bloqueado a PAdES-BES
+        if(this.padesPolicyDlg.getSelectedPolicy() != null) {
+	        this.padesBasicFormat.removeAllItems();
+			this.padesBasicFormat.addItem(PADES_FORMAT_BES_TEXT);
+			this.padesBasicFormat.addItem(PADES_FORMAT_BASIC_TEXT);
+			this.padesBasicFormat.setSelectedItem(PADES_FORMAT_BES_TEXT);
+			this.padesBasicFormat.setEnabled(false);
+		}
+		
     	this.padesPolicyDlg.setModificationListener(modificationListener);
     	this.padesPolicyDlg.setKeyListener(keyListener);
 
@@ -367,7 +376,7 @@ final class PreferencesPanelPades extends JPanel {
 			PreferencesManager.put(PREFERENCE_PADES_SIGN_REASON, this.padesSignReason.getText());
 		}
 
-		PreferencesManager.put(PREFERENCE_PADES_FORMAT, ((ValueTextPair) this.padesBasicFormat.getSelectedItem()).getValue());
+		PreferencesManager.put(PREFERENCE_PADES_FORMAT, this.padesBasicFormat.getSelectedItem().toString());
 
 		final AdESPolicy padesPolicy = this.padesPolicyDlg.getSelectedPolicy();
 		if (padesPolicy != null) {
@@ -402,7 +411,7 @@ final class PreferencesPanelPades extends JPanel {
 			AOSignConstants.PADES_SUBFILTER_BASIC
 		);
 		for (int i = 0; i < padesFormatModel.getSize(); i++) {
-			if (padesFormatModel.getElementAt(i).equals(selectedValue)) {
+			if (padesFormatModel.getElementAt(i).toString().equals(selectedValue)) {
 				this.padesBasicFormat.setSelectedIndex(i);
 				break;
 			}
@@ -631,16 +640,14 @@ final class PreferencesPanelPades extends JPanel {
 					} else {
 						PreferencesManager.remove(PREFERENCE_PADES_POLICY_QUALIFIER);
 					}
+					// Para cualquier politica definida se usa PAdES-BES como formato de firma
+					
+					this.padesBasicFormat.removeAllItems();
+					this.padesBasicFormat.addItem(new String(PADES_FORMAT_BES_TEXT));
+					this.padesBasicFormat.addItem(new String(PADES_FORMAT_BASIC_TEXT));
+					this.padesBasicFormat.setSelectedItem(new String(PADES_FORMAT_BES_TEXT));
+					this.padesBasicFormat.setEnabled(false);
 
-					// Si se ha establecido alguna de las politicas de firmas de la AGE, se establece
-					// la el formato a DETACHED y se
-					if (AgePolicy.isAGEPolicy(padesPolicy.getPolicyIdentifier(), AOSignConstants.SIGN_FORMAT_PADES)) {
-						this.padesBasicFormat.setSelectedItem(PADES_FORMAT_BES_TEXT);
-						this.padesBasicFormat.setEnabled(false);
-					}
-					else {
-						this.padesBasicFormat.setEnabled(true);
-					}
 				} else {
 					PreferencesManager.remove(PREFERENCE_PADES_POLICY_IDENTIFIER);
 					PreferencesManager.remove(PREFERENCE_PADES_POLICY_IDENTIFIER_HASH);
