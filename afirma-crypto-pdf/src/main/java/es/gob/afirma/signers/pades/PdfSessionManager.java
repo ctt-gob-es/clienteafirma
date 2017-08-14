@@ -34,6 +34,7 @@ import com.aowagie.text.pdf.PdfStamper;
 
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.ui.AOUIFactory;
 
 /** Gestor del n&uacute;cleo de firma PDF. Esta clase realiza las operaciones necesarias tanto para
@@ -113,10 +114,19 @@ public final class PdfSessionManager {
 				);
 			}
 		}
-
+		
+		// Se verifica la politica de firma
+		final String policyID = extraParams.getProperty(PdfExtraParams.POLICY_IDENTIFIER);
+		
 		// Nombre del subfiltro de firma en el diccionario PDF
-		final String signatureSubFilter = extraParams.getProperty(PdfExtraParams.SIGNATURE_SUBFILTER);
-
+		String signatureSubFilter = extraParams.getProperty(PdfExtraParams.SIGNATURE_SUBFILTER);
+		
+		// Si existe una politica de firma el subfiltro a definir sera siempre "ETSI.CAdES.detached" (de firma PAdES-BES)
+		if (policyID != null) {
+			signatureSubFilter = AOSignConstants.PADES_SUBFILTER_BES;
+			extraParams.setProperty(PdfExtraParams.SIGNATURE_SUBFILTER, AOSignConstants.PADES_SUBFILTER_BES);
+    	}
+		
 		// Nivel de certificacion del PDF
 		int certificationLevel;
 		try {
