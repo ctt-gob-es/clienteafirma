@@ -2,6 +2,7 @@ package es.gob.afirma.test.pades;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.security.KeyStore;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.util.Properties;
@@ -50,9 +51,12 @@ public class TestCosignature {
 		);
 
 		File tempFile = File.createTempFile("afirmaPDF-OneSign_", ".pdf"); //$NON-NLS-1$ //$NON-NLS-2$
-		FileOutputStream fos = new FileOutputStream(tempFile);
-		fos.write(signedPdf);
-		fos.close();
+		try (
+    		final OutputStream fos = new FileOutputStream(tempFile);
+		) {
+	        fos.write(signedPdf);
+	        fos.flush();
+        }
 
 		signedPdf = signer.sign(
 				signedPdf,
@@ -63,9 +67,12 @@ public class TestCosignature {
 		);
 
 		tempFile = File.createTempFile("afirmaPDF-TwoSign_", ".pdf"); //$NON-NLS-1$ //$NON-NLS-2$
-		fos = new FileOutputStream(tempFile);
-		fos.write(signedPdf);
-		fos.close();
+		try (
+    		final OutputStream fos = new FileOutputStream(tempFile);
+		) {
+	        fos.write(signedPdf);
+	        fos.flush();
+        }
 
 	}
 

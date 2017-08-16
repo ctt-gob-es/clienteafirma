@@ -114,19 +114,19 @@ public final class PdfSessionManager {
 				);
 			}
 		}
-		
+
 		// Se verifica la politica de firma
 		final String policyID = extraParams.getProperty(PdfExtraParams.POLICY_IDENTIFIER);
-		
+
 		// Nombre del subfiltro de firma en el diccionario PDF
 		String signatureSubFilter = extraParams.getProperty(PdfExtraParams.SIGNATURE_SUBFILTER);
-		
+
 		// Si existe una politica de firma el subfiltro a definir sera siempre "ETSI.CAdES.detached" (de firma PAdES-BES)
 		if (policyID != null) {
 			signatureSubFilter = AOSignConstants.PADES_SUBFILTER_BES;
 			extraParams.setProperty(PdfExtraParams.SIGNATURE_SUBFILTER, AOSignConstants.PADES_SUBFILTER_BES);
     	}
-		
+
 		// Nivel de certificacion del PDF
 		int certificationLevel;
 		try {
@@ -452,7 +452,7 @@ public final class PdfSessionManager {
 		}
 
 		// Reservamos el espacio necesario en el PDF para insertar la firma
-		final HashMap<PdfName, Integer> exc = new HashMap<PdfName, Integer>();
+		final HashMap<PdfName, Integer> exc = new HashMap<>();
 		exc.put(PdfName.CONTENTS, Integer.valueOf(CSIZE * 2 + 2));
 
 		try {
@@ -475,7 +475,7 @@ public final class PdfSessionManager {
      * @return  Rect&aacute;ngulo que define la posici&oacute;n de la p&aacute;gina en donde
      *          debe agregarse la firma*/
     private static Rectangle getSignaturePositionOnPage(final Properties extraParams) {
-    	return PdfPreProcessor.getPositionOnPage(extraParams, "signature"); //$NON-NLS-1$
+    	return PdfUtil.getPositionOnPage(extraParams, "signature"); //$NON-NLS-1$
     }
 
 }

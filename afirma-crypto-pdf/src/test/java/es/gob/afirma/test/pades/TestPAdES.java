@@ -193,10 +193,13 @@ public class TestPAdES {
 		);
 
         final File saveFile = File.createTempFile("TSA-", ".pdf"); //$NON-NLS-1$ //$NON-NLS-2$
-        final OutputStream os = new FileOutputStream(saveFile);
-        os.write(result);
-        os.flush();
-        os.close();
+        try (
+    		final OutputStream os = new FileOutputStream(saveFile);
+		) {
+	        os.write(result);
+	        os.flush();
+        }
+
         System.out.println("Temporal para comprobacion manual: " + saveFile.getAbsolutePath()); //$NON-NLS-1$
 
         Assert.assertNotNull(prueba, result);
@@ -244,10 +247,12 @@ public class TestPAdES {
 		);
 
         final File saveFile = File.createTempFile("TSA-", ".pdf"); //$NON-NLS-1$ //$NON-NLS-2$
-        final OutputStream os = new FileOutputStream(saveFile);
-        os.write(result);
-        os.flush();
-        os.close();
+        try (
+    		final OutputStream os = new FileOutputStream(saveFile);
+		) {
+	        os.write(result);
+	        os.flush();
+        }
         System.out.println("Temporal para comprobacion manual: " + saveFile.getAbsolutePath()); //$NON-NLS-1$
 
         Assert.assertNotNull(prueba, result);
@@ -315,10 +320,12 @@ public class TestPAdES {
                     Assert.assertEquals(AOSignConstants.SIGN_FORMAT_PDF, signer.getSignInfo(result).getFormat());
 
                     final File saveFile = File.createTempFile(algo, ".pdf"); //$NON-NLS-1$
-                    final OutputStream os = new FileOutputStream(saveFile);
-                    os.write(result);
-                    os.flush();
-                    os.close();
+                    try (
+                		final OutputStream os = new FileOutputStream(saveFile);
+            		) {
+            	        os.write(result);
+            	        os.flush();
+                    }
                     System.out.println("Temporal para comprobacion manual: " + saveFile.getAbsolutePath()); //$NON-NLS-1$
 
                 }
@@ -375,10 +382,12 @@ public class TestPAdES {
         		extraParams
     		);
             final File file = File.createTempFile("PDF-FALLIDO_", ".pdf"); //$NON-NLS-1$ //$NON-NLS-2$
-            final OutputStream fos = new FileOutputStream(file);
-            fos.write(result);
-            fos.flush();
-            fos.close();
+            try (
+        		final OutputStream fos = new FileOutputStream(file);
+    		) {
+	            fos.write(result);
+	            fos.flush();
+            }
             System.out.println("PDF Fallido: " + file.getAbsolutePath()); //$NON-NLS-1$
         }
         catch(final Exception e) {
@@ -455,9 +464,11 @@ public class TestPAdES {
 
         	final File tempFile = File.createTempFile("afirmaPDF", ".pdf"); //$NON-NLS-1$ //$NON-NLS-2$
 
-        	final FileOutputStream fos = new FileOutputStream(tempFile);
-        	fos.write(result);
-        	fos.close();
+        	try (
+    			final FileOutputStream fos = new FileOutputStream(tempFile);
+			) {
+        		fos.write(result);
+        	}
 
 //        	Logger.getLogger("es.gob.afirma").info( //$NON-NLS-1$
 //        			"Fichero temporal para la comprobacion manual del resultado: " + //$NON-NLS-1$

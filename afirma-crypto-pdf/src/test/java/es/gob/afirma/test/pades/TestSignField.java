@@ -66,9 +66,11 @@ public class TestSignField {
 
 		File tempFile = File.createTempFile("afirmaPDF-IMAGEN-1_", ".pdf"); //$NON-NLS-1$ //$NON-NLS-2$
 
-		FileOutputStream fos = new FileOutputStream(tempFile);
-		fos.write(signedPdf);
-		fos.close();
+		try (
+			final FileOutputStream fos = new FileOutputStream(tempFile);
+		) {
+			fos.write(signedPdf);
+		}
 
 		Logger.getLogger("es.gob.afirma").info( //$NON-NLS-1$
 			"Fichero temporal para la comprobacion manual del resultado: " + //$NON-NLS-1$
@@ -86,9 +88,11 @@ public class TestSignField {
 			extraParams
 		);
 		tempFile = File.createTempFile("afirmaPDF-IMAGEN-LAST_", ".pdf"); //$NON-NLS-1$ //$NON-NLS-2$
-		fos = new FileOutputStream(tempFile);
-		fos.write(signedPdf);
-		fos.close();
+		try (
+			final FileOutputStream fos = new FileOutputStream(tempFile);
+		) {
+			fos.write(signedPdf);
+		}
 
 		Logger.getLogger("es.gob.afirma").info( //$NON-NLS-1$
 			"Fichero temporal para la comprobacion manual del resultado: " + //$NON-NLS-1$
@@ -105,9 +109,11 @@ public class TestSignField {
 			extraParams
 		);
 		tempFile = File.createTempFile("afirmaPDF-IMAGEN-TODAS_", ".pdf"); //$NON-NLS-1$ //$NON-NLS-2$
-		fos = new FileOutputStream(tempFile);
-		fos.write(signedPdf);
-		fos.close();
+		try (
+			final FileOutputStream fos = new FileOutputStream(tempFile);
+		) {
+			fos.write(signedPdf);
+		}
 
 		Logger.getLogger("es.gob.afirma").info( //$NON-NLS-1$
 			"Fichero temporal para la comprobacion manual del resultado: " + //$NON-NLS-1$
@@ -161,9 +167,11 @@ public class TestSignField {
 
 		final File tempFile = File.createTempFile("afirmaPDF", ".pdf"); //$NON-NLS-1$ //$NON-NLS-2$
 
-		final FileOutputStream fos = new FileOutputStream(tempFile);
-		fos.write(signedPdf);
-		fos.close();
+		try (
+			final FileOutputStream fos = new FileOutputStream(tempFile);
+		) {
+			fos.write(signedPdf);
+		}
 
 		Logger.getLogger("es.gob.afirma").info( //$NON-NLS-1$
 			"Fichero temporal para la comprobacion manual del resultado: " + //$NON-NLS-1$
@@ -206,9 +214,11 @@ public class TestSignField {
 
 		final File tempFile = File.createTempFile("afirmaPDF", ".pdf"); //$NON-NLS-1$ //$NON-NLS-2$
 
-		final FileOutputStream fos = new FileOutputStream(tempFile);
-		fos.write(signedPdf);
-		fos.close();
+		try (
+			final FileOutputStream fos = new FileOutputStream(tempFile);
+		) {
+			fos.write(signedPdf);
+		}
 
 		Logger.getLogger("es.gob.afirma").info( //$NON-NLS-1$
 				"Fichero temporal para la comprobacion manual del resultado: " + //$NON-NLS-1$
@@ -255,9 +265,11 @@ public class TestSignField {
 
 		final File tempFile = File.createTempFile("afirmaPDF", ".pdf"); //$NON-NLS-1$ //$NON-NLS-2$
 
-		final FileOutputStream fos = new FileOutputStream(tempFile);
-		fos.write(signedPdf);
-		fos.close();
+		try (
+			final FileOutputStream fos = new FileOutputStream(tempFile);
+		) {
+			fos.write(signedPdf);
+		}
 
 		Logger.getLogger("es.gob.afirma").info( //$NON-NLS-1$
 				"Fichero temporal para la comprobacion manual del resultado: " + //$NON-NLS-1$
@@ -304,9 +316,11 @@ public class TestSignField {
 
 		final File tempFile = File.createTempFile("afirmaPDF", ".pdf"); //$NON-NLS-1$ //$NON-NLS-2$
 
-		final FileOutputStream fos = new FileOutputStream(tempFile);
-		fos.write(signedPdf);
-		fos.close();
+		try (
+			final FileOutputStream fos = new FileOutputStream(tempFile);
+		) {
+			fos.write(signedPdf);
+		}
 
 		Logger.getLogger("es.gob.afirma").info( //$NON-NLS-1$
 				"Fichero temporal para la comprobacion manual del resultado: " + //$NON-NLS-1$
@@ -358,9 +372,11 @@ public class TestSignField {
 
 		final File tempFile = File.createTempFile("afirmaPDF", ".pdf"); //$NON-NLS-1$ //$NON-NLS-2$
 
-		final FileOutputStream fos = new FileOutputStream(tempFile);
-		fos.write(signedPdf);
-		fos.close();
+		try (
+			final FileOutputStream fos = new FileOutputStream(tempFile);
+		) {
+			fos.write(signedPdf);
+		}
 
 		Logger.getLogger("es.gob.afirma").info( //$NON-NLS-1$
 				"Fichero temporal para la comprobacion manual del resultado: " + //$NON-NLS-1$

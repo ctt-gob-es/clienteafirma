@@ -56,9 +56,11 @@ public class TestPAdESNonCompress {
 				);
 
 		final File tempFile = File.createTempFile("afirmaPAdES-doNotCompressPdf", ".pdf"); //$NON-NLS-1$ //$NON-NLS-2$
-		final FileOutputStream fos = new FileOutputStream(tempFile);
-		fos.write(signedPdf);
-		fos.close();
+		try (
+			final FileOutputStream fos = new FileOutputStream(tempFile);
+		) {
+			fos.write(signedPdf);
+		}
 
 		Logger.getLogger("es.gob.afirma").info( //$NON-NLS-1$
 				"Fichero generado: " + tempFile.getAbsolutePath() //$NON-NLS-1$

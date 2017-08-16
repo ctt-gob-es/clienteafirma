@@ -42,12 +42,14 @@ public final class TestStandaloneTimestamp {
 			EXTRAPARAMS,
 			new GregorianCalendar()
 		);
-    	final OutputStream fos = new FileOutputStream(
-			File.createTempFile("COSIGNED_TIMESTAMPED_", ".pdf") //$NON-NLS-1$ //$NON-NLS-2$
-		);
-    	fos.write(outPdf);
-    	fos.flush();
-    	fos.close();
+    	try (
+	    	final OutputStream fos = new FileOutputStream(
+				File.createTempFile("COSIGNED_TIMESTAMPED_", ".pdf") //$NON-NLS-1$ //$NON-NLS-2$
+			);
+		) {
+    		fos.write(outPdf);
+    		fos.flush();
+    	}
     }
 
 }

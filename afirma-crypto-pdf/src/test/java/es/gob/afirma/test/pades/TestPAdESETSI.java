@@ -149,10 +149,12 @@ public final class TestPAdESETSI {
                     Assert.assertEquals(AOSignConstants.SIGN_FORMAT_PDF, signer.getSignInfo(result).getFormat());
 
                     final File saveFile = File.createTempFile(file.replace(".pdf", "") + "_" + (extraParams.getProperty("policyIdentifier") != null ? "POL_" : "") + (extraParams.getProperty("tsaURL") != null ? "TSP_" : "") + algo + "_", ".pdf"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$ //$NON-NLS-10$ //$NON-NLS-11$
-                    final OutputStream os = new FileOutputStream(saveFile);
-                    os.write(result);
-                    os.flush();
-                    os.close();
+                    try (
+                		final OutputStream os = new FileOutputStream(saveFile);
+            		) {
+            	        os.write(result);
+            	        os.flush();
+                    }
                     System.out.println("Temporal para comprobacion manual: " + saveFile.getAbsolutePath()); //$NON-NLS-1$
 
 

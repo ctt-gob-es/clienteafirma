@@ -69,11 +69,11 @@ public final class TestGetSignersStructure {
 			Assert.assertNotNull("No se ha devuelto el arbol de firmantes", tree); //$NON-NLS-1$
 
 			final File tempFile = File.createTempFile("test", ".pdf"); //$NON-NLS-1$ //$NON-NLS-2$
-			try {
+			try (
 				final FileOutputStream fos = new FileOutputStream(tempFile);
+			) {
 				final byte[] signature = signer.sign(testPdf, AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA, this.pke.getPrivateKey(), this.pke.getCertificateChain(), null);
 				fos.write(signature);
-				fos.close();
 			}
 			catch (final AOException e) {
 				Assert.fail("Error durante la firma con el certificado del almacen: " + filename + ":\n" + e); //$NON-NLS-1$ //$NON-NLS-2$

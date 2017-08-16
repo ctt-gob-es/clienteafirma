@@ -38,7 +38,7 @@ final class PdfVisibleAreasUtils {
 	private static final String LAYERTEXT_TAG_ISSUERCN = "$$ISSUERCN$$"; //$NON-NLS-1$
 	private static final String LAYERTEXT_TAG_CERTSERIAL = "$$CERTSERIAL$$"; //$NON-NLS-1$
 
-	private static final Map<String, ColorValues> COLORS = new HashMap<String, ColorValues>(7);
+	private static final Map<String, ColorValues> COLORS = new HashMap<>(7);
 	static {
 		COLORS.put(BLACK      , new ColorValues(0,     0,   0));
 		COLORS.put("white"    , new ColorValues(255, 255, 255)); //$NON-NLS-1$

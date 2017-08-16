@@ -49,7 +49,7 @@ public class TestAddingXmp {
 		final String sigDataBase64 = Base64.encode(AOUtil.getDataFromInputStream(
 			ClassLoader.getSystemResourceAsStream("4df6ec6b6b5c7.jpg") //$NON-NLS-1$
 		));
-		final HashMap<String, String> moreInfo = new HashMap<String, String>(1);
+		final HashMap<String, String> moreInfo = new HashMap<>(1);
 		moreInfo.put("SignerBiometricSignatureData", sigDataBase64); //$NON-NLS-1$
 		moreInfo.put("SignerBiometricSignatureFormat", "ISO 19795-7"); //$NON-NLS-1$ //$NON-NLS-2$
 		moreInfo.put("SignerName", "Tom\u00E1s Garc\u00EDa-Mer\u00E1s"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -60,11 +60,12 @@ public class TestAddingXmp {
 
         // Guardamos el resultado
         final File tmpFile = File.createTempFile("TESTXMP_", ".pdf"); //$NON-NLS-1$ //$NON-NLS-2$
-        final OutputStream fos = new FileOutputStream(tmpFile);
-        fos.write(baos.toByteArray());
-        fos.flush();
-        fos.close();
-
+        try (
+    		final OutputStream fos = new FileOutputStream(tmpFile);
+		) {
+	        fos.write(baos.toByteArray());
+	        fos.flush();
+        }
 	}
 
 //	private static final class BioMetadataSchema extends XmpSchema {

@@ -84,10 +84,12 @@ public class TestAttachments {
         Assert.assertNotNull(result);
 
         final File tmpFile = File.createTempFile("AFIRMA", ".pdf"); //$NON-NLS-1$ //$NON-NLS-2$
-        final OutputStream fos = new FileOutputStream(tmpFile);
-        fos.write(result);
-        fos.flush();
-        fos.close();
+        try (
+    		final OutputStream fos = new FileOutputStream(tmpFile);
+		) {
+	        fos.write(result);
+	        fos.flush();
+        }
         System.out.println("Resultado guardado en " + tmpFile.getAbsolutePath()); //$NON-NLS-1$
 	}
 }

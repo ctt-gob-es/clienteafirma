@@ -48,9 +48,11 @@ public final class TestSignTime {
     		extraParams
 		);
 
-        final OutputStream fos = new FileOutputStream(File.createTempFile("PDF_TIME_", ".pdf")); //$NON-NLS-1$ //$NON-NLS-2$
-        fos.write(res);
-        fos.close();
+        try (
+    		final OutputStream fos = new FileOutputStream(File.createTempFile("PDF_TIME_", ".pdf")); //$NON-NLS-1$ //$NON-NLS-2$
+		) {
+        	fos.write(res);
+        }
 	}
 
 }

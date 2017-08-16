@@ -107,94 +107,100 @@ public final class PdfTimestamper {
         			pdfVersion = UNDEFINED;
         		}
 
-                final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        		final PdfStamper stp;
-        		try {
-        			stp = PdfStamper.createSignature(
-        				pdfReader, // PDF de entrada
-        				baos,      // Salida
-        				pdfVersion == UNDEFINED ? '\0' /* Mantener version */ : Integer.toString(pdfVersion).toCharArray()[0] /* Version a medida */,
-        				null,      // No crear temporal
-        				PdfUtil.getAppendMode(extraParams, pdfReader), // Append Mode
-        				signTime   // Momento de la firma
-        			);
+        		try (
+    				final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+				) {
+	        		final PdfStamper stp;
+	        		try {
+	        			stp = PdfStamper.createSignature(
+	        				pdfReader, // PDF de entrada
+	        				baos,      // Salida
+	        				pdfVersion == UNDEFINED ? '\0' /* Mantener version */ : Integer.toString(pdfVersion).toCharArray()[0] /* Version a medida */,
+	        				null,      // No crear temporal
+	        				PdfUtil.getAppendMode(extraParams, pdfReader), // Append Mode
+	        				signTime   // Momento de la firma
+	        			);
+	        		}
+	        		catch(final BadPasswordException e) {
+	        			throw new PdfIsPasswordProtectedException(e);
+	        		}
+	        		catch (final DocumentException e) {
+						throw new AOException("Error de formato en el PDF de entrada: " + e, e); //$NON-NLS-1$
+					}
+
+	        		// Aplicamos todos los atributos de firma
+	        		final PdfSignatureAppearance sap = stp.getSignatureAppearance();
+
+	        		// La compresion solo para versiones 5 y superiores
+	        		// Hacemos la comprobacion a "false", porque es el valor que deshabilita esta opcion
+	        		if (pdfVersion >= PDF_MIN_COMPRESABLE_VERSION && !"false".equalsIgnoreCase(extraParams.getProperty(PdfExtraParams.COMPRESS_PDF))) { //$NON-NLS-1$
+	        			stp.setFullCompression();
+	        		}
+
+	        		PdfUtil.enableLtv(stp);
+
+	        		sap.setAcro6Layers(true);
+	        		sap.setRender(PdfSignatureAppearance.SignatureRenderDescription);
+	        		sap.setSignDate(signTime);
+
+	        		final PdfSignature pdfSignature = new PdfSignature(
+	    				PdfName.ADOBE_PPKLITE,
+	    				new PdfName(TIMESTAMP_SUBFILTER)
+	    			);
+
+	        		pdfSignature.setDate(new PdfDate(signTime));
+	        		sap.setCryptoDictionary(pdfSignature);
+
+	        		// Reservamos el espacio necesario en el PDF para insertar la firma
+	        		final HashMap<PdfName, Integer> exc = new HashMap<>();
+	        		exc.put(PdfName.CONTENTS, Integer.valueOf(CSIZE * 2 + 2));
+
+	        		try {
+						sap.preClose(exc, signTime);
+					}
+	        		catch (final DocumentException e) {
+						throw new AOException("Error en el procesado del PDF: " + e, e); //$NON-NLS-1$
+					}
+
+	        		// Obtenemos el rango procesable
+	        		final byte[] original = AOUtil.getDataFromInputStream(sap.getRangeStream());
+
+	        		// Obtenemos el sello
+	        		final byte[] tspToken = getTspToken(extraParams, original, signTime);
+
+	            	// Y lo insertamos en el PDF
+	        		final byte[] outc = new byte[CSIZE];
+
+	                if (tspToken.length > CSIZE) {
+	                	throw new AOException(
+	            			"El tamano del sello de tiempo (" + tspToken.length + ") supera el maximo permitido para un PDF (" + CSIZE + ")" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+	        			);
+	                }
+
+	        		final PdfDictionary dic2 = new PdfDictionary();
+	        		System.arraycopy(tspToken, 0, outc, 0, tspToken.length);
+	                dic2.put(PdfName.CONTENTS, new PdfString(outc).setHexWriting(true));
+
+	        	    try {
+	    		       sap.close(dic2);
+	    		    }
+	    		    catch (final Exception e) {
+	    		    	baos.close();
+	    		        throw new AOException("Error al cerrar el PDF para finalizar el proceso de firma", e); //$NON-NLS-1$
+	    		    }
+
+	        	    return baos.toByteArray();
         		}
-        		catch(final BadPasswordException e) {
-        			throw new PdfIsPasswordProtectedException(e);
-        		}
-        		catch (final DocumentException e) {
-					throw new AOException("Error de formato en el PDF de entrada: " + e, e); //$NON-NLS-1$
-				}
-
-        		// Aplicamos todos los atributos de firma
-        		final PdfSignatureAppearance sap = stp.getSignatureAppearance();
-
-        		// La compresion solo para versiones 5 y superiores
-        		// Hacemos la comprobacion a "false", porque es el valor que deshabilita esta opcion
-        		if (pdfVersion >= PDF_MIN_COMPRESABLE_VERSION && !"false".equalsIgnoreCase(extraParams.getProperty(PdfExtraParams.COMPRESS_PDF))) { //$NON-NLS-1$
-        			stp.setFullCompression();
-        		}
-
-        		PdfUtil.enableLtv(stp);
-
-        		sap.setAcro6Layers(true);
-        		sap.setRender(PdfSignatureAppearance.SignatureRenderDescription);
-        		sap.setSignDate(signTime);
-
-        		final PdfSignature pdfSignature = new PdfSignature(
-    				PdfName.ADOBE_PPKLITE,
-    				new PdfName(TIMESTAMP_SUBFILTER)
-    			);
-
-        		pdfSignature.setDate(new PdfDate(signTime));
-        		sap.setCryptoDictionary(pdfSignature);
-
-        		// Reservamos el espacio necesario en el PDF para insertar la firma
-        		final HashMap<PdfName, Integer> exc = new HashMap<PdfName, Integer>();
-        		exc.put(PdfName.CONTENTS, Integer.valueOf(CSIZE * 2 + 2));
-
-        		try {
-					sap.preClose(exc, signTime);
-				}
-        		catch (final DocumentException e) {
-					throw new AOException("Error en el procesado del PDF: " + e, e); //$NON-NLS-1$
-				}
-
-        		// Obtenemos el rango procesable
-        		final byte[] original = AOUtil.getDataFromInputStream(sap.getRangeStream());
-
-        		// Obtenemos el sello
-        		final byte[] tspToken = getTspToken(extraParams, original, signTime);
-
-            	// Y lo insertamos en el PDF
-        		final byte[] outc = new byte[CSIZE];
-
-                if (tspToken.length > CSIZE) {
-                	throw new AOException(
-            			"El tamano del sello de tiempo (" + tspToken.length + ") supera el maximo permitido para un PDF (" + CSIZE + ")" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-        			);
-                }
-
-        		final PdfDictionary dic2 = new PdfDictionary();
-        		System.arraycopy(tspToken, 0, outc, 0, tspToken.length);
-                dic2.put(PdfName.CONTENTS, new PdfString(outc).setHexWriting(true));
-
-        	    try {
-    		       sap.close(dic2);
-    		    }
-    		    catch (final Exception e) {
-    		    	baos.close();
-    		        throw new AOException("Error al cerrar el PDF para finalizar el proceso de firma", e); //$NON-NLS-1$
-    		    }
-
-        	    return baos.toByteArray();
             }
     	}
 		return inPDF;
 	}
 
-	private static byte[] getTspToken(final Properties extraParams, final byte[] original, final Calendar signTime) throws AOException, NoSuchAlgorithmException, IOException {
-
+	private static byte[] getTspToken(final Properties extraParams,
+			                          final byte[] original,
+			                          final Calendar signTime) throws AOException,
+	                                                                  NoSuchAlgorithmException,
+	                                                                  IOException {
     	// Obtenemos el sellador de tiempo
 		final TsaParams tsaParams = new TsaParams(extraParams);
         final CMSTimestamper timestamper = new CMSTimestamper(tsaParams);

@@ -46,7 +46,6 @@ public final class TestPDFX {
         extraParams.put("alwaysCreateRevision", "true"); //$NON-NLS-1$ //$NON-NLS-2$
 
         byte[] resPdf;
-        OutputStream fos;
 
         resPdf = signer.sign(
     		testPdf,
@@ -56,9 +55,11 @@ public final class TestPDFX {
     		extraParams
 		);
 
-        fos = new FileOutputStream(File.createTempFile("PDF_REV_", ".pdf")); //$NON-NLS-1$ //$NON-NLS-2$
-        fos.write(resPdf);
-        fos.close();
+        try (
+    		final OutputStream fos = new FileOutputStream(File.createTempFile("PDF_REV_", ".pdf")); //$NON-NLS-1$ //$NON-NLS-2$
+		) {
+        	fos.write(resPdf);
+        }
 	}
 
 	/** Prueba firma de PDF-X.
@@ -83,10 +84,7 @@ public final class TestPDFX {
 
         // Firma de PDF/A-2B
 
-        byte[] resPdf;
-        OutputStream fos;
-
-        resPdf = signer.sign(
+        byte[] resPdf = signer.sign(
     		testPdfA2b,
     		DEFAULT_SIGNATURE_ALGORITHM,
     		pke.getPrivateKey(),
@@ -96,9 +94,11 @@ public final class TestPDFX {
 
         File outputFile = File.createTempFile("PDFA2BSIGNED_", ".pdf"); //$NON-NLS-1$ //$NON-NLS-2$
 
-        fos = new FileOutputStream(outputFile);
-        fos.write(resPdf);
-        fos.close();
+        try (
+    		final OutputStream fos = new FileOutputStream(outputFile);
+		) {
+        	fos.write(resPdf);
+        }
 
         System.out.println("Fichero de firma de PDF/A-2B guardado en: " + outputFile.getAbsolutePath()); //$NON-NLS-1$
 
@@ -118,9 +118,11 @@ public final class TestPDFX {
 
         outputFile = File.createTempFile("PDFA1ASIGNED_", ".pdf"); //$NON-NLS-1$ //$NON-NLS-2$
 
-        fos = new FileOutputStream(outputFile);
-        fos.write(resPdf);
-        fos.close();
+        try (
+    		final OutputStream fos = new FileOutputStream(outputFile);
+		) {
+        	fos.write(resPdf);
+        }
 
         System.out.println("Fichero de firma de PDF/A-1A guardado en: " + outputFile.getAbsolutePath()); //$NON-NLS-1$
 
@@ -140,10 +142,11 @@ public final class TestPDFX {
 
         outputFile = File.createTempFile("PDFA1BSIGNED_", ".pdf"); //$NON-NLS-1$ //$NON-NLS-2$
 
-        fos = new FileOutputStream(outputFile);
-        fos.write(resPdf);
-        fos.close();
-
+        try (
+    		final OutputStream fos = new FileOutputStream(outputFile);
+		) {
+        	fos.write(resPdf);
+        }
         System.out.println("Fichero de firma de PDF/A-1B guardado en: " + outputFile.getAbsolutePath()); //$NON-NLS-1$
 
         // Firma de PDF/A-2B generado con PDFTools
@@ -162,9 +165,11 @@ public final class TestPDFX {
 
         outputFile = File.createTempFile("PDFA2BPDFTOOLS_SIGNED_", ".pdf"); //$NON-NLS-1$ //$NON-NLS-2$
 
-        fos = new FileOutputStream(outputFile);
-        fos.write(resPdf);
-        fos.close();
+        try (
+    		final OutputStream fos = new FileOutputStream(outputFile);
+		) {
+        	fos.write(resPdf);
+        }
 
         System.out.println("Fichero de firma de PDF/A-1A guardado en: " + outputFile.getAbsolutePath()); //$NON-NLS-1$
 	}

@@ -209,7 +209,7 @@ final class XmpHelper {
 
 		n.appendChild(node);
 
-		final Map<String, String> props = new ConcurrentHashMap<String, String>(1);
+		final Map<String, String> props = new ConcurrentHashMap<>(1);
 		props.put("encoding", "utf-8"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		String xmlString = new String(

@@ -123,7 +123,8 @@ public final class PdfPreProcessor {
 	}
 
 	/** Sobreimpone una imagen en un documento PDF.
-	 * @param extraParams Datos de la imagen a a&ntilde;adir como <a href="doc-files/extraparams.html">par&aacute;metros adicionales</a>.
+	 * @param extraParams Datos de la imagen a a&ntilde;adir como <a href="doc-files/extraparams.html">par&aacute;metros
+	 *                    adicionales</a>.
 	 * @param stp Estampador de PDF, debe abrirse y cerrarse fuera de este m&eacute;todo.
 	 * @param pdfReader Lector PDF, para obtener el n&uacute;mero de p&aacute;ginas del documento.
 	 * @throws IOException Cuando ocurren errores de entrada / salida. */
@@ -139,7 +140,7 @@ public final class PdfPreProcessor {
 		}
 		final byte[] image = Base64.decode(imageDataBase64);
 
-		final Rectangle rect = getPositionOnPage(extraParams, PdfExtraParams.IMAGE);
+		final Rectangle rect = PdfUtil.getPositionOnPage(extraParams, PdfExtraParams.IMAGE);
 
 		if (rect == null) {
 			return;
@@ -155,7 +156,9 @@ public final class PdfPreProcessor {
 			pageNum = Integer.parseInt(imagePage);
 		}
 		catch(final NumberFormatException e) {
-			throw new IOException("Se ha indicado un numero de pagina con formato invalido para insertar la imagen (" + imagePage + "): " + e, e); //$NON-NLS-1$ //$NON-NLS-2$
+			throw new IOException(
+				"Se ha indicado un numero de pagina con formato invalido para insertar la imagen (" + imagePage + "): " + e, e //$NON-NLS-1$ //$NON-NLS-2$
+			);
 		}
 
 		if (pageNum == LAST_PAGE) {
@@ -185,36 +188,6 @@ public final class PdfPreProcessor {
 
 		LOGGER.info("Anadida imagen al PDF antes de la firma"); //$NON-NLS-1$
 	}
-
-    /** Devuelve la posici&oacute;n de la p&aacute;gina en donde debe agregarse el elemento
-     * gr&aacute;fico indicado como prefijo. La medida de posicionamiento es el p&iacute;xel y se cuenta en
-     * el eje horizontal de izquierda a derecha y en el vertical de abajo a arriba.
-     * @param extraParams Definici&oacute;n de las coordenadas como conjunto de propiedades
-     * @param prefix Prefijo de las propiedades de coordenada en el conjunto
-     * @return Rect&aacute;ngulo que define una posici&oacute;n de un elemento en una p&aacute;gina del PDF */
-    static Rectangle getPositionOnPage(final Properties extraParams, final String prefix) {
-    	if (extraParams == null || prefix == null) {
-    		LOGGER.severe("Se ha pedido una posicion para un elemento grafico nulo"); //$NON-NLS-1$
-    		return null;
-    	}
-    	if (extraParams.getProperty(prefix + "PositionOnPageLowerLeftX") != null && //$NON-NLS-1$
-    		extraParams.getProperty(prefix + "PositionOnPageLowerLeftY") != null && //$NON-NLS-1$
-			extraParams.getProperty(prefix + "PositionOnPageUpperRightX") != null && //$NON-NLS-1$
-			extraParams.getProperty(prefix + "PositionOnPageUpperRightY") != null //$NON-NLS-1$
-		) {
-	        try {
-	            return new Rectangle(Integer.parseInt(extraParams.getProperty(prefix + "PositionOnPageLowerLeftX")), //$NON-NLS-1$
-	                                 Integer.parseInt(extraParams.getProperty(prefix + "PositionOnPageLowerLeftY")), //$NON-NLS-1$
-	                                 Integer.parseInt(extraParams.getProperty(prefix + "PositionOnPageUpperRightX")), //$NON-NLS-1$
-	                                 Integer.parseInt(extraParams.getProperty(prefix + "PositionOnPageUpperRightY")) //$NON-NLS-1$
-	            );
-	        }
-	        catch (final Exception e) {
-	        	LOGGER.severe("Se ha indicado una posicion invalida para el elemento grafico '" + prefix + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
-	        }
-    	}
-    	return null;
-    }
 
     static com.aowagie.text.Image getImage(final String imagebase64Encoded) {
     	if (imagebase64Encoded == null || imagebase64Encoded.isEmpty()) {

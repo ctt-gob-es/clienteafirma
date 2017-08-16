@@ -113,7 +113,7 @@ public final class TestMetadata {
 
 		n.appendChild(node);
 
-		final Map<String, String> props = new ConcurrentHashMap<String, String>(1);
+		final Map<String, String> props = new ConcurrentHashMap<>(1);
 		props.put("encoding", "utf-8"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		String xmlString = new String(
@@ -145,9 +145,11 @@ public final class TestMetadata {
 
 		reader.close();
 
-		final OutputStream fos = new FileOutputStream(File.createTempFile("PDFXMP_", ".txt")); //$NON-NLS-1$ //$NON-NLS-2$
-		fos.write(baos.toByteArray());
-		fos.close();
+		try (
+			final OutputStream fos = new FileOutputStream(File.createTempFile("PDFXMP_", ".txt")); //$NON-NLS-1$ //$NON-NLS-2$
+		) {
+			fos.write(baos.toByteArray());
+		}
 
 	}
 

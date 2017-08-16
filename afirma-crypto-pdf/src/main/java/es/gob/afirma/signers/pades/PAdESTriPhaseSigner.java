@@ -151,7 +151,8 @@ public final class PAdESTriPhaseSigner {
     }
 
     /** Obtiene la pre-firma PAdES/CAdES de un PDF (atributos CAdES a firmar)
-     * @param digestAlgorithmName Nombre del algoritmo de huella digital usado para la firma. Debe usarse exactamente el mismo valor en la post-firma.
+     * @param digestAlgorithmName Nombre del algoritmo de huella digital usado para la firma.
+     *                            Debe usarse exactamente el mismo valor en la post-firma.
      * <p>Se aceptan los siguientes algoritmos en el par&aacute;metro <code>digestAlgorithmName</code>:</p>
      * <ul>
      *  <li><i>SHA1</i></li>
@@ -160,8 +161,10 @@ public final class PAdESTriPhaseSigner {
      *  <li><i>SHA-512</i></li>
      * </ul>
      * @param inPDF PDF a firmar. Debe usarse exactamente el mismo documento en la post-firma.
-     * @param signerCertificateChain Cadena de certificados del firmante Debe usarse exactamente la misma cadena de certificados en la post-firma.
-     * @param xParams Par&aacute;metros adicionales para la firma (<a href="doc-files/extraparams.html">detalle</a>). Deben usarse exactamente los mismos valores en la post-firma.
+     * @param signerCertificateChain Cadena de certificados del firmante.
+     *                               Debe usarse exactamente la misma cadena de certificados en la post-firma.
+     * @param xParams Par&aacute;metros adicionales para la firma (<a href="doc-files/extraparams.html">detalle</a>).
+     *                Deben usarse exactamente los mismos valores en la post-firma.
      * @param signTime Momento de la firma. Debe usarse exactamente el mismo valor en la post-firma.
      * @return pre-firma CAdES/PAdES (atributos CAdES a firmar)
      * @throws IOException En caso de errores de entrada / salida
@@ -359,21 +362,20 @@ public final class PAdESTriPhaseSigner {
 		}
         final PdfSignatureAppearance sap = pts.getSAP();
 
-    	final ByteArrayOutputStream baos = pts.getBAOS();
-	    final String badFileID = pts.getFileID();
-
-	    try {
-	       sap.close(dic2);
-	    }
-	    catch (final Exception e) {
-	    	baos.close();
-	        throw new AOException("Error al cerrar el PDF para finalizar el proceso de firma", e); //$NON-NLS-1$
-	    }
-
-	    final byte[] ret = new String(baos.toByteArray(), "ISO-8859-1").replace(badFileID, signature.getFileID()).getBytes("ISO-8859-1"); //$NON-NLS-1$ //$NON-NLS-2$
-
-	    baos.close();
-
+        final byte[] ret;
+        try (
+    		final ByteArrayOutputStream baos = pts.getBAOS();
+		) {
+		    final String badFileID = pts.getFileID();
+		    try {
+		       sap.close(dic2);
+		    }
+		    catch (final Exception e) {
+		    	baos.close();
+		        throw new AOException("Error al cerrar el PDF para finalizar el proceso de firma", e); //$NON-NLS-1$
+		    }
+		    ret = new String(baos.toByteArray(), "ISO-8859-1").replace(badFileID, signature.getFileID()).getBytes("ISO-8859-1"); //$NON-NLS-1$ //$NON-NLS-2$
+        }
 	    return ret;
     }
 

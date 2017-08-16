@@ -24,6 +24,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import com.aowagie.text.Rectangle;
 import com.aowagie.text.exceptions.BadPasswordException;
 import com.aowagie.text.pdf.AcroFields;
 import com.aowagie.text.pdf.PdfArray;
@@ -50,7 +51,7 @@ public final class PdfUtil {
 
 	private static final Set<String> SUPPORTED_SUBFILTERS;
 	static {
-		SUPPORTED_SUBFILTERS = new HashSet<String>();
+		SUPPORTED_SUBFILTERS = new HashSet<>();
 		SUPPORTED_SUBFILTERS.add("/ETSI.RFC3161"); //$NON-NLS-1$
 		SUPPORTED_SUBFILTERS.add(FILTER_ADOBE_PKCS7_DETACHED);
 		SUPPORTED_SUBFILTERS.add("/ETSI.CAdES.detached"); //$NON-NLS-1$
@@ -383,7 +384,7 @@ public final class PdfUtil {
 	 * @return Campos de firma vac&iacute;os del PDF proporcionado. */
 	public static List<SignatureField> getPdfEmptySignatureFields(final byte[] pdf) {
 		if (pdf == null) {
-			return new ArrayList<SignatureField>(0);
+			return new ArrayList<>(0);
 		}
 		final PdfReader reader;
 		try {
@@ -393,12 +394,12 @@ public final class PdfUtil {
 			LOGGER.severe(
 				"Error leyendo el PDF de entrada: " + e //$NON-NLS-1$
 			);
-			return new ArrayList<SignatureField>(0);
+			return new ArrayList<>(0);
 		}
 		final AcroFields fields = reader.getAcroFields();
 		if (fields != null) {
 			final List<String> emptySignatureFields = fields.getBlankSignatureNames();
-			final List<SignatureField> ret = new ArrayList<SignatureField>();
+			final List<SignatureField> ret = new ArrayList<>();
 			if (emptySignatureFields != null) {
 				for(final String signame : emptySignatureFields) {
 					final float[] positions = fields.getFieldPositions(signame);
@@ -419,6 +420,39 @@ public final class PdfUtil {
 				return ret;
 			}
 		}
-		return new ArrayList<SignatureField>(0);
+		return new ArrayList<>(0);
 	}
+
+    /** Devuelve la posici&oacute;n de la p&aacute;gina en donde debe agregarse el elemento
+     * gr&aacute;fico indicado como prefijo. La medida de posicionamiento es el p&iacute;xel y se cuenta en
+     * el eje horizontal de izquierda a derecha y en el vertical de abajo a arriba.
+     * @param extraParams Definici&oacute;n de las coordenadas como conjunto de propiedades
+     * @param prefix Prefijo de las propiedades de coordenada en el conjunto
+     * @return Rect&aacute;ngulo que define una posici&oacute;n de un elemento en una p&aacute;gina del PDF */
+    public static com.aowagie.text.Rectangle getPositionOnPage(final Properties extraParams, final String prefix) {
+    	if (extraParams == null || prefix == null) {
+    		LOGGER.severe("Se ha pedido una posicion para un elemento grafico nulo"); //$NON-NLS-1$
+    		return null;
+    	}
+    	if (extraParams.getProperty(prefix + "PositionOnPageLowerLeftX") != null && //$NON-NLS-1$
+    		extraParams.getProperty(prefix + "PositionOnPageLowerLeftY") != null && //$NON-NLS-1$
+			extraParams.getProperty(prefix + "PositionOnPageUpperRightX") != null && //$NON-NLS-1$
+			extraParams.getProperty(prefix + "PositionOnPageUpperRightY") != null //$NON-NLS-1$
+		) {
+	        try {
+	            return new Rectangle(
+            		Integer.parseInt(extraParams.getProperty(prefix + "PositionOnPageLowerLeftX")), //$NON-NLS-1$
+                     Integer.parseInt(extraParams.getProperty(prefix + "PositionOnPageLowerLeftY")), //$NON-NLS-1$
+                     Integer.parseInt(extraParams.getProperty(prefix + "PositionOnPageUpperRightX")), //$NON-NLS-1$
+                     Integer.parseInt(extraParams.getProperty(prefix + "PositionOnPageUpperRightY")) //$NON-NLS-1$
+	            );
+	        }
+	        catch (final Exception e) {
+	        	LOGGER.severe(
+        			"Se ha indicado una posicion invalida para el elemento grafico '" + prefix + "': " + e //$NON-NLS-1$ //$NON-NLS-2$
+    			);
+	        }
+    	}
+    	return null;
+    }
 }
