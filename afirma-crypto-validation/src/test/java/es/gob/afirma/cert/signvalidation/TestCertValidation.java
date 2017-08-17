@@ -25,7 +25,7 @@ public final class TestCertValidation {
 		).validateCertificate();
 		vr.check();
 	}
-	
+
 	/** Prueba de certificados MDEF.
 	 * @throws Exception En cualquier error. */
 	@SuppressWarnings("static-method")
@@ -39,7 +39,7 @@ public final class TestCertValidation {
 		).validateCertificate();
 		vr.check();
 	}
-	
+
 	/** Prueba de certificados DNIe.
 	 * @throws Exception En cualquier error. */
 	@SuppressWarnings("static-method")
@@ -47,6 +47,20 @@ public final class TestCertValidation {
 	public void testDnie() throws Exception {
 		final X509Certificate cert = (X509Certificate) CertificateFactory.getInstance("X.509").generateCertificate( //$NON-NLS-1$
 			TestCertValidation.class.getResourceAsStream("/certMinHAP.cer") //$NON-NLS-1$
+		);
+		final ValidationResult vr = CertificateVerifierFactory.getCertificateVerifier(
+			cert
+		).validateCertificate();
+		vr.check();
+	}
+
+	/** Prueba de certificados gen&eacute;ricos.
+	 * @throws Exception En cualquier error. */
+	@SuppressWarnings("static-method")
+	@Test
+	public void testGen() throws Exception {
+		final X509Certificate cert = (X509Certificate) CertificateFactory.getInstance("X.509").generateCertificate( //$NON-NLS-1$
+			TestCertValidation.class.getResourceAsStream("/CERT_ATOS_TEST.cer") //$NON-NLS-1$
 		);
 		final ValidationResult vr = CertificateVerifierFactory.getCertificateVerifier(
 			cert

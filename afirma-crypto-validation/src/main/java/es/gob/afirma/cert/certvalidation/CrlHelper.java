@@ -73,12 +73,19 @@ final class CrlHelper {
 		final List<String> crlDistPoints;
 		try {
 			crlDistPoints = overridingDistributionPoints == null || overridingDistributionPoints.isEmpty() ?
-								getCrlDistributionPoints(cert) :
-									overridingDistributionPoints;
+				getCrlDistributionPoints(cert) :
+					overridingDistributionPoints;
 		}
 		catch (final IOException e) {
 			LOGGER.severe("Error obteniendo los puntos de distribucion de CRL: " + e); //$NON-NLS-1$
 			return ValidationResult.SERVER_ERROR;
+		}
+
+		if (crlDistPoints == null || crlDistPoints.isEmpty()) {
+			LOGGER.warning(
+				"El certificado con serie '" + cert.getSerialNumber() + "' no tiene CRL asociadas" //$NON-NLS-1$ //$NON-NLS-2$
+			);
+			return ValidationResult.UNKNOWN;
 		}
 
 		LOGGER.info(

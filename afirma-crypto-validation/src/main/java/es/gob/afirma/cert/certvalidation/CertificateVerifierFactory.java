@@ -42,9 +42,9 @@ public final class CertificateVerifierFactory {
 	}
 
 	/** Obtiene un validador para el certificado proporcionado.
-	 * @param cert Certificado a validar
-	 * @return Validador para el certificado proporcionado
-	 * @throws CertificateVerifierFactoryException Si o se conocen mecanismos de validacion
+	 * @param cert Certificado a validar.
+	 * @return Validador para el certificado proporcionado.
+	 * @throws CertificateVerifierFactoryException Si no se conocen mecanismos de validaci&oacute;n
 	 *                                             para los certificados del emisor indicado.*/
 	public static CertificateVerificable getCertificateVerifier(final X509Certificate cert) throws CertificateVerifierFactoryException {
 		if (cert == null) {
@@ -77,7 +77,7 @@ public final class CertificateVerifierFactory {
 		if ("ocsp".equalsIgnoreCase(validationClass)) { //$NON-NLS-1$
 			certVerif = new OcspCertificateVerifier();
 		}
-		else if ("crl".equalsIgnoreCase(validationClass)) { //$NON-NLS-1$
+		else if ("crl".equalsIgnoreCase(validationClass) || validationClass == null) { //$NON-NLS-1$
 			certVerif = new CrlCertificateVerifier();
 		}
 		else {
@@ -87,11 +87,15 @@ public final class CertificateVerifierFactory {
 			}
 			catch (final ClassNotFoundException e) {
 				LOGGER.warning("No se encuentra la clase validadora: " + e); //$NON-NLS-1$
-				throw new CertificateVerifierFactoryException("No se encuentran la clase validadora: " + e, e); //$NON-NLS-1$
+				throw new CertificateVerifierFactoryException(
+					"No se encuentran la clase validadora: " + e, e //$NON-NLS-1$
+				);
 			}
 			catch (final Exception e) {
 				LOGGER.warning("No se ha podido instanciar el verificador del certificado: " + e); //$NON-NLS-1$
-				throw new CertificateVerifierFactoryException("No se ha podido instanciar el verificador del certificado: " + e, e); //$NON-NLS-1$
+				throw new CertificateVerifierFactoryException(
+					"No se ha podido instanciar el verificador del certificado: " + e, e //$NON-NLS-1$
+				);
 			}
 		}
 		certVerif.setValidationProperties(validationProperties);

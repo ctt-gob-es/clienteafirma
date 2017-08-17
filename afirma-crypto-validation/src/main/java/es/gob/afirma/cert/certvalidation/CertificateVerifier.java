@@ -31,8 +31,8 @@ public abstract class CertificateVerifier implements CertificateVerificable {
 	protected static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	private X509Certificate certificate = null;
-	private Properties conf = new Properties();
-	
+	private final Properties conf = new Properties();
+
 	@Override
 	public void setSubjectCert(final X509Certificate c) {
 		this.certificate = c;
@@ -41,22 +41,28 @@ public abstract class CertificateVerifier implements CertificateVerificable {
 	protected X509Certificate getCertificate() {
 		return this.certificate;
 	}
-	
+
 	protected Properties getValidationProperties() {
 		return this.conf;
 	}
-	
+
 	@Override
-	public void setValidationProperties(String confFile) {
+	public void setValidationProperties(final String confFile) {
+		if (confFile == null) {
+			LOGGER.warning(
+				"No hay configuracion especifica de validacion, se usaran los valores por defecto" //$NON-NLS-1$
+			);
+			return;
+		}
 		try {
 			this.conf.load(CertificateVerifier.class.getResourceAsStream(confFile));
 		}
 		catch (final Exception e) {
 			throw new IllegalArgumentException(
-				"No se ha podido cargar la configuracion del servidor (" + confFile + ": " + e, e //$NON-NLS-1$ //$NON-NLS-2$
+				"No se ha podido cargar la configuracion del verificador (" + confFile + ": " + e, e //$NON-NLS-1$ //$NON-NLS-2$
 			);
 		}
-		
+
 		final String issuerCertFile = this.conf.getProperty("issuerCertFile"); //$NON-NLS-1$
 		if (issuerCertFile != null) {
 			try {
@@ -75,9 +81,9 @@ public abstract class CertificateVerifier implements CertificateVerificable {
 			}
 		}
 	}
-	
+
 	private X509Certificate issuerCert;
-	
+
 	@Override
 	public void setIssuerCert(final X509Certificate cert) {
 		this.issuerCert = cert;

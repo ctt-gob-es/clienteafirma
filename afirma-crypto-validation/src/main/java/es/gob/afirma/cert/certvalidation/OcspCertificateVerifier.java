@@ -74,7 +74,10 @@ public final class OcspCertificateVerifier extends CertificateVerifier {
 		}
 		else {
 			try {
-				ocspRequest = OcspHelper.createOcspRequest(cert, getIssuerCert());
+				ocspRequest = OcspHelper.createOcspRequest(
+					cert,
+					getIssuerCert()
+				);
 			}
 			catch (final Exception e) {
 				LOGGER.severe("Error creando la peticion OCSP: " + e); //$NON-NLS-1$
