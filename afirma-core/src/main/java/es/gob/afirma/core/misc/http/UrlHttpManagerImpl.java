@@ -145,7 +145,13 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 				tmpStr = un.getPassword();
 			}
 			authString = Base64.encode(tmpStr.getBytes());
-			url = un.getProtocol() + PROT_SEPARATOR + un.getHost() + (un.getPort() != -1 ? URN_SEPARATOR + Integer.toString(un.getPort()) : "") + "/" + un.getFile(); //$NON-NLS-1$ //$NON-NLS-2$
+			url = un.getProtocol() +
+				PROT_SEPARATOR +
+					un.getHost() +
+						(un.getPort() != -1 ? URN_SEPARATOR +
+							Integer.toString(un.getPort()) : "") + //$NON-NLS-1$
+								"/" + //$NON-NLS-1$
+									(un.getFile() != null ? un.getFile() : ""); //$NON-NLS-1$
 		}
 		else {
 			url = urlToRead;
