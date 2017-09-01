@@ -149,7 +149,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 			try {
 				dataBinary = Base64.decode(this.dataStore.toString());
 			}
-			catch (final IOException e) {
+			catch (final Exception e) {
 				setError(e, "Los datos proporcionados est\u00E1n mal codificados en base 64"); //$NON-NLS-1$
 				throw e;
 			}
@@ -185,7 +185,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 				setError(ce);
 				throw ce;
 			}
-			catch (final PrivilegedActionException e) {
+			catch (final Exception e) {
 				setError(e);
 				throw e;
 			}
@@ -312,7 +312,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 			try {
 				signature = Base64.decode(this.dataStore.toString());
 			}
-			catch (final IOException e) {
+			catch (final Exception e) {
 				setError(e, "La firma proporcionada est\u00E1 mal codificada en base 64"); //$NON-NLS-1$
 				throw e;
 			}
@@ -462,7 +462,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 			try {
 				signature = Base64.decode(this.dataStore.toString());
 			}
-			catch (final IOException e) {
+			catch (final Exception e) {
 				setError(e, "La firma proporcionada est\u00E1 mal codificada en base 64"); //$NON-NLS-1$
 				throw e;
 			}
