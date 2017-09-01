@@ -56,8 +56,7 @@ public final class MozillaKeyStoreUtilities {
 	private static final String PKCS11TXT_FILENAME = "pkcs11.txt"; //$NON-NLS-1$
 
 	private static final String AFIRMA_NSS_HOME = "AFIRMA_NSS_HOME"; //$NON-NLS-1$
-
-	private static final String AFIRMA_PROFILES_INI = "AFIRMA_PROFILES_INI"; //$NON-NLS-1$
+	private static final String AFIRMA_PROFILES_INI = "AFIRMA_NSS_PROFILES_INI"; //$NON-NLS-1$
 
 	private static final String USE_ENV_VARS = "es.gob.afirma.keystores.mozilla.UseEnvironmentVariables"; //$NON-NLS-1$
 

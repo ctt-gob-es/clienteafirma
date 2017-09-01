@@ -30,6 +30,8 @@ import es.gob.afirma.keystores.callbacks.UIPasswordCallback;
 public class MozillaUnifiedKeyStoreManager extends AggregatedKeyStoreManager {
 
     private static final String ONLY_PKCS11 = "es.gob.afirma.keystores.mozilla.LoadSscdOnly"; //$NON-NLS-1$
+    private static final String ONLY_PKCS11_ENV = "AFIRMA_NSS_LOAD_SSCD_ONLY"; //$NON-NLS-1$
+
     protected static final String INCLUDE_NATIVE_DNIE_P11 = "es.gob.afirma.keystores.mozilla.IncludeNativeDniePkcs11"; //$NON-NLS-1$
 
 	private PasswordCallback passwordCallback = null;
@@ -60,7 +62,7 @@ public class MozillaUnifiedKeyStoreManager extends AggregatedKeyStoreManager {
 
 		final Object parentComponent = params != null && params.length > 0 ? params[0] : null;
 
-		if (!Boolean.getBoolean(ONLY_PKCS11) && !Boolean.parseBoolean(System.getenv(ONLY_PKCS11))) {
+		if (!Boolean.getBoolean(ONLY_PKCS11) && !Boolean.parseBoolean(System.getenv(ONLY_PKCS11_ENV))) {
 			// Primero anadimos el almacen principal NSS
 			final AOKeyStoreManager ksm = getNssKeyStoreManager();
 			try {
@@ -202,7 +204,9 @@ public class MozillaUnifiedKeyStoreManager extends AggregatedKeyStoreManager {
 	protected Map<String, String> getExternalStores() {
 		return MozillaKeyStoreUtilities.getMozillaPKCS11Modules(
 			// Si no es Linux o NO nos han indicado que incluyamos controlador nativo DNIe, lo excluimos
-			!Platform.OS.LINUX.equals(Platform.OS.LINUX) || !(Boolean.getBoolean(INCLUDE_NATIVE_DNIE_P11) || Boolean.parseBoolean(System.getenv(INCLUDE_NATIVE_DNIE_P11))), // Excluir modulos nativos DNIe
+			!Platform.OS.LINUX.equals(Platform.OS.LINUX) ||
+				Boolean.getBoolean(KeyStoreUtilities.DISABLE_DNIE_NATIVE_DRIVER) ||
+					Boolean.parseBoolean(System.getenv(KeyStoreUtilities.DISABLE_DNIE_NATIVE_DRIVER_ENV)),
 			true  // Incluir los PKCS#11 que esten instalados en el sistema pero no en Mozilla
 		);
 	}

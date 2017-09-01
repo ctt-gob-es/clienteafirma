@@ -103,6 +103,9 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
     /** Indica si esta permitida la b&uacute;squeda de actualizaciones de la aplicaci&oacute;n. */
     private static boolean updatesEnabled = true;
 
+    private static final String DO_NOT_SEND_ANALYTICS = "es.gob.afirma.doNotSendAnalytics"; //$NON-NLS-1$
+    private static final String DO_NOT_SEND_ANALYTICS_ENV = "AUTOFIRMA_DO_NOT_SEND_ANALYTICS"; //$NON-NLS-1$
+
     /** Modo de depuraci&oacute;n para toda la aplicaci&oacute;n. */
     public static final boolean DEBUG = false;
 
@@ -482,8 +485,8 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 
 		// Google Analytics
 		if (PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_USEANALYTICS, true) &&
-			!Boolean.getBoolean("es.gob.afirma.doNotSendAnalytics") && //$NON-NLS-1$
-			!Boolean.parseBoolean(System.getenv("es.gob.afirma.doNotSendAnalytics")) //$NON-NLS-1$
+			!Boolean.getBoolean(DO_NOT_SEND_ANALYTICS) &&
+				!Boolean.parseBoolean(System.getenv(DO_NOT_SEND_ANALYTICS_ENV))
 		) {
 	    	new Thread(() ->  {
 			    	try {

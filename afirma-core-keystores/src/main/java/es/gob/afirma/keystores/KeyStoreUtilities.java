@@ -42,6 +42,17 @@ import es.gob.afirma.keystores.filters.CertificateFilter;
 /** Utilidades para le manejo de almacenes de claves y certificados. */
 public final class KeyStoreUtilities {
 
+	/** Nombre de la variable de entorno (a nivel de sistema operativo) que debe establecerse a <code>true</code>
+	 * si se desea <b>no</b> usar el controlador de DNIe Java interno del programa. */
+	public static final String DISABLE_DNIE_NATIVE_DRIVER_ENV = "AFIRMA_NSS_DISABLE_DNIE_NATIVE_DRIVER"; //$NON-NLS-1$
+
+	/** Nombre de la propiedad Java (a nivel de JVM) que debe establecerse a <code>true</code>
+	 * si se desea <b>no</b> usar el controlador de DNIe Java interno del programa. */
+	public static final String DISABLE_DNIE_NATIVE_DRIVER = "es.gob.afirma.keystores.mozilla.disableDnieNativeDriver"; //$NON-NLS-1$
+
+	private static final String DISABLE_CERES_NATIVE_DRIVER_ENV = "AFIRMA_NSS_DISABLE_CERES_NATIVE_DRIVER"; //$NON-NLS-1$
+	private static final String DISABLE_CERES_NATIVE_DRIVER = "es.gob.afirma.keystores.mozilla.disableCeresNativeDriver"; //$NON-NLS-1$
+
     private KeyStoreUtilities() {
         // No permitimos la instanciacion
     }
@@ -296,11 +307,11 @@ public final class KeyStoreUtilities {
 	 *         {@code false} en caso contrario.
 	 * @throws AOCancelledOperationException Cuando se cancela la carga del almac&eacute;n. */
 	public static boolean addPreferredKeyStoreManagers(final AggregatedKeyStoreManager aksm, final Object parentComponent) {
-		// Anadimos el controlador Java del DNIe SIEMPRE excepto:
-		// -Que se indique "es.gob.afirma.keystores.mozilla.disableDnieNativeDriver=true"
+		// Anadimos el controlador Java del DNIe SIEMPRE excepto a menos que se indique lo contrario
+		// mediante una variable de entorno de sistema operativo o una propiedad Java
 		if (
-			!Boolean.getBoolean("es.gob.afirma.keystores.mozilla.disableDnieNativeDriver") && //$NON-NLS-1$
-			!Boolean.parseBoolean(System.getenv("es.gob.afirma.keystores.mozilla.disableDnieNativeDriver")) //$NON-NLS-1$
+			!Boolean.getBoolean(DISABLE_DNIE_NATIVE_DRIVER) &&
+			!Boolean.parseBoolean(System.getenv(DISABLE_DNIE_NATIVE_DRIVER_ENV))
 		) {
 			try {
 				aksm.addKeyStoreManager(getDnieKeyStoreManager(parentComponent));
@@ -314,12 +325,12 @@ public final class KeyStoreUtilities {
 			}
 		}
 
-		// Anadimos el controlador Java de CERES SIEMPRE a menos que:
-		// -Se indique "es.gob.afirma.keystores.mozilla.disableCeresNativeDriver=true"
-		// -El sistema sea Linux
+		// Anadimos el controlador Java de CERES SIEMPRE a menos que el sistema sea Linux o
+		// se indique lo contrario mediante una variable de entorno de sistema operativo o
+		// una propiedad Java
 		if (
-			!Boolean.getBoolean("es.gob.afirma.keystores.mozilla.disableCeresNativeDriver") && //$NON-NLS-1$
-			!Boolean.parseBoolean(System.getenv("es.gob.afirma.keystores.mozilla.disableCeresNativeDriver")) && //$NON-NLS-1$
+			!Boolean.getBoolean(DISABLE_CERES_NATIVE_DRIVER) &&
+			!Boolean.parseBoolean(System.getenv(DISABLE_CERES_NATIVE_DRIVER_ENV)) &&
 			!Platform.OS.LINUX.equals(Platform.getOS())
 		) {
 			try {

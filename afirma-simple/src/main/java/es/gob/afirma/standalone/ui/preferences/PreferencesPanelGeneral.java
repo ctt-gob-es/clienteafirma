@@ -427,11 +427,6 @@ final class PreferencesPanelGeneral extends JPanel {
 		proxyConfigButton.getAccessibleContext().setAccessibleDescription(
 			SimpleAfirmaMessages.getString("PreferencesPanel.127") //$NON-NLS-1$
 		);
-		proxyConfigButton.setEnabled(
-			// Si hay un proxy configurado a nivel de sistema no dejamos
-			// sobreescribirlo desde AutoFirma
-			!isUnprotected() && !ProxyUtil.isSystemProxySet()
-		);
 
 		final JLabel proxyLabel = new JLabel(SimpleAfirmaMessages.getString("PreferencesPanel.128")); //$NON-NLS-1$
 		proxyLabel.setLabelFor(proxyConfigButton);
