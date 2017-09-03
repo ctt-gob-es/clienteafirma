@@ -82,7 +82,7 @@ import es.gob.afirma.signers.xml.style.CannotDereferenceException;
 import es.gob.afirma.signers.xml.style.IsInnerlException;
 import es.gob.afirma.signers.xml.style.ReferenceIsNotXmlException;
 import es.gob.afirma.signers.xml.style.XmlStyle;
-import net.java.xades.util.DOMOutputImpl;
+import es.uji.crypto.xades.jxades.util.DOMOutputImpl;
 
 /** Manejador de firmas XML en formato XMLDSig.
  * @version 0.2 */

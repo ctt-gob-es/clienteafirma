@@ -42,10 +42,10 @@ import org.w3c.dom.NodeList;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.signers.AOSignConstants;
-import net.java.xades.security.xml.XAdES.CommitmentTypeIdImpl;
-import net.java.xades.security.xml.XAdES.CommitmentTypeIndication;
-import net.java.xades.security.xml.XAdES.CommitmentTypeIndicationImpl;
-import net.java.xades.security.xml.XAdES.XAdES_EPES;
+import es.uji.crypto.xades.jxades.security.xml.XAdES.CommitmentTypeIdImpl;
+import es.uji.crypto.xades.jxades.security.xml.XAdES.CommitmentTypeIndication;
+import es.uji.crypto.xades.jxades.security.xml.XAdES.CommitmentTypeIndicationImpl;
+import es.uji.crypto.xades.jxades.security.xml.XAdES.XAdES_EPES;
 
 /** Utilidades varias para firmas XAdES.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */

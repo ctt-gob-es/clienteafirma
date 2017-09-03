@@ -112,7 +112,7 @@
                       </excludes>
                     </filter>
                     <filter>
-                      <artifact>net.java.xades:jxades</artifact>
+                      <artifact>es.uji.crypto.xades:jxades</artifact>
                       <excludes>
                         <exclude>TrustRootCACertificates/**</exclude>
                         <exclude>*.*</exclude>
@@ -137,7 +137,7 @@
                   </excludes>
                 </filter>
                 <filter>
-                  <artifact>net.java.xades:jxades</artifact>
+                  <artifact>es.uji.crypto.xades:jxades</artifact>
                   <excludes>
                     <exclude>TrustRootCACertificates/**</exclude>
                     <exclude>*.*</exclude>

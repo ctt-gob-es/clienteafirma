@@ -58,12 +58,12 @@ import es.gob.afirma.signers.xml.style.CannotDereferenceException;
 import es.gob.afirma.signers.xml.style.IsInnerlException;
 import es.gob.afirma.signers.xml.style.ReferenceIsNotXmlException;
 import es.gob.afirma.signers.xml.style.XmlStyle;
-import net.java.xades.security.xml.XAdES.CommitmentTypeIndication;
-import net.java.xades.security.xml.XAdES.DataObjectFormat;
-import net.java.xades.security.xml.XAdES.DataObjectFormatImpl;
-import net.java.xades.security.xml.XAdES.ObjectIdentifierImpl;
-import net.java.xades.security.xml.XAdES.XAdES;
-import net.java.xades.security.xml.XAdES.XAdES_EPES;
+import es.uji.crypto.xades.jxades.security.xml.XAdES.CommitmentTypeIndication;
+import es.uji.crypto.xades.jxades.security.xml.XAdES.DataObjectFormat;
+import es.uji.crypto.xades.jxades.security.xml.XAdES.DataObjectFormatImpl;
+import es.uji.crypto.xades.jxades.security.xml.XAdES.ObjectIdentifierImpl;
+import es.uji.crypto.xades.jxades.security.xml.XAdES.XAdES;
+import es.uji.crypto.xades.jxades.security.xml.XAdES.XAdES_EPES;
 
 /** Firmador simple XAdES.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */

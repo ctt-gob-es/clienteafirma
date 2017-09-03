@@ -32,11 +32,11 @@ import javax.xml.crypto.dsig.spec.C14NMethodParameterSpec;
 import javax.xml.crypto.dsig.spec.TransformParameterSpec;
 
 import es.gob.afirma.signers.xml.Utils;
-import net.java.xades.security.xml.WrappedKeyStorePlace;
-import net.java.xades.security.xml.XmlWrappedKeyInfo;
-import net.java.xades.security.xml.XAdES.SignaturePolicyIdentifierImpl;
-import net.java.xades.security.xml.XAdES.XAdES_EPES;
-import net.java.xades.security.xml.XAdES.XMLAdvancedSignature;
+import es.uji.crypto.xades.jxades.security.xml.WrappedKeyStorePlace;
+import es.uji.crypto.xades.jxades.security.xml.XmlWrappedKeyInfo;
+import es.uji.crypto.xades.jxades.security.xml.XAdES.SignaturePolicyIdentifierImpl;
+import es.uji.crypto.xades.jxades.security.xml.XAdES.XAdES_EPES;
+import es.uji.crypto.xades.jxades.security.xml.XAdES.XMLAdvancedSignature;
 
 final class OOXMLAdvancedSignature extends XMLAdvancedSignature {
 

@@ -41,7 +41,7 @@ import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.core.util.tree.AOTreeNode;
 import es.gob.afirma.signers.xml.Utils;
 import es.gob.afirma.signers.xml.XMLConstants;
-import net.java.xades.util.XMLUtils;
+import es.uji.crypto.xades.jxades.util.XMLUtils;
 
 /** Manejador de firmas XML XAdES
  * <p>Soporta XAdES-BES y XAdES-EPES.</p>

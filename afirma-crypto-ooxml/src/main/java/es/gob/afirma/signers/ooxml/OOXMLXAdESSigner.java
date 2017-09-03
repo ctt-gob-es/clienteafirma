@@ -43,14 +43,14 @@ import org.xml.sax.SAXException;
 
 import es.gob.afirma.signers.xades.XAdESUtil;
 import es.gob.afirma.signers.xml.XMLConstants;
-import net.java.xades.security.xml.XAdES.CommitmentTypeIndication;
-import net.java.xades.security.xml.XAdES.SignatureProductionPlace;
-import net.java.xades.security.xml.XAdES.SignatureProductionPlaceImpl;
-import net.java.xades.security.xml.XAdES.SignerRole;
-import net.java.xades.security.xml.XAdES.SignerRoleImpl;
-import net.java.xades.security.xml.XAdES.XAdES;
-import net.java.xades.security.xml.XAdES.XAdES_EPES;
-import net.java.xades.util.DOMOutputImpl;
+import es.uji.crypto.xades.jxades.security.xml.XAdES.CommitmentTypeIndication;
+import es.uji.crypto.xades.jxades.security.xml.XAdES.SignatureProductionPlace;
+import es.uji.crypto.xades.jxades.security.xml.XAdES.SignatureProductionPlaceImpl;
+import es.uji.crypto.xades.jxades.security.xml.XAdES.SignerRole;
+import es.uji.crypto.xades.jxades.security.xml.XAdES.SignerRoleImpl;
+import es.uji.crypto.xades.jxades.security.xml.XAdES.XAdES;
+import es.uji.crypto.xades.jxades.security.xml.XAdES.XAdES_EPES;
+import es.uji.crypto.xades.jxades.util.DOMOutputImpl;
 
 /** Firmador XAdES OOXML.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */

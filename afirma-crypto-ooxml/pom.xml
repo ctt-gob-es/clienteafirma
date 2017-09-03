@@ -33,9 +33,9 @@
 		</dependency>
 
 		<dependency>
-			<groupId>net.java.xades</groupId>
-			<artifactId>jxades</artifactId>
-			<version>0.1.6-SNAPSHOT</version>
+  			<groupId>es.uji.crypto.xades</groupId>
+  			<artifactId>jxades</artifactId>
+  			<version>0.2.0</version>
 		</dependency>
 		
 	</dependencies>

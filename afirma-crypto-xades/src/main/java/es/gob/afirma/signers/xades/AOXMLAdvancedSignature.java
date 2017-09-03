@@ -38,12 +38,12 @@ import org.w3c.dom.Element;
 
 import es.gob.afirma.signers.xml.dereference.CustomUriDereferencer;
 import es.gob.afirma.signers.xml.style.XmlStyle;
-import net.java.xades.security.xml.WrappedKeyStorePlace;
-import net.java.xades.security.xml.XmlWrappedKeyInfo;
-import net.java.xades.security.xml.XAdES.XAdES_BES;
-import net.java.xades.security.xml.XAdES.XMLAdvancedSignature;
+import es.uji.crypto.xades.jxades.security.xml.WrappedKeyStorePlace;
+import es.uji.crypto.xades.jxades.security.xml.XmlWrappedKeyInfo;
+import es.uji.crypto.xades.jxades.security.xml.XAdES.XAdES_BES;
+import es.uji.crypto.xades.jxades.security.xml.XAdES.XMLAdvancedSignature;
 
-/** Derivado de <code>net.java.xades.security.xml.XAdES.XMLAdvancedSignature</code> con los
+/** Derivado de <code>es.uji.crypto.xades.security.xml.XAdES.XMLAdvancedSignature</code> con los
  * siguientes cambios:
  * <ul>
  *  <li>En el <i>KeyInfo</i> no se a&ntilde;aden los elementos <i>SubjectX500Principal</i> y <i>X509IssuerSerial</i>.</li>

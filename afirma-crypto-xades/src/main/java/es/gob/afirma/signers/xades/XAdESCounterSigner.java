@@ -42,12 +42,12 @@ import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.signers.xml.Utils;
 import es.gob.afirma.signers.xml.XMLConstants;
-import net.java.xades.security.xml.XAdES.DataObjectFormat;
-import net.java.xades.security.xml.XAdES.DataObjectFormatImpl;
-import net.java.xades.security.xml.XAdES.ObjectIdentifier;
-import net.java.xades.security.xml.XAdES.ObjectIdentifierImpl;
-import net.java.xades.security.xml.XAdES.XAdES;
-import net.java.xades.security.xml.XAdES.XAdES_EPES;
+import es.uji.crypto.xades.jxades.security.xml.XAdES.DataObjectFormat;
+import es.uji.crypto.xades.jxades.security.xml.XAdES.DataObjectFormatImpl;
+import es.uji.crypto.xades.jxades.security.xml.XAdES.ObjectIdentifier;
+import es.uji.crypto.xades.jxades.security.xml.XAdES.ObjectIdentifierImpl;
+import es.uji.crypto.xades.jxades.security.xml.XAdES.XAdES;
+import es.uji.crypto.xades.jxades.security.xml.XAdES.XAdES_EPES;
 
 /** Contrafirmador XAdES. */
 public final class XAdESCounterSigner {
