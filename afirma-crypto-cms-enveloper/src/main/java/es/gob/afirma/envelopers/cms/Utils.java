@@ -680,10 +680,10 @@ final class Utils {
      * @throws NoSuchPaddingException Cuando el JRE no soporta alg&uacute;n tipo de relleno necesario.
      * @throws NoSuchAlgorithmException Cuando el JRE no soporta alg&uacute;n algoritmo necesario.
      * @throws InvalidKeyException Cuando la clave proporcionada no es v&aacute;lida.
-     * @throws BadPaddingException Si el relleno a usar en la desenvoltura es distinta a la que se us&oacute;
+     * @throws BadPaddingException Si el relleno a usar en la desenvoltura es distinto al que se us&oacute;
      *                             en la envoltura.
-     * @throws IllegalBlockSizeException Si el tipo de bloque a usar en la desenvoltura es distinta a la que se us&oacute;
-     *                                   en la envoltura.*/
+     * @throws IllegalBlockSizeException Si el tipo de bloque a usar en la desenvoltura es distinto al que se us&oacute;
+     *                                   en la envoltura. */
     static KeyAsigned assignKey(final byte[] passCiphered,
     		                    final PrivateKeyEntry keyEntry,
     		                    final AlgorithmIdentifier algClave) throws NoSuchAlgorithmException,

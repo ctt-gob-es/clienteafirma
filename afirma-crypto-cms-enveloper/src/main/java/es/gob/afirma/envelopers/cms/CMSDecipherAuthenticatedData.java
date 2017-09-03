@@ -18,16 +18,15 @@ import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.Enumeration;
 
-import javax.crypto.Cipher;
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 
 import org.spongycastle.asn1.ASN1Encoding;
-import org.spongycastle.asn1.ASN1Sequence;
 import org.spongycastle.asn1.ASN1Set;
 import org.spongycastle.asn1.DEROctetString;
 import org.spongycastle.asn1.cms.AuthenticatedData;
-import org.spongycastle.asn1.x509.AlgorithmIdentifier;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.ciphers.CipherConstants.AOCipherAlgorithm;
@@ -54,21 +53,27 @@ final class CMSDecipherAuthenticatedData {
      * @throws InvalidKeyException Cuando la clave almacenada en el sobre no es v&aacute;lida.
      * @throws NoSuchAlgorithmException Cuando no se reconozca el algoritmo utilizado para generar el
      *                                  c&oacute;digo de autenticaci&oacute;n.
-     * @throws NoSuchPaddingException Cuando no se soporta un tipo de relleno necesario. */
+     * @throws NoSuchPaddingException Cuando no se soporta un tipo de relleno necesario.
+     * @throws BadPaddingException Si el relleno a usar en la desenvoltura es distinto al que se us&oacute;
+     *                             en la envoltura.
+     * @throws IllegalBlockSizeException Si el tipo de bloque a usar en la desenvoltura es distinto al que se us&oacute;
+     *                                   en la envoltura. */
     byte[] decipherAuthenticatedData(final byte[] cmsData,
     		                         final PrivateKeyEntry keyEntry) throws IOException,
                                                                             CertificateEncodingException,
                                                                             AOException,
                                                                             InvalidKeyException,
                                                                             NoSuchAlgorithmException,
-                                                                            NoSuchPaddingException {
+                                                                            NoSuchPaddingException,
+                                                                            IllegalBlockSizeException,
+                                                                            BadPaddingException {
         final AuthenticatedData authenticated;
 
         final Enumeration<?> elementRecipient;
         try {
-            final ASN1Sequence authenticatedData = Utils.fetchWrappedData(cmsData);
-
-            authenticated = AuthenticatedData.getInstance(authenticatedData);
+            authenticated = AuthenticatedData.getInstance(
+        		Utils.fetchWrappedData(cmsData)
+    		);
             elementRecipient = authenticated.getRecipientInfos().getObjects();
         }
         catch (final Exception ex) {
@@ -79,7 +84,7 @@ final class CMSDecipherAuthenticatedData {
         final EncryptedKeyDatas encryptedKeyDatas = Utils.fetchEncryptedKeyDatas(userCert, elementRecipient);
 
         // Asignamos la clave de descifrado del contenido.
-        assignKey(encryptedKeyDatas.getEncryptedKey(), keyEntry, encryptedKeyDatas.getAlgEncryptedKey());
+        Utils.assignKey(encryptedKeyDatas.getEncryptedKey(), keyEntry, encryptedKeyDatas.getAlgEncryptedKey());
 
         final ASN1Set authAttr = authenticated.getAuthAttrs();
 
@@ -98,53 +103,4 @@ final class CMSDecipherAuthenticatedData {
         return new byte[0];
     }
 
-    /** Asigna la clave para firmar el contenido del fichero que queremos
-     * envolver y que m&aacute;s tarde ser&aacute; cifrada con la clave
-     * p&uacute;blica del usuario que hace la firma.
-     * @param passCiphered Clave cifrada.
-     * @param keyEntry Contrase&ntilde;a que se va a usar para descifrar.
-     * @param algClave Algoritmo necesario para crear la clave.
-     * @throws InvalidKeyException Cuando hay problemas de adecuaci&oacute;n de la clave.
-     * @throws NoSuchAlgorithmException Si el JRE no soporta alg&uacute;n algoritmo necesario
-     * @throws NoSuchPaddingException Cuando no se soporta un tipo de relleno necesario. */
-    private void assignKey(final byte[] passCiphered,
-    		               final PrivateKeyEntry keyEntry,
-    		               final AlgorithmIdentifier algClave) throws InvalidKeyException,
-    		                                                          NoSuchAlgorithmException,
-    		                                                          NoSuchPaddingException {
-        AOCipherAlgorithm algorithmConfig = null;
-        final String currentAlgorithm = algClave.getAlgorithm().toString();
-
-        // obtenemos el algoritmo usado para cifrar la pass
-        for (final AOCipherAlgorithm config : AOCipherAlgorithm.values()) {
-            if (config.getOid().equals(currentAlgorithm)) {
-                algorithmConfig = config;
-                break;
-            }
-        }
-
-        if (algorithmConfig == null) {
-            throw new NoSuchAlgorithmException(
-        		"No se ha podido obtener el algoritmo para cifrar la contrasena: " + currentAlgorithm //$NON-NLS-1$
-    		);
-        }
-
-        this.macAlgorithmConfig = algorithmConfig;
-
-        // Desembolvemos la clave usada para cifrar el contenido
-        // a partir de la clave privada del certificado del usuario.
-        final Cipher cipher = createCipher(keyEntry.getPrivateKey().getAlgorithm());
-        cipher.init(Cipher.UNWRAP_MODE, keyEntry.getPrivateKey());
-        this.cipherKey = (SecretKey) cipher.unwrap(passCiphered, algorithmConfig.getName(), Cipher.SECRET_KEY);
-    }
-
-    /** Crea el cifrador usado para cifrar tanto el fichero como la clave usada
-     * para cifrar dicho fichero.
-     * @param algName algoritmo utilizado para cifrar.
-     * @return Cifrador.
-     * @throws java.security.NoSuchAlgorithmException Si el JRE no soporta alg&uacute;n algoritmo necesario
-     * @throws javax.crypto.NoSuchPaddingException Cuando no se soporta un tipo de relleno necesario. */
-    private static Cipher createCipher(final String algName) throws NoSuchAlgorithmException, NoSuchPaddingException {
-        return Cipher.getInstance(algName);
-    }
 }
