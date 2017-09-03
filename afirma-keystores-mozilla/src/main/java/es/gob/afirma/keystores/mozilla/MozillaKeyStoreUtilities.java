@@ -56,7 +56,7 @@ public final class MozillaKeyStoreUtilities {
 	private static final String PKCS11TXT_FILENAME = "pkcs11.txt"; //$NON-NLS-1$
 
 	private static final String AFIRMA_NSS_HOME = "AFIRMA_NSS_HOME"; //$NON-NLS-1$
-	private static final String AFIRMA_PROFILES_INI = "AFIRMA_NSS_PROFILES_INI"; //$NON-NLS-1$
+	private static final String AFIRMA_NSS_PROFILES_INI = "AFIRMA_NSS_PROFILES_INI"; //$NON-NLS-1$
 
 	private static final String USE_ENV_VARS = "es.gob.afirma.keystores.mozilla.UseEnvironmentVariables"; //$NON-NLS-1$
 
@@ -486,13 +486,13 @@ public final class MozillaKeyStoreUtilities {
 		if (Boolean.getBoolean(USE_ENV_VARS) ||
 			Boolean.parseBoolean(System.getenv(USE_ENV_VARS))) {
 			try {
-				profilesIniPath = System.getenv(AFIRMA_PROFILES_INI);
+				profilesIniPath = System.getenv(AFIRMA_NSS_PROFILES_INI);
 				if (profilesIniPath == null) {
-					profilesIniPath = System.getProperty(AFIRMA_PROFILES_INI);
+					profilesIniPath = System.getProperty(AFIRMA_NSS_PROFILES_INI);
 				}
 			}
 			catch(final Exception e) {
-				LOGGER.warning("No se tiene acceso a la variable de entorno '" + AFIRMA_PROFILES_INI + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
+				LOGGER.warning("No se tiene acceso a la variable de entorno '" + AFIRMA_NSS_PROFILES_INI + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 			if (profilesIniPath != null) {
 
@@ -509,12 +509,12 @@ public final class MozillaKeyStoreUtilities {
 				final File profilesIniFile = new File(profilesIniPath);
 				if (profilesIniFile.isFile() && profilesIniFile.canRead()) {
 					LOGGER.info(
-						"Fichero de perfiles de Firefox determinado a partir de la variable de entorno '" + AFIRMA_PROFILES_INI + "'" //$NON-NLS-1$ //$NON-NLS-2$
+						"Fichero de perfiles de Firefox determinado a partir de la variable de entorno '" + AFIRMA_NSS_PROFILES_INI + "'" //$NON-NLS-1$ //$NON-NLS-2$
 					);
 					return profilesIniPath;
 				}
 				LOGGER.warning(
-					"La variable de entorno '" + AFIRMA_PROFILES_INI + "' apunta a un fichero que no existe o sobre el que no se tienen permisos de lectura, se ignorara: " + profilesIniPath //$NON-NLS-1$ //$NON-NLS-2$
+					"La variable de entorno '" + AFIRMA_NSS_PROFILES_INI + "' apunta a un fichero que no existe o sobre el que no se tienen permisos de lectura, se ignorara: " + profilesIniPath //$NON-NLS-1$ //$NON-NLS-2$
 				);
 			}
 		}
