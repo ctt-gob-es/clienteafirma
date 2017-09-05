@@ -22,7 +22,10 @@ public final class Updater {
 	private static String currentVersion = null;
 	private static String updateSite = "https://github.com/ctt-gob-es/clienteafirma/"; //$NON-NLS-1$
 
-	private static final String AUTOFIRMA_AVOID_UPDATE_CHECK = "AUTOFIRMA_AVOID_UPDATE_CHECK"; //$NON-NLS-1$
+	/** Variable de entorno que hay que establecer (a nivel de sistema operativo o como propiedad de Java a
+	 * nivel de JVM) a <code>true</code> para evitar la comprobaci&oacute;n de disponibilidad de
+	 * actualizaciones de la aplicaci&oacute;n. */
+	public static final String AUTOFIRMA_AVOID_UPDATE_CHECK = "AUTOFIRMA_AVOID_UPDATE_CHECK"; //$NON-NLS-1$
 
 	private static Properties updaterProperties = null;
 

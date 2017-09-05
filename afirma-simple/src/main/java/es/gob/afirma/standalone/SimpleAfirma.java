@@ -103,8 +103,13 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
     /** Indica si esta permitida la b&uacute;squeda de actualizaciones de la aplicaci&oacute;n. */
     private static boolean updatesEnabled = true;
 
-    private static final String DO_NOT_SEND_ANALYTICS = "es.gob.afirma.doNotSendAnalytics"; //$NON-NLS-1$
-    private static final String DO_NOT_SEND_ANALYTICS_ENV = "AUTOFIRMA_DO_NOT_SEND_ANALYTICS"; //$NON-NLS-1$
+    /** Propiedad Java que hay que establecer (a nivel de JVM) a <code>true</code> para evitar el env&iacute;o
+     * de estad&iacute;sticas a Google Analytics. */
+    public static final String DO_NOT_SEND_ANALYTICS = "es.gob.afirma.doNotSendAnalytics"; //$NON-NLS-1$
+
+    /** Variable de entorno que hay que establecer (a nivel de sistema operativo) a <code>true</code> para
+     * evitar el env&iacute;o de estad&iacute;sticas a Google Analytics. */
+    public static final String DO_NOT_SEND_ANALYTICS_ENV = "AUTOFIRMA_DO_NOT_SEND_ANALYTICS"; //$NON-NLS-1$
 
     /** Modo de depuraci&oacute;n para toda la aplicaci&oacute;n. */
     public static final boolean DEBUG = false;
@@ -759,29 +764,23 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 		LOGGER.info("Memoria actualmente libre: " + Runtime.getRuntime().freeMemory()/(1024*1024) + "MB"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
-	/**
-	 * Indica si la llamada a AutoFirma se considera llamada por l&iacute;nea de comandos.
+	/** Indica si la llamada a AutoFirma se considera llamada por l&iacute;nea de comandos.
 	 * @param args Argumentos recibidos en la llamada a la aplicaci&oacute;n.
-	 * @return {@code true} si la llamada se debe procesar como si se hubiese recibido por linea de comandos.
-	 */
+	 * @return {@code true} si la llamada se debe procesar como si se hubiese recibido por l&iacute;nea de comandos. */
 	private static boolean isUsingCommnadLine(final String[] args) {
 		return args != null && args.length > 0 && !args[0].toLowerCase().startsWith(PROTOCOL_URL_START_LOWER_CASE);
 	}
 
-	/**
-	 * Establece si las actualizaciones est&aacute;n permitidas.
+	/** Establece si las actualizaciones est&aacute;n permitidas.
 	 * @param enabled {@code true} si se permite la b&uacute;squeda y configuraci&oacute;n
-	 * de actualizaciones, {@code false} en caso contrario.
-	 */
+	 * de actualizaciones, {@code false} en caso contrario. */
 	public static void setUpdatesEnabled(final boolean enabled) {
 		updatesEnabled = enabled;
 	}
 
-	/**
-	 * Indica si las actualizaciones est&aacute;n permitidas.
+	/** Indica si las actualizaciones est&aacute;n permitidas.
 	 * @return {@code true} si se permite la b&uacute;squeda y configuraci&oacute;n
-	 * de actualizaciones, {@code false} en caso contrario.
-	 */
+	 * de actualizaciones, {@code false} en caso contrario. */
 	public static boolean isUpdatesEnabled() {
 		return updatesEnabled;
 	}

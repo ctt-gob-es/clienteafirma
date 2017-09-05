@@ -42,6 +42,7 @@ import es.gob.afirma.standalone.AutoFirmaUtil;
 import es.gob.afirma.standalone.ProxyUtil;
 import es.gob.afirma.standalone.SimpleAfirma;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
+import es.gob.afirma.standalone.updater.Updater;
 
 final class PreferencesPanelGeneral extends JPanel {
 
@@ -84,9 +85,7 @@ final class PreferencesPanelGeneral extends JPanel {
 		return this.disposableInterface;
 	}
 
-	/**
-	 * Atributo para gestionar el bloqueo de propiedades.
-	 */
+	/** Atributo para gestionar el bloqueo de propiedades. */
 	private boolean unprotected = true;
 
 	PreferencesPanelGeneral(final KeyListener keyListener,
@@ -128,10 +127,27 @@ final class PreferencesPanelGeneral extends JPanel {
 		);
 		this.avoidAskForClose.setSelected(PreferencesManager.getBoolean(PREFERENCE_GENERAL_OMIT_ASKONCLOSE, false));
 		this.hideDniStartScreen.setSelected(PreferencesManager.getBoolean(PREFERENCE_GENERAL_HIDE_DNIE_START_SCREEN, false));
-		if (SimpleAfirma.isUpdatesEnabled()) {
+
+		if (
+			Boolean.getBoolean(Updater.AUTOFIRMA_AVOID_UPDATE_CHECK) ||
+			Boolean.parseBoolean(System.getenv(Updater.AUTOFIRMA_AVOID_UPDATE_CHECK)) ||
+			!SimpleAfirma.isUpdatesEnabled()
+		) {
+			this.checkForUpdates.setSelected(false);
+			this.checkForUpdates.setEnabled(false);
+		}
+		else {
 			this.checkForUpdates.setSelected(PreferencesManager.getBoolean(PREFERENCE_GENERAL_UPDATECHECK, true));
 		}
-		this.sendAnalytics.setSelected(PreferencesManager.getBoolean(PREFERENCE_GENERAL_USEANALYTICS, true));
+
+		if (Boolean.getBoolean(SimpleAfirma.DO_NOT_SEND_ANALYTICS) ||
+				Boolean.parseBoolean(System.getenv(SimpleAfirma.DO_NOT_SEND_ANALYTICS_ENV))) {
+			this.sendAnalytics.setSelected(false);
+			this.sendAnalytics.setEnabled(false);
+		}
+		else {
+			this.sendAnalytics.setSelected(PreferencesManager.getBoolean(PREFERENCE_GENERAL_USEANALYTICS, true));
+		}
 
 		// Formatos por defecto
 		this.pdfFilesCombo.setSelectedItem(PreferencesManager.get(PREFERENCE_GENERAL_DEFAULT_FORMAT_PDF, PADES));
@@ -142,15 +158,11 @@ final class PreferencesPanelGeneral extends JPanel {
 		this.binFilesCombo.setSelectedItem(PreferencesManager.get(PREFERENCE_GENERAL_DEFAULT_FORMAT_BIN, CADES));
 	}
 
-	/**
-	 * Carga las opciones de configuraci&oacute;n por defecto del panel general
+	/** Carga las opciones de configuraci&oacute;n por defecto del panel general
 	 * desde un fichero externo de preferencias.
-	 *
-	 * @param unprotected
-	 *            {@code true} Si las opciones de configuraci&oacute;n sensibles
-	 *            a ello est&aacute;n protegidas y no pueden ser modificadas,
-	 *            {@code false} en caso contrario
-	 */
+	 * @param unprotected {@code true} Si las opciones de configuraci&oacute;n sensibles
+	 *                    a ello est&aacute;n protegidas y no pueden ser modificadas,
+	 *                    {@code false} en caso contrario. */
 	void loadDefaultPreferences() {
 
 
@@ -343,13 +355,12 @@ final class PreferencesPanelGeneral extends JPanel {
 		// Solo se buscaran actualizaciones automaticamente en Windows
 		if (SimpleAfirma.isUpdatesEnabled() && Platform.OS.WINDOWS.equals(Platform.getOS())) {
 			this.checkForUpdates.getAccessibleContext().setAccessibleDescription(
-					SimpleAfirmaMessages.getString("PreferencesPanel.88") //$NON-NLS-1$
-					);
+				SimpleAfirmaMessages.getString("PreferencesPanel.88") //$NON-NLS-1$
+			);
 			this.checkForUpdates.setMnemonic('B');
 			this.checkForUpdates.addItemListener(modificationListener);
 			this.checkForUpdates.addKeyListener(keyListener);
 			signConfigPanel.add(this.checkForUpdates, signConstraint);
-
 			signConstraint.gridy++;
 		}
 
@@ -645,10 +656,9 @@ final class PreferencesPanelGeneral extends JPanel {
 		return this.unprotected;
 	}
 
-	/**
-	 * M&eacute;todo setter del atributo unprotected
-	 * @param unprotected the unprotected to set
-	 */
+	/** Indica si de deben proteger ciertas opciones de configuraci&oacute;n.
+	 * @param unprotected <code>true</code> para dejar desprotegidas todas las opciones,
+	 *                    <code>false</code> para proteger las opciones adecuadas. */
 	public void setUnprotected(final boolean unprotected) {
 		this.unprotected = unprotected;
 	}
