@@ -460,7 +460,7 @@ final class PreferencesPanelGeneral extends JPanel {
 
 	/** Crea el panel con la configuraci&oacute;n de los formatos de firma a utilizar con cada tipo de fichero.
 	 * @param modificationListener Listener para la detecci&oacute;n de cambio de configuraci&oacute;n.
-	 * @param keyListener Listener para la deteccion del uso de teclas para el cierre de la pantalla.
+	 * @param keyListener Listener para la detecci&oacute;n del uso de teclas para el cierre de la pantalla.
 	 * @param unprotected <code>true</code> para permitir al usuario realizar cualquier modificaci&oacute;n en las preferencias,
 	 *                    <code>false</code> para limitar las preferencias que puede modificar.
 	 * @return Panel con los componentes de configuraci&oacute;n. */
@@ -623,9 +623,8 @@ final class PreferencesPanelGeneral extends JPanel {
 					PreferencesManager.put(PreferencesManager.PREFERENCE_GENERAL_PROXY_PORT, port);
 					PreferencesManager.put(PreferencesManager.PREFERENCE_GENERAL_PROXY_USERNAME, proxyDlg.getUsername());
 
-					String cipheredPwd;
 					try {
-						cipheredPwd = ProxyUtil.cipherPassword(proxyDlg.getPassword());
+						final String cipheredPwd = ProxyUtil.cipherPassword(proxyDlg.getPassword());
 						if (cipheredPwd != null) {
 							PreferencesManager.put(PreferencesManager.PREFERENCE_GENERAL_PROXY_PASSWORD, cipheredPwd);
 						}
@@ -656,7 +655,7 @@ final class PreferencesPanelGeneral extends JPanel {
 		return this.unprotected;
 	}
 
-	/** Indica si de deben proteger ciertas opciones de configuraci&oacute;n.
+	/** Indica si se deben proteger ciertas opciones de configuraci&oacute;n.
 	 * @param unprotected <code>true</code> para dejar desprotegidas todas las opciones,
 	 *                    <code>false</code> para proteger las opciones adecuadas. */
 	public void setUnprotected(final boolean unprotected) {
