@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -34,16 +35,20 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 
 import es.gob.afirma.core.misc.AOUtil;
 import nu.xom.converters.DOMConverter;
 
-
 /** Class XMLSignatureInput.
  * @author Christian Geuer-Pollmann
  * $todo$ check whether an XMLSignatureInput can be _both_, octet stream _and_ node set? */
-class XMLSignatureInput {
+final class XMLSignatureInput {
+
+	static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+
     /*
      * The XMLSignature Input can be either:
      *   A byteArray like with/or without InputStream.
@@ -107,12 +112,10 @@ class XMLSignatureInput {
 
     /** Returns the node set from input which was specified as the parameter of
      * {@link XMLSignatureInput} constructor.
-     *
      * @return the node set
-     * @throws SAXException
-     * @throws IOException
-     * @throws ParserConfigurationException
-     */
+     * @throws SAXException If error on SAX parsing.
+     * @throws IOException If error while reading the data,
+     * @throws ParserConfigurationException If error while creating the XML parser. */
     public Set<Node> getNodeSet() throws ParserConfigurationException,
                                          IOException,
                                          SAXException {
@@ -120,16 +123,15 @@ class XMLSignatureInput {
     }
 
     /** Returns the node set from input which was specified as the parameter of
-     * {@link XMLSignatureInput} constructor
-     * @param circumvent
-     *
+     * {@link XMLSignatureInput} constructor.
+     * @param circumvent If there's need for fixing Java Bug 2650.
      * @return The node set
-     * @throws SAXException
-     * @throws IOException
-     * @throws ParserConfigurationException
-     */
+     * @throws SAXException If error on SAX parsing.
+     * @throws IOException If error while reading the data,
+     * @throws ParserConfigurationException If error while creating the XML parser. */
     public Set<Node> getNodeSet(final boolean circumvent) throws ParserConfigurationException,
-        IOException, SAXException {
+                                                                 IOException,
+                                                                 SAXException {
         if (this.inputNodeSet != null) {
             return this.inputNodeSet;
         }
@@ -256,7 +258,25 @@ class XMLSignatureInput {
         final DocumentBuilder db = this.dfactory.newDocumentBuilder();
         // select all nodes, also the comments.
         try {
-            db.setErrorHandler(new com.sun.org.apache.xml.internal.security.utils.IgnoreAllErrorHandler());
+        	// Se ignoran los errores (como en org.apache.xml.security.utils.IgnoreAllErrorHandler)
+            db.setErrorHandler(
+        		new ErrorHandler() {
+					@Override
+					public void warning(final SAXParseException exception) throws SAXException {
+						// Se ignora
+					}
+
+					@Override
+					public void error(final SAXParseException exception) throws SAXException {
+						// Se ignora
+					}
+
+					@Override
+					public void fatalError(final SAXParseException exception) throws SAXException {
+						// Se ignora
+					}
+				}
+    		);
 
             final Document doc = db.parse(getOctetStream());
             this.subNode = doc;
