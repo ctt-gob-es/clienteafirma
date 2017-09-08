@@ -41,6 +41,10 @@ public final class AOSignConstants {
 	/** Identificador de la firma PKCS1 (RAW). */
 	public static final String SIGN_FORMAT_PKCS1 = "NONE"; //$NON-NLS-1$
 
+	/** Identificador de la firma PKCS1 (RAW) para su uso en modo trifasico
+	 * (la parte servidora no hara nada. */
+	public static final String SIGN_FORMAT_PKCS1_TRI = "NONEtri"; //$NON-NLS-1$
+
 	/** Identificador de la firma XAdES-ASiC-S. */
 	public static final String SIGN_FORMAT_XADES_ASIC_S = "XAdES-ASiC-S"; //$NON-NLS-1$
 

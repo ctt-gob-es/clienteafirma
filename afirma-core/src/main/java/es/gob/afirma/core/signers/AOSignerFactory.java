@@ -25,51 +25,59 @@ public final class AOSignerFactory {
 	private static final Map<String, AOSigner> SIGNERS = new HashMap<>(20);
 
 	/* Listado de los manejador de firma soportados y los identificadores de formato de firma asociados. */
-	private static final String SIGNER_CLASS_CADES        = "es.gob.afirma.signers.cades.AOCAdESSigner"; //$NON-NLS-1$
-	private static final String SIGNER_CLASS_CADES_TRI    = "es.gob.afirma.signers.cadestri.client.AOCAdESTriPhaseSigner"; //$NON-NLS-1$
-	private static final String SIGNER_CLASS_CADES_ASIC_S = "es.gob.afirma.signers.cades.asic.AOCAdESASiCSSigner"; //$NON-NLS-1$
-	private static final String SIGNER_CLASS_CMS          = "es.gob.afirma.signers.cms.AOCMSSigner"; //$NON-NLS-1$
-	private static final String SIGNER_CLASS_FACTURAE     = "es.gob.afirma.signers.xades.AOFacturaESigner"; //$NON-NLS-1$
-	private static final String SIGNER_CLASS_FACTURAE_TRI = "es.gob.afirma.signers.xadestri.client.AOFacturaETriPhaseSigner"; //$NON-NLS-1$
-	private static final String SIGNER_CLASS_XADES        = "es.gob.afirma.signers.xades.AOXAdESSigner"; //$NON-NLS-1$
-	private static final String SIGNER_CLASS_XADES_TRI    = "es.gob.afirma.signers.xadestri.client.AOXAdESTriPhaseSigner"; //$NON-NLS-1$
-	private static final String SIGNER_CLASS_XADES_ASIC_S = "es.gob.afirma.signers.xades.asic.AOXAdESASiCSSigner"; //$NON-NLS-1$
-	private static final String SIGNER_CLASS_XMLDSIG      = "es.gob.afirma.signers.xmldsig.AOXMLDSigSigner"; //$NON-NLS-1$
-	private static final String SIGNER_CLASS_PADES        = "es.gob.afirma.signers.pades.AOPDFSigner"; //$NON-NLS-1$
-	private static final String SIGNER_CLASS_PADES_TRI    = "es.gob.afirma.signers.padestri.client.AOPDFTriPhaseSigner"; //$NON-NLS-1$
-	private static final String SIGNER_CLASS_ODF          = "es.gob.afirma.signers.odf.AOODFSigner"; //$NON-NLS-1$
-	private static final String SIGNER_CLASS_OOXML        = "es.gob.afirma.signers.ooxml.AOOOXMLSigner"; //$NON-NLS-1$
+	private static final String SIGNER_CLASS_CADES        	  = "es.gob.afirma.signers.cades.AOCAdESSigner"; //$NON-NLS-1$
+	private static final String SIGNER_CLASS_CADES_TRI    	  = "es.gob.afirma.signers.cadestri.client.AOCAdESTriPhaseSigner"; //$NON-NLS-1$
+	private static final String SIGNER_CLASS_CADES_ASIC_S	  = "es.gob.afirma.signers.cades.asic.AOCAdESASiCSSigner"; //$NON-NLS-1$
+	private static final String SIGNER_CLASS_CADES_ASIC_S_TRI = "es.gob.afirma.signers.cadestri.client.asic.AOCAdESASiCSTriPhaseSigner"; //$NON-NLS-1$
+	private static final String SIGNER_CLASS_CMS         	  = "es.gob.afirma.signers.cms.AOCMSSigner"; //$NON-NLS-1$
+	private static final String SIGNER_CLASS_FACTURAE    	  = "es.gob.afirma.signers.xades.AOFacturaESigner"; //$NON-NLS-1$
+	private static final String SIGNER_CLASS_FACTURAE_TRI	  = "es.gob.afirma.signers.xadestri.client.AOFacturaETriPhaseSigner"; //$NON-NLS-1$
+	private static final String SIGNER_CLASS_XADES       	  = "es.gob.afirma.signers.xades.AOXAdESSigner"; //$NON-NLS-1$
+	private static final String SIGNER_CLASS_XADES_TRI   	  = "es.gob.afirma.signers.xadestri.client.AOXAdESTriPhaseSigner"; //$NON-NLS-1$
+	private static final String SIGNER_CLASS_XADES_ASIC_S	  = "es.gob.afirma.signers.xades.asic.AOXAdESASiCSSigner"; //$NON-NLS-1$
+	private static final String SIGNER_CLASS_XADES_ASIC_S_tri = "es.gob.afirma.signers.xadestri.client.asic.AOXAdESASiCSTriPhaseSigner"; //$NON-NLS-1$
+	private static final String SIGNER_CLASS_XMLDSIG     	  = "es.gob.afirma.signers.xmldsig.AOXMLDSigSigner"; //$NON-NLS-1$
+	private static final String SIGNER_CLASS_PADES       	  = "es.gob.afirma.signers.pades.AOPDFSigner"; //$NON-NLS-1$
+	private static final String SIGNER_CLASS_PADES_TRI   	  = "es.gob.afirma.signers.padestri.client.AOPDFTriPhaseSigner"; //$NON-NLS-1$
+	private static final String SIGNER_CLASS_ODF         	  = "es.gob.afirma.signers.odf.AOODFSigner"; //$NON-NLS-1$
+	private static final String SIGNER_CLASS_OOXML       	  = "es.gob.afirma.signers.ooxml.AOOOXMLSigner"; //$NON-NLS-1$
+	private static final String SIGNER_CLASS_PKCS1		 	  = "es.gob.afirma.core.signers.AOPkcs1Signer"; //$NON-NLS-1$
+	private static final String SIGNER_CLASS_PKCS1_TRI		  = "es.gob.afirma.core.signers.AOPkcs1TriPhaseSigner"; //$NON-NLS-1$
 
 	// Listado los formatos con la siguiente informacion:
 	// 0.- Nombre
 	// 1.- Clase manejadora
 	// 2.- Soporte de identificacion de firmas
 	private static final String[][] SIGNERS_CLASSES = new String[][] {
-		{AOSignConstants.SIGN_FORMAT_CADES,              SIGNER_CLASS_CADES,        Boolean.TRUE.toString()},
-		{AOSignConstants.SIGN_FORMAT_CADES_TRI,          SIGNER_CLASS_CADES_TRI,    Boolean.FALSE.toString()},
-		{AOSignConstants.SIGN_FORMAT_CADES_ASIC_S,       SIGNER_CLASS_CADES_ASIC_S, Boolean.TRUE.toString()},
-		{AOSignConstants.SIGN_FORMAT_CMS,                SIGNER_CLASS_CMS,          Boolean.TRUE.toString()},
-		{AOSignConstants.SIGN_FORMAT_FACTURAE,           SIGNER_CLASS_FACTURAE,     Boolean.TRUE.toString()},
-		{AOSignConstants.SIGN_FORMAT_FACTURAE_ALT1,      SIGNER_CLASS_FACTURAE,     Boolean.FALSE.toString()},
-		{AOSignConstants.SIGN_FORMAT_FACTURAE_TRI,       SIGNER_CLASS_FACTURAE_TRI, Boolean.FALSE.toString()},
-		{AOSignConstants.SIGN_FORMAT_XADES,              SIGNER_CLASS_XADES,        Boolean.TRUE.toString()},
-		{AOSignConstants.SIGN_FORMAT_XADES_DETACHED,     SIGNER_CLASS_XADES,        Boolean.FALSE.toString()},
-		{AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED,    SIGNER_CLASS_XADES,        Boolean.FALSE.toString()},
-		{AOSignConstants.SIGN_FORMAT_XADES_ENVELOPING,   SIGNER_CLASS_XADES,        Boolean.FALSE.toString()},
-		{AOSignConstants.SIGN_FORMAT_XADES_TRI,          SIGNER_CLASS_XADES_TRI,    Boolean.FALSE.toString()},
-		{AOSignConstants.SIGN_FORMAT_XADES_ASIC_S,       SIGNER_CLASS_XADES_ASIC_S, Boolean.TRUE.toString()},
-		{AOSignConstants.SIGN_FORMAT_XMLDSIG,            SIGNER_CLASS_XMLDSIG,      Boolean.TRUE.toString()},
-		{AOSignConstants.SIGN_FORMAT_XMLDSIG_DETACHED,   SIGNER_CLASS_XMLDSIG,      Boolean.FALSE.toString()},
-		{AOSignConstants.SIGN_FORMAT_XMLDSIG_ENVELOPED,  SIGNER_CLASS_XMLDSIG,      Boolean.FALSE.toString()},
-		{AOSignConstants.SIGN_FORMAT_XMLDSIG_ENVELOPING, SIGNER_CLASS_XMLDSIG,      Boolean.FALSE.toString()},
-		{AOSignConstants.SIGN_FORMAT_PDF,                SIGNER_CLASS_PADES,        Boolean.FALSE.toString()},
-		{AOSignConstants.SIGN_FORMAT_PDF_TRI,            SIGNER_CLASS_PADES_TRI,    Boolean.FALSE.toString()},
-		{AOSignConstants.SIGN_FORMAT_PADES,              SIGNER_CLASS_PADES,        Boolean.TRUE.toString()},
-		{AOSignConstants.SIGN_FORMAT_PADES_TRI,          SIGNER_CLASS_PADES_TRI,    Boolean.FALSE.toString()},
-		{AOSignConstants.SIGN_FORMAT_ODF,                SIGNER_CLASS_ODF,          Boolean.TRUE.toString()},
-		{AOSignConstants.SIGN_FORMAT_ODF_ALT1,           SIGNER_CLASS_ODF,          Boolean.FALSE.toString()},
-		{AOSignConstants.SIGN_FORMAT_OOXML,              SIGNER_CLASS_OOXML,        Boolean.TRUE.toString()},
-		{AOSignConstants.SIGN_FORMAT_OOXML_ALT1,         SIGNER_CLASS_OOXML,        Boolean.FALSE.toString()}
+		{AOSignConstants.SIGN_FORMAT_CADES,              SIGNER_CLASS_CADES,        	Boolean.TRUE.toString()},
+		{AOSignConstants.SIGN_FORMAT_CADES_TRI,          SIGNER_CLASS_CADES_TRI,    	Boolean.FALSE.toString()},
+		{AOSignConstants.SIGN_FORMAT_CADES_ASIC_S,       SIGNER_CLASS_CADES_ASIC_S, 	Boolean.TRUE.toString()},
+		{AOSignConstants.SIGN_FORMAT_CADES_ASIC_S_TRI,   SIGNER_CLASS_CADES_ASIC_S_TRI, Boolean.FALSE.toString()},
+		{AOSignConstants.SIGN_FORMAT_CMS,                SIGNER_CLASS_CMS,          	Boolean.TRUE.toString()},
+		{AOSignConstants.SIGN_FORMAT_FACTURAE,           SIGNER_CLASS_FACTURAE,     	Boolean.TRUE.toString()},
+		{AOSignConstants.SIGN_FORMAT_FACTURAE_ALT1,      SIGNER_CLASS_FACTURAE,     	Boolean.FALSE.toString()},
+		{AOSignConstants.SIGN_FORMAT_FACTURAE_TRI,       SIGNER_CLASS_FACTURAE_TRI, 	Boolean.FALSE.toString()},
+		{AOSignConstants.SIGN_FORMAT_XADES,              SIGNER_CLASS_XADES,        	Boolean.TRUE.toString()},
+		{AOSignConstants.SIGN_FORMAT_XADES_DETACHED,     SIGNER_CLASS_XADES,        	Boolean.FALSE.toString()},
+		{AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED,    SIGNER_CLASS_XADES,        	Boolean.FALSE.toString()},
+		{AOSignConstants.SIGN_FORMAT_XADES_ENVELOPING,   SIGNER_CLASS_XADES,        	Boolean.FALSE.toString()},
+		{AOSignConstants.SIGN_FORMAT_XADES_TRI,          SIGNER_CLASS_XADES_TRI,    	Boolean.FALSE.toString()},
+		{AOSignConstants.SIGN_FORMAT_XADES_ASIC_S,       SIGNER_CLASS_XADES_ASIC_S, 	Boolean.TRUE.toString()},
+		{AOSignConstants.SIGN_FORMAT_XADES_ASIC_S_TRI,   SIGNER_CLASS_XADES_ASIC_S_tri, Boolean.FALSE.toString()},
+		{AOSignConstants.SIGN_FORMAT_XMLDSIG,            SIGNER_CLASS_XMLDSIG,      	Boolean.TRUE.toString()},
+		{AOSignConstants.SIGN_FORMAT_XMLDSIG_DETACHED,   SIGNER_CLASS_XMLDSIG,      	Boolean.FALSE.toString()},
+		{AOSignConstants.SIGN_FORMAT_XMLDSIG_ENVELOPED,  SIGNER_CLASS_XMLDSIG,      	Boolean.FALSE.toString()},
+		{AOSignConstants.SIGN_FORMAT_XMLDSIG_ENVELOPING, SIGNER_CLASS_XMLDSIG,      	Boolean.FALSE.toString()},
+		{AOSignConstants.SIGN_FORMAT_PDF,                SIGNER_CLASS_PADES,        	Boolean.FALSE.toString()},
+		{AOSignConstants.SIGN_FORMAT_PDF_TRI,            SIGNER_CLASS_PADES_TRI,    	Boolean.FALSE.toString()},
+		{AOSignConstants.SIGN_FORMAT_PADES,              SIGNER_CLASS_PADES,        	Boolean.TRUE.toString()},
+		{AOSignConstants.SIGN_FORMAT_PADES_TRI,          SIGNER_CLASS_PADES_TRI,    	Boolean.FALSE.toString()},
+		{AOSignConstants.SIGN_FORMAT_ODF,                SIGNER_CLASS_ODF,          	Boolean.TRUE.toString()},
+		{AOSignConstants.SIGN_FORMAT_ODF_ALT1,           SIGNER_CLASS_ODF,          	Boolean.FALSE.toString()},
+		{AOSignConstants.SIGN_FORMAT_OOXML,              SIGNER_CLASS_OOXML,        	Boolean.TRUE.toString()},
+		{AOSignConstants.SIGN_FORMAT_OOXML_ALT1,         SIGNER_CLASS_OOXML,        	Boolean.FALSE.toString()},
+		{AOSignConstants.SIGN_FORMAT_PKCS1,				 SIGNER_CLASS_PKCS1,        	Boolean.FALSE.toString()},
+		{AOSignConstants.SIGN_FORMAT_PKCS1_TRI,			 SIGNER_CLASS_PKCS1_TRI,        Boolean.FALSE.toString()}
 	};
 
 	private AOSignerFactory() {
@@ -114,6 +122,7 @@ public final class AOSignerFactory {
 	 * @param signFormat Formato de firma para el cual solicitamos el manejador.
 	 * @return Manejador capaz de firmar en el formato indicado. */
 	public static AOSigner getSigner(final String signFormat) {
+
 		String signerClass = null;
 		for (final String[] format : SIGNERS_CLASSES) {
 			if (format[0].equalsIgnoreCase(signFormat)) {
@@ -147,4 +156,9 @@ public final class AOSignerFactory {
 		return formats;
 	}
 
+	public static void main(String[] args) {
+
+		final AOSigner signer = getSigner(AOSignConstants.SIGN_FORMAT_PKCS1_TRI);
+		System.out.println(signer);
+	}
 }
