@@ -41,9 +41,9 @@ final class ValidateCMSSignedData {
     public static boolean isCMSSignedData(final byte[] data) throws IOException {
     	new SCChecker().checkSpongyCastle();
         boolean isValid = true;
-        ASN1InputStream is = null;
-        try {
-            is = new ASN1InputStream(data);
+        try (
+    		final ASN1InputStream is = new ASN1InputStream(data);
+		) {
             final ASN1Sequence dsq = (ASN1Sequence) is.readObject();
             final Enumeration<?> e = dsq.getObjects();
             // Elementos que contienen los elementos OID Data
@@ -65,22 +65,17 @@ final class ValidateCMSSignedData {
             }
         }
         catch (final Exception ex) {
-            isValid = false;
-        }
-        finally {
-        	if (is != null) {
-        		is.close();
-        	}
+            return false;
         }
         return isValid;
     }
 
     /** M&eacute;todo que verifica que los SignerInfos tenga el par&aacute;metro
      * que identifica que es de tipo cades.
-     * @param si
-     *        SignerInfo para la verificaci&oacute;n del p&aacute;rametro
-     *        adecuado.
-     * @return si contiene el par&aacute;metro. */
+     * @param si <i>SignerInfo</i> para la verificaci&oacute;n del p&aacute;rametro
+     *           adecuado.
+     * @return <code>true</code> si contiene el par&aacute;metro, <code>false</code>
+     *         en caso contrario. */
     private static boolean verifySignerInfo(final SignerInfo si) {
         boolean isSignerValid = true;
         final ASN1Set attrib = si.getAuthenticatedAttributes();

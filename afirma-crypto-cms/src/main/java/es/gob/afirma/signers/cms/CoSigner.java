@@ -87,27 +87,30 @@ final class CoSigner {
      * @throws java.security.cert.CertificateException Si se produce alguna excepci&oacute;n con
      *                                                 los certificados de firma. */
     byte[] coSigner(final P7ContentSignerParameters parameters,
-                           final byte[] sign,
-                           final boolean omitContent,
-                           final String dataType,
-                           final PrivateKey key,
-                           final java.security.cert.Certificate[] certChain,
-                           final Map<String, byte[]> atrib,
-                           final Map<String, byte[]> uatrib,
-                           final byte[] messageDigest) throws IOException, NoSuchAlgorithmException, CertificateException {
-
+                    final byte[] sign,
+                    final boolean omitContent,
+                    final String dataType,
+                    final PrivateKey key,
+                    final java.security.cert.Certificate[] certChain,
+                    final Map<String, byte[]> atrib,
+                    final Map<String, byte[]> uatrib,
+                    final byte[] messageDigest) throws IOException,
+                                                       NoSuchAlgorithmException,
+                                                       CertificateException {
         // LEEMOS EL FICHERO QUE NOS INTRODUCEN
-    	final ASN1InputStream is = new ASN1InputStream(sign);
-        final ASN1Sequence dsq = (ASN1Sequence) is.readObject();
-        is.close();
+    	final ASN1Sequence dsq;
+    	try (
+			final ASN1InputStream is = new ASN1InputStream(sign);
+		) {
+    		dsq = (ASN1Sequence) is.readObject();
+    	}
+
         final Enumeration<?> e = dsq.getObjects();
         // Elementos que contienen los elementos OID SignedData
         e.nextElement();
         // Contenido de SignedData
         final ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
-        final ASN1Sequence contentSignedData = (ASN1Sequence) doj.getObject();// contenido
-                                                                        // del
-                                                                        // SignedData
+        final ASN1Sequence contentSignedData = (ASN1Sequence) doj.getObject();
 
         final SignedData sd = SignedData.getInstance(contentSignedData);
 
@@ -133,7 +136,7 @@ final class CoSigner {
         }
 
         if (certChain.length != 0) {
-            final List<ASN1Encodable> ce = new ArrayList<ASN1Encodable>();
+            final List<ASN1Encodable> ce = new ArrayList<>();
             for (final java.security.cert.Certificate element : certChain) {
                 ce.add(Certificate.getInstance(ASN1Primitive.fromByteArray(element.getEncoded())));
             }
@@ -160,13 +163,19 @@ final class CoSigner {
         if (messageDigest == null) {
             signedAttr =
             	generateSignerInfo(
-            			digestAlgorithm,
-            			content2 != null ? content2 : parameters.getContent(),
-            			dataType,
-            			atrib);
+        			digestAlgorithm,
+        			content2 != null ? content2 : parameters.getContent(),
+        			dataType,
+        			atrib
+    			);
         }
         else {
-            signedAttr = generateSignerInfoFromHash((X509Certificate) certChain[0], messageDigest, dataType, atrib);
+            signedAttr = generateSignerInfoFromHash(
+        		(X509Certificate) certChain[0],
+        		messageDigest,
+        		dataType,
+        		atrib
+    		);
         }
 
         // atributos no firmados.
@@ -248,15 +257,19 @@ final class CoSigner {
         byte[] messageDigest = digest != null ? digest.clone() : null;
 
         // LEEMOS EL FICHERO QUE NOS INTRODUCEN
-        final ASN1InputStream is = new ASN1InputStream(sign);
-        final ASN1Sequence dsq = (ASN1Sequence) is.readObject();
-        is.close();
+        final ASN1Sequence dsq;
+        try (
+    		final ASN1InputStream is = new ASN1InputStream(sign);
+		) {
+        	dsq = (ASN1Sequence) is.readObject();
+        }
+
         final Enumeration<?> e = dsq.getObjects();
         // Elementos que contienen los elementos OID SignedData
         e.nextElement();
         // Contenido de SignedData
         final ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
-        final ASN1Sequence contentSignedData = (ASN1Sequence) doj.getObject(); // Contenido del SignedData
+        final ASN1Sequence contentSignedData = (ASN1Sequence) doj.getObject();
 
         final SignedData sd = SignedData.getInstance(contentSignedData);
 
@@ -283,7 +296,7 @@ final class CoSigner {
         }
 
         if (signerCertificateChain.length != 0) {
-            final List<ASN1Encodable> ce = new ArrayList<ASN1Encodable>();
+            final List<ASN1Encodable> ce = new ArrayList<>();
             for (final X509Certificate element : signerCertificateChain) {
                 ce.add(Certificate.getInstance(ASN1Primitive.fromByteArray(element.getEncoded())));
             }

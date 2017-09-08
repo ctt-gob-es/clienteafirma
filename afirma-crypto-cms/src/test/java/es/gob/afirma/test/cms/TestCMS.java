@@ -127,10 +127,12 @@ public final class TestCMS {
         		);
 
                 final File saveFile = File.createTempFile(algo + "-", ".csig"); //$NON-NLS-1$ //$NON-NLS-2$
-                final OutputStream os = new FileOutputStream(saveFile);
-                os.write(result);
-                os.flush();
-                os.close();
+                try (
+            		final OutputStream os = new FileOutputStream(saveFile);
+        		) {
+	                os.write(result);
+	                os.flush();
+                }
                 System.out.println("Temporal para comprobacion manual: " + saveFile.getAbsolutePath()); //$NON-NLS-1$
 
               // Enviamos a validar a AFirma

@@ -69,8 +69,8 @@ final class CounterSigner {
 
     private int actualIndex = 0;
     private ASN1Set signedAttr2;
-    private Map<String, byte[]> atrib2 = new HashMap<String, byte[]>();
-    private Map<String, byte[]> uatrib2 = new HashMap<String, byte[]>();
+    private Map<String, byte[]> atrib2 = new HashMap<>();
+    private Map<String, byte[]> uatrib2 = new HashMap<>();
 
     /** Constructor de la clase. Se crea una contrafirma a partir de los datos
      * del firmante, el archivo que se firma y del archivo que contiene las
@@ -107,9 +107,13 @@ final class CounterSigner {
         this.uatrib2 = uatri;
 
         // LEEMOS EL FICHERO QUE NOS INTRODUCEN
-        final ASN1InputStream is = new ASN1InputStream(data);
-        final ASN1Sequence dsq = (ASN1Sequence) is.readObject();
-        is.close();
+        final ASN1Sequence dsq;
+        try (
+    		final ASN1InputStream is = new ASN1InputStream(data);
+		) {
+        	dsq = (ASN1Sequence) is.readObject();
+        }
+
         final Enumeration<?> e = dsq.getObjects();
         // Elementos que contienen los elementos OID SignedData
         e.nextElement();
@@ -179,10 +183,12 @@ final class CounterSigner {
         		);
 
                 // Esto se realiza asi por problemas con los casting.
-                final ASN1InputStream sd2 = new ASN1InputStream(sigDat.getEncoded(ASN1Encoding.DER));
-                final ASN1Sequence contentSignedData2 = (ASN1Sequence) sd2.readObject();// contenido del SignedData
-                sd2.close();
-
+                final ASN1Sequence contentSignedData2;
+                try (
+            		final ASN1InputStream sd2 = new ASN1InputStream(sigDat.getEncoded(ASN1Encoding.DER));
+        		) {
+                	contentSignedData2 = (ASN1Sequence) sd2.readObject();// contenido del SignedData
+                }
                 aux = SignedData.getInstance(contentSignedData2);
             }
 
@@ -349,7 +355,7 @@ final class CounterSigner {
                                                                             CertificateException,
                                                                             AOException {
 
-        final List<Object> attributes = new ArrayList<Object>();
+        final List<Object> attributes = new ArrayList<>();
         final ASN1EncodableVector signerInfosU = new ASN1EncodableVector();
         final ASN1EncodableVector signerInfosU2 = new ASN1EncodableVector();
 
@@ -474,7 +480,7 @@ final class CounterSigner {
                                                                                                                 CertificateException,
                                                                                                                 AOException {
 
-        final List<Object> attributes = new ArrayList<Object>();
+        final List<Object> attributes = new ArrayList<>();
         final ASN1EncodableVector signerInfosU = new ASN1EncodableVector();
         final ASN1EncodableVector signerInfosU2 = new ASN1EncodableVector();
 
@@ -591,7 +597,7 @@ final class CounterSigner {
                                                        final java.security.cert.Certificate[] certChain) throws NoSuchAlgorithmException,
                                                                                                                 IOException,
                                                                                                                 CertificateException {
-        final List<Object> attributes = new ArrayList<Object>();
+        final List<Object> attributes = new ArrayList<>();
         final ASN1EncodableVector signerInfosU = new ASN1EncodableVector();
         final ASN1EncodableVector signerInfosU2 = new ASN1EncodableVector();
 
@@ -710,7 +716,7 @@ final class CounterSigner {
                                                                               CertificateException,
                                                                               AOException {
 
-        final List<Object> attributes = new ArrayList<Object>();
+        final List<Object> attributes = new ArrayList<>();
         final ASN1EncodableVector signerInfosU = new ASN1EncodableVector();
         SignerInfo counterSigner = null;
         if (signerInfo.getUnauthenticatedAttributes() != null) {

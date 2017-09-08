@@ -48,8 +48,8 @@ import es.gob.afirma.signers.pkcs7.SCChecker;
 public final class AOCMSSigner implements AOSigner {
 
     private String dataType = null;
-    private final Map<String, byte[]> atrib = new HashMap<String, byte[]>();
-    private final Map<String, byte[]> uatrib = new HashMap<String, byte[]>();
+    private final Map<String, byte[]> atrib = new HashMap<>();
+    private final Map<String, byte[]> uatrib = new HashMap<>();
 
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
@@ -168,7 +168,16 @@ public final class AOCMSSigner implements AOSigner {
             try {
                 // No habra messageDigest porque no nos pueden dar un hash
                 // en este metodo, tendria que ser en el que incluye datos
-				return new CoSigner().coSigner(algorithm, (X509Certificate[])certChain, sign, this.dataType, key, this.atrib, this.uatrib, null);
+				return new CoSigner().coSigner(
+					algorithm,
+					(X509Certificate[])certChain,
+					sign,
+					this.dataType,
+					key,
+					this.atrib,
+					this.uatrib,
+					null
+				);
 			}
             catch (final Exception e) {
             	throw new AOException("Error generando la Cofirma PKCS#7", e); //$NON-NLS-1$
@@ -279,8 +288,9 @@ public final class AOCMSSigner implements AOSigner {
             catch (final Exception e) {
                 throw new AOException("Error generando la Contrafirma PKCS#7", e); //$NON-NLS-1$
             }
-        } else {
-            throw new AOException("Los datos no se corresponden con una firma CMS valida");     //$NON-NLS-1$
+        }
+        else {
+            throw new AOException("Los datos no se corresponden con una firma CMS valida"); //$NON-NLS-1$
         }
 
         return dataSigned;
@@ -324,19 +334,15 @@ public final class AOCMSSigner implements AOSigner {
     /** A&ntilde;ade un atributo firmado al formato de firma seleccionado. Este
      * formato debe reconocer el OID especificado, siendo el atributo value su
      * valor como cadena de texto.
-     * @param oid
-     *        Object Identifier. Identificador del objeto a introducir.
-     * @param value
-     *        Valor asignado */
+     * @param oid OID del objeto a introducir.
+     * @param value Valor asignado */
     public void addSignedAttribute(final String oid, final byte[] value) {
         this.atrib.put(oid, value);
     }
 
     /** A&ntilde;ade un atributo no firmado al formato de firma seleccionado.
-     * @param oid
-     *        Object Identifier. Identificador del atributo a introducir.
-     * @param value
-     *        Valor asignado */
+     * @param oid OID del atributo a introducir.
+     * @param value Valor asignado */
     public void addUnsignedAttribute(final String oid, final byte[] value) {
         this.uatrib.put(oid, value);
     }
@@ -345,10 +351,14 @@ public final class AOCMSSigner implements AOSigner {
     @Override
 	public byte[] getData(final byte[] signData) throws AOException, IOException {
         if (signData == null) {
-            throw new IllegalArgumentException("Se han introducido datos nulos para su comprobacion"); //$NON-NLS-1$
+            throw new IllegalArgumentException(
+        		"Se han introducido datos nulos para su comprobacion" //$NON-NLS-1$
+    		);
         }
         if (!ValidateCMSSignedData.isCMSSignedData(signData)) {
-            throw new AOInvalidFormatException("Los datos introducidos no se corresponden con un objeto de firma"); //$NON-NLS-1$
+            throw new AOInvalidFormatException(
+        		"Los datos introducidos no se corresponden con un objeto de firma" //$NON-NLS-1$
+    		);
         }
 		return ObtainContentSignedData.obtainData(signData);
     }
@@ -365,17 +375,21 @@ public final class AOCMSSigner implements AOSigner {
 	public AOSignInfo getSignInfo(final byte[] signData) throws AOException, IOException {
 
         if (signData == null) {
-            throw new IllegalArgumentException("No se han introducido datos para analizar"); //$NON-NLS-1$
+            throw new IllegalArgumentException(
+        		"No se han introducido datos para analizar" //$NON-NLS-1$
+    		);
         }
 
         if (!isSign(signData)) {
-            throw new AOInvalidFormatException("Los datos introducidos no se corresponden con un objeto de firma"); //$NON-NLS-1$
+            throw new AOInvalidFormatException(
+        		"Los datos introducidos no se corresponden con un objeto de firma" //$NON-NLS-1$
+    		);
         }
 
         final AOSignInfo signInfo = new AOSignInfo(AOSignConstants.SIGN_FORMAT_CMS);
+
         // Aqui podria venir el analisis de la firma buscando alguno de los
-        // otros datos de relevancia
-        // que se almacenan en el objeto AOSignInfo
+        // otros datos de relevancia que se almacenan en el objeto AOSignInfo
 
         return signInfo;
     }

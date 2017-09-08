@@ -54,9 +54,8 @@ import es.gob.afirma.signers.pkcs7.AOAlgorithmID;
 import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
 import es.gob.afirma.signers.pkcs7.SigUtils;
 
-/** Clase que implementa firma digital PKCS#7/CMS SignedData. La Estructura del
+/** Implementa firma digital PKCS#7/CMS SignedData. La Estructura del
  * mensaje es la siguiente:<br>
- *
  * <pre>
  * <code>
  *  SignedData ::= SEQUENCE {
@@ -103,12 +102,12 @@ final class GenSignedData {
      * @param uatrib Atributos no autenticados firmados opcionales.
      * @param messageDigest Huella digital a aplicar en la firma.
      * @return La firma generada codificada.
-     * @throws java.security.NoSuchAlgorithmException Si no se soporta alguno de los algoritmos de firma o huella
-     *                                                digital
-     * @throws java.security.cert.CertificateException Si se produce alguna excepci&oacute;n con los certificados de
-     *                                                 firma.
-     * @throws java.io.IOException Cuando ocurre un error durante el proceso de descifrado
-     *                             (formato o clave incorrecto,...)
+     * @throws NoSuchAlgorithmException Si no se soporta alguno de los algoritmos de firma o huella
+     *                                  digital.
+     * @throws CertificateException Si se produce alguna excepci&oacute;n con los certificados de
+     *                              firma.
+     * @throws IOException Cuando ocurre un error durante el proceso de descifrado
+     *                     (formato o clave incorrecto,...)
      * @throws AOException Cuando ocurre un error durante el proceso de descifrado
      *                     (formato o clave incorrecto,...) */
     byte[] generateSignedData(final P7ContentSignerParameters parameters,
@@ -155,7 +154,7 @@ final class GenSignedData {
         ASN1Set certificates = null;
 
         if (certChain.length != 0) {
-            final List<ASN1Encodable> ce = new ArrayList<ASN1Encodable>();
+            final List<ASN1Encodable> ce = new ArrayList<>();
             for (final java.security.cert.Certificate element : certChain) {
                 ce.add(Certificate.getInstance(ASN1Primitive.fromByteArray(element.getEncoded())));
             }
@@ -217,7 +216,7 @@ final class GenSignedData {
      * @param digestAlgorithm Algoritmo Firmado.
      * @param datos Datos firmados.
      * @param dataType Identifica el tipo del contenido a firmar.
-     * @param timestamp Introducir el momento de la firma como atributo firmado (no confundir con un sello de tiempo reconocido)
+     * @param timestamp Momento de la firma como atributo firmado (no confundir con un sello de tiempo reconocido)
      * @param atrib Lista de atributos firmados que se insertar&aacute;n dentro
      *              del archivo de firma.
      * @param messageDigest Huella digital.
@@ -246,20 +245,31 @@ final class GenSignedData {
 
         // fecha de firma
         if (timestamp) {
-            contexExpecific.add(new Attribute(CMSAttributes.signingTime, new DERSet(new ASN1UTCTime(new Date()))));
+            contexExpecific.add(
+        		new Attribute(
+    				CMSAttributes.signingTime, new DERSet(new ASN1UTCTime(new Date()))
+				)
+    		);
         }
 
         // Si nos viene el hash de fuera no lo calculamos
         final byte[] md;
         if (messageDigest == null || messageDigest.length < 1) {
-            md = MessageDigest.getInstance(AOSignConstants.getDigestAlgorithmName(digestAlgorithm)).digest(datos);
+            md = MessageDigest.getInstance(
+        		AOSignConstants.getDigestAlgorithmName(digestAlgorithm)
+    		).digest(datos);
         }
         else {
             md = messageDigest;
         }
 
         // MessageDigest
-        contexExpecific.add(new Attribute(CMSAttributes.messageDigest, new DERSet(new DEROctetString(md.clone()))));
+        contexExpecific.add(
+    		new Attribute(
+				CMSAttributes.messageDigest,
+				new DERSet(new DEROctetString(md.clone()))
+			)
+		);
 
         // agregamos la lista de atributos a mayores.
         if (atrib.size() != 0) {
@@ -267,10 +277,12 @@ final class GenSignedData {
             final Iterator<Map.Entry<String, byte[]>> it = atrib.entrySet().iterator();
             while (it.hasNext()) {
                 final Map.Entry<String, byte[]> e = it.next();
-                contexExpecific.add(new Attribute(
-                  new ASN1ObjectIdentifier(e.getKey()), // el oid
-                  new DERSet(new DERPrintableString(new String(e.getValue()))) // el array de bytes en formato string
-                ));
+                contexExpecific.add(
+            		new Attribute(
+        				new ASN1ObjectIdentifier(e.getKey()), // el oid
+        				new DERSet(new DERPrintableString(new String(e.getValue()))) // el array de bytes en formato string
+    				)
+        		);
             }
 
         }
@@ -319,7 +331,7 @@ final class GenSignedData {
      * @param signatureAlgorithm Algoritmo para la firma.
      * @param key Clave para firmar.
      * @return Firma de los atributos.
-     * @throws AOException Si ocurre cualquier problema durante el proceso */
+     * @throws AOException Si ocurre cualquier problema durante el proceso. */
     private ASN1OctetString firma(final String signatureAlgorithm, final PrivateKey key) throws AOException {
 
         final Signature sig;
@@ -327,7 +339,9 @@ final class GenSignedData {
             sig = Signature.getInstance(signatureAlgorithm);
         }
         catch (final Exception e) {
-            throw new AOException("Error obteniendo la clase de firma para el algoritmo " + signatureAlgorithm, e); //$NON-NLS-1$
+            throw new AOException(
+        		"Error obteniendo la clase de firma para el algoritmo " + signatureAlgorithm, e //$NON-NLS-1$
+    		);
         }
 
         // Indicar clave privada para la firma
@@ -343,7 +357,9 @@ final class GenSignedData {
             sig.update(this.signedAttr2.getEncoded(ASN1Encoding.DER));
         }
         catch (final Exception e) {
-            throw new AOException("Error al configurar la informacion de firma o al obtener los atributos a firmar", e); //$NON-NLS-1$
+            throw new AOException(
+        		"Error al configurar la informacion de firma o al obtener los atributos a firmar", e //$NON-NLS-1$
+    		);
         }
 
         // firmamos.
@@ -356,7 +372,6 @@ final class GenSignedData {
         }
 
         return new DEROctetString(realSig);
-
     }
 
 }
