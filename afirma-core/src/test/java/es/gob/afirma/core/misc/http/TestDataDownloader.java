@@ -34,8 +34,8 @@ public final class TestDataDownloader {
 		"    <email>sdfg@dsfg.com</email>\r\n" + //$NON-NLS-1$
 		"    <name>Javier</name>\r\n" + //$NON-NLS-1$
 		"    <proposal-id type=\"integer\">57</proposal-id>\r\n" + //$NON-NLS-1$
-		"    <surname>Pe�a</surname>\r\n" + //$NON-NLS-1$
-		"    <surname2>Mart�nez</surname2>\r\n" + //$NON-NLS-1$
+		"    <surname>Pena</surname>\r\n" + //$NON-NLS-1$
+		"    <surname2>Martinez</surname2>\r\n" + //$NON-NLS-1$
 		"    <terms type=\"boolean\">true</terms>\r\n" + //$NON-NLS-1$
 		"</ilp-signature>\r\n" //$NON-NLS-1$
 	;
@@ -54,9 +54,11 @@ public final class TestDataDownloader {
 		conn.setRequestProperty("Content-Type", "application/xml"); //$NON-NLS-1$ //$NON-NLS-2$ //
 		conn.setRequestProperty("Accept", "text/xml"); //$NON-NLS-1$ //$NON-NLS-2$
 
-		final OutputStream os = conn.getOutputStream();
-		os.write(TEST_POST_BODY.getBytes("UTF-8")); //$NON-NLS-1$
-		os.close();
+		try (
+			final OutputStream os = conn.getOutputStream();
+		) {
+			os.write(TEST_POST_BODY.getBytes("UTF-8")); //$NON-NLS-1$
+		}
 
 		conn.connect();
 
@@ -64,10 +66,12 @@ public final class TestDataDownloader {
 		final String statusCode = Integer.toString(resCode);
 		System.out.println("Status code: " + statusCode); //$NON-NLS-1$
 
-		final InputStream is = conn.getInputStream();
-		final byte[] data = AOUtil.getDataFromInputStream(is);
-		is.close();
-
+		final byte[] data;
+		try (
+			final InputStream is = conn.getInputStream();
+		) {
+			data = AOUtil.getDataFromInputStream(is);
+		}
 		System.out.println(new String(data));
 	}
 

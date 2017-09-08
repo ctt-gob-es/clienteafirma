@@ -156,9 +156,4 @@ public final class AOSignerFactory {
 		return formats;
 	}
 
-	public static void main(String[] args) {
-
-		final AOSigner signer = getSigner(AOSignConstants.SIGN_FORMAT_PKCS1_TRI);
-		System.out.println(signer);
-	}
 }
