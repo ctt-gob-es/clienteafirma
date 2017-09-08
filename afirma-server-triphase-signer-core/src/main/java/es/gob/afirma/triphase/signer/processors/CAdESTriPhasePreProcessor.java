@@ -30,7 +30,7 @@ import es.gob.afirma.triphase.signer.cades.AOCAdESTriPhaseCounterSigner;
  * @author Tom&aacute;s Garc&iacute;a Mer&aacute;s. */
 public class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 
-	/** Indica si la postfirma requiere la prefirma. */
+	/** Indica si la postfirma requiere los datos. */
 	private static final String PROPERTY_NAME_NEED_DATA = "NEED_DATA"; //$NON-NLS-1$
 
 	/** Indica si la postfirma requiere la prefirma. */
