@@ -29,6 +29,8 @@ import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.Map;
+import java.util.Properties;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -124,6 +126,21 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 			              final String contentType,
 			              final String accept,
 			              final UrlHttpMethod method) throws IOException {
+		final Properties headers = new Properties();
+		if (contentType != null) {
+			headers.setProperty("Content-Type", contentType); //$NON-NLS-1$
+		}
+		if (accept != null) {
+			headers.setProperty("Accept", accept); //$NON-NLS-1$
+		}
+		return readUrl(urlToRead, timeout, method, headers);
+	}
+
+	@Override
+	public byte[] readUrl(final String urlToRead,
+	                      final int timeout,
+		                  final UrlHttpMethod method,
+		                  final Properties requestProperties) throws IOException {
 		if (urlToRead == null) {
 			throw new IllegalArgumentException("La URL a leer no puede ser nula"); //$NON-NLS-1$
 		}
@@ -193,24 +210,39 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 
 		conn.setRequestMethod(method.toString());
 
-		if (authString != null) {
+
+		// Trabajamos las cabeceras, las por defecto y las que nos indiquen
+
+		final Properties headers = new Properties();
+		if (requestProperties == null) {
+			headers.putAll(requestProperties);
+		}
+
+		if (authString != null && !headers.containsKey("Authorization")) { //$NON-NLS-1$
 			conn.addRequestProperty("Authorization", "Basic " + authString); //$NON-NLS-1$ //$NON-NLS-2$
 		}
-		conn.addRequestProperty(
-			"Accept", //$NON-NLS-1$
-			accept != null ? accept : "*/*" //$NON-NLS-1$
-		);
-		conn.addRequestProperty("Connection", "keep-alive"); //$NON-NLS-1$ //$NON-NLS-2$
-		if (contentType != null) {
-			conn.addRequestProperty("Content-Type", contentType); //$NON-NLS-1$
+		if (!headers.containsKey("Accept")) { //$NON-NLS-1$
+			conn.addRequestProperty(
+				"Accept", //$NON-NLS-1$
+				"*/*" //$NON-NLS-1$
+			);
+		}
+		if (!headers.containsKey("Connection")) { //$NON-NLS-1$
+			conn.addRequestProperty("Connection", "keep-alive"); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+		if (!headers.containsKey("Host")) { //$NON-NLS-1$
+			conn.addRequestProperty("Host", uri.getHost()); //$NON-NLS-1$
+		}
+		if (!headers.containsKey("Origin")) { //$NON-NLS-1$
+			conn.addRequestProperty("Origin", uri.getProtocol() +  "://" + uri.getHost()); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
-		conn.addRequestProperty("Host", uri.getHost()); //$NON-NLS-1$
-		conn.addRequestProperty("Origin", uri.getProtocol() +  "://" + uri.getHost()); //$NON-NLS-1$ //$NON-NLS-2$
-
-		if (timeout != DEFAULT_TIMEOUT) {
-			conn.setConnectTimeout(timeout);
-			conn.setReadTimeout(timeout);
+		// Ponemos el resto de las cabeceras
+		for (final Map.Entry<?, ?> entry: headers.entrySet()) {
+			conn.addRequestProperty(
+				(String) entry.getKey(),
+				(String) entry.getValue()
+			);
 		}
 
 		if (urlParameters != null) {
@@ -218,7 +250,6 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 				"Content-Length", String.valueOf(urlParameters.getBytes("UTF-8").length) //$NON-NLS-1$ //$NON-NLS-2$
 			);
 			conn.setDoOutput(true);
-
 			try (
 				final OutputStream os = conn.getOutputStream();
 			) {

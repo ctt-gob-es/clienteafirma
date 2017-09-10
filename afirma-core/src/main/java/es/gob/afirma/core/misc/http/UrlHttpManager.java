@@ -11,6 +11,7 @@
 package es.gob.afirma.core.misc.http;
 
 import java.io.IOException;
+import java.util.Properties;
 
 /** Clase abstracta para la lectura y env&iacute;o de datos a URL remotas.
  * @author Carlos Gamuci */
@@ -37,4 +38,16 @@ public interface UrlHttpManager {
 	 * @return Contenido de la URL.
 	 * @throws IOException Si no se puede leer la URL */
 	byte[] readUrl(final String url, final UrlHttpMethod method) throws IOException;
+
+	/** Lee una URL HTTP o HTTPS.
+	 * @param url URL a leer.
+	 * @param timeout Timeout.
+	 * @param method M&eacute;todo HTTP.
+	 * @param requestProperties Propiedades a usar en la cabecera de la petici&oacute;n HTTP.
+	 * @return Contenido de la URL.
+	 * @throws IOException Si no se puede leer la URL */
+	byte[] readUrl(final String url,
+		           final int timeout,
+			       final UrlHttpMethod method,
+			       final Properties requestProperties) throws IOException;
 }
