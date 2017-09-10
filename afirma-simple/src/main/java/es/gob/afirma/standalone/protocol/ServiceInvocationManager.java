@@ -43,9 +43,9 @@ public final class ServiceInvocationManager {
 
 	private static final int READ_BUFFER_SIZE = 2048;
 
-	/** Tamano del segmento de cada fragmento de datos que se lea del sokect que se mantendra
+	/** Tama&ntilde;o del segmento de cada fragmento de datos que se lea del <code>socket</code> que se mantendr&aacute;
 	 * almacenado por si el segmento de fin de entrada queda dividido entre dos fragmentos. El valor
-	 * permite que quepa al completo en un subfragmente la etiqueta EOF y la etiqueta idSession con
+	 * permite que quepa al completo en un subfragmento la etiqueta <i>EOF</i> y la etiqueta <i>idSession</i> con
 	 * su valor. */
 	private static final int BUFFERED_SECURITY_RANGE = 36;
 
@@ -55,7 +55,7 @@ public final class ServiceInvocationManager {
 	/** Tiempo de espera de cada socket en milisegundos. */
 	private static int SOCKET_TIMEOUT = 90000;
 
-	/** Maximo numero de caracteres que podemos enviar en una respuesta. */
+	/** M&aacute;ximo numero de caracteres que podemos enviar en una respuesta. */
 	private static final int RESPONSE_MAX_SIZE = 1000000;
 	//  peticiones que podemos recibir
 	private static final String CMD = "cmd="; //$NON-NLS-1$
@@ -99,8 +99,9 @@ public final class ServiceInvocationManager {
 	private static final String KEYSTORE_NAME = "autofirma.pfx"; //$NON-NLS-1$
 	private static final String PKCS12 = "PKCS12"; //$NON-NLS-1$
 	private static final String KEY_MANAGER_TYPE = "SunX509"; //$NON-NLS-1$
-	private static final String SSLCONTEXT = "TLS"; //$NON-NLS-1$
-	// timer para cerrar la aplicacion cuando pase un tiempo de inactividad.
+	private static final String SSLCONTEXT = "TLSv1"; //$NON-NLS-1$
+
+	/** Temporizador para cerrar la aplicaci&oacute;n cuando pase un tiempo de inactividad. */
 	private final static Timer timer = new Timer(SOCKET_TIMEOUT, evt -> {
 		LOGGER.warning("Se ha caducado la conexion. Se deja de escuchar en el puerto..."); //$NON-NLS-1$
 		if (Platform.OS.MACOSX.equals(Platform.getOS())) {
@@ -109,10 +110,8 @@ public final class ServiceInvocationManager {
 		System.exit(-4);
 	});
 
-	/**
-	 * Mata el proceso de AutoFirma cuando estamos en OS X. En el resto de sistemas
-	 * no hace nada.
-	 */
+	/** Mata el proceso de AutoFirma cuando estamos en macOS. En el resto de sistemas
+	 * no hace nada. */
 	public static void closeMacService() {
 		LOGGER.warning("Ejecuto kill"); //$NON-NLS-1$
 		final String script =
@@ -123,12 +122,13 @@ public final class ServiceInvocationManager {
 		final ScriptEngine se = MozillaKeyStoreUtilitiesOsX.getAppleScriptEngine();
 		try {
 			se.eval(script);
-		} catch (final Exception e) {
-			LOGGER.warning("Fallo kill: " + e); //$NON-NLS-1$
+		}
+		catch (final Exception e) {
+			LOGGER.warning("No se ha podido cerrar la aplicacion: " + e); //$NON-NLS-1$
 		}
 	}
 
-	/** Coge el foco del sistema en OS X. En el resto del sistemas no hace nada. */
+	/** Coge el foco del sistema en macOS. En el resto del sistemas no hace nada. */
 	public static void focusApplication() {
 		if (Platform.OS.MACOSX.equals(Platform.getOS())) {
 			final String script = "tell me to activate"; //$NON-NLS-1$
@@ -137,7 +137,7 @@ public final class ServiceInvocationManager {
 				se.eval(script);
 			}
 			catch (final Exception e) {
-				LOGGER.warning("Fallo cogiendo el foco en mac: " + e); //$NON-NLS-1$
+				LOGGER.warning("Fallo cogiendo el foco en macOS: " + e); //$NON-NLS-1$
 			}
 		}
 	}
@@ -145,16 +145,16 @@ public final class ServiceInvocationManager {
 	private final static List<String> request = new ArrayList<>();
 	private final static List<String> toSend = new ArrayList<>();
 	private static int parts = 0;
-	private static SSLServerSocket  ssocket;
 	private static String idSession ;
+
 	/** Constructor vac&iacute;o privado para que no se pueda instanciar la clase ya que es est&aacute;tico. */
 	private ServiceInvocationManager(){
 		// No instanciable
 	}
 
-	/** Inicia el servicio. Se intenta establecer un socket que escuche en el puerto pasado por la URL.
-	 * @param url URL. Debe indicar el puerto.
-	 * @throws UnsupportedProtocolException Si no se sooprta el protocolo o la versi&oacute;n de este. */
+	/** Inicia el servicio. Se intenta establecer un <code>socket</code> que escuche en el puerto pasado por la URL.
+	 * @param url URL (debe indicarse el puerto).
+	 * @throws UnsupportedProtocolException Si no se soporta el protocolo o la versi&oacute;n de este. */
 	static void startService(final String url) throws UnsupportedProtocolException {
 
 		checkSupportProtocol(getVersion(url));
@@ -163,7 +163,9 @@ public final class ServiceInvocationManager {
 			// ruta de la que debe buscar el fichero
 			final File sslKeyStoreFile = getKeyStoreFile();
 			if (sslKeyStoreFile == null) {
-				throw new KeyStoreException("No se encuentra el almacen para el cifrado de la comunicacion SSL"); //$NON-NLS-1$
+				throw new KeyStoreException(
+					"No se encuentra el almacen para el cifrado de la comunicacion SSL" //$NON-NLS-1$
+				);
 			}
 
 			// pass del fichero
@@ -178,51 +180,67 @@ public final class ServiceInvocationManager {
 
 			final SSLContext sc = SSLContext.getInstance(SSLCONTEXT);
 			sc.init(kmf.getKeyManagers(), null, null);
-			LOGGER.info("Iniciando servicio local de firma...: " + url); //$NON-NLS-1$
+			LOGGER.info("Iniciando servicio local de firma: " + url); //$NON-NLS-1$
 			final SSLServerSocketFactory ssocketFactory = sc.getServerSocketFactory();
-			tryPorts(getPorts(url), ssocketFactory);
-			// empieza la cuenta atras del timer.
+			final SSLServerSocket ssocket = tryPorts(getPorts(url), ssocketFactory);
+			ssocket.setReuseAddress(true);
+
+			// empieza la cuenta atras del temporizador.
 			timer.start();
-			// mostramos la informacion del server socket
+
 			while (true){
-				try ( final SSLSocket socketChannel = (SSLSocket) ssocket.accept() ) {
+				try {
+
+					final SSLSocket sslSocket = (SSLSocket) ssocket.accept();
+
 					LOGGER.info("Detectada conexion entrante"); //$NON-NLS-1$
+
 					// comprobamos que la direccion es local. Si no es local se descarta la peticion
-					if (!isLocalAddress((InetSocketAddress) socketChannel.getRemoteSocketAddress())) {
-						socketChannel.close();
+					if (!isLocalAddress((InetSocketAddress) sslSocket.getRemoteSocketAddress())) {
+						sslSocket.close();
 						ssocket.close();
 						LOGGER.severe(
 							"Se ha detectado un acceso no autorizado desde " + //$NON-NLS-1$
-								((InetSocketAddress) socketChannel.getRemoteSocketAddress()).getHostString()
+								((InetSocketAddress) sslSocket.getRemoteSocketAddress()).getHostString()
 						);
 						continue;
 					}
+					new Thread(() ->  {
+						try {
+							final String httpRequest = read(sslSocket.getInputStream());
 
-					try {
-						final String httpRequest = read(socketChannel.getInputStream());
-
-						// comprobamos que la peticion no es vacia
-						if (httpRequest == null) {
-							LOGGER.warning("Se ha recibido una peticion vacia"); //$NON-NLS-1$
+							// comprobamos que la peticion no es vacia
+							if (httpRequest == null) {
+								LOGGER.warning("Se ha recibido una peticion vacia"); //$NON-NLS-1$
+							}
+							else {
+								LOGGER.fine("Peticion HTTP recibida:\n" + httpRequest); //$NON-NLS-1$
+								getCommandUri(httpRequest, sslSocket);
+							}
 						}
-						else {
-							LOGGER.fine("Peticion HTTP recibida:\n" + httpRequest); //$NON-NLS-1$
-							getCommandUri(httpRequest, socketChannel);
+						catch (final IllegalArgumentException e) {
+							LOGGER.severe(
+								"Los parametros recibidos a traves del socket no son validos, se ignorara la peticion: " + e //$NON-NLS-1$
+							);
+							return;
 						}
-					}
-					catch (final IllegalArgumentException e) {
-						LOGGER.severe("Los parametros recibidos a traves del socket no son validos, se ignorara la peticion: " + e); //$NON-NLS-1$
-						continue;
-					}
+						catch(final IOException e) {
+							LOGGER.severe(
+								"Error en el envio a traves del socket: " + e //$NON-NLS-1$
+							);
+							return;
+						}
+					}).start();
 
 				}
 				catch (final SocketTimeoutException e) {
-						LOGGER.severe("Tiempo de espera del socket terminado" + e); //$NON-NLS-1$
+					LOGGER.severe("Tiempo de espera del socket terminado: " + e); //$NON-NLS-1$
 				}
 			}
 		}
 
-		// Con las excepciones no hacemos nada ya que no tenemos forma de transmitir el error de vuelta y no debemos mostrar dialogos graficos
+		// Con las excepciones no hacemos nada ya que no tenemos forma de transmitir el
+		// error de vuelta y no debemos mostrar dialogos graficos
 		catch (final IOException e) {
 			LOGGER.log(Level.SEVERE, "Error en la comunicacion a traves del socket", e); //$NON-NLS-1$
 		}
@@ -244,11 +262,9 @@ public final class ServiceInvocationManager {
 
 	}
 
-	/**
-	 * Obtiene el fichero del almac&eacute;n con la clave SSL de alguno de los directorios
+	/** Obtiene el fichero del almac&eacute;n con la clave SSL de alguno de los directorios
 	 * del sistema en los que puede estar.
-	 * @return Almac&eacute;n de claves o {@code null} si no se encontr&oacute;.
-	 */
+	 * @return Almac&eacute;n de claves o {@code null} si no se encontr&oacute;. */
 	private static File getKeyStoreFile() {
 
 		File appDir = AutoFirmaUtil.getApplicationDirectory();
@@ -280,18 +296,18 @@ public final class ServiceInvocationManager {
 
 	/** Manda los datos de respuesta a la aplicaci&oacute;n.
 	 * @param response Respuesta al env&iacute;o.
-	 * @param socketChannel <code>SocketChannel</code> a donde mandar la respuesta.
-	 * @param petition Petici&oacute;n que se manda, para registrarla en el log.
+	 * @param socket <code>Socket</code> a donde mandar la respuesta.
+	 * @param petition Petici&oacute;n que se manda, para registrarla en el <i>log</i>.
 	 * @throws IOException Si hay errores en el env&iacute;o. */
-	private static void sendData(final byte[] response, final Socket socketChannel, final String petition) throws IOException {
-		socketChannel.getOutputStream().write(response);
-		socketChannel.getOutputStream().flush();
+	private static void sendData(final byte[] response, final Socket socket, final String petition) throws IOException {
+		socket.getOutputStream().write(response);
+		socket.getOutputStream().flush();
 		LOGGER.info("Mandando respuesta a la peticion: " + petition);  //$NON-NLS-1$
 		// volvemos a activar el timer
 		timer.restart();
 	}
 
-	/** Crea una respuesta HTTP para enviar a traves del socket.
+	/** Crea una respuesta HTTP para enviar a traves del <i>socket</i>.
 	 * @param ok Indica si la operacion finaliz&oacute; bien o mal.
 	 * @param response La respuesta que se mandar&aacute; en el HTTP.
 	 * @return Devuelve el byte array con la respuesta en formato HTTP. */
@@ -303,7 +319,7 @@ public final class ServiceInvocationManager {
 		else  {
 			sb.append("HTTP/1.1 500 Internal Server Error"); //$NON-NLS-1$
 		}
-		sb.append("Connection: keep-alive\n"); //$NON-NLS-1$
+		sb.append("Connection: close\n"); //$NON-NLS-1$
 		sb.append("Pragma: no-cache\n"); //$NON-NLS-1$
 		sb.append("Server: Cliente @firma\n"); //$NON-NLS-1$
 		sb.append("Content-Type: text/html; charset=utf-8\n"); //$NON-NLS-1$
@@ -325,7 +341,7 @@ public final class ServiceInvocationManager {
 			u = new URI(url);
 		}
 		catch (final Exception e) {
-			throw new IllegalArgumentException("La URI " + url + "de invocacion no es valida: " + e); //$NON-NLS-1$ //$NON-NLS-2$
+			throw new IllegalArgumentException("La URI (" + url + ") de invocacion no es valida: " + e); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		final String query = u.getQuery();
 		checkNullParameter(query, "La URI de invocacion no contiene parametros: " + url); //$NON-NLS-1$
@@ -354,8 +370,9 @@ public final class ServiceInvocationManager {
 		}
 		idSession = p.getProperty(IDSESSION);
 		if(idSession != null ){
-		    LOGGER.info("Se ha recibido un idSesion para la transaccion"); //$NON-NLS-1$
-		} else {
+		    LOGGER.info("Se ha recibido un idSesion para la transaccion: " + idSession); //$NON-NLS-1$
+		}
+		else {
             LOGGER.info("No se utilizara idSesion durante la transaccion"); //$NON-NLS-1$
         }
 		return ret;
@@ -390,16 +407,16 @@ public final class ServiceInvocationManager {
 	/** Intenta realizar una conexi&oacute; por <i>socket</i> en los puertos que se pasan por par&aacute;metro.
 	 * @param ports Puertos a probar.
 	 * @param socket <i>Socket</i> que se intenta conectar.
+	 * @return El <code>SSLServerSocket</code> ya creado en el primer puerto encontrado disponible.
 	 * @throws IOException Si ocurren errores durante el intento. */
-	private static void tryPorts(final int[] ports, final SSLServerSocketFactory  socket) throws IOException {
-
+	private static SSLServerSocket tryPorts(final int[] ports, final SSLServerSocketFactory socket) throws IOException {
 		checkNullParameter(ports, "La lista de puertos no puede ser nula"); //$NON-NLS-1$
 		checkNullParameter(socket, "El socket servidor no puede ser nulo"); //$NON-NLS-1$
 		for (final int port : ports) {
 			try {
-				ssocket = (SSLServerSocket) socket.createServerSocket(port);
+				final SSLServerSocket ssocket = (SSLServerSocket) socket.createServerSocket(port);
 				LOGGER.info("Establecido el puerto " + port + " para el servicio Cliente @firma"); //$NON-NLS-1$ //$NON-NLS-2$
-				return;
+				return ssocket;
 			}
 			catch (final BindException e) {
 				LOGGER.warning(
@@ -536,7 +553,8 @@ public final class ServiceInvocationManager {
 	}
 
 	/** Analiza cual el <i>ComandUri</i> de la petici&oacute;n recibida y realiza sus operaciones pertinentes.
-	 * @param httpRequest Petici&oacute;n http recibida de la que hay que extraer el command uri. Las peticiones permitidas son:
+	 * @param httpRequest Petici&oacute;n http recibida de la que hay que extraer el <i>command uri</i>.<br>
+	 * Las peticiones permitidas son:
 	 * <ul>
 	 * 		<li>cmd= Iniciar una operaci&oacute;n que viene sin fragmentar.</li>
 	 * 		<li>echo= Petici&oacute;n echo para comprobar que la aplicaci&oacute;n esta lista</li>
@@ -544,9 +562,9 @@ public final class ServiceInvocationManager {
 	 * 		<li>firm= Inicia una operaci&oacute;n juntando los datos fragmentados de las peticiones anteriores.</li>
 	 * 		<li>send= Env&iacute;a la respuesta de la una operaci&oacute;n realizada. Si es demasiado grande se fragmenta en varios env&iacute;os.</li>
 	 * </ul>
-	 * @param socketChannel El Socket en el que se escucha la petici&oacute;n.
+	 * @param socket El <code>Socket</code> en el que se escucha la petici&oacute;n.
 	 * @throws IOException Si hay error en el tratamiento de datos. */
-	private static void getCommandUri(final String httpRequest, final Socket socketChannel) throws IOException {
+	private static void getCommandUri(final String httpRequest, final Socket socket) throws IOException {
 		checkNullParameter(httpRequest, "Los datos recibidos por HTTP son nulos"); //$NON-NLS-1$
 		final String uriType = getUriTypeFromRequest(httpRequest);
 		LOGGER.info("Recibido comando de tipo: " + uriType); //$NON-NLS-1$
@@ -555,45 +573,45 @@ public final class ServiceInvocationManager {
 			switch (uriType) {
 
 				case ECHO:
-					doEchoPetition(httpRequest.substring(httpRequest.indexOf(ECHO) + ECHO.length()),socketChannel);
+					doEchoPetition(httpRequest.substring(httpRequest.indexOf(ECHO) + ECHO.length()), socket);
 					break;
 
 				case CMD:
-					doCmdPetition(httpRequest.substring(httpRequest.indexOf(CMD) + CMD.length()), socketChannel);
+					doCmdPetition(httpRequest.substring(httpRequest.indexOf(CMD) + CMD.length()), socket);
 					break;
 
 				case FRAGMENT:
-					doFragmentPetition(httpRequest.substring(httpRequest.indexOf(FRAGMENT) + FRAGMENT.length()), socketChannel);
+					doFragmentPetition(httpRequest.substring(httpRequest.indexOf(FRAGMENT) + FRAGMENT.length()), socket);
 					break;
 
 				case SIGN:
-					doFragmentedProcess(socketChannel);
+					doFragmentedProcess(socket);
 					break;
 
 				case SEND:
-					doSendPetition(httpRequest.substring(httpRequest.indexOf(SEND) + SEND.length()), socketChannel);
+					doSendPetition(httpRequest.substring(httpRequest.indexOf(SEND) + SEND.length()), socket);
 					break;
-				// nunca deberia entrar aqui
-				default:
-					throw new IllegalStateException("Estado no permitido"); //$NON-NLS-1$
-				}
+
+				default: // Nunca deberia entrar aqui
+					throw new IllegalStateException("Comando no permitido: " + uriType); //$NON-NLS-1$
+			}
 		}
         catch (final OutOfMemoryError e){
             LOGGER.severe("Se ha producido un error por falta memoria de la maquina virtual: " + e); //$NON-NLS-1$
-            sendData(createHttpResponse(true, MEMORY_ERROR), socketChannel, "Error de memoria"); //$NON-NLS-1$
+            sendData(createHttpResponse(true, MEMORY_ERROR), socket, "Error de memoria"); //$NON-NLS-1$
         }
 		catch(final Exception e) {
 			throw new IllegalArgumentException(
 				"Error al procesar el comando de tipo '" + uriType + "': " + e, e //$NON-NLS-1$ //$NON-NLS-2$
 			);
 		}
-
+		socket.close();
 	}
 
 	/** Devuelve el <code>uriType</code> de la petici&oacute;n recibida. Lanza una excepci&oacute;n en caso
 	 * de que la petici&oacute;n no sea petici&oacute;n.
 	 * @param httpRequest La petici&oacute;n a tratar.
-	 * @return String uriType de la petici&oacute;n. */
+	 * @return String <i>uriType</i> de la petici&oacute;n. */
 	private static String getUriTypeFromRequest(final String httpRequest) {
 		final String[] supportedUriTypes = new String[] {CMD, ECHO, FRAGMENT, SIGN, SEND};
 
@@ -613,13 +631,12 @@ public final class ServiceInvocationManager {
 		return uriType;
 	}
 
-
-	/** Realiza las acciones pertinentes en caso de que la petici&oacute;n contenta una petici&oacute;n echo.
-	 * Se resetean las variables de control de la aplicaci&oacute;n para desechar cualquier petici&oacute;n anterior.
+	/** Realiza las acciones pertinentes en caso de que la petici&oacute;n contenga una petici&oacute;n <i>echo</i>.
+	 * Se reinician las variables de control de la aplicaci&oacute;n para desechar cualquier petici&oacute;n anterior.
 	 * @param cmd Comando URI.
-	 * @param socketChannel <i>Socket</i> donde se recibe la petici&oacute;n.
+	 * @param socket <i>Socket</i> donde se recibe la petici&oacute;n.
 	 * @throws IOException Si hay error en el env&iacute;o de datos. */
-	private static void doEchoPetition(final String cmd, final Socket socketChannel) throws IOException {
+	private static void doEchoPetition(final String cmd, final Socket socket) throws IOException {
 		// paramos el timer mientras la aplicacion realiza operaciones
 		timer.stop();
 		// solo reseteamos las variables de control si la peticion es echo=- en caso de que sea un echo= simplemente respondemos
@@ -628,14 +645,14 @@ public final class ServiceInvocationManager {
 		}
 
 		LOGGER.info("Comando URI recibido por HTTP: " + ECHO); //$NON-NLS-1$
-		sendData(createHttpResponse(true, OK), socketChannel, ECHO);
+		sendData(createHttpResponse(true, OK), socket, ECHO);
 	}
 
 	/** Realiza la operaci&oacute;n que corresponda cuando ya se han recibido todos los
 	 * fragmentos de la petici&oacute;n (<code>firm=</code>).
-	 * @param socketChannel Socket donde se recibe la petici&oacute;n.
+	 * @param socket <code>Socket</code> donde se recibe la petici&oacute;n.
 	 * @throws IOException Si hay error en la lectura o env&iacute;o de datos. */
-	private static void doFragmentedProcess(final Socket socketChannel) throws IOException {
+	private static void doFragmentedProcess(final Socket socket) throws IOException {
 		// paramos el timer mientras la aplicacion realiza operaciones
 		boolean isSave = false;
 	    timer.stop();
@@ -655,15 +672,15 @@ public final class ServiceInvocationManager {
 			    isSave = true;
 				final String operationResult = ProtocolInvocationLauncher.launch(totalhttpRequest.toString(), true);
 				if (operationResult.equals(OK)){
-					sendData(createHttpResponse(true, SAVE_OK), socketChannel, "Operacion save realizada con exito"); //$NON-NLS-1$
+					sendData(createHttpResponse(true, SAVE_OK), socket, "Operacion save realizada con exito"); //$NON-NLS-1$
 				}
 				else if (operationResult.equals(CANCEL)){
-				    sendData(createHttpResponse(true, CANCEL), socketChannel, "Cancelado por el usuario"); //$NON-NLS-1$
+				    sendData(createHttpResponse(true, CANCEL), socket, "Cancelado por el usuario"); //$NON-NLS-1$
 				}
 				else {
 					throw new IllegalArgumentException(
-							"Error al realizar la operacion save" //$NON-NLS-1$
-						);
+						"Error al realizar la operacion save" //$NON-NLS-1$
+					);
 				}
 			}
 			// Si hay que devolver el valor obtenido
@@ -678,16 +695,16 @@ public final class ServiceInvocationManager {
 		// si no es una operacion save y nos vuelven a pedir una parte.
 		if (!isSave){
 		    sendData(
-	    		createHttpResponse(true, Integer.toString(parts)), socketChannel, "Se mandaran " + parts + " partes"  //$NON-NLS-1$//$NON-NLS-2$
+	    		createHttpResponse(true, Integer.toString(parts)), socket, "Se mandaran " + parts + " partes"  //$NON-NLS-1$//$NON-NLS-2$
     		);
 		}
 	}
 
 	/** Realiza las acciones pertinentes en caso de que la petici&oacute;n contenga una petici&oacute;n <code>cmd=</code>.
 	 * @param cmd Valor del par&aacute;metro <code>cmd</code>.
-	 * @param socketChannel <i>Socket</i> donde se recibe la petici&oacute;n.
+	 * @param socket <i>Socket</i> donde se recibe la petici&oacute;n.
 	 * @throws IOException Error en la lectura o en el env&iacute;o de datos. */
-	private static void doCmdPetition (final String cmd, final Socket socketChannel) throws IOException{
+	private static void doCmdPetition (final String cmd, final Socket socket) throws IOException{
 		final String cmdUri = new String(Base64.decode(cmd.trim(), true));
 		if (cmdUri.startsWith(AFIRMA) && !(cmdUri.startsWith(AFIRMA2) || cmdUri.startsWith(AFIRMA3))) {
 			// paramos el timer mientras la aplicacion realiza operaciones
@@ -696,14 +713,14 @@ public final class ServiceInvocationManager {
 			if (cmdUri.startsWith(SAVE) || cmdUri.startsWith(SAVE2)) {
 				final String operationResult = ProtocolInvocationLauncher.launch(cmdUri.toString(), true);
 				if (operationResult.equals(OK)) {
-					sendData(createHttpResponse(true, SAVE_OK), socketChannel, "save"); //$NON-NLS-1$
+					sendData(createHttpResponse(true, SAVE_OK), socket, "save"); //$NON-NLS-1$
 				}
 				else if (operationResult.equals(CANCEL)) {
-                    sendData(createHttpResponse(true, CANCEL), socketChannel, "Cancelado por el usuario"); //$NON-NLS-1$
+                    sendData(createHttpResponse(true, CANCEL), socket, "Cancelado por el usuario"); //$NON-NLS-1$
                 }
 				else {
 					throw new IllegalArgumentException(
-						"Error al realizar la operacion save" //$NON-NLS-1$
+						"Error al realizar la operacion 'save'" //$NON-NLS-1$
 					);
 				}
 			}
@@ -713,7 +730,7 @@ public final class ServiceInvocationManager {
 					final String operationResult = ProtocolInvocationLauncher.launch(cmdUri.toString(), true);
 					calculateNumberPartsResponse(operationResult);
 				}
-				sendData(createHttpResponse(true, Integer.toString(parts)), socketChannel, "Se mandaran " + parts + " partes"); //$NON-NLS-1$ //$NON-NLS-2$
+				sendData(createHttpResponse(true, Integer.toString(parts)), socket, "Se mandaran " + parts + " partes"); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		}
 		else {
@@ -725,9 +742,9 @@ public final class ServiceInvocationManager {
 
 	/** Realiza las acciones pertinentes en caso de que la petici&oacute;n contenta una petici&oacute;n <code>fragment=</code>.
 	 * @param fragment httpRequest URL de la que hay que substraer el commandUri.
-	 * @param socketChannel Socket donde se recibe la petici&oacute;n.
+	 * @param socket <code>Socket</code> donde se recibe la petici&oacute;n.
 	 * @throws IOException Si hay error en el tratamiento de datos. */
-	private static void doFragmentPetition (final String fragment, final Socket socketChannel) throws IOException{
+	private static void doFragmentPetition (final String fragment, final Socket socket) throws IOException{
 
 		// paramos el timer mientras la aplicacion realiza operaciones
 		timer.stop();
@@ -746,19 +763,18 @@ public final class ServiceInvocationManager {
 			request.add(part-1, save);
 		}
 		if (part == partTotal){
-			sendData(createHttpResponse(true, OK), socketChannel, "Mandada la ultima parte " + part +"de " + partTotal); //$NON-NLS-1$ //$NON-NLS-2$
+			sendData(createHttpResponse(true, OK), socket, "Mandada la ultima parte " + part +"de " + partTotal); //$NON-NLS-1$ //$NON-NLS-2$
 		}
-		else{
-			sendData(createHttpResponse(true, MORE_DATA_NEED), socketChannel, "Mandar resto de datos de la firma, parte " + part +"de " + partTotal);  //$NON-NLS-1$//$NON-NLS-2$
+		else {
+			sendData(createHttpResponse(true, MORE_DATA_NEED), socket, "Mandar resto de datos de la firma, parte " + part + "de " + partTotal);  //$NON-NLS-1$//$NON-NLS-2$
 		}
 	}
 
-
 	/** Realiza el env&iacute;o de datos.
-	 * @param send Configuracion para el env&iacute;o de datos.
-	 * @param socketChannel <i>Socket</i> donde se recibe la petici&oacute;n.
+	 * @param send Configuraci&oacute;n para el env&iacute;o de datos.
+	 * @param socket <i>Socket</i> donde se recibe la petici&oacute;n.
 	 * @throws IOException Si hay error en el tratamiento de datos. */
-	private static void doSendPetition (final String send, final Socket socketChannel) throws IOException {
+	private static void doSendPetition (final String send, final Socket socket) throws IOException {
 
 		// paramos el timer mientras la aplicacion realiza operaciones
 		timer.stop();
@@ -771,9 +787,8 @@ public final class ServiceInvocationManager {
 				"Se ha solicitado enviar un fragmento invalido: " + part + "de " + partTotal //$NON-NLS-1$ //$NON-NLS-2$
 			);
 		}
-		sendData(createHttpResponse(true, toSend.get(part-1)), socketChannel, "Mandada la parte " + part + " de " + partTotal); //$NON-NLS-1$ //$NON-NLS-2$
+		sendData(createHttpResponse(true, toSend.get(part-1)), socket, "Mandada la parte " + part + " de " + partTotal); //$NON-NLS-1$ //$NON-NLS-2$
 	}
-
 
 	/** Calcula en cuantas partes hay que realizar el env&iacute;o de la operaci&oacute;n y divide la respuesta en dichas partes.
 	 * @param operationResult La operaci&oacute;n resultante que hay que dividir. */
@@ -787,7 +802,7 @@ public final class ServiceInvocationManager {
 		for (int i = 0; i < parts; i++){
 			offset = RESPONSE_MAX_SIZE * i;
 			toSend.add(operationResult.substring(offset, Math.min(offset + RESPONSE_MAX_SIZE, operationResult.length())));
-			LOGGER.info("Tam de la parte " + (i+1) + " =" + toSend.get(i).length()); //$NON-NLS-1$ //$NON-NLS-2$
+			LOGGER.info("Tamano de la parte " + (i+1) + " =" + toSend.get(i).length()); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 	}
 
