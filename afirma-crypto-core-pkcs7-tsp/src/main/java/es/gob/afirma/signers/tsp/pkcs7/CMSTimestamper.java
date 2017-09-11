@@ -211,7 +211,7 @@ public final class CMSTimestamper {
         final SignerInformationStore origSignerInfoStore =  signedData.getSignerInfos();
 
         // Insertamos un sello de tiempo en cada una de las firmas encontradas en el PKCS#7
-        final List<SignerInformation> vNewSigners = new ArrayList<SignerInformation>();
+        final List<SignerInformation> vNewSigners = new ArrayList<>();
 
         final Collection<?> ovSigners = origSignerInfoStore.getSigners();
         for (final Object name : ovSigners) {
@@ -224,14 +224,17 @@ public final class CMSTimestamper {
         		 time
     		 );
 
-             final ASN1InputStream is = new ASN1InputStream(new ByteArrayInputStream(tsToken));
-             final ASN1Primitive derObj = is.readObject();
-             is.close();
+             final ASN1Primitive derObj;
+             try (
+        		 final ASN1InputStream is = new ASN1InputStream(new ByteArrayInputStream(tsToken));
+    		 ) {
+            	 derObj = is.readObject();
+             }
              final DERSet derSet = new DERSet(derObj);
 
              final Attribute unsignAtt = new Attribute(new ASN1ObjectIdentifier(SIGNATURE_TIMESTAMP_TOKEN_OID), derSet);
 
-             final Hashtable<ASN1ObjectIdentifier, Attribute> ht = new Hashtable<ASN1ObjectIdentifier, Attribute>();
+             final Hashtable<ASN1ObjectIdentifier, Attribute> ht = new Hashtable<>();
              ht.put(new ASN1ObjectIdentifier(SIGNATURE_TIMESTAMP_TOKEN_OID), unsignAtt);
 
              final AttributeTable unsignedAtts = new AttributeTable(ht);
@@ -259,11 +262,12 @@ public final class CMSTimestamper {
     }
 
     private byte[] getTSAResponseSocket(final byte[] request) throws IOException {
-    	final Socket socket = new Socket(this.tsaURL.getHost(), this.tsaURL.getPort());
-    	socket.setSoTimeout(SOCKET_TIMEOUT);
-    	final byte[] ret = getTSAResponseExternalSocket(request, socket);
-    	socket.close();
-    	return ret;
+    	try (
+			final Socket socket = new Socket(this.tsaURL.getHost(), this.tsaURL.getPort());
+		) {
+    		socket.setSoTimeout(SOCKET_TIMEOUT);
+    		return getTSAResponseExternalSocket(request, socket);
+    	}
     }
 
     private static byte[] getTSAResponseExternalSocket(final byte[] request, final Socket socket) throws IOException {
@@ -314,10 +318,12 @@ public final class CMSTimestamper {
      * @throws IOException Si hay problemas de dentrada / salida */
     private static byte[] getTSAResponseHttp(final byte[] requestBytes, final URLConnection conn) throws IOException {
 
-         final OutputStream out = conn.getOutputStream();
-         out.write(requestBytes);
-         out.flush();
-         out.close();
+    	try (
+			final OutputStream out = conn.getOutputStream();
+		) {
+	         out.write(requestBytes);
+	         out.flush();
+    	}
 
          final byte[] respBytes = AOUtil.getDataFromInputStream(conn.getInputStream());
 

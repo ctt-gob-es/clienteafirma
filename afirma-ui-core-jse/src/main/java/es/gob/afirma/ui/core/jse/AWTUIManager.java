@@ -16,6 +16,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.lang.reflect.Method;
 
 import es.gob.afirma.core.AOCancelledOperationException;
@@ -82,10 +83,12 @@ public final class AWTUIManager extends JSEUIManager {
         	throw new AOCancelledOperationException();
         }
 
-    	final FileOutputStream fos = new FileOutputStream(file);
-        fos.write(data);
-        fos.flush();
-        fos.close();
+        try (
+    		final OutputStream fos = new FileOutputStream(file);
+		) {
+	        fos.write(data);
+	        fos.flush();
+        }
 
         return file;
     }

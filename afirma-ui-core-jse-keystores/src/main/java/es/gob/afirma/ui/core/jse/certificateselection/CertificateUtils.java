@@ -14,6 +14,7 @@ import java.awt.Component;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.lang.reflect.Method;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
@@ -70,10 +71,11 @@ final class CertificateUtils {
 			try {
 				final File certFile = saveTemp(certificate.getEncoded(), CERTIFICATE_DEFAULT_EXTENSION);
 				new ProcessBuilder(
-						new String[] {
-								"cmd", "/C", "start", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-								"\"" + CertificateSelectionDialogMessages.getString("CertificateUtils.0") + "\"", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-								"\"" + certFile.getAbsolutePath() + "\""} //$NON-NLS-1$ //$NON-NLS-2$
+					new String[] {
+						"cmd", "/C", "start", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+						"\"" + CertificateSelectionDialogMessages.getString("CertificateUtils.0") + "\"", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+						"\"" + certFile.getAbsolutePath() + "\"" //$NON-NLS-1$ //$NON-NLS-2$
+					}
 				).start();
 				return;
 			}
@@ -105,12 +107,12 @@ final class CertificateUtils {
 		}
 		catch (final CertificateEncodingException e) {
 			new JSEUIManager().showConfirmDialog(
-					parent,
-					CertificateSelectionDialogMessages.getString("CertificateUtils.4"), //$NON-NLS-1$
-					CertificateSelectionDialogMessages.getString("CertificateUtils.3"), //$NON-NLS-1$
-					JOptionPane.CLOSED_OPTION,
-					JOptionPane.ERROR_MESSAGE
-				);
+				parent,
+				CertificateSelectionDialogMessages.getString("CertificateUtils.4"), //$NON-NLS-1$
+				CertificateSelectionDialogMessages.getString("CertificateUtils.3"), //$NON-NLS-1$
+				JOptionPane.CLOSED_OPTION,
+				JOptionPane.ERROR_MESSAGE
+			);
 		}
 		catch(final AOCancelledOperationException e) {
 			// El usuario ha cancelado la operacion, no hacemos nada
@@ -118,9 +120,11 @@ final class CertificateUtils {
 	}
 
     private static boolean saveFile(final File file, final byte[] dataToSave) throws IOException {
-    	final FileOutputStream fos = new FileOutputStream(file);
-    	fos.write(dataToSave);
-    	fos.close();
+    	try (
+			final OutputStream fos = new FileOutputStream(file);
+		) {
+    		fos.write(dataToSave);
+    	}
     	return true;
     }
 

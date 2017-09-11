@@ -19,6 +19,7 @@ import java.awt.Toolkit;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -564,11 +565,11 @@ public class JSEUIManager implements AOUIManager {
 	                }
 
 	                // Hemos seleccionado la opcion de sobreescribir
-                    try {
-                    	final FileOutputStream fos = new FileOutputStream(file);
+                    try (
+                		final OutputStream fos = new FileOutputStream(file);
+            		) {
                         fos.write(data);
                         fos.flush();
-                        fos.close();
                     }
                     catch (final Exception ex) {
                         LOGGER.warning("No se pudo guardar la informacion en el fichero indicado: " + ex); //$NON-NLS-1$

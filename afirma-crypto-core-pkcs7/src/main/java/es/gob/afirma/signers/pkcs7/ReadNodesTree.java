@@ -53,8 +53,8 @@ public final class ReadNodesTree {
     private AOTreeNode rama;
     private AOTreeNode rama2;
     private int seleccionados[];
-    private final List<String> lista = new ArrayList<String>();
-    private final List<X509Certificate[]> listaCert = new ArrayList<X509Certificate[]>();
+    private final List<String> lista = new ArrayList<>();
+    private final List<X509Certificate[]> listaCert = new ArrayList<>();
 
     int[] getSeleccionados() {
         return this.seleccionados;
@@ -85,9 +85,12 @@ public final class ReadNodesTree {
     public AOTreeModel readNodesTree(final byte[] data, final boolean asSimpleSignInfo) throws IOException {
 
         // LEEMOS EL FICHERO QUE NOS INTRODUCEN
-    	final ASN1InputStream is = new ASN1InputStream(data);
-        final ASN1Sequence dsq = (ASN1Sequence) is.readObject();
-        is.close();
+    	final ASN1Sequence dsq;
+    	try (
+			final ASN1InputStream is = new ASN1InputStream(data);
+		) {
+    		dsq = (ASN1Sequence) is.readObject();
+    	}
         final Enumeration<?> contentsData = dsq.getObjects();
 
         // Elementos que contienen los elementos OID SignedData
@@ -242,7 +245,7 @@ public final class ReadNodesTree {
      *        array con posibles repetidos.
      * @return array sin repetidos. */
     public static int[] simplyArray(final int[] nodes) {
-        final List<Integer> devolver = new ArrayList<Integer>();
+        final List<Integer> devolver = new ArrayList<>();
 
         for (int i = 0; i < nodes.length; i++) {
             if (!devolver.contains(Integer.valueOf(nodes[i]))) {

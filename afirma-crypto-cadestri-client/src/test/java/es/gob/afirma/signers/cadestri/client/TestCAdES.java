@@ -30,9 +30,7 @@ import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSigner;
 
-
-/**
- * Pruebas del m&oacute;dulo CAdES de Afirma.
+/** Pruebas del m&oacute;dulo CAdES de Afirma.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public final class TestCAdES {
 
@@ -50,12 +48,13 @@ public final class TestCAdES {
 		"ANF PFISICA ACTIVO.pfx" //$NON-NLS-1$
 	};
 
-	private static final List<byte[]> DATA = new ArrayList<byte[]>(2);
+	private static final List<byte[]> DATA = new ArrayList<>(2);
 	static {
 		for (final String dataFile : DATA_FILES) {
 			try {
 				DATA.add(AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(dataFile)));
-			} catch (final IOException e) {
+			}
+			catch (final IOException e) {
 				Logger.getLogger("es.gob.afirma").severe("No se ha podido cargar el fichero de pruebas: " + dataFile);  //$NON-NLS-1$//$NON-NLS-2$
 				DATA.add(null);
 			}
@@ -134,10 +133,12 @@ public final class TestCAdES {
 					final byte[] result = signer.sign(DATA.get(i), algo, pke.getPrivateKey(), pke.getCertificateChain(), extraParams);
 
 					final File saveFile = File.createTempFile(algo + "-", ".csig"); //$NON-NLS-1$ //$NON-NLS-2$
-					final OutputStream os = new FileOutputStream(saveFile);
-					os.write(result);
-					os.flush();
-					os.close();
+					try (
+						final OutputStream os = new FileOutputStream(saveFile);
+					) {
+						os.write(result);
+						os.flush();
+					}
 					System.out.println("Temporal para comprobacion manual: " + saveFile.getAbsolutePath()); //$NON-NLS-1$
 				}
 			}
@@ -188,10 +189,12 @@ public final class TestCAdES {
 
 
 					final File saveFile = File.createTempFile("Cofirma_CAdES_" + algo + "-", ".csig"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-					final OutputStream os = new FileOutputStream(saveFile);
-					os.write(sign3);
-					os.flush();
-					os.close();
+					try (
+						final OutputStream os = new FileOutputStream(saveFile);
+					) {
+						os.write(sign3);
+						os.flush();
+					}
 					System.out.println("Temporal para comprobacion manual: " + saveFile.getAbsolutePath()); //$NON-NLS-1$
 				}
 			}

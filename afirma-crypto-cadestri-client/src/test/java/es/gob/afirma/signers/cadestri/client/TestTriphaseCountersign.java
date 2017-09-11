@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.security.KeyStore;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.util.Properties;
@@ -50,9 +51,12 @@ public class TestTriphaseCountersign {
 	//@Ignore // Necesita el servidor
 	public void prueba_contrafirma_de_arbol_de_firma_implicita() throws Exception {
 
-		final InputStream is = getClass().getClassLoader().getResourceAsStream(SHA1_COUNTERSIGN_FILE);
-		final byte[] sign = AOUtil.getDataFromInputStream(is);
-		is.close();
+		final byte[] sign;
+		try (
+			final InputStream is = getClass().getClassLoader().getResourceAsStream(SHA1_COUNTERSIGN_FILE);
+		) {
+			sign = AOUtil.getDataFromInputStream(is);
+		}
 
 		final Properties config = new Properties();
 		config.setProperty(PARAM_NAME_SERVER_URL, SERVLET_URL);
@@ -74,9 +78,11 @@ public class TestTriphaseCountersign {
 		System.out.println("Prueba de contrafirma de arbol sobre firma implicita."); //$NON-NLS-1$
 		System.out.println("El resultado se almacena en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
 
-		final FileOutputStream fos = new FileOutputStream(tempFile);
-		fos.write(countersign);
-		fos.close();
+		try (
+			final OutputStream fos = new FileOutputStream(tempFile);
+		) {
+			fos.write(countersign);
+		}
 	}
 
 	/** Prueba de contrafirma de los nodos hoja de una firma impl&iacute;cita.
@@ -84,10 +90,12 @@ public class TestTriphaseCountersign {
 	@Test
 	//@Ignore // Necesita el servidor
 	public void prueba_contrafirma_de_firma_implicita_nodos_hoja() throws Exception {
-
-		final InputStream is = getClass().getClassLoader().getResourceAsStream(SHA1_COUNTERSIGN_FILE);
-		final byte[] sign = AOUtil.getDataFromInputStream(is);
-		is.close();
+		final byte[] sign;
+		try (
+			final InputStream is = getClass().getClassLoader().getResourceAsStream(SHA1_COUNTERSIGN_FILE);
+		) {
+			sign = AOUtil.getDataFromInputStream(is);
+		}
 
 		final Properties config = new Properties();
 		config.setProperty(PARAM_NAME_SERVER_URL, SERVLET_URL);
@@ -108,9 +116,11 @@ public class TestTriphaseCountersign {
 		System.out.println("Prueba de contrafirma de nodos hoja sobre firma implicita."); //$NON-NLS-1$
 		System.out.println("El resultado se almacena en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
 
-		final FileOutputStream fos = new FileOutputStream(tempFile);
-		fos.write(countersign);
-		fos.close();
+		try (
+			final OutputStream fos = new FileOutputStream(tempFile);
+		) {
+			fos.write(countersign);
+		}
 	}
 
 	/** Cierra el flujo de lectura del almac&eacute;n de certificados.

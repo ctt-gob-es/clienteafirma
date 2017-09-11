@@ -29,7 +29,7 @@ public final class AOAlgorithmID {
         // No permitimos la instanciacion
     }
 
-    private static final Dictionary<String, String> OIDS = new Hashtable<String, String>();
+    private static final Dictionary<String, String> OIDS = new Hashtable<>();
     static {
         OIDS.put("SHA1", OID_SHA1); //$NON-NLS-1$
         OIDS.put("SHA-1", OID_SHA1); //$NON-NLS-1$

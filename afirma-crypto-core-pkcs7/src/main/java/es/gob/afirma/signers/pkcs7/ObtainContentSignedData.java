@@ -53,9 +53,13 @@ public final class ObtainContentSignedData {
 		ASN1ObjectIdentifier doi;
 		ASN1TaggedObject doj;
 		try {
-			final ASN1InputStream is = new ASN1InputStream(data);
-			final ASN1Sequence dsq  = (ASN1Sequence) is.readObject();
-			is.close();
+
+			final ASN1Sequence dsq;
+			try (
+				final ASN1InputStream is = new ASN1InputStream(data);
+			) {
+				dsq  = (ASN1Sequence) is.readObject();
+			}
 
 			final Enumeration<?> e = dsq.getObjects();
 			// Elementos que contienen los elementos OID Data
@@ -100,9 +104,12 @@ public final class ObtainContentSignedData {
 	public static byte[] obtainMessageDigest(final byte[] signature, final String digestAlgorithm) throws IOException {
 
 		// LEEMOS EL FICHERO QUE NOS INTRODUCEN
-		final ASN1InputStream is = new ASN1InputStream(signature);
-		final ASN1Sequence dsq  = (ASN1Sequence) is.readObject();
-		is.close();
+		final ASN1Sequence dsq;
+		try (
+			final ASN1InputStream is = new ASN1InputStream(signature);
+		) {
+			dsq  = (ASN1Sequence) is.readObject();
+		}
 
 		final Enumeration<?> e = dsq.getObjects();
 

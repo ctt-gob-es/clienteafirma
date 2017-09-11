@@ -66,7 +66,7 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 	/** Altura de un elemento de la lista de certificados. */
 	private static final int CERT_LIST_ELEMENT_HEIGHT = 86;
 
-	private JList/*<CertificateLine>*/ certList;
+	private JList<CertificateLine> certList;
 
 	JScrollPane sPane;
 
@@ -230,7 +230,7 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 		c.gridy++;
 
 		CertificateLine certLine;
-		final List<CertificateLine> certLines = new ArrayList<CertificateSelectionPanel.CertificateLine>();
+		final List<CertificateLine> certLines = new ArrayList<>();
 		for (final NameCertificateBean nameCert : this.certificateBeans) {
 			if (nameCert.getCertificate() != null) {
 				certLine = createCertLine(nameCert.getName(), nameCert.getCertificate() );
@@ -239,18 +239,18 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 			}
 		}
 
-		this.certList = new JList/*<CertificateLine>*/();
+		this.certList = new JList<>();
 		this.certList.setCellRenderer(new CertListCellRendered());
-		this.certList.setListData(certLines.toArray());
+		this.certList.setListData(certLines.toArray(new CertificateLine[certLines.size()]));
 		this.certList.setVisibleRowCount(Math.max(Math.min(4, certLines.size()), 1));
 		if (certLines.size() > 0) {
 			this.certList.setSelectedIndex(0);
 		}
 
 		this.sPane = new JScrollPane(
-				this.certList,
-				ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
-				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER
+			this.certList,
+			ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+			ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER
 		);
 
 		this.certList.addListSelectionListener(this);
@@ -274,7 +274,7 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 		this.certificateBeans = certs.clone();
 
 		CertificateLine certLine;
-		final List<CertificateLine> certLines = new ArrayList<CertificateSelectionPanel.CertificateLine>();
+		final List<CertificateLine> certLines = new ArrayList<>();
 		for (final NameCertificateBean nameCert : this.certificateBeans) {
 		    try {
 		    	certLine = createCertLine(nameCert.getName(), nameCert.getCertificate() );
@@ -286,7 +286,7 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 			certLines.add(certLine);
 		}
 
-		this.certList.setListData(certLines.toArray());
+		this.certList.setListData(certLines.toArray(new CertificateLine[certLines.size()]));
 		this.certList.setVisibleRowCount(Math.max(Math.min(4, certLines.size()), 1));
 		if (certLines.size() > 0) {
 			this.certList.setSelectedIndex(0);
@@ -442,7 +442,7 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 	}
 
 	/** Renderer para mostrar la informaci&oacute;n de un certificado. */
-	private static final class CertListCellRendered implements ListCellRenderer/*<CertificateLine>*/ {
+	private static final class CertListCellRendered implements ListCellRenderer<CertificateLine> {
 
 		CertListCellRendered() {
 			/* Limitamos la visibilidad del constructor */
@@ -450,10 +450,10 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 
 		/** {@inheritDoc} */
 		@Override
-		public Component getListCellRendererComponent(final JList/*<? extends CertificateLine>*/ list, /*CertificateLine*/final Object value,
+		public Component getListCellRendererComponent(final JList<? extends CertificateLine> list, final CertificateLine value,
 				final int index, final boolean isSelected, final boolean cellHasFocus) {
 
-			final CertificateLine line = (CertificateLine) value;
+			final CertificateLine line = value;
 			if (isSelected) {
 				line.setBackground(Color.decode("0xD9EAFF")); //$NON-NLS-1$
 				line.setBorder(BorderFactory.createCompoundBorder(
@@ -489,7 +489,7 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 		/** {@inheritDoc} */
 		@Override
 		public void mouseClicked(final MouseEvent me) {
-			final JList/*<?>*/ tmpList = (JList/*<?>*/) me.getSource();
+			final JList<?> tmpList = (JList<?>) me.getSource();
 			final CertificateLine tmpLine = (CertificateLine) tmpList.getSelectedValue();
 			if (tmpLine != null &&
 				me.getClickCount() == 1 &&
@@ -509,7 +509,7 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 		/** {@inheritDoc} */
 		@Override
 		public void mouseMoved(final MouseEvent me) {
-			final JList/*<?>*/ tmpList = (JList/*<?>*/) me.getSource();
+			final JList<?> tmpList = (JList<?>) me.getSource();
 			final CertificateLine tmpLine = (CertificateLine) tmpList.getSelectedValue();
 			if (tmpLine != null) {
 				if (me.getY() < CERT_LIST_ELEMENT_HEIGHT * tmpList.getModel().getSize() &&
