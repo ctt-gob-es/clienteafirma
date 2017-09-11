@@ -124,9 +124,12 @@ final class CAdESCoSigner {
 
 	private static SignedData readData(final byte[] signature) throws IOException {
 		// LEEMOS EL FICHERO QUE NOS INTRODUCEN
-		final ASN1InputStream is = new ASN1InputStream(signature);
-		final ASN1Sequence dsq = (ASN1Sequence) is.readObject();
-		is.close();
+		final ASN1Sequence dsq;
+		try (
+			final ASN1InputStream is = new ASN1InputStream(signature);
+		) {
+			dsq = (ASN1Sequence) is.readObject();
+		}
 		final Enumeration<?> e = dsq.getObjects();
 		// Elementos que contienen los elementos OID SignedData
 		e.nextElement();
@@ -361,9 +364,12 @@ final class CAdESCoSigner {
 			                                                                     CertificateException,
 			                                                                     ContainsNoDataException {
 		// LEEMOS EL FICHERO QUE NOS INTRODUCEN
-		final ASN1InputStream is = new ASN1InputStream(signature);
-		final ASN1Sequence dsq = (ASN1Sequence) is.readObject();
-		is.close();
+		final ASN1Sequence dsq;
+		try (
+			final ASN1InputStream is = new ASN1InputStream(signature);
+		) {
+			dsq = (ASN1Sequence) is.readObject();
+		}
 		final Enumeration<?> e = dsq.getObjects();
 
 		// Elementos que contienen los elementos OID SignedData
@@ -399,7 +405,7 @@ final class CAdESCoSigner {
 		}
 
 		if (signerCertificateChain.length != 0) {
-			final List<ASN1Encodable> ce = new ArrayList<ASN1Encodable>();
+			final List<ASN1Encodable> ce = new ArrayList<>();
 			for (final X509Certificate element : signerCertificateChain) {
 				ce.add(Certificate.getInstance(ASN1Primitive.fromByteArray(element.getEncoded())));
 			}

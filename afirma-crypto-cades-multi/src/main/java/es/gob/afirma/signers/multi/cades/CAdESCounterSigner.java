@@ -211,9 +211,12 @@ final class CAdESCounterSigner {
                                                                                     CertificateException,
                                                                                     AOException {
         // Leemos los datos originales (la firma que nos llega)
-    	final ASN1InputStream is = new ASN1InputStream(signature);
-        final ASN1Sequence dsq = (ASN1Sequence) is.readObject();
-        is.close();
+    	final ASN1Sequence dsq;
+    	try (
+			final ASN1InputStream is = new ASN1InputStream(signature);
+		) {
+    		dsq = (ASN1Sequence) is.readObject();
+    	}
         final Enumeration<?> pkcs7RootSequenceElements = dsq.getObjects();
 
         // Pasamos el primer elemento de la secuencia original, que es el OID de SignedData
@@ -373,7 +376,7 @@ final class CAdESCounterSigner {
                                                                                                           CertificateException,
                                                                                                           AOException {
     	// Base para el nuevo SET de SignerInfos
-    	final List<Attribute> newUnauthenticatedAttributesList = new ArrayList<Attribute>();
+    	final List<Attribute> newUnauthenticatedAttributesList = new ArrayList<>();
         final ASN1EncodableVector signerInfosU = new ASN1EncodableVector();
 
         // Es hoja?
@@ -558,7 +561,7 @@ final class CAdESCounterSigner {
 
     private static List<SignerInfo> getSignerInfoFromUnauthenticatedAttributes(final Attribute unauthenticatedAttribute) {
 
-    	final ArrayList<SignerInfo> signerInfos = new ArrayList<SignerInfo>();
+    	final ArrayList<SignerInfo> signerInfos = new ArrayList<>();
 
     	// El atributo tiene dentro un SignerInfos, que es un SET de SignerInfo
         final ASN1Set values = unauthenticatedAttribute.getAttrValues();

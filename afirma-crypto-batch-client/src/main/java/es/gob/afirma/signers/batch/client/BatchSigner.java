@@ -247,16 +247,18 @@ public final class BatchSigner {
 
 	private static String getAlgorithm(final String batch) throws IOException {
 		final byte[] xml =  Base64.decode(batch.replace("-", "+").replace("_", "/")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-		final InputStream is = new ByteArrayInputStream(xml);
 		final Document doc;
-		try {
+		try (
+			final InputStream is = new ByteArrayInputStream(xml);
+		) {
 			doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(is);
 		}
 		catch (final Exception e) {
-			Logger.getLogger("es.gob.afirma").severe("Error al cargar el fichero XML de lote: " + e + "\n" + new String(xml)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			Logger.getLogger("es.gob.afirma").severe( //$NON-NLS-1$
+				"Error al cargar el fichero XML de lote: " + e + "\n" + new String(xml) //$NON-NLS-1$ //$NON-NLS-2$
+			);
 			throw new IOException("Error al cargar el fichero XML de lote: " + e, e); //$NON-NLS-1$
 		}
-		is.close();
 
 		final Node signBatchNode = doc.getDocumentElement();
 		if (!"signbatch".equalsIgnoreCase(signBatchNode.getNodeName())) { //$NON-NLS-1$

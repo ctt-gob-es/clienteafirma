@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.security.KeyStore;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.util.Properties;
@@ -18,7 +19,7 @@ import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.signers.cades.AOCAdESSigner;
 
 /** Prueba de contrafirma indicando el ContentType en la firma. */
-public class TestINC309356 {
+public final class TestINC309356 {
 
 	private static final String DATA = "data"; //$NON-NLS-1$
 	private static final String SIGNATURE_WITH_CONTENT_TYPE = "firma_contentType_TIFF.csig"; //$NON-NLS-1$
@@ -37,17 +38,17 @@ public class TestINC309356 {
 		ks.load(ksIs, PASSWORD.toCharArray());
 	}
 
-	/**
-	 * Prueba asociada a la incidencia INC 309356. Permite comprobar que las contrafirmas
+	/** Prueba asociada a la incidencia INC 309356. Permite comprobar que las contrafirmas
 	 * CAdES no se generan con el contentType "data" por defecto.
-	 * @throws Exception Cuando ocurre un error.
-	 */
+	 * @throws Exception Cuando ocurre un error. */
 	@Test
 	public void testContentTypePorDefecto() throws Exception {
-
-		final InputStream is = getClass().getClassLoader().getResourceAsStream(DATA);
-		final byte[] data = AOUtil.getDataFromInputStream(is);
-		is.close();
+		final byte[] data;
+		try (
+			final InputStream is = getClass().getClassLoader().getResourceAsStream(DATA);
+		) {
+			data = AOUtil.getDataFromInputStream(is);
+		}
 
 		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(PASSWORD.toCharArray()));
 
@@ -77,22 +78,24 @@ public class TestINC309356 {
 		System.out.println("Prueba de firma y contrafirma consecutiva."); //$NON-NLS-1$
 		System.out.println("El resultado se almacena en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
 
-		final FileOutputStream fos = new FileOutputStream(tempFile);
-		fos.write(countersign);
-		fos.close();
+		try (
+			final OutputStream fos = new FileOutputStream(tempFile);
+		) {
+			fos.write(countersign);
+		}
 	}
 
-	/**
-	 * Prueba asociada a la incidencia INC 309356. Permite comprobar que las contrafirmas
+	/** Prueba asociada a la incidencia INC 309356. Permite comprobar que las contrafirmas
 	 * CAdES no se generan con el contentType "data" cuando se indica el OID del tipo de contenido.
-	 * @throws Exception Cuando ocurre un error.
-	 */
+	 * @throws Exception Cuando ocurre un error. */
 	@Test
 	public void testIndicandoContentType() throws Exception {
-
-		final InputStream is = getClass().getClassLoader().getResourceAsStream(DATA);
-		final byte[] data = AOUtil.getDataFromInputStream(is);
-		is.close();
+		final byte[] data;
+		try (
+			final InputStream is = getClass().getClassLoader().getResourceAsStream(DATA);
+		) {
+			data = AOUtil.getDataFromInputStream(is);
+		}
 
 		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(PASSWORD.toCharArray()));
 
@@ -125,22 +128,24 @@ public class TestINC309356 {
 		System.out.println("Prueba de firma y contrafirma consecutiva."); //$NON-NLS-1$
 		System.out.println("El resultado se almacena en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
 
-		final FileOutputStream fos = new FileOutputStream(tempFile);
-		fos.write(countersign);
-		fos.close();
+		try (
+			final OutputStream fos = new FileOutputStream(tempFile);
+		) {
+			fos.write(countersign);
+		}
 	}
 
-	/**
-	 * Prueba asociada a la incidencia INC 309356. Permite comprobar que las contrafirmas
+	/** Prueba asociada a la incidencia INC 309356. Permite comprobar que las contrafirmas
 	 * CAdES no se generan con el contentType "data" cuando se indica el OID del tipo de contenido.
-	 * @throws Exception Cuando ocurre un error.
-	 */
+	 * @throws Exception Cuando ocurre un error. */
 	@Test
 	public void testContrafirmaSobreFirmaConContentType() throws Exception {
-
-		final InputStream is = getClass().getClassLoader().getResourceAsStream(SIGNATURE_WITH_CONTENT_TYPE);
-		final byte[] signature = AOUtil.getDataFromInputStream(is);
-		is.close();
+		final byte[] signature;
+		try (
+			final InputStream is = getClass().getClassLoader().getResourceAsStream(SIGNATURE_WITH_CONTENT_TYPE);
+		) {
+			signature = AOUtil.getDataFromInputStream(is);
+		}
 
 		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(PASSWORD.toCharArray()));
 
@@ -163,9 +168,11 @@ public class TestINC309356 {
 		System.out.println("Prueba de contrafirma sobre firma con ContentType."); //$NON-NLS-1$
 		System.out.println("El resultado se almacena en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
 
-		final FileOutputStream fos = new FileOutputStream(tempFile);
-		fos.write(countersign);
-		fos.close();
+		try (
+			final OutputStream fos = new FileOutputStream(tempFile);
+		) {
+			fos.write(countersign);
+		}
 	}
 
 	/** Cierra el flujo de lectura del almac&eacute;n de certificados.

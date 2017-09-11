@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.security.KeyStore;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.util.Properties;
@@ -20,7 +21,7 @@ import es.gob.afirma.signers.cades.AOCAdESSigner;
 
 /** Prueba de contrafirmas CAdES.
  * @author Carlos Gamuci. */
-public class TestCountersign {
+public final class TestCountersign {
 
 	private static final String PKCS12_KEYSTORE = "ANCERTCCP_FIRMA.p12"; //$NON-NLS-1$
 	private static final String PASSWORD = "1111"; //$NON-NLS-1$
@@ -42,16 +43,16 @@ public class TestCountersign {
 		ksIs.close();
 	}
 
-	/**
-	 * Prueba de contrafirma de todo el &aacute;rbol de firmas de una firma expl&iacute;cita.
-	 * @throws Exception Cuando se produce un error.
-	 */
+	/** Prueba de contrafirma de todo el &aacute;rbol de firmas de una firma expl&iacute;cita.
+	 * @throws Exception Cuando se produce un error. */
 	@Test
 	public void prueba_contrafirma_de_arbol_de_firma_explicita() throws Exception {
-
-		final InputStream is = getClass().getClassLoader().getResourceAsStream(EXPLICIT_SHA1_COUNTERSIGN_FILE);
-		final byte[] sign = AOUtil.getDataFromInputStream(is);
-		is.close();
+		final byte[] sign;
+		try (
+			final InputStream is = getClass().getClassLoader().getResourceAsStream(EXPLICIT_SHA1_COUNTERSIGN_FILE);
+		) {
+			sign = AOUtil.getDataFromInputStream(is);
+		}
 
 		final Properties config = new Properties();
 
@@ -72,21 +73,23 @@ public class TestCountersign {
 		System.out.println("Prueba de contrafirma de arbol sobre firma explicita."); //$NON-NLS-1$
 		System.out.println("El resultado se almacena en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
 
-		final FileOutputStream fos = new FileOutputStream(tempFile);
-		fos.write(countersign);
-		fos.close();
+		try (
+			final OutputStream fos = new FileOutputStream(tempFile);
+		) {
+			fos.write(countersign);
+		}
 	}
 
-	/**
-	 * Prueba de contrafirma de los nodos hoja de una firma explicita.
-	 * @throws Exception Cuando se produce un error.
-	 */
+	/** Prueba de contrafirma de los nodos hoja de una firma expl&iacute;cita.
+	 * @throws Exception Cuando se produce un error. */
 	@Test
 	public void prueba_contrafirma_de_firma_explicita_nodos_hoja() throws Exception {
-
-		final InputStream is = getClass().getClassLoader().getResourceAsStream(EXPLICIT_SHA1_COUNTERSIGN_FILE);
-		final byte[] sign = AOUtil.getDataFromInputStream(is);
-		is.close();
+		final byte[] sign;
+		try (
+			final InputStream is = getClass().getClassLoader().getResourceAsStream(EXPLICIT_SHA1_COUNTERSIGN_FILE);
+		) {
+			sign = AOUtil.getDataFromInputStream(is);
+		}
 
 		final Properties config = new Properties();
 
@@ -107,19 +110,23 @@ public class TestCountersign {
 		System.out.println("Prueba de contrafirma de nodos hoja sobre firma explicita."); //$NON-NLS-1$
 		System.out.println("El resultado se almacena en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
 
-		final FileOutputStream fos = new FileOutputStream(tempFile);
-		fos.write(countersign);
-		fos.close();
+		try (
+			final OutputStream fos = new FileOutputStream(tempFile);
+		) {
+			fos.write(countersign);
+		}
 	}
 
 	/** Prueba de contrafirma de todo el &aacute;rbol de firmas de una firma impl&iacute;cita.
 	 * @throws Exception Cuando se produce un error. */
 	@Test
 	public void prueba_contrafirma_de_arbol_de_firma_implicita() throws Exception {
-
-		final InputStream is = getClass().getClassLoader().getResourceAsStream(IMPLICIT_SHA1_COUNTERSIGN_FILE);
-		final byte[] sign = AOUtil.getDataFromInputStream(is);
-		is.close();
+		final byte[] sign;
+		try (
+			final InputStream is = getClass().getClassLoader().getResourceAsStream(IMPLICIT_SHA1_COUNTERSIGN_FILE);
+		) {
+			sign = AOUtil.getDataFromInputStream(is);
+		}
 
 		final Properties config = new Properties();
 
@@ -139,21 +146,23 @@ public class TestCountersign {
 		System.out.println("Prueba de contrafirma de arbol sobre firma implicita."); //$NON-NLS-1$
 		System.out.println("El resultado se almacena en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
 
-		final FileOutputStream fos = new FileOutputStream(tempFile);
-		fos.write(countersign);
-		fos.close();
+		try (
+			final OutputStream fos = new FileOutputStream(tempFile);
+		) {
+			fos.write(countersign);
+		}
 	}
 
-	/**
-	 * Prueba de contrafirma de los nodos hoja de una firma implicita.
-	 * @throws Exception Cuando se produce un error.
-	 */
+	/** Prueba de contrafirma de los nodos hoja de una firma impl&iacute;cita.
+	 * @throws Exception Cuando se produce un error. */
 	@Test
 	public void prueba_contrafirma_de_firma_implicita_nodos_hoja() throws Exception {
-
-		final InputStream is = getClass().getClassLoader().getResourceAsStream(IMPLICIT_SHA1_COUNTERSIGN_FILE);
-		final byte[] sign = AOUtil.getDataFromInputStream(is);
-		is.close();
+		final byte[] sign;
+		try (
+			final InputStream is = getClass().getClassLoader().getResourceAsStream(IMPLICIT_SHA1_COUNTERSIGN_FILE);
+		) {
+			sign = AOUtil.getDataFromInputStream(is);
+		}
 
 		final Properties config = new Properties();
 
@@ -174,9 +183,11 @@ public class TestCountersign {
 		System.out.println("Prueba de contrafirma de nodos hoja sobre firma implicita."); //$NON-NLS-1$
 		System.out.println("El resultado se almacena en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
 
-		final FileOutputStream fos = new FileOutputStream(tempFile);
-		fos.write(countersign);
-		fos.close();
+		try (
+			final OutputStream fos = new FileOutputStream(tempFile);
+		) {
+			fos.write(countersign);
+		}
 	}
 
 	/** Main para pruebas sin JUnit.
@@ -192,10 +203,12 @@ public class TestCountersign {
 	 * @throws Exception Cuando se produce un error. */
 	@Test
 	public void prueba_contrafirma_cades_A() throws Exception {
-
-		final InputStream is = getClass().getClassLoader().getResourceAsStream(EXPLICIT_SHA1_CADES_A_FILE);
-		final byte[] sign = AOUtil.getDataFromInputStream(is);
-		is.close();
+		final byte[] sign;
+		try (
+			final InputStream is = getClass().getClassLoader().getResourceAsStream(EXPLICIT_SHA1_CADES_A_FILE);
+		) {
+			sign = AOUtil.getDataFromInputStream(is);
+		}
 
 		System.out.println("Sellos antes de la contrafirma:\n " + TimestampsAnalyzer.getCmsTimestamps(sign)); //$NON-NLS-1$
 
@@ -218,9 +231,11 @@ public class TestCountersign {
 		System.out.println("Prueba de contrafirma de una firma CAdES-A."); //$NON-NLS-1$
 		System.out.println("El resultado se almacena en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
 
-		final FileOutputStream fos = new FileOutputStream(tempFile);
-		fos.write(countersign);
-		fos.close();
+		try (
+			final OutputStream fos = new FileOutputStream(tempFile);
+		) {
+			fos.write(countersign);
+		}
 
 		System.out.println("Sellos despues de la contrafirma:\n " + TimestampsAnalyzer.getCmsTimestamps(countersign)); //$NON-NLS-1$
 	}
@@ -229,10 +244,12 @@ public class TestCountersign {
 	 * @throws Exception Cuando se produce un error. */
 	@Test
 	public void prueba_contrafirma_cades_T() throws Exception {
-
-		final InputStream is = getClass().getClassLoader().getResourceAsStream(IMPLICIT_SHA1_CADES_T_FILE);
-		final byte[] sign = AOUtil.getDataFromInputStream(is);
-		is.close();
+		final byte[] sign;
+		try (
+			final InputStream is = getClass().getClassLoader().getResourceAsStream(IMPLICIT_SHA1_CADES_T_FILE);
+		) {
+			sign = AOUtil.getDataFromInputStream(is);
+		}
 
 		System.out.println("Sellos antes de la contrafirma:\n " + TimestampsAnalyzer.getCmsTimestamps(sign)); //$NON-NLS-1$
 		System.out.println();
@@ -256,9 +273,11 @@ public class TestCountersign {
 		System.out.println("Prueba de contrafirma de una firma CAdES-T."); //$NON-NLS-1$
 		System.out.println("El resultado se almacena en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
 
-		final FileOutputStream fos = new FileOutputStream(tempFile);
-		fos.write(countersign);
-		fos.close();
+		try (
+			final OutputStream fos = new FileOutputStream(tempFile);
+		) {
+			fos.write(countersign);
+		}
 
 		System.out.println();
 		System.out.println("Sellos despues de la contrafirma:\n " + TimestampsAnalyzer.getCmsTimestamps(countersign)); //$NON-NLS-1$

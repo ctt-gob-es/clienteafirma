@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.security.KeyStore;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.MessageDigest;
@@ -21,11 +22,9 @@ import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.signers.cades.AOCAdESSigner;
 
-/**
- * Prueba de cofirmas CAdES.
- * @author Carlos Gamuci
- */
-public class TestCosign {
+/** Pruebas de cofirmas CAdES.
+ * @author Carlos Gamuci. */
+public final class TestCosign {
 
 	private static final String PKCS12_KEYSTORE = "ANCERTCCP_FIRMA.p12"; //$NON-NLS-1$
 
@@ -59,10 +58,12 @@ public class TestCosign {
 	 * @throws Exception Cuando se produce un error. */
 	@Test
 	public void prueba_cofirmar_firma_implicita_sin_indicar_datos() throws Exception {
-
-		final InputStream is = getClass().getClassLoader().getResourceAsStream(IMPLICIT_SHA1_SIGN_FILE);
-		final byte[] sign = AOUtil.getDataFromInputStream(is);
-		is.close();
+		final byte[] sign;
+		try (
+			final InputStream is = getClass().getClassLoader().getResourceAsStream(IMPLICIT_SHA1_SIGN_FILE);
+		) {
+			sign = AOUtil.getDataFromInputStream(is);
+		}
 
 		final Properties config = new Properties();
 		config.setProperty("mode", AOSignConstants.SIGN_MODE_IMPLICIT); //$NON-NLS-1$
@@ -81,28 +82,34 @@ public class TestCosign {
 		System.out.println("Prueba de cofirma implicita sobre firma implicita sin indicar los datos."); //$NON-NLS-1$
 		System.out.println("El resultado se almacena en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
 
-		final FileOutputStream fos = new FileOutputStream(tempFile);
-		fos.write(cosign);
-		fos.close();
+		try (
+			final OutputStream fos = new FileOutputStream(tempFile);
+		) {
+			fos.write(cosign);
+		}
 	}
 
-	/** Prueba de cofirma implicita de una firma impl&iacute;cita CAdES-T sin indicar los datos de firma.
+	/** Prueba de cofirma impl&iacute;cita de una firma impl&iacute;cita CAdES-T sin indicar los datos de firma.
 	 * @throws Exception Cuando se produce un error. */
 	@Test
 	public void prueba_cofirmar_cades_T() throws Exception {
+		final byte[] sign;
+		try (
+			final InputStream is = getClass().getClassLoader().getResourceAsStream(
+				IMPLICIT_SHA1_CADES_T_FILE
+			);
+		) {
+			sign = AOUtil.getDataFromInputStream(is);
+		}
 
-		final InputStream is = getClass().getClassLoader().getResourceAsStream(
-			IMPLICIT_SHA1_CADES_T_FILE
-		);
-		final byte[] sign = AOUtil.getDataFromInputStream(is);
-		is.close();
-
-		final InputStream is2 = getClass().getClassLoader().getResourceAsStream(
+		final byte[] originalData;
+		try (
+			final InputStream is2 = getClass().getClassLoader().getResourceAsStream(
 				"FicheroOriginal_cades_t_csig.pdf" //$NON-NLS-1$
 			);
-			final byte[] originalData = AOUtil.getDataFromInputStream(is2);
-			is2.close();
-
+		) {
+			originalData = AOUtil.getDataFromInputStream(is2);
+		}
 
 		final Properties config = new Properties();
 		config.setProperty("mode", AOSignConstants.SIGN_MODE_IMPLICIT); //$NON-NLS-1$
@@ -130,24 +137,28 @@ public class TestCosign {
 		}
 
 		final File tempFile = File.createTempFile("CosignCades", ".csig"); //$NON-NLS-1$ //$NON-NLS-2$
-		final FileOutputStream fos = new FileOutputStream(tempFile);
-		fos.write(signature);
-		fos.close();
+		try (
+			final OutputStream fos = new FileOutputStream(tempFile);
+		) {
+			fos.write(signature);
+		}
 
 		System.out.println("Prueba de cofirma sobre firma CAdES-T"); //$NON-NLS-1$
 		System.out.println("El resultado se almacena en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
 	}
 
-	/** Prueba de cofirma implicita de una firma impl&iacute;cita CAdES-T sin indicar los datos de firma.
+	/** Prueba de cofirma impl&iacute;cita de una firma impl&iacute;cita CAdES-T sin indicar los datos de firma.
 	 * @throws Exception Cuando se produce un error. */
 	@Test
 	public void prueba_cofirmar_cades_A_() throws Exception {
-
-		final InputStream is = getClass().getClassLoader().getResourceAsStream(
-			IMPLICIT_SHA1_CADES_A_FILE
-		);
-		final byte[] sign = AOUtil.getDataFromInputStream(is);
-		is.close();
+		final byte[] sign;
+		try (
+			final InputStream is = getClass().getClassLoader().getResourceAsStream(
+				IMPLICIT_SHA1_CADES_A_FILE
+			);
+		) {
+			sign = AOUtil.getDataFromInputStream(is);
+		}
 
 		final Properties config = new Properties();
 		config.setProperty("mode", AOSignConstants.SIGN_MODE_EXPLICIT); //$NON-NLS-1$
@@ -179,10 +190,12 @@ public class TestCosign {
 	 */
 	@Test
 	public void prueba_cofirmar_firma_implicita_indicando_datos() throws Exception {
-
-		final InputStream is = getClass().getClassLoader().getResourceAsStream(IMPLICIT_SHA1_SIGN_FILE);
-		final byte[] sign = AOUtil.getDataFromInputStream(is);
-		is.close();
+		final byte[] sign;
+		try (
+			final InputStream is = getClass().getClassLoader().getResourceAsStream(IMPLICIT_SHA1_SIGN_FILE);
+		) {
+			sign = AOUtil.getDataFromInputStream(is);
+		}
 
 		final Properties config = new Properties();
 		config.setProperty("mode", AOSignConstants.SIGN_MODE_IMPLICIT); //$NON-NLS-1$
@@ -203,21 +216,23 @@ public class TestCosign {
 		System.out.println("Prueba de cofirma implicita sobre firma implicita indicando datos."); //$NON-NLS-1$
 		System.out.println("El resultado se almacena en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
 
-		final FileOutputStream fos = new FileOutputStream(tempFile);
-		fos.write(cosign);
-		fos.close();
+		try (
+			final OutputStream fos = new FileOutputStream(tempFile);
+		) {
+			fos.write(cosign);
+		}
 	}
 
-	/**
-	 * Prueba de cofirma implicita de una firma explicita sin indicar los datos de firma.
-	 * @throws Exception Cuando se produce un error.
-	 */
+	/** Prueba de cofirma impl&iacute;cita de una firma expl&iacute;cita sin indicar los datos de firma.
+	 * @throws Exception Cuando se produce un error. */
 	@Test
 	public void prueba_cofirma_implicita_de_firma_explicita_sin_indicar_datos() throws Exception {
-
-		final InputStream is = getClass().getClassLoader().getResourceAsStream(EXPLICIT_SHA1_SIGN_FILE);
-		final byte[] sign = AOUtil.getDataFromInputStream(is);
-		is.close();
+		final byte[] sign;
+		try (
+			final InputStream is = getClass().getClassLoader().getResourceAsStream(EXPLICIT_SHA1_SIGN_FILE);
+		) {
+			sign = AOUtil.getDataFromInputStream(is);
+		}
 
 		final Properties config = new Properties();
 		config.setProperty("mode", AOSignConstants.SIGN_MODE_IMPLICIT); //$NON-NLS-1$
@@ -237,9 +252,11 @@ public class TestCosign {
 		System.out.println("Prueba de cofirma implicita sobre firma explicita sin indicar los datos."); //$NON-NLS-1$
 		System.out.println("El resultado se almacena en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
 
-		final FileOutputStream fos = new FileOutputStream(tempFile);
-		fos.write(cosign);
-		fos.close();
+		try (
+			final OutputStream fos = new FileOutputStream(tempFile);
+		) {
+			fos.write(cosign);
+		}
 	}
 
 	/**
@@ -248,10 +265,12 @@ public class TestCosign {
 	 */
 	@Test
 	public void prueba_cofirma_implicita_de_firma_explicita_indicando_datos() throws Exception {
-
-		final InputStream is = getClass().getClassLoader().getResourceAsStream(EXPLICIT_SHA1_SIGN_FILE);
-		final byte[] sign = AOUtil.getDataFromInputStream(is);
-		is.close();
+		final byte[] sign;
+		try (
+			final InputStream is = getClass().getClassLoader().getResourceAsStream(EXPLICIT_SHA1_SIGN_FILE);
+		) {
+			sign = AOUtil.getDataFromInputStream(is);
+		}
 
 		final Properties config = new Properties();
 		config.setProperty("mode", AOSignConstants.SIGN_MODE_IMPLICIT); //$NON-NLS-1$
@@ -272,21 +291,23 @@ public class TestCosign {
 		System.out.println("Prueba de cofirma implicita sobre firma explicita indicando datos."); //$NON-NLS-1$
 		System.out.println("El resultado se almacena en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
 
-		final FileOutputStream fos = new FileOutputStream(tempFile);
-		fos.write(cosign);
-		fos.close();
+		try (
+			final OutputStream fos = new FileOutputStream(tempFile);
+		) {
+			fos.write(cosign);
+		}
 	}
 
-	/**
-	 * Prueba de cofirma explicita de una firma explicita indicando el hash de los datos firmados.
-	 * @throws Exception Cuando se produce un error.
-	 */
+	/** Prueba de cofirma expl&iacute;cita de una firma explicita indicando el hash de los datos firmados.
+	 * @throws Exception Cuando se produce un error. */
 	@Test
 	public void prueba_cofirma_explicita_de_firma_explicita_indicando_hash() throws Exception {
-
-		final InputStream is = getClass().getClassLoader().getResourceAsStream(EXPLICIT_SHA1_SIGN_FILE);
-		final byte[] sign = AOUtil.getDataFromInputStream(is);
-		is.close();
+		final byte[] sign;
+		try (
+			final InputStream is = getClass().getClassLoader().getResourceAsStream(EXPLICIT_SHA1_SIGN_FILE);
+		) {
+			sign = AOUtil.getDataFromInputStream(is);
+		}
 
 		final MessageDigest md = MessageDigest.getInstance("SHA1"); //$NON-NLS-1$
 		md.update(data);
@@ -312,21 +333,23 @@ public class TestCosign {
 		System.out.println("Prueba de cofirma implicita sobre firma explicita indicando datos."); //$NON-NLS-1$
 		System.out.println("El resultado se almacena en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
 
-		final FileOutputStream fos = new FileOutputStream(tempFile);
-		fos.write(cosign);
-		fos.close();
+		try (
+			final OutputStream fos = new FileOutputStream(tempFile);
+		) {
+			fos.write(cosign);
+		}
 	}
 
-	/**
-	 * Prueba de cofirma explicita de una firma explicita ambas generadas con el mismo algoritmo.
-	 * @throws Exception Cuando se produce un error.
-	 */
+	/** Prueba de cofirma expl&iacute;cita de una firma expl&iacute;cita ambas generadas con el mismo algoritmo.
+	 * @throws Exception Cuando se produce un error. */
 	@Test
 	public void prueba_cofirma_explicita_de_firma_explicita_mismo_algoritmo_sin_datos() throws Exception {
-
-		final InputStream is = getClass().getClassLoader().getResourceAsStream(EXPLICIT_SHA1_SIGN_FILE);
-		final byte[] sign = AOUtil.getDataFromInputStream(is);
-		is.close();
+		final byte[] sign;
+		try (
+			final InputStream is = getClass().getClassLoader().getResourceAsStream(EXPLICIT_SHA1_SIGN_FILE);
+		) {
+			sign = AOUtil.getDataFromInputStream(is);
+		}
 
 		final Properties config = new Properties();
 		config.setProperty("mode", AOSignConstants.SIGN_MODE_EXPLICIT); //$NON-NLS-1$
@@ -341,32 +364,28 @@ public class TestCosign {
 			config
 		);
 
-		try {
-			is.close();
-		} catch (final Exception e) {
-			// Se obvia el error
-		}
-
 		final File tempFile = File.createTempFile("CosignCades", ".csig"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		System.out.println("Prueba de cofirma explicita sobre firma explicita ambas generadas con el mismo algoritmo y sin indicar los datos."); //$NON-NLS-1$
 		System.out.println("El resultado se almacena en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
 
-		final FileOutputStream fos = new FileOutputStream(tempFile);
-		fos.write(cosign);
-		fos.close();
+		try (
+			final OutputStream fos = new FileOutputStream(tempFile);
+		) {
+			fos.write(cosign);
+		}
 	}
 
-	/**
-	 * Prueba de cofirma explicita de una firma explicita ambas generadas con distinto algoritmo.
-	 * @throws Exception Cuando se produce un error.
-	 */
+	/** Prueba de cofirma expl&iacute;cita de una firma expl&iacute;cita ambas generadas con distinto algoritmo.
+	 * @throws Exception Cuando se produce un error. */
 	@Test
 	public void prueba_cofirma_explicita_de_firma_explicita_distinto_algoritmo_sin_datos() throws Exception {
-
-		final InputStream is = getClass().getClassLoader().getResourceAsStream(EXPLICIT_SHA1_SIGN_FILE);
-		final byte[] sign = AOUtil.getDataFromInputStream(is);
-		is.close();
+		final byte[] sign;
+		try (
+			final InputStream is = getClass().getClassLoader().getResourceAsStream(EXPLICIT_SHA1_SIGN_FILE);
+		) {
+			sign = AOUtil.getDataFromInputStream(is);
+		}
 
 		final Properties config = new Properties();
 		config.setProperty("mode", AOSignConstants.SIGN_MODE_EXPLICIT); //$NON-NLS-1$

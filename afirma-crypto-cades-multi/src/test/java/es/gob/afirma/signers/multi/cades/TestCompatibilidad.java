@@ -45,11 +45,10 @@ public class TestCompatibilidad {
 	}
 
 	private static byte[] loadFile(final String filename) throws IOException {
-
-		final InputStream is = TestCompatibilidad.class.getClassLoader().getResourceAsStream(filename);
-		final byte[] data = AOUtil.getDataFromInputStream(is);
-		is.close();
-
-		return data;
+		try (
+			final InputStream is = TestCompatibilidad.class.getClassLoader().getResourceAsStream(filename);
+		) {
+			return AOUtil.getDataFromInputStream(is);
+		}
 	}
 }

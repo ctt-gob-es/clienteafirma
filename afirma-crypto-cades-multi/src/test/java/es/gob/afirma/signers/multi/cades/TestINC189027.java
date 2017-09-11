@@ -43,10 +43,12 @@ public class TestINC189027 {
 	 * @throws Exception Cuando ocurre un error. */
 	@Test
 	public void testContrafirmaCAdEST() throws Exception {
-
-		final InputStream is = getClass().getClassLoader().getResourceAsStream(FILE_CADES_T);
-		final byte[] signature = AOUtil.getDataFromInputStream(is);
-		is.close();
+		final byte[] signature;
+		try (
+			final InputStream is = getClass().getClassLoader().getResourceAsStream(FILE_CADES_T);
+		) {
+			signature = AOUtil.getDataFromInputStream(is);
+		}
 
 		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(PASSWORD.toCharArray()));
 
@@ -82,10 +84,12 @@ public class TestINC189027 {
 	 * @throws Exception Cuando ocurre un error. */
 	@Test
 	public void testCofirmaCAdEST() throws Exception {
-
-		final InputStream is = getClass().getClassLoader().getResourceAsStream(FILE_CADES_T);
-		final byte[] signature = AOUtil.getDataFromInputStream(is);
-		is.close();
+		final byte[] signature;
+		try (
+			final InputStream is = getClass().getClassLoader().getResourceAsStream(FILE_CADES_T);
+		) {
+			signature = AOUtil.getDataFromInputStream(is);
+		}
 
 		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(PASSWORD.toCharArray()));
 
@@ -128,10 +132,12 @@ public class TestINC189027 {
 	 * @throws Exception Cuando ocurre un error. */
 	@Test
 	public void testContrafirmaCAdESA() throws Exception {
-
-		final InputStream is = getClass().getClassLoader().getResourceAsStream(FILE_CADES_A);
-		final byte[] signature = AOUtil.getDataFromInputStream(is);
-		is.close();
+		final byte[] signature;
+		try (
+			final InputStream is = getClass().getClassLoader().getResourceAsStream(FILE_CADES_A);
+		) {
+			signature = AOUtil.getDataFromInputStream(is);
+		}
 
 		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(PASSWORD.toCharArray()));
 
@@ -168,10 +174,12 @@ public class TestINC189027 {
 	 * @throws Exception Cuando ocurre un error. */
 	@Test
 	public void testCofirmaCAdESA() throws Exception {
-
-		final InputStream is = getClass().getClassLoader().getResourceAsStream(FILE_CADES_A);
-		final byte[] signature = AOUtil.getDataFromInputStream(is);
-		is.close();
+		final byte[] signature;
+		try (
+			final InputStream is = getClass().getClassLoader().getResourceAsStream(FILE_CADES_A);
+		) {
+			signature = AOUtil.getDataFromInputStream(is);
+		}
 
 		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(PASSWORD.toCharArray()));
 

@@ -41,17 +41,17 @@ final class TimestampsAnalyzer {
 				"La firma proporcionada no es un SignedData compatible CMS, se devolvera una lista de sellos vacia: " + e, //$NON-NLS-1$
 				e
 			);
-			return new ArrayList<AOTimestampInfo>(0);
+			return new ArrayList<>(0);
 		}
 		return getCmsTimestamps(signedData);
 	}
 
 	private static List<AOTimestampInfo> getCmsTimestamps(final CMSSignedData signedData) {
 		if (signedData == null) {
-			return new ArrayList<AOTimestampInfo>(0);
+			return new ArrayList<>(0);
 		}
 
-		final List<AOTimestampInfo> ret = new ArrayList<AOTimestampInfo>();
+		final List<AOTimestampInfo> ret = new ArrayList<>();
 
 		final Iterator<SignerInformation> i = signedData.getSignerInfos().getSigners().iterator();
 		while (i.hasNext()) {

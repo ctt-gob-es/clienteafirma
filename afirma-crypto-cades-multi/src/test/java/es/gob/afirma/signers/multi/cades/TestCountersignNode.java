@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.security.KeyStore;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.util.Properties;
@@ -96,21 +97,23 @@ public class TestCountersignNode {
 
 		final File tempFile = File.createTempFile("CountersignCades-1-Node-", ".csig"); //$NON-NLS-1$ //$NON-NLS-2$
 
-		final FileOutputStream fos = new FileOutputStream(tempFile);
-		fos.write(sign);
-		fos.close();
+		try (
+			final OutputStream fos = new FileOutputStream(tempFile);
+		) {
+			fos.write(sign);
+		}
 	}
 
-	/**
-	 * Prueba de contrafirma del nodo 1 de la firma de entrada.
-	 * @throws Exception Cuando se produce un error.
-	 */
+	/** Prueba de contrafirma del nodo 1 de la firma de entrada.
+	 * @throws Exception Cuando se produce un error. */
 	@Test
 	public void pruebaContrafirmaNode1() throws Exception {
-
-		final InputStream is = getClass().getClassLoader().getResourceAsStream(SIGN_FILE);
-		final byte[] sign = AOUtil.getDataFromInputStream(is);
-		is.close();
+		final byte[] sign;
+		try (
+			final InputStream is = getClass().getClassLoader().getResourceAsStream(SIGN_FILE);
+		) {
+			sign = AOUtil.getDataFromInputStream(is);
+		}
 
 		final Properties config = new Properties();
 
@@ -129,21 +132,23 @@ public class TestCountersignNode {
 
 		System.out.println("Resultado de la prueba de contrafirma del Nodo 1: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
 
-		final FileOutputStream fos = new FileOutputStream(tempFile);
-		fos.write(countersign);
-		fos.close();
+		try (
+			final OutputStream fos = new FileOutputStream(tempFile);
+		) {
+			fos.write(countersign);
+		}
 	}
 
-	/**
-	 * Prueba de contrafirma del nodo 2 de la firma de entrada.
-	 * @throws Exception Cuando se produce un error.
-	 */
+	/** Prueba de contrafirma del nodo 2 de la firma de entrada.
+	 * @throws Exception Cuando se produce un error. */
 	@Test
 	public void pruebaContrafirmaNode2() throws Exception {
-
-		final InputStream is = getClass().getClassLoader().getResourceAsStream(SIGN_FILE);
-		final byte[] sign = AOUtil.getDataFromInputStream(is);
-		is.close();
+		final byte[] sign;
+		try (
+			final InputStream is = getClass().getClassLoader().getResourceAsStream(SIGN_FILE);
+		) {
+			sign = AOUtil.getDataFromInputStream(is);
+		}
 
 		final Properties config = new Properties();
 
@@ -162,9 +167,11 @@ public class TestCountersignNode {
 
 		System.out.println("Resultado de la prueba de contrafirma del Nodo 2: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
 
-		final FileOutputStream fos = new FileOutputStream(tempFile);
-		fos.write(countersign);
-		fos.close();
+		try (
+			final OutputStream fos = new FileOutputStream(tempFile);
+		) {
+			fos.write(countersign);
+		}
 	}
 
 	/**
@@ -173,10 +180,12 @@ public class TestCountersignNode {
 	 */
 	@Test
 	public void pruebaContrafirmaNode3() throws Exception {
-
-		final InputStream is = getClass().getClassLoader().getResourceAsStream(SIGN_FILE);
-		final byte[] sign = AOUtil.getDataFromInputStream(is);
-		is.close();
+		final byte[] sign;
+		try (
+			final InputStream is = getClass().getClassLoader().getResourceAsStream(SIGN_FILE);
+		) {
+			sign = AOUtil.getDataFromInputStream(is);
+		}
 
 		final Properties config = new Properties();
 
@@ -195,21 +204,23 @@ public class TestCountersignNode {
 
 		System.out.println("Resultado de la prueba de contrafirma del Nodo 3: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
 
-		final FileOutputStream fos = new FileOutputStream(tempFile);
-		fos.write(countersign);
-		fos.close();
+		try (
+			final OutputStream fos = new FileOutputStream(tempFile);
+		) {
+			fos.write(countersign);
+		}
 	}
 
-	/**
-	 * Prueba de contrafirma de hojas de la firma de entrada.
-	 * @throws Exception Cuando se produce un error.
-	 */
+	/** Prueba de contrafirma de hojas de la firma de entrada.
+	 * @throws Exception Cuando se produce un error. */
 	@Test
 	public void pruebaContrafirmaHojas() throws Exception {
-
-		final InputStream is = getClass().getClassLoader().getResourceAsStream(SIGN_FILE);
-		final byte[] sign = AOUtil.getDataFromInputStream(is);
-		is.close();
+		final byte[] sign;
+		try (
+			final InputStream is = getClass().getClassLoader().getResourceAsStream(SIGN_FILE);
+		) {
+			sign = AOUtil.getDataFromInputStream(is);
+		}
 
 		final Properties config = new Properties();
 
@@ -240,19 +251,23 @@ public class TestCountersignNode {
 
 		System.out.println("Resultado de la prueba de contrafirma de hojas: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
 
-		final FileOutputStream fos = new FileOutputStream(tempFile);
-		fos.write(countersign);
-		fos.close();
+		try (
+			final OutputStream fos = new FileOutputStream(tempFile);
+		) {
+			fos.write(countersign);
+		}
 	}
 
 	/** Prueba de contrafirma de &aacute;rbol de la firma de entrada.
 	 * @throws Exception Cuando se produce un error. */
 	@Test
 	public void pruebaContrafirmaArbol() throws Exception {
-
-		final InputStream is = getClass().getClassLoader().getResourceAsStream(SIGN_FILE);
-		final byte[] sign = AOUtil.getDataFromInputStream(is);
-		is.close();
+		final byte[] sign;
+		try (
+			final InputStream is = getClass().getClassLoader().getResourceAsStream(SIGN_FILE);
+		) {
+			sign = AOUtil.getDataFromInputStream(is);
+		}
 
 		final Properties config = new Properties();
 
@@ -272,28 +287,32 @@ public class TestCountersignNode {
 
 		System.out.println("Resultado de la prueba de contrafirma de arbol: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
 
-		FileOutputStream fos = new FileOutputStream(tempFile);
-		fos.write(countersign);
-		fos.close();
+		try (
+			OutputStream fos = new FileOutputStream(tempFile);
+		) {
+			fos.write(countersign);
+		}
 
 		// Repetimos!
 		countersign = signer.countersign(
-				countersign,
-				AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA,
-				CounterSignTarget.TREE,
-				null,
-				pke.getPrivateKey(),
-				pke.getCertificateChain(),
-				config
+			countersign,
+			AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA,
+			CounterSignTarget.TREE,
+			null,
+			pke.getPrivateKey(),
+			pke.getCertificateChain(),
+			config
 		);
 
 		tempFile = File.createTempFile("CountersignCadesTree-002-", ".csig"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		System.out.println("Resultado de la prueba de contrafirma de arbol: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
 
-		fos = new FileOutputStream(tempFile);
-		fos.write(countersign);
-		fos.close();
+		try (
+			final OutputStream fos = new FileOutputStream(tempFile);
+		) {
+			fos.write(countersign);
+		}
 	}
 
 	/** Cierra el flujo de lectura del almac&eacute;n de certificados.

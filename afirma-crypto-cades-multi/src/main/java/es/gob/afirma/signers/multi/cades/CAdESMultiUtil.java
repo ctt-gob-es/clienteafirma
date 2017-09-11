@@ -38,7 +38,7 @@ final class CAdESMultiUtil {
 		"1.2.840.113549.1.9.16.2.48" //$NON-NLS-1$
 	);
 
-	private static final List<ASN1ObjectIdentifier> UNSUPPORTED_ATTRIBUTES = new ArrayList<ASN1ObjectIdentifier>(8);
+	private static final List<ASN1ObjectIdentifier> UNSUPPORTED_ATTRIBUTES = new ArrayList<>(8);
 	static {
 		UNSUPPORTED_ATTRIBUTES.add(ARCHIVE_TIMESTAMP_V2_OID);
 		UNSUPPORTED_ATTRIBUTES.add(PKCSObjectIdentifiers.id_aa_ets_revocationRefs);

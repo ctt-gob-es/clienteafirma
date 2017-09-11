@@ -17,6 +17,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.security.CodeSource;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.KeyStore;
@@ -93,7 +94,7 @@ public final class JarSignatureCertExtractor {
 		}
 		final Store<X509CertificateHolder> store = signedData.getCertificates();
 		final CertificateFactory certFactory = CertificateFactory.getInstance("X.509"); //$NON-NLS-1$
-		final List<X509Certificate> ret = new ArrayList<X509Certificate>();
+		final List<X509Certificate> ret = new ArrayList<>();
 
 		final Iterator<X509CertificateHolder> certIt = store.getMatches(null).iterator();
 		while (certIt.hasNext()) {
@@ -187,25 +188,26 @@ public final class JarSignatureCertExtractor {
 	                                                                        NoSuchAlgorithmException,
 	                                                                        CertificateException,
 	                                                                        IOException {
-		final FileInputStream fis = new FileInputStream(storeFile);
-		final KeyStore ks = KeyStore.getInstance("JKS"); //$NON-NLS-1$
-		for (final String password : CACERTS_DEFAULT_PASSWORDS) {
-			try {
-				ks.load(fis, password.toCharArray());
-				keystorePassword = password;
-				break;
-			} catch (final IOException e) {
-				// Si el error no se debe a una clave erronea, la subimos
-				if (!(e.getCause() instanceof UnrecoverableKeyException)) {
-					fis.close();
-					throw e;
+		final KeyStore ks;
+		try (
+			final FileInputStream fis = new FileInputStream(storeFile);
+		) {
+			ks = KeyStore.getInstance("JKS"); //$NON-NLS-1$
+			for (final String password : CACERTS_DEFAULT_PASSWORDS) {
+				try {
+					ks.load(fis, password.toCharArray());
+					keystorePassword = password;
+					break;
+				}
+				catch (final IOException e) {
+					// Si el error no se debe a una clave erronea, la subimos
+					if (!(e.getCause() instanceof UnrecoverableKeyException)) {
+						fis.close();
+						throw e;
+					}
 				}
 			}
 		}
-		fis.close();
-
-
-
 		return ks;
 	}
 
@@ -258,9 +260,12 @@ public final class JarSignatureCertExtractor {
 	                                                                              InvalidAlgorithmParameterException {
 
 		// Primero, obtenemos los certificados con los que se ha firmado la aplicacion
-		final InputStream jarIs = getJarInputStream();
-		final byte[] signature = getJarSignature(jarIs);
-		try { jarIs.close(); } catch (final Exception ex) { /* No hacemos nada */ }
+		final byte[] signature;
+		try (
+			final InputStream jarIs = getJarInputStream();
+		) {
+			signature = getJarSignature(jarIs);
+		}
 
 		final X509Certificate[] certs = getJarSignatureCertChain(signature);
 		if (certs == null || certs.length < 1) {
@@ -359,9 +364,11 @@ public final class JarSignatureCertExtractor {
 			);
 		}
 
-		final FileOutputStream fos = new FileOutputStream(usersCaCertFile);
-		usersTruststore.store(fos, keystorePassword.toCharArray());
-		fos.close();
+		try (
+			final OutputStream fos = new FileOutputStream(usersCaCertFile);
+		) {
+			usersTruststore.store(fos, keystorePassword.toCharArray());
+		}
 
 		LOGGER.info("Se han insertado correctamente certificados en el cacerts del usuario"); //$NON-NLS-1$
 	}
