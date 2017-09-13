@@ -20,6 +20,7 @@ public final class HttpError extends IOException {
 
 	private final int responseCode;
 	private final String responseDescription;
+	private final byte[] errorStreamBytes;
 
 	/** Crea una excepci&oacute;n de error de conexi&oacute;n HTTP.
 	 * @param resCode C&oacute;digo HTTP de respuesta. */
@@ -27,6 +28,7 @@ public final class HttpError extends IOException {
 		super("Error en conexion HTTP con codigo de respuesta " + resCode); //$NON-NLS-1$
 		this.responseCode = resCode;
 		this.responseDescription = null;
+		this.errorStreamBytes = null;
 	}
 
 	/** Crea una excepci&oacute;n de error de conexi&oacute;n HTTP.
@@ -34,13 +36,30 @@ public final class HttpError extends IOException {
 	 * @param resDescription Descripci&oacute;n del error.
 	 * @param url URL a la que se intent&oacute; conectar.  */
 	public HttpError(final int resCode, final String resDescription, final String url) {
+		this(resCode, resDescription, null, url);
+	}
+
+	/** Crea una excepci&oacute;n de error de conexi&oacute;n HTTP.
+	 * @param resCode C&oacute;digo HTTP de respuesta.
+	 * @param resDescription Descripci&oacute;n del error.
+	 * @param errorStreamContent Contenido del flujo de error.
+	 * @param url URL a la que se intent&oacute; conectar.  */
+	public HttpError(final int resCode, final String resDescription, final byte[] errorStreamContent, final String url) {
 		super(
-			"Error en conexion HTTP con codigo de respuesta " + resCode + //$NON-NLS-1$
-				" y descripcion '" + resDescription  + //$NON-NLS-1$
-					"' para la direccion: " + url //$NON-NLS-1$
+			"Error HTTP con codigo  " + resCode + //$NON-NLS-1$
+				(errorStreamContent != null && errorStreamContent.length > 1  ? ", cuerpo '" + new String(errorStreamContent) + "'" : "") + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+					" y descripcion '" + resDescription  + //$NON-NLS-1$
+						"' para la direccion: " + url //$NON-NLS-1$
 		);
 		this.responseCode = resCode;
 		this.responseDescription = resDescription;
+		this.errorStreamBytes = errorStreamContent;
+	}
+
+	/** Obtiene el contenido del flujo de error HTTP.
+	 * @return Contenido del flujo de error HTTP. */
+	public byte[] getErrorStreamBytes() {
+		return this.errorStreamBytes != null ? this.errorStreamBytes.clone() : null;
 	}
 
 	/** Obtiene el c&oacute;digo HTTP de respuesta.

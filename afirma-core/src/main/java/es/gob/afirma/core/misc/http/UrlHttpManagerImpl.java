@@ -264,7 +264,14 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 			if (uri.getProtocol().equals(HTTPS)) {
 				enableSslChecks();
 			}
-			throw new HttpError(resCode, conn.getResponseMessage(), url);
+			throw new HttpError(
+				resCode,
+				conn.getResponseMessage(),
+				AOUtil.getDataFromInputStream(
+					conn.getErrorStream()
+				),
+				url
+			);
 		}
 
 		final byte[] data;
