@@ -214,7 +214,7 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 		// Trabajamos las cabeceras, las por defecto y las que nos indiquen
 
 		final Properties headers = new Properties();
-		if (requestProperties == null) {
+		if (requestProperties != null) {
 			headers.putAll(requestProperties);
 		}
 
