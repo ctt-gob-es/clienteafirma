@@ -14,9 +14,9 @@ var originalXMLHttpRequest = window.XMLHttpRequest;
 
 var MiniApplet = ( function ( window, undefined ) {
 
-		var VERSION = "1.6";
+		var VERSION = "1.5";
 
-		var JAR_NAME = 'miniapplet-full_1_6.jar';
+		var JAR_NAME = 'miniapplet-full_1_5.jar';
 
 		var JAVA_ARGUMENTS = '-Xms512M -Xmx512M ';
 
