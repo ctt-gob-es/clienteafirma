@@ -17,7 +17,7 @@ public interface DocumentManager {
 	 * @param certChain Cadena de certificados que se usar&aacute; para realizar la firma
 	 * @param config Par&aacute;metros para la configuraci&oacute;n de la recuperaci&oacute;n del documento.
 	 * @return Documento (en binario)
-	 * @throws IOException Cuando ocurre alg&uacute;n problema con la recuperaci&oacute;n */
+	 * @throws IOException Cuando ocurre alg&uacute;n problema con la recuperaci&oacute;n. */
 	byte[] getDocument(String id, X509Certificate[] certChain, Properties config) throws IOException;
 
 	/** Almacena un documento firmado.
@@ -28,6 +28,6 @@ public interface DocumentManager {
 	 * @param data Datos firmados.
 	 * @param config Par&aacute;metros para la configuraci&oacute;n del guardado del documento.
 	 * @return Identificador del nuevo documento codificado en base 64.
-	 * @throws IOException Cuando ocurre alg&uacute;n problema con la recuperaci&oacute;n */
+	 * @throws IOException Cuando ocurre alg&uacute;n problema con el guardado. */
 	String storeDocument(String id, final X509Certificate[] certChain, byte[] data, Properties config) throws IOException;
 }
