@@ -34,6 +34,7 @@ import es.gob.afirma.triphase.signer.processors.CAdESASiCSTriPhasePreProcessor;
 import es.gob.afirma.triphase.signer.processors.CAdESTriPhasePreProcessor;
 import es.gob.afirma.triphase.signer.processors.FacturaETriPhasePreProcessor;
 import es.gob.afirma.triphase.signer.processors.PAdESTriPhasePreProcessor;
+import es.gob.afirma.triphase.signer.processors.Pkcs1TriPhasePreProcessor;
 import es.gob.afirma.triphase.signer.processors.TriPhasePreProcessor;
 import es.gob.afirma.triphase.signer.processors.XAdESASiCSTriPhasePreProcessor;
 import es.gob.afirma.triphase.signer.processors.XAdESTriPhasePreProcessor;
@@ -393,6 +394,10 @@ public final class SignatureService extends HttpServlet {
 						)
 					);
 					prep = new FacturaETriPhasePreProcessor(installXmlDSig);
+		}
+		else if (AOSignConstants.SIGN_FORMAT_PKCS1.equalsIgnoreCase(format) ||
+				 AOSignConstants.SIGN_FORMAT_PKCS1_TRI.equalsIgnoreCase(format)) {
+					prep = new Pkcs1TriPhasePreProcessor();
 		}
 		else if (AOSignConstants.SIGN_FORMAT_AUTO.equalsIgnoreCase(format)) {
 			final boolean installXmlDSig = Boolean.parseBoolean(
