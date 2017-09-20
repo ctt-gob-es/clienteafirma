@@ -39,14 +39,14 @@ public final class TestTemd {
 			TestTemd.class.getResource("/temd-pkcs11/x86_6_1_3/FNMT_P11.dll").toURI() //$NON-NLS-1$
 		);
 
-        final Provider p = new sun.security.pkcs11.SunPKCS11(
-    		new ByteArrayInputStream((
+		final Provider p = Security.getProvider("SunPKCS11"); //$NON-NLS-1$
+		p.load(new ByteArrayInputStream((
 				"name=pkcs11-win_dll\n" + //$NON-NLS-1$
 				"library=" + f.getAbsolutePath() + "\n" + //$NON-NLS-1$ //$NON-NLS-2$
 				"disabledMechanisms={ CKM_SHA1_RSA_PKCS }\n" + //$NON-NLS-1$
 				"showInfo=true" //$NON-NLS-1$
-			).getBytes())
-		);
+			).getBytes()));
+
 		Security.addProvider(p);
 		final KeyStore ks = KeyStore.getInstance("PKCS11", p); //$NON-NLS-1$
 		ks.load(null, "A111111a".toCharArray()); //$NON-NLS-1$

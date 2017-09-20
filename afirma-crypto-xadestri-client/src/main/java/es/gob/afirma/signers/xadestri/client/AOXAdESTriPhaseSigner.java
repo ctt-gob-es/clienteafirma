@@ -243,7 +243,7 @@ public class AOXAdESTriPhaseSigner implements AOSigner {
         		new ByteArrayInputStream(sign)
     		).getDocumentElement();
 
-            final List<Node> signNodes = new ArrayList<Node>();
+            final List<Node> signNodes = new ArrayList<>();
             if (rootNode.getNodeName().equals(SIGNATURE_NODE_NAME)) {
                 signNodes.add(rootNode);
             }
