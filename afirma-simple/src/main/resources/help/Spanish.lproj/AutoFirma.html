@@ -15,14 +15,15 @@
    sobre ficheros locales.
   </p>
   <p>
-   Para simplificar al usuario el proceso, dispone de un mecanismo de selecci&oacute;n autom&aacute;tica de formato de firma en
-   base al fichero a firmar (que, no obstante, puede cambiarse desde el men&uacute; de preferencias):
+   Para simplificar al usuario el proceso, se determina automáticamente el formato de firma a utilizar en
+   base al fichero de datos seleccionado. El usuario puede modificar el formato de firma por defecto para
+   cada tipo de fichero desde el men&uacute; de preferencias. Los formatos por defecto son:
   </p>
   <dl>
    <dt>Ficheros Adobe PDF</dt>
    	<dd>Se aplica firma PAdES (<i>PDF Advanced Electronic Signature</i>) B&aacute;sico.</dd>
    <dt>Ficheros XML</dt>
-    <dd>Se aplica firma XAdES (<i>XML Advanced Electronic Signature</i>) BES/EPES de tipo enveloping con los datos impl&iacute;citos.</dd>
+    <dd>Se aplica firma XAdES (<i>XML Advanced Electronic Signature</i>) Baseline/BES de tipo enveloping.</dd>
    <dt>Factura electr&oacute;nica</dt>
     <dd>Se aplica firma para facturas electr&oacute;nicas.</dd>
    <dt>Documentos OOXML (Microsoft Office)</dt>
@@ -30,8 +31,12 @@
    <dt>Documentos ODF de (LibreOffice, OpenOffice.org...)</dt>
     <dd>Se aplica firma ODF.</dd>
    <dt>Otros ficheros (binarios gen&eacute;ricos)</dt>
-	<dd>Se aplica firma CAdES (<i>CMS Advanced Electronic Signature</i>) BES/EPES con los datos impl&iacute;citos.</dd>
+	<dd>Se aplica firma CAdES (<i>CMS Advanced Electronic Signature</i>) Baseline/BES.</dd>
   </dl>
+  <p>
+   Todas las firmas CAdES y XAdES generadas por "AutoFirma" se realizan conforme a los perfiles Baseline. También son
+   acordes a estos perfiles las firmas PAdES-BES generadas. No así, las firmas PAdES Básicas.
+  </p>
   <p>
    "AutoFirma" est&aacute; dise&ntilde;ada para utilizar DNI electr&oacute;nico (DNIe) como dispositivo
    preferente para la creaci&oacute;n de firmas en sistemas con lector de tarjetas inteligentes instalado, aunque puede hacer
