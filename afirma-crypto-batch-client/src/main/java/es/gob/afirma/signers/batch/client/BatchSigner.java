@@ -26,6 +26,7 @@ import org.w3c.dom.Node;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.Base64;
+import es.gob.afirma.core.misc.http.HttpError;
 import es.gob.afirma.core.misc.http.UrlHttpManagerFactory;
 import es.gob.afirma.core.misc.http.UrlHttpMethod;
 import es.gob.afirma.core.signers.AOPkcs1Signer;
@@ -42,6 +43,8 @@ public final class BatchSigner {
 
 	private static final String EQU = "="; //$NON-NLS-1$
 	private static final String AMP = "&"; //$NON-NLS-1$
+
+	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	private BatchSigner() {
 		// No instanciable
@@ -203,12 +206,19 @@ public final class BatchSigner {
 
 		final String batchUrlSafe = batchB64.replace("+", "-").replace("/",  "_");  //$NON-NLS-1$ //$NON-NLS-2$//$NON-NLS-3$ //$NON-NLS-4$
 
-		byte[] ret = UrlHttpManagerFactory.getInstalledManager().readUrl(
-			batchPresignerUrl + "?" + //$NON-NLS-1$
-				BATCH_XML_PARAM + EQU + batchUrlSafe + AMP +
-				BATCH_CRT_PARAM + EQU + getCertChainAsBase64(certificates),
-			UrlHttpMethod.POST
-		);
+		byte[] ret;
+		try {
+			ret = UrlHttpManagerFactory.getInstalledManager().readUrl(
+					batchPresignerUrl + "?" + //$NON-NLS-1$
+							BATCH_XML_PARAM + EQU + batchUrlSafe + AMP +
+							BATCH_CRT_PARAM + EQU + getCertChainAsBase64(certificates),
+							UrlHttpMethod.POST
+					);
+		}
+		catch (final HttpError e) {
+			LOGGER.warning("El servicio de firma devolvio un  error durante la prefirma: " + e.getResponseDescription()); //$NON-NLS-1$
+			throw e;
+		}
 
 		final TriphaseData td1 = TriphaseData.parser(ret);
 
@@ -222,13 +232,19 @@ public final class BatchSigner {
 		);
 
 		// Llamamos al servidor de nuevo para el postproceso
-		ret = UrlHttpManagerFactory.getInstalledManager().readUrl(
-			batchPostSignerUrl + "?" + //$NON-NLS-1$
-				BATCH_XML_PARAM + EQU + batchUrlSafe + AMP +
-				BATCH_CRT_PARAM + EQU + getCertChainAsBase64(certificates) + AMP +
-				BATCH_TRI_PARAM + EQU + Base64.encode(td2.toString().getBytes(), true),
-			UrlHttpMethod.POST
-		);
+		try {
+			ret = UrlHttpManagerFactory.getInstalledManager().readUrl(
+					batchPostSignerUrl + "?" + //$NON-NLS-1$
+							BATCH_XML_PARAM + EQU + batchUrlSafe + AMP +
+							BATCH_CRT_PARAM + EQU + getCertChainAsBase64(certificates) + AMP +
+							BATCH_TRI_PARAM + EQU + Base64.encode(td2.toString().getBytes(), true),
+							UrlHttpMethod.POST
+					);
+		}
+		catch (final HttpError e) {
+			LOGGER.warning("El servicio de firma devolvio un  error durante la postfirma: " + e.getResponseDescription()); //$NON-NLS-1$
+			throw e;
+		}
 
 		return new String(ret);
 	}

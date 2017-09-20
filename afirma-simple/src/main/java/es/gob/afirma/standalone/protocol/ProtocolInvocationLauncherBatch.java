@@ -153,13 +153,19 @@ final class ProtocolInvocationLauncherBatch {
 			}
 		}
 		catch(final HttpError e) {
-			LOGGER.severe("Error en la comunicacion con el servicio de firma de lotes. StatusCode: " + //$NON-NLS-1$
+			if (e.getResponseCode() / 100 == 4) {
+				LOGGER.severe("Error en la comunicacion con el servicio de firma de lotes. StatusCode: " + //$NON-NLS-1$
 					e.getResponseCode() + ". Descripcion: " + e.getResponseDescription());  //$NON-NLS-1$
+			}
+			else {
+				LOGGER.severe("Error en el servicio de firma de lotes. StatusCode: " + //$NON-NLS-1$
+						e.getResponseCode() + ". Descripcion: " + e.getResponseDescription());  //$NON-NLS-1$
+			}
 			ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.SAF_26);
 			if (!bySocket){
-				throw new SocketOperationException(ProtocolInvocationLauncherErrorManager.SAF_26);
+				throw new SocketOperationException(ProtocolInvocationLauncherErrorManager.SAF_26 + ": " + e.getResponseDescription()); //$NON-NLS-1$
 			}
-			return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.SAF_26);
+			return ProtocolInvocationLauncherErrorManager.SAF_26 + ": " + e.getResponseDescription(); //$NON-NLS-1$
 		}
 		catch(final Exception e) {
 			LOGGER.log(
