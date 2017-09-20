@@ -7,7 +7,7 @@
 	<packaging>war</packaging>
 	<artifactId>afirma-signature-retriever</artifactId>
 	<name>afirma-signature-retriever</name>
-	<version>3.3.2-SNAPSHOT</version>
+	<version>1.6-SNAPSHOT</version>
 
 	<dependencies>
 		<dependency>

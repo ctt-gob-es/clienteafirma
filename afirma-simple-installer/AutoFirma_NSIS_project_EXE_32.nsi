@@ -20,7 +20,7 @@ SetCompressor lzma
   
 ;Definimos el valor de la variable VERSION, en caso de no definirse en el script
 ;podria ser definida en el compilador
-!define VERSION "1.5.0"
+!define VERSION "1.6.0"
 
 ;--------------------------------
 ;Paginas del instalador
@@ -57,7 +57,7 @@ SetCompressor lzma
 ; Configuration General ;
 ;;;;;;;;;;;;;;;;;;;;;;;;;
 ;Nuestro instalador se llamara si la version fuera la 1.0: Ejemplo-1.0.exe
-OutFile AutoFirma_32_v1_5_0_installer.exe
+OutFile AutoFirma_32_v1_6_0_installer.exe
 
 ;Aqui comprobamos que en la version Inglesa se muestra correctamente el mensaje:
 ;Welcome to the $Name Setup Wizard
@@ -229,53 +229,52 @@ Section "Programa" sPrograma
 	;CascadeAfirma.reg
 	WriteRegStr HKEY_CLASSES_ROOT "*\shell\afirma.sign" "" "Firmar con AutoFirma"
 	WriteRegStr HKEY_CLASSES_ROOT "*\shell\afirma.sign" "Icon" "$INSTDIR\AutoFirma\AutoFirma.exe"
-	WriteRegStr HKEY_CLASSES_ROOT "*\shell\afirma.sign\command" "" "$INSTDIR\AutoFirma\AutoFirma.exe sign -gui -i %1" 
+	WriteRegStr HKEY_CLASSES_ROOT "*\shell\afirma.sign\command" "" '$INSTDIR\AutoFirma\AutoFirma.exe sign -gui -i "%1"'
 
 	;Generar huella archivos
  	WriteRegStr HKEY_CLASSES_ROOT "*\shell\afirma.hashFile" "" "Generar huella digital con AutoFirma"
 	WriteRegStr HKEY_CLASSES_ROOT "*\shell\afirma.hashFile" "Icon" "$INSTDIR\AutoFirma\AutoFirma.exe"
-	WriteRegStr HKEY_CLASSES_ROOT "*\shell\afirma.hashFile\command" "" "$INSTDIR\AutoFirma\AutoFirma.exe createdigest -i %1" 
+	WriteRegStr HKEY_CLASSES_ROOT "*\shell\afirma.hashFile\command" "" '$INSTDIR\AutoFirma\AutoFirma.exe createdigest -i "%1"'
 
 	;Generar huella directorios
 	WriteRegStr HKEY_CLASSES_ROOT "Directory\shell\afirma.hashDirectory" "" "Generar huella digital con AutoFirma"
 	WriteRegStr HKEY_CLASSES_ROOT "Directory\shell\afirma.hashDirectory" "Icon" "$INSTDIR\AutoFirma\AutoFirma.exe"
-	WriteRegStr HKEY_CLASSES_ROOT "Directory\shell\afirma.hashDirectory\command" "" "$INSTDIR\AutoFirma\AutoFirma.exe createdigest -i %1" 
+	WriteRegStr HKEY_CLASSES_ROOT "Directory\shell\afirma.hashDirectory\command" "" '$INSTDIR\AutoFirma\AutoFirma.exe createdigest -i "%1"'
 
 	;Comprobar huella .hash
  	WriteRegStr HKEY_CLASSES_ROOT ".hash\shell\afirma.hash" "" "Comprobar huella digital con AutoFirma"
 	WriteRegStr HKEY_CLASSES_ROOT ".hash\shell\afirma.hash" "Icon" "$INSTDIR\AutoFirma\AutoFirma.exe"
-	WriteRegStr HKEY_CLASSES_ROOT ".hash\shell\afirma.hash\command" "" "$INSTDIR\AutoFirma\AutoFirma.exe checkdigest -i %1" 
+	WriteRegStr HKEY_CLASSES_ROOT ".hash\shell\afirma.hash\command" "" '$INSTDIR\AutoFirma\AutoFirma.exe checkdigest -i "%1"'
 
 	;Comprobar huella .hashb64
  	WriteRegStr HKEY_CLASSES_ROOT ".hashb64\shell\afirma.hasbh64" "" "Comprobar huella digital con AutoFirma"
 	WriteRegStr HKEY_CLASSES_ROOT ".hashb64\shell\afirma.hasbh64" "Icon" "$INSTDIR\AutoFirma\AutoFirma.exe"
-	WriteRegStr HKEY_CLASSES_ROOT ".hashb64\shell\afirma.hasbh64\command" "" "$INSTDIR\AutoFirma\AutoFirma.exe checkdigest -i %1" 
+	WriteRegStr HKEY_CLASSES_ROOT ".hashb64\shell\afirma.hasbh64\command" "" '$INSTDIR\AutoFirma\AutoFirma.exe checkdigest -i "%1"'
 	
 	;Comprobar huella .hashfiles
  	WriteRegStr HKEY_CLASSES_ROOT ".hashfiles\shell\afirma.hashfiles" "" "Comprobar huella digital con AutoFirma"
 	WriteRegStr HKEY_CLASSES_ROOT ".hashfiles\shell\afirma.hashfiles" "Icon" "$INSTDIR\AutoFirma\AutoFirma.exe"
-	WriteRegStr HKEY_CLASSES_ROOT ".hashfiles\shell\afirma.hashfiles\command" "" "$INSTDIR\AutoFirma\AutoFirma.exe checkdigest -i %1" 
+	WriteRegStr HKEY_CLASSES_ROOT ".hashfiles\shell\afirma.hashfiles\command" "" '$INSTDIR\AutoFirma\AutoFirma.exe checkdigest -i "%1"'
 
 	;Verify
 	; .csig
 	WriteRegStr HKEY_CLASSES_ROOT ".csig" "" "Firma binaria CMS/CAdES"
 	WriteRegStr HKEY_CLASSES_ROOT ".csig\DefaultIcon" "" "$INSTDIR\AutoFirma\ic_firmar.ico"
 	WriteRegStr HKEY_CLASSES_ROOT ".csig\shell\Verify" "" "Verificar con AutoFirma"
-	WriteRegStr HKEY_CLASSES_ROOT ".csig\shell\Verify\command" "" "$INSTDIR\AutoFirma\AutoFirma.exe verify -gui -i %1"
-	;verify -gui -i %1"	
+	WriteRegStr HKEY_CLASSES_ROOT ".csig\shell\Verify\command" "" '$INSTDIR\AutoFirma\AutoFirma.exe verify -gui -i "%1"'
 
 	;Verify
 	; .xsig
 	WriteRegStr HKEY_CLASSES_ROOT ".xsig" "" "Firma XMLDSig/XAdES"
 	WriteRegStr HKEY_CLASSES_ROOT ".xsig\DefaultIcon" "" "$INSTDIR\AutoFirma\ic_firmar.ico"
 	WriteRegStr HKEY_CLASSES_ROOT ".xsig\shell\Verify" "" "Verificar con AutoFirma"
-	WriteRegStr HKEY_CLASSES_ROOT ".xsig\shell\Verify\command" "" "$INSTDIR\AutoFirma\AutoFirma.exe verify -gui -i %1"	
+	WriteRegStr HKEY_CLASSES_ROOT ".xsig\shell\Verify\command" "" '$INSTDIR\AutoFirma\AutoFirma.exe verify -gui -i "%1"'
 	
 	;Protocolo afirma
 	WriteRegStr HKEY_CLASSES_ROOT "afirma" "" "URL:Afirma Protocol"
 	WriteRegStr HKEY_CLASSES_ROOT "afirma\DefaultIcon" "" "$INSTDIR\AutoFirma\ic_firmar.ico"
 	WriteRegStr HKEY_CLASSES_ROOT "afirma" "URL Protocol" ""
-	WriteRegStr HKEY_CLASSES_ROOT "afirma\shell\open\command" "" "$INSTDIR\AutoFirma\AutoFirma.exe %1"	
+	WriteRegStr HKEY_CLASSES_ROOT "afirma\shell\open\command" "" '$INSTDIR\AutoFirma\AutoFirma.exe "%1"'
 
 	; Eliminamos los certificados generados en caso de que existan por una instalacion previa
 	IfFileExists "$INSTDIR\AutoFirma\AutoFirma_ROOT.cer" 0 +1
@@ -609,6 +608,7 @@ Section "uninstall"
 	DeleteRegKey HKEY_CLASSES_ROOT "afirma"
 	
 	;Borramos las claves de registro en las que se almacenan las preferencias de la aplicacion
+	DeleteRegKey HKCU "SOFTWARE\JavaSoft\Prefs\es\gob\afirma\ui"
 	DeleteRegKey HKCU "SOFTWARE\JavaSoft\Prefs\es\gob\afirma\standalone"
 	DeleteRegKey /ifempty HKCU "SOFTWARE\JavaSoft\Prefs\es\gob\afirma"
 	DeleteRegKey /ifempty HKCU "SOFTWARE\JavaSoft\Prefs\es\gob"

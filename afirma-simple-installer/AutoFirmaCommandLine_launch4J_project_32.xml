@@ -27,12 +27,12 @@
     <opt>-DdisableSslChecks=true</opt>
   </jre>
   <versionInfo>
-    <fileVersion>1.5.0.3</fileVersion>
-    <txtFileVersion>1.5.0</txtFileVersion>
+    <fileVersion>1.6.0.3</fileVersion>
+    <txtFileVersion>1.6.0</txtFileVersion>
     <fileDescription>AutoFirma</fileDescription>
     <copyright>Gobierno de España</copyright>
-    <productVersion>1.5.0.3</productVersion>
-    <txtProductVersion>1.5.0</txtProductVersion>
+    <productVersion>1.6.0.3</productVersion>
+    <txtProductVersion>1.6.0</txtProductVersion>
     <productName>AutoFirma</productName>
     <companyName>Gobierno de España</companyName>
     <internalName>AutoFirma</internalName>

@@ -23,8 +23,8 @@
     <jdkPreference>preferJre</jdkPreference>
     <runtimeBits>64/32</runtimeBits>
     <initialHeapSize>512</initialHeapSize>
-    <maxHeapSize>2048</maxHeapSize>
-    <opt>-DdisableSslChecks=true</opt>
+    <maxHeapSize>1536</maxHeapSize>
+    <opt>-Xms512m -Xmx1536m</opt>
   </jre>
   <splash>
     <file>splash.bmp</file>
@@ -33,18 +33,18 @@
     <timeoutErr>false</timeoutErr>
   </splash>
   <versionInfo>
-    <fileVersion>1.5.0.3</fileVersion>
-    <txtFileVersion>1.5.0</txtFileVersion>
+    <fileVersion>1.6.0.0</fileVersion>
+    <txtFileVersion>1.6.0</txtFileVersion>
     <fileDescription>AutoFirma</fileDescription>
     <copyright>Gobierno de España</copyright>
-    <productVersion>1.5.0.3</productVersion>
-    <txtProductVersion>1.5.0</txtProductVersion>
+    <productVersion>1.6.0.0</productVersion>
+    <txtProductVersion>1.6.0</txtProductVersion>
     <productName>AutoFirma</productName>
     <companyName>Gobierno de España</companyName>
     <internalName>AutoFirma</internalName>
     <originalFilename>AutoFirma.exe</originalFilename>
     <trademarks></trademarks>
-    <language>ENGLISH_US</language>
+    <language>CASTILIAN_SPANISH</language>
   </versionInfo>
   <messages>
     <startupErr>Ocurrió un error mientras arrancaba la aplicación.</startupErr>

@@ -6,7 +6,7 @@
 	<groupId>es.gob.afirma</groupId>
 	<artifactId>afirma-ui-simpleafirma</artifactId>
 	<name>afirma-ui-simpleafirma</name>
-	<version>3.3.2-SNAPSHOT</version>
+	<version>1.6-SNAPSHOT</version>
 
 	<properties>
         <project.build.sourceEncoding>utf-8</project.build.sourceEncoding>
@@ -15,12 +15,6 @@
         <afirma.keytool.password>afirma</afirma.keytool.password>
 	</properties>
 
-	<repositories>
-		<repository>
-			<id>uji</id>
-			<url>http://devel.uji.es/nexus/content/groups/public/</url>
-		</repository>
-	</repositories>
 	<dependencies>
 	    
 	    <dependency>
@@ -184,7 +178,7 @@
 			<artifactId>bcpkix-jdk15on</artifactId>
 			<version>1.56.0.0</version>
 		</dependency>
-				
+
 		<dependency>
 			<groupId>es.gob</groupId>
 			<artifactId>jmulticard-jse</artifactId>

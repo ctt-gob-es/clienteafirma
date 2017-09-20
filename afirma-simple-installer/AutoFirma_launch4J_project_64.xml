@@ -2,8 +2,8 @@
 <launch4jConfig>
   <dontWrapJar>false</dontWrapJar>
   <headerType>gui</headerType>
-  <jar>AutoFirma.jar</jar>
-  <outfile>AutoFirma.exe</outfile>
+  <jar>C:\Users\carlos.gamuci\Documents\Afirma\SVN_GitHub\clienteafirma\afirma-simple\target\AutoFirma.jar</jar>
+  <outfile>C:\Users\carlos.gamuci\Desktop\AutoFirma.exe</outfile>
   <errTitle>Error: Se ha superado el tiempo de espera antes de recibir peticiones.</errTitle>
   <cmdLine></cmdLine>
   <chdir>.</chdir>
@@ -31,18 +31,18 @@
     <timeoutErr>false</timeoutErr>
   </splash>
   <versionInfo>
-    <fileVersion>1.5.0.3</fileVersion>
-    <txtFileVersion>1.5.0</txtFileVersion>
+    <fileVersion>1.6.0.0</fileVersion>
+    <txtFileVersion>1.6.0</txtFileVersion>
     <fileDescription>AutoFirma</fileDescription>
     <copyright>Gobierno de España</copyright>
-    <productVersion>1.5.0.3</productVersion>
-    <txtProductVersion>1.5.0</txtProductVersion>
+    <productVersion>1.6.0.0</productVersion>
+    <txtProductVersion>1.6.0</txtProductVersion>
     <productName>AutoFirma</productName>
     <companyName>Gobierno de España</companyName>
     <internalName>AutoFirma</internalName>
     <originalFilename>AutoFirma.exe</originalFilename>
     <trademarks></trademarks>
-    <language>ENGLISH_US</language>
+    <language>CASTILIAN_SPANISH</language>
   </versionInfo>
   <messages>
     <startupErr>Ocurrió un error mientras arrancaba la aplicación.</startupErr>

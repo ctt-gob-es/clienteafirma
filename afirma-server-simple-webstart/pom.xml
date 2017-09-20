@@ -7,7 +7,7 @@
 	<packaging>war</packaging>
 	<artifactId>afirma-server-simpleafirma-webstart</artifactId>
 	<name>afirma-server-simpleafirma-webstart</name>
-	<version>3.3.2-SNAPSHOT</version>
+	<version>1.6-SNAPSHOT</version>
 
 	<properties>
 		<project.build.sourceEncoding>utf-8</project.build.sourceEncoding>

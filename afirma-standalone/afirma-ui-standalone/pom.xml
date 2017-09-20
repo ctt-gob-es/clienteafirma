@@ -6,7 +6,7 @@
 	<groupId>es.gob.afirma</groupId>
 	<artifactId>afirma-ui-standalone</artifactId>
 	<name>afirma-ui-standalone</name>
-	<version>3.3.2-SNAPSHOT</version>
+	<version>2.2-SNAPSHOT</version>
 
 	<properties>
         <project.build.sourceEncoding>utf-8</project.build.sourceEncoding>

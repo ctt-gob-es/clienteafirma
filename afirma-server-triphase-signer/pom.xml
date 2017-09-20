@@ -5,7 +5,7 @@
 	<groupId>es.gob.afirma</groupId>
 	<artifactId>afirma-server-triphase-signer</artifactId>
 	<name>afirma-server-triphase-signer</name>
-	<version>3.3.2-SNAPSHOT</version>
+	<version>1.6-SNAPSHOT</version>
 	<packaging>war</packaging>
 
 	<properties>

@@ -5,7 +5,7 @@
 	<groupId>es.gob.afirma</groupId>
 	<artifactId>afirma-server-triphase-signer-core</artifactId>
 	<name>afirma-server-triphase-signer-core</name>
-	<version>3.3.2-SNAPSHOT</version>
+	<version>1.6-SNAPSHOT</version>
 
 	<properties>
 		<project.build.sourceEncoding>utf-8</project.build.sourceEncoding>
@@ -52,8 +52,8 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.6.1</version>
 				<configuration>
-					<source>1.6</source>
-					<target>1.6</target>
+					<source>1.7</source>
+					<target>1.7</target>
 					<fork>true</fork>
 					<compilerArgs>
 -						<arg>-Xbootclasspath:${java.home}/lib/jsse.jar${path.separator}${java.home}/lib/rt.jar${path.separator}${java.home}/lib/jce.jar</arg>

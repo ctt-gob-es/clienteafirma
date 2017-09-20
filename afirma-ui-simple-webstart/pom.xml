@@ -6,7 +6,7 @@
 	<groupId>es.gob.afirma</groupId>
 	<artifactId>afirma-ui-simpleafirma-webstart</artifactId>
 	<name>afirma-ui-simpleafirma-webstart</name>
-	<version>3.3.2-SNAPSHOT</version>
+	<version>1.6-SNAPSHOT</version>
 
 	<properties>
 		<project.build.sourceEncoding>utf-8</project.build.sourceEncoding>
@@ -15,9 +15,16 @@
 		<afirma.keytool.password>afirma</afirma.keytool.password>
 	</properties>
 
-	<dependencies>
+	<profiles>
+	
+		<profile>
+			<id>env-dev</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+	      	</activation>
 
-		<dependency>
+		<dependencies>
+		 <dependency>
 		 	 <groupId>es.gob.afirma</groupId>
 		 	 <artifactId>afirma-ui-simpleafirma</artifactId>
 		 	 <version>${project.version}</version>
@@ -63,9 +70,9 @@
 		 	<systemPath>${java.home}/lib/javaws.jar</systemPath>
 		 </dependency>
 
-	</dependencies>
-
-	<build>
+		</dependencies>
+		
+		<build>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -125,6 +132,7 @@
 								<include>properties/protocolmessages.properties</include>
 								<include>properties/simpleafirmamessages.properties</include>
 								<include>properties/updater.properties</include>
+								<include>properties/preferences.properties</include>
                     			<include>resources/afirma_ico.png</include>
                     		</includes>
 						</filter>
@@ -153,7 +161,7 @@
 				</configuration>
 				
 			</plugin>
-<!--
+
 			<plugin>
 				<groupId>com.github.wvengen</groupId>
 				<artifactId>proguard-maven-plugin</artifactId>
@@ -184,7 +192,7 @@
 					</dependency>
 				</dependencies>
 			</plugin>
--->
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
@@ -207,4 +215,171 @@
 
 		</plugins>
 	</build>
+	</profile>
+
+
+	<!-- Construccion para el despliegue como aplicacion WebStart completa, con la misma funcionalidad
+	 que la aplicacion nativa (aunque no acepte las llamadas por protocolo). -->
+	<profile>
+			<id>compile-complete</id>
+			<activation>
+			 <property>
+	          <name>compile</name>
+	          <value>complete</value>
+	         </property>
+	      	</activation>
+
+		<dependencies>
+		 <dependency>
+		 	 <groupId>es.gob.afirma</groupId>
+		 	 <artifactId>afirma-ui-simpleafirma</artifactId>
+		 	 <version>${project.version}</version>
+		 </dependency>
+
+		 <dependency>
+		 	 <groupId>es.gob.afirma</groupId>
+		 	 <artifactId>afirma-ui-simpleafirma-configurator</artifactId>
+		 	 <version>${project.version}</version>
+		 	 <scope>provided</scope>
+		 </dependency>
+
+		<dependency>
+			<groupId>javax.jnlp</groupId>
+		 	<artifactId>jnlp-api</artifactId>
+		 	<version>8.0</version>
+			<scope>system</scope>
+		 	<systemPath>${java.home}/lib/javaws.jar</systemPath>
+		 </dependency>
+
+		</dependencies>
+
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.1</version>
+				<configuration>
+					<source>1.8</source>
+					<target>1.8</target>
+					<fork>true</fork>
+					<compilerArgument>-XDignore.symbol.file</compilerArgument>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-shade-plugin</artifactId>
+				<version>1.6</version>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>shade</goal>
+						</goals>
+						<configuration>
+							<transformers>
+								<transformer
+									implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+									<manifestEntries>
+										<Application-Name>AutoFirma</Application-Name>
+										<Main-Class>es.gob.afirma.standalone.ws.AutoFirmaWebStart</Main-Class>
+										<Permissions>all-permissions</Permissions>
+									</manifestEntries>
+								</transformer>
+							</transformers>
+						</configuration>
+					</execution>
+				</executions>
+				<configuration>
+					<archive>
+						<addMavenDescriptor>false</addMavenDescriptor>
+					</archive>
+					<filters>
+						<filter>
+							<artifact>*:*</artifact>
+							<excludes>
+								<exclude>META-INF/*.SF</exclude>
+								<exclude>META-INF/*.DSA</exclude>
+								<exclude>META-INF/*.RSA</exclude>
+								<exclude>*.crt</exclude>
+							</excludes>
+						</filter>
+						<filter>
+							<artifact>es.gob.afirma:afirma-ui-simpleafirma</artifact>
+							<excludes>
+								<exclude>windows/**</exclude>
+								<exclude>linux/**</exclude>
+								<exclude>osx/**</exclude>
+							</excludes>
+						</filter>
+						<filter>
+							<artifact>net.java.xades:jxades</artifact>
+							<excludes>
+								<exclude>TrustRootCACertificates/**</exclude>
+								<exclude>*.*</exclude>
+							</excludes>
+						</filter>
+					</filters>
+				</configuration>
+				
+			</plugin>
+<!-- 
+			<plugin>
+				<groupId>com.github.wvengen</groupId>
+				<artifactId>proguard-maven-plugin</artifactId>
+				<version>2.0.13</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>proguard</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<proguardVersion>5.2</proguardVersion>
+					<injar>${project.build.finalName}.jar</injar>
+					<outputDirectory>${project.build.directory}</outputDirectory>
+					<proguardInclude>${basedir}/proguard.conf</proguardInclude>
+					<libs>
+						<lib>${java.home}/lib/rt.jar</lib>
+						<lib>${java.home}/lib/jsse.jar</lib>
+						<lib>${java.home}/lib/jce.jar</lib>
+					</libs>
+				</configuration>
+				<dependencies>
+					<dependency>
+						<groupId>net.sf.proguard</groupId>
+						<artifactId>proguard-base</artifactId>
+						<version>5.2</version>
+					</dependency>
+				</dependencies>
+			</plugin>
+ -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>2.4</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>sign</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<keystore>${afirma.keytool.keystore}</keystore>
+					<alias>${afirma.keytool.alias}</alias>
+					<storepass>${afirma.keytool.password}</storepass>
+					<signedjar>${project.build.directory}/${project.build.finalName}-signed.jar</signedjar>
+					<verify>true</verify>
+				</configuration>
+			</plugin>
+
+		</plugins>
+	</build>
+		</profile>
+
+	</profiles>
 </project>

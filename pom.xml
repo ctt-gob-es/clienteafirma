@@ -4,7 +4,7 @@
 
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>es.gob.afirma</groupId>
-	<version>3.3.2-SNAPSHOT</version>
+	<version>1.6-SNAPSHOT</version>
 	<artifactId>afirma-client</artifactId>
 	<packaging>pom</packaging>
 	<name>afirma-client</name>
@@ -48,29 +48,11 @@
 		<module>afirma-server-triphase-signer-core</module>
 		<module>afirma-server-triphase-signer-document</module>
 	</modules>
-	
-	<repositories>
-		<repository>
-			<id>uji</id>
-			<url>http://devel.uji.es/nexus/content/groups/public/</url>
-		</repository>
-	</repositories>
-	
+
 	<scm>
 		<connection>scm:git:https://github.com/ctt-gob-es/clienteafirma</connection>
 		<url>https://github.com/ctt-gob-es/clienteafirma</url>
 	</scm>
-
-	<distributionManagement>
-		<repository>
-			<id>nexus</id>
-			<url>http://devel01.uji.es:8080/nexus/content/repositories/releases</url>
-		</repository>
-		<snapshotRepository>
-			<id>nexus</id>
-			<url>http://devel01.uji.es:8080/nexus/content/repositories/snapshots</url>
-		</snapshotRepository>
-	</distributionManagement>
 
 	<dependencies>
 		<dependency>

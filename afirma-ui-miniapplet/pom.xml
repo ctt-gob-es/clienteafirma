@@ -6,7 +6,7 @@
 	<groupId>es.gob.afirma</groupId>
 	<artifactId>afirma-ui-miniapplet</artifactId>
 	<name>afirma-ui-miniapplet</name>
-	<version>3.3.2-SNAPSHOT</version>
+	<version>1.6-SNAPSHOT</version>
 
 	<properties>
 		<project.build.sourceEncoding>utf-8</project.build.sourceEncoding>
@@ -14,7 +14,7 @@
 		<afirma.keytool.alias>codesign</afirma.keytool.alias>
 		<afirma.keytool.password>afirma</afirma.keytool.password>
 		<afirma.jar.name>miniapplet-full</afirma.jar.name>
-		<afirma.legible.version>1_5</afirma.legible.version>
+		<afirma.legible.version>1_6</afirma.legible.version>
 	</properties>
 
 	<profiles>
