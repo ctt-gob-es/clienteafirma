@@ -149,6 +149,7 @@ public final class SignPdfDialog extends JDialog implements PdfLoaderListener, S
 	@Override
 	public void positionSelected(final Properties extraParams) {
 		setVisible(false);
+		LOGGER.info("Propiedades establecidas mediante GUI: " + extraParams); //$NON-NLS-1$
 		this.listener.propertiesCreated(extraParams);
 		dispose();
 	}
