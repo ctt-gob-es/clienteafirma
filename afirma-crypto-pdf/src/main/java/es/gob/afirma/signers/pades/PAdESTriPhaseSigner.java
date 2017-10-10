@@ -139,7 +139,7 @@ public final class PAdESTriPhaseSigner {
 	private static final String PDF_DESC = "Documento en formato PDF"; //$NON-NLS-1$
 
     /** Referencia a la &uacute;ltima p&aacute;gina del documento PDF. */
-    public static final int LAST_PAGE = -666;
+    public static final int LAST_PAGE = -1;
 
     /** Versi&oacute;n de iText necesaria para el uso de esta clase (2.1.7). */
     public static final String ITEXT_VERSION = "2.1.7"; //$NON-NLS-1$
