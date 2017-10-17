@@ -767,8 +767,7 @@ var MiniApplet = ( function ( window, undefined ) {
 					if (successCallback == undefined || successCallback == null) {
 						return filenameDataBase64Pair.substring(sepPos + 1);
 					}
-					var singlePair = [filenameDataBase64Pair];
-					successCallback(singlePair);
+					successCallback(filenameDataBase64Pair.substring(0, sepPos), filenameDataBase64Pair.substring(sepPos + 1));
 				} catch(e) {
 					if (errorCallback == undefined || errorCallback == null) {
 						throw e;
@@ -798,11 +797,25 @@ var MiniApplet = ( function ( window, undefined ) {
 			if (clientType == TYPE_APPLET) {
 				
 				try {
-					
 					var filenameDataBase64Pairs = buildData(clienteFirma.getMultiFileNameContentBase64(title, extensions, description, filePath));
-					
-					successCallback(filenameDataBase64Pairs)
-					
+					if (successCallback == undefined || successCallback == null) {
+						return filenameDataBase64Pairs;
+					}
+
+					var fileNameArray = new Array();
+					var dataB64Array = new Array();
+					for (i = 0; i < filenameDataBase64Pairs.length; i++) {
+						var sepPos = filenameDataBase64Pairs[i].indexOf("|");
+						if (sepPos == -1) {
+							fileNameArray.push(filenameDataBase64Pairs[i]);
+							dataB64Array.push("");
+						}
+						else {
+							fileNameArray.push(filenameDataBase64Pairs[i].substring(0, sepPos));
+							dataB64Array.push(filenameDataBase64Pairs[i].substring(sepPos + 1));
+						}
+					}
+					successCallback(fileNameArray, dataB64Array);
 				} catch(e) {
 					if (errorCallback == undefined || errorCallback == null) {
 						throw e;
@@ -817,8 +830,9 @@ var MiniApplet = ( function ( window, undefined ) {
 		
 		var getCurrentLog = function (successCallback, errorCallback) {
 			forceLoad();
-			
-			var error =	" === JAVASCRIPT INFORMATION === " +
+						
+			if (clientType == TYPE_APPLET) {
+				var log = " === JAVASCRIPT INFORMATION === " +
 				"\nnavigator.appCodeName: " + navigator.appCodeName +
 				"\nnavigator.appName: " +  navigator.appName +
 				"\nnavigator.appVersion: " + navigator.appVersion +
@@ -827,26 +841,21 @@ var MiniApplet = ( function ( window, undefined ) {
 				"\nnavigator.javaEnabled(): " + navigator.javaEnabled() +
 				"\nscreen.width: " + (window.screen ? screen.width : 0) +
 				"\nscreen.height: " + (window.screen ? screen.height : 0) +
-				"\n\n   === CLIENTE LOG === \n" + 
-				clienteFirma.getCurrentLog();
-			
-			if (clientType == TYPE_APPLET) {
+				"\n\n   === CLIENTE LOG === \n";
 				try {
-					
-					var log = buildData(clienteFirma.getCurrentLog());
-					
-					if (successCallback == undefined || successCallback == null) {
-						return filenameDataBase64Pair.substring(sepPos + 1);
-					}
-					
-					successCallback(log);
-					
+					log += buildData(clienteFirma.getCurrentLog());
 				} catch(e) {
 					if (errorCallback == undefined || errorCallback == null) {
 						throw e;
 					}
-					errorCallback(error);
+					errorCallback(clienteFirma.getErrorType(), clienteFirma.getErrorMessage());
+					return;
 				}
+				
+				if (successCallback == undefined || successCallback == null) {
+					return log;
+				}
+				successCallback(log);
 			}
 			else {
 				clienteFirma.getCurrentLog(successCallback, errorCallback)
@@ -1158,7 +1167,7 @@ var MiniApplet = ( function ( window, undefined ) {
 			// esta version
 			if (!avoidJnlpLoad && !needNativeAppInstalled() && !!jnlpServiceAddress) {
 				// Aplicamos un retardo en la carga de la aplicacion WebStart para dar tiempo a cargar la pagina
-				var jnlpUrl = "jnlp" + jnlpServiceAddress.substring(4) + "?os=" + getOSName() + "&arg=" + encodeURIComponent("afirma://service?op=install");
+				var jnlpUrl = "jnlp" + jnlpServiceAddress.substring(4) + "?os=" + getOSName() + "&arg=" + Base64.encode("afirma://service?op=install", true);
 				setTimeout(openUrl, 2000, jnlpUrl);
 			}
 		}
@@ -1493,7 +1502,7 @@ var MiniApplet = ( function ( window, undefined ) {
 				// Si no se dan las condiciones que requieren el uso de la aplicacion nativa,
 				// por entorno y si se ha configurado la URL del servicio, cargamos la version JNLP
 				if (!needNativeAppInstalled() && !!jnlpServiceAddress) {
-					openUrl("jnlp" + jnlpServiceAddress.substring(4) + "?os=" + getOSName() + "&arg=" + encodeURIComponent("afirma://service?ports=" + portsLine + "&amp;v=" + PROTOCOL_VERSION + "&amp;idsession=" + idSession));
+					openUrl("jnlp" + jnlpServiceAddress.substring(4) + "?os=" + getOSName() + "&arg=" + Base64.encode("afirma://service?ports=" + portsLine + "&amp;v=" + PROTOCOL_VERSION + "&amp;idsession=" + idSession, true));
 				}
 				// En caso contrario, cargamos la version nativa
 				else {
@@ -1937,12 +1946,22 @@ var MiniApplet = ( function ( window, undefined ) {
 				}
 				
 				// Vengo de getCurrentLog
-				if (data.indexOf("<log>") > 0) {
-					successCallback(data);
+				if (data.length > 150 && data.substr(0, 150).indexOf("<log>") != -1) {
+					var log = " === JAVASCRIPT INFORMATION === " +
+					"\nnavigator.appCodeName: " + navigator.appCodeName +
+					"\nnavigator.appName: " +  navigator.appName +
+					"\nnavigator.appVersion: " + navigator.appVersion +
+					"\nnavigator.platform: " + navigator.platform +
+					"\nnavigator.userAgent: " + navigator.userAgent+
+					"\nnavigator.javaEnabled(): " + navigator.javaEnabled() +
+					"\nscreen.width: " + (window.screen ? screen.width : 0) +
+					"\nscreen.height: " + (window.screen ? screen.height : 0) +
+					"\n\n   === CLIENTE LOG === \n" + data;
+					successCallback(log);
 					return;
 				}
 				
-				// Compruebo si se trata de una operacin de carga/multicarga (load).
+				// Compruebo si se trata de una operacion de carga/multicarga (load).
 				// El separador "|"  distingue los pares "filename-1:dataBase64-1|filename-2:dataBase64-2...", uno por cada archivo cargado.
 				// Devolveremos un array en el que cada posicion sera uno de estos pares: "filename-n:dataBase64-n".
 				// La funcion de callback realizara el tratamiento deseado,
@@ -2292,7 +2311,7 @@ var MiniApplet = ( function ( window, undefined ) {
 			 * Implementada en el applet Java de firma
 			 */
 			function selectCertificate (extraParams, successCallback, errorCallback) {
-				throwException(UnsupportedOperationException, "La operacion de seleccion de certificados no esta soportada");
+				throwException("java.lang.UnsupportedOperationException", "La operacion de seleccion de certificados no esta soportada");
 			}
 			
 			/**
@@ -2779,8 +2798,7 @@ var MiniApplet = ( function ( window, undefined ) {
 				// Si no se pide cargar la aplicacion nativa, ni el entorno lo requiere y
 				// si se ha configurado el servicio JNLP, cargamos la aplicacion JNLP
 				if (!needNativeAppInstalled() && !!jnlpServiceAddress) {
-					// En las llamadas al JNLP sustituimos los ampersands para que no den problemas al formar el JNLP
-					openUrl("jnlp" + jnlpServiceAddress.substring(4) + "?os=" + getOSName() + '?arg=' + encodeURIComponent(intentURL));
+					openUrl("jnlp" + jnlpServiceAddress.substring(4) + "?os=" + getOSName() + '&arg=' + Base64.encode(intentURL, true));
 				}
 				// En caso contrario, desplegamos la version nativa
 				else {
